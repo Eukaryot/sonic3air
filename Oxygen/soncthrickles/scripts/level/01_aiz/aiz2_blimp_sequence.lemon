@@ -1,0 +1,555 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0502c6) end(0x050348)
+function void fn0502c6()
+{
+	// This does the auto-scrolling!
+
+	u16[0xffffeebc] = 0
+	D0.u16 = camera.position.x.u16 + 4
+	if (D0.u16 >= u16[0xffffeed4] - getScreenExtend() * 2)
+	{
+		D1.u16 = 0x0200
+		u16[0xffffeebc] = D1.u16
+		u16[0xffffb010] -= D1.u16
+		u16[0xffffb05a] -= D1.u16
+
+	#if STANDALONE
+		// Also update position backup data (e.g. for after-images)
+		for (u32 address = 0xffffe500; address < 0xffffe600; address += 4)
+			u16[address] -= D1.u16
+	#endif
+
+		D0.u16 = camera.position.x.u16 - D1.u16
+		D1.u16 = (D0.u16 & 0xfff0) - 0x10
+		camera.foreground.x.old = D1.u16
+		u16[0xffffa9fe] = D1.u16
+	}
+
+	camera.position.x.u16 = D0.u16
+	camera.foreground.x.u16 = D0.u16
+	move_area.left = D0.u16
+	move_area.right = D0.u16
+
+	D1.u16 = D0.u16
+	A1 = 0xffffb000
+	fn050318()
+
+	D0.u16 = D1.u16
+	A1 = 0xffffb04a
+	fn050318()
+}
+
+
+function void fn050318()
+{
+	if (u8[A1 + 0x20] == 5)
+		u8[A1 + 0x20] = 0
+
+	D0.u16 += 0x18
+	if (objA1.position.x.u16 < D0.u16)
+	{
+		objA1.position.x.u16 = D0.u16
+		u16[A1 + 0x1c] = 0x0400
+	}
+	else
+	{
+		D0.u16 += 0x88 + getScreenExtend()
+		if (objA1.position.x.u16 >= D0.u16)
+		{
+			objA1.position.x.u16 = D0.u16
+		}
+	}
+}
+
+
+//# address-hook(0x05034a) end(0x05038c)
+function void fn05034a()
+{
+	objA0.update_address = 0x050390
+	u32[A0 + 0x2e] = 0x23c0a6
+	s16[A0 + 0x32] = 0x01a4		// Time until first bomb drop
+#if STANDALONE
+	if (Game.getSetting(SETTING_AIZ_BLIMPSEQUENCE))
+	{
+		s16[A0 + 0x32] = 0x0120 - 0x50
+	}
+#endif
+
+	D1.u16 = 0x3fbc
+	D2 = 1
+	while (D2.s16 >= 0)
+	{
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		objA1.update_address = 0x050426
+		u16[A1 + 0x2e] = D1.u16
+		D1.u16 = 0x3dcc
+		--D2.s16
+	}
+
+	// Loads palette colors 0x10 .. 0x1f
+	copyMemory(0xfffffc20, 0x23c05a, 0x20)
+
+	fn050390()
+}
+
+
+//# address-hook(0x050390) end(0x050424)
+function void fn050390()
+{
+	// Blimp movement
+#if STANDALONE
+	if (Game.getSetting(SETTING_AIZ_BLIMPSEQUENCE))
+	{
+		u32[0xffffee98] -= 0x10000
+	}
+	else
+	{
+		u32[0xffffee98] -= 0x8800 + ((getScreenExtend() / 4) << 8)
+	}
+#else
+	u32[0xffffee98] -= 0x8800
+#endif
+
+	if (u16[0xffffee98] < 0x3cdc)
+	{
+		objA0.update_address = 0x0506be
+		u8[0xffffeec4] = 0xff
+		if (allocDynamicObjectAfterA0())
+		{
+			// Spawn the tree spawner
+			objA1.update_address = 0x050614
+		}
+		return
+	}
+
+	D1.u16 = u16[0xffffee98]
+	D0.u16 = u16[0xffffee98] - 0x3d5c
+	if (D0.s16 < 0)
+	{
+		u16[0xffffee9c] = u16[0xffffeea2] + ((-D0.s16) >> 1)
+	}
+	else
+	{
+		D1.u16 = (D1.u16 >> 2) & 0x0f
+		u16[0xffffee9c] = u16[0xffffeea2] + u8[0x23c096 + D1.s16]
+	}
+
+	D0.u16 = (level.framecounter - 1) & 0x0f
+	if (D0.u16 == 0)
+	{
+		playSound(0xbd)
+	}
+
+	--s16[A0 + 0x32]
+	if (s16[A0 + 0x32] == -1)	// Do not check for (s16[A0 + 0x32] < 0) here, as this would lead to different behaviour
+	{
+		// Table with bomb spawn data from 0x23c0a6 on;
+		// consists of 21 entries with the following 2 words each:
+		//  - Frames until next bomb drop (0x20 or 0x40)
+		//  - Position offset, e.g. 0x3f5c
+		A2 = u32[A0 + 0x2e]
+		objA0.value32 = u16[A2]
+
+		if (s16[A0 + 0x32] >= 0)
+		{
+			if (allocDynamicObjectAfterA0())
+			{
+				// Spawn bomb
+				objA1.update_address = 0x05047c
+				u16[A1 + 0x2e] = u16[A2+2]
+
+				u32[A0 + 0x2e] += 4
+			}
+		}
+	}
+}
+
+
+
+// Blimp object
+
+//# address-hook(0x050426) end(0x050452)
+function void fn050426()
+{
+	objA0.update_address = 0x050458
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.y = 0x20
+	objA0.box_size.x = 0x08
+	objA0.sprite_priority = 0x80
+	objA0.sprite_attributes = 0x0500
+	objA0.mapping_offset = 0x23c182
+	u16[A0 + 0x30] = 0x0a71
+
+	fn050458()
+}
+
+
+//# address-hook(0x050458) end(0x050476)
+function void fn050458()
+{
+	if (u16[0xffffeec0] == 0x0c)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		Object.animationUpdate(0x23c1aa)
+		fn05057a()
+		DrawObject()
+	}
+}
+
+
+
+// Bomb from the blimp
+
+//# address-hook(0x05047c) end(0x0504ae)
+function void fn05047c()
+{
+	objA0.update_address = 0x0504b4
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x18
+	objA0.sprite_priority = 0x80
+	objA0.sprite_attributes = 0x0500
+	objA0.mapping_offset = 0x23c1b2
+	objA0.hitbox_extends.y = 0x10
+	u16[A0 + 0x30] = 0x0a60
+	objA0.value32 = 0x06
+
+	fn0504b4()
+}
+
+
+//# address-hook(0x0504b4) end(0x0504ba)
+function void fn0504b4()
+{
+	D0 = objA0.base_state
+	call 0x0504be + D0.u16
+}
+
+//# address-hook(0x0504be) end(0x0504be)
+function void fn0504be()
+{
+	fn0504ca()
+}
+
+//# address-hook(0x0504c2) end(0x0504c2)
+function void fn0504c2()
+{
+	fn0504dc()
+}
+
+//# address-hook(0x0504c6) end(0x0504c6)
+function void fn0504c6()
+{
+	fn0504f8()
+}
+
+
+//# address-hook(0x0504ca) end(0x0504da)
+function void fn0504ca()
+{
+	u16[A0 + 0x30] += 2
+	if (u16[A0 + 0x30] >= 0x0a80)
+	{
+		objA0.base_state += 4
+	}
+	fn0504ee()
+}
+
+
+//# address-hook(0x0504dc) end(0x0504e8)
+function void fn0504dc()
+{
+	--objA0.value32
+	if (objA0.value32 == 0)
+	{
+		objA0.base_state += 4
+		playSound(0x51)
+	}
+	fn0504ee()
+}
+
+
+//# address-hook(0x0504ee) end(0x0504f2)
+function void fn0504ee()
+{
+	fn05057a()
+	DrawObject()
+}
+
+
+//# address-hook(0x0504f8) end(0x050578)
+function void fn0504f8()
+{
+	objA0.position.y += u32[A0 + 0x1a]
+	u32[A0 + 0x1a] += 0x2000
+
+	D0 = objA0.position.y.u16
+	fn050586()
+
+	DrawObject()
+	CheckGroundCollision()
+	if (D1.s16 <= -8)
+	{
+		camera.screenshake.state = 0x10
+		playSound(0x4e)
+
+		if (allocDynamicObjectAfterA0())
+		{
+			A2 = 0x23c0fc
+			D1 = 7
+
+			while (D1.s16 >= 0)
+			{
+				// Spawn explosion effect
+				objA1.update_address = 0x0505a4
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16
+				D2.u16 = u16[(A2+=2)-2]
+				objA1.position.x.u16 += D2.u16
+				D2.u16 = u16[(A2+=2)-2]
+				objA1.position.y.u16 += D2.u16
+				u16[A1 + 0x20] = u16[(A2+=2)-2]
+				u16[A1 + 0x2e] = u16[(A2+=2)-2]
+
+				if (!allocDynamicObjectAfterA1())
+					break
+
+				--D1.s16
+			}
+		}
+
+		objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	}
+}
+
+
+//# address-hook(0x05057a) end(0x050582)
+function void fn05057a()
+{
+	D0.u16 = u16[A0 + 0x30] - u16[0xffffee9c] + camera.foreground.y.u16
+	fn050586()
+}
+
+
+//# address-hook(0x050586) end(0x0505a2)
+function void fn050586()
+{
+	objA0.position.x.u16 = objA0.countdown_value - u16[0xffffee98] + camera.foreground.x.u16
+	objA0.position.y.u16 = D0.u16 + camera.screenshake.offset - camera.screenshake.prev_offset
+}
+
+
+
+// Bomb explosion effect
+
+//# address-hook(0x0505a4) end(0x0505da)
+function void fn0505a4()
+{
+	D0.u16 = u16[0xffffeebc]
+	objA0.position.x.u16 -= D0.u16
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.update_address = 0x0505dc
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x20
+	objA0.sprite_attributes = 0x0500
+	objA0.mapping_offset = 0x23c1b2
+	u8[A0 + 0x28] = 0x8b
+
+	fn0505e4()
+}
+
+
+//# address-hook(0x0505dc) end(0x0505e0)
+function void fn0505dc()
+{
+	objA0.position.x.u16 -= u16[0xffffeebc]
+	fn0505e4()
+}
+
+
+//# address-hook(0x0505e4) end(0x05060e)
+function void fn0505e4()
+{
+	A1 = 0x23c22a
+	Object.AlternativeAnimationUpdate()
+
+	if (objA0.base_state != 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		D0 = objA0.state + 4
+		if (D0.u8 > objA0.animation.sprite)
+		{
+			AddAsDynamicObject()
+		}
+		DrawObject()
+	}
+}
+
+
+
+// Tree spawner, used just before AIZ 2 boss fight (S/T only)
+
+//# address-hook(0x050614) end(0x05062a)
+function void fn050614()
+{
+	if (camera.position.x.u16 < 0x44d0 - getScreenExtend() * 2)
+		return
+
+	objA0.update_address = 0x050632
+	objA0.countdown_value = u16[0xffffeeb6]
+	u32[A0 + 0x30] = 0x23c13c
+	fn050632()
+}
+
+
+//# address-hook(0x050632) end(0x050662)
+function void fn050632()
+{
+	A2 = u32[A0 + 0x30]
+	if (s16[A2] < 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	D0.s16 = u16[0xffffeeb6] - objA0.countdown_value
+	if (D0.s16 >= s16[A2] - getScreenExtend() / 3)	// Screen width dependency is just trial-and-error here
+	{
+		// Spawn a new tree
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x050664
+			objA1.sprite_priority = u16[A2+2]
+
+			u32[A0 + 0x30] = A2 + 4
+		}
+	}
+}
+
+
+
+// Tree in background just before AIZ 2 boss fight (S/T only)
+
+//# address-hook(0x050664) end(0x050684)
+function void fn050664()
+{
+	objA0.update_address = 0x05068a
+	objA0.sprite_attributes = 0x0438
+	objA0.mapping_offset = 0x23c248
+	objA0.position.y.u16 = 0xe9
+	objA0.countdown_value = 0x01c0
+	u16[A0 + 0x30] = u16[0xffffeeb6] + getScreenExtend() * 3	// Screen width dependency is just trial-and-error here
+	fn05068a()
+}
+
+
+//# address-hook(0x05068a) end(0x0506bc)
+function void fn05068a()
+{
+	if (camera.position.x.u16 >= 0x4880)
+	{
+		UnloadObject()
+		return
+	}
+
+	// Update position
+	D1.s16 = u16[0xffffeeb6] - u16[A0 + 0x30]
+	D1.u16 -= D1.s16 >> 2
+	D0.u16 = objA0.countdown_value - D1.u16
+	objA0.position.x.u16 = D0.u16
+
+	if (D0.u16 < 0x01c0 + getScreenExtend() * 2)
+	{
+		DrawObject()
+		//debugDrawRect(camera.position.x.u16 + objA0.position.x.u16 - 0x80, camera.position.y.u16 + objA0.position.y.u16 - 0xb0, 0x10, 0x60, 0xa0c0c0c0)
+	}
+}
+
+
+
+// Camera controller
+
+//# address-hook(0x0506be) end(0x0506fc)
+function void fn0506be()
+{
+	objA0.update_address = 0x050700
+	objA0.sprite_priority = 0x0300
+	objA0.sprite_attributes = 0x0500
+	objA0.mapping_offset = 0x23c264
+	objA0.position.x.u16 = 0x30
+	objA0.position.y.u16 = 0xd8
+	objA0.velocity.x = 0x05
+	objA0.countdown_value = 0
+
+	copyMemory(0xfffffc22, 0x23c07a, 0x1c)
+	fn050700()
+}
+
+
+//# address-hook(0x050700) end(0x05077c)
+function void fn050700()
+{
+	if (objA0.flags2e == 0)
+	{
+		if (camera.position.x.u16 < 0x4670 - getScreenExtend() * 2)
+			return
+
+		objA0.flags2e = 0xff
+	}
+
+#if STANDALONE
+	// Make sure move_area.left gets far enough to the right
+	if (objA0.position.x.u16 >= 0x02af)
+#else
+	if (objA0.position.x.u16 >= 0x0240)
+#endif
+	{
+		// Stop auto-scrolling now
+		player1.camera_lock = 0
+		level.special_scrolling = 0
+		u16[0xffffeebc] = 0
+		move_area.right = 0x6000
+		UnloadObject()
+		return
+	}
+
+	D1 = u32[A0 + 0x18]
+	objA0.position.x += D1
+	if (objA0.value2f == 0)
+	{
+		D1 -= 0x0e80
+		objA0.value2f = (D1.s32 <= -0x10000) ? 0xff : 0x00
+	}
+	else
+	{
+		D1 += 0x0e80
+	}
+
+	u32[A0 + 0x18] = D1
+	DrawObject()
+
+	D0.u16 = (level.framecounter - 1) & 0x0f
+	if (D0.u16 == 0)
+	{
+		playSound(0xbe)
+	}
+}

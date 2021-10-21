@@ -1,0 +1,322 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03fcd4) end(0x03fd22)
+function void fn03fcd4()
+{
+	D0 = objA0.subtype2c & 0x3f
+	u16[A0 + 0x30] = D0.u16 * 8
+	objA0.value32 = D0.u16 * 16
+
+	D0.u8 = objA0.subtype2c & 0xc0
+	if (D0.u8 == 0x40)
+	{
+		// Narrow stream of sand flowing to the side, Sonic is rolling / jumping
+		objA0.update_address = 0x03fe44
+		fn03fe44()
+	}
+	else if (D0.u8 == 0x80)
+	{
+		// Wide stream of sand flowing up or down, making Sonic tumble
+		objA0.update_address = 0x03ff80
+		fn03ff80()
+	}
+	else if (D0.u8 == 0xc0)
+	{
+		// This part of quicksand, or is quicksand actually just the same as sandflow?
+		objA0.update_address = 0x0400ca
+		fn0400ca()
+	}
+	else
+	{
+		// Narrow stream of sand flowing down, Sonic is rolling / jumping
+		objA0.update_address = 0x03fd28
+		fn03fd28()
+	}
+}
+
+
+//# address-hook(0x03fd28) end(0x03fd48)
+function void fn03fd28()
+{
+	D2.u16 = u16[A0 + 0x30]
+	D3.u16 = objA0.value32
+
+	A1 = 0xffffb000
+	D6 = 3
+	D5.u16 = control.player1
+	fn03fd4e()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	D5.u16 = control.tails
+	fn03fd4e()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03fd4e) end(0x03fe42)
+function void fn03fd4e()
+{
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + D2.u16
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
+	{
+		if (dx < 0x20 && dy < D3.u16)
+		{
+			if (u8[A1 + 0x2a] & 0x02 && (u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+			{
+				objA0.flags2a |= bit
+
+				u8[A1 + 0x1e] = 0x0e
+				u8[A1 + 0x1f] = 0x07
+				objA1.state = char.state.ROLLING
+				objA1.flags2a |= (char.flag.ROLLING | char.flag.ON_OBJECT)
+				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				u8[A1 + 0x2f] = 0
+				u8[A1 + 0x40] = 0
+				objA1.velocity.y >>= 1
+				objA1.velocity.x >>= 1
+			}
+		}
+	}
+	else
+	{
+		if (dx < 0x20 && dy < D3.u16)
+		{
+			if (u8[A1 + 0x2a] & 0x02)
+			{
+				// Check if jump button pressed
+				if (D5.u16 & CONTROL_ABC)
+				{
+					objA1.velocity.y = -0x800
+					playSound(0x62)
+				}
+
+			#if STANDALONE
+				bool pressInDirection = ((D5.u16 >> 8) & ((objA1.velocity.x < 0) ? CONTROL_LEFT : CONTROL_RIGHT)) != 0
+				if (pressInDirection)
+				{
+					// Give player a bit more control over movement speed
+					objA1.velocity.x = objA1.velocity.x * 3/4
+				}
+				else
+			#endif
+				{
+					objA1.velocity.x >>= 1
+				}
+
+				if (objA1.velocity.y < 0)
+				{
+					objA1.velocity.y += 0x68
+				}
+				else
+				{
+					objA1.velocity.y = (objA0.flags2a & 0x02) ? -0x198 : 0xa8
+				}
+				return
+			}
+		}
+
+		u8[A1 + 0x2a] &= ~0x08
+		objA0.flags2a &= ~bit
+	}
+}
+
+
+//# address-hook(0x03fe44) end(0x03fe6a)
+function void fn03fe44()
+{
+	D2.u16 = u16[A0 + 0x30]
+	D3.u16 = objA0.value32
+	A2 = A0 + 0x34
+
+	A1 = 0xffffb000
+	D6 = 3
+	D5.u16 = control.player1
+	fn03fe70()
+
+	++A2
+	A1 = 0xffffb04a
+	D6 = 4
+	D5.u16 = control.tails
+	fn03fe70()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03fe70) end(0x03ff7e)
+function void fn03fe70()
+{
+	if (u8[A2] != 0)
+	{
+		--u8[A2]
+		return
+	}
+
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
+
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		if (dx < D3.u16 && dy < 0x20)
+		{
+			if (u8[A1 + 0x2a] & 0x02 && (u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0)
+			{
+				u8[A1 + 0x2a] |= 0x08
+				objA0.flags2a |= (1 << D6.u8)
+				u8[A1 + 0x1e] = 0x0e
+				u8[A1 + 0x1f] = 0x07
+				u8[A1 + 0x20] = 0x02
+				u8[A1 + 0x2a] |= 0x04
+				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				u8[A1 + 0x2f] = 0
+				u8[A1 + 0x40] = 0
+				objA1.velocity.y >>= 1
+				objA1.velocity.x >>= 1
+			}
+		}
+	}
+	else
+	{
+		if (dx < D3.u16 && dy < 0x20)
+		{
+			if (u8[A1 + 0x2a] & 0x02)
+			{
+				D5.u16 &= 0x70
+				if (D5.u16 != 0)
+				{
+					objA1.velocity.y = 0x0400
+					u8[A1 + 0x2a] &= ~0x08
+					objA0.flags2a &= ~(1 << D6.u8)
+
+					u8[A2] = 0x1e
+					playSound(0x62)
+				}
+				else
+				{
+					objA1.velocity.y = 0
+				#if STANDALONE
+					// Give player a bit more control over movement speed
+					objA1.velocity.x = objA1.velocity.x * 3/4
+				#else
+					objA1.velocity.x >>= 1
+				#endif
+					u32[A1 + 0x10] += (objA0.flags2a & 0x01) ? -0xb000 : 0xb000
+				}
+				return
+			}
+		}
+
+		objA1.velocity.y = 0
+		u8[A1 + 0x2a] &= ~0x08
+		objA0.flags2a &= ~(1 << D6.u8)
+	}
+}
+
+
+//# address-hook(0x03ff80) end(0x03ff98)
+function void fn03ff80()
+{
+	D2.u16 = u16[A0 + 0x30]
+	D3.u16 = objA0.value32
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn03ff9e()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	fn03ff9e()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03ff9e) end(0x0400c8)
+function void fn03ff9e()
+{
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x20
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + D2.u16
+
+	u8 bit = 1 << D6.u8
+	if ((objA0.flags2a & bit) == 0)
+	{
+		if (dx < 0x40 && dy < D3.u16)
+		{
+			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+			{
+				if ((objA0.flags2a & 0x02) == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+					return
+
+				objA0.flags2a |= bit
+				objA1.flags2a |= char.flag.IN_AIR
+				objA1.flags2a |= char.flag.ON_OBJECT
+				objA1.flags2a &= ~char.flag.ROLLING
+				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				u8[A1 + 0x2f] = 0
+				u8[A1 + 0x40] = 0
+
+				D6 = 1
+				u16[A1 + 0x1c] = 1
+				if (u8[A1 + 0x27] == 0)
+				{
+					u8[A1 + 0x27] = 1
+					u8[A1 + 0x20] = 0
+					u8[A1 + 0x30] = 0x7f
+					u8[A1 + 0x31] = 0x08
+				}
+
+			#if STANDALONE
+				// Fix for bug when Tails carries other player and gets caught by the sand flow
+				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
+				{
+					u8[0xffffb02a] |= char.flag.IN_AIR
+					u8[0xffffb02e] = 0
+				}
+			#endif
+			}
+		}
+	}
+	else
+	{
+		if (dx < 0x40 && dy < D3.u16)
+		{
+			if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2a] & char.flag.IN_AIR)
+			{
+				u8[A1 + 0x30] = 0x7f
+				if (objA1.velocity.y < 0)
+				{
+					objA1.velocity.y += 0x68
+				}
+				else
+				{
+					objA1.velocity.y = 0xa8
+					if (objA0.flags2a & 0x02)
+					{
+						objA1.velocity.y = -0x330
+					}
+				}
+				if ((level.framecounter.low & 0x07) == 0)
+				{
+					objA1.velocity.x >>= 1
+				}
+				return
+			}
+		}
+
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA0.flags2a &= ~bit
+	}
+}

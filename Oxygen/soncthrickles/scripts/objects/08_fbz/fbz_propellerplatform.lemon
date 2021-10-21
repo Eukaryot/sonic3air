@@ -1,0 +1,193 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03a580) end(0x03a5d4)
+function void fn03a580()
+{
+	objA0.mapping_offset = 0x03a742
+	objA0.sprite_attributes = 0x2383
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x18
+	objA0.sprite_priority = 0x0280
+	u8[A0 + 0x28] = 0x8c
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	D0.u16 = (objA0.subtype2c & 0x70) >> 2
+	u32[A0 + 0x40] = u32[0x03a56c + D0.s16]
+	D1.u16 = (objA0.subtype2c & 0x0f) << 4
+	objA0.value26 = D1.u8
+
+	objA0.update_address = 0x03a5da
+	fn03a5da()
+}
+
+
+//# address-hook(0x03a5da) end(0x03a61a)
+function void fn03a5da()
+{
+	u16 backup_px = objA0.position.x.u16
+	A1 = u32[A0 + 0x40]
+	call A1
+
+	D1.u16 = 0x2b
+	D2.u16 = 0x0c
+	D3.u16 = 0xfff3
+	D4.u16 = backup_px
+	fn01de20()
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 1
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 3)
+			objA0.animation.sprite = 0
+	}
+
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}
+
+
+//# address-hook(0x03a620) end(0x03a638)
+function void fn03a620()
+{
+	D0.u8 = u8[A0 + 0x27]
+	++u8[A0 + 0x27]
+	LookupSinCos()
+	D0.s16 >>= 5
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D0.u16
+}
+
+
+//# address-hook(0x03a63a) end(0x03a644)
+function void fn03a63a()
+{
+	D0 = u16(u8[0xfffffe78]) - 0x20
+	fn03a650()
+}
+
+
+//# address-hook(0x03a646) end(0x03a64c)
+function void fn03a646()
+{
+	D0 = u16(u8[0xfffffe8c]) - 0x40
+	fn03a650()
+}
+
+
+//# address-hook(0x03a650) end(0x03a662)
+function void fn03a650()
+{
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s16 = -D0.s16
+	}
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D0.u16
+}
+
+
+//# address-hook(0x03a664) end(0x03a690)
+function void fn03a664()
+{
+	D0.u8 = level.framecounter.low
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s8 = -D0.s8
+	}
+	D0.u8 += objA0.value26
+	LookupSinCos()
+	D0.s16 >>= 2
+	D1.s16 >>= 2
+	D0.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D0.u16
+	D1.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D1.u16
+}
+
+
+//# address-hook(0x03a692) end(0x03a69c)
+function void fn03a692()
+{
+	if ((objA0.flags2a & 0x18) == 0)
+	{
+		fn03a620()
+	}
+	else
+	{
+		u32[A0 + 0x40] = 0x03a6a4
+		fn03a6a4()
+	}
+}
+
+
+//# address-hook(0x03a6a4) end(0x03a6cc)
+function void fn03a6a4()
+{
+	if (u8[A0 + 0x27] & 0x7f)
+	{
+		fn03a620()
+	}
+	else
+	{
+		u32[A0 + 0x40] = 0x03a6d0
+		u8[A0 + 0x27] = 0
+		u16[A0 + 0x36] = (objA0.subtype2c & 0x0f) * 2 + 0x28
+		fn03a6d0()
+	}
+}
+
+
+//# address-hook(0x03a6d0) end(0x03a740)
+function void fn03a6d0()
+{
+	D2.u16 = u16[A0 + 0x36]
+	--D2.u16
+	if (u8[A0 + 0x30] == 0)
+	{
+		D1.u16 = u16[A0 + 0x34]
+		D1.u16 += 0x04
+		u16[A0 + 0x34] = D1.u16
+		objA0.value32 += D1.u16
+		if (D2.u8 <= u8[A0 + 0x32])
+		{
+			u8[A0 + 0x30] = 0x01
+		}
+	}
+	else
+	{
+		D1.u16 = u16[A0 + 0x34]
+		D1.u16 -= 0x04
+		u16[A0 + 0x34] = D1.u16
+		objA0.value32 += D1.u16
+		if (D2.u8 > u8[A0 + 0x32])
+		{
+			u8[A0 + 0x30] = 0
+		}
+	}
+
+	D0 = objA0.value32 >> 6
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s16 = -D0.s16
+	}
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D0.u16
+
+	if (u16[A0 + 0x34] == 0)
+	{
+		u16[A0 + 0x46] = objA0.position.y.u16
+		u32[A0 + 0x40] = 0x03a620
+	}
+}

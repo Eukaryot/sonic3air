@@ -1,0 +1,221 @@
+{
+
+	// ----- HUD ----- //
+
+	// HUD texts
+	"hud_text_score":	  { "File": "hud_text_sprites.png", "Rect": "0,0,40,12" },
+	"hud_text_time":	  { "File": "hud_text_sprites.png", "Rect": "0,12,40,12" },
+	"hud_text_time_red":  { "File": "hud_text_sprites.png", "Rect": "40,12,1,1" },		// Empty pixel
+	"hud_text_rings":	  { "File": "hud_text_sprites.png", "Rect": "0,24,40,12" },
+	"hud_text_rings_red": { "File": "hud_text_sprites.png", "Rect": "40,24,1,1" },		// Empty pixel
+
+	// Additional texts for level results
+	"hud_text_ring":  { "File": "hud_text_sprites.png", "Rect": "0,24,32,12" },
+	"hud_text_bonus": { "File": "hud_text_sprites.png", "Rect": "0,36,40,12" },
+	"hud_text_total": { "File": "hud_text_sprites.png", "Rect": "0,48,40,12" },
+
+	// Special stage results
+	"hud_text_score_chaosstage":	{ "File": "hud_text_sprites.png", "Rect": "44,0,40,12" },
+	"hud_text_ring_chaosstage":		{ "File": "hud_text_sprites.png", "Rect": "44,12,32,12" },
+	"hud_text_bonus_chaosstage":	{ "File": "hud_text_sprites.png", "Rect": "44,24,40,12" },
+	"hud_text_perfect_chaosstage":	{ "File": "hud_text_sprites.png", "Rect": "44,36,56,12" },
+	"hud_text_continue_chaosstage":	{ "File": "hud_text_sprites.png", "Rect": "44,48,62,12" },
+	"hud_text_score_superstage":	{ "File": "hud_text_sprites.png", "Rect": "108,0,40,12" },
+	"hud_text_ring_superstage":		{ "File": "hud_text_sprites.png", "Rect": "108,12,32,12" },
+	"hud_text_bonus_superstage":	{ "File": "hud_text_sprites.png", "Rect": "108,24,40,12" },
+	"hud_text_perfect_superstage":	{ "File": "hud_text_sprites.png", "Rect": "108,36,56,12" },
+	"hud_text_continue_superstage":	{ "File": "hud_text_sprites.png", "Rect": "108,48,62,12" },
+
+	"hud_bonus_icon_blue":   { "File": "hud_text_sprites.png", "Rect":  "0,61,12,19" },
+	"hud_bonus_icon_orange": { "File": "hud_text_sprites.png", "Rect": "13,61,12,19" },
+	"hud_bonus_icon_red":    { "File": "hud_text_sprites.png", "Rect": "26,61,12,19" },
+
+	// Digits (for score, time, rings)
+	"hud_digit_0": { "File": "hud_text_sprites.png", "Rect":  "0,108,8,12" },
+	"hud_digit_1": { "File": "hud_text_sprites.png", "Rect":  "8,108,8,12" },
+	"hud_digit_2": { "File": "hud_text_sprites.png", "Rect": "16,108,8,12" },
+	"hud_digit_3": { "File": "hud_text_sprites.png", "Rect": "24,108,8,12" },
+	"hud_digit_4": { "File": "hud_text_sprites.png", "Rect": "32,108,8,12" },
+	"hud_digit_5": { "File": "hud_text_sprites.png", "Rect": "40,108,8,12" },
+	"hud_digit_6": { "File": "hud_text_sprites.png", "Rect": "48,108,8,12" },
+	"hud_digit_7": { "File": "hud_text_sprites.png", "Rect": "56,108,8,12" },
+	"hud_digit_8": { "File": "hud_text_sprites.png", "Rect": "64,108,8,12" },
+	"hud_digit_9": { "File": "hud_text_sprites.png", "Rect": "72,108,8,12" },
+
+	// Digits (Chaos Emerald stage results)
+	"hud_digit_0_chaosstage": { "File": "hud_text_sprites.png", "Rect":  "0,120,8,12" },
+	"hud_digit_1_chaosstage": { "File": "hud_text_sprites.png", "Rect":  "8,120,8,12" },
+	"hud_digit_2_chaosstage": { "File": "hud_text_sprites.png", "Rect": "16,120,8,12" },
+	"hud_digit_3_chaosstage": { "File": "hud_text_sprites.png", "Rect": "24,120,8,12" },
+	"hud_digit_4_chaosstage": { "File": "hud_text_sprites.png", "Rect": "32,120,8,12" },
+	"hud_digit_5_chaosstage": { "File": "hud_text_sprites.png", "Rect": "40,120,8,12" },
+	"hud_digit_6_chaosstage": { "File": "hud_text_sprites.png", "Rect": "48,120,8,12" },
+	"hud_digit_7_chaosstage": { "File": "hud_text_sprites.png", "Rect": "56,120,8,12" },
+	"hud_digit_8_chaosstage": { "File": "hud_text_sprites.png", "Rect": "64,120,8,12" },
+	"hud_digit_9_chaosstage": { "File": "hud_text_sprites.png", "Rect": "72,120,8,12" },
+
+	// Other characters for time
+	"hud_char_colon":   { "File": "hud_text_sprites.png", "Rect": "80,108,8,12" },
+	"hud_char_minutes": { "File": "hud_text_sprites.png", "Rect": "88,108,8,12" },
+	"hud_char_seconds": { "File": "hud_text_sprites.png", "Rect": "96,108,8,12" },
+
+	// Continue icons
+	"continue_icon_sonic":    { "File": "hud_text_sprites.png", "Rect": "0,82,20,24",  "Center": "12,24" },
+	"continue_icon_tails":    { "File": "hud_text_sprites.png", "Rect": "20,82,20,24", "Center": "10,24" },
+	"continue_icon_knuckles": { "File": "hud_text_sprites.png", "Rect": "40,82,20,24", "Center": "9,24" },
+
+	// Character icon for lives
+	"hud_lives_icon_sonic":    { "File": "hud_life_sprites.png", "Rect": "0,16,48,16" },
+	"hud_lives_icon_tails":    { "File": "hud_life_sprites.png", "Rect": "0,32,48,16" },
+	"hud_lives_icon_knuckles": { "File": "hud_life_sprites.png", "Rect": "0,48,48,16" },
+	"hud_lives_icon_miles":    { "File": "hud_life_sprites.png", "Rect": "0,64,48,16" },
+
+	// Small digits for lives
+	"hud_smalldigit_0": { "File": "hud_life_sprites.png", "Rect": "0,0,8,8" },
+	"hud_smalldigit_1": { "File": "hud_life_sprites.png", "Rect": "8,0,8,8" },
+	"hud_smalldigit_2": { "File": "hud_life_sprites.png", "Rect": "16,0,8,8" },
+	"hud_smalldigit_3": { "File": "hud_life_sprites.png", "Rect": "24,0,8,8" },
+	"hud_smalldigit_4": { "File": "hud_life_sprites.png", "Rect": "32,0,8,8" },
+	"hud_smalldigit_5": { "File": "hud_life_sprites.png", "Rect": "0,8,8,8" },
+	"hud_smalldigit_6": { "File": "hud_life_sprites.png", "Rect": "8,8,8,8" },
+	"hud_smalldigit_7": { "File": "hud_life_sprites.png", "Rect": "16,8,8,8" },
+	"hud_smalldigit_8": { "File": "hud_life_sprites.png", "Rect": "24,8,8,8" },
+	"hud_smalldigit_9": { "File": "hud_life_sprites.png", "Rect": "32,8,8,8" },
+
+	// Title card
+	"titlecard_redbar": { "File": "titlecard_redbar.png", "Rect": "0,0,66,178" },
+
+
+
+	// ----- Menus ----- //
+
+	// SEGA logo
+	"original_game_by": { "File": "original_game_by.png" },
+
+	// Title intro
+	"intro_wideframe1": { "File": "intro_wideframe1.bmp" },
+	"intro_wideframe2": { "File": "intro_wideframe2.bmp" },
+
+	// Title screen
+	"bg_title_screen":    { "File": "title_background.bmp" },
+	"title_screen_air":   { "File": "title_screen.png", "Rect": "0,0,152,18",  "Center": "76,9" },
+	"title_screen_air_h": { "File": "title_screen.png", "Rect": "0,18,152,18", "Center": "76,9" },
+	"title_screen_start": { "File": "title_screen.png", "Rect": "0,36,140,8",  "Center": "70,4" },
+	"title_screen_cr":    { "File": "title_screen.png", "Rect": "0,46,72,18" },
+
+	"bg_title_screen_sk": { "File": "title_sk_background.bmp", "Center": "0,112" },
+	"bg_title_screen_sk2":{ "File": "title_sk_foreground_extension.bmp", "Center": "-24,-152" },
+
+	// Data Select BG
+	"bg_dataselect":      { "File": "dataselect_bg.bmp" },
+
+	// Character selection icons
+	"charselect_sonic":    { "File": "charselect_sonic.bmp", "Center": "17,20" },
+	"charselect_tails":    { "File": "charselect_tails.bmp", "Center": "26,24" },
+	"charselect_knuckles": { "File": "charselect_knuckles.bmp", "Center": "13,20" },
+
+	// Sonic & Knuckles Logo (in Blue Spheres mode BG)
+	"sklogo": { "File": "sklogo.png", "Rect": "0,0,96,64", "Center": "48,32" },
+
+
+
+	// ----- Backgrounds ----- //
+
+	// DEZ backgrounds
+	"bg_dez1": { "File": "dez1_background.bmp" },
+	"bg_dez2": { "File": "dez2_background.png" },
+
+
+
+	// ----- Objects ----- //
+
+	// Sonic drop dash sprites
+	"sonic_dropdash_0": { "File": "sonic_dropdash.bmp", "Rect":  "0,0,32,32", "Center": "16,16" },
+	"sonic_dropdash_1": { "File": "sonic_dropdash.bmp", "Rect": "32,0,32,32", "Center": "16,16" },
+
+	// Sonic super peel-out sprites
+	"sonic_peelout_0": { "File": "sonic_peelout.bmp", "Rect":  "0,0,40,40", "Center": "20,20" },
+	"sonic_peelout_1": { "File": "sonic_peelout.bmp", "Rect": "40,0,40,40", "Center": "20,20" },
+	"sonic_peelout_2": { "File": "sonic_peelout.bmp", "Rect": "80,0,40,40", "Center": "20,20" },
+	"sonic_peelout_3": { "File": "sonic_peelout.bmp", "Rect":"120,0,40,40", "Center": "20,20" },
+
+	// Rings
+	"ring_00": { "File": "rings.bmp", "Rect":  "0,0,16,16", "Center": "8,8" },
+	"ring_01": { "File": "rings.bmp", "Rect": "16,0,16,16", "Center": "8,8" },
+	"ring_02": { "File": "rings.bmp", "Rect": "32,0,16,16", "Center": "8,8" },
+	"ring_03": { "File": "rings.bmp", "Rect": "48,0,16,16", "Center": "8,8" },
+	"ring_04": { "File": "rings.bmp", "Rect": "64,0,16,16", "Center": "8,8" },
+	"ring_05": { "File": "rings.bmp", "Rect": "80,0,16,16", "Center": "8,8" },
+	"ring_06": { "File": "rings.bmp", "Rect": "96,0,16,16", "Center": "8,8" },
+	"ring_07": { "File": "rings.bmp", "Rect":"112,0,16,16", "Center": "8,8" },
+	
+	// Monitors
+	"monitor_s3_intact": { "File": "monitors.bmp", "Rect":"0,0,32,32",   "Center": "16,16" },
+	"monitor_s3_broken": { "File": "monitors.bmp", "Rect":"32,0,32,32",  "Center": "16,16" },
+	"monitor_s2_intact": { "File": "monitors.bmp", "Rect":"0,32,32,32",  "Center": "16,16" },
+	"monitor_s2_broken": { "File": "monitors.bmp", "Rect":"32,32,32,32", "Center": "16,16" },
+	"monitor_icon_ring":            { "File": "monitors.bmp", "Rect":"64,0,16,16",  "Center": "8,8" },
+	"monitor_icon_speedshoes":      { "File": "monitors.bmp", "Rect":"80,0,16,16",  "Center": "8,8" },
+	"monitor_icon_invincibility":   { "File": "monitors.bmp", "Rect":"96,0,16,16",  "Center": "8,8" },
+	"monitor_icon_super":           { "File": "monitors.bmp", "Rect":"112,0,16,16", "Center": "8,8" },
+	"monitor_icon_lightningshield": { "File": "monitors.bmp", "Rect":"64,16,16,16", "Center": "8,8" },
+	"monitor_icon_fireshield":      { "File": "monitors.bmp", "Rect":"80,16,16,16", "Center": "8,8" },
+	"monitor_icon_bubbleshield":    { "File": "monitors.bmp", "Rect":"96,16,16,16", "Center": "8,8" },
+	"monitor_icon_classicshield":   { "File": "monitors.bmp", "Rect":"112,16,16,16","Center": "8,8" },
+	"monitor_icon_sonic":           { "File": "monitors.bmp", "Rect":"64,32,16,16", "Center": "8,8" },
+	"monitor_icon_tails":           { "File": "monitors.bmp", "Rect":"80,32,16,16", "Center": "8,8" },
+	"monitor_icon_knuckles":        { "File": "monitors.bmp", "Rect":"96,32,16,16", "Center": "8,8" },
+	"monitor_icon_static":          { "File": "monitors.bmp", "Rect":"64,48,16,16", "Center": "8,8" },
+	"monitor_icon_robotnik":        { "File": "monitors.bmp", "Rect":"80,48,16,16", "Center": "8,8" },
+
+	// Classic Shield
+	"shield_classic_01": { "File": "shield_classic.png", "Rect": "0,0,48,48",  "Center": "24,24" },
+	"shield_classic_02": { "File": "shield_classic.png", "Rect": "48,0,48,48", "Center": "24,24" },
+	"shield_classic_03": { "File": "shield_classic.png", "Rect": "96,0,48,48", "Center": "24,24" },
+	"shield_classic_04": { "File": "shield_classic.png", "Rect": "144,0,48,48","Center": "24,24" },
+	"shield_classic_05": { "File": "shield_classic.png", "Rect": "192,0,48,48","Center": "24,24" },
+	"shield_classic_06": { "File": "shield_classic.png", "Rect": "240,0,48,48","Center": "24,24" },
+	
+	// Bonus Bubble for Classic Shield
+	"bonusbubble_classicshield": { "File": "bonusbubble_classicshield.png", "Rect": "0,0,32,32", "Center": "16,16" },
+
+	// Time Attack Pole
+	"timeattack_pole_01": { "File": "timeattack_pole.png", "Rect":  "0,0,12,60", "Center": "6,30" },
+	"timeattack_pole_02": { "File": "timeattack_pole.png", "Rect": "13,0,12,60", "Center": "6,30" },
+	"timeattack_pole_03": { "File": "timeattack_pole.png", "Rect": "26,0,12,60", "Center": "6,30" },
+	"timeattack_pole_04": { "File": "timeattack_pole.png", "Rect": "39,0,12,60", "Center": "6,30" },
+	
+	// HCZ 1 water front
+	"hcz_waterfront": { "File": "hcz_waterfront.bmp", "Rect": "0,0,48,32" },
+	
+	// FBZ 2 egg robo head
+	"eggrobo_fbz_00": { "File": "eggrobo_fbz.png", "Rect":  "0,0,32,16", "Center": "16,8" },
+	"eggrobo_fbz_01": { "File": "eggrobo_fbz.png", "Rect":  "0,0,32,15", "Center": "16,7" },
+	"eggrobo_fbz_02": { "File": "eggrobo_fbz.png", "Rect": "32,0,32,16", "Center": "16,8" },
+	"eggrobo_fbz_03": { "File": "eggrobo_fbz.png", "Rect": "64,0,32,16", "Center": "16,8" },
+
+	// SOZ dark sand pit overlay
+	"obj_dark_sand_pit_overlay": { "File": "soz_darksandpit.png" },
+
+	// DEZ retracting spring base
+	"dez_retracting_spring_base": { "File": "dez_retracting_spring_base.bmp", "Rect": "0,0,32,16", "Center": "16,8" },
+
+	// DDZ missile
+	"ddz_missile_00": { "File": "ddz_missile.png", "Rect": "0,0,64,16",  "Center": "24,8" },
+	"ddz_missile_01": { "File": "ddz_missile.png", "Rect": "0,16,64,16", "Center": "24,8" },
+	
+	// "Sonic" text on Tornado when facing left
+	"tornado_text_sonic": { "File": "tornado_text_sonic.bmp", "Rect": "0,0,27,5" },
+
+
+
+	// ----- Blue Spheres ----- //
+
+	"bluespheres_glow_background":	{ "File": "bluespheres_glow.png", "Rect": "0,91,432,68", "Center":"216,0" },
+	"bluespheres_glow_foreground":	{ "File": "bluespheres_glow.png", "Rect":  "0,0,432,90", "Center":"216,0" },
+	"bluespheres_shadow_1P_pixel":	{ "File": "bluespheres_shadows.png", "Rect": "0,0,34,30" },
+	"bluespheres_shadow_2P_pixel":	{ "File": "bluespheres_shadows.png", "Rect": "0,30,34,46" },
+	"bluespheres_shadow_1P_smooth":	{ "File": "bluespheres_shadows.png", "Rect": "34,0,34,30" },
+	"bluespheres_shadow_2P_smooth":	{ "File": "bluespheres_shadows.png", "Rect": "34,30,34,46" }
+
+}

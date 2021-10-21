@@ -1,0 +1,158 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Moving Platform                                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x025506) end(0x0255ee)
+function void MovingPlatform.Init()
+{
+	if (global.zone_act == 0x0000)
+	{
+		objA0.mapping_offset = 0x0256a2
+		objA0.sprite_attributes = 0x43f7
+	}
+	else if (global.zone_act == 0x0001)
+	{
+		objA0.mapping_offset = 0x0256a2
+		objA0.sprite_attributes = 0x4440
+	}
+	else if (global.zone == 0x01)
+	{
+		objA0.mapping_offset = 0x025688
+		objA0.sprite_attributes = 0x441d
+	}
+	else if (global.zone == 0x02)
+	{
+		objA0.mapping_offset = 0x025654
+		objA0.sprite_attributes = 0x4001
+	}
+
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x180
+	D0 = (u16(objA0.subtype2c) >> 2) & 0x1c
+	A2 = 0x0254fa + D0.s16
+	objA0.box_size.x = u8[(A2+=1)-1]
+	objA0.box_size.y = u8[(A2+=1)-1]
+	objA0.animation.sprite = u8[(A2+=1)-1]
+	u16[A0 + 0x30] = objA0.position.x.u16
+	u16[A0 + 0x32] = objA0.position.x.u16
+	u16[A0 + 0x34] = objA0.position.y.u16
+	objA0.flags2e = objA0.flags2a
+	objA0.value42 = 0x280
+	u16[A0 + 0x44] = objA0.position.x.u16
+
+	D0 = (objA0.subtype2c & 0x0f) - 8
+	if (D0.s16 >= 0)
+	{
+		if (D0.u16 < 4)
+		{
+			A2 = 0xfffffe9a + D0.u16 * 4
+			if (s16[A2] < 0)
+			{
+				objA0.flags2e ^= 0x01
+			}
+		}
+		else
+		{
+			objA0.value42 = 0x380
+			u16[A0 + 0x44] += 0x100
+		}
+	}
+
+	objA0.subtype2c = (objA0.subtype2c & 0x0f) * 2
+	objA0.update_address = 0x0255f4
+	MovingPlatform.Update()
+}
+
+
+//# address-hook(0x0255f4) end(0x02564e)
+function void MovingPlatform.Update()
+{
+	u16 backup = objA0.position.x.u16
+
+	// Targets:
+	//  - 0x024f90	-> objA0.subtype2c = 0x00
+	//  - 0x024fc8	-> objA0.subtype2c = 0x02
+	//  - 0x024fd4	-> objA0.subtype2c = 0x04
+	//  - 0x024ff6	-> objA0.subtype2c = 0x06
+	//  - 0x025002	-> objA0.subtype2c = 0x08
+	//  - 0x02503e	-> objA0.subtype2c = 0x0c
+	//  - 0x0251e4	-> objA0.subtype2c = 0x0e
+	//  - 0x025278	-> objA0.subtype2c = 0x10
+	//  - 0x02529a	-> objA0.subtype2c = 0x14
+	call tableLookupAddress(0x024f76, objA0.subtype2c)
+
+	D4.u16 = backup
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		D1 = objA0.box_size.x
+		D3 = objA0.box_size.y + 1
+		PlatformCheckClimbOn()
+	}
+
+	D0.u16 = (u16[A0 + 0x44] & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= objA0.value42)
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x024fc8) end(0x024fd2)
+function void MovingPlatform.Horizontal01.Update()
+{
+	objA0.position.x.u16 = u16[A0 + 0x30] + getMovingPlatformOffset(0xfffffe78, 0x40)
+}
+
+//# address-hook(0x024fd4) end(0x024ff4)
+function void MovingPlatform.Horizontal02.Update()
+{
+	objA0.position.x.u16 = u16[A0 + 0x30] + getMovingPlatformOffset(0xfffffe8c, 0x80)
+}
+
+//# address-hook(0x024ff6) end(0x025000)
+function void MovingPlatform.Vertical01.Update()
+{
+	objA0.position.y.u16 = u16[A0 + 0x34] - getMovingPlatformOffset(0xfffffe78, 0x40)
+}
+
+//# address-hook(0x025002) end(0x025022)
+function void MovingPlatform.Vertical02.Update()
+{
+	objA0.position.y.u16 = u16[A0 + 0x34] - getMovingPlatformOffset(0xfffffe8c, 0x80)
+}
+
+
+function u16 getMovingPlatformOffset(u32 patternAddress, u16 size)
+{
+	if (objA0.flags2a & 0x01)
+		return size - u8[patternAddress]
+	else
+		return u8[patternAddress]
+}
+
+function u16 getMovingPlatformOffset2(u32 patternAddress, u16 size)
+{
+	if (objA0.flags2a & 0x01)
+		return size - (u8[patternAddress] >> 1)
+	else
+		return (u8[patternAddress] >> 1)
+}

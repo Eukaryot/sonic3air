@@ -1,0 +1,241 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04379e) end(0x0437f8)
+function void fn04379e()
+{
+	objA0.mapping_offset = 0x043a8e
+	objA0.sprite_attributes = 0x2442
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x20
+	objA0.sprite_priority = 0x0280
+	objA0.hitbox_extends.x = 0x20
+	objA0.hitbox_extends.y = 0x20
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	if (objA0.subtype2c == 0)
+	{
+		objA0.sprite_attributes |= 0x8000
+		u8[A0 + 0x28] = 0x8f
+		objA0.update_address = 0x04397e
+		fn04397e()
+	}
+	else
+	{
+		objA0.update_address = 0x0437fe
+		fn0437fe()
+	}
+}
+
+
+//# address-hook(0x0437fe) end(0x043898)
+function void fn0437fe()
+{
+	D0.u8 = objA0.value26
+	LookupSinCos()
+	D1.s16 >>= 2
+	D1.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D1.u16
+	u8[A0 + 0x28] = 0
+	objA0.sprite_attributes &= 0x7fff
+	if (s8[A0 + 0x26] < 0)
+	{
+		objA0.sprite_attributes |= 0x8000
+		u8[A0 + 0x28] = 0x8f
+	}
+
+	A1 = 0xffffb000
+	D0.u16 = objA1.position.y.u16 - u16[A0 + 0x46] + 0x40
+	if (D0.u16 < 0x80)
+	{
+		D0.u16 = objA1.position.x.u16 - u16[A0 + 0x44]
+		if (D0.s16 < 0 && debug_mode.state == 0)
+		{
+			u8[A0 + 0x30] = 1
+		}
+	}
+
+	if (u8[A0 + 0x30] != 0)
+	{
+		D0.u8 = objA0.subtype2c
+		if (D0.u8 == objA0.value26)
+		{
+			objA0.update_address = 0x04389e
+			objA0.velocity.x = -0x400
+			objA0.velocity.y = 0
+		}
+	}
+
+	objA0.value26 -= 0x02
+	if (u8[A0 + 0x30] == 0)
+	{
+		D0.u16 = u16[A0 + 0x44]
+		fn01b666()
+	}
+	else
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+}
+
+
+
+// The variant getting loose and chasing you
+
+//# address-hook(0x04389e) end(0x043978)
+function void fn04389e()
+{
+	if ((objA0.flags2a & 0x02) == 0)
+	{
+		UpdateMovementStraightSimple()
+
+		D3 = objA0.position.x.u16 - 0x20
+		fn00fe44()
+
+		if (D1.s16 < 0)
+		{
+			objA0.position.x.u16 -= D1.u16
+			objA0.velocity.x = 0
+			u8[A0 + 0x30] = 0
+		}
+
+		CheckGroundCollision()
+		if (D1.s16 <= 0x0e)
+		{
+			objA0.position.y.u16 += D1.u16
+			objA0.velocity.y = 0
+			if (objA0.velocity.x != 0 && (level.framecounter.low & 0x0f) == 0)
+			{
+				playSound(0x96)
+			}
+
+			objA0.velocity.x -= 4
+			fn0439ec()
+		}
+		else
+		{
+			objA0.flags2a |= 0x02
+		}
+	}
+	else
+	{
+		D3 = objA0.position.x.u16 - 0x20
+		fn00fe44()
+
+		if (D1.s16 < 0)
+		{
+			objA0.position.x.u16 -= D1.u16
+			objA0.velocity.x = 0
+		}
+
+		UpdateMovementSimple()
+
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 += D1.u16
+			objA0.flags2a &= ~0x02
+			objA0.velocity.y = 0
+		}
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 3
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 3)
+			objA0.animation.sprite = 0
+	}
+
+	if (u8[A0 + 0x30] != 0)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		fn01b662()
+	}
+}
+
+
+
+// The variant that just rolls back and forth
+
+//# address-hook(0x04397e) end(0x0439e6)
+function void fn04397e()
+{
+	D0.u8 = objA0.value26
+	LookupSinCos()
+	D1.s16 >>= 2
+	D1.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D1.u16
+
+	if ((objA0.flags2a & 0x02) == 0)
+	{
+		CheckGroundCollision()
+		objA0.position.y.u16 += D1.u16
+	}
+
+	if (s8[A0 + 0x04] < 0 && (level.framecounter.low & 0x0f) == 0)
+	{
+		playSound(0x96)
+	}
+
+	fn0439ec()
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 3
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 3)
+			objA0.animation.sprite = 0
+	}
+
+	objA0.value26 -= 2
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}
+
+
+//# address-hook(0x0439ec) end(0x043a6a)
+function void fn0439ec()
+{
+	D0.u16 = level.framecounter & 0x03
+	if (D0.u16 == 0 && s8[A0 + 0x04] < 0)
+	{
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x043a6c
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16 + 0x20
+			u32[A1 + 0x0c] = 0x043b12
+			u16[A1 + 0x0a] = 0xc0d3
+			u8[A1 + 0x04] |= 0x84
+			u16[A1 + 0x08] = 0
+			u8[A1 + 0x07] = 4
+			u8[A1 + 0x06] = 4
+
+			GetRandomNumber()
+			D0.u16 = (D0.u16 & 0x01ff) - 0x100
+			objA1.velocity.x = D0.u16
+			D0.s16 >>= 4
+			objA1.position.x.u16 += D0.u16
+			D0 = (D0 << 16) + (D0 >> 16)
+			D0.u16 = (D0.u16 & 0x01ff) - 0x400
+			objA1.velocity.y = D0.u16
+		}
+	}
+}

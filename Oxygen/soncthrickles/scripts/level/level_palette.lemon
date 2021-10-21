@@ -1,0 +1,768 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Update palette effects                                //
+//-------------------------------------------------------//
+
+//# address-hook(0x003bb8) end(0x003be2)
+function void UpdatePaletteEffects()
+{
+	if (global.fade_timer == 0)
+	{
+		UpdatePaletteEffects.Default()
+	}
+	else if (global.fade_timer > 0)
+	{
+		--global.fade_timer
+
+		if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
+		{
+			FadeInFromWhite()
+		}
+		else
+		{
+			FadeInPalette()
+		}
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Level palette effects                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x002142) end(0x002156)
+function void UpdatePaletteEffects.Default()
+{
+	UpdatePaletteEffects.SuperForm()
+
+	u8 offset = global.zone * 4 + global.act * 2
+
+	// Targets:
+	//  - 0x0021be	-> offset = 0x00	-> AIZ 1
+	//  - 0x00227c	-> offset = 0x02	-> AIZ 2
+	//  - 0x002334	-> offset = 0x04	-> HCZ 1
+	//  - 0x002382	-> offset = 0x06	-> HCZ 2
+	//  - 0x0021bc	-> offset = 0x08	-> MGZ 1	 (empty function)
+	//  - 0x0021bc	-> offset = 0x0a	-> MGZ 2	 (empty function)
+	//  - 0x002384	-> offset = 0x0c	-> CNZ 1
+	//  - 0x002384	-> offset = 0x0e	-> CNZ 2
+	//  - 0x002440	-> offset = 0x10	-> FBZ 1
+	//  - 0x002440	-> offset = 0x12	-> FBZ 1
+	//  - 0x00244e	-> offset = 0x14	-> ICZ 1
+	//  - 0x00244e	-> offset = 0x16	-> ICZ 2
+	//  - 0x002508	-> offset = 0x18	-> LBZ 1
+	//  - 0x002510	-> offset = 0x1a	-> LBZ 2
+	//  - 0x0021bc	-> offset = 0x1c	-> MHZ 1	 (empty function)
+	//  - 0x0021bc	-> offset = 0x1e	-> MHZ 2	 (empty function)
+	//  - 0x002546	-> offset = 0x20	-> SOZ 1
+	//  - 0x002598	-> offset = 0x22	-> SOZ 2
+	//  - 0x00266c	-> offset = 0x24	-> LRZ 1
+	//  - 0x0026f2	-> offset = 0x26	-> LRZ 2
+	//  - 0x0021bc	-> offset = 0x28	-> SSZ S/T	 (empty function)
+	//  - 0x0021bc	-> offset = 0x2a	-> SSZ Knux	 (empty function)
+	//  - 0x00277e	-> offset = 0x2c	-> DEZ 1
+	//  - 0x0027b2	-> offset = 0x2e	-> DEZ 2
+	//  - 0x0021bc	-> offset = 0x30	-> DDZ 		 (empty function)
+	//  - 0x0021bc	-> offset = 0x36	-> Outro S/T (empty function)
+	//  - 0x0021bc	-> offset = 0x38	-> ALZ		 (empty function)
+	//  - 0x00281a	-> offset = 0x3c	-> BPZ
+	//  - 0x0021bc	-> offset = 0x40	-> DPZ		 (empty function)
+	//  - 0x002884	-> offset = 0x44	-> CGZ
+	//  - 0x0028ba	-> offset = 0x48	-> EMZ
+	//  - 0x0021bc	-> offset = 0x4c	-> Bonus GM (empty function)
+	//  - 0x002918	-> offset = 0x50	-> Bonus GS
+	//  - 0x0029a8	-> offset = 0x54	-> Bonus SM
+	//  - 0x002a50	-> offset = 0x58	-> LRZ Boss
+	//  - 0x002ac0	-> offset = 0x5a	-> HPZ
+	//  - 0x0021bc	-> offset = 0x5c	-> DEZ Boss (empty function)
+	//  - 0x002ac0	-> offset = 0x5e	-> HPZ Cave
+	call tableLookupAddress(0x00215c, offset)
+}
+
+
+//# address-hook(0x0021bc) end(0x0021bc)
+function void LevelPaletteUpdate.Empty()
+{
+	// This function does nothing
+}
+
+
+//# address-hook(0x0021be) end(0x00227a)
+function void LevelPaletteUpdate.AIZ1()
+{
+	D0.u8 = u8[0xfffff72e]
+	if (D0.u8 == 0)
+	{
+		--u16[0xfffff634]
+		if (s16[0xfffff634] < 0)
+		{
+			u16[0xfffff634] = 7
+			D0.u16 = u16[0xfffff632]
+			u16[0xfffff632] += 8
+			D0.u16 &= 0x18
+
+			u32[0xfffffc56] = u32[0x002af6 + D0.u16]
+			u32[0xfffffc5a] = u32[0x002af6 + D0.u16 + 4]
+
+			if (u8[0xfffff650] == 0)
+			{
+				D0.u16 = u16[0xfffff652]
+				u16[0xfffff652] = (u16[0xfffff652] >= 42) ? 0 : (u16[0xfffff652] + 6)	// No modulo here, does not verify
+				u32[0xfffffc78] = u32[0x002bf6 + D0.s16]
+				u16[0xfffffc7c] = u16[0x002bf6 + D0.s16 + 4]
+			}
+		}
+	}
+	else
+	{
+		--u16[0xfffff634]
+		if (s16[0xfffff634] < 0)
+		{
+			u16[0xfffff634] = 9
+			D0.u16 = u16[0xfffff632]
+			u16[0xfffff632] = (u16[0xfffff632] + 8) % 80
+			u32[0xfffffc64] = u32[0x002b16 + D0.s16]
+			u32[0xfffffc68] = u32[0x002b16 + D0.s16 + 4]
+
+			D0.u16 = u16[0xfffff652]
+			u16[0xfffff652] = (u16[0xfffff652] + 6) % 60
+			u32[0xfffffc7a] = u32[0x002b96 + D0.s16]
+			u16[0xfffffc7e] = u16[0x002b96 + D0.s16 + 4]
+		}
+	}
+}
+
+
+//# address-hook(0x00227c) end(0x002332)
+function void LevelPaletteUpdate.AIZ2()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 5
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 8
+		D0.u16 &= 0x18
+
+		u32[0xfffffc78] = u32[0x002c26 + D0.s16]
+		u32[0xfffffc7c] = u32[0x002c26 + D0.s16 + 4]
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] = (u16[0xfffff652] + 6) % 48
+
+		A0 = (camera.position.x.u16 >= 0x3800) ? 0x002c76 : 0x002c46
+
+		u16[0xfffffc48] = u16[A0 + D0.s16]
+		u16[0xfffffc50] = u16[A0 + D0.s16 + 2]
+		u16[0xfffffc76] = u16[A0 + D0.s16 + 4]
+		if (camera.position.x.u16 < 0x1c0)
+			u16[0xfffffc5c] = u16[A0 + D0.s16 + 4]
+		else
+			u16[0xfffffc5c] = 0x0a0e
+	}
+
+	--u16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 1
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] = (u16[0xfffff654] + 2) % 52
+
+		A0 = (camera.position.x.u16 >= 0x3800) ? 0x002cda : 0x002ca6
+		u16[0xfffffc62] = u16[A0 + D0.s16]
+	}
+}
+
+
+//# address-hook(0x002334) end(0x002380)
+function void LevelPaletteUpdate.HCZ1()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = (u8[0xfffff650] != 0) ? 0 : 7
+		A0 = 0x002d0e
+		D0.u16 = u16[0xfffff632]
+
+		u16[0xfffff632] += 8
+		if (u16[0xfffff632] >= 0x20)
+			u16[0xfffff632] = 0
+
+		u32[0xfffffc46] = u32[A0 + D0.s16]
+		u32[0xfffffc4a] = u32[A0 + D0.s16 + 4]
+		u32[0xfffff0c6] = u32[A0 + D0.s16]
+		u32[0xfffff0ca] = u32[A0 + D0.s16 + 4]
+	}
+}
+
+
+//# address-hook(0x002382) end(0x002382)
+function void LevelPaletteUpdate.HCZ2()
+{
+}
+
+
+//# address-hook(0x002384) end(0x00243e)
+function void LevelPaletteUpdate.CNZ()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 3
+		A0 = 0x002d2e
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 6
+		if (u16[0xfffff632] >= 0x60)
+			u16[0xfffff632] = 0
+
+		u32[0xfffffc72] = u32[A0 + D0.s16]
+		u16[0xfffffc76] = u16[A0 + D0.s16 + 4]
+
+		A0 = 0x002e82
+		u32[0xfffff0f2] = u32[A0 + D0.s16]
+		u16[0xfffff0f6] = u16[A0 + D0.s16 + 4]
+	}
+
+#if STANDALONE
+	// Slow down animation depending on anti-flicker setting
+	if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 1 && (level.framecounter & 0x01) != 0)
+		return
+	if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2 && (level.framecounter & 0x03) != 0)
+		return
+#endif
+
+	A0 = 0x002d8e
+	D0.u16 = u16[0xfffff652]
+	u16[0xfffff652] += 0x06
+	if (u16[0xfffff652] >= 0xb4)
+	{
+		u16[0xfffff652] = 0
+	}
+	u32[0xfffffc52] = u32[A0 + D0.s16]
+	u16[0xfffffc56] = u16[A0 + D0.s16 + 4]
+
+	A0 = 0x002ee2
+	u32[0xfffff0d2] = u32[A0 + D0.s16]
+	u16[0xfffff0d6] = u16[A0 + D0.s16 + 4]
+	--u16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 2
+
+		A0 = 0x002e42
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] += 4
+		if (u16[0xfffff654] >= 0x40)
+			u16[0xfffff654] = 0
+
+		u32[0xfffffc4e] = u32[A0 + D0.s16]
+		A0 = 0x002e42
+		u32[0xfffff0ce] = u32[A0 + D0.s16]
+	}
+}
+
+
+//# address-hook(0x00244e) end(0x002506)
+function void LevelPaletteUpdate.ICZ()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 5
+		A0 = 0x002fd6
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] = (u16[0xfffff632] + 4) % 64
+		u32[0xfffffc5c] = u32[A0 + D0.s16]
+	}
+
+	--u16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 9
+		A0 = 0x003016
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] = (u16[0xfffff652] + 4) % 72
+		if (u16[0xffffeee8] != 0)
+			u32[0xfffffc7c] = u32[A0 + D0.s16]
+	}
+
+	--u16[0xfffff65a]
+	if (s16[0xfffff65a] < 0)
+	{
+		u16[0xfffff65a] = 7
+		A0 = 0x00305e
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] = (u16[0xfffff654] + 4) % 24
+		if (u16[0xffffeee8] != 0)
+			u32[0xfffffc78] = u32[A0 + D0.s16]
+
+		A0 = 0x003076
+		D0.u16 = u16[0xfffff656]
+		u16[0xfffff656] = (u16[0xfffff656] + 4) % 64
+		u32[0xfffffc58] = u32[A0 + D0.s16]
+	}
+}
+
+
+//# address-hook(0x002508) end(0x00250e)
+function void LevelPaletteUpdate.LBZ1()
+{
+	A0 = 0x0030b6
+	LevelPaletteUpdate.LBZ_shared()
+}
+
+
+//# address-hook(0x002510) end(0x002510)
+function void LevelPaletteUpdate.LBZ2()
+{
+	A0 = 0x0030c8
+	LevelPaletteUpdate.LBZ_shared()
+}
+
+
+//# address-hook(0x002516) end(0x002544)
+function void LevelPaletteUpdate.LBZ_shared()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 3
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] = (u16[0xfffff632] + 6) % 18
+		u32[0xfffffc50] = u32[A0 + D0.s16]
+		u16[0xfffffc54] = u16[A0 + D0.s16 + 4]
+
+	#if STANDALONE
+		// New for underwater palettes [added by Thorn]
+		u32[0xfffff0d0] = u32[A0 + D0.s16]
+		u16[0xfffff0d4] = u16[A0 + D0.s16 + 4]
+	#endif
+	}
+}
+
+
+//# address-hook(0x002440) end(0x00244c)
+function void LevelPaletteUpdate.FBZ()
+{
+	if (level.framecounter.low == 0)
+	{
+		u8[0xfffff7c1] ^= 0x01
+	}
+
+#if STANDALONE
+	// Standalone uses upper bits to store more data
+	//  -> Bit 0 = Electricity on/off (as in original)
+	//  -> Bits 1-7 = Intensity value going up/down just before the actual switch
+	u8 intensity = (u8[0xfffff7c1] & 0x01) * 255
+	if (level.framecounter.low > 0xf0)
+	{
+		if (u8[0xfffff7c1] & 0x01)
+			intensity = 0xfe - (level.framecounter.low - 0xf0) * 0x10
+		else
+			intensity = (level.framecounter.low - 0xf0) * 0x10
+	}
+	u8[0xfffff7c1] = (u8[0xfffff7c1] & 0x01) | intensity
+#endif
+}
+
+
+//# address-hook(0x002546) end(0x00257a)
+function void LevelPaletteUpdate.SOZ1()
+{
+	--u16[0xfffff65a]
+	if (s16[0xfffff65a] < 0)
+	{
+		u16[0xfffff65a] = 5
+
+		A0 = 0x0030da
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] += 8
+		if (u16[0xfffff654] >= 0x20)
+			u16[0xfffff654] = 0
+
+		u32[0xfffffc58] = u32[A0 + D0.s16]
+		u32[0xfffffc5c] = u32[A0 + D0.s16 + 4]
+	}
+}
+
+
+//# address-hook(0x002598) end(0x00266a)
+function void LevelPaletteUpdate.SOZ2()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		// Change light state every 15 seconds
+		u16[0xfffff634] = 899
+		if (u8[0xfffff7c3] < 5)
+		{
+			// Go to next light state... it's getting darker
+			++u8[0xfffff7c3]
+			if ((u8[0xfffff7c3] & 0x01) == 0)
+			{
+				u8[0xfffff650] = 2
+				u16[0xfffff658] = 0
+			}
+		}
+	}
+
+	bool goto00264e = false
+	if (u8[0xfffff650] != 0)
+	{
+		--u16[0xfffff658]
+		if (s16[0xfffff658] < 0)
+		{
+			u16[0xfffff658] = 3
+			if (s8[0xfffff650] >= 0)
+			{
+				--u8[0xfffff650]
+				u16[0xfffff652] += 0x34
+				++u16[0xfffff656]
+			}
+			else
+			{
+				++u8[0xfffff650]
+				u16[0xfffff652] -= 0x34
+				--u16[0xfffff656]
+			}
+
+			A0 = 0x00317a + s16[0xfffff652]
+			copyMemory(0xfffffc42, A0, 0x16)
+			A0 += 0x16
+			copyMemory(0xfffffc62, A0, 0x1e)
+
+			D0.u16 = u16[0xfffff654]
+			goto00264e = true
+		}
+	}
+
+	--u16[0xfffff65a]
+	if (s16[0xfffff65a] < 0)
+	{
+		u16[0xfffff65a] = 5
+
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] += 8
+		if (u16[0xfffff654] >= 0x20)
+			u16[0xfffff654] = 0
+
+		goto00264e = true
+	}
+
+	if (goto00264e)
+	{
+		D1.u16 = u16[0xfffff656] * 32
+		A0 = 0x0030da + D1.s16
+		u32[0xfffffc58] = u32[A0 + D0.s16]
+		u32[0xfffffc5c] = u32[A0 + D0.s16 + 4]
+	}
+}
+
+
+//# address-hook(0x00266c) end(0x0026f0)
+function void LevelPaletteUpdate.LRZ1()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 0x0f
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 8
+		if (u16[0xfffff632] >= 0x80)
+			u16[0xfffff632] = 0
+
+		A0 = 0x00327e
+		u32[0xfffffc42] = u32[A0 + D0.s16]
+		u32[0xfffffc46] = u32[A0 + D0.s16 + 4]
+
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] += 4
+		if (u16[0xfffff652] >= 0x1c)
+			u16[0xfffff652] = 0
+
+		A0 = 0x0032fe
+		u32[0xfffffc62] = u32[A0 + D0.s16]
+	}
+
+	--u16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 7
+
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] += 2
+		if (u16[0xfffff654] >= 0x22)
+			u16[0xfffff654] = 0
+
+		A0 = 0x003322
+		u16[0xfffffc56] = u16[A0 + D0.s16]
+	}
+}
+
+
+//# address-hook(0x0026f2) end(0x00277c)
+function void LevelPaletteUpdate.LRZ2()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 0x0f
+
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 8
+		if (u16[0xfffff632] >= 128)
+			u16[0xfffff632] = 0
+
+		A0 = 0x00327e
+		u32[0xfffffc42] = u32[A0 + D0.s16]
+		u32[0xfffffc46] = u32[A0 + D0.s16 + 4]
+
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] += 4
+		if (u16[0xfffff652] >= 28)
+			u16[0xfffff652] = 0
+
+		A0 = 0x0032fe
+		u32[0xfffffc62] = u32[A0 + D0.s16]
+	}
+
+	--u16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 0x0f
+
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] += 8
+		if (u16[0xfffff654] >= 256)
+			u16[0xfffff654] = 0
+
+	#if STANDALONE
+		// Fixed palette cycle, thanks to Alieneer
+		copyMemory(0xfffffc76, 0x003344 + D0.u16, 8)
+	#else
+		A0 = 0x003344
+		u32[0xfffffc76] = u32[A0 + D0.s16]
+		u32[0xfffffc7a] = u32[A0 + D0.s16]
+	#endif
+	}
+}
+
+
+//# address-hook(0x002a50) end(0x002abe)
+function void LevelPaletteUpdate.LRZ_Boss()
+{
+	if (s8[0xfffff650] >= 0)
+	{
+		--u16[0xfffff634]
+		if (s16[0xfffff634] < 0)
+		{
+			u16[0xfffff634] = 0x0f
+
+			D0.u16 = u16[0xfffff632]
+			u16[0xfffff632] += 8
+			if (u16[0xfffff632] >= 0x80)
+				u16[0xfffff632] = 0
+
+			A0 = 0x00327e
+			u32[0xfffffc42] = u32[A0 + D0.s16]
+			u32[0xfffffc46] = u32[A0 + D0.s16 + 4]
+		}
+
+		if (u8[0xfffff650] != 0)
+		{
+			--u16[0xfffff658]
+			if (s16[0xfffff658] < 0)
+			{
+				u16[0xfffff658] = 7
+
+				D0.u16 = u16[0xfffff654]
+				u16[0xfffff654] += 4
+				if (u16[0xfffff654] >= 0x3c)
+					u16[0xfffff654] = 0
+
+				A0 = 0x0036ec
+				u32[0xfffffc78] = u32[A0 + D0.s16]
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x002ac0) end(0x002af4)
+function void LevelPaletteUpdate.HPZ()
+{
+	if (u8[0xfffff650] == 0)
+	{
+		--u16[0xfffff634]
+		if (s16[0xfffff634] < 0)
+		{
+			u16[0xfffff634] = 7
+
+			D0.u16 = u16[0xfffff632]
+			u16[0xfffff632] += 4
+			if (u16[0xfffff632] >= 40)
+				u16[0xfffff632] = 0
+
+			A0 = 0x003728
+			u32[0xfffffc62] = u32[A0 + D0.s16]
+		}
+	}
+}
+
+
+//# address-hook(0x00277e) end(0x0027ac)
+function void LevelPaletteUpdate.DEZ1()
+{
+	--u16[0xfffff65a]
+	if (s16[0xfffff65a] < 0)
+	{
+		u16[0xfffff65a] = 0x0f
+
+		D0.u16 = u16[0xfffff654]
+		u16[0xfffff654] += 8
+		if (u16[0xfffff654] >= 0x30)
+			u16[0xfffff654] = 0
+
+		A0 = 0x00349c
+		u32[0xfffffc78] = u32[A0 + D0.s16]
+		u32[0xfffffc7c] = u32[A0 + D0.s16 + 4]
+	}
+
+	LevelPaletteUpdate.DEZ2()
+}
+
+
+//# address-hook(0x0027b2) end(0x002818)
+function void LevelPaletteUpdate.DEZ2()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 4
+
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 4
+		if (u16[0xfffff632] >= 48)
+			u16[0xfffff632] = 0
+
+		A0 = 0x003444
+		u32[0xfffffc5a] = u32[A0 + D0.s16]
+	}
+
+	--u16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 0x13
+
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] += 10
+		if (u16[0xfffff652] >= 40)
+			u16[0xfffff652] = 0
+
+		A0 = 0x003474 + D0.s16
+		A1 = 0xfffffc50
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u16[(A1+=2)-2] = u16[(A0+=2)-2]
+	}
+}
+
+
+
+// Competition Mode
+
+//# address-hook(0x00281a) end(0x002882)
+function void LevelPaletteUpdate.BPZ()
+{
+	--s16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 0x07
+		A0 = 0x0034cc
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 0x06
+		if (u16[0xfffff632] >= 0x12)
+		{
+			u16[0xfffff632] = 0
+		}
+		u32[0xfffffc5a] = u32[A0 + D0.u16]
+		u16[0xfffffc5e] = u16[A0 + D0.u16 + 0x04]
+	}
+
+	--s16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 0x11
+		A0 = 0x0034de
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] += 0x06
+		if (u16[0xfffff652] >= 0x7e)
+		{
+			u16[0xfffff652] = 0
+		}
+		u32[0xfffffc64] = u32[A0 + D0.s16]
+		u16[0xfffffc68] = u16[A0 + D0.s16 + 0x04]
+	}
+}
+
+
+//# address-hook(0x002884) end(0x0028b8)
+function void LevelPaletteUpdate.CGZ()
+{
+	--s16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 0x09
+		A0 = 0x00355c
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 0x08
+		if (u16[0xfffff632] >= 0x50)
+		{
+			u16[0xfffff632] = 0
+		}
+		u32[0xfffffc44] = u32[A0 + D0.u16]
+		u32[0xfffffc48] = u32[A0 + D0.u16 + 0x04]
+	}
+}
+
+
+//# address-hook(0x0028ba) end(0x002916)
+function void LevelPaletteUpdate.EMZ()
+{
+	--s16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 0x07
+		A0 = 0x0035ac
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 0x02
+		if (u16[0xfffff632] >= 0x3c)
+		{
+			u16[0xfffff632] = 0
+		}
+		u16[0xfffffc5c] = u16[A0 + D0.u16 + 0x04]
+	}
+
+	--s16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 0x1f
+		A0 = 0x0035e8
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] += 0x04
+		if (u16[0xfffff652] >= 0x34)
+		{
+			u16[0xfffff652] = 0
+		}
+		u32[0xfffffc72] = u32[A0 + D0.u16]
+	}
+}

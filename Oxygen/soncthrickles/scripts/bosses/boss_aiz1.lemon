@@ -1,0 +1,1012 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// AIZ 1 Boss                                            //
+//-------------------------------------------------------//
+
+//# address-hook(0x068a24) end(0x068a32)
+function void Boss.AIZ1.BaseUpdate()
+{
+	// Targets:
+	//  - 0x068a46	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x068a6e	-> objA0.base_state = 0x02	-> Waiting until character reaches the right position
+	//  - 0x068574	-> objA0.base_state = 0x04	-> Short wait time
+	//  - 0x068aba	-> objA0.base_state = 0x06	-> Flying down or up
+	//  - 0x0685fc	-> objA0.base_state = 0x08	-> Flame thrower (plus rockets in Knuckles' fight)
+	//  - 0x068b1c	-> objA0.base_state = 0x0a	-> Short wait time before flying up
+	//  - 0x068b68	-> objA0.base_state = 0x0c	-> Short wait time before flying left/right or down again
+	//  - 0x068bbc	-> objA0.base_state = 0x0e	-> Flying left/right
+	call tableLookupAddress(0x068a36, objA0.base_state)
+
+	Boss.AIZ1.RegularUpdate()
+}
+
+
+//# address-hook(0x068a46) end(0x068a68)
+function void fn068a46()
+{
+	setupObjectAttributesFull(0x068ffe)
+	boss.remaining_hits = 6
+	level.boss_encounter = 1
+
+	requestLoadingPatterns(0x5a)
+	loadPaletteLine1(0x06917c)
+
+#if STANDALONE
+	// Move to the right, so that there is no dead corner where character is behind him
+//	objA0.position.x.u16 += max(getScreenExtend() - 8, 0)
+#endif
+}
+
+
+//# address-hook(0x068a6e) end(0x068a90)
+function void fn068a6e()
+{
+#if STANDALONE
+	// Choose boss area depending on which route has been taken, not the character selection
+	D5.u16 = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0
+	D5.u16 -= getScreenExtend()
+#else
+	D5.u16 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x10c0 : 0x10e0
+#endif
+
+	if (camera.position.x.u16 >= D5.u16)
+	{
+		objA0.countdown_callback = 0x068a94
+		fn068556()
+	}
+}
+
+
+//# address-hook(0x068a94) end(0x068ab4)
+function void fn068a94()
+{
+	objA0.countdown_callback = 0x068acc
+	objA0.base_state = 0x06
+
+	fn06859c()
+
+	spawnChildObjects(0x06905c)
+	spawnChildObjects(0x069086)
+}
+
+
+
+//# address-hook(0x068aba) end(0x068ac6)
+function void fn068aba()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x068acc) end(0x068ada)
+function void fn068acc()
+{
+	objA0.countdown_callback = 0x068ade
+	objA0.countdown_value = 0x14
+	fn0685d8()
+}
+
+
+//# address-hook(0x068ade) end(0x068afc)
+function void fn068ade()
+{
+	objA0.countdown_callback = 0x068afe
+	objA0.countdown_value = 0x1e
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		objA0.flags38 |= 0x02
+	}
+}
+
+
+//# address-hook(0x068afe) end(0x068b16)
+function void fn068afe()
+{
+	objA0.base_state = 0x0a
+	objA0.value39 = 8
+	playSound(0x4f)
+
+	spawnChildObjects(0x0690b6)
+}
+
+
+//# address-hook(0x068b1c) end(0x068b62)
+function void fn068b1c()
+{
+	fn08486e()
+	if (_equal() || D1.s16 >= 0)
+	{
+		UpdateMovementStraightSimple()
+		Enemy.DrawDynamicObject()
+	}
+	else
+	{
+		fn068b34()
+	}
+}
+
+
+//# address-hook(0x068b34)
+function void fn068b34()
+{
+	objA0.base_state = 0x06
+	objA0.countdown_value = 0x5f
+	objA0.flags38 ^= 0x04
+	if ((objA0.flags38 & 0x04) == 0)
+	{
+		objA0.velocity.y = 0x100
+		objA0.countdown_callback = 0x068acc
+	}
+	else
+	{
+		objA0.velocity.y = -0x100
+		objA0.countdown_callback = 0x068b74
+	}
+
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x068b74) end(0x068b74)
+function void fn068b74()
+{
+	objA0.countdown_callback = 0x068b92
+	fn068b7c()
+}
+
+
+//# address-hook(0x068b7c) end(0x068b90)
+function void fn068b7c()
+{
+	objA0.base_state = 0x0c
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	objA0.countdown_value = 0x10
+}
+
+
+//# address-hook(0x068b68) end(0x068b6e)
+function void fn068b68()
+{
+	Object.CountdownAndTrigger()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x068b92) end(0x068bb8)
+function void fn068b92()
+{
+	objA0.base_state = 0x0e
+	objA0.value39 = 0x04
+	objA0.countdown_callback = 0x068bdc
+	objA0.flags38 ^= 0x08
+	objA0.velocity.x = (objA0.flags38 & 0x08) ? -0x100 : 0x100
+	fn0685e2()
+}
+
+
+//# address-hook(0x068bbc) end(0x068bd6)
+function void fn068bbc()
+{
+	fn08486e()
+	if (_equal())
+	{
+		UpdateMovementStraightSimple()
+	}
+	else
+	{
+		A1 = objA0.countdown_callback
+		call A1
+	}
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x068bdc) end(0x068bf0)
+function void fn068bdc()
+{
+	objA0.value39 = 0x04
+	objA0.countdown_callback = 0x068bf6
+	objA0.render_flags ^= 0x01
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x068bf6) end(0x068bfe)
+function void fn068bf6()
+{
+	objA0.countdown_callback = 0x068b34
+	fn068b7c()
+}
+
+
+//# address-hook(0x068c02) end(0x068c0c)
+function void fn068c02()
+{
+	fn085ba8()
+	spawnChildObjects(0x06910c)
+}
+
+
+//# address-hook(0x068c12) end(0x068c26)
+function void fn068c12()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x068754	-> objA0.base_state = 0x00
+	//  - 0x068c38	-> objA0.base_state = 0x02
+	//  - 0x068574	-> objA0.base_state = 0x04
+	//  - 0x06879c	-> objA0.base_state = 0x06
+	//  - 0x06879c	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x068c2c, objA0.base_state)
+
+	fn08498c()
+}
+
+
+//# address-hook(0x068c38) end(0x068c54)
+function void fn068c38()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x02)
+	{
+		objA0.base_state = 0x04
+		objA0.countdown_callback = 0x068c58
+		fn068ec0()
+	}
+}
+
+
+//# address-hook(0x068c58) end(0x068c60)
+function void fn068c58()
+{
+	objA0.countdown_callback = 0x068c64
+	fn06878c()
+}
+
+
+//# address-hook(0x068c64) end(0x068c7e)
+function void fn068c64()
+{
+	objA0.base_state = 0x08
+	objA0.countdown_callback = 0x068c84
+	u32[A0 + 0x30] = 0x069136
+	spawnChildObjects(0x0690a8)
+}
+
+
+//# address-hook(0x068c84) end(0x068c94)
+function void fn068c84()
+{
+	objA0.base_state = 0x02
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x38] &= ~0x02
+}
+
+
+
+// Rocket
+
+//# address-hook(0x068c96) end(0x068cc0)
+function void fn068c96()
+{
+	// Targets:
+	//  - 0x068cd0	-> objA0.base_state = 0x00
+	//  - 0x068cf4	-> objA0.base_state = 0x02
+	//  - 0x068574	-> objA0.base_state = 0x04
+	//  - 0x068d42	-> objA0.base_state = 0x06
+	//  - 0x068d5e	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x068cc6, objA0.base_state)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	A1 = 0xffff0000 + u16[A1 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x068cd0) end(0x068cf2)
+function void fn068cd0()
+{
+	fn06885a()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u32[A1] == 0x06872c)	// Rocket launcher of AIZ 1 mini-boss
+		u8[A0 + 0x28] = 0
+	objA0.countdown_callback = 0x068d06
+	objA0.hitbox_extends.y = 8
+
+#if STANDALONE
+	if (global.act == 1)
+	{
+		// For Knuckles' AIZ 1 boss fight on Sonic's route (Act is 1 here already!)
+		//  -> Draw in foreground because of the palmtrees
+		objA0.sprite_attributes |= 0x8000
+	}
+#endif
+}
+
+
+//# address-hook(0x068cf4) end(0x068d00)
+function void fn068cf4()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+
+//# address-hook(0x068d06) end(0x068d1a)
+function void fn068d06()
+{
+	objA0.base_state = 0x04
+	objA0.countdown_value = 8
+	objA0.countdown_callback = 0x068d1c
+}
+
+
+//# address-hook(0x068d1c) end(0x068d40)
+function void fn068d1c()
+{
+	objA0.base_state = 0x06
+	objA0.countdown_callback = 0x068d48
+	objA0.render_flags |= render_flag.FLIP_Y
+	fn068ed4()
+
+	D0.u16 = camera.position.y.u16 - 0x20
+	objA0.position.y.u16 = D0.u16
+}
+
+
+//# address-hook(0x068d42) end(0x068d42)
+function void fn068d42()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x068d48) end(0x068d5c)
+function void fn068d48()
+{
+	objA0.base_state = 0x08
+	objA0.sprite_priority = 0x80
+	objA0.countdown_callback = 0x068d70
+}
+
+
+//# address-hook(0x068d5e) end(0x068d6a)
+function void fn068d5e()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementStraightSimple()
+	Object.TriggerOnGroundHit()
+}
+
+
+//# address-hook(0x068d70) end(0x068d82)
+function void fn068d70()
+{
+	playSound(0x4e)
+	spawnChildObjects(0x0690d8)
+	Object.TriggerUnloading()
+}
+
+
+
+// Explosion (used by AIZ 1 mini-boss rockets)
+
+//# address-hook(0x068d88) end(0x068d92)
+function void fn068d88()
+{
+	// Targets:
+	//  - 0x068d9c	-> objA0.base_state = 0x00
+	//  - 0x068dd8	-> objA0.base_state = 0x02
+	//  - 0x068dee	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x068d96, objA0.base_state)
+}
+
+
+//# address-hook(0x068d9c) end(0x068dd4)
+function void fn068d9c()
+{
+	setupObjectAttributesFull(0x069032)
+
+	if (global.zone != 0x00)
+	{
+		objA0.sprite_attributes = 0x500
+	}
+#if STANDALONE
+	else if (global.act == 1)
+	{
+		// For Knuckles' AIZ 1 boss fight on Sonic's route (Act is 1 here already!)
+		//  -> Draw in foreground because of the palmtrees
+		objA0.sprite_attributes |= 0x8000
+	}
+#endif
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x28] == 0)
+		u8[A0 + 0x28] = 0
+
+	u32[A0 + 0x30] = 0x083fcc
+	objA0.countdown_callback = 0x068dde
+	D1 = 0x0c
+	fn068928()
+}
+
+
+//# address-hook(0x068dd8) end(0x068dd8)
+function void fn068dd8()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x068dee) end(0x068df4)
+function void fn068dee()
+{
+	fn08459c()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x068dde) end(0x068dec)
+function void fn068dde()
+{
+	objA0.base_state = 0x04
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+}
+
+
+//# address-hook(0x068dfa) end(0x068e46)
+function void fn068dfa()
+{
+	setupObjectAttributesFull(0x06904a)
+	objA0.update_address = 0x068e7e
+	objA0.countdown_callback = 0x068e84
+
+	D0 = objA0.subtype2c
+	D1.u16 = camera.position.y.u16		// Not used here?
+	objA0.position.x.u16 = camera.position.x.u16 + u16[0x068e48 + D0.u16]
+	objA0.position.y.u16 = u16[0x068e54 + D0.u16]
+	objA0.velocity.x = u16[0x068e60 + D0.u16]
+	objA0.countdown_value = u16[0x068e60 + D0.u16]
+	D0.u16 >>= 1
+	objA0.animation.sprite = u8[0x068e78 + D0.u16]
+}
+
+
+
+//# address-hook(0x068e7e) end(0x068e7e)
+function void fn068e7e()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x068e84) end(0x068e8a)
+function void fn068e84()
+{
+	objA0.update_address = 0x068e8c
+}
+
+
+//# address-hook(0x068e8c) end(0x068e92)
+function void fn068e8c()
+{
+	UpdateMovementStraightSimple()
+	fn08498c()
+}
+
+
+//# address-hook(0x068e98) end(0x068eba)
+function void fn068e98()
+{
+	setupObjectAttributesBasic(0x069056)
+
+	objA0.update_address = 0x085102
+	objA0.animation.sprite = 14 + (objA0.subtype2c >> 1)
+	D0 = 8
+	fn0852d0()
+}
+
+
+//# address-hook(0x068ec0) end(0x068ecc)
+function void fn068ec0()
+{
+	D0 = objA0.subtype2c
+	objA0.countdown_value = u16[0x068ece + D0.s16]
+}
+
+
+//# address-hook(0x068ed4) end(0x068f26)
+function void fn068ed4()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0 = u8[A1 + 0x2c]
+	objA0.countdown_value = u16[0x068f28 + D0.s16]
+	fn068ee4()
+}
+
+
+//# address-hook(0x068ee4)
+function void fn068ee4()
+{
+	D0.u16 >>= 1
+	D1.u8 = u8[A1 + 0x39] + 4
+	u8[A1 + 0x39] = D1.u8
+	D1.u16 &= 0x0c
+	D0.u16 += D1.u16
+
+	if (u8[A1 + 0x04] & 0x01)
+	{
+		A2 = 0x068f3e
+		A3 = 0x068f58
+	}
+	else
+	{
+		A2 = 0x068f2e
+		A3 = 0x068f4e
+	}
+
+	// Determine where the rocket comes down
+	//  -> Note that this is used for both the transition cutscene and the boss fight (where rockets appear only for Knuckles)
+	D0.u8 = u8[A2 + D0.s16]
+	u16 offset = u16[A3 + D0.s16 * 2]
+#if STANDALONE
+	offset = u32(offset) * getScreenWidth() / 320
+#endif
+	objA0.position.x.u16 = camera.position.x.u16 + offset
+	objA0.velocity.y = 0x400
+}
+
+
+
+//# address-hook(0x068f62) end(0x068fe0)
+function void Boss.AIZ1.RegularUpdate()
+{
+	if (u8[A0 + 0x28] != 0)
+		return
+
+	if (boss.remaining_hits == 0)
+	{
+		// Boss beaten
+		objA0.update_address = 0x085668
+		objA0.countdown_callback = 0x068c02
+		objA0.velocity.x = 0
+		objA0.velocity.y = 0
+
+		// Spawns one 0x083d84
+		spawnSimpleChildObjects(0x083fee)
+		if (_equal())
+		{
+			u8[A1 + 0x2c] = 0x10
+		}
+		AddScoreForBossEnemy()
+		return
+	}
+
+	if (objA0.state == 0)
+	{
+		objA0.state = 0x20
+		playSound(0x6e)
+		objA0.flags2a |= 0x40
+	}
+
+	Boss.updateHitFlashing(4, 0x068fe6, 0x068fee)
+
+	--objA0.state
+	if (objA0.state == 0)
+	{
+		objA0.flags2a &= ~0x40
+		u8[A0 + 0x28] = u8[A0 + 0x25]
+	}
+}
+
+
+
+//# address-hook(0x069482) end(0x06949e)
+function void fn069482()
+{
+	objA0.countdown_callback = 0x0694a4
+	u8[0xfffffaa3] = 0xff
+	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.flags38 |= 0x10
+
+	spawnChildObjects(0x069d66)
+}
+
+
+
+//# address-hook(0x0686be) end(0x0686e2)
+function void fn0686be()
+{
+	MoveAndFlipWithParent()
+	setupObjectAttributesMost(0x06900a)
+
+	objA0.flags2b |= 0x10
+	u32[A0 + 0x30] = 0x069126
+	objA0.update_address = 0x0686e8
+	fn0849a2()
+}
+
+
+//# address-hook(0x0686e8) end(0x068704)
+function void fn0686e8()
+{
+	MoveAndFlipWithParent()
+	Object.AnimationProgressByLocalA1()
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+		u8[A0 + 0x28] = 0
+
+	fn0849a2()
+}
+
+
+
+// Update of the three rocket launchers
+// (not sure if the first two functions are part of them as well)
+
+//# address-hook(0x06870a) end(0x06871a)
+function void fn06870a()
+{
+	MoveAndFlipWithParent()
+	objA0.update_address = 0x068720
+	setupObjectAttributesMost(0x069012)
+}
+
+
+//# address-hook(0x068720) end(0x068726)
+function void fn068720()
+{
+	MoveAndFlipWithParent()
+	fn08498c()
+}
+
+
+//# address-hook(0x06872c) end(0x068740)
+function void fn06872c()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x068754	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x06875e	-> objA0.base_state = 0x02  -> Waiting while blimb flying in from above
+	//  - 0x06877e	-> objA0.base_state = 0x04  -> Closed
+	//  - 0x06879c	-> objA0.base_state = 0x06  -> Opening / Opened
+	//  - 0x0687dc	-> objA0.base_state = 0x08  -> Shooting rockets
+	//  - 0x06879c	-> objA0.base_state = 0x0a  -> Closing again (same function as state 0x06!)
+	//  - 0x068572	-> objA0.base_state = 0x0c  -> Inactive (empty function)
+	call tableLookupAddress(0x068746, objA0.base_state)
+
+	fn08498c()
+}
+
+
+//# address-hook(0x068754) end(0x068758)
+function void fn068754()
+{
+	setupObjectAttributesMost(0x06901a)
+}
+
+
+//# address-hook(0x06875e) end(0x06877a)
+function void fn06875e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x02) == 0)
+		return
+
+	objA0.base_state = 0x04
+	objA0.countdown_callback = 0x068784
+	fn068ec0()
+}
+
+
+//# address-hook(0x06877e) end(0x06877e)
+function void fn06877e()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x068784) end(0x068784)
+function void fn068784()
+{
+	objA0.countdown_callback = 0x0687a2
+	fn06878c()
+}
+
+
+//# address-hook(0x06878c) end(0x06879a)
+function void fn06878c()
+{
+	objA0.base_state = 0x06
+	u32[A0 + 0x30] = 0x06912f
+}
+
+
+//# address-hook(0x06879c) end(0x06879c)
+function void fn06879c()
+{
+	fn08459c()
+}
+
+
+//# address-hook(0x0687a2) end(0x0687d6)
+function void fn0687a2()
+{
+	objA0.base_state = 0x08
+	objA0.value39 = 3
+	objA0.countdown_callback = 0x0687b6
+	fn0687b6()
+}
+
+
+//# address-hook(0x0687b6)
+function void fn0687b6()
+{
+	objA0.countdown_value = 0x1c
+	--objA0.value39
+
+	// Spawn rocket
+	A2 = (objA0.value39 != 1) ? 0x06909a : 0x0690a8
+	SpawnChildObjects()
+}
+
+
+//# address-hook(0x0687dc) end(0x068800)
+function void fn0687dc()
+{
+	Object.CountdownAndTrigger()
+	if (s8[A0 + 0x39] >= 0)
+		return
+
+	objA0.base_state = 0x0a
+	u32[A0 + 0x30] = 0x069136
+	objA0.countdown_callback = 0x068802
+}
+
+
+
+//# address-hook(0x068802) end(0x068808)
+function void fn068802()
+{
+	objA0.base_state = 0x0c
+}
+
+
+//# address-hook(0x06880a) end(0x06881e)
+function void fn06880a()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x068828	-> objA0.base_state = 0x00
+	//  - 0x06879c	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x068824, objA0.base_state)
+
+	DrawObject()
+}
+
+
+//# address-hook(0x068828) end(0x068842)
+function void fn068828()
+{
+	setupObjectAttributesMost(0x069022)
+	u32[A0 + 0x30] = 0x06913f
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+}
+
+
+
+// Additional rocket in transition cutscene
+
+//# address-hook(0x068844) end(0x06884e)
+function void fn068844()
+{
+	// Targets:
+	//  - 0x06885a	-> objA0.base_state = 0x00
+	//  - 0x06888e	-> objA0.base_state = 0x02
+	//  - 0x068574	-> objA0.base_state = 0x04
+	//  - 0x06888e	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x068852, objA0.base_state)
+}
+
+
+//# address-hook(0x06885a) end(0x068888)
+function void fn06885a()
+{
+	setupObjectAttributesMost(0x06902a)
+	playSound(0x4d)
+
+	u32[A0 + 0x30] = 0x06914c
+	objA0.countdown_callback = 0x06889a
+	objA0.velocity.y = -0x400
+	objA0.countdown_value = 0x60
+	DrawObject()
+}
+
+
+//# address-hook(0x06888e) end(0x068894)
+function void fn06888e()
+{
+	fn08564c()
+	DrawObject()
+}
+
+
+//# address-hook(0x06889a) end(0x0688ae)
+function void fn06889a()
+{
+	objA0.base_state = 0x04
+	objA0.countdown_value = 8
+	objA0.countdown_callback = 0x0688b0
+}
+
+
+//# address-hook(0x0688b0) end(0x0688f2)
+function void fn0688b0()
+{
+	objA0.base_state = 0x06
+	playSound(0x51)
+	objA0.sprite_priority = 0x80
+	objA0.render_flags |= render_flag.FLIP_Y
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_value = 0x60
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0 = u8[A1 + 0x2c]
+	fn068ee4()
+
+	objA0.position.y.u16 = camera.position.y.u16 - 0x20
+}
+
+
+
+// Flame thrower
+
+//# address-hook(0x0688f4) end(0x068904)
+function void fn0688f4()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x06890e	-> objA0.base_state = 0x00
+	//  - 0x068574	-> objA0.base_state = 0x02
+	//  - 0x068956	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x068908, objA0.base_state)
+}
+
+
+//# address-hook(0x06890e) end(0x068936)
+function void fn06890e()
+{
+	setupObjectAttributesFull(0x06903e)
+	objA0.flags2b |= 0x10
+	objA0.countdown_callback = 0x06893e
+	D1 = 6
+	fn068928()
+}
+
+//# address-hook(0x068928)
+function void fn068928()
+{
+	objA0.countdown_value = (D1.u16 - objA0.subtype2c) * 2
+}
+
+
+//# address-hook(0x068956) end(0x06895c)
+function void fn068956()
+{
+	fn08459c()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x06893e) end(0x068954)
+function void fn06893e()
+{
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x06915f
+	objA0.countdown_callback = 0x068962
+}
+
+
+//# address-hook(0x068994) end(0x0689a2)
+function void fn068994()
+{
+	// Targets:
+	//  - 0x0689ac	-> objA0.base_state = 0x00
+	//  - 0x0689f8	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x0689a8, objA0.base_state)
+
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x0689ac) end(0x0689f6)
+function void fn0689ac()
+{
+	fn06890e()
+	objA0.sprite_priority = 0x100
+	u32[A0 + 0x30] = 0x06916f
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	A1 = 0xffff0000 + u16[A1 + 0x46]
+	u16[A0 + 0x46] = A1.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	D0.s16 = -0x60
+	if (u8[A1 + 0x04] & 0x01)
+	{
+		D0.s16 = -D0.s16
+		objA0.render_flags |= render_flag.FLIP_X
+	}
+	D1.u16 = objA1.position.x.u16 + D0.u16
+	objA0.position.x.u16 = D1.u16
+}
+
+
+//# address-hook(0x0689f8) end(0x068a16)
+function void fn0689f8()
+{
+	fn08459c()
+	if (D2.s16 > 0)
+	{
+		D0.u16 = u16[0x068a18 + D0.s16]
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+			D0.s16 = -D0.s16
+
+		objA0.position.x.u16 += D0.u16
+	}
+}
+
+
+
+//# address-hook(0x0757ba) end(0x0757ba)
+function void fn0757ba()
+{
+	fn085ba8()
+}
+
+
+
+//# address-hook(0x068690) end(0x0686b8)
+function void fn068690()
+{
+	UpdateMovementStraightSimple()
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		level.boss_encounter = 0
+		PlayMusicAfterLevelResults()
+
+		addPatternLoadingCue(0x083d48)
+		fn0852ae()
+	}
+}

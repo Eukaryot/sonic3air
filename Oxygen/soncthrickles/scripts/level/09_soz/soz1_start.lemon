@@ -1,0 +1,240 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Object that lets characters jump into and out of sand at SOZ 1 start
+
+//# address-hook(0x041fee) end(0x042026)
+function void fn041fee()
+{
+	objA0.update_address = 0x042028
+	player1.control_override = 1
+	player2.control_override = 1
+	control.player1 = 0
+	control.pad1 = 0
+	control.tails = 0
+	control.pad2 = 0
+
+	A1 = 0xffffb000
+	u8[A1 + 0x2e] = 1
+
+	A1 = 0xffffb04a
+	if (u32[A1] != 0)
+	{
+		u8[A1 + 0x2e] = 1
+	}
+}
+
+
+//# address-hook(0x042028) end(0x042090)
+function void fn042028()
+{
+	player1.control_override = 1
+	player2.control_override = 1
+	control.player1 = 0
+	control.tails = 0
+
+	A1 = 0xffffb000
+	fn042092()
+
+	A1 = 0xffffb04a
+	if (u32[A1] != 0)
+	{
+		fn042092()
+	}
+
+	A2 = 0xffffb000
+	D0.u16 = (global.characters == CHARS_TAILS_ALONE) ? 0x0694 : 0x0690
+	if (D0.u16 == u16[A2 + 0x14])
+	{
+		fn042180()
+
+		playSound(0x82)
+
+		A2 = 0xffffb04a
+		if (u32[A2] != 0)
+		{
+			fn042180()
+		}
+	}
+
+	if (u16[0xffffb014] >= 0x06c0)
+	{
+		objA0.update_address = 0x0420a6
+	}
+}
+
+
+//# address-hook(0x042092) end(0x0420a4)
+function void fn042092()
+{
+	D0.u16 = objA1.velocity.y
+	objA1.velocity.y += 0x38
+	D0.s32 = D0.s16
+	D0 <<= 8
+	u32[A1 + 0x14] += D0
+}
+
+
+//# address-hook(0x0420a6) end(0x0420fa)
+function void fn0420a6()
+{
+	player1.control_override = 1
+	player2.control_override = 1
+	control.player1 = 0
+	control.tails = 0
+	if ((control.pad1.pressed & CONTROL_ABC) == 0)
+		return
+
+	objA0.update_address = 0x0420fc
+
+	A1 = 0xffffb000
+	fn0420de()
+
+	A1 = 0xffffb04a
+	fn0420de()
+}
+
+
+function void fn0420de()
+{
+	if (u32[A1] != 0)
+	{
+		objA1.velocity.y = -0x800
+		objA1.state = char.state.STRAIGHTJUMP
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2e] = 1
+		u8[A1 + 0x40] = 0
+	}
+}
+
+
+//# address-hook(0x0420fc) end(0x04217e)
+function void fn0420fc()
+{
+	player1.control_override = 1
+	player2.control_override = 1
+	control.player1 = 0
+	control.tails = 0
+
+	A2 = 0xffffb000
+	if (u16[A2 + 0x14] < 0x06a8)
+	{
+		u8[A2 + 0x2e] = 0
+		fn042180()
+
+		A2 = 0xffffb04a
+		if (u32[A2] != 0)
+		{
+			u8[A2 + 0x2e] = 0
+			fn042180()
+		}
+
+		playSound(0x82)
+		player1.control_override = 0
+		player2.control_override = 0
+		UnloadObject()
+		return
+	}
+	fn042160()
+
+	A2 = 0xffffb04a
+	if (u32[A2] != 0)
+	{
+		fn042160()
+	}
+}
+
+
+function void fn042160()
+{
+	D0.s32 = s16[A2 + 0x18]
+	D0 <<= 8
+	u32[A2 + 0x10] += D0
+
+	D0.u16 = u16[A2 + 0x1a]
+	u16[A2 + 0x1a] += 0x38
+	D0.s32 = D0.s16
+	D0 <<= 8
+	u32[A2 + 0x14] += D0
+}
+
+
+//# address-hook(0x042180) end(0x04219c)
+function void fn042180()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x04219e
+		objA1.position.x.u16 = u16[A2 + 0x10]
+		objA1.position.y.u16 = 0x066c
+	}
+}
+
+
+//# address-hook(0x04219e) end(0x0421f8)
+function void fn04219e()
+{
+	objA0.mapping_offset = 0x040d10
+	objA0.sprite_attributes = 0x4432
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x34
+	objA0.sprite_priority = 0x80
+	objA0.animation.sprite = 0x08
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 1
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	D0.u16 = objA0.position.y.u16
+	D0.u16 += 0x68
+	u16[(A2+=2)-2] = D0.u16
+	u16[(A2+=2)-2] = 0x0d
+	objA0.animation.timer = 3
+	u16[A0 + 0x30] = 0x13
+
+	objA0.update_address = 0x0421fe
+	fn0421fe()
+}
+
+
+//# address-hook(0x0421fe) end(0x042248)
+function void fn0421fe()
+{
+	A2 = A0 + 0x18
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 3
+		objA0.render_flags ^= 0x01
+		++objA0.position.y.u16
+		++objA0.velocity.y
+		++u8[A0 + 0x1d]
+		if (u8[A0 + 0x1d] >= 0x0d)
+		{
+			u8[A0 + 0x1d] = 0x09
+		}
+	}
+
+	if (u16[A0 + 0x30] == 0x0c)
+	{
+		objA0.animation.sprite = 0x0d
+	}
+
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}

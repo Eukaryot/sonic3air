@@ -1,0 +1,620 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Lap display
+
+//# address-hook(0x03703a) end(0x03708c)
+function void fn03703a()
+{
+	objA0.mapping_offset = 0x0370d6
+	objA0.sprite_attributes = 0x8700
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x0c
+	objA0.position.x.u16 = getScreenWidth() + 0x50
+	objA0.position.y.u16 = 0x98
+
+	if (objA0.subtype2c != 0)
+	{
+		if (competition_mode.multiplay == 0)
+		{
+			UnloadObject()
+			return
+		}
+
+		objA0.render_flags |= 0x10
+		u32[A0] = 0x0370b4
+		fn0370b4()
+	}
+	else
+	{
+		objA0.render_flags |= 0x08
+		u32[A0] = 0x037092
+		fn037092()
+	}
+}
+
+
+//# address-hook(0x037092) end(0x0370ae)
+function void fn037092()
+{
+	D0.u8 = min(s8[0xfffffedc], s8[0xfffffeda]) % 10
+	objA0.animation.sprite = D0.u8
+	DrawObject()
+}
+
+
+//# address-hook(0x0370b4) end(0x0370d0)
+function void fn0370b4()
+{
+	D0.u8 = min(s8[0xfffffedd], s8[0xfffffeda]) % 10
+	objA0.animation.sprite = D0.u8
+	DrawObject()
+}
+
+
+
+// "Finish" text
+
+//# address-hook(0x03713a) end(0x037166)
+function void fn03713a()
+{
+	objA0.mapping_offset = 0x0375fa
+	objA0.sprite_attributes = 0x8756
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x28
+	u32[A0] = 0x03716c
+	if (competition_mode.multiplay == 0)
+	{
+		objA0.render_flags |= 0x08
+	}
+	fn03716c()
+}
+
+
+//# address-hook(0x03716c) end(0x0371bc)
+function void fn03716c()
+{
+	Object.animationUpdate(0x03750e)
+	if (objA0.state == 0x01 && objA0.animation.timer == 0x05)
+	{
+		D1.u8 = objA0.animation.frame
+		if (D1.u8 == 0x1f)
+		{
+			playSound(0xad)
+		}
+		else if (D1.u8 == 0x01 || D1.u8 == 0x0b || D1.u8 == 0x15)
+		{
+			playSound(0xa7)
+		}
+	}
+
+	fn0371be()
+	if (u16[0xffffeee6] == 0)
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x0371be) end(0x037398)
+function void fn0371be()
+{
+	if (objA0.value3a == 0)
+	{
+		if (player1.control_override != 0)
+		{
+			objA0.state.both = 0x01
+			objA0.animation.sprite = 0x0a
+		}
+		else if (objA0.animation.sprite == 0x03)
+		{
+			hud.dirty.timer = 0x01
+			u8[0xfffffec7] = 0x01
+			objA0.value3a = 0x01
+		}
+		return
+	}
+
+	if (objA0.value3a == 0x01)
+	{
+		D0 = 0x093b63
+		if (D0 <= u32[0xffffee52] || D0 <= u32[0xffffee56])
+		{
+			objA0.value3a = 0x02
+			u16[0xffffeee8] = 0x78
+		}
+
+		D0.u8 = u8[0xfffffeda]
+		if (D0.u8 < u8[0xfffffedc])
+		{
+			objA0.state = (competition_mode.multiplay == 0) ? 3 : 4
+			objA0.render_flags |= 0x08
+			objA0.value3a = 0x02
+			u16[0xffffeee8] = 0x78
+			if (competition_mode.multiplay != 0 && u8[0xffffff8b] == 0)
+			{
+				u16[0xffffeee8] = 0x0168
+			}
+			hud.dirty.timer = 0x80
+
+			fn037430()
+			playSound(0x6a)
+
+			D0.u8 = u8[0xfffffeda]
+			if (D0.u8 < u8[0xfffffedd])
+			{
+				objA0.state = 0x06
+				objA0.render_flags &= ~0x08
+				u16[0xffffeee8] = 0x78
+				u8[0xfffffec7] = 0x80
+			}
+			else
+			{
+				fn037406()
+			}
+		}
+		else if (D0.u8 < u8[0xfffffedd])
+		{
+			objA0.state = 0x04
+			objA0.render_flags |= 0x10
+			objA0.value3a = 0x02
+			u16[0xffffeee8] = (u8[0xffffff8b] != 0) ? 0x78 : 0x0168
+			u8[0xfffffec7] = 0x80
+
+			fn037406()
+			playSound(0x6a)
+		}
+		return
+	}
+
+	if (objA0.value3a != 0x02)
+	{
+		fn0373a4()
+		return
+	}
+
+	if (u8[0xffffff8b] != 0)
+	{
+		if (s8[0xfffffe1e] < 0)
+		{
+			if (competition_mode.multiplay != 0)
+			{
+				if (s8[0xfffffec7] >= 0)
+				{
+					jump 0x037306
+				}
+			}
+			--u16[0xffffeee8]
+			if (s16[0xffffeee8] < 0)
+			{
+				global.game_mode = 0x40
+				if (s8[0xffffff8b] < 0)
+				{
+					global.game_mode = 0x50
+				}
+			}
+		}
+		return
+	}
+
+	if (s8[0xfffffe1e] < 0 || u8[0xfffffedc] != u8[0xfffffeda])
+	{
+		--u16[0xffffeee8]
+		if (s16[0xffffeee8] >= 0)
+		{
+			if (u32[0xffffee52] < 0x093b63 && u32[0xffffee56] < 0x093b63)
+				return
+		}
+	}
+	else
+	{
+		if (u32[0xffffee52] < 0x093b63 && u32[0xffffee56] < 0x093b63)
+			return
+	}
+
+	D0 = global.zone - 0x0e
+	D0.u8 = u8[0x03739f + D0.s16]
+	A1 = 0xffff7800
+	u32[A1 + D0.s16] = u32[0xffffee52]
+	u32[A1 + D0.s16 + 0x14] = u32[0xffffee56]
+	if (s8[0xfffffe1e] >= 0)
+	{
+		u32[A1 + D0.s16] = 0x093b63
+	}
+	if (s8[0xfffffec7] >= 0)
+	{
+		u32[A1 + D0.s16 + 0x14] = 0x093b63
+	}
+
+	D0.u8 = global.zone - 0x0e
+	D0.u8 = u8[0x03739a + D0.s16]
+	if (D0.u8 != 0)
+	{
+		global.zone = D0.u8
+		level.restart.u8 = 1
+	}
+	else
+	{
+		global.game_mode = 0x44
+	}
+}
+
+
+//# address-hook(0x0373a4) end(0x037404)
+function void fn0373a4()
+{
+	D0.u8 = u8[0xfffffeda]
+	if (D0.u8 < u8[0xfffffedc] && s8[0xfffffe1e] >= 0)
+	{
+		objA0.state = 0x05
+		objA0.render_flags |= 0x08
+		hud.dirty.timer = 0x80
+		u16[0xffffeee8] = 0x78
+		playSound(0x6a)
+	}
+
+	D0.u8 = u8[0xfffffeda]
+	if (D0.u8 < u8[0xfffffedd] && s8[0xfffffec7] >= 0)
+	{
+		objA0.state = 0x05
+		objA0.render_flags |= 0x10
+		u8[0xfffffec7] = 0x80
+		u16[0xffffeee8] = 0x78
+		playSound(0x6a)
+	}
+}
+
+
+
+//# address-hook(0x037406) end(0x03742e)
+function void fn037406()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		u32[A1] = 0x03713a
+		u16[A1 + 0x10] = 0x0120 + getScreenExtend()
+		u16[A1 + 0x14] = 0xb8
+		u8[A1 + 0x20] = 0x02
+		u8[A1 + 0x3a] = 0x03
+	}
+}
+
+
+//# address-hook(0x037430) end(0x0374b6)
+function void fn037430()
+{
+	if (s8[0xffffff8b] >= 0)
+		return
+
+	// Update Time Attack records
+	A1 = 0xffffe600 + ((global.zone - 0x0e) << 4)
+	D0 = u32[0xffffee52]
+	if (D0 < u32[A1])
+	{
+		u8[A1 + 0x0e] = u8[A1 + 0x0d]
+		u8[A1 + 0x0d] = u8[A1 + 0x0c]
+		u8[A1 + 0x0c] = u8[0xffffffea]
+		u32[A1 + 0x08] = u32[A1 + 0x04]
+		u32[A1 + 0x04] = u32[A1]
+		u32[A1] = D0
+		u8[0xffffee5a] = 0
+	}
+	else if (D0 < u32[A1 + 0x04])
+	{
+		u8[A1 + 0x0e] = u8[A1 + 0x0d]
+		u8[A1 + 0x0d] = u8[0xffffffea]
+		u32[A1 + 0x08] = u32[A1 + 0x04]
+		u32[A1 + 0x04] = D0
+		u8[0xffffee5a] = 0x01
+	}
+	else if (D0 < u32[A1 + 0x08])
+	{
+		u8[A1 + 0x0e] = u8[0xffffffea]
+		u32[A1 + 0x08] = D0
+		u8[0xffffee5a] = 0x02
+	}
+
+	fn00c3c2()
+}
+
+
+
+// "Fault" text
+
+//# address-hook(0x0374b8) end(0x0374ea)
+function void fn0374b8()
+{
+	objA0.mapping_offset = 0x0375fa
+	objA0.sprite_attributes = 0x8756
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x28
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0xb8
+	objA0.state = 0x07
+
+	u32[A0] = 0x0374f0
+	fn0374f0()
+}
+
+
+//# address-hook(0x0374f0) end(0x037508)
+function void fn0374f0()
+{
+	if (u16[0xffffeee6] == 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	Object.animationUpdate(0x03750e)
+	DrawObject()
+}
+
+
+
+// Time Display
+
+//# address-hook(0x037c8e) end(0x037cd6)
+function void fn037c8e()
+{
+	objA0.mapping_offset = 0xff7000
+	objA0.sprite_attributes = 0x8600
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x10
+	objA0.position.x.u16 = 0xc8
+	objA0.position.y.u16 = 0x90
+	objA0.render_flags |= 0x08
+
+	A1 = 0x037e8e
+	A2 = 0xffff7000
+	D0.u16 = 0x19
+	while (D0.s16 >= 0)
+	{
+		u16[(A2+=2)-2] = u16[(A1+=2)-2]
+		--D0.s16
+	}
+
+	u32[A0] = 0x037cdc
+	fn037cdc()
+}
+
+
+//# address-hook(0x037cdc) end(0x037cfe)
+function void fn037cdc()
+{
+	A1 = 0xfffffe26
+	A2 = 0xffff700a
+	A3 = 0xfffffe23
+	D1 = u8[0xffffee5c]
+	A4 = 0xfffffe1e
+	A5 = 0xffffee52
+	A6 = 0xffff7828
+	fn037d7c()
+}
+
+
+//# address-hook(0x037d00) end(0x037d54)
+function void fn037d00()
+{
+	if (competition_mode.multiplay == 0)
+	{
+		UnloadObject()
+		return
+	}
+
+#if STANDALONE
+	objA0.mapping_offset = 0xffff7080
+#else
+	objA0.mapping_offset = 0xff7080		// Needs to be set that way for verification
+#endif
+	objA0.sprite_attributes = 0x8600
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x10
+	objA0.position.x.u16 = 0xc8
+	objA0.position.y.u16 = 0x90
+	objA0.render_flags |= 0x10
+
+	copyMemory(0xffff7080, 0x037e8e, 0x34)
+
+	u32[A0] = 0x037d5a
+	fn037d5a()
+}
+
+
+//# address-hook(0x037d5a) end(0x037d76)
+function void fn037d5a()
+{
+	A1 = 0xfffffed6
+	A2 = 0xffff708a
+	A3 = 0xfffffed3
+	D1 = u8[0xffffee5d]
+	A4 = 0xfffffec7
+	A5 = 0xffffee56
+	A6 = 0xffff7840
+	fn037d7c()
+}
+
+
+//# address-hook(0x037d7c) end(0x037e24)
+function void fn037d7c()
+{
+	bool goto037dd0 = false
+	if (s8[A4] > 0)
+	{
+		if (u32[A5] >= 0x093b63)
+		{
+			u8[A4] = 0x80
+			u32[A5] = 0x093b63
+			goto037dd0 = true
+		}
+		else
+		{
+			--A1
+			++u8[A1]
+			if (u8[A1] >= 60)
+			{
+				u8[A1] = 0
+				--A1
+				++u8[A1]
+				if (u8[A1] >= 60)
+				{
+					u8[A1] = 0
+					--A1
+					++u8[A1]
+				}
+			}
+		}
+	}
+
+	if (!goto037dd0)
+	{
+		D6 = u32[A3 - 0x01]
+		fn00b0e4()
+
+		if (D1.u16 < 0x05)
+		{
+			D1.u16 <<= 2
+			u32[A6 + D1.s16] = D6
+			D5 = u32[A6 + 0x14]
+			fn036f76()
+			u32[A5] = D6
+		}
+	}
+
+	++A5
+	A1 = 0x037e2a
+	D0 = u8[(A5+=1)-1] * 4
+	u32[(A2+=4)-4] = u32[A1 + D0.u16]
+	A2 += 8
+	D2 = 0
+	D0 = u8[(A5+=1)-1]
+	while (true)
+	{
+		D0.u16 -= 0x0a
+		if (D0.s16 < 0)
+			break
+
+		D2.u16 += 4
+	}
+	D0.u16 += 0x0a
+
+	u32[(A2+=4)-4] = u32[A1 + D2.s16]
+	A2 += 2
+	D0.u16 <<= 2
+	u32[(A2+=4)-4] = u32[A1 + D0.s16]
+	A2 += 8
+	D0 = u8[(A5+=1)-1]
+	D2 = 0
+	while (true)
+	{
+		D0.u16 -= 0x0a
+		if (D0.s16 < 0)
+			break
+
+		D2.u16 += 4
+	}
+	D0.u16 += 0x0a
+
+	u32[(A2+=4)-4] = u32[A1 + D2.s16]
+	A2 += 2
+	D0.u16 <<= 2
+	u32[(A2+=4)-4] = u32[A1 + D0.s16]
+
+	DrawObject()
+}
+
+
+
+//# address-hook(0x00b0e4) end(0x00b0f2)
+function void fn00b0e4()
+{
+	A1 = 0x037e52
+	D0 = D6.u8
+	D6.u8 = u8[A1 + D0.s16]
+}
+
+
+
+// Item Display
+
+//# address-hook(0x037ec2) end(0x037f14)
+function void fn037ec2()
+{
+	objA0.mapping_offset = 0x037f6a
+	objA0.sprite_attributes = 0x8750
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.position.x.u16 = 0x120 + getScreenExtend()
+	objA0.position.y.u16 = 0xe0
+
+	if (objA0.subtype2c != 0)
+	{
+		if (!competition_mode.multiplay)
+		{
+			UnloadObject()
+			return
+		}
+
+		objA0.render_flags |= 0x10
+		u32[A0] = 0x037f42
+		fn037f42()
+	}
+	else
+	{
+		objA0.render_flags |= 0x08
+		u32[A0] = 0x037f1a
+		fn037f1a()
+	}
+}
+
+
+//# address-hook(0x037f1a) end(0x037f3c)
+function void fn037f1a()
+{
+	if (u8[0xffffb02b] & 0x04)
+	{
+		objA0.animation.sprite = (global.move.speedcap == 0x0c00) ? 1 : 2
+	}
+	else
+	{
+		objA0.animation.sprite = (ring_counter == 0) ? 0 : 3
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x037f42) end(0x037f64)
+function void fn037f42()
+{
+	if (u8[0xffffb075] & 0x04)
+	{
+		objA0.animation.sprite = (u16[0xfffffec0] == 0x0c00) ? 1 : 2
+	}
+	else
+	{
+		objA0.animation.sprite = (u16[0xfffffed0] == 0) ? 0 : 3
+	}
+	DrawObject()
+}
+
+
+
+// Unknown
+
+//# address-hook(0x03827a) end(0x03827a)
+function void fn03827a()
+{
+}

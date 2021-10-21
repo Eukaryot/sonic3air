@@ -1,0 +1,48 @@
+{
+
+	// Enter the path to the game ROM here if it can't be found automatically
+	"RomPath": "___internal/Sonic_Knuckles_wSonic3.bin",
+
+	// Paths
+	"ScriptsDir":     "scripts",
+	"MainScriptName": "main.lemon",
+	"SaveStatesDir":  "saves/states",
+
+	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
+	"PlatformFlags": "-1",
+
+	// Load save state
+	"LoadSaveState": "state_01",
+	//"LoadLevel": "0x0601",
+	//"UseCharacters": "2",			// 0: Sonic & Tails, 1: Sonic, 2: Tails, 3: Knuckles, 4: Knuckles & Tails
+
+	// Game
+	"StartPhase": "3",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
+	"DevMode": "1",
+	"GameRecording": "-1",
+	"GameRecPlayFrom": "0",
+	"GameRecIgnoreKeys": "0",
+
+	// Video
+	"WindowSize": "1200 x 740",
+	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
+	"Filtering": "0",				// Can be toggled with Alt + F
+	"FullEmulationRendering": "1",	// Can be toggled with R key
+
+	// Audio
+	"AudioSampleRate": "48000",
+
+	// Input recorder
+	"InputRecorder":
+	{
+		//"Playback": "test_00",
+		//"Record": "test_00",
+		"": ""
+	},
+
+	// Script / Debug
+	"ScriptOptimizationLevel": "3",
+	"CompileScripts": "0",
+	"EnableROMDataAnalyzer": "0",
+	"WaitForDebugger": "0"
+}

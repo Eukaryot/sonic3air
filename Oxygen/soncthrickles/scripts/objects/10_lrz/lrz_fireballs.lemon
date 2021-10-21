@@ -1,0 +1,94 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Fire ball emitter
+
+//# address-hook(0x042bb8) end(0x042bf0)
+function void fn042bb8()
+{
+	objA0.mapping_offset = 0x042cb2
+	objA0.sprite_attributes = 0x63a1
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x04
+#if STANDALONE
+	// The box is definitely too small, was this by intent or did someone confuse x and y?
+	objA0.box_size.y = 0x10
+#endif
+	objA0.sprite_priority = 0x0280
+	objA0.animation.sprite = 2
+	u16[A0 + 0x30] = u16(objA0.subtype2c) * 4
+
+	objA0.update_address = 0x042bf6
+	fn042bf6()
+}
+
+
+//# address-hook(0x042bf6) end(0x042c7a)
+function void fn042bf6()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_value = u16[A0 + 0x30]
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			if (allocDynamicObjectAfterA0())
+			{
+				objA1.update_address = 0x042c80
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16
+				objA1.position.x.u16 += 0x08
+				u8[A1 + 0x04] = objA0.render_flags
+				u32[A1 + 0x0c] = objA0.mapping_offset
+				u16[A1 + 0x0a] = 0x03a1
+				u16[A1 + 0x08] = 0x0300
+				u8[A1 + 0x07] = 0x0c
+				u8[A1 + 0x06] = 0x08
+				u8[A1 + 0x28] = 0x9b
+				u8[A1 + 0x2b] |= 0x10
+				objA1.velocity.x = 0x0200
+				if (objA0.flags2a & 0x01)
+				{
+					objA1.velocity.x = -objA1.velocity.x
+					objA1.position.x.u16 -= 0x10
+				}
+
+				playSound(0x67)
+			}
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+// Fire ball
+
+//# address-hook(0x042c80) end(0x042cac)
+function void fn042c80()
+{
+	if ((level.framecounter.low & 0x03) == 0)
+	{
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x01
+	}
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		UpdateMovementStraightSimple()
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}

@@ -1,0 +1,189 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Collapsing Cliff (AIZ, ICZ)                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x0204fe) end(0x02058e)
+function void CollapsingCliff.Init()
+{
+	objA0.sprite_attributes = 0x4001
+	if (global.zone == 0x05)
+	{
+		// IceCap Zone
+		objA0.mapping_offset = 0x21f2f2
+		u32[A0 + 0x30] = 0x020cd4
+		u32[A0 + 0x3c] = 0x020ede
+		objA0.box_size.x = 0x30
+		objA0.box_size.y = 0x30
+	}
+	else
+	{
+		// Angel Island Zone
+		u32[A0 + 0x0c] = (global.zone_act == 0x0001) ? 0x21e7ac : 0x21e6c8
+		u32[A0 + 0x30] = 0x020cb6
+		u32[A0 + 0x3c] = 0x020e9e
+		objA0.box_size.x = 0x3c
+		objA0.box_size.y = 0x20
+	}
+
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x280
+	objA0.flags38 = 0x07
+	objA0.animation.sprite = objA0.subtype2c
+	objA0.flags2a |= 0x80
+	objA0.update_address = 0x020594
+	CollapsingCliff.Update()
+}
+
+
+//# address-hook(0x020594) end(0x0205b0)
+function void CollapsingCliff.Update()
+{
+	if (objA0.value3a != 0)
+	{
+		if (objA0.flags38 == 0)
+		{
+			fn020c24()
+			return
+		}
+		--objA0.flags38
+	}
+
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 != 0)
+	{
+		objA0.value3a = 1
+	}
+
+	fn0205b6()
+}
+
+
+//# address-hook(0x0205b6) end(0x0205ca)
+function void fn0205b6()
+{
+	D1 = objA0.box_size.x
+	A2 = u32[A0 + 0x3c]
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x020c24) end(0x020c34)
+function void fn020c24()
+{
+	objA0.update_address = 0x0205de
+	D4 = 0x0205ce
+	objA0.animation.sprite += 2
+	A4 = u32[A0 + 0x30]
+	fn020c38()
+}
+
+
+//# address-hook(0x020c38) end(0x020cb0)
+function void fn020c38()
+{
+	D0 = objA0.animation.sprite * 2
+	A3 = u32[A0 + 0x0c]
+	A3.u16 += u16[A3 + D0.s16]
+	D1.u16 = u16[(A3+=2)-2]
+	objA0.render_flags |= 0x20
+	D5.u8 = objA0.render_flags
+	A1 = A0
+
+	while (true)
+	{
+		u8[A1 + 0x04] = D5.u8
+		u8[A1 + 0x06] = objA0.box_size.y
+		u8[A1 + 0x07] = objA0.box_size.x
+		u16[A1 + 0x08] = objA0.sprite_priority
+		u16[A1 + 0x0a] = u16[A0 + 0x0a]
+		u32[A1 + 0x0c] = A3
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x38] = u8[(A4+=1)-1]
+
+		--D1.s16
+		if (D1.s16 <= 0)
+			break
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		A3 += 6
+		u32[A1] = D4
+	}
+
+	DrawObject()
+
+	if (objA0.respawn_entry)
+	{
+		A1 = 0xffff0000 + objA0.respawn_entry
+		u8[A1] &= ~0x80
+		objA0.respawn_entry = 0
+	}
+	playSound(SFX_COLLAPSE)
+}
+
+
+//# address-hook(0x0205ce) end(0x0205da)
+function void fn0205ce()
+{
+	--objA0.flags38
+	if (objA0.flags38 == 0)
+	{
+		objA0.update_address = 0x020620
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x0205de) end(0x02061e)
+function void fn0205de()
+{
+	fn0205b6()
+	--objA0.flags38
+	if (objA0.flags38 == 0)
+	{
+		objA0.update_address = 0x020620
+
+		for (u8 i = 0; i < 2; ++i)
+		{
+			A1 = 0xffffb000 + i * 0x4a
+			u8 bit = 1 << (3 + i)
+
+			if (objA0.flags2a & bit)
+			{
+				objA0.flags2a &= ~bit
+				objA1.flags2a &= ~char.flag.ON_OBJECT
+				objA1.flags2a &= ~char.flag.PUSHING
+				objA1.flags2a |= char.flag.IN_AIR
+				u8[A1 + 0x21] = 1
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x020620) end(0x02062c)
+function void fn020620()
+{
+	if (!(objA0.render_flags & render_flag.VISIBLE))
+	{
+		UnloadObject()
+	}
+	else
+	{
+		UpdateMovementSimple()
+		DrawObject()
+	}
+}

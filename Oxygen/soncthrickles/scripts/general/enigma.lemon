@@ -1,0 +1,258 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Enigma Decompression                                  //
+//-------------------------------------------------------//
+
+function void Enigma.decompress(u32 compressedSourceAddress, u32 outputAddress, u16 index)
+{
+	A0 = compressedSourceAddress
+	A1 = outputAddress
+	D0.u16 = index
+	Enigma.Decompress()
+}
+
+
+//# address-hook(0x0018b4) end(0x0018fa)
+//# translated(0x0018fe) end(0x001958)
+function void Enigma.Decompress()
+{
+	pushDxA12345()
+
+	A3 = 0xffff0000 + D0.u16
+	A5 = 0xffff0000 + u8[A0]
+	A2 = 0xffff0000 + u16[A0+2] + A3.u16
+	A4 = 0xffff0000 + u16[A0+4] + A3.u16
+	D4.u8 = u8[A0+1] << 3
+	D5.u16 = (u16(u8[A0+6]) << 8) + u8[A0+7]
+	D6 = 0x10
+	A0 += 8
+
+	while (true)
+	{
+		D0 = 7
+		D7 = D6.u16 - D0.u16
+		D1.u16 = (D5.u16 >> D7) & 0x7f
+		D2.u16 = D1.u16
+		if (D1.u16 < 0x40)
+		{
+			D0 = 6
+			D2.u16 >>= 1
+		}
+
+		fn001a22()
+
+		D2.u16 &= 0x0f
+		D1.u16 = (D1.u16 >> 4) * 2
+
+		if (D1.u16 == 0x00 || D1.u16 == 0x02)
+		{
+			while (true)
+			{
+				u16[(A1+=2)-2] = A2.u16
+				++A2
+				--D2.s16
+				if (D2.s16 < 0)
+					break
+			}
+		}
+		else if (D1.u16 == 0x04 || D1.u16 == 0x06)
+		{
+			while (true)
+			{
+				u16[(A1+=2)-2] = A4.u16
+				--D2.s16
+				if (D2.s16 < 0)
+					break
+			}
+		}
+		else if (D1.u16 == 0x08)
+		{
+			fn001972()
+
+			while (true)
+			{
+				u16[(A1+=2)-2] = D1.u16
+				--D2.s16
+				if (D2.s16 < 0)
+					break
+			}
+		}
+		else if (D1.u16 == 0x0a)
+		{
+			fn001972()
+
+			while (true)
+			{
+				u16[A1] = D1.u16
+				A1 += 2
+				++D1.u16
+				--D2.s16
+				if (D2.s16 < 0)
+					break
+			}
+		}
+		else if (D1.u16 == 0x0c)
+		{
+			fn001972()
+
+			while (true)
+			{
+				u16[A1] = D1.u16
+				A1 += 2
+				--D1.u16
+				--D2.s16
+				if (D2.s16 < 0)
+					break
+			}
+		}
+		else if (D1.u16 == 0x0e)
+		{
+			if (D2.u16 == 0x0f)
+			{
+				fn00195a()
+				return
+			}
+
+			while (true)
+			{
+				fn001972()
+
+				u16[A1] = D1.u16
+				A1 += 2
+				--D2.s16
+				if (D2.s16 < 0)
+					break
+			}
+		}
+		else
+		{
+			// Fallback -- should never be used
+			call 0x00194a + D1.s16
+			return
+		}
+	}
+}
+
+
+//# address-hook(0x00195a) end(0x001970)
+function void fn00195a()
+{
+	--A0
+	if (D6.u16 == 0x10)
+		--A0
+
+	D0.u16 = A0.u16
+	if (D0.u16 & 1)
+		++A0
+	D0.u16 >>= 1
+
+	popDxA12345()
+}
+
+
+//# address-hook(0x001972) end(0x001a00)
+function void fn001972()
+{
+	D3.u16 = A3.u16
+	D1.u8 = D4.u8
+	if (D1.u8 & 0x80)
+	{
+		--D6.u16
+		if (D5 & (u32(1) << D6))
+		{
+			D3.u16 |= 0x8000
+		}
+	}
+	if (D1.u8 & 0x40)
+	{
+		--D6.u16
+		if (D5 & (u32(1) << D6))
+		{
+			D3.u16 += 0x4000
+		}
+	}
+	if (D1.u8 & 0x20)
+	{
+		--D6.u16
+		if (D5 & (u32(1) << D6))
+		{
+			D3.u16 += 0x2000
+		}
+	}
+	if (D1.u8 & 0x10)
+	{
+		--D6.u16
+		if (D5 & (u32(1) << D6))
+		{
+			D3.u16 |= 0x1000
+		}
+	}
+	if (D1.u8 & 0x08)
+	{
+		--D6.u16
+		if (D5 & (u32(1) << D6))
+		{
+			D3.u16 |= 0x0800
+		}
+	}
+
+	D1.u16 = D5.u16
+	D7.u16 = D6.u16 - A5.u16
+	if (D7.s16 > 0)
+	{
+		D1.u16 >>= D7
+		D0.u16 = A5.u16 * 2
+		D1.u16 &= u16[0x001a00 + D0.s16]
+		D1.u16 += D3.u16
+		D0.u16 = A5.u16
+		fn001a22()
+		return
+	}
+	else if (D7.s16 < 0)
+	{
+		D6.u16 = D7.u16 + 0x10
+		D7.s16 = -D7.s16
+		D1.u16 <<= D7
+		D5.u8 = u8[A0]
+		D5.u8 = (D5.u8 << D7.u8) | (D5.u8 >> (8 - D7.u8))
+		D7.u16 *= 2
+		D5.u16 &= u16[0x001a00 + D7.s16]
+		D1.u16 += D5.u16
+	}
+	else
+	{
+		D6 = 0x10
+	}
+
+	D0.u16 = A5.u16 * 2
+	D1.u16 &= u16[0x001a00 + D0.s16]
+	D1.u16 += D3.u16
+#if STANDALONE
+	D5.u16 = u16[A0]
+#else
+	D5.u16 = (u8[A0] << 8) + u8[A0+1]
+#endif
+	A0 += 2
+}
+
+
+//# address-hook(0x001a22) end(0x001a30)
+function void fn001a22()
+{
+	D6.u16 -= D0.u16
+	if (D6.u16 < 9)
+	{
+		D6.u16 += 8
+		D5.u16 = (D5.u16 << 8) + u8[A0]
+		++A0
+	}
+}

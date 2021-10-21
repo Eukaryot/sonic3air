@@ -1,0 +1,707 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// AIZ zip line                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x021c6e) end(0x021cb6)
+function void AIZZipLine.Init()
+{
+	A1 = A0
+	objA1.update_address = 0x021d28
+	fn021d00()
+
+	u8[A1 + 0x22] = 0x21
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+	u16[A0 + 0x46] = objA0.position.x.u16 + ((objA0.subtype2c & 0x7f) << 4)
+
+	D1 = 4
+	if (allocDynamicObjectAfterA0())
+	{
+		objA0.value3e = A1.u16
+		objA1.update_address = 0x021f80
+		u16[A1 + 0x3c] = A0.u16
+		fn021cb8()
+	}
+	else
+	{
+		fn021d28()
+	}
+}
+
+
+//# translated(0x021cb8) end(0x021cfe)
+//# address-hook(0x021cd0)
+function void fn021cb8()
+{
+	while (D1.s16 >= 0)
+	{
+		A2 = A1
+		fn021d00()
+		objA1.position.x.u16 = D2.u16
+		objA1.position.y.u16 = D3.u16
+		D3.u16 += 0x10
+		++u16[A0 + 0x36]
+		u16[A1 + 0x36] = u16[A0 + 0x36]
+
+		--D1.s16
+		if (D1.s16 < 0)
+		{
+			objA1.update_address = 0x022074
+			u8[A1 + 0x22] = 0x20
+			u16[A0 + 0x40] = A1.u16
+			break
+		}
+
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		objA1.update_address = 0x022014
+		u16[A1 + 0x3c] = A2.u16
+		u16[A2 + 0x3e] = A1.u16
+	}
+	fn021d28()
+}
+
+
+//# address-hook(0x021d00) end(0x021d26)
+function void fn021d00()
+{
+	u8[A1 + 0x04] = render_flag.WORLD
+	u8[A1 + 0x06] = 8
+	u8[A1 + 0x07] = 8
+	u16[A1 + 0x08] = 0x0200
+	u16[A1 + 0x0a] = 0x041b
+	u32[A1 + 0x0c] = 0x022b9e
+}
+
+
+//# address-hook(0x021d28) end(0x021d48)
+function void fn021d28()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x40]
+	if (u16[A1 + 0x32] != 0)
+	{
+		objA0.update_address = 0x021d4c
+		A1 = 0xffff0000 + u16[A0 + 0x3e]
+		u16[A1 + 0x2e] = 1
+		u16[A1 + 0x38] = 0
+	}
+	fn021f38()
+}
+
+
+
+//# address-hook(0x021d4c) end(0x021dee)
+function void fn021d4c()
+{
+	objA0.position.x += 0x80000
+	objA0.position.y += 0x20000
+	D0.u16 = objA0.position.x.u16
+	if (D0.u16 >= u16[A0 + 0x46])
+	{
+		if (s8[A0 + 0x2c] < 0)
+		{
+			objA0.update_address = 0x021df2
+			objA0.velocity.x = 0x800
+			objA0.velocity.y = 0x200
+			objA0.mapping_offset = 0x02bfda
+			objA0.sprite_attributes = 0x62e9
+			objA0.box_size.x = 8
+			objA0.box_size.y = 12
+			objA0.animation.sprite = 0
+			objA0.state.both = 1
+
+			A1 = 0xffff0000 + u16[A0 + 0x40]
+			A2 = A1 + 0x32
+			if (u8[A2] != 0)
+				u8[A2] = 0x81
+
+			++A2
+			if (u8[A2] != 0)
+				u8[A2] = 0x81
+		}
+		else
+		{
+			objA0.update_address = 0x021e14
+			A1 = 0xffff0000 + u16[A0 + 0x3e]
+			objA1.update_address = 0x021fe8
+			u16[A1 + 0x3a] = 0
+			A1 = 0xffff0000 + u16[A0 + 0x40]
+			u16[A1 + 0x30] = 1
+			u16[A0 + 0x26] = 0
+			u16[A0 + 0x3a] = 0x400
+		}
+	}
+	fn021f38()
+}
+
+
+// Broken zip line in AIZ 2
+//# address-hook(0x021df2) end(0x021e10)
+function void fn021df2()
+{
+	UpdateMovementSimple()
+	if (!(objA0.render_flags & render_flag.VISIBLE))
+	{
+		objA0.position.x.u16 = 0x7ff0
+	}
+	Object.animationUpdate(0x02bf9c)
+	fn021f38()
+}
+
+
+//# address-hook(0x021e14) end(0x021e68)
+function void fn021e14()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x40]
+	D0.u16 = u16[A0 + 0x3a] - abs(s8(objA0.value26)) * 2
+	u16[A0 + 0x26] -= D0.u16
+	if (u16[A1 + 0x32] == 0)
+	{
+		D0.u8 = objA0.value26 + 8
+		if (D0.u8 < 0x10)
+		{
+			objA0.update_address = 0x021e6c
+			objA0.value42 = 0
+			u16[A0 + 0x44] = 0xfd00
+			u16[A0 + 0x38] = 0x1000
+			objA0.countdown_value = 0
+			A1 = 0xffff0000 + u16[A0 + 0x40]
+			u16[A1 + 0x30] = 2
+		}
+	}
+	fn021f38()
+}
+
+
+
+// The following seems to control the zip line animation somehow
+
+//# address-hook(0x021e6c) end(0x021f06)
+function void AIZZipLine.unknown_fn021e6c()
+{
+	D2 = objA0.flags38
+	D0.u16 = u16[A0 + 0x44]
+	D1.u16 = 0
+	if (objA0.countdown_value == 0)
+	{
+		D0.u16 += D2.u16
+		u16[A0 + 0x44] = D0.u16
+		objA0.value42 += D0.u16
+		if (D1.s8 <= s8[A0 + 0x42])
+		{
+			D0.s16 >>= 4
+			u16[A0 + 0x44] -= D0.u16
+			objA0.countdown_value = 1
+			if (u16[A0 + 0x38] == 0xc00)
+			{
+				objA0.update_address = 0x021f0a
+				u16[A0 + 0x38] = 0
+				A1 = 0xffff0000 + u16[A0 + 0x40]
+				u16[A1 + 0x30] = 0
+			}
+			else
+			{
+				u16[A0 + 0x38] -= 0x40
+			}
+		}
+	}
+	else
+	{
+		D0.u16 -= D2.u16
+		u16[A0 + 0x44] = D0.u16
+		objA0.value42 += D0.u16
+		if (D1.s8 > s8[A0 + 0x42])
+		{
+			D0.s16 >>= 4
+			u16[A0 + 0x44] -= D0.u16
+			objA0.countdown_value = 0
+			if (u16[A0 + 0x38] == 0xc00)
+			{
+				objA0.update_address = 0x021f0a
+				u16[A0 + 0x38] = 0
+				A1 = 0xffff0000 + u16[A0 + 0x40]
+				u16[A1 + 0x30] = 0
+			}
+			else
+			{
+				u16[A0 + 0x38] -= 0x40
+			}
+		}
+	}
+
+	D0.u16 = objA0.value42
+	u16[A0 + 0x26] = D0.u16
+	D0.s16 >>= 3
+	u16[A0 + 0x3a] = D0.u16
+	A1 = 0xffff0000 + u16[A0 + 0x3e]
+	u16[A1 + 0x3a] = u16[A0 + 0x3a]
+	fn021f38()
+}
+
+
+//# address-hook(0x021f0a) end(0x021f0e)
+function void fn021f0a()
+{
+	D0.u8 = objA0.flags38
+	u16[A0 + 0x38] += 0x0200
+	fn021f38()
+}
+
+
+//# address-hook(0x021f14) end(0x021f32)
+function void fn021f14()
+{
+	D0.s16 = lookupSin(D0.u8) << 2
+	if (D0.u16 == 0x400)
+		D0.u16 = 0x3ff
+	u16[A0 + 0x26] = D0.u16
+	u16[A0 + 0x3a] = D0.u16
+
+	A1 = 0xffff0000 + u16[A0 + 0x3e]
+	u16[A1 + 0x3a] = u16[A0 + 0x3a]
+	fn021f38()
+}
+
+
+//# address-hook(0x021f38) end(0x021f7a)
+function void fn021f38()
+{
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x280)
+	{
+		DrawObject()
+	}
+	else
+	{
+		A2 = 0xffff0000 + u16[A0 + 0x3e]
+		D2.u16 = u16[A0 + 0x36]
+		while (D2.s16 > 0)
+		{
+			A1 = A2
+			A2 = 0xffff0000 + u16[A1 + 0x3e]
+			UnloadObjectA1()
+			--D2.s16
+		}
+
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+
+// Swinging of zip line
+
+//# address-hook(0x021f80) end(0x021fe2)
+function void fn021f80()
+{
+	u8 angle = u8[A0 + 0x38]
+	if (objA0.countdown_value == 0)
+	{
+		u16[A0 + 0x38] += 0x200
+		D0.s16 = lookupSin(angle) << 2
+		if (D0.u16 == 0x400)
+			D0.u16 = 0x3ff
+		u16[A0 + 0x3a] = D0.u16
+	}
+	else
+	{
+		u16[A0 + 0x38] += 0x100
+		D0.s16 = lookupSin(angle) << 3
+		u16[A0 + 0x3a] = D0.u16
+	}
+
+	u16[A0 + 0x26] = u16[A0 + 0x3a]
+	objA0.animation.sprite = u8(objA0.value26 + 4) >> 3
+
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	DrawObject()
+}
+
+
+//# address-hook(0x021fe8) end(0x02200e)
+function void AIZZipLine.unknown_fn021fe8()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	u16[A0 + 0x26] = u16[A1 + 0x26]
+	objA0.animation.sprite = u8(objA0.value26 + 4) >> 3
+
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	DrawObject()
+}
+
+
+//# address-hook(0x022014) end(0x02203a)
+function void fn022014()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	u16[A0 + 0x3a] = u16[A1 + 0x3a]
+#if STANDALONE
+	// Slightly bend the vine; this helps smoothing the animation
+	u16[A0 + 0x3a] += 0x100
+#endif
+	u16[A0 + 0x26] = u16[A1 + 0x26] + u16[A0 + 0x3a]
+	objA0.animation.sprite = u8(objA0.value26 + 4) >> 3
+
+	fn022040()
+	DrawObject()
+}
+
+
+
+// Vine segment
+
+// These are basically the same
+//  -> In fact, one calls 0x022040, the other calls 0x02254a, but these are identical
+//# address-hook(0x022074) end(0x0220c0)
+//# address-hook(0x02257e) end(0x0225ce)
+function void AIZZipLine.BaseUpdate()
+{
+	D4.u16 = objA0.position.x.u16
+	D5.u16 = objA0.position.y.u16
+	fn022040()
+
+	if (D4.u16 != objA0.position.x.u16)
+	{
+		u16[A0 + 0x42] = D4.u16
+	}
+	if (D5.u16 != objA0.position.y.u16)
+	{
+		u16[A0 + 0x44] = D5.u16
+	}
+
+	// React to player input (jumping off)
+	A1 = 0xffffb000
+	A2 = A0 + 0x32
+	D0.u16 = control.player1
+	fn0220c2()
+
+	A1 = 0xffffb04a
+	A2 += 1
+	D0.u16 = control.tails
+	fn0220c2()
+
+	if (u16[A0 + 0x32] == 0 || u16[A0 + 0x30] == 0)
+	{
+		DrawObject()
+	}
+}
+
+
+// These two are exactly the same
+//# address-hook(0x022040) end(0x022072)
+//# address-hook(0x02254a) end(0x02257c)
+function void fn022040()
+{
+	// Move with parent object
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	u8 angle = u8[A1 + 0x26]
+
+#if 0
+
+	// The following is not a good idea to get things smoothed because it will make the vine look broken
+
+	// To get better precision, rotate around the root object
+	u8 distance = 1
+	while (objA1.update_address == objA0.update_address)
+	{
+		A1 = 0xffff0000 + u16[A1 + 0x3c]
+		++distance
+	}
+
+	s16 dx = ((8 - lookupSin(angle)) * distance) >> 4
+	s16 dy = ((8 + lookupCos(angle)) * distance) >> 4
+	objA0.position.x.u16 = objA1.position.x.u16 + dx
+	objA0.position.y.u16 = objA1.position.y.u16 + dy
+
+#else
+
+	angle = (angle + 4) & 0xf8
+	s16 dx = (8 - lookupSin(angle)) >> 4
+	s16 dy = (8 + lookupCos(angle)) >> 4
+	objA0.position.x.u16 = objA1.position.x.u16 + dx
+	objA0.position.y.u16 = objA1.position.y.u16 + dy
+
+#endif
+}
+
+
+//# address-hook(0x0220c2) end(0x02219c)
+function void fn0220c2()
+{
+#if STANDALONE
+	if (debug_mode.state)
+	{
+		u8[A2] = 0
+		return
+	}
+#endif
+
+	if (u8[A2] == 0)
+	{
+		fn0222f4()
+		return
+	}
+
+	if (s8[A2] > 0)
+	{
+		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 4)
+		{
+			D1.u8 = D0.u8 & 0x70
+			if (D1.u8 == 0)
+			{
+				fn0221ec()
+				return
+			}
+
+			u8[A2] = 0
+			u8[A1 + 0x2e] = 0
+			if (u16[A0 + 0x30] != 0x01)
+			{
+				D1.s16 = s16(objA0.position.x.u16 - objA0.value42) << 7
+				objA1.velocity.x = D1.u16
+				D1.s16 = s16(objA0.position.y.u16 - u16[A0 + 0x44]) << 7
+				objA1.velocity.y = D1.u16
+				u8[A2 + 0x02] = 0x3c
+				if (D0 & 0x0400)
+				{
+					objA1.velocity.x = -0x200
+				}
+				if (D0 & 0x0800)
+				{
+					objA1.velocity.x = 0x200
+				}
+				objA1.velocity.y -= 0x380
+			}
+			else
+			{
+				u8[A2 + 0x02] = 0x3c
+				A3 = 0xffff0000 + u16[A0 + 0x3c]
+				u8 angle = u8[A3 + 0x26]
+				objA1.velocity.x = lookupCos(angle) << 3
+				objA1.velocity.y = lookupSin(angle) << 3
+			}
+
+			u8[A1 + 0x1e] = 14
+			u8[A1 + 0x1f] = 7
+			objA1.state = char.state.ROLLING
+			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+			u8[A1 + 0x40] = 1
+			return
+		}
+	}
+	else
+	{
+		u8[A1 + 0x2a] |= 0x02
+		objA1.velocity.x = 0x300
+		objA1.velocity.y = 0x200
+	}
+
+	u8[A1 + 0x2e] = 0
+	u8[A2] = 0
+	u8[A2 + 0x02] = 0x3c
+}
+
+
+//# address-hook(0x0221ec) end(0x022246)
+function void fn0221ec()
+{
+	if (u16[A0 + 0x30] != 0)
+	{
+		fn022258()
+		return
+	}
+
+	fn02219e()
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16 + 0x14
+
+	A3 = 0xffff0000 + u16[A0 + 0x3c]
+	D0 = u8[A3 + 0x26]
+	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+		D0.s8 = -D0.s8
+
+	D0.u16 = u8(D0.u8 + 8) >> 4
+	u8[A1 + 0x22] = u8[0x022248 + D0.u16]
+	fn022224()
+}
+
+
+//# address-hook(0x022224)
+function void fn022224()
+{
+	D1.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
+	u8[A1 + 0x04] &= 0xfc
+	u8[A1 + 0x04] |= D1.u8
+
+	D0 = u8[A1 + 0x22]
+	u32 backupA2 = A2
+	SetCharacterSpritePatterns()
+	A2 = backupA2
+}
+
+
+//# address-hook(0x02219e) end(0x0221e0)
+function void fn02219e()
+{
+	if (A1 != 0xffffb000 || D0.u8 == 0)
+		return
+
+	D1 = u8[A0 + 0x25]
+	if (D0.u8 == u8[0x0221e2 + D1.s16])
+	{
+		++u8[A0 + 0x25]
+		D1.u8 = u8[0x0221e3 + D1.s16]
+		if (D1.u8 != 0)
+			return
+
+	#if STANDALONE
+		u8[0x02219e] = 0x14
+	#else
+		levelselect.unlocked = 1
+		pausecheats.unlocked = 1
+	#endif
+
+		D1.u16 = D0.u16
+		playSound(SFX_RING)
+		D0.u16 = D1.u16
+	}
+	u8[A0 + 0x25] = 0
+}
+
+
+//# address-hook(0x022258) end(0x0222d0)
+function void fn022258()
+{
+	A3 = 0xffff0000 + u16[A0 + 0x3c]
+	u8 angle = u8[A3 + 0x26]
+	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+		angle = -angle
+
+	objA1.state = char.state.RUNNING
+	A3 = 0xffff0000 + u16[A0 + 0x3c]
+
+	u16 offset = (u8(angle + 0x10) >> 5) * 2
+	u8[A1 + 0x22] = u8[0x0222d4 + offset]
+
+#if STANDALONE
+
+	// Using smooth rotation
+	u8[A1 + 0x26] = u8[A3 + 0x26]	// Apply rotation for the character
+
+	s16 dx = lookupSin(angle) * 5/32
+	s16 dy = lookupCos(angle) * 5/32
+	if (!(u8[A1 + 0x2a] & char.flag.FACING_LEFT))
+		dx = -dx
+
+#else
+
+	s16 dx = s8[0x0222e4 + offset]
+	s16 dy = s8[0x0222e5 + offset]
+	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+		dx = -dx
+
+	angle = (angle + 4) & 0xf8
+	dx += (8 - lookupSin(angle)) >> 4
+	dy += (8 + lookupCos(angle)) >> 4
+
+#endif
+
+	objA1.position.x.u16 = u16[A3 + 0x10] + dx
+	objA1.position.y.u16 = u16[A3 + 0x14] + dy
+
+	fn022224()
+}
+
+
+//# address-hook(0x0222f4) end(0x02237c)
+function void fn0222f4()
+{
+	if (u8[A2 + 2] != 0)
+	{
+		--u8[A2 + 2]
+		if (u8[A2 + 2] != 0)
+		{
+			return
+		}
+	}
+
+#if STANDALONE
+	// Increase the hit box a bit
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x12
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x04
+	//debugDrawRect(objA0.position.x.u16 - 0x12, objA0.position.y.u16 - 0x04, 0x24, 0x1c, 0x80ffffff)
+	if (dx < 0x24 && dy < 0x1c)
+#else
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16
+	if (dx < 0x20 && dy < 0x18)
+#endif
+	{
+		if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		{
+		#if STANDALONE
+			// Ignore for Tails while he's carrying the main player
+			if (A1 == 0xffffb04a && tails.carrying)
+				return
+		#endif
+
+			u8[A1 + 0x04] &= 0xfd
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16 + 0x14
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0
+			objA1.state = char.state.HANGING
+			u8[A1 + 0x2e] = 3
+			u8[A1 + 0x3d] = 0
+
+			u8[A2] = 1
+			playSound(SFX_GRAB)
+		}
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// AIZ Zip Line End Pole                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x01e7b6) end(0x01e7dc)
+function void AIZZipLineEndPole.Init()
+{
+	objA0.mapping_offset = 0x21c42a
+	objA0.sprite_priority = 0x380
+	objA0.box_size.x = 0x20
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_attributes = 0x4324
+	objA0.update_address = 0x01e7dc
+	AIZZipLineEndPole.Update()
+}
+
+
+//# address-hook(0x01e7dc)
+function void AIZZipLineEndPole.Update()
+{
+	DrawOrUnloadObject()
+}

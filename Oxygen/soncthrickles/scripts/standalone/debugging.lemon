@@ -1,0 +1,146 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Debug watches                                         //
+//-------------------------------------------------------//
+
+function void Debugging.setupDebugWatches()
+{
+	// This function gets called on each script reload.
+	// It's a good place to temporarily add your custom debug watches when you need them.
+
+	//debugWatch(0xffffb02a, 1)
+}
+
+
+
+//-------------------------------------------------------//
+// Optional debug output                                 //
+//-------------------------------------------------------//
+
+global bool debugDrawFlag
+global bool key0_state
+
+function void Debugging.debugDraw()
+{
+	if (debugDrawFlag)
+	{
+		Debugging.debugDrawDynamicObjects()
+	}
+
+	if (debug_mode.state != 0)
+	{
+		Standalone.debugOutputMultiSampleCollision()
+	}
+
+	if (Key0)
+	{
+		if (!key0_state)
+		{
+			debugDrawFlag = !debugDrawFlag
+			if (debugDrawFlag)
+				System.writeDisplayLine("Enabled collision box debug output")
+			else
+				System.writeDisplayLine("Disabled collision box debug output")
+			key0_state = true
+		}
+	}
+	else
+	{
+		key0_state = false
+	}
+
+	if (Key1)
+	{
+		move_area.left = 0
+		move_area.right = 0x8000
+		move_area.bottom.target = 0x2000
+		move_area.bottom.current = 0x2000
+		level.vertical_wrap = 0
+	}
+}
+
+function void Debugging.debugDrawDynamicObjects()
+{
+	// Draw positions of dynamic objects
+	A0 = 0xffffb000
+	for (u8 i = 0; i < 0x6e; ++i)
+	{
+		if (objA0.update_address != 0)
+		{
+			debugDrawRect(objA0.position.x.u16 - objA0.hitbox_extends.x, objA0.position.y.u16 - objA0.hitbox_extends.y, objA0.hitbox_extends.x * 2 + 1, objA0.hitbox_extends.y * 2 + 1)
+		}
+
+		// Go on to next object
+		A0 += 0x4a
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Debug Side Panel setup                                //
+//-------------------------------------------------------//
+
+// Note that this function gets called outside of usual game simulation and even if simulation is paused.
+// It should not make any changes affecting game simulation, but only read from memory instead.
+
+function void OxygenCallback.setupCustomSidePanelEntries()
+{
+	// Game Objects panel
+	if (System.SidePanel.setupCustomCategory("O", "GAME OBJECTS"))
+	{
+		bool showEmptySlots    = System.SidePanel.addOption("Show empty object slots", true)
+		bool showUpdateRoutine = System.SidePanel.addOption("Show update routine", true)
+		bool showPosition      = System.SidePanel.addOption("Show position", false)
+		bool showSubType       = System.SidePanel.addOption("Show subtype", false)
+
+		for (u32 address = 0xffffb000; address < 0xffffcfcc; address += 0x4a)
+		{
+			u32 updateRoutine = u32[address]
+			if (updateRoutine == 0)
+			{
+				if (showEmptySlots)
+				{
+					System.SidePanel.addEntry(address)
+					System.SidePanel.addLine(stringformat("0x%08x", address), 0, 0xc0c0c0c0)
+					if (showUpdateRoutine)
+						System.SidePanel.addLine(stringformat("---", updateRoutine), 8, 0xc0c0c0c0)
+					if (showPosition)
+						System.SidePanel.addLine("---", 8, 0xc0c0c0c0)
+					if (showSubType)
+						System.SidePanel.addLine("---", 8, 0xc0c0c0c0)
+				}
+				continue
+			}
+
+			u16 px = u16[address + 0x10]
+			u16 py = u16[address + 0x14]
+
+			System.SidePanel.addEntry(address)
+			{
+				System.SidePanel.addLine(stringformat("0x%08x", address), 0)
+				if (showUpdateRoutine)
+					System.SidePanel.addLine(stringformat("- Update routine: 0x%06x", updateRoutine), 8)
+				if (showPosition)
+					System.SidePanel.addLine(stringformat("- Position: 0x%04x, 0x%04x", px, py), 8)
+				if (showSubType)
+					System.SidePanel.addLine(stringformat("- Subtype: 0x%02x", u8[address + 0x2c]), 8)
+			}
+
+			if (System.SidePanel.isEntryHovered(address))
+			{
+				// TODO: Unfortunately, this does not work when simulation is paused
+				debugDrawRect(px - 15, py - 15, 31, 31, 0xc00080ff)
+			}
+		}
+	}
+}

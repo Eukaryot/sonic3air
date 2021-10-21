@@ -1,0 +1,104 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Crusher (large one from MGZ, small one from LBZ)      //
+//-------------------------------------------------------//
+
+//# address-hook(0x029216) end(0x029332)
+function void Crusher.Init()
+{
+	if (global.zone == 0x02)
+	{
+		// Marble Garden Zone: Large crusher
+		objA0.mapping_offset = 0x228246
+		objA0.sprite_attributes = 0x4001
+		objA0.box_size.x = 0x20
+		objA0.box_size.y = 0x28
+		objA0.sprite_priority = 0x0280
+	}
+	else
+	{
+		// Launch Base Zone: Small crusher
+		objA0.mapping_offset = 0x228236
+		objA0.sprite_attributes = 0x4455
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x10
+		objA0.sprite_priority = 0x80
+	}
+
+	objA0.render_flags = render_flag.WORLD
+	u16[A0 + 0x30] = objA0.position.y.u16
+	D0 = u16(objA0.subtype2c) * 8
+	u16[A0 + 0x38] = D0.u16
+
+	objA0.update_address = 0x02927c
+	Crusher.Update()
+}
+
+
+//# address-hook(0x02927c) end(0x029332)
+function void Crusher.Update()
+{
+	if (u8[A0 + 0x32] == 0)
+	{
+		D0.u16 = objA0.velocity.y
+		objA0.velocity.y += 0x80
+		D0.s32 = s32(D0.s16) << 8
+		objA0.countdown_callback += D0
+		D2.u16 = u16[A0 + 0x34]
+		if (D2.u16 >= u16[A0 + 0x38])
+		{
+			objA0.velocity.y = 0
+			u16[A0 + 0x34] = u16[A0 + 0x38]
+			u8[A0 + 0x32] = 0x01
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				playSound((global.zone == 0x02) ? 0x5f : 0x96)
+			}
+		}
+	}
+	else
+	{
+		D2.u16 = u16[A0 + 0x34]
+		if (D2.u16 != 0)
+		{
+			--D2.u16
+			u16[A0 + 0x34] = D2.u16
+		}
+		else
+		{
+			u8[A0 + 0x32] = 0
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x30] + u16[A0 + 0x34]
+	objA0.position.y.u16 = D0.u16
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x04)
+	{
+		A1 = 0xffffb000
+		DamageCharacter()
+	}
+
+	if (D6.u8 & 0x08)
+	{
+		A1 = 0xffffb04a
+		DamageCharacter()
+	}
+
+	DrawOrUnloadObject()
+}

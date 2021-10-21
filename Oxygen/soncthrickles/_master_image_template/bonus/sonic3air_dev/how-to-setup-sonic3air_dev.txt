@@ -1,0 +1,19 @@
+
+Getting started with the development version of Sonic 3 A.I.R.:
+
+- (No extra steps required here any more)
+
+- Just switch to the "bonus/oxygenengine" folder, and start the Oxygen App executable there.
+	That's "OxygenApp.exe" under Windows, or "oxygenapp_linux" under Linux.
+	This engine application is a development environment useful for testing and debugging S3AIR script code.
+
+
+
+Now you have a functional development installation.
+As next steps, make sure to read the documentation, namely:
+
+- The Modding Manual at "doc/Modding.pdf" in the S3AIR game installation.
+
+- The Oxygen Engine Handbook at "bonus/oxygenengine/Handbook.pdf" covering details especially for scripting.
+
+

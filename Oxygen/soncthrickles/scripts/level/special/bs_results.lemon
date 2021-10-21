@@ -1,0 +1,1095 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Special Stage Result Screen                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x02e3b8) end(0x02e3c2)
+function void fn02e3b8()
+{
+	// Targets:
+	//  - 0x02e3da	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x02e410	-> objA0.base_state = 0x02  -> Texts flying in, waiting, then counting
+	//  - 0x02e4d6	-> objA0.base_state = 0x04  -> Check for continue
+	//  - 0x02e512	-> objA0.base_state = 0x06  -> Waiting for fade out
+	call tableLookupAddress(0x02e3c6, objA0.base_state)
+}
+
+
+//# address-hook(0x02e3da) end(0x02e40e)
+function void fn02e3da()
+{
+	A1 = A0 + 0x4a
+	A2 = 0x02e834
+	D1 = 0x12
+	fn02e802()
+
+	results.ring_bonus = u32(bluespheres.rings_collected) * 10
+	results.time_bonus = (bluespheres.rings_remaining == 0) ? 5000 : 0
+
+	// Wait for six seconds
+	objA0.countdown_value = 360
+#if STANDALONE
+	// Shorten the wait time a bit
+	objA0.countdown_value -= 20
+#endif
+	objA0.base_state += 2
+}
+
+
+//# address-hook(0x02e410) end(0x02e4d2)
+function void fn02e410()
+{
+	if (objA0.countdown_value != 0)
+	{
+		// Still waiting
+		--objA0.countdown_value
+		if (objA0.countdown_value == 0 && global.lock_on_state == 0 && global.sk_bluespheres && bluespheres.blue_remaining == 0)
+		{
+			palette_fade.range = 0x003f
+			global.fade_timer = 0x16
+
+			A1 = 0xfffffc00
+			u16[A1 + 0x42] = 0x0eee
+			u16[A1 + 0x44] = 0x0eee
+			u16[A1 + 0x4c] = 0x0eee
+			u16[A1 + 0x62] = 0x0eee
+			u16[A1 + 0x66] = 0x0eee
+			u16[A1 + 0x6e] = 0x0eee
+			u16[A1 + 0x70] = 0x0eee
+			u16[A1 + 0x7c] = 0x0eee
+			u16[A1 + 0x7e] = 0x0eee
+		}
+
+	#if STANDALONE
+		if (objA0.countdown_value == 269)
+	#else
+		if (objA0.countdown_value == 289)
+	#endif
+		{
+			playMusic(MUSIC_LEVELCLEAR)
+		}
+	}
+	else
+	{
+		// Counting bonusses towards score
+		u16 delta = 10
+	#if STANDALONE
+		if (Game.getSetting(SETTING_LEVELRESULT_SCORE))
+		{
+			// Count faster over time
+			if (results.total_bonus >= 3000)
+				delta = 30
+			else if (results.total_bonus >= 1000)
+				delta = 20
+
+			// Allow for manually (more or less) skipping the counter
+			if (control.pad1.state & (CONTROL_ABC | CONTROL_START))
+			{
+				delta = 200
+			}
+		}
+	#endif
+
+		D0 = 0
+		if (results.time_bonus != 0)
+		{
+			u16 diff = min(delta, results.time_bonus)
+			D0.u16 += diff
+			results.time_bonus -= diff
+		}
+		if (results.ring_bonus != 0)
+		{
+			u16 diff = min(delta, results.ring_bonus)
+			D0.u16 += diff
+			results.ring_bonus -= diff
+		}
+
+	#if STANDALONE
+		// Needed for SETTING_LEVELRESULT_SCORE
+		results.total_bonus += D0.u16
+	#endif
+		if (D0.u16 != 0)
+		{
+			// Still counting
+			AddScore()
+			if ((level.framecounter & 0x03) == 0)
+			{
+				playSound(SFX_CLICK)
+			}
+		}
+		else
+		{
+			playSound(0xb0)
+			objA0.countdown_value = 120
+			objA0.base_state += 2
+			fn02e4d6()
+		}
+	}
+}
+
+
+//# address-hook(0x02e4d6) end(0x02e50e)
+function void fn02e4d6()
+{
+	if (bluespheres.rings_collected >= 50)
+	{
+		if (objA0.countdown_value != 0)
+		{
+			--objA0.countdown_value
+			return
+		}
+
+		u16[0xffffeee0] = 0
+		if (allocDynamicObjectAfterA0())
+		{
+			u16[0xffffeee0] = A1.u16
+			objA1.update_address = 0x02ebe8
+			objA0.countdown_value = 0x010e
+			playSound(0xac)
+		}
+	}
+
+	objA0.base_state += 2
+	fn02e512()
+}
+
+
+//# address-hook(0x02e512) end(0x02e5be)
+function void fn02e512()
+{
+	if (global.lock_on_state == 0 && global.sk_bluespheres && bluespheres.blue_remaining == 0)
+	{
+		objA0.countdown_value = 0x3c
+		objA0.base_state = 0x0e
+		fn02e616()
+		return
+	}
+
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+		return
+	}
+
+	if (bluespheres.blue_remaining == 0 && global.chaos_emeralds >= 7)
+	{
+		if (isMainCharacter(CHARACTER_TAILS) && !Game.getSetting(SETTING_HYPER_TAILS))
+		{
+			// Tails
+			if (u8[0xffffef6a] != 4 && u8[0xffffef6a] < 7)
+			{
+				global.game_mode = 0x0c
+				return
+			}
+			objA0.base_state = 0x0a
+		}
+		else
+		{
+			// Sonic, Knuckles (or Tails if using Hyper Tails setting)
+			if (global.lock_on_state == 0)
+			{
+				if (u8[0xffffef6a] == 4 || u8[0xffffef6a] >= 7)
+				{
+					objA0.base_state = 0x0a
+				}
+			}
+		}
+
+		A1 = 0xffffbd96
+		for (u8 i = 0; i < 5; ++i)
+		{
+			objA1.update_address = 0x02ec1e
+			A1 += 0x4a
+		}
+
+		u16[0xffffbe58] = 4
+		u16[0xffffbeec] = 4
+		u16[A0 + 0x30] = 5
+		objA0.base_state += 2
+	}
+	else
+	{
+		global.game_mode = 0x0c
+	}
+}
+
+
+//# address-hook(0x02e5c0) end(0x02e5de)
+function void fn02e5c0()
+{
+	if (u16[A0 + 0x30] == 0)
+	{
+		A1 = 0xffffbd96
+		A2 = 0x02e918
+		D1 = 0x05
+		fn02e802()
+
+		objA0.countdown_value = 0xf0
+		objA0.base_state += 2
+	}
+}
+
+
+//# address-hook(0x02e5e0) end(0x02e5f2)
+function void fn02e5e0()
+{
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+		return
+	}
+
+	global.game_mode = 0x0c
+}
+
+
+//# address-hook(0x02e5f4) end(0x02e614)
+function void fn02e5f4()
+{
+	// "... can go to Hidden Palace"
+	if (u16[A0 + 0x30] == 0)
+	{
+		A1 = 0xffffbd96
+		A2 = 0x02e960
+		D1 = 0x02
+		fn02e802()
+
+		objA0.countdown_value = 0xf0
+		objA0.base_state = 0x0a
+	}
+}
+
+
+//# address-hook(0x02e616) end(0x02e744)
+function void fn02e616()
+{
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+		return
+	}
+
+	D0.u16 = camera.position.y.u16
+	if (D0.u16 < 0x0320)
+	{
+		++D0.u16
+		camera.position.y.u16 = D0.u16
+		if (D0.u16 != 0x02a0)
+			return
+
+		D0 = 4
+		if (bluespheres.rings_collected >= 50)
+		{
+			D1.u16 = u16[0xffffeee0]
+			if (D1.u16 != 0)
+			{
+				A1 = 0xffff0000 + D1.u16
+				objA1.update_address = 0x02ec4a
+				u16[A1 + 0x2e] = 0x14
+			}
+			++D0.u16
+		}
+		u16[A0 + 0x30] = D0.u16
+
+		A1 = 0xffffb98a
+		while (D0.s16 >= 0)
+		{
+			objA1.update_address = 0x02ec1e
+			A1 += 0x4a
+			--D0.s16
+		}
+
+		D0 = (global.super_emeralds >= 7) ? 4 : 2
+		u16[A0 + 0x30] += D0.u16
+
+		A1 = 0xffffbd96
+		while (D0.s16 >= 0)
+		{
+			objA1.update_address = 0x02ec1e
+			A1 += 0x4a
+			--D0.s16
+		}
+
+		u16[A0 + 0x30] += 2
+
+		A1 = 0xffffb98a
+		u16[A1 + 0x2e] = 0x08
+		u16[A1 + 0x78] = 0x0c
+		u16[A1 + 0xc2] = 0x0c
+		u16[A1 + 0x010c] = 0x10
+		u16[A1 + 0x0156] = 0x10
+		if (bluespheres.rings_collected >= 50)
+		{
+			u16[A1 + 0x01a0] = 0x14
+		}
+		u16[A1 + 0xaa] = 0
+		u16[A1 + 0x013e] = 0
+
+		A1 = 0xffffbd96
+		u16[A1 + 0xc2] = 0x04
+		if (global.super_emeralds >= 7)
+		{
+			u16[A1 + 0x0156] = 0x04
+		}
+	}
+	else
+	{
+		updateSpritePattern(0x18a204, 0xf380, 0x0200)
+
+		if (allocDynamicObjectStd())
+		{
+			D1 = 0
+			D2 = 0
+			D3 = 7
+			while (D3.s16 >= 0)
+			{
+				objA1.update_address = 0x02ecd0
+				u16[A1 + 0x2e] = D1.u16
+				u16[A1 + 0x30] = D2.u16
+				u16[A1 + 0x34] = A0.u16
+				D1.u16 += 0x10
+				++D2.u16
+				if (!allocDynamicObjectAfterA1())
+					break
+
+				--D3.s16
+			}
+		}
+
+		objA0.countdown_value = 0x1e
+		u16[A0 + 0x30] = 0
+		objA0.base_state += 2
+
+		playSound(0xb8)
+	}
+}
+
+
+//# address-hook(0x02e746) end(0x02e7d8)
+function void fn02e746()
+{
+	if (u16[A0 + 0x30] == 0)
+		return
+
+	if (s16[A0 + 0x30] > 0)
+	{
+		u8[A0 + 0x30] = 0xff
+		playSound(0x9c)
+	}
+
+	if (global.super_emeralds < 7)
+	{
+		objA0.countdown_value = 0x3c
+		objA0.base_state = 0x0a
+	}
+	else
+	{
+		if (objA0.countdown_value != 0)
+		{
+			--objA0.countdown_value
+		}
+		else
+		{
+			u16 cameraTargetX = 0x15a0 - getScreenExtend()
+			if (camera.position.x.u16 != cameraTargetX)
+			{
+				D0.s16 = (camera.position.x.u16 > cameraTargetX) ? -1 : 1
+				camera.position.x.u16 += D0.u16
+			}
+			else
+			{
+				if (allocDynamicObjectStd())
+				{
+					D1 = 0
+					D2 = 0
+					D3 = 7
+					while (D3.s16 >= 0)
+					{
+						objA1.update_address = 0x02ecd0
+						u16[A1 + 0x2e] = D1.u16
+						u16[A1 + 0x30] = D2.u16
+						u16[A1 + 0x34] = A0.u16
+						u8[A1 + 0x36] = 0xff
+						D1.u16 += 0x10
+						++D2.u16
+						if (!allocDynamicObjectAfterA1())
+							break
+
+						--D3.s16
+					}
+				}
+
+				objA0.countdown_value = 120
+				objA0.base_state += 2
+				playSound(0xb8)
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x02e7da) end(0x02e800)
+function void fn02e7da()
+{
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+		return
+	}
+
+	A1 = 0xffffc280
+	A2 = 0x02e984
+	D1 = 0x06
+	fn02e802()
+
+	objA0.countdown_value = 0x0168
+	objA0.base_state = 0x0a
+}
+
+
+//# address-hook(0x02e802) end(0x02e832)
+function void fn02e802()
+{
+	// Create objects for the result screen
+	while (D1.s16 >= 0)
+	{
+		u32[A1] = u32[A2]
+		u8[A1 + 0x04] = render_flag.COMPOUND
+		u8[A1 + 0x07] = u8[A2+11]
+		u32[A1 + 0x0c] = 0x02f26a
+		objA1.position.x.u16 = u16[A2+6] + getScreenExtend()
+		objA1.position.y.u16 = u16[A2+8]
+		u8[A1 + 0x22] = u8[A2+10]
+		u16[A1 + 0x46] = u16[A2+4] + getScreenExtend()
+		u16[A1 + 0x48] = A0.u16
+
+		A1 += 0x4a
+		A2 += 12
+		--D1.s16
+	}
+}
+
+
+
+//# address-hook(0x00c4d2) end(0x00c530)
+function void CheckSaveGameSlotAfterBlueSpheres()
+{
+	if (global.active_saveslot != 0 && global.lock_on_state == 0)
+	{
+		A1 = global.active_saveslot
+		if (!global.sk_bluespheres)
+		{
+			u8[A1 + 0x02] &= 0xf0
+			u8[A1 + 0x02] |= (global.next_bluespheres & 0x0f)
+		}
+
+		// Build a compact representation of emerald collection states
+		D0 = 0
+		for (u8 i = 0; i < 7; ++i)
+		{
+			D0 |= u8[0xffffffb2 + i] & 0x03
+			D0.u16 <<= 2
+		}
+
+		u16[A1 + 0x06] = D0.u16
+		u16[A1 + 0x04] = level.giantrings_clear.u16
+		continues_counter = min(continues_counter, 99)
+		u8[A1 + 0x09] = continues_counter
+
+		SaveGameSlot()
+	}
+}
+
+
+
+// "... can be Super/Hyper ..." text
+
+//# address-hook(0x02e9d8) end(0x02e9f4)
+function void fn02e9d8()
+{
+	D0.u16 = u16[A0 - 0x3a]
+	if (D0.u16 == u16[A0 - 0x04])
+	{
+		u8[0xfffffac1] = 0
+		playSound(0x68)
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x02e9f6) end(0x02ea0a)
+function void fn02e9f6()
+{
+	if (global.characters == CHARS_KNUCKLES_ALONE && global.lock_on_state == 0 && global.sk_bluespheres != 0)
+	{
+		objA0.sprite_attributes = 0x2000
+	}
+	fn02ea10()
+}
+
+
+//# address-hook(0x02ea10) end(0x02ea1c)
+function void fn02ea10()
+{
+	fn02ec80()
+	objA0.position.x.u16 += D0.u16
+	u16[A0 + 0x46] += D0.u16
+	fn02ea4a()
+}
+
+
+
+// Texts
+
+//# address-hook(0x02ea1e) end(0x02ea3c)
+function void fn02ea1e()
+{
+	if (global.lock_on_state == 0 && global.sk_bluespheres)
+	{
+		if (global.characters == CHARS_KNUCKLES_ALONE)
+		{
+			objA0.animation.sprite += 0x1f
+		}
+		else
+		{
+			objA0.animation.sprite += 0x1a
+		}
+	}
+
+	fn02ea4a()
+}
+
+
+//# address-hook(0x02ea3e) end(0x02ea46)
+function void fn02ea3e()
+{
+	fn02ec80()
+	objA0.position.x.u16 -= D0.u16
+	u16[A0 + 0x46] -= D0.u16
+	fn02ea4a()
+}
+
+
+//# address-hook(0x02ea4a) end(0x02ea4a)
+function void fn02ea4a()
+{
+	objA0.update_address = 0x02ea50
+	fn02ea50()
+}
+
+
+//# address-hook(0x02ea50) end(0x02ea54)
+function void fn02ea50()
+{
+	// objA0.animation.sprite:
+	//  - 0x17, 0x31, 0x36 = "Score"
+	//  - 0x18, 0x32, 0x37 = "Ring Bonus"
+	//  - 0x19, 0x33, 0x38 = "Perfect"
+	//  - 0x1a, 0x34, 0x39 = "Continue"
+	//  - 0x13			   = "Sonic"
+	//  - 0x14			   = "Miles" (not verified)
+	//  - 0x15			   = "Tails"
+	//  - 0x16			   = "Knuckles" (not verified)
+	//  - 0x23			   = "got a"
+	//  - 0x24			   = "Chaos Emerald"
+	//  - 0x30			   = "Super Emerald"
+
+	if (!fn02de04())
+	{
+		DrawObject()
+	}
+}
+
+
+
+// Bonus score numbers
+
+//# address-hook(0x02ea5a) end(0x02ea62)
+function void fn02ea5a()
+{
+	if (fn02de04())
+		return
+
+	D0.u16 = results.ring_bonus
+	fn02ea6c()
+}
+
+
+//# address-hook(0x02ea64) end(0x02ea68)
+function void fn02ea64()
+{
+	if (fn02de04())
+		return
+
+	D0.u16 = results.time_bonus
+	fn02ea6c()
+}
+
+
+//# address-hook(0x02ea6c) end(0x02ea76)
+function void fn02ea6c()
+{
+	fn02ddc6()
+	objA0.sprite_attributes = u16[0xffffef68]
+	DrawObject()
+}
+
+
+//# address-hook(0x02ea7c) end(0x02eaa4)
+function void fn02ea7c()
+{
+	if (bluespheres.rings_collected < 50)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		fn02ea1e()
+	}
+}
+
+
+
+// Chaos Emerald
+
+//# address-hook(0x02eaa6) end(0x02eac6)
+function void fn02eaa6()
+{
+	if (u8[0xffffffb2 + objA0.box_size.x] != 1)
+	{
+		UnloadObject()
+	}
+	else if (u16[0xffffe666] != 0)
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x02eac8) end(0x02ead4)
+function void fn02eac8()
+{
+	if (bluespheres.blue_remaining == 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		fn02ecbc()
+		fn02ea50()
+	}
+}
+
+
+//# address-hook(0x02ead8) end(0x02eaf0)
+function void fn02ead8()
+{
+	if (bluespheres.blue_remaining != 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	fn02eca8()
+	if (u8[A1] >= 7)
+	{
+		objA0.position.x.u16 -= 0x10
+		u16[A0 + 0x46] -= 0x10
+	}
+
+	fn02eaf6()
+}
+
+
+//# address-hook(0x02eaf6) end(0x02eb2c)
+function void fn02eaf6()
+{
+	fn02ec80()
+	objA0.position.x.u16 += D0.u16
+	u16[A0 + 0x46] += D0.u16
+	objA0.animation.sprite += D1.u8
+	objA0.sprite_attributes = 0xff79
+
+	if (global.lock_on_state == 0 && global.sk_bluespheres && global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		objA0.sprite_attributes -= 0xe000
+	}
+
+	fn02ea4a()
+}
+
+
+//# address-hook(0x02eb30) end(0x02eb60)
+function void fn02eb30()
+{
+	if (bluespheres.blue_remaining != 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	fn02ecbc()
+	fn02ec80()
+
+	objA0.position.x.u16 -= D0.u16
+	u16[A0 + 0x46] -= D0.u16
+
+	fn02eca8()
+	if (u8[A1] >= 7)
+	{
+		objA0.position.x.u16 -= 0x10
+		u16[A0 + 0x46] -= 0x10
+	}
+
+	fn02ea4a()
+}
+
+
+//# address-hook(0x02eb64) end(0x02eba0)
+function void fn02eb64()
+{
+	if (bluespheres.blue_remaining != 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	fn02ecbc()
+
+	if (global.lock_on_state == 0 && global.sk_bluespheres)
+	{
+		objA0.animation.sprite = 0x30
+		if (global.super_emeralds >= 7)
+		{
+			objA0.position.x.u16 -= 8
+			u16[A0 + 0x46] -= 8
+		}
+	}
+	else
+	{
+		if (global.chaos_emeralds >= 7)
+		{
+			objA0.position.x.u16 -= 8
+			u16[A0 + 0x46] -= 8
+		}
+	}
+
+	fn02ea4a()
+}
+
+
+//# address-hook(0x02eba4) end(0x02ebc8)
+function void fn02eba4()
+{
+	if (bluespheres.blue_remaining != 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	fn02ecbc()
+	fn02eca8()
+
+	if (u8[A1] < 7)
+	{
+		UnloadObject()
+		return
+	}
+
+	fn02ec80()
+	objA0.position.x.u16 -= D0.u16
+	u16[A0 + 0x46] -= D0.u16
+
+	fn02ea4a()
+}
+
+
+//# address-hook(0x02ebcc) end(0x02ebe4)
+function void fn02ebcc()
+{
+	if (bluespheres.blue_remaining != 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	fn02ecbc()
+	fn02eca8()
+
+	if (u8[A1] < 7)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		fn02ea50()
+	}
+}
+
+
+
+// Continue icon
+
+//# address-hook(0x02ebe8) end(0x02ec1c)
+function void fn02ebe8()
+{
+	objA0.mapping_offset = 0x02f26a
+	objA0.position.x.u16 = 0x017c + getScreenExtend()
+	objA0.position.y.u16 = 0x014c
+	objA0.animation.sprite = 0x28 + max(global.characters, 1)	// 0x29 for Sonic (with or without Tails), 0x2a for Tails, 0x2b for Knuckles
+
+	if (level.framecounter.low & 0x08)
+	{
+		DrawObject()
+	}
+}
+
+
+
+// Super Emerald activation after Blue Spheres
+
+//# address-hook(0x02ec1e) end(0x02ec44)
+function void fn02ec1e()
+{
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+	}
+	else
+	{
+		if (s8[A0 + 0x04] >= 0)
+		{
+			A1 = 0xffff0000 + objA0.respawn_entry
+			--u16[A1 + 0x30]
+			UnloadObject()
+			return
+		}
+		objA0.position.x.u16 += 0x20
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x02ec4a) end(0x02ec78)
+function void fn02ec4a()
+{
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+	}
+	else
+	{
+		if (objA0.position.x.u16 >= getScreenWidth() + 140)
+		{
+			UnloadObject()
+			return
+		}
+		objA0.position.x.u16 += 0x20
+	}
+
+	if (level.framecounter.low & 0x08)
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x02ec7a) end(0x02ec7a)
+function void fn02ec7a()
+{
+	UnloadObject()
+}
+
+
+
+// Something different
+
+//# address-hook(0x02ec80) end(0x02eca6)
+function void fn02ec80()
+{
+	if (isMainCharacter(CHARACTER_SONIC))
+	{
+		D0 = 0
+		D1 = 0
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		if (global.region_code & 0x80)
+		{
+			D0 = 4
+			D1 = 2
+		}
+		else
+		{
+			D0 = 0
+			D1 = 1
+		}
+	}
+	else
+	{
+		D0 = -0x18
+		D1 = 3
+	}
+}
+
+
+//# address-hook(0x02eca8) end(0x02ecba)
+function void fn02eca8()
+{
+	A1 = (global.lock_on_state == 0 && global.sk_bluespheres) ? 0xffffffb1 : 0xffffffb0
+}
+
+
+//# address-hook(0x02ecbc) end(0x02ecce)
+function void fn02ecbc()
+{
+	if (global.lock_on_state != 0 || !global.sk_bluespheres)
+	{
+		objA0.sprite_attributes = 0x6000
+	}
+}
+
+
+
+// Stars effect on Super Emerald activation
+
+//# address-hook(0x02ecd0) end(0x02ed26)
+function void fn02ecd0()
+{
+	objA0.update_address = 0x02ed2a
+	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.sprite_attributes = 0x879c
+	objA0.mapping_offset = 0x018aea
+
+	u16[A0 + 0x16] = 2
+	if (u16[A0 + 0x36] != 0)
+	{
+		objA0.position.x.u16 = 0x1640
+		objA0.position.y.u16 = 0x0340
+		objA0.value32 = 0
+	}
+	else
+	{
+		A1 = 0x02e398
+		D0 = u8[0xffffef6e] * 2
+		objA0.position.x.u16 = u16[A1 + D0.s16] + 160	// Do not add screen extend here
+		objA0.position.y.u16 = u16[A1 + D0.s16 + 0x10]
+		objA0.value32 = 0xe000
+	}
+
+	fn02ed2a()
+}
+
+
+//# address-hook(0x02ed2a) end(0x02edca)
+function void fn02ed2a()
+{
+	D0.u16 = objA0.countdown_value
+	LookupSinCos()
+	D2.u16 = objA0.value32
+
+	D3.u8 = (D1.s16 < 0) ? 0xff : 0x00
+	D1.u16 = abs(D1.s16)
+	D1 = u32(D1.u16) * D2.u16
+	D1 = (D1 << 16) + (D1 >> 16)
+	if (D3.u8 != 0)
+	{
+		D1.s16 = -D1.s16
+	}
+
+	D3.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D0.u16 = abs(D0.s16)
+	D0 = u32(D0.u16) * D2.u16
+	D0 = (D0 << 16) + (D0 >> 16)
+	if (D3.u8 != 0)
+	{
+		D0.s16 = -D0.s16
+	}
+
+	D2.u16 = u16[A0 + 0x30] + 1
+	if (D2.u16 > 8)
+	{
+		D2 = 0
+	}
+	u16[A0 + 0x30] = D2.u16
+
+	A1 = A0 + 0x18
+	u16[(A1+=2)-2] = objA0.position.x.u16 + D1.s16
+	u16[(A1+=2)-2] = objA0.position.y.u16 + D0.s16
+	u16[(A1+=2)-2] = D2.u16
+	u16[(A1+=2)-2] = objA0.position.x.u16 - D1.s16
+	u16[(A1+=2)-2] = objA0.position.y.u16 - D0.s16
+	u16[(A1+=2)-2] = D2.u16
+	objA0.countdown_value += 2
+
+	if (u16[A0 + 0x36] == 0)
+	{
+		bool carry = (s32(objA0.value32) - 0x100) < 0
+		objA0.value32 -= 0x100
+		if (!carry)
+		{
+			DrawObject()
+			return
+		}
+
+		A1 = 0xffff0000 + u16[A0 + 0x34]
+		u8[A1 + 0x31] = 0xff
+		u8[0xfffffac0] = 0
+	}
+	else
+	{
+		bool carry = (u32(objA0.value32) + 0x100) >= 0x10000
+		objA0.value32 += 0x100
+		if (!carry)
+		{
+			DrawObject()
+			return
+		}
+	}
+
+	UnloadObject()
+}
+
+
+
+//# address-hook(0x085a1a) end(0x085a58)
+function void fn085a1a()
+{
+	if (u8[0xfffffabf] != 0)
+		return
+
+	--objA0.value3a
+	if (s8(objA0.value3a) >= 0)
+		return
+
+	A3 = u32[(A1+=4)-4]
+	D0.u16 = u16[(A1+=2)-2]
+
+	D1 = objA0.value3b + 2
+	D2 = u8[A1 + D1.s16]
+	if (D2.s8 < 0)
+	{
+		D1 = 0
+		D2.u8 = u8[A1]
+	}
+
+	objA0.value3b = D1.u8
+	objA0.value3a = u8[A1 + D1.s16 + 0x01]
+	D2.u16 = u16[A3 + D2.s16 * 2]
+
+	A3 += D2.s16
+	while (D0.s16 >= 0)
+	{
+		u16[(A2+=2)-2] = u16[(A3+=2)-2]
+		--D0.s16
+	}
+}

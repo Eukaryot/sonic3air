@@ -1,0 +1,326 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Technosqueek (mouse enemy from FBZ)                   //
+//-------------------------------------------------------//
+
+//# address-hook(0x089820) end(0x089820)
+function void Technosqueek.Init()
+{
+	Object.InitWithUpdateAddress(0x089826)
+}
+
+
+//# address-hook(0x089826) end(0x089834)
+function void Technosqueek.Update()
+{
+	// Targets:
+	//  - 0x089842	-> objA0.base_state = 0x00
+	//  - 0x0898dc	-> objA0.base_state = 0x02
+	//  - 0x08992e	-> objA0.base_state = 0x04
+	//  - 0x08995c	-> objA0.base_state = 0x06
+	//  - 0x0899a0	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x089838, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x089842) end(0x0898da)
+function void fn089842()
+{
+	objA0.countdown_value = 0x0800
+	objA0.countdown_callback = 0x089926
+	if (objA0.subtype2c != 4)
+	{
+		setupObjectAttributesFull(0x089b06)
+
+		u32[A0 + 0x30] = 0x089b2c
+		objA0.render_flags |= 0x01
+		if (objA0.subtype2c == 2)
+			objA0.render_flags |= 0x02
+
+		spawnChildObjects(0x089b24)
+
+		D0.u16 = 0x0400
+		u16[A0 + 0x3a] = D0.u16
+		objA0.velocity.x = D0.u16
+		u16[A0 + 0x3c] = 0x20
+		objA0.flags38 &= ~0x08
+	}
+	else
+	{
+		setupObjectAttributesFull(0x089b12)
+
+		objA0.base_state = 0x06
+		u32[A0 + 0x30] = 0x089b52
+		objA0.render_flags |= 0x02
+
+		spawnChildObjects(0x089b24)
+
+		D0.u16 = 0x0400
+		objA0.value3e = D0.u16
+		objA0.velocity.y = D0.u16
+		u16[A0 + 0x40] = 0x20
+		objA0.flags38 &= ~0x01
+	}
+}
+
+
+//# address-hook(0x0898dc) end(0x089924)
+function void fn0898dc()
+{
+	fn08460e()
+	if (D2.u16 != 0 && objA0.animation.frame == 6)
+	{
+		objA0.flags38 |= 0x02
+	}
+
+	fn08482a()
+	if (objA0.velocity.x != 0)
+	{
+		UpdateMovementStraightSimple()
+		Object.CountdownAndTrigger()
+		return
+	}
+
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x089b42
+	objA0.countdown_callback = 0x089932
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+}
+
+
+//# address-hook(0x089926) end(0x08992c)
+function void fn089926()
+{
+	objA0.flags38 &= ~0x20
+}
+
+
+//# address-hook(0x08992e) end(0x08992e)
+function void fn08992e()
+{
+	fn084464()
+}
+
+
+//# address-hook(0x089932) end(0x089938)
+function void fn089932()
+{
+	objA0.base_state = 0x02
+	u32[A0 + 0x30] = 0x089b37
+	fn089940()
+}
+
+
+//# address-hook(0x089940) end(0x08995a)
+function void fn089940()
+{
+	objA0.flags38 &= ~0x02
+	objA0.flags38 |= 0x20
+	objA0.countdown_value = 0x10
+	objA0.countdown_callback = 0x089926
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+}
+
+
+//# address-hook(0x08995c) end(0x08999c)
+function void fn08995c()
+{
+	fn08464a()
+	if (D2.u16 != 0 && objA0.animation.frame == 6)
+	{
+		objA0.flags38 |= 0x02
+	}
+
+	fn0847e6()
+	if (objA0.velocity.y != 0)
+	{
+		UpdateMovementStraightSimple()
+		Object.CountdownAndTrigger()
+		return
+	}
+
+	objA0.base_state = 0x08
+	u32[A0 + 0x30] = 0x089b68
+	objA0.countdown_callback = 0x0899a4
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+}
+
+
+//# address-hook(0x0899a0) end(0x0899a0)
+function void fn0899a0()
+{
+	fn084498()
+}
+
+
+//# address-hook(0x0899a4) end(0x0899b2)
+function void fn0899a4()
+{
+	objA0.base_state = 0x06
+	u32[A0 + 0x30] = 0x089b5d
+	fn089940()
+}
+
+
+//# address-hook(0x0899b4) end(0x0899c2)
+function void fn0899b4()
+{
+	// Targets:
+	//  - 0x0899cc	-> objA0.base_state = 0x00
+	//  - 0x0899e8	-> objA0.base_state = 0x02
+	//  - 0x089a20	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x0899c6, objA0.base_state)
+
+	fn084920()
+}
+
+
+//# address-hook(0x0899cc) end(0x0899e6)
+function void fn0899cc()
+{
+	setupObjectAttributesBasic(0x089b1e)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2c] == 0x04)
+	{
+		objA0.base_state = 0x04
+	}
+}
+
+
+//# address-hook(0x0899e8) end(0x089a16)
+function void fn0899e8()
+{
+	Object.animationProgress(0x089b4d)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u16 offset = (u8[A1 + 0x38] & 0x02) ? 4 : (u16(u8[A1 + 0x22]) * 2)
+	objA0.value42 = u16[0x089a1a + offset]
+	if ((u8[A1 + 0x38] & 0x20) == 0)
+	{
+		MoveAndFlipWithParent()
+	}
+}
+
+
+//# address-hook(0x089a20) end(0x089a50)
+function void fn089a20()
+{
+	Object.animationProgress(0x089b73)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u16 offset = (u8[A1 + 0x38] & 0x02) ? 4 : (u16(u8[A1 + 0x22]) * 2 - 10)
+	objA0.value42 = u16[0x089a54 + offset]
+	if ((u8[A1 + 0x38] & 0x20) == 0)
+	{
+		MoveAndFlipWithParent()
+	}
+}
+
+
+
+// Used when jumping out of a capsule
+
+//# address-hook(0x089a5a) end(0x089a68)
+function void fn089a5a()
+{
+	// Targets:
+	//  - 0x089a70	-> objA0.base_state = 0x00
+	//  - 0x089aa2	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x089a6c, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x089a70) end(0x089a9e)
+function void fn089a70()
+{
+	setupObjectAttributesFull(0x089b06)
+
+	objA0.hitbox_extends.y = 0x07
+	objA0.countdown_callback = 0x089ab6
+	D0.u16 = 0x90
+	fn0852d0()
+	fn084b6e()
+	objA0.subtype2c = 0
+
+	spawnChildObjects(0x089b24)
+}
+
+
+//# address-hook(0x089aa2) end(0x089ab0)
+function void fn089aa2()
+{
+	MoveWithGravity20()
+	if (objA0.velocity.y >= 0)
+	{
+		Object.TriggerOnGroundHit()
+	}
+}
+
+
+//# address-hook(0x089ab6) end(0x089b04)
+function void fn089ab6()
+{
+	objA0.update_address = 0x089826
+	objA0.base_state = 0x02
+	objA0.countdown_value = 0x0800
+	objA0.countdown_callback = 0x089926
+	u32[A0 + 0x30] = 0x089b2c
+	D0.u16 = 0x0400
+	u16[A0 + 0x3a] = D0.u16
+	objA0.flags38 &= ~0x08
+	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+	{
+		D0.s16 = -D0.s16
+		objA0.flags38 |= 0x08
+	}
+	objA0.velocity.x = D0.u16
+	u16[A0 + 0x3c] = 0x20
+	objA0.velocity.y = 0
+}
+
+
+
+//# address-hook(0x084498) end(0x0844cc)
+function void fn084498()
+{
+	A1 = u32[A0 + 0x30]
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		++objA0.animation.frame
+		D0 = objA0.animation.frame
+		D1 = u8[A1 + objA0.animation.frame + 1]
+		if (D1.s8 < 0)
+		{
+			fn084428()
+		}
+		else
+		{
+			if (D1 & 0x40)
+			{
+				D1 &= ~0x40
+				objA0.render_flags ^= 0x02
+			}
+			objA0.animation.timer = u8[A1]
+			objA0.animation.sprite = D1.u8
+		}
+	}
+}

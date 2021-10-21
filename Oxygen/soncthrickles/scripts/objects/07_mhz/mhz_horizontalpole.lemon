@@ -1,0 +1,267 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Horizontal Pole to swing around                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x03ed1a) end(0x03ed40)
+function void HorizontalPole.Init()
+{
+	objA0.mapping_offset = 0x03f04a
+	objA0.sprite_attributes = 0x03f3
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x04
+
+	objA0.update_address = 0x03ed46
+	HorizontalPole.Update()
+}
+
+
+//# address-hook(0x03ed46) end(0x03ed68)
+function void HorizontalPole.Update()
+{
+	A2 = A0 + 0x30
+	A3 = A0 + 0x3a
+	A1 = 0xffffb000
+	D1.u16 = control.player1
+	fn03ed6e()
+
+	++A2
+	A3 = A0 + 0x3c
+	A1 = 0xffffb04a
+	D1.u16 = control.tails
+	fn03ed6e()
+
+#if STANDALONE
+	bool player2attached = u8[A0 + 0x31]
+	DrawOrUnloadObject()
+
+	// Handle second character if he's still attached to the pole
+	if (objA0.update_address == 0 && player2attached)
+	{
+		u8[0xffffb04a + 0x2e] &= 0xfc
+	}
+#else
+	DrawOrUnloadObject()
+#endif
+}
+
+
+//# address-hook(0x03ed6e) end(0x03efb8)
+function void fn03ed6e()
+{
+	if (u8[A2] != 0)
+	{
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+		{
+			if (D1 & 0x0400)
+			{
+				D0.u16 = objA0.position.x.u16 - 0x16
+				if (D0.s16 < s16[A1 + 0x10])
+				{
+					--objA1.position.x.u16
+					--u8[A2 + 0x06]
+					if (s8[A2 + 0x06] < 0)
+					{
+						u8[A2 + 0x06] = 0x07
+						u8[A2 + 0x08] += 0x10
+						u8[A2 + 0x08] &= 0x10
+					}
+				}
+			}
+
+			if (D1 & 0x0800)
+			{
+				D0.u16 = objA0.position.x.u16 + 0x15
+				if (D0.s16 > s16[A1 + 0x10])
+				{
+					++objA1.position.x.u16
+					--u8[A2 + 0x06]
+					if (s8[A2 + 0x06] < 0)
+					{
+						u8[A2 + 0x06] = 0x07
+						u8[A2 + 0x08] += 0x10
+						u8[A2 + 0x08] &= 0x10
+					}
+				}
+			}
+
+			D1.u16 &= 0x70
+			if (D1.u16 == 0)
+			{
+				bool goto03ee8c = false
+
+				if (u8[A2 + 0x04] == 0x28)
+				{
+					u16[A1 + 0x20] = 0x1000
+					D0.u16 = u16[A3]
+					D1.u16 = D0.u16
+					D1.s16 >>= 1
+					D0.u16 += D1.u16
+					objA1.velocity.y = D0.u16
+					goto03ee8c = true
+				}
+
+				if (u8[A2 + 0x04] == 0x05)
+				{
+					u16[A1 + 0x20] = 0
+					objA1.velocity.y = u16[A3]
+					goto03ee8c = true
+				}
+
+				if (goto03ee8c)
+				{
+					u8[A2] = 0
+					u8[A2 + 0x02] = 0x08
+					u8[A1 + 0x2e] &= 0xfc
+					u8[A1 + 0x2a] |= 0x02
+					u8[A1 + 0x40] = 0
+					u8[A1 + 0x3d] = 0
+					u8[A1 + 0x05] = 0x02
+					objA1.flags2a &= ~char.flag.CONTROL_LOCK
+					u8[A1 + 0x2f] = 0
+					u8[A1 + 0x27] = 0
+				}
+				else
+				{
+					fn03efba()
+
+					D0 = u8[A1 + 0x22]
+					u32 backupA2 = A2
+					SetCharacterSpritePatterns()
+					A2 = backupA2
+				}
+				return
+			}
+
+			objA1.velocity.y = -0x500
+			if (u8[A1 + 0x2a] & 0x40)
+			{
+				objA1.velocity.y = -0x200
+			}
+		}
+
+		u8[A2] = 0
+		u8[A2 + 2] = (u8[A1 + 0x2a] & 0x40) ? 0x3c : 0x1e
+
+		u8[A1 + 0x2e] &= 0xfc
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x40] = 0x01
+		u8[A1 + 0x1e] = 0x0e
+		u8[A1 + 0x1f] = 0x07
+		u8[A1 + 0x20] = 0x02
+		u8[A1 + 0x2a] |= 0x04
+		objA1.flags2a &= ~char.flag.CONTROL_LOCK
+		u8[A1 + 0x27] = 0
+		return
+	}
+
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		return
+	}
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x16
+	if (D0.u16 < 0x2c)
+	{
+		D0.u16 = objA0.position.y.u16 + 0x14
+		if (D0.u16 < objA1.position.y.u16)
+		{
+			D0.u16 += 0x10
+			if (D0.u16 >= objA1.position.y.u16)
+			{
+				if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+				{
+					if (u8[A1 + 0x2e] == 0)
+					{
+						u16[A3] = objA1.velocity.y
+						objA1.velocity.x = 0
+						objA1.velocity.y = 0
+						u16[A1 + 0x1c] = 0
+						u8[A1 + 0x04] &= 0xfc
+						objA1.position.y.u16 = objA0.position.y.u16 + 0x14
+						u8[A1 + 0x20] = 0
+						u8[A1 + 0x2e] = 0x03
+						u8[A1 + 0x22] = 0x94
+						u8[A2 + 0x04] = 0
+						u8[A2 + 0x06] = 0
+						u8[A2 + 0x08] = 0
+
+						if (s16[A3] <= -0x400)
+						{
+							u8[A1 + 0x22] = 0x95
+							u8[A2 + 0x04] = 0x20
+							u8[A2 + 0x08] = 0x10
+						}
+						else if (s16[A3] >= 0x0400)
+						{
+							u8[A1 + 0x22] = 0x95
+							u8[A2 + 0x04] = 0x21
+							u8[A2 + 0x08] = 0x10
+						}
+
+						u8[A2] = 1
+						D0 = u8[A1 + 0x22]
+						u32 backupA2 = A2
+						SetCharacterSpritePatterns()
+						A2 = backupA2
+						playSound(0x4a)
+					}
+				}
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x03efba) end(0x03f018)
+function void fn03efba()
+{
+	if (abs(s16[A3]) < 0x400)
+	{
+		D0.u8 = u8[A2 + 0x04]
+		if (D0.u8 != 0)
+		{
+			if (D0.s8 < 0)
+			{
+				D0.u8 += 6
+				if (D0.s8 >= 0)
+					D0 = 0
+			}
+			else
+			{
+				D0.u8 -= 6
+				if (D0.s8 < 0)
+					D0 = 0
+			}
+			u8[A2 + 0x04] = D0.u8
+		}
+	}
+	else
+	{
+		D0.u8 = u8[A2 + 0x04] + 0x0c
+		u8[A2 + 0x04] = D0.u8
+	}
+
+	D0 = u8[A2 + 0x04]
+	D0.u8 >>= 4
+	D0.u8 += u8[A2 + 0x08]
+	D1.u8 = u8[0x03f01a + D0.s16]
+	u8[A1 + 0x22] = D1.u8
+	D0.u16 &= 0x0f
+	D1.u8 = u8[0x03f03a + D0.s16]
+	D1.s16 = D1.s8
+	D1.u16 += objA0.position.y.u16
+	objA1.position.y.u16 = D1.u16
+}

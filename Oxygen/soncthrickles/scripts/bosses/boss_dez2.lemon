@@ -1,0 +1,1369 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// DEZ 2 (First) Boss - the anti-gravity machine         //
+//-------------------------------------------------------//
+
+//# address-hook(0x07f06c) end(0x07f0ba)
+function void fn07f06c()
+{
+	A1 = 0x07f0be
+	if (InitBoss(0x07f076))
+		return
+
+	objA0.update_address = 0x07f0ce
+	objA0.countdown_callback = 0x07f0d2
+
+	A1 = 0x07f0c6
+	objA0.value26 = 0x19
+	StartBossFight()
+	u8[0xfffffab8] = 0
+
+	requestLoadingPatterns(0x76)
+	Kosinski.addToDMAQueue(0x181002, 0x7140)
+	loadPaletteLine1(0x07fd08)
+	spawnChildObjects(0x07fc8c)
+}
+
+
+//# address-hook(0x07f0ce) end(0x07f0ce)
+function void fn07f0ce()
+{
+	CheckForBossStart()
+}
+
+
+//# address-hook(0x07f0d2) end(0x07f0d8)
+function void fn07f0d2()
+{
+	objA0.update_address = 0x07f0da
+}
+
+
+//# address-hook(0x07f0da) end(0x07f0fe)
+function void fn07f0da()
+{
+	// Targets:
+	//  - 0x07f10e	-> objA0.base_state = 0x00
+	//  - 0x07f150	-> objA0.base_state = 0x02
+	//  - 0x07f182	-> objA0.base_state = 0x04
+	//  - 0x07f1cc	-> objA0.base_state = 0x06
+	//  - 0x07f182	-> objA0.base_state = 0x08
+	//  - 0x07f1cc	-> objA0.base_state = 0x0a
+	call tableLookupAddress(0x07f102, objA0.base_state)
+
+	fn07fb92()
+	if ((global.framecounter.low & 0x3f) == 0)
+	{
+		playSound(0xc6)
+	}
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x07f10e) end(0x07f14e)
+function void fn07f10e()
+{
+	setupObjectAttributesFull(0x07fc44)
+
+	boss.remaining_hits = 8
+	objA0.velocity.y = 0x0100
+	objA0.countdown_value = 0xbf
+	objA0.countdown_callback = 0x07f15a
+
+	spawnSimpleChildObjects(0x07fc9a)
+
+	if (u32[0xffffb04a] != 0)	// Is Tails here as well?
+	{
+		spawnSimpleChildObjects(0x07fc9a)
+		if (_equal())
+		{
+			u8[A1 + 0x2c] = 0x02
+		}
+	}
+}
+
+
+//# address-hook(0x07f150) end(0x07f156)
+function void fn07f150()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x07f15a) end(0x07f160)
+function void fn07f15a()
+{
+	fn0685e2()
+	objA0.velocity.x = 0x0100
+	fn07f166()
+}
+
+
+//# address-hook(0x07f166) end(0x07f180)
+function void fn07f166()
+{
+	objA0.base_state = 0x04
+	objA0.flags38 &= 0xf3
+	objA0.countdown_value = 0xb3
+	objA0.countdown_callback = 0x07f194
+}
+
+
+//# address-hook(0x07f182) end(0x07f190)
+function void fn07f182()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn07fa60()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x07f194) end(0x07f1ca)
+function void fn07f194()
+{
+	if (objA0.value39 < 0x03)
+	{
+		objA0.base_state = 0x06
+		++objA0.value39
+		objA0.flags38 |= 0x08
+		objA0.countdown_callback = 0x07f1de
+
+		A1 = 0x07fcd4
+		fn084580()
+
+		spawnChildObjects(0x07fca0)
+	}
+	else
+	{
+		objA0.countdown_value = 0x0f
+	}
+}
+
+
+//# address-hook(0x07f1cc) end(0x07f1da)
+function void fn07f1cc()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn07fa60()
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x07f1de) end(0x07f1f8)
+function void fn07f1de()
+{
+	objA0.base_state = 0x08
+	objA0.flags38 |= 0x04
+	objA0.countdown_value = 0x3f
+	objA0.countdown_callback = 0x07f1fa
+}
+
+
+//# address-hook(0x07f1fa) end(0x07f20c)
+function void fn07f1fa()
+{
+	objA0.base_state = 0x0a
+	objA0.countdown_callback = 0x07f166
+	A1 = 0x07fcd9
+	fn084580()
+}
+
+
+//# address-hook(0x07f210) end(0x07f21e)
+function void fn07f210()
+{
+	objA0.update_address = 0x07f220
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+}
+
+
+
+// These get called when fight is over
+
+//# address-hook(0x07f220) end(0x07f264)
+function void fn07f220()
+{
+	MoveWithGravity20()
+	if (objA0.position.y.u16 < 0x0318)
+	{
+		DrawObject()
+		return
+	}
+
+	objA0.update_address = 0x07f266
+	objA0.render_flags &= ~0x80
+
+	spawnSimpleChildObjects(0x07fcce)
+	spawnSimpleChildObjects(0x07fcc8)
+	spawnSimpleChildObjects(0x083fee)
+
+	playMusic(MUSIC_CTRL_FADEOUT)
+}
+
+
+//# address-hook(0x07f266) end(0x07f298)
+function void fn07f266()
+{
+	if (u8[0xfffffab8] & 0x02)
+	{
+		objA0.update_address = 0x07f29a
+		objA0.flags38 |= 0x10
+		objA0.countdown_value = 0x3f
+		objA0.position.x.u16 = 0x35d0
+		objA0.position.y.u16 = 0x0328
+
+		spawnSimpleChildObjects(0x083fee)
+	}
+}
+
+
+//# address-hook(0x07f29a) end(0x07f2da)
+function void fn07f29a()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value != 0)
+	{
+		if (objA0.countdown_value == 0x30)
+		{
+			u8[0xffffeec4] = 0xff
+		}
+		return
+	}
+
+	objA0.update_address = 0x07f2dc
+	level.boss_encounter = 0
+	playMusic(0x17)
+
+	screenmover_target.right = 0x3620
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x084a48
+	}
+}
+
+
+//# address-hook(0x07f2dc) end(0x07f2fc)
+function void fn07f2dc()
+{
+	move_area.left = camera.position.x.u16
+	if (camera.position.x.u16 >= 0x3620 - getScreenExtend() * 2)
+	{
+		objA0.update_address = 0x07f2fe
+		player1.camera_lock = 1
+		move_area.right += 0x40
+	}
+}
+
+
+//# address-hook(0x07f2fe) end(0x07f330)
+function void fn07f2fe()
+{
+	if (u16[0xffffb010] < camera.position.x.u16 + getScreenWidth() + 0x20)
+		return
+
+	level.skip_titlecard = 0xff
+	u16[0xffffef5e] = ring_counter
+	u32[0xffffef60] = timer.alldata
+	global.shields_backup_2 = u8[0xffffb02b]
+
+	D0.u16 = 0x1700
+	TriggerNextZone()
+	UnloadObject()
+}
+
+
+// Shield plate protecting the boss from those nasty player characters
+
+//# address-hook(0x07f336) end(0x07f33e)
+function void fn07f336()
+{
+	setupObjectAttributesBasic(0x07fc50)
+	objA0.update_address = 0x07f344
+	fn07f344()
+}
+
+
+//# address-hook(0x07f344) end(0x07f394)
+function void fn07f344()
+{
+	A2 = (objA0.subtype2c == 0) ? 0xffffb000 : 0xffffb04a
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	fn08622c()
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x08)
+	{
+		D1.u8 = D0.u8
+		D2.u8 = (D1.s8 < 0) ? 0xff : 0x00
+		D1.u8 += 0x30
+		if (D1.u8 < 0x60)
+		{
+			D0.s32 = (D2.u8 != 0) ? -0x30 : 0x30
+		}
+	}
+	u8[A0 + 0x3c] = D0.u8
+
+	A2 = 0x07fd28
+	fn084cf4()
+
+	fn07fa7e()
+	fn07facc()
+
+	D0 = 0x08
+	fn084a04()
+}
+
+
+
+// Small robot
+
+//# address-hook(0x07f398) end(0x07f3ac)
+function void fn07f398()
+{
+	setupObjectAttributesBasic(0x07fc62)
+	objA0.update_address = 0x07f3b0
+	objA0.hitbox_extends.y = 0x0b
+	fn084920()
+}
+
+
+//# address-hook(0x07f3b0) end(0x07f3ca)
+function void fn07f3b0()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x04) == 0)
+	{
+		MoveWithParent()
+		fn084920()
+		return
+	}
+
+	objA0.update_address = 0x07f3d0
+	objA0.countdown_value = 0x10
+	fn07f3d0()
+}
+
+
+//# address-hook(0x07f3d0) end(0x07f3f0)
+function void fn07f3d0()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		objA0.flags38 ^= 0x04
+		if (objA0.flags38 & 0x04)
+		{
+			++u8[A0 + 0x43]
+		}
+		MoveWithParent()
+		fn084920()
+		return
+	}
+
+	objA0.update_address = 0x07f3f6
+	objA0.countdown_value = 0x07
+	fn07f3f6()
+}
+
+
+//# address-hook(0x07f3f6) end(0x07f40e)
+function void fn07f3f6()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x07f414
+		playSound(0x87)
+	}
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	fn07f414()
+}
+
+
+//# address-hook(0x07f414) end(0x07f454)
+function void fn07f414()
+{
+	fn07f8a0()
+
+	if (objA0.velocity.y < 0)
+	{
+		fn00fc12()
+		if (D1.s16 < 0)
+		{
+			fn07f45a()
+		}
+	}
+	else
+	{
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			fn07f472()
+		}
+	}
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (objA0.flags2a & 0x80)
+	{
+		fn07f4ac()
+		return
+	}
+
+	// Flickering
+	if ((global.framecounter.low & 0x01) == 0)
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x07f45a) end(0x07f46e)
+function void fn07f45a()
+{
+	objA0.position.y.u16 -= D1.u16
+	objA0.base_state = 0
+	u8[A0 + 0x28] = 0xc6
+	objA0.value3a = 0xff
+	fn07f486()
+}
+
+
+//# address-hook(0x07f472) end(0x07f482)
+function void fn07f472()
+{
+	objA0.position.y.u16 += D1.u16
+	objA0.base_state = 0x02
+	u8[A0 + 0x28] = 0xc6
+	objA0.value3a = 0
+	fn07f486()
+}
+
+
+//# address-hook(0x07f486) end(0x07f4aa)
+function void fn07f486()
+{
+	objA0.update_address = 0x07f4fa
+	objA0.countdown_value = 0x0257
+	GetRandomNumber()
+	objA0.velocity.x = (D0.s8 < 0) ? -0x80 : 0x80
+	objA0.velocity.y = 0
+}
+
+
+//# address-hook(0x07f4ac) end(0x07f4b4)
+function void fn07f4ac()
+{
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	fn07f4c0()
+}
+
+
+//# address-hook(0x07f4b8) end(0x07f4b8)
+function void fn07f4b8()
+{
+	objA0.countdown_callback = 0x07f4ee
+	fn07f4c0()
+}
+
+
+//# address-hook(0x07f4c0) end(0x07f4e8)
+function void fn07f4c0()
+{
+	spawnSimpleChildObjects(0x083fee)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = 0x06
+	}
+
+	objA0.update_address = 0x08565e
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	--u8[A1 + 0x39]
+	objA0.countdown_value = 0x07
+	DrawObject()
+}
+
+
+//# address-hook(0x07f4ee) end(0x07f4f6)
+function void fn07f4ee()
+{
+	spawnChildObjects(0x07fcb4)
+	Object.TriggerUnloading()
+}
+
+
+
+// Also part of the little robots
+
+//# address-hook(0x07f4fa) end(0x07f51a)
+function void fn07f4fa()
+{
+	// Targets:
+	//  - 0x07f528	-> objA0.base_state = 0x00
+	//  - 0x07f538	-> objA0.base_state = 0x02
+	//  - 0x07f568	-> objA0.base_state = 0x04
+	//  - 0x07f5d2	-> objA0.base_state = 0x06
+	//  - 0x07f5fc	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x07f51e, objA0.base_state)
+	if (checkForMultiReturn())
+		return
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		fn07f4ac()
+	}
+	else
+	{
+		fn07fb4e()
+		if (checkForMultiReturn())
+			return
+
+		Enemy.DrawDynamicObject()
+	}
+}
+
+
+//# address-hook(0x07f528) end(0x07f536)
+function void fn07f528()
+{
+	fn07f900()
+	if (checkForMultiReturn())
+		return
+
+	fn07f8ca()
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn07f55a()
+	}
+}
+
+
+//# address-hook(0x07f538) end(0x07f556)
+function void fn07f538()
+{
+	UpdateMovementStraightSimple()
+	fn07f9a8()
+	fn07fa60()
+
+	Object.animationProgress(0x07fcde)
+	fn07f8ca()
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn07f55a()
+	}
+}
+
+
+//# address-hook(0x07f55a) end(0x07f566)
+function void fn07f55a()
+{
+	objA0.base_state = 0x08
+	objA0.countdown_value = 0x1f
+}
+
+
+//# address-hook(0x07f568) end(0x07f568)
+function void fn07f568()
+{
+	fn07f8a0()
+	fn07f56e()
+}
+
+
+//# address-hook(0x07f56e) end(0x07f5d0)
+function void fn07f56e()
+{
+	fn07f9f8()
+	if (checkForMultiReturn())
+		return
+
+	bool b = false
+	if (objA0.velocity.y < 0)
+	{
+		fn00fc12()
+		if (D1.s16 >= 0)
+			return
+
+		objA0.position.y.u16 -= D1.u16
+		objA0.value3a = 0xff
+		b = (objA0.render_flags & render_flag.FLIP_Y)
+	}
+	else
+	{
+		CheckGroundCollision()
+		if (D1.s16 >= 0)
+			return
+
+		objA0.position.y.u16 += D1.u16
+		objA0.value3a = 0
+		b = ((objA0.render_flags & render_flag.FLIP_Y) == 0)
+	}
+
+	if (b)
+	{
+		objA0.base_state = 0x02
+		u8[A0 + 0x28] = 0xc6
+		objA0.velocity.x = u16[A0 + 0x3c]
+		objA0.velocity.y = 0
+	}
+	else
+	{
+		objA0.base_state = 0
+		u8[A0 + 0x28] = 0xc6
+	}
+}
+
+
+//# address-hook(0x07f5d2) end(0x07f5f8)
+function void fn07f5d2()
+{
+	--objA0.value42
+	if (objA0.value42 == 0)
+	{
+		objA0.render_flags ^= 0x02
+	}
+
+	fn07f8a0()
+	fn07fa60()
+	u16[A0 + 0x3c] = (objA0.velocity.x < 0) ? -0x80 : 0x80
+	fn07f56e()
+}
+
+
+//# address-hook(0x07f5fc) end(0x07f608)
+function void fn07f5fc()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn07f4b8()
+		signalMultiReturn()
+	}
+}
+
+
+//# address-hook(0x07f60a) end(0x07f62c)
+function void fn07f60a()
+{
+	setupObjectAttributesBasic(0x07fc68)
+
+	objA0.update_address = 0x07f62e
+	MoveAndFlipWithParent()
+	fn07fb1a()
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	A1 = 0xffff0000 + u16[A1 + 0x46]
+	u16[A0 + 0x46] = A1.u16
+}
+
+
+//# address-hook(0x07f62e) end(0x07f644)
+function void fn07f62e()
+{
+	UpdateMovementStraightSimple()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		fn085180()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x07f64a) end(0x07f668)
+function void fn07f64a()
+{
+	setupObjectAttributesBasic(0x07fc56)
+
+	objA0.update_address = 0x07f66c
+	u32[A0 + 0x30] = 0x07fcef
+
+	spawnSimpleChildObjects(0x07fcae)
+
+	fn084934()
+}
+
+
+//# address-hook(0x07f66c) end(0x07f68a)
+function void fn07f66c()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x04) == 0)
+	{
+		MoveWithParent()
+		fn08459c()
+		fn084934()
+		return
+	}
+
+	objA0.update_address = 0x07f690
+	objA0.countdown_value = 0x10
+	fn07f690()
+}
+
+
+//# address-hook(0x07f690) end(0x07f6b4)
+function void fn07f690()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		objA0.flags38 ^= 0x04
+		if (objA0.flags38 & 0x04)
+		{
+			++u8[A0 + 0x43]
+		}
+		MoveWithParent()
+		fn08459c()
+		fn084920()
+		return
+	}
+
+	objA0.update_address = 0x07f6ba
+	objA0.countdown_value = 0x07
+	fn07f6ba()
+}
+
+
+//# address-hook(0x07f6ba) end(0x07f6cc)
+function void fn07f6ba()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		MoveWithParent()
+		fn08459c()
+		fn084920()
+		return
+	}
+
+	objA0.update_address = 0x07f6d2
+	fn07f6d2()
+}
+
+
+//# address-hook(0x07f6d2) end(0x07f6f6)
+function void fn07f6d2()
+{
+	objA0.flags38 ^= 0x04
+	if (objA0.flags38 & 0x04)
+	{
+		--u8[A0 + 0x43]
+	}
+
+	MoveWithParent()
+	fn08459c()
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x08)
+	{
+		fn084934()
+	}
+	else
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x07f6fa) end(0x07f702)
+function void fn07f6fa()
+{
+	setupObjectAttributesBasic(0x07fc5c)
+
+	objA0.update_address = 0x07f708
+	fn07f708()
+}
+
+
+//# address-hook(0x07f708) end(0x07f718)
+function void fn07f708()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+
+	fn084920()
+}
+
+
+
+// Robotnik standing there and watching
+
+//# address-hook(0x07f71c) end(0x07f746)
+function void fn07f71c()
+{
+	setupObjectAttributesFull(0x07fc74)
+
+	objA0.update_address = 0x070068
+	objA0.countdown_callback = 0x07f74c
+	u32[A0 + 0x30] = 0x07fce2
+	objA0.position.x.u16 = 0x3610
+	objA0.position.y.u16 = 0x0324
+
+	DrawObject()
+}
+
+
+//# address-hook(0x07f74c) end(0x07f77c)
+function void fn07f74c()
+{
+	A1 = 0xffffb000
+	D1.u16 = objA1.position.x.u16
+	D0.u16 = objA0.position.x.u16 - D1.u16
+	if (D0.s16 >= 0 && D0.u16 < 0x40)
+	{
+		D1.u16 += 0x40
+		objA0.position.x.u16 = D1.u16
+	}
+
+	Object.animationProgress(0x070419)
+	UpdateMovementStraightSimple()
+	DrawOrUnloadObject()
+}
+
+
+
+// That's from a different ROM address, but still part of Robotnik (maybe shared code...?)
+
+//# address-hook(0x070068) end(0x070094)
+function void fn070068()
+{
+	fn08459c()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		objA0.update_address = 0x07009a
+		objA0.animation.sprite = 3
+	}
+	else if (u8[A1 + 0x2a] & 0x40)
+	{
+		objA0.animation.sprite = 2
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x07009a) end(0x0700e4)
+function void fn07009a()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x10)
+	{
+		objA0.update_address = objA0.countdown_callback
+		objA0.position.y.u16 -= 0x04
+		objA0.velocity.x = 0x0200
+		objA0.sprite_attributes = 0x84a9
+	#if STANDALONE
+		if (global.zone_act == 0x0b01)		// DEZ 2 boss is always Robotnik
+			objA0.mapping_offset = 0x06837e
+		else
+	#endif
+			objA0.mapping_offset = isMainCharacter(CHARACTER_KNUCKLES) ? 0x186c20 : 0x06837e
+
+		objA0.animation.sprite = 0
+		objA0.animation.timer = 0
+		objA0.animation.frame = 0
+		objA0.render_flags |= 0x01
+	}
+
+	DrawObject()
+}
+
+
+
+// Robotnik's console in front of him
+
+//# address-hook(0x07f782) end(0x07f796)
+function void fn07f782()
+{
+	setupObjectAttributesFull(0x07fc80)
+
+	objA0.update_address = 0x07f79c
+	objA0.position.x.u16 = 0x3600
+	objA0.position.y.u16 = 0x032c
+
+	fn07f79c()
+}
+
+
+//# address-hook(0x07f79c) end(0x07f7c8)
+function void fn07f79c()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x10)
+	{
+		objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+		objA0.animation.sprite = 0x15
+
+		spawnSimpleChildObjects(0x083fee)
+		if (_equal())
+		{
+			u8[A1 + 0x2c] = 0x06
+		}
+	}
+
+	DrawObject()
+}
+
+
+// Called after fight
+
+//# address-hook(0x07f7ce) end(0x07f7f0)
+function void fn07f7ce()
+{
+	setupObjectAttributesBasic(0x07fc6e)
+	objA0.update_address = 0x085102
+	objA0.animation.sprite = 0x22 + (objA0.subtype2c >> 1)
+
+	D0 = 0x08
+	fn0852d0()
+	DrawObject()
+}
+
+
+//# address-hook(0x07f7f6) end(0x07f81a)
+function void fn07f7f6()
+{
+	objA0.update_address = 0x07f81e
+	objA0.position.y.u16 += 0x38
+	u16[A0 + 0x3a] = 0x1010
+
+	D0 = 2
+	D1 = 4
+	if (objA0.subtype2c != 0)
+	{
+		D0.s16 = -D0.s16
+		D1 = 2
+	}
+	objA0.velocity.x = D0.u16
+	objA0.value39 = D1.u8
+
+	fn07f81e()
+}
+
+
+//# address-hook(0x07f81e) end(0x07f870)
+function void fn07f81e()
+{
+	--objA0.value39
+	if (s8[A0 + 0x39] < 0)
+	{
+		objA0.value39 = 0x03
+		fn083e84()
+	}
+
+	objA0.position.x.u16 += objA0.velocity.x
+	D1.u16 = objA0.position.x.u16
+	if (objA0.velocity.x >= 0)
+	{
+		D2.u16 = 0x35d0
+		if (D1.u16 < D2.u16)
+			return
+	}
+	else
+	{
+		D2.u16 = 0x3450
+		if (D1.u16 > D2.u16)
+			return
+	}
+
+	objA0.position.x.u16 = D2.u16
+	objA0.update_address = 0x07f872
+	objA0.velocity.y = -2
+	if (objA0.subtype2c == 0)
+	{
+		u8[0xfffffab8] |= 0x02
+	}
+}
+
+
+//# address-hook(0x07f872) end(0x07f89a)
+function void fn07f872()
+{
+	--objA0.value39
+	if (s8[A0 + 0x39] < 0)
+	{
+		objA0.value39 = 0x03
+		fn083e84()
+	}
+
+	objA0.position.y.u16 += objA0.velocity.y
+	if (objA0.position.y.u16 < 0x0240)
+	{
+		UnloadObject()
+	}
+}
+
+
+
+// Helper code
+
+
+//# address-hook(0x07f8a0) end(0x07f8c8)
+function void fn07f8a0()
+{
+	D0.s32 = objA0.velocity.x
+	D0 <<= 8
+	objA0.position.x += D0
+	D0.u16 = objA0.velocity.y
+	D0.u16 += (global.inv_gravity) ? -0x38 : 0x38
+	objA0.velocity.y = D0.u16
+	D0.s32 = D0.s16
+	D0 <<= 8
+	objA0.position.y += D0
+}
+
+
+//# address-hook(0x07f8ca) end(0x07f8fe)
+function void fn07f8ca()
+{
+	D0.u8 = (objA0.value3a != 0) ? 0xff : 0x00
+	if (global.inv_gravity)
+	{
+		D0.u8 ^= 0xff
+	}
+	if (D0.u8 != 0)
+	{
+		objA0.base_state = 0x04
+		u8[A0 + 0x28] = 0xc6
+		objA0.value39 = 0
+		D0.u16 = objA0.velocity.x
+		if (D0.u16 != 0)
+		{
+			u16[A0 + 0x3c] = D0.u16
+			objA0.velocity.x = 0
+		}
+		objA0.velocity.y = 0
+	}
+}
+
+
+
+//# address-hook(0x07f900) end(0x07f9a6)
+function void fn07f900()
+{
+	fn085870()
+	if (_equal())
+		return
+
+	if (u8[A1 + 0x20] != 0x02)
+	{
+		if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+		{
+			Enemy.DamageCharacter()
+		}
+		return
+	}
+
+	if (u8[A1 + 0x2a] & 0x02)
+	{
+		objA1.velocity.y = -0x300
+		u8[A1 + 0x1e] = 0x0e
+		u8[A1 + 0x1f] = 0x07
+		objA1.state = char.state.ROLLING
+		objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+		fn07f4ac()
+
+		signalMultiReturn()
+		signalMultiReturn()
+		return
+	}
+
+	objA0.base_state = 0x06
+	u8[A0 + 0x28] = 0xc6
+	objA0.value42 = 0x07
+	objA0.value39 = 0x08
+
+	objA0.velocity.x = (objA1.velocity.x < 0) ? -0x200 : 0x200
+
+	D4.u16 = max(abs(s16[A1 + 0x1c]), 0x500)
+	if (objA0.render_flags & render_flag.FLIP_Y)
+	{
+		D4.s16 = -D4.s16
+	}
+	objA0.velocity.y = D4.u16
+
+	signalMultiReturn()
+}
+
+
+//# address-hook(0x07f9a8) end(0x07f9f6)
+function void fn07f9a8()
+{
+	fn085870()
+	if (_equal())
+		return
+
+	if (u8[A1 + 0x20] == 0x02)
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
+			D1.u8 = (D0.s16 < 0) ? 0xff : 0x00
+			D2.u16 = objA1.velocity.x
+			if (D2.s16 >= 0)
+			{
+				D1.u8 ^= 0xff
+			}
+			if (D1.u8 != 0)
+			{
+				D2.s16 = -D2.s16
+				objA1.velocity.x = D2.u16
+				s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+			}
+			return
+		}
+	}
+
+	if (u8[A1 + 0x34] == 0)
+	{
+		if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+		{
+			Enemy.DamageCharacter()
+		}
+	}
+}
+
+
+//# address-hook(0x07f9f8) end(0x07fa5e)
+function void fn07f9f8()
+{
+	fn085870()
+	if (_equal())
+		return
+
+	if (objA0.value39 != 0)
+	{
+		--objA0.value39
+		return
+	}
+
+	if (u8[A1 + 0x20] != 0x02 && u8[A1 + 0x20] != 0x09)
+	{
+		if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+		{
+			Enemy.DamageCharacter()
+		}
+		return
+	}
+
+	CheckDistanceToObjectA1()
+	if (D2.u16 >= 0x10)
+	{
+		if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+		{
+			Enemy.DamageCharacter()
+		}
+		return
+	}
+
+	D2.u8 = (objA0.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
+	if (D1.u16 == 0)
+	{
+		D2.u8 ^= 0xff
+	}
+	if (D2.u8 != 0)
+	{
+		if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+		{
+			Enemy.DamageCharacter()
+		}
+		return
+	}
+
+	objA1.velocity.x = -objA1.velocity.x
+	objA1.velocity.y = -objA1.velocity.y
+	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+	fn07f4ac()
+
+	signalMultiReturn()
+	signalMultiReturn()
+}
+
+
+//# address-hook(0x07fa60) end(0x07fa7c)
+function void fn07fa60()
+{
+	D0.u16 = objA0.position.x.u16
+	if (objA0.velocity.x >= 0)
+	{
+		if (D0.u16 < 0x3598)
+			return
+	}
+	else
+	{
+		if (D0.u16 > 0x3488)
+			return
+	}
+
+	objA0.velocity.x = -objA0.velocity.x
+}
+
+
+//# address-hook(0x07fa7e) end(0x07faca)
+function void fn07fa7e()
+{
+	fn085870()
+	if (!_equal())
+	{
+		D0.u8 = u8[A0 + 0x3c]
+		D1.s8 = (global.framecounter.low & 0x03) - 2
+		D0.u16 += D1.s8
+		LookupSinCos()
+		D0.u16 <<= 3
+		D1.u16 <<= 3
+		objA1.velocity.x = D0.u16
+		objA1.velocity.y = D1.u16
+		objA1.flags2a |= char.flag.IN_AIR
+		objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+		u8[A1 + 0x40] = 0
+
+		objA0.state = 0x01
+		playSound(0xaa)
+	}
+}
+
+
+//# address-hook(0x07facc) end(0x07fb08)
+function void fn07facc()
+{
+	D2.u8 = (u8[A0 + 0x3c] & 0x80) ? 0xff : 0x00
+	D0 = u8[A0 + 0x3c] & ~0x80
+
+	D3 = 0x04
+	A1 = 0x07fb0a
+	if (D0 & 0x40)
+	{
+		D3 = 0x0a
+		A1 += 8
+	}
+
+	while (true)
+	{
+		if (D0.u8 < u8[(A1+=1)-1])
+			break
+
+		++D3.u16
+	}
+
+	objA0.animation.sprite = D3.u8
+	D0.u8 = objA0.render_flags & 0xfc
+	if (D2.u8 != 0)
+	{
+		D0.u8 |= 0x03
+	}
+	objA0.render_flags = D0.u8
+}
+
+
+//# address-hook(0x07fb1a) end(0x07fb40)
+function void fn07fb1a()
+{
+	objA0.animation.sprite = (objA0.subtype2c >> 1) + 0x1f
+	u32[A0 + 0x18] = u32[0x07fb42 + objA0.subtype2c * 2]
+	if (objA0.render_flags & render_flag.FLIP_Y)
+	{
+		objA0.velocity.y = -objA0.velocity.y
+	}
+}
+
+
+//# address-hook(0x07fb4e) end(0x07fb88)
+function void fn07fb4e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x40)
+		return
+
+	A2 = 0x07fb8a
+	fn0858c8()
+	if (!_equal())
+	{
+		D0.u8 = (objA0.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
+		if (objA0.velocity.y < 0)
+		{
+			D0.u8 ^= 0xff
+		}
+		if (D0.u8 != 0)
+		{
+			u8[A1 + 0x42] = 0xff
+			u8[A1 + 0x2a] |= 0x40
+		}
+		fn07f4b8()
+		signalMultiReturn()
+	}
+}
+
+
+//# address-hook(0x07fb92) end(0x07fc16)
+function void fn07fb92()
+{
+	if (u8[A0 + 0x42] == 0)
+		return
+
+	if (objA0.state == 0)
+	{
+		--boss.remaining_hits
+		if (boss.remaining_hits == 0)
+		{
+			objA0.update_address = 0x085694
+			objA0.flags2a |= 0x80
+			u8[0xfffffab8] |= 0x01
+			objA0.countdown_callback = 0x07f210
+
+			spawnSimpleChildObjects(0x083fee)
+
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x07fc3e
+			}
+			AddScoreForBossEnemy()
+			return
+		}
+
+		objA0.state = 0x20
+		playSound(0x6e)
+	}
+
+	Boss.updateHitFlashing(6, 0x07fc1a, 0x07fc26)
+
+	--objA0.state
+	if (objA0.state == 0)
+	{
+		objA0.flags2a &= ~0x40
+		u8[A0 + 0x42] = 0
+	}
+}
+
+
+//# address-hook(0x07fc3e) end(0x07fc42)
+function void fn07fc3e()
+{
+	// Back to normal gravity when fight is over
+	global.inv_gravity = 0
+}

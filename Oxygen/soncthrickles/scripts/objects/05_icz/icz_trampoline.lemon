@@ -1,0 +1,316 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Trampoline (from ICZ)                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b89a) end(0x08b8b2)
+function void fn08b89a()
+{
+	setupObjectAttributesFull(0x08babc)
+	objA0.update_address = 0x08b8b6
+	u16[A0 + 0x30] = objA0.position.y.u16
+	spawnChildObjects(0x08bad0)
+}
+
+
+//# address-hook(0x08b8b6) end(0x08b8be)
+function void fn08b8b6()
+{
+	fn08b950()
+	fn08ba1c()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b950) end(0x08b9d6)
+function void fn08b950()
+{
+	if (objA0.flags38 & 0x04)
+	{
+		D0.u16 = 0x80
+		D1.s16 = objA0.position.y.u16 - objA0.value32
+		D2.u16 = objA0.velocity.y
+		D3.u8 = objA0.value39
+		u8[A0 + 0x39] = (D1.s16 < 0) ? 0xff : 0x00
+		if (D1.s16 >= 0)
+		{
+			D0.s16 = -D0.s16
+		}
+		else
+		{
+			D1.s16 = -D1.s16
+		}
+
+		if (D3.u8 != objA0.value39)
+		{
+			D2.u16 += D0.u16 * 2
+			if (D2.s16 < -0x80)
+			{
+				if (D2.s16 <= -0x400)
+				{
+					fn08b9d8()
+				}
+			}
+			else
+			{
+				if (D2.s16 <= 0x80)
+				{
+					if (D1.u16 <= 0x01)
+					{
+						objA0.flags38 &= ~0x04
+					}
+				}
+			}
+		}
+
+		D2.u16 += D0.u16
+		D3.u16 = 0xf700
+		if (D2.s16 < D3.s16)
+		{
+			D2.u16 = D3.u16
+		}
+		else
+		{
+			D3.s16 = -D3.s16
+			if (D2.s16 > D3.s16)
+			{
+				D2.u16 = D3.u16
+			}
+		}
+
+		objA0.velocity.y = D2.u16
+		UpdateMovementStraightSimple()
+		if (D1.u16 >= 0x50)
+		{
+			objA0.velocity.y = -0x100
+		}
+	}
+}
+
+
+//# address-hook(0x08b9d8) end(0x08ba1a)
+function void fn08b9d8()
+{
+	if (objA0.value3a & 0x08)
+	{
+		A1 = 0xffffb000
+		fn08b9fa()
+	}
+	if (objA0.value3a & 0x10)
+	{
+		A1 = 0xffffb04a
+		fn08b9fa()
+	}
+}
+
+
+//# address-hook(0x08b9fa)
+function void fn08b9fa()
+{
+	u8[A1 + 0x05] = 0x02
+	objA1.velocity.y = D2.u16
+	objA1.state = char.state.STRAIGHTJUMP
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+	u8[A1 + 0x40] = 0
+#if STANDALONE
+	u8[A1 + 0x3d] = 0	// Stop spindash
+#endif
+}
+
+
+//# address-hook(0x08ba1c) end(0x08ba7c)
+function void fn08ba1c()
+{
+	objA0.value3a = objA0.flags2a
+	u32 backup = u16[0xffffb01a] + (u32(u16[0xffffb064]) << 16)
+
+	D1 = 0x23
+	D2 = 0x14
+	D3 = 0x0b
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	D0 = backup
+	D1.u8 = objA0.flags2a
+	D2.u8 = objA0.value3a
+	objA0.value3a = D1.u8
+
+	D2.u8 = (D2.u8 ^ D1.u8) & 0x18
+	if (D2.u8 != 0)
+	{
+		fn08ba9e()
+		objA0.flags38 |= 0x04
+		objA0.value39 = 0
+
+		D4 = 3
+		if (D2 & (u32(1) << D4))
+		{
+			A1 = 0xffffb000
+			fn08ba7e()
+		}
+
+		D4 = 4
+		if (D2 & (u32(1) << D4))
+		{
+			D0 = (D0 << 16) + (D0 >> 16)
+			A1 = 0xffffb04a
+			fn08ba7e()
+		}
+	}
+}
+
+
+//# address-hook(0x08ba7e) end(0x08ba9c)
+function void fn08ba7e()
+{
+	// D0.s16 is the character's velocity.y before the collision
+
+	D5.u16 = objA0.velocity.y
+	if ((D1 & (u32(1) << D4)) == 0)
+	{
+		if (D0.s16 < 0)
+		{
+			objA1.velocity.y += D5.u16
+			D0.s16 = -D0.s16
+		}
+	}
+
+#if STANDALONE
+	// AI Tails should better not have an effect on the trampoline
+	if (A1 == 0xffffb04a && tails.control_counter == 0)
+		return
+#endif
+
+	D5.s16 += D0.s16
+	D5.s16 -= D5.s16 >> 2
+	objA0.velocity.y = D5.s16
+}
+
+
+//# address-hook(0x08ba9e) end(0x08baba)
+function void fn08ba9e()
+{
+	D5 = 0
+	if (D1 & 0x08)
+	{
+		D5.u16 += 8
+	}
+	if (D1 & 0x10)
+	{
+		D5.u16 += 8
+	}
+
+	D3.u16 = u16[A0 + 0x30] + D5.u16
+	objA0.value32 = D3.u16
+}
+
+
+//# address-hook(0x08b8c2) end(0x08b8ec)
+function void fn08b8c2()
+{
+	setupObjectAttributesMost(0x08bac8)
+
+	objA0.update_address = 0x08b8f2
+	if (objA0.subtype2c != 0)
+		objA0.render_flags |= render_flag.FLIP_X
+
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 0x02
+	fn08b8fa()
+
+	objA0.animation.sprite = 0x08
+	fn08b8f2()
+}
+
+
+//# address-hook(0x08b8f2) end(0x08b8f6)
+function void fn08b8f2()
+{
+	fn08b930()
+	fn084920()
+}
+
+
+//# address-hook(0x08b8fa) end(0x08b92a)
+function void fn08b8fa()
+{
+	A1 = A0 + 0x18
+	D0.u16 = objA0.position.x.u16
+	D1.u16 = objA0.position.y.u16
+	D2 = 0
+	D3 = 1
+
+	while (D3.s16 >= 0)
+	{
+		D4.u16 = D0.u16
+		D5.u16 = u16[0x08b92c + D2.s16]
+		if (objA0.render_flags & render_flag.FLIP_X)
+			D5.s16 = -D5.s16
+
+		D4.u16 += D5.u16
+		u16[(A1+=2)-2] = D4.u16
+		u16[(A1+=2)-2] = D1.u16
+		u16[(A1+=2)-2] = 8
+
+		D2.u16 += 2
+		--D3.s16
+	}
+}
+
+
+//# address-hook(0x08b930) end(0x08b94e)
+function void fn08b930()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	A2 = A0 + 0x1a
+	D0.u16 = objA0.position.y.u16
+	D1.u16 = objA1.position.y.u16
+	D2.u16 = D1.u16
+	D1.u16 -= D0.u16
+	D1.s16 >>= 1
+	D1.u16 += D0.u16
+	u16[A2] = D1.u16
+	A2 += 6
+	u16[A2] = D2.u16
+}
+
+
+
+// Small now block usually to one side of the trampoline
+
+//# address-hook(0x08a330) end(0x08a330)
+function void fn08a330()
+{
+	Object.InitWithUpdateAddress(0x08a336)
+}
+
+
+//# address-hook(0x08a336) end(0x08a33e)
+function void fn08a336()
+{
+	setupObjectAttributesFull(0x08a3ee)
+	objA0.update_address = 0x08a344
+	fn08a344()
+}
+
+
+//# address-hook(0x08a344) end(0x08a354)
+function void fn08a344()
+{
+	D1 = 0x1b
+	D2 = 0x10
+	D3 = 0x11
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+	DrawOrUnloadObject()
+}

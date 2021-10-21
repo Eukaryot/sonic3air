@@ -1,0 +1,165 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Button                                                //
+//-------------------------------------------------------//
+
+//# address-hook(0x02c518) end(0x02c5b8)
+function void Button.Init()
+{
+	if (competition_mode.active)
+	{
+		fn02c696()
+		return
+	}
+
+	objA0.mapping_offset = 0x02c71e
+	objA0.sprite_attributes = 0x0456
+	if (global.zone == 0x01)
+	{
+		objA0.mapping_offset = 0x22bd1a
+		objA0.sprite_attributes = 0x2426
+	}
+	else if (global.zone == 0x03)
+	{
+		objA0.mapping_offset = 0x22bd4a
+		objA0.sprite_attributes = 0x441a
+	}
+	else if (global.zone == 0x04)
+	{
+		objA0.sprite_attributes = 0x0500
+	}
+	else if (global.zone == 0x09)
+	{
+		objA0.mapping_offset = 0x02c748
+		objA0.sprite_attributes = (global.act == 0) ? 0x63a1 : 0x2429
+	}
+
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x08
+#if STANDALONE
+	objA0.box_size.y = 0x0c
+#endif
+	objA0.sprite_priority = 0x0200
+	objA0.position.y.u16 += 4
+
+	if (objA0.subtype2c & 0x20)
+	{
+		objA0.update_address = 0x02c62c
+		fn02c62c()
+	}
+	else
+	{
+	#if STANDALONE
+		// Make it a little bit higher to prevent early clipping
+		objA0.box_size.y += 4
+	#endif
+
+		objA0.update_address = 0x02c5be
+		fn02c5be()
+	}
+}
+
+
+//# address-hook(0x02c5be) end(0x02c626)
+function void fn02c5be()
+{
+	// This is used e.g. in AIZ2
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		D1.u16 = 0x1b
+		D2.u16 = 0x04
+		D3.u16 = 0x05
+		D4.u16 = objA0.position.x.u16
+		fn01dc56()
+
+		D3 = (objA0.subtype2c & 0x40) ? 7 : 0
+		Button.checkIfPressed()
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x02c62c) end(0x02c690)
+function void fn02c62c()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		D1.u16 = 0x10
+		D3.u16 = 0x06
+		D4.u16 = objA0.position.x.u16
+		PlatformCheckClimbOn()
+
+		D3 = (objA0.subtype2c & 0x40) ? 7 : 0
+		Button.checkIfPressed()
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x02c696) end(0x02c6ba)
+function void fn02c696()
+{
+	objA0.mapping_offset = 0x22bd7a
+	objA0.sprite_attributes = 0x03ad
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x0c
+	objA0.sprite_priority = 0x0200
+	objA0.position.y.u16 += 4
+	objA0.update_address = 0x02c6c0
+
+	fn02c6c0()
+}
+
+
+//# address-hook(0x02c6c0) end(0x02c718)
+function void fn02c6c0()
+{
+	D1.u16 = 0x13
+	D2.u16 = 0x04
+	D3.u16 = 0x05
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D3 = 0
+	Button.checkIfPressed()
+
+	DrawObject()
+}
+
+
+function void Button.checkIfPressed()
+{
+	// This points to one of "level.trigger00" ... "level.trigger0f"
+	A3 = 0xfffff7e0 + (objA0.subtype2c & 0x0f)
+
+	if ((objA0.flags2a & 0x18) == 0)
+	{
+		// Button is released
+		if ((objA0.subtype2c & 0x10) == 0)
+		{
+			u8[A3] &= ~(1 << D3.u8)
+		}
+		objA0.animation.sprite = 0
+	}
+	else
+	{
+		// Button is pressed
+		if (u8[A3] == 0)
+		{
+			playSound(0x5b)
+		}
+		u8[A3] |= (1 << D3.u8)
+		objA0.animation.sprite = 1
+	}
+}

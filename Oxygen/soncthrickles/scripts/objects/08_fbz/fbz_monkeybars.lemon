@@ -1,0 +1,493 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03a7cc) end(0x03a846)
+function void fn03a7cc()
+{
+	if (objA0.subtype2c & 0x80)
+	{
+		D0.u16 = (objA0.subtype2c & 0x3f) << 4
+		objA0.value3e = D0.u16
+		objA0.update_address = 0x03aa5a
+		fn03aa5a()
+		return
+	}
+
+	objA0.render_flags = 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x80
+	objA0.sprite_priority = 0x80
+	u16[A0 + 0x46] = objA0.position.y.u16
+	objA0.mapping_offset = 0x03ad8a
+	objA0.sprite_attributes = 0x4379
+
+	objA0.countdown_value = (objA0.subtype2c & 0x7f) << 3
+	u16[A0 + 0x3c] = 0x02
+
+	if (objA0.subtype2c & 0x80)	// We checked this already and it was false...?
+	{
+		D0.u16 = objA0.countdown_value
+		u16[A0 + 0x3a] = D0.u16
+		objA0.flags38 = 0x01
+		objA0.position.y.u16 += D0.u16
+		D0.u16 >>= 4
+		++D0.u16
+		objA0.animation.sprite = D0.u8
+	}
+
+	objA0.update_address = 0x03a84c
+	fn03a84c()
+}
+
+
+//# address-hook(0x03a84c) end(0x03a8b2)
+function void fn03a84c()
+{
+	bool goto03a87a = false
+	D2.u16 = u16[A0 + 0x3a]
+	if ((objA0.flags38 == 0) != (u16[A0 + 0x30] == 0))
+	{
+		if (D2.u16 != objA0.countdown_value)
+		{
+			D2.u16 += u16[A0 + 0x3c]
+			goto03a87a = true
+		}
+	}
+	else
+	{
+		if (D2.u16 != 0)
+		{
+			D2.u16 -= u16[A0 + 0x3c]
+			goto03a87a = true
+		}
+	}
+
+	if (goto03a87a)
+	{
+		u16[A0 + 0x3a] = D2.u16
+		objA0.position.y.u16 = u16[A0 + 0x46] + D2.u16
+		D0.u16 = D2.u16
+		if (D0.u16 != 0)
+		{
+			D0.u16 >>= 4
+			++D0.u16
+		}
+		objA0.animation.sprite = D0.u8
+	}
+
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D0.u16 = control.player1
+	fn03a8b8()
+
+	A1 = 0xffffb04a
+	++A2
+	D0.u16 = control.tails
+	fn03a8b8()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03a8b8) end(0x03aa58)
+function void fn03a8b8()
+{
+	if (u8[A2] != 0)
+	{
+		if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+		{
+			D0.u8 &= CONTROL_ABC
+			if (D0.u8 == 0)
+			{
+				if (D0 & 0x0400)
+				{
+					objA1.flags2a |= char.flag.FACING_LEFT
+				}
+				if (D0 & 0x0800)
+				{
+					objA1.flags2a &= ~char.flag.FACING_LEFT
+				}
+				u8[A1 + 0x04] &= ~char.flag.FACING_LEFT
+				u8[A1 + 0x04] |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+				objA1.position.y.u16 = objA0.position.y.u16 + 0x9c
+			}
+			else
+			{
+				u8[A1 + 0x2e] = 0
+				u8[A2] = 0
+				u8[A2 + 0x02] = 0x12
+				D0.u16 &= 0x0f00
+				if (D0.u16 != 0)
+				{
+					u8[A2 + 0x02] = 0x3c
+				}
+				if (D0 & 0x0400)
+				{
+					objA1.velocity.x = -0x200
+				}
+				if (D0 & 0x0800)
+				{
+					objA1.velocity.x = 0x0200
+				}
+				objA1.velocity.y = -0x380
+				u8[A1 + 0x1e] = 0x0e
+				u8[A1 + 0x1f] = 0x07
+				objA1.state = char.state.ROLLING
+				u8[A1 + 0x27] = 0
+				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+				objA1.flags2a &= ~(char.flag.ON_OBJECT | char.flag.CONTROL_LOCK)
+				u8[A1 + 0x40] = 1
+				u16[A1 + 0x42] = 0
+			}
+		}
+		else
+		{
+			u8[A2] = 0
+			u8[A2 + 0x02] = 0x3c
+
+			u8[A1 + 0x2e] = 0
+			u8[A1 + 0x2a] &= ~0x08
+			u16[A1 + 0x42] = 0
+		}
+		return
+	}
+
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		if (u8[A2 + 0x02] != 0)
+			return
+	}
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x90
+	if (D0.u16 < 0x20 && D1.u16 < 0x18)
+	{
+		if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		{
+		#if STANDALONE
+			// Ignore for Tails while he's carrying the main player
+			//  -> The other way round gets handled further below
+			if (A1 == 0xffffb04a && tails.carrying)
+				return
+		#endif
+
+			if (u8[A1 + 0x2a] & 0x08)
+			{
+				A3 = 0xffff0000 + u16[A1 + 0x42]
+				if (u32[A3] == 0x03aa5a)
+				{
+					D0.u16 = A2.u16 - A0.u16
+					A3 += D0.u16
+					if (u8[A3 + 0x04] != 0)
+						return
+
+					u8[A3] = 0
+					u8[A3 + 0x02] = 0x3c
+				}
+			}
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16 + 0x9c
+			objA1.state = char.state.HANGING
+			objA1.flags2a |= char.flag.ON_OBJECT
+			u8[A1 + 0x2e] = 0x01
+			u16[A1 + 0x42] = A0.u16
+
+			u8[A2] = 0x01
+			playSound(0x4a)
+
+		#if STANDALONE
+			u8[A1 + 0x3d] = 0	// Clear char.spindash
+
+			// If player is carried by Tails, this connection should better get resolved now
+			if (tails.carrying)
+			{
+				tails.carrying = 0		// Seems to be this simple, or is anything else needed here?
+			}
+		#endif
+		}
+	}
+}
+
+
+//# address-hook(0x03aa5a) end(0x03aa78)
+function void fn03aa5a()
+{
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D0.u16 = control.player1
+	fn03aa7e()
+
+	A1 = 0xffffb04a
+	++A2
+	D0.u16 = control.tails
+	fn03aa7e()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03aa7e) end(0x03ac36)
+function void fn03aa7e()
+{
+	if (u8[A2] == 0)
+	{
+		fn03ac86()
+		return
+	}
+
+	if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+	{
+		D0.u8 &= CONTROL_ABC
+		if (D0.u8 == 0)
+		{
+			while (true)
+			{
+				if (u8[A2 + 0x04] == 0)
+				{
+					D2.u16 = objA0.value3e - 0x10
+					if (D0 & 0x0400)
+					{
+						objA1.flags2a |= char.flag.FACING_LEFT
+						D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
+						if (D1.u16 != 0)
+						{
+							u8[A2 + 0x04] = 4
+							u8[A2 + 0x02] = 1
+						}
+					}
+					if (D0 & 0x0800)
+					{
+						objA1.flags2a &= ~char.flag.FACING_LEFT
+						D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
+						if (D1.u16 != D2.u16 * 2)
+						{
+							u8[A2 + 0x04] = 4
+							u8[A2 + 0x02] = 0
+						}
+					}
+
+					D0.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
+					u8[A1 + 0x04] &= 0xfc
+					u8[A1 + 0x04] |= D0.u8
+					objA1.position.y.u16 = objA0.position.y.u16 + 0x12
+					if (u8[A2 + 0x04] == 0)
+					{
+						break
+					}
+				}
+
+				--u8[A2 + 0x06]
+				if (s8[A2 + 0x06] >= 0)
+					break
+
+				u8[A2 + 0x06] = 7
+				D1 = u8[A2 + 0x04]
+				if (D1.u8 == 2)
+				{
+					playSound(0x4a)
+				}
+				--D1.u16
+				u8[A1 + 0x20] = (D1.u16 == 0) ? char.state.HANGING : char.state.RUNNING
+
+				D1.u8 += u8[A2 + 0x08]
+				u8[A1 + 0x22] = u8[0x03ac38 + D1.s16]
+				D1.s16 = s8[0x03ac40 + D1.s16]
+				if (u8[A2 + 0x02] != 0)
+				{
+					D1.s16 = -D1.s16
+				}
+			#if STANDALONE
+				if (A1 == 0xffffb000)
+					globalCameraOffsetX -= D1.s16
+			#endif
+				objA1.position.x.u16 += D1.s16
+
+				--u8[A2 + 0x04]
+				if (u8[A2 + 0x04] != 0)
+					break
+
+				fn03ac48()
+
+				u8[A2 + 0x06] = 0
+				u8[A2 + 0x08] ^= 0x04
+
+				if ((D0.u16 & 0x0c00) == 0)
+					break
+			}
+		}
+		else
+		{
+			u8[A2] = 0
+			u8[A2 + 0x02] = 0x12
+
+			D0.u16 &= 0x0f00
+			if (D0.u16 != 0)
+			{
+				u8[A2 + 0x02] = 0x3c
+			}
+			if (D0 & 0x0400)
+			{
+				objA1.velocity.x = -0x200
+			}
+			if (D0 & 0x0800)
+			{
+				objA1.velocity.x = 0x200
+			}
+			objA1.velocity.y = -0x380
+			u8[A1 + 0x1e] = 0x0e
+			u8[A1 + 0x1f] = 0x07
+			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x22] = 0x96
+			u8[A1 + 0x27] = 0
+			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+			objA1.flags2a &= ~(char.flag.ON_OBJECT | char.flag.CONTROL_LOCK)
+			u8[A1 + 0x2e] = 0
+			u8[A1 + 0x40] = 1
+			u16[A1 + 0x42] = 0
+		}
+
+		D0 = u8[A1 + 0x22]
+		u32 backupA2 = A2
+		SetCharacterSpritePatterns()
+		A2 = backupA2
+	}
+	else
+	{
+		fn03ab24()
+	}
+}
+
+
+//# address-hook(0x03ab24)
+function void fn03ab24()
+{
+	u8[A1 + 0x2e] = 0
+	u8[A2] = 0
+	u8[A2 + 0x02] = 0x3c
+	u8[A1 + 0x2a] &= ~0x08
+	u16[A1 + 0x42] = 0
+}
+
+
+//# address-hook(0x03ac48) end(0x03ac84)
+function void fn03ac48()
+{
+	if (objA0.subtype2c & 0x40)
+	{
+		D2.u16 = objA0.value3e - 0x10
+		if (objA0.flags2a & 0x01)
+		{
+			D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
+			if (D1.u16 == 0)
+			{
+				fn03ab24()
+			}
+		}
+		else
+		{
+			D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
+			if (D1.u16 == D2.u16 * 2)
+			{
+				fn03ab24()
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x03ac86) end(0x03ad88)
+function void fn03ac86()
+{
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		if (u8[A2 + 0x02] != 0)
+			return
+	}
+
+	D2.u16 = objA0.value3e
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16
+	D2.u16 *= 2
+	if (D0.u16 < D2.u16 && D1.u16 < 0x18)
+	{
+		if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		{
+		#if STANDALONE
+			// Ignore for Tails while he's carrying the main player
+			//  -> The other way round gets handled further below
+			if (A1 == 0xffffb04a && tails.carrying)
+				return
+		#endif
+
+			if (u8[A1 + 0x2a] & 0x08)
+			{
+				A3 = 0xffff0000 + u16[A1 + 0x42]
+				if (u32[A3] == 0x03a84c)
+					return
+			}
+
+			D0.u16 &= 0xffe0
+			if (objA0.subtype2c & 0x40)
+			{
+				if (objA0.flags2a & 0x01)
+				{
+					if (D0.u16 == 0)
+						return
+				}
+				else
+				{
+					D2.u16 -= 0x20
+					if (D0.u16 == D2.u16)
+						return
+				}
+			}
+
+			// Character grabs the monkey bar
+			u8[A1 + 0x04] &= 0xfd
+			objA1.position.x.u16 = objA0.position.x.u16 + 0x10 + D0.u16 - objA0.value3e
+			objA1.position.y.u16 = objA0.position.y.u16 + 0x12
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0
+			objA1.state = char.state.HANGING
+			u8[A1 + 0x22] = 0x91
+			u8[A1 + 0x2a] |= 0x08
+			u8[A1 + 0x2e] = 0x03
+			u16[A1 + 0x42] = A0.u16
+
+			u8[A2] = 0x01
+			u8[A2 + 0x02] = 0
+			u8[A2 + 0x04] = 0
+			u8[A2 + 0x06] = 0
+
+			D0 = u8[A1 + 0x22]
+			u32 backupA2 = A2
+			SetCharacterSpritePatterns()
+			A2 = backupA2
+
+			playSound(0x4a)
+
+		#if STANDALONE
+			u8[A1 + 0x3d] = 0	// Clear char.spindash
+
+			// If player is carried by Tails, this connection should better get resolved now
+			if (tails.carrying)
+			{
+				tails.carrying = 0		// Seems to be this simple, or is anything else needed here?
+			}
+		#endif
+		}
+	}
+}

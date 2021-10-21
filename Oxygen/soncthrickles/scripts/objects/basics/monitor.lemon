@@ -1,0 +1,902 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Monitor (a.k.a. Item Box)                             //
+//-------------------------------------------------------//
+
+// Monitor types (stored in objA0.subtype2c and objA0.state):
+//  0x01 = Extra Life
+//  0x02 = Robotnik
+//  0x03 = Rings
+//  0x04 = Speed Shoes
+//  0x05 = Fire Shield
+//  0x06 = Lightning Shield
+//  0x07 = Water Shield
+//  0x08 = Invincibility
+//  0x09 = "Super" monitor (debug only)
+//  0x0a = Already broken, too bad...
+//  0x0b = Classic Shield (Standalone only)
+
+
+#if STANDALONE
+
+function u8 Monitor.getRandomMonitorType(bool hiddenMonitor)
+{
+	// Number of monitors in the game (i.e. last time I checked the AIR layouts):
+	//  - Extra life:		 53 (10%)
+	//  - Robotnik:			 10  (2%)
+	//  - Rings:			243 (47%)
+	//  - Speed Shoes:		 12  (2%)
+	//  - Fire Shield:		 47  (9%)
+	//  - Lightning Shield:	 63 (12%)
+	//  - Bubble Shield:	 39  (8%)
+	//  - Invincibility:	 48  (9%)
+
+	// Note on shield probabilities:
+	// Bubble shield is slightly lower because other shield types might be made bubble shields underwater,
+	// which increases the bubble shield's effective probability
+
+	u8 random = (global.level_random_base ^ objA0.position.x.u16 ^ objA0.position.y.u16) % 100
+	if (hiddenMonitor)
+	{
+		// Hidden monitors (that appear when the signpost hits them) use a different distribution
+		if (random < 10)
+		{
+			return 0x01		// 10% = Extra life
+		}
+		else if (random < 31)
+		{
+			return 0x03		// 21% = Rings
+		}
+		else if (random < 39)
+		{
+			return 0x04		//  8% = Speed Shoes
+		}
+		else if (random < 57)
+		{
+			return 0x05		// 18% = Fire Shield
+		}
+		else if (random < 75)
+		{
+			return 0x06		// 18% = Lightning Shield
+		}
+		else if (random < 92)
+		{
+			return 0x07		// 17% = Bubble Shield
+		}
+		else
+		{
+			return 0x08		//  8% = Invincibility
+		}
+	}
+	else
+	{
+		if (random < 3)
+		{
+			return 0x01		//  3% = Extra life
+		}
+		else if (random < 6)
+		{
+			return 0x02		//  3% = Robotnik
+		}
+		else if (random < 49)
+		{
+			return 0x03		// 43% = Rings
+		}
+		else if (random < 57)
+		{
+			return 0x04		//  8% = Speed Shoes
+		}
+		else if (random < 59)
+		{
+			return 0x05		// 12% = Fire Shield
+		}
+		else if (random < 81)
+		{
+			return 0x06		// 12% = Lightning Shield
+		}
+		else if (random < 92)
+		{
+			return 0x07		// 11% = Bubble Shield
+		}
+		else
+		{
+			return 0x08		//  8% = Invincibility
+		}
+	}
+}
+
+
+function u8 Monitor.getRandomizedType(u8 type, bool hiddenMonitor)
+{
+	if (type & 0x10)	// This flag marks shield monitors that should be a classic shield when having all shield types active
+	{
+		if (Game.getSetting(SETTING_SHIELD_TYPES) == 2)
+		{
+			type = 0x0b
+		}
+		else
+		{
+			type &= ~0x10
+		}
+	}
+
+	if (type <= 0x08 || type == 0x0b)
+	{
+		if (Game.getSetting(SETTING_RANDOM_MONITORS) == 2)
+		{
+			// Monitor randomization
+			type = Monitor.getRandomMonitorType(hiddenMonitor)
+
+			if (type >= 0x05 && type <= 0x07)	// Shield
+			{
+				if (Game.getSetting(SETTING_SHIELD_TYPES) == 2)
+				{
+					u8 random = (global.level_random_base ^ ((objA0.position.x.u16 + objA0.position.y.u16) >> 4)) & 0x03
+					if (random == 0x03)
+						type = 0x0b
+				}
+			}
+		}
+		else if (Game.getSetting(SETTING_RANDOM_MONITORS) == 1)
+		{
+			// Shield randomization
+			if ((type >= 0x05 && type <= 0x07) || type == 0x0b)
+			{
+				if (Game.getSetting(SETTING_SHIELD_TYPES) == 2)
+				{
+					u8 random = (global.level_random_base ^ ((objA0.position.x.u16 + objA0.position.y.u16) >> 4)) & 0x03
+					type = (random < 3) ? (0x05 + random) : 0x0b
+				}
+				else
+				{
+					u8 random = (global.level_random_base ^ objA0.position.x.u16 ^ objA0.position.y.u16) % 3
+					type = 0x05 + random
+				}
+			}
+		}
+	}
+
+	if (Game.getSetting(SETTING_RANDOM_MONITORS) != 0)
+	{
+		// No lightning shield or fire shield underwater
+		if ((type == 0x05 || type == 0x06) && level.water_present && objA0.position.y.u16 > water.height.current)
+		{
+			// Make it either a bubble shield or rings
+			type = (type == 0x05) ? 0x07 : 0x03
+		}
+	}
+
+	if (Game.isTimeAttack() || Game.getSetting(SETTING_INFINITE_LIVES))
+	{
+		// Replace extra life monitors
+		if (type == 0x01)
+		{
+			type = 0x03
+		}
+	}
+
+	return type
+}
+
+
+function bool Monitor.enforceClassicShield()
+{
+	u8 setting = Game.getSetting(SETTING_SHIELD_TYPES)
+	if (setting == 0)
+	{
+		return true
+	}
+	else if (setting == 3)
+	{
+		return (u8[0xffffb02b] & char.bonus.ANY_SHIELD) == 0
+	}
+	return false
+}
+
+
+function u64 Monitor.getIconSpriteKey(u8 type)
+{
+	if (type == 0)
+		return "monitor_icon_static"
+	else if (type == 0x01)
+		return (getMainCharacter() == CHARACTER_SONIC) ? "monitor_icon_sonic" : (getMainCharacter() == CHARACTER_TAILS) ? "monitor_icon_tails" : "monitor_icon_knuckles"
+	else if (type == 0x02)
+		return "monitor_icon_robotnik"
+	else if (type == 0x03)
+		return "monitor_icon_ring"
+	else if (type == 0x04)
+		return "monitor_icon_speedshoes"
+	else if (type == 0x05)
+		return "monitor_icon_fireshield"
+	else if (type == 0x06)
+		return "monitor_icon_lightningshield"
+	else if (type == 0x07)
+		return "monitor_icon_bubbleshield"
+	else if (type == 0x08)
+		return "monitor_icon_invincibility"
+	else if (type == 0x09)
+		return "monitor_icon_super"
+	else if (type == 0x0b)
+		return "monitor_icon_classicshield"
+
+	return 0
+}
+
+#endif
+
+
+
+//# address-hook(0x01d566) end(0x01d570)
+function void MonitorIntact.BaseUpdate()
+{
+	// Targets:
+	//  - 0x01d57e	-> state = 0x00		-> Initialization
+	//  - 0x01d5dc	-> state = 0x02		-> Regular update
+	//  - 0x01d716	-> state = 0x04		-> Gets opened
+	call tableLookupAddress(0x01d574, u8[A0 + 0x05])
+}
+
+
+//# address-hook(0x01d57e) end(0x01d5d6)
+function void MonitorIntact.Init()
+{
+	objA0.base_state += 2
+	objA0.hitbox_extends.x = 0x0f
+	objA0.hitbox_extends.y = 0x0f
+	objA0.mapping_offset = 0x01dba2
+	objA0.sprite_attributes = 0x04c4
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x180
+	objA0.box_size.x = 0x0e
+	objA0.box_size.y = 0x10
+
+#if STANDALONE
+	if (Game.getSetting(SETTING_MONITOR_STYLE) == 1)
+	{
+		objA0.box_size.x = 0x11
+		objA0.box_size.y = 0x0e
+	}
+
+	objA0.subtype2c = Monitor.getRandomizedType(objA0.subtype2c, false)
+#endif
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		if (u8[A2] & 0x01)
+		{
+			objA0.animation.sprite = 0x0b
+		#if STANDALONE
+			objA0.update_address = 0x01d61a		// Needed for render hook, simply calls "DrawOrUnloadObject"
+		#else
+			objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+		#endif
+			return
+		}
+	}
+
+	u8[A0 + 0x28] = 0x46
+	objA0.state = objA0.subtype2c
+#if STANDALONE
+	if (objA0.state == 0x0b)	// Classic Shield's state is not completely supported
+		objA0.state = 0x05
+#endif
+
+	MonitorIntact.UpdateDefault()
+}
+
+
+//# address-hook(0x01d5dc) end(0x01d616)
+function void MonitorIntact.UpdateDefault()
+{
+	fn01d63a()
+
+#if STANDALONE
+	u16 width = objA0.box_size.x + 11
+	u16 height = objA0.box_size.y + 1	// Needed for Sonic 2 monitors
+#else
+	u16 width = 0x19
+	u16 height = 0x11
+#endif
+
+	// Collision check against player 1
+	A1 = 0xffffb000
+	D1.u16 = width
+	D2.u16 = height - 1
+	D3.u16 = height
+	D4.u16 = objA0.position.x.u16
+	D6 = 3
+	MonitorIntact.CheckBlocking()
+
+	// Collision check against player 2
+	A1 = 0xffffb04a
+	D1.u16 = width
+	D2.u16 = height - 1
+	D3.u16 = height
+	D4.u16 = objA0.position.x.u16
+	D6 = 4
+	fn01d6c2()
+
+	AddAsDynamicObject()
+
+	Object.animationUpdate(0x01db3a)
+	MonitorIntact.Render()
+}
+
+
+//# address-hook(0x01d61a) end(0x01d61a)
+function void MonitorIntact.Render()
+{
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x01d61e) end(0x01d636)
+function void fn01d61e()
+{
+	// Broken monitor
+	if (objA0.animation.sprite == 0x0b)
+	{
+		objA0.update_address = 0x01d61a
+	}
+
+	Object.animationUpdate(0x01db3a)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x01d63a) end(0x01d694)
+function void fn01d63a()
+{
+	// Update falling monitor
+	if (u8[A0 + 0x3c] != 0)
+	{
+		UpdateMovementSimple()
+
+		if ((objA0.render_flags & render_flag.FLIP_Y) == 0)
+		{
+			if (objA0.velocity.y >= 0)
+			{
+				CheckGroundCollision()
+				if (D1.s16 <= 0)
+				{
+					objA0.position.y.u16 += D1.u16
+					objA0.velocity.y = 0
+					u8[A0 + 0x3c] = 0
+				}
+			}
+		}
+		else
+		{
+			if (objA0.velocity.y < 0)
+			{
+				fn00fc12()
+				if (D1.s16 <= 0)
+				{
+					objA0.position.y.u16 -= D1.u16
+					objA0.velocity.y = 0
+					u8[A0 + 0x3c] = 0
+				}
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x01d696) end(0x01d6be)
+function void MonitorIntact.CheckBlocking()
+{
+	if ((objA0.flags2a >> D6.u8) & 1)
+	{
+		fn01d6dc()
+	}
+	else
+	{
+		// Note that "Character.OnCollisionWithDynamicObject" does the same checks again
+
+		bool canOpenMonitor = false
+		if (objA1.state == char.state.ROLLING)
+		{
+			canOpenMonitor = true
+		}
+	#if STANDALONE
+		else if (u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state == char.state.SONIC_DROPDASH)
+		{
+			canOpenMonitor = true
+		}
+	#endif
+		else if (u8[A1 + 0x38] == CHARACTER_KNUCKLES)
+		{
+			// Check if Knuckles glides into the monitor
+			canOpenMonitor = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3)
+		}
+
+		if (!canOpenMonitor)
+		{
+			// Block character movement
+			fn01df90()
+		}
+	}
+}
+
+
+//# address-hook(0x01d6c2) end(0x01d6da)
+function void fn01d6c2()
+{
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
+	{
+		if (competition_mode.active == 0 || u8[A1 + 0x20] != 2)
+		{
+			fn01df90()
+		}
+	}
+	else
+	{
+		fn01d6dc()
+	}
+}
+
+//# address-hook(0x01d6dc) end(0x01d714)
+function void fn01d6dc()
+{
+	D2.u16 = D1.u16 * 2
+	if ((u8[A1 + 0x2a] & 0x02) == 0)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		if (D0.s16 >= 0 && D0.u16 < D2.u16)
+		{
+			D2.u16 = D4.u16
+			UpdateSonicPositionOnMovingObject()
+			D4 = 0
+			return
+		}
+	}
+
+	u8 bit = (1 << D6.u8)
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+	objA1.flags2a |= char.flag.IN_AIR
+	objA0.flags2a &= ~bit
+	D4 = 0
+}
+
+
+//# address-hook(0x01d716) end(0x01d7b6)
+function void MonitorIntact.Opening()
+{
+	if ((objA0.flags2a & 0x28) != 0)
+	{
+		u8[0xffffb02a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
+	#if !STANDALONE
+		// No idea why this is added in the original code
+		//  -> It just leads to the bug that you often get stopped by the second monitor if spindashing into multiple monitors next to each other
+		u8[0xffffb02a] |= char.flag.IN_AIR
+	#endif
+	}
+
+	if ((objA0.flags2a & 0x50) != 0)
+	{
+		u8[0xffffb074] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
+	#if !STANDALONE
+		u8[0xffffb074] |= char.flag.IN_AIR
+	#endif
+	}
+
+	objA0.flags2a &= 0x03
+	u8[A0 + 0x28] = 0
+
+	if (allocDynamicObjectAfterA0())
+	{
+		// Effect icon from the monitor
+		objA1.update_address = 0x01d7ba
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x04] = objA0.render_flags
+	#if STANDALONE
+		u8[A1 + 0x20] = objA0.subtype2c
+	#else
+		u8[A1 + 0x20] = objA0.state
+	#endif
+		u8[A1 + 0x2a] = objA0.flags2a
+		u16[A1 + 0x42] = objA0.value42
+	}
+
+	if (allocDynamicObjectAfterA0())
+	{
+		// Explosion
+		objA1.update_address = 0x01e5e0
+		u8[A1 + 0x05] += 2
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+	}
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] |= 0x01
+	}
+
+	objA0.state = 0x0a
+	objA0.update_address = 0x01d61e
+
+	DrawObject()
+
+#if STANDALONE
+	Standalone.onMonitorOpened()
+#endif
+}
+
+
+
+//-------------------------------------------------------//
+// Effect icon from monitor                              //
+//-------------------------------------------------------//
+
+//# address-hook(0x01d7ba) end(0x01d7c4)
+function void ItemEffect.BaseUpdate()
+{
+	// Targets:
+	//  - 0x01d7ce 	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x01d81a 	-> objA0.base_state = 0x02	-> Rising animation
+	//  - 0x01db2e 	-> objA0.base_state = 0x04	-> Wait time when stopped (+ fade-out in S3AIR)
+	call tableLookupAddress(0x01d7c8, objA0.base_state)
+}
+
+
+//# address-hook(0x01d7ce) end(0x01d816)
+function void ItemEffect.Init()
+{
+	objA0.base_state += 2
+	objA0.sprite_attributes = 0x84c4
+	objA0.render_flags |= (render_flag.WORLD | 0x20)
+	objA0.sprite_priority = 0x180
+	objA0.box_size.x = 8
+	objA0.velocity.y = (objA0.render_flags & render_flag.FLIP_Y) ? 0x300 : -0x300
+
+	D0 = objA0.state + 1
+	objA0.animation.sprite = D0.u8
+
+	// Targets:
+	//  - 0x01dbba	-> D0 = 0x00
+	//  - 0x01dbc2	-> D0 = 0x01
+	//  - 0x01dbd0	-> D0 = 0x02
+	//  - 0x01dbde	-> D0 = 0x03
+	//  - 0x01dbec	-> D0 = 0x04
+	//  - 0x01dbfa	-> D0 = 0x05
+	//  - 0x01dc08	-> D0 = 0x06
+	//  - 0x01dc16	-> D0 = 0x07
+	//  - 0x01dc24	-> D0 = 0x08
+	//  - 0x01dc32	-> D0 = 0x09
+	//  - 0x01dc40	-> D0 = 0x0a
+	//  - 0x01dc4e	-> D0 = 0x0b
+	//  - 0x01dba3	-> D0 = 0x0c
+	A1 = tableLookupAddress(0x01dba2, D0 * 2)
+	A1 += 2
+	u32[A0 + 0x0c] = A1
+
+#if STANDALONE
+	u8[A0 + 0x49] = objA0.state		// Backup original
+	if (objA0.state >= 0x05 && objA0.state <= 0x07)
+	{
+		if (Monitor.enforceClassicShield())
+		{
+			objA0.state = 0x0b
+		}
+	}
+#endif
+
+	ItemEffect.UpdateDefault()
+}
+
+
+//# address-hook(0x01d81a) end(0x01d81c)
+function void ItemEffect.UpdateDefault()
+{
+	ItemEffect.UpdateDefaultInternal()
+	DrawObject()
+}
+
+
+//# address-hook(0x01d820) end(0x01d878)
+function void ItemEffect.UpdateDefaultInternal()
+{
+#if STANDALONE
+	if (u8[A0 + 0x49] != objA0.state)
+	{
+		// Go back from Classic Shield to original if player acquired a shield meanwhile
+		//  -> E.g. when opening two shield monitor quickly one after another
+		if (!Monitor.enforceClassicShield())
+		{
+			objA0.state = u8[A0 + 0x49]
+		}
+	}
+#endif
+
+	if ((objA0.render_flags & render_flag.FLIP_Y) == 0)
+	{
+		if (objA0.velocity.y < 0)
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y += 0x18
+			return
+		}
+	}
+	else
+	{
+		if (objA0.velocity.y >= 0)
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y -= 0x18
+			return
+		}
+	}
+
+	objA0.base_state += 2
+	u16[A0 + 0x24] = 0x1d
+
+	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = (A1 == 0xffffb000) ? 0xfffffecc : 0xfffffece
+#if STANDALONE
+	if (objA0.state == 0x0b)	// Classic Shield
+	{
+		ItemEffect.applyShield(0, 0x0194ce, 0x3a)
+	}
+	else
+#endif
+	{
+		// Targets:
+		//  - 0x01d898	-> objA0.base_state = 0x01
+		//  - 0x01d890	-> objA0.base_state = 0x02
+		//  - 0x01d8ac	-> objA0.base_state = 0x03
+		//  - 0x01d90a	-> objA0.base_state = 0x04
+		//  - 0x01d954	-> objA0.base_state = 0x05
+		//  - 0x01d992	-> objA0.base_state = 0x06
+		//  - 0x01d9d0	-> objA0.base_state = 0x07
+		//  - 0x01da0e	-> objA0.base_state = 0x08
+		//  - 0x01da60	-> objA0.base_state = 0x09
+		call tableLookupAddress(0x01d87c, objA0.state * 2)
+	}
+}
+
+
+//# address-hook(0x01d898) end(0x01d8a6)
+function void ItemEffect.ApplyExtraLifePlayer1()
+{
+	++u16[0xfffffecc]
+	gainExtraLife()
+}
+
+
+//# address-hook(0x01d8ac) end(0x01d906)
+function void ItemEffect.ApplyExtraRings()
+{
+	++u16[A2]
+
+	ring_counter = min(ring_counter + 10, 999)
+	u16[0xfffffec8] = min(u16[0xfffffec8] + 10, 999)
+	hud.dirty.rings |= 0x01
+
+	if (checkForExtraLifeByRings())
+	{
+		if (A1 == 0xffffb000)
+		{
+			ItemEffect.ApplyExtraLifePlayer1()
+		}
+		else
+		{
+			fn01d890()
+		}
+	}
+	else
+	{
+		playMusic(SFX_RING)
+	}
+}
+
+
+//# address-hook(0x01d890) end(0x01d892)
+function void fn01d890()
+{
+	++u16[A2]
+	DamageCharacter()
+}
+
+
+//# address-hook(0x01d90a) end(0x01d94e)
+function void ItemEffect.ApplySpeedUp()
+{
+	++u16[A2]
+	u8[A1 + 0x2b] |= char.bonus.SPEED_UP
+	u8[A1 + 0x36] = 0x96
+
+#if STANDALONE
+	u32 backupA0 = A0
+	A0 = A1
+	if (A0 == 0xffffb000 && global.characters != CHARS_TAILS_ALONE)
+	{
+		setSpeedCapProperties(0xfffff760)
+	}
+	else
+	{
+		setSpeedCapProperties(0xfffffec0)
+	}
+	A0 = backupA0
+#else
+	if (A1 == 0xffffb000 && global.characters != CHARS_TAILS_ALONE)
+	{
+		global.move.speedcap = 0xc00
+		global.move.acceleration = 0x18
+		global.move.deceleration = 0x80
+	}
+	else
+	{
+		u16[0xfffffec0] = 0xc00
+		u16[0xfffffec2] = 0x18
+		u16[0xfffffec4] = 0x80
+	}
+#endif
+
+	changeMusicTempo(8)
+}
+
+
+function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundId)
+{
+	++u16[A2]
+	u8[A1 + 0x2b] &= ~0x71
+	u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | shieldType)
+	playMusic(soundId)
+
+	u32 shieldObjectAddress = (u8[A0 + 0x43] == 0) ? 0xffffcce8 : 0xffffcd32
+#if STANDALONE
+	// Attention if we're right during lightning shield flash effect in water
+	if (u32[shieldObjectAddress] == 0x01989e)
+	{
+		copyMemory(0xfffff080, 0xfffff000, 0x80)
+	}
+#endif
+
+	u32[shieldObjectAddress] = updateRoutine
+	u16[shieldObjectAddress + 0x42] = A1.u16
+}
+
+
+//# address-hook(0x01d954) end(0x01d990)
+function void ItemEffect.ApplyShieldFire()
+{
+	ItemEffect.applyShield(char.bonus.SHIELD_FIRE, 0x0195a6, SFX_FIRESHIELD)
+}
+
+
+//# address-hook(0x01d992) end(0x01d9ce)
+function void ItemEffect.ApplyShieldLightning()
+{
+	ItemEffect.applyShield(char.bonus.SHIELD_LIGHTNING, 0x0196c2, SFX_LIGHTNINGSHIELD)
+}
+
+
+//# address-hook(0x01d9d0) end(0x01da0c)
+function void ItemEffect.ApplyShieldBubble()
+{
+	ItemEffect.applyShield(char.bonus.SHIELD_BUBBLE, 0x0198be, SFX_BUBBLESHIELD)
+}
+
+
+//# address-hook(0x01da0e) end(0x01da5e)
+function void ItemEffect.ApplyInvincibility()
+{
+	++u16[A2]
+	if (super.active == 0 && super.active.tails == 0)
+	{
+	#if STANDALONE
+		if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) && u8[A1 + 0x35] > 0)
+		{
+			Game.setAchievementComplete(ACHIEVEMENT_DOUBLE_INVINCIBILITY)
+		}
+	#endif
+
+		u8[A1 + 0x2b] |= char.bonus.INVINCIBLE
+		u8[A1 + 0x35] = 150			// "char.invinc.countdown", decreases every 8 frames
+		if (!level.boss_encounter && u8[A1 + 0x2c] > 12)	// Check "char.drown_countdown"
+		{
+			playMusic(0x2c)
+		}
+
+		if (u8[A0 + 0x43] == 0)
+		{
+			u32[0xffffcd7c] = 0x0187f0
+			u16[0xffffcdbe] = A1.u16
+		}
+		else
+		{
+			u32[0xffffcea4] = 0x0187f0
+			u16[0xffffcee6] = A1.u16
+		}
+	}
+}
+
+
+//# address-hook(0x01da60) end(0x01db26)
+function void ItemEffect.ApplySuperTransformation()
+{
+	++u16[A2]
+	ring_counter += 50		// Without a check for 999 rings...
+	super.palettefx.state = 1
+	super.palettefx.timer = 0x0f
+	super.active = 1
+	super.ring_dec.frames = 60
+	global.move.speedcap = 0x800
+	global.move.acceleration = 0x18
+	global.move.deceleration = 0xc0
+	u8[0xffffb020] = 0x1f
+
+	if (isMainCharacter(CHARACTER_SONIC))
+	{
+		// Sonic
+		u32[0xffffb00c] = 0x146816		// "char.mapping_offset"
+		super.active = 0xff
+		global.move.speedcap = 0xa00
+		global.move.acceleration = 0x30
+		global.move.deceleration = 0x100
+		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
+		u32[0xffffcbc0] = 0x01a494		// After-images effect
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		// Tails
+		super.active = 0
+	#if STANDALONE
+		super.active.tails = 0xff
+	#else
+		super.active.tails = 1
+	#endif
+		u8[0xffffb020] = 0x29
+		u16[0xfffffec0] = 0x800
+		u16[0xfffffec2] = 0x18
+		u16[0xfffffec4] = 0xc0
+		u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
+	}
+	else
+	{
+		// Knuckles
+		u32[0xffffcbc0] = 0x01a494		// After-images effect
+	#if STANDALONE
+		super.active = 0xff
+	#endif
+	}
+
+	u8[0xffffb02e] = 0x81
+	u8[0xffffb035] = 0
+	u8[A1 + 0x2b] |= 0x02
+
+	playSound(0x9f)
+#if STANDALONE
+	chooseFittingMusic()	// Usually switches to super theme
+#else
+	playMusic(0x2c)
+#endif
+}
+
+
+//# address-hook(0x01db2e) end(0x01db36)
+function void fn01db2e()
+{
+	--s16[A0 + 0x24]
+	if (s16[A0 + 0x24] < 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}

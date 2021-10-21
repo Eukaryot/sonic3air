@@ -1,0 +1,356 @@
+{
+
+	//----------------------------------------------//
+	// Music and jingles                            //
+	//----------------------------------------------//
+
+	// AIZ
+	"01": { "Source": "EmulationDirect", "Type": "Music" },
+	"02": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// HCZ
+	"03": { "Source": "EmulationDirect", "Type": "Music" },
+	"04": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// MGZ
+	"05": { "Source": "EmulationDirect", "Type": "Music" },
+	"06": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// CNZ
+	"07": { "Source": "EmulationDirect", "Type": "Music" },
+	"08": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// FBZ
+	"09": { "Source": "EmulationDirect", "Type": "Music" },
+	"0A": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// ICZ
+	"0B": { "Source": "EmulationDirect", "Type": "Music" },
+	"0C": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// LBZ
+	"0D": { "Source": "EmulationDirect", "Type": "Music" },
+	"0E": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// MHZ
+	"0F": { "Source": "EmulationDirect", "Type": "Music" },
+	"10": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// SOZ
+	"11": { "Source": "EmulationDirect", "Type": "Music" },
+	"12": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// LRZ
+	"13": { "Source": "EmulationDirect", "Type": "Music" },
+	"14": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// SSZ
+	"15": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// DEZ
+	"16": { "Source": "EmulationDirect", "Type": "Music" },
+	"17": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// Boss music
+	"18":		   { "Source": "Emulation", "Type": "Music" },
+	"19":		   { "Source": "Emulation", "Type": "Music" },
+	"sonic1_boss": { "File": "sonic1_boss.ogg", "Type": "Music", "LoopStart": "600" },
+	"sonic2_boss": { "File": "sonic2_boss.ogg", "Type": "Music", "LoopStart": "11160" },
+
+	// DDZ
+	"1A": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// Bonus stages & blue spheres
+	"1B":			{ "Source": "Emulation", "Type": "Music" },
+	"1C":			{ "Source": "EmulationDirect", "Type": "Music" },
+	"1C_speedup":	{ "Source": "EmulationDirect", "EmulatedID": "0x1c", "Type": "Music" },
+	"1C_speedup45":	{ "Source": "EmulationDirect", "EmulatedID": "0x1c", "Type": "Music" },
+	"1D":			{ "Source": "Emulation", "Type": "Music" },
+	"1E":			{ "Source": "Emulation", "Type": "Music" },
+
+	// Knuckles' Theme
+	"1F":		 { "Source": "Emulation", "Type": "Music" },
+	"1F_sonic3": { "Source": "Emulation", "EmulatedID": "0x1f", "Address": "0x2d97fd", "Type": "Music" },
+
+	// Competition mode
+	"20": { "Source": "Emulation", "Type": "Music" },
+	"21": { "Source": "Emulation", "Type": "Music" },
+	"22": { "Source": "Emulation", "Type": "Music" },
+	"23": { "Source": "Emulation", "Type": "Music" },
+	"24": { "Source": "Emulation", "Type": "Music" },
+
+	// Title Theme (playing in title screen)
+	"25":		 { "Source": "Emulation", "Type": "Jingle" },
+	"25_sonic3": { "Source": "Emulation", "EmulatedID": "0x25", "Address": "0x2de18f", "Type": "Jingle" },
+
+
+	// Credits (Sonic 3)
+	"26": { "Source": "Emulation", "Type": "Music" },
+
+	// Game Over
+	"27": { "Source": "Emulation", "Type": "Jingle" },
+
+	// Continue Screen / Competition mode results
+	"28": 		 { "Source": "Emulation", "Type": "Music" },
+	"28_sonic3": { "Source": "Emulation", "EmulatedID": "0x28", "Address": "0x2dec7b", "Type": "Music" },
+
+	// Level results jingle (don't start the music again afterwards)
+	"29": { "Source": "Emulation", "Type": "Jingle" },
+
+	// Extra life jingle
+	"2A":		 { "Source": "Emulation", "Type": "Jingle" },
+	"2A_sonic3": { "Source": "Emulation", "EmulatedID": "0x2a", "Address": "0x2df095", "Type": "Jingle" },
+
+	// Emerald jingle
+	"2B": { "Source": "Emulation", "Type": "Jingle" },
+
+	// Invincibility theme
+	"2C":		 { "Source": "EmulationDirect", "Type": "Music" },
+	"2C_sonic3": { "Source": "EmulationDirect", "EmulatedID": "0x2c", "Address": "0x2df364", "Type": "Music" },
+	
+	// Additional super theme
+	"supertheme_sonic2": { "File": "supertheme_sonic2.ogg", "Type": "Music", "LoopStart": "167300" },
+
+	// Competition Mode menu
+	"2D": { "Source": "Emulation", "Type": "Music" },
+
+	// "2E" is a redirect to Mini-boss theme
+	"2E_sonic3": { "Source": "Emulation", "EmulatedID": "0x2e", "Address": "0x2c71a0", "Type": "Music" },
+
+	// Data Select menu
+	"2F": { "Source": "Emulation", "Type": "Music" },
+
+	// Final Boss
+	"30": { "Source": "EmulationDirect", "Type": "Music" },
+
+	// Drowning jingle
+	"31": { "Source": "Emulation", "Type": "Jingle" },
+
+	// Victory music (when game is finished)
+	"32":		 { "Source": "Emulation", "Type": "Jingle" },
+	"32_sonic3": { "Source": "Emulation", "EmulatedID": "0x32", "Address": "0x2dfbfe", "Type": "Jingle" },
+
+
+
+	// CNZ (Sonic 3 Prototype)
+	"07_proto":	{ "File": "proto07_cnz1.smps", "ContentOffset": "0x0000", "Source": "EmulationDirect", "EmulatedID": "0x07", "Type": "Music" },	// Original location in prototype ROM = 0x0b8000
+	"08_proto":	{ "File": "proto08_cnz2.smps", "ContentOffset": "0x1bbb", "Source": "EmulationDirect", "EmulatedID": "0x08", "Type": "Music" },	// Original location in prototype ROM = 0x0b9bbb
+
+	// ICZ (Sonic 3 Prototype)
+	"0B_proto":	{ "File": "proto0B_icz1.smps", "ContentOffset": "0x4499", "Source": "EmulationDirect", "EmulatedID": "0x0b", "Type": "Music" },	// Original location in prototype ROM = 0x0bc499
+	"0C_proto":	{ "File": "proto0C_icz2.smps", "ContentOffset": "0x4a37", "Source": "EmulationDirect", "EmulatedID": "0x0c", "Type": "Music" },	// Original location in prototype ROM = 0x0bca37
+
+	// LBZ (Sonic 3 Prototype)
+	"0D_proto":	{ "File": "proto0D_lbz1.smps", "ContentOffset": "0x504b", "Source": "EmulationDirect", "EmulatedID": "0x0d", "Type": "Music" },	// Original location in prototype ROM = 0x0bd04b
+	"0E_proto":	{ "File": "proto0E_lbz2.smps", "ContentOffset": "0x0000", "Source": "EmulationDirect", "EmulatedID": "0x0e", "Type": "Music" },	// Original location in prototype ROM = 0x0c0000
+
+	// Knuckles' Theme (Sonic 3 Prototype)
+	"1F_proto":	{ "File": "proto1F_knuckles.smps",    "ContentOffset": "0x3b19", "Source": "Emulation", "EmulatedID": "0x1f", "Type": "Music" },	// Original location in prototype ROM = 0x0cbb19
+
+	// Credits (Sonic 3 Prototype)
+	"26_proto":	{ "File": "proto26_credits.smps",     "ContentOffset": "0x2dcc", "Source": "Emulation", "EmulatedID": "0x26", "Type": "Music" },	// Original location in prototype ROM = 0x0d2dcc
+
+	// Competition Mode menu (Sonic 3 Prototype)
+	"2D_proto":	{ "File": "proto2D_competition.smps", "ContentOffset": "0x4cb8", "Source": "Emulation", "EmulatedID": "0x2d", "Type": "Music" },	// Original location in prototype ROM = 0x0d4cb8
+
+	// Unused track (Sonic 3 Prototype)
+	"2E_proto":	{ "File": "proto2E_unused.smps",      "ContentOffset": "0x5eaa", "Source": "Emulation", "EmulatedID": "0x2e", "Type": "Music" },	// Original location in prototype ROM = 0x0d5eaa
+
+
+
+	//----------------------------------------------//
+	// Sound effects                                //
+	//----------------------------------------------//
+
+	"33": { "Source": "Emulation", "Type": "Sound", "Volume": "0.8" },	// Alternating ring sound (emulation plays left)
+	"34": { "Source": "Emulation", "Type": "Sound", "Volume": "0.8" },	// Ring sound always playing right
+	"35": { "Source": "Emulation", "Type": "Sound" },
+	"36": { "Source": "Emulation", "Type": "Sound" },		// Brake
+	"37": { "Source": "Emulation", "Type": "Sound" },
+	"38": { "Source": "Emulation", "Type": "Sound" },
+	"39": { "Source": "Emulation", "Type": "Sound" },
+	"3A": { "Source": "Emulation", "Type": "Sound" },
+	"3B": { "Source": "Emulation", "Type": "Sound" },
+	"3C": { "Source": "Emulation", "Type": "Sound", "Volume": "0.7" },		// Roll
+	"3D": { "Source": "Emulation", "Type": "Sound" },
+	"3E": { "Source": "Emulation", "Type": "Sound" },
+	"3F": { "Source": "Emulation", "Type": "Sound" },
+
+	"40": { "Source": "Emulation", "Type": "Sound" },
+	"41": { "Source": "Emulation", "Type": "Sound" },
+	"42": { "Source": "Emulation", "Type": "Sound" },
+	"43": { "Source": "Emulation", "Type": "Sound" },
+	"44": { "Source": "Emulation", "Type": "Sound" },
+	"45": { "Source": "Emulation", "Type": "Sound" },
+	"46": { "Source": "Emulation", "Type": "Sound" },
+	"47": { "Source": "Emulation", "Type": "Sound" },
+	"48": { "Source": "Emulation", "Type": "Sound" },
+	"49": { "Source": "Emulation", "Type": "Sound" },
+	"4A": { "Source": "Emulation", "Type": "Sound" },
+	"4B": { "Source": "Emulation", "Type": "Sound" },
+	"4C": { "Source": "Emulation", "Type": "Sound" },
+	"4D": { "Source": "Emulation", "Type": "Sound" },
+	"4E": { "Source": "Emulation", "Type": "Sound" },
+	"4F": { "Source": "Emulation", "Type": "Sound" },
+
+	"50": { "Source": "Emulation", "Type": "Sound" },
+	"51": { "Source": "Emulation", "Type": "Sound" },
+	"52": { "Source": "Emulation", "Type": "Sound" },
+	"53": { "Source": "Emulation", "Type": "Sound" },
+	"54": { "Source": "Emulation", "Type": "Sound" },
+	"55": { "Source": "Emulation", "Type": "Sound" },
+	"56": { "Source": "Emulation", "Type": "Sound" },
+	"57": { "Source": "Emulation", "Type": "Sound" },
+	"58": { "Source": "Emulation", "Type": "Sound" },
+	"59": { "Source": "Emulation", "Type": "Sound", "Volume": "0.7" },		// Collapse sound (which is a bit loud imho)
+	"5A": { "Source": "Emulation", "Type": "Sound" },
+	"5B": { "File": "sfx5B.ogg", "Type": "Sound" },			// Still using the recorded version, as the emulated version somehow feels off (though I can't really say why)
+	"5C": { "Source": "Emulation", "Type": "Sound" },
+	"5D": { "Source": "Emulation", "Type": "Sound" },
+	"5E": { "Source": "Emulation", "Type": "Sound" },
+	"5F": { "Source": "Emulation", "Type": "Sound" },
+
+	"60": { "Source": "Emulation", "Type": "Sound" },
+	"61": { "Source": "Emulation", "Type": "Sound" },
+	"62": { "Source": "Emulation", "Type": "Sound" },		// Jump
+	"63": { "Source": "Emulation", "Type": "Sound" },
+	"64": { "Source": "Emulation", "Type": "Sound" },
+	"65": { "Source": "Emulation", "Type": "Sound" },
+	"66": { "Source": "Emulation", "Type": "Sound" },
+	"67": { "Source": "Emulation", "Type": "Sound" },
+	"68": { "Source": "Emulation", "Type": "Sound" },
+	"69": { "Source": "Emulation", "Type": "Sound" },
+	"6A": { "Source": "Emulation", "Type": "Sound" },
+	"6B": { "Source": "Emulation", "Type": "Sound" },
+	"6C": { "Source": "Emulation", "Type": "Sound" },
+	"6D": { "Source": "Emulation", "Type": "Sound" },
+	"6E": { "Source": "Emulation", "Type": "Sound" },
+	"6F": { "Source": "Emulation", "Type": "Sound" },
+
+	"70": { "Source": "Emulation", "Type": "Sound" },
+	"71": { "Source": "Emulation", "Type": "Sound" },
+	"72": { "Source": "Emulation", "Type": "Sound" },
+	"73": { "Source": "Emulation", "Type": "Sound" },
+	"74": { "Source": "Emulation", "Type": "Sound" },
+	"75": { "Source": "Emulation", "Type": "Sound" },
+	"76": { "Source": "Emulation", "Type": "Sound" },
+	"77": { "Source": "Emulation", "Type": "Sound" },
+	"78": { "Source": "Emulation", "Type": "Sound" },
+	"79": { "Source": "Emulation", "Type": "Sound" },
+	"7A": { "Source": "Emulation", "Type": "Sound" },
+	"7B": { "Source": "Emulation", "Type": "Sound" },
+	"7C": { "Source": "Emulation", "Type": "Sound" },
+	"7D": { "Source": "Emulation", "Type": "Sound" },
+	"7E": { "Source": "Emulation", "Type": "Sound" },
+	"7F": { "Source": "Emulation", "Type": "Sound" },
+
+	"80": { "Source": "Emulation", "Type": "Sound" },
+	"81": { "Source": "Emulation", "Type": "Sound" },
+	"82": { "Source": "Emulation", "Type": "Sound" },
+	"83": { "Source": "Emulation", "Type": "Sound" },
+	"84": { "Source": "Emulation", "Type": "Sound" },		// I wonder where this is ever used?
+	"85": { "Source": "Emulation", "Type": "Sound" },		// I wonder where this is ever used?
+	"86": { "Source": "Emulation", "Type": "Sound" },
+	"87": { "Source": "Emulation", "Type": "Sound" },
+	"88": { "Source": "Emulation", "Type": "Sound" },
+	"89": { "Source": "Emulation", "Type": "Sound" },
+	"8A": { "Source": "Emulation", "Type": "Sound" },
+	"8B": { "Source": "Emulation", "Type": "Sound" },
+	"8C": { "Source": "Emulation", "Type": "Sound" },
+	"8D": { "Source": "Emulation", "Type": "Sound" },
+	"8E": { "Source": "Emulation", "Type": "Sound" },
+	"8F": { "Source": "Emulation", "Type": "Sound" },
+
+	"90": { "Source": "Emulation", "Type": "Sound" },
+	"91": { "Source": "Emulation", "Type": "Sound" },
+	"92": { "Source": "Emulation", "Type": "Sound" },
+	"93": { "Source": "Emulation", "Type": "Sound" },
+	"94": { "Source": "Emulation", "Type": "Sound" },
+	"95": { "Source": "Emulation", "Type": "Sound" },
+	"96": { "Source": "Emulation", "Type": "Sound" },
+	"97": { "Source": "Emulation", "Type": "Sound" },
+	"98": { "Source": "Emulation", "Type": "Sound" },		// TODO: This sounds different than in emulator
+	"99": { "Source": "Emulation", "Type": "Sound" },
+	"9A": { "Source": "Emulation", "Type": "Sound" },
+	"9B": { "Source": "Emulation", "Type": "Sound" },
+	"9C": { "Source": "Emulation", "Type": "Sound" },
+	"9D": { "Source": "Emulation", "Type": "Sound" },
+	"9E": { "Source": "Emulation", "Type": "Sound" },
+	"9F": { "Source": "Emulation", "Type": "Sound" },
+
+	"A0": { "Source": "Emulation", "Type": "Sound" },
+	"A1": { "Source": "Emulation", "Type": "Sound" },
+	"A2": { "Source": "Emulation", "Type": "Sound" },
+	"A3": { "Source": "Emulation", "Type": "Sound" },
+	"A4": { "Source": "Emulation", "Type": "Sound" },
+	"A5": { "Source": "Emulation", "Type": "Sound" },
+	"A6": { "Source": "Emulation", "Type": "Sound" },
+	"A7": { "Source": "Emulation", "Type": "Sound" },
+	"A8": { "Source": "Emulation", "Type": "Sound" },
+	"A9": { "Source": "Emulation", "Type": "Sound" },
+	"AA": { "Source": "Emulation", "Type": "Sound" },
+	"AB": { "Source": "EmulationContinuous", "Type": "Sound", "Volume": "0.8" },		// Spindash charge; needs to be emulated dynamically (i.e. "continuous") because of reverb effect
+	"AC": { "Source": "Emulation", "Type": "Sound" },
+	"AD": { "Source": "Emulation", "Type": "Sound" },
+	"AE": { "Source": "Emulation", "Type": "Sound" },
+	"AF": { "Source": "Emulation", "Type": "Sound" },
+
+	"B0": { "Source": "Emulation", "Type": "Sound" },
+	"B1": { "Source": "Emulation", "Type": "Sound" },
+	"B2": { "Source": "Emulation", "Type": "Sound" },
+	"B3": { "Source": "Emulation", "Type": "Sound" },
+	"B4": { "Source": "Emulation", "Type": "Sound" },
+	"B5": { "Source": "Emulation", "Type": "Sound" },
+	"B6": { "Source": "Emulation", "Type": "Sound", "Channel": "AB" },	// Spindash release
+	"B7": { "Source": "Emulation", "Type": "Sound" },
+	"B8": { "Source": "Emulation", "Type": "Sound" },
+	"B9": { "Source": "Emulation", "Type": "Sound" },
+	"BA": { "Source": "Emulation", "Type": "Sound" },
+	"BB": { "Source": "Emulation", "Type": "Sound" },
+	
+	// Continuous sounds have to be emulated
+	"BC": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"BD": { "Source": "EmulationContinuous", "Type": "Sound", "Volume": "0.5" },
+	"BE": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"BF": { "Source": "EmulationContinuous", "Type": "Sound" },
+
+	"C0": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C1": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C2": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C3": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C4": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C5": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C6": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C7": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C8": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"C9": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"CA": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"CB": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"CC": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"CD": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"CE": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"CF": { "Source": "EmulationContinuous", "Type": "Sound" },
+
+	"D0": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D1": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D2": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D3": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D4": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D5": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D6": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D7": { "Source": "EmulationContinuous", "Type": "Sound" },		// TODO: Emulation sounds different
+	"D8": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"D9": { "Source": "EmulationContinuous", "Type": "Sound" },		// Emulation sounds awful for this, but the prerecorded sound is just fine
+	"DA": { "Source": "EmulationContinuous", "Type": "Sound" },
+	"DB": { "Source": "EmulationContinuous", "Type": "Sound" },
+
+//	"DC_sk": { "Source": "Emulation", "Type": "Jingle" },		// Unused original version of this
+
+	"FF": { "File": "sfxFF_sega.ogg", "Type": "Jingle" },
+
+	"dropdash_charge": { "File": "s3air_dropdash_charge.ogg", "Type": "Sound", "Channel": "AB" },	// Use spindash channel
+	"dropdash_release":{ "File": "s3air_dropdash_release.ogg", "Type": "Sound", "Channel": "AB" },	// Use spindash channel
+	"peelout_charge":  { "File": "scd_peelout_charge.ogg", "Type": "Sound", "Channel": "AB" },		// Use spindash channel
+	"peelout_release": { "File": "scd_peelout_release.ogg", "Type": "Sound", "Channel": "AB" }		// Use spindash channel
+
+}

@@ -1,0 +1,192 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+// This file may only be included if STANDALONE preprocessor definition is not set
+#if !STANDALONE
+	COMPILER_ERROR
+#endif
+#if GAMEAPP
+	COMPILER_ERROR
+#endif
+
+
+//-------------------------------------------------------//
+// Replacements for game app's script bindings           //
+//-------------------------------------------------------//
+
+function u32 Game.getSetting(u32 settingId)
+{
+	// Regard all settings as default
+	return (settingId & 0xff)
+}
+
+function bool Game.isSecretUnlocked(u32 secretId)
+{
+	// Regard all secrets as locked
+	return false
+}
+
+function bool Game.isEnduserBuild()
+{
+	// There's no differentiation between end-user and development builds any more, so this exists only for mod compatibility
+	return false
+}
+
+function void Game.setSecretUnlocked(u32 secretId)
+{
+	// Ignore this function call
+}
+
+function void Game.triggerRestart()
+{
+	// Ignore this function call
+}
+
+function void Game.onGamePause(bool canRestart)
+{
+	// Ignore this function call
+}
+
+function void Game.allowRestartInGamePause(bool canRestart)
+{
+	// Ignore this function call
+}
+
+function void Game.onLevelStart()
+{
+	// Ignore this function call
+}
+
+function void Game.onZoneActCompleted(u16 zoneAndAct)
+{
+	// Ignore this function call
+}
+
+function u16 Game.onTriggerNextZone(u16 zoneAndAct)
+{
+	// No modification
+	return zoneAndAct
+}
+
+function u16 Game.onFadedOutLoadingZone(u16 zoneAndAct)
+{
+	// No modification
+	return zoneAndAct
+}
+
+function bool Game.onCharacterDied(u8 playerIndex)
+{
+	// Ignore this function call
+	return true
+}
+
+function void Game.onScreenFadedOutBeforeDataSelect()
+{
+	// Ignore this function call
+}
+
+function void Game.returnToMainMenu()
+{
+	// Ignore this function call
+}
+
+function bool Game.isNormalGame()
+{
+	// Always true in Oxygen project
+	return true
+}
+
+function bool Game.isTimeAttack()
+{
+	// Always false in Oxygen project
+	return false
+}
+
+function void Game.onTimeAttackFinish()
+{
+	// Ignore this function call
+}
+
+function void Game.changePlanePatternRectAtex(u16 px, u16 py, u16 width, u16 height, u8 planeIndex, u8 atex)
+{
+	// TODO: Implement this in script
+}
+
+function void Game.renderBlueSpheresGround()
+{
+	// Not available without C++ code, so just do nothing here...
+}
+
+function void Game.writeBlueSpheresData()
+{
+	// Not available without C++ code, so just do nothing here...
+}
+
+function u32 Game.getAchievementValue(u32 achievementId)
+{
+	// Feature not supported in Oxygen project
+	return 0
+}
+
+function void Game.setAchievementValue(u32 achievementId, u32 value)
+{
+	// Feature not supported in Oxygen project
+}
+
+function bool Game.isAchievementComplete(u32 achievementId)
+{
+	// Feature not supported in Oxygen project
+	return false
+}
+
+function void Game.setAchievementComplete(u32 achievementId)
+{
+	// Feature not supported in Oxygen project
+}
+
+function void Game.startSkippableCutscene()
+{
+	// Feature not supported in Oxygen project
+}
+
+function void Game.endSkippableCutscene()
+{
+	// Feature not supported in Oxygen project
+}
+
+function void Game.setUnderwaterAudioEffect(u8 effect)
+{
+	// Feature not supported in Oxygen project
+}
+
+function bool Game.isModdedSound(u64 key)
+{
+	// TODO: Implement this
+	return false
+}
+
+function void Game.setDiscordDetails(u64 text)
+{
+	// Feature not supported in Oxygen project
+}
+
+function void Game.setDiscordState(u64 text)
+{
+	// Feature not supported in Oxygen project
+}
+
+function void Game.setDiscordLargeImage(u64 imageName)
+{
+	// Feature not supported in Oxygen project
+}
+
+function void Game.setDiscordSmallImage(u64 imageName)
+{
+	// Feature not supported in Oxygen project
+}

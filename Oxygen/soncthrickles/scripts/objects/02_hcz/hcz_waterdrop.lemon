@@ -1,0 +1,123 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03827c) end(0x0382b4)
+function void fn03827c()
+{
+	objA0.mapping_offset = 0x23794e
+	objA0.sprite_attributes = 0x235c
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 8
+	objA0.box_size.y = 8
+	objA0.hitbox_extends.x = 8
+	objA0.hitbox_extends.y = 7
+	objA0.animation.sprite = 6
+
+	objA0.update_address = 0x0382ba
+	fn0382ba()
+}
+
+
+//# address-hook(0x0382ba) end(0x0382f6)
+function void fn0382ba()
+{
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		D0 = u16(objA0.subtype2c) << 2
+		u16[A0 + 0x30] = D0.u16
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			if (allocDynamicObjectAfterA0())
+			{
+				D0 = 0x2c
+				while (D0.s16 >= 0)
+				{
+					u16[A1 + D0.s16] = u16[A0 + D0.s16]
+					D0.u16 -= 2
+				}
+
+				objA1.update_address = 0x0382fc
+				u8[A1 + 0x28] = 0xc7
+				D0 = 0
+			}
+		}
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0382fc) end(0x038332)
+function void fn0382fc()
+{
+	if (objA0.base_state != 0)
+	{
+		UpdateMovementStraightSimple()
+		objA0.velocity.y += 8
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			objA0.update_address = 0x038336
+			objA0.position.y.u16 += D1.u16
+			objA0.velocity.y = 0
+			objA0.state.both = 0x0101
+			objA0.animation.timer = 1
+			objA0.animation.frame = 0
+		}
+	}
+
+	fn038336()
+}
+
+
+//# address-hook(0x038336) end(0x03837c)
+function void fn038336()
+{
+	Object.animationUpdate(0x0383aa)
+	if (objA0.base_state == 0x04)
+	{
+		UnloadObject()
+		return
+	}
+
+	if (u8[A0 + 0x29] != 0)
+	{
+		A2 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			fn038382()
+		}
+
+		A2 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			fn038382()
+		}
+
+		u8[A0 + 0x29] = 0
+	}
+
+	AddAsDynamicObject()
+	DrawObject()
+}
+
+
+//# address-hook(0x038382) end(0x0383a8)
+function void fn038382()
+{
+	if (u8[A2 + 0x20] == 0x05)
+		u8[A2 + 0x21] = 0
+
+	objA0.state = 0x01
+	objA0.update_address = 0x038336
+	u8[A0 + 0x28] = 0
+	objA0.base_state = 0x02
+}

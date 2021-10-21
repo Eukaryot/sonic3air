@@ -1,0 +1,127 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Miles Prower's fluffy rear parts                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x0160a6) end(0x01615e)
+function void TailsTails.Init()
+{
+	objA0.mapping_offset = 0x344bb8
+	objA0.sprite_attributes = 0x06b0
+	objA0.sprite_priority = 0x100
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.render_flags = render_flag.WORLD
+
+	objA0.update_address = 0x0160d2
+	TailsTails.Update()
+}
+
+
+//# address-hook(0x0160d2)
+function void TailsTails.Update()
+{
+	// Update various properties from Tails main object
+	A2 = 0xffff0000 + u16[A0 + 0x30]
+	objA0.position.x.u16 = u16[A2 + 0x10]
+	objA0.position.y.u16 = u16[A2 + 0x14]
+	u8[A0 + 0x26] = u8[A2 + 0x26]			// Rotation
+	objA0.flags2a = u8[A2 + 0x2a]			// Flags
+	objA0.sprite_priority = u16[A2 + 0x08]
+	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+
+	D0 = u8[A2 + 0x20]
+	if ((u8[A2 + 0x2a] & 0x20) && u8[0xfffff7c9] == 0)
+	{
+		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)
+		{
+			D0 = 4
+		}
+	}
+	if (u8[A0 + 0x34] != D0.u8)
+	{
+		u8[A0 + 0x34] = D0.u8
+		objA0.state = u8[0x016164 + D0.s16]
+	}
+
+	A1 = 0x016196
+	UpdateTailsAnimation_inner()
+	if (global.inv_gravity && objA0.state != 0x03)
+	{
+		objA0.render_flags ^= render_flag.FLIP_Y
+	}
+
+	TailsTails.UpdateSpritePatterns()
+	DrawObject()
+}
+
+
+//# address-hook(0x015c3e) end(0x015c6c)
+function void TailsTails.UpdateSpritePatterns()
+{
+	updateCharacterSpritePatternsInternal(objA0.animation.sprite, 0x336620, 0x344d74, 0xd600, 0xfffff7df)
+}
+
+
+
+// Competition mode
+
+//# address-hook(0x016022) end(0x01604e)
+function void fn016022()
+{
+	u16 targetInVRAM = (A0 == 0xffffcc0a) ? 0xd600 : 0xd200
+	updateMultipleSpritePatterns(0x33d5e0, 0x2a024c, targetInVRAM, objA0.animation.sprite)
+}
+
+
+//# address-hook(0x0161fa) end(0x01622c)
+function void fn0161fa()
+{
+	objA0.mapping_offset = 0x2a00a4
+	objA0.sprite_attributes = (A0 == 0xffffcc0a) ? 0x06b0 : 0x0690
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.render_flags = 0x04
+
+	u32[A0] = 0x016232
+	fn016232()
+}
+
+
+//# address-hook(0x016232) end(0x01629a)
+function void fn016232()
+{
+	A2 = 0xffff0000 + u16[A0 + 0x30]
+	objA0.value26 = u8[A2 + 0x26]
+	objA0.flags2a = u8[A2 + 0x2a]
+	objA0.position.x.u16 = u16[A2 + 0x10]
+	objA0.position.y.u16 = u16[A2 + 0x14]
+	objA0.sprite_priority = u16[A2 + 0x08]
+	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+
+	D0 = u8[A2 + 0x20]
+	if ((u8[A2 + 0x2a] & 0x20) && D0.u8 != 0x05)
+	{
+		D0 = 0x04
+	}
+	if (D0.u8 != u8[A0 + 0x34])
+	{
+		u8[A0 + 0x34] = D0.u8
+		objA0.state = u8[0x0162a0 + D0.u16]
+	}
+
+	A1 = 0x0162c2
+	fn015cd6()
+	fn016022()
+	DrawObject()
+}

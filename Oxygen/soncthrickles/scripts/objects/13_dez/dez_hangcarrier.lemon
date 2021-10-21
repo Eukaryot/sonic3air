@@ -1,0 +1,167 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x046f84) end(0x046fbc)
+function void fn046f84()
+{
+	objA0.mapping_offset = 0x04717e
+	objA0.sprite_attributes = 0x235d
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x14
+	objA0.hitbox_extends.y = 0x14
+	objA0.sprite_priority = 0x80
+	u16[A0 + 0x34] = objA0.subtype2c * 4
+
+	objA0.update_address = 0x046fc2
+	fn046fc2()
+}
+
+
+//# address-hook(0x046fc2) end(0x046fc8)
+function void fn046fc2()
+{
+	if (u8[A0 + 0x30] != 0)
+	{
+		objA0.update_address = 0x046ff2
+	}
+	fn046fce()
+}
+
+
+//# address-hook(0x046fce) end(0x046fec)
+function void fn046fce()
+{
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D0.u16 = control.player1
+	fn04703e()
+
+	++A2
+	A1 = 0xffffb04a
+	D0.u16 = control.tails
+	fn04703e()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x046ff2) end(0x04702a)
+function void fn046ff2()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y -= 8
+	fn00fc12()
+
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 -= D1.u16
+		objA0.velocity.x = (objA0.flags2a & 0x01) ? - 0x200 : 0x200
+		objA0.velocity.y = 0
+		objA0.update_address = 0x04702c
+	}
+	fn046fce()
+}
+
+
+//# address-hook(0x04702c) end(0x04703c)
+function void fn04702c()
+{
+	if (u16[A0 + 0x34] != 0)
+	{
+		--u16[A0 + 0x34]
+		UpdateMovementStraightSimple()
+	}
+	fn046fce()
+}
+
+
+//# address-hook(0x04703e) end(0x04717c)
+function void fn04703e()
+{
+	if (u8[A2] != 0)
+	{
+		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
+		{
+			if ((D0.u8 & CONTROL_ABC) == 0)
+			{
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16 + 0x28
+				if ((level.framecounter.low & 0x0f) == 0)
+				{
+					playSound(0xd0)
+				}
+				return
+			}
+
+			u8[A2] = 0
+			u8[A2 + 0x02] = 0x12
+
+			if (D0.u16 & 0x0f00)
+			{
+				u8[A2 + 0x02] = 0x3c
+				if (D0 & 0x0800)
+				{
+					objA1.velocity.x = 0x200
+				}
+				else if (D0 & 0x0400)
+				{
+					objA1.velocity.x = -0x200
+				}
+			}
+
+			objA1.velocity.y = -0x380
+			u8[A1 + 0x1e] = 0x0e
+			u8[A1 + 0x1f] = 0x07
+			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x27] = 0
+			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+			objA1.flags2a &= ~char.flag.CONTROL_LOCK
+			u8[A1 + 0x2e] = 0
+			u8[A1 + 0x40] = 1
+		}
+		else
+		{
+			u8[A1 + 0x2e] = 0
+			u8[A2] = 0
+			u8[A2 + 0x02] = 0x3c
+		}
+		return
+	}
+
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		return
+	}
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x28
+	if (D0.u16 < 0x20 && D1.u16 < 0x18)
+	{
+		if ((u8[A1 + 0x2e] & 0x80) == 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		{
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16 + 0x28
+			objA1.state = char.state.HANGING
+		#if !STANDALONE
+			// This interferes with the drop dash and does not seem to be necessary (also see FBZ monkeybars -> "fn03a8b8")
+			objA1.flags2a &= ~char.flag.IN_AIR
+		#endif
+			u8[A1 + 0x2e] = 1
+
+			u8[A2] = 1
+			playSound(0x5b)
+		}
+	}
+}

@@ -1,0 +1,395 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04f030) end(0x04f070)
+function void fn04f030()
+{
+	push(A5)
+	push(A4)
+	push(D1)
+	fn04f03e()
+
+	D1 = pop()
+	A4 = pop()
+	A5 = pop()
+	if (!_negative())
+		fn04f03e()
+}
+
+
+function void fn04f03e()
+{
+	D0.u16 = u16[0xffffeec8]
+	D1.u16 = D1.u16 & level.height.tilemask
+	D2.u16 = (D1.u16 + 0xf0) & level.height.tilemask
+
+	if (D0.u16 >= D1.u16 && D0.u16 <= D2.u16)
+	{
+		while (true)
+		{
+			A5 += 4
+			A4 += 2
+			if (D0.u16 < u16[A4-2])
+				break
+		}
+		D1.u16 = u16[A5]
+		D6 = 0x20
+		LoadTileContentSingleLine()
+	}
+	u16[0xffffeec8] -= 0x10
+	--u16[0xffffeeca]
+	_setNegativeFlagByValue(s16[0xffffeeca])
+}
+
+
+
+//# address-hook(0x04f28c) end(0x04f2d8)
+function void UpdateVerticalScrollOffsetsDuringCollapse()
+{
+	updateVerticalScrollOffsetsDuringCollapse(false)
+}
+
+
+function void updateVerticalScrollOffsetsDuringCollapse(bool useSharedMemory)
+{
+	// Data at A4 (usually in ROM):
+	//  - n words, each the width of a scrolling block in pixels
+	//  - the first one is the world x-position where the scrolling region starts
+	//  - a value of 0x7fff signals the end
+
+	A1 = 0xffffeeea		// Start address of vertical scroll offsets
+	u16 rows = 20		// It's 20 columns of tiles (each 16 pixels wide) supported here
+
+#if STANDALONE
+	if (useSharedMemory)
+	{
+		// For standalone, allow for using a larger buffer that can hold more than 320 pixel (= more than 20 rows)
+		u8[0x818080] = 1
+		A1 = 0x818000
+		rows = 32
+	}
+#endif
+
+	// Search for the first column on screen
+	D1.u16 = camera.background.y.u16
+	D0.u16 = (camera.foreground.x.u16 + 0x0f) >> 4
+	while (D0.s16 >= 0)
+	{
+		D2.u16 = u16[A4] >> 4
+		A4 += 2
+		A5 += 2
+		D0.u16 -= D2.u16
+	}
+	D0.s16 = -D0.s16
+
+	D2 = rows - D0.u16 - 1
+	D0 = min(D0.u16, rows) - 1
+
+	while (true)
+	{
+		D3.u16 = u16[A5]
+		A5 += 2
+		while (D0.s16 >= 0)
+		{
+			u16[A1]   = D3.u16
+			u16[A1+2] = D1.u16
+			A1 += 4
+			--D0.s16
+		}
+
+		if (D2.s16 < 0)
+			break
+
+		D0.u16 = u16[A4] >> 4
+		A4 += 2
+		D3.u16 = D2.u16
+		D2.u16 -= D0.u16
+		if (D2.s16 >= 0)
+		{
+			--D0.u16
+		}
+		else
+		{
+			D0.u16 = D3.u16
+		}
+	}
+}
+
+
+
+//# address-hook(0x04f368) end(0x04f384)
+function void fn04f368()
+{
+	D1.u16 = u16[A1]
+	u16[A1] = D0.u16
+	D0.u16 -= D1.u16
+	if (D0.s16 < 0)
+	{
+		D0.s16 = -D0.s16
+		if (D0.u16 >= D2.u16)
+			D0.u16 -= D3.u16
+		u16[A1+2] -= D0.u16
+	}
+	else
+	{
+		if (D0.u16 >= D2.u16)
+			D0.u16 -= D3.u16
+		u16[A1+2] += D0.u16
+	}
+	A1 += 4
+}
+
+
+//# address-hook(0x04f386) end(0x04f39e)
+function void fn04f386()
+{
+	u16[0xffffee3e] = camera.foreground.x.u16 - camera.background.x.u16
+	u16[0xffffee40] = camera.foreground.y.u16 - camera.background.y.u16
+}
+
+
+//# address-hook(0x04f3a0) end(0x04f3ae)
+function void fn04f3a0()
+{
+	if (super.active.tails)
+	{
+		// Move Super Flickies
+		A1 = 0xffffcd7c
+		D2 = 0x03
+		fn04f3b6()
+	}
+}
+
+
+//# address-hook(0x04f3b0) end(0x04f3d2)
+function void fn04f3b0()
+{
+	// Move all objects after the characters
+	A1 = 0xffffb128
+	D2 = 0x59
+	fn04f3b6()
+}
+
+
+//# address-hook(0x04f3b6)
+function void fn04f3b6()
+{
+	while (D2.s16 >= 0)
+	{
+		if (u32[A1] != 0 && (u8[A1 + 0x04] & 0x04))
+		{
+			objA1.position.x.u16 -= D0.u16
+			objA1.position.y.u16 -= D1.u16
+		}
+
+		A1 += 0x4a
+		--D2.s16
+	}
+}
+
+
+
+//# address-hook(0x04f3d4) end(0x04f40a)
+function void UpdateScreenShake()
+{
+	camera.screenshake.prev_offset = camera.screenshake.offset
+	D1 = 0
+	if (u8[0xffffb005] < 0x06 && camera.screenshake.state != 0)
+	{
+		if ((camera.screenshake.state & 0x8000) == 0)
+		{
+			--camera.screenshake.state
+			D1.s16 = s8[0x04f424 + camera.screenshake.state]
+		}
+		else
+		{
+			D0.u16 = level.framecounter & 0x3f
+			D1.u8 = u8[0x04f438 + D0.u16]
+		}
+	}
+	camera.screenshake.offset = D1.s16
+}
+
+
+//# address-hook(0x04f40c) end(0x04f422)
+function void Level.UpdateHyperKnucklesScreenShake()
+{
+	// This is used for the screen shake when Hyper Knuckles glides into a wall fast enough
+	//  -> In S3AIR, it's also used by Super/Hyper Sonic's drop dash (when >= 0x0100)
+	if (camera.hyper_knux_shake == 0)
+		return
+
+#if STANDALONE
+	if (camera.hyper_knux_shake >= 0x0100)
+	{
+		// Check if camera is locked in y-direction (e.g. in MHZ 2 boss fight)
+		if (level.vertical_wrap == move_area.bottom.target)
+		{
+			camera.hyper_knux_shake = 0
+		}
+		else
+		{
+			--camera.hyper_knux_shake
+			camera.foreground.y.u16 += s8[0x04f424 + (camera.hyper_knux_shake & 0xff)] * 2/3
+			if ((camera.hyper_knux_shake & 0xff00) == 0)
+				camera.hyper_knux_shake = 0
+		}
+	}
+	else
+#endif
+	{
+		--camera.hyper_knux_shake
+		camera.foreground.x.u16 += s8[0x04f424 + camera.hyper_knux_shake]
+	}
+}
+
+
+//# address-hook(0x04f8f8) end(0x04f904)
+function void fn04f8f8()
+{
+	zeroMemory(0xfffff7e0, 0x20)
+}
+
+
+
+//# translated(0x085c36) end(0x085c7c)
+function bool InitBoss(u32 returnAddress)
+{
+	return InitBoss(returnAddress, false)
+}
+
+
+function bool InitBoss(u32 returnAddress, bool useScreenExtend)
+{
+	D1.u16 = camera.position.x.u16
+	D0.u16 = camera.position.y.u16
+	u16 minY = u16[(A1+=2)-2]
+	u16 maxY = u16[(A1+=2)-2]
+	u16 minX = u16[(A1+=2)-2]
+	u16 maxX = u16[(A1+=2)-2]
+	if (useScreenExtend)
+		minX -= getScreenExtend() * 2
+
+	if (D0.u16 >= minY && D0.u16 <= maxY && D1.u16 >= minX && D1.u16 <= maxX)
+	{
+		if (D0.u16 > u16[A1])
+			u8[A0 + 0x27] |= 0x80
+		else
+			u8[A0 + 0x27] &= ~0x80
+
+		if (D1.u16 > u16[A1 + 0x04])
+			u8[A0 + 0x27] |= 0x40
+		else
+			u8[A0 + 0x27] &= ~0x40
+
+		// Originally this is "objA0.update_address = u32[A7]"
+		//  -> But this wouldn't work in script, as the system stack is not used the same way
+		//  -> So the value has to be given explicitly
+		objA0.update_address = returnAddress
+		return false
+	}
+	else
+	{
+		CheckForUnloadObject()
+		return true
+	}
+}
+
+
+//# address-hook(0x085d6a) end(0x085d6a)
+function void StartBossFight()
+{
+	level.boss_encounter = 1
+	fn085d70()
+}
+
+
+//# address-hook(0x085d70) end(0x085d78)
+function void fn085d70()
+{
+	playMusic(MUSIC_CTRL_FADEOUT)
+	objA0.countdown_value = 120
+	InitBossArea()
+}
+
+
+//# address-hook(0x085d7e) end(0x085da6)
+function void InitBossArea()
+{
+	screenmover_target.top    = level.vertical_wrap
+	screenmover_target.bottom = move_area.bottom.target
+	screenmover_target.left   = move_area.left
+	screenmover_target.right  = move_area.right
+
+	level.bossarea.top    = u16[A1]
+	level.bossarea.bottom = u16[A1+2]
+	level.bossarea.left   = u16[A1+4]
+	level.bossarea.right  = u16[A1+6]
+	A1 += 8
+}
+
+
+//# address-hook(0x085e3a) end(0x085e50)
+function void TriggerNextZone()
+{
+#if STANDALONE
+	Standalone.onLevelFinished()
+	D0.u16 = Game.onTriggerNextZone(D0.u16)
+
+	// Decide on the next zone's start location -- either the default or an alternative one
+	//  - 0 is the default
+	//  - 1 is Sonic's and Tails' path
+	//  - 2 is Knuckles's path
+	level.start_location = 0
+	if (D0.u16 == 0x0300)
+	{
+		// MGZ -> CNZ
+		level.start_location = (camera.position.y.u16 < 0x0600) ? 2 : 1
+	}
+	else if (D0.u16 == 0x0500)
+	{
+		// CNZ -> ICZ
+		level.start_location = (camera.position.y.u16 > 0x0300) ? 2 : 1
+	}
+
+	if (Game.getSetting(SETTING_MAINTAIN_SHIELDS))
+	{
+		global.shields_backup_1 = u8[0xffffb02b] & 0x71
+	}
+#endif
+
+	// Trigger the fade out and loading of next zone
+	global.zone_act = D0.u16
+	global.zone_act.apparent = D0.u16
+	level.restart = 1
+	checkpoint.number = 0
+	global.stage_type = 0
+
+#if STANDALONE
+	Standalone.onLevelStart()
+#endif
+}
+
+
+
+//# address-hook(0x085e52) end(0x085e5e)
+function void PlaySoundRepeatedly()
+{
+	playSoundRepeatedly(D0.u8)
+}
+
+
+function void playSoundRepeatedly(u8 soundId)
+{
+	if ((global.framecounter & 0x0f) == 0)
+	{
+		playSound(soundId)
+	}
+}

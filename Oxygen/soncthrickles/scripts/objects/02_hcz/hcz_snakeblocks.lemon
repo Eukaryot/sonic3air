@@ -1,0 +1,131 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0256be) end(0x02571e)
+function void fn0256be()
+{
+	objA0.mapping_offset = 0x025688
+	objA0.sprite_attributes = 0x28
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0180
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.animation.sprite = 0x01
+	u16[A0 + 0x30] = objA0.position.x.u16
+	u16[A0 + 0x34] = objA0.position.y.u16
+	objA0.flags2e = objA0.flags2a
+
+	D0 = 0x01
+	D1.u8 = objA0.subtype2c
+	if (D1.s8 < 0)
+		D0.s16 = -D0.s16
+	u8[A0 + 0x40] = D0.u8
+	D1.u8 &= 0x7f
+	objA0.value26 = D1.u8
+	objA0.value42 = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+
+	objA0.update_address = 0x025724
+	fn025724()
+}
+
+
+//# address-hook(0x025724) end(0x02576a)
+function void fn025724()
+{
+	fn025770()
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u16 = (u16[A0 + 0x44] & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= objA0.value42)
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x025770) end(0x025824)
+function void fn025770()
+{
+	D0.u8 = u8[A0 + 0x40]
+	if (D0.s8 < 0)
+	{
+		// TODO: There is certainly a better way to express the carry flag check here
+		bool carryFlagSet = ((u16(objA0.value26) + u16(D0.u8)) & 0x100) != 0
+		objA0.value26 += D0.u8
+		if (!carryFlagSet)
+		{
+			--objA0.flags2e
+			objA0.flags2e &= 0x03
+		}
+	}
+	else
+	{
+		objA0.value26 += D0.u8
+		if (objA0.value26 == 0)
+		{
+			++objA0.flags2e
+			objA0.flags2e &= 0x03
+		}
+	}
+
+	D2.u16 = 0x40
+	D0.u8 = (objA0.value26 < 0x80) ? 0x80 : objA0.value26
+
+	LookupSinCos()
+	D1.s16 >>= 2
+	D3.u8 = objA0.flags2e & 0x03
+	if (D3.u8 == 0)
+	{
+		D1.u16 += u16[A0 + 0x30]
+		objA0.position.x.u16 = D1.u16
+		D2.s16 = -D2.s16
+		D2.u16 += u16[A0 + 0x34]
+		objA0.position.y.u16 = D2.u16
+	}
+	else if (D3.u8 == 1)
+	{
+		D1.u16 += u16[A0 + 0x34]
+		objA0.position.y.u16 = D1.u16
+		D2.u16 += u16[A0 + 0x30]
+		objA0.position.x.u16 = D2.u16
+	}
+	else if (D3.u8 == 2)
+	{
+		D1.s16 = -D1.s16
+		D1.u16 += u16[A0 + 0x30]
+		objA0.position.x.u16 = D1.u16
+		D2.u16 += u16[A0 + 0x34]
+		objA0.position.y.u16 = D2.u16
+	}
+	else
+	{
+		D1.s16 = -D1.s16
+		D1.u16 += u16[A0 + 0x34]
+		objA0.position.y.u16 = D1.u16
+		D2.s16 = -D2.s16
+		D2.u16 += u16[A0 + 0x30]
+		objA0.position.x.u16 = D2.u16
+	}
+}

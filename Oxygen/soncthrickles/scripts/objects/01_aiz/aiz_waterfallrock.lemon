@@ -1,0 +1,113 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// AIZ Waterfall Disappearing Rock                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x02a252) end(0x02a366)
+function void AIZWaterfallRock.Init()
+{
+	D0.u16 = objA0.subtype2c & 0x0f
+	D1.u8 = objA0.subtype2c
+	D2.u16 = D0.u16
+	objA0.value32 = u16[0x02a232 + D0.s16 * 2]
+	D2.u16 -= 3
+	if (D2.s16 < 0)
+		D2 = 0
+
+	D1.u16 = (D1.u16 >> 4) & 0x0f
+	D1.u16 <<= D2
+	u16[A0 + 0x34] = D1.u16
+	objA0.mapping_offset = 0x2294b4
+	objA0.sprite_attributes = 0x4001
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x18
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x280
+
+	D0.u16 = (level.framecounter + u16[A0 + 0x34]) & objA0.value32
+	if (D0.u16 != 0 && D0.u16 < 0xc8)
+	{
+		objA0.animation.timer = 0xc8 - D0.u16
+		objA0.animation.frame = 0
+		objA0.state.both = 0x0202
+		objA0.animation.sprite = 5
+	}
+
+	objA0.update_address = 0x02a2d6
+	AIZWaterfallRock.Update()
+}
+
+
+//# address-hook(0x02a2d6)
+function void AIZWaterfallRock.Update()
+{
+	D0.u16 = (level.framecounter + u16[A0 + 0x34]) & objA0.value32
+	if (D0.u16 == 0)
+	{
+		objA0.state.both = 0x0100
+		u8[A0 + 0x36] = 0
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			playSound(0x4b)
+		}
+	}
+
+	A1 = 0x02a3b0
+	Object.AlternativeAnimationUpdate()
+
+	if (objA0.animation.sprite == 5 && u8[A0 + 0x36] == 0)
+	{
+		u8[A0 + 0x36] = 1
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x02a36c
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			u32[A1 + 0x0c] = 0x2294c0
+			u16[A1 + 0x0a] = 0x62e9
+			u8[A1 + 0x07] = 0x28
+			u8[A1 + 0x06] = 0x20
+			u8[A1 + 0x04] = render_flag.WORLD
+			u16[A1 + 0x08] = 0x200
+			u16[A1 + 0x3c] = A0.u16
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x02a36c) end(0x02a3aa)
+function void AIZWaterfallRock.SplashEffect.Update()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	if (u8[A1 + 0x22] == 0x03)
+	{
+		objA0.position.x.u16 = 0x7ff0
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 3
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 3
+	}
+
+	D1.u16 = 0x2b
+	D2.u16 = 0x18
+	D3.u16 = 0x19
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}

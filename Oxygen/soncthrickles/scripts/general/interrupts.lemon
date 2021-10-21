@@ -1,0 +1,834 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Interrupts                                            //
+//-------------------------------------------------------//
+
+// Interrupt scripts generally don't use an address hook, as this would lead to stack manipulation error
+// (Because of the implicit return executed on hooks, which is not the right thing here)
+
+//# translated(0x000584) end(0x00076a)
+function void VInt()
+{
+	pushAll()
+
+	if (global.frame_state != 0)
+	{
+		// Some kind of sync?
+		while ((u16[0xc00004] & 0x08) == 0)
+		{
+		}
+
+		// Waste some time in PAL version
+		if (global.region_code & 0x40)
+		{
+			D0.u16 = 0x700
+			while (D0.s16 >= 0)
+				--D0.s16
+		}
+
+		VInt.InnerUpdate()
+	}
+	else
+	{
+	// 0x000608:
+		++global.lag_frames
+		if (global.game_mode == 0x08 || global.game_mode == 0x0c || global.game_mode == 0x88 || global.game_mode == 0x8c)
+		{
+			D0.u16 = u16[0xc00004]
+
+			// Waste some time in PAL version
+			if (global.region_code & 0x40)
+			{
+				D0.u16 = 0x700
+				while (D0.s16 >= 0)
+					--D0.s16
+			}
+
+			u16[0xfffff644] = 1
+
+			if (level.water_present)
+			{
+				syncZ80_variantA()
+
+				if (water.fullscreen == 0)
+				{
+					// This is something like:
+					//  VDP.copyToCRAMbyDMA(0xfffff080, ..., 0x80)
+					u32[0xc00004] = 0x94009340
+					u32[0xc00004] = 0x96fe9500
+					u16[0xc00004] = 0x977f
+					u16[0xc00004] = 0xc000
+					u16[0xc00004] = 0x80
+					u16[0xfffff640] = 0x80
+				}
+				else
+				{
+					u32[0xc00004] = 0x94009340
+					u32[0xc00004] = 0x96f89540
+					u16[0xc00004] = 0x977f
+					u16[0xc00004] = 0xc000
+					u16[0xc00004] = 0x80
+					u16[0xfffff640] = 0x80
+				}
+
+				Renderer.configureHInt()
+			}
+			else
+			{
+				Renderer.configureHInt()
+
+				syncZ80_variantA()
+
+				if (competition_mode.active)
+				{
+					VDP.setupVSRAMWrite(0)
+					VDP.writeData32(scrolloffset.y.both)
+
+					if (u16[0xffffef3c] != 0)
+					{
+						u32[0xc00004] = 0x94019340
+						u32[0xc00004] = 0x96fc9500
+						u16[0xc00004] = 0x977f
+						u16[0xc00004] = 0x7800
+						u16[0xc00004] = 0x83
+						u16[0xfffff640] = 0x83
+					}
+					else
+					{
+						u32[0xc00004] = 0x94019340
+						u32[0xc00004] = 0x96bc9540
+						u16[0xc00004] = 0x977f
+						u16[0xc00004] = 0x7800
+						u16[0xc00004] = 0x83
+						u16[0xfffff640] = 0x83
+					}
+				}
+			}
+
+			u16[0xa11100] = 0
+		}
+
+		++global.framecounter
+	}
+
+	popAll()
+
+	jump 0x0005e4	// rte
+}
+
+
+function void VInt.InnerUpdate()
+{
+	// Write scroll offsets to VSRAM
+	VDP.setupVSRAMWrite(0)
+	VDP.writeData32(scrolloffset.y.both)
+
+	u8 oldFrameState = global.frame_state
+	global.frame_state = 0
+	u16[0xfffff644] = 1
+
+	// Targets:
+	//  - 0x000606	-> global.frame_state = 0x00	-> Startup
+	//  - 0x00076e	-> global.frame_state = 0x02	-> Used in SEGA logo
+	//  - 0x0007ba	-> global.frame_state = 0x04	-> Used in title screen
+	//  - 0x0007ea	-> global.frame_state = 0x08	-> Used in main game
+	//  - 0x000978	-> global.frame_state = 0x0c	-> Used during level loading
+	//  - 0x0007e0	-> global.frame_state = 0x10	-> Used during game pause
+	//  - 0x000a94	-> global.frame_state = 0x12	-> Used during screen fades
+	//  - 0x000780	-> global.frame_state = 0x14	-> Used in SEGA logo
+	//  - 0x000b5c	-> global.frame_state = 0x16	-> Used in Level Select
+	//  - 0x000c00	-> global.frame_state = 0x1a	-> Used in S&K title screen, Blue Spheres mode results screen
+	//  - 0x000c20	-> global.frame_state = 0x1c	-> Used in Blue Spheres special stage
+	//  - 0x000c3e	-> global.frame_state = 0x1e	-> Used in Data Select
+	call tableLookupAddress(0x0005e6, oldFrameState & 0x3e)
+
+	++global.framecounter
+}
+
+
+//# address-hook(0x000606)
+function void fn000606()
+{
+}
+
+
+//# address-hook(0x0007e0) end(0x0007e6)
+function void fn0007e0()
+{
+	if (global.game_mode == 0x34)	// Blue Spheres
+	{
+		VInt.Update.BlueSpheres()
+	}
+	else
+	{
+		VInt.Update.MainGame()
+	}
+}
+
+
+#if STANDALONE
+function u16 VInt.getBlendFactorForScreenFlash()
+{
+	return min(u16(global.whiteflash_timeout + 1) * 0x60, 0xa0)
+}
+#endif
+
+
+//# address-hook(0x0007ea) end(0x000954)
+function void VInt.Update.MainGame()
+{
+	syncZ80_variantA()
+
+	UpdateControllers()
+
+	if (global.whiteflash_timeout > 0)
+	{
+		// Used for short fullscreen flashes (e.g. Sonic's hyper dash)
+		--global.whiteflash_timeout
+
+		VDP.setupCRAMWrite(0)
+		#if STANDALONE
+		{
+			// Use blending instead of showing the full white flash
+			u16 blendFactor = VInt.getBlendFactorForScreenFlash()
+			u32 paletteAddress = (water.fullscreen) ? 0xfffff080 : 0xfffffc00
+			for (u8 i = 0; i < 0x20; ++i)
+			{
+				VDP.writeData16(blendColorsPacked(u16[paletteAddress + i * 2], 0x0eee, blendFactor))
+			}
+			VDP.writeData16(blendColorsPacked(u16[paletteAddress + 0x40], 0, blendFactor))
+			for (u8 i = 0x21; i < 0x40; ++i)
+			{
+				VDP.writeData16(blendColorsPacked(u16[paletteAddress + i * 2], 0x0eee, blendFactor))
+			}
+		}
+		#else
+		{
+			for (u8 i = 0; i < 0x20; ++i)
+			{
+				VDP.writeData16(0x0eee)
+			}
+			VDP.writeData16(0)
+			for (u8 i = 0x21; i < 0x40; ++i)
+			{
+				VDP.writeData16(0x0eee)
+			}
+		}
+		#endif
+	}
+	else
+	{
+		// Update palette
+		u32 paletteAddress = (water.fullscreen) ? 0xfffff080 : 0xfffffc00
+		VDP.copyToCRAMbyDMA(paletteAddress, 0x0000, 0x80)
+		u16[0xfffff640] = 0x80
+
+	#if STANDALONE
+		if (EXTENDED_CHARACTER_PALETTES)
+		{
+			// Also update additional palettes
+			paletteAddress = (water.fullscreen) ? 0x802300 : 0x802000
+			for (u16 i = 0; i < 0xc0; ++i)
+			{
+				Renderer.setPaletteEntryPacked(i + 0x40, u16[paletteAddress + i * 2])
+			}
+		}
+	#endif
+
+		Renderer.configureHInt()
+	}
+
+	// Update scroll offsets in VRAM
+	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
+	u16[0xfffff640] = 0x83
+
+	// Update sprite attrribute data in VRAM
+	u32 spriteDataSourceAddress = 0xfffff800
+	if (competition_mode.active)
+	{
+		if (u16[0xffffef3e] != 0)
+		{
+			u16[0xffffef3e] = 0
+			u16[0xffffef3c] ^= 0xffff
+		}
+		if (u16[0xffffef3c] == 0)
+		{
+			spriteDataSourceAddress = 0xffff7880
+		}
+	}
+	VDP.copyToVRAMbyDMA(spriteDataSourceAddress, 0xf800, 0x0280)
+	u16[0xfffff640] = 0x83
+
+	ProcessDMAQueue()
+	u32[0xffffee3a] = u32[0xfffff61e]
+	CallPlaneUpdateRoutine()
+	UpdatePlanePatterns()
+
+#if !STANDALONE
+	u16[0xa11100] = 0
+	set_status_register(0x2300)
+
+	if (level.water_present && h_int.line < 92)
+	{
+		// This way "fn00095a()" gets called in H-Int
+		u8[0xfffff64f] = 1
+	}
+	else
+#endif
+	{
+		fn00095a()
+	}
+
+	VInt.CheckIfInterruptedKosinski()
+}
+
+
+//# address-hook(0x00095a) end(0x000976)
+function void fn00095a()
+{
+	UpdateTimeAndHud()
+
+	global.lag_frames = 0
+
+#if STANDALONE
+	// In standalone, always take care of pattern loading immediately
+	//  -> This solves broken Egg Robo head in Knuckles' MHZ 2 boss fight
+	while (u16[0xfffff6f8] > 0)
+#endif
+	{
+		fn0017f4()
+	}
+
+	if (global.demo_countdown != 0)
+		--global.demo_countdown
+}
+
+
+//# address-hook(0x000978) end(0x000a82)
+function void VInt.Update.LevelLoading()
+{
+	syncZ80_variantA()
+
+	UpdateControllers()
+
+	// Update palette
+	u32 paletteAddress = (water.fullscreen) ? 0xfffff080 : 0xfffffc00
+	VDP.copyToCRAMbyDMA(paletteAddress, 0x0000, 0x80)
+	u16[0xfffff640] = 0x80
+
+	Renderer.configureHInt()
+
+	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
+
+	if (competition_mode.active)
+	{
+		if (u16[0xffffef3e] != 0)
+		{
+			u16[0xffffef3e] = 0
+			u16[0xffffef3c] ^= 0xffff
+		}
+	}
+
+	if (competition_mode.active && u16[0xffffef3c] == 0)
+	{
+		VDP.copyToVRAMbyDMA(0xffff7880, 0xf800, 0x280)
+	}
+	else
+	{
+		VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)
+	}
+	u16[0xfffff640] = 0x83
+
+	ProcessDMAQueue()
+	u32[0xffffee3a] = u32[0xfffff61e]
+
+	u16[0xa11100] = 0
+
+#if STANDALONE
+	// Speed up level loading by doing this part 2 times each frame
+	//  -> More is possible, even doing all at once
+	//  -> But a too short title card feels weird
+	//  -> For Time Attack, we want it to as short as possible
+	u16 speed = Game.isTimeAttack() ? 0x1000 : (global.framecounter % 3) ? 1 : 2
+	for (u16 i = 0; i < speed; ++i)
+	{
+		if (u16[0xfffff6f8] == 0)
+			break
+		fn0017d8()
+	}
+#else
+	fn0017d8()
+#endif
+
+	VInt.CheckIfInterruptedKosinski()
+}
+
+
+//# address-hook(0x000b5c) end(0x000bfa)
+function void VInt.Update.LevelSelect()
+{
+#if !STANDALONE
+	syncZ80_variantA()
+#endif
+
+	UpdateControllers()
+
+	// Update palette
+	VDP.copyToCRAMbyDMA(0xfffffc00, 0, 0x80)
+	u16[0xfffff640] = 0x80
+
+	VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)
+	u16[0xfffff640] = 0x83
+
+	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
+	u16[0xfffff640] = 0x83
+
+	ProcessDMAQueue()
+
+#if !STANDALONE
+	u16[0xa11100] = 0
+#endif
+
+	fn0017d8()
+
+	if (global.demo_countdown != 0)
+		--global.demo_countdown
+
+	VInt.CheckIfInterruptedKosinski()
+}
+
+
+//# address-hook(0x0010de) end(0x001118)
+function void UpdateControllers()
+{
+	#if STANDALONE
+	{
+		// The following would be the correct implementation for Oxygen,
+		// but we don't do that here and rather in "waitForNextFrame" to ensure that controllers get updated each frame
+	/*
+		control.pad1.state = Input.getController(0)
+		control.pad1.pressed = control.pad1.state & ~Input.getControllerPrevious(0)
+		control.pad2.state = Input.getController(1)
+		control.pad2.pressed = control.pad2.state & ~Input.getControllerPrevious(1)
+	*/
+	}
+	#else
+	{
+		A0 = 0xfffff604
+		A1 = 0xa10003
+
+		for (u8 i = 0; i < 2; ++i)
+		{
+			u8[A1] = 0
+			D0.u8 = (u8[A1] << 2) & 0xc0
+			u8[A1] = 0x40
+			D1.u8 = u8[A1] & 0x3f
+			D0.u8 = (D0.u8 | D1.u8) ^ 0xff
+
+			D1.u8 = u8[A0] ^ D0.u8
+			u8[A0] = D0.u8
+			u8[A0+1] = D1.u8 & D0.u8
+
+			A0 += 2
+			A1 += 2
+		}
+	}
+	#endif
+}
+
+
+//# address-hook(0x001bf0) end(0x001c18)
+function void VInt.CheckIfInterruptedKosinski()
+{
+	#if !STANDALONE
+	{
+		if (kosinski.queue_size & 0x8000)
+		{
+			// This checks if the current interrupt happened right
+			//  inside the critical region inside "Kosinski.ProcessDecompressionQueue()"
+			D0 = u32[A7 + 0x42]
+			if (D0 >= 0x001c26 && D0 < 0x001cfa)
+			{
+				u32[0xffffff3a] = u32[A7 + 0x42]
+				u32[A7 + 0x42] = 0x001d0c
+			}
+		}
+	}
+	#endif
+}
+
+
+//# address-hook(0x000a94) end(0x000a9c)
+function void fn000a94()
+{
+	fn000c50()
+	Renderer.configureHInt()
+	fn0017d8()
+}
+
+
+//# address-hook(0x000c20) end(0x000c38)
+function void VInt.Update.BlueSpheres()
+{
+	fn0087da()
+	fn000c50()
+	fn00881a()
+	if (global.demo_countdown != 0)
+	{
+		--global.demo_countdown
+	}
+	VInt.CheckIfInterruptedKosinski()
+}
+
+
+//# address-hook(0x000c50) end(0x000d0a)
+function void fn000c50()
+{
+	syncZ80_variantA()
+
+	UpdateControllers()
+
+	u32 paletteAddress = (water.fullscreen) ? 0xfffff080 : 0xfffffc00
+	VDP.copyToCRAMbyDMA(paletteAddress, 0x0000, 0x80)
+	u16[0xfffff640] = 0x80
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		// Also update additional palettes
+		paletteAddress = (water.fullscreen) ? 0x802300 : 0x802000
+		for (u16 i = 0; i < 0xc0; ++i)
+		{
+			Renderer.setPaletteEntryPacked(i + 0x40, u16[paletteAddress + i * 2])
+		}
+	}
+#endif
+
+	VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)
+	u16[0xfffff640] = 0x83
+
+	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, 0x380)
+	u16[0xfffff640] = 0x83
+
+	ProcessDMAQueue()
+	u16[0xa11100] = 0
+}
+
+
+//# translated(0x000d10) end(0x000dd6)
+function void HInt_000d10()
+{
+	if (u16[0xfffff644] != 0)
+	{
+		u16[0xfffff644] = 0
+
+		push(A5)
+		push(D0)
+
+	#if STANDALONE
+
+		if (h_int.line < 0xdf)
+		{
+			// Replace both layers of plane A & B with two rects each
+			Renderer.enforceClearScreen(true)
+			Renderer.enableDefaultPlane(0, false)
+			Renderer.enableDefaultPlane(1, false)
+			Renderer.enableDefaultPlane(2, false)
+			Renderer.enableDefaultPlane(3, false)
+			u8 splitScreenHeight = 0x6b
+			u8 splitScreen2Start = getScreenHeight() - splitScreenHeight
+
+			// Upper screen
+			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x00, 0, 0x1000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x01, 1, 0x2000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x10, 0, 0x3000)
+			Renderer.setupPlane(0, 0, getScreenWidth(), splitScreenHeight, 0x11, 1, 0x4000)
+			Renderer.setScrollOffsetV(1, 0, camera.foreground.y.u16)
+
+			// Lower screen
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x00, 2, 0x1000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x01, 3, 0x2000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x10, 2, 0x3000)
+			Renderer.setupPlane(0, splitScreen2Start, getScreenWidth(), splitScreenHeight, 0x11, 3, 0x4000)
+			Renderer.setScrollOffsetV(2, 0, u16[0xffffee3c])
+			Renderer.setScrollOffsetV(3, 0, u16[0xffffee3a])
+
+			// TODO: Rewrite this
+			VDP.copyToVRAMbyDMA((u16[0xffffef3c] != 0) ? 0xffff7b00 : 0xffff7d80, 0xf800, 0x0280)
+			u16[0xfffff640] = 0x83
+		}
+
+	#else
+
+		while ((u16[0xc00004] & 0x04) == 0)
+		{
+			burnCycles(0x140)	// Just to keep things going for the emulator
+		}
+
+		VDP.Config.setActiveDisplay(false)
+		VDP.setupVSRAMWrite(0)
+		VDP.writeData32(u32[0xffffee3a])
+
+		syncZ80_variantA()
+
+		VDP.copyToVRAMbyDMA((u16[0xffffef3c] != 0) ? 0xffff7b00 : 0xffff7d80, 0xf800, 0x0280)
+		u16[0xfffff640] = 0x83
+
+		u16[0xa11100] = 0
+		while ((u16[0xc00004] & 0x04) == 0)
+		{
+			burnCycles(0x140)	// Just to keep things going for the emulator
+		}
+
+		VDP.Config.setActiveDisplay(true)
+
+	#endif
+
+		D0 = pop()
+		A5 = pop()
+	}
+}
+
+
+
+// Horizontal Interrupts
+
+//# translated(0x000dd8) end(0x000e56)
+function void HInt_000dd8()
+{
+	if (u16[0xfffff644] != 0)
+	{
+		u16[0xfffff644] = 0
+
+		push(A2)
+		push(A1)
+		push(A0)
+		push(D1)
+		push(D0)
+
+		#if STANDALONE
+		{
+			Renderer.enableSecondaryPalette(h_int.line + 2)
+
+			A2 = water.palette.source
+			D1.u16 = u16[A2]
+			A2 += 2
+
+			while (D1.s16 >= 0)
+			{
+				D0.u16 = u16[A2]
+				A2 += 2
+
+				// Our source is the secondary palette in RAM
+				A0 = 0xfffff080 + D0.u16
+				u16 color0 = u16[A0]
+				u16 color1 = u16[A0 + 2]
+				u16 color2 = u16[A0 + 4]
+
+				// Consider Hyper Dash screen flash
+				//  -> Note that this will not work in the flash's last frame
+				if (global.whiteflash_timeout > 0)
+				{
+					// Use blending instead of showing the full white flash
+					u16 blendFactor = VInt.getBlendFactorForScreenFlash()
+					color0 = blendColorsPacked(color0, 0x0eee, blendFactor)
+					color1 = blendColorsPacked(color1, 0x0eee, blendFactor)
+					color2 = blendColorsPacked(color2, 0x0eee, blendFactor)
+				}
+
+				// Each loop cycle will write 3 palette entries from offset D0.u16 on
+				u8 index = D0.u16 / 2
+				Renderer.setSecondaryPaletteEntryPacked(index,     color0)
+				Renderer.setSecondaryPaletteEntryPacked(index + 1, color1)
+				Renderer.setSecondaryPaletteEntryPacked(index + 2, color2)
+
+				--D1.s16
+			}
+
+			if (EXTENDED_CHARACTER_PALETTES)
+			{
+				// Also update additional palettes
+				for (u16 i = 0; i < 0xc0; ++i)
+				{
+					Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
+				}
+			}
+		}
+		#else
+		{
+			// Clear H-Int configuration for now
+			A1 = 0xc00000
+			u16[0xc00004] = 0x8aff
+
+			syncZ80_variantA()
+
+			// Waste some time
+			D0 = 0x0c
+			while (D0.s16 >= 0)
+				--D0.s16
+
+			A2 = water.palette.source
+			D1.u16 = u16[A2]
+			A2 += 2
+
+			// Limit palette data transfer to VDP towards end of frame
+			if (h_int.line >= 200)
+			{
+				D1.u16 -= (h_int.line - 200)
+			}
+
+			while (D1.s16 >= 0)
+			{
+				D0.u16 = u16[A2]
+				A2 += 2
+
+				// Our source is the secondary palette in RAM
+				A0 = 0xfffff080 + D0.u16
+
+				// Each loop cycle will write 3 palette entries from offset D0.u16 on
+				u32[0xc00004] = 0xc0000000 + (D0 << 16)
+				u32[0xc00000] = u32[A0]
+				u16[0xc00000] = u16[A0+4]
+
+				// Waste some time
+				D0 = 0x24
+				while (D0.s16 >= 0)
+					--D0.s16
+
+				--D1.s16
+			}
+
+			u16[0xa11100] = 0
+		}
+		#endif
+
+		D0 = pop()
+		D1 = pop()
+		A0 = pop()
+		A1 = pop()
+		A2 = pop()
+
+		#if !STANDALONE
+		{
+			if (u8[0xfffff64f] != 0)
+			{
+				u8[0xfffff64f] = 0
+				pushAll()
+				fn00095a()
+				popAll()
+			}
+		}
+		#endif
+	}
+}
+
+
+//# translated(0x001024) end(0x0010ac)
+function void HInt_001024()
+{
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+	if (u16[0xfffff644] == 0)
+		return
+
+	u16[0xfffff644] = 0
+
+	#if STANDALONE
+	{
+		Renderer.enableSecondaryPalette(h_int.line + 2)
+
+		// Consider Hyper Dash screen flash
+		//  -> Note that this will not work in the flash's last frame
+		u16 blendFactor = 0
+		if (global.whiteflash_timeout > 0)
+		{
+			// Use blending instead of showing the full white flash
+			blendFactor = VInt.getBlendFactorForScreenFlash()
+		}
+
+		for (u8 index = 0; index < 0x40; ++index)
+		{
+			u16 color = u16[0xfffff080 + index * 2]
+			if (blendFactor > 0)
+			{
+				color = blendColorsPacked(color, 0x0eee, blendFactor)
+			}
+			Renderer.setSecondaryPaletteEntryPacked(index, color)
+		}
+
+		if (EXTENDED_CHARACTER_PALETTES)
+		{
+			// Also update additional palettes
+			for (u16 i = 0; i < 0xc0; ++i)
+			{
+				Renderer.setSecondaryPaletteEntryPacked(i + 0x40, u16[0x802300 + i * 2])
+			}
+		}
+	}
+	#else
+	{
+		// Set H-Int configuration to last line (0xdf = 223)
+		u16[0xc00004] = 0x8adf
+
+		// Set complete water palette at once
+		//  -> For Hydrocity, this is okay as artefacts are hidden by the water surface effect
+		u32[0xc00004] = 0xc0000000
+		for (u8 i = 0; i < 0x20; ++i)
+		{
+			u32[0xc00000] = u32[0xfffff080 + i * 4]
+		}
+
+		if (u8[0xfffff64f] != 0)
+		{
+			u8[0xfffff64f] = 0
+
+			pushAll()
+			fn00095a()
+			popAll()
+		}
+	}
+	#endif
+}
+
+
+//# translated(0x050056) end(0x050070)
+function void HInt_050056()
+{
+	// H-Int used in AIZ 2 blimp sequence + MHZ 2 zone transition to change scroll offset
+
+	#if STANDALONE
+	{
+		// Replace both layers of plane A with two rects each
+		Renderer.enableDefaultPlane(1, false)
+		Renderer.enableDefaultPlane(3, false)
+		Renderer.setupPlane(0, 0, getScreenWidth(), h_int.line, 0x01, 1, 0x2000)
+		Renderer.setupPlane(0, 0, getScreenWidth(), h_int.line, 0x11, 1, 0x4000)
+		Renderer.setupPlane(0, h_int.line, getScreenWidth(), getScreenHeight() - h_int.line, 0x01, 3, 0x2000)
+		Renderer.setupPlane(0, h_int.line, getScreenWidth(), getScreenHeight() - h_int.line, 0x11, 3, 0x4000)
+		Renderer.setScrollOffsetV(3, 0, camera.foreground.y.u16)
+
+		// To fix an issue in MHZ 2 zone transition with Knuckles
+		//  -> The screen moves up there...
+		A0 = 0xffffb000
+		char.look_up_down_timer = 0
+	}
+	#else
+	{
+		// Clear H-Int configuration for now
+		u16[0xc00004] = 0x8aff
+
+		VDP.setupVSRAMWrite(0)
+		VDP.writeData32(camera.foreground.y.u16)
+	}
+	#endif
+}

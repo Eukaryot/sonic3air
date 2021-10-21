@@ -1,0 +1,432 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0630e0) end(0x063124)
+function void fn0630e0()
+{
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		if (checkpoint.number >= 7)
+		{
+			UnloadObject()
+			return
+		}
+
+		A1 = 0x0630d0
+		if (InitBoss(0x0630fc))
+			return
+
+		fn0630fc()
+	}
+	else
+	{
+		spawnChildObjects(0x0665bc)
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x0630fc)
+function void fn0630fc()
+{
+	// Targets:
+	//  - 0x063134	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x063170	-> objA0.base_state = 0x02  -> Waiting for Sonic/Tails to come closer
+	//  - 0x0631a4	-> objA0.base_state = 0x04  -> Starting (one frame)
+	//  - 0x063220	-> objA0.base_state = 0x06  -> Animation (using the lever etc.) and wind blowing
+	//  - 0x0632ae	-> objA0.base_state = 0x08  -> Blowing Sonic/Tails up; you know, not blowing them up, but blowing them up
+	call tableLookupAddress(0x06312a, objA0.base_state)
+
+	Object.loadSpritePatterns(0x066672)
+	fn085208()
+}
+
+
+//# address-hook(0x063134) end(0x06316a)
+function void fn063134()
+{
+	A1 = 0x0663cc
+	if (fn084fa4())
+		return
+
+	objA0.countdown_callback = 0x063182
+	screenmover_target.left = move_area.left
+	level.bossarea.left = u16[0x0630dc]
+	fn065dd6()
+
+	u8[0xffffeee8] = 0xff
+	CutsceneKnuckles.loadPalette()
+
+	spawnChildObjects(0x0665bc)
+}
+
+
+//# address-hook(0x063170) end(0x0631a2)
+function void fn063170()
+{
+	// More correct would be "getScreenExtend() * 2"
+	//  -> But then the invincibility monitor to the left is visible after the cutscene in 400 pixel mode
+	//  -> So as a compromise, we allow for getting closer to Knuckles in widescreen
+	//  -> This still works in 480 pixel mode, but then things get a bit ugly
+	D1.u16 = level.bossarea.left - getScreenExtend()
+	D0.u16 = camera.position.x.u16
+	if (D0.u16 < D1.u16)
+	{
+		move_area.left = D0.u16
+		return
+	}
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
+
+	move_area.left = D1.u16
+	objA0.base_state = 0x04
+	objA0.countdown_value = 59
+	player1.control_override = 0xff
+	player2.control_override = 0xff
+	control.player1 = 0
+	control.tails = 0
+}
+
+
+//# address-hook(0x0631a4) end(0x06321a)
+function void fn0631a4()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		D0 = 0
+		A1 = 0xffffb000
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0 |= 0x01
+		}
+
+		A2 = 0xffffb04a
+		if (u32[A2] == 0 || (u8[A2 + 0x04] & 0x80) == 0 || (u8[A2 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0 |= 0x02
+		}
+
+		if (D0.u8 != 0x03)
+			return
+	}
+
+	objA0.base_state = 0x06
+	objA0.countdown_callback = 0x063280
+	objA0.value3e = 0x10
+	objA0.countdown_value = 0
+	objA0.value39 = 0x01
+
+	for (u8 player = 0; player < 2; ++player)
+	{
+		A1 = 0xffffb000 + player * 0x4a
+		if (player != 0 && u32[A1] != 0)
+		{
+			u8[A1 + 0x2e] = 0x81
+			u8[A1 + 0x20] = 0x05
+			StopObjectA1()
+
+		#if STANDALONE
+			if (u8[A1 + 0x2a] & char.flag.ROLLING)
+			{
+				// Correct position, so character is not partially in the ground
+				u32 backupA0 = A0
+				A0 = A1
+				Character.LandingOnGroundStandUp()
+				A0 = backupA0
+			}
+		#endif
+		}
+	}
+}
+
+
+//# address-hook(0x063220) end(0x06327e)
+function void fn063220()
+{
+	fn065e62()
+	if (objA0.animation.frame >= 8)
+	{
+		playSoundRepeatedly(0xda)
+		fn065eb4()
+	}
+
+	A1 = 0x0666f6
+	fn0845a0()
+	if (!_equal())
+	{
+		if (objA0.animation.frame == 0x0c)
+		{
+			A1 = 0xffffb000
+			objA1.state = char.state.HANGING
+
+			A1 = 0xffffb04a
+			if (objA1.render_flags & render_flag.VISIBLE)
+			{
+				objA1.state = char.state.HANGING
+			}
+		}
+
+		if (objA0.animation.sprite == 0x02)
+		{
+			++objA0.value39
+			objA0.value3e -= 4
+			playSound(0x5b)
+		}
+	}
+}
+
+
+//# address-hook(0x063280) end(0x0632a8)
+function void fn063280()
+{
+	objA0.base_state = 0x08
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x06338e
+	}
+
+	if (u8[0xffffb04e] & 0x80)
+	{
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x06338e
+			u8[A1 + 0x2c] = 0x02
+		}
+	}
+
+	fn0632ae()
+}
+
+
+//# address-hook(0x0632ae) end(0x0632b6)
+function void fn0632ae()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		fn065eb4()
+	}
+	else
+	{
+		fn062422()
+	}
+}
+
+
+//# address-hook(0x0632ca) end(0x063302)
+function void fn0632ca()
+{
+	setupObjectAttributesFull(0x066456)
+
+	objA0.update_address = 0x063308
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+		objA0.sprite_attributes = 0x8528
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		objA0.respawn_entry = u16[A1 + 0x48]
+	}
+
+	Kosinski.addToDMAQueue(0x16a072, 0xa500)
+}
+
+
+//# address-hook(0x063308) end(0x06331e)
+function void fn063308()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.animation.sprite = 0
+	if (u8[A1 + 0x22] == 2)
+	{
+		objA0.animation.sprite = 1
+	}
+	fn084920()
+}
+
+
+//# address-hook(0x063324) end(0x06336e)
+function void fn063324()
+{
+	setupObjectAttributesFull(0x06646e)
+	objA0.update_address = 0x063372
+
+	GetRandomNumber()
+#if STANDALONE
+	D0.u16 %= getScreenWidth()
+#else
+	D0.u16 &= 0x01ff
+	if (D0.u16 >= getScreenWidth())
+	{
+		D0.u16 = (D0.u16 & 0x3f) * 4
+	}
+#endif
+
+	objA0.position.x.u16 = camera.foreground.x.u16 + D0.u16
+	objA0.position.y.u16 = camera.foreground.y.u16 + 0xe8
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D1 = u8[A1 + 0x39]
+	D1.s16 = -D1.s16 * 2
+	objA0.velocity.y = D1.u16
+
+	fn063372()
+}
+
+
+//# address-hook(0x063372) end(0x063388)
+function void fn063372()
+{
+	objA0.position.y.u16 += objA0.velocity.y
+
+	D0.u16 = camera.position.y.u16 - 0x08
+	if (D0.u16 >= objA0.position.y.u16)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x06338e) end(0x0633d4)
+function void fn06338e()
+{
+	A1 = (objA0.subtype2c == 0) ? 0xffffb000 : 0xffffb04a
+	objA0.update_address = 0x0633d6
+	u16[A0 + 0x44] = A1.u16
+	objA0.velocity.y = -0x1000
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	u8[A1 + 0x2e] = 0x81
+	objA1.state = char.state.LIFTED
+	u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+	u8[A1 + 0x0a] |= 0x80
+	u8[0xffffee39] = 0xff
+}
+
+
+//# address-hook(0x0633d6) end(0x063440)
+function void fn0633d6()
+{
+	playSoundRepeatedly(0xda)
+	MoveWithGravity20()
+
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16
+	if (objA0.velocity.y < 0)
+		return
+
+#if STANDALONE
+	Game.endSkippableCutscene()
+#endif
+
+	player1.control_override = 0
+	player2.control_override = 0
+	control.player1 = 0
+	control.tails = 0
+	u8[A1 + 0x2e] = 0
+	u8[A1 + 0x0a] &= ~0x80
+#if STANDALONE
+	// Different animation
+	objA1.state = char.state.FALLING_PANIC
+	objA1.flags2a |= char.flag.IN_AIR
+#else
+	objA1.state = char.state.RUNNING
+#endif
+	u16[A1 + 0x1c] = 0x10
+	u8[0xffffee39] = 0
+	u8[0xffffeee8] = 0
+	checkpoint.number = 7
+	checkpoint.x = 0x052a
+	checkpoint.y = 0x05ac
+
+	Checkpoint.SaveCurrentState()
+	UnloadObject()
+}
+
+
+
+//# address-hook(0x065e62) end(0x065eae)
+function void fn065e62()
+{
+	A1 = 0xffffb000
+	fn065e72()
+
+	A1 = 0xffffb04a
+	if (u32[A1] != 0)
+	{
+		fn065e72()
+	}
+}
+
+
+//# address-hook(0x065e72)
+function void fn065e72()
+{
+	u8[A1 + 0x20] = 0x05
+	if (objA0.animation.frame >= 0x0c)
+	{
+		u8[A1 + 0x04] |= render_flag.FLIP_Y
+		u8[A1 + 0x20] = 0
+		u8[A1 + 0x2e] = 0x83
+
+		D0 = (global.framecounter & 0x02) ? 2 : 0
+		D0.u8 += u8[A1 + 0x38]
+		u8[A1 + 0x22] = u8[0x065eb0 + D0.s16]
+
+		fn085fc4()
+	}
+}
+
+
+//# address-hook(0x065eb4) end(0x065ed2)
+function void fn065eb4()
+{
+	// Update particle spawning
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_value = objA0.value3e
+	#if STANDALONE
+		// Spawn more particles on the wider screen
+		objA0.countdown_value = objA0.countdown_value * 320 / getScreenWidth()
+	#endif
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x063324
+			u16[A1 + 0x46] = A0.u16
+		}
+	}
+}
+
+
+
+//# address-hook(0x062422) end(0x062452)
+function void fn062422()
+{
+	// Copies palette colors 0x10 .. 0x1f from secondary (underwater) to primary palette
+	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
+
+	addPatternLoadingCue(0x083d48)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b0a
+	}
+
+	fn0851e4()
+	Object.TriggerUnloading()
+}

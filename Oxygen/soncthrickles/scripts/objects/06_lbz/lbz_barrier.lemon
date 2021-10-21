@@ -1,0 +1,215 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Barrier in LBZ to be opened/closed by wall trigger    //
+//-------------------------------------------------------//
+
+//# address-hook(0x025f6a) end(0x025ff8)
+function void fn025f6a()
+{
+	D0.u8 = objA0.subtype2c
+	D1.u8 = D0.u8 & 0x0f
+	if (u8[A0 + 0x34] == 0)
+	{
+		A3 = 0xfffff7e0
+		if (u8[A3 + D0.s16] != 0)
+		{
+			D0.u16 += 4
+		}
+	}
+
+	D0.u8 >>= 1
+	D0.u16 &= 0x38
+	A1 = 0x025f2a + D0.s16
+	objA0.mapping_offset = 0x224de6
+	objA0.sprite_attributes = 0x43c3
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.y.u16
+	objA0.position.x.u16 = u16[A0 + 0x30] + s8[(A1+=1)-1]
+	objA0.position.y.u16 = objA0.value32 + s8[(A1+=1)-1]
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+
+	D0 = u8[(A1+=1)-1]
+	u16[A0 + 0x36] = D0.u16
+	objA0.animation.sprite = u8[(A1+=1)-1]
+	if (u8[A0 + 0x34] != 0)
+	{
+		D0.u8 = u8[(A1+=1)-1]
+		u16[A0 + 0x36] = D0.u16
+		objA0.animation.sprite = u8[(A1+=1)-1]
+		u8[A0 + 0x34] = 0
+	}
+
+	objA0.update_address = 0x025ffe
+	fn025ffe()
+}
+
+
+//# address-hook(0x025ffe) end(0x026032)
+function void fn025ffe()
+{
+	// Targets:
+	//  - 0x026044	-> u16[A0 + 0x36] = 0x00
+	//  - 0x02609e	-> u16[A0 + 0x36] = 0x02
+	//  - 0x0260b0	-> u16[A0 + 0x36] = 0x04
+	//  - 0x0260d2	-> u16[A0 + 0x36] = 0x06
+	//  - 0x02609e	-> u16[A0 + 0x36] = 0x08
+	//  - 0x0260c0	-> u16[A0 + 0x36] = 0x0a
+	call tableLookupAddress(0x026038, u16[A0 + 0x36])
+
+#if STANDALONE
+	// Just unloaded itself?
+	if (objA0.update_address == 0)
+		return
+#endif
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		D1 = objA0.box_size.x + 11
+		D2 = objA0.box_size.y
+		D3.u16 = D2.u16 + 1
+		D4.u16 = objA0.position.x.u16
+		CheckCharacterOnClimbableObject()
+	}
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x026044) end(0x02609c)
+function void fn026044()
+{
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	if (u8[A3 + D0.s16] != 0)
+	{
+		++objA0.animation.sprite
+		u16[A0 + 0x38] = 7
+		u16[A0 + 0x36] += 2
+
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x025f6a
+			objA1.position.x.u16 = u16[A0 + 0x30]
+			objA1.position.y.u16 = objA0.value32
+			D0.u8 = (objA0.subtype2c + 0x40) & 0x7f
+			u8[A1 + 0x2c] = D0.u8
+			u16[A1 + 0x38] = 8
+			u8[A1 + 0x34] = 1
+		}
+	}
+}
+
+
+//# address-hook(0x02609e) end(0x0260ae)
+function void fn02609e()
+{
+	++objA0.animation.sprite
+	--u16[A0 + 0x38]
+	if (u16[A0 + 0x38] == 0)
+	{
+		objA0.position.x.u16 = 0x7fff
+	}
+}
+
+
+//# address-hook(0x0260b0) end(0x0260be)
+function void fn0260b0()
+{
+	--objA0.animation.sprite
+	--u16[A0 + 0x38]
+	if (u16[A0 + 0x38] == 0)
+	{
+		u16[A0 + 0x36] += 2
+	}
+}
+
+
+//# address-hook(0x0260c0) end(0x0260d0)
+function void fn0260c0()
+{
+	--objA0.animation.sprite
+	--u16[A0 + 0x38]
+	if (u16[A0 + 0x38] == 0)
+	{
+		u16[A0 + 0x36] = 0
+	}
+}
+
+
+//# address-hook(0x0260d2) end(0x02612a)
+function void fn0260d2()
+{
+	D0.u16 = objA0.subtype2c & 0x0f
+	if (u8[0xfffff7e0 + D0.u16] == 0)
+	{
+		++objA0.animation.sprite
+		u16[A0 + 0x36] += 2
+		u16[A0 + 0x38] = 7
+
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x025f6a
+			objA1.position.x.u16 = u16[A0 + 0x30]
+			objA1.position.y.u16 = objA0.value32
+			u8[A1 + 0x2c] = (objA0.subtype2c + 0x40) & 0x7f
+			u8[A1 + 0x34] = 1
+			u16[A1 + 0x38] = 8
+		}
+	}
+#if STANDALONE
+	// Special handling for the horizontal barrier that get activated by the first wall trigger
+	else if (global.zone_act == 0x0600 && objA0.position.x.u16 == 0x1500 && objA0.position.y.u16 == 0x03c8)
+	{
+		// Unload if main character is below again, otherwise he's blocked
+		if (u16[0xffffb010] < 0x1540 && u16[0xffffb014] > 0x03d0)
+		{
+			UnloadObject()
+		}
+	}
+#endif
+}
+
+
+
+// Not sure if this is even related to the barrier
+
+//# address-hook(0x0625e2) end(0x0625f4)
+function void fn0625e2()
+{
+	objA0.position.x.u16 += 4
+	Object.AnimationProgressByLocalA1()
+
+	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
+	{
+		objA0.base_state = 0x0e
+		fn0625fa()
+	}
+}
+
+
+//# address-hook(0x0625fa) end(0x062618)
+function void fn0625fa()
+{
+	u8[0xffffb02e] = 0
+
+	// Reset palette after Knuckles is off screen
+	loadPaletteLine1(0x0a8fbc)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b0a
+	}
+}

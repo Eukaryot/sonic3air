@@ -1,0 +1,321 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Moving Platform in Launch Base Zone                   //
+//-------------------------------------------------------//
+
+//# address-hook(0x024e3c) end(0x024eec)
+function void fn024e3c()
+{
+	objA0.mapping_offset = 0x025338
+	objA0.sprite_attributes = 0x43c3
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0180
+
+	if (objA0.subtype2c & 0x80)
+	{
+		u16[A0 + 0x38] = (objA0.subtype2c & 0x7f) << 4
+		objA0.subtype2c = 0x17
+	}
+
+	D0 = (objA0.subtype2c >> 2) & 0x1c
+	A2 = 0x024e34 + D0.s16
+	objA0.box_size.x = u8[(A2+=1)-1]
+	objA0.box_size.y = u8[(A2+=1)-1]
+	objA0.animation.sprite = u8[(A2+=1)-1]
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.x.u16
+	u16[A0 + 0x34] = objA0.position.y.u16
+	objA0.flags2e = objA0.flags2a
+	objA0.value42 = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+
+	D0 = u16(objA0.subtype2c & 0x0f) - 8
+	if (D0.s16 > 0)
+	{
+		if (D0.u16 < 4)
+		{
+			D0.u16 <<= 2
+			A2 = 0xfffffe9a + D0.s16
+			if (s16[A2] < 0)
+			{
+				objA0.flags2e ^= 0x01
+			}
+		}
+		else
+		{
+			objA0.value42 = 0x0380
+			u16[A0 + 0x44] += 0x0100
+		}
+	}
+
+	objA0.subtype2c = (objA0.subtype2c & 0x0f) * 2
+
+	objA0.update_address = 0x024ef2
+	fn024ef2()
+}
+
+
+//# address-hook(0x024ef2) end(0x024f16)
+function void fn024ef2()
+{
+	u16 backup_px = objA0.position.x.u16
+
+	// Targets:
+	//  - 0x024f90	-> objA0.subtype2c = 0x00	-> Non-moving platform
+	//  - 0x024fc8	-> objA0.subtype2c = 0x02	-> Horizontally moving platform (small range)
+	//  - 0x024fd4	-> objA0.subtype2c = 0x04	-> Horizontally moving platform (large range)
+	//  - 0x024ff6	-> objA0.subtype2c = 0x06	-> Vertically moving platform (small range)
+	//  - 0x025002	-> objA0.subtype2c = 0x08	-> Vertically moving platform (large range)
+	//  - 0x025024	-> objA0.subtype2c = 0x0a	-> Diagionally moving platform
+	//  - 0x02505c	-> objA0.subtype2c = 0x0e	-> Moving diagonally, e.g. up a ramp, when stepped on
+	//  - 0x0250ac	-> objA0.subtype2c = 0x18	-> Horizontally moving platform (large range, using different timing?)
+	//  - 0x025108	-> objA0.subtype2c = 0x1a	-> Falling down when stepped on
+	//  - 0x025132	-> objA0.subtype2c = 0x1c	-> Falling down right now
+	call tableLookupAddress(0x024f58, objA0.subtype2c)
+	D4.u16 = backup_px
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		D1 = objA0.box_size.x
+		D3.u16 = 9
+		PlatformCheckClimbOn()
+	}
+
+	fn024f1c()
+}
+
+
+//# address-hook(0x024f1c) end(0x024f52)
+function void fn024f1c()
+{
+	D0.u16 = (u16[A0 + 0x44] & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= objA0.value42)
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (u8[A0 + 0x3d] != 0)
+		{
+			A1 = 0xffff0000 + objA0.value3e
+			UnloadObjectA1()
+		}
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x024f90) end(0x024fc6)
+function void fn024f90()
+{
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 == 0)
+	{
+		if (objA0.value3a != 0)
+		{
+			objA0.value3a -= 4
+		}
+	}
+	else
+	{
+		if (objA0.value3a != 0x40)
+		{
+			objA0.value3a += 4
+		}
+	}
+
+	D0.s16 = lookupSin(objA0.value3a) >> 6
+	D0.u16 += u16[A0 + 0x34]
+	objA0.position.y.u16 = D0.u16
+}
+
+
+//# address-hook(0x025024) end(0x02503c)
+function void fn025024()
+{
+	objA0.position.x.u16 = u16[A0 + 0x30] + getMovingPlatformOffset(0xfffffe8c, 0x80)
+	objA0.position.y.u16 = u16[A0 + 0x34] - getMovingPlatformOffset2(0xfffffe8c, 0x40)
+}
+
+
+//# address-hook(0x02503e) end(0x02505a)
+function void fn02503e()
+{
+	objA0.position.x.u16 = u16[A0 + 0x30] + 0x80 - getMovingPlatformOffset(0xfffffe8c, 0x80)
+	objA0.position.y.u16 = u16[A0 + 0x34] - getMovingPlatformOffset2(0xfffffe8c, 0x40)
+}
+
+
+//# address-hook(0x02505c) end(0x0250aa)
+function void fn02505c()
+{
+	D2.u16 = u16[A0 + 0x38]
+	D1.u16 = u16[A0 + 0x36]
+	if ((objA0.flags2a & 0x18) == 0)
+	{
+		if (D1.u16 == 0)
+			return
+
+		D1.u16 -= 4
+		if (D1.s16 < 0)
+			D1 = 0
+		u16[A0 + 0x36] = D1.u16
+	}
+	else
+	{
+		D1.u16 += 2
+		if (D1.u16 >= D2.u16)
+			D1.u16 = D2.u16
+		u16[A0 + 0x36] = D1.u16
+	}
+
+	D0.u16 = objA0.value32 - D1.u16
+	objA0.position.x.u16 = D0.u16
+	u16[A0 + 0x30] = D0.u16
+	D1.u16 >>= 1
+	D0.u16 = u16[A0 + 0x34] - D1.u16
+	objA0.position.y.u16 = D0.u16
+}
+
+
+//# address-hook(0x0250ac) end(0x025106)
+function void fn0250ac()
+{
+	D1.u16 = u16[A0 + 0x40]
+	D2.u16 = 0x7f
+	if (u8[A0 + 0x3c] == 0)
+	{
+		D1.u16 += 4
+		u16[A0 + 0x40] = D1.u16
+		u16[A0 + 0x36] += D1.u16
+		if (D2.u8 <= u8[A0 + 0x36])
+		{
+			u8[A0 + 0x3c] = 1
+		}
+	}
+	else
+	{
+		D1.u16 -= 4
+		u16[A0 + 0x40] = D1.u16
+		u16[A0 + 0x36] += D1.u16
+		if (D2.u8 > u8[A0 + 0x36])
+		{
+			u8[A0 + 0x3c] = 0
+		}
+	}
+
+	D0 = u8[A0 + 0x36]
+	if (objA0.flags2a & 0x01)
+	{
+		D0.u16 = D2.u16 - D0.s16
+	}
+	D0.u16 += u16[A0 + 0x30]
+	objA0.position.x.u16 = D0.u16
+}
+
+
+//# address-hook(0x025108) end(0x025130)
+function void fn025108()
+{
+	if (u16[A0 + 0x3a] == 0)
+	{
+		if (objA0.flags2a & 0x18)
+		{
+			u16[A0 + 0x3a] = 0x1e
+		}
+	}
+	else
+	{
+		--u16[A0 + 0x3a]
+		if (u16[A0 + 0x3a] == 0)
+		{
+			u16[A0 + 0x3a] = 0x20
+			objA0.subtype2c += 2
+		}
+	}
+}
+
+
+//# address-hook(0x025132) end(0x025192)
+function void fn025132()
+{
+	if (u16[A0 + 0x3a] != 0)
+	{
+		--u16[A0 + 0x3a]
+		if (u16[A0 + 0x3a] == 0)
+		{
+			if (objA0.flags2a & 0x08)
+			{
+				objA0.flags2a &= ~0x08
+				A1 = 0xffffb000
+				fn025194()
+			}
+
+			if (objA0.flags2a & 0x10)
+			{
+				objA0.flags2a &= ~0x10
+				A1 = 0xffffb04a
+				fn025194()
+			}
+
+			objA0.update_address = 0x0251ae
+		}
+	}
+
+	D3 = objA0.position.y
+	D0.u16 = objA0.velocity.y
+	D0.s32 = D0.s16
+	D0.s32 <<= 8
+	D3 += D0
+	objA0.position.y = D3
+	objA0.velocity.y += 0x38
+	D0.u16 = move_area.bottom.current + 0x0120
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.position.x.u16 = 0x7f00
+		u16[A0 + 0x44] = 0x7f00
+	}
+}
+
+
+//# address-hook(0x025194) end(0x0251ac)
+function void fn025194()
+{
+	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x05] = 0x02
+	objA1.velocity.y = objA0.velocity.y
+}
+
+
+//# address-hook(0x0251ae) end(0x0251e0)
+function void fn0251ae()
+{
+	D3 = objA0.position.y
+	D0.s32 = objA0.velocity.y
+	D0.s32 <<= 8
+	D3 += D0
+	objA0.position.y = D3
+	objA0.velocity.y += 0x38
+	D0.u16 = move_area.bottom.current + 0x0120
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.position.x.u16 = 0x7f00
+		u16[A0 + 0x44] = 0x7f00
+	}
+	fn024f1c()
+}

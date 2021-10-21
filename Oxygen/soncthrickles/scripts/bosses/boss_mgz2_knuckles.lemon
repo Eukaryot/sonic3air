@@ -1,0 +1,499 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x06c698) end(0x06c6ee)
+function void fn06c698()
+{
+	A1 = 0x06c688
+	if (InitBoss(0x06c6a2))
+		return
+
+#if STANDALONE
+	// Use main boss music
+	objA0.value26 = 0x19
+#else
+	objA0.value26 = 0x2e
+#endif
+	StartBossFight()
+
+	objA0.update_address = 0x06c6f4
+	objA0.countdown_callback = 0x06c6fa
+
+	Kosinski.addToDMAQueue(0x36b340, 0x67e0)
+
+	Kosinski.addToDMAQueue(0x36d572, 0x8bc0)
+
+	requestLoadingPatterns(0x6d)
+	loadPaletteLine1(0x06d97c)
+
+	level.bossarea.left -= getScreenExtend()
+	level.bossarea.right += getScreenExtend()
+}
+
+
+//# address-hook(0x06c6f4) end(0x06c6f4)
+function void fn06c6f4()
+{
+	CheckForBossStart()
+}
+
+
+//# address-hook(0x06c6fa) end(0x06c700)
+function void fn06c6fa()
+{
+	objA0.update_address = 0x06c702
+}
+
+
+//# address-hook(0x06c702) end(0x06c714)
+function void fn06c702()
+{
+	// Targets:
+	//  - 0x06c72a	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x06c782	-> objA0.base_state = 0x02  -> Short wait time
+	//  - 0x06c796	-> objA0.base_state = 0x04  -> Shooting his drillers
+	//  - 0x06c814	-> objA0.base_state = 0x06  -> Short wait time
+	//  - 0x06c7d8	-> objA0.base_state = 0x08  -> Going along the driller lines, part 1
+	//  - 0x06c814	-> objA0.base_state = 0x0a  -> Short wait time
+	//  - 0x06c83c	-> objA0.base_state = 0x0c  -> Going along the driller lines, part 2
+	//  - 0x06c88a	-> objA0.base_state = 0x0e  -> Wait time before starting the cycle again in state 0x04
+	call tableLookupAddress(0x06c71a, objA0.base_state)
+
+	fn06d61e()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x06c72a) end(0x06c77c)
+function void fn06c72a()
+{
+	setupObjectAttributesFull(0x06d770)
+
+	u8[A0 + 0x46] = 0xff
+	boss.remaining_hits = 8
+	objA0.hitbox_extends.y = 0x1c
+	u16[A0 + 0x26] = 0x0c
+	objA0.subtype2c = 0x02
+	objA0.flags38 |= 0x08
+	objA0.countdown_value = 0x3f
+	objA0.countdown_callback = 0x06c788
+
+	spawnChildObjects(0x06819c)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = 0x09
+	}
+
+	spawnChildObjects(0x06d7c0)
+}
+
+
+//# address-hook(0x06c782) end(0x06c782)
+function void fn06c782()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x06c788) end(0x06c794)
+function void fn06c788()
+{
+	objA0.base_state = 0x04
+	objA0.flags38 |= 0x02
+}
+
+
+//# address-hook(0x06c796) end(0x06c7ba)
+function void fn06c796()
+{
+	if ((objA0.flags38 & 0x04) == 0)
+		return
+
+	objA0.base_state = 0x06
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x06c7bc
+	objA0.subtype2c = 0
+}
+
+
+//# address-hook(0x06c7bc) end(0x06c7d4)
+function void fn06c7bc()
+{
+	objA0.base_state = 0x08
+	objA0.countdown_value = 0x87
+	objA0.countdown_callback = 0x06c7fe
+
+	A1 = 0xfffffa82
+	fn06d51a()
+}
+
+
+//# address-hook(0x06c7d8) end(0x06c7f8)
+function void fn06c7d8()
+{
+	if (objA0.countdown_value == 0x28)
+	{
+		playSound(0x59)
+		spawnSimpleChildObjects(0x06d83e)
+	}
+
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x06c7fe) end(0x06c812)
+function void fn06c7fe()
+{
+	objA0.base_state = 0x0a
+	objA0.countdown_value = 0x3f
+	objA0.countdown_callback = 0x06c81a
+}
+
+
+//# address-hook(0x06c814) end(0x06c814)
+function void fn06c814()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x06c81a) end(0x06c838)
+function void fn06c81a()
+{
+	objA0.base_state = 0x0c
+	objA0.countdown_value = 0x9f
+	objA0.countdown_callback = 0x06c862
+	objA0.subtype2c = 0x02
+
+	A1 = 0xfffffa8a
+	fn06d51a()
+}
+
+
+//# address-hook(0x06c83c) end(0x06c85c)
+function void fn06c83c()
+{
+	if (objA0.countdown_value == 0x48)
+	{
+		playSound(0x59)
+		spawnSimpleChildObjects(0x06d83e)
+	}
+
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x06c862) end(0x06c888)
+function void fn06c862()
+{
+	objA0.base_state = 0x0e
+	objA0.position.x.u16 = 0x3e18
+	objA0.position.y.u16 = 0xffa8
+	objA0.countdown_value = 119
+	objA0.countdown_callback = 0x06c788
+	objA0.flags38 &= ~0x04
+}
+
+
+//# address-hook(0x06c88a) end(0x06c88a)
+function void fn06c88a()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x06c890) end(0x06c8ae)
+function void fn06c890()
+{
+	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.sprite_priority = 0x0200
+	objA0.countdown_callback = 0x06c8b4
+	objA0.flags38 |= 0x10
+
+	spawnChildObjects(0x06d822)
+}
+
+
+//# address-hook(0x06c8b4) end(0x06c8ee)
+function void fn06c8b4()
+{
+	objA0.update_address = 0x06c8f4
+	level.wait_for_results = 0xff
+	level.boss_encounter = 0
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x086540
+		objA1.position.x.u16 = 0x3f40
+		objA1.position.y.u16 = 0xb0
+	}
+
+	D0.u16 = level.bossarea.left + getScreenWidth() - 0x28
+	screenmover_target.right = D0.u16
+
+	spawnSimpleChildObjects(0x084b00)
+}
+
+
+//# address-hook(0x06c8f4) end(0x06c930)
+function void fn06c8f4()
+{
+	move_area.left = camera.position.x.u16
+	if (level.wait_for_results)
+		return
+
+	objA0.update_address = 0x06c932
+	level.wait_for_results = 0
+	stopCharacterWinPose(0xffffb000)
+	PlayMusicAfterLevelResults()
+	control.player1 = 0
+	player1.control_override = 0xff
+	objA0.countdown_value = 0
+	player1.camera_lock = 1
+	move_area.right += 0x30
+
+#if STANDALONE
+	// Replace a chunk so Knuckles won't run into a wall (just outside the right screen border)
+	// Note that this chunk is actually on the left of the level, as we're on the rightmost edge of the level, and the chunks wrap here
+	u8[0xffff8188] = 0x4a
+#endif
+}
+
+
+//# address-hook(0x06c932) end(0x06c942)
+function void fn06c932()
+{
+	D0.u16 = camera.position.x.u16 + getScreenWidth() + 0x10
+	if (D0.u16 <= u16[0xffffb010])
+	{
+		fn06d13c()
+	}
+	else
+	{
+		fn086334()
+	}
+}
+
+
+
+// Rocks (debris) spawner
+
+//# address-hook(0x06d16a) end(0x06d1a4)
+function void fn06d16a()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = camera.position.y.u16 + 0x70
+	D1.u16 = camera.position.y.u16
+	if (D0.s16 < s16[A1 + 0x14])
+	{
+		D1.u16 += 0xc8
+		objA0.flags38 |= 0x04
+	}
+	else
+	{
+		D1.u16 += 0x18
+	}
+	objA0.position.y.u16 = D1.u16
+	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.value39 = 9		// Spawn 10 pieces of debris
+	objA0.countdown_callback = 0x06d1a6
+}
+
+
+//# address-hook(0x06d1a6) end(0x06d1b8)
+function void fn06d1a6()
+{
+	--objA0.value39
+	if (s8(objA0.value39) < 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.countdown_value = 0x03
+
+	// This creates the debris objects
+	spawnSimpleChildObjects(0x06d844)
+}
+
+
+
+// Debris object
+
+//# address-hook(0x06d1be) end(0x06d1ce)
+function void fn06d1be()
+{
+	setupObjectAttributesFull(0x06d7a8)
+
+	objA0.update_address = 0x06d1d2
+	fn06d1de()
+	fn06d1d2()
+}
+
+
+//# address-hook(0x06d1d2) end(0x06d1d8)
+function void fn06d1d2()
+{
+	MoveWithGravity20()
+	fn0850d4()
+}
+
+
+//# address-hook(0x06d1de) end(0x06d222)
+function void fn06d1de()
+{
+	// Velocities of the debris
+	GetRandomNumber()
+	objA0.animation.sprite = u8[0x06d224 + (D0.u16 & 0x03)]
+	D1.u16 = D0.u16 & 0x03ff
+	if (D1 & 0x01)
+	{
+		D1.s16 = -D1.s16
+	}
+	objA0.velocity.x = D1.u16
+
+	D0 >>= 16
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x04)
+	{
+		D0.u16 = 0x0200 + (D0.u16 & 0x01ff)
+		if (D0 & 0x01)
+		{
+			D0.s16 = -D0.s16
+		}
+		objA0.velocity.y = D0.u16
+	}
+}
+
+
+
+//# address-hook(0x06d42e) end(0x06d45a)
+function void fn06d42e()
+{
+	// Determine movement from the ceiling down
+	GetRandomNumber()
+	D0.u16 &= 0xff
+	D1.u16 = D0.u16 & 0x01
+	objA0.render_flags &= ~0x01
+	D0.u16 -= 0x80
+	if (D0.s16 < 0)
+	{
+		D1.u16 += 2
+		objA0.render_flags |= 0x01
+	}
+	D3.u16 = camera.position.y.u16 + 8
+
+	// D0.s16 is a positional offset here, between -0x80 and 0x7f
+	// D1.u16 determines how he moves:
+	//  - 0x00 = Going straight down, looking left
+	//  - 0x01 = Going diagonally from upper right to lower left, looking left
+	//  - 0x02 = Going straight down, looking right
+	//  - 0x03 = Going diagonally from upper left to lower right, looking right
+
+	A2 = 0xfffffa82
+	fn06d45e()
+}
+
+
+//# address-hook(0x06d45e) end(0x06d4aa)
+function void fn06d45e()
+{
+	u16 type = D1.u16
+#if STANDALONE
+	u16 px = camera.position.x.u16 + getScreenWidth() / 2 + 8 + D0.s16
+#else
+	u16 px = camera.position.x.u16 + 168 + D0.s16
+#endif
+	u16 py = D3.u16
+	u16 offset = u16[0x06d4ac + type * 2]
+	u16[A0 + 0x26] = offset
+
+	objA0.position.x.u16 = px
+	objA0.position.y.u16 = py
+	u16[A2+0] = type * 2
+	u16[A2+2] = offset
+	u16[A2+4] = px
+	u16[A2+6] = py
+	u32[A0 + 0x30] = u32[0x06d4bc + type * 4]
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+
+	u32[A0 + 0x18] = u32[0x06d34e + offset * 2]
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		objA0.velocity.x = -objA0.velocity.x
+	}
+}
+
+
+//# address-hook(0x06d4dc) end(0x06d512)
+function void fn06d4dc()
+{
+	// Determine movement from the ground up
+	GetRandomNumber()
+	D0.u16 &= 0x7f
+	D1.u16 = (D0.u16 & 0x01) + 4
+	D2.u16 = u16[0xfffffa82] >> 1
+	objA0.render_flags |= 0x01
+	D3.u8 = u8[0x06d516 + D2.s16]
+	if (D3.u8 != 0)
+	{
+		D0.s16 = -D0.s16
+		objA0.render_flags &= ~0x01
+	}
+	D1.u8 += D3.u8
+	D3.u16 = 0xf8
+
+	// D0.s16 is a positional offset here, between -0x80 and 0x7f
+	// D1.u16 determines how he moves:
+	//  - 0x04 = Going straight up, looking right
+	//  - 0x05 = Going diagonally from lower right to upper left, looking right
+	//  - 0x06 = Going straight up, looking left
+	//  - 0x07 = Going diagonally from lower left to upper right, looking left
+
+	A2 = 0xfffffa8a
+	fn06d45e()
+}
+
+
+//# address-hook(0x06d51a) end(0x06d582)
+function void fn06d51a()
+{
+	D0.u16 = u16[(A1+=2)-2]
+	D1.u16 = u16[(A1+=2)-2]
+	u16[A0 + 0x26] = D1.u16
+	D2.u16 = u16[(A1+=2)-2]
+	D3.u16 = u16[(A1+=2)-2]
+	A2 = 0x06d588 + D0.s16
+	D2.u16 += s8[(A2+=1)-1]
+	objA0.position.x.u16 = D2.u16
+	D3.u16 += s8[(A2+=1)-1]
+	objA0.position.y.u16 = D3.u16
+	objA0.value3a = u8[0x06d598 + (D0.u16 >> 1)]
+	D0.u16 >>= 2
+	D2.u8 = u8[0x06d5a0 + D0.s16]
+	objA0.render_flags &= 0xfc
+	objA0.render_flags |= D2.u8
+	D1.u16 *= 2
+
+	A2 = 0x06d34e
+	u32[A0 + 0x18] = u32[A2 + D1.s16]
+	objA0.velocity.x >>= 1
+	objA0.velocity.y >>= 1
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		objA0.velocity.x = -objA0.velocity.x
+	}
+	playSound(0x59)
+
+	spawnSimpleChildObjects(0x06d83e)
+}

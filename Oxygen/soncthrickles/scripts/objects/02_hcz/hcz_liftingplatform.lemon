@@ -1,0 +1,75 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// HCZ underwater platform lifted when stepping on it    //
+//-------------------------------------------------------//
+
+//# address-hook(0x0251e4) end(0x025276)
+function void fn0251e4()
+{
+	if (u8[A0 + 0x3c] == 0)
+	{
+		D0.u8 = objA0.flags2a & 0x18
+		if (D0.u8 != 0)
+		{
+			u8[A0 + 0x3c] = 0x01
+			objA0.hitbox_extends.y = 0x0c
+		}
+		return
+	}
+
+	UpdateMovementStraightSimple()
+	D1 = 8
+	D0.u16 = u16[A0 + 0x34] - 0x80
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		D1.s16 = -D1.s16
+		objA0.velocity.y += D1.u16
+	}
+
+	fn00fc12()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 -= D1.u16
+		u8[A0 + 0x3c] = 0
+		objA0.velocity.y = 0
+		return
+	}
+
+	if (objA0.flags2a & 0x08)
+	{
+		fn0251e4_sub(0xffffb000)
+	}
+
+	if (objA0.flags2a & 0x10)
+	{
+		fn0251e4_sub(0xffffb04a)
+	}
+}
+
+
+function void fn0251e4_sub(u32 address)
+{
+	u32 backupA0 = A0
+	A0 = address
+	fn00f846()
+	if (D1.s16 < 0)
+	{
+	#if STANDALONE
+		// Check if character is already dying, if so this makes no sense
+		if (char.base_state != 0x06)
+	#endif
+		{
+			Character.Die()
+		}
+	}
+	A0 = backupA0
+}

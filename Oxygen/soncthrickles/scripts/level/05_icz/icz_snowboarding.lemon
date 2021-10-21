@@ -1,0 +1,506 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Sonic snowboarding in ICZ 1                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x0393ee) end(0x039434)
+function void fn0393ee()
+{
+	objA0.sprite_attributes = 0x0680
+	objA0.mapping_offset = 0x347e30
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x20
+	objA0.render_flags = render_flag.WORLD
+	objA0.animation.sprite = 0x06
+	objA0.state.both = 0x01
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x0398e0
+		u16[A1 + 0x30] = A0.u16
+	}
+
+	objA0.update_address = 0x03943a
+	fn03943a()
+}
+
+
+//# address-hook(0x03943a) end(0x039470)
+function void fn03943a()
+{
+	// This state is only used before touching the ground with the snowboard for the first time
+
+	A1 = 0xffffb000
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		objA0.state = 1
+		objA0.update_address = 0x0394a0
+	}
+
+	Object.animationUpdate(0x039476)
+	fn03968e()
+	DrawObject()
+}
+
+
+//# address-hook(0x0394a0) end(0x0394f0)
+function void fn0394a0()
+{
+	// Main state while snowboarding (except for curves)
+
+	A2 = 0xffffb000
+	objA0.position.x.u16 = u16[A2 + 0x10]
+	objA0.position.y.u16 = u16[A2 + 0x14]
+
+	D0 = u8[A2 + 0x26] + 5
+	D0.u16 >>= 4
+	objA0.state = u8[0x0394f2 + D0.s16]
+	if ((u8[A2 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		// Touching ground
+		fn039502()
+	}
+	else
+	{
+		// In air
+	#if STANDALONE
+		// Prevent insta-shield and drop dash, by resetting "char.jumping"
+		u8[A2 + 0x40] = 0
+	#endif
+
+		objA0.state = 0
+		if (s16[A2 + 0x18] >= 0x1000)
+			s16[A2 + 0x18] = 0x1000
+		if (s16[A2 + 0x1a] < -0x200)
+			s16[A2 + 0x1a] = -0x200
+
+		fn039554()
+	}
+
+#if STANDALONE
+	// Update achievement
+	if (ring_counter >= 50)
+	{
+		Game.setAchievementComplete(ACHIEVEMENT_ICZ_SNOWBOARDING)
+	}
+#endif
+}
+
+
+//# address-hook(0x039502) end(0x03954e)
+function void fn039502()
+{
+	if ((level.framecounter.low & 0x0f) == 0)
+	{
+		playSound(0xc8)
+	}
+
+	D0 = 0
+	if (u16[A2 + 0x10] >= 0x1310 && u16[A2 + 0x10] < 0x1330)
+	{
+		D0 = 1
+	}
+	else if (u16[A2 + 0x10] >= 0x2210 && u16[A2 + 0x10] < 0x2230)
+	{
+		D0 = 2
+	}
+
+	if (D0 != 0 && D0.u8 != u8[A0 + 0x36])
+	{
+		u8[A0 + 0x36] = D0.u8
+		u8[A2 + 0x2e] = 0x03	// Change "char.control_flags" to prevent jumping
+		objA0.update_address = 0x0395fe
+		u16[A0 + 0x34] = 0
+	}
+
+	fn039554()
+}
+
+
+//# address-hook(0x039554) end(0x0395f8)
+function void fn039554()
+{
+	Object.animationUpdate(0x039476)
+	if (objA0.animation.sprite == 0x08 && s16[A2 + 0x1c] >= 0x1000)
+	{
+		u16[A2 + 0x1c] -= 8
+	}
+	else
+	{
+		if (s16[A2 + 0x1c] < 0x1000)
+			u16[A2 + 0x1c] = 0x1000
+	}
+
+	if (u16[A2 + 0x10] >= 0x3880 && u16[A2 + 0x18] == 0)
+	{
+		objA0.update_address = 0x039676
+		u16[A2 + 0x18] = -0x200
+		u16[A2 + 0x1a] = -0x400
+		u8[A2 + 0x20] = char.state.GOT_HURT_PANIC
+		u8[A2 + 0x2a] |= char.flag.IN_AIR
+		u8[A2 + 0x2e] = 0
+		camera.screenshake.state = 0x14
+		playSound(0x5f)
+
+	#if STANDALONE
+		tails.respawn_counter = 0
+	#endif
+		tails.ai_routine = 0x02
+	}
+
+	if ((u8[A2 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		D0.u8 = objA0.animation.sprite
+		if (D0.u8 != u8[A0 + 0x32])
+		{
+			if (D0.u8 == 0x07 || D0.u8 == 0x08)
+			{
+				playSound(0x7e)
+			}
+		}
+	}
+
+	fn03968e()
+	DrawObject()
+}
+
+
+//# address-hook(0x0395fe) end(0x039670)
+function void fn0395fe()
+{
+	A2 = 0xffffb000
+	D0.u16 = u16[A0 + 0x34]
+	u16[A0 + 0x34] += 0x06
+	A1 = (u8[A0 + 0x36] == 0x01) ? 0x344e80 : 0x344f48
+	A1 += D0.s16
+
+	D0.u16 = u16[(A1+=2)-2]
+	objA0.position.x.u16 = D0.u16
+	u16[A2 + 0x10] = D0.u16
+	D0.u16 = u16[(A1+=2)-2]
+	objA0.position.y.u16 = D0.u16
+	u16[A2 + 0x14] = D0.u16
+
+	D0.u16 = u16[(A1+=2)-2]
+	objA0.animation.sprite = D0.u8
+	if (s16[A1] < 0)
+	{
+		u8[A2 + 0x46] = 0x0e
+		u8[A2 + 0x47] = 0x0f
+		u8[A2 + 0x2e] = 0x02
+		objA0.update_address = 0x0394a0
+	}
+
+	D0.u8 = objA0.animation.sprite
+	if (D0.u8 != u8[A0 + 0x32])
+	{
+		playSound(0x7e)
+	}
+
+	fn03968e()
+	DrawObject()
+}
+
+
+//# address-hook(0x039676) end(0x039676)
+function void fn039676()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x03968e) end(0x039698)
+function void fn03968e()
+{
+	D4.u16 = 0xd000
+	D6 = 0x345010
+	A2 = 0x347f8a
+	fn03969e()
+}
+
+
+//# address-hook(0x03969e) end(0x0396e2)
+function void fn03969e()
+{
+	// This function updates Sonic's sprite while snowboarding (also used before by the snowboard)
+	if (objA0.animation.sprite != u8[A0 + 0x32])
+	{
+		u8[A0 + 0x32] = objA0.animation.sprite
+
+		u32 sourceBase   = D6
+		u32 tableAddress = A2
+		u16 targetInVRAM = D4.u16
+		updateMultipleSpritePatterns(sourceBase, tableAddress, targetInVRAM, objA0.animation.sprite)
+	}
+}
+
+
+//# address-hook(0x0396e4) end(0x03977a)
+function void fn0396e4()
+{
+	A1 = 0xffffb000
+	objA1.velocity.x = 0x0800
+	objA1.velocity.y = 0x0280
+	u16[A1 + 0x1c] = 0x0800
+	u8[A1 + 0x1e] = 0x0e
+	u8[A1 + 0x1f] = 0x07
+	objA1.state = char.state.ROLLING
+	u8[A1 + 0x22] = 0
+	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+	u8[A1 + 0x2e] = 0x03
+	u8[A1 + 0x40] = 0
+
+	player1.control_override = 1
+	control.player1 = 0
+	control.pad1 = 0
+
+	objA0.animation.timer = 0x1e
+	objA0.mapping_offset = 0x348020
+	objA0.sprite_attributes = 0x0320
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x20
+	objA0.render_flags = render_flag.WORLD
+	objA0.animation.sprite = 0x08
+	objA0.position.x.u16 = 0xc0
+	objA0.position.y.u16 = 0x0170
+
+	objA0.update_address = 0x039780
+	fn039780()
+}
+
+
+//# address-hook(0x039780) end(0x039790)
+function void fn039780()
+{
+	--objA0.animation.timer
+	if (objA0.animation.timer == 0)
+	{
+		A2 = 0xffffb000
+		u8[A2 + 0x2e] = 0
+		objA0.update_address = 0x039796
+	}
+	fn039796()
+}
+
+
+//# address-hook(0x039796) end(0x0397c0)
+function void fn039796()
+{
+	player1.control_override = 1
+	control.player1 = 0
+	A2 = 0xffffb000
+	if (u16[A2 + 0x10] >= 0xc0)
+	{
+		objA0.velocity.y = -0x600
+		u16[A2 + 0x18] = 0x0400
+		u16[A2 + 0x1a] = 0xf800
+		objA0.update_address = 0x0397d2
+	}
+	fn0397c6()
+}
+
+
+//# address-hook(0x0397c6) end(0x0397cc)
+function void fn0397c6()
+{
+	fn03967c()
+	DrawObject()
+}
+
+
+//# address-hook(0x03967c) end(0x03968c)
+function void fn03967c()
+{
+	D4.u16 = 0x6400
+	D6 = 0x347850
+	A2 = 0x348128
+	fn03969e()
+}
+
+
+//# address-hook(0x0397d2) end(0x03984a)
+function void fn0397d2()
+{
+	A2 = 0xffffb000
+	objA0.position.x.u16 = u16[A2 + 0x10]
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 1
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 9)
+			objA0.animation.sprite = 1
+	}
+
+	if (u16[A2 + 0x10] >= 0x0184)
+	{
+		u8[A2 + 0x22] = 0
+		u8[A2 + 0x2e] = 0x02
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x0393ee
+			objA1.position.x.u16 = u16[A2 + 0x10]
+			objA1.position.y.u16 = u16[A2 + 0x14]
+			objA1.velocity.x = u16[A2 + 0x18]
+			objA1.velocity.y = u16[A2 + 0x1a]
+		}
+		objA0.update_address = 0x03984e
+	}
+	else
+	{
+		UpdateMovementStraightSimple()
+		objA0.velocity.y += 0x28
+		fn0397c6()
+	}
+}
+
+
+//# address-hook(0x03984e) end(0x0398a4)
+function void fn03984e()
+{
+	A2 = 0xffffb000
+	objA0.position.x.u16 = u16[A2 + 0x10]
+	objA0.position.y.u16 = u16[A2 + 0x14]
+
+	D0.u16 = control.pad1 & 0xf0f0
+	control.player1 = D0.u16
+	if (u8[A2 + 0x2e] == 0)
+	{
+		player1.control_override = 0
+		objA0.update_address = 0x0398a6
+		objA0.position.y.u16 += 0x14
+		objA0.velocity.x = -0x200
+		objA0.velocity.y = -0x400
+		objA0.render_flags = render_flag.WORLD | render_flag.VISIBLE
+		objA0.animation.sprite = 1
+		objA0.animation.timer = 1
+		fn0397c6()
+	}
+}
+
+
+//# address-hook(0x0398a6) end(0x0398dc)
+function void fn0398a6()
+{
+	if (!(objA0.render_flags & render_flag.VISIBLE))
+	{
+		UnloadObject()
+		return
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 1
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 9)
+			objA0.animation.sprite = 1
+	}
+
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x28
+	fn0397c6()
+}
+
+
+//# address-hook(0x0398e0) end(0x0398e0)
+function void fn0398e0()
+{
+	objA0.update_address = 0x0398e6
+	fn0398e6()
+}
+
+
+//# address-hook(0x0398e6) end(0x039922)
+function void fn0398e6()
+{
+	A3 = 0xffff0000 + u16[A0 + 0x30]
+	A2 = 0xffffb000
+	if (u8[A2 + 0x2e] == 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	if ((u8[A2 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		fn039924()
+		fn039924()
+		if (u8[A3 + 0x22] != 0x07 && u8[A3 + 0x22] != 0x08)
+		{
+			return
+		}
+
+		fn039924()
+		fn039924()
+		fn039924()
+		fn039924()
+		fn039924()
+		fn039924()
+	}
+}
+
+
+//# address-hook(0x039924) end(0x0399a4)
+function void fn039924()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x0399a6
+		u16[A1 + 0x0a] = 0x06b8
+		u32[A1 + 0x0c] = 0x0399d8
+		u16[A1 + 0x08] = 0x0100
+		u8[A1 + 0x07] = 0x04
+		u8[A1 + 0x06] = 0x04
+		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		u16[A1 + 0x20] = 0x01
+		objA1.position.x.u16 = u16[A2 + 0x10]
+		objA1.position.y.u16 = u16[A2 + 0x14]
+		objA1.position.y.u16 += 0x14
+
+		GetRandomNumber()
+		D1 = D0
+		D0.u16 &= 0x01ff
+		D0.s16 = -D0.s16
+		objA1.velocity.y -= 0x0200
+		objA1.velocity.y = D0.u16
+		objA1.velocity.x = -0x100
+		D0 = D1
+		D0.u16 &= 0x0f
+		objA1.position.x.u16 -= D0.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+		D0.u16 &= 0x0f
+		objA1.position.y.u16 -= D0.u16
+	}
+}
+
+
+//# address-hook(0x0399a6) end(0x0399ca)
+function void fn0399a6()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		UpdateMovementStraightSimple()
+		Object.animationUpdate(0x0399d0)
+		if (objA0.base_state == 0)
+		{
+			DrawObject()
+			return
+		}
+	}
+	UnloadObject()
+}

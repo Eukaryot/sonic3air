@@ -1,0 +1,573 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// HUD display                                           //
+//-------------------------------------------------------//
+
+#if STANDALONE
+function void HUD.drawSprite(u64 key, u16 px, u16 py, u16 renderQueue)
+{
+	Renderer.drawCustomSprite(key, px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+}
+
+function void HUD.drawDigit(u8 digit, u16 px, u16 py, u16 renderQueue)
+{
+	Renderer.drawCustomSprite(stringformat("hud_digit_%d", digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+}
+
+function void HUD.drawNumber(u64 stringMask, u32 number, u16 px, u16 py, u16 renderQueue)
+{
+	while (true)
+	{
+		u8 digit = number % 10
+		Renderer.drawCustomSprite(stringformat(stringMask, digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+		px -= 8
+		number /= 10
+		if (number == 0)
+			break
+	}
+}
+
+function void HUD.drawSmallDigit(u8 digit, u16 px, u16 py, u16 renderQueue)
+{
+	Renderer.drawCustomSprite(stringformat("hud_smalldigit_%d", digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+}
+#endif
+
+function bool HUD.useMobileLivesDisplay()
+{
+#if STANDALONE
+	if (Game.getSetting(SETTING_LIVES_DISPLAY) == 0)
+	{
+		return System.hasPlatformFlag(PlatformFlags.MOBILE)
+	}
+	else
+	{
+		return (Game.getSetting(SETTING_LIVES_DISPLAY) == 2)
+	}
+#else
+	return false
+#endif
+}
+
+
+//# address-hook(0x00db3c) end(0x00db42)
+function void fn00db3c()
+{
+#if STANDALONE
+	if (debug_mode.state)
+	{
+		Renderer.setLogicalSpriteSpace(Space.SCREEN)
+		RenderHUD()
+		Renderer.setLogicalSpriteSpace(Space.WORLD)
+	}
+#else
+	if (debug_mode.enabled)
+	{
+		RenderHUD()
+	}
+#endif
+}
+
+
+//# address-hook(0x00db44) end(0x00dbb2)
+function void RenderHUD()
+{
+#if STANDALONE
+	if (DEBUG_DISABLE_HUD)
+		return
+#endif
+
+	s16 baseX = global.level_started
+	if (baseX < 0)
+	{
+		baseX += 8
+		global.level_started = baseX
+	}
+	baseX += 0x0f
+	s16 baseY = 0x08
+	u16 renderQueue = 0xe000
+
+	bool isBonusStage = (global.zone >= 0x13 && global.zone <= 0x15)
+#if STANDALONE
+	if (!debug_mode.state)
+	{
+		if (!isBonusStage)
+		{
+			// Score
+			HUD.drawSprite("hud_text_score", baseX, baseY, renderQueue)
+			++renderQueue
+			HUD.drawNumber("hud_digit_%d", player.score * 10, baseX + 0x58, baseY, renderQueue)
+			++renderQueue
+
+			// Time
+			{
+				bool show = (timer.minutes < 9 || isBonusStage || (level.framecounter & 0x08) || Game.getSetting(SETTING_INFINITE_TIME))
+				HUD.drawSprite(show ? "hud_text_time" : "hud_text_time_red", baseX, baseY + 0x10, renderQueue)
+				++renderQueue
+
+				// Unfortunately, the time progress is done later inside the frame, so we don't have the right value in "timer.frames" yet
+				//  -> If the conditions for time progress are met, add one and everything will be alright
+				u16 minutes = timer.minutes
+				u16 seconds = timer.seconds
+				u16 frames = timer.frames
+				if (hud.dirty.timer && !global.game.paused && timer.alldata < 0x93b3b)	// That is 9:59 and 59 frames
+				{
+					++frames
+					seconds += (frames / 60)
+					minutes += (seconds / 60)
+					frames %= 60
+					seconds %= 60
+				}
+				u16 centiseconds = (frames * 99 + 30) / 59
+
+				u16 px = (minutes >= 10) ? (baseX + 8) : baseX
+				if (Game.getSetting(SETTING_EXTENDED_HUD))
+				{
+					if (minutes >= 10)
+						HUD.drawDigit(minutes / 10, px + 0x20, baseY + 0x10, renderQueue)
+					HUD.drawDigit(minutes % 10, px + 0x28, baseY + 0x10, renderQueue)
+					HUD.drawSprite("hud_char_minutes", px + 0x30, baseY + 0x10, renderQueue)
+					HUD.drawDigit(seconds / 10, px + 0x38, baseY + 0x10, renderQueue)
+					HUD.drawDigit(seconds % 10, px + 0x40, baseY + 0x10, renderQueue)
+					HUD.drawSprite("hud_char_seconds", px + 0x48, baseY + 0x10, renderQueue)
+					HUD.drawDigit(centiseconds / 10, px + 0x50, baseY + 0x10, renderQueue)
+					if (minutes < 10)
+						HUD.drawDigit(centiseconds % 10, px + 0x58, baseY + 0x10, renderQueue)
+				}
+				else
+				{
+					if (minutes >= 10)
+						HUD.drawDigit(minutes / 10, px + 0x20, baseY + 0x10, renderQueue)
+					HUD.drawDigit(minutes % 10, px + 0x28, baseY + 0x10, renderQueue)
+					HUD.drawSprite("hud_char_colon", px + 0x30, baseY + 0x10, renderQueue)
+					HUD.drawDigit(seconds / 10, px + 0x38, baseY + 0x10, renderQueue)
+					HUD.drawDigit(seconds % 10, px + 0x40, baseY + 0x10, renderQueue)
+				}
+				++renderQueue
+			}
+		}
+
+		// Rings
+		{
+			u16 py = (isBonusStage) ? baseY : baseY + 0x20
+			bool show = (ring_counter != 0 || (level.framecounter & 0x08))
+			HUD.drawSprite(show ? "hud_text_rings" : "hud_text_rings_red", baseX, py, renderQueue)
+			++renderQueue
+
+			u16 px = baseX + (!isBonusStage && Game.getSetting(SETTING_EXTENDED_HUD) ? 0x58 : 0x40)
+			for (u32 value = ring_counter;;)
+			{
+				HUD.drawDigit(value % 10, px, py, renderQueue)
+				px -= 8
+				value /= 10
+				if (value == 0)
+					break
+			}
+			++renderQueue
+		}
+
+		// Lives (not visible in Time Attack)
+		if (!Game.isTimeAttack() && !Game.getSetting(SETTING_INFINITE_LIVES))
+		{
+			bool useMobilePosition = HUD.useMobileLivesDisplay()
+			u16 px = useMobilePosition ? (getScreenWidth() - baseX - 0x30) : baseX
+			u16 py = useMobilePosition ? baseY : 200
+
+			u64 characterName
+			if (getMainCharacter() == CHARACTER_SONIC)
+				characterName = "sonic"
+			else if (getMainCharacter() == CHARACTER_TAILS)
+				characterName = (global.region_code & 0x80) ? "tails" : "miles"
+			else
+				characterName = "knuckles"
+			HUD.drawSprite(stringformat("hud_lives_icon_%s", characterName), px, py, renderQueue)
+			++renderQueue
+
+			if (lives_counter >= 10)
+				HUD.drawSmallDigit(u16((lives_counter / 10) % 10), px + 0x20, py + 8, renderQueue)
+			HUD.drawSmallDigit(u16(lives_counter % 10), px + 0x28, py + 8, renderQueue)
+		}
+	}
+	else
+#endif
+	{
+		D4 = (isBonusStage) ? 8 : 0
+
+		if ((level.framecounter & 0x08) == 0)
+		{
+			if (ring_counter == 0)
+			{
+				D4 += 2
+			}
+			if (timer.minutes == 9 && !isBonusStage)
+			{
+				D4 += 4
+			}
+		}
+
+		// Targets:
+		//  - 0x00dbc2	-> D4.u16 = 0x00
+		//  - 0x00dc00	-> D4.u16 = 0x02
+		//  - 0x00dc32	-> D4.u16 = 0x04
+		//  - 0x00dc96	-> D4.u16 = 0x08
+		//  - 0x00dcb6	-> D4.u16 = 0x0a
+		A1 = tableLookupAddress(0x00dbb6, D4.u16)
+
+		D4.s16 = u16[A1] - 1
+		D0.s16 = baseX + 0x80
+		D1.u16 = 0x0108
+		D5.u16 = 0x86ca
+		A1 += 2
+		if (D4.s16 >= 0)
+		{
+			writeToSpriteTable(renderQueue)
+		}
+	}
+}
+
+
+//# address-hook(0x00dd06) end(0x00de86)
+function void UpdateTimeAndHud()
+{
+	if (competition_mode.active == 0)
+	{
+		if (debug_mode.state == 0)
+		{
+			// Update score
+			if (hud.dirty.score)
+			{
+				hud.dirty.score = 0
+				D0 = 0x5c800003
+				D1 = player.score
+				RefreshScoreHudDisplay()
+			}
+
+			// Update rings
+			if (hud.dirty.rings != 0)
+			{
+				if (hud.dirty.rings & 0x80)
+				{
+					ResetRingsDisplay()
+				}
+				hud.dirty.rings = 0
+				D0 = 0x5f400003
+				D1 = ring_counter
+				RefreshRingsHudDisplay()
+			}
+
+			// Update time
+			bool updateTimerHUD = false
+			if (hud.dirty.timer & 0x80)
+			{
+				hud.dirty.timer = 0x01
+				updateTimerHUD = true
+			}
+			else if (hud.dirty.timer != 0 && !global.game.paused)
+			{
+			#if STANDALONE
+				if (Game.getSetting(SETTING_INFINITE_TIME))
+				{
+					if (timer.alldata == 0x3b3b3b)		// That is 59:59 and 59 frames
+					{
+						// Reset back to 0
+						timer.alldata = 0
+					}
+				}
+				else
+			#endif
+				{
+					if (timer.alldata == 0x93b3b)		// That is 9:59 and 59 frames
+					{
+						// Time over
+						hud.dirty.timer = 0
+						A0 = 0xffffb000
+						if (objA0.base_state < 0x06 && global.zone != 0x15)
+						{
+							A2 = A0
+							Character.Die()
+						}
+						global.time_over = 1
+						return
+					}
+				}
+
+				// Time progress
+				++timer.frames
+				if (timer.frames >= 60)
+				{
+					timer.frames = 0
+					++timer.seconds
+					if (timer.seconds >= 60)
+					{
+						timer.seconds = 0
+						++timer.minutes
+
+					#if STANDALONE
+						if (!Game.getSetting(SETTING_INFINITE_TIME))
+					#endif
+						{
+							timer.minutes = min(timer.minutes, 9)
+						}
+					}
+					updateTimerHUD = true
+				}
+			}
+
+			if (updateTimerHUD)
+			{
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xde40)
+				D1 = min(timer.minutes, 9)
+				RefreshTimeMinutesHudDisplay()
+
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdec0)
+				D1 = timer.seconds
+				RefreshTimeSecondsHudDisplay()
+			}
+
+			// Update lives
+			if (hud.dirty.lives != 0)
+			{
+				hud.dirty.lives = 0
+				UpdateHudLivesDisplay()
+			}
+		}
+		else
+		{
+			// Debug mode
+			DebugModePositionDisplay()
+			if (hud.dirty.rings != 0)
+			{
+				if (hud.dirty.rings & 0x80)
+				{
+					ResetRingsDisplay()
+				}
+				hud.dirty.rings = 0
+				D0 = 0x5f400003
+				D1 = ring_counter
+				RefreshRingsHudDisplay()
+			}
+
+			D0 = VDPHelper.getDirectVRAMWriteCode(0xde40)
+			D1 = global.lag_frames
+			RefreshTimeMinutesHudDisplay()
+
+			D0 = VDPHelper.getDirectVRAMWriteCode(0xdec0)
+			D1 = u8[0xfffff62c]
+			RefreshTimeSecondsHudDisplay()
+
+			if (hud.dirty.lives != 0)
+			{
+				hud.dirty.lives = 0
+				UpdateHudLivesDisplay()
+			}
+
+			if (!global.game.paused)
+			{
+				A1 = 0xfffffe26
+				--A1
+				++u8[A1]
+				if (u8[A1] >= 60)
+				{
+					u8[A1] = 0
+					--A1
+					++u8[A1]
+					if (u8[A1] >= 60)
+					{
+						u8[A1] = 0
+						--A1
+						++u8[A1]
+						if (u8[A1] >= 9)
+						{
+							u8[A1] = 9
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (debug_mode.enabled)
+		{
+			DebugModePositionDisplay()
+		}
+	}
+}
+
+
+//# address-hook(0x00de88) end(0x00de9a)
+function void ResetRingsDisplay()
+{
+	// Initialize direct VRAM write
+	VDP.setupVRAMWrite(0xdf40)
+	A2 = 0x00def8
+	D2.u16 = 2
+	fn00debe()
+}
+
+
+//# address-hook(0x00de9c) end(0x00deba)
+function void ResetScoreDisplay()
+{
+	UpdateHudLivesDisplay()
+	if (competition_mode.active)
+		return
+
+	// Initialize direct VRAM write
+	VDP.setupVRAMWrite(0xdc40)
+	A2 = 0x00deec
+	D2.u16 = 14
+	fn00debe()
+}
+
+
+//# translated(0x00debe) end(0x00deea)
+function void fn00debe()
+{
+	while (D2.s16 >= 0)
+	{
+		D0.u8 = u8[A2]
+		++A2
+
+		if (D0.s8 >= 0)
+		{
+			u32 address = 0xe18a + u32(D0.u8) * 0x20
+			VDP.copyToVRAM(address, 0x40)
+		}
+		else
+		{
+			VDP.zeroVRAM(0x40)
+		}
+
+		--D2.s16
+	}
+}
+
+
+//# address-hook(0x00defc) end(0x00df52)
+function void DebugModePositionDisplay()
+{
+	// Initialize direct VRAM write
+	VDP.setupVRAMWrite(0xdc40)
+
+	D1 = (u32(camera.position.x.u16) << 16) + u16[0xffffb010]
+	fn00df1c()
+
+	D1 = (u32(camera.position.y.u16) << 16) + u16[0xffffb014]
+	fn00df1c()
+}
+
+function void fn00df1c()
+{
+	D6 = 8
+	while (D6 > 0)
+	{
+		D1.u16 = (D1.u16 << 4) + (D1.u16 >> 12)
+		D2.u16 = D1.u16 & 0x0f
+		if (D2.u16 >= 10)
+			D2.u16 += 7
+
+		A3 = 0x00e5ca + D2.u16 * 0x20
+		VDP.copyToVRAM(A3, 0x20)
+
+		D1 = (D1 << 16) + (D1 >> 16)
+		--D6
+	}
+}
+
+
+//# address-hook(0x00df80) end(0x00df88)
+function void RefreshRingsHudDisplay()
+{
+	refreshHudDisplayShared(3, false)
+}
+
+//# address-hook(0x00df8a) end(0x00dfe6)
+function void RefreshScoreHudDisplay()
+{
+	refreshHudDisplayShared(6, false)
+}
+
+//# address-hook(0x00e058) end(0x00e060)
+function void RefreshTimeMinutesHudDisplay()
+{
+	refreshHudDisplayShared(1, true)
+}
+
+//# address-hook(0x00e062) end(0x00e0ba)
+function void RefreshTimeSecondsHudDisplay()
+{
+	refreshHudDisplayShared(2, true)
+}
+
+function void refreshHudDisplayShared(u8 numDigits, bool showAllDigits)
+{
+	u32 decimal = pow(10, numDigits - 1)
+
+	while (decimal > 0)
+	{
+		u8 digit = D1 / decimal
+		D1 %= decimal
+
+		if (digit != 0)
+		{
+			// From now on, show all digits (don't skip leading zeroes any more)
+			showAllDigits = true
+		}
+
+		if (showAllDigits)
+		{
+			// Location of sprite for this digit
+			A3 = 0x00e18a + digit * 0x40
+
+			u32 vramAddress = VDPHelper.getVRAMAddressFromWriteCode(D0)
+			VDP.setupVRAMWrite(vramAddress)
+			VDP.copyToVRAM(A3, 0x40)
+		}
+
+		D0 += 0x400000
+		decimal /= 10
+	}
+}
+
+
+//# address-hook(0x00e11e) end(0x00e188)
+function void UpdateHudLivesDisplay()
+{
+	u16 vramAddress = 0xfba0
+	u16 number = lives_counter
+	u8 digit = 10
+
+	while (digit > 0)
+	{
+		u8 counter = 0
+		while (number >= digit)
+		{
+			number -= digit
+			++counter
+		}
+
+		VDP.setupVRAMWrite(vramAddress)
+		if (counter > 0 || digit == 1)
+		{
+			A3 = 0x00e48a + counter * 0x20
+			VDP.copyToVRAM(A3, 0x20)
+		}
+		else
+		{
+			VDP.zeroVRAM(0x20)
+		}
+
+		vramAddress += 0x40
+		digit /= 10
+	}
+}

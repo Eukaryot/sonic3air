@@ -1,0 +1,1075 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Character Sprites                                     //
+//-------------------------------------------------------//
+
+//# address-hook(0x012cb4) end(0x012d20)
+function void UpdateSonicSpritePatterns()
+{
+	updateCharacterSpritePatterns(CHARACTER_SONIC, char.animation.sprite)
+}
+
+//# address-hook(0x015c6e) end(0x015cce)
+function void UpdateTailsSpritePatterns()
+{
+	updateCharacterSpritePatterns(CHARACTER_TAILS, char.animation.sprite)
+}
+
+//# address-hook(0x01810e) end(0x018162)
+function void UpdateKnucklesSpritePatterns()
+{
+	updateCharacterSpritePatterns(CHARACTER_KNUCKLES, char.animation.sprite)
+}
+
+function void updateCharacterSpritePatterns(u8 character, u8 animationSprite)
+{
+	u32 sourceBase
+	u32 tableAddress
+	u16 targetInVRAM = 0xd000
+	u32 animationSpriteBackup = 0xfffff766
+
+	if (character == CHARACTER_SONIC)
+	{
+		// Sonic
+		sourceBase = (animationSprite >= 0xda) ? 0x140060 : 0x100000
+		tableAddress = (super.active) ? 0x148378 : 0x148182
+	}
+	else if (character == CHARACTER_TAILS)
+	{
+		// Tails
+		sourceBase = (animationSprite >= 0xd1) ? 0x143d00 : 0x3200e0
+		tableAddress = 0x14a08a
+		targetInVRAM = 0xd400
+		animationSpriteBackup = 0xfffff7de
+	}
+	else
+	{
+		// Knuckles
+		sourceBase = 0x1200e0
+		tableAddress = 0x14bd0a
+	}
+	updateCharacterSpritePatternsInternal(animationSprite, sourceBase, tableAddress, targetInVRAM, animationSpriteBackup)
+}
+
+function void updateCharacterSpritePatternsInternal(u8 animationSprite, u32 sourceBase, u32 tableAddress, u16 targetInVRAM, u32 animationSpriteBackup)
+{
+	if (animationSprite != u8[animationSpriteBackup])
+	{
+		u8[animationSpriteBackup] = animationSprite
+		updateCharacterSpritePatternsInner(animationSprite, sourceBase, tableAddress, targetInVRAM)
+	}
+}
+
+function void updateCharacterSpritePatternsInner(u8 animationSprite, u32 sourceBase, u32 tableAddress, u16 targetInVRAM)
+{
+	A2 = tableLookupAddress(tableAddress, u16(animationSprite) * 2)
+	s16 numSprites = s16[A2]
+
+#if STANDALONE
+	// Sanity check: Never use more than 16 sprites (this should never trigger)
+	if (numSprites > 0x10)
+		numSprites = 0x10
+#endif
+
+	for (; numSprites > 0; --numSprites)
+	{
+		// Next sprite
+		A2 += 2
+		u32 sourceInROM = sourceBase + ((u16[A2] & 0x0fff) << 5)
+		u16 lengthInWords = 0x10 + ((u16[A2] & 0xf000) >> 8)
+
+		updateSpritePattern(sourceInROM, targetInVRAM, lengthInWords)
+		targetInVRAM += lengthInWords * 2
+	}
+}
+
+
+//# address-hook(0x018122)
+function void fn018122()
+{
+	updateCharacterSpritePatternsInner(D0.u8, 0x1200e0, 0x14bd0a, D4.u16)
+}
+
+
+//# address-hook(0x012d22) end(0x012d32)
+function void SetCharacterSpritePatterns()
+{
+	updateCharacterSpritePatterns(u8[A1 + 0x38], D0.u8)
+}
+
+
+
+//-------------------------------------------------------//
+// Animation                                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x012600) end(0x01286c)
+//# translated(0x012a2a) end(0x012a6e)
+function void UpdateSonicAnimation()
+{
+	if (char.state != char.state.former)
+	{
+		char.state.former = char.state
+		char.animation.frame = 0
+		char.animation.timer = 0
+		char.flags &= ~char.flag.PUSHING
+	}
+
+	A1 = (super.active) ? 0x012c3a : 0x012aa6
+	A1 = tableLookupAddress(A1, char.state * 2)
+	D0.u8 = u8[A1]
+
+	// D0.u8 is either:
+	//  - 0xff when running
+	//  - 0xfe when rolling (on ground or in air)
+	//  - between 0x00 and 0x7f in other cases (like standing, balancing, spring-jumping, getting hurt, etc.)
+
+	if (D0.u8 < 0x80)
+	{
+		updateSonicAnimationStanding()
+	}
+	else if (D0.u8 == 0xff)
+	{
+		updateSonicAnimationRunning()
+	}
+	else
+	{
+		updateSonicAnimationRolling()
+	}
+}
+
+function void updateSonicAnimationStanding()
+{
+	D1.u8 = char.flags & char.flag.FACING_LEFT
+	char.render_flags = (char.render_flags & 0xfc) | D1.u8
+
+	--char.animation.timer
+	if (s8(char.animation.timer) < 0)
+	{
+		char.animation.timer = D0.u8
+		updateSonicAnimation_shared()
+	}
+}
+
+function void updateSonicAnimationRolling()
+{
+	D1.u8 = char.flags & char.flag.FACING_LEFT
+	char.render_flags = (char.render_flags & 0xfc) | D1.u8
+
+	--char.animation.timer
+	if (s8(char.animation.timer) >= 0)
+		return
+
+	D2.u16 = abs(char.groundspeed)
+	if (char.character == CHARACTER_SONIC)
+	{
+		A1 = (D2.u16 < 0x600) ? 0x012b02 : 0x012b0c
+	}
+	else if (char.character == CHARACTER_TAILS)
+	{
+		A1 = (D2.u16 < 0x600) ? 0x015b18 : 0x015b1d
+	}
+	else if (char.character == CHARACTER_KNUCKLES)
+	{
+		A1 = (D2.u16 < 0x600) ? 0x017f52 : 0x017f5c
+	}
+
+	D2.u16 = max(0x400 - D2.s16, 0) >> 8
+	char.animation.timer = D2.u8
+
+	updateSonicAnimation_shared()
+}
+
+
+function void updateSonicAnimation_shared()
+{
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("SonicAnimation", A1))
+		{
+			u8 result = u8[A1 + char.animation.frame + 1]
+			ROMDataAnalyser.beginEntry("SonicAnimation", A1)
+			ROMDataAnalyser.addKeyValue(stringformat("0x%02x", char.animation.frame), stringformat("0x%02x", result))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
+
+	D0.u8 = u8[A1 + char.animation.frame + 1]
+	if (D0.u8 < 0xfc)
+	{
+		char.animation.sprite = D0.u8
+		++char.animation.frame
+	}
+	else if (D0.u8 == 0xfd)
+	{
+		char.state = u8[A1 + char.animation.frame + 2]
+	}
+	else if (D0.u8 == 0xfe)
+	{
+		u8 diff = u8[A1 + char.animation.frame + 2]
+		char.animation.frame -= diff
+		char.animation.sprite = u8[A1 + char.animation.frame + 1]
+		++char.animation.frame
+	}
+	else if (D0.u8 == 0xff)
+	{
+		char.animation.frame = 1
+		char.animation.sprite = u8[A1 + 1]
+	}
+	// Note: (D0.u8 == 0xfc) is an unhandled case
+}
+
+
+function void updateSonicAnimationRunning()
+{
+	D0 = 0
+	if ((u8[A0 + 0x2d] & 0x80) || char.rotation.x != 0)
+	{
+		updateCharacterAnimationRunning_shared()
+	}
+	else
+	{
+		D0.u8 = (s8(char.rotation) > 0) ? (char.rotation - 1) : char.rotation
+		D2.u8 = char.flags & char.flag.FACING_LEFT
+		if (D2.u8 == 0)
+			D0.s8 = -D0.s8 - 1
+
+		D0.u8 += 0x10
+		D1 = (D0.u8 & 0x80) ? (render_flag.FLIP_X | render_flag.FLIP_Y) : 0
+		D2.u8 ^= D1.u8
+
+		char.render_flags &= 0xfc
+		char.render_flags |= D2.u8
+
+		if (char.flags & char.flag.PUSHING)
+		{
+			updateSonicAnimationPushing()
+			return
+		}
+
+		D0.u8 = (D0.u8 >> 4) & 0x06
+		D2.u16 = abs(char.groundspeed)
+		if (char.bonus_effect & char.bonus.INFINITE_INERTIA)
+			D2.u16 *= 2
+
+		if (char.character == CHARACTER_SONIC)
+		{
+			if (super.active == 0)
+			{
+				if (D2.u16 < 0x600)
+				{
+					A1 = 0x012aee
+					D3.u8 = D0.u8 * 4
+				}
+				else
+				{
+					A1 = 0x012af8
+					D3.u8 = D0.u8 * 2
+				}
+			}
+			else
+			{
+				if (D2.u16 < 0x800)
+				{
+					A1 = 0x012c7a
+					D3.u8 = D0.u8 * 4
+				}
+				else
+				{
+					A1 = 0x012c84
+					D3.u8 = D0.u8 * 2
+				}
+			}
+		}
+		else if (char.character == CHARACTER_TAILS)
+		{
+			if (D2.u16 < 0x600)
+			{
+				A1 = 0x015b04
+				D3.u8 = D0.u8 * 4
+			}
+			else if (D2.u16 < 0x700)
+			{
+				A1 = 0x015b0e
+				D3.u8 = D0.u8 * 2
+			}
+			else
+			{
+				A1 = 0x015bfe
+				D3.u8 = D0.u8
+			}
+		}
+		else if (char.character == CHARACTER_KNUCKLES)
+		{
+			if (D2.u16 < 0x600)
+			{
+				A1 = 0x017f3e
+				D3.u8 = D0.u8 * 4
+			}
+			else
+			{
+				A1 = 0x017f48
+				D3.u8 = D0.u8 * 2
+			}
+		}
+
+		D0.u8 = u8[A1 + char.animation.frame + 1]
+	#if STANDALONE
+		if (D0.u8 >= 0xfe)		// 0xfe is possible in rare cases when Sonic touches ground while being carried by Tails
+	#else
+		if (D0.u8 == 0xff)
+	#endif
+		{
+			char.animation.frame = 0
+			D0.u8 = u8[A1 + 1]
+		}
+
+		char.animation.sprite = D0.u8 + D3.u8
+		--char.animation.timer
+		if (s8(char.animation.timer) < 0)
+		{
+			char.animation.timer = max(0x800 - D2.s16, 0) >> 8
+			++char.animation.frame
+		}
+	}
+}
+
+function void updateCharacterAnimationRunning_shared()
+{
+	D1.u16 = u8[A0 + 0x2d] & 0x7f
+	if (D1.u16 != 0)
+	{
+		fn012872()
+		return
+	}
+
+	D0.u8 = char.rotation.x
+	D1 = 0
+	char.render_flags &= 0xfc
+	if ((char.flags & char.flag.FACING_LEFT) == 0)
+	{
+		if (u8[A0 + 0x2d] & 0x80)
+		{
+			if (global.zone != 0x0b && global.zone != 0x04)
+			{
+				char.render_flags |= render_flag.FLIP_Y
+				D0.s8 = 0x8f - D0.s8
+			}
+		}
+		else
+		{
+			D0.u8 += 11
+		}
+	}
+	else
+	{
+		if (u8[A0 + 0x2d] & 0x80 && (global.zone == 0x04 || global.zone == 0x0b || global.zone == 0x07))
+		{
+			char.render_flags |= render_flag.FLIP_X
+			D0.u8 += 11
+		}
+		else
+		{
+			char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
+			D0.s8 = 0x8f - D0.s8
+		}
+	}
+
+	D0.u16 = D0 / 0x16 + 0x31
+	char.animation.sprite = D0.u8
+	char.animation.timer = 0
+}
+
+
+//# address-hook(0x012a72) end(0x012aa2)
+function void updateSonicAnimationPushing()
+{
+	--char.animation.timer
+	if (s8(char.animation.timer) < 0)
+	{
+		D2.s16 = 0x800 - abs(char.groundspeed)
+		D2.s16 = max(D2.s16, 0) >> 6
+		char.animation.timer = D2.u8
+
+		if (char.character == CHARACTER_SONIC)
+		{
+			A1 = (super.active) ? 0x012c8e : 0x012b16
+		}
+		else if (char.character == CHARACTER_TAILS)
+		{
+			A1 = 0x015b22
+		}
+		else if (char.character == CHARACTER_KNUCKLES)
+		{
+			char.animation.timer >>= 2		// Faster animation for Knuckles
+			A1 = 0x017f66
+		}
+
+		updateSonicAnimation_shared()
+	}
+}
+
+
+//# address-hook(0x015862) end(0x015aae)
+function void UpdateTailsAnimation()
+{
+	A1 = 0x015ab0
+	UpdateTailsAnimation_inner()
+}
+
+//# address-hook(0x015868)
+function void UpdateTailsAnimation_inner()
+{
+	if (char.state != char.state.former)
+	{
+		char.state.former = char.state
+		char.animation.frame = 0
+		char.animation.timer = 0
+		char.flags &= ~char.flag.PUSHING
+	}
+
+	A1.u16 += u16[A1 + char.state * 2]
+	D0.u8 = u8[A1]
+
+	if (D0.u8 < 0x80)
+	{
+		updateSonicAnimationStanding()
+	}
+	else if (D0.u8 == 0xff)
+	{
+		updateSonicAnimationRunning()
+	}
+	else if (D0.u8 == 0xfe)
+	{
+		updateSonicAnimationRolling()
+	}
+	else
+	{
+		--char.animation.timer
+		if (s8(char.animation.timer) < 0)
+		{
+			// Animation update of Tails' tails while rolling
+			D1.u16 = u16[A2 + 0x18]
+			D2.u16 = u16[A2 + 0x1a]
+			LookupAngleByVector()
+			if (global.zone == 0x15)
+			{
+				D0.u8 += u8[0xffffe400]
+			}
+
+			D2.u8 = char.flags & char.flag.FACING_LEFT
+			if (D2.u8 == 0)
+				D0.u8 ^= 0xff
+			else
+				D0.u8 += 0x80
+
+			D0.u8 += 0x10
+			D1 = (D0.s8 < 0) ? 3 : 0
+
+			char.render_flags &= 0xfc
+			D2.u8 ^= D1.u8
+			char.render_flags |= D2.u8
+
+			if (global.inv_gravity)
+				char.render_flags ^= render_flag.FLIP_Y
+
+			D3.u8 = (D0.u8 >> 3) & 0x0c
+			A1 = 0x0161c2
+			char.animation.timer = 3
+			updateSonicAnimation_shared()
+			char.animation.sprite += D3.u8
+		}
+	}
+}
+
+
+//# address-hook(0x017d30) end(0x017ef0)
+function void UpdateKnucklesAnimation()
+{
+	A1 = 0x017ef4
+
+	if (char.state != char.state.former)
+	{
+		char.state.former = char.state
+		char.animation.frame = 0
+		char.animation.timer = 0
+		char.flags &= ~char.flag.PUSHING
+	}
+
+	A1.u16 += u16[A1 + char.state * 2]
+	D0.u8 = u8[A1]
+
+	if (D0.u8 < 0x80)
+	{
+		updateSonicAnimationStanding()
+	}
+	else if (D0.u8 == 0xff)
+	{
+		updateSonicAnimationRunning()
+	}
+	else
+	{
+		updateSonicAnimationRolling()
+	}
+}
+
+
+//# address-hook(0x012872) end(0x012a28)
+function void fn012872()
+{
+	char.render_flags &= 0xfc
+	D0.u8 = char.rotation.x
+	D3.u8 = u8[0x01286e + D1.s16]
+
+	if (D1.u8 == 1)
+	{
+		if (char.flags & char.flag.FACING_LEFT)
+		{
+			char.render_flags |= render_flag.FLIP_X
+		}
+
+		D0.u8 -= 8
+		D0.u16 = D0 / 22
+		D0.u8 += D3.u8
+	}
+	else if (D1.u8 == 2)
+	{
+		if (char.flags & char.flag.FACING_LEFT)
+		{
+			char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
+			D0.s8 = 0x8f - D0.s8
+		}
+		else
+		{
+			D0.u8 += 11
+		}
+
+		D0.u16 = D0 / 22
+		D0.u8 += D3.u8
+	}
+	else if (D1.u8 == 3)
+	{
+		if (char.flags & char.flag.FACING_LEFT)
+		{
+			char.render_flags |= render_flag.FLIP_X
+			D0.u8 += 11
+		}
+		else
+		{
+			char.render_flags |= render_flag.FLIP_Y
+			D0.s8 = 0x8f - D0.s8
+		}
+
+		D0.u16 = D0 / 22
+		D0.u8 += D3.u8
+	}
+	else if (D1.u8 == 4)
+	{
+		if (char.flags & char.flag.FACING_LEFT)
+		{
+			char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
+			D0.s8 = 0x8f - D0.s8
+		}
+		else
+		{
+			D0.u8 += 11
+		}
+
+		D0.u16 = D0 / 22
+		D0.u8 += 0x31
+	}
+	else
+	{
+		if (char.flags & char.flag.FACING_LEFT)
+		{
+			char.render_flags |= render_flag.FLIP_X
+		}
+
+		D0.u8 += 11
+		D0.u16 = D0 / 22
+		D0.u8 += 0x31
+	}
+
+	char.animation.sprite = D0.u8
+	char.animation.timer = 0
+	D1 = 0
+}
+
+
+
+//-------------------------------------------------------//
+// Competition mode                                      //
+//-------------------------------------------------------//
+
+// Sonic, Knuckles
+
+//# address-hook(0x012d36) end(0x012f80)
+function void fn012d36()
+{
+	D0 = objA0.state
+	if (D0.u8 != objA0.state.former)
+	{
+		objA0.state.former = D0.u8
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+		objA0.flags2a &= ~0x20
+	}
+	A1 = tableLookupAddress((char.character == CHARACTER_SONIC) ? 0x012f84 : 0x012fcc, D0.u16 * 2)
+
+	D0.u8 = u8[A1]
+	if (D0.s8 >= 0)
+	{
+		objA0.render_flags = (objA0.render_flags & ~0x03) | (objA0.flags2a & 0x01)
+
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) >= 0)
+			return
+
+		objA0.animation.timer = D0.u8
+	}
+	else if (D0.u8 == 0xff)
+	{
+		D0 = u8[A0 + 0x27]
+		if (D0.u8 == 0)
+		{
+			D0.u8 = objA0.value26
+			if (D0.s8 > 0)
+			{
+				--D0.u8
+			}
+			D2.u8 = objA0.flags2a & 0x01
+			if (D2.u8 == 0)
+			{
+				D0.u8 ^= 0xff
+			}
+			D0.u8 += 0x10
+			D1 = (D0.s8 < 0) ? 3 : 0
+			objA0.render_flags &= ~0x03
+			D2.u8 ^= D1.u8
+			objA0.render_flags |= D2.u8
+
+			if (objA0.flags2a & 0x20)
+			{
+				--objA0.animation.timer
+				if (s8(objA0.animation.timer) >= 0)
+					return
+
+				D2.u16 = 0x0800 - abs(objA0.groundspeed)
+				if (D2.s16 < 0)
+					D2 = 0
+				if (char.character == CHARACTER_SONIC)
+				{
+					// Sonic
+					A1 = 0x01302c
+					D2.u16 >>= 6
+				}
+				else
+				{
+					// Knuckles
+					A1 = 0x013032
+					D2.u16 >>= 8
+				}
+				objA0.animation.timer = D2.u8
+				objA0.render_flags = (objA0.render_flags & ~0x03) | (objA0.flags2a & 0x01)
+			}
+			else
+			{
+				D0.u8 = (D0.u8 >> 5) & 0x03
+				D2.u16 = abs(objA0.groundspeed)
+				if (s8[A0 + 0x2b] < 0)
+				{
+					D2.u16 *= 2
+				}
+				D3.u8 = D0.u8
+				if (D2.u16 < 0x0600)
+				{
+					A1 = 0x013014
+					D0.u8 *= 2
+				}
+				else
+				{
+					A1 = 0x01301a
+				}
+				D3.u8 += D0.u8
+				D1 = objA0.animation.frame
+				D0.u8 = u8[A1 + D1.s16 + 0x01]
+				if (D0.u8 == 0xff)
+				{
+					objA0.animation.frame = 0
+					D0.u8 = u8[A1 + 0x01]
+				}
+				objA0.animation.sprite = D0.u8 + D3.u8
+				--objA0.animation.timer
+				if (s8(objA0.animation.timer) < 0)
+				{
+					D2.u16 = max(0x0800 - D2.s16, 0) >> 8
+					objA0.animation.timer = D2.u8
+					++objA0.animation.frame
+				}
+				return
+			}
+		}
+		else
+		{
+			objA0.render_flags &= ~0x03
+			D0.u8 = u8[A0 + 0x27]
+			D1 = 0
+			D2.u8 = objA0.flags2a & 0x01
+			if (D2.u8 == 0)
+			{
+				D0.u8 += 0x16
+				D0.u16 = D0 / 0x2c
+				D0.u8 += 0x15
+				objA0.animation.sprite = D0.u8
+				objA0.animation.timer = 0
+			}
+			else
+			{
+				if (s8[A0 + 0x2d] < 0)
+				{
+					objA0.render_flags |= 0x01
+					D0.u8 += 0x16
+				}
+				else
+				{
+					objA0.render_flags |= 0x03
+					D0.u8 = 0x9a - D0.u8
+				}
+				D0.u16 = D0 / 0x2c
+				D0.u8 += 0x15
+				objA0.animation.sprite = D0.u8
+				objA0.animation.timer = 0
+			}
+			return
+		}
+	}
+	else
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) >= 0)
+			return
+
+		D2.u16 = abs(objA0.groundspeed)
+		A1 = (D2.u16 < 0x0600) ? 0x013020 : 0x013026
+		D2.u16 = max(0x0400 - D2.s16, 0) >> 8
+		objA0.animation.timer = D2.u8
+		D1.u8 = objA0.flags2a & 0x01
+		objA0.render_flags = (objA0.render_flags & ~0x03) | D1.u8
+	}
+
+// 0x012d90:
+	D1 = objA0.animation.frame
+	D0.u8 = u8[A1 + D1.s16 + 0x01]
+	if (D0.u8 >= 0xfc)
+	{
+		if (D0.u8 == 0xff)
+		{
+			objA0.animation.frame = 0
+			D0.u8 = u8[A1 + 0x01]
+		}
+		else if (D0.u8 == 0xfe)
+		{
+			D0.u8 = u8[A1 + D1.s16 + 0x02]
+			objA0.animation.frame -= D0.u8
+			D1.u8 -= D0.u8
+			D0.u8 = u8[A1 + D1.s16 + 0x01]
+		}
+		else if (D0.u8 == 0xfd)
+		{
+			objA0.state = u8[A1 + D1.s16 + 0x02]
+			return
+		}
+		else if (D0.u8 == 0xfc)
+		{
+			return
+		}
+	}
+	objA0.animation.sprite = D0.u8
+	++objA0.animation.frame
+}
+
+
+//# address-hook(0x01309a) end(0x013100)
+function void fn01309a()
+{
+	u16 targetInVRAM = (A0 == 0xffffb000) ? 0xd000 : 0xd400
+	if (char.character != CHARACTER_SONIC)
+	{
+		updateMultipleSpritePatterns(0x33db60, 0x2a0498, targetInVRAM, objA0.animation.sprite)
+	}
+	else
+	{
+		updateMultipleSpritePatterns(0x337780, 0x29fde4, targetInVRAM, objA0.animation.sprite)
+	}
+}
+
+
+
+// Tails
+
+//# address-hook(0x015cd0) end(0x015cd0)
+function void fn015cd0()
+{
+	A1 = 0x015f60
+	fn015cd6()
+}
+
+
+//# address-hook(0x015cd6) end(0x015f5e)
+function void fn015cd6()
+{
+	D0 = objA0.state
+	if (D0.u8 != objA0.state.former)
+	{
+		objA0.state.former = D0.u8
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+		objA0.flags2a &= ~0x20
+	}
+	A1 = tableLookupAddress(A1, D0.u16 * 2)
+
+	D0.u8 = u8[A1]
+	if (D0.s8 >= 0)
+	{
+		objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x01)
+
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = D0.u8
+			fn015d1e()
+		}
+		return
+	}
+	else if (D0.u8 == 0xff)
+	{
+		D0 = u8[A0 + 0x27]
+		if (D0.u8 == 0)
+		{
+			D1 = 0
+			D0.u8 = objA0.value26
+			if (D0.s8 > 0)
+			{
+				--D0.u8
+			}
+			D2.u8 = objA0.flags2a & 0x01
+			if (D2.u8 == 0)
+			{
+				D0.u8 ^= 0xff
+			}
+			D0.u8 += 0x10
+			if (D0.s8 < 0)
+			{
+				D1 = 0x03
+			}
+			objA0.render_flags &= 0xfc
+			D2.u8 ^= D1.u8
+			objA0.render_flags |= D2.u8
+			if (objA0.flags2a & 0x20)
+			{
+				--objA0.animation.timer
+				if (s8(objA0.animation.timer) >= 0)
+					return
+
+				D2.u16 = 0x0800 - abs(objA0.groundspeed)
+				if (D2.s16 < 0)
+					D2 = 0
+				D2.u16 >>= 6
+				objA0.animation.timer = D2.u8
+				A1 = 0x015fb8
+				objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x01)
+				fn015d1e()
+				return
+			}
+
+			D0.u8 >>= 5
+			D0.u8 &= 0x03
+			D2.u16 = u16(objA0.groundspeed)
+			if (D2.s16 < 0)
+			{
+				D2.s16 = -D2.s16
+			}
+			if (s8[A0 + 0x2b] < 0)
+			{
+				D2.u16 *= 2
+			}
+			D3.u8 = D0.u8
+			A1 = 0x015fa8
+			if (D2.u16 < 0x0600)
+			{
+				A1 = 0x015fa2
+				D0.u8 *= 2
+			}
+			D3.u8 += D0.u8
+			D1 = objA0.animation.frame
+			D0.u8 = u8[A1 + D1.s16 + 0x01]
+			if (D0.u8 == 0xff)
+			{
+				objA0.animation.frame = 0
+				D0.u8 = u8[A1 + 0x01]
+			}
+			objA0.animation.sprite = D0.u8 + D3.u8
+			--objA0.animation.timer
+			if (s8(objA0.animation.timer) < 0)
+			{
+				D2.s16 = 0x0800 - D2.s16
+				if (D2.s16 < 0)
+					D2 = 0
+				D2.u16 >>= 8
+				objA0.animation.timer = D2.u8
+				++objA0.animation.frame
+			}
+			return
+		}
+
+		D0.u8 = u8[A0 + 0x27]
+		D1 = 0
+		D2.u8 = objA0.flags2a &  0x01
+		if (D2.u8 == 0)
+		{
+			objA0.render_flags &= 0xfc
+			D0.u8 += 0x16
+			D0.u16 = D0 / 0x2c   // Result should also contain modulo in upper byte/word
+			D0.u8 += 0x15
+			objA0.animation.sprite = D0.u8
+			objA0.animation.timer = 0
+			return
+		}
+
+		objA0.render_flags &= 0xfc
+		if (s8[A0 + 0x2d] < 0)
+		{
+			objA0.render_flags |= 0x01
+			D0.u8 += 0x16
+		}
+		else
+		{
+			objA0.render_flags |= 0x03
+			D0.u8 = 0x9a - D0.u8
+		}
+		D0.u16 = D0 / 0x2c   // Result should also contain modulo in upper byte/word
+		D0.u8 += 0x15
+		objA0.animation.sprite = D0.u8
+		objA0.animation.timer = 0
+		return
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) >= 0)
+		return
+
+	if (D0.u8 == 0xfe)
+	{
+		D2.u16 = abs(objA0.groundspeed)
+		A1 = (D2.u16 < 0x0600) ? 0x015fae : 0x015fb3
+		D2.s16 = 0x0400 - D2.s16
+		if (D2.s16 < 0)
+			D2 = 0
+		D2.u16 >>= 8
+		objA0.animation.timer = D2.u8
+		objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x01)
+		fn015d1e()
+	}
+	else
+	{
+		D0.u8 += 3
+		D1.u16 = u16[A2 + 0x18]
+		D2.u16 = u16[A2 + 0x1a]
+		LookupAngleByVector()
+		D1 = 0
+		D2.u8 = objA0.flags2a & 0x01
+		if (D2.u8 == 0)
+			D0.u8 ^= 0xff
+		else
+			D0.u8 += 0x80
+		D0.u8 += 0x10
+		if (D0.s8 < 0)
+		{
+			D1 = 0x03
+		}
+		objA0.render_flags &= 0xfc
+		D2.u8 ^= D1.u8
+		objA0.render_flags |= D2.u8
+		D0.u8 >>= 5
+		D0.u8 &= 0x03
+		D3.u8 = D0.u8 * 3
+		A1 = 0x0162d2
+		objA0.animation.timer = 0x03
+		fn015d1e()
+		objA0.animation.sprite += D3.u8
+	}
+}
+
+
+//# address-hook(0x015d1e)
+function void fn015d1e()
+{
+	D1 = objA0.animation.frame
+	D0.u8 = u8[A1 + D1.s16 + 0x01]
+	if (D0.u8 >= 0xf0)
+	{
+		if (D0.u8 == 0xff)
+		{
+			objA0.animation.frame = 0
+			D0.u8 = u8[A1 + 0x01]
+		}
+		else if (D0.u8 == 0xfe)
+		{
+			D0.u8 = u8[A1 + D1.s16 + 0x02]
+			objA0.animation.frame -= D0.u8
+			D1.u8 -= D0.u8
+			D0.u8 = u8[A1 + D1.s16 + 0x01]
+		}
+		else if (D0.u8 == 0xfd)
+		{
+			objA0.state = u8[A1 + D1.s16 + 0x02]
+			return
+		}
+		else
+		{
+			return
+		}
+	}
+
+	objA0.animation.sprite = D0.u8
+	++objA0.animation.frame
+}
+
+
+//# address-hook(0x016050) end(0x0160a4)
+function void fn016050()
+{
+	u16 targetInVRAM = (A0 == 0xffffb000) ? 0xd000 : 0xd400
+	updateMultipleSpritePatterns(0x33a840, 0x2a013e, targetInVRAM, objA0.animation.sprite)
+}
+
+
+//# address-hook(0x01607c)
+function void fn01607c()
+{
+	// Main part of "updateMultipleSpritePatterns"
+	while (true)
+	{
+		D1 = u16[(A2+=2)-2]
+		D3.u16 = ((D1.u16 >> 8) & 0xf0) + 0x10
+		D1 = D6 + ((D1 & 0x0fff) << 5)
+		D2.u16 = D4.u16
+		D4.u16 += D3.u16 * 2
+		UpdateSpritePattern()
+
+		--D5.s16
+		if (D5.s16 < 0)
+			break
+	}
+}

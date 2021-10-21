@@ -1,0 +1,739 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Knuckles' intro in MHZ 1 (or AIZ 1)
+
+//# address-hook(0x063446) end(0x063460)
+function void fn063446()
+{
+	bool showKnucklesIntro = (isMainCharacter(CHARACTER_KNUCKLES) && checkpoint.number == 0)
+#if STANDALONE
+	// Show in AIZ instead of MHZ
+	showKnucklesIntro &= (global.zone_act == 0x0000 && Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 && !Game.isTimeAttack())
+#else
+	// Show only in S&K alone
+	showKnucklesIntro &= (global.lock_on_state != 0)
+#endif
+
+	if (showKnucklesIntro)
+	{
+		objA0.update_address = 0x063466
+		fn063466()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x063466) end(0x063480)
+function void fn063466()
+{
+	// Targets:
+	//  - 0x0634ca	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x063526	-> objA0.base_state = 0x02	-> Waiting, bomb falling
+	//  - 0x063562	-> objA0.base_state = 0x04	-> Bomb hit the ground, then burns down
+	//  - 0x06358e	-> objA0.base_state = 0x06	-> Bomb explosion, screen turns white
+	//  - 0x0635c8	-> objA0.base_state = 0x08	-> Fade back in
+	//  - 0x0635f6	-> objA0.base_state = 0x0a	-> Egg Robo flies in, hovers
+	//  - 0x063620	-> objA0.base_state = 0x0c	-> Egg Robo flies away
+	call tableLookupAddress(0x063486, objA0.base_state)
+
+	// Targets:
+	//  - 0x06349a	-> objA0.value42 = 0x00		-> Before bomb explosion
+	//  - 0x0634ac	-> objA0.value42 = 0x02		-> When Knuckles gets blown back, and when going after Egg Robo
+	//  - 0x0634b8	-> objA0.value42 = 0x04		-> When screen fades back in, and afterwards
+	call tableLookupAddress(0x063494, objA0.value42)
+
+	// This renders Knuckles himself
+	DrawObject()
+}
+
+
+
+//# address-hook(0x06349a) end(0x0634a6)
+function void fn06349a()
+{
+	objA0.mapping_offset = 0x067352
+	Object.loadSpritePatterns(0x06667a)
+}
+
+
+//# address-hook(0x0634ac) end(0x0634b4)
+function void fn0634ac()
+{
+	objA0.mapping_offset = 0x14a8d6
+	fn06618a()
+}
+
+
+//# address-hook(0x0634b8) end(0x0634c4)
+function void fn0634b8()
+{
+	objA0.mapping_offset = 0x066f36
+	Object.loadSpritePatterns(0x066682)
+}
+
+
+//# address-hook(0x0634ca) end(0x063524)
+function void fn0634ca()
+{
+	A1 = 0x0663de
+	if (fn084fa4())
+		return
+
+	objA0.countdown_value = 0xef
+	u8[0xffffb02e] = 0x83
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+
+	if (global.zone_act == 0x0000)
+	{
+		if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
+		{
+			objA0.position.x.u16 = 0x17e1
+			objA0.position.y.u16 = 0x0125
+
+			camera.position.x.u16 = 0x1768
+			camera.position.y.u16 = 0x0090
+		}
+		else
+		{
+			objA0.position.x.u16 = 0x13f0
+			objA0.position.y.u16 = 0x0425
+
+			camera.position.x.u16 = 0x1390
+			camera.position.y.u16 = 0x0380
+		}
+	}
+	else
+#endif
+	{
+		camera.position.x.u16 = max(0x0540, 0x0560 - getScreenExtend())
+		camera.position.y.u16 = 0x0948
+	}
+	player1.camera_lock = 0xff
+	global.random.seed = global.framecounter
+	global.level_started = 0
+
+	if (allocDynamicObjectStd())
+	{
+		u32[A1] = 0x063682
+	}
+
+	// Spawn the 8 critters (with update routine 0x063694)
+	spawnSimpleChildObjects(0x066656)
+
+	copyMemory(0xfffffca0, 0x066a32, 0x20)
+}
+
+
+
+// Animation for chilling Knuckles
+
+//# address-hook(0x063526) end(0x06355c)
+function void fn063526()
+{
+	if ((u8[0xfffffab8] & 0x01) == 0)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value == 0)
+		{
+			if (allocDynamicObjectStd())
+			{
+				u32[A1] = 0x063790
+			}
+		}
+
+		Object.animationProgress(0x0668c3)
+	}
+	else
+	{
+		objA0.base_state = 0x04
+		objA0.animation.sprite = 0x04
+		A1 = 0x0668c7
+		fn084580()
+	}
+}
+
+
+//# address-hook(0x063562) end(0x063588)
+function void fn063562()
+{
+	if ((u8[0xfffffab8] & 0x02) == 0)
+	{
+		fn08459c()
+		return
+	}
+
+	objA0.base_state = 0x06
+	objA0.value42 = 0x02
+	objA0.animation.sprite = 0x8d
+	objA0.velocity.x = -0x100
+	objA0.velocity.y = -0x100
+
+	fn06358e()
+}
+
+
+//# address-hook(0x06358e) end(0x0635c4)
+function void fn06358e()
+{
+	if ((u8[0xfffffab8] & 0x04) == 0)
+	{
+		objA0.velocity.y += 8
+		UpdateMovementStraightSimple()
+		return
+	}
+
+	objA0.base_state = 0x08
+	objA0.value42 = 0x04
+	objA0.animation.sprite = 0x03
+	objA0.position.y.u16 -= 0x08
+	objA0.hitbox_extends.y = 0x13
+	objA0.velocity.x = -0x100
+	objA0.velocity.y = 0
+
+	fn0635c8()
+}
+
+
+//# address-hook(0x0635c8) end(0x0635f0)
+function void fn0635c8()
+{
+	MoveWithGravity20()
+	CheckGroundCollision()
+	if (D1.s16 >= 0)
+		return
+
+	objA0.position.y.u16 += D1.u16
+	objA0.base_state = 0x0a
+	objA0.countdown_callback = 0x0635fc
+
+	A1 = 0x0668d0
+	fn084580()
+}
+
+
+//# address-hook(0x0635f6) end(0x0635f6)
+function void fn0635f6()
+{
+	fn08459c()
+}
+
+
+//# address-hook(0x0635fc) end(0x06361a)
+function void fn0635fc()
+{
+	objA0.base_state = 0x0c
+	objA0.value42 = 0x02
+	objA0.animation.sprite = 0x07
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+
+	A1 = 0x06682f
+	fn084580()
+
+#if STANDALONE
+	// Create the object that fades out the Knuckles theme and starts the level music afterwards
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b0a
+	}
+#endif
+}
+
+
+
+//# address-hook(0x063620) end(0x06364a)
+function void fn063620()
+{
+	if (objA0.velocity.x + 0x0c <= 0x0400)
+	{
+		objA0.velocity.x += 0x0c
+	}
+	UpdateMovementStraightSimple()
+	fn08450e()
+
+	u16 pointToReach = camera.position.x.u16 + 0x0180
+#if STANDALONE
+	if (global.zone_act == 0x0000)
+		pointToReach = camera.position.x.u16 + getScreenWidth() / 2 - 0x10
+#endif
+	if (objA0.position.x.u16 > pointToReach)
+	{
+		fn06364e()
+	}
+}
+
+
+//# address-hook(0x06364e) end(0x06367c)
+function void fn06364e()
+{
+	checkpoint.number = 1
+	checkpoint.x = 0x06f4
+	checkpoint.y = 0x09ec
+#if STANDALONE
+	if (global.zone_act == 0x0000)
+	{
+		if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
+		{
+			checkpoint.x = 0x1830
+			checkpoint.y = 0x0119
+		}
+		else
+		{
+			checkpoint.x = 0x1460
+			checkpoint.y = 0x041a
+		}
+	}
+#endif
+	Checkpoint.SaveCurrentState()
+	checkpoint.time = 0
+
+#if !STANDALONE
+	// This should already have been set to exactly this value...
+	D0.u16 = 0x0700
+	global.zone_act = D0.u16
+	global.zone_act.apparent = D0.u16
+#endif
+
+#if STANDALONE
+	Game.endSkippableCutscene()
+
+	// Use this code for a direct start without fade to black (along with the "pointToReach" change above)
+	bool manualCutsceneSkip = ((control.pad1.pressed & CONTROL_START) || (control.pad2.pressed & CONTROL_START))
+	if (global.zone_act == 0x0000 && !manualCutsceneSkip)
+	{
+		u32 backupA0 = A0
+
+		u16[0xffffb010] = objA0.position.x.u16
+		u16[0xffffb014] = objA0.position.y.u16
+		s16[0xffffb018] = objA0.velocity.x
+		s16[0xffffb01c] = objA0.velocity.x
+		u8[0xffffb02e] = 0
+
+		// Give Knuckles another update, to make sure he's rendered this frame at all
+		A0 = 0xffffb000
+		call objA0.update_address
+		A0 = backupA0
+
+		// Remove the critters, and the object that listens to CONTROL_START
+		for (u32 address = 0xffffb128; address < 0xffffcfcb; address += 0x4a)
+		{
+			A1 = address
+			if (objA1.update_address == 0x063720 || objA1.update_address == 0x063750 || objA1.update_address == 0x063682)
+			{
+				unloadObjectAt(A1)
+			}
+		}
+
+		// Load palette line 1 for enemies
+		copyMemory(0xfffffc20, 0x0a8b7c, 0x20)
+
+		player1.control_override = 0
+		player1.camera_lock = 0
+		fn0851e4()
+
+		if (allocDynamicObjectStd())
+		{
+			// Show title card
+			objA1.update_address = 0x02d690
+		}
+
+		global.level_started = -0x6f	// Let HUD fly in
+		hud.dirty.timer = 0x80
+		timer.alldata = 0
+		hud.dirty.lives = 0x01
+
+		UnloadObject()
+
+		// Spawn Tails
+		if (getNumPlayers() > 1)
+		{
+			tails.respawn_counter = 60
+			tails.ai_routine = 0x02
+		}
+	}
+	else
+#endif
+	{
+		level.restart = 1
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x063682) end(0x063692)
+function void fn063682()
+{
+	// Check for cutscene skip
+	if ((control.pad1.pressed & CONTROL_START) || (control.pad2.pressed & CONTROL_START))
+	{
+		fn06364e()
+	}
+}
+
+
+
+// Critter
+
+//# address-hook(0x063694) end(0x0636f2)
+function void fn063694()
+{
+	objA0.position.x.u16 = u16[0x0636f4 + objA0.subtype2c]
+	objA0.position.y.u16 = 0x09f4
+
+	D1 = (objA0.subtype2c >= 0x08) ? 4 : 0
+	u32[A0 + 0x3a] = u32[0x063704 + D1.u16]
+
+	A1 = 0x06370c
+	objA0.hitbox_extends.y = 0x0c
+	if (objA0.subtype2c & 0x02)
+	{
+		A1 += 0x0a
+		objA0.hitbox_extends.y = 0x0a
+	}
+
+	objA0.update_address = u32[(A1+=4)-4]
+	objA0.mapping_offset = u32[(A1+=4)-4]
+	objA0.sprite_attributes = u16[(A1+=2)-2]
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+
+#if STANDALONE
+	if (global.zone_act == 0x0000)
+	{
+		objA0.position.x.u16 += camera.position.x.u16 - 0x0560
+		objA0.position.y.u16 += camera.position.y.u16 - 0x0948 - 0x10	// Additional offset 0x10 to make sure non of them falls through the underground
+		u16[A0 + 0x3a] += camera.position.x.u16 - 0x0560
+		u16[A0 + 0x3c] += camera.position.y.u16 - 0x0948
+	}
+#endif
+}
+
+
+//# address-hook(0x063720) end(0x06374a)
+function void fn063720()
+{
+	UpdateMovementSimple()
+	objA0.animation.sprite = 0x01
+	if (objA0.velocity.y >= 0)
+	{
+		objA0.animation.sprite = 0
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 += D1.u16
+			fn065e02()
+		}
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x063750) end(0x06378a)
+function void fn063750()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x18
+	if (objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 += D1.u16
+			fn065e02()
+		}
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 0x01
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x01
+	}
+
+	DrawObject()
+}
+
+
+
+// The bomb
+
+//# address-hook(0x063790) end(0x0637e6)
+function void fn063790()
+{
+	setupObjectAttributesFull(0x066486)
+
+	objA0.update_address = 0x0637ec
+	objA0.hitbox_extends.y = 0x10
+	objA0.position.x.u16 = camera.position.x.u16 + getScreenWidth() / 2
+	objA0.position.y.u16 = camera.position.y.u16 - 0x40
+
+	playSound(0x51)
+	spawnChildObjects(0x06665c)
+
+	addPatternLoadingCue(0x083d64)
+	Kosinski.addToDMAQueue(0x165000, 0xa5c0)
+}
+
+
+//# address-hook(0x0637ec) end(0x063840)
+function void fn0637ec()
+{
+	UpdateMovementSimple()
+	if (s8[A0 + 0x04] < 0 && objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 += D1.u16
+			u8[0xfffffab8] |= 0x01
+			playSound(0x5d)
+
+			D0.s16 = -(objA0.velocity.y >> 2)
+			objA0.velocity.y = D0.u16
+			if (D0.s16 >= -0x0100)
+			{
+				objA0.update_address = 0x063846
+				objA0.countdown_value = 119
+				playMusic(MUSIC_CTRL_FADEOUT)
+			}
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x063846) end(0x06389c)
+function void fn063846()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x0638a2
+		objA0.flags2a |= 0x80
+		u8[0xfffffab8] |= 0x02
+
+		playSound(0x4e)
+		copyMemory(0xfffffc80, 0xfffffc00, 0x20)
+
+		if (allocDynamicObjectStd())
+		{
+			u16[A0 + 0x44] = A1.u16
+			u32[A1] = 0x085e64
+			u16[A1 + 0x3a] = 0x07
+			u8[A1 + 0x2c] = 0xff
+			spawnSimpleChildObjects(0x066650)
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x0638a2) end(0x0638d6)
+function void fn0638a2()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if ((u8[A1 + 0x38] & 0x20) == 0)
+		return
+
+	u8[0xfffffab8] |= 0x04
+	if (allocDynamicObjectStd())
+	{
+		u32[A1] = 0x0639c8
+	}
+	copyMemory(0xfffffca0, 0x0a973c, 0x20)
+
+	Object.TriggerUnloading()
+}
+
+
+
+// Knuckles' animation
+
+//# address-hook(0x0638dc) end(0x0638e6)
+function void fn0638dc()
+{
+	objA0.update_address = 0x0638ec
+	setupObjectAttributesBasic(0x066492)
+}
+
+
+//# address-hook(0x0638ec) end(0x063910)
+function void fn0638ec()
+{
+	Object.animationProgress(0x066905)
+	MoveWithParent()
+
+	if ((global.framecounter.low & 0x07) == 0)
+	{
+		spawnSimpleChildObjects(0x066664)
+	}
+	fn084920()
+}
+
+
+//# address-hook(0x063916) end(0x063940)
+function void fn063916()
+{
+	setupObjectAttributesBasic(0x066498)
+	objA0.update_address = 0x063946
+	objA0.countdown_callback = 0x0852a0
+
+	GetRandomNumber()
+	objA0.velocity.x = (D0.u16 & 0x7f) - 0x3f
+	objA0.velocity.y = -0x100
+
+	fn063946()
+}
+
+
+//# address-hook(0x063946) end(0x063956)
+function void fn063946()
+{
+	UpdateMovementStraightSimple()
+	Object.animationProgress(0x06690b)
+	fn084920()
+}
+
+
+//# address-hook(0x06395c) end(0x0639a0)
+function void fn06395c()
+{
+	setupObjectAttributesFull(0x083fb4)
+	objA0.countdown_callback = 0x0852a0
+	playSound(0xb4)
+
+	D0 = objA0.subtype2c
+	A1 = 0x0639a2 + D0.u16
+	objA0.countdown_value = D0.u16 >> 1
+	objA0.position.x.u16 += s8[(A1+=1)-1]
+	objA0.position.y.u16 += s8[(A1+=1)-1]
+
+	objA0.update_address = 0x0639b6
+	fn0639b6()
+}
+
+
+//# address-hook(0x0639b6) end(0x0639c6)
+function void fn0639b6()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x083f68
+		fn083f68()
+	}
+}
+
+
+//# address-hook(0x0639c8) end(0x063a10)
+function void fn0639c8()
+{
+	setupObjectAttributesFull(0x0919a6)
+	objA0.update_address = 0x063a16
+
+	objA0.position.x.u16 = camera.position.x.u16 + 0x0110
+	objA0.position.y.u16 = camera.position.y.u16 - 0x60
+	playMusic(0x19)
+
+	spawnChildObjects(0x0919d0)
+
+	Kosinski.addToDMAQueue(0x17b17e, 0xa000)
+}
+
+
+//# address-hook(0x063a16) end(0x063a40)
+function void fn063a16()
+{
+	++objA0.position.y.u16
+	D0.u16 = camera.position.y.u16 + 0x40
+	if (D0.s16 < s16[A0 + 0x14])
+	{
+		objA0.update_address = 0x063a46
+		objA0.countdown_value = 0x7f
+		fn0685e2()
+	}
+
+	fn091988()
+	DrawObject()
+}
+
+
+//# address-hook(0x063a46) end(0x063a64)
+function void fn063a46()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value == 0)
+	{
+		objA0.velocity.x = 0x0400
+	}
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn091988()
+	Object.DrawOrUnload()
+}
+
+
+
+//# address-hook(0x06618a) end(0x0661de)
+function void fn06618a()
+{
+	if (objA0.animation.sprite != objA0.value3a)
+	{
+		objA0.value3a = objA0.animation.sprite
+		updateMultipleSpritePatterns(0x1200e0, 0x14bd0a, 0xd400, objA0.animation.sprite)
+	}
+}
+
+
+
+// Critter animations
+
+//# address-hook(0x065e02) end(0x065e4a)
+function void fn065e02()
+{
+	GetRandomNumber()
+	D0.u16 = -(D0.u16 & 0x01ff) - 0x0100
+	objA0.velocity.y = D0.u16
+
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1.u16 = 0x0100
+	bool skip = false
+	if ((u8[0xfffffab8] & 0x04) == 0)
+	{
+		objA0.render_flags &= ~0x01
+		D2.u16 = objA0.position.x.u16
+		if (D2.u16 < u16[A0 + 0x3a])
+		{
+			skip = true
+		}
+		else if (D2.u16 <= u16[A0 + 0x3c] && D0.s16 >= 0)
+		{
+			skip = true
+		}
+	}
+
+	if (!skip)
+	{
+		D1.s16 = -D1.s16
+		objA0.render_flags |= 0x01
+	}
+	objA0.velocity.x = D1.u16
+}

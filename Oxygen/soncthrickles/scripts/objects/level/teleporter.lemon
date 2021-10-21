@@ -1,0 +1,928 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Teleporter (in HPZ, SSZ, CNZ/ICZ transition)          //
+//-------------------------------------------------------//
+
+
+// Teleporter in Hidden Palace Zone and Sky Sanctuary Zone
+
+//# address-hook(0x045528) end(0x0455c8)
+function void fn045528()
+{
+	objA0.update_address = 0x0455cc
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x18
+	objA0.sprite_priority = 0x0180
+	objA0.sprite_attributes = 0x035c
+	objA0.mapping_offset = 0x046b3c
+	u16[A0 + 0x16] = objA0.position.y.u16
+
+	if (objA0.subtype2c & 0x80)
+	{
+		A1 = (objA0.subtype2c & 0x40) ? 0xffffeed4 : 0xffffeed2
+		if ((u8[A1] & 0x80) == 0)
+		{
+		#if STANDALONE
+			if (!Game.isTimeAttack())
+		#endif
+			{
+				// Start inside the floor
+				objA0.velocity.y = 0x20
+			}
+		}
+	}
+
+	if (global.zone_act == 0x1701)
+	{
+		// Hidden Palace when entered through Giant Ring
+		objA0.sprite_attributes = 0x0488
+		objA0.animation.sprite = 0x0a
+	}
+	else if (global.zone == 0x16)
+	{
+		// Hidden Palace in normal gameplay
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x045b94
+			u16[A1 + 0x2e] = A0.u16
+		}
+
+		objA0.sprite_attributes = 0x052e
+		if (global.characters == CHARS_KNUCKLES_ALONE)
+		{
+			objA0.subtype2c = 0x4a
+		}
+		objA0.animation.sprite = 0x0a
+	}
+	else	// Sky Sanctuary?
+	{
+		if (objA0.position.x.u16 >= 0x1a00 && objA0.position.y.u16 < 0x0680)
+		{
+			fn045a66()
+			return
+		}
+	}
+
+	fn0455cc()
+}
+
+
+//# address-hook(0x0455cc) end(0x0456ee)
+function void fn0455cc()
+{
+	if (global.zone == 0x16)	// Hidden Palace in normal gameplay
+	{
+		if (objA0.flags38 == 0)
+		{
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				u32[0xfffffc62] = 0x040c0408
+				u8[0xfffff650] = 0xff
+			}
+			else
+			{
+				u8[0xfffff650] = 0
+			}
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x16] + objA0.velocity.y
+	objA0.position.y.u16 = D0.u16
+	fn045866()
+
+	fn0455cc_sub()
+
+	DrawOrUnloadObject()
+}
+
+
+function void fn0455cc_sub()
+{
+	if (objA0.subtype2c == 0 && u8[0xffffeed6] != 0)
+		return
+
+	if (objA0.velocity.y == 0)
+	{
+		D1 = 0x23
+		A2 = 0x0466e8
+		D4.u16 = objA0.position.x.u16
+		fn01e2fe()
+	}
+
+	if (objA0.subtype2c == 0)
+		return
+
+	if (objA0.subtype2c & 0x80)
+	{
+		A1 = (objA0.subtype2c & 0x40) ? 0xffffeed4 : 0xffffeed2
+	#if STANDALONE
+		if (Game.isTimeAttack())
+		{
+			u8[A1] = 0xff
+		}
+		else
+	#endif
+		if ((u8[A1] & 0x80) == 0)
+			return
+
+		if (objA0.velocity.y != 0)
+		{
+			if ((level.framecounter & 0x03) == 0)
+			{
+				--objA0.velocity.y
+			}
+			return
+		}
+	}
+
+	if (objA0.flags2a & 0x08)
+	{
+		A2 = 0xffffb000
+		D0.u16 = u16[A2 + 0x10] - objA0.position.x.u16 + 0x0c
+		if (D0.u16 < 0x18)
+		{
+			if (u8[A2 + 0x2e] == 0 && u8[A2 + 0x05] < 0x04 && debug_mode.state == 0)
+			{
+				if (allocDynamicObjectAfterA0())
+				{
+					u16[A0 + 0x3c] = A1.u16
+					objA1.update_address = 0x0458b4
+					u16[A1 + 0x48] = A0.u16
+					objA1.position.x.u16 = objA0.position.x.u16
+					objA1.position.y.u16 = objA0.position.y.u16
+					u16[A2 + 0x18] = 0
+					u16[A2 + 0x1c] = 0
+					u16[A2 + 0x1a] = 0xffff
+					u8[A2 + 0x3d] = 0
+					u8[A2 + 0x2e] = 0x01
+					u8[A2 + 0x20] = 0x05
+					objA0.update_address = 0x0456f4
+					u16[A0 + 0x38] = 0xff00
+
+					playSound(0x53)
+				}
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0456f4) end(0x0457b8)
+function void fn0456f4()
+{
+	fn045856()
+
+	A1 = 0xffffb000
+	A2 = 0xffff0000 + u16[A0 + 0x3c]
+	if (s8[A2 + 0x46] >= 0x08)
+	{
+		if (u8[A2 + 0x46] != 0x08)
+		{
+			if (u8[A2 + 0x46] < 0x18)
+			{
+				if (level.framecounter.low & 0x01)
+				{
+					--objA1.position.y.u16
+					if (level.framecounter.low & 0x02)
+					{
+						D1 = 1
+						D0.u16 = objA1.position.x.u16
+						if (D0.u16 != objA0.position.x.u16)
+						{
+							if (D0.u16 >= objA0.position.x.u16)
+								D1.s16 = -D1.s16
+							objA1.position.x.u16 += D1.u16
+						}
+					}
+				}
+			}
+			else
+			{
+				objA0.update_address = 0x0457be
+				D0.u8 = objA0.subtype2c
+				if (global.zone != 0x16)
+					D0.u16 &= 0x3f
+				u8[A0 + 0x2d] = D0.u8
+				u8[A1 + 0x2e] = 3
+				u8[A1 + 0x20] = 0
+				u8[A1 + 0x22] = 0
+
+				if (global.zone == 0x16)
+				{
+					move_area.left = 0x0aa0 - getScreenExtend()
+				}
+				else
+				{
+					level.vertical_wrap = 0xff00
+					D0.u16 = 0x1000
+					move_area.bottom.current = D0.u16
+					move_area.bottom.target = D0.u16
+				}
+
+				u8[0xffffeed7] = 0
+				playSound(0x73)
+				player1.camera_lock = 0xff
+			}
+		}
+		else
+		{
+			objA1.flags2a &= ~char.flag.ON_OBJECT
+			objA1.flags2a |= char.flag.ROLLING
+			objA1.state = char.state.ROLLING
+		#if STANDALONE
+			objA1.groundspeed = 0	// Kill drop dash effect
+		#endif
+			u8[0xffffeed6] = 0xff
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x0457be) end(0x045816)
+function void fn0457be()
+{
+	fn045856()
+
+	A1 = 0xffffb000
+	if (u8[A0 + 0x2d] == 0)
+	{
+		u8[A1 + 0x2e] = 0x01
+		u8[A1 + 0x20] = 0x02
+		u8[A1 + 0x2a] |= 0x04
+		objA0.value3e = objA1.position.y.u16
+		u32[A0 + 0x2e] = 0
+		u32[A0 + 0x32] = 0
+		u8[A0 + 0x36] = 0
+		player1.camera_lock = 0
+
+		A1 = 0xffff0000 + u16[A0 + 0x3c]
+		u8[A1 + 0x05] = 0xff
+		objA0.update_address = 0x04581c
+	}
+	else
+	{
+		objA1.position.y.u16 -= 0x10
+		--u8[A0 + 0x2d]
+		if (u8[A0 + 0x2d] != 0)
+		{
+			camera.position.y.u16 -= 0x10
+		}
+
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x04581c) end(0x045854)
+function void fn04581c()
+{
+	fn045856()
+
+	A1 = 0xffffb000
+	D0 = 0x020000
+	D1 = 0x0800
+	fn0465d6()
+
+	D0.u16 += objA0.value3e
+	objA1.position.y.u16 = D0.u16
+	if (s32[A0 + 0x2e] >= 0)
+	{
+		u8[A1 + 0x2e] = 0
+		u8[A1 + 0x20] = 0
+		u8[0xffffeed6] = 0
+		objA0.update_address = 0x0455cc
+	}
+}
+
+
+
+//# address-hook(0x045856) end(0x045860)
+function void fn045856()
+{
+	D1 = 0x23
+	A2 = 0x0466e8
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+	fn045866()
+}
+
+
+//# address-hook(0x045866) end(0x0458b2)
+function void fn045866()
+{
+	if (objA0.value39 != 0)
+	{
+		--objA0.value39
+	}
+	else
+	{
+		objA0.value39 = 0x03
+		D0.u16 = u16[A0 + 0x3a]
+		if (D0.u16 == 0 && objA0.flags38 == 0)
+			return
+
+		D0.u16 += 4
+		if (D0.u16 >= 0x28)
+			D0 = 0
+		u16[A0 + 0x3a] = D0.u16
+
+		A1 = 0x04670c
+		if (global.zone == 0x0a)	// Sky Sanctuary
+		{
+			u32[0xfffffc58] = u32[A1 + D0.s16]
+		}
+		else
+		{
+			u16[0xfffffc62] = u16[A1 + D0.s16 + 0x02]
+			u16[0xfffffc64] = u16[A1 + D0.s16]
+		}
+	}
+}
+
+
+
+// Teleporter in HPZ that brings you to SSZ
+
+//# address-hook(0x045b94) end(0x045bf2)
+function void fn045b94()
+{
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		// Knuckles' HPZ teleporter
+		if (camera.position.y.u16 >= 0x0240 || u16[0xffffb010] < 0x0b00)
+			return
+
+		playMusic(MUSIC_CTRL_FADEOUT)
+
+		u8[0xffffef56] = 0xff
+		SaveGameOnLevelFinished()
+
+		D0.u16 = 0x0a01
+		TriggerNextZone()
+	}
+	else
+	{
+		// Sonic's / Tails's HPZ teleporter (part of the HPZ cutscene)
+		A1 = 0xffff0000 + u16[A0 + 0x2e]
+		if (objA1.position.x.u16 < 0x1000)
+		{
+			UnloadObject()
+			return
+		}
+
+		u32[0xfffffc62] = 0x040c0408
+		u8[0xfffff650] = 0xff
+		objA1.update_address = 0x045ad6
+		objA0.update_address = 0x045bf4
+	}
+}
+
+
+//# address-hook(0x045bf4) end(0x045c8c)
+function void fn045bf4()
+{
+	u16 minX = 0x1600
+	u16 maxX = minX + getScreenExtend() * 2
+	if (camera.position.x.u16 <= minX && move_area.right != maxX)
+	{
+		move_area.right = maxX
+		level.vertical_wrap = 0
+	}
+
+	A1 = 0xffffb000
+	A2 = 0xfffff602		// Address of "control.player1"
+	A3 = 0xfffff7ca		// Address of "player1.control_override"
+	A4 = A0 + 0x30
+	A5 = A0 + 0x31
+	D6 = 0
+	fn045c8e()
+
+	if (getNumPlayers() >= 2)
+	{
+		A1 = 0xffffb04a
+		A2 = 0xfffff66a		// Address of "control.tails"
+		A3 = 0xfffff7cb		// Address of "player2.control_override"
+		A4 = A0 + 0x31
+		A5 = A0 + 0x30
+		D6 = 1
+		fn045c8e()
+	}
+
+	if (objA0.subtype2c != 0)
+	{
+		--u8[A0 + 0x2d]
+		if (u8[A0 + 0x2d] == 0)
+		{
+			if (objA0.subtype2c == 1)
+			{
+				u8[0xfffffab8] |= 0x40
+				u16[A0 + 0x2c] = 0x023c
+			}
+			else
+			{
+				A1 = 0xffff0000 + u16[A0 + 0x2e]
+				u8[A1 + 0x05] = 0xff
+				u16[A0 + 0x2c] = 0
+			}
+		}
+	}
+
+	if (objA0.base_state != 0)
+	{
+		--camera.position.x.u16
+		if (objA0.base_state & 0x01)
+		{
+			--camera.position.y.u16
+		}
+		--objA0.base_state
+	}
+}
+
+
+//# address-hook(0x045c8e) end(0x045dac)
+function void fn045c8e()
+{
+	// s8[A4] is the state of this character:
+	//  - 0x00	-> Has not reached the teleporter yet
+	//  - 0x01	-> Waiting for character to touch the ground
+	//  - 0x02	-> Waiting for other character
+	//  - 0x03	-> Waiting to jump in
+	//  - 0x04	-> Jumping in
+	//  - 0x05	-> Teleporting
+	D0.s8 = s8[A4]
+	if (D0.s8 < 0)
+		return
+
+	if (D0.u8 == 0)
+	{
+		// Waiting for characters to reach a certain spot
+		//  - D6.u16 tells us the player index (0 or 1)
+		D0.u16 = (D6.u16 == 0) ? 0x1628 : 0x1638
+		if (D0.u16 >= objA1.position.x.u16)
+		{
+		#if STANDALONE
+			// Tails can get left behind and won't fly in properly without this
+			if (D6.u16 == 0 || tails.ai_routine != 0x04)
+		#endif
+			{
+				objA1.position.x.u16 = D0.u16
+				objA1.velocity.x = 0
+				u16[A1 + 0x1c] = 0
+			#if STANDALONE
+				objA1.flags2a |= char.flag.FACING_LEFT	// Another small fix for Tails
+			#endif
+				u16[A2] = 0
+				u8[A3] = 0xff	// Activate player1.control_override / player2.control_override
+				++u8[A4]
+			}
+		}
+	}
+	else if (D0.u8 == 1)
+	{
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+			return
+
+		u8[A4 + 0x02] = (D6.u16 == 0) ? 0xa0 : 0xdc
+		++u8[A4]
+	}
+	else if (D0.u8 == 2)
+	{
+		if (getNumPlayers() >= 2 && u8[A5 + 0x02] == 0)
+			return
+
+		// Start camera movement to the transporter
+		u16[A0 + 0x2c] = 0x013c
+		objA0.base_state = 0x48
+		player1.camera_lock = 0xff
+		++u8[A4]
+	}
+	else if (D0.u8 == 3)
+	{
+		if (u16[A0 + 0x2c] != 0)
+			return
+
+		--u8[A4 + 0x02]
+		if (u8[A4 + 0x02] == 0)
+		{
+			objA1.velocity.x = -0x100
+			u16[A2] = 0x2424
+			++u8[A4]
+		}
+	}
+	else if (D0.u8 == 4)
+	{
+		D0.u16 = 0x15c0
+		if (D0.u16 >= objA1.position.x.u16)
+		{
+			objA1.position.x.u16 = D0.u16
+			objA1.position.y.u16 -= 0x80
+			objA1.velocity.x = 0
+			u16[A1 + 0x1c] = 0
+			u8[A1 + 0x2e] = 0x03
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x22] = 0
+
+			u16[A2] = 0
+			playSound(0x73)
+
+			if (D6.u16 != 0)
+			{
+				u8[A4] = 0xff
+			}
+			else
+			{
+				u8[A4 + 0x02] = (getNumPlayers() >= 2) ? 0x78 : 0x3c
+				++u8[A4]
+			}
+		}
+		else
+		{
+			u16[A2] = 0x2404
+		}
+	}
+	else
+	{
+		--u8[A4 + 0x02]
+		if (u8[A4 + 0x02] == 0)
+		{
+			playMusic(MUSIC_CTRL_FADEOUT)
+
+			u8[0xffffef56] = 0xff
+			SaveGameOnLevelFinished()
+
+			D0.u16 = 0x0a00
+			TriggerNextZone()
+		}
+	}
+}
+
+
+
+// Teleporter object at Knuckles' end of CNZ 2
+
+//# address-hook(0x0522a0) end(0x0522fe)
+function void fn0522a0()
+{
+	A1 = 0xffffb000
+	if (objA1.position.x.u16 >= 0x4a38)
+	{
+		if (u8[A1 + 0x2a] & 0x02)
+		{
+			D0.u16 = 0x4a40
+			if (D0.u16 > objA1.position.x.u16)
+				return
+
+			objA1.position.x.u16 = D0.u16
+		}
+
+		objA1.velocity.x = 0
+		u16[A1 + 0x1c] = 0
+		player1.control_override = 0xff
+		control.player1 = 0
+
+		Kosinski.addToDMAQueue(0x159cae, 0xa000)
+
+		A1 = 0xfffffc22
+		objA1.update_address = 0x0eee0ec0
+		u16[A1 + 0x0e] = 0x0ea2
+		u16[A1 + 0x12] = 0x0e80
+		objA0.update_address = 0x052300
+	}
+}
+
+
+//# address-hook(0x052300) end(0x052348)
+function void fn052300()
+{
+	if (kosinski.waiting_modules == 0)
+	{
+		A1 = 0xffffb000
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			if (allocDynamicObjectAfterA0())
+			{
+				u16[A0 + 0x3c] = A1.u16
+				objA1.update_address = 0x0458b4
+				u16[A1 + 0x48] = A0.u16
+
+				D0.u16 = 0x4a40
+				objA0.position.x.u16 = D0.u16
+				objA1.position.x.u16 = D0.u16
+				objA1.position.y.u16 = 0x0a38
+
+				playSound(0x53)
+				objA0.update_address = 0x05234a
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x05234a) end(0x0523c8)
+function void fn05234a()
+{
+	A1 = 0xffffb000
+	A2 = 0xffff0000 + u16[A0 + 0x3c]
+	if (s8[A2 + 0x46] >= 0x08)
+	{
+		if (u8[A2 + 0x46] != 0x08)
+		{
+			if (u8[A2 + 0x46] < 0x18)
+			{
+				if ((level.framecounter.low & 0x01) == 0)
+					return
+
+				--objA1.position.y.u16
+				if ((level.framecounter.low & 0x02) == 0)
+					return
+
+				D1 = 1
+				D0.u16 = objA1.position.x.u16
+				if (D0.u16 == objA0.position.x.u16)
+					return
+
+				if (D0.u16 >= objA0.position.x.u16)
+					D1.s16 = -D1.s16
+
+				objA1.position.x.u16 += D1.u16
+				return
+			}
+
+			objA0.update_address = 0x0523ca
+			u8[A1 + 0x2e] = 3
+			objA1.position.y.u16 = 0
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x22] = 0
+
+			playSound(0x73)
+			player1.camera_lock = 0xff
+		}
+		else
+		{
+			u8[A1 + 0x2e] = 1
+			u8[A1 + 0x2a] |= 0x04
+			u8[A1 + 0x20] = 0x02
+		}
+	}
+}
+
+
+//# address-hook(0x0523ca) end(0x0523ea)
+function void fn0523ca()
+{
+	camera.position.y.u16 -= 0x10
+	if (camera.position.y.u16 < 0x0780)
+	{
+		playMusic(MUSIC_CTRL_FADEOUT)
+
+		D0.u16 = 0x0500
+		TriggerNextZone()
+	}
+}
+
+
+
+// Teleporter beam
+
+//# address-hook(0x0458b4) end(0x045910)
+function void fn0458b4()
+{
+	objA0.update_address = 0x045916
+	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.box_size.y = 0x80
+	objA0.box_size.x = 0x18
+	objA0.sprite_priority = 0x80
+	objA0.mapping_offset = 0x046b3c
+	u16[A0 + 0x16] = 0x01
+	u16[A0 + 0x44] = objA0.position.y.u16 - 0x88
+	u8[A0 + 0x47] = 0x10
+
+	if (global.zone == 0x03)
+	{
+		objA0.sprite_attributes = 0x24ee
+	}
+	else if (global.zone == 0x16)
+	{
+		objA0.sprite_attributes = 0x652e
+	}
+	else
+	{
+		objA0.sprite_attributes = 0xe35c
+	}
+
+	fn045916()
+}
+
+
+//# address-hook(0x045916) end(0x045990)
+function void fn045916()
+{
+	if (u8[A0 + 0x47] != 0)
+	{
+		--u8[A0 + 0x47]
+		return
+	}
+
+	if ((level.framecounter.low & 0x01) == 0)
+		return
+
+	A1 = A0 + 0x18
+	D0.u16 = objA0.position.y.u16
+	D1.u16 = u16[A0 + 0x16] - 1
+
+	while (D1.s16 >= 0)
+	{
+		u16[A1] = objA0.position.x.u16
+		u16[A1 + 0x02] = D0.u16
+		if (D1.u16 == 0)
+		{
+			u8[A0 + 0x46] ^= 0xff
+			if (u8[A0 + 0x46] & 0xff)
+			{
+				u8[A1 + 0x05] = 1
+			}
+			else
+			{
+				u8[A1 + 0x05] = 2
+				++u16[A0 + 0x16]
+			}
+		}
+		else
+		{
+			u8[A1 + 0x05] = 2
+			D0.u16 -= 0x20
+			A1 += 6
+		}
+
+		--D1.s16
+	}
+
+	if (u16[A0 + 0x16] >= 7 && u8[A0 + 0x46] == 0)
+	{
+		objA0.update_address = 0x045992
+		u8[A0 + 0x47] = 0x10
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x045992) end(0x0459ae)
+function void fn045992()
+{
+	--u8[A0 + 0x47]
+	if (u8[A0 + 0x47] != 0)
+	{
+		if (level.framecounter.low & 0x01)
+		{
+			DrawObject()
+		}
+	}
+	else
+	{
+		objA0.update_address = 0x0459b4
+		u16[A0 + 0x16] = 2
+		fn0459b4()
+	}
+}
+
+
+//# address-hook(0x045a66) end(0x045a6c)
+function void fn045a66()
+{
+	objA0.update_address = 0x045a72
+	objA0.sprite_attributes += 0x8000
+	fn045a72()
+}
+
+
+//# address-hook(0x045a72) end(0x045ad0)
+function void fn045a72()
+{
+	if (objA0.value32 != 0)
+	{
+		--objA0.value32
+		if (objA0.value32 != 0)
+		{
+			DrawObject()
+		}
+		else
+		{
+			UnloadObject()
+		}
+		return
+	}
+
+	if (u16[A0 + 0x2e] == 0)
+	{
+		if (camera.position.y.u16 == move_area.bottom.current)
+		{
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x07b288
+				u16[0xfffffaa4] = A1.u16
+				u16[A0 + 0x30] = A1.u16
+				objA0.flags2e = 0xff
+			}
+		}
+	}
+	else
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x30]
+		if (objA1.position.x.u16 <= objA0.position.x.u16)
+		{
+			objA0.value32 = 0x20
+			spawnChildObjects(0x083fee)
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x045ad6) end(0x045b16)
+function void fn045ad6()
+{
+	fn045866()
+	if (objA0.base_state != 0)
+	{
+		if (allocDynamicObjectAfterA0())
+		{
+			u16[A0 + 0x3c] = A1.u16
+			objA1.update_address = 0x0458b4
+			u16[A1 + 0x48] = A0.u16
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			objA0.update_address = 0x045b1c
+			u16[A0 + 0x38] = 0xff00
+
+			playSound(0x53)
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x045b1c) end(0x045b84)
+function void fn045b1c()
+{
+	fn045866()
+
+	A1 = 0xffff0000 + u16[0xfffffaa4]
+	A2 = 0xffff0000 + u16[A0 + 0x3c]
+	if (s8[A2 + 0x46] >= 0x08)
+	{
+		if (u8[A2 + 0x46] != 0x08)
+		{
+			if (u8[A2 + 0x46] < 0x18)
+			{
+				if (level.framecounter.low & 0x01)
+				{
+					--objA1.position.y.u16
+					if (level.framecounter.low & 0x02)
+					{
+						D0.u16 = objA1.position.x.u16
+						if (D0.u16 != objA0.position.x.u16)
+						{
+							D1 = (D0.u16 >= objA0.position.x.u16) ? -1 : 1
+							objA1.position.x.u16 += D1.u16
+						}
+					}
+				}
+			}
+			else
+			{
+				u32[A1] = 0
+				playSound(0x73)
+				objA0.update_address = 0x045b8a
+			}
+		}
+		else
+		{
+			u8[0xfffffab8] |= 0x80
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x045b8a) end(0x045b8e)
+function void fn045b8a()
+{
+	fn045866()
+	DrawObject()
+}

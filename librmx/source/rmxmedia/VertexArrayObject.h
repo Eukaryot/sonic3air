@@ -1,0 +1,52 @@
+/*
+*	rmx Library
+*	Copyright (C) 2008-2021 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*
+*	VertexArrayObject
+*		Support for OpenGL VAOs.
+*/
+
+#pragma once
+
+
+namespace opengl
+{
+	class VertexArrayObject
+	{
+	public:
+		enum class Format
+		{
+			UNDEFINED,
+			P2,			// 2D position
+			P2_C3,		// 2D position, RGB color
+			P2_C4,		// 2D position, RGBA color
+			P2_T2		// 2D position, 2D texcoords
+						// ...add more as needed
+		};
+
+	public:
+		~VertexArrayObject();
+
+		void setup(Format format);
+
+		inline size_t getNumBufferedVertices() const  { return mNumBufferedVertices; }
+		void updateVertexData(const float* vertexData, size_t numVertices);
+
+		void bind();
+		void unbind();
+
+		void draw(GLenum mode);		// Shortcut for "bind()" + "glDrawArrays(mode, 0, mNumBufferedVertices)"
+
+	private:
+		GLuint mHandle = 0;						// Vertex array object handle
+		GLuint mVertexBufferObjectHandle = 0;	// We could actually use multiple VBOs (e.g. one for positions, one for texcoords), but one is sufficient
+		Format mCurrentFormat = Format::UNDEFINED;
+
+		size_t mNumBufferedVertices = 0;
+		size_t mNumVertexAttributes = 0;
+		size_t mFloatsPerVertex = 0;
+	};
+}

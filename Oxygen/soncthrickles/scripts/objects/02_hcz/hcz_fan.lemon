@@ -1,0 +1,474 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x030580) end(0x03064c)
+function void fn030580()
+{
+	if (competition_mode.active)
+	{
+		fn0309cc()
+		return
+	}
+
+	A1 = A0
+	if (s8[A0 + 0x2c] < 0)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+
+		objA0.update_address = 0x030850
+		u16[A0 + 0x40] = objA0.position.x.u16
+		objA0.position.y.u16 += 0x1c
+		objA0.mapping_offset = 0x22e76c
+		objA0.sprite_attributes = 0x43d4
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x10
+		objA0.render_flags = render_flag.WORLD
+		objA0.sprite_priority = 0x0280
+		u16[A0 + 0x3c] = A1.u16
+		u16[A0 + 0x3a] = (objA0.subtype2c & 0x30) * 2
+		u8[A1 + 0x2c] = (objA0.subtype2c & ~0x20) | 0x10
+	}
+
+	u32[A1 + 0x0c] = 0x22f3aa
+	u16[A1 + 0x0a] = 0x240b
+	u8[A1 + 0x04] |= 0x04
+	u16[A1 + 0x08] = 0x0200
+	u8[A1 + 0x07] = 0x10
+	u8[A1 + 0x06] = 0x0c
+	u16[A1 + 0x40] = objA1.position.x.u16
+	D0.u16 = ((u8[A1 + 0x2c] & 0x0f) + 8) << 4
+	u16[A1 + 0x36] = D0.u16
+	D0.u16 += 0x30
+	u16[A1 + 0x38] = D0.u16
+	objA1.update_address = 0x03064e
+}
+
+
+//# address-hook(0x03064e) end(0x030778)
+function void fn03064e()
+{
+	if (objA0.subtype2c & 0x20)
+	{
+		if (level.trigger00 == 0)
+		{
+			D0.u16 = u16[A0 + 0x40]
+			DrawOrUnloadObjectByD0()
+			return
+		}
+
+		objA0.subtype2c &= ~0x20
+		objA0.subtype2c |= 0x10
+	}
+
+	bool goto0306c2 = false
+	if (u8[A0 + 0x42] == 0)
+	{
+		if ((objA0.subtype2c & 0x10) == 0)
+		{
+			--u16[A0 + 0x30]
+			if (s16[A0 + 0x30] < 0)
+			{
+				u8[A0 + 0x32] ^= 0x01
+				u16[A0 + 0x30] = (u8[A0 + 0x32] & 0x01) ? 0x78 : 0xb4
+				u16[A0 + 0x34] = 0
+			}
+
+			goto0306c2 = (u8[A0 + 0x32] == 0)
+		}
+		else
+		{
+			goto0306c2 = true
+		}
+	}
+
+	bool goto0306f2 = false
+	if (!goto0306c2)
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			if (u16[A0 + 0x34] < 0x0400)
+			{
+				u16[A0 + 0x34] += 0x2a
+				objA0.animation.timer = u8[A0 + 0x34]
+
+				++objA0.animation.sprite
+				if (objA0.animation.sprite >= 5)
+					objA0.animation.sprite = 0
+
+				goto0306f2 = true
+			}
+		}
+	}
+	else
+	{
+		A1 = 0xffffb000
+		fn03077e()
+
+		A1 = 0xffffb04a
+		fn03077e()
+
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 0
+
+			++objA0.animation.sprite
+			if (objA0.animation.sprite >= 5)
+				objA0.animation.sprite = 0
+		}
+
+		goto0306f2 = true
+	}
+
+	if (goto0306f2)
+	{
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			if (((level.framecounter.low + 1) & 0x0f) == 0)
+			{
+				playSound(0xc1)
+			}
+		}
+
+		if (objA0.subtype2c & 0x40)
+		{
+			if ((level.framecounter.low & 0x03) == 0)
+			{
+				// Create a new bubble
+				if (allocDynamicObjectStd())
+				{
+					objA1.update_address = 0x030834
+					u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+					u8[A1 + 0x07] = 0x04
+					u16[A1 + 0x08] = 0x0300
+					u16[A1 + 0x0a] = 0x045c
+					u32[A1 + 0x0c] = 0x02fcb2
+					objA1.position.x.u16 = objA0.position.x.u16
+
+					GetRandomNumber()
+					objA1.position.x.u16 += (D0.u16 & 0x0f) - 8
+					objA1.position.y.u16 = objA0.position.y.u16
+					objA1.velocity.y = -0x800
+				}
+			}
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x40]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x03077e) end(0x030832)
+function void fn03077e()
+{
+#if STANDALONE
+	if (debug_mode.state != 0)
+		return
+#endif
+
+	if (u8[A1 + 0x05] >= 0x04)
+		return
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x18
+	if (D0.u16 < 0x30)
+	{
+		D1 = objA1.position.y.u16 + u16[A0 + 0x36] + u8[0xfffffe84] - objA0.position.y.u16
+		if (D1.s16 >= 0 && D1.u16 < u16[A0 + 0x38])
+		{
+			if (u8[A1 + 0x2e] == 0)
+			{
+				D1.u16 -= u16[A0 + 0x36]
+				if (D1.s16 >= 0)
+				{
+					D1.u16 ^= 0xffff
+					D1.u16 *= 2
+				}
+
+				D1.u16 += u16[A0 + 0x36]
+				D1.s16 = (-D1.s16) >> 6
+				objA1.position.y.u16 += D1.u16
+				objA1.velocity.y = 0
+				objA1.flags2a |= char.flag.IN_AIR
+				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				u8[A1 + 0x2f] = 0
+				u8[A1 + 0x40] = 0
+
+				if (objA0.subtype2c & 0x40)
+				{
+					// Underwater fan
+					objA1.state = char.state.LIFTED
+				}
+				else if (u8[A1 + 0x27] == 0)
+				{
+					objA1.state = char.state.RUNNING
+					u8[A1 + 0x27] = 1
+					u8[A1 + 0x30] = 0x7f
+					u8[A1 + 0x31] = 0x08
+				}
+
+			#if STANDALONE
+				// Fix for bug when Tails carries other player and gets caught by the fan
+				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
+				{
+					u8[0xffffb02a] |= char.flag.IN_AIR
+					u8[0xffffb02e] = 0
+				}
+			#endif
+			}
+
+			u16[A1 + 0x1c] = 1
+		}
+	}
+}
+
+
+
+// Bubble
+
+//# address-hook(0x030834) end(0x03084a)
+function void fn030834()
+{
+#if STANDALONE
+	bool shouldDespawn = (objA0.position.y.u16 <= water.height.current + 4)
+	// Also despawn above the screen
+	//  -> Without this, there's kind of a spam of bubbles in HCZ 1 (around X=0x1f40, Y=0x08c0) that can prevent regular object spawn
+	shouldDespawn = shouldDespawn || (objA0.position.y.u16 < camera.position.y.u16 - 0x10)
+#else
+	bool shouldDespawn = (objA0.position.y.u16 <= water.height.current)
+#endif
+	if (shouldDespawn)
+	{
+		UnloadObject()
+		return
+	}
+
+	UpdateMovementStraightSimple()
+	DrawObject()
+}
+
+
+
+// Some other object
+
+//# address-hook(0x030850) end(0x0308f4)
+function void fn030850()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+
+	if (D0.s16 >= 0x20)
+	{
+		if (u8[A1 + 0x42] == 0)
+		{
+			u8[A1 + 0x42] = 0x01
+			u16[A1 + 0x34] = 0
+			playSound(0x58)
+		}
+
+		D1.u16 = u16[A0 + 0x3a]
+		if (D1.u16 != u16[A0 + 0x30])
+		{
+			u16[A0 + 0x30] += 8
+		}
+	}
+	else if (D0.s16 < -0x30)
+	{
+		if (u8[A1 + 0x42] != 0)
+		{
+			u8[A1 + 0x42] = 0
+			u8[A1 + 0x24] = 0
+			playSound(0x58)
+		}
+
+		if (u16[A0 + 0x30] != 0)
+		{
+			u16[A0 + 0x30] -= 8
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x30]
+	if (objA0.flags2a & 0x01)
+		D0.s16 = -D0.s16
+	D0.u16 += u16[A0 + 0x40]
+	objA0.position.x.u16 = D0.u16
+	objA1.position.x.u16 = D0.u16
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u16 = u16[A0 + 0x40]
+	DrawOrUnloadObjectByD0()
+}
+
+
+
+// Fans creating strong underwater currents
+// (They actually don't, it's just an effect, the current is there nevertheless)
+
+//# address-hook(0x0308fa) end(0x030936)
+function void fn0308fa()
+{
+	D0.u16 = u16[0xffffb010] - 0x20
+	if (D0.u16 >= objA0.position.x.u16)
+	{
+		D0.u16 = u16[0xffffb014] - objA0.position.y.u16 - 0x20
+		if (D0.u16 < 0x40)
+		{
+			Kosinski.addToDMAQueue(0x390900, 0xa000)
+
+			objA0.update_address = 0x03093c
+			fn03093c()
+			return
+		}
+	}
+
+	u8[0xfffff7c7] = 3
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03093c) end(0x030978)
+function void fn03093c()
+{
+	if (kosinski.waiting_modules != 0)
+		return
+
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	objA0.mapping_offset = 0x22f418
+	objA0.sprite_attributes = 0x2500
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x20
+	u16[A0 + 0x30] = 0x08
+
+	playSound(0x58)
+
+	objA0.update_address = 0x03097e
+	fn03097e()
+}
+
+
+//# address-hook(0x03097e) end(0x0309c6)
+function void fn03097e()
+{
+	if (u16[A0 + 0x30] != 0)
+	{
+		objA0.position.y.u16 += 8
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			u8[0xfffff7c7] = 0
+		}
+	}
+
+	D0.u8 = level.framecounter.low & 0x0f
+	if (D0.u8 == 0)
+	{
+		playSound(0xc0)
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 0
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 5)
+			objA0.animation.sprite = 0
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+
+// Competition mode fan, from CGZ
+
+//# address-hook(0x0309cc) end(0x030a0a)
+function void fn0309cc()
+{
+	objA0.mapping_offset = 0x22f620
+	objA0.sprite_attributes = 0x6300
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x04
+
+	D0.u16 = ((objA0.subtype2c & 0x0f) + 8) << 4
+	u16[A0 + 0x36] = D0.u16
+	D0.u16 += 0x30
+	u16[A0 + 0x38] = D0.u16
+
+	u32[A0] = 0x030a10
+	fn030a10()
+}
+
+
+//# address-hook(0x030a10) end(0x030a32)
+function void fn030a10()
+{
+	A1 = 0xffffb000
+	fn030a38()
+
+	A1 = 0xffffb04a
+	fn030a38()
+
+	++objA0.animation.sprite
+	if (objA0.animation.sprite >= 3)
+	{
+		objA0.animation.sprite = 0
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x030a38) end(0x030ace)
+function void fn030a38()
+{
+	if (u8[A1 + 0x05] >= 0x04 || u8[A1 + 0x2e] != 0)
+		return
+
+	u16 dx = u16[A1 + 0x10] - objA0.position.x.u16 + 0x14
+	s16 dy = u8[0xfffffe84] + u16[A1 + 0x14] + u16[A0 + 0x36] - objA0.position.y.u16
+	if (dx < 0x28 && dy >= 0 && dy < u16[A0 + 0x38])
+	{
+		D1.u16 = dy - u16[A0 + 0x36]
+		if (D1.s16 >= 0)
+		{
+			D1.u16 ^= 0xffff
+			D1.u16 *= 2
+		}
+		D1.u16 += u16[A0 + 0x36]
+		D1.s16 = -D1.s16 >> 6
+		u16[A1 + 0x14] += D1.u16
+		u8[A1 + 0x2a] |= 0x02
+		objA1.flags2a &= ~char.flag.CONTROL_LOCK
+		u16[A1 + 0x1a] = 0
+		u8[A1 + 0x2f] = 0
+		u8[A1 + 0x40] = 0
+		u16[A1 + 0x1c] = 0x01
+
+		if (u8[A1 + 0x27] == 0)
+		{
+			u8[A1 + 0x27] = 0x01
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x30] = 0x7f
+			u8[A1 + 0x31] = 0x08
+		}
+	}
+}

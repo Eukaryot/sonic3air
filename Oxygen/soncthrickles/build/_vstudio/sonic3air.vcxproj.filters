@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="_resources">
+      <UniqueIdentifier>{985846cd-e7a9-4570-8e72-6929fcb04dd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="audio">
+      <UniqueIdentifier>{a01403dc-3777-4e1b-bc32-94e81ed12b2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{42163305-1062-4b89-bda4-c1d0beec816a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="debug">
+      <UniqueIdentifier>{0227d73b-36b6-4c9e-adb4-87ce02b2cfd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="generator">
+      <UniqueIdentifier>{2ffc19d3-51ef-4726-91ed-a0f64d0d407e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helper">
+      <UniqueIdentifier>{24e8af96-d3f9-4cb6-9bbb-fb2013119bb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu">
+      <UniqueIdentifier>{a4274187-874a-4ff3-8a7d-4417c037e2c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\overlays">
+      <UniqueIdentifier>{d5073a41-861e-403f-a34c-2af44d116314}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scriptimpl">
+      <UniqueIdentifier>{0f5d0315-3478-4f95-b6df-0a33f43ad80c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\context">
+      <UniqueIdentifier>{69356213-d949-4e86-873e-636f58d06662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="menu\options">
+      <UniqueIdentifier>{6b07e599-948f-45ed-837b-49322e0644d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_nativized">
+      <UniqueIdentifier>{08f6d9c0-554c-44b7-80ce-85ac88afe488}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\SharedResources.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\PauseMenu.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\GameMenuBase.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\MenuBackground.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\TimeAttackResultsMenu.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.cpp">
+      <Filter>scriptimpl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.cpp">
+      <Filter>debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.cpp">
+      <Filter>generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\TimeAttackMenu.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\ExtrasMenu.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\MainMenu.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\data\PlayerProgress.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\data\SharedDatabase.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\data\TimeAttackData.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\data\PlayerRecorder.cpp">
+      <Filter>data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\audio\AudioOut.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\overlays\SecretUnlockedWindow.cpp">
+      <Filter>menu\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\overlays\SkippableCutsceneWindow.cpp">
+      <Filter>menu\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\GameMenuManager.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\ConfigurationImpl.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\EngineDelegate.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\Game.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\main.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\ActSelectMenu.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\ModsMenu.cpp">
+      <Filter>menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp">
+      <Filter>menu\context</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsMenu.cpp">
+      <Filter>menu\options</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsEntry.cpp">
+      <Filter>menu\options</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\audio\CustomAudioMixer.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\_nativized\NativizedCode.cpp">
+      <Filter>_nativized</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.cpp">
+      <Filter>menu\options</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>_resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\GameApp.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\SharedResources.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\PauseMenu.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\GameMenuBase.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\MenuBackground.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\TimeAttackResultsMenu.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.h">
+      <Filter>scriptimpl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.h">
+      <Filter>debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h">
+      <Filter>generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\TimeAttackMenu.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\ExtrasMenu.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\MainMenu.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\GameUtils.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\data\PlayerProgress.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\data\SharedDatabase.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\data\TimeAttackData.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\data\PlayerRecorder.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\audio\AudioOut.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\overlays\SecretUnlockedWindow.h">
+      <Filter>menu\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\overlays\SkippableCutsceneWindow.h">
+      <Filter>menu\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\GameMenuManager.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\ConfigurationImpl.h" />
+    <ClInclude Include="..\..\source\sonic3air\EngineDelegate.h" />
+    <ClInclude Include="..\..\source\sonic3air\Game.h" />
+    <ClInclude Include="..\..\source\sonic3air\pch.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\ActSelectMenu.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\ModsMenu.h">
+      <Filter>menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.h">
+      <Filter>menu\context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsMenu.h">
+      <Filter>menu\options</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsEntry.h">
+      <Filter>menu\options</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\audio\CustomAudioMixer.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.h">
+      <Filter>menu\options</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\config.json" />
+    <None Include="..\..\source\sonic3air\version.inc" />
+    <None Include="..\..\source\sonic3air\_nativized\NativizedCode.inc">
+      <Filter>_nativized</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sonic3air.rc">
+      <Filter>_resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\___internal\icon\app-no-border.ico">
+      <Filter>_resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

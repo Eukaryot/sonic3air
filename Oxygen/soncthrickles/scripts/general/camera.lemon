@@ -1,0 +1,482 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Camera                                                //
+//-------------------------------------------------------//
+
+#if STANDALONE
+	global s16 globalCameraOffsetX
+	global s16 currentCameraPanning
+	global u16 cameraPanningLastSonicPos
+#endif
+
+
+//# address-hook(0x01bfb0) end(0x01c0a4)
+function void UpdateCamera()
+{
+	if (u8[0xffffee30] != 0)
+		return
+
+	u16[0xffffee00] = 0
+	u16[0xffffee02] = 0
+	u16[0xffffee04] = 0
+	u16[0xffffee06] = 0
+
+	if (!competition_mode.active)
+	{
+		if (player1.camera_lock == 0)
+		{
+			if (!camera.use_forced_target)
+			{
+				A0 = 0xffffb000		// Use player's actual position
+			}
+			else
+			{
+				camera.use_forced_target = false
+				camera.locktime.player1 = 0
+				A0 = 0xfffff668		// This way A0 + 0x10 is 0xfffff678, i.e. start of forced target position
+			}
+
+			A1 = 0xffffee78		// Address of camera.position.x
+			A2 = 0xffffee14		// Address of move_area.left
+			A4 = 0xffffee00		// Looks like last camera movement (delta x) gets stored here
+			A5 = 0xffffee24		// Address of camera.locktime.player1
+			A6 = 0xffffe500		// Address of position backup
+			UpdateCameraPositionX()
+
+			A1 = 0xffffee7c		// Address of camera.position.y
+			A4 = 0xffffee02		// Looks like last camera movement (delta y) gets stored here
+			D3.u16 = (global.characters != CHARS_TAILS_ALONE) ? camera.yoffset.player : camera.yoffset.tails
+			UpdateCameraPositionY()
+		}
+	}
+	else
+	{
+		// Player 1
+		if (player1.camera_lock == 0)
+		{
+			A0 = 0xffffb000
+			A1 = 0xffffee78
+			A2 = 0xffffee14
+			A4 = 0xffffee00
+			A5 = 0xffffee24
+			A6 = 0xffffe500
+			UpdateCameraPositionX_CompMode()
+
+			A1 = 0xffffee7c
+			A2 = 0xffffee14
+			A4 = 0xffffee02
+			D3.u16 = (global.characters != CHARS_TAILS_ALONE) ? camera.yoffset.player : camera.yoffset.tails
+			UpdateCameraPositionY()
+		}
+
+		// Player 2
+		if (player2.camera_lock == 0)
+		{
+			A0 = 0xffffb04a
+			A1 = 0xffffee60
+			A2 = 0xffffee1c
+			A4 = 0xffffee04
+			A5 = 0xffffee28
+			A6 = 0xffffe400
+			UpdateCameraPositionX_CompMode()
+
+			A1 = 0xffffee64
+			A2 = 0xffffee1c
+			A4 = 0xffffee06
+			D3.u16 = camera.yoffset.tails
+			UpdateCameraPositionY()
+		}
+	}
+
+	UpdateCameraBoundsInLevel()
+}
+
+
+//# address-hook(0x01c0a8) end(0x01c11c)
+function void UpdateCameraPositionX()
+{
+	u16 oldCamPos = u16[A1]
+	D4.u16 = oldCamPos
+
+#if !STANDALONE
+	// This check is effectively dead code
+	if (unused.teleport_active != 0)
+		return
+#endif
+
+	u16 px = char.position.x.u16
+#if STANDALONE
+	// Handle additional camera offset
+	//  -> This was only introduced to smooth the camera while using the FBZ monkey bars
+	if (globalCameraOffsetX != 0)
+	{
+		if (abs(globalCameraOffsetX) >= 8)
+			globalCameraOffsetX += clamp(-globalCameraOffsetX, -2, 2)
+		else
+			globalCameraOffsetX += clamp(-globalCameraOffsetX, -1, 1)
+		px += globalCameraOffsetX
+	}
+#endif
+
+	s16 limitLeft = s16[A2]		// "move_area.left"
+	s16 limitRight = s16[A2+2]	// "move_area.right"
+
+	// Handle temporary camera lock right e.g. after spindash
+	//  u16[A5]   = camera.locktime.player*
+	//  u16[A5+2] = posbackup.offset.player*
+	if (u16[A5] > 0)
+	{
+		u16[A5] -= 0x100
+		D1 = (u8[A5] * 4) + 4
+		D0.u8 = u16[A5+2] - D1.u8
+		px = u16[A6 + D0.u8] & 0x7fff
+	}
+
+#if STANDALONE
+	if (Game.getSetting(SETTING_EXTENDED_CAMERA))
+	{
+		if (global.level_started <= 0 || global.stage_type != 0)	// First is relevant e.g. for AIZ 1 Sonic intro
+		{
+			currentCameraPanning = 0
+		}
+		else
+		{
+			if (Game.getSetting(SETTING_EXTENDED_CAMERA) == 1)
+			{
+				// Variant A
+				s16 diff = 0
+				if (u8[0xffffb02e] & 0xc0 || u8[0xffffb03c] != 0)		// Reset to normal it certain situations when the player has no direct control, or when on a convex surface
+				{
+					diff = clamp(-currentCameraPanning, -2, 2)
+				}
+				else if (char.state == char.state.SPINDASH || char.spindash == 0x80)
+				{
+					diff = (char.flags & char.flag.FACING_LEFT) ? -4 : 4
+				}
+				else
+				{
+					if (char.groundspeed == 0)
+					{
+						if (char.flags & char.flag.FACING_LEFT)
+							diff = clamp(-currentCameraPanning, -2, 0)
+						else
+							diff = clamp(-currentCameraPanning, 0, 2)
+					}
+					else
+					{
+						if (char.flags & char.flag.FACING_LEFT)
+							diff = (char.groundspeed <= -0x600 || currentCameraPanning > 1) ? -2 : 0
+						else
+							diff = (char.groundspeed >= 0x600 || currentCameraPanning < -1) ? 2 : 0
+					}
+				}
+				currentCameraPanning = clamp(currentCameraPanning + diff, -0x30, 0x30)
+			}
+			else
+			{
+				// Variant B
+				if (char.state == char.state.SPINDASH || char.spindash == 0x80)
+				{
+					currentCameraPanning += (char.flags & char.flag.FACING_LEFT) ? -4 : 4
+				}
+				else
+				{
+					s16 target = char.groundspeed >> 4
+					s16 diff = target - currentCameraPanning
+					if (abs(diff) >= 0x30 || target == 0 || (target < 0) == (diff > 0))
+					{
+						currentCameraPanning += clamp(diff, -2, 2)
+					}
+				}
+				currentCameraPanning = clamp(currentCameraPanning, -0x30, 0x30)
+			}
+
+			px += currentCameraPanning
+		}
+	}
+
+	u16 currentScreenPivot = oldCamPos + getScreenWidth() / 2 - 8		// A bit left of the actual screen center
+	s16 diffx = px - currentScreenPivot
+
+	// Standalone's version of this code does the limit checks in each frame, even if there was no camera movement
+	//  -> Needed e.g. to prevent a possible camera jump in AIZ 2 boss
+	s16 movex = 0
+	if (abs(diffx) > 8)
+	{
+		diffx += (diffx < 0) ? 8 : -8
+		s16 range = 24
+
+		if (Game.getSetting(SETTING_CAMERA_OUTRUN) && char.control_flags == 0)	// The second check is false e.g. in ICZ snowboarding
+		{
+			// Allow for out-running the camera
+			range = 15
+			u16 justOutsideScreen = getScreenWidth() / 2 + 24
+			if (abs(diffx) > justOutsideScreen)
+			{
+				// Never leave the screen
+				range = min(range + abs(diffx) - justOutsideScreen, 24)
+			}
+		}
+
+		movex = clamp(diffx, -range, range)
+	}
+
+	limitRight = max(limitLeft, limitRight - (getScreenWidth() - 320))
+	px = clamp(s16(oldCamPos + movex), limitLeft, limitRight)
+
+#else
+
+	s16 diffx = px - (oldCamPos + getScreenWidth() / 2 - 16)
+	if (diffx < 0)
+	{
+		diffx = max(diffx, -24)
+		px = max(s16(oldCamPos + diffx), limitLeft)
+	}
+	else if (diffx >= 16)
+	{
+		diffx = min(diffx - 16, 24)
+		px = min(s16(oldCamPos + diffx), limitRight)
+	}
+	else
+	{
+		u16[A4] = 0		// No change at all
+		return
+	}
+#endif
+
+	u16[A1] = px	// Update camera position
+	u16[A4] = s16(px - oldCamPos) << 8
+}
+
+
+//# address-hook(0x01c11e) end(0x01c236)
+function void UpdateCameraPositionY()
+{
+	D0.s16 = char.position.y.u16 - u16[A1]
+	if (level.vertical_wrap == 0xff00)
+	{
+		D0.s16 &= level.height.bitmask
+	}
+	if (char.flags & char.flag.ROLLING)
+	{
+		D0.s16 -= 5
+	}
+
+	#if STANDALONE
+		// Prevent the infamous level wrap glitch
+		if (Game.getSetting(SETTING_FIX_GLITCHES) && level.vertical_wrap == 0xff00)
+		{
+			if (D0.s16 > level.height.bitmask / 2)
+			{
+				D0.s16 -= level.height.bitmask
+			}
+		}
+	#endif
+
+	D1 = D3.u16
+	if (competition_mode.active)
+		D1.u16 >>= 1
+
+	if (char.flags & char.flag.IN_AIR)
+	{
+		D0.s16 += 0x20 - D1.u16
+		if (D0.s16 < 0)
+		{
+			D1.u16 = 0x1800
+		}
+		else
+		{
+			D0.u16 -= 0x40
+			if (D0.s16 >= 0)
+			{
+				D1.u16 = 0x1800
+			}
+			else if (u8[0xffffee32] != 0)
+			{
+				u8[0xffffee32] = 0
+				D0 = 0
+			}
+			else
+			{
+				u16[A4] = 0
+				return
+			}
+		}
+	}
+	else
+	{
+		D0.s16 -= D1.u16
+		if (D0.s16 == 0)
+		{
+			if (u8[0xffffee32] != 0)
+			{
+				u8[0xffffee32] = 0
+				D0 = 0
+			}
+			else
+			{
+				u16[A4] = 0
+				return
+			}
+		}
+		else
+		{
+		#if !STANDALONE
+			// This check leads to strange camera behavior when looking up/down on (fast) vertically moving object
+			//  -> For example, on the moving ice platform in ICZ 1; this can lead to a vertical wrap glitch
+			//  -> I don't know yet what this check is even for...
+			if (D3.u16 != 0x60)
+			{
+				D1.u16 = 0x200
+			}
+			else
+		#endif
+			if (u8[0xffffee39] != 0)
+			{
+				D1.u16 = 0x1800
+			}
+			else if (abs(s16[A0 + 0x1c]) >= 0x800)
+			{
+				D1.u16 = 0x1800
+			}
+			else
+			{
+				D1.u16 = 0x600
+			}
+		}
+	}
+
+	s16 threshold = (D1.u16 >> 8)
+	if (D0.s16 > threshold)
+	{
+		D1.s32 = D1.s16 << 8
+		D1 += u32[A1]
+		D1 = (D1 << 16) + (D1 >> 16)
+	}
+	else if (D0.s16 < -threshold)
+	{
+		D1.s32 = (-D1.s16) << 8
+		D1 += u32[A1]
+		D1 = (D1 << 16) + (D1 >> 16)
+	}
+	else
+	{
+		D1 = D0.u16
+		D1.u16 += u16[A1]
+	}
+
+	if (D0.s16 < 0)
+	{
+		if (D1.s16 <= s16[A2 + 4])
+		{
+			if (D1.s16 <= -0x100)
+			{
+				D1.u16 &= level.height.bitmask
+			}
+			else
+			{
+				D1.u16 = u16[A2 + 4]
+			}
+		}
+	}
+	else
+	{
+		if (D1.s16 >= s16[A2 + 6])
+		{
+			u16 levelHeight = level.height.bitmask + 1
+			D1.u16 -= levelHeight
+			if (D1.s16 >= 0)
+			{
+				u16[A1] -= levelHeight
+			}
+			else
+			{
+				D1.u16 = u16[A2 + 6]
+			}
+		}
+	}
+
+	D4.u16 = u16[A1]
+	D1 = (D1 << 16) + (D1 >> 16)
+	D3 = D1 - u32[A1]
+	D3 = (D3 >> 8) + (D3 << 24)
+	u16[A4] = D3.u16
+	u32[A1] = D1
+
+	if (competition_mode.active)
+	{
+		D1 = (D1 << 16) + (D1 >> 16)
+		D1.u16 &= level.height.bitmask
+		u16[A1] = D1.u16
+	}
+}
+
+
+
+// Competition Mode
+
+//# address-hook(0x01c238) end(0x01c2a8)
+function void UpdateCameraPositionX_CompMode()
+{
+	D4.u16 = u16[A1]
+
+#if !STANDALONE
+	// This check is effectively dead code
+	if (unused.teleport_active != 0)
+		return
+#endif
+
+	D1.u16 = u16[A5]
+	if (D1.u16 != 0)
+	{
+		u16[A5] = D1.u16 - 0x100
+		D1 = u8[A5] * 4 + 4
+		D0.u16 = u16[A5 + 0x02]
+		D0.u8 -= D1.u8
+		D0.u16 = u16[A6 + D0.s16] & 0x7fff
+	}
+	else
+	{
+		D0.u16 = objA0.position.x.u16
+	}
+
+	D2.u16 = u16[0xffffeea8]
+	D0.u16 = ((D0.u16 - u16[A1]) & D2.u16) - (getScreenWidth() / 2 - 0x10)
+	if (D0.s16 < 0)
+	{
+		if (D0.s16 <= -0x10)
+		{
+			D0.s16 = -0x10
+		}
+		D0.u16 += u16[A1]
+	}
+	else
+	{
+		D0.u16 -= 0x10
+		if (D0.s16 < 0)
+		{
+			u16[A4] = 0
+			return
+		}
+
+		if (D0.u16 >= 0x10)
+		{
+			D0.u16 = 0x10
+		}
+		D0.u16 += u16[A1]
+	}
+
+	D1.u16 = (D0.u16 - u16[A1]) << 8
+	D0.u16 = (D0.u16 & D2.u16) + 0x0400
+	u16[A1] = D0.u16
+	u16[A4] = D1.u16
+}

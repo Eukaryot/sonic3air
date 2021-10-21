@@ -1,0 +1,119 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Small explosion                                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x01e5e0) end(0x01e5ea)
+function void SmallExplosion.BaseUpdate()
+{
+	// Targets:
+	//  - 0x01e5f6	-> objA0.base_state = 0x00
+	//  - 0x01e61a	-> objA0.base_state = 0x02
+	//  - 0x01e626	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x01e5ee, objA0.base_state)
+}
+
+
+//# address-hook(0x01e5f6) end(0x01e614)
+function void SmallExplosion.Init1()
+{
+	objA0.base_state += 2
+
+	if (allocDynamicObjectStd())
+	{
+		// Create a freed critter
+		objA1.update_address = 0x02c778
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u16[A1 + 0x3e] = objA0.value3e
+	}
+
+	SmallExplosion.Init2()
+}
+
+
+//# address-hook(0x01e61a) end(0x01e622)
+function void SmallExplosion.Init2()
+{
+	playSound(SFX_POP)
+	objA0.base_state += 2
+	fn01e626()
+}
+
+
+//# address-hook(0x01e626) end(0x01e668)
+function void fn01e626()
+{
+	objA0.mapping_offset = 0x01e758
+	D0.u16 = (objA0.sprite_attributes & 0x8000) | 0x05a0
+	objA0.sprite_attributes = D0.u16
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	u8[A0 + 0x28] = 0
+	objA0.box_size.x = 12
+	objA0.box_size.y = 12
+	objA0.animation.timer = 3
+	objA0.animation.sprite = 0
+
+	objA0.update_address = 0x01e66e
+	SmallExplosion.Update()
+}
+
+
+//# address-hook(0x01e66e) end(0x01e688)
+function void SmallExplosion.Update()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		++objA0.animation.sprite
+		if (objA0.animation.sprite == 5)
+		{
+			UnloadObject()
+			return
+		}
+	}
+	DrawObject()
+}
+
+
+
+//-------------------------------------------------------//
+// Explosion used for defeated Robotnik                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x083f52) end(0x083f70)
+function void fn083f52()
+{
+	objA0.update_address = 0x083f68
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	playSound(0xb4)
+	fn083f68()
+}
+
+
+//# address-hook(0x083f68)
+function void fn083f68()
+{
+	A1 = 0x083fcc
+	fn0845a0()
+	DrawObject()
+}
+
+
+//# address-hook(0x083f76) end(0x083f7e)
+function void fn083f76()
+{
+	setupObjectAttributesFull(0x083fc0)
+	fn083f52()
+}

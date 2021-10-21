@@ -1,0 +1,399 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Conveyor Belt (Hydrocity Zone variant)                //
+//-------------------------------------------------------//
+
+//# address-hook(0x031164) end(0x0311be)
+function void fn031164()
+{
+	A1 = 0xffffcfe0
+	D0 = objA0.subtype2c
+	if (u8[A1 + D0.s16] != 0)
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+		return
+	}
+
+	u8[A1 + D0.s16] = 1
+	A1 = 0x031124 + (D0.u16 & 0x0f) * 4
+
+	D0.u16 = u16[(A1+=2)-2]
+	u16[A0 + 0x3c] = D0.u16
+	if ((objA0.flags2a & 0x01) == 0)
+	{
+		D0.u16 -= 8
+	}
+	u16[A0 + 0x40] = D0.u16
+
+	D0.u16 = u16[(A1+=2)-2]
+	objA0.value3e = D0.u16
+	if (objA0.flags2a & 0x01)
+	{
+		D0.u16 += 8
+	}
+	objA0.value42 = D0.u16
+
+	objA0.update_address = 0x0311c4
+	fn0311c4()
+}
+
+
+//# address-hook(0x0311c4) end(0x031220)
+function void fn0311c4()
+{
+	A2 = A0 + 0x32
+	A1 = 0xffffb000
+	D1.u16 = control.player1
+	D2 = 0
+	fn031226()
+
+	++A2
+	A1 = 0xffffb04a
+	D1.u16 = control.tails
+	D2 = 1
+	fn031226()
+
+	D1.u16 = level.despawn_position.x
+	D0.u16 = (u16[A0 + 0x3c] & 0xff80) - 0x0280
+	if (D1.u16 >= D0.u16)
+	{
+		D0.u16 = objA0.value3e & 0xff80
+		if (D1.u16 <= D0.u16)
+			return
+	}
+
+	A1 = 0xffffcfe0
+	D0 = objA0.subtype2c
+	u8[A1 + D0.s16] = 0
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+	UnloadObject()
+}
+
+
+//# address-hook(0x031226) end(0x031458)
+function void fn031226()
+{
+	if (u8[A2] != 0)
+	{
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+		{
+			if (D1 & 0x0400)
+			{
+				--objA1.position.x.u16
+				--u8[A2 + 0x06]
+				if (s8[A2 + 0x06] < 0)
+				{
+					u8[A2 + 0x06] = 0x07
+					u8[A2 + 0x08] += 0x10
+					u8[A2 + 0x08] &= 0x10
+				}
+			}
+
+			if (D1 & 0x0800)
+			{
+				++objA1.position.x.u16
+				--u8[A2 + 0x06]
+				if (s8[A2 + 0x06] < 0)
+				{
+					u8[A2 + 0x06] = 0x07
+					u8[A2 + 0x08] += 0x10
+					u8[A2 + 0x08] &= 0x10
+				}
+			}
+
+			D1.u16 &= 0x70
+			if (D1.u16 == 0)
+			{
+				D0 = 0x02
+				if (objA0.flags2a & 0x01)
+				{
+					D0.s16 = -D0.s16
+				}
+				objA1.position.x.u16 += D0.u16
+				D0.u16 = objA1.position.x.u16
+				if (D0.u16 >= u16[A0 + 0x40] && D0.u16 < objA0.value42)
+				{
+					fn03145a()
+					D0 = u8[A1 + 0x22]
+
+					u32 backupA2 = A2
+					SetCharacterSpritePatterns()
+					A2 = backupA2
+					return
+				}
+			}
+			else
+			{
+				objA1.velocity.y = (u8[A1 + 0x2a] & char.flag.UNDERWATER) ? -0x200 : -0x500
+			}
+		}
+
+		u8[A2] = 0
+		u8[A2+2] = (u8[A1 + 0x2a] & char.flag.UNDERWATER) ? 0x5a : 0x3c
+
+		u8[A1 + 0x1e] = 0x0e
+		u8[A1 + 0x1f] = 0x07
+		objA1.state = char.state.ROLLING
+		u8[A1 + 0x27] = 0
+		objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+		objA1.flags2a &= ~char.flag.CONTROL_LOCK
+		u8[A1 + 0x2e] &= 0xfc
+		u8[A1 + 0x40] = 0x01
+		return
+	}
+
+	if (u8[A2+2] != 0)
+	{
+		--u8[A2+2]
+		return
+	}
+
+	D0.u16 = objA1.position.x.u16
+	if (D0.u16 >= u16[A0 + 0x40] && D0.u16 < objA0.value42)
+	{
+		bool upperBelt = (u16[A1 + 0x1c] == 1)
+		u16 py = objA0.position.y.u16 + (upperBelt ? -0x14 : 0x14)
+
+		if (objA1.position.y.u16 > py && objA1.position.y.u16 <= py + 0x10)
+		{
+			if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+			{
+				if (upperBelt)
+				{
+					objA1.position.y.u16 = objA0.position.y.u16 - 0x14
+					u8[A1 + 0x22] = 0x65
+					u8[A2 + 0x04] = 0x80
+				}
+				else
+				{
+					if (objA1.velocity.y < 0)
+						return
+
+					u8[A1 + 0x22] = 0x63
+					u8[A2 + 0x04] = 0
+				}
+
+				u8[A1 + 0x04] &= 0xfc
+				objA1.position.y.u16 = py
+				objA1.velocity.x = 0
+				objA1.velocity.y = 0
+				u16[A1 + 0x1c] = 0
+				u8[A1 + 0x20] = 0
+				u8[A1 + 0x2e] = 3
+
+				u8[A2 + 0x06] = 0
+				u8[A2 + 0x08] = 0
+				u8[A2] = 1
+
+				D0 = u8[A1 + 0x22]
+
+				u32 backupA2 = A2
+				SetCharacterSpritePatterns()
+				A2 = backupA2
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x03145a) end(0x0314d0)
+function void fn03145a()
+{
+	// Update Sonic's animation while hanging on the conveyor belt
+
+	if (u16[A1 + 0x1c] == 0)
+	{
+		D0.u8 = u8[A2 + 0x04]
+		if (D0.u8 != 0)
+		{
+			if (D0.s8 < 0)
+			{
+				D0.u8 += 6
+				if (D0.s8 > 0)
+					D0 = 0
+			}
+			else
+			{
+				D0.u8 -= 6
+				if (D0.s8 < 0)
+					D0 = 0
+			}
+			u8[A2 + 0x04] = D0.u8
+		}
+	}
+	else
+	{
+		u16[A1 + 0x1c] = 0
+		D0.u8 = u8[A2 + 0x04] - 0x80
+		if (D0.u8 != 0)
+		{
+			if (D0.s8 < 0)
+			{
+				D0.u8 += 6
+				if (D0.s8 > 0)
+					D0 = 0
+			}
+			else
+			{
+				D0.u8 -= 6
+				if (D0.s8 < 0)
+					D0 = 0
+			}
+			u8[A2 + 0x04] = D0.u8 + 0x80
+		}
+	}
+
+	D0 = (u8[A2 + 0x04] >> 4) + u8[A2 + 0x08]
+	u8[A1 + 0x22] = u8[0x0314d2 + D0.s16]
+	D0.u16 &= 0x0f
+	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x0314f2 + D0.u16]
+}
+
+
+
+// The bomb?
+
+//# address-hook(0x031502) end(0x03157a)
+function void fn031502()
+{
+	A1 = 0x031124 + (objA0.subtype2c & 0x0f) * 4
+	u16[A0 + 0x3c] = u16[(A1+=2)-2]
+	objA0.value3e = u16[(A1+=2)-2]
+	objA0.mapping_offset = 0x23035e
+	objA0.sprite_attributes = 0x243e
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x0c
+	u8[A0 + 0x28] = 0x8b
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.y.u16
+
+	if (objA0.flags2a & 0x01)
+	{
+		objA0.position.y.u16 += 0x18
+
+		objA0.update_address = 0x0315d2
+		fn0315d2()
+	}
+	else
+	{
+		objA0.position.y.u16 -= 0x18
+		u16[A0 + 0x26] = 0x40
+
+		objA0.update_address = 0x031580
+		fn031580()
+	}
+}
+
+
+//# address-hook(0x031580) end(0x03159a)
+function void fn031580()
+{
+	objA0.position.x.u16 += 2
+	if (objA0.position.x.u16 == objA0.value3e)
+	{
+		objA0.update_address = 0x03159e
+		u16[A0 + 0x30] = objA0.position.x.u16
+	}
+
+	fn031626()
+}
+
+
+//# address-hook(0x03159e) end(0x0315d0)
+function void fn03159e()
+{
+	u16[A0 + 0x26] -= 0x02
+	u16[A0 + 0x26] &= 0x7e
+	D0.u16 = u16[A0 + 0x26]
+	if (D0.u16 == 0)
+	{
+		objA0.update_address = 0x0315d2
+	}
+
+	A1 = 0x031664
+	D1.u16 = u16[A1 + D0.s16] + u16[A0 + 0x30]
+	D2.u16 = u16[A1 + D0.s16 + 0x20] + objA0.value32
+	objA0.position.x.u16 = D1.u16
+	objA0.position.y.u16 = D2.u16
+
+	fn031626()
+}
+
+
+//# address-hook(0x0315d2) end(0x0315ec)
+function void fn0315d2()
+{
+	objA0.position.x.u16 -= 0x02
+	D0.u16 = objA0.position.x.u16
+	if (D0.u16 == u16[A0 + 0x3c])
+	{
+		objA0.update_address = 0x0315ee
+		u16[A0 + 0x30] = objA0.position.x.u16
+	}
+
+	fn031626()
+}
+
+
+//# address-hook(0x0315ee) end(0x031622)
+function void fn0315ee()
+{
+	u16[A0 + 0x26] -= 0x02
+	u16[A0 + 0x26] &= 0x7e
+	D0.u16 = u16[A0 + 0x26]
+	if (u16[A0 + 0x26] == 0x40)
+	{
+		objA0.update_address = 0x031580
+	}
+
+	A1 = 0x031664
+	D1.u16 = u16[A1 + D0.s16] + u16[A0 + 0x30]
+	D2.u16 = u16[A1 + D0.s16 + 0x20] + objA0.value32
+	objA0.position.x.u16 = D1.u16
+	objA0.position.y.u16 = D2.u16
+
+	fn031626()
+}
+
+
+//# address-hook(0x031626) end(0x03165e)
+function void fn031626()
+{
+	D1.u16 = level.despawn_position.x
+	D0.u16 = (u16[A0 + 0x3c] & 0xff80) - 0x0280
+	if (D1.u16 >= D0.u16 && D1.u16 <= (objA0.value3e & 0xff80))
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}

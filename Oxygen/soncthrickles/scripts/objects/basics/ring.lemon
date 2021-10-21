@@ -1,0 +1,453 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Dynamic ring                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x01a84e) end(0x01a886)
+function void DynamicRing.Init()
+{
+	objA0.mapping_offset = 0x01a99a
+	objA0.sprite_attributes = 0xa6bc
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x100
+	u8[A0 + 0x28] = 0x47
+	objA0.box_size.x = 8
+	objA0.box_size.y = 8
+	objA0.hitbox_extends.x = 8
+	objA0.hitbox_extends.y = 8
+
+	objA0.update_address = 0x01a88c
+	DynamicRing.Update()
+}
+
+
+//# address-hook(0x01a88c) end(0x01a91a)
+function void DynamicRing.Update()
+{
+	if (objA0.base_state == 0)
+	{
+		// In this state, the ring is attracted by a lightning shield
+		DynamicRing.UpdateAttraction()
+
+		// Lost lightning shield?
+		if ((u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING) == 0)
+		{
+			objA0.update_address = 0x01a64a
+			objA0.base_state = 0x02
+			spilled_rings.speed = 0xff
+		}
+
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 3
+			objA0.animation.sprite = (objA0.animation.sprite + 1) & 0x03
+		}
+
+		D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+		if (D0.u16 <= 0x280)
+		{
+			AddAsDynamicObject()
+			DrawObject()
+		}
+		else
+		{
+			if (objA0.respawn_entry)
+			{
+				A2 = 0xffff0000 + objA0.respawn_entry
+				u8[A2] &= ~0x80
+			}
+
+			D0.u16 = u16[0x30]
+			if (D0.u16 != 0)
+			{
+				A2 = 0xffff0000 + D0.u16
+				u16[A2] = 0
+			}
+			UnloadObject()
+		}
+	}
+	else
+	{
+		u8[A0 + 0x28] = 0
+		objA0.sprite_priority = 0x80
+		--level.total_rings
+		CollectRing()
+
+		objA0.update_address = 0x01a920
+		objA0.base_state = 0
+		DynamicRing.FadeOut()
+	}
+}
+
+
+//# address-hook(0x01a920) end(0x01a934)
+function void DynamicRing.FadeOut()
+{
+	if (objA0.base_state == 0)
+	{
+		Object.animationUpdate(0x01a992)
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x01a938) end(0x01a98c)
+function void DynamicRing.UpdateAttraction()
+{
+	s16 dx = u16[0xffffb010] - objA0.position.x.u16
+	if (dx < 0)
+	{
+		D1.s16 = -0x30
+		if (objA0.velocity.x >= 0)
+		{
+			D1.u16 *= 4
+		}
+	}
+	else
+	{
+		D1.s16 = 0x30
+		if (objA0.velocity.x < 0)
+		{
+			D1.u16 *= 4
+		}
+	}
+	objA0.velocity.x += D1.s16
+
+	s16 dy = u16[0xffffb014] - objA0.position.y.u16
+	#if STANDALONE
+		// Consider level wrap for ring collection
+		if (level.vertical_wrap == 0xff00)
+		{
+			if (dy > s16(level.height.bitmask) / 2)
+			{
+				objA0.position.y.u16 += level.height.bitmask
+			}
+			else if (dy < -s16(level.height.bitmask) / 2)
+			{
+				objA0.position.y.u16 -= level.height.bitmask
+			}
+			dy = u16[0xffffb014] - objA0.position.y.u16
+		}
+	#endif
+	if (dy < 0)
+	{
+		D1.s16 = -0x30
+		if (objA0.velocity.y >= 0)
+		{
+			D1.s16 *= 4
+		}
+	}
+	else
+	{
+		D1.s16 = 0x30
+		if (objA0.velocity.y < 0)
+		{
+			D1.s16 *= 4
+		}
+	}
+	objA0.velocity.y += D1.s16
+
+	UpdateMovementStraightSimple()
+}
+
+
+
+//# address-hook(0x01a64a) end(0x01a654)
+function void fn01a64a()
+{
+	// Targets:
+	//  - 0x01a67a	-> objA0.base_state = 0x00
+	//  - 0x01a75c	-> objA0.base_state = 0x02
+	//  - 0x01a7c2	-> objA0.base_state = 0x04
+	//  - 0x01a7d6	-> objA0.base_state = 0x06
+	//  - 0x01a7e4	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x01a658, objA0.base_state)
+}
+
+
+//# address-hook(0x01a662) end(0x01a66c)
+function void fn01a662()
+{
+	// Targets:
+	//  - 0x01a7e8	-> objA0.base_state = 0x02
+	//  - 0x01a7c2	-> objA0.base_state = 0x04
+	//  - 0x01a7d6	-> objA0.base_state = 0x06
+	//  - 0x01a7e4	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x01a670, objA0.base_state)
+}
+
+
+//# address-hook(0x01a67a) end(0x01a6ac)
+function void fn01a67a()
+{
+	D6 = global.inv_gravity ? 0x01a662 : 0x01a64a
+#if STANDALONE
+	// Standalone uses a higher limit
+	u16 maxRings = 48
+#else
+	// Limit to 32 rings spilled
+	u16 maxRings = 32
+#endif
+
+	A1 = A0
+	D5 = (u8[A0 + 0x3f] == 0) ? ring_counter : u16[0xfffffed0]
+	D5.u16 = min(D5.u16, maxRings) - 1
+	D4.u16 = 0x288
+	SpillRings()
+}
+
+
+//# address-hook(0x01a6b6) end(0x01a734)
+//# translated(0x01a6ae) end(0x01a758)
+function void SpillRings()
+{
+	while (D5.s16 >= 0)
+	{
+		u32[A1] = D6
+		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		u8[A1 + 0x05] += 2
+		u8[A1 + 0x07] = 8
+		u16[A1 + 0x08] = 0x180
+		u16[A1 + 0x0a] = 0xa6bc
+		u32[A1 + 0x0c] = 0x01a99a
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x1e] = 8
+		u8[A1 + 0x1f] = 8
+		u8[A1 + 0x28] = 0x47
+
+		spilled_rings.speed = 0xff
+		if (D4.s16 >= 0)
+		{
+			// Entered only for every second ring (the others use x-mirrored directions)
+			u8 angle = D4.u8
+			u8 shift = D4.u16 >> 8
+			D2.s16 = lookupSin(angle) << shift
+			D3.s16 = lookupCos(angle) << shift
+
+			// Go on with next angle (and possibly switch to a lower shift)
+			if (D4.u8 < 0xf0)
+			{
+				D4.u8 += 0x10
+			}
+			else
+			{
+				D4.u16 -= 0x170
+				if (D4.s16 < 0)
+				{
+					D4.s16 = 0x288
+				}
+			}
+		}
+		objA1.velocity.x = D2.u16
+		objA1.velocity.y = D3.u16
+		D2.s16 = -D2.s16
+		D4.s16 = -D4.s16
+
+		// Next ring
+		--D5.s16
+		if (D5.s16 < 0)
+			break
+		if (!allocDynamicObjectAfterA0())
+			break
+	}
+
+	playSound(SFX_SPILLRINGS)
+	ring_counter = 0
+	hud.dirty.rings = 0x80
+	extra_lives_granted = 0
+
+	if (global.inv_gravity)
+	{
+		fn01a7e8()
+	}
+	else
+	{
+		fn01a75c()
+	}
+}
+
+
+//# address-hook(0x01a75c) end(0x01a7be)
+function void fn01a75c()
+{
+	objA0.animation.sprite = spilled_rings.animframe
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x18
+	if (objA0.velocity.y >= 0)
+	{
+		D0.u8 = (global.framecounter + D7.u8) & 0x07
+		if (D0.u8 == 0)
+		{
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				fn00f994()
+				if (D1.s16 < 0)
+				{
+					objA0.position.y.u16 += D1.u16
+					objA0.velocity.y = (objA0.velocity.y >> 2) - objA0.velocity.y
+				}
+			}
+
+			if (spilled_rings.speed == 0)
+			{
+				// Time over for this ring
+				UnloadObject()
+				return
+			}
+
+			if (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight())
+			{
+				UnloadObject()
+				return
+			}
+		}
+	}
+
+	AddAsDynamicObject()
+	objA0.position.x.u16 -= u16[0xffffeebc]
+	DrawObject()
+}
+
+
+//# address-hook(0x01a7e4) end(0x01a7e4)
+function void fn01a7e4()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x01a7e8) end(0x01a84a)
+function void fn01a7e8()
+{
+	objA0.animation.sprite = spilled_rings.animframe
+	UpdateMovementStraight()
+	objA0.velocity.y += 0x18
+	if (objA0.velocity.y >= 0)
+	{
+		D0.u8 = (global.framecounter + D7.u8) & 0x07
+		if (D0.u8 == 0)
+		{
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				fn00fca0()
+				if (D1.s16 < 0)
+				{
+					objA0.position.y.u16 -= D1.u16
+					D0.s16 = objA0.velocity.y >> 2
+					objA0.velocity.y -= D0.u16
+					objA0.velocity.y = -objA0.velocity.y
+				}
+			}
+
+			if ((spilled_rings.speed == 0) || (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight()))
+			{
+				UnloadObject()
+				return
+			}
+		}
+	}
+
+	AddAsDynamicObject()
+	D0.u16 = u16[0xffffeebc]
+	objA0.position.x.u16 -= D0.u16
+	DrawObject()
+}
+
+
+//# address-hook(0x01a7c2) end(0x01a7e0)
+function void fn01a7c2()
+{
+	objA0.base_state += 2
+	u8[A0 + 0x28] = 0
+	objA0.sprite_priority = 0x80
+	CollectRing()
+	fn01a7d6()
+}
+
+//# address-hook(0x01a7d6)
+function void fn01a7d6()
+{
+	Object.animationUpdate(0x01a992)
+	DrawObject()
+}
+
+
+
+//-------------------------------------------------------//
+// Dynamic ring spawned by debug mode                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x01a51a) end(0x01a524)
+function void fn01a51a()
+{
+	// Targets:
+	//  - 0x01a532	-> objA0.base_state = 0x00
+	//  - 0x01a568	-> objA0.base_state = 0x02
+	//  - 0x01a572	-> objA0.base_state = 0x04
+	//  - 0x01a584	-> objA0.base_state = 0x06
+	//  - 0x01a592	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x01a528, objA0.base_state)
+}
+
+
+//# address-hook(0x01a532) end(0x01a562)
+function void fn01a532()
+{
+	objA0.base_state += 2
+	objA0.mapping_offset = 0x01a99a
+	objA0.sprite_attributes = (competition_mode.active) ? 0x63d2 :0xa6bc
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0100
+	u8[A0 + 0x28] = 0x47
+	objA0.box_size.x = 0x08
+	fn01a568()
+}
+
+
+//# address-hook(0x01a568) end(0x01a56e)
+function void fn01a568()
+{
+	objA0.animation.sprite = static_rings.animframe
+	fn01b662()
+}
+
+
+//# address-hook(0x01a572) end(0x01a582)
+function void fn01a572()
+{
+	objA0.base_state += 2
+	u8[A0 + 0x28] = 0
+	objA0.sprite_priority = 0x80
+	CollectRing()
+	fn01a584()
+}
+
+
+//# address-hook(0x01a584) end(0x01a58e)
+function void fn01a584()
+{
+	Object.animationUpdate(0x01a992)
+	DrawObject()
+}
+
+
+//# address-hook(0x01a592) end(0x01a592)
+function void fn01a592()
+{
+	UnloadObject()
+}

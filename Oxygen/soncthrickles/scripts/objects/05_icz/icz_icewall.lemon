@@ -1,0 +1,148 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// ICZ Ice Wall                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x08a26c) end(0x08a27a)
+function void fn08a26c()
+{
+	setupObjectAttributesFull(0x08a406)
+	objA0.update_address = 0x08a280
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x08a280) end(0x08a2dc)
+function void fn08a280()
+{
+#if STANDALONE
+	// Ground speed of player 1 before the collision
+	s16 speed = s16[0xffffb000 + 0x1c]
+#endif
+
+	D1 = 0x2b
+	D2 = 0x40
+	D3 = 0x70
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	// Knuckles can break this kind of wall
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		D6 = (D6 << 16) + (D6 >> 16)
+		D6.u16 &= 0x01
+		if (D6.u16 != 0)
+		{
+			fn08a2e2()
+
+		#if STANDALONE
+			// Restore Knuckles ground speed, which in most cases got reset
+			// TODO: Check how this is done in other cases of breakable rocks
+			s16[0xffffb000 + 0x1c] = speed
+			u8[0xffffb000 + 0x2a] &= ~char.flag.PUSHING
+		#endif
+			return
+		}
+	}
+
+	A1 = 0xffff0000 + u16[0xfffffaa4]
+	if (u32[A1] == 0x089f38)
+	{
+		D0.u16 = objA1.position.x.u16
+		D1.u16 = objA1.position.y.u16 & level.height.bitmask
+		D2.u16 = objA0.position.x.u16
+		D3.u16 = objA0.position.y.u16
+
+		A2 = 0x08a2fc
+		D2.u16 += u16[(A2+=2)-2]
+		if (D0.u16 >= D2.u16)
+		{
+			D2.u16 += u16[(A2+=2)-2]
+			if (D0.u16 < D2.u16)
+			{
+				D3.u16 += u16[(A2+=2)-2]
+				if (D1.u16 >= D3.u16)
+				{
+					D3.u16 += u16[(A2+=2)-2]
+					if (D1.u16 < D3.u16)
+					{
+						fn08a2e2()
+						return
+					}
+				}
+			}
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x08a2e2) end(0x08a2f6)
+function void fn08a2e2()
+{
+	spawnSimpleChildObjects(0x08a430)
+	Object.TriggerUnloading()
+	playSound(SFX_COLLAPSE)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x08a304) end(0x08a312)
+function void fn08a304()
+{
+	setupObjectAttributesFull(0x08a3fa)
+	objA0.update_address = 0x08a318
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x08a318) end(0x08a32a)
+function void fn08a318()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x08)
+	{
+		objA0.update_address = 0x0856d0
+	}
+	DrawOrUnloadObject()
+}
+
+
+
+// Fragments when wall bursts
+
+//# address-hook(0x08a20c) end(0x08a242)
+function void fn08a20c()
+{
+	setupObjectAttributesFull(0x08a41e)
+	objA0.update_address = 0x08a258
+	u32[A0 + 0x30] = 0x08a444
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_value = 0x5f
+
+	D0 = objA0.subtype2c
+	objA0.value42 = u16[0x08a246 + D0.s16]
+	MoveWithParent()
+	D0 = 0
+	fn0852d0()
+}
+
+
+//# address-hook(0x08a258) end(0x08a266)
+function void fn08a258()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementSimple()
+	Object.CountdownAndTrigger()
+	DrawOrUnloadObject()
+}

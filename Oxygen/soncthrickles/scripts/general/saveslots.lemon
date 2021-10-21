@@ -1,0 +1,509 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// SRAM layout overview
+// (Note: The first part of 0x50 bytes is the same as in original S3&K, the rest is specific for S3AIR)
+//  - Bytes 0x00.. 0x4f = 8 save slots as seen in Data Select, with 10 bytes each
+//  - Bytes 0x50.. 0x53 = Current Blue Sphere game progress
+
+
+
+// Read from SRAM
+
+
+//# address-hook(0x00c154) end(0x00c260)
+function void InitSaveSlots()
+{
+	// Without Sonic 3 locked-on, don't do anything here
+	if (global.lock_on_state != 0)
+		return
+
+	u16[0xffffef56] = 0
+
+#if STANDALONE
+
+	// Read competition mode persistent data
+	{
+		// Before trying to load persistent data, write some default data first
+		for (u8 i = 0; i < 0x50; i += 0x10)
+		{
+			u32[0xffffe600 + i + 0]  = 0x80000000
+			u32[0xffffe600 + i + 4]  = 0x80000000
+			u32[0xffffe600 + i + 8]  = 0x80000000
+			u32[0xffffe600 + i + 12] = 0x00010200
+		}
+
+		// Now overwrite it if there is persistent data to load; otherwise this has no effect
+		System.loadPersistentData(0xffffe600, "SRAM_CompetitionRecords", 0x50)
+	}
+
+	// Read data select saves persistent data
+	{
+		// Before trying to load persistent data, write some default data first
+		zeroMemory(0xffffe6ac, 0x50)
+		for (u8 i = 0; i < 8; ++i)
+		{
+			u8[0xffffe6ac + i * 0x0a] = 0x80
+		}
+
+		// Now overwrite it if there is persistent data to load; otherwise this has no effect
+		//  -> This is even done twice, once using the old SRAM system (for legacy support), once using the more flexible persistent data system
+		SRAM.load(0xffffe6ac, 0, 0x50)
+		System.loadPersistentData(0xffffe6ac, "SRAM_Saveslots", 0x50)
+
+	/*
+		// TEST: Create 3 save slots with all Chaos Emeralds, and 3 with all Super Emeralds
+
+		A0 = 0xffffe6ac
+		u8[A0 + 0x00] = 2
+		u8[A0 + 0x01] = 0
+		u8[A0 + 0x02] = 0x10
+		u8[A0 + 0x03] = 0x0e
+		u16[A0 + 0x04] = 0
+		u16[A0 + 0x06] = 0x5555
+		u8[A0 + 0x08] = 5
+		u8[A0 + 0x09] = 1
+
+		A0 += 0x0a
+		u8[A0 + 0x00] = 2
+		u8[A0 + 0x01] = 0
+		u8[A0 + 0x02] = 0x20
+		u8[A0 + 0x03] = 0x0e
+		u16[A0 + 0x04] = 0
+		u16[A0 + 0x06] = 0x5555
+		u8[A0 + 0x08] = 5
+		u8[A0 + 0x09] = 1
+
+		A0 += 0x0a
+		u8[A0 + 0x00] = 2
+		u8[A0 + 0x01] = 0
+		u8[A0 + 0x02] = 0x30
+		u8[A0 + 0x03] = 0x0e
+		u16[A0 + 0x04] = 0
+		u16[A0 + 0x06] = 0x5555
+		u8[A0 + 0x08] = 5
+		u8[A0 + 0x09] = 1
+
+		A0 += 0x0a
+		u8[A0 + 0x00] = 3
+		u8[A0 + 0x01] = 0
+		u8[A0 + 0x02] = 0x10
+		u8[A0 + 0x03] = 0x0e
+		u16[A0 + 0x04] = 0
+		u16[A0 + 0x06] = 0xffff
+		u8[A0 + 0x08] = 5
+		u8[A0 + 0x09] = 1
+
+		A0 += 0x0a
+		u8[A0 + 0x00] = 3
+		u8[A0 + 0x01] = 0
+		u8[A0 + 0x02] = 0x20
+		u8[A0 + 0x03] = 0x0e
+		u16[A0 + 0x04] = 0
+		u16[A0 + 0x06] = 0xffff
+		u8[A0 + 0x08] = 5
+		u8[A0 + 0x09] = 1
+
+		A0 += 0x0a
+		u8[A0 + 0x00] = 3
+		u8[A0 + 0x01] = 0
+		u8[A0 + 0x02] = 0x30
+		u8[A0 + 0x03] = 0x0e
+		u16[A0 + 0x04] = 0
+		u16[A0 + 0x06] = 0xffff
+		u8[A0 + 0x08] = 5
+		u8[A0 + 0x09] = 1
+	*/
+
+		// Load additional save slot data
+		zeroMemory(0x801100, 0x100)
+		System.loadPersistentData(0x801100, "SRAM_SaveslotsExt", 0x100)
+	}
+
+#else
+
+	A0 = 0x200011
+	A1 = 0x2000bd
+	A2 = 0xffffe600
+	D0 = 0x29
+	D1.u16 = 0x4c44
+	fn00c30e()
+	if (!_equal())
+	{
+		copyMemory(0xffffe600, 0x00c262, 0x52)
+		fn00c3c6()
+	}
+
+	bool skipUntil00c256 = false
+	A0 = 0x200281
+	A1 = 0x20032d
+	A2 = 0xffffe6ac
+	D0 = 0x29
+	D1.u16 = 0x4244
+	fn00c30e()
+
+	if (_equal())
+	{
+		A0 = 0xffffe6ac
+		for (u8 i = 0; i < 8; ++i)
+		{
+			if (s8[A0] >= 0)
+			{
+				skipUntil00c256 = true
+				break
+			}
+			A0 += 0x0a
+		}
+	}
+
+	if (!skipUntil00c256)
+	{
+		copyMemory(0xffffe600, 0x00c2b4, 0x52)
+
+		A0 = 0x200169
+		A1 = 0x2001f5
+		A2 = 0xffff0000
+		D0 = 0x19
+		D1.u16 = 0x4244
+		fn00c30e()
+		if (_equal())
+		{
+			A0 = 0xffffe6ac
+			A1 = 0xff0000
+			A2 = 0x00c306
+			D0 = 0x05
+			while (D0.s16 >= 0)
+			{
+				if (s8[A1] >= 0)
+				{
+					u8[A0] = 0
+					u8[A0 + 0x04] = u8[A1 + 0x01]
+					u8[A0 + 0x05] = u8[A1 + 0x07]
+					u8[A0 + 0x02] = u8[A1 + 0x02] << 4
+					D1 = u8[A1 + 0x03]
+					u8[A0 + 0x03] = u8[A2 + D1.s16]
+					D1.u8 = u8[A1 + 0x04]
+					u8[A0 + 0x02] |= D1.u8
+					D1.u8 = u8[A1 + 0x06]
+
+					D2 = 0
+					D3 = 0x06
+					while (D3.s16 >= 0)
+					{
+						if (D1.u8 & 0x01)
+						{
+							D2.u16 |= 0x01
+						}
+						D1.u8 <<= 1
+						D2.u16 <<= 2
+						--D3.s16
+					}
+					u16[A0 + 0x06] = D2.u16
+				}
+
+				A0 += 0x0a
+				A1 += 8
+				--D0.s16
+			}
+		}
+
+		SaveGameSlot()
+	}
+#endif
+
+	u16[0xffffef4c] = 0
+	dataselect.slot_selected = 1
+}
+
+
+//# address-hook(0x00c30e) end(0x00c31e)
+function void fn00c30e()
+{
+	A3 = A2
+	D2.u16 = D0.u16
+	fn00c320()
+	if (!_equal())
+	{
+		A0 = A1
+		A2 = A3
+		D0.u16 = D2.u16
+		fn00c320()
+	}
+}
+
+
+//# address-hook(0x00c320) end(0x00c360)
+function void fn00c320()
+{
+#if !STANDALONE
+	if (u16[0xffffef56] != 0)
+	{
+		set_status_register(0x2700)
+	}
+	u8[0xa130f1] = 1	// Enable SRAM
+#endif
+
+	A6 = A2
+	D6.u16 = D0.u16
+
+	while (D0.s16 >= 0)
+	{
+		u8[A2]   = u8[A0]
+		u8[A2+1] = u8[A0+2]
+		A0 += 4
+		A2 += 2
+		--D0.s16
+	}
+
+#if !STANDALONE
+	u8[0xa130f1] = 0	// Disable SRAM
+	if (u16[0xffffef56] != 0)
+	{
+		set_status_register(0x2300)
+	}
+#endif
+
+	--D6.u16
+	fn00c362()
+
+	if (D7.u16 == u16[A6])
+	{
+		_setZeroFlagByValue(D1.u16 - u16[A6 - 0x02])
+	}
+}
+
+
+//# address-hook(0x00c362) end(0x00c374)
+function void fn00c362()
+{
+	D7 = 0
+	while (D6.s16 >= 0)
+	{
+		D5.u16 = u16[A6]
+		D7.u16 ^= D5.u16
+		if (D7.u16 & 1)
+		{
+			D7.u16 >>= 1
+			D7.u16 ^= 0x8810
+		}
+		else
+		{
+			D7.u16 >>= 1
+		}
+		A6 += 2
+		--D6.s16
+	}
+}
+
+
+//# address-hook(0x00c376) end(0x00c3c0)
+function void fn00c376()
+{
+	A6 = A2
+	D6.u16 = D0.u16 - 1
+	fn00c362()
+
+	u16[A6] = D7.u16
+
+#if !STANDALONE
+	if (u16[0xffffef56] != 0)
+	{
+		set_status_register(0x2700)
+	}
+	u8[0xa130f1] = 1	// Enable SRAM
+#endif
+
+	A3 = A2
+	D1.u16 = D0.u16
+	while (D0.s16 >= 0)
+	{
+		u8[A0]   = u8[A2]
+		u8[A0+2] = u8[A2+1]
+		A0 += 4
+		A2 += 2
+		--D0.s16
+	}
+
+	while (D1.s16 >= 0)
+	{
+		u8[A1]   = u8[A3]
+		u8[A1+2] = u8[A3+1]
+		A1 += 4
+		A3 += 2
+		--D1.s16
+	}
+
+#if !STANDALONE
+	u8[0xa130f1] = 0	// Disable SRAM
+	if (u16[0xffffef56] != 0)
+	{
+		set_status_register(0x2300)
+	}
+#endif
+}
+
+
+//# address-hook(0x00c3c2) end(0x00c3c2)
+function void fn00c3c2()
+{
+	u8[0xffffef56] = 0xff
+	fn00c3c6()
+}
+
+
+//# address-hook(0x00c3c6) end(0x00c3e2)
+function void fn00c3c6()
+{
+	// This function saves the competition mode record data to SRAM
+
+#if STANDALONE
+	System.savePersistentData(0xffffe600, "SRAM_CompetitionRecords", 0x50)
+
+#else
+	u32 backupA0 = A0
+	u16 backupD7 = D7.u16
+
+	// A0 and A1 look like ROM addresses, but actually refer to SRAM (mapped to 0x200000...0x203fff)
+	A0 = 0x200011
+	A1 = 0x2000bd
+	A2 = 0xffffe600
+	D0 = 0x29
+	fn00c376()
+
+	A0 = backupA0
+	D7.u16 = backupD7
+#endif
+}
+
+
+//# address-hook(0x00c3e4) end(0x00c402)
+function void SaveGameSlot()
+{
+	// This function saves the data select saves data to SRAM
+
+#if STANDALONE
+	// Before saving, do a quick check if data is actually valid
+	//  -> Otherwise something went horribly wrong before and we would wipe the save data by saving now
+	bool invalidOrDefault = true
+	for (u32 i = 0; i < 0x50; i += 0x0a)
+	{
+		if (u32[0xffffe6ac + i] != 0 || u32[0xffffe6ac + i + 4] != 0 || (u16[0xffffe6ac + i + 8] != 0 && u16[0xffffe6ac + i + 8] != 0x300))
+		{
+			invalidOrDefault = false
+			break
+		}
+	}
+
+	if (!invalidOrDefault)
+	{
+		SRAM.save(0xffffe6ac, 0, 0x50)
+		System.savePersistentData(0xffffe6ac, "SRAM_Saveslots", 0x50)
+		System.savePersistentData(0x801100, "SRAM_SaveslotsExt", 0x100)
+	}
+
+#else
+	u32 backupA0 = A0
+	u16 backupD7 = D7.u16
+
+	A0 = 0x200281
+	A1 = 0x20032d
+	A2 = 0xffffe6ac
+	D0 = 0x29
+	fn00c376()
+
+	A0 = backupA0
+	D7.u16 = backupD7
+#endif
+}
+
+
+//# address-hook(0x00c434) end(0x00c4d0)
+function void SaveGameOnLevelFinished()
+{
+	// Save game slot
+	if (global.lock_on_state == 0 && global.active_saveslot != 0)
+	{
+		A1 = global.active_saveslot
+
+		// Get the number of the next zone (using the usual internal zone numbering, see definition of global.zone.apparent)
+		u8 offset = global.zone * 2 + global.act
+		u8 nextZone = u8[0x00c404 + offset]
+
+		bool gameCompleted = false
+		if (u8[A1] & 0x03)
+		{
+			// This gets entered only for already completed games
+			if (nextZone < u8[A1 + 0x03])
+			{
+				gameCompleted = true
+			}
+			else
+			{
+				// This is a weird case, supposedly needed for unlocking DDZ after collecting all Super Emeralds in an formerly complete game?
+				u8[A1] &= 0xfc
+			}
+		}
+
+		if (!gameCompleted)
+		{
+			u8[A1 + 0x03] = nextZone
+			if (global.characters == CHARS_KNUCKLES_ALONE)
+			{
+				gameCompleted = (nextZone >= 0x0c)
+			}
+			else if (global.characters == CHARS_TAILS_ALONE)
+			{
+				gameCompleted = (nextZone >= 0x0d)
+			}
+			else
+			{
+				gameCompleted = (nextZone >= 0x0e) || (nextZone == 0x0d && global.chaos_emeralds < 7)
+			}
+
+			if (gameCompleted)
+			{
+				u8[A1] = (global.chaos_emeralds < 7) ? 1 : (global.super_emeralds < 7) ? 2 : 3
+			}
+
+			u16[A1 + 0x04] = 0
+		}
+
+		lives_counter = min(lives_counter, 99)
+		u8[A1 + 0x08] = lives_counter
+
+	#if STANDALONE
+		// Store additional data
+		u32 slotIndex = (A1 - 0xffffe6ac) / 0x0a
+		u32 address = 0x801100 + slotIndex * 0x20
+		u32[address] = player.score
+	#endif
+
+		SaveGameSlot()
+	}
+
+	level.giantrings_clear = 0
+}
+
+
+//# address-hook(0x00c532) end(0x00c56c)
+function void fn00c532()
+{
+	if (global.lock_on_state == 0 && global.active_saveslot != 0)
+	{
+		lives_counter = min(lives_counter, 99)
+		continues_counter = min(continues_counter, 99)
+
+		A1 = global.active_saveslot
+		u8[A1 + 0x08] = lives_counter
+		u8[A1 + 0x09] = continues_counter
+
+		SaveGameSlot()
+	}
+}

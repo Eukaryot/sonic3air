@@ -1,0 +1,97 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Bubbles enemy from Marble Garden Zone                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x088336) end(0x088336)
+function void BubblesEnemy.Init()
+{
+	Object.InitWithUpdateAddress(0x08833c)
+}
+
+
+//# address-hook(0x08833c) end(0x088366)
+function void BubblesEnemy.Update()
+{
+	// Targets:
+	//  - 0x088370	-> objA0.base_state = 0x00
+	//  - 0x0883ac	-> objA0.base_state = 0x02
+	//  - 0x0883e6	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08836a, objA0.base_state)
+
+	u8[A0 + 0x28] = (objA0.animation.sprite == 4) ? 0x86 : 0x12
+
+	Object.loadSpritePatterns(0x088436)
+	fn085208()
+}
+
+
+//# address-hook(0x088370) end(0x0883aa)
+function void fn088370()
+{
+	A1 = 0x088424
+	if (fn084fa4())
+		return
+
+	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80
+	u32[A0 + 0x30] = 0x08844d
+	D0.u16 = 0x0100
+	objA0.value3e = D0.u16
+	objA0.velocity.y = D0.u16
+	u16[A0 + 0x40] = 0x02
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x0883ac) end(0x0883e0)
+function void fn0883ac()
+{
+	fn08459c()
+	D4.u16 = objA0.velocity.y
+	fn0847e6()
+	if (objA0.velocity.y == 0 && D4.s16 >= 0)
+	{
+		objA0.base_state = 0x04
+		u32[A0 + 0x30] = 0x08843e
+		objA0.countdown_callback = 0x088414
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+	}
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x0883e6) end(0x08840e)
+function void fn0883e6()
+{
+	fn08459c()
+	if (!_equal() && objA0.animation.frame == 4)
+	{
+		playSound(0x94)
+	}
+
+	fn0847e6()
+	if (D3.u16 != 0)
+	{
+		objA0.velocity.x = -objA0.velocity.x
+		objA0.render_flags ^= 0x01
+	}
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x088414) end(0x088422)
+function void fn088414()
+{
+	objA0.base_state = 0x02
+	u32[A0 + 0x30] = 0x08844d
+}

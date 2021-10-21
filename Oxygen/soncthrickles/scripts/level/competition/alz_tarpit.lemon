@@ -1,0 +1,97 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Uses code from mgz_tarpit
+
+
+//# address-hook(0x032b8c) end(0x032c68)
+function void fn032b8c()
+{
+	if (debug_mode.state != 0)
+		return
+
+	A1 = 0xffffb000
+	if ((objA0.flags2a & 0x08) == 0)
+	{
+		if (objA0.flags38 < 0x30)
+		{
+			objA0.flags38 += 2
+		}
+		if (u8[A1 + 0x2a] & 0x08)
+		{
+			A2 = 0xffff0000 + u16[A1 + 0x42]
+			if (u32[A2] == 0x032aae)
+			{
+				objA0.flags38 = u8[A2 + 0x38]
+			}
+		}
+	}
+	else
+	{
+		if (objA0.flags38 == 0)
+		{
+			objA0.flags38 = 0x30
+			D1.u8 ^= 0xff
+			objA0.flags2a &= D1.u8
+			u32[A7-=4] = A0
+			A2 = A0
+			A0 = A1
+			Character.Die()
+			A0 = u32[(A7+=4)-4]
+			return
+		}
+		--objA0.flags38
+	}
+
+	D1 = objA0.box_size.x
+	D3 = objA0.flags38 >> 1
+	D6 = 3
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOnForCharacterA1()
+
+	A1 = 0xffffb04a
+	if ((objA0.flags2a & 0x10) == 0)
+	{
+		if (objA0.value3a < 0x30)
+		{
+			objA0.value3a += 2
+		}
+		if (u8[A1 + 0x2a] & 0x08)
+		{
+			A2 = 0xffff0000 + u16[A1 + 0x42]
+			if (u32[A2] == 0x032aae)
+			{
+				objA0.value3a = u8[A2 + 0x3a]
+			}
+		}
+	}
+	else
+	{
+		if (objA0.value3a == 0)
+		{
+			objA0.value3a = 0x30
+			D1.u8 ^= 0xff
+			objA0.flags2a &= D1.u8
+			u32[A7-=4] = A0
+			A2 = A0
+			A0 = A1
+			Character.Die()
+			A0 = u32[(A7+=4)-4]
+			return
+		}
+		--objA0.value3a
+	}
+
+	D1 = objA0.box_size.x
+	D3 = objA0.value3a >> 1
+	D6 = 4
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOnForCharacterA1()
+}

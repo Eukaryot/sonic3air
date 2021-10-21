@@ -1,0 +1,978 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Defines
+
+define outro.wait_time    = s16[0xfffff660]
+define outro.ending_type  =  s8[0xfffffa88]		// This is 2 for best ending, 0 for good ending, -2 for bad ending
+define outro.scrolling.x  = s16[0xfffffac2]
+define outro.scrolling.y  = s16[0xfffffac4]
+define outro.scroll_speed = u32[0xfffffac8]
+
+
+
+
+// Order of things happening with the credits, for Sonic/Tails:
+//   1) Start of credits medley playback -> "fn05dfee()" in best ending, "fn05e1c2()" in other endings
+//   2) Initialization of wait time before credits text starts -> "fn05b514()"
+//   3) Credits text start -> "fn05b1f4()"
+//   4) Credits text end -> "fn05b29e()"
+//   5) Character final pose (needs to be synced well to the music)
+
+// For Knuckles:
+//   1) Initialization of wait time before credits text starts, while music still fades out -> "fn05b514()"
+//   2) Start of credits medley playback -> "fn085b44()"
+//   3) Credits text start -> "fn05b1f4()"
+//   4) Credits text end -> "fn05b29e()"
+//   5) Character final pose (needs to be synced well to the music)
+
+
+
+// Shared between Sonic/Tails and Knuckles
+
+//# address-hook(0x05928c) end(0x0592bc)
+function void fn05928c()
+{
+	// Palette cycling for the ocean
+	if (u8[0xfffff650] == 0)
+	{
+		--u16[0xfffff634]
+		if (s16[0xfffff634] < 0)
+		{
+			u16[0xfffff634] = 0x07
+			D0.u16 = u16[0xfffff632] + 0x06
+			if (D0.u16 >= 0x30)
+				D0 = 0
+			u16[0xfffff632] = D0.u16
+			u32[0xfffffc7a] = u32[0x0592be + D0.s16]
+			u16[0xfffffc7e] = u16[0x0592c2 + D0.s16]
+		}
+	}
+}
+
+
+
+// Credits (Sonic / Tails)
+
+//# address-hook(0x05b18e) end(0x05b196)
+function void fn05b18e()
+{
+	// Targets:
+	//  - 0x05b1a2	-> u16[0xfffffa86] = 0x00  -> Initialization
+	//  - 0x05b1f4	-> u16[0xfffffa86] = 0x02  -> Wait time until credits start
+	//  - 0x05b204	-> u16[0xfffffa86] = 0x04  -> Rolling credits
+	//  - 0x05b2d4	-> u16[0xfffffa86] = 0x06  -> Do nothing any more (when character jumps to the camera, final pose, and final screen)
+	call tableLookupAddress(0x05b19a, u16[0xfffffa86])
+}
+
+
+//# address-hook(0x05b1a2) end(0x05b1e6)
+function void fn05b1a2()
+{
+	u16[0xfffffa86] += 0x02
+	u8[0xfffffacc] = 0
+#if STANDALONE
+	camera.position.x.u16 = -getScreenExtend()		// Center the credits
+#endif
+	camera.position.y = 0
+	scrolloffset.y.both = 0
+	u16[0xfffffaae] = 0
+
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		// Create the object that fades out music and starts the credits medley afterwards
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x085b30
+			u8[A1 + 0x2c] = 0xdc
+		}
+	}
+
+	fn05b514()
+
+	u16[0xfffffc02] = 0x0eee
+	u16[0xfffffc22] = 0x00ee
+
+	addPatternLoadingCue(0x05b1ec)
+}
+
+
+//# address-hook(0x05b1f4) end(0x05b202)
+function void fn05b1f4()
+{
+	--outro.wait_time
+	if (outro.wait_time < 0)
+	{
+		u16[0xfffffa86] += 2
+		fn05b42a()
+	}
+}
+
+
+//# address-hook(0x05b204) end(0x05b282)
+function void fn05b204()
+{
+	u16 oldCamPos = camera.position.y >> 16
+	camera.position.y += outro.scroll_speed
+	u16 newCamPos = camera.position.y >> 16
+
+	if ((oldCamPos & 0x0010) != (newCamPos & 0x0010))
+	{
+		// Next line of text
+		D0.u16 = (newCamPos << 4) + 0x0e00
+		D1.u16 = D0.u16 & 0x0f00
+		fn05b2d6()		// Clear VRAM first for the text line
+
+	#if STANDALONE
+		A1 = CreditsDataGenerator.build(u16[0xfffffaae] / 4)
+	#else
+		u32 address = 0x05b284
+		address += u16[0xfffffaae]		// Credits table index (times 4), this is either 0 or 4
+		address += (global.lock_on_state == 0) ? 0 : 8	// S3&K credits has some more entries, especially in the music sections
+		A1 = u32[address]
+	#endif
+
+		// u16[0xfffffa84] is the line index (times 2) of the next text to print
+		u16 lineIndex = u16[0xfffffa84]
+		A1 = tableLookupAddress(A1, lineIndex)
+
+		// D2.u16 encodes:
+		//  - Upper byte: Credits line number when to print the text (empty lines until this is reached)
+		//  - Bits 1..7:  X-position in patterns where to start the text and color
+		//  - Bit 0:      Text color: white or yellow
+		D2.u16 = u16[A1]
+		A1 += 2
+
+		if (D2.u16 == 0xfff8)
+		{
+			// Switch to next credits table
+			//  -> There are two of them, as each is limited to 0x100 lines
+			//  -> It's even three for S3AIR
+			fn05b294()
+		}
+		else if (D2.u16 == 0xfff4)
+		{
+			fn05b29e()
+		}
+		else
+		{
+			// D0.u16 counts up here until reaching D3.u16, producing empty lines in between
+			D0.u16 &= 0xff00
+			D3.u16 = D2.u16 & 0xff00
+			if (D3.u16 == D0.u16)
+			{
+				// Next actual text line
+				D6.u16 = (D2.u16 & 0x0001) ? 0xa347 : 0x8347	// Includes base sprite VRAM address + the palette to use
+				D2.u16 &= 0x0ffe	// This is the start offset from the left side inside plane A
+
+				// Print next characters, read from address A1 (using ASCII encoding)
+				fn05b318()
+				u16[0xfffffa84] += 2
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x05b294) end(0x05b29c)
+function void fn05b294()
+{
+	u16[0xfffffaae] += 4
+	u16[0xfffffa84] = 0
+}
+
+
+//# address-hook(0x05b29e) end(0x05b2d2)
+function void fn05b29e()
+{
+	u16[0xfffffa86] += 2
+	timer.alldata = 0
+	u8[0xffffeec4] = 0xff
+	u8[0xfffffacc] = 0xff
+
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		if (outro.ending_type >= 0)
+		{
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x05ef68
+			}
+		}
+		else
+		{
+			u8[0xfffffab9] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x05b2d4) end(0x05b2d4)
+function void fn05b2d4()
+{
+}
+
+
+//# address-hook(0x05b2d6) end(0x05b316)
+function void fn05b2d6()
+{
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	// Update credits in plane A: Empty the text line
+	u16 vramAddress = 0xc000 + D1.u16
+	for (u8 i = 0; i < 2; ++i)
+	{
+		VDP.setupVRAMWrite(vramAddress)
+		VDP.zeroVRAM(0x50)
+		vramAddress += 0x80
+	}
+
+#if !STANDALONE
+	set_status_register(0x2300)
+#endif
+}
+
+
+//# address-hook(0x05b514) end(0x05b564)
+function void fn05b514()
+{
+	D1 = 0
+	if (global.lock_on_state == 0)
+	{
+		D1.u16 += 0x24
+	}
+	if (global.region_code & 0x40)		// PAL region needs different timing
+	{
+		D1.u16 += 0x12
+	}
+
+	// Add 6 for Tails, 12 for Knuckles
+	if (isMainCharacter(CHARACTER_TAILS))
+	{
+		D1.u16 += 6
+	}
+	else if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		D1.u16 += 12
+	}
+
+	// Add 4 for best ending, 2 for good ending, 0 for bad ending
+	D1.u16 += (outro.ending_type + 2)
+
+	// Set the credits scrolling speed
+	// Values for S3&K non-PAL:
+	//  - 0x00ce -> Sonic, Tails (bad & good endings)
+	//  - 0x00cf -> Sonic (best ending)
+	//  - 0x00cd -> Tails (best ending)
+	//  - 0x00c8 -> Knuckles (bad ending)
+	//  - 0x00bc -> Knuckles (good & best ending)
+	outro.scroll_speed = u32(u16[0x05b69e + D1.u16]) << 8
+
+	// Set the wait time until credits start
+	// Values for S3&K non-PAL:
+	//  - 0x02ee -> Sonic, Tails (bad ending)
+	//  - 0x0294 -> Sonic (good ending)
+	//  - 0x02ee -> Tails (good ending)
+	//  - 0x0000 -> Sonic, Tails (best ending)
+	//  - 0x00a5 -> Knuckles (bad ending)
+	//  - 0x0078 -> Knuckles (good & best ending)
+	outro.wait_time = u16[0x05b656 + D1.u16]
+
+#if STANDALONE
+	u32 lines = 0x26a			// Number of text lines in credits
+	u32 syncPoint = 0x2cce		// Sync point in credits music (in frames from music start)
+
+	// Credits start and end measured in frames from credits music start
+	//  -> In case of Knuckles' outro, the music will start in 0x5a frames, for the others it has started already
+	u32 creditsStart = isMainCharacter(CHARACTER_KNUCKLES) ? (outro.wait_time - 0x5a) : (level.framecounter + outro.wait_time)
+	u32 creditsEnd = syncPoint
+
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		creditsEnd -= (outro.ending_type == -2) ? 0x248 : 0
+	}
+	else if (isMainCharacter(CHARACTER_SONIC) && outro.ending_type >= 0)
+	{
+		creditsEnd -= 0xda
+	}
+	else
+	{
+		creditsEnd -= (outro.ending_type > 0) ? 0x7c : 0x60
+	}
+
+	// Do our own scroll speed calculation (one more to "round up")
+	outro.scroll_speed = (lines - 0x0e) * 0x1000 / (creditsEnd - creditsStart) + 1
+
+	// Double check to get rounding errors out
+	s32 error =	creditsEnd - creditsStart - (lines - 0x0e) * 0x1000 / outro.scroll_speed
+
+	outro.wait_time += error
+	outro.scroll_speed <<= 8
+#endif
+}
+
+
+
+// The Tornado in full size
+
+//# address-hook(0x05ea52) end(0x05ea64)
+function void fn05ea52()
+{
+	// Targets:
+	//  - 0x05ea74	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x05eadc	-> objA0.base_state = 0x02  -> With main character on the plane (also used during credits)
+	//  - 0x05eb02	-> objA0.base_state = 0x04  -> Waiting until it gets visible
+	//  - 0x05eb16	-> objA0.base_state = 0x06  -> Before catching main character
+	//  - 0x05eb2e	-> objA0.base_state = 0x08  -> Just hovering...
+	call tableLookupAddress(0x05ea6a, objA0.base_state)
+
+	fn060038()
+	fn084920()
+}
+
+
+//# address-hook(0x05ea74) end(0x05ead6)
+function void fn05ea74()
+{
+	setupObjectAttributesFull(0x0600ce)
+
+	if (objA0.flags38 & 0x04)
+	{
+		objA0.flags38 &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
+	}
+
+	if (objA0.subtype2c != 0)
+	{
+		objA0.base_state = 0x04
+		objA0.position.x.u16 = 0x40
+		objA0.position.y.u16 = 0x010b
+		u16[A0 + 0x3a] = 0x010b
+		if (outro.ending_type >= 0)
+		{
+			spawnChildObjects(0x0601e8)
+		}
+	}
+
+	if (global.characters == CHARS_TAILS_ALONE)
+	{
+		u8[A0 + 0x43] -= 4
+	}
+
+	objA0.render_flags |= render_flag.COMPOUND
+	u16[A0 + 0x16] = 0x02
+
+	spawnChildObjects(0x0601c2)
+}
+
+
+//# address-hook(0x05eadc) end(0x05eb00)
+function void fn05eadc()
+{
+	fn085a5a()
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x04) == 0)
+	{
+		MoveAndFlipWithParent()
+	}
+	else
+	{
+		objA0.base_state = 0x08
+		u16[A0 + 0x3a] = objA0.position.y.u16
+	}
+}
+
+
+//# address-hook(0x05eb02) end(0x05eb14)
+function void fn05eb02()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x08)
+	{
+		objA0.base_state = 0x06
+	}
+}
+
+
+//# address-hook(0x05eb16) end(0x05eb2c)
+function void fn05eb16()
+{
+	if ((u8[0xfffffab8] & 0x01) == 0)
+	{
+		objA0.position.x.u16 += 2
+		fn060000()
+	}
+	else
+	{
+		objA0.base_state = 0x02
+	}
+}
+
+
+//# address-hook(0x05eb2e) end(0x05eb2e)
+function void fn05eb2e()
+{
+	fn060000()
+}
+
+
+
+//# address-hook(0x05eb32) end(0x05eb66)
+function void fn05eb32()
+{
+	objA0.update_address = 0x05ebb4
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.sprite_priority = u16[A1 + 0x08]
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x20
+	if (u8[A1 + 0x04] & 0x04)
+	{
+		objA0.render_flags |= 0x04
+	}
+
+	// Targets:
+	//  - 0x05eb72	-> global.characters = CHARS_SONIC_AND_TAILS
+	//  - 0x05eb72	-> global.characters = CHARS_SONIC_ALONE
+	//  - 0x05eb88	-> global.characters = CHARS_TAILS_ALONE
+	//  - 0x05eb9e	-> global.characters = CHARS_KNUCKLES_ALONE
+	call tableLookupAddress(0x05eb6a, global.characters * 2)
+}
+
+
+//# address-hook(0x05ebb4) end(0x05ebc0)
+function void fn05ebb4()
+{
+	fn085a5a()
+	MoveAndFlipWithParent()
+	fn084920()
+}
+
+
+
+//# address-hook(0x05ed6a) end(0x05ed7a)
+function void fn05ed6a()
+{
+	setupObjectAttributesBasic(0x0600f8)
+	objA0.update_address = 0x05ed7e
+	fn05ec00()
+}
+
+
+//# address-hook(0x05ed7e) end(0x05eda6)
+function void fn05ed7e()
+{
+	MoveAndFlipWithParent()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x02)
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.animation.sprite = (global.framecounter.low & 0x02) ? 0x19 : 0x18
+	DrawObject()
+}
+
+
+
+// Logo "Sonic the Hedgehog 3" (without "& Knuckles" and trademark)
+
+//# address-hook(0x05f1f6) end(0x05f204)
+function void fn05f1f6()
+{
+	if ((u8[0xfffffab8] & 0x08) == 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+
+// Large logo "Sonic the Hedgehog 3" (without "& Knuckles" and trademark) in best ending post-credits screen
+
+//# address-hook(0x05f2ea) end(0x05f2f2)
+function void fn05f2ea()
+{
+	if (objA0.countdown_value == 0x40)
+	{
+		u8[0xfffffab8] |= 0x04
+	}
+	fn05f2f8()
+}
+
+
+//# address-hook(0x05f2f8) end(0x05f31a)
+function void fn05f2f8()
+{
+	if ((control.pad1.state & CONTROL_START) == 0 && (control.pad2.state & CONTROL_START) == 0)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value >= 0)
+		{
+			DrawObject()
+			return
+		}
+	}
+
+	global.game_mode = 0
+}
+
+
+
+// Object to create the full "Sonic the Hedgehog 3 & Knuckles" logo
+
+//# address-hook(0x05f20a) end(0x05f25e)
+function void fn05f20a()
+{
+	setupObjectAttributesFull(0x060124)
+
+	// "Sonic the Hedgehog 3"
+	objA0.update_address = 0x05f1f6
+
+	A1 = 0x05f260
+	fn05ff1c()
+
+	copyMemory(0xfffffca0, 0x060ada, 0x20)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f526
+		u16[A1 + 0x46] = A0.u16
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f4fa
+		u16[A1 + 0x46] = A0.u16
+		u8[A1 + 0x2c] = 0x02
+	}
+}
+
+
+
+// "Sonic the Hedgehog 3 & Knuckles" logo in the best ending final screen
+
+//# address-hook(0x05f26c) end(0x05f2dc)
+function void fn05f26c()
+{
+	setupObjectAttributesFull(0x060154)
+
+	objA0.update_address = 0x05f1f6
+	if (objA0.subtype2c != 0)
+	{
+		objA0.update_address = 0x05f2ea
+		objA0.countdown_value = 0x04af
+		u8[0xfffffab8] &= ~0x04
+	}
+
+	A1 = 0x05f2e2
+	fn05ff1c()
+
+	copyMemory(0xfffffca0, 0x060ada, 0x20)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f4fa
+		u16[A1 + 0x46] = A0.u16
+		u8[A1 + 0x2c] = 0x04
+	}
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f546
+		u16[A1 + 0x46] = A0.u16
+	}
+
+	spawnChildObjects(0x0601f0)
+}
+
+
+
+// Sonic in best ending final screen
+
+//# address-hook(0x05f31c) end(0x05f36c)
+function void fn05f31c()
+{
+	setupObjectAttributesMost(0x060160)
+
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x05f376
+
+	A1 = 0x05f36e
+	fn05fefe()
+
+	copyMemory(0xfffffc80, 0x0a8a3c, 0x20)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05ff62
+		u16[A1 + 0x30] = 0xfc02
+		u16[A1 + 0x32] = 0xfc82
+		u16[A1 + 0x3a] = 0x0e
+	}
+}
+
+
+//# address-hook(0x05f376) end(0x05f398)
+function void fn05f376()
+{
+	Object.animationProgress(0x06025c)
+	if (u8[0xfffffab8] & 0x04)
+	{
+		objA0.update_address = 0x05f39e
+		A1 = 0x060260
+		fn084580()
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x05f39e) end(0x05f3a4)
+function void fn05f39e()
+{
+	Object.AnimationProgressByLocalA1()
+	DrawObject()
+}
+
+
+// Tails in best ending final screen
+
+//# address-hook(0x05f3aa) end(0x05f3cc)
+function void fn05f3aa()
+{
+	setupObjectAttributesMost(0x060168)
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x05f3da
+
+	A1 = 0x05f3d2
+	fn05fefe()
+
+	spawnChildObjects(0x060204)
+}
+
+
+//# address-hook(0x05f3da) end(0x05f3e4)
+function void fn05f3da()
+{
+	Object.animationProgress(0x06026b)
+	DrawObject()
+}
+
+
+//# address-hook(0x05f3ea) end(0x05f3fa)
+function void fn05f3ea()
+{
+	// And this is Tails' tails
+	setupObjectAttributesBasic(0x060170)
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x05f400
+	fn05f400()
+}
+
+
+//# address-hook(0x05f400) end(0x05f40a)
+function void fn05f400()
+{
+	Object.animationProgress(0x06026f)
+	DrawObject()
+}
+
+
+// Knuckles in best ending final screen
+
+//# address-hook(0x05f410) end(0x05f460)
+function void fn05f410()
+{
+	setupObjectAttributesFull(0x060176)
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x05f46a
+#if STANDALONE
+	// Make sure Knuckles is rendered in front of Sonic
+	objA0.sprite_priority = 0x80
+#endif
+
+	A1 = 0x05f462
+	fn05fefe()
+
+	copyMemory(0xfffffcc0, 0x060afa, 0x20)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05ff62
+		u16[A1 + 0x30] = 0xfc42
+		u16[A1 + 0x32] = 0xfcc2
+		u16[A1 + 0x3a] = 0x0e
+	}
+}
+
+
+//# address-hook(0x05f46a) end(0x05f47a)
+function void fn05f46a()
+{
+	A1 = 0x066771
+	fn08468c()
+	fn05fea8()
+	DrawObject()
+}
+
+
+
+// Logo "& Knuckles"
+
+//# address-hook(0x05f4fa) end(0x05f51c)
+function void fn05f4fa()
+{
+	if ((global.region_code & 0x80) == 0)
+	{
+		fn05ec36()
+		return
+	}
+
+	setupObjectAttributesFull(0x060130)
+
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x084920
+
+	A1 = 0x05f520
+	fn05ffd4()
+}
+
+
+
+// Trademark?
+
+//# address-hook(0x05f526) end(0x05f540)
+function void fn05f526()
+{
+	setupObjectAttributesFull(0x06013c)
+
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x084920
+
+	A1 = 0x05f544
+	fn05ffd4()
+}
+
+
+
+// "& Knuckles" logo in best ending final screen
+
+//# address-hook(0x05f546) end(0x05f560)
+function void fn05f546()
+{
+	setupObjectAttributesFull(0x060148)
+
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x084920
+
+	A1 = 0x05f564
+	fn05ffd4()
+}
+
+
+
+// Clouds
+
+//# address-hook(0x05f94c) end(0x05f980)
+function void fn05f94c()
+{
+	objA0.update_address = 0x05f986
+	global.random.seed = global.framecounter
+
+	A1 = 0x060b3a
+	A2 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0xfffffc00 : 0xfffffc20
+	copyMemory(A2, 0x060b3a, 0x10)
+
+	Kosinski.addToDMAQueue(0x165826, 0x76c0)
+}
+
+
+//# address-hook(0x05f986) end(0x05fa56)
+function void fn05f986()
+{
+	if (u8[0xfffffab9] == 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	if (global.framecounter.low & u8[0xfffffab9])
+		return
+
+	++objA0.value39
+	if (allocDynamicObjectStd())
+	{
+		GetRandomNumber()
+		objA1.update_address = 0x05fa58
+		u8[A1 + 0x2c] = D0.u8
+
+		if (outro.scrolling.x != 0)
+		{
+			D1.u16 = D0.u16 & 0x3f
+			if (outro.scrolling.x < 0)
+				D1.s16 = -D1.s16
+			objA1.velocity.x = outro.scrolling.x + D1.s16
+		}
+
+		if (outro.scrolling.y != 0)
+		{
+			D1 = (D0 >> 16) & 0x3f
+			if (outro.scrolling.y < 0)
+				D1.s16 = -D1.s16
+			objA1.velocity.y = outro.scrolling.y + D1.s16
+		}
+
+		if (outro.scrolling.x != 0 && (outro.scrolling.y == 0 || (objA0.value39 & 0x01) == 0))
+		{
+			objA1.position.x.u16 = (outro.scrolling.x < 0) ? (0x1f0 + getScreenExtend() * 2) : 0x50
+			objA1.position.y.u16 = (D0.u16 & 0xff) + 0x80
+		}
+		else
+		{
+			D1.u16 = D0.u16 & 0x01ff
+			D2.s16 = D1.u16 - (getScreenWidth() + 0x20)
+			if (D2.s16 >= 0)
+			{
+				D1.u16 = D2.s16 * 2 + 0x10
+			}
+			objA1.position.x.u16 = D1.u16 + 0x70
+			objA1.position.y.u16 = (outro.scrolling.y < 0) ? 0x180 : 0x60
+		}
+
+		u8[A1 + 0x22] = (D0.s16 < 0) ? 3 : 1
+	}
+}
+
+
+//# address-hook(0x05fa58) end(0x05fa86)
+function void fn05fa58()
+{
+	objA0.update_address = 0x05fa8c
+	objA0.mapping_offset = 0x053518
+	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x03b6 : 0x23b6
+	objA0.sprite_priority = 0x0300
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x10
+	fn05fa8c()
+}
+
+
+//# address-hook(0x05fa8c) end(0x05fac8)
+function void fn05fa8c()
+{
+	if (outro.scrolling.x != 0)
+	{
+		objA0.position.x += s16(objA0.velocity.x + outro.scrolling.x) << 8
+	}
+	if (outro.scrolling.y != 0)
+	{
+		objA0.position.y += s16(objA0.velocity.y + outro.scrolling.y) << 8
+	}
+
+	if (objA0.position.x.u16 >= 0x0200 + getScreenExtend() * 2 || objA0.position.y.u16 >= 0x0200)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+
+//# address-hook(0x05fe82) end(0x05fea6)
+function void fn05fe82()
+{
+	zeroMemory(0xfffffa82, 8)
+
+	outro.ending_type = (global.super_emeralds == 7) ? 2 : (global.chaos_emeralds == 7) ? 0 : -2
+}
+
+
+
+//# address-hook(0x05fea8) end(0x05fefc)
+function void fn05fea8()
+{
+	if (objA0.animation.sprite != objA0.value3a)
+	{
+		objA0.value3a = objA0.animation.sprite
+		updateMultipleSpritePatterns(0x1200e0, 0x14bd0a, 0xbc00, objA0.animation.sprite)
+	}
+}
+
+
+
+//# address-hook(0x05fefe) end(0x05ff1a)
+function void fn05fefe()
+{
+	A1 += (global.characters & 0x03) * 2
+	objA0.position.x.u16 += s8[(A1+=1)-1]
+	objA0.position.y.u16 += s8[(A1+=1)-1]
+}
+
+
+//# address-hook(0x05ffd4) end(0x05fffe)
+function void fn05ffd4()
+{
+	A1 += objA0.subtype2c
+	A2 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = u16[A2 + 0x10] + s8[(A1+=1)-1]
+	objA0.position.y.u16 = u16[A2 + 0x14] + s8[(A1+=1)-1]
+}
+
+
+
+//# address-hook(0x060000) end(0x06001c)
+function void fn060000()
+{
+	// Gentle hovering animation of the Tornado
+	u8[A0 + 0x3c] += 4
+	D0.u8 = u8[A0 + 0x3c]
+	LookupSinCos()
+	D0.s16 >>= 6
+	D1.u16 = u16[A0 + 0x3a] + D0.u16
+	objA0.position.y.u16 = D1.u16
+}
+
+
+//# address-hook(0x060038) end(0x06006c)
+function void fn060038()
+{
+	A1 = 0x06006e
+	fn086458()
+
+	D0 = u8[A0 + 0x44] + 1
+	if (D0.u8 >= 6)
+		D0 = 0
+	u8[A0 + 0x44] = D0.u8
+	u8[A0 + 0x1d] = u8[0x060072 + D0.s16]
+	objA0.animation.frame = (global.framecounter.low & 0x01) ? 7 : 6
+}
+
+
+//# address-hook(0x06008a) end(0x0600ae)
+function void fn06008a()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0 = u16(u8[A1 + 0x22] - 1) * 2
+	A2 = tableLookupAddress(0x0600b0, D0.s16)
+	if (objA0.subtype2c != 0)
+		A2 += 2
+	D0.u16 = u16[(A2+=2)-2]
+	objA0.value42 = D0.u16
+}

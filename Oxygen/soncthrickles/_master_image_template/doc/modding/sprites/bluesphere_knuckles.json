@@ -1,0 +1,13 @@
+{
+	"bluesphere_knuckles_0x01": { "File": "bluesphere_knuckles.bmp", "Rect": "0,4,32,48", "Center": "16,39" },
+	"bluesphere_knuckles_0x02": { "File": "bluesphere_knuckles.bmp", "Rect": "32,4,32,48", "Center": "16,43" },
+	"bluesphere_knuckles_0x03": { "File": "bluesphere_knuckles.bmp", "Rect": "64,4,32,48", "Center": "16,43" },
+	"bluesphere_knuckles_0x04": { "File": "bluesphere_knuckles.bmp", "Rect": "96,0,32,56", "Center": "16,43" },
+	"bluesphere_knuckles_0x05": { "File": "bluesphere_knuckles.bmp", "Rect": "128,4,32,48", "Center": "16,43" },
+	"bluesphere_knuckles_0x06": { "File": "bluesphere_knuckles.bmp", "Rect": "160,4,32,48", "Center": "16,43" },
+	"bluesphere_knuckles_0x07": { "File": "bluesphere_knuckles.bmp", "Rect": "192,0,32,56", "Center": "16,43" },
+	"bluesphere_knuckles_0x08": { "File": "bluesphere_knuckles.bmp", "Rect": "224,4,32,48", "Center": "16,43" },
+	"bluesphere_knuckles_0x09": { "File": "bluesphere_knuckles.bmp", "Rect": "256,12,32,32", "Center": "16,38" },
+	"bluesphere_knuckles_0x0a": { "File": "bluesphere_knuckles.bmp", "Rect": "288,12,32,32", "Center": "16,38" },
+	"bluesphere_knuckles_0x0b": { "File": "bluesphere_knuckles.bmp", "Rect": "320,12,32,32", "Center": "16,38" }
+}

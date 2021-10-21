@@ -1,0 +1,83 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03ca1a) end(0x03ca1a)
+function void fn03ca1a()
+{
+	objA0.update_address = 0x03ca20
+
+#if STANDALONE
+	// Spawn the first platform here already (and the second one right away in "fn03ca20")
+	FBZWindingElevator.spawnPlatform((objA0.flags2a & 0x01) ? 96 : -96)
+#endif
+
+	fn03ca20()
+}
+
+
+//# address-hook(0x03ca20) end(0x03ca8c)
+function void fn03ca20()
+{
+	// Countdown until next platform spawns
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		u16[A0 + 0x30] = 95
+		FBZWindingElevator.spawnPlatform(0)
+	}
+
+	CheckForUnloadObject()
+}
+
+
+function void FBZWindingElevator.spawnPlatform(s16 offset)
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03ca92
+		u16[A1 + 0x0a] = 0x42d2
+		u8[A1 + 0x04] |= 0x04
+		u8[A1 + 0x06] = 0x20
+		u8[A1 + 0x07] = 0x30
+		u16[A1 + 0x08] = 0x80
+		u32[A1 + 0x0c] = 0x03cb0c
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16 + offset
+		objA1.velocity.y = (objA0.flags2a & 0x01) ? 1 : -1
+		u16[A1 + 0x30] = u16(objA0.subtype2c) * 8
+	}
+}
+
+
+
+// Single platform in the elevator
+
+//# address-hook(0x03ca92) end(0x03caca)
+function void fn03ca92()
+{
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		objA0.position.x.u16 = 0x7f00
+	}
+
+	objA0.position.y.u16 += objA0.velocity.y
+	D1.u16 = 0x3b
+	D2.u16 = 0x10
+	D4.u16 = objA0.position.x.u16
+	A2 = 0x03cad0
+	fn01dd0e()
+
+	if (objA0.velocity.y >= 0)
+	{
+		fn01e580()
+	}
+	DrawOrUnloadObject()
+}

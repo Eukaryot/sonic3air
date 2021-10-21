@@ -1,0 +1,13 @@
+{
+	"cutscene_knuckles_5_0x00": { "File": "cutscene_knuckles_5.bmp", "Rect": "0,8,40,24", "Center": "20,12" },
+	"cutscene_knuckles_5_0x01": { "File": "cutscene_knuckles_5.bmp", "Rect": "40,8,40,24", "Center": "20,12" },
+	"cutscene_knuckles_5_0x02": { "File": "cutscene_knuckles_5.bmp", "Rect": "80,8,40,24", "Center": "20,12" },
+	"cutscene_knuckles_5_0x03": { "File": "cutscene_knuckles_5.bmp", "Rect": "124,8,32,24", "Center": "12,12" },
+	"cutscene_knuckles_5_0x04": { "File": "cutscene_knuckles_5.bmp", "Rect": "160,8,40,24", "Center": "20,12" },
+	"cutscene_knuckles_5_0x05": { "File": "cutscene_knuckles_5.bmp", "Rect": "200,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_5_0x06": { "File": "cutscene_knuckles_5.bmp", "Rect": "240,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_5_0x07": { "File": "cutscene_knuckles_5.bmp", "Rect": "280,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_5_0x08": { "File": "cutscene_knuckles_5.bmp", "Rect": "320,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_5_0x09": { "File": "cutscene_knuckles_5.bmp", "Rect": "364,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_5_0x0a": { "File": "cutscene_knuckles_5.bmp", "Rect": "404,0,32,40", "Center": "12,20" }
+}

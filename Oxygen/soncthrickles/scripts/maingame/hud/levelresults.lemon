@@ -1,0 +1,544 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Results screen at end of act                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x02dad0) end(0x02dada)
+function void LevelResults.Update()
+{
+#if STANDALONE
+	// TODO: This does not really work, it should better be any of the ABC buttons instead of Start and work like an actual big fullscreen button
+	//Input.setTouchInputMode(TOUCH_INPUT_MODE_FULLSCREEN_START)
+#endif
+
+	// Targets:
+	//  - 0x02dae6	-> objA0.base_state = 0x00
+	//  - 0x02dbca	-> objA0.base_state = 0x02
+	//  - 0x02dc36	-> objA0.base_state = 0x04
+	//  - 0x02dcca	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x02dade, objA0.base_state)
+}
+
+
+//# address-hook(0x02dae6) end(0x02dbc8)
+function void fn02dae6()
+{
+	playMusic(MUSIC_CTRL_FADEOUT)
+
+	Kosinski.addToDMAQueue(0x0d6a62, 0xa400)
+	if (global.zone_act != 0x1600 && global.act.apparent == 0)
+	{
+		// Any Act 1
+		A1 = 0x0d6d84
+		D0 = 0
+	}
+	else
+	{
+		// Any Act 2, incl. Lava Reef Boss Act
+		A1 = 0x0d6e46
+		D0 = 0xffffffff
+	}
+
+	u16[A0 + 0x2c] = D0.u16
+	Kosinski.addToDMAQueue(A1, 0xad00)
+
+	if (isMainCharacter(CHARACTER_SONIC))
+	{
+		// Sonic
+		A1 = 0x15b95c
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		// Tails - or Miles
+		A1 = (global.region_code & 0x80) ? 0x39ab6a : 0x39aa18
+	}
+	else
+	{
+		// Knuckles
+		A1 = 0x0d67f0
+	}
+	D2.u16 = (u16[A0 + 0x2c] != 0) ? 0xb400 : 0xaf00
+	Kosinski.addToDMAQueue(A1, D2.u16)
+
+	hud.dirty.timer = 0
+	u32 seconds = timer.seconds + u32(timer.minutes) * 60
+	if (seconds == 599)
+	{
+		// Special time bonus for 9:59
+		results.time_bonus = 10000
+	}
+	else
+	{
+		// Time bonus		  Original	   S3AIR
+		//  - 0:00 .. 0:59	-> 50.000	-> 50.000
+		//  - 1:00 .. 1:29	-> 10.000	-> 10.000
+		//  - 1:30 .. 1:59	->  5.000	-> 10.000
+		//  - 2:00 .. 2:29	->  4.000	->  5.000
+		//  - 2:30 .. 2:59	->  3.000	->  5.000
+		//  - 3:00 .. 3:29	->  1.000	->  3.000
+		//  - 3:30 .. 3:59	->    100	->  3.000
+		//  - 4:00 .. 4:59	->    100	->  2.000
+		//  - 5:00 .. 5:59	->    100	->  1.000
+		//  - 6:00 .. 6:59	->    100	->    500
+		//  - 7:00 .. 9:58	->    100	->      0
+	#if STANDALONE
+		if (seconds < 60)
+			results.time_bonus = 5000
+		else if (seconds < 120)
+			results.time_bonus = 1000
+		else if (seconds < 180)
+			results.time_bonus = 500
+		else if (seconds < 240)
+			results.time_bonus = 300
+		else if (seconds < 300)
+			results.time_bonus = 200
+		else if (seconds < 360)
+			results.time_bonus = 100
+		else if (seconds < 420)
+			results.time_bonus = 50
+		else
+			results.time_bonus = 0
+	#else
+		u16 offset = min(seconds / 30, 7)
+		results.time_bonus = u16[0x02deaa + offset * 2]
+	#endif
+	}
+
+	results.ring_bonus = u32(ring_counter) * 10
+	results.total_bonus = 0
+	objA0.countdown_value = 360
+	u16[A0 + 0x30] = 12
+	objA0.base_state += 2
+}
+
+
+//# address-hook(0x02dbca) end(0x02dc34)
+function void fn02dbca()
+{
+	if (kosinski.waiting_modules != 0)
+		return
+
+	// Create the HUD elements
+	if (allocDynamicObjectAfterA0())
+	{
+		A2 = 0x02deba
+		D1 = 11
+
+		while (D1.s16 >= 0)
+		{
+			u32[A1] = u32[A2]
+			u8[A1 + 0x04] = render_flag.COMPOUND
+			u16[A1 + 0x46] = u16[A2+4]
+			objA1.position.x.u16 = u16[A2+6]
+			objA1.position.y.u16 = u16[A2+8]
+			u8[A1 + 0x05] = (s16[A1 + 0x10] >= 0) ? 0xff : 0x00
+			u8[A1 + 0x22] = u8[A2+10]
+			u8[A1 + 0x07] = u8[A2+11]
+			u8[A1 + 0x28] = u16[A2+12]
+			u32[A1 + 0x0c] = 0x02f26a
+			u16[A1 + 0x48] = A0.u16
+			A2 += 14
+
+			#if STANDALONE
+			{
+				// Move elements towards screen center
+				u16 offset = getScreenExtend()
+				objA1.position.x.u16 += offset
+				if (u32[A1] != 0x02d8e2)
+					u16[A1 + 0x46] += offset
+			}
+			#endif
+
+			--D1.s16
+			if (!allocDynamicObjectAfterA1())
+				break
+		}
+
+		objA0.base_state += 2
+		if (global.act.apparent == 0)
+		{
+			// AIZ and ICZ have some special handling of apparent vs. current act 1
+			if (global.zone.apparent != 0x00 && global.zone.apparent != 0x05)
+			{
+				u8[0xffffeec6] = 0xff
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x02dc36) end(0x02dd38)
+function void LevelResults.UpdateBonusCounting()
+{
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value != 289)
+			return
+
+		// Reset char.drown_countdown for both characters
+		u8[0xffffb02c] = 30
+		u8[0xffffb076] = 30
+
+		playMusic(MUSIC_LEVELCLEAR)
+		return
+	}
+
+	u16 delta = 10
+#if STANDALONE
+	if (Game.getSetting(SETTING_LEVELRESULT_SCORE))
+	{
+		// Count faster over time
+		if (results.total_bonus >= 3000)
+			delta = 30
+		else if (results.total_bonus >= 1000)
+			delta = 20
+
+		// Allow for manually (more or less) skipping the counter
+		if ((control.pad1.state & (CONTROL_ABC | CONTROL_START)) || Input.buttonDown(BUTTON_Y))
+		{
+			delta = 200
+		}
+	}
+#endif
+
+	D0 = 0
+	if (results.time_bonus != 0)
+	{
+		u16 diff = min(delta, results.time_bonus)
+		D0.u16 += diff
+		results.time_bonus -= diff
+	}
+	if (results.ring_bonus != 0)
+	{
+		u16 diff = min(delta, results.ring_bonus)
+		D0.u16 += diff
+		results.ring_bonus -= diff
+	}
+
+	results.total_bonus += D0.u16
+	if (D0.u16 != 0)
+	{
+		// Still counting
+		addScore(D0)
+		if ((level.framecounter & 0x03) == 0)
+		{
+			playSound(SFX_CLICK)
+		}
+	}
+	else
+	{
+		// Done
+		playSound(0xb0)
+
+		// Special handling for Sky Sanctuary Zone (S/T) and probably also Lava Reef Boss
+		if (global.zone_act == 0x0a00 || u16[A0 + 0x2c] != 0)
+		{
+			u8[0xffffef56] = 0xff
+			SaveGameOnLevelFinished()
+		}
+
+		objA0.countdown_value = 90
+		objA0.base_state += 2
+		LevelResults.AdvanceToNextAct()
+	}
+}
+
+
+//# address-hook(0x02dcca)
+function void LevelResults.AdvanceToNextAct()
+{
+#if STANDALONE
+	if (level.restart)
+	{
+		// Fix "frame-perfect reset" bug, but only for highest level of glitch fix setting
+		if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
+		{
+			UnloadObject()
+			return
+		}
+	}
+#endif
+
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+		return
+	}
+
+	if (u16[A0 + 0x30] != 0)
+	{
+		++objA0.value32
+		return
+	}
+
+	level.wait_for_results = 0
+
+#if STANDALONE
+	Standalone.onLevelFinished()
+#endif
+
+	// Sky Sanctuary, Lava Reef Boss, Hidden Palace, or any Act 2?
+	if (global.zone == 0x0a || global.zone == 0x16 || global.act.apparent != 0)
+	{
+		level.results_done = 0xff
+		UnloadObject()
+		return
+	}
+
+	global.act.apparent = 1
+	checkpoint.number = 0
+	global.stage_type = 0
+
+	// Sandopolis, Death Egg use a small cutscene before showing the title card
+	if (global.zone == 0x08 || global.zone == 0x0b)
+	{
+		UnloadObject()
+		return
+	}
+
+	// Show title card for Act 2
+	objA0.update_address = 0x02d690
+	objA0.base_state = 0
+	u8[A0 + 0x3e] = 0xff
+
+#if STANDALONE
+	Standalone.onLevelStart()
+
+	// Special handling for AIZ, when Knuckles uses Sonic's path
+	if (global.zone == 0x00 && isMainCharacter(CHARACTER_KNUCKLES) && camera.position.y.u16 < 0x400)
+	{
+		checkpoint.number = 4		// That number seems to be unused otherwise in whole AIZ
+		checkpoint.x = 0x1240
+		checkpoint.y = 0x0358
+		Checkpoint.SaveCurrentState()
+		checkpoint.move_area.bottom = 0x0590	// Overwrite move_area.bottom.* backup accordingly
+	}
+#endif
+}
+
+
+
+// Single HUD elements
+
+// In level results, the following are the individual objects.
+// Most important difference between them is their animation sprite.
+//  - Character name			-> objA0.animation.sprite = 0x13 ... 0x16
+//  - "got"						-> objA0.animation.sprite = 0x11
+//  - "through"					-> objA0.animation.sprite = 0x10
+//  - Act icon					-> objA0.animation.sprite = 0x0f (at least for Act 1)
+//  - "Time"					-> objA0.animation.sprite = 0x0e
+//  - "Ring"					-> objA0.animation.sprite = 0x0d
+//  - 2x "Bonus" incl. the icon	-> objA0.animation.sprite = 0x0c
+//  - "Total" incl. the icon	-> objA0.animation.sprite = 0x0b
+
+//# address-hook(0x02dd3e) end(0x02dd92)
+function void LevelResults.UpdateCharacterNameDisplay()
+{
+	if (global.characters == CHARS_TAILS_ALONE)
+	{
+		++objA0.animation.sprite
+		if (global.region_code & 0x80)
+		{
+			// Small changes for "Miles" instead of "Tails"
+			++objA0.animation.sprite
+			D0 = 8
+			objA0.position.x.u16 += D0.u16
+			u16[A0 + 0x46] += D0.u16
+			objA0.box_size.x -= D0.u8
+		}
+	}
+	else if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		objA0.animation.sprite += 3
+		D0 = 0x30
+		objA0.position.x.u16 -= D0.u16
+		u16[A0 + 0x46] -= D0.u16
+		objA0.box_size.x += D0.u8
+	}
+
+	A1 = 0xffff0000 + u16[A0 + 0x48]
+	D0 = (u16[A1 + 0x2c] != 0) ? 0x28 : 0
+	objA0.sprite_attributes = D0.u16
+	objA0.update_address = 0x02dd98
+	LevelResults.UpdateStaticTextDisplay()
+}
+
+
+//# address-hook(0x02dd98) end(0x02dd9c)
+function void LevelResults.UpdateStaticTextDisplay()
+{
+	if (fn02de04())
+		return
+	DrawObject()
+}
+
+
+//# translated(0x02de04) end(0x02de4e)
+function bool fn02de04()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x48]
+	D0.u16 = u16[A1 + 0x32]
+	if (D0.u16 != 0)
+	{
+		if (!(objA0.render_flags & render_flag.VISIBLE))
+		{
+			--u16[A1 + 0x30]
+			UnloadObject()
+			return true
+		}
+
+		if (D0.u8 < u8[A0 + 0x28])
+			return false
+
+		objA0.position.x.u16 += (objA0.base_state != 0) ? 0x20 : -0x20
+	}
+	else
+	{
+		s16 diff = u16[A0 + 0x46] - objA0.position.x.u16
+		if (diff != 0)
+		{
+			objA0.position.x.u16 += clamp(diff, -0x10, 0x10)
+		}
+	}
+	return false
+}
+
+
+//# address-hook(0x02dda2) end(0x02ddaa)
+function void LevelResults.UpdateTimeBonusDisplay()
+{
+	if (fn02de04())
+		return
+	D0.u16 = results.time_bonus
+	fn02ddbe()
+}
+
+
+//# address-hook(0x02ddac) end(0x02ddb4)
+function void LevelResults.UpdateRingBonusDisplay()
+{
+	if (fn02de04())
+		return
+	D0.u16 = results.ring_bonus
+	fn02ddbe()
+}
+
+
+//# address-hook(0x02ddb6) end(0x02ddc0)
+function void LevelResults.UpdateTotalBonusDisplay()
+{
+	if (fn02de04())
+		return
+	D0.u16 = results.total_bonus
+	fn02ddbe()
+}
+
+
+//# address-hook(0x02ddbe)
+function void fn02ddbe()
+{
+	fn02ddc6()
+
+#if !STANDALONE
+	DrawObject()
+#endif
+}
+
+
+//# address-hook(0x02ddc6) end(0x02de02)
+function void fn02ddc6()
+{
+#if STANDALONE
+	// Exclude Blue Sphere results (for now)
+	u16 renderQueue = (objA0.update_address < 0x02ea5a) ? 0xe000 : 0
+#endif
+
+	u16[A0 + 0x16] = 7
+	fn02de50()
+
+	D1 = (D1 << 4) + (D1 >> 28)
+	A1 = A0 + 0x18
+	D2.u16 = objA0.position.x.u16 - 0x38
+	D3.u16 = objA0.position.y.u16
+	D4 = 0
+
+	for (u8 i = 0; i < 7; ++i)
+	{
+		u16[A1] = D2.u16
+		u16[A1+2] = D3.u16
+		D1 = (D1 << 4) + (D1 >> 28)
+		D0.u16 = D1 & 0x0f
+		if (D0.u16 != 0)
+			D4 = 1
+		D0.u16 += D4.u16
+		u8[A1+5] = D0.u8
+
+	#if STANDALONE
+		// Render the score digits directly right here
+		if (renderQueue != 0 && D0.u16 > 0)
+		{
+			HUD.drawDigit(D0.u16 - 1, D2.u16 - 0x80, D3.u16 - 0x80, renderQueue)
+		}
+	#endif
+
+		A1 += 6
+		D2.u16 += 8
+	}
+
+#if STANDALONE
+	// Render the additional 0 at the end
+	if (renderQueue != 0)
+	{
+		HUD.drawDigit(0, D2.u16 - 0x80, D3.u16 - 0x80, renderQueue)
+	}
+#endif
+}
+
+
+//# address-hook(0x02de50) end(0x02de78)
+function void fn02de50()
+{
+	u32[0xffffef40] = 0
+	A1 = 0x02deaa
+	for (u8 k = 0; k < 0x10; ++k)
+	{
+		D0.u16 = (D0.u16 >> 1) + (D0.u16 << 15)
+		if (D0.u16 & 0x8000)
+		{
+			// BCD calculation
+			u8 carry = 0
+			for (u8 i = 1; i < 4; ++i)
+			{
+				u8 src = u8[A1 - i]
+				u8 dst = u8[0xffffef44 - i]
+
+				u16 value = (src & 0x0f) + (dst & 0x0f) + carry
+				if (value >= 0x0a)
+					value += 6
+
+				value += (src & 0xf0) + (dst & 0xf0)
+				carry = (value >= 0xa0) ? 1 : 0
+				if (carry)
+					value -= 0xa0
+
+				u8[0xffffef44 - i] = value
+			}
+			A1 -= 3
+		}
+		else
+		{
+			A1 -= 3
+		}
+	}
+	D1 = u32[0xffffef40]
+}

@@ -1,0 +1,115 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// This file may only be included if STANDALONE preprocessor definition is set
+#if !STANDALONE
+	COMPILER_ERROR
+#endif
+
+
+// Basic switches
+define bool DIRECT_OBJECT_RENDERING			  = 1	// Renders objects in a more direct way, similar to the characters
+define bool EXTENDED_CHARACTER_PALETTES		  = 1	// Make characters use their own, additional palette lines -- note that there are parts of the code that require this to be set!
+
+// Experimental modifications to the original game
+define bool MODIFICATION_TOGETHERNESS		  = 0	// Allows player 2 to instantly move to player 1 by pressing Y
+
+// Cheats
+define bool CHEAT_ONE_BLUE_SPHERE			  = 0	// If set, only a single blue sphere has to be collected in the special stages
+
+// Debugging stuff
+define bool DEBUG_DISABLE_HUD				  = 0
+define bool DEBUG_DYNAMIC_COLLISIONS		  = 0
+
+
+
+// Global variables
+global bool useKnucklesAndTails
+
+global s16 globalComponentTintColorR
+global s16 globalComponentTintColorG
+global s16 globalComponentTintColorB
+global s16 globalComponentAddedColorR
+global s16 globalComponentAddedColorG
+global s16 globalComponentAddedColorB
+
+global bool enableCustomPlaneReset
+
+global s16 verticalScrollOffsetBias
+
+
+
+
+//-------------------------------------------------------//
+// Functions called from script to end current frame     //
+//-------------------------------------------------------//
+
+function void waitForNextFrame()
+{
+	// V-Int
+	VInt.InnerUpdate()
+
+	// H-Int
+	if (h_int.line < getScreenHeight())
+	{
+		if (irq_table.lineupdate == 0x000d10)
+		{
+			// Used in competition mode
+			HInt_000d10()
+		}
+		else if (irq_table.lineupdate == 0x000dd8)
+		{
+			// Default water handling
+			HInt_000dd8()
+		}
+		else if (irq_table.lineupdate == 0x001024)
+		{
+			// Hydrocity Zone water handling
+			HInt_001024()
+		}
+		else if (irq_table.lineupdate == 0x050056)
+		{
+			// Used in AIZ 2 blimp sequence + MHZ 2 zone transition
+			HInt_050056()
+		}
+	}
+
+	// Apply global tint color for screen fades
+	Renderer.setGlobalComponentTint(globalComponentTintColorR, globalComponentTintColorG, globalComponentTintColorB, globalComponentAddedColorR, globalComponentAddedColorG, globalComponentAddedColorB)
+
+	// Tell the game whether an automatically triggered pause (e.g. by minimizing the app) should have the Restart button available
+	bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb005] <= 0x04) && !competition_mode.active
+	Game.allowRestartInGamePause(canRestart)
+
+	// TODO: Unfinished feature
+	//// In certain parts of the game (title screen, rolling demo, continue screen, special stage results): Hide touch controls, but still react to touches
+	//if (global.game_mode <= 0x08 || global.game_mode == 0x14 || global.game_mode == 0x48)
+	//{
+	//	Input.setTouchInputMode(TOUCH_INPUT_MODE_FULLSCREEN_START)
+	//}
+
+	// Enough for this frame
+	yieldExecution()
+
+	// Start of the next frame: Update controllers
+	{
+		control.pad1.state = Input.getController(0)
+		control.pad1.pressed = control.pad1.state & ~Input.getControllerPrevious(0)
+		control.pad2.state = Input.getController(1)
+		control.pad2.pressed = control.pad2.state & ~Input.getControllerPrevious(1)
+	}
+}
+
+
+function void yieldInWhiteScreen()
+{
+	Renderer.setGlobalComponentTint(0, 0, 0, 0xff, 0xff, 0xff)	// Needed so the HUD won't briefly flash for one frame now
+	yieldExecution()
+}

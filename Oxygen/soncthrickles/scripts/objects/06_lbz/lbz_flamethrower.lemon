@@ -1,0 +1,87 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Flame Thrower (from Launch Base Zone)                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x0263d2) end(0x0263d6)
+function void fn0263d2()
+{
+	A1 = A0
+	fn0263aa()
+
+	objA0.update_address = 0x0263dc
+	fn0263dc()
+}
+
+
+//# address-hook(0x0263dc) end(0x02645a)
+function void fn0263dc()
+{
+	D0.u8 = (global.framecounter + objA0.subtype2c) & 0x7f
+	if (D0.u8 == 0)
+	{
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x026460
+			fn0263aa()
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			u8[A1 + 0x2a] = objA0.flags2a
+			u8[A1 + 0x28] = 0x9d
+			u8[A1 + 0x2b] |= 0x10
+			objA1.position.x.u16 += 0x40
+			if (objA0.flags2a & 0x01)
+			{
+				objA1.position.x.u16 -= 0x80
+			}
+
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				playSound(0x43)
+			}
+		}
+	}
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0263aa) end(0x0263d0)
+function void fn0263aa()
+{
+	u32[A1 + 0x0c] = 0x22544e
+	u16[A1 + 0x0a] = 0x43ac
+	u8[A1 + 0x07] = 0x10
+	u8[A1 + 0x06] = 0x10
+	u8[A1 + 0x04] |= 0x04
+	u16[A1 + 0x08] = 0x0200
+}
+
+
+
+// Flame object
+
+//# address-hook(0x026460) end(0x026478)
+function void fn026460()
+{
+	Object.animationUpdate(0x02647e)
+	if (objA0.base_state != 0)
+	{
+		objA0.position.x.u16 = 0x7fff
+	}
+	fn01b662()
+}

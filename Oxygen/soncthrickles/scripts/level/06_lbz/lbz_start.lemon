@@ -1,0 +1,124 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Launch Base Zone Start                                //
+//-------------------------------------------------------//
+
+// This objects lets the character(s) jump out of the snow in LBZ1
+
+//# address-hook(0x039a40) end(0x039a7e)
+function void fn039a40()
+{
+	objA0.update_address = 0x039a80
+	player1.control_override = 1
+	player2.control_override = 1
+	control.player1 = 0
+	control.pad1 = 0
+	control.tails = 0
+	control.pad2 = 0
+	objA0.animation.timer = 0x1e
+
+	A1 = 0xffffb000
+	u8[A1 + 0x2e] = 0x03
+
+	A1 = 0xffffb04a
+	if (u32[A1] != 0)
+	{
+		u8[A1 + 0x2e] = 0x03
+	}
+}
+
+
+//# address-hook(0x039a80) end(0x039ad0)
+function void fn039a80()
+{
+	player1.control_override = 1
+	player2.control_override = 1
+	control.player1 = 0
+	control.tails = 0
+	--objA0.animation.timer
+	if (objA0.animation.timer != 0)
+		return
+
+	objA0.update_address = 0x039ad2
+
+	A1 = 0xffffb000
+	objA1.velocity.y = -0xb00
+	objA1.flags2a |= char.flag.IN_AIR
+	u8[A1 + 0x40] = 0
+	objA1.state = char.state.STRAIGHTJUMP
+	u8[A1 + 0x2e] = 0x01
+
+	A1 = 0xffffb04a
+	if (u32[A1] != 0)
+	{
+		objA1.velocity.y = -0xb00
+		objA1.flags2a |= char.flag.IN_AIR
+		u8[A1 + 0x40] = 0
+		objA1.state = char.state.STRAIGHTJUMP
+		u8[A1 + 0x2e] = 0x01
+	}
+}
+
+
+//# address-hook(0x039ad2) end(0x039b64)
+function void fn039ad2()
+{
+	player1.control_override = 1
+	player2.control_override = 1
+	control.player1 = 0
+	control.tails = 0
+
+	A2 = 0xffffb000
+	if (u16[A2 + 0x14] < 0x05c0)
+	{
+		u8[A2 + 0x2e] = 0
+		u16[0xffffcc74] = 0x0400
+		u16[0xffffcc68] = 0x05c0
+		A2 = 0xffffb04a
+		if (u32[A2] != 0)
+		{
+			u8[A2 + 0x2e] = 0
+			u16[0xffffccbe] = 0x0400
+			u16[0xffffccb2] = 0x05c0
+		}
+
+		playSound(0x82)
+
+		player1.control_override = 0
+		player2.control_override = 0
+		UnloadObject()
+	}
+	else
+	{
+		fn039b46()
+
+		A2 = 0xffffb04a
+		if (u32[A2] != 0)
+		{
+			fn039b46()
+		}
+	}
+}
+
+
+function void fn039b46()
+{
+	D0.u16 = u16[A2 + 0x18]
+	D0.s32 = D0.s16
+	D0 <<= 8
+	u32[A2 + 0x10] += D0
+	D0.u16 = u16[A2 + 0x1a]
+	u16[A2 + 0x1a] += 0x38
+	D0.s32 = D0.s16
+	D0 <<= 8
+	u32[A2 + 0x14] += D0
+}

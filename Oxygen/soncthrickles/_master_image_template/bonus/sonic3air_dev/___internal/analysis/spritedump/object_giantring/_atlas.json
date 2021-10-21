@@ -1,0 +1,14 @@
+{
+	"object_giantring_0x00": { "File": "_atlas.bmp", "Rect": "24,24,16,16", "Center": "8,8" },
+	"object_giantring_0x01": { "File": "_atlas.bmp", "Rect": "88,24,16,16", "Center": "8,8" },
+	"object_giantring_0x02": { "File": "_atlas.bmp", "Rect": "148,20,24,24", "Center": "12,12" },
+	"object_giantring_0x03": { "File": "_atlas.bmp", "Rect": "212,20,24,24", "Center": "12,12" },
+	"object_giantring_0x04": { "File": "_atlas.bmp", "Rect": "272,16,32,32", "Center": "16,16" },
+	"object_giantring_0x05": { "File": "_atlas.bmp", "Rect": "336,12,32,40", "Center": "16,20" },
+	"object_giantring_0x06": { "File": "_atlas.bmp", "Rect": "396,12,40,40", "Center": "20,20" },
+	"object_giantring_0x07": { "File": "_atlas.bmp", "Rect": "460,8,40,48", "Center": "20,24" },
+	"object_giantring_0x08": { "File": "_atlas.bmp", "Rect": "512,0,64,64", "Center": "32,32" },
+	"object_giantring_0x09": { "File": "_atlas.bmp", "Rect": "580,0,56,64", "Center": "28,32" },
+	"object_giantring_0x0a": { "File": "_atlas.bmp", "Rect": "660,0,24,64", "Center": "12,32" },
+	"object_giantring_0x0b": { "File": "_atlas.bmp", "Rect": "708,0,56,64", "Center": "28,32" }
+}

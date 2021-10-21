@@ -1,0 +1,1136 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x05aaa2) end(0x05aaec)
+function void InitLevelTiles.Outro()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05d86a
+	}
+
+	global.pause_disabled.u8 = 0xff
+	player1.camera_lock = 0xff
+	u8[0xffffb02e] = 0x03
+
+	D0 = 0x02000000
+	camera.position.x = D0
+	camera.foreground.x = D0
+	camera.position.y = D0
+	camera.foreground.y = D0
+	u32[0xffffee98] = 0
+	u32[0xffffee9c] = 0
+	u16[0xffffeed4] = 0x02b4
+
+	fn05b11c()
+
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x05aaf2) end(0x05aaf6)
+function void UpdateLevelTiles.Outro()
+{
+	// s16[0xffffeec0] == 0x00	-> First part until Angel Island gets visible
+	// s16[0xffffeec0] == 0x04	-> Second part until the Tornado flies away from Angel Island again
+	// s16[0xffffeec0] == 0x08	-> Third part before fade-out to credits
+	call 0x05aafa + s16[0xffffeec0]
+}
+
+//# address-hook(0x05aafa) end(0x05aafa)
+function void fn05aafa()
+{
+	fn05ab36()
+}
+
+//# address-hook(0x05aafe) end(0x05aafe)
+function void fn05aafe()
+{
+	fn05ab58()
+}
+
+//# address-hook(0x05ab02) end(0x05ab02)
+function void fn05ab02()
+{
+	fn05ab6e()
+}
+
+//# address-hook(0x05ab06) end(0x05ab06)
+function void fn05ab06()
+{
+	fn05abbc()
+}
+
+//# address-hook(0x05ab0a) end(0x05ab0a)
+function void fn05ab0a()
+{
+	fn05ac70()
+}
+
+//# address-hook(0x05ab0e) end(0x05ab0e)
+function void fn05ab0e()
+{
+	fn05acfc()
+}
+
+//# address-hook(0x05ab12) end(0x05ab12)
+function void fn05ab12()
+{
+	fn05ad16()
+}
+
+//# address-hook(0x05ab16) end(0x05ab16)
+function void fn05ab16()
+{
+	fn05ad30()
+}
+
+//# address-hook(0x05ab1a) end(0x05ab1a)
+function void fn05ab1a()
+{
+	fn05ad56()
+}
+
+//# address-hook(0x05ab1e) end(0x05ab1e)
+function void fn05ab1e()
+{
+	fn05ad8e()
+}
+
+//# address-hook(0x05ab22) end(0x05ab22)
+function void fn05ab22()
+{
+	fn05ae0a()
+}
+
+//# address-hook(0x05ab26) end(0x05ab26)
+function void fn05ab26()
+{
+	fn05ae76()
+}
+
+//# address-hook(0x05ab2a) end(0x05ab2a)
+function void fn05ab2a()
+{
+	fn05ae90()
+}
+
+//# address-hook(0x05ab2e) end(0x05ab2e)
+function void fn05ab2e()
+{
+	fn05aea8()
+}
+
+//# address-hook(0x05ab32) end(0x05ab32)
+function void fn05ab32()
+{
+	fn05aed4()
+}
+
+
+//# address-hook(0x05ab36) end(0x05ab56)
+function void fn05ab36()
+{
+	if (u16[0xffffeec4] != 0)
+	{
+		u16[0xffffeec4] = 0
+		level.display_routine = u16[0xffffee98]
+		fn05aeea()
+		Level.GetCameraPosition()
+		u16[0xffffeec0] += 4
+	}
+
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x05ab58) end(0x05ab6a)
+function void fn05ab58()
+{
+	if (u16[0xffffeec4] == 0)
+	{
+		fn05aeea()
+		LoadTileContentDefault()
+		return
+	}
+
+	u16[0xffffeec4] = 0
+	u16[0xffffeec0] += 4
+	fn05ab6e()
+}
+
+
+//# address-hook(0x05ab6e) end(0x05abba)
+function void fn05ab6e()
+{
+	fn05aeea()
+
+	if (global.chaos_emeralds >= 7)
+	{
+		D0 = min(u16[0xffffeed8] + 0x10, 0x8000)
+		u16[0xffffeed8] = D0.u16
+		u32[0xffffeed4] -= D0
+	}
+
+	if (u16[0xffffeec4] == 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	u16[0xffffeec4] = 0
+	palette_fade.range = 0x3f
+	u16[0xffffeeda] = 0x15
+	u8[0xffffee50] = 0xff
+	u8[0xfffff650] = 0xff
+	u16[0xffffeec0] += 4
+
+	fn05abc0()
+}
+
+
+//# address-hook(0x05abbc) end(0x05abbc)
+function void fn05abbc()
+{
+	fn05aeea()
+	fn05abc0()
+}
+
+
+//# address-hook(0x05abc0) end(0x05ac6c)
+function void fn05abc0()
+{
+	u32 backupA0 = A0
+	FadeOutPalette()
+	A0 = backupA0
+
+	--u16[0xffffeeda]
+	if (s16[0xffffeeda] >= 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb04a, 0x1fb4)
+
+	if (global.super_emeralds < 7)
+	{
+		u16[0xffffeec0] = 0x24
+		fn05adc0()
+		return
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05dfee
+	}
+
+	push(A3)
+	push(A2)
+	push(A0)
+	push(D7)
+
+	Kosinski.addToDecompressionQueue(0x3abc40, 0xffff0000)
+	Kosinski.addToDecompressionQueue(0x3a374a, 0xffff9000)
+	Kosinski.addToDecompressionQueue(0x3a458a, 0xffff9268)
+
+	Kosinski.addToDMAQueue(0x3a566a, 0x0000)
+	Kosinski.addToDMAQueue(0x3a944e, 0x17c0)
+
+	D7 = pop()
+	A0 = pop()
+	A2 = pop()
+	A3 = pop()
+
+	u16[0xffffeec0] += 4
+	fn05ac70()
+}
+
+
+//# address-hook(0x05ac70) end(0x05acf8)
+function void fn05ac70()
+{
+	if (kosinski.waiting_modules != 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	push(A3)
+	push(A2)
+	push(A0)
+	push(D7)
+
+	global.zone_act = 0
+	checkpoint.number = 0x01
+	fn01c362()
+	fn0076a6()
+	global.zone_act = 0x0d01
+	checkpoint.number = 0
+
+	Level.loadNonfadingPaletteData(0x03)
+	Level.loadNonfadingPaletteData(0x2a)
+	copyMemory(0xfffffca0, 0x0a97bc, 0x20)
+
+	fn04fa4c()		// Has to do with AIZ background
+
+	D7 = pop()
+	A0 = pop()
+	A2 = pop()
+	A3 = pop()
+
+	D0.u16 = 0x1eb8 - getScreenExtend()
+	camera.position.x.u16 = D0.u16
+	camera.foreground.x.u16 = D0.u16
+	D0.u16 = 0x01e0
+	camera.position.y.u16 = D0.u16
+	camera.foreground.y.u16 = D0.u16
+
+	Level.GetCameraPosition()
+	D0.u16 = (D0.u16 + 0xe0) & level.height.tilemask
+	u16[0xffffeec8] = D0.u16
+	u16[0xffffeeca] = 0x0f
+	u16[0xffffeec0] += 4
+
+	fn05acfc()
+}
+
+
+//# address-hook(0x05acfc) end(0x05ad12)
+function void fn05acfc()
+{
+	D1.u16 = camera.foreground.x.u16
+	D2.u16 = camera.foreground.y.u16
+	fn04ef56()
+	if (!_negative())
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	level.scrolling_routine += 4
+	u16[0xffffeec0] += 4
+	fn05ad16()
+}
+
+
+//# address-hook(0x05ad16) end(0x05ad2c)
+function void fn05ad16()
+{
+	if (level.scrolling_routine < 0x10)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	palette_fade.range = 0x3f
+	u16[0xffffeeda] = 0x15
+	u16[0xffffeec0] += 4
+	fn05ad30()
+}
+
+
+//# address-hook(0x05ad30) end(0x05ad52)
+function void fn05ad30()
+{
+	u32 backupA0 = A0
+	FadeInPalette()
+	A0 = backupA0
+
+	--u16[0xffffeeda]
+	if (s16[0xffffeeda] >= 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	global.fade_timer = 0
+	u8[0xfffff650] = 0
+	u16[0xfffff634] = 0
+	u16[0xfffff632] = 0
+	u16[0xffffeec0] += 4
+	fn05ad56()
+}
+
+
+//# address-hook(0x05ad56) end(0x05ad8a)
+function void fn05ad56()
+{
+	if (u16[0xffffeec4] == 0)
+	{
+		u32[0xffffeedc] += 0x1000
+
+		u32 backupA0 = A0
+		LevelPaletteUpdate.AIZ1()
+		A0 = backupA0
+
+		LoadTileContentDefault()
+		return
+	}
+
+	u16[0xffffeec4] = 0
+	palette_fade.range = 0x3f
+	u16[0xffffeeda] = 0x15
+	u8[0xffffee50] = 0xff
+	u8[0xfffff650] = 0xff
+	u16[0xffffeec0] += 4
+
+	fn05ad8e()
+}
+
+
+//# address-hook(0x05ad8e) end(0x05adbc)
+function void fn05ad8e()
+{
+	u32 backupA0 = A0
+	FadeOutPalette()
+	A0 = backupA0
+
+	--u16[0xffffeeda]
+	if (s16[0xffffeeda] >= 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb04a, 0x1fb4)
+	fn05adc0()
+}
+
+
+//# address-hook(0x05adc0) end(0x05ae06)
+function void fn05adc0()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05e18a
+	}
+
+	push(A3)
+	push(A2)
+	push(A0)
+	push(D7)
+
+	Kosinski.addToDecompressionQueue(0x1d17a6, 0xffff0000)
+	Kosinski.addToDecompressionQueue(0x1cf2d4, 0xffff9000)
+
+	Kosinski.addToDMAQueue(0x1cfb44, 0x0000)
+
+	D7 = pop()
+	A0 = pop()
+	A2 = pop()
+	A3 = pop()
+
+	u16[0xffffeec0] += 4
+	fn05ae0a()
+}
+
+
+//# address-hook(0x05ae0a) end(0x05ae72)
+function void fn05ae0a()
+{
+	if (kosinski.waiting_modules != 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	push(A3)
+	push(A2)
+	push(A0)
+	push(D7)
+
+	fn01c362()
+	fn0076a6()
+
+	Level.loadNonfadingPaletteData(0x03)
+
+	copyMemory(0xfffffca0, 0x0a97fc, 0x60)
+	fn05b11c()
+
+	D7 = pop()
+	A0 = pop()
+	A2 = pop()
+	A3 = pop()
+
+	D0 = 0x02000000
+	camera.position.x = D0
+	camera.foreground.x = D0
+	camera.position.y = D0
+	camera.foreground.y = D0
+	Level.GetCameraPosition()
+	D0.u16 = (D0.u16 + 0xe0) & level.height.tilemask
+	u16[0xffffeec8] = D0.u16
+	u16[0xffffeeca] = 0x0f
+	u16[0xffffeec0] += 4
+
+	fn05ae76()
+}
+
+
+//# address-hook(0x05ae76) end(0x05ae8c)
+function void fn05ae76()
+{
+	D1.u16 = camera.foreground.x.u16
+	D2.u16 = camera.foreground.y.u16
+	fn04ef56()
+	if (!_negative())
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	level.scrolling_routine = 0x14
+	u16[0xffffeec0] += 4
+	fn05ae90()
+}
+
+
+//# address-hook(0x05ae90) end(0x05aea4)
+function void fn05ae90()
+{
+	if (level.scrolling_routine > 0x04)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	palette_fade.range = 0x3f
+	u16[0xffffeeda] = 0x15
+	u16[0xffffeec0] += 4
+	fn05aea8()
+}
+
+
+//# address-hook(0x05aea8) end(0x05aed0)
+function void fn05aea8()
+{
+	u32 backupA0 = A0
+	FadeInPalette()
+	A0 = backupA0
+
+	--u16[0xffffeeda]
+	if (s16[0xffffeeda] >= 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	global.fade_timer = 0
+	u8[0xfffff650] = 0
+	u16[0xfffff634] = 0
+	u16[0xfffff632] = 0
+	camera.position.y = 0
+	camera.foreground.y = 0
+	u16[0xffffeec0] += 4
+
+	fn05aed4()
+}
+
+
+//# address-hook(0x05aed4) end(0x05aee4)
+function void fn05aed4()
+{
+	push(A3)
+	push(A2)
+	push(A0)
+	push(D7)
+
+	fn05b18e()
+
+	D7 = pop()
+	A0 = pop()
+	A2 = pop()
+	A3 = pop()
+}
+
+
+//# address-hook(0x05aeea) end(0x05af06)
+function void fn05aeea()
+{
+	// Subtracting double the screen extend is needed, otherwise Angel Island does not get loaded completely
+	camera.foreground.x.u16 = u16[0xffffee98] - level.display_routine + 0x0140 - getScreenExtend() * 2
+	camera.foreground.y.u16 = u16[0xffffee9c] - u16[0xffffeed4]
+}
+
+
+
+//# address-hook(0x05af08) end(0x05af24)
+function void InitLevelScrolling.Outro()
+{
+	fn05b092()
+	fn04f2f6()
+
+	D1.u16 = 0x0200
+	Level.InitialTilesFill()
+
+	A4 = 0x05b144
+	A5 = 0xffffa804
+	fn04f0ce()
+}
+
+
+//# address-hook(0x05af2a) end(0x05af2e)
+function void UpdateLevelScrolling.Outro()
+{
+	D0.u16 = level.scrolling_routine
+	call 0x05af32 + D0.s16
+}
+
+//# address-hook(0x05af32) end(0x05af32)
+function void fn05af32()
+{
+	fn05af4e()
+}
+
+//# address-hook(0x05af36) end(0x05af36)
+function void fn05af36()
+{
+	fn05af84()
+}
+
+//# address-hook(0x05af3a) end(0x05af3a)
+function void fn05af3a()
+{
+	fn05afc4()
+}
+
+//# address-hook(0x05af3e) end(0x05af3e)
+function void fn05af3e()
+{
+	fn05aff0()
+}
+
+//# address-hook(0x05af42) end(0x05af42)
+function void fn05af42()
+{
+	fn05b012()
+}
+
+//# address-hook(0x05af46) end(0x05af46)
+function void fn05af46()
+{
+	fn05b03a()
+}
+
+//# address-hook(0x05af4a) end(0x05af4a)
+function void fn05af4a()
+{
+	fn05b072()
+}
+
+
+//# address-hook(0x05af4e) end(0x05af84)
+function void fn05af4e()
+{
+	if (u16[0xffffeec6] == 0)
+	{
+		fn05b092()
+	}
+	else
+	{
+		u16[0xffffeec6] = 0
+		copyMemory(0xfffffc20, 0x0a97fc, 0x60)
+
+		fn05b116()
+
+		D0.u16 = 0x0220
+		u16[0xffffee9c] = D0.u16
+		camera.background.y.old = D0.u16
+		level.scrolling_routine += 4
+		fn05b0a8()
+	}
+
+	fn05af88()
+}
+
+
+//# address-hook(0x05af84)
+function void fn05af84()
+{
+	fn05b0a8()
+	fn05af88()
+}
+
+
+//# address-hook(0x05af88) end(0x05afc2)
+function void fn05af88()
+{
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1.u16 = 0x0200
+	D6 = 0x20
+	LoadTileContentInDirY()
+
+	A4 = (level.scrolling_routine == 0) ? 0x05b144 : 0x05b15a
+	A5 = 0xffffa804
+	fn04f0ce()
+
+	A1 = (level.scrolling_routine == 0) ? 0x0592ee : 0x05928c
+	call A1
+}
+
+
+
+// Short clip of Knuckles in Angel Island Zone (in best ending only)
+
+//# address-hook(0x05afc4) end(0x05afee)
+function void fn05afc4()
+{
+	UpdateBackgroundScrolling.AIZ1()
+	fn04f2f6()
+	u32[0xffffa800] = 0
+	u16[0xffffa806] = D2.u16
+	u16[0xffffeec8] = (D0.u16 + 0xe0) & level.height.tilemask
+	u16[0xffffeeca] = 0x0f
+	level.scrolling_routine += 0x04
+	fn05aff6()
+}
+
+
+//# address-hook(0x05aff0) end(0x05aff0)
+function void fn05aff0()
+{
+	UpdateBackgroundScrolling.AIZ1()
+	fn05aff6()
+}
+
+
+//# address-hook(0x05aff6) end(0x05b010)
+function void fn05aff6()
+{
+	A4 = 0x23b254
+	A5 = 0xffffa7fc
+	D1.u16 = camera.background.y.u16
+	fn04f030()
+	if (_negative())
+	{
+		level.scrolling_routine += 0x04
+	}
+	fn05b020()
+}
+
+
+//# address-hook(0x05b012) end(0x05b01c)
+function void fn05b012()
+{
+	UpdateBackgroundScrolling.AIZ1()
+	camera.background.y.u16 -= u16[0xffffeedc]
+	fn05b020()
+}
+
+
+//# address-hook(0x05b020) end(0x05b034)
+function void fn05b020()
+{
+	A4 = 0x23b254
+	A5 = 0xffffa800
+	D6 = 0x20
+	D5 = 0x02
+	fn04edf6()
+	UpdateForegroundScrolling.AIZ1()
+}
+
+
+
+//# address-hook(0x05b03a) end(0x05b070)
+function void fn05b03a()
+{
+	A1 = 0xffff0004 + u16[A3 + 0x1c]
+	u8[(A1+=1)-1] = 0x1a
+	u8[(A1+=1)-1] = 0x1b
+	u8[(A1+=1)-1] = 0x1a
+	u8[(A1+=1)-1] = 0x1b
+
+	fn05b0a8()
+	fn04f2f6()
+
+	D0.u16 = (D0.u16 + 0xe0) & level.height.tilemask
+	u16[0xffffeec8] = D0.u16
+	u16[0xffffeeca] = 0x0f
+	level.scrolling_routine += 4
+	fn05b076()
+}
+
+
+//# address-hook(0x05b072) end(0x05b072)
+function void fn05b072()
+{
+	fn05b0a8()
+	fn05b076()
+}
+
+
+//# address-hook(0x05b076) end(0x05b08e)
+function void fn05b076()
+{
+	D1.u16 = 0x0200
+	D2.u16 = camera.background.y.u16
+	fn04ef56()
+	if (!_negative())
+	{
+		fn05af88()
+		return
+	}
+	level.scrolling_routine = 0x04
+	if (s16[0xffffeec2] >= 0)
+	{
+		fn05af88()
+	}
+	else
+	{
+		fn05b092()
+	}
+}
+
+
+//# address-hook(0x05b092) end(0x05b0a4)
+function void fn05b092()
+{
+	camera.background.y.u16 = min(u16[0xffffee9c], 0x0120)
+	fn058d44()
+}
+
+
+//# address-hook(0x05b0a8) end(0x05b114)
+function void fn05b0a8()
+{
+	camera.background.y.u16 = u16[0xffffee9c]
+	D0 = u32(u16[0xffffee98]) << 16
+	D1 = D0
+	D1.s32 >>= 4
+	A1 = 0xffffa800
+	D1 += u32[A1]
+	u32[(A1+=4)-4] += 0x0800
+	A1 += 0x10
+	D2 = 0x1f
+	while (D2.s16 >= 0)
+	{
+		u16[(A1+=2)-2] = D0 >> 16
+		u16[(A1+=2)-2] = D0 >> 16
+		u16[(A1+=2)-2] = D0 >> 16
+		u16[(A1+=2)-2] = D0 >> 16
+		D0 += D1
+		--D2.s16
+	}
+
+	A1 = 0xffffa814
+	u16[A1 - 0x04] = u16[A1]
+	u16[A1 - 0x0c] = u16[A1]
+	u16[A1 - 0x08] = u16[A1 + 0x08]
+	u16[A1 - 0x02] = objA1.position.x.u16
+	u16[A1 - 0x0e] = objA1.velocity.x
+	u16[A1 - 0x0a] = u16[A1 + 0x20]
+	u16[A1 - 0x06] = u16[A1 + 0x28]
+}
+
+
+//# address-hook(0x05b116) end(0x05b11a)
+function void fn05b116()
+{
+	A6 = 0xfffffc20
+	fn05b120()
+}
+
+
+//# address-hook(0x05b11c) end(0x05b11c)
+function void fn05b11c()
+{
+	A6 = 0xfffffca0
+	fn05b120()
+}
+
+
+//# address-hook(0x05b120) end(0x05b142)
+function void fn05b120()
+{
+	A5 = 0xfffffca0
+	copyMemory(A5, 0x05b16e, 0x20)
+	copyMemory(A6, 0x05b16e, 0x20)
+	A6 += 0x20
+
+	A5 = 0xfffffcc0
+	copyMemory(A5, 0x0a97bc, 0x20)
+	copyMemory(A6, 0x0a97bc, 0x20)
+}
+
+
+
+
+
+//# address-hook(0x058d44)
+function void fn058d44()
+{
+	A1 = 0xffffa800
+	D0 = u32[A1]
+	u32[(A1+=4)-4] += 0x8000
+	A1 += 0x16
+	u16[A1-=2] = 0x5e
+	D0.u16 = 0
+	D1 = D0
+	D1.s32 >>= 3
+	D2 = 0x07
+	while (D2.s16 >= 0)
+	{
+		D0 = (D0 << 16) + (D0 >> 16)
+		u16[A1-=2] = D0.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+		D0 -= D1
+		--D2.s16
+	}
+}
+
+
+//# address-hook(0x058d3e) end(0x058fba)
+function void fn058d3e()
+{
+	// This function seems to animate Angel Island in the background
+	//  -> The vertical scroll offsets for the background get written to 0xffffa970 first, and later copied to 0xffffeeea
+
+	if (level.scrolling_routine != 0)
+	{
+		fn058d44()
+		return
+	}
+
+	if (u16[0xffffeec0] < 0x0c)
+	{
+		A1 = 0xffffa800
+		D2 = u32[A1]
+		u32[(A1+=4)-4] += 0x1000
+		u16[(A1+=2)-2] = 0
+
+		D0.u16 = camera.foreground.x.u16
+		D0 = (D0 << 16)
+		D0.s32 >>= 5
+		D1 = D0
+		D0.s32 >>= 1
+		D0 += D2
+		u16[A1]        = D0 >> 16
+		u16[A1 + 0x04] = D0 >> 16
+		u16[A1 + 0x08] = D0 >> 16
+		objA1.position.x.u16 = D0 >> 16
+		u16[A1 + 0x36] = D0 >> 16
+		u16[A1 + 0x3a] = D0 >> 16
+		u16[A1 + 0x3e] = D0 >> 16
+		u16[A1 + 0x46] = D0 >> 16
+		D1 += D2
+		D0 += D1
+		u16[A1 + 0x06] = D0 >> 16
+		u16[A1 + 0x0a] = D0 >> 16
+		u16[A1 + 0x0e] = D0 >> 16
+		objA1.position.y.u16 = D0 >> 16
+		u16[A1 + 0x3c] = D0 >> 16
+		u16[A1 + 0x40] = D0 >> 16
+		u16[A1 + 0x44] = D0 >> 16
+		D0 += D1
+		u16[A1 + 0x02] = D0 >> 16
+		u16[A1 + 0x0c] = D0 >> 16
+		u16[A1 + 0x16] = D0 >> 16
+		u16[A1 + 0x34] = D0 >> 16
+		u16[A1 + 0x38] = D0 >> 16
+		u16[A1 + 0x42] = D0 >> 16
+		D0 += D1
+		u16[A1 + 0x12] = D0 >> 16
+		A1 += 0x18
+
+		D2 = 0x08
+		while (D2.s16 >= 0)
+		{
+			u16[(A1+=2)-2] = D0 >> 16
+			D0 += D1
+			--D2.s16
+		}
+
+		if (u16[0xffffeec0] <= 0x04)
+		{
+			A1 = 0xffffa82a
+			D0.u16 = camera.foreground.x.u16
+			D1 = 0x08
+			while (D1.s16 >= 0)
+			{
+				u16[(A1+=2)-2] = D0.u16
+				--D1.s16
+			}
+		}
+		else
+		{
+			A1 = 0xffffa804
+			u16[A1 + 0x2c] = u16[A1 + 0x2a]
+			D0.u16 = u16[A1 + 0x28]
+			u16[A1 + 0x2a] = D0.u16
+			u16[A1 + 0x2e] = D0.u16
+			u16[A1 + 0x28] = u16[A1 + 0x26]
+			u16[A1 + 0x26] = u16[A1 + 0x24]
+			u16[A1 + 0x30] = u16[A1 + 0x22]
+			u16[A1 + 0x32] = u16[A1 + 0x1e]
+			u16[A1 + 0x34] = objA1.velocity.y
+		}
+
+		D0.u16 = camera.foreground.y.u16 - u16[0xffffee9c] - 0x0320
+		D1.u16 = gfx.plane_update_routine - 0x04
+		if (D1.u16 != 0)
+		{
+			D1.u16 -= 4
+			if (D1.u16 != 0)
+			{
+				D0.u16 += 8
+			}
+		}
+
+		camera.background.x.u16 = 0x5e - getScreenExtend()
+		camera.background.y.u16 = D0.u16
+
+		A5 = 0xffffa8d0
+		A6 = A5
+		D0.u16 = level.display_routine
+		D6.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D0.s16 = abs(D0.s16)
+		D0 = (D0 << 16)
+		D0.s32 >>= 7
+		D1.u16 = D0.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+		D2 = 0
+		D3 = 0
+		D4 = 0x3f
+		if (D6.u8 == 0)
+		{
+			while (D4.s16 >= 0)
+			{
+				D2.u16 += D0.u16 + ((u32(D3.u16) + u32(D1.u16)) >> 16)
+				D3.u16 += D1.u16
+				u16[A5-=2] = D2.u16
+				D5.s16 = -D2.s16
+				u16[(A6+=2)-2] = D5.u16
+				--D4.s16
+			}
+		}
+		else
+		{
+			while (D4.s16 >= 0)
+			{
+				D2.u16 += D0.u16 + ((u32(D3.u16) + u32(D1.u16)) >> 16)
+				D3.u16 += D1.u16
+				u16[(A6+=2)-2] = D2.u16
+				D5.s16 = -D2.s16
+				u16[A5-=2] = D5.u16
+				--D4.s16
+			}
+		}
+
+		// Update horizontal scroll offsets
+		A5 = 0xffffa960
+		A6 = A5
+		D0.u16 = level.display_routine
+		D6.u8 = (D0.s16 < 0) ? 0xff : 0x00
+		D0.s16 = abs(D0.s16)
+		D0 = (D0 << 16)
+		D0.s32 >>= 3
+		D1.u16 = D0.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+		D2 = 0
+		D3 = 0
+		D4 = 0x07
+		if (D6.u8 == 0)
+		{
+			while (D4.s16 >= 0)
+			{
+				D2.u16 += D0.u16 + ((u32(D3.u16) + u32(D1.u16)) >> 16)
+				D3.u16 += D1.u16
+				u16[A5-=2] = D2.u16
+				D5.s16 = -D2.s16
+				u16[(A6+=2)-2] = D5.u16
+				--D4.s16
+			}
+		}
+		else
+		{
+			while (D4.s16 >= 0)
+			{
+				D2.u16 += D0.u16 + ((u32(D3.u16) + u32(D1.u16)) >> 16)
+				D3.u16 += D1.u16
+				u16[(A6+=2)-2] = D2.u16
+				D5.s16 = -D2.s16
+				u16[A5-=2] = D5.u16
+				--D4.s16
+			}
+		}
+
+		// Update vertical scroll offsets
+		A1 = 0xffffa970
+		A5 = 0xffffa940
+		D0.u16 = camera.background.x.u16
+		D1.u16 = D0.u16 & 0x0f
+		if (D1.u16 != 0)
+		{
+			D0.u16 += 0x10
+		}
+		A5 += (D0.u16 >> 3) & 0xfffe
+		D0.u16 = camera.background.y.u16 + 8
+
+		D1 = 0x13
+		while (D1.s16 >= 0)
+		{
+			D2.u16 = u16[(A5+=2)-2] + D0.u16
+			u16[(A1+=2)-2] = D2.u16
+			--D1.s16
+		}
+	}
+	else if (u16[0xffffeec0] >= 0x18)
+	{
+		A1 = 0xffffa800
+		D0 = u32[A1]
+		u32[(A1+=4)-4] -= 0x010000
+		A1 += 0x0110
+		D0.u16 = 0
+		D1.s32 = D0.s32 >> 5
+		D2 = 0x1f
+		while (D2.s16 >= 0)
+		{
+			u16[A1-=2] = D0 >> 16
+			u16[A1-=2] = D0 >> 16
+			u16[A1-=2] = D0 >> 16
+			u16[A1-=2] = D0 >> 16
+			D0 -= D1
+			--D2.s16
+		}
+
+		u16[A1 - 0x04] = -s16[A1]
+		u16[A1 - 0x0c] = -s16[A1]
+		u16[A1 - 0x08] = -s16[A1 + 0x08]
+		u16[A1 - 0x02] = -s16[A1 + 0x10]
+		u16[A1 - 0x0e] = -objA1.velocity.x
+		u16[A1 - 0x0a] = -s16[A1 + 0x20]
+		u16[A1 - 0x06] = -s16[A1 + 0x28]
+	}
+}
+
+
+
+//# address-hook(0x0592ee) end(0x059318)
+function void fn0592ee()
+{
+	if (u8[0xfffff650] == 0)
+	{
+		--u16[0xfffff634]
+		if (s16[0xfffff634] < 0)
+		{
+			u16[0xfffff634] = 3
+			D0.u16 = u16[0xfffff632] + 4
+			if (D0.u16 >= 0x38)
+				D0 = 0
+			u16[0xfffff632] = D0.u16
+			u32[0xfffffc76] = u32[0x05931a + D0.s16]
+		}
+	}
+}

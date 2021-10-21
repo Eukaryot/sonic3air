@@ -1,0 +1,23 @@
+{
+
+	// Enter the path to the game ROM here if it can't be found automatically
+	"RomPath": "",
+
+	// Default window size
+	"WindowSize": "1200 x 672",
+
+	// Audio output sample rate, valid values: 11025, 22050, 44100, 48000
+	"AudioSampleRate": "48000",
+
+	// Allow for dumping of a game simulation recording by pressing F2 (set to "1" to enforce this feature even in fail-safe mode)
+	"GameRecording": "-1",
+
+	// Set to "1" to enable developer mode (see Oxygen Handbook in "bonus/oxygenengine" folder for details)
+	"DevMode": "0",
+
+	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
+	"PlatformFlags": "-1",
+
+	// Script optimizations (use "3" as default = maximum optimization)
+	"ScriptOptimizationLevel": "3"
+}

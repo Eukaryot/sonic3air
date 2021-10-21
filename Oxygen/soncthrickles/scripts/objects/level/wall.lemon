@@ -1,0 +1,551 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Wall                                                  //
+//-------------------------------------------------------//
+
+// Subtype flags:
+//  0x01 .. 0x0f = Wall type; can affect behavior in some cases, e.g. 0x02 in MGZ means wall is breakable by spinning top only
+//  0x10         = Used in MGZ for a wall that is only breakable by Knuckles
+//  0x80         = Object is only loaded when level trigger 0 was not activated yet
+
+
+//# address-hook(0x02131c) end(0x021560)
+function void fn02131c()
+{
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.update_address = 0x021568
+	if ((objA0.subtype2c & 0x80) && (level.trigger00 != 0))
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.animation.sprite = objA0.subtype2c & 0x0f
+	objA0.mapping_offset = 0x21fd52
+	objA0.sprite_attributes = 0x4001
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x28
+	objA0.countdown_callback = 0x02193a
+	u32[A0 + 0x38] = 0x02196a
+
+	if (global.zone == 0x01)
+	{
+		// Hydrocity Zone
+		objA0.mapping_offset = 0x21ffd8
+		objA0.sprite_attributes = 0x6001
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x20
+		objA0.countdown_callback = 0x02199a
+		u32[A0 + 0x38] = 0x0219ba
+
+		if (objA0.animation.sprite == 0x02)
+		{
+			objA0.sprite_attributes = 0x4350
+			objA0.box_size.x = 0x18
+			objA0.box_size.y = 0x20
+			objA0.countdown_callback = 0x02199a
+			u32[A0 + 0x38] = 0x0219ba
+			objA0.update_address = 0x021818
+			return
+		}
+	}
+	else if (global.zone == 0x02)
+	{
+		// Marble Garden Zone
+		objA0.mapping_offset = 0x21ff18
+		objA0.sprite_attributes = 0x4001
+		objA0.box_size.x = 0x20
+		objA0.box_size.y = 0x28
+		objA0.countdown_callback = 0x021a2a
+		u32[A0 + 0x38] = 0x0219da
+
+		if (objA0.subtype2c & 0x10)
+		{
+			objA0.update_address = 0x021818
+			return
+		}
+		if (objA0.animation.sprite == 0x02)
+		{
+			objA0.update_address = 0x02172e
+			return
+		}
+	}
+	else if (global.zone == 0x03)
+	{
+		// Carnival Night Zone
+		objA0.mapping_offset = 0x021aba
+		objA0.sprite_attributes = 0x4420
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x20
+		objA0.countdown_callback = 0x021a7a
+		u32[A0 + 0x38] = 0x021a9a
+
+		if (objA0.animation.sprite == 0x02)
+		{
+			objA0.update_address = 0x021818
+			return
+		}
+	}
+	else if (global.zone == 0x06)
+	{
+		// Launch Base Zone
+		objA0.mapping_offset = 0x22005e
+		objA0.sprite_attributes = 0x22ea
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x20
+		objA0.countdown_callback = 0x02199a
+		u32[A0 + 0x38] = 0x0219ba
+
+		objA0.update_address = 0x021818
+		return
+	}
+	else if (global.zone == 0x07)
+	{
+		// Mushroom Hill Zone
+		objA0.mapping_offset = 0x021bce
+		objA0.sprite_attributes = 0x434b
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x20
+		objA0.countdown_callback = 0x021a7a
+		u32[A0 + 0x38] = 0x021a9a
+
+		objA0.update_address = 0x021818
+		return
+	}
+	else if (global.zone == 0x08)
+	{
+		// Sandopolis Zone
+		objA0.mapping_offset = 0x021aba
+		objA0.sprite_attributes = 0x448c
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x20
+		objA0.countdown_callback = 0x021a7a
+		u32[A0 + 0x38] = 0x021a9a
+
+		objA0.update_address = 0x021818
+		if (objA0.animation.sprite == 0x04)
+		{
+			objA0.box_size.y = 0x30
+			objA0.countdown_callback = 0x02193a
+			u32[A0 + 0x38] = 0x02196a
+		}
+		return
+	}
+	else if (global.zone == 0x09)
+	{
+		// Lava Reef Zone
+		objA0.mapping_offset = 0x021c1e
+		objA0.sprite_attributes = 0x640d
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x20
+		objA0.countdown_callback = 0x021a7a
+		u32[A0 + 0x38] = 0x021a9a
+	}
+
+	fn021568()
+}
+
+
+//# address-hook(0x021568) end(0x021690)
+function void fn021568()
+{
+	u16[A0 + 0x30] = u16[0xffffb018]
+	objA0.value32 = u16[0xffffb062]
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	if (u8[A0 + 0x2c] & 0x80)
+	{
+		if (level.trigger00 == 0)
+		{
+			DrawOrUnloadObject()
+		}
+		else
+		{
+			UnloadObject()
+		}
+		return
+	}
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	D6.u16 &= 0x03
+	if (D6.u16 == 0)
+	{
+		DrawOrUnloadObject()
+		return
+	}
+
+	A1 = 0xffffb000
+	D1.u16 = u16[A0 + 0x30]
+	if (D6.u16 & 0x01)
+	{
+		bool canBreakWall = false
+		if (super.active || u8[A1 + 0x38] == CHARACTER_KNUCKLES)
+		{
+			// Super/Hyper forms can break walls, and Knuckles can
+			canBreakWall = true
+		}
+		else
+		{
+			// Does this wall allow for rolling into the wall? Otherwise the fire shield will do
+			if ((objA0.flags2a & 0x20) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
+			{
+				canBreakWall = (objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
+			}
+		}
+
+		if (canBreakWall)
+		{
+			objA0.flags2a &= ~0x20
+			fn02165a()
+
+			A1 = 0xffffb04a
+			if ((objA0.flags2a & 0x40) && objA1.state == char.state.ROLLING)
+			{
+				objA0.flags2a &= ~0x40
+				objA1.velocity.x = objA0.value32
+				u16[A1 + 0x1c] = objA1.velocity.x
+				objA1.flags2a &= ~char.flag.PUSHING
+			}
+
+			DrawOrUnloadObject()
+			return
+		}
+	}
+
+	A1 = 0xffffb04a
+	D1.u16 = objA0.value32
+	if ((objA0.flags2a & 0x40) && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
+	{
+		objA0.flags2a &= ~0x40
+		fn02165a()
+
+	#if STANDALONE
+		if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
+		{
+			// Prevent slope glitch here for player 1
+			if ((u8[0xffffb02a] & char.flag.ON_OBJECT) && u16[0xffffb042] == A0.u16)
+			{
+				u8[0xffffb02a] &= ~char.flag.ON_OBJECT
+				u8[0xffffb02a] |= char.flag.IN_AIR
+			}
+		}
+	#endif
+	}
+#if STANDALONE
+	else if (global.zone == 0x02)
+	{
+		// In MGZ, make all normal breakable walls also breakable by spinning top
+		D6 = (D6 << 16) + (D6 >> 16)
+		fn021758()
+	}
+#endif
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+function void fn02165a()
+{
+	objA1.velocity.x = D1.u16
+	if (objA0.position.x.u16 >= objA1.position.x.u16)
+	{
+		objA1.position.x.u16 -= 4
+		A4 = u32[A0 + 0x38]
+	}
+	else
+	{
+		objA1.position.x.u16 += 4
+		A4 = objA0.countdown_callback
+	}
+
+#if STANDALONE
+	// Check for Knuckles gliding
+	if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 1)
+	{
+		objA1.groundspeed = abs(objA1.velocity.x)
+	}
+	else
+#endif
+	{
+		objA1.groundspeed = objA1.velocity.x
+	}
+
+	objA1.flags2a &= ~char.flag.PUSHING
+	objA0.update_address = 0x021692
+	++objA0.animation.sprite
+
+	Wall.Destroy()
+	fn021692()
+
+#if STANDALONE
+	if (global.zone == 0x02)
+	{
+		// Needed in MGZ to prevent Knuckles from a complete stop, when he uses a spinning top to break the wall
+		u8[0xffffb037] &= ~0x40
+	}
+#endif
+}
+
+
+//# address-hook(0x021692) end(0x0216aa)
+function void fn021692()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x70
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x0216b0) end(0x0216b2)
+function void Wall.Destroy()
+{
+	playSound(SFX_COLLAPSE)
+	objA0.sprite_priority = 0x80
+	fn0216b8()
+}
+
+
+//# address-hook(0x0216b8) end(0x0216e0)
+//# translated(0x0216e2) end(0x02172c)
+function void fn0216b8()
+{
+	D0 = objA0.animation.sprite * 2
+	A3 = u32[A0 + 0x0c]
+	A3 += u16[A3 + D0.s16]
+	D1.u16 = u16[A3] - 1
+	A3 += 2
+	objA0.render_flags |= 0x20
+	D4 = objA0.update_address
+	D5.u8 = objA0.render_flags
+	A1 = A0
+
+	while (true)
+	{
+		u32[A1] = D4
+		u32[A1 + 0x0c] = A3
+		u8[A1 + 0x04] = D5.u8
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u16[A1 + 0x0a] = u16[A0 + 0x0a] | 0x8000
+		u8[A1 + 0x08] = u8[A0 + 0x08]
+		u8[A1 + 0x07] = objA0.box_size.x
+		u8[A1 + 0x06] = objA0.box_size.y
+		objA1.velocity.x = u16[A4]
+		objA1.velocity.y = u16[A4+2]
+
+		A4 += 4
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		A3 += 6
+	}
+}
+
+
+//# address-hook(0x02172e) end(0x0217e8)
+function void fn02172e()
+{
+	// Used for the MGZ wall variant that is only breakable by spinning top
+
+	u16[A0 + 0x30] = u16[0xffffb018]
+	objA0.value32 = u16[0xffffb062]
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	fn021758()
+}
+
+
+function void fn021758()
+{
+	// Check against spinning top
+	bool hitByPlayer1 = false
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x01)
+	{
+		A1 = 0xffffb000
+		if (u8[A1 + 0x37] & 0x40)
+		{
+			u8[A1 + 0x37] &= ~0x40
+			objA1.velocity.x = u16[A0 + 0x30]
+			u16[A1 + 0x1c] = objA1.velocity.x
+			objA1.flags2a &= ~char.flag.PUSHING
+			objA0.flags2a &= ~0x20
+
+			fn0217ee()
+			hitByPlayer1 = true
+		}
+	}
+
+	if (D6.u8 & 0x02)
+	{
+		A1 = 0xffffb04a
+		if (u8[A1 + 0x37] & 0x40)
+		{
+			u8[A1 + 0x37] &= ~0x40
+			objA1.velocity.x = objA0.value32
+			u16[A1 + 0x1c] = objA1.velocity.x
+			objA1.flags2a &= ~char.flag.PUSHING
+			objA0.flags2a &= ~0x40
+
+			if (!hitByPlayer1)
+			{
+				fn0217ee()
+			}
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0217ee) end(0x021814)
+function void fn0217ee()
+{
+	A4 = objA0.countdown_callback
+	D0.u16 = objA0.position.x.u16
+	if (D0.u16 >= objA1.position.x.u16)
+	{
+		objA1.position.x.u16 -= 8
+		A4 = u32[A0 + 0x38]
+	}
+
+	objA0.update_address = 0x021692
+	++objA0.animation.sprite
+
+	Wall.Destroy()
+	fn021692()
+}
+
+
+//# address-hook(0x021818) end(0x021936)
+function void fn021818()
+{
+	u16[A0 + 0x30] = u16[0xffffb018]
+	objA0.value32 = u16[0xffffb062]
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	if (s8[A0 + 0x2c] < 0)
+	{
+		if (level.trigger00 == 0)
+		{
+			DrawOrUnloadObject()
+		}
+		else
+		{
+			UnloadObject()
+		}
+		return
+	}
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	D6.u16 &= 0x03
+	if (D6.u16 == 0)
+	{
+		DrawOrUnloadObject()
+		return
+	}
+
+	A1 = 0xffffb000
+	D1.u16 = u16[A0 + 0x30]
+	if ((D6.u16 & 0x01) && (u8[A1 + 0x38] == CHARACTER_KNUCKLES))
+	{
+		objA0.flags2a &= ~0x20
+		fn0218ce()
+
+		A1 = 0xffffb04a
+		if ((objA0.flags2a & 0x40) == 0)
+		{
+			DrawOrUnloadObject()
+			return
+		}
+
+		objA1.velocity.x = objA0.value32
+		u16[A1 + 0x1c] = objA1.velocity.x
+		objA0.flags2a &= ~0x40
+		objA1.flags2a &= ~char.flag.PUSHING
+		DrawOrUnloadObject()
+	}
+	else
+	{
+		A1 = 0xffffb04a
+		D1.u16 = objA0.value32
+		if ((objA0.flags2a & 0x40) == 0 || u8[A1 + 0x38] != CHARACTER_KNUCKLES)
+		{
+			DrawOrUnloadObject()
+			return
+		}
+
+		objA0.flags2a &= ~0x40
+		fn0218ce()
+	}
+}
+
+
+function void fn0218ce()
+{
+	objA1.velocity.x = D1.u16
+	if (objA0.position.x.u16 >= objA1.position.x.u16)
+	{
+		objA1.position.x.u16 -= 4
+		A4 = u32[A0 + 0x38]
+	}
+	else
+	{
+		objA1.position.x.u16 += 4
+		A4 = objA0.countdown_callback
+	}
+
+	u16[A1 + 0x1c] = objA1.velocity.x
+	objA1.flags2a &= ~char.flag.PUSHING
+	if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 0x01)
+	{
+		u8[A1 + 0x2f] = 0x02
+		u8[A1 + 0x20] = 0x21
+		if (objA1.velocity.x < 0)
+			objA1.flags2a |= char.flag.FACING_LEFT
+		else
+			objA1.flags2a &= ~char.flag.FACING_LEFT
+	}
+
+	objA0.update_address = 0x021692
+	++objA0.animation.sprite
+
+	Wall.Destroy()
+	fn021692()
+}

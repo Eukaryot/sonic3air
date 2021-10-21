@@ -1,0 +1,196 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Called by C++ code (engine or S3AIR application)      //
+//-------------------------------------------------------//
+
+function void Init()
+{
+	//global.chaos_emeralds = 7
+	//global.super_emeralds = 7
+	//debug_mode.enabled = 1
+
+	// In standalone, pause cheats should always be unlocked
+	pausecheats.unlocked = 1
+
+#if GAMEAPP
+	// Setup region code according to settings
+	global.region_code = Game.getSetting(SETTING_REGION_CODE)
+#endif
+
+	// Initialization of global variables
+	{
+		globalComponentTintColorR = 0xff
+		globalComponentTintColorG = 0xff
+		globalComponentTintColorB = 0xff
+		globalComponentAddedColorR = 0
+		globalComponentAddedColorG = 0
+		globalComponentAddedColorB = 0
+
+		enableCustomPlaneReset = true
+	}
+
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		// This is only needed when loading old save states, but must not be done otherwise (e.g. on Time Attack restart)
+		//  -> That's why we're doing some checks here
+		if (u16[0x802002] == 0 && level.framecounter != 0)
+		{
+			// Load Sonic, Tails & Knuckles palette -- TODO: Handle this elsewhere
+			loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+			loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+			loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+			loadCharacterPalette(CHARACTER_SONIC,    0x802480, 1)	// Just using AIZ underwater palette...
+			loadCharacterPalette(CHARACTER_TAILS,    0x8024c0, 1)
+			loadCharacterPalette(CHARACTER_KNUCKLES, 0x802500, 1)
+
+			copyMemory(0x802000, 0x802180, 0xc0)
+			copyMemory(0x802300, 0x802480, 0xc0)
+		}
+	}
+
+	OnGameplaySettingsChange()
+
+	Debugging.setupDebugWatches()
+}
+
+
+function void OnGameplaySettingsChange()
+{
+	ApplyROMManipulations()
+}
+
+
+//# pre-update-hook
+function void PreFrameUpdate()
+{
+	if (enableCustomPlaneReset)
+	{
+		Renderer.resetCustomPlaneConfigurations()
+	}
+	else
+	{
+		// This has to get set explicitly once in each frame if used
+		enableCustomPlaneReset = true
+	}
+}
+
+
+//# post-update-hook
+function void PostFrameUpdate()
+{
+	if (Game.getSetting(SETTING_PLAYER2_OFFSCREEN) && global.game_mode == 0x0c && !competition_mode.active)
+	{
+		// Draw off-screen Tails (only when controlled by a player)
+		A0 = 0xffffb04a
+		if (objA0.update_address != 0 && tails.control_counter > 0)
+		{
+			s32 halfx = getScreenWidth() / 2
+			s32 halfy = getScreenHeight() / 2
+			s32 px = s32(char.position.x.u16) - camera.foreground.x.u16 - halfx
+			s32 py = s32(char.position.y.u16) - camera.foreground.y.u16 - halfy
+
+			if (level.vertical_wrap == 0xff00)
+			{
+				// Consider vertical level wrap
+				py &= level.height.bitmask
+				if (py > level.height.bitmask / 2)
+					py -= (level.height.bitmask + 1)
+			}
+
+			if (abs(px) >= halfx || abs(py) >= halfy)
+			{
+				s32 maxX = halfx * 19/20
+				s32 maxY = halfy * 19/20
+				if (abs(px) > maxX)
+				{
+					py = py * maxX / abs(px)
+					px = (px > 0 ? maxX : -maxX)
+				}
+				if (abs(py) > maxY)
+				{
+					px = px * maxY / abs(py)
+					py = (py > 0 ? maxY : -maxY)
+				}
+
+				px += halfx
+				py += halfy
+				Standalone.drawCharacterSprite(char.character, 1, px, py, true)
+
+				// Tails' tails
+				// TODO: This leads to a crash
+				//if (u16[0xffffcc3a] != 0)
+				//{
+				//	A0 = 0xffffcc0a
+				//	Standalone.drawCharacterSprite(CHARACTER_TAILS, 2, px, py, true)
+				//}
+			}
+		}
+	}
+
+	// Time Attack update
+	Standalone.checkTimeAttackFinish()
+
+	// Debug output
+	Debugging.debugDraw()
+	setWorldSpaceOffset(s32(s16(camera.position.x.u16)), s32(s16(camera.position.y.u16)))
+}
+
+
+function void restartLevel()
+{
+	global.zone_act = global.zone_act.apparent
+	checkpoint.number = 0
+
+	global.stage_type = 0
+	global.in_extra_stage = 0
+
+	level.restart = 1
+
+	// This is needed only for restarting the AIZ 1 intro from within the fire transition (but does not hurt in all the other cases)
+	camera.background.x = 0
+	camera.background.y = 0
+
+	Standalone.onRestartLevel()
+}
+
+
+function void restartAtCheckpoint()
+{
+	// This check should always be false, but it's relevant if restart is allowed from within special / bonus stages
+	if (global.stage_type != 0)
+	{
+		global.zone_act = checkpoint.zone_act
+		global.zone_act.apparent = checkpoint.zone_act.apparent
+		checkpoint.number = checkpoint.number.backup
+
+		global.stage_type = 0
+	}
+
+	global.zone_act = global.zone_act.apparent
+	global.in_extra_stage = 0
+	level.restart = 1
+
+	Standalone.onRestartAtCheckpoint()
+}
+
+
+function void restartTimeAttack()
+{
+	// Fade out music and screen
+	Audio.fadeOutChannel(0, 0x100)
+	FadeOutScreenBlocking()
+
+	// Signal restart
+	Game.triggerRestart()
+
+	yieldInWhiteScreen()
+}

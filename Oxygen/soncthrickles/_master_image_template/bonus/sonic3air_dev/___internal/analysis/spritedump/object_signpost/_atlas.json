@@ -1,0 +1,9 @@
+{
+	"0dcc76_083b6c_083b9e_0x00": { "File": "_atlas.bmp", "Rect": "0,0,48,32", "Center": "24,16" },
+	"0dcc76_083b6c_083b9e_0x01": { "File": "_atlas.bmp", "Rect": "48,0,48,32", "Center": "24,16" },
+	"0dcc76_083b6c_083b9e_0x02": { "File": "_atlas.bmp", "Rect": "96,0,48,32", "Center": "24,16" },
+	"0dcc76_083b6c_083b9e_0x03": { "File": "_atlas.bmp", "Rect": "144,0,48,32", "Center": "24,16" },
+	"0dcc76_083b6c_083b9e_0x04": { "File": "_atlas.bmp", "Rect": "200,0,32,32", "Center": "16,16" },
+	"0dcc76_083b6c_083b9e_0x05": { "File": "_atlas.bmp", "Rect": "260,0,8,32", "Center": "4,16" },
+	"0dcc76_083b6c_083b9e_0x06": { "File": "_atlas.bmp", "Rect": "296,0,32,32", "Center": "16,16" }
+}

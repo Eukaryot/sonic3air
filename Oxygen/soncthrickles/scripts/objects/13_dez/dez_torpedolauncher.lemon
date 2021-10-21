@@ -1,0 +1,109 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04719a) end(0x0471d0)
+function void fn04719a()
+{
+	objA0.mapping_offset = 0x0472a8
+	objA0.sprite_attributes = 0x0373
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+
+	D0 = u16(objA0.subtype2c) * 4
+	objA0.countdown_value = D0.u16
+	u16[A0 + 0x30] = D0.u16
+	#if STANDALONE
+		// Increase initial fire timer to accomplish for widescreen; some parts get a little unfair otherwise
+		objA0.countdown_value += getScreenExtend() / 4
+	#endif
+
+	objA0.update_address = 0x0471d6
+	fn0471d6()
+}
+
+
+//# address-hook(0x0471d6) end(0x047266)
+function void fn0471d6()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value < 0)
+		{
+			objA0.countdown_value = u16[A0 + 0x30]
+
+			if (allocDynamicObjectAfterA0())
+			{
+				// Launch torpedo
+				objA1.update_address = 0x04728a
+				u8[A1 + 0x04] = objA0.render_flags
+				u8[A1 + 0x06] = 0x08
+				u8[A1 + 0x07] = 0x08
+				u16[A1 + 0x08] = 0x0300
+				u16[A1 + 0x0a] = 0x2373
+				u32[A1 + 0x0c] = objA0.mapping_offset
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16
+				objA1.velocity.x = (objA0.flags2a & 0x01) ? 0x400 : -0x400
+				u8[A1 + 0x22] = 0x09
+				u8[A1 + 0x28] = 0x9b
+
+				playSound(0x7c)
+			}
+
+			objA0.update_address = 0x04726c
+			objA0.animation.sprite = 8
+			objA0.animation.timer = 0x1f
+			fn04726c()
+			return
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x04726c) end(0x047284)
+function void fn04726c()
+{
+	if (objA0.animation.timer > 0)
+	{
+		--objA0.animation.timer
+	}
+	else
+	{
+		objA0.animation.timer = 7
+		--objA0.animation.sprite
+		if (objA0.animation.sprite == 0)
+		{
+			objA0.update_address = 0x0471d6
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x04728a) end(0x0472a2)
+function void fn04728a()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		UpdateMovementStraightSimple()
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}

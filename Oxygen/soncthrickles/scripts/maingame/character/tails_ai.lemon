@@ -1,0 +1,899 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Tails AI                                              //
+//-------------------------------------------------------//
+
+//# address-hook(0x0139cc) end(0x0139e8)
+function void Character.TailsAI.Update()
+{
+	A1 = 0xffffb000		// Player 1
+
+	// When player 2 presses any key, that disables the AI for 10 seconds
+	if (control.tails.state & 0x7f)
+	{
+		tails.control_counter = 600		// 10 sec
+	}
+
+#if STANDALONE
+	if (MODIFICATION_TOGETHERNESS)
+	{
+		if (Input.buttonPressed(BUTTON_PAD2 | BUTTON_Y) && tails.ai_routine == 0x06 && tails.ai_routine <= 0x06)
+		{
+			// Reset Tails next to Player 1
+			u32 positionLookupAddress = 0xffffe500 + u32(u8(posbackup.offset.player1 - 20))
+
+			char.render_flags = (char.render_flags & ~0x03) | (objA1.render_flags & 0x03)
+			char.position.x.u16 = u16[positionLookupAddress]
+			char.position.y.u16 = u16[positionLookupAddress + 2]
+			char.velocity.x = objA1.velocity.x
+			char.velocity.y = objA1.velocity.y
+			char.groundspeed = objA1.groundspeed
+			char.state = objA1.state
+			char.rotation = u8[A1 + 0x26]
+			char.rotation.x = u8[A1 + 0x27]
+			char.flags = (char.flags & ~0x03) | (objA1.flags2a & 0x03)
+			char.control_flags = u8[A1 + 0x2e]
+			char.layer_flags1 = u8[A1 + 0x46]
+			char.layer_flags2 = u8[A1 + 0x47]
+
+			tails.ai_routine = 0x06
+			tails.control_counter = 600		// 10 sec
+		}
+	}
+
+	// This should only be called if SETTING_TAILS_ASSIST_MODE is active
+	if (tails.ai_routine == 0x30)
+	{
+		if (updateTailsAssist())
+			return
+
+		// Return to usual behavior
+		tails.ai_routine = 0x06
+	}
+#endif
+
+	// Targets:
+	//  - 0x013a10	-> tails.ai_routine = 0x00	-> Initialization (single frame)
+	//  - 0x013b26	-> tails.ai_routine = 0x02	-> Respawn (can be a single frame)
+	//  - 0x013bf8	-> tails.ai_routine = 0x04	-> Flying in
+	//  - 0x013d4a	-> tails.ai_routine = 0x06	-> Normal state, controlled by player or AI
+	//  - 0x013f40	-> tails.ai_routine = 0x08	-> Unknown
+	//  - 0x013fc0	-> tails.ai_routine = 0x0a	-> Inactive (e.g. in AIZ Intro with Sonic & Tails, but not with Sonic alone)
+	//  - 0x013fc2	-> tails.ai_routine = 0x0c	-> Unknown
+	//  - 0x013ffa	-> tails.ai_routine = 0x0e	-> Flying Sonic in automatically (e.g. CNZ 1 start with Sonic & Tails)
+	//  - 0x01408a	-> tails.ai_routine = 0x10	-> Flying away to disappear      (e.g. CNZ 1 start with Sonic alone)
+	//  - 0x0140c6	-> tails.ai_routine = 0x12	-> Direct control in MGZ 2 boss, waiting (direct control by first player, used in MGZ 2 boss with Sonic)
+	//  - 0x0140ce	-> tails.ai_routine = 0x14	-> Direct control in MGZ 2 boss, initialization
+	//  - 0x014106	-> tails.ai_routine = 0x16	-> Direct control in MGZ 2 boss, entering the screen from below
+	//  - 0x01414c	-> tails.ai_routine = 0x18	-> Direct control in MGZ 2 boss, now actually controllable
+	//  - 0x0141f2	-> tails.ai_routine = 0x1a	-> Unknown (no code ported)
+	//  - 0x01421c	-> tails.ai_routine = 0x1c	-> Unknown (no code ported)
+	//  - 0x014254	-> tails.ai_routine = 0x1e	-> Unknown (no code ported)
+	//  - 0x01425c	-> tails.ai_routine = 0x20	-> Unknown
+	//  - 0x014286	-> tails.ai_routine = 0x22	-> Flying in automatically alone (e.g. CNZ 1 start with Tails alone)
+	call tableLookupAddress(0x0139ec, tails.ai_routine)
+}
+
+
+#if STANDALONE
+function bool updateTailsAssist()
+{
+	// Check for manual second player control
+	if (tails.control_counter == 0)
+	{
+		// Still flying or swimming?
+		if (char.state >= char.state.TAILS_FLYDOWN && char.state <= char.state.TAILS_SWIMTIRED)
+		{
+			u8 input = 0
+
+			if (tails.carrying)
+			{
+				// Direct control by player 1 when carried
+				input = control.pad1.state
+
+				if (Game.getSetting(SETTING_TAILS_ASSIST_MODE) >= 2)	// Hybrid & Mania style only
+				{
+					if (Game.getSetting(SETTING_TAILS_ASSIST_MODE) == 3)
+					{
+						// For Mania style, do not allow button pressing [up] to ascend
+						input &= ~CONTROL_UP
+					}
+					if (control.pad1.pressed & CONTROL_ABC)
+					{
+						input |= CONTROL_UP
+					}
+				}
+			}
+			else
+			{
+				// Some more or less intelligent behavior when waiting for other player to hang on
+				s16 dx = objA1.position.x.u16 - char.position.x.u16
+				s16 dy = objA1.position.y.u16 - char.position.y.u16
+				if (abs(dx) > 0x100 || abs(dy) > 0x100 || tails.flight_countdown < 30)
+				{
+					// Abort Tails Assist and switch back to normal AI behavior
+					return false
+				}
+				else
+				{
+					// Move towards other player
+					//  -> Look 16 frames ahead to avoid overshooting
+					//  -> Also take into account other character's velocity
+					dx -= char.velocity.x >> 4
+					dx += objA1.velocity.x >> 4
+					if (dx <= -0x0c)
+					{
+						input = CONTROL_LEFT
+					}
+					else if (dx >= 0x0c)
+					{
+						input = CONTROL_RIGHT
+					}
+
+					if (global.inv_gravity)
+						dy = -dy
+					dy -= char.velocity.y >> 4
+					if (control.pad1.state & CONTROL_DOWN)	// If player 1 pressed down, try to land instead of targeting a spot above the other character
+					{
+						dy += 0x40
+					}
+					else
+					{
+						// Target height is a certain amount over the other player, which reduces while he's moving vertically (jumping!)
+						u16 heightDifference = max(0x40 - abs(objA1.velocity.y >> 4), 0)
+						dy -= heightDifference
+					}
+					if (dy <= 0)
+					{
+						input |= CONTROL_UP
+					}
+					else
+					{
+						input |= CONTROL_DOWN
+					}
+				}
+			}
+
+			control.tails = 0
+			control.tails.state = (input & 0x0c)
+			if (input & CONTROL_DOWN)
+			{
+				// Nothing here, just fly down
+			}
+			else if (input & CONTROL_UP)
+			{
+				control.tails |= 0x7070
+			}
+			else
+			{
+				// Do not hover in place, it feels kind of weird, as it's different from how (single player) Tails controls
+			/*
+				// Hover in place
+				++tails.up_press_timer
+				if (tails.up_press_timer >= 0x58)
+				{
+					tails.up_press_timer = 0
+					control.tails |= 0x7070
+				}
+			*/
+			}
+
+			// Carrying other player right now?
+			if (tails.carrying)
+			{
+				u8[0xfffffaac] = 0		// Don't know what this is for...
+
+				A2 = 0xfffff73e
+				A1 = 0xffffb000
+				D0.u16 = control.pad1
+				Tails.UpdateCarrySonic()
+			}
+			return true
+		}
+	}
+
+	// Switch back to normal AI behavior
+	return false
+}
+#endif
+
+
+//# address-hook(0x013a10) end(0x013b24)
+function void Character.TailsAI.Init()
+{
+	if (u8[0xfffff746] == 0)	// This is some checkpoint number backup for Tails
+	{
+		if (global.zone_act == 0x0100 || global.zone_act == 0x0200 || global.zone_act == 0x0600 || global.zone_act == 0x0900 || global.zone_act == 0x1600)
+		{
+			tails.respawn_counter = 0
+			tails.ai_routine = 0x06
+			char.control_flags = 0
+			return
+		}
+		else if (global.zone_act == 0x0800 || global.zone == 0x17)
+		{
+			tails.respawn_counter = 0
+			tails.ai_routine = 0x06
+			return
+		}
+		else if (global.zone_act == 0x0000)		// AIZ 1
+		{
+		#if STANDALONE
+			// We want Tails to appear right from the start in Knuckles & Tails mode, unless using Knuckles intro
+			if (isMainCharacter(CHARACTER_SONIC) || Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES))
+		#endif
+			{
+				Character.CheckDiedStateEnd()
+				tails.ai_routine = 0x0a
+				char.control_flags = 0x83
+				return
+			}
+		}
+		else if (global.zone_act == 0x0300)		// CNZ 1
+		{
+		#if STANDALONE
+			if (!isMainCharacter(CHARACTER_KNUCKLES) || level.start_location == 1)
+		#endif
+			{
+				char.position.x.u16 = 0x18
+				char.position.y.u16 = 0x600
+				char.flags = char.flag.IN_AIR
+				tails.control_counter = 0
+				tails.respawn_counter = 0
+				tails.ai_routine = 0x0c
+				return
+			}
+		}
+		else if (global.zone_act == 0x0500 || global.zone_act == 0x0a00)	// ICZ 1 or SSZ (S/T)
+		{
+		#if STANDALONE
+			if (isMainCharacter(CHARACTER_KNUCKLES))
+			{
+				tails.respawn_counter = 0
+				tails.ai_routine = 0x02
+				char.control_flags = 0x81
+				char.flags = char.flag.IN_AIR
+				char.position.x.u16 = 0
+				char.position.y.u16 = 0
+				tails.flight_countdown = 0xf0
+				return
+			}
+		#endif
+
+			// Disable Tails
+			// TODO: At least in SSZ, we should spawn Tails as well right from the start (he will reappear after a death anyway)
+			RespawnTails()
+			tails.ai_routine = 0x0a
+			char.control_flags = 0x83
+			return
+		}
+		else if (global.zone_act == 0x0700 && global.lock_on_state == 0)
+		{
+			// MHZ 1
+			char.flags = char.flag.IN_AIR
+			tails.control_counter = 0
+			tails.respawn_counter = 0
+			tails.ai_routine = 0x0c
+
+		#if STANDALONE
+			if (isMainCharacter(CHARACTER_KNUCKLES))
+			{
+				char.position.x.u16 += 0x10
+				char.position.y.u16 -= 0x10
+				char.render_flags &= ~render_flag.FLIP_X
+				char.state = char.state.FALLING_PANIC
+				char.velocity.x = 0
+				char.velocity.y = 0
+				char.groundspeed = 0
+				char.control_flags = 0
+				tails.ai_routine = 0x06
+				return
+			}
+		#endif
+
+			char.position.x.u16 = 0xd8
+			char.position.y.u16 = 0x500
+			return
+		}
+	}
+
+	char.state = char.state.RUNNING
+	char.velocity.x = 0
+	char.velocity.y = 0
+	char.groundspeed = 0
+	char.flags = 0
+	char.control_flags = 0
+	tails.respawn_counter = 0
+	tails.ai_routine = 0x06
+}
+
+
+//# address-hook(0x013b26) end(0x013bf6)
+function void fn013b26()
+{
+#if STANDALONE
+	// Wait for an additional delay (used in AIZ intro)
+	if (tails.respawn_counter > 0)
+	{
+		--tails.respawn_counter
+		return
+	}
+#endif
+
+	if ((control.tails.state & 0xf0) == 0)	// Check buttons, but not D-pad
+	{
+		// Check only every 64 frames
+		if ((level.framecounter & 0x3f) != 0)
+			return
+		if (u8[A1 + 0x2e] & 0x80)	// control_flags
+			return
+		if (u8[A1 + 0x2a] & 0x80)	// flags
+			return
+	}
+
+	tails.ai_routine = 0x04
+
+	// Spawn above player 1
+	u16 px = objA1.position.x.u16
+	u16 py = objA1.position.y.u16
+	char.position.x.u16 = px
+	char.position.y.u16 = py + (global.inv_gravity ? 0xc0 : -0xc0)
+	tails.flight_target.x = px
+	tails.flight_target.y = py
+
+	char.sprite_attributes |= 0x8000
+	char.sprite_priority = 0x100
+	char.velocity.x = 0
+	char.velocity.y = 0
+	char.groundspeed = 0
+	u8[A0 + 0x2d] = 0
+	char.double_jump_state = 0
+	char.flags = char.flag.IN_AIR
+	char.drown_countdown = 30
+	char.control_flags = 0x81
+	u8[A0 + 0x30] = 0
+	u8[A0 + 0x31] = 0
+	char.hlock_countdown = 0
+	char.invuln.countdown = 0
+	char.invinc.countdown = 0
+	char.speedup.countdown = 0
+	char.protection_flag = 0
+	char.look_up_down_timer = 0
+	char.angle_sensor_1 = 0
+	char.angle_sensor_2 = 0
+	u8[A0 + 0x3c] = 0
+	char.spindash = 0
+	char.spindash_charge = 0
+	char.jumping = 0
+
+#if STANDALONE
+	// Fix for Tails' speed caps not corrected when he despawned underwater
+	setSpeedCapProperties(A4, false)
+#endif
+
+	u8[A0 + 0x41] = 0
+	tails.flight_countdown = 0xf0
+	UpdateTailsFlight_innerB()
+}
+
+
+//# address-hook(0x013bf8) end(0x013d48)
+function void fn013bf8()
+{
+	// Tails AI flying in after respawn
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		tails.flight_countdown = 0xf0
+		char.flags |= char.flag.IN_AIR
+		UpdateTailsFlight_innerB()
+		tails.respawn_counter = 0
+	}
+	else
+	{
+		++tails.respawn_counter
+	#if STANDALONE
+		if (tails.respawn_counter >= 300 || (Input.buttonPressed(BUTTON_Y | BUTTON_PAD2) && tails.ai_routine == 0x06))
+	#else
+		if (tails.respawn_counter >= 300)
+	#endif
+		{
+			tails.respawn_counter = 0
+			tails.ai_routine = 0x02
+			char.control_flags = 0x81
+			char.flags = char.flag.IN_AIR
+			char.position.x.u16 = 0
+			char.position.y.u16 = 0
+			tails.flight_countdown = 0xf0
+			UpdateTailsFlight_innerB()
+			return
+		}
+	}
+
+	D3.u8 = posbackup.offset.player1 - 0x44
+	tails.flight_target.x = u16[0xffffe500 + D3.u8]
+	tails.flight_target.y = u16[0xffffe500 + D3.u8 + 2]
+	D0.u16 = char.position.x.u16 - tails.flight_target.x
+	if (D0.u16 != 0)
+	{
+		D2.u16 = min(abs(D0.s16) >> 4, 12)
+		D1.u8 = abs(s8[A1 + 0x18])
+		D2.u8 += D1.u8 + 1
+		if (D0.s16 >= 0)
+		{
+			char.flags |= char.flag.FACING_LEFT
+			if (D2.u16 >= D0.u16)
+			{
+				D2.u16 = D0.u16
+				D0 = 0
+			}
+			D2.s16 = -D2.s16
+		}
+		else
+		{
+			char.flags &= ~char.flag.FACING_LEFT
+			D0.s16 = -D0.s16
+			if (D2.u16 >= D0.u16)
+			{
+				D2.u8 = D0.u8
+				D0 = 0
+			}
+		}
+		char.position.x.u16 += D2.u16
+	}
+
+	D1.s16 = char.position.y.u16 - tails.flight_target.y
+	if (D1.s16 != 0)
+	{
+		s16 dy = D1.s16
+	#if STANDALONE
+		// Consider vertical level wrap
+		if (level.vertical_wrap == 0xff00)
+		{
+			dy &= level.height.bitmask
+			if (dy > level.height.bitmask / 2)
+				dy -= (level.height.bitmask + 1)
+		}
+	#endif
+		char.position.y.u16 += (dy > 0) ? -1 : 1
+	}
+
+	D2.u8 = u8[0xffffe400 + D3.u8 + 2] & 0x80
+	if (D2.u8 == 0)
+	{
+		D1.u16 |= D0.u16
+		if (u8[0xffffb005] < 0x06)
+		{
+			bool gainControlNow = false
+		#if STANDALONE
+			// Allow for pressing a jump button to gain control over Tails at once
+			gainControlNow = (control.tails.pressed & CONTROL_ABC)
+		#endif
+
+			if (D1.u16 == 0 || gainControlNow)
+			{
+				tails.ai_routine = 0x06
+				char.control_flags = 0
+				char.state = char.state.RUNNING
+				char.velocity.x = 0
+				char.velocity.y = 0
+				char.groundspeed = 0
+				char.flags &= char.flag.UNDERWATER
+				char.flags |= char.flag.IN_AIR
+				char.hlock_countdown = 0
+				char.sprite_attributes = (char.sprite_attributes & 0x7fff) | (objA1.sprite_attributes & 0x8000)
+				char.layer_flags1 = u8[A1 + 0x46]
+				char.layer_flags2 = u8[A1 + 0x47]
+
+				if (gainControlNow)
+				{
+					// Roll instead
+					char.state = char.state.ROLLING
+				}
+				return
+			}
+		}
+	}
+	char.control_flags = 0x81
+}
+
+
+//# address-hook(0x013d4a) end(0x013ec8)
+function void fn013d4a()
+{
+	if (u8[0xffffb005] >= 0x06)
+	{
+		tails.ai_routine = 0x04
+		char.spindash = 0
+		char.spindash_charge = 0
+		char.control_flags = 0x81
+		char.flags = char.flag.IN_AIR
+		char.state = char.state.TAILS_FLYDOWN
+		return
+	}
+
+	fn013efc()
+
+	if (tails.control_counter == 0 && (u8[A0 + 0x2e] & 0x80) == 0 && (u8[A1 + 0x37] & 0x80) == 0)
+	{
+		if (char.hlock_countdown != 0 && char.groundspeed == 0)
+		{
+			tails.ai_routine = 0x08
+		}
+
+		D0.u8 = posbackup.offset.player1 - 0x44
+		u16 targetPosX = u16[0xffffe500 + D0.u8]
+		u16 targetPosY = u16[0xffffe500 + D0.u8 + 2]
+		u16 controlBackup = u16[0xffffe400 + D0.u8]
+		u8 flagsBackup = u8[0xffffe400 + D0.u8 + 2]
+	#if STANDALONE
+		// Make Tails account for Sonic's speed just enough he won't fall behind in AIZ 2 bombing section
+		targetPosX += (s16[A1 + 0x18] >> 7)
+	#endif
+
+		if ((u8[A1 + 0x2a] & 0x08) == 0 && s16[A1 + 0x1c] < 0x400)
+		{
+			// Prefer to stand left, not directly behind main character
+			targetPosX -= 0x20
+		}
+		s16 relativeTargetPosX = targetPosX - char.position.x.u16
+
+		control.tails = controlBackup
+		if ((char.flags & char.flag.PUSHING) && ((flagsBackup & char.flag.PUSHING) == 0))
+		{
+			// Jump over obstacle
+		#if STANDALONE
+			// Do not jump if target position is close anyways
+			if (abs(relativeTargetPosX) >= 0x30)
+		#endif
+			if ((level.framecounter.low & 0x3f) == 0 && char.state != char.state.COWERING)
+			{
+				control.tails |= 0x7070
+				tails.ai_jumping = 1
+			}
+		}
+		else
+		{
+			if (relativeTargetPosX == 0)
+			{
+				char.flags = (char.flags & ~char.flag.FACING_LEFT) | (flagsBackup & char.flag.FACING_LEFT)
+			}
+			else
+			{
+				if (relativeTargetPosX < 0)
+				{
+					if (relativeTargetPosX <= -0x30)
+					{
+						control.tails = (control.tails & 0xf3f3) | 0x0404		// Move left
+					}
+
+					if (char.groundspeed != 0 && (char.flags & char.flag.FACING_LEFT) != 0 && (char.control_flags & 0x01) == 0)
+					{
+						--char.position.x.u16
+					}
+				}
+				else
+				{
+					if (relativeTargetPosX >= 0x30)
+					{
+						control.tails = (control.tails & 0xf3f3) | 0x0808		// Move right
+					}
+
+					if (char.groundspeed != 0 && (char.flags & char.flag.FACING_LEFT) == 0 && (char.control_flags & 0x01) == 0)
+					{
+						++char.position.x.u16
+					}
+				}
+			}
+
+			if (tails.ai_jumping != 0)
+			{
+				control.tails |= 0x7000
+				if (char.flags & char.flag.IN_AIR)
+					return
+
+				tails.ai_jumping = 0
+			}
+
+			if ((level.framecounter & 0xff) == 0 || abs(relativeTargetPosX) < 0x40)
+			{
+				s16 relativeTargetPosY = targetPosY - char.position.y.u16
+				if (relativeTargetPosY <= -0x20)
+				{
+					if (((level.framecounter.low & 0x3f) == 0) && (char.state != char.state.COWERING))
+					{
+						control.tails |= 0x7070
+						tails.ai_jumping = 1
+					}
+				}
+			}
+
+		#if STANDALONE
+			// If both are standing still horizontally... (which includes spindash charging)
+			if (char.velocity.x == 0 && objA1.velocity.x == 0)
+			{
+				// Make sure Tails looks into the same direction as the main player
+				if ((objA0.flags2a & char.flag.FACING_LEFT) != (objA1.flags2a & char.flag.FACING_LEFT))
+				{
+					objA0.flags2a = (objA0.flags2a & ~char.flag.FACING_LEFT) | (objA1.flags2a & char.flag.FACING_LEFT)
+				}
+
+				// Start charging a spindash if the main player does so as well
+				if (char.spindash == 0 && u8[A1 + 0x3d] != 0 && char.state == char.state.COWERING)
+				{
+					control.tails |= 0x0020
+				}
+			}
+		#endif
+		}
+	}
+	else if (tails.control_counter != 0)
+	{
+		--tails.control_counter
+	}
+}
+
+
+//# address-hook(0x013efc) end(0x013f3e)
+function void fn013efc()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		tails.respawn_counter = 0
+	}
+	else
+	{
+		if (char.flags & char.flag.ON_OBJECT)
+		{
+			A3 = 0xffff0000 + u16[A0 + 0x42]
+			D0 = u16[0xfffff700]
+			if (D0.u16 != u16[A3])
+			{
+				RespawnTails()
+				return
+			}
+		}
+
+		++tails.respawn_counter
+	#if STANDALONE
+		if (tails.respawn_counter >= 300 || (Input.buttonPressed(BUTTON_Y | BUTTON_PAD2) && tails.ai_routine == 0x06))
+	#else
+		if (tails.respawn_counter >= 300)
+	#endif
+		{
+			RespawnTails()
+			return
+		}
+	}
+
+	if (char.flags & char.flag.ON_OBJECT)
+	{
+		A3 = 0xffff0000 + u16[A0 + 0x42]
+		u16[0xfffff700] = u16[A3]
+	}
+}
+
+
+//# address-hook(0x013f40) end(0x013fbe)
+function void fn013f40()
+{
+	fn013efc()
+
+	if (tails.control_counter != 0 || objA0.value32 != 0)
+		return
+
+	if (u8[A0 + 0x3d] == 0)
+	{
+		if (objA0.groundspeed != 0)
+			return
+
+		D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
+		if (D0.s16 >= 0)
+			objA0.flags2a |= char.flag.FACING_LEFT
+		else
+			objA0.flags2a &= ~char.flag.FACING_LEFT
+
+		control.tails = 0x0202
+		D0.u8 = level.framecounter.low & 0x7f
+		if (D0.u8 == 0)
+		{
+			control.tails = 0
+			tails.ai_routine = 0x06
+		}
+		else if (char.state == char.state.COWERING)
+		{
+			control.tails = 0x7272
+		}
+	}
+	else
+	{
+		control.tails = 0x0202
+		D0.u8 = level.framecounter.low & 0x7f
+		if (D0.u8 == 0)
+		{
+			control.tails = 0
+			tails.ai_routine = 0x06
+		}
+		else if ((D0.u8 & 0x1f) == 0)
+		{
+			control.tails = 0x7272
+		}
+	}
+}
+
+
+//# address-hook(0x013fc0) end(0x013fc0)
+function void fn013fc0()
+{
+}
+
+
+//# address-hook(0x013fc2) end(0x013ff4)
+function void fn013fc2()
+{
+	objA0.value2f = 1
+	tails.flight_countdown = 0xf0
+	objA0.flags2a = char.flag.IN_AIR
+	objA0.velocity.x = 0x0100
+	objA0.velocity.y = 0
+	u16[A0 + 0x1c] = 0
+
+	A1 = 0xffffb000
+	fn01459e()
+
+	tails.carrying = 1
+	tails.ai_routine = 0x0e
+	fn013ffa()
+}
+
+
+//# address-hook(0x013ffa) end(0x014086)
+function void fn013ffa()
+{
+	tails.control_counter = 0
+	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808
+
+	A2 = 0xfffff73e
+	A1 = 0xffffb000
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		tails.ai_routine = 0x06
+		objA0.flags2e = 0
+		objA0.state = 0
+		objA0.velocity.x = 0
+		objA0.velocity.y = 0
+		u16[A0 + 0x1c] = 0
+		objA0.flags2a = char.flag.IN_AIR
+		objA0.value32 = 0
+		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u8[A1 + 0x0a] & 0x8000)
+
+		char.layer_flags1 = u8[A1 + 0x46]
+		char.layer_flags2 = u8[A1 + 0x47]
+		if (getNumPlayers() < 2)
+		{
+			tails.ai_routine = 0x10
+		}
+	}
+
+	D0.u16 = control.pad1
+	Tails.UpdateCarrySonic()
+}
+
+
+//# address-hook(0x01408a) end(0x0140c4)
+function void fn01408a()
+{
+	tails.control_counter = 0
+	tails.flight_countdown = 0xf0
+	control.tails = (level.framecounter.low & 0x0f) ? 0 : 0x7878
+
+	if (!(objA0.render_flags & render_flag.VISIBLE))
+	{
+		objA0.update_address = 0
+		objA0.position.x.u16 = 0
+		objA0.position.y.u16 = 0
+		tails.ai_routine = 0x0a
+	}
+}
+
+
+//# address-hook(0x0140c6) end(0x0140cc)
+function void fn0140c6()
+{
+	control.tails = 0
+}
+
+
+//# address-hook(0x0140ce) end(0x014100)
+function void fn0140ce()
+{
+	objA0.value2f = 0x01
+	tails.flight_countdown = 0xf0
+	objA0.flags2a = char.flag.IN_AIR
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	u16[A0 + 0x1c] = 0
+
+	A1 = 0xffffb000
+	fn01459e()
+
+	tails.carrying = 1
+	tails.ai_routine = 0x16
+	fn014106()
+}
+
+
+//# address-hook(0x014106) end(0x014148)
+function void fn014106()
+{
+	tails.control_counter = 0
+	tails.flight_countdown = 0xf0
+	control.tails = (level.framecounter.low & 0x07) ? 0 : 0x7070
+
+	if (objA0.position.y.u16 <= camera.position.y.u16 + 0x90)
+	{
+		tails.ai_routine = 0x18
+	}
+
+	A2 = 0xfffff73e
+	A1 = 0xffffb000
+	D0.u16 = control.pad1
+	Tails.UpdateCarrySonic()
+}
+
+
+//# address-hook(0x01425c) end(0x0142e0)
+function void fn01425c()
+{
+	objA0.velocity.y = 0
+	char.groundspeed = 0
+	objA0.flags2a = char.flag.IN_AIR
+	tails.flight_countdown = 0xf0
+	objA0.value2f = 0x01
+	tails.control_counter = 0
+	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808
+
+	if (objA0.flags2a & char.flag.IN_AIR)
+	{
+		tails.ai_routine = 0x22
+		objA0.velocity.x = 0x0100
+	}
+	else
+	{
+		tails.ai_routine = 0x06
+		objA0.velocity.x = 0
+		objA0.flags2e = 0
+		objA0.state = 0
+		objA0.value32 = 0
+		objA0.sprite_attributes &= 0x7fff
+	}
+}
+
+
+//# address-hook(0x014286)
+function void fn014286()
+{
+	tails.control_counter = 0
+	control.tails = (level.framecounter.low & 0x1f) ? 0 : 0x0808
+
+	if ((objA0.flags2a & char.flag.IN_AIR) == 0)
+	{
+		tails.ai_routine = 0x06
+		objA0.flags2e = 0
+		objA0.state = 0
+		objA0.velocity.x = 0
+		objA0.velocity.y = 0
+		u16[A0 + 0x1c] = 0
+		objA0.flags2a = char.flag.IN_AIR
+		objA0.value32 = 0
+		objA0.sprite_attributes &= 0x7fff
+	}
+}

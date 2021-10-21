@@ -1,0 +1,268 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x040786) end(0x04084c)
+function void fn040786()
+{
+	objA0.mapping_offset = 0x040b0c
+	objA0.sprite_attributes = 0x43c9
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x2c
+	objA0.box_size.y = 0x2c
+	objA0.sprite_priority = 0x0280
+	objA0.flags2a |= 0x80
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x040872
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u8[A1 + 0x04] = objA0.render_flags
+		u8[A1 + 0x07] = 0x40
+		u8[A1 + 0x06] = 0x40
+		u16[A1 + 0x08] = 0x0200
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x04] |= 0x40
+		u16[A1 + 0x16] = 8
+
+		D1 = objA0.position.x - 0x280000
+		D2 = objA0.position.y + 0x280000
+		A2 = A1 + 0x18
+		D0 = u16[A1 + 0x16] - 1
+		while (D0.s16 >= 0)
+		{
+			u16[(A2+=2)-2] = D1 >> 16
+			u16[(A2+=2)-2] = D2 >> 16
+			u16[(A2+=2)-2] = 0
+			D1 += 0x0b504f
+			D2 -= 0x0b504f
+			--D0.s16
+		}
+
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	objA0.position.y.u16 += 0x28
+	u16[A0 + 0x30] = 0x60
+
+	objA0.update_address = 0x040852
+	fn040852()
+}
+
+
+//# address-hook(0x040852) end(0x04086c)
+function void fn040852()
+{
+	fn040878()
+	fn040a08()
+
+	D1.u16 = 0x30
+	A2 = 0xff8f00
+	D4.u16 = objA0.position.x.u16
+	fn01e356()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x040872) end(0x040872)
+function void fn040872()
+{
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x040878) end(0x0408d2)
+function void fn040878()
+{
+	D4 = 0
+	D5.u16 = u16[A0 + 0x30]
+
+	A2 = A0 + 0x35
+	A1 = 0xffffb04a
+	D6 = 4
+	fn04093e()
+
+	--A2
+	A1 = 0xffffb000
+	D6 = 3
+	fn04093e()
+
+	u16[A0 + 0x30] = D5.u16
+	if (u8[A0 + 0x36] == 0)
+	{
+		if (D4.u16 != objA0.value32)
+		{
+			D0.u16 = (D4.s16 < s16[A0 + 0x32]) ? -0x40 : 0x40
+			objA0.value32 += D0.u16
+		}
+	}
+	else
+	{
+		D0 = u16[0x0408d4 + objA0.animation.frame]
+		objA0.value32 = D0.u16
+		if (objA0.value32 == 0)
+		{
+			u8[A0 + 0x36] = D0.u8
+			objA0.animation.frame = D0.u8
+		}
+		else
+		{
+			objA0.animation.frame += 2
+		}
+	}
+}
+
+
+//# address-hook(0x04093e) end(0x0409b8)
+function void fn04093e()
+{
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		u8[A2] = 0
+		return
+	}
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x30
+	if (D0.u16 < 0x60)
+	{
+		if (objA0.flags2a & 0x01)
+		{
+			D0.u16 ^= 0xffff
+			D0.u16 += 0x60
+		}
+
+		D5.u16 = D0.u16
+		D4.u16 = -0x100
+		if (u8[A2] == 0)
+		{
+			u8[A2] = (D0.u16 < 0x3c) ? -1 : 1
+		}
+		else if (s8[A2] < 0)
+		{
+			if (D0.u16 >= 0x3c)
+			{
+				u8[A2] = 0
+				u8[A0 + 0x36] = 1
+				fn0409ba()
+			}
+		}
+		else
+		{
+			D1 = 0x18
+			if (objA0.flags2a & 0x01)
+			{
+				D1.u16 ^= 0xffff
+			}
+			u16[A1 + 0x1c] -= D1.u16
+
+			if (D0.u16 < 0x3c)
+			{
+				u8[A2] = 0
+				u8[A0 + 0x36] = 1
+				fn0409ba()
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0409ba) end(0x040a02)
+function void fn0409ba()
+{
+	objA1.velocity.y = -0xef0
+	if (objA0.flags2a & 0x01)
+	{
+		u8[A1 + 0x2a] &= ~0x01
+		objA1.velocity.x = 0xef0
+	}
+	else
+	{
+		u8[A1 + 0x2a] |= 0x01
+		objA1.velocity.x = -0xef0
+	}
+
+	u8[A1 + 0x05] = 0x02
+	objA1.state = char.state.STRAIGHTJUMP
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+	u8[A1 + 0x2f] = 0
+	u8[A1 + 0x40] = 0
+
+	playSound(0xb1)
+}
+
+
+//# address-hook(0x040a08) end(0x040aa8)
+function void fn040a08()
+{
+	D5.u16 = u16[A0 + 0x30]
+	if (D5.u16 == 0)
+		return
+
+	A1 = 0x040aaa
+	D0 = u8[A1 + D5.s16]
+	D0.s32 = s32(D0.s16) * s16[A0 + 0x32]
+	D1.s32 = D5.s16
+	D0 += D1.s32 << 8
+	D4 = D0
+
+	D0.s32 = D0.s32 / D5.s16
+	D0.s32 <<= 8
+	D2.u16 = D5.u16 - 1
+	A2 = 0xffff8f00
+	D3 = 0
+	while (D2.s16 >= 0)
+	{
+		u8[(A2+=1)-1] = D3.u8
+		D3 = (D3 << 16) + (D3 >> 16)
+		D3 += D0
+		D3 = (D3 << 16) + (D3 >> 16)
+		--D2.s16
+	}
+
+	if (D5.u16 < 0x60)
+	{
+		D2.u16 = 0x60 - D5.u16
+		D0 = 0x6000 - D4
+		D0.s32 = D0.s32 / D2.s16
+		D0.s32 <<= 8
+		while (D2.s16 > 0)
+		{
+			u8[(A2+=1)-1] = D3.u8
+			D3 = (D3 << 16) + (D3 >> 16)
+			D3 += D0
+			D3 = (D3 << 16) + (D3 >> 16)
+			--D2.s16
+		}
+	}
+
+	A3 = 0xffff8f06
+	D2.u16 = objA0.position.y.u16 + 6
+
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	A2 = A1 + 0x1a
+	D3 = 6
+	if (objA0.flags2a & 0x01)
+	{
+		A2 = A1 + 0x44
+		D3.s16 = -D3.s16
+	}
+
+	D0 = 7
+	while (D0.s16 >= 0)
+	{
+		u16[A2] = D2.u16 - s8[A3]
+		A2 += D3.s16
+		A3 += 0x0c
+		--D0.s16
+	}
+}

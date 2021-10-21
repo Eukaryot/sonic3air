@@ -1,0 +1,170 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// ICZ Tower of four Ice Blocks                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x08ab4e) end(0x08ab6a)
+function void IceBlockTower.Init()
+{
+	setupObjectAttributesFull(0x08ace2)
+	objA0.update_address = 0x0850a2
+	A2 = (objA0.subtype2c == 0) ? 0x08acf4 : 0x08acfc
+	SpawnChildObjectHierarchy()
+}
+
+
+//# address-hook(0x08ab86) end(0x08abac)
+function void fn08ab86()
+{
+	setupObjectAttributesBasic(0x08acee)
+	objA0.update_address = 0x08abb0
+	D0 = objA0.subtype2c
+	if (D0 == 0x06)
+		objA0.animation.sprite = 0x03
+
+	D0.u16 <<= 4
+	objA0.position.y.u16 -= D0.u16
+	fn08acce()
+}
+
+
+//# address-hook(0x08abb0) end(0x08ac1c)
+function void fn08abb0()
+{
+	if (objA0.subtype2c != 0)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		if (u8[A1 + 0x38] & 0x01)
+		{
+			objA0.update_address = 0x08ac1e
+			objA0.flags38 |= 0x01
+			D0 = 0x0f + (u16(objA0.subtype2c) << 2)
+			objA0.countdown_value = D0.u16
+			objA0.countdown_callback = 0x08ac2a
+			return
+		}
+	}
+
+	u16[A7-=2] = u16[0xffffb018]
+	u16[A7-=2] = u16[0xffffb062]
+	fn08ac70()
+
+	D0 = u32[(A7+=4)-4]
+	D1 = 5
+	if (objA0.animation.sprite != 0x03)
+	{
+		if (objA0.subtype2c == 0)
+		{
+			A1 = 0xffffb000
+			if (fn08ac80())
+				return
+
+			A1 = 0xffffb04a
+			D0 = (D0 << 16) + (D0 >> 16)
+			++D1.u8
+			if (fn08ac80())
+				return
+		}
+	}
+	fn08acce()
+}
+
+
+//# address-hook(0x08ac1e) end(0x08ac26)
+function void fn08ac1e()
+{
+	fn08ac70()
+	Object.CountdownAndTrigger()
+	fn08acce()
+}
+
+
+//# address-hook(0x08ac2a) end(0x08ac42)
+function void fn08ac2a()
+{
+	objA0.update_address = 0x08ac44
+	objA0.countdown_value = 0x07
+	objA0.countdown_callback = 0x08ac54
+	objA0.subtype2c -= 2
+}
+
+
+//# address-hook(0x08ac44) end(0x08ac50)
+function void fn08ac44()
+{
+	fn08ac70()
+	objA0.position.y.u16 += 4
+	Object.CountdownAndTrigger()
+	fn08acce()
+}
+
+
+//# address-hook(0x08ac54) end(0x08ac6e)
+function void fn08ac54()
+{
+	objA0.update_address = 0x08abb0
+	objA0.flags38 &= ~0x01
+	camera.screenshake.state = 0x10
+	playSound(0x96)
+}
+
+
+//# address-hook(0x08ac70) end(0x08ac7a)
+function void fn08ac70()
+{
+	D1 = 0x2b
+	D2 = 0x10
+	D3 = 0x10
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}
+
+
+//# translated(0x08ac80) end(0x08accc)
+function bool fn08ac80()
+{
+	if (objA0.flags2a & (1 << D1.u8))
+	{
+		// To break through, the character needs to be rolling fast enough
+		D3.u16 = abs(D0.s16)
+		if ((u8[A1 + 0x20] == char.state.ROLLING) && (D3.u16 >= 0x0600))
+		{
+			objA1.velocity.x = D0.s16
+			s16[A1 + 0x1c] = D0.s16
+			objA0.flags2a &= ~(1 << D1.u8)
+			u8[A1 + 0x2a] &= ~(1 << D1.u8)
+			objA0.flags38 |= 0x01
+
+			spawnChildObjects(0x08aaea)
+			fn08594e()
+			Object.TriggerUnloading()
+			playSound(SFX_COLLAPSE)
+			return true
+		}
+	}
+	return false
+}
+
+
+//# address-hook(0x08acce) end(0x08acdc)
+function void fn08acce()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u8[A1 + 0x38] & 0x10)
+	{
+		fn0852ae()
+	}
+	else
+	{
+		DrawObject()
+	}
+}

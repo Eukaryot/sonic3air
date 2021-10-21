@@ -1,0 +1,201 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Energy Beam object slowing moving up                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x049eee) end(0x049ef2)
+function void fn049eee()
+{
+	A1 = A0
+	D1 = 1
+	fn049f20()
+}
+
+
+//# address-hook(0x049f20)
+//# translated(0x049ef4) end(0x049f50)
+function void fn049f20()
+{
+	while (true)
+	{
+		u32[A1 + 0x0c] = 0x04a08a
+		u16[A1 + 0x0a] = 0xa352
+		u8[A1 + 0x04] |= 0x04
+		u8[A1 + 0x07] = 0x08
+		u8[A1 + 0x06] = 0x18
+		u16[A1 + 0x08] = 0
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		objA1.update_address = 0x04a07a
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.x.u16 += 0x0190
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x04] |= render_flag.FLIP_X
+		u16[A1 + 0x3e] = A0.u16
+	}
+
+	objA0.animation.timer = 60
+	u8[A0 + 0x25] = 0xf0
+	objA0.update_address = 0x049f5c
+	fn049f5c()
+}
+
+
+//# address-hook(0x049f5c) end(0x049fde)
+function void fn049f5c()
+{
+	D0.u8 = level.framecounter.low & 0x07
+	if (D0.u8 == 0)
+	{
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x04a09a
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.x.u16 += 0x80
+			objA1.position.y.u16 = objA0.position.y.u16
+			u8[A1 + 0x26] = objA0.value26
+			u16[A1 + 0x3e] = A0.u16
+		}
+	}
+
+	objA0.value26 += 8
+	if (objA0.subtype2c == 0)
+	{
+		if (u8[A0 + 0x25] != 0)
+		{
+			--u8[A0 + 0x25]
+		}
+		else
+		{
+			--objA0.position.y.u16
+		}
+	}
+
+	A1 = 0xffffb000
+	D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x0180
+	if (D0.u16 < 0x0180)
+	{
+		D0.u8 = level.framecounter.low & 0x3f
+		if (D0.u8 == 0)
+		{
+			playSound(0x73)
+		}
+	}
+	fn049fe4()
+
+	A1 = 0xffffb04a
+	fn049fe4()
+
+	DrawObject()
+}
+
+
+//# address-hook(0x049fe4) end(0x04a078)
+function void fn049fe4()
+{
+	D0.u16 = objA1.position.y.u16
+	if (D0.s16 < -0x20)
+	{
+		if (A1 == 0xffffb000)
+		{
+			// Reached the upper end
+			objA0.animation.timer = 0
+
+		#if STANDALONE
+			Game.setAchievementComplete(ACHIEVEMENT_GS_EXIT_TOP)
+		#endif
+		}
+	}
+	else
+	{
+		D0.u16 = D0.u16 - objA0.position.y.u16 + 0x0c
+		if (D0.u16 >= 0x18 || debug_mode.state != 0)
+			return
+
+		objA1.position.y.u16 = objA0.position.y.u16
+		if (u8[A1 + 0x2e] == 0)
+		{
+			playSound(0x8a)
+		}
+	}
+
+	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x2a] |= 0x02
+	if (A1 == 0xffffb000)
+	{
+		objA0.subtype2c = 1
+		--objA0.animation.timer
+		if (objA0.animation.timer == 0xff)
+		{
+			global.zone_act = checkpoint.zone_act
+			global.zone_act.apparent = checkpoint.zone_act.apparent
+			checkpoint.number = checkpoint.number.backup
+			global.stage_type = 0
+			level.restart.u8 = 1
+			checkpoint.rings = ring_counter
+			checkpoint.lives_granted = extra_lives_granted
+			global.shields_backup_1 = u8[0xffffb02b] & 0x71
+		}
+	}
+}
+
+
+//# address-hook(0x04a07a) end(0x04a084)
+function void fn04a07a()
+{
+	A1 = 0xffff0000 + objA0.value3e
+	objA0.position.y.u16 = objA1.position.y.u16
+	DrawObject()
+}
+
+
+//# address-hook(0x04a09a) end(0x04a0c0)
+function void fn04a09a()
+{
+	objA0.mapping_offset = 0x04a118
+	objA0.sprite_attributes = 0xe364
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x88
+	objA0.box_size.y = 0x08
+	objA0.sprite_priority = 0x80
+
+	objA0.update_address = 0x04a0c6
+	fn04a0c6()
+}
+
+
+//# address-hook(0x04a0c6) end(0x04a10a)
+function void fn04a0c6()
+{
+	A1 = 0xffff0000 + objA0.value3e
+
+	D0.s16 = objA1.position.y.u16 + (lookupSin(objA0.value26) >> 4)
+	objA0.position.y.u16 = D0.u16
+	D0 = (objA0.value26 + 0x10) >> 5
+	objA0.animation.sprite = u8[0x04a110 + D0.s16]
+	objA0.value26 += 0x84
+	objA0.position.x.u16 += 2
+	if (objA0.position.x.u16 > 0x0178)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}

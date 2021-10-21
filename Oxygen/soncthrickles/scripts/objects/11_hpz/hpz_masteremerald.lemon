@@ -1,0 +1,91 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0906a0) end(0x0906fa)
+function void fn0906a0()
+{
+	setupObjectAttributesFull(0x090fac)
+
+	objA0.update_address = 0x090700
+	u16[0xfffffaba] = A0.u16
+	u8[0xfffffabc] = 0xf0
+	u8[0xfffffabd] = 0xe8
+
+	A1 = 0x0914ce
+	A2 = 0xfffffade
+	u32[(A2+=4)-4] = u32[(A1+=4)-4]
+	u32[(A2+=4)-4] = u32[(A1+=4)-4]
+	u16[A2] = 0
+	objA0.position.x.u16 = 0x1640
+	objA0.position.y.u16 = 0x0340
+	u16[0xfffff634] = 7999
+
+	A1 = 0xffffffb2
+	D0 = 3
+	D1 = 6
+	while (true)
+	{
+		if (D0.u8 != u8[(A1+=1)-1])
+			break
+
+		--D1.s16
+		if (D1.s16 < 0)
+		{
+			objA0.value26 = 0xff
+			spawnSimpleChildObjects(0x090fe4)
+			break
+		}
+	}
+
+	fn090700()
+}
+
+
+//# address-hook(0x090700) end(0x09072e)
+function void fn090700()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		if (objA0.value26 == 0)
+		{
+			u32[0xfffffc62] = 0x06a00660
+		}
+		else if (u8[0xfffffac1] == 0)
+		{
+			A1 = 0x0914ce
+			A2 = 0xfffffc62
+			fn085a1a()
+		}
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x090734) end(0x09073e)
+function void fn090734()
+{
+	setupObjectAttributesMost(0x090fb8)
+
+	objA0.update_address = 0x090744
+	fn090744()
+}
+
+
+//# address-hook(0x090744) end(0x090762)
+function void fn090744()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+
+	D0 = u8[A1 + 0x3b] >> 1
+	objA0.animation.sprite = u8[0x090768 + D0.s16]
+	fn084920()
+}

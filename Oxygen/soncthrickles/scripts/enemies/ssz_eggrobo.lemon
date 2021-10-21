@@ -1,0 +1,456 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Egg Robo (from Sky Sanctuary Zone)                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x091518) end(0x091518)
+function void EggRobo.Init()
+{
+	Object.InitWithUpdateAddress(0x09151e)
+
+#if STANDALONE
+	objA0.box_size.x = 0x30
+#endif
+}
+
+
+//# address-hook(0x09151e) end(0x091524)
+function void EggRobo.BaseUpdate()
+{
+	fn09185e()
+	if (checkForMultiReturn())
+		return
+
+	A1 = objA0.update_address
+	call A1
+}
+
+
+//# address-hook(0x091526) end(0x091594)
+function void fn091526()
+{
+	D0.u8 = u8[A0 + 0x40] - 3
+	if (D0.u8 >= 4 && D0.u8 != u8[A0 + 0x41])
+	{
+		u8[A0 + 0x40] = D0.u8
+		u8[A0 + 0x41] = D0.u8
+		fn08614e()
+	}
+
+	--u16[A0 + 0x3c]
+	objA0.velocity.y += u16[A0 + 0x3c]
+	if (objA0.velocity.y < 0 && s8[A0 + 0x04] >= 0)
+	{
+		D0.u16 = (objA0.subtype2c & 0xf0) >> 4
+		D1.u16 = u16[0xfffffa82]
+		D1 |= (1 << D0)
+		u16[0xfffffa82] = D1.u16
+
+		Kosinski.addToDMAQueue(0x17b17e, 0xa000)
+		UnloadObject()
+	}
+	else
+	{
+		fn086180()
+		fn08619a()
+		DrawObject()
+	}
+}
+
+
+
+// Main update when active
+
+//# address-hook(0x09159a) end(0x0915d8)
+function void fn09159a()
+{
+	fn091988()
+	objA0.value32 = u16[A0 + 0x30]
+	u16[A0 + 0x30] = objA0.position.y.u16
+	fn0847e6()
+	UpdateMovementStraightSimple()
+
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+	fn084b5c()
+
+#if STANDALONE
+	// Limit range in x-direction as well, partly to accomodate for earlier spawn in widescreen
+	if (D2.u16 < 0x100 && D3.u16 <= 0x08)
+#else
+	if (D3.u16 <= 0x08)
+#endif
+	{
+		// Shoot
+		objA0.update_address = 0x0915de
+		objA0.flags38 |= 0x02
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x0915de) end(0x0915f0)
+function void fn0915de()
+{
+	fn091988()
+	if ((objA0.flags38 & 0x02) == 0)
+	{
+		objA0.update_address = 0x09159a
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+
+// Suddenly appearing (with fleeing animals)
+
+//# address-hook(0x0915f6) end(0x091648)
+function void fn0915f6()
+{
+	D0.u8 = global.framecounter.low & 0x0f
+	if (D0.u8 == 0 && s8[A0 + 0x04] < 0)
+	{
+		spawnSimpleChildObjects(0x0919e6)
+
+		--objA0.value39
+		if (s8[A0 + 0x39] < 0)
+		{
+			objA0.update_address = 0x09164e
+
+			setupObjectAttributesFull(0x0919a6)
+
+			u8[A0 + 0x0a] &= ~0x80
+			objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x300 : -0x300
+
+			spawnChildObjects(0x0919d0)
+		}
+	}
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x09164e) end(0x091678)
+function void fn09164e()
+{
+	fn091988()
+	objA0.velocity.y -= 0x10
+	UpdateMovementStraightSimple()
+
+	D0.u16 = objA0.velocity.y
+	if (D0.s16 <= -0x0200)
+	{
+		objA0.update_address = 0x09167e
+		objA0.velocity.x = 0
+		u8[A0 + 0x0a] |= 0x80
+	}
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x09167e) end(0x0916a2)
+function void fn09167e()
+{
+	fn091988()
+	objA0.velocity.y += 0x20
+	UpdateMovementStraightSimple()
+
+	D0.u16 = objA0.velocity.y
+	if (D0.s16 >= 0x0100)
+	{
+		objA0.update_address = 0x09159a
+		fn0918e2()
+	}
+
+	Enemy.DrawOrUnload()
+}
+
+
+
+//# address-hook(0x0916a8) end(0x0916ca)
+function void fn0916a8()
+{
+	setupObjectAttributesBasic(0x0919be)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x04] & 0x04) == 0)
+	{
+		objA0.render_flags &= ~0x04
+	}
+	objA0.update_address = 0x0916cc
+}
+
+
+//# address-hook(0x0916cc) end(0x0916e8)
+function void fn0916cc()
+{
+	MoveAndFlipWithParent()
+	D1.u16 = objA1.velocity.y
+	objA0.animation.sprite = (D1.s16 < 0) ? 6 : (D1.u16 >= 0x20) ? 4 : 5
+	fn084920()
+}
+
+
+//# address-hook(0x0916ee) end(0x091710)
+function void fn0916ee()
+{
+	setupObjectAttributesBasic(0x0919c4)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x04] & 0x04) == 0)
+	{
+		objA0.render_flags &= ~0x04
+	}
+	objA0.update_address = 0x091712
+}
+
+
+//# address-hook(0x091712) end(0x091734)
+function void fn091712()
+{
+	fn091930()
+	if (u8[A1 + 0x38] & 0x02)
+	{
+		objA0.update_address = 0x09173a
+		objA0.countdown_value = 0x5f
+		A2 = 0x0919de
+		SpawnChildObjectsInDir()
+	}
+	fn084920()
+}
+
+
+//# address-hook(0x09173a) end(0x091750)
+function void fn09173a()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x091712
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		u8[A1 + 0x38] &= ~0x02
+	}
+	fn084920()
+}
+
+
+//# address-hook(0x091756) end(0x091766)
+function void fn091756()
+{
+	setupObjectAttributesBasic(0x0919ca)
+	objA0.update_address = 0x09176c
+	objA0.countdown_value = 0x1f
+	fn09176c()
+}
+
+
+//# address-hook(0x09176c) end(0x0917ae)
+function void fn09176c()
+{
+	objA0.animation.sprite = (global.framecounter.low & 0x01) ? 7 : 0
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x0917b4
+		objA0.animation.sprite = 0x07
+		u8[A0 + 0x28] = 0x9c
+		objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x800 : -0x800
+		playSound(0x5e)
+	}
+	fn084934()
+}
+
+
+//# address-hook(0x0917b4) end(0x0917ba)
+function void fn0917b4()
+{
+	UpdateMovementStraightSimple()
+	Enemy.DrawOrUnload()
+}
+
+
+
+// This spawns the fleeing animal
+
+//# address-hook(0x0917c0) end(0x091858)
+function void fn0917c0()
+{
+	objA0.update_address = 0x02c778
+	objA0.base_state += 2
+	GetRandomNumber()
+	D0.u16 &= 0x01
+	objA0.sprite_attributes = (D0.u16 == 0) ? 0x0580 : 0x0592
+	u8[A0 + 0x30] = D0.u8
+	D0.u16 <<= 3
+
+	A1 = 0x02c7ea + D0.u16
+	D1.u16 = u16[(A1+=2)-2]
+	A2 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A2 + 0x04] & 0x01)
+		D1.s16 = -D1.s16
+	objA0.velocity.x = D1.u16
+
+	u16[A0 + 0x34] = u16[(A1+=2)-2]
+	objA0.mapping_offset = u32[(A1+=4)-4]
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 &= 0x01ff
+	if (D0.u16 < 0x0100)
+		D0.u16 = 0x0100
+	D0.s16 = -D0.s16
+	objA0.velocity.y = D0.u16
+
+	objA0.hitbox_extends.y = 0x0c
+	objA0.render_flags = 0x04
+	objA0.render_flags |= 0x01
+	objA0.sprite_priority = 0x0300
+	objA0.box_size.x = 0x08
+	objA0.animation.timer = 7
+	objA0.animation.sprite = 1
+	D0.u8 = u8[A0 + 0x30] * 2 + 4
+	objA0.base_state = D0.u8
+	DrawObject()
+}
+
+
+
+//# address-hook(0x09185e) end(0x09186a)
+function void fn09185e()
+{
+	// Targets:
+	//  - 0x091874	-> (objA0.subtype2c & 0x0f) = 0x00
+	//  - 0x0918c4	-> (objA0.subtype2c & 0x0f) = 0x02
+	//  - 0x0918fc	-> (objA0.subtype2c & 0x0f) = 0x04
+	call tableLookupAddress(0x09186e, objA0.subtype2c & 0x0f)
+}
+
+
+//# address-hook(0x091874) end(0x0918c2)
+function void fn091874()
+{
+	setupObjectAttributesFull(0x09199a)
+
+	objA0.update_address = 0x091526
+	u16[A0 + 0x3a] = 0xa000
+	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -0x80 : 0x80
+	u16[A0 + 0x30] = objA0.position.x.u16
+	u16[A0 + 0x34] = objA0.position.y.u16
+	u8[A0 + 0x40] = 0x7f
+	u32[A0 + 0x42] = 0x17b6e0
+	objA0.velocity.y = 0x0180
+}
+
+
+//# address-hook(0x0918c4) end(0x0918dc)
+function void fn0918c4()
+{
+	if (fn091914())
+	{
+		signalMultiReturn()
+		return
+	}
+
+	setupObjectAttributesFull(0x0919a6)
+	objA0.update_address = 0x09159a
+	spawnChildObjects(0x0919d0)
+	fn0918e2()
+}
+
+
+//# address-hook(0x0918e2) end(0x0918fa)
+function void fn0918e2()
+{
+	D0.u16 = 0x0100
+	objA0.value3e = D0.u16
+	objA0.velocity.y = D0.u16
+	u16[A0 + 0x40] = 0x08
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x0918fc) end(0x091912)
+function void fn0918fc()
+{
+	setupObjectAttributesFull(0x0919b2)
+	objA0.update_address = 0x0915f6
+	objA0.value39 = 0x04
+}
+
+
+//# translated(0x091914) end(0x09192a)
+function bool fn091914()
+{
+	D0.u16 = (objA0.subtype2c & 0xf0) >> 4
+	D1.u16 = u16[0xfffffa82]
+	if (D1 & (1 << D0))
+		return false
+
+	Enemy.UnloadDelayed()
+	return true
+}
+
+
+//# address-hook(0x091930) end(0x091986)
+function void fn091930()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = objA1.position.x.u16
+	D1.s16 = s8[A0 + 0x42]
+	objA0.render_flags &= ~0x01
+	if (u8[A1 + 0x04] & 0x01)
+	{
+		D1.s16 = -D1.s16
+		objA0.render_flags |= 0x01
+	}
+	D0.u16 += D1.u16
+	objA0.position.x.u16 = D0.u16
+	D0.u16 = u16[A1 + 0x32]
+	if (D0.u16 == 0)
+	{
+		D0.u16 = objA1.position.y.u16
+	}
+	D1.s16 = s8[A0 + 0x43]
+	objA0.render_flags &= ~0x02
+	if (u8[A1 + 0x04] & 0x02)
+	{
+		D1.s16 = -D1.s16
+		objA0.render_flags |= 0x02
+	}
+	D0.u16 += D1.u16
+	objA0.position.y.u16 = D0.u16
+}
+
+
+//# address-hook(0x091988) end(0x091998)
+function void fn091988()
+{
+	objA0.animation.sprite = (global.framecounter.low & 0x01) ? 3 : 1
+}
+
+
+
+// Only used here
+
+//# address-hook(0x08619a) end(0x0861be)
+function void fn08619a()
+{
+	D2.u16 = u16[A0 + 0x30]
+	D3.u16 = u16[A0 + 0x34]
+	D0 = u16(u8[A0 + 0x40]) + 4
+	D4 = 0x0100
+	D4.u16 = D4 / D0.u16
+	D2.u16 -= D4.u16
+	D3.u16 -= D4.u16
+	objA0.position.x.u16 = D2.u16
+	objA0.position.y.u16 = D3.u16
+}

@@ -1,0 +1,320 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// AIZ Collapsing Bridge                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x02acdc) end(0x02ae6c)
+function void fn02acdc()
+{
+	D0.u8 = objA0.subtype2c
+	if (D0.s8 >= 0)
+	{
+		u8[A0 + 0x36] = D0.u8
+		u8[A0 + 0x35] = D0.u8 + 0x30
+		u8[A0 + 0x37] = 0x08
+		objA0.mapping_offset = 0x02b070
+		objA0.sprite_attributes = 0x42e9
+		objA0.box_size.x = 0x5a
+		objA0.box_size.y = 0x08
+		objA0.render_flags = render_flag.WORLD
+		objA0.sprite_priority = 0x200
+
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x02aeb4
+			u32[A1 + 0x0c] = 0x02b070
+			u16[A1 + 0x0a] = 0x42e9
+			u8[A1 + 0x04] |= 0x04
+			u8[A1 + 0x07] = 0x5a
+			u8[A1 + 0x06] = 0x08
+			u16[A1 + 0x08] = 0x200
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			u8[A1 + 0x04] |= render_flag.COMPOUND
+			u16[A1 + 0x16] = 6
+			D2.u16 = objA0.position.y.u16
+			D3.u16 = objA0.position.x.u16 - 0x4b
+
+			A2 = A1 + 0x18
+			D6.u16 = u16[A1 + 0x16]
+			u16[A2+4] = 1
+
+			while (D6.s16 > 0)
+			{
+				u16[A2] = D3.u16
+				u16[A2+2] = D2.u16
+				A2 += 6
+				D3.u16 += 0x1e
+				--D6.s16
+			}
+			u16[A2-2] = 2
+			u16[A0 + 0x3c] = A1.u16
+		}
+		objA0.update_address = 0x02ae70
+	}
+	else
+	{
+		D0.u8 &= 0x7f
+		u8[A0 + 0x36] = D0.u8
+		u8[A0 + 0x35] = D0.u8 + 0x30
+		u8[A0 + 0x37] = 0x08
+		objA0.mapping_offset = 0x02b092
+		objA0.sprite_attributes = 0xc2e9
+		objA0.box_size.x = 0x60
+		objA0.box_size.y = 0x08
+		objA0.render_flags = render_flag.WORLD
+		objA0.sprite_priority = 0x200
+
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x02aeb4
+			u32[A1 + 0xc] = 0x02b092
+			u16[A1 + 0xa] = 0xc2e9
+			u8[A1 + 0x04] |= 0x04
+			u8[A1 + 0x07] = 0x60
+			u8[A1 + 0x06] = 0x08
+			u16[A1 + 0x08] = 0x200
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			u8[A1 + 0x04] |= render_flag.COMPOUND
+			u16[A1 + 0x16] = 6
+			D2.u16 = objA0.position.y.u16
+			D3.u16 = objA0.position.x.u16 - 0x50
+
+			A2 = A1 + 0x18
+			D6.u16 = u16[A1 + 0x16]
+			u16[A2+4] = 1
+
+			while (D6.s16 > 0)
+			{
+				u16[A2] = D3.u16
+				u16[A2+2] = D2.u16
+				A2 += 6
+				D3.u16 += 0x20
+				--D6.s16
+			}
+			u16[A2-2] = 2
+			u16[A0 + 0x3c] = A1.u16
+		}
+		objA0.update_address = 0x02aee2
+		fn02aee2()
+	}
+}
+
+
+//# address-hook(0x02ae70) end(0x02aeae)
+function void fn02ae70()
+{
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 != 0)
+	{
+		u8[A0 + 0x34] = u8[A0 + 0x35]
+		D2.u8 = u8[A0 + 0x36]
+		D3.u8 = u8[A0 + 0x37]
+		objA0.update_address = 0x02af70
+		D4 = 0x02aeba
+		fn02affe()
+	}
+
+	D1 = objA0.box_size.x
+	D3 = objA0.box_size.y
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x02aee2) end(0x02af1c)
+function void fn02aee2()
+{
+	if (u8[0xfffffaa2] != 0)
+	{
+		u8[A0 + 0x34] = u8[A0 + 0x35]
+		D2.u8 = u8[A0 + 0x36]
+		D3.u8 = u8[A0 + 0x37]
+		objA0.update_address = 0x02af70
+		D4 = 0x02af22
+		fn02affe()
+	}
+
+	D1 = objA0.box_size.x
+	D3 = objA0.box_size.y
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x02affe) end(0x02b014)
+function void fn02affe()
+{
+	A3 = 0xffff0000 + u16[A0 + 0x3c]
+	A2 = A3 + 0x18
+	D6.u16 = u16[A3 + 0x16] - 1
+	u8[A3 + 0x04] &= ~0x40
+	A1 = A3
+	fn02b016()
+}
+
+
+//# address-hook(0x02b01e)
+//# translated(0x02b016) end(0x02b06a)
+function void fn02b016()
+{
+	while (true)
+	{
+		u32[A1] = D4
+		u32[A1 + 0x0c] = u32[A3 + 0x0c]
+		u8[A1 + 0x04] = u8[A3 + 0x04]
+		u16[A1 + 0x0a] = u16[A3 + 0x0a]
+		u16[A1 + 0x08] = u16[A3 + 0x08]
+		u8[A1 + 0x07] = u8[A3 + 0x07]
+		u8[A1 + 0x06] = u8[A3 + 0x06]
+		objA1.position.x.u16 = u16[(A2+=2)-2]
+		objA1.position.y.u16 = u16[(A2+=2)-2]
+		D0.u16 = u16[(A2+=2)-2]
+		u8[A1 + 0x22] = D0.u8
+		u8[A1 + 0x34] = D2.u8
+		D2.u8 += D3.u8
+
+		--D6.s16
+		if (D6.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+	}
+
+	u16[A3 + 0x18] = 0
+	u16[A3 + 0x1a] = 0
+	playSound(SFX_COLLAPSE)
+}
+
+
+//# address-hook(0x02aeb4) end(0x02aeb4)
+function void fn02aeb4()
+{
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x02aeba) end(0x02aedc)
+function void fn02aeba()
+{
+	if (u8[A0 + 0x34] != 0)
+	{
+		--u8[A0 + 0x34]
+		DrawObject()
+	}
+	else
+	{
+		UpdateMovementSimple()
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			DrawObject()
+		}
+		else
+		{
+			UnloadObject()
+		}
+	}
+}
+
+
+//# address-hook(0x02af70) end(0x02af96)
+function void fn02af70()
+{
+	--u8[A0 + 0x34]
+	if (u8[A0 + 0x34] == 0)
+	{
+		objA0.update_address = 0x02b452
+	}
+
+	D3.u8 = u8[A0 + 0x34]
+	D1 = objA0.box_size.x
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn02af9c()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	fn02af9c()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x02af9c) end(0x02affc)
+function void fn02af9c()
+{
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		D2.u16 = D1.u16 * 2
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D2.u16)
+			{
+				if (objA0.flags2a & 0x01)
+				{
+					D0.s16 = D2.u16 - D0.s16
+				}
+				D0.u16 >>= 5
+				D0.u16 *= 8
+				D0.u8 += u8[A0 + 0x36]
+				D2.u8 = u8[A0 + 0x35] - D0.u8
+				if (D3.u8 > D2.u8)
+					return
+			}
+		}
+		objA0.flags2a &= ~(1 << D6.u8)
+		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~0x20
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x21] = 1
+	}
+}
+
+
+//# address-hook(0x02b452) end(0x02b492)
+function void fn02b452()
+{
+	if (u8[A0 + 0x34] != 0)
+	{
+		--u8[A0 + 0x34]
+		return
+	}
+
+	if (objA0.flags2a & 0x08)
+	{
+		objA0.flags2a &= ~0x08
+		u8[0xffffb02a] &= ~0x08
+		u8[0xffffb02a] |= 0x02
+		u8[0xffffb020] = 0x1b
+
+	#if STANDALONE
+		// Give player back controls (done here instead of "fn065c56")
+		player1.control_override = 0
+	#endif
+	}
+
+	if (objA0.flags2a & 0x10)
+	{
+		objA0.flags2a &= ~0x10
+		u8[0xffffb074] &= ~0x08
+		u8[0xffffb074] |= 0x02
+		u8[0xffffb06a] = 0x1b
+	}
+
+	UnloadObject()
+}

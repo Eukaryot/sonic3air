@@ -1,0 +1,283 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Flame thrower from Lava Reef Act 2                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x043d68) end(0x043dd6)
+function void fn043d68()
+{
+	objA0.mapping_offset = 0x04408a
+	objA0.sprite_attributes = 0x2090
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+
+	objA0.value32 = (objA0.subtype2c & 0x7f) * 4
+	u16[A0 + 0x30] = 0x78
+
+	if (objA0.subtype2c & 0x80)
+	{
+		objA0.animation.sprite = 7
+		if (objA0.flags2a & 0x01)
+		{
+			objA0.render_flags |= 0x02
+		}
+
+		objA0.update_address = 0x043f12
+		fn043f12()
+	}
+	else
+	{
+		objA0.animation.sprite = 6
+
+		objA0.update_address = 0x043ddc
+		fn043ddc()
+	}
+}
+
+
+//# address-hook(0x043ddc) end(0x043f0c)
+function void fn043ddc()
+{
+	// Flame thrower variant facing sidewards
+	bool spawnFlames = false
+	if (objA0.value2f == 0)
+	{
+		// Flame thrower is active
+		--u16[A0 + 0x30]
+		spawnFlames = (s16[A0 + 0x30] >= 0)
+		if (!spawnFlames)
+		{
+			u16[A0 + 0x30] = objA0.value32
+			objA0.value2f = 1
+		}
+	}
+	else
+	{
+		// Flame thrower is in cooldown
+		--u16[A0 + 0x30]
+		spawnFlames = (s16[A0 + 0x30] < 0)
+		if (spawnFlames)
+		{
+			u16[A0 + 0x30] = 0x78
+			objA0.value2f = 0
+		#if STANDALONE
+			if (objA0.render_flags & render_flag.VISIBLE)
+		#endif
+			playSound(0xc2)
+		}
+	}
+
+	if (spawnFlames)
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 2
+			++u8[A0 + 0x25]
+			u8[A0 + 0x25] &= 0x01
+		}
+
+		if ((level.framecounter.low & 0x03) == 0)
+		{
+			if ((level.framecounter.low & 0x0f) == 0)
+			{
+			#if STANDALONE
+				if (objA0.render_flags & render_flag.VISIBLE)
+			#else
+				if ((level.framecounter.low & 0x0f) == 0)
+			#endif
+				{
+					playSound(0xc2)
+				}
+			}
+
+			D0.u8 = objA0.value26
+			LookupSinCos()
+			D0.s16 >>= 4
+			objA0.flags2e = D0.u8
+			objA0.value26 += 8
+
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				if (allocDynamicObjectAfterA0())
+				{
+					objA1.update_address = 0x044048
+					objA1.position.x.u16 = objA0.position.x.u16
+					objA1.position.y.u16 = objA0.position.y.u16
+					objA1.position.x.u16 += 0x10
+					u8[A1 + 0x04] = objA0.render_flags
+					u32[A1 + 0x0c] = objA0.mapping_offset
+					u16[A1 + 0x0a] = 0x240d
+					u16[A1 + 0x08] = 0x0300
+					u8[A1 + 0x07] = 0x0c
+					u8[A1 + 0x06] = 0x0c
+					u8[A1 + 0x28] = 0x98
+					u8[A1 + 0x2b] |= 0x10
+					D0.u8 = objA0.flags2e
+					LookupSinCos()
+					D1.s16 <<= 2
+					D0.s16 <<= 2
+					objA1.velocity.x = D1.u16
+					objA1.velocity.y = D0.u16
+					if (objA0.flags2a & 0x01)
+					{
+						objA1.velocity.x = -objA1.velocity.x
+						objA1.position.x.u16 -= 0x20
+					}
+					u8[A1 + 0x22] = u8[A0 + 0x25]
+					u8[A1 + 0x25] = objA0.animation.timer
+					u8[A1 + 0x24] = 8
+				}
+			}
+		}
+	}
+
+	D1.u16 = 0x23
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x043f12) end(0x044042)
+function void fn043f12()
+{
+	bool spawnFlames = false
+	if (objA0.value2f == 0)
+	{
+		--u16[A0 + 0x30]
+		spawnFlames = (s16[A0 + 0x30] >= 0)
+		if (!spawnFlames)
+		{
+			u16[A0 + 0x30] = objA0.value32
+			objA0.value2f = 1
+		}
+	}
+	else
+	{
+		--u16[A0 + 0x30]
+		spawnFlames = (s16[A0 + 0x30] < 0)
+		if (spawnFlames)
+		{
+			u16[A0 + 0x30] = 0x78
+			objA0.value2f = 0
+		#if STANDALONE
+			if (objA0.render_flags & render_flag.VISIBLE)
+		#endif
+			playSound(0xc2)
+		}
+	}
+
+	if (spawnFlames)
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 2
+			++u8[A0 + 0x25]
+			u8[A0 + 0x25] &= 0x01
+		}
+
+		if ((level.framecounter.low & 0x03) == 0)
+		{
+			if (u16[A0 + 0x30] >= 0x1e)
+			{
+			#if STANDALONE
+				if (objA0.render_flags & render_flag.VISIBLE)
+			#else
+				if ((level.framecounter.low & 0x0f) == 0)
+			#endif
+				{
+					playSound(0xc2)
+				}
+			}
+
+			D0.u8 = objA0.value26
+			LookupSinCos()
+			D0.s16 >>= 4
+			objA0.flags2e = D0.u8
+			objA0.value26 += 8
+
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				if (allocDynamicObjectAfterA0())
+				{
+					objA1.update_address = 0x044048
+					objA1.position.x.u16 = objA0.position.x.u16
+					objA1.position.y.u16 = objA0.position.y.u16
+					objA1.position.y.u16 += 0x10
+					u8[A1 + 0x04] = objA0.render_flags
+					u32[A1 + 0x0c] = objA0.mapping_offset
+					u16[A1 + 0x0a] = 0x240d
+					u16[A1 + 0x08] = 0x0300
+					u8[A1 + 0x07] = 0x0c
+					u8[A1 + 0x06] = 0x0c
+					u8[A1 + 0x28] = 0x98
+					u8[A1 + 0x2b] |= 0x10
+					D0.u8 = objA0.flags2e
+					LookupSinCos()
+					D1.s16 <<= 2
+					D0.s16 <<= 2
+					objA1.velocity.y = D1.u16
+					objA1.velocity.x = D0.u16
+					if (objA0.flags2a & 0x01)
+					{
+						objA1.velocity.y = -objA1.velocity.y
+						objA1.position.y.u16 -= 0x20
+					}
+					u8[A1 + 0x22] = u8[A0 + 0x25]
+					u8[A1 + 0x25] = objA0.animation.timer
+					u8[A1 + 0x24] = 8
+				}
+			}
+		}
+	}
+
+	D1.u16 = 0x1b
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x044048) end(0x044084)
+function void fn044048()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		objA0.animation.sprite += 2
+		if (objA0.animation.sprite >= 6)
+		{
+			UnloadObject()
+			return
+		}
+	}
+
+	--u8[A0 + 0x25]
+	if (s8[A0 + 0x25] < 0)
+	{
+		u8[A0 + 0x25] = 2
+		objA0.animation.sprite ^= 0x01
+	}
+
+	UpdateMovementStraightSimple()
+	AddAsDynamicObject()
+	DrawObject()
+}

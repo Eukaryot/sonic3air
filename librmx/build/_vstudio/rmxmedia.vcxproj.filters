@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{93ae71eb-0497-45b0-83ce-1f1ceb909e26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audio &amp; Video">
+      <UniqueIdentifier>{e43239b3-bb26-4ee6-b652-3e5ce06affb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{ceadbb3b-dbf4-48cd-a7a7-38bc3b17675f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threads &amp; Jobs">
+      <UniqueIdentifier>{42962671-2e05-433d-bb86-a1fc7bd1119a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Font">
+      <UniqueIdentifier>{f57a4965-2183-421b-b584-f5142d63f9f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{af148935-1a74-47a5-a685-8f6148a99176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_glew">
+      <UniqueIdentifier>{e0ae607f-6624-402b-b1db-e7c5f8405f76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_glew\GL">
+      <UniqueIdentifier>{32ed261f-d8b2-4e98-8548-4e516eeeb5f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileIO">
+      <UniqueIdentifier>{35e5c7d6-38db-4a70-9860-56300bfac414}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\rmxmedia\AppFramework.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\FTX_System.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\AudioBuffer.cpp">
+      <Filter>Audio &amp; Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\VideoBuffer.cpp">
+      <Filter>Audio &amp; Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\Framebuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\GLTools.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\Painter.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\Shader.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\SpriteAtlas.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\Texture.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\JobManager.cpp">
+      <Filter>Threads &amp; Jobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\Thread.cpp">
+      <Filter>Threads &amp; Jobs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\Font.cpp">
+      <Filter>Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\FontOutput.cpp">
+      <Filter>Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\FontSource.cpp">
+      <Filter>Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\GuiBase.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\rmxmedia.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\glew\glew.c">
+      <Filter>_glew</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\VertexArrayObject.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\AudioReference.cpp">
+      <Filter>Audio &amp; Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\AudioManager.cpp">
+      <Filter>Audio &amp; Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\Camera.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\FileInputStreamSDL.cpp">
+      <Filter>FileIO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\AudioMixer.cpp">
+      <Filter>Audio &amp; Video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\FileProviderSDL.cpp">
+      <Filter>FileIO</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\rmxmedia\AppFramework.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\FTX_System.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\AudioBuffer.h">
+      <Filter>Audio &amp; Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\VideoBuffer.h">
+      <Filter>Audio &amp; Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\Framebuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\GLTools.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\Painter.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\Shader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\SpriteAtlas.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\Texture.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\JobManager.h">
+      <Filter>Threads &amp; Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\Thread.h">
+      <Filter>Threads &amp; Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\Font.h">
+      <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\FontOutput.h">
+      <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\FontSource.h">
+      <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\GuiBase.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia.h" />
+    <ClInclude Include="..\..\source\rmxmedia\glew\GL\glew.h">
+      <Filter>_glew\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\glew\GL\wglew.h">
+      <Filter>_glew\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\VertexArrayObject.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\AudioReference.h">
+      <Filter>Audio &amp; Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\AudioManager.h">
+      <Filter>Audio &amp; Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia_externals.h" />
+    <ClInclude Include="..\..\source\rmxmedia\FileInputStreamSDL.h">
+      <Filter>FileIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\AudioMixer.h">
+      <Filter>Audio &amp; Video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\OpenGLHelper.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\FileProviderSDL.h">
+      <Filter>FileIO</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\rmxmedia\StdFontData.inc">
+      <Filter>Font</Filter>
+    </None>
+  </ItemGroup>
+</Project>

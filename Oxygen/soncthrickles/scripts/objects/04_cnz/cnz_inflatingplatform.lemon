@@ -1,0 +1,106 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x031b9e) end(0x031bca)
+function void fn031b9e()
+{
+	objA0.mapping_offset = 0x230cdc
+	objA0.sprite_attributes = 0x43be
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x30
+	objA0.box_size.y = 0x10
+	objA0.hitbox_extends.y = 0x06
+
+	objA0.update_address = 0x031bd0
+	fn031bd0()
+}
+
+
+//# address-hook(0x031bd0) end(0x031bd0)
+function void fn031bd0()
+{
+	fn031c0a()
+	fn031bd2()
+}
+
+
+//# address-hook(0x031bd2) end(0x031bf0)
+function void fn031bd2()
+{
+	D1.u16 = 0x30
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	Object.animationUpdate(0x031bf6)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x031c0a) end(0x031c98)
+function void fn031c0a()
+{
+	D0.u8 = objA0.flags2a & 0x18
+#if STANDALONE
+	// Ignore AI Tails
+	if (tails.control_counter == 0)
+		D0.u8 &= 0x08
+#endif
+	if (u8[A0 + 0x30] == 0)
+	{
+		if (D0.u8 != 0)
+		{
+			u8[A0 + 0x30] = 1
+			objA0.state.both = 0x0100
+		}
+
+		if (objA0.velocity.y != 0)
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y += 8
+			if (objA0.velocity.y >= 0)
+			{
+				objA0.velocity.y = 0
+				objA0.state.both = 0x0200
+			}
+		}
+	}
+	else
+	{
+		if (D0.u8 != 0)
+		{
+			UpdateMovementStraightSimple()
+			if (objA0.velocity.y < 0x200)
+			{
+				objA0.velocity.y += 0x18
+			}
+
+			CheckGroundCollision()
+			if (D1.s16 < 0)
+			{
+				// Hit the ground
+				objA0.position.y.u16 += D1.u16
+			#if !STANDALONE
+				// In original code, the platform is stuck at the ground now
+				//  -> But this is just punishing player who don't know this, so don't do this in S3AIR
+				objA0.update_address = 0x031bd2
+			#endif
+				objA0.state.both = 0x0200
+			}
+		}
+		else
+		{
+			objA0.velocity.y = -objA0.velocity.y - 0x80
+			u8[A0 + 0x30] = 0
+			playSound(0x75)
+		}
+	}
+}

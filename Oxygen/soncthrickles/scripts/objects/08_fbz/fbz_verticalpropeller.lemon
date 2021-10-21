@@ -1,0 +1,251 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03bf56) end(0x03bf62)
+function void fn03bf56()
+{
+	u16[A0 + 0x36] = objA0.subtype2c * 8
+	objA0.update_address = 0x03bf68
+	fn03bf68()
+}
+
+
+//# address-hook(0x03bf68) end(0x03bf9a)
+function void fn03bf68()
+{
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D1.u16 = control.player1
+	fn03bfa0()
+
+	++A2
+	A1 = 0xffffb04a
+	D1.u16 = control.tails
+	fn03bfa0()
+
+	if (u8[A0 + 0x30] != 0)
+	{
+		camera.use_forced_target = true
+		camera.forced_target.x = objA0.position.x.u16
+		camera.forced_target.y = u16[0xffffb014]
+	}
+
+#if STANDALONE
+	bool player2attached = u8[A0 + 0x31]
+	CheckForUnloadObject()
+
+	// Handle second character if he's still attached to the pole
+	if (objA0.update_address == 0 && player2attached)
+	{
+		u8[0xffffb04a + 0x2e] &= 0xfc
+	}
+#else
+	CheckForUnloadObject()
+#endif
+}
+
+
+//# address-hook(0x03bfa0) end(0x03bff6)
+function void fn03bfa0()
+{
+	if (u8[A2] == 0)
+	{
+		fn03c0d0()
+		return
+	}
+
+	if (debug_mode.state != 0 || u8[A1 + 0x05] >= 0x04 || s8[A1 + 0x2e] < 0)
+	{
+		fn03c096()
+		return
+	}
+
+	if (D1 & 0x0100)	// Up
+	{
+		D0.u16 = objA0.position.y.u16 - u16[A0 + 0x36]
+		if (D0.s16 < s16[A1 + 0x14])
+		{
+			--objA1.position.y.u16
+		}
+	}
+	if (D1 & 0x0200)	// Down
+	{
+		D0.u16 = objA0.position.y.u16
+		if (D0.s16 > s16[A1 + 0x14])
+		{
+			++objA1.position.y.u16
+		}
+	}
+
+	if (D1.u16 & CONTROL_ABC)
+	{
+		fn03c068()
+	}
+	else
+	{
+		u8[A2 + 0x04] += 8
+		fn03c010()
+		fn03bffe()
+	}
+}
+
+
+//# address-hook(0x03bffe) end(0x03c00e)
+function void fn03bffe()
+{
+	D0 = u8[A1 + 0x22]
+	u32 backupA2 = A2
+	SetCharacterSpritePatterns()
+	A2 = backupA2
+}
+
+
+//# address-hook(0x03c010) end(0x03c046)
+function void fn03c010()
+{
+	D0 = u8[A2 + 0x04]
+	if (D0.s8 >= 0)
+		u16[A1 + 0x0a] |= 0x8000
+	else
+		u16[A1 + 0x0a] &= 0x7fff
+
+	D0.u8 >>= 4
+	D1.u8 = u8[0x03c048 + D0.s16]
+	u8[A1 + 0x22] = D1.u8
+	D1.s16 = s8[0x03c058 + D0.s16]
+	if (u8[A1 + 0x04] & 0x01)
+	{
+		D1.s16 = -D1.s16
+	}
+	D1.u16 += objA0.position.x.u16
+	objA1.position.x.u16 = D1.u16
+}
+
+
+//# address-hook(0x03c068) end(0x03c090)
+function void fn03c068()
+{
+	objA1.velocity.x = (D1 & 0x0400) ? -0x1000 : 0x1000
+	objA1.velocity.y = -0x100
+	u8[A1 + 0x1e] = 0x0e
+	u8[A1 + 0x1f] = 0x07
+	objA1.state = char.state.ROLLING
+	objA1.flags2a |= char.flag.ROLLING
+
+	fn03c096()
+}
+
+
+//# address-hook(0x03c096) end(0x03c0ce)
+function void fn03c096()
+{
+	u8[A2] = 0
+	u8[A2 + 0x02] = 0x1e
+
+	u16[A1 + 0x0a] &= 0x7fff
+	u8[A1 + 0x27] = 0
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~char.flag.CONTROL_LOCK
+	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2f] = 0
+	u8[A1 + 0x3d] = 0
+	u8[A1 + 0x40] = 1
+}
+
+
+//# address-hook(0x03c0d0) end(0x03c19a)
+function void fn03c0d0()
+{
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		return
+	}
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x0c
+	if (D0.u16 < 0x18)
+	{
+		D1.u16 = u16[A0 + 0x36]
+		D0.u16 = objA0.position.y.u16 - objA1.position.y.u16 + 0x10
+		if (D0.u16 < u16[A0 + 0x36] && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		{
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0
+			u8[A1 + 0x04] &= 0xfc
+			D0.u8 = u8[A1 + 0x1e]
+			u8[A1 + 0x1e] = u8[A1 + 0x44]
+			u8[A1 + 0x1f] = u8[A1 + 0x45]
+
+			if (u8[A1 + 0x2a] & char.flag.ROLLING)
+			{
+				objA1.flags2a &= ~char.flag.ROLLING
+				D0.s8 -= u8[A1 + 0x44]
+				objA1.position.y.u16 += D0.s8
+			}
+
+			objA1.position.x.u16 = objA0.position.x.u16
+			D0.u16 = objA0.position.y.u16
+			if (D0.u16 < objA1.position.y.u16)
+			{
+				objA1.position.y.u16 = D0.u16
+			}
+
+			u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+			u8[A1 + 0x20] = 0
+			objA1.flags2a |= char.flag.IN_AIR
+			objA1.flags2a &= ~char.flag.FACING_LEFT
+			u8[A1 + 0x2e] = 0x03
+
+			u8[A2 + 0x04] = 0xe0
+			u8[A2] = 1
+
+			fn03c010()
+			fn03bffe()
+		}
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Top of propeller                                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x03c1a6) end(0x03c1e8)
+function void fn03c1a6()
+{
+	objA0.mapping_offset = 0x03c20c
+	objA0.sprite_attributes = 0x22e5
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x68
+	objA0.box_size.y = 0x08
+	objA0.sprite_priority = 0x0280
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 0x01
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0
+
+	objA0.update_address = 0x03c1ee
+	fn03c1ee()
+}
+
+
+//# address-hook(0x03c1ee) end(0x03c202)
+function void fn03c1ee()
+{
+	A2 = A0 + 0x1d
+	u8[A2] = (u8[A2] + 1) % 4
+	u8[A0 + 0x28] = u8[0x03c208 + u8[A2]]
+	fn01b662()
+}

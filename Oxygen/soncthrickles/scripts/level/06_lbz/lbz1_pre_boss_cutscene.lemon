@@ -1,0 +1,814 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Cutscene: Knuckles throws a bomb to destroy building  //
+//-------------------------------------------------------//
+
+// Also includes Robotnik just before
+
+//# address-hook(0x08cb56) end(0x08cb62)
+function void fn08cb56()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	A1 = 0x08cb96
+	if (InitBoss(0x08cb66))
+		return
+
+	fn08cb66()
+}
+
+
+//# address-hook(0x08cb66) end(0x08cb7a)
+function void fn08cb66()
+{
+	// Targets:
+	//  - 0x08cb9e	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x08cbf2	-> objA0.base_state = 0x02  -> Robotnik waiting for characters
+	//  - 0x08cc2e	-> objA0.base_state = 0x04  -> Robotnik moving up
+	//  - 0x08cc5a	-> objA0.base_state = 0x06  -> Waiting for the building collapse to start
+	//  - 0x08cc84	-> objA0.base_state = 0x08  -> Building collapse
+	//  - 0x08ccb4	-> objA0.base_state = 0x0a  -> Robotnik waiting
+	//  - 0x08cce8	-> objA0.base_state = 0x0c  -> Robotnik moving up to place the box
+	//  - 0x08cd30	-> objA0.base_state = 0x0e  -> Robotnik fleeing before the mini-boss fight starts
+	call tableLookupAddress(0x08cb80, objA0.base_state)
+
+	fn08d1fc()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x08cb90) end(0x08cb90)
+function void fn08cb90()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x08cb9e) end(0x08cbec)
+function void fn08cb9e()
+{
+	setupObjectAttributesFull(0x08d230)
+
+	u8[A0 + 0x29] = 0xff
+	u8[0xfffffaab] = 0xff
+	fn0685e2()
+	move_area.left = 0x3820
+	move_area.right = 0x3ae8 + getScreenExtend()
+
+	requestLoadingPatterns(0x60)
+
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+
+	spawnChildObjects(0x06817c)
+
+	A2 = 0x08d254
+	SpawnIdenticalChildObjects()
+}
+
+
+//# address-hook(0x08cbf2) end(0x08cc2c)
+function void fn08cbf2()
+{
+	// Check if main character is close enough to cause Robotnik to flee
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+	bool stayThere = (D1.u16 != 0 && (D2.u16 >= 0x70 || D3.u16 >= 0x60 || (u8[A1 + 0x2a] & char.flag.IN_AIR)))
+
+#if STANDALONE
+	// Also check second character
+	if (stayThere && getNumPlayers() > 1)
+	{
+		A1 = 0xffffb04a
+		if (u8[A1 + 0x2e] != 0x81)	// Check control flag for flying Tails
+		{
+			CheckDistanceToObjectA1()
+			stayThere = (D1.u16 != 0 && (D2.u16 >= 0x70 || D3.u16 >= 0x60 || (u8[A1 + 0x2a] & char.flag.IN_AIR)))
+		}
+	}
+#endif
+
+	if (stayThere)
+	{
+		fn0847e6()
+		UpdateMovementStraightSimple()
+	}
+	else
+	{
+		objA0.base_state = 0x04
+		objA0.velocity.y = -0x400
+	}
+}
+
+
+//# address-hook(0x08cc2e) end(0x08cc54)
+function void fn08cc2e()
+{
+	if (objA0.position.y.u16 >= 0x0300)
+	{
+		UpdateMovementStraightSimple()
+		return
+	}
+
+	objA0.base_state = 0x06
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.position.x.u16 = 0x3ec0
+	objA0.position.y.u16 = 0x01a0
+	fn0685e2()
+}
+
+
+//# address-hook(0x08cc5a) end(0x08cc82)
+function void fn08cc5a()
+{
+	A1 = 0xffffb000
+	if (camera.position.x.u16 + (getScreenWidth() - 320) >= 0x3b40 && objA1.position.y.u16 >= 0x01c0)
+	{
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			objA0.base_state = 0x08
+			u8[0xffffeec4] = 0xff
+
+		#if STANDALONE
+			// Prevent the screen from going up here again (when player looks up and/or jumps)
+			level.vertical_wrap = 0x0148
+		#endif
+		}
+	}
+}
+
+
+//# address-hook(0x08cc84) end(0x08ccae)
+function void fn08cc84()
+{
+	if (u16[0xffffeec4] != 0)
+		return
+
+	objA0.base_state = 0x0a
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+	screenmover_target.right = 0x3ea0
+
+	spawnSimpleChildObjects(0x084b00)
+}
+
+
+//# address-hook(0x08ccb4) end(0x08cce6)
+function void fn08ccb4()
+{
+	D0.u16 = camera.position.x.u16
+	if (D0.u16 < 0x3e50)
+	{
+		move_area.left = D0.u16
+	}
+
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x60)
+	{
+		fn0847e6()
+		UpdateMovementStraightSimple()
+	}
+	else
+	{
+		objA0.base_state = 0x0c
+		objA0.velocity.y = -0x400
+
+	#if STANDALONE
+		// Revert our former change from "fn08cc5a"
+		level.vertical_wrap = 0x00a0
+	#endif
+	}
+}
+
+
+//# address-hook(0x08cce8) end(0x08cd2a)
+function void fn08cce8()
+{
+	if (objA0.position.y.u16 > 0x012c)
+	{
+		UpdateMovementStraightSimple()
+		return
+	}
+
+	objA0.base_state = 0x0e
+	objA0.position.y.u16 = 0x012c
+	objA0.flags38 |= 0x02
+	objA0.velocity.x = 0x0200
+	objA0.velocity.y = 0x0200
+
+	Kosinski.addToDMAQueue(0x375358, 0x9ac0)
+
+	spawnChildObjects(0x0681b4)
+}
+
+
+//# address-hook(0x08cd30) end(0x08cd4a)
+function void fn08cd30()
+{
+	UpdateMovementStraightSimple()
+	if (objA0.position.y.u16 >= 0x01b8)
+	{
+		objA0.update_address = 0x08cd4c
+		objA0.velocity.y = 0
+	}
+}
+
+
+//# address-hook(0x08d1fc) end(0x08d22e)
+function void fn08d1fc()
+{
+	if (u8[A0 + 0x28] == 0)
+	{
+		if (objA0.state == 0)
+		{
+			objA0.state = 0x20
+			playSound(0x6e)
+			objA0.flags2a |= 0x40
+		}
+
+		--objA0.state
+		if (objA0.state == 0)
+		{
+			objA0.flags2a &= ~0x40
+			u8[A0 + 0x28] = u8[A0 + 0x25]
+		}
+	}
+}
+
+
+//# address-hook(0x08cd6c) end(0x08cd92)
+function void fn08cd6c()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x02)
+	{
+		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		objA0.countdown_value = 0x1f
+		objA0.countdown_callback = 0x08cd98
+		objA0.position.y.u16 = 0x0160
+	}
+	MoveWithParent()
+}
+
+
+//# address-hook(0x08cdb8) end(0x08cdf0)
+function void fn08cdb8()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES) || u8[0xfffffaab] != 0)
+	{
+		objA0.update_address = 0x01b5d4		// That is "CheckForUnloadObject()"
+		return
+	}
+
+	objA0.update_address = 0x08cdf2
+	move_area.right = 0x3ea0
+	move_area.left = 0x3c00
+
+	A2 = 0x08d25c
+	SpawnIdenticalChildObjects()
+
+	fn08d116()
+	fn08d0ea()
+}
+
+
+//# address-hook(0x08d0ea) end(0x08d110)
+function void fn08d0ea()
+{
+	Kosinski.addToDMAQueue(0x375358, 0x9ac0)
+
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+
+	addPatternLoadingCue(0x083d64)
+}
+
+
+//# address-hook(0x08d116) end(0x08d12a)
+function void fn08d116()
+{
+	// Spawn Robotnik
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b30
+		u8[A1 + 0x2c] = 0x2e
+	}
+}
+
+
+//# address-hook(0x08ce34) end(0x08ce54)
+function void fn08ce34()
+{
+	// Targets:
+	//  - 0x08ce64	-> objA0.base_state = 0x00
+	//  - 0x08ce72	-> objA0.base_state = 0x02
+	//  - 0x08ce9a	-> objA0.base_state = 0x04
+	//  - 0x08cea8	-> objA0.base_state = 0x06
+	//  - 0x08cef4	-> objA0.base_state = 0x08
+	//  - 0x08cf0a	-> objA0.base_state = 0x0a
+	call tableLookupAddress(0x08ce58, objA0.base_state)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x08ce64) end(0x08ce6e)
+function void fn08ce64()
+{
+	setupObjectAttributesFull(0x08d23c)
+	fn08d12c()
+}
+
+
+//# address-hook(0x08d12c) end(0x08d16e)
+function void fn08d12c()
+{
+	D0 = objA0.subtype2c
+	objA0.countdown_value = u16[0x08d170 + D0.s16]
+	D0.u16 *= 2
+	u32[A0 + 0x30] = u32[0x08d184 + D0.s16]
+	objA0.countdown_callback = u32[0x08d1ac + D0.s16]
+
+	A1 = 0x08d1d4 + D0.u16
+	objA0.animation.sprite = u8[(A1+=1)-1]
+	D1.u8 = u8[(A1+=1)-1]
+	objA0.render_flags |= D1.u8
+	D1.s8 = s8[(A1+=1)-1]
+	s8[A0 + 0x42] = D1.s8
+	objA0.position.x.u16 += D1.s8
+	D1.s8 = s8[(A1+=1)-1]
+	s8[A0 + 0x43] = D1.s8
+	objA0.position.y.u16 += D1.s8
+}
+
+
+//# address-hook(0x08ce72) end(0x08ce98)
+function void fn08ce72()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x08) == 0)
+	{
+		MoveWithParent()
+		return
+	}
+
+	objA0.base_state = 0x04
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		u16[0xffffeec4] = 0x55
+	}
+}
+
+
+//# address-hook(0x08ce9a) end(0x08cea6)
+function void fn08ce9a()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x06
+	}
+}
+
+
+//# address-hook(0x08cea8) end(0x08cea8)
+function void fn08cea8()
+{
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x08cef4) end(0x08cf08)
+function void fn08cef4()
+{
+	UpdateMovementStraightSimple()
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x0a
+	}
+}
+
+
+//# address-hook(0x08cf0a) end(0x08cf0a)
+function void fn08cf0a()
+{
+	Object.AnimationProgressByLocalA1()
+}
+
+
+
+//# address-hook(0x062640) end(0x062662)
+function void fn062640()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	// Targets:
+	//  - 0x062678	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x0626b2	-> objA0.base_state = 0x02  -> Waiting for character in the cup elevator
+	//  - 0x062014	-> objA0.base_state = 0x04  -> Short wait time, just standing there
+	//  - 0x0626ee	-> objA0.base_state = 0x06  -> Throwing
+	//  - 0x062014	-> objA0.base_state = 0x08  -> Ending throw animation
+	//  - 0x062354	-> objA0.base_state = 0x0a  -> Waiting and then laughing while bomb is in the air
+	//  - 0x062354	-> objA0.base_state = 0x0c  -> Bomb explosions, still laughing
+	//  - 0x062778	-> objA0.base_state = 0x0e  -> Running away
+	call tableLookupAddress(0x062668, objA0.base_state)
+
+	Object.loadSpritePatternsForVDP(0x06666a)
+	fn085208()
+}
+
+
+//# address-hook(0x062678) end(0x0626ac)
+function void fn062678()
+{
+	D0.u16 = u16[0xffffb010]
+	if (D0.u16 >= objA0.position.x.u16)
+	{
+		fn0851d8()
+		return
+	}
+
+	A1 = 0x0663ba
+	if (fn084fa4())
+		return
+
+	objA0.animation.sprite = 0x16
+	level.vertical_wrap = 0x00a0
+
+	CutsceneKnuckles.loadPalette()
+
+	spawnChildObjects(0x06657c)
+}
+
+
+//# address-hook(0x0626b2) end(0x0626d4)
+function void fn0626b2()
+{
+	if ((objA0.flags38 & 0x08) == 0)
+		return
+
+	objA0.base_state = 0x04
+	fn065dd6()
+	objA0.countdown_value = 0x3b
+	objA0.countdown_callback = 0x0626d6
+}
+
+
+//# address-hook(0x0626ee) end(0x0626ee)
+function void fn0626ee()
+{
+	fn08459c()
+}
+
+
+//# address-hook(0x062778) end(0x0627c0)
+function void fn062778()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		objA0.position.x.u16 += 2
+
+	#if STANDALONE
+		// Make Knuckles jump here, as the platforms ends inside the visible screen
+		if (objA0.position.x.u16 >= 0x3c28)
+		{
+			u16 step = (objA0.position.x.u16 - 0x3c28) / 2
+			if (step == 0)
+			{
+				// Start jumping
+				objA0.velocity.y = -0x500
+			}
+
+			objA0.position.y.u16 += objA0.velocity.y >> 8
+			objA0.velocity.y += 0x38
+			objA0.animation.sprite = (step & 0x02) ? 0x08 : (0x04 + (step / 4) % 4)
+		}
+		else
+	#endif
+		Object.AnimationProgressByLocalA1()
+		return
+	}
+
+	// Knuckles despawns
+	u8[0xfffffaa9] = 0
+	u8[0xffffb02e] = 0		// Reset control_flags
+	u8[0xffffb078] = 0
+	screenmover_target.right = 0x3b60 + getScreenExtend() * 2
+
+	spawnSimpleChildObjects(0x084b00)
+
+	move_area.bottom.target = 0x0148
+	fn0851e4()
+
+	loadPaletteLine1(0x0a929c)
+	Object.TriggerUnloading()
+}
+
+
+//# address-hook(0x0627c6) end(0x0627fe)
+function void fn0627c6()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		UnloadObject()
+		return
+	}
+
+	A1 = 0x062822
+	fn0858f8()
+	if (D0 != 0)
+	{
+		if (D0.u16 != 0)
+		{
+			A2 = 0xffff0000 + u16[A0 + 0x46]
+			u8[A2 + 0x38] |= 0x08
+			fn062800()
+		}
+
+		D0 = (D0 << 16) + (D0 >> 16)
+		if (D0.u16 != 0)
+		{
+			fn062800()
+		}
+	}
+}
+
+
+//# address-hook(0x062800) end(0x062820)
+function void fn062800()
+{
+	u8[0xfffffaa9] = 0xff
+	A1 = 0xffff0000 + D0.u16
+	if (u8[A1 + 0x05] >= 0x06)
+	{
+		fn0627c6()
+		return
+	}
+
+	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x04] &= ~render_flag.FLIP_X
+	u8[A1 + 0x2a] &= ~0x01
+}
+
+
+//# address-hook(0x0626d6) end(0x0626ec)
+function void fn0626d6()
+{
+	// Knuckles starts throwing the bomb
+
+	objA0.base_state = 0x06
+	u32[A0 + 0x30] = 0x0666c3
+	objA0.countdown_callback = 0x0626f4
+}
+
+
+//# address-hook(0x0626f4) end(0x062720)
+function void fn0626f4()
+{
+	objA0.base_state = 0x08
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x062726
+	playSound(0x51)
+
+	spawnChildObjects(0x066584)
+
+	addPatternLoadingCue(0x083d64)
+}
+
+
+//# address-hook(0x062726) end(0x06273a)
+function void fn062726()
+{
+	objA0.base_state = 0x0a
+	objA0.countdown_value = 0x7f
+	objA0.countdown_callback = 0x06273e
+	fn062056()
+}
+
+
+//# address-hook(0x06282a) end(0x062848)
+function void fn06282a()
+{
+	setupObjectAttributesFull(0x06640e)
+
+	objA0.update_address = 0x06284e
+	objA0.velocity.x = -0x200
+	objA0.velocity.y = -0x400
+	playSound(0x51)
+
+	fn06284e()
+}
+
+
+//# address-hook(0x06284e) end(0x062854)
+function void fn06284e()
+{
+	// Bomb flying
+	MoveWithGravity20()
+	fn0850d4()
+}
+
+
+//# address-hook(0x06273e) end(0x06275a)
+function void fn06273e()
+{
+	objA0.base_state = 0x0c
+	camera.screenshake.state.hi = 0xff
+	objA0.countdown_value = 0x5f
+	objA0.countdown_callback = 0x062760
+
+	spawnSimpleChildObjects(0x06658c)
+}
+
+
+//# address-hook(0x062760) end(0x062776)
+function void fn062760()
+{
+	objA0.base_state = 0x0e
+	u32[A0 + 0x30] = 0x06669f
+	objA0.animation.timer = 0
+	objA0.animation.frame = 0
+}
+
+
+//# address-hook(0x06285a) end(0x06288e)
+function void fn06285a()
+{
+	objA0.update_address = 0x0628a0
+	objA0.countdown_callback = 0x083e70
+
+	D0 = objA0.subtype2c * 2
+	A1 = 0x062890 + D0.s16
+	objA0.position.x.u16 = u16[(A1+=2)-2]
+	objA0.position.y.u16 = u16[(A1+=2)-2]
+	objA0.value39 = 0x20
+	objA0.value3a = 0x20
+	objA0.value3b = 0x20
+}
+
+
+//# address-hook(0x0628a0) end(0x0628a4)
+function void fn0628a0()
+{
+	objA0.position.y.u16 -= 4
+	Object.CountdownAndTrigger()
+}
+
+
+
+// Robotnik?
+
+//# address-hook(0x054164) end(0x054196)
+function void fn054164()
+{
+	if (camera.position.x.u16 >= 0x3d80)
+	{
+		UnloadObject()
+		return
+	}
+
+	D4.u16 = 0x3bc0
+	objA0.position.x.u16 = D4.u16
+	objA0.position.y.u16 = 0x0100
+	objA0.box_size.x = 0x40
+	objA0.flags2a |= 0x80
+
+	D1 = 0x4b
+	D2.u16 = 0x0100
+	D3.u16 = 0x0100
+	CheckCharacterOnClimbableObject()
+}
+
+
+
+//# address-hook(0x08cd4c) end(0x08cd58)
+function void fn08cd4c()
+{
+	UpdateMovementStraightSimple()
+	fn08d1fc()
+	fn085160()
+}
+
+
+//# address-hook(0x08cd5c) end(0x08cd66)
+function void fn08cd5c()
+{
+	objA0.update_address = 0x08cd6c
+	A2 = 0x08d25c
+	SpawnIdenticalChildObjects()
+}
+
+
+//# address-hook(0x08cd98) end(0x08cd98)
+function void fn08cd98()
+{
+	fn08d116()
+	fn08cd9c()
+}
+
+
+//# address-hook(0x08cd9c) end(0x08cdb4)
+function void fn08cd9c()
+{
+	objA0.flags38 |= 0x08
+	playSound(0x50)
+
+	spawnChildObjects(0x08d264)
+	fn0852ae()
+}
+
+
+//# address-hook(0x08cdf2) end(0x08ce30)
+function void fn08cdf2()
+{
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+	if (D2.u16 < 0x70)
+	{
+		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		move_area.left = 0x3da0
+		objA0.countdown_value = 0x1f
+		objA0.countdown_callback = 0x08cd9c
+	}
+
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 > 0x0280)
+	{
+		Enemy.UnloadDelayed()
+	}
+}
+
+
+
+// Part of box containing the mini-boss
+
+//# address-hook(0x08ceae) end(0x08ceda)
+function void fn08ceae()
+{
+	objA0.base_state = 0x08
+	D0 = u16(objA0.subtype2c) - 0x0c
+	objA0.velocity.y = u16[0x08ceec + D0.s16]
+	D0.u16 *= 2
+	u32[A0 + 0x30] = u32[0x08cedc + D0.s16]
+	objA0.countdown_callback = 0x08cf10
+	objA0.countdown_value = 0x5f
+}
+
+
+//# address-hook(0x08cf10) end(0x08cf1c)
+function void fn08cf10()
+{
+	objA0.update_address = 0x08cf1e
+	objA0.sprite_priority = 0x0380
+}
+
+
+//# address-hook(0x08cf1e) end(0x08cf5c)
+function void fn08cf1e()
+{
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x0280)
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (!isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			if (objA0.subtype2c != 0x0c)
+			{
+				UnloadObject()
+				return
+			}
+
+			addPatternLoadingCue(0x083d3a)
+		}
+
+		addPatternLoadingCue(0x08cf62)
+		UnloadObject()
+	}
+}

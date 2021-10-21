@@ -1,0 +1,195 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Generic object                                        //
+//-------------------------------------------------------//
+
+//# address-hook(0x02bf20) end(0x02bf54)
+function void GenericObject.Init()
+{
+	u32[A0 + 0xc] = 0x02bfda
+	objA0.render_flags |= render_flag.WORLD
+	objA0.state = objA0.subtype2c
+
+	A1 = 0x02bf6c + objA0.subtype2c * 6
+	objA0.sprite_attributes = u16[A1]
+	objA0.sprite_priority = u16[A1+2]
+	objA0.box_size.x = u8[A1+4]
+	objA0.box_size.y = u8[A1+5]
+	objA0.update_address = 0x02bf5a
+
+#if STANDALONE
+	// Check if it's a flame in AIZ
+	if (objA0.sprite_attributes == 0x62e9 && objA0.mapping_offset == 0x02bfda)
+	{
+		// Make it a little bit higher to prevent early clipping
+		objA0.box_size.y += 4
+	}
+#endif
+
+	GenericObject.Update()
+}
+
+
+//# address-hook(0x02bf5a) end(0x02bf66)
+function void GenericObject.Update()
+{
+#if STANDALONE
+	// Check if it's an underwater flame in AIZ
+	if (objA0.sprite_attributes == 0x62e9 && objA0.mapping_offset == 0x02bfda)
+	{
+		if (objA0.position.y.u16 >= water.height.current - 10)
+		{
+			UnloadObject()
+			return
+		}
+	}
+#endif
+
+	Object.animationUpdate(0x02bf9c)
+	DrawOrUnloadObject()
+}
+
+
+
+//# address-hook(0x084898) end(0x0848b4)
+function void Object.TriggerOnGroundHit()
+{
+	if (objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 <= 0)
+		{
+			objA0.position.y.u16 += D1.s16
+			A1 = objA0.countdown_callback
+			call A1
+		}
+	}
+}
+
+
+
+//# address-hook(0x069946) end(0x069958)
+function void fn069946()
+{
+	objA0.update_address = 0x069914
+	u32[A0 + 0x30] = 0x069e29
+	objA0.velocity.y = 0
+}
+
+
+//# address-hook(0x08dbd4) end(0x08dbea)
+function void fn08dbd4()
+{
+	objA0.base_state = 0x08
+	u32[A0 + 0x30] = 0x08dced
+	objA0.countdown_callback = 0x08db76
+}
+
+
+
+//# address-hook(0x0465d6) end(0x046616)
+function void fn0465d6()
+{
+	D2 = u32[A0 + 0x2e]
+	if (u8[A0 + 0x36] != 0)
+	{
+		D1.s32 = -D1.s32
+		u32[A0 + 0x32] += D2
+		if (s32[A0 + 0x32] < 0)
+		{
+			u32[A0 + 0x2e] -= D1
+		}
+		else
+		{
+			u32[A0 + 0x2e] = D0
+			u32[A0 + 0x32] = 0
+			u8[A0 + 0x36] = 0
+		}
+	}
+	else
+	{
+		u32[A0 + 0x32] += D2
+		if (s32[A0 + 0x32] > 0)
+		{
+			u32[A0 + 0x2e] -= D1
+		}
+		else
+		{
+			D0.s32 = -D0.s32
+			u32[A0 + 0x2e] = D0
+			u32[A0 + 0x32] = 0
+			u8[A0 + 0x36] = 0xff
+		}
+	}
+
+	D0.u16 = objA0.value32
+}
+
+
+//# address-hook(0x0459b4) end(0x045a64)
+function void fn0459b4()
+{
+	if (level.framecounter.low & 0x01)
+	{
+		D0.u16 = u16[A0 + 0x44]
+		D1.u16 = D0.u16 - camera.position.y.u16
+		if (D1.s16 > 0x68)
+		{
+			D0.u16 = camera.position.y.u16 + 0x68
+		}
+
+		objA0.position.y.u16 = D0.u16
+		D1.u16 = objA0.position.x.u16
+		D2 = u8[A0 + 0x46]
+		D3.u16 = D2.u16
+		D2.u16 = min(D2.u16, 0x12) + 6
+		D3.u16 <<= 3
+
+		A1 = (global.zone == 0x0a || global.zone == 0x16) ? 0x046734 : 0x0467fc
+		A1.u16 += D3.u16
+		A2 = A0 + 0x18
+		u16[A2] = D1.u16 - D2.u16
+		u16[A2+2] = u16[(A1+=2)-2] + D0.u16
+		u16[A2+4] = u16[(A1+=2)-2]
+		u16[A2+6] = D1.u16 + D2.u16
+		u16[A2+8] = u16[(A1+=2)-2] + D0.u16
+		u16[A2+10] = u16[(A1+=2)-2]
+		A2 += 12
+
+		if (objA0.base_state != 0)
+		{
+			--u8[A0 + 0x46]
+			if (s8[A0 + 0x46] >= 0)
+			{
+				DrawObject()
+				return
+			}
+
+			objA0.animation.sprite = 0x09
+			u16[A0 + 0x16] = 0
+			objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+			A1 = 0xffff0000 + objA0.respawn_entry
+			u8[A1 + 0x38] = 0
+		}
+		else
+		{
+			if (level.framecounter.low & 0x02)
+			{
+				if (u8[A0 + 0x46] < 0x18)
+				{
+					++u8[A0 + 0x46]
+				}
+			}
+		}
+		DrawObject()
+	}
+}

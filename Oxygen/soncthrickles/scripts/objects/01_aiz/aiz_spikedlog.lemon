@@ -1,0 +1,174 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Spiked Wooden Logs in water (from AIZ)                //
+//-------------------------------------------------------//
+
+//# address-hook(0x02b758) end(0x02b7ae)
+function void AIZSpikedLog.Init()
+{
+	objA0.mapping_offset = 0x22b0f0
+	objA0.sprite_attributes = 0x42e9
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x08
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	u16[A0 + 0x30] = objA0.position.y.u16
+	u8[A0 + 0x36] = water.transition_counter
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x02b8ee
+		u8[A1 + 0x04] = render_flag.WORLD
+		u8[A1 + 0x28] = 0x9c
+		u16[A1 + 0x3c] = A0.u16
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	objA0.update_address = 0x02b7b4
+	AIZSpikedLog.Update()
+}
+
+
+//# address-hook(0x02b7b4) end(0x02b88c)
+function void AIZSpikedLog.Update()
+{
+	if (s8[A0 + 0x34] >= 0)
+	{
+		D0.u8 = u8[A0 + 0x36]
+		if (D0.u8 != water.transition_counter)
+		{
+			u8[A0 + 0x36] = water.transition_counter
+			u8[A0 + 0x34] = 0x81
+		}
+		else
+		{
+			D0.u8 = objA0.flags2a & 0x18
+			if (D0.u8 == 0)
+			{
+				if (u8[A0 + 0x32] != 0)
+					u8[A0 + 0x32] -= 4
+
+				fn02b81a()
+				return
+			}
+		}
+	}
+
+	if (u8[A0 + 0x34] == 0)
+	{
+		u8[A0 + 0x35] = objA0.animation.frame
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+		u8[A0 + 0x34] = 1
+	}
+
+	if (u8[A0 + 0x32] != 0x40)
+	{
+		u8[A0 + 0x32] += 4
+	}
+	else
+	{
+		u8[A0 + 0x34] &= 0x7f
+	}
+
+	fn02b81a()
+}
+
+
+function void fn02b81a()
+{
+	D0.s16 = lookupSin(u8[A0 + 0x32]) >> 5
+	D0.u16 += u16[A0 + 0x30]
+	objA0.position.y.u16 = D0.u16
+
+	if (u8[A0 + 0x34] != 0)
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 3
+			--objA0.animation.sprite
+			objA0.animation.sprite &= 0x0f
+			++objA0.animation.frame
+			if (objA0.animation.frame >= 0x10)
+			{
+				objA0.animation.frame = u8[A0 + 0x35]
+				u8[A0 + 0x34] = 0
+			}
+		}
+	}
+	else
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 0x17
+			D0 = objA0.animation.frame
+			++objA0.animation.frame
+			objA0.animation.sprite = u8[0x02b88e + D0.s16]
+			D0.u8 = u8[0x02b88f + D0.s16]
+			if (D0.s8 < 0)
+				objA0.animation.frame = 0
+		}
+	}
+
+	fn02b896()
+}
+
+
+//# address-hook(0x02b896) end(0x02b8e8)
+function void fn02b896()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x0280)
+	{
+		DrawObject()
+	}
+	else
+	{
+		D0.u16 = u16[A0 + 0x3c]
+		if (D0.u16 != 0)
+		{
+			A1 = 0xffff0000 + D0.u16
+			UnloadObjectA1()
+		}
+
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x02b8ee) end(0x02b916)
+function void fn02b8ee()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+
+	D0 = u8[0x02b918 + u8[A1 + 0x22]]
+	if (D0.s8 != 0)
+	{
+		objA0.position.y.u16 += D0.s8
+		AddAsDynamicObject()
+	}
+}

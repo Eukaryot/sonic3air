@@ -1,0 +1,17 @@
+{
+	// Overwrite Sonic's colors with red tones in the default non-underwater palette;
+	// this will affect Sonic himself (unless a palette mod is used), and also other places
+	// where his colors are used, e.g. his image on the signpost
+	"red_sonic_palette":
+	{
+		"File": "default-palette-sonic.bin",
+		"RomInject": "0x0a8a40"
+	},
+	
+	// Overwrite Sonic's colors in the special stages
+	"special_stage_red_sonic":
+	{
+		"File": "special-stage-sonic.bin",
+		"RomInject": "0x00897e"
+	}
+}

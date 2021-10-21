@@ -1,0 +1,168 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// HCZ 2 Knuckles cutscene                               //
+//-------------------------------------------------------//
+
+//# address-hook(0x062112) end(0x06211e)
+function void fn062112()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	#if STANDALONE
+		// In time attack, skip this cutscene and trigger the bridge now
+		if (Game.isTimeAttack())
+		{
+			level.trigger08 = 0xff
+			UnloadObject()
+			return
+		}
+
+		// Slightly change the cutscene area via ROM manipulation
+		u16[0x062154] = 0x38b0
+		u16[0x062156] = 0x38f0
+
+		// There is this one chunk visible with broken palette, replace it
+		u8[0xffff8849] = 0xb2
+	#endif
+
+	A1 = 0x062150
+	if (InitBoss(0x062124))
+		return
+
+	fn062124()
+}
+
+
+//# address-hook(0x062124) end(0x06213c)
+function void fn062124()
+{
+	// Targets:
+	//  - 0x06215e	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x062194	-> objA0.base_state = 0x02	-> Waiting for player to reach the right place
+	//  - 0x062014	-> objA0.base_state = 0x04	-> Waiting time before Knuckles starts
+	//  - 0x062200	-> objA0.base_state = 0x06	-> Knuckles walks in
+	//  - 0x062014	-> objA0.base_state = 0x08	-> Knuckles stands next to the button
+	//  - 0x0620aa	-> objA0.base_state = 0x0a	-> Knuckles jumps onto the button and back, triggers bridge collapse in between
+	//  - 0x062242	-> objA0.base_state = 0x0c	-> End of cutscene
+	call tableLookupAddress(0x062142, objA0.base_state)
+
+	Object.loadSpritePatternsForVDP(0x06666a)
+	fn085208()
+}
+
+
+//# address-hook(0x06215e) end(0x062192)
+function void fn06215e()
+{
+	A1 = 0x0663ba
+	if (fn084fa4())
+		return
+
+	screenmover_target.top = level.vertical_wrap
+	screenmover_target.right = move_area.right
+	move_area.right = 0x3940	// Could be moved right, but then you can see bricks with broken palette
+
+	spawnChildObjects(0x0665a2)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = 2
+	}
+	objA0.position.x.u16 += 0x9e
+}
+
+
+//# address-hook(0x062194) end(0x0621d4)
+function void fn062194()
+{
+	A1 = 0xffffb000
+	if (objA1.position.x.u16 >= 0x3990 && u8[A1 + 0x2e] == 0 && u8[A1 + 0x2a] & 0x08)
+	{
+		objA0.base_state = 0x04
+		fn065dd6()
+
+		objA0.countdown_value = 179
+		objA0.countdown_callback = 0x0621d6
+	#if STANDALONE
+		// Reduce the wait time, 3 seconds is just too much
+		objA0.countdown_value = 89
+	#endif
+		return
+	}
+
+	level.vertical_wrap = camera.position.y.u16
+	move_area.left = camera.position.x.u16
+}
+
+
+//# address-hook(0x0621d6) end(0x0621fa)
+function void fn0621d6()
+{
+	objA0.base_state = 0x06
+	objA0.render_flags |= 0x01
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x062216
+	level.vertical_wrap = 0x05c0
+	CutsceneKnuckles.loadPalette()
+}
+
+
+//# address-hook(0x062200) end(0x062210)
+function void fn062200()
+{
+	// Knuckles runs in
+	objA0.position.x.u16 -= 4
+	Object.animationProgress(0x06669f)
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x062216) end(0x062230)
+function void fn062216()
+{
+	objA0.base_state = 0x08
+	objA0.animation.sprite = 0x20
+	objA0.countdown_value = 0x3f
+	objA0.countdown_callback = 0x062232
+}
+
+
+//# address-hook(0x062232) end(0x06223e)
+function void fn062232()
+{
+	objA0.base_state = 0x0a
+	objA0.render_flags ^= 0x01
+	fn062080()
+}
+
+
+//# address-hook(0x062242) end(0x06227a)
+function void fn062242()
+{
+	Object.AnimationProgressByLocalA1()
+	if (objA0.render_flags & render_flag.VISIBLE)
+		return
+
+	loadPaletteLine1(0x0a8dfc)
+
+	spawnChildObjects(0x062280)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b0a
+	}
+	fn0851e4()
+	Object.TriggerUnloading()
+}

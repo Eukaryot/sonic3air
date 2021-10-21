@@ -1,0 +1,318 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Snail Blaster (enemy in LBZ)                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x08bfae) end(0x08bfae)
+function void fn08bfae()
+{
+	Object.InitWithUpdateAddress(0x08bfb4)
+}
+
+
+//# address-hook(0x08bfb4) end(0x08bfc2)
+function void fn08bfb4()
+{
+	// Targets:
+	//  - 0x08bfd4	-> objA0.base_state = 0x00
+	//  - 0x08bff2	-> objA0.base_state = 0x02
+	//  - 0x08c026	-> objA0.base_state = 0x04
+	//  - 0x08c052	-> objA0.base_state = 0x06
+	//  - 0x08c0aa	-> objA0.base_state = 0x08
+	//  - 0x08c0d4	-> objA0.base_state = 0x0a
+	//  - 0x08c0f4	-> objA0.base_state = 0x0c
+	call tableLookupAddress(0x08bfc6, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08bfd4) end(0x08bfee)
+function void fn08bfd4()
+{
+	setupObjectAttributesFull(0x08c266)
+	objA0.countdown_value = 0x20
+	objA0.countdown_callback = 0x08c00e
+	spawnChildObjects(0x08c28a)
+}
+
+
+//# address-hook(0x08bff2) end(0x08c00a)
+function void fn08bff2()
+{
+	u8[A0 + 0x28] = 0x1a
+	u8[A0 + 0x29] = (objA0.flags38 & 0x02) ? 0 : 0x7f
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08c00e) end(0x08c024)
+function void fn08c00e()
+{
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x08c2b6
+	objA0.countdown_callback = 0x08c030
+}
+
+
+//# address-hook(0x08c026) end(0x08c02c)
+function void fn08c026()
+{
+	u8[A0 + 0x28] = 0x1a
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x08c052) end(0x08c0a8)
+function void fn08c052()
+{
+	u8[A0 + 0x28] = 0x1a
+	u8[A0 + 0x29] = 0x7f
+
+	if (fn08c23c())
+		return
+
+	fn08459c()
+
+	if (D2.u16 != 0)
+	{
+		D0 = (s16[A0 + 0x40] >= 0) ? 4 : 3
+		if (D0.u8 == objA0.animation.sprite)
+		{
+			D0.u16 = u16[A0 + 0x40]
+			objA0.position.y.u16 += D0.u16
+
+			--objA0.value39
+			if (s8(objA0.value39) < 0)
+			{
+				objA0.base_state = 0x02
+				objA0.countdown_value = 0x90
+				objA0.flags38 |= 0x02
+				objA0.countdown_callback = 0x08c03e
+				s16[A0 + 0x40] = -s16[A0 + 0x40]
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x08c0aa) end(0x08c0d2)
+function void fn08c0aa()
+{
+	u8[A0 + 0x29] = 0x7f
+	--objA0.animation.sprite
+	if (objA0.animation.sprite != 0)
+		return
+
+	objA0.base_state = 0x0a
+	u8[A0 + 0x29] = 0x7f
+	objA0.countdown_value = 0x3b
+	objA0.countdown_callback = 0x08c0de
+}
+
+
+//# address-hook(0x08c0d4) end(0x08c0da)
+function void fn08c0d4()
+{
+	u8[A0 + 0x29] = 0x7f
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08c0f4) end(0x08c0f4)
+function void fn08c0f4()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08c030) end(0x08c036)
+function void fn08c030()
+{
+	u16[A0 + 0x40] = 0xfffe
+	u32[A0 + 0x30] = 0x08c2c0
+	fn08c03e()
+}
+
+
+//# address-hook(0x08c03e) end(0x08c050)
+function void fn08c03e()
+{
+	objA0.base_state = 0x06
+	objA0.value39 = 0x02
+	objA0.flags38 &= ~0x02
+}
+
+
+//# address-hook(0x08c0de) end(0x08c0f2)
+function void fn08c0de()
+{
+	objA0.base_state = 0x0c
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x08c0f8
+}
+
+
+//# address-hook(0x08c0f8) end(0x08c11c)
+function void fn08c0f8()
+{
+	u8[A0 + 0x28] = 0x1a
+	u8[A0 + 0x29] = 0x7f
+	objA0.countdown_value = 0x02
+	++objA0.animation.sprite
+	if (objA0.animation.sprite >= 0x03)
+	{
+		objA0.base_state = 0x06
+	}
+}
+
+
+//# translated(0x08c23c) end(0x08c264)
+function bool fn08c23c()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x30 && D3.u16 < 0x30)
+	{
+		if (u8[A1 + 0x20] == 2)
+		{
+			objA0.base_state = 0x08
+			objA0.animation.sprite = 3
+			return true
+		}
+	}
+	return false
+}
+
+
+//# address-hook(0x08c11e) end(0x08c130)
+function void fn08c11e()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x08c13a	-> objA0.base_state = 0x00
+	//  - 0x08c144	-> objA0.base_state = 0x02
+	//  - 0x08459c	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08c134, objA0.base_state)
+
+	fn084920()
+}
+
+
+//# address-hook(0x08c13a) end(0x08c13e)
+function void fn08c13a()
+{
+	setupObjectAttributesBasic(0x08c272)
+}
+
+
+//# address-hook(0x08c144) end(0x08c168)
+function void fn08c144()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x02) == 0)
+		return
+
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x08c2c5
+	objA0.countdown_callback = 0x08c16a
+}
+
+
+//# address-hook(0x08c17c) end(0x08c18e)
+function void fn08c17c()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x08c19a	-> objA0.base_state = 0x00
+	//  - 0x08c1a4	-> objA0.base_state = 0x02
+	//  - 0x08c1d8	-> objA0.base_state = 0x04
+	//  - 0x08c226	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x08c192, objA0.base_state)
+
+	fn084934()
+}
+
+
+//# address-hook(0x08c19a) end(0x08c19e)
+function void fn08c19a()
+{
+	setupObjectAttributesBasic(0x08c278)
+}
+
+
+//# address-hook(0x08c1a4) end(0x08c1d6)
+function void fn08c1a4()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x02) == 0)
+		return
+
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = (objA0.subtype2c == 0) ? 0x08c2d0 : 0x08c2d9
+	objA0.countdown_callback = 0x08c21e
+}
+
+
+//# address-hook(0x08c1d8) end(0x08c21c)
+function void fn08c1d8()
+{
+	fn08459c()
+	if (D2.s16 > 0 && objA0.animation.frame == 4)
+	{
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			playSound(0x4d)
+
+			A2 = 0x08c29e
+			SpawnProjectileChildObjects()
+
+			A2 = 0xffff0000 + u16[A0 + 0x46]
+			if (u8[A2 + 0x04] & 0x01)
+			{
+				objA1.velocity.x = -objA1.velocity.x
+			}
+			if (objA0.subtype2c != 0)
+			{
+				objA1.velocity.y = -objA1.velocity.y
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x08c226) end(0x08c23a)
+function void fn08c226()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x02) == 0)
+	{
+		objA0.base_state = 0x02
+	}
+}
+
+
+//# address-hook(0x08c16a) end(0x08c17a)
+function void fn08c16a()
+{
+	objA0.base_state = 0x02
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x38] &= ~0x02
+}
+
+
+//# address-hook(0x08c21e) end(0x08c224)
+function void fn08c21e()
+{
+	objA0.base_state = 0x06
+}

@@ -1,0 +1,199 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x040e5c) end(0x040ebe)
+function void fn040e5c()
+{
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x40
+	objA0.sprite_priority = 0x80
+	u16[A0 + 0x46] = objA0.position.y.u16
+	objA0.mapping_offset = 0x041090
+	objA0.sprite_attributes = 0x03af
+	objA0.countdown_value = (objA0.subtype2c & 0x7f) * 8
+	u16[A0 + 0x38] = 0x02
+	objA0.animation.sprite = 0x06
+	objA0.render_flags |= 0x40
+
+	u16[A0 + 0x16] = 1
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0
+
+	objA0.update_address = 0x040ec4
+	fn040ec4()
+}
+
+
+//# address-hook(0x040ec4) end(0x040f4c)
+function void fn040ec4()
+{
+	bool goto040f14 = false
+	D2.u16 = u16[A0 + 0x36]
+
+	u8 newState = u8[A0 + 0x30]		// This is 1 if main player is hanging on the switch
+#if STANDALONE
+	newState |= u8[A0 + 0x31]		// Treat second player the same way
+#endif
+	if ((newState == 0) != (u16[A0 + 0x34] == 0))
+	{
+		if (D2.u16 != objA0.countdown_value)
+		{
+			D2.u16 += u16[A0 + 0x38]
+			if (D2.u16 == objA0.countdown_value)
+			{
+				u16[0xfffff634] = 899
+				u8[0xfffff7c3] = 0
+				D0.u16 = u16[0xfffff656]
+				D0.s8 = -D0.s8
+				u8[0xfffff650] = D0.u8
+				u16[0xfffff658] = 0
+			}
+			goto040f14 = true
+		}
+	}
+	else
+	{
+		if (D2.u16 != 0)
+		{
+			D2.u16 -= u16[A0 + 0x38]
+			goto040f14 = true
+		}
+	}
+
+	if (goto040f14)
+	{
+		u16[A0 + 0x36] = D2.u16
+		objA0.velocity.y = u16[A0 + 0x46] + D2.u16
+		D0.u16 = D2.u16
+		if (D0.u16 != 0)
+		{
+			D0.u16 >>= 3
+			++D0.u16
+		}
+		u8[A0 + 0x1d] = D0.u8
+	}
+
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D0.u16 = control.player1
+	fn040f52()
+
+	A1 = 0xffffb04a
+	++A2
+	D0.u16 = control.tails
+	fn040f52()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x040f52) end(0x04108e)
+function void fn040f52()
+{
+	if (u8[A2] != 0)
+	{
+		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
+		{
+			D0.u8 &= CONTROL_ABC
+			if (D0.u8 == 0)
+			{
+				bool goto040fd8 = false
+				if (s8[A0 + 0x2c] < 0)
+				{
+					push(A2)
+					push(A1)
+					fn00f8ea()
+					A1 = pop()
+					A2 = pop()
+
+					goto040fd8 = (D1.s16 <= 0)
+				}
+
+				if (!goto040fd8)
+				{
+					objA1.position.y.u16 = objA0.velocity.y + 0x30
+					return
+				}
+			}
+			else
+			{
+				u8[A1 + 0x2e] = 0
+				u8[A2] = 0
+				u8[A2+2] = 0x12
+
+				if (D0.u16 & 0x0f00)
+				{
+					u8[A2+2] = 0x3c
+				}
+
+				if (D0.u16 & 0x0800)
+				{
+					objA1.velocity.x = 0x200
+				}
+				else if (D0.u16 & 0x0400)
+				{
+					objA1.velocity.x = -0x200
+				}
+
+				objA1.velocity.y = -0x380
+				u8[A1 + 0x1e] = 0x0e
+				u8[A1 + 0x1f] = 0x07
+				objA1.state = char.state.ROLLING
+				u8[A1 + 0x27] = 0
+				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				u8[A1 + 0x40] = 1
+				return
+			}
+		}
+
+		u8[A1 + 0x2e] = 0
+		u8[A2] = 0
+		u8[A2+2] = 0x3c
+	}
+	else
+	{
+		if (u8[A2+2] != 0)
+		{
+			--u8[A2+2]
+			if (u8[A2+2] != 0)
+				return
+		}
+
+		#if STANDALONE
+			// Don't react for any of the two if Tails is carrying the other character
+			if (tails.carrying)
+				return
+		#endif
+
+		u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+		u16 dy = objA1.position.y.u16 - objA0.velocity.y - 0x30
+		if (dx < 0x20 && dy < 0x18)
+		{
+			if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+			{
+				objA1.velocity.x = 0
+				objA1.velocity.y = 0
+				u16[A1 + 0x1c] = 0
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.velocity.y + 0x30
+				objA1.state = char.state.HANGING
+				u8[A1 + 0x2e] = 1
+
+				u8[A2] = 1
+
+				playSound(0x5b)
+			}
+		}
+	}
+}

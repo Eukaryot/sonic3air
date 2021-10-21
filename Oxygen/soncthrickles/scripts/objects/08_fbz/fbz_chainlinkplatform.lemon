@@ -1,0 +1,189 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03b2f6) end(0x03b3ba)
+function void fn03b2f6()
+{
+	objA0.mapping_offset = 0x03b4de
+	objA0.sprite_attributes = 0x2443
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+	objA0.hitbox_extends.y = 0x0f
+	u16[A0 + 0x46] = objA0.position.y.u16
+	u8[A0 + 0x28] = 0x8d
+
+	D1 = u16(objA0.subtype2c) << 4
+	D1.u16 -= 0x20
+	objA0.countdown_value = D1.u16
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03b482
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u8[A1 + 0x04] = objA0.render_flags
+		u8[A1 + 0x07] = 0x10
+		u8[A1 + 0x06] = 0x80
+		u16[A1 + 0x08] = 0x0200
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16 - 0x70
+		u8[A1 + 0x04] |= 0x40
+
+		D0 = 8
+		u16[A1 + 0x16] = D0.u16
+		D1.u16 = objA0.position.y.u16 + 0x0c
+		A2 = A1 + 0x18
+		D0.u16 = u16[A1 + 0x16]
+		--D0.u16
+		while (D0.s16 >= 0)
+		{
+			u16[(A2+=2)-2] = objA0.position.x.u16
+			u16[(A2+=2)-2] = D1.u16
+			u16[(A2+=2)-2] = 0x01
+			--D0.s16
+		}
+		u16[A1 + 0x1c] = 0x03
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	objA0.update_address = 0x03b3c0
+	fn03b3c0()
+}
+
+
+//# address-hook(0x03b3c0) end(0x03b3e6)
+function void fn03b3c0()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x58
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 += D1.u16
+		objA0.velocity.y = 0
+		objA0.hitbox_extends.y = 0x10
+		objA0.update_address = 0x03b3ec
+	}
+	fn03b3ec()
+}
+
+
+//# address-hook(0x03b3ec) end(0x03b3f8)
+function void fn03b3ec()
+{
+	if (u8[0xfffff7c1] & 0x01)
+	{
+		objA0.update_address = 0x03b3fa
+	}
+	fn03b462()
+}
+
+
+//# address-hook(0x03b3fa) end(0x03b44a)
+function void fn03b3fa()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y -= 0x18
+	D0.u16 = u16[A0 + 0x46] - objA0.position.y.u16
+	if (D0.u16 >= objA0.countdown_value)
+	{
+		D0.u16 = u16[A0 + 0x46] - objA0.countdown_value
+		objA0.position.y.u16 = D0.u16
+		objA0.velocity.y = 0
+		objA0.update_address = 0x03b450
+		playSound(0x7c)
+	}
+	else
+	{
+		fn00fc12()
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 -= D1.u16
+			objA0.velocity.y = 0
+			objA0.update_address = 0x03b450
+		}
+	}
+
+	fn03b450()
+}
+
+
+//# address-hook(0x03b450) end(0x03b45c)
+function void fn03b450()
+{
+	if ((u8[0xfffff7c1] & 0x01) == 0)
+	{
+		objA0.hitbox_extends.y = 0x0f
+		objA0.update_address = 0x03b3c0
+	}
+	fn03b462()
+}
+
+
+//# address-hook(0x03b462) end(0x03b47c)
+function void fn03b462()
+{
+	fn03b488()
+
+	D1.u16 = 0x23
+	D2.u16 = 0x08
+	D3.u16 = 0xfff7
+	D4.u16 = objA0.position.x.u16
+	fn01de20()
+	fn01b662()
+}
+
+
+//# address-hook(0x03b482) end(0x03b482)
+function void fn03b482()
+{
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03b488) end(0x03b4dc)
+function void fn03b488()
+{
+#if STANDALONE
+	// Sanity check if the chain object was really spawned (which can fail in rare cases)
+	if (u16[A0 + 0x3c] == 0)
+		return
+#endif
+
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	A2 = A1 + 0x20
+	D2.u16 = objA0.position.y.u16 + 0x18
+	D0.u16 = u16[A0 + 0x46] - objA0.position.y.u16
+	D6.u16 = (D0.u16 + 0x18) >> 5
+	++D6.u16
+	if (D6.u16 >= 8)
+		D6 = 8
+	u16[A1 + 0x16] = D6.u16
+	D6.u16 -= 2
+	if (D6.s16 >= 0)
+	{
+		while (D6.s16 >= 0)
+		{
+			u16[A2] = D2.u16
+			u16[A2+2] = 2
+			A2 += 6
+			D2.u16 += 0x20
+			--D6.s16
+		}
+
+		D0.u16 = (D0.u16 - 8) & 0x1f
+		if (D0.u16 < 0x10)
+		{
+			u16[A2-4] = 1
+		}
+	}
+}

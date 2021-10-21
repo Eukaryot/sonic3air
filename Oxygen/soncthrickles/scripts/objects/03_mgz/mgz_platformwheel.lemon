@@ -1,0 +1,121 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x033f84) end(0x034034)
+function void fn033f84()
+{
+	objA0.mapping_offset = 0x233318
+	objA0.sprite_attributes = 0x435f
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x0c
+	objA0.sprite_priority = 0x0200
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.y.u16
+	objA0.animation.sprite = 2
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03406e
+		u32[A1 + 0x0c] = 0x233318
+		u16[A1 + 0x0a] = 0x435f
+		u8[A1 + 0x04] = render_flag.WORLD
+		u8[A1 + 0x07] = 0x50
+		u8[A1 + 0x06] = 0x50
+		u16[A1 + 0x08] = 0x0280
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		if ((objA0.flags2a & 0x02) == 0)
+		{
+			u8[A1 + 0x22] = 0x01
+		}
+		u8[A1 + 0x04] |= 0x40
+		u16[A1 + 0x16] = 0x04
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	u8[A0 + 0x36] = (objA0.flags2a & 0x01) ? -1 : 1
+	u8[A0 + 0x34] = objA0.subtype2c
+
+	objA0.update_address = 0x03403a
+	fn03403a()
+}
+
+
+//# address-hook(0x03403a) end(0x034068)
+function void fn03403a()
+{
+	u16 backup_px = objA0.position.x.u16
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	fn034074()
+
+	u8[A0 + 0x34] += u8[A0 + 0x36]
+
+	D1 = objA0.box_size.x
+	D3 = objA0.box_size.y + 1
+	D4.u16 = backup_px
+	PlatformCheckClimbOn()
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x03406e) end(0x03406e)
+function void fn03406e()
+{
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x034074) end(0x0340ca)
+function void fn034074()
+{
+	D0.u8 = u8[A0 + 0x34]
+	LookupSinCos()
+	D2.u16 = objA0.value32
+	D3.u16 = u16[A0 + 0x30]
+	D0 = (D0 << 16)
+	D1 = (D1 << 16)
+	D0.s32 >>= 4
+	D1.s32 >>= 4
+	D4 = D0
+	D5 = D1
+	A2 = A1 + 0x18
+	D6.u16 = u16[A1 + 0x16]
+
+	while (D6.s16 > 0)
+	{
+		push(D5)
+		push(D4)
+
+		D4 = (D4 << 16) + (D4 >> 16)
+		D5 = (D5 << 16) + (D5 >> 16)
+		D4.u16 += D2.u16
+		D5.u16 += D3.u16
+		u16[A2]   = D5.u16
+		u16[A2+2] = D4.u16
+
+		D4 = pop()
+		D5 = pop()
+
+		D4 += D0
+		D5 += D1
+		A2 += 6
+		--D6.s16
+	}
+
+	D4 = (D4 << 16) + (D4 >> 16)
+	D5 = (D5 << 16) + (D5 >> 16)
+	D4.u16 += D2.u16
+	D5.u16 += D3.u16
+	objA0.position.x.u16 = D5.u16
+	objA0.position.y.u16 = D4.u16
+}

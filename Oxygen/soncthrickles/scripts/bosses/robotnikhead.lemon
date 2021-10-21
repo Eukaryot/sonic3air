@@ -1,0 +1,248 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Robotnik's or EggRobo's head                          //
+//-------------------------------------------------------//
+
+// Main update function for heads:
+//  - 0x067aca	in HCZ, CNZ, ICZ
+//  - 0x067b66	in AIZ
+//  - 0x067c38	in LBZ (boss 2)
+//  - 0x067cd2	in LBZ (boss 3), MHZ, SOZ
+
+
+//# address-hook(0x067aca) end(0x067ade)
+function void fn067aca()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x067aea	-> objA0.base_state = 0x00
+	//  - 0x067b34	-> objA0.base_state = 0x02
+	//  - 0x067b64	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x067ae4, objA0.base_state)
+
+	fn08498c()
+}
+
+
+//# address-hook(0x067aea) end(0x067b12)
+function void fn067aea()
+{
+	setupObjectAttributesFull(0x06812e)
+
+	fn069b2e()
+
+	u32[A0 + 0x30] = 0x0681cc
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u16[A0 + 0x44] = u16[A1 + 0x46]
+
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		fn067b14()
+	}
+}
+
+
+//# address-hook(0x067b14) end(0x067b14)
+function void fn067b14()
+{
+#if STANDALONE
+	if (global.zone_act == 0x1700)	// In DEZ Boss, always show Robotnik, even for Knuckles
+		return
+#endif
+
+	// Load Egg Robo head
+	objA0.mapping_offset = 0x0681d4
+	fn067b1c()
+}
+
+
+//# address-hook(0x067b1c) end(0x067b2e)
+function void fn067b1c()
+{
+	u32[A0 + 0x30] = 0x0681d0
+
+	Kosinski.addToDMAQueue(0x15fddc, 0xa5c0)
+}
+
+
+//# address-hook(0x067b34) end(0x067b62)
+function void fn067b34()
+{
+	Object.AnimationProgressByLocalA1()
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		if (u8[A1 + 0x2a] & 0x40)
+			objA0.animation.sprite = 02
+	}
+	else
+	{
+		objA0.base_state = 0x04
+		objA0.animation.sprite = 3
+	}
+}
+
+
+//# address-hook(0x067b64) end(0x067b64)
+function void fn067b64()
+{
+}
+
+
+//# address-hook(0x067b66) end(0x067b8a)
+function void fn067b66()
+{
+	MoveAndFlipWithParent()
+	fn069b2e()
+
+	// Targets:
+	//  - 0x067aea	-> objA0.base_state = 0x00
+	//  - 0x067b34	-> objA0.base_state = 0x02
+	//  - 0x067b64	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x067b90, objA0.base_state)
+
+	if ((objA0.flags38 & 0x40) == 0)
+	{
+		fn08498c()
+	}
+}
+
+
+//# address-hook(0x067c38) end(0x067c4c)
+function void fn067c38()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x067c58	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x067c8a	-> objA0.base_state = 0x02  -> Normal update
+	//  - 0x067cba	-> objA0.base_state = 0x04  -> Defeated
+	call tableLookupAddress(0x067c52, objA0.base_state)
+	fn08498c()
+}
+
+
+//# address-hook(0x067c58) end(0x067c88)
+function void fn067c58()
+{
+	setupObjectAttributesFull(0x06812e)
+	u32[A0 + 0x30] = 0x0681cc
+
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		fn067b14()
+	}
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x0a] & 0x80)
+	{
+		u8[A0 + 0x0a] |= 0x80
+	}
+}
+
+
+//# address-hook(0x067c8a) end(0x067cb8)
+function void fn067c8a()
+{
+	Object.AnimationProgressByLocalA1()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		if (u8[A1 + 0x2a] & 0x40)
+		{
+			objA0.animation.sprite = 2
+		}
+	}
+	else
+	{
+		objA0.base_state = 0x04
+		objA0.animation.sprite = 3
+	}
+}
+
+
+//# address-hook(0x067cba) end(0x067ccc)
+function void fn067cba()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		Object.animationProgress(0x0681cc)
+	}
+
+#if STANDALONE
+	// Check if parent object's priority flag changes (triggered in "fn073056")
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A0 + 0x0a] & 0x80) != (u8[A1 + 0x0a] & 0x80))
+	{
+		u8[A0 + 0x0a] = (u8[A0 + 0x0a] & ~0x80) | (u8[A1 + 0x0a] & 0x80)
+		if (global.zone_act == 0x0601 && camera.position.y.u16 == 0x0668)
+		{
+			// Switch sprite again for Robotnik when he goes up to get Big Arms
+			objA0.animation.sprite = 1
+		}
+	}
+#endif
+}
+
+
+//# address-hook(0x067cd2) end(0x067cfe)
+function void fn067cd2()
+{
+	MoveAndFlipWithParent()
+	fn085a5a()
+
+	// Targets:
+	//  - 0x067c58	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x067c8a	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x067cba	-> objA0.base_state = 0x04  -> Defeated
+	call tableLookupAddress(0x067d04, objA0.base_state)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x20) == 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+
+// Mecha Sonic head (in Sky Sanctuary)
+
+//# address-hook(0x067d0a) end(0x067d24)
+function void fn067d0a()
+{
+	setupObjectAttributesFull(0x068158)
+	objA0.update_address = 0x067d2a
+
+	Kosinski.addToDMAQueue(0x17c6e0, 0xa5c0)
+}
+
+
+//# address-hook(0x067d2a) end(0x067d3c)
+function void fn067d2a()
+{
+	MoveAndFlipWithParent()
+	if (u8[0xfffffa89] == 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}

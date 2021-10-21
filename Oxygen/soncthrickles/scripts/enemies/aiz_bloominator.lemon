@@ -1,0 +1,107 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Bloominator (flower enemy in AIZ)                     //
+//-------------------------------------------------------//
+
+//# address-hook(0x086d6a) end(0x086d6a)
+function void Bloominator.Init()
+{
+	Object.InitWithUpdateAddress(0x086d70)
+}
+
+
+//# address-hook(0x086d70) end(0x086d7e)
+function void Bloominator.BaseUpdate()
+{
+	// Targets:
+	//  - 0x086d8a	-> objA0.base_state = 0x00
+	//  - 0x086da2	-> objA0.base_state = 0x02
+	//  - 0x086dc6	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x086d84, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x086d8a) end(0x086da0)
+function void fn086d8a()
+{
+	setupObjectAttributesFull(0x086e12)
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x086dae
+}
+
+
+//# address-hook(0x086da2) end(0x086daa)
+function void fn086da2()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		Object.CountdownAndTrigger()
+	}
+}
+
+
+//# address-hook(0x086dae) end(0x086dc4)
+function void fn086dae()
+{
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x086e42
+	objA0.countdown_callback = 0x086dfc
+}
+
+
+//# address-hook(0x068962) end(0x06898e)
+function void fn068962()
+{
+	objA0.mapping_offset = 0x083ffc
+	objA0.sprite_attributes = 0x84d2
+	u32[A0 + 0x30] = 0x069164
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	if (objA0.subtype2c == 0x06)
+	{
+		spawnChildObjects(0x0690d0)
+	}
+}
+
+
+//# address-hook(0x086dc6) end(0x086dfa)
+function void fn086dc6()
+{
+	fn08459c()
+	if (_equal())
+		return
+
+	if (D0.u8 != 0x06 && D0.u8 != 0x0e)
+		return
+
+	playSound(0x4d)
+	A2 = 0x086e2a
+	SpawnProjectileChildObjects()
+	if (_equal())
+	{
+		++objA0.value39
+		if (objA0.value39 & 0x01)
+		{
+			objA1.velocity.x = -objA1.velocity.x
+		}
+	}
+}
+
+
+//# address-hook(0x086dfc) end(0x086e10)
+function void fn086dfc()
+{
+	objA0.base_state = 0x02
+	objA0.countdown_value = 120
+	objA0.countdown_callback = 0x086dae
+}

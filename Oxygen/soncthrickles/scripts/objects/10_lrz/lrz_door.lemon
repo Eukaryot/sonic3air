@@ -1,0 +1,96 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Door usually opened by a nearby button                //
+//-------------------------------------------------------//
+
+//# address-hook(0x04292a) end(0x04296e)
+function void fn04292a()
+{
+	objA0.mapping_offset = 0x0429da
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.sprite_priority = 0x0200
+	u16[A0 + 0x46] = objA0.position.y.u16
+	if (global.act == 0)
+	{
+		objA0.sprite_attributes = 0x43a1
+		objA0.box_size.y = 0x28
+	}
+	else
+	{
+		objA0.animation.sprite = 1
+		objA0.sprite_attributes = 0x4090
+		objA0.box_size.y = 0x20
+	}
+
+	objA0.update_address = 0x042974
+	fn042974_inner(true)
+}
+
+
+//# address-hook(0x042974) end(0x0429d4)
+function void fn042974()
+{
+	fn042974_inner(false)
+}
+
+
+function void fn042974_inner(bool firstUpdate)
+{
+	A3 = 0xfffff7e0
+	D0.u16 = objA0.subtype2c & 0x0f
+	if (u8[A3 + D0.s16] != 0)
+	{
+	#if STANDALONE
+		if (!firstUpdate)	// No opening sound if door just got spawned, this just leads to a confusing door sound somewhere offscreen
+	#endif
+		{
+			playSound(0x8f)
+		}
+
+		objA0.update_address = 0x042994
+		fn042994()
+	}
+	else
+	{
+		fn0429bc()
+	}
+}
+
+
+//# address-hook(0x042994)
+function void fn042994()
+{
+	++objA0.flags2e
+	if (objA0.flags2e == 0x40)
+	{
+		objA0.update_address = 0x0429bc
+	}
+
+	D0.s16 = lookupSin(objA0.flags2e) >> 2
+	D0.u16 = u16[A0 + 0x46] - D0.s16
+	objA0.position.y.u16 = D0.u16
+
+	fn0429bc()
+}
+
+
+//# address-hook(0x0429bc)
+function void fn0429bc()
+{
+	D1.u16 = 0x1b
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}

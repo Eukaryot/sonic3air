@@ -1,0 +1,294 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04187e) end(0x0418de)
+function void fn04187e()
+{
+	objA0.mapping_offset = 0x041b56
+	objA0.sprite_attributes = 0x4455
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x30
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0300
+	objA0.animation.sprite = 0x01
+	u16[A0 + 0x44] = objA0.position.x.u16
+	objA0.render_flags |= 0x40
+
+	u16[A0 + 0x16] = 1
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16 + ((objA0.flags2a & 0x01) ? -0x10 : 0x10)
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0
+
+	objA0.update_address = 0x0418e4
+	fn0418e4()
+}
+
+
+//# address-hook(0x0418e4) end(0x04197e)
+function void fn0418e4()
+{
+	A3 = 0xfffff7e0 + (objA0.subtype2c & 0x0f)
+	D1 = u8[A3]
+	u16[A0 + 0x36] = D1.u16
+	u8[A0 + 0x30] = u8[0xffffb02a]
+	u8[A0 + 0x31] = u8[0xffffb074]
+
+	D1.u16 = 0x17
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D4 = 0
+	fn0419c6()
+
+	D0.u16 = u16[A0 + 0x36]
+#if STANDALONE
+	// Avoid one-pixel-jittering of character when pushing the fully pushed switch
+	//  -> But not for the variant that is meant to be pushed by a rock; it leads to the rock not being held in place
+	if ((objA0.subtype2c & 0x80) == 0)
+		++D0.u16
+#endif
+	D0.u16 >>= 2
+	if (objA0.flags2a & 0x01)
+		D0.s16 = -D0.s16
+	D0.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D0.u16
+
+	if (objA0.subtype2c & 0x80)
+	{
+		fn041aa8()
+	}
+
+	D1.u16 = u16[A0 + 0x36]
+	u8[A3] = D1.u8
+
+	D0.u16 = (u16[A0 + 0x44] & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x0280)
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+
+		if (u16[A0 + 0x36] == 0)
+		{
+			UnloadObject()
+		}
+		else
+		{
+			objA0.update_address = 0x041984
+			fn041984()
+		}
+	}
+}
+
+
+//# address-hook(0x041984) end(0x0419c4)
+function void fn041984()
+{
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		if (u8[A2] & 0x80)
+		{
+			UnloadObject()
+			return
+		}
+	}
+
+	A3 = 0xfffff7e0 + (objA0.subtype2c & 0x0f)
+	D1 = u8[A3]
+	u16[A0 + 0x36] = D1.u16
+
+	fn041a6c()
+
+	D1.u16 = u16[A0 + 0x36]
+	u8[A3] = D1.u8
+
+	if (u16[A0 + 0x36] == 0)
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x0419c6) end(0x0419f8)
+function void fn0419c6()
+{
+	D5 = 0
+
+	D3.u8 = objA0.flags2a & 0x60
+	if (D3.u8 == 0)
+	{
+		fn041a6c()
+		return
+	}
+
+	D2.u16 = objA0.position.x.u16
+	A1 = 0xffffb000
+	D0.u8 = u8[A0 + 0x30]
+	D6 = 5
+	fn0419fa()
+
+	if (D5.u16 == 0)
+	{
+		A1 = 0xffffb04a
+		D0.u8 = u8[A0 + 0x31]
+		D6 = 6
+		fn0419fa()
+
+		if (D5.u16 == 0)
+		{
+			fn041a6c()
+		}
+	}
+}
+
+
+//# address-hook(0x0419fa) end(0x041a6a)
+function void fn0419fa()
+{
+	if ((D3 & (1 << D6)) == 0)
+		return
+
+	if ((D0 & 0x20) == 0)
+		return
+
+	// Pushing from left or right?
+	bool sign = (D2.u16 < objA1.position.x.u16)
+	if (((objA0.flags2a & 0x01) == 0) == sign)
+		return
+
+	#if STANDALONE
+		// Check character's orientation, is he faced away?
+		if (sign != ((u8[A1 + 0x2a] & char.flag.FACING_LEFT) != 0))
+			return
+	#endif
+
+	if (u16[A0 + 0x36] != 0x80)
+	{
+	#if STANDALONE
+		if (Game.getSetting(SETTING_FASTER_PUSH))
+		{
+			u16[A0 + 0x36] = min(u16[A0 + 0x36] / 2 * 2 + 2, 0x80)
+		}
+		else
+	#endif
+		++u16[A0 + 0x36]
+
+		if ((u16[A0 + 0x36] % 4) == 0)
+		{
+			objA1.position.x.u16 += (sign ? -1 : 1)
+			playSound(0x69)
+		}
+	}
+
+	D5 = 1
+}
+
+
+//# address-hook(0x041a6c) end(0x041aa6)
+function void fn041a6c()
+{
+	D0.u16 = objA0.subtype2c & 0x70
+	if (D0.u16 == 0)
+	{
+		--u16[A0 + 0x34]
+		if (s16[A0 + 0x34] >= 0)
+			return
+
+		u16[A0 + 0x34] = 9
+	}
+
+	if (u16[A0 + 0x36] == 0)
+		return
+
+	--u16[A0 + 0x36]
+	if (u16[A0 + 0x36] == 0)
+	{
+		playSound(0x91)
+	}
+	else
+	{
+		--objA0.value3a
+		if (s8[A0 + 0x3a] < 0)
+		{
+			objA0.value3a = 3
+			playSound(0x90)
+		}
+	}
+
+	D4 = 1
+}
+
+
+
+// Reacting to a pushed rock
+
+//# address-hook(0x041aa8) end(0x041b54)
+function void fn041aa8()
+{
+	if (u16[0xfffff7c4] == 0)
+		return
+
+	A2 = 0xffff0000 + u16[0xfffff7c4]
+	if (u32[A2] != 0x0405d6)	// Is it a pushable rock?
+	{
+		u16[0xfffff7c4] = 0
+		return
+	}
+
+	D2.u16 = u16[A2 + 0x10] - objA0.position.x.u16 + 0x1b
+	D3.u16 = u16[A2 + 0x14] - objA0.position.y.u16 + 0x0c
+	if (D2.u16 < 0x37 && D3.u16 < 0x18)
+	{
+		D0.u8 = objA0.flags2a & 0x01
+		if (D2.u16 >= 0x1c)
+			D0.u8 ^= 0x01
+
+		if (D0.u8 == 0 && u16[A0 + 0x36] != 0x80)
+		{
+			D0.u16 = u16[A0 + 0x38]
+			if (D0.u16 == u16[A2 + 0x10])
+				D1 = 1
+			else
+				D1 = D4.u16 + 4
+
+			u16[A0 + 0x36] += D1.u16
+			if (u16[A0 + 0x36] >= 0x80)
+			{
+				u16[A0 + 0x36] = 0x80
+			}
+		}
+
+		D0.u16 = u16[A0 + 0x36] >> 2
+		if (objA0.flags2a & 0x01)
+		{
+			D0.s16 = -D0.s16
+		}
+		D0.u16 += u16[A0 + 0x44]
+		objA0.position.x.u16 = D0.u16
+
+		if (D2.u16 >= 0x1c)
+			D0.u16 += 0x1c
+		else
+			D0.u16 -= 0x1c
+		u16[A2 + 0x10] = D0.u16
+	}
+
+	u16[A0 + 0x38] = u16[A2 + 0x10]
+}

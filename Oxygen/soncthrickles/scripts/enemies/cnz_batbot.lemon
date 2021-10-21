@@ -1,0 +1,141 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Batbot enemy in CNZ                                   //
+//-------------------------------------------------------//
+
+//# address-hook(0x089376) end(0x089376)
+function void fn089376()
+{
+	Object.InitWithUpdateAddress(0x08937c)
+}
+
+
+//# address-hook(0x08937c) end(0x08938a)
+function void fn08937c()
+{
+	// Targets:
+	//  - 0x089394	-> objA0.base_state = 0x00
+	//  - 0x0893a4	-> objA0.base_state = 0x02
+	//  - 0x0893cc	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08938e, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x089394) end(0x0893a0)
+function void fn089394()
+{
+	setupObjectAttributesFull(0x089454)
+
+	spawnChildObjects(0x08946c)
+}
+
+
+//# address-hook(0x0893a4) end(0x0893ca)
+function void fn0893a4()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x40)
+		return
+
+	objA0.base_state = 0x04
+	objA0.flags38 |= 0x08
+	D0.u16 = 0x0200
+	//if (D0.u16 == 0)
+	//	D0.s16 = -D0.s16
+	objA0.velocity.x = D0.u16
+}
+
+
+//# address-hook(0x0893cc) end(0x0893e2)
+function void fn0893cc()
+{
+	Object.animationProgress(0x08947a)
+
+	A1 = 0xffffb000
+	D0.u16 = 0x0200
+	D1 = 8
+	fn085436()
+
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x0893e8) end(0x0893fa)
+function void fn0893e8()
+{
+	MoveWithParent()
+
+	// Targets:
+	//  - 0x089404	-> objA0.base_state = 0x00
+	//  - 0x08940c	-> objA0.base_state = 0x02
+	//  - 0x089426	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x0893fe, objA0.base_state)
+
+	fn084920()
+}
+
+
+//# address-hook(0x089404) end(0x089408)
+function void fn089404()
+{
+	setupObjectAttributesBasic(0x089460)
+}
+
+
+//# address-hook(0x08940c) end(0x089424)
+function void fn08940c()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x08)
+	{
+		objA0.base_state = 0x04
+		++objA0.animation.sprite
+	}
+}
+
+
+//# address-hook(0x089426) end(0x08942a)
+function void fn089426()
+{
+	A1 = 0x089480
+	fn0845a0()
+}
+
+
+//# address-hook(0x08942e) end(0x089440)
+function void fn08942e()
+{
+	MoveWithParent()
+
+	// Targets:
+	//  - 0x08944a	-> objA0.base_state = 0x00
+	//  - 0x08940c	-> objA0.base_state = 0x02
+	//  - 0x089452	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x089444, objA0.base_state)
+
+	fn084920()
+}
+
+
+//# address-hook(0x08944a) end(0x08944e)
+function void fn08944a()
+{
+	setupObjectAttributesBasic(0x089466)
+}
+
+
+//# address-hook(0x089452) end(0x089452)
+function void fn089452()
+{
+}

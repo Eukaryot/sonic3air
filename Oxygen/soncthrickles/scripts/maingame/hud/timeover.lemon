@@ -1,0 +1,101 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Time Over / Game Over display on screen               //
+//-------------------------------------------------------//
+
+//# address-hook(0x02d5c6) end(0x02d60c)
+function void fn02d5c6()
+{
+	if (u32[0xfffff680] != 0)
+		return
+
+	if (objA0.animation.sprite == 0)
+	{
+		u8[0xffffef56] = 0xff
+		fn00c532()
+	}
+
+	bool isLeft = ((objA0.animation.sprite & 0x01) == 0)
+	objA0.position.x.u16 = isLeft ? 0x50 : 0x1f0 + getScreenExtend() * 2
+	objA0.position.y.u16 = 0xf0
+	objA0.mapping_offset = 0x02edd0
+	objA0.sprite_attributes = 0x879c
+	objA0.sprite_priority = 0
+
+	objA0.update_address = 0x02d612
+	fn02d612()
+}
+
+
+//# address-hook(0x02d612) end(0x02d636)
+function void fn02d612()
+{
+	u16 targetPositionX = 0x120
+	#if STANDALONE
+		targetPositionX += getScreenExtend()
+	#endif
+
+	s16 diff = targetPositionX - objA0.position.x.u16
+	if (diff != 0)
+	{
+		objA0.position.x.u16 += clamp(diff, -0x10, 0x10)
+		DrawObject()
+	}
+	else
+	{
+		u16[A0 + 0x24] = 0x01e0
+		objA0.update_address = 0x02d638
+		#if STANDALONE
+			// Prevent short flicker
+			DrawObject()
+		#endif
+	}
+}
+
+
+//# address-hook(0x02d638) end(0x02d68a)
+function void fn02d638()
+{
+	u16[0xffffe380] = 0
+	if ((objA0.animation.sprite & 0x01) == 0)
+	{
+		D0.u8 = (control.pad1.pressed | control.pad2.pressed) & 0xf0
+		if (D0.u8 == 0 && u16[A0 + 0x24] != 0)
+		{
+			--u16[A0 + 0x24]
+		}
+		else
+		{
+			if (global.time_over)
+			{
+				checkpoint.time = 0
+				level.restart = 1
+
+			#if STANDALONE
+				Standalone.onDeath()
+			#endif
+			}
+			else
+			{
+				if (continues_counter == 0)
+				{
+					global.game_mode = 0
+				}
+				else
+				{
+					global.game_mode = 0x14
+				}
+			}
+		}
+	}
+	DrawObject()
+}

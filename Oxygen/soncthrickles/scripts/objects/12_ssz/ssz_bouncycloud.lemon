@@ -1,0 +1,304 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0450a4) end(0x0450e8)
+function void fn0450a4()
+{
+	objA0.update_address = 0x0450ec
+	objA0.render_flags = 0x04
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x20
+	objA0.sprite_priority = 0x80
+	objA0.sprite_attributes = 0xe3d6
+	objA0.mapping_offset = 0x046a44
+	u8[A0 + 0x2d] = 0
+	objA0.velocity.y = objA0.position.y.u16
+
+	GetRandomNumber()
+	u16[A0 + 0x30] = (D0.u16 & 0x0fff) + 0x0c00
+	fn0450ec()
+}
+
+
+//# address-hook(0x0450ec) end(0x04516a)
+function void fn0450ec()
+{
+	D0 = 0x1c00
+	D1 = 0x80
+	fn0465d6()
+
+	D0.u16 += objA0.velocity.y
+	D1.u8 = u8[A0 + 0x3e]
+	D2.u8 = u8[A0 + 0x46]
+	D3.u8 = D1.u8 | D2.u8
+	if (D3.u8 != 0)
+	{
+		if (D1.u8 < D2.u8)
+		{
+			u32 tmp = D2
+			D2 = D1
+			D1 = tmp
+		}
+		D0.u16 += D1.s8
+	}
+	else
+	{
+		D1.u8 = objA0.value39
+		D2.u8 = u8[A0 + 0x3f]
+		D3.u8 = u8[A0 + 0x41]
+		D4.u8 = u8[A0 + 0x47]
+		if (D1.u8 < D3.u8)
+		{
+			u32 tmp = D2
+			D2 = D4
+			D4 = tmp
+		}
+		D0.u16 += D2.s8
+	}
+
+	objA0.position.y.u16 = D0.u16
+	if (objA0.base_state != 0)
+	{
+		--objA0.base_state
+	}
+	objA0.state = u8[A0 + 0x2d]
+
+	A1 = 0xffffb000
+	A2 = A0 + 0x38
+	D6 = 3
+	fn045170()
+
+	A1 = 0xffffb04a
+	A2 = A0 + 0x40
+	D6 = 4
+	fn045170()
+
+	Object.animationUpdate(0x046ac4)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x045170) end(0x0452d8)
+function void fn045170()
+{
+#if STANDALONE
+	if (debug_mode.state)
+		return
+#endif
+
+	D1 = 0x20
+	D2 = 0x10
+	D3 = 0
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOnForCharacterA1()
+
+	if (u8[A2] == 0)
+	{
+		if (objA0.flags2a & (1 << D6.u8))
+		{
+			u16[A2 + 0x02] = objA1.velocity.x
+			u16[A2 + 0x04] = u16[A1 + 0x1c]
+			objA1.velocity.x = 0
+			u16[A1 + 0x1c] = 0
+			objA0.state = 0x01
+			u8[A0 + 0x2d] = 0x01
+			D0.u8 = objA0.base_state
+			if (D0.u8 == 0)
+			{
+				D0 = 7
+				objA0.base_state = D0.u8
+			}
+			u8[A2] = D0.u8
+			u8[A2 + 0x06] = u8[0x04669f]
+		}
+	}
+	else if (s8[A2] >= 0)
+	{
+		--u8[A2]
+		if (u8[A2] != 0)
+		{
+			D0.s16 = s8[A2]
+			A3 = 0x046698
+			u8[A2 + 0x06] = u8[A3 + D0.s16]
+		}
+		else
+		{
+			playSound(0x8a)
+			objA1.velocity.x = u16[A2 + 0x02]
+			u16[A1 + 0x1c] = u16[A2 + 0x04]
+			objA1.velocity.y = -0x700
+			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x40] = 0
+			u8[A1 + 0x3d] = 0
+			u8[A1 + 0x05] = 0x02
+			u8[A1 + 0x20] = 0
+
+			u8[A2] = 0xff
+			D0 = -0x1c
+			if ((u8[A1 + 0x2a] & char.flag.FACING_LEFT) == 0)
+			{
+				D0.s16 = -D0.s16
+				u8[A2] &= ~0x01
+			}
+			u8[A1 + 0x26] = D0.u8
+			u8[A0 + 0x2d] = 0
+			u8[A2 + 0x06] = 0
+			u8[A2 + 0x01] = 0x26
+
+			A3 = 0x0466c8
+			D1.u16 = objA1.position.x.u16
+
+			if (allocDynamicObjectAfterA0())
+			{
+				D2 = 3
+				while (D2.s16 >= 0)
+				{
+					objA1.update_address = 0x0452da
+					u16[A1 + 0x2e] = A0.u16
+					D3.u16 = u16[(A3+=2)-2]
+					D3.u16 += D1.u16
+					objA1.position.x.u16 = D3.u16
+					D3.u16 = u16[(A3+=2)-2]
+					D3.u16 += objA0.position.y.u16
+					objA1.position.y.u16 = D3.u16
+					objA1.velocity.x = u16[(A3+=2)-2]
+					objA1.velocity.y = u16[(A3+=2)-2]
+
+					if (!allocDynamicObjectAfterA1())
+						break
+
+					--D2.s16
+				}
+			}
+		}
+	}
+	else
+	{
+		if (u8[A1 + 0x2e] == 0)
+		{
+			D0.u8 = u8[A1 + 0x2a]
+			if (D0 & 0x02)
+			{
+				D0.u16 &= 0x28
+				if (D0.u16 == 0)
+				{
+					D0.s16 = s8[A2 + 0x01]
+					A3 = 0x0466a0
+					u8[A2 + 0x07] = u8[A3 + D0.s16]
+
+					--D0.u8
+					if (D0.s8 >= 0)
+					{
+						u8[A2 + 0x01] = D0.u8
+					}
+					D0.u8 = u8[A1 + 0x26]
+					D1 = 0x00060002
+					if ((u8[A2] & 0x01) == 0)
+					{
+						if (D0.s8 >= 0)
+						{
+							D1 = (D1 << 16) + (D1 >> 16)
+						}
+
+						u16 result = u16(D0.u8) + u16(D1.u8)
+						D0.u8 = (result & 0x100) ? 0 : result
+					}
+					else
+					{
+						if (D0.s8 < 0)
+						{
+							D1 = (D1 << 16) + (D1 >> 16)
+						}
+
+						u16 result = u16(D0.u8) - u16(D1.u8)
+						D0.u8 = (result & 0x100) ? 0 : result
+					}
+
+					u8[A1 + 0x26] = D0.u8
+					if (u8[A1 + 0x26] != 0)
+					{
+						return
+					}
+				}
+			}
+		}
+		u8[A2] = 0
+	}
+}
+
+
+
+// Particle effect
+
+//# address-hook(0x0452da) end(0x045330)
+function void fn0452da()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x2e]
+	D0.u16 = objA1.position.x.u16
+	if (objA0.velocity.x < 0)
+	{
+		D0.u16 -= 0x18
+		if (D0.u16 > objA0.position.x.u16)
+		{
+			UnloadObject()
+			return
+		}
+	}
+	else
+	{
+		D0.u16 += 0x18
+		if (D0.u16 < objA0.position.x.u16)
+		{
+			UnloadObject()
+			return
+		}
+	}
+
+	objA0.update_address = 0x045336
+	objA0.render_flags = 0x04
+	objA0.box_size.y = 0x04
+	objA0.box_size.x = 0x04
+	objA0.sprite_priority = 0x80
+	objA0.sprite_attributes = 0xe3d6
+	objA0.mapping_offset = 0x046a44
+	objA0.state = 0x02
+
+	fn045336()
+}
+
+
+//# address-hook(0x045336) end(0x04535e)
+function void fn045336()
+{
+	A1 = 0x046ac4
+	Object.AlternativeAnimationUpdate()
+	if (objA0.base_state != 0)
+	{
+		objA0.update_address = 0x01abb6
+	}
+	UpdateMovementStraightSimple()
+
+	A1 = A0 + 0x18
+	fn045364()
+
+	A1 = A0 + 0x1a
+	fn045364()
+
+	DrawObject()
+}
+
+
+//# address-hook(0x045364) end(0x04536a)
+function void fn045364()
+{
+	D0.s16 = s16[A1] >> 2
+	u16[A1] -= D0.u16
+}

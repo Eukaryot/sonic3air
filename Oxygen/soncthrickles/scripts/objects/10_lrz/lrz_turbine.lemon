@@ -1,0 +1,238 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Turbine objects in LRZ 2                              //
+//-------------------------------------------------------//
+
+
+// Ladders
+
+//# address-hook(0x04429c) end(0x0442ec)
+function void fn04429c()
+{
+	objA0.sprite_attributes = 0xa3ad
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+
+	if (objA0.subtype2c != 0)
+	{
+		objA0.mapping_offset = 0x0445b0
+		objA0.box_size.x = 0x04
+		objA0.box_size.y = 0x30
+		u8[A0 + 0x28] = 0xa0
+
+		objA0.update_address = 0x044592
+		fn044592()
+	}
+	else
+	{
+		objA0.mapping_offset = 0x0445a6
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x30
+
+		objA0.update_address = 0x0442f2
+		fn0442f2()
+	}
+}
+
+
+//# address-hook(0x0442f2) end(0x044332)
+function void fn0442f2()
+{
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D1.u16 = control.player1
+	fn044338()
+
+	++A2
+	A1 = 0xffffb04a
+	D1.u16 = control.tails
+	fn044338()
+
+	objA0.animation.sprite = (level.framecounter.low >> 1) & 0x03
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		if ((level.framecounter.low & 0x0f) == 0)
+		{
+			playSound(0xc0)
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x044338) end(0x0443b2)
+function void fn044338()
+{
+	if (u8[A2] == 0)
+	{
+		fn044434()
+		return
+	}
+
+	if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
+	{
+		if (D1.u16 & 0x70)
+		{
+			fn0443c4()
+			return
+		}
+
+		fn04450a()
+
+		D0 = u8[A1 + 0x22]
+		u32 backupA2 = A2
+		SetCharacterSpritePatterns()
+		A2 = backupA2
+		return
+	}
+
+	u8[A2] = 0
+	u8[A2 + 0x02] = 0x1e
+
+	u16[A1 + 0x08] = 0x0100
+	u8[A1 + 0x1e] = 0x0e
+	u8[A1 + 0x1f] = 0x07
+	objA1.state = char.state.ROLLING
+	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+	objA1.flags2a &= ~char.flag.CONTROL_LOCK
+	u8[A1 + 0x27] = 0
+	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x40] = 1
+}
+
+
+//# address-hook(0x0443c4) end(0x044432)
+function void fn0443c4()
+{
+	D1 = u8[A2 + 0x04] >> 4
+	D1.u8 = u8[0x0443b4 + D1.s16]
+	D0.u8 = u8[A2 + 0x04] & 0x0f
+	D0.u8 |= D1.u8
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * 0x0c
+	D0.s16 = -D0.s16
+
+	objA1.velocity.y = D0.u16
+	u16[A1 + 0x20] = 0
+	if (D0.s16 < 0)
+	{
+		u16[A1 + 0x20] = 0x1000
+		u16[A1 + 0x0a] |= 0x8000
+	}
+
+	u8[A2] = 0
+	u8[A2 + 0x02] = 0x14
+
+	u8[A1 + 0x05] = 0x02
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~char.flag.CONTROL_LOCK
+	u8[A1 + 0x27] = 0
+	u8[A1 + 0x2e] &= 0xfc
+	u8[A1 + 0x2f] = 0
+	u8[A1 + 0x3d] = 0
+	u8[A1 + 0x40] = 0
+}
+
+
+//# address-hook(0x044434) end(0x044508)
+function void fn044434()
+{
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		if (u8[A2 + 0x02] == 0)
+		{
+			u16[A1 + 0x08] = 0x0100
+		}
+		return
+	}
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	if (D0.u16 < 0x20)
+	{
+		D1 = 0x70
+		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x50
+		if (D0.u16 >= 0x18)
+		{
+			D1 = 0x30
+			D0.u16 -= 0x40
+			if (D0.u16 >= 0x18)
+			{
+				D0.u16 -= 0x40
+				if (D0.u16 >= 0x18)
+					return
+
+				D1 = -0x10
+			}
+		}
+
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		{
+			if (D1.u8 == 0x30 && s16[A1 + 0x0a] >= 0)
+				return
+
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0
+			u8[A1 + 0x04] &= 0xfc
+			objA1.position.x.u16 = objA0.position.x.u16
+
+			D0.u8 = ((level.framecounter.low & 0x07) - 4) * 4
+			D1.u8 += D0.u8
+			u8[A2 + 0x04] = D1.u8
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x2e] = 3
+			u8[A2] = 1
+
+			fn04450a()
+
+			D0 = u8[A1 + 0x22]
+			u32 backupA2 = A2
+			SetCharacterSpritePatterns()
+			A2 = backupA2
+		}
+	}
+}
+
+
+//# address-hook(0x04450a) end(0x044550)
+function void fn04450a()
+{
+	D0 = u8[A2 + 0x04] >> 3
+	D1.u8 = u8[0x044552 + D0.s16]
+	u8[A1 + 0x22] = D1.u8
+	D0.u16 &= 0x1f
+	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x044572 + D0.s16]
+	u16[A1 + 0x08] = 0x0100
+	u16[A1 + 0x0a] |= 0x8000
+
+	D0.u8 = u8[A2 + 0x04]
+	if (D0.s8 < 0)
+	{
+		u16[A1 + 0x08] = 0x0280
+		u16[A1 + 0x0a] &= 0x7fff
+	}
+	D0.u8 += 4
+	u8[A2 + 0x04] = D0.u8
+}
+
+
+
+// Spikes
+
+//# address-hook(0x044592) end(0x0445a0)
+function void fn044592()
+{
+	objA0.animation.sprite = (level.framecounter.low >> 1) & 0x03
+	fn01b662()
+}

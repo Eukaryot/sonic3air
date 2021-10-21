@@ -1,0 +1,604 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04b958) end(0x04b978)
+function void fn04b958()
+{
+	control.player1 = control.pad1
+	if (debug_mode.state)
+	{
+		DebugMode.BaseUpdate()
+		fn04bbf4()
+	}
+	else
+	{
+		// Targets:
+		//  - 0x04b9ce	-> objA0.base_state = 0x00
+		//  - 0x04ba4e	-> objA0.base_state = 0x02
+		//  - 0x04bc1e	-> objA0.base_state = 0x04
+		call tableLookupAddress(0x04b9bc, objA0.base_state)
+
+		fn04b97c()
+	}
+}
+
+
+//# address-hook(0x04b97c) end(0x04b998)
+function void fn04b97c()
+{
+	objA0.state = 0x02
+	fn04b99e()
+
+	A1 = 0xffffb000
+	D0 = u8[A1 + 0x22]
+	SetCharacterSpritePatterns()
+
+	fn04bbf4()
+#if STANDALONE
+	// Prevent slightly wrong camera placement in first frame by applying this at once
+	camera.foreground.x.u16 = camera.position.x.u16
+#endif
+
+	DrawObject()
+}
+
+
+//# address-hook(0x04b99e) end(0x04b9b6)
+function void fn04b99e()
+{
+	if (objA0.flags38 == 0)
+	{
+		UpdateSonicAnimation()
+	}
+	else if (objA0.flags38 == 1)
+	{
+		UpdateTailsAnimation()
+	}
+	else
+	{
+		UpdateKnucklesAnimation()
+	}
+}
+
+
+//# address-hook(0x04b9ce) end(0x04ba48)
+function void fn04b9ce()
+{
+	objA0.base_state += 2
+	objA0.hitbox_extends.x = 0x07
+	objA0.hitbox_extends.y = 0x0e
+	D0.u16 = (global.characters > 0) ? (global.characters - 1) : 0
+	objA0.flags38 = D0.u8
+	objA0.mapping_offset = u32[0x04b9c2 + D0.s16 * 4]
+	objA0.sprite_attributes = 0x0680
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0100
+	objA0.state = 0x02
+	objA0.flags2a |= 0x04
+	objA0.flags2a |= 0x02
+
+	if (global.characters == CHARS_TAILS_ALONE)
+	{
+		// Tails' tails object
+		objA0.sprite_attributes = 0x06a0
+		u32[0xffffcc0a] = 0x0160a6
+		u16[0xffffcc3a] = A0.u16
+	}
+
+	slotmachine.rotation.full = 0
+	u16[0xffffe402] = 0x40
+	ring_counter = checkpoint.rings
+	extra_lives_granted = checkpoint.lives_granted
+	hud.dirty.rings = 0x01
+#if STANDALONE
+	slotmachine.rings_collected = 0
+#endif
+
+	fn04ba4e()
+}
+
+
+//# address-hook(0x04ba4e) end(0x04ba8e)
+function void fn04ba4e()
+{
+	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
+	{
+		debug_mode.state = 0x01
+	}
+
+	u8[A0 + 0x30] = 0
+	if (objA0.flags2e == 0)
+	{
+		// Targets:
+		//  - 0x04ba94	-> (objA0.flags2a & 0x02) = 0x00
+		//  - 0x04ba98	-> (objA0.flags2a & 0x02) = 0x02
+		call tableLookupAddress(0x04ba90, objA0.flags2a & 0x02)
+	}
+	else
+	{
+		slotmachine.rotation.full += s16[0xffffe402] << 4
+	}
+}
+
+
+//# address-hook(0x04ba94) end(0x04ba94)
+function void fn04ba94()
+{
+	fn04bbb2()
+	fn04ba98()
+}
+
+
+//# address-hook(0x04ba98) end(0x04baba)
+function void fn04ba98()
+{
+	fn04babc()
+	fn04bcb0()
+	fn04bdca()
+	fn04be3a()
+	UpdateMovementStraightSimple()
+	slotmachine.rotation.full += u16[0xffffe402]
+}
+
+
+//# address-hook(0x04babc) end(0x04bb52)
+function void fn04babc()
+{
+	if (control.player1.state & CONTROL_LEFT)
+	{
+		fn04bb54()
+	}
+	if (control.player1.state & CONTROL_RIGHT)
+	{
+		fn04bb84()
+	}
+
+	if ((control.player1.state & (CONTROL_LEFT | CONTROL_RIGHT)) == 0)
+	{
+		D0.u16 = objA0.groundspeed
+		if (D0.u16 != 0)
+		{
+			if (D0.s16 >= 0)
+			{
+				D0.u16 -= 0x0c
+				if (D0.s16 < 0)
+					D0.u16 = 0
+				objA0.groundspeed = D0.u16
+			}
+			else
+			{
+				D0.u16 += 0x0c
+				if (D0.s16 > 0)
+					D0.u16 = 0
+				objA0.groundspeed = D0.u16
+			}
+		}
+	}
+
+	D0.u8 = (slotmachine.rotation.u8 + 0x20) & 0xc0
+	D0.s8 = -D0.s8
+	LookupSinCos()
+	D1.s32 = s32(D1.s16) * objA0.groundspeed
+	D0.s32 = s32(D0.s16) * objA0.groundspeed
+	objA0.position.x += D1
+	objA0.position.y += D0
+
+	u32 backupD0 = D0
+	u32 backupD1 = D1
+
+	D2 = objA0.position.y
+	D3 = objA0.position.x
+	fn04bd5a()
+
+	D0 = backupD0
+	D1 = backupD1
+
+	if (!_equal())	// Uses result from fn04bd5a()
+	{
+		objA0.position.x -= D1
+		objA0.position.y -= D0
+		objA0.groundspeed = 0
+	}
+}
+
+
+//# address-hook(0x04bb54) end(0x04bb82)
+function void fn04bb54()
+{
+	objA0.flags2a |= 0x01
+	D0.u16 = objA0.groundspeed
+	if (D0.s16 > 0)
+	{
+		D0.u16 -= 0x40
+		objA0.groundspeed = D0.u16
+	}
+	else
+	{
+		D0.u16 -= 0x0c
+		objA0.groundspeed = max(D0.s16, -0x800)
+	}
+}
+
+
+//# address-hook(0x04bb84) end(0x04bbb0)
+function void fn04bb84()
+{
+	objA0.flags2a &= ~0x01
+	D0.u16 = objA0.groundspeed
+	if (D0.s16 >= 0)
+	{
+		D0.u16 += 0x0c
+		objA0.groundspeed = min(D0.s16, 0x800)
+	}
+	else
+	{
+		D0.u16 += 0x40
+		objA0.groundspeed = D0.u16
+	}
+}
+
+
+//# address-hook(0x04bbb2) end(0x04bbf2)
+function void fn04bbb2()
+{
+	if (control.player1.pressed & CONTROL_ABC)
+	{
+		D0.u8 = -(0x40 + slotmachine.rotation.u8 & 0xfc)
+		LookupSinCos()
+		D1.s32 = s32(D1.s16) * 0x0680
+		D1.s32 >>= 8
+		objA0.velocity.x = D1.u16
+		D0.s32 = s32(D0.s16) * 0x0680
+		D0.s32 >>= 8
+		objA0.velocity.y = D0.u16
+		objA0.flags2a |= 0x02
+		playSound(0x62)
+	}
+}
+
+
+//# address-hook(0x04bbf4) end(0x04bc1c)
+function void fn04bbf4()
+{
+	D3.u16 = objA0.position.x.u16 - getScreenWidth() / 2
+	if (D3.s16 >= 0)
+	{
+		camera.position.x.u16 = D3.u16
+	}
+
+	D2.u16 = objA0.position.y.u16 - getScreenHeight() / 2
+	if (D2.s16 >= 0)
+	{
+		camera.position.y.u16 = D2.u16
+	}
+}
+
+
+#if STANDALONE
+	// Use a different location in RAM, otherwise char.character would get overwritten
+	define slotmachine.fadeout.countdown = s16[A0 + 0x48]
+#else
+	define slotmachine.fadeout.countdown = s16[A0 + 0x38]
+#endif
+
+//# address-hook(0x04bc1e) end(0x04bc52)
+function void fn04bc1e()
+{
+	u16[0xffffe402] += 0x40
+	if (u16[0xffffe402] == 0x1800)
+	{
+		palette_fade.range = 0x3f
+		u16[0xfffff794] = 0
+		objA0.update_address = 0x04bc54
+		slotmachine.fadeout.countdown = 60
+		u8[0xfffff650] = 0xff
+	}
+	slotmachine.rotation.full += u16[0xffffe402]
+}
+
+
+//# address-hook(0x04bc54) end(0x04bcac)
+function void fn04bc54()
+{
+	--u16[0xfffff794]
+	if (s16[0xfffff794] < 0)
+	{
+		u16[0xfffff794] = 0x02
+		u32 backupA0 = A0
+		FadeOutPalette()
+		A0 = backupA0
+	}
+	u16[0xffffe402] += 0x40
+	slotmachine.rotation.full += u16[0xffffe402]
+
+	--slotmachine.fadeout.countdown
+	if (slotmachine.fadeout.countdown == 0)
+	{
+		global.zone_act = checkpoint.zone_act
+		global.zone_act.apparent = checkpoint.zone_act.apparent
+		checkpoint.number = checkpoint.number.backup
+		global.stage_type = 0
+		level.restart.u8 = 1
+		checkpoint.rings = ring_counter
+		checkpoint.lives_granted = extra_lives_granted
+	}
+	fn04b97c()
+}
+
+
+//# address-hook(0x04bcb0) end(0x04bd58)
+function void fn04bcb0()
+{
+	D3 = objA0.position.x
+	D2 = objA0.position.y
+	D0.u8 = slotmachine.rotation.u8 & 0xfc
+	LookupSinCos()
+
+	D0 = s32(D0.s16) * 0x2a + (objA0.velocity.x << 8)
+	D1 = s32(D1.s16) * 0x2a + (objA0.velocity.y << 8)
+	D3 += D0
+
+	fn04bd5a()
+	if (!_equal())
+	{
+		D3 -= D0
+		D0 = 0
+		objA0.velocity.x = D0.u16
+		objA0.flags2a &= ~0x02
+		objA0.value3a = 0x04
+		D2 += D1
+
+		fn04bd5a()
+		if (_equal())
+		{
+			D0.s32 >>= 8
+			D1.s32 >>= 8
+			objA0.velocity.x = D0.u16
+			objA0.velocity.y = D1.u16
+		}
+		else
+		{
+			D2 -= D1
+			D1 = 0
+			objA0.velocity.y = D1.u16
+		}
+	}
+	else
+	{
+		D2 += D1
+
+		fn04bd5a()
+		if (!_equal())
+		{
+			D2 -= D1
+			D1 = 0
+			objA0.velocity.y = D1.u16
+			objA0.flags2a &= ~0x02
+			objA0.value3a = 0x04
+
+			D0.s32 >>= 8
+			D1.s32 >>= 8
+			objA0.velocity.x = D0.u16
+			objA0.velocity.y = D1.u16
+		}
+		else
+		{
+			D0.s32 >>= 8
+			D1.s32 >>= 8
+			objA0.velocity.x = D0.u16
+			objA0.velocity.y = D1.u16
+			if (objA0.value3a != 0)
+			{
+				--objA0.value3a
+			}
+			else
+			{
+				objA0.flags2a |= 0x02
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x04bd5a) end(0x04bda0)
+function void fn04bd5a()
+{
+	A1 = 0xffff3000
+	A1 += (((D3 >> 16) + 0x14) / 0x18)
+	A1 += (((D2 >> 16) + 0x44) / 0x18) * 0x80
+
+	D5 = 0
+	D4.u8 = u8[A1]
+	++A1
+	fn04bda2()
+
+	D4.u8 = u8[A1]
+	++A1
+	fn04bda2()
+	A1 += 0x7e
+
+	D4.u8 = u8[A1]
+	++A1
+	fn04bda2()
+
+	D4.u8 = u8[A1]
+	++A1
+	fn04bda2()
+
+	_setZeroFlagByValue(D5.u8)
+}
+
+
+//# address-hook(0x04bda2) end(0x04bdc8)
+function void fn04bda2()
+{
+	if (D4.u8 != 0 && D4.u8 != 0x08 && D4.u8 < 0x10)
+	{
+		if (D4.u8 != 0x07 && D4.u8 < 0x09)
+		{
+			u8[A0 + 0x30] = D4.u8
+			u32[A0 + 0x32] = A1
+		}
+		D5 = -1
+	}
+}
+
+
+//# address-hook(0x04bdca) end(0x04be38)
+function void fn04bdca()
+{
+	A1 = 0xffff3000
+	A1 += ((objA0.position.x.u16 + 0x20) / 0x18)
+	A1 += ((objA0.position.y.u16 + 0x50) / 0x18) * 0x80
+
+	D4.u8 = u8[A1]
+	if (D4.u8 == 0)
+	{
+		D4 = 0
+		return
+	}
+
+	if (D4.u8 != 0x08)
+	{
+		D4 = -1
+		return
+	}
+
+	fn04b57c()
+	if (_equal())
+	{
+		u8[A2] = 0x01
+		u32[A2 + 0x04] = A1
+	}
+
+	SlotMachine.collectRing()
+
+	D4 = 0
+}
+
+
+function void SlotMachine.collectRing()
+{
+	CollectRing()
+
+#if STANDALONE
+	++slotmachine.rings_collected
+	if (slotmachine.rings_collected >= 50)
+#else
+	if (ring_counter >= 50)
+#endif
+	{
+		if ((extra_lives_granted & 0x01) == 0)
+		{
+			extra_lives_granted |= 0x01
+			++continues_counter
+			playMusic(0xac)
+
+		#if STANDALONE
+			if (continues_counter >= 5)
+			{
+				Game.setAchievementComplete(ACHIEVEMENT_CONTINUES)
+			}
+		#endif
+		}
+	}
+}
+
+
+//# address-hook(0x04be3a) end(0x04bf60)
+function void fn04be3a()
+{
+	D0.u8 = u8[A0 + 0x30]
+	if (D0.u8 == 0)
+	{
+		--u8[A0 + 0x36]
+		if (s8[A0 + 0x36] < 0)
+		{
+			u8[A0 + 0x36] = 0
+		}
+		--u8[A0 + 0x37]
+		if (s8[A0 + 0x37] < 0)
+		{
+			u8[A0 + 0x37] = 0
+		}
+	}
+	else if (D0.u8 <= 0x03)
+	{
+		fn04b57c()
+		if (_equal())
+		{
+			u8[A2] = 0x03
+			A1 = u32[A0 + 0x32] - 1
+			u32[A2 + 0x04] = A1
+
+			D0.u8 = u8[A1] + 1
+			if (D0.u8 > 4)
+			{
+				D0.u8 = 4
+			}
+			u8[A2 + 0x04] = D0.u8
+		}
+		playSound(0xae)
+	}
+	else if (D0.u8 == 0x04)
+	{
+		objA0.base_state += 2
+		playSound(0x6a)
+	}
+	else if (D0.u8 == 0x05)
+	{
+		D1 = u32[A0 + 0x32] - 0xffff3001
+		D2.u16 = D1.u16
+		D1.u16 &= 0x7f
+		D1 = u32(D1.u16) * 0x18
+		D1.u16 -= 0x14
+		D2.u16 >>= 7
+		D2.u16 &= 0x7f
+		D2 = u32(D2.u16) * 0x18
+		D2.u16 -= 0x44
+		D1.u16 -= objA0.position.x.u16
+		D2.u16 -= objA0.position.y.u16
+		LookupAngleByVector()
+		LookupSinCos()
+		D1.s32 = s32(D1.s16) * -0x0700
+		D1.s32 >>= 8
+		objA0.velocity.x = D1.u16
+		D0.s32 = s32(D0.s16) * -0x0700
+		D0.s32 >>= 8
+		objA0.velocity.y = D0.u16
+		objA0.flags2a |= 0x02
+
+		fn04b57c()
+		if (_equal())
+		{
+			u8[A2] = 0x02
+			D0 = u32[A0 + 0x32] - 1
+			u32[A2 + 0x04] = D0
+		}
+		playSound(0xaa)
+	}
+	else if (D0.u8 == 0x06)
+	{
+		if (u8[A0 + 0x37] != 0)
+			return
+		u8[A0 + 0x37] = 0x1e
+
+		fn04b57c()
+		if (_equal())
+		{
+			u8[A2] = 0x04
+			D0 = u32[A0 + 0x32]
+			--D0
+			u32[A2 + 0x04] = D0
+		}
+		s16[0xffffe402] = -s16[0xffffe402]
+		playSound(0xad)
+	}
+}

@@ -1,0 +1,148 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Super Sonic (or Knuckles) stars trail                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x019156) end(0x01919e)
+function void fn019156()
+{
+	updateSpritePattern(0x18bd44, 0xf380, 0x01a0)
+
+	objA0.mapping_offset = 0x0192de
+	objA0.render_flags = 0x04
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.sprite_attributes = 0x079c
+	if (u8[0xffffb00a] & 0x80)
+		u8[A0 + 0x0a] |= 0x80
+
+	objA0.update_address = 0x0191a4
+	fn0191a4()
+}
+
+
+//# address-hook(0x0191a4) end(0x019230)
+function void fn0191a4()
+{
+	if (!super.active)
+	{
+		UnloadObject()
+		return
+	}
+
+#if STANDALONE
+	// Sonic charging a Super Peel-Out right now?
+	if (u8[0xffffb03d] == 0x80)
+	{
+		objA0.position.x.u16 += (s16[0xffffb01c] >> 10) * ((u8[0xffffb02a] & char.flag.FACING_LEFT) ? 1 : -1)
+	}
+#endif
+
+	if (objA0.state != 0)
+	{
+		fn019236()
+	}
+
+	if (u8[A0 + 0x34] != 0)
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 1
+			++objA0.animation.sprite
+			if (objA0.animation.sprite >= 6)
+			{
+				objA0.animation.sprite = 0
+				u8[A0 + 0x34] = 0
+				u8[A0 + 0x35] = 1
+				return
+			}
+		}
+
+		if (u8[A0 + 0x35] == 0)
+		{
+			objA0.position.x.u16 = u16[0xffffb010]
+			objA0.position.y.u16 = u16[0xffffb014]
+		}
+		DrawObject()
+	}
+	else
+	{
+		if (u8[0xffffb02e] == 0 && abs(s16[0xffffb01c]) >= 0x0800)
+		{
+			objA0.animation.sprite = 0
+			u8[A0 + 0x34] = 0x01
+
+			objA0.position.x.u16 = u16[0xffffb010]
+			objA0.position.y.u16 = u16[0xffffb014]
+			DrawObject()
+		}
+		else
+		{
+			u8[A0 + 0x34] = 0
+			u8[A0 + 0x35] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x019236) end(0x0192be)
+function void fn019236()
+{
+	objA0.state = 0
+	A2 = 0xffffb000
+	D5 = 0x0f
+	D4.u16 = 0x0488
+
+	while (D5.s16 >= 0)
+	{
+		if (!allocDynamicObjectStd())
+			return
+
+		objA1.update_address = 0x0192c0
+		u8[A1 + 0x04] = 0x84
+		u8[A1 + 0x06] = 0x08
+		u8[A1 + 0x07] = 0x08
+		u16[A1 + 0x08] = 0x0380
+		u16[A1 + 0x0a] = 0x879c
+		u32[A1 + 0x0c] = 0x0192ea
+		objA1.position.x.u16 = u16[A2 + 0x10]
+		objA1.position.y.u16 = u16[A2 + 0x14]
+
+		if (D4.s16 >= 0)
+		{
+			D0.u16 = D4.u16
+			LookupSinCos()
+			D2.u16 = D4.u16 >> 8
+			D0.s16 <<= D2
+			D1.s16 <<= D2
+			D2.u16 = D0.u16
+			D3.u16 = D1.u16
+			D4.u8 += 0x10
+			if (D4.u8 < 0x10)
+			{
+				D4.u16 -= 0x80
+				if (D4.s16 < 0)
+				{
+					D4.u16 = 0x0488
+				}
+			}
+		}
+
+		objA1.velocity.x = D2.u16
+		objA1.velocity.y = D3.u16
+		D2.s16 = -D2.s16
+		D4.s16 = -D4.s16
+		--D5.s16
+	}
+}

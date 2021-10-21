@@ -1,0 +1,52 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+// This file may only be included if STANDALONE preprocessor definition is not set
+#if STANDALONE
+	COMPILER_ERROR
+#endif
+#if GAMEAPP
+	COMPILER_ERROR
+#endif
+
+
+
+// Just for debugging
+//# update-hook
+function void onUpdateFrame()
+{
+	// Update debug draw offset by camera position
+	setWorldSpaceOffset(s32(s16(camera.position.x.u16)), s32(s16(camera.position.y.u16)))
+}
+
+
+function void waitForNextFrame()
+{
+	jump 0x001d18
+}
+
+
+function u32 Game.getSetting(u32 settingId)
+{
+	return 0
+}
+
+function void VDP.Config.setPlaneWScrollOffset(u16 x, u8 y)
+{
+}
+
+
+
+// This is just a dummy so that code output will always add this function
+//# address-hook(0x000206)
+function void RomCodeStart()
+{
+	A7 = 0xfffffe00
+	jump 0x00020a
+}

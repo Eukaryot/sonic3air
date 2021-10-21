@@ -1,0 +1,398 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Enduser|x64">
+      <Configuration>Release-Enduser</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-Enduser|Win32">
+      <Configuration>Release-Enduser</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\sonic3air\audio\AudioOut.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\audio\CustomAudioMixer.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\ConfigurationImpl.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\data\PlayerProgress.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\data\PlayerRecorder.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\data\SharedDatabase.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\data\TimeAttackData.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\EngineDelegate.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\Game.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\helper\BlueSpheresRendering.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\main.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\ExtrasMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\ActSelectMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\GameMenuBase.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\GameMenuManager.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\MainMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\MenuBackground.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\ModsMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsEntry.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\overlays\SecretUnlockedWindow.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\overlays\SkippableCutsceneWindow.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\PauseMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\SharedResources.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\TimeAttackMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\TimeAttackResultsMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\_nativized\NativizedCode.cpp" />
+    <ClInclude Include="..\..\source\sonic3air\audio\AudioOut.h" />
+    <ClInclude Include="..\..\source\sonic3air\audio\CustomAudioMixer.h" />
+    <ClInclude Include="..\..\source\sonic3air\ConfigurationImpl.h" />
+    <ClInclude Include="..\..\source\sonic3air\data\PlayerProgress.h" />
+    <ClInclude Include="..\..\source\sonic3air\data\PlayerRecorder.h" />
+    <ClInclude Include="..\..\source\sonic3air\data\SharedDatabase.h" />
+    <ClInclude Include="..\..\source\sonic3air\data\TimeAttackData.h" />
+    <ClInclude Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.h" />
+    <ClInclude Include="..\..\source\sonic3air\EngineDelegate.h" />
+    <ClInclude Include="..\..\source\sonic3air\Game.h" />
+    <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h" />
+    <ClInclude Include="..\..\source\sonic3air\helper\BlueSpheresRendering.h" />
+    <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h" />
+    <ClInclude Include="..\..\source\sonic3air\helper\GameUtils.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\ExtrasMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\ActSelectMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\GameApp.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\GameMenuBase.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\GameMenuManager.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\MainMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\MenuBackground.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\ModsMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsEntry.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\overlays\SecretUnlockedWindow.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\overlays\SkippableCutsceneWindow.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\PauseMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\SharedResources.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\TimeAttackMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\TimeAttackResultsMenu.h" />
+    <ClInclude Include="..\..\source\sonic3air\pch.h" />
+    <ClInclude Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\config.json" />
+    <None Include="..\..\source\sonic3air\version.inc" />
+    <None Include="..\..\source\sonic3air\_nativized\NativizedCode.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sonic3air.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\___internal\icon\app-no-border.ico" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3D05398E-EEAC-42DC-82BF-BCD901A3F4BF}</ProjectGuid>
+    <RootNamespace>genplusgx</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>sonic3air</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../../oxygenengine/build/_vstudio/oxygen.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>Sonic3AIR</TargetName>
+    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>Sonic3AIR</TargetName>
+    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>Sonic3AIR</TargetName>
+    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>Sonic3AIR</TargetName>
+    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'">
+    <TargetName>Sonic3AIR</TargetName>
+    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'">
+    <TargetName>Sonic3AIR</TargetName>
+    <IntDir>tmp\sonic3air_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
+exit /b 0</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+exit /b 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
+exit /b 0</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+exit /b 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
+exit /b 0</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+exit /b 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
+exit /b 0</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+exit /b 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ENDUSER;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/Release_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/Release_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
+exit /b 0</Command>
+    </PreBuildEvent>
+    <PreLinkEvent />
+    <PostBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+exit /b 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-Enduser|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../source/external;../../../lemonscript/source;../../../oxygenengine/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ENDUSER;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>sonic3air/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/Release_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/Release_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\..\oxygenengine\data\shader $(ProjectDir)..\..\data\shader /mir &gt; nul
+exit /b 0</Command>
+    </PreBuildEvent>
+    <PreLinkEvent />
+    <PostBuildEvent>
+      <Command>robocopy $(ProjectDir)..\..\source\external\discord_game_sdk\lib\x86_64 $(ProjectDir)..\..\bin\$(Configuration)_$(BuildCode) discord_game_sdk.dll /mir &gt; nul
+exit /b 0</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

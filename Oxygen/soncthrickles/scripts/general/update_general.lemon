@@ -1,0 +1,671 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Game mode control loop                                //
+//-------------------------------------------------------//
+
+//# address-hook(0x000494) end(0x0004c4)
+function void GameModeControlLoop()
+{
+#if !STANDALONE
+	call 0x00043a
+	global.lock_on_state = D1.u16
+
+	call 0x000558
+	call 0x00111a
+	call 0x0012ce
+	call 0x0010ae
+#endif
+
+	InitSaveSlots()
+	global.game_mode = 0
+
+	while (true)
+	{
+	@EntryPoint:
+
+	#if STANDALONE
+		// Restart on invalid game mode
+		if (global.game_mode & 0x03 || (global.game_mode & 0x7f) > 0x50)
+		{
+			assert(false, stringformat("Invalid game mode: 0x%02x", global.game_mode))
+			global.game_mode = 0
+		}
+
+	#if GAMEAPP
+		Game.setUnderwaterAudioEffect(0)
+	#endif
+	#endif
+
+		// Targets:
+		//  - 0x003e2a	-> global.game_mode = 0x00				-> Initialization
+		//  - 0x003e32	-> global.game_mode = 0x04				-> SEGA logo, Intro, Title Screen
+		//  - 0x005fb2	-> global.game_mode = 0x08				-> Rolling Demo (handled by Main Game)
+		//  - 0x005fb2	-> global.game_mode = 0x0c				-> Main Game
+		//  - 0x00051a	-> global.game_mode = 0x10, 0x18		-> "JumpToSegaScreen" according to s3unlocked, does not seem to be used?
+		//  - 0x05c2e0	-> global.game_mode = 0x14				-> Continue Screen
+		//  - 0x007a74	-> global.game_mode = 0x1c, 0x24, 0x28	-> Level Select
+		//  - 0x05d868	-> global.game_mode = 0x20				-> Credits screen in Sonic 3
+		//  - 0x04c97e	-> global.game_mode = 0x2c				-> Blue Sphere game: Menu
+		//  - 0x04da7e	-> global.game_mode = 0x30				-> Blue Sphere game: Results Screen
+		//  - 0x0081c6	-> global.game_mode = 0x34				-> Special Stage
+		//  - 0x00a85e	-> global.game_mode = 0x38				-> Competition Mode: Main Menu
+		//  - 0x00b2cc	-> global.game_mode = 0x3c				-> Competition Mode: Player Selection
+		//  - 0x00ab90	-> global.game_mode = 0x40				-> Competition Mode: Level Selection
+		//  - 0x00b74e	-> global.game_mode = 0x44				-> Competition Mode: Results Screen
+		//  - 0x02df64	-> global.game_mode = 0x48				-> Special Stage results
+		//  - 0x00c570	-> global.game_mode = 0x4c				-> Data Select
+		//  - 0x00bc08	-> global.game_mode = 0x50				-> Competition Mode: Records Screen
+
+		D0.u16 = global.game_mode & 0x7c
+		A0 = u32[0x0004c6 + D0.u16]
+		call A0
+
+	#if STANDALONE
+		// Game mode changes definitely end any cutscene
+		Game.endSkippableCutscene()
+	#endif
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Update objects                                        //
+//-------------------------------------------------------//
+
+//# address-hook(0x01aada) end(0x01ab18)
+function void UpdateGameObjects()
+{
+#if !STANDALONE
+	// This check is effectively dead code
+	if (unused.teleport_active != 0)
+		return
+#endif
+
+	A0 = 0xffffb000
+	if (competition_mode.active == 0 && u8[A0 + 0x05] >= 0x06 && u8[A0 + 0x05] != 0x0c)
+	{
+		// Special case: Main character just died
+
+		// 0xffffb000...0xffffb127
+		//  -> First 4 game objects, especially the 2 characters
+		D7 = 0x03
+		updateGameObjectLoop()
+
+		// 0xffffb128...0xffffcb2b
+		//  -> 90 normal game objects, these just get rendered here
+		D7 = 0x59
+		updateGameObjectLoopRenderOnly()
+
+		// 0xffffcb2c...0xffffcfcb
+		//  -> 16 last game objects (see defines_global.lemon)
+		D7 = 0x0f
+		updateGameObjectLoop()
+	}
+	else
+	{
+		// Go through all 110 object slots without special handling
+		D7 = 0x6d
+		updateGameObjectLoop()
+	}
+}
+
+function void updateGameObjectLoop()
+{
+	while (D7.s16 >= 0)
+	{
+		// Setting D1 to zero is not done in the original code
+		//  -> If we don't, its value is basically "undefined", though it's used in some places like "fn034074" and "fn043604"
+		//  -> The emulator does this as well in this specific location (0x01aafc)
+		D1 = 0
+
+		D0 = u32[A0]
+		if (D0 != 0)
+		{
+			assert((D0 & 1) == 0 && D0 < 0x400000, "Invalid update routine address")	// Must be valid address in ROM
+			A1 = D0
+			call A1
+		}
+
+		// Go on to next object
+		A0 += 0x4a
+		--D7.s16
+	}
+}
+
+//# address-hook(0x01ab1a) end(0x01ab30)
+function void updateGameObjectLoopRenderOnly()
+{
+	while (D7.s32 >= 0)
+	{
+		D0 = u32[A0]
+		if (D0 != 0)
+		{
+			// Only objects that are visible on screen
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				DrawObject()
+			}
+		}
+
+		// Go on to next object
+		A0 += 0x4a
+		--D7.s32
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Dynamic object allocation                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x01bae2) end(0x01baf0)
+function void AllocDynamicObjectAfterA1()
+{
+	allocDynamicObjectAfterA1()
+}
+
+function bool allocDynamicObjectAfterA1()
+{
+	return allocDynamicObject(A1, D0 - 1)
+}
+
+
+//# address-hook(0x01baf2) end(0x01baf8)
+function void AllocDynamicObjectStd()
+{
+	allocDynamicObjectStd()
+}
+
+function bool allocDynamicObjectStd()
+{
+	return allocDynamicObject(0xffffb0de, 0x59)
+}
+
+
+//# address-hook(0x01bafa) end(0x01bb14)
+function void AllocDynamicObjectAfterA0()
+{
+	allocDynamicObjectAfterA0()
+}
+
+function bool allocDynamicObjectAfterA0()
+{
+	u32 offset = (0xffffcae2 - A0) >> 6
+	D0.u16 = u8[0x01bb16 + offset]
+	return allocDynamicObject(A0, D0.u16)
+}
+
+
+function bool allocDynamicObject(u32 startAddress, s8 remaining)
+{
+	A1 = startAddress
+	D0.s16 = remaining
+	while (D0.s16 >= 0)
+	{
+		A1 += 0x4a
+		if (u32[A1] == 0)
+		{
+			// Found a free place
+			_setZeroFlagByValue(0)
+			return true
+		}
+		--D0.s16
+	}
+
+	// Failed
+	_setZeroFlagByValue(1)
+	return false
+}
+
+
+
+
+//# address-hook(0x04e800) end(0x04e80a)
+function void CallPlaneUpdateRoutine()
+{
+	// This is called from "VInt.Update.MainGame()"
+	A6 = 0xc00000
+
+	// Targets:
+	//  - 0x04e80e	-> gfx.plane_update_routine = 0x00	-> Default: Does nothing
+	//  - 0x04e812	-> gfx.plane_update_routine = 0x04	-> Switch to vertical scrolling mode
+	//  - 0x04e816	-> gfx.plane_update_routine = 0x08	-> Update vertical scrolling mode
+	//  - 0x04e81a	-> gfx.plane_update_routine = 0x0c	-> Leave vertical scrolling mode
+	//  - 0x04e81e	-> gfx.plane_update_routine = 0x10	-> Enable plane W in LBZ 2 outro
+	//  - 0x04e822	-> gfx.plane_update_routine = 0x14
+	//  - 0x04e826	-> gfx.plane_update_routine = 0x18
+	//  - 0x04e82a	-> gfx.plane_update_routine = 0x1c
+	call 0x04e80e + gfx.plane_update_routine
+}
+
+
+//# address-hook(0x04e80e) end(0x04e80e)
+function void fn04e80e()
+{
+	// Default implementation does nothing at all
+}
+
+//# address-hook(0x04e812) end(0x04e812)
+function void fn04e812()
+{
+	fn04e82e()
+}
+
+//# address-hook(0x04e816) end(0x04e816)
+function void fn04e816()
+{
+	fn04e838()
+}
+
+//# address-hook(0x04e81a) end(0x04e81a)
+function void fn04e81a()
+{
+	fn04e84e()
+}
+
+//# address-hook(0x04e81e) end(0x04e81e)
+function void fn04e81e()
+{
+	fn04e85a()
+}
+
+//# address-hook(0x04e822) end(0x04e822)
+function void fn04e822()
+{
+	fn04e8a4()
+}
+
+//# address-hook(0x04e826) end(0x04e826)
+function void fn04e826()
+{
+	fn04e8cc()
+}
+
+//# address-hook(0x04e82a) end(0x04e82a)
+function void fn04e82a()
+{
+	fn04e8e8()
+}
+
+
+//# address-hook(0x04e82e) end(0x04e84c)
+function void fn04e82e()
+{
+	// Used to switch to vertical scrolling mode, e.g. in:
+	//  - Gumball Machine Special Stage
+	//  - AIZ 1 fire wall
+	//  - LBZ 1 building collapse in Knuckles cutscene
+	//  - LRZ 2 boss
+	VDP.Config.setVerticalScrolling(true, 0xff)
+	gfx.plane_update_routine += 4
+
+	fn04e838()
+}
+
+
+//# address-hook(0x04e838) end(0x04e84c)
+function void fn04e838()
+{
+#if STANDALONE
+
+	bool useCustomVScrollBuffer = (u8[0x818080] != 0)
+	u32 vscrollBufferAddress = useCustomVScrollBuffer ? 0x818000 : 0xffffeeea
+	u16 rows = useCustomVScrollBuffer ? 32 : 20
+
+	// Write vertical scroll data
+	VDP.setupVSRAMWrite(0)
+	u8 row = 0
+	for (; row < rows; ++row)
+	{
+		VDP.writeData32(u32[vscrollBufferAddress + row * 4])
+	}
+
+	if (row * 0x10 < getScreenWidth())
+	{
+		// This is just a fallback in case there is no explicit definition of more than the first 20 vertical scrolling rows
+
+		// Just repeat the last scroll offset for additional rows
+		//  - AIZ 1 fire wall: Looks okay, but not optimal as the rightmost flames are all at the same y-position
+		//  - LBZ 1 building collapse: Right part is fixed this way
+		//  - LRZ 2 boss: No shift for the right part of the lava
+
+		u32 value = (verticalScrollOffsetBias == 0) ? u32[0xffffeeea + 19 * 4] : u32[0xffffeeea]
+		for (; row < 0x20; ++row)
+		{
+			VDP.writeData32(value)
+		}
+	}
+	Renderer.setVerticalScrollOffsetBias(verticalScrollOffsetBias)
+
+#else
+
+	// Write vertical scroll data
+	//  Note: 0xffffeeea is the start address of vertical scroll offsets
+	VDP.setupVSRAMWrite(0)
+	for (u8 row = 0; row < 20; ++row)
+	{
+		VDP.writeData32(u32[0xffffeeea + row * 4])
+	}
+
+#endif
+}
+
+
+//# address-hook(0x04e84e) end(0x04e858)
+function void fn04e84e()
+{
+	// Switch back to horizontal scrolling mode
+	VDP.Config.setVerticalScrolling(false, 0xff)
+	gfx.plane_update_routine = 0
+
+#if STANDALONE
+	// Reset the flag that controls custom vertical scroll offsets buffer usage
+	u8[0x818080] = 0
+#endif
+}
+
+
+//# address-hook(0x04e85a) end(0x04e8a2)
+function void fn04e85a()
+{
+	// This is used in post-boss cutscene in LBZ 2 (S/T)
+	A0 = 0xfffff580
+	D0.u16 = (u16[0xffffeeca] + 0x0d) & 0x1f
+	D2.u16 = 0xc000 + (D0.u16 << 7)
+	D0.u16 = D2.u16 + 0x64
+	D1 = 0x06
+	ReadDataFromVRAM()
+
+	D0.u16 = D2.u16
+	D1 = 0x18
+	ReadDataFromVRAM()
+
+	A0 = 0xfffff580
+	D0.u16 = 0x8000 + (u16[0xffffeeca] << 7)
+	D1 = 0x1f
+	WriteDataToVRAM()
+
+	--u16[0xffffeeca]
+	if (s16[0xffffeeca] < 0)
+	{
+		gfx.plane_update_routine += 4
+	}
+}
+
+
+//# address-hook(0x04e8a4) end(0x04e8ca)
+function void fn04e8a4()
+{
+	// This is used in post-boss cutscene in LBZ 2 (S/T)
+	VDP.setupVRAMWrite(0xc900)
+	VDP.zeroVRAM(0x300)
+
+	VDP.Config.setNameTableBasePlaneW(0x8000)
+	VDP.Config.setupWindowPlane(true, 40)
+	gfx.plane_update_routine = 0
+
+#if STANDALONE
+	VDP.Config.setPlaneWScrollOffset(-getScreenExtend(), 0)
+#endif
+}
+
+
+//# address-hook(0x04e8cc) end(0x04e8e6)
+function void fn04e8cc()
+{
+	VDP.setupVRAMWrite(0xc600)
+	for (u8 i = 0; i < 0x60; ++i)
+	{
+		VDP.writeData32(0)
+		VDP.writeData32(0)
+	}
+
+	gfx.plane_update_routine += 4
+}
+
+
+//# address-hook(0x04e8e8) end(0x04e928)
+function void fn04e8e8()
+{
+	A0 = 0xfffff580
+	D0.u16 = 0x829c
+	D1 = 0x18
+	ReadDataFromVRAM()
+
+	D0.u16 = 0x8280
+	D1 = 0x06
+	ReadDataFromVRAM()
+
+	VDP.setupVRAMWrite(0xc900)
+	for (u16 i = 0; i < 6; ++i)
+	{
+		A0 = 0xfffff580
+		for (u16 k = 0; k < 0x20; ++k)
+		{
+			VDP.writeData32(u32[A0])
+			A0 += 4
+		}
+	}
+
+	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	gfx.plane_update_routine = 0
+}
+
+
+
+//# address-hook(0x0014e6) end(0x001504)
+function void CopyRectToVRAM()
+{
+	copyRectToVRAM(A1, VDPHelper.getVRAMAddressFromWriteCode(D0), D1.u16 + 1, D2.u16 + 1)
+}
+
+
+function void copyRectToVRAM(u32 source, u16 vramAddress, u16 width, u16 height)
+{
+	A1 = source
+	u16 bytesPerLine = width * 2
+
+	// Lines
+	for (u16 y = 0; y < height; ++y)
+	{
+		// Pixel data in that line
+		VDP.setupVRAMWrite(vramAddress)
+		VDP.copyToVRAM(A1, bytesPerLine)
+
+		A1 += bytesPerLine
+		vramAddress += 0x80
+	}
+}
+
+
+//# address-hook(0x001506) end(0x001524)
+function void fn001506()
+{
+	// Seems to be used only in Data Select
+	u16 vramAddress = VDPHelper.getVRAMAddressFromWriteCode(D0)
+	u16 bytesPerLine = (D1.u16 + 1) * 2
+
+	for (u16 i = 0; i <= D2.u16; ++i)
+	{
+		VDP.setupVRAMWrite(vramAddress)
+		VDP.copyToVRAM(A1, bytesPerLine)
+
+		A1 += bytesPerLine
+		vramAddress += 0x100
+	}
+}
+
+
+
+//# address-hook(0x0011ca) end(0x0012cc)
+function void fn0011ca()
+{
+	syncZ80_variantA()
+
+	#if !STANDALONE
+	{
+		// In emulator, do not execute this in lemon script, as syncing without cycles consumption leads to a deadlock
+		jump 0x0011dc
+	}
+	#endif
+
+	VDP.setWriteIncrement(1)
+	VDP.fillVRAMbyDMA(0, 0x0000, 0x40)
+
+	if (competition_mode.active)
+	{
+		VDP.fillVRAMbyDMA(0, 0x8000, 0x8000)
+	}
+	else
+	{
+		VDP.fillVRAMbyDMA(0, 0xc000, 0x2000)
+		VDP.fillVRAMbyDMA(0, 0xe000, 0x2000)
+	}
+	VDP.setWriteIncrement(2)
+
+	scrolloffset.y.both = 0
+	u32[0xfffff61a] = 0
+
+	zeroMemory(0xfffff800, 0x280)
+	zeroMemory(0xffffe000, 0x400)
+
+	u16[0xa11100] = 0
+}
+
+
+//# address-hook(0x01aa6e) end(0x01aa9e)
+function void fn01aa6e()
+{
+	u16[0xffffef3a] = 0
+	u32[0xffffef3c] = 0
+
+	if (competition_mode.active)
+	{
+		A0 = 0xfffff800
+		fn01aaa2()
+		fn01aabc()
+
+		A0 = 0xffff7880
+		fn01aaa2()
+		fn01aabc()
+
+		A0 = 0xffff7b00
+		fn01aaa2()
+
+		A0 = 0xffff7d80
+		fn01aaa2()
+	}
+	else
+	{
+		A0 = 0xfffff800
+		fn01aaa2()
+	}
+}
+
+
+//# address-hook(0x01aaa2) end(0x01aaba)
+function void fn01aaa2()
+{
+	D0 = 0
+	D1 = 1
+	D7 = 0x50
+	while (D7 > 0)
+	{
+		u16[A0] = 0
+		u8[A0 + 3] = D1.u8
+		A0 += 8
+		++D1.u16
+		--D7
+	}
+	u8[A0 - 5] = 0
+}
+
+
+//# address-hook(0x01aabc) end(0x01aad8)
+function void fn01aabc()
+{
+	A0 -= 0x0280
+	u32[(A0+=4)-4] = 0x00eb0301
+	u32[(A0+=4)-4] = 0x00000001
+	u32[(A0+=4)-4] = 0x00eb0302
+	u32[A0]        = 0x00000000
+}
+
+
+
+//# address-hook(0x007616) end(0x0076a4)
+function void UpdateRollingDemo()
+{
+	if (!global.rolling_demo)
+		return
+
+	if (control.pad1.pressed & CONTROL_START)
+	{
+		global.game_mode = 0x04
+	}
+
+	A0 = u32[0xffffef52]
+	if (global.zone != 0x04 && global.zone < 0x07)
+	{
+		D1.u8 = u8[0xffffef50] & CONTROL_START
+		D1.u8 |= u8[A0-1]
+		D0.u8 = control.pad1.state & CONTROL_START
+		u8[0xffffef50] = (D0.u8 != 0) ? 0xff : 0
+		D0.u8 |= u8[A0]
+		++A0
+	}
+	else
+	{
+		D2.u8 = u8[A0]
+		--rolling_demo.input_timer
+		if (rolling_demo.input_timer == 0xff)
+		{
+			rolling_demo.input_timer = u8[A0+1]
+			A0 += 2
+		}
+
+		D1.u8 = u8[0xffffef50] & CONTROL_START
+		D1.u8 |= rolling_demo.last_input
+		rolling_demo.last_input = D2.u8
+		D0.u8 = control.pad1.state & CONTROL_START
+		u8[0xffffef50] = (D0.u8 != 0) ? 0xff : 0
+		D0.u8 |= D2.u8
+	}
+
+#if STANDALONE
+	// Only use button C, not A or B -- those are problematic with debug mode enabled
+	//  -> Otherwise MGZ is broken
+	if (D0.u8 & CONTROL_ABC)
+	{
+		D0.u8 = (D0.u8 & ~CONTROL_ABC) | CONTROL_C
+	}
+#endif
+
+	control.pad1.state = D0.u8
+	D1.u8 ^= D0.u8
+	D1.u8 &= D0.u8
+	control.pad1.pressed = D1.u8
+	control.pad2 &= 0x8080
+	u32[0xffffef52] = A0
+}
+
+
+
+// Happens after Game Over
+
+//# address-hook(0x003e2a) end(0x003e30)
+function void fn003e2a()
+{
+	global.game_mode = 0x04
+}

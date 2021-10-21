@@ -1,0 +1,135 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+//-------------------------------------------------------//
+// Characters                                            //
+//-------------------------------------------------------//
+
+// Single characters
+define u8 CHARACTER_SONIC	 	 = 0
+define u8 CHARACTER_TAILS	 	 = 1
+define u8 CHARACTER_KNUCKLES 	 = 2
+
+// Character combinations
+define u16 CHARS_SONIC_AND_TAILS = 0
+define u16 CHARS_SONIC_ALONE	 = 1
+define u16 CHARS_TAILS_ALONE	 = 2
+define u16 CHARS_KNUCKLES_ALONE	 = 3
+
+// Character abilities
+define u8 DROPDASH_FULLCHARGE	 = 0x15
+
+
+
+//-------------------------------------------------------//
+// Input                                                 //
+//-------------------------------------------------------//
+
+// Controls
+define u8 CONTROL_UP	= 0x01
+define u8 CONTROL_DOWN	= 0x02
+define u8 CONTROL_LEFT	= 0x04
+define u8 CONTROL_RIGHT	= 0x08
+define u8 CONTROL_B		= 0x10
+define u8 CONTROL_C		= 0x20
+define u8 CONTROL_A		= 0x40
+define u8 CONTROL_START	= 0x80
+
+define u8 CONTROL_DPAD	= 0x0f	// Any of the four directions
+define u8 CONTROL_ABC	= 0x70	// Any of the three buttons
+
+
+#if STANDALONE
+
+	// Standalone-specific button definitions
+	define u8 BUTTON_UP		= 0x00		// Up on d-pad
+	define u8 BUTTON_DOWN	= 0x01		// Down on d-pad
+	define u8 BUTTON_LEFT	= 0x02		// Left on d-pad
+	define u8 BUTTON_RIGHT	= 0x03		// Right on d-pad
+	define u8 BUTTON_A		= 0x04		// Button A = lower face button -- resembles button B on Genesis pad
+	define u8 BUTTON_B		= 0x05		// Button B = right face button -- resembles button C on Genesis pad
+	define u8 BUTTON_X		= 0x06		// Button X =  left face button -- resembles button A on Genesis pad
+	define u8 BUTTON_START	= 0x06		// Start button
+	define u8 BUTTON_Y		= 0x09		// Button Y = upper face button
+	define u8 BUTTON_BACK	= 0x0b		// Back button
+	define u8 BUTTON_PAD2	= 0x10		// Add to button ID for second controller
+
+	// Touch input modes for "Input.setTouchInputMode"
+	//  -> Only relevant when using a touch device, these do not affect keyboard / gamepad input
+	define u8 TOUCH_INPUT_MODE_HIDDEN_CONTROLS 	= 0		// Hidden touch controls overlay, no touch input possible
+	define u8 TOUCH_INPUT_MODE_FULLSCREEN_START	= 1		// Hidden touch controls overlay, reacting to a released touch anywhere on the screen by injecting a BUTTON_START press
+	define u8 TOUCH_INPUT_MODE_NORMAL_CONTROLS	= 2		// Normal touch input via the visible touch controls overlay
+
+#endif
+
+
+
+//-------------------------------------------------------//
+// Music and sound effects                               //
+//-------------------------------------------------------//
+
+define u8 MUSIC_MINIBOSS		= 0x18
+define u8 MUSIC_MAINBOSS		= 0x19
+define u8 MUSIC_GAMEOVER		= 0x27
+define u8 MUSIC_LEVELCLEAR		= 0x29
+define u8 MUSIC_EXTRALIFE		= 0x2a
+define u8 MUSIC_CHAOSEMERALD	= 0x2b
+define u8 MUSIC_MINIBOSS_2		= 0x2e	// Identical to 0x18
+define u8 MUSIC_DROWNING		= 0x31
+define u8 MUSIC_GAMECLEAR		= 0x32
+
+define u8 SFX_RING				= 0x33	// Alternating between left and right channel
+define u8 SFX_RING_ALT			= 0x34	// Alternative ring sfx, not alternating
+define u8 SFX_BRAKE				= 0x36
+define u8 SFX_HITSPIKES			= 0x37
+define u8 SFX_WATERSPLASH		= 0x39
+define u8 SFX_DROWN				= 0x3b
+define u8 SFX_ROLL				= 0x3c
+define u8 SFX_POP				= 0x3d
+define u8 SFX_FIRESHIELD		= 0x3e
+define u8 SFX_BUBBLESHIELD		= 0x3f
+define u8 SFX_LIGHTNINGSHIELD	= 0x41
+define u8 SFX_INSTASHIELD		= 0x42
+define u8 SFX_FIRESHIELDDASH	= 0x43
+define u8 SFX_BUBBLEBOUNCE		= 0x44
+define u8 SFX_LIGHTNINGJUMP		= 0x45
+define u8 SFX_GRAB				= 0x4a
+define u8 SFX_BOMBFALL			= 0x51
+define u8 SFX_SPIKESMOVE		= 0x52
+define u8 SFX_COLLAPSE			= 0x59
+define u8 SFX_CLICK				= 0x5b
+define u8 SFX_JUMP				= 0x62
+define u8 SFX_SUPERTRANSFORM	= 0x9f
+define u8 SFX_UNDERWATER_BELL	= 0xa9
+define u8 SFX_SPINDASH_CHARGE	= 0xab
+define u8 SFX_SPRING			= 0xb1
+define u8 SFX_SPINDASH_RELEASE	= 0xb6
+define u8 SFX_SPILLRINGS		= 0xb9
+
+define u8 MUSIC_CTRL_FADEOUT	= 0xe1
+define u8 MUSIC_CTRL_STOP		= 0xe2
+
+
+
+//-------------------------------------------------------//
+// Platform constants                                    //
+//-------------------------------------------------------//
+
+define u32 PlatformFlags.DESKTOP = 0x0001	// Set on desktop versions like Windows, MacOS, Linux
+define u32 PlatformFlags.MOBILE	 = 0x0002	// Set on mobile devices with Android or iOS
+
+
+
+//-------------------------------------------------------//
+// Misc                                                  //
+//-------------------------------------------------------//
+
+// Spaces
+define u8 Space.SCREEN = 0
+define u8 Space.WORLD  = 1

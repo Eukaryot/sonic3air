@@ -1,0 +1,1671 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Marble Garden Zone Act 1                              //
+//-------------------------------------------------------//
+
+//# address-hook(0x051118) end(0x051120)
+function void InitLevelTiles.MGZ1()
+{
+	u16[0xffffeee8] = 0
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x051124) end(0x051130)
+function void UpdateLevelTiles.MGZ1()
+{
+	camera.foreground.y.u16 += camera.screenshake.offset
+	fn05127c()
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x051134) end(0x05114c)
+function void InitLevelScrolling.MGZ1()
+{
+	UpdateBackground.MGZ1()
+
+	D0 = 0
+	D1 = 0
+	Level.InitialTilesFill()
+
+	A4 = 0x23c9f8
+	A5 = 0xffffa800
+	fn04f0ce()
+}
+
+
+//# address-hook(0x051150) end(0x051154)
+function void UpdateLevelScrolling.MGZ1()
+{
+	call 0x051158 + level.scrolling_routine
+}
+
+//# address-hook(0x051158) end(0x051158)
+function void fn051158()
+{
+	fn051160()
+}
+
+//# address-hook(0x05115c) end(0x05115c)
+function void fn05115c()
+{
+	fn0511c8()
+}
+
+
+//# address-hook(0x051160) end(0x0511c4)
+function void fn051160()
+{
+	if (u16[0xffffeec6] != 0)
+	{
+		u16[0xffffeec6] = 0
+
+		push(A3)
+		push(A2)
+		push(A0)
+		push(D7)
+
+		Kosinski.addToDecompressionQueue(0x3cb1c4, 0xffff6b00)
+		Kosinski.addToDecompressionQueue(0x3c9cd2, 0xffff9c60)
+
+		Kosinski.addToDMAQueue(0x3ca132, 0x4a40)
+
+		requestLoadingPatterns(0x14)
+
+		D7 = pop()
+		A0 = pop()
+		A2 = pop()
+		A3 = pop()
+
+		level.scrolling_routine += 4
+	}
+
+	UpdateBackground.MGZ1()
+
+	A4 = 0x23c9f8
+	A5 = 0xffffa800
+	fn04f0ce()
+	UpdateScreenShake()
+}
+
+
+//# address-hook(0x0511c8) end(0x051278)
+function void fn0511c8()
+{
+	if (kosinski.waiting_modules == 0)
+	{
+		global.zone_act = 0x0201
+		camera.update_routine = 0
+		dynobjects.routine = 0
+		rings.update_routine = 0
+		level.boss_encounter = 0
+		global.in_extra_stage = 0
+		fn04f8f8()
+
+		push(A3)
+		push(A2)
+		push(A0)
+		push(D7)
+
+		fn01c362()
+		fn0076a6()
+
+		Level.loadPaletteData(0x0f)
+
+		D7 = pop()
+		A0 = pop()
+		A2 = pop()
+		A3 = pop()
+
+		D0.u16 = 0x2e00
+		D1.u16 = 0x0600
+		u16[0xffffb010] -= D0.u16
+		u16[0xffffb014] -= D1.u16
+		u16[0xffffb05a] -= D0.u16
+		u16[0xffffb05e] -= D1.u16
+		fn04f3b0()
+
+		camera.position.x.u16 -= D0.u16
+		camera.position.y.u16 -= D1.u16
+		camera.foreground.x.u16 -= D0.u16
+		camera.foreground.y.u16 -= D1.u16
+		move_area.left -= D0.u16
+		move_area.right -= D0.u16
+		level.vertical_wrap -= D1.u16
+		move_area.bottom.current -= D1.u16
+		move_area.bottom.target = move_area.bottom.current
+		Level.GetCameraPosition()
+		u32[0xffffeee2] = 0
+		u16[0xffffeee6] = 0
+		u16[0xffffeea2] = 0
+		u16[0xffffeeb4] = 0
+		u16[0xffffeeb8] = 0
+		level.scrolling_routine = 0
+	}
+
+	UpdateBackground.MGZ1()
+
+	A4 = 0x23c9f8
+	A5 = 0xffffa800
+	fn04f0ce()
+}
+
+
+//# address-hook(0x05127c) end(0x0512a4)
+function void fn05127c()
+{
+	if (u8[0xffffb005] < 0x06 && (u16[0xffffeee8] == 0) && (camera.screenshake.state & 0x8000))
+	{
+		if (((level.framecounter - 1) & 0x0f) == 0)
+		{
+			playSound(0x6f)
+		}
+	}
+}
+
+
+
+//# address-hook(0x23c970) end(0x23c9cc)
+function void UpdateBackground.MGZ1()
+{
+	camera.background.y.u16 = camera.screenshake.offset
+	D0.u16 = camera.foreground.x.u16
+	D0 <<= 16
+	D0.s32 >>= 2
+	D1 = D0
+	D1.s32 >>= 4
+
+	A1 = 0xffffa81c
+	D2 = 8
+	while (D2.s16 >= 0)
+	{
+		u16[A1-=2] = D0 >> 16
+		D0 -= D1
+		--D2.s16
+	}
+
+	A1 = 0xffffa800
+	D2 = u32[0xffffa81c]
+	u32[0xffffa81c] += 0x0500
+	D0.s32 >>= 1
+	D3 = 4
+	while (D3.s16 >= 0)
+	{
+		D0 += D2
+		D2 += 0x0500
+		u16[(A1+=2)-2] = D0 >> 16
+		D0 += D1
+		--D3.s16
+	}
+
+	D0.u16 = u16[A1 - 0x02]
+	u16[A1 - 0x02] = u16[A1 - 0x04]
+	u16[A1 - 0x04] = D0.u16
+}
+
+
+
+//# address-hook(0x01c91c) end(0x01c926)
+function void UpdateCameraBounds.MGZ()
+{
+	// Targets:
+	//  - 0x01c930	-> camera.update_routine = 0x00
+	//  - 0x01c96e	-> camera.update_routine = 0x02
+	//  - 0x01c9c8	-> camera.update_routine = 0x04
+	call tableLookupAddress(0x01c92a, camera.update_routine)
+}
+
+
+//# address-hook(0x01c930) end(0x01c96c)
+function void fn01c930()
+{
+	if (camera.position.y.u16 >= 0x0600 && camera.position.y.u16 < 0x0700)
+	{
+		if (camera.position.x.u16 >= 0x3a00)
+		{
+			D0.u16 = 0x06a0
+			level.vertical_wrap = D0.u16
+			u16[0xffffee10] = D0.u16
+			move_area.bottom.current = D0.u16
+			move_area.bottom.target = D0.u16
+			D0.u16 = 0x3c80 + ((getScreenExtend() + 0x0f) & 0xfff0)
+			move_area.right = D0.u16
+			u16[0xffffee0e] = D0.u16
+			camera.update_routine += 2
+		}
+	}
+}
+
+
+//# address-hook(0x01c96e) end(0x01c9c6)
+function void fn01c96e()
+{
+	if (camera.position.x.u16 >= 0x3a00)
+	{
+		D0.u16 = 0x3c80 - (getScreenExtend() & 0xfff0)
+		if (D0.u16 > camera.position.x.u16)
+			return
+
+		move_area.left = D0.u16
+		u16[0xffffee0c] = D0.u16
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x06c31a
+			objA1.position.x.u16 = 0x3d20
+			objA1.position.y.u16 = 0x0668
+		}
+
+		camera.update_routine += 2
+	}
+	else
+	{
+		D0 = 0x1000
+		u32[0xffffee18] = D0
+		u32[0xffffee10] = D0
+
+		D0.u16 = 0x6000
+		move_area.right = D0.u16
+		u16[0xffffee0e] = D0.u16
+
+		camera.update_routine -= 2
+	}
+}
+
+
+//# address-hook(0x01c9c8) end(0x01c9c8)
+function void fn01c9c8()
+{
+}
+
+
+
+//-------------------------------------------------------//
+// Marble Garden Zone Act 2                              //
+//-------------------------------------------------------//
+
+//# address-hook(0x0512a6) end(0x0512ba)
+function void InitLevelTiles.MGZ2()
+{
+	u32[0xffffeee2] = 0
+	u32[0xffffeee6] = 0
+	u16[0xffffeeb4] = 0
+	u16[0xffffeeb8] = 0
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x0512be) end(0x0512d8)
+function void UpdateLevelTiles.MGZ2()
+{
+	camera.foreground.y.u16 += camera.screenshake.offset
+	if (u16[0xffffeeb4] != 0)
+	{
+		camera.screenshake.state.hi = 0xff
+	}
+	fn05127c()
+
+	call 0x0512dc + s16[0xffffeec0]
+}
+
+
+//# address-hook(0x0512dc) end(0x0512dc)
+function void fn0512dc()
+{
+	fn0512e8()
+}
+
+//# address-hook(0x0512e0) end(0x0512e0)
+function void fn0512e0()
+{
+	fn05130c()
+}
+
+//# address-hook(0x0512e4) end(0x0512e4)
+function void fn0512e4()
+{
+	fn05132c()
+}
+
+
+//# address-hook(0x0512e8) end(0x051308)
+function void fn0512e8()
+{
+	if (u16[0xffffeec4] == 0)
+	{
+		fn0514aa()
+		fn0516b4()
+		LoadTileContentDefault()
+	}
+	else
+	{
+		u16[0xffffeec4] = 0
+		u8[0xffffeee8] = 0xff
+		camera.screenshake.state = 0x14
+		u16[0xffffeec0] += 4
+		fn05130c()
+	}
+}
+
+
+//# address-hook(0x05130c) end(0x051328)
+function void fn05130c()
+{
+	fn05134c()
+
+	if ((camera.screenshake.state & 0x8000) == 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	A4 = 0x23d070
+	A5 = 0xffffa900
+	D6 = 0x0f
+	D5 = 0x0a
+	fn04ee9e()
+}
+
+
+//# address-hook(0x05132c) end(0x051348)
+function void fn05132c()
+{
+	D0 = u32[0xffffeeda]
+	if (D0 < 0x050000)
+	{
+		D0 += 0x0800
+		u32[0xffffeeda] = D0
+	}
+	D0 = (D0 << 16) + (D0 >> 16)
+	u16[0xffffeede] += D0.u16
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x05134c) end(0x0514a8)
+function void fn05134c()
+{
+	if (u8[0xffffb005] >= 0x06)
+		return
+
+	if ((camera.screenshake.state & 0x8000) == 0)
+	{
+		if (camera.screenshake.state != 0)
+			return
+
+		// Clear parts of the level chunks to get rid of the collision
+		A1 = 0xffff0079 + u16[A3 + 0x38]
+		D0.u16 = u16[A3 - 0x08]
+		D1 = 2
+		while (D1.s16 >= 0)
+		{
+		#if STANDALONE
+			u8[A1-1] = 0	// Need to clear one more chunk on the left for widescreen
+		#endif
+			u8[A1]   = 0
+			u8[A1+1] = 0
+			u8[A1+2] = 0
+			A1 += D0.u16
+			--D1.s16
+		}
+
+		A1 = 0xffffa902
+		A5 = 0xffffa93c
+		A6 = A5 + 0x28
+		D0.u16 = camera.foreground.y.u16 & level.height.tilemask
+		D1 = 9
+		while (D1.s16 >= 0)
+		{
+			u16[A1] = D0.u16
+			u32[A5] = 0
+			u32[A6] = 0
+			A1 += 4
+			A5 += 4
+			A6 += 4
+			--D1.s16
+		}
+
+		// Create collision objects that replace the terrain during collapse
+		//  -> There's an upper and a lower line of these objects
+		if (allocDynamicObjectStd())
+		{
+			D1.u16 = 0x3c90
+			D2 = 0x05c00790
+			D3 = 0xffffa93c
+			D4 = 9
+			while (D4.s16 >= 0)
+			{
+				objA1.update_address = 0x05180a
+				objA1.position.x.u16 = D1.u16
+				u16[A1 + 0x2e] = D2.u16
+				u32[A1 + 0x30] = D3
+				D2 = (D2 << 16) + (D2 >> 16)
+
+				if (!allocDynamicObjectAfterA1())
+					break
+
+				objA1.update_address = 0x05180a
+				objA1.position.x.u16 = D1.u16
+				u16[A1 + 0x2e] = D2.u16
+				u32[A1 + 0x30] = D3
+				D1.u16 += 0x20
+				D2 = (D2 << 16) + (D2 >> 16)
+				D3 += 4
+
+				if (!allocDynamicObjectAfterA1())
+					break
+
+				--D4.s16
+			}
+		}
+
+		camera.screenshake.state.hi = 0xff
+		u16[0xffffeed8] = 0
+		u8[0xffffeea2] = 0xff
+		gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
+	#if STANDALONE
+		verticalScrollOffsetBias = 0
+	#endif
+	}
+
+	A1 = 0xffffa900
+	A4 = A1 + 0x28
+	A5 = A4 + 0x14
+	A6 = 0x23d05c
+	D0.u16 = u16[0xffffeed8]
+	++u16[0xffffeed8]
+
+	D1 = 10
+	D2 = 9
+	while (D2.s16 >= 0)
+	{
+		if (D0.u16 >= u16[(A6+=2)-2])
+		{
+			u32[A1 + 0x64] += 0x0500
+		}
+		D3 = u32[A1 + 0x64]
+		u32[(A5+=4)-4] += D3
+		D3.u16 = u16[A5 - 0x04]
+		if (D3.u16 >= 0x02e0)
+		{
+			D3.u16 = 0x02e0
+			--D1.u16
+		}
+		D4.u16 = camera.foreground.y.u16 - D3.u16
+		u16[(A4+=2)-2] = D4.u16
+		u16[A1] = D4.u16
+		A1 += 4
+		--D2.s16
+	}
+
+	D0.u16 = (level.framecounter - 1) & 0x0f
+	if (D0.u16 == 0)
+	{
+		playSound(0xcc)
+	}
+
+	if (D1.u16 == 0)
+	{
+		A1 = 0xffff0079 + u16[A3 + 0x2c]
+		D0.u16 = u16[A3 - 0x08] - 3
+		D1 = 2
+		while (D1.s16 >= 0)
+		{
+			u8[(A1+=1)-1] = 0
+			u8[(A1+=1)-1] = 0
+			u8[(A1+=1)-1] = 0
+			A1 += D0.u16
+			--D1.s16
+		}
+
+		camera.screenshake.state = 0
+		u32[0xffffeeda] = 0
+		u16[0xffffeede] = camera.foreground.x.u16
+		gfx.plane_update_routine = 0x0c		// Leave vertical scroll mode again
+		u16[0xffffeec0] += 4
+	}
+}
+
+
+//# address-hook(0x0514aa) end(0x0514e4)
+function void fn0514aa()
+{
+	if (s16[0xffffeeb8] < 0)
+	{
+		if (u32[0xfffff680] == 0)
+		{
+			u16[0xffffeeb8] = 0xff
+		}
+	}
+
+	if (s16[0xffffeeb8] > 0)
+	{
+		D0.u16 = level.vertical_wrap
+		if (D0.u16 != 0 && D0.u16 != 0x01e0)
+		{
+			D0.u16 -= 2
+			if (D0.s16 < 0)
+			{
+				u16[0xffffeeb8] = 0
+				D0 = 0
+			}
+			level.vertical_wrap = D0.u16
+		}
+	}
+
+	D0.u16 = u16[0xffffb010]
+	D1.u16 = u16[0xffffb014]
+	D2.u16 = u16[0xffffeee2]
+	call 0x0514e8 + D2.s16
+}
+
+//# address-hook(0x0514e8) end(0x0514e8)
+function void fn0514e8()
+{
+	fn051504()
+}
+
+//# address-hook(0x0514ec) end(0x0514ec)
+function void fn0514ec()
+{
+	fn051560()
+}
+
+//# address-hook(0x0514f0) end(0x0514f0)
+function void fn0514f0()
+{
+	fn0515a4()
+}
+
+//# address-hook(0x0514f4) end(0x0514f4)
+function void fn0514f4()
+{
+	fn05160e()
+}
+
+//# address-hook(0x0514f8) end(0x0514f8)
+function void fn0514f8()
+{
+	fn051672()
+}
+
+//# address-hook(0x0514fc) end(0x0514fc)
+function void fn0514fc()
+{
+	fn05167c()
+}
+
+//# address-hook(0x051500) end(0x051500)
+function void fn051500()
+{
+	fn051698()
+}
+
+
+//# address-hook(0x051504) end(0x05155e)
+function void fn051504()
+{
+	A5 = 0xffffeee4
+	A1 = 0x23cf58
+	D2 = 4
+	D3 = 2
+	while (D3.s16 >= 0)
+	{
+		if (u8[A5] == 0)
+		{
+			if (D0.u16 >= u16[A1] && D0.u16 < u16[A1 + 2] && D1.u16 >= u16[A1 + 4] && D1.u16 < u16[A1 + 6])
+			{
+				u16[0xffffeee2] = D2.u16
+
+				D0.u16 = u16[A1 + 8]
+				move_area.bottom.current = D0.u16
+				move_area.bottom.target = D0.u16
+
+				D0.u16 = u16[A1 + 10]
+				if (D2.u16 == 4)
+				{
+					move_area.right = D0.u16
+				}
+				else
+				{
+					move_area.left = D0.u16
+				}
+			#if STANDALONE
+				// Make sure the screen mover gets stopped (in case it is active here), as it may mess up things here
+				screenmover_target.right = move_area.right
+			#endif
+				return
+			}
+		}
+
+		A1 += 12
+		++A5
+		D2.u16 += 4
+		--D3.s16
+	}
+}
+
+
+//# address-hook(0x051560) end(0x0515a2)
+function void fn051560()
+{
+	if (D0.u16 < 0x0780)
+	{
+		fn051656()
+		return
+	}
+
+	D0.u16 = move_area.right + (320 - getScreenWidth())
+	if (camera.position.x.u16 >= D0.u16)
+	{
+		move_area.left = D0.u16
+		u8[0xffffeee4] = 0xff
+		u16[0xffffeee2] += 0x0c
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x06bf2a
+			objA1.position.x.u16 = 0x08e0
+			objA1.position.y.u16 = 0x0690
+			camera.screenshake.state.hi = 0xff
+			u8[0xffffeeb4] = 0xff
+		}
+	}
+}
+
+
+//# address-hook(0x0515a4) end(0x05160c)
+function void fn0515a4()
+{
+	if (D0.u16 >= 0x3200)
+	{
+		level.vertical_wrap = 0x01df
+		fn051656()
+		return
+	}
+
+	D1.u16 = move_area.bottom.current
+	if (D1.u16 == camera.position.y.u16 && D1.u16 != level.vertical_wrap)
+	{
+		level.vertical_wrap = D1.u16
+		u8[0xffffeeb9] = 0xff
+	}
+
+	D0.u16 = move_area.left
+	if (D0.u16 >= camera.position.x.u16)
+	{
+		move_area.right = D0.u16
+		u8[0xffffeee5] = 0xff
+		u16[0xffffeee2] += 0x0c
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x06bf2a
+			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.position.x.u16 = 0x2fa0
+			objA1.position.y.u16 = 0x02d0
+			camera.screenshake.state.hi = 0xff
+			u8[0xffffeeb4] = 0xff
+		}
+	}
+}
+
+
+//# address-hook(0x05160e) end(0x051654)
+function void fn05160e()
+{
+	if (D0.u16 < 0x3480)
+	{
+		D0.u16 = move_area.left
+		if (D0.u16 >= camera.position.x.u16)
+		{
+			move_area.right = D0.u16 + getScreenExtend() * 2
+			u8[0xffffeee6] = 0xff
+			u16[0xffffeee2] += 0x0c
+
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x06bf2a
+				u8[A1 + 0x04] |= render_flag.FLIP_X
+				objA1.position.x.u16 = 0x3300
+				objA1.position.y.u16 = 0x0790
+				camera.screenshake.state.hi = 0xff
+				u8[0xffffeeb4] = 0xff
+			}
+		}
+	}
+	else
+	{
+		fn051656()
+	}
+}
+
+
+//# address-hook(0x051656) end(0x051670)
+function void fn051656()
+{
+	move_area.bottom.current = 0x1000
+	move_area.bottom.target = 0x1000
+	move_area.left = 0
+	move_area.right = 0x6000
+	u16[0xffffeee2] = 0
+}
+
+
+//# address-hook(0x051672) end(0x05167a)
+function void fn051672()
+{
+	if (u16[0xffffb010] >= 0x0980)
+	{
+		fn0516a2()
+	}
+}
+
+
+//# address-hook(0x05167c) end(0x051696)
+function void fn05167c()
+{
+	if (u16[0xffffb014] < 0x0100 && u16[0xffffb010] >= 0x2f80)
+	{
+		move_area.right = 0x6000
+		fn0516a2()
+	}
+}
+
+
+//# address-hook(0x051698) end(0x0516b2)
+function void fn051698()
+{
+	if (u16[0xffffb010] < 0x3200)
+	{
+		fn0516a2()
+	}
+}
+
+
+//# address-hook(0x0516a2)
+function void fn0516a2()
+{
+	D0.u16 = 0x1000
+	move_area.bottom.current = D0.u16
+	move_area.bottom.target = D0.u16
+	u16[0xffffeee2] = 0
+}
+
+
+//# address-hook(0x0516b4) end(0x0516b8)
+function void fn0516b4()
+{
+	call 0x0516bc + s16[0xffffeed6]
+}
+
+//# address-hook(0x0516bc) end(0x0516bc)
+function void fn0516bc()
+{
+	fn0516d2()
+}
+
+//# address-hook(0x0516c0) end(0x0516c0)
+function void fn0516c0()
+{
+	fn05172a()
+}
+
+//# address-hook(0x0516c4) end(0x0516c4)
+function void fn0516c4()
+{
+	fn051748()
+}
+
+//# address-hook(0x0516c8) end(0x0516c8)
+function void fn0516c8()
+{
+	fn051748()
+}
+
+//# address-hook(0x0516cc) end(0x0516cc)
+function void fn0516cc()
+{
+	fn0517c4()
+}
+
+//# address-hook(0x0516d0) end(0x0516d0)
+function void fn0516d0()
+{
+}
+
+
+//# address-hook(0x0516d2) end(0x051724)
+function void fn0516d2()
+{
+	D0.u16 = u16[0xffffb010]
+	D1.u16 = u16[0xffffb014]
+
+	A1 = 0x23cf7c
+	D2 = 4
+	D3 = 2
+	while (D3.s16 >= 0)
+	{
+		if (D0.u16 >= u16[A1] && D0.u16 < u16[A1 + 2] && D1.u16 >= u16[A1 + 4] && D1.u16 < u16[A1 + 6])
+		{
+			if (D2.u16 != 4 || (camera.screenshake.state & 0x8000))
+			{
+				u16[0xffffeed6] = D2.u16
+				u16[0xffffeed8] = 0
+				u16[0xffffeeda] = 0
+				u16[0xffffeedc] = u16[A1 + 0x08]
+				u16[0xffffeede] = u16[A1 + 0x0a]
+
+				fn05172a()
+				return
+			}
+		}
+
+		A1 += 12
+		D2.u16 += 4
+		--D3.s16
+	}
+}
+
+
+//# address-hook(0x05172a) end(0x051746)
+function void fn05172a()
+{
+	D0.u16 = u16[0xffffeed8]
+	if (D0.u16 >= 0x5c)
+	{
+		camera.screenshake.state = 0
+		u16[0xffffeeb4] = 0
+		move_area.left = 0
+		u16[0xffffeed6] = 0x10
+	}
+	else
+	{
+		fn051762()
+	}
+}
+
+
+//# address-hook(0x051748) end(0x051760)
+function void fn051748()
+{
+	D0.u16 = u16[0xffffeed8]
+	if (D0.u16 >= 0x5c)
+	{
+		D0.u16 = 0x6000
+		move_area.right = D0.u16
+		u16[0xffffeed6] = 0x14
+	}
+	else
+	{
+		fn051762()
+	}
+}
+
+
+//# address-hook(0x051762) end(0x0517c2)
+function void fn051762()
+{
+	--u16[0xffffeeda]
+	if (s16[0xffffeeda] < 0)
+	{
+		u16[0xffffeeda] = 6
+		D2.u16 = D0.u16
+		fn0517d6()
+
+		D0.u16 = u16[0xffffeedc] - camera.foreground.x.u16 + 0x80
+		if (D0.s16 >= 0 && D0.u16 < 0x01c0)
+		{
+			D0.u16 = u16[0xffffeede]
+			A1 = 0x23cfa0
+			D0.u16 += u16[A1 + D2.s16]
+			D2.u16 = u16[A1 + D2.s16 + 0x02]
+
+			while (D2.s16 >= 0)
+			{
+				D3.u16 = camera.foreground.y.u16 & level.height.tilemask
+				if (D0.u16 >= D3.u16)
+				{
+					D3.u16 += 0xf0
+					if (D0.u16 < D3.u16)
+					{
+						D1.u16 = u16[0xffffeedc]
+						D6 = 8
+						D2 = (D2 << 16) + (D2 >> 16)
+						LoadTileContentSingleLine()
+						D2 = (D2 << 16) + (D2 >> 16)
+					}
+				}
+				D0.u16 += 0x10
+				--D2.s16
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0517c4) end(0x0517d4)
+function void fn0517c4()
+{
+	if (u16[0xffffb010] >= 0x2a00)
+	{
+		u16[0xffffeed6] = 0
+		D0 = 0x5c
+		fn0517d6()
+	}
+}
+
+
+//# address-hook(0x0517d6) end(0x051808)
+function void fn0517d6()
+{
+	A1 = 0x23cffc
+	A5 = 0xffff5880
+	fn0517ea()
+
+	A5 = 0xffff7500
+	fn0517ea()
+}
+
+
+function void fn0517ea()
+{
+	A4 = 0x3cbbb4 + u16[A1 + D0.s16]
+	copyMemory(A5, A4, 0x80)
+
+	D0.u16 += 2
+	u16[0xffffeed8] = D0.u16
+}
+
+
+
+// Collision objects the character can stand on shortly during the collapse at MGZ 2 boss startup
+
+//# address-hook(0x05180a) end(0x05183c)
+function void fn05180a()
+{
+	if (u16[0xffffeec0] == 8)
+	{
+		UnloadObject()
+		return
+	}
+
+	A1 = u32[A0 + 0x30]
+	D0.u16 = objA0.countdown_value + u16[A1]
+	objA0.position.y.u16 = D0.u16
+	objA0.box_size.x = 0x10
+	objA0.flags2a |= 0x80
+
+	D1 = 0x1b
+	D2 = 0x40
+	D3 = 0x40
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+}
+
+
+
+//# address-hook(0x051842) end(0x0518f4)
+function void InitLevelScrolling.MGZ2()
+{
+	fn0519b2()
+	level.scrolling_routine = 0x04
+	u16[0xffffeea2] = 0
+
+	D0.u16 = u16[0xffffb010]
+	D1.u16 = u16[0xffffb014]
+	if (D1.u16 < 0x0500)
+	{
+		if (D0.u16 >= 0x3800)
+		{
+			level.display_routine = 0x04
+			D1 = 0x051abc
+			if (D0.u16 < 0x3a80)
+			{
+				if (allocDynamicObjectStd())
+				{
+					u32[A1] = D1
+				}
+			}
+			else
+			{
+				u16[0xffffeed4] = 0x0220
+			}
+		}
+	}
+	else if (D1.u16 >= 0x0800)
+	{
+		if (D0.u16 >= 0x34c0)
+		{
+			level.display_routine = 0x08
+			D1 = 0x051ad0
+			if (D0.u16 < 0x3800)
+			{
+				if (allocDynamicObjectStd())
+				{
+					u32[A1] = D1
+				}
+			}
+			else
+			{
+				u16[0xffffeed4] = 0x01d0
+			}
+		}
+	}
+	else
+	{
+		if (D0.u16 >= 0x3900)
+		{
+			level.display_routine = 0x0c
+			u16[0xffffeed4] = 0x01d0
+			u8[0xffffeee0] = 0xff
+			u32[0xffffa838] = 0
+		}
+	}
+
+	fn23d1d0()
+	fn04f2f6()
+
+	u32[0xffffa800] = 0
+	u16[0xffffa806] = D2.u16
+
+	A4 = 0x23d494
+	A5 = 0xffffa800
+	fn04ecec()
+
+	A4 = 0x23d498
+	A5 = 0xffffa808
+	fn04f0ce()
+}
+
+
+//# address-hook(0x0518f8) end(0x0518fc)
+function void UpdateLevelScrolling.MGZ2()
+{
+	call 0x051900 + level.scrolling_routine
+}
+
+
+//# address-hook(0x051900) end(0x051900)
+function void fn051900()
+{
+	fn05190c()
+}
+
+//# address-hook(0x051904) end(0x051904)
+function void fn051904()
+{
+	fn05191a()
+}
+
+//# address-hook(0x051908) end(0x051908)
+function void fn051908()
+{
+	fn05198e()
+}
+
+
+//# address-hook(0x05190c) end(0x051918)
+function void fn05190c()
+{
+	fn0519b2()
+	u32[0xffffa800] = 0
+	level.scrolling_routine += 4
+	fn051968()
+}
+
+
+//# address-hook(0x05191a) end(0x051920)
+function void fn05191a()
+{
+	fn0519c4()
+	if (_equal())
+	{
+		fn23d1d0()
+		fn051926()
+	}
+	else
+	{
+		fn051968()
+	}
+}
+
+
+//# address-hook(0x051926) end(0x051966)
+function void fn051926()
+{
+	A4 = 0x23d494
+	A5 = 0xffffa800
+	D6 = 0x20
+	D5 = 0x02
+	fn04edf6()
+
+	A4 = 0x23d498
+	A5 = 0xffffa808
+	fn04f0ce()
+
+	A4 = 0x23d070
+	A5 = 0xffffa926
+	UpdateVerticalScrollOffsetsDuringCollapse()
+
+#if STANDALONE
+	// Set additional vertical scroll offsets on the right
+	u16 rows = (getScreenWidth() + 15) / 16
+	for (u16 row = 20; row < rows; ++row)
+	{
+		Renderer.setScrollOffsetV(1, row, u16[0xffffeeea + (row - 20) * 4])
+	}
+#endif
+
+	fn04f386()
+	UpdateScreenShake()
+
+	if (level.dualplanecollision != 0)
+	{
+		fn0569dc()
+	}
+}
+
+
+//# address-hook(0x051968) end(0x05198c)
+function void fn051968()
+{
+	fn23d1d0()
+	fn04f2f6()
+
+	u16[0xffffa806] = D2.u16
+	u16[0xffffeec8] = (D0.u16 + getScreenHeight()) & level.height.tilemask
+	u16[0xffffeeca] = 0x0f
+	level.scrolling_routine += 4
+	fn051994()
+}
+
+
+//# address-hook(0x05198e) end(0x05198e)
+function void fn05198e()
+{
+	fn23d1d0()
+	fn051994()
+}
+
+
+//# address-hook(0x051994) end(0x0519ae)
+function void fn051994()
+{
+	A4 = 0x23d494
+	A5 = 0xffffa7fc
+	D1.u16 = camera.background.y.u16
+	fn04f030()
+	if (!_negative())
+	{
+		fn051926()
+	}
+	else
+	{
+		level.scrolling_routine -= 4
+		fn051926()
+	}
+}
+
+
+//# address-hook(0x0519b2) end(0x0519c2)
+function void fn0519b2()
+{
+	D0.u16 = u16[A3] + 8
+	u16[A3 + 0x74] = D0.u16
+	u16[A3 + 0x78] = D0.u16
+	u16[A3 + 0x7c] = D0.u16
+}
+
+
+//# address-hook(0x0519c4) end(0x0519d8)
+function void fn0519c4()
+{
+	if (u16[0xffffeea2] != 0)
+	{
+		_setZeroFlagByValue(1)
+		return
+	}
+
+	D0.u16 = u16[0xffffb010]
+	D1.u16 = u16[0xffffb014]
+	D2.u16 = level.display_routine
+	call 0x0519dc + D2.s16
+}
+
+
+//# address-hook(0x0519dc) end(0x0519dc)
+function void fn0519dc()
+{
+	fn051a6a()
+}
+
+//# address-hook(0x0519e0) end(0x0519e0)
+function void fn0519e0()
+{
+	fn051a3c()
+}
+
+//# address-hook(0x0519e4) end(0x0519e4)
+function void fn0519e4()
+{
+	fn051a04()
+}
+
+
+//# address-hook(0x0519e8) end(0x051a02)
+function void fn0519e8()
+{
+	level.dualplanecollision = 0
+	if (D1.u16 < 0x0800 || D0.u16 < 0x3a40)
+	{
+		_setZeroFlagByValue(0)
+	}
+	else
+	{
+		level.display_routine = 0x08
+		_setZeroFlagByValue(1)
+	}
+}
+
+
+//# address-hook(0x051a04) end(0x051a3a)
+function void fn051a04()
+{
+	// Sonic's / Tails' earthquake sequence
+	level.dualplanecollision = 0xff
+
+#if STANDALONE
+	// Render background in two parts to avoid background blur being applied to the grass
+	s16 splitY = 0x200 - camera.background.y.u16
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.setupPlane(0, 0, getScreenWidth(), splitY, 0x00, 0, 0x1000)
+	Renderer.setupPlane(0, splitY, getScreenWidth(), getScreenHeight() - splitY, 0x00, 0, 0x1800)
+#endif
+
+	u16 newLevelDisplayRoutine = 0xffff
+	if (D1.u16 < 0x0800)
+	{
+		if (D0.u16 >= 0x3900)
+		{
+			u8[0xffffeee0] = 0xff
+			u32[0xffffa838] = 0
+			newLevelDisplayRoutine = 0x0c
+		}
+	}
+	else
+	{
+		if (D1.u16 < 0x0900 && D0.u16 < 0x34c0)
+		{
+			newLevelDisplayRoutine = 0
+		}
+	}
+
+	if (newLevelDisplayRoutine != 0xffff)
+	{
+		level.display_routine = newLevelDisplayRoutine
+		D0 = -1
+	}
+	else
+	{
+		D0 = 0
+	}
+	_setZeroFlagByValue(D0)
+}
+
+
+//# address-hook(0x051a3c) end(0x051a68)
+function void fn051a3c()
+{
+	// Knuckles' earthquake sequence
+	if (D1.u16 < 0x0100 && D0.u16 >= 0x3c00)
+	{
+		level.dualplanecollision = 0
+	}
+	else
+	{
+		level.dualplanecollision = 0xff
+
+	#if STANDALONE
+		// Render background in two parts to avoid background blur being applied to the grass
+		s16 splitY = 0x200 - camera.background.y.u16
+		Renderer.enableDefaultPlane(0, false)
+		Renderer.setupPlane(0, 0, getScreenWidth(), splitY, 0x00, 0, 0x1000)
+		Renderer.setupPlane(0, splitY, getScreenWidth(), getScreenHeight() - splitY, 0x00, 0, 0x1800)
+	#endif
+	}
+
+	if (D1.u16 < 0x80 || D1.u16 >= 0x0180 || D0.u16 >= 0x3800)
+	{
+		D0 = 0
+	}
+	else
+	{
+		level.display_routine = 0
+		D0 = -1
+	}
+	_setZeroFlagByValue(D0)
+}
+
+
+//# address-hook(0x051a6a) end(0x051aba)
+function void fn051a6a()
+{
+	level.dualplanecollision = 0
+	u16 newLevelDisplayRoutine = 0
+
+	if (D1.u16 >= 0x80)
+	{
+		if (D1.u16 < 0x0180 && D0.u16 >= 0x3800)
+		{
+			newLevelDisplayRoutine = 4
+			D1 = 0x051abc
+		}
+		else if (D1.u16 >= 0x0800 && D1.u16 < 0x0900 && D0.u16 >= 0x34c0)
+		{
+			newLevelDisplayRoutine = 8
+			D1 = 0x051ad0
+		}
+	}
+
+	if (newLevelDisplayRoutine != 0)
+	{
+		level.display_routine = newLevelDisplayRoutine
+		u16[0xffffeed4] = 0
+
+		if (allocDynamicObjectStd())
+		{
+			u32[A1] = D1
+		}
+	}
+	_setZeroFlagByValue(newLevelDisplayRoutine)
+}
+
+
+// Earthquake area handler object
+
+//# address-hook(0x051abc) end(0x051ace)
+function void fn051abc()
+{
+	// For Knuckles
+	D0 = 4
+	D1.u16 = 0x0400
+	D2.u16 = 0x38a0
+	D3.u16 = 0x0220
+	D4.u16 = 0x6000
+	fn051ae6()
+}
+
+
+//# address-hook(0x051ad0) end(0x051ae2)
+function void fn051ad0()
+{
+	// For Sonic / Tails
+	D0 = 8
+	D1.u16 = 0x0a80
+	D2.u16 = 0x36d0
+	D3.u16 = 0x01d0
+	D4.u16 = 0x6000
+	objA0.flags38 = 0xff
+	fn051ae6()
+}
+
+
+//# address-hook(0x051ae6) end(0x051b16)
+function void fn051ae6()
+{
+	if (D0.u16 != level.display_routine)
+	{
+		UnloadObject()
+		return
+	}
+
+	if (D1.u16 >= u16[0xffffb014] || D2.u16 >= u16[0xffffb010])
+		return
+
+	objA0.countdown_value = D3.u16
+	objA0.value32 = D4.u16
+	move_area.left = camera.foreground.x.u16
+	knuckles.preventclimbing |= 0x80
+
+	objA0.update_address = 0x051b1c
+	fn051b1c()
+}
+
+
+//# address-hook(0x051b1c) end(0x051b92)
+function void fn051b1c()
+{
+	D0.u16 = u16[0xffffeed4]
+	if (D0.u16 >= objA0.countdown_value)
+	{
+		playSound(0x5f)
+		camera.screenshake.state = 0x0e
+		u16[0xffffeeb4] = 0
+		knuckles.preventclimbing &= ~0x80
+		UnloadObject()
+		return
+	}
+
+	D2.u16 = u16[0xffffb010]
+	D3.u16 = u16[0xffffb014]
+	if (objA0.value39 != 0)
+	{
+		D1.u16 = D0.u16
+		++D1.u16
+	}
+	else
+	{
+		if (objA0.flags38 == 0)
+		{
+			if (D3.u16 < 0x0200 && D2.u16 < 0x3cb0)
+			{
+				objA0.value39 = 0xff
+			}
+		}
+		else
+		{
+			if (D2.u16 >= 0x3d50)
+			{
+				objA0.value39 = 0xff
+			}
+		}
+
+		D1 = objA0.countdown_callback + u32[A0 + 0x30]
+		objA0.countdown_callback = D1
+		D1 = (D1 << 16) + (D1 >> 16)
+	}
+
+	u16[0xffffeed4] = D1.u16
+	D1.u16 -= D0.u16
+	u16[0xffffb014] -= D1.u16
+	u16[0xffffb05e] -= D1.u16
+}
+
+
+
+
+// Background handling
+//  -> In MGZ 2, the background is partly used as second foreground layer
+
+//# address-hook(0x23d1d0) end(0x23d1d4)
+function void fn23d1d0()
+{
+	call 0x23d1d8 + level.display_routine
+}
+
+//# address-hook(0x23d1d8) end(0x23d1d8)
+function void fn23d1d8()
+{
+	fn23d21e()
+}
+
+//# address-hook(0x23d1dc) end(0x23d1dc)
+function void fn23d1dc()
+{
+	fn23d1f4()
+}
+
+//# address-hook(0x23d1e0) end(0x23d1e0)
+function void fn23d1e0()
+{
+	fn23d1ea()
+}
+
+//# address-hook(0x23d1e4) end(0x23d1e8)
+function void fn23d1e4()
+{
+	D1.u16 = 0x0500
+	fn23d220()
+}
+
+
+//# address-hook(0x23d1ea) end(0x23d1f2)
+function void fn23d1ea()
+{
+	D1.u16 = 0x08f0
+	D2.u16 = 0x3200
+	fn23d1fc()
+}
+
+
+//# address-hook(0x23d1f4) end(0x23d218)
+function void fn23d1f4()
+{
+	D1.u16 = 0x01e0
+	D2.u16 = 0x3580
+	fn23d1fc()
+}
+
+
+//# address-hook(0x23d1fc) end(0x23d21c)
+function void fn23d1fc()
+{
+	camera.background.x.u16 = camera.foreground.x.u16 - D2.u16
+	camera.background.y.u16 = camera.foreground.y.u16 - D1.u16 + u16[0xffffeed4]
+	u16[0xffffa804] = camera.background.x.u16
+	u16[0xffffa836] = camera.background.x.u16
+
+	fn23d24c()
+}
+
+
+//# address-hook(0x23d21e) end(0x23d21e)
+function void fn23d21e()
+{
+	D1 = 0
+	fn23d220()
+}
+
+
+//# address-hook(0x23d220) end(0x23d248)
+function void fn23d220()
+{
+	D2.u16 = camera.screenshake.offset
+	D0.u16 = camera.foreground.y.u16 - camera.screenshake.offset - D1.u16
+	D0 = (D0 << 16)
+	D0.s32 >>= 4
+	D0 *= 3
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 += D2.u16
+	camera.background.x.u16 = 0
+	camera.background.y.u16 = D0.u16
+	u16[0xffffa804] = 0
+	u16[0xffffa836] = 0
+	fn23d24c()
+}
+
+
+//# address-hook(0x23d24c) end(0x23d2bc)
+function void fn23d24c()
+{
+	D0.u16 = (u16[0xffffeec0] == 8) ? u16[0xffffeede] : camera.foreground.x.u16
+	D0 = (D0 << 16)
+	D0.s32 >>= 1
+	D1 = D0
+	D1.s32 >>= 3
+	D2 = D1
+	D2.s32 >>= 2
+
+	A1 = 0xffffa836
+	D3 = 7
+	while (D3.s16 >= 0)
+	{
+		u16[A1-=2] = D0 >> 16
+		D0 -= D1
+		--D3.s16
+	}
+
+	if (u16[0xffffeee0] == 0)
+	{
+		u32[0xffffa838] += 0x0800
+	}
+	D1 = u32[0xffffa838]
+
+	A1 = 0xffffa808
+	A5 = 0x23d4c8
+	D0 = D2
+	D2.s32 >>= 1
+	D3 = 0x0e
+	while (D3.s16 >= 0)
+	{
+		D4.u16 = u16[(A5+=2)-2]
+		D0 += D1
+		u16[A1 + D4.s16] = D0 >> 16
+		D0 += D2
+		--D3.s16
+	}
+
+	A5 = 0x23d4e6
+	D0 = 0x16
+	while (D0.s16 >= 0)
+	{
+		D1.u16 = u16[(A5+=2)-2]
+		u16[(A1+=2)-2] += D1.u16
+		--D0.s16
+	}
+}
+
+
+
+// Used in earthquake sequence
+
+//# address-hook(0x0569dc) end(0x056a10)
+function void fn0569dc()
+{
+	push(A3)
+	push(A2)
+	push(A0)
+	push(D7)
+
+	A1 = 0xffffb000
+	if (u8[A1 + 0x2a] & 0x08)
+	{
+		A0 = 0xffff0000 + u16[A1 + 0x42]
+		fn01e580()
+	}
+
+	A1 = 0xffffb04a
+	if (u8[A1 + 0x2a] & 0x08)
+	{
+		A0 = 0xffff0000 + u16[A1 + 0x42]
+		fn01e580()
+	}
+
+	D7 = pop()
+	A0 = pop()
+	A2 = pop()
+	A3 = pop()
+}

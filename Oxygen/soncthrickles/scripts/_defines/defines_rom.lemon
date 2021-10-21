@@ -1,0 +1,19 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// ROM Locations                                         //
+//-------------------------------------------------------//
+
+// This is just meant as documentation, not relevant for scripts
+
+
+// 0x00398e = Palette colors for fading between Sonic's usual colors and his Super palette.
+//             -> 6 entries of three u16 values each.

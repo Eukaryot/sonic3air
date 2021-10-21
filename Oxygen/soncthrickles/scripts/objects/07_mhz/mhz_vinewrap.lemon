@@ -1,0 +1,308 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Vine Wrap                                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x03dc9c) end(0x03dcca)
+function void fn03dc9c()
+{
+	objA0.box_size.x = 0xd0
+	if (objA0.flags2a & 0x01)
+	{
+		// Vine from lower left to upper right
+		objA0.update_address = 0x03de6a
+		fn03de6a()
+	}
+	else
+	{
+		// Vine from upper left to lower right
+		objA0.update_address = 0x03dcba
+		fn03dcba()
+	}
+}
+
+
+//# address-hook(0x03dcba) end(0x03dcca)
+function void fn03dcba()
+{
+	A1 = 0xffffb000
+	D6 = 3
+	fn03dcd0()
+
+	A1 = 0xffffb04a
+	++D6.u8
+	fn03dcd0()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03dcd0) end(0x03de68)
+function void fn03dcd0()
+{
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+			if (objA1.velocity.x > 0)
+			{
+				// Going right, possibly down the vine
+				if (D0.s16 > -0x30 || D0.s16 < -0x40)
+					return
+
+				D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
+				if (D1.u16 >= 0x20 || u8[A1 + 0x2e] != 0)
+					return
+
+				u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
+				LetSonicClimbOnObject()
+				u8[A1 + 0x2d] = 0x80
+
+				u16[A1 + 0x32] = 20
+				if (u16[A1 + 0x1c] < 0x600)
+				{
+					u16[A1 + 0x1c] = 0x600
+				}
+			}
+			else if (objA1.velocity.x < 0)
+			{
+				// Going left, possibly up the vine
+				if (D0.s16 < 0x30 || D0.s16 > 0x40)
+					return
+
+				D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x10
+				if (D1.u16 >= 0x20 || u8[A1 + 0x2e] != 0)
+					return
+
+				u8[A1 + 0x2a] |= char.flag.FACING_LEFT
+				LetSonicClimbOnObject()
+				u8[A1 + 0x2d] = 0x80
+				u8[A1 + 0x27] = 0x80	// Set rotation
+
+			#if STANDALONE
+				// Enforce a brief blocking of left/right inputs in any case, so the character can't just stop in between in a somewhat broken hovering state
+				u16[A1 + 0x32] = 20
+			#endif
+				if (s16[A1 + 0x1c] > -0x600)
+				{
+					s16[A1 + 0x1c] = -0x600
+					u16[A1 + 0x32] = 20
+				}
+			}
+		}
+		return
+	}
+
+	D0.u16 = abs(s16[A1 + 0x1c])
+	if (D0.u16 >= 0x0500)
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x40
+			if (D0.s16 >= 0)
+			{
+				if (D0.u16 < 0x80)
+				{
+					if ((u8[A1 + 0x2a] & 0x08) == 0)
+						return
+
+					D2.u16 = D0.u16
+					D0.u8 += 0x80
+					LookupSinCos()
+					D3.u16 = D1.u16
+					D1.s16 >>= 4
+					D1.u16 += objA0.position.y.u16
+					D0 = u8[A1 + 0x1e]
+					D0.s32 = s32(D0.s16) * D3.s16
+					D0.s16 >>= 8
+					D1.u16 += D0.u16
+					objA1.position.y.u16 = D1.u16
+					u8[A1 + 0x27] = D2.u8
+				}
+				else
+				{
+					u8[A1 + 0x2a] &= ~0x08
+					objA0.flags2a &= ~(1 << D6.u8)
+					u8[A1 + 0x26] = 0x80
+					u8[A1 + 0x27] = 0
+					u8[A1 + 0x2d] = 0
+					s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+					objA1.velocity.x = -objA1.velocity.x
+					u8[A1 + 0x2a] |= 0x01
+				}
+			}
+			else
+			{
+				u8[A1 + 0x2a] &= ~0x08
+				objA0.flags2a &= ~(1 << D6.u8)
+				u8[A1 + 0x26] = 0
+				u8[A1 + 0x27] = 0
+				u8[A1 + 0x2d] = 0
+			}
+			return
+		}
+	}
+	else
+	{
+		u8[A1 + 0x27] = 0
+	}
+
+	u8[A1 + 0x2a] &= ~0x08
+	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x30] = 0
+	u8[A1 + 0x31] = 0x04
+	u8[A1 + 0x2d] = 0
+}
+
+
+//# address-hook(0x03de6a) end(0x03de7a)
+function void fn03de6a()
+{
+	A1 = 0xffffb000
+	D6 = 3
+	fn03de80()
+
+	A1 = 0xffffb04a
+	++D6.u8
+	fn03de80()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03de80) end(0x03e016)
+function void fn03de80()
+{
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+			if (objA1.velocity.x != 0)
+			{
+				if (objA1.velocity.x > 0)
+				{
+					// Going right, possibly up the vine
+					if (D0.s16 > -0x30 || D0.s16 < -0x40)
+						return
+
+					D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x10
+					if (D1.u16 >= 0x20)
+						return
+					if (u8[A1 + 0x2e] != 0)
+						return
+
+					u8[A1 + 0x2a] &= ~0x01
+					LetSonicClimbOnObject()
+					u8[A1 + 0x27] = 0x80
+					u8[A1 + 0x2d] = 0x84
+
+				#if STANDALONE
+					// Enforce a brief blocking of left/right inputs in any case, so the character can't just stop in between in a somewhat broken hovering state
+					u16[A1 + 0x32] = 20
+				#endif
+					if (s16[A1 + 0x1c] < 0x600)
+					{
+						u16[A1 + 0x1c] = 0x600
+						u16[A1 + 0x32] = 20
+					}
+				}
+				else
+				{
+					// Going left, possibly down the vine
+					if (D0.s16 < 0x30 || D0.s16 > 0x40)
+						return
+
+					D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
+					if (D1.u16 >= 0x20)
+						return
+					if (u8[A1 + 0x2e] != 0)
+						return
+
+					u8[A1 + 0x2a] |= 0x01
+					LetSonicClimbOnObject()
+					u8[A1 + 0x2d] = 0x84
+
+					u16[A1 + 0x32] = 20
+					if (s16[A1 + 0x1c] > -0x600)
+					{
+						s16[A1 + 0x1c] = -0x600
+					}
+				}
+			}
+		}
+		return
+	}
+
+	D0.u16 = abs(s16[A1 + 0x1c])
+	if (D0.u16 >= 0x0500)
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x40
+			if (D0.s16 >= 0)
+			{
+				if (D0.u16 < 0x80)
+				{
+					if ((u8[A1 + 0x2a] & 0x08) == 0)
+						return
+
+					D2.u16 = D0.u16
+					LookupSinCos()
+					D3.u16 = D1.u16
+					D1.s16 >>= 4
+					D1.u16 += objA0.position.y.u16
+					D0 = 0
+					D0.u8 = u8[A1 + 0x1e]
+					D0.s32 = s32(D0.s16) * D3.s16
+					D0.s16 >>= 8
+					D1.u16 += D0.u16
+					objA1.position.y.u16 = D1.u16
+					D2.u8 -= 0x80
+					D2.s8 = -D2.s8
+					u8[A1 + 0x27] = D2.u8
+				}
+				else
+				{
+					u8[A1 + 0x2a] &= ~0x08
+					objA0.flags2a &= ~(1 << D6.u8)
+					u8[A1 + 0x26] = 0
+					u8[A1 + 0x27] = 0
+					u8[A1 + 0x2d] = 0
+				}
+			}
+			else
+			{
+				u8[A1 + 0x2a] &= ~0x08
+				objA0.flags2a &= ~(1 << D6.u8)
+				u8[A1 + 0x26] = 0x80
+				u8[A1 + 0x27] = 0
+				u8[A1 + 0x2d] = 0
+				s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+				objA1.velocity.x = -objA1.velocity.x
+				u8[A1 + 0x2a] &= ~0x01
+			}
+			return
+		}
+	}
+	else
+	{
+		u8[A1 + 0x27] = 0
+	}
+
+	u8[A1 + 0x2a] &= ~0x08
+	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x30] = 0
+	u8[A1 + 0x31] = 0x04
+	u8[A1 + 0x2d] = 0
+}

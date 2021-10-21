@@ -1,0 +1,150 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x046d9e) end(0x046e16)
+function void fn046d9e()
+{
+	u16[A0 + 0x44] = objA0.position.x.u16
+	D2.u16 = objA0.position.x.u16 - 0x70
+	D1 = 7
+	D4 = 1
+	A1 = A0
+
+	while (true)
+	{
+		objA1.update_address = 0x046e4c
+		objA1.position.x.u16 = D2.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u16[A1 + 0x44] = u16[A0 + 0x44]
+		u16[A1 + 0x46] = objA0.position.y.u16
+		u32[A1 + 0x0c] = 0x046f7a
+		u16[A1 + 0x0a] = 0x234d
+		u8[A1 + 0x04] |= 0x04
+		u8[A1 + 0x07] = 0x10
+		u8[A1 + 0x06] = 0x10
+		u16[A1 + 0x08] = 0x0280
+		u8[A1 + 0x2a] |= 0x80
+		u16[A1 + 0x3e] = A0.u16
+		u16[A1 + 0x38] = D4.u16
+		++D4.u16
+		D2.u16 += 0x20
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+	}
+
+	objA0.update_address = 0x046e1c
+	fn046e1c()
+}
+
+
+//# address-hook(0x046e1c) end(0x046e46)
+function void fn046e1c()
+{
+	u16[A0 + 0x30] = u16[A0 + 0x34]
+	objA0.value32 = u16[A0 + 0x36]
+	u16[A0 + 0x34] = 0
+	u16[A0 + 0x36] = 0
+
+	D0.u16 = abs(s16(objA0.position.y.u16 - u16[A0 + 0x46]))
+	if (D0.u16 >= 0x70)
+	{
+		objA0.flags2e = 0x01
+	}
+	fn046e4c()
+}
+
+
+//# address-hook(0x046e4c) end(0x046ed2)
+function void fn046e4c()
+{
+	A1 = 0xffff0000 + objA0.value3e
+
+	D0.u16 = u16[A1 + 0x30]
+	if (D0.u16 != 0)
+	{
+		s16 offset = u16[A0 + 0x38] + D0.u16 * 8 - 9
+		D0.s16 = s8[0x046ed8 + offset] * 2
+	}
+
+	D1.u16 = u16[A1 + 0x32]
+	if (D1.u16 != 0)
+	{
+		s16 offset = u16[A0 + 0x38] + (D1.u16 * 8) - 9
+		D1.s16 = s8[0x046ed8 + offset] * 2
+	}
+
+	D0.u16 += D1.u16
+	D0.s32 = D0.s16
+	u32[A0 + 0x3a] += D0
+
+	D0 = u32[A0 + 0x3a]
+	objA0.position.y += D0
+	if (objA0.flags2a & 0x08)
+	{
+		u16[A1 + 0x34] = u16[A0 + 0x38]
+	}
+	if (objA0.flags2a & 0x10)
+	{
+		u16[A1 + 0x36] = u16[A0 + 0x38]
+	}
+	if (u8[A1 + 0x2e] != 0)
+	{
+		objA0.update_address = 0x046f18
+	}
+
+	D1.u16 = 0x1b
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x046f18) end(0x046f22)
+function void fn046f18()
+{
+	u32[A0 + 0x3a] = s32[A0 + 0x3a] << 2
+	objA0.update_address = 0x046f28
+	fn046f28()
+}
+
+
+//# address-hook(0x046f28) end(0x046f74)
+function void fn046f28()
+{
+	u32[A0 + 0x3a] += 0x1000
+	objA0.position.y += u32[A0 + 0x3a]
+
+	D0.u16 = move_area.bottom.current + 0x0110
+	if (D0.s16 <= s16(objA0.position.y.u16))
+	{
+		objA0.position.x.u16 = 0x7f00
+		u16[A0 + 0x44] = 0x7f00
+	}
+
+	D1.u16 = 0x1b
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	fn01e580()
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}

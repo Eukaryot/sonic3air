@@ -1,0 +1,264 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// MGZ Large Column to run down in a spiral              //
+//-------------------------------------------------------//
+
+//# address-hook(0x033c74) end(0x033c80)
+function void fn033c74()
+{
+	u16[A0 + 0x3c] = objA0.subtype2c * 16
+	objA0.update_address = 0x033c86
+	fn033c86()
+}
+
+
+//# address-hook(0x033c86) end(0x033ca6)
+function void fn033c86()
+{
+	A1 = 0xffffb000
+	A2 = A0 + 0x30
+	D6 = 3
+	D5.u16 = control.player1
+	fn033cac()
+
+	A1 = 0xffffb04a
+	A2 = A0 + 0x36
+	++D6.u8
+	D5.u16 = control.tails
+	fn033cac()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x033cac) end(0x033f64)
+function void fn033cac()
+{
+	u8 bit = 1 << D6.u8
+	if ((objA0.flags2a & bit) == 0)
+	{
+		if (u8[A2 + 0x04] != 0)
+		{
+			--u8[A2 + 0x04]
+			if (u8[A2 + 0x04] == 0)
+			{
+				u8[A1 + 0x2e] &= ~0x01
+			}
+
+			D0.s32 = objA1.velocity.x
+			D0 <<= 8
+			u32[A1 + 0x10] += D0
+			D0.s32 = objA1.velocity.y
+			objA1.velocity.y += 0x38
+			D0 <<= 8
+			u32[A1 + 0x14] += D0
+			return
+		}
+
+		D1 = u8[A1 + 0x1e] + 0x24
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		D1.u16 *= 2
+		if (D0.u16 < D1.u16)
+		{
+			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16
+			if (D0.u16 < 0x20)
+			{
+				if (u8[A1 + 0x2e] == 0 && debug_mode.state == 0 && (u8[A1 + 0x2a] & 0x02) == 0)
+				{
+					D0.u8 = u8[A1 + 0x26]
+					D0.u8 &= 0x7f
+					if (D0.u16 == 0x40)
+					{
+						u32[A2] = u32[A1 + 0x14]
+						u16[A2] = u16[A2] - objA0.position.y.u16
+						fn033c34()
+
+						D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+						if (D0.s16 >= 0)
+						{
+							u8[A1 + 0x04] |= render_flag.FLIP_X
+							u8[A1 + 0x26] = 0x40
+							u8[A2 + 0x05] = 0
+						}
+						else
+						{
+							u8[A1 + 0x04] &= ~render_flag.FLIP_X
+							u8[A1 + 0x26] = -0x40
+							u8[A2 + 0x05] = 0x80
+						}
+
+						u8[A1 + 0x04] |= render_flag.FLIP_Y
+						u8[A1 + 0x2e] |= 0x40
+						u8[A1 + 0x2e] |= 0x02
+						u8[A1 + 0x20] = 0
+					}
+				}
+			}
+		}
+		return
+	}
+
+	if (debug_mode.state == 0)
+	{
+		if (D5.u16 & CONTROL_ABC)
+		{
+			u8[A2 + 0x04] = 0x08
+			u8[A1 + 0x2e] |= 0x01
+			u8[A1 + 0x2a] |= 0x03
+			u8[A1 + 0x40] = 0
+			objA1.velocity.x = -0x800
+			objA1.velocity.y = -0x200
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+			if (D0.s16 >= 0)
+			{
+				objA1.velocity.x = -objA1.velocity.x
+				u8[A1 + 0x2a] &= ~0x01
+			}
+
+			#if STANDALONE
+				playSound(SFX_JUMP)
+			#endif
+		}
+		else
+		{
+			D0.u16 = u16[A1 + 0x1c]
+			if (D0.s16 < 0)
+			{
+				D0.s16 = -D0.s16
+				if (D0.u16 < 0x0400)
+				{
+					u16[A1 + 0x1c] = -0x400
+				}
+			}
+			else
+			{
+				if (D0.u16 < 0x0400)
+				{
+					u16[A1 + 0x1c] = 0x400
+				}
+			}
+
+			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16
+			if (D0.u16 < u16[A0 + 0x3c])
+			{
+				D0.u16 = u16[A1 + 0x1c]
+				if (D0.s16 < 0)
+				{
+					D0.s16 = -D0.s16
+					if (D0.u16 >= 0xc00)
+					{
+						u16[A1 + 0x1c] = -0xc00
+						objA1.velocity.y = 0xc00
+					}
+				}
+				else
+				{
+					if (D0.u16 >= 0xc00)
+					{
+						u16[A1 + 0x1c] = 0xc00
+						objA1.velocity.y = 0xc00
+					}
+				}
+
+				D0.s32 = objA1.velocity.y
+				D0 <<= 6
+				D1 = D0
+				D0 *= 3
+				u32[A2] += D0
+				D0 = u16[A2]
+				D0 = u32(D0.u16) * 0x0155
+				D0 >>= 8
+				D2 = D0.u16
+				D0.u8 += u8[A2 + 0x05]
+				LookupSinCos()
+				D3.u16 = D1.u16
+				D1.s16 >>= 3
+				D1.u16 += objA0.position.x.u16
+				D0 = u8[A1 + 0x1e]
+				D0.s32 = s32(D0.s16) * D3.s16
+				D0.s16 >>= 8
+				D1.u16 += D0.u16
+				objA1.position.x.u16 = D1.u16
+				objA1.position.y.u16 = u16[A2] + objA0.position.y.u16
+				D0 = 0
+				u16[A1 + 0x0a] &= 0x7fff
+				if (D2.u8 < 0x80)
+				{
+					u16[A1 + 0x0a] |= 0x8000
+				}
+				D2.u16 = u8(0x40 - D2.u8)
+				D2.u16 = D2 / 0x0b
+				u8[A1 + 0x22] = u8[0x033f6c + D2.s16]
+
+				D0 = u8[A1 + 0x22]
+				SetCharacterSpritePatterns()
+				return
+			}
+			else
+			{
+				D0.u16 = u16[A1 + 0x1c]
+				if (D0.s16 < 0)
+				{
+					D0.s16 = -D0.s16
+					if (D0.u16 >= 0xc00)
+					{
+						u16[A1 + 0x1c] = -0xc00
+						objA1.velocity.y = 0xc00
+					}
+				}
+				else
+				{
+					if (D0.u16 >= 0xc00)
+					{
+						u16[A1 + 0x1c] = 0xc00
+						objA1.velocity.y = 0xc00
+					}
+				}
+
+				D0.s32 = objA1.velocity.y
+				D0 <<= 6
+				D1 = D0
+				D0 *= 3
+				D0 += u32[A2]
+				D0 = (D0 << 16) + (D0 >> 16)
+				D0 = u32(D0.u16) * 0x0155
+				D0 >>= 8
+				D2 = D0.u16
+				D0.u8 += u8[A2 + 0x05]
+				LookupSinCos()
+				D3.u16 = D1.u16
+				D1.s16 >>= 3
+				D1.u16 += objA0.position.x.u16
+				D0 = u8[A1 + 0x1e]
+				D0.s32 = s32(D0.s16) * D3.s16
+				D0.s16 >>= 8
+				D1.u16 += D0.u16
+				objA1.position.x.u16 = D1.u16
+			}
+		}
+	}
+
+	if (objA0.flags2a & 0x01)
+	{
+		u8[A1 + 0x26] += 0x80
+	}
+
+	u8[A1 + 0x2a] &= ~0x04
+	u8[A1 + 0x1e] = 0x13
+	u8[A1 + 0x1f] = 0x09
+	u16[A1 + 0x20] = 0x01
+	u8[A1 + 0x2a] &= ~0x08
+	objA0.flags2a &= ~bit
+	u8[A1 + 0x2e] &= ~0x40
+	u8[A1 + 0x2e] &= ~0x02
+	u16[A1 + 0x0a] &= 0x7fff
+}

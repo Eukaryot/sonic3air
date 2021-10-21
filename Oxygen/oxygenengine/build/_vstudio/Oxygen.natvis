@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<Type Name="CArray&lt;*&gt;">
+		<DisplayString>{{ count={count} }}</DisplayString>
+		<Expand>
+			<Item Name="count" ExcludeView="simple">count</Item>
+			<Item Name="size" ExcludeView="simple">size</Item>
+			<ArrayItems>
+				<Size>count</Size>
+				<ValuePointer>list</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="genericmanager::ElementList&lt;*&gt;">
+		<DisplayString>{{ count={mSize} }}</DisplayString>
+		<Expand>
+			<Item Name="mSize" ExcludeView="simple">mSize</Item>
+			<Item Name="mReserved" ExcludeView="simple">mReserved</Item>
+			<ArrayItems>
+				<Size>mSize</Size>
+				<ValuePointer>mElements</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="lemon::Function">
+		<DisplayString>{mName}</DisplayString>
+	</Type>
+
+	<Type Name="lemon::RuntimeFunction">
+		<DisplayString>{mFunction->mName}</DisplayString>
+	</Type>
+
+</AutoVisualizer>

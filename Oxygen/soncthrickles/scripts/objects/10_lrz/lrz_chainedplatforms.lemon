@@ -1,0 +1,214 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04a644) end(0x04a710)
+//# translated(0x04a712) end(0x04a748)
+function void fn04a644()
+{
+	D0.u8 = objA0.subtype2c
+	if (D0.s8 >= 0)
+	{
+		objA0.mapping_offset = 0x04a980
+		objA0.sprite_attributes = 0x240d
+		objA0.render_flags |= 0x04
+		objA0.box_size.x = 0x18
+		objA0.box_size.y = 0x18
+		objA0.sprite_priority = 0x0200
+
+		D0 = (objA0.subtype2c >> 3) & 0x1e
+
+		// Targets:
+		//  - 0x04a896	-> D0.u16 = 0x00
+		//  - 0x04a8c0	-> D0.u16 = 0x02
+		//  - 0x04a8ea	-> D0.u16 = 0x04
+		A2 = tableLookupAddress(0x04a890, D0.u16)
+
+		u16[A0 + 0x3c] = u16[(A2+=2)-2]
+		u32[A0 + 0x40] = A2
+		D1.u16 = (objA0.subtype2c & 0x0f) * 4
+		u8[A0 + 0x3c] = D1.u8
+		u8[A0 + 0x3e] = 4
+
+		if (objA0.flags2a & 0x01)
+		{
+			s8[A0 + 0x3e] = -s8[A0 + 0x3e]
+			D1 = u8[A0 + 0x3c] + u8[A0 + 0x3e]
+			if (D1.u8 >= u8[A0 + 0x3d])
+			{
+				D1 = (D1.s8 >= 0) ? 0 : (u8[A0 + 0x3d] - 4)
+			}
+			u8[A0 + 0x3c] = D1.u8
+		}
+
+		u16[A0 + 0x38] = u16[A2 + D1.s16] + u16[A0 + 0x34]
+		u16[A0 + 0x3a] = u16[A2 + D1.s16 + 2] + u16[A0 + 0x36]
+		fn04a818()
+
+		objA0.update_address = 0x04a74a
+		fn04a74a()
+		return
+	}
+
+	D0.u16 = (objA0.subtype2c & 0x7f) * 2
+
+	// Targets:
+	//  - 0x04a91a	-> D0.u16 = 0x00
+	//  - 0x04a934	-> D0.u16 = 0x02
+	//  - 0x04a94e	-> D0.u16 = 0x04
+	A2 = tableLookupAddress(0x04a914, D0.u16)
+
+	D1.u16 = u16[(A2+=2)-2]
+	A1 = A0
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+
+	while (true)
+	{
+		objA1.update_address = 0x04a644
+		D0.u16 = u16[(A2+=2)-2]
+		D0.u16 += D2.u16
+		objA1.position.x.u16 = D0.u16
+		D0.u16 = u16[(A2+=2)-2]
+		D0.u16 += D3.u16
+		objA1.position.y.u16 = D0.u16
+		u16[A1 + 0x34] = D2.u16
+		u16[A1 + 0x36] = D3.u16
+		D0.u16 = u16[(A2+=2)-2]
+		u8[A1 + 0x2c] = D0.u8
+		u8[A1 + 0x2a] = objA0.flags2a
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectStd())
+			break
+	}
+}
+
+
+//# address-hook(0x04a74a) end(0x04a7b4)
+function void fn04a74a()
+{
+	u16 backup_px = objA0.position.x.u16
+	fn04a7ba()
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = backup_px
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x04)
+	{
+		A1 = 0xffffb000
+		DamageCharacter()
+	}
+	if (D6.u8 & 0x08)
+	{
+		A1 = 0xffffb04a
+		DamageCharacter()
+	}
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		if ((level.framecounter.low & 0x0f) == 0)
+		{
+			playSound(0x94)
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x34]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x04a7ba) end(0x04a816)
+function void fn04a7ba()
+{
+	if (objA0.position.x.u16 == u16[A0 + 0x38] && objA0.position.y.u16 == u16[A0 + 0x3a])
+	{
+		D1 = u8[A0 + 0x3c] + u8[A0 + 0x3e]
+		if (D1.u8 >= u8[A0 + 0x3d])
+		{
+			D1 = (D1.s8 >= 0) ? 0 : (u8[A0 + 0x3d] - 4)
+		}
+		u8[A0 + 0x3c] = D1.u8
+
+		A1 = u32[A0 + 0x40]
+		u16[A0 + 0x38] = u16[A1 + D1.s16] + u16[A0 + 0x34]
+		u16[A0 + 0x3a] = u16[A1 + D1.s16 + 2] + u16[A0 + 0x36]
+
+		fn04a818()
+	}
+
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x04a818) end(0x04a88e)
+function void fn04a818()
+{
+	D0 = 0
+	D1 = 0
+
+	D2.u16 = -0x100
+	D0.s16 = objA0.position.x.u16 - u16[A0 + 0x38]
+	if (D0.s16 < 0)
+	{
+		D0.s16 = -D0.s16
+		D2.s16 = -D2.s16
+	}
+
+	D3.u16 = -0x100
+	D1.s16 = objA0.position.y.u16 - u16[A0 + 0x3a]
+	if (D1.s16 < 0)
+	{
+		D1.s16 = -D1.s16
+		D3.s16 = -D3.s16
+	}
+
+	s16 modulo = 0
+	if (D1.u16 >= D0.u16)
+	{
+		D0.s16 = objA0.position.x.u16 - u16[A0 + 0x38]
+		if (D0.s16 != 0)
+		{
+			D0.s32 = D0.s16
+			D0.s32 <<= 8
+			modulo = D0.s32 % D1.s16
+			D0.s16 = D0.s32 / D1.s16
+			D0.s16 = -D0.s16
+		}
+
+		objA0.velocity.x = D0.u16
+		objA0.velocity.y = D3.u16
+		u16[A0 + 0x12] = modulo
+		u16[A0 + 0x16] = 0
+	}
+	else
+	{
+		D1.s16 = objA0.position.y.u16 - u16[A0 + 0x3a]
+		if (D1.s16 != 0)
+		{
+			D1.s32 = D1.s16
+			D1.s32 <<= 8
+			modulo = D1.s32 % D0.s16
+			D1.s16 = D1.s32 / D0.s16
+			D1.s16 = -D1.s16
+		}
+
+		objA0.velocity.y = D1.u16
+		objA0.velocity.x = D2.u16
+		u16[A0 + 0x16] = modulo
+		u16[A0 + 0x12] = 0
+	}
+}

@@ -1,0 +1,322 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Sticky Vine                                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x03ea56) end(0x03eac4)
+function void fn03ea56()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03ed0a
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u32[A1 + 0x0c] = 0x03ed10
+		u16[A1 + 0x0a] = 0x440a
+		u8[A1 + 0x04] |= 0x04
+		u16[A1 + 0x08] = 0x0200
+		objA1.box_size.x = 0x80
+		objA1.box_size.y = 0x80
+		u8[A1 + 0x04] |= 0x40
+	#if STANDALONE
+		objA1.box_size.x += 0x40	// Avoid early clipping that can happen when being caught while going very fast
+	#endif
+
+		u8 numSegments = 8
+		u16[A1 + 0x16] = numSegments
+
+		A2 = A1 + 0x18
+		for (u8 i = 0; i < numSegments; ++i)
+		{
+			u16[A2]   = objA0.position.x.u16
+			u16[A2+2] = objA0.position.y.u16
+			u16[A2+4] = 0
+			A2 += 6
+		}
+
+		u16[A0 + 0x46] = A1.u16
+		objA0.update_address = 0x03eaca
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x03eaca) end(0x03ead6)
+function void fn03eaca()
+{
+	A1 = 0xffffb000
+	fn03eada()
+
+	A1 = 0xffffb04a
+	fn03eada()
+
+	fn03ebf8()
+}
+
+
+//# address-hook(0x03eada) end(0x03eb24)
+function void fn03eada()
+{
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x0c
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x18
+	if (dx < 0x18 && dy < 0x30)
+	{
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		{
+			objA0.update_address = 0x03eb26
+			u32[A0 + 0x2e] = A1
+		}
+	}
+}
+
+
+//# address-hook(0x03eb26) end(0x03eb4c)
+function void fn03eb26()
+{
+	A1 = u32[A0 + 0x2e]
+	if (u8[A1 + 0x3d] != 0)		// Check spindash charge of the character
+	{
+		u8[A0 + 0x3d] = 0x01
+		u8[A0 + 0x3e] = 0x10
+	}
+
+#if STANDALONE
+	// Also react to drop dash
+	if (u8[A1 + 0x38] == CHARACTER_SONIC && Game.getSetting(SETTING_DROPDASH) && u8[A1 + 0x25] > 0)
+	{
+		u8[A0 + 0x3d] = 0x02
+		u8[A0 + 0x3e] = 0x10
+	}
+#endif
+
+	D0 = u32[A1 + 0x10]
+	D1 = u32[A1 + 0x14]
+
+	fn03ec2a()
+	fn03ec66()
+	fn03ebf8()
+}
+
+
+//# address-hook(0x03eb50) end(0x03ebf2)
+function void fn03eb50()
+{
+	A1 = u32[A0 + 0x2e]
+	D0 = u32[A0 + 0x30]
+	D1 = objA0.countdown_callback
+	fn03ec2a()
+
+	D0.s16 = u16[A0 + 0x30] - objA0.position.x.u16
+	if (D0.s16 != 0)
+	{
+		if (D0.s16 < 0)
+		{
+			D0.s16 += 2
+			if (D0.s16 > 0)
+			{
+				D0 = 0
+			}
+		}
+		else
+		{
+			D0.s16 -= 2
+			if (D0.s16 < 0)
+			{
+				D0 = 0
+			}
+		}
+	}
+
+	u16[A0 + 0x30] = D0.u16 + objA0.position.x.u16
+
+	D1.u16 = u16[A0 + 0x34] -objA0.position.y.u16
+	if (D1.u16 != 0)
+	{
+		if (D1.s16 < 0)
+		{
+			D2.u16 = objA0.velocity.y
+			objA0.velocity.y += 0x38
+			D2.s32 = s32(D2.s16) << 8
+			objA0.countdown_callback += D2
+			D2.u16 = u16[A0 + 0x34]
+			if (D2.u16 >= objA0.position.y.u16)
+			{
+				u16[A0 + 0x34] = objA0.position.y.u16
+				objA0.velocity.y = 0
+			}
+		}
+		else
+		{
+			if (objA0.velocity.y < 0)
+			{
+				D2.u16 = objA0.velocity.y
+				objA0.velocity.y += 0x38
+				D2.s32 = s32(D2.s16) << 8
+				objA0.countdown_callback += D2
+			}
+			else
+			{
+				u16[A0 + 0x34] -= 2
+				D2.u16 = u16[A0 + 0x34]
+				if (D2.u16 < objA0.position.y.u16)
+				{
+					u16[A0 + 0x34] = objA0.position.y.u16
+					objA0.velocity.y = 0
+				}
+			}
+		}
+	}
+
+	D1.u16 |= D0.u16
+	if (D1.u16 == 0)
+	{
+		objA0.update_address = 0x03eaca
+	}
+	fn03ebf8()
+}
+
+
+//# address-hook(0x03ebf8) end(0x03ec24)
+function void fn03ebf8()
+{
+	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (dx <= 0x0280)
+		return
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	UnloadObjectA1()
+	UnloadObject()
+}
+
+
+//# address-hook(0x03ec2a) end(0x03ec64)
+function void fn03ec2a()
+{
+	A2 = 0xffff0000 + u16[A0 + 0x46]
+	D2 = objA0.position.x
+	D3 = objA0.position.y
+	D0 -= D2
+	D1 -= D3
+
+	u32 backupD0 = D0
+	u32 backupD1 = D1
+
+	D0.s32 >>= 3
+	D1.s32 >>= 3
+	A3 = A2 + 0x48
+	D6 = 7
+
+	while (true)
+	{
+		A3 -= 2
+		u16[A3-=2] = D3 >> 16
+		u16[A3-=2] = D2 >> 16
+		--D6.s16
+		if (D6.s16 < 0)
+			break
+
+		D2 += D0
+		D3 += D1
+	}
+
+	D1 = backupD0	// Yes, this is correct
+	D2 = backupD1
+}
+
+
+//# address-hook(0x03ec66) end(0x03ed08)
+function void fn03ec66()
+{
+	D1 = (D1 << 16) + (D1 >> 16)
+	D2 = (D2 << 16) + (D2 >> 16)
+	D3.u16 = abs(D1.s16)
+	D4.u16 = abs(D2.s16)
+	D3.u16 = (D3.u16 + D4.u16) * 2
+	LookupAngleByVector()
+	LookupSinCos()
+	D1.s32 = s32(D1.s16) * D3.s16
+	D1.s32 <<= 2
+	D0.s32 = s32(D0.s16) * D3.s16
+	D0.s32 <<= 1
+
+	u32[A1 + 0x10] -= D1
+	if (u8[A1 + 0x2a] & 0x02)
+	{
+		u32[A1 + 0x14] -= D0
+		if (objA1.velocity.y >= 0)
+		{
+			objA1.velocity.x >>= 1
+		}
+	}
+	else
+	{
+		D1.s32 >>= 8
+		D1.s16 = abs(D1.s16)
+		D0.u16 = abs(s16[A1 + 0x1c])
+		if (D0.u16 >= 0x0200)
+		{
+			D0.u16 -= 0x10
+			if (D0.u16 < D1.u16)
+			{
+				s16[A1 + 0x1c] >>= 1
+			}
+		}
+	}
+
+	// Release by spindash (or drop dash):
+	//  - u8[A0 + 0x3d] gets set to 1 when starting a spindash
+	//  - u8[A1 + 0x3d] is "char.spindash" and gets 0 on spindash release
+	bool release = false
+#if STANDALONE
+	if (u8[A0 + 0x3d] == 1)
+	{
+		release = (u8[A1 + 0x3d] == 0)
+	}
+	else if (u8[A0 + 0x3d] == 2)
+	{
+		release = (u8[A1 + 0x38] == CHARACTER_SONIC && Game.getSetting(SETTING_DROPDASH) && u8[A1 + 0x25] == 0)
+	}
+#else
+	release = (u8[A0 + 0x3d] != 0 && u8[A1 + 0x3d] == 0)
+#endif
+
+	if (release)
+	{
+		--u8[A0 + 0x3e]
+		if (u8[A0 + 0x3e] == 0)
+		{
+			u32[A0 + 0x30] = u32[A1 + 0x10]
+			objA0.countdown_callback = u32[A1 + 0x14]
+			objA0.velocity.y = -0x600
+			u8[A0 + 0x3d] = 0
+			u8[A0 + 0x3e] = 0
+			objA0.update_address = 0x03eb50
+		}
+	}
+
+	u8[A1 + 0x2a] &= ~0x20
+}
+
+
+//# address-hook(0x03ed0a) end(0x03ed0a)
+function void fn03ed0a()
+{
+	DrawObject()
+}

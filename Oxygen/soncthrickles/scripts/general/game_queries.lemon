@@ -1,0 +1,72 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Characters                                            //
+//-------------------------------------------------------//
+
+function u8 getMainCharacter()
+{
+	if (global.characters == CHARS_SONIC_AND_TAILS || global.characters == CHARS_SONIC_ALONE)
+	{
+		return CHARACTER_SONIC
+	}
+	else if (global.characters == CHARS_TAILS_ALONE)
+	{
+		return CHARACTER_TAILS
+	}
+	else if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		return CHARACTER_KNUCKLES
+	}
+	else
+	{
+		assert(false, "Unsupported character selection")
+		return CHARACTER_SONIC
+	}
+}
+
+function u8 getSecondCharacter()
+{
+	if (global.characters == CHARS_SONIC_AND_TAILS)
+	{
+		return CHARACTER_TAILS
+	}
+#if STANDALONE
+	else if (useKnucklesAndTails)
+	{
+		return CHARACTER_TAILS
+	}
+#endif
+	else
+	{
+		return 0xff	// No second character
+	}
+}
+
+function u8 getPlayerCharacter(u8 player)
+{
+	return (player == 1) ? getSecondCharacter() : getMainCharacter()
+}
+
+function bool isMainCharacter(u8 character)
+{
+	return (getMainCharacter() == character)
+}
+
+function bool isSecondCharacter(u8 character)
+{
+	return (getSecondCharacter() == character)
+}
+
+function u8 getNumPlayers()
+{
+	return (getSecondCharacter() == 0xff) ? 1 : 2
+}

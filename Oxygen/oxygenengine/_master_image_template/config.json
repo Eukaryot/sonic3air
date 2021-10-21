@@ -1,0 +1,19 @@
+{
+
+	// Path to game project to load (use relative path, prefer forward slashes)
+	"LoadProject": "../sonic3air_dev",
+
+	// Load save state
+	"LoadSaveState": "",
+
+	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
+	"PlatformFlags": "-1",
+
+	// Video
+	"WindowSize": "1200 x 740",
+	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
+	"Filtering": "0",				// Can be toggled with Alt + F
+
+	// Audio
+	"AudioSampleRate": "48000"
+}

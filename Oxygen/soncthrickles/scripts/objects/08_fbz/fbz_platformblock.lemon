@@ -1,0 +1,79 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03c34c) end(0x03c3a2)
+function void fn03c34c()
+{
+	D0.u16 = (objA0.subtype2c >> 4) & 0x07
+	objA0.animation.sprite = D0.u8
+	objA0.box_size.x = u8[0x03c344 + D0.u16 * 2]
+	objA0.box_size.y = u8[0x03c345 + D0.u16 * 2]
+	objA0.mapping_offset = 0x03c416
+	objA0.sprite_attributes = 0x440d
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x30] = (objA0.subtype2c & 0x0f) << 4
+
+	if (u16[A0 + 0x30] == 0)
+	{
+		objA0.update_address = 0x03c3ee
+		fn03c3ee()
+	}
+	else
+	{
+		objA0.update_address = 0x03c3a8
+		fn03c3a8()
+	}
+}
+
+
+//# address-hook(0x03c3a8) end(0x03c410)
+function void fn03c3a8()
+{
+	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	if (D0.s16 >= 0x20)
+	{
+		D1.u16 = u16[A0 + 0x30]
+		if (D1.u16 != objA0.value32)
+		{
+			objA0.value32 += 0x08
+		}
+	}
+	else if (D0.s16 < -0x28)
+	{
+		if (objA0.value32 != 0)
+		{
+			objA0.value32 -= 0x08
+		}
+	}
+
+	D0.u16 = objA0.value32
+	if (objA0.flags2a & 0x01)
+		D0.s16 = -D0.s16
+	D0.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D0.u16
+
+	fn03c3ee()
+}
+
+
+//# address-hook(0x03c3ee) end(0x03c410)
+function void fn03c3ee()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}

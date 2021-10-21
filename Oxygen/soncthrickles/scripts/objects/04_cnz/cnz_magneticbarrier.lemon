@@ -1,0 +1,192 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// One-way barrier in Carnival Night Zone                //
+//-------------------------------------------------------//
+
+//# address-hook(0x031f30) end(0x031f46)
+function void fn031f30()
+{
+	if (objA0.subtype2c != 0)
+	{
+		u8[A0 + 0x34] = objA0.subtype2c * 2
+		objA0.update_address = 0x031ff4
+		fn031ff4()
+	}
+	else
+	{
+		objA0.update_address = 0x031f4c
+		fn031f4c()
+	}
+}
+
+
+//# address-hook(0x031f4c) end(0x031f5c)
+function void fn031f4c()
+{
+	A1 = 0xffffb000
+	fn031f62()
+
+	A1 = 0xffffb04a
+	fn031f62()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x031f62) end(0x031ff2)
+function void fn031f62()
+{
+	#if STANDALONE
+		if (debug_mode.state != 0)
+			return
+	#endif
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+	if ((objA0.flags2a & 0x01) == 0)
+	{
+		D0.s16 = -D0.s16
+	}
+
+	D0.u16 += 0x50
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x20
+	if (D0.u16 < 0xa0 && D1.s16 >= 0 && D1.u16 < 0x40)
+	{
+		if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		{
+			D0.u16 -= 0x50
+			if (D0.s16 < 0)
+			{
+				D0.u16 ^= 0xffff
+				u16[A1 + 0x1c] = 0x1000
+				if ((objA0.flags2a & 0x01) == 0)
+				{
+					s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+				}
+				objA1.velocity.x = u16[A1 + 0x1c]
+				return
+			}
+
+			D0.u16 = 0x60 + D0.u16 * 2
+			if ((objA0.flags2a & 0x01) == 0)
+			{
+				D0.s16 = -D0.s16
+			}
+			D0.s8 = -D0.s8
+			D0.s16 >>= 4
+			objA1.position.x.u16 += D0.u16
+			D0.u16 = u16[A0 + 0x36]
+			if (D0.u16 == 0)
+			{
+				playSound(0x74)
+			}
+			++u16[A0 + 0x36]
+			u16[A0 + 0x36] &= 0x1f
+		}
+	}
+}
+
+
+//# address-hook(0x031ff4) end(0x03200a)
+function void fn031ff4()
+{
+#if STANDALONE
+	if (debug_mode.state != 0)
+		return
+#endif
+
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	fn032010()
+
+	++A2
+	A1 = 0xffffb04a
+	fn032010()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x032010) end(0x0320e0)
+function void fn032010()
+{
+	D0.u8 = u8[A2]
+	if (D0.u8 == 0)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x18
+		if (D0.u16 < 0x30)
+		{
+			D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
+			if (D1.u16 < 0x50)
+			{
+				if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+				{
+					D1.u16 = 0x50 - D1.u16
+					if (D1.u16 >= 0x40)
+					{
+						u8[A2] = 1
+						u8[A2+2] = u8[A0 + 0x34]
+
+						u16 backupD0 = D0.u16
+						playSound(0x73)
+						D0.u16 = backupD0
+					}
+
+					D1.s16 >>= 2
+					if (u8[A1 + 0x38] != 0x01)
+					{
+						D1.s16 >>= 1
+					}
+					objA1.position.y.u16 -= D1.u16
+					D2 = 1
+					if (D0.u16 != 0x18)
+					{
+						if (D0.u16 >= 0x18)
+						{
+							D2.s16 = -D2.s16
+						}
+						objA1.position.x.u16 += D2.u16
+					}
+					objA1.flags2a |= char.flag.IN_AIR
+					objA1.state = char.state.LIFTED
+					u8[A1 + 0x40] = 0
+				}
+			}
+		}
+	}
+	else if (D0.u8 == 1)
+	{
+		--u8[A2 + 0x02]
+		if (u8[A2 + 0x02] != 0)
+		{
+			objA1.position.y.u16 -= 8
+			D2 = 1
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+			if (D0.u16 != 0)
+			{
+				if (D0.s16 > 0)
+				{
+					D2.s16 = -D2.s16
+				}
+				objA1.position.x.u16 += D2.u16
+			}
+
+			objA1.velocity.x = 0
+			u16[A1 + 0x1c] = 0
+			objA1.velocity.y = 0
+		}
+		else
+		{
+			objA1.velocity.y = -0x800
+			u8[A2] = 0
+		}
+	}
+}

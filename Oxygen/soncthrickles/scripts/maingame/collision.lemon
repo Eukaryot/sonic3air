@@ -1,0 +1,1169 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Tile Access                                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x00eff0) end(0x00f028)
+function void fn00eff0()
+{
+	A1 = getTileAtWorldPosition(D3.u16, D2.u16, 0xffff8008)
+}
+
+//# address-hook(0x00efb6) end(0x00efee)
+function void fn00efb6()
+{
+	A1 = getTileAtWorldPosition(D3.u16, D2.u16, 0xffff800a)
+}
+
+function u32 getTileAtWorldPosition(u16 input.x, u16 input.y, u32 chunksBaseAddress)
+{
+	// Get chunk base address by y-coordinate (chunks are usually 128 pixels)
+	// This offset is divisible by 4 and usually uses input.y bits 7-11
+	u16 offset = (input.y >> 5) & level.chunksize.bitmask
+	u16 ramAddress = u16[chunksBaseAddress + offset]
+
+	// Access chunk by x-coordinate
+	ramAddress += input.x >> 7
+
+	// Attention: "ramAddress" is usually supposed to be >= 0x8000 (i.e. "negative"), but it can get to lower values ("positive") in some cases
+	//  -> This lead to a ROM access instead of RAM access
+	u32 address = (s16(ramAddress) >= 0) ? u32(ramAddress) : (0xffff0000 + u32(ramAddress))
+	u8 chunkType = u8[address]
+
+	// Access tile inside chunk (tile size is 16 pixels)
+	address = 0xffff0000 + u16[0x00f02a + u32(chunkType) * 2]
+	address += input.y & 0x70
+	address += (input.x >> 3) & 0x0e
+
+	// Output tile address, each tile is 2 bytes
+	return address
+}
+
+
+
+//-------------------------------------------------------//
+// Collision                                             //
+//-------------------------------------------------------//
+
+function s16 checkStaticCollisionVertical(u16 input.x, u16 input.y, u32 sensorAddress, s16 offset, u16 flipMask)
+{
+	D3 = input.x
+	D2 = input.y
+	A4 = sensorAddress
+	A3 = offset
+	D6 = flipMask
+	CheckStaticCollisionVertical()
+/*
+	if (flipMask)
+	{
+		debugDrawRect(D3 - 1, (D2 ^ 0x0f) - 1, 3, 3, 0x80ffff00)
+		debugDrawRect(D3 - 1, (D2 ^ 0x0f) - D1.s16, 3, D1.s16, 0xc0ff0000)
+	}
+	else
+	{
+		debugDrawRect(D3 - 1, D2 - 1, 3, 3, 0x80ffff00)
+		debugDrawRect(D3 - 1, D2, 3, D1.s16 + 1, 0xc0ff0000)
+	}
+*/
+	return D1.s16
+}
+
+
+//# address-hook(0x00f22a) end(0x00f262)
+function void CheckStaticCollisionVertical()
+{
+	A5 = 0x00eff0
+	if (level.dualplanecollision == 0)
+	{
+		// This is the usual way to go
+		GetDistanceToStaticCollisionY2()
+	}
+	else
+	{
+		// This is only used in rare cases with two foreground planes
+		GetDistanceToStaticCollisionY2()
+		D3.u16 -= u16[0xffffee3e]
+		D2.u16 -= u16[0xffffee40]
+		s16 result1 = D1.s16
+		u8[A4 + 1] = u8[A4]
+
+		A5 = 0x00efb6
+		GetDistanceToStaticCollisionY2()
+		D3.u16 += u16[0xffffee3e]
+		D2.u16 += u16[0xffffee40]
+
+		D0.s16 = result1
+		if (D1.s16 > D0.s16)
+		{
+			u8[A4] = u8[A4 + 1]
+			D1.u16 = D0.u16
+		}
+	}
+}
+
+
+//# address-hook(0x00f264) end(0x00f30a)
+function void GetDistanceToStaticCollisionY2()
+{
+	u16 input.y = D2.u16
+	s16 fraction = input.y & 0x0f
+
+	s16 indent = getCollisionIndentY()
+	if (indent > 0 && indent < 16)
+	{
+		D1.s16 = 15 - fraction - indent
+	}
+	else if (indent + fraction < 0 || indent == 16)
+	{
+		D2.u16 -= A3.u16
+		GetDistanceToStaticCollisionY1()
+		D2.u16 += A3.u16
+		D1.s16 -= 16
+	}
+	else
+	{
+		D2.u16 += A3.u16
+		GetDistanceToStaticCollisionY1()
+		D2.u16 -= A3.u16
+		D1.s16 += 16
+	}
+}
+
+
+//# address-hook(0x00f30c) end(0x00f3a2)
+function void GetDistanceToStaticCollisionY1()
+{
+	u16 input.y = D2.u16
+	s16 fraction = input.y & 0x0f
+
+	s16 indent = getCollisionIndentY()
+	if (indent != 0)
+	{
+		if (indent > 0)
+		{
+			// Code address 0x00f384
+			D1.s16 = 15 - fraction - indent
+			return
+		}
+
+		if (indent + fraction < 0)
+		{
+			// Code address 0x00f3a0
+			D1.s16 = -1 - fraction
+			return
+		}
+	}
+
+	// Code address 0x00f31c
+	D1.s16 = 15 - fraction
+}
+
+
+function s16 checkStaticCollisionVerticalShort(u16 input.x, u16 input.y, u32 sensorAddress, s16 offset, u16 flipMask)
+{
+	D3 = input.x
+	D2 = input.y
+	A4 = sensorAddress
+	A3 = offset
+	D6 = flipMask
+	CheckStaticCollisionVerticalShort()
+/*
+	if (flipMask)
+	{
+		debugDrawRect((D3 ^ 0x0f) - 1, D2 - 1, 3, 3, 0x80ffff00)
+		debugDrawRect((D3 ^ 0x0f) - D1.s16, D2 - 1, D1.s16, 3, 0xc0ff0000)
+	}
+	else
+	{
+		debugDrawRect(D3 - 1, D2 - 1, 3, 3, 0x80ffff00)
+		debugDrawRect(D3, D2 - 1, D1.s16 + 1, 3, 0xc0ff0000)
+	}
+*/
+	return D1.s16
+}
+
+
+//# address-hook(0x00f3a4) end(0x00f3de)
+function void CheckStaticCollisionVerticalShort()
+{
+	A5 = 0x00eff0
+	if (level.dualplanecollision == 0)
+	{
+		// This is the usual way to go
+		GetDistanceToStaticCollisionY2a()
+	}
+	else
+	{
+		// This is only used in rare cases with two foreground planes
+		GetDistanceToStaticCollisionY2a()
+		D3.u16 -= u16[0xffffee3e]
+		D2.u16 -= u16[0xffffee40]
+		s16 result1 = D1.s16
+		u8[A4 + 1] = u8[A4]
+
+		A5 = 0x00efb6
+		GetDistanceToStaticCollisionY2a()
+		D3.u16 += u16[0xffffee3e]
+		D2.u16 += u16[0xffffee40]
+
+		D0.s16 = result1
+		if (D1.s16 > D0.s16)
+		{
+			u8[A4] = u8[A4 + 1]
+			D1.u16 = D0.u16
+		}
+	}
+}
+
+
+//# address-hook(0x00f3de) end(0x00f47c)
+function void GetDistanceToStaticCollisionY2a()
+{
+	u16 input.y = D2.u16
+	s16 fraction = input.y & 0x0f
+
+	s16 indent = getCollisionIndentY()
+	if (indent > 0 && indent < 16)
+	{
+		D1.s16 = 15 - fraction - indent
+	}
+	else if (indent + fraction < 0 || indent == 16)
+	{
+		D2.u16 -= A3.u16
+		GetDistanceToStaticCollisionY1()
+		D2.u16 += A3.u16
+		D1.s16 -= 16
+	}
+	else
+	{
+		D1.s16 = 16
+	}
+}
+
+
+function s16 checkStaticCollisionHorizontal(u16 input.x, u16 input.y, u32 sensorAddress, s16 offset, u16 flipMask)
+{
+	D3 = input.x
+	D2 = input.y
+	A4 = sensorAddress
+	A3 = offset
+	D6 = flipMask
+	CheckStaticCollisionHorizontal()
+/*
+	if (flipMask)
+	{
+		debugDrawRect((D3 ^ 0x0f) - 1, D2 - 1, 3, 3, 0x80ffff00)
+		debugDrawRect((D3 ^ 0x0f) - D1.s16, D2 - 1, D1.s16, 3, 0xc0ff0000)
+	}
+	else
+	{
+		debugDrawRect(D3 - 1, D2 - 1, 3, 3, 0x80ffff00)
+		debugDrawRect(D3, D2 - 1, D1.s16 + 1, 3, 0xc0ff0000)
+	}
+*/
+	return D1.s16
+}
+
+
+//# address-hook(0x00f47e) end(0x00f582)
+function void CheckStaticCollisionHorizontal()
+{
+	A5 = 0x00eff0
+	if (level.dualplanecollision == 0)
+	{
+		// This is the usual way to go
+		GetDistanceToStaticCollisionX2()
+	}
+	else
+	{
+		// This is only used in rare cases with two foreground planes
+		GetDistanceToStaticCollisionX2()
+		u8[A4 + 1] = u8[A4]
+		u16 oldD1 = D1.u16
+		D0.u16 = A3.u16
+		if (D0.s16 < 0)
+		{
+			D3.u16 ^= 0x0f
+			D3.u16 -= u16[0xffffee3e]
+			D3.u16 ^= 0x0f
+		}
+		else
+		{
+			D3.u16 -= u16[0xffffee3e]
+		}
+		D2.u16 -= u16[0xffffee40]
+
+		A5 = 0x00efb6
+		GetDistanceToStaticCollisionX2()
+		D0.u16 = A3.u16
+		if (D0.s16 < 0)
+		{
+			D3.u16 ^= 0x0f
+			D3.u16 += u16[0xffffee3e]
+			D3.u16 ^= 0x0f
+		}
+		else
+		{
+			D3.u16 += u16[0xffffee3e]
+		}
+		D2.u16 += u16[0xffffee40]
+
+		D0.u16 = oldD1
+		if (D1.s16 > D0.s16)
+		{
+			u8[A4] = u8[A4 + 1]
+			D1.u16 = D0.u16
+		}
+	}
+}
+
+
+function u16 getTileAndAngle()
+{
+	// Inputs:
+	//  - A4 = address of sensor to write result (angle) to -- e.g. 0xfffff768 or 0xfffff76a
+	//  - A5 = algorithm for getting tile address -- usually 0x00eff0
+	//  - D2.u16 = input.y
+	//  - D3.u16 = input.x
+	//  - D5.u8  = layer bit to check -- values between 0x0c and 0x0f
+	//  - D6.u16 = xor bitmask for flipping
+
+#if STANDALONE
+	// Outside the upper border, use topmost valid level collision
+	if (Game.getSetting(SETTING_FIX_GLITCHES) && level.vertical_wrap != 0xff00)
+	{
+		D2.s16 = max(D2.s16, 0)
+	}
+#endif
+
+	// Output:
+	//  - u8[A4] = sensor value, angle of tile
+	//  - D1.s16 = signed indent of collision inside the hit tile at input position
+
+	// Meanings of layer bits:
+	//  - 0x0c = Path 1 solid from above
+	//  - 0x0d = Path 1 solid from other sides
+	//  - 0x0e = Path 2 solid from above
+	//  - 0x0f = Path 2 solid from other sides
+	u8 layer_bit = D5.u8
+
+	call A5		// This usually calls "fn00eff0()"
+
+	// Tile:
+	//  - Lower bits: tile type
+	//  - Bit 0x0400 = flip horizontally
+	//  - Bit 0x0800 = flip vertically
+	//  - Higher bits: layers
+	u16 tile = u16[A1]
+	u16 tileType = tile & 0x03ff
+
+	if (tileType != 0 && (tile >> layer_bit) & 1)
+	{
+		A2 = u32[0xfffff796]
+		u8 tileForm = u8[A2 + tileType * 2]
+		if (tileForm != 0)
+		{
+			u8 angle = u8[0x096000 + tileForm]
+			if (tile & 0x0400)	// Flip horizontally
+			{
+				angle = -angle
+			}
+			if (tile & 0x0800)	// Flip vertically
+			{
+				angle = 0x80 - angle
+			}
+			u8[A4] = angle
+
+			return tile
+		}
+	}
+	return 0
+}
+
+
+function s16 getCollisionIndentX()
+{
+	u16 tile = getTileAndAngle()
+	if (tile != 0)
+	{
+		u16 input.y = D2.u16
+		u8 tileForm = u8[A2 + (tile & 0x3ff) * 2]
+
+		u16 iy = input.y & 0x0f
+		if (tile & 0x0800)	// Flip vertically
+		{
+			iy = 15 - iy
+		}
+
+		s16 indent = s8[0x097100 + (tileForm * 0x10) + iy]
+		if (indent != 0)
+		{
+			tile ^= D6.u16
+			if (tile & 0x0400)	// Flip horizontally
+			{
+				indent = -indent
+			}
+			return indent
+		}
+	}
+	return 0
+}
+
+
+function s16 getCollisionIndentY()
+{
+	u16 tile = getTileAndAngle()
+	if (tile != 0)
+	{
+		u16 input.x = D3.u16
+		u8 tileForm = u8[A2 + (tile & 0x3ff) * 2]
+
+		u16 ix = input.x & 0x0f
+		if (tile & 0x0400)	// Flip horizontally
+		{
+			ix = 15 - ix
+		}
+
+		s16 indent = s8[0x096100 + (tileForm * 0x10) + ix]
+		if (indent != 0)
+		{
+			tile ^= D6.u16
+			if (tile & 0x0800)	// Flip vertically
+			{
+				indent = -indent
+			}
+			return indent
+		}
+	}
+	return 0
+}
+
+
+//# address-hook(0x00f4dc) end(0x00f582)
+function void GetDistanceToStaticCollisionX2()
+{
+	u16 input.x = D3.u16
+	s16 fraction = input.x & 0x0f
+
+	s16 indent = getCollisionIndentX()
+	if (indent != 0)
+	{
+		if (indent > 0 && indent < 16)
+		{
+			D1.s16 = 15 - fraction - indent
+			return
+		}
+
+		if (indent + fraction < 0 || indent == 16)
+		{
+			D3.u16 -= A3.u16
+			GetDistanceToStaticCollisionX1()
+			D3.u16 += A3.u16
+			D1.s16 -= 16
+			return
+		}
+	}
+
+	D3.u16 += A3.u16
+	GetDistanceToStaticCollisionX1()
+	D3.u16 -= A3.u16
+	D1.s16 += 16
+}
+
+
+//# address-hook(0x00f584) end(0x00f61a)
+function void GetDistanceToStaticCollisionX1()
+{
+	// This is used for checking for collisions to the left and right
+
+	u16 input.x = D3.u16
+	s16 fraction = input.x & 0x0f
+
+	s16 indent = getCollisionIndentX()
+	if (indent != 0)
+	{
+		if (indent > 0)
+		{
+			// Code address 0x00f5fc
+			D1.s16 = 15 - fraction - indent
+			return
+		}
+
+		if (fraction + indent < 0)
+		{
+			// Code address 0x00f618
+			D1.s16 = -1 - fraction
+			return
+		}
+	}
+
+	// Code address 0x00f594
+	D1.s16 = 15 - fraction
+}
+
+
+//# address-hook(0x00f61c) end(0x00f6b0)
+function void fn00f61c()
+{
+	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+
+	u8[0xfffff768] = D0.u8
+	u8[0xfffff76a] = D0.u8
+
+	D5.u8 = char.layer_flags2
+	D3 = objA0.position.x + (s32(objA0.velocity.x) << 8)
+	D2 = objA0.position.y
+
+	if (competition_mode.active == 0)
+	{
+		D1.s16 = objA0.velocity.y
+		if (global.inv_gravity)
+			D1.s16 = -D1.s16
+
+		D2 += s32(D1.s16) << 8
+		D2 = (D2 >> 16) + (D2 << 16)
+		D3 = (D3 >> 16) + (D3 << 16)
+
+		D1.u8 = D0.u8
+		D0.u8 = getRotationQuarter(D0.u8)
+		if (D0.u8 == 0)
+		{
+			fn00f802()
+		}
+		else if (D0.u8 == 0x80)
+		{
+			fn00fbce()
+		}
+		else
+		{
+			// The following seems to be responsible for some collision glitches
+			//  -> E.g. sudden stops in fast sections of HCZ 1 and ramps of ICZ 2
+			//  -> But without it, steps can be taken too easily
+			//  -> Compromise: Only use it for low and medium speeds
+		#if STANDALONE
+			if (abs(char.groundspeed) <= 0x600)
+		#endif
+			{
+				// Does this check make any sense? It must be true here...
+				if (competition_mode.active == 0)
+				{
+					if ((D1.u8 & 0x38) == 0)
+					{
+						D2.u16 += 8
+					}
+				}
+			}
+
+			if (D0.u8 == 0x40)
+			{
+				fn00fda8()
+			}
+			else
+			{
+				fn00fa88()
+			}
+		}
+	}
+	else
+	{
+		fn00f6b4()
+	}
+}
+
+
+//# address-hook(0x00f6b4) end(0x00f72a)
+function void fn00f6b4()
+{
+	// This is actually for competition mode, but for some reason also used by the MGZ spinning top
+	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+	D5.u8 = char.layer_flags2
+
+	D3 = objA0.position.x + (s32(objA0.velocity.x) << 8)
+	D2 = objA0.position.y + (s32(objA0.velocity.y) << 8)
+	D3 = (D3 << 16) + (D3 >> 16)
+	D2 = (D2 << 16) + (D2 >> 16)
+	u8[0xfffff768] = D0.u8
+	u8[0xfffff76a] = D0.u8
+
+	D1.u8 = D0.u8
+	D0.u8 = getRotationQuarter(D0.u8)
+	if (D0.u8 == 0)
+	{
+		fn00f828()
+	}
+	else if (D0.u8 == 0x40)
+	{
+		fn00fdc8()
+	}
+	else if (D0.u8 == 0x80)
+	{
+		fn00fbee()
+	}
+	else
+	{
+		fn00faa4()
+	}
+}
+
+
+//# address-hook(0x00f72e) end(0x00f76a)
+function void fn00f72e()
+{
+	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+
+	D5.u8 = char.layer_flags2
+	u8[0xfffff768] = D0.u8
+	u8[0xfffff76a] = D0.u8
+
+	D0.u8 = (D0.u8 + 0x20) & 0xc0
+	if (D0.u8 == 0x40)
+	{
+		fn00fcca()
+	}
+	else if (D0.u8 == 0x80)
+	{
+		CheckHitboxCollisionUpwards()
+	}
+	else if (D0.u8 == 0xc0)
+	{
+		fn00f9ba()
+	}
+	else
+	{
+		CheckHitboxCollisionDownwards()
+	}
+}
+
+
+//# address-hook(0x00f76e) end(0x00f7f8)
+function void CheckHitboxCollisionDownwards()
+{
+	// Check for ground collision at the borders of the character / object hitbox
+
+	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+	D5.u8 = char.layer_flags1
+
+	D3 = objA0.position.x.u16 + objA0.hitbox_extends.x
+	D2 = objA0.position.y.u16 + objA0.hitbox_extends.y
+	s16 result1 = checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+
+	D3 = objA0.position.x.u16 - objA0.hitbox_extends.x
+	D2 = objA0.position.y.u16 + objA0.hitbox_extends.y
+	s16 result2 = checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff76a, 0x10, 0)
+
+	if (result2 > result1)
+	{
+		D0.s16 = result2
+		D1.s16 = result1
+		D3.u8 = u8[0xfffff768]
+	}
+	else
+	{
+		D0.s16 = result1
+		D1.s16 = result2
+		D3.u8 = u8[0xfffff76a]
+	}
+
+	D2.u8 = 0
+	if (D3 & 0x01)
+		D3.u8 = 0
+}
+
+
+//# address-hook(0x00f7e2)
+function void fn00f7e2()
+{
+	if (D1.s16 > D0.s16)
+	{
+		u32 tmp = D1
+		D1 = D0
+		D0 = tmp
+		D3.u8 = u8[0xfffff768]
+	}
+	else
+	{
+		D3.u8 = u8[0xfffff76a]
+	}
+
+	if (D3 & 0x01)
+		D3.u8 = D2.u8
+}
+
+
+//# address-hook(0x00f802) end(0x00f826)
+function void fn00f802()
+{
+	D2.u16 += 10
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+	D2.u8 = 0
+	fn00f81a()
+}
+
+
+//# address-hook(0x00f81a)
+function void fn00f81a()
+{
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = D2.u8
+}
+
+
+//# address-hook(0x00f828) end(0x00f844)
+function void fn00f828()
+{
+	D2.u16 += s8(objA0.hitbox_extends.x)
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+	D2.u8 = 0
+	fn00f81a()
+}
+
+
+//# address-hook(0x00f846) end(0x00f892)
+function void fn00f846()
+{
+	D3.u16 = objA0.position.x.u16
+	D2.u16 = objA0.position.y.u16 - 4
+	u32[0xfffff796] = (char.layer_flags2 == 0x0d) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+
+	u8[0xfffff768] = 0
+	D5.u8 = char.layer_flags2
+
+	pushA456()
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+	popA456()
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0
+}
+
+
+//# address-hook(0x00f898) end(0x00f8e8)
+function void fn00f898()
+{
+	D2.u16 = objA0.position.y.u16 + s8(objA0.hitbox_extends.y)
+	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+
+	u8[0xfffff768] = 0
+	D5.u8 = char.layer_flags1
+
+	pushA456()
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+	popA456()
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0
+}
+
+
+//# address-hook(0x00f8a6) end(0x00f8e8)
+function void fn00f8a6()
+{
+	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+
+	u8[0xfffff768] = 0
+	D5.u8 = char.layer_flags1
+
+	pushA456()
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+	popA456()
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0
+}
+
+
+//# address-hook(0x00f8ea) end(0x00f936)
+function void fn00f8ea()
+{
+	D3.u16 = objA1.position.x.u16
+	D2.u16 = objA1.position.y.u16 + s8[A1 + 0x1e]
+	u32[0xfffff796] = (u8[A1 + 0x46] == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+
+	u8[0xfffff768] = 0
+	D5.u8 = u8[A1 + 0x46]
+
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0
+}
+
+
+//# address-hook(0x00f938) end(0x00f96c)
+function void CheckGroundCollision()
+{
+	checkGroundCollisionAtX(objA0.position.x.u16)
+}
+
+//# address-hook(0x00f93c)
+function void CheckGroundCollisionFixedX()
+{
+	checkGroundCollisionAtX(D3.u16)
+}
+
+function void checkGroundCollisionAtX(u16 px)
+{
+	u16 py = objA0.position.y.u16 + s8(objA0.hitbox_extends.y)
+
+	u8[0xfffff768] = 0
+	D5 = 0x0c
+
+	checkStaticCollisionVertical(px, py, 0xfffff768, 0x10, 0)
+
+	D3.u8 = u8[0xfffff768]
+	if (D3.u8 & 0x01)
+		D3.u8 = 0
+}
+
+
+//# address-hook(0x00f994) end(0x00f9b6)
+function void fn00f994()
+{
+	D3.u16 = objA0.position.x.u16
+	D2.u16 = objA0.position.y.u16 + objA0.hitbox_extends.y
+	u8[0xfffff768] = 0
+	D5 = 0x0c
+	checkStaticCollisionVerticalShort(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+}
+
+
+//# address-hook(0x00f9ba) end(0x00fa16)
+function void fn00f9ba()
+{
+	D3.u16 = objA0.position.x.u16 + s8(objA0.hitbox_extends.y)
+	D2.u16 = objA0.position.y.u16 - s8(objA0.hitbox_extends.x)
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+	u16 backupD1 = D1.u16
+
+	D3.u16 = objA0.position.x.u16 + s8(objA0.hitbox_extends.y)
+	D2.u16 = objA0.position.y.u16 + s8(objA0.hitbox_extends.x)
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff76a, 0x10, 0)
+	D0.u16 = backupD1
+
+	D2.u8 = 0xc0
+	fn00f7e2()
+}
+
+
+//# address-hook(0x00fa1a) end(0x00fa76)
+function void fn00fa1a()
+{
+	D0 = 0
+	D3.u16 = objA0.position.x.u16 + s8(objA0.hitbox_extends.x)
+	D2.u16 = objA0.position.y.u16 - s8(objA0.hitbox_extends.y)
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+
+	u16 backupD1 = D1.u16
+	D3.u16 = objA0.position.x.u16 + s8(objA0.hitbox_extends.x)
+	D2.u16 = objA0.position.y.u16 + s8(objA0.hitbox_extends.y)
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff76a, 0x10, 0)
+
+	D0.u16 = backupD1
+	D2.u8 = 0xc0
+	fn00f7e2()
+}
+
+
+//# address-hook(0x00fa7a) end(0x00fac0)
+function void fn00fa7a()
+{
+	D2.u16 = objA0.position.y.u16
+	D3.u16 = objA0.position.x.u16
+	if (competition_mode.active == 0)
+	{
+		fn00fa88()
+	}
+	else
+	{
+		fn00faa4()
+	}
+}
+
+//# address-hook(0x00fa88)
+function void fn00fa88()
+{
+	D3.u16 += 10
+	fn00fa7a_shared()
+}
+
+//# address-hook(0x00faa4)
+function void fn00faa4()
+{
+	D3.u16 += objA0.hitbox_extends.x
+	fn00fa7a_shared()
+}
+
+function void fn00fa7a_shared()
+{
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+
+	D2.u8 = 0xc0
+	if (D3 & 0x01)
+		D3.u8 = 0xc0
+}
+
+
+//# address-hook(0x00fac4) end(0x00faf0)
+function void fn00fac4()
+{
+	D3.u16 += objA0.position.x.u16
+	D2.u16 = objA0.position.y.u16
+	u8[0xfffff768] = 0
+	D5 = 0x0d
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0xc0
+}
+
+
+//# address-hook(0x00faf2) end(0x00fb56)
+function void CheckHitboxCollisionUpwards()
+{
+	// Check for ceiling collision at the borders of the character / object hitbox
+
+	D2.u16 = (objA0.position.y.u16 - objA0.hitbox_extends.y) ^ 0x0f
+	D3.u16 = objA0.position.x.u16 + objA0.hitbox_extends.x
+	s16 result1 = checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, -0x10, 0x800)
+
+	D2.u16 = (objA0.position.y.u16 - objA0.hitbox_extends.y) ^ 0x0f
+	D3.u16 = objA0.position.x.u16 - objA0.hitbox_extends.x
+	s16 result2 = checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff76a, -0x10, 0x800)
+
+	if (result2 > result1)
+	{
+		D0.s16 = result2
+		D1.s16 = result1
+		D3.u8 = u8[0xfffff768]
+	}
+	else
+	{
+		D0.s16 = result1
+		D1.s16 = result2
+		D3.u8 = u8[0xfffff76a]
+	}
+
+	D2.u8 = 0x80
+	if (D3 & 0x01)
+		D3.u8 = 0x80
+}
+
+
+//# address-hook(0x00fb5a) end(0x00fbc2)
+function void fn00fb5a()
+{
+	// Only used for MGZ spinning top
+	D3.u16 = objA0.position.x.u16 + s8(objA0.hitbox_extends.x) - 2
+	D2.u16 = (objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, -0x10, 0x800)
+
+	u16 backupD1 = D1.u16
+	D3.u16 = objA0.position.x.u16 - s8(objA0.hitbox_extends.x) + 2
+	D2.u16 = (objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff76a, -0x10, 0x800)
+
+	D0.u16 = backupD1
+	D2.u8 = 0x80
+	fn00f7e2()
+}
+
+
+//# address-hook(0x00fbce) end(0x00fbea)
+function void fn00fbce()
+{
+	D2.u16 = (D2.u16 - 10) ^ 0x0f
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, -0x10, 0x800)
+
+	D2.u8 = 0x80
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0x80
+}
+
+
+//# address-hook(0x00fbee) end(0x00fc0e)
+function void fn00fbee()
+{
+	D2.u16 = (D2.u16 - s8(objA0.hitbox_extends.x)) ^ 0x0f
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, -0x10, 0x800)
+	D2.u8 = 0x80
+	fn00f81a()
+}
+
+
+//# address-hook(0x00fc12) end(0x00fc48)
+function void fn00fc12()
+{
+	D3.u16 = objA0.position.x.u16
+	D2.u16 = (objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
+	D5 = 0x0d
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, -0x10, 0x800)
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0x80
+}
+
+
+//# address-hook(0x00fc4a) end(0x00fc9e)
+function void fn00fc4a()
+{
+	D2.u16 = (objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
+	fn00fc5c()
+}
+
+
+//# address-hook(0x00fc5c)
+function void fn00fc5c()
+{
+	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
+
+	u8[0xfffff768] = 0
+	D5.u8 = char.layer_flags1
+
+	pushA456()
+	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, -0x10, 0x0800)
+	popA456()
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0
+}
+
+
+//# address-hook(0x00fca0) end(0x00fcc6)
+function void fn00fca0()
+{
+	D3.u16 = objA0.position.x.u16
+	D2.u16 = (objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
+	u8[0xfffff768] = 0
+	D5 = 0x0c
+	checkStaticCollisionVerticalShort(D3.u16, D2.u16, 0xfffff768, -0x10, 0x0800)
+}
+
+
+//# address-hook(0x00fcca) end(0x00fd2e)
+function void fn00fcca()
+{
+	D3.u16 = (objA0.position.x.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
+	D2.u16 = objA0.position.y.u16 - s8(objA0.hitbox_extends.x)
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, -0x10, 0x400)
+	u16 backupD1 = D1.u16
+
+	D3.u16 = (objA0.position.x.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
+	D2.u16 = objA0.position.y.u16 + s8(objA0.hitbox_extends.x)
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff76a, -0x10, 0x400)
+	D0.u16 = backupD1
+
+	D2.u8 = 0x40
+	fn00f7e2()
+}
+
+
+//# address-hook(0x00fd32) end(0x00fd96)
+function void fn00fd32()
+{
+	D0 = 0
+	D3.u16 = (objA0.position.x.u16 - objA0.hitbox_extends.x) ^ 0x0f
+	D2.u16 = objA0.position.y.u16 - objA0.hitbox_extends.y
+	s16 result1 = checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, -0x10, 0x400)
+
+	D3.u16 = (objA0.position.x.u16 - objA0.hitbox_extends.x) ^ 0x0f
+	D2.u16 = objA0.position.y.u16 + objA0.hitbox_extends.y
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff76a, -0x10, 0x400)
+
+	D0.s16 = result1
+	D2.u8 = 0x40
+	fn00f7e2()
+}
+
+
+//# address-hook(0x00fd9a) end(0x00fde8)
+function void fn00fd9a()
+{
+	D3.u16 = objA0.position.x.u16
+	D2.u16 = objA0.position.y.u16
+	if (competition_mode.active == 0)
+	{
+		fn00fda8()
+	}
+	else
+	{
+		fn00fdc8()
+	}
+}
+
+//# address-hook(0x00fda8)
+function void fn00fda8()
+{
+	D3.u16 -= 10
+	fn00fd9a_shared()
+}
+
+//# address-hook(0x00fdc8)
+function void fn00fdc8()
+{
+	D3.u16 -= objA0.hitbox_extends.x
+	fn00fd9a_shared()
+}
+
+function void fn00fd9a_shared()
+{
+	D3.u16 ^= 0x0f
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, -0x10, 0x400)
+
+	D2.u8 = 0x40
+	if (D3 & 0x01)
+		D3.u8 = 0x40
+}
+
+
+//# address-hook(0x00fe3c) end(0x00fe40)
+function void fn00fe3c()
+{
+	D3.u16 = (D3.u16 + objA0.position.x.u16) ^ 0x0f
+	fn00fe44()
+}
+
+
+//# address-hook(0x00fe6e) end(0x00fe8c)
+function void fn00fe6e()
+{
+	// Only used in competition mode
+	D5 = objA0.hitbox_extends.y - 3
+	D2.u16 = objA0.position.x.u16 - 4
+	D3.u16 = objA0.position.y.u16 - D5.u16
+	D4.u16 = 8
+	D5.u16 *= 2
+	Character.CheckCollisionsWithDynamicObjects_partial()
+}
+
+
+//# address-hook(0x00fe44) end(0x00fe6c)
+function void fn00fe44()
+{
+	D2.u16 = objA0.position.y.u16
+
+	u8[0xfffff768] = 0
+	D5 = 0x0d
+	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, -0x10, 0x400)
+
+	D3.u8 = u8[0xfffff768]
+	if (D3 & 0x01)
+		D3.u8 = 0x40
+}

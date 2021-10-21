@@ -1,0 +1,1831 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+function void CompetitionMode.drawBackground(u8 atex)
+{
+#if STANDALONE
+	// Replace background with widescreen version
+	Renderer.enableDefaultPlane(0, false)
+	Renderer.drawCustomSprite("bg_dataselect", getScreenExtend() - 40, 0, atex, 0, 0x1100)
+#endif
+}
+
+
+// Main Menu
+
+//# address-hook(0x00a85e) end(0x00aa24)
+function void CompetitionMode.MainMenu()
+{
+	CompetitionMode.drawBackground(0x30)
+	FadeOutScreenBlocking()
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.setActiveDisplay(false)
+	fn0011ca()
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setBackdropColor(0x30)
+	VDP.Config.setVerticalScrolling(false, 0)
+	VDP.Config.setRenderingModeConfiguration(false)
+	VDP.Config.setPlayfieldSizeInPixels(512, 512)
+	fn00c02a()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+	level.framecounter = 0
+	if (competition_mode.mode >= 0x03)
+	{
+		competition_mode.mode = 0
+	}
+
+	Enigma.decompress(0x39d2a2, 0xffff0000, 0x6001)
+	copyRectToVRAM(0xffff0000, 0xe000, 0x28, 0x1c)
+
+	A0 = 0x39d4a4
+	A1 = 0xffff0000
+	A2 = 0xffff0020
+	fn00c006()
+
+	u32[0xffffef44] = 0xa85c
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	A0 = 0x39f87e
+	A1 = 0xffff0000
+	A2 = 0xffff53e0
+	fn00c006()
+
+	A0 = 0x39f46e
+	A2 = 0xffff6940
+	fn00c006()
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	copyMemory(0xfffffc80, 0x209818, 0x60)
+	copyMemory(0xfffffce0, 0x39d282, 0x20)
+
+	A0 = 0xffffb000
+	A1 = 0x00ab48
+	D0.u16 = u16[(A1+=2)-2]
+	while (D0.s16 >= 0)
+	{
+		u32[A0] = u32[(A1+=4)-4]
+		objA0.sprite_attributes = 0x034a
+		objA0.mapping_offset = 0x2098c0
+		objA0.position.x.u16 = u16[(A1+=2)-2] + getScreenExtend()
+		objA0.position.y.u16 = u16[(A1+=2)-2]
+		objA0.animation.sprite = u8[(A1+=1)-1]
+		objA0.flags2e = u8[(A1+=1)-1]
+		A0 += 0x4a
+		--D0.s16
+	}
+
+	fn01aa6e()
+	UpdateGameObjects()
+	RenderSprites()
+	CompetitionMode.drawBackground(0x30)
+
+	playMusic(0x2d)
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	VDP.Config.setActiveDisplay(true)
+	Menu.FadeInAfterInit()
+
+	while (true)
+	{
+		global.frame_state = 0x1e
+		waitForNextFrame()
+
+		++level.framecounter
+		UpdateGameObjects()
+		RenderSprites()
+		CompetitionMode.drawBackground(0x30)
+
+		D0.u8 = control.pad1.pressed | control.pad2.pressed
+	#if STANDALONE
+		if (D0.u8 & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
+	#else
+		if (D0.u8 & CONTROL_B)
+	#endif
+		{
+			global.game_mode = 0x04
+
+		#if STANDALONE
+			playSound(0xad)
+
+			u32 backupA0 = A0
+			FadeOutScreenBlocking()
+			A0 = backupA0
+
+			Game.returnToMainMenu()
+			yieldExecution()
+		#endif
+			return
+		}
+
+		if (D0.u8 & 0xf0)
+		{
+			D2 = competition_mode.mode * 2
+			call 0x00aa28 + D2.s16
+			break
+		}
+
+		D1.u8 = competition_mode.mode
+		if (D0.u16 & CONTROL_UP)
+		{
+			playSound(0x5b)
+			if (D1.s8 <= 0)
+				D1 = 3
+			else
+				--D1.u8
+		}
+		else if (D0.u16 & CONTROL_DOWN)
+		{
+			playSound(0x5b)
+			++D1.u8
+			if (D1.u8 > 3)
+				D1 = 0
+		}
+		competition_mode.mode = D1.u8
+	}
+}
+
+
+//# address-hook(0x00aa28) end(0x00aa28)
+function void fn00aa28()
+{
+	fn00aa36()
+}
+
+//# address-hook(0x00aa2a) end(0x00aa2a)
+function void fn00aa2a()
+{
+	fn00aa54()
+}
+
+//# address-hook(0x00aa2c) end(0x00aa2c)
+function void fn00aa2c()
+{
+	fn00aa74()
+}
+
+//# address-hook(0x00aa2e) end(0x00aa34)
+function void fn00aa2e()
+{
+	global.game_mode = 0x04
+
+#if STANDALONE
+	playSound(0xad)
+
+	u32 backupA0 = A0
+	FadeOutScreenBlocking()
+	A0 = backupA0
+
+	Game.returnToMainMenu()
+	yieldExecution()
+#endif
+}
+
+
+//# address-hook(0x00aa36) end(0x00aa52)
+function void fn00aa36()
+{
+	u8[0xffffff8b] = 0
+	u8[0xffffff8a] = u8[0xffffef4e]
+	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
+	global.game_mode = 0x3c
+	fn00aa8e()
+}
+
+
+//# address-hook(0x00aa54) end(0x00aa72)
+function void fn00aa54()
+{
+	u8[0xffffff8b] = 0x03
+	u8[0xffffff8a] = u8[0xffffef4e]
+	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
+	global.game_mode = 0x40
+	fn00aa8e()
+}
+
+
+//# address-hook(0x00aa74) end(0x00aaa0)
+function void fn00aa74()
+{
+	if (control.pad1.pressed & 0xe0)
+	{
+		u16[0xffffff8a] = 0xffff
+		competition_mode.multiplay = 0
+		global.game_mode = 0xc0
+		fn00aa8e()
+	}
+	else
+	{
+		fn00aaa6()
+	}
+}
+
+
+//# address-hook(0x00aa8e)
+function void fn00aa8e()
+{
+	zeroMemory(0xffff7800, 0x28)
+	playSound(0x63)
+}
+
+
+//# address-hook(0x00aaa6) end(0x00aad8)
+function void fn00aaa6()
+{
+	D1.u8 = competition_mode.mode
+	if (D0.u16 & 0x01)
+	{
+		playSound(0x5b)
+		if (D1.s8 <= 0)
+			D1 = 3
+		else
+			--D1.u8
+	}
+	else if (D0.u16 & 0x02)
+	{
+		playSound(0x5b)
+		++D1.u8
+		if (D1.u8 > 3)
+			D1 = 0
+	}
+	competition_mode.mode = D1.u8
+
+	// TODO: Resolve this... it's actually a "continue" in the main menu loop
+	//  -> This whole function should be removed as soon as it's not referenced any more
+	call 0x00a9e8
+}
+
+
+
+// Menu Item
+
+//# address-hook(0x00aadc) end(0x00aafa)
+function void fn00aadc()
+{
+	D0.u8 = objA0.flags2e
+	if (D0.s8 >= 0)
+	{
+		objA0.sprite_attributes &= 0x9fff
+		D1.u16 = (D0.u8 == competition_mode.mode) ? 0x4000 : 0x2000
+		objA0.sprite_attributes |= D1.u16
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x00ab00) end(0x00ab46)
+function void fn00ab00()
+{
+	if (competition_mode.mode <= 0x01)
+	{
+		D0.u16 = (control.pad1.pressed | control.pad2.pressed) & 0x0c
+		if (D0.u16 != 0)
+		{
+			u8[0xffffef4e] = (u8[0xffffef4e] == 0) ? 0xff : 0x00
+			playSound(0x5b)
+		}
+
+		objA0.position.x.u16 = ((u8[0xffffef4e] == 0) ? 0x015c : 0x017c) + getScreenExtend()
+		if (level.framecounter.low & 0x08)
+		{
+			DrawObject()
+		}
+	}
+}
+
+
+
+// Stage Select
+
+//# address-hook(0x00ab90) end(0x00af1c)
+function void CompetitionMode.StageSelect()
+{
+	FadeOutScreenBlocking()
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.setActiveDisplay(false)
+	fn0011ca()
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setBackdropColor(0x00)
+	VDP.Config.setVerticalScrolling(false, 0)
+	VDP.Config.setRenderingModeConfiguration(true)
+	VDP.Config.setPlayfieldSizeInPixels(512, 512)
+	fn00c02a()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+
+	level.framecounter = 0
+	competition_mode.active = 0
+	global.level_started = 0
+	u16[0xffffeee2] = 0xffff
+	u16[0xffffeee4] = 0
+	u16[0xffffeee6] = 0
+#if STANDALONE
+	u16[0xffffe000] = getScreenExtend()
+#endif
+
+	Enigma.decompress(0x39d2a2, 0xffff0000, 0x01)
+	copyRectToVRAM(0xffff0000, 0xe000, 0x28, 0x1c)
+
+	Enigma.decompress(0x39f104, 0xffff0000, 0x829f)
+	Enigma.decompress(0x39f24c, 0xffff1000, 0xe29f)
+	Enigma.decompress(0x39f36c, 0xffff2000, 0xa29f)
+
+	A0 = 0x00b0f4
+	fn00c088()
+	fn00afb2()
+
+	D0 = u32(D0.u16) * 0x48
+	scrolloffset.y.planeA = D0.u16
+	fn00b006()
+	fn00b036()
+
+	A0 = 0x39d4a4
+	A1 = 0xffff0000
+	A2 = 0xffff0020
+	fn00c006()
+
+	u32[0xffffef44] = 0xa85c
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	A0 = 0x39f87e
+	A1 = 0xffff0000
+	A2 = 0xffff53e0
+	fn00c006()
+
+	A0 = 0x3a1b30
+	A2 = 0xffffb920
+	fn00c006()
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	copyMemory(0xfffffc80, 0x39d282, 0x20)
+	copyMemory(0xfffffca0, 0x20a55e, 0x60)
+
+	A0 = 0xffffb000
+	A1 = (u8[0xfffff600] & 0x80) ? 0x00b282 : 0x00b1f0
+	D0.u16 = u16[(A1+=2)-2]
+	while (D0.s16 >= 0)
+	{
+		u32[A0] = u32[(A1+=4)-4]
+		objA0.mapping_offset = 0x20a6e4
+		objA0.position.x.u16 = u16[A1] + getScreenExtend()
+		objA0.position.x.frac = u16[(A1+=2)-2]
+		objA0.position.y.u16 = u16[A1]
+		objA0.position.y.frac = u16[(A1+=2)-2]
+		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.animation.sprite = u8[(A1+=1)-1]
+		objA0.flags2e = u8[(A1+=1)-1]
+		A0 += 0x4a
+		--D0.s16
+	}
+
+	D0 = u32(u8[0xffffffea]) * 0x55
+	D0.u8 += 0x40
+	u8[0xffffb0c2] = D0.u8
+	if (s8[0xfffff600] >= 0)
+	{
+		D0 = u32(u8[0xffffffeb]) * 0x55
+		D0.u8 += 0x40
+		u8[0xffffb234] = D0.u8
+	}
+
+	fn01aa6e()
+	UpdateGameObjects()
+	RenderSprites()
+	CompetitionMode.drawBackground(0x00)
+
+	fn00c0ae()
+	UpdateGameObjects()
+	RenderSprites()
+	CompetitionMode.drawBackground(0x00)
+
+	A0 = 0xffffb378
+	u32[A0] = 0x00af58
+	objA0.mapping_offset = 0x20a6e4
+	objA0.sprite_attributes += 0xc29f
+	objA0.position.x.u16 = 0xb0 + getScreenExtend()
+	playMusic(0x2d)
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	VDP.Config.setActiveDisplay(true)
+#if STANDALONE
+	// Load Knuckles' extended palette
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+	Menu.FadeInAfterInit()
+
+	while (true)
+	{
+	// 0x00adf2:
+		global.frame_state = 0x1e
+		waitForNextFrame()
+
+	@EntryPoint:
+		++level.framecounter
+		UpdateGameObjects()
+		fn00c0ae()
+		RenderSprites()
+		CompetitionMode.drawBackground(0x00)
+
+		D0.u8 = u8[0xffffeee4]
+		if (D0.u8 != 0)
+		{
+			global.game_mode = D0.u8
+			return
+		}
+
+		D0.u16 = u16[0xffffeee2]
+		if (competition_mode.multiplay == 0)
+		{
+			D0.u16 >>= 8
+		}
+
+		if (D0.u16 != 0)
+		{
+			if (u16[0xffffe000] != getScreenExtend())
+			{
+				if (u16[0xffffe000] == 0xffa8 + getScreenExtend())
+				{
+					u32[0xffffef44] = 0xafc8
+				}
+				u16[0xffffe000] += 8
+			}
+			continue
+		}
+
+		if (u16[0xffffe000] != 0xffa8 + getScreenExtend())
+		{
+			u16[0xffffe000] -= 8
+			continue
+		}
+
+		D0 = 0x08
+		D1.u16 = u16[0xffffeee6]
+		if (D1.u16 != 0)
+		{
+			if (D1.s16 < 0)
+			{
+				D0.s16 = -D0.s16
+			}
+			scrolloffset.y.planeA += D0.u16
+			u16[0xffffeee6] -= D0.u16
+			continue
+		}
+
+		D1.u8 = control.pad1.pressed
+		D2 = (competition_mode.multiplay) ? control.pad2.pressed : 0
+	#if STANDALONE
+		if (D1 & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
+	#else
+		if (D1 & CONTROL_B)
+	#endif
+		{
+			u8[0xffffb0c3] = 0
+			u8[0xffffeee2] = 0xff
+		}
+	#if STANDALONE
+		if (D2 & CONTROL_B || Input.buttonPressed(BUTTON_BACK | BUTTON_PAD2))
+	#else
+		if (D2 & CONTROL_B)
+	#endif
+		{
+			u8[0xffffb235] = 0
+			u8[0xffffeee3] = 0xff
+		}
+		D1.u8 |= D2.u8
+		D2.u16 = D1.u8 & 0x03
+		if (D2.u16 != 0)
+		{
+			if ((D2.u8 & CONTROL_UP) == 0)
+			{
+				if (competition_mode.stage != 0x04)
+				{
+					playSound(0x5b)
+					++competition_mode.stage
+					if (competition_mode.stage != 0x01 && competition_mode.stage != 0x04)
+					{
+						s16[0xffffeee6] = 0x48
+						continue
+					}
+				}
+			}
+			else
+			{
+				if (competition_mode.stage != 0)
+				{
+					playSound(0x5b)
+					--competition_mode.stage
+					if (competition_mode.stage != 0x00 && competition_mode.stage != 0x03)
+					{
+						s16[0xffffeee6] = -0x48
+						continue
+					}
+				}
+			}
+		}
+
+		if (D1.u16 & 0xe0)
+			break
+	}
+
+	// Start now
+	playSound(0x63)
+	global.zone = u8[0x00af1e + competition_mode.stage]
+	global.act = 0
+	fn00c104()
+	global.game_mode = 0x0c
+}
+
+
+
+// Marker frame around the selected stage
+
+//# address-hook(0x00af24) end(0x00af56)
+function void fn00af24()
+{
+	if (u16[0xffffe000] == 0xffa8 + getScreenExtend() && u16[0xffffeee6] == 0)
+	{
+		objA0.position.y.u16 = u32(competition_mode.stage) * 0x48 + (0xac - scrolloffset.y.planeA)
+		if (level.framecounter.low & 0x08)
+		{
+			DrawObject()
+		}
+	}
+}
+
+
+//# address-hook(0x00af58) end(0x00afb0)
+function void fn00af58()
+{
+	if (u16[0xffffe000] == 0xffa8 + getScreenExtend() && u16[0xffffeee6] == 0)
+	{
+		objA0.position.y.u16 = u32(competition_mode.stage) * 0x48 + (0xa8 - scrolloffset.y.planeA)
+		objA0.animation.sprite = competition_mode.stage + 0x06
+		DrawObject()
+
+		A1 = 0x20a5be + competition_mode.stage * 0x20
+		copyMemory(0xfffffc40, A1, 0x20)
+	}
+	else
+	{
+		copyMemory(0xfffffc40, 0x20a57e, 0x20)
+	}
+}
+
+
+//# address-hook(0x00afb2) end(0x00afc6)
+function void fn00afb2()
+{
+	D0 = clamp(s8(competition_mode.stage) - 1, 0, 2)
+}
+
+
+//# address-hook(0x00afc8) end(0x00b000)
+function void fn00afc8()
+{
+	u32[0xffffef44] = 0xa85c
+
+	u16 vramAddress = 0xc204
+	VDP.setWriteIncrement(0x80)
+	for (u8 y = 0; y < 9; ++y)
+	{
+		VDP.setupVRAMWrite(vramAddress)
+		for (u8 x = 0; x < 0x13; ++x)
+		{
+			VDP.writeData32(0x80008000)
+		}
+		vramAddress += 2
+	}
+	VDP.setWriteIncrement(0x02)
+
+	fn00b006()
+}
+
+
+//# address-hook(0x00b006) end(0x00b032)
+function void fn00b006()
+{
+	fn00afb2()
+
+	D0 = 0xc004 + ((u32(D0.u16) * 0x48 + 0x20) << 4)
+	D7.u16 = D0.u16
+	if (s8[0xfffff600] < 0)
+	{
+		D0.u16 += 0x0300
+	}
+	else
+	{
+		fn00c04c()
+		D0.u16 = D7.u16 + 0x0600
+	}
+	fn00c04c()
+}
+
+
+//# address-hook(0x00b036) end(0x00b062)
+function void fn00b036()
+{
+	D7.u16 = 0xc2d2
+	D6 = u32[0xffffe600]
+	fn00b066()
+
+	D7.u16 += 0x0480
+	D6 = u32[0xffffe610]
+	fn00b066()
+
+	D7.u16 += 0x0480
+	D6 = u32[0xffffe630]
+	fn00b066()
+
+	D7.u16 += 0x0480
+	D6 = u32[0xffffe620]
+	fn00b066()
+
+	D7.u16 += 0x0480
+	D6 = u32[0xffffe640]
+	fn00b066()
+}
+
+
+//# address-hook(0x00b066) end(0x00b0a2)
+function void fn00b066()
+{
+	// This function writes a time (record, lap time, etc.)
+	//  -> Time value is expected in D6, using the format 0x00MMSSHH (minutes, seconds, hundredths)
+	D5 = 0
+	D6 <<= 8
+	D3 = 2
+	while (D3.s16 >= 0)
+	{
+		D6 = (D6 << 8) + (D6 >> 24)
+		D0 = D6.u8
+		fn02de50()
+
+		D5.u8 = D1.u8
+		D5 <<= 8
+		--D3.s16
+	}
+
+	A1 = 0xfffff100
+	A2 = 0x20a130
+	D0 = 0
+	fn00b0c2()
+
+	D0.u8 = 0xff
+	fn00b0c2()
+
+	D1 = 0x0a
+	fn00b0d4()
+	fn00b0c2()
+	fn00b0c2()
+
+	D1 = 0x0b
+	fn00b0d4()
+	fn00b0c2()
+	fn00b0c2()
+
+	A1 = 0xfffff100
+	fn00b0a6()
+}
+
+
+//# address-hook(0x00b0a6) end(0x00b0bc)
+function void fn00b0a6()
+{
+	copyRectToVRAM(A1, D7.u16, 8, 2)
+}
+
+
+//# address-hook(0x00b0c2) end(0x00b0d2)
+function void fn00b0c2()
+{
+	D5 = (D5 << 4) + (D5 >> 28)
+	D1.u16 = D5.u16 & 0x0f
+	if (D1.u16 == 0 && D0.u16 == 0)
+	{
+		D1 = 0x0c
+		D0.u8 = 0xff
+	}
+	fn00b0d4()
+}
+
+
+//# address-hook(0x00b0d4) end(0x00b0e2)
+function void fn00b0d4()
+{
+	D1.u16 *= 4
+	u16[(A1+=2)-2] = u16[A2 + D1.s16]
+	u16[A1 + 0x0e] = u16[A2 + D1.s16 + 0x02]
+}
+
+
+
+// Character selection for Grand Prix
+
+//# address-hook(0x00b2cc) end(0x00b4f4)
+function void fn00b2cc()
+{
+	FadeOutScreenBlocking()
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.setActiveDisplay(false)
+	fn0011ca()
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setBackdropColor(0x00)
+	VDP.Config.setVerticalScrolling(false, 0)
+	VDP.Config.setRenderingModeConfiguration(true)
+	VDP.Config.setPlayfieldSizeInPixels(512, 512)
+	fn00c02a()
+
+	D0.u16 = 0xc220
+	fn00c04c()
+	D0.u16 = 0xc820
+	fn00c04c()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+	level.framecounter = 0
+	u16[0xffffeee2] = 0xffff
+	u16[0xffffeee4] = 0
+
+	Enigma.decompress(0x39d2a2, 0xffff0000, 0x01)
+	copyRectToVRAM(0xffff0000, 0xe000, 0x28, 0x1c)
+
+	A0 = 0x39d4a4
+	A1 = 0xffff0000
+	A2 = 0xffff0020
+	fn00c006()
+
+	u32[0xffffef44] = 0xa85c
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	A0 = 0x39f87e
+	A1 = 0xffff0000
+	A2 = 0xffff53e0
+	fn00c006()
+
+	A0 = 0x3a1b30
+	A2 = 0xffffb920
+	fn00c006()
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	copyMemory(0xfffffc80, 0x39d282, 0x20)
+	copyMemory(0xfffffca0, 0x20a55e, 0x60)
+
+#if STANDALONE
+	u16[0xffffe000] = getScreenExtend()
+#endif
+
+	A0 = 0xffffb04a
+	A1 = 0x00b6c8
+	D0.u16 = u16[(A1+=2)-2]
+	while (D0.s16 >= 0)
+	{
+		u32[A0] = u32[(A1+=4)-4]
+		objA0.mapping_offset = 0x20a6e4
+		objA0.position.x.u16 = u16[A1]
+		objA0.position.x.frac = u16[(A1+=2)-2]
+		objA0.position.y.u16 = u16[A1]
+		objA0.position.y.frac = u16[(A1+=2)-2]
+		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.animation.sprite = u8[(A1+=1)-1]
+		objA0.flags2e = u8[(A1+=1)-1]
+		A0 += 0x4a
+		--D0.s16
+	}
+
+	D0 = u32(u8[0xffffffea]) * 0x55
+	u8[0xffffb0c2] = 0x40 + D0.u8
+	D0 = u32(u8[0xffffffeb]) * 0x55
+	u8[0xffffb234] = 0x40 + D0.u8
+
+	fn01aa6e()
+	UpdateGameObjects()
+	RenderSprites()
+	CompetitionMode.drawBackground(0x00)
+
+	fn00c0ae()
+	UpdateGameObjects()
+	RenderSprites()
+	CompetitionMode.drawBackground(0x00)
+
+	playMusic(0x2d)
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	VDP.Config.setActiveDisplay(true)
+#if STANDALONE
+	// Load Knuckles' extended palette
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+	Menu.FadeInAfterInit()
+
+	while (true)
+	{
+		global.frame_state = 0x1e
+		waitForNextFrame()
+
+		++level.framecounter
+		UpdateGameObjects()
+		fn00c0ae()
+		RenderSprites()
+		CompetitionMode.drawBackground(0x00)
+
+		if (u8[0xffffeee4] != 0)
+		{
+			global.game_mode = u8[0xffffeee4]
+			return
+		}
+
+		D0.u16 = u16[0xffffeee2]
+		if (competition_mode.multiplay == 0)
+		{
+			D0.u16 >>= 8
+		}
+		if (D0.u16 == 0)
+			break
+	}
+
+	global.zone_act = 0x0e00
+	fn00c104()
+	global.game_mode = 0x0c
+}
+
+
+
+// Updates the stage icons
+
+//# address-hook(0x00b4f6) end(0x00b502)
+function void fn00b4f6()
+{
+	objA0.position.x.u16 = objA0.position.x.frac + u16[0xffffe000]
+	DrawObject()
+}
+
+
+// ...
+
+
+//# address-hook(0x00b508) end(0x00b528)
+function void fn00b508()
+{
+	A1 = 0xfffff607		// Address of control.pad2.pressed
+	A2 = 0xffffeee3
+	A3 = 0xffffffeb
+	if (competition_mode.multiplay)
+	{
+		fn00b538()
+	}
+	else
+	{
+		if (u16[0xffffeee6] == 0)
+		{
+			competition_mode.multiplay = (s8[A1] < 0) ? 0xff : 0x00
+		}
+		D0 = 0
+		fn00b638()
+	}
+}
+
+
+//# address-hook(0x00b52c) end(0x00b534)
+function void fn00b52c()
+{
+	A1 = 0xfffff605		// Address of control.pad1.pressed
+	A2 = 0xffffeee2
+	A3 = 0xffffffea
+	fn00b538()
+}
+
+
+//# address-hook(0x00b538) end(0x00b634)
+function void fn00b538()
+{
+	if (u16[0xffffe000] == getScreenExtend())
+	{
+		if (objA0.value2f != 0)
+		{
+			bool pressedB = (u8[A1] & CONTROL_B)
+		#if STANDALONE
+			pressedB |= Input.buttonPressed(BUTTON_BACK | (A1 == 0xfffff605 ? 0 : BUTTON_PAD2))
+		#endif
+			if (pressedB)
+			{
+				objA0.value2f = 0
+				u8[A2] = 0xff
+			}
+		}
+		else
+		{
+			bool skip = false
+			if (u8[A0 + 0x30] == 0)
+			{
+				if ((u8[A1] & 0x0c) == 0)
+				{
+					bool pressedB = (u8[A1] & CONTROL_B)
+				#if STANDALONE
+					pressedB |= Input.buttonPressed(BUTTON_BACK | (A1 == 0xfffff605 ? 0 : BUTTON_PAD2))
+				#endif
+					if (pressedB)
+					{
+						u8[0xffffeee4] = 0x38
+					}
+					else
+					{
+						D0.u16 = u8[A1] & 0xe0
+						if (D0.u16 != 0)
+						{
+							objA0.value2f = 0xff
+							u8[A2] = 0
+							playSound(0x63)
+						}
+					}
+
+					skip = true
+				}
+				else
+				{
+					playSound(0xc3)
+
+					u8[A0 + 0x34] = 0
+					u8[A0 + 0x35] = objA0.flags2e
+					D0.u16 = u8[A1] & 0x0c
+					if ((D0 & 0x04) == 0)
+					{
+						u8[A0 + 0x30] = 0x01
+						D0.u8 = u8[A3] + 1
+						if (D0.u8 > 0x02)
+							D0 = 0
+						u8[A3] = D0.u8
+						D0 = u32(D0.u16) * 0x55
+						if (D0 == 0)
+							D0.u16 = 0x0100
+						D0.u16 += 0x40
+						objA0.value32 = D0.u16
+					}
+					else
+					{
+						u8[A0 + 0x30] = 0xff
+						D0.u8 = u8[A3] - 1
+						if (D0.s8 < 0)
+							D0 = 0x02
+						u8[A3] = D0.u8
+						D0 = u32(D0.u16) * 0x55
+						if (D0.u16 >= 0x80)
+							D0.s16 = D0.s8
+						D0.u16 += 0x40
+						objA0.value32 = D0.u16
+					}
+				}
+			}
+
+			if (!skip)
+			{
+				D0.u16 = u16[A0 + 0x34]
+				D1.u16 = objA0.value32
+				if (s8[A0 + 0x30] >= 0)
+				{
+					D0.u16 += 5
+					if (D1.s16 <= D0.s16)
+					{
+						D0.u16 = D1.u16
+						u8[A0 + 0x30] = 0
+					}
+				}
+				else
+				{
+					D0.u16 -= 5
+					if (D1.s16 >= D0.s16)
+					{
+						D0.u16 = D1.u16
+						u8[A0 + 0x30] = 0
+					}
+				}
+				u16[A0 + 0x34] = D0.u16
+				objA0.flags2e = D0.u8
+			}
+		}
+	}
+
+	D0 = 0x01
+	if (objA0.value2f == 0)
+	{
+		D0.u16 = (level.framecounter >> 3) & 0x01
+	}
+	fn00b638()
+}
+
+
+//# address-hook(0x00b638) end(0x00b648)
+function void fn00b638()
+{
+	objA0.animation.sprite = D0.u8
+	objA0.position.x.u16 = objA0.position.x.frac + u16[0xffffe000]
+	DrawObject()
+}
+
+
+//# address-hook(0x00b6a6) end(0x00b6c6)
+function void fn00b6a6()
+{
+	if (competition_mode.multiplay == 0 && (level.framecounter.low & 0x20))
+	{
+		objA0.position.x.u16 = objA0.position.x.frac + u16[0xffffe000]
+		DrawObject()
+	}
+}
+
+
+
+// Character display
+
+//# address-hook(0x00b64e) end(0x00b654)
+function void fn00b64e()
+{
+	// This is for player 2
+	if (competition_mode.multiplay)
+	{
+		fn00b656()
+	}
+}
+
+
+//# address-hook(0x00b656) end(0x00b6a0)
+function void fn00b656()
+{
+	objA0.mapping_offset = 0x3a1aee
+	objA0.sprite_attributes = 0x25c9
+	D0 = 0
+	D1 = 0xffffffab
+	D2 = objA0.flags2e
+	while (D2.s16 >= 0)
+	{
+		D0.u16 += 0x4a
+		D1.u16 += 0x55
+		--D2.s16
+	}
+
+	D0.s16 = -D0.s16
+	D0.u8 = u8[A0 + D0.s16 + 0x2e] + D1.u8
+	LookupSinCos()
+	D1.s16 >>= 4
+	D1.u16 += objA0.position.x.frac + u16[0xffffe000]
+	objA0.position.x.u16 = D1.u16
+	D0.s16 >>= 5
+	D0.u16 += objA0.position.y.frac
+	objA0.position.y.u16 = D0.u16
+
+	DrawObject()
+}
+
+
+
+//# address-hook(0x00c02a) end(0x00c04a)
+function void fn00c02a()
+{
+	VDP.setupVRAMWrite(0xc000)
+	for (u16 i = 0; i < 0x0800; ++i)
+	{
+		VDP.writeData32(0x80008000)
+	}
+}
+
+
+//# address-hook(0x00c04c) end(0x00c066)
+function void fn00c04c()
+{
+	D1 = 0
+	for (u8 i = 0; i < 8; ++i)
+	{
+		D3.u16 = D0.u16
+		fn00c068()
+		D0.u16 = (D0.u16 + 0x80) & 0xdfff
+	}
+}
+
+
+//# address-hook(0x00c068) end(0x00c086)
+function void fn00c068()
+{
+	VDP.setupVRAMWrite(D3.u16)
+	VDP.writeData32(D1)
+	VDP.writeData32(D1)
+	VDP.writeData32(D1)
+	VDP.writeData32(D1)
+	VDP.writeData16(D1.u16)
+}
+
+
+//# address-hook(0x00c088) end(0x00c0ac)
+function void fn00c088()
+{
+	D7.u16 = u16[(A0+=2)-2]
+	while (D7.s16 >= 0)
+	{
+		A1 = u32[(A0+=4)-4]
+		D0 = u16[(A0+=2)-2]
+		D1.u16 = u16[(A0+=2)-2]
+		D2.u16 = u16[(A0+=2)-2]
+		copyRectToVRAM(A1, D0, D1.u16 + 1, D2.u16 + 1)
+		--D7.s16
+	}
+}
+
+
+//# address-hook(0x00c0ae) end(0x00c0b4)
+function void fn00c0ae()
+{
+	A0 = 0xffffb0de
+	fn00c0b8()
+
+	A0 = 0xffffb250
+	fn00c0b8()
+}
+
+
+//# address-hook(0x00c0b8) end(0x00c0e8)
+function void fn00c0b8()
+{
+	A1 = A0 + 0x4a
+	A2 = A1 + 0x4a
+	fn00c0ea()
+	fn00c0ea()
+
+	objA0.sprite_priority = 0x80
+	u16[A1 + 0x08] = 0x0100
+	u16[A2 + 0x08] = 0x0180
+	u8[A0 + 0x0a] |= 0x80
+	u8[A1 + 0x0a] &= ~0x80
+	u8[A2 + 0x0a] &= ~0x80
+}
+
+
+//# address-hook(0x00c0ea) end(0x00c102)
+function void fn00c0ea()
+{
+	if (objA0.position.y.u16 <= s16[A1 + 0x14])
+	{
+		u32 tmp = A0
+		A0 = A1
+		A1 = tmp
+	}
+
+	if (s16[A1 + 0x14] <= s16[A2 + 0x14])
+	{
+		u32 tmp = A2
+		A2 = A1
+		A1 = tmp
+	}
+}
+
+
+//# address-hook(0x00c104) end(0x00c10a)
+function void fn00c104()
+{
+	competition_mode.active = 1
+	fn00c110()
+}
+
+
+
+// Grand Prix results
+
+//# address-hook(0x00b74e) end(0x00b9a2)
+function void fn00b74e()
+{
+	FadeOutScreenBlocking()
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.setActiveDisplay(false)
+	fn0011ca()
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setBackdropColor(0x00)
+	VDP.Config.setVerticalScrolling(false, 0)
+	VDP.Config.setRenderingModeConfiguration(true)
+	VDP.Config.setPlayfieldSizeInPixels(512, 512)
+	fn00c02a()
+
+	D0.u16 = 0xc1aa
+	fn00c04c()
+	D0.u16 = 0xc82a
+	fn00c04c()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+	level.framecounter = 0
+	competition_mode.active = 0
+	global.level_started = 0
+	u16[0xffffeee8] = 30
+
+	A0 = 0x39d2a2
+	A1 = 0xffff0000
+	D0.u16 = 0x01
+	Enigma.Decompress()
+
+	A0 = 0x20ae62
+	A1 = 0xffff1000
+	D0.u16 = 0xa34a
+	Enigma.Decompress()
+
+	A0 = 0x00bbac
+	fn00c088()
+
+	fn00ba04()
+
+	A0 = 0x39d4a4
+	A1 = 0xffff0000
+	A2 = 0xffff0000 + 0x20
+	fn00c006()
+
+	u32[0xffffef44] = 0x00a85c
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	A0 = 0x39f87e
+	A1 = 0xffff0000
+	A2 = 0xffff0000 + 0x53e0
+	fn00c006()
+
+	A0 = 0x3a16be
+	A2 = 0xffff0000 + 0x6940
+	fn00c006()
+
+	A0 = 0x3a1b30
+	A2 = 0xffff0000 + 0xb920
+	fn00c006()
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	copyMemory(0xfffffc80, 0x39d282, 0x20)
+	copyMemory(0xfffffca0, 0x20a55e, 0x40)
+	copyMemory(0xfffffce0, 0x20ad84, 0x20)
+
+	A0 = 0xffffb000
+	A1 = 0x00bb4a
+	D0.u16 = u16[(A1+=2)-2]
+	while (D0.s16 >= 0)
+	{
+		u32[A0] = u32[(A1+=4)-4]
+		objA0.mapping_offset = 0x20a6e4
+		objA0.position.x.u16 = u16[A1]
+		objA0.position.x.frac = u16[(A1+=2)-2]
+		objA0.position.y.u16 = u16[A1]
+		objA0.position.y.frac = u16[(A1+=2)-2]
+		objA0.sprite_attributes = u16[(A1+=2)-2] + 0x829f
+		objA0.animation.sprite = u8[(A1+=1)-1]
+		objA0.flags2e = u8[(A1+=1)-1]
+		A0 += 0x4a
+		--D0.s16
+	}
+
+#if STANDALONE
+	u16[0xffffe000] = getScreenExtend() * 2
+#endif
+
+	fn01aa6e()
+	UpdateGameObjects()
+	RenderSprites()
+	CompetitionMode.drawBackground(0x00)
+
+	playMusic(0x28)
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	VDP.Config.setActiveDisplay(true)
+	Menu.FadeInAfterInit()
+
+	while (true)
+	{
+		global.frame_state = 0x1e
+		waitForNextFrame()
+
+		++level.framecounter
+		D7.u16 = u16[0xffffeea0]
+		if (D7.u16 != 0)
+		{
+			if ((level.framecounter.low & 0x08) == 0)
+			{
+				A1 = 0xfffff120
+				fn00b0a6()
+			}
+			else
+			{
+				D6 = u32[0xffffee98]
+				fn00b066()
+			}
+		}
+
+		// Countdown before first button reaction
+		if (u16[0xffffeee8] != 0)
+		{
+			--u16[0xffffeee8]
+		}
+		else
+		{
+			D0.u8 = control.pad1.pressed
+			if (competition_mode.multiplay != 0)
+			{
+				D0.u8 |= control.pad2.pressed
+			}
+
+			s16 startScreenOffset = getScreenExtend() * 2
+			s16 endScreenOffset = (getScreenExtend() / 16 * 24) - 0x88
+
+			if (u16[0xffffe000] != startScreenOffset)
+			{
+				if (u16[0xffffe000] == endScreenOffset)
+				{
+					if (D0.u16 & 0xe0)
+					{
+						global.game_mode = 0x38
+						return
+					}
+				}
+				else
+				{
+					u16[0xffffe000] -= 8
+				}
+			}
+			else
+			{
+				if (D0.u16 & 0xe0)
+				{
+					u16[0xffffe000] -= 8
+				}
+			}
+		}
+
+		UpdateGameObjects()
+		RenderSprites()
+		CompetitionMode.drawBackground(0x00)
+	}
+}
+
+
+
+// Used in both results screens
+
+//# address-hook(0x00b9a6) end(0x00b9c6)
+function void fn00b9a6()
+{
+	// Character icon
+	objA0.mapping_offset = 0x3a1aee
+	objA0.sprite_attributes = 0xa5c9
+	objA0.animation.sprite = (objA0.flags2e == 0) ? u8[0xffffffea] : u8[0xffffffeb]
+	fn00b4f6()
+}
+
+
+
+// Only in Grand Prix results
+
+//# address-hook(0x00b9ca) end(0x00ba02)
+function void fn00b9ca()
+{
+	objA0.sprite_attributes = 0xa34a
+	D0.u8 = u8[0xffffeea2]
+	D1.u8 = u8[0xffffeea3]
+	if (objA0.flags2e != 0)
+	{
+		u32 tmp = D0
+		D0 = D1
+		D1 = tmp
+	}
+
+	if (D1.u8 == D0.u8)
+	{
+		D2 = 0x0d
+	}
+	else if (D1.u8 > D0.u8)
+	{
+		D2 = 0x0c
+	}
+	else
+	{
+		D2 = 0x0b
+	}
+	objA0.animation.sprite = D2.u8
+
+	if (D2.u8 != 0x0b || (level.framecounter.low & 0x08))
+	{
+		fn00b4f6()
+	}
+}
+
+
+//# address-hook(0x00ba04) end(0x00baec)
+function void fn00ba04()
+{
+	A0 = 0xffff7800
+	D7.u16 = 0xc15a
+	fn00baee()
+	D7.u16 = 0xc7da
+	fn00baee()
+
+	A0 = 0xffff7800
+	fn00bb04()
+
+	D7.u16 = 0xc65a
+	u32[0xffffee98] = D6
+	u16[0xffffeea0] = D7.u16
+	fn00b066()
+
+	fn00bb04()
+
+	D7.u16 = 0xccda
+	if (D6 <= u32[0xffffee98])
+	{
+		if (D6 == u32[0xffffee98])
+		{
+			u16[0xffffeea0] = 0
+		}
+		else
+		{
+			u32[0xffffee98] = D6
+			u16[0xffffeea0] = D7.u16
+		}
+	}
+	fn00b066()
+
+	u16[0xffffeea2] = 0
+	A0 = 0xff7800
+	D5 = 0x41480003
+	for (u8 i = 0; i < 5; ++i)
+	{
+		A1 = 0x20af08
+		A2 = 0x20af10
+		++u8[0xffffeea2]
+		D0 = u32[(A0+=4)-4]
+		if (D0 != objA0.position.x)
+		{
+			if (D0 >= objA0.position.x)
+			{
+				u32 tmp = A1
+				A1 = A2
+				A2 = tmp
+				--u8[0xffffeea2]
+				++u8[0xffffeea3]
+			}
+		}
+		else
+		{
+			A1 = 0x20af18
+			A2 = A1
+			--u8[0xffffeea2]
+		}
+
+		D0 = D5
+		D1 = 0x01
+		D2 = 0x01
+		CopyRectToVRAM()
+
+		A1 = A2
+		D0 = D5 + 0x06800000
+		D1 = 0x01
+		D2 = 0x01
+		CopyRectToVRAM()
+
+		D5 += 0x01000000
+	}
+
+	D7.u16 = u16[0xffffeea0]
+	if (D7.u16 != 0)
+	{
+		D6 = u32[0xffffee98]
+		fn00b066()
+
+		A0 = 0xfffff100
+		A1 = A0 + 0x20
+		for (u8 i = 0; i < 0x10; ++i)
+		{
+			D1.u16 = (u16[(A0+=2)-2] & 0x9fff) | 0x6000
+			u16[(A1+=2)-2] = D1.u16
+		}
+	}
+}
+
+
+//# address-hook(0x00baee) end(0x00baee)
+function void fn00baee()
+{
+	D0 = 0x04
+	fn00baf0()
+}
+
+
+//# address-hook(0x00baf0) end(0x00bb02)
+function void fn00baf0()
+{
+	s16 count = D0.s16
+	for (s16 i = 0; i <= count; ++i)
+	{
+		D6 = u32[(A0+=4)-4]
+		fn00b066()
+		D7.u16 += 0x0100
+	}
+}
+
+
+//# address-hook(0x00bb04) end(0x00bb48)
+function void fn00bb04()
+{
+	u32[0xffffef40] = 0
+	for (u8 i = 0; i < 5; ++i)
+	{
+		D6 = u32[(A0+=4)-4]
+		A1 = 0xffffef44
+		u8[A1-=1] += D6.u8
+		if (u8[A1] >= 100)
+		{
+			u8[A1] -= 100
+			++u8[A1 - 0x01]
+		}
+		D6 >>= 8
+		u8[A1-=1] += D6.u8
+		if (u8[A1] >= 60)
+		{
+			u8[A1] -= 60
+			++u8[A1 - 0x01]
+		}
+		D6 >>= 8
+		u8[A1-=1] += D6.u8
+		if (u8[A1] >= 100)
+		{
+			u8[A1] = 0x63
+		}
+	}
+	D6 = u32[0xffffef40]
+}
+
+
+//# address-hook(0x00bc08) end(0x00beb0)
+function void fn00bc08()
+{
+	FadeOutScreenBlocking()
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.setActiveDisplay(false)
+	fn0011ca()
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setBackdropColor(0x00)
+	VDP.Config.setVerticalScrolling(false, 0)
+	VDP.Config.setRenderingModeConfiguration(true)
+	VDP.Config.setPlayfieldSizeInPixels(512, 512)
+	fn00c02a()
+
+	D0.u16 = 0xc1aa
+	fn00c04c()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+	level.framecounter = 0
+	competition_mode.active = 0
+	global.level_started = 0
+	u16[0xffffeee8] = 0x1e
+	u16[0xffffe000] = 0xff78 + getScreenExtend()
+
+	Enigma.decompress(0x39d2a2, 0xffff0000, 0x01)
+
+	A0 = 0x00bf96
+	fn00c088()
+
+	A1 = u32[0x00bff2 + (global.zone - 0x0e) * 4]
+	copyRectToVRAM(A1, 0xc826, 0x0d, 2)
+
+	fn00beb2()
+
+	Nemesis.loadDataToVRAM(0x05d788, 0xb1a0)
+	Nemesis.loadDataToVRAM(0x38d3e0, 0xb420)
+
+	A0 = 0x39d4a4
+	A1 = 0xffff0000
+	A2 = 0xffff0020
+	fn00c006()
+
+	u32[0xffffef44] = 0x00a85c
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	A0 = 0x39f87e
+	A1 = 0xffff0000
+	A2 = 0xffff53e0
+	fn00c006()
+
+	A0 = 0x3a16be
+	A2 = 0xffff6940
+	fn00c006()
+
+	A0 = 0x3a1b30
+	A2 = 0xffffb920
+	fn00c006()
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	Kosinski.decompress(0x15bac0, 0xffff0020)
+	Kosinski.decompress(0x15c130, A1)
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.setupVRAMWrite(0xae40)
+	A0 = 0xffff0f60
+	D0.u16 = 0xd7
+	while (D0.s16 >= 0)
+	{
+		VDP.writeData32(u32[(A0+=4)-4])
+		--D0.s16
+	}
+
+	copyMemory(0xfffffc80, 0x39d282, 0x20)
+	copyMemory(0xfffffca0, 0x20a55e, 0x40)
+	copyMemory(0xfffffce0, 0x20b26c, 0x20)
+
+	A0 = 0xffffb000
+	A1 = 0x00bf58
+	D0.u16 = u16[(A1+=2)-2]
+	while (D0.s16 >= 0)
+	{
+		u32[A0] = u32[(A1+=4)-4]
+		objA0.mapping_offset = 0x20a6e4
+		objA0.position.x.u16 = u16[A1] + getScreenExtend()
+		objA0.position.x.frac = u16[(A1+=2)-2]
+		objA0.position.y.u16 = u16[A1]
+		objA0.position.y.frac = u16[(A1+=2)-2]
+		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.animation.sprite = u8[(A1+=1)-1]
+		objA0.flags2e = u8[(A1+=1)-1]
+		A0 += 0x4a
+		--D0.s16
+	}
+
+	fn01aa6e()
+	UpdateGameObjects()
+	RenderSprites()
+	CompetitionMode.drawBackground(0x00)
+	playMusic(0x28)
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+	VDP.Config.setActiveDisplay(true)
+	Menu.FadeInAfterInit()
+
+	while (true)
+	{
+		global.frame_state = 0x1e
+		waitForNextFrame()
+		++level.framecounter
+
+		D7.u16 = u16[0xffffeea0]
+		if (D7.u16 != 0)
+		{
+			if ((level.framecounter.low & 0x08) == 0)
+			{
+				A1 = 0xfffff120
+				fn00b0a6()
+			}
+			else
+			{
+				D6 = u32[0xffffee98]
+				fn00b066()
+			}
+		}
+
+		if (u16[0xffffeee8] != 0)
+		{
+			--u16[0xffffeee8]
+		}
+		else
+		{
+			if (control.pad1.pressed & 0xe0)
+			{
+				global.game_mode = 0xc0
+				return
+			}
+		}
+
+		UpdateGameObjects()
+		RenderSprites()
+		CompetitionMode.drawBackground(0x00)
+	}
+}
+
+
+//# address-hook(0x00beb2) end(0x00bef6)
+function void fn00beb2()
+{
+	A0 = 0xffff7828
+	D7.u16 = 0xc15a
+	D0 = 0x05
+	fn00baf0()
+
+	A0 = 0xffffe600 + ((global.zone - 0x0e) << 4)
+	D7.u16 = 0xc95a
+	D6 = u32[(A0+=4)-4]
+	fn00b066()
+
+	D7.u16 += 0x0180
+	D6 = u32[(A0+=4)-4]
+	fn00b066()
+
+	D7.u16 += 0x0180
+	D6 = u32[(A0+=4)-4]
+	fn00b066()
+
+	u16[0xffffeea0] = 0
+}
+
+
+//# address-hook(0x00bef8) end(0x00bf38)
+function void fn00bef8()
+{
+	objA0.mapping_offset = 0x02f26a
+	objA0.sprite_attributes = 0x9fd5
+
+	A1 = 0xffffe60c + ((global.zone - 0x0e) << 4)
+	D0 = u8[A1 + objA0.flags2e]
+	if (D0.u16 == 0x02)
+	{
+		objA0.sprite_attributes += 0x2000
+	}
+	D0.u16 += 0x29
+	objA0.animation.sprite = D0.u8
+
+	u32[A0] = 0x00bf3e
+	fn00bf3e()
+}
+
+
+//# address-hook(0x00bf3e) end(0x00bf56)
+function void fn00bf3e()
+{
+	if (u8[0xffffee5a] != objA0.flags2e || (level.framecounter.low & 0x08))
+	{
+		DrawObject()
+	}
+}

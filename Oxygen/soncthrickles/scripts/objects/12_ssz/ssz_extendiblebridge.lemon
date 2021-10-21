@@ -1,0 +1,108 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// SSZ bridge triggered by Knuckles in the cutscene      //
+//-------------------------------------------------------//
+
+//# address-hook(0x044f52) end(0x044fa0)
+function void fn044f52()
+{
+	objA0.render_flags = 0x44
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x60
+	objA0.sprite_priority = 0x0180
+	objA0.sprite_attributes = 0xc2f4
+	objA0.mapping_offset = 0x046958
+	u16[A0 + 0x12] = objA0.position.x.u16
+	u16[A0 + 0x16] = 0x03
+	objA0.flags2a |= 0x80
+	objA0.countdown_value = 0xc0
+
+	A1 = (checkpoint.number == 0) ? 0x044fa2 : 0x04501a
+	objA0.update_address = A1
+	call A1
+}
+
+
+//# address-hook(0x044fa2) end(0x045014)
+function void fn044fa2()
+{
+	D1.u16 = objA0.countdown_value
+	if (u16[0xffffeeda] != 0)
+	{
+	#if STANDALONE
+		// Different behavior in Time Attack or when playing as Knuckles
+		//  -> We want the bridge to be extended already
+		if (Game.isTimeAttack() || isMainCharacter(CHARACTER_KNUCKLES))
+			objA0.countdown_value = 2
+	#endif
+
+		if (objA0.countdown_value == 0x68)
+		{
+			playSound(0x8f)
+		}
+
+		objA0.countdown_value -= 2
+		if (objA0.countdown_value == 0)
+		{
+			u8[0xffffeed7] = 0
+			move_area.left = 0
+			move_area.right = 0x19a0
+			level.vertical_wrap = 0xff00
+			move_area.bottom.current = 0x1000
+			move_area.bottom.target  = 0x1000
+
+			checkpoint.x = 0x0140
+			checkpoint.y = 0x0c6c
+			checkpoint.number = 0x01
+			Checkpoint.SaveCurrentState()
+
+			checkpoint.time = 0
+			objA0.update_address = 0x04501a
+		}
+	}
+
+	D4.u16 = objA0.position.x.u16
+	objA0.position.x.u16 = objA0.countdown_value + u16[A0 + 0x12]
+	fn045026()
+	DrawObject()
+}
+
+
+//# address-hook(0x04501a) end(0x045020)
+function void fn04501a()
+{
+	D4.u16 = objA0.position.x.u16
+	fn045026()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x045026) end(0x045050)
+function void fn045026()
+{
+	D1 = 0x60
+	D2 = 0x10
+	D3 = 0x09
+	PlatformCheckClimbOn()
+
+	A1 = A0 + 0x18
+	D0.u16 = objA0.position.x.u16 - 0x40
+	D1 = 2
+	while (D1.s16 >= 0)
+	{
+		u16[A1]   = D0.u16
+		u16[A1+2] = objA0.position.y.u16
+		A1 += 6
+		D0.u16 += 0x40
+		--D1.s16
+	}
+}

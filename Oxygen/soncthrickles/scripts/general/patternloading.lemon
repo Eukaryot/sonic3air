@@ -1,0 +1,278 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Handling of Pattern Loading Cues (PLC)
+
+//# address-hook(0x0016fa) end(0x00172a)
+function void RequestLoadingPatterns()
+{
+	u32 backupA1 = A1
+	u32 backupA2 = A2
+
+	// Targets:
+	//  - 0x09249e	-> D0.u16 = 0x01
+	//  - 0x0924cc	-> D0.u16 = 0x03
+	//  - 0x0924dc	-> D0.u16 = 0x05
+	//  - 0x09250a	-> D0.u16 = 0x07
+	//  - 0x092524	-> D0.u16 = 0x08
+	//  - 0x092534	-> D0.u16 = 0x0a
+	//  - 0x09253c	-> D0.u16 = 0x0b
+	//  - 0x092562	-> D0.u16 = 0x0c
+	//  - 0x092588	-> D0.u16 = 0x0e
+	//  - 0x0925ae	-> D0.u16 = 0x0f
+	//  - 0x0925b6	-> D0.u16 = 0x10
+	//  - 0x0925dc	-> D0.u16 = 0x11
+	//  - 0x0925f0	-> D0.u16 = 0x12
+	//  - 0x09260a	-> D0.u16 = 0x14
+	//  - 0x092624	-> D0.u16 = 0x16
+	//  - 0x092624	-> D0.u16 = 0x17
+	//  - 0x092624	-> D0.u16 = 0x18
+	//  - 0x092624	-> D0.u16 = 0x19
+	//  - 0x092638	-> D0.u16 = 0x1a
+	//  - 0x09264c	-> D0.u16 = 0x1c
+	//  - 0x092660	-> D0.u16 = 0x1e
+	//  - 0x092686	-> D0.u16 = 0x20
+	//  - 0x0926a6	-> D0.u16 = 0x22
+	//  - 0x0926b4	-> D0.u16 = 0x24
+	//  - 0x0926c2	-> D0.u16 = 0x25
+	//  - 0x0926ca	-> D0.u16 = 0x26
+	//  - 0x0926ca	-> D0.u16 = 0x28
+	//  - 0x0926de	-> D0.u16 = 0x2a
+	//  - 0x0926ec	-> D0.u16 = 0x2c
+	//  - 0x0926fa	-> D0.u16 = 0x2e
+	//  - 0x0926fa	-> D0.u16 = 0x2f
+	//  - 0x09270e	-> D0.u16 = 0x30
+	//  - 0x09271c	-> D0.u16 = 0x32
+	//  - 0x09271c	-> D0.u16 = 0x34
+	//  - 0x09272a	-> D0.u16 = 0x36
+	//  - 0x092738	-> D0.u16 = 0x38
+	//  - 0x092746	-> D0.u16 = 0x3a
+	//  - 0x09274e	-> D0.u16 = 0x40
+	//  - 0x092750	-> D0.u16 = 0x42
+	//  - 0x092782	-> D0.u16 = 0x43
+	//  - 0x0927ba	-> D0.u16 = 0x44
+	//  - 0x0927f2	-> D0.u16 = 0x45
+	//  - 0x09282a	-> D0.u16 = 0x46
+	//  - 0x092862	-> D0.u16 = 0x47
+	//  - 0x09286a	-> D0.u16 = 0x48
+	//  - 0x092878	-> D0.u16 = 0x4c
+	//  - 0x092888	-> D0.u16 = 0x50
+	//  - 0x092896	-> D0.u16 = 0x51
+	//  - 0x09289e	-> D0.u16 = 0x52
+	//  - 0x0928b8	-> D0.u16 = 0x5a
+	//  - 0x0928d2	-> D0.u16 = 0x5b
+	//  - 0x0928e0	-> D0.u16 = 0x5d
+	//  - 0x0928f6	-> D0.u16 = 0x5f
+	//  - 0x092904	-> D0.u16 = 0x60
+	//  - 0x092934	-> D0.u16 = 0x6b
+	//  - 0x092942	-> D0.u16 = 0x6c
+	//  - 0x09295c	-> D0.u16 = 0x6d
+	//  - 0x092970	-> D0.u16 = 0x6e
+	//  - 0x09298a	-> D0.u16 = 0x6f
+	//  - 0x0929b0	-> D0.u16 = 0x70
+	//  - 0x0929ca	-> D0.u16 = 0x71
+	//  - 0x0929d8	-> D0.u16 = 0x76
+	//  - 0x0929ec	-> D0.u16 = 0x77
+	//  - 0x092a00	-> D0.u16 = 0x7b
+	u32 address = tableLookupAddress(0x09238c, D0.u16 * 2)
+	addPatternLoadingCue(address)	// This is originally not called here, but it does the exact same thing as the original code
+
+	A1 = backupA1
+	A2 = backupA2
+}
+
+function void requestLoadingPatterns(u8 index)
+{
+	D0 = index
+	RequestLoadingPatterns()
+}
+
+
+//# address-hook(0x00172c) end(0x001744)
+function void AddPatternLoadingCue()
+{
+	// Search for next free place in table
+	A2 = 0xfffff680
+	while (u32[A2] != 0)
+	{
+		A2 += 6
+	}
+
+	u16 bytes = (u16[A1] + 1) * 6
+	A1 += 2
+	copyMemory(A2, A1, bytes)
+}
+
+
+function void addPatternLoadingCue(u32 address)
+{
+	A1 = address
+	AddPatternLoadingCue()
+}
+
+
+//# address-hook(0x001746) end(0x001770)
+function void FillPatternLoadingCues()
+{
+	ClearPatternLoadingQueue()
+
+	// Targets:
+	//  - 0x09249e	-> D0.u16 = 0x01
+	//  - 0x0924cc	-> D0.u16 = 0x03
+	//  - 0x0924dc	-> D0.u16 = 0x05
+	//  - 0x09250a	-> D0.u16 = 0x07
+	//  - 0x092524	-> D0.u16 = 0x08
+	//  - 0x092534	-> D0.u16 = 0x0b
+	//  - 0x09253c	-> D0.u16 = 0x0c
+	//  - 0x092562	-> D0.u16 = 0x0d
+	//  - 0x092588	-> D0.u16 = 0x0e
+	//  - 0x0925ae	-> D0.u16 = 0x0f
+	//  - 0x0925b6	-> D0.u16 = 0x10
+	//  - 0x0925dc	-> D0.u16 = 0x11
+	//  - 0x0925f0	-> D0.u16 = 0x12
+	//  - 0x09260a	-> D0.u16 = 0x14
+	//  - 0x092624	-> D0.u16 = 0x16
+	//  - 0x092624	-> D0.u16 = 0x17
+	//  - 0x092624	-> D0.u16 = 0x18
+	//  - 0x092624	-> D0.u16 = 0x19
+	//  - 0x092638	-> D0.u16 = 0x1a
+	//  - 0x09264c	-> D0.u16 = 0x1c
+	//  - 0x092660	-> D0.u16 = 0x1e
+	//  - 0x092686	-> D0.u16 = 0x20
+	//  - 0x0926a6	-> D0.u16 = 0x22
+	//  - 0x0926b4	-> D0.u16 = 0x24
+	//  - 0x0926c2	-> D0.u16 = 0x25
+	//  - 0x0926ca	-> D0.u16 = 0x26
+	//  - 0x0926ca	-> D0.u16 = 0x28
+	//  - 0x0926de	-> D0.u16 = 0x2a
+	//  - 0x0926ec	-> D0.u16 = 0x2c
+	//  - 0x0926fa	-> D0.u16 = 0x2e
+	//  - 0x0926fa	-> D0.u16 = 0x2f
+	//  - 0x09270e	-> D0.u16 = 0x30
+	//  - 0x09271c	-> D0.u16 = 0x32
+	//  - 0x09271c	-> D0.u16 = 0x34
+	//  - 0x09272a	-> D0.u16 = 0x36
+	//  - 0x092738	-> D0.u16 = 0x38
+	//  - 0x092746	-> D0.u16 = 0x3a
+	//  - 0x09274e	-> D0.u16 = 0x40
+	//  - 0x092750	-> D0.u16 = 0x42
+	//  - 0x092782	-> D0.u16 = 0x43
+	//  - 0x0927ba	-> D0.u16 = 0x44
+	//  - 0x0927f2	-> D0.u16 = 0x45
+	//  - 0x09282a	-> D0.u16 = 0x46
+	//  - 0x092862	-> D0.u16 = 0x47
+	//  - 0x09286a	-> D0.u16 = 0x48
+	//  - 0x092878	-> D0.u16 = 0x4c
+	//  - 0x092888	-> D0.u16 = 0x50
+	//  - 0x092896	-> D0.u16 = 0x51
+	//  - 0x09289e	-> D0.u16 = 0x52
+	//  - 0x0928b8	-> D0.u16 = 0x5a
+	//  - 0x0928d2	-> D0.u16 = 0x5b
+	//  - 0x0928e0	-> D0.u16 = 0x5d
+	//  - 0x0928f6	-> D0.u16 = 0x5f
+	//  - 0x092904	-> D0.u16 = 0x60
+	//  - 0x092934	-> D0.u16 = 0x6b
+	//  - 0x092942	-> D0.u16 = 0x6c
+	//  - 0x09295c	-> D0.u16 = 0x6d
+	//  - 0x092970	-> D0.u16 = 0x6e
+	//  - 0x09298a	-> D0.u16 = 0x6f
+	//  - 0x0929b0	-> D0.u16 = 0x70
+	//  - 0x0929ca	-> D0.u16 = 0x71
+	//  - 0x0929d8	-> D0.u16 = 0x76
+	//  - 0x0929ec	-> D0.u16 = 0x77
+	//  - 0x092a00	-> D0.u16 = 0x7b
+	u32 address = tableLookupAddress(0x09238c, D0.u16 * 2)
+
+	s16 value = s16[address]
+	if (value >= 0)
+	{
+		u16 bytes = (value + 1) * 6
+		copyMemory(0xfffff680, address + 2, bytes)
+	}
+}
+
+
+//# address-hook(0x001772) end(0x00177e)
+function void ClearPatternLoadingQueue()
+{
+	zeroMemory(0xfffff680, 0x80)
+}
+
+
+//# address-hook(0x0017d8) end(0x0017f2)
+function void fn0017d8()
+{
+	if (u16[0xfffff6f8] == 0)
+		return
+
+	u16[0xfffff6fa] = 6
+	D0 = u16[0xfffff684]
+	u16[0xfffff684] += 0xc0
+
+	fn00180c()
+}
+
+
+//# address-hook(0x0017f4) end(0x001806)
+function void fn0017f4()
+{
+	if (u16[0xfffff6f8] == 0)
+		return
+
+	u16[0xfffff6fa] = 3
+	D0 = u16[0xfffff684]
+	u16[0xfffff684] += 0x60
+
+	fn00180c()
+}
+
+
+//# address-hook(0x00180c) end(0x001880)
+function void fn00180c()
+{
+	VDP.setupVRAMWrite(D0.u16)
+
+	A0 = u32[0xfffff680]
+	A3 = u32[0xfffff6e0]
+	D0 = u32[0xfffff6e4]
+	D1 = u32[0xfffff6e8]
+	D2 = u32[0xfffff6ec]
+	D5 = u32[0xfffff6f0]
+	D6 = u32[0xfffff6f4]
+	A1 = 0xffffaa00
+
+	while (u16[0xfffff6fa] > 0)
+	{
+		A5 = 8
+		fn001646()
+
+		--u16[0xfffff6f8]
+		if (u16[0xfffff6f8] == 0)
+		{
+			A0 = 0xfffff680
+			for (u8 i = 0; i < 0x16; ++i)
+			{
+				u32[A0] = u32[A0+6]
+				A0 += 4
+			}
+			return
+		}
+
+		--u16[0xfffff6fa]
+	}
+
+	u32[0xfffff680] = A0
+	u32[0xfffff6e0] = A3
+	u32[0xfffff6e4] = D0
+	u32[0xfffff6e8] = D1
+	u32[0xfffff6ec] = D2
+	u32[0xfffff6f0] = D5
+	u32[0xfffff6f4] = D6
+}

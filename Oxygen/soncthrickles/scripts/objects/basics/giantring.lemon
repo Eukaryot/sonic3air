@@ -1,0 +1,366 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Giant Ring (portal to Special Stages)                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x06166a) end(0x06167c)
+function void GiantRing.Init()
+{
+#if STANDALONE
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
+
+	D0.u8 = objA0.subtype2c
+	if (level.giantrings_clear & (1 << D0))
+	{
+		UnloadObject()
+	}
+	else
+	{
+		Object.InitWithUpdateAddress(0x061682)
+	}
+}
+
+
+//# address-hook(0x061682) end(0x061690)
+function void GiantRing.BaseUpdate()
+{
+	// Targets:
+	//  - 0x06169a	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x0616e6	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x0617b8	-> objA0.base_state = 0x04  -> Character jumped in
+	call tableLookupAddress(0x061694, objA0.base_state)
+
+	fn0618fc()
+}
+
+
+function bool GiantRing.isSuperEmeraldStage()
+{
+#if STANDALONE
+	if (!isSonicAndKnucklesZone())
+	{
+		// Sonic 3 zones: It's a super emerald stage after Chaos Emeralds got traded in (this can only happen after completing the game)
+		return (global.chaos_emeralds == 7 && global.traded_emeralds)
+	}
+	else
+	{
+		// Sonic & Knuckles zones: All 7 Chaos Emeralds needed, then all giant rings lead to HPZ -- also see "fn0616e6()"
+		return (global.chaos_emeralds == 7)
+	}
+#else
+	return (global.lock_on_state == 0 && isSonicAndKnucklesZone() && global.chaos_emeralds == 7)
+#endif
+
+}
+
+
+//# address-hook(0x06169a) end(0x0616e4)
+function void fn06169a()
+{
+	A1 = 0x06198e
+	if (fn084fa4())
+		return
+
+	u32[A0 + 0x30] = 0x0619c2
+
+	bool isSuperEmeraldStage = (objA0.subtype2c & 0x80) || GiantRing.isSuperEmeraldStage()
+	if (isSuperEmeraldStage)
+	{
+		objA0.flags38 |= 0x40
+		copyMemory(0xfffffade, 0x061c28, 8)
+		copyMemory(0xfffffae6, 0x061ca4, 8)
+		u16[0xfffffaee] = 0
+	}
+
+	fn0616e6()
+}
+
+
+//# address-hook(0x0616e6) end(0x06178a)
+function void fn0616e6()
+{
+	Object.AnimationProgressByLocalA1()
+	if (debug_mode.state == 0 && objA0.animation.sprite >= 8)
+	{
+		A1 = 0x06178c
+		fn0858f8()
+		if (D0.u16 != 0)
+		{
+			A1 = 0xffffb000
+			if (u8[A1 + 0x05] >= 6)
+				return
+
+			playSound(0xb3)
+
+		#if STANDALONE
+			Standalone.onGiantRingCollected()
+		#endif
+
+			bool enterRing = true
+			if (global.super_emeralds == 7)
+			{
+				// All 14 Emeralds collected
+				//  -> Now Giant Rings always grant 50 rings and can't be entered any more
+				enterRing = false
+			}
+			else if (global.chaos_emeralds == 7)
+			{
+				// All 7 Chaos Emeralds collected, but not all Super Emeralds yet
+				//  -> Giant Rings can only be entered in S&K half
+				//  -> However, S3AIR also allows you to enter Giant Rings in the S3 half after you've visited the HPZ emerald cave once (relevant after finishing the game in this save game slot)
+				enterRing = GiantRing.isSuperEmeraldStage()
+			}
+
+			if (!enterRing)
+			{
+				// Do not enter the ring, but grant 50 rings
+				GiantRing.Grant50Rings()
+				return
+			}
+
+			objA0.base_state = 0x04
+			u8[0xfffff766] = 0xff
+
+			A1 = 0xffffb000
+			objA1.state = char.state.DISAPPEARED
+			u8[A1 + 0x22] = 0
+			u8[A1 + 0x2e] = 0x53
+
+			if (tails.carrying)
+			{
+				A1 = 0xffffb04a
+				objA1.state = char.state.DISAPPEARED
+				u8[A1 + 0x22] = 0
+				u8[A1 + 0x2e] = 0x53
+			}
+
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x0617be
+				u16[A1 + 0x46] = A0.u16
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x061794) end(0x0617b2)
+function void GiantRing.Grant50Rings()
+{
+	playSound(0xb3)
+
+	level.giantrings_clear |= (1 << objA0.subtype2c)
+	objA0.flags38 |= 0x20
+
+	D0 = 50
+	AddRings()
+}
+
+
+//# address-hook(0x0617b8) end(0x0617b8)
+function void fn0617b8()
+{
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x0617be) end(0x0617d6)
+function void fn0617be()
+{
+	// Targets:
+	//  - 0x0617e0	-> objA0.base_state = 0x00
+	//  - 0x061822	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x0617dc, objA0.base_state)
+
+	Object.loadSpritePatterns(0x0619ba)
+
+	DrawObject()
+}
+
+
+//# address-hook(0x0617e0) end(0x061820)
+function void fn0617e0()
+{
+	A1 = 0x0619a0
+	if (fn084fa4())
+		return
+
+	u32[A0 + 0x30] = 0x0619d4
+	objA0.countdown_callback = 0x061846
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	objA0.subtype2c = u8[A1 + 0x2c]
+	D0.u16 = u16[0xffffb010]
+	if (D0.u16 >= objA0.position.x.u16)
+	{
+		u8[A1 + 0x04] |= render_flag.FLIP_X
+	}
+}
+
+
+//# address-hook(0x061822) end(0x061844)
+function void fn061822()
+{
+	D6.u8 = objA0.animation.sprite
+	fn084464()
+	if (D6.u8 != objA0.animation.sprite && objA0.animation.frame == 3)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		u8[A1 + 0x38] |= 0x20
+	}
+}
+
+
+//# address-hook(0x061846) end(0x06185a)
+function void fn061846()
+{
+	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.countdown_value = 0x20
+	objA0.countdown_callback = 0x06185c
+}
+
+
+//# address-hook(0x06185c) end(0x06188c)
+function void fn06185c()
+{
+	// Start fading to white
+	playSound(0xaf)
+
+	fn01bb7e()
+	fn02d1cc()
+
+	D0 = 0		// This is needed, don't ask why
+	bool isSuperEmeraldStage = (objA0.subtype2c & 0x80) || GiantRing.isSuperEmeraldStage()
+	if (isSuperEmeraldStage)
+	{
+		// Enter Hidden Palace, and then a Super Emeralds special stage
+		fn0618ac()
+	}
+	else
+	{
+		// Enter a Chaos Emerald special stage
+		fn061892()
+	}
+}
+
+
+//# address-hook(0x061892) end(0x0618a8)
+function void fn061892()
+{
+	global.sk_bluespheres = D0.u8
+	global.stage_type = 1
+	global.game_mode = 0x34
+	global.in_extra_stage = 1
+	fn0618d0()
+}
+
+
+//# address-hook(0x0618ac) end(0x0618ca)
+function void fn0618ac()
+{
+	global.stage_type = 2
+	global.zone_act = 0x1701
+	global.zone_act.apparent = 0x1701
+	checkpoint.number = 0
+	level.restart.u8 = 1
+	global.in_extra_stage = 1
+	fn0618d0()
+}
+
+
+//# address-hook(0x0618d0) end(0x0618de)
+function void fn0618d0()
+{
+	level.giantrings_clear |= (1 << objA0.subtype2c)
+	fn0851d8()
+}
+
+
+//# address-hook(0x0618e4) end(0x0618fa)
+function void IsSonicAndKnucklesZone()
+{
+	D1 = isSonicAndKnucklesZone() ? 1 : 0
+	_setZeroFlagByValue(D1)
+}
+
+function bool isSonicAndKnucklesZone()
+{
+	u8 zone = global.zone
+	if (global.stage_type == 2)
+	{
+		// It's a bonus stage, get the stored actual zone
+		zone = checkpoint.zone_act >> 8
+	}
+
+	if (zone < 7 && zone != 4)
+	{
+		// Zone is from Sonic 3
+		return false
+	}
+	else
+	{
+		// Zone is from Sonic & Knuckles
+		return true
+	}
+}
+
+
+//# address-hook(0x0618fc) end(0x061988)
+function void fn0618fc()
+{
+	if ((objA0.flags38 & 0x20) == 0)
+	{
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			if (objA0.flags38 & 0x40)
+			{
+				fn08598a()
+			}
+
+			Object.loadSpritePatternsForVDP(0x0619b2)
+			DrawObject()
+			return
+		}
+
+		u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	#if STANDALONE
+		// This is done to prevent the AIZ 1 ring shortly after fire transition from despawning and not easily reappearing
+		u16 dy = (objA0.position.y.u16 & 0xff80) - (camera.position.y.u16 & 0xff80) + 0x80
+		if (dx <= 0x280 && dy <= 0x280)
+	#else
+		u16 dy = objA0.position.y.u16 - camera.position.y.u16 + 0x80
+		if (dx <= 0x280 && dy <= 0x200)
+	#endif
+		{
+			// Reset ring palette to non-flashing
+			u32[0xfffffc2a] = 0x00ee0088
+			u16[0xfffffc3e] = 0x0044
+			DrawObject()
+			return
+		}
+	}
+
+	// Despawn
+	u32[0xfffffc2a] = 0x00ee0088
+	u16[0xfffffc3e] = 0x0044
+
+	Kosinski.addToDMAQueue(0x0db406, 0xb400)
+
+	fn0851cc()
+}

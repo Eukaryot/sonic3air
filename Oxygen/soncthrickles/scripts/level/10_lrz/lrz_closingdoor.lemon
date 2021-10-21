@@ -1,0 +1,110 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Closing "door" a bit after S/T start in LRZ 1
+
+//# address-hook(0x042a18) end(0x042a62)
+function void fn042a18()
+{
+	objA0.mapping_offset = 0x042b24
+	objA0.sprite_attributes = 0x43a1
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x30
+	objA0.box_size.y = 0x40
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		if (u8[A2] & 0x01)
+		{
+			objA0.position.y.u16 += 0x80
+			objA0.update_address = 0x042b08
+			fn042b08()
+			return
+		}
+	}
+
+	objA0.update_address = 0x042a68
+	fn042a68()
+}
+
+
+//# address-hook(0x042a68) end(0x042b02)
+function void fn042a68()
+{
+	A1 = 0xffffb000
+	D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x40
+	if (D0.u16 < 0x80)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+		if (D0.s16 >= 0x50)
+		{
+			objA0.update_address = 0x042aae
+			camera.screenshake.state = 0xffff
+			playSound(0xcc)
+
+			if (objA0.respawn_entry)
+			{
+				A2 = 0xffff0000 + objA0.respawn_entry
+				u8[A2] |= 0x01
+			}
+
+			fn042aae()
+			return
+		}
+	}
+
+	fn042b08()
+}
+
+
+//# address-hook(0x042aae)
+function void fn042aae()
+{
+	++objA0.flags2e
+	if (objA0.flags2e == 0x40)
+	{
+		objA0.update_address = 0x042b08
+		camera.screenshake.state = 0
+	}
+
+	D0.u8 = objA0.flags2e
+	LookupSinCos()
+	D0.s16 >>= 1
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D0.u16
+
+	D0.u8 = level.framecounter.low & 0x0f
+	if (D0.u8 == 0)
+	{
+		playSound(0xcc)
+	}
+
+	D1.u16 = 0x3b
+	D2.u16 = 0x40
+	D3.u16 = 0x41
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawObject()
+}
+
+
+//# address-hook(0x042b08) end(0x042b1e)
+function void fn042b08()
+{
+	D1.u16 = 0x3b
+	D2.u16 = 0x40
+	D3.u16 = 0x41
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}

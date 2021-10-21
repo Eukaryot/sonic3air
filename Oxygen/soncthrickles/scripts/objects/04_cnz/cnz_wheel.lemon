@@ -1,0 +1,107 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Wheel to run around                                   //
+//-------------------------------------------------------//
+
+//# address-hook(0x0328c4) end(0x0328ca)
+function void fn0328c4()
+{
+	u8[A0 + 0x32] = 0x60
+	objA0.update_address = 0x0328d0
+	fn0328d0()
+}
+
+
+//# address-hook(0x0328d0) end(0x0328e2)
+function void fn0328d0()
+{
+	A2 = A0 + 0x36
+	A1 = 0xffffb000
+	fn0328e8()
+
+	++A2
+	A1 = 0xffffb04a
+	fn0328e8()
+
+	CheckForUnloadObject()
+
+	//debugDrawRect(objA0.position.x.u16 - 0x60, objA0.position.y.u16 - 0x60, 0xc0, 0xc0, 0x4000ff00)
+}
+
+
+//# address-hook(0x0328e8) end(0x03298e)
+function void fn0328e8()
+{
+	u16 radius = u8[A0 + 0x32]
+	s16 dx = s16(objA1.position.x.u16 - objA0.position.x.u16)
+	s16 dy = s16(objA1.position.y.u16 - objA0.position.y.u16)
+	D0.u16 = dx + radius
+	D1.u16 = dy + radius
+	D3.u16 = radius * 2
+
+	bool inside = (D0.u16 < D3.u16 && D1.u16 < D3.u16)
+#if STANDALONE
+	// We need a more precise check, otherwise this object can't safely be added e.g. in CNZ 1 at (0x1380, 0x0538)
+	//  -> Also slightly reduce the radius, so that Sonic standing on the monitors below the first CNZ 1 wheel won't get affected
+	if (inside && Game.getSetting(SETTING_FIX_GLITCHES))
+	{
+		radius = radius * 7/8
+		inside = (dx * dx + dy * dy < radius * radius)
+	}
+#endif
+
+	if (inside)
+	{
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+		{
+		#if STANDALONE
+			if (Game.getSetting(SETTING_FIX_GLITCHES))
+			{
+				u8[A1 + 0x3c] = 0	// Clear the "char.on_convex_surface" flag, in this case as well
+			}
+		#endif
+			u8[A2] = 0
+			return
+		}
+	}
+	else
+	{
+		if (u8[A2] != 0)
+		{
+			u8[A1 + 0x3c] = 0	// Clear the "char.on_convex_surface" flag
+			u8[A2] = 0
+		}
+		return
+	}
+
+	if (u8[A2] == 0)
+	{
+		u8[A2] = 1
+		if ((u8[A1 + 0x2a] & char.flag.ROLLING) == 0)
+		{
+			u8[A1 + 0x20] = 0
+		}
+		u8[A1 + 0x21] = 0x01
+		objA1.flags2a &= ~char.flag.PUSHING
+		u8[A1 + 0x3c] = 1		// Set the "char.on_convex_surface" flag
+	}
+
+	// Keep ground speed inside certain bounds
+	if (objA0.flags2a & 0x01)
+	{
+		s16[A1 + 0x1c] = clamp(s16[A1 + 0x1c], -0xf00, -0x400)
+	}
+	else
+	{
+		s16[A1 + 0x1c] = clamp(s16[A1 + 0x1c], 0x400, 0xf00)
+	}
+}

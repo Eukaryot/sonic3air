@@ -1,0 +1,249 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Cannon (from Carnival Night Zone)                     //
+//-------------------------------------------------------//
+
+//# address-hook(0x0318a4) end(0x0318ec)
+function void fn0318a4()
+{
+	objA0.mapping_offset = 0x230a32
+	objA0.sprite_attributes = 0x4374
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x30
+	objA0.box_size.y = 0x30
+	objA0.animation.sprite = 0x09
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 0x01
+
+	A2 = A0 + 0x18
+	u16[A2]   = objA0.position.x.u16
+	u16[A2+2] = objA0.position.y.u16
+	u16[A2+4] = 0x04
+
+	objA0.update_address = 0x0318f2
+	fn0318f2()
+}
+
+
+//# address-hook(0x0318f2) end(0x031926)
+function void fn0318f2()
+{
+	fn03192c()
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D6 = 0x03
+	D1.u16 = control.player1
+	fn0319f4()
+
+	++A2
+	A1 = 0xffffb04a
+	D6 = 0x04
+	D1.u16 = control.tails
+	if (tails.ai_routine == 0x02)
+	{
+		u8[A2] = 0
+	}
+	fn0319f4()
+
+	fn031b18()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03192c) end(0x0319f2)
+function void fn03192c()
+{
+	if (u16[A0 + 0x34] == 0)
+	{
+		// Outside or currently entering the cannon
+		D1.u16 = 0x10
+		D3.u16 = 0x29
+		D4.u16 = objA0.position.x.u16
+		PlatformCheckClimbOn()
+	}
+	else if (u16[A0 + 0x34] == 1)
+	{
+		// Inside the rotating cannon
+		D0.u8 = objA0.value26
+		objA0.value26 += 0x02
+		LookupSinCos()
+		D0.u16 += 0x0120
+		D0.u16 >>= 6
+		u8[A0 + 0x1d] = D0.u8
+		D0.u8 = level.framecounter.low & 0x1f
+		if (D0.u8 == 0)
+		{
+			playSound(0xc7)
+		}
+	}
+	else if (u16[A0 + 0x34] == 2)
+	{
+		// Shooting
+		--s16[A0 + 0x36]
+		if (s16[A0 + 0x36] < 0)
+		{
+			u16[A0 + 0x34] = 3
+		}
+		D0.u8 = level.framecounter.low & 0x03
+		if (D0.u8 == 0)
+		{
+			if (allocDynamicObjectAfterA0())
+			{
+				objA1.update_address = 0x01e68e
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16 - 0x18
+
+				D0.u8 = 0x80 + u8[A0 + 0x1d] * 0x10
+				LookupSinCos()
+				objA1.velocity.x = D1.s16 * 8
+				objA1.velocity.y = D0.s16 * 8
+			}
+		}
+	}
+	else
+	{
+		// Reset back to original state
+		D0.u8 = objA0.value26
+		objA0.value26 += 0x02
+		LookupSinCos()
+		D0.u16 += 0x0120
+		D0.u16 >>= 6
+		u8[A0 + 0x1d] = D0.u8
+		if (D0.u8 == 0x04)
+		{
+			u16[A0 + 0x34] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x0319f4) end(0x031b16)
+function void fn0319f4()
+{
+#if STANDALONE
+	// Ignore for Tails while he's carrying another player
+	if (A1 == 0xffffb04a && tails.carrying)
+		return
+
+	// Also ignore character in all but normal state (especially in hurt state, as this would lead to buggy behavior)
+	if (u8[A1 + 0x05] != 0x02)
+		return
+#endif
+
+	if (u8[A2] == 0)
+	{
+		u8 bit = 1 << D6.u8
+		if (objA0.flags2a & bit)
+		{
+			objA0.flags2a &= ~bit
+			u16[A1 + 0x08] = 0x0380
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0
+			u8[A1 + 0x1e] = 0x0e
+			u8[A1 + 0x1f] = 0x07
+			objA1.state = char.state.ROLLING
+			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+			objA1.flags2a &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2e] = 0x81
+
+			u8[A2] = 1
+
+		#if STANDALONE
+			// If Tails is carrying the other player, this connection should better get resolved now
+			if (tails.carrying)
+			{
+				tails.carrying = 0		// Seems to be this simple, or is anything else needed here?
+			}
+		#endif
+		}
+	}
+	else if (u8[A2] == 1)
+	{
+		D0.u16 = objA1.velocity.y
+		objA1.velocity.y += 0x38
+		D0.s32 = s32(D0.s16) << 8
+		u32[A1 + 0x14] += D0
+		if (objA1.position.y.u16 > objA0.position.y.u16)
+		{
+			objA1.position.y.u16 = objA0.position.y.u16
+			objA1.state = char.state.DISAPPEARED
+
+			u8[A2] = 2
+		}
+	}
+	else if (u8[A2] == 2)
+	{
+		if (u16[A0 + 0x34] != 2)
+		{
+			if (u16[A0 + 0x30] == 0x0200 || u16[A0 + 0x30] == 0x0202)
+			{
+				u16[A0 + 0x34] = 1
+			}
+
+			if ((D1.u16 & CONTROL_ABC) == 0)
+				return
+		}
+
+		D0.u8 = 0x80 + u8[A0 + 0x1d] * 0x10
+		LookupSinCos()
+		D1.s16 <<= 4
+		D0.s16 <<= 4
+
+		objA1.velocity.x = D1.s16
+		objA1.velocity.y = D0.s16
+		objA1.groundspeed = D1.s16
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16 - 0x18
+		objA1.state = char.state.ROLLING
+		objA1.flags2a |= char.flag.IN_AIR
+		u8[A1 + 0x2e] = 0
+		u8[A1 + 0x40] = 0
+
+		u16[A0 + 0x34] = 2
+		u16[A0 + 0x36] = 0x0f
+
+		u8[A2] = 3
+		u8[A2 + 0x02] = 0x08
+	}
+	else
+	{
+		--u8[A2 + 0x02]
+		if (u8[A2 + 0x02] == 0)
+		{
+			u16[A1 + 0x08] = 0x0100
+			u8[A2] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x031b18) end(0x031b70)
+function void fn031b18()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		// Update sprite patterns for current rotation
+		D0 = u8[A0 + 0x1d]
+	#if !STANDALONE
+		// In S3AIR, we update the graphics in every frame
+		//  -> This way it's no problem if there are briefly two cannons accessing this at the same time
+		if (D0.u8 != objA0.flags2e)
+	#endif
+		{
+			objA0.flags2e = D0.u8
+			updateMultipleSpritePatterns(0x28ce74, 0x031b72, 0x8900, D0.u8)
+		}
+	}
+}

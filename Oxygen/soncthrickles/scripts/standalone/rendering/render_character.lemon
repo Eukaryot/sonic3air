@@ -1,0 +1,357 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Standalone-specific character rendering               //
+//-------------------------------------------------------//
+
+global u8 oldRotationPlayer1
+global u8 oldRotationPlayer2
+
+
+// This function is here only for script mods that want to change or extend the character sprites
+function u16 Standalone.getModdedAnimationSpriteEx(u8 character, u8 animationSprite)
+{
+	// Default implementation: No change
+	return animationSprite
+}
+
+
+// This function is here only for script mods that want to change or extend the character sprites
+function u64 Standalone.getModdedAnimationSpriteKey(u8 character, u16 animationSpriteEx)
+{
+	// Default implementation: No key set
+	return 0
+}
+
+
+function void Standalone.drawCharacterSpriteDirect(u8 character, s16 px, s16 py, u16 animationSpriteEx, u8 flags, u8 atex, u16 renderQueue)
+{
+	// First ask modded scripts
+	u64 key = Standalone.getModdedAnimationSpriteKey(character, animationSpriteEx)
+
+	if (key == 0 && animationSpriteEx >= 0x100)
+	{
+		// Custom added sprites for Sonic's Drop Dash & Super Peel-Out
+		if (animationSpriteEx >= CHAR_ANIMSPRITE_SONIC_PEELOUT)
+		{
+			key = stringformat("sonic_peelout_%d", animationSpriteEx - CHAR_ANIMSPRITE_SONIC_PEELOUT)
+		}
+		else
+		{
+			key = stringformat("sonic_dropdash_%d", animationSpriteEx - CHAR_ANIMSPRITE_SONIC_DROPDASH)
+		}
+	}
+
+	if (key == 0)
+	{
+		u8 animationSprite = animationSpriteEx
+		if (character == CHARACTER_SONIC)
+		{
+			key = stringformat(super.active ? "character_supersonic_0x%02x" : "character_sonic_0x%02x", animationSprite)
+		}
+		else if (character == CHARACTER_TAILS)
+		{
+			key = stringformat("character_tails_0x%02x", animationSprite)
+		}
+		else if (character == CHARACTER_KNUCKLES)
+		{
+			key = stringformat("character_knuckles_0x%02x", animationSprite)
+		}
+
+		if (!Renderer.hasCustomSprite(key))
+		{
+			u32 sourceBase    = (character == CHARACTER_SONIC) ? ((animationSprite >= 0xda) ? 0x140060 : 0x100000) : (character == CHARACTER_TAILS) ? ((animationSprite >= 0xd1) ? 0x143d00 : 0x3200e0) : 0x1200e0
+			u32 tableAddress  = (character == CHARACTER_SONIC) ? (super.active ? 0x148378 : 0x148182) : (character == CHARACTER_TAILS) ? 0x14a08a : 0x14bd0a
+			u32 mappingOffset = (character == CHARACTER_SONIC) ? (super.active ? 0x146816 : 0x146620) : (character == CHARACTER_TAILS) ? 0x148eb8 : 0x14a8d6		// Not really necessary here, we could also use "char.mapping_offset"
+
+			key = Renderer.setupCustomCharacterSprite(sourceBase, tableAddress, mappingOffset, animationSprite, 0x00)
+		}
+	}
+
+	// Render character
+	Renderer.drawCustomSprite(key, px, py, atex, flags, renderQueue)
+}
+
+
+function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s16 py, bool asSmallGhost)
+{
+	bool isPlayer1 = (variant == 0)
+	u32 characterAddress = isPlayer1 ? 0xffffb000 : 0xffffb04a
+
+	// Check only needed for Tails' tails
+	if (variant == 2)
+	{
+		// No smooth rotation in Slot Machine
+		if (global.zone == 0x15)
+			return false
+
+		characterAddress = 0xffff0000 + u16[A0 + 0x30]
+
+		// Do not render when blinking after hit
+		if (u8[characterAddress + 0x34] != 0 && ((u8[characterAddress + 0x34] + 1) & 0x04) == 0)
+		{
+			// Prevent emulator-like rendering
+			return true
+		}
+
+		// Do not render when Tails looks into the background (e.g. LBZ 2 end cutscene) and in DEZ gravity transporters
+		if (u8[characterAddress + 0x22] >= 0x55 && u8[characterAddress + 0x22] <= 0x5b)
+		{
+			// Prevent emulator-like rendering
+			return true
+		}
+
+		isPlayer1 = (characterAddress == 0xffffb000)
+		character = CHARACTER_TAILS
+	}
+
+	if (level.vertical_wrap == 0xff00)
+	{
+		// For vertically wrapping levels, "normalize" py into interval [-move_area.bottom.target * 3/4, -move_area.bottom.target * 1/4]
+		py &= level.height.bitmask
+		if (py > move_area.bottom.target * 3/4 && move_area.bottom.target >= 0xe0)	// move_area.bottom.target is very low in DEZ boss act
+			py -= move_area.bottom.target
+	}
+
+	u8 animationSprite = char.animation.sprite
+	u16 animationSpriteEx = Standalone.getModdedAnimationSpriteEx(character, animationSprite)
+	u8 flags = (char.render_flags & 0x03)
+	u8 angle = 0
+	u64 key = 0
+	u8 rotationMode = 0
+
+	if (variant < 2)
+	{
+		if (character == CHARACTER_SONIC && animationSpriteEx == animationSprite)	// Last check is only false if modded scripts made their own changes
+		{
+			// Special handling for Drop Dash & Super Peel-Out
+			if (char.state == char.state.SONIC_DROPDASH)
+			{
+				animationSpriteEx = CHAR_ANIMSPRITE_SONIC_DROPDASH + ((level.framecounter >> 1) & 0x01)
+			}
+			else if (!super.active && animationSprite >= 0x21 && animationSprite <= 0x30)
+			{
+				if (sonic.fastrunanim.timer > 0)
+				{
+					animationSpriteEx = CHAR_ANIMSPRITE_SONIC_PEELOUT + (level.framecounter & 0x03)
+
+					if (!Game.getSetting(SETTING_SMOOTH_ROTATION))
+					{
+						angle = (animationSprite - 0x21) / 4 * 0xe0
+						if (char.flags & char.flag.FACING_LEFT)
+							angle = -angle
+						animationSprite = 0x21 + (animationSprite - 0x21) % 4
+					}
+				}
+			}
+		}
+
+		if (Game.getSetting(SETTING_SMOOTH_ROTATION))
+		{
+			// Character
+			if (animationSprite >= 0x01 && animationSprite <= 0x20)
+			{
+				animationSprite = 0x01 + (animationSprite - 0x01) % 8
+				rotationMode = 1
+			}
+			else if (animationSprite >= 0x21 && animationSprite <= 0x30)
+			{
+				animationSprite = 0x21 + (animationSprite - 0x21) % 4
+				rotationMode = 1
+			}
+			else if (animationSprite >= 0x78 && animationSprite <= 0x7f)
+			{
+				animationSprite = 0x78
+				rotationMode = 2
+			}
+			else if (character == CHARACTER_TAILS && animationSprite >= 0xc3 && animationSprite <= 0xca)
+			{
+				animationSprite = 0xc3 + (animationSprite - 0xc3) % 2
+				rotationMode = 1
+			}
+			else if (character == CHARACTER_KNUCKLES && animationSprite == 0xc0)
+			{
+				// Only for DDZ
+				rotationMode = 1
+			}
+
+			if (rotationMode != 0)
+			{
+				s8 oldRotation = isPlayer1 ? oldRotationPlayer1 : oldRotationPlayer2
+				flags = char.flags & char.flag.FACING_LEFT		// This really has to be "char.flags", not "char.render_flags"
+
+				angle = char.rotation
+				if (rotationMode == 1)
+				{
+					if (abs(s8(char.rotation)) <= 0x10 && abs(s8(oldRotation)) <= 0x10)
+					{
+						angle = 0
+					}
+
+					if (angle != char.rotation)
+					{
+						s8 diff = angle - oldRotation
+						angle = oldRotation + clamp(diff, -3, 3)
+					}
+				}
+			}
+
+			if (isPlayer1)
+				oldRotationPlayer1 = angle
+			else
+				oldRotationPlayer2 = angle
+		}
+
+		if (animationSpriteEx >= 0x100)
+		{
+			// Special handling for Drop Dash & Super Peel-Out
+			if (animationSpriteEx >= CHAR_ANIMSPRITE_SONIC_PEELOUT)
+			{
+				key = stringformat("sonic_peelout_%d", animationSpriteEx - CHAR_ANIMSPRITE_SONIC_PEELOUT)
+			}
+			else
+			{
+				key = stringformat("sonic_dropdash_%d", animationSpriteEx - CHAR_ANIMSPRITE_SONIC_DROPDASH)
+			}
+		}
+		timeattack.animSpriteEx = animationSpriteEx
+
+		if (key == 0)
+		{
+			if (character == CHARACTER_SONIC)
+			{
+				key = stringformat(super.active ? "character_supersonic_0x%02x" : "character_sonic_0x%02x", animationSprite)
+			}
+			else if (character == CHARACTER_TAILS)
+			{
+				key = stringformat("character_tails_0x%02x", animationSprite)
+			}
+			else if (character == CHARACTER_KNUCKLES)
+			{
+				key = stringformat("character_knuckles_0x%02x", animationSprite)
+			}
+
+			if (!Renderer.hasCustomSprite(key))
+			{
+				u32 sourceBase    = (character == CHARACTER_SONIC) ? ((animationSprite >= 0xda) ? 0x140060 : 0x100000) : (character == CHARACTER_TAILS) ? ((animationSprite >= 0xd1) ? 0x143d00 : 0x3200e0) : 0x1200e0
+				u32 tableAddress  = (character == CHARACTER_SONIC) ? (super.active ? 0x148378 : 0x148182) : (character == CHARACTER_TAILS) ? 0x14a08a : 0x14bd0a
+				u32 mappingOffset = (character == CHARACTER_SONIC) ? (super.active ? 0x146816 : 0x146620) : (character == CHARACTER_TAILS) ? 0x148eb8 : 0x14a8d6		// Not really necessary here, we could also use "char.mapping_offset"
+
+				key = Renderer.setupCustomCharacterSprite(sourceBase, tableAddress, mappingOffset, animationSprite, 0x00)
+			}
+		}
+	}
+	else
+	{
+		if (Game.getSetting(SETTING_SMOOTH_ROTATION))
+		{
+			// Tails' tails
+			if (animationSprite >= 0x05 && animationSprite <= 0x14)
+			{
+				animationSprite = 0x05 + (animationSprite - 0x05) % 4
+				angle = lookupAngleByVector(s16[characterAddress + 0x18], s16[characterAddress + 0x1a])
+
+				flags = 0
+				if (objA0.flags2a & 0x01)
+				{
+					flags |= SPRITE_FLAG_FLIP_X
+					angle += 0x80
+				}
+				if (global.inv_gravity)
+				{
+					flags ^= SPRITE_FLAG_FLIP_Y
+					angle = -angle
+				}
+			}
+		}
+
+		key = stringformat("character_tails_tails_0x%02x", animationSprite)
+		if (!Renderer.hasCustomSprite(key))
+		{
+			key = Renderer.setupCustomCharacterSprite(0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00)
+		}
+	}
+
+	u16 renderQueue = 0xa000 - char.sprite_priority
+	u8 atex = (char.sprite_attributes >> 9) & 0x30
+	if (EXTENDED_CHARACTER_PALETTES)
+		atex = 0x40 + character * 0x20
+
+	if (char.sprite_attributes & 0x8000)
+		flags |= SPRITE_FLAG_PRIO
+
+	if (rotationMode != 0 && global.inv_gravity)
+	{
+		// Correction for inverse gravity
+		angle = 128 - angle
+		flags ^= SPRITE_FLAG_FLIP_X
+	}
+
+	// Render character
+	if (asSmallGhost)
+	{
+		Renderer.drawCustomSprite(key, px, py, atex, flags | SPRITE_FLAG_PRIO, 0xa800, angle, 0xc0ffffff, 0x8000)
+	}
+	else
+	{
+		Renderer.drawCustomSprite(key, px, py, atex, flags, renderQueue, angle, 255)
+	}
+
+	bool useAfterImages
+	if (isPlayer1)
+	{
+		if ((super.active == 0xff) || (super.active.tails == 0xff))
+		{
+			useAfterImages = true
+		}
+		else
+		{
+			if (Game.getSetting(SETTING_SPEEDUP_AFTERIMGS))
+			{
+				useAfterImages = ((u8[characterAddress + 0x2b] & char.bonus.SPEED_UP) != 0)
+			}
+		}
+	}
+
+	if (useAfterImages)
+	{
+		// Additional offset for Sonic charging a Super Peel-Out (either Hyper Sonic or with Speed Shoes)
+		s16 afterImagesOffsetX = 0
+		if (char.character == CHARACTER_SONIC && char.spindash == 0x80)
+		{
+			afterImagesOffsetX = (char.groundspeed >> 7) * ((char.flags & char.flag.FACING_LEFT) ? 1 : -1)
+		}
+
+		for (s8 i = 3; i > 0; --i)
+		{
+			A1 = 0xffffe500 + u8(posbackup.offset.player1 - (i * 8 + 4))
+			s16 px0 = u16[A1] - camera.foreground.x.u16 + (i * afterImagesOffsetX / 4)
+			s16 py0 = u16[A1+2] - camera.foreground.y.u16
+			if (level.vertical_wrap == 0xff00)	// Consider vertical level wrap
+				py0 &= level.height.bitmask
+
+			Renderer.setSpriteTagWithPosition(characterAddress + 0x10 + i, px0, py0)
+			Renderer.drawCustomSprite(key, px0, py0, atex, flags, renderQueue - i, angle, 192 - i * 32)
+		}
+	}
+
+	// Prevent emulator-like rendering
+	return true
+}
+
+
+
+// Helper functions
+
+function u64 getCharacterBonusTextIcon(u8 character)
+{
+	return (character == CHARACTER_KNUCKLES) ? "hud_bonus_icon_red" : (character == CHARACTER_TAILS) ? "hud_bonus_icon_orange" : "hud_bonus_icon_blue"
+}

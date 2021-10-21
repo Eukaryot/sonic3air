@@ -1,0 +1,350 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Debug mode                                            //
+//-------------------------------------------------------//
+
+//# address-hook(0x092a0e) end(0x092a18)
+function void DebugMode.BaseUpdate()
+{
+	D0 = debug_mode.state >> 8
+
+	// Targets:
+	//  - 0x092a20	-> D0 = 0x00  -> Initialization
+	//  - 0x092ab0	-> D0 = 0x02  -> Regular update in object placement mode
+	call tableLookupAddress(0x092a1c, D0)
+}
+
+
+//# address-hook(0x092a20) end(0x092aaa)
+function void DebugMode.Enter()
+{
+	debug_mode.state += 0x200
+	u32[0xffffffca] = u32[A0 + 0x0c]
+	if (char.base_state < 0x06)
+	{
+		u16[0xffffffce] = char.sprite_attributes
+	}
+	D0.u16 = level.height.bitmask
+	u16[0xffffb014] &= D0.u16
+	camera.position.y.u16 &= D0.u16
+	player1.camera_lock = 0
+	u16[0xfffff7c8] = 0
+	if (char.flags & char.flag.UNDERWATER)
+	{
+		char.flags &= ~char.flag.UNDERWATER
+		A1 = A0
+		UpdateMusicOnWaterTransition()
+		global.move.speedcap = 0x600
+		global.move.acceleration = 0x0c
+		global.move.deceleration = 0x80
+	}
+
+	char.animation.sprite = 0
+	char.state = char.state.RUNNING
+
+	DebugMode.GetObjectTable()
+
+	if (debug_mode.selection >= D6.u8)
+		debug_mode.selection = 0
+	DebugMode.OnSelectionChanged()
+
+	debug_mode.move_delay = 12
+	debug_mode.move_speed = 1
+
+#if STANDALONE
+	// Disconnect from Tails if needed
+	tails.carrying = 0
+#endif
+
+	DebugMode.Update()
+}
+
+
+//# address-hook(0x092ab0) end(0x092ace)
+function void DebugMode.Update()
+{
+	DebugMode.GetObjectTable()
+	DebugMode.EvaluateInput()
+	DrawObject()
+}
+
+
+function void DebugMode.GetObjectTable()
+{
+	u8 offset = global.zone * 4 + global.act * 2
+	A2 = tableLookupAddress(0x092caa, offset)
+	D6.u16 = u16[A2]	// Number of objects available
+	A2 += 2
+}
+
+
+//# address-hook(0x092c88) end(0x092ca8)
+function void DebugMode.OnSelectionChanged()
+{
+	D0 = debug_mode.selection * 10
+	objA0.mapping_offset = u32[A2 + D0.u16 + 4]
+	objA0.sprite_attributes = u16[A2 + D0.u16 + 8]
+	char.animation.sprite = u8[A2 + D0.u16]
+}
+
+
+//# address-hook(0x092ad4) end(0x092c52)
+function void DebugMode.EvaluateInput()
+{
+	bool skipMovement = false
+
+	D4 = control.pad1.pressed & CONTROL_DPAD
+	if (D4 == 0)
+	{
+		if ((control.pad1.state & CONTROL_DPAD) == 0)
+		{
+			debug_mode.move_delay = 12
+			debug_mode.move_speed = 15
+			skipMovement = true
+		}
+		else
+		{
+			--debug_mode.move_delay
+			if (debug_mode.move_delay == 0)
+			{
+				debug_mode.move_delay = 1	// Tha's basically no delay at all
+
+				// Increase movement speed, up to 0xff
+				if (debug_mode.move_speed < 0xff)
+					++debug_mode.move_speed
+				D4 = control.pad1.state
+			}
+		}
+	}
+	else
+	{
+		D4 = control.pad1.state
+	}
+
+	if (!skipMovement)
+	{
+		// Free movement
+		u32 step = (u32(debug_mode.move_speed) + 1) << 12
+		D3 = char.position.x
+		D2 = char.position.y
+		if (D4 & CONTROL_UP)
+		{
+			D2 -= step
+			D0 = u32(level.vertical_wrap) << 16
+			D2.s32 = max(D2.s32, D0.s32)
+		}
+		if (D4 & CONTROL_DOWN)
+		{
+			D2 += step
+			D0 = u32(move_area.bottom.target + 223) << 16
+			D2.s32 = min(D2.s32, D0.s32)
+		}
+		if (D4 & CONTROL_LEFT)
+		{
+			D3 -= step
+			D3.s32 = max(D3.s32, 0)
+		}
+		if (D4 & CONTROL_RIGHT)
+		{
+			D3 += step
+		}
+		char.position.x = D3
+		char.position.y = D2
+	}
+
+	if (control.pad1.state & CONTROL_A)
+	{
+		// Change selection
+		s8 change = 0
+		if (control.pad1.pressed & CONTROL_C)
+			change = -1
+		else if (control.pad1.pressed & CONTROL_A)
+			change = 1
+
+		if (change != 0)
+		{
+			u8 numObjects = D6.u8
+			debug_mode.selection = (debug_mode.selection + change + numObjects) % numObjects
+			DebugMode.OnSelectionChanged()
+			return
+		}
+	}
+
+	if (control.pad1.pressed & CONTROL_C)
+	{
+		// Place new object
+		if (allocDynamicObjectStd())
+		{
+			objA1.position.x.u16 = char.position.x.u16
+			objA1.position.y.u16 = char.position.y.u16
+			u8[A1 + 0x04] = char.render_flags
+			u8[A1 + 0x2a] = char.render_flags & 0x7f
+
+			D0 = debug_mode.selection * 10
+			u8[A1 + 0x2c] = u8[A2 + D0.u16 + 4]
+			u32[A1] = u32[A2 + D0.u16]
+			u8[A1] = 0
+			if (u32[A1] == 0x01d566)	// S-Monitor
+			{
+				u8[A1 + 0x2c] = 0x09
+			}
+			return
+		}
+	}
+
+	if (control.pad1.pressed & CONTROL_B)
+	{
+		debug_mode.state = 0
+
+	#if !STANDALONE
+		set_status_register(0x2700)
+	#endif
+		ResetScoreDisplay()
+		hud.dirty.score = 0x01
+		hud.dirty.rings = 0x80
+	#if !STANDALONE
+		set_status_register(0x2300)
+	#endif
+
+		A1 = 0xffffb000
+		objA1.mapping_offset = u32[0xffffffca]
+		objA1.sprite_attributes = u16[0xffffffce]
+		DebugMode.ResetSonic()
+		u8[A1 + 0x1e] = 0x13
+		u8[A1 + 0x1f] = 0x09
+	}
+}
+
+
+//# address-hook(0x092c54) end(0x092c86)
+function void DebugMode.ResetSonic()
+{
+	u8[A1 + 0x05] = 0x02
+	u16[A1 + 0x12] = 0
+	u16[A1 + 0x16] = 0
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	u16[A1 + 0x1c] = 0
+	u8[A1 + 0x20] = 0
+	u8[A1 + 0x2a] &= 0x01
+	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2e] = 0
+	u8[A1 + 0x3d] = 0
+}
+
+
+function bool updateDebugModeRegular()
+{
+	// Debug mode: free moving around and placement
+	if ((debug_mode.state & 0xff) == 1)
+	{
+		DebugMode.BaseUpdate()
+		return false
+	}
+	else
+	{
+		if (control.pad1.pressed & CONTROL_B)
+		{
+			debug_mode.state = 0
+		}
+
+	#if STANDALONE
+		s8 change = (control.pad1.pressed & CONTROL_LEFT) ? -1 : (control.pad1.pressed & CONTROL_RIGHT) ? 1 : 0
+		if (change != 0)
+		{
+			debug_mode.move_delay = 12
+		}
+		else
+		{
+			if ((control.pad1.state & (CONTROL_A | CONTROL_C)) == 0)
+			{
+				if (debug_mode.move_delay > 0)
+				{
+					--debug_mode.move_delay
+					return true
+				}
+				else if (level.framecounter & 0x03)		// Only react every 4th frame
+				{
+					return true
+				}
+			}
+
+			if (control.pad1.state & CONTROL_LEFT)
+			{
+				change = -1
+			}
+			else if (control.pad1.state & CONTROL_RIGHT)
+			{
+				change = 1
+			}
+		}
+
+		if (change == -1)
+		{
+			--char.animation.sprite
+			if (char.animation.sprite >= 0xfb)
+				char.animation.sprite = 0xfa
+		}
+		else if (change == 1)
+	#endif
+		{
+			++char.animation.sprite
+			if (char.animation.sprite >= 0xfb)
+				char.animation.sprite = 0
+		}
+
+		// Continue with character rendering
+		return true
+	}
+}
+
+
+function bool updateDebugModeInput(bool playingAsTails)
+{
+	if (!debug_mode.enabled)
+		return false
+
+	if (playingAsTails && global.characters != CHARS_TAILS_ALONE)
+		return false
+
+	// Gravity toggle
+	if (control.pad1.pressed & CONTROL_A)
+	{
+		global.inv_gravity ^= 0x01
+		control.pad1.pressed &= ~CONTROL_A
+
+		#if STANDALONE
+			// Stop vertical movement to make things better controllable
+			s16[0xffffb01a] = 0
+		#endif
+	}
+
+	// Object mode toggle
+	if (control.pad1.pressed & CONTROL_B)
+	{
+		player1.control_override = 0
+		if (control.pad1.state & CONTROL_C)
+		{
+			// Special animation test mode
+			debug_mode.state = 0x0002
+			if (playingAsTails)
+				char.state = char.state.RUNNING
+		}
+		else
+		{
+			// Object placement mode
+			debug_mode.state = 0x0001
+		}
+		return true
+	}
+	return false
+}

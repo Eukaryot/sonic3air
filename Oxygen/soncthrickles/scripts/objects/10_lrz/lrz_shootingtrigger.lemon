@@ -1,0 +1,118 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x042dbe) end(0x042dfa)
+function void fn042dbe()
+{
+	objA0.mapping_offset = 0x042f06
+	objA0.sprite_attributes = 0x63a1
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+	u8[A0 + 0x28] = 0xc6
+	D0 = (objA0.subtype2c & 0xf0) >> 2
+	u16[A0 + 0x30] = D0.u16
+
+	objA0.update_address = 0x042e00
+	fn042e00()
+}
+
+
+//# address-hook(0x042e00) end(0x042eba)
+function void fn042e00()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_value = u16[A0 + 0x30]
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			if (allocDynamicObjectAfterA0())
+			{
+				objA1.update_address = 0x042ee8
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16
+				u8[A1 + 0x04] = objA0.render_flags
+				u32[A1 + 0x0c] = objA0.mapping_offset
+				u16[A1 + 0x0a] = 0x03a1
+				u16[A1 + 0x08] = 0x0300
+				u8[A1 + 0x07] = 0x04
+				u8[A1 + 0x06] = 0x04
+				u8[A1 + 0x28] = 0x98
+				u8[A1 + 0x2b] |= 0x08
+				u8[A1 + 0x22] = 0x01
+				objA1.velocity.x = 0x0200
+				objA1.velocity.y = 0x0200
+				if (objA0.flags2a & 0x01)
+				{
+					objA1.velocity.x = -objA1.velocity.x
+				}
+
+				playSound(0x4d)
+			}
+		}
+	}
+
+	if (u8[A0 + 0x29] != 0)
+	{
+		D0.u16 = objA0.subtype2c & 0x0f
+		A3 = 0xfffff7e0 + D0.u16
+		D3 = 0
+
+		A1 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			u8[A0 + 0x29] &= ~0x01
+			fn042ec0()
+		}
+
+		A1 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			u8[A0 + 0x29] &= ~0x02
+			fn042ec0()
+		}
+	}
+
+	fn01b662()
+}
+
+
+//# address-hook(0x042ec0) end(0x042ee6)
+function void fn042ec0()
+{
+	if (u8[A1 + 0x20] == 2)
+	{
+		objA1.velocity.x = -objA1.velocity.x
+		objA1.velocity.y = -objA1.velocity.y
+		u8[A3] |= (1 << D3.u8)
+		objA0.update_address = 0x01e5e0
+		objA0.base_state = 0x02
+		u8[A0 + 0x28] = 0
+		u8[A0 + 0x29] = 0
+	}
+}
+
+
+//# address-hook(0x042ee8) end(0x042f00)
+function void fn042ee8()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		UpdateMovementStraightSimple()
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}

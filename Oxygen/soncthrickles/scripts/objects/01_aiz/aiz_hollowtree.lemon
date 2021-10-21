@@ -1,0 +1,237 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Hollow tree in AIZ 1                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x01f746) end(0x01f7b2)
+function void fn01f746()
+{
+	objA0.box_size.x = 0xd0
+	objA0.update_address = 0x01f752
+	fn01f752()
+}
+
+
+//# address-hook(0x01f752)
+function void fn01f752()
+{
+	fn01f7b8()
+
+	if ((objA0.flags2a & 0x18) == 0 && u16[A0 + 0x38] != 0)
+	{
+		--u16[A0 + 0x38]
+		if (u16[A0 + 0x38] == 0)
+		{
+			move_area.left = 0x1300
+			move_area.right = 0x4000
+		}
+		else
+		{
+			if (move_area.left != 0x1300)
+			{
+				if (u16[0xffffb010] >= 0x2d00)
+				{
+					move_area.left = 0x1300
+				}
+				else
+				{
+					move_area.left -= 4
+				}
+			}
+			if (move_area.right != 0x4000)
+			{
+				if (u16[0xffffb010] < 0x2d00)
+				{
+					move_area.right = 0x4000
+				}
+				else
+				{
+					move_area.right += 4
+				}
+			}
+		}
+	}
+#if STANDALONE
+	else
+	{
+		if (camera.position.x.u16 < 0x2c00 && camera.position.y.u16 >= 0x0360)
+		{
+			move_area.right = 0x2c54 + getScreenExtend()
+		}
+		else if (camera.position.y.u16 < 0x0320)
+		{
+			move_area.right = 0x4000
+		}
+	}
+
+	// Dirty hack to refresh parts of the screen and avoid visual glitches
+	fillPlaneA_Default(0x2d80, 0x02e0, 512, 512)
+#endif
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x01f7b8) end(0x01f90e)
+function void fn01f7b8()
+{
+	A1 = 0xffffb000
+	A2 = A0 + 0x30
+	D6 = 3
+	fn01f7ce()
+
+	A1 = 0xffffb04a
+	A2 = A0 + 0x34
+	D6 = 4
+	fn01f7ce()
+}
+
+
+function void fn01f7ce()
+{
+#if STANDALONE
+	if (debug_mode.state)
+		return
+#endif
+
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			s16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+			s16 dy = objA1.position.y.u16 - objA0.position.y.u16
+			if (dx >= 0 && dx < 0x40 && dy >= -0x5a && dy <= 0xa0)
+			{
+				if (objA1.velocity.x >= 0x600 && u8[A1 + 0x2e] == 0)
+				{
+					LetSonicClimbOnObject()
+
+					u32[A2] = 0
+					u8[A1 + 0x20] = 0
+					u8[A1 + 0x2e] |= 0x42
+					if (A1 == 0xffffb000)
+					{
+						if (allocDynamicObjectAfterA0())
+						{
+							objA1.update_address = 0x04fa0c
+						}
+
+					#if STANDALONE
+						move_area.left = 0x2c54 - getScreenExtend()
+						move_area.right = 0x2c54 + getScreenExtend()
+					#else
+						move_area.left = 0x2c60
+						move_area.right = 0x2c60
+					#endif
+						u16[A0 + 0x38] = 0x3c
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		D0.u16 = abs(s16[A1 + 0x1c])
+		if (D0.u16 >= 0x600)
+		{
+			if ((u8[A1 + 0x2a] & 0x02) == 0)
+			{
+				D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x90
+				if (D0.s16 >= 0 && D0.u16 <= 0x130)
+				{
+					fn01f914()
+					return
+				}
+			}
+			else
+			{
+				if (objA1.position.x.u16 < 0x2c99)
+				{
+					objA1.position.x.u16 = 0x2c99
+					objA1.velocity.x = 0x400
+				}
+				if (objA1.position.x.u16 >= 0x2d66)
+				{
+					objA1.position.x.u16 = 0x2d66
+					objA1.velocity.x = -0x400
+				}
+			}
+		}
+		else
+		{
+			if (u16[A2] < 0x400)
+			{
+				u32 backupA1 = A1
+				u32 backupD6 = D6
+				fn01f914()
+				A1 = backupA1
+				D6 = backupD6
+			}
+		}
+
+		fn01f8b4()
+	}
+}
+
+//# address-hook(0x01f8b4)
+function void fn01f8b4()
+{
+	objA1.velocity.x >>= 1
+	objA1.velocity.y >>= 1
+	u8[A1 + 0x1e] = 19
+	u8[A1 + 0x1f] = 9
+	u16[A1 + 0x20] = 1
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~(char.flag.ROLLING | char.flag.ON_OBJECT)
+	u8[A1 + 0x2e] &= ~0x42
+	u8[A1 + 0x30] = 0
+	u8[A1 + 0x31] = 4
+	objA0.flags2a &= ~(1 << D6.u8)
+}
+
+
+//# address-hook(0x01f914) end(0x01f994)
+function void fn01f914()
+{
+	if ((u8[A1 + 0x2a] & 0x08) == 0)
+		return
+
+	D0 = s32(s16[A1 + 0x1c]) << 8
+	u32[A2] += D0
+	if (s32[A2] < 0)
+	{
+		fn01f8b4()
+		return
+	}
+
+	if (u16[A2] >= 0x400)
+	{
+		move_area.left = 0x1300
+		move_area.right = 0x4000
+	}
+
+	D0.u16 = u16[A2] >> 1
+	D2.u16 = objA1.position.x.u16
+	s16 dx = (s32(lookupSin(D0.u8)) * 0x7000) >> 16
+	D0.u16 = objA0.position.x.u16 + dx
+	objA1.position.x.u16 = D0.u16
+	objA1.velocity.x = (D0.s16 - D2.s16) << 8
+	D2.u16 = objA1.position.y.u16
+	D0.s16 = objA0.position.y.u16 + 0x90 - (u16[A2] >> 2)
+	objA1.position.y.u16 = D0.u16
+	objA1.velocity.y = (D0.s16 - D2.s16) << 8
+
+	D0 = (u16[A2] >> 1) / 11
+	u8[A1 + 0x22] = u8[0x01f99a + D0.s16]
+	D0 = u8[A1 + 0x22]
+	SetCharacterSpritePatterns()
+}

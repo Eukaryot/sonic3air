@@ -1,0 +1,816 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Gumball Machine bonus stage                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x23ef58) end(0x23ef9e)
+function void InitLevelTiles.BonusGM()
+{
+	level.height.bitmask = 0x03ff
+	level.height.tilemask = 0x03f0
+	level.chunksize.bitmask = 0x1c
+	gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
+#if STANDALONE
+	verticalScrollOffsetBias = getScreenExtend() & 0x0f
+	u8[0x818080] = 0	// Do not use the custom vetical scroll offsets buffer
+#endif
+
+	D0.u16 = 0xc0
+	D1.u16 = D0.u16
+	fn23efca()
+
+	fn23a002()
+
+	D2.u16 = 0xffff		// Hacked in... I can't find where this gets actually set in original execution
+	u16[0xffffa802] = D2.u16
+	u16[0xffffa80a] = D2.u16
+	u16[0xffffa806] = u16[0xffffa80e] & level.height.tilemask
+
+	A4 = 0x23efe6
+	A5 = 0xffffa800
+	D0.u16 = camera.foreground.x.old
+	fn239baa()
+}
+
+
+//# address-hook(0x0284c8) end(0x0284fc)
+function void LevelTilesAnim.BonusGM()
+{
+	A3 = 0xfffff7f0
+	D1.u16 = (u16[0xffffeee2] - camera.background.y.u16) & 0x1f
+	if (D1.u8 != u8[A3 + 0x01])
+	{
+		u8[A3 + 0x01] = D1.u8
+
+		u32 sourceInROM = 0x2c2180 + D1.u16 * 4
+		updateSpritePattern(sourceInROM, 0x0a80, 0x40)
+	}
+}
+
+
+//# address-hook(0x23efa2) end(0x23efb2)
+function void UpdateLevelTiles.BonusGM()
+{
+	camera.foreground.x.u16 = 0x60 - getScreenExtend()
+
+	fn23efb6()
+
+	A4 = 0x23efe6
+	A5 = 0xffffa800
+	D6 = 0x0f
+	D5 = 3
+	fn239d1e()
+
+#if STANDALONE
+	// Copy some foreground tiles to fill in the outer columns
+	// TODO: This is quite hacked in, better do this in the right way
+	for (u16 base = 0xc000; base < 0xd000; base += 0x80)
+	{
+		setVRAM(base + 0x0c, getVRAM(base + 0x5c))
+		setVRAM(base + 0x0e, getVRAM(base + 0x5e))
+		setVRAM(base + 0x70, getVRAM(base + 0x20))
+		setVRAM(base + 0x72, getVRAM(base + 0x22))
+	}
+#endif
+}
+
+
+//# address-hook(0x23efb6) end(0x23efc8)
+function void fn23efb6()
+{
+	D0.u16 = camera.foreground.y.u16
+	A5 = 0xffff0000 + u16[0xfffffaa4]
+	D1.u16 = D0.u16 + 0xc8 - u16[A5 + 0x14]
+	fn23efca()
+}
+
+
+//# address-hook(0x23efca) end(0x23efe4)
+function void fn23efca()
+{
+	A1 = 0xffffa800
+	u16[A1] = D0.u16
+	u16[A1 + 0x08] = D0.u16
+	u16[A1 + 0x0c] = D0.u16
+	objA1.position.x.u16 = D0.u16
+	u16[A1 + 0x04] = D1.u16
+	u16[A1 + 0x0e] = D1.u16
+}
+
+
+//# address-hook(0x23efec) end(0x23effa)
+function void fn23efec()
+{
+	fn23f012()
+	fn23a01e()
+
+	D1 = 0
+	fn239b60()
+	fn239e52()
+}
+
+
+//# address-hook(0x23effe) end(0x23f00e)
+function void UpdateLevelScrolling.BonusGM()
+{
+	fn23f012()
+	fn239e52()
+
+	A4 = 0x23efe6
+	A5 = 0xffffa80a
+	fn239fb4()
+}
+
+
+//# address-hook(0x23f012) end(0x23f028)
+function void fn23f012()
+{
+	camera.background.x.u16 = -0x20
+	camera.background.y.u16 = camera.foreground.y.u16 >> 1
+	u16[0xffffeee2] = camera.foreground.y.u16 >> 2
+}
+
+
+
+// Seems to be used only here
+
+//# address-hook(0x239b60) end(0x239b7c)
+function void fn239b60()
+{
+	D2 = 0x0f
+	while (D2.s16 >= 0)
+	{
+		push(A0)
+		push(D2)
+		push(D1)
+		push(D0)
+
+		D6 = 0x20
+		fn239a22()
+		fn239618()
+
+		D0 = pop()
+		D1 = pop()
+		D2 = pop()
+		A0 = pop()
+
+		D0.u16 += 0x10
+		--D2.s16
+	}
+}
+
+
+//# address-hook(0x239baa) end(0x239bd4)
+function void fn239baa()
+{
+	D2.u16 = u16[A4]
+	A4 += 2
+
+	for (u8 i = 0; i < 0x20; ++i)
+	{
+		while (D2.u16 <= D0.u16)
+		{
+			D2.u16 += u16[A4]
+			A4 += 2
+			A5 += 4
+		}
+
+		D1.u16 = u16[A5]
+		D6 = 0x10
+
+		push(A5)
+		push(A4)
+		push(A0)
+		push(D2)
+		push(D0)
+
+		fn239864()
+		fn239618()
+
+		D0 = pop()
+		D2 = pop()
+		A0 = pop()
+		A4 = pop()
+		A5 = pop()
+
+		D0.u16 += 0x10
+	}
+}
+
+
+//# address-hook(0x239bd6) end(0x239bee)
+function void fn239bd6()
+{
+	while (D2.s16 >= 0)
+	{
+		push(A0)
+		push(D6)
+		push(D2)
+		push(D1)
+		push(D0)
+
+		fn239b20()
+		fn239690()
+
+		D0 = pop()
+		D1 = pop()
+		D2 = pop()
+		D6 = pop()
+		A0 = pop()
+
+		D0.u16 += 0x10
+		--D2.s16
+	}
+}
+
+
+//# address-hook(0x239d1e) end(0x239d3a)
+function void fn239d1e()
+{
+	push(A5)
+	push(A4)
+	push(D5)
+
+	A6 = 0xffffee80		// Address of camera.foreground.x
+	fn239dbc()
+
+	A5 = 0xffffee88		// Address of camera.foreground.x.old
+	fn239822()
+
+	D5 = pop()
+	A4 = pop()
+	A6 = pop()
+
+	D6.u16 = camera.foreground.x.old
+	fn239d58()
+}
+
+
+//# address-hook(0x239d58) end(0x239dba)
+function void fn239d58()
+{
+	D1.u16 = D6.u16
+	while (true)
+	{
+		D6.u16 -= u16[(A4+=2)-2]
+		if (D6.s16 < 0)
+			break
+
+		D0.u16 = u16[(A6+=2)-2] & level.height.tilemask
+		u16[(A6+=2)-2] = D0.u16
+		--D5.u16
+	}
+
+	D6.s16 = -D6.s16
+	D6.u16 >>= 4
+	D4 = 0x15
+	D4.u16 -= D6.u16
+	if (D4.s16 < 0)
+	{
+		D4 = 0
+		D6 = 0x15
+	}
+
+	while (true)
+	{
+		push(D6.u16)
+		push(D5.u16)
+		push(D4.u16)
+		push(D1.u16)
+		push(A6)
+		push(A4)
+
+		A5 = A6 + 2
+		fn23998e()
+
+		A4 = pop()
+		A6 = pop()
+		D1.s32 = s16(pop())
+		D4.s32 = s16(pop())
+		D5.s32 = s16(pop())
+		D6.s32 = s16(pop())
+
+		A6 += 4
+		if (D4.u16 == 0)
+			break
+
+		D6.u16 <<= 4
+		D1.u16 += D6.u16
+		--D5.u16
+		D6.u16 = u16[(A4+=2)-2] >> 4
+		D0.u16 = D4.u16
+		D4.u16 -= D6.u16
+		if (D4.s16 < 0)
+		{
+			D6.u16 = D0.u16
+			D4 = 0
+		}
+	}
+
+	while (true)
+	{
+		--D5.u16
+		if (D5.u16 == 0)
+			break
+
+		D0.u16 = u16[(A6+=2)-2] & level.height.tilemask
+		u16[(A6+=2)-2] = D0.u16
+	}
+}
+
+
+//# address-hook(0x239dbc) end(0x239dd4)
+function void fn239dbc()
+{
+	D2.u16 = u16[(A4+=2)-2]
+	D0.u16 = u16[A6]
+	fn239dc6()
+
+	D0.u16 += 0x0140
+	fn239dc6()
+}
+
+
+function void fn239dc6()
+{
+	while (D0.u16 >= D2.u16)
+	{
+		D2.u16 += u16[A4]
+		A4 += 2
+		A5 += 4
+	}
+
+	D1.u16 = u16[A5]
+	D1 = (D1 << 16) + (D1 >> 16)
+}
+
+
+//# address-hook(0x239e52) end(0x239e72)
+function void fn239e52()
+{
+	A1 = 0xffffe000		// Location of linewise scroll offsets
+	D0.s16 = -camera.foreground.x.u16
+	D0 = (D0 << 16)
+	D0.s16 = -s16(camera.background.x.u16)
+
+	for (u8 line = 0; line < getScreenHeight(); ++line)
+	{
+		u32[A1 + line * 4] = D0
+	}
+}
+
+
+//# address-hook(0x239fb4) end(0x23a000)
+function void fn239fb4()
+{
+	A1 = 0xffffeeea		// Start address of vertical scroll offsets
+	D1.u16 = camera.background.y.u16
+	D0.u16 = camera.foreground.x.u16
+	D2.u16 = camera.foreground.x.u16 & 0x0f
+	if (D2.u16 != 0)
+		D0.u16 += 0x10
+	D0.u16 >>= 4
+
+	while (D0.s16 >= 0)
+	{
+		A5 += 2
+		D2.u16 = u16[(A4+=2)-2] >> 4
+		D0.u16 -= D2.u16
+	}
+
+	D0.s16 = -D0.s16
+	D2 = 0x13
+	D2.u16 -= D0.u16
+	if (D2.s16 < 0)
+		D0 = 0x14
+	--D0.u16
+
+	while (true)
+	{
+		D3.u16 = u16[(A5+=2)-2]
+		while (D0.s16 >= 0)
+		{
+			u16[A1]   = D3.u16
+			u16[A1+2] = D1.u16
+			A1 += 4
+			--D0.s16
+		}
+
+		if (D2.s16 < 0)
+			break
+
+		D0.u16 = u16[(A4+=2)-2] >> 4
+		D3.u16 = D2.u16
+		D2.u16 -= D0.u16
+		if (D2.s16 >= 0)
+			--D0.u16
+		else
+			D0.u16 = D3.u16
+	}
+}
+
+
+//# address-hook(0x23a002) end(0x23a01c)
+function void fn23a002()
+{
+	D1.u16 = camera.foreground.x.u16
+	camera.foreground.x.old = camera.foreground.x.u16 & 0xfff0
+	camera.foreground.y.old = camera.foreground.y.u16 & level.height.tilemask
+}
+
+
+//# address-hook(0x23a01e) end(0x23a03a)
+function void fn23a01e()
+{
+	D1.u16 = camera.background.x.u16
+	D2.u16 = camera.background.x.u16 & 0xfff0
+	D0.u16 = camera.background.y.u16 & level.height.tilemask
+
+	camera.background.x.old = D2.u16
+	camera.background.y.old = D0.u16
+}
+
+
+
+//# address-hook(0x239618) end(0x23965a)
+function void fn239618()
+{
+	// This function does the same as "writePlanePatterns", so just use this one
+	writePlanePatterns(0xfffff100)
+}
+
+
+//# address-hook(0x23965c) end(0x239676)
+function void fn23965c()
+{
+	// This function does exactly the same as "WriteDataToVRAM", so just use this one
+	WriteDataToVRAM()
+}
+
+
+//# address-hook(0x239690) end(0x2396b4)
+function void fn239690()
+{
+	A0 = 0xfffff100
+	while (true)
+	{
+		D0.u16 = u16[A0]
+		if (D0.u16 == 0)
+			break
+
+		u16[A0] = 0
+		D1.u16 = u16[A0+2]
+		D2.u16 = D0.u16
+		D4.u16 = D1.u16
+		A0 += 4
+		fn23965c()
+
+		D0.u16 = D2.u16 + u16[0xffffeeb0]
+		D1.u16 = D4.u16
+		fn23965c()
+	}
+}
+
+
+
+// Vertical chunk loading...?
+
+//# address-hook(0x239822) end(0x239860)
+function void fn239822()
+{
+	D0.u16 = u16[A6] & 0xfff0
+	D2.u16 = u16[A5]
+	u16[A5] = D0.u16
+	D3.u16 = D2.u16
+	D2.u16 -= D0.u16
+	if (D2.u16 == 0)
+		return
+
+	if (D2.s8 < 0)
+	{
+		D2.s16 = -D2.s16
+		D0.u16 = D3.u16 + 0x0150
+		D1 = (D1 << 16) + (D1 >> 16)
+	}
+
+	D2.u16 &= 0x30
+	u8[0xffffeea4] = (D2.u16 != 0x10) ? 0xff : 0x00
+
+	push(D6.u16)
+	push(D1.u16)
+	fn239864()
+	D1.s32 = s16(pop())
+	D6.s32 = s16(pop())
+
+	if (u8[0xffffeea4] != 0)
+	{
+		D0.u16 += 0x10
+		fn239864()
+	}
+}
+
+
+//# address-hook(0x239864) end(0x23996c)
+function void fn239864()
+{
+	D2.u16 = D1.u16 & 0x70
+	D3.u16 = (D1.u16 << 4) & 0x0f00
+	D1.s16 >>= 4
+	D4.u16 = D1.u16 & 0x0f
+	D1.s16 = (D1.s16 >> 1) & level.chunksize.bitmask
+	D5 = 0x10
+	D5.u16 -= D4.u16
+	D4.u16 = D5.u16
+	D5.u16 -= D6.u16
+	if (D5.s16 >= 0)
+	{
+		u16[A0] = ((D0.s16 >> 2) & 0x7c) + D7.u16 + D3.u16
+
+		D5.u16 = D6.u16
+		--D6.u16
+		u16[A0+2] = D6.u16 | 0x8000
+		A0 += 4
+		A1 = A0
+		D5.u16 *= 4
+		A0 += D5.u16
+
+		fn23996e()
+	}
+	else
+	{
+		D5.s16 = -D5.s16
+		u16 backup_D5 = D5.u16
+		D5.s16 = ((D0.s16 >> 2) & 0x7c) + D7.u16 + D3.u16
+		u16[A0] = D5.u16
+
+		D6.u16 = D4.u16
+		--D6.u16
+		u16[A0+2] = D6.u16 | 0x8000
+		A0 += 4
+		A1 = A0
+		D4.u16 *= 4
+		A0 += D4.u16
+
+		fn23996e()
+		fn239900()
+
+		D6.u16 = backup_D5
+		u16[A0] = ((D0.s16 >> 2) & 0x7c) + D7.u16
+
+		D5.u16 = D6.u16
+		--D6.u16
+		u16[A0+2] = D6.u16 | 0x8000
+		A0 += 4
+		A1 = A0
+		D5.u16 *= 4
+		A0 += D5.u16
+	}
+
+	fn239900()
+}
+
+
+function void fn239900()
+{
+	// Seems to handle initial loading of foreground tiles
+	D7 = (D7 << 16) + (D7 >> 16)
+	while (D6.s16 >= 0)
+	{
+		D4.u16 = u16[A5 + D2.s16]
+		D3.u16 = (D4.u16 & 0x03ff) * 8
+		D5.u16 = u16[A2 + D3.s16]
+		D5 = (D5 << 16)
+		D5.u16 = u16[A2 + D3.s16 + 0x04]
+		D7.u16 = u16[A2 + D3.s16 + 0x06]
+		D3.u16 = u16[A2 + D3.s16 + 0x02]
+		D3 = (D3 << 16) + D7.u16
+
+		if (D4 & 0x0800)
+		{
+			D5 ^= 0x10001000
+			D3 ^= 0x10001000
+			D5 = (D5 << 16) + (D5 >> 16)
+			D3 = (D3 << 16) + (D3 >> 16)
+		}
+
+		if (D4 & 0x0400)
+		{
+			u32[A0] = D5 ^ 0x08000800
+			u32[A1] = D3 ^ 0x08000800
+		}
+		else
+		{
+			u32[A0] = D3
+			u32[A1] = D5
+		}
+
+		D2.u16 = (D2.u16 + 0x10) & 0x70
+		if (D2.u16 == 0)
+		{
+			D1.u16 = (D1.u16 + 4) & level.chunksize.bitmask
+			fn23996e()
+		}
+
+		A0 += 4
+		A1 += 4
+		--D6.s16
+	}
+
+	D7 = (D7 << 16) + (D7 >> 16)
+	u16[A0] = 0
+}
+
+
+//# address-hook(0x23996e) end(0x23998c)
+function void fn23996e()
+{
+	A4 = 0xffff0000 + u16[A3 + D1.s16]
+	D3.s16 = D0.s16 >> 7
+	A4 += D3.u16
+	D3 = 0xffff0000 + u8[A4]
+	D3.u16 <<= 7
+	D4.u16 = (D0.s16 >> 3) & 0x0e
+	D3.u16 += D4.u16
+	A5 = D3
+}
+
+
+//# address-hook(0x23998e) end(0x2399d6)
+function void fn23998e()
+{
+	D0.u16 = u16[A6] & level.height.tilemask
+	D2.u16 = u16[A5]
+	u16[A5] = D0.u16
+	D3.u16 = D2.u16
+	D2.u16 -= D0.u16
+	if (D2.u16 == 0)
+		return
+
+	if (D2.s8 < 0)
+	{
+		D2.s16 = -D2.s16
+		D0.u16 = (D3.u16 + 0xf0) & level.height.tilemask
+	}
+
+	D2.u16 &= 0x30
+	u8[0xffffeea4] = (D2.u16 != 0x10) ? 0xff : 0x00
+
+	push(D6.u16)
+	push(D1.u16)
+	fn239a22()
+	D1.s32 = s16(pop())
+	D6.s32 = s16(pop())
+
+	if (u8[0xffffeea4] == 0)
+		return
+
+	D0.u16 = (D0.u16 + 0x10) & level.height.tilemask
+	fn239a22()
+}
+
+
+//# address-hook(0x239a22) end(0x239aa6)
+function void fn239a22()
+{
+	// Fill plane pattern update table
+	D1.s16 >>= 4
+	D2.u16 = D1.u16
+	D4.u16 = D1.u16
+	D1.s16 >>= 3
+	D2.u16 *= 2
+	D3.u16 = (D2.u16 * 2) & 0x7c
+	D2.u16 &= 0x0e
+	D4.u16 &= 0x1f
+	D5 = 0x20
+	D5.u16 -= D4.u16
+	D4.u16 = D5.u16
+	D5.u16 -= D6.u16
+	if (D5.s16 >= 0)
+	{
+		u16[A0] = ((D0.u16 & 0xf0) << 4) + D7.u16 + D3.u16
+		D5.u16 = D6.u16
+		--D6.u16
+		u16[A0+2] = D6.u16
+		A0 += 4
+		A1 = A0
+		D5.u16 *= 4
+		A0 += D5.u16
+
+		fn239afe()
+	}
+	else
+	{
+		D5.s16 = -D5.s16
+		u16 backup = D5.u16
+		D5.u16 = ((D0.u16 & 0xf0) << 4) + D7.u16 + D3.u16
+		u16[A0] = D5.u16
+		D6.u16 = D4.u16 - 1
+		u16[A0+2] = D6.u16
+		A0 += 4
+		A1 = A0
+		D4.u16 *= 4
+		A0 += D4.u16
+
+		fn239afe()
+
+		fn239aa8()
+
+		D6.u16 = backup
+		D5.u16 = ((D0.u16 & 0xf0) << 4) + D7.u16
+		u16[A0] = D5.u16
+		D5.u16 = D6.u16
+		--D6.u16
+		u16[A0+2] = D6.u16
+		A0 += 4
+		A1 = A0
+		D5.u16 *= 4
+		A0 += D5.u16
+	}
+
+	fn239aa8()
+}
+
+
+//# address-hook(0x239aa8) end(0x239afc)
+function void fn239aa8()
+{
+	while (D6.s16 >= 0)
+	{
+		D4.u16 = u16[A5 + D2.s16]
+		D3.u16 = (D4.u16 & 0x03ff) * 8
+		D5 = u32[A2 + D3.s16]
+		D3 = u32[A2 + D3.s16 + 4]
+
+		if (D4 & 0x0400)
+		{
+			D5 ^= 0x08000800
+			D3 ^= 0x08000800
+			D5 = (D5 << 16) + (D5 >> 16)
+			D3 = (D3 << 16) + (D3 >> 16)
+		}
+
+		if (D4 & 0x0800)
+		{
+			u32[A0] = D5 ^ 0x10001000
+			u32[A1] = D3 ^ 0x10001000
+		}
+		else
+		{
+			u32[A0] = D3
+			u32[A1] = D5
+		}
+
+		D2.u16 = (D2.u16 + 2) & 0x0e
+		if (D2.u16 == 0)
+		{
+			++D1.u16
+			fn239b0a()
+		}
+
+		A0 += 4
+		A1 += 4
+		--D6.s16
+	}
+	u16[A0] = 0
+}
+
+
+//# address-hook(0x239b20) end(0x239b5c)
+function void fn239b20()
+{
+	D1.s16 >>= 3
+	D2.u16 = D1.u16
+	D1.s16 >>= 4
+	D2.u16 &= 0x0e
+	if (u16[0xffffeeb0] != 0x0100)
+	{
+		D3 = 4
+		D4.u16 = 0x1f80
+	}
+	else
+	{
+		D3 = 5
+		D4.u16 = 0x1f00
+	}
+
+	D5.u16 = (D0.u16 << D3) & D4.u16
+	D5.u16 += D7.u16
+	u16[(A0+=2)-2] = D5.u16
+	D5.u16 = D6.u16
+	--D6.u16
+	u16[(A0+=2)-2] = D6.u16
+	A1 = A0
+	D5.u16 *= 4
+	A0 += D5.u16
+	fn239afe()
+	fn239aa8()
+}

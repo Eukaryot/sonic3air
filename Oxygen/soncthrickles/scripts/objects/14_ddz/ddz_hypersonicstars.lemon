@@ -1,0 +1,53 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x08242a) end(0x08244c)
+function void fn08242a()
+{
+	setupObjectAttributesFull(0x08321a)
+
+	objA0.update_address = 0x082452
+	objA0.animation.sprite = 6
+
+	updateSpritePattern(0x18bd44, 0xf380, 0x1a0)
+}
+
+
+//# address-hook(0x082452) end(0x082494)
+function void fn082452()
+{
+#if STANDALONE
+	bool isSuperActive = isMainCharacter(CHARACTER_TAILS) ? super.active.tails : super.active
+#else
+	bool isSuperActive = super.active
+#endif
+	if (!isSuperActive)
+		return
+
+	objA0.position.x.u16 -= u16[0xfffffaae]
+	objA0.position.x.u16 -= 8
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 1
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 6)
+		{
+			objA0.animation.sprite = 0
+
+			A1 = 0xffffb000
+			objA0.position.x.u16 = objA1.position.x.u16
+			objA0.position.y.u16 = objA1.position.y.u16
+		}
+	}
+
+	DrawObject()
+}

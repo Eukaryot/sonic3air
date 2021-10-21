@@ -1,0 +1,42 @@
+{
+	"Metadata":
+	{
+		"Name": "Sample Script Mod",
+		"Author": "Eukaryot",
+		"Description": "A basic script mod giving Super / Hyper Tails unlimited flight.",
+		"URL": "https://sonic3air.org",
+		"ModVersion": "1.0.0.0",
+		"GameVersion": "20.07.18.0"
+	},
+	"Settings":
+	{
+		"List":
+		[
+			{
+				"InternalName": "FlightGravity",
+				"DisplayName": "Flight Gravity",
+				"Category": "Gameplay",
+				"Variable": "option.tails.flight_gravity",	// This must be the name of a global variable in the scripts (not a define!)
+				"DefaultValue": "0x08",
+				"Options":
+				{
+					"0x02": "Reduced gravity",
+					"0x08": "Normal gravity",
+					"0x18": "High gravity"
+				}
+			},
+			{
+				"InternalName": "RequireSuper",
+				"DisplayName": "Unlimited Flight",
+				"Category": "Gameplay",
+				"Variable": "option.require_super",
+				"DefaultValue": "1",
+				"Options":
+				{
+					"0": "Always",
+					"1": "Super/Hyper only"
+				}
+			}
+		]
+	}
+}

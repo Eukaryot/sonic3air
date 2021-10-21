@@ -1,0 +1,73 @@
+/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2021 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+#pragma once
+
+#include <rmxbase.h>
+
+
+class Mod
+{
+friend class ModManager;	// For access to mWillGetActive
+
+public:
+	enum class State
+	{
+		INACTIVE,
+		ACTIVE,
+		FAILED
+	};
+
+	struct Setting
+	{
+		struct Option
+		{
+			std::string mDisplayName;
+			uint32 mValue = 0;
+		};
+
+		std::string mIdentifier;
+		std::string mDisplayName;
+		std::string mBinding;
+		std::vector<Option> mOptions;
+		uint32 mDefaultValue = 0;
+		uint32 mCurrentValue = 0;
+	};
+	struct SettingCategory
+	{
+		std::string mDisplayName;
+		uint64 mNameHash = 0;
+		std::vector<Setting> mSettings;
+	};
+
+public:
+	std::string mName;					// Internal name, which is also the directory name
+	std::wstring mLocalDirectory;		// Local path inside mods directory, excluding the trailing slash, e.g. "my-sample-mod" or "modfolder/my-sample-mod"
+	std::wstring mFullPath;				// Complete path, now including the trailing slash, e.g. "<savedatadir>/mods/modfolder/my-sample-mod/"
+	uint64 mLocalDirectoryHash = 0;
+	State mState = State::INACTIVE;
+	std::string mFailedMessage;
+	uint32 mActivePriority = 0;			// Priority in mod loading, starting at 0 for lowest priority; this is also the index in mActiveMods, and is not valid for inactive mods
+
+	// Meta data
+	std::string mDisplayName;
+	std::string mModVersion;
+	std::string mAuthor;
+	std::string mDescription;
+	std::string mURL;
+
+	// Settings
+	std::vector<SettingCategory> mSettingCategories;
+
+public:
+	void loadFromJson(const Json::Value& json);
+
+private:
+	bool mDirty = false;			// Only temporarily used by ModManager
+	bool mWillGetActive = false;	// Only temporarily used by ModManager
+};

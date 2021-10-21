@@ -1,0 +1,257 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x047966) end(0x0479ea)
+function void fn047966()
+{
+	objA0.mapping_offset = 0x047c08
+	objA0.sprite_attributes = 0x2408
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x10
+	objA0.hitbox_extends.x = 0x3f
+	objA0.hitbox_extends.y = 0x0f
+	objA0.sprite_priority = 0x0280
+	objA0.state = 0x02
+	u8[A0 + 0x31] = (objA0.flags2a & 0x01)
+	objA0.flags2a &= 0xfe
+	u16[A0 + 0x34] = 0x01
+
+	D0.u16 = objA0.subtype2c & 0x7f
+	if (D0.u16 != 0)
+	{
+		D0.u16 <<= 3
+		objA0.value32 = D0.u16
+		if (s8[A0 + 0x2c] < 0)
+		{
+			s16[A0 + 0x34] = -s16[A0 + 0x34]
+		}
+		objA0.mapping_offset = 0x047ca8
+		objA0.box_size.x = 0x80
+		objA0.render_flags |= 0x40
+		u16[A0 + 0x16] = 0
+	}
+
+	objA0.update_address = 0x0479f0
+	fn0479f0()
+}
+
+
+//# address-hook(0x0479f0) end(0x047a12)
+function void fn0479f0()
+{
+#if STANDALONE
+	if (objA0.flags2a & 0x08)	// Only first player is allowed to start the platform
+#else
+	if (objA0.flags2a & 0x18)
+#endif
+	{
+		objA0.state = u8[A0 + 0x31]
+		u32[A0] = (objA0.subtype2c != 0) ? 0x047a14 : 0x047ab4
+	}
+
+	fn047a58()
+}
+
+
+//# address-hook(0x047a14) end(0x047a52)
+function void fn047a14()
+{
+	if (objA0.value32 != 0)
+	{
+		--objA0.value32
+		objA0.position.y.u16 += u16[A0 + 0x34]
+		if ((level.framecounter.low & 0x0f) == 0)
+		{
+			playSound(0xd7)
+		}
+	}
+
+	fn047a88()
+
+	// Check if characters on top changed
+	D0.u8 = objA0.flags2a
+	D1.u8 = u8[A0 + 0x30]
+	u8[A0 + 0x30] = objA0.flags2a
+	D1.u8 ^= D0.u8
+	D1.u8 &= D0.u8
+#if STANDALONE
+	D1.u8 &= 0x08	// Ignore second player, it's just annoying having to deal with AI Tails
+#else
+	D1.u8 &= 0x18
+#endif
+	if (D1.u8 != 0)
+	{
+		// Change direction
+		objA0.state ^= 0x01
+	}
+
+	fn047a58()
+}
+
+
+//# address-hook(0x047a58) end(0x047a82)
+function void fn047a58()
+{
+	Object.animationUpdate(0x047bf4)
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x047a88) end(0x047ab2)
+function void fn047a88()
+{
+	A1 = 0xffffb000
+	D6 = 3
+	fn047a96()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	fn047a96()
+}
+
+
+function void fn047a96()
+{
+	// Move characters standing on the conveyor belt
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		D0 = 2
+		if ((objA0.state != 0) != global.inv_gravity)
+		{
+			D0.s16 = -D0.s16
+		}
+		objA1.position.x.u16 += D0.u16
+	}
+}
+
+
+//# address-hook(0x047ab4) end(0x047b52)
+function void fn047ab4()
+{
+	u16 backup_px = objA0.position.x.u16
+	fn047b58()
+
+	objA0.position.x.u16 += (objA0.state != 0) ? -1 : 1
+	D3 = -0x40
+	fn00fe3c()
+
+	if (D1.s16 < 0)
+	{
+		objA0.position.x.u16 -= D1.u16
+		objA0.state ^= 0x01
+	}
+
+	D3 = 0x40
+	fn00fac4()
+	if (D1.s16 < 0)
+	{
+		objA0.position.x.u16 += D1.u16
+		objA0.state ^= 0x01
+	}
+
+	D0.u8 = objA0.flags2a
+	D1.u8 = u8[A0 + 0x30]
+	u8[A0 + 0x30] = objA0.flags2a
+	D1.u8 ^= D0.u8
+	D1.u8 &= D0.u8
+#if STANDALONE
+	D1.u8 &= 0x08	// Ignore second player, it's just annoying having to deal with AI Tails
+#else
+	D1.u8 &= 0x18
+#endif
+	if (D1.u8 != 0)
+	{
+		objA0.state ^= 0x01
+	}
+
+	D4.u16 = backup_px
+	Object.animationUpdate(0x047bf4)
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	fn01dc56()
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		if ((level.framecounter.low & 0x0f) == 0)
+		{
+			playSound(0xd7)
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x047b58) end(0x047bf2)
+function void fn047b58()
+{
+	D0.u16 = u16[A0 + 0x36]
+	if (u16[A0 + 0x36] == 0)
+	{
+		D0.u16 = u16[A0 + 0x34]
+		objA0.position.y.u16 += D0.u16
+		CheckGroundCollision()
+
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 += D1.u16
+			u16[A0 + 0x36] = 1
+		}
+	}
+	else if (u16[A0 + 0x36] == 1)
+	{
+		D3.u16 = objA0.position.x.u16 - 0x30
+		CheckGroundCollisionFixedX()
+		u16 backupD1 = D1.u16
+
+		D3.u16 = objA0.position.x.u16 + 0x30
+		CheckGroundCollisionFixedX()
+
+		D1.s16 = min(D1.s16, backupD1)
+		if (D1.s16 <= 0x0e)
+		{
+			objA0.position.y.u16 += D1.u16
+		}
+		else
+		{
+			u16[A0 + 0x36] = 2
+		}
+	}
+	else
+	{
+		UpdateMovementSimple()
+		D0.u16 = move_area.bottom.current + 0x0120
+		if (D0.s16 <= s16(objA0.position.y.u16))
+		{
+			D4.u16 = 0x7f00
+			objA0.position.x.u16 = D4.u16
+		}
+		else
+		{
+			CheckGroundCollision()
+			if (D1.s16 < 0)
+			{
+				objA0.position.y.u16 += D1.u16
+				objA0.velocity.y = 0
+				u16[A0 + 0x36] = 1
+			}
+		}
+	}
+}

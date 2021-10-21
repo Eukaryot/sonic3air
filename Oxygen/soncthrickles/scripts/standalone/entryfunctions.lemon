@@ -1,0 +1,85 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Entry functions for Standalone                        //
+//-------------------------------------------------------//
+
+function void scriptMainEntryPoint()
+{
+	System.setupCallFrame("GameModeControlLoop")
+}
+
+
+function void EntryFunctions.dataSelect()
+{
+	EntryFunctions.sharedInit()
+	System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
+	System.setupCallFrame("loadupDataSelect")
+}
+
+
+function void loadupDataSelect()
+{
+	// Load save states
+	InitSaveSlots()
+
+	// Go to Data Select
+	global.game_mode = 0x4c
+	DataSelect.setup()
+	Menu.FadeInAfterInit()
+	//Menu.fadeInImmediatelyAfterInit()
+	DataSelect.update()
+}
+
+
+function void EntryFunctions.actSelect()
+{
+	EntryFunctions.sharedInit()
+	System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
+	System.setupCallFrame("LevelSelect.startGame")
+}
+
+
+function void EntryFunctions.competitionMode()
+{
+	EntryFunctions.sharedInit()
+	System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
+	System.setupCallFrame("CompetitionMode.MainMenu")
+
+	global.game_mode = 0x38
+	InitSaveSlots()
+}
+
+
+function void EntryFunctions.blueSphereGame()
+{
+	EntryFunctions.sharedInit()
+	System.setupCallFrame("BlueSphereGame")
+}
+
+
+function void EntryFunctions.levelSelect()
+{
+	EntryFunctions.sharedInit()
+	System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
+	System.setupCallFrame("LevelSelect")
+
+	global.game_mode = 0x1c
+}
+
+
+function void EntryFunctions.sharedInit()
+{
+	#if GAMEAPP
+		// Disabled the muffled underwater sound effect in any case
+		Game.setUnderwaterAudioEffect(0)
+	#endif
+}

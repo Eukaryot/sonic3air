@@ -1,0 +1,1702 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Launch Base Zone Act 1                                //
+//-------------------------------------------------------//
+
+//# address-hook(0x053e96) end(0x053f1e)
+function void InitLevelTiles.LBZ1()
+{
+	D0.u16 = u16[A3 + 0x04] - 0x76
+	u16[A3 + 0x70] = D0.u16
+	u16[A3 + 0x74] = D0.u16
+	u16[A3 + 0x78] = D0.u16
+	u16[A3 + 0x7c] = D0.u16
+
+	A1 = 0xffff0000 + u16[A3 + 0x48]
+	A5 = 0xffff0000 + u16[A3 + 0x4c]
+	u8[A5 + 0x79] = u8[A1 + 0x79]
+	u8[A1 + 0x79] = 0xdb
+
+	fn054146()
+
+	zeroMemory(0xffffa948, 0x38)
+	fn053ff8()
+
+	A1 = 0xffffa900
+	D0 = 11
+	while (D0.s16 >= 0)
+	{
+		D1.u16 = u16[(A1+=2)-2] & level.height.tilemask
+		u16[(A1+=2)-2] = D1.u16
+		--D0.s16
+	}
+
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		fn0540d0()
+	}
+	else
+	{
+		if (camera.position.x.u16 >= 0x3b60 - getScreenExtend() * 2)
+		{
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x054164
+			}
+
+			fn0540d0()
+		}
+	}
+
+	D0.u16 = u16[0xffffb010]
+	D1.u16 = u16[0xffffb014]
+	D2 = 0
+	fn23e458()
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x0540d0) end(0x05410a)
+function void fn0540d0()
+{
+	A1 = 0xffff0000 + u16[A3] + 0x74
+	D0.u16 = u16[A3 - 0x08] - 4
+	D1 = 0x0b
+	while (D1.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = 0
+		A1.u16 += D0.u16
+		--D1.s16
+	}
+
+	A5 = 0xffff0000 + u16[A3] + 0x98
+	A1 = 0xffff0000 + u16[A3 + 0x24] + 0x74
+	D0.u16 = u16[A3 - 0x08] - 4
+	D1 = 2
+	while (D1.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		A5.u16 += D0.u16
+		A1.u16 += D0.u16
+		--D1.s16
+	}
+
+	u8[0xffffeed4] = 0xff
+}
+
+
+//# address-hook(0x054146) end(0x054162)
+function void fn054146()
+{
+	D2 = 0x17
+	while (D2.s16 >= 0)
+	{
+		A1 = 0xff6e00
+		A5 = A1 - 2
+		D0.u16 = u16[A5]
+
+		D1 = 0x3e
+		while (D1.s16 >= 0)
+		{
+			u16[A1-=2] = u16[A5-=2]
+			--D1.s16
+		}
+
+		u16[A5] = D0.u16
+		--D2.s16
+	}
+}
+
+
+//# address-hook(0x05419c) end(0x0541ec)
+function void InitLevelScrolling.LBZ1()
+{
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		A1 = 0xffff0000 + u16[A3] + 2
+		u8[(A1+=1)-1] = 0xe4
+		u8[(A1+=1)-1] = 0xe6
+		u8[(A1+=1)-1] = 0xe0
+
+		A1 = 0xffff0000 + u16[A3+4] + 2
+		u8[(A1+=1)-1] = 0xec
+		u8[(A1+=1)-1] = 0xee
+		u8[(A1+=1)-1] = 0xe8
+	}
+
+	fn23e756()
+	fn04f2f6()
+	u16[0xffffa802] = D2.u16
+	u32[0xffffa804] = 0
+	A4 = 0x05433a
+	A5 = 0xffffa800
+	fn04ecec()
+	A4 = 0x05433e
+	A5 = 0xffffa808
+	fn04f0ce()
+}
+
+
+//# address-hook(0x053f22) end(0x053fa2)
+function void UpdateLevelTiles.LBZ1()
+{
+	camera.foreground.y.u16 += camera.screenshake.offset
+
+	fn05410c()
+
+	if (u16[0xffffeec4] == 0x55)
+	{
+		u16[0xffffeec4] = 0
+		if (global.characters != CHARS_KNUCKLES_ALONE)
+		{
+			A1 = 0xffff007d + u16[A3 + 0x08]
+			u8[A1] = 0xda
+		}
+		else
+		{
+			// This gets reached when the floor explodes after Knuckles' LBZ 1 boss
+			A1 = 0xffff0078 + u16[A3 + 0x4c]
+			D0.u8 = u8[A1]
+			A1 = 0xffff0078 + u16[A3 + 0x50]
+			u8[(A1+=1)-1] = D0.u8
+			u8[(A1+=1)-1] = D0.u8
+			u8[(A1+=1)-1] = D0.u8
+
+		#if STANDALONE
+			// Change characters to the falling animations
+			if (u8[0xffffb020] == char.state.RUNNING || u8[0xffffb020] == char.state.STANDING)
+			{
+				u8[0xffffb020] = char.state.KNUX_FALLING
+				u8[0xffffb021] = char.state.KNUX_FALLING
+				u8[0xffffb022] = 0xcb
+				u8[0xffffb023] = 1
+				u8[0xffffb02a] |= char.flag.IN_AIR
+			}
+			if (u8[0xffffb06a] == char.state.RUNNING || u8[0xffffb06a] == char.state.STANDING)
+			{
+				u8[0xffffb06a] = char.state.FALLING_PANIC
+				u8[0xffffb074] |= char.flag.IN_AIR
+			}
+		#endif
+		}
+
+		fn04ed62()
+		return
+	}
+
+	D0.u16 = u16[0xffffb010]
+	D1.u16 = u16[0xffffb014]
+	D2.u16 = level.display_routine
+	if (D2.u16 == 0)
+	{
+		fn23e458()
+		if (D3.s16 < 0)
+		{
+			fn053fe2()
+		}
+		else
+		{
+			fn04ed62()
+		}
+		return
+	}
+
+	A1 = 0x23e5cc + D2.u16
+	u16 minimum = u16[(A1+=2)-2]
+	u16 maximum = u16[(A1+=2)-2]
+	if (D0.u16 >= minimum && D0.u16 <= maximum)
+	{
+		fn053fe2()
+		return
+	}
+
+	level.display_routine = 0
+	call 0x053fa4 + (D2.u16 >> 1)
+	fn04ed62()
+}
+
+
+//# address-hook(0x053fa6) end(0x053fa6)
+function void fn053fa6()
+{
+	fn053fae()
+}
+
+
+//# address-hook(0x053fae) end(0x053fb4)
+function void fn053fae()
+{
+	A5 = 0xffff0000 + u16[A3]
+	A5 = A5 + 0x88
+	fn23e526()
+}
+
+
+//# address-hook(0x053fa8) end(0x053fa8)
+function void fn053fa8()
+{
+	fn053fba()
+}
+
+
+//# address-hook(0x053fba) end(0x053fc2)
+function void fn053fba()
+{
+	A5 = 0xffff0000 + u16[A3 + 0x24]
+	A5 = A5 + 0x8a
+	fn23e506()
+}
+
+
+//# address-hook(0x053faa) end(0x053faa)
+function void fn053faa()
+{
+	fn053fc8()
+}
+
+
+//# address-hook(0x053fc8) end(0x053fce)
+function void fn053fc8()
+{
+	A5 = 0xffff0000 + u16[A3]
+	A5 = A5 + 0x98
+	fn23e4ec()
+}
+
+
+//# address-hook(0x053fe2) end(0x053ff4)
+function void fn053fe2()
+{
+	fn053ff8()
+
+	A4 = 0x23e598
+	A5 = 0xffffa900
+	D6 = 0x0f
+	D5 = 0x0c
+	fn04ee9e()
+}
+
+
+//# address-hook(0x053ff8) end(0x0540ce)
+function void fn053ff8()
+{
+	if (u16[0xffffeec4] != 0)
+	{
+		if (s16[0xffffeec4] < 0)
+		{
+			u16[0xffffeec4] = 0x01
+			gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
+		#if STANDALONE
+			verticalScrollOffsetBias = 0
+		#endif
+
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x054164
+			}
+
+			#if STANDALONE
+				// We don't want the screen to move to the left from here
+				move_area.left = 0x3b60
+				camera.position.x.u16 = 0x3b60
+			#endif
+		}
+
+		A1 = 0xffffa94c
+		A5 = 0x23e5e0
+		u32 movementSpeed = u32[A1 + 0x2c]
+		u32[A1 + 0x2c] += 0x0100
+	#if STANDALONE
+		// Collapse faster
+		u32[A1 + 0x2c] += 0x0100
+	#endif
+
+		D1.s16 = s16[A1 + 0x30] >> 6
+		++u16[A1 + 0x30]
+
+		u8 columnsMoving = 10
+		for (u8 column = 0; column < 10; ++column)
+		{
+			D1.u16 = (D1.u16 + 2) & 0x0e
+			D4 = u16[A5 + D1.s16] << 4
+			D5 = u32[A1] - D4 - movementSpeed
+			D5 = (D5 << 16) + (D5 >> 16)
+			if (D5.s16 <= -0x0300)
+			{
+				D5.u16 = -0x0300
+				--columnsMoving
+			}
+			D5 = (D5 << 16) + (D5 >> 16)
+			u32[A1] = D5
+			A1 += 4
+		}
+
+		if (columnsMoving > 0)
+		{
+			if (((level.framecounter - 1) & 0x0f) == 0)
+			{
+				playSound(0xcc)
+			}
+		}
+		else
+		{
+			camera.screenshake.state = 0
+			u16[0xffffeec4] = 0
+			gfx.plane_update_routine = 0x0c		// Leave vertical scroll mode again
+
+			fn0540d0()
+
+			zeroMemory(0xffffa948, 0x38)
+			playSound(0x5f)
+		}
+	}
+
+	// Write scroll offset data
+	A1 = 0xffffa900
+	A4 = 0xffffa930
+	A5 = 0xffffa948
+	for (u8 i = 0; i < 12; ++i)
+	{
+		u16 value = u16[A5] + camera.foreground.y.u16
+		u16[A1] = value
+		u16[A4] = value
+		A1 += 4
+		A4 += 2
+		A5 += 4
+	}
+}
+
+
+//# address-hook(0x053fac) end(0x053fac)
+function void fn053fac()
+{
+	fn053fd4()
+}
+
+
+//# address-hook(0x053fd4) end(0x053fdc)
+function void fn053fd4()
+{
+	A5 = 0xffff0000 + u16[A3 + 0x30]
+	A5 = A5 + 0x9a
+	fn23e4d0()
+}
+
+
+//# address-hook(0x05410c) end(0x054144)
+function void fn05410c()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		u16 px = u16[0xffffb010]
+		u16 py = u16[0xffffb014]
+		if (px >= 0x37c0 && px <= 0x3800 && py >= 0x0600 && py <= 0x0680)
+		{
+			// Limits the screen to this top position, to hide that there's something (namely Sonic's path) above
+			level.vertical_wrap = (py < 0x0640) ? 0x040c : 0
+		}
+	#if STANDALONE
+		else if (px >= 0x3800 && py >= 0x0500 && py <= 0x0580)
+		{
+			// Do the same for a horizontal stripe through the whole rest of the act
+			//  -> This is needed because you can get back from the last checkpoint with Knuckles & Tails
+			level.vertical_wrap = (py < 0x0540) ? 0x040c : 0
+		}
+	#endif
+	}
+}
+
+
+
+// Something more general?
+
+//# address-hook(0x04e96c) end(0x04eab6)
+function void LoadTileContentInDirX.LBZ1()
+{
+	u16 oldOffset = u16[A5]
+	u16 newOffset = u16[A6] & 0xfff0
+	u16[A5] = newOffset
+
+	// Anything to do?
+	s16 diff = oldOffset - newOffset
+	if (diff == 0)
+		return
+
+	if (diff > 0)
+	{
+		// Screen moved left
+		D0.u16 = newOffset
+	}
+	else
+	{
+		// Screen moved right
+		diff = -diff
+		D0.u16 = oldOffset + (getScreenWidth() + 31) / 16 * 16
+		D1 = (D1 << 16) + (D1 >> 16)
+	}
+	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
+
+	u32 backupD1 = D1
+	u32 backupD6 = D6
+	LoadTileContentSingleRow()
+	D1 = backupD1
+	D6 = backupD6
+
+	if (u8[0xffffeea4] != 0)
+	{
+		D0.u16 += 0x10
+		LoadTileContentSingleRow()
+	}
+}
+
+
+//# address-hook(0x04ee9e) end(0x04eeba)
+function void fn04ee9e()
+{
+	// Loads tile content in x-direction
+
+	u32 backupD5 = D5
+	u32 backupA4 = A4
+	u32 backupA5 = A5
+
+	A6 = 0xffffee80		// Address of camera.foreground.x
+	fn04ef3c()
+
+	A5 = 0xffffee88		// Address of camera.foreground.x.old
+	LoadTileContentInDirX.LBZ1()
+
+	D5 = backupD5
+	A4 = backupA4
+	A6 = backupA5
+
+	D6.u16 = camera.foreground.x.old
+	LoadTileContentInDirY.LBZ1()
+}
+
+
+//# address-hook(0x04eebc) end(0x04eed4)
+function void fn04eebc()
+{
+	u32 backupD5 = D5
+	u32 backupA4 = A4
+	u32 backupA5 = A5
+
+	A6 = 0xffffee8c		// Address of camera.background.x
+	fn04ef3c()
+
+	A5 = 0xffffee94		// Address of camera.background.x.old
+	LoadTileContentInDirX.LBZ1()
+
+	D5 = backupD5
+	A4 = backupA4
+	A6 = backupA5
+
+	D6.u16 = camera.background.x.old
+	LoadTileContentInDirY.LBZ1()
+}
+
+
+//# address-hook(0x04eed8) end(0x04ef3a)
+function void LoadTileContentInDirY.LBZ1()
+{
+	D1.u16 = D6.u16
+	while (true)
+	{
+		D6.u16 -= u16[A4]
+		A4 += 2
+		if (D6.s16 < 0)
+			break
+
+		u16[A6+2] = u16[A6] & level.height.tilemask
+		A6 += 4
+		--D5.u16
+	}
+
+	u32 screenColumns = (getScreenWidth() + 31) / 16
+	D6.s16 = -D6.s16
+	D6.u16 >>= 4
+	D4 = screenColumns - D6.u16
+	if (D4.s16 < 0)
+	{
+		D4 = 0
+		D6 = screenColumns
+	}
+
+	while (true)
+	{
+		u32 backupA4 = A4
+		u32 backupA6 = A6
+		u16 backupD1 = D1.u16
+		u16 backupD4 = D4.u16
+		u16 backupD5 = D5.u16
+		u16 backupD6 = D6.u16
+
+		// LoadTileContentInDirY expects:
+		//  - A5 = address of old scroll offset
+		//  - A6 = address of new scroll offset
+		//  - D6 = number of columns to load
+		A5 = A6 + 2
+		LoadTileContentInDirY()
+
+		A4 = backupA4
+		A6 = backupA6
+		D1.u16 = backupD1
+		D4.u16 = backupD4
+		D5.u16 = backupD5
+		D6.u16 = backupD6
+
+		A6 += 4
+		if (D4.u16 == 0)
+			break
+
+		D1.u16 += D6.u16 << 4
+		D6.u16 = u16[A4] >> 4
+		A4 += 2
+		--D5.u16
+		D0.u16 = D4.u16
+		D4.u16 -= D6.u16
+		if (D4.s16 < 0)
+		{
+			D6.u16 = D0.u16
+			D4 = 0
+		}
+	}
+
+	while (true)
+	{
+		--D5.u16
+		if (D5.u16 == 0)
+			break
+
+		u16[A6+2] = u16[A6] & level.height.tilemask
+		A6 += 4
+	}
+}
+
+
+//# address-hook(0x04ef3c) end(0x04ef42)
+function void fn04ef3c()
+{
+	D2.u16 = u16[(A4+=2)-2]
+	D0.u16 = u16[A6]
+	fn04ef46()
+
+	D0.u16 += getScreenWidth()
+	fn04ef46()
+}
+
+
+//# address-hook(0x04ef46) end(0x04ef54)
+function void fn04ef46()
+{
+	while (D0.u16 >= D2.u16)
+	{
+		D2.u16 += u16[(A4+=2)-2]
+		A5 += 4
+	}
+
+	D1.u16 = u16[A5]
+	D1 = (D1 << 16) + (D1 >> 16)
+}
+
+
+
+// Despite its address, this seems to be used only inside LBZ
+// Possibly code from Sonic 3 recycled in S3K ?
+
+//# address-hook(0x23e458) end(0x23e492)
+function void fn23e458()
+{
+	// Check for indoors chunks to replace when entering / leaving a building
+
+	u16 px = D0.u16
+	u16 py = D1.u16
+
+	A1 = 0x23e5b0
+	D3 = 3
+
+	while (D3.s16 >= 0)
+	{
+		A5 = A1
+		u16 minX = u16[(A5+=2)-2]
+		u16 maxX = u16[(A5+=2)-2]
+		u16 minY = u16[(A5+=2)-2]
+		u16 maxY = u16[(A5+=2)-2]
+
+		if (px >= minX && px <= maxX && py >= minY && py <= maxY)
+		{
+			if (D2.u16 != 0 || px < 0x1580 || py < 0x0400)
+			{
+				D2.u16 += 4
+				level.display_routine = D2.u16
+				call 0x23e494 + (D2.u16 >> 1)
+				return
+			}
+		}
+
+		A1 += 8
+		D2.u16 += 4
+		--D3.s16
+	}
+}
+
+
+//# address-hook(0x23e496) end(0x23e496)
+function void fn23e496()
+{
+	fn23e49e()
+}
+
+
+//# address-hook(0x23e49e) end(0x23e4a4)
+function void fn23e49e()
+{
+	A5 = 0xffff0000 + u16[A3]
+	A5 = A5 + 0x80
+	fn23e526()
+}
+
+
+//# address-hook(0x23e498) end(0x23e498)
+function void fn23e498()
+{
+	fn23e4a8()
+}
+
+
+//# address-hook(0x23e4a8) end(0x23e4b0)
+function void fn23e4a8()
+{
+	A5 = 0xffff0000 + u16[A3 + 0x24]
+	A5 = A5 + 0x80
+	fn23e506()
+}
+
+
+//# address-hook(0x23e49a) end(0x23e49a)
+function void fn23e49a()
+{
+	fn23e4b2()
+}
+
+
+//# address-hook(0x23e4b2) end(0x23e4c6)
+function void fn23e4b2()
+{
+	if (u16[0xffffeed4] != 0)
+	{
+		level.display_routine = 0
+		D3 = -1
+		return
+	}
+
+	A5 = 0xffff0000 + u16[A3]
+	A5 = A5 + 0x94
+	fn23e4ec()
+}
+
+
+//# address-hook(0x23e49c) end(0x23e49c)
+function void fn23e49c()
+{
+	fn23e4c8()
+}
+
+
+//# address-hook(0x23e4c8) end(0x23e4cc)
+function void fn23e4c8()
+{
+	A5 = 0xffff0000 + u16[A3 + 0x30]
+	A5 = A5 + 0x94
+	fn23e4d0()
+}
+
+
+//# address-hook(0x23e4d0) end(0x23e4ea)
+function void fn23e4d0()
+{
+	A1 = 0xffff0000 + u16[A3]
+	A1 += 0x7a
+	D0.u16 = u16[A3 - 0x08] - 6
+	D1 = 5
+
+	while (D1.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		u16[(A1+=2)-2] = u16[(A5+=2)-2]
+		A5.u16 += D0.u16
+		A1.u16 += D0.u16
+		--D1.s16
+	}
+}
+
+
+//# address-hook(0x23e4ec) end(0x23e504)
+function void fn23e4ec()
+{
+	A1 = 0xffff0000 + u16[A3]
+	A1 += 0x74
+	D0.u16 = u16[A3 - 0x08] - 4
+	D1 = 0x0b
+
+	while (D1.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		A5.u16 += D0.u16
+		A1.u16 += D0.u16
+		--D1.s16
+	}
+}
+
+
+//# address-hook(0x23e506) end(0x23e524)
+function void fn23e506()
+{
+	A1 = 0xffff0000 + u16[A3]
+	A1 += 0x42
+	D0.u16 = u16[A3 - 0x08] - 10
+	D1 = 0x0d
+
+	while (D1.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		u16[(A1+=2)-2] = u16[(A5+=2)-2]
+		A5.u16 += D0.u16
+		A1.u16 += D0.u16
+		--D1.s16
+	}
+}
+
+
+//# address-hook(0x23e526) end(0x23e542)
+function void fn23e526()
+{
+	A1 = 0xffff0000 + u16[A3 + 0x08]
+	A1 += 0x26
+	D0.u16 = u16[A3 - 0x08] - 8
+	D1 = 8
+
+	while (D1.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		u32[(A1+=4)-4] = u32[(A5+=4)-4]
+		A5.u16 += D0.u16
+		A1.u16 += D0.u16
+		--D1.s16
+	}
+}
+
+
+
+// Level scrolling
+
+//# address-hook(0x0541f0) end(0x0541f4)
+function void fn0541f0()
+{
+	call 0x0541f8 + level.scrolling_routine
+}
+
+//# address-hook(0x0541f8) end(0x0541f8)
+function void fn0541f8()
+{
+	fn054200()
+}
+
+//# address-hook(0x0541fc) end(0x0541fc)
+function void fn0541fc()
+{
+	fn05427c()
+}
+
+
+//# address-hook(0x054200) end(0x054278)
+function void fn054200()
+{
+	if (u16[0xffffeec6] != 0)
+	{
+		u16[0xffffeec6] = 0
+
+		u32 backupD7 = D7
+		u32 backupA0 = A0
+		u32 backupA2 = A2
+		u32 backupA3 = A3
+
+		Kosinski.addToDecompressionQueue(0x3eaf04, 0xffff0000)
+		Kosinski.addToDecompressionQueue(0x3e5f70, 0xffff96b8)
+
+		Kosinski.addToDMAQueue(0x3e77d0, 0x33a0)
+
+		D7 = backupD7
+		A0 = backupA0
+		A2 = backupA2
+		A3 = backupA3
+
+		level.scrolling_routine += 4
+	}
+
+	fn23e756()
+
+	A4 = 0x05433a
+	A5 = 0xffffa800
+	D6 = 0x20
+	D5 = 2
+	fn04edf6()
+
+	A4 = 0x05433e
+	A5 = 0xffffa808
+	fn04f0ce()
+
+	A4 = 0x23e598
+	A5 = 0xffffa92e		// That's where the scroll offset data got written before (in "fn053ff8")
+	UpdateVerticalScrollOffsetsDuringCollapse()
+
+	UpdateScreenShake()
+}
+
+
+//# address-hook(0x05427c) end(0x054336)
+function void fn05427c()
+{
+	if (kosinski.waiting_modules == 0)
+	{
+		global.zone_act = 0x0601
+		camera.update_routine = 0
+		dynobjects.routine = 0
+		rings.update_routine = 0
+		level.boss_encounter = 0
+		global.in_extra_stage = 0
+		fn04f8f8()
+
+		u32 backupD7 = D7
+		u32 backupA0 = A0
+		u32 backupA2 = A2
+		u32 backupA3 = A3
+
+		fn01c362()
+		fn0076a6()
+
+		Level.InitializeWater()
+		VDP.Config.enableHInt(true)
+
+		Level.loadPaletteData(0x17)
+
+		D7 = backupD7
+		A0 = backupA0
+		A2 = backupA2
+		A3 = backupA3
+
+		fn0543cc()
+
+		D0.u16 = 0x3a00
+		D1 = 0
+		u16[0xffffb010] -= D0.u16
+		u16[0xffffb05a] -= D0.u16
+		fn04f3b0()
+
+		camera.position.x.u16 -= D0.u16
+		camera.foreground.x.u16 -= D0.u16
+		move_area.left -= D0.u16
+		move_area.right -= D0.u16
+		Level.GetCameraPosition()
+
+		level.display_routine = 0
+		u16[0xffffeed4] = 0
+		u32[0xffffeee6] = 0
+		u16[0xffffeea0] = 0
+		u16[0xffffef40] = 0
+		u16[0xffffeebe] = 0
+		u16[0xffffeee2] = 0x40
+		if (camera.position.y.u16 >= 0x0540)
+		{
+			s16[0xffffeee2] = -s16[0xffffeee2]
+		}
+
+		backupD7 = D7
+		backupA0 = A0
+		backupA2 = A2
+		backupA3 = A3
+
+		fn02807a()
+
+		D7 = backupD7
+		A0 = backupA0
+		A2 = backupA2
+		A3 = backupA3
+
+		level.scrolling_routine = 0
+	
+	#if STANDALONE
+		// Enforce a full screen refresh of plane A to get rid of wrong tiles being shown
+		fillPlaneA_Default(camera.position.x.u16, camera.position.y.u16, getScreenWidth(), getScreenHeight())
+	#endif
+	}
+
+	A4 = 0x05433e
+	A5 = 0xffffa808
+	fn04f0ce()
+}
+
+
+//# address-hook(0x23e756) end(0x23e7c2)
+function void fn23e756()
+{
+	D0.u16 = camera.foreground.y.u16 - camera.screenshake.offset
+	D0.s16 >>= 4
+	D0.u16 += camera.screenshake.offset
+	camera.background.y.u16 = D0.u16
+	D0.u16 = camera.foreground.x.u16
+	D0 = (D0 << 16)
+	D0.s32 >>= 4
+	D1 = D0
+	D0.s32 >>= 1
+	u16[0xffffeee2] = D0 >> 16
+	camera.background.x.u16 = D1 >> 16
+	u16[0xffffa800] = D1 >> 16
+	u16[0xffffa808] = D1 >> 16
+	A1 = 0xffffa80a
+	D1 += D0 * 2
+	D0.s32 >>= 2
+	D2 = 3
+
+	while (D2.s16 >= 0)
+	{
+		u16[(A1+=2)-2] = D1 >> 16
+		D1 += D0
+		--D2.s16
+	}
+
+	u16[0xffffeee2] += 10
+	camera.background.x.u16 += 10
+	u16[0xffffa800] += 10
+	u16[0xffffa808] += 10
+	u16[0xffffa80a] += 4
+	u16[0xffffa80c] -= 2
+	u16[0xffffa80e] += 7
+}
+
+
+//# address-hook(0x01ca3e) end(0x01ca3e)
+function void UpdateCameraBounds.LBZ1()
+{
+}
+
+
+
+//-------------------------------------------------------//
+// Launch Base Zone Act 2                                //
+//-------------------------------------------------------//
+
+//# address-hook(0x054348) end(0x054368)
+function void InitLevelTiles.LBZ2()
+{
+	fn0543cc()
+
+	u16[0xffffeec0] = 4
+	u32[0xffffeee6] = 0
+	u16[0xffffeea0] = 0
+	u16[0xffffef40] = 0
+	u16[0xffffeebe] = 0
+
+	fn0543a2()
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x0543a2) end(0x0543c0)
+function void fn0543a2()
+{
+	A5 = 0xffff0094 + u16[A3]
+	A1 = 0xffff0006 + u16[A3]
+	D0.u16 = u16[A3 - 0x08]
+	for (u8 i = 0; i < 6; ++i)
+	{
+		copyMemory(A1, A5, 0x06)
+		A5 += D0.u16
+		A1 += D0.u16
+	}
+}
+
+
+//# address-hook(0x0543cc) end(0x05440c)
+function void fn0543cc()
+{
+	A1 = 0xffff0000 + u16[0xffff8050]
+	A5 = 0xffff0000 + u16[0xffff8054]
+	u8[A5 + 0x05] = u8[A1 + 0x05]
+	u8[A1 + 0x05] = 0xdb
+	fn054146()
+
+	A1 = 0xffff0000 + u16[0xffff8054]
+	D0.u8 = u8[A1 + 0x04]
+
+	A1 = 0xffff0004 + u16[0xffff8058]
+	u8[(A1+=1)-1] = D0.u8
+	u8[(A1+=1)-1] = D0.u8
+	u8[(A1+=1)-1] = D0.u8
+
+	A1 = 0xffff0000 + u16[0xffff8024]
+	u8[A1 + 0x8a] = 0x58
+
+	A1 = 0xffff0000 + u16[0xffff8028]
+	u8[A1 + 0x8a] = 0x55
+}
+
+
+//# address-hook(0x05440e) end(0x054440)
+function void InitLevelScrolling.LBZ2()
+{
+	level.scrolling_routine = 8
+	UpdateBackground.LBZ2()
+
+	fn04f2f6()
+
+	D1 = 0
+	Level.InitialTilesFill()
+
+	D0 = 0x40
+	if (s16[0xffffeee2] <= 0x40)
+	{
+		D0.s16 = -0x40
+	}
+
+	if (s16[0xffffeee2] >= D0.s16)
+	{
+		s16[0xffffeee2] = D0.s16
+	}
+
+	A4 = 0x23eee0
+	A5 = 0xffffa800
+	fn04f0ce()
+}
+
+
+//# address-hook(0x05436c) end(0x054378)
+function void UpdateLevelTiles.LBZ2()
+{
+	camera.foreground.y.u16 += camera.screenshake.offset
+	call 0x05437c + s16[0xffffeec0]
+}
+
+
+//# address-hook(0x05437c) end(0x05437c)
+function void fn05437c()
+{
+	fn054384()
+}
+
+
+//# address-hook(0x054384) end(0x05439e)
+function void fn054384()
+{
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		fn0543c2()
+	}
+	else
+	{
+		if (u16[0xffffb010] >= 0x060a)
+		{
+			fn0543a2()
+			u16[0xffffeec0] += 4
+			fn04ed62()
+		}
+		else
+		{
+			LoadTileContentDefault()
+		}
+	}
+}
+
+
+//# address-hook(0x054380) end(0x054380)
+function void fn054380()
+{
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x0543c2) end(0x0543c8)
+function void fn0543c2()
+{
+	fn0543a2()
+	u16[0xffffeec0] += 4
+	LoadTileContentDefault()
+}
+
+
+
+//# address-hook(0x054444) end(0x054448)
+function void UpdateLevelScrolling.LBZ2()
+{
+	call 0x05444c + level.scrolling_routine
+}
+
+
+//# address-hook(0x05444c) end(0x05444c)
+function void fn05444c()
+{
+	fn054464()
+}
+
+
+//# address-hook(0x054464) end(0x054482)
+function void fn054464()
+{
+	UpdateBackground.LBZ2()
+	fn04f2f6()
+
+	u16[0xffffeec8] = (D0.u16 + getScreenHeight()) & level.height.tilemask
+	u16[0xffffeeca] = 0x0f
+	level.scrolling_routine += 4
+	fn054488()
+}
+
+
+//# address-hook(0x054450) end(0x054450)
+function void fn054450()
+{
+	fn054484()
+}
+
+//# address-hook(0x054454) end(0x054454)
+function void fn054454()
+{
+	fn05449a()
+}
+
+//# address-hook(0x054458) end(0x054458)
+function void fn054458()
+{
+	fn054508()
+}
+
+//# address-hook(0x05445c) end(0x05445c)
+function void fn05445c()
+{
+	fn05455e()
+}
+
+
+//# address-hook(0x05455e) end(0x0545c2)
+function void fn05455e()
+{
+	if (gfx.plane_update_routine != 0)
+	{
+		fn0545da()
+		return
+	}
+
+	if ((level.framecounter & 0x03) == 0)
+	{
+		D0.u16 = u16[0xffffeee8]
+		if (D0.u16 >= 0x28)
+		{
+			u16[0xffffeee8] = 0
+			gfx.plane_update_routine = 0x18
+
+			A1 = 0xffff0087 + u16[A3 + 0x2a]
+			u8[A1] = 0
+			u8[A1+1] = 0
+			u8[A1+2] = 0
+			A1.u16 += u16[A3 - 0x0a]
+			u8[(A1+=1)-1] = 0
+			u8[(A1+=1)-1] = 0
+			u8[A1] = 0
+
+			level.scrolling_routine += 4
+			fn0545c4()
+			return
+		}
+
+		++D0.u16
+		u16[0xffffeee8] = D0.u16
+	}
+
+	fn0545da()
+
+	scrolloffset.y.planeA = camera.foreground.y.u16 + u16[0xffffeee8]
+	scrolloffset.y.planeB = camera.background.y.u16
+
+	signalMultiReturn()
+}
+
+
+//# address-hook(0x054460) end(0x054460)
+function void fn054460()
+{
+	fn0545c4()
+}
+
+
+//# address-hook(0x054484) end(0x054484)
+function void fn054484()
+{
+	UpdateBackground.LBZ2()
+	fn054488()
+}
+
+
+//# address-hook(0x054488) end(0x054498)
+function void fn054488()
+{
+	D1 = 0
+	D2.u16 = camera.background.y.u16
+	fn04ef56()
+	if (_negative())
+	{
+		level.scrolling_routine += 04
+	}
+	fn0544a4()
+}
+
+
+//# address-hook(0x05449a) end(0x054504)
+function void fn05449a()
+{
+	if (u16[0xffffeec6] == 0)
+	{
+		UpdateBackground.LBZ2()
+		fn0544a4()
+		return
+	}
+
+	u16[0xffffeec6] = 0
+	u16[A3] = u16[A3 + 0x08]
+	u16[A3 + 0x04] = u16[A3 + 0x0c]
+	move_area.right = 0x4390 + getScreenExtend()
+	move_area.bottom.current = 0x0668
+	move_area.bottom.target = 0x0668
+	u16[0xffffeee0] = 0x3c
+	u16[0xffffeea2] = 0x1e00
+	u32[0xffffee9c] = 0x6200
+	player1.camera_lock = 0xff
+	u8[0xffffef40] = 0xff
+	level.scrolling_routine += 4
+
+	fn054508()
+}
+
+
+//# address-hook(0x0544a4)
+function void fn0544a4()
+{
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1 = 0
+	D6 = 0x20
+	LoadTileContentInDirY()
+
+	A4 = 0x23eee0
+	A5 = 0xffffa800
+	fn04f0ce()
+	UpdateScreenShake()
+}
+
+
+//# address-hook(0x054508) end(0x05455a)
+function void fn054508()
+{
+	if (u16[0xffffef40] != 0)
+	{
+		if (camera.screenshake.state == 0)
+		{
+			u16[0xffffef40] = 0
+		}
+		else
+		{
+			D0.u16 = (level.framecounter - 1) & 0x0f
+			if (D0.u16 == 0)
+			{
+				playSound(0xcd)
+			}
+		}
+	}
+
+	if (u16[0xffffeec6] != 0)
+	{
+		fn054a94()
+
+		if (s16[0xffffee9c] < 0)
+		{
+			u16[0xffffeec6] = 0
+			u16[0xffffeeca] = 0x1b
+			gfx.plane_update_routine = 0x10
+			level.water_present = 0
+			level.scrolling_routine += 4
+		}
+	}
+
+	fn0545de()
+}
+
+
+//# address-hook(0x0545c4) end(0x0545d8)
+function void fn0545c4()
+{
+	if (u16[0xffffeec6] != 0)
+	{
+		player1.camera_lock = 0xff
+		camera.foreground.y.u16 = camera.position.y.u16
+		camera.position.y.u16 -= 2
+
+	#if STANDALONE
+		// Remove garbage values for plane A that would be visible on the upper left otherwise
+		// -> Unfortunately, new patterns can get loaded afterwards in the same frame (in "writeplanePatterns")
+		VDP.Util.clearPatternRectInVRAM(0xc000, 0xd000, 0x80, 0x40, 0x60)
+	#endif
+	}
+	else
+	{
+		fn0545da()
+	}
+}
+
+
+//# address-hook(0x0545da) end(0x0545da)
+function void fn0545da()
+{
+	fn054a94()
+	fn0545de()
+}
+
+
+//# address-hook(0x0545de) end(0x054604)
+function void fn0545de()
+{
+	fn0549c6()
+	fn05480c()
+
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1 = 0
+	D6 = 0x20
+	LoadTileContentInDirY()
+
+	A4 = 0x23ef04
+	A5 = 0xffffa800
+	fn04f0ce()
+	UpdateScreenShake()
+}
+
+
+
+//# address-hook(0x054608) end(0x05480a)
+function void UpdateBackground.LBZ2()
+{
+	D3.u16 = camera.screenshake.offset
+	D0.u16 = camera.foreground.y.u16 - D3.u16 - 0x05f0
+	D1.u16 = D0.u16
+	D0 = (D0 << 16)
+	D0.s32 >>= 1
+	D2 = D0
+	D2.s32 >>= 3
+	D0 -= D2
+	D2.s32 >>= 2
+	D0 -= D2
+	D0 >>= 16
+	D2.u16 = D0.u16
+	camera.background.y.u16 = D0.u16 + 0x02c0 + D3.u16
+	D2.u16 -= D1.u16
+	u16[0xffffeee2] = D2.u16
+	D0 = u32(camera.foreground.x.u16) << 16
+	if (D2.u16 != 0)
+	{
+		D1 = D0
+		D3 = D0
+		D3.s32 >>= 6
+		D4 = D3
+		D4.s32 >>= 3
+		D3 -= D4
+		if (D2.s16 <= -0x40)
+		{
+			A1 = 0xffffa81e
+			for (u8 i = 0; i < 0x40; ++i)
+			{
+				u16[A1] = D1 >> 16
+				#if STANDALONE
+					// Add a nice moving waves effect
+					s16 distance = (0x1200 / (0x80 - i))
+					u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
+				#endif
+				A1 += 2
+				D1 -= D3
+			}
+		}
+		else
+		{
+			A1 = 0xffffa91e
+			for (u8 i = 0; i < 0x40; ++i)
+			{
+				A1 -= 2
+				u16[A1] = D1 >> 16
+				#if STANDALONE
+					// Add a nice moving waves effect; except if underwater, there is another waves effect already
+					s16 distance = (0x1200 / (0x80 - i))
+					u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
+				#endif
+				D1 -= D3
+			}
+
+			if (D2.s16 < 0x40)
+			{
+				A1 = 0xffffa89e
+				A5 = A1
+				A6 = 0x26f460
+				D1.u16 = D2.u16
+				if (D1.s16 >= 0)
+				{
+					D3.u16 = 0x40 - D1.s16
+					D3.u16 <<= 6
+					A6 += D3.s16
+					D3 = 0
+					while (D1.s16 > 0)
+					{
+						D3.u8 = u8[A6]
+						u16[A1] = u16[A5 + D3.s16 * 2]
+						A1 += 2
+						++A6
+						--D1.s16
+					}
+				}
+				else
+				{
+					D1.s16 = -D1.s16
+
+					D3.u16 = 0x40 - D1.s16
+					D3.u16 <<= 6
+					A6 += D3.s16
+					D3 = 0
+					while (D1.s16 > 0)
+					{
+						A1 -= 2
+						D3.u8 = u8[A6]
+						u16[A1] = u16[A5 + D3.s16 * 2]
+						++A6
+						--D1.s16
+					}
+				}
+			}
+		}
+	}
+
+	A1 = 0xffffa9e2
+	D1 = D0.s32 >> 1
+	D3 = D0.s32 >> 4
+	camera.background.x.u16 = D1 >> 16
+	u16[A1-=2] = D1 >> 16
+	D1 -= D3
+	u16[0xffffeee4] = D1 >> 16
+	u16[A1-=2] = D1 >> 16
+	A5 = 0x23ef4e
+	D1 -= D3
+	D4 = 4
+
+	while (D4.s16 >= 0)
+	{
+		D1 -= D3
+		u16 value = D1 >> 16
+		D5.u16 = u16[(A5+=2)-2]
+		while (D5.s16 >= 0)
+		{
+			u16[A1-=2] = value
+			u16[A1-=2] = value
+			u16[A1-=2] = value
+			u16[A1-=2] = value
+			--D5.s16
+		}
+		--D4.s16
+	}
+
+	D3 = 0x3f
+	if (D2.s16 >= 0)
+	{
+		D3.u16 -= D2.u16
+	}
+
+	D1 = (D1 << 16) + (D1 >> 16)
+	while (D3.s16 >= 0)
+	{
+		u16[A1-=2] = D1.u16
+		--D3.s16
+	}
+
+	A1 = 0xffffa800
+	A5 = 0x23ef34
+	D1 = D0
+	D1.s32 >>= 6
+	D3 = D1
+	D4 = u32[0xffffa9e2]
+	u32[0xffffa9e2] += 0x0e00
+	D5 = 0x0c
+
+	while (D5.s16 >= 0)
+	{
+		D6.u16 = u16[(A5+=2)-2]
+		D1 += D4
+		u16[A1 + D6.s16] = D1 >> 16
+		D1 += D3
+		--D5.s16
+	}
+
+	D1 = D0
+	D1.s32 >>= 4
+	D3 = D1
+	D3.s32 >>= 1
+	A1 = 0xffffa81a
+	u16[(A1+=2)-2] = D1 >> 16
+	D1 += D3
+	D1 = (D1 << 16) + (D1 >> 16)
+	u16[(A1+=2)-2] = D1.u16
+
+	bool goto0547b6 = true
+	if (D2.s16 < 0)
+	{
+		D4 = 0x3f
+		D4.u16 += D2.u16
+
+		if (D4.s16 >= 0x30)
+		{
+			D4.u16 -= 0x30
+		}
+		else
+		{
+			while (D4.s16 >= 0)
+			{
+				u16[(A1+=2)-2] = D1.u16
+				--D4.s16
+			}
+			goto0547b6 = false
+		}
+	}
+	else
+	{
+		D4 = 0x0f
+	}
+
+	if (goto0547b6)
+	{
+		D5 = 0x17
+		while (D5.s16 >= 0)
+		{
+			u16[(A1+=2)-2] = D1.u16
+			u16[(A1+=2)-2] = D1.u16
+			--D5.s16
+		}
+
+		D1 = (D1 << 16) + (D1 >> 16)
+		D1 += D3
+		D1 = (D1 << 16) + (D1 >> 16)
+
+		while (D4.s16 >= 0)
+		{
+			u16[(A1+=2)-2] = D1.u16
+			--D4.s16
+		}
+	}
+
+	D0 = 0x3f
+	D0.u16 -= D2.u16
+	if (D0.s16 >= 0)
+	{
+		D0.u16 = min(D0.u16 + 0x60, 0xdf)
+
+		A1 = 0xffffa9de
+		A5 = 0x04f878
+		D1.u16 = (level.framecounter >> 1) & 0x7e
+		A5.u16 += D1.u16
+
+		while (D0.s16 >= 0)
+		{
+			D3.u16 = u16[A5-=2]
+			A1 -= 2
+			u16[A1] += D3.u16
+			--D0.s16
+		}
+	}
+}
+
+
+//# address-hook(0x054a94) end(0x054ab4)
+function void fn054a94()
+{
+	if (u16[0xffffeea2] != 0)
+	{
+		u16[0xffffeea2] -= 0x0100
+	}
+	else if (s32[0xffffee9c] > -0x018000)
+	{
+		u32[0xffffee9c] -= 0x0100
+	}
+}
+
+
+
+//# address-hook(0x01ca40) end(0x01ca4a)
+function void UpdateCameraBounds.LBZ2()
+{
+	// Targets:
+	//  - 0x01ca52	-> camera.update_routine = 0x00
+	//  - 0x01caaa	-> camera.update_routine = 0x02
+	call tableLookupAddress(0x01ca4e, camera.update_routine)
+}
+
+
+//# address-hook(0x01ca52) end(0x01caa8)
+function void fn01ca52()
+{
+	if (camera.position.x.u16 >= 0x3bc0 && camera.position.y.u16 >= 0x0500)
+	{
+		camera.update_routine += 2
+
+		Kosinski.addToDecompressionQueue(0x3e69b0, 0xffff9000)
+		Kosinski.addToDecompressionQueue(0x3ed3d4, 0xffff0000)
+
+		Kosinski.addToDMAQueue(0x3e8f72, 0x0000)
+		Kosinski.addToDMAQueue(0x37f6ee, 0xb400)
+	}
+}
+
+
+//# address-hook(0x01caaa) end(0x01caaa)
+function void fn01caaa()
+{
+}
+
+
+
+//# address-hook(0x02807a) end(0x0280a8)
+function void fn02807a()
+{
+	A3 = 0xfffff7f4
+	u16[0xfffff7f6] = 1
+	D1.u16 = u16[0xffffeee2]
+	if (D1.u16 == 0)
+	{
+		fn02804a()
+		return
+	}
+
+	if (D1.s16 < 0)
+	{
+		fn028066()
+		updateSpritePattern(0x2bbb40, 0x5860, 0x100)
+	}
+	else
+	{
+		fn028052()
+	}
+
+	fn027f66()
+}

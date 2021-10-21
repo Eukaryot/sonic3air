@@ -1,0 +1,58 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x044a68) end(0x044a9a)
+function void fn044a68()
+{
+	objA0.update_address = 0x044aa0
+	objA0.render_flags = 0x04
+	objA0.box_size.y = 0x11
+	objA0.box_size.x = 0x20
+	objA0.sprite_priority = 0x0180
+	objA0.sprite_attributes = 0x42d4
+	objA0.mapping_offset = 0x046900
+	objA0.animation.sprite = 1
+	objA0.velocity.y = objA0.position.y.u16
+
+	fn044aa0()
+}
+
+
+//# address-hook(0x044aa0) end(0x044ada)
+function void fn044aa0()
+{
+	D0.u16 = objA0.countdown_value
+	D1.u16 = objA0.flags2a & 0x18
+	if (D1.u16 == 0)
+	{
+		if (D0.u16 > 0)
+		{
+			--D0.u16
+		}
+	}
+	else
+	{
+		if (D0.u16 < 4)
+		{
+			++D0.u16
+		}
+	}
+
+	objA0.countdown_value = D0.u16
+	D0.u16 += objA0.velocity.y
+	objA0.position.y.u16 = D0.u16
+
+	D1 = 0x2b
+	D2 = 0x11
+	D3 = 0x11
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+	DrawOrUnloadObject()
+}

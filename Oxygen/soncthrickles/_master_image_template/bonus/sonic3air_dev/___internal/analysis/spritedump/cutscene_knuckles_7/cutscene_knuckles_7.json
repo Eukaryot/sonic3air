@@ -1,0 +1,7 @@
+{
+	"cutscene_knuckles_7_0x00": { "File": "cutscene_knuckles_7.bmp", "Rect": "4,0,24,32", "Center": "12,16" },
+	"cutscene_knuckles_7_0x01": { "File": "cutscene_knuckles_7.bmp", "Rect": "36,0,24,32", "Center": "12,16" },
+	"cutscene_knuckles_7_0x02": { "File": "cutscene_knuckles_7.bmp", "Rect": "64,0,32,32", "Center": "12,16" },
+	"cutscene_knuckles_7_0x03": { "File": "cutscene_knuckles_7.bmp", "Rect": "96,0,32,32", "Center": "12,16" },
+	"cutscene_knuckles_7_0x04": { "File": "cutscene_knuckles_7.bmp", "Rect": "136,4,16,24", "Center": "4,16" }
+}

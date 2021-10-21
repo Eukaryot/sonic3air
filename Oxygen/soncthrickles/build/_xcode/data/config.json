@@ -1,0 +1,120 @@
+{
+
+	// Enter the path to the game ROM here if it can't be found automatically
+	"RomPath": "",
+
+	// Default window size
+	"WindowSize": "1200 x 672",
+
+	// Audio output sample rate, valid values: 11025, 22050, 44100, 48000
+	"AudioSampleRate": "48000",
+
+	// Allow for dumping of a game simulation recording by pressing F2 (set to "1" to enforce this feature even in fail-safe mode)
+	"GameRecording": "-1",
+
+	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
+	"PlatformFlags": "-1",
+
+	// Script
+	"ScriptOptimizationLevel": "3",
+
+	// [DEPRECATED] Mapping of input devices to game controls
+	//  -> Use settings_input.json in %appdata%/Sonic3AIR instead.
+	//     You can copy the "InputDevices" block from here to the settings.json, and remove all the parts you don't need.
+	//     As usual, take care of proper JSON syntax, especially with the commas!
+	"InputDevices":
+	{
+		// Keyboard key mapping 1
+		"Keyboard1":
+		{
+			"Up":    [ "Up" ],
+			"Down":  [ "Down" ],
+			"Left":  [ "Left" ],
+			"Right": [ "Right" ],
+			"A":     [ "A" ],
+			"B":     [ "S" ],
+			"X":     [ "D", "Q" ],
+			"Y":     [ "W" ],
+			"Start": [ "Enter" ],
+			"Back":  [ "Space" ]
+		},
+
+		// Keyboard key mapping 2
+		//	Fill in your own key mapping if you need the keyboard for both players
+		"Keyboard2":
+		{
+			"Up":    [ ],
+			"Down":  [ ],
+			"Left":  [ ],
+			"Right": [ ],
+			"A":     [ ],
+			"B":     [ ],
+			"X":     [ ],
+			"Y":     [ ],
+			"Start": [ ],
+			"Back":  [ ]
+		},
+
+		// XBox Controller and compatible
+		"XBoxController":
+		{
+			"DeviceNames":
+			[
+				"Controller (XBOX 360 for Windows)",
+				"*"						// Mark this as a default in case no other controller definition matches
+			],
+
+			"Up":    [ "Axis2", "Pov0" ],
+			"Down":  [ "Axis3", "Pov2" ],
+			"Left":  [ "Axis0", "Pov3" ],
+			"Right": [ "Axis1", "Pov1" ],
+			"A":     [ "Button0" ],
+			"B":     [ "Button1" ],
+			"X":     [ "Button2" ],
+			"Y":     [ "Button3" ],
+			"Start": [ "Button7" ],
+			"Back":  [ "Button6" ]
+		},
+
+		// PS4 Controller
+		"PS4Controller":
+		{
+			"DeviceNames":
+			[
+				"PS4 Controller"
+			],
+
+			"Up":    [ "Axis2", "Button11" ],
+			"Down":  [ "Axis3", "Button12" ],
+			"Left":  [ "Axis0", "Button13" ],
+			"Right": [ "Axis1", "Button14" ],
+			"A":     [ "Button0" ],
+			"B":     [ "Button1" ],
+			"X":     [ "Button2" ],
+			"Y":     [ "Button3" ],
+			"Start": [ "Button5", "Button6" ],
+			"Back":  [ "Button4" ]
+		},
+
+		// Other controllers like some Logitech controllers; these use a different numbering of buttons
+		"LogitechController":
+		{
+			"DeviceNames":
+			[
+				"Logitech Dual Action"
+			],
+
+			"Up":    [ "Axis2", "Pov0" ],
+			"Down":  [ "Axis3", "Pov2" ],
+			"Left":  [ "Axis0", "Pov3" ],
+			"Right": [ "Axis1", "Pov1" ],
+			"A":     [ "Button1" ],
+			"B":     [ "Button2" ],
+			"X":     [ "Button0" ],
+			"Y":     [ "Button3" ],
+			"Start": [ "Button9" ],
+			"Back":  [ "Button8" ]
+		}
+	}
+
+}

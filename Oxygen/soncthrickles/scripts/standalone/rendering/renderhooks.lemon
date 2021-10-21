@@ -1,0 +1,872 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Standalone-specific functions and callbacks           //
+//-------------------------------------------------------//
+
+define u8 SPRITE_FLAG_FLIP_X		 = 0x01
+define u8 SPRITE_FLAG_FLIP_Y		 = 0x02
+define u8 SPRITE_FLAG_WORLDSPACE	 = 0x20
+define u8 SPRITE_FLAG_PRIO			 = 0x40
+define u8 SPRITE_FLAG_NO_GLOBAL_TINT = 0x80
+
+define u16 CHAR_ANIMSPRITE_SONIC_DROPDASH = 0x100
+define u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x102
+
+
+function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
+{
+	// This function gets called once when rendering an object, even if it consists of multiple VDP sprites
+	//  -> That is in contrast to e.g. "Standalone.onDrawVdpSprite" which gets called for each VDP sprite
+	//  -> So if an object's sprites should be replaced with a new loaded graphics, this here is the place to go
+
+	u8 gameMode = global.game_mode & 0x7f
+	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+
+	// Check for characters first
+	{
+		u8 drawCharacterVariant = 0xff
+		if (A0 == 0xffffb000)
+		{
+			// Player 1
+			drawCharacterVariant = 0
+		}
+		else if (A0 == 0xffffb04a)
+		{
+			// Player 2
+			drawCharacterVariant = 1
+		}
+		else if (A0 == 0xffffcc0a && u16[0xffffcc3a] != 0)
+		{
+			// Tails' tails
+			drawCharacterVariant = 2
+		}
+
+		// And now for the edge cases...
+		if (gameMode != 0x0c && gameMode != 0x08)
+		{
+			// Check if fading out to special stage, which is only relevant when entering a super emerald stage from the HPZ emerald cave
+			if (gameMode != 0x34 || drawCharacterVariant == 2 || (objA0.update_address != 0x010a94 && objA0.update_address != 0x01365c && objA0.update_address != 0x016444))
+				drawCharacterVariant = 0xff
+		}
+		if ((debug_mode.state & 0xff) == 1)		// Not when in object placement mode
+		{
+			drawCharacterVariant = 0xff
+		}
+		else if ((char.render_flags & render_flag.WORLD) == 0 && global.zone_act != 0x0d01)		// Additional check disables this when fading out Data Select, but not in outro
+		{
+			drawCharacterVariant = 0xff
+		}
+
+		if (drawCharacterVariant != 0xff)
+		{
+			return Standalone.drawCharacterSprite(char.character, drawCharacterVariant, px, py, false)
+		}
+	}
+
+	if (gameMode == 0x0c || gameMode == 0x08)
+	{
+		// Main game or rolling demo
+
+		// Sonic on the snowboard in ICZ 1
+		if (objA0.update_address == 0x03943a || objA0.update_address == 0x0394a0 || objA0.update_address == 0x0395fe)
+		{
+			u64 key = stringformat("character_sonic_snowboarding_0x%02x", objA0.animation.sprite)
+			if (!Renderer.hasCustomSprite(key))
+			{
+				key = Renderer.setupCustomCharacterSprite(0x345010, 0x347f8a, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+			}
+			Renderer.drawCustomSprite(key, px, py, 0x40, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+			return true
+		}
+
+		// Classic shield
+		if (objA0.update_address == 0x01952a && (u8[0xffffb02b] & char.bonus.ANY_SHIELD))
+		{
+			u8 anim = (level.framecounter >> 2) % 6
+			if (level.framecounter & 0x01)
+				Renderer.drawCustomSprite(stringformat("shield_classic_0%d", anim+1), px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue, 0, 224)
+			else
+				Renderer.drawCustomSprite(stringformat("shield_classic_0%d", (anim == 5) ? 6 : 5-anim), px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue-0x100, 0, 128)
+			return true
+		}
+
+		// Dynamic ring (placed by debug mode, or those in Knuckles' SSZ)
+		if ((objA0.update_address == 0x01a51a) && objA0.base_state == 0x02)
+		{
+			// Use smoother ring rotation
+			u16 animFrame = ((static_rings.animframe * 8 + 7 - static_rings.animtimer) / 4) % 8
+			u64 key = stringformat("ring_0%d", animFrame)
+			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue, 0, 255)
+			return true
+		}
+
+		// Spilled ring
+		if ((objA0.update_address == 0x01a64a || objA0.update_address == 0x01a662) && objA0.base_state == 0x02)
+		{
+			// Use smoother ring rotation
+			u16 animFrame = (spilled_rings.progress >> 8) % 8
+			u8 alpha = min(255, u16(spilled_rings.speed) * 10)
+			u64 key = stringformat("ring_0%d", animFrame)
+			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue, 0, alpha)
+			return true
+		}
+
+		// Monitor
+		if (objA0.update_address >= 0x01d566 && objA0.update_address <= 0x01d61e)
+		{
+			u8 flags = ((objA0.render_flags & 0x02) ? SPRITE_FLAG_FLIP_Y : 0) | ((objA0.sprite_attributes & 0x8000) ? SPRITE_FLAG_PRIO : 0)
+			if (objA0.animation.sprite == 11)
+			{
+				if (Game.getSetting(SETTING_MONITOR_STYLE))
+				{
+					Renderer.drawCustomSprite("monitor_s2_broken", px, py, 0x00, flags, renderQueue)
+				}
+				else
+				{
+					Renderer.drawCustomSprite("monitor_s3_broken", px, py, 0x00, flags, renderQueue)
+				}
+			}
+			else
+			{
+				if (Game.getSetting(SETTING_MONITOR_STYLE))
+				{
+					Renderer.drawCustomSprite("monitor_s2_intact", px, py, 0x00, flags, renderQueue)
+					py += (objA0.render_flags & 0x02) ? 2 : -2
+				}
+				else
+				{
+					Renderer.drawCustomSprite("monitor_s3_intact", px, py, 0x00, flags, renderQueue)
+					py += (objA0.render_flags & 0x02) ? 5 : -5
+				}
+
+				if (objA0.animation.sprite <= 1)
+				{
+					if (objA0.animation.sprite == 1)
+					{
+						Renderer.drawCustomSprite("monitor_icon_static", px, py, 0x00, flags, renderQueue + 1)
+					}
+				}
+				else
+				{
+					u64 key = Monitor.getIconSpriteKey(objA0.subtype2c)
+					if (objA0.subtype2c >= 0x05 && objA0.subtype2c <= 0x07)
+					{
+						if (Monitor.enforceClassicShield())
+						{
+							key = "monitor_icon_classicshield"
+						}
+					}
+					if (key != 0)
+					{
+						Renderer.drawCustomSprite(key, px, py, 0x00, flags, renderQueue + 1)
+					}
+				}
+			}
+			return true
+		}
+
+		// Monitor item effect
+		if (objA0.update_address == 0x01d7ba)
+		{
+			u64 key = Monitor.getIconSpriteKey(objA0.state)
+			if (key != 0)
+			{
+				u8 flags = ((objA0.render_flags & 0x02) ? SPRITE_FLAG_FLIP_Y : 0) | ((objA0.sprite_attributes & 0x8000) ? SPRITE_FLAG_PRIO : 0)
+				u8 alpha = 255
+				if (objA0.base_state == 0x04)
+				{
+					alpha = (s16[A0 + 0x24] > 0) ? min(255, s16[A0 + 0x24] * 32) : 0
+				}
+				Renderer.drawCustomSprite(key, px, py, 0x00, flags, renderQueue, 0, alpha)
+			}
+			return true
+		}
+
+		// Level results texts
+		if (objA0.update_address == 0x02dd98)
+		{
+			if (objA0.animation.sprite == 0x0b)
+			{
+				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+36, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
+				Renderer.drawCustomSprite("hud_text_total", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				return true
+			}
+			else if (objA0.animation.sprite == 0x0c)
+			{
+				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+37, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
+				Renderer.drawCustomSprite("hud_text_bonus", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				return true
+			}
+			else if (objA0.animation.sprite == 0x0d)
+			{
+				Renderer.drawCustomSprite("hud_text_ring", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				return true
+			}
+			else if (objA0.animation.sprite == 0x0e)
+			{
+				Renderer.drawCustomSprite("hud_text_time", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				return true
+			}
+		}
+
+		// ICZ 1 snowboard
+		if (objA0.update_address >= 0x0396e4 && objA0.update_address <= 0x0398a6)
+		{
+			u64 key = Renderer.setupCustomCharacterSprite(0x347850, 0x348128, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+			Renderer.drawCustomSprite(key, px, py, 0x40, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue, (objA0.animation.timer == 0 || (objA0.update_address != 0x0397d2 && objA0.update_address != 0x0398a6)) ? 0 : 0xf0, 255)
+			return true
+		}
+
+		// FBZ 2 boss fight Egg Robo head
+		if (objA0.update_address == 0x067b96 && isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			u64 key
+			if (objA0.animation.sprite < 2)
+				key = (level.framecounter & 0x10) ? "eggrobo_fbz_00" : "eggrobo_fbz_01"
+			else if (objA0.animation.sprite == 2)
+				key = "eggrobo_fbz_02"
+			else
+				key = "eggrobo_fbz_03"
+			Renderer.drawCustomSprite(key, px, py, 0x00, (objA0.render_flags & 0x01) | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+			return true
+		}
+
+		// Tornado in outro, when flying left
+		if (objA0.update_address == 0x05ea52 && char.render_flags & 0x01)
+		{
+			// Render additional sprite on top
+			Renderer.drawCustomSprite("tornado_text_sonic", px-16, py-6, 0, 0x00, renderQueue + 1)
+			return false
+		}
+
+		// Missile in DDZ
+		if (objA0.update_address == 0x0820d0)
+		{
+			u8 rotation = 0xc0 - (u8[A0 + 0x3c] + 0x02) & 0xfc
+			u64 key = stringformat("ddz_missile_0%d", (global.framecounter.low >> 1) & 0x01)
+			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue, rotation, 255)
+			return true
+		}
+		else if (objA0.update_address == 0x08215c)
+		{
+			// Exhaust effect is drawn as part of the missile itself
+			return true
+		}
+
+		// Cutscene Sonic in intro
+		if (objA0.update_address == 0x067472)
+		{
+			Standalone.drawCharacterSprite(0, 0, px, py, false)
+			return true
+		}
+
+		// Cutscene Knuckles in his own outro
+		if (objA0.update_address == 0x05e6c0 && objA0.mapping_offset == 0x0602d6)
+		{
+			Standalone.renderCutsceneKnuckles(6, px, py, renderQueue)
+			return true
+		}
+
+		// Cutscene Knuckles in LRZ 2, HPZ, SSZ
+		//  -> Sub-mode that uses "real" Knuckles sprites
+		if ((objA0.update_address == 0x063a6a) || (objA0.update_address == 0x063de0 && u16[A0 + 0x44] == 0) || (objA0.update_address == 0x0656da && (objA0.flags38 & 0x40) == 0) || (objA0.update_address == 0x063466 && objA0.value42 == 0x02))
+		{
+			u64 key = stringformat("character_knuckles_0x%02x", objA0.animation.sprite)
+			if (!Renderer.hasCustomSprite(key))
+			{
+				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)
+			}
+			Renderer.drawCustomSprite(key, px, py, 0x80, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+			return true
+		}
+
+		// Direct object rendering = replacement with custom sprites initialized from the ROM data, but independent from patterns in VRAM
+		if (DIRECT_OBJECT_RENDERING)
+		{
+			// Cutscene Knuckles (only before MHZ 2, from there on he gets handled differently)
+			if (objA0.update_address == 0x061d92 || objA0.update_address == 0x061f98 || objA0.update_address == 0x062124 || objA0.update_address == 0x0622b2 || objA0.update_address == 0x0624f2 || objA0.update_address == 0x062640 || objA0.update_address == 0x0628aa || objA0.update_address == 0x062b3a)
+			{
+				Standalone.renderCutsceneKnuckles(1, px, py, renderQueue)
+				return true
+			}
+
+			// Cutscene Knuckles in his own intro (MHZ 1 originally, or AIZ 1 in S3AIR) -- used only when objA0.value42 is 0x00 or 0x04
+			if (objA0.update_address == 0x063466)
+			{
+				if (objA0.value42 == 0)
+				{
+					Standalone.renderCutsceneKnuckles(5, px, py, renderQueue)
+				}
+				else  // objA0.value42 == 4
+				{
+					Standalone.renderCutsceneKnuckles(2, px, py, renderQueue)
+				}
+				return true
+			}
+
+			// Cutsceen Knuckles looking left and right in MHZ 1
+			if (objA0.update_address == 0x062fa2 || objA0.update_address == 0x062fca)
+			{
+				Standalone.renderCutsceneKnuckles(7, px, py, renderQueue)
+				return true
+			}
+
+			// Cutscene Knuckles in MHZ 2
+			if (objA0.update_address == 0x0630fc)
+			{
+				Standalone.renderCutsceneKnuckles(4, px, py, renderQueue)
+				return true
+			}
+
+			// Cutscene Knuckles in HPZ
+			if (objA0.update_address == 0x063de0 && u16[A0 + 0x44] != 0)
+			{
+				if (u16[A0 + 0x44] == 4)
+				{
+					Standalone.renderCutsceneKnuckles(3, px, py, renderQueue)
+				}
+				else
+				{
+					Standalone.renderCutsceneKnuckles(2, px, py, renderQueue)
+				}
+				return true
+			}
+
+			// Cutscene Knuckles in SSZ
+			if (objA0.update_address == 0x0656da && (objA0.flags38 & 0x40) != 0)
+			{
+				// Correction for wrong sprite offset (of course this could be solved differently)
+				if (char.animation.sprite == 0x06)
+					--px
+
+				Standalone.renderCutsceneKnuckles(3, px, py, renderQueue)
+				return true
+			}
+
+			// Giant Ring
+			if (objA0.update_address == 0x061682)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x0619b2, 0xff, renderQueue)
+				return true
+			}
+
+			// Signpost
+			if (objA0.update_address == 0x0837b2)
+			{
+				u8 customAtex = (objA0.animation.sprite == 2) ? 0x80 : 0xff		// Use Knuckles' palette when needed
+				Standalone.renderWithStandardPacking(px, py, 0x083b42, customAtex, renderQueue)
+				return true
+			}
+
+			// AIZ Rhinobot
+			if (objA0.update_address == 0x086e5c)
+			{
+				Standalone.renderWithStandardPacking(px, py, 0x087132, 0xff, renderQueue)
+				return true
+			}
+
+			// HCZ Pointdexter
+			if (objA0.update_address == 0x088282)
+			{
+				Standalone.renderWithKosinskiCompression(px, py, 0x36ad8a, 0xff, renderQueue)
+				return true
+			}
+
+			// HCZ Turbospiker (and subobjects)
+			if (objA0.update_address == 0x087bca || objA0.update_address == 0x087d5e)
+			{
+				Standalone.renderWithKosinskiCompression(px, py, 0x36a968, 0xff, renderQueue)
+				return true
+			}
+
+			// HCZ Piranha
+			if (objA0.update_address == 0x087f5c)
+			{
+				Standalone.renderWithKosinskiCompression(px, py, 0x36a6c4, 0xff, renderQueue)
+				return true
+			}
+
+			//// CNZ Balloon
+			//if (objA0.update_address == 0x031754)		// TODO: This still does not work (except for the red balloon, but not even its cord)
+			//{
+			//	Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)
+			//	return true
+			//}
+		}
+	}
+	else if (gameMode == 0x2c)
+	{
+		// (Super) Sonic in Blue Sphere mini-game Perfect screen
+		if (objA0.update_address == 0x04e222 || objA0.update_address == 0x04e23a)
+		{
+			Standalone.drawCharacterSprite(0, 0, px, py, false)
+			return true
+		}
+	}
+	//else if (gameMode == 0x34)
+	{
+		// Characters in special stage
+		if (objA0.update_address == 0x00903e || objA0.update_address == 0x00927a)
+		{
+			u8 character = (objA0.update_address == 0x00927a) ? getSecondCharacter() : getMainCharacter()
+			u8 atex = (character == CHARACTER_TAILS) ? 0x10 : 0x00
+			u64 key = stringformat((character == CHARACTER_SONIC) ? "bluesphere_sonic_0x%02x" : (character == CHARACTER_TAILS) ? "bluesphere_tails_0x%02x" : "bluesphere_knuckles_0x%02x", objA0.animation.sprite)
+			if (Renderer.hasCustomSprite(key))
+			{
+				// Check if there's also a custom palette
+				u64 paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+				if (System.hasExternalPaletteData(paletteKey, 0))
+				{
+					atex = 0x40 + character * 0x20
+				}
+			}
+			else
+			{
+				if (character == CHARACTER_SONIC)
+					key = Renderer.setupCustomCharacterSprite(0x0aaa7c, 0x0abe14, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+				else if (character == CHARACTER_TAILS)
+					key = Renderer.setupCustomCharacterSprite(0x28f95a, 0x2908d2, objA0.mapping_offset, objA0.animation.sprite, 0x10)
+				else
+					key = Renderer.setupCustomCharacterSprite(0x0abf22, 0x0ad31a, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+			}
+			Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+			return true
+		}
+
+		// Tails' tails object in special stage
+		if (objA0.update_address == 0x009488)
+		{
+			u8 atex = 0x10
+			u64 key = stringformat("bluesphere_tails_tails_0x%02x", objA0.animation.sprite)
+			if (Renderer.hasCustomSprite(key))
+			{
+				// Check if there's also a custom palette
+				u64 paletteKey = "bluesphere_palette_tails"
+				if (System.hasExternalPaletteData(paletteKey, 0))
+				{
+					atex = 0x40 + CHARACTER_TAILS * 0x20
+				}
+			}
+			else
+			{
+				key = Renderer.setupCustomCharacterSprite(0x2909e8, 0x291106, objA0.mapping_offset, objA0.animation.sprite, 0x10)
+			}
+			Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+			return true
+		}
+	}
+
+	// Title card red bar
+	if (objA0.update_address == 0x02d8e2)
+	{
+		Renderer.drawCustomSprite("titlecard_redbar", px - 0x20, py - 0x40, 0x00, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, renderQueue)
+		return true
+	}
+
+	if (gameMode == 0x48 || gameMode == 0x0c)	// Blue Spheres results + fade to main game afterwards
+	{
+		// Blue Spheres results texts
+		if (objA0.update_address == 0x02ea50)
+		{
+			bool isSKStage = (global.lock_on_state == 0 && global.sk_bluespheres)
+			if (objA0.animation.sprite == 0x17 || objA0.animation.sprite == 0x31 || objA0.animation.sprite == 0x36)
+			{
+				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px-60, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
+				Renderer.drawCustomSprite(isSKStage ? "hud_text_score_superstage" : "hud_text_score_chaosstage", px - 96, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", player.score * 10, px + 88, py, renderQueue)
+				return true
+			}
+			else if (objA0.animation.sprite == 0x18 || objA0.animation.sprite == 0x32 || objA0.animation.sprite == 0x37)
+			{
+				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+77, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
+				Renderer.drawCustomSprite(isSKStage ? "hud_text_ring_superstage" : "hud_text_ring_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				Renderer.drawCustomSprite(isSKStage ? "hud_text_bonus_superstage" : "hud_text_bonus_chaosstage", px + 40, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", results.ring_bonus * 10, px + 184, py, renderQueue)
+				return true
+			}
+			else if (objA0.animation.sprite == 0x19 || objA0.animation.sprite == 0x33 || objA0.animation.sprite == 0x38)
+			{
+				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+52, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
+				Renderer.drawCustomSprite(isSKStage ? "hud_text_perfect_superstage" : "hud_text_perfect_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", results.time_bonus * 10, px + 184, py, renderQueue)
+				return true
+			}
+			else if (objA0.animation.sprite == 0x1a || objA0.animation.sprite == 0x34 || objA0.animation.sprite == 0x39)
+			{
+				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+60, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
+				Renderer.drawCustomSprite(isSKStage ? "hud_text_continue_superstage" : "hud_text_continue_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				return true
+			}
+		}
+		else if (objA0.update_address == 0x02ea5a || objA0.update_address == 0x02ea64)
+		{
+			// Do not render the numbers for rings and perfect bonus, they will get rendered with the texts already (see above)
+			return true
+		}
+
+		// Continue icon
+		if (objA0.update_address == 0x02ebe8 && objA0.animation.sprite >= 0x29 && objA0.animation.sprite <= 0x2b)
+		{
+			u64 key = (objA0.animation.sprite == 0x29) ? "continue_icon_sonic" : (objA0.animation.sprite == 0x2a) ? "continue_icon_tails" : "continue_icon_knuckles"
+			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+			return true
+		}
+	}
+
+	// Knuckles in competition mode character selection (needs to use a custom palette here)
+	if (objA0.mapping_offset == 0x3a1aee && objA0.animation.sprite == 2)
+	{
+		Standalone.drawCharacterSpriteDirect(CHARACTER_KNUCKLES, px-4, py-20, 0xd9, 0x00, 0x80, renderQueue)
+		return true
+	}
+
+/*
+	// TODO: Seems like the arrows are part of this graphics as well...?
+	if (objA0.update_address == 0x00d30c || objA0.update_address == 0x00d42c)
+	{
+		if (objA0.animation.sprite == 4)
+		{
+			// Sonic & Tails
+			Standalone.drawCharacterSpriteDirect(CHARACTER_SONIC, px-9, py-20, 0xb1, 0x01, 0x40, renderQueue)
+			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px+6, py-18, 0xa6, 0x01, 0x60, renderQueue)
+			return true
+		}
+		else if (objA0.animation.sprite == 5)
+		{
+			// Sonic alone
+			Standalone.drawCharacterSpriteDirect(CHARACTER_SONIC, px-3, py-20, 0xb1, 0x01, 0x40, renderQueue)
+			return true
+		}
+		else if (objA0.animation.sprite == 6)
+		{
+			// Tails alone
+			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px+1, py-16, 0xa6, 0x00, 0x60, renderQueue)
+			return true
+		}
+		else if (objA0.animation.sprite == 7)
+		{
+			// Knuckles alone
+			Renderer.drawCustomSprite("charselect_knuckles", px, py-20, 0x80, 0x00, renderQueue)
+			return true
+		}
+		else if (objA0.animation.sprite == 8)
+		{
+			// Knuckles & Tails
+			Renderer.drawCustomSprite("charselect_knuckles", px-7, py-20, 0x80, 0x01, renderQueue)
+			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px+6, py-18, 0xa6, 0x01, 0x60, renderQueue)
+			return true
+		}
+	}
+*/
+	return false
+}
+
+
+function bool Standalone.onDrawVdpSprite(s16 px, s16 py, u8 size, u16 index, u16 renderQueue)
+{
+	// Explosion of bosses
+	if (u32[A0 + 0x0c] == 0x083ffc)
+	{
+		if (u8[A0 + 0x23] == 0)		// Actually the last frame before removal
+		{
+			Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, 64)
+			Renderer.drawVdpSpriteWithAlpha(px+1, py, size, index, renderQueue, 64)
+		}
+		else if (u8[A0 + 0x23] == 0x0c)
+		{
+			Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, 112)
+			Renderer.drawVdpSpriteWithAlpha(px+1, py, size, index, renderQueue, 112)
+		}
+		else
+		{
+			Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, 255)
+		}
+		return true
+	}
+
+	// Hyper Sonic stars
+	if (objA0.update_address == 0x0193ec || objA0.update_address == 0x0193ca)
+	{
+		// Draw not fully opaque
+		u8 alpha = 0xff
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) >= 1)
+		{
+			u8 step = objA0.animation.sprite * 2 + (1 - objA0.animation.timer)	// Ranges from 0 to 5
+			if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+				alpha = 0xe0 - step * 0x20
+			else
+				alpha = 0xff - step * 0x18
+		}
+		Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, alpha)
+		return true
+	}
+
+	// FBZ electricity effects
+	if (objA0.update_address == 0x03b1fc || objA0.update_address == 0x03b238)
+	{
+		u8 alpha = u8[0xfffff7c1]
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+		{
+			if (objA0.update_address == 0x03b1fc)
+			{
+				// Main lightning effect: Weaken the effect a bit (tried out other things, but they all did not work well...)
+				alpha -= alpha / 3
+			}
+			else
+			{
+				// Small lights: Smooth fading over time
+				alpha = (u16(alpha) * (abs(s8(level.framecounter & 0x1f) - 0x10) * 0x0f)) >> 8
+			}
+		}
+		Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, alpha)
+		return true
+	}
+
+	// Death Egg in LRZ 2 background, and glow effect at start of LRZ boss act
+	if (objA0.update_address == 0x057156 || objA0.update_address == 0x079406)
+	{
+		// Draw as part of the BG
+		Renderer.drawVdpSprite(px, py, size, index, 0x1700)
+		return true
+	}
+
+	// Super Emerald when active
+	if (objA0.update_address == 0x09089e && Game.getSetting(SETTING_GFX_ANTIFLICKER) >= 1)
+	{
+		if (global.framecounter.low & 0x01)
+		{
+			Renderer.drawVdpSprite(px, py, size, index, renderQueue)
+		}
+		else
+		{
+			u32 glow = abs((global.framecounter.low & 0x7f) - 0x40)
+			Renderer.drawVdpSpriteWithTint(px, py, size, index, renderQueue, 0xffc0c0c0 - 0x10101 * glow, 0x10101 * glow)
+		}
+		return true
+	}
+
+	// Death Egg (and part of the terrain) in S&K title screen
+	if (objA0.update_address == 0x0057a2 || objA0.update_address == 0x005802 || objA0.update_address == 0x00587c)
+	{
+		// Draw as part of the BG
+		Renderer.drawVdpSprite(px, py, size, index, 0x1700 + (objA0.update_address >> 8))
+		return true
+	}
+
+	// DEZ 1 Retractable Spring (the one added for S3AIR specifically)
+	if (objA0.update_address == 0x0480d4 && global.zone_act == 0x0b00 && index == 0x2b32)
+	{
+		Renderer.drawCustomSprite("dez_retracting_spring_base", px + 0x10, py + 8, 0, objA0.render_flags, renderQueue + 1)
+		return true
+	}
+
+/*
+	// Super Sonic in the intro
+	// TODO: Does not look very good this way... -- if this gets activated, make sure to enable after-images for Super Sonic (not only Hyper) as well
+	if (objA0.update_address == 0x067472 && super.active)
+	{
+		// After-images effect
+		for (s8 i = 2; i >= 0; --i)
+		{
+			Renderer.drawVdpSpriteWithAlpha(px - (i+1) * 24, py, size, index, renderQueue, 160 - i * 32)
+		}
+
+		return false
+	}
+*/
+	return false
+}
+
+
+function bool Standalone.onDrawVdpSpriteCompound(s16 px, s16 py, u8 size, u16 index, u16 renderQueue, u8 spriteCounter)
+{
+	// Character icons in Data Select
+	if (objA0.update_address == 0x00d30c || objA0.update_address == 0x00d42c)
+	{
+		if (index == 0xa342)	// Icon for "Knuckles & Tails" (would actually be a broken "Del" sign)
+		{
+			// Draw Knuckles (flipped)
+			px += 2
+			py += 32
+			Renderer.drawVdpSprite(px,   py,    0x0e, 0xab2f ^ 0x0800, renderQueue)
+			Renderer.drawVdpSprite(px+8, py+24, 0x08, 0xab3b ^ 0x0800, renderQueue)
+			Renderer.drawVdpSprite(px,   py+32, 0x0c, 0xab3e ^ 0x0800, renderQueue)
+
+			// Draw Tails
+			px += 18
+			py -= 2
+			Renderer.drawVdpSprite(px+8, py,    0x00, 0xab1d, renderQueue)
+			Renderer.drawVdpSprite(px,   py+8,  0x0d, 0xab1e, renderQueue)
+			Renderer.drawVdpSprite(px+8, py+24, 0x0d, 0xab26, renderQueue)
+			Renderer.drawVdpSprite(px,   py+32, 0x00, 0xab2e, renderQueue)
+			return true
+		}
+		else if (index == 0xa34e)	// Ignore right part of broken "Del" sign
+		{
+			return true
+		}
+	}
+
+	// HCZ water waves effect
+	if (objA0.update_address == 0x01f244)
+	{
+		if (A0 == 0xffffcf82 && D4.u16 == 0)		// Only for one sprite of the main object
+		{
+			Renderer.clearSpriteTag()
+			px = (camera.position.x.u16 & 0xffe0) - camera.position.x.u16 - 0x10	// Extend a bit more to the left just for sprite interpolation
+			for (; px < s16(getScreenWidth()); px += 0x20)
+			{
+				Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, 160)
+			}
+		}
+		return true
+	}
+
+	// MHZ 2 boss fight spiked balls and pole
+	if (objA0.update_address == 0x0557c8 || objA0.update_address == 0x05576a)
+	{
+		if (u16[0xffffeedc] != 0)
+			return false	// Fight is over, render normally
+
+		s16 dx = s16[A0 + 0x1c]
+		if (dx <= 0)
+			return true		// Render nothing
+
+		if (objA0.update_address == 0x0557c8)
+		{
+			bool isSecondRow = (u16[A0 + 0x30] != 0)
+			u16 leftPattern = u16[0xffffeed8]
+			u32 baseAddress = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x0558f8 : 0x0558e8
+			u16 rightPattern = u8[baseAddress + ((u16[0xffffeeda] + 1) & 0x0f)]
+
+			bool renderLeft  = (!isSecondRow || leftPattern == 4)
+			bool renderRight = (!isSecondRow || rightPattern == 4)
+
+			if (renderRight)
+			{
+				// Find out correct y-position for the right one
+				if (isSecondRow)
+					rightPattern = 0
+
+				u16 offset = rightPattern * 8 + u16[A0 + 0x2e] * 2
+				py = u16[0x0558c2 + offset]
+
+				// Render right one explicitly here
+				py = py - camera.position.y.u16 + s8[A1]
+				Renderer.drawVdpSprite(px + dx, py, size, index, renderQueue)
+			}
+
+			// Render left one implicitly
+			return !renderLeft
+		}
+		else
+		{
+			// Render right one explicitly here
+			Renderer.drawVdpSprite(px + dx, py, size, index, renderQueue)
+
+			// Render left one implicitly
+			return false
+		}
+	}
+
+	// SSZ clouds effect
+	if (objA0.update_address == 0x057bf6)
+	{
+		Renderer.drawVdpSpriteWithAlpha(px,   py, size, index, 0xd000, 140)
+		Renderer.drawVdpSpriteWithAlpha(px+1, py, size, index, 0xd000, 144)
+		return true
+	}
+
+	// Sky background behind Angel Island in Knuckles' outro
+	if (objA0.update_address == 0x059208)
+	{
+		Renderer.drawVdpSprite(px, py, size, index, 0x1700)
+	}
+
+	return false
+}
+
+
+function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRomAddress, u8 customAtex, u16 renderQueue)
+{
+	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
+	u64 key = Renderer.setupCustomObjectSprite(u32[patternRomAddress], u32[patternRomAddress + 4], objA0.mapping_offset, objA0.animation.sprite, 0x00)
+	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+	return key
+}
+
+
+function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patternRomAddress, u8 customAtex, u16 renderQueue)
+{
+	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
+	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+	return key
+}
+
+
+function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patternRomAddress, u8 customAtex, u16 renderQueue, u16 originalVramAddress)
+{
+	// This second variant is needed if the mappings contain a base offset that needs to be removed
+	//  -> This is the case when in the original sprite attributes point to a different VRAM address than where the Kosinski data got decompressed to
+	//  -> An example is the CNZ balloons
+	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
+	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00, originalVramAddress / 0x20 - objA0.sprite_attributes)
+	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+	return key
+}
+
+
+function void Standalone.renderCutsceneKnuckles(u8 variant, s16 px, s16 py, u16 renderQueue)
+{
+	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	u64 key = stringformat("cutscene_knuckles_%d_0x%02x", variant, objA0.animation.sprite)
+	if (Renderer.hasCustomSprite(key))
+	{
+		Renderer.drawCustomSprite(key, px, py, 0x80, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+	}
+	else
+	{
+		if (variant == 1)
+		{
+			key = Standalone.renderWithStandardPacking(px, py, 0x06666a, 0x80, renderQueue)
+		}
+		else if (variant == 2)
+		{
+			key = Standalone.renderWithStandardPacking(px, py, 0x066682, 0x80, renderQueue)
+		}
+		else if (variant == 3)
+		{
+			key = Standalone.renderWithStandardPacking(px, py, 0x06668a, 0x80, renderQueue)
+		}
+		else if (variant == 4)
+		{
+			key = Standalone.renderWithStandardPacking(px, py, 0x066672, 0x80, renderQueue)
+		}
+		else if (variant == 5)
+		{
+			key = Standalone.renderWithStandardPacking(px, py, 0x06667a, 0x80, renderQueue)
+		}
+		else if (variant == 6)
+		{
+			key = Standalone.renderWithKosinskiCompression(px, py, 0x163b9a, 0x80, renderQueue)
+		}
+		else if (variant == 7)
+		{
+			key = Standalone.renderWithKosinskiCompression(px, py, 0x1695c0, 0x80, renderQueue)
+		}
+		//Renderer.extractCustomSprite(key, stringformat("cutscene_knuckles_%d", variant), objA0.animation.sprite, 0x80)
+	}
+}

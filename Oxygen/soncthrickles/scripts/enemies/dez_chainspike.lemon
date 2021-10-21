@@ -1,0 +1,306 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Chainspike enemy in Death Egg Zone                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x091c3c) end(0x091c3c)
+function void fn091c3c()
+{
+	Object.InitWithUpdateAddress(0x091c42)
+}
+
+
+//# address-hook(0x091c42) end(0x091c50)
+function void fn091c42()
+{
+	// Targets:
+	//  - 0x091c62	-> objA0.base_state = 0x00
+	//  - 0x091c9a	-> objA0.base_state = 0x02
+	//  - 0x091cc2	-> objA0.base_state = 0x04
+	//  - 0x091d0c	-> objA0.base_state = 0x06
+	//  - 0x091d20	-> objA0.base_state = 0x08
+	//  - 0x091d36	-> objA0.base_state = 0x0a
+	call tableLookupAddress(0x091c56, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x091c62) end(0x091c94)
+function void fn091c62()
+{
+	setupObjectAttributesFull(0x091eda)
+
+	D0.u16 = 0xee00
+	D1.u16 = 0x0180
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.s16 = -D0.s16
+		D1.s16 = -D1.s16
+	}
+	objA0.value3e = D0.u16
+	u16[A0 + 0x3c] = D1.u16
+	objA0.countdown_callback = 0x091ca6
+
+	spawnChildObjects(0x091eec)
+}
+
+
+//# address-hook(0x091c9a) end(0x091ca0)
+function void fn091c9a()
+{
+	if (fn091e7e())
+		return
+
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x091ca6) end(0x091cc0)
+function void fn091ca6()
+{
+	objA0.base_state = 0x04
+	objA0.velocity.x = objA0.value3e
+	u16[A0 + 0x40] = u16[A0 + 0x3c]
+
+	playSound(0x74)
+}
+
+
+//# address-hook(0x091cc2) end(0x091d0a)
+function void fn091cc2()
+{
+	if (fn091e7e())
+		return
+
+	D2 = 0
+	D0.u16 = objA0.velocity.x
+	D1.u16 = u16[A0 + 0x40]
+	D2.s16 = (D1.s16 >= 0) ? -0x0c : 0x0c
+	D1.u16 += D2.u16
+	u16[A0 + 0x40] = D1.u16
+	D0.u16 += D1.u16
+
+	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	if (s16[A0 + 0x3e] < 0)
+		D2.u8 ^= 0xff
+
+	if (D2.u8 == 0)
+	{
+		objA0.velocity.x = D0.u16
+		UpdateMovementStraightSimple()
+	}
+	else
+	{
+		objA0.base_state = 0x02
+		objA0.countdown_value = 119
+		s16[A0 + 0x3e] = -s16[A0 + 0x3e]
+		s16[A0 + 0x3c] = -s16[A0 + 0x3c]
+	}
+}
+
+
+//# address-hook(0x091d0c) end(0x091d0c)
+function void fn091d0c()
+{
+	fn084700()
+}
+
+
+//# address-hook(0x091d12) end(0x091d1e)
+function void fn091d12()
+{
+	objA0.base_state = 0x08
+	objA0.flags38 |= 0x02
+}
+
+
+//# address-hook(0x091d20) end(0x091d34)
+function void fn091d20()
+{
+	if ((objA0.flags38 & 0x02) == 0)
+	{
+		objA0.base_state = 0x0a
+		objA0.value39 = 0x1f
+	}
+}
+
+
+//# address-hook(0x091d36) end(0x091d50)
+function void fn091d36()
+{
+	--objA0.value39
+	if (s8[A0 + 0x39] < 0)
+	{
+		objA0.base_state = objA0.value3a
+		objA0.countdown_value = u16[A0 + 0x26]
+		objA0.countdown_callback = 0x091ca6
+	}
+}
+
+
+//# address-hook(0x091d52) end(0x091d60)
+function void fn091d52()
+{
+	// Targets:
+	//  - 0x091d6c	-> objA0.base_state = 0x00
+	//  - 0x091d8c	-> objA0.base_state = 0x02
+	//  - 0x091de2	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x091d66, objA0.base_state)
+
+	fn084934()
+}
+
+
+//# address-hook(0x091d6c) end(0x091d8a)
+function void fn091d6c()
+{
+	setupObjectAttributesBasic(0x091ee6)
+
+	objA0.countdown_callback = 0x091e46
+	if (objA0.subtype2c != 0)
+	{
+		objA0.render_flags |= 0x02
+	}
+}
+
+
+//# address-hook(0x091d8c) end(0x091de0)
+function void fn091d8c()
+{
+	MoveWithParent()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x02)
+	{
+		D0.u8 = (u8[A1 + 0x04] & 0x02) ? 0xff : 0x00
+		if (objA0.subtype2c != 0)
+			D0.u8 ^= 0xff
+
+		if (D0.u8 == 0)
+		{
+			objA0.base_state = 0x04
+			u8[A0 + 0x28] = 0x18
+			u8[A0 + 0x29] = 0xff
+			objA0.velocity.y = (u8[A1 + 0x04] & 0x02) ? -8 : 8
+			u16[A0 + 0x3a] = objA0.position.y.u16
+			objA0.countdown_value = 0x17
+		}
+	}
+}
+
+
+//# address-hook(0x091de2) end(0x091e58)
+function void fn091de2()
+{
+	objA0.position.y.u16 += objA0.velocity.y
+	fn091eb0()
+
+	if (objA0.position.y.u16 != u16[A0 + 0x3a])
+	{
+		D0.u8 = (objA0.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
+		if (objA0.velocity.y >= 0)
+			D0.u8 ^= 0xff
+
+		if (D0.u8 != 0)
+		{
+			CheckGroundCollision()
+			bool goto091e46 = false
+			if (D1.s16 < 0)
+			{
+				goto091e46 = true
+			}
+			else if (u8[A0 + 0x28] == 0)
+			{
+				u8[A0 + 0x28] = 0x18
+				goto091e46 = true
+			}
+
+			if (goto091e46)
+			{
+				objA0.countdown_value = 0x5f
+				objA0.velocity.y = -(objA0.velocity.y >> 2)
+				return
+			}
+		}
+
+		Object.CountdownAndTrigger()
+	}
+	else
+	{
+		objA0.base_state = 0x02
+		u8[A0 + 0x28] = 0x98
+		objA0.animation.sprite = 2
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		u8[A1 + 0x38] &= ~0x02
+	}
+}
+
+
+//# address-hook(0x091e5a) end(0x091e6c)
+function void fn091e5a()
+{
+	u8[A0 + 0x28] = 0x98
+	objA0.box_size.x = 8
+	objA0.box_size.y = 8
+	objA0.update_address = 0x091e72
+	fn091e72()
+}
+
+
+//# address-hook(0x091e72) end(0x091e78)
+function void fn091e72()
+{
+	MoveWithParent()
+	fn08495e()
+}
+
+
+//# translated(0x091e7e) end(0x091eae)
+function bool fn091e7e()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x10)
+		return false
+
+	objA0.value3a = objA0.base_state
+	objA0.base_state = 0x06
+	u16[A0 + 0x26] = objA0.countdown_value
+	u32[A0 + 0x30] = 0x091f06
+	objA0.countdown_callback = 0x091d12
+	return true
+}
+
+
+//# address-hook(0x091eb0) end(0x091ed2)
+function void fn091eb0()
+{
+	D1.u16 = abs(s16(u16[A0 + 0x3a] - objA0.position.y.u16))
+	D2 = 0
+	D3 = 0x18
+	D4 = 3
+
+	while (true)
+	{
+		D2.u16 += D3.u16
+		if (D1.u16 <= D2.u16)
+			break
+
+		--D4.s16
+		if (D4.s16 < 0)
+		{
+			D4 = 0
+			break
+		}
+	}
+
+	objA0.animation.sprite = u8[0x091ed4 + D4.s16]
+}

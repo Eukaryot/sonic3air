@@ -1,0 +1,6 @@
+{
+	"cutscene_knuckles_4_0x00": { "File": "cutscene_knuckles_4.bmp", "Rect": "0,0,32,40", "Center": "16,20" },
+	"cutscene_knuckles_4_0x01": { "File": "cutscene_knuckles_4.bmp", "Rect": "32,0,32,40", "Center": "16,20" },
+	"cutscene_knuckles_4_0x02": { "File": "cutscene_knuckles_4.bmp", "Rect": "64,0,32,40", "Center": "16,20" },
+	"cutscene_knuckles_4_0x03": { "File": "cutscene_knuckles_4.bmp", "Rect": "96,0,32,40", "Center": "16,20" }
+}

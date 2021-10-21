@@ -1,0 +1,43 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// 0xfffff100 .. 0xfffff4ff
+//  -> Level layout, 32x32 bytes
+
+
+define bluespheres.position.x		 = u16[0xffffe422]	// Upper byte = full grid position, lower byte = position between grid points
+define bluespheres.position.y		 = u16[0xffffe424]
+define bluespheres.direction		 =  u8[0xffffe426]
+define bluespheres.movement_speed	 = s16[0xffffe428]	// Current movement speed, can be negative when going backwards
+define bluespheres.next_direction	 =  s8[0xffffe42a]
+define bluespheres.going_forward	 =  u8[0xffffe431]
+define bluespheres.blue_remaining	 = u16[0xffffe438]
+define bluespheres.rings_collected	 = u16[0xffffe43a]
+define bluespheres.bs_hud_dirty		 =  u8[0xffffe43c]
+define bluespheres.rings_flags		 =  u8[0xffffe43d]	// See below
+define bluespheres.speedup_countdown = u16[0xffffe43e]
+define bluespheres.rings_remaining	 = u16[0xffffe442]
+define bluespheres.current_gamespeed = u16[0xffffe444]	// Current game speed, which is the limit for movement speed
+define bluespheres.lifted_height	 = u16[0xffffe44a]	// Height of lifted spheres when all blue spheres were collected
+define bluespheres.started_running	 =  u8[0xffffe450]
+
+
+// 0xffffffa2 .. 0xffffffa5
+//  -> Seed for generated stages
+
+
+define bluespheres.minigame_mode	 =  u8[0xffffffd4]	// This is 1 when in lock-on mode for something else than Sonic 3 (or Sonic 2)
+
+
+// Rings flags:
+//  - 0x01 = Continue for 50 rings was granted
+//  - 0x02 = 1-up for 100 rings was granted
+//  - 0x04 = 1-up for 200 rings was granted
+//  - 0x80 = Rings display in HUD needs to be refreshed

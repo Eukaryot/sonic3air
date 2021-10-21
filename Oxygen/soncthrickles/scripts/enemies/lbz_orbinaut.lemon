@@ -1,0 +1,108 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Orbinaut (from Launch Base Zone)                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x08c632) end(0x08c632)
+function void fn08c632()
+{
+	Object.InitWithUpdateAddress(0x08c638)
+}
+
+
+//# address-hook(0x08c638) end(0x08c646)
+function void fn08c638()
+{
+	// Targets:
+	//  - 0x08c64e	-> objA0.base_state = 0x00
+	//  - 0x08c662	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x08c64a, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08c64e) end(0x08c65c)
+function void fn08c64e()
+{
+	setupObjectAttributesFull(0x08c6f2)
+	spawnChildObjects(0x08c704)
+}
+
+
+//# address-hook(0x08c662) end(0x08c68c)
+function void fn08c662()
+{
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+	objA0.render_flags &= ~render_flag.FLIP_X
+	D1.u16 = -0x80
+	if (D0.u16 != 0)
+	{
+		objA0.render_flags |= render_flag.FLIP_X
+		D1.s16 = -D1.s16
+	}
+	objA0.velocity.x = D1.u16
+
+	fn08c6d4()
+	if (!_equal())
+	{
+		UpdateMovementStraightSimple()
+	}
+}
+
+
+//# address-hook(0x08c6d4) end(0x08c6f0)
+function void fn08c6d4()
+{
+	A2 = 0xffffb000
+	if ((u8[A2 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		if (u16[A2 + 0x18] != 0 || u16[A2 + 0x1a] != 0)
+		{
+			_setZeroFlagByValue(1)
+			return
+		}
+	}
+	D0 = 0
+	_setZeroFlagByValue(0)
+}
+
+
+// Spikes
+
+//# address-hook(0x08c692) end(0x08c6ac)
+function void fn08c692()
+{
+	setupObjectAttributesBasic(0x08c6fe)
+	objA0.update_address = 0x08c6b0
+	D0.u8 = objA0.subtype2c
+	D0.u8 <<= 5
+	u8[A0 + 0x3c] = D0.u8
+	fn084934()
+}
+
+
+//# address-hook(0x08c6b0) end(0x08c6d0)
+function void fn08c6b0()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	fn08c6d4()
+	if (!_equal())
+	{
+		u8[A0 + 0x3c] += (u8[A1 + 0x04] & 0x01) ? -8 : 8
+	}
+
+	D2 = 4
+	fn084c42()
+	fn084934()
+}

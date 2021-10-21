@@ -1,0 +1,275 @@
+{
+
+	//----------------------------------------------//
+	// Music and jingles                            //
+	//----------------------------------------------//
+
+	// AIZ 1
+	"01":      { "File": "...", "Type": "Music" },
+	"01_fast": { "File": "...", "Type": "Music" },
+
+	// AIZ 2
+	"02":      { "File": "...", "Type": "Music" },
+	"02_fast": { "File": "...", "Type": "Music" },
+
+	// HCZ 1
+	"03":      { "File": "...", "Type": "Music" },
+	"03_fast": { "File": "...", "Type": "Music" },
+
+	// HCZ 2
+	"04":      { "File": "...", "Type": "Music" },
+	"04_fast": { "File": "...", "Type": "Music" },
+
+	// MGZ 1
+	"05":      { "File": "...", "Type": "Music" },
+	"05_fast": { "File": "...", "Type": "Music" },
+
+	// MGZ 2
+	"06":      { "File": "...", "Type": "Music" },
+	"06_fast": { "File": "...", "Type": "Music" },
+
+	// CNZ 1
+	"07":      { "File": "...", "Type": "Music" },
+	"07_fast": { "File": "...", "Type": "Music" },
+
+	// CNZ 2
+	"08":      { "File": "...", "Type": "Music" },
+	"08_fast": { "File": "...", "Type": "Music" },
+
+	// FBZ 1
+	"09":      { "File": "...", "Type": "Music" },
+	"09_fast": { "File": "...", "Type": "Music" },
+
+	// FBZ 2
+	"0A":      { "File": "...", "Type": "Music" },
+	"0A_fast": { "File": "...", "Type": "Music" },
+
+	// ICZ 1
+	"0B":      { "File": "...", "Type": "Music" },
+	"0B_fast": { "File": "...", "Type": "Music" },
+
+	// ICZ 2
+	"0C":      { "File": "...", "Type": "Music" },
+	"0C_fast": { "File": "...", "Type": "Music" },
+
+	// LBZ 1
+	"0D":      { "File": "...", "Type": "Music" },
+	"0D_fast": { "File": "...", "Type": "Music" },
+
+	// LBZ 2
+	"0E":      { "File": "...", "Type": "Music" },
+	"0E_fast": { "File": "...", "Type": "Music" },
+
+	// MHZ 1
+	"0F":      { "File": "...", "Type": "Music" },
+	"0F_fast": { "File": "...", "Type": "Music" },
+
+	// MHZ 2
+	"10":      { "File": "...", "Type": "Music" },
+	"10_fast": { "File": "...", "Type": "Music" },
+
+	// SOZ 1
+	"11":      { "File": "...", "Type": "Music" },
+	"11_fast": { "File": "...", "Type": "Music" },
+
+	// SOZ 2
+	"12":      { "File": "...", "Type": "Music" },
+	"12_fast": { "File": "...", "Type": "Music" },
+
+	// LRZ 1
+	"13":      { "File": "...", "Type": "Music" },
+	"13_fast": { "File": "...", "Type": "Music" },
+
+	// LRZ 2
+	"14":      { "File": "...", "Type": "Music" },
+	"14_fast": { "File": "...", "Type": "Music" },
+
+	// SSZ
+	"15":      { "File": "...", "Type": "Music" },
+	"15_fast": { "File": "...", "Type": "Music" },
+
+	// DEZ 1
+	"16":      { "File": "...", "Type": "Music" },
+	"16_fast": { "File": "...", "Type": "Music" },
+
+	// DEZ 2
+	"17":      { "File": "...", "Type": "Music" },
+	"17_fast": { "File": "...", "Type": "Music" },
+
+	// Mini-boss
+	//  -> First ID is S&K version, second is S3 version
+	"18": { "File": "...", "Type": "Music" },
+	"2E_sonic3": { "File": "...", "Type": "Music" },
+
+	// Main boss
+	"19": { "File": "...", "Type": "Music" },
+
+	// DDZ
+	"1A":      { "File": "...", "Type": "Music" },
+	"1A_fast": { "File": "...", "Type": "Music" },
+
+	// Glowing Spheres bonus stage
+	"1B": { "File": "...", "Type": "Music" },
+
+	// Blue Spheres special stage
+	//  -> This requires a music file including music speedup every 30 seconds
+	//  -> The second ID requires a music file including music speedup every 45 seconds, which is used for the randomly generated stages
+	"1C_speedup": { "File": "...", "Type": "Music" },
+	"1C_speedup45":	{ "File": "...", "Type": "Music" },
+
+	// Slot Machine bonus stage
+	"1D": { "File": "...", "Type": "Music" },
+
+	// Gumball Machine bonus stage
+	"1E": { "File": "...", "Type": "Music" },
+
+	// Knuckles' Theme
+	//  -> First ID is S&K version, second is S3 version
+	"1F": { "File": "...", "Type": "Music" },
+	"1F_sonic3": { "File": "...", "Type": "Music" },
+
+	// Competition mode
+	"20": { "File": "...", "Type": "Music" },
+	"21": { "File": "...", "Type": "Music" },
+	"22": { "File": "...", "Type": "Music" },
+	"23": { "File": "...", "Type": "Music" },
+	"24": { "File": "...", "Type": "Music" },
+
+	// Title screen
+	//  -> First ID is S&K version, second is S3 version
+	"25": { "File": "...", "Type": "Jingle" },
+	"25_sonic3": { "File": "...", "Type": "Jingle" },
+
+	// Credits Music (from Sonic 3)
+	"26": { "File": "...", "Type": "Music" },
+
+	// Game Over
+	"27": { "File": "...", "Type": "Jingle" },
+
+	// Continue Screen
+	"28": { "File": "...", "Type": "Music" },
+
+	// Level results jingle
+	"29": { "File": "...", "Type": "Jingle", "ClearMusic": "1" },
+
+	// Extra life jingle
+	//  -> First ID is S&K version, second is S3 version
+	"2A": { "File": "...", "Type": "Jingle" },
+	"2A_sonic3": { "File": "...", "Type": "Jingle" },
+
+	// Emerald jingle
+	"2B": { "File": "...", "Type": "Jingle" },
+
+	// Invincibility theme
+	//  -> First ID is S&K version, second is S3 version
+	"2C": { "File": "...", "Type": "Music" },
+	"2C_fast": { "File": "...", "Type": "Music" },
+	"2C_sonic3": { "File": "...", "Type": "Music" },
+	"2C_sonic3_fast": { "File": "...", "Type": "Music" },
+
+	// Competition Mode menu
+	"2D": { "File": "...", "Type": "Music" },
+
+	// Data Select menu
+	"2F": { "File": "...", "Type": "Music" },
+
+	// Final Boss
+	"30": { "File": "...", "Type": "Music" },
+
+	// Drowning jingle
+	"31": { "File": "...", "Type": "Jingle" },
+
+	// Victory music (when game is finished)
+	"32": { "File": "...", "Type": "Jingle" },
+	"32_sonic3": { "File": "...", "Type": "Jingle" },
+
+	// Outro
+	"DC": { "File": "...", "Type": "Jingle" },
+
+	// SEGA sound
+	"FF": { "File": "...", "Type": "Jingle" },
+
+	// Super theme from Sonic 2
+	"supertheme_sonic2": { "File": "...", "Type": "Music" },
+
+	// Sonic 1 boss music
+	"sonic1_boss": { "File": "...", "Type": "Music" },
+
+	// Sonic 2 boss music
+	"sonic2_boss": { "File": "...", "Type": "Music" },
+
+	// CNZ 1 (Sonic 3 Prototype)
+	"07_proto":		 { "File": "...", "Type": "Music" },
+	"07_proto_fast": { "File": "...", "Type": "Music" },
+
+	// CNZ 2 (Sonic 3 Prototype)
+	"08_proto":		 { "File": "...", "Type": "Music" },
+	"08_proto_fast": { "File": "...", "Type": "Music" },
+
+	// ICZ 1 (Sonic 3 Prototype)
+	"0B_proto":		 { "File": "...", "Type": "Music" },
+	"0B_proto_fast": { "File": "...", "Type": "Music" },
+
+	// ICZ 2 (Sonic 3 Prototype)
+	"0C_proto":		 { "File": "...", "Type": "Music" },
+	"0C_proto_fast": { "File": "...", "Type": "Music" },
+
+	// LBZ 1 (Sonic 3 Prototype)
+	"0D_proto":		 { "File": "...", "Type": "Music" },
+	"0D_proto_fast": { "File": "...", "Type": "Music" },
+
+	// ICZ 2 (Sonic 3 Prototype)
+	"0E_proto":		 { "File": "...", "Type": "Music" },
+	"0E_proto_fast": { "File": "...", "Type": "Music" },
+
+	// Knuckles Theme (Sonic 3 Prototype)
+	"1F_proto":		 { "File": "...", "Type": "Music" },
+
+	// Credits (Sonic 3 Prototype)
+	"26_proto":		 { "File": "...", "Type": "Music" },
+
+	// Competition Mode menu (Sonic 3 Prototype)
+	"2D_proto":		 { "File": "...", "Type": "Music" },
+
+	// Unused track (Sonic 3 Prototype), used as alternative Super Theme
+	"2E_proto":		 { "File": "...", "Type": "Music" },
+
+
+
+	//----------------------------------------------//
+	// Sound effects                                //
+	//----------------------------------------------//
+
+	// You can also mod (most) of the sound effects if you like.
+	// They are in general using the same hexadecimal IDs as seen in the original game's level select.
+	// Some examples:
+
+	// Rings (33 = sound on left speaker, 34 = sound on right speaker)
+	"33": { "File": "...", "Type": "Sound" },
+	"34": { "File": "...", "Type": "Sound" },
+	
+	// Braking sound
+	"36": { "File": "...", "Type": "Sound" },
+	
+	// Rolling sound
+	"3C": { "File": "...", "Type": "Sound" },
+
+	// Spindash release sound (note: it uses the spindash charging sound's channel "AB", in order to stop it)
+	"B6": { "File": "...", "Type": "Sound", "Channel": "AB" },
+
+	// In addition, all the sound IDs from "33" to "BB" are valid keys you can replace with your own ogg files.
+
+	// The only difficult cases are the following sound effects, which won't really work by playing an audio
+	// file, but need to be emulated instead:
+	//  - The spindash charging sound "AB" (because of the reverb effect)
+	//	- The continuous sound effects, which is full range from "BC" to "DB"
+
+
+	// And last but not least, there's these special sound effects for S3AIR:
+
+	"dropdash_charge": { "File": "...", "Type": "Sound", "Channel": "AB" },
+	"dropdash_release":{ "File": "...", "Type": "Sound", "Channel": "AB" },
+	"peelout_charge":  { "File": "...", "Type": "Sound", "Channel": "AB" },
+	"peelout_release": { "File": "...", "Type": "Sound", "Channel": "AB" }
+
+}

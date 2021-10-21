@@ -1,0 +1,109 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x044826) end(0x0448a2)
+function void fn044826()
+{
+	objA0.mapping_offset = 0x0449bc
+	objA0.sprite_attributes = 0x240d
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x044954
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16 - 8
+		u16[A1 + 0x46] = objA1.position.y.u16
+		u8[A1 + 0x04] = objA0.render_flags
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u16[A1 + 0x08] = 0x0280
+		u8[A1 + 0x07] = 0x10
+		u8[A1 + 0x06] = 0x10
+		u8[A1 + 0x28] = 0x9a
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	objA0.update_address = 0x0448a8
+	fn0448a8()
+}
+
+
+//# address-hook(0x0448a8) end(0x044910)
+function void fn0448a8()
+{
+	A1 = 0x04495a
+	Object.AlternativeAnimationUpdate()
+
+	if (objA0.base_state != 0)
+	{
+		objA0.base_state = 0
+		if (objA0.state == 0)
+		{
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				playSound(0x53)
+			}
+		}
+		else
+		{
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				playSound(0x6e)
+			}
+
+			A1 = 0xffff0000 + u16[A0 + 0x3c]
+			objA1.update_address = 0x044916
+			objA1.velocity.y = -(objA0.subtype2c * 16)
+		}
+	}
+
+	D1.u16 = 0x1b
+	D2.u16 = 4
+	D3.u16 = 5
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x044916) end(0x044954)
+function void fn044916()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 2
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 3)
+			objA0.animation.sprite = 0
+	}
+
+	UpdateMovementSimple()
+	D0.u16 = u16[A0 + 0x46]
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+		objA0.animation.sprite = 0
+		objA0.update_address = 0x044954
+	}
+
+	fn01b662()
+}
+
+
+//# address-hook(0x044954)
+function void fn044954()
+{
+	fn01b662()
+}

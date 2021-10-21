@@ -1,0 +1,896 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x05a3b4) end(0x05a47c)
+function void InitLevelTiles.DEZBossAct()
+{
+	u16[0xffffeee2] = 0
+	u8[0xffffeee4] = 0xff
+	fn05a79e()
+
+	D0.u16 = u16[A3]
+	u16[A3 + 0x10] = D0.u16
+	u16[A3 + 0x12] = D0.u16
+	u16[A3 + 0x7c] = D0.u16
+	u16[A3 + 0x7e] = D0.u16
+
+	A3 = 0xffff800a
+	D7.u16 = 0xe000
+	A1 = 0xffff8000
+	D0 = u32(u16[A1])   * u16[A1 + 4]
+	D1 = u32(u16[A1+2]) * u16[A1 + 6]
+	D0.u16 += D1.u16 + 0x88
+	A1 += D0.u16
+	zeroMemory(A1, 0x1000 - D0.u16)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05a7c8
+		if (allocDynamicObjectAfterA1())
+		{
+			objA1.update_address = 0x05a8e6
+			if (allocDynamicObjectAfterA1())
+			{
+				objA1.update_address = 0x07fd68
+				D0.u16 = 0x03c0
+				D1.u16 = 0xf8
+				objA1.position.x.u16 = D0.u16
+				objA1.position.y.u16 = D1.u16
+				u16[0xffffeed4] = D0.u16
+				u16[0xffffeed6] = D1.u16
+			}
+		}
+	}
+
+	level.display_routine = 0x06c0
+	player1.camera_lock = 0xff
+	D0.u16 = 0x80
+	camera.position.x.u16 = D0.u16
+	camera.foreground.x.u16 = D0.u16
+	u16[0xffffeee8] = D0.u16
+
+	fn05a508()
+	Level.GetCameraPosition()
+
+	A1 = 0xffffa800
+	u32[(A1+=4)-4] = 0
+	u16[A1] = u16[(A1+=2)-2]
+	u16[(A1+=2)-2] &= 0xfff0
+	u16[A1] = 0
+
+	A4 = 0x05a524
+	A5 = 0xffffa800
+	fn04ecec()
+}
+
+
+//# address-hook(0x05a482) end(0x05a48e)
+function void UpdateLevelTiles.DEZ_Boss()
+{
+	A3 = 0xffff800a
+	D7.u16 = 0xe000
+	call 0x05a492 + s16[0xffffeec0]
+}
+
+//# address-hook(0x05a492) end(0x05a492)
+function void fn05a492()
+{
+	fn05a49a()
+}
+
+//# address-hook(0x05a496) end(0x05a496)
+function void fn05a496()
+{
+	fn05a4c4()
+}
+
+
+//# address-hook(0x05a49a) end(0x05a4c0)
+function void fn05a49a()
+{
+	D0.u16 = u16[0xffffef5e]
+	if (D0.u16 != 0)
+	{
+		u16[0xffffef5e] = 0
+		ring_counter = D0.u16
+		hud.dirty.rings = 0x01
+	}
+
+	D0 = u32[0xffffef60]
+	if (D0 != 0)
+	{
+		u32[0xffffef60] = 0
+		u32[0xfffffe22] = D0
+		hud.dirty.timer = 0xff
+	}
+
+	u16[0xffffeec0] += 4
+	fn05a4c4()
+}
+
+
+//# address-hook(0x05a4c4) end(0x05a506)
+function void fn05a4c4()
+{
+	fn05a508()
+
+	A4 = 0x05a524
+	A6 = 0xffffa800
+	D5 = 2
+	D6.u16 = camera.foreground.y.old
+	fn04ee20()
+
+	D1.u16 = u16[0xffffeed8]
+	if (D1.u16 != 0)
+	{
+		u16[0xffffeed8] = 0
+		D0.u16 = 0x01e0
+		D1.u16 &= D0.u16
+		D6 = 2
+		D2 = 1
+		while (D2.s16 >= 0)
+		{
+			push(D6.u16)
+			push(D2.u16)
+			push(D1.u16)
+			push(D0.u16)
+
+			LoadTileContentSingleLine()
+
+			D0 = s16(pop())
+			D1 = s16(pop())
+			D2 = s16(pop())
+			D6 = s16(pop())
+
+			D0.u16 += 0x10
+			--D2.s16
+		}
+	}
+}
+
+
+//# address-hook(0x05a508) end(0x05a522)
+function void fn05a508()
+{
+	camera.foreground.y.u16 = 0x20 + camera.screenshake.offset
+	u16[0xffffa80a] = camera.foreground.x.u16
+	u16[0xffffa804] = camera.foreground.x.u16 & 0x01ff
+}
+
+
+//# address-hook(0x05a528) end(0x05a540)
+function void InitLevelScrolling.DEZ_Boss()
+{
+	A3 = 0xffff8008
+	D7.u16 = 0xc000
+	fn05a76c()
+
+	fn04f2f6()
+	Level.InitialTilesFill()
+	fn05a734()
+}
+
+
+//# address-hook(0x05a544) end(0x05a554)
+function void UpdateLevelScrolling.DEZ_Boss()
+{
+	#if STANDALONE
+		// Draw our own widescreen version of the background
+		Renderer.enforceClearScreen(true)
+		Renderer.enableDefaultPlane(0, false)
+		Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+	#endif
+
+	A3 = 0xffff8008
+	D7.u16 = 0xc000
+	fn05a76c()
+
+	D0.u16 = level.scrolling_routine
+	call 0x05a558 + D0.s16
+}
+
+//# address-hook(0x05a558) end(0x05a558)
+function void fn05a558()
+{
+	fn05a57c()
+}
+
+//# address-hook(0x05a55c) end(0x05a55c)
+function void fn05a55c()
+{
+	fn05a5b0()
+}
+
+//# address-hook(0x05a560) end(0x05a560)
+function void fn05a560()
+{
+	fn05a5e0()
+}
+
+//# address-hook(0x05a564) end(0x05a564)
+function void fn05a564()
+{
+	fn05a606()
+}
+
+//# address-hook(0x05a568) end(0x05a568)
+function void fn05a568()
+{
+	fn05a61a()
+}
+
+//# address-hook(0x05a56c) end(0x05a56c)
+function void fn05a56c()
+{
+	fn05a662()
+}
+
+//# address-hook(0x05a570) end(0x05a570)
+function void fn05a570()
+{
+	fn05a676()
+}
+
+//# address-hook(0x05a574) end(0x05a574)
+function void fn05a574()
+{
+	fn05a71a()
+}
+
+//# address-hook(0x05a578) end(0x05a578)
+function void fn05a578()
+{
+	fn05a72e()
+}
+
+
+//# address-hook(0x05a57c) end(0x05a5ac)
+function void fn05a57c()
+{
+	hud.dirty.lives = 0x01
+	if (u16[0xffffeec6] == 0)
+	{
+		fn05a72e()
+		return
+	}
+
+	u16[0xffffeec6] = 0
+	A1 = 0xffff0000 + u16[A3 + 0x08]
+	u8[A1 + 0x0d] = 0x1a
+
+	D0.u16 = camera.background.y.u16
+	D1.u16 = camera.background.x.u16
+	D6 = 0x15
+	fn04ed6c()
+
+	level.scrolling_routine += 4
+	fn05a734()
+}
+
+
+//# address-hook(0x05a5b0) end(0x05a5dc)
+function void fn05a5b0()
+{
+	if (camera.screenshake.state == 0)
+	{
+		fn05a72e()
+		return
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		u16 px = (0x02c0 - getScreenExtend()) & 0xffe0
+		objA1.update_address = 0x05a922
+		u16[A1 + 0x2e] = 0x13
+		u16[A1 + 0x30] = px + 0x10
+		u16[0xffffeee8] = px
+		level.scrolling_routine += 4
+	}
+
+	fn05a72e()
+}
+
+
+//# address-hook(0x05a5e0) end(0x05a602)
+function void fn05a5e0()
+{
+	if (level.display_routine == 0x06c0)
+	{
+		fn05a72e()
+		return
+	}
+
+	fn04f2f6()
+	u16[0xffffeec8] = 0xf0
+	u16[0xffffeeca] = 0x0f
+	u16[0xffffeede] = camera.background.x.frac
+	level.scrolling_routine += 4
+	fn05a606()
+}
+
+
+//# address-hook(0x05a606) end(0x05a616)
+function void fn05a606()
+{
+	D1 = 0
+	D2 = 0
+	fn04ef56()
+	if (_negative())
+	{
+		u16[0xffffeede] = 0
+		level.scrolling_routine += 4
+	}
+
+	fn05a61a()
+}
+
+
+//# address-hook(0x05a61a) end(0x05a65e)
+function void fn05a61a()
+{
+	if (level.display_routine == 0x02c0)
+	{
+		fn05a72e()
+		return
+	}
+
+	fn04f2f6()
+	u16[0xffffeec8] = 0xf0
+	u16[0xffffeeca] = 0x0f
+	u16[0xffffeede] = camera.background.x.frac
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05a94c
+		D0.u16 = camera.foreground.x.u16 & 0xffe0
+		u16[0xffffeee8] = D0.u16
+		D0.u16 -= 0x10
+		u16[A1 + 0x30] = D0.u16
+	}
+
+	level.scrolling_routine += 4
+	fn05a662()
+}
+
+
+//# address-hook(0x05a662) end(0x05a672)
+function void fn05a662()
+{
+	D1 = 0
+	D2 = 0
+	fn04ef56()
+	if (_negative())
+	{
+		u16[0xffffeede] = 0
+		level.scrolling_routine += 4
+	}
+
+	fn05a676()
+}
+
+
+//# address-hook(0x05a676) end(0x05a692)
+function void fn05a676()
+{
+	if (level.display_routine == 0)
+	{
+		fn05a6fe()
+		return
+	}
+
+	fn05a79e()
+	if (u16[0xffffeec6] == 0)
+	{
+		fn05a72e()
+		return
+	}
+
+	u16[0xffffeec6] = 0
+	D0.u16 = u16[0xffffeedc]
+	call 0x05a696 + D0.s16
+}
+
+
+//# address-hook(0x05a696) end(0x05a696)
+function void fn05a696()
+{
+	fn05a69e()
+}
+
+//# address-hook(0x05a698) end(0x05a698)
+function void fn05a698()
+{
+	fn05a6a4()
+}
+
+//# address-hook(0x05a69a) end(0x05a69a)
+function void fn05a69a()
+{
+	fn05a69e()
+}
+
+//# address-hook(0x05a69c) end(0x05a69c)
+function void fn05a69c()
+{
+	fn05a6aa()
+}
+
+//# address-hook(0x05a69e) end(0x05a6a2)
+function void fn05a69e()
+{
+	D0.u16 = 0x0603
+	fn05a6b4()
+}
+
+//# address-hook(0x05a6a4) end(0x05a6a8)
+function void fn05a6a4()
+{
+	D0.u16 = 0x0903
+	fn05a6b4()
+}
+
+//# address-hook(0x05a6aa) end(0x05a6ae)
+function void fn05a6aa()
+{
+	D0.u16 = 0x0807
+	u16[0xffffeedc] = 0xfffe
+	fn05a6b4()
+}
+
+//# address-hook(0x05a6b4) end(0x05a6fc)
+function void fn05a6b4()
+{
+	u16[0xffffeedc] += 2
+	A1 = 0xffff0000 + u16[A3 + 0x08]
+	u8[A1 + 0x0e] = D0.u8
+	D0.u16 >>= 8
+	A1 = 0xffff0000 + u16[A3 + 0x0c]
+	u8[A1 + 0x0e] = D0.u8
+
+	D1.u16 = 0x0700
+	D0.u16 = 0x0160
+	D6 = 0x08
+	D2 = 0x09
+	D3.u16 = (camera.background.y.u16 & 0xfff0) + 0xe0
+
+	while (D2.s16 >= 0)
+	{
+		push(D6.u16)
+		push(D3.u16)
+		push(D2.u16)
+		push(D1.u16)
+		push(D0.u16)
+
+		LoadTileContentSingleLine()
+
+		D0 = s16(pop())
+		D1 = s16(pop())
+		D2 = s16(pop())
+		D3 = s16(pop())
+		D6 = s16(pop())
+
+		D0.u16 += 0x10
+		if (D0.u16 > D3.u16)
+			break
+
+		--D2.s16
+	}
+
+	fn05a72e()
+}
+
+
+//# address-hook(0x05a6fe) end(0x05a716)
+function void fn05a6fe()
+{
+	fn04f2f6()
+	u16[0xffffeec8] = 0xf0
+	u16[0xffffeeca] = 0x0f
+	u16[0xffffeede] = camera.background.x.frac
+	level.scrolling_routine += 4
+	fn05a71a()
+}
+
+
+//# address-hook(0x05a71a) end(0x05a72a)
+function void fn05a71a()
+{
+	D1 = 0
+	D2 = 0
+	fn04ef56()
+	if (_negative())
+	{
+		u16[0xffffeede] = 0
+		level.scrolling_routine += 4
+	}
+	fn05a72e()
+}
+
+
+//# address-hook(0x05a72e) end(0x05a72e)
+function void fn05a72e()
+{
+	UpdateBackgroundTiles.General()
+	fn05a734()
+}
+
+
+//# address-hook(0x05a734) end(0x05a766)
+function void fn05a734()
+{
+	A1 = 0xffffe000		// Location of linewise scroll offsets
+	A4 = 0x05a524
+	A5 = 0xffffa808
+	D0.u16 = camera.foreground.y.u16
+	D1.u16 = getScreenHeight() - 1
+	D3.u16 = (u16[0xffffeede] == 0) ? camera.background.x.u16 : u16[0xffffeede]
+	fn04f0de()
+
+	scrolloffset.y.planeA = camera.background.y.u16
+	scrolloffset.y.planeB = camera.foreground.y.u16
+
+	signalMultiReturn()
+	UpdateScreenShake()
+}
+
+
+//# address-hook(0x05a76c) end(0x05a79c)
+function void fn05a76c()
+{
+	camera.background.x.frac = camera.background.x.u16
+	if (level.display_routine == 0)
+	{
+		camera.background.x.u16 = 0
+	}
+	else
+	{
+		camera.background.x.u16 = camera.foreground.x.u16 - u16[0xffffeed4] + level.display_routine
+	}
+
+	camera.background.y.u16 = camera.foreground.y.u16 - u16[0xffffeed6] + 0x0180
+}
+
+
+
+//# address-hook(0x05a79e) end(0x05a7c6)
+function void fn05a79e()
+{
+	if (u16[0xffffeee2] != u16[0xffffeee4])
+	{
+		u16[0xffffeee4] = u16[0xffffeee2]
+		u32 sourceInROM = 0x15a674 + (u16[0xffffeee2] + 2) * 4
+		updateSpritePattern(sourceInROM, 0x4100, 0x40)
+	}
+}
+
+
+
+// Floor collision
+
+#if STANDALONE
+	define s16 DEZBoss.FloorCollision.extra_width = 0x20	// Needed for widescreen, otherwise parts of the floor on the right are not solid; must be multiple of 0x20, but not more than 0x40
+#else
+	define s16 DEZBoss.FloorCollision.extra_width = 0
+#endif
+
+
+//# address-hook(0x05a7c8) end(0x05a7e6)
+function void fn05a7c8()
+{
+	objA0.update_address = 0x05a7ec
+	objA0.box_size.y = 0x10
+	objA0.position.x.u16 = 0x130 + DEZBoss.FloorCollision.extra_width
+	objA0.position.y.u16 = 0xf0
+	objA0.flags2a |= 0x80
+	objA0.countdown_value = 0x80
+	fn05a7ec()
+}
+
+
+//# address-hook(0x05a7ec) end(0x05a86c)
+function void fn05a7ec()
+{
+	if (global.zone != 0x17)
+	{
+		UnloadObject()
+		return
+	}
+
+	// u16[0xffffeeda] = Position of floor block to fall next (if != 0)
+	// u16[0xffffeee8] = Left screen border
+
+	if (u16[0xffffeeda] != 0)
+	{
+		D1.u16 = u16[0xffffeeda]
+		u16[0xffffeeda] = 0
+		if (D1.u16 >= u16[0xffffeee8])
+		{
+			if (allocDynamicObjectAfterA0())
+			{
+				objA1.update_address = 0x05a872
+				objA1.position.x.u16 = D1.u16
+				D2.u16 = objA0.countdown_value - 0x20
+				if (D2.u16 <= D1.u16)
+				{
+					u16[0xffffeed8] = D1.u16
+				}
+			}
+
+			u16[0xffffeee8] += 0x20
+			if (D1.u16 >= objA0.countdown_value)
+			{
+				objA0.position.x.u16 += 0x20
+			}
+		}
+	}
+
+	D0.u16 = camera.foreground.x.u16 & 0xffe0
+	D2.u16 = objA0.countdown_value
+	if (D0.u16 != D2.u16)
+	{
+		if (D0.u16 >= D2.u16)
+		{
+			if (D2.u16 >= u16[0xffffeee8])
+			{
+				objA0.position.x.u16 += 0x20
+			}
+		}
+		else
+		{
+			objA0.position.x.u16 -= 0x20
+		}
+		objA0.countdown_value = D0.u16
+	}
+
+	D1.u16 = 0xb0 + DEZBoss.FloorCollision.extra_width
+	D2 = 0x10
+	D3 = 0x10
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+}
+
+
+
+// Collapsing floor single piece
+
+//# address-hook(0x05a872) end(0x05a8ae)
+function void fn05a872()
+{
+	objA0.update_address = 0x05a8b2
+	objA0.render_flags = 0x84
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x0c
+	objA0.sprite_priority = 0x80
+	objA0.sprite_attributes = 0xc001
+	objA0.mapping_offset = 0x05a9ac
+	objA0.position.y.u16 = 0xf0
+	objA0.animation.sprite = (objA0.position.x.u16 & 0x60) >> 5
+
+	fn05a8b2()
+}
+
+
+//# address-hook(0x05a8b2) end(0x05a8e0)
+function void fn05a8b2()
+{
+	if ((u8[A0 + 0x04] & 0x80) == 0)
+	{
+		objA0.position.x.u16 = level.despawn_position.x + 0x0400
+	}
+
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x1a
+
+	D1 = 0x10
+	D2 = 0x10
+	D3 = 0x10
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	DrawOrUnloadObject()
+}
+
+
+
+// Another object?
+
+//# address-hook(0x05a8e6) end(0x05a8fe)
+function void fn05a8e6()
+{
+	objA0.update_address = 0x05a904
+	objA0.box_size.y = 0x10
+	objA0.position.x.u16 = 0x40
+	objA0.position.y.u16 = 0xf0
+	objA0.flags2a |= 0x80
+	fn05a904()
+}
+
+
+//# address-hook(0x05a904) end(0x05a91c)
+function void fn05a904()
+{
+	if (level.display_routine != 0x06c0)
+	{
+		UnloadObject()
+		return
+	}
+
+	D1 = 0x40
+	D2 = 0x10
+	D3 = 0x10
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+}
+
+
+
+// This object lets parts of the floor collapse
+
+//# address-hook(0x05a922) end(0x05a94a)
+function void fn05a922()
+{
+	--objA0.value32
+	if (s16[A0 + 0x32] < 0)
+	{
+		objA0.value32 = 0x0f
+		u16[0xffffeeda] = u16[A0 + 0x30]
+		u16[A0 + 0x30] += 0x20
+
+		--objA0.countdown_value
+		if (objA0.countdown_value == 0)
+		{
+			camera.screenshake.state = 0
+			UnloadObject()
+		}
+	}
+}
+
+
+//# address-hook(0x05a94c) end(0x05a9aa)
+function void fn05a94c()
+{
+	if (global.zone != 0x17)
+	{
+		UnloadObject()
+		return
+	}
+
+	if (level.display_routine == 0)
+	{
+		// Floor collapsing in third phase
+		D0.u16 = camera.foreground.x.u16 + 0x9c + getScreenExtend()
+		if (D0.u16 >= u16[A0 + 0x30])
+		{
+			u16[0xffffeeda] = u16[A0 + 0x30]
+			u16[A0 + 0x30] += 0x20
+		}
+	}
+	else
+	{
+		if (u16[0xffffeed6] < 0x0110)
+		{
+			--objA0.value32
+			if (s16[A0 + 0x32] < 0)
+			{
+				D0.u16 = u16[0xffffeed4] + 0x90
+				if (D0.u16 >= u16[A0 + 0x30])
+				{
+					u16[0xffffeeda] = u16[A0 + 0x30]
+					u16[A0 + 0x30] += 0x20
+					objA0.value32 = 0x0d
+				}
+			}
+		}
+	}
+}
+
+
+
+// Running Robotnik
+
+//# address-hook(0x080de0) end(0x080dfc)
+function void fn080de0()
+{
+	setupObjectAttributesFull(0x0812e0)
+	objA0.update_address = 0x080e02
+
+	objA0.position.x.u16 = 0x70
+	objA0.position.y.u16 = 0xc0
+	objA0.render_flags |= 0x01
+	fn080e02()
+}
+
+
+//# address-hook(0x080e02) end(0x080e26)
+function void fn080e02()
+{
+	Object.animationProgress(0x081354)
+
+	objA0.position.x.u16 += 6
+	D0.u16 = objA0.position.x.u16
+	if (D0.u16 < 0x03d0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		u8[0xfffffab8] |= 0x01
+		UnloadObject()
+	}
+}
+
+
+
+// Door to the large Egg Robo
+
+//# address-hook(0x080d72) end(0x080d9a)
+function void fn080d72()
+{
+	setupObjectAttributesFull(0x081286)
+	objA0.update_address = 0x080d9e
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = objA1.position.x.u16 - 0x10
+	objA0.position.x.u16 = D0.u16
+	D0.u16 = objA1.position.y.u16 - 0x3c
+	objA0.position.y.u16 = D0.u16
+	fn080d9e()
+}
+
+
+//# address-hook(0x080d9e) end(0x080db8)
+function void fn080d9e()
+{
+	if (u8[0xfffffab8] & 0x01)
+	{
+		objA0.update_address = 0x080dbe
+		objA0.countdown_value = 0x1f
+		objA0.velocity.x = -0x80
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x080dbe) end(0x080dda)
+function void fn080dbe()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		UpdateMovementStraightSimple()
+		DrawObject()
+	}
+	else
+	{
+		u8[0xfffffab8] |= 0x02
+		u8[0xffffeec6] = 0xff
+		UnloadObject()
+	}
+}
+
+
+
+// Some object controlling the camera?
+
+//# address-hook(0x0810a0) end(0x0810d0)
+function void fn0810a0()
+{
+	move_area.left = camera.position.x.u16
+	D1.u16 = 0x0520
+	if (camera.position.x.u16 < D1.u16)
+		return
+
+	u8[0xfffffab8] |= 0x04
+	move_area.left = D1.u16
+	move_area.right = D1.u16 + getScreenWidth() / 2
+	level.display_routine = 0x02c0
+	objA0.position.x.u16 += 0x0100
+	UnloadObject()
+}

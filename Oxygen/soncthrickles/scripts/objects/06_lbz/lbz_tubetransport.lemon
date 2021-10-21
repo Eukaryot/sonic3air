@@ -1,0 +1,588 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Transporter running through a tube in LBZ             //
+//-------------------------------------------------------//
+
+//# address-hook(0x029c9e) end(0x029d44)
+function void fn029c9e()
+{
+	objA0.mapping_offset = 0x2291a4
+	objA0.sprite_attributes = 0x2455
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x30
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	if (objA0.subtype2c & 0x40)
+	{
+		// Exit point (closed)
+		objA0.animation.sprite = 0
+		objA0.value26 = 0
+
+		objA0.update_address = 0x029d6a
+		fn029d6a()
+	}
+	else
+	{
+		// Start point
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x029dec
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			u8[A1 + 0x04] |= 0x04
+			u8[A1 + 0x06] = 0x18
+			u8[A1 + 0x07] = 0x18
+			u16[A1 + 0x0a] = 0x2455
+			u32[A1 + 0x0c] = 0x2291a4
+			u16[A1 + 0x08] = 0x0280
+			u8[A1 + 0x22] = 0x06
+			u16[A1 + 0x42] = A0.u16
+		}
+
+		objA0.animation.sprite = 2
+		objA0.value26 = 2
+
+		objA0.update_address = 0x029d4a
+		fn029d4a()
+	}
+}
+
+
+//# address-hook(0x029d4a) end(0x029d64)
+function void fn029d4a()
+{
+	fn029e22()
+
+	A1 = 0xffffb000
+	A2 = A0 + 0x38
+	fn02a106()
+
+	A1 = 0xffffb04a
+	++A2
+	fn02a106()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x029d6a) end(0x029de6)
+function void fn029d6a()
+{
+	// Check if main character is using a tube transport, in this case this exit should despawn again
+	A1 = 0xffffb000
+	if ((objA1.flags2a & char.flag.ON_OBJECT) && (u8[A1 + 0x2e] != 0))
+	{
+		A2 = 0xffff0000 + u16[A1 + 0x42]
+		if (u32[A2] == 0x029d4a)
+		{
+			// This leads to despawn
+			objA0.position.x.u16 = 0x7ff0
+		}
+	}
+
+	A4 = A0 + 0x2e
+	u8[A4+1] += 2
+	D0.u8 = u8[A4+1]
+	if (D0.u8 >= 0xb0 && D0.u8 < 0xd0)
+	{
+		D0.u8 += 0x20
+	}
+	u8[A4+1] = D0.u8
+
+	LookupSinCos()
+	if (D0.u16 == 0x0100)
+	{
+		--D0.u16
+	}
+	D0.s16 >>= 6
+	objA0.position.y.u16 = u16[A0 + 0x46] - D0.u16
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x029dec) end(0x029e16)
+function void fn029dec()
+{
+	A1 = 0xffff0000 + objA0.value42
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	if (objA1.render_flags & render_flag.VISIBLE)
+	{
+		D0 = u8[A1 + 0x22]
+		D0.u16 = objA1.position.x.u16 + s8[0x029e1c + D0.s16]
+		objA0.position.x.u16 = D0.u16
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x029e22) end(0x029e30)
+function void fn029e22()
+{
+	A4 = A0 + 0x2e
+	A1 = A0
+
+	// Targets:
+	//  - 0x029e42	-> u8[A4] = 0x00
+	//  - 0x029eb2	-> u8[A4] = 0x02
+	//  - 0x029f34	-> u8[A4] = 0x04
+	//  - 0x029fcc	-> u8[A4] = 0x06
+	//  - 0x02a018	-> u8[A4] = 0x08
+	//  - 0x02a07e	-> u8[A4] = 0x0a
+	//  - 0x02a0b0	-> u8[A4] = 0x0c
+	call tableLookupAddress(0x029e34, u8[A4])
+}
+
+
+//# address-hook(0x029e42) end(0x029eb0)
+function void fn029e42()
+{
+	if (u16[A0 + 0x38] != 0x0200 && u16[A0 + 0x38] != 0x0202)
+	{
+		u8[A4 + 1] += 2
+		D0.u8 = u8[A4 + 1]
+		if (D0.u8 >= 0xb0 && D0.u8 < 0xd0)
+		{
+			D0.u8 += 0x20
+		}
+		u8[A4 + 1] = D0.u8
+		LookupSinCos()
+
+		if (D0.u16 == 0x0100)
+			--D0.u16
+		D0.s16 >>= 6
+		D2.u16 = u16[A0 + 0x46] - D0.u16
+		objA0.position.y.u16 = D2.u16
+
+		D1 = objA0.box_size.x + 11
+		D2.u16 = 0x08
+		D3.u16 = 0x20
+		D4.u16 = objA0.position.x.u16
+
+		fn01de20()
+	}
+	else
+	{
+		u8[A4] += 2
+		playSound(0x3c)
+		fn029eb2()
+	}
+}
+
+
+//# address-hook(0x029eb2) end(0x029f32)
+function void fn029eb2()
+{
+	D0.u16 = u16[A0 + 0x22] - u16[A0 + 0x3c]
+	if (D0.s16 < 0)
+		D0.u16 += 0x0600
+	u16[A0 + 0x22] = D0.u16
+
+	D0.u16 = u16[A0 + 0x26] - u16[A0 + 0x3c]
+	if (D0.s16 < 0)
+		D0.u16 += 0x0c00
+	u16[A0 + 0x26] = D0.u16
+
+	if (u16[A0 + 0x3c] < 0x0180)
+	{
+		u16[A0 + 0x3c] += Game.getSetting(SETTING_LBZ_TUBETRANSPORT) ? 8 : 2
+	}
+	else
+	{
+		u8[A4] += 2
+		u8[A4+1] = 0
+		u16[A0 + 0x3c] = 0x0180
+		fn0297a2()
+		u8[0xffffee39] = 1
+	}
+
+	D0.u8 = u8[A4+1]
+	u8[A4+1] += 2
+	LookupSinCos()
+	D0.s16 >>= 6
+	objA0.position.y.u16 = u16[A0 + 0x46] - D0.u16
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}
+
+
+//# address-hook(0x029f34) end(0x029fca)
+function void fn029f34()
+{
+	// Acceleration the rotation
+	u16 velocity = u16[A0 + 0x3c]
+
+	u16[A0 + 0x22] -= velocity	// Note that this affects "objA0.animation.sprite" = u8[A0 + 0x22]
+	u16[A0 + 0x26] -= velocity
+	if (s16[A0 + 0x22] < 0)
+		s16[A0 + 0x22] += 0x600
+	if (s16[A0 + 0x26] < 0)
+		s16[A0 + 0x26] += 0xc00
+
+	--u8[A4 + 0x02]
+	if (s8[A4 + 0x02] <= 0)
+	{
+		A2 = u32[A4 + 0x06]
+		D4.u16 = u16[(A2+=2)-2]
+		D5.u16 = u16[(A2+=2)-2]
+		objA1.position.x.u16 = D4.u16
+		objA1.position.y.u16 = D5.u16
+		u32[A4 + 0x06] = A2
+		u16[A4 + 0x04] -= 4
+		if (u16[A4 + 0x04] != 0)
+		{
+			D4.u16 = u16[(A2+=2)-2]
+			D5.u16 = u16[(A2+=2)-2]
+			D2.u16 = 0x1000
+			fn029818()
+		}
+		else
+		{
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A0 + 0x46] = objA0.position.y.u16
+			u8[A4] += 2
+			u8[A4+1] = 0
+			u8[0xffffee39] = 0
+		}
+		return
+	}
+
+	u32[A1 + 0x10] += s32(objA1.velocity.x) << 8
+	u32[A1 + 0x14] += s32(objA1.velocity.y) << 8
+}
+
+
+//# address-hook(0x029fcc) end(0x02a014)
+function void fn029fcc()
+{
+	// Slowing down
+	u16 velocity = u16[A0 + 0x3c]
+
+	u16[A0 + 0x22] -= velocity	// Note that this affects "objA0.animation.sprite" = u8[A0 + 0x22]
+	u16[A0 + 0x26] -= velocity
+	if (s16[A0 + 0x22] < 0)
+		s16[A0 + 0x22] += 0x600
+	if (s16[A0 + 0x26] < 0)
+		s16[A0 + 0x26] += 0xc00
+
+	if (u16[A0 + 0x3c] == 8)
+	{
+		if (objA0.animation.sprite == 2)
+		{
+			u8[A4] += 2
+			if (objA0.respawn_entry)
+			{
+				A2 = 0xffff0000 + objA0.respawn_entry
+				u8[A2] &= ~0x80
+				objA0.respawn_entry = 0
+			}
+		}
+	}
+	else
+	{
+	#if STANDALONE
+		if (Game.getSetting(SETTING_LBZ_TUBETRANSPORT))
+		{
+			// Keep rotating with velocity == 0xa0 until close enough to end state
+			if (u16[A0 + 0x3c] > 0xa0)
+			{
+				u16[A0 + 0x3c] -= 8
+			}
+			else
+			{
+				s16 fullBrakeRestLength = (u16[A0 + 0x3c] * (u16[A0 + 0x3c] / 8 - 1)) / 2
+				s16 remaining = s16[A0 + 0x26] - 0x920 - fullBrakeRestLength
+				while (remaining < 0)
+					remaining += 0xc00
+				if (remaining <= u16[A0 + 0x3c])
+					u16[A0 + 0x3c] -= 8
+			}
+		}
+		else
+	#endif
+		{
+			u16[A0 + 0x3c] -= 4
+		}
+	}
+
+	fn02a018()
+}
+
+
+//# address-hook(0x02a018) end(0x02a07c)
+function void fn02a018()
+{
+	u8[A4+1] += 2
+	D0.u8 = u8[A4+1]
+	if (D0.u8 >= 0xb0 && D0.u8 < 0xd0)
+	{
+		D0.u8 += 0x20
+	}
+	u8[A4+1] = D0.u8
+
+	LookupSinCos()
+	if (D0.u16 == 0x0100)
+	{
+		--D0.u16
+	}
+	D0.s16 >>= 6
+	D2.u16 = u16[A0 + 0x46] - D0.u16
+	objA0.position.y.u16 = D2.u16
+
+	D1 = objA0.box_size.x + 11
+	D2.u16 = 8
+	D3.u16 = 0x20
+	D4.u16 = objA0.position.x.u16
+	fn01de20()
+
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 == 0)
+	{
+		u8[A4] += 2
+		objA0.animation.timer = 0
+	}
+}
+
+
+//# address-hook(0x02a07e) end(0x02a0aa)
+function void fn02a07e()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 15
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 6)
+		{
+			objA0.animation.sprite = 0
+			u8[A4] += 2
+		}
+
+		++objA0.value26
+		if (objA0.value26 >= 6)
+			objA0.value26 = 0
+	}
+
+	fn02a0b0()
+}
+
+
+//# address-hook(0x02a0b0) end(0x02a104)
+function void fn02a0b0()
+{
+	u8[A4+1] += 2
+	D0.u8 = u8[A4+1]
+	if (D0.u8 >= 0xb0 && D0.u8 < 0xd0)
+	{
+		D0.u8 += 0x20
+	}
+	u8[A4+1] = D0.u8
+
+	LookupSinCos()
+	if (D0.u16 == 0x0100)
+	{
+		--D0.u16
+	}
+	D0.s16 >>= 6
+	D2.u16 = u16[A0 + 0x46]
+	D2.u16 -= D0.u16
+	objA0.position.y.u16 = D2.u16
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}
+
+
+//# address-hook(0x02a106) end(0x02a216)
+function void fn02a106()
+{
+	D0.u8 = u8[A2]
+	if (D0.u8 == 0)
+	{
+		if (debug_mode.state != 0)
+			return
+
+		if (A1 != 0xffffb04a || (objA0.flags2a & 0x10) == 0 || u8[A2-1] == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 3
+			if (objA0.flags2a & 0x01)
+				D0.u16 += 0x0a
+			if (D0.u16 >= 0x10)
+				return
+
+			D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x20
+			if (D1.u16 >= 0x40)
+				return
+
+			if (u8[A1 + 0x2e] != 0 || (objA1.flags2a & char.flag.IN_AIR) != 0)
+				return
+		}
+
+		u8[A2] += 2
+		u8[A1 + 0x2e] = 0x83
+		u8[A1 + 0x20] = 0
+		u8[A1 + 0x40] = 0
+		u16[A1 + 0x1c] = 0
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		objA1.flags2a &= ~char.flag.PUSHING
+		objA1.flags2a &= ~char.flag.IN_AIR
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16 + 0x18 - u8[A1 + 0x1e]
+	#if STANDALONE
+		// Make sure that character is "on" the object as it's possible that this did not get set accordingly before
+		//  -> If not set, this leads to a closed transporter already blocking the way at the exit point
+		//  -> So you would just pop out of the transporter when reaching the end of the ride (you've certainly seen this happening before)
+		objA1.flags2a |= char.flag.ON_OBJECT
+		u16[A1 + 0x42] = A0.u16
+	#endif
+
+		objA0.flags2a &= ~0x20
+	}
+	else
+	{
+		D0.u8 -= 2
+		if (D0.u8 != 0)
+			return
+
+		objA1.position.x.u16 = objA0.position.x.u16
+		D0.u16 = objA0.position.y.u16 + 0x18
+		D1 = u8[A1 + 0x1e]
+		D0.u16 -= D1.u16
+		objA1.position.y.u16 = D0.u16
+		if (objA0.flags2e == 0x08)
+		{
+			objA1.flags2a |= char.flag.FACING_LEFT
+			u8[A1 + 0x2e] = 0
+			u8[A2] += 2
+		}
+
+	#if STANDALONE
+		if (!debug_mode.state)
+	#endif
+		{
+			D0 = objA0.value26
+			u8[A1 + 0x22] = u8[0x02a218 + D0.s16]
+			u8[A1 + 0x04] &= 0xfc
+			D0.u8 = u8[0x02a224 + D0.s16]
+			u8[A1 + 0x04] |= D0.u8
+			D0 = u8[A1 + 0x22]
+
+			u32 backupA2 = A2
+			SetCharacterSpritePatterns()
+			A2 = backupA2
+		}
+	}
+}
+
+
+//# address-hook(0x02a230) end(0x02a230)
+function void fn02a230()
+{
+}
+
+
+
+// More general code? (Also used by two FBZ platform objects)
+
+//# address-hook(0x01de20) end(0x01deca)
+function void fn01de20()
+{
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn01de36()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb04a
+	++D6.u8
+	fn01de36()
+}
+
+
+function void fn01de36()
+{
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D1.u16 * 2)
+			{
+				D0.u16 = objA0.position.y.u16 - D2.u16 + D3.u16
+				D1 = u8[A1 + 0x1e]
+				D0.u16 -= D1.u16
+				objA1.position.y.u16 = D0.u16
+				objA1.position.x.u16 -= (D4.u16 - objA0.position.x.u16)
+				D4 = 0
+				return
+			}
+		}
+
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
+
+		objA0.flags2a &= ~(1 << D6.u8)
+		D4 = 0
+	}
+	else
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		if (D0.s16 >= 0 && D0.u16 <= D1.u16 * 2)
+		{
+			D5.u16 = objA0.position.y.u16 + D3.u16
+			D2.u16 += s8[A1 + 0x1e]
+			D3.u16 = objA1.position.y.u16 - D5.u16 + D2.u16 + 4
+			if (D3.s16 >= 0 && D3.u16 < D2.u16 * 2)
+			{
+				fn01dffe()
+				return
+			}
+
+		#if STANDALONE
+			// When moving fast vertically above, limit velocity to prevent phasing through (and maybe even getting killed because of that)
+			if (objA1.velocity.y > 0xc00 && D3.s16 >= -0x20 && D3.s16 < D2.s16 * 2)
+			{
+				objA1.velocity.y = 0xc00
+			}
+		#endif
+		}
+
+		fn01e0a2()
+	}
+}

@@ -1,0 +1,390 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Ribot, the frog-like enemy in Launch Base Zone        //
+//-------------------------------------------------------//
+
+//# address-hook(0x08c2e2) end(0x08c2e2)
+function void fn08c2e2()
+{
+	Object.InitWithUpdateAddress(0x08c2e8)
+}
+
+
+//# address-hook(0x08c2e8) end(0x08c2f6)
+function void fn08c2e8()
+{
+	// Targets:
+	//  - 0x08c2fe	-> objA0.base_state = 0x00
+	//  - 0x08c34e	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x08c2fa, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08c2fe) end(0x08c348)
+function void fn08c2fe()
+{
+	setupObjectAttributesFull(0x08c5ca)
+	objA0.flags38 |= 0x04
+
+	D0.u8 = objA0.subtype2c - 2
+	if (D0.u8 == 0)
+	{
+		u32[A0 + 0x30] = 0x08c626
+		A2 = 0x08c5f0
+	}
+	else if (D0.s8 > 0)
+	{
+		u32[A0 + 0x30] = 0x08c62c
+		A2 = 0x08c5fe
+	}
+	else
+	{
+		u32[A0 + 0x30] = 0x08c626
+		A2 = 0x08c5e2
+	}
+	SpawnChildObjects()
+}
+
+
+//# address-hook(0x08c34e) end(0x08c36c)
+function void fn08c34e()
+{
+	if (objA0.flags38 & 0x04)
+	{
+		objA0.flags38 &= ~0x04
+		objA0.flags38 &= 0xfc
+
+		objA0.flags38 ^= 0x08
+		D0 = (objA0.flags38 & 0x08) ? 0 : 1
+		objA0.flags38 |= (1 << D0.u8)
+	}
+	Object.AnimationProgressByLocalA1()
+}
+
+
+
+// Variant: Swinging its weight in a circle around him
+
+//# address-hook(0x08c370) end(0x08c388)
+function void fn08c370()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D2 = u8[A1 + 0x2c]
+
+	// Targets:
+	//  - 0x08c396	-> objA0.base_state = 0x00
+	//  - 0x08c3bc	-> objA0.base_state = 0x02
+	//  - 0x08c428	-> objA0.base_state = 0x04
+	//  - 0x08c48e	-> objA0.base_state = 0x06
+	//  - 0x08c4ba	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x08c38c, objA0.base_state)
+
+	fn084934()
+}
+
+
+//# address-hook(0x08c396) end(0x08c3b8)
+function void fn08c396()
+{
+	setupObjectAttributesBasic(0x08c5d6)
+	objA0.hitbox_extends.y = 0x08
+	u8[A0 + 0x43] = 0xf0
+	objA0.value3e = objA0.position.x.u16
+	u16[A0 + 0x40] = objA0.position.y.u16
+	fn08c594()
+}
+
+
+//# address-hook(0x08c594) end(0x08c5c4)
+function void fn08c594()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u8 = u8[A1 + 0x2c] - 2
+	if (D0.u8 == 0)
+	{
+		A2 = (objA0.subtype2c == 0) ? 0x08c60e : 0x08c616
+	}
+	else
+	{
+		A2 = (D0.s8 > 0) ? 0x08c61e : 0x08c606
+	}
+	SpawnIdenticalChildObjects()
+}
+
+
+//# address-hook(0x08c3bc) end(0x08c3c0)
+function void fn08c3bc()
+{
+	// Targets:
+	//  - 0x08c3ca	-> D2.u16 = 0x00
+	//  - 0x08c3ec	-> D2.u16 = 0x02
+	//  - 0x08c41e	-> D2.u16 = 0x04
+	call tableLookupAddress(0x08c3c4, D2.u16)
+}
+
+
+//# address-hook(0x08c3ca) end(0x08c3ea)
+function void fn08c3ca()
+{
+	D0 = (objA0.subtype2c == 0) ? 1 : 0
+	if ((u8[A1 + 0x38] & (1 << D0.u8)) == 0)
+		return
+
+	objA0.base_state = 0x04
+	objA0.countdown_callback = 0x08c456
+}
+
+
+//# address-hook(0x08c41e) end(0x08c424)
+function void fn08c41e()
+{
+	u8[A0 + 0x3c] += 2
+	D2 = 2
+	fn084cac()
+}
+
+
+//# address-hook(0x08c428) end(0x08c42c)
+function void fn08c428()
+{
+	// Targets:
+	//  - 0x08c436	-> D2.u16 = 0x00
+	//  - 0x08c484	-> D2.u16 = 0x02
+	call tableLookupAddress(0x08c430, D2.u16)
+}
+
+
+//# address-hook(0x08c436) end(0x08c452)
+function void fn08c436()
+{
+	D0.u16 = objA0.position.y.u16 - u16[A0 + 0x40]
+	if (D0.u16 >= 0x80)
+	{
+		fn08c46a()
+	}
+	else
+	{
+		UpdateMovementSimple()
+		if (objA0.velocity.y >= 0)
+		{
+			Object.TriggerOnGroundHit()
+		}
+	}
+}
+
+
+//# address-hook(0x08c484) end(0x08c48a)
+function void fn08c484()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08c48e) end(0x08c492)
+function void fn08c48e()
+{
+	// Targets:
+	//  - 0x08c49c	-> D2.u16 = 0x00
+	//  - 0x08c49c	-> D2.u16 = 0x02
+	call tableLookupAddress(0x08c496, D2.u16)
+}
+
+
+//# address-hook(0x08c49c) end(0x08c49c)
+function void fn08c49c()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08c4ba) end(0x08c4be)
+function void fn08c4ba()
+{
+	// Targets:
+	//  - 0x08c4c8	-> D2.u16 = 0x00
+	//  - 0x08c4f8	-> D2.u16 = 0x02
+	call tableLookupAddress(0x08c4c2, D2.u16)
+}
+
+
+//# address-hook(0x08c4c8) end(0x08c4d8)
+function void fn08c4c8()
+{
+	D0.u16 = objA0.position.y.u16 - 2
+	if (D0.u16 > u16[A0 + 0x40])
+	{
+		objA0.position.y.u16 = D0.u16
+	}
+	else
+	{
+		fn08c4da()
+	}
+}
+
+
+//# address-hook(0x08c4da) end(0x08c4f6)
+function void fn08c4da()
+{
+	objA0.base_state = 0x02
+	objA0.position.x.u16 = objA0.value3e
+	objA0.position.y.u16 = u16[A0 + 0x40]
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x38] |= 0x04
+}
+
+
+//# address-hook(0x08c4f8) end(0x08c4fe)
+function void fn08c4f8()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+
+// Weight
+
+//# address-hook(0x08c502) end(0x08c51e)
+function void fn08c502()
+{
+	setupObjectAttributesBasic(0x08c5dc)
+	objA0.update_address = 0x08c522
+	objA0.value3e = objA0.position.x.u16
+	u16[A0 + 0x40] = objA0.position.y.u16
+	fn084920()
+}
+
+
+//# address-hook(0x08c522) end(0x08c544)
+function void fn08c522()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D2.u16 = objA1.position.x.u16 - objA0.value3e
+	D3.u16 = objA1.position.y.u16 - u16[A0 + 0x40]
+
+	// Targets:
+	//  - 0x08c54e	-> objA0.subtype2c = 0x00
+	//  - 0x08c568	-> objA0.subtype2c = 0x02
+	//  - 0x08c57e	-> objA0.subtype2c = 0x04
+	call tableLookupAddress(0x08c548, objA0.subtype2c)
+	fn084920()
+}
+
+
+//# address-hook(0x08c54e) end(0x08c566)
+function void fn08c54e()
+{
+	D2.s16 >>= 2
+	D2.s16 = -D2.s16
+	D2.u16 += objA1.position.x.u16
+	objA0.position.x.u16 = D2.u16
+
+	D3.s16 >>= 2
+	D3.s16 = -D3.s16
+	D3.u16 += objA1.position.y.u16
+	objA0.position.y.u16 = D3.u16
+}
+
+
+//# address-hook(0x08c568) end(0x08c57c)
+function void fn08c568()
+{
+	D2.s16 >>= 1
+	D2.u16 += objA0.value3e
+	objA0.position.x.u16 = D2.u16
+
+	D3.s16 >>= 1
+	D3.u16 += u16[A0 + 0x40]
+	objA0.position.y.u16 = D3.u16
+}
+
+
+//# address-hook(0x08c57e) end(0x08c592)
+function void fn08c57e()
+{
+	D2.s16 >>= 2
+	D2.u16 += objA0.value3e
+	objA0.position.x.u16 = D2.u16
+
+	D3.s16 >>= 2
+	D3.u16 += u16[A0 + 0x40]
+	objA0.position.y.u16 = D3.u16
+}
+
+
+
+// A different variant (the vertical one)
+
+//# address-hook(0x08c456) end(0x08c468)
+function void fn08c456()
+{
+	D0.u16 = objA0.velocity.y
+	if (D0.u16 >= 0x0100)
+	{
+		objA0.velocity.y = -(D0.s16 >> 2)
+	}
+	else
+	{
+		fn08c46a()
+	}
+}
+
+
+//# address-hook(0x08c46a) end(0x08c482)
+function void fn08c46a()
+{
+	objA0.base_state = 0x06
+	objA0.countdown_value = 0x10
+	objA0.countdown_callback = 0x08c4a0
+	objA0.velocity.y = 0
+}
+
+
+//# address-hook(0x08c4a0) end(0x08c4b8)
+function void fn08c4a0()
+{
+	objA0.base_state = 0x08
+	objA0.velocity.x = -objA0.velocity.x
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x08c4da
+}
+
+
+
+// Third variant (the horizontal one)
+
+//# address-hook(0x08c3ec) end(0x08c41c)
+function void fn08c3ec()
+{
+	if (objA0.subtype2c == 0)
+	{
+		D0 = 1
+		D1.s16 = -0x400
+	}
+	else
+	{
+		D0 = 0
+		D1.s16 = 0x400
+	}
+
+	if ((u8[A1 + 0x38] & (1 << D0)) == 0)
+		return
+
+	objA0.base_state = 0x04
+	objA0.velocity.x = D1.u16
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x08c46a
+}

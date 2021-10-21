@@ -1,0 +1,59 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+function void LevelObjectTableBuilder.buildObjects_HPZ1()
+{
+	LevelObjectTableBuilder.addObject(0x02d0, 0x0670, OBJECTTABLE2_01, 0x03, 0)
+	LevelObjectTableBuilder.addObject(0x02f0, 0x0670, OBJECTTABLE2_01, 0x05, 0)
+	LevelObjectTableBuilder.addObject(0x0310, 0x0670, OBJECTTABLE2_01, 0x06, 0)
+	LevelObjectTableBuilder.addObject(0x0330, 0x0670, OBJECTTABLE2_01, 0x07, 0)
+	LevelObjectTableBuilder.addObject(0x0338, 0x0ae0, OBJECTTABLE2_02, 0x61, 0)
+	LevelObjectTableBuilder.addObject(0x0344, 0x08ef, OBJECTTABLE2_07, 0x10, LVLOBJ_IGNORE_Y)
+	LevelObjectTableBuilder.addObject(0x0350, 0x0670, OBJECTTABLE2_01, 0x08, 0)
+	LevelObjectTableBuilder.addObject(0x0370, 0x0670, OBJECTTABLE2_01, 0x04, 0)
+	LevelObjectTableBuilder.addObject(0x0390, 0x0910, OBJECTTABLE2_28, 0x11, 0)
+	LevelObjectTableBuilder.addObject(0x03a0, 0x0930, OBJECTTABLE2_28, 0x31, 0)
+	LevelObjectTableBuilder.addObject(0x03c0, 0x0af2, OBJECTTABLE2_08, 0x00, 0)
+	LevelObjectTableBuilder.addObject(0x04c0, 0x0908, OBJECTTABLE2_07, 0x03, LVLOBJ_IGNORE_Y)
+	LevelObjectTableBuilder.addObject(0x04e0, 0x09b2, OBJECTTABLE2_08, 0x00, 0)
+	LevelObjectTableBuilder.addObject(0x05e0, 0x0b08, OBJECTTABLE2_07, 0x03, LVLOBJ_IGNORE_Y)
+	LevelObjectTableBuilder.addObject(0x0600, 0x0a08, OBJECTTABLE2_07, 0x03, LVLOBJ_IGNORE_Y)
+	LevelObjectTableBuilder.addObject(0x0680, 0x08b2, OBJECTTABLE2_08, 0x00, 0)
+	LevelObjectTableBuilder.addObject(0x06e0, 0x0a30, OBJECTTABLE2_28, 0x31, 0)
+	LevelObjectTableBuilder.addObject(0x06f0, 0x0a10, OBJECTTABLE2_28, 0x11, 0)
+	LevelObjectTableBuilder.addObject(0x0748, 0x08a8, OBJECTTABLE2_02, 0x41, 0)
+	LevelObjectTableBuilder.addObject(0x07bc, 0x09ef, OBJECTTABLE2_07, 0x10, LVLOBJ_FLIP_X | LVLOBJ_IGNORE_Y)
+	LevelObjectTableBuilder.addObject(0x0878, 0x08a8, OBJECTTABLE2_02, 0x21, 0)
+	LevelObjectTableBuilder.addObject(0x0940, 0x0468, OBJECTTABLE2_28, 0xf1, 0)
+	LevelObjectTableBuilder.addObject(0x0970, 0x05f0, OBJECTTABLE2_01, 0x03, 0)
+	LevelObjectTableBuilder.addObject(0x0990, 0x05f0, OBJECTTABLE2_01, 0x03, 0)
+	LevelObjectTableBuilder.addObject(0x09b0, 0x05f0, OBJECTTABLE2_01, 0x01, 0)
+	LevelObjectTableBuilder.addObject(0x0a38, 0x08a8, OBJECTTABLE2_02, 0x41, 0)
+	LevelObjectTableBuilder.addObject(0x0b40, 0x0418, OBJECTTABLE2_79, 0x00, 0)
+	LevelObjectTableBuilder.addObject(0x0b40, 0x08d8, OBJECTTABLE2_79, 0x4a, 0)
+	LevelObjectTableBuilder.addObject(0x0c30, 0x08b0, OBJECTTABLE2_01, 0x03, 0)
+	LevelObjectTableBuilder.addObject(0x0cf0, 0x03e8, OBJECTTABLE2_34, 0x02, 0)
+	LevelObjectTableBuilder.addObject(0x0d00, 0x0380, OBJECTTABLE2_02, 0x42, 0)
+	LevelObjectTableBuilder.addObject(0x11f0, 0x042c, OBJECTTABLE2_82, 0x28, 0)
+	LevelObjectTableBuilder.addObject(0x1550, 0x0398, OBJECTTABLE2_b4, 0x05, 0)
+	LevelObjectTableBuilder.addObject(0x15a0, 0x0358, OBJECTTABLE2_b4, 0x03, 0)
+	LevelObjectTableBuilder.addObject(0x15c0, 0x0620, OBJECTTABLE2_79, 0x4a, 0)
+	LevelObjectTableBuilder.addObject(0x15e0, 0x03a8, OBJECTTABLE2_b4, 0x01, 0)
+	LevelObjectTableBuilder.addObject(0x1610, 0x03a0, OBJECTTABLE2_02, 0x20, 0)
+	LevelObjectTableBuilder.addObject(0x1640, 0x0340, OBJECTTABLE2_b0, 0x00, 0)
+	LevelObjectTableBuilder.addObject(0x1640, 0x0370, OBJECTTABLE2_b4, 0x00, 0)
+	LevelObjectTableBuilder.addObject(0x1670, 0x03a0, OBJECTTABLE2_02, 0x40, 0)
+	LevelObjectTableBuilder.addObject(0x16a0, 0x03a8, OBJECTTABLE2_b4, 0x02, 0)
+	LevelObjectTableBuilder.addObject(0x16e0, 0x0358, OBJECTTABLE2_b4, 0x04, 0)
+	LevelObjectTableBuilder.addObject(0x1730, 0x0398, OBJECTTABLE2_b4, 0x06, 0)
+
+	u16[A0] = 0xffff
+	A0 += 2
+}

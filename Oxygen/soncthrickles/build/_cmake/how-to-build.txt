@@ -1,0 +1,31 @@
+
+=== Build under Linux ===
+
+Make sure the following packages are installed.
+If needed, install them via "sudo apt-get install" (for Debian-based systems, this may differ for other Linux distributions).
+	- g++
+	- cmake
+	- libgl1-mesa-dev
+	- libglu1-mesa-dev
+	- libasound2-dev
+	- libpulse-dev
+	=> Complete line to copy:   sudo apt-get install g++ cmake libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev
+
+Setup and build with CMake:
+	- cd ./Oxygen/soncthrickles/source/_cmake/build
+	- cmake -DCMAKE_BUILD_TYPE=Release ..
+	- cmake --build .
+
+
+
+=== Run Linux Builds ===
+
+For both, place a copy of the S3&K ROM "Sonic_Knuckles_wSonic3.bin" inside "Oxygen/soncthrickles/___internal".
+
+Run S3AIR:
+	- cd Oxygen/soncthrickles
+	- ./sonic3air_linux
+
+Run Oxygen:
+	- cd Oxygen/oxygenengine
+	- ./oxygenapp_linux

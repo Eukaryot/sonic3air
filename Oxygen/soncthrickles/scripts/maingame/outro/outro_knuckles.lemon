@@ -1,0 +1,1137 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// This is Knuckles in his own outro
+
+//# address-hook(0x05e6c0) end(0x05e6f6)
+function void fn05e6c0()
+{
+	// Targets:
+	//  - 0x05e70e	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x05e80a	-> objA0.base_state = 0x02  -> Wait time until the Tornado gets visible
+	//  - 0x05e832	-> objA0.base_state = 0x04  -> Tornado gets into the screen from below
+	//  - 0x05e86a	-> objA0.base_state = 0x06  -> Hovering in place, Knuckles signalling his okay
+	//  - 0x05e890	-> objA0.base_state = 0x08  -> Flying out of the screen to the right
+	//  - 0x05e916	-> objA0.base_state = 0x0a  -> Flying right to left, medium sized
+	//  - 0x05e98a	-> objA0.base_state = 0x0c  -> Flying behind the island, small sized
+	//  - 0x05e9c2	-> objA0.base_state = 0x0e  -> Angel Island gets repowered and starts rising
+	//  - 0x05e9e2	-> objA0.base_state = 0x10  -> Flying away to the right
+	call tableLookupAddress(0x05e6fc, objA0.base_state)
+
+	if (outro.ending_type > 0)
+	{
+		A1 = 0x07dd5a
+		A2 = 0xfffffc5c
+		fn085a1a()
+	}
+
+	A1 = 0xffffb000
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16
+
+	DrawObject()
+}
+
+
+//# address-hook(0x05e70e) end(0x05e804)
+function void fn05e70e()
+{
+	setupObjectAttributesFull(0x0600c2)
+	objA0.countdown_value = 299
+
+	A1 = 0xffffb000
+	u8[A1 + 0x2e] = 0x83
+	u8[A1 + 0x22] = 0
+
+	player1.camera_lock = 0xff
+	u8[0xfffffab8] = 0
+	global.level_started = 0
+	camera.screenshake.state = 0
+	timer.alldata = 0
+
+	objA0.position.x.u16 = camera.position.x.u16 + 0xc0
+	objA0.position.y.u16 = camera.position.y.u16 + 0x0110
+
+	spawnChildObjects(0x0601ba)
+	u32[A0 + 0x30] = 0x060236
+
+	fn05fe82()
+
+	if (outro.ending_type >= 0)
+	{
+		objA0.animation.sprite = 0x04
+		u32[A0 + 0x30] = 0x06023f
+
+		spawnChildObjects(0x0601b2)
+
+		Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
+
+		if (outro.ending_type != 0)
+		{
+			hud.dirty.timer = 0x01
+			super.palettefx.state = 0xff
+			super.palettefx.timer = 0x0f
+			super.active = 1
+			super.ring_dec.frames = 0x7fff
+		}
+	}
+
+	copyMemory(0xfffffca0, 0x0a8a3c, 0x20)
+	u32[0xfffffcaa] = 0xee0088
+
+	Kosinski.addToDMAQueue(0x163b9a, 0x6200)
+	Kosinski.addToDMAQueue(0x163418, 0x3c60)
+	Kosinski.addToDMAQueue(0x162914, 0x4dc0)
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+
+	if (Game.isNormalGame())
+		Game.setAchievementComplete(ACHIEVEMENT_LONGPLAY)
+#endif
+}
+
+
+//# address-hook(0x05e80a) end(0x05e830)
+function void fn05e80a()
+{
+	playSoundRepeatedly(0xce)
+	fn08459c()
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x04
+		objA0.velocity.y = -0x6c0
+
+	#if STANDALONE
+		// Play outro music (not the medley, but the music before that; it's SSZ in the original)
+		playMusic(0x26)
+	#else
+		PlayMusicAfterLevelResults()
+	#endif
+	}
+}
+
+
+//# address-hook(0x05e832) end(0x05e868)
+function void fn05e832()
+{
+	fn08459c()
+	MoveWithGravity20()
+	if (objA0.velocity.y >= 0)
+	{
+		objA0.base_state = 0x06
+		fn0685e2()
+		objA0.countdown_value = 0xb3
+		if (outro.ending_type >= 0)
+		{
+			A1 = 0x060244
+			fn084580()
+		}
+	}
+}
+
+
+//# address-hook(0x05e86a) end(0x05e88e)
+function void fn05e86a()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08459c()
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x08
+		objA0.velocity.x = 0x0400
+	}
+}
+
+
+//# address-hook(0x05e890) end(0x05e910)
+function void fn05e890()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08459c()
+
+	D0.u16 = camera.position.x.u16 + 0x0200
+	if (D0.u16 > objA0.position.x.u16)
+		return
+
+	objA0.base_state = 0x0a
+	objA0.mapping_offset = 0x060486
+	objA0.sprite_attributes = 0x826e
+	objA0.animation.sprite = 0x01
+	objA0.render_flags |= 0x01
+	objA0.flags2a |= 0x80
+
+	objA0.position.y.u16 = camera.position.y.u16 + 0x50
+	objA0.velocity.x = -0x200
+	fn06001e()
+
+	A1 = 0x060253
+	fn084580()
+
+	spawnChildObjects(0x0601d8)
+	spawnSimpleChildObjects(0x0601ca)
+	spawnChildObjects(0x0601d0)
+}
+
+
+// Now the Knuckles object becomes the Tornado
+
+//# address-hook(0x05e916) end(0x05e984)
+function void fn05e916()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	D3.u16 = camera.position.x.u16 + 0x60
+	if (D3.u16 >= objA0.position.x.u16)
+	{
+		fn08459c()
+	}
+	D3.u16 -= 0xa0
+	if (D3.u16 < objA0.position.x.u16)
+		return
+
+	objA0.base_state = 0x0c
+	objA0.sprite_attributes = 0x226e
+	objA0.animation.sprite = 0x06
+	objA0.render_flags &= ~0x01
+	objA0.flags38 |= 0x10
+
+	objA0.position.y.u16 = u16[0xffffee9c] + 0x0448
+	objA0.velocity.x = 0x0100
+	objA0.velocity.y = 0
+
+	spawnChildObjects(0x06022e)
+
+	loadPaletteLine1(0x060a9a)
+}
+
+
+//# address-hook(0x05e98a) end(0x05e9c0)
+function void fn05e98a()
+{
+	UpdateMovementStraightSimple()
+	D0.u16 = camera.position.x.u16 + getScreenWidth() / 2
+	if (D0.u16 < objA0.position.x.u16)
+	{
+		objA0.base_state = 0x0e
+		objA0.animation.sprite = 0
+		u8[0xffffeec4] = 0xff
+		if (outro.ending_type >= 0)
+		{
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x05fc1e
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x05e9c2) end(0x05e9e0)
+function void fn05e9c2()
+{
+	if (u8[0xfffffaa9] != 0)
+	{
+		objA0.base_state = 0x10
+		objA0.animation.sprite = 0x1a
+		objA0.position.y.u16 = u16[0xffffee9c] + 0x0448
+	}
+}
+
+
+//# address-hook(0x05e9e2) end(0x05ea18)
+function void fn05e9e2()
+{
+	UpdateMovementStraightSimple()
+	if (s8[A0 + 0x04] >= 0)
+	{
+		objA0.update_address = 0x05ea1a
+		objA0.countdown_value = 0x0167
+		objA0.flags38 |= 0x02
+
+		super.active = 0
+		super.active.tails = 0
+		super.palettefx.state = 2
+		super.palettefx.frame = 30
+	}
+}
+
+
+//# address-hook(0x05ea1a) end(0x05ea4c)
+function void fn05ea1a()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f94c
+	}
+
+	u8[0xfffffab9] = 0x3f
+	outro.scrolling.x = 0
+	outro.scrolling.y = (outro.ending_type >= 0) ? 0x80 : -0x80
+	UnloadObject()
+}
+
+
+
+//# address-hook(0x05eb9e) end(0x05ebb2)
+function void fn05eb9e()
+{
+	// Knuckles
+	objA0.mapping_offset = 0x060486
+	objA0.sprite_attributes = 0x826e
+	objA0.animation.sprite = 0x12
+}
+
+
+
+// The Master Emerald
+
+//# address-hook(0x05ebc6) end(0x05ebde)
+function void fn05ebc6()
+{
+	objA0.update_address = 0x05ebe4
+	setupObjectAttributesFull(0x07d450)
+	objA0.sprite_attributes += 0x4000
+	objA0.animation.sprite = 2
+	fn05ebe4()
+}
+
+
+//# address-hook(0x05ebe4) end(0x05ebea)
+function void fn05ebe4()
+{
+	MoveWithParent()
+	fn084920()
+}
+
+
+
+
+//# address-hook(0x05ebf0) end(0x05ebfa)
+function void fn05ebf0()
+{
+	setupObjectAttributesBasic(0x0600f2)
+	objA0.update_address = 0x05ec14
+	fn05ec00()
+}
+
+
+//# address-hook(0x05ec00) end(0x05ec12)
+function void fn05ec00()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x04] & 0x04) == 0)
+	{
+		objA0.render_flags &= ~0x04
+	}
+}
+
+
+//# address-hook(0x05ec14) end(0x05ec36)
+function void fn05ec14()
+{
+	MoveAndFlipWithParent()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x10) == 0)
+	{
+		if ((global.framecounter.low & 0x02) == 0)
+		{
+			DrawObject()
+		}
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x05ec36)
+function void fn05ec36()
+{
+	UnloadObject()
+}
+
+
+
+// Some other object
+
+//# address-hook(0x05ec3c) end(0x05ec4c)
+function void fn05ec3c()
+{
+	setupObjectAttributesBasic(0x0600f8)
+	objA0.update_address = 0x05ec4e
+	fn05ec00()
+}
+
+
+//# address-hook(0x05ec4e) end(0x05ec88)
+function void fn05ec4e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0 = u16(u8[A1 + 0x22] - 1) * 2
+	objA0.value42 = u16[0x05ec8e + D0.s16]
+	MoveAndFlipWithParent()
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x10)
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.animation.sprite = (global.framecounter.low & 0x02) ? 0x17 : 0x16
+	DrawObject()
+}
+
+
+
+// Small characters on Tornado
+
+//# address-hook(0x05ecb4) end(0x05ed0c)
+function void fn05ecb4()
+{
+	setupObjectAttributesFull(0x0600e6)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A0 + 0x0a] = (u8[A0 + 0x0a] & ~0x80) | (u8[A1 + 0x0a] & 0x80)
+	if ((u8[A1 + 0x04] & 0x04) == 0)
+	{
+		objA0.render_flags &= ~0x04
+	}
+
+	objA0.update_address = 0x05ed18
+	u16 offset = global.characters
+	if ((global.characters == CHARS_KNUCKLES_ALONE) && (outro.ending_type >= 0))
+	{
+		++offset	// Knuckles with Master Emerald
+	}
+	offset *= 2
+	if (objA0.subtype2c != 0)
+	{
+		++offset
+	}
+	objA0.animation.sprite = u8[0x05ed0e + offset]
+
+#if STANDALONE
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		// Set correct colors for Knuckles
+		// TODO: This is not using custom palettes, so there's no palette effect for Hyper Knuckles
+		u16[0xfffffc04] = 0x064e
+		u16[0xfffffc06] = 0x020c
+		u16[0xfffffc08] = 0x0206
+	}
+#endif
+}
+
+
+//# address-hook(0x05ed18) end(0x05ed30)
+function void fn05ed18()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x10)
+	{
+		UnloadObject()
+		return
+	}
+
+	fn06008a()
+	MoveAndFlipWithParent()
+	DrawObject()
+}
+
+
+
+//# address-hook(0x05ef68) end(0x05efb4)
+function void fn05ef68()
+{
+	objA0.update_address = 0x05f144
+	objA0.countdown_value = 0x01ff
+	super.palettefx.state = 0
+
+	D0.u16 = (global.characters & 0x03) - 2
+	D1 = 0
+	if (D0.s16 >= 0)
+	{
+		D1.u16 += (D0.u16 == 0) ? 0x30 : 0x60
+	}
+	if (global.lock_on_state == 0)
+	{
+		D1.u16 += 0x18
+	}
+	if (outro.ending_type >= 0)
+	{
+		D1.u16 += (outro.ending_type == 0) ? 0x08 : 0x10
+	}
+
+	A1 = 0x05efb6 + D1.s16
+	A2 = u32[(A1+=4)-4]
+	objA0.countdown_callback = u32[(A1+=4)-4]
+	call A2
+}
+
+
+
+//# address-hook(0x05f0a6) end(0x05f0c2)
+function void fn05f0a6()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f480
+	}
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f20a
+	}
+}
+
+
+//# address-hook(0x05f0c4) end(0x05f0d8)
+function void fn05f0c4()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f20a
+		u8[A1 + 0x2c] = 0x08
+	}
+}
+
+
+//# address-hook(0x05f0da) end(0x05f0e0)
+function void fn05f0da()
+{
+	global.game_mode = 0
+}
+
+
+
+// Final screen for best ending (Knuckles)
+
+//# address-hook(0x05f116) end(0x05f124)
+function void fn05f116()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05fd5a
+	}
+}
+
+
+
+//# address-hook(0x05f126) end(0x05f142)
+function void fn05f126()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f71e
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f8c6
+	}
+}
+
+
+//# address-hook(0x05f144) end(0x05f188)
+function void fn05f144()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		if (objA0.countdown_value == 0x40)
+		{
+			u8[0xfffffab8] |= 0x04
+		}
+	}
+	else
+	{
+		objA0.update_address = 0x05f18a
+		u8[0xfffff650] = 0xff
+
+		if (allocDynamicObjectStd())
+		{
+			u16[A0 + 0x44] = A1.u16
+			objA1.update_address = 0x08554e
+			u16[A1 + 0x3a] = 0x05
+			u16[A1 + 0x3c] = 0x3f
+			u16[A1 + 0x30] = 0xfc00
+		}
+	}
+}
+
+
+
+// Used by all characters
+
+//# address-hook(0x05f18a) end(0x05f1a8)
+function void fn05f18a()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+		return
+
+	objA0.update_address = 0x05f1aa
+	u8[0xfffffab8] |= 0x08
+
+	A1 = objA0.countdown_callback
+	call A1
+}
+
+
+//# address-hook(0x05f1aa) end(0x05f1aa)
+function void fn05f1aa()
+{
+}
+
+
+
+// Knuckles?
+
+//# address-hook(0x05f480) end(0x05f4e2)
+function void fn05f480()
+{
+	objA0.update_address = 0x05f4e4
+	objA0.mapping_offset = 0x060a4c
+	objA0.sprite_attributes = 0x02c1
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x40
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0x0108
+	u32[A0 + 0x30] = 0x0602ca
+
+	copyMemory(0xfffffc00, 0x060bea, 0x20)
+
+	if (outro.ending_type > 0)
+	{
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x05fba0
+		}
+	}
+}
+
+
+//# address-hook(0x05f4e4) end(0x05f4f4)
+function void fn05f4e4()
+{
+	if (u8[0xfffffab8] & 0x08)
+	{
+		Object.TriggerUnloading()
+	}
+	else
+	{
+		Object.AnimationProgressByLocalA1()
+		DrawObject()
+	}
+}
+
+
+
+// Mecha Sonic rising again (after fade out in Knuckles' bad ending)
+
+//# address-hook(0x05f71e) end(0x05f738)
+function void fn05f71e()
+{
+	// Targets:
+	//  - 0x05f74e	-> objA0.base_state = 0x00
+	//  - 0x05f7cc	-> objA0.base_state = 0x02
+	//  - 0x05f802	-> objA0.base_state = 0x04
+	//  - 0x05f82c	-> objA0.base_state = 0x06
+	//  - 0x05f82c	-> objA0.base_state = 0x08
+	//  - 0x05f85a	-> objA0.base_state = 0x0a
+	//  - 0x05f82c	-> objA0.base_state = 0x0c
+	//  - 0x05f8a8	-> objA0.base_state = 0x0e
+	call tableLookupAddress(0x05f73e, objA0.base_state)
+
+	Object.loadSpritePatterns(0x07d4d6)
+	DrawObject()
+}
+
+
+//# address-hook(0x05f74e) end(0x05f7c6)
+function void fn05f74e()
+{
+	u16[0xfffffa9a] = 0
+	A1 = 0x07d3ea
+	if (fn084fa4())
+		return
+
+	objA0.render_flags &= ~0x04
+	u8[A0 + 0x0a] |= 0x80
+	objA0.animation.sprite = 0x0f
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0xf8
+	objA0.countdown_value = 0xef
+
+	copyMemory(0xfffffca0, 0x07d850, 0x20)
+	fn05fda4()
+
+	spawnSimpleChildObjects(0x07d48c)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = 0x80
+	}
+
+	A1 = 0x07d842
+	A2 = 0xfffffade
+	u32[(A2+=4)-4] = u32[(A1+=4)-4]
+	u32[(A2+=4)-4] = u32[(A1+=4)-4]
+	u16[A2] = 0
+
+	Kosinski.addToDMAQueue(0x17f738, 0x8380)
+}
+
+
+//# address-hook(0x05f7cc) end(0x05f7fc)
+function void fn05f7cc()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		fn08598a()
+		return
+	}
+
+	objA0.base_state = 0x04
+	copyMemory(0xfffffc20, 0x07d850, 0x20)
+
+	objA0.flags38 |= 0x40
+	spawnChildObjects(0x07d492)
+}
+
+
+//# address-hook(0x05f802) end(0x05f826)
+function void fn05f802()
+{
+	if (objA0.flags38 & 0x40)
+		return
+
+	objA0.base_state = 0x06
+	objA0.animation.sprite = 0x0e
+	objA0.countdown_callback = 0x05f832
+
+	A1 = 0x07d5ef
+	fn084580()
+}
+
+
+//# address-hook(0x05f82c) end(0x05f82c)
+function void fn05f82c()
+{
+	fn08459c()
+}
+
+
+//# address-hook(0x05f832) end(0x05f846)
+function void fn05f832()
+{
+	objA0.base_state = 0x08
+	objA0.countdown_callback = 0x05f84c
+	A1 = 0x07d5f6
+	fn084580()
+}
+
+
+//# address-hook(0x05f84c) end(0x05f858)
+function void fn05f84c()
+{
+	objA0.base_state = 0x0a
+	objA0.velocity.y = -0x400
+}
+
+
+//# address-hook(0x05f85a) end(0x05f894)
+function void fn05f85a()
+{
+	MoveWithGravity20()
+	if (objA0.velocity.y < 0 || objA0.position.y.u16 < 0xc8)
+		return
+
+	objA0.base_state = 0x0c
+	objA0.position.y.u16 = 0xcc
+	objA0.countdown_callback = 0x05f89a
+	playSound(0x96)
+
+	A1 = 0x07d5ab
+	fn084580()
+}
+
+
+//# address-hook(0x05f89a) end(0x05f8a6)
+function void fn05f89a()
+{
+	objA0.base_state = 0x0e
+	objA0.countdown_value = 0x04af
+}
+
+
+//# address-hook(0x05f8a8) end(0x05f8c4)
+function void fn05f8a8()
+{
+	// Wait until someone presses Start, then reset
+	if ((control.pad1.state & CONTROL_START) == 0 && (control.pad2.state & CONTROL_START) == 0)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value >= 0)
+			return
+	}
+
+	global.game_mode = 0
+}
+
+
+
+// Master Emerald (after fade out in Knuckles' bad ending)
+
+//# address-hook(0x05f8c6) end(0x05f938)
+function void fn05f8c6()
+{
+	setupObjectAttributesFull(0x060182)
+	objA0.render_flags &= ~0x04
+	objA0.update_address = 0x05f946
+
+	A1 = 0x05f93e + objA0.subtype2c
+	objA0.position.x.u16 = u16[A1] + getScreenExtend()
+	objA0.position.y.u16 = u16[A1+2]
+
+	copyMemory(0xfffffc80, 0x060b1a, 0x20)
+
+	if (allocDynamicObjectStd())
+	{
+		u16[A0 + 0x44] = A1.u16
+		objA1.update_address = 0x0855b2
+		D0 = 0x05
+		u16[A1 + 0x3a] = D0.u16
+		u16[A1 + 0x2e] = D0.u16
+		u16[A1 + 0x3c] = 0x0f
+		u16[A1 + 0x30] = 0xfc00
+		u16[A1 + 0x32] = 0xfc80
+	}
+
+	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
+}
+
+
+//# address-hook(0x05f946) end(0x05f946)
+function void fn05f946()
+{
+	DrawObject()
+}
+
+
+
+// Final screen for best ending (Knuckles)
+
+//# address-hook(0x05fba0) end(0x05fbe0)
+function void fn05fba0()
+{
+	if (u8[0xfffff650] != 0)
+	{
+		fn05ec36()
+		return
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 0x02
+		A1 = 0x05fbe2
+		D0.u16 = u16[A0 + 0x3a] + 6
+		if (D0.u16 >= 0x3c)
+		{
+			D0 = 0
+			objA0.animation.timer = 0x0e
+		}
+		u16[A0 + 0x3a] = D0.u16
+
+		A2 = 0xfffffc04
+		u32[A2] = u32[A1 + D0.s16]
+		u16[A2 + 6] = u16[A1 + D0.s16 + 4]
+	}
+}
+
+
+
+//# address-hook(0x05fc1e) end(0x05fc24)
+function void fn05fc1e()
+{
+	objA0.value39 = 0x02
+	objA0.update_address = 0x05fc2a
+	fn05fc2a()
+}
+
+
+//# address-hook(0x05fc2a) end(0x05fc60)
+function void fn05fc2a()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_value = 0x05
+		fadeColorsToWhiteUniform(0xfffffc42, 0x0f)
+
+		--objA0.value39
+		if (s8(objA0.value39) < 0)
+		{
+			objA0.update_address = 0x05fc62
+			objA0.value39 = 0x02
+			objA0.countdown_value = 0x13
+		}
+	}
+}
+
+
+//# address-hook(0x05fc62) end(0x05fc88)
+function void fn05fc62()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_value = 0x03
+		fadeColorsTowardsTargetUniform(0xfffffc42, 0xfffffcc2, 0x0f)
+
+		--objA0.value39
+		if (s8[A0 + 0x39] < 0)
+		{
+			Object.TriggerUnloading()
+		}
+	}
+}
+
+
+
+//# address-hook(0x05fd5a) end(0x05fd60)
+function void fn05fd5a()
+{
+	objA0.update_address = 0x05fd66
+	objA0.countdown_value = 0x1f
+	fn05fd66()
+}
+
+
+//# address-hook(0x05fd66) end(0x05fd82)
+function void fn05fd66()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05f26c
+		u8[A1 + 0x2c] = 0x04
+	}
+	UnloadObject()
+}
+
+
+
+// Logo "Sonic the Hedgehog 3 & Knuckles"
+
+//# address-hook(0x05ff1c) end(0x05ff60)
+function void fn05ff1c()
+{
+	A1 += objA0.subtype2c
+	objA0.position.x.u16 = u16[(A1+=2)-2] + getScreenExtend()
+	objA0.position.y.u16 = u16[(A1+=2)-2]
+	objA0.render_flags &= ~0x04
+
+	zeroMemory(0xfffffc20, 0x20)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x05ff62
+		u16[A1 + 0x30] = 0xfc20
+		u16[A1 + 0x32] = 0xfca0
+		u16[A1 + 0x3a] = 0x0f
+	}
+}
+
+
+//# address-hook(0x05ff62) end(0x05ff68)
+function void fn05ff62()
+{
+	objA0.value39 = 0x07
+	objA0.update_address = 0x05ff6e
+	fn05ff6e()
+}
+
+
+//# address-hook(0x05ff6e) end(0x05ffa0)
+function void fn05ff6e()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.countdown_value = 3
+	A1 = 0xffff0000 + u16[A0 + 0x30]
+	D0.u16 = u16[A0 + 0x3a]
+	fadeColorsToWhiteUniform(A1, D0.u16 + 1)
+
+	--objA0.value39
+	if (s8[A0 + 0x39] < 0)
+	{
+		objA0.update_address = 0x05ffa6
+		objA0.value39 = 0x07
+		objA0.countdown_value = 0x03
+		fn05ffa6()
+	}
+}
+
+
+//# address-hook(0x05ffa6) end(0x05ffce)
+function void fn05ffa6()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.countdown_value = 3
+	A1 = 0xffff0000 + u16[A0 + 0x30]
+	A2 = 0xffff0000 + objA0.value32
+	D0.u16 = u16[A0 + 0x3a]
+	fadeColorsTowardsTargetUniform(A1, A2, u16[A0 + 0x3a] + 1)
+
+	--objA0.value39
+	if (s8[A0 + 0x39] < 0)
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x06001e) end(0x060036)
+function void fn06001e()
+{
+	objA0.value3e = 0x80
+	objA0.velocity.y = 0x80
+	u16[A0 + 0x40] = 0x08
+	objA0.flags38 &= ~0x01
+}
+
+
+
+//# address-hook(0x086458) end(0x08648a)
+function void fn086458()
+{
+	A2 = A0 + 0x18
+	D0.u16 = u16[A0 + 0x16] - 1
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+
+	while (D0.s16 >= 0)
+	{
+		D1.s16 = s8[A1]
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D1.s16 = -D1.s16
+		}
+		u16[A2]   = D2.u16 + D1.s16
+		u16[A2+2] = D3.u16 + s8[A1+1]
+		A1 += 2
+		A2 += 6
+
+		--D0.s16
+	}
+}
+
+
+
+// Some object, looks like some kind of fade out
+
+//# address-hook(0x08554e) end(0x08555a)
+function void fn08554e()
+{
+	objA0.update_address = 0x08555e
+	objA0.value39 = 0x07
+	u8[0xfffffabf] = 0xff
+	fn08555e()
+}
+
+
+//# address-hook(0x08555e) end(0x08558e)
+function void fn08555e()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.countdown_value = u16[A0 + 0x3a]
+	A1 = 0xffff0000 + u16[A0 + 0x30]
+	D0.u16 = u16[A0 + 0x3c]
+	D1 = 0x0e
+	D2 = 0xffffffe0
+	while (D0.s16 >= 0)
+	{
+		fn085590()
+		--D0.s16
+	}
+
+	--objA0.value39
+	if (s8[A0 + 0x39] < 0)
+	{
+		u8[0xfffffabf] = 0
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x085590) end(0x0855b0)
+function void fn085590()
+{
+	D3.u8 = u8[A1] & D1.u8
+	if (D3.u8 != 0)
+		D3.u8 -= 2
+	u8[(A1+=1)-1] = D3.u8
+
+	D4.u8 = u8[A1]
+	D3.u8 = u8[A1] & D2.u8
+	if (D3.u8 != 0)
+		D3.u8 -= 0x20
+
+	D4.u8 &= D1.u8
+	if (D4.u8 != 0)
+		D4.u8 -= 2
+	D4.u8 |= D3.u8
+
+	u8[(A1+=1)-1] = D4.u8
+}
+
+
+
+//# address-hook(0x05fda4) end(0x05fdd2)
+function void fn05fda4()
+{
+	if (allocDynamicObjectStd())
+	{
+		u16[A0 + 0x44] = A1.u16
+		objA1.update_address = 0x0855b2
+		D0 = 5
+		u16[A1 + 0x3a] = D0.u16
+		u16[A1 + 0x2e] = D0.u16
+		u16[A1 + 0x3c] = 0x0f
+		u16[A1 + 0x30] = 0xfc20
+		u16[A1 + 0x32] = 0xfca0
+	}
+}

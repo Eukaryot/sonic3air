@@ -1,0 +1,306 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Sandworm enemy from SOZ                               //
+//-------------------------------------------------------//
+
+//# address-hook(0x08ea66) end(0x08ea66)
+function void fn08ea66()
+{
+	Object.InitWithUpdateAddress(0x08ea6c)
+}
+
+
+//# address-hook(0x08ea6c) end(0x08ea7a)
+function void fn08ea6c()
+{
+	// Targets:
+	//  - 0x08ea88	-> objA0.base_state = 0x00
+	//  - 0x08eacc	-> objA0.base_state = 0x02
+	//  - 0x08eb2e	-> objA0.base_state = 0x04
+	//  - 0x08eacc	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x08ea80, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08ea88) end(0x08eaa4)
+function void fn08ea88()
+{
+	setupObjectAttributesFull(0x08ed44)
+
+	objA0.flags38 |= 0x80
+	u32[A0 + 0x30] = 0x08ed8c
+
+	spawnSimpleChildObjects(0x08ed66)
+
+	fn08eaaa()
+}
+
+
+//# address-hook(0x08eaaa) end(0x08eac6)
+function void fn08eaaa()
+{
+	objA0.countdown_value = 0x7f
+	objA0.countdown_callback = 0x08ead2
+	if (objA0.flags38 & 0x80)
+	{
+		A2 = 0x08ed6c
+		SpawnIdenticalChildObjects()
+	}
+}
+
+
+//# address-hook(0x08eacc) end(0x08eacc)
+function void fn08eacc()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08ead2) end(0x08eb28)
+function void fn08ead2()
+{
+	objA0.base_state = 0x04
+	u8[A0 + 0x28] = 0x8b - (objA0.flags38 & 0x80)	// All parts except head count as threat
+	u16[A0 + 0x3a] = objA0.position.y.u16
+
+	D0 = -0x60
+	D1.u16 = -0x200
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.s16 = -D0.s16
+		D1.s16 = -D1.s16
+	}
+	objA0.position.x.u16 += D0.u16
+	objA0.velocity.x = D1.u16
+	objA0.velocity.y = -0x400
+
+	if (objA0.flags38 & 0x80)
+	{
+		playSound(0x6c)
+
+		spawnChildObjects(0x08ed74)
+	}
+}
+
+
+//# address-hook(0x08eb2e) end(0x08eb78)
+function void fn08eb2e()
+{
+	Object.AnimationProgressByLocalA1()
+	MoveWithGravity20()
+
+	D0.u16 = u16[A0 + 0x3a]
+	if (D0.u16 > objA0.position.y.u16)
+		return
+
+	objA0.base_state = 0x06
+	u8[A0 + 0x28] = 0
+	objA0.position.y.u16 = D0.u16
+	objA0.countdown_value = 0x3f
+	objA0.countdown_callback = 0x08eb7e
+
+	if (objA0.flags38 & 0x80)
+	{
+		playSound(0x6c)
+		spawnChildObjects(0x08ed74)
+	}
+}
+
+
+//# address-hook(0x08eb7e) end(0x08eb8a)
+function void fn08eb7e()
+{
+	objA0.base_state = 0x02
+	objA0.render_flags ^= 0x01
+	fn08eaaa()
+}
+
+
+//# address-hook(0x08eb8e) end(0x08eb9e)
+function void fn08eb8e()
+{
+	// Targets:
+	//  - 0x08ebac	-> objA0.base_state = 0x00
+	//  - 0x08eacc	-> objA0.base_state = 0x02
+	//  - 0x08eb2e	-> objA0.base_state = 0x04
+	//  - 0x08eacc	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x08eba4, objA0.base_state)
+
+	D0 = 0
+	fn084a04()
+}
+
+
+//# address-hook(0x08ebac) end(0x08ebe0)
+function void fn08ebac()
+{
+	setupObjectAttributesBasic(0x08ed60)
+
+	u32[A0 + 0x30] = 0x08ed90
+	fn084b82()
+
+	objA0.countdown_value = (objA0.subtype2c * 3) + 5
+	objA0.countdown_callback = 0x08eaaa
+}
+
+
+//# address-hook(0x08ebe2) end(0x08ec1c)
+function void fn08ebe2()
+{
+	setupObjectAttributesMost(0x08ed50)
+
+	objA0.update_address = 0x08ec1c
+	objA0.countdown_callback = 0x08ec22
+
+	D0 = objA0.subtype2c * 4
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x04] & 0x01) == 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.position.x.u16 += D0.u16
+
+	objA0.countdown_value =objA0.subtype2c * 4 - 1
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08ec1c)
+function void fn08ec1c()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08ec22) end(0x08ec44)
+function void fn08ec22()
+{
+	objA0.update_address = 0x08ec46
+	u32[A0 + 0x30] = 0x08ed88
+	objA0.velocity.y = -0x80
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x08ec5e
+}
+
+
+//# address-hook(0x08ec46) end(0x08ec58)
+function void fn08ec46()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+	DrawObject()
+}
+
+
+//# address-hook(0x08ec5e) end(0x08ec72)
+function void fn08ec5e()
+{
+	objA0.velocity.y = 0x40
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+}
+
+
+
+// Sand splash
+
+//# address-hook(0x08ec74) end(0x08ec82)
+function void fn08ec74()
+{
+	// Targets:
+	//  - 0x08ec92	-> objA0.base_state = 0x00
+	//  - 0x08ecb0	-> objA0.base_state = 0x02
+	//  - 0x08ecda	-> objA0.base_state = 0x04
+	//  - 0x08ed02	-> objA0.base_state = 0x06
+	//  - 0x08ed3e	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x08ec88, objA0.base_state)
+
+	DrawObject()
+}
+
+
+//# address-hook(0x08ec92) end(0x08ecb0)
+function void fn08ec92()
+{
+	setupObjectAttributesMost(0x08ed58)
+
+	objA0.countdown_value = objA0.subtype2c * 2
+	objA0.countdown_callback = 0x08ecb6
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08ecb0) end(0x08ecb0)
+function void fn08ecb0()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08ecb6) end(0x08ecd8)
+function void fn08ecb6()
+{
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x08ed94
+	objA0.velocity.y = -0x400
+	objA0.countdown_value = 0x07
+	objA0.countdown_callback = 0x08ecec
+}
+
+
+//# address-hook(0x08ecda) end(0x08ece6)
+function void fn08ecda()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08ecec) end(0x08ed00)
+function void fn08ecec()
+{
+	objA0.base_state = 0x06
+	objA0.countdown_value = 0x17
+	objA0.countdown_callback = 0x08ed1e
+}
+
+
+//# address-hook(0x08ed02) end(0x08ed18)
+function void fn08ed02()
+{
+	D0 = (objA0.value2f & 0x01) ? 8 : -8
+	objA0.position.y.u16 += D0.u16
+	Object.AnimationProgressByLocalA1()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08ed1e) end(0x08ed3c)
+function void fn08ed1e()
+{
+	objA0.base_state = 0x08
+	objA0.animation.timer = 0
+	objA0.animation.frame = 0
+	u32[A0 + 0x30] = 0x08ed98
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+}
+
+
+//# address-hook(0x08ed3e) end(0x08ed3e)
+function void fn08ed3e()
+{
+	fn08459c()
+}

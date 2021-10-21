@@ -1,0 +1,4 @@
+{
+	"enemy_aiz_rhinobot_0x01": { "File": "_atlas.bmp", "Rect": "0,0,40,32", "Center": "20,16" },
+	"enemy_aiz_rhinobot_0x02": { "File": "_atlas.bmp", "Rect": "48,0,24,32", "Center": "12,16" }
+}

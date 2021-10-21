@@ -1,0 +1,27 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+// This file may only be included if STANDALONE preprocessor definition is not set
+#if !STANDALONE
+	COMPILER_ERROR
+#endif
+#if !GAMEAPP
+	COMPILER_ERROR
+#endif
+
+
+//-------------------------------------------------------//
+// Deprecated functions formerly implemented natively    //
+//-------------------------------------------------------//
+
+function bool Game.isEnduserBuild()
+{
+	// There's no differentiation between end-user and development builds any more
+	return true
+}

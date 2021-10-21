@@ -1,0 +1,210 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Sparkle enemy in CNZ                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x089198) end(0x089198)
+function void fn089198()
+{
+	Object.InitWithUpdateAddress(0x08919e)
+}
+
+
+//# address-hook(0x08919e) end(0x0891ac)
+function void fn08919e()
+{
+	// Targets:
+	//  - 0x0891ba	-> objA0.base_state = 0x00
+	//  - 0x0891c2	-> objA0.base_state = 0x02
+	//  - 0x0891ee	-> objA0.base_state = 0x04
+	//  - 0x08920e	-> objA0.base_state = 0x06
+	//  - 0x08920e	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x0891b0, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x0891ba) end(0x0891be)
+function void fn0891ba()
+{
+	setupObjectAttributesFull(0x08933a)
+}
+
+
+//# address-hook(0x0891ee) end(0x0891ee)
+function void fn0891ee()
+{
+	fn084700()
+}
+
+
+//# address-hook(0x08920e) end(0x08920e)
+function void fn08920e()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x0891c2) end(0x0891ec)
+function void fn0891c2()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x80)
+		return
+
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x089362
+	objA0.countdown_callback = 0x0891f2
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+}
+
+
+//# address-hook(0x0891f2) end(0x08920a)
+function void fn0891f2()
+{
+	objA0.base_state = 0x06
+	objA0.countdown_value = 0x04
+	objA0.countdown_callback = 0x089212
+
+	spawnChildObjects(0x089352)
+}
+
+
+//# address-hook(0x089212) end(0x08924a)
+function void fn089212()
+{
+	objA0.base_state = 0x08
+	objA0.render_flags ^= 0x02
+	objA0.position.y.u16 += (objA0.render_flags & render_flag.FLIP_Y) ? -0x68 : 0x68
+
+	objA0.countdown_value = 0x20
+	objA0.countdown_callback = 0x08924e
+	playSound(0x79)
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		A2 = 0x08935a
+		SpawnIdenticalChildObjects()
+	}
+}
+
+
+//# address-hook(0x08924e) end(0x089254)
+function void fn08924e()
+{
+	objA0.base_state = 0x02
+}
+
+
+//# address-hook(0x089256) end(0x089264)
+function void fn089256()
+{
+	// Targets:
+	//  - 0x08926c	-> objA0.base_state = 0x00
+	//  - 0x089298	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x089268, objA0.base_state)
+
+	fn084934()
+}
+
+
+//# address-hook(0x08926c) end(0x089296)
+function void fn08926c()
+{
+	setupObjectAttributesBasic(0x089346)
+	objA0.flags2b |= 0x20
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0 = 0x34
+	if ((u8[A1 + 0x04] & 0x02) == 0)
+		D0.s16 = -D0.s16
+	objA0.position.y.u16 += D0.u16
+}
+
+
+//# address-hook(0x089298) end(0x08929c)
+function void fn089298()
+{
+	Object.animationProgress(0x089367)
+}
+
+
+//# address-hook(0x0892a0) end(0x0892ae)
+function void fn0892a0()
+{
+	// Targets:
+	//  - 0x0892b8	-> objA0.base_state = 0x00
+	//  - 0x0892ee	-> objA0.base_state = 0x02
+	//  - 0x089334	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x0892b2, objA0.base_state)
+
+	fn085180()
+}
+
+
+//# address-hook(0x0892b8) end(0x0892ec)
+function void fn0892b8()
+{
+	setupObjectAttributesBasic(0x08934c)
+
+	objA0.flags2b |= 0x20
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+
+	D0.u16 = 0x0600
+	if ((u8[A1 + 0x04] & 0x02) == 0)
+		D0.s16 = -D0.s16
+	objA0.velocity.y = D0.u16
+
+	D0.u16 = 0x0600
+	if (objA0.subtype2c == 0)
+		D0.s16 = -D0.s16
+	objA0.velocity.x = D0.u16
+}
+
+
+//# address-hook(0x0892ee) end(0x08932e)
+function void fn0892ee()
+{
+	Object.animationProgress(0x089372)
+
+	D0 = 0x40
+	D1.u16 = objA0.velocity.x
+	if (D1.s16 >= 0)
+		D0.s16 = -D0.s16
+	D1.u16 += D0.u16
+
+	if (D1.s16 >= -0x0100 && D1.s16 <= 0x0100)
+	{
+		objA0.base_state = 0x04
+	}
+	else
+	{
+		objA0.velocity.x = D1.u16
+		D0 = 0x40
+		D1.u16 = objA0.velocity.y
+		if (D1.s16 >= 0)
+			D0.s16 = -D0.s16
+		D1.u16 += D0.u16
+		objA0.velocity.y = D1.u16
+	}
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x089334) end(0x089334)
+function void fn089334()
+{
+	UpdateMovementStraightSimple()
+}

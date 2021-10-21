@@ -1,0 +1,240 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x040546) end(0x0405d0)
+function void fn040546()
+{
+	objA0.mapping_offset = 0x040776
+	objA0.sprite_attributes = 0x4455
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x0c
+	objA0.hitbox_extends.y = 0x0b
+	objA0.sprite_priority = 0x0280
+
+	D0 = (objA0.subtype2c & 0x1f) * 4
+	A1 = u32[0x1e3fd8 + D0.s16]
+	u16[A0 + 0x3a] = u16[(A1+=2)-2]
+	u32[A0 + 0x36] = A1
+	if (s8[A0 + 0x2c] < 0)
+	{
+		u16[0xfffff7c4] = A0.u16
+		objA0.update_address = 0x0405d6
+		fn0405d6()
+	}
+	else
+	{
+		objA0.update_address = 0x0405aa
+		fn0405aa()
+	}
+}
+
+
+//# address-hook(0x0405aa)
+function void fn0405aa()
+{
+	u8[A0 + 0x30] = u8[0xffffb02a]
+	u8[A0 + 0x31] = u8[0xffffb074]
+	D1.u16 = 0x1b
+	D2.u16 = 0x0c
+	D3.u16 = 0x0d
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	fn0406b4()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0405d6) end(0x0405d6)
+function void fn0405d6()
+{
+	fn0405aa()
+}
+
+
+//# address-hook(0x0405d8) end(0x040638)
+function void fn0405d8()
+{
+	// Rock is falling
+
+	u16 backup_px = objA0.position.x.u16
+	UpdateMovementSimple()
+	D4.u16 = backup_px
+	D0.u16 = move_area.bottom.current + 0x0120
+	if (D0.s16 <= s16(objA0.position.y.u16))
+	{
+		D4.u16 = 0x7f00
+		objA0.position.x.u16 = D4.u16
+	}
+
+	D0.u16 = u16[A0 + 0x3a]
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+		objA0.velocity.y = 0
+		A1 = u32[A0 + 0x36]
+		D0.u16 = u16[(A1+=2)-2]
+		if (D0.s16 < 0)
+		{
+			objA0.update_address = 0x0406ae
+		}
+		else
+		{
+			u16[A0 + 0x3a] = D0.u16
+			u32[A0 + 0x36] = A1
+			objA0.update_address = 0x040654
+			objA0.velocity.x = 0x0100
+			if (D0.u16 < objA0.position.x.u16)
+			{
+				objA0.velocity.x = -objA0.velocity.x
+			}
+		}
+	}
+
+	fn04063c()
+}
+
+
+//# address-hook(0x04063c) end(0x04064e)
+function void fn04063c()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x0c
+	D3.u16 = 0x0d
+	fn01dc56()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x040654) end(0x0406ac)
+function void fn040654()
+{
+	// Rock is transported
+
+	u16 backup_px = objA0.position.x.u16
+	UpdateMovementStraightSimple()
+	D4.u16 = backup_px
+
+	if ((level.framecounter.low & 0x1f) == 0)
+	{
+		playSound(0x55)
+	}
+
+	bool check = false
+	if (objA0.velocity.x >= 0)
+	{
+		check = (u16[A0 + 0x3a] <= objA0.position.x.u16)
+	}
+	else
+	{
+		check = (u16[A0 + 0x3a] >= objA0.position.x.u16)
+	}
+
+	if (check)
+	{
+		A1 = u32[A0 + 0x36]
+		D0.u16 = u16[(A1+=2)-2]
+		if (D0.s16 < 0)
+		{
+			objA0.update_address = 0x0406ae
+		}
+		else
+		{
+			u16[A0 + 0x3a] = D0.u16
+			u32[A0 + 0x36] = A1
+			objA0.update_address = 0x0405d8
+		}
+	}
+
+	fn04063c()
+}
+
+
+//# address-hook(0x0406ae) end(0x0406b2)
+function void fn0406ae()
+{
+	// Rock is stopped by a wall
+
+	D4.u16 = objA0.position.x.u16
+	fn04063c()
+}
+
+
+//# address-hook(0x0406b4) end(0x0406e2)
+function void fn0406b4()
+{
+	D5 = 0
+	D3.u8 = objA0.flags2a & 0x60
+
+	if (D3.u8 != 0)
+	{
+		D2.u16 = objA0.position.x.u16
+
+		A1 = 0xffffb000
+		D0.u8 = u8[A0 + 0x30]
+		D6 = 5
+		fn0406e4()
+
+		if (D5.u16 == 0)
+		{
+			A1 = 0xffffb04a
+			D0.u8 = u8[A0 + 0x31]
+			D6 = 6
+			fn0406e4()
+		}
+	}
+}
+
+
+//# address-hook(0x0406e4) end(0x04076c)
+//# translated(0x04076e) end(0x040770)
+function void fn0406e4()
+{
+	if ((D3 & (1 << D6)) == 0)
+		return
+
+	if ((D0 & 0x20) == 0)
+		return
+
+	s8 sign = (D2.u16 < objA1.position.x.u16) ? -1 : 1
+
+	--objA0.value32
+	if (s16(objA0.value32) < 0)
+	{
+		objA0.value32 = 4
+	#if STANDALONE
+		// Tweak: Gotta push fast! (Except for rolling demo, as this would break the SOZ one)
+		if (Game.getSetting(SETTING_FASTER_PUSH) && !global.rolling_demo)
+		{
+			// ...and even faster when spindashing
+			objA0.value32 = (u8[A1 + 0x3d] != 0) ? 0 : 1
+		}
+	#endif
+
+		objA0.position.x.u16 += sign
+		objA1.position.x.u16 += sign
+		playSound(0x69)
+
+		D3.u16 = objA0.position.x.u16 - sign * 0x10
+		CheckGroundCollisionFixedX()
+
+		if (D1.s16 > 0x0e)
+		{
+			objA0.flags2a |= 0x02
+			objA0.update_address = 0x0405d8
+		}
+		else
+		{
+			objA0.position.y.u16 += D1.u16
+		}
+	}
+	D5 = 1
+}

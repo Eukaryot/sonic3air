@@ -1,0 +1,145 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+function void LevelRingsTableBuilder.buildRings()
+{
+	u32 originalA1 = A1
+	A1 = 0x814000
+
+	// Load rings from a custom binary file
+	u32 bytes = Standalone.loadRawLevelData("%s_rings", global.zone_act, A1)
+	bool loadedCustomData = (bytes != 0)
+
+	if (!loadedCustomData)
+	{
+		// Load rings from hard-coded scripts
+		if (global.zone_act == 0x0000)
+		{
+			LevelRingsTableBuilder.buildRings_AIZ1()
+		}
+		else if (global.zone_act == 0x0001)
+		{
+			LevelRingsTableBuilder.buildRings_AIZ2()
+		}
+		else if (global.zone_act == 0x0100)
+		{
+			LevelRingsTableBuilder.buildRings_HCZ1()
+		}
+		else if (global.zone_act == 0x0101)
+		{
+			LevelRingsTableBuilder.buildRings_HCZ2()
+		}
+		else if (global.zone_act == 0x0200)
+		{
+			LevelRingsTableBuilder.buildRings_MGZ1()
+		}
+		else if (global.zone_act == 0x0201)
+		{
+			LevelRingsTableBuilder.buildRings_MGZ2()
+		}
+		else if (global.zone_act == 0x0300)
+		{
+			LevelRingsTableBuilder.buildRings_CNZ1()
+		}
+		else if (global.zone_act == 0x0301)
+		{
+			LevelRingsTableBuilder.buildRings_CNZ2()
+		}
+		else if (global.zone_act == 0x0400)
+		{
+			LevelRingsTableBuilder.buildRings_FBZ1()
+		}
+		else if (global.zone_act == 0x0401)
+		{
+			LevelRingsTableBuilder.buildRings_FBZ2()
+		}
+		else if (global.zone_act == 0x0500)
+		{
+			LevelRingsTableBuilder.buildRings_ICZ1()
+		}
+		else if (global.zone_act == 0x0501)
+		{
+			LevelRingsTableBuilder.buildRings_ICZ2()
+		}
+		else if (global.zone_act == 0x0600)
+		{
+			LevelRingsTableBuilder.buildRings_LBZ1()
+		}
+		else if (global.zone_act == 0x0601)
+		{
+			LevelRingsTableBuilder.buildRings_LBZ2()
+		}
+		else if (global.zone_act == 0x0700)
+		{
+			LevelRingsTableBuilder.buildRings_MHZ1()
+		}
+		else if (global.zone_act == 0x0701)
+		{
+			LevelRingsTableBuilder.buildRings_MHZ2()
+		}
+		else if (global.zone_act == 0x0800)
+		{
+			LevelRingsTableBuilder.buildRings_SOZ1()
+		}
+		else if (global.zone_act == 0x0801)
+		{
+			LevelRingsTableBuilder.buildRings_SOZ2()
+		}
+		else if (global.zone_act == 0x0900)
+		{
+			LevelRingsTableBuilder.buildRings_LRZ1()
+		}
+		else if (global.zone_act == 0x0901)
+		{
+			LevelRingsTableBuilder.buildRings_LRZ2()
+		}
+		else if (global.zone_act == 0x0a00)
+		{
+			LevelRingsTableBuilder.buildRings_SSZ1()
+		}
+		else if (global.zone_act == 0x0a01)
+		{
+			LevelRingsTableBuilder.buildRings_SSZ2()
+		}
+		else if (global.zone_act == 0x0b00)
+		{
+			LevelRingsTableBuilder.buildRings_DEZ1()
+		}
+		else if (global.zone_act == 0x0b01)
+		{
+			LevelRingsTableBuilder.buildRings_DEZ2()
+		}
+		else if (global.zone_act == 0x1600)
+		{
+			LevelRingsTableBuilder.buildRings_LRZ3()
+		}
+		else if (global.zone_act == 0x1601)
+		{
+			LevelRingsTableBuilder.buildRings_HPZ1()
+		}
+
+		loadedCustomData = (A1 != 0x814000)
+		A1 = 0x814000
+	}
+
+	if (!loadedCustomData)
+	{
+		// Use original rings in ROM
+		A1 = originalA1
+	}
+}
+
+
+function void LevelRingsTableBuilder.addRing(u16 px, u16 py)
+{
+	u16[A1]   = px
+	u16[A1+2] = py
+	A1 += 4
+}

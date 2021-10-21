@@ -1,0 +1,125 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x048aaa) end(0x048ad0)
+function void fn048aaa()
+{
+	objA0.mapping_offset = 0x048bea
+	objA0.sprite_attributes = 0x2490
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x08
+	objA0.sprite_priority = 0x0280
+
+	objA0.update_address = 0x048ad6
+	fn048ad6()
+}
+
+
+//# address-hook(0x048ad6) end(0x048b3a)
+function void fn048ad6()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x08
+	D3.u16 = 0x09
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u16 & 0x14)
+	{
+		objA0.animation.sprite = 1
+		objA0.update_address = 0x048b7e
+		u16[A0 + 0x30] = 3
+
+		D0 = (objA0.render_flags & render_flag.FLIP_Y) ? -8 : 8		// D0 is used inside "fn048b40()"
+		objA0.position.y.u16 += D0
+
+		A1 = 0xffffb000
+		D2.u16 = D6.u16
+		D3.u16 = 0x14
+		fn048b40()
+
+		A1 = 0xffffb04a
+		D2.u16 = D6.u16
+		D3.u16 = 0x28
+		fn048b40()
+
+		playSound(0x73)
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x048b40) end(0x048b7c)
+function void fn048b40()
+{
+	if (u8[A1 + 0x2e] == 0)
+	{
+		u8[A1 + 0x20] = 0
+		u8[A1 + 0x2d] = 0
+		u8[A1 + 0x2f] = 0
+		u8[A1 + 0x40] = 0
+		u8[A1 + 0x3d] = 0
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		u16[A1 + 0x1c] = 0
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~0x08
+
+		D2.u16 &= D3.u16
+		if (D2.u16 != 0)
+		{
+			objA1.position.y.u16 += D0.u16
+		}
+	}
+}
+
+
+//# address-hook(0x048b7e) end(0x048b96)
+function void fn048b7e()
+{
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		u16[A0 + 0x30] = 0x13
+		global.inv_gravity ^= 0x01
+		objA0.update_address = 0x048b9c
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x048b9c) end(0x048be4)
+function void fn048b9c()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x08
+	D3.u16 = 0x09
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	if (objA0.flags2a & 0x08)
+	{
+		u16[A0 + 0x30] = 0
+	}
+	else
+	{
+		--u16[A0 + 0x30]
+		if (s16[A0 + 0x30] < 0)
+		{
+			objA0.animation.sprite = 0
+			objA0.position.y.u16 -= (objA0.render_flags & render_flag.FLIP_Y) ? -8 : 8
+			objA0.update_address = 0x048ad6
+		}
+	}
+	DrawOrUnloadObject()
+}

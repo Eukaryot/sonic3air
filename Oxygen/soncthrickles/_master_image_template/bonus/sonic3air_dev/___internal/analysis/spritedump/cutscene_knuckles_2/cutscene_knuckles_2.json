@@ -1,0 +1,21 @@
+{
+	"cutscene_knuckles_2_0x00": { "File": "cutscene_knuckles_2.bmp", "Rect": "0,4,40,32", "Center": "20,16" },
+	"cutscene_knuckles_2_0x01": { "File": "cutscene_knuckles_2.bmp", "Rect": "40,4,40,32", "Center": "20,16" },
+	"cutscene_knuckles_2_0x02": { "File": "cutscene_knuckles_2.bmp", "Rect": "80,4,40,32", "Center": "20,16" },
+	"cutscene_knuckles_2_0x03": { "File": "cutscene_knuckles_2.bmp", "Rect": "120,4,40,32", "Center": "20,11" },
+	"cutscene_knuckles_2_0x04": { "File": "cutscene_knuckles_2.bmp", "Rect": "160,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x05": { "File": "cutscene_knuckles_2.bmp", "Rect": "200,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x06": { "File": "cutscene_knuckles_2.bmp", "Rect": "240,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x07": { "File": "cutscene_knuckles_2.bmp", "Rect": "280,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x08": { "File": "cutscene_knuckles_2.bmp", "Rect": "320,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x09": { "File": "cutscene_knuckles_2.bmp", "Rect": "364,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0a": { "File": "cutscene_knuckles_2.bmp", "Rect": "404,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0b": { "File": "cutscene_knuckles_2.bmp", "Rect": "444,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0c": { "File": "cutscene_knuckles_2.bmp", "Rect": "484,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0d": { "File": "cutscene_knuckles_2.bmp", "Rect": "524,4,32,32", "Center": "12,12" },
+	"cutscene_knuckles_2_0x0e": { "File": "cutscene_knuckles_2.bmp", "Rect": "564,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0f": { "File": "cutscene_knuckles_2.bmp", "Rect": "604,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x10": { "File": "cutscene_knuckles_2.bmp", "Rect": "0,40,40,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x11": { "File": "cutscene_knuckles_2.bmp", "Rect": "44,40,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x12": { "File": "cutscene_knuckles_2.bmp", "Rect": "84,40,32,40", "Center": "12,20" }
+}

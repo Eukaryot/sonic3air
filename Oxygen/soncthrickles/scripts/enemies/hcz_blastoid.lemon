@@ -1,0 +1,99 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x087928) end(0x087928)
+function void fn087928()
+{
+	Object.InitWithUpdateAddress(0x08792e)
+}
+
+
+//# address-hook(0x08792e) end(0x087940)
+function void fn08792e()
+{
+	// Targets:
+	//  - 0x08794a	-> objA0.base_state = 0x00
+	//  - 0x087952	-> objA0.base_state = 0x02
+	//  - 0x087976	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x087944, objA0.base_state)
+
+	if (fn0879a8())
+		return
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08794a) end(0x08794e)
+function void fn08794a()
+{
+	setupObjectAttributesFull(0x0879e0)
+}
+
+
+//# address-hook(0x087952) end(0x087974)
+function void fn087952()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x80)
+		return
+
+	objA0.base_state = 0x04
+	u32[A0 + 0x30] = 0x087a10
+	objA0.countdown_callback = 0x0879a0
+}
+
+
+//# address-hook(0x087976) end(0x08799c)
+function void fn087976()
+{
+	fn08459c()
+	if (D2.s16 > 0 && objA0.animation.sprite == 1 && u8[A0 + 0x04] & 0x80)
+	{
+		playSound(0x4d)
+		A2 = 0x0879f8
+		SpawnProjectileChildObjectsInDir()
+	}
+}
+
+
+//# address-hook(0x0879a0) end(0x0879a6)
+function void fn0879a0()
+{
+	objA0.base_state = 0x02
+}
+
+
+//# translated(0x0879a8) end(0x0879da)
+function bool fn0879a8()
+{
+	fn085870()
+	if (_equal())
+	{
+		return false
+	}
+
+	fn0857c2()
+	if (_equal())
+	{
+		if (u8[A1 + 0x34] == 0)
+		{
+			Enemy.DamageCharacter()
+		}
+		return false
+	}
+
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	u8[A3 + D0.s16] = 0xff
+	fn085732()
+	DrawObject()
+	return true
+}

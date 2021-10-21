@@ -1,0 +1,209 @@
+/*
+*	Part of the Oxygen Engine / Sonic 3 A.I.R. software distribution.
+*	Copyright (C) 2017-2021 by Eukaryot
+*
+*	Published under the GNU GPLv3 open source software license, see license.txt
+*	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+#include "oxygen/pch.h"
+#include "oxygen/drawing/Drawer.h"
+#include "oxygen/drawing/DrawerInterface.h"
+#include "oxygen/drawing/DrawerTexture.h"
+
+
+Drawer::Drawer()
+{
+}
+
+Drawer::~Drawer()
+{
+	shutdown();
+
+	// Unregister all textures
+	for (DrawerTexture* texture : mDrawerTextures)
+	{
+		texture->mRegisteredOwner = nullptr;
+	}
+}
+
+Drawer::Type Drawer::getType() const
+{
+	return mActiveDrawer->getType();
+}
+
+void Drawer::destroyDrawer()
+{
+	SAFE_DELETE(mActiveDrawer);
+
+	// Invalidate drawer textures
+	for (DrawerTexture* texture : mDrawerTextures)
+	{
+		texture->invalidate();
+	}
+}
+
+void Drawer::shutdown()
+{
+	destroyDrawer();
+}
+
+void Drawer::createTexture(DrawerTexture& outTexture)
+{
+	RMX_ASSERT(nullptr != mActiveDrawer, "No active drawer instance created");
+	RMX_ASSERT(nullptr == outTexture.mRegisteredOwner, "Drawer texture already registered");
+	RMX_ASSERT(!outTexture.isValid(), "Drawer texture already created");
+
+	mActiveDrawer->createTexture(outTexture);
+	outTexture.mRegisteredOwner = this;
+	outTexture.mRegisteredIndex = mDrawerTextures.size();
+	mDrawerTextures.push_back(&outTexture);
+}
+
+void Drawer::setRenderTarget(DrawerTexture& texture, const Recti& rect)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetRenderTargetDrawCommands.createObject(texture, rect));
+}
+
+void Drawer::setWindowRenderTarget(const Recti& rect)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWindowRenderTargetDrawCommands.createObject(rect));
+}
+
+void Drawer::setBlendMode(DrawerBlendMode blendMode)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetBlendModeDrawCommands.createObject(blendMode));
+}
+
+void Drawer::setSamplingMode(DrawerSamplingMode samplingMode)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetSamplingModeDrawCommands.createObject(samplingMode));
+}
+
+void Drawer::setWrapMode(DrawerWrapMode wrapMode)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWrapModeDrawCommands.createObject(wrapMode));
+}
+
+void Drawer::drawRect(const Rectf& rect, const Color& color)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, color));
+}
+
+void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture));
+}
+
+void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Color& tintColor)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, tintColor));
+}
+
+void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, uv0, uv1, tintColor));
+}
+
+void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mUpscaledRectDrawCommands.createObject(rect, texture));
+}
+
+void Drawer::drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mMeshDrawCommands.createObject(triangles, texture));
+}
+
+void Drawer::drawMesh(const std::vector<DrawerMeshVertex_P2_C4>& triangles)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mMeshVertexColorDrawCommands.createObject(triangles));
+}
+
+void Drawer::drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture)
+{
+	std::vector<DrawerMeshVertex> triangles;
+	triangles.resize(6);
+	triangles[0] = quad[0];
+	triangles[1] = quad[1];
+	triangles[2] = quad[2];
+	triangles[3] = quad[2];
+	triangles[4] = quad[1];
+	triangles[5] = quad[3];
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mMeshDrawCommands.createObject(std::move(triangles), texture));
+}
+
+void Drawer::printText(Font& font, const Recti& rect, const String& text, int alignment, Color color)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, alignment, color));
+}
+
+void Drawer::printText(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, printOptions));
+}
+
+void Drawer::printText(Font& font, const Recti& rect, const WString& text, int alignment, Color color)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, alignment, color));
+}
+
+void Drawer::printText(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions)
+{
+	if (!text.empty())
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, printOptions));
+}
+
+void Drawer::pushScissor(const Recti& rect)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPushScissorDrawCommands.createObject(rect));
+}
+
+void Drawer::popScissor()
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPopScissorDrawCommands.createObject());
+}
+
+void Drawer::setupRenderWindow(SDL_Window* window)
+{
+	RMX_ASSERT(nullptr != mActiveDrawer, "No active drawer instance created");
+	mActiveDrawer->setupRenderWindow(window);
+}
+
+void Drawer::performRendering()
+{
+	RMX_ASSERT(nullptr != mActiveDrawer, "No active drawer instance created");
+	mActiveDrawer->performRendering(mDrawCollection);
+	mDrawCollection.clear();
+}
+
+void Drawer::presentScreen()
+{
+	RMX_ASSERT(nullptr != mActiveDrawer, "No active drawer instance created");
+	mActiveDrawer->presentScreen();
+}
+
+void Drawer::onDrawerCreated()
+{
+	// Recreate implementations of registered drawer textures
+	for (DrawerTexture* texture : mDrawerTextures)
+	{
+		RMX_ASSERT(!texture->isValid(), "Drawer texture already created");
+		mActiveDrawer->refreshTexture(*texture);
+	}
+}
+
+void Drawer::unregisterTexture(DrawerTexture& texture)
+{
+	// Remove by swapping with last texture
+	const size_t index = texture.mRegisteredIndex;
+	if (index + 1 < mDrawerTextures.size())
+	{
+		mDrawerTextures[index] = mDrawerTextures.back();
+		mDrawerTextures[index]->mRegisteredIndex = index;
+	}
+	mDrawerTextures.pop_back();
+}

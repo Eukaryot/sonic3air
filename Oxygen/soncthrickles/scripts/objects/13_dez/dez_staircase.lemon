@@ -1,0 +1,163 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04763e) end(0x0476e4)
+function void fn04763e()
+{
+	objA0.render_flags |= 0x04
+	D0.u16 = objA0.subtype2c & 0x07
+	if ((D0.u16 >= 4) == !(objA0.render_flags & render_flag.FLIP_Y))
+	{
+		objA0.render_flags ^= 0x01
+	}
+
+	D3 = 0x34
+	D4 = 2
+	if (objA0.flags2a & 0x01)
+	{
+		D3 = 0x3a
+		D4 = -2
+	}
+
+	D2.u16 = objA0.position.x.u16
+	A1 = A0
+	D1 = 3
+	while (true)
+	{
+		u32[A1 + 0x0c] = 0x046f7a
+		u16[A1 + 0x0a] = 0x2480
+		u8[A1 + 0x04] = objA0.render_flags
+		u16[A1 + 0x08] = 0x0180
+		u8[A1 + 0x07] = 0x10
+		u8[A1 + 0x06] = 0x10
+		u8[A1 + 0x2c] = objA0.subtype2c
+		objA1.position.x.u16 = D2.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u16[A1 + 0x44] = objA0.position.x.u16
+		u16[A1 + 0x46] = objA1.position.y.u16
+		D2.u16 += 0x20
+		u8[A1 + 0x33] = D3.u8
+		u16[A1 + 0x3e] = A0.u16
+		D3.u8 += D4.u8
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		objA1.update_address = 0x0476fe
+	}
+
+	objA0.update_address = 0x0476ea
+	fn0476ea()
+}
+
+
+//# address-hook(0x0476ea) end(0x0476fa)
+function void fn0476ea()
+{
+	// Targets:
+	//  - 0x04774a	-> (objA0.subtype2c & 0x07) = 0x00
+	//  - 0x0477c2	-> (objA0.subtype2c & 0x07) = 0x01
+	//  - 0x04774a	-> (objA0.subtype2c & 0x07) = 0x04
+	//  - 0x0477ec	-> (objA0.subtype2c & 0x07) = 0x05
+	call tableLookupAddress(0x04773a, (objA0.subtype2c & 0x07) * 2)
+
+	fn0476fe()
+}
+
+
+//# address-hook(0x0476fe) end(0x047734)
+function void fn0476fe()
+{
+	A2 = 0xffff0000 + objA0.value3e
+	D0 = u8[A0 + 0x33]
+	objA0.position.y.u16 = u16[A2 + D0.s16] + u16[A0 + 0x46]
+	D1.u16 = 0x1b
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	u8[A2 + 0x32] |= D6.u8
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x04774a) end(0x04776e)
+function void fn04774a()
+{
+	if (u16[A0 + 0x30] == 0)
+	{
+		if (u8[A0 + 0x32] & 0x30)
+		{
+			u16[A0 + 0x30] = 0x1e
+		}
+	}
+	else
+	{
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			++objA0.subtype2c
+			playSound(0xc0)
+		}
+	}
+}
+
+
+//# address-hook(0x0477c2) end(0x0477ea)
+function void fn0477c2()
+{
+	A1 = A0 + 0x34
+	if (u16[A1] != 0x80)
+	{
+		++u16[A1]
+		D1 = u32(u16[(A1+=2)-2]) << 15
+		D2 = D1
+		D1 >>= 1
+		D3 = D1
+		D3 += D2
+		D1 = (D1 << 16) + (D1 >> 16)
+		D2 = (D2 << 16) + (D2 >> 16)
+		D3 = (D3 << 16) + (D3 >> 16)
+		u16[(A1+=2)-2] = D3.u16
+		u16[(A1+=2)-2] = D2.u16
+		u16[(A1+=2)-2] = D1.u16
+	}
+}
+
+
+//# address-hook(0x0477ec) end(0x047814)
+function void fn0477ec()
+{
+	A1 = A0 + 0x34
+	if (u16[A1] != -0x80)
+	{
+		--u16[A1]
+		D1 = u32(u16[(A1+=2)-2]) << 16
+		D1.s32 >>= 1
+		D2 = D1
+		D1.s32 >>= 1
+		D3 = D1
+		D3 += D2
+		D1 = (D1 << 16) + (D1 >> 16)
+		D2 = (D2 << 16) + (D2 >> 16)
+		D3 = (D3 << 16) + (D3 >> 16)
+		u16[(A1+=2)-2] = D3.u16
+		u16[(A1+=2)-2] = D2.u16
+		u16[(A1+=2)-2] = D1.u16
+	}
+}

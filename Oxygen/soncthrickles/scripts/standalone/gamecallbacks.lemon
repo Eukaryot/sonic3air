@@ -1,0 +1,117 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Callbacks from the scripts, to do some custom stuff   //
+//-------------------------------------------------------//
+
+function void Standalone.onLevelStart()
+{
+	// Handle achievements
+	Game.setAchievementValue(ACHIEVEMENT_MGZ_GIANTRINGS, 0)
+	Game.setAchievementValue(ACHIEVEMENT_LBZ_STAY_DRY, (global.zone_act == 0x0601) ? 1 : 0)
+	Game.setAchievementValue(ACHIEVEMENT_MHZ_OPEN_MONITORS, 0)
+	Game.setAchievementValue(ACHIEVEMENT_FBZ_FREE_ANIMALS, 0)
+	Game.setAchievementValue(ACHIEVEMENT_ELECTROCUTE, 0)
+
+	if (!Game.isTimeAttack())
+	{
+		// Intentionally not using the (more deterministic) "getRandomNumber" here
+		global.level_random_base = 1 + (System.rand() % 0xff)		// Avoid the 0 value
+	}
+
+	// Set controller LEDs (for game controllers that support it) depending on ccharacter selection
+	{
+		// Player 1
+		Input.setControllerLEDs(0, getCharacterColorsForControllerLEDs(clamp(levelselect.characters - 1, 0, 2)))
+
+		// Player 2
+		if (levelselect.characters == CHARS_SONIC_AND_TAILS || levelselect.characters == 4)
+			Input.setControllerLEDs(1, getCharacterColorsForControllerLEDs(CHARACTER_TAILS))
+	}
+
+	// Call C++ function
+	Game.onLevelStart()
+}
+
+
+function void Standalone.onLevelFinished()
+{
+}
+
+
+function void Standalone.onDeath()
+{
+	Standalone.onRestartAtCheckpoint()
+}
+
+
+function void Standalone.onRestartLevel()
+{
+	Standalone.onLevelStart()
+}
+
+
+function void Standalone.onRestartAtCheckpoint()
+{
+	// Handle achievements
+	Game.setAchievementValue(ACHIEVEMENT_MGZ_GIANTRINGS, 0)
+	Game.setAchievementValue(ACHIEVEMENT_FBZ_FREE_ANIMALS, 0)
+}
+
+
+function void Standalone.onMonitorOpened()
+{
+	if (global.zone_act == 0x0700)
+	{
+		u8 count = Game.getAchievementValue(ACHIEVEMENT_MHZ_OPEN_MONITORS) + 1
+		if (count >= 18)
+		{
+			Game.setAchievementComplete(ACHIEVEMENT_MHZ_OPEN_MONITORS)
+		}
+		else
+		{
+			Game.setAchievementValue(ACHIEVEMENT_MHZ_OPEN_MONITORS, count)
+		}
+	}
+}
+
+
+function void Standalone.onGiantRingCollected()
+{
+	// Check for MGZ 1 achievement
+	if (global.zone_act == 0x0200)
+	{
+		u8 count = Game.getAchievementValue(ACHIEVEMENT_MGZ_GIANTRINGS) + 1
+		if (count >= 6)
+		{
+			Game.setAchievementComplete(ACHIEVEMENT_MGZ_GIANTRINGS)
+		}
+		else
+		{
+			Game.setAchievementValue(ACHIEVEMENT_MGZ_GIANTRINGS, count)
+		}
+	}
+}
+
+
+function void Standalone.onAnimalFreed()
+{
+	// Update achievement (except after boss defeated)
+	if (global.zone_act == 0x0400 && level.boss_encounter == 0)
+	{
+		u32 animalsFreed = Game.getAchievementValue(ACHIEVEMENT_FBZ_FREE_ANIMALS) + 1
+		Game.setAchievementValue(ACHIEVEMENT_FBZ_FREE_ANIMALS, animalsFreed)
+		if (animalsFreed >= 35)
+		{
+			Game.setAchievementComplete(ACHIEVEMENT_FBZ_FREE_ANIMALS)
+		}
+	}
+}

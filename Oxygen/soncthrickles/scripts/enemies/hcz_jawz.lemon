@@ -1,0 +1,86 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Jaws (shark enemy from HCZ)                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x0878b2) end(0x0878b2)
+function void Jawz.Init()
+{
+	Object.InitWithUpdateAddress(0x0878b8)
+}
+
+
+//# address-hook(0x0878b8) end(0x0878ca)
+function void Jawz.PostInit()
+{
+	setupObjectAttributesFull(0x087918)
+
+	objA0.update_address = 0x0878ce
+	D4.u16 = -0x200
+	fn085416()
+}
+
+
+//# address-hook(0x0878ce) end(0x08790c)
+function void Jawz.Update()
+{
+	UpdateMovementStraightSimple()
+
+	Object.animationProgress(0x087924)
+
+	D0 = u8[A0 + 0x29]
+	if (D0.u8 == 0)
+	{
+		Enemy.DrawOrUnload()
+		return
+	}
+
+	A1 = 0xffff0000 + u16[0x087910 + D0.s16 * 2]
+	fn0857c2()
+	if (_equal())
+	{
+		spawnChildObjects(0x06bdb2)
+		Object.TriggerUnloading()
+	}
+	else
+	{
+		u16[A0 + 0x44] = A1.u16
+		fn085732()
+		DrawObject()
+	}
+}
+
+
+
+// Explosion (somehow different from the other badniks?)
+
+//# address-hook(0x06b77c) end(0x06b79c)
+function void fn06b77c()
+{
+	setupObjectAttributesFull(0x06bd66)
+	objA0.update_address = 0x06b7a2
+	u32[A0 + 0x30] = 0x06bf02
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x06b7a2) end(0x06b7b6)
+function void fn06b7a2()
+{
+	Object.AnimationProgressByLocalA1()
+	if (objA0.animation.sprite < 3)
+	{
+		AddAsDynamicObject()
+	}
+	DrawObject()
+}

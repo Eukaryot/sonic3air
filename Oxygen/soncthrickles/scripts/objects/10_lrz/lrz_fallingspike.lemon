@@ -1,0 +1,76 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Spike falling from the ceiling when getting near it   //
+//-------------------------------------------------------//
+
+//# address-hook(0x04285a) end(0x042892)
+function void fn04285a()
+{
+	objA0.mapping_offset = 0x042920
+	objA0.sprite_attributes = 0x43a1
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.hitbox_extends.y = 0x0c
+	objA0.sprite_priority = 0x0280
+	u8[A0 + 0x28] = 0x82
+	objA0.value2f = objA0.subtype2c
+
+	objA0.update_address = 0x042898
+	fn042898()
+}
+
+
+//# address-hook(0x042898) end(0x0428d0)
+function void fn042898()
+{
+	A1 = 0xffffb000
+	D0.u16 = abs(objA0.position.x.u16 - objA1.position.x.u16)
+
+	A2 = 0xffffb04a
+	D1.u16 = abs(objA0.position.x.u16 - u16[A2 + 0x10])
+
+	D0.u16 = min(D0.u16, D1.u16)
+	if (D0.u16 < objA0.countdown_value && debug_mode.state == 0)
+	{
+		objA0.update_address = 0x0428d6
+	}
+	fn01b662()
+}
+
+
+//# address-hook(0x0428d6) end(0x0428fe)
+function void fn0428d6()
+{
+	UpdateMovementSimple()
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 += D1.u16
+		u8[A0 + 0x28] = 0
+		objA0.update_address = 0x042904
+		playSound(0x98)
+	}
+	fn01b662()
+}
+
+
+//# address-hook(0x042904) end(0x04291a)
+function void fn042904()
+{
+	D1.u16 = 0x13
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}

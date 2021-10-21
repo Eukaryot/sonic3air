@@ -1,0 +1,71 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Pointdexter (blow fish enemy from HCZ)                //
+//-------------------------------------------------------//
+
+//# address-hook(0x08827c) end(0x08827c)
+function void Pointdexter.Init()
+{
+	Object.InitWithUpdateAddress(0x088282)
+}
+
+
+//# address-hook(0x088282) end(0x088290)
+function void Pointdexter.BaseUpdate()
+{
+	// Targets:
+	//  - 0x088298	-> objA0.base_state = 0x00
+	//  - 0x0882e6	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x088294, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x088298) end(0x0882e4)
+function void fn088298()
+{
+	setupObjectAttributesFull(0x088320)
+
+	u32[A0 + 0x30] = 0x08832c
+	objA0.countdown_value = objA0.subtype2c * 4
+	u16[A0 + 0x3a] = objA0.subtype2c * 8
+	objA0.countdown_callback = 0x08830e
+
+	D4.u16 = -0x40
+	fn085416()
+
+	objA0.value3e = 0x20
+	objA0.velocity.y = 0x20
+	u16[A0 + 0x40] = 0x01
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x0882e6) end(0x08830c)
+function void fn0882e6()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08459c()
+	Object.CountdownAndTrigger()
+	u8[A0 + 0x28] = (objA0.animation.sprite == 2) ? 0x86 : 0x0a
+}
+
+
+//# address-hook(0x08830e) end(0x08831e)
+function void fn08830e()
+{
+	objA0.velocity.x = -objA0.velocity.x
+	objA0.render_flags ^= 0x01
+	objA0.countdown_value = u16[A0 + 0x3a]
+}

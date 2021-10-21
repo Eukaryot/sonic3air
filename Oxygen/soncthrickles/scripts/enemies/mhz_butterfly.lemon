@@ -1,0 +1,62 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Butterfly enemy from MHZ                              //
+//-------------------------------------------------------//
+
+//# address-hook(0x08e09e) end(0x08e09e)
+function void Butterfly.Init()
+{
+	Object.InitWithUpdateAddress(0x08e0a4)
+}
+
+
+//# address-hook(0x08e0a4) end(0x08e0bc)
+function void Butterfly.Update()
+{
+	// Targets:
+	//  - 0x08e0c6	-> objA0.base_state = 0x00
+	//  - 0x08e0da	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x08e0c2, objA0.base_state)
+
+	Object.loadSpritePatterns(0x08e11c)
+	fn085208()
+}
+
+
+//# address-hook(0x08e0c6) end(0x08e0d8)
+function void fn08e0c6()
+{
+	A1 = 0x08e10a
+	if (fn084fa4())
+		return
+
+	u32[A0 + 0x30] = 0x08e124
+}
+
+
+//# address-hook(0x08e0da) end(0x08e104)
+function void fn08e0da()
+{
+	CheckDistanceToPlayers()
+
+	if (D0.u16 != 0)
+		objA0.render_flags |= render_flag.FLIP_X
+	else
+		objA0.render_flags &= ~render_flag.FLIP_X
+
+	D0.u16 = 0x0100
+	D1.u16 = 4
+	fn085436()
+
+	UpdateMovementStraightSimple()
+	Object.AnimationProgressByLocalA1()
+}

@@ -1,0 +1,256 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Knuckles in cutscenes                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x061d4c) end(0x061d5c)
+function void fn061d4c()
+{
+	u16[0xfffffaa4] = A0.u16
+
+	// Targets:
+	//  - 0x061d92	-> objA0.subtype2c = 0x00	-> Knuckles cutscene as part of Sonic's AIZ 1 intro
+	//  - 0x061f98	-> objA0.subtype2c = 0x04	-> Knuckles cutscene in AIZ 2 (after boss)
+	//  - 0x062112	-> objA0.subtype2c = 0x08	-> Knuckles cutscene in HCZ 2
+	//  - 0x06229e	-> objA0.subtype2c = 0x0c	-> Knuckles cutscene in CNZ 2 (midway)
+	//  - 0x0624de	-> objA0.subtype2c = 0x10	-> Knuckles cutscene in CNZ 2 (before boss)
+	//  - 0x062640	-> objA0.subtype2c = 0x14	-> Knuckles cutscene in LBZ 1
+	//  - 0x0628aa	-> objA0.subtype2c = 0x18	-> Knuckles cutscene in LBZ 2 (before boss)
+	//  - 0x062b3a	-> objA0.subtype2c = 0x1c	-> Knuckles cutscene in MHZ 1
+	//  - 0x0630e0	-> objA0.subtype2c = 0x20	-> Knuckles cutscene in MHZ 2
+	//  - 0x063a6a	-> objA0.subtype2c = 0x24	-> Knuckles cutscene in LRZ 2
+	//  - 0x063cfc	-> objA0.subtype2c = 0x28	-> Knuckles cutscene in HPZ
+	//  - 0x0656da	-> objA0.subtype2c = 0x2c	-> Knuckles cutscene in SSZ (S/T version)
+	//  - 0x063446	-> objA0.subtype2c = 0x30	-> Knuckles's MHZ 1 intro cutscene (in Sonic & Knuckles alone)
+
+	A1 = u32[0x061d5e + objA0.subtype2c]
+	objA0.update_address = A1
+	call A1
+}
+
+
+function void CutsceneKnuckles.loadPalette()
+{
+	loadPaletteLine1(0x066912)
+
+	// When using EXTENDED_CHARACTER_PALETTES:
+	//  - the (potentially modded) Knuckles palette gets used instead
+	//  - it is already loaded at this point
+}
+
+
+//# address-hook(0x062014) end(0x062014)
+function void fn062014()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x0620aa) end(0x0620e0)
+function void fn0620aa()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementSimple()
+
+	if (objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			if (objA0.flags38 & 0x04)
+			{
+				objA0.base_state += 2
+				objA0.position.y.u16 += D1.u16
+				fn062056()
+			}
+			else
+			{
+				objA0.flags38 |= 0x04
+				objA0.velocity.x = -objA0.velocity.x
+				objA0.velocity.y = -objA0.velocity.y
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x062354) end(0x06235a)
+function void fn062354()
+{
+	Object.AnimationProgressByLocalA1()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x0623fe) end(0x06241c)
+function void fn0623fe()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementSimple()
+	if (objA0.render_flags & render_flag.VISIBLE)
+		return
+
+	spawnChildObjects(0x066568)
+
+	move_area.bottom.target = screenmover_target.bottom
+	fn062422()
+}
+
+
+
+//-------------------------------------------------------//
+// Buttons that Knuckles loves to jump on                //
+//-------------------------------------------------------//
+
+//# address-hook(0x065c04) end(0x065c3a)
+function void fn065c04()
+{
+	if (u16[0xfffffaa4] != 0)
+	{
+		A1 = 0xffff0000 + u16[0xfffffaa4]
+		A2 = 0x065c48
+		fn0858c8()
+		if (!_equal())
+		{
+			objA0.update_address = 0x065c50
+			objA0.animation.sprite = 1
+			u8[0xfffffaa9] = 0xff
+			objA0.respawn_entry = 0
+
+			// Targets:
+			//  - 0x065c56	-> objA0.subtype2c = 0x00  -> In AIZ 2 cutscene
+			//  - 0x065c72	-> objA0.subtype2c = 0x02  -> In HCZ 2 cutscene
+			//  - 0x065c78	-> objA0.subtype2c = 0x04  -> In CNZ 2 lights-off cutscene
+			//  - 0x065cac	-> objA0.subtype2c = 0x06  -> In CNZ 2 pre-boss cutscene
+			call tableLookupAddress(0x065c40, objA0.subtype2c)
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+// AIZ 2 button reaction
+
+//# address-hook(0x065c56) end(0x065c6c)
+function void fn065c56()
+{
+#if !STANDALONE
+	// In standalone, this is done in "fn02b452", so player can't jump and avoid falling down
+	player1.control_override = 0
+#endif
+
+	D0.u16 = 0x1000
+	screenmover_target.bottom = D0.u16
+	move_area.bottom.target = D0.u16
+
+	spawnSimpleChildObjects(0x084b12)
+}
+
+
+// HCZ 2 button reaction
+
+//# address-hook(0x065c72) end(0x065c76)
+function void fn065c72()
+{
+	level.trigger08 = 0xff
+}
+
+
+// CNZ 2 button reaction (lights-off cutscene)
+
+//# address-hook(0x065c78) end(0x065caa)
+function void fn065c78()
+{
+	camera.screenshake.state = 0x14
+	water.height.next = camera.position.y.u16 + 0x0100
+	water.height.target = 0x0350
+	u8[0xfffffaa3] = 0xff
+
+	playSound(0x57)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x062480
+	}
+}
+
+
+// CNZ 2 button reaction (pre-boss cutscene)
+
+//# address-hook(0x065cac) end(0x065d14)
+function void fn065cac()
+{
+	camera.screenshake.state = 0x14
+
+	// Manipulate chunks
+	A1 = 0xffff008e + u16[0xffff8048]
+	u16 stride = u16[0xffff8000]
+	u8[A1]              = 0x14
+	u8[A1 + stride]     = 0x0f
+	u8[A1 + stride * 2] = 0x0f
+	u8[A1 + stride * 3] = 0x88
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x031f30
+		objA1.position.x.u16 = 0x4740
+		objA1.position.y.u16 = 0x0828
+		u8[A1 + 0x2c] = 0x4c
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x031f30
+		objA1.position.x.u16 = 0x4740
+		objA1.position.y.u16 = 0x0a28
+		u8[A1 + 0x2c] = 0x20
+	}
+
+#if STANDALONE
+	// Refresh on-screen part of the tube
+	//  -> We can't do this earlier, e.g. on button press already, because this conflicts with Knuckles' palette
+	fillPlaneA_Default(0x4720, 0x09d0, 0x40, 0x20)
+#endif
+}
+
+
+
+// More shared stuff
+
+//# address-hook(0x065c50) end(0x065c50)
+function void fn065c50()
+{
+	Object.DrawOrUnload()
+}
+
+
+//# address-hook(0x065dec) end(0x065dfc)
+function void fn065dec()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x04
+	D3.u16 = 0x05
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}
+
+
+//# address-hook(0x065e4c) end(0x065e5c)
+function void fn065e4c()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x20
+	D3.u16 = 0x20
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}

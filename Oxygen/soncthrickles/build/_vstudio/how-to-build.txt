@@ -1,0 +1,42 @@
+
+=== Build for Windows using Visual Studio ===
+
+
+PLEASE NOTE:
+
+- The Visual Studio projects are configured for statically linking all libraries together
+	into one exe. This applies to the external dependencies as well. (Only exception is the
+	Discord Game SDK.)
+
+- There is no working 64-bit build due to a linker error I did not resolve (as the public
+	releases for Windows are 32-bit anyways). This can probably be fixed with few changes
+	to SDL2, or by switching back to dynamic linking - at least for SDL2.
+
+
+
+>>> What you need
+
+Visual Studio 2019 (either Community or Pro edition) with the "Desktop development with C++"
+workload installed.
+
+The Visual Studio 2022 Preview should could as well, but isn't tested yet.
+
+
+
+>>> Build the external dependencies in "framework"
+
+Under "framework/external", you can find multiple libraries that S3AIR is built upon.
+Each of them needs to be built once following the "how-to-build.txt" in each library's directory.
+
+If building from the S3AIR Github repository, you can ignore the "If downloaded xyz separately or
+updating it" part of the instructions, as these changes are already applied to the Visual Studio
+projects.
+
+So you only need to build all required configurations, and then execute the copy scripts.
+
+
+
+>>> Build the main Visual Studio solution
+
+Open the "sonic3air.sln" right next to this text file. Choose "sonic3air" as startup project and
+build / run it. That's all.

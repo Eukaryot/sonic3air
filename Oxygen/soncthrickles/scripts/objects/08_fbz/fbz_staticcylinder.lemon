@@ -1,0 +1,261 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03a23a) end(0x03a24c)
+function void fn03a23a()
+{
+	D0 = u16(objA0.subtype2c) << 8
+	u16[A0 + 0x40] = D0.u16
+	objA0.value42 = D0.u16 << 2
+
+	objA0.update_address = 0x03a252
+	fn03a252()
+}
+
+
+//# address-hook(0x03a252) end(0x03a26a)
+function void fn03a252()
+{
+	A1 = 0xffffb000
+	A2 = A0 + 0x30
+	D6 = 3
+	fn03a270()
+
+	A1 = 0xffffb04a
+	A2 = A0 + 0x38
+	++D6.u8
+	fn03a270()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03a270) end(0x03a312)
+function void fn03a270()
+{
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		fn03a314()
+		return
+	}
+
+	if ((u8[A1 + 0x2a] & 0x02) == 0)
+	{
+		bool inRange = false
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+		if (objA1.velocity.x >= 0)
+		{
+			if (D0.s16 >= -0xc0 && D0.s16 <= -0xb0)
+			{
+				D2 = 0
+				inRange = true
+			}
+		}
+		else
+		{
+			if (D0.s16 >= 0xb0 && D0.s16 <= 0xc0)
+			{
+				D2 = 1
+				inRange = true
+			}
+		}
+
+		if (inRange)
+		{
+			D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
+			if (D1.u16 < 0x20)
+			{
+				D0.u16 = abs(s16[A1 + 0x1c])
+			#if STANDALONE
+				// Check for Super Peel-Out
+				if (u8[A1 + 0x38] == CHARACTER_SONIC && (control.player1.state & CONTROL_UP) && u16[A1 + 0x18] == 0)
+					return
+			#endif
+				if (D0.u16 >= 0x0400 && u8[A1 + 0x2e] == 0)
+				{
+					D3 = 0
+					if (objA0.subtype2c != 0)
+					{
+						if (((objA0.flags2a & 0x01) == 0) != (D2.u16 == 0))
+							return
+					}
+
+					u32[A2] = 0
+					u8[A2 + 0x04] = D2.u8
+					u16[A2 + 0x06] = D3.u16
+
+					u8[A1 + 0x2a] |= 0x02
+					LetSonicClimbOnObject()
+
+					u8[A1 + 0x2e] = 0x42
+					fn03a314()
+				}
+			}
+		}
+	}
+}
+
+
+
+//# address-hook(0x03a314) end(0x03a466)
+function void fn03a314()
+{
+	D0.u16 = abs(s16[A1 + 0x1c])
+	if (D0.u16 >= 0x0400 && (u8[A1 + 0x2a] & 0x02) == 0)
+	{
+		if (u32[A2] != 0)
+		{
+			fn03a480()
+			return
+		}
+
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0xc0
+		if (D0.s16 >= 0 && D0.s16 < 0x0180)
+		{
+			if ((u8[A1 + 0x2a] & 0x08) == 0)
+				return
+
+			if (objA0.subtype2c != 0)
+			{
+				if (u8[A2 + 0x04] == 0)
+				{
+					if (D0.u16 >= 0xc0 && s16[A1 + 0x1c] >= 0)
+					{
+						u16[A2] = D0.u16 - 0xc0
+						u16[A2 + 0x02] = 0
+						u8[A1 + 0x04] |= (render_flag.FLIP_X | render_flag.FLIP_Y)
+
+						fn03a480()
+						return
+					}
+				}
+				else
+				{
+					if (D0.u16 < 0xc0 && s16[A1 + 0x1c] < 0)
+					{
+						u16[A2] = D0.u16 + objA0.value42 - 0xc0
+						u16[A2 + 0x02] = 0
+						u16[A2 + 0x06] = -s16[A0 + 0x40]
+						u8[A1 + 0x04] &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+
+						fn03a480()
+						return
+					}
+				}
+			}
+
+			D0.u16 >>= 5
+			D0.u16 &= 0x0f
+			D1.s8 = s8[0x03a468 + D0.s16]
+			u8[A1 + 0x22] = u8[0x03a474 + D0.s16]
+			D2.u16 = objA0.position.y.u16 + u16[A2 + 0x06] + D1.s8
+			D1 = u8[A1 + 0x1e]
+			D1.u16 -= 0x13
+			D2.u16 -= D1.u16
+			objA1.position.y.u16 = D2.u16
+			u8[A1 + 0x20] = 0
+
+			D0 = u8[A1 + 0x22]
+			u32 backupA2 = A2
+			SetCharacterSpritePatterns()
+			A2 = backupA2
+		}
+		else
+		{
+			u8[A1 + 0x2a] &= ~0x04
+			u8[A1 + 0x1e] = u8[A1 + 0x44]
+			u8[A1 + 0x1f] = u8[A1 + 0x45]
+			u16[A1 + 0x20] = 0x01
+			u8[A1 + 0x2e] = 0
+			u8[A1 + 0x2a] &= ~0x08
+			objA0.flags2a &= ~(1 << D6.u8)
+		}
+	}
+	else
+	{
+		objA1.velocity.x >>= 1
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~0x04
+		u8[A1 + 0x1e] = u8[A1 + 0x44]
+		u8[A1 + 0x1f] = u8[A1 + 0x45]
+		u16[A1 + 0x20] = 0x01
+		u8[A1 + 0x2e] = 0
+		u8[A1 + 0x2a] &= ~0x08
+		objA0.flags2a &= ~(u8(1) << D6.u8)
+		u8[A1 + 0x27] = 0xc0
+		u8[A1 + 0x30] = 0
+		u8[A1 + 0x31] = 0x04
+	}
+}
+
+
+//# address-hook(0x03a480) end(0x03a542)
+function void fn03a480()
+{
+	D0.s32 = s16[A1 + 0x1c]
+	D0 <<= 8
+	u32[A2] += D0
+	if (s32[A2] < 0)
+	{
+		u32[A2] = 0
+		u8[A2 + 0x04] = 0
+		u16[A2 + 0x06] = -s16[A0 + 0x40]
+
+		u8[A1 + 0x04] |= render_flag.FLIP_X
+		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+
+		fn03a314()
+		return
+	}
+
+	D0.u16 = u16[A2]
+	if (D0.u16 >= objA0.value42)
+	{
+		u32[A2] = 0
+		u8[A2 + 0x04] = render_flag.FLIP_X
+		u16[A2 + 0x06] = u16[A0 + 0x40]
+
+		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+
+		fn03a314()
+		return
+	}
+
+	D2.u16 = objA1.position.x.u16
+	D0.u16 = u16[A2]
+	D0.u16 >>= 1
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * 0x6800
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 += objA0.position.x.u16
+	objA1.position.x.u16 = D0.u16
+	D0.u16 -= D2.u16
+	D0.s16 <<= 8
+	objA1.velocity.x = D0.u16
+	D2.u16 = objA1.position.y.u16
+	D0.u16 = u16[A2] >> 2
+	D0.u16 += u16[A2 + 0x06] + objA0.position.y.u16
+	objA1.position.y.u16 = D0.u16
+	D0.u16 -= D2.u16
+	D0.s16 <<= 8
+	objA1.velocity.y = D0.u16
+
+	D0 = (u16[A2] >> 1) & 0xff
+	if (s16[A1 + 0x1c] < 0)
+	{
+		D0.s8 = -D0.s8
+	}
+	D0.u16 = D0 / 0x0b
+	u8[A1 + 0x22] = u8[0x03a548 + D0.s16]
+	u8[A1 + 0x20] = 0
+	D0 = u8[A1 + 0x22]
+	SetCharacterSpritePatterns()
+}

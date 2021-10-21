@@ -1,0 +1,76 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+function u64 getZoneInitials(u8 zone)
+{
+	// This expects internal zone index
+	if (zone == 0x00)
+		return "aiz"
+	if (zone == 0x01)
+		return "hcz"
+	if (zone == 0x02)
+		return "mgz"
+	if (zone == 0x03)
+		return "cnz"
+	if (zone == 0x05)
+		return "icz"
+	if (zone == 0x06)
+		return "lbz"
+	if (zone == 0x07)
+		return "mhz"
+	if (zone == 0x04)
+		return "fbz"
+	if (zone == 0x08)
+		return "soz"
+	if (zone == 0x09)
+		return "lrz"
+	if (zone == 0x16)
+		return "hpz"
+	if (zone == 0x0a)
+		return "ssz"
+	if (zone == 0x0b)
+		return "dez"
+	if (zone == 0x0c)
+		return "ddz"
+	return 0
+}
+
+
+function u64 getZoneActInitials(u16 zoneAndAct)
+{
+	u64 zoneInitials = getZoneInitials(zoneAndAct >> 8)
+	if (zoneInitials == 0)
+		return 0
+
+	return stringformat("%s%d", zoneInitials, (zoneAndAct & 0x01) ? 2 : 1)
+}
+
+
+function u32 Standalone.loadRawLevelData(u64 format, u16 zoneAndAct, u32 targetAddress)
+{
+	u64 key = stringformat(format, getZoneActInitials(zoneAndAct))
+	if (key == 0)
+		return 0
+
+	bool allowOriginalData = Game.isTimeAttack() || (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
+	bool allowModdedData = !Game.isTimeAttack()
+	return System.loadExternalRawData(key, targetAddress, 0, 0, allowOriginalData, allowModdedData)
+}
+
+
+function u32 getCharacterColorsForControllerLEDs(u8 character)
+{
+	if (character == CHARACTER_SONIC)
+		return 0xff2800
+	else if (character == CHARACTER_TAILS)
+		return 0x0099ff
+	else
+		return 0x2800ff
+}

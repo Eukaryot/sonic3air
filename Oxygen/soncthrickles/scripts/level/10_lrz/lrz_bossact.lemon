@@ -1,0 +1,209 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Object with unknown purpose
+// Appears right at the start of LRZ boss act (but also when restarting after a death)
+
+//# address-hook(0x059fc4) end(0x059fd6)
+function void fn059fc4()
+{
+	objA0.update_address = 0x059fdc
+	objA0.box_size.y = 0xc0
+	objA0.position.y.u16 = 0x0640
+	objA0.flags2a |= 0x80
+	fn059fdc()
+
+#if STANDALONE
+	if (camera.position.x.u16 < 0x0100)
+	{
+		// Only purpose of this is to disable control
+		//  -> We can't do it right here, as initializeMainGame would overwrite the value
+		objA0.update_address = 0x059fda
+	}
+#endif
+}
+
+
+#if STANDALONE
+//# address-hook(0x059fda)
+function void fn059fda()
+{
+	// Disable control here already, so player does not accidently steer into the lava
+	player1.control_override = 0xff
+	player2.control_override = 0xff
+	control.player1 = 0
+	control.pad2 = 0
+	u16[0xffffb018] = 0		// Velocity x
+	u16[0xffffb062] = 0
+
+	objA0.update_address = 0x059fdc
+}
+#endif
+
+
+//# address-hook(0x059fdc) end(0x05a104)
+function void fn059fdc()
+{
+	if (level.scrolling_routine == 0x0c)
+	{
+		// Update lava heights
+		D0.u16 = u16[0xffffeedc]
+		if (u8[0xffffeedb] != 0)
+		{
+			if (D0.u16 < 0x80)
+			{
+				++D0.u16
+			}
+		}
+		else
+		{
+			if (D0.u16 != 0)
+			{
+				--D0.u16
+			}
+		}
+
+		u16[0xffffeedc] = D0.u16
+		u32 result
+
+		D0 = (D0 << 16)
+		D0.s32 >>= 8
+		D1.u16 = D0.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+	#if STANDALONE
+		D2 = 0x30 - (D0 >> 26)	// Move lava down on Robotnik's side
+	#else
+		D2 = 0x30
+	#endif
+		D3 = 0
+		D4.u16 = getScreenWidth() / 2 + 0x0f
+		if (u8[0xffffeeda] == 0)
+		{
+			// Lava height increasing from left to right (Robotnik on the left side)
+			A1 = 0xffffa910
+			while (D4.s16 >= 0)
+			{
+				u8[A1] = D2.u8
+
+				result = u32(D3.u16) + u32(D1.u16)
+				D3.u16 = result
+				D2.u16 += D0.u16
+				if (result & 0x10000)	// Carry flag
+					++D2.u16
+
+				++A1
+				--D4.s16
+			}
+
+			D2 = 0x30
+			D3 = 0
+			D4 = 0x0f
+			A1 = 0xffffa910
+			while (D4.s16 >= 0)
+			{
+				result = u32(D3.u16) - u32(D1.u16)
+				D3.u16 = result
+				D2.u16 -= D0.u16
+				if (result & 0x10000)	// Carry flag
+					--D2.u16
+
+				--A1
+				u8[A1] = D2.u8
+				--D4.s16
+			}
+		}
+		else
+		{
+			// Lava height increasing from right to left (Robotnik on the right side)
+			A1 = 0xffffa9b0 + getScreenExtend()
+			while (D4.s16 >= 0)
+			{
+				--A1
+				u8[A1] = D2.u8
+
+				result = u32(D3.u16) + u32(D1.u16)
+				D3.u16 = result
+				D2.u16 += D0.u16
+				if (result & 0x10000)	// Carry flag
+					++D2.u16
+
+				--D4.s16
+			}
+
+			D2 = 0x30
+			D3 = 0
+			D4 = 0x0f
+			A1 = 0xffffa9b0 + getScreenExtend()
+			while (D4.s16 >= 0)
+			{
+				result = u32(D3.u16) - u32(D1.u16)
+				D3.u16 = result
+				D2.u16 -= D0.u16
+				if (result & 0x10000)	// Carry flag
+					--D2.u16
+
+				u8[A1] = D2.u8
+				++A1
+				--D4.s16
+			}
+		}
+
+		// Collision check against the lava
+		D1.u16 = getScreenWidth() / 2
+		A2 = 0xffffa910
+		D4.u16 = 0x0a00 + getScreenWidth() / 2
+		objA0.position.x.u16 = D4.u16
+		fn01e2fe()
+	}
+	else
+	{
+		D1.u16 = 0x0180
+		D2.u16 = 0x40
+		D3.u16 = 0x30
+		D4.u16 = 0x0b80
+		objA0.position.x.u16 = D4.u16
+		PlatformCheckClimbOn()
+	}
+
+	D0.u16 = u16[0xffffeedc]
+	D0 = (D0 << 16)
+	D0 >>= 7
+	D1 = D0 >> 1
+	D0 += D1
+	if (u8[0xffffeeda] == 0)
+	{
+		D0.s32 = -D0.s32
+	}
+
+	u32[0xffffeee6] = D0
+	if (objA0.flags2a & 0x08)
+	{
+		A1 = 0xffffb000
+		if (!level.results_done && (u8[A1 + 0x2b] & 0x10) == 0 && !level.capsule_opened)
+		{
+			DamageCharacter()
+		}
+
+		D0 = u32[0xffffeee6]
+		u32[A1 + 0x10] += D0
+	}
+
+	if (objA0.flags2a & 0x10)
+	{
+		A1 = 0xffffb04a
+		if (!level.results_done && !level.capsule_opened)
+		{
+			DamageCharacter()
+		}
+
+		D0 = u32[0xffffeee6]
+		u32[A1 + 0x10] += D0
+	}
+}

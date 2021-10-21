@@ -1,0 +1,706 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Water update                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x006c34) end(0x006ca0)
+function void UpdateWater()
+{
+	if (!level.water_present)
+	{
+		fn00714e()
+		return
+	}
+
+	if (u8[0xffffee30] == 0 && u8[0xffffb005] < 0x06)
+	{
+		fn006f4a()
+		UpdateWaterSurfaceLevel()
+	}
+
+	water.fullscreen = 0
+	water.height.current = water.height.next
+
+#if STANDALONE
+	// This fixes an occasional palette glitch
+	if (global.zone_act == 0x0100 && camera.position.x.u16 <= 0x900)
+#else
+	if (global.zone_act == 0x0100 && camera.position.x.u16 < 0x900)
+#endif
+	{
+		// Special handling for HCZ 1 first part
+		h_int.line = 0xff
+		return
+	}
+
+	s16 waterScreenPositionY = water.height.current - camera.position.y.u16
+	if (waterScreenPositionY > 0)
+	{
+	#if STANDALONE
+		if (waterScreenPositionY >= getScreenHeight())
+			waterScreenPositionY = 0xff
+	#else
+		if (waterScreenPositionY >= getScreenHeight() - 1)
+			waterScreenPositionY = 0xff
+	#endif
+
+		h_int.line = waterScreenPositionY
+		fn00714e()
+	}
+	else
+	{
+		water.fullscreen = 1
+		h_int.line = 0xff
+	}
+}
+
+
+//# address-hook(0x00714e) end(0x00748a)
+function void fn00714e()
+{
+	if (global.zone_act == 0x101)
+	{
+		A1 = 0xffffb000
+		D2.u8 = control.player1.state
+		fn00717c()
+
+		A1 = 0xffffb04a
+		D2.u8 = control.tails.state
+		fn00717c()
+	}
+	else if (global.zone_act == 0x0500)
+	{
+		A1 = 0xffffb000
+		D2.u8 = control.player1.state
+		fn0071e4()
+
+		A1 = 0xffffb04a
+		D2.u8 = control.tails.state
+		fn0071e4()
+	}
+	else if (global.zone == 0x08)
+	{
+		fn0072fa()
+	}
+}
+
+
+function void fn00717c()
+{
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		if (u8[A1 + 0x46] != 0x0c)
+		{
+			A2 = 0xffff8000
+			D0.u16 = (objA1.position.y.u16 >> 5) & level.chunksize.bitmask
+			D0.u16 = u16[A2 + D0.s16 + 8]
+			D0.u16 += objA1.position.x.u16 >> 7
+
+			A2 = 0xffff0000 + D0.u16
+			D0.u8 = u8[A2]
+
+			A2 = 0x007498
+			D1 = 9
+			while (D1.s16 >= 0)
+			{
+				--D1.s16
+				if (D0.u8 == u8[A2-=1])
+				{
+					D0 = -8
+					fn00723e()
+					return
+				}
+			}
+		}
+	}
+
+	if (s8[A1 + 0x2b] < 0)
+	{
+		u16[A1 + 0x32] = 0x05
+		u8[A1 + 0x2b] &= 0x7f
+	}
+}
+
+
+function void fn0071e4()
+{
+	if ((u8[A1 + 0x2a] & 0x0a) == 0)
+	{
+		A2 = 0xffff8000
+		D0.u16 = (objA1.position.y.u16 >> 5) & level.chunksize.bitmask
+		D0.u16 = u16[A2 + D0.s16 + 8]
+		D0.u16 += objA1.position.x.u16 >> 7
+
+		A2 = 0xffff0000 + D0.u16
+		D0.u8 = u8[A2]
+
+		A2 = 0x0074a2
+		D1 = 9
+		while (D1.s16 >= 0)
+		{
+			--A2
+			if (D0.u8 == u8[A2])
+			{
+				A2 = 0x0074a2
+				D0.u8 = u8[A2 + D1.s16]
+				fn00723e()
+				return
+			}
+			--D1.s16
+		}
+	}
+
+	if (s8[A1 + 0x2b] < 0)
+	{
+		u16[A1 + 0x32] = 0x05
+		u8[A1 + 0x2b] &= 0x7f
+	}
+}
+
+
+//# address-hook(0x00723e)
+function void fn00723e()
+{
+	if (D0.u8 != 0)
+	{
+		D1.u8 = u8[A1 + 0x1c]
+		if (D0.s8 < 0)
+		{
+			if (D1.s8 > D0.s8)
+				u16[A1 + 0x1c] -= 0x40
+		}
+		else
+		{
+			if (D1.s8 < D0.s8)
+				u16[A1 + 0x1c] += 0x40
+		}
+
+		u8[A1 + 0x2a] &= ~0x01
+		if (D1.s8 < 0)
+			u8[A1 + 0x2a] |= 0x01
+
+		u8[A1 + 0x20] = (global.zone == 0x05) ? 0x19 : 0x1b
+		u8[A1 + 0x2b] |= 0x80
+	}
+	else
+	{
+		D1.u16 = 4
+		D0.u16 = u16[A1 + 0x1c]
+		if (D2 & 0x04)
+		{
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x2a] |= 0x01
+			D0.u16 -= D1.u16
+			if (D0.s16 < 0)
+				D0.u16 -= D1.u16
+		}
+		if (D2 & 0x08)
+		{
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x2a] &= ~0x01
+			D0.u16 += D1.u16
+			if (D0.s16 >= 0)
+				D0.u16 += D1.u16
+		}
+
+		D1.u16 = 4
+		if (D0.u16 != 0)
+		{
+			if (D0.s16 >= 0)
+			{
+				D0.u16 -= D1.u16
+				if (D0.s16 <= 0)
+				{
+					D0.u16 = 0
+					u8[A1 + 0x20] = 0x05
+				}
+			}
+			else
+			{
+				D0.u16 += D1.u16
+				if (D0.s16 <= 0)
+				{
+					D0.u16 = 0
+					u8[A1 + 0x20] = 0x05
+				}
+			}
+		}
+		u16[A1 + 0x1c] = D0.u16
+		u8[A1 + 0x2b] |= 0x80
+	}
+}
+
+
+//# address-hook(0x0072fa)
+function void fn0072fa()
+{
+	A1 = 0xffffb000
+	D2.u8 = control.player1.state
+	fn00730c()
+
+	A1 = 0xffffb04a
+	D2.u8 = control.tails.state
+	fn00730c()
+}
+
+
+function void fn00730c()
+{
+	if ((u8[A1 + 0x2a] & 0x02) == 0 && (u8[A1 + 0x2a] & 0x08) == 0)
+	{
+		A2 = 0xffff8000
+		D0 = 0x14
+		D0.u16 += objA1.position.y.u16
+		D0.u16 >>= 5
+		D0.u16 &= level.chunksize.bitmask
+		D0.u16 = u16[A2 + D0.s16 + 0x08]
+		D1.u16 = objA1.position.x.u16
+		D1.u16 >>= 7
+		D0.u16 += D1.u16
+		A2 = 0xffff0000 + D0.u16
+		D0.u8 = u8[A2]
+		A2 = 0x0074bd
+		D1 = 0x10
+
+		while (D1.s16 >= 0)
+		{
+			--A2
+			if (D0.u8 == u8[A2])
+				break
+
+			--D1.s16
+		}
+
+		if (D0.u8 == u8[A2])
+		{
+			bool goto007398 = false
+
+			A2 = 0x0074bd
+			D1.u16 *= 2
+			D0.u8 = u8[A2 + D1.s16]
+			D1.u8 = u8[A2 + D1.s16 + 1]
+			if (D1.u8 == 0)
+			{
+				goto007398 = true
+			}
+			else if (D1.u8 == 1)
+			{
+				D1.u16 = objA1.position.x.u16 & 0x7f
+				goto007398 = (D1.u16 < 0x40)
+			}
+			else if (D1.u8 == 2)
+			{
+				D1.u16 = objA1.position.x.u16 & 0x7f
+				goto007398 = (D1.u16 >= 0x40)
+			}
+			else
+			{
+				D0 = (u8[A1 + 0x46] == 0x0c) ? -8 : 8
+				goto007398 = true
+			}
+
+			if (goto007398)
+			{
+				D1.u8 = u8[A1 + 0x1c]
+				if (D0.s8 < 0)
+				{
+					if (D1.s8 > D0.s8)
+					{
+						u16[A1 + 0x1c] -= 0x40
+						if (s8[A1 + 0x2b] >= 0 && s16[A1 + 0x1c] >= 0)
+						{
+							s16[A1 + 0x1c] >>= 1
+							if (D0.u8 == 0xf8)
+							{
+								u16[A1 + 0x1c] = 0
+							}
+						}
+					}
+				}
+				else
+				{
+					if (D1.s8 < D0.s8)
+					{
+						u16[A1 + 0x1c] += 0x40
+						if (s8[A1 + 0x2b] >= 0 && s16[A1 + 0x1c] < 0)
+						{
+							s16[A1 + 0x1c] >>= 1
+							if (D0.u8 == 0x08)
+							{
+								u16[A1 + 0x1c] = 0
+							}
+						}
+					}
+				}
+
+				if (D1.u8 != 0)
+				{
+					u8[A1 + 0x2a] &= ~0x01
+					if (D1.s8 < 0)
+					{
+						u8[A1 + 0x2a] |= 0x01
+					}
+				}
+
+				u8[A1 + 0x20] = 0x19
+				objA1.position.y.u16 += s8(u8[A1 + 0x1e] - 0x0e)
+				u8[A1 + 0x1e] = 0x0e
+				u8[A1 + 0x1f] = 0x07
+				u8[A1 + 0x2a] &= ~0x04
+				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				u8[A1 + 0x2b] |= 0x80
+
+				D0.u8 = global.framecounter & 0x0f
+				if (D0.u8 == 0)
+				{
+					playSound(0xc8)
+				}
+				return
+			}
+		}
+	}
+
+	if (s8[A1 + 0x2b] < 0)
+	{
+		u16[A1 + 0x32] = 0x05
+		u8[A1 + 0x2b] &= 0x7f
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			u8[A1 + 0x1e] = u8[A1 + 0x44]
+			u8[A1 + 0x1f] = u8[A1 + 0x45]
+			u8[A1 + 0x2a] &= ~0x04
+			objA1.flags2a &= ~char.flag.CONTROL_LOCK
+			u8[A1 + 0x20] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x006f4a) end(0x00705a)
+function void fn006f4a()
+{
+	if (debug_mode.state != 0 || global.zone != 0x01)
+		return
+
+	if (global.characters != CHARS_TAILS_ALONE)
+	{
+		A3 = 0xfffff7c8
+		A1 = 0xffffb000
+		D6.u8 = control.player1.state
+		D5 = 0
+		fn006f90()
+
+		A3 = 0xfffff7c9
+		A1 = 0xffffb04a
+		D6.u8 = control.tails.state
+		D5 = 1
+		fn006f90()
+	}
+	else
+	{
+		A3 = 0xfffff7c9
+		A1 = 0xffffb000
+		D6.u8 = control.player1.state
+		D5 = 0
+		fn006f90()
+	}
+}
+
+
+function void fn006f90()
+{
+	A2 = (global.act == 0) ? 0x00705c : 0x007130
+	D2.u16 = u16[(A2+=2)-2]
+
+	while (D2.s16 >= 0)
+	{
+		D0.u16 = objA1.position.x.u16
+		D1.u16 = objA1.position.y.u16
+		if (D0.u16 >= u16[A2] && D0.u16 < u16[A2 + 4] && D1.u16 >= u16[A2 + 2] && D1.u16 < u16[A2 + 6])
+		{
+			if (u8[A1 + 0x05] >= 4)
+			{
+				u8[A3] = 0
+				return
+			}
+
+			if ((u8[0xfffff7c7] & (1 << D5.u8)) == 0)
+			{
+				if (u8[A1 + 0x2e] != 0)
+				{
+					u8[A3] = 0
+					return
+				}
+
+				u8[A3] = 1
+				D0.u16 = u16[A2 + 0x08]
+				objA1.velocity.x = D0.u16
+				D0.s32 = s32(D0.s16) << 8
+				u32[A1 + 0x10] += D0
+				D1.u16 = u16[A2 + 0x0a]
+				objA1.velocity.y = D1.u16
+				D1.s32 = s32(D1.s16) << 8
+				u32[A1 + 0x14] += D1
+				objA1.state = char.state.LIFTED
+				objA1.flags2a |= char.flag.IN_AIR
+				u8[A1 + 0x2f] = 0
+				if (u8[A2 + 0x0c] != 0)
+				{
+					if (D6 & 0x04)
+					{
+						--objA1.position.x.u16
+					}
+					if (D6 & 0x08)
+					{
+						++objA1.position.x.u16
+					}
+				}
+				else
+				{
+					if (D6 & 0x01)
+					{
+						--objA1.position.y.u16
+					}
+					if (D6 & 0x02)
+					{
+						++objA1.position.y.u16
+					}
+				}
+
+			#if STANDALONE
+				u8[A1 + 0x40] = 0	// Clear "char.jumping"
+			#endif
+			}
+			return
+		}
+
+		A2.u16 += 14
+		--D2.s16
+	}
+
+	if (u8[A3] != 0)
+	{
+		u8[A1 + 0x20] = 0x1a
+		u8[A3] = 0
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Water surface level update                            //
+//-------------------------------------------------------//
+
+//# address-hook(0x006d6c) end(0x006d9a)
+function void UpdateWaterSurfaceLevel()
+{
+	u8 offset = global.zone * 4 + global.act * 2
+
+	// Targets:
+	//  - 0x006ddc	-> offset = 0x00	-> AIZ 1
+	//  - 0x006dde	-> offset = 0x02	-> AIZ 2
+	//  - 0x006e82	-> offset = 0x04	-> HCZ 1
+	//  - 0x006e9c	-> offset = 0x06	-> HCZ 2
+	//  - 0x006eca	-> offset = 0x0e	-> CNZ 2
+	//  - 0x006eca	-> offset = 0x16	-> ICZ 2
+	//  - 0x006ee8	-> offset = 0x1a	-> LBZ 2
+	call tableLookupAddress(0x006d9c, offset)
+
+	// Update changing water surface height
+	if (water.height.next != water.height.target)
+	{
+		if (water.height.next < water.height.target)
+			water.height.next += water.height.changerate
+		else
+			water.height.next -= water.height.changerate
+	}
+}
+
+
+//# address-hook(0x006ddc) end(0x006ddc)
+function void UpdateWaterSurfaceLevel.AIZ1()
+{
+}
+
+
+//# address-hook(0x006dde) end(0x006e6c)
+function void UpdateWaterSurfaceLevel.AIZ2()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		if (move_area.bottom.target == 0x0820 || camera.position.x.u16 >= 0x3b60)
+			return
+	}
+
+	// Somewhere in here:
+	//  - Lower water level
+	//  - Cause screen shake to start
+
+	if (camera.position.x.u16 < 0x2440)
+	{
+		if (water.height.target == 0x0618)
+		{
+			water.height.target = 0x0528
+			water.height.changerate = 2
+		}
+	}
+	else
+	{
+		if (level.trigger00 == 0)
+		{
+			if (camera.position.x.u16 < 0x2850)
+				return
+
+			level.trigger00 = 1
+		}
+
+		if (water.height.target != 0x0618)
+		{
+			if (camera.position.x.u16 < 0x2900)
+			{
+				camera.screenshake.state = 0xffff
+				if (allocDynamicObjectStd())
+				{
+					objA1.update_address = 0x006e6e
+					u8[A1 + 0x24] = 0xb4
+				}
+			}
+
+			A3 = 0xffff8024
+			D1 = 4
+			while (D1 > 0)
+			{
+				A1 = 0xffff0000 + u16[A3]
+				u8[A1 + 0x4e] = 0
+				A3 += 4
+				--D1
+			}
+			water.height.target = 0x0618
+		}
+	}
+}
+
+
+//# address-hook(0x006e6e) end(0x006e7c)
+function void Object.ScreenShakeTimeout()
+{
+	// Helper object to stop screen shake after a given time (used e.g. in AIZ 2)
+	--objA0.animation.timer
+	if (objA0.animation.timer == 0)
+	{
+		camera.screenshake.state = 0
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x006e82) end(0x006e88)
+function void UpdateWaterSurfaceLevel.HCZ1()
+{
+	A1 = 0x006e8c
+	fn006f2c()
+}
+
+
+//# address-hook(0x006e9c) end(0x006eb8)
+function void UpdateWaterSurfaceLevel.HCZ2()
+{
+	if (u8[0xfffffaa2] != 0)
+		return
+
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		A1 = 0x006eba
+		fn006f2c()
+	}
+	else
+	{
+		A1 = 0x006ec2
+		fn006f2c()
+	}
+}
+
+
+//# address-hook(0x006eca) end(0x006eca)
+function void UpdateWaterSurfaceLevel.Empty()
+{
+}
+
+
+//# address-hook(0x006ee8) end(0x006f10)
+function void UpdateWaterSurfaceLevel.LBZ2()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		if (global.level_flag02 == 0)
+		{
+		#if STANDALONE
+			// Special handling for Knuckles on Sonic's route (only before the cutscene starts)
+			if (checkpoint.number == 5 && camera.position.x.u16 < 0x3c00)
+			{
+				water.height.current = 0x0660
+				water.height.next = 0x0660
+				return
+			}
+		#endif
+
+			A1 = 0x006f12
+			fn006f2c()
+		}
+		else
+		{
+		#if STANDALONE
+			if (water.height.next > 0x0660)
+			{
+				// Revised handling of rising water:
+				//  -> Do not set the water level to the target level (at 0x0660) too early, as this makes things a bit unfair for slower players
+				//  -> But when you're fast, make sure the water can keep up -- this is needed to prevent the water from rising too slow and leaving abroken background at the exit for really fast players
+				if (camera.position.y.u16 >= water.height.next && camera.position.y.u16 < 0x08e0)
+				{
+					water.height.next = 0x0660
+				}
+				else if (camera.position.y.u16 + getScreenHeight() < water.height.next)
+				{
+					water.height.next = camera.position.y.u16 + getScreenHeight()
+				}
+			}
+		#else
+			if (camera.position.y.u16 >= water.height.next)
+			{
+				water.height.next = 0x0660
+			}
+		#endif
+		}
+	}
+}
+
+
+//# address-hook(0x006f2c) end(0x006f48)
+function void fn006f2c()
+{
+	D0.u16 = camera.position.x.u16
+	while (true)
+	{
+		D1 = u32[A1]
+		A1 += 4
+		if (D0.u16 <= D1.u16)
+			break
+	}
+
+	D1 >>= 16
+	if (D1.u16 & 0x8000)
+	{
+		D1.u16 &= 0x7fff
+		water.height.next = D1.u16
+	}
+	water.height.target = D1.u16
+}

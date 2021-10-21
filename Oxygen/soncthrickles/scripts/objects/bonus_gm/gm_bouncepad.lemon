@@ -1,0 +1,80 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x060f2e) end(0x060f38)
+function void fn060f2e()
+{
+	setupObjectAttributesFull(0x0613a4)
+
+	objA0.update_address = 0x060f3e
+	fn060f3e()
+}
+
+
+//# address-hook(0x060f3e) end(0x060f8e)
+function void fn060f3e()
+{
+	if (s16[0xffff2020] >= 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		D1 = 0x0d
+		D2 = 0x08
+		D3 = 0x11
+		D4.u16 = objA0.position.x.u16
+		fn01dc56()
+
+		if ((D6 & 0x00010000) || (objA0.flags2a & 0x08))
+		{
+			A1 = 0xffffb000
+		}
+		else if ((D6 & 0x00020000) || (objA0.flags2a & 0x10))
+		{
+			A1 = 0xffffb04a
+		}
+		else
+		{
+			DrawObject()
+			return
+		}
+
+		fn060f94()
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x060f94) end(0x060ffc)
+function void fn060f94()
+{
+	D0.u16 = -0x300
+	objA1.velocity.y = -0x600
+	u8[A1 + 0x2a] |= 0x01
+	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+	{
+		u8[A1 + 0x2a] &= ~0x01
+		D0.s16 = -D0.s16
+	}
+	objA1.velocity.x = D0.u16
+	u16[A1 + 0x1c] = D0.u16
+	objA1.state = char.state.STRAIGHTJUMP
+	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x40] = 0
+
+	u8[0xffff2000 + objA0.subtype2c] = 0
+	u16[0xffff2020] = 0x0f
+	A1 = 0xffff0000 + u16[0xfffffaa4]
+	u8[A1 + 0x38] |= 0x01
+
+	playSound(0xb1)
+}

@@ -1,0 +1,127 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Mushroom Head, the one you can use as trampoline      //
+//-------------------------------------------------------//
+
+//# address-hook(0x03e018) end(0x03e07a)
+function void MushroomHead.Init()
+{
+	objA0.sprite_priority = (objA0.subtype2c & 0x80) ? 0x300 : 0x80
+
+	if (objA0.subtype2c & 0x01)
+	{
+		objA0.sprite_attributes = 0xc399
+		u8[A0 + 0x36] = 0x14
+	}
+	else
+	{
+		objA0.sprite_attributes = 0xc369
+	}
+
+	if (objA0.subtype2c & 0x40)
+	{
+		objA0.sprite_attributes &= 0x7fff
+	}
+
+	objA0.mapping_offset = 0x03e1fe
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x10
+#if STANDALONE
+	objA0.box_size.y = 0x18		// Avoid clipping to early
+#endif
+	objA0.flags2a |= 0x80
+	u16[A0 + 0x38] = objA0.position.x.u16
+	u16[A0 + 0x3a] = objA0.position.y.u16
+
+	objA0.update_address = 0x03e080
+	MushroomHead.Update()
+}
+
+
+//# address-hook(0x03e080) end(0x03e0d4)
+function void MushroomHead.Update()
+{
+	Object.animationUpdate(0x03e1da)
+	if (objA0.base_state != 0)
+	{
+		objA0.state.both = 0
+		objA0.animation.frame = 0
+		objA0.base_state = 0
+	}
+
+	fn03e0de()
+
+	D1.u16 = 0x18
+	D3 = objA0.animation.sprite
+	D3.u8 = u8[0x03e0da + D3.s16]
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	A1 = 0xffffb000
+	D5 = 0x30
+	D6 = 0x03
+	fn03e172()
+
+	A1 = 0xffffb04a
+	D5 = 0x32
+	D6 = 0x04
+	fn03e172()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03e0de) end(0x03e104)
+function void fn03e0de()
+{
+	D0 = u8[0xfffff7ff]
+	D0.u8 += u8[A0 + 0x36]
+	A1 = 0x03e106 + D0.s16
+
+	objA0.position.x.u16 = u16[A0 + 0x38] + s8[(A1+=1)-1]
+	objA0.position.y.u16 = u16[A0 + 0x3a] + s8[(A1+=1)-1]
+}
+
+
+//# address-hook(0x03e172) end(0x03e1d8)
+function void fn03e172()
+{
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		u16[A0 + D5.s16] = objA1.velocity.y
+		return
+	}
+
+	objA0.state = 0x01
+	if (objA0.animation.sprite == 0x03)
+	{
+		D0.u16 = u16[A0 + D5.s16]
+		if (D0.s16 >= 0x0760)
+			D1.u16 = 0x0860
+		else if (D0.s16 >= 0x0660)
+			D1.u16 = 0x0760
+		else
+			D1.u16 = 0x0660
+
+		D1.u16 += 0x20
+		D1.s16 = -D1.s16
+		objA1.velocity.y = D1.u16
+		u8[A1 + 0x05] = 0x02
+		objA1.state = char.state.STRAIGHTJUMP
+		objA1.flags2a |= char.flag.IN_AIR
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x40] = 0
+		u8[A1 + 0x3d] = 0
+		playSound(0x87)
+	}
+}

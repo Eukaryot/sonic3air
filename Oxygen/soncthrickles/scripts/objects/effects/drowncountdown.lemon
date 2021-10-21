@@ -1,0 +1,58 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Drown countdown                                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x018272) end(0x0182ac)
+function void fn018272()
+{
+	A2 = u32[A0 + 0x40]
+	if (u8[A2 + 0x2c] <= 12)
+	{
+		--u16[A0 + 0x3c]
+		if (u16[A0 + 0x3c] == 0)
+		{
+			objA0.base_state = 14
+			objA0.state += 7
+			fn018254()
+			return
+		}
+
+		Object.animationUpdate(0x0186c4)
+		fn01841e()
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			DrawObject()
+			return
+		}
+	}
+	UnloadObject()
+}
+
+
+// Is this also part of drown countdown or something else?
+
+//# address-hook(0x0182b2) end(0x0182cc)
+function void fn0182b2()
+{
+	A2 = u32[A0 + 0x40]
+	if (u8[A2 + 0x2c] > 12)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		fn0182d2()
+		Object.animationUpdate(0x0186c4)
+		DrawObject()
+	}
+}

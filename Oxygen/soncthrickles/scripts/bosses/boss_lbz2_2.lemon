@@ -1,0 +1,956 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// LBZ 2 Second Boss (with spiked sphere and lasers)     //
+//-------------------------------------------------------//
+
+//# address-hook(0x0729ba) end(0x0729cc)
+function void fn0729ba()
+{
+	// Targets:
+	//  - 0x0729de	-> objA0.base_state = 0x00
+	//  - 0x072a54	-> objA0.base_state = 0x02
+	//  - 0x072a70	-> objA0.base_state = 0x04
+	//  - 0x072aec	-> objA0.base_state = 0x06
+	//  - 0x072aee	-> objA0.base_state = 0x08
+	//  - 0x072b04	-> objA0.base_state = 0x0a
+	call tableLookupAddress(0x0729d2, objA0.base_state)
+
+	fn0734fa()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x0729de) end(0x072a4e)
+function void fn0729de()
+{
+	setupObjectAttributesFull(0x0736cc)
+
+	boss.remaining_hits = 9
+	level.boss_encounter = 1
+	objA0.countdown_callback = 0x072a5a
+
+#if STANDALONE
+	// Load required sprite patterns
+	bool isKnucklesFight = (camera.position.y.u16 < 0x0500)
+	if (!isKnucklesFight)
+#else
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
+#endif
+	{
+		objA0.countdown_value = 0x7f
+		hud.dirty.timer = 0xff
+		requestLoadingPatterns(0x71)
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x085b30
+			u8[A1 + 0x2c] = 0x19
+		}
+	}
+
+	spawnChildObjects(0x06817c)
+	spawnChildObjects(0x0737f0)
+	spawnChildObjects(0x073766)
+
+	A2 = 0x0737e8
+	SpawnIdenticalChildObjects()
+}
+
+
+//# address-hook(0x072a5a) end(0x072a6a)
+function void fn072a5a()
+{
+	objA0.base_state = 0x04
+	objA0.velocity.y = -0x100
+
+	loadPaletteLine1(0x073886)
+}
+
+
+//# address-hook(0x072a54) end(0x072a54)
+function void fn072a54()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x072a70) end(0x072ae6)
+function void fn072a70()
+{
+	D0.u16 = objA0.position.y.u16
+	D1.u16 = camera.position.y.u16
+	if (objA0.velocity.y >= 0)
+	{
+		D1.u16 += 0x0118
+		if (D0.u16 < D1.u16)
+		{
+			UpdateMovementStraightSimple()
+			return
+		}
+	}
+	else
+	{
+		D1.u16 -= 0xb0
+		if (D0.u16 > D1.u16)
+		{
+			UpdateMovementStraightSimple()
+			return
+		}
+	}
+
+	if (boss.remaining_hits > 0x02 && (objA0.flags38 & 0x08) == 0)
+		return
+
+	GetRandomNumber()
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1 = 0
+	objA0.render_flags &= ~render_flag.FLIP_X
+	if (D0 & 0x01)
+	{
+		D1 = 0x02
+		objA0.render_flags |= render_flag.FLIP_X
+	}
+
+	D1.u16 = u16[0x072ae8 + D1.s16]
+	D2.u16 = camera.position.x.u16 + D1.u16 + getScreenExtend()
+	objA0.position.x.u16 = D2.u16
+	D0.u16 = 0x0100
+	if (objA0.velocity.y >= 0)
+		D0.s16 = -D0.s16
+	objA0.velocity.y = D0.u16
+}
+
+
+//# address-hook(0x072aec) end(0x072aec)
+function void fn072aec()
+{
+}
+
+
+//# address-hook(0x072aee) end(0x072b02)
+function void fn072aee()
+{
+	--u8[A0 + 0x40]
+	if (s8[A0 + 0x40] < 0)
+	{
+		objA0.base_state = 0x0a
+		u8[A0 + 0x40] = 0x04
+	}
+}
+
+
+//# address-hook(0x072b04) end(0x072b16)
+function void fn072b04()
+{
+	objA0.position.y.u16 += 0x08
+	--u8[A0 + 0x40]
+	if (s8[A0 + 0x40] < 0)
+	{
+		objA0.base_state = 0x06
+	}
+}
+
+
+
+//# address-hook(0x072ffa) end(0x073028)
+function void fn072ffa()
+{
+	A1 = 0x072fea
+	if (InitBoss(0x073004))
+		return
+
+	objA0.value26 = 0x19
+	StartBossFight()
+
+	level.bossarea.left -= getScreenExtend()
+	level.bossarea.right += getScreenExtend()
+
+	objA0.update_address = 0x073046
+	objA0.countdown_callback = 0x07304c
+	u8[0xfffffaa2] = 0
+	u8[0xfffffaa3] = 0
+
+	requestLoadingPatterns(0x71)
+	fn07302e()
+}
+
+
+//# address-hook(0x07302e) end(0x073032)
+function void fn07302e()
+{
+	addPatternLoadingCue(0x073038)
+}
+
+
+//# address-hook(0x073046) end(0x073046)
+function void fn073046()
+{
+	CheckForBossStart()
+}
+
+
+//# address-hook(0x07304c) end(0x073052)
+function void fn07304c()
+{
+	objA0.update_address = 0x0729ba
+}
+
+
+
+// Object that will spawn Big Arms when Robotnik left the screen to the top
+
+//# address-hook(0x073054) end(0x073088)
+function void fn073054()
+{
+	D0.u16 = objA0.position.y.u16 - 1
+	D1.u16 = camera.position.y.u16 - 0x50
+	if (D0.u16 >= D1.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+		DrawObject()
+		return
+	}
+
+	objA0.position.y.u16 = D1.u16
+	objA0.flags38 |= 0x20
+
+	if (allocDynamicObjectStd())
+	{
+		// Spawn Big Arms
+		objA1.update_address = 0x074262
+	}
+	fn0852ae()
+}
+
+
+#if STANDALONE
+// Using a dummy address
+//# address-hook(0x073056)
+function void fn073056()
+{
+	// Wait for (exploding) Robotnik to leave the screen to the bottom
+	D0.u16 = objA0.position.y.u16 + 1
+	D1.u16 = camera.position.y.u16 + 0x140
+	if (D0.u16 <= D1.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+		DrawObject()
+	}
+	else
+	{
+		objA0.position.y.u16 = D1.u16
+		objA0.flags38 |= 0x20				// Stop the explosions
+		objA0.sprite_attributes &= 0x7fff	// Draw him in background
+		objA0.update_address = 0x073058
+	}
+}
+
+// Using a dummy address
+//# address-hook(0x073058)
+function void fn073058()
+{
+	// Wait for Robotnik to leave the screen to the top
+	D0.u16 = objA0.position.y.u16 - 1
+	D1.u16 = camera.position.y.u16 - 0x50
+	if (D0.u16 >= D1.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+		DrawObject()
+		u16[A0 + 0x48] = 0
+	}
+	else
+	{
+		objA0.position.y.u16 = D1.u16
+		objA0.update_address = 0x07305a
+	}
+}
+
+
+// Using a dummy address
+//# address-hook(0x07305a)
+function void fn07305a()
+{
+	// Handling for Big Arms fight on Sonic's path:
+	//  Music change, fade to dark sky
+	if (u16[A0 + 0x48] == 0)
+	{
+		playMusic(MUSIC_CTRL_FADEOUT)
+	}
+	else if (u16[A0 + 0x48] == 120)
+	{
+		playMusic(0x30)
+		level.boss_encounter = 2	// Usually only 0 or 1, but we're using a value of 2 here for "chooseFittingMusic"
+	}
+
+	// Sky palette fade steps
+	if (u16[A0 + 0x48] == 16)
+	{
+		u16[0xfffffc00 + 0x3b * 2] = 0x0cac
+		u16[0xfffffc00 + 0x3c * 2] = 0x0c68
+		u16[0xfffffc00 + 0x3d * 2] = 0x0c46
+		u16[0xfffffc00 + 0x3e * 2] = 0x0a44
+	}
+	else if (u16[A0 + 0x48] == 32)
+	{
+		u16[0xfffffc00 + 0x3b * 2] = 0x0a88
+		u16[0xfffffc00 + 0x3c * 2] = 0x0a46
+		u16[0xfffffc00 + 0x3d * 2] = 0x0824
+		u16[0xfffffc00 + 0x3e * 2] = 0x0622
+	}
+	else if (u16[A0 + 0x48] == 48)
+	{
+		u16[0xfffffc00 + 0x3b * 2] = 0x0844
+		u16[0xfffffc00 + 0x3c * 2] = 0x0622
+		u16[0xfffffc00 + 0x3d * 2] = 0x0400
+		u16[0xfffffc00 + 0x3e * 2] = 0x0200
+	}
+
+	++u16[A0 + 0x48]
+	if (u16[A0 + 0x48] <= 120)
+		return
+
+	if (allocDynamicObjectStd())
+	{
+		// Spawn Big Arms
+		objA1.update_address = 0x074262
+	}
+	fn0852ae()
+}
+#endif
+
+
+//# address-hook(0x07308e) end(0x0730aa)
+function void fn07308e()
+{
+	setupObjectAttributesFull(0x0736d8)
+
+	objA0.update_address = 0x0730b0
+	objA0.countdown_callback = 0x0730b0
+
+	A2 = 0x0737ba
+	SpawnIdenticalChildObjects()
+}
+
+
+//# address-hook(0x0730b0) end(0x0730ba)
+function void fn0730b0()
+{
+	MoveAndFlipWithParent()
+	fn07361e()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x0730c0) end(0x0730ec)
+function void fn0730c0()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x40) == 0)
+	{
+		objA0.update_address = objA0.countdown_callback
+		if (u8[A1 + 0x2a] & 0x20)
+		{
+			u8[A0 + 0x43] -= 0x28
+			if (objA0.subtype2c == 0x04)
+			{
+				u8[A1 + 0x2a] &= ~0x20
+			}
+		}
+	}
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x0730f2) end(0x0730f2)
+function void fn0730f2()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x0730f8) end(0x0730fe)
+function void fn0730f8()
+{
+	u16[A0 + 0x3c] = 0x01
+	fn07308e()
+}
+
+
+//# address-hook(0x073100) end(0x073122)
+function void fn073100()
+{
+	setupObjectAttributesFull(0x0736e4)
+
+	objA0.update_address = 0x073128
+	objA0.countdown_callback = 0x073128
+	u16[A0 + 0x3c] = 0x02
+
+	spawnChildObjects(0x0737da)
+}
+
+
+//# address-hook(0x073128) end(0x073132)
+function void fn073128()
+{
+	MoveAndFlipWithParent()
+	fn07361e()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x073138) end(0x07314e)
+function void fn073138()
+{
+	setupObjectAttributesBasic(0x0736f8)
+	objA0.update_address = 0x073152
+	objA0.countdown_value = 0x60
+
+	fn073682()
+	fn073152()
+}
+
+
+//# address-hook(0x073152) end(0x07315e)
+function void fn073152()
+{
+	UpdateMovementSimple()
+	fn084f80()
+	DrawObject()
+}
+
+
+//# address-hook(0x073164) end(0x07316e)
+function void fn073164()
+{
+	objA0.update_address = 0x073174
+	setupObjectAttributesFull(0x07371e)
+}
+
+
+//# address-hook(0x073174) end(0x07318c)
+function void fn073174()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		MoveAndFlipWithParent()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x073192) end(0x0731ae)
+function void fn073192()
+{
+	setupObjectAttributesFull(0x07372a)
+	objA0.update_address = 0x0731b0
+	if (objA0.subtype2c != 0)
+	{
+		objA0.animation.sprite = 0x22
+	}
+}
+
+
+//# address-hook(0x0731b0) end(0x0731c8)
+function void fn0731b0()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x40)
+	{
+		MoveAndFlipWithParent()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x0731ce) end(0x0731ee)
+function void fn0731ce()
+{
+	setupObjectAttributesBasic(0x0736fe)
+
+	objA0.update_address = 0x0731f4
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u16[A0 + 0x44] = u16[A1 + 0x46]
+	if (objA0.subtype2c != 0)
+	{
+		objA0.value39 = 0x08
+	}
+
+	fn0731f4()
+}
+
+
+//# address-hook(0x0731f4) end(0x0731fa)
+function void fn0731f4()
+{
+	fn0733fc()
+	D0 = 4
+	fn0849c6()
+}
+
+
+
+
+//# address-hook(0x07321a) end(0x073230)
+function void fn07321a()
+{
+	setupObjectAttributesMost(0x073704)
+	objA0.update_address = 0x073232
+	u16[A0 + 0x3a] = 0x08
+}
+
+
+//# address-hook(0x073232) end(0x07326a)
+function void fn073232()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		MoveAndFlipWithParent()
+		--objA0.countdown_value
+		if (objA0.countdown_value >= 0)
+			return
+
+		objA0.countdown_value = u16[A0 + 0x3a]
+		--u16[A0 + 0x3a]
+		if (s16[A0 + 0x3a] < 0)
+		{
+			objA0.update_address = 0x073270
+			objA0.countdown_value = 0x18
+		}
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x073270) end(0x0732a2)
+function void fn073270()
+{
+	MoveAndFlipWithParent()
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		if ((objA0.value2f & 0x01) == 0)
+		{
+			DrawObject()
+		}
+	}
+	else
+	{
+		objA0.update_address = 0x0732a8
+		u32[A0 + 0x30] = 0x073849
+		objA0.countdown_callback = 0x0732ba
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x0732a8) end(0x0732b4)
+function void fn0732a8()
+{
+	MoveAndFlipWithParent()
+	Object.AnimationProgressByLocalA1()
+	DrawObject()
+}
+
+
+//# address-hook(0x0732ba) end(0x0732f4)
+function void fn0732ba()
+{
+	objA0.update_address = 0x0732f6
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		playSound(0x5e)
+	}
+	u8[A0 + 0x28] = 0x9c
+	objA0.animation.sprite = 0x11
+
+	D0 = -0x2c
+	D1.u16 = -0x800
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.s16 = -D0.s16
+		D1.s16 = -D1.s16
+	}
+	objA0.position.x.u16 += D0.u16
+	objA0.velocity.x = D1.u16
+}
+
+
+//# address-hook(0x0732f6) end(0x073334)
+function void fn0732f6()
+{
+	if ((global.framecounter & 0x01) == 0)
+	{
+		spawnChildObjects(0x0737d2)
+		u32[A1 + 0x30] = 0x073851
+		fn0734e4()
+	}
+	else
+	{
+		spawnChildObjects(0x0737d2)
+		u32[A1 + 0x30] = 0x073857
+		fn0734e4()
+	}
+
+	UpdateMovementStraightSimple()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x073364) end(0x073382)
+function void fn073364()
+{
+	setupObjectAttributesMost(0x0736f0)
+
+	objA0.flags2b |= 0x10
+	objA0.update_address = 0x073384
+	u32[A0 + 0x30] = 0x073844
+}
+
+
+//# address-hook(0x073384) end(0x073390)
+function void fn073384()
+{
+	MoveAndFlipWithParent()
+	Object.AnimationProgressByLocalA1()
+	fn084934()
+}
+
+
+//# address-hook(0x073396) end(0x0733c8)
+function void fn073396()
+{
+	setupObjectAttributesFull(0x073712)
+
+	objA0.update_address = 0x0733ca
+	u32[A0 + 0x30] = 0x07385d
+	objA0.countdown_callback = 0x0733e2
+	u8[A0 + 0x43] = 0xec
+	if (objA0.subtype2c != 0)
+	{
+		u8[A0 + 0x3c] = 0x80
+	}
+}
+
+
+//# address-hook(0x0733ca) end(0x0733dc)
+function void fn0733ca()
+{
+	Object.AnimationProgressByLocalA1()
+	++u8[A0 + 0x3c]
+	D2 = 3
+	fn084cac()
+	fn084934()
+}
+
+
+//# address-hook(0x0733e2) end(0x0733fa)
+function void fn0733e2()
+{
+	D0.u8 = objA0.value39 + 1
+	objA0.value39 = D0.u8
+	objA0.render_flags &= 0xfc
+	objA0.render_flags |= (D0.u8 & 0x03)
+}
+
+
+//# address-hook(0x0733fc) end(0x0734a8)
+function void fn0733fc()
+{
+	D0 = objA0.value39
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x44]
+		if (u8[A1 + 0x04] & 0x01)
+		{
+			D2.u8 = 0xff
+			--D0.u8
+			if (D0.s8 < 0)
+			{
+				D0 = 0x0b
+			}
+		}
+		else
+		{
+			D2.u8 = 0
+			++D0.u8
+			if (D0.u8 >= 0x0c)
+			{
+				D0 = 0
+			}
+		}
+
+		objA0.value39 = D0.u8
+		A2 = 0x0734aa
+		D1.u8 = u8[A2 + D0.s16]
+		objA0.render_flags |= render_flag.FLIP_X
+		if ((D1 & 0x80) == 0)
+		{
+			objA0.render_flags &= ~render_flag.FLIP_X
+			D2.u8 ^= 0xff
+		}
+		D1 &= ~0x80
+
+		u8[A1 + 0x38] &= ~0x08
+		if (D1.u8 == 0x04)
+		{
+			u8[A1 + 0x38] |= 0x08
+			if (D2.u8 != 0)
+			{
+				push(D1)
+				push(D0)
+				spawnChildObjects(0x0737c2)
+				D0 = pop()
+				D1 = pop()
+			}
+		}
+
+		objA0.animation.sprite = D1.u8
+		objA0.countdown_value = u16[0x0734b6 + D0.s16 * 2]
+	}
+
+	A1 = 0x0734ce + D0.s16 * 2
+	A2 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = u16[A2 + 0x10] + s8[(A1+=1)-1]
+	objA0.position.y.u16 = u16[A2 + 0x14] + s8[(A1+=1)-1]
+}
+
+
+//# address-hook(0x07333a) end(0x073352)
+function void fn07333a()
+{
+	setupObjectAttributesBasic(0x07370c)
+
+	objA0.update_address = 0x073358
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	MoveAndFlipWithParent()
+	fn073358()
+}
+
+
+//# address-hook(0x073358) end(0x07335e)
+function void fn073358()
+{
+	Object.AnimationProgressByLocalA1()
+	DrawObject()
+}
+
+
+//# address-hook(0x0734e4) end(0x0734f8)
+function void fn0734e4()
+{
+	GetRandomNumber()
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u8 = (D0.u8 & 0x07) + 0x18
+	u8[A1 + 0x42] = D0.u8
+}
+
+
+//# address-hook(0x0734fa) end(0x073602)
+function void fn0734fa()
+{
+	if (u8[A0 + 0x28] != 0)
+		return
+
+	if (boss.remaining_hits == 0)
+	{
+		// Note: This code in S3A is at 0x050194
+
+		AddScoreForBossEnemy_NoHudDirty()
+
+		objA0.animation.sprite = 5
+		objA0.flags2a |= 0x40
+		objA0.flags2a |= 0x80
+		u8[A0 + 0x28] = 0
+		D0.u16 = u16[A0 + 0x3c]
+		objA0.flags38 |= (1 << D0.u8)
+
+		spawnChildObjects(0x083fee)
+		u8[A1 + 0x2c] = 0x04
+
+	#if STANDALONE
+		// Knuckles can fight Sonic's bosses as well (using Tails)
+		//  -> So don't check for him, but check the camera position
+		bool isKnucklesFight = (camera.position.y.u16 < 0x0500)
+		if (isKnucklesFight)
+		{
+			// Spawn Big Arms for Knuckles
+			objA0.update_address = 0x073054
+		}
+		else if (Game.getSetting(SETTING_LBZ_BIGARMS))
+		{
+			// Spawn Big Arms for Sonic/Tails
+			objA0.update_address = 0x073056
+		}
+		else
+		{
+			// Skip Big Arms
+			objA0.update_address = 0x072b18
+		}
+	#else
+		// For Knuckles, spawn Big Arms now
+		objA0.update_address = isMainCharacter(CHARACTER_KNUCKLES) ? 0x073054 : 0x072b18
+	#endif
+		return
+	}
+
+	if (objA0.state == 0)
+	{
+		objA0.value3a = objA0.base_state
+		objA0.base_state = 0x06
+		objA0.state = 0x20
+		objA0.flags2a |= 0x40
+
+		playSound(0x6e)
+
+		D0.u16 = objA0.velocity.y << 1
+		if (abs(D0.s16) <= 0x0800)
+		{
+			objA0.velocity.y = D0.u16
+		}
+
+		if (boss.remaining_hits == 1 || boss.remaining_hits == 5)
+		{
+			if (boss.remaining_hits != 5)
+			{
+				objA0.flags38 |= 0x08
+			}
+
+			D0.u16 = u16[A0 + 0x3c]
+			objA0.flags38 |= (1 << D0.u8)
+			++u16[A0 + 0x3c]
+			objA0.base_state = 0x08
+			u8[A0 + 0x40] = 0x0f
+			objA0.flags2a |= 0x20
+
+			spawnChildObjects(0x0737f8)
+		}
+	}
+
+	Boss.updateHitFlashing(2, 0x073612, 0x073616)
+
+	--objA0.state
+	if (objA0.state == 0)
+	{
+		objA0.base_state = objA0.value3a
+		u16[0xfffffc22] = 0x0eee
+		u8[A0 + 0x28] = u8[A0 + 0x25]
+		objA0.flags2a &= ~0x40
+	}
+}
+
+
+//# address-hook(0x07361e) end(0x073680)
+function void fn07361e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = u16[A0 + 0x3c]
+	if (u8[A1 + 0x38] & (1 << D0.u8))
+	{
+		objA0.flags2a |= 0x80
+		if (D0.u16 == 2)
+		{
+			u32[A0 + 0x3e] = 0x0736c6
+			A2 = 0x073794
+		}
+		else
+		{
+			u32[A0 + 0x3e] = 0x0736c2
+			A2 = 0x07377a
+		}
+
+		objA0.countdown_value = 0x10
+		objA0.update_address = 0x0730f2
+
+		spawnChildObjects(A2)
+		spawnChildObjects(0x083fee)
+	}
+	else
+	{
+		if (u8[A1 + 0x2a] & 0x40)
+		{
+			objA0.update_address = 0x0730c0
+		}
+	}
+}
+
+
+//# address-hook(0x073682) end(0x0736a8)
+function void fn073682()
+{
+	D0 = objA0.subtype2c
+	D1.u16 = D0.u16 >> 1
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	A1 = u32[A1 + 0x3e]
+	objA0.animation.sprite = u8[A1 + D1.s16]
+
+	A1 = 0x0736aa + D0.s16 * 2
+	objA0.velocity.x = u16[(A1+=2)-2]
+	objA0.velocity.y = u16[(A1+=2)-2]
+}
+
+
+
+//# address-hook(0x084f80) end(0x084f8e)
+function void fn084f80()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		level.boss_encounter = 1
+		fn0852ae()
+	}
+}
+
+
+//# address-hook(0x0844ce) end(0x08450c)
+function void fn0844ce()
+{
+	--u8[A1 + 0x24]
+	if (s8[A1 + 0x24] < 0)
+	{
+		u8[A1 + 0x24] = u8[A2]
+		D0 = u8[A1 + 0x23] + 2
+		u8[A1 + 0x23] = D0.u8
+		D1.u8 = u8[A2 + D0.s16 + 0x01]
+		if (D1.u8 == 0)
+		{
+			fn085fc4()
+			A1 = objA0.countdown_callback
+			call A1
+			return
+		}
+
+		u8[A1 + 0x22] = D1.u8
+		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		if (u8[A2 + D0.s16 + 0x02] != 0)
+		{
+			u8[A1 + 0x04] |= render_flag.FLIP_X
+		}
+	}
+	fn085fc4()
+}

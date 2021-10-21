@@ -1,0 +1,254 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Round Bumper                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x032df2) end(0x032eea)
+function void fn032df2()
+{
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x80
+	u8[A0 + 0x28] = 0xd7
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.y.u16
+
+	if (global.zone == 0x14)
+	{
+		objA0.mapping_offset = 0x0330a2
+		objA0.sprite_attributes = 0x62cd
+		objA0.update_address = 0x032ef0
+		fn032ef0()
+		return
+	}
+
+	if (competition_mode.active)
+	{
+		objA0.mapping_offset = 0x2322ee
+		objA0.sprite_attributes = 0x2300
+		objA0.update_address = 0x032ff0
+		fn032ff0()
+		return
+	}
+
+	objA0.mapping_offset = 0x2322ce
+	objA0.sprite_attributes = 0x4364
+	if (objA0.subtype2c != 0)
+	{
+		objA0.value26 = objA0.subtype2c
+		objA0.update_address = 0x032e7e
+		fn032e7e()
+	}
+	else
+	{
+		objA0.update_address = 0x032eaa
+		fn032eaa()
+	}
+}
+
+
+//# address-hook(0x032e7e)
+function void fn032e7e()
+{
+	D0.u8 = level.framecounter.low
+	if (objA0.flags2a & 0x01)
+		D0.s8 = -D0.s8
+
+	D0.u8 += objA0.value26
+	LookupSinCos()
+	D1.s16 >>= 2
+	D0.s16 >>= 2
+	D1.u16 += u16[A0 + 0x30]
+	D0.u16 += objA0.value32
+	objA0.position.x.u16 = D1.u16
+	objA0.position.y.u16 = D0.u16
+	fn032eaa()
+}
+
+
+//# address-hook(0x032eaa) end(0x032eea)
+function void fn032eaa()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		fn032f34()
+	}
+
+	Object.animationUpdate(0x033094)
+	D0.u16 = (u16[A0 + 0x30] & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x0280)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+		return
+	}
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+	UnloadObject()
+}
+
+
+//# address-hook(0x032ef0) end(0x032f2e)
+function void fn032ef0()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		fn032f34()
+	}
+
+	Object.animationUpdate(0x033094)
+	D0.u16 = (objA0.position.y.u16 & 0xff80) - level.despawn_position.y
+	if (D0.u16 <= 0x0200)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x032f34) end(0x032f54)
+function void fn032f34()
+{
+	A1 = 0xffffb000
+	if (u8[A0 + 0x29] & 0x01)
+	{
+		fn032f56()
+	}
+
+	A1 = 0xffffb04a
+	if (u8[A0 + 0x29] & 0x02)
+	{
+		fn032f56()
+	}
+
+	u8[A0 + 0x29] = 0
+}
+
+
+//# address-hook(0x032f56) end(0x032fee)
+function void fn032f56()
+{
+	D1.u16 = objA0.position.x.u16 - objA1.position.x.u16
+	D2.u16 = objA0.position.y.u16 - objA1.position.y.u16
+	LookupAngleByVector()
+
+	D1.u16 = u8[0xfffffe04] & 0x03
+	D0.u16 += D1.u16
+	LookupSinCos()
+
+	D1.s32 = s32(D1.s16) * -0x700
+	D1.s32 >>= 8
+	objA1.velocity.x = D1.u16
+	D0.s32 = s32(D0.s16) * -0x700
+	D0.s32 >>= 8
+	objA1.velocity.y = D0.u16
+
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+	u8[A1 + 0x40] = 0
+	objA0.state = 0x01
+
+	playSound(0xaa)
+
+	D0.u16 = objA0.respawn_entry
+	if (D0.u16 != 0)
+	{
+		A2 = 0xffff0000 + D0.u16
+		if (u8[A2] >= 0x8a)
+			return
+
+		++u8[A2]
+	}
+
+	A3 = 0xffff0000 + A1.u16
+	addScore(1)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x02cce0
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x22] = 0x04
+	}
+}
+
+
+//# address-hook(0x032ff0) end(0x033018)
+function void fn032ff0()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		A1 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			fn03301c()
+		}
+
+		A1 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			fn03301c()
+		}
+
+		u8[A0 + 0x29] = 0
+	}
+
+	fn03307c()
+}
+
+
+//# address-hook(0x03301c) end(0x03307a)
+function void fn03301c()
+{
+	D1.u16 = objA0.position.x.u16 - objA1.position.x.u16
+	D2.u16 = objA0.position.y.u16 - objA1.position.y.u16
+	LookupAngleByVector()
+
+	D0.u16 += u8[0xfffffe04] & 0x03
+	LookupSinCos()
+	D1.s32 = s32(D1.s16) * -0x700
+	D1.s32 >>= 8
+	objA1.velocity.x = D1.u16
+	D0.s32 = s32(D0.s16) * -0x700
+	D0.s32 >>= 8
+	objA1.velocity.y = D0.u16
+
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+	u8[A1 + 0x40] = 0
+	objA0.state = 0x01
+
+	playSound(0x7b)
+}
+
+
+//# address-hook(0x03307c) end(0x03308e)
+function void fn03307c()
+{
+	Object.animationUpdate(0x033094)
+	AddAsDynamicObject()
+	DrawObject()
+}

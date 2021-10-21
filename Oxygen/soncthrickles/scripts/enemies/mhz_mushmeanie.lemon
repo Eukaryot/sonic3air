@@ -1,0 +1,207 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Mushmeanie enemy from MHZ                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x08daf6) end(0x08daf6)
+function void fn08daf6()
+{
+	Object.InitWithUpdateAddress(0x08dafc)
+}
+
+
+//# address-hook(0x08dafc) end(0x08db0e)
+function void fn08dafc()
+{
+	// Targets:
+	//  - 0x08db1e	-> objA0.base_state = 0x00
+	//  - 0x08db3e	-> objA0.base_state = 0x02
+	//  - 0x08db64	-> objA0.base_state = 0x04
+	//  - 0x08db94	-> objA0.base_state = 0x06
+	//  - 0x08dbec	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x08db14, objA0.base_state)
+
+	fn08dc6e()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08db1e) end(0x08db38)
+function void fn08db1e()
+{
+	setupObjectAttributesFull(0x08dcca)
+	objA0.value39 = 0x02
+	objA0.hitbox_extends.y = 0x12
+	spawnChildObjects(0x08dcde)
+}
+
+
+//# address-hook(0x08db3e) end(0x08db62)
+function void fn08db3e()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x80)
+	{
+		objA0.base_state = 0x04
+		u32[A0 + 0x30] = 0x08dce6
+		objA0.countdown_callback = 0x08db76
+	}
+}
+
+
+//# address-hook(0x08db64) end(0x08db74)
+function void fn08db64()
+{
+	fn08459c()
+	if (D2.u16 != 0)
+	{
+		objA0.position.y.u16 -= 3
+	}
+}
+
+
+//# address-hook(0x08db94) end(0x08dbce)
+function void fn08db94()
+{
+	MoveWithGravity20()
+	if (objA0.velocity.x >= 0)
+	{
+		D3 = 8
+		fn00fac4()
+	}
+	else
+	{
+		D3 = -8
+		fn00fe3c()
+	}
+
+	if (D1.s16 < 0)
+	{
+		objA0.position.x.u16 += D1.u16
+		objA0.velocity.x = -objA0.velocity.x
+		objA0.render_flags ^= 0x01
+	}
+
+	if (objA0.velocity.y >= 0)
+	{
+		Object.TriggerOnGroundHit()
+	}
+}
+
+
+//# address-hook(0x08dbec) end(0x08dc06)
+function void fn08dbec()
+{
+	fn08459c()
+	if (D2.u16 != 0)
+	{
+		D0.u16 = u16[0x08dc08 + objA0.animation.frame]
+		objA0.position.y.u16 += D0.u16
+	}
+}
+
+
+//# address-hook(0x08dc6e) end(0x08dcc4)
+function void fn08dc6e()
+{
+	if (objA0.state != 0)
+	{
+		--objA0.state
+		if (objA0.state != 0)
+			return
+
+		u8[A0 + 0x28] = 0xd7
+	}
+
+	fn085870()
+	if (!_equal())
+	{
+		fn0857c2()
+		if (_equal())
+		{
+			if (u8[A1 + 0x34] == 0)
+			{
+				Enemy.DamageCharacter()
+			}
+			return
+		}
+
+		--objA0.value39
+		if (objA0.value39 == 0)
+		{
+			fn085732()
+			return
+		}
+
+		u8[A0 + 0x28] = 0
+		u8[A0 + 0x29] = 0
+		objA0.state = 0x20
+		objA0.flags2a |= 0x40
+		objA1.velocity.x = -objA1.velocity.x
+		objA1.velocity.y = -objA1.velocity.y
+		s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+	}
+}
+
+
+//# address-hook(0x08dc14) end(0x08dc1e)
+function void fn08dc14()
+{
+	setupObjectAttributesMost(0x08dcd6)
+
+	objA0.update_address = 0x08dc24
+	fn08dc24()
+}
+
+
+//# address-hook(0x08dc24) end(0x08dc5c)
+function void fn08dc24()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	if ((u8[A1 + 0x2a] & 0x40) == 0)
+	{
+		fn084920()
+		return
+	}
+
+	objA0.update_address = 0x08dc62
+	A2 = 0xffff0000 + u16[A1 + 0x44]
+	D0.u16 = 0x0200
+	if (s16[A2 + 0x18] >= 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.velocity.x = D0.u16
+	objA0.velocity.y = -0x200
+	fn08dc62()
+}
+
+
+//# address-hook(0x08dc62) end(0x08dc68)
+function void fn08dc62()
+{
+	MoveWithGravity20()
+	fn0850d4()
+}
+
+
+//# address-hook(0x08db76) end(0x08db8e)
+function void fn08db76()
+{
+	objA0.base_state = 0x06
+	objA0.velocity.y = -0x300
+	objA0.countdown_callback = 0x08dbd4
+	D4.u16 = -0x100
+	fn085416()
+}

@@ -1,0 +1,284 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x089bdc) end(0x089c12)
+function void fn089bdc()
+{
+	setupObjectAttributesFull(0x089e78)
+	objA0.update_address = 0x089c14
+	spawnChildObjects(0x089ea8)
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		if (u8[A2] & 0x01)
+		{
+			objA0.update_address = 0x089c54
+			objA0.animation.sprite = 0x01
+			objA0.flags38 |= 0x20
+		}
+	}
+}
+
+
+//# address-hook(0x089c14) end(0x089c50)
+function void fn089c14()
+{
+	// This is also used in SOZ 2 for the ghosts
+
+	if (objA0.flags38 & 0x02)
+	{
+		objA0.update_address = 0x089c54
+		objA0.animation.sprite = 1
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] |= 0x01
+		}
+		fn089dac()
+
+		spawnSimpleChildObjects(0x083fee)
+		if (_equal())
+		{
+			u8[A1 + 0x2c] = 0x08
+		}
+
+		spawnChildObjects(0x089eb0)
+	}
+
+	fn089c54()
+}
+
+
+//# address-hook(0x089c54) end(0x089c58)
+function void fn089c54()
+{
+	fn089d9c()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x089c5c) end(0x089c84)
+function void fn089c5c()
+{
+	// Containing rings
+	setupObjectAttributesBasic(0x086b3e)
+	objA0.update_address = 0x08672a
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x20)
+	{
+		objA0.update_address = 0x086754
+		objA0.animation.sprite = 0x0c
+	}
+}
+
+
+//# address-hook(0x089c86) end(0x089cde)
+function void fn089c86()
+{
+	setupObjectAttributesFull(0x089e84)
+	objA0.animation.sprite = 0x05
+	fn086a3e()
+
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 != 0)
+	{
+		//objA0.animation.sprite = 0x06		// Will get overwritten in any case, so what's the point?
+		if (D0 & 0x08)
+		{
+			objA0.animation.sprite = 0x0c
+			A1 = 0xffffb000
+			D0.u16 = 0xf600
+			fn08635e()
+		}
+
+	#if STANDALONE
+		// Bug fix
+		D0.u8 = objA0.flags2a & 0x18
+	#endif
+		if (D0 & 0x10)
+		{
+			objA0.animation.sprite = 0x0c
+			A1 = 0xffffb04a
+			D0.u16 = 0xf600
+			fn08635e()
+		}
+	}
+	Object.DrawOrUnload()
+}
+
+
+
+//# address-hook(0x089ce2) end(0x089cfc)
+function void fn089ce2()
+{
+#if STANDALONE
+	Standalone.onAnimalFreed()
+#endif
+
+	setupObjectAttributesBasic(0x089e96)
+
+	objA0.update_address = 0x089d02
+	objA0.hitbox_extends.y = 0x08
+
+	fn089dee()
+	DrawObject()
+}
+
+
+//# address-hook(0x089d02) end(0x089d14)
+function void fn089d02()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x089d18
+		objA0.sprite_priority = 0x80
+	}
+	Object.DrawOrUnload()
+}
+
+
+//# address-hook(0x089d18) end(0x089d40)
+function void fn089d18()
+{
+	MoveWithGravity20()
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 += D1.u16
+		objA0.velocity.y = objA0.value3e
+	}
+
+	D0 = (global.framecounter.low & 0x08) ? 0 : 1
+	objA0.animation.sprite = D0.u8
+	Object.DrawOrUnload()
+}
+
+
+
+//# address-hook(0x089d44) end(0x089d72)
+function void fn089d44()
+{
+	// Spawn rings
+	setupObjectAttributesFull(0x089e9c)
+	objA0.update_address = 0x01a64a
+
+	spilled_rings.speed = 0xff
+	objA0.hitbox_extends.x = 0x08
+	objA0.hitbox_extends.y = 0x08
+	objA0.render_flags = 0x84
+
+	D0 = 4
+	fn0852d0()
+	DrawObject()
+}
+
+
+
+// SOZ ghost capsule only?
+
+//# address-hook(0x089d78) end(0x089d96)
+function void fn089d78()
+{
+	setupObjectAttributesBasic(0x089e90)
+	objA0.update_address = 0x085102
+	fn086a64()
+
+	D0 = 4
+	fn0852d0()
+	DrawObject()
+}
+
+
+//# address-hook(0x089d9c) end(0x089da6)
+function void fn089d9c()
+{
+	D1 = 0x2b
+	D2 = 0x18
+	D3 = 0x18
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}
+
+
+//# address-hook(0x089dac) end(0x089db8)
+function void fn089dac()
+{
+	// Targets:
+	//  - 0x089dc4	-> objA0.subtype2c = 0x00
+	//  - 0x089dcc	-> objA0.subtype2c = 0x01
+	//  - 0x089dde	-> objA0.subtype2c = 0x02
+	//  - 0x08f514	-> objA0.subtype2c = 0x03
+	call tableLookupAddress(0x089dbc, objA0.subtype2c * 2)
+}
+
+
+//# address-hook(0x089dc4) end(0x089dc8)
+function void fn089dc4()
+{
+	spawnChildObjects(0x089ed0)
+}
+
+
+//# address-hook(0x089dcc) end(0x089dda)
+function void fn089dcc()
+{
+	// Rings
+	playSound(0xb9)
+	spawnChildObjects(0x089ef0)
+}
+
+
+//# address-hook(0x089dde) end(0x089dea)
+function void fn089dde()
+{
+	spawnChildObjects(0x089f16)
+	spawnChildObjects(0x089f24)
+}
+
+
+//# address-hook(0x089dee) end(0x089e6a)
+function void fn089dee()
+{
+	D1.u16 = objA0.subtype2c
+	D0 = objA0.subtype2c & 0x06
+	A1 = 0x089e6c
+	D2.u16 = u16[A1 + D0.s16]
+	objA0.velocity.y = D2.u16
+	objA0.value3e = D2.u16
+	D0.u16 &= 0x02
+	D2.u16 = D0.u16
+	objA0.sprite_attributes = u16[0x089e74 + D2.s16]
+	D2 = global.zone * 2
+	A1 = 0x02c7ba + D2.u16
+	D0.u16 >>= 1
+	D0.u8 = u8[A1 + D0.s16]
+	D0.u16 <<= 3
+
+	A2 = 0x02c7ea
+	objA0.mapping_offset = u32[A2 + D0.s16 + 0x04]
+	D1.u16 <<= 2
+	objA0.countdown_value = D1.u16
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = objA0.position.x.u16
+	D1.u16 = 0x0200
+	if (D0.u16 < objA1.position.x.u16)
+	{
+		D1.s16 = -D1.s16
+	}
+	objA0.velocity.x = D1.u16
+	objA0.render_flags &= ~0x01
+	if (objA0.velocity.x < 0)
+	{
+		objA0.render_flags |= 0x01
+	}
+}

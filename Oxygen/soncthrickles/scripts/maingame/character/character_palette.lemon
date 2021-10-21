@@ -1,0 +1,760 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+#if STANDALONE
+
+function u64 getCharacterPaletteKey(u8 character)
+{
+	return (character == CHARACTER_SONIC) ? "character_palette_sonic" : (character == CHARACTER_TAILS) ? "character_palette_tails" : "character_palette_knuckles"
+}
+
+
+function void loadCharacterPalette(u8 character, u32 targetAddress, u8 paletteVariant)
+{
+	// Palette variants:
+	//  - 0 = Normal character palette
+	//  - 1 = Underwater character palette for AIZ
+	//  - 2 = Underwater character palette for ICZ
+	//  - 3 = Underwater character palette for HCZ
+	//  - 4 = Underwater character palette for CNZ and LBZ
+
+	// Only Knuckles makes use of all four underwater palette variants,
+	// the other characters have only two actually different underwater palettes:
+	//     - AIZ and ICZ are identical for S/T
+	//     - HCZ, CNZ, LBZ are identical for S/T
+	// In all cases, CNZ and LBZ share the same underwater character palettes.
+	// Also, there's never differences between the two acts of a zone.
+
+	// Load original character palette from ROM
+	u32 sourceAddress
+	if (paletteVariant == 0)
+	{
+		// Normal palette variant
+		sourceAddress = (character != CHARACTER_KNUCKLES) ? 0x0a8a3c : 0x0a8afc
+		copyMemory(targetAddress, sourceAddress, 0x20)
+	}
+	else
+	{
+		// Underwater palette variant
+		if (paletteVariant <= 2)
+		{
+			sourceAddress = 0x0a8c9c
+		}
+		else
+		{
+			sourceAddress = 0x0a8e5c
+		}
+		copyMemory(targetAddress, sourceAddress, 0x20)
+
+		if (character == CHARACTER_KNUCKLES)
+		{
+			// Copying in Knuckles' colors into underwater palette;
+			// these are in fact mostly different (in palette variant order):
+			//  - AIZ:		0x0a6a, 0x0a2a, 0x0624
+			//  - ICZ:		0x0a4c, 0x0a28, 0x0428
+			//  - HCZ:		0x0e2a, 0x0c0a, 0x0a06
+			//  - CNZ, LBZ: 0x064c, 0x0628, 0x0624
+			if (paletteVariant == 1)
+			{
+				A1 = 0x007a4a
+			}
+			else if (paletteVariant == 2)
+			{
+				A1 = 0x007a4a + 30
+			}
+			else if (paletteVariant == 3)
+			{
+				A1 = 0x007a4a + 6
+			}
+			else
+			{
+				A1 = 0x007a4a + 18
+			}
+			copyMemory(targetAddress + 0x04, A1, 6)
+		}
+	}
+
+	// Allow for loading modded palettes
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		u16 numColors = System.loadExternalPaletteData(getCharacterPaletteKey(character), paletteVariant, 0x800000, 0x20)
+		for (u8 i = 0; i < numColors; ++i)
+		{
+			u32 rgba = u32[0x800000 + i * 4]
+			u16[targetAddress + i * 2] = packColorExt(rgba)
+		}
+
+		if (numColors < 0x20)
+		{
+			// First 16 colors got written in any case
+			numColors = max(numColors, 0x10)
+			zeroMemory(targetAddress + numColors * 2, 0x40 - numColors * 2)
+		}
+	}
+}
+
+#endif
+
+
+
+//-------------------------------------------------------//
+// Super/Hyper form palette effects                      //
+//-------------------------------------------------------//
+
+// Values of super.palettefx.state:
+//  0x00 = No effect because not super
+//  0x01 = Start of effect on transformation
+//  0x02 = End of effect because of de-transforming
+//  0xff = Effect is active and looping
+
+
+function u32 UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette()
+{
+	return (global.zone == 0 || global.zone == 5) ? 0x0039ca : 0x003a06
+}
+
+function void UpdatePaletteEffects.SuperForm.applyGeneral(u8 characterVersion, u32 source)
+{
+	u32 primaryDest   = 0xfffffc00
+	u32 secondaryDest = 0xfffff080
+#if STANDALONE
+	if (characterVersion != 0xff)	// Special handling for the flickies
+	{
+		u8 character = clamp(characterVersion, 1, 3) - 1
+		primaryDest   = 0x802000 + character * 0x40
+		secondaryDest = 0x802300 + character * 0x40
+	}
+#endif
+
+	if (characterVersion != 2)
+	{
+		// Sonic / Knuckles
+		copyMemory(primaryDest + 4, source + super.palettefx.frame, 6)
+		if (level.water_present)
+		{
+			if (characterVersion == 1)
+			{
+				// Super Sonic has his own underwater palettes (used for Hyper Sonic only when fading)
+				source = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette()
+				copyMemory(secondaryDest + 4, source + super.palettefx.frame, 6)
+			}
+			else
+			{
+				copyMemory(secondaryDest + 4, primaryDest + 4, 6)
+			}
+		}
+	}
+	else
+	{
+		// Tails
+		source += super.palettefx.frame.tails
+		u32 dest = primaryDest + 0x10
+		u16[dest + 0] = u16[source + 0]
+		u16[dest + 2] = u16[source + 2]
+		u16[dest + 6] = u16[source + 4]
+
+		if (level.water_present)
+		{
+			u32 dest2 = secondaryDest + 0x10
+			u16[dest2 + 0] = u16[dest + 0]
+			u16[dest2 + 2] = u16[dest + 2]
+			u16[dest2 + 6] = u16[dest + 6]
+		}
+	}
+}
+
+
+//# address-hook(0x003750) end(0x00398c)
+function void UpdatePaletteEffects.SuperForm()
+{
+	// This function gets entered even if not in a Super or Hyper form
+	//  -> If so, leave now again
+	if (super.palettefx.state == 0)
+		return
+
+	// Palette effects depend on the character, and for Sonic on Hyper vs. Super form:
+	//  - 0x00 = Hyper Sonic
+	//  - 0x01 = Super Sonic
+	//  - 0x02 = Super/Hyper Tails
+	//  - 0x03 = Super/Hyper Knuckles
+	u8 characterVersion = isMainCharacter(CHARACTER_SONIC) ? ((super.active & 0x80) ? 0 : 1) : (getMainCharacter() + 1)
+
+	// There's three variants of this function:
+	//  - The original code -- with differentiation between standalone incl. extended palettes and real original
+	//  - Smoothed palette effects when an anti-flicker setting is active
+	//  - Variant for modded palettes
+
+#if STANDALONE
+	u64 characterKey = getCharacterPaletteKey(getMainCharacter())
+	bool isNormalPaletteModded = System.hasExternalPaletteData(characterKey, 0)		// Check line index 0, for the normal form palette
+	bool isSuperPaletteModded = System.hasExternalPaletteData(characterKey, 5)		// Check line index 5, for Super/Hyper form palette
+	if (isSuperPaletteModded)
+	{
+		// Modded super palettes (possible using different super colors) need a special handling
+		UpdatePaletteEffects.SuperForm.moddingVersion(characterVersion)
+	}
+	else if (Game.getSetting(SETTING_GFX_ANTIFLICKER) != 0 || isNormalPaletteModded)
+	{
+		// Smoothed version of effects -- also used when normal character palette is modded, but super palette is not
+		UpdatePaletteEffects.SuperForm.smoothedVersion(characterVersion)
+	}
+	else
+#endif
+	{
+		// Original version of effects -- does not support modded palettes
+		UpdatePaletteEffects.SuperForm.originalVersion(characterVersion)
+	}
+}
+
+
+function void UpdatePaletteEffects.SuperForm.originalVersion(u8 characterVersion)
+{
+	if (super.palettefx.state & 0x80)
+	{
+		// Update ongoing palette effect
+		if (characterVersion == 0)
+		{
+			// Hyper Sonic
+			--super.palettefx.timer
+			if (super.palettefx.timer >= 0)
+				return
+
+			UpdatePaletteEffects.SuperForm.applyGeneral(characterVersion, 0x003a42)
+
+			super.palettefx.timer = 4
+			super.palettefx.frame += 6
+			if (super.palettefx.frame >= 72)
+				super.palettefx.frame = 0
+		}
+		else if (characterVersion == 1)
+		{
+			// Super Sonic
+			UpdatePaletteEffects.UpdateSuperSonic.Original(characterVersion)
+		}
+		else if (characterVersion == 2)
+		{
+			// Super/Hyper Tails
+			--super.palettefx.timer.tails
+			if (super.palettefx.timer.tails < 0)
+			{
+				UpdatePaletteEffects.SuperForm.applyGeneral(characterVersion, 0x003a8a)
+
+				super.palettefx.timer.tails = 0x0b
+				super.palettefx.frame.tails = (super.palettefx.frame.tails + 6) % 36
+			}
+
+			// Also update Sonic's colors, for the flickies
+			UpdatePaletteEffects.UpdateSuperSonic.Original(0xff)
+		}
+		else
+		{
+			// Super/Hyper Knuckles
+			--super.palettefx.timer
+			if (super.palettefx.timer >= 0)
+				return
+
+			UpdatePaletteEffects.SuperForm.applyGeneral(characterVersion, 0x003aae)
+
+			super.palettefx.timer = 2
+			super.palettefx.frame += 6
+			if (super.palettefx.frame >= 60)
+			{
+				super.palettefx.frame = 0
+				super.palettefx.timer = 0x0e
+			}
+		}
+	}
+	else if (super.palettefx.state == 1)
+	{
+		// Fade in effect
+		--super.palettefx.timer
+		if (super.palettefx.timer >= 0)
+			return
+
+		super.palettefx.timer = 1
+		if (characterVersion <= 1)
+		{
+			// Sonic
+			UpdatePaletteEffects.SuperForm.applyGeneral(1, 0x00398e)
+
+			super.palettefx.frame += 6
+			if (super.palettefx.frame < 36)
+				return
+		}
+		else
+		{
+			// Tails / Knuckles
+			//  -> They don't need an additional fade-in, as their palette animation is constantly fading in and out anyway
+			super.palettefx.frame = 0
+			super.palettefx.frame.tails = 0
+		}
+
+		super.palettefx.state = 0xff
+		u8[0xffffb02e] = 0		// Reset "char.control_flags"
+	}
+	else  // (super.palettefx.state == 2)
+	{
+		// Fade out effect
+		if (characterVersion <= 1)
+		{
+			// Sonic
+			--super.palettefx.timer
+			if (super.palettefx.timer >= 0)
+				return
+
+			UpdatePaletteEffects.SuperForm.applyGeneral(1, 0x00398e)
+
+			super.palettefx.timer = 3
+			super.palettefx.frame -= 6
+			if (s16(super.palettefx.frame) < 0)
+			{
+			#if STANDALONE
+				super.palettefx.frame = 0
+			#else
+				u8[0xfffff65c] = 0		// Clear only upper byte of super.palettefx.frame (but why?)
+			#endif
+				super.palettefx.state = 0
+			}
+		}
+		else
+		{
+			// Tails / Knuckles: There is no fade-out, their colors instantly convert back to normal
+			super.palettefx.frame = 0
+			super.palettefx.state = 0
+			super.palettefx.frame.tails = 0
+			if (characterVersion == 2)
+			{
+				// Tails
+			#if STANDALONE
+				u32 offset = getMainCharacter() * 0x40
+				u16[0x802010 + offset] = u16[0x8021d0]
+				u16[0x802012 + offset] = u16[0x8021d2]
+				u16[0x802016 + offset] = u16[0x8021d6]
+				if (level.water_present)
+				{
+					u16[0x802310 + offset] = u16[0x8024d0]
+					u16[0x802312 + offset] = u16[0x8024d2]
+					u16[0x802316 + offset] = u16[0x8024d6]
+				}
+			#else
+				UpdatePaletteEffects.SuperForm.applyGeneral(characterVersion, 0x003a8a)
+			#endif
+
+				// Revert flickies colors
+				UpdatePaletteEffects.SuperForm.applyGeneral(0xff, 0x00398e)
+			}
+			else
+			{
+				// Knuckles
+			#if STANDALONE
+				u32 offset = getMainCharacter() * 0x40
+				copyMemory(0x802004 + offset, 0x802204, 6)
+				if (level.water_present)
+					copyMemory(0x802304 + offset, 0x802504, 6)
+			#else
+				UpdatePaletteEffects.SuperForm.applyGeneral(characterVersion, 0x003aea)
+			#endif
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x00386e)
+function void UpdatePaletteEffects.UpdateSuperSonic.Original(u8 characterVersion)
+{
+	// Note that this is used for Tails as well, but only to update Sonic's palette (affects the Flickies!)
+	--super.palettefx.timer
+	if (super.palettefx.timer < 0)
+	{
+		UpdatePaletteEffects.SuperForm.applyGeneral(characterVersion, 0x00398e)
+
+		super.palettefx.timer = 6
+		super.palettefx.frame += 6
+		if (super.palettefx.frame >= 54)
+			super.palettefx.frame = 36
+	}
+}
+
+
+
+#if STANDALONE
+
+function void UpdatePaletteEffects.SuperForm.smoothedVersion(u8 characterVersion)
+{
+	if (super.palettefx.state & 0x80)
+	{
+		// Update ongoing palette effect
+		if (characterVersion == 0)
+		{
+			// Hyper Sonic
+			u8 cycles = (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2) ? 0x18 : 0x0c
+			u32 address1 = 0x003a42 + super.palettefx.frame
+			u32 address2 = 0x003a42 + (super.palettefx.frame + 6) % 72
+			u16 blendFactor = u16(super.palettefx.timer) * 0x100 / cycles
+
+			UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, false)
+			if (level.water_present)
+				UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, true)	// Same palette as above water
+
+			--super.palettefx.timer
+			if (super.palettefx.timer < 0)
+			{
+				super.palettefx.timer = cycles - 1
+				super.palettefx.frame += 6
+				if (super.palettefx.frame >= 72)
+					super.palettefx.frame = 0
+			}
+		}
+		else if (characterVersion == 1)
+		{
+			// Super Sonic
+			u8 cycles = (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2) ? 0x18 : 0x0c
+			u16 nextFrame = (super.palettefx.frame < 48) ? (super.palettefx.frame + 6) : 36
+			u32 address1 = 0x00398e + super.palettefx.frame
+			u32 address2 = 0x00398e + nextFrame
+			u16 blendFactor = super.palettefx.timer * 0x100 / cycles
+			UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, false)
+
+			if (level.water_present)
+			{
+				u32 source = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette()
+				address1 = source + super.palettefx.frame
+				address2 = source + nextFrame
+				UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, true)
+			}
+
+			--super.palettefx.timer
+			if (super.palettefx.timer < 0)
+			{
+				super.palettefx.timer = cycles - 1
+				super.palettefx.frame = nextFrame
+			}
+		}
+		else if (characterVersion == 2)
+		{
+			// Super/Hyper Tails
+			u8 cycles = 0x0c
+			u32 address1 = 0x003a8a + super.palettefx.frame.tails
+			u32 address2 = 0x003a8a + (super.palettefx.frame.tails + 6) % 36
+			u16 blendFactor = u16(super.palettefx.timer.tails) * 0x100 / cycles
+
+			UpdatePaletteEffects.SuperForm.blendTails(address2, address1, blendFactor, false)
+			if (level.water_present)
+				UpdatePaletteEffects.SuperForm.blendTails(address2, address1, blendFactor, true)
+
+			--super.palettefx.timer.tails
+			if (super.palettefx.timer.tails < 0)
+			{
+				super.palettefx.timer.tails = cycles - 1
+				super.palettefx.frame.tails = (super.palettefx.frame.tails + 6) % 36
+			}
+
+			// Also update Sonic's colors, for the flickies
+			UpdatePaletteEffects.UpdateSuperSonic.Original(0xff)
+		}
+		else
+		{
+			// Super/Hyper Knuckles
+			u16 nextFrame = (super.palettefx.frame + 6) % 60
+			u8 cycles = (nextFrame == 0) ? 0x0f : 0x03
+			super.palettefx.timer = min(super.palettefx.timer, cycles - 1)
+			u32 address1 = 0x003aae + super.palettefx.frame
+			u32 address2 = 0x003aae + nextFrame
+			u16 blendFactor = super.palettefx.timer * 0x100 / cycles
+			UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, false)
+
+			if (level.water_present)
+			{
+				address1 = 0x003aae + super.palettefx.frame
+				address2 = 0x003aae + nextFrame
+				UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, true)
+			}
+
+			--super.palettefx.timer
+			if (super.palettefx.timer < 0)
+			{
+				super.palettefx.timer = 0x10	// Will be corrected in next update
+				super.palettefx.frame = nextFrame
+			}
+		}
+	}
+	else if (super.palettefx.state == 1)
+	{
+		// Fade in
+		if (characterVersion <= 1)
+		{
+			// Sonic
+			u16 blendFactor = clamp((super.palettefx.frame + (1 - super.palettefx.timer) * 6 / 2) * 0x100 / 0x24, 0, 0x100)
+			u32 superPaletteAddress = 0x00398e + 0x1e
+			UpdatePaletteEffects.SuperForm.blendSonicKnux(0x802184, superPaletteAddress, blendFactor, false)
+
+			if (level.water_present)
+			{
+				superPaletteAddress = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette() + 0x1e
+				UpdatePaletteEffects.SuperForm.blendSonicKnux(0x802484, superPaletteAddress, blendFactor, true)
+			}
+
+			// Brief wait time for animation (standing still in the air)
+			--super.palettefx.timer
+			if (super.palettefx.timer >= 0)
+				return
+
+			// Fade in effect
+			super.palettefx.frame += 6
+			super.palettefx.timer = 1
+			if (super.palettefx.frame < 36)
+				return
+		}
+		else
+		{
+			// Brief wait time for animation (standing still in the air)
+			--super.palettefx.timer
+			if (super.palettefx.timer >= 0)
+				return
+
+			// Tails / Knuckles
+			//  -> They don't need an additional fade-in, as their palette animation is constantly fading in and out anyway
+			super.palettefx.frame = 0
+			super.palettefx.frame.tails = 0
+		}
+
+		// Fully faded in
+		super.palettefx.state = 0xff
+		u8[0xffffb02e] = 0		// Reset "char.control_flags"
+	}
+	else  // (super.palettefx.state == 2)
+	{
+		// Fade out
+		if (super.palettefx.frame >= 30)
+		{
+			// This is the first frame, set everything so that only the timer is used
+			super.palettefx.frame = 0
+			super.palettefx.frame.tails = 0
+			super.palettefx.timer = 0x11
+		}
+		u16 blendFactor = clamp(u16(super.palettefx.timer) * 0x100 / 0x12, 0, 0x100)
+
+		if (characterVersion <= 1)
+		{
+			// Sonic (both Super and Hyper form use the same fade-out)
+			u32 superPaletteAddress = 0x00398e + 0x1e
+			UpdatePaletteEffects.SuperForm.blendSonicKnux(0x802184, superPaletteAddress, blendFactor, false)
+
+			if (level.water_present)
+			{
+				superPaletteAddress = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette() + 0x1e
+				UpdatePaletteEffects.SuperForm.blendSonicKnux(0x802484, superPaletteAddress, blendFactor, true)
+			}
+		}
+		else if (characterVersion == 2)
+		{
+			// Tails
+			u32 superPaletteAddress = 0x003a8a + 0x12
+			UpdatePaletteEffects.SuperForm.blendTails2(0x8021d0, superPaletteAddress, blendFactor, false)
+
+			if (level.water_present)
+			{
+				UpdatePaletteEffects.SuperForm.blendTails2(0x8024d0, superPaletteAddress, blendFactor, true)
+			}
+
+			// Update of Sonic's colors used by the Flickies
+			{
+				superPaletteAddress = 0x00398e + 0x1e
+				for (u8 k = 0; k < 6; k += 2)
+				{
+					u16[0xfffffc04 + k] = blendColorsPacked(u16[0x802184 + k], u16[superPaletteAddress + k], blendFactor)
+				}
+
+				if (level.water_present)
+				{
+					superPaletteAddress = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette() + 0x1e
+					for (u8 k = 0; k < 6; k += 2)
+					{
+						u16[0xfffff084 + k] = blendColorsPacked(u16[0x802384 + k], u16[superPaletteAddress + k], blendFactor)
+					}
+				}
+			}
+		}
+		else
+		{
+			// Knuckles
+			u32 superPaletteAddress = 0x003aae + 0x1e
+			UpdatePaletteEffects.SuperForm.blendSonicKnux(0x802204, superPaletteAddress, blendFactor, false)
+
+			if (level.water_present)
+			{
+				UpdatePaletteEffects.SuperForm.blendSonicKnux(0x802504, superPaletteAddress, blendFactor, true)
+			}
+		}
+
+		if (super.palettefx.timer == 0)
+		{
+			// Fully faded out
+			super.palettefx.state = 0
+		}
+		else
+		{
+			--super.palettefx.timer
+		}
+	}
+}
+
+
+function void UpdatePaletteEffects.SuperForm.blendSonicKnux(u32 source1, u32 source2, u16 blendFactor, bool underwater)
+{
+	u32 offset = getMainCharacter() * 0x40 + (underwater ? 0x300 : 0)
+	for (u8 k = 0; k < 6; k += 2)
+	{
+		u16[0x802004 + offset + k] = blendColorsPacked(u16[source1 + k], u16[source2 + k], blendFactor)
+	}
+}
+
+function void UpdatePaletteEffects.SuperForm.blendTails(u32 source1, u32 source2, u16 blendFactor, bool underwater)
+{
+	u32 offset = getMainCharacter() * 0x40 + (underwater ? 0x300 : 0)
+	u16[0x802010 + offset] = blendColorsPacked(u16[source1 + 0], u16[source2 + 0], blendFactor)
+	u16[0x802012 + offset] = blendColorsPacked(u16[source1 + 2], u16[source2 + 2], blendFactor)
+	u16[0x802016 + offset] = blendColorsPacked(u16[source1 + 4], u16[source2 + 4], blendFactor)
+}
+
+function void UpdatePaletteEffects.SuperForm.blendTails2(u32 source1, u32 source2, u16 blendFactor, bool underwater)
+{
+	u32 offset = getMainCharacter() * 0x40 + (underwater ? 0x300 : 0)
+	u16[0x802010 + offset] = blendColorsPacked(u16[source1 + 0], u16[source2 + 0], blendFactor)
+	u16[0x802012 + offset] = blendColorsPacked(u16[source1 + 2], u16[source2 + 2], blendFactor)
+	u16[0x802016 + offset] = blendColorsPacked(u16[source1 + 6], u16[source2 + 4], blendFactor)
+}
+
+
+function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
+{
+	if (super.palettefx.state & 0x80)
+	{
+		// Update ongoing palette effect
+		u8 character = getMainCharacter()
+		bool isHyperEffect = (super.active == 0xff || super.active.tails == 0xff)
+		u16 nextFrame = (super.palettefx.frame + 6) % (isHyperEffect ? 108 : 18)
+		u16 blendFactor = super.palettefx.timer * 0x100 / (isHyperEffect ? 0x07 : 0x0f)
+		if (nextFrame % 18 == 0)
+			blendFactor = 0x100 - blendFactor
+		else if (nextFrame % 18 == 12)
+			blendFactor = 0
+
+		for (u8 underwater = 0; underwater < (level.water_present ? 2 : 1); ++underwater)
+		{
+			u32 offset = character * 0x40 + (underwater ? 0x300 : 0)
+			u32 source = 0x802180 + offset
+			u32 dest   = 0x802000 + offset
+
+			// Load modded Super palette
+			u8 line = 5
+			if (isHyperEffect)
+			{
+				// Hyper color cycle (if mod supports it)
+				line = 6 + super.palettefx.frame / 18
+				if (!System.hasExternalPaletteData(getCharacterPaletteKey(character), line))
+					line = 5
+			}
+			zeroMemory(dest, 0x40)
+			u16 numColors = System.loadExternalPaletteData(getCharacterPaletteKey(character), line, 0x800000, 0x20)
+			for (u16 i = 0; i < numColors; ++i)
+			{
+				u32 rgba = u32[0x800000 + i * 4]
+				u16[dest + i * 2] = (rgba & 0xff000000) ? packColorExt(rgba) : 0
+			}
+
+			for (u8 k = 0; k < 0x40; k += 2)
+			{
+				if (u16[dest + k] == 0)
+				{
+					// Use original color as fallback
+					u16[dest + k] = u16[source + k]
+				}
+				else
+				{
+					// Apply flash effect
+					u16[dest + k] = blendColorsPacked(u16[dest + k], 0x0eee, blendFactor)
+				}
+			}
+		}
+
+		--super.palettefx.timer
+		if (super.palettefx.timer < 0)
+		{
+			super.palettefx.timer = isHyperEffect ? 0x07 : 0x0f
+			super.palettefx.frame = nextFrame
+		}
+	}
+	else if (super.palettefx.state == 1)
+	{
+		// Fade in
+		//  -> Do not use any fade-in at all
+		super.palettefx.frame = 0
+		super.palettefx.frame.tails = 0
+		super.palettefx.state = 0xff
+		u8[0xffffb02e] = 0		// Reset "char.control_flags"
+	}
+	else  // (super.palettefx.state == 2)
+	{
+		// Fade out
+		if (super.palettefx.frame >= 30)
+		{
+			// This is the first frame, set everything so that only the timer is used
+			super.palettefx.frame = 0
+			super.palettefx.frame.tails = 0
+			super.palettefx.timer = 0x11
+		}
+
+		u16 blendFactor = clamp(u16(super.palettefx.timer) * 0x100 / 0x12, 0, 0x100)
+		for (u8 underwater = 0; underwater < (level.water_present ? 2 : 1); ++underwater)
+		{
+			u32 offset = getMainCharacter() * 0x40 + (underwater ? 0x300 : 0)
+			u32 source = 0x802180 + offset
+			u32 dest   = 0x802000 + offset
+
+			for (u8 k = 0; k < 0x40; k += 2)
+			{
+				u16[dest + k] = blendColorsPacked(u16[source + k], 0x0eee, blendFactor * 3/4)
+			}
+		}
+
+		if (characterVersion == 2)
+		{
+			// Tails: Update of Sonic's colors used by the Flickies
+			u32 superPaletteAddress = 0x00398e + 0x1e
+			for (u8 k = 0; k < 6; k += 2)
+			{
+				u16[0xfffffc04 + k] = blendColorsPacked(u16[0x802184 + k], u16[superPaletteAddress + k], blendFactor)
+			}
+
+			if (level.water_present)
+			{
+				superPaletteAddress = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette() + 0x1e
+				for (u8 k = 0; k < 6; k += 2)
+				{
+					u16[0xfffff084 + k] = blendColorsPacked(u16[0x802384 + k], u16[superPaletteAddress + k], blendFactor)
+				}
+			}
+		}
+
+		if (super.palettefx.timer == 0)
+		{
+			// Fully faded out
+			super.palettefx.state = 0
+		}
+		else
+		{
+			--super.palettefx.timer
+		}
+	}
+}
+
+#endif

@@ -1,0 +1,305 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Spiker enemy from MGZ                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x088b96) end(0x088b96)
+function void Spiker.Init()
+{
+	Object.InitWithUpdateAddress(0x088b9c)
+}
+
+
+//# address-hook(0x088b9c) end(0x088bb0)
+function void Spiker.Update()
+{
+	D0 = 0x0a
+	fn088dce()
+
+	// Targets:
+	//  - 0x088bc0	-> objA0.base_state = 0x00
+	//  - 0x088bd0	-> objA0.base_state = 0x02
+	//  - 0x088bea	-> objA0.base_state = 0x04
+	//  - 0x088c04	-> objA0.base_state = 0x06
+	//  - 0x088c24	-> objA0.base_state = 0x08
+	//  - 0x088c38	-> objA0.base_state = 0x0a
+	call tableLookupAddress(0x088bb4, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x088bc0) end(0x088bcc)
+function void fn088bc0()
+{
+	setupObjectAttributesFull(0x088dfa)
+
+	spawnChildObjects(0x088e1e)
+}
+
+
+//# address-hook(0x088bd0) end(0x088be8)
+function void fn088bd0()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x40)
+	{
+		objA0.base_state = 0x04
+		objA0.countdown_value = 7
+	}
+}
+
+
+//# address-hook(0x088bea) end(0x088c02)
+function void fn088bea()
+{
+	--objA0.position.y.u16
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x06
+		objA0.flags38 |= 0x04
+	}
+}
+
+
+//# address-hook(0x088c04) end(0x088c22)
+function void fn088c04()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x40)
+	{
+		objA0.base_state = 0x08
+		objA0.flags38 &= ~0x04
+		objA0.countdown_value = 7
+	}
+}
+
+
+//# address-hook(0x088c24) end(0x088c36)
+function void fn088c24()
+{
+	++objA0.position.y.u16
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x02
+	}
+}
+
+
+//# address-hook(0x088c38) end(0x088c6c)
+function void fn088c38()
+{
+	A1 = 0x088e4a
+	fn0845a0()
+	if (D2.u16 != 0 && objA0.animation.frame == 4)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x44]
+		u8[A1 + 0x05] = 0x02
+		objA1.velocity.y = -0x600
+		objA1.flags2a |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x40] = 0
+	}
+}
+
+
+//# address-hook(0x088c6e) end(0x088c7a)
+function void fn088c6e()
+{
+	objA0.base_state = objA0.value3a
+	u8[A0 + 0x28] = 0x0a
+}
+
+
+//# address-hook(0x088c7c) end(0x088c8e)
+function void fn088c7c()
+{
+	MoveWithParent()
+
+	// Targets:
+	//  - 0x088c9a	-> objA0.base_state = 0x00
+	//  - 0x088cb0	-> objA0.base_state = 0x02
+	//  - 0x088cc6	-> objA0.base_state = 0x04
+	//  - 0x088d02	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x088c92, objA0.base_state)
+
+	fn084920()
+}
+
+
+//# address-hook(0x088c9a) end(0x088cae)
+function void fn088c9a()
+{
+	setupObjectAttributesBasic(0x088e06)
+
+	if (objA0.subtype2c == 0)
+	{
+		objA0.render_flags |= 0x01
+	}
+}
+
+
+//# address-hook(0x088cb0) end(0x088cc4)
+function void fn088cb0()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x04)
+	{
+		objA0.base_state = 0x04
+	}
+}
+
+
+//# address-hook(0x088cc6) end(0x088d00)
+function void fn088cc6()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x04)
+	{
+		CheckDistanceToPlayers()
+		if (D2.u16 < 0x40)
+		{
+			if (objA0.subtype2c != 0)
+			{
+				D0.u16 -= 2
+			}
+			if (D0.u16 == 0)
+			{
+				objA0.base_state = 0x06
+				objA0.countdown_callback = 0x088d28
+			}
+		}
+	}
+	else
+	{
+		objA0.base_state = 0x02
+	}
+}
+
+
+//# address-hook(0x088d02) end(0x088d26)
+function void fn088d02()
+{
+	A1 = 0x088e53
+	fn0845a0()
+	if (D2.u16 != 0 && objA0.animation.sprite == 4)
+	{
+		playSound(0x4d)
+		A2 = 0x088e32
+		SpawnProjectileChildObjectsInDir()
+	}
+}
+
+
+//# address-hook(0x088d28) end(0x088d2e)
+function void fn088d28()
+{
+	objA0.base_state = 0x04
+}
+
+
+//# address-hook(0x088d30) end(0x088d42)
+function void fn088d30()
+{
+	MoveWithParent()
+
+	// Targets:
+	//  - 0x088d4c	-> objA0.base_state = 0x00
+	//  - 0x088d54	-> objA0.base_state = 0x02
+	//  - 0x088d94	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x088d46, objA0.base_state)
+
+	fn084934()
+}
+
+
+//# address-hook(0x088d4c) end(0x088d50)
+function void fn088d4c()
+{
+	setupObjectAttributesBasic(0x088e0c)
+	fn088d54()
+}
+
+
+//# address-hook(0x088d54) end(0x088d92)
+function void fn088d54()
+{
+	fn085870()
+	if (_equal())
+		return
+
+#if STANDALONE
+	// Careful, A1 can be 0xffffb04a here in a single-player game (thought it's not yet clear why)
+	//  -> This can lead to a bug in MGZ 2 boss start where Tails does not get initialized correctly, as he starts with base_state 0x02 already
+	if (u32[A1] == 0)
+		return
+#endif
+
+	fn088da6()
+
+	objA0.base_state = 0x04
+	u8[A0 + 0x28] = 0
+	objA0.countdown_value = 0x10
+	objA0.countdown_callback = 0x088d98
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x38] |= 0x08
+	u8[A1 + 0x22] = 0x01
+	u8[A1 + 0x28] = 0
+	u16[A1 + 0x44] = u16[A0 + 0x44]
+}
+
+
+//# address-hook(0x088d94) end(0x088d94)
+function void fn088d94()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x088d98) end(0x088da4)
+function void fn088d98()
+{
+	objA0.base_state = 0x02
+	u8[A0 + 0x28] = 0xca
+}
+
+
+//# address-hook(0x088da6) end(0x088dcc)
+function void fn088da6()
+{
+	u8[A1 + 0x05] = 0x02
+	objA1.position.y.u16 += 6
+	objA1.velocity.y = 0
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~char.flag.CONTROL_LOCK
+	u8[A1 + 0x40] = 0
+
+	playSound(0xb1)
+}
+
+
+//# address-hook(0x088dce) end(0x088df8)
+function void fn088dce()
+{
+	if ((objA0.flags38 & 0x08) == 0)
+		return
+
+	objA0.flags38 &= ~0x08
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+	objA0.value3a = objA0.base_state
+	objA0.base_state = D0.u8
+	objA0.countdown_callback = 0x088c6e
+}

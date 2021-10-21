@@ -1,0 +1,98 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Death Egg starting in LRZ boss act                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x0793e2) end(0x0793fe)
+function void fn0793e2()
+{
+	setupObjectAttributesFull(0x079602)
+
+	objA0.update_address = 0x079406
+	objA0.position.x.u16 = 0xb0
+	objA0.position.y.u16 = 0x0449
+	objA0.countdown_callback = 0x079416
+
+	fn079406()
+}
+
+
+//# address-hook(0x079406) end(0x079410)
+function void fn079406()
+{
+	Object.animationProgress(0x07968c)
+	DrawObject()
+}
+
+
+//# address-hook(0x079416) end(0x079480)
+function void fn079416()
+{
+	objA0.update_address = 0x079486
+	u8[0xfffff650] = 0x80
+	objA0.countdown_value = 0x0f
+	playSound(0x9f)
+
+	copyMemory(0xfffffc80, 0xfffffc00, 0x20)
+	copyMemory(0xfffffca0, 0x079726, 0x60)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085e64
+		u16[A0 + 0x44] = A1.u16
+		u16[A1 + 0x3a] = 0x03
+	}
+
+	Kosinski.addToDMAQueue(0x17093c, 0x8480)
+
+	addPatternLoadingCue(0x083d64)
+}
+
+
+//# address-hook(0x079486) end(0x0794d8)
+function void fn079486()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+		return
+
+	u8[0xfffff650] = 1
+	u8[0xfffffab8] |= 0x01
+	u8[0xffffeec4] = 0xff
+	playSound(0x9c)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085ee6
+		u16[A0 + 0x44] = A1.u16
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		// Spawn platform
+		objA1.update_address = 0x020630
+		objA1.position.x.u16 = 0x60
+		objA1.position.y.u16 = 0x04d0
+
+	#if STANDALONE
+		if (allocDynamicObjectStd())
+		{
+			// Spawn another platform on the right
+			objA1.update_address = 0x020630
+			objA1.position.x.u16 = 0x160
+			objA1.position.y.u16 = 0x04d0
+		}
+	#endif
+	}
+
+	UnloadObject()
+}

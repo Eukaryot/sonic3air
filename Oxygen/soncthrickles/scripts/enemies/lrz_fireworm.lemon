@@ -1,0 +1,303 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Fireworm enemy from Lava Reef Zone                    //
+//-------------------------------------------------------//
+
+// The worm hole
+
+//# address-hook(0x08f750) end(0x08f750)
+function void fn08f750()
+{
+	Object.InitWithUpdateAddress(0x08f756)
+}
+
+
+//# address-hook(0x08f756) end(0x08f764)
+function void fn08f756()
+{
+	// Targets:
+	//  - 0x08f770	-> objA0.base_state = 0x00
+	//  - 0x08f77a	-> objA0.base_state = 0x02
+	//  - 0x08f7a2	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08f76a, objA0.base_state)
+
+	Object.DrawOrUnload()
+}
+
+
+//# address-hook(0x08f770) end(0x08f774)
+function void fn08f770()
+{
+	setupObjectAttributesFull(0x08f9de)
+}
+
+
+//# address-hook(0x08f77a) end(0x08f7a0)
+function void fn08f77a()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x80)
+		return
+
+	objA0.base_state = 0x04
+	spawnChildObjects(0x08fa0e)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = objA0.subtype2c
+	}
+}
+
+
+//# address-hook(0x08f7a2) end(0x08f7a2)
+function void fn08f7a2()
+{
+}
+
+
+
+// The worm
+
+//# address-hook(0x08f7a4) end(0x08f7da)
+function void fn08f7a4()
+{
+	// Targets:
+	//  - 0x08f7ea	-> objA0.base_state = 0x00
+	//  - 0x08f812	-> objA0.base_state = 0x04
+	//  - 0x08f862	-> objA0.base_state = 0x06
+	//  - 0x08f89a	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x08f7e0, objA0.base_state)
+
+	Object.loadSpritePatterns(0x08fa38)
+
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x0280)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		fn0851d8()
+	}
+}
+
+
+//# address-hook(0x08f7ea) end(0x08f80c)
+function void fn08f7ea()
+{
+	A1 = 0x08f9ea
+	if (fn084fa4())
+		return
+
+	objA0.base_state = 0x04
+	objA0.countdown_value = 0x03
+	objA0.countdown_callback = 0x08f81e
+	D4.u16 = 0xff00
+	fn085416()
+}
+
+
+//# address-hook(0x08f812) end(0x08f818)
+function void fn08f812()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08f81e) end(0x08f828)
+function void fn08f81e()
+{
+	objA0.animation.sprite = 1
+	spawnChildObjects(0x08fa16)
+	fn08f82e()
+}
+
+
+//# address-hook(0x08f82e) end(0x08f83a)
+function void fn08f82e()
+{
+	objA0.base_state = 0x06
+	objA0.value42 = 0xff00
+	u32[A0 + 0x30] = 0x08fa40
+	fn08f842()
+}
+
+
+//# address-hook(0x08f842) end(0x08f860)
+function void fn08f842()
+{
+	objA0.value39 = 0x08
+	objA0.value3e = 0x80
+	objA0.velocity.y = 0x80
+	u16[A0 + 0x40] = 0x08
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x08f862) end(0x08f898)
+function void fn08f862()
+{
+	fn08486e()
+	if (_equal())
+	{
+		UpdateMovementStraightSimple()
+		fn08459c()
+		return
+	}
+
+	objA0.base_state = 0x08
+	u16[A0 + 0x44] = objA0.velocity.x
+	objA0.velocity.y = objA0.value42
+	s16[A0 + 0x42] = -s16[A0 + 0x42]
+	objA0.countdown_value = 0
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+}
+
+
+//# address-hook(0x08f89a) end(0x08f8ec)
+function void fn08f89a()
+{
+	A1 = 0x08fa4d
+	fn084612()
+
+	++objA0.countdown_value
+	if (s16[A0 + 0x44] >= 0)
+	{
+		D0.u16 = objA0.velocity.x - 0x10
+		if (D0.s16 > -0x0100)
+		{
+			objA0.velocity.x = D0.u16
+			UpdateMovementStraightSimple()
+			return
+		}
+	}
+	else
+	{
+		D0.u16 = objA0.velocity.x + 0x10
+		if (D0.s16 < 0x0100)
+		{
+			objA0.velocity.x = D0.u16
+			UpdateMovementStraightSimple()
+			return
+		}
+	}
+
+	objA0.base_state = 0x06
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+	fn08f842()
+}
+
+
+//# address-hook(0x08f8f0) end(0x08f900)
+function void fn08f8f0()
+{
+	// Targets:
+	//  - 0x08f910	-> objA0.base_state = 0x00
+	//  - 0x08f948	-> objA0.base_state = 0x02
+	//  - 0x08f862	-> objA0.base_state = 0x06
+	//  - 0x08f89a	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x08f906, objA0.base_state)
+
+	D0 = 0
+	fn084a04()
+}
+
+
+//# address-hook(0x08f910) end(0x08f93e)
+function void fn08f910()
+{
+	setupObjectAttributesFull(0x08f9fc)
+
+	objA0.countdown_value = u16[0x08f940 + objA0.subtype2c]
+	objA0.countdown_callback = 0x08f94e
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.velocity.x = objA1.velocity.x
+	objA0.render_flags = u8[A1 + 0x04]
+}
+
+
+//# address-hook(0x08f948) end(0x08f948)
+function void fn08f948()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08f94e) end(0x08f958)
+function void fn08f94e()
+{
+	spawnChildObjects(0x08fa30)
+	fn08f82e()
+}
+
+
+//# address-hook(0x08f95c) end(0x08f970)
+function void fn08f95c()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x08f97c	-> objA0.base_state = 0x00
+	//  - 0x08f99e	-> objA0.base_state = 0x02
+	//  - 0x08f9c8	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08f976, objA0.base_state)
+
+	fn084934()
+}
+
+
+//# address-hook(0x08f97c) end(0x08f99c)
+function void fn08f97c()
+{
+	setupObjectAttributesBasic(0x08fa08)
+
+	u32[A0 + 0x30] = 0x08fa56
+	objA0.countdown_callback = 0x08f9a4
+	objA0.flags2b |= 0x10
+}
+
+
+//# address-hook(0x08f99e) end(0x08f99e)
+function void fn08f99e()
+{
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x08f9a4) end(0x08f9c6)
+function void fn08f9a4()
+{
+	objA0.base_state = 0x04
+	objA0.animation.sprite = 7
+	GetRandomNumber()
+	objA0.countdown_value = D0.u16 & 0x3f
+	objA0.countdown_callback = 0x08f9ce
+}
+
+
+//# address-hook(0x08f9c8) end(0x08f9c8)
+function void fn08f9c8()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08f9ce) end(0x08f9dc)
+function void fn08f9ce()
+{
+	objA0.base_state = 0x02
+	objA0.countdown_callback = 0x08f9a4
+}

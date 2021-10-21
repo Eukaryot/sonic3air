@@ -1,0 +1,102 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Mushroom falling down when standing on it             //
+//-------------------------------------------------------//
+
+//# address-hook(0x03f370) end(0x03f396)
+function void fn03f370()
+{
+	objA0.mapping_offset = 0x03f44a
+	objA0.sprite_attributes = 0x43cd
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x20
+
+	objA0.update_address = 0x03f39c
+	fn03f39c()
+}
+
+
+//# address-hook(0x03f39c) end(0x03f416)
+function void fn03f39c()
+{
+	if (objA0.flags2e != 0)
+	{
+		if (objA0.value2f != 0)
+		{
+			--objA0.value2f
+		}
+		else
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y += 0x28
+			fn01e580()
+
+			if (!(objA0.render_flags & render_flag.VISIBLE))
+			{
+				objA0.position.x.u16 = 0x7f00
+			}
+		}
+	}
+
+	D1 = objA0.box_size.x
+	A2 = 0x03f42a
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+
+	if (objA0.flags2a & 0x18)
+	{
+		objA0.state = 0x01
+		if (objA0.subtype2c != 0 && objA0.flags2e == 0)
+		{
+			objA0.flags2e = 0x01
+			objA0.value2f = 0x10
+		}
+	}
+
+	Object.animationUpdate(0x03f41c)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x01e580) end(0x01e5de)
+function void fn01e580()
+{
+	A1 = 0xffffb000
+	if (objA0.flags2a & 0x08)
+	{
+		fn00f8ea()
+		if (D1.s16 <= 0)
+		{
+			A1 = 0xffffb000
+			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] |= 0x02
+			objA0.flags2a &= ~0x08
+		}
+	}
+
+	A1 = 0xffffb04a
+	if (objA0.flags2a & 0x10)
+	{
+		fn00f8ea()
+		if (D1.s16 <= 0)
+		{
+			A1 = 0xffffb04a
+			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] |= 0x02
+			objA0.flags2a &= ~0x10
+		}
+	}
+
+	D4 = 0
+}

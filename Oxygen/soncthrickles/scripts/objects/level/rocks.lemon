@@ -1,0 +1,857 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Rocks (in different sizes e.g. in AIZ)                //
+//-------------------------------------------------------//
+
+//# address-hook(0x01f9e0) end(0x01faee)
+function void Rocks.Init()
+{
+	D2.u16 = objA0.subtype2c
+	D0.u16 = (objA0.subtype2c >> 4) & 0x07
+	objA0.animation.sprite = D0.u8
+	D0.u16 *= 2
+	objA0.box_size.x = u8[0x01f9d0 + D0.u16]
+	D1.u8 = u8[0x01f9d1 + D0.u16]
+	objA0.box_size.y = D1.u8
+	objA0.hitbox_extends.y = D1.u8
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x200
+	objA0.countdown_value = objA0.position.x.u16
+	objA0.value42 = 0x40
+
+	if (global.zone_act == 0x0001)	// Angel Island Act 2
+	{
+		objA0.mapping_offset = 0x21dd64
+		objA0.sprite_attributes = 0x42e9
+	}
+	else if (global.zone_act == 0x1200)	// ?
+	{
+		objA0.mapping_offset = 0x21ddec
+		objA0.sprite_attributes = 0xe300
+		objA0.animation.sprite = 0
+	}
+	else if (global.zone == 0x09)	// Lava Reef
+	{
+		if (global.act == 0)
+		{
+			objA0.mapping_offset = 0x0203d8
+			objA0.sprite_attributes = 0x40d3
+		}
+		else
+		{
+			objA0.mapping_offset = 0x02047a
+			objA0.sprite_attributes = 0x640d
+		}
+		objA0.animation.sprite += 4
+	}
+	else
+	{
+		objA0.mapping_offset = 0x21dcdc
+		objA0.sprite_attributes = 0x2333
+	}
+
+	D2.u16 &= 0x0f
+	if (D2.u16 == 0x0f)
+	{
+		objA0.update_address = 0x020002
+		fn020002()
+		return
+	}
+
+	if (objA0.subtype2c & 0x04)
+	{
+		objA0.update_address = 0x01fd08
+		fn01fd08()
+		return
+	}
+
+	if (objA0.subtype2c & 0x08)
+	{
+		objA0.update_address = 0x01ff48
+		fn01ff48()
+		return
+	}
+
+	objA0.update_address = 0x01faf2
+	D0.u16 = objA0.respawn_entry
+	if (D0.u16 != 0)
+	{
+		A2 = 0xffff0000 + D0.u16
+		D0.u16 = u8[A2] & 0x7f
+		if (D0.u16 != 0)
+		{
+			objA0.position.x.u16 -= D0.u16
+			D0.s16 = 0x40 - D0.s16
+			objA0.value42 = D0.u16
+			CheckGroundCollision()
+			objA0.position.y.u16 += D1.u16
+		}
+	}
+
+	Rocks.Update()
+}
+
+
+//# address-hook(0x01faf2) end(0x01fb4a)
+function void Rocks.Update()
+{
+	u16[A0 + 0x38] = score.bonus_counter
+	u8[A0 + 0x32] = u8[0xffffb020]
+	u8[A0 + 0x33] = u8[0xffffb06a]
+	objA0.value3a = u8[0xffffb02a]
+	objA0.value3b = u8[0xffffb074]
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	if (objA0.subtype2c & 0x02)
+	{
+		fn0200a2()
+	}
+
+	if (objA0.subtype2c & 0x01)
+	{
+		D0.u8 = objA0.flags2a & 0x18
+		if (D0.u8 != 0)
+		{
+			if (D0.u8 == 0x18)
+			{
+				if (u8[A0 + 0x32] == 2 || u8[A0 + 0x33] == 2)
+				{
+					A1 = 0xffffb000
+					D0.u8 = u8[A0 + 0x32]
+					fn01fba8()
+
+					A1 = 0xffffb04a
+					D0.u8 = u8[A0 + 0x33]
+					fn01fba8()
+
+					fn01fbf8()
+					return
+				}
+			}
+			else
+			{
+				D1.u8 = D0.u8 & 0x08
+				if (D1.u8 == 0)
+				{
+					fn01fbe0()
+					return
+				}
+
+				if (u8[A0 + 0x32] == 2)
+				{
+					A1 = 0xffffb000
+					fn01fbae()
+					fn01fbf8()
+					return
+				}
+			}
+		}
+	}
+
+	fn01fb4c()
+}
+
+
+//# address-hook(0x01fb4c) end(0x01fba6)
+function void fn01fb4c()
+{
+	if (competition_mode.active == 0)
+	{
+		D0.u16 = objA0.countdown_value
+		DrawOrUnloadObjectByD0()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x01fba8) end(0x01fba8)
+function void fn01fba8()
+{
+	if (D0.u8 == 0x02)
+	{
+		fn01fbae()
+	}
+	else
+	{
+		u8[A1 + 0x05] = 2
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~0x08
+	}
+}
+
+//# address-hook(0x01fbae) end(0x01fbde)
+function void fn01fbae()
+{
+	u8[A1 + 0x05] = 2
+	objA1.velocity.y = -0x300
+	u8[A1 + 0x1e] = 14
+	u8[A1 + 0x1f] = 7
+	u8[A1 + 0x20] = 2
+	u8[A1 + 0x2a] |= 0x06
+	u8[A1 + 0x2a] &= ~0x08
+}
+
+
+//# address-hook(0x01fbe0) end(0x01fbf6)
+function void fn01fbe0()
+{
+	D0.u8 &= 0x10
+	if (D0.u8 == 0 || u8[A0 + 0x33] != 2)
+	{
+		fn01fb4c()
+	}
+	else
+	{
+		A1 = 0xffffb04a
+		fn01fbae()
+		fn01fbf8()
+	}
+}
+
+
+//# address-hook(0x01fbf8) end(0x01fc12)
+function void fn01fbf8()
+{
+	score.bonus_counter = u16[A0 + 0x38]
+	objA0.flags2a &= 0xe7
+	if (competition_mode.active == 0)
+	{
+		objA0.update_address = 0x01fc16
+		fn02011e()
+		fn01fc16()
+	}
+	else
+	{
+		fn01fcc8()
+		objA0.animation.sprite = 3
+		objA0.update_address = 0x01fcae
+		fn02011e()
+		fn01fcae()
+	}
+}
+
+
+//# address-hook(0x01fc16) end(0x01fc1e)
+function void fn01fc16()
+{
+	if (global.zone != 0x09)
+	{
+		objA0.update_address = 0x01fc24
+		fn01fc24()
+	}
+	else
+	{
+		objA0.update_address = 0x01fc66
+		fn01fc66()
+	}
+}
+
+
+//# address-hook(0x01fc24) end(0x01fc60)
+function void fn01fc24()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 2
+		D0.u8 = objA0.animation.sprite + 1
+		if (D0.u8 >= 7)
+			D0 = 3
+		objA0.animation.sprite = D0.u8
+	}
+	fn01fcae()
+}
+
+
+//# address-hook(0x01fc66) end(0x01fcaa)
+function void fn01fc66()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		D0.u8 = (objA0.animation.sprite + 1) & 0x03
+		D0.u8 += u8[A0 + 0x3c]
+		objA0.animation.sprite = D0.u8
+	}
+	fn01fcae()
+}
+
+
+//# address-hook(0x01fcae) end(0x01fcc2)
+function void fn01fcae()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x18
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x01fcc8) end(0x01fcf0)
+function void fn01fcc8()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		D0 = 0x48
+		while (D0.s16 >= 0)
+		{
+			u16[A1 + D0.s16] = u16[A0 + D0.s16]
+			D0.u16 -= 2
+		}
+
+		u32[A1 + 0x44] = objA0.update_address
+		objA1.update_address = 0x01fcf2
+		u8[A1 + 0x22] = 0x07
+		D0 = 0
+	}
+}
+
+
+//# address-hook(0x01fcf2) end(0x01fd02)
+function void fn01fcf2()
+{
+	// Seems to be used only in competition mode
+	if (s8[A0 + 0x04] >= 0)
+	{
+		u32[A0] = u32[A0 + 0x44]
+		objA0.animation.sprite = 0
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x01fd08) end(0x01ff1a)
+function void fn01fd08()
+{
+	u16[A0 + 0x30] = u16[0xffffb018]
+	u16[A0 + 0x36] = u16[0xffffb062]
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u16 & 0x03)
+	{
+		bool canBreakWall = false
+
+		A1 = 0xffffb000
+		D1.u16 = u16[A0 + 0x30]
+		if (D6.u16 & 0x01)
+		{
+			if (u8[A1 + 0x38] == CHARACTER_KNUCKLES)
+			{
+				// Knuckles can break all walls
+				canBreakWall = true
+			}
+			else
+			{
+				if ((objA0.subtype2c & 0x80) == 0)	// Special Knuckles-only wall?
+				{
+					if (super.active)
+					{
+						// Super form breaks walls even when going slow
+						canBreakWall = true
+					}
+					else if ((objA0.flags2a & 0x20) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
+					{
+						// Normal Sonic and Tails need to quickly roll into a wall to break it (this includes the fire shield attack)
+						canBreakWall = (objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x480)
+					}
+				}
+			}
+
+			if (canBreakWall)
+			{
+				objA0.flags2a &= ~0x20
+				Rocks.BreakWall()
+
+				if (objA0.flags2a & 0x40)
+				{
+					// Check for second character
+					A1 = 0xffffb04a
+					if (u8[A1 + 0x38] == CHARACTER_KNUCKLES || objA1.state == char.state.ROLLING)
+					{
+						objA1.velocity.x = u16[A0 + 0x36]
+						u16[A1 + 0x1c] = objA1.velocity.x
+						objA0.flags2a &= ~0x40
+						objA1.flags2a &= ~char.flag.PUSHING
+					}
+				}
+			}
+		}
+
+		if (!canBreakWall)
+		{
+			// Give second character a try
+			A1 = 0xffffb04a
+			D1.u16 = u16[A0 + 0x36]
+
+			if (objA0.flags2a & 0x40)
+			{
+				if (u8[A1 + 0x38] == CHARACTER_KNUCKLES)
+				{
+					// Knuckles can break all walls
+					canBreakWall = true
+				}
+				else
+				{
+					if ((objA0.subtype2c & 0x80) == 0)	// Special Knuckles-only wall?
+					{
+						// Normal Sonic and Tails need to quickly roll into a wall to break it (this includes the fire shield attack)
+						canBreakWall = (objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x480)
+					}
+				}
+			}
+
+			if (canBreakWall)
+			{
+				objA0.flags2a &= ~0x40
+				Rocks.BreakWall()
+				return
+			}
+		}
+	}
+
+	if (competition_mode.active == 0)
+	{
+		if (checkForUnloadObjectAtPosition(objA0.countdown_value))
+			return
+	}
+	DrawObject()
+}
+
+
+function void Rocks.BreakWall()
+{
+	fn01ff1e()
+	if (competition_mode.active == 0)
+	{
+		objA1.velocity.x = D1.u16
+		D0.u16 = objA0.position.x.u16
+		if (D0.u16 >= objA1.position.x.u16)
+		{
+			objA1.position.x.u16 -= 4
+			A4 = 0x020314
+		}
+		else
+		{
+			objA1.position.x.u16 += 4
+			A4 = 0x0202f4
+		}
+
+		u16[A1 + 0x1c] = objA1.velocity.x
+		u8[A1 + 0x2a] &= ~0x20
+		if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 0x01)
+		{
+			u8[A1 + 0x2f] = 0x02
+			u8[A1 + 0x20] = 0x21
+			if (objA1.velocity.x < 0)
+				u8[A1 + 0x2a] |= 0x01
+			else
+				u8[A1 + 0x2a] &= ~0x01
+		}
+
+		D0 = objA0.animation.sprite
+		if (global.zone == 0x09)		// Lava Reef Zone
+		{
+			D0 = (D0 - 4) * 2
+			objA0.update_address = 0x01fc66
+			fn0201de()
+		}
+		else
+		{
+			D0 *= 2
+			objA0.update_address = 0x01fc16
+			fn02013a()
+		}
+		fn01fc16()
+
+	#if STANDALONE
+		// Prevent this object from respawning
+		//  -> Otherwise the rocks next to the first AIZ 1 giant ring may respawn after the special stage
+		objA0.respawn_entry = 0
+	#endif
+	}
+	else
+	{
+		// Competition mode code
+		objA1.velocity.x = D1.u16
+		D0.u16 = objA0.position.x.u16
+		if (D0.u16 >= objA1.position.x.u16)
+		{
+			objA1.position.x.u16 -= 4
+			A4 = 0x020388
+		}
+		else
+		{
+			objA1.position.x.u16 += 4
+			A4 = 0x020370
+		}
+
+		u16[A1 + 0x1c] = objA1.velocity.x
+		u8[A1 + 0x2a] &= ~0x20
+		fn01fcc8()
+		objA0.update_address = 0x01fcae
+		objA0.animation.sprite = 3
+		D0 = objA0.animation.sprite * 2
+		fn02013a()
+		fn01fcae()
+	}
+}
+
+
+//# address-hook(0x01ff1e) end(0x01ff46)
+function void fn01ff1e()
+{
+	if (objA0.flags2a & 0x08)
+	{
+		objA0.flags2a &= ~0x08
+		u8[0xffffb02a] |= char.flag.IN_AIR
+		u8[0xffffb02a] &= ~char.flag.ON_OBJECT
+	}
+
+	if (objA0.flags2a & 0x10)
+	{
+		objA0.flags2a &= ~0x10
+		u8[0xffffb074] |= char.flag.IN_AIR
+		u8[0xffffb074] &= ~char.flag.ON_OBJECT
+	}
+}
+
+
+
+// Layered rock formation in LRZ 1 that can only be crushed from below
+
+//# address-hook(0x01ff48) end(0x01fffe)
+function void fn01ff48()
+{
+	u16[A0 + 0x30] = u16[0xffffb01a]
+	u16[A0 + 0x36] = u16[0xffffb064]
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	D6.u16 &= 0x0c
+	if (D6.u16 == 0)
+	{
+		D0.u16 = objA0.countdown_value
+		DrawOrUnloadObjectByD0()
+		return
+	}
+
+	if (D6.u8 & 0x04)
+	{
+		A1 = 0xffffb000
+		objA1.velocity.y = u16[A0 + 0x30]
+
+		if (D6.u8 & 0x08)
+		{
+			A1 = 0xffffb04a
+			objA1.velocity.y = u16[A0 + 0x36]
+		}
+	}
+	else
+	{
+		// "D6.u8 & 0x08" must be true in this case
+		A1 = 0xffffb04a
+		objA1.velocity.y = u16[A0 + 0x36]
+	}
+
+	if (objA0.flags2a & 0x08)
+	{
+		A1 = 0xffffb000
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~0x08
+	}
+
+	if (objA0.flags2a & 0x10)
+	{
+		A1 = 0xffffb04a
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~0x08
+	}
+
+	objA0.update_address = 0x01fc16
+	fn02011e()
+	fn01fc16()
+}
+
+
+
+//# address-hook(0x02011e) end(0x020136)
+function void fn02011e()
+{
+	if (global.zone == 0x09)		// Lava Reef Zone
+	{
+		fn0201c4()
+		return
+	}
+
+	D0 = objA0.animation.sprite * 2
+	A4 = tableLookupAddress(0x0202e4, D0)
+	fn02013a()
+}
+
+//# address-hook(0x02013a) end(0x02015a)
+function void fn02013a()
+{
+	A3 = tableLookupAddress(0x02026e, D0)
+	D1.u16 = u16[(A3+=2)-2]
+	D4     = objA0.update_address
+	D5.u8  = objA0.render_flags
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+	D6.u16 = 3
+	A1 = A0
+	fn020162()
+}
+
+
+//# address-hook(0x02015c) end(0x0201be)
+function void fn02015c()
+{
+	fn02015c_internal(true)
+}
+
+//# address-hook(0x020162)
+function void fn020162()
+{
+	fn02015c_internal(false)
+}
+
+function void fn02015c_internal(bool doAllocation)
+{
+	while (true)
+	{
+		if (doAllocation)
+		{
+			if (!allocDynamicObjectAfterA0())
+				break
+		}
+
+		doAllocation = true
+		u32[A1] = D4
+		u32[A1 + 0x0c] = u32[A0 + 0x0c]
+		u8[A1 + 0x04] = D5.u8
+		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
+		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
+		u16[A1 + 0x0a] = u16[A0 + 0x0a] | 0x8000
+		u16[A1 + 0x08] = 0x80
+		u8[A1 + 0x07] = 0x18
+		objA1.velocity.x = u16[(A4+=2)-2]
+		objA1.velocity.y = u16[(A4+=2)-2]
+		u8[A1 + 0x22] = D6.u8
+		++D6.u8
+		if (D6.u8 >= 7)
+			D6.u16 = 3
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+	}
+	playSound(SFX_COLLAPSE)
+}
+
+
+
+//# address-hook(0x020002) end(0x020052)
+function void fn020002()
+{
+	u16[A0 + 0x38] = score.bonus_counter
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u8 = objA0.flags2a & 0x08
+	if (D0.u8 == 0)
+	{
+		DrawOrUnloadObject()
+		return
+	}
+
+	A1 = 0xffffb000
+	if (u8[A1 + 0x38] != 0x02)
+	{
+		DrawOrUnloadObject()
+		return
+	}
+	fn020056()
+
+	if (objA0.flags2a & 0x10)
+	{
+		A1 = 0xffffb04a
+		fn020056()
+	}
+
+	fn020088()
+}
+
+
+//# address-hook(0x020056) end(0x020086)
+function void fn020056()
+{
+	u8[A1 + 0x2a] |= 0x04
+	u8[A1 + 0x1e] = 0x0e
+	u8[A1 + 0x1f] = 0x07
+	objA1.state = char.state.ROLLING
+	objA1.velocity.y = -0x300
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+	u8[A1 + 0x05] = 2
+}
+
+
+//# address-hook(0x020088) end(0x02009e)
+function void fn020088()
+{
+	score.bonus_counter = u16[A0 + 0x38]
+	objA0.flags2a &= 0xe7
+	objA0.update_address = 0x01fc16
+	fn02011e()
+	fn01fc16()
+}
+
+
+//# address-hook(0x0200a2) end(0x0200ca)
+function void fn0200a2()
+{
+	D3.u8 = objA0.flags2a & 0x60
+	if (D3.u8 != 0)
+	{
+		D2.u16 = objA0.position.x.u16
+
+		A1 = 0xffffb000
+		D0.u8 = objA0.value3a
+		D6 = 5
+		fn0200cc()
+
+		A1 = 0xffffb04a
+		D0.u8 = objA0.value3b
+		D6 = 6
+		fn0200cc()
+	}
+}
+
+
+//# address-hook(0x0200cc) end(0x02011c)
+function void fn0200cc()
+{
+	u32 bit = 1 << D6
+	if ((D3 & bit) && (D2.u16 < objA1.position.x.u16) && (D0 & 0x20))
+	{
+		--u16[A0 + 0x40]
+		if (s16[A0 + 0x40] < 0)
+		{
+			u16[A0 + 0x40] = Game.getSetting(SETTING_FASTER_PUSH) ? 4 : 16
+			if (objA0.value42 != 0)
+			{
+				--objA0.value42
+				--objA0.position.x.u16
+				--objA1.position.x.u16
+				CheckGroundCollision()
+				objA0.position.y.u16 += D1.u16
+
+				D0.u16 = objA0.respawn_entry
+				if (D0.u16 != 0)
+				{
+					A2 = 0xffff0000 + D0.u16
+					u8[A2] = (0x40 - u8[A0 + 0x43]) | 0x80
+				}
+			}
+		}
+	}
+}
+
+
+
+// Lava Reef breakable rock wall
+
+//# address-hook(0x0201c4) end(0x0201fe)
+function void fn0201c4()
+{
+	objA0.update_address = 0x01fc66
+	D0 = (objA0.animation.sprite - 4) * 2
+
+	A4 = 0x0202e4
+	A4 += u16[A4 + D0.s16]
+
+	fn0201de()
+}
+
+
+//# address-hook(0x0201de) end(0x020268)
+function void fn0201de()
+{
+	A3 = 0x02026e
+	A3 += u16[A3 + D0.s16]
+
+	D1.u16 = u16[(A3+=2)-2]
+	D4     = objA0.update_address
+	D5.u8  = objA0.render_flags
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+	D6.u16 = 3
+	A1 = A0
+
+	while (true)
+	{
+		u32[A1] = D4
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u8[A1 + 0x04] = D5.u8
+		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
+		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u16[A1 + 0x0a] |= 0x8000
+		u16[A1 + 0x08] = 0x80
+		u8[A1 + 0x07] = 0x20
+		objA1.velocity.x = u16[(A4+=2)-2]
+		objA1.velocity.y = u16[(A4+=2)-2]
+		u8[A1 + 0x22] = u8[(A3+=1)-1]
+		D0.u8 = u8[A1 + 0x22] & 0xfc
+		u8[A1 + 0x3c] = D0.u8
+		u8[A1 + 0x24] = 0x07
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+	}
+
+	playSound(0x59)
+}

@@ -1,0 +1,73 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Blinking button-like object attached to wall          //
+//-------------------------------------------------------//
+
+//# address-hook(0x025cbe) end(0x025cea)
+function void fn025cbe()
+{
+	objA0.mapping_offset = 0x2249a8
+	objA0.sprite_attributes = 0x4433
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+	u8[A0 + 0x28] = 0xc6
+
+	objA0.update_address = 0x025cf0
+	fn025cf0()
+}
+
+
+//# address-hook(0x025cf0) end(0x025d26)
+function void fn025cf0()
+{
+	D0.u8 = u8[A0 + 0x29]
+	if (D0.u8 != 0)
+	{
+		D0.u16 = objA0.subtype2c & 0x0f
+		A3 = 0xfffff7e0 + D0.s16
+		D3 = 0
+
+		A1 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			u8[A0 + 0x29] &= ~0x01
+			fn025d2c()
+		}
+
+		A1 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			u8[A0 + 0x29] &= ~0x02
+			fn025d2c()
+		}
+	}
+
+	fn01b662()
+}
+
+
+//# address-hook(0x025d2c) end(0x025d52)
+function void fn025d2c()
+{
+	if (u8[A1 + 0x20] == 0x02)
+	{
+		objA1.velocity.x = -objA1.velocity.x
+		objA1.velocity.y = -objA1.velocity.y
+		u8[A3] ^= (1 << D3.u8)
+		objA0.update_address = 0x01e5e0
+		objA0.base_state = 0x02
+		u8[A0 + 0x28] = 0
+		u8[A0 + 0x29] = 0
+	}
+}

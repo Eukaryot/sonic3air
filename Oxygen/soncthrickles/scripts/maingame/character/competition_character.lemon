@@ -1,0 +1,750 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Shared
+
+function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
+{
+	if (A0 == 0xffffb000)
+	{
+		A4 = 0xfffff760
+		A5 = 0xffffee2c
+		A6 = 0xffffcc54
+		if (u8[0xffffb082] == char.character)
+		{
+			char.render_flags ^= 0x08
+		}
+
+		if (debug_mode.state != 0)
+		{
+			DebugMode.BaseUpdate()
+			return
+		}
+	}
+	else
+	{
+		A4 = 0xfffffec0
+		A5 = 0xffffee2e
+		A6 = 0xffffcc9e
+		if (u8[0xffffb038] == char.character)
+		{
+			char.render_flags ^= 0x10
+		}
+	}
+
+	call tableLookupAddress(mainRoutineTableAddress, char.base_state)
+}
+
+
+
+// Sonic
+
+//# address-hook(0x0105c4) end(0x010618)
+function void fn0105c4()
+{
+	CompetitionMode.Character.BaseUpdate(0x01061c)
+}
+
+
+//# address-hook(0x010628) end(0x01073c)
+function void fn010628()
+{
+	char.base_state += 0x02
+	char.hitbox_extends.x = 5
+	char.hitbox_extends.y = 11
+	u8[A0 + 0x45] = 5
+	u8[A0 + 0x44] = 11
+	char.sprite_priority = 0x0100
+	char.box_size.x = 0x0c
+	char.box_size.y = 0x0c
+	char.render_flags = render_flag.WORLD
+
+	A1 = 0x1e3c00 + char.character * 8
+	u16[A4] = u16[(A1+=2)-2]
+	u16[A4 + 0x02] = u16[(A1+=2)-2]
+	u16[A4 + 0x04] = u16[(A1+=2)-2]
+
+	if (checkpoint.number == 0)
+	{
+		char.layer_flags1 = 0x0c
+		char.layer_flags2 = 0x0d
+		if (A0 == 0xffffb000)
+		{
+			if (char.character == CHARACTER_SONIC)
+			{
+				char.mapping_offset = 0x29fc3a
+				char.sprite_attributes = 0x0680
+			}
+			else
+			{
+				char.mapping_offset = 0x2a02aa
+				char.sprite_attributes = 0x2680
+			}
+			if (global.zone == 0x12)
+			{
+				char.sprite_attributes |= 0x8000
+			}
+			checkpoint.x = char.position.x.u16
+			checkpoint.y = char.position.y.u16
+			checkpoint.sprite_attr = char.sprite_attributes
+			checkpoint.layer_flags = u16[A0 + 0x46]
+		}
+		else
+		{
+			if (char.character == CHARACTER_SONIC)
+			{
+				char.mapping_offset = 0x29fc3a
+				char.sprite_attributes = 0x06a0
+			}
+			else
+			{
+				char.mapping_offset = 0x2a02aa
+				char.sprite_attributes = 0x26a0
+			}
+			if (global.zone == 0x12)
+			{
+				char.sprite_attributes |= 0x8000
+			}
+			u16[0xfffffe4c] = char.position.x.u16
+			u16[0xfffffe4e] = char.position.y.u16
+			u16[0xfffffe56] = char.sprite_attributes
+			u16[0xfffffe58] = u16[A0 + 0x46]
+		}
+	}
+
+	u8[A0 + 0x30] = 0
+	u8[A0 + 0x31] = 0x04
+	super.active = 0
+	char.drown_countdown = 30
+	ClearPositionBackup()
+
+	fn010740()
+}
+
+
+//# address-hook(0x010740) end(0x0107ec)
+function void fn010740()
+{
+	if (A0 == 0xffffb04a)
+		debugWatch(A0 + 0x04, 1)
+
+	if (debug_mode.enabled && A0 == 0xffffb000 && (control.pad1.pressed & CONTROL_B))
+	{
+		debug_mode.state = 0x01
+		player1.control_override = 0
+		return
+	}
+
+	if (A0 == 0xffffb000)
+	{
+		if (player1.control_override == 0)
+		{
+			control.player1 = control.pad1
+		}
+	}
+	else
+	{
+		if (player2.control_override == 0)
+		{
+			control.player1 = control.pad2
+		}
+	}
+
+	UpdateSonicBonusEffects()
+	if ((char.control_flags & 0x01) == 0)
+	{
+		// Targets:
+		//  - 0x0107f6	-> (char.flags & 0x06) = 0x00
+		//  - 0x010868	-> (char.flags & 0x06) = 0x02
+		//  - 0x010896	-> (char.flags & 0x06) = 0x04
+		//  - 0x0108b8	-> (char.flags & 0x06) = 0x06
+		call tableLookupAddress(0x0107ee, char.flags & 0x06)
+	}
+
+	if (level.vertical_wrap == 0xff00)
+	{
+		char.position.y.u16 &= level.height.bitmask
+	}
+	char.position.x.u16 = 0x0400 + (char.position.x.u16 & u16[0xffffeea8])
+	Character.WriteToPositionBackup()
+
+	char.angle_sensor_1 = u8[0xfffff768]
+	char.angle_sensor_2 = u8[0xfffff76a]
+	if ((char.control_flags & 0x02) == 0)
+	{
+		fn012d36()
+		fn01309a()
+	}
+
+	D0.u8 = char.control_flags & 0xa0
+	if (D0.u8 == 0)
+	{
+		fn00fe6e()
+	}
+}
+
+
+//# address-hook(0x0107f6) end(0x010866)
+function void fn0107f6()
+{
+	if ((control.player1.pressed & CONTROL_ABC) == 0)
+	{
+		if (char.state == 0x0a || char.state == 0x0b)
+			return
+
+		if (char.state == 0x05 && char.animation.frame >= 0x1e)
+		{
+			Character.UpdateUprightSlopeEffect()
+			if (control.player1.state & 0x7f)
+			{
+				char.state = (char.animation.frame < 0xac) ? 0x0a : 0x0b
+			}
+
+			Character.UpdateRotationOnGround_partial()
+			Character.UpdateGroundContact()
+			return
+		}
+	}
+
+	fn01094c()
+	if (checkForMultiReturn())
+		return
+
+	if (Character.CheckStartJump())
+		return
+
+	Character.UpdateUprightSlopeEffect()
+	Character.UpdateUprightOnGroundInner()
+	fn0108e6()
+	UpdateMovementStraightSimple()
+
+	Character.UpdateRotationOnGround_partial()
+	Character.UpdateGroundContact()
+}
+
+
+//# address-hook(0x010868) end(0x010894)
+function void fn010868()
+{
+	UpdateSonicJumpMoves()
+	Character.UpdateControlInAir()
+	UpdateMovementSimple()
+	if (char.flags & 0x40)
+	{
+		char.velocity.y -= 0x28
+	}
+	Character.UpdateRotationInAir()
+
+	push(A6)
+	push(A5)
+	push(A4)
+	Character.CheckCollision()
+	A4 = pop()
+	A5 = pop()
+	A6 = pop()
+}
+
+
+//# address-hook(0x010896) end(0x0108b6)
+function void fn010896()
+{
+	if (u8[A0 + 0x3d] == 0)
+	{
+		if (Character.CheckStartJump())
+			return
+	}
+
+	Character.UpdateRollingSlopeEffect()
+	UpdateSonicControlRollingOnGround()
+	UpdateMovementStraightSimple()
+	Character.UpdateRotationOnGround_partial()
+	Character.UpdateGroundContact()
+}
+
+
+//# address-hook(0x0108b8) end(0x0108e4)
+function void fn0108b8()
+{
+	// This is exactly the same as "fn010868", so just call this one
+	fn010868()
+}
+
+
+//# address-hook(0x0108e6) end(0x01094a)
+function void fn0108e6()
+{
+	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
+	{
+		if ((control.player1.state & 0x0c) == 0 && (control.player1.state & CONTROL_DOWN) && (char.flags & 0x04) == 0)
+		{
+			char.flags |= 0x04
+			char.hitbox_extends.x = 3
+			char.hitbox_extends.y = 7
+			char.state = 0x02
+			char.position.y.u16 += 4
+			playSound(0x3c)
+			if (char.groundspeed == 0)
+			{
+				char.groundspeed = 0x0200
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x01094c) end(0x010a12)
+function void fn01094c()
+{
+	if (u8[A0 + 0x3d] == 0)
+	{
+		if ((char.state == 0x08) && (control.player1.pressed & CONTROL_ABC))
+		{
+			char.state = 0x09
+			playSound(0xab)
+			signalMultiReturn()
+
+			u8[A0 + 0x3d] = 0x01
+			char.spindash_charge = 0
+			if (char.drown_countdown >= 12)
+			{
+				u8[A6 + 0x20] = 0x02
+			}
+			Character.UpdateRotationOnGround_partial()
+		}
+		return
+	}
+
+	if (control.player1.state & CONTROL_DOWN)
+	{
+		fn010a38()
+		return
+	}
+
+	char.hitbox_extends.x = 3
+	char.hitbox_extends.y = 7
+	char.state = 0x02
+	char.position.y.u16 += 4
+	u8[A0 + 0x3d] = 0
+
+	D0 = u8[A0 + 0x3e] * 2
+	char.groundspeed = u16[0x010a14 + D0.u16]
+	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28
+	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
+	if (char.flags & 0x01)
+	{
+		char.groundspeed = -char.groundspeed
+	}
+	char.flags |= 0x04
+	u8[A6 + 0x20] = 0
+	playSound(SFX_SPINDASH_RELEASE)
+
+	fn010a80()
+}
+
+
+//# address-hook(0x010a38) end(0x010a7a)
+function void fn010a38()
+{
+	if (char.spindash_charge != 0)
+	{
+		char.spindash_charge -= char.spindash_charge >> 5
+		if (s16(char.spindash_charge) < 0)
+			char.spindash_charge = 0
+	}
+
+	if (control.player1.pressed & CONTROL_ABC)
+	{
+		char.state.both = 0x0900
+		playSound(0xab)
+		char.spindash_charge += 0x0200
+		if (char.spindash_charge >= 0x0800)
+			char.spindash_charge = 0x0800
+	}
+
+	fn010a80()
+}
+
+
+//# address-hook(0x010a80) end(0x010a92)
+function void fn010a80()
+{
+	signalMultiReturn()
+
+	if (u16[A5] != 0x60)
+	{
+		if (u16[A5] < 0x60)
+		{
+			u16[A5] += 2
+		}
+		else
+		{
+			u16[A5] -= 2
+		}
+	}
+	Character.UpdateRotationOnGround_partial()
+}
+
+
+
+// Tails
+
+//# address-hook(0x013102) end(0x013156)
+function void fn013102()
+{
+	CompetitionMode.Character.BaseUpdate(0x01315a)
+}
+
+
+//# address-hook(0x013166) end(0x01326e)
+function void fn013166()
+{
+	char.base_state += 0x02
+	char.hitbox_extends.x = 5
+	char.hitbox_extends.y = 11
+	u8[A0 + 0x45] = 5
+	u8[A0 + 0x44] = 11
+	char.mapping_offset = 0x29fee6
+	char.sprite_priority = 0x0100
+	char.box_size.x = 0x0c
+	char.box_size.y = 0x0c
+	char.render_flags = render_flag.WORLD | render_flag.VISIBLE
+	char.character = CHARACTER_TAILS
+
+	A1 = 0x1e3c00 + char.character * 8
+	u16[A4] = u16[(A1+=2)-2]
+	u16[A4 + 0x02] = u16[(A1+=2)-2]
+	u16[A4 + 0x04] = u16[(A1+=2)-2]
+
+	if (checkpoint.number == 0)
+	{
+		char.layer_flags1 = 0x0c
+		char.layer_flags2 = 0x0d
+		if (A0 == 0xffffb000)
+		{
+			char.sprite_attributes = 0x0680
+			if (global.zone == 0x12)
+			{
+				char.sprite_attributes |= 0x8000
+			}
+			checkpoint.x = char.position.x.u16
+			checkpoint.y = char.position.y.u16
+			checkpoint.sprite_attr = char.sprite_attributes
+			checkpoint.layer_flags = u16[A0 + 0x46]
+			u32[0xffffcbc0] = 0x0161fa
+			u16[0xffffcbf0] = A0.u16
+		}
+		else
+		{
+			char.sprite_attributes = 0x06a0
+			if (global.zone == 0x12)
+			{
+				char.sprite_attributes |= 0x8000
+			}
+			u16[0xfffffe4c] = char.position.x.u16
+			u16[0xfffffe4e] = char.position.y.u16
+			u16[0xfffffe56] = char.sprite_attributes
+			u16[0xfffffe58] = u16[A0 + 0x46]
+			u32[0xffffcc0a] = 0x0161fa
+			u16[0xffffcc3a] = A0.u16
+		}
+	}
+
+	u8[A0 + 0x30] = 0
+	u8[A0 + 0x31] = 0x04
+	char.drown_countdown = 30
+	tails.ai_routine = 0
+	tails.control_counter = 600
+	tails.respawn_counter = 0
+
+	fn013274()
+}
+
+
+//# address-hook(0x013274) end(0x01332c)
+function void fn013274()
+{
+	if (debug_mode.enabled != 0 && A0 == 0xffffb000 && (control.pad1.pressed & CONTROL_B))
+	{
+		debug_mode.state = 0x01
+		player1.control_override = 0
+		return
+	}
+
+	if (A0 == 0xffffb000)
+	{
+		control.tails = control.player1
+		if (player1.control_override == 0)
+		{
+			control.tails = control.pad1
+			control.player1 = control.pad1
+		}
+	}
+	else
+	{
+		if (player2.control_override == 0)
+		{
+			control.tails = control.pad2
+		}
+	}
+
+	UpdateTailsBonusEffects()
+	if ((char.control_flags & 0x01) == 0)
+	{
+		// Targets:
+		//  - 0x013336	-> (char.flags & 0x06) = 0x00
+		//  - 0x01335a	-> (char.flags & 0x06) = 0x02
+		//  - 0x01346a	-> (char.flags & 0x06) = 0x04
+		//  - 0x01348c	-> (char.flags & 0x06) = 0x06
+		call tableLookupAddress(0x01332e, char.flags & 0x06)
+	}
+
+	if (level.vertical_wrap == 0xff00)
+	{
+		char.position.y.u16 &= level.height.bitmask
+	}
+	char.position.x.u16 = 0x0400 + (char.position.x.u16 & u16[0xffffeea8])
+	Character.WriteToPositionBackup()
+
+	char.angle_sensor_1 = u8[0xfffff768]
+	char.angle_sensor_2 = u8[0xfffff76a]
+	if ((char.control_flags & 0x02) == 0)
+	{
+		fn015cd0()
+		fn016050()
+	}
+
+	D0.u8 = char.control_flags & 0xa0
+	if (D0.u8 == 0)
+	{
+		fn00fe6e()
+	}
+}
+
+
+//# address-hook(0x013336) end(0x013358)
+function void fn013336()
+{
+	fn013520()
+	if (checkForMultiReturn())
+		return
+
+	if (Character.CheckStartJump())
+		return
+
+	Character.UpdateUprightSlopeEffect()
+	UpdateTailsUprightOnGroundInner()
+	fn0134ba()
+	UpdateMovementStraightSimple()
+
+	Character.UpdateRotationOnGround_partial()
+	Character.UpdateGroundContact()
+}
+
+
+//# address-hook(0x01335a) end(0x0133ac)
+function void fn01335a()
+{
+	if (char.double_jump_state == 0)
+	{
+		UpdateTailsJumpMoves()
+		Character.UpdateControlInAir()
+		UpdateMovementSimple()
+		if (char.flags & 0x40)
+		{
+			char.velocity.y -= 0x28
+		}
+	}
+	else
+	{
+		fn0133ae()
+		Character.UpdateControlInAir()
+		UpdateMovementStraightSimple()
+	}
+
+	Character.UpdateRotationInAir()
+	push(A6)
+	push(A5)
+	push(A4)
+	Character.CheckCollision()
+	A4 = pop()
+	A5 = pop()
+	A6 = pop()
+}
+
+
+//# address-hook(0x0133ae) end(0x013468)
+function void fn0133ae()
+{
+	UpdateTailsFlight_innerA()
+
+	if (((level.framecounter.low + 0x08) & 0x0f) == 0)
+	{
+		playSound((tails.flight_countdown == 0) ? 0xbb : 0xba)
+	}
+}
+
+
+//# address-hook(0x01346a) end(0x01348a)
+function void fn01346a()
+{
+	if (u8[A0 + 0x3d] == 0)
+	{
+		if (Character.CheckStartJump())
+			return
+	}
+
+	Character.UpdateRollingSlopeEffect()
+	UpdateTailsControlRollingOnGround()
+	UpdateMovementStraightSimple()
+	Character.UpdateRotationOnGround_partial()
+	Character.UpdateGroundContact()
+}
+
+
+//# address-hook(0x01348c) end(0x0134b8)
+function void fn01348c()
+{
+	UpdateTailsJumpMoves()
+	Character.UpdateControlInAir()
+	UpdateMovementSimple()
+	if (char.flags & 0x40)
+	{
+		char.velocity.y -= 0x28
+	}
+	Character.UpdateRotationInAir()
+
+	push(A6)
+	push(A5)
+	push(A4)
+	Character.CheckCollision()
+	A4 = pop()
+	A5 = pop()
+	A6 = pop()
+}
+
+
+//# address-hook(0x0134ba) end(0x01351e)
+function void fn0134ba()
+{
+	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
+	{
+		if ((control.tails.state & 0x0c) == 0 && (control.tails.state & CONTROL_DOWN) && (char.flags & 0x04) == 0)
+		{
+			char.flags |= 0x04
+			char.hitbox_extends.x = 3
+			char.hitbox_extends.y = 7
+			char.state = 0x02
+			char.position.y.u16 += 4
+			playSound(0x3c)
+			if (char.groundspeed == 0)
+			{
+				char.groundspeed = 0x0200
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x013520) end(0x0135ec)
+function void fn013520()
+{
+	if (u8[A0 + 0x3d] == 0)
+	{
+		if ((char.state == 0x08) && (control.tails.pressed & CONTROL_ABC))
+		{
+			char.state = 0x09
+			playSound(0xab)
+			signalMultiReturn()
+
+			u8[A0 + 0x3d] = 0x01
+			char.spindash_charge = 0
+			if (char.drown_countdown >= 12)
+			{
+				u8[A6 + 0x20] = 0x02
+			}
+			Character.CheckAgainstMoveBorders()
+			Character.UpdateRotationOnGround_partial()
+		}
+		return
+	}
+
+	if (control.tails.state & 0x02)
+	{
+		fn013600()
+		return
+	}
+
+	char.hitbox_extends.x = 3
+	char.hitbox_extends.y = 7
+	char.state = 0x02
+	char.position.y.u16 += 4
+	u8[A0 + 0x3d] = 0
+
+	D0 = u8[A0 + 0x3e] * 2
+	char.groundspeed = u16[0x0135ee + D0.u16]
+	A1 = (A0 == 0xffffb000) ? 0xffffee24 : 0xffffee28
+	u16[A1] = 0x2000 - (((u16(char.groundspeed) - 0x0800) * 2) & 0x1f00)
+	if (char.flags & 0x01)
+	{
+		char.groundspeed = -char.groundspeed
+	}
+	char.flags |= 0x04
+	u8[A6 + 0x20] = 0
+#if STANDALONE
+	playSound(SFX_SPINDASH_RELEASE)
+#else
+	playSound(0xfb)
+#endif
+
+	fn013648()
+}
+
+
+//# address-hook(0x013600) end(0x01365a)
+function void fn013600()
+{
+	if (char.spindash_charge != 0)
+	{
+		char.spindash_charge -= char.spindash_charge >> 5
+		if (s16(char.spindash_charge) < 0)
+			char.spindash_charge = 0
+	}
+
+	if (control.tails.pressed & CONTROL_ABC)
+	{
+		char.state.both = 0x0900
+		playSound(0xab)
+		char.spindash_charge += 0x0200
+		if (char.spindash_charge >= 0x0800)
+			char.spindash_charge = 0x0800
+	}
+
+	fn013648()
+}
+
+
+//# address-hook(0x013648) end(0x01365a)
+function void fn013648()
+{
+	signalMultiReturn()
+
+	if (u16[A5] != 0x60)
+	{
+		if (u16[A5] < 0x60)
+		{
+			u16[A5] += 2
+		}
+		else
+		{
+			u16[A5] -= 2
+		}
+	}
+	Character.UpdateRotationOnGround_partial()
+}

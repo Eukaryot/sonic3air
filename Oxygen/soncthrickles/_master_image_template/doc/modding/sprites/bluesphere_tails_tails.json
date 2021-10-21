@@ -1,0 +1,16 @@
+{
+	"bluesphere_tails_tails_0x01": { "File": "bluesphere_tails_tails.bmp", "Rect": "4,4,16,24", "Center": "8,22" },
+	"bluesphere_tails_tails_0x02": { "File": "bluesphere_tails_tails.bmp", "Rect": "24,4,24,24", "Center": "8,14" },
+	"bluesphere_tails_tails_0x03": { "File": "bluesphere_tails_tails.bmp", "Rect": "48,8,24,16", "Center": "8,6" },
+	"bluesphere_tails_tails_0x04": { "File": "bluesphere_tails_tails.bmp", "Rect": "76,4,16,24", "Center": "8,14" },
+	"bluesphere_tails_tails_0x05": { "File": "bluesphere_tails_tails.bmp", "Rect": "100,0,16,32", "Center": "8,22" },
+	"bluesphere_tails_tails_0x06": { "File": "bluesphere_tails_tails.bmp", "Rect": "120,4,24,24", "Center": "16,22" },
+	"bluesphere_tails_tails_0x07": { "File": "bluesphere_tails_tails.bmp", "Rect": "148,4,16,24", "Center": "8,22" },
+	"bluesphere_tails_tails_0x08": { "File": "bluesphere_tails_tails.bmp", "Rect": "172,4,16,24", "Center": "8,22" },
+	"bluesphere_tails_tails_0x09": { "File": "bluesphere_tails_tails.bmp", "Rect": "192,4,24,24", "Center": "16,14" },
+	"bluesphere_tails_tails_0x0a": { "File": "bluesphere_tails_tails.bmp", "Rect": "216,8,24,16", "Center": "16,6" },
+	"bluesphere_tails_tails_0x0b": { "File": "bluesphere_tails_tails.bmp", "Rect": "244,4,16,24", "Center": "8,14" },
+	"bluesphere_tails_tails_0x0c": { "File": "bluesphere_tails_tails.bmp", "Rect": "268,0,16,32", "Center": "8,22" },
+	"bluesphere_tails_tails_0x0d": { "File": "bluesphere_tails_tails.bmp", "Rect": "288,4,24,24", "Center": "8,22" },
+	"bluesphere_tails_tails_0x0e": { "File": "bluesphere_tails_tails.bmp", "Rect": "316,4,16,24", "Center": "8,22" }
+}

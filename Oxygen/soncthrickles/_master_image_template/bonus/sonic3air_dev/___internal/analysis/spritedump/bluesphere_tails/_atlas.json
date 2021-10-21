@@ -1,0 +1,13 @@
+{
+	"bluesphere_tails_0x01": { "File": "_atlas.bmp", "Rect": "0,4,32,40", "Center": "12,31" },
+	"bluesphere_tails_0x02": { "File": "_atlas.bmp", "Rect": "32,0,32,48", "Center": "13,35" },
+	"bluesphere_tails_0x03": { "File": "_atlas.bmp", "Rect": "64,0,32,48", "Center": "12,35" },
+	"bluesphere_tails_0x04": { "File": "_atlas.bmp", "Rect": "100,0,24,48", "Center": "11,35" },
+	"bluesphere_tails_0x05": { "File": "_atlas.bmp", "Rect": "128,0,32,48", "Center": "12,35" },
+	"bluesphere_tails_0x06": { "File": "_atlas.bmp", "Rect": "160,0,32,48", "Center": "20,35" },
+	"bluesphere_tails_0x07": { "File": "_atlas.bmp", "Rect": "196,0,24,48", "Center": "13,35" },
+	"bluesphere_tails_0x08": { "File": "_atlas.bmp", "Rect": "224,0,32,48", "Center": "20,35" },
+	"bluesphere_tails_0x09": { "File": "_atlas.bmp", "Rect": "260,8,24,32", "Center": "12,35" },
+	"bluesphere_tails_0x0a": { "File": "_atlas.bmp", "Rect": "292,8,24,32", "Center": "12,35" },
+	"bluesphere_tails_0x0b": { "File": "_atlas.bmp", "Rect": "324,8,24,32", "Center": "12,35" }
+}

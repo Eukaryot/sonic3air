@@ -1,0 +1,710 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Stack                                                 //
+//-------------------------------------------------------//
+
+function void pushAll()
+{
+	push(A6)
+	push(A5)
+	push(A4)
+	push(A3)
+	push(A2)
+	push(A1)
+	push(A0)
+	push(D7)
+	push(D6)
+	push(D5)
+	push(D4)
+	push(D3)
+	push(D2)
+	push(D1)
+	push(D0)
+}
+
+function void popAll()
+{
+	D0 = pop()
+	D1 = pop()
+	D2 = pop()
+	D3 = pop()
+	D4 = pop()
+	D5 = pop()
+	D6 = pop()
+	D7 = pop()
+	A0 = pop()
+	A1 = pop()
+	A2 = pop()
+	A3 = pop()
+	A4 = pop()
+	A5 = pop()
+	A6 = pop()
+}
+
+
+function void pushDxA01345()
+{
+	push(A5)
+	push(A4)
+	push(A3)
+	push(A1)
+	push(A0)
+	push(D7)
+	push(D6)
+	push(D5)
+	push(D4)
+	push(D3)
+	push(D2)
+	push(D1)
+	push(D0)
+}
+
+function void popDxA01345()
+{
+	D0 = pop()
+	D1 = pop()
+	D2 = pop()
+	D3 = pop()
+	D4 = pop()
+	D5 = pop()
+	D6 = pop()
+	D7 = pop()
+	A0 = pop()
+	A1 = pop()
+	A3 = pop()
+	A4 = pop()
+	A5 = pop()
+}
+
+
+function void pushDxA12345()
+{
+	push(A5)
+	push(A4)
+	push(A3)
+	push(A2)
+	push(A1)
+	push(D7)
+	push(D6)
+	push(D5)
+	push(D4)
+	push(D3)
+	push(D2)
+	push(D1)
+	push(D0)
+}
+
+function void popDxA12345()
+{
+	D0 = pop()
+	D1 = pop()
+	D2 = pop()
+	D3 = pop()
+	D4 = pop()
+	D5 = pop()
+	D6 = pop()
+	D7 = pop()
+	A1 = pop()
+	A2 = pop()
+	A3 = pop()
+	A4 = pop()
+	A5 = pop()
+}
+
+
+function void pushA456()
+{
+	push(A6)
+	push(A5)
+	push(A4)
+}
+
+function void popA456()
+{
+	A4 = pop()
+	A5 = pop()
+	A6 = pop()
+}
+
+
+
+//-------------------------------------------------------//
+// Maths                                                 //
+//-------------------------------------------------------//
+
+function u32 pow(u32 base, u32 power)
+{
+	u32 value = 1
+	for (u32 i = 0; i < power; ++i)
+	{
+		value *= base
+	}
+	return value
+}
+
+//# address-hook(0x001d4c) end(0x001d62)
+function void LookupSinCos()
+{
+	u8 angle = D0.u8
+	D0.s16 = lookupSin(angle)
+	D1.s16 = lookupCos(angle)
+}
+
+function s16 lookupSin(u8 angle)
+{
+	return s16[0x001d64 + u16(angle) * 2]
+}
+
+function s16 lookupCos(u8 angle)
+{
+	return s16[0x001d64 + u16(angle) * 2 + 0x80]
+}
+
+
+//# address-hook(0x001fe4) end(0x00203e)
+function void LookupAngleByVector()
+{
+	D0.u16 = lookupAngleByVector(D1.s16, D2.s16)
+}
+
+function u8 lookupAngleByVector(s16 dx, s16 dy)
+{
+	if (dx == 0 && dy == 0)
+	{
+		return 0x40
+	}
+
+	u32 ax = abs(dx)
+	u32 ay = abs(dy)
+
+	u16 index
+	u8 angle
+	if (ay < ax)
+	{
+		index = (ay << 8) / ax
+		angle = u8[0x002040 + index]
+	}
+	else
+	{
+		index = (ax << 8) / ay
+		angle = 0x40 - u8[0x002040 + index]
+	}
+
+	if (dx < 0)
+	{
+		angle = 0x80 - angle
+	}
+	if (dy < 0)
+	{
+		angle = -angle
+	}
+	return angle
+}
+
+
+//# address-hook(0x00a230) end(0x00a24a)
+function void LookupHighPrecisionSinCos()
+{
+	u8 angle = D0.u8
+	u16 offsetSin = (u16(angle) * 2) & 0x01fe
+	u16 offsetCos = (u16(angle + 0x40) * 2) & 0x01fe
+	D0.u16 = u16[0x00a264 + offsetSin]
+	D1.u16 = u16[0x00a264 + offsetCos]
+}
+
+
+function bool checkBoxOverlap(u32 pos1.x, u32 pos1.y, s16 size1.x, s16 size1.y, u32 pos2.x, u32 pos2.y, s16 size2.x, s16 size2.y)
+{
+	s32 dx = pos2.x - pos1.x
+	s32 dy = pos2.y - pos1.y
+
+	return (dx >= -size2.x && dx <= size1.x && dy >= -size2.y && dy <= size1.y)
+}
+
+
+
+//-------------------------------------------------------//
+// Data access                                           //
+//-------------------------------------------------------//
+
+function u32 tableLookupAddress(u32 baseAddress, s16 offset)
+{
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (baseAddress < 0x400000)
+		{
+			u32 result = baseAddress + s16[baseAddress + offset]
+			ROMDataAnalyser.beginEntry("TableLookup", baseAddress)
+			ROMDataAnalyser.addKeyValue(stringformat("0x%04x", u32(offset)), stringformat("0x%06x", result))
+			ROMDataAnalyser.endEntry()
+			return result
+		}
+	}
+#endif
+	return baseAddress + s16[baseAddress + offset]
+}
+
+function u32 tableLookupAddressLog(u32 baseAddress, s16 offset)
+{
+	u32 result = tableLookupAddress(baseAddress, offset)
+	debugLog(stringformat("TableLookup: 0x%06x <- 0x%02x", result, offset))
+	return result
+}
+
+
+
+//-------------------------------------------------------//
+// Random number generator                               //
+//-------------------------------------------------------//
+
+//# address-hook(0x001d24) end(0x001d4a)
+function void GetRandomNumber()
+{
+	D1 = global.random.seed
+	if (D1.u16 == 0)
+		D1 = 0x2a6d365b
+
+	D0 = D1
+	D1 <<= 2
+	D1 += D0
+	D1 <<= 3
+	D1 += D0
+	D0.u16 = D1.u16
+	D1 = (D1 << 16) + (D1 >> 16)
+	D0.u16 += D1.u16
+	D1.u16 = D0.u16
+	D1 = (D1 << 16) + (D1 >> 16)
+	global.random.seed = D1
+}
+
+function u32 getRandomNumber()
+{
+	GetRandomNumber()
+	return D0
+}
+
+
+
+//-------------------------------------------------------//
+// Colors                                                //
+//-------------------------------------------------------//
+
+// Color formats used:
+//  - Original hardware's packed colors (9-bit):	0000 BBB0 GGG0 RRR0
+//  - S3AIR's extended packed colors (15-bit):		1BBB BBGG GGGR RRRR
+//  - Mostly only for calculations, 24-bit color:	0000 0000 BBBB BBBB GGGG GGGG RRRR RRRR
+
+function u32 unpackColor(u16 color)
+{
+#if STANDALONE
+	if (color & 0x8000)
+	{
+		// Extended 15-bit color format (Standalone only)
+		u32 r = min(((color)       & 0x1f) * 0x09, 0xff)
+		u32 g = min(((color >> 5)  & 0x1f) * 0x09, 0xff)
+		u32 b = min(((color >> 10) & 0x1f) * 0x09, 0xff)
+		return r + (g << 8) + (b << 16)
+	}
+	else
+#endif
+	{
+		// Original 9-bit color format
+		u32 r = ((color >> 1) & 0x07) * 0x24
+		u32 g = ((color >> 5) & 0x07) * 0x24
+		u32 b = ((color >> 9) & 0x07) * 0x24
+		return r + (g << 8) + (b << 16)
+	}
+}
+
+function u16 packColor(u32 color)
+{
+	u16 r = (((color)       & 0xff) + 0x12) / 0x24
+	u16 g = (((color >> 8)  & 0xff) + 0x12) / 0x24
+	u16 b = (((color >> 16) & 0xff) + 0x12) / 0x24
+	return (r << 1) + (g << 5) + (b << 9)
+}
+
+#if STANDALONE
+function u16 packColorExt(u32 color)
+{
+	u16 r = (((color)       & 0xff) + 0x04) / 0x09
+	u16 g = (((color >> 8)  & 0xff) + 0x04) / 0x09
+	u16 b = (((color >> 16) & 0xff) + 0x04) / 0x09
+	return (r) + (g << 5) + (b << 10) + 0x8000
+}
+#endif
+
+function u16 blendColorsPacked(u16 colorA, u16 colorB, u16 blendFactor)
+{
+	u32 unpackedA = unpackColor(colorA)
+	u32 unpackedB = unpackColor(colorB)
+	u32 unpackedResult = blendColors(unpackedA, unpackedB, blendFactor)
+#if STANDALONE
+	return packColorExt(unpackedResult)
+#else
+	return packColor(unpackedResult)
+#endif
+}
+
+function u32 blendColors(u32 colorA, u32 colorB, u16 blendFactor)
+{
+	u32 r = ( (colorA        & 0xff) * (0x100 - blendFactor) + ( colorB        & 0xff) * blendFactor + 0x80) >> 8
+	u32 g = (((colorA >> 8)  & 0xff) * (0x100 - blendFactor) + ((colorB >> 8)  & 0xff) * blendFactor + 0x80) >> 8
+	u32 b = (((colorA >> 16) & 0xff) * (0x100 - blendFactor) + ((colorB >> 16) & 0xff) * blendFactor + 0x80) >> 8
+	return r + (g << 8) + (b << 16)
+}
+
+
+
+//-------------------------------------------------------//
+// VDP Access                                            //
+//-------------------------------------------------------//
+
+function u32 VDPHelper.getDirectWriteCode(u16 address, u16 mode)
+{
+	u32 higherBits = (address & 0x3fff) | mode
+	u32 lowerBits  = (address & 0xc000) >> 14
+	return (higherBits << 16) + lowerBits
+}
+
+function u32 VDPHelper.getDirectVRAMWriteCode(u16 vramAddress)
+{
+	return VDPHelper.getDirectWriteCode(vramAddress, 0x4000)
+}
+
+function u16 VDPHelper.getVRAMAddressFromWriteCode(u32 code)
+{
+	u32 higherBits = (code >> 16)
+	u32 lowerBits  = (code & 0xffff)
+	return (higherBits & 0x3fff) + ((lowerBits & 0x0003) << 14)
+}
+
+
+#if STANDALONE
+
+function void VDP.Config.enableHInt(bool enable)
+{
+	if (!enable)
+	{
+		// This effectively disables the HInt call inside "waitForNextFrame()"
+		h_int.line = 0xff
+	}
+}
+
+
+#else
+
+function void VDP.setupVRAMWrite(u16 vramAddress)
+{
+	u32[0xc00004] = VDPHelper.getDirectVRAMWriteCode(vramAddress)
+}
+
+function void VDP.setupVSRAMWrite(u16 vsramAddress)
+{
+	u32[0xc00004] = 0x40000010 | ((vsramAddress & 0x3fff) << 16) | ((vsramAddress & 0xc000) >> 14)
+}
+
+function void VDP.setupCRAMWrite(u16 cramAddress)
+{
+	// TODO: Support cramAddress parameter
+	u32[0xc00004] = 0xc0000000
+}
+
+function void VDP.setWriteIncrement(u8 increment)
+{
+	u16[0xc00004] = 0x8f00 + increment
+}
+
+function u16 VDP.readData16()
+{
+	return u16[0xc00000]
+}
+
+function u32 VDP.readData32()
+{
+	return u32[0xc00000]
+}
+
+function void VDP.writeData16(u16 value)
+{
+	u16[0xc00000] = value
+}
+
+function void VDP.writeData32(u32 value)
+{
+	u32[0xc00000] = value
+}
+
+
+function void VDP.copyToVRAM(u32 address, u16 bytes)
+{
+	for (u16 i = 0; i < bytes; i += 2)
+	{
+		u16[0xc00000] = u16[address + i]
+	}
+}
+
+function void VDP.zeroVRAM(u16 bytes)
+{
+	for (u16 i = 0; i < bytes; i += 2)
+	{
+		u16[0xc00000] = 0
+	}
+}
+
+
+function void VDP.copyByDMA(u32 sourceAddress, u16 vramAddress, u16 bytes, u16 mode)
+{
+	// Encode length
+	u16 word1 = 0x9300 | ((bytes >> 1) & 0xff)
+	u16 word2 = 0x9400 | ((bytes >> 9) & 0xff)
+
+	// Encode source
+	u16 word3 = 0x9500 | ((sourceAddress >> 1) & 0xff)
+	u16 word4 = 0x9600 | ((sourceAddress >> 9) & 0xff)
+	u16 word5 = 0x9700 | ((sourceAddress >> 17) & 0x7f)
+
+	// Encode destination + control flags
+	u16 word6 = (vramAddress & 0x3fff) | mode
+	u16 word7 = ((vramAddress & 0xc000) >> 14) | 0x0080
+
+	u32[0xc00004] = word1 + (u32(word2) << 16)
+	u32[0xc00004] = word3 + (u32(word4) << 16)
+	u16[0xc00004] = word5
+	u16[0xc00004] = word6
+	u16[0xc00004] = word7
+}
+
+function void VDP.copyToVRAMbyDMA(u32 sourceAddress, u16 vramAddress, u16 bytes)
+{
+	VDP.copyByDMA(sourceAddress, vramAddress, bytes, 0x4000)
+}
+
+function void VDP.copyToCRAMbyDMA(u32 sourceAddress, u16 cramAddress, u16 bytes)
+{
+	VDP.copyByDMA(sourceAddress, cramAddress, bytes, 0xc000)
+}
+
+function void VDP.fillVRAMbyDMA(u16 fillValue, u16 vramAddress, u16 bytes)
+{
+	bytes -= 2	// Because first word gets written immediately, others by DMA
+
+	// Encode length
+	u16 word1 = 0x9300 | ((bytes >> 1) & 0xff)
+	u16 word2 = 0x9400 | ((bytes >> 9) & 0xff)
+
+	// Encode destination + control flags
+	u16 word6 = (vramAddress & 0x3fff) | 0x4000
+	u16 word7 = ((vramAddress & 0xc000) >> 14) | 0x0080
+
+	u32[0xc00004] = word1 + (u32(word2) << 16)
+	u16[0xc00004] = 0x9780
+	u16[0xc00004] = word6
+	u16[0xc00004] = word7
+	u16[0xc00000] = fillValue
+
+	// Wait for DMA to finish
+	while (u16[0xc00004] & 0x02)
+	{
+		burnCycles(0x140)	// Just to keep things going for the emulator
+	}
+}
+
+
+function void VDP.Config.enableHInt(bool enable)
+{
+	u16[0xc00004] = enable ? 0x8014 : 0x8004
+}
+
+function void VDP.Config.setActiveDisplay(bool enable)
+{
+	u16 value = u16[0xfffff60e]		// Value e.g. 0x8174
+	if (enable)
+	{
+		value |= 0x0040
+	}
+	else
+	{
+		value &= 0xffbf
+	}
+	u16[0xc00004] = value
+}
+
+function void VDP.Config.setNameTableBasePlaneA(u16 nameTableBase)
+{
+	u8 data = (nameTableBase >> 13) << 3
+	u16[0xc00004] = 0x8200 + data
+}
+
+function void VDP.Config.setNameTableBasePlaneW(u16 nameTableBase)
+{
+	u8 data = (nameTableBase >> 10)
+	u16[0xc00004] = 0x8300 + data
+}
+
+function void VDP.Config.setNameTableBasePlaneB(u16 nameTableBase)
+{
+	u8 data = (nameTableBase >> 13)
+	u16[0xc00004] = 0x8400 + data
+}
+
+function void VDP.Config.setSpriteAttributeTableBase(u16 satBase)
+{
+	u8 data = (satBase >> 9)
+	u16[0xc00004] = 0x8500 + data
+}
+
+function void VDP.Config.setBackdropColor(u8 paletteIndex)
+{
+	u16[0xc00004] = 0x8700 + paletteIndex
+}
+
+function void VDP.Config.setVerticalScrolling(bool vertical, u8 scrollMask)
+{
+	u8 data = (vertical ? 0x04 : 0x00)
+	data += (scrollMask == 0xff) ? 3 : (scrollMask >= 0xf8) ? 2 : (scrollMask >= 0x07) ? 1 : 0
+	u16[0xc00004] = 0x8b00 + data
+}
+
+function void VDP.Config.setRenderingModeConfiguration(bool shadowHighlightPalette)
+{
+	u8 data = 0x81
+	if (shadowHighlightPalette)
+		data |= 0x08
+	u16[0xc00004] = 0x8c00 + data
+}
+
+function void VDP.Config.setHorizontalScrollTableBase(u16 vramAddress)
+{
+	u8 data = (vramAddress >> 10)
+	u16[0xc00004] = 0x8d00 + data
+}
+
+function void VDP.Config.setPlayfieldSizeInPixels(u16 width, u16 height)
+{
+	// TODO: Support other index values as needed
+	u8 columnsIndex = (width > 512) ? 3 : 1
+	u8 rowsIndex = (height > 256) ? 1 : 0
+
+	u8 data = (columnsIndex & 0x03) + (rowsIndex & 0x03) * 0x10
+	u16[0xc00004] = 0x9000 + data
+}
+
+function void VDP.Config.setupWindowPlane(bool useWindowPlane, u16 splitY)
+{
+	u8 data = (useWindowPlane * 0x80) + (splitY / 8)
+	u16[0xc00004] = 0x9200 + data
+}
+
+#endif
+
+
+
+function void Renderer.configureHInt()
+{
+	#if !STANDALONE
+	{
+		// This usually configures H-INT by setting VDP register 0x0a
+		//  -> h_int.configuration == 0x8a## where ## is the h-int line
+		u16[0xc00004] = h_int.configuration
+	}
+	#endif
+}
+
+
+
+//-------------------------------------------------------//
+// VDP Utility                                           //
+//-------------------------------------------------------//
+
+function void VDP.Util.clearPatternRectInVRAM(u16 baseAddressStart, u16 baseAddressEnd, u16 baseAddressStride, u16 lineStart, u16 lineEnd)
+{
+	for (u16 base = baseAddressStart; base < baseAddressEnd; base += baseAddressStride)
+	{
+		VDP.setupVRAMWrite(base + lineStart)
+		VDP.zeroVRAM(lineEnd - lineStart)
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Sync with Z80                                         //
+//-------------------------------------------------------//
+
+function void syncZ80_variantA()
+{
+	#if !STANDALONE
+	{
+		u16[0xa11100] = 0x0100
+		while (u8[0xa11100] & 0x01)
+		{
+			burnCycles(0x140)	// Just to keep things going for the emulator
+		}
+	}
+	#endif
+}
+
+function void syncZ80_variantB(u8 value)
+{
+	#if !STANDALONE
+	{
+		syncZ80_variantA()
+
+		u8[0xa01c10] = value
+		u16[0xa11100] = 0
+	}
+	#endif
+}
+
+
+
+//-------------------------------------------------------//
+// Handling of "multiple returns" (like "A7 += 4")       //
+//-------------------------------------------------------//
+
+global u8 _multiReturnCounter
+
+function bool checkForMultiReturn()
+{
+	if (_multiReturnCounter > 0)
+	{
+		--_multiReturnCounter
+		return true
+	}
+	else
+	{
+		return false
+	}
+}
+
+function void signalMultiReturn()
+{
+	++_multiReturnCounter
+}
+
+
+
+//-------------------------------------------------------//
+// Debug draw                                            //
+//-------------------------------------------------------//
+
+function void debugDrawOutlineRect(s32 px, s32 py, s32 width, s32 height, u32 color)
+{
+#if STANDALONE
+	debugDrawRect(px, py, 1, height, color)
+	debugDrawRect(px + width - 1, py, 1, height, color)
+	debugDrawRect(px, py, width, 1, color)
+	debugDrawRect(px, py + height - 1, width, 1, color)
+#endif
+}

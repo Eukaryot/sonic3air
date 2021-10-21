@@ -1,0 +1,36 @@
+{
+
+	// Path to game project to load
+	//"LoadProject": "../oxygen_sonic1",
+	//"LoadProject": "../oxygen_sonic2",
+	"LoadProject": "../soncthrickles",
+	//"LoadProject": "../oxygen_tje2",
+
+	// Load save state
+	//"LoadSaveState": "state_02",
+
+	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
+	"PlatformFlags": "-1",
+
+	// Game recorder
+	"GameRecording": "-1",
+	"GameRecPlayFrom": "0",
+	"GameRecIgnoreKeys": "0",
+
+	// Video
+	"WindowSize": "1200 x 740",
+	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
+	"Filtering": "0",				// Can be toggled with Alt + F
+	"FullEmulationRendering": "1",	// Can be toggled with R key
+
+	// Audio
+	"AudioSampleRate": "48000",
+
+	// Input recorder
+	"InputRecorder":
+	{
+		//"Playback": "test_00",
+		//"Record": "test_00",
+		"": ""
+	}
+}

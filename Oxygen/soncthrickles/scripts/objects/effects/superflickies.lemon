@@ -1,0 +1,354 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x01a170) end(0x01a198)
+function void fn01a170()
+{
+	// Create flickies
+	Kosinski.addToDMAQueue(0x14c7d4, 0xd000)
+
+	A1 = A0
+	D0 = 0
+	D1 = 3
+	while (D1.s16 >= 0)
+	{
+		objA1.update_address = 0x01a19c
+		u8[A1 + 0x34] = D0.u8
+		D0.u8 += 0x40
+		A1 += 0x4a
+		--D1.s16
+	}
+
+	fn01a19c()
+}
+
+
+//# address-hook(0x01a19c) end(0x01a1ee)
+function void fn01a19c()
+{
+	// Initialization for a single flicky
+	if (kosinski.waiting_modules != 0)
+		return
+
+	objA0.mapping_offset = 0x01a464
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x08
+	objA0.sprite_attributes = 0x8680
+	objA0.position.x.u16 = u16[0xffffb010] - 0xc0
+	objA0.position.y.u16 = u16[0xffffb014] - 0xc0
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+
+	objA0.update_address = 0x01a1f4
+	fn01a1f4()
+}
+
+
+//# address-hook(0x01a1f4) end(0x01a226)
+function void fn01a1f4()
+{
+	// Update routine for a single flicky
+	if (super.active.tails == 0)
+	{
+		u16[0xffffb05a] = 0
+		u16[0xffffb05e] = 0
+		u8[0xffffb06a] = 0
+		if (u8[A0 + 0x30] != 0)
+		{
+			A1 = 0xffff0000 + objA0.value42
+			u8[A1 + 0x2d] = 0
+		}
+		u8[A0 + 0x30] = 0
+		u8[A0 + 0x32] = 0x78
+		objA0.update_address = 0x01a276
+	}
+
+	fn01a292()
+	fn01a228()
+}
+
+
+//# address-hook(0x01a228) end(0x01a270)
+function void fn01a228()
+{
+	fn01a37a()
+
+	u8[A0 + 0x34] += 2
+	if (objA0.velocity.x != 0)
+	{
+		if (objA0.velocity.x < 0)
+			objA0.render_flags |= 0x01
+		else
+			objA0.render_flags &= ~0x01
+	}
+
+	objA0.render_flags &= 0xfd
+	if (global.inv_gravity)
+	{
+		objA0.render_flags |= 0x02
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 1
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x01
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x01a276) end(0x01a28c)
+function void fn01a276()
+{
+	// Flickies fly away again when Tails returns to normal form
+	D2.u16 = u16[0xffffb010] - 0xc0
+	D3.u16 = u16[0xffffb014] - 0xc0
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		fn01a228()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x01a292) end(0x01a31c)
+function void fn01a292()
+{
+	if (u8[A0 + 0x30] == 0)
+	{
+		bool goto01a2ac = false
+		if (u8[A0 + 0x32] != 0)
+		{
+			--u8[A0 + 0x32]
+			goto01a2ac = true
+		}
+		else
+		{
+			fn01a3fe()
+			goto01a2ac = (D1.u16 == 0)
+		}
+
+		if (goto01a2ac)
+		{
+			D0.u8 = u8[A0 + 0x34]
+			LookupSinCos()
+			D0.s16 >>= 3
+			D1.s16 >>= 4
+			D2.u16 = u16[0xffffb010]
+			D3.u16 = u16[0xffffb014] - 0x20
+			if (global.inv_gravity)
+				D3.u16 += 0x40
+			D2.u16 += D0.u16
+			D3.u16 += D1.u16
+			return
+		}
+	}
+
+	A1 = 0xffff0000 + objA0.value42
+	D2.u16 = objA1.position.x.u16
+	D3.u16 = objA1.position.y.u16
+	if (objA1.render_flags & render_flag.VISIBLE)
+	{
+		D0.u16 = objA0.position.x.u16 - D2.u16 + 0x0c
+		D1.u16 = objA0.position.y.u16 - D3.u16 + 0x0c
+		if (D0.u16 >= 0x18 || D1.u16 >= 0x18)
+			return
+
+		fn01a31e()
+	}
+
+	u8[A1 + 0x2d] = 0
+	u8[A0 + 0x30] = 0
+	u8[A0 + 0x32] = 0x78
+}
+
+
+//# address-hook(0x01a31e) end(0x01a378)
+function void fn01a31e()
+{
+	D0.u8 = u8[A1 + 0x28]
+	if (D0.u8 == 0)
+		return
+
+	D0.u8 &= 0xc0
+	if (D0.u8 == 0)
+	{
+		if (u8[A1 + 0x29] != 0)
+		{
+			D0.u16 = 0xb04a
+			u8[A1 + 0x25] = u8[A1 + 0x28]
+			u8[A1 + 0x1c] = 0x4a
+			u8[A1 + 0x28] = 0
+
+			--u8[A1 + 0x29]
+			if (u8[A1 + 0x29] == 0)
+			{
+				u8[A1 + 0x2a] |= 0x80
+			}
+		}
+		else
+		{
+			// Damage or destroy enemy
+			fn01052e()
+			return
+		}
+	}
+	else
+	{
+		if (D0.u8 != 0xc0)
+			return
+
+		u8[A1 + 0x29] |= 0x02
+	}
+
+	u16[0xffffb05a] = objA0.position.x.u16
+	u16[0xffffb05e] = objA0.position.y.u16
+	u8[0xffffb06a] = 2
+}
+
+
+//# address-hook(0x01a37a) end(0x01a3fc)
+function void fn01a37a()
+{
+	s16 acceleration = 0
+	if (D2.s16 < s16(objA0.position.x.u16))
+	{
+		acceleration = -0x20
+		if (objA0.velocity.x >= 0)
+		{
+			acceleration *= 4
+		}
+	}
+	else
+	{
+		acceleration = 0x20
+		if (objA0.velocity.x < 0)
+		{
+			acceleration *= 4
+		}
+	}
+	objA0.velocity.x += acceleration
+
+	D3.s16 = (D3.u16 & level.height.bitmask) - objA0.position.y.u16
+	bool flyUp = (D3.s16 < 0)
+#if STANDALONE
+	if (abs(D3.s16) >= 0x500)
+#else
+	if (abs(D3.s16) > level.height.bitmask / 2)		// Consider level wrap; don't use the 0x500 value as it does not always work, e.g. in the FBZ 2 boss
+#endif
+	{
+		flyUp = !flyUp
+	}
+
+	// Decelerate if going too fast
+	if (objA0.velocity.y <= -0x1000)
+	{
+		flyUp = false
+	}
+	else if (objA0.velocity.y >= 0x1000)
+	{
+		flyUp = true
+	}
+
+	if (flyUp)
+	{
+		acceleration = -0x20
+		if (objA0.velocity.y >= 0)
+		{
+			acceleration *= 4
+		}
+	}
+	else
+	{
+		acceleration = 0x20
+		if (objA0.velocity.y < 0)
+		{
+			acceleration *= 4
+		}
+	}
+	objA0.velocity.y += acceleration
+
+	UpdateMovementStraightSimple()
+	objA0.position.x.u16 -= u16[0xffffeebc]
+	objA0.position.y.u16 &= level.height.bitmask
+}
+
+
+//# address-hook(0x01a3fe) end(0x01a432)
+function void fn01a3fe()
+{
+	D1 = 0
+	A4 = 0xffffe380
+	D6.u16 = u16[A4]
+	A4 += 2
+	if (D6.u16 != 0)
+	{
+		u8[0xfffff66c] += 2
+		if (u8[0xfffff66c] >= D6.u8)
+		{
+			u8[0xfffff66c] = 0
+		}
+
+		D0 = u8[0xfffff66c]
+		D6.u16 -= D0.u16
+		A4 += D0.s16
+		while (D6.u16 != 0)
+		{
+			A1 = 0xffff0000 + u16[A4]
+			A4 += 2
+			D0.u8 = u8[A1 + 0x28]
+			if (D0.u8 != 0)
+			{
+				fn01a434()
+			}
+			D6.u16 -= 2
+		}
+	}
+}
+
+
+//# address-hook(0x01a434) end(0x01a462)
+function void fn01a434()
+{
+	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x2d] == 0)
+	{
+	#if STANDALONE
+		// Exclude SOZ 1 boss
+		if (u32[A1] == 0x076f46)
+			return
+
+		// Exclude DEZ 2 boss and its robots
+		if (u32[A1] == 0x07f344 || u32[A1] == 0x07f4fa)
+			return
+
+		// Excluse SOZ 2 sand cork
+		if (u32[A1] == 0x041d32)
+			return
+	#endif
+
+		D0.u8 &= 0xc0
+		if (D0.u8 == 0 || D0.u8 == 0xc0)
+		{
+			u8[A1 + 0x2d] = 0xff		// Could this be a flag like "attacked by a flicky"?
+			objA0.value42 = A1.u16
+			u8[A0 + 0x30] = 1
+			D1 = 1
+			D6 = 2
+		}
+	}
+}

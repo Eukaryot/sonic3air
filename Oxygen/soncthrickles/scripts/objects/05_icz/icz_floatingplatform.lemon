@@ -1,0 +1,375 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Floating ice platform (in ICZ2)                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x089f32) end(0x089f32)
+function void fn089f32()
+{
+	Object.InitWithUpdateAddress(0x089f38)
+}
+
+
+//# address-hook(0x089f38) end(0x089f64)
+function void fn089f38()
+{
+	D0 = objA0.base_state
+	D1.u16 = u16[0x089f6a + D0.s16]
+	u16 backupPosition = objA0.position.x.u16
+	call 0x089f6a + D1.s16
+
+	D1 = 0x2b
+	D2 = 0x14
+	D3 = 0x14
+	D4.u16 = backupPosition
+	if ((objA0.flags2a & 0x80) == 0)
+	{
+		fn01dc56()
+		fn08a3c4()
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x089f7e) end(0x089fae)
+function void fn089f7e()
+{
+	setupObjectAttributesFull(0x08a3e2)
+	u16[0xfffffaa4] = A0.u16
+	objA0.hitbox_extends.x = 0x20
+	objA0.hitbox_extends.y = 0x12
+	D0 = objA0.subtype2c >> 1
+	objA0.base_state = u8[0x089fb2 + D0.u16]
+	if (D0.u16 == 0)
+	{
+		spawnChildObjects(0x08a436)
+	}
+}
+
+
+//# address-hook(0x08a178) end(0x08a190)
+function void fn08a178()
+{
+	if (objA0.flags2a & 0x18)
+	{
+		objA0.base_state = 0x10
+		u16[A0 + 0x3a] = objA0.position.y.u16
+	}
+}
+
+
+//# address-hook(0x08a192) end(0x08a1ac)
+function void fn08a192()
+{
+	// Gets called when Sonic is standing on it
+	if (objA0.flags2a & 0x18)
+	{
+		++objA0.position.y.u16
+	}
+	else
+	{
+		objA0.base_state = 0x12
+		objA0.velocity.y = 0
+	}
+}
+
+
+//# address-hook(0x08a1ae) end(0x08a1d2)
+function void fn08a1ae()
+{
+	objA0.velocity.y -= 0x20
+	UpdateMovementStraightSimple()
+	D0.u16 = objA0.position.y.u16
+	if (D0.u16 <= u16[A0 + 0x3a])
+	{
+		objA0.base_state = 0x0e
+		objA0.position.y.u16 = u16[A0 + 0x3a]
+	}
+}
+
+
+//# address-hook(0x08a3c4) end(0x08a3e0)
+function void fn08a3c4()
+{
+	u8[0xffffee39] = 0
+	if (objA0.velocity.x != 0 || objA0.velocity.y != 0)
+	{
+		if (objA0.flags2a & 0x08)
+		{
+			u8[0xffffee39] = 0xff
+		}
+	}
+}
+
+
+
+// Hanging / moving variant
+
+//# address-hook(0x089fb6) end(0x089fd4)
+function void fn089fb6()
+{
+	if (objA0.flags2a & 0x08)
+	{
+		objA0.base_state = 0x04
+		objA0.countdown_value = 0x0f
+		objA0.countdown_callback = 0x089fea
+	}
+}
+
+
+//# address-hook(0x089fd6) end(0x089fe6)
+function void fn089fd6()
+{
+	// Shaking before falling
+	if (global.framecounter & 0x01)
+		--objA0.position.x.u16
+	else
+		++objA0.position.x.u16
+
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x089fea) end(0x089ff0)
+function void fn089fea()
+{
+	objA0.base_state = 0x0a
+}
+
+
+//# address-hook(0x08a11c) end(0x08a174)
+function void fn08a11c()
+{
+	fn08a36c()
+	UpdateMovementStraightSimple()
+	CheckGroundCollision()
+	if (D1.s16 >= 0)
+	{
+		if (objA0.velocity.x != 0)
+		{
+			if (objA0.velocity.x >= 0)
+			{
+				D3 = 0x20
+				fn00fac4()
+				if (D1.s16 < 0)
+				{
+					objA0.position.x.u16 += D1.u16
+					objA0.velocity.x = 0
+				}
+			}
+			else
+			{
+				D3 = -0x20
+				fn00fe3c()
+				if (D1.s16 < 0)
+				{
+					objA0.position.x.u16 += D1.u16
+					objA0.velocity.x = 0
+				}
+			}
+		}
+	}
+	else
+	{
+		objA0.base_state = 0x08
+		D0.u16 = objA0.velocity.y
+		if (D3 & 0x40)
+			D0.s16 = -D0.s16
+
+		objA0.velocity.x = D0.u16
+	}
+}
+
+
+//# address-hook(0x08a1d4) end(0x08a1fc)
+function void fn08a1d4()
+{
+	setupObjectAttributesFull(0x08a412)
+
+	objA0.update_address = 0x0856cc
+	u32[A0 + 0x30] = 0x08a43e
+
+	D0 = objA0.subtype2c
+	objA0.value42 = u16[0x08a200 + D0.s16]
+	MoveWithParent()
+
+	D0 = 8
+	fn0852d0()
+}
+
+
+//# address-hook(0x08a36c) end(0x08a384)
+function void fn08a36c()
+{
+	D0.u16 = objA0.velocity.y + 0x38
+	if (abs(D0.s16) <= 0xc00)
+	{
+		objA0.velocity.y = D0.u16
+	}
+}
+
+
+
+// Variant waiting to be pushed
+
+//# address-hook(0x089ff2) end(0x08a034)
+function void fn089ff2()
+{
+#if STANDALONE
+	// There is only one instance of this object sub-type in the whole game, and pushing that one to the left is bad
+	bool pushing = (objA0.flags2a & 0x20) && (control.pad1.state & CONTROL_RIGHT)
+#else
+	bool pushing = (objA0.flags2a & 0x20) && (control.pad1.state & (CONTROL_LEFT | CONTROL_RIGHT))
+#endif
+
+	if (pushing)
+	{
+		++objA0.value39
+		if (objA0.value39 >= 0x10)
+		{
+			objA0.base_state = 0x08
+
+			A1 = 0xffffb000
+			CheckDistanceToPlayers()
+
+			D1.u16 = 0x80
+			if (D0.u16 != 0)
+				D1.s16 = -D1.s16
+			objA0.velocity.x = D1.u16
+		}
+	}
+	else
+	{
+		objA0.value39 = 0
+	}
+}
+
+
+
+//# address-hook(0x08a036) end(0x08a0fa)
+function void fn08a036()
+{
+	if (level.vertical_wrap == 0xff00)
+	{
+		D0.u16 = level.height.bitmask
+		objA0.position.y.u16 &= D0.u16
+	}
+
+	UpdateMovementStraightSimple()
+	CheckGroundCollision()
+	if (D1.s16 < 0x08)
+	{
+		objA0.value26 = D3.u8
+		objA0.position.y.u16 += D1.u16
+		D0.u8 = D3.u8
+		if (D0.s8 < 0)
+			D0.s8 = -D0.s8
+		D0.u8 &= 0xf8
+		if (D0.u8 != 0)
+		{
+			D0.u16 = objA0.velocity.x
+			D3.u16 *= 2
+			D3.s16 = D3.s8
+			D3.s16 >>= 1
+			D0.u16 += D3.u16
+			fn08a35a()
+		}
+
+		if (objA0.velocity.x >= 0)
+		{
+			D3 = 0x1c
+			fn00fac4()
+			if (D1.s16 < 0)
+			{
+				objA0.base_state = 0x0c
+
+				u8[0xffffee39] = 0
+				objA0.velocity.x = 0
+				objA0.velocity.y = 0
+				if (objA0.subtype2c == 0)
+					return
+
+				spawnSimpleChildObjects(0x08a42a)
+				if (allocDynamicObjectAfterA0())
+				{
+					// Create spring
+					objA1.update_address = 0x022d06
+					objA1.position.x.u16 = 0x5d5a
+					objA1.position.y.u16 = 0x027a
+					u8[A1 + 0x2c] = 0
+				}
+				fn08594e()
+				Enemy.UnloadDelayed()
+			}
+		}
+		else
+		{
+			D3 = -0x1c
+			fn00fe3c()
+			if (D1.s16 < 0)
+			{
+				objA0.base_state = 0x0c
+			}
+		}
+	}
+	else
+	{
+		objA0.base_state = 0x0a
+		fn08a386()
+	}
+}
+
+
+//# address-hook(0x08a35a) end(0x08a36a)
+function void fn08a35a()
+{
+	if (abs(D0.s16) <= 0xc00)
+	{
+		objA0.velocity.x = D0.u16
+	}
+}
+
+
+//# address-hook(0x08a386) end(0x08a39c)
+function void fn08a386()
+{
+	D1.u16 = abs(objA0.velocity.x)
+	D3.u16 = (objA0.value26 >> 3) & 0x0e
+
+	// Targets:
+	//  - 0x08a3b6	-> D3.u16 = 0x02
+	//  - 0x08a3be	-> D3.u16 = 0x0c
+	//  - 0x08a3b6	-> D3.u16 = 0x0e
+	call tableLookupAddress(0x08a3a0, D3.u16)
+}
+
+
+//# address-hook(0x08a3b6) end(0x08a3bc)
+function void fn08a3b6()
+{
+	D1.u16 >>= 1
+	objA0.velocity.y = D1.u16
+}
+
+
+//# address-hook(0x08a3be) end(0x08a3c2)
+function void fn08a3be()
+{
+	objA0.velocity.y = D1.u16
+}
+
+
+//# address-hook(0x08a176) end(0x08a176)
+function void fn08a176()
+{
+}

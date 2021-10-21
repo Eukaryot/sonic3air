@@ -1,0 +1,98 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04808e) end(0x0480ce)
+function void fn04808e()
+{
+	objA0.mapping_offset = 0x0481b6
+	objA0.sprite_attributes = 0x2332
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x20
+	u16[A0 + 0x44] = objA0.position.x.u16
+	objA0.value32 = 0x20
+	u16[A0 + 0x30] = u16[0x04808a + (objA0.subtype2c & 0x02)]
+
+	objA0.update_address = 0x0480d4
+	fn0480d4()
+}
+
+
+//# address-hook(0x0480d4) end(0x04819c)
+function void fn0480d4()
+{
+	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	if (D0.s16 >= 0)
+	{
+		if (D0.s16 >= 0x20 && u16[A0 + 0x34] != objA0.value32)
+		{
+			if (u16[A0 + 0x34] == 0)
+			{
+				playSound(0x9a)
+			}
+			u16[A0 + 0x34] += 8
+		}
+	}
+	else
+	{
+		if (D0.s16 < -0x20 && u16[A0 + 0x34] != 0)
+		{
+			D1.u16 = objA0.value32
+			if (D1.u16 == u16[A0 + 0x34])
+			{
+				playSound(0x9a)
+			}
+			u16[A0 + 0x34] -= 8
+		}
+	}
+
+	D0.s16 = u16[A0 + 0x34]
+	if (((objA0.flags2a & 0x01) != 0) == ((objA0.flags2a & 0x02) != 0))
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.position.x.u16 = u16[A0 + 0x44] + D0.s16
+
+	D1 = objA0.box_size.x
+	D3 = 9
+	D4.u16 = objA0.position.x.u16
+
+	push(D4)
+	push(D3)
+	push(D2)
+	push(D1)
+
+	A1 = 0xffffb000
+	D6 = 3
+	PlatformCheckClimbOnForCharacterA1()
+	if (objA0.flags2a & 0x08)
+	{
+		SpringVertical.ApplyToCharacter()
+	}
+
+	D1 = pop()
+	D2 = pop()
+	D3 = pop()
+	D4 = pop()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	PlatformCheckClimbOnForCharacterA1()
+	if (objA0.flags2a & 0x10)
+	{
+		SpringVertical.ApplyToCharacter()
+	}
+
+	Object.animationUpdate(0x0481a2)
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}

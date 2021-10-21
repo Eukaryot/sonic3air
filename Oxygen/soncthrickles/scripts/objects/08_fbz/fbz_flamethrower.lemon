@@ -1,0 +1,298 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03cc8a) end(0x03cd26)
+function void fn03cc8a()
+{
+	objA0.mapping_offset = 0x03cfd0
+	objA0.sprite_attributes = 0x041d
+	objA0.render_flags = 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0180
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 0x03
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16 + 8
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0x11
+	u16[(A2+=2)-2] = objA0.position.x.u16 - 8
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0x10
+
+	objA0.animation.sprite = (objA0.subtype2c & 0x80) ? 3 : 1
+
+	if (objA0.subtype2c & 0x40)
+	{
+		u16[A0 + 0x16] = 0x02
+		if (objA0.flags2a & 0x01)
+		{
+			A2 = A0 + 0x18
+			u16[A2] -= 0x10
+			u8[A2 + 0x05] = 0x10
+		}
+
+		objA0.update_address = 0x03cdb0
+		fn03cdb0()
+	}
+	else
+	{
+		objA0.update_address = 0x03cd2c
+		fn03cd2c()
+	}
+}
+
+
+//# address-hook(0x03cd2c) end(0x03cdaa)
+function void fn03cd2c()
+{
+	if (objA0.animation.sprite != 0x02)
+	{
+		--u8[A0 + 0x34]
+		if (s8[A0 + 0x34] < 0)
+		{
+			u8[A0 + 0x34] = 0x02
+			++u8[A0 + 0x35]
+			u8[A0 + 0x35] &= 0x03
+		}
+
+		if ((level.framecounter.low & 0x03) == 0)
+		{
+			D1.u8 = level.framecounter.low & 0x0f
+			if (D1.u8 == 0)
+			{
+				if (objA0.render_flags & render_flag.VISIBLE)
+				{
+					playSound(0xc2)
+				}
+			}
+
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				objA0.flags2e -= 4
+				objA0.flags2e &= 0x7f
+				fn03cec0()
+
+				objA0.flags2e |= 0x80
+				fn03cec0()
+			}
+		}
+	}
+
+	fn03ce7a()
+
+	D1.u16 = 0x1b
+	D2.u16 = 0x08
+	D3.u16 = 0x09
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	fn03ce1a()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03cdb0) end(0x03ce14)
+function void fn03cdb0()
+{
+	if (objA0.animation.sprite != 2)
+	{
+		--u8[A0 + 0x34]
+		if (s8[A0 + 0x34] < 0)
+		{
+			u8[A0 + 0x34] = 0x02
+			++u8[A0 + 0x35]
+			u8[A0 + 0x35] &= 0x03
+		}
+
+		if ((level.framecounter.low & 0x03) == 0)
+		{
+			D1.u8 = level.framecounter.low & 0x0f
+			if (D1.u8 == 0)
+			{
+				if (objA0.render_flags & render_flag.VISIBLE)
+				{
+					playSound(0xc2)
+				}
+			}
+
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				objA0.flags2e += 2
+				fn03cec0()
+			}
+		}
+	}
+
+	D1.u16 = 0x1b
+	D2.u16 = 0x08
+	D3.u16 = 0x09
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	fn03ce1a()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03ce1a) end(0x03ce78)
+function void fn03ce1a()
+{
+	if (s8[A0 + 0x2c] < 0)
+		return
+
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 == 0)
+	{
+		u16[A0 + 0x30] = 0
+		objA0.animation.sprite = 1
+		return
+	}
+
+	if (u16[A0 + 0x30] != 0)
+	{
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] != 0)
+			return
+
+		A1 = 0xffffb000
+		if (objA0.flags2a & 0x08)
+		{
+			objA0.flags2a &= ~0x08
+			fn03cbce()
+		}
+
+		A1 = 0xffffb04a
+		if (objA0.flags2a & 0x10)
+		{
+			objA0.flags2a &= ~0x10
+			fn03cbce()
+		}
+	}
+	else
+	{
+		u16[A0 + 0x30] = 0x3c
+		objA0.animation.sprite = 2
+		objA0.flags2e = 0
+	}
+}
+
+
+//# address-hook(0x03ce7a) end(0x03cebe)
+function void fn03ce7a()
+{
+	D0.u8 = objA0.flags2e
+	LookupSinCos()
+	D1.s16 >>= 5
+	D0.u16 = D1.u16
+	A2 = A0 + 0x18
+	D2.u16 = objA0.position.x.u16
+	D1.u16 += D2.u16
+	u16[A2] = D1.u16
+	D0.s16 = D2.u16 - D0.s16
+	u16[A2 + 0x0c] = D0.u16
+
+	if (objA0.flags2e >= 0xc0)
+	{
+		u8[A2 + 0x05] = 0
+		u8[A2 + 0x11] = 0x10
+	}
+	else
+	{
+		u8[A2 + 0x05] = 0x10
+		u8[A2 + 0x11] = 0
+	}
+}
+
+
+//# address-hook(0x03cec0) end(0x03cf8e)
+function void fn03cec0()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03cf90
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		objA1.position.y.u16 -= 0x04
+		u8[A1 + 0x04] = objA0.render_flags
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = 0x041d
+		u16[A1 + 0x08] = 0x0200
+		u8[A1 + 0x07] = 0x0c
+		u8[A1 + 0x06] = 0x0c
+		u8[A1 + 0x28] = 0x98
+		u8[A1 + 0x2b] |= 0x10
+
+		if (objA0.subtype2c & 0x40)
+		{
+			D0.u8 = objA0.flags2e
+			LookupSinCos()
+			D2.s16 = D1.s16 >> 1
+			D1.u16 += D2.u16 + 0x0280
+			objA1.position.x.u16 += 0x10
+			objA1.velocity.x = D1.u16
+			if (objA0.flags2a & 0x01)
+			{
+				objA1.position.x.u16 -= 0x20
+				objA1.velocity.x = -objA1.velocity.x
+			}
+		}
+		else
+		{
+			D0.u8 = objA0.flags2e
+			if (D0.s8 < 0)
+			{
+				u16[A1 + 0x08] = 0x80
+			}
+			LookupSinCos()
+			D0.s16 = D1.s16 >> 4
+			objA1.position.x.u16 += D0.u16
+			D1.s16 <<= 2
+			objA1.velocity.x = D1.u16
+		}
+
+		u8[A1 + 0x23] = u8[A0 + 0x35]
+		u8[A1 + 0x24] = 0x04
+		u8[A1 + 0x20] = 0x0c
+	}
+}
+
+
+
+// Flame
+
+//# address-hook(0x03cf90) end(0x03cfca)
+function void fn03cf90()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 5
+		objA0.state -= 4
+		if (objA0.state == 0)
+		{
+			UnloadObject()
+			return
+		}
+	}
+
+	++objA0.animation.frame
+	objA0.animation.frame &= 0x03
+
+	D0.u8 = objA0.state + objA0.animation.frame
+	objA0.animation.sprite = D0.u8
+	UpdateMovementStraightSimple()
+	AddAsDynamicObject()
+	DrawObject()
+}

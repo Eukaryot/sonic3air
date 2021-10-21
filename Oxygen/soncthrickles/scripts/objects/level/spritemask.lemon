@@ -1,0 +1,84 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Sprite masking object
+//  -> Used in the driller sections, in the LRZ 1 boss,
+//     and in the LRZ boss stage (masking for the lavafall platforms)
+//  -> Also used in the S/T good ending final screen, for the rising Egg Robo
+
+//# address-hook(0x0862ae) end(0x0862ae)
+function void fn0862ae()
+{
+	objA0.render_flags |= 0x04
+	fn0862b4()
+}
+
+
+//# address-hook(0x0862b4) end(0x0862fc)
+function void fn0862b4()
+{
+	objA0.update_address = (objA0.subtype2c & 0x08) ? 0x086308 : 0x0862fe
+	objA0.sprite_attributes = 0
+	objA0.mapping_offset = 0x18595e
+	objA0.box_size.x = 0x20
+
+	D0 = (objA0.subtype2c & 0xf0) >> 2
+	objA0.box_size.y = D0.u8
+	objA0.animation.sprite = D0.u16 >> 2
+	D1.u16 = (objA0.subtype2c & 0x07) * 2
+	objA0.sprite_priority = u16[0x086324 + D1.s16]
+}
+
+
+//# address-hook(0x0862fe) end(0x086302)
+function void fn0862fe()
+{
+	u8[0xffffef3a] = 0xff
+
+	#if STANDALONE
+		s16 px = objA0.position.x.u16 - objA0.box_size.x - 0x80
+		s16 py = objA0.position.y.u16 - objA0.box_size.y
+
+		Renderer.addSpriteMaskWorld(px, py, 320, objA0.box_size.y * 2, 0xa000 - objA0.sprite_priority, 1)
+		//debugDrawRect(px, py, 320, objA0.box_size.y * 2, 0xc0c0c0c0)
+
+		checkForUnloadObjectAtPosition(objA0.position.x.u16)
+	#else
+		DrawOrUnloadObject()
+	#endif
+}
+
+
+//# address-hook(0x086308) end(0x08631e)
+function void fn086308()
+{
+	u8[0xffffef3a] = 0xff
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x20) == 0)
+	{
+		#if STANDALONE
+			s16 px = objA0.position.x.u16 - objA0.box_size.x - 0x80
+			s16 py = objA0.position.y.u16 - objA0.box_size.y
+
+			// Hacky correction for outro (don't ask...)
+			if (global.zone_act == 0x0d01)
+				py += camera.foreground.y.u16 - 0x80
+
+			Renderer.addSpriteMaskWorld(px, py, 320, objA0.box_size.y * 2, 0xa000 - objA0.sprite_priority, 1)
+			//debugDrawRect(px, py, 320, objA0.box_size.y * 2, 0xc0c0c0c0)
+		#else
+			DrawObject()
+		#endif
+	}
+	else
+	{
+		UnloadObject()
+	}
+}

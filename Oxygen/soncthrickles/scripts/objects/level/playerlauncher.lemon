@@ -1,0 +1,147 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Launcher object from FBZ and DEZ (but not LBZ)        //
+//-------------------------------------------------------//
+
+//# address-hook(0x03b934) end(0x03b974)
+function void fn03b934()
+{
+	objA0.mapping_offset = 0x03ba8a
+	if (global.zone == 0x0b)
+	{
+		// Death Egg Zone
+		objA0.sprite_attributes = 0x22fc
+		objA0.animation.sprite = 0x01
+	}
+	else
+	{
+		// Flying Battery Zone
+		objA0.sprite_attributes = 0x23b5
+	}
+
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+
+	objA0.update_address = 0x03b97a
+	fn03b97a()
+}
+
+
+//# address-hook(0x03b97a) end(0x03b9d2)
+function void fn03b97a()
+{
+	if (u8[A0 + 0x30] != 0)
+	{
+		--u8[A0 + 0x30]
+		if (u8[A0 + 0x30] == 0)
+		{
+			objA0.velocity.x = 0
+			objA0.update_address = 0x03ba4a
+			u8[A0 + 0x32] = 1
+		}
+
+		UpdateMovementStraightSimple()
+		if (u8[A0 + 0x31] != 0)
+		{
+			--u8[A0 + 0x31]
+			objA0.velocity.x <<= 1
+		}
+	}
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn03b9d8()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	fn03b9d8()
+
+	D1.u16 = 0x10
+	D3.u16 = 0x03
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x03b9d8) end(0x03ba48)
+function void fn03b9d8()
+{
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		D0 = 4
+		D1.u16 = 0x0100
+		u8[A1 + 0x2a] &= ~0x01
+		if (objA0.flags2a & 0x01)
+		{
+			u8[A1 + 0x2a] |= 0x01
+			D0.s16 = -D0.s16
+			D1.s16 = -D1.s16
+		}
+
+		D0.u16 += objA0.position.x.u16
+		objA1.position.x.u16 = D0.u16
+		if (u8[A0 + 0x32] != 0)
+		{
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x2a] |= 0x02
+			objA1.velocity.y = 0
+			return
+		}
+
+		D0.u16 = objA0.velocity.x
+		objA1.velocity.x = D0.u16
+		u16[A1 + 0x1c] = D0.u16
+		if (u8[A0 + 0x30] == 0)
+		{
+			objA0.velocity.x = D1.u16
+			u8[A0 + 0x30] = 0x0c
+			u8[A0 + 0x31] = 0x04
+			playSound(0xa2)
+		}
+	}
+}
+
+
+//# address-hook(0x03ba4a) end(0x03ba84)
+function void fn03ba4a()
+{
+	u16 backup_px = objA0.position.x.u16
+	D1 = 1
+	D0.u16 = objA0.position.x.u16 - u16[A0 + 0x44]
+	if (D0.u16 == 0)
+	{
+		objA0.update_address = 0x03b97a
+		u8[A0 + 0x32] = 0
+	}
+	else
+	{
+		if (D0.s16 > 0)
+		{
+			D1.s16 = -D1.s16
+		}
+		objA0.position.x.u16 += D1.u16
+	}
+
+	D1.u16 = 0x10
+	D3.u16 = 0x03
+	D4.u16 = backup_px
+	PlatformCheckClimbOn()
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}

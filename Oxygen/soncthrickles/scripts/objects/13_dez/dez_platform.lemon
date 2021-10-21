@@ -1,0 +1,55 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x025a30) end(0x025a78)
+function void fn025a30()
+{
+	objA0.mapping_offset = 0x025aca
+	objA0.sprite_attributes = 0x233a
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x10
+	u16[A0 + 0x30] = objA0.position.x.u16
+	u16[A0 + 0x34] = objA0.position.y.u16
+
+	// Targets:
+	//  - 0x0258ce	-> (objA0.subtype2c & 0x0f) = 0x00
+	//  - 0x0258d0	-> (objA0.subtype2c & 0x0f) = 0x01
+	//  - 0x0258dc	-> (objA0.subtype2c & 0x0f) = 0x02
+	//  - 0x025924	-> (objA0.subtype2c & 0x0f) = 0x03
+	//  - 0x0258fa	-> (objA0.subtype2c & 0x0f) = 0x04
+	u16 offset = (objA0.subtype2c & 0x0f) * 2
+	u32[A0 + 0x42] = tableLookupAddress(0x025ab8, offset)
+
+	objA0.update_address = 0x025a7e
+	fn025a7e()
+}
+
+
+//# address-hook(0x025a7e) end(0x025ab2)
+function void fn025a7e()
+{
+	u16 backup_px = objA0.position.x.u16
+	A1 = u32[A0 + 0x42]
+	call A1
+	D4.u16 = backup_px
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	fn01dc56()
+
+	++objA0.animation.sprite
+	objA0.animation.sprite &= 0x01
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}

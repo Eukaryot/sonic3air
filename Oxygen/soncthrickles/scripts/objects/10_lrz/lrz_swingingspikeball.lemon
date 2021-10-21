@@ -1,0 +1,143 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+
+//# address-hook(0x043502) end(0x0435da)
+function void fn043502()
+{
+	if (global.act == 0)
+	{
+		objA0.mapping_offset = 0x043666
+		objA0.sprite_attributes = 0xa3a1
+	}
+	else
+	{
+		objA0.mapping_offset = 0x04367e
+		objA0.sprite_attributes = 0xa40d
+	}
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+	u8[A0 + 0x28] = 0x9a
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x0435fe
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u16[A1 + 0x0a] &= 0x9fff
+		u8[A1 + 0x04] = objA0.render_flags
+		u8[A1 + 0x07] = 0x50
+		u8[A1 + 0x06] = 0x50
+		u16[A1 + 0x08] = 0x0280
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x04] |= 0x40
+		u16[A1 + 0x16] = objA0.subtype2c & 0x0f
+
+		A2 = A1 + 0x18
+		D0.u16 = u16[A1 + 0x16]
+		while (D0.s16 > 0)
+		{
+			u16[(A2+=2)-2] = objA0.position.x.u16
+			u16[(A2+=2)-2] = objA0.position.y.u16
+			u16[(A2+=2)-2] = 1
+			--D0.s16
+		}
+
+		u8[A1 + 0x22] = 1
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	D0 = (objA0.flags2a & 0x01) ? -2 : 2
+	u8[A0 + 0x36] = D0.u8
+
+	objA0.update_address = 0x0435e0
+	fn0435e0()
+}
+
+
+//# address-hook(0x0435e0) end(0x0435f8)
+function void fn0435e0()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	fn043604()
+
+	D2.u8 = u8[A0 + 0x34]
+	D0.u8 = u8[A0 + 0x36]
+	u8[A0 + 0x34] += D0.u8
+
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}
+
+
+//# address-hook(0x0435fe) end(0x0435fe)
+function void fn0435fe()
+{
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x043604) end(0x043664)
+function void fn043604()
+{
+	D0.u8 = u8[A0 + 0x34]
+	LookupSinCos()
+	D2.u16 = u16[A0 + 0x46]
+	D3.u16 = u16[A0 + 0x44]
+	D0 = (D0 << 16)
+	D1 = (D1 << 16)
+	D0.s32 >>= 4
+	D1.s32 >>= 4
+	D4 = D0
+	D5 = D1
+	if (s8[A0 + 0x2c] < 0)
+	{
+		D4 += D0
+		D5 += D1
+	}
+	A2 = A1 + 0x18
+	D6.u16 = u16[A1 + 0x16] - 1
+
+	while (true)
+	{
+		push(D5)
+		push(D4)
+
+		D4 = (D4 << 16) + (D4 >> 16)
+		D5 = (D5 << 16) + (D5 >> 16)
+		D4.u16 += D2.u16
+		D5.u16 += D3.u16
+		u16[(A2+=2)-2] = D5.u16
+		u16[(A2+=2)-2] = D4.u16
+
+		D4 = pop()
+		D5 = pop()
+
+		D4 += D0
+		D5 += D1
+		A2 += 2
+
+		--D6.s16
+		if (D6.s16 < 0)
+			break
+	}
+
+	D4 = (D4 << 16) + (D4 >> 16)
+	D5 = (D5 << 16) + (D5 >> 16)
+	D4.u16 += D2.u16
+	D5.u16 += D3.u16
+	objA0.position.x.u16 = D5.u16
+	objA0.position.y.u16 = D4.u16
+}

@@ -1,0 +1,112 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03b0e2) end(0x03b186)
+function void fn03b0e2()
+{
+	objA0.mapping_offset = 0x03b25c
+	objA0.sprite_attributes = 0x2443
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+
+	if (objA0.subtype2c == 0)
+	{
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x10
+		objA0.hitbox_extends.y = 0x0a
+		u8[A0 + 0x28] = 0x9a
+
+		objA0.update_address = 0x03b18c
+		fn03b18c()
+	}
+	else if (s8[A0 + 0x2c] >= 0)
+	{
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x10
+		u8[A0 + 0x28] = 0x9a
+
+		objA0.update_address = 0x01b662
+		fn01b662()
+	}
+	else if ((objA0.subtype2c & 0x01) == 0)
+	{
+		objA0.sprite_attributes |= 0x8000
+		objA0.box_size.x = 0x30
+		objA0.box_size.y = 0x08
+
+		objA0.update_address = 0x03b1fc
+		fn03b1fc()
+	}
+	else
+	{
+		objA0.sprite_attributes = 0xa442
+		objA0.box_size.x = 0x24
+		objA0.box_size.y = 0x04
+		objA0.animation.sprite = 0x04
+		objA0.sprite_priority = 0x0200
+
+		objA0.update_address = 0x03b238
+		fn03b238()
+	}
+}
+
+
+//# address-hook(0x03b18c) end(0x03b1ac)
+function void fn03b18c()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x58
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 += D1.u16
+		objA0.velocity.y = 0
+		objA0.update_address = 0x03b1b2
+	}
+	fn03b1b2()
+}
+
+
+//# address-hook(0x03b1b2) end(0x03b1be)
+function void fn03b1b2()
+{
+	if (u8[0xfffff7c1] & 0x01)
+	{
+		objA0.update_address = 0x03b1c4
+	}
+	fn01b662()
+}
+
+
+//# address-hook(0x03b1c4) end(0x03b1e4)
+function void fn03b1c4()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y -= 0x18
+	fn00fc12()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 -= D1.u16
+		objA0.velocity.y = 0
+		objA0.update_address = 0x03b1ea
+	}
+	fn03b1ea()
+}
+
+
+//# address-hook(0x03b1ea) end(0x03b1f6)
+function void fn03b1ea()
+{
+	if ((u8[0xfffff7c1] & 0x01) == 0)
+	{
+		objA0.update_address = 0x03b18c
+	}
+	fn01b662()
+}

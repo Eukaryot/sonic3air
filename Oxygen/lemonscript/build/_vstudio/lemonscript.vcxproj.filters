@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="lemon">
+      <UniqueIdentifier>{623f7cc0-f8c4-468e-b675-027970933d5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\compiler">
+      <UniqueIdentifier>{530062be-8729-4ac9-9436-aaa166a842c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\program">
+      <UniqueIdentifier>{f41bc9b9-5213-4cff-ab5c-67ccea0b112f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\runtime">
+      <UniqueIdentifier>{85c8db3e-243b-4ed1-a38c-a0f44f7671ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\translator">
+      <UniqueIdentifier>{5f5cd1f5-9155-48ee-a5d2-e4202b21c510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\runtime\provider">
+      <UniqueIdentifier>{a4f5d1ec-558c-40ad-aabc-d73ac59dd3f8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\FunctionCompiler.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\Parser.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\TokenProcessing.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\Function.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\Program.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\Runtime.cpp">
+      <Filter>lemon\runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\Token.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\StandardLibrary.cpp">
+      <Filter>lemon\runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\FunctionWrapper.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\pch.cpp">
+      <Filter>lemon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\Node.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\Preprocessor.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\Module.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\GlobalsLookup.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\RuntimeFunction.cpp">
+      <Filter>lemon\runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\ParserHelper.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\translator\Translator.cpp">
+      <Filter>lemon\translator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\translator\Nativizer.cpp">
+      <Filter>lemon\translator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\translator\SourceCodeWriter.cpp">
+      <Filter>lemon\translator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\OpcodeProcessor.cpp">
+      <Filter>lemon\runtime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\Opcode.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.cpp">
+      <Filter>lemon\runtime\provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\provider\OptimizedOpcodeProvider.cpp">
+      <Filter>lemon\runtime\provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\provider\NativizedOpcodeProvider.cpp">
+      <Filter>lemon\runtime\provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\DataType.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\StoredString.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp">
+      <Filter>lemon\runtime</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\FunctionCompiler.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Parser.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Token.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\TokenProcessing.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\TokenTypes.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Utility.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\DataType.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Define.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Function.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Opcode.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Program.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Variable.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\Runtime.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\StandardLibrary.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\pch.h">
+      <Filter>lemon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Node.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\ParserTokens.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Definitions.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Preprocessor.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\ParserHelper.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Module.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\GlobalsLookup.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\RuntimeFunction.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\translator\Translator.h">
+      <Filter>lemon\translator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\RuntimeOpcode.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\translator\Nativizer.h">
+      <Filter>lemon\translator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h">
+      <Filter>lemon\translator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\StoredString.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\OpcodeExecUtils.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.h">
+      <Filter>lemon\runtime\provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\provider\OptimizedOpcodeProvider.h">
+      <Filter>lemon\runtime\provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\provider\NativizedOpcodeProvider.h">
+      <Filter>lemon\runtime\provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\OpcodeHelper.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\RuntimeOpcodeContext.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="lemonscript.natvis" />
+  </ItemGroup>
+</Project>

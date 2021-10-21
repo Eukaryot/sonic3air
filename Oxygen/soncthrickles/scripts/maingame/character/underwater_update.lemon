@@ -1,0 +1,351 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Underwater Update                                     //
+//-------------------------------------------------------//
+
+// This object gets created when main character goes underwater for the first time.
+// It can be one of different things:
+//  - the handler object that decreases "char.drown_countdown", spawns bubbles, updates the countdown digits
+//  - the spawned bubbles and drown countdown digits
+
+
+//# address-hook(0x018164) end(0x01816e)
+function void UnderwaterUpdate.BaseUpdate()
+{
+	// Targets:
+	//	- 0x018184	-> objA0.base_state = 0x00	-> Initialization
+	//	- 0x0181dc	-> objA0.base_state = 0x02	-> Bubble update
+	//	- 0x0181e8	-> objA0.base_state = 0x04	-> Bubble update near the surface?
+	//	- 0x018254	-> objA0.base_state = 0x06	-> Drown counterdown digit
+	//	- 0x01826c	-> objA0.base_state = 0x08	-> Bubble popped
+	//	- 0x018466	-> objA0.base_state = 0x0a	-> Underwater handler update
+	call tableLookupAddress(0x018172, objA0.base_state)
+}
+
+
+//# address-hook(0x018184) end(0x0181d6)
+function void fn018184()
+{
+	objA0.base_state += 2
+	objA0.mapping_offset = (u8[A0 + 0x43] == 0) ? 0x02fcb2 : 0x02fce0
+	objA0.sprite_attributes = 0x045c
+	objA0.render_flags = (render_flag.VISIBLE | render_flag.WORLD)
+	objA0.box_size.x = 0x10
+	objA0.sprite_priority = 0x80
+
+	if (objA0.subtype2c & 0x80)
+	{
+		// Underwater handler
+		objA0.base_state += 8
+		u8[A0 + 0x37] = objA0.subtype2c & 0x7f
+		fn018466()
+	}
+	else
+	{
+		// Bubble
+		objA0.state = objA0.subtype2c
+		u16[A0 + 0x34] = objA0.position.x.u16
+		objA0.velocity.y = -0x100
+		fn0181dc()
+	}
+}
+
+
+//# address-hook(0x0181dc) end(0x0181e2)
+function void fn0181dc()
+{
+	Object.animationUpdate(0x0186c4)
+	fn0181e8()
+}
+
+
+//# address-hook(0x0181e8) end(0x018266)
+function void fn0181e8()
+{
+	if (objA0.position.y.u16 <= water.height.current)
+	{
+		objA0.base_state = 0x06
+		objA0.state = min(objA0.state + 7, 13)
+
+		fn018254()
+	}
+	else
+	{
+		if (u16[0xfffff7c8] != 0)
+		{
+			u16[A0 + 0x34] += 4
+		}
+
+		D0.u16 = objA0.value26 & 0x7f
+		objA0.position.x.u16 = u16[A0 + 0x34] + s8[0x01831e + D0.u16]
+		++objA0.value26
+
+		fn0182d2()
+		UpdateMovementStraightSimple()
+		if (objA0.render_flags & render_flag.VISIBLE)
+		{
+			DrawObject()
+		}
+		else
+		{
+			UnloadObject()
+		}
+	}
+}
+
+
+//# address-hook(0x018254)
+function void fn018254()
+{
+	fn0182d2()
+	Object.animationUpdate(0x0186c4)
+	fn01841e()
+	DrawObject()
+}
+
+
+//# address-hook(0x0182d2) end(0x01831c)
+function void fn0182d2()
+{
+	if (u16[A0 + 0x3c] != 0)
+	{
+		--u16[A0 + 0x3c]
+		if (u16[A0 + 0x3c] == 0 && objA0.state < 0x07)
+		{
+			u16[A0 + 0x3c] = 0x0f
+			objA0.velocity.y = 0
+			objA0.render_flags = render_flag.VISIBLE
+			objA0.position.x.u16 = objA0.position.x.u16 - camera.position.x.u16 + 0x80
+			objA0.position.y.u16 = objA0.position.y.u16 - camera.position.y.u16 + 0x80
+			objA0.base_state = 0x0c
+		}
+	}
+}
+
+
+//# address-hook(0x01841e) end(0x018464)
+function void fn01841e()
+{
+	if (objA0.animation.sprite >= 9 && objA0.animation.sprite <= 0x12 && objA0.animation.sprite != u8[A0 + 0x32])
+	{
+		u8[A0 + 0x32] = objA0.animation.sprite
+		u32 sourceBase = 0x0a9dfc + (objA0.animation.sprite - 9) * 0xc0
+		u16 targetInVRAM = (u8[A0 + 0x43] == 0) ? 0xfc00 : 0xfe00
+		updateSpritePattern(sourceBase, targetInVRAM, 0x60)
+	}
+}
+
+
+//# address-hook(0x01826c) end(0x01826c)
+function void fn01826c()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x018466) end(0x018680)
+function void fn018466()
+{
+	A2 = u32[A0 + 0x40]
+	#if GAMEAPP
+		if (Game.getSetting(SETTING_UNDERWATER_AUDIO) && A2 == 0xffffb000 && u8[0xffffb005] <= 0x04)
+		{
+			s16 diff = s16[0xffffb014] - s16(water.height.current)
+			Game.setUnderwaterAudioEffect(clamp(diff - 8, 0, 64) * 0xff / 64)
+		}
+	#endif
+
+	bool doChecks = true
+	if (u16[A0 + 0x30] == 0)
+	{
+		// Character died?
+		if (u8[A2 + 0x05] >= 0x06)
+			return
+
+		// Protected by bubble shield?
+		if (u8[A2 + 0x2b] & char.bonus.SHIELD_BUBBLE)
+			return
+
+	#if STANDALONE
+		// Hyper form active?
+		if (u8[A2 + 0x38] == CHARACTER_TAILS)
+		{
+			if (super.active.tails & 0x80)
+				return
+		}
+		else
+	#endif
+		{
+			if (super.active & 0x80)
+				return
+		}
+
+		// Left the water?
+		if ((u8[A2 + 0x2a] & char.flag.UNDERWATER) == 0)
+			return
+
+		// Decrease the drown countdown
+		--u16[A0 + 0x3c]
+		if (s16[A0 + 0x3c] < 0)
+		{
+			u16[A0 + 0x3c] = 0x3b
+			u16[A0 + 0x3a] = 0x01
+			objA0.flags38 = (getRandomNumber() & 0x01)
+
+			D0 = u8[A2 + 0x2c]
+			if (D0.u16 != 0x0f && D0.u16 != 0x14 && D0.u16 != 0x19)
+			{
+				if (D0.u16 <= 0x0c)
+				{
+					if (D0.u16 == 0x0c && u8[A0 + 0x43] == 0)
+					{
+						playMusic(MUSIC_DROWNING)
+					}
+
+					--u8[A0 + 0x36]
+					if (s8[A0 + 0x36] < 0)
+					{
+						u8[A0 + 0x36] = u8[A0 + 0x37]
+						objA0.value3a |= 0x80
+					}
+				}
+			}
+			else
+			{
+				if (u8[A0 + 0x43] == 0)
+				{
+					playSound(SFX_UNDERWATER_BELL)
+				}
+			}
+
+			--u8[A2 + 0x2c]
+			if (s8[A2 + 0x2c] < 0)
+			{
+				// Drowned
+				u8[A2 + 0x2e] = 0x81
+				playSound(SFX_DROWN)
+
+				objA0.flags38 = 0x0a
+				u16[A0 + 0x3a] = 0x01
+				u16[A0 + 0x30] = 0x78
+
+				A1 = A2
+				UpdateMusicOnWaterTransition()
+				u32 backupA0 = A0
+
+				A0 = A2
+				Character.LandingOnGroundNoSpindash()
+
+				objA0.state = 0x17
+				objA0.flags2a |= 0x02
+				u8[A0 + 0x0a] |= 0x80
+				objA0.velocity.y = 0
+				objA0.velocity.x = 0
+				s16[A0 + 0x1c] = 0
+				objA0.base_state = 0x0c
+				A0 = backupA0
+				if (A2 == 0xffffb000)
+				{
+					u8[0xffffee30] = 1
+				}
+				return
+			}
+			else
+			{
+				doChecks = false
+			}
+		}
+	}
+	else
+	{
+		u8[A2 + 0x20] = 0x17
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			u8[A2 + 0x05] = 0x06
+			return
+		}
+	}
+
+	if (doChecks)
+	{
+		if (u16[A0 + 0x3a] == 0)
+			return
+
+		--objA0.value3e
+		if (s16[A0 + 0x3e] >= 0)
+			return
+	}
+
+	objA0.value3e = 8 + (getRandomNumber() & 0x0f)
+	if (allocDynamicObjectStd())
+	{
+		u32[A1] = objA0.update_address
+		objA1.position.x.u16 = u16[A2 + 0x10]
+		D0 = 6
+		if (u8[A2 + 0x2a] & char.flag.FACING_LEFT)
+		{
+			D0.s16 = -D0.s16
+			u8[A1 + 0x26] = 0x40
+		}
+		objA1.position.x.u16 += D0.u16
+		objA1.position.y.u16 = u16[A2 + 0x14]
+		u32[A1 + 0x40] = u32[A0 + 0x40]
+		u8[A1 + 0x2c] = 6
+		if (u16[A0 + 0x30] != 0)
+		{
+			objA0.value3e &= 0x07
+			D0.u16 = u16[A2 + 0x14] - 12
+			objA1.position.y.u16 = D0.u16
+			u8[A1 + 0x26] = getRandomNumber()
+			D0.u16 = level.framecounter & 0x03
+			if (D0.u8 == 0)
+			{
+				u8[A1 + 0x2c] = 0x0e
+			}
+		}
+		else
+		{
+			if (objA0.value3a & 0x80)
+			{
+				D2 = u8[A2 + 0x2c]
+				if (D2.u8 < 0x0c)
+				{
+					D2.u16 >>= 1
+					D0.u16 = getRandomNumber() & 0x03
+					if (D0.u16 == 0)
+					{
+						if ((objA0.value3a & 0x40) == 0)
+						{
+							objA0.value3a |= 0x40
+							u8[A1 + 0x2c] = D2.u8
+							u16[A1 + 0x3c] = 28
+						}
+					}
+					if (objA0.flags38 == 0)
+					{
+						if ((objA0.value3a & 0x40) == 0)
+						{
+							objA0.value3a |= 0x40
+							u8[A1 + 0x2c] = D2.u8
+							u16[A1 + 0x3c] = 28
+						}
+					}
+				}
+			}
+		}
+
+		--objA0.flags38
+		if (s8[A0 + 0x38] < 0)
+			u16[A0 + 0x3a] = 0
+	}
+}

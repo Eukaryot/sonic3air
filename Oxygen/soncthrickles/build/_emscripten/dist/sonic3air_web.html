@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta content="text/html; charset=utf-8"http-equiv=Content-Type>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sonic 3 A.I.R.</title>
+<link rel="apple-touch-icon" sizes="256x256" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<style>body{background:black;color:white;font-family:arial;margin:0;padding:none;overflow:hidden;-webkit-user-select:none;}.emscripten{padding-right:0;margin-left:auto;margin-right:auto;display:block}div.emscripten{text-align:center}div.emscripten_border{border:0 none;}canvas.emscripten{border:0 none;background-color:#000}.spinner{height:30px;width:30px;margin:0;margin-top:20px;margin-left:20px;display:inline-block;vertical-align:top;-webkit-animation:rotation .8s linear infinite;-moz-animation:rotation .8s linear infinite;-o-animation:rotation .8s linear infinite;animation:rotation .8s linear infinite;border-left:5px solid #ebebeb;border-right:5px solid #ebebeb;border-bottom:5px solid #ebebeb;border-top:5px solid #787878;border-radius:100%;background-color:#bdd72e}@-webkit-keyframes rotation{from{-webkit-transform:rotate(0)}to{-webkit-transform:rotate(360deg)}}@-moz-keyframes rotation{from{-moz-transform:rotate(0)}to{-moz-transform:rotate(360deg)}}@-o-keyframes rotation{from{-o-transform:rotate(0)}to{-o-transform:rotate(360deg)}}@keyframes rotation{from{transform:rotate(0)}to{transform:rotate(360deg)}}#status{display:inline-block;vertical-align:top;margin-top:30px;margin-left:20px;font-size:1em;font-weight:700;color:#787878}#progress{height:20px;width:250px}
+.hidden{display:none !important;}
+.file_select{
+	text-align:center;
+	font-size: 0.9em;
+}
+input[type="file"] {display: none;}
+.fileSelector {
+  display: inline-block;
+  background: #222;
+  background: linear-gradient(0deg, #111 0%, #444 100%);
+  border: 1px solid #999;
+  border-radius: 5px;
+  margin-top:3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #555;
+  font-size: 32px;
+}
+.fileSelector:hover {
+  border-color: black;
+}
+.fileSelector:active {
+  background: linear-gradient(0deg, #333 0%, #555 100%);
+}
+.restart{text-align:center;font-size: 1em;}
+.extraDownloads{display:inline-block;}
+.restart > button,.extraDownloads > button,.extraDownloadsSection > button {
+  display: inline-block;
+  color: white;
+  background: #222;
+  background: linear-gradient(0deg, #111 0%, #444 100%);
+  border: 1px solid #999;
+  border-radius: 5px;
+  margin-top:3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #555;
+  font-size: 32px;
+}
+.extraDownloadsSection{
+	text-align: center;
+}
+.extraDownloadsProgress{
+	text-align:center;
+	font-size: 0.9em;
+}
+#root{
+	color: black;
+}
+</style>
+<script src="browserfs.min.js"></script>
+<script>
+	//This wrapper around the wasm build of the game is intentionally not obfuscated.
+	//Feel free to use it as an example of how to interact with emscripten WebAssembly builds for other projects.
+var hasRemasteredAudio = false;
+function startGame(){
+	callMain();
+	
+	//Resize canvas AFTER it starts, because it needs an inital size to work properly.
+	var gameCanvas = document.getElementById('canvas');
+	gameCanvas.style.width = "min(100vw, calc(100vh * 16 / 9))";
+	gameCanvas.style.height = "min(100vh, calc(100vw * 9 / 16))";
+	gameCanvas.style.marginTop = "max(0vh, calc(50vh - (100vw * 9 / 16 / 2)))";
+}
+
+function onPageLoaded(){
+	//Uncomment the service worker below for actual releases to force files to be cached so you can play offline.
+	//Leave it commented when testing because otherwise when you refresh the page you'll still be getting cached data.
+	/*if('serviceWorker' in navigator) {
+    	navigator.serviceWorker.register('worker.js');
+	};*/
+	var startup = document.getElementById("startup");
+	startup.style.display = 'none';
+	
+	var uiElements = document.getElementsByClassName('pageUI');
+	for (var i = 0; i < uiElements.length; i++) {
+		uiElements[i].classList.remove('hidden');
+	}
+	
+	//Load the loader after the rest of the stuff, because otherwise we get a console error?
+	var loader=document.createElement('script');
+	loader.setAttribute('async', '');
+	loader.setAttribute('src', 'loader.js');
+	document.body.appendChild(loader);
+	Module['calledRun'] = true; //We got here from pre-run, so loader needs to know that.
+}
+
+function onGameExit(){
+	var restartBits = document.getElementsByClassName('restart');
+	for (var i = 0; i < restartBits.length; i++) {
+		restartBits[i].classList.remove('hidden');
+	}
+	if(hasRemasteredAudio === false){
+		var extraBits = document.getElementsByClassName('extraDownloads');
+		for (var i = 0; i < extraBits.length; i++) {
+			extraBits[i].classList.remove('hidden');
+		}
+	}
+	
+	var gameView = document.getElementById("gameView");
+	gameView.classList.add('hidden');
+	var rootView = document.getElementById("root");
+	rootView.classList.remove('hidden');
+	
+	//Add file manager to existing page so we don't cause a page navigation which would enable the swipe back gesture
+	var jsRuntime = document.createElement('script');
+	jsRuntime.setAttribute('src', 'fileManagerRuntime.js');
+	document.body.appendChild(jsRuntime);
+	
+	var jsReact = document.createElement('script');
+	jsReact.setAttribute('src', 'react.js');
+	document.body.appendChild(jsReact);
+	
+	var jsFileman = document.createElement('script');
+	jsFileman.setAttribute('src', 'filemanager.js');
+	document.body.appendChild(jsFileman);
+	
+	exitRuntime();
+}
+
+function onDownloadsComplete(){
+	//Before we mount BrowserFS, we need to patch abort() to bypass a bug in the implementation of stat().
+	//In Vanilla Emscripten FS, if you call stat() for a file that does not exist, it throws an exception with error code 44.
+	//But BrowserFS does not throw a compatible exception, so I'm going to cheat and make it compatible.
+	//Ideally I should fix BrowserFS and send them a pull request, but this solution is a quick fix until I do.
+	var originalAbort = abort;
+	abort = function(what){
+		if(what.stack.indexOf('browserfs')>0){
+			what.errno = 44;
+			return;
+		}
+		originalAbort(what);
+	}
+	
+	//Now that we've worked around the bug, let's mount BrowserFS
+	var BFS = new BrowserFS.EmscriptenFS(Module.FS, Module.PATH, Module.ERRNO_CODES);
+	FS.mount(BFS, {root: '/'}, '/sonic3air/savedata/'); //Mount BrowserFS root into /sonic3air/savedata
+	FS.chdir("/sonic3air");
+	hasRemasteredAudio = (FS.analyzePath("/sonic3air/savedata/audioremaster.bin", true).exists === true);
+	if(hasRemasteredAudio === true){
+		FS.symlink('/sonic3air/savedata/audioremaster.bin','/sonic3air/data/audioremaster.bin');
+	}
+	if(FS.analyzePath("/sonic3air/savedata/Sonic_Knuckles_wSonic3.bin", true).exists === true){
+		//Everything exists
+		var internalFolder = FS.analyzePath("/sonic3air/___internal/");
+		if(!internalFolder.exists){
+			FS.mkdir('/sonic3air/___internal/');
+		}
+		hidePageUI();
+		startGame();
+	}
+	else{
+		//No ROM, display file selector
+		var uiElements = document.getElementsByClassName('file_select');
+		for (var i = 0; i < uiElements.length; i++) {
+			uiElements[i].classList.remove('hidden');
+		}
+	}
+}
+
+function hidePageUI(){
+	var fileElement = document.getElementsByClassName('file_select');
+	if(fileElement.length > 0){
+		fileElement[0].remove();
+	}
+		
+	var uiElements = document.getElementsByClassName('pageUI');
+	for (var i = 0; i < uiElements.length; i++) {
+		uiElements[i].style.display = 'none';
+	}
+}
+
+function showExtraDownloads(){
+	var extraBits = document.getElementsByClassName('extraDownloadsSection');
+	for (var i = 0; i < extraBits.length; i++) {
+		extraBits[i].classList.remove('hidden');
+	}
+	
+	extraBits = document.getElementsByClassName('restart');
+	for (var i = 0; i < extraBits.length; i++) {
+		extraBits[i].classList.add('hidden');
+	}
+	
+	extraBits = document.getElementById('root');
+	extraBits.classList.add('hidden');
+}
+
+function hideExtraDownloads(){
+	let extraBits = document.getElementsByClassName('extraDownloadsSection');
+	for (var i = 0; i < extraBits.length; i++) {
+		extraBits[i].classList.add('hidden');
+	}
+	
+	extraBits = document.getElementsByClassName('restart');
+	for (var i = 0; i < extraBits.length; i++) {
+		extraBits[i].classList.remove('hidden');
+	}
+	
+	extraBits = document.getElementById('root');
+	extraBits.classList.remove('hidden');
+}
+
+async function downloadRemastered(){
+	let extraBits = document.getElementsByClassName('extraDownloadsSection');
+	for (var i = 0; i < extraBits.length; i++) {
+		extraBits[i].classList.add('hidden');
+	}
+	
+	extraBits = document.getElementsByClassName('extraDownloadsProgress');
+	for (var i = 0; i < extraBits.length; i++) {
+		extraBits[i].classList.remove('hidden');
+	}
+	
+	let progressBar = document.getElementById('extraProgress');
+	let statusText = document.getElementById('extraStatus');
+	progressBar.value = 0;
+	let response = await fetch('audioremaster.bin');
+	const reader = response.body.getReader();
+	const totalSize = +response.headers.get('Content-Length');
+	if(totalSize > 0){
+		let file = FS.open('/sonic3air/savedata/audioremaster.bin','w+');
+		for(currentSize = 0; currentSize < totalSize;) {
+		  const {done, value} = await reader.read();
+		
+		  if (done) {
+			  progressBar.value = 100;
+		    break;
+		  }
+		
+		  FS.write(file, value, 0, value.length);
+		  currentSize += value.length;
+		  progressBar.value = currentSize * 100 / totalSize;
+		}
+		FS.close(file);
+		statusText.innerText = "Download complete! Restarting game...";
+	}
+	else{
+		statusText.innerText = "Download failed to start. Restarting game...";
+	}
+	setTimeout(()=>location.reload(), 2000);
+	await sleep(2000);
+}
+
+function installS3kFile(fileInput) {
+    if (fileInput.files.length == 0)
+        return;
+    var file = fileInput.files[0];
+
+    var fr = new FileReader();
+    fr.onload = function () {
+        var data = new Uint8Array(fr.result);
+		if(data.length != 4194304){
+			//Wrong size! No good!
+			document.getElementById("s3kPromptMessage").innerText = "The selected file was not Sonic 3 and Knuckles. Try again:";
+			return;
+		}
+		else if(data[0x186] != 0x31 || data[0x187] != 0x35 || data[0x188] != 0x36 || data[0x189] != 0x33){
+			//MK-1563 is Sonic & Knuckles, which is attached to Sonic 3. If this is not in the header, the ROM is wrong.
+			document.getElementById("s3kPromptMessage").innerText = "The selected file was not Sonic 3 and Knuckles. Try again:";
+			return;
+		}
+
+		//If this call throws an exception with error code 20, it means the ROM already exists.
+		//But that shouldn't happen because we wouldn't be calling this if it already existed.
+        Module['FS_createDataFile']('/sonic3air/savedata/', 'Sonic_Knuckles_wSonic3.bin', data, true, true, true);
+		
+		hidePageUI();
+		
+		//Save into IndexedDB
+		var internalFolder = FS.analyzePath("/sonic3air/___internal/");
+		if(!internalFolder.exists){
+			FS.mkdir('/sonic3air/___internal/');
+		}
+		startGame();
+    };
+    fr.readAsArrayBuffer(file);
+}
+</script>
+</head>
+<body>
+<div id="startup"><h2>Loading...</h2></div>
+<div class="spinner pageUI hidden" id=spinner></div>
+<div class="emscripten pageUI hidden" id=status>Downloading...</div>
+<div class="emscripten pageUI hidden"><progress hidden id=progress max=100 value=0></progress></div>
+<div class="file_select hidden">
+	<span>To run the game, Sonic 3 A.I.R. requires an original copy of the Sonic 3 and Knuckles ROM. 
+	You can get this file by purchasing the game on Steam for Windows, Mac or Linux.</span><br/>
+	<span id="s3kPromptMessage">Please provide Sonic_Knuckles_wSonic3.bin:</span><br/>
+	<label for="fileSelector" class="fileSelector">
+	    Select File...
+	</label>
+	<input id="fileSelector" class="fileSelector" type="file" onChange="installS3kFile(this);"}/>
+</div>
+<div class="restart hidden">
+	<button type="button" onclick="location.reload()">Restart Game</button>
+	<div class="extraDownloads hidden">
+		<button type="button" onclick="showExtraDownloads()">Extra Downloads</button> 
+	</div>
+</div>
+<div class="extraDownloadsSection hidden">
+	<div style="margin:1em;">On other platforms, Sonic 3 A.I.R. includes remastered music which is enabled by default. 
+	None of the compositions have been altered, but instead the music is played back in higher quality 
+	than the original MegaDrive or Genesis console was capable of. On this device the remastered music 
+	is not included by default and you can install it here. Installing this may reduce the stability 
+	of the game on devices with low memory causing stuttering or the game to no longer load at all.</div>
+	<br/>
+	<button type="button" onclick="hideExtraDownloads()">Go Back</button> 
+	<br/>
+	<button type="button" onclick="downloadRemastered()">Install Anyway</button>
+</div>
+<div class="extraDownloadsProgress hidden">
+	<!-- I could have just reused the emscripten progress stuff above, but it may benefit me later to keep it separate. -->
+	<div id=extraStatus>Downloading...</div>
+	<div><progress id=extraProgress max=100 value=0></progress></div>
+</div>
+<div id="root" class="hidden"></div>
+<div id="gameView" class="emscripten_border">
+	<canvas class="emscripten" id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
+</div>
+<script>
+var statusElement = document.getElementById("status"),
+    progressElement = document.getElementById("progress"),
+    spinnerElement = document.getElementById("spinner");
+var Module = {
+    preRun: function(){
+		onPageLoaded();
+    },
+    postRun: [],
+	onExit: function(){
+		onGameExit();
+	},
+	noInitialRun: true,
+    printErr: function(e) {
+        arguments.length > 1 && (e = Array.prototype.slice.call(arguments).join(" ")), console.error(e)
+    },
+    canvas: function() {
+        var e = document.getElementById("canvas");
+        return e.addEventListener("webglcontextlost", (function(e) {
+            alert("WebGL context lost. You will need to reload the page."), e.preventDefault()
+        }), !1), e
+    }(),
+    setStatus: function(e) {
+        if (Module.setStatus.last || (Module.setStatus.last = {
+                time: Date.now(),
+                text: ""
+            }), e !== Module.setStatus.last.text) {
+            var t = e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/),
+                n = Date.now();
+            t && n - Module.setStatus.last.time < 30 || (Module.setStatus.last.time = n, Module.setStatus.last.text = e, t ? (e = t[1], progressElement.value = 100 * parseInt(t[2]), progressElement.max = 100 * parseInt(t[4]), progressElement.hidden = !1, spinnerElement.hidden = !1) : (progressElement.value = null, progressElement.max = null, progressElement.hidden = !0, e || (spinnerElement.style.display = "none")), statusElement.innerHTML = e)
+        }
+    },
+    totalDependencies: 0,
+    monitorRunDependencies: function(e) {
+        this.totalDependencies = Math.max(this.totalDependencies, e), Module.setStatus(e ? "Preparing... (" + (this.totalDependencies - e) + "/" + this.totalDependencies + ")" : "All downloads complete.")
+		if(!e){
+			if(FS.analyzePath("/sonic3air/config.json", true).exists === true){
+				//Done downloading or retrieving from IDBFS the game data
+				FS.mkdir('/sonic3air/savedata');
+				
+				//BrowserFS.configure() takes some time to run so we need to make sure it's done before we try to mount it.
+				BrowserFS.configure({
+					fs: "AsyncMirror",
+					options: {
+						sync: { fs: "InMemory" },
+						async: { fs: "IndexedDB",
+							options: {
+								storeName : "sonic3air_savedata"
+							}
+						}
+					}
+				}, function(e) {
+					if (e) {
+						throw e; // An error occurred.
+					}
+					// Otherwise, BrowserFS is ready to use!
+					onDownloadsComplete();
+				});
+				
+			}
+		}
+    }
+};
+Module.setStatus("Downloading..."), window.onerror = function(e) {
+    Module.setStatus("Exception thrown, see JavaScript console"), spinnerElement.style.display = "none", Module.setStatus = function(e) {
+        e && Module.printErr("[post-exception status] " + e)
+    }
+}
+</script>
+<script async src=sonic3air_web.js></script>
+</body>
+</html>

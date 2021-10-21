@@ -1,0 +1,1204 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x005048) end(0x00552c)
+function void TitleScreen_SK()
+{
+	Kosinski.decompress(0x0cca20, 0xffff0000)
+	Kosinski.decompress(0x0cc6a0, A1)
+	Kosinski.decompress(0x0d2504, A1)
+	updateSpritePattern(0xffff0000, 0x0000, 0x0e20)
+	updateSpritePattern(0xffff1c40, 0x9380, 0x1640)
+
+	Kosinski.decompress(0x0d33e4, 0xffff4e00)
+	updateSpritePattern(0xffff4e00, 0xd000, 0x0720)
+
+	Kosinski.decompress(0x0d3a64, 0xffff5d00)
+	updateSpritePattern(0xffff5d00, 0xf400, 0x0150)
+
+	Enigma.decompress(0x0cba68, 0xffff7400, 0x849c)
+	if ((global.region_code & 0x80) == 0)
+	{
+		D0.u16 = 0xa49c
+		u16[0xffff775c] = D0.u16
+		u16[0xffff775e] = D0.u16
+		u16[0xffff7760] = D0.u16
+		u16[0xffff77ac] = D0.u16
+		u16[0xffff77ae] = D0.u16
+		u16[0xffff77b0] = D0.u16
+	}
+	copyRectToVRAM(0xffff7400, 0xc000, 0x28, 0x1c)
+
+	Enigma.decompress(0x0cc3aa, 0xffff7cc0, 0x0000)
+
+	A1 = 0xffff7cc0
+	D0 = 0x60000003
+	fn005d24()
+
+	Enigma.decompress(0x0cbb32, 0xffff8580, 0x80e2)
+	Enigma.decompress(0x0cbce0, 0xffff8e40, 0x80e2)
+	Enigma.decompress(0x0cbf3e, 0xffff9700, 0x80e2)
+	Enigma.decompress(0x0cc1c4, 0xffff9fc0, 0x80e2)
+
+	Kosinski.addToDecompressionQueue(0x0d4ba6, 0xffff4800)
+
+	A1 = 0xfffffc80
+	for (u8 i = 0; i < 4; ++i)
+	{
+		u16[A1] = 0
+		fillMemory_u16(A1 + 2, 0x1e, 0x0eee)
+		A1 += 0x20
+	}
+	copyMemory(0xfffffca0, 0x0055a8, 0x20)
+
+	global.demo_countdown = (global.region_code & 0x40) ? 150 : 180
+
+	VDP.Config.setActiveDisplay(true)
+
+	Menu.FadeInAfterInit()
+	playMusic(0xff)
+
+	while (true)
+	{
+		while (true)
+		{
+		#if STANDALONE
+			Renderer.resetSprites()
+			Renderer.drawCustomSprite("original_game_by", getScreenWidth() / 2 - 85, 60, 0x00, 0, 0x2000, 0, min((180 - global.demo_countdown) * 8, 96))
+		#endif
+
+			global.frame_state = 0x14
+			Kosinski.ProcessDecompressionQueue()
+			waitForNextFrame()
+
+			Kosinski.ProcessModules()
+			if (kosinski.waiting_modules == 0)
+				break
+		}
+
+		if ((control.pad1.pressed & CONTROL_START) || global.demo_countdown == 0)
+			break
+	}
+
+	playMusic(0xfe)
+
+	copyMemory(0xfffffc80, 0x005588, 0x80)
+
+	Kosinski.addToDMAQueue(0x0cd910, 0x1c40)
+
+	palette_fade.range = 0x3f
+	global.fade_timer = 0x16
+	u32[0xffffb000] = 0x5628
+	u32[0xffffb04a] = 0x5770
+	u32[0xffffb094] = 0x5856
+
+	playMusic(0x25)
+
+	lives_counter = 3
+	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080
+
+	while (true)
+	{
+		global.frame_state = 0x1a
+		Kosinski.ProcessDecompressionQueue()
+		waitForNextFrame()
+
+		if (global.fade_timer != 0)
+		{
+			--global.fade_timer
+			FadeInFromWhite()
+		}
+
+		UpdateGameObjects()
+		RenderSprites()
+		fn005d94()
+		Kosinski.ProcessModules()
+
+		if ((control.pad1.pressed & CONTROL_START) == 0)
+		{
+			if (u32[0xffffb0de] != 0)
+				break
+		}
+		else
+		{
+			if (global.fade_timer == 0)
+			{
+				A0 = 0xffffb128
+				fn005972()
+
+				u32[0xffffb04a] = 0x005802
+				u16[0xffffb078] = 0x0140
+				u16[0xffffb07c] = 0x70
+				u16[0xffffeec0] = 0x03
+
+				camera.screenshake.state = 0
+				D0.u16 = 0x0100
+				scrolloffset.y.planeB = D0.u16
+				scrolloffset.y.planeB = D0.u16
+				camera.position.y.u16 = D0.u16
+				u16[0xffffee64] = D0.u16
+
+				A0 = 0x005608
+				A2 = 0xfffffc20
+				for (u8 i = 0; i < 8; ++i)
+				{
+					u32[A2] = u32[A0]
+					u32[A2 + 0x80] = u32[A0]
+					A0 += 4
+					A2 += 4
+				}
+
+				fn005d94()
+				global.frame_state = 0x1a
+				waitForNextFrame()
+
+			#if !STANDALONE
+				set_status_register(0x2700)
+			#endif
+
+				copyRectToVRAM(0xffff7cc0, 0xe000, 0x28, 0x1c)
+
+				A0 = 0xffffb000
+				fn00571e()
+				break
+			}
+		}
+	}
+
+	while (true)
+	{
+		while (true)
+		{
+			global.frame_state = 0x1a
+			Kosinski.ProcessDecompressionQueue()
+			waitForNextFrame()
+
+			if (global.fade_timer != 0)
+			{
+				--global.fade_timer
+				FadeInFromWhite()
+			}
+
+			UpdateGameObjects()
+			RenderSprites()
+			fn005d94()
+			Kosinski.ProcessModules()
+
+			if (u32[0xffffb172] != 0)
+				break
+		}
+
+		if (global.demo_countdown == 0)
+			break
+
+		if ((control.pad1.pressed & CONTROL_START) == 0)
+			continue
+
+		global.game_mode = 0x0c
+		lives_counter = 3
+		u8[0xfffffec6] = 3
+		ring_counter = 0
+		timer.alldata = 0
+		player.score = 0
+		u16[0xfffffed0] = 0
+		u32[0xfffffed2] = 0
+		u32[0xfffffed6] = 0
+		continues_counter = 0
+		player.next_life_score = 5000
+		u32[0xffffffc4] = 5000
+
+		playSound(MUSIC_CTRL_FADEOUT)
+
+	#if !STANDALONE
+		// Is this even possible...?
+		if (u8[0xffffff86] >= 0x02)
+		{
+			// Level Select
+			global.game_mode = 0x28
+			return
+		}
+	#endif
+
+		levelselect.characters = u8[0xffffff86] * 2 + 1
+		D0.u16 = 0x0700
+		global.zone_act = D0.u16
+		global.zone_act.apparent = D0.u16
+		checkpoint.zone_act = D0.u16
+		u16[0xfffffe16] = 0
+		u16[0xffffffb0] = 0
+		u32[0xffffffb2] = 0
+		u16[0xffffffb6] = 0
+		u8[0xffffffb8] = 0
+		level.giantrings_clear = 0
+		global.active_saveslot = 0
+
+	#if STANDALONE
+		// In S3AIR, always go to the main menu
+		//  -> It's Data Select here, but that's just for the fade-out to work as in the Sonic 3 title screen
+		global.game_mode = 0x4c
+	#else
+		if (levelselect.unlocked && (control.pad1.state & CONTROL_A))
+		{
+			// Level Select
+			global.game_mode = 0x28
+		}
+	#endif
+		return
+	}
+
+	// Start rolling demo
+	playSound(MUSIC_CTRL_FADEOUT)
+
+#if !STANDALONE
+	global.demo_number = max(global.demo_number, 3)
+#endif
+
+	u16[0xffffef7a] = global.demo_number
+	D0.u16 = (global.demo_number & 0x07) * 2
+	D0.u16 = u16[0x004344 + D0.u16]
+	global.zone_act = D0.u16
+	global.zone_act.apparent = D0.u16
+	checkpoint.zone_act = D0.u16
+
+	++global.demo_number
+	if (global.demo_number >= 7)
+	{
+	#if STANDALONE
+		global.demo_number = 0		// Play all demos
+	#else
+		global.demo_number = 3		// Skip first 3 demos
+	#endif
+	}
+
+	if (D0.s16 < 0)
+	{
+		global.game_mode = 0x34
+		global.next_bluespheres = 1
+		global.sk_bluespheres = 1
+		global.zone = 0x07
+		u16[0xffffffb0] = 0
+		u32[0xffffffb2] = 0
+		u16[0xffffffb6] = 0
+		u8[0xffffffb8] = 0
+	}
+	else
+	{
+		if (D0.u16 == 0x0700)
+		{
+			fn00552e()
+		}
+		global.game_mode = 0x08
+	}
+
+	global.rolling_demo = 1
+	lives_counter = 3
+	u8[0xfffffec6] = 3
+	ring_counter = 0
+	timer.alldata = 0
+	player.score = 0
+	u16[0xfffffed0] = 0
+	u32[0xfffffed2] = 0
+	u32[0xfffffed6] = 0
+	player.next_life_score = 5000
+	u32[0xffffffc4] = 5000
+}
+
+
+//# address-hook(0x00552e) end(0x005586)
+function void fn00552e()
+{
+	checkpoint.x = 0x06f4
+	checkpoint.y = 0x09ec
+	checkpoint.number = 1
+	checkpoint.number.backup = 1
+	checkpoint.zone_act = D0.u16
+	checkpoint.zone_act.apparent = D0.u16
+	checkpoint.sprite_attr = 0x0680
+	checkpoint.layer_flags = 0x0c0d
+	checkpoint.rings = 0
+	checkpoint.lives_granted = 0
+	checkpoint.time = 0
+	checkpoint.camera_routine = 0
+	checkpoint.move_area.bottom = 0x0aa0
+	checkpoint.camera.x = 0x0680
+	checkpoint.camera.y = 0x098c
+	checkpoint.water.height = 0x1000
+	checkpoint.water.fullscreen = 0
+}
+
+
+
+// Sonic jumping down
+
+//# address-hook(0x005628) end(0x005654)
+function void fn005628()
+{
+	objA0.mapping_offset = 0x0cb860
+	objA0.sprite_attributes = 0x04ef
+	objA0.position.x.u16 = 0xe8
+	objA0.position.y.u16 = 0x16
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x68
+	objA0.box_size.y = 0x70
+
+	objA0.update_address = 0x00565a
+	fn00565a()
+}
+
+
+//# address-hook(0x00565a) end(0x0056e2)
+function void fn00565a()
+{
+	if (objA0.position.y.u16 != 0xf0)
+		++objA0.position.y.u16
+
+	if (u16[0xffffeec0] == 0x03)
+	{
+		objA0.sprite_attributes |= 0x8000
+		if (camera.position.y.u16 >= 0xe0)
+		{
+			if (camera.position.y.u16 == 0xe0)
+			{
+			#if !STANDALONE
+				set_status_register(0x2700)
+			#endif
+				copyRectToVRAM(0xffff8e40, 0xc000, 0x28, 0x1c)
+			#if !STANDALONE
+				set_status_register(0x2300)
+			#endif
+
+				objA0.animation.timer = 6
+			}
+
+			if (camera.position.y.u16 != 0x0100)
+			{
+				camera.position.y.u16 += 8
+			}
+			else
+			{
+				objA0.update_address = 0x0056e8
+				fn0056e8()
+			}
+			return
+		}
+
+		camera.position.y.u16 += 8
+	#if STANDALONE
+		// Timing for standalone needs to be different, as it's loading the data faster
+		if (camera.position.y.u16 == 0xd0)
+	#else
+		if (camera.position.y.u16 == 0xc8)
+	#endif
+		{
+			Kosinski.addToDMAQueue(0x0d0e12, 0x8c40)
+		}
+
+		A1 = 0xffff8580
+		D0 = 0x40000003
+		D1.u16 = camera.position.y.u16
+		fn005ce8()
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x0056e8) end(0x005716)
+function void fn0056e8()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+	#if !STANDALONE
+		set_status_register(0x2700)
+	#endif
+		copyRectToVRAM(0xffff9700, 0xc000, 0x28, 0x1c)
+	#if !STANDALONE
+		set_status_register(0x2300)
+	#endif
+
+		objA0.animation.timer = 4
+		objA0.update_address = 0x005718
+	}
+}
+
+
+//# address-hook(0x005718) end(0x00571c)
+function void fn005718()
+{
+	// Sonic's next animation step when landing
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		fn00571e()
+	}
+}
+
+
+//# address-hook(0x00571e) end(0x00576e)
+function void fn00571e()
+{
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+	copyRectToVRAM(0xffff9fc0, 0xc000, 0x28, 0x1c)
+#if !STANDALONE
+	set_status_register(0x2300)
+#endif
+
+	Kosinski.addToDMAQueue(0x0d3bb4, 0x9dc0)
+	Kosinski.addToDMAQueue(0x0d5cc6, 0x8c40)
+
+	u32[0xffffb0de] = 0x58a8
+	u8[0xffffb102] = 0x1e
+	objA0.update_address = 0x00576e
+}
+
+
+//# address-hook(0x00576e)
+function void fn00576e()
+{
+}
+
+
+
+// The Death Egg
+
+//# address-hook(0x005770) end(0x00579c)
+function void fn005770()
+{
+	objA0.mapping_offset = 0x0cb924
+	objA0.sprite_attributes = 0x4680
+	objA0.position.x.u16 = 0x0140 + getScreenExtend()
+	objA0.position.y.u16 = 0xb0
+	objA0.sprite_priority = 0x0180
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x40
+
+	objA0.update_address = 0x0057a2
+	fn0057a2()
+}
+
+
+//# address-hook(0x0057a2) end(0x0057fc)
+function void fn0057a2()
+{
+	if (objA0.position.y.u16 != 0xf0)
+	{
+		objA0.position.y += 0x8000
+		if (u16[0xffffee64] != 0x0100)
+		{
+			++u16[0xffffee64]
+			A1 = 0xffff7cc0
+			D0 = 0x60000003
+			D1.u16 = u16[0xffffee64]
+			fn005ce8()
+		}
+
+		DrawObject()
+	}
+	else
+	{
+		// Reached its position on the volcano
+		u32[A0 + 0x2e] = objA0.position.x
+		u32[A0 + 0x32] = objA0.position.y
+		u16[0xffffee66] = 0x8000
+		level.display_routine = 0x22
+		u16[0xffffeec0] = 0x01
+		camera.screenshake.state = 0x1e
+
+		objA0.update_address = 0x005802
+		fn005802()
+	}
+}
+
+
+//# address-hook(0x005802) end(0x005850)
+function void fn005802()
+{
+	fn005d62()
+
+	if (u16[0xffffee64] != 0x0100)
+	{
+		u32[A0 + 0x32] -= 0x8000
+		u32[0xffffee64] += 0x8000
+		A1 = 0xffff7cc0
+		D0 = 0x60000003
+		D1.u16 = u16[0xffffee64]
+		fn005ce8()
+	}
+
+	D0.u16 = objA0.countdown_value
+	D1.u16 = objA0.value32
+	if (camera.screenshake.state != 0)
+	{
+		D0.u16 -= u16[0xffffee68]
+		D1.u16 -= u16[0xffffee6c]
+	}
+	objA0.position.x.u16 = D0.u16
+	objA0.position.y.u16 = D1.u16
+
+	DrawObject()
+}
+
+
+
+// Part of the terrain that's meant to be rendered in front of the Death Egg
+
+//# address-hook(0x005856) end(0x005876)
+function void fn005856()
+{
+	objA0.mapping_offset = 0x0cba4c
+	objA0.sprite_attributes = 0x67a0
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x30
+	objA0.box_size.y = 0x08
+
+	objA0.update_address = 0x00587c
+	fn00587c()
+}
+
+
+//# address-hook(0x00587c) end(0x0058a2)
+function void fn00587c()
+{
+	D0.u16 = 0x0140 - u16[0xffffee60]
+	D1.u16 = 0x01a8 - u16[0xffffee64]
+	if (camera.screenshake.state != 0)
+	{
+		D0.u16 -= u16[0xffffee68]
+		D1.u16 -= u16[0xffffee6c]
+	}
+	objA0.position.x.u16 = D0.u16 + getScreenExtend()
+	objA0.position.y.u16 = D1.u16
+
+	DrawObject()
+
+#if STANDALONE
+	// Here is a good place to draw the widescreen background
+	Renderer.drawCustomSprite("bg_title_screen_sk", objA0.position.x.u16 - 0x0168, objA0.position.y.u16 - 0xa8, 0x00, 0, 0x1100)
+	Renderer.drawCustomSprite("bg_title_screen_sk2", getScreenExtend() - 40, 0x100 - camera.position.y.u16, 0x00, 0, 0x3000)
+#endif
+}
+
+
+
+// Sonic & Knuckles logo and character animations
+
+//# address-hook(0x0058a8) end(0x0058ea)
+function void fn0058a8()
+{
+	--objA0.animation.timer
+	if (objA0.animation.timer != 0)
+		return
+
+	objA0.mapping_offset = 0x0cb994
+	objA0.sprite_attributes = 0x84ee
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x7c
+	objA0.box_size.y = 0x28
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0x0180
+	objA0.velocity.y = 0x0400
+	u32[A0 + 0x30] = 0xffa00000
+
+	objA0.update_address = 0x0058f0
+	fn0058f0()
+}
+
+
+//# address-hook(0x0058f0) end(0x00596c)
+function void fn0058f0()
+{
+	D2.u8 = u8[A0 + 0x34]
+	D0.s32 = s16(objA0.velocity.y)
+	D0 <<= 8
+	u32[A0 + 0x30] += D0
+	D0.u16 = u16[A0 + 0x30]
+	u8[A0 + 0x34] = 0
+	D1.u16 = 0x40
+
+	bool flag = true
+	if (D0.s16 >= 0x00)
+	{
+		if (D0.u16 == 0x00 && objA0.velocity.y == 0xffa5)
+		{
+			objA0.update_address = 0x00596c
+			u32[0xffffb172] = 0x005ae4
+			u32[0xffffb1bc] = 0x005c10
+			u32[0xffffb206] = 0x005c70
+			u32[0xffffb250] = 0x005cb0
+			flag = false
+		}
+		else
+		{
+			u8[A0 + 0x34] = 0xff
+			D1.u16 = 0xffc0
+		}
+	}
+
+	if (flag)
+	{
+		objA0.velocity.y += D1.u16
+		if (D2.u8 != u8[A0 + 0x34])
+		{
+			objA0.velocity.y >>= 1
+		}
+	}
+
+	objA0.position.y.u16 = 0x0118 - s16[A0 + 0x30]
+	DrawObject()
+}
+
+
+//# address-hook(0x00596c) end(0x00596c)
+function void fn00596c()
+{
+	DrawObject()
+}
+
+
+
+//# address-hook(0x005972) end(0x0059a0)
+function void fn005972()
+{
+	updateSpritePattern(0xffff4800, 0x1c60, 0x30)
+	updateSpritePattern(0xffff4e40, 0x1cc0, 0x0290)
+
+	u8[A0 + 0x30] = 0xb4
+
+	objA0.update_address = 0x0059a6
+	fn0059a6()
+}
+
+
+//# address-hook(0x0059a6) end(0x005a4e)
+function void fn0059a6()
+{
+	A1 = 0x005a94
+	A2 = A0 + 0x30
+	fn005a50()
+	if (D0.s16 >= 0)
+	{
+		A1 = 0xffff4800 + D0.s16
+		updateSpritePattern(A1, 0x1c60, 0x30)
+	}
+
+	A1 = 0x005a9a
+	A2 = A0 + 0x32
+	fn005a50()
+	if (D0.s16 >= 0)
+	{
+		A1 = 0xffff4920 + D0.s16
+		updateSpritePattern(A1, 0x1cc0, 0x0290)
+	}
+
+	A1 = 0x005ac9
+	A2 = A0 + 0x34
+	fn005a50()
+	if (D0.s16 >= 0)
+	{
+		A1 = 0xffff5880 + D0.s16
+		updateSpritePattern(A1, 0x21e0, 0x02f0)
+	}
+
+	A1 = 0x005ada
+	A2 = A0 + 0x36
+	fn005a50()
+	if (D0.s16 >= 0)
+	{
+		A1 = 0xffff6a20 + D0.s16
+		updateSpritePattern(A1, 0x27c0, 0x0140)
+	}
+}
+
+
+//# address-hook(0x005a50) end(0x005a92)
+function void fn005a50()
+{
+	if (u8[A2] != 0)
+	{
+		--u8[A2]
+		D0 = 0xffffffff
+		return
+	}
+
+	u8[A2] = u8[A1]
+	D1 = u8[A2 + 0x01]
+	D0.u8 = u8[A1 + D1.s16 + 0x01]
+	if (D0.s8 < 0)
+	{
+		++D0.u8
+		if (D0.u8 == 0)
+		{
+			u8[A2 + 0x01] = 0
+			D0.u8 = u8[A1 + 0x01]
+		}
+		else
+		{
+			++D0.u8
+			if (D0.u8 != 0)
+			{
+				D0 = 0xffffffff
+				return
+			}
+
+			D0.u8 = u8[A1 + D1.s16 + 0x02]
+			u8[A2 + 0x01] -= D0.u8
+			D1.u8 -= D0.u8
+			D0.u8 = u8[A1 + D1.s16 + 0x01]
+		}
+	}
+
+	++u8[A2 + 0x01]
+	D0.s16 = s16(D0.s8) << 5
+}
+
+
+
+// Character texts / selection
+
+//# address-hook(0x005ae4) end(0x005b3c)
+function void fn005ae4()
+{
+	objA0.position.x.u16 = 0x0108 + getScreenExtend()
+	objA0.position.y.u16 = 0x0150
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+	objA0.mapping_offset = 0x005ed8
+	objA0.sprite_attributes = 0x8462
+	objA0.render_flags |= 0x40
+
+	A2 = A0 + 0x18
+	objA0.position.y.frac = 0x02
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0
+
+	u8[0xffffff86] &= 0x01
+	objA0.value26 = (u8[0xffffff86] >> 1) + (u8[0xffffff86] << 7)
+	u8[A0 + 0x27] = 0x08
+
+	objA0.update_address = 0x005b42
+	fn005b42()
+}
+
+
+//# address-hook(0x005b42) end(0x005c0a)
+function void fn005b42()
+{
+	D2 = u8[0xffffff86]
+	D0.u8 = objA0.value26 & 0x7f
+	if (D0.u8 == 0)
+	{
+		D0.u8 = control.pad1.pressed
+		if (D0 & CONTROL_UP)
+		{
+			objA0.value26 -= 8
+			s8[A0 + 0x27] = -8
+			--D2.u8
+			if (D2.u8 == 0xff)
+			{
+				D2.u8 = 1
+			}
+		}
+		if (D0 & CONTROL_DOWN)
+		{
+			objA0.value26 += 8
+			s8[A0 + 0x27] = 8
+			++D2.u8
+			D2.u8 &= 0x01
+			if (D2.u8 >= 3)
+			{
+				D2 = 0
+			}
+		}
+		u8[0xffffff86] = D2.u8
+
+		if (D0.u8 & 0x03)
+		{
+			playSound(0x5b)
+		}
+	}
+
+	if (objA0.value26 & 0x7f)
+	{
+		objA0.value26 += u8[A0 + 0x27]
+	}
+
+	D0.u8 = objA0.value26 + 0x98
+	LookupSinCos()
+	D1.s32 = s32(D1.s16) * 0x05
+	D0.s32 = s32(D0.s16) * 0x05
+	D1.s32 >>= 8
+	D0.s32 >>= 8
+	D3.u16 = u16[A0 + 0x44] - D1.s16
+	D2.u16 = u16[A0 + 0x46] - D0.s16
+	D1.u16 += u16[A0 + 0x44]
+	D0.u16 += u16[A0 + 0x46]
+	D4 = 0
+	D5 = 2
+	D6.u8 = objA0.value26 - 0xa0
+	if (D6.s8 < 0)
+	{
+		u32 tmp
+		tmp = D3
+		D3 = D1
+		D1 = tmp
+		tmp = D2
+		D2 = D0
+		D0 = tmp
+		tmp = D5
+		D5 = D4
+		D4 = tmp
+	}
+	++D5.u8
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = D1.u16
+	u16[(A2+=2)-2] = D0.u16
+	u16[(A2+=2)-2] = D4.u16
+	u16[(A2+=2)-2] = D3.u16
+	u16[(A2+=2)-2] = D2.u16
+	u8[A2 + 0x01] = D5.u8
+
+	DrawObject()
+}
+
+
+
+// Character icon that transforms from Sonic to Knuckles and back
+
+//# address-hook(0x005c10) end(0x005c54)
+function void fn005c10()
+{
+	objA0.position.x.u16 = 0xd0 + getScreenExtend()
+	objA0.position.y.u16 = 0x014c
+	objA0.mapping_offset = 0x005ed8
+	objA0.sprite_attributes = 0x8462
+	D0.u8 = u8[0xffffff86]
+	objA0.state = D0.u8
+	objA0.state.former = D0.u8
+	objA0.animation.frame = 1
+
+	objA0.update_address = 0x005c42
+	fn005c42()
+}
+
+
+//# address-hook(0x005c42) end(0x005c54)
+function void fn005c42()
+{
+	objA0.state = u8[0xffffff86]
+
+	Object.animationUpdate(0x005c5a)
+	DrawObject()
+}
+
+
+
+// No idea what this is
+
+//# address-hook(0x005c70) end(0x005c9c)
+function void fn005c70()
+{
+	objA0.mapping_offset = 0x005f62
+	objA0.sprite_attributes = 0x8462
+	objA0.position.x.u16 = 0x01a2 + getScreenExtend()
+	objA0.position.y.u16 = 0x011d
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x04
+
+	objA0.update_address = 0x005ca2
+	fn005ca2()
+}
+
+
+//# address-hook(0x005ca2) end(0x005cae)
+function void fn005ca2()
+{
+	if (s8[0xffffffd8] < 0)
+	{
+		DrawObject()
+	}
+}
+
+
+
+// Copyright text
+
+//# address-hook(0x005cb0) end(0x005cdc)
+function void fn005cb0()
+{
+	objA0.mapping_offset = 0x005f6c
+	objA0.sprite_attributes = 0x8462
+	objA0.position.x.u16 = 0x017f
+	objA0.position.y.u16 = 0x0152
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x2c
+	objA0.box_size.y = 0x04
+
+#if STANDALONE
+	objA0.position.x.u16 = 0x0184 + getScreenExtend() * 2
+	objA0.position.y.u16 = 0x0150
+#endif
+
+	objA0.update_address = 0x005ce2
+	fn005ce2()
+}
+
+
+//# address-hook(0x005ce2) end(0x005ce2)
+function void fn005ce2()
+{
+	DrawObject()
+
+#if STANDALONE
+	Renderer.drawCustomSprite("title_screen_cr", getScreenWidth() - 88, 204, 0x00, SPRITE_FLAG_PRIO, 0x9fff)
+#endif
+}
+
+
+
+//# address-hook(0x005ce8) end(0x005d22)
+function void fn005ce8()
+{
+	D1.u16 -= 0x10
+	if (D1.s16 >= 0 && (D1.u16 & 0x07) == 0)
+	{
+		D1.u16 &= 0xf8
+		D2.u16 = D1.u16
+		A1 += D1.u16 * 10
+		D2.u16 <<= 4
+		D0 = (D0 << 16) + (D0 >> 16)
+		D0.u16 += D2.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+
+		D3 = 0x27
+		A6 = 0xc00000
+	#if !STANDALONE
+		set_status_register(0x2700)
+	#endif
+		fn005d42()
+	#if !STANDALONE
+		set_status_register(0x2300)
+	#endif
+	}
+}
+
+
+//# address-hook(0x005d24) end(0x005d40)
+function void fn005d24()
+{
+	A6 = 0xc00000
+#if STANDALONE
+	D1 = 0x3f	// Write full plane width
+#else
+	D1 = 0x27
+#endif
+	for (u8 i = 0; i < 0x20; ++i)
+	{
+		A2 = A1
+		D3.u16 = D1.u16
+		fn005d42()
+
+		A1 = A2
+		D0 += 0x800000
+	}
+}
+
+
+//# address-hook(0x005d42) end(0x005d4c)
+function void fn005d42()
+{
+	u16 vramAddress = VDPHelper.getVRAMAddressFromWriteCode(D0)
+	VDP.setupVRAMWrite(vramAddress)
+
+	while (D3.s16 >= 0)
+	{
+		VDP.writeData16(u16[A1])
+		A1 += 2
+		--D3.s16
+	}
+}
+
+
+//# address-hook(0x005d4e) end(0x005d60)
+function void fn005d4e()
+{
+	u16 vramAddress = VDPHelper.getVRAMAddressFromWriteCode(D0)
+	VDP.setupVRAMWrite(vramAddress)
+
+	while (D3.s16 >= 0)
+	{
+		VDP.writeData32(0)
+		--D3.s16
+	}
+}
+
+
+//# address-hook(0x005d62) end(0x005d92)
+function void fn005d62()
+{
+	if (camera.screenshake.state != 0)
+	{
+		--camera.screenshake.state
+		if (camera.screenshake.state == 0)
+		{
+			++u16[0xffffeec0]
+		}
+
+		D0.u16 = global.framecounter.u16 & 0x3f
+		A1 = 0x005e96 + D0.u16
+		u16[0xffffee6c] = u8[A1]		// Vertical scroll offset
+		u16[0xffffee68] = u8[A1+1]		// Horzontal scroll offset
+	}
+}
+
+
+
+// Scrolling & effect on the SEGA logo
+
+//# address-hook(0x005d94) end(0x005e94)
+function void fn005d94()
+{
+	scrolloffset.y.planeA = camera.position.y.u16
+	scrolloffset.y.planeB = u16[0xffffee64]
+	D2 = 0
+	if (camera.screenshake.state != 0)
+	{
+		D0.u16 = u16[0xffffee6c]
+		scrolloffset.y.planeA += D0.u16
+		scrolloffset.y.planeB += D0.u16
+		D2.u16 = u16[0xffffee68]
+	}
+
+	A1 = 0xffffe000
+	D0.u16 = u16[0xffffeec0]
+	if (D0.u16 == 0)
+	{
+		// Nothing special in this case
+	}
+	else if (D0.u16 == 1)
+	{
+		D2.u16 += u16[0xffffee60]
+		D2.s16 = -D2.s16
+		D3.u16 = 0x6f
+		while (D3.s16 >= 0)
+		{
+			GetRandomNumber()
+			D0.u16 &= 0x07
+			u16[(A1+=2)-2] = D0.u16 + getScreenExtend()
+			u16[(A1+=2)-2] = D2.u16 + getScreenExtend()
+
+			D0 = (D0 << 16) + (D0 >> 16)
+			D0.u16 &= 0x07
+			D0.s16 = -D0.s16
+			u16[(A1+=2)-2] = D0.u16 + getScreenExtend()
+			u16[(A1+=2)-2] = D2.u16 + getScreenExtend()
+			--D3.s16
+		}
+		return
+	}
+	else if (D0.u16 == 2)
+	{
+		--level.display_routine
+		if (level.display_routine == 0)
+		{
+			++u16[0xffffeec0]
+
+			// Clear VRAM from 0xc500 on to overwrite the SEGA logo
+		#if !STANDALONE
+			set_status_register(0x2700)
+		#endif
+			D0 = 0x45000003
+		#if STANDALONE
+			D3.u16 = 0x23f	// Clear 0x900 bytes
+		#else
+			D3.u16 = 0xff	// Clear 0x400 bytes
+		#endif
+			fn005d4e()
+		#if !STANDALONE
+			set_status_register(0x2300)
+		#endif
+
+			copyMemory(0xfffffc20, 0x005608, 0x20)
+
+			u32[0xffffb128] = 0x005972
+			D2 = 0
+		}
+		else
+		{
+			D2.u16 = -s16[0xffffee60]
+			for (u8 i = 0; i < 224; i += 2)
+			{
+				GetRandomNumber()
+				u16[A1] += (8 + (D0.u16 & 0x07))
+			#if !STANDALONE
+				u16[A1] = min(s16[A1], 0xfc)
+			#endif
+				u16[A1+2] = D2.u16 + getScreenExtend()
+				A1 += 4
+
+				D0 = (D0 << 16) + (D0 >> 16)
+				u16[A1] -= (8 + (D0.u16 & 0x07))
+			#if !STANDALONE
+				u16[A1] = max(s16[A1], -0x104)
+			#endif
+				u16[A1+2] = D2.u16 + getScreenExtend()
+				A1 += 4
+			}
+
+		#if STANDALONE
+			// This is some evil wizardry to prevent the SEGA logo from wrapping the screen
+			Renderer.setHorizontalScrollNoRepeat(1, true)
+		#endif
+			return
+		}
+	}
+	else
+	{
+		// Nothing special in this case
+	}
+
+#if STANDALONE
+	D2 -= getScreenExtend()
+#endif
+
+	D0.u16 = camera.position.x.u16 + D2.u16
+	D0.s16 = -D0.s16
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 = u16[0xffffee60] + D2.u16
+	D0.s16 = -D0.s16
+
+	for (u8 i = 0; i < 224; ++i)
+	{
+		u32[(A1+=4)-4] = D0
+	}
+}
+
+
+
+// V-Int
+
+//# address-hook(0x000c00) end(0x000c1a)
+function void fn000c00()
+{
+	// Fades the background to blue
+	fn000c50()
+	u16[0xfffff748] = control.pad1
+	fn0017d8()
+	if (global.demo_countdown != 0)
+	{
+		--global.demo_countdown
+	}
+	VInt.CheckIfInterruptedKosinski()
+}

@@ -1,0 +1,218 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Special object to allow for running on water          //
+//-------------------------------------------------------//
+
+//# address-hook(0x0383bc) end(0x03845e)
+function void RunOnWaterHandler.Init()
+{
+	if (objA0.subtype2c != 0)
+	{
+		objA0.mapping_offset = 0x237c7a
+		objA0.sprite_attributes = (global.act == 0) ? 0x036e : 0x0344
+		objA0.render_flags |= render_flag.WORLD
+		objA0.sprite_priority = 0x0300
+		objA0.box_size.x = 0xa0
+		objA0.box_size.y = 0x80
+		u8[A0 + 0x31] = 0xff
+		objA0.flags2a = 0
+		objA0.render_flags |= 0x40
+
+		u16[A0 + 0x16] = 0x02
+		A2 = A0 + 0x18
+		u16[A2]    = objA0.position.x.u16
+		u16[A2+2]  = objA0.position.y.u16
+		u16[A2+4]  = 0x0005
+		u16[A2+6]  = objA0.position.x.u16
+		u16[A2+8]  = objA0.position.y.u16
+		u16[A2+10] = 0x0505
+
+		objA0.update_address = 0x0384b2
+		RunOnWaterHandler.Update()
+	}
+	else
+	{
+		objA0.mapping_offset = 0x237c60
+		objA0.sprite_attributes = 0x43b2
+		objA0.render_flags |= render_flag.WORLD
+		objA0.sprite_priority = 0x0300
+		objA0.box_size.x = 0x28
+		objA0.box_size.y = 0x20
+		u8[A0 + 0x30] = 0xff
+
+		objA0.update_address = 0x038464
+		fn038464()
+	}
+}
+
+
+//# address-hook(0x038464) end(0x0384ac)
+function void fn038464()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x03
+	}
+
+	if (u8[A0 + 0x04] & 0x80)
+	{
+		if (objA0.animation.sprite != u8[A0 + 0x30])
+		{
+			u8[A0 + 0x30] = objA0.animation.sprite
+			D1 = 0x392b14 + objA0.animation.sprite * 0x300
+			updateSpritePattern(D1, 0x7640, 0x0180)
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0384b2) end(0x03852e)
+function void RunOnWaterHandler.Update()
+{
+	objA0.position.x.u16 = u16[0xffffb010]
+	objA0.position.y.u16 = water.height.current
+	fn038534()
+
+	if (objA0.flags2a != 0)
+	{
+		D0.u8 = (level.framecounter.low + 2) & 0x0f
+		if (D0.u8 == 0)
+		{
+			playSound(0xdb)
+		}
+
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 2
+			++u8[A0 + 0x30]
+			if (u8[A0 + 0x30] >= 5)
+				u8[A0 + 0x30] = 0
+		}
+	}
+
+	D1 = u8[A0 + 0x30]
+	if (D1.u8 != u8[A0 + 0x31])
+	{
+		u8[A0 + 0x31] = D1.u8
+		u32 sourceInROM = 0x392394 + (D1.u16 * 0x180)
+		u16 targetInVRAM = (global.act == 0) ? 0x6dc0 : 0x6880
+		updateSpritePattern(sourceInROM, targetInVRAM, 0xc0)
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x038534) end(0x03857c)
+function void fn038534()
+{
+	A1 = 0xffffb000
+	A2 = A0 + 0x18
+	D6 = 3
+	D5.u16 = control.player1
+	fn03857e()
+
+	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+		objA0.render_flags |= render_flag.FLIP_X
+	else
+		objA0.render_flags &= ~render_flag.FLIP_X
+
+	A1 = 0xffffb04a
+	A2 = A0 + 0x1e
+	D6 = 4
+	D5.u16 = control.tails
+	fn03857e()
+
+	D0.u8 = (objA0.render_flags + u8[A1 + 0x2a]) & 0x01
+	if (D0.u8 != 0)
+	{
+		u8[A2 + 0x05] = 0x05
+	}
+}
+
+
+//# address-hook(0x03857e) end(0x038686)
+function void fn03857e()
+{
+	u8 bit = 1 << D6.u8
+	if ((objA0.flags2a & bit) == 0)
+	{
+		if (objA1.velocity.y == 0)
+		{
+			D1 = objA1.position.y.u16 + u8[A1 + 0x1e] + 1
+			if (D1.u16 == water.height.current && abs(objA1.velocity.x) >= 0x700)
+			{
+				objA0.flags2a |= bit
+				u16[A2] = objA1.position.x.u16
+				u16[A2 + 0x02] = water.height.current
+				u8[A2 + 0x05] = 0
+
+				if (objA1.velocity.x < 0)
+					objA1.flags2a |= char.flag.FACING_LEFT
+				else
+					objA1.flags2a &= ~char.flag.FACING_LEFT
+			}
+		}
+		return
+	}
+
+	if ((D5.u16 & CONTROL_ABC) == 0)
+	{
+		D1 = u8[A1 + 0x1e]
+		D0.u16 = water.height.current - D1.u16 - 1
+		if (D0.u16 <= objA1.position.y.u16 && abs(objA1.velocity.x) >= 0x700)
+		{
+			objA1.position.y.u16 = D0.u16
+			objA1.velocity.y = 0
+			u16[A2] = objA1.position.x.u16
+			u16[A2 + 0x02] = water.height.current
+			if ((u8[A1 + 0x2a] & 0x02) == 0)
+				return
+
+			D5.u16 &= 0x0c00
+			if (D5.u16 != 0)
+				return
+
+			D1.u16 = 0x0c
+			if (objA1.velocity.x != 0)
+			{
+				if (objA1.velocity.x > 0)
+				{
+					objA1.velocity.x = max(objA1.velocity.x - D1.u16, 0)
+				}
+				else
+				{
+					objA1.velocity.x = min(objA1.velocity.x + D1.u16, 0)
+				}
+				return
+			}
+		}
+	}
+	else
+	{
+		objA1.velocity.y = -0x680
+		u8[A1 + 0x1e] = 0x0e
+		u8[A1 + 0x1f] = 0x07
+		objA1.state = char.state.ROLLING
+		objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+		u8[A1 + 0x40] = 1
+	}
+
+	objA0.flags2a &= ~bit
+	u8[A2 + 0x05] = 0x05
+}

@@ -1,0 +1,683 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// DEZ Tunnel Launcher                                   //
+//-------------------------------------------------------//
+
+//# address-hook(0x0481f2) end(0x04826a)
+function void fn0481f2()
+{
+	objA0.mapping_offset = 0x048424
+	objA0.sprite_attributes = 0x0385
+	objA0.render_flags |= render_flag.WORLD
+	objA0.render_flags &= ~render_flag.FLIP_X
+	objA0.box_size.x = 0x48
+	objA0.box_size.y = 0x50
+	objA0.sprite_priority = 0x80
+	objA0.render_flags |= 0x40
+
+	u16[A0 + 0x16] = 1
+	A2 = A0 + 0x18
+	D2.u16 = objA0.position.x.u16 + ((objA0.flags2a & 0x01) ? -0x38 : 0x38)
+	u16[A2] = D2.u16
+	D3.u16 = objA0.position.y.u16 - 0x2c
+	if (objA0.flags2a & 0x02)
+	{
+		D3.u16 += 0x58
+		objA0.render_flags |= render_flag.FLIP_X
+	}
+	u16[A2+2] = D3.u16
+	u16[A2+4] = 0
+	objA0.animation.sprite = 0
+
+	objA0.update_address = 0x048270
+	fn048270()
+}
+
+
+//# address-hook(0x048270) end(0x048316)
+function void fn048270()
+{
+	A4 = A0 + 0x30
+	A1 = 0xffffb000
+	fn048370()
+
+	A4 = A0 + 0x38
+	A1 = 0xffffb04a
+	fn048370()
+
+	if (objA0.countdown_value != 0)
+	{
+	#if STANDALONE
+		objA0.flags2e = min(objA0.flags2e, 40)		// Use time intervals of 0.67 instead of 1.0 second
+	#endif
+
+		--objA0.flags2e
+		if (objA0.flags2e == 0)
+		{
+			objA0.flags2e = 60
+			if (objA0.value2f != 0)
+			{
+				--objA0.value2f
+				playSound((objA0.value2f == 7) ? 0xad : 0xa7)
+				if (objA0.value2f == 7)
+				{
+					// Create tunnel controller object
+					if (allocDynamicObjectAfterA0())
+					{
+						objA1.update_address = 0x0484b0
+						objA1.position.x.u16 = objA0.position.x.u16
+						objA1.position.y.u16 = objA0.position.y.u16
+						u8[A1 + 0x2c] = objA0.subtype2c
+						u8[A1 + 0x30] = u8[A0 + 0x30]
+						u8[A1 + 0x38] = u8[A0 + 0x38]
+					}
+					objA0.update_address = 0x04831c
+				}
+			}
+		}
+
+		--objA0.animation.sprite
+		if (objA0.animation.sprite == 0)
+			objA0.animation.sprite = 2
+
+		u8[A0 + 0x1d] = (objA0.flags2e & 0x01) ? objA0.value2f : 0
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x04831c) end(0x04836a)
+function void fn04831c()
+{
+	--objA0.flags2e
+	if (objA0.flags2e == 0)
+	{
+		objA0.countdown_value = 0
+		objA0.animation.sprite = 0
+		u8[A0 + 0x1d] = 0
+		u8[A0 + 0x30] = 0
+		objA0.flags38 = 0
+		objA0.update_address = 0x048270
+	}
+	else
+	{
+		u8[A0 + 0x1d] = (objA0.flags2e & 0x01) ? objA0.value2f : 0
+
+		if (objA0.animation.sprite != 6)
+			++objA0.animation.sprite
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x048370) end(0x048422)
+function void fn048370()
+{
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 8
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
+	if (dx < 0x10 && dy < 0x20)
+	{
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && u8[A1 + 0x2e] == 0)
+		{
+			objA1.position.x.u16 = objA0.position.x.u16
+			u8[A1 + 0x2a] = (u8[A1 + 0x2a] & ~char.flag.FACING_LEFT) | (objA0.flags2a & char.flag.FACING_LEFT)
+
+			u32 backupA0 = A0
+			A0 = A1
+			Character.LandingOnGroundNoSpindash()
+			A0 = backupA0
+
+			objA1.state = char.state.SPINDASH
+			u8[A1 + 0x2e] = 0x81
+			u8[A4] = 2
+			if (objA0.value2f == 0)
+			{
+				playSound(0xa6)
+				if (A1 == 0xffffb000)
+				{
+					objA0.countdown_value = 0x3c0a
+					u8[A0 + 0x1d] = 0x0a
+					playSound(0xa7)
+				}
+				else
+				{
+					objA0.countdown_value = 0x3c00
+				}
+
+				if (objA0.animation.sprite == 0)
+					objA0.animation.sprite = 7
+			}
+		}
+	#if STANDALONE
+		else if (u8[A4] == 2)
+		{
+			bool jumpOff = (A1 == 0xffffb000) ? (control.player1 & CONTROL_ABC) : (control.tails & CONTROL_ABC)
+			if (jumpOff)
+			{
+				objA1.hitbox_extends.x = 7
+				objA1.hitbox_extends.y = 14
+				objA1.velocity.x = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? -0x200 : 0x200
+				objA1.velocity.y = -0x600
+				objA1.state = char.state.ROLLING
+				objA1.flags2a |= char.flag.IN_AIR | char.flag.ROLLING
+				u8[A1 + 0x2e] = 0
+				u8[A1 + 0x40] = 1
+
+				playSound(SFX_JUMP)
+
+				u8[A4] = 0
+				if (A1 == 0xffffb000)
+				{
+					objA0.countdown_value = 0
+					u8[A0 + 0x1d] = 0
+				}
+				if (u8[A0 + 0x30] == 0 && u8[A0 + 0x38] == 0)		// Check if both characters left the launcher
+				{
+					objA0.update_address = 0x04831c
+					objA0.flags2e = 30
+				}
+			}
+		}
+	#endif
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Light Tunnel                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x0484b0) end(0x0484e2)
+function void fn0484b0()
+{
+	// Set delays for player characters
+	u8[A0 + 0x31] = 0x0a
+	u8[A0 + 0x39] = 0x0a
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x0487e4
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+
+		u16[A0 + 0x2e] = A1.u16
+		u8[A0 + 0x40] = 0x02		// 0x02 = initialization state
+	}
+
+	objA0.update_address = 0x0484e8
+	fn0484e8()
+}
+
+
+//# address-hook(0x0484e8) end(0x048512)
+function void fn0484e8()
+{
+	// Update positions of characters
+	//  -> They are always a bit behind the first tunnel element, so this is the same as below, but delayed
+	A1 = 0xffffb000
+	A4 = A0 + 0x30
+	fn048518()
+
+	A1 = 0xffffb04a
+	A4 = A0 + 0x38
+	fn048518()
+
+	// Update position of first light tunnel element
+	A1 = 0xffff0000 + u16[A0 + 0x2e]
+	A4 = A0 + 0x40
+	fn048518()
+
+	D0.u8 = u8[A0 + 0x30] + objA0.flags38
+	if (D0.u8 == 0)
+	{
+		CheckForUnloadObject()
+	}
+}
+
+
+//# address-hook(0x048518) end(0x048520)
+function void fn048518()
+{
+	// For all states:
+	//  -  u8[A4]        = Current state, see below
+	//  -  u8[A4 + 0x02] = Remaining state changes
+	//  - u32[A4 + 0x04] = Pointer to descriptor for the current state (4 bytes each); will increase by 4 when the state is finished
+
+	// Targets:
+	//  - 0x048532	-> u8[A4] = 0x00	-> Going straight towards the end
+	//  - 0x048534	-> u8[A4] = 0x02	-> Initialization
+	//  - 0x048592	-> u8[A4] = 0x04	-> Straight movement
+	//  - 0x04865e	-> u8[A4] = 0x06	-> Wide circle
+	//  - 0x04866e	-> u8[A4] = 0x08	-> Narrow circle
+	//  - 0x0486c4	-> u8[A4] = 0x0a	-> Spiraling down (used with inverse gravity)
+	//  - 0x0486d0	-> u8[A4] = 0x0c	-> Spiraling up
+	call tableLookupAddress(0x048524, u8[A4])
+}
+
+
+//# address-hook(0x048532) end(0x048532)
+function void fn048532()
+{
+	// State 0x00: Do nothing any more
+}
+
+
+//# address-hook(0x048534) end(0x048590)
+function void fn048534()
+{
+	// State 0x02: Initialization
+	//  - u8[A4 + 0x01] = Number of frames until start
+
+	--s8[A4 + 0x01]
+	if (s8[A4 + 0x01] < 0)
+	{
+		u8[A4] += 2
+
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		u16[A1 + 0x1c] = 0x0800
+		objA1.state = char.state.ROLLING
+		u16[A1 + 0x26] = 0
+		objA1.flags2a |= char.flag.IN_AIR
+		u8[A1 + 0x2e] = 0x81
+		u8[A1 + 0x40] = 0
+
+		fn04872c()
+
+		if (u32[A1] != 0x0487e4 && u32[A1] != 0x0487f0)		// Is target a character?
+		{
+			u8[A1 + 0x22] = 0x96
+			D0 = u8[A1 + 0x22]
+			SetCharacterSpritePatterns()
+		}
+	}
+}
+
+
+//# address-hook(0x048592) end(0x0485aa)
+function void fn048592()
+{
+	// State 0x04: Straight movement
+	//  - u8[A4 + 0x01] = Number of frames until state change
+
+	--s8[A4 + 0x01]
+	if (s8[A4 + 0x01] > 0)
+	{
+		fn048638()
+		return
+	}
+
+	// Switch to next state
+	A2 = u32[A4 + 0x04]
+	objA1.position.x.u16 = u16[A2]
+	objA1.position.y.u16 = u16[A2+2]
+	A2 += 4
+	u32[A4 + 0x04] = A2
+
+	fn0485ae()
+}
+
+
+//# address-hook(0x0485ae) end(0x048636)
+function void fn0485ae()
+{
+	// State change
+
+	--u8[A4 + 0x02]
+	if (u8[A4 + 0x02] == 0)
+	{
+		// Reached the end of the tunnel
+		u8[A1 + 0x2e] = 0	// Reset control flags for characters
+    	u8[A4] = 0
+		return
+	}
+
+	if ((u8[A2] & 0x80) == 0)
+	{
+		// Straight movement towards next point, which is stored in the 4 bytes from A2 on
+		D4.u16 = u16[A2]
+		D5.u16 = u16[A2+2]
+		//A2 += 4	// Not needed actually
+		D2.u16 = 0x0c00
+
+		fn048762()
+	}
+	else
+	{
+		// Movement in other pattern
+		D4.u16 = u8[A2] & 0x7f
+		if (u32[A1] == 0x0487f0)	// Check if this is a tunnel element and not a character
+		{
+			u16[A1 + 0x30] = u8[0x048620 + D4.u16]
+		}
+
+		// Determine next state
+		s16 radius = s16[0x048618 + D4.u16 * 2]	// Radius: -0x80 for state 0x06, -0x40 for state 0x08
+		u8[A4] += (D4.u8 + 1) * 2				// Next state; note that u8[A4] is usually 0x04 before this point, so this is 0x06 or above
+		u8[A4 + 0x01] = u8[A2+1]				// Countdown parameter for next state
+		u8[A4 + 0x03] = u8[A2+2]				// Target parameter for next state
+
+		u8 angle = (u8[A2+2] + 0x20) & 0xc0
+		u16 px = objA1.position.x.u16 + ((s32(lookupSin(angle)) * radius) >> 8)
+		u16 py = objA1.position.y.u16 + ((s32(lookupCos(angle)) * radius) >> 8)
+		u16[A1 + 0x12] = px
+		u16[A1 + 0x16] = (u8[A4] < 0x0a) ? py : objA1.position.y.u16
+		A2 += 3
+	}
+}
+
+
+//# address-hook(0x048638) end(0x04865c)
+function void fn048638()
+{
+	// Move ahead with current velocity
+	u32[A1 + 0x10] += s32(objA1.velocity.x) << 8
+	u32[A1 + 0x14] += s32(objA1.velocity.y) << 8
+}
+
+
+//# address-hook(0x04865e) end(0x04866c)
+function void fn04865e()
+{
+	// State 0x06: Move along a circle (wide radius)
+	//  - u8[A4 + 0x03] = Current movement direction
+
+	D0.u8 = u8[A4 + 0x03]
+	LookupSinCos()
+	D0.s16 >>= 1
+	D1.s16 >>= 1
+	fn04867c()
+}
+
+
+//# address-hook(0x04866e) end(0x04867a)
+function void fn04866e()
+{
+	// State 0x08: Move along a circle (narrow radius)
+	//  - u8[A4 + 0x03] = Current movement direction
+
+	D0.u8 = u8[A4 + 0x03]
+	LookupSinCos()
+	D0.s16 >>= 2
+	D1.s16 >>= 2
+	fn04867c()
+}
+
+
+//# address-hook(0x04867c) end(0x0486c2)
+function void fn04867c()
+{
+	// Note that objA1.position.x.frac, objA1.position.y.frac are used as the circle center here
+
+	D0.u16 += objA1.position.x.frac
+	objA1.velocity.x = s16(D0.u16 - objA1.position.x.u16) << 8
+	objA1.position.x.u16 = D0.u16
+
+	D1.u16 += objA1.position.y.frac
+	objA1.velocity.y = s16(D1.u16 - objA1.position.y.u16) << 8
+	objA1.position.y.u16 = D1.u16
+
+	// Read in:
+	//  - D5.u16 = Lower u8 is target angle
+	//  - D4.u16 = Lower s8 is direction angle change per frame
+	A2 = u32[A4 + 0x04]
+	D4.u16 = u16[A2]
+	D5.u16 = u16[A2+2]
+	A2 += 4
+
+	if (D5.u8 == u8[A4 + 0x03])
+	{
+		// Reached the target angle
+		u8[A4] = 0x04
+		u32[A4 + 0x04] = A2
+		fn0485ae()
+	}
+	else
+	{
+		// Change move direction angle a bit
+		u8[A4 + 0x03] += D4.s8
+	}
+}
+
+
+//# address-hook(0x0486c4) end(0x0486ce)
+function void fn0486c4()
+{
+	objA1.position.y.u16 += 3
+	objA1.velocity.y = 0x300
+	fn0486da()
+}
+
+
+//# address-hook(0x0486d0) end(0x0486d4)
+function void fn0486d0()
+{
+	objA1.position.y.u16 -= 3
+	objA1.velocity.y = -0x300
+	fn0486da()
+}
+
+
+//# address-hook(0x0486da) end(0x04872a)
+function void fn0486da()
+{
+	u8[A1 + 0x26] = 0xff
+	D0.u8 = u8[A4 + 0x03]
+	u8[A1 + 0x27] = D0.u8
+	LookupSinCos()
+	D0.s16 >>= 1
+	D1.s16 >>= 2
+	D0.u16 += u16[A1 + 0x12]
+	D2.u16 = D0.u16 - objA1.position.x.u16
+	objA1.position.x.u16 = D0.u16
+	objA1.velocity.x = D2.s16 << 8
+
+	// Read in:
+	//  - D5.u16 = Lower u8 is target angle
+	//  - D4.u16 = Lower s8 is direction angle change per frame
+	A2 = u32[A4 + 0x04]
+	D4.u16 = u16[A2]
+	D5.u16 = u16[A2+2]
+	A2 += 4
+
+	if (D5.u8 == u8[A4 + 0x03])
+	{
+		// Reached the target angle
+		u16[A1 + 0x26] = 0
+
+		u8[A4] = 0x04
+		u32[A4 + 0x04] = A2
+		fn0485ae()
+	}
+	else
+	{
+		u8[A4 + 0x03] += D4.s8
+	}
+}
+
+
+//# address-hook(0x04872c) end(0x04875e)
+function void fn04872c()
+{
+	// Choose light tunnel pattern depending on subtype
+	// Used values (and resulting addresses for A2):
+	//  - 0x00 (0x1fb49e) in DEZ 1
+	//  - 0x01 (0x1fb518) in DEZ 1
+	//  - 0x03 (0x1fb5b2) in DEZ 2
+	//  - 0x04 (0x1fb5f0) in DEZ 2
+	//  - 0x05 (0x1fb646) in DEZ 2
+	//  - 0x06 (0x1fb6b4) in DEZ 1 for spiraling tunnel
+	//  - 0x07 (0x1fb6ce) in DEZ 2 for spiraling tunnel (inverse gravity)
+
+
+	// Each of these pattern data blocks is organized as follows.
+	//
+	// First 6 bytes are forming a header:
+	//   - u16[x]   = Number of single states in the whole pattern
+	//   - u16[x+2] = Start x-position, namely the player position during startup phase
+	//   - u16[x+4] = Start y-position, namely the player position during startup phase
+	//
+	// Then the single states, each taking 4 bytes; bit 0x80 of determines which of these two variants is used:
+	//   A) Bit 0x80 clear: Straight movement to a target point (handled in "fn048762")
+	//       - u16[x]   = Target x-position
+	//       - u16[x+2] = Target y-position
+	//   B) Bit 0x80 set: More complex type of movement, e.g. in a circle or spiraling up/down
+	//       -  u8[x]   = Lower bits (except 0x80) determine the movement type; valid values are 0x00 to 0x03
+	//       -  u8[x+1] = Target angle
+	//       -  u8[x+2] = Unused?
+	//       -  u8[x+3] = Movement angle change per frame
+
+
+	D0.u16 = (objA0.subtype2c & 0x1f) * 4
+	A2 = u32[0x1e4058 + D0.u16]
+
+	u8[A4 + 0x02] = u16[A2] - 1			// Number of state changes (minus one)
+	objA1.position.x.u16 = u16[A2+2]	// Start x-position
+	objA1.position.y.u16 = u16[A2+4]	// Start y-position
+	A2 += 6
+
+	u32[A4 + 0x04] = A2
+	D4.u16 = u16[A2]
+	D5.u16 = u16[A2+2]
+	//A2 += 4	// Not needed actually
+	D2.u16 = 0x0c00
+
+	fn048762()
+}
+
+
+//# address-hook(0x048762) end(0x0487e2)
+function void fn048762()
+{
+	// Move towards target position
+	//  - D4.u16 = target x-position
+	//  - D5.u16 = target y-position
+	//  - D2.u16 = movement speed (pixels per frame as 8.8 fixed point number)
+
+	D3.u16 = D2.u16
+
+	s16 dx = D4.u16 - objA1.position.x.u16
+	s16 dy = D5.u16 - objA1.position.y.u16
+	if (dx < 0)
+	{
+		D2.s16 = -D2.s16
+	}
+	if (dy < 0)
+	{
+		D3.s16 = -D3.s16
+	}
+
+	if (abs(dy) >= abs(dx))
+	{
+		D1 = s32(dy << 16) / D3.s16
+		D0 = s32(dx << 16) / D1.s16
+
+		objA1.velocity.x = D0.s16
+		objA1.velocity.y = D3.s16
+
+		// Calculate number of frames to reach the target position
+		u8[A4 + 0x01] = abs(D1.s16) >> 8
+	}
+	else
+	{
+		D0 = s32(dx << 16) / D2.s16
+		D1 = s32(dy << 16) / D0.s16
+
+		objA1.velocity.y = D1.s16
+		objA1.velocity.x = D2.s16
+
+		// Calculate number of frames to reach the target position
+		u8[A4 + 0x01] = abs(D0.s16) >> 8
+	}
+}
+
+
+//# address-hook(0x0487e4) end(0x0487ea)
+function void fn0487e4()
+{
+	u16[A0 + 0x30] = 7
+	objA0.update_address = 0x0487f0
+	fn0487f0()
+}
+
+
+//# address-hook(0x0487f0) end(0x04889e)
+function void fn0487f0()
+{
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		u16[A0 + 0x30] = 1
+		if (allocDynamicObjectAfterA0())
+		{
+			// Create next "ring" of the tunnel
+			objA1.update_address = 0x0488a4
+			u8[A1 + 0x04] |= 0x04
+			u8[A1 + 0x06] = 0x10
+			u8[A1 + 0x07] = 0x10
+			u16[A1 + 0x08] = 0x80
+			u16[A1 + 0x0a] = 0x2385
+			u32[A1 + 0x0c] = 0x0489cc
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+
+			if (objA0.value26 == 0xff)
+			{
+				// 3D spiral part: Rotated circle sprite
+				D1.u8 = u8[A0 + 0x27]
+				u16[A1 + 0x08] = 0
+				D0.u8 = D1.u8 * 2
+				if (D0.s8 < 0)
+				{
+					u8[A1 + 0x2a] |= 0x01
+					u16[A1 + 0x08] = 0x80
+				}
+				D1.u8 = (((D1.u8 + 8) >> 4) & 0x07) + 8
+				u8[A1 + 0x20] = D1.u8
+			}
+			else
+			{
+				// 2D direction: Choose graphics depending on current velocity
+				D1.u16 = objA0.velocity.x
+				D2.u16 = objA0.velocity.y
+				LookupAngleByVector()
+				D0.u8 = ((D0.u8 + 8) >> 4) & 0x07
+				u8[A1 + 0x20] = D0.u8
+			}
+		}
+
+		playSound(0xca)
+	}
+
+	if (objA0.flags2e == 0)
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x0488a4) end(0x0488bc)
+function void fn0488a4()
+{
+	Object.animationUpdate(0x0488c2)
+	if (objA0.base_state != 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}

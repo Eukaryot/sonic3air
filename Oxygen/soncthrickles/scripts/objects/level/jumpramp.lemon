@@ -1,0 +1,75 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Jump ramp (from AIZ, LRZ)                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x024d68) end(0x024d94)
+function void fn024d68()
+{
+	A1 = 0xffffb000
+	fn024d9a()
+
+	A1 = 0xffffb04a
+	fn024d9a()
+
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 > 0x280)
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x024d9a) end(0x024e32)
+function void fn024d9a()
+{
+	if (u8[A1 + 0x2a] & 0x02)
+		return
+
+	s16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	s16 dy = objA1.position.y.u16 - objA0.position.y.u16
+	if (dx >= 0 && dx < 0x20 && dy >= -0x14 && dy <= 0x20)
+	{
+		if (u8[A1 + 0x2e] == 0)
+		{
+			if ((objA0.flags2a & 0x01) == 0)
+			{
+				if (objA1.velocity.x < 0x400)
+					return
+
+				objA1.velocity.x += 0x400
+			}
+			else
+			{
+				if (objA1.velocity.x > -0x400)
+					return
+
+				objA1.velocity.x -= 0x400
+			}
+
+			objA1.velocity.y = -0x700
+			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x05] = 2
+			u16[A1 + 0x1c] = 1
+			u8[A1 + 0x27] = 1
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x30] = 0
+			u8[A1 + 0x31] = 4
+			u8[A1 + 0x2d] = 5
+		}
+	}
+}

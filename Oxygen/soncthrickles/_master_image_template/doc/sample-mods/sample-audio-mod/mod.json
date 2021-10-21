@@ -1,0 +1,11 @@
+{
+	"Metadata":
+	{
+		"Name": "Sample Audio Mod",
+		"Author": "Eukaryot",
+		"Description": "An example how an audio mod basically looks like. The main menu / data select music gets exchanged with menu music from Sonic 2.",
+		"URL": "https://sonic3air.org",
+		"ModVersion": "1.0.0.0",
+		"GameVersion": "20.04.26.0"
+	}
+}

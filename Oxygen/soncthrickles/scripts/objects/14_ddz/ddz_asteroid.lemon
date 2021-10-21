@@ -1,0 +1,185 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0821de) end(0x0821f8)
+function void fn0821de()
+{
+	objA0.update_address = 0x0821fc
+	objA0.mapping_offset = 0x0832e2
+	objA0.sprite_attributes = 0xa2db
+	objA0.sprite_priority = 0
+	fn083146()
+	fn0821fc()
+}
+
+
+//# address-hook(0x0821fc) end(0x082340)
+function void fn0821fc()
+{
+	if (debug_mode.state == 0)
+	{
+		UpdateMovementStraightSimple()
+	}
+
+	D0.u16 = u16[0xfffffaae]
+	objA0.position.x.u16 -= D0.u16
+
+#if STANDALONE
+	bool isSuperActive = isMainCharacter(CHARACTER_TAILS) ? super.active.tails : super.active
+#else
+	bool isSuperActive = super.active
+#endif
+	if (!isSuperActive)
+	{
+		DrawOrUnloadObject()
+		return
+	}
+
+	A1 = 0xffffb000
+	A2 = u32[A0 + 0x30]
+	fn0858c8()
+	if (_equal())
+	{
+		DrawOrUnloadObject()
+		return
+	}
+
+	// Sonic crashed into the asteroid
+	playSound(0x59)
+	D0.u16 = u16[0xfffffa8e]
+	if (D0.u16 != 0)
+	{
+		A2 = 0xffff0000 + D0.u16
+		u16[A2 + 0x18] = 0xfc00
+	}
+
+	D0 = u32[0xfffffa82]
+	D1 = 0x010000
+	D0 -= D1
+	if (D0 < D1)
+		D0 = D1
+
+	u32[0xfffffa82] = D0
+	D0 = objA0.subtype2c & 0xf0
+	if (D0.u8 == 0x20)
+	{
+		D1 = 0
+		D2.u16 = objA0.position.y.u16 - u16[0xffffb014]
+		D3.u8 = (D2.s16 < 0) ? 0xff : 0x00
+		D2.u16 = abs(D2.s16)
+		if (D2.u16 >= 0x10)
+		{
+			D1 = (D3.u8 != 0) ? 8 : 4
+		}
+
+		A2 = u32[0x082346 + D1.s16]
+		D4 = 2
+		while (D4.s16 >= 0)
+		{
+			if (!allocDynamicObjectStd())
+			{
+				if (objA0.respawn_entry)
+				{
+					A2 = 0xffff0000 + objA0.respawn_entry
+					u8[A2] &= ~0x80
+				}
+				UnloadObject()
+				return
+			}
+
+			objA1.update_address = 0x0821de
+			D2.u16 = objA0.position.x.u16 + u16[(A2+=2)-2]
+			D3.u16 = objA0.position.y.u16 + u16[(A2+=2)-2]
+			objA1.position.x.u16 = D2.u16
+			objA1.position.y.u16 = D3.u16
+			D0.u8 = (objA0.subtype2c & 0x0f) + 0x10
+			u8[A1 + 0x2c] = D0.u8
+
+			--D4.s16
+		}
+
+		A1 = 0x082376 + D1.u16
+		objA0.position.x.u16 += u16[(A1+=2)-2]
+		objA0.position.y.u16 += u16[(A1+=2)-2]
+	}
+
+	D0.u16 = objA0.subtype2c & 0x10
+	D0.u16 >>= 2
+	A2 = u32[0x082382 + D0.s16]
+	D1 = 0x0823ee
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+	D4.u16 = u16[(A2+=2)-2]
+
+	while (true)
+	{
+		if (!allocDynamicObjectStd())
+			break
+
+		u32[A1] = D1
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.position.x.u16 = D2.u16 + s8[(A2+=1)-1]
+		objA1.position.y.u16 = D3.u16 + s8[(A2+=1)-1]
+		u16[A1 + 0x2c] = u16[(A2+=2)-2]
+		objA1.velocity.x = u16[(A2+=2)-2]
+		objA1.velocity.y = u16[(A2+=2)-2]
+
+		--D4.s16
+		if (D4.s16 < 0)
+			break
+	}
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+	UnloadObject()
+}
+
+
+//# address-hook(0x0823ee) end(0x08240a)
+function void fn0823ee()
+{
+	setupObjectAttributesBasic(0x083208)
+	objA0.update_address = 0x082412
+	u32[A0 + 0x30] = (objA0.subtype2c == 0) ? 0x0832a8 : 0x0832ae
+	fn082412()
+}
+
+
+//# address-hook(0x082412) end(0x082424)
+function void fn082412()
+{
+	D0.u16 = u16[0xfffffaae]
+	objA0.position.x.u16 -= D0.u16
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementStraightSimple()
+	DrawOrUnloadObject()
+}
+
+
+
+//# address-hook(0x083146) end(0x08317c)
+function void fn083146()
+{
+	D0.u16 = (objA0.subtype2c & 0xf0) >> 1
+	D1.u16 = objA0.subtype2c
+	A1 = 0x08318a + D0.u16
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	objA0.animation.sprite = u8[(A1+=1)-1]
+	u8[A0 + 0x28] = u8[(A1+=1)-1]
+	u32[A0 + 0x30] = u32[(A1+=4)-4]
+	objA0.render_flags |= 0x04
+	D1.u16 = (D1.u16 & 0x0f) * 2
+	objA0.velocity.x = u16[0x08317e + D1.s16]
+}

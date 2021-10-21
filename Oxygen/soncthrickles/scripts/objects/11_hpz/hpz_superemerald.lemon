@@ -1,0 +1,210 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x090774) end(0x090796)
+function void fn090774()
+{
+	setupObjectAttributesFull(0x090fc0)
+
+	D0 = objA0.subtype2c
+	D1 = u8[0xffffffb2 + D0.u16]
+
+	// Targets:
+	//  - 0x0907a2	-> D1.u16 = 0x00
+	//  - 0x0907a8	-> D1.u16 = 0x01
+	//  - 0x0907a8	-> D1.u16 = 0x02
+	//  - 0x0907de	-> D1.u16 = 0x03
+	call tableLookupAddress(0x09079a, D1.u16 * 2)
+}
+
+
+//# address-hook(0x0907a2) end(0x0907a2)
+function void fn0907a2()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x0907a8) end(0x0907d8)
+function void fn0907a8()
+{
+	objA0.update_address = 0x0908de
+	objA0.sprite_attributes = 0x8477
+	objA0.flags38 |= 0x01
+
+	fn09084e()
+	fn090832()
+
+	if (objA0.flags38 & 0x80)
+	{
+		objA0.update_address = 0x090880
+		objA0.animation.sprite = D0.u8
+		fn0907fa()
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x0907de) end(0x0907f4)
+function void fn0907de()
+{
+	objA0.animation.sprite = D0.u8
+	objA0.update_address = 0x09089e
+
+	fn09084e()
+	fn090832()
+	fn0907fa()
+
+	DrawObject()
+}
+
+
+//# address-hook(0x0907fa) end(0x090814)
+function void fn0907fa()
+{
+	D1.u16 = D0.u16 * 4
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		D1.u16 += 2
+	}
+	D0.u16 = u16[0x090816 + D1.s16]
+	objA0.sprite_attributes = D0.u16
+	u16[A0 + 0x3a] = D0.u16
+}
+
+
+//# address-hook(0x090832) end(0x09083c)
+function void fn090832()
+{
+	D1.u16 = D0.u16 * 2
+	objA0.sprite_priority = u16[0x09083e + D1.s16]
+}
+
+
+//# address-hook(0x09084e) end(0x09085e)
+function void fn09084e()
+{
+	D1.u16 = D0.u16 * 4
+	A1 = 0x090860 + D1.s16
+	objA0.position.x.u16 = u16[(A1+=2)-2]
+	objA0.position.y.u16 = u16[(A1+=2)-2]
+}
+
+
+//# address-hook(0x090880) end(0x0908d8)
+function void fn090880()
+{
+	if (objA0.flags38 & 0x20)
+	{
+		objA0.update_address = 0x0908de
+		objA0.animation.sprite = 0x1e
+		objA0.sprite_attributes = 0x8477
+
+		fn0908de()
+	}
+	else
+	{
+		fn09089e()
+	}
+}
+
+
+//# address-hook(0x09089e)
+function void fn09089e()
+{
+	if (u8[0xfffffac0] == (objA0.subtype2c | 0x80))
+	{
+		objA0.animation.sprite = 0x1e
+		objA0.sprite_attributes = 0x8477
+	}
+	else
+	{
+		bool showGray = (global.framecounter.low & 0x01) != 0
+	#if STANDALONE
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) >= 1)
+		{
+			// In this case, flickering is handled differently, see "Standalone.onDrawVdpSprite"
+			showGray = false
+		}
+	#endif
+
+		if (showGray)
+		{
+			// Draw only a gray something
+			objA0.animation.sprite = 0x07
+			objA0.sprite_attributes = 0x83b5
+		}
+		else
+		{
+			objA0.animation.sprite = objA0.subtype2c
+			objA0.sprite_attributes = u16[A0 + 0x3a]
+		}
+	}
+
+	fn0908de()
+}
+
+
+//# address-hook(0x0908de) end(0x090920)
+function void fn0908de()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x10
+	D3.u16 = 0x10
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	if ((objA0.flags2a & 0x08) && (objA0.flags38 & 0x01))
+	{
+	#if STANDALONE
+		// Not allowed in normal HPZ
+		if (global.stage_type == 2)
+	#endif
+		{
+			// Start special stage
+			objA0.update_address = 0x090926
+			objA0.countdown_value = 0x0f
+
+			A1 = 0xffffb000
+			u8[A1 + 0x2e] = 0x81
+			u16[A1 + 0x20] = 0x0500
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x090926) end(0x09095e)
+function void fn090926()
+{
+	--objA0.countdown_value
+#if STANDALONE
+	// This additional check if kind of dumb and I'm sorry for that,
+	// but it's needed to prevent a visual glitch on the emeralds
+	if ((objA0.countdown_value < 0) && (global.framecounter.low & 0x01))
+#else
+	if (objA0.countdown_value < 0)
+#endif
+	{
+		playSound(0xaf)
+
+		global.next_bluespheres = objA0.subtype2c
+		global.stage_type = 1
+		global.game_mode = 0x34
+		global.in_extra_stage = 1
+		global.sk_bluespheres = 1
+		checkpoint.number = level.backup.checkpoint
+		global.shields_backup_2 = u8[0xffffb02b]
+	}
+
+	DrawObject()
+}

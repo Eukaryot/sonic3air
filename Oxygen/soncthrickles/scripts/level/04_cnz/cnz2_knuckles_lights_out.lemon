@@ -1,0 +1,341 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x06229e) end(0x0622ac)
+function void fn06229e()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	#if STANDALONE
+		if (Game.isTimeAttack())
+		{
+			UnloadObject()
+			return
+		}
+	#endif
+
+	A1 = 0x06228e
+	if (InitBoss(0x0622b2))
+		return
+
+	fn0622b2()
+}
+
+
+//# address-hook(0x0622b2) end(0x0622ca)
+function void fn0622b2()
+{
+	// Targets:
+	//  - 0x0622e4	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x062332	-> objA0.base_state = 0x02  -> Knuckles waiting, and being quite happy
+	//  - 0x062354	-> objA0.base_state = 0x04  -> Another small wait time before starting the jump
+	//  - 0x06237c	-> objA0.base_state = 0x06  -> Jumping (twice)
+	//  - 0x062354	-> objA0.base_state = 0x08  -> Waiting briefly again, then chuckling
+	//  - 0x0623fe	-> objA0.base_state = 0x0a  -> Jumping away
+	call tableLookupAddress(0x0622d0, objA0.base_state)
+
+	Object.loadSpritePatternsForVDP(0x06666a)
+	DrawObject()
+}
+
+
+//# address-hook(0x0622e4) end(0x06232c)
+function void fn0622e4()
+{
+	A1 = 0x0663ba
+	if (fn084fa4())
+		return
+
+	u32[A0 + 0x30] = 0x0666bf
+	objA0.countdown_callback = 0x06233e
+
+	A1 = 0x062296
+	objA0.value26 = 0x1f
+	fn085d70()
+
+	level.bossarea.left -= getScreenExtend() * 2
+
+	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
+
+	CutsceneKnuckles.loadPalette()
+
+	spawnChildObjects(0x066560)
+}
+
+
+//# address-hook(0x062332) end(0x062338)
+function void fn062332()
+{
+	Object.AnimationProgressByLocalA1()
+	CheckForBossStart()
+}
+
+
+//# address-hook(0x06233e) end(0x062352)
+function void fn06233e()
+{
+	objA0.base_state = 0x04
+	objA0.countdown_value = 0x3f
+	objA0.countdown_callback = 0x062360
+}
+
+
+//# address-hook(0x062360) end(0x062378)
+function void fn062360()
+{
+	objA0.base_state = 0x06
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.velocity.x = 0x140
+	objA0.velocity.y = -0x600
+	fn06208c()
+}
+
+
+//# address-hook(0x06237c) end(0x0623d6)
+function void fn06237c()
+{
+	Object.AnimationProgressByLocalA1()
+	UpdateMovementSimple()
+
+	if (objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			D0 = objA0.value39
+			if (objA0.value39 >= 8)
+			{
+				objA0.base_state = 0x08
+				objA0.render_flags &= ~render_flag.FLIP_X
+				objA0.position.y.u16 += D1.u16
+				objA0.countdown_value = 0x3f
+				objA0.countdown_callback = 0x0623e2
+
+				fn062056()
+			}
+			else
+			{
+				u32[A0 + 0x18] = u32[0x0623da + D0.s16]
+				D0.u8 += 0x04
+				objA0.value39 = D0.u8
+				objA0.render_flags ^= 0x01
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0623e2) end(0x0623fa)
+function void fn0623e2()
+{
+	objA0.base_state = 0x0a
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.velocity.x = 0x400
+	objA0.velocity.y = -0x600
+	fn06208c()
+}
+
+
+
+// Invisible collision object
+
+//# address-hook(0x062458) end(0x06247a)
+function void fn062458()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.box_size.x = 0x08
+	D1 = 0x13
+	D2.u16 = 0x0100
+	D3.u16 = 0x0200
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+}
+
+
+//# address-hook(0x062480) end(0x0624ca)
+function void fn062480()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	D0 = objA0.value39
+	if (objA0.value39 >= 6)
+	{
+		if (objA0.subtype2c != 0)
+		{
+			A1 = 0x0a8fdc
+			copyMemory(0xfffffc40, A1, 0x40)
+		}
+
+		UnloadObject()
+	}
+	else
+	{
+		++objA0.value39
+		objA0.countdown_value = u16[0x0624d0 + D0.s16 * 2]
+
+		A1 = (D0 & 0x01) ? 0x066972 : 0x066932
+		copyMemory(0xfffffc40, A1, 0x40)
+	}
+}
+
+
+
+// Light Bulb
+
+//# address-hook(0x031d3a) end(0x031d8a)
+function void fn031d3a()
+{
+	objA0.mapping_offset = 0x230e52
+	objA0.sprite_attributes = 0x4404
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+
+	if (level.water_present == 0)
+	{
+		objA0.update_address = 0x031d8a
+		fn031d8a()
+	}
+	else
+	{
+		objA0.update_address = 0x031d74
+		fn031d74()
+	}
+}
+
+
+//# address-hook(0x031d74)
+function void fn031d74()
+{
+	D0.u16 = water.height.current
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.animation.sprite = 1
+		objA0.update_address = 0x031d8a
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x031d8a)
+function void fn031d8a()
+{
+	DrawOrUnloadObject()
+}
+
+
+
+//# address-hook(0x065d16) end(0x065d16)
+function void fn065d16()
+{
+	Object.InitWithUpdateAddress(0x065d1c)
+}
+
+
+//# address-hook(0x065d1c) end(0x065d42)
+function void fn065d1c()
+{
+	objA0.update_address = 0x065d46
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x02a3d0
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x2c] = 0x01
+		u16[A0 + 0x44] = A1.u16
+	}
+	fn065d46()
+}
+
+
+
+// Object lowering the water level (way after the cutscene)
+
+//# address-hook(0x065d46) end(0x065d68)
+function void fn065d46()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u32[A1] != 0x02a5f8)
+	{
+		CheckForUnloadObject()
+		return
+	}
+
+	if (u8[0xfffffaa2] == 0)
+	{
+		u8[0xfffffaa2] = 0xff
+		water.height.target = 0x0958
+	}
+
+	UnloadObject()
+}
+
+
+
+// Switch for light on
+
+//# address-hook(0x065d6e) end(0x065d86)
+function void fn065d6e()
+{
+	setupObjectAttributesFull(0x066402)
+
+	objA0.update_address = 0x065d8c
+	objA0.position.y.u16 += 4
+
+	addPatternLoadingCue(0x065bfc)
+}
+
+
+//# address-hook(0x065d8c) end(0x065dd0)
+function void fn065d8c()
+{
+	fn065dec()
+	objA0.animation.sprite = 0
+
+	if (objA0.flags2a & 0x18)
+	{
+		objA0.animation.sprite = 1
+
+	#if STANDALONE
+		if (Game.isTimeAttack())
+		{
+			// Lower the water level, even though lights were on all the time
+			water.height.target = 0x0a58
+		}
+	#endif
+
+		if (u8[0xfffffaa3] != 0)
+		{
+			u8[0xfffffaa3] = 0
+			water.height.target = 0x0a58
+			playSound(0x57)
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x062480
+				u8[A1 + 0x2c] = 0xff
+			}
+		}
+	}
+
+	DrawOrUnloadObject()
+}

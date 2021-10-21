@@ -1,0 +1,275 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+define u32 CreditsDataGenerator.startAddress = 0x800000
+
+
+function u32 CreditsDataGenerator.build(u8 creditsIndex)
+{
+	// This builds the credits data for S3&K
+	//  - credits index 0 originally starting at 0x05bc8a
+	//  - credits index 1 originally starting at 0x05bf48
+	//  - credits index 2 is the S3AIR-specific part
+
+	// Note on timing:
+	// Scrolling is exactly 3 lines per second
+
+	u32 startAddress = CreditsDataGenerator.startAddress
+
+	// First check if the data was written already
+	if (u32[startAddress + 0xfc] == 0xbadc0ffe && u8[startAddress + 0xfb] == creditsIndex)
+		return startAddress
+
+	u32 backupA0 = A0
+	u32 backupA1 = A1
+	A0 = startAddress
+	A1 = startAddress + 0x100
+
+	// Write the signature, so we know if the data was written already
+	u8[A0 + 0xfb] = creditsIndex
+	u32[A0 + 0xfc] = 0xbadc0ffe
+
+	if (creditsIndex == 0)
+	{
+		CreditsDataGenerator.addLine(0x0f, 0x03, 1, "EXECUTIVE PRODUCER")
+		CreditsDataGenerator.addLine(0x11, 0x07, 0, "HAYAO NAKAYAMA")
+
+		CreditsDataGenerator.addLine(0x21, 0x05, 1, "PROJECT MANAGERS")
+		CreditsDataGenerator.addLine(0x23, 0x08, 0, "HISASHI SUZUKI")
+		CreditsDataGenerator.addLine(0x24, 0x07, 0, "SHINOBU TOYODA")
+		CreditsDataGenerator.addLine(0x25, 0x07, 0, "MASAHARU YOSHII")
+
+		CreditsDataGenerator.addLine(0x35, 0x0c, 1, "PRODUCER")
+		CreditsDataGenerator.addLine(0x37, 0x0c, 0, "YUJI NAKA")
+
+		CreditsDataGenerator.addLine(0x47, 0x0d, 1, "DIRECTOR")
+		CreditsDataGenerator.addLine(0x49, 0x04, 0, "HIROKAZU YASUHARA")
+
+		CreditsDataGenerator.addLine(0x59, 0x04, 1, "LEAD GAME DESIGNER")
+		CreditsDataGenerator.addLine(0x5b, 0x04, 0, "HIROKAZU YASUHARA")
+
+		CreditsDataGenerator.addLine(0x6b, 0x01, 1, "SENIOR GAME DESIGNERS")
+		CreditsDataGenerator.addLine(0x6d, 0x05, 0, "HISAYOSHI YOSHIDA")
+		CreditsDataGenerator.addLine(0x6e, 0x08, 0, "TAKASHI IIZUKA")
+
+		CreditsDataGenerator.addLine(0x7e, 0x05, 1, "LEAD PROGRAMMER")
+		CreditsDataGenerator.addLine(0x80, 0x0c, 0, "YUJI NAKA")
+
+		CreditsDataGenerator.addLine(0x90, 0x03, 1, "SENIOR PROGRAMMERS")
+		CreditsDataGenerator.addLine(0x92, 0x06, 0, "TAKAHIRO HAMANO")
+		CreditsDataGenerator.addLine(0x93, 0x04, 0, "MASANOBU YAMAMOTO")
+
+		CreditsDataGenerator.addLine(0xa3, 0x03, 1, "CHARACTER DESIGNER")
+		CreditsDataGenerator.addLine(0xa5, 0x03, 0, "TAKASHI THOMAS YUDA")
+
+		CreditsDataGenerator.addLine(0xb5, 0x0b, 1, "C.G. ARTIST")
+		CreditsDataGenerator.addLine(0xb7, 0x09, 0, "KUNITAKE AOKI")
+
+		CreditsDataGenerator.addLine(0xc7, 0x09, 1, "ENEMY ARTIST")
+		CreditsDataGenerator.addLine(0xc9, 0x05, 0, "SATOSHI YOKOKAWA")
+
+		CreditsDataGenerator.addLine(0xd9, 0x08, 1, "SCENE ARTISTS")
+		CreditsDataGenerator.addLine(0xdb, 0x09, 0, "KUNITAKE AOKI")
+		CreditsDataGenerator.addLine(0xdc, 0x0a, 0, "CHIE YOSHIDA")
+		CreditsDataGenerator.addLine(0xdd, 0x09, 0, "TSUNEKO AOKI")
+		CreditsDataGenerator.addLine(0xde, 0x08, 0, "SHIGERU OKADA")
+		CreditsDataGenerator.addLine(0xdf, 0x03, 0, "TAKASHI THOMAS YUDA")
+		CreditsDataGenerator.addLine(0xe0, 0x05, 0, "SATOSHI YOKOKAWA")
+
+		CreditsDataGenerator.addLine(0xf0, 0x08, 1, "ART ASSISTANT")
+		CreditsDataGenerator.addLine(0xf2, 0x09, 0, "OSAMU OHASHI")
+
+		// Signal switch to second credits table (= credits index 1)
+		CreditsDataGenerator.addSignal(0xfff8)
+	}
+	else if (creditsIndex == 1)
+	{
+		CreditsDataGenerator.addLine(0x02, 0x06, 1, "MUSIC COMPOSERS")
+		CreditsDataGenerator.addLine(0x04, 0x0b, 0, "BRAD BUXER")
+		CreditsDataGenerator.addLine(0x05, 0x09, 0, "BOBBY BROOKS")
+		CreditsDataGenerator.addLine(0x06, 0x0a, 0, "DARRYL ROSS")
+		CreditsDataGenerator.addLine(0x07, 0x0a, 0, "GEOFF GRACE")
+		CreditsDataGenerator.addLine(0x08, 0x07, 0, "DOUG GRIGSBY III")
+		CreditsDataGenerator.addLine(0x09, 0x0d, 0, "SCIROCCO")
+		CreditsDataGenerator.addLine(0x0a, 0x07, 0, "HOWARD DROSSIN")
+
+		CreditsDataGenerator.addLine(0x1a, 0x06, 1, "SEGA SOUND TEAM")
+		CreditsDataGenerator.addLine(0x1c, 0x12, 0, "BO")
+		CreditsDataGenerator.addLine(0x1d, 0x09, 0, "SACHIO OGAWA")
+		CreditsDataGenerator.addLine(0x1e, 0x10, 0, "MILPO")
+		CreditsDataGenerator.addLine(0x1f, 0x05, 0, "MASARU SETSUMARU")
+		CreditsDataGenerator.addLine(0x20, 0x06, 0, "TATSUYUKI MAEDA")
+		CreditsDataGenerator.addLine(0x21, 0x06, 0, "TOMONORI SAWADA")
+		CreditsDataGenerator.addLine(0x22, 0x07, 0, "MASAYUKI NAGAO")
+		CreditsDataGenerator.addLine(0x23, 0x0b, 0, "JUN SENOUE")
+
+		CreditsDataGenerator.addLine(0x33, 0x04, 1, "SOUND COORDINATOR")
+		CreditsDataGenerator.addLine(0x35, 0x0a, 0, "HISAKI NIMIYA")
+
+		CreditsDataGenerator.addLine(0x45, 0x01, 1, "EXECUTIVE MANAGEMENT")
+		CreditsDataGenerator.addLine(0x47, 0x03, 0, "SHOUICHIROU IRIMAJIRI")
+		CreditsDataGenerator.addLine(0x48, 0x09, 0, "TOM KALINSKE")
+		CreditsDataGenerator.addLine(0x49, 0x0b, 0, "PAUL RIOUX")
+
+		CreditsDataGenerator.addLine(0x59, 0x06, 1, "PRODUCT MANAGER")
+		CreditsDataGenerator.addLine(0x5b, 0x09, 0, "PAMELA KELLY")
+
+		CreditsDataGenerator.addLine(0x6b, 0x01, 1, "EXECUTIVE COORDINATOR")
+		CreditsDataGenerator.addLine(0x6d, 0x07, 0, "MAMORU SHIGETA")
+		CreditsDataGenerator.addLine(0x6e, 0x0a, 0, "TOMIO TAKAMI")
+		CreditsDataGenerator.addLine(0x6f, 0x05, 0, "DIANE A. FORNASIER")
+		CreditsDataGenerator.addLine(0x70, 0x09, 0, "ROGER HECTOR")
+		CreditsDataGenerator.addLine(0x71, 0x02, 0, "TAKAHARU UTSUNOMIYA")
+
+		CreditsDataGenerator.addLine(0x81, 0x0d, 1, "TESTERS")
+		CreditsDataGenerator.addLine(0x83, 0x0b, 0, "JASON KUO")
+		CreditsDataGenerator.addLine(0x84, 0x0b, 0, "RICK GREER")
+		CreditsDataGenerator.addLine(0x85, 0x09, 0, "MIKE WILLIAMS")
+
+		CreditsDataGenerator.addLine(0x95, 0x02, 1, "SOUND SPECIAL THANKS")
+		CreditsDataGenerator.addLine(0x97, 0x03, 0, "MAYUMI NINA SAKAZAKI")
+		CreditsDataGenerator.addLine(0x98, 0x10, 0, "(MRM)")
+		CreditsDataGenerator.addLine(0x99, 0x0b, 0, "CUBE CORP.")
+		CreditsDataGenerator.addLine(0x9a, 0x0b, 0, "OPUS CORP.")
+		CreditsDataGenerator.addLine(0x9b, 0x04, 0, "MASANORI NAKAYAMA")
+		CreditsDataGenerator.addLine(0x9c, 0x0a, 0, "(STUDIO WHO)")
+
+		CreditsDataGenerator.addLine(0xac, 0x07, 1, "SPECIAL THANKS")
+		CreditsDataGenerator.addLine(0xae, 0x08, 0, "JINA ISHIWATARI")
+		CreditsDataGenerator.addLine(0xaf, 0x09, 0, "EMI KAWAMURA")
+		CreditsDataGenerator.addLine(0xb0, 0x04, 0, "DEBORAH MCCRACKEN")
+		CreditsDataGenerator.addLine(0xb1, 0x0a, 0, "TAKU MAKINO")
+
+		CreditsDataGenerator.addLine(0xc5, 1, "ORIGINAL GAME")
+		CreditsDataGenerator.addLine(0xc7, 0, "PRESENTED BY SEGA")
+
+		if (true)
+		{
+			// Signal switch to S3AIR credits table (= credits index 2)
+			CreditsDataGenerator.addSignal(0xfff8)
+		}
+		else
+		{
+			// Some spaces, then signal end
+			CreditsDataGenerator.addLine(0xd7, 0x10, 0, "   ")
+			CreditsDataGenerator.addSignal(0xfff4)
+		}
+	}
+	else
+	{
+		u8 line = 0xdc
+		CreditsDataGenerator.addLine(line,   1, "ANGEL ISLAND REVISITED")
+		line += 0x0c
+
+		CreditsDataGenerator.addLine(line,   1, "ENGINE AND GAME PORT")
+		CreditsDataGenerator.addLine(line+2, 0, "EUKARYOT")
+		line += 0x10
+
+		CreditsDataGenerator.addLine(line,   1, "REMASTERED MUSIC")
+		CreditsDataGenerator.addLine(line+2, 0, "G SPINDASH")
+		line += 0x10
+
+		CreditsDataGenerator.addLine(line,   1, "MACOS PORT")
+		CreditsDataGenerator.addLine(line+1, 1, "IOS AND WEB PORT")
+		CreditsDataGenerator.addLine(line+3, 0, "SAPPHARAD")
+		line += 0x11
+
+		CreditsDataGenerator.addLine(line,   1, "SWITCH PORT")
+		CreditsDataGenerator.addLine(line+2, 0, "HEYJOEWAY")
+		line += 0x10
+
+		CreditsDataGenerator.addLine(line,   1, "ADDITIONAL CREDITS")
+		CreditsDataGenerator.addLine(line+2, 0, "CARJEM GENERATIONS")
+		CreditsDataGenerator.addLine(line+3, 0, "MASATO NAKAMURA")
+		CreditsDataGenerator.addLine(line+4, 0, "MARKEYJESTER")
+		CreditsDataGenerator.addLine(line+5, 0, "LINNCAKI")
+		CreditsDataGenerator.addLine(line+6, 0, "FLAMEWING")
+		CreditsDataGenerator.addLine(line+7, 0, "HYLLIAN")
+		line += 0x15
+
+		CreditsDataGenerator.addLine(line,   1, "SPECIAL THANKS TO")
+		CreditsDataGenerator.addLine(line+2, 0, "FRED BRONZE")
+		CreditsDataGenerator.addLine(line+3, 0, "MAINMEMORY")
+		CreditsDataGenerator.addLine(line+4, 0, "VALLEYBELL")
+		CreditsDataGenerator.addLine(line+5, 0, "SAXMAN")
+		CreditsDataGenerator.addLine(line+6, 0, "THE SONIC RETRO")
+		CreditsDataGenerator.addLine(line+7, 0, "COMMUNITY")
+		line += 0x15
+
+		CreditsDataGenerator.addLine(line,   0, "A BIG THANK YOU")
+		CreditsDataGenerator.addLine(line+1, 0, "TO ALL SUPPORTERS")
+		CreditsDataGenerator.addLine(line+2, 0, "OF THIS PROJECT")
+		CreditsDataGenerator.addLine(line+4, 1, "YOU ARE THE BEST")
+		line += 0x12
+
+		// Note: If changing the number of lines in the credits, make sure to also adjust "u32 lines" in "fn05b514()"
+
+		// Some spaces, then signal end
+		line = 0x68		// This is chosen to match timing
+		CreditsDataGenerator.addLine(line, 0x10, 0, "   ")
+		CreditsDataGenerator.addSignal(0xfff4)
+	}
+
+	A0 = backupA0
+	A1 = backupA1
+	return startAddress
+}
+
+
+
+function void CreditsDataGenerator.addLine(u8 line, u8 color, u64 text)
+{
+	// Calculate left start position depending on text length and characters included (some like space and 'I' are only half as wide)
+	u32 length = strlen(text)
+	u32 width = 0
+	for (u32 i = 0; i < length; ++i)
+	{
+		u8 ch = getchar(text, i)
+		width += (ch == 0x20 || ch == 0x21 || ch == 0x28 || ch == 0x29 || ch == 0x2e || ch == 0x49) ? 1 : 2
+	}
+
+	u32 left = 20 - width / 2
+	CreditsDataGenerator.addLine(line, left, color, text)
+}
+
+
+function void CreditsDataGenerator.addLine(u8 line, u8 left, u8 color, u64 text)
+{
+	u16[A0] = A1 - 0x800000
+	A0 += 2
+
+	u8[A1]   = line
+	u8[A1+1] = (left * 2) + color
+	A1 += 2
+
+	u32 length = strlen(text)
+	for (u32 i = 0; i < length; ++i)
+	{
+		u8[A1 + i] = getchar(text, i)
+	}
+	A1 += length
+
+	u8 zeroes = (A1 & 1) ? 1 : 2	// Make sure the entry ends at an address divisible by 2
+	for (u8 k = 0; k < zeroes; ++k)
+	{
+		u8[A1] = 0
+		++A1
+	}
+}
+
+
+function void CreditsDataGenerator.addSignal(u16 signal)
+{
+	u16[A0] = A1 - 0x800000
+	A0 += 2
+
+	u16[A1] = signal
+	A1 += 2
+}

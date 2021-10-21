@@ -1,0 +1,140 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x044ae0) end(0x044b2c)
+function void fn044ae0()
+{
+	objA0.update_address = 0x044b30
+	objA0.render_flags = 0x04
+	objA0.base_state = 0x01
+	objA0.box_size.y = 0x21
+	objA0.box_size.x = 0x10
+	objA0.sprite_priority = 0x0180
+	objA0.sprite_attributes = 0xe2e4
+	objA0.mapping_offset = 0x046900
+	objA0.animation.sprite = 2
+	objA0.velocity.y = objA0.position.y.u16
+
+	GetRandomNumber()
+	D0.u16 &= 0x1fff
+	D0.u16 += 0x0800
+	u16[A0 + 0x30] = D0.u16
+	fn044b30()
+}
+
+
+//# address-hook(0x044b30) end(0x044b8a)
+function void fn044b30()
+{
+	D0.u16 = objA0.flags2a & 0x18
+	if (D0.u16 != 0)
+	{
+		objA0.base_state = 0
+		if (allocDynamicObjectAfterA0())
+		{
+			A2 = 0x046618
+			D1.u16 = objA0.position.x.u16
+			D2 = 7
+			while (D2.s16 >= 0)
+			{
+				objA1.update_address = 0x044bcc
+				u16[A1 + 0x2e] = A0.u16
+				D3.u16 = u16[(A2+=2)-2]
+				D3.u16 += D1.u16
+				objA1.position.x.u16 = D3.u16
+				u16[A1 + 0x30] = u16[(A2+=2)-2]
+				u16[A1 + 0x32] = u16[(A2+=2)-2]
+				D3.u16 = u16[(A2+=2)-2]
+				u8[A1 + 0x22] = D3.u8
+				++objA0.base_state
+
+				if (!allocDynamicObjectAfterA1())
+					break
+				--D2.s16
+			}
+		}
+
+		playSound(0x59)
+		objA0.animation.sprite = 0
+		objA0.update_address = 0x044b90
+	}
+	fn044b90()
+}
+
+
+//# address-hook(0x044b90) end(0x044bc6)
+function void fn044b90()
+{
+	if (objA0.base_state == 0 || s8[A0 + 0x05] < 0)
+	{
+		objA0.position.x.u16 = 0x7fff
+	}
+
+	D0 = 0x2800
+	D1 = 0x80
+	fn0465d6()
+	D0.u16 += objA0.velocity.y
+	objA0.position.y.u16 = D0.u16
+
+	D1 = 0x1b
+	D2 = 0x21
+	D3 = 0x21
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x044bcc) end(0x044bf0)
+function void fn044bcc()
+{
+	objA0.update_address = 0x044bf8
+	objA0.render_flags = 0x84
+	objA0.box_size.y = 0x08
+	objA0.box_size.x = 0x08
+	objA0.sprite_priority = 0x0200
+	objA0.sprite_attributes = 0xe2e4
+	objA0.mapping_offset = 0x046900
+	fn044bf8()
+}
+
+
+//# address-hook(0x044bf8) end(0x044c3e)
+function void fn044bf8()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x2e]
+	if (s8[A0 + 0x04] >= 0)
+	{
+		if (objA0.value32 != 0 && s16[A0 + 0x32] >= 0)
+		{
+			--u8[A1 + 0x05]
+		}
+		UnloadObject()
+		return
+	}
+
+	--objA0.value32
+	if (s16[A0 + 0x32] < 0)
+	{
+		objA0.countdown_callback += 0x3800
+		D0.u16 = objA0.position.y.u16 + u16[A0 + 0x34]
+	}
+	else
+	{
+		if (objA0.value32 == 0)
+		{
+			--u8[A1 + 0x05]
+		}
+		D0.u16 = objA1.position.y.u16 + u16[A0 + 0x30]
+	}
+	objA0.position.y.u16 = D0.u16
+
+	DrawObject()
+}

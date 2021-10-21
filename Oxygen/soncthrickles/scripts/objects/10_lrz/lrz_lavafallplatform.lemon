@@ -1,0 +1,412 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Platform in lava fall of LRZ boss act                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x079c52) end(0x079c5a)
+function void fn079c52()
+{
+	D0 = objA0.subtype2c * 4
+	call 0x079c5e + D0.s16
+}
+
+//# address-hook(0x079c5e) end(0x079c5e)
+function void fn079c5e()
+{
+	fn079c72()
+}
+
+//# address-hook(0x079c62) end(0x079c62)
+function void fn079c62()
+{
+	fn079cce()
+}
+
+//# address-hook(0x079c66) end(0x079c66)
+function void fn079c66()
+{
+	fn079cce()
+}
+
+//# address-hook(0x079c6e) end(0x079c6e)
+function void fn079c6e()
+{
+	fn079cf8()
+}
+
+
+//# address-hook(0x079c72) end(0x079ccc)
+function void fn079c72()
+{
+	fn07a040()
+	if (_equal())
+		return
+
+	objA0.update_address = 0x079c9e
+	spawnSimpleChildObjects(0x07a1b0)
+	if (_equal())
+	{
+		objA1.position.y.u16 += 0xc0
+		u8[A1 + 0x2c] = objA0.subtype2c
+		u16[A1 + 0x2e] = 0x037f
+	}
+	fn079c9e()
+}
+
+
+//# address-hook(0x079c9e) end(0x079cae)
+function void fn079c9e()
+{
+	if (u16[0xfffffaa4] != 0)
+	{
+		fn08594e()
+    	Object.TriggerUnloading()
+	}
+	else
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value < 0)
+		{
+			objA0.countdown_value = 0x017f
+			fn079cb4()
+		}
+	}
+}
+
+
+//# address-hook(0x079cb4) end(0x079ccc)
+function void fn079cb4()
+{
+	spawnSimpleChildObjects(0x07a1b0)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = objA0.subtype2c
+		u16[A1 + 0x2e] = 0x04ff
+	}
+}
+
+
+//# address-hook(0x079cce) end(0x079cd8)
+function void fn079cce()
+{
+	fn07a040()
+	if (!_equal())
+	{
+		fn079cb4()
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x079cf8) end(0x079d02)
+function void fn079cf8()
+{
+	setupObjectAttributesFull(0x07a178)
+	objA0.update_address = 0x079d08
+	fn079d08()
+}
+
+
+//# address-hook(0x079d08) end(0x079d22)
+function void fn079d08()
+{
+	Object.animationProgress(0x07a1e9)
+
+	D1 = 0x2b
+	D2 = 0x18
+	D3 = 0x19
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	Object.DrawOrUnload()
+}
+
+
+//# address-hook(0x079d28) end(0x079d3e)
+function void fn079d28()
+{
+	setupObjectAttributesFull(0x07a16c)
+
+	objA0.update_address = 0x079d44
+	objA0.velocity.y = -0x80
+	u16[A0 + 0x3a] = 0x20
+	fn079d44()
+}
+
+
+//# address-hook(0x079dc2) end(0x079de4)
+function void fn079dc2()
+{
+	// Gets called not before boss fight starts
+
+	fn07a064()
+	if (objA0.position.y.u16 >= 0x0612)
+	{
+		objA0.update_address = 0x079dea
+		u8[0xfffffa88] |= 0x01
+		objA0.velocity.y = 0
+		objA0.flags2a |= 0x80
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x079dea) end(0x079e08)
+function void fn079dea()
+{
+	if (fn079ffe())
+		return
+
+	if (u8[0xfffffaa3] == 0 && s8[A0 + 0x04] >= 0)
+	{
+		fn08594e()
+    	Object.TriggerUnloading()
+	}
+	else
+	{
+		fn079f14()
+		fn07a064()
+		fn079f30()
+		Object.DrawOrUnload()
+	}
+}
+
+
+
+//# address-hook(0x079d44) end(0x079d68)
+function void fn079d44()
+{
+	--u16[A0 + 0x3a]
+	if (s16[A0 + 0x3a] >= 0)
+	{
+		fn07a064()
+
+		// This is actually a part of "fn079d6e" copied here, namely from location 0x079d82
+		bool visible = (objA0.render_flags & render_flag.VISIBLE)
+		if (u16[0xfffffaa4] == 0)
+		{
+			visible = true
+		}
+		else
+		{
+			if (visible && objA0.subtype2c == 0 && u8[0xfffffaa9] == 0 && objA0.position.y.u16 <= 0x0612)
+			{
+				objA0.update_address = 0x079dc2
+				u8[0xfffffaa9] = 0xff
+			}
+		}
+
+		if (visible)
+		{
+			DrawObject()
+		}
+		else
+		{
+			fn08594e()
+			Object.TriggerUnloading()
+		}
+		return
+	}
+
+	objA0.update_address = 0x079d6e
+	objA0.sprite_priority = 0x0180
+	objA0.velocity.y = 0x80
+
+	spawnSimpleChildObjects(0x07a1b6)
+
+	fn079d6e()
+}
+
+
+//# address-hook(0x079d6e) end(0x079dbc)
+function void fn079d6e()
+{
+	fn07a064()
+
+	bool visible = (objA0.render_flags & render_flag.VISIBLE)
+	D0.u8 = objA0.subtype2c
+	if (objA0.subtype2c != 1)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value >= 0)
+		{
+			if (u16[0xfffffaa4] == 0)
+			{
+				visible = true
+			}
+			else
+			{
+				if (visible && objA0.subtype2c == 0 && u8[0xfffffaa9] == 0 && objA0.position.y.u16 <= 0x0612)
+				{
+					objA0.update_address = 0x079dc2
+					u8[0xfffffaa9] = 0xff
+				}
+			}
+		}
+	}
+
+	if (visible)
+	{
+		DrawObject()
+	}
+	else
+	{
+		fn08594e()
+		Object.TriggerUnloading()
+	}
+}
+
+
+
+// Spawn of platforms in boss fight
+
+//# address-hook(0x079e5a) end(0x079e6a)
+function void fn079e5a()
+{
+	setupObjectAttributesFull(0x07a16c)
+	objA0.update_address = 0x079dea
+	fn079dea()
+}
+
+
+
+//# address-hook(0x079e6c) end(0x079e76)
+function void fn079e6c()
+{
+	setupObjectAttributesMost(0x07a184)
+	objA0.update_address = 0x079e7c
+	fn079e7c()
+}
+
+
+//# address-hook(0x079e7c) end(0x079e96)
+function void fn079e7c()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+
+	Object.animationProgress(0x07a1e5)
+	fn084920()
+}
+
+
+
+// Fragment when platform gets crushed
+
+//# address-hook(0x079e9c) end(0x079eb0)
+function void fn079e9c()
+{
+	setupObjectAttributesFull(0x07960e)
+	objA0.update_address = 0x085102
+	fn07a07c()
+	DrawObject()
+}
+
+
+
+//# address-hook(0x079f14) end(0x079f2e)
+function void fn079f14()
+{
+	D1.u16 = u16[0xfffffa84] >> 2
+	D0.u16 = (u16[0xffffeedc] + D1.u16) * 2
+	if (u8[0xfffffaa2] == 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.velocity.x = D0.u16
+}
+
+
+//# address-hook(0x079f30) end(0x079f56)
+function void fn079f30()
+{
+	D0.u16 = (objA0.position.x.u16 - 0x09e0) >> 1
+	D1 = 0x0642 - u8[0xffffa900 + D0.s16]
+	D1.u16 += u16[A0 + 0x26]
+	objA0.position.y.u16 = D1.u16
+}
+
+
+
+//# translated(0x079ffe) end(0x07a036)
+function bool fn079ffe()
+{
+	A1 = 0xffff0000 + u16[0xfffffaa4]
+	if (u16[A1] == 0)
+		return false
+
+	A2 = 0x07a038
+	fn085898()
+	if (_equal())
+		return false
+
+	spawnSimpleChildObjects(0x07a1bc)
+
+	Object.TriggerUnloading()
+	fn08594e()
+
+	playSound(0x9e)
+	return true
+}
+
+
+//# address-hook(0x07a040) end(0x07a062)
+function void fn07a040()
+{
+	_setZeroFlagByValue(0)
+	D0.u16 = objA0.position.x.u16 - camera.position.x.u16
+	if (D0.u16 < 0x0140)
+	{
+		D0.u16 = objA0.position.y.u16 - camera.position.y.u16
+		if (D0.u16 < 0xe0)
+		{
+			_setZeroFlagByValue(1)
+		}
+	}
+}
+
+
+//# address-hook(0x07a064) end(0x07a076)
+function void fn07a064()
+{
+	u16 backup_px = objA0.position.x.u16
+	UpdateMovementStraightSimple()
+
+	D1 = 0x23
+	D2 = 0x10
+	D3 = 0x0d
+	D4.u16 = backup_px
+	PlatformCheckClimbOn()
+}
+
+
+//# address-hook(0x07a07c) end(0x07a0b8)
+function void fn07a07c()
+{
+	D0 = objA0.subtype2c >> 1
+	D1.u16 = objA0.subtype2c
+	objA0.animation.sprite = u8[0x07a0ba + D0.s16]
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D2.u16 = objA1.position.x.u16
+	D3.u16 = objA1.position.y.u16
+
+	A2 = 0x07a0c4 + D1.s16
+	D2.u16 += s8[(A2+=1)-1]
+	D3.u16 += s8[(A2+=1)-1]
+	objA0.position.x.u16 = D2.u16
+	objA0.position.y.u16 = D3.u16
+
+	u32[A0 + 0x18] = u32[0x07a0d8 + D1.s16 * 2]
+}

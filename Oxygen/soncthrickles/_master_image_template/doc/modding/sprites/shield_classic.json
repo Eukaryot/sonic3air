@@ -1,0 +1,11 @@
+{
+
+	// Classic Shield
+	"shield_classic_01": { "File": "shield_classic.png", "Rect": "0,0,48,48",  "Center": "24,24" },
+	"shield_classic_02": { "File": "shield_classic.png", "Rect": "48,0,48,48", "Center": "24,24" },
+	"shield_classic_03": { "File": "shield_classic.png", "Rect": "96,0,48,48", "Center": "24,24" },
+	"shield_classic_04": { "File": "shield_classic.png", "Rect": "144,0,48,48","Center": "24,24" },
+	"shield_classic_05": { "File": "shield_classic.png", "Rect": "192,0,48,48","Center": "24,24" },
+	"shield_classic_06": { "File": "shield_classic.png", "Rect": "240,0,48,48","Center": "24,24" }
+
+}

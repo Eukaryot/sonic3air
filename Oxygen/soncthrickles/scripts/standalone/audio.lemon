@@ -1,0 +1,396 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+define u8 SoundRegType.TYPE_MUSIC  = 0		// Looping, uses music channel (0)
+define u8 SoundRegType.TYPE_JINGLE = 1		// Not looping, uses jingle channel (1) and aborts or pauses music
+define u8 SoundRegType.TYPE_SOUND  = 2		// Sound effect (can be one-shot playback or continuous)
+
+define u8 AudioContext.CONTEXT_MUSIC = 0x00		// Use music volume setting
+define u8 AudioContext.CONTEXT_SOUND = 0x01		// Use sound volume setting
+
+define u8 FastMusicFlag.MUSIC_TEMPO = 0x01
+define u8 FastMusicFlag.SUPER_THEME = 0x02
+
+global u8 fastMusicFlags
+global u8 alternatingRingSoundState
+
+
+// This function is here only for script mods that want to change the sound key, e.g. to play a custom music track / sound effect
+function u64 Standalone.getModdedSoundKey(u64 soundKey, u8 sfxId, u8 soundRegType)
+{
+	// Default implementation: No change
+	return soundKey
+}
+
+
+// This function is here only for script mods that also want to change the sound reg type of a sound key
+function u8 Standalone.getModdedSoundRegType(u64 soundKey, u8 sfxId, u8 soundRegType)
+{
+	// Default implementation: No change
+	return soundRegType
+}
+
+
+function void Standalone.playAudio(u8 sfxId)
+{
+	// Handle music control IDs
+	if (sfxId == MUSIC_CTRL_FADEOUT)
+	{
+		Audio.fadeOutChannel(0, 0x200)	// Fade out over 2 seconds
+		return
+	}
+	else if (sfxId == MUSIC_CTRL_STOP)
+	{
+		Audio.stopChannel(0)
+		return
+	}
+	else if (sfxId >= 0xe3 && sfxId <= 0xef)
+	{
+		// Just ignore these
+		return
+	}
+
+	u64 soundKey = sfxId
+
+	// Choose whether it's music, a jingle or a sound effect
+	u8 soundRegType = 0
+	if (sfxId <= 0x24)
+	{
+		soundRegType = SoundRegType.TYPE_MUSIC
+	}
+	else if (sfxId <= 0x2b)
+	{
+		soundRegType = (sfxId == 0x26 || sfxId == 0x28) ? SoundRegType.TYPE_MUSIC : SoundRegType.TYPE_JINGLE
+	}
+	else if (sfxId <= 0x30)
+	{
+		soundRegType = SoundRegType.TYPE_MUSIC
+	}
+	else if (sfxId <= 0x32)
+	{
+		soundRegType = SoundRegType.TYPE_JINGLE
+	}
+	else if (sfxId <= 0xdb)
+	{
+		soundRegType = SoundRegType.TYPE_SOUND
+	}
+	else
+	{
+		soundRegType = SoundRegType.TYPE_JINGLE
+	}
+
+	// Clear music for level results, emerald jingle, drowning music and outro music
+	if (sfxId == 0x29 || sfxId == 0x2b || sfxId == 0x31 || sfxId == 0xdc)
+	{
+		Audio.stopChannel(0)
+	}
+
+	// Check if a script mod wants to change the sound key
+	u64 moddedSoundKey = Standalone.getModdedSoundKey(soundKey, sfxId, soundRegType)
+	if (moddedSoundKey != soundKey)
+	{
+		// Sound key got changed by modded function, so don't run the default logic here;
+		// instead, ask modded scripts if they want to change the sound reg type as well
+		soundKey = moddedSoundKey
+		soundRegType = Standalone.getModdedSoundRegType(soundKey, sfxId, soundRegType)
+	}
+	else
+	{
+		// Hard-coded handling of special sfx IDs
+		if (sfxId == 0x1c)
+		{
+			// Special Stage
+			if (true)	// TODO: Add option to disable the speedup, of course for both music and gameplay
+			{
+				soundKey = "1c_speedup"
+			}
+		}
+		else if (sfxId == 0x1f)
+		{
+			// Knuckles' Theme
+			if (Game.getSetting(SETTING_AUDIO_KNUCKLES_THEME) == 0)
+			{
+				soundKey = "1f_sonic3"
+			}
+			else if (Game.getSetting(SETTING_AUDIO_KNUCKLES_THEME) == 2)
+			{
+				soundKey = "1f_proto"
+			}
+			else if (Game.getSetting(SETTING_AUDIO_KNUCKLES_THEME) == 0x10)
+			{
+				if (!isSonicAndKnucklesZone())
+					soundKey = "1f_sonic3"
+			}
+		}
+		else if (sfxId == 0x25)
+		{
+			// Title theme
+			if (Game.getSetting(SETTING_AUDIO_TITLE_THEME) == 0)
+			{
+				soundKey = "25_sonic3"
+			}
+		}
+		else if (sfxId == 0x26)
+		{
+			// Outro music
+			if (Game.getSetting(SETTING_AUDIO_OUTRO) == 0)
+			{
+				soundKey = 0x15			// Sky Sanctuary
+			}
+			else if (Game.getSetting(SETTING_AUDIO_OUTRO) == 2)
+			{
+				soundKey = "26_proto"
+			}
+		}
+		else if (sfxId == 0x28)
+		{
+			// Continue screen music
+			if (Game.getSetting(SETTING_AUDIO_CONTINUE_SCREEN) == 0)
+			{
+				soundKey = "28_sonic3"
+			}
+		}
+		else if (sfxId == 0x2a)
+		{
+			// Extra life jingle
+			if (Game.getSetting(SETTING_AUDIO_EXTRALIFE_JINGLE) == 0)
+			{
+				soundKey = "2a_sonic3"
+			}
+			else if (Game.getSetting(SETTING_AUDIO_EXTRALIFE_JINGLE) == 0x10)
+			{
+				if (!isSonicAndKnucklesZone())
+					soundKey = "2a_sonic3"
+			}
+
+			// Special handling for this jingle: Play in channel 1, but mark as override for channel 0 (= music)
+			Audio.playOverride(soundKey, AudioContext.CONTEXT_MUSIC, 1, 0)
+			return
+		}
+		else if (sfxId == 0x2c)
+		{
+			// Invincibility Theme
+			if (global.game_mode != 0x2c)	// In Blue Sphere game's Perfect screen, always use the S&K version
+			{
+				if (Game.getSetting(SETTING_AUDIO_INVINCIBILITY_THEME) == 0)
+				{
+					soundKey = "2c_sonic3"
+				}
+				else if (Game.getSetting(SETTING_AUDIO_INVINCIBILITY_THEME) == 0x10)
+				{
+					if (!isSonicAndKnucklesZone())
+						soundKey = "2c_sonic3"
+				}
+			}
+		}
+		else if (sfxId == 0x2d)
+		{
+			// Competition Menu music
+			if (Game.getSetting(SETTING_AUDIO_COMPETITION_MENU) == 1)
+			{
+				soundKey = "2d_proto"
+			}
+		}
+		else if (sfxId == 0x18 || sfxId == 0x2e)
+		{
+			// Mini-boss music
+			soundKey = 0x18
+			if (Game.getSetting(SETTING_AUDIO_MINIBOSS_THEME) == 0)
+			{
+				soundKey = "2e_sonic3"
+			}
+			else if (Game.getSetting(SETTING_AUDIO_MINIBOSS_THEME) == 0x10)
+			{
+				if (!isSonicAndKnucklesZone())
+					soundKey = "2e_sonic3"
+			}
+		}
+		else if (sfxId == 0x33)
+		{
+			// Alternating ring sound
+			alternatingRingSoundState = !alternatingRingSoundState
+			if (!alternatingRingSoundState)
+			{
+				soundKey = 0x34
+			}
+		}
+		else if (sfxId == 0xf0)
+		{
+			// Super Theme
+			soundRegType = SoundRegType.TYPE_MUSIC
+			u8 configOption = Game.getSetting(SETTING_AUDIO_SUPER_THEME)
+			if (configOption == 0 || configOption == 1)
+			{
+				// Enable the fast level music
+				if (configOption == 1)
+				{
+					Standalone.setFastMusicFlag(FastMusicFlag.SUPER_THEME, true)
+				}
+
+				// Continue normal level music, start it if necessary
+				if (!Audio.isPlayingAudio(level.default_music.u8) && level.default_music.u8 != sfxId)
+				{
+					Standalone.playAudio(level.default_music.u8)
+					return
+				}
+			}
+			else if (configOption == 2)
+			{
+				// Sonic 2 super theme
+				soundKey = "supertheme_sonic2"
+			}
+			else if (configOption == 3)
+			{
+				// Sonic 3 invincibility theme
+				soundKey = "2c_sonic3"
+			}
+			else if (configOption == 4)
+			{
+				// S&K invincibility theme
+				soundKey = 0x2c
+			}
+			else
+			{
+				// Unused track from Sonic 3 prototypes
+				soundKey = "2e_proto"
+			}
+		}
+		else if (sfxId == 0xf2)
+		{
+			// Sonic 1 boss music
+			soundKey = "sonic1_boss"
+			soundRegType = SoundRegType.TYPE_MUSIC
+		}
+		else if (sfxId == 0xf3)
+		{
+			// Sonic 2 boss music
+			soundKey = "sonic2_boss"
+			soundRegType = SoundRegType.TYPE_MUSIC
+		}
+		else if (sfxId == 0xf4)
+		{
+			// Knuckles' Theme (S3 version enforced)
+			soundKey = "1f_sonic3"
+			soundRegType = SoundRegType.TYPE_MUSIC
+		}
+		else if (sfxId == 0xf5)
+		{
+			// Knuckles' Theme (S&K version enforced)
+			soundKey = 0x1f
+			soundRegType = SoundRegType.TYPE_MUSIC
+		}
+		else if (sfxId == 0xf6)
+		{
+			// Mini-boss music (S3 version enforced)
+			soundKey = "2e_sonic3"
+			soundRegType = SoundRegType.TYPE_MUSIC
+		}
+		else if (sfxId == 0xf7)
+		{
+			// Mini-boss music (S&K version enforced)
+			soundKey = 0x18
+			soundRegType = SoundRegType.TYPE_MUSIC
+		}
+		else if (sfxId == 0xf8)
+		{
+			// Special Stage (generated ones, with speed-up only every 45 seconds)
+			if (true)	// TODO: Add option to disable the speedup, of course for both music and gameplay
+			{
+				soundKey = "1c_speedup45"
+				if (!Game.isModdedSound("1c_speedup45") && Game.isModdedSound("1c_speedup30"))
+				{
+					// Prefer modded 30 seconds version variant over the non-modded 45 seconds version
+					soundKey = "1c_speedup30"
+				}
+				soundRegType = SoundRegType.TYPE_MUSIC
+			}
+		}
+
+		// Support for Sonic 3 prototype music
+		if (sfxId == 0x07 && (Game.getSetting(SETTING_CNZ_PROTOTYPE_MUSIC) & 0x01))
+		{
+			soundKey = "07_proto"
+		}
+		else if (sfxId == 0x08 && (Game.getSetting(SETTING_CNZ_PROTOTYPE_MUSIC) & 0x02))
+		{
+			soundKey = "08_proto"
+		}
+		else if (sfxId == 0x0b && (Game.getSetting(SETTING_ICZ_PROTOTYPE_MUSIC) & 0x01))
+		{
+			soundKey = "0b_proto"
+		}
+		else if (sfxId == 0x0c && (Game.getSetting(SETTING_ICZ_PROTOTYPE_MUSIC) & 0x02))
+		{
+			soundKey = "0c_proto"
+		}
+		else if (sfxId == 0x0d && (Game.getSetting(SETTING_LBZ_PROTOTYPE_MUSIC) & 0x01))
+		{
+			soundKey = "0d_proto"
+		}
+		else if (sfxId == 0x0e && (Game.getSetting(SETTING_LBZ_PROTOTYPE_MUSIC) & 0x02))
+		{
+			soundKey = "0e_proto"
+		}
+	}
+
+	if (soundRegType == SoundRegType.TYPE_MUSIC)
+	{
+		if (Audio.isPlayingAudio(soundKey))
+		{
+			// Do not restart music if already playing
+			//  -> But make sure it gets played at full volume (in case it's fading out)
+			Audio.fadeInChannel(0, 0x40)
+			return
+		}
+	}
+
+	u8 audioContext = (soundRegType != SoundRegType.TYPE_SOUND) ? AudioContext.CONTEXT_MUSIC : AudioContext.CONTEXT_SOUND
+	Audio.playAudio(soundKey, audioContext)
+}
+
+
+function void Standalone.setFastMusicFlag(u8 flag, bool enable)
+{
+	// Update flags
+	bool wasFastMusicMode = (fastMusicFlags != 0)
+	if (enable)
+		fastMusicFlags |= flag
+	else
+		fastMusicFlags &= ~flag
+
+	// Any change?
+	bool shouldBeFastMusicMode = (fastMusicFlags != 0)
+	if (shouldBeFastMusicMode != wasFastMusicMode)
+	{
+		// Switch to fast music, or back to normal
+		//  -> In the Oxygen engine, this is implemented as an audio modifier for channel 0
+		if (shouldBeFastMusicMode)
+		{
+			Audio.enableAudioModifier(0, 0, "_fast", 0x14000)
+		}
+		else
+		{
+			Audio.disableAudioModifier(0, 0)
+		}
+	}
+}
+
+function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, u32 relativeSpeed)
+{
+	if (relativeSpeed <= 0x10000)
+	{
+		Standalone.setFastMusicFlag(flag, false)
+	}
+	else
+	{
+		fastMusicFlags |= flag
+		Audio.enableAudioModifier(0, 0, "_fast", relativeSpeed)
+	}
+}

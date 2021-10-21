@@ -1,0 +1,492 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+#if STANDALONE
+function bool DEZFinalBoss3.shouldEscapeWithMasterEmerald()
+{
+	return DEZFinalBoss3.canPlayerEnterDoomsday()
+}
+#endif
+
+function bool DEZFinalBoss3.canPlayerEnterDoomsday()
+{
+	return (global.characters <= CHARS_SONIC_ALONE && global.chaos_emeralds == 7)
+}
+
+
+
+//# address-hook(0x080160) end(0x080174)
+function void fn080160()
+{
+	// Targets:
+	//  - 0x080184	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x0801d2	-> objA0.base_state = 0x02  -> Rising
+	//  - 0x080208	-> objA0.base_state = 0x04  -> Moving right at the start
+	//  - 0x08023e	-> objA0.base_state = 0x06  -> Waiting briefly
+	//  - 0x080264	-> objA0.base_state = 0x08  -> Main update: Speeding forward, then falling back, repeat on hit
+	call tableLookupAddress(0x08017a, objA0.base_state)
+
+	fn080e2c()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x080184) end(0x0801d4)
+function void fn080184()
+{
+	setupObjectAttributesFull(0x0812ec)
+
+	objA0.render_flags |= 0x01
+	u8[A0 + 0x28] = 0x0f
+	boss.remaining_hits = 8
+
+	objA0.position.x.u16 = camera.foreground.x.u16 + 0x60 + getScreenExtend()
+	objA0.position.y.u16 = camera.foreground.y.u16 + 0x140
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x08642e
+	}
+
+	spawnChildObjects(0x06817c)
+	spawnChildObjects(0x081330)
+}
+
+
+//# address-hook(0x0801d8) end(0x080202)
+function void fn0801d8()
+{
+	--objA0.position.y.u16
+#if STANDALONE
+	if ((objA0.position.y.u16 % 3) == 0)
+		--objA0.position.y.u16	// Rise a bit faster
+#endif
+	if (objA0.position.y.u16 > camera.position.y.u16 + 0x50)
+		return
+
+	objA0.base_state = 0x04
+	objA0.velocity.x = 0x500
+
+	spawnChildObjects(0x0681b4)
+	fn0685e2()
+}
+
+
+//# address-hook(0x080208) end(0x08023c)
+function void fn080208()
+{
+	fn080f0e()
+	fn0847e6()
+	UpdateMovementStraightSimple()
+
+	D0.u16 = camera.position.x.u16 + 0x100 + getScreenExtend()
+	if (D0.u16 <= objA0.position.x.u16)
+	{
+		objA0.base_state = 0x06
+		objA0.velocity.x = 0
+		objA0.countdown_value = 0x1f
+		objA0.countdown_callback = 0x080250
+	}
+}
+
+
+//# address-hook(0x08023e) end(0x08024c)
+function void fn08023e()
+{
+	fn080ef4()
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x080250) end(0x080262)
+function void fn080250()
+{
+	objA0.base_state = 0x08
+	objA0.velocity.x = 0x500
+	objA0.flags38 |= 0x80
+}
+
+
+//# address-hook(0x080264) end(0x08029a)
+function void fn080264()
+{
+	fn080f0e()
+	fn080ef4()
+	fn0847e6()
+
+	if (objA0.velocity.x > 0x280)
+	{
+		objA0.velocity.x -= 0x10
+	}
+	UpdateMovementStraightSimple()
+
+	objA0.position.x.u16 = max(objA0.position.x.u16, camera.position.x.u16 + 0x100 + getScreenExtend())
+}
+
+
+//# address-hook(0x08029c) end(0x0802b0)
+function void fn08029c()
+{
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x0802b2
+#if STANDALONE
+	if (!DEZFinalBoss3.shouldEscapeWithMasterEmerald())
+#endif
+	{
+		u8[0xfffffab8] |= 0x08
+	}
+}
+
+
+//# address-hook(0x0802b2) end(0x0802be)
+function void fn0802b2()
+{
+	objA0.update_address = 0x0802c0
+#if STANDALONE
+	if (!DEZFinalBoss3.shouldEscapeWithMasterEmerald())
+#endif
+	{
+		u8[0xfffffab8] |= 0x10
+	}
+}
+
+
+//# address-hook(0x0802c0) end(0x080308)
+function void fn0802c0()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+
+	if (objA0.position.x.u16 <= camera.position.x.u16 + getScreenWidth() + 0x40)
+	{
+		DrawObject()
+		return
+	}
+
+	objA0.update_address = 0x08030e
+	u8[0xfffffab8] |= 0x20
+#if STANDALONE
+	u8[0xfffffab8] |= 0x18	// Drop the Master Emerald outside; otherwise the hook & emerald fly in from the left again
+#endif
+	objA0.flags38 |= 0x30
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x08642e
+	}
+
+	Kosinski.addToDMAQueue(0x0db406, 0xb400)
+}
+
+
+
+// Debris
+
+//# address-hook(0x080426) end(0x08048e)
+function void fn080426()
+{
+	setupObjectAttributesFull(0x081304)
+	objA0.update_address = 0x080494
+
+	GetRandomNumber()
+	objA0.sprite_priority = (D0.s16 >= 0) ? 0 : 0x0300
+	D0.u16 &= 0x01ff
+	objA0.position.x.u16 = camera.position.x.u16 + D0.u16 + 0x20 + getScreenExtend()
+	objA0.position.y.u16 = camera.position.y.u16 - 0x20
+	objA0.render_flags |= D0.u8 & 0x03
+	D0 >>= 16
+
+	A1 = 0x080490 + (D0.u16 & 0x03)
+	objA0.animation.sprite = u8[A1]
+	objA0.velocity.y = (D0.u16 & 0x0300) + 0x0100
+}
+
+
+//# address-hook(0x080494) end(0x0804aa)
+function void fn080494()
+{
+	UpdateMovementStraightSimple()
+	D0.u16 = camera.position.y.u16 + 0x108
+	if (D0.s16 < s16(objA0.position.y.u16))
+	{
+		UnloadObject()
+	}
+	else
+	{
+		Enemy.DrawDynamicObject()
+	}
+}
+
+
+//# address-hook(0x08030e) end(0x080380)
+function void fn08030e()
+{
+	objA0.update_address = 0x080382
+	objA0.flags38 = 0
+	objA0.position.x.u16 = camera.position.x.u16 - 0x80
+	objA0.position.y.u16 = camera.position.y.u16 + 0x80
+
+	for (u8 i = 0; i < 4; ++i)
+	{
+		spawnSimpleChildObjects(0x083fee)
+		if (_equal())
+		{
+			u8[A1 + 0x2c] = (i < 2) ? 0x16 : 0x18
+		}
+	}
+}
+
+
+//# address-hook(0x080382) end(0x0803d4)
+function void fn080382()
+{
+	// Explosions movement
+	objA0.position.x.u16 += 2
+	D0.u16 = camera.position.x.u16 + 0x80
+	if (D0.u16 < objA0.position.x.u16)
+	{
+		objA0.update_address = 0x0803d6
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x085e64
+			u16[A0 + 0x44] = A1.u16
+			u16[A1 + 0x3a] = 0x03
+			return
+		}
+
+		zeroMemory(0xffffc280, 0x4a)
+		A2 = 0xffffc280
+
+		u32[A2] = 0x085e64
+		u16[A2 + 0x3a] = 0x03
+		u16[A0 + 0x44] = A2.u16
+	}
+}
+
+
+//# address-hook(0x0803d6) end(0x080424)
+function void fn0803d6()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		u8[0xffffef56] = 0xff
+		SaveGameOnLevelFinished()
+		Object.TriggerUnloading()
+
+		if (DEZFinalBoss3.canPlayerEnterDoomsday())
+		{
+			// Yay, Doomsday Zone!
+			D0.u16 = 0x0c00
+			TriggerNextZone()
+		}
+		else
+		{
+			if (global.characters != CHARS_KNUCKLES_ALONE)
+			{
+				// Outro for Sonic / Tails
+				D0.u16 = 0x0d01
+				TriggerNextZone()
+			}
+			else
+			{
+				global.game_mode = 0
+			}
+		}
+	}
+}
+
+
+
+// Hook child object
+
+//# address-hook(0x0804b0) end(0x0804be)
+function void fn0804b0()
+{
+	// Targets:
+	//  - 0x0804c8	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x0804d2	-> objA0.base_state = 0x02  -> Update
+	call tableLookupAddress(0x0804c4, objA0.base_state)
+	DrawObject()
+}
+
+
+//# address-hook(0x0804c8) end(0x0804cc)
+function void fn0804c8()
+{
+	setupObjectAttributesFull(0x0812f8)
+}
+
+
+//# address-hook(0x0804d2) end(0x0804ee)
+function void fn0804d2()
+{
+	if ((u8[0xfffffab8] & 0x08) == 0)
+	{
+		MoveAndFlipWithParent()
+	}
+	else
+	{
+		objA0.update_address = 0x08565e
+		objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	}
+}
+
+
+
+// Master Emerald
+
+//# address-hook(0x080760) end(0x08077c)
+function void fn080760()
+{
+	if (objA0.value3a != 0)
+	{
+		fn08598a()
+	}
+	MoveWithParent()
+	if (u8[0xfffffab8] & 0x10)
+	{
+		objA0.update_address = 0x080782
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x080782) end(0x0807a6)
+function void fn080782()
+{
+	if (objA0.value3a != 0)
+	{
+		fn08598a()
+	}
+	UpdateMovementSimple()
+	if (objA0.position.y.u16 >= 0xcf)
+	{
+		objA0.update_address = 0x0807ac
+		objA0.position.y.u16 = 0xcf
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x0807ac) end(0x0807b6)
+function void fn0807ac()
+{
+	if (objA0.value3a != 0)
+	{
+		fn08598a()
+	}
+	DrawObject()
+}
+
+
+
+//# address-hook(0x080e2c) end(0x080ede)
+function void fn080e2c()
+{
+	if (u8[A0 + 0x28] != 0)
+		return
+
+	D0.u8 = boss.remaining_hits
+	if (D0.u8 == 0)
+	{
+		// Defeated
+		objA0.update_address = 0x08565e
+		objA0.countdown_value = 0x2f
+		objA0.countdown_callback = 0x08029c
+
+		spawnSimpleChildObjects(0x083fee)
+		if (_equal())
+		{
+			u8[A1 + 0x2c] = 0x04
+		}
+
+		addScore(100)
+
+	#if STANDALONE
+		// Search for the floor object
+		for (u32 address = 0xffffb094; address < 0xffffcfcb; address += 0x4a)
+		{
+			if (u32[address] == 0x05a7ec)
+			{
+				// Create blocker element
+				if (allocDynamicObjectStd())
+				{
+					objA1.update_address = 0x01ec18
+					objA1.position.x.u16 = u16[address + 0x2e] + 0xb8
+					objA1.position.y.u16 = 0x0080
+					objA1.subtype2c = 0x3f
+				}
+				break
+			}
+		}
+	#endif
+		return
+	}
+
+	if (objA0.state == 0)
+	{
+		objA0.state = 0x20
+		playSound(0x6e)
+		objA0.flags2a |= 0x40
+		if (objA0.flags38 & 0x80)
+		{
+			A1 = (u8[A0 + 0x1c] == 0) ? 0xffffb000 : 0xffffb04a
+			objA1.velocity.x = 0
+			u16[A1 + 0x1c] = 0
+		}
+	}
+
+	Boss.updateHitFlashing(3, 0x080ee2, 0x080ee8, 0x080eec)
+
+	--objA0.state
+	if (objA0.state == 0)
+	{
+		objA0.flags2a &= ~0x40
+		u8[A0 + 0x28] = u8[A0 + 0x25]
+		if (objA0.base_state >= 0x08)
+		{
+			// Accelerate after hit
+			objA0.velocity.x = 0x800 + getScreenExtend() * 3
+		}
+	}
+}
+
+
+//# address-hook(0x080ef4) end(0x080f0c)
+function void fn080ef4()
+{
+	if ((global.framecounter.low & 0x0f) == 0)
+	{
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x080426
+		}
+	}
+}
+
+
+//# address-hook(0x080f0e) end(0x080f38)
+function void fn080f0e()
+{
+	D0 = u32[0xfffffa84] + 0x1000
+	if (D0 <= 0x040000)
+	{
+		u32[0xfffffa84] = D0
+	}
+
+	camera.position.x += D0
+	D1 = camera.position.x >> 16
+	move_area.left = D1.u16
+	move_area.right = D1.u16 + getScreenExtend() * 2
+}

@@ -1,0 +1,351 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Snake platform
+
+//# address-hook(0x03b64c) end(0x03b6ca)
+function void fn03b64c()
+{
+	while (true)
+	{
+		A2 = u32[A0 + 0x30]
+		objA0.position.x.u16 = u16[(A2+=2)-2]
+		objA0.position.y.u16 = u16[(A2+=2)-2]
+		u32[A0 + 0x30] = A2
+
+		D4.u16 = u16[(A2+=2)-2]
+		if (D4.s16 >= 0)
+		{
+			D5.u16 = u16[(A2+=2)-2]
+			D0.u16 = 0x0140
+			if (D4.u16 != objA0.position.x.u16)
+			{
+				if (D4.u16 < objA0.position.x.u16)
+				{
+					D0.s16 = -D0.s16
+				}
+				objA0.velocity.x = D0.u16
+				objA0.velocity.y = 0
+			}
+			else if (D5.u16 != objA0.position.y.u16)
+			{
+				if (D5.u16 < objA0.position.y.u16)
+				{
+					D0.s16 = -D0.s16
+				}
+				objA0.velocity.x = 0
+				objA0.velocity.y = D0.u16
+			}
+			else
+			{
+				objA0.velocity.x = D0.u16
+				objA0.velocity.y = D0.u16
+			}
+			return
+		}
+
+		D0.u16 = u16[A2]
+		if (D0.u16 != 0)
+		{
+			u16[A0 + 0x38] = D0.u16
+			objA0.update_address = 0x03b63a
+		}
+
+		D0.u16 = (objA0.subtype2c & 0x0f) * 4
+		A2 = u32[0x1e3f98 + D0.s16] + 4
+		u32[A0 + 0x30] = A2
+	}
+}
+
+
+//# address-hook(0x03b534) end(0x03b560)
+function void fn03b534()
+{
+	D2 = 0x19
+	D1 = 2
+	while (D1.s16 >= 0)
+	{
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x03b566
+			u8[A1 + 0x24] = D2.u8
+			D2.u8 += 0x18
+			u8[A1 + 0x2c] = objA0.subtype2c
+		}
+		--D1.s16
+	}
+
+	objA0.animation.timer = 1
+	objA0.update_address = 0x03b566
+	fn03b566()
+}
+
+
+//# address-hook(0x03b566) end(0x03b5c6)
+function void fn03b566()
+{
+	objA0.mapping_offset = 0x03b6ce
+	objA0.sprite_attributes = 0x246b
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x0c
+	objA0.sprite_priority = 0x0280
+	objA0.flags2a |= 0x80
+	D0.u16 = (objA0.subtype2c & 0x0f) * 4
+
+	A2 = u32[0x1e3f98 + D0.s16]
+	D1.u16 = u16[(A2+=2)-2]
+	D0.u16 = u16[(A2+=2)-2]
+	u16[A0 + 0x34] = D0.u16
+	D0.u16 -= D1.u16
+	D0.u16 &= 0xff80
+	D0.u16 += 0x0300
+	u16[A0 + 0x36] = D0.u16
+	u32[A0 + 0x30] = A2
+	fn03b64c()
+
+	objA0.update_address = 0x03b5cc
+	fn03b5cc()
+}
+
+
+//# address-hook(0x03b5cc) end(0x03b5d2)
+function void fn03b5cc()
+{
+	--objA0.animation.timer
+	if (objA0.animation.timer == 0)
+	{
+		objA0.update_address = 0x03b5d8
+		fn03b5d8()
+	}
+	else
+	{
+		fn03b60e()
+	}
+}
+
+
+//# address-hook(0x03b5d8) end(0x03b5fa)
+function void fn03b5d8()
+{
+	u16 backup_px = objA0.position.x.u16
+	UpdateMovementStraightSimple()
+
+	A2 = u32[A0 + 0x30]
+	D0.u16 = u16[(A2+=2)-2]
+	if (D0.u16 == objA0.position.x.u16)
+	{
+		D0.u16 = u16[(A2+=2)-2]
+		if (D0.u16 == objA0.position.y.u16)
+		{
+			fn03b64c()
+		}
+	}
+
+	D4.u16 = backup_px
+	fn03b5fc()
+}
+
+
+//# address-hook(0x03b5fc) end(0x03b608)
+function void fn03b5fc()
+{
+	D1.u16 = 0x17
+	D2.u16 = 0x0c
+	D3.u16 = 0x0d
+	fn01dc56()
+	fn03b60e()
+}
+
+
+//# address-hook(0x03b60e) end(0x03b634)
+function void fn03b60e()
+{
+	D0.u16 = (u16[A0 + 0x34] & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= u16[A0 + 0x36])
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+
+// Variant that just goes straight through your way (as a horizontal obstacle)
+
+//# address-hook(0x03b63a) end(0x03b64a)
+function void fn03b63a()
+{
+	D4.u16 = objA0.position.x.u16
+	--u16[A0 + 0x38]
+	if (u16[A0 + 0x38] != 0)
+	{
+		fn03b5fc()
+	}
+	else
+	{
+		objA0.update_address = 0x03b5d8
+		fn03b5d8()
+	}
+}
+
+
+
+// Direction changer
+
+//# address-hook(0x03b6de) end(0x03b712)
+function void fn03b6de()
+{
+	objA0.mapping_offset = 0x03b73c
+	objA0.sprite_attributes = 0x246b
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+	objA0.animation.sprite = objA0.subtype2c
+	D0.u16 = (objA0.subtype2c & 0x03) * 2
+	objA0.box_size.x = u8[0x03b6d8 + D0.s16]
+	objA0.box_size.y = u8[0x03b6d9 + D0.s16]
+
+	objA0.update_address = 0x03b718
+	fn03b718()
+}
+
+
+//# address-hook(0x03b718) end(0x03b736)
+function void fn03b718()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}
+
+
+
+// The type just rotating around a center
+
+//# address-hook(0x03b766) end(0x03b866)
+function void fn03b766()
+{
+	D0.u16 = (objA0.subtype2c & 0x0f) * 8
+	A2 = 0x03b780 + D0.s16
+	D1 = u8[(A2+=1)-1]
+	D2.u8 = u8[(A2+=1)-1]
+
+	A1 = A0
+	while (true)
+	{
+		objA1.update_address = 0x03b86a
+		u32[A1 + 0x0c] = 0x03b91a
+		u16[A1 + 0x0a] = 0x246b
+		u8[A1 + 0x04] |= 0x04
+	#if STANDALONE
+		// Increased size of bounding box to avoid early clipping
+		u8[A1 + 0x07] = 0x12
+		u8[A1 + 0x06] = 0x12
+	#else
+		u8[A1 + 0x07] = 0x0c
+		u8[A1 + 0x06] = 0x0c
+	#endif
+		u16[A1 + 0x08] = 0x0280
+		u8[A1 + 0x2a] = objA0.flags2a
+		u8[A1 + 0x2a] |= 0x80
+		u16[A1 + 0x44] = objA0.position.x.u16
+		u16[A1 + 0x46] = objA0.position.y.u16
+		u8[A1 + 0x30] = u8[(A2+=1)-1]
+
+		if (D2.u8 & 1)
+		{
+			objA1.update_address = 0x03b8c2
+			u16[A1 + 0x0a] = 0x2443
+			u8[A1 + 0x22] = 0x01
+			u8[A1 + 0x28] = 0x86
+		}
+		D2.u8 >>= 1
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+	}
+
+	fn03b86a()
+}
+
+
+//# address-hook(0x03b86a) end(0x03b8bc)
+function void fn03b86a()
+{
+	u16 backup_px = objA0.position.x.u16
+	D0.u8 = objA0.value26
+	LookupSinCos()
+	D2.u16 = u16[A0 + 0x30]
+	D1.s32 = s32(D1.s16) * D2.s16
+	D0.s32 = s32(D0.s16) * D2.s16
+	D1 = (D1 << 16) + (D1 >> 16)
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1.u16 += u16[A0 + 0x44]
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.x.u16 = D1.u16
+	objA0.position.y.u16 = D0.u16
+
+	D1.u16 = 0x17
+	D2.u16 = 0x0c
+	D3.u16 = 0x0d
+	D4.u16 = backup_px
+	fn01dc56()
+
+	objA0.value26 += (objA0.flags2a & 0x01) ? -1 : 1
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}
+
+
+
+// Spiked ball
+
+//# address-hook(0x03b8c2) end(0x03b914)
+function void fn03b8c2()
+{
+	u16 backup_px = objA0.position.x.u16
+	D0.u8 = objA0.value26
+	LookupSinCos()
+	D2.u16 = u16[A0 + 0x30]
+	D1.s32 = s32(D1.s16) * D2.s16
+	D0.s32 = s32(D0.s16) * D2.s16
+	D1 = (D1 << 16) + (D1 >> 16)
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1.u16 += u16[A0 + 0x44]
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.x.u16 = D1.u16
+	objA0.position.y.u16 = D0.u16
+
+	D1.u16 = 0x17
+	D2.u16 = 0x0c
+	D3.u16 = 0x0d
+	D4.u16 = backup_px
+	fn01dc56()
+
+	objA0.value26 += (objA0.flags2a & 0x01) ? -1 : 1
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}

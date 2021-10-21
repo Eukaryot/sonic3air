@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\FunctionCompiler.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\Node.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\Parser.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\ParserHelper.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\Preprocessor.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\Token.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\TokenProcessing.cpp" />
+    <ClCompile Include="..\..\source\lemon\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\DataType.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\Function.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\FunctionWrapper.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\GlobalsLookup.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\Module.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\Opcode.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\Program.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\StoredString.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\OpcodeProcessor.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\provider\NativizedOpcodeProvider.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\provider\OptimizedOpcodeProvider.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\RuntimeFunction.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\Runtime.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\StandardLibrary.cpp" />
+    <ClCompile Include="..\..\source\lemon\translator\Nativizer.cpp" />
+    <ClCompile Include="..\..\source\lemon\translator\SourceCodeWriter.cpp" />
+    <ClCompile Include="..\..\source\lemon\translator\Translator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\FunctionCompiler.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\Node.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\Definitions.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\Parser.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\ParserHelper.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\ParserTokens.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\Preprocessor.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\Token.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\TokenProcessing.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\TokenTypes.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\Utility.h" />
+    <ClInclude Include="..\..\source\lemon\pch.h" />
+    <ClInclude Include="..\..\source\lemon\program\DataType.h" />
+    <ClInclude Include="..\..\source\lemon\program\Define.h" />
+    <ClInclude Include="..\..\source\lemon\program\Function.h" />
+    <ClInclude Include="..\..\source\lemon\program\FunctionWrapper.h" />
+    <ClInclude Include="..\..\source\lemon\program\GlobalsLookup.h" />
+    <ClInclude Include="..\..\source\lemon\program\Module.h" />
+    <ClInclude Include="..\..\source\lemon\program\Opcode.h" />
+    <ClInclude Include="..\..\source\lemon\program\OpcodeHelper.h" />
+    <ClInclude Include="..\..\source\lemon\program\Program.h" />
+    <ClInclude Include="..\..\source\lemon\program\StoredString.h" />
+    <ClInclude Include="..\..\source\lemon\program\Variable.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\OpcodeExecUtils.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\provider\NativizedOpcodeProvider.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\provider\OptimizedOpcodeProvider.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\RuntimeFunction.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\Runtime.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\RuntimeOpcode.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\RuntimeOpcodeContext.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\StandardLibrary.h" />
+    <ClInclude Include="..\..\source\lemon\translator\Nativizer.h" />
+    <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h" />
+    <ClInclude Include="..\..\source\lemon\translator\Translator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="lemonscript.natvis" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7F7D8740-C72D-44E2-A8A9-50265C4E8BD4}</ProjectGuid>
+    <RootNamespace>lemonscript</RootNamespace>
+    <ProjectName>lemonscript</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="workspace.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="workspace.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="workspace.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="workspace.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+    <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+    <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>tmp\lemonscript_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;LSB_FIRST;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>lemon/pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;LSB_FIRST;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>lemon/pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LSB_FIRST;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>lemon/pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LSB_FIRST;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>lemon/pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

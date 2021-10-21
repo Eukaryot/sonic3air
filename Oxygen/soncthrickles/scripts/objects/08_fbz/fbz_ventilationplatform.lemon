@@ -1,0 +1,91 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03bab2) end(0x03bb02)
+function void fn03bab2()
+{
+	objA0.mapping_offset = 0x03bbbe
+	objA0.sprite_attributes = 0x23ba
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+	objA0.animation.sprite = 2
+
+	D0.u16 = (objA0.subtype2c & 0x0c) >> 1
+	objA0.value32 = u16[0x03baaa + D0.s16]
+	u16[A0 + 0x30] = ((objA0.value32 + 1) >> 4) * ((objA0.subtype2c & 0xf0) >> 4)
+
+	objA0.update_address = 0x03bb08
+	fn03bb08()
+}
+
+
+//# address-hook(0x03bb08) end(0x03bb2e)
+function void fn03bb08()
+{
+	if ((level.framecounter + u16[A0 + 0x30]) & objA0.value32)
+	{
+		CheckForUnloadObject()
+		return
+	}
+
+	objA0.state = objA0.subtype2c & 0x03
+	objA0.state.former = 0x04
+	objA0.update_address = 0x03bb34
+	fn03bb34()
+}
+
+
+//# address-hook(0x03bb34) end(0x03bb80)
+function void fn03bb34()
+{
+	A1 = 0x03bb9a
+	Object.AlternativeAnimationUpdate()
+	if (objA0.animation.sprite != 0)
+	{
+		A1 = 0xffffb000
+		D6 = 3
+		fn03bb86()
+
+		A1 = 0xffffb04a
+		D6 = 4
+		fn03bb86()
+
+		if (objA0.base_state != 0)
+		{
+			objA0.base_state = 0
+			objA0.animation.sprite = 0x02
+			objA0.update_address = 0x03bb08
+		}
+	}
+	else
+	{
+		D1.u16 = 0x1b
+		D3.u16 = 0x11
+		D4.u16 = objA0.position.x.u16
+		PlatformCheckClimbOn()
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03bb86) end(0x03bb98)
+function void fn03bb86()
+{
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
+	{
+		objA0.flags2a &= ~bit
+		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= 0x02
+	}
+}

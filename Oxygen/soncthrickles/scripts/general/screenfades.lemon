@@ -1,0 +1,449 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+#if STANDALONE
+
+function u16 makeNormalPackedColor(u16 color)
+{
+	if (color & 0x8000)
+	{
+		// Convert from extended packed color to normal packed color (here by intentionally rounding down)
+		return ((color & 0x001c) >> 1) + ((color & 0x0380) >> 2) + ((color & 0x7000) >> 3)
+	}
+	return color
+}
+
+function u16 makeExtendedPackedColor(u16 color)
+{
+	if ((color & 0x8000) == 0)
+	{
+		// Convert from normal packed color to extended packed color
+		return 0x8000 + ((color & 0x000e) << 1) + ((color & 0x00e0) << 2) + ((color & 0x0e00) << 3)
+	}
+	return color
+}
+
+#endif
+
+
+
+//# address-hook(0x003b14) end(0x003b52)
+function void FadeInPalette()
+{
+	// Go through primary (k==0) and secondary (k==1) palette
+	u8 numPalettes = (level.water_present != 0) ? 2 : 1
+	for (u8 k = 0; k < numPalettes; ++k)
+	{
+		A0 = ((k == 0) ? 0xfffffc00 : 0xfffff080) + palette_fade.offset
+		A1 = ((k == 0) ? 0xfffffc80 : 0xfffff000) + palette_fade.offset
+		for (u8 i = 0; i <= palette_fade.count; ++i)
+		{
+			FadeInColor()
+		}
+	}
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		for (u8 k = 0; k < numPalettes; ++k)
+		{
+			A0 = ((k == 0) ? 0x802000 : 0x802300)
+			A1 = ((k == 0) ? 0x802180 : 0x802480)
+			for (u16 i = 0; i < 0xc0; ++i)
+			{
+				FadeInColor()
+			}
+		}
+	}
+
+	if (globalComponentTintColorB < 0xff)
+		globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0xff)
+	else if (globalComponentTintColorG < 0xff)
+		globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0xff)
+	else if (globalComponentTintColorR < 0xff)
+		globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0xff)
+#endif
+}
+
+
+//# address-hook(0x003b54) end(0x003b7e)
+function void FadeInColor()
+{
+	u16 color = u16[A0]
+	u16 target = u16[A1]
+	if (color != target)
+	{
+	#if STANDALONE
+		// Handle extended packed color format for target
+		if (target & 0x8000)
+		{
+			color = makeExtendedPackedColor(color)
+			if ((color & 0x7c00) < (target & 0x7c00))
+			{
+				color += min((target & 0x7c00) - (color & 0x7c00), 0x1000)
+			}
+			else if ((color & 0x03e0) < (target & 0x03e0))
+			{
+				color += min((target & 0x03e0) - (color & 0x03e0), 0x0080)
+			}
+			else if ((color & 0x001f) < (target & 0x001f))
+			{
+				color += min((target & 0x001f) - (color & 0x001f), 0x0004)
+			}
+		}
+		else
+		{
+			color = makeNormalPackedColor(color)
+	#else
+		{
+	#endif
+			if (color + 0x0200 <= target)
+			{
+				color += 0x0200
+			}
+			else if (color + 0x0020 <= target)
+			{
+				color += 0x0020
+			}
+			else
+		#if STANDALONE	// The original game does not perform this check, though there are situations where color is larger than target from the start (SSZ start)
+			if (color + 0x0002 <= target)
+		#endif
+			{
+				color += 0x0002
+			}
+		}
+		u16[A0] = color
+	}
+	A0 += 2
+	A1 += 2
+}
+
+
+//# address-hook(0x003b80) end(0x003bb6)
+function void SetPaletteFadedOut()
+{
+	if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
+	{
+	#if STANDALONE
+		// Avoid brief glitches while fading in from white into the HPZ emerald cave
+		if (global.zone_act == 0x1701)
+		{
+			palette_fade.range = 0x003f
+		}
+	#endif
+
+		SetPaletteToWhite()
+	}
+	else
+	{
+		zeroMemory(0xfffffc00 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
+		if (level.water_present)
+			zeroMemory(0xfffff080 + u32(palette_fade.offset), (palette_fade.count + 1) * 2)
+
+	#if STANDALONE
+		if (EXTENDED_CHARACTER_PALETTES && palette_fade.range < 0x2000)
+		{
+			zeroMemory(0x802000, 0x180)
+			if (level.water_present)
+			{
+				zeroMemory(0x802300, 0x180)
+			}
+		}
+
+		globalComponentTintColorR = 0
+		globalComponentTintColorG = 0
+		globalComponentTintColorB = 0
+		globalComponentAddedColorR = 0
+		globalComponentAddedColorG = 0
+		globalComponentAddedColorB = 0
+	#endif
+	}
+}
+
+
+//# address-hook(0x003be4) end(0x003c02)
+function void FadeOutScreenBlocking()
+{
+	palette_fade.range = 0x003f
+	D4.u16 = 0x15
+	while (D4.s16 >= 0)
+	{
+	#if STANDALONE
+		// Preserve former custom plane setup
+		enableCustomPlaneReset = false
+	#endif
+
+		global.frame_state = 0x12
+		waitForNextFrame()
+
+	@EntryPoint:
+		FadeOutPalette()
+		LoadRequiredSpritePatterns()
+		--D4.s16
+	}
+}
+
+
+//# address-hook(0x003c04) end(0x003c30)
+function void FadeOutPalette()
+{
+	// Go through primary (k==0) and secondary (k==1) palette
+	for (u8 k = 0; k < 2; ++k)
+	{
+		A0 = ((k == 0) ? 0xfffffc00 : 0xfffff080) + palette_fade.offset
+		for (u8 i = 0; i <= palette_fade.count; ++i)
+		{
+			FadeOutColor()
+		}
+	}
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		for (u8 k = 0; k < 2; ++k)
+		{
+			A0 = (k == 0) ? 0x802000 : 0x802300
+			for (u8 i = 0; i < 0xc0; ++i)
+			{
+				FadeOutColor()
+			}
+		}
+	}
+
+	if (globalComponentTintColorR > 0)
+		globalComponentTintColorR = max(globalComponentTintColorR - 0x25, 0)
+	else if (globalComponentTintColorG > 0)
+		globalComponentTintColorG = max(globalComponentTintColorG - 0x25, 0)
+	else if (globalComponentTintColorB > 0)
+		globalComponentTintColorB = max(globalComponentTintColorB - 0x25, 0)
+
+	if (globalComponentAddedColorR > 0)
+		globalComponentAddedColorR = max(globalComponentAddedColorR - 0x25, 0)
+	else if (globalComponentAddedColorG > 0)
+		globalComponentAddedColorG = max(globalComponentAddedColorG - 0x25, 0)
+	else if (globalComponentAddedColorB > 0)
+		globalComponentAddedColorB = max(globalComponentAddedColorB - 0x25, 0)
+#endif
+}
+
+
+//# address-hook(0x003c32) end(0x003c60)
+function void FadeOutColor()
+{
+	u16 color = u16[A0]
+#if STANDALONE
+	color = makeNormalPackedColor(color)
+#endif
+	if (color != 0)
+	{
+		if (color & 0x000e)
+		{
+			color -= 0x0002
+		}
+		else if (color & 0x00e0)
+		{
+			color -= 0x0020
+		}
+		else if (color & 0x0e00)
+		{
+			color -= 0x0200
+		}
+		u16[A0] = color
+	}
+	A0 += 2
+}
+
+
+//# address-hook(0x003c62) end(0x003c80)
+function void SetPaletteToWhite()
+{
+	for (u8 i = 0; i <= palette_fade.count; ++i)
+	{
+		u8 offset = palette_fade.offset + i*2
+		u16[0xfffffc00 + offset] = 0x0eee
+	}
+	u16[0xffffface] = 0
+
+#if STANDALONE
+	globalComponentTintColorR = 0
+	globalComponentTintColorG = 0
+	globalComponentTintColorB = 0
+	globalComponentAddedColorR = 0xff
+	globalComponentAddedColorG = 0xff
+	globalComponentAddedColorB = 0xff
+#endif
+}
+
+
+//# address-hook(0x003ca4) end(0x003cee)
+function void FadeInFromWhite()
+{
+	// Fading from a white screen to the target palette
+
+	--u16[0xffffface]
+	if (s16[0xffffface] >= 0)
+		return
+
+	u16[0xffffface] = 2
+
+	// Go through primary (k==0), and possibly secondary (k==1) palette
+	u8 numPalettes = (level.water_present != 0) ? 2 : 1
+	for (u8 k = 0; k < numPalettes; ++k)
+	{
+		A0 = ((k == 0) ? 0xfffffc00 : 0xfffff080) + palette_fade.offset
+		A1 = ((k == 0) ? 0xfffffc80 : 0xfffff000) + palette_fade.offset
+		for (u8 i = 0; i <= palette_fade.count; ++i)
+		{
+			FadeColorTowardsTarget()
+		}
+	}
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES && palette_fade.offset == 0)
+	{
+		for (u8 k = 0; k < numPalettes; ++k)
+		{
+			A0 = ((k == 0) ? 0x802000 : 0x802300)
+			A1 = ((k == 0) ? 0x802180 : 0x802480)
+			for (u16 i = 0; i < 0xc0; ++i)
+			{
+				FadeColorTowardsTarget()
+			}
+		}
+	}
+
+	globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0xff)
+	globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0xff)
+	globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0xff)
+	globalComponentAddedColorR = max(globalComponentAddedColorR - 0x25, 0)
+	globalComponentAddedColorG = max(globalComponentAddedColorG - 0x25, 0)
+	globalComponentAddedColorB = max(globalComponentAddedColorB - 0x25, 0)
+#endif
+}
+
+
+//# address-hook(0x003cf0) end(0x003d2e)
+function void FadeColorTowardsTarget()
+{
+	u16 color = u16[A0]
+	u16 target = u16[A1]
+#if STANDALONE
+	color  = makeNormalPackedColor(color)
+	target = makeNormalPackedColor(target)
+#endif
+
+	if ((color & 0x0eee) > (target & 0x0eee))
+	{
+		if ((color & 0x0e00) > (target & 0x0e00))
+		{
+			color -= 0x0200
+		}
+		if ((color & 0x00e0) > (target & 0x00e0))
+		{
+			color -= 0x0020
+		}
+		if ((color & 0x000e) > (target & 0x000e))
+		{
+			color -= 0x0002
+		}
+		u16[A0] = color
+	}
+	A0 += 2
+	A1 += 2
+}
+
+
+//# address-hook(0x003d30) end(0x003d4e)
+function void FadeScreenToWhiteBlocking()
+{
+	palette_fade.range = 0x003f
+	D4.u16 = 0x15
+	while (D4.s16 >= 0)
+	{
+		global.frame_state = 0x12
+		waitForNextFrame()
+
+		FadePaletteToWhite()
+		LoadRequiredSpritePatterns()
+		--D4.s16
+	}
+}
+
+
+//# address-hook(0x003d50) end(0x003d7c)
+function void FadePaletteToWhite()
+{
+	// Go through primary (k==0) and secondary (k==1) palette
+	for (u8 k = 0; k < 2; ++k)
+	{
+		A0 = ((k == 0) ? 0xfffffc00 : 0xfffff080) + palette_fade.offset
+		for (u8 i = 0; i <= palette_fade.count; ++i)
+		{
+			FadeColorToWhite()
+		}
+	}
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		for (u8 k = 0; k < 2; ++k)
+		{
+			A0 = ((k == 0) ? 0x802000 : 0x802300)
+			A1 = ((k == 0) ? 0x802180 : 0x802480)
+			for (u16 i = 0; i < 0xc0; ++i)
+			{
+				FadeColorToWhite()
+			}
+		}
+	}
+
+	if (globalComponentTintColorR > 0)
+		globalComponentTintColorR = max(globalComponentTintColorR - 0x25, 0)
+	else if (globalComponentTintColorG > 0)
+		globalComponentTintColorG = max(globalComponentTintColorG - 0x25, 0)
+	else if (globalComponentTintColorB > 0)
+		globalComponentTintColorB = max(globalComponentTintColorB - 0x25, 0)
+
+	if (globalComponentAddedColorR < 0xff)
+		globalComponentAddedColorR = min(globalComponentAddedColorR + 0x25, 0xff)
+	else if (globalComponentAddedColorG < 0xff)
+		globalComponentAddedColorG = min(globalComponentAddedColorG + 0x25, 0xff)
+	else if (globalComponentAddedColorB < 0xff)
+		globalComponentAddedColorB = min(globalComponentAddedColorB + 0x25, 0xff)
+#endif
+}
+
+
+//# address-hook(0x003d7e) end(0x003dbc)
+function void FadeColorToWhite()
+{
+	u16 color = u16[A0]
+#if STANDALONE
+	color = makeNormalPackedColor(color)
+#endif
+	if (color != 0x0eee)
+	{
+		if ((color & 0x000e) != 0x000e)
+		{
+			color += 0x0002
+		}
+		else if ((color & 0x00e0) != 0x00e0)
+		{
+			color += 0x0020
+		}
+		else if ((color & 0x0e00) != 0x0e00)
+		{
+			color += 0x0200
+		}
+		u16[A0] = color
+	}
+	A0 += 2
+}

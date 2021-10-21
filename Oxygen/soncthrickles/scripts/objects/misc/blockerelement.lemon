@@ -1,0 +1,306 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Non-damaging blocker element (GTGT in debug mode)     //
+//-------------------------------------------------------//
+
+//# address-hook(0x01ec18) end(0x01ec66)
+function void fn01ec18()
+{
+	objA0.mapping_offset = 0x01ecc6
+	objA0.sprite_attributes = 0x86bc
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x200
+	objA0.flags2a |= 0x80
+	objA0.box_size.x = ((objA0.subtype2c & 0xf0) >> 1) + 8
+	objA0.box_size.y = ((objA0.subtype2c & 0x0f) << 3) + 8
+
+	if (competition_mode.active)
+	{
+		objA0.update_address = 0x01ecaa
+	}
+	else
+	{
+		objA0.update_address = 0x01ec6c
+		fn01ec6c()
+	}
+}
+
+
+//# address-hook(0x01ec6c) end(0x01eca8)
+function void fn01ec6c()
+{
+	fn01ecaa()
+	BlockerElement.checkForUnloadAndDebugRender(0xffe0e0e0)
+}
+
+
+//# address-hook(0x01ecaa) end(0x01ecc2)
+function void fn01ecaa()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+}
+
+
+
+//-------------------------------------------------------//
+// Damaging blocker element (GTGT in debug mode)         //
+//-------------------------------------------------------//
+
+//# address-hook(0x01f3ea) end(0x01f3f0)
+function void fn01f3ea()
+{
+	objA0.flags2b |= 0x20
+	fn01f3f8()
+}
+
+
+//# address-hook(0x01f3f2) end(0x01f4f2)
+function void fn01f3f2()
+{
+	objA0.flags2b |= 0x10
+	fn01f3f8()
+}
+
+
+//# address-hook(0x01f3f8) end(0x01f458)
+function void fn01f3f8()
+{
+	objA0.mapping_offset = 0x01ecc6
+	objA0.sprite_attributes = 0x86bc
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	objA0.flags2a |= 0x80
+	objA0.box_size.x = (u16(objA0.subtype2c & 0xf0) + 0x10) >> 1
+	objA0.box_size.y = (u16(objA0.subtype2c & 0x0f) + 0x01) << 3
+
+	if (objA0.flags2a & 0x01)
+	{
+		objA0.update_address = 0x01f4c4
+	}
+	else if (objA0.flags2a & 0x02)
+	{
+		objA0.update_address = 0x01f528
+	}
+	else
+	{
+		objA0.update_address = 0x01f45e
+		fn01f45e()
+	}
+}
+
+
+//# address-hook(0x01f45e) end(0x01f4c2)
+function void fn01f45e()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	if (objA0.flags2a & 0x08)
+	{
+		A1 = 0xffffb000
+		BlockerElement.DoDamage()
+	}
+	if (objA0.flags2a & 0x10)
+	{
+		A1 = 0xffffb04a
+		BlockerElement.DoDamage()
+	}
+
+	BlockerElement.checkForUnloadAndDebugRender(0xff80ffff)
+}
+
+
+
+// Object that is (flipped) GTGT
+
+//# address-hook(0x01f528) end(0x01f58a)
+function void fn01f528()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x04)
+	{
+		A1 = 0xffffb000
+		BlockerElement.DoDamage()
+	}
+	if (D6.u8 & 0x08)
+	{
+		A1 = 0xffffb04a
+		BlockerElement.DoDamage()
+	}
+
+	BlockerElement.checkForUnloadAndDebugRender(0xff8080ff)
+}
+
+
+//# address-hook(0x01f58c) end(0x01f59e)
+function void BlockerElement.DoDamage()
+{
+	// Check if character is protected by shield against this damage type
+	D0.u8 = objA0.flags2b & 0x73
+	if ((D0.u8 & u8[A1 + 0x2b]) == 0)
+	{
+		DamageCharacter()
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Killing blocker element (GTGT in debug mode)          //
+//-------------------------------------------------------//
+
+//# address-hook(0x01f5a0) end(0x01f600)
+function void fn01f5a0()
+{
+	objA0.mapping_offset = 0x01ecc6
+	objA0.sprite_attributes = 0x86bc
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	objA0.flags2a |= 0x80
+	objA0.box_size.x = (u16(objA0.subtype2c & 0xf0) + 0x10) >> 1
+	objA0.box_size.y = (u16(objA0.subtype2c & 0x0f) + 0x01) << 3
+
+	if (objA0.flags2a & 0x01)
+	{
+		// Kills character entering from the sides (orange debug color)
+		objA0.update_address = 0x01f66c
+	}
+	else if (objA0.flags2a & 0x02)
+	{
+		// Kills character entering from below (yellow debug color)
+		objA0.update_address = 0x01f6d0
+	}
+	else
+	{
+		// Kills character entering from the top (red debug color)
+		objA0.update_address = 0x01f606
+		fn01f606()
+	}
+}
+
+
+//# address-hook(0x01f606) end(0x01f66a)
+function void fn01f606()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	if (objA0.flags2a & 0x08)
+	{
+		A1 = 0xffffb000
+		BlockerElement.KillCharacter()
+	}
+	if (objA0.flags2a & 0x10)
+	{
+		A1 = 0xffffb04a
+		BlockerElement.KillCharacter()
+	}
+
+	BlockerElement.checkForUnloadAndDebugRender(0xffffa0a0)
+}
+
+
+//# address-hook(0x01f66c) end(0x01f6ce)
+function void fn01f66c()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x01)
+	{
+		A1 = 0xffffb000
+		BlockerElement.KillCharacter()
+	}
+	if (D6.u8 & 0x02)
+	{
+		A1 = 0xffffb04a
+		BlockerElement.KillCharacter()
+	}
+
+	BlockerElement.checkForUnloadAndDebugRender(0xffffc080)
+}
+
+
+//# address-hook(0x01f6d0) end(0x01f732)
+function void fn01f6d0()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x04)
+	{
+		A1 = 0xffffb000
+		BlockerElement.KillCharacter()
+	}
+	if (D6.u8 &= 0x08)
+	{
+		A1 = 0xffffb04a
+		BlockerElement.KillCharacter()
+	}
+
+	BlockerElement.checkForUnloadAndDebugRender(0xffffff80)
+}
+
+
+//# address-hook(0x01f734) end(0x01f744)
+function void BlockerElement.KillCharacter()
+{
+	u16 backupD6 = D6.u16
+	u32 backupA0 = A0
+	A0 = A1
+	Character.Die()
+	A0 = backupA0
+	D6.u16 = backupD6
+}
+
+
+function void BlockerElement.checkForUnloadAndDebugRender(u32 color)
+{
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 > 0x0280)
+	{
+		Object.DespawnAndUnload()
+	}
+	else if (debug_mode.state)
+	{
+		DrawObject()
+
+	#if STANDALONE
+		debugDrawOutlineRect(objA0.position.x.u16 - objA0.box_size.x, objA0.position.y.u16 - objA0.box_size.y, s16(objA0.box_size.x) * 2, s16(objA0.box_size.y) * 2, color)
+		debugDrawRect(objA0.position.x.u16 - objA0.box_size.x, objA0.position.y.u16 - objA0.box_size.y, s16(objA0.box_size.x) * 2, s16(objA0.box_size.y) * 2, (color & 0xffffff) + (((color >> 24) / 2) << 24))
+	#endif
+	}
+}

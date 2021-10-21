@@ -1,0 +1,619 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Globals in RAM                                        //
+//-------------------------------------------------------//
+
+
+// 0xffff8000 .. 0xffff8fff
+// Level chunk data
+//  - u16[0xffff8000] = level width in chunks (each chunk is 0x80 pixels wide)
+//  - u16[0xffff8002] = background width in chunks (each chunk is 0x80 pixels wide)
+//  - u16[0xffff8004] = level height in chunks (each chunk is 0x80 pixels high)
+//  - u16[0xffff8006] = background height in chunks (each chunk is 0x80 pixels high)
+//  - from 0xffff8008 on = RAM addresses of chunk data for each line, two words per line
+//     - first word = foreground
+//     - second word = background
+
+
+// 0xffffb000 .. 0xffffcfcb
+// Game objects (up to 110 of them), including some reserved slots:
+//  - 0xffffb000 = main character
+//  - 0xffffb04a = second character
+//  - 0xffffb0de = HUD element 1 (things like Time Over text)
+//  - 0xffffb128 = HUD element 2 (dito)
+//  - 0xffffcb2c = Underwater handler object for S/K
+//  - 0xffffcb76 = Underwater handler object for Tails
+//  - 0xffffcbc0 = After-images effect
+//  - 0xffffcc0a = Tails' tails
+//  - 0xffffcc54 = Dust cloud / water splash effect for S/K
+//  - 0xffffcc9e = Dust cloud / water splash effect for Tails
+//  - 0xffffcce8 = Shield
+//  - 0xffffcd32 = Shield (secondary slot, whatever this is used for...?)
+//  - 0xffffcd7c = Invincibility effect; also used for first Super Flicky (for Hyper Tails)
+//  - 0xffffcdc6 = 2nd Super Flicky
+//  - 0xffffce10 = 3rd Super Flicky
+//  - 0xffffce5a = 4th Super Flicky
+//  - 0xffffcea4 = Another invincibility effect...?
+//  - 0xffffcf82 = HCZ waves effect
+
+
+// 0xffffd000 .. 0xffffdfff
+// Kosinski decompression buffer
+//  - Buffer for decompressed Kosinski data that should be copied to VRAM
+
+
+// 0xffffe380 .. 0xffffe3ff
+// Table of dynamic objects in range
+//  - First word is twice the number of objects in the table
+//  - One word for object, telling us its RAM address (lower u16 part only)
+
+
+// 0xffffe41c .. 0xffffe450
+// Part of state backup, see below
+// But inside Blue Spheres special stage, these have a different usage, see "defines_bluespheres.lemon"
+
+
+// 0xffffe400 .. 0xffffe4ff
+// State backup (at least in normal game, partly used differently in Blue Spheres)
+// 64 entries of 4 bytes:
+//  - one word: control state backup (state and pressed, like e.g. control.player1)
+//  - one byte: flags (char.flags)
+//  - one byte: upper byte of sprite attributes, includes the priority flag
+
+// 0xffffe500 .. 0xffffe5ff
+// Position backup consisting of 64 entries of positions (x and y, both u16)
+
+// 0xffffe600 .. 0xffffe64f
+// Record times and characters in competition mode
+//  - u32[0xffffe600] is best time, u32[0xffffe604] is second, u32[0xffffe608] is third
+//  - u8[0xffffe60c] is best time character, u8[0xffffe60d] is second, u8[0xffffe60e] is third
+//  - Above addresses for ALZ, add 0x10 for BPZ, etc.
+
+
+define global.active_saveslot	= u32[0xffffe660]	// Pointer to the active save game slot data (either zero, or 0xffffe6ac, 0xffffe6b6, ..., 0xffffe6f2)
+
+// 0xffffe6ac .. 0xffffe6fb
+// Save game slots, 8 slots with 10 bytes each:
+//  -  u8[x + 0x00] = 0x80 for unused slot, 0 if game was not completed yet, 1 if completed without emeralds, 2 if completed with all Chaos Emeralds, 3 if completed with all Super Emeralds
+//  -  u8[x + 0x01] = seems to be unused in original -- S3AIR stores a randomly generated value here, as basis for global.game_random_base
+//  -  u8[x + 0x02] = upper 4 bits for characters (see CHARS_* constants); lower 4 bits for last collected emerald...?
+//  -  u8[x + 0x03] = zone number (seems to use the order as presented to the player!)
+//  - u16[x + 0x04] = bitmask of Giant Rings already entered in the current zone
+//  - u16[x + 0x06] = compact representation of emerald collection states (see 0xffffffb2)
+//  -  u8[x + 0x08] = lives
+//  -  u8[x + 0x09] = continues
+
+// Note that for S3AIR, from 0x801100 on there's more space to save additional data
+
+
+// Addresses from 0xffffe700:
+// Ring state table
+//  - one word per ring
+//  - initially 0x0000 (not collected)
+//  - used for animation (one bytes is animation frame, the other a timer)
+//  - stops at 0xffff
+
+
+// 0xffffeb00 .. 0xffffedff
+// Object respawn table (for almost all levels, but not in GS)
+// Each entry is one byte:
+//  - flag 0x01 = used by monitors (and possibly other objects), when it should spawn in a broken state
+//  - flag 0x80 = if set, object must not spawn again; can be because it's currently loaded or because it got removed entirely (e.g. defeated badniks)
+
+
+define player1.camera_lock		=  u8[0xffffee0a]	// If set (either 1 or 0xff), camera movement is locked
+define player2.camera_lock		=  u8[0xffffee0b]	// Same as above for player 2 in competition mode
+
+define move_area.bottom.target	= u16[0xffffee12]	// Bottom border where camera (and character) can move (minus screen height, usually 224)
+define move_area.left			= u16[0xffffee14]	// Left border where character can move (minus 0x10 = 16)
+define move_area.right			= u16[0xffffee16]	// Right border where character can move (plus 0x128 = 296)
+define level.vertical_wrap		= u16[0xffffee18]	// 0xff00 if vertical wrap is used
+define move_area.bottom.current	= u16[0xffffee1a]	// Bottom border where camera (and character) can move (minus screen height, usually 224)
+define camera.locktime.player1	= u16[0xffffee24]	// Set e.g. when spindashing to hold camera in place for some frames
+define posbackup.offset.player1 = u16[0xffffee26]	// Offset to be added to 0xffffe500 for next position backup, and to 0xffffe400 for state backup; this offset is always between 0x00 and 0xfc
+define camera.locktime.player2	= u16[0xffffee28]	// Set e.g. when spindashing to hold camera in place for some frames
+define posbackup.offset.player2 = u16[0xffffee2a]	// Offset to be added to 0xffffe400 for next position backup of player 2 (in competition mode only!)
+define camera.yoffset.player	= u16[0xffffee2c]	// Camera Y-offset by looking up/down (default is 0x60)
+define camera.yoffset.tails		= u16[0xffffee2e]	// Camera Y-offset by looking up/down (default is 0x60)
+define camera.update_routine	=  u8[0xffffee33]
+
+define rings.around.first		= u32[0xffffee42]	// Static data address of first ring in area around main character (considering x-position only)
+define rings.around.last		= u32[0xffffee46]	// Static data address of last ring in area around main character
+define rings.around.first.state	= u16[0xffffee4a]	// RAM address of dynamic state of the first ring in area around main character
+
+
+// Regular zones:
+//  0x00 = AIZ - Angel Island
+//  0x01 = HCZ - Hydrocity
+//  0x02 = MGC - Marble Garden
+//  0x03 = CNZ - Carnival Night
+//  0x05 = ICZ - IceCap
+//  0x06 = LBZ - Launch Base
+//  0x07 = MHZ - Mushroom Hill
+//  0x04 = FBZ - Flying Battery
+//  0x08 = SOZ - Sandopolis
+//  0x09 = LRZ - Lava Reef
+//  0x0a = SSZ - Sky Sanctuary (0x0a00 for Sonic/Tails, 0x0a01 for Knuckles' End Bosses)
+//  0x0b = DEZ - Death Egg
+//  0x0c = DDZ - Doomsday (0x0c00)
+//  0x0d = Outro for Sonic/Tails (0x0d01)
+//  0x16 = Lava Reef Boss for Sonic/Tails (0x1600), Hidden Palace (0x1601)
+//  0x17 = Hidden Palace emerald cave when entered through Giant Ring (0x1701), Death Egg Boss (0x1700)
+//
+// Competition mode:
+//  0x0e = Azure Lake
+//  0x0f = Balloon Park
+//  0x10 = Desert Palace
+//  0x11 = Chrome Gadget
+//  0x12 = Endless Mine
+//
+// Bonus stages:
+//  0x13 = GM - Gumball Machine
+//  0x14 = GS - Glowing Spheres
+//  0x15 = SM - Slot Machine
+
+define global.zone.apparent		=  u8[0xffffee4e]	// Same as global.zone
+define global.act.apparent		=  u8[0xffffee4f]	// Same as global.act, except for burnt AIZ 1 and last part of ICZ 1 - then this is still 0, though global.act is 1 already
+define global.zone_act.apparent	= u16[0xffffee4e]
+
+define global.fade_timer		= s16[0xffffee50]
+define level.skip_titlecard		=  u8[0xffffee5e]	// If set (to 0xff), this will skip the title card in the next level loading
+// Others inside 0xffffee52 to 0xffffee5f seem to be used only in competition mode
+
+// Actual camera position
+//  -> y-coordinate seems to be measured in half pixels
+define camera.position.x		= u32[0xffffee78]
+define camera.position.x.u16	= u16[0xffffee78]
+define camera.position.x.frac	= u16[0xffffee7a]
+define camera.position.y		= u32[0xffffee7c]
+define camera.position.y.u16	= u16[0xffffee7c]
+define camera.position.y.frac	= u16[0xffffee7e]
+
+// Foreground scroll position (used for world rendering) -- basically a copy of camera position
+define camera.foreground.x		= u32[0xffffee80]
+define camera.foreground.x.u16	= u16[0xffffee80]
+define camera.foreground.x.frac	= u16[0xffffee82]
+define camera.foreground.y		= u32[0xffffee84]
+define camera.foreground.y.u16	= u16[0xffffee84]
+define camera.foreground.y.frac	= u16[0xffffee86]
+define camera.foreground.x.old	= u16[0xffffee88]
+define camera.foreground.y.old	= u16[0xffffee8a]
+
+define camera.background.x		= u32[0xffffee8c]
+define camera.background.x.u16	= u16[0xffffee8c]
+define camera.background.x.frac	= u16[0xffffee8e]
+define camera.background.y		= u32[0xffffee90]
+define camera.background.y.u16	= u16[0xffffee90]
+define camera.background.y.frac	= u16[0xffffee92]
+define camera.background.x.old	= u16[0xffffee94]
+define camera.background.y.old	= u16[0xffffee96]
+
+define gfx.plane_update_routine = u16[0xffffeea6]
+
+define level.height.bitmask		= u16[0xffffeeaa]	// Used especially for vertical wrap
+define level.height.tilemask	= u16[0xffffeeac]	// The same as above, but rounded down to full multiple of 0x10
+define level.chunksize.bitmask	= u16[0xffffeeae]	// 0x7c or 0x3c in normal game, 0x0c in competition mode
+
+define level.special_scrolling	= u16[0xffffeeb2]	// Special scrolling routine
+define level.scrolling_routine	= u16[0xffffeec2]
+
+define camera.screenshake.state.hi	  =  u8[0xffffeecc]
+define camera.screenshake.state		  = u16[0xffffeecc]
+define camera.screenshake.offset	  = s16[0xffffeece]
+define camera.screenshake.prev_offset = s16[0xffffeed0]
+
+define level.display_routine	= u16[0xffffeed2]
+
+// 0xffffeeea .. 0xffffef39
+// Vertical scroll offsets (2x 20 interleaved words for foreground and background, covering the 320 pixels of original screen width)
+
+define competition_mode.mode		=  u8[0xffffef48]	// 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
+define competition_mode.multiplay	=  u8[0xffffef49]	// 0 for single player, 1 for 2P multiplay
+define competition_mode.stage		=  u8[0xffffef4a]	// 0 for ALZ, 1 for BPZ, etc. (always 0 in Grand Prix!)
+
+define dataselect.slot_selected	=  u8[0xffffef4b]
+
+define level.object_type_table	= u32[0xffffef5a]	// Address of lookup table that maps object type ID to object logic address
+define level.despawn_position.y	= u16[0xffffef64]	// Only really used in Glowing Spheres
+define camera.hyper_knux_shake	= u16[0xffffef66]	// Set to 0x14 when Hyper Knuckles glides into a wall fast enough, then counting down
+
+define global.pause_disabled	= u16[0xffffef72]	// Only used in outro
+define global.pause_disabled.u8	=  u8[0xffffef72]
+
+define rolling_demo.input_timer	=  u8[0xffffef78]	// Frames until next input change from pre-recorded rolling demo data is applied
+define rolling_demo.last_input	=  u8[0xffffef79]	// Last input during rolling demo
+
+
+// 0xfffff000 ... 0xfffff0ff
+// Secondary palette, typically used underwater
+// Each of the following is 64 packed color entries:
+//  - 0xfffff000 ... 0xfffff07f   -> Palette with no fading applied
+//  - 0xfffff080 ... 0xfffff0ff   -> Palette with fading applied (same as above when no fading is active)
+
+
+// 0xfffff100 ... 0xfffff57f (end according to http://info.sonicretro.org/SCHG:Sonic_the_Hedgehog_3_%26_Knuckles/RAM_Editing)
+// Plane pattern update table
+//  - Contains a list of tile rows and columns to be updated
+//  - Each table entry consists of a 4 byte header and a payload of varying size
+// Table entry:
+//  - First word:  VRAM address where to begin writing; can be zero to indicate the end of the table
+//  - Second word: Number of tiles (not patterns) to update, minus one; uppermost bit is set for a row, cleared for a column
+//  - Payload:     This is the data to be written to VRAM; it's 4 bytes for each tile to be copied (one tile is two u16 patterns)
+
+
+// Game mode:
+//  - 0x00 = Initialization
+//  - 0x04 = SEGA logo, Intro, Title Screen
+//  - 0x08 = Rolling Demo
+//  - 0x0c = Main Game
+//  - ...more see "GameModeControlLoop()"
+//  + Flag 0x80 is set during loading for some modes (incl. Main Game)
+define global.game_mode			=  u8[0xfffff600]
+
+
+
+// --- Controls ---
+
+// Control flags see CONTROL_* constants
+//  - *.state is current pressed state of buttons
+//  - *.pressed contains only buttons just changed to pressed state in this very frame
+define control.player1			= u16[0xfffff602]
+define control.player1.state	=  u8[0xfffff602]
+define control.player1.pressed	=  u8[0xfffff603]
+
+define control.pad1				= u16[0xfffff604]
+define control.pad1.state		=  u8[0xfffff604]
+define control.pad1.pressed		=  u8[0xfffff605]
+
+define control.pad2				= u16[0xfffff606]
+define control.pad2.state		=  u8[0xfffff606]
+define control.pad2.pressed		=  u8[0xfffff607]
+
+// Deprecated old names for the "control.pad2" defines (left in for compatibility with existing mods)
+//  -> They are somewhat misleading, as these are mostly used in the same way as first controller's "control.pad1", but not "control.player1" (thanks to Veenee)
+define control.player2			= u16[0xfffff606]
+define control.player2.state	=  u8[0xfffff606]
+define control.player2.pressed	=  u8[0xfffff607]
+
+
+
+define global.demo_countdown	= u16[0xfffff614]
+
+define scrolloffset.y.both		= u32[0xfffff616]
+define scrolloffset.y.planeA	= u16[0xfffff616]
+define scrolloffset.y.planeB	= u16[0xfffff618]
+// 0xfffff61a...0xfffff61d are presumably the same, but for player 2 in competition mode
+
+define unused.teleport_timer	=  u8[0xfffff622]	// Unused leftover from Sonic 2
+define unused.teleport_active	=  u8[0xfffff623]	// Unused leftover from Sonic 2
+
+define h_int.configuration		= u16[0xfffff624]	// Usually 0x8a## (with ## = h_int.line)
+define h_int.line				=  u8[0xfffff625]
+
+define palette_fade.offset		=  u8[0xfffff626]	// Offset in bytes of first palette entry to be affected by fade effects; divide by two to get the palette entry index
+define palette_fade.count		=  u8[0xfffff627]	// Number of palette entries minus one (!) to be affected by fade effects
+define palette_fade.range		= u16[0xfffff626]	// Both of the above combined; default value is 0x003f
+
+define global.lag_frames		= u16[0xfffff628]
+
+// Known states:
+//  0x00 = Blank screen / loading, used in various places
+//  0x02 = Used in some first title prelude frames
+//  0x04 = Title screen & also in some prelude frames
+//  0x08 = Main game incl. cutscenes
+//  0x0c = Loading a level
+//  0x12 = Transition / screen fading
+//  0x14 = SEGA logo (after its initial fade)
+//  0x16 = Level select screen
+//  0x1e = Data select screen & competition mode menus
+define global.frame_state		=  u8[0xfffff62a]	// Gets reset to 0 in V-INT
+
+define water.palette.source		= u32[0xfffff62e]	// Address with description data how and where to load secondary palette
+
+define global.random.seed		= u32[0xfffff636]
+
+define global.game.paused		= u16[0xfffff63a]	// true when game is paused (in standalone, this is never the case)
+define water.height.current		= u16[0xfffff646]
+define water.height.next		= u16[0xfffff648]	// Most of the time, this is the same as "water.height.current"
+define water.height.target		= u16[0xfffff64a]
+define water.height.changerate	=  u8[0xfffff64c]	// Change per frame of height towards target
+
+define water.transition_counter	=  u8[0xfffff64d]	// Counts how often Sonic switched between above and under water
+define water.fullscreen			=  u8[0xfffff64e]	// This is set to 0x01 if the whole screen is underwater
+
+define super.palettefx.frame	= u16[0xfffff65c]
+define super.palettefx.timer	=  s8[0xfffff65e]	// Only for Sonic / Knuckles, as Tails has his own version (though he sometimes uses this one as well...?)
+define super.palettefx.state	=  u8[0xfffff65f]
+
+define level.dualplanecollision	=  u8[0xfffff664]	// If set (to 0xff), game checks against two collision planes instead of just one
+define global.passing_floor		=  u8[0xfffff665]	// If set (to 0xff), hitting the lower level border won't lead to a death (e.g. in MGZ 2 S/T boss)
+define global.whiteflash_timeout=  u8[0xfffff666]	// Gets set to 4 by Hyper Dash, decreases every frame
+
+define super.active.tails		   =  u8[0xfffff667]
+define super.palettefx.frame.tails =  u8[0xfffff668]
+define super.palettefx.timer.tails =  s8[0xfffff669]
+define control.tails			   = u16[0xfffff66a]
+define control.tails.state		   =  u8[0xfffff66a]
+define control.tails.pressed	   =  u8[0xfffff66b]
+
+define super.ring_dec.frames	= s16[0xfffff670]	// Frame countdown until Super Sonic consumes next ring
+
+define camera.use_forced_target	=  u8[0xfffff676]
+define camera.forced_target.x	= u16[0xfffff678]
+define camera.forced_target.y	= u16[0xfffff67c]
+
+
+// 0xfffff680 ... 0xfffff6df  -> Pattern loading request table
+
+
+define tails.control_counter	= u16[0xfffff702]	// Time in frames until AI takes over control again
+define tails.respawn_counter	= u16[0xfffff704]	// Counts up when Tails is offscreen, until 300 frames
+define tails.ai_routine			= u16[0xfffff708]	// Routine used to control second player Tails; see comments in "Character.TailsAI.Update"
+define tails.flight_target.x	= u16[0xfffff70a]	// Automatic flight target position after respawn
+define tails.flight_target.y	= u16[0xfffff70c]	// Automatic flight target position after respawn
+define tails.up_press_timer		=  u8[0xfffff70e]	// Timer controlling when to virtually press up again for hovering Tails AI (especially for MGZ 2 boss)
+define tails.ai_jumping			=  u8[0xfffff70f]
+
+define rings.update_routine		=  u8[0xfffff710]
+define global.level_started		=  s8[0xfffff711]	// Can be negative, which causes the HUD to fly in at the start
+define level.water_present		=  u8[0xfffff730]
+
+define tails.carrying			=  u8[0xfffff73e]	// If Tails carries another character, this is 1, otherwise 0
+define tails.catch_timeout		=  u8[0xfffff73f]	// Frames remaining until Tails can catch other character again
+define tails.carried_velocity_x	= s16[0xfffff744]	// Backup of velocity.x of carried character
+// u8[0xfffff74a] = player 1 died in competition mode
+// u8[0xfffff74b] = player 2 died in competition mode
+define tails.carried_velocity_y	= s16[0xfffff74c]	// Backup of velocity.y of carried character
+
+define knuckles.glideclimbstate	=  u8[0xfffff74e]	// Flag 0x02 is set while gliding / climbing / falling, flag 0x20 while climbing (values are invalid when neither is true)
+define knuckles.preventclimbing	=  u8[0xfffff74f]	// Flag 0x80 is set in situations when Knuckles can't climb walls (e.g. MGZ earthquake sections)
+
+define global.move.speedcap		= u16[0xfffff760]	// Speed cap for normal running (common value is 0x0600)
+define global.move.acceleration	= u16[0xfffff762]	// Acceleration (common value is 0x000c)
+define global.move.deceleration	= u16[0xfffff764]	// Deceleration (common value is 0x0080)
+
+define dynobjects.routine		=  u8[0xfffff76c]
+define dynobjects.areastart.x	= u16[0xfffff76e]	// Left camera border chunk position-x
+define dynobjects.areastart.y	= u16[0xfffff770]	// Upper camera border chunk position-y
+define dynobjects.addr.end		= u32[0xfffff772]	// ROM address of next object after x-area around screen
+define dynobjects.addr.begin	= u32[0xfffff776]	// ROM address of first object in x-area around screen
+define dynobjects.respawn.end	= u16[0xfffff77a]	// Something with next object after x-area around screen
+define dynobjects.respawn.begin	= u16[0xfffff77c]	// Something with first object in x-area around screen
+
+define level.boss_encounter		=  u8[0xfffff7aa]	// Set to 1 if in boss fight or similar (like transition to burning AIZ)
+
+// 0xfffff7b0 and 0xfffff7b1 are used as rotations for the two characters by objects like spinning cylinders
+
+define global.level_flag02		=  u8[0xfffff7c2]	// Used only in LBZ 2
+
+define global.inv_gravity		=  u8[0xfffff7c6]	// Set to 1 if inverse gravity is used (Deathegg Act 2)
+define player1.control_override	=  s8[0xfffff7ca]	// If set to 1 or 0xff, first character cannot be controlled
+define player2.control_override	=  s8[0xfffff7cb]	// If set to 1 or 0xff, second character cannot be controlled
+
+define score.bonus_counter		= u16[0xfffff7d0]	// Needed for increases bonusses when destroying multiple enemies in a row
+define results.time_bonus		= u16[0xfffff7d2]	// Time bonus value in level results; also used for Perfect bonus in special stage results
+define results.ring_bonus		= u16[0xfffff7d4]	// Ring bonus value in level and special stage results
+
+define level.despawn_position.x	= u16[0xfffff7da]
+
+define level.trigger00			=  u8[0xfffff7e0] 	// Level-specific triggers, e.g. by pressing buttons
+define level.trigger01			=  u8[0xfffff7e1]
+define level.trigger02			=  u8[0xfffff7e2]
+define level.trigger03			=  u8[0xfffff7e3]
+define level.trigger04			=  u8[0xfffff7e4]
+define level.trigger05			=  u8[0xfffff7e5]
+define level.trigger06			=  u8[0xfffff7e6]
+define level.trigger07			=  u8[0xfffff7e7]
+define level.trigger08			=  u8[0xfffff7e8]
+define level.trigger09			=  u8[0xfffff7e9]
+define level.trigger0a			=  u8[0xfffff7ea]
+define level.trigger0b			=  u8[0xfffff7eb]
+define level.trigger0c			=  u8[0xfffff7ec]
+define level.trigger0d			=  u8[0xfffff7ed]
+define level.trigger0e			=  u8[0xfffff7ee]
+define level.trigger0f			=  u8[0xfffff7ef]
+
+
+
+// 0xfffff800 ... 0xfffffa7f
+// Sprite data buffer, containing sprite data to be copied to VRAM (usually to VRAM address 0xf800)
+// This is an array of entries with 8 bytes size in the VDP sprite format:
+//  - 2 bytes = Position-y on screen (plus 0x80 added)
+//  - 1 byte  = Encoded size, number of patterns in width and height
+//  - 1 byte  = Unused, stays 0 ?
+//  - 2 bytes = Encoded start pattern data (include atex and flip flags as well)
+//  - 2 bytes = Position-x on screen (plus 0x80 added)
+
+
+
+define screenmover_target.right	= u16[0xfffffa92]
+define screenmover_target.left	= u16[0xfffffa94]
+define screenmover_target.top	= u16[0xfffffa96]
+define screenmover_target.bottom= u16[0xfffffa98]
+
+define level.signpost.address	= u16[0xfffffaa6]	// RAM address of current signpost
+define level.wait_for_results	=  u8[0xfffffaa8]	// Set to 0xff when waiting for level results to complete
+define level.results_done		=  u8[0xfffffaaa]	// Set to 0xff when level results are completed
+
+define level.bossarea.top		= u16[0xfffffab0]
+define level.bossarea.bottom	= u16[0xfffffab2]
+define level.bossarea.left		= u16[0xfffffab4]
+define level.bossarea.right		= u16[0xfffffab6]
+
+define level.capsule_opened		=  u8[0xfffffacd]
+
+
+// 0xfffffc00 ... 0xfffffcff
+// Primary palette
+// Each of the following is 64 packed color entries:
+//  - 0xfffffc00 ... 0xfffffc7f   -> Palette with fading applied (same as below when no fading is active)
+//  - 0xfffffc80 ... 0xfffffcff   -> Palette with no fading applied
+
+
+// 0xfffffd00 ... 0xfffffdff  -> Reserved for system stack
+
+
+
+define level.restart			= u16[0xfffffe02]	// Set this to anything != 0 to trigger a level restart
+define level.restart.u8			=  u8[0xfffffe02]	// Upper 8 bits, sometimes used instead of the u16 version
+define level.framecounter		= u16[0xfffffe04]	// Gets updated by game simulation, i.e. not counting lag frames
+define level.framecounter.low	=  u8[0xfffffe05]	// Lower 8 bits of frame counter
+
+define debug_mode.selection		=  u8[0xfffffe06]
+define debug_mode.state			= u16[0xfffffe08]
+define debug_mode.move_delay	=  u8[0xfffffe0a]
+define debug_mode.move_speed	=  u8[0xfffffe0b]	// Current camera movement speed (initially 0x0f, increases while holding direction button)
+
+define global.framecounter		= u32[0xfffffe0c]	// Gets updated once per frame, i.e. counting lag frames
+define global.framecounter.u16	= u16[0xfffffe0e]	// Lower 16 bits of frame counter
+define global.framecounter.low	=  u8[0xfffffe0f]	// Lower 8 bits of frame counter
+
+define global.zone				=  u8[0xfffffe10]
+define global.act				=  u8[0xfffffe11]	// 0 or 1 -- note that in burnt AIZ 1 and last part of ICZ 1, this is 1 already (also see global.act.apparent)
+define global.zone_act			= u16[0xfffffe10]
+
+define lives_counter			=  u8[0xfffffe12]
+define global.next_bluespheres	=  u8[0xfffffe16]	// Number of next Blue Spheres special stage (between 0 and 6)
+define continues_counter		=  u8[0xfffffe18]
+define super.active				=  u8[0xfffffe19]	// 0x01 for Super, 0xff for Hyper
+
+define global.time_over			=  u8[0xfffffe1a]
+define extra_lives_granted		=  u8[0xfffffe1b]	// Bitmask for continue (bit 0), and extra lives at 100 and 200 rings (bits 1, 2); see "checkForExtraLifeByRings()" for details
+define hud.dirty.lives			=  u8[0xfffffe1c]	// Gets increased for each life earned this frame
+define hud.dirty.rings			=  u8[0xfffffe1d]	// Flags: 0x01 to update last digit only, 0x80 to update all digits
+define hud.dirty.timer			=  u8[0xfffffe1e]	// If zero, time is stopped; usual value is 0x01
+define hud.dirty.score			=  u8[0xfffffe1f]	// Set to 0x01 to update the score
+
+define ring_counter				= u16[0xfffffe20]
+define timer.alldata			= u32[0xfffffe22]
+define timer.minutes			=  u8[0xfffffe23]
+define timer.seconds			=  u8[0xfffffe24]
+define timer.frames				=  u8[0xfffffe25]	// Frames inside current second
+define player.score				= u32[0xfffffe26]	// Score * 0.1
+
+define checkpoint.number			=  u8[0xfffffe2a]	// Starpost number of last checkpoint (gets reset after act)
+define checkpoint.number.backup		=  u8[0xfffffe2b]	// Starpost number of last actually passed checkpoint (not reset after act)
+define checkpoint.zone_act			= u16[0xfffffe2c]
+define checkpoint.x					= u16[0xfffffe2e]
+define checkpoint.y					= u16[0xfffffe30]
+define checkpoint.rings				= u16[0xfffffe32]
+define checkpoint.time				= u32[0xfffffe34]
+define checkpoint.minutes			=  u8[0xfffffe35]
+define checkpoint.seconds			=  u8[0xfffffe36]
+define checkpoint.frames			=  u8[0xfffffe37]
+define checkpoint.sprite_attr		= u16[0xfffffe38]
+define checkpoint.layer_flags		= u16[0xfffffe3a]
+define checkpoint.camera.x			= u16[0xfffffe3c]
+define checkpoint.camera.y			= u16[0xfffffe3e]
+define checkpoint.water.height		= u16[0xfffffe40]
+define checkpoint.water.fullscreen	=  u8[0xfffffe42]
+define checkpoint.lives_granted		=  u8[0xfffffe43]
+define checkpoint.move_area.bottom	= u16[0xfffffe44]
+define checkpoint.camera_routine	=  u8[0xfffffe46]
+
+define global.shields_backup_1	=  u8[0xfffffe47]
+define global.stage_type		=  u8[0xfffffe48]	// 0 in normal gameplay, 1 in special stage, 2 in HPZ entered through giant ring as well as in bonus stages
+define level.backup.checkpoint	=  u8[0xfffffe49]
+define level.backup.zone_act	= u16[0xfffffe4a]
+// There's more backup stuff from here
+
+define oscillating_number_flags = u16[0xfffffe6e]
+// 0xfffffe70 ... 0xfffffeaf  -> 16 oscillating numbers, each consisting of two u16
+
+
+define static_rings.animtimer	=  u8[0xfffffeb2]	// Timer counting down between animation frames
+define static_rings.animframe	=  u8[0xfffffeb3]	// Animation frame 0..3
+
+define spilled_rings.speed		=  u8[0xfffffeb6]	// This is both animation speed and a countdown until spilled rings vanish
+define spilled_rings.animframe	=  u8[0xfffffeb7]	// Animation frame 0..3
+define spilled_rings.progress	= u16[0xfffffeb8]	// Grows faster at first, slower towards the end
+
+
+define level.total_rings		= u16[0xffffff04]	// All rings in stage (except in monitors or just lost by character)
+
+define global.characters		= u16[0xffffff08]	// See CHARS_* constants
+define levelselect.characters	= u16[0xffffff0a]	// Can also be 4 for Knuckles & Tails
+
+
+
+// Kosinski decompression queue
+//  - Holds pointers to data to be compressed and to the target location in RAM
+//  - This queue can hold up to 4 pointers at a time
+//  - New items are added via function "Kosinski.AddToQueue"
+//  - Decompression is done in "ProcessKosinskiQueue"
+define kosinski.queue_size		= u16[0xffffff0e]	// Uppermost bit is set while decompression in progress
+// 0xffffff40 .. 0xffffff5f	-> Kosinski decompression queue
+
+// Kosinski DMA queue
+//  - Queue for copying decompressed data to VRAM
+//  - Each element in the queue represents a module of up to 0x1000 (decompressed) bytes of data
+define kosinski.waiting_modules	=  u8[0xffffff60]	// Uppermost bit: data of next module is already decompressed
+define kosinski.decompr_words	= u16[0xffffff62]	// Half of the number of bytes of the last module
+// 0xffffff64 .. 0xffffff7b	-> Kosinski DMA queue
+
+
+
+define levelselect.selection		= u16[0xffffff82]
+define levelselect.soundtest		= u16[0xffffff84]	// Selected piece in sound test (only up to 0xff)
+
+define results.total_bonus			= u16[0xffffff8e]
+define level.default_music			= u16[0xffffff90]
+define level.default_music.u8		=  u8[0xffffff91]
+define level.giantrings_clear		= u32[0xffffff92]	// One flag for each giant ring in the level, which gets set when the ring disappears
+define level.giantrings_clear.u16	= u16[0xffffff94]	// Only lower 16 bits, but more does not seem to get used anyway
+
+define global.shields_backup_2		=  u8[0xffffff96]
+define global.in_extra_stage		=  u8[0xffffff97]	// Set when entering Special Stage or Bonus Stage (note that this does not always get reset back to zero!)
+define checkpoint.zone_act.apparent	= u16[0xffffff9a]
+
+// u16[0xfffffaa4] = RAM address pointer used for various things
+
+define global.lock_on_state			= u16[0xffffffae]	// If 0, this is combined S3&K
+define global.chaos_emeralds		=  u8[0xffffffb0]	// Number of Chaos Emeralds (0..7)
+define global.super_emeralds		=  u8[0xffffffb1]	// Number of Super Emeralds (0..7)
+
+// 0xffffffb2 .. 0xffffffb8
+// Emerald collection states, one byte per emerald (for 7 emeralds, either a Chaos or Super Emerald each)
+//  - 0 = Emerald not collected
+//  - 1 = Chaos Emerald collected
+//  - 2 = Chaos Emerald traded for an (inactive) Super Emerald
+//  - 3 = Super Emerald collected
+
+define global.traded_emeralds	=  u8[0xffffffba]	// If not zero (usually 0xff), Chaos Emeralds were exchanged for Super Emeralds already
+define global.sk_bluespheres	=  u8[0xffffffbb]	// If 1, play S&K specials tages, otherwise S3 special stages
+
+define titleintro.frames		=  u8[0xffffffbd]	// Frame countdown until next animation image is shown
+define titleintro.animstep		= s16[0xffffffbe]	// Animation image number
+
+define player.next_life_score	= u32[0xffffffc0]	// Score value * 0.1 when next extra life will be granted (some multiple of 5000)
+define global.rolling_demo		= u16[0xffffffd0]	// Set to 1 for rolling demo (also in Blue Spheres rolling dmeo)
+define global.demo_number		= u16[0xffffffd2]	// Number of current / last rolling demo -- demos: AIZ, HCZ, MGZ, MHZ, FBZ, SOZ, Bluespheres
+
+define global.region_code		=  u8[0xffffffd8]	// Flag 0x80 is set outside of Japan, 0x40 for PAL regions, rest is zero
+define debug_mode.enabled		= u16[0xffffffda]
+define debug_mode.enabled.u8	=  u8[0xffffffda]
+define levelselect.unlocked		=  u8[0xffffffe0]	// If set, level select can be entered from title screen
+define pausecheats.unlocked		=  u8[0xffffffe1]	// If set, in game pause you can use A to reset game
+define debug_mode.unlocked		=  u8[0xffffffe2]	// If set, debug mode can be entered from level select by pressing A when starting a level
+define competition_mode.active	= u16[0xffffffe8]
+
+// [0xfffffff0] = Start of IRQ table (12 bytes, at least that gets written in fn000304)
+// There are two entries, each consisting of:
+//  - 2 bytes with data 0x4ef9 (the machine code for a jump)
+//  - 4 bytes holding a function pointer in ROM, see below
+define irq_table.frameupdate	= u32[0xfffffff2]	// ROM address of function to call once a frame
+define irq_table.lineupdate		= u32[0xfffffff8]	// ROM address of function to call once for each horizontal line rendered
+
+// S3AIR uses some of these bytes for its own purposes
+define level.start_location		=  u8[0xfffffff0]	// If not 0, this enforces a starting path for a level: 1 for Sonic/Tails' path, 2 for Knuckles' path
+
+

@@ -1,0 +1,10 @@
+{
+	"snowboard_0x01": { "File": "_atlas.bmp", "Rect": "0,24,56,8", "Center": "28,6" },
+	"snowboard_0x02": { "File": "_atlas.bmp", "Rect": "60,8,48,40", "Center": "21,20" },
+	"snowboard_0x03": { "File": "_atlas.bmp", "Rect": "136,0,8,56", "Center": "2,28" },
+	"snowboard_0x04": { "File": "_atlas.bmp", "Rect": "176,4,40,48", "Center": "20,21" },
+	"snowboard_0x05": { "File": "_atlas.bmp", "Rect": "224,24,56,8", "Center": "28,2" },
+	"snowboard_0x06": { "File": "_atlas.bmp", "Rect": "284,8,48,40", "Center": "27,20" },
+	"snowboard_0x07": { "File": "_atlas.bmp", "Rect": "360,0,8,56", "Center": "6,28" },
+	"snowboard_0x08": { "File": "_atlas.bmp", "Rect": "400,4,40,48", "Center": "20,27" }
+}

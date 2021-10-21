@@ -1,0 +1,419 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Title card                                            //
+//-------------------------------------------------------//
+
+// u8[A0 + 0x3e] (and with it objA0.value3e) is non-zero when there's a direct transition from the previous act
+
+//# address-hook(0x02d690) end(0x02d69a)
+function void TitleCard.Update()
+{
+	// Targets:
+	//  - 0x02d6a6	-> objA0.base_state = 0x00	  -> TitleCard.Init
+	//  - 0x02d76a	-> objA0.base_state = 0x02	  -> TitleCard.Wait
+	//  - 0x02d804	-> objA0.base_state = 0x04	  -> TitleCard.Appear
+	//  - 0x02d856	-> objA0.base_state = 0x06	  -> TitleCard.Show (also includes disappearing)
+	call tableLookupAddress(0x02d69e, objA0.base_state)
+}
+
+
+//# address-hook(0x02d6a6) end(0x02d768)
+function void TitleCard.Init()
+{
+	if (global.zone_act == 0x0d01)
+	{
+		UnloadObject()
+		return
+	}
+	else if (global.zone >= 0x0e && global.zone <= 0x12)
+	{
+		u8[A0 + 0x45] = 0xff
+		UnloadObject()
+		return
+	}
+
+	Kosinski.addToDMAQueue(0x0d6f28, 0xa000)
+
+	A1 = (global.lock_on_state == 0) ? 0x15c3a2 : 0x15c2e0
+	Kosinski.addToDMAQueue(A1, 0xa200)
+
+	A1 = 0x0d6e46
+	if (global.zone_act != 0x1600 && global.zone_act != 0x1700 && global.act.apparent == 0)
+	{
+		A1 = 0x0d6d84
+	}
+	Kosinski.addToDMAQueue(A1, 0xa7a0)
+
+	A1 = 0x02da16
+	D0 = global.zone.apparent
+	if (global.zone_act == 0x1600)
+	{
+		D0 = 9
+	}
+	else if (global.zone_act == 0x1601)
+	{
+		D0 = 13
+	}
+	else if (global.zone_act == 0x1700)
+	{
+		D0 = 11
+	}
+
+	A1 = u32[A1 + D0.u16 * 4]
+	Kosinski.addToDMAQueue(A1, 0xa9a0)
+
+	objA0.countdown_value = 0x5a
+	objA0.value32 = 0
+	u8[A0 + 0x48] = 0xff
+	objA0.base_state += 2
+}
+
+
+//# address-hook(0x02d76a) end(0x02d802)
+function void TitleCard.Wait()
+{
+	if (kosinski.waiting_modules)
+		return
+
+	if (allocDynamicObjectAfterA0())
+	{
+		if (global.zone >= 0x13 && global.zone != 0x16 && global.zone_act != 0x1700)
+		{
+			// Bonus stage
+			A2 = 0x02dab4
+			D1 = 1
+		}
+		else if (u8[A0 + 0x45] != 0)
+		{
+			// Yet unknown...
+			A2 = 0x02daa6
+			D1 = 0
+		}
+		else
+		{
+			// Normal stage
+			A2 = 0x02da6e
+			D1 = 3
+		}
+
+		while (D1.s16 >= 0)
+		{
+			++u16[A0 + 0x30]
+			u32[A1] = u32[A2]
+			u8[A1 + 0x04] = render_flag.COMPOUND
+			u16[A1 + 0x46] = u16[A2+4]
+			objA1.position.x.u16 = u16[A2+6]
+			objA1.position.y.u16 = u16[A2+8]
+			u8[A1 + 0x22] = u8[A2+10]
+			u8[A1 + 0x07] = u8[A2+11]
+			u8[A1 + 0x28] = u16[A2+12]
+			u32[A1 + 0x0c] = 0x02ee10
+			u16[A1 + 0x48] = A0.u16
+			A2 += 14
+
+			#if STANDALONE
+			{
+				// Move title card elements towards screen center
+				u16 offset = getScreenExtend()
+				objA1.position.x.u16 += offset
+				if (u32[A1] != 0x02d8e2)
+					u16[A1 + 0x46] += offset
+			}
+			#endif
+
+			--D1.s16
+			if (!allocDynamicObjectAfterA1())
+				break
+		}
+
+		if (u8[A0 + 0x3e] != 0 && global.zone == 0x06)
+		{
+			requestLoadingPatterns(0x25)
+		}
+
+		objA0.base_state += 2
+	}
+}
+
+
+//# address-hook(0x02d804) end(0x02d854)
+function void TitleCard.Appear()
+{
+	if (u16[A0 + 0x34] != 0)
+	{
+		u16[A0 + 0x34] = 0
+		return
+	}
+
+	if (objA0.value3e != 0)
+	{
+		timer.alldata = 0
+		ring_counter = 0
+		u16[0xfffffec8] = 0
+		extra_lives_granted = 0
+		u32[0xfffffed2] = 0
+		u16[0xfffffed0] = 0
+		u16[0xfffffeca] = 0
+		hud.dirty.timer = 0xff
+		hud.dirty.rings = 0xff
+		u8[0xffffb02c] = 30
+		u8[0xffffb076] = 30
+		PlayMusicAfterLevelResults()
+	}
+
+	u16[A0 + 0x48] = 0
+	objA0.base_state += 2
+}
+
+
+//# address-hook(0x02d856) end(0x02d8dc)
+function void TitleCard.Show()
+{
+	if (objA0.countdown_value != 0)
+	{
+		--objA0.countdown_value
+		return
+	}
+
+	if (u16[A0 + 0x30] != 0)
+	{
+		++objA0.value32
+		return
+	}
+
+	if (u8[A0 + 0x45] == 0)
+	{
+		if (global.zone_act == 0x801)
+		{
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x08f0b8
+			}
+		}
+
+		if (global.zone >= 0x13 && global.zone != 0x16 && global.zone_act != 0x1700)
+		{
+			// Do nothing
+		}
+		else
+		{
+			if (objA0.value3e != 0)
+			{
+				level.results_done = 0xff
+				if (global.zone_act != 0x1700)
+				{
+					fn02f77c()
+					StartLoadingPatternsForZone()
+				}
+			}
+			else if (global.zone != 0x0c && global.zone_act != 0x1700)
+			{
+				addPatternLoadingCue(0x08399a)
+				fn02f77c()
+				StartLoadingPatternsForZone()
+			}
+		}
+	}
+	UnloadObject()
+}
+
+
+//# address-hook(0x02f77c) end(0x02f7bc)
+function void fn02f77c()
+{
+	// Load additional sprite patterns used by the level, those that share VRAM space with the title card texts
+	//  -> This includes graphics for certain objects and badniks
+	u16 offset = global.zone
+	if (global.zone == 0x16)
+	{
+		offset = 0x0d
+	}
+	else if (global.zone_act == 0x1700)
+	{
+		offset = 0x0e
+	}
+	offset = offset * 4 + global.act * 2
+
+	// Targets:
+	//  - 0x02f7fa	-> offset = 0x00	-> AIZ 1
+	//  - 0x02f7fa	-> offset = 0x02	-> AIZ 2
+	//  - 0x02f80e	-> offset = 0x04	-> HCZ 1
+	//  - 0x02f828	-> offset = 0x06	-> HCZ 2
+	//  - 0x02f842	-> offset = 0x08	-> MGZ 1
+	//  - 0x02f856	-> offset = 0x0a	-> MGZ 2
+	//  - 0x02f864	-> offset = 0x0c	-> CNZ 1
+	//  - 0x02f864	-> offset = 0x0e	-> CNZ 2
+	//  - 0x02f87e	-> offset = 0x10	-> FBZ 1
+	//  - 0x02f87e	-> offset = 0x12	-> FBZ 1
+	//  - 0x02f892	-> offset = 0x14	-> ICZ 1
+	//  - 0x02f892	-> offset = 0x16	-> ICZ 2
+	//  - 0x02f8a0	-> offset = 0x18	-> LBZ 1
+	//  - 0x02f8a0	-> offset = 0x1a	-> LBZ 2
+	//  - 0x02f8ba	-> offset = 0x1c	-> MHZ 1
+	//  - 0x02f8ce	-> offset = 0x1e	-> MHZ 2
+	//  - 0x02f8e8	-> offset = 0x20	-> SOZ 1
+	//  - 0x02f8e8	-> offset = 0x22	-> SOZ 2
+	//  - 0x02f8fc	-> offset = 0x24	-> LRZ 1
+	//  - 0x02f8fc	-> offset = 0x26	-> LRZ 2
+	//  - 0x02f910	-> offset = 0x28	-> SSZ S/T
+	//  - 0x02f910	-> offset = 0x2a	-> SSZ Knux
+	//  - 0x02f918	-> offset = 0x2c	-> DEZ 1
+	//  - 0x02f918	-> offset = 0x2e	-> DEZ 2
+	//  - 0x02f92e	-> offset = 0x34	-> DDZ
+	//  - 0x02f92e	-> offset = 0x36	-> Outro S/T
+	A6 = tableLookupAddress(0x02f7be, offset)
+
+	u16 count = u16[A6] + 1
+	A6 += 2
+	for (u16 i = 0; i < count; ++i)
+	{
+		u32 sourceAddress = u32[A6]
+		u16 targetInVRAM = u16[A6+4]
+		Kosinski.addToDMAQueue(sourceAddress, targetInVRAM)
+		A6 += 6
+	}
+}
+
+
+//# address-hook(0x085fde) end(0x085ff8)
+function void StartLoadingPatternsForZone()
+{
+	addPatternLoadingCue(0x083d6c)
+
+	// Targets:
+	//  - 0x08602e	-> global.zone = 0x00	-> AIZ
+	//  - 0x08603c	-> global.zone = 0x01	-> HCZ
+	//  - 0x08604a	-> global.zone = 0x02	-> MGC
+	//  - 0x086058	-> global.zone = 0x03	-> CNZ
+	//  - 0x086066	-> global.zone = 0x04	-> FBZ
+	//  - 0x086074	-> global.zone = 0x05	-> ICZ
+	//  - 0x086082	-> global.zone = 0x06	-> LBZ
+	//  - 0x086090	-> global.zone = 0x07	-> MHZ
+	//  - 0x08609e	-> global.zone = 0x08	-> SOZ
+	//  - 0x0860ac	-> global.zone = 0x09	-> LRZ
+	//  - 0x0860ba	-> global.zone = 0x0a	-> SSZ
+	//  - 0x0860c8	-> global.zone = 0x0b	-> DEZ
+	//  - 0x0860d6	-> global.zone = 0x0c	-> DDZ
+	//  - 0x0860e4	-> global.zone = 0x0d	-> Outro S/T
+	//  - 0x0860e4	-> global.zone = 0x16	-> LRZ Boss
+	u32 address = tableLookupAddress(0x085ffe, global.zone * 2)
+	addPatternLoadingCue(address)
+}
+
+
+//# address-hook(0x02d8e2) end(0x02d926)
+function void TitleCard.RedBarElement.Update()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x48]
+	D0.u16 = u16[A1 + 0x32]
+	if (D0.u16 != 0)
+	{
+		// Disappearing
+		if (!(objA0.render_flags & render_flag.VISIBLE))
+		{
+			--u16[A1 + 0x30]
+			UnloadObject()
+			return
+		}
+
+		if (D0.u8 >= u8[A0 + 0x28])
+		{
+			objA0.position.y.u16 -= 0x20
+		}
+	}
+	else
+	{
+		// Appearing or showing
+		if (objA0.position.y.u16 != u16[A0 + 0x46])
+		{
+			objA0.position.y.u16 += 0x10
+			u8[A1 + 0x34] = 0xff
+		}
+	}
+
+	objA0.box_size.y = 0x70
+	DrawObject()
+}
+
+
+//# address-hook(0x02d92c) end(0x02d956)
+function void TitleCard.TextElement.Init()
+{
+	if (global.zone_act == 0x1600)
+	{
+		objA0.animation.sprite = 0x0d
+	}
+	else if (global.zone_act == 0x1601)   // Hidden Palace (in normal playthrough)
+	{
+		objA0.animation.sprite = 0x11
+	}
+	else if (global.zone_act == 0x1700)
+	{
+		objA0.animation.sprite = 0x0f
+	}
+	else
+	{
+		objA0.animation.sprite += global.zone.apparent
+	}
+
+	objA0.update_address = 0x02d95c
+	TitleCard.TextElement.Update()
+}
+
+
+//# address-hook(0x02d95c) end(0x02d99a)
+function void TitleCard.TextElement.Update()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x48]
+	D0 = u16[A1 + 0x32]
+	if (D0.u16 != 0)
+	{
+		if (!(objA0.render_flags & render_flag.VISIBLE))
+		{
+			--u16[A1 + 0x30]
+			UnloadObject()
+			return
+		}
+
+		if (D0.u8 >= u8[A0 + 0x28])
+		{
+			objA0.position.x.u16 += 0x20
+		}
+	}
+	else
+	{
+		// Appearing or showing
+		if (objA0.position.x.u16 > u16[A0 + 0x46])
+		{
+			objA0.position.x.u16 = max(objA0.position.x.u16 - 0x10, u16[A0 + 0x46])
+			u8[A1 + 0x34] = 0xff
+		}
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x02d9a0) end(0x02d9c6)
+function void fn02d9a0()
+{
+	objA0.update_address = 0x02d95c
+	if (global.zone == 0x0a || global.zone == 0x0c || global.zone_act == 0x1601)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x48]
+		--u16[A1 + 0x30]
+		UnloadObject()
+	}
+	else
+	{
+		TitleCard.TextElement.Update()
+	}
+}

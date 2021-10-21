@@ -1,0 +1,81 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x047892) end(0x0478b8)
+function void fn047892()
+{
+	objA0.mapping_offset = 0x04792e
+	objA0.sprite_attributes = 0x0379
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x18
+	objA0.sprite_priority = 0x0280
+	u8[A0 + 0x28] = 0x9f
+
+#if STANDALONE
+	// Lightning shield protects from the bolt damage
+	u8[A0 + 0x2b] = char.bonus.SHIELD_LIGHTNING
+#endif
+
+	fn0478be()
+}
+
+
+//# address-hook(0x0478be) end(0x0478dc)
+function void fn0478be()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		playSound(0x79)
+	}
+
+	u16[A0 + 0x30] = objA0.subtype2c
+	objA0.state.both = 0x01
+
+	objA0.update_address = 0x0478e2
+	fn0478e2()
+}
+
+
+//# address-hook(0x0478e2) end(0x047914)
+function void fn0478e2()
+{
+	Object.animationUpdate(0x047926)
+	if (objA0.base_state != 0)
+	{
+		objA0.base_state = 0
+		objA0.animation.sprite = 0
+		objA0.update_address = 0x04791a
+	}
+
+	if (objA0.animation.sprite == 3)
+	{
+		fn01b662()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x04791a) end(0x047920)
+function void fn04791a()
+{
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		fn0478be()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}

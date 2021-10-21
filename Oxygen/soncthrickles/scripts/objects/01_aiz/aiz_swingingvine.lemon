@@ -1,0 +1,171 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// AIZ Swinging Vine                                     //
+//-------------------------------------------------------//
+
+//# address-hook(0x02237e) end(0x0223d0)
+function void fn02237e()
+{
+	A1 = A0
+	objA1.update_address = 0x022442
+	fn02241a()
+	u8[A1 + 0x22] = 0x21
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+	D1.u16 = objA0.subtype2c & 0x0f
+	if (!allocDynamicObjectAfterA0())
+	{
+		fn022442()
+		return
+	}
+
+	u16[A1 + 0x44] = 0xfe50
+	u16[A1 + 0x38] = 0x800
+	objA0.value3e = A1.u16
+	objA1.update_address = 0x02248a
+	u16[A1 + 0x3c] = A0.u16
+	D0.u8 = objA0.subtype2c & 0xf0
+	u8[A1 + 0x42] = D0.u8
+	fn0223ea()
+}
+
+
+//# address-hook(0x0223ea)
+//# translated(0x0223d2) end(0x022418)
+function void fn0223ea()
+{
+	while (true)
+	{
+		A2 = A1
+		fn02241a()
+
+		objA1.position.x.u16 = D2.u16
+		objA1.position.y.u16 = D3.u16
+		D3.u16 += 0x10
+		++u16[A0 + 0x36]
+		u16[A1 + 0x36] = u16[A0 + 0x36]
+		--D1.s16
+		if (D1.s16 < 0)
+		{
+			objA1.update_address = 0x02257e
+			u8[A1 + 0x22] = 0x20
+			u16[A0 + 0x40] = A1.u16
+			break
+		}
+
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		objA1.update_address = 0x02251e
+		u16[A1 + 0x3c] = A2.u16
+		u16[A2 + 0x3e] = A1.u16
+	}
+
+	fn022442()
+}
+
+
+//# address-hook(0x02241a) end(0x022440)
+function void fn02241a()
+{
+	u8[A1 + 0x04] = render_flag.WORLD
+	u8[A1 + 0x06] = 8
+	u8[A1 + 0x07] = 8
+	u16[A1 + 0x08] = 0x200
+	u16[A1 + 0x0a] = 0x41b
+	u32[A1 + 0x0c] = 0x022b9e
+}
+
+
+//# address-hook(0x022442) end(0x022484)
+function void fn022442()
+{
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x280)
+	{
+		DrawObject()
+		return
+	}
+
+	D2.u16 = u16[A0 + 0x36]
+	A2 = 0xffff0000 + u16[A0 + 0x3e]
+	while (D2.s16 > 0)
+	{
+		A1 = A2
+		A2 = 0xffff0000 + u16[A1 + 0x3e]
+		UnloadObjectA1()
+		--D2.s16
+	}
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+	UnloadObject()
+}
+
+
+//# address-hook(0x02248a) end(0x022518)
+function void fn02248a()
+{
+	if (u8[A0] == 0)
+	{
+		u8 angle = u8[0xfffffeba] + u8[A0 + 0x42]
+		D0.s32 = s32(lookupSin(angle)) * 0x2c
+	}
+	else
+	{
+		D2 = objA0.flags38
+		D0.u16 = u16[A0 + 0x44]
+		D1.u16 = 0
+		if (objA0.countdown_value == 0)
+		{
+			D0.u16 += D2.u16
+			u16[A0 + 0x44] = D0.u16
+			objA0.value42 += D0.u16
+			if (D1.s8 <= s8[A0 + 0x42])
+			{
+				objA0.countdown_value = 1
+			}
+		}
+		else
+		{
+			D0.u16 -= D2.u16
+			u16[A0 + 0x44] = D0.u16
+			objA0.value42 += D0.u16
+			if (D1.s8 > s8[A0 + 0x42])
+			{
+				objA0.countdown_value = 0
+			}
+		}
+		D0.u16 = objA0.value42
+	}
+
+	u16[A0 + 0x26] = D0.u16
+	D0.s16 >>= 3
+	u16[A0 + 0x3a] = D0.u16
+	objA0.animation.sprite = (objA0.value26 + 4) >> 3
+	DrawObject()
+}
+
+
+//# address-hook(0x02251e) end(0x022544)
+function void fn02251e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	u16[A0 + 0x3a] = u16[A1 + 0x3a]
+	u16[A0 + 0x26] = u16[A1 + 0x26] + u16[A0 + 0x3a]
+	objA0.animation.sprite = (objA0.value26 + 4) >> 3
+	fn022040()
+	DrawObject()
+}

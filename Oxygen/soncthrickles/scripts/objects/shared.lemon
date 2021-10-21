@@ -1,0 +1,1921 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Rendering                                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x01abc6) end(0x01abe6)
+function void DrawObject()
+{
+	// Add object RAM address to one of the lists of rendered objects
+	//  -> There are multiple lists of 0x80 bytes, to get a priorization
+	u32 address = 0xffffac00 + objA0.sprite_priority
+	while (address <= 0xffffaf80)
+	{
+		// Still some space in this list?
+		u16 offset = u16[address]
+		if (offset < 0x7e)
+		{
+			// Add object RAM address to the list
+			offset += 2
+			u16[address] = offset
+			u16[address + offset] = A0.u16
+			break
+		}
+
+		// Otherwise go to the next list
+		address += 0x80
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Unload Check                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x01b588) end(0x01b5ac)
+function void DrawOrUnloadObject()
+{
+	DrawOrUnloadObjectAtPosition(objA0.position.x.u16)
+}
+
+//# address-hook(0x01b5b0) end(0x01b5d0)
+function void DrawOrUnloadObjectByD0()
+{
+	DrawOrUnloadObjectAtPosition(D0.u16)
+}
+
+function void DrawOrUnloadObjectAtPosition(u16 px)
+{
+	if (!checkForUnloadObjectAtPosition(px))
+	{
+		DrawObject()
+	}
+}
+
+
+// TODO: Default parameters would be a cool script feature...
+
+function bool shouldUnloadObjectAtPosition(u16 px)
+{
+	return shouldUnloadObjectAtPosition(px, 0x280)
+}
+
+function bool shouldUnloadObjectAtPosition(u16 px, u16 threshold)
+{
+	return ((px & 0xff80) - level.despawn_position.x > threshold)
+}
+
+
+function bool checkForUnloadObjectAtPosition(u16 px)
+{
+	return checkForUnloadObjectAtPosition(px, 0x280)
+}
+
+function bool checkForUnloadObjectAtPosition(u16 px, u16 threshold)
+{
+	bool result = shouldUnloadObjectAtPosition(px, threshold)
+	if (result)
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+	return result
+}
+
+
+function void unloadObjectAt(u32 address)
+{
+	zeroMemory(address, 0x4a)
+}
+
+
+//# address-hook(0x01abb6) end(0x01abb6)
+function void UnloadObject()
+{
+	unloadObjectAt(A0)
+	A1 = A0 + 0x4a
+}
+
+
+//# address-hook(0x01abb8) end(0x01abc4)
+function void UnloadObjectA1()
+{
+	unloadObjectAt(A1)
+	A1 += 0x4a
+}
+
+
+//# address-hook(0x01b5d4) end(0x01b5f6)
+function void CheckForUnloadObject()
+{
+	checkForUnloadObjectAtPosition(objA0.position.x.u16)
+}
+
+
+//# address-hook(0x01ebaa) end(0x01ebb6)
+function void Object.DespawnAndUnload()
+{
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+	UnloadObject()
+}
+
+
+//# address-hook(0x0852a0) end(0x0852ac)
+function void Object.TriggerUnloading()
+{
+	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.flags2a |= 0x80
+}
+
+
+
+//-------------------------------------------------------//
+// Dynamic Object Registration                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x006c2c) end(0x006c32)
+function void ResetDynamicObjectList()
+{
+	u16[0xffffe380] = 0
+}
+
+
+//# address-hook(0x01040c) end(0x01041c)
+function void AddAsDynamicObject()
+{
+	if (u16[0xffffe380] < 0x7e)
+	{
+		u16[0xffffe380] += 2
+		u16[0xffffe380 + u16[0xffffe380]] = A0.u16
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Setup object attributes                               //
+//-------------------------------------------------------//
+
+function void setupObjectAttributesFull(u32 sourceAddress)
+{
+	A1 = sourceAddress
+	SetupObjectAttributesFull()
+}
+
+function void setupObjectAttributesMost(u32 sourceAddress)
+{
+	A1 = sourceAddress
+	SetupObjectAttributesMost()
+}
+
+function void setupObjectAttributesBasic(u32 sourceAddress)
+{
+	A1 = sourceAddress
+	SetupObjectAttributesBasic()
+}
+
+
+//# address-hook(0x084038) end(0x084038)
+function void SetupObjectAttributesFull()
+{
+	objA0.mapping_offset = u32[A1]
+	objA0.sprite_attributes = u16[A1+4]
+	A1 += 6
+	SetupObjectAttributesBasic()
+}
+
+
+//# address-hook(0x08403c) end(0x08403c)
+function void SetupObjectAttributesMost()
+{
+	objA0.sprite_attributes = u16[A1]
+	A1 += 2
+	SetupObjectAttributesBasic()
+}
+
+
+//# address-hook(0x084040) end(0x08405e)
+function void SetupObjectAttributesBasic()
+{
+	objA0.sprite_priority  = u16[A1]
+	objA0.box_size.x       = u8[A1+2]
+	objA0.box_size.y       = u8[A1+3]
+	objA0.animation.sprite = u8[A1+4]
+	u8[A0 + 0x28]          = u8[A1+5]
+	objA0.render_flags |= render_flag.WORLD
+	objA0.base_state += 2
+	A1 += 6
+}
+
+
+
+//-------------------------------------------------------//
+// Misc                                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x084388) end(0x0843ac)
+function void MoveWithParent()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16 + s8[A0 + 0x42]
+	objA0.position.y.u16 = objA1.position.y.u16 + s8[A0 + 0x43]
+}
+
+
+//# address-hook(0x0843ae) end(0x0843fe)
+function void MoveAndFlipWithParent()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+
+	D1.s16 = s8[A0 + 0x42]
+	objA0.render_flags &= ~render_flag.FLIP_X
+	if (objA1.render_flags & render_flag.FLIP_X)
+	{
+		D1.s16 = -D1.s16
+		objA0.render_flags |= render_flag.FLIP_X
+	}
+	objA0.position.x.u16 = objA1.position.x.u16 + D1.s16
+
+	D1.s16 = s8[A0 + 0x43]
+	objA0.render_flags &= ~render_flag.FLIP_Y
+	if (objA1.render_flags & render_flag.FLIP_Y)
+	{
+		D1.s16 = -D1.s16
+		objA0.render_flags |= render_flag.FLIP_Y
+	}
+	objA0.position.y.u16 = objA1.position.y.u16 + D1.s16
+}
+
+
+
+//# address-hook(0x08488a) end(0x084896)
+function void Object.CountdownAndTrigger()
+{
+	// Countdown, then trigger a defined function
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+
+
+//# address-hook(0x01dc56) end(0x01dcb4)
+function void fn01dc56()
+{
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn01dc74()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb04a
+	if (objA1.render_flags & render_flag.VISIBLE)
+	{
+		++D6.u8		// Do not simply set to 4, as upper bits should be preserved
+		fn01dc74()
+	}
+}
+
+
+//# address-hook(0x01dc74)
+function void fn01dc74()
+{
+	u8 bit = 1 << D6.u8
+	if ((objA0.flags2a & bit) == 0)
+	{
+		fn01df88()
+	}
+	else
+	{
+		D2.u16 = D1.u16 * 2
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D2.u16)
+			{
+				D2.u16 = D4.u16
+				UpdateSonicPositionOnMovingObject()
+				D4 = 0
+				return
+			}
+		}
+
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
+		objA0.flags2a &= ~bit
+		D4 = 0
+	}
+}
+
+
+//# address-hook(0x01dcb6) end(0x01dd0c)
+function void CheckCharacterOnClimbableObject()
+{
+	//debugDrawRect(objA0.position.x.u16 - D1.u16 + 11, objA0.position.y.u16 - D2.u16, (D1.u16 - 11) * 2, D2.u16 * 2, 0xc08080ff)
+
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+	D6 = 0
+
+	// Check for main character
+	if (fn01dcb6_internal(0xffffb000, 3))
+	{
+		fn01df90()
+	}
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	// Check for Tails
+	if (fn01dcb6_internal(0xffffb04a, 4))
+	{
+		fn01df90()
+	}
+}
+
+
+//# address-hook(0x01dccc)
+function void fn01dccc()
+{
+	if (fn01dcb6_internal(A1, D6.u8))
+	{
+		fn01df90()
+	}
+}
+
+
+function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
+{
+	A1 = characterAddress
+	D6.u8 = bitnum
+	u8 bit = 1 << bitnum
+
+	if ((objA0.flags2a & bit) == 0)
+	{
+		return true
+	}
+	else
+	{
+		D2.u16 = D1.u16 * 2
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D2.u16)
+			{
+				D2.u16 = D4.u16
+				UpdateSonicPositionOnMovingObject()
+				D4 = 0
+				return false
+			}
+		}
+
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
+		objA0.flags2a &= ~bit
+		D4 = 0
+		return false
+	}
+}
+
+
+//# address-hook(0x01dd0e) end(0x01dd22)
+function void fn01dd0e()
+{
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn01dd24()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb04a
+	++D6
+	fn01dd24()
+}
+
+
+//# address-hook(0x01dd24) end(0x01dd6c)
+function void fn01dd24()
+{
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		fn01dece()
+		return
+	}
+
+	D2.u16 = D1.u16 * 2
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		if (D0.s16 >= 0 && D0.u16 < D2.u16)
+		{
+			D2.u16 = D4.u16
+			fn01e240()
+			D4.u16 = D6.u16 + 0x11
+			D6 |= (u32(1) << D4)
+			D4 = 0
+			return
+		}
+	}
+
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~(1 << D6.u8)
+	D4 = 0
+}
+
+
+
+// Unknown
+
+//# address-hook(0x08598a) end(0x0859cc)
+function void fn08598a()
+{
+	if (u8[0xfffffabf] != 0)
+		return
+
+	A1 = 0xfffffade
+	while (u16[A1] != 0)
+	{
+		--u8[A1 + 2]
+		if (s8[A1 + 2] < 0)
+		{
+			A2 = u32[A1 + 4]
+			A3 = 0xffff0000 + u16[A2]
+			A4 = A2 + u16[A1]
+			D1.u16 = u16[A4]
+			if (D1.s16 < 0)
+			{
+				if (fn0859ce())
+				{
+					A1 += 8
+					continue
+				}
+			}
+
+			D2 = u8[A2 + 2]
+			while (D2.s16 >= 0)
+			{
+				u16[A3] = u16[A4]
+				A3 += 2
+				A4 += 2
+				--D2.s16
+			}
+
+			u8[A1 + 2] = u16[A4]
+			A4 += 2
+			D0 = A4 - A2
+			u16[A1] = D0.u16
+		}
+		A1 += 8
+	}
+}
+
+
+//# translated(0x0859ce) end(0x0859d6)
+function bool fn0859ce()
+{
+	D2.u8 = u8[A2 + 0x03]	// D2 assigment is needed
+	if (D2.u8 == 0)
+	{
+		fn0859fc()
+	}
+	else
+	{
+		// Known targets of indirect call (actually a jump):
+		//  - 0x0859da (when D1.s16 == 0xfff8)
+		//  - 0x0859de (when D1.s16 == 0xfff4) -> This contains a "A7 += 4" which can't be translated without an explicit call
+		if (D1.s16 == 0xfff4)
+		{
+			if (fn085a02())
+				return true
+		}
+		else
+		{
+			// Fallback to original behavior
+			call 0x0859d2 - D1.s16
+		}
+	}
+	return false
+}
+
+
+//# address-hook(0x0859da) end(0x0859da)
+//# address-hook(0x0859e2) end(0x085a00)
+function void fn0859e2()
+{
+	++u8[A1 + 0x03]
+	if (D2.u8 <= u8[A1 + 0x03])
+	{
+		D2.u16 = u16[A4 + 0x02]
+		A2.u16 += D2.u16
+		u32[A1 + 0x04] = A2
+		A3 = 0xffff0000 + u16[A2]
+		u16[A1 + 0x02] = 0
+	}
+	A4 = A2 + 4
+}
+
+
+//# address-hook(0x0859fc) end(0x085a00)
+function void fn0859fc()
+{
+	A4 = A2 + 4
+}
+
+
+//# translated(0x0859de) end(0x0859de)
+//# translated(0x085a02) end(0x085a18)
+function bool fn085a02()
+{
+	++u8[A1 + 0x03]
+	if (D2.u8 > u8[A1 + 0x03])
+	{
+		fn0859fc()
+		return false
+	}
+
+	A2 = u32[0xfffffada]
+	u32 backupA1 = A1
+	call A2
+	A1 = backupA1
+	return true
+}
+
+
+//# address-hook(0x085022) end(0x08506e)
+function void Object.LoadSpritePatterns()
+{
+	// The following code is similar to "updateCharacterSpritePatternsInternal", yet different in some details
+	if (objA0.value3a != objA0.animation.sprite)
+	{
+		objA0.value3a = objA0.animation.sprite
+
+		u32 sourceBase = u32[A2]
+		u32 tableAddress = u32[A2+4]
+		u16 targetInVRAM = (objA0.sprite_attributes & 0x07ff) << 5
+
+		A2 = tableLookupAddress(tableAddress, u16(objA0.animation.sprite) * 2)
+		u16 numSprites = u16[A2] + 1
+
+		for (u16 i = 0; i < numSprites; ++i)
+		{
+			// Next sprite
+			A2 += 2
+			u32 sourceInROM = sourceBase + (u16[A2] & 0x7ff0) * 2
+			u16 lengthInWords = ((u16[A2] & 0x000f) + 1) * 0x10
+
+			updateSpritePattern(sourceInROM, targetInVRAM, lengthInWords)
+			targetInVRAM += lengthInWords * 2
+		}
+	}
+}
+
+function void Object.loadSpritePatterns(u32 address)
+{
+	A2 = address
+	Object.LoadSpritePatterns()
+}
+
+function void Object.loadSpritePatternsForVDP(u32 address)
+{
+#if STANDALONE
+	// Loading patterns into VRAM is not needed with direct rendering
+	//  -> This requires the object to be fully supported for direct rendering, see "Standalone.onWriteToSpriteTable"
+	if (DIRECT_OBJECT_RENDERING)
+		return
+#endif
+
+	Object.loadSpritePatterns(address)
+}
+
+
+//# address-hook(0x0850a2) end(0x0850d2)
+function void fn0850a2()
+{
+	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (dx <= 0x0280)
+	{
+		DrawObject()
+	}
+	else
+	{
+		fn0850ba()
+	}
+}
+
+
+//# address-hook(0x0850ba)
+function void fn0850ba()
+{
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+
+	objA0.flags38 |= 0x10
+	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+}
+
+
+//# address-hook(0x0850d4) end(0x0850fc)
+function void fn0850d4()
+{
+	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	u16 dy = objA0.position.y.u16 - camera.position.y.u16 + 0x80
+	if (dx <= 0x0280 && dy <= 0x0200)
+	{
+		DrawObject()
+	}
+	else
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x08594e) end(0x085988)
+function void fn08594e()
+{
+	if (objA0.flags2a & 0x08)
+	{
+		objA0.flags2a &= ~0x08
+		A1 = 0xffffb000
+		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= 0x02
+	}
+
+	if (objA0.flags2a & 0x10)
+	{
+		objA0.flags2a &= ~0x10
+		A1 = 0xffffb04a
+		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= 0x02
+	}
+}
+
+
+//# address-hook(0x085180) end(0x0851ae)
+function void fn085180()
+{
+	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	u16 dy = objA0.position.y.u16 - camera.position.y.u16 + 0x80
+	if (dx <= 0x0280 && dy <= 0x0200)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x0851b4) end(0x0851c6)
+function void fn0851b4()
+{
+	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (dx <= 0x0280)
+	{
+		DrawObject()
+	}
+	else
+	{
+		fn0851cc()
+	}
+}
+
+
+//# address-hook(0x0851cc) end(0x0851d4)
+function void fn0851cc()
+{
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] &= ~0x80
+	}
+	fn0851d8()
+}
+
+
+//# address-hook(0x0851d8) end(0x0851ee)
+function void fn0851d8()
+{
+	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.flags2a |= 0x80
+	fn0851e4()
+}
+
+
+//# address-hook(0x0851e4) end(0x0851ee)
+function void fn0851e4()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	u8[A1] &= ~(1 << objA0.value3b)
+}
+
+
+//# address-hook(0x085208) end(0x085232)
+function void fn085208()
+{
+	if (s8[A0 + 0x2a] >= 0)
+	{
+		D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+		if (D0.u16 <= 0x280)
+		{
+			AddAsDynamicObject()
+			DrawObject()
+		}
+		else
+		{
+			fn0851cc()
+		}
+	}
+	else
+	{
+		fn08522c()
+	}
+}
+
+
+//# address-hook(0x08522c)
+function void fn08522c()
+{
+	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	fn0851e4()
+}
+
+
+//# address-hook(0x085b0a) end(0x085b2a)
+function void fn085b0a()
+{
+	objA0.countdown_value = 120
+	playMusic(MUSIC_CTRL_FADEOUT)
+	objA0.update_address = 0x085b1e
+	fn085b1e()
+}
+
+
+//# address-hook(0x085b1e)
+function void fn085b1e()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		PlayMusicAfterLevelResults()
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x085b30) end(0x085b3e)
+function void fn085b30()
+{
+	objA0.countdown_value = 90
+	playMusic(MUSIC_CTRL_FADEOUT)
+
+	objA0.update_address = 0x085b44
+	fn085b44()
+}
+
+
+//# address-hook(0x085b44) end(0x085b5a)
+function void fn085b44()
+{
+	// This function is used for music changes before boss fights, but also in Sonic's intro and Knuckles' outro
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+	#if STANDALONE
+		if (Game.getSetting(SETTING_SSZ_BOSS_TRACKS) && objA0.subtype2c == MUSIC_MAINBOSS && global.zone_act == 0x0a00)
+		{
+			if (camera.position.x.u16 < 0x0400)
+			{
+				objA0.subtype2c = 0xf2		// Sonic 1 boss music
+			}
+			else if (camera.position.x.u16 < 0x1800)
+			{
+				objA0.subtype2c = 0xf3		// Sonic 2 boss music
+			}
+		}
+		else if (objA0.subtype2c == MUSIC_MINIBOSS_2)
+		{
+			// In FBZ pre-boss encounter, enforce main boss music
+			if (global.zone_act == 0x0401)
+			{
+				objA0.subtype2c = MUSIC_MAINBOSS
+			}
+
+			// In HPZ emerald theft cutscene, consider config option
+			if (global.zone_act == 0x1601)
+			{
+				u8 option = Game.getSetting(SETTING_AUDIO_HPZ_MUSIC)
+				if (option == 0)
+					objA0.subtype2c = 0xf6		// Enforce mini-boss theme from S3
+				else
+					objA0.subtype2c = 0xf7		// Enforce mini-boss theme from S&K
+			}
+		}
+	#endif
+
+		level.default_music.u8 = objA0.subtype2c
+		playMusic(objA0.subtype2c)
+
+	#if STANDALONE
+		// Credits in Knuckles' outro?
+		if (objA0.subtype2c == 0xdc)
+		{
+			// Reset frame counter so we can use it to get the current credits music playback position
+			level.framecounter = 0
+
+			// Start skippable cutscene again, to reset the timer
+			Game.startSkippableCutscene()
+		}
+	#endif
+
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x085b60) end(0x085b84)
+function void PlayMusicAfterLevelResults()
+{
+	// This function is used to start the music again after level results
+
+#if STANDALONE
+	// Special handling for LRZ 2 boss
+	if (global.zone_act == 0x1600)
+	{
+		D0.u8 = 0x14
+	}
+	else
+#endif
+	{
+		u16 offset = global.zone.apparent * 2 + global.act.apparent
+		D0.u8 = u8[0x005f82 + offset]
+	}
+	level.default_music = D0.u8
+
+#if STANDALONE
+	if (super.active || super.active.tails)
+	{
+		// Check if this is an outro
+		if (global.zone_act == 0x0a01 || global.zone_act == 0x0d01)
+		{
+			// TODO: Is this part still used / needed?
+			playMusic(0x26)		// Play Sonic 3 credits (instead of Sky Sanctuary)
+		}
+		else
+		{
+			playMusic(0xf0)		// Super Theme
+		}
+	}
+	else
+#endif
+	if (u8[0xffffb02b] & char.bonus.INVINCIBLE)
+	{
+		playMusic(0x2c)
+	}
+	else
+	{
+		playMusic(D0.u8)
+	}
+}
+
+
+//# address-hook(0x085b8a) end(0x085b8a)
+function void fn085b8a()
+{
+	stopCharacterWinPose(0xffffb000)
+}
+
+
+function void stopCharacterWinPose(u32 address)
+{
+	A1 = address
+	StopCharacterWinPose()
+}
+
+//# address-hook(0x085b8e) end(0x085ba6)
+function void StopCharacterWinPose()
+{
+	u16[A1 + 0x20] = 0x0505
+	u8[A1 + 0x23] = 0
+	u8[A1 + 0x24] = 0
+	objA1.flags2a &= ~char.flag.IN_AIR
+	u8[A1 + 0x2e] = 0
+
+#if STANDALONE
+	// This fixes "Zombie Tails" when Tails gets killed just before the win pose
+	if (A1 == 0xffffb000)
+	{
+		player2.control_override = 0
+	}
+#endif
+}
+
+
+//# address-hook(0x085c00) end(0x085c16)
+function void fn085c00()
+{
+	if (level.wait_for_results)
+		return
+
+	objA0.update_address = 0x085c1a
+
+	A1 = 0xffffb000
+	StopCharacterWinPose()
+
+	A1 = 0xffffb04a
+	StopCharacterWinPose()
+}
+
+
+
+//-------------------------------------------------------//
+// Animation                                             //
+//-------------------------------------------------------//
+
+function void Object.animationUpdate(u32 address)
+{
+	A1 = address
+	Object.AnimationUpdate()
+}
+
+//# address-hook(0x01abe8) end(0x01ac86)
+function void Object.AnimationUpdate()
+{
+	if (objA0.state != objA0.state.former)
+	{
+		objA0.state.former = objA0.state
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+	}
+
+	--objA0.animation.timer
+	if (objA0.animation.timer == 0xff)
+	{
+		A1 = tableLookupAddress(A1, objA0.state * 2)
+		objA0.animation.timer = u8[A1]
+
+		D0.u8 = u8[A1 + objA0.animation.frame + 1]
+		if (D0.u8 & 0x80)
+		{
+			if (D0.u8 == 0xff)
+			{
+				objA0.animation.frame = 0
+				D0.u8 = u8[A1 + 1]
+			}
+			else if (D0.u8 == 0xfe)
+			{
+				D0.u8 = u8[A1 + objA0.animation.frame + 2]
+				objA0.animation.frame -= D0.u8
+				D0.u8 = u8[A1 + objA0.animation.frame + 1]
+			}
+			else
+			{
+				if (D0.u8 == 0xfd)
+				{
+					objA0.state = u8[A1 + objA0.animation.frame + 2]
+				}
+				else if (D0.u8 == 0xfc)
+				{
+					objA0.base_state += 2
+					objA0.animation.timer = 0
+					++objA0.animation.frame
+				}
+				else if (D0.u8 == 0xfb)
+				{
+					objA0.position.x.u16 = 0x7f00
+				}
+				return
+			}
+		}
+
+		objA0.animation.sprite = D0.u8
+		objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x03)
+		++objA0.animation.frame
+	}
+}
+
+
+//# address-hook(0x01ac88) end(0x01ad1e)
+function void Object.AlternativeAnimationUpdate()
+{
+	if (objA0.state != objA0.state.former)
+	{
+		objA0.state.former = objA0.state
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+	}
+
+	--objA0.animation.timer
+	if (objA0.animation.timer == 0xff)
+	{
+		A1.u16 += u16[A1 + objA0.state * 2]
+		D1 = objA0.animation.frame * 2
+
+		D0.u8 = u8[A1 + D1.s16]
+		if (D0.u8 & 0x80)
+		{
+			if (D0.u8 == 0xff)
+			{
+				D1 = 0
+				objA0.animation.frame = 0
+				D0.u8 = u8[A1]
+			}
+			else if (D0.u8 == 0xfe)
+			{
+				D0.u8 = u8[A1 + D1.s16 + 1]
+				objA0.animation.frame -= D0.u8
+				D1.u8 -= D0.u8 * 2
+				D0.u8 = u8[A1 + D1.s16]
+			}
+			else
+			{
+				if (D0.u8 == 0xfd)
+				{
+					objA0.state = u8[A1 + D1.s16 + 1]
+				}
+				else if (D0.u8 == 0xfc)
+				{
+					objA0.base_state += 2
+					objA0.animation.timer = 0
+					++objA0.animation.frame
+				}
+				return
+			}
+		}
+
+		objA0.animation.timer = u8[A1 + D1.s16 + 1]
+		objA0.animation.sprite = D0.u8
+		objA0.render_flags = (objA0.render_flags & 0xfc) | objA0.flags2a & 0x03
+		++objA0.animation.frame
+	}
+}
+
+
+
+
+// Some very generally used code
+
+//# address-hook(0x01df88) end(0x01e19a)
+function void fn01df88()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		// Note that this will also call "fn01e0a2()" inside, just like the else-part
+		fn01df90()
+	}
+	else
+	{
+		fn01e0a2()
+	}
+}
+
+
+//# address-hook(0x01df90)
+function void fn01df90()
+{
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D3.u16 = D1.u16 * 2
+	if (D0.u16 <= D3.u16)
+	{
+		D4.u16 = D2.u16 + s8[A1 + 0x44]		// "char.hitbox.default.y"
+		D2.u16 = D2.u16 + s8[A1 + 0x1e]		// "char.hitbox_extends.y"
+		D3.s16 = objA1.position.y.u16 - objA0.position.y.u16
+		if (global.inv_gravity)
+			D3.s16 = -D3.s16
+
+		D3.u16 = (D2.u16 + D3.s16 + 4) & 0x0fff
+		D4.u16 += D2.u16
+
+		if (D3.u16 < D4.u16)
+		{
+			fn01dffe()
+			return
+		}
+	}
+
+	fn01e0a2()
+}
+
+
+//# address-hook(0x01dffe)
+function void fn01dffe()
+{
+	if (u8[A1 + 0x2e] & 0x80)	// Check "char.control_flags" against the no-collision flag
+	{
+		fn01e0a2()
+	}
+	else
+	{
+		fn01e006()
+	}
+}
+
+
+function void fn01e006()
+{
+	if (u8[A1 + 0x05] >= 0x06 || debug_mode.state != 0)
+	{
+		D4 = 0
+		return
+	}
+
+	// D0.u16 is the character's x-offset relative to the object's collision box (left border)
+	// D1.u16 is the object collision box half width
+	D5.u16 = D0.u16
+	if (D0.u16 > D1.u16)
+	{
+		D0.u16 -= D1.u16 * 2
+		D5.s16 = -D0.s16
+	}
+
+	// D3.u16 is the character's y-offset relative to the object's collision box (top border)
+	// D2.u16 is the object collision box half height, I guess... but it seems to change whether the character is rolled or not
+	D1.u16 = D3.u16
+	if (D3.u16 > D2.u16)
+	{
+		D3.u16 -= D4.u16 + 4
+		D1.s16 = -D3.s16
+	}
+
+	if (D1.u16 >= D5.u16 && D1.u16 > 4)
+	{
+		// Blocked by the object
+		fn01e042()
+	}
+	else if (D3.s16 >= 0)
+	{
+		if (D3.u16 < 0x10)
+		{
+		// 0x01e154:
+			D3.u16 -= 4
+			D2.u16 = objA0.box_size.x * 2
+			D1.s16 = objA1.position.x.u16 - objA0.position.x.u16 + objA0.box_size.x
+			if (D1.s16 >= 0 && D1.u16 < D2.u16)
+			{
+				if (global.inv_gravity)
+				{
+					D3.s16 = -D3.s16
+					++objA1.position.y.u16
+				}
+				else
+				{
+					--objA1.position.y.u16
+				}
+
+				objA1.position.y.u16 -= D3.u16
+				if (objA1.velocity.y >= 0)
+				{
+					LetSonicClimbOnObject()
+					D6 |= (u32(1) << (D6.u16 + 17))
+					D4 = 0xffffffff
+					return
+				}
+			}
+			D4 = 0
+		}
+		else
+		{
+			fn01e0a2()
+		}
+	}
+	else
+	{
+		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
+		{
+			if (objA1.velocity.y == 0)
+			{
+				if (abs(D0.s16) < 0x10)
+				{
+					// Blocked by the object
+					fn01e042()
+				}
+				else
+				{
+					// Getting crushed
+					u32 backupA0 = A0
+					A0 = A1
+					Character.Die()
+					A0 = backupA0
+
+					D6 |= (u32(1) << (D6.u16 + 15))
+					D4 = 0xfffffffe
+				}
+				return
+			}
+			else
+			{
+				if (objA1.velocity.y > 0 || D3.s16 >= 0)
+				{
+					fn01e10e()
+					return
+				}
+			}
+		}
+		else
+		{
+			u16[A1 + 0x1c] = 0
+		}
+
+		if (global.inv_gravity)
+			D3.s16 = -D3.s16
+
+		objA1.position.y.u16 -= D3.u16
+		objA1.velocity.y = 0
+
+		fn01e10e()
+	}
+}
+
+
+//# address-hook(0x01e042)
+function void fn01e042()
+{
+	if (D0.u16 != 0)
+	{
+		if ((objA1.velocity.x >= 0) == (D0.s16 > 0))
+		{
+			u16[A1 + 0x1c] = 0
+			objA1.velocity.x = 0
+			if (u8[A1 + 0x37] & 0x80)
+				u8[A1 + 0x37] |= 0x40
+		}
+	}
+
+	objA1.position.x.u16 -= D0.u16
+	u8 bit = 1 << (D6.u16 + 2)
+	if (objA1.flags2a & char.flag.IN_AIR)
+	{
+		objA0.flags2a &= ~bit
+		objA1.flags2a &= ~char.flag.PUSHING
+	}
+	else
+	{
+		objA0.flags2a |= bit
+		objA1.flags2a |= char.flag.PUSHING
+	}
+
+	D6 |= (u32(1) << (D6.u16 + 13))
+	D4 = 1
+}
+
+
+//# address-hook(0x01e0a2)
+function void fn01e0a2()
+{
+	u8 bit = 1 << (D6.u16 + 2)
+	if (objA0.flags2a & bit)
+	{
+		if (u8[A1 + 0x20] != char.state.ROLLING && u8[A1 + 0x20] != char.state.SPINDASH)
+		{
+		#if STANDALONE
+			// Make an exception for the win pose
+			//  -> This prevents characters from showing their walking animation when standing next to an object like the capsule during the level results
+			if (u8[A1 + 0x20] != char.state.WIN_POSE)
+		#endif
+			{
+				u8[A1 + 0x20] = 0x00
+				u8[A1 + 0x21] = 0x01
+			}
+		}
+
+		objA0.flags2a &= ~bit
+		objA1.flags2a &= ~char.flag.PUSHING
+	}
+	D4 = 0
+}
+
+
+//# address-hook(0x01e10e)
+function void fn01e10e()
+{
+	if (s8[A1 + 0x37] < 0)
+		u8[A1 + 0x37] |= 0x20
+
+	D6 |= (u32(1) << (D6.u16 + 15))
+	D4 = 0xfffffffe
+}
+
+
+
+//-------------------------------------------------------//
+// Platforms                                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x01e19c) end(0x01e1b0)
+function void UpdateSonicPositionOnMovingObject()
+{
+	if (global.inv_gravity)
+	{
+		D0.u16 = objA0.position.y.u16 + D3.u16
+		updateSonicPositionOnMovingObjectInternal(1)
+	}
+	else
+	{
+		D0.u16 = objA0.position.y.u16 - D3.u16
+		updateSonicPositionOnMovingObjectInternal(-1)
+	}
+}
+
+//# address-hook(0x01e1ca) end(0x01e1f2)
+function void fn01e1ca()
+{
+	updateSonicPositionOnMovingObjectInternal(-1)
+}
+
+//# address-hook(0x01e1f4) end(0x01e21c)
+function void fn01e1f4()
+{
+	updateSonicPositionOnMovingObjectInternal(1)
+}
+
+function void updateSonicPositionOnMovingObjectInternal(s8 sign)
+{
+	// First check is against collision interaction flag in "char.control_flags"
+	if ((u8[A1 + 0x2e] & 0x80) == 0 && u8[A1 + 0x05] < 6 && debug_mode.state == 0)
+	{
+		objA1.position.x.u16 += objA0.position.x.u16 - D2.u16
+		objA1.position.y.u16 = D0.u16 + u8[A1 + 0x1e] * sign
+	}
+}
+
+
+//# address-hook(0x01e21e) end(0x01e23e)
+function void fn01e21e()
+{
+	if ((u8[A1 + 0x2a] & 0x08) == 0)
+		return
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.u16 = D1.u16 * 2 - D0.u16 - 1
+	}
+
+	D0.u16 = objA0.position.y.u16 - s8[A2 + D0.s16] - u8[A1 + 0x1e]
+	objA1.position.y.u16 = D0.u16
+	D2.u16 -= objA0.position.x.u16
+	objA1.position.x.u16 -= D2.u16
+}
+
+
+//# address-hook(0x01e240) end(0x01e280)
+function void fn01e240()
+{
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
+	{
+		D0.u16 = (objA1.position.x.u16 - objA0.position.x.u16 + D1.u16) >> 1
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D0.u16 = D1.u16 - D0.u16 - 1
+		}
+
+		D0.u16 = objA0.position.y.u16 - s8[A2 + D0.s16] - u8[A1 + 0x1e]
+		objA1.position.y.u16 = D0.u16
+		D2.u16 -= objA0.position.x.u16
+		objA1.position.x.u16 -= D2.u16
+	}
+}
+
+
+//# address-hook(0x01e2a6) end(0x01e2fc)
+function void PlatformCheckClimbOn()
+{
+	//debugLog(stringformat("PlatformCheckClimbOn(0x%04x, 0x%04x, 0x%04x, 0x%04x, 0x%02x)", D1.u16, D2.u16, D3.u16, D4.u16, D6.u8))
+	//debugDrawRect(D4.u16 - D1.u16, objA0.position.y.u16 - D3.u16, D1.u16 * 2, D3.u16 * 2, 0x80ff0000)
+
+	// Parameters:
+	//  - D1.u16 = Half width of the object
+	//  - D2.u16 = ?? (seems to be related to character's last known x-position, at least for horizontally moving platforms)
+	//  - D3.u16 = Half height of the object
+	//  - D4.u16 = Center x-position of the climbable area (in world space)
+	//  - D6.u8  = Bit index, usually depending on the character index to check
+
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+
+	A1 = 0xffffb000
+	D6 = 3
+	PlatformCheckClimbOnForCharacterA1()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb04a
+	++D6.u8
+	PlatformCheckClimbOnForCharacterA1()
+}
+
+
+//# address-hook(0x01e2bc)
+function void PlatformCheckClimbOnForCharacterA1()
+{
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
+	{
+		CheckCharacterClimbOnObject()
+		return
+	}
+
+	s16 halfWidth = D1.u16
+	s16 diffX = objA1.position.x.u16 - objA0.position.x.u16
+	if ((objA1.flags2a & char.flag.IN_AIR) == 0 && diffX >= -halfWidth && diffX < halfWidth)
+	{
+		// Still on the object, correct height
+		D2.u16 = D4.u16
+		UpdateSonicPositionOnMovingObject()
+	}
+	else
+	{
+		// Not on the object any more (either in air, or outside the object's width)
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
+		objA0.flags2a &= ~bit
+	}
+	D4 = 0
+}
+
+
+// This is a check against an object with a non-uniform surface
+//  -> Its surface "height map" is encoded from A2 on, each byte there representing 2 pixels
+
+//# address-hook(0x01e2fe) end(0x01e354)
+function void fn01e2fe()
+{
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn01e314()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb04a
+	++D6.u8
+	fn01e314()
+}
+
+
+function void fn01e314()
+{
+	u8 bit = 1 << D6.u8
+	if ((objA0.flags2a & bit) == 0)
+	{
+		fn01e50e()
+	}
+	else
+	{
+		D2.u16 = D1.u16 * 2
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D2.u16)
+			{
+				D2.u16 = D4.u16
+				fn01e240()
+				D4 = 0
+				return
+			}
+		}
+
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
+		objA0.flags2a &= ~bit
+		D4 = 0
+	}
+}
+
+
+//# address-hook(0x01e356) end(0x01e3ac)
+function void fn01e356()
+{
+	push(D4)
+	push(D3)
+	push(D2)
+	push(D1)
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn01e36c()
+
+	D1 = pop()
+	D2 = pop()
+	D3 = pop()
+	D4 = pop()
+
+	A1 = 0xffffb04a
+	++D6.u8
+	fn01e36c()
+}
+
+
+function void fn01e36c()
+{
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
+	{
+		fn01e546()
+		return
+	}
+
+	D2.u16 = D1.u16 * 2
+	if ((u8[A1 + 0x2a] & 0x02) == 0)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		if (D0.s16 >= 0 && D0.u16 < D2.u16)
+		{
+			D2.u16 = D4.u16
+			fn01e21e()
+			D4 = 0
+			return
+		}
+	}
+
+	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] |= 0x02
+	objA0.flags2a &= ~bit
+	D4 = 0
+}
+
+
+//# address-hook(0x01e410) end(0x01e42c)
+function void fn01e410()
+{
+	if (objA1.velocity.y < 0)
+		return
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	if (D0.s16 >= 0 && D0.u16 < D2.u16)
+	{
+		CheckCharacterClimbOnObjectInner()
+	}
+}
+
+
+//# address-hook(0x01e42e) end(0x01e50c)
+function void CheckCharacterClimbOnObject()
+{
+	if (objA1.velocity.y >= 0)
+	{
+		D0.s16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		if (D0.s16 >= 0 && D0.s16 < D1.s16 * 2)
+		{
+			CheckCharacterClimbOnObjectInner()
+		}
+	}
+}
+
+//# address-hook(0x01e44c)
+function void CheckCharacterClimbOnObjectInner()
+{
+	if (global.inv_gravity)
+	{
+		D0.u16 = objA0.position.y.u16 + D3.u16
+		D0.u16 = objA1.position.y.u16 - D0.u16 - s8[A1 + 0x1e] - 4
+		if (D0.s16 < -0x10 || D0.s16 >= 0)
+			return
+		if (s8[A1 + 0x2e] < 0 || u8[A1 + 0x05] >= 6)
+			return
+
+		objA1.position.y.u16 = objA1.position.y.u16 - D0.u16 - 4
+		LetSonicClimbOnObject()
+	}
+	else
+	{
+		D0.u16 = objA0.position.y.u16 - D3.u16
+		fn01e45a()
+	}
+}
+
+//# address-hook(0x01e45a)
+function void fn01e45a()
+{
+	D0.u16 = D0.u16 - objA1.position.y.u16 - s8[A1 + 0x1e] - 4		// s8[A1 + 0x1e] = Sonic's hitbox_extends.y
+	if (D0.s16 < -0x10 || D0.s16 >= 0)
+		return
+	if (s8[A1 + 0x2e] < 0 || u8[A1 + 0x05] >= 6)
+		return
+
+	objA1.position.y.u16 = objA1.position.y.u16 + D0.u16 + 3
+	LetSonicClimbOnObject()
+}
+
+
+//# address-hook(0x01e490)
+function void LetSonicClimbOnObject()
+{
+	u8 bit = 1 << D6.u8
+
+	// Already on another object?
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
+	{
+		// Unregister there
+		A3 = 0xffff0000 + u16[A1 + 0x42]
+		u8[A3 + 0x2a] &= ~bit
+	}
+
+	// Standing on this object now
+	u16[A1 + 0x42] = A0.u16
+	u8[A1 + 0x26] = 0
+	objA1.velocity.y = 0
+	objA1.groundspeed = objA1.velocity.x
+	objA1.flags2a |= char.flag.ON_OBJECT
+
+	objA0.flags2a |= bit
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+	{
+		objA1.flags2a &= ~char.flag.IN_AIR
+		u32 backupA0 = A0
+		A0 = A1
+		Character.LandingOnGroundNoSpindash()
+		A0 = backupA0
+	}
+}
+
+
+//# address-hook(0x01e50e) end(0x01e542)
+function void fn01e50e()
+{
+	if (objA1.velocity.y < 0)
+		return
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D1.u16 *= 2
+	if (D0.s16 >= 0 && D0.u16 < D1.u16)
+	{
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D0.u16 = D1.u16 - D0.u16 - 1
+		}
+
+		D0.u16 >>= 1
+		D0.u16 = objA0.position.y.u16 - s8[A2 + D0.u16]
+		fn01e45a()
+	}
+}
+
+
+//# address-hook(0x01e546) end(0x01e57c)
+function void fn01e546()
+{
+	if (objA1.velocity.y < 0)
+		return
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D1.u16 *= 2
+	if (D0.s16 >= 0 && D0.u16 < D1.u16)
+	{
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D0.u16 = D1.u16 - D0.u16 - 1
+		}
+
+		D0.u16 = objA0.position.y.u16 - s8[A2 + D0.s16]
+		fn01e45a()
+	}
+}
+
+
+
+
+// Shared by several different objects
+// Check if one of the characters is inside a given box
+
+//# address-hook(0x0858f8) end(0x08593e)
+function void fn0858f8()
+{
+	D3.u16 = objA0.position.x.u16 + u16[(A1+=2)-2]
+	D5.u16 = D3.u16 + u16[(A1+=2)-2]
+	D4.u16 = objA0.position.y.u16 + u16[(A1+=2)-2]
+	D6.u16 = D4.u16 + u16[(A1+=2)-2]
+
+	D0 = 0
+	A2 = 0xffffb04a
+	D1.u16 = u16[A2 + 0x10]
+	D2.u16 = u16[A2 + 0x14]
+	fn08592c()
+
+	D0 <<= 16
+	A2 = 0xffffb000
+	D1.u16 = u16[A2 + 0x10]
+	D2.u16 = u16[A2 + 0x14]
+	fn08592c()
+}
+
+
+function void fn08592c()
+{
+	if (D1.u16 >= D3.u16 && D1.u16 < D5.u16)
+	{
+		if (D2.u16 >= D4.u16 && D2.u16 < D6.u16)
+		{
+			D0.u16 = A2.u16
+		}
+	}
+}
+
+
+
+//# address-hook(0x084400) end(0x084432)
+function void Object.AnimationProgressByLocalA1()
+{
+	Object.animationProgress(u32[A0 + 0x30])
+}
+
+
+//# address-hook(0x084404)
+function void Object.AnimationProgress()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		++objA0.animation.frame
+		D0 = objA0.animation.frame
+		D1 = u8[A1 + objA0.animation.frame + 1]
+		if (D1.s8 < 0)
+		{
+			fn084428()
+		}
+		else
+		{
+			objA0.animation.timer = u8[A1]
+			objA0.animation.sprite = D1.u8
+		}
+	}
+}
+
+function void Object.animationProgress(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress()
+}
+
+
+//# address-hook(0x084428)
+function void fn084428()
+{
+	call 0x084430 - D1.s8		// Can be 0x084434, 0x084438, 0x08443c
+	objA0.animation.frame = 0
+}
+
+
+//# address-hook(0x084434) end(0x084434)
+function void fn084434()
+{
+	fn08444e()
+}
+
+//# address-hook(0x084438) end(0x084438)
+function void fn084438()
+{
+	fn084440()
+}
+
+//# address-hook(0x08443c) end(0x08443c)
+function void fn08443c()
+{
+	fn08445a()
+}
+
+
+//# address-hook(0x084440) end(0x084458)
+function void fn084440()
+{
+	A1 += s8[A1 + D0.s16 + 2]
+	u32[A0 + 0x30] = A1
+	objA0.animation.sprite = u8[A1 + 1]
+	objA0.animation.timer = u8[A1]
+}
+
+
+//# address-hook(0x08444e)
+function void fn08444e()
+{
+	objA0.animation.sprite = u8[A1 + 1]
+	objA0.animation.timer = u8[A1]
+}
+
+
+//# address-hook(0x08445a) end(0x084462)
+function void fn08445a()
+{
+	objA0.animation.timer = 0
+	A1 = objA0.countdown_callback
+	call A1
+}
+
+
+//# address-hook(0x084464) end(0x084496)
+function void fn084464()
+{
+	A1 = u32[A0 + 0x30]
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		D0 = objA0.animation.frame + 1
+		objA0.animation.frame = D0.u8
+
+		D1 = u8[A1 + D0.s16 + 1]
+		if (D1.s8 < 0)
+		{
+			fn084428()
+		}
+		else
+		{
+			if (D1 & 0x40)
+			{
+				D1 &= ~0x40
+				objA0.render_flags ^= render_flag.FLIP_X
+			}
+
+			objA0.animation.timer = u8[A1]
+			objA0.animation.sprite = D1.u8
+		}
+	}
+}
+
+
+
+//# address-hook(0x01b662) end(0x01b662)
+function void fn01b662()
+{
+	D0.u16 = objA0.position.x.u16
+	fn01b666()
+}
+
+
+//# address-hook(0x01b666) end(0x01b68c)
+function void fn01b666()
+{
+	D0.u16 = (D0.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x280)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}

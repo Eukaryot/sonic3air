@@ -1,0 +1,171 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03cb3a) end(0x03cbc8)
+function void fn03cb3a()
+{
+	objA0.mapping_offset = 0x03cc5a
+	objA0.sprite_attributes = 0x030f
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x80
+
+	objA0.update_address = 0x03cb66
+	fn03cb66()
+}
+
+
+//# address-hook(0x03cb66) end(0x03cbc8)
+function void fn03cb66()
+{
+	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	if (D0.s16 >= 0)
+	{
+		if (D0.s16 >= 0x20)
+		{
+			objA0.state = 1
+		}
+	}
+	else
+	{
+		if (D0.s16 < -0x10)
+		{
+			objA0.state = 0
+		}
+	}
+
+	A1 = 0xffffb000
+	if (objA0.flags2a & 0x08)
+	{
+		objA0.flags2a &= ~0x08
+		fn03cbce()
+	}
+
+	A1 = 0xffffb04a
+	if (objA0.flags2a & 0x10)
+	{
+		objA0.flags2a &= ~0x10
+		fn03cbce()
+	}
+
+	D1.u16 = 0x1b
+	D2.u16 = 0x08
+	D3.u16 = 0x09
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	Object.animationUpdate(0x03cc4c)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03cbce) end(0x03cc46)
+function void fn03cbce()
+{
+	u8[A1 + 0x05] = 0x02
+	objA1.velocity.y = (objA0.subtype2c & 0x02) ? -0xa00 : -0x1000
+	objA1.state = char.state.STRAIGHTJUMP
+	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x3d] = 0
+	u8[A1 + 0x40] = 0
+
+	if (objA0.subtype2c & 0x01)
+	{
+		u8[A1 + 0x20] = 0
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1
+		u8[A1 + 0x31] = 0x04
+
+		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+		{
+			s16[A1 + 0x1c] = -1
+			s8[A1 + 0x27] = -1
+		}
+		else
+		{
+			s16[A1 + 0x1c] = 1
+			s8[A1 + 0x27] = 1
+		}
+	}
+
+	playSound(0xb1)
+}
+
+
+
+// Spring inside the floor
+
+//# address-hook(0x0239e4) end(0x0239f6)
+function void fn0239e4()
+{
+	SpringVertical.BaseUpdate()
+
+	D0.u16 = (objA0.subtype2c >> 3) & 0x0e
+
+	// Targets:
+	//  - 0x023a04	-> D0.u16 = 0x00
+	//  - No other targets...?
+	call tableLookupAddress(0x0239fa, D0.u16)
+}
+
+
+//# address-hook(0x023a04) end(0x023a04)
+function void fn023a04()
+{
+	objA0.update_address = 0x023a0a
+	fn023a0a()
+}
+
+
+//# address-hook(0x023a0a) end(0x023a1c)
+function void fn023a0a()
+{
+	fn023ab8()
+
+	objA0.position.y.u16 = u16[A0 + 0x34] + u8[A0 + 0x36]
+	SpringVertical.Update()
+}
+
+
+//# address-hook(0x023ab8) end(0x023b16)
+function void fn023ab8()
+{
+	if (u16[A0 + 0x3a] != 0)
+	{
+		--u16[A0 + 0x3a]
+		if (u16[A0 + 0x3a] == 0 && u8[A0 + 0x04] & 0x80)
+		{
+			playSound(0x52)
+		}
+		return
+	}
+
+	if (u16[A0 + 0x38] != 0)
+	{
+		u16[A0 + 0x36] -= 0x0800
+		if (s16[A0 + 0x36] < 0)
+		{
+			u16[A0 + 0x36] = 0
+			u16[A0 + 0x38] = 0
+			u16[A0 + 0x3a] = 0x3c
+		}
+	}
+	else
+	{
+		u16[A0 + 0x36] += 0x0800
+		if (u16[A0 + 0x36] >= 0x2000)
+		{
+			u16[A0 + 0x36] = 0x2000
+			u16[A0 + 0x38] = 0x01
+			u16[A0 + 0x3a] = 0x3c
+		}
+	}
+}

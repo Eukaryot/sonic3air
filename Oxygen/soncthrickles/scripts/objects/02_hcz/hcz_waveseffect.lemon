@@ -1,0 +1,114 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Waves effect on water surface                         //
+//-------------------------------------------------------//
+
+//# address-hook(0x01f202) end(0x01f23e)
+function void fn01f202()
+{
+	objA0.mapping_offset = 0x01f2ce
+	objA0.sprite_attributes = 0x842e
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x08
+	objA0.render_flags |= 0x40
+
+	#if STANDALONE
+	{
+		u16[A0 + 0x16] = 0		// Number of compound child objects, for standalone we use only the main object
+	}
+	#else
+	{
+		u16[A0 + 0x16] = 1		// Number of compound child objects is usually 1
+		u16[A0 + 0x18] = objA0.position.x.u16 + 0xc0
+		u16[A0 + 0x1a] = objA0.position.y.u16
+	}
+	#endif
+
+	objA0.update_address = 0x01f244
+	fn01f244()
+}
+
+
+//# address-hook(0x01f244) end(0x01f2ca)
+function void fn01f244()
+{
+	D1.u16 = (camera.position.x.u16 & 0xffe0) + 0x60
+	#if !STANDALONE
+	{
+		if (level.framecounter.low & 0x01)
+		{
+			// Every second frame, the water is drawn one "water tile" right
+			D1.u16 += 0x20
+		}
+	}
+	#endif
+
+	// Position of main object
+	objA0.position.x.u16 = D1.u16
+	objA0.position.y.u16 = water.height.current
+
+	#if !STANDALONE
+	{
+		// Position of compound child object
+		A2 = A0 + 0x18
+		u16[A2]   = objA0.position.x.u16 + 0xc0
+		u16[A2+2] = objA0.position.y.u16
+	}
+	#endif
+
+	bool goto01f2a6 = false
+	if (u8[A0 + 0x32] == 0)
+	{
+		if (s8[0xfffff603] >= 0 && s8[0xfffff66b] >= 0)
+		{
+			goto01f2a6 = true
+		}
+		else
+		{
+			u8[A0 + 0x32] = 1
+			objA0.animation.sprite += 3
+		}
+	}
+	else
+	{
+		if (global.game.paused == 0)
+		{
+			u8[A0 + 0x32] = 0
+			objA0.animation.sprite -= 3
+
+			goto01f2a6 = true
+		}
+	}
+
+	if (goto01f2a6)
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 9
+
+			++objA0.animation.sprite
+			if (objA0.animation.sprite >= 4)
+				objA0.animation.sprite = 1
+		}
+	}
+
+	#if !STANDALONE
+	{
+		A2 = A0 + 0x18
+		u8[A2+5] = objA0.animation.sprite
+	}
+	#endif
+
+	DrawObject()
+}

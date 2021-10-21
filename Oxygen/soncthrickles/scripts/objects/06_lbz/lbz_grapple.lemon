@@ -1,0 +1,165 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Grapple object in LBZ                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x029020) end(0x029080)
+function void fn029020()
+{
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.sprite_priority = 0x80
+	objA0.box_size.y = 0x80
+	u16[A0 + 0x3c] = objA0.position.y.u16
+	objA0.mapping_offset = 0x227dbc
+	objA0.sprite_attributes = 0x42ea
+
+	D0.u16 = objA0.subtype2c & 0x7f
+	D0.u16 <<= 3
+	objA0.countdown_value = D0.u16
+	u16[A0 + 0x3a] = 0x02
+	D0.u8 = objA0.subtype2c
+	if (D0.s8 < 0)
+	{
+		D0.u16 = objA0.countdown_value
+		u16[A0 + 0x38] = D0.u16
+		u8[A0 + 0x36] = 0x01
+		objA0.position.y.u16 += D0.u16
+		objA0.animation.sprite = (D0.u16 >> 4) + 1
+	}
+
+	objA0.update_address = 0x029086
+	fn029086()
+}
+
+
+//# address-hook(0x029086) end(0x0290ec)
+function void fn029086()
+{
+	bool goto0290b4 = false
+	if ((u16[A0 + 0x30] == 0) != (u8[A0 + 0x36] == 0))
+	{
+		D2.u16 = u16[A0 + 0x38]
+		if (D2.u16 != objA0.countdown_value)
+		{
+			D2.u16 += u16[A0 + 0x3a]
+			goto0290b4 = true
+		}
+	}
+	else
+	{
+		D2.u16 = u16[A0 + 0x38]
+		if (D2.u16 != 0)
+		{
+			D2.u16 -= u16[A0 + 0x3a]
+			goto0290b4 = true
+		}
+	}
+
+	if (goto0290b4)
+	{
+		u16[A0 + 0x38] = D2.u16
+		objA0.position.y.u16 = D2.u16 + u16[A0 + 0x3c]
+		if (D2.u16 != 0)
+		{
+			objA0.animation.sprite = (D2.u16 >> 4) + 1
+		}
+		else
+		{
+			objA0.animation.sprite = D2.u8
+		}
+	}
+
+	A1 = 0xffffb000
+	A2 = A0 + 0x30
+	D0.u16 = control.player1
+	fn0290f2()
+
+	A1 = 0xffffb04a
+	++A2
+	D0.u16 = control.tails
+	fn0290f2()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0290f2) end(0x029214)
+function void fn0290f2()
+{
+	if (u8[A2] != 0)
+	{
+		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
+		{
+			if ((D0.u8 & 0x70) == 0)
+			{
+				objA1.position.y.u16 = objA0.position.y.u16 + 0x94
+				return
+			}
+
+			u8[A1 + 0x2e] = 0
+			u8[A2] = 0
+			u8[A2+2] = ((D0.u16 & 0x0f00) == 0) ? 0x12 : 0x3c
+			if (D0 & 0x0400)
+			{
+				objA1.velocity.x = -0x200
+			}
+			if (D0 & 0x0800)
+			{
+				objA1.velocity.x = 0x200
+			}
+
+			objA1.velocity.y = -0x380
+			u8[A1 + 0x1e] = 0x0e
+			u8[A1 + 0x1f] = 0x07
+			objA1.state = char.state.ROLLING
+			u8[A1 + 0x27] = 0
+			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+			objA1.flags2a &= ~char.flag.CONTROL_LOCK
+			u8[A1 + 0x40] = 1
+		}
+		else
+		{
+			u8[A1 + 0x2e] = 0
+			u8[A2] = 0
+			u8[A2+2] = 0x3c
+		}
+	}
+	else
+	{
+		if (u8[A2+2] != 0)
+		{
+			--u8[A2+2]
+			if (u8[A2+2] != 0)
+				return
+		}
+
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+		D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x88
+		if (D0.u16 < 0x20 && D1.u16 < 0x18)
+		{
+			if (s8[A1 + 0x2e] >= 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+			{
+				objA1.velocity.x = 0
+				objA1.velocity.y = 0
+				u16[A1 + 0x1c] = 0
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16 + 0x94
+				objA1.state = char.state.HANGING
+				u8[A1 + 0x2e] = 0x01
+				u8[A2] = 0x01
+
+				playSound(0x5b)
+			}
+		}
+	}
+}

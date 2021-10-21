@@ -1,0 +1,102 @@
+{
+	// Metadata
+	"ShortName":  "Sonic 3 A.I.R.",
+	"FullName":   "Sonic 3 - Angel Island Revisited",
+
+	// ROM
+	"Rom":        "___internal/Sonic_Knuckles_wSonic3.bin",
+	"RomCheck":   "size=0x400000, overwrite=0x2001f0:0x4a, checksum=0x0c06aa82",
+	"RomAutoDiscover":
+	{
+		"SteamGameName": "Sonic 3 & Knuckles",
+		"SteamRomName":  "Sonic_Knuckles_wSonic3.bin"
+	},
+
+	// Paths
+	"GameDataPath": "data",
+
+	// Scripts
+	"MainScript": "main.lemon",
+	
+	// Data packages
+	"DataPackages":
+	{
+		"enginedata.bin":    { "Required": true },
+		"gamedata.bin":      { "Required": true },
+		"audiodata.bin":     { "Required": true },
+		"audioremaster.bin": { "Required": false }		
+	},
+
+
+	// Emulation-relevant data
+	"Emulation":
+	{
+		"SyncPoints":
+		[
+			"0x001d1c",				// "waitForNextFrame()"
+			"0x000326 - 0x000330",	// Right after reset
+			"0x000564 - 0x00057c",	// Right after reset
+			"0x001194 - 0x00119a"	// Right after reset
+		],
+		"VerifyIgnoreRAM":
+		[
+			"0xfd00 - 0xfe00",		// Stack
+			"0xff10 - 0xff40"		// Kosinski register backup
+		],
+
+		"AsmStackRange": "0xfd00 - 0xfe00",
+		"StackTranslation":
+		[
+			{
+				// Part of game intro
+				"AsmStack":   [ "0x0004c4", "0x003fd2" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "TitleScreen @EntryPoint_003fd2" ]
+			},
+			{
+				// Title screen main update loop
+				"AsmStack":   [ "0x0004c4", "0x0041de" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "TitleScreen @EntryPoint" ]
+			},
+			{
+				// Only temporarily needed -- though this could be a general start without any save state!
+				"AsmStack":   [ "0x0004c4", "0x007a7c", "0x003bf8" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "LevelSelect" ]
+			},
+			{
+				// Level select main update loop
+				"AsmStack":   [ "0x0004c4", "0x007c54" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "LevelSelect @EntryPoint" ]
+			},
+			{
+				// Data select main update loop
+				"AsmStack":   [ "0x0004c4", "0x00c80e" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "DataSelect.update @EntryPoint" ]
+			},
+			{
+				// In-game main update loop
+				"AsmStack":   [ "0x0004c4", "0x006520" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "GameMode.MainGame @EntryPoint" ]
+			},
+			{
+				// In-game main update loop, with game paused
+				"AsmStack":   [ "0x0004c4", "0x006510", "0x00143a" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "GameMode.MainGame @EntryPoint", "UpdateGamePause @EntryPoint" ]
+			},
+			{
+				// Special Stage (Blue Spheres) update loop
+				"AsmStack":   [ "0x0004c4", "0x0084d6" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "SpecialStage @EntryPoint" ]
+			},			
+			{
+				// Competition mode menu
+				"AsmStack":   [ "0x0004c4", "0x00adfe" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "CompetitionMode.StageSelect @EntryPoint" ]
+			},
+			{
+				// Competition mode main game update loop
+				"AsmStack":   [ "0x0004c4", "0x00668c" ],
+				"LemonStack": [ "GameModeControlLoop @EntryPoint", "GameMode.MainGame @EntryPointCompetition" ]
+			}
+		]
+	}
+}

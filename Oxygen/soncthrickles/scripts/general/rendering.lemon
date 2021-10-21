@@ -1,0 +1,832 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Rendering                                             //
+//-------------------------------------------------------//
+
+// The following functions are implemented in C++, but added here as a reference
+/*
+
+function u16 getScreenWidth()
+{
+#if STANDALONE
+	return 400
+#else
+	return 320
+#endif
+}
+
+function u16 getScreenHeight()
+{
+	return 224
+}
+
+function u16 getScreenExtend()
+{
+	// This is actually "(getScreenWidth() - 320) / 2"
+#if STANDALONE
+	return 40
+else
+	return 0
+#endif
+}
+
+*/
+
+
+function void updateSpritePattern(u32 sourceInROM, u16 targetInVRAM, u16 lengthInWords)
+{
+	// "sourceInROM" is actually a misnomer, there are plenty of cases where the source is actually in RAM
+	D1 = sourceInROM
+	D2 = targetInVRAM
+	D3 = lengthInWords
+	UpdateSpritePattern()
+}
+
+
+// This is "Add_To_DMA_Queue" in skdisasm
+
+//# address-hook(0x001526) end(0x001586)
+function void UpdateSpritePattern()
+{
+	// Different behavior for standalone version:
+	//  - Emulation:  "ProcessDMAQueue()" takes this data and copies it to VRAM
+	//  - Standalone: Directly perform the VRAM copy here
+	#if STANDALONE
+	{
+		u16 bytes = D3 * 2
+		VDP.copyToVRAMbyDMA(D1, D2, bytes)
+	}
+	#else
+	{
+		// Pointer to the last element (in worst case points to itself)
+		u32 ptr = u32[0xfffffbfc]
+		if (ptr != 0xfffffbfc)
+		{
+			// D3 is number of words to copy
+			u16[ptr]   = 0x9300 + (D3 & 0xff)
+			u16[ptr+2] = 0x9400 + ((D3 >> 8) & 0xff)
+
+			// D1 is source address in ROM
+			u16[ptr+4] = 0x9500 + ((D1 >> 1) & 0xff)
+			u16[ptr+6] = 0x9600 + ((D1 >> 9) & 0xff)
+			u16[ptr+8] = 0x9700 + ((D1 >> 17) & 0x7f)
+
+			// D2 is target address in VRAM
+			u32[ptr+10] = VDPHelper.getDirectVRAMWriteCode(D2) | 0x0080
+			ptr += 14
+
+			u32[0xfffffbfc] = ptr
+			if (ptr != 0xfffffbfc)
+			{
+				u16[ptr] = 0
+			}
+		}
+	}
+	#endif
+}
+
+
+function void updateMultipleSpritePatterns(u32 sourceBase, u32 tableAddress, u16 targetInVRAM, u16 animationSprite)
+{
+	A2 = tableLookupAddress(tableAddress, animationSprite * 2)
+	u16 numSprites = u16[A2]
+
+	for (u16 i = 0; i < numSprites; ++i)
+	{
+		// Next sprite
+		A2 += 2
+		u32 sourceInROM = sourceBase + ((u16[A2] & 0x0fff) << 5)
+		u16 lengthInWords = 0x10 + ((u16[A2] & 0xf000) >> 8)
+
+		updateSpritePattern(sourceInROM, targetInVRAM, lengthInWords)
+		targetInVRAM += lengthInWords * 2
+	}
+}
+
+
+//# address-hook(0x001588) end(0x0015b8)
+function void ProcessDMAQueue()
+{
+	// Standalone version does not need this, see "UpdateSpritePattern()" function
+	#if !STANDALONE
+	{
+		// This function pushes sprite pattern updates to the VDP
+		u32 ptr = 0xfffffb00
+		while (ptr < 0xfffffbfc && u16[ptr] != 0)
+		{
+			u16[0xc00004] = u16[ptr]
+			u16[0xc00004] = u16[ptr+2]
+			u16[0xc00004] = u16[ptr+4]
+			u16[0xc00004] = u16[ptr+6]
+			u16[0xc00004] = u16[ptr+8]
+			u16[0xc00004] = u16[ptr+10]
+			u16[0xc00004] = u16[ptr+12]
+			ptr += 14
+		}
+	}
+	#endif
+
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+}
+
+
+
+//-------------------------------------------------------//
+// Scroll Offsets                                        //
+//-------------------------------------------------------//
+
+// For game app, these two are implemented in C++ for performance reasons
+#if !GAMEAPP
+
+// This is "PlainDeformation" in skdisasm
+
+//# address-hook(0x04f072) end(0x04f092)
+function void WriteScrollOffsets()
+{
+	// Update horizontal scroll offsets according to current camera position
+	D0.s16 = -s16(camera.foreground.x.u16)
+	D0 <<= 16
+	D0.s16 = -s16(camera.background.x.u16)
+
+	for (u8 line = 0; line < getScreenHeight(); ++line)
+	{
+		u32[0xffffe000 + line * 4] = D0
+	}
+}
+
+
+//# address-hook(0x04f094) end(0x04f0b4)
+function void WriteScrollOffsetsFlipped()
+{
+	// Update horizontal scroll offsets, with foreground and background exchanged
+	D0.s16 = -s16(camera.background.x.u16)
+	D0 <<= 16
+	D0.u16 = -s16(camera.foreground.x.u16)
+
+	for (u8 line = 0; line < getScreenHeight(); ++line)
+	{
+		u32[0xffffe000 + line * 4] = D0
+	}
+}
+
+#endif
+
+
+//-------------------------------------------------------//
+// Sprite Rendering                                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x01ad20) end(0x01af68)
+function void RenderSprites()
+{
+#if STANDALONE
+	Renderer.resetSprites()
+#endif
+
+	if (competition_mode.active)
+	{
+		RenderSprites_CompetitionMode()
+		return
+	}
+
+	D7 = 0x4f			// Hard sprite limit: Not more than 0x50 -- but for standalone, we will happily ignore the limit
+	D6 = 0
+	A5 = 0xffffac00
+	A3 = 0xffffee80		// Address of camera.foreground.x
+	A6 = 0xfffff800
+	if (global.level_started != 0)
+	{
+	#if STANDALONE
+		Renderer.setSpriteTagWithPosition(1, 0, 0)
+		Renderer.setLogicalSpriteSpace(Space.SCREEN)
+	#endif
+		RenderHUD()
+
+	#if STANDALONE
+		Renderer.clearSpriteTag()
+		Renderer.setLogicalSpriteSpace(Space.WORLD)
+	#endif
+		RenderStaticRings()
+	}
+
+	// Iterate over sprite priority lists
+	while (A5 < 0xffffb000)
+	{
+		if (u16[A5] > 0)
+		{
+			A4 = A5 + 2
+			while (u16[A5] > 0)
+			{
+				renderNextObject()
+				u16[A5] -= 2
+			}
+		}
+
+		if (A5 == 0xffffac00 && global.zone == 0x09)	// Lava Reef Zone
+		{
+		#if STANDALONE
+			Renderer.clearSpriteTag()
+		#endif
+			RenderLevelSprites.LRZ()
+		}
+		A5 += 0x80
+	}
+
+#if STANDALONE
+	Renderer.clearSpriteTag()
+#endif
+
+	// Fill up remaining space
+#if STANDALONE
+	D7.s16 = max(D7.s16, 0)
+#endif
+	D6.u16 = D7.u16
+	while (D7.s16 >= 0)
+	{
+		u16[A6] = 0
+		A6 += 8
+		--D7.u16
+	}
+
+	u8[0xfffff62c] = 0x4f - D6.u8
+	if (u16[0xffffef3a] != 0)
+	{
+		if (u8[0xffffb005] < 0x06)
+		{
+			u16[0xffffef3a] = 0
+		}
+
+		A0 = 0xfffff804
+		D1 = 0x4e
+		while (D1.s8 >= 0)
+		{
+			if (u16[A0] == 0x07c0)
+			{
+				u16[A0 + 0x02] = 1
+				objA0.sprite_attributes = 0
+			}
+			A0 += 8
+			--D1
+		}
+	}
+}
+
+
+function void renderNextObject()
+{
+	u16 cameraX = u16[A3]
+	u16 cameraY = u16[A3+4]
+	u16 renderQueue = 0xa000 - (A4 - 0xffffac00)
+
+	A0 = 0xffff0000 + u16[A4]
+	A4 += 2
+
+	objA0.render_flags &= ~render_flag.VISIBLE		// Reset visibility flag
+	D6.u8 = objA0.render_flags
+	D0.u16 = objA0.position.x.u16
+	D1.u16 = objA0.position.y.u16
+
+	// Special handling for compound objects
+	if (objA0.render_flags & render_flag.COMPOUND)
+	{
+		if ((objA0.render_flags & render_flag.WORLD) == 0)
+		{
+			D2 = objA0.box_size.x
+			D0.u16 -= 0x80
+			if (D0.s16 + D2.s16 < 0 || D0.s16 - D2.s16 >= getScreenWidth())
+				return
+
+			D0.u16 += 0x80
+			D2.u8 = objA0.box_size.y
+			D1.u16 -= 0x80
+			if (D1.s16 + D2.s16 < 0 || D1.s16 - D2.s16 >= getScreenHeight())
+				return
+
+			D1.u16 += 0x80
+		}
+		else
+		{
+			// Debug output of graphics bounding box
+			//debugDrawRect(D0.u16 - objA0.box_size.x, D1.u16 - objA0.box_size.y, objA0.box_size.x * 2, objA0.box_size.y * 2, 0x40ff8000)
+
+			D2 = objA0.box_size.x
+			D0.u16 -= cameraX
+			if (D0.s16 + D2.s16 < 0 || D0.s16 - D2.s16 >= getScreenWidth())
+				return
+
+			D0.u16 += 0x80
+			D1.u16 = (D1.u16 + objA0.box_size.y - cameraY) & level.height.bitmask
+			D2.u16 = objA0.box_size.y * 2 + getScreenHeight()
+			if (D1.u16 >= D2.u16)
+				return
+
+			D1.u16 = D1.u16 + 0x80 - objA0.box_size.y
+		}
+
+		objA0.render_flags |= render_flag.VISIBLE	// Set visibility flag
+
+	#if STANDALONE
+		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
+			return
+	#else
+		if (D7.s16 < 0)
+			return
+	#endif
+
+		A2 = objA0.mapping_offset
+		D5.u16 = objA0.sprite_attributes
+		if (objA0.animation.sprite != 0)
+		{
+			A1 = tableLookupAddress(A2, s16(objA0.animation.sprite) * 2)
+			D4.u16 = u16[A1] - 1
+			A1 += 2
+			if (D4.s16 >= 0)
+			{
+				u16 backup = D6.u16
+				writeToSpriteTableCompound(renderQueue)
+				D6.u16 = backup
+
+			#if !STANDALONE
+				if (D7.s16 < 0)
+					return
+			#endif
+			}
+		}
+
+		D3.u16 = u16[A0 + 0x16] - 1
+		if (D3.s16 < 0)
+			return
+
+		A0 += 0x18
+
+	#if STANDALONE
+		while (D3.s16 >= 0)
+	#else
+		while (D3.s16 >= 0 && D7.s16 >= 0)
+	#endif
+		{
+			D0.u16 = u16[A0]
+			D1.u16 = u16[A0 + 2]
+			if (D6 & render_flag.WORLD)
+			{
+				D0.u16 = (D0.u16 + 0x80 - cameraX)
+				D1.u16 = (D1.u16 + 0x80 - cameraY) & level.height.bitmask
+			}
+			D4 = u16(u8[A0 + 5]) * 2
+			A0 += 6
+
+			A1 = tableLookupAddress(A2, D4.u16)
+			D4.u16 = u16[A1] - 1
+			A1 += 2
+			u32 spriteTag = A0
+			if (D4.s16 >= 0)
+			{
+				u16 backup = D6.u16
+				++spriteTag
+				Renderer.setSpriteTagWithPosition(spriteTag, D0.u16, D1.u16)
+				writeToSpriteTableCompound(renderQueue)
+				D6.u16 = backup
+			}
+
+			--D3.u16
+		}
+	}
+	else
+	{
+		// Normal (non-compound) object
+		if (objA0.render_flags & render_flag.WORLD)
+		{
+			// Debug output of graphics bounding box
+			//debugDrawRect(D0.u16 - objA0.box_size.x, D1.u16 - objA0.box_size.y, objA0.box_size.x * 2, objA0.box_size.y * 2, 0x40ff0000)
+
+			D2 = objA0.box_size.x
+			D0.u16 -= cameraX
+			if (D0.s16 + D2.s16 < 0 || D0.s16 - D2.s16 >= getScreenWidth())
+				return
+
+			D1.u16 = (D1.u16 + objA0.box_size.y - cameraY) & level.height.bitmask
+			D2.u16 = objA0.box_size.y * 2 + getScreenHeight()
+			if (D1.u16 >= D2.u16)
+				return
+
+			D0.u16 += 0x80
+			D1.u16 += 0x80 - objA0.box_size.y
+		}
+
+		objA0.render_flags |= render_flag.VISIBLE
+	#if !STANDALONE
+		if (D7.s16 < 0)
+			return
+	#endif
+
+	#if STANDALONE
+		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
+			return
+	#endif
+
+		A1 = objA0.mapping_offset
+		D4 = 0
+		if ((objA0.render_flags & 0x20) == 0)
+		{
+			A1 = tableLookupAddress(A1, s16(objA0.animation.sprite) * 2)
+			D4.u16 = u16[A1] - 1
+			A1 += 2
+			if (D4.s16 < 0)
+				return
+		}
+
+		D5.u16 = objA0.sprite_attributes
+		writeToSpriteTable(renderQueue)
+	}
+}
+
+
+//# address-hook(0x01af6c) end(0x01afd6)
+//# translated(0x01afe8) end(0x01b026)
+//# translated(0x01b038) end(0x01b06e)
+function void WriteToSpriteTable()
+{
+	// Assume 0xa000 as render queue value if we have nothing better
+	writeToSpriteTable(0xa000)
+}
+
+
+function void writeToSpriteTable(u16 renderQueue)
+{
+	// A6 is 0xfffff808 for the first object, increasing by 8 for each one
+	u16 baseX = D0.u16
+	u16 baseY = D1.u16
+
+	// In emulation, this bitmask is always 0x01ff
+	//  -> This limits the actual sprite x-position on screen to max. 383 (after 0x80 got subtracted)
+	//  -> That is okay for a 320 screen, but not when using wider screen sizes
+	//  -> So we optionally use an extra bit (which would be unused anyway) to store the x-position
+#if STANDALONE
+	u16 px_bitmask = 0x03ff
+#else
+	u16 px_bitmask = 0x01ff
+#endif
+
+	bool flipX = (D6.u8 & render_flag.FLIP_X)
+	bool flipY = (D6.u8 & render_flag.FLIP_Y)
+
+#if STANDALONE
+	if (D4.s16 >= 0x100)
+	{
+		assert(false, stringformat("Passed a very high value of sprites (namely 0x%04x) to writeToSpriteTable", D4.s16))
+		return
+	}
+	while (D4.s16 >= 0)
+#else
+	while (D4.s16 >= 0 && D7.s16 >= 0)
+#endif
+	{
+		u8 size = u8[A1+1]
+		u8 width = ((size / 4 + 1) * 8)
+		u8 height = ((size % 4 + 1) * 8)
+
+		s16 px = baseX
+		if (flipX)
+			px -= s16[A1+4] + width
+		else
+			px += u16[A1+4]
+
+		u16 py = baseY
+		if (flipY)
+			py -= s8[A1] + height
+		else
+			py += s8[A1]
+
+		u16 index = u16[A1+2] + D5.u16
+		if (flipX)
+			index ^= 0x0800
+		if (flipY)
+			index ^= 0x1000
+
+	#if STANDALONE
+		if (!Standalone.onDrawVdpSprite(px - 0x80, py - 0x80, size, index, renderQueue))
+		{
+			Renderer.drawVdpSprite(px - 0x80, py - 0x80, size, index, renderQueue)
+		}
+	#endif
+
+		if (D7.s16 >= 0)
+		{
+			u16[A6+0] = py
+			 u8[A6+2] = size
+			u16[A6+4] = index
+			u16[A6+6] = max(1, px & px_bitmask)
+
+			A6 += 8
+			--D7.s16
+		}
+
+		A1 += 6
+		--D4.s16
+	}
+}
+
+
+//# address-hook(0x01b070) end(0x01b11a)
+//# translated(0x01b12c) end(0x01b18a)
+//# translated(0x01b19c) end(0x01b1f2)
+function void WriteToSpriteTableCompound()
+{
+	// Assume 0x9000 as render queue value if we have nothing better
+	writeToSpriteTableCompound(0x9000)
+}
+
+
+function void writeToSpriteTableCompound(u16 renderQueue)
+{
+	u16 baseX = D0.u16
+	u16 baseY = D1.u16
+
+	bool flipX = (D6.u8 & render_flag.FLIP_X)
+	bool flipY = (D6.u8 & render_flag.FLIP_Y)
+
+	u8 spriteCounter = 0
+#if STANDALONE
+	if (D4.s16 >= 0x100)
+	{
+		assert(false, stringformat("Passed a very high value of sprites (namely 0x%04x) to writeToSpriteTableCompound", D4.s16))
+		return
+	}
+	while (D4.s16 >= 0)
+#else
+	while (D4.s16 >= 0 && D7.s16 >= 0)
+#endif
+	{
+		u8 size = u8[A1+1]
+		u8 width = ((size / 4 + 1) * 8)
+		u8 height = ((size % 4 + 1) * 8)
+
+		u16 py = baseY
+		if (flipY)
+			py -= s8[A1] + height
+		else
+			py += s8[A1]
+
+		if (py > 0x60 && py < 0x160)
+		{
+			s16 px = baseX
+			if (flipX)
+				px -= s16[A1+4] + width
+			else
+				px += u16[A1+4]
+
+			u16 index = u16[A1+2] + D5.u16
+			if (flipX)
+				index ^= 0x0800
+			if (flipY)
+				index ^= 0x1000
+
+		#if STANDALONE
+			// Note that clipping in x-direction is ignored for standalone rendering
+			u32 backupA0 = A0
+			A0 = u32(0xffff0000) + u16[A4-2]
+			if (!Standalone.onDrawVdpSpriteCompound(px - 0x80, py - 0x80, size, index, renderQueue, spriteCounter))
+			{
+				Renderer.drawVdpSprite(px - 0x80, py - 0x80, size, index, renderQueue)
+			}
+			A0 = backupA0
+		#endif
+
+			if (D7.s16 >= 0)
+			{
+				u16[A6+0] = py
+				 u8[A6+2] = size
+				u16[A6+4] = index
+
+				if (px > 0x60 && px < 0x80 + getScreenWidth())
+				{
+					u16[A6+6] = px
+					A6 += 8
+					--D7.s16
+				}
+			}
+		}
+
+		A1 += 6
+		--D4.s16
+		++spriteCounter
+	}
+}
+
+
+
+// Competition mode
+
+//# address-hook(0x01b1f4) end(0x01b584)
+function void RenderSprites_CompetitionMode()
+{
+#if STANDALONE
+	// Setup viewports, to be used in render queue ranges for the sprites
+	Renderer.setViewport(0, 0, getScreenWidth(), 0x6b, 0x97ff)
+	Renderer.setViewport(0, 0x75, getScreenWidth(), 0x6b, 0x9bff)
+#endif
+
+	// Upper screen
+	D7 = 0x4d
+	D6 = 0
+	A5 = 0xffffac00
+	A3 = 0xffffee80
+	A6 = (u16[0xffffef3c] != 0) ? 0xffff7890 : 0xfffff810
+
+	if (global.level_started != 0)
+	{
+		// Render HUD (for debug mode)
+		fn00db3c()
+	}
+
+	while (A5 < 0xffffb000)
+	{
+		u8[A5] = u8[A5 + 0x01]
+		A4 = A5 + 2
+		while (u8[A5] != 0)
+		{
+			renderNextCompModeObject(0)
+			u8[A5] -= 2
+		}
+		A5 += 0x80
+	}
+
+	while (D7.s16 >= 0)
+	{
+		u16[A6] = 0
+		A6 += 8
+		--D7.s16
+	}
+
+	if (u32[0xffffad02] == 0xb000b04a)
+	{
+		u32[0xffffad02] = 0xb04ab000
+	}
+
+	// Lower screen
+	D7 = 0x4f
+	A5 = 0xffffac00
+	A3 = 0xffffee68
+	A6 = (u16[0xffffef3c] != 0) ? 0xffff7d80 : 0xffff7b00
+
+	while (A5 < 0xffffb000)
+	{
+		A4 = A5 + 2
+		while (u8[A5 + 0x01] != 0)
+		{
+			renderNextCompModeObject(1)
+			u8[A5 + 0x01] -= 2
+		}
+		A5 += 0x80
+	}
+
+	while (D7.s16 >= 0)
+	{
+		u16[A6] = 0
+		A6 += 8
+		--D7.s16
+	}
+	u8[0xffffef3e] = 0xff
+}
+
+
+function void renderNextCompModeObject(u8 splitScreenIndex)
+{
+	u16 renderQueue = 0x9800 + u16(splitScreenIndex) * 0x400
+
+	A0 = 0xffff0000 + u16[(A4+=2)-2]
+	if (splitScreenIndex == 0)
+	{
+		objA0.render_flags &= ~render_flag.VISIBLE		// Reset visibility flag
+		D6.u8 = objA0.render_flags
+		if (D6 & 0x10)
+			return
+	}
+	else
+	{
+		D6.u8 = objA0.render_flags
+		if (D6 & 0x08)
+			return
+	}
+	u16 offsetY = splitScreenIndex * 0x70
+
+	D0.u16 = objA0.position.x.u16
+	D1.u16 = objA0.position.y.u16
+
+	// Special handling for compound objects
+	if (objA0.render_flags & render_flag.COMPOUND)
+	{
+		D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & u16[0xffffeea8]
+		D3.u16 = objA0.box_size.x
+		D2.u16 = getScreenWidth() + objA0.box_size.x * 2
+		if (D0.u16 >= D2.u16)
+			return
+
+		D0.u16 = D0.u16 + 0x80 + offsetY - D3.u16
+		D1.u16 = (D1.u16 - u16[A3 + 0x04] + objA0.box_size.y) & level.height.bitmask
+		D3.u16 = objA0.box_size.y
+		D2.u16 = 0x70 + objA0.box_size.y * 2
+		if (D1.u16 >= D2.u16)
+			return
+
+		D1.u16 = D1.u16 + 0x80 - D3.u16
+		objA0.render_flags |= render_flag.VISIBLE	// Set visibility flag
+		if (D7.s16 < 0)
+			return
+
+		D5.u16 = objA0.sprite_attributes
+		A2 = objA0.mapping_offset
+		D4 = objA0.animation.sprite
+		if (D4.u8 != 0)
+		{
+			A1 = tableLookupAddress(A2, D4.u16 * 2)
+			D4.s16 = s16[A1] - 1
+			A1 += 2
+			if (D4.s16 >= 0)
+			{
+				D3.u16 = D6.u16
+				writeToSpriteTableCompound(renderQueue)
+				D6.u16 = D3.u16
+				if (D7.s16 < 0)
+					return
+			}
+		}
+
+		D3.u16 = objA0.position.y.frac - 1
+		if (D3.s16 >= 0)
+		{
+			A0 += 0x18
+			while (D3.s16 >= 0 && D7.s16 >= 0)
+			{
+				D0.u16 = (u16[A0]   - u16[A3]   + 0x80) & u16[0xffffeea8]
+				D1.u16 = (u16[A0+2] - u16[A3+4] + 0x80) & level.height.bitmask
+				D1.u16 += offsetY
+				D4 = u8[A0+5]
+				A0 += 6
+
+				A1 = tableLookupAddress(A2, D4.u16 * 2)
+				D4.s16 = s16[A1] - 1
+				A1 += 2
+				if (D4.s16 >= 0)
+				{
+					u16 backupD6 = D6.u16
+					writeToSpriteTableCompound(renderQueue)
+					D6.u16 = backupD6
+				}
+				--D3.s16
+			}
+		}
+	}
+	else
+	{
+		if (D6 & render_flag.WORLD)
+		{
+			D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & u16[0xffffeea8]
+			D3.u16 = objA0.box_size.x
+			D2.u16 = getScreenWidth() + objA0.box_size.x * 2
+			if (D0.u16 >= D2.u16)
+				return
+
+			D0.u16 = D0.u16 + 0x80 - D3.u16
+			D1.u16 = (D1.u16 - u16[A3 + 0x04] + objA0.box_size.y) & level.height.bitmask
+			D3.u16 = objA0.box_size.y
+			D2.u16 = 0x70 + objA0.box_size.y * 2
+			if (D1.u16 >= D2.u16)
+				return
+
+			D1.u16 = D1.u16 + 0x80 - D3.u16
+		}
+		D1.u16 += offsetY
+
+		objA0.render_flags |= 0x80
+		if (D7.s16 >= 0)
+		{
+			A1 = objA0.mapping_offset
+			D4 = 0
+			if ((D6 & 0x20) == 0)
+			{
+				D4.u16 = u16(objA0.animation.sprite) * 2
+				A1 += u16[A1 + D4.u16]
+				D4.u16 = u16[(A1+=2)-2] - 1
+			}
+
+			if (D4.s16 >= 0)
+			{
+				D5.u16 = objA0.sprite_attributes
+				writeToSpriteTable(renderQueue)
+			}
+		}
+	}
+}

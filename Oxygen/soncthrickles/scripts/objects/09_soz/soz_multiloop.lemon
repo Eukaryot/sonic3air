@@ -1,0 +1,417 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// This object makes Sonic go through loops more often
+// Used in Sandopolis
+
+//# address-hook(0x01d106) end(0x01d174)
+function void fn01d106()
+{
+	objA0.mapping_offset = 0x01d05a
+	objA0.sprite_attributes = 0x26bc
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x40
+	objA0.sprite_priority = 0x0280
+
+	D0.u8 = objA0.subtype2c
+	if ((objA0.subtype2c & 0x04) == 0)
+	{
+		fn01d180()
+		return
+	}
+
+	objA0.animation.sprite = D0.u8 & 0x07
+	D0.u16 = (D0.u16 & 0x03) * 2
+	objA0.value32 = u16[0x01d178 + D0.s16]
+
+	D1.u16 = objA0.position.y.u16
+	A1 = 0xffffb000
+	if (D1.u16 < objA1.position.y.u16)
+	{
+		u8[A0 + 0x34] = 1
+	}
+
+	A1 = 0xffffb04a
+	if (D1.u16 < objA1.position.y.u16)
+	{
+		u8[A0 + 0x35] = 1
+	}
+
+	objA0.update_address = 0x01d390
+	fn01d390()
+}
+
+
+//# address-hook(0x01d180) end(0x01d1b4)
+function void fn01d180()
+{
+	objA0.animation.sprite = D0.u8 & 0x03
+	D0.u16 = (D0.u16 & 0x03) * 2
+	objA0.value32 = u16[0x01d178 + D0.s16]
+
+	D1.u16 = objA0.position.x.u16
+	A1 = 0xffffb000
+	if (D1.u16 < objA1.position.x.u16)
+	{
+		u8[A0 + 0x34] = 1
+	}
+
+	A1 = 0xffffb04a
+	if (D1.u16 < objA1.position.x.u16)
+	{
+		u8[A0 + 0x35] = 1
+	}
+
+	objA0.update_address = 0x01d1ba
+	fn01d1ba()
+}
+
+
+//# address-hook(0x01d1ba) end(0x01d1dc)
+function void fn01d1ba()
+{
+	if (debug_mode.state == 0)
+	{
+		D1.u16 = objA0.position.x.u16
+		A2 = A0 + 0x34
+
+		A1 = 0xffffb000
+		fn01d1e2()
+
+		A1 = 0xffffb04a
+		fn01d1e2()
+
+		CheckForUnloadObject()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x01d1e2) end(0x01d38e)
+function void fn01d1e2()
+{
+	if (u8[(A2+=1)-1] == 0)
+	{
+		if (D1.u16 > objA1.position.x.u16)
+			return
+
+		u8[A2 - 0x01] = 1
+		D2.u16 = objA0.position.y.u16 - objA0.value32
+		D3.u16 = objA0.position.y.u16 + objA0.value32
+		D4.u16 = objA1.position.y.u16
+		if (D4.s16 < D2.s16 || D4.s16 >= D3.s16)
+			return
+
+		D0.u8 = objA0.subtype2c
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+			return
+
+		D2.u16 = abs(s16(objA1.position.x.u16 - D1.u16))
+		if (D2.u16 >= 0x40)
+			return
+
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+		{
+			if ((D0 & 0x08) == 0)
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+					u8[A1 + 0x46] = 0x0c
+					u8[A1 + 0x47] = 0x0d
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0c
+						u8[A1 + 0x47] = 0x0d
+					}
+				}
+			}
+			else
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0e
+						u8[A1 + 0x47] = 0x0f
+					}
+				}
+			}
+		}
+
+		if (D0 & 0x20)
+			u16[A1 + 0x0a] |= 0x8000
+		else
+			u16[A1 + 0x0a] &= 0x7fff
+	}
+	else
+	{
+		if (D1.u16 <= objA1.position.x.u16)
+			return
+
+		u8[A2 - 0x01] = 0
+		D2.u16 = objA0.position.y.u16 - objA0.value32
+		D3.u16 = objA0.position.y.u16 + objA0.value32
+		D4.u16 = objA1.position.y.u16
+		if (D4.s16 < D2.s16 || D4.s16 >= D3.s16)
+			return
+
+		D0.u8 = objA0.subtype2c
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+			return
+
+		D2.u16 = abs(s16(objA1.position.x.u16 - D1.u16))
+		if (D2.u16 >= 0x40)
+			return
+
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+		{
+			if ((D0 & 0x10) == 0)
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+					u8[A1 + 0x46] = 0x0c
+					u8[A1 + 0x47] = 0x0d
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0c
+						u8[A1 + 0x47] = 0x0d
+					}
+				}
+			}
+			else
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0e
+						u8[A1 + 0x47] = 0x0f
+					}
+				}
+			}
+		}
+
+		if (D0 & 0x40)
+			u16[A1 + 0x0a] |= 0x8000
+		else
+			u16[A1 + 0x0a] &= 0x7fff
+	}
+}
+
+
+//# address-hook(0x01d390) end(0x01d3b2)
+function void fn01d390()
+{
+	if (debug_mode.state == 0)
+	{
+		D1.u16 = objA0.position.y.u16
+		A2 = A0 + 0x34
+
+		A1 = 0xffffb000
+		fn01d3b8()
+
+		A1 = 0xffffb04a
+		fn01d3b8()
+
+		CheckForUnloadObject()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x01d3b8) end(0x01d564)
+function void fn01d3b8()
+{
+	if (u8[(A2+=1)-1] == 0)
+	{
+		if (D1.u16 > objA1.position.y.u16)
+			return
+
+		u8[A2 - 0x01] = 0x01
+		D2.u16 = objA0.position.x.u16 - objA0.value32
+		D3.u16 = objA0.position.x.u16 + objA0.value32
+		D4.u16 = objA1.position.x.u16
+		if (D4.s16 < D2.s16 || D4.s16 >= D3.s16)
+			return
+
+		D0.u8 = objA0.subtype2c
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+			return
+
+		D2.u16 = abs(s16(objA1.position.y.u16 - D1.u16))
+		if (D2.u16 >= 0x40)
+			return
+
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+		{
+			if ((D0 & 0x08) == 0)
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+					u8[A1 + 0x46] = 0x0c
+					u8[A1 + 0x47] = 0x0d
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0c
+						u8[A1 + 0x47] = 0x0d
+					}
+				}
+			}
+			else
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0e
+						u8[A1 + 0x47] = 0x0f
+					}
+				}
+			}
+		}
+
+		if (D0 & 0x20)
+			u16[A1 + 0x0a] |= 0x8000
+		else
+			u16[A1 + 0x0a] &= 0x7fff
+	}
+	else
+	{
+		if (D1.u16 <= objA1.position.y.u16)
+			return
+
+		u8[A2 - 0x01] = 0
+		D2.u16 = objA0.position.x.u16 - objA0.value32
+		D3.u16 = objA0.position.x.u16 + objA0.value32
+		D4.u16 = objA1.position.x.u16
+		if (D4.s16 < D2.s16 || D4.s16 >= D3.s16)
+			return
+
+		D0.u8 = objA0.subtype2c
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+			return
+
+		D2.u16 = abs(s16(objA1.position.y.u16 - D1.u16))
+		if (D2.u16 >= 0x40)
+			return
+
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+		{
+			if ((D0 & 0x10) == 0)
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+					u8[A1 + 0x46] = 0x0c
+					u8[A1 + 0x47] = 0x0d
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0c
+						u8[A1 + 0x47] = 0x0d
+					}
+				}
+			}
+			else
+			{
+				if (u8[A1 + 0x46] == 0x0c)
+				{
+					u8[A2 + 0x01] = 0
+				}
+				else
+				{
+					++u8[A2 + 0x01]
+					if (u8[A2 + 0x01] == 2)
+					{
+						u8[A2 + 0x01] = 0
+					}
+					else
+					{
+						u8[A1 + 0x46] = 0x0e
+						u8[A1 + 0x47] = 0x0f
+					}
+				}
+			}
+		}
+
+		if (D0 & 0x40)
+			u16[A1 + 0x0a] |= 0x8000
+		else
+			u16[A1 + 0x0a] &= 0x7fff
+	}
+}

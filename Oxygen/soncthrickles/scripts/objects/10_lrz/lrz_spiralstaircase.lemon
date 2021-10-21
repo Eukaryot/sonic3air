@@ -1,0 +1,189 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x04224e) end(0x042254)
+function void fn04224e()
+{
+	objA0.box_size.x = 0xd0
+	objA0.update_address = 0x04225a
+	fn04225a()
+}
+
+
+//# address-hook(0x04225a) end(0x04225c)
+function void fn04225a()
+{
+	fn042262()
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x042262) end(0x042366)
+function void fn042262()
+{
+	A1 = 0xffffb000
+	A2 = A0 + 0x30
+	D6 = 3
+	fn042278()
+
+	A1 = 0xffffb04a
+	A2 = A0 + 0x34
+	++D6.u8
+	fn042278()
+}
+
+
+function void fn042278()
+{
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+		if (D0.s16 >= -0x10 && D0.s16 < 0x10)
+		{
+			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
+			if (D0.s16 <= 0x20)
+			{
+				if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & 0x02) == 0 && s16[A1 + 0x1c] >= 0)
+				{
+					if (s16[A1 + 0x1c] < 0x0600)
+					{
+						u16[A1 + 0x1c] = 0x0600
+					}
+					if (u8[A1 + 0x2a] & 0x08)
+					{
+						A3 = 0xffff0000 + u16[A1 + 0x42]
+						u8[A3 + 0x2a] &= ~bit
+					}
+
+					objA0.flags2a |= bit
+					score.bonus_counter = 0
+					u32[A2] = 0
+
+					u16[A1 + 0x42] = A0.u16
+					objA1.velocity.x = 0
+					objA1.velocity.y = 0
+					u8[A1 + 0x1e] = u8[A1 + 0x44]
+					u8[A1 + 0x1f] = u8[A1 + 0x45]
+					u8[A1 + 0x2a] &= 0x89
+					u8[A1 + 0x2a] |= 0x08
+					u8[A1 + 0x40] = 0
+					u8[A1 + 0x26] = 0
+					u8[A1 + 0x27] = 0
+					u8[A1 + 0x2d] = 0
+					u8[A1 + 0x30] = 0
+					u8[A1 + 0x39] = 0
+					u8[A1 + 0x2f] = 0
+					u8[A1 + 0x2a] &= ~0x01
+					u8[A1 + 0x04] &= 0xfc
+					u8[A1 + 0x2e] = 0x43
+					u8[A1 + 0x20] = 0
+				}
+			}
+		}
+	}
+	else if (debug_mode.state == 0)
+	{
+		fn0423d0()
+	}
+	else
+	{
+		fn042368()
+	}
+}
+
+
+//# address-hook(0x042368) end(0x042394)
+function void fn042368()
+{
+	u8[A1 + 0x2a] &= 0x81
+	u8[A1 + 0x2a] |= 0x02
+	objA0.flags2a &= ~(1 << D6.u8)
+	u16[A1 + 0x20] = 1
+	u8[A1 + 0x2e] = 0
+	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+	objA1.velocity.x = u16[A1 + 0x1c]
+	objA1.velocity.y = 0
+}
+
+
+//# address-hook(0x042396) end(0x0423ce)
+function void fn042396()
+{
+	u8[A1 + 0x46] = 0x0e
+	u8[A1 + 0x47] = 0x0f
+	u8[A1 + 0x2a] &= 0x81
+	u8[A1 + 0x2a] |= 0x01
+	objA0.flags2a &= ~(1 << D6.u8)
+	u16[A1 + 0x20] = 1
+	u8[A1 + 0x2e] = 0
+	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+	objA1.velocity.x = u16[A1 + 0x1c]
+	objA1.velocity.y = 0
+}
+
+
+//# address-hook(0x0423d0) end(0x042478)
+function void fn0423d0()
+{
+	D0.s32 = s16[A1 + 0x1c]
+	D0 <<= 8
+	u32[A2] += D0
+
+	if (s32[A2] < 0)
+	{
+		fn042368()
+		return
+	}
+
+	if (u16[A2] >= 0x0700)
+	{
+		fn042396()
+		return
+	}
+
+	if (s16[A1 + 0x1c] < 0x1000)
+	{
+		u16[A1 + 0x1c] += 0x10
+	}
+
+	D0.u16 = (u16[A2] >> 1) + 0x40
+	if (D0.s8 >= 0)
+		u8[A1 + 0x0a] |= 0x80
+	else
+		u8[A1 + 0x0a] &= ~0x80
+
+	D2.u16 = objA1.position.x.u16
+	D0.u16 = u16[A2] >> 1
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * 0x4800
+	D0 >>= 16
+	D0.u16 += objA0.position.x.u16
+	objA1.position.x.u16 = D0.u16
+	objA1.velocity.x = s16(D0.u16 - D2.u16) << 8
+
+	A3 = (u16[A2] < 0x0600) ? 0x04248a : 0x04250a
+	D2.u16 = objA1.position.y.u16
+	D0.u16 = u16[A2] >> 2
+	D1.u16 = D0.u16 & 0x7f
+	D0.u16 &= 0xff80
+	D0.u8 += u8[A3 + D1.s16]
+	D0.u16 += objA0.position.y.u16
+	objA1.position.y.u16 = D0.u16
+	D0.u16 -= D2.u16
+	D0.s16 <<= 8
+	objA1.velocity.y = D0.u16
+	D0 = (u16[A2] >> 1) & 0xff
+	D0.u16 = D0 / 0x16
+	u8[A1 + 0x22] = u8[0x04247e + D0.s16]
+
+	D0 = u8[A1 + 0x22]
+	SetCharacterSpritePatterns()
+}

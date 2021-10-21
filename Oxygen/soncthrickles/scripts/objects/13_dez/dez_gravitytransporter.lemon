@@ -1,0 +1,235 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x048c16) end(0x048c2a)
+function void fn048c16()
+{
+	A1 = 0xffffb000
+	A4 = A0 + 0x30
+	fn048c30()
+
+	A1 = 0xffffb04a
+	A4 = A0 + 0x3a
+	fn048c30()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x048c30) end(0x048c38)
+function void fn048c30()
+{
+	// Targets:
+	//  - 0x048c44	-> u8[A4] = 0x00  -> Waiting for player
+	//  - 0x048d2c	-> u8[A4] = 0x02  -> Starting the teleport (spinning the player)
+	//  - 0x048dca	-> u8[A4] = 0x04  -> Teleporting
+	//  - 0x048e94	-> u8[A4] = 0x06  -> Stopping, waiting for player to leave
+	call tableLookupAddress(0x048c3c, u8[A4])
+}
+
+
+//# address-hook(0x048c44) end(0x048d2a)
+function void fn048c44()
+{
+	if (debug_mode.state != 0)
+		return
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 3
+	if (objA0.flags2a & 0x01)
+	{
+		D0.u16 += 0x0a
+	}
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x20
+
+	if (D0.u16 < 0x10 && D1.u16 < 0x40)
+	{
+		if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & 0x02) == 0 && (u8[0xfffffab8] & 0x01) == 0)
+		{
+			A3 = 0xffff0000 + u16[A1 + 0x42]
+			if (u32[A3] == 0x048c16)
+			{
+				D0.u16 = A4.u16 - A0.u16
+				if (u8[A3 + D0.s16] != 0)
+					return
+			}
+
+			u16[A1 + 0x42] = A0.u16
+			u8[A1 + 0x2e] = 0x83
+			objA1.state = char.state.RUNNING
+			u16[A1 + 0x1c] = 0
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u8[A1 + 0x2a] &= ~0x20
+			u8[A1 + 0x2a] |= 0x02
+			objA1.position.x.u16 = objA0.position.x.u16
+			if (u8[A1 + 0x2a] & 0x04)
+			{
+				u8[A1 + 0x2a] &= ~0x04
+				D0.u8 = u8[A1 + 0x1e] - u8[A1 + 0x44]
+				u8[A1 + 0x1e] = u8[A1 + 0x44]
+				u8[A1 + 0x1f] = u8[A1 + 0x45]
+				if (global.inv_gravity)
+					D0.s8 = -D0.s8
+				objA1.position.y.u16 += D0.s8
+			}
+
+			u8[A4] += 2
+			u8[A4 + 1] = 0
+			u16[A4 + 2] = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? 0x600 : 0
+			u16[A4 + 4] = 0
+
+		#if STANDALONE
+			// Correctly align player
+			objA1.position.y.u16 = objA0.position.y.u16
+			if (u8[A1 + 0x38] == CHARACTER_TAILS)
+				objA1.position.y.u16 += global.inv_gravity ? -4 : 4
+			objA1.state = char.state.STANDING
+		#endif
+		}
+	}
+}
+
+
+//# address-hook(0x048d2c) end(0x048d60)
+function void fn048d2c()
+{
+#if STANDALONE
+	// Accelerate rotation faster
+	u16[A4 + 0x04] += 16
+#else
+	u16[A4 + 0x04] += 8
+#endif
+	if (u16[A4 + 0x04] == 0x0300)
+	{
+		D0.u16 = objA0.subtype2c & 0x7f
+		u16[A4 + 0x06] = D0.u16
+		u16[A4 + 0x08] = D0.u16 >> 1
+		objA1.velocity.y = (objA0.flags2a & 0x02) ? 0x1000 : -0x1000
+		u8[A4] += 2
+		playSound(0x9f)
+	}
+
+	fn048d66()
+}
+
+
+//# address-hook(0x048d66) end(0x048db0)
+function void fn048d66()
+{
+	// u16[A4 + 0x02] = Current character rotation
+	// u16[A4 + 0x04] = Angular speed of rotation
+	u16[A4 + 0x02] = (u16[A4 + 0x02] + u16[A4 + 0x04]) % 0x0c00
+
+	D0 = u8[A4 + 0x02]
+	u8[A1 + 0x22] = u8[0x048db2 + D0.s16]
+	u8[A1 + 0x04] &= 0xfc
+	D0.u8 = u8[0x048dbe + D0.s16]
+	if (global.inv_gravity)
+		D0.u8 |= 0x02
+	u8[A1 + 0x04] |= D0.u8
+
+	D0 = u8[A1 + 0x22]
+	u32 backupA2 = A2
+	SetCharacterSpritePatterns()
+	A2 = backupA2
+}
+
+
+//# address-hook(0x048dca) end(0x048e92)
+function void fn048dca()
+{
+	// u16[A4 + 0x06] is the remaining time in frames until teleport stops
+
+	D1.u16 = u16[A4 + 0x06]
+	D2.u16 = u16[A4 + 0x08]
+	if (D1.u16 == D2.u16 && A1 == 0xffffb000)
+	{
+		D0.u8 = (objA0.subtype2c & 0x80) != 0
+		if (D0.u8 == global.inv_gravity)
+		{
+			u8[A4 + 0x01] = 1
+		}
+		global.inv_gravity = D0.u8
+	}
+
+	u8[A1 + 0x34] = 0
+	if (D1.u16 >= 5 && D1.u16 < (D2.u16 * 2 - 5))
+	{
+		u8[A1 + 0x34] = 1
+	}
+
+	--u16[A4 + 0x06]
+	if (s16[A4 + 0x06] >= 0)
+	{
+		D3 = u32[A1 + 0x14]
+		D0.s32 = objA1.velocity.y
+		D0.s32 <<= 8
+		D3 += D0
+		u32[A1 + 0x14] = D3
+		fn048d66()
+		return
+	}
+
+	u8[A4] += 2
+	u8[A1 + 0x2e] = 0
+	objA1.velocity.y = 0
+
+	D0 = (u8[A1 + 0x38] == 1) ? 17 : 9
+	if (s8[A0 + 0x2c] < 0)
+	{
+		D0.s16 = -D0.s16
+		if ((objA0.flags2a & 0x02) != 0)
+		{
+			if (u8[A4 + 0x01] != 0)
+			{
+				D0 = 16
+			}
+			else
+			{
+				D0 = (u8[A1 + 0x38] == 1) ? -1 : 7
+			}
+			objA1.position.y.u16 += D0.u16
+			return
+		}
+	}
+	else
+	{
+		if ((objA0.flags2a & 0x02) == 0)
+		{
+			if (u8[A4 + 0x01] != 0)
+			{
+				D0 = -16
+			}
+			else
+			{
+				D0 = (u8[A1 + 0x38] == 1) ? 1 : -7
+			}
+			objA1.position.y.u16 += D0.u16
+			return
+		}
+	}
+
+	if (u8[A4 + 0x01] == 0)
+	{
+		objA1.position.y.u16 += D0.u16
+	}
+}
+
+
+//# address-hook(0x048e94) end(0x048eac)
+function void fn048e94()
+{
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	if (D0.u16 >= 0x20)
+	{
+		u16[A1 + 0x42] = 0
+		u8[A4] = 0
+	}
+}

@@ -1,0 +1,241 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// DEZ Energy Bridge                                     //
+//-------------------------------------------------------//
+
+// Shared code
+
+//# address-hook(0x047dde) end(0x047e2c)
+function void fn047dde()
+{
+	objA0.sprite_attributes = 0x23ff
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0300
+
+	D0.u16 = (objA0.subtype2c & 0x0c) >> 1
+	D0.u16 = u16[0x047dd6 + D0.s16]
+	objA0.value32 = D0.u16
+	D0 = (D0.u16 + 1) >> 4
+	D1.u16 = (objA0.subtype2c & 0xf0) >> 4
+	D0 = D0 * D1.u16
+	u16[A0 + 0x30] = D0.u16
+	D1.u16 = (objA0.subtype2c & 0x03) + 2
+	D1.u16 <<= 5
+	D0.u16 = (level.framecounter + u16[A0 + 0x30]) & objA0.value32
+}
+
+
+
+// Straight bridge
+
+//# address-hook(0x047e2e) end(0x047e86)
+function void fn047e2e()
+{
+	objA0.mapping_offset = 0x047ff8
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x08
+	objA0.flags2a |= 0x80
+	fn047dde()
+
+	D0.u16 -= D1.u16
+	if (D0.s16 < 0)
+	{
+		D0.s16 = -D0.s16
+		u16[A0 + 0x34] = D0.u16
+
+		objA0.update_address = 0x047e8c
+		fn047e8c()
+	}
+	else
+	{
+		objA0.update_address = 0x047e62
+		fn047e62()
+	}
+}
+
+
+//# address-hook(0x047e62)
+function void fn047e62()
+{
+	D0.u16 = (level.framecounter + u16[A0 + 0x30]) & objA0.value32
+	if (D0.u16 != 0)
+	{
+		CheckForUnloadObject()
+		return
+	}
+
+	D0.u16 = (objA0.subtype2c & 0x03) + 2
+	D0.u16 <<= 5
+	u16[A0 + 0x34] = D0.u16
+	objA0.update_address = 0x047e8c
+
+	fn047e8c()
+}
+
+
+//# address-hook(0x047e8c) end(0x047ee2)
+function void fn047e8c()
+{
+	--u16[A0 + 0x34]
+	if (u16[A0 + 0x34] == 0)
+	{
+		A1 = 0xffffb000
+		D6 = 3
+		fn047ee8()
+
+		A1 = 0xffffb04a
+		D6 = 4
+		fn047ee8()
+
+		objA0.update_address = 0x047e62
+	}
+	else
+	{
+		D1 = objA0.box_size.x
+		D3.u16 = 9
+		D4.u16 = objA0.position.x.u16
+		PlatformCheckClimbOn()
+	}
+
+	objA0.animation.sprite = (level.framecounter.low & 0x03)
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		if ((level.framecounter.low & 0x07) == 0)
+		{
+			playSound(0xa8)
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x047ee8) end(0x047efa)
+function void fn047ee8()
+{
+	u8 bit = 1 << D6.u8
+	if (objA0.flags2a & bit)
+	{
+		objA0.flags2a &= ~bit
+		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= 0x02
+	}
+}
+
+
+
+// Curved bridge
+
+//# address-hook(0x047efc) end(0x047f50)
+function void fn047efc()
+{
+	objA0.mapping_offset = 0x048038
+	objA0.box_size.x = 0x50
+	objA0.box_size.y = 0x30
+	fn047dde()
+
+	D0.u16 -= D1.u16
+	if (D0.s16 < 0)
+	{
+		D0.s16 = -D0.s16
+		u16[A0 + 0x34] = D0.u16
+
+		objA0.update_address = 0x047f56
+		fn047f56()
+	}
+	else
+	{
+		objA0.update_address = 0x047f2c
+		fn047f2c()
+	}
+}
+
+
+//# address-hook(0x047f2c)
+function void fn047f2c()
+{
+	D0.u16 = (level.framecounter + u16[A0 + 0x30]) & objA0.value32
+	if (D0.u16 != 0)
+	{
+		CheckForUnloadObject()
+		return
+	}
+
+	D0.u16 = (objA0.subtype2c & 0x03) + 2
+	D0.u16 <<= 5
+	u16[A0 + 0x34] = D0.u16
+	objA0.update_address = 0x047f56
+	fn047f56()
+}
+
+
+//# address-hook(0x047f56) end(0x047f96)
+function void fn047f56()
+{
+	--u16[A0 + 0x34]
+	if (u16[A0 + 0x34] == 0)
+	{
+		objA0.update_address = 0x047f2c
+	}
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn047f9c()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	fn047f9c()
+
+	objA0.animation.sprite = (level.framecounter.low & 0x03)
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		if ((level.framecounter.low & 0x07) == 0)
+		{
+			playSound(0xa8)
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x047f9c) end(0x047ff6)
+function void fn047f9c()
+{
+	if (u16[A0 + 0x34] != 0)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x50
+		if (D0.u16 < 0xa0)
+		{
+			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
+			if (D0.u16 < 0x60)
+			{
+				objA0.flags2a |= (1 << D6.u8)
+				u8[A1 + 0x46] = 0x0e
+				u8[A1 + 0x47] = 0x0f
+				return
+			}
+		}
+	}
+
+	u8 bit = 1 << D6.u8
+	if (objA0.flags2a & bit)
+	{
+		objA0.flags2a &= ~bit
+		if (u16[A0 + 0x34] == 0)
+		{
+			u8[A1 + 0x2a] |= 0x02
+		}
+		u8[A1 + 0x46] = 0x0c
+		u8[A1 + 0x47] = 0x0d
+	}
+}

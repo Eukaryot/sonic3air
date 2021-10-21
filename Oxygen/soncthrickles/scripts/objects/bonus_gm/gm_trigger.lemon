@@ -1,0 +1,199 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x060c56) end(0x060cb2)
+function void fn060c56()
+{
+	setupObjectAttributesFull(0x0613b0)
+
+	objA0.update_address = 0x060cb8
+	u16[0xfffffaa4] = A0.u16
+	objA0.position.y.u16 -= 0x0100
+	u16[A0 + 0x3a] = objA0.position.y.u16
+
+	global.passing_floor = 0xff
+	global.random.seed = global.framecounter
+	ring_counter = checkpoint.rings
+	extra_lives_granted = checkpoint.lives_granted
+	hud.dirty.rings = 0x01
+	u8[0xffffb00a] |= 0x80
+	u8[0xffffb054] |= 0x80
+
+	A1 = 0xffff2000
+	for (u8 i = 0; i < 9; ++i)
+	{
+		u32[A1] = 0xffffffff
+		A1 += 4
+	}
+
+	spawnChildObjects(0x0613f8)
+
+	fn060cb8()
+}
+
+
+//# address-hook(0x060cb8) end(0x060d10)
+function void fn060cb8()
+{
+	fn06126c()
+
+	A1 = 0x060d16
+	fn0858f8()
+	if (D0.u16 == 0)
+	{
+		D0 = (D0 << 16) + (D0 >> 16)
+		if (D0.u16 == 0)
+		{
+			DrawObject()
+			return
+		}
+	}
+
+	objA0.update_address = 0x060d1e
+	objA0.countdown_callback = 0x060d32
+	objA0.flags38 |= 0x02
+
+	A1 = 0xffff0000 + D0.u16
+	D0.u16 = objA0.position.x.u16
+	D1.u8 = (D0.u16 < objA1.position.x.u16) ? 0xff : 0x00
+	if (objA1.velocity.y >= 0)
+	{
+		D1.u8 ^= 0xff
+	}
+
+	objA0.render_flags &= ~render_flag.FLIP_X
+	if (D1.u8 != 0)
+	{
+		objA0.render_flags |= render_flag.FLIP_X
+	}
+
+	playSound(0xd2)
+	DrawObject()
+}
+
+
+//# address-hook(0x060d1e) end(0x060d2c)
+function void fn060d1e()
+{
+	// Trigger turning
+	fn06126c()
+	Object.animationProgress(0x061450)
+	DrawObject()
+}
+
+
+//# address-hook(0x060d32) end(0x060d3e)
+function void fn060d32()
+{
+	// Slot opening
+	objA0.update_address = 0x060d40
+	objA0.flags38 |= 0x08
+}
+
+
+//# address-hook(0x060d40) end(0x060d52)
+function void fn060d40()
+{
+	fn06126c()
+	if ((objA0.flags38 & 0x02) == 0)
+	{
+		objA0.update_address = 0x060cb8
+	}
+	DrawObject()
+}
+
+
+
+//# address-hook(0x06126c) end(0x0612a6)
+function void fn06126c()
+{
+	if (objA0.flags38 & 0x01)
+	{
+		objA0.flags38 &= ~0x01
+
+		A1 = 0xffff2000
+		D0 = 0
+		D1 = 0x0d
+		while (true)
+		{
+			if (u16[(A1+=2)-2] != 0)
+				break
+
+			D0.u16 += 0x20
+			--D1.s16
+			if (D1.s16 < 0)
+				break
+		}
+
+		D1.u16 = u16[A0 + 0x3a] + D0.u16
+		u16[A0 + 0x3c] = D1.u16
+	}
+
+	D1.u16 = u16[A0 + 0x3c]
+	D2.u16 = objA0.position.y.u16
+	if (D2.u16 < D1.u16)
+	{
+		D2.u16 += 4
+		objA0.position.y.u16 = D2.u16
+	}
+
+	#if STANDALONE
+		Renderer.addSpriteMaskWorld(objA0.position.x.u16 - 0x100, objA0.position.y.u16 - 0x10, 0x200, 0x30, 0x9e00, 1)
+	#endif
+}
+
+
+
+// Slot
+
+//# address-hook(0x060ea2) end(0x060eb8)
+function void fn060ea2()
+{
+	objA0.update_address = 0x060e5c
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x38] &= ~0x02
+	u8[A1 + 0x38] &= ~0x08
+}
+
+
+//# address-hook(0x060e4c) end(0x060e86)
+function void fn060e4c()
+{
+	setupObjectAttributesFull(0x0613bc)
+
+	objA0.update_address = 0x060e5c
+	fn060e5c()
+}
+
+
+//# address-hook(0x060e5c) end(0x060e86)
+function void fn060e5c()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x08)
+	{
+		objA0.update_address = 0x060e8c
+		objA0.countdown_callback = 0x060ea2
+		spawnSimpleChildObjects(0x061444)
+	}
+
+	MoveWithParent()
+	DrawObject()
+}
+
+
+//# address-hook(0x060e8c) end(0x060e9c)
+function void fn060e8c()
+{
+	A1 = 0x06145b
+	fn0845a0()
+	MoveWithParent()
+	DrawObject()
+}

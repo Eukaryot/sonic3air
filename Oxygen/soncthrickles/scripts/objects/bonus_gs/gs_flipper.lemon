@@ -1,0 +1,208 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Pinball Flipper                                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x049c5e) end(0x049c84)
+function void fn049c5e()
+{
+	objA0.mapping_offset = 0x049e8c
+	objA0.sprite_attributes = 0x832f
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x1c
+	objA0.sprite_priority = 0x0280
+
+	objA0.update_address = 0x049c8a
+	fn049c8a()
+}
+
+
+//# address-hook(0x049c8a) end(0x049cf8)
+function void fn049c8a()
+{
+	D1 = objA0.box_size.x
+	A2 = 0x049e5a
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+
+	A3 = A0 + 0x36
+	A1 = 0xffffb000
+	D5.u16 = control.player1
+	D6 = 3
+	fn049cfe()
+
+	A3 = A0 + 0x37
+	A1 = 0xffffb04a
+	D5.u16 = control.tails
+	D6 = 4
+	fn049cfe()
+
+	if (objA0.flags38 != 0)
+	{
+		objA0.flags38 = 0
+
+		A3 = A0 + 0x36
+		A1 = 0xffffb000
+		D6 = 3
+		fn049d72()
+
+		A3 = A0 + 0x37
+		A1 = 0xffffb04a
+		D6 = 4
+		fn049d72()
+
+		objA0.state = 0x01
+	}
+
+	Object.animationUpdate(0x049e7a)
+	fn049b22()
+}
+
+
+//# address-hook(0x049cfe) end(0x049d6e)
+function void fn049cfe()
+{
+	if (debug_mode.state == 0)
+	{
+		D0.u8 = u8[A3]
+		if (D0.u8 == 0)
+		{
+			if (objA0.flags2a & (1 << D6.u8))
+			{
+				++u8[A3]
+				u16[A1 + 0x20] = 0x0200
+				u8[A1 + 0x2e] = 0x01
+				u8[A1 + 0x1e] = 0x0e
+				u8[A1 + 0x1f] = 0x07
+				u8[A1 + 0x20] = 0x02
+				if ((u8[A1 + 0x2a] & 0x04) == 0)
+				{
+					u8[A1 + 0x2a] |= 0x04
+					objA1.position.y.u16 += 5
+				}
+			}
+			return
+		}
+
+		D5.u16 &= 0x70
+		if (D5.u16 != 0)
+		{
+			objA0.flags38 = 0x01
+			fn049de4()
+			return
+		}
+
+		if (objA0.flags2a & (1 << D6.u8))
+		{
+			D1 = 0x18
+			if (objA0.flags2a & 0x01)
+			{
+				D1.u16 ^= 0xffff
+			}
+			u16[A1 + 0x1c] += D1.u16
+			fn049de4()
+			return
+		}
+	}
+
+	u8[A1 + 0x2e] = 0
+	u8[A3] = 0
+}
+
+
+//# address-hook(0x049de4) end(0x049e58)
+function void fn049de4()
+{
+	u32 backupA0 = A0
+	A0 = A1
+	D0.u16 = u16[A0 + 0x1c]
+	if (D0.u16 != 0)
+	{
+		if (D0.s16 >= 0)
+		{
+			D0.u16 -= D5.u16
+			if (D0.s16 < 0)
+				D0.u16 = 0
+		}
+		else
+		{
+			D0.u16 += D5.u16
+			if (D0.s16 > 0)
+				D0.u16 = 0
+		}
+		u16[A0 + 0x1c] = D0.u16
+	}
+
+	D0.u8 = objA0.value26
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * s16[A0 + 0x1c]
+	D0.s32 >>= 8
+	objA0.velocity.y = D0.u16
+	D1.s32 = s32(D1.s16) * s16[A0 + 0x1c]
+	D1.s32 >>= 8
+	objA0.velocity.x = D1.u16
+	UpdateMovementStraight()
+
+	fn00fd9a()
+	if (D1.s16 < 0)
+	{
+		objA0.position.x.u16 -= D1.u16
+		u16[A0 + 0x1c] = 0
+	}
+
+	fn00fa7a()
+	if (D1.s16 < 0)
+	{
+		objA0.position.x.u16 += D1.u16
+		u16[A0 + 0x1c] = 0
+	}
+	A0 = backupA0
+}
+
+
+//# address-hook(0x049d72) end(0x049dde)
+function void fn049d72()
+{
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
+		return
+	objA0.flags2a &= ~bit
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+	if (objA0.flags2a & 0x01)
+		D0.s16 = -D0.s16
+
+	D0.u16 += 0x20
+	D2.u16 = 0x0800 + (D0.u16 << 5)
+	D2.s16 = -D2.s16
+	D0.s16 >>= 2
+	D0.u16 += 0x40
+	LookupSinCos()
+
+	D0.s32 = s32(D0.s16) * D2.s16
+	D1.s32 = s32(D1.s16) * D2.s16
+	D0.s32 >>= 8
+	D1.s32 >>= 8
+	objA1.velocity.y = D0.u16
+	if (objA0.flags2a & 0x01)
+		D1.s16 = -D1.s16
+
+	objA1.velocity.x = D1.u16
+	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x05] = 0x02
+	u8[A1 + 0x2e] = 0
+	u8[A3] = 0
+
+	playSound(0xae)
+}

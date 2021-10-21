@@ -1,0 +1,266 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Driller enemy from Marble Garden Zone Act 1           //
+//-------------------------------------------------------//
+
+//# address-hook(0x08845a) end(0x08845a)
+function void Driller.Init()
+{
+	Object.InitWithUpdateAddress(0x088460)
+
+#if STANDALONE
+	// Need to increase the bounding box just a little bit
+	objA0.box_size.x = 0x30
+#endif
+}
+
+
+//# address-hook(0x088460) end(0x088472)
+function void Driller.Update()
+{
+	// Targets:
+	//  - 0x088480	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x0884a2	-> objA0.base_state = 0x02	-> Waiting for the player to come close
+	//  - 0x0884d2	-> objA0.base_state = 0x04	-> Hovering
+	//  - 0x0884fa	-> objA0.base_state = 0x06	-> Going up without drilling
+	//  - 0x08852e	-> objA0.base_state = 0x08	-> Going up, drilling through the ceiling
+	call tableLookupAddress(0x088476, objA0.base_state)
+
+	fn088a62()
+
+#if STANDALONE
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x280)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		Enemy.UnloadDelayed()
+
+		// Stop screenshake
+		camera.screenshake.state = 0
+
+		// Reset palette changes due to flashing in any case
+		objA0.state = 1
+		Boss.updateHitFlashing(3, 0x088ae4, 0x088aea)
+	}
+
+#else
+	Enemy.DrawOrUnload()
+#endif
+}
+
+
+//# address-hook(0x088480) end(0x08849e)
+function void fn088480()
+{
+	setupObjectAttributesFull(0x088af6)
+
+	u8[A0 + 0x29] = 0xfe
+	objA0.hitbox_extends.y = 0x28
+	fn0685e2()
+
+	spawnChildObjects(0x088b2c)
+}
+
+
+//# address-hook(0x0884a2) end(0x0884d0)
+function void fn0884a2()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x60)
+	{
+		objA0.base_state = 0x04
+		u32[A0 + 0x30] = 0x088b73
+		objA0.countdown_callback = 0x0884e2
+	}
+}
+
+
+//# address-hook(0x0884d2) end(0x0884de)
+function void fn0884d2()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn084700()
+}
+
+
+//# address-hook(0x0884e2) end(0x0884f8)
+function void fn0884e2()
+{
+	objA0.base_state = 0x06
+	u32[A0 + 0x30] = 0x088b79
+	objA0.countdown_callback = 0x088514
+}
+
+
+//# address-hook(0x0884fa) end(0x088512)
+function void fn0884fa()
+{
+	Object.AnimationProgressByLocalA1()
+	--objA0.position.y.u16
+	fn00fc12()
+	if (D1.s16 < 0)
+	{
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+
+//# address-hook(0x088514) end(0x08852c)
+function void fn088514()
+{
+	objA0.base_state = 0x08
+	camera.screenshake.state.hi = 0xff
+	objA0.countdown_value = 0xbf
+	objA0.countdown_callback = 0x08855a
+}
+
+
+//# address-hook(0x08852e) end(0x088556)
+function void fn08852e()
+{
+	Object.AnimationProgressByLocalA1()
+	objA0.position.y.u16 += (global.framecounter.low & 0x01) ? 1 : -2
+	if ((global.framecounter.low & 0x07) == 0)
+	{
+		playSound(0x6f)
+		fn088a32()
+	}
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08855a) end(0x088562)
+function void fn08855a()
+{
+	camera.screenshake.state = 0
+	level.trigger08 = 0xff
+	Object.TriggerUnloading()
+
+#if STANDALONE
+	// Reset palette changes due to flashing in any case
+	objA0.state = 1
+	Boss.updateHitFlashing(3, 0x088ae4, 0x088aea)
+#endif
+}
+
+
+
+// Debris?
+
+//# address-hook(0x0887f6) end(0x088802)
+function void fn0887f6()
+{
+	objA0.update_address = 0x088804
+	u8[A0 + 0x28] = 0x9e
+}
+
+
+//# address-hook(0x088804) end(0x08881a)
+function void fn088804()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		MoveAndFlipWithParent()
+		AddAsDynamicObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x088820) end(0x088860)
+function void fn088820()
+{
+	setupObjectAttributesFull(0x088b02)
+
+	objA0.flags2b |= 0x08
+	GetRandomNumber()
+	D0.u8 &= 0x03
+	objA0.animation.sprite = D0.u8
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x02 && D0.u8 == 0)
+	{
+		setupObjectAttributesFull(0x088b0e)
+	}
+
+	objA0.update_address = 0x084f6e
+	objA0.countdown_value = 0x5f
+	Enemy.DrawDynamicObject()
+}
+
+
+
+//# address-hook(0x088a32) end(0x088a60)
+function void fn088a32()
+{
+	spawnChildObjects(0x088b3a)
+	if (_equal())
+	{
+		GetRandomNumber()
+		D0.u16 &= 0x01ff
+		objA1.position.x.u16 = camera.position.x.u16 - 0x40 + D0.u16
+		objA1.position.y.u16 = camera.position.y.u16 - 0x20
+	}
+}
+
+
+//# address-hook(0x088a62) end(0x088ae0)
+function void fn088a62()
+{
+	if (u8[A0 + 0x28] != 0)
+		return
+
+	if (u8[A0 + 0x29] == 0)
+	{
+		objA0.update_address = 0x085668
+		camera.screenshake.state = 0
+		objA0.countdown_callback = 0x0887ca
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x0887da
+		}
+
+		spawnChildObjects(0x083fee)
+		AddScoreForBossEnemy()
+		return
+	}
+
+	if (objA0.state == 0)
+	{
+		objA0.state = 0x20
+		playSound(0x6e)
+		objA0.flags2a |= 0x40
+	}
+
+	Boss.updateHitFlashing(3, 0x088ae4, 0x088aea)
+
+	--objA0.state
+	if (objA0.state == 0)
+	{
+		objA0.flags2a &= ~0x40
+		u8[A0 + 0x28] = u8[A0 + 0x25]
+	}
+}

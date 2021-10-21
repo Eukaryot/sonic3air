@@ -1,0 +1,184 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Horizontal
+
+//# address-hook(0x043b3a) end(0x043b90)
+function void fn043b3a()
+{
+	objA0.mapping_offset = 0x043d24
+	objA0.sprite_attributes = 0x240d
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	if (objA0.subtype2c & 0x01)
+	{
+		objA0.subtype2c &= ~0x01
+		objA0.box_size.x = 0x20
+		objA0.box_size.y = 0x20
+		objA0.animation.sprite = 1
+
+		objA0.update_address = 0x043bde
+		fn043bde()
+	}
+	else
+	{
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x10
+
+		objA0.update_address = 0x043b96
+		fn043b96()
+	}
+}
+
+
+//# address-hook(0x043b96) end(0x043bd8)
+function void fn043b96()
+{
+	u8[A0 + 0x28] = 0
+	objA0.sprite_attributes &= 0x7fff
+	D0.u8 = level.framecounter.low * 2
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s8 = -D0.s8
+	}
+	D0.u8 += objA0.subtype2c
+	if (D0.s8 < 0)
+	{
+		objA0.sprite_attributes |= 0x8000
+		u8[A0 + 0x28] = 0x9a
+	}
+	LookupSinCos()
+	D1.s16 >>= 3
+	D1.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D1.u16
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}
+
+
+//# address-hook(0x043bde) end(0x043c26)
+function void fn043bde()
+{
+	u8[A0 + 0x28] = 0
+	objA0.sprite_attributes &= 0x7fff
+	D0.u8 = level.framecounter.low * 2
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s8 = -D0.s8
+	}
+	D0.u8 += objA0.subtype2c
+	if (D0.s8 < 0)
+	{
+		objA0.sprite_attributes |= 0x8000
+		u8[A0 + 0x28] = 0x8f
+	}
+	LookupSinCos()
+	D0.u16 = D1.u16
+	D1.s16 >>= 1
+	D1.u16 += D0.u16
+	D1.s16 >>= 3
+	D1.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D1.u16
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}
+
+
+
+// Vertical
+
+//# address-hook(0x043c2c) end(0x043c82)
+function void fn043c2c()
+{
+	objA0.mapping_offset = 0x043d24
+	objA0.sprite_attributes = 0x240d
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	if (objA0.subtype2c & 0x01)
+	{
+		objA0.subtype2c &= ~0x01
+		objA0.box_size.x = 0x20
+		objA0.box_size.y = 0x20
+		objA0.animation.sprite = 1
+
+		objA0.update_address = 0x043cd6
+		fn043cd6()
+	}
+	else
+	{
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x10
+
+		objA0.update_address = 0x043c88
+		fn043c88()
+	}
+}
+
+
+//# address-hook(0x043c88) end(0x043cd0)
+function void fn043c88()
+{
+	u8[A0 + 0x28] = 0
+	objA0.sprite_attributes &= 0x7fff
+	D0.u8 = level.framecounter.low * 2
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s8 = -D0.s8
+	}
+	D0.u8 += objA0.subtype2c
+	if (D0.s8 < 0)
+	{
+		objA0.sprite_attributes |= 0x8000
+		u8[A0 + 0x28] = 0x9a
+	}
+	LookupSinCos()
+	D0.u16 = D1.u16
+	D1.s16 >>= 2
+	D1.u16 += D0.u16
+	D1.s16 >>= 3
+	D1.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D1.u16
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}
+
+
+//# address-hook(0x043cd6) end(0x043d1e)
+function void fn043cd6()
+{
+	u8[A0 + 0x28] = 0
+	objA0.sprite_attributes &= 0x7fff
+	D0.u8 = level.framecounter.low * 2
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s8 = -D0.s8
+	}
+	D0.u8 += objA0.subtype2c
+	if (D0.s8 < 0)
+	{
+		objA0.sprite_attributes |= 0x8000
+		u8[A0 + 0x28] = 0x8f
+	}
+	LookupSinCos()
+	D1.s16 >>= 2
+	D0.u16 = D1.u16
+	D0.s16 >>= 3
+	D1.u16 -= D0.u16
+	D1.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D1.u16
+	D0.u16 = u16[A0 + 0x44]
+	fn01b666()
+}

@@ -1,0 +1,808 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Hydrocity Zone Act 1                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x050b7e) end(0x050b86)
+function void InitLevelTiles.HCZ1()
+{
+	u16[0xffffeee8] = 0
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x050b8e) end(0x050bba)
+function void InitLevelScrolling.HCZ1()
+{
+	UpdateBackground.HCZ1()
+	fn04f2f6()
+	D1 = 0
+	Level.InitialTilesFill()
+
+	D0 = 0x60
+	if (s16[0xffffeee2] <= 0x60)
+	{
+		D0.s16 = -0x60
+	}
+	if (s16[0xffffeee2] >= D0.s16)
+	{
+		s16[0xffffeee2] = D0.s16
+	}
+
+	A4 = 0x23c590
+	A5 = 0xffffa800
+	fn04f0ce()
+}
+
+
+// Some kind of level initialization ?
+
+//# address-hook(0x0279d4) end(0x027a52)
+function void fn0279d4()
+{
+	A2 = 0x0287f4
+	A3 = 0xfffff7f4
+	D1.u16 = u16[0xffffeee2]
+	if (D1.u16 == 0)
+	{
+		fn02797e()
+		return
+	}
+
+	if (D1.s16 < 0)
+	{
+		D1.u16 += 0x60
+		if (D1.s16 >= 0)
+		{
+			fn0279ac()
+			fn02788c()
+			return
+		}
+
+		fn0279ac()
+
+		updateSpritePattern(0x2a6a60, 0x5b80, 0xc0)
+		updateSpritePattern(0x2a7060, 0x5d00, 0xc0)
+	}
+	else
+	{
+		D1.u16 = 0x60 - D1.s16
+		if (D1.s16 >= 0)
+		{
+			fn027984()
+			fn02788c()
+			return
+		}
+
+		fn027984()
+
+		updateSpritePattern(0x2a6d60, 0x5e80, 0xc0)
+		updateSpritePattern(0x2a7360, 0x6000, 0xc0)
+	}
+}
+
+
+//# address-hook(0x050b8a) end(0x050b8a)
+function void UpdateLevelTiles.HCZ1()
+{
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x050bbe) end(0x050bc2)
+function void UpdateLevelScrolling.HCZ1()
+{
+	call 0x050bc6 + level.scrolling_routine
+}
+
+
+//# address-hook(0x050bc6) end(0x050bc6)
+function void fn050bc6()
+{
+	fn050bce()
+}
+
+//# address-hook(0x050bca) end(0x050bca)
+function void fn050bca()
+{
+	fn050c4c()
+}
+
+
+//# address-hook(0x050bce) end(0x050c48)
+function void fn050bce()
+{
+	if (u16[0xffffeec6] != 0)
+	{
+		u16[0xffffeec6] = 0
+
+		u32 backupD7 = D7
+		u32 backupA0 = A0
+		u32 backupA2 = A2
+		u32 backupA3 = A3
+
+		Kosinski.addToDecompressionQueue(0x3c18ee, 0xffff0a00)
+		Kosinski.addToDecompressionQueue(0x3bf17c, 0xffff9558)
+
+		Kosinski.addToDMAQueue(0x3bfa6c, 0x2360)
+
+		requestLoadingPatterns(0x10)
+		requestLoadingPatterns(0x11)
+
+		D7 = backupD7
+		A0 = backupA0
+		A2 = backupA2
+		A3 = backupA3
+
+		u8[0xffffeee8] = 0xff
+		level.scrolling_routine += 4
+	}
+
+	UpdateBackground.HCZ1()
+
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1 = 0
+	D6 = 0x20
+	LoadTileContentInDirY()
+
+	A4 = 0x23c590
+	A5 = 0xffffa800
+	fn04f0ce()
+}
+
+
+//# address-hook(0x050c4c) end(0x050cfa)
+function void fn050c4c()
+{
+	if (kosinski.waiting_modules == 0)
+	{
+		global.zone_act = 0x0101
+		camera.update_routine = 0
+		dynobjects.routine = 0
+		rings.update_routine = 0
+		level.boss_encounter = 0
+		global.in_extra_stage = 0
+		fn04f8f8()
+
+		u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
+		u8[0xffffb19e] = 0x01
+
+		u32 backupD7 = D7
+		u32 backupA0 = A0
+		u32 backupA2 = A2
+		u32 backupA3 = A3
+
+		fn01c362()
+		fn0076a6()
+		Level.InitializeWater()
+
+		D0.u16 = 0x06a0
+		water.height.current = D0.u16
+		water.height.next = D0.u16
+		water.height.target = D0.u16
+
+		Level.loadPaletteData(0x0d)
+
+		D7 = backupD7
+		A0 = backupA0
+		A2 = backupA2
+		A3 = backupA3
+
+		D0.u16 = 0x3600
+		D1 = 0
+		u16[0xffffb010] -= D0.u16
+		u16[0xffffb05a] -= D0.u16
+		fn04f3b0()
+
+		camera.position.x.u16 -= D0.u16
+		camera.foreground.x.u16 -= D0.u16
+		move_area.left -= D0.u16
+		move_area.right -= D0.u16
+		Level.GetCameraPosition()
+
+		level.scrolling_routine = 0
+	}
+
+	UpdateBackground.HCZ1()
+
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1 = 0
+	D6 = 0x20
+	LoadTileContentInDirY()
+
+	A4 = 0x23c590
+	A5 = 0xffffa800
+	fn04f0ce()
+}
+
+
+//# address-hook(0x050cfe) end(0x050e86)
+function void UpdateBackground.HCZ1()
+{
+	D1.s16 = camera.foreground.y.u16 - 0x0610
+	D0.s16 = D1.s16 >> 2
+	camera.background.y.u16 = D0.s16 + 0x0190
+	D2.u16 = D0.s16 - D1.s16
+	u16[0xffffeee2] = D2.u16
+	D0.u16 = camera.foreground.x.u16
+	D0 = (D0 << 16)
+
+	if (D2.u16 != 0)
+	{
+		// This part seems to control the scroll offsets inside the water surface in background
+		//  -> D2.s16 is the "signed height" in pixels of the water surface (it's negative underwater)
+		D1 = D0
+		D3 = D0.s32 >> 7
+		if (D2.s16 <= -0x60)
+		{
+			A1 = 0xffffa81a
+			for (u8 i = 0; i < 0x60; ++i)
+			{
+				u16[A1] = (D1 >> 16)
+				#if STANDALONE
+					// Add a nice moving waves effect
+					s16 distance = (0x1200 / (0x80 - i))
+					u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
+				#endif
+				A1 += 2
+				D1 -= D3
+			}
+		}
+		else
+		{
+			A1 = 0xffffa99a
+			for (u8 i = 0; i < 0x60; ++i)
+			{
+				A1 -= 2
+				u16[A1] = D1 >> 16
+				#if STANDALONE
+					// Add a nice moving waves effect
+					s16 distance = (0x1200 / (0x80 - i))
+					u16[A1] += (lookupSin(distance * 10 - level.framecounter) / s32(distance))
+				#endif
+				D1 -= D3
+			}
+
+			if (D2.s16 < 0x60)
+			{
+				A1 = 0xffffa8da
+				A5 = 0xffffa8da
+				A6 = 0x26d000
+				D1.u16 = D2.u16
+				if (D1.s16 >= 0)
+				{
+					D3.u16 = (0x60 - D1.s16) << 5
+					A6 += D3.u16 * 3
+					--D1.u16
+
+					D3 = 0
+					while (D1.s16 >= 0)
+					{
+						D3 = u8[(A6+=1)-1]
+						u16[(A1+=2)-2] = u16[A5 + D3.s16 * 2]
+						--D1.s16
+					}
+				}
+				else
+				{
+					D3.u16 = (D1.u16 + 0x60) << 5
+					A6 += D3.u16 * 3
+					D1.s16 = -D1.s16
+					--D1.u16
+
+					D3 = 0
+					while (D1.s16 >= 0)
+					{
+						D3 = u8[(A6+=1)-1]
+						u16[A1-=2] = u16[A5 + D3.s16 * 2]
+						--D1.s16
+					}
+				}
+			}
+		}
+	}
+
+	D1 = D0.s32 >> 5
+	D0.s32 >>= 2
+	A1 = 0xffffa800
+	u16[A1]        = D0 >> 16
+	objA1.velocity.x = D0 >> 16
+	D3.u16 = D0 >> 16
+	D0 -= D1
+	u16[A1 + 0x02] = D0 >> 16
+	u16[A1 + 0x16] = D0 >> 16
+	D0 -= D1
+	u16[A1 + 0x04] = D0 >> 16
+	objA1.position.y.u16 = D0 >> 16
+	D0 -= D1
+	u16[A1 + 0x06] = D0 >> 16
+	u16[A1 + 0x12] = D0 >> 16
+	D0 -= D1
+	u16[A1 + 0x08] = D0 >> 16
+	objA1.position.x.u16 = D0 >> 16
+	D0 -= D1
+	u16[A1 + 0x0a] = D0 >> 16
+	u16[A1 + 0x0e] = D0 >> 16
+	D0 -= D1
+	D0 = (D0 << 16) + (D0 >> 16)
+	u16[A1 + 0x0c] = D0.u16
+	u16[A1 + 0x019a] = D0.u16
+	D4.u16 = D0.u16
+
+	if (D2.s16 < 0)
+	{
+		A1 = 0xffffa8da
+		D0 = 0x2f
+		while (D0.s16 >= 0)
+		{
+			u16[(A1+=2)-2] = D4.u16
+			u16[(A1+=2)-2] = D4.u16
+			--D0.s16
+		}
+
+		A1 = 0xffffa81a
+		D0 = 0x5f + D2.u16
+		while (D0.s16 >= 0)
+		{
+			u16[(A1+=2)-2] = D3.u16
+			--D0.s16
+		}
+	}
+	else
+	{
+		A1 = 0xffffa81a
+		D0 = 0x2f
+		while (D0.s16 >= 0)
+		{
+			u16[(A1+=2)-2] = D3.u16
+			u16[(A1+=2)-2] = D3.u16
+			--D0.s16
+		}
+
+		A1 = 0xffffa99a
+		D0 = 0x5f - D2.u16
+		while (D0.s16 >= 0)
+		{
+			u16[A1-=2] = D4.u16
+			--D0.s16
+		}
+	}
+}
+
+
+
+//# address-hook(0x01c87e) end(0x01c888)
+function void fn01c87e()
+{
+	// Targets:
+	//  - 0x01c892	-> camera.update_routine = 0x00
+	//  - 0x01c8b8	-> camera.update_routine = 0x02
+	//  - 0x01c8f4	-> camera.update_routine = 0x04
+	call tableLookupAddress(0x01c88c, camera.update_routine)
+}
+
+
+//# address-hook(0x01c892) end(0x01c8b6)
+function void fn01c892()
+{
+	if (camera.position.x.u16 < 0x0360 && camera.position.y.u16 >= 0x03e0)
+	{
+		A1 = 0xfffffc70
+		u16[(A1+=2)-2] = 0x0b80
+		u16[(A1+=2)-2] = 0x0240
+		u16[(A1+=2)-2] = 0x0220
+		camera.update_routine += 2
+	}
+}
+
+
+//# address-hook(0x01c8b8) end(0x01c8f2)
+function void fn01c8b8()
+{
+	if (camera.position.x.u16 < 0x0360 && camera.position.y.u16 < 0x03e0)
+	{
+		camera.update_routine -= 2
+
+		A1 = 0xfffffc70
+		u16[(A1+=2)-2] = 0x0cee
+		u16[(A1+=2)-2] = 0x0ace
+		u16[(A1+=2)-2] = 0x8a
+	}
+	else if (camera.position.x.u16 >= 0x0900 && camera.position.y.u16 >= 0x0500)
+	{
+		camera.update_routine += 2
+
+		A1 = 0xfffffc70
+		u16[(A1+=2)-2] = 0x0cee
+		u16[(A1+=2)-2] = 0x0ace
+		u16[(A1+=2)-2] = 0x8a
+	}
+}
+
+
+//# address-hook(0x01c8f4) end(0x01c8f4)
+function void fn01c8f4()
+{
+}
+
+
+
+//# address-hook(0x050e90) end(0x050e98)
+function void UpdateLevelTiles.HCZ2()
+{
+	camera.foreground.y.u16 += camera.screenshake.offset
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x050e9c) end(0x050eee)
+function void UpdateLevelScrolling.HCZ2()
+{
+	if (camera.position.x.u16 < 0x0c00 && camera.position.y.u16 >= 0x0500)
+	{
+		level.scrolling_routine = 0x04
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x0510da
+		}
+
+		fn050ff0()
+		fn04f2f6()
+		Level.InitialTilesFill()
+		WriteScrollOffsets()
+	}
+	else
+	{
+		level.scrolling_routine = 0x10
+		UpdateBackground.HCZ2()
+		fn04f2f6()
+
+		D1 = 0
+		Level.InitialTilesFill()
+
+		A4 = 0x23c7d2
+		A5 = 0xffffa800
+		fn04f0ce()
+	}
+}
+
+
+//# address-hook(0x050ef2) end(0x050ef6)
+function void fn050ef2()
+{
+	call 0x050efa + level.scrolling_routine
+}
+
+//# address-hook(0x050efa) end(0x050efa)
+function void fn050efa()
+{
+	fn050f0e()
+}
+
+//# address-hook(0x050efe) end(0x050efe)
+function void fn050efe()
+{
+	fn050f20()
+}
+
+//# address-hook(0x050f02) end(0x050f02)
+function void fn050f02()
+{
+	fn050f86()
+}
+
+//# address-hook(0x050f06) end(0x050f06)
+function void fn050f06()
+{
+	fn050fb4()
+}
+
+//# address-hook(0x050f0a) end(0x050f0a)
+function void fn050f0a()
+{
+	fn050fca()
+}
+
+
+//# address-hook(0x050f0e) end(0x050f1c)
+function void fn050f0e()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x0510da
+	}
+
+	level.scrolling_routine += 4
+	fn050f20()
+}
+
+
+//# address-hook(0x050f20) end(0x050f82)
+function void fn050f20()
+{
+	if (u16[0xffffeec6] == 0)
+	{
+		fn050ff0()
+		UpdateBackgroundTiles.General()
+		WriteScrollOffsets()
+		UpdateScreenShake()
+		fn04f386()
+		level.dualplanecollision = 0
+
+		D0.u16 = u16[0xffffb010]
+		if (D0.u16 >= 0x03f0 && D0.u16 < 0x0c10)
+		{
+			D0.u16 = u16[0xffffb014]
+			if (D0.u16 >= 0x0600 && D0.u16 < 0x0840)
+			{
+				level.dualplanecollision = 0xff
+			}
+		}
+	}
+	else
+	{
+		// HCZ 2: Stop wall chase now
+		u16[0xffffeec6] = 0
+		if (camera.screenshake.state & 0x8000)
+		{
+			camera.screenshake.state = 0
+		}
+		level.dualplanecollision = 0
+		u16[0xffffeec8] = 0xf0
+		u16[0xffffeeca] = 0x0f
+
+		level.scrolling_routine += 4
+		fn050f86()
+
+	#if STANDALONE
+		// Correct vertical move area, to avoid some camera bugs whose exact cause I wasn't able to track down
+		level.vertical_wrap = 0x0000
+		move_area.bottom.current = 0x1000
+		move_area.bottom.target = 0x1000
+		checkpoint.move_area.bottom = 0x1000
+	#endif
+	}
+}
+
+
+//# address-hook(0x050f86) end(0x050fb2)
+function void fn050f86()
+{
+#if STANDALONE
+	// We can clear plane B much faster than the original code, which only clears two tile rows per frame
+	//  -> This is actually needed for widescreen, otherwise the background loading will start too late
+	VDP.setupVRAMWrite(0xe000)
+	VDP.zeroVRAM(0x1000)
+#else
+	// Paint background black
+	D1.u16 = 0x0400
+	D2 = 0
+	fn04ef64()
+	if (!_negative())
+	{
+		WriteScrollOffsets()
+		return
+	}
+#endif
+
+	// Continue with normal background update (which will at first redraw everything)
+	UpdateBackground.HCZ2()
+	fn04f2f6()
+
+	u16[0xffffeec8] = (D0.u16 + getScreenHeight()) & level.height.tilemask
+	u16[0xffffeeca] = 0x0f
+	level.scrolling_routine += 4
+	fn050fb8()
+}
+
+
+
+//-------------------------------------------------------//
+// Hydrocity Zone Act 2                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x050e88) end(0x050e8c)
+function void InitLevelTiles.HCZ2()
+{
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x050fb4) end(0x050fb4)
+function void fn050fb4()
+{
+	UpdateBackground.HCZ2()
+	fn050fb8()
+}
+
+
+//# address-hook(0x050fb8) end(0x050fc8)
+function void fn050fb8()
+{
+	D1 = 0
+	D2.u16 = camera.background.y.u16
+	fn04ef56()
+	if (_negative())
+	{
+		level.scrolling_routine += 4
+	}
+	fn050fce()
+}
+
+
+//# address-hook(0x050fca) end(0x050fca)
+function void fn050fca()
+{
+	UpdateBackground.HCZ2()
+	fn050fce()
+}
+
+
+//# address-hook(0x050fce) end(0x050fec)
+function void fn050fce()
+{
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1 = 0
+	D6 = 0x20
+	LoadTileContentInDirY()
+
+	A4 = 0x23c7d2
+	A5 = 0xffffa800
+	fn04f0ce()
+	UpdateScreenShake()
+}
+
+
+// Wall in HCZ 2 first part
+
+//# address-hook(0x050ff0) end(0x05106e)
+function void fn050ff0()
+{
+	if (u8[0xffffb005] < 0x06)
+	{
+		D0 = (u16[0xffffb010] < 0x0a88) ? 0x00e000 : 0x014000
+		D1.u16 = level.display_routine
+
+		bool goto05103a = false
+		if (D1.u16 != 0)
+		{
+			if (D1.s16 > -0x0600)
+			{
+				goto05103a = true
+			}
+			else if (camera.screenshake.state & 0x8000)
+			{
+				camera.screenshake.state = 0x0e
+				playSound(0x5f)
+			}
+		}
+		else
+		{
+			if (u16[0xffffb010] >= 0x0680)
+			{
+				camera.screenshake.state.hi = 0xff
+				goto05103a = true
+			}
+		}
+
+		if (goto05103a)
+		{
+			u32[0xffffeed2] -= D0
+			D0.u16 = (level.framecounter - 1) & 0x0f
+			if (D0.u16 == 0)
+			{
+				playSound(0x6f)
+			}
+		}
+	}
+
+	camera.background.x.u16 = camera.foreground.x.u16 - 0x0200 + level.display_routine
+	camera.background.y.u16 = camera.foreground.y.u16 - 0x0500
+}
+
+
+//# address-hook(0x051070) end(0x0510d8)
+function void UpdateBackground.HCZ2()
+{
+	// This function updates background scroll offsets and the content between the pillars
+
+	D0.u16 = camera.foreground.y.u16 - camera.screenshake.offset
+	D0.s16 >>= 2
+	D0.u16 += camera.screenshake.offset
+	camera.background.y.u16 = D0.u16
+
+	D0.u16 = camera.foreground.x.u16
+	D0 = (D0 << 16)
+	D0.s32 >>= 1
+	D1 = D0
+	D1.s32 >>= 3
+	A1 = 0xffffa800
+	A5 = 0x23c800
+	D2 = 0
+	while (true)
+	{
+		D3.u8 = u8[(A5+=1)-1]
+		if (D3.s8 < 0)
+			break
+
+		D3.s16 = D3.s8
+		while (D3.s16 >= 0)
+		{
+			D2.u8 = u8[(A5+=1)-1]
+			u16[A1 + D2.s16] = D0 >> 16
+			--D3.s16
+		}
+
+		D0 -= D1
+	}
+
+	u16[0xffffeee2] = u16[A1 + 0x12] - u16[A1 + 0x0a]
+	u16[0xffffeee4] = u16[A1 + 0x06] - u16[A1 + 0x12]
+	u16[0xffffeee6] = u16[A1 + 0x04] - u16[A1 + 0x12]
+}
+
+
+
+// Some object in HCZ 2
+
+//# address-hook(0x0510da) end(0x051112)
+function void fn0510da()
+{
+	if (level.scrolling_routine != 0x04)
+	{
+		UnloadObject()
+		return
+	}
+
+	D4.u16 = 0x05be - level.display_routine
+	objA0.position.x.u16 = D4.u16
+	objA0.position.y.u16 = 0x0700
+	objA0.box_size.x = 0x40
+	objA0.flags2a |= 0x80
+
+	D1 = 0x4b
+	D2.u16 = 0x0100
+	D3.u16 = 0x0100
+	CheckCharacterOnClimbableObject()
+}
+
+
+
+//# address-hook(0x01c8f6) end(0x01c900)
+function void fn01c8f6()
+{
+	// Targets:
+	//  - 0x01c908	-> camera.update_routine = 0x00
+	//  - 0x01c91a	-> camera.update_routine = 0x02
+	call tableLookupAddress(0x01c904, camera.update_routine)
+}
+
+
+//# address-hook(0x01c908) end(0x01c918)
+function void fn01c908()
+{
+	if (camera.position.x.u16 >= 0x0c00)
+	{
+		u8[0xffffeec6] = 0xff
+		camera.update_routine += 2
+	}
+}
+
+//# address-hook(0x01c91a) end(0x01c91a)
+function void fn01c91a()
+{
+}

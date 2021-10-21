@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\achievement_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\activity_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\application_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\core.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\image_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\lobby_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\network_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\overlay_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\relationship_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\storage_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\store_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\types.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\user_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\voice_manager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\achievement_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\activity_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\application_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\core.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\discord.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\event.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\ffi.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\image_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\lobby_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\network_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\overlay_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\relationship_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\storage_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\store_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\types.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\user_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\voice_manager.h" />
+  </ItemGroup>
+</Project>

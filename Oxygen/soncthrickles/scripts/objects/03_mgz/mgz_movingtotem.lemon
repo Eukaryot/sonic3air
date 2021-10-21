@@ -1,0 +1,102 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0346e2) end(0x034722)
+function void fn0346e2()
+{
+	objA0.mapping_offset = 0x233b98
+	objA0.sprite_attributes = 0x4001
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x30
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.y.u16
+	if (objA0.flags2a & 0x01)
+	{
+		u8[A0 + 0x34] = 0x01
+	}
+
+#if STANDALONE
+	// Make this a tiny wider and higher to prevent early clipping
+	objA0.box_size.x += 6
+	objA0.box_size.y += 4
+#endif
+
+	objA0.update_address = 0x034728
+	fn034728()
+}
+
+
+//# address-hook(0x034728) end(0x0347fa)
+function void fn034728()
+{
+	u16 backup_px = objA0.position.x.u16
+	if (u8[A0 + 0x34] == 0)
+	{
+		++objA0.position.x.u16
+		D0.u16 = u16[A0 + 0x30] + 0x50
+		if (D0.u16 == objA0.position.x.u16)
+		{
+			u8[A0 + 0x34] = 0x01
+		}
+	}
+	else
+	{
+		--objA0.position.x.u16
+		D0.u16 = u16[A0 + 0x30] - 0x50
+		if (D0.u16 == objA0.position.x.u16)
+		{
+			u8[A0 + 0x34] = 0
+		}
+	}
+
+	D0 = u8[0xfffffe80] + objA0.value32
+	objA0.position.y.u16 = D0.u16
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = backup_px
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x01)
+	{
+		objA0.flags2a &= ~0x20
+		A1 = 0xffffb000
+		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x28
+		if (D0.s16 >= 0)
+		{
+			DamageCharacter()
+		}
+	}
+
+	if (D6.u8 & 0x02)
+	{
+		objA0.flags2a &= ~0x40
+		A1 = 0xffffb04a
+		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x28
+		if (D0.s16 >= 0)
+		{
+			DamageCharacter()
+		}
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x03
+	}
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}

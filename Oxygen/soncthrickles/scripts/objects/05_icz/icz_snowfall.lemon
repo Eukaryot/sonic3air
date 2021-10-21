@@ -1,0 +1,132 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Snow falling at the end of ICZ 1                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b660) end(0x08b6a8)
+function void fn08b660()
+{
+	u16[0xfffffaae] = A0.u16
+	if ((objA0.flags38 & 0x20) == 0)
+	{
+		objA0.position.x.u16 = camera.foreground.x.u16
+		objA0.position.y.u16 = camera.foreground.y.u16 - 8
+		--objA0.countdown_value
+		if (objA0.countdown_value < 0)
+		{
+			objA0.countdown_value = 0x08
+			D0.u8 = u8[0xfffffaad] + 1
+			if (D0.u8 <= 0x3c)
+			{
+				u8[0xfffffaad] = D0.u8
+				if (allocDynamicObjectStd())
+				{
+					objA1.update_address = 0x08b6ae
+				}
+			}
+		}
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x08b6ae) end(0x08b712)
+function void fn08b6ae()
+{
+	setupObjectAttributesFull(0x08b838)
+	objA0.update_address = 0x08b720
+
+	#if STANDALONE
+	{
+		D0.u16 = getRandomNumber() % getScreenWidth()
+	}
+	#else
+	{
+		D0.u16 = getRandomNumber() & 0x01ff
+		if (D0.u16 >= 0x0140)	// That is 320 in decimal
+		{
+			D0.u16 = (D0.u16 & 0x3f) * 4
+		}
+	}
+	#endif
+
+	D0.u16 += camera.position.x.u16
+	if (D0.u16 < 0x0380)
+	{
+		fn08b756()
+		return
+	}
+
+	objA0.position.x.u16 = D0.u16
+	D0.u16 = camera.position.y.u16 - 4
+	objA0.position.y.u16 = D0.u16
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1.u16 = D0.u16
+	D0.u16 &= 0x03
+	objA0.animation.sprite = u8[0x08b714 + D0.s16]
+	objA0.sprite_priority = u16[0x08b718 + D0.s16 * 2]
+	objA0.velocity.x = (D1.u16 & 0x3c) - 0x20
+	objA0.velocity.y = 0x0100
+}
+
+
+//# address-hook(0x08b720) end(0x08b738)
+function void fn08b720()
+{
+	UpdateMovementStraightSimple()
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		objA0.update_address = 0x08b73a
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x08b73a) end(0x08b750)
+function void fn08b73a()
+{
+	UpdateMovementStraightSimple()
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		objA0.flags38 ^= 0x01
+		if (objA0.flags38 & 0x01)
+		{
+			DrawObject()
+		}
+		else
+		{
+			fn08b598()
+		}
+	}
+	else
+	{
+		fn08b756()
+	}
+}
+
+
+//# address-hook(0x08b756) end(0x08b762)
+function void fn08b756()
+{
+	D0.u8 = u8[0xfffffaad] - 1
+	if (D0.s8 >= 0)
+	{
+		u8[0xfffffaad] = D0.u8
+	}
+	UnloadObject()
+}

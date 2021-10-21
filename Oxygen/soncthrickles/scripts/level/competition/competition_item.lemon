@@ -1,0 +1,360 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Collectable Item
+
+//# address-hook(0x036364) end(0x0363ca)
+function void fn036364()
+{
+	objA0.mapping_offset = 0x036aa6
+	objA0.sprite_attributes = 0x03c6
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x08
+	objA0.hitbox_extends.x = 0x04
+	objA0.hitbox_extends.y = 0x08
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.y.u16
+	objA0.value26 = objA0.subtype2c
+
+	u8[A0 + 0x27] = (objA0.flags2a & 0x01) ? -1 : 1
+	objA0.flags2a &= ~0x01
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0xc7
+
+	u32[A0] = 0x0363d0
+	fn0363d0()
+}
+
+
+//# address-hook(0x0363d0) end(0x036436)
+function void fn0363d0()
+{
+	fn03643c()
+
+	D0.u8 = objA0.value26
+	LookupSinCos()
+	D1.s16 = u16[A0 + 0x30] + ((D1.s16 * 7) >> 5)
+	D1.u16 &= u16[0xffffeea8]
+	D1.u16 += 0x0400
+	objA0.position.x.u16 = D1.u16
+
+	D0.u16 = objA0.value32 + ((D0.s16 * 7) >> 5)
+	if (level.vertical_wrap == 0xff00)
+	{
+		D0.u16 &= level.height.bitmask
+	}
+	objA0.position.y.u16 = D0.u16
+
+	objA0.value26 += u8[A0 + 0x27]
+
+	Object.animationUpdate(0x036a58)
+	AddAsDynamicObject()
+	DrawObject()
+}
+
+
+//# address-hook(0x03643c) end(0x036462)
+function void fn03643c()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		A2 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			u8[A0 + 0x29] &= ~0x01	// Needed for verification
+			fn036464()
+		}
+
+		A2 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			u8[A0 + 0x29] &= ~0x02	// Needed for verification
+			fn036464()
+		}
+
+		u8[A0 + 0x29] = 0
+	}
+}
+
+
+//# address-hook(0x036464) end(0x036474)
+function void fn036464()
+{
+	// Called when a character collects this item
+
+	// Targets:
+	//  - 0x036486	-> objA0.state = 0x00
+	//  - 0x0364d8	-> objA0.state = 0x01
+	//  - 0x03652a	-> objA0.state = 0x02
+	//  - 0x0365e8	-> objA0.state = 0x03
+	//  - 0x036612	-> objA0.state = 0x04
+	//  - 0x036652	-> objA0.state = 0x05
+	//  - 0x036676	-> objA0.state = 0x06
+	//  - 0x03669a	-> objA0.state = 0x07
+	call tableLookupAddress(0x036476, objA0.state * 2)
+}
+
+
+//# address-hook(0x036486) end(0x0364d6)
+function void fn036486()
+{
+	// Speed shoes
+	u8[A2 + 0x2b] |= 0x04
+	u8[A2 + 0x36] = 0x4b
+	if (A2 == 0xffffb000)
+	{
+		global.move.speedcap = 0x0c00
+		global.move.acceleration = 0x18
+		global.move.deceleration = 0x80
+	}
+	else
+	{
+		u16[0xfffffec0] = 0x0c00
+		u16[0xfffffec2] = 0x18
+		u16[0xfffffec4] = 0x80
+	}
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0
+
+	D1 = 0x036a1a
+	D2 = 0x09
+	fn036a38()
+}
+
+
+//# address-hook(0x0364d8) end(0x036528)
+function void fn0364d8()
+{
+	// Slow shoes
+	u8[A2 + 0x2b] |= 0x04
+	u8[A2 + 0x36] = 0x4b
+	if (A2 == 0xffffb000)
+	{
+		global.move.speedcap = 0x0300
+		global.move.acceleration = 0x08
+		global.move.deceleration = 0x20
+	}
+	else
+	{
+		u16[0xfffffec0] = 0x0300
+		u16[0xfffffec2] = 0x08
+		u16[0xfffffec4] = 0x20
+	}
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0
+
+	D1 = 0x036a1a
+	D2 = 0x09
+	fn036a38()
+}
+
+
+//# address-hook(0x03652a) end(0x0365e6)
+function void fn03652a()
+{
+	// Switch
+	A2 = 0xffffb000
+	A3 = 0xffffb04a
+	D0.u8 = u8[A2 + 0x2b]
+	u8[A2 + 0x2b] = u8[A3 + 0x2b]
+	u8[A3 + 0x2b] = D0.u8
+	D0.u8 = u8[A2 + 0x36]
+	u8[A2 + 0x36] = u8[A3 + 0x36]
+	u8[A3 + 0x36] = D0.u8
+
+	D0.u16 = global.move.speedcap
+	D1.u16 = global.move.acceleration
+	D2.u16 = global.move.deceleration
+	D3.u16 = u16[0xfffffec0]
+	D4.u16 = u16[0xfffffec2]
+	D5.u16 = u16[0xfffffec4]
+	u16[A7-=2] = D0.u16
+
+	A1 = 0x1e3c00 + u8[A2 + 0x38] * 8
+	global.move.speedcap = u16[(A1+=2)-2]
+	global.move.acceleration = u16[(A1+=2)-2]
+	global.move.deceleration = u16[(A1+=2)-2]
+
+	A1 = 0x1e3c00 + u8[A3 + 0x38] * 8
+	u16[0xfffffec0] = u16[(A1+=2)-2]
+	u16[0xfffffec2] = u16[(A1+=2)-2]
+	u16[0xfffffec4] = u16[(A1+=2)-2]
+
+	D0.u16 = u16[(A7+=2)-2]
+	if (u8[A2 + 0x2b] & 0x04)
+	{
+		global.move.speedcap = D3.u16
+		global.move.acceleration = D4.u16
+		global.move.deceleration = D5.u16
+	}
+	if (u8[A3 + 0x2b] & 0x04)
+	{
+		u16[0xfffffec0] = D0.u16
+		u16[0xfffffec2] = D1.u16
+		u16[0xfffffec4] = D2.u16
+	}
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0
+
+	D1 = 0x036a1a
+	D2 = 0x09
+	fn036a38()
+}
+
+
+//# address-hook(0x0365e8) end(0x03660c)
+function void fn0365e8()
+{
+	// Ring
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0
+
+	D1 = 0x036a1a
+	D2 = 0x08
+	fn036a38()
+
+	if (A2 == 0xffffb000)
+	{
+		CollectRing()
+	}
+	else
+	{
+		call 0x01a5f0
+	}
+}
+
+
+//# address-hook(0x036612) end(0x036650)
+function void fn036612()
+{
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0
+	u8[A0 + 0x29] = 0
+
+	copyMemory(0xffffcb2c, A0, 0x2e)
+
+	u32[A1] = 0x03669c
+	u8[A1 + 0x20] = 0x04
+	u16[A1 + 0x46] = u16[A2 + 0x46]
+	if (u16[A2 + 0x0a] & 0x8000)
+	{
+		u16[A1 + 0x0a] |= 0x8000
+	}
+}
+
+
+//# address-hook(0x036652) end(0x036674)
+function void fn036652()
+{
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0
+	u8[A0 + 0x29] = 0
+
+	D1 = 0x0366b6
+	D2 = 0x05
+	fn036a38()
+	if (_equal())
+	{
+		u16[A1 + 0x46] = u16[A2 + 0x46]
+	}
+}
+
+
+//# address-hook(0x036676) end(0x036698)
+function void fn036676()
+{
+	objA0.state = 0x07
+	u8[A0 + 0x28] = 0
+	u8[A0 + 0x29] = 0
+
+	D1 = 0x0366be
+	D2 = 0x06
+	fn036a38()
+	if (_equal())
+	{
+		u16[A1 + 0x46] = u16[A2 + 0x46]
+	}
+}
+
+
+//# address-hook(0x03669a) end(0x03669a)
+function void fn03669a()
+{
+}
+
+
+//# address-hook(0x03669c) end(0x0366b4)
+function void fn03669c()
+{
+	objA0.groundspeed = -0x400
+	objA0.value26 = 0
+	objA0.flags2a = 0
+	D2 = 0x0368aa
+	fn0366c4()
+}
+
+
+//# address-hook(0x0366b6) end(0x0366bc)
+function void fn0366b6()
+{
+	D2 = 0x0367c2
+	fn0366c4()
+}
+
+
+//# address-hook(0x0366c4) end(0x036708)
+function void fn0366c4()
+{
+	u32 backupD2 = D2
+	UpdateMovementSimple()
+	CheckGroundCollision()
+	D2 = backupD2
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 += D1.u16
+		u32[A0] = D2
+		u8[A0 + 0x28] = 0xc7
+	}
+	if (level.vertical_wrap == 0xff00)
+	{
+		objA0.position.y.u16 &= level.height.bitmask
+	}
+
+	D0.u16 = move_area.bottom.current + 0x60
+	if (D0.s16 < s16[A0 + 0x14])
+	{
+		UnloadObject()
+	}
+	else
+	{
+		fn036a1a()
+	}
+}
+
+
+//# address-hook(0x036a38) end(0x036a56)
+function void fn036a38()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		D0 = 0x2c
+		while (D0.s16 >= 0)
+		{
+			u16[A1 + D0.u16] = u16[A0 + D0.u16]
+			D0.u16 -= 2
+		}
+
+		u32[A1] = D1
+		u8[A1 + 0x20] = D2.u8
+		D0 = 0
+	}
+}

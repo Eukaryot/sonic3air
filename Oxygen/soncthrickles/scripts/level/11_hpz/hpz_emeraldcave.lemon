@@ -1,0 +1,699 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Part of HPZ when entered through Giant Ring           //
+//-------------------------------------------------------//
+
+//# address-hook(0x05aa02) end(0x05aa2e)
+function void InitLevelTiles.EC()
+{
+	if (global.chaos_emeralds != 0)
+	{
+		u8[0xffffef70] = global.next_bluespheres | 0x80
+	}
+
+	A1 = 0xffff0000 + u16[A3 + 0x10]
+	u8[A1 + 0x29] = 0
+	u8[A1 + 0x2b] = 0
+
+	A1 = 0xffff0000 + u16[A3 + 0x14]
+	u8[A1 + 0x29] = 0
+
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x05aa34) end(0x05aa3c)
+function void UpdateLevelTiles.EC()
+{
+	camera.foreground.y.u16 += camera.screenshake.offset
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x05aa42) end(0x05aa72)
+function void InitLevelScrolling.EC()
+{
+	fn05a334()
+	fn04f2f6()
+
+	A1 = 0xffffa800
+	u16[A1] = u16[(A1+=2)-2]
+	u16[(A1+=2)-2] &= 0xfff0
+	u16[A1] = u16[(A1+=2)-2] & 0xfff0
+
+	A4 = 0x05a39c
+	A5 = 0xffffa800
+	fn04ecec()
+
+	A4 = 0x05a3a0
+	A5 = 0xffffa808
+	fn04f0ce()
+}
+
+
+//# address-hook(0x05aa78) end(0x05aa9c)
+function void UpdateLevelScrolling.EC()
+{
+	fn05a334()
+
+	A4 = 0x05a39c
+	A5 = 0xffffa800
+	D6 = 0x20
+	D5 = 2
+	fn04edf6()
+
+	A4 = 0x05a3a0
+	A5 = 0xffffa808
+	fn04f0ce()
+
+	UpdateScreenShake()
+}
+
+
+
+//# address-hook(0x090964) end(0x090a70)
+function void fn090964()
+{
+	Kosinski.addToDMAQueue(0x1759ac, 0x9580)
+	Kosinski.addToDMAQueue(0x17588a, 0x9100)
+
+	A1 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x0a8a3c : 0x066912
+	copyMemory(0xfffffca0, A1, 0x20)
+	copyMemory(0xfffffcc0, 0x0669f2, 0x40)
+
+	u32[0xfffffce2] = 0x06a00660
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x0906a0
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x045528
+		objA1.position.x.u16 = 0x1640
+		objA1.position.y.u16 = 0x03c7
+		u16[A0 + 0x44] = A1.u16
+	}
+
+	if (u16[0xffffef6c] != 0)
+	{
+		D2 = 0
+		D3 = 6
+		while (D3.s16 >= 0)
+		{
+			allocDynamicObjectStd()
+			objA1.update_address = 0x090774
+			u8[A1 + 0x2c] = D2.u8
+			++D2.u16
+			--D3.s16
+		}
+
+		UnloadObject()
+		return
+	}
+
+	objA0.update_address = 0x090a72
+	objA0.countdown_value = 0x1f
+	A2 = 0xffffffb2
+	D1 = 2
+	D2 = 0
+	D3 = 6
+	while (D3.s16 >= 0)
+	{
+		if (D1.u8 <= u8[(A2+=1)-1])
+		{
+			allocDynamicObjectStd()
+			objA1.update_address = 0x090774
+			u8[A1 + 0x2c] = D2.u8
+		}
+		++D2.u16
+		--D3.s16
+	}
+
+	A1 = 0xffffb000
+	fn090a4c()
+
+	A1 = 0xffffb04a
+	fn090a4c()
+}
+
+
+function void fn090a4c()
+{
+	u8[A1 + 0x0a] |= 0x80
+	objA1.position.x.u16 = 0x1640
+	objA1.position.y.u16 = 0x03a3
+	objA1.state = char.state.DISAPPEARED
+	u8[A1 + 0x22] = 0
+	u8[A1 + 0x2e] = 0x83
+}
+
+
+//# address-hook(0x090a72) end(0x090a92)
+function void fn090a72()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x090a94
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x090ca2
+			u8[A1 + 0x2c] = 7
+		}
+	}
+}
+
+
+//# address-hook(0x090a94) end(0x090b06)
+function void fn090a94()
+{
+	if ((u8[0xfffffab8] & 0x01) == 0)
+		return
+	u8[0xfffffab8] &= ~0x01
+
+	A1 = 0xffffffb2
+	A2 = 0x090b1a
+	A3 = 0xfffffa82
+	A4 = 0x090b0c
+	A5 = 0xfffffab0
+	D0 = 0
+	D1 = 0
+	D2 = 0
+	D3 = 6
+	while (D3.s16 >= 0)
+	{
+		D0.u8 = u8[(A2+=1)-1]
+		D4.u8 = u8[A1 + D0.s16]
+		if (D4.u8 == 1)
+		{
+			u8[(A5+=1)-1] = D0.u8
+			u16[(A3+=2)-2] = u16[A4 + D0.s16 * 2]
+			D1 = 1
+		}
+		else if (D4.u8 == 2)
+		{
+			D2 = 1
+		}
+		--D3.s16
+	}
+
+	u16[A3] = 0
+	if (D1.u16 == 0)
+	{
+		if (D2.u16 == 0)
+		{
+			objA0.flags38 |= 0x20
+		}
+		fn090c16()
+		return
+	}
+
+	objA0.update_address = 0x090b22
+	objA0.countdown_value = 0x021f
+	global.traded_emeralds = 0xff
+
+	spawnSimpleChildObjects(0x090fea)
+}
+
+
+//# address-hook(0x090b22) end(0x090b2a)
+function void fn090b22()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_callback = 0x090bf4
+		fn090b32()
+	}
+}
+
+
+//# address-hook(0x090b32) end(0x090bba)
+function void fn090b32()
+{
+	objA0.update_address = 0x090bd2
+	player1.camera_lock = 0xff
+	D0 = objA0.value39
+	++objA0.value39
+
+	A1 = 0xfffffab0
+	D1 = u8[A1 + D0.s16]
+	u8[A0 + 0x3c] = D1.u8
+
+	A1 = 0xfffffa82
+	u16[A0 + 0x3a] = u16[A1 + D0.s16 * 2]
+	if (u16[A0 + 0x3a] == 0)
+	{
+		objA0.countdown_callback = 0x090c16
+		u16[A0 + 0x3a] = 0x15a0
+		D1 = 2
+	}
+#if STANDALONE
+	u16[A0 + 0x3a] -= getScreenExtend()
+#endif
+	A2 = 0x090bbc + D1.s16 * 2
+
+	A1 = 0xffffb000
+	fn090b84()
+
+	A1 = 0xffffb04a
+	fn090b84()
+}
+
+
+function void fn090b84()
+{
+	if (u8[A2] != 0)
+	{
+		u8[A1 + 0x04] |= render_flag.FLIP_X
+		u8[A1 + 0x2a] |= 0x01
+	}
+	else
+	{
+		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		u8[A1 + 0x2a] &= ~0x01
+	}
+
+	D0 = u8[A2 + 0x01] + u8[A1 + 0x38]
+	u8[A1 + 0x22] = u8[0x090bca + D0.s16]
+
+	u32 backupA2 = A2
+	fn085fc4()
+	A2 = backupA2
+}
+
+
+//# address-hook(0x090bd2) end(0x090bf2)
+function void fn090bd2()
+{
+	D0.u16 = camera.position.x.u16 - u16[A0 + 0x3a]
+	D1 = (D0.s16 < 0) ? 0x10 : -0x10
+	D0.u16 = abs(D0.s16)
+	if (D0.u16 >= 0x10)
+	{
+		camera.position.x.u16 += D1.s16
+	}
+	else
+	{
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+
+//# address-hook(0x090bf4) end(0x090c14)
+function void fn090bf4()
+{
+	objA0.update_address = 0x090c2a
+	objA0.countdown_value = 0x1f
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x090ca2
+		u8[A1 + 0x2c] = u8[A0 + 0x3c]
+	}
+}
+
+
+
+//# address-hook(0x090c16) end(0x090c28)
+function void fn090c16()
+{
+	objA0.update_address = 0x090c34
+	player1.camera_lock = 0
+	u8[0xffffb02e] = 0
+	u8[0xffffb078] = 0
+}
+
+
+//# address-hook(0x090c2a) end(0x090c32)
+function void fn090c2a()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn090b32()
+	}
+}
+
+
+//# address-hook(0x090c34) end(0x090ca0)
+function void fn090c34()
+{
+	A1 = 0xffffb000
+	D0.u16 = abs(s16[A1 + 0x10] - 0x1640)
+	if (D0.u16 >= 8)
+	{
+		if (D0.u16 >= 0x18)
+		{
+			objA0.flags38 |= 0x08
+		}
+		return
+	}
+
+	if (objA0.flags38 & 0x08)
+	{
+		objA0.flags38 &= ~0x08
+		A1 = 0xffff0000 + u16[A0 + 0x44]
+		if ((u8[A1 + 0x2a] & 0x08) && (objA0.flags38 & 0x20))
+		{
+			playSound(0xaf)
+			level.restart = 1
+			checkpoint.number = level.backup.checkpoint | 0x80
+			global.zone_act   = level.backup.zone_act
+			global.zone_act.apparent = u16[0xffffff9c]
+			global.shields_backup_2 = u8[0xffffb02b]
+		}
+	}
+}
+
+
+
+// Teleport beam
+
+//# address-hook(0x090ca2) end(0x090cd2)
+function void fn090ca2()
+{
+	setupObjectAttributesFull(0x090fcc)
+	objA0.update_address = 0x090cf4
+
+	A1 = 0x090cd4 + objA0.subtype2c * 4
+	objA0.position.x.u16 = u16[(A1+=2)-2]
+	u16[A0 + 0x3a] = u16[(A1+=2)-2]
+	objA0.position.y.u16 = camera.position.y.u16 - 0x80
+}
+
+
+//# address-hook(0x090cf4) end(0x090d1a)
+function void fn090cf4()
+{
+	D0.u16 = objA0.position.y.u16 + 0x10
+	objA0.position.y.u16 = D0.u16
+	if (D0.u16 >= u16[A0 + 0x3a])
+	{
+		objA0.update_address = 0x090d30
+		objA0.countdown_value = 0x3f
+		camera.screenshake.state = 8
+		playSound(0x54)
+	}
+
+	fn090d20()
+}
+
+
+//# address-hook(0x090d20) end(0x090d2a)
+function void fn090d20()
+{
+	if ((global.framecounter.low & 0x01) == 0)
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x090d30) end(0x090d50)
+function void fn090d30()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		if (objA0.countdown_value != 0x20)
+		{
+			fn090d20()
+			return
+		}
+
+		fn090e9a()
+	}
+
+	objA0.update_address = 0x090d52
+	objA0.countdown_callback = 0x090d5e
+	fn090d20()
+}
+
+
+//# address-hook(0x090d52) end(0x090d5c)
+function void fn090d52()
+{
+	Object.animationProgress(0x090ff6)
+	fn090d20()
+}
+
+
+//# address-hook(0x090d5e) end(0x090d72)
+function void fn090d5e()
+{
+	u8[0xfffffab8] |= 0x01
+	D0.u16 = u16[A0 + 0x44]
+	if (D0.u16 != 0)
+	{
+		A1 = 0xffff0000 + D0.u16
+		u8[A1 + 0x38] |= 0x20
+	}
+	Object.TriggerUnloading()
+}
+
+
+
+//# address-hook(0x090d78) end(0x090d9c)
+function void fn090d78()
+{
+	objA0.update_address = 0x090da2
+	objA0.render_flags |= 0x04
+	objA0.velocity.y = -0x80
+	objA0.countdown_value = 0x7f
+
+	playSound(0xb8)
+
+	spawnSimpleChildObjects(0x090ff0)
+
+	fn090da2()
+}
+
+
+//# address-hook(0x090da2) end(0x090dd6)
+function void fn090da2()
+{
+	UpdateMovementStraightSimple()
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x090ddc
+
+		A1 = 0xffffb000
+		fn090dc0()
+
+		A1 = 0xffffb04a
+		fn090dc0()
+	}
+}
+
+
+
+// Creation of Super Emeralds from the Chaos Emeralds
+
+function void fn090dc0()
+{
+	D0 = u8[A1 + 0x38]
+	u8[A1 + 0x22] = u8[0x090dd8 + D0.s16]
+
+	u32 backupA2 = A2
+	fn085fc4()
+	A2 = backupA2
+}
+
+
+//# address-hook(0x090ddc) end(0x090dfa)
+function void fn090ddc()
+{
+	if (u8[A0 + 0x27] == 0x7f)
+	{
+		objA0.flags38 |= 0x04
+		if ((objA0.flags38 & 0x80) == 0)
+		{
+			objA0.flags38 |= 0x80
+			playSound(0x9c)
+		}
+	}
+}
+
+
+//# address-hook(0x090dfc) end(0x090e18)
+function void fn090dfc()
+{
+	setupObjectAttributesFull(0x090fd8)
+
+	objA0.update_address = 0x090e1c
+	objA0.render_flags |= 0x80
+	objA0.countdown_value = 0x7f
+
+	if (fn090f0a())
+		return
+	fn090e1c()
+}
+
+
+//# address-hook(0x090e1c) end(0x090e2e)
+function void fn090e1c()
+{
+	D0.u16 = u16[A0 + 0x3a] + 0x10
+	u16[A0 + 0x3a] = D0.u16
+	if (D0.u16 >= 0x1800)
+	{
+		objA0.update_address = 0x090e4e
+	}
+	fn090e34()
+}
+
+
+//# address-hook(0x090e34) end(0x090e38)
+function void fn090e34()
+{
+	u8[A0 + 0x3c] += 4
+	fn084c00()
+	fn090e3e()
+}
+
+
+//# address-hook(0x090e3e) end(0x090e48)
+function void fn090e3e()
+{
+	if ((global.framecounter.low & 0x01) == 0)
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x090e4e) end(0x090e6e)
+function void fn090e4e()
+{
+	D0.u8 = u8[A0 + 0x3d] - u8[A0 + 0x3c]
+	if (D0.u8 >= 4)
+	{
+		fn090e34()
+		return
+	}
+
+	objA0.update_address = 0x090e72
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x27] |= (1 << objA0.subtype2c)
+	fn090e72()
+}
+
+
+//# address-hook(0x090e72) end(0x090e84)
+function void fn090e72()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x04)
+	{
+		objA0.update_address = 0x090e86
+	}
+	fn090e3e()
+}
+
+
+//# address-hook(0x090e86) end(0x090e94)
+function void fn090e86()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		UpdateMovementStraightSimple()
+		fn090e3e()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x090e9a) end(0x090f00)
+function void fn090e9a()
+{
+	if (objA0.subtype2c == 7)
+	{
+		A1 = 0xffffb000
+		fn090eae()
+
+		A1 = 0xffffb04a
+		fn090eae()
+		return
+	}
+
+	A1 = 0xffffffb2
+	D0 = objA0.subtype2c
+	++u8[A1 + D0.s16]
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x090774
+		u8[A1 + 0x2c] = objA0.subtype2c
+		u8[A1 + 0x38] |= 0x80
+		u16[A0 + 0x44] = A1.u16
+	}
+
+	u8[0xffffef56] = 0xff
+	CheckSaveGameSlotAfterBlueSpheres()
+}
+
+
+function void fn090eae()
+{
+	D0 = u8[A1 + 0x38]
+	if (D0.u8 == 1)
+	{
+		objA1.position.y.u16 += 4
+	}
+
+	u8[A1 + 0x22] = u8[0x090f06 + D0.s16]
+	u8[A1 + 0x20] = 5
+	fn085fc4()
+}
+
+
+
+// Chaos Emerald during conversion scene
+
+//# translated(0x090f0a) end(0x090f5e)
+function bool fn090f0a()
+{
+	D0 = objA0.subtype2c >> 1
+	D1.u16 = objA0.subtype2c
+	objA0.subtype2c = D0.u8
+	u8[A0 + 0x3c] = u8[0x090f64 + D0.s16]
+	u8[A0 + 0x3d] = u8[0x090f6c + D0.s16]
+
+	A1 = 0xffffffb2
+	D2.u8 = u8[A1 + D0.s16]
+	if (D2.u8 != 0 && D2.u8 < 2)
+	{
+		objA0.animation.sprite = D0.u8
+		D1.u16 *= 2
+		u32[A0 + 0x18] = u32[0x090f74 + D1.s16]
+		if (global.characters == CHARS_KNUCKLES_ALONE)
+			D1.u16 += 2
+		D2.u16 = u16[0x090f90 + D1.s16]
+		objA0.sprite_attributes = D2.u16
+		return false
+	}
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x27] |= (1 << D0.u8)
+	UnloadObject()
+	return true
+}

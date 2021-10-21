@@ -1,0 +1,175 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Yes, we do ROM writes here indeed!
+
+function void ApplyROMManipulations()
+{
+	ROMManipulation.RepairSpriteMappings()
+	ROMManipulation.CutsceneKnucklesPalette()
+	ROMManipulation.AIZ2.StartPosition()
+	ROMManipulation.AIZ2.BlimpSequenceBombs()
+	ROMManipulation.BonusSM.Probabilities()
+	ROMManipulation.ALZ.MusicFix()
+	ROMManipulation.DPZ.LoopBugFix()
+	ROMManipulation.RollingDemoFix()
+}
+
+
+function void ROMManipulation.RepairSpriteMappings()
+{
+	// Fix for slight offset in Knuckles looking up sprites (0xd5 and 0xd5)
+	s16[0x14ba44] = -0x0d
+	s16[0x14ba4a] = -0x0d
+	s16[0x14ba52] = -0x0d
+	s16[0x14ba58] = -0x0d
+
+	// Fix for slight offset in Super Sonic balancing sprites (0xa1 and 0xa2)
+	s16[0x14805c] = -0x18	// Originally -0x16
+	s16[0x148076] = -0x18	// Originally -0x16
+
+	// Fix for slight offset in Super Sonic transformation sprites (0xd5 and 0xd6)
+	s16[0x148160] = -0x0e
+	s16[0x148174] = -0x0e
+
+	// Fix for the HCZ blow fish ("Pointdexter")
+	s8[0x360e8e] = -0x08
+	s8[0x360e9a] = -0x08
+}
+
+
+function void ROMManipulation.CutsceneKnucklesPalette()
+{
+	// Changing Cutscene Knuckles' colors a bit to better fit the playable Knuckles
+	//  -> Note that this is not used (any more) in S3AIR, as Cutscene Knuckles uses a special palette there
+	//  -> See renderhooks.lemon
+	u16[0x066912 + 0x04] = 0x064e
+	u16[0x066912 + 0x06] = 0x020c
+	u16[0x066912 + 0x08] = 0x0206
+	//u16[0x066912 + 0x0a] = 0x0080		// TODO: This entry is also used for the rings, should not be changed to green
+}
+
+
+function void ROMManipulation.AIZ2.StartPosition()
+{
+	if (true)
+	{
+		// Changed start position for S/T
+		u16[0x1e3c1c] = 0x1240
+		u16[0x1e3c1e] = 0x0358
+	}
+	else
+	{
+		// Original
+		u16[0x1e3c1c] = 0x18a0
+		u16[0x1e3c1e] = 0x04da
+	}
+}
+
+
+function void ROMManipulation.AIZ2.BlimpSequenceBombs()
+{
+	A0 = 0x23c0a6
+
+	if (Game.getSetting(SETTING_AIZ_BLIMPSEQUENCE))
+	{
+		// New sequence
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3f5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x4e, 0x3f2c)
+
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3f5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x12, 0x3f2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3edc)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x30, 0x3eac)
+
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3f5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x12, 0x3f2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3edc)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x12, 0x3eac)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3e5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x16, 0x3e2c)
+
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3f5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x12, 0x3f2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3edc)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x12, 0x3eac)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x0c, 0x3e5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x12, 0x3e2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x40, 0x3dec)
+
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x40, 0x3dec)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x04, 0x3dec)
+	}
+	else
+	{
+		// Original values
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3f5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3f2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3f5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3f2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3f5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x38, 0x3f2c)
+
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3edc)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3eac)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3edc)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3eac)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3edc)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x38, 0x3eac)
+
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3e5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3e2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3e5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3e2c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x20, 0x3e5c)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x38, 0x3e2c)
+
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x40, 0x3dec)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x40, 0x3dec)
+		ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(0x40, 0x3dec)
+	}
+}
+
+function void ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(u16 delayAfterwards, u16 position)
+{
+	u16[A0]   = delayAfterwards
+	u16[A0+2] = position
+	A0 += 4
+}
+
+function void ROMManipulation.BonusSM.Probabilities()
+{
+	// Increased chance for Jackpot, reduced chance for Robotnik, and bringing Knuckles on the same level as Sonic & Tails
+	A0 = 0x04c8b4
+	u8[A0]      = 7		// Chance of 3x Jackpot (enforced triple)	-- original value: 4
+	u8[A0 + 3]  = 9		// Chance of 3x Sonic (enforced triple)		-- original value: 9
+	u8[A0 + 6]  = 9		// Chance of 3x Knuckles (enforced triple)	-- original value: 4
+	u8[A0 + 9]  = 15	// Chance of 3x Robotnik (enforced triple)	-- original value: 18
+	u8[A0 + 12] = 9		// Chance of 3x Tails (enforced triple)		-- original value: 9
+	u8[A0 + 15] = 15	// Chance of 3x Ring (enforced triple)		-- original value: 15
+	u8[A0 + 18] = 15	// Chance of 3x Bar (enforced triple)		-- original value: 15
+}
+
+function void ROMManipulation.ALZ.MusicFix()
+{
+	// Azure Lake emulated music fix as suggested by Legobouwer
+	u8[0x2d9f81] = 0x04
+}
+
+function void ROMManipulation.DPZ.LoopBugFix()
+{
+	// Move y-position of one path swapper from 0x0160 down some pixels to avoid a bug that can send you backwards through the loop
+	u16[0x1fc628] = 0x0168
+}
+
+function void ROMManipulation.RollingDemoFix()
+{
+	u8[0x15fd6c] = 0x9d
+}

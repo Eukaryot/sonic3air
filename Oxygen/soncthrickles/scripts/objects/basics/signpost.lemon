@@ -1,0 +1,566 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Hidden Monitor handler object                         //
+//-------------------------------------------------------//
+
+//# address-hook(0x0836e0) end(0x083706)
+function void fn0836e0()
+{
+	setupObjectAttributesFull(0x0837a6)
+
+#if STANDALONE
+	objA0.subtype2c = Monitor.getRandomizedType(objA0.subtype2c, true)
+
+	// No lightning shield or fire shield underwater
+	if ((objA0.subtype2c == 0x05 || objA0.subtype2c == 0x06) && level.water_present && objA0.position.y.u16 > water.height.current)
+	{
+		// Make it either a bubble shield or rings
+		objA0.subtype2c = (objA0.subtype2c == 0x05) ? 0x07 : 0x03
+	}
+
+	u8[A0 + 0x49] = 0
+#endif
+
+	objA0.update_address = 0x083708
+	objA0.hitbox_extends.x = 0x0f
+	objA0.hitbox_extends.y = 0x0f
+	u8[A0 + 0x28] = 0x46
+	objA0.state = objA0.subtype2c
+}
+
+
+//# address-hook(0x083708) end(0x083798)
+function void fn083708()
+{
+	// Check for signpost hit
+	if (level.signpost.address != 0)
+	{
+		A1 = 0xffff0000 + level.signpost.address
+		if (u32[A1] == 0x0837b2)
+		{
+			u16 px = objA1.position.x.u16
+			u16 py = objA1.position.y.u16
+
+			A2 = 0x08379e
+			u16 minX = objA0.position.x.u16 + u16[(A2+=2)-2]
+			u16 maxX = minX + u16[(A2+=2)-2]
+			u16 minY = objA0.position.y.u16 + u16[(A2+=2)-2]
+			u16 maxY = minY + u16[(A2+=2)-2]
+
+			if (px >= minX && px < maxX)
+			{
+				if (py >= minY && py < maxY && (objA1.flags38 & 0x01))
+				{
+					objA1.flags38 &= ~0x01
+
+					objA0.update_address = 0x01d566		// Make this a real monitor
+					objA0.base_state = 0x02
+					u8[A0 + 0x3c] = 0x04
+					objA0.velocity.y = -0x500
+				#if STANDALONE
+					if (objA0.state == 0x0b)	// Classic Shield's state is not completely supported
+						objA0.state = 0x05
+				#endif
+
+					playSound(SFX_BUBBLEBOUNCE)
+
+					if (objA0.render_flags & render_flag.FLIP_X)
+					{
+						objA0.render_flags &= ~render_flag.FLIP_X
+						objA0.sprite_attributes |= 0x8000
+						objA0.flags2a = 0
+					}
+
+					DrawOrUnloadObject()
+					return
+				}
+			#if STANDALONE
+				else if (objA1.velocity.x != 0)
+				{
+					// Only needed for the hint
+					u8 maximum = 0x50 + abs(s8(global.framecounter & 0x1f) - 0x10) * 0x02
+					u8[A0 + 0x49] = min(u8[A0 + 0x49] + 4, maximum)
+				}
+			#endif
+			}
+			else
+			{
+				bool unload = (objA1.flags38 & 0x01)
+			#if STANDALONE
+				// As a bug fix, also check "countdown_value" to make sure it's not the exact frame where the signpost hit the ground, but a later one
+				//  -> Otherwise hidden monitors can get locked too early
+				unload = unload && (s16[A1 + 0x2e] < 0x40)
+
+				// Only needed for the hint
+				u8[A0 + 0x49] = (u8[A0 + 0x49] > 4) ? (u8[A0 + 0x49] - 4) : 0
+			#endif
+
+				if (unload)
+				{
+					// Signpost touched ground without hitting a monitor
+					playSound(0x7e)
+					objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+				}
+			}
+
+		#if STANDALONE
+			if (Game.getSetting(SETTING_HIDDEN_MONITOR_HINT) && u8[A0 + 0x49] > 0x20)
+			{
+				// Draw a hint
+				px = objA0.position.x.u16 - camera.foreground.x.u16 - 0x10
+				py = objA0.position.y.u16 - camera.foreground.y.u16 - 0x10
+				Renderer.drawVdpSpriteWithAlpha(px, py, 0x0f, 0x84c4, 0xd000, u8[A0 + 0x49] - 0x20)
+			}
+		#endif
+		}
+	}
+
+	CheckForUnloadObject()
+}
+
+
+
+//-------------------------------------------------------//
+// Sign Post (falling down after Act 1 boss)             //
+//-------------------------------------------------------//
+
+//# address-hook(0x0837b2) end(0x0837c8)
+function void SignPost.BaseUpdate()
+{
+	// Targets:
+	//  - 0x0837d8	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x083832	-> objA0.base_state = 0x02  -> In air, turning
+	//  - 0x0838c2	-> objA0.base_state = 0x04  -> On ground, still turning
+	//  - 0x083912	-> objA0.base_state = 0x06  -> On ground, standing still (one frame only)
+	//  - 0x083938	-> objA0.base_state = 0x08  -> Done
+	call tableLookupAddress(0x0837ce, objA0.base_state)
+
+	Object.loadSpritePatterns(0x083b42)
+	DrawObject()
+}
+
+
+//# address-hook(0x0837d8) end(0x08382e)
+function void fn0837d8()
+{
+	A1 = 0x083b04
+	if (fn084fa4())
+		return
+
+	if (u8[0xffffb00a] & 0x80)
+		u8[A0 + 0x0a] |= 0x80
+
+	level.signpost.address = A0.u16
+
+	objA0.hitbox_extends.x = 0x18
+	objA0.hitbox_extends.y = 0x1e
+	u32[A0 + 0x30] = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x083b58 : 0x083b4a
+	objA0.position.y.u16 = camera.position.y.u16 - 0x20
+
+	playSound(0xb8)
+
+	spawnChildObjects(0x083b2e)
+}
+
+
+//# address-hook(0x083832) end(0x0838bc)
+function void fn083832()
+{
+	if ((global.framecounter & 0x03) == 0)
+	{
+		spawnSimpleChildObjects(0x083b36)
+	}
+
+	fn083a50()
+	objA0.velocity.y += 0x0c
+	UpdateMovementStraightSimple()
+	fn083ac6()
+	Object.AnimationProgressByLocalA1()
+
+	D0.u16 = camera.position.y.u16 + 0x50
+	if (D0.u16 <= objA0.position.y.u16 && objA0.velocity.y >= 0)
+	{
+		bool touchedGround = false
+
+		// Special handling for SOZ 1 (because of sand pit?)
+		if (global.zone == 0x08)
+		{
+			D0 = (objA0.position.x.u16 >= 0x4210) ? 2 : 0
+			if (D0.u16 != objA0.value3e)
+			{
+				objA0.value3e = D0.u16
+				objA0.sprite_priority = u16[0x0838be + D0.u16]
+			}
+			touchedGround = (objA0.position.y.u16 >= 0x09f2)
+		}
+
+		if (!touchedGround)
+		{
+			CheckGroundCollision()
+			if (D1.s16 < 0)
+			{
+				objA0.position.y.u16 += D1.s16
+				touchedGround = true
+			}
+		}
+
+		if (touchedGround)
+		{
+			// This also gets called when the signpost hits a hidden monitor
+			//  -> In that case, flag 0x01 will get reset in "fn083708()"
+			objA0.base_state = 0x04
+			objA0.flags38 |= 0x01
+			objA0.countdown_value = 0x40
+		}
+	}
+}
+
+
+//# address-hook(0x0838c2) end(0x08390c)
+function void fn0838c2()
+{
+	if (objA0.flags38 & 0x01)
+	{
+		Object.AnimationProgressByLocalA1()
+		--objA0.countdown_value
+		if (objA0.countdown_value >= 0)
+			return
+
+		objA0.base_state = 0x06
+		u8[0xfffffabe] = 0xff
+		objA0.velocity.x = 0
+		objA0.velocity.y = 0
+		objA0.animation.sprite = u8[0x08390e + global.characters]
+		player2.control_override = 0xff
+	}
+	else
+	{
+		// Touched a monitor
+		objA0.base_state = 0x02
+		objA0.state = 0x20
+		objA0.velocity.y = -0x200
+	}
+}
+
+
+//# address-hook(0x083912) end(0x083936)
+function void fn083912()
+{
+	A1 = 0xffffb000
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+		objA0.base_state = 0x08
+		StartCharacterWinPose()
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x02dad0
+		}
+
+	#if STANDALONE
+		Game.onZoneActCompleted(global.zone_act.apparent)
+	#endif
+	}
+}
+
+
+//# address-hook(0x083938) end(0x083996)
+function void fn083938()
+{
+	if (global.zone == 0x0b)
+	{
+		CheckGroundCollision()
+		if (D1.s16 > 0)
+		{
+			UpdateMovementSimple()
+		}
+		else
+		{
+			objA0.position.y.u16 += D1.u16
+			objA0.velocity.y = 0
+		}
+	}
+	else
+	{
+		objA0.velocity.y = 0
+	}
+
+	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	u16 dy = objA0.position.y.u16 - camera.position.y.u16 + 0x80
+	if (dx <= 0x0280 && dy <= 0x0200)
+	{
+		fn086932()
+	}
+	else
+	{
+		addPatternLoadingCue(0x08399a)
+		fn0851e4()
+		Object.TriggerUnloading()
+	}
+}
+
+
+
+// End sign sparks
+
+//# address-hook(0x0839a2) end(0x083ae2)
+function void fn0839a2()
+{
+	setupObjectAttributesFull(0x083b22)
+	if (u8[0xffffb00a] & 0x80)
+		u8[A0 + 0x0a] |= 0x80
+
+	objA0.update_address = 0x0839ea
+	D0.u16 = (getRandomNumber() & 0x1f) - 0x10
+	objA0.position.y.u16 += D0.u16
+	u16[A0 + 0x3a] = objA0.position.x.u16
+	objA0.velocity.x = 0x1000
+	objA0.countdown_value = 0x20
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	fn0839ea()
+}
+
+
+//# address-hook(0x0839ea) end(0x083a1e)
+function void fn0839ea()
+{
+	objA0.velocity.x += (objA0.position.x.u16 >= u16[A0 + 0x3a]) ? -0x400 : 0x400
+	objA0.sprite_priority = (objA0.velocity.x < 0) ? 0x380 : 0x280
+	UpdateMovementStraightSimple()
+
+	Object.animationProgress(0x083b66)
+	Object.CountdownAndTrigger()
+	DrawObject()
+}
+
+
+
+// End sign's base stick
+
+//# address-hook(0x083a24) end(0x083a3a)
+function void fn083a24()
+{
+	setupObjectAttributesFull(0x083b16)
+	objA0.update_address = 0x083a40
+	if (u8[0xffffb00a] & 0x80)
+		u8[A0 + 0x0a] |= 0x80
+
+	fn083a40()
+}
+
+//# address-hook(0x083a40) end(0x083a4a)
+function void fn083a40()
+{
+	MoveWithParent()
+	fn085a5a()
+	fn084920()
+}
+
+
+
+//# address-hook(0x083a50) end(0x083abc)
+function void fn083a50()
+{
+	if (objA0.state != 0)
+	{
+		// Don't react for a short time
+		--objA0.state
+		return
+	}
+
+	A1 = 0x083abe
+	fn0858f8()
+
+	if (D0.u16 != 0)
+	{
+		fn083a70()
+	}
+
+	D0 >>= 16
+	if (D0.u16 != 0)
+	{
+		fn083a70()
+	}
+}
+
+function void fn083a70()
+{
+	A1 = 0xffff0000 + D0.u16
+	if (u8[A1 + 0x20] != 2)
+		return
+	if (objA1.velocity.y >= 0)
+		return
+
+	// Touched by character
+	objA0.state = 0x20
+	D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
+	if (D0.u16 == 0)
+		D0 = 8
+
+	D0.u16 <<= 4
+	objA0.velocity.x = D0.u16
+	objA0.velocity.y = -0x200
+
+	playSound(0xb8)
+
+	spawnSimpleChildObjects(0x083b3c)
+
+	A3 = A1
+	addScore(10)
+}
+
+
+//# address-hook(0x083ac6) end(0x083b02)
+function void fn083ac6()
+{
+	D0.u16 = camera.position.x.u16
+	if (objA0.velocity.x >= 0)
+	{
+		D0.u16 += getScreenWidth() - 0x18
+		if (D0.u16 >= objA0.position.x.u16)
+		{
+			D3 = 0x20
+			fn00fac4()
+			if (D1.s16 >= 0)
+				return
+		}
+	}
+	else
+	{
+		D0.u16 += 0x18
+		if (D0.u16 <= objA0.position.x.u16)
+		{
+			D3 = -0x20
+			fn00fe3c()
+			if (D1.s16 >= 0)
+				return
+		}
+	}
+	objA0.velocity.x = -objA0.velocity.x
+}
+
+
+
+//# address-hook(0x085a5a) end(0x085a78)
+function void fn085a5a()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x0a] & 0x80)
+		u8[A0 + 0x0a] |= 0x80
+	else
+		u8[A0 + 0x0a] &= ~0x80
+	objA0.sprite_priority = u16[A1 + 0x08]
+}
+
+
+
+//# address-hook(0x08671c) end(0x086726)
+function void fn08671c()
+{
+	objA0.update_address = 0x08672a
+	setupObjectAttributesBasic(0x086b3e)
+}
+
+
+//# address-hook(0x08672a) end(0x086750)
+function void fn08672a()
+{
+	fn086a3e()
+	if (objA0.flags2a & 0x18)
+	{
+		objA0.update_address = 0x086754
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		objA1.flags38 |= 0x02
+		objA0.animation.sprite = 0x0c
+	}
+	fn084920()
+}
+
+
+//# address-hook(0x086754) end(0x086758)
+function void fn086754()
+{
+	fn086a3e()
+	fn084920()
+}
+
+
+//# address-hook(0x086932) end(0x086980)
+function void fn086932()
+{
+	if (!level.wait_for_results)
+		return
+
+	if (global.zone == 0x03)
+	{
+		A1 = 0xffffb000
+		StartCharacterWinPose()
+	}
+
+	if (objA0.flags38 & 0x80)
+		return
+
+	A1 = 0xffffb04a
+	if (u8[A1 + 0x2a] & 0x80)
+		return
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+		return
+	if (u8[A1 + 0x05] >= 0x06)
+		return
+
+	objA0.flags38 |= 0x80
+	player2.control_override = 0
+	StartCharacterWinPose()
+}
+
+
+
+//# address-hook(0x086a3e) end(0x086a4e)
+function void fn086a3e()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x04
+	D3.u16 = 0x06
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}
+
+
+
+//# address-hook(0x0869c6) end(0x0869f4)
+function void StartCharacterWinPose()
+{
+#if STANDALONE
+	if (u8[A1 + 0x2a] & char.flag.ROLLING)
+	{
+		// Correct position, so character is not partially in the ground
+		u32 backupA0 = A0
+		A0 = A1
+		Character.LandingOnGroundStandUp()
+		A0 = backupA0
+	}
+
+	// Fix for player being able to walk around and do stuff, if carried by Tails when touching ground
+	tails.carrying = 0
+#endif
+
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	u16[A1 + 0x1c] = 0
+	objA1.state = char.state.WIN_POSE
+	objA1.flags2a &= ~char.flag.PUSHING
+	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x3d] = 0
+
+	objA0.flags2a &= ~0x20
+	objA0.flags2a &= ~0x40
+}

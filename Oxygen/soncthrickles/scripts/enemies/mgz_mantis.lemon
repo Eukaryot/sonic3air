@@ -1,0 +1,152 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Mantis enemy from Marble Garden Zone                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x088e60) end(0x088e60)
+function void Mantis.Init()
+{
+	Object.InitWithUpdateAddress(0x088e66)
+}
+
+
+//# address-hook(0x088e66) end(0x088e74)
+function void Mantis.Update()
+{
+	// Targets:
+	//  - 0x088e82	-> objA0.base_state = 0x00
+	//  - 0x088e98	-> objA0.base_state = 0x02
+	//  - 0x088ec4	-> objA0.base_state = 0x04
+	//  - 0x088efe	-> objA0.base_state = 0x06
+	//  - 0x088f22	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x088e78, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x088e82) end(0x088e94)
+function void fn088e82()
+{
+	setupObjectAttributesFull(0x088f8a)
+	objA0.hitbox_extends.y = 0x29
+
+	spawnChildObjects(0x088f9c)
+}
+
+
+//# address-hook(0x088e98) end(0x088ec2)
+function void fn088e98()
+{
+	CheckDistanceToPlayers()
+	if (D0.u16 != 0)
+		objA0.render_flags |= 0x01
+	else
+		objA0.render_flags &= ~0x01
+
+	if (D2.u16 < 0x40)
+	{
+		objA0.base_state = 0x04
+		objA0.countdown_callback = 0x088ee8
+	}
+}
+
+
+//# address-hook(0x088ec4) end(0x088ee0)
+function void fn088ec4()
+{
+	A1 = 0x088fa4
+	fn0845a0()
+	if (D2.s16 > 0)
+	{
+		objA0.position.y.u16 += u16[0x088ee2 + objA0.animation.frame]
+	}
+}
+
+
+//# address-hook(0x088ee8) end(0x088efc)
+function void fn088ee8()
+{
+	objA0.base_state = 0x06
+	objA0.velocity.y = -0x600
+	objA0.countdown_callback = 0x088f0e
+}
+
+
+//# address-hook(0x088efe) end(0x088f0a)
+function void fn088efe()
+{
+	UpdateMovementSimple()
+	if (objA0.velocity.y >= 0)
+	{
+		Object.TriggerOnGroundHit()
+	}
+}
+
+
+//# address-hook(0x088f0e) end(0x088f20)
+function void fn088f0e()
+{
+	objA0.base_state = 0x08
+	objA0.velocity.y = 0
+	objA0.countdown_callback = 0x088f48
+}
+
+
+//# address-hook(0x088f22) end(0x088f3e)
+function void fn088f22()
+{
+	A1 = 0x088fab
+	fn0845a0()
+	if (D2.s16 > 0)
+	{
+		objA0.position.y.u16 += u16[0x088f40 + objA0.animation.frame]
+	}
+}
+
+
+//# address-hook(0x088f48) end(0x088f4e)
+function void fn088f48()
+{
+	objA0.base_state = 0x02
+}
+
+
+//# address-hook(0x088f50) end(0x088f62)
+function void fn088f50()
+{
+	MoveAndFlipWithParent()
+
+	// Targets:
+	//  - 0x088f6a	-> objA0.base_state = 0x00
+	//  - 0x088f72	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x088f66, objA0.base_state)
+
+	fn084920()
+}
+
+
+//# address-hook(0x088f6a) end(0x088f6e)
+function void fn088f6a()
+{
+	setupObjectAttributesBasic(0x088f96)
+}
+
+
+//# address-hook(0x088f72) end(0x088f88)
+function void fn088f72()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.animation.sprite = 5
+	if (objA1.velocity.y >= 0)
+		objA0.animation.sprite = 4
+}

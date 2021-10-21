@@ -1,0 +1,253 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Glowing Sphere                                        //
+//-------------------------------------------------------//
+
+//# address-hook(0x04a3dc) end(0x04a402)
+function void fn04a3dc()
+{
+	objA0.mapping_offset = 0x04a3d2
+	objA0.sprite_attributes = 0x6378
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+
+	objA0.update_address = 0x04a408
+	fn04a408()
+}
+
+
+//# address-hook(0x04a408) end(0x04a422)
+function void fn04a408()
+{
+	A2 = A0 + 0x30
+	A1 = 0xffffb000
+	D1.u16 = control.player1
+	fn04a428()
+
+	++A2
+	A1 = 0xffffb04a
+	D1.u16 = control.tails
+	fn04a428()
+
+	fn049b4e()
+}
+
+
+//# address-hook(0x049b4e) end(0x049b70)
+function void fn049b4e()
+{
+	D0.u16 = (objA0.position.y.u16 & 0xff80) - level.despawn_position.y
+	if (D0.u16 > 0x0200)
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x04a428) end(0x04a4a2)
+function void fn04a428()
+{
+	if (u8[A2] == 0)
+	{
+		fn04a53a()
+		return
+	}
+
+	if (debug_mode.state != 0 || u8[A1 + 0x05] >= 0x04)
+	{
+		fn04a4f0()
+		return
+	}
+
+	if (s8[A1 + 0x2e] < 0)
+	{
+		fn04a4f6()
+		return
+	}
+
+	if (D1 & 0x70)
+	{
+		fn04a4b4()
+		return
+	}
+
+	if (D1 & 0x0400)
+	{
+		--u8[A2 + 0x06]
+	}
+	if (D1 & 0x0800)
+	{
+		++u8[A2 + 0x06]
+	}
+
+	D1.u16 = objA1.position.x.u16
+	D2.u16 = objA1.position.y.u16
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	fn04a5e0()
+	D1 = backupD1
+	D2 = backupD2
+
+	D1.u16 -= objA1.position.x.u16
+	D1.s16 <<= 8
+	D1.s16 = -D1.s16
+	objA1.velocity.x = D1.u16
+	D2.u16 -= objA1.position.y.u16
+	D2.s16 <<= 8
+	D2.s16 = -D2.s16
+	objA1.velocity.y = D2.u16
+
+	D0.u8 = level.framecounter.low & 0x0f
+	if (D0.u8 == 0)
+	{
+		playSound(0xc6)
+	}
+}
+
+
+//# address-hook(0x04a4b4) end(0x04a538)
+function void fn04a4b4()
+{
+	D0.u8 = u8[A2 + 4] & 0x0f
+	D1 = u8[A2 + 4] >> 4
+	D1.u8 = u8[0x04a4a4 + D1.s16]
+	D0.u8 |= D1.u8
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * 0x0c
+	D2.u16 = D0.u16
+	D0.u8 = u8[A2 + 0x06]
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * D2.s16
+	D1.s32 = s32(D1.s16) * D2.s16
+	D0.s32 >>= 8
+	D1.s32 >>= 8
+
+	objA1.velocity.x = D0.u16
+	objA1.velocity.y = -D1.s16
+	fn04a4f0()
+}
+
+
+//# address-hook(0x04a4f0) end(0x04a4f0)
+function void fn04a4f0()
+{
+	u8[A1 + 0x2e] &= 0xfc
+	fn04a4f6()
+}
+
+
+//# address-hook(0x04a4f6) end(0x04a538)
+function void fn04a4f6()
+{
+	u8[A2] = 0
+	u8[A2 + 0x02] = 0x1e
+
+	u16[A1 + 0x08] = 0x0100
+	u8[A1 + 0x1e] = 0x0e
+	u8[A1 + 0x1f] = 0x07
+	u8[A1 + 0x20] = 0x02
+	u8[A1 + 0x27] = 0
+	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+	objA1.flags2a &= ~char.flag.CONTROL_LOCK
+	u8[A1 + 0x2f] = 0
+	u8[A1 + 0x40] = 0
+}
+
+
+//# address-hook(0x04a53a) end(0x04a5de)
+function void fn04a53a()
+{
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		if (u8[A2 + 0x02] == 0)
+		{
+			u16[A1 + 0x08] = 0x0100
+		}
+		return
+	}
+
+	D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x38
+	D2.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x38
+	if (D1.u16 < 0x70 && D2.u16 < 0x70)
+	{
+		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		{
+			D1.u16 -= 0x38
+			D2.u16 -= 0x38
+			LookupAngleByVector()
+			D1 = 0
+			if (D0.s8 < 0)
+			{
+				D1 = -0x80
+				D0.u8 += 0x80
+			}
+
+			u8[A2] = 1
+			u8[A2 + 0x04] = D1.u8
+			u8[A2 + 0x06] = D0.u8 - 0x40
+
+			u8[A1 + 0x04] &= 0xfd
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			u16[A1 + 0x1c] = 0x0800
+			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x2e] = 0x01
+			fn04a5e0()
+		}
+	}
+}
+
+
+//# address-hook(0x04a5e0) end(0x04a642)
+function void fn04a5e0()
+{
+	D0 = u8[A2 + 0x04]
+	LookupSinCos()
+	D1.s32 = s32(D1.s16) * 0x3800
+	D1 >>= 16
+	D2 = 0
+	D3.u16 = D1.u16
+
+	D0 = u8[A2 + 0x06]
+	LookupSinCos()
+	D5.u16 = D3.u16
+	D5.s32 = s32(D5.s16) * D0.s16
+	D3.s32 = s32(D3.s16) * D1.s16
+	D3.s32 >>= 8
+	D2 -= D5
+	D2.s32 >>= 8
+	D2.u16 += objA0.position.x.u16
+	D3.u16 += objA0.position.y.u16
+	objA1.position.x.u16 = D2.u16
+	objA1.position.y.u16 = D3.u16
+	D0.u8 = u8[A2 + 0x04]
+	if (D0.s8 < 0)
+	{
+		u16[A1 + 0x08] = 0x0280
+		u16[A1 + 0x0a] &= 0x7fff
+	}
+	else
+	{
+		u16[A1 + 0x08] = 0x0100
+		u16[A1 + 0x0a] |= 0x8000
+	}
+	D0.u8 += 4
+	u8[A2 + 0x04] = D0.u8
+}

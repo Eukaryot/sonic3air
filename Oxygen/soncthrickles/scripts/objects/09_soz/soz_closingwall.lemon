@@ -1,0 +1,105 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x041b70) end(0x041bda)
+function void fn041b70()
+{
+	objA0.mapping_offset = 0x041c72
+	objA0.sprite_attributes = 0x4455
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x40
+	objA0.sprite_priority = 0x0200
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	D0.u8 = u8[A3 + D0.s16]
+	u16[A0 + 0x36] = D0.u16
+
+	D0.u16 = objA0.subtype2c & 0xf0
+	if (D0.u16 != 0)
+	{
+		objA0.animation.sprite = 1
+		objA0.box_size.x = 0x40
+		objA0.box_size.y = 0x0c
+
+		objA0.update_address = 0x041c3a
+		fn041c3a()
+	}
+	else
+	{
+		objA0.update_address = 0x041be0
+		fn041be0()
+	}
+}
+
+
+//# address-hook(0x041be0) end(0x041c34)
+function void fn041be0()
+{
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	D0.u8 = u8[A3 + D0.s16]
+	if (D0.u16 != u16[A0 + 0x36])
+	{
+		// If setting is active, the wall is opening too slowly without this speed-up
+		s8 maxChange = Game.getSetting(SETTING_FASTER_PUSH) ? 2 : 1
+		u16[A0 + 0x36] += clamp(s16(D0.u16 - u16[A0 + 0x36]), -maxChange, maxChange)
+	}
+
+	D0.u16 = u16[A0 + 0x36]
+	if ((objA0.flags2a & 0x01) == 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D0.u16
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x041c3a) end(0x041c70)
+function void fn041c3a()
+{
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	D0.u8 = u8[A3 + D0.s16]
+	if (D0.u16 != u16[A0 + 0x36])
+	{
+		// If setting is active, the wall is opening too slowly without this speed-up
+		s8 maxChange = Game.getSetting(SETTING_FASTER_PUSH) ? 2 : 1
+		u16[A0 + 0x36] += clamp(s16(D0.u16 - u16[A0 + 0x36]), -maxChange, maxChange)
+	}
+
+	D0.u16 = u16[A0 + 0x36]
+	if ((objA0.flags2a & 0x01) == 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	D0.u16 += u16[A0 + 0x44]
+	objA0.position.x.u16 = D0.u16
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}

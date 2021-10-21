@@ -1,0 +1,310 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Death Egg Zone Act 1                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x059352) end(0x059358)
+function void InitLevelTiles.DEZ1()
+{
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x05935e) end(0x059378)
+function void UpdateLevelTiles.DEZ1()
+{
+	if (u16[0xffffeec4] != 0)
+	{
+		u16[0xffffeec4] = 0
+		A1 = 0xffff0000 + u16[A3 + 0x14]
+		u8[A1 + 0x6e] = 0xbd
+		fn04ed62()
+	}
+	else
+	{
+		LoadTileContentDefault()
+	}
+}
+
+
+//# address-hook(0x05937e) end(0x059392)
+function void fn05937e()
+{
+	camera.background.x.u16 = 0
+	camera.background.y.u16 = 0
+	fn04f2f6()
+	Level.InitialTilesFill()
+	WriteScrollOffsets()
+}
+
+
+//# address-hook(0x059398) end(0x05939c)
+function void UpdateLevelScrolling.DEZ1()
+{
+	#if STANDALONE
+		// Draw our own widescreen version of the background
+		Renderer.enforceClearScreen(true)
+		Renderer.enableDefaultPlane(0, false)
+		Renderer.drawCustomSprite("bg_dez1", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+	#endif
+
+	call 0x0593a0 + level.scrolling_routine
+}
+
+
+//# address-hook(0x0593a0) end(0x0593a0)
+function void fn0593a0()
+{
+	fn0593a8()
+}
+
+//# address-hook(0x0593a4) end(0x0593a4)
+function void fn0593a4()
+{
+	fn0593ec()
+}
+
+
+//# address-hook(0x0593a8) end(0x0593e6)
+function void fn0593a8()
+{
+	if (u16[0xffffeec6] != 0)
+	{
+		u16[0xffffeec6] = 0
+
+		push(A3)
+		push(A2)
+		push(A0)
+		push(D7)
+
+		Kosinski.addToDecompressionQueue(0x1d7e3a, 0xffffa5e0)
+
+		Kosinski.addToDMAQueue(0x1d7fca, 0x5240)
+
+		requestLoadingPatterns(0x38)
+
+		D7 = pop()
+		A0 = pop()
+		A2 = pop()
+		A3 = pop()
+
+		level.scrolling_routine += 4
+	}
+
+	WriteScrollOffsets()
+}
+
+
+//# address-hook(0x0593ec) end(0x059488)
+function void fn0593ec()
+{
+	if (kosinski.waiting_modules == 0)
+	{
+		global.zone_act = 0x0b01
+		camera.update_routine = 0
+		dynobjects.routine = 0
+		rings.update_routine = 0
+		level.boss_encounter = 0
+		global.in_extra_stage = 0
+		fn04f8f8()
+
+		push(A3)
+		push(A2)
+		push(A0)
+		push(D7)
+
+		fn01c362()
+		fn0076a6()
+
+		copyMemory(0xfffffc40, 0x0a993c, 0x40)
+
+		D7 = pop()
+		A0 = pop()
+		A2 = pop()
+		A3 = pop()
+
+		D0.u16 = 0x3600
+		D1.u16 = -0x400
+		u16[0xffffb010] -= D0.u16
+		u16[0xffffb014] -= D1.u16
+		u16[0xffffb05a] -= D0.u16
+		u16[0xffffb05e] -= D1.u16
+
+		fn04f3b0()
+
+		camera.position.x.u16 -= D0.u16
+		camera.position.y.u16 -= D1.u16
+		camera.foreground.x.u16 -= D0.u16
+		camera.foreground.y.u16 -= D1.u16
+		move_area.left -= D0.u16
+		move_area.right -= D0.u16
+		level.vertical_wrap -= D1.u16
+		move_area.bottom.current -= D1.u16
+		move_area.bottom.target = move_area.bottom.current
+		Level.GetCameraPosition()
+		level.scrolling_routine = 0
+	}
+
+	WriteScrollOffsets()
+}
+
+
+
+//-------------------------------------------------------//
+// Death Egg Zone Act 2                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x05948e) end(0x05949a)
+function void InitLevelTiles.DEZ2()
+{
+	u16[0xffffeec0] = 0x04
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x0594a0) end(0x0594a4)
+function void UpdateLevelTiles.DEZ2()
+{
+	call 0x0594a8 + s16[0xffffeec0]
+}
+
+
+//# address-hook(0x0594a8) end(0x0594a8)
+function void fn0594a8()
+{
+	fn0594b4()
+}
+
+//# address-hook(0x0594ac) end(0x0594ac)
+function void fn0594ac()
+{
+	fn0594da()
+}
+
+//# address-hook(0x0594b0) end(0x0594b0)
+function void fn0594b0()
+{
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x0594b4) end(0x0594d4)
+function void fn0594b4()
+{
+	if (u16[0xffffeec4] == 0)
+	{
+		LoadTileContentDefault()
+		return
+	}
+
+	u16[0xffffeec4] = 0
+	A1 = 0xffff0000 + u16[A3 + 0x38]
+	u8[A1+1] = 0xd7
+	u8[A1+2] = 0xdc
+	u8[A1+3] = 0xd7
+	A1 += 3
+	u16[0xffffeec0] += 4
+	fn04ed62()
+}
+
+
+//# address-hook(0x0594da) end(0x0594f8)
+function void fn0594da()
+{
+	if (u16[0xffffeec4] != 0)
+	{
+		u16[0xffffeec4] = 0
+		A1 = 0xffff0000 + u16[A3 + 0x18]
+		u8[A1 + 0x6b] = 0xbc
+		u16[0xffffeec0] += 4
+		fn04ed62()
+	}
+	else
+	{
+		LoadTileContentDefault()
+	}
+}
+
+
+//# address-hook(0x0594fe) end(0x059518)
+function void InitScrolling.DEZ2()
+{
+	level.scrolling_routine = 0x08
+	camera.background.x.u16 = 0
+	camera.background.y.u16 = 0
+	fn04f2f6()
+	Level.InitialTilesFill()
+	WriteScrollOffsets()
+}
+
+
+//# address-hook(0x05951e) end(0x059522)
+function void UpdateLevelScrolling.DEZ2()
+{
+	#if STANDALONE
+		// Draw our own widescreen version of the background
+		Renderer.enforceClearScreen(true)
+		Renderer.enableDefaultPlane(0, false)
+		Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+	#endif
+
+	call 0x059526 + level.scrolling_routine
+}
+
+
+//# address-hook(0x059526) end(0x059526)
+function void fn059526()
+{
+	fn059532()
+}
+
+//# address-hook(0x05952a) end(0x05952a)
+function void fn05952a()
+{
+	fn059556()
+}
+
+//# address-hook(0x05952e) end(0x05952e)
+function void fn05952e()
+{
+	WriteScrollOffsets()
+}
+
+
+//# address-hook(0x059532) end(0x059552)
+function void fn059532()
+{
+	camera.background.x.u16 = 0
+	camera.background.y.u16 = 0
+	fn04f2f6()
+
+	u16[0xffffeec8] = (D0.u16 + getScreenHeight()) & level.height.tilemask
+	u16[0xffffeeca] = 0x0f
+	level.scrolling_routine += 4
+	fn059556()
+}
+
+
+//# address-hook(0x059556) end(0x059566)
+function void fn059556()
+{
+	D1 = 0
+	D2 = 0
+	fn04ef56()
+	if (_negative())
+	{
+		level.scrolling_routine += 4
+	}
+	WriteScrollOffsets()
+}

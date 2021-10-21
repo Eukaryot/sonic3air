@@ -1,0 +1,5 @@
+{
+	"icz2_layout":  { "File": "../level/zone05_icz/act2_layout.bin" },
+	"icz2_objects": { "File": "../level/zone05_icz/act2_objects.bin" },
+	"icz2_rings":   { "File": "../level/zone05_icz/act2_rings.bin" }
+}

@@ -1,0 +1,216 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Standalone-specific functions and callbacks           //
+//-------------------------------------------------------//
+
+function void Standalone.checkTimeAttackFinish()
+{
+	// For time attack, check if end was reached
+	if (!Game.isTimeAttack())
+		return
+
+	s16 px = s16[0xffffb010]
+	s16 py = s16[0xffffb014]
+	s16 poleX = -1
+	s16 poleY = -1
+
+	// AIZ
+	if (global.zone_act.apparent == 0x0000)
+	{
+		if (global.zone_act == 0x0001)
+		{
+			poleX = 0x1160
+			poleY = (py >= 0x0400) ? 0x0510 : 0x0370	// First is end for Knuckles, second is for S/T
+		}
+	}
+	else if (global.zone_act.apparent == 0x0001)
+	{
+		poleX = (py >= 0x0400) ? 0x3f30 : 0x4200		// First is end for Knuckles, second is for S/T
+		poleY = (py >= 0x0400) ? 0x0690 : 0x0211
+	}
+
+	// HCZ
+	if (global.zone_act.apparent == 0x0100)
+	{
+		poleX = 0x35b0
+		poleY = 0x0400
+	}
+	else if (global.zone_act.apparent == 0x0101)
+	{
+		poleX = (py >= 0x0700) ? 0x3f80 : 0x45a0		// First is end for S/T, second is for Knuckles
+		poleY = (py >= 0x0700) ? 0x0800 : 0x0380
+	}
+
+	// MGZ
+	if (global.zone_act.apparent == 0x0200)
+	{
+		poleX = 0x2d40
+		poleY = 0x0ed0
+	}
+	else if (global.zone_act.apparent == 0x0201)
+	{
+		if (py < 0x0100)
+		{
+			poleX = 0x3c18		// For Knuckles
+			poleY = 0x008c
+		}
+		else if (py >= 0x0500 && py < 0x07a0)
+		{
+			poleX = 0x3c80		// For Sonic/Tails
+			poleY = 0x074c
+		}
+	}
+
+	// CNZ
+	if (global.zone_act.apparent == 0x0300)
+	{
+		poleX = 0x30a0
+		poleY = (py < 0x0880) ? 0x0240 : 0x0940		// First is end for S/T, second is for Knuckles
+	}
+	else if (global.zone_act.apparent == 0x0301)
+	{
+		poleX = 0x497c
+		poleY = 0x0a40
+	}
+
+	// ICZ
+	if (global.zone_act.apparent == 0x0500)
+	{
+		if (global.zone_act == 0x0501)
+		{
+			poleX = 0x0700
+			poleY = (py < 0x0500) ? 0x0380 : 0x0980		// First is end for S/T, second is for Knuckles
+		}
+	}
+	else if (global.zone_act.apparent == 0x0501)
+	{
+		poleX = 0x4400
+		poleY = 0x06c0
+	}
+
+	// LBZ
+	if (global.zone_act.apparent == 0x0600)
+	{
+		poleX = 0x38e0
+		poleY = 0x0600
+	}
+	else if (global.zone_act.apparent == 0x0601)
+	{
+		if (py < 0x0500 || py > 0x0700)
+		{
+			poleX = 0x43a0		// For Knuckles
+			poleY = 0x03e0
+		}
+		else
+		{
+			poleX = 0x39e0		// For Sonic/Tails
+			poleY = 0x0639
+		}
+	}
+
+	// MHZ
+	if (global.zone_act.apparent == 0x0700)
+	{
+		poleX = 0x42e0
+		poleY = 0x07c0
+	}
+	else if (global.zone_act.apparent == 0x0701)
+	{
+		poleX = 0x3b90
+		poleY = 0x0300
+	}
+
+	// FBZ
+	if (global.zone_act.apparent == 0x0400)
+	{
+		poleX = 0x2d70
+		poleY = 0x0600
+	}
+	else if (global.zone_act.apparent == 0x0401)
+	{
+		if (py < 0x0700)
+		{
+			poleX = 0x29f0
+			poleY = 0x0680
+		}
+	}
+
+	// SOZ
+	if (global.zone_act.apparent == 0x0800)
+	{
+		poleX = 0x4380
+		poleY = 0x0a00
+	}
+	else if (global.zone_act.apparent == 0x0801)
+	{
+		poleX = 0x5160
+		poleY = 0x0740
+	}
+
+	// LRZ
+	if (global.zone_act.apparent == 0x0900)
+	{
+		poleX = 0x2b90
+		poleY = 0x07c1
+	}
+	else if (global.zone_act.apparent == 0x0901)
+	{
+		poleX = 0x3880
+		poleY = 0x0240
+	}
+
+	// SSZ
+	if (global.zone_act.apparent == 0x0a00)
+	{
+		if (py >= 0x0800 && py < 0x0a00)
+		{
+			poleX = 0x1a20
+			poleY = 0x09c0
+		}
+	}
+
+	// DEZ
+	if (global.zone_act.apparent == 0x0b00)
+	{
+		poleX = 0x3540
+		poleY = 0x0300
+	}
+	else if (global.zone_act.apparent == 0x0b01)
+	{
+		poleX = 0x3570
+		poleY = 0x04c0
+	}
+
+	if (poleX != -1 && poleY != -1)
+	{
+		// Render the goal pole
+		u64 key = stringformat("timeattack_pole_0%d", ((level.framecounter / 6) & 0x03) + 1)
+		Renderer.drawCustomSprite(key, poleX - camera.position.x.u16, poleY - camera.position.y.u16 - 30, 0x00, 0, 0x9f00)
+
+		// Reached the end?
+		if (px >= poleX)
+		{
+			if (Game.onTimeAttackFinish())
+			{
+				hud.dirty.timer = 0
+				player1.camera_lock = 1
+				playMusic(MUSIC_LEVELCLEAR)
+
+				u32 totalFrames = timer.minutes * 3600 + timer.seconds * 60 + timer.frames
+				if (global.zone_act.apparent == 0x0000 && totalFrames <= 45 * 60)
+				{
+					Game.setAchievementComplete(ACHIEVEMENT_AIZ_TIMEATTACK)
+				}
+			}
+		}
+	}
+}

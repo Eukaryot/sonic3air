@@ -1,0 +1,256 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Mushroom Catapult                                     //
+//-------------------------------------------------------//
+
+//# address-hook(0x03f868) end(0x03f960)
+function void fn03f868()
+{
+	objA0.mapping_offset = 0x03fb70
+	objA0.sprite_attributes = 0x43cd
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x0c
+	u16[A0 + 0x30] = objA0.position.y.u16
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03fa8e
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u16[A1 + 0x2e] = objA0.position.x.u16
+		u16[A1 + 0x30] = objA0.position.y.u16
+		if (objA0.subtype2c == 0)
+			objA1.position.x.u16 += 0x40
+		else
+			objA1.position.x.u16 -= 0x40
+
+		objA1.position.y.u16 -= 0x18
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u8[A1 + 0x04] |= 0x04
+		u16[A1 + 0x08] = objA0.sprite_priority
+		u8[A1 + 0x07] = 0x20
+		u8[A1 + 0x06] = 0x0c
+		u16[A1 + 0x46] = A0.u16
+		u16[A1 + 0x34] = 0x18
+		u16[A0 + 0x46] = A1.u16
+
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x03fac2
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			u16[A1 + 0x2e] = objA0.position.x.u16
+			u16[A1 + 0x30] = objA1.position.y.u16
+			objA1.position.y.u16 -= 0x14
+			u32[A1 + 0x0c] = objA0.mapping_offset
+			u16[A1 + 0x0a] = 0x2420
+			u8[A1 + 0x04] |= 0x04
+			u16[A1 + 0x08] = objA0.sprite_priority
+			u8[A1 + 0x07] = 0x10
+			u8[A1 + 0x06] = 0x08
+			u8[A1 + 0x22] = 0x01
+			u16[A1 + 0x46] = A0.u16
+		}
+	}
+
+	objA0.update_address = 0x03f966
+	fn03f966()
+}
+
+
+//# address-hook(0x03f966) end(0x03f990)
+function void fn03f966()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	fn03f996()
+
+	D0.u16 = u16[A0 + 0x30] - u16[A0 + 0x34]
+	objA0.position.y.u16 = D0.u16
+	D1 = objA0.box_size.x
+	A2 = 0x03fb50
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03f996) end(0x03fa88)
+function void fn03f996()
+{
+	D2.u16 = u16[A0 + 0x36]
+	if (objA0.value32 == 0)
+	{
+		if (objA0.flags2a & 0x18)
+			D2 = 0
+
+		D0.u8 = objA0.flags2a & 0x18
+		if (D0.u8 != 0 && u16[A0 + 0x34] != 0)
+		{
+			u8[A0 + 0x32] = 1
+			u16[A0 + 0x36] = 0
+		}
+		else
+		{
+			D0.u8 = objA1.flags2a & 0x18
+			if (D0.u8 != 0)
+			{
+				D2 = 0x18
+				if (u16[A0 + 0x34] != 0x18)
+				{
+					u8[A0 + 0x33] = 1
+					u16[A0 + 0x36] = 0x18
+				}
+			}
+		}
+	}
+
+	if (D2.u16 == 0)
+	{
+		if (u16[A0 + 0x34] != 0)
+		{
+			u16[A0 + 0x34] -= 8
+			return
+		}
+
+		if (u8[A0 + 0x32] == 0)
+			return
+
+		objA0.value32 = 0
+		D0.u8 = u8[A1 + 0x2a] & 0x18
+		if (D0.u8 == 0)
+		{
+			u16[A0 + 0x3a] = 0
+			return
+		}
+
+		A2 = 0xffffb000
+		D6 = 3
+		fn03fa26()
+
+		A2 = 0xffffb04a
+		D6 = 4
+		fn03fa26()
+	}
+	else
+	{
+		if (u16[A0 + 0x34] != 0x18)
+		{
+			u16[A0 + 0x34] += 8
+			return
+		}
+
+		if (u8[A0 + 0x33] == 0)
+			return
+
+		objA0.value32 = 0
+
+		A2 = 0xffffb000
+		D6 = 3
+		fn03fa5a()
+
+		A2 = 0xffffb04a
+		D6 = 4
+		fn03fa5a()
+	}
+}
+
+
+function void fn03fa26()
+{
+	if (u8[A1 + 0x2a] & (1 << D6.u8))
+	{
+		u8[A2 + 0x05] = 0x02
+		u16[A2 + 0x1a] = (u16[A0 + 0x3a] < 0x0900) ? 0xf300 : 0xf180
+		u8[A2 + 0x20] = char.state.STRAIGHTJUMP
+		u8[A2 + 0x2a] |= char.flag.IN_AIR
+		u8[A2 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A2 + 0x3d] = 0
+		u8[A2 + 0x40] = 0
+
+		playSound(0x87)
+	}
+}
+
+
+function void fn03fa5a()
+{
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		u8[A2 + 0x05] = 0x02
+		u16[A2 + 0x1a] = 0xf300
+		u8[A2 + 0x20] = char.state.STRAIGHTJUMP
+		u8[A2 + 0x2a] |= char.flag.IN_AIR
+		u8[A2 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A2 + 0x3d] = 0
+		u8[A2 + 0x40] = 0
+
+		playSound(0x87)
+	}
+}
+
+
+//# address-hook(0x03fa8e) end(0x03fabc)
+function void fn03fa8e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = u16[A0 + 0x30] + u16[A1 + 0x34] - 0x18
+	objA0.position.y.u16 = D0.u16
+	D1 = objA0.box_size.x
+	A2 = 0x03fb50
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+	D0.u16 = objA0.countdown_value
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x03fac2) end(0x03fb06)
+function void fn03fac2()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = u16[A0 + 0x30] - u16[A1 + 0x34] - 0x14
+	objA0.position.y.u16 = D0.u16
+	if (u16[A1 + 0x34] == 0x18)
+	{
+		objA0.update_address = 0x03fb0c
+		playSound(0xae)
+
+		u16[A1 + 0x36] = 0x18
+		if (u16[A1 + 0x3a] != 0)
+			objA0.velocity.y = -0xa00
+		else
+			objA0.velocity.y = -0x800
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03fb0c) end(0x03fb4a)
+function void fn03fb0c()
+{
+	UpdateMovementSimple()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = u16[A0 + 0x30] - u16[A1 + 0x34] - 0x14
+	if (D0.u16 <= objA0.position.y.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+		objA0.update_address = 0x03fac2
+		u16[A1 + 0x36] = 0
+		u8[A1 + 0x32] = 1
+		u16[A1 + 0x3a] = objA0.velocity.y
+		objA0.velocity.y = 0
+	}
+	DrawOrUnloadObject()
+}

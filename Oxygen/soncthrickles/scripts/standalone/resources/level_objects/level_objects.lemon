@@ -1,0 +1,613 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+function void LevelObjectTableBuilder.buildObjects()
+{
+	u32 originalA0 = A0
+	A0 = 0x810000
+
+	// Load objects from a custom binary file
+	u32 bytes = Standalone.loadRawLevelData("%s_objects", global.zone_act, A0)
+	bool loadedCustomData = (bytes != 0)
+
+	if (!loadedCustomData)
+	{
+		// Load objects from hard-coded scripts
+		if (global.zone_act == 0x0000)
+		{
+			LevelObjectTableBuilder.buildObjects_AIZ1()
+		}
+		else if (global.zone_act == 0x0001)
+		{
+			LevelObjectTableBuilder.buildObjects_AIZ2()
+		}
+		else if (global.zone_act == 0x0100)
+		{
+			LevelObjectTableBuilder.buildObjects_HCZ1()
+		}
+		else if (global.zone_act == 0x0101)
+		{
+			LevelObjectTableBuilder.buildObjects_HCZ2()
+		}
+		else if (global.zone_act == 0x0200)
+		{
+			LevelObjectTableBuilder.buildObjects_MGZ1()
+		}
+		else if (global.zone_act == 0x0201)
+		{
+			LevelObjectTableBuilder.buildObjects_MGZ2()
+		}
+		else if (global.zone_act == 0x0300)
+		{
+			LevelObjectTableBuilder.buildObjects_CNZ1()
+		}
+		else if (global.zone_act == 0x0301)
+		{
+			LevelObjectTableBuilder.buildObjects_CNZ2()
+		}
+		else if (global.zone_act == 0x0400)
+		{
+			LevelObjectTableBuilder.buildObjects_FBZ1()
+		}
+		else if (global.zone_act == 0x0401)
+		{
+			LevelObjectTableBuilder.buildObjects_FBZ2()
+		}
+		else if (global.zone_act == 0x0500)
+		{
+			LevelObjectTableBuilder.buildObjects_ICZ1()
+		}
+		else if (global.zone_act == 0x0501)
+		{
+			LevelObjectTableBuilder.buildObjects_ICZ2()
+		}
+		else if (global.zone_act == 0x0600)
+		{
+			LevelObjectTableBuilder.buildObjects_LBZ1()
+		}
+		else if (global.zone_act == 0x0601)
+		{
+			LevelObjectTableBuilder.buildObjects_LBZ2()
+		}
+		else if (global.zone_act == 0x0700)
+		{
+			LevelObjectTableBuilder.buildObjects_MHZ1()
+		}
+		else if (global.zone_act == 0x0701)
+		{
+			LevelObjectTableBuilder.buildObjects_MHZ2()
+		}
+		else if (global.zone_act == 0x0800)
+		{
+			LevelObjectTableBuilder.buildObjects_SOZ1()
+		}
+		else if (global.zone_act == 0x0801)
+		{
+			LevelObjectTableBuilder.buildObjects_SOZ2()
+		}
+		else if (global.zone_act == 0x0900)
+		{
+			LevelObjectTableBuilder.buildObjects_LRZ1()
+		}
+		else if (global.zone_act == 0x0901)
+		{
+			LevelObjectTableBuilder.buildObjects_LRZ2()
+		}
+		else if (global.zone_act == 0x0a00)
+		{
+			LevelObjectTableBuilder.buildObjects_SSZ1()
+		}
+		else if (global.zone_act == 0x0a01)
+		{
+			LevelObjectTableBuilder.buildObjects_SSZ2()
+		}
+		else if (global.zone_act == 0x0b00)
+		{
+			LevelObjectTableBuilder.buildObjects_DEZ1()
+		}
+		else if (global.zone_act == 0x0b01)
+		{
+			LevelObjectTableBuilder.buildObjects_DEZ2()
+		}
+		else if (global.zone_act == 0x0c01)
+		{
+			LevelObjectTableBuilder.buildObjects_DDZ()
+		}
+		else if (global.zone_act == 0x1600)
+		{
+			LevelObjectTableBuilder.buildObjects_LRZ3()
+		}
+		else if (global.zone_act == 0x1601)
+		{
+			LevelObjectTableBuilder.buildObjects_HPZ1()
+		}
+
+	#if 0
+		// Debug output
+		if (A0 != 0x810000 && Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
+		{
+			u32[A0] = 0
+			A0 += 4
+			debugDumpToFile(stringformat("level_objects_%04x.bin", global.zone_act), 0x810000, A0 - 0x810000)
+		}
+	#endif
+
+		loadedCustomData = (A0 != 0x810000)
+		A0 = 0x810000
+	}
+
+	if (!loadedCustomData)
+	{
+		// Use original objects in ROM
+		A0 = originalA0
+	}
+}
+
+
+define u8 LVLOBJ_FLIP_X   = 0x01
+define u8 LVLOBJ_FLIP_Y   = 0x02
+define u8 LVLOBJ_IGNORE_Y = 0x04
+
+
+// First object table
+define u8 OBJECTTABLE1_00		= 0x00		// Object address 0x01a51a = Ring
+define u8 OBJECTTABLE1_01		= 0x01		// Object address 0x01d566 = Monitor
+define u8 OBJECTTABLE1_02		= 0x02		// Object address 0x01ccae = Path Swapper
+define u8 OBJECTTABLE1_03		= 0x03		// Object address 0x01f746 = AIZ Hollow Tree
+define u8 OBJECTTABLE1_04		= 0x04		// Object address 0x0204fe = Collapsing Cliff
+define u8 OBJECTTABLE1_05		= 0x05		// Object address 0x01f9e0 = Rocks
+define u8 OBJECTTABLE1_06		= 0x06		// Object address 0x021c6e = AIZ Zipline (object 1)
+define u8 OBJECTTABLE1_07		= 0x07		// Object address 0x022d06 = Spring
+define u8 OBJECTTABLE1_08		= 0x08		// Object address 0x023f84 = Spikes
+define u8 OBJECTTABLE1_09		= 0x09		// Object address 0x01e78a = Palmtree part in AIZ1 transition cutscene
+define u8 OBJECTTABLE1_0a		= 0x0a		// Object address 0x01e7b6 = AIZ Zipline (object 2)
+define u8 OBJECTTABLE1_0b		= 0x0b		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_0c		= 0x0c		// Object address 0x02237e = AIZ Swinging Vine
+define u8 OBJECTTABLE1_0d		= 0x0d		// Object address 0x02131c = Wall
+define u8 OBJECTTABLE1_0e		= 0x0e		// Object address 0x024d68 = Jump Ramp
+define u8 OBJECTTABLE1_0f		= 0x0f		// Object address 0x020630 = Barrier
+define u8 OBJECTTABLE1_10		= 0x10		// Object address 0x029c9e = LBZ Tube Transport
+define u8 OBJECTTABLE1_11		= 0x11		// Object address 0x024e3c = LBZ Moving Platform
+define u8 OBJECTTABLE1_12		= 0x12		// Object address 0x025af6 = Unused?
+define u8 OBJECTTABLE1_13		= 0x13		// Object address 0x025cbe = LBZ Wall Trigger
+define u8 OBJECTTABLE1_14		= 0x14		// Object address 0x025f6a = LBZ Barrier
+define u8 OBJECTTABLE1_15		= 0x15		// Object address 0x026130 = LBZ Spring Booster (object 1)
+define u8 OBJECTTABLE1_16		= 0x16		// Object address 0x0263d2 = LBZ Flame Thrower
+define u8 OBJECTTABLE1_17		= 0x17		// Object address 0x0264c0 = LBZ Ride Grapple
+define u8 OBJECTTABLE1_18		= 0x18		// Object address 0x02694e = LBZ Cup Elevator
+define u8 OBJECTTABLE1_19		= 0x19		// Object address 0x027096 = LBZ Cup ELevator Pole
+define u8 OBJECTTABLE1_1a		= 0x1a		// Object address 0x027106 = Unused?
+define u8 OBJECTTABLE1_1b		= 0x1b		// Object address 0x0273e4 = LBZ Pipe Wall
+define u8 OBJECTTABLE1_1c		= 0x1c		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_1d		= 0x1d		// Object address 0x025368 = Unused?
+define u8 OBJECTTABLE1_1e		= 0x1e		// Object address 0x028db8 = LBZ Spin Launcher
+define u8 OBJECTTABLE1_1f		= 0x1f		// Object address 0x029020 = LBZ Grapple
+define u8 OBJECTTABLE1_20		= 0x20		// Object address 0x029216 = Crusher
+define u8 OBJECTTABLE1_21		= 0x21		// Object address 0x029338 = LBZ Laser Gate
+define u8 OBJECTTABLE1_22		= 0x22		// Object address 0x029446 = LBZ Flybot
+define u8 OBJECTTABLE1_23		= 0x23		// Object address 0x029518 = Unused?
+define u8 OBJECTTABLE1_24		= 0x24		// Object address 0x0295d0 = LBZ Booster Tube
+define u8 OBJECTTABLE1_25		= 0x25		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_26		= 0x26		// Object address 0x01e7e2 = Auto-spin object
+define u8 OBJECTTABLE1_27		= 0x27		// Object address 0x01eb36 = Unused?
+define u8 OBJECTTABLE1_28		= 0x28		// Object address 0x01ec18 = Non-damaging Blocker Element
+define u8 OBJECTTABLE1_29		= 0x29		// Object address 0x02a252 = AIZ Waterfall Rock
+define u8 OBJECTTABLE1_2a		= 0x2a		// Object address 0x02a3d0 = Corkfloor
+define u8 OBJECTTABLE1_2b		= 0x2b		// Object address 0x02a94c = AIZ Flip Bridge
+define u8 OBJECTTABLE1_2c		= 0x2c		// Object address 0x02acdc = AIZ Collapsing Bridge
+define u8 OBJECTTABLE1_2d		= 0x2d		// Object address 0x02b586 = AIZ Waterfall Wood
+define u8 OBJECTTABLE1_2e		= 0x2e		// Object address 0x02b758 = AIZ Spiked Log
+define u8 OBJECTTABLE1_2f		= 0x2f		// Object address 0x02b928 = Decorative Sprite
+define u8 OBJECTTABLE1_30		= 0x30		// Object address 0x02bf20 = Generic Object (like AIZ flames)
+define u8 OBJECTTABLE1_31		= 0x31		// Object address 0x02c3ae = LBZ Large Horizontal Cylinder
+define u8 OBJECTTABLE1_32		= 0x32		// Object address 0x02b12a = AIZ2 Boss
+define u8 OBJECTTABLE1_33		= 0x33		// Object address 0x02c518 = Button
+define u8 OBJECTTABLE1_34		= 0x34		// Object address 0x02cfa8 = Checkpoint / Starpost
+define u8 OBJECTTABLE1_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Farns
+define u8 OBJECTTABLE1_36		= 0x36		// Object address 0x01ed26 = HCZ Breakable Bar
+define u8 OBJECTTABLE1_37		= 0x37		// Object address 0x02fda4 = -- hcz1_firstpool.lemon
+define u8 OBJECTTABLE1_38		= 0x38		// Object address 0x030580 = -- hcz_fan.lemon
+define u8 OBJECTTABLE1_39		= 0x39		// Object address 0x0308fa = -- hcz_fan.lemon
+define u8 OBJECTTABLE1_3a		= 0x3a		// Object address 0x030ad0 = -- hcz_handlauncher.lemon
+define u8 OBJECTTABLE1_3b		= 0x3b		// Object address 0x02fef6 = -- hcz_waterpipe.lemon
+define u8 OBJECTTABLE1_3c		= 0x3c		// Object address 0x030e24 = -- cnz_trapdoor.lemon
+define u8 OBJECTTABLE1_3d		= 0x3d		// Object address 0x0239e4 = -- fbz_flippedspring.lemon
+define u8 OBJECTTABLE1_3e		= 0x3e		// Object address 0x031164 = -- hcz_conveyorbelt.lemon
+define u8 OBJECTTABLE1_3f		= 0x3f		// Object address 0x031502 = -- hcz_conveyorbelt.lemon
+define u8 OBJECTTABLE1_40		= 0x40		// Object address 0x01f392 = -- hcz_blocks.lemon
+define u8 OBJECTTABLE1_41		= 0x41		// Object address 0x031704 = -- cnz_balloon.lemon
+define u8 OBJECTTABLE1_42		= 0x42		// Object address 0x0318a4 = -- cnz_cannon.lemon
+define u8 OBJECTTABLE1_43		= 0x43		// Object address 0x031b9e = -- cnz_inflatingplatform.lemon
+define u8 OBJECTTABLE1_44		= 0x44		// Object address 0x031c9e = -- cnz_helix.lemon
+define u8 OBJECTTABLE1_45		= 0x45		// Object address 0x031d3a = -- cnz2_knuckles_lights_out.lemon
+define u8 OBJECTTABLE1_46		= 0x46		// Object address 0x031d90 = -- cnz_fan.lemon
+define u8 OBJECTTABLE1_47		= 0x47		// Object address 0x0320f2 = -- cnz_barrel.lemon
+define u8 OBJECTTABLE1_48		= 0x48		// Object address 0x031f30 = -- cnz_magneticbarrier.lemon
+define u8 OBJECTTABLE1_49		= 0x49		// Object address 0x0328c4 = -- cnz_wheel.lemon
+define u8 OBJECTTABLE1_4a		= 0x4a		// Object address 0x032df2 = -- roundbumper.lemon
+define u8 OBJECTTABLE1_4b		= 0x4b		// Object address 0x032990 = -- cnz_bouncepad.lemon
+define u8 OBJECTTABLE1_4c		= 0x4c		// Object address 0x0330c8 = -- cnz_helix.lemon
+define u8 OBJECTTABLE1_4d		= 0x4d		// Object address 0x033360 = -- cnz_barberpole.lemon
+define u8 OBJECTTABLE1_4e		= 0x4e		// Object address 0x033836 = -- cnz_verticalcylinder.lemon
+define u8 OBJECTTABLE1_4f		= 0x4f		// Object address 0x032a78 = -- mgz_tarpit.lemon
+define u8 OBJECTTABLE1_50		= 0x50		// Object address 0x033c74 = -- mgz_spiralrun.lemon
+define u8 OBJECTTABLE1_51		= 0x51		// Object address 0x025506 = Moving Platform
+define u8 OBJECTTABLE1_52		= 0x52		// Object address 0x029216 = Crusher
+define u8 OBJECTTABLE1_53		= 0x53		// Object address 0x033f84 = -- mgz_platformwheel.lemon
+define u8 OBJECTTABLE1_54		= 0x54		// Object address 0x02f938 = Air Bubble
+define u8 OBJECTTABLE1_55		= 0x55		// Object address 0x034302 = -- mgz_reliefhead.lemon
+define u8 OBJECTTABLE1_56		= 0x56		// Object address 0x0346e2 = -- mgz_movingtotem.lemon
+define u8 OBJECTTABLE1_57		= 0x57		// Object address 0x034574 = -- mgz_triggeredplatform.lemon
+define u8 OBJECTTABLE1_58		= 0x58		// Object address 0x0340cc = -- mgz_chainspikeball.lemon
+define u8 OBJECTTABLE1_59		= 0x59		// Object address 0x025d54 = -- mgz_spinwheeltrigger.lemon
+define u8 OBJECTTABLE1_5a		= 0x5a		// Object address 0x034800 = -- mgz_yoyo.lemon
+define u8 OBJECTTABLE1_5b		= 0x5b		// Object address 0x034bf8 = -- mgz_spinningtop.lemon
+define u8 OBJECTTABLE1_5c		= 0x5c		// Object address 0x03598e = -- mgz_spinningtop.lemon
+define u8 OBJECTTABLE1_5d		= 0x5d		// Object address 0x032c6a = Competition mode object
+define u8 OBJECTTABLE1_5e		= 0x5e		// Object address 0x035a7a = Competition mode object
+define u8 OBJECTTABLE1_5f		= 0x5f		// Object address 0x023b38 = Competition mode object
+define u8 OBJECTTABLE1_60		= 0x60		// Object address 0x035bf8 = Competition mode object
+define u8 OBJECTTABLE1_61		= 0x61		// Object address 0x035d80 = Competition mode object
+define u8 OBJECTTABLE1_62		= 0x62		// Object address 0x035f3a = Competition mode object
+define u8 OBJECTTABLE1_63		= 0x63		// Object address 0x0362a2 = Competition mode object
+define u8 OBJECTTABLE1_64		= 0x64		// Object address 0x036364 = Competition mode object
+define u8 OBJECTTABLE1_65		= 0x65		// Object address 0x036be0 = Competition mode object
+define u8 OBJECTTABLE1_66		= 0x66		// Object address 0x0380f8 = Competition mode object
+define u8 OBJECTTABLE1_67		= 0x67		// Object address 0x0256be = -- hcz_snakeblocks.lemon
+define u8 OBJECTTABLE1_68		= 0x68		// Object address 0x032656 = -- hcz_rotatingpillar.lemon
+define u8 OBJECTTABLE1_69		= 0x69		// Object address 0x03907c = -- hcz_corkscrewslide.lemon
+define u8 OBJECTTABLE1_6a		= 0x6a		// Object address 0x01f3f8 = Damaging Blocker Element
+define u8 OBJECTTABLE1_6b		= 0x6b		// Object address 0x01f5a0 = Killing Blocker Element
+define u8 OBJECTTABLE1_6c		= 0x6c		// Object address 0x038688 = Bridge
+define u8 OBJECTTABLE1_6d		= 0x6d		// Object address 0x0383bc = HCZ Run-on-water Handler
+define u8 OBJECTTABLE1_6e		= 0x6e		// Object address 0x03827c = HCZ Water Drop
+define u8 OBJECTTABLE1_6f		= 0x6f		// Object address 0x039f2e = -- fbz_spinningcylinder.lemon
+define u8 OBJECTTABLE1_70		= 0x70		// Object address 0x03a23a = -- fbz_staticcylinder.lemon
+define u8 OBJECTTABLE1_71		= 0x71		// Object address 0x03a580 = -- fbz_propellerplatform.lemon
+define u8 OBJECTTABLE1_72		= 0x72		// Object address 0x03a7cc = -- fbz_monkeybars.lemon
+define u8 OBJECTTABLE1_73		= 0x73		// Object address 0x03b0e2 = -- fbz_spikedball.lemon
+define u8 OBJECTTABLE1_74		= 0x74		// Object address 0x03b2f6 = -- fbz_chainlinkplatform.lemon
+define u8 OBJECTTABLE1_75		= 0x75		// Object address 0x03b534 = -- fbz_snakeplatform.lemon
+define u8 OBJECTTABLE1_76		= 0x76		// Object address 0x03b6de = -- fbz_snakeplatform.lemon
+define u8 OBJECTTABLE1_77		= 0x77		// Object address 0x03b766 = -- fbz_snakeplatform.lemon
+define u8 OBJECTTABLE1_78		= 0x78		// Object address 0x03b934 = -- playerlauncher.lemon
+define u8 OBJECTTABLE1_79		= 0x79		// Object address 0x03bab2 = -- fbz_ventilationplatform.lemon
+define u8 OBJECTTABLE1_7a		= 0x7a		// Object address 0x03bbee = -- fbz_screwdoor.lemon
+define u8 OBJECTTABLE1_7b		= 0x7b		// Object address 0x03bf56 = -- fbz_verticalpropeller.lemon
+define u8 OBJECTTABLE1_7c		= 0x7c		// Object address 0x03c1a6 = -- fbz_verticalpropeller.lemon
+define u8 OBJECTTABLE1_7d		= 0x7d		// Object address 0x03c25c = -- fbz_goldenbullet.lemon
+define u8 OBJECTTABLE1_7e		= 0x7e		// Object address 0x03c34c = -- fbz_platformblock.lemon
+define u8 OBJECTTABLE1_7f		= 0x7f		// Object address 0x03c462 = -- fbz_parachutebombs.lemon
+define u8 OBJECTTABLE1_80		= 0x80		// Object address 0x0836e0 = Hidden monitor
+define u8 OBJECTTABLE1_81		= 0x81		// Object address 0x086540 = Capsule
+define u8 OBJECTTABLE1_82		= 0x82		// Object address 0x061d4c = Cutscene Knuckles
+define u8 OBJECTTABLE1_83		= 0x83		// Object address 0x065bd4 = -- aiz2_post_boss_cutscene.lemon
+define u8 OBJECTTABLE1_84		= 0x84		// Object address 0x067472 = Cutscene Sonic in intro
+define u8 OBJECTTABLE1_85		= 0x85		// Object address 0x06166a = Giant Ring
+define u8 OBJECTTABLE1_86		= 0x86		// Object address 0x060c56 = -- gm_trigger.lemon
+define u8 OBJECTTABLE1_87		= 0x87		// Object address 0x060f2e = -- gm_bouncepad.lemon
+define u8 OBJECTTABLE1_88		= 0x88		// Object address 0x065d16 = -- cnz2_knuckles_lights_out.lemon
+define u8 OBJECTTABLE1_89		= 0x89		// Object address 0x065d6e = -- cnz2_knuckles_lights_out.lemon
+define u8 OBJECTTABLE1_8a		= 0x8a		// Object address 0x086cf6 = -- boss_fbz2.lemon
+define u8 OBJECTTABLE1_8b		= 0x8b		// Object address 0x0862ae = Sprite Mask Object
+define u8 OBJECTTABLE1_8c		= 0x8c		// Object address 0x086d6a = -- aiz_bloominator.lemon
+define u8 OBJECTTABLE1_8d		= 0x8d		// Object address 0x086e56 = -- aiz_rhinobot.lemon
+define u8 OBJECTTABLE1_8e		= 0x8e		// Object address 0x087156 = -- aiz_monkeydude.lemon
+define u8 OBJECTTABLE1_8f		= 0x8f		// Object address 0x0876ca = -- aiz_catakillerjr.lemon
+define u8 OBJECTTABLE1_90		= 0x90		// Object address 0x0684ec = -- aiz1_transition_cutscene.lemon
+define u8 OBJECTTABLE1_91		= 0x91		// Object address 0x068a24 = -- boss_aiz1.lemon
+define u8 OBJECTTABLE1_92		= 0x92		// Object address 0x0691a8 = -- boss_aiz2.lemon
+define u8 OBJECTTABLE1_93		= 0x93		// Object address 0x0878b2 = -- hcz_jawz.lemon
+define u8 OBJECTTABLE1_94		= 0x94		// Object address 0x087928 = -- hcz_blastoid.lemon
+define u8 OBJECTTABLE1_95		= 0x95		// Object address 0x087a24 = -- hcz_bugernaut.lemon
+define u8 OBJECTTABLE1_96		= 0x96		// Object address 0x087bc4 = -- hcz_turbospiker.lemon
+define u8 OBJECTTABLE1_97		= 0x97		// Object address 0x087f56 = -- hcz_piranha.lemon
+define u8 OBJECTTABLE1_98		= 0x98		// Object address 0x08827c = -- hcz_pointdexter.lemon
+define u8 OBJECTTABLE1_99		= 0x99		// Object address 0x069ea0 = -- boss_hcz1.lemon
+define u8 OBJECTTABLE1_9a		= 0x9a		// Object address 0x06aeb6 = -- boss_hcz2.lemon
+define u8 OBJECTTABLE1_9b		= 0x9b		// Object address 0x088336 = -- mgz_bubbles.lemon
+define u8 OBJECTTABLE1_9c		= 0x9c		// Object address 0x088b96 = -- mgz_spiker.lemon
+define u8 OBJECTTABLE1_9d		= 0x9d		// Object address 0x088e60 = -- mgz_mantis.lemon
+define u8 OBJECTTABLE1_9e		= 0x9e		// Object address 0x08845a = -- mgz_driller.lemon
+define u8 OBJECTTABLE1_9f		= 0x9f		// Object address 0x088568 = -- boss_mgz1.lemon
+define u8 OBJECTTABLE1_a0		= 0xa0		// Object address 0x06bf2a = -- mgz_robotnikencounters.lemon
+define u8 OBJECTTABLE1_a1		= 0xa1		// Object address 0x06c31a = -- boss_mgz2.lemon
+define u8 OBJECTTABLE1_a2		= 0xa2		// Object address 0x06c698 = -- boss_mgz2_knuckles.lemon
+define u8 OBJECTTABLE1_a3		= 0xa3		// Object address 0x088fb4 = -- cnz_clamer.lemon
+define u8 OBJECTTABLE1_a4		= 0xa4		// Object address 0x089198 = -- cnz_sparkle.lemon
+define u8 OBJECTTABLE1_a5		= 0xa5		// Object address 0x089376 = -- cnz_batbot.lemon
+define u8 OBJECTTABLE1_a6		= 0xa6		// Object address 0x06d99c = -- boss_cnz1.lemon
+define u8 OBJECTTABLE1_a7		= 0xa7		// Object address 0x06e47e = -- boss_cnz2.lemon
+define u8 OBJECTTABLE1_a8		= 0xa8		// Object address 0x08948e = -- fbz_blaster.lemon
+define u8 OBJECTTABLE1_a9		= 0xa9		// Object address 0x089820 = -- fbz_technosqueek.lemon
+define u8 OBJECTTABLE1_aa		= 0xaa		// Object address 0x06ee68 = -- boss_fbz1.lemon
+define u8 OBJECTTABLE1_ab		= 0xab		// Object address 0x06fd0c = -- boss_fbz2_mid.lemon
+define u8 OBJECTTABLE1_ac		= 0xac		// Object address 0x0705ea = -- boss_fbz2.lemon
+define u8 OBJECTTABLE1_ad		= 0xad		// Object address 0x08bade = -- icz_penguin.lemon
+define u8 OBJECTTABLE1_ae		= 0xae		// Object address 0x08be2e = -- icz_starpointer.lemon
+define u8 OBJECTTABLE1_af		= 0xaf		// Object address 0x08a44a = -- icz_hugeblock.lemon
+define u8 OBJECTTABLE1_b0		= 0xb0		// Object address 0x089f32 = -- icz_floatingplatform.lemon
+define u8 OBJECTTABLE1_b1		= 0xb1		// Object address 0x08a26c = -- icz_icewall.lemon
+define u8 OBJECTTABLE1_b2		= 0xb2		// Object address 0x08a640 = -- icz_freezer.lemon
+define u8 OBJECTTABLE1_b3		= 0xb3		// Object address 0x08ab4e = -- icz_iceblocktower.lemon
+define u8 OBJECTTABLE1_b4		= 0xb4		// Object address 0x08ad04 = -- icz_swingingplatform.lemon
+define u8 OBJECTTABLE1_b5		= 0xb5		// Object address 0x08b194 = -- icz_largeicicle.lemon
+define u8 OBJECTTABLE1_b6		= 0xb6		// Object address 0x08b36c = -- icz_iceblock.lemon
+define u8 OBJECTTABLE1_b7		= 0xb7		// Object address 0x08b2a0 = ICZ Icicles
+define u8 OBJECTTABLE1_b8		= 0xb8		// Object address 0x08b4ca = ICZ Ice Crystal
+define u8 OBJECTTABLE1_b9		= 0xb9		// Object address 0x08b550 = ICZ Snow
+define u8 OBJECTTABLE1_ba		= 0xba		// Object address 0x08b89a = ICZ Trampoline
+define u8 OBJECTTABLE1_bb		= 0xbb		// Object address 0x08a330 = ICZ White Block (next to trampoline)
+define u8 OBJECTTABLE1_bc		= 0xbc		// Object address 0x071162 = ICZ 1 Boss
+define u8 OBJECTTABLE1_bd		= 0xbd		// Object address 0x071bce = ICZ 2 Boss
+define u8 OBJECTTABLE1_be		= 0xbe		// Object address 0x08bfae = LBZ Snailblaster
+define u8 OBJECTTABLE1_bf		= 0xbf		// Object address 0x08c2e2 = LBZ Ribot
+define u8 OBJECTTABLE1_c0		= 0xc0		// Object address 0x08c632 = LBZ Orbinaut
+define u8 OBJECTTABLE1_c1		= 0xc1		// Object address 0x08c728 = LBZ Corkey
+define u8 OBJECTTABLE1_c2		= 0xc2		// Object address 0x08c966 = LBZ Flybot
+define u8 OBJECTTABLE1_c3		= 0xc3		// Object address 0x08cb56 = -- lbz1_pre_boss_cutscene.lemon
+define u8 OBJECTTABLE1_c4		= 0xc4		// Object address 0x08cdb8 = -- lbz1_pre_boss_cutscene.lemon
+define u8 OBJECTTABLE1_c5		= 0xc5		// Object address 0x08cf80 = -- boss_lbz1.lemon
+define u8 OBJECTTABLE1_c6		= 0xc6		// Object address 0x08d29c = -- lbz2_mid_boss_cutscene.lemon
+define u8 OBJECTTABLE1_c7		= 0xc7		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_c8		= 0xc8		// Object address 0x062ac2 = -- lbz2_mid_boss_cutscene.lemon
+define u8 OBJECTTABLE1_c9		= 0xc9		// Object address 0x0723e0 = -- boss_lbz1.lemon
+define u8 OBJECTTABLE1_ca		= 0xca		// Object address 0x0729ba = -- boss_lbz2_2.lemon
+define u8 OBJECTTABLE1_cb		= 0xcb		// Object address 0x0738d6 = -- boss_lbz2_1.lemon
+define u8 OBJECTTABLE1_cc		= 0xcc		// Object address 0x074262 = -- boss_lbz2_3.lemon
+define u8 OBJECTTABLE1_cd		= 0xcd		// Object address 0x072ffa = -- boss_lbz2_2.lemon
+define u8 OBJECTTABLE1_ce		= 0xce		// Object address 0x070c2c = -- boss_fbz2.lemon
+define u8 OBJECTTABLE1_cf		= 0xcf		// Object address 0x089bdc = FBZ Capsule (object 1)
+define u8 OBJECTTABLE1_d0		= 0xd0		// Object address 0x089c86 = FBZ Capsule (object 2)
+define u8 OBJECTTABLE1_d1		= 0xd1		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d2		= 0xd2		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d3		= 0xd3		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d4		= 0xd4		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d5		= 0xd5		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d6		= 0xd6		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d7		= 0xd7		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d8		= 0xd8		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_d9		= 0xd9		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_da		= 0xda		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_db		= 0xdb		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_dc		= 0xdc		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_dd		= 0xdd		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_de		= 0xde		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_df		= 0xdf		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_e0		= 0xe0		// Object address 0x03c7ec = -- fbz_rocketlauncher.lemon
+define u8 OBJECTTABLE1_e1		= 0xe1		// Object address 0x03c946 = -- fbz_mine.lemon
+define u8 OBJECTTABLE1_e2		= 0xe2		// Object address 0x03ca1a = -- fbz_windingelevator.lemon
+define u8 OBJECTTABLE1_e3		= 0xe3		// Object address 0x03cb3a = -- fbz_flippedspring.lemon
+define u8 OBJECTTABLE1_e4		= 0xe4		// Object address 0x03cc8a = -- fbz_flamethrower.lemon
+define u8 OBJECTTABLE1_e5		= 0xe5		// Object address 0x03d090 = -- fbz_spider.lemon
+define u8 OBJECTTABLE1_e6		= 0xe6		// Object address 0x049aae = -- gs_sidebumper.lemon
+define u8 OBJECTTABLE1_e7		= 0xe7		// Object address 0x049c5e = -- gs_flipper.lemon
+define u8 OBJECTTABLE1_e8		= 0xe8		// Object address 0x049eee = -- gs_energybeam.lemon
+define u8 OBJECTTABLE1_e9		= 0xe9		// Object address 0x04a09a = -- gs_energybeam.lemon
+define u8 OBJECTTABLE1_ea		= 0xea		// Object address 0x04a186 = Unused?
+define u8 OBJECTTABLE1_eb		= 0xeb		// Object address 0x04a2c6 = Unused?
+define u8 OBJECTTABLE1_ec		= 0xec		// Object address 0x04a3dc = -- gs_glowingsphere.lemon
+define u8 OBJECTTABLE1_ed		= 0xed		// Object address 0x04a1e6 = -- gs_bonusbubble.lemon
+define u8 OBJECTTABLE1_ee		= 0xee		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_ef		= 0xef		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f0		= 0xf0		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f1		= 0xf1		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f2		= 0xf2		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f3		= 0xf3		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f4		= 0xf4		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f5		= 0xf5		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f6		= 0xf6		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f7		= 0xf7		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f8		= 0xf8		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_f9		= 0xf9		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_fa		= 0xfa		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_fb		= 0xfb		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_fc		= 0xfc		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_fd		= 0xfd		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_fe		= 0xfe		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE1_ff		= 0xff		// Object address 0x03d448 = FBZ Magnetic Pendulum
+
+// Second object table
+define u8 OBJECTTABLE2_00		= 0x00		// Object address 0x01a51a = Ring
+define u8 OBJECTTABLE2_01		= 0x01		// Object address 0x01d566 = Monitor
+define u8 OBJECTTABLE2_02		= 0x02		// Object address 0x01ccae = Path Swapper
+define u8 OBJECTTABLE2_03		= 0x03		// Object address 0x03dc9c = MHZ Vine Wrap
+define u8 OBJECTTABLE2_04		= 0x04		// Object address 0x0204fe = Collapsing Cliff
+define u8 OBJECTTABLE2_05		= 0x05		// Object address 0x01f9e0 = Rocks
+define u8 OBJECTTABLE2_06		= 0x06		// Object address 0x03e23e = MHZ Elevator
+define u8 OBJECTTABLE2_07		= 0x07		// Object address 0x022d06 = Spring
+define u8 OBJECTTABLE2_08		= 0x08		// Object address 0x023f84 = Spikes
+define u8 OBJECTTABLE2_09		= 0x09		// Object address 0x03e836 = -- mhz_curledvine.lemon
+define u8 OBJECTTABLE2_0a		= 0x0a		// Object address 0x03ea56 = -- mhz_stickyvine.lemon
+define u8 OBJECTTABLE2_0b		= 0x0b		// Object address 0x03ed1a = -- mhz_horizontalpole.lemon
+define u8 OBJECTTABLE2_0c		= 0x0c		// Object address 0x03f05a = -- mhz_verticalpole.lemon
+define u8 OBJECTTABLE2_0d		= 0x0d		// Object address 0x02131c = Wall
+define u8 OBJECTTABLE2_0e		= 0x0e		// Object address 0x024d68 = Jump Ramp
+define u8 OBJECTTABLE2_0f		= 0x0f		// Object address 0x020630 = Barrier
+define u8 OBJECTTABLE2_10		= 0x10		// Object address 0x0225d0 = -- mhz_swingvine.lemon
+define u8 OBJECTTABLE2_11		= 0x11		// Object address 0x03f370 = -- mhz_fallingmushroom.lemon
+define u8 OBJECTTABLE2_12		= 0x12		// Object address 0x03f4b0 = -- mhz_stickyvine.lemon
+define u8 OBJECTTABLE2_13		= 0x13		// Object address 0x03f868 = -- mhz_mushroomcatapult.lemon
+define u8 OBJECTTABLE2_14		= 0x14		// Object address 0x03fb90 = Upwind
+define u8 OBJECTTABLE2_15		= 0x15		// Object address 0x04224e = -- lrz_spiralstaircase.lemon
+define u8 OBJECTTABLE2_16		= 0x16		// Object address 0x04254a = -- lrz_downwardhalfpipe.lemon
+define u8 OBJECTTABLE2_17		= 0x17		// Object address 0x04279e = -- lrz_sinking_stone.lemon
+define u8 OBJECTTABLE2_18		= 0x18		// Object address 0x04285a = -- lrz_fallingspike.lemon
+define u8 OBJECTTABLE2_19		= 0x19		// Object address 0x04292a = -- lrz_door.lemon
+define u8 OBJECTTABLE2_1a		= 0x1a		// Object address 0x042a18 = -- lrz_closingdoor.lemon
+define u8 OBJECTTABLE2_1b		= 0x1b		// Object address 0x042bb8 = -- lrz_fireballs.lemon
+define u8 OBJECTTABLE2_1c		= 0x1c		// Object address 0x042cd6 = -- lrz_button.lemon
+define u8 OBJECTTABLE2_1d		= 0x1d		// Object address 0x042dbe = -- lrz_shootingtrigger.lemon
+define u8 OBJECTTABLE2_1e		= 0x1e		// Object address 0x042f1a = -- lrz_dashelevator.lemon
+define u8 OBJECTTABLE2_1f		= 0x1f		// Object address 0x043698 = -- lrz_lavafall.lemon
+define u8 OBJECTTABLE2_20		= 0x20		// Object address 0x043502 = -- lrz_swingingspikeball.lemon
+define u8 OBJECTTABLE2_21		= 0x21		// Object address 0x0430ea = -- lrz_stompplatform.lemon
+define u8 OBJECTTABLE2_22		= 0x22		// Object address 0x04379e = -- lrz_rollingball.lemon
+define u8 OBJECTTABLE2_23		= 0x23		// Object address 0x03e018 = -- mhz_mushroom.lemon
+define u8 OBJECTTABLE2_24		= 0x24		// Object address 0x0295d0 = -- lbz_boostertube.lemon
+define u8 OBJECTTABLE2_25		= 0x25		// Object address 0x04a644 = -- lrz_chainedplatforms.lemon
+define u8 OBJECTTABLE2_26		= 0x26		// Object address 0x01e7e2 = Auto-spin object
+define u8 OBJECTTABLE2_27		= 0x27		// Object address 0x01eb36 = Unused?
+define u8 OBJECTTABLE2_28		= 0x28		// Object address 0x01ec18 = Non-damaging Blocker Element
+define u8 OBJECTTABLE2_29		= 0x29		// Object address 0x043d68 = LRZ Flamethrower
+define u8 OBJECTTABLE2_2a		= 0x2a		// Object address 0x02a3d0 = Corkfloor
+define u8 OBJECTTABLE2_2b		= 0x2b		// Object address 0x043b3a = LRZ Orbiting Spike Ball (horizontal)
+define u8 OBJECTTABLE2_2c		= 0x2c		// Object address 0x043c2c = LRZ Orbiting Spike Ball (vertical)
+define u8 OBJECTTABLE2_2d		= 0x2d		// Object address 0x02582e = -- lrz_blockplatform.lemon
+define u8 OBJECTTABLE2_2e		= 0x2e		// Object address 0x0440f2 = Unused?
+define u8 OBJECTTABLE2_2f		= 0x2f		// Object address 0x02b928 = Decorative Sprite
+define u8 OBJECTTABLE2_30		= 0x30		// Object address 0x02bf20 = Generic Object (like AIZ flames)
+define u8 OBJECTTABLE2_31		= 0x31		// Object address 0x039c50 = -- lrz_collapsingrocks.lemon
+define u8 OBJECTTABLE2_32		= 0x32		// Object address 0x04429c = -- lrz_turbine.lemon
+define u8 OBJECTTABLE2_33		= 0x33		// Object address 0x02c518 = Button
+define u8 OBJECTTABLE2_34		= 0x34		// Object address 0x02cfa8 = Checkpoint / Starpost
+define u8 OBJECTTABLE2_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Farns
+define u8 OBJECTTABLE2_36		= 0x36		// Object address 0x01ed26 = HCZ Breakable Bar
+define u8 OBJECTTABLE2_37		= 0x37		// Object address 0x044826 = -- lrz_spikeballlauncher.lemon
+define u8 OBJECTTABLE2_38		= 0x38		// Object address 0x03fcd4 = -- soz_sandflow.lemon
+define u8 OBJECTTABLE2_39		= 0x39		// Object address 0x040276 = -- soz_sandslideblock.lemon
+define u8 OBJECTTABLE2_3a		= 0x3a		// Object address 0x01d106 = -- soz_multiloop.lemon
+define u8 OBJECTTABLE2_3b		= 0x3b		// Object address 0x04044a = -- soz_multiloop2.lemon
+define u8 OBJECTTABLE2_3c		= 0x3c		// Object address 0x030e24 = CNZ Trap Door
+define u8 OBJECTTABLE2_3d		= 0x3d		// Object address 0x0239e4 = -- fbz_flippedspring.lemon
+define u8 OBJECTTABLE2_3e		= 0x3e		// Object address 0x040546 = -- soz_pushablerock.lemon
+define u8 OBJECTTABLE2_3f		= 0x3f		// Object address 0x040786 = -- soz_springvine.lemon
+define u8 OBJECTTABLE2_40		= 0x40		// Object address 0x040b16 = -- soz_sandwall.lemon
+define u8 OBJECTTABLE2_41		= 0x41		// Object address 0x040e5c = -- soz_lightswitch.lemon
+define u8 OBJECTTABLE2_42		= 0x42		// Object address 0x041176 = -- soz_movingpillar.lemon
+define u8 OBJECTTABLE2_43		= 0x43		// Object address 0x04143c = -- soz_swingingplatform.lemon
+define u8 OBJECTTABLE2_44		= 0x44		// Object address 0x041702 = -- soz_rock.lemon
+define u8 OBJECTTABLE2_45		= 0x45		// Object address 0x04187e = -- soz_pushswitch.lemon
+define u8 OBJECTTABLE2_46		= 0x46		// Object address 0x041b70 = -- soz_closingwall.lemon
+define u8 OBJECTTABLE2_47		= 0x47		// Object address 0x041cc2 = -- soz_sandcork.lemon
+define u8 OBJECTTABLE2_48		= 0x48		// Object address 0x04a9a8 = -- soz_zipline.lemon
+define u8 OBJECTTABLE2_49		= 0x49		// Object address 0x041f44 = -- soz_unknown.lemon
+define u8 OBJECTTABLE2_4a		= 0x4a		// Object address 0x025a30 = -- dez_platform.lemon
+define u8 OBJECTTABLE2_4b		= 0x4b		// Object address 0x046d9e = -- dez_tiltingbridge.lemon
+define u8 OBJECTTABLE2_4c		= 0x4c		// Object address 0x046f84 = -- dez_hangcarrier.lemon
+define u8 OBJECTTABLE2_4d		= 0x4d		// Object address 0x04719a = -- dez_torpedolauncher.lemon
+define u8 OBJECTTABLE2_4e		= 0x4e		// Object address 0x047378 = -- dez_liftpad.lemon
+define u8 OBJECTTABLE2_4f		= 0x4f		// Object address 0x04763e = -- dez_staircase.lemon
+define u8 OBJECTTABLE2_50		= 0x50		// Object address 0x047816 = -- dez_conveyorbelt.lemon
+define u8 OBJECTTABLE2_51		= 0x51		// Object address 0x025506 = Moving Platform
+define u8 OBJECTTABLE2_52		= 0x52		// Object address 0x047892 = -- dez_lightnings.lemon
+define u8 OBJECTTABLE2_53		= 0x53		// Object address 0x047966 = -- dez_conveyorpad.lemon
+define u8 OBJECTTABLE2_54		= 0x54		// Object address 0x02f938 = Air Bubble
+define u8 OBJECTTABLE2_55		= 0x55		// Object address 0x047e2e = -- dez_energybridge.lemon
+define u8 OBJECTTABLE2_56		= 0x56		// Object address 0x047efc = -- dez_energybridge.lemon
+define u8 OBJECTTABLE2_57		= 0x57		// Object address 0x0481f2 = -- dez_tunnellauncher.lemon
+define u8 OBJECTTABLE2_58		= 0x58		// Object address 0x048aaa = -- dez_gravityswitch.lemon
+define u8 OBJECTTABLE2_59		= 0x59		// Object address 0x048c16 = -- dez_gravitytransporter.lemon
+define u8 OBJECTTABLE2_5a		= 0x5a		// Object address 0x048eae = -- dez_centrifugetube.lemon
+define u8 OBJECTTABLE2_5b		= 0x5b		// Object address 0x0491f4 = -- dez_centrifugetube.lemon
+define u8 OBJECTTABLE2_5c		= 0x5c		// Object address 0x0492b2 = -- dez_centrifugetube.lemon
+define u8 OBJECTTABLE2_5d		= 0x5d		// Object address 0x04808e = -- dez_retractingspring.lemon
+define u8 OBJECTTABLE2_5e		= 0x5e		// Object address 0x04945c = -- dez_hovermachine.lemon
+define u8 OBJECTTABLE2_5f		= 0x5f		// Object address 0x049602 = -- dez1_windtunnel.lemon
+define u8 OBJECTTABLE2_60		= 0x60		// Object address 0x049766 = -- dez1_windtunnel.lemon
+define u8 OBJECTTABLE2_61		= 0x61		// Object address 0x0498d2 = -- dez1_windtunnel.lemon
+define u8 OBJECTTABLE2_62		= 0x62		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_63		= 0x63		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_64		= 0x64		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_65		= 0x65		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_66		= 0x66		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_67		= 0x67		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_68		= 0x68		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_69		= 0x69		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_6a		= 0x6a		// Object address 0x01f3f8 = Damaging Blocker Element
+define u8 OBJECTTABLE2_6b		= 0x6b		// Object address 0x01f5a0 = Killing Blocker Element
+define u8 OBJECTTABLE2_6c		= 0x6c		// Object address 0x038688 = Bridge
+define u8 OBJECTTABLE2_6d		= 0x6d		// Object address 0x01f3ea = Blocker Element
+define u8 OBJECTTABLE2_6e		= 0x6e		// Object address 0x01f3f2 = Blocker Element
+define u8 OBJECTTABLE2_6f		= 0x6f		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_70		= 0x70		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_71		= 0x71		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_72		= 0x72		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_73		= 0x73		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_74		= 0x74		// Object address 0x046426 = -- ssz_flipspring.lemon
+define u8 OBJECTTABLE2_75		= 0x75		// Object address 0x0460d8 = -- ssz_swingingshell.lemon
+define u8 OBJECTTABLE2_76		= 0x76		// Object address 0x045dae = -- ssz_spinningdisc.lemon
+define u8 OBJECTTABLE2_77		= 0x77		// Object address 0x044f52 = -- ssz_extendiblebridge.lemon
+define u8 OBJECTTABLE2_78		= 0x78		// Object address 0x03b934 = -- playerlauncher.lemon
+define u8 OBJECTTABLE2_79		= 0x79		// Object address 0x045528 = -- teleporter.lemon
+define u8 OBJECTTABLE2_7a		= 0x7a		// Object address 0x04536c = -- ssz_movingbar.lemon
+define u8 OBJECTTABLE2_7b		= 0x7b		// Object address 0x044d60 = -- ssz_bridge.lemon
+define u8 OBJECTTABLE2_7c		= 0x7c		// Object address 0x044c44 = -- ssz_bridge.lemon
+define u8 OBJECTTABLE2_7d		= 0x7d		// Object address 0x0450a4 = -- ssz_bouncycloud.lemon
+define u8 OBJECTTABLE2_7e		= 0x7e		// Object address 0x044ae0 = -- ssz_floatingpillar.lemon
+define u8 OBJECTTABLE2_7f		= 0x7f		// Object address 0x044a68 = -- ssz_platform.lemon
+define u8 OBJECTTABLE2_80		= 0x80		// Object address 0x0836e0 = Hidden monitor
+define u8 OBJECTTABLE2_81		= 0x81		// Object address 0x086540 = Capsule
+define u8 OBJECTTABLE2_82		= 0x82		// Object address 0x061d4c = Cutscene Knuckles
+define u8 OBJECTTABLE2_83		= 0x83		// Object address 0x065bd4 = -- aiz2_post_boss_cutscene.lemon
+define u8 OBJECTTABLE2_84		= 0x84		// Object address 0x067472 = Cutscene Sonic in intro
+define u8 OBJECTTABLE2_85		= 0x85		// Object address 0x06166a = Giant Ring
+define u8 OBJECTTABLE2_86		= 0x86		// Object address 0x060c56 = -- gm_trigger.lemon
+define u8 OBJECTTABLE2_87		= 0x87		// Object address 0x060f2e = -- gm_bouncepad.lemon
+define u8 OBJECTTABLE2_88		= 0x88		// Object address 0x065d16 = -- cnz2_knuckles_lights_out.lemon
+define u8 OBJECTTABLE2_89		= 0x89		// Object address 0x065d6e = -- cnz2_knuckles_lights_out.lemon
+define u8 OBJECTTABLE2_8a		= 0x8a		// Object address 0x086cf6 = -- boss_fbz2.lemon
+define u8 OBJECTTABLE2_8b		= 0x8b		// Object address 0x0862ae = Sprite Mask Object
+define u8 OBJECTTABLE2_8c		= 0x8c		// Object address 0x08d580 = -- mhz_madmole.lemon
+define u8 OBJECTTABLE2_8d		= 0x8d		// Object address 0x08daf6 = -- mhz_mushmeanie.lemon
+define u8 OBJECTTABLE2_8e		= 0x8e		// Object address 0x08dd32 = -- mhz_dragonfly.lemon
+define u8 OBJECTTABLE2_8f		= 0x8f		// Object address 0x08e09e = -- mhz_butterfly.lemon
+define u8 OBJECTTABLE2_90		= 0x90		// Object address 0x08e17e = -- mhz_cluckoid.lemon
+define u8 OBJECTTABLE2_91		= 0x91		// Object address 0x075a84 = -- boss_mhz1.lemon
+define u8 OBJECTTABLE2_92		= 0x92		// Object address 0x0751ca = -- boss_mhz1.lemon
+define u8 OBJECTTABLE2_93		= 0x93		// Object address 0x075f50 = -- boss_mhz2.lemon
+define u8 OBJECTTABLE2_94		= 0x94		// Object address 0x08e650 = -- soz_skorp.lemon
+define u8 OBJECTTABLE2_95		= 0x95		// Object address 0x08ea66 = -- soz_sandworm.lemon
+define u8 OBJECTTABLE2_96		= 0x96		// Object address 0x08eda0 = -- soz_rockn.lemon
+define u8 OBJECTTABLE2_97		= 0x97		// Object address 0x076a12 = -- boss_soz1.lemon
+define u8 OBJECTTABLE2_98		= 0x98		// Object address 0x07764e = -- boss_soz2.lemon
+define u8 OBJECTTABLE2_99		= 0x99		// Object address 0x08f750 = -- lrz_fireworm.lemon
+define u8 OBJECTTABLE2_9a		= 0x9a		// Object address 0x08fae6 = -- lrz_iwamodoki.lemon
+define u8 OBJECTTABLE2_9b		= 0x9b		// Object address 0x08fd30 = -- lrz_toxomister.lemon
+define u8 OBJECTTABLE2_9c		= 0x9c		// Object address 0x0900f0 = -- lrz_largedriller.lemon
+define u8 OBJECTTABLE2_9d		= 0x9d		// Object address 0x0784f0 = -- boss_lrz1.lemon
+define u8 OBJECTTABLE2_9e		= 0x9e		// Object address 0x078f56 = -- lrz_bossinbackground.lemon
+define u8 OBJECTTABLE2_9f		= 0x9f		// Object address 0x01a51a = Unused (points to ring)
+define u8 OBJECTTABLE2_a0		= 0xa0		// Object address 0x091518 = -- ssz_eggrobo.lemon
+define u8 OBJECTTABLE2_a1		= 0xa1		// Object address 0x07a20e = -- boss_ssz_mid1.lemon
+define u8 OBJECTTABLE2_a2		= 0xa2		// Object address 0x07a6a6 = -- boss_ssz_mid2.lemon
+define u8 OBJECTTABLE2_a3		= 0xa3		// Object address 0x07b288 = -- boss_ssz_mecha1.lemon
+define u8 OBJECTTABLE2_a4		= 0xa4		// Object address 0x0919ec = -- dez_spikebonker.lemon
+define u8 OBJECTTABLE2_a5		= 0xa5		// Object address 0x091c3c = -- dez_chainspike.lemon
+define u8 OBJECTTABLE2_a6		= 0xa6		// Object address 0x07ddb4 = -- boss_dez1.lemon
+define u8 OBJECTTABLE2_a7		= 0xa7		// Object address 0x07f06c = -- boss_dez2.lemon
+define u8 OBJECTTABLE2_a8		= 0xa8		// Object address 0x062ca4 = -- mhz1_knuckles_cutscene.lemon
+define u8 OBJECTTABLE2_a9		= 0xa9		// Object address 0x062e28 = -- mhz1_knuckles_cutscene.lemon
+define u8 OBJECTTABLE2_aa		= 0xaa		// Object address 0x08f0b8 = -- soz2_ghostspawn.lemon
+define u8 OBJECTTABLE2_ab		= 0xab		// Object address 0x08f390 = -- soz2_ghostspawn.lemon
+define u8 OBJECTTABLE2_ac		= 0xac		// Object address 0x08f3f6 = -- soz2_ghostspawn.lemon
+define u8 OBJECTTABLE2_ad		= 0xad		// Object address 0x079c52 = -- lrz_lavafallplatform.lemon
+define u8 OBJECTTABLE2_ae		= 0xae		// Object address 0x063b22 = -- lrz_knucklescutscene.lemon
+define u8 OBJECTTABLE2_af		= 0xaf		// Object address 0x0659b6 = -- ssz_start.lemon
+define u8 OBJECTTABLE2_b0		= 0xb0		// Object address 0x0906a0 = -- hpz_masteremerald.lemon
+define u8 OBJECTTABLE2_b1		= 0xb1		// Object address 0x0656a8 = -- level_hpz.lemon
+define u8 OBJECTTABLE2_b2		= 0xb2		// Object address 0x07ca1c = -- level_ssz_knuckles.lemon
+define u8 OBJECTTABLE2_b3		= 0xb3		// Object address 0x0863ec = -- level_lrz.lemon
+define u8 OBJECTTABLE2_b4		= 0xb4		// Object address 0x090774 = -- hpz_superemerald.lemon
+define u8 OBJECTTABLE2_b5		= 0xb5		// Object address 0x090964 = -- hpz_emeraldcave.lemon
+define u8 OBJECTTABLE2_b6		= 0xb6		// Object address 0x0817da = -- boss_ddz_1.lemon
+define u8 OBJECTTABLE2_b7		= 0xb7		// Object address 0x0821de = -- ddz_asteroid.lemon
+define u8 OBJECTTABLE2_b8		= 0xb8		// Object address 0x081fee = -- ddz_missile.lemon
+// Rest is not used (object address is 0xffffffff)
+
+
+function void LevelObjectTableBuilder.addObject(u16 px, u16 py, u8 type, u8 subtype, u8 flags)
+{
+	u16[A0]   = px
+	u16[A0+2] = py | (flags << 13)
+	u8[A0+4]  = type
+	u8[A0+5]  = subtype
+	A0 += 6
+}

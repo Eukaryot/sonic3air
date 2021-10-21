@@ -1,0 +1,137 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Balloon (from Carnival Night Zone)                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x031704) end(0x03174e)
+function void fn031704()
+{
+	objA0.mapping_offset = 0x230502
+	objA0.sprite_attributes = 0x0351
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x10
+#if STANDALONE
+	objA0.box_size.y = 0x30
+#else
+	objA0.box_size.y = 0x20
+#endif
+	u8[A0 + 0x28] = 0xd7
+	objA0.value32 = objA0.position.y.u16
+
+	// Colors in objA0.state:
+	//  - 0x00, 0x02 = Light blue
+	//  - 0x04 = Yellow
+	//  - 0x06 = Dark blue
+	//  - 0x08 = Red
+	//  - Others are unused / broken
+	objA0.state = (objA0.subtype2c * 2) & 0x0e
+
+	GetRandomNumber()
+	objA0.value26 = D0.u8
+
+	objA0.update_address = 0x031754
+	fn031754()
+}
+
+
+//# address-hook(0x031754) end(0x0317a8)
+function void fn031754()
+{
+	A1 = 0xffffb000
+	if (u8[A0 + 0x29] & 0x01)
+	{
+		u8[A0 + 0x29] &= ~0x01
+		fn0317ae()
+	}
+
+	A1 = 0xffffb04a
+	if (u8[A0 + 0x29] & 0x02)
+	{
+		u8[A0 + 0x29] &= ~0x02
+		fn0317ae()
+	}
+
+	Object.animationUpdate(0x03185e)
+
+	//if (u8[0x05] != 0)		// WTF?
+	//{
+	//	objA0.position.x.u16 = 0x7f00
+	//}
+
+	objA0.position.y.u16 = objA0.value32 + (lookupSin(objA0.value26) >> 5)
+	++objA0.value26
+
+	fn01b662()
+}
+
+
+//# address-hook(0x0317ae) end(0x03181c)
+function void fn0317ae()
+{
+	objA1.velocity.y = -0x700
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+	u8[A1 + 0x2e] = 0
+
+#if STANDALONE
+	// Check for active dropdash
+	if (u8[A1 + 0x38] != CHARACTER_SONIC || u8[A1 + 0x20] != char.state.SONIC_DROPDASH)
+#endif
+	{
+		// Reset the "char.jumping" to make the character bounce off ignoring the velocity-y limit
+		u8[A1 + 0x40] = 0
+	}
+
+	objA0.state |= 0x01
+	if (s8[A0 + 0x2c] < 0)
+	{
+		objA1.velocity.y = -0x380
+		if (level.water_present != 0 && u8[A0 + 0x34] == 0)
+		{
+			A2 = 0x03185a
+			fn03181e()
+			fn03181e()
+			fn03181e()
+			fn03181e()
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+		}
+	}
+
+	if (u8[A0 + 0x34] == 0)
+	{
+		playSound(0x77)
+		u8[A0 + 0x34] = 0x01
+	}
+}
+
+
+//# address-hook(0x03181e) end(0x031858)
+function void fn03181e()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x02f938
+		GetRandomNumber()
+		s16 dx = (D0.u16 & 0x0f) - 8
+	#if STANDALONE
+		// I believe the original behavior is not intended
+		s16 dy = ((D0.u16 >> 4) & 0x0f) - 8
+	#else
+		s16 dy = dx
+	#endif
+		objA1.position.x.u16 = objA0.position.x.u16 + dx
+		objA1.position.y.u16 = objA0.position.y.u16 + dy
+		u8[A1 + 0x2c] = u8[(A2+=1)-1]
+	}
+}

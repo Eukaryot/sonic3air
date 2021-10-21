@@ -1,0 +1,19 @@
+How to build the dev version:
+=============================
+1. Open Xcode project.
+2. Make sure the scheme at the top is set to “sonic3air Development”.
+3. Build. 
+	- Note that you will need to copy the game data into the same folder as the build output to use it.
+
+
+How to build the end user version:
+==================================
+1. Open the Xcode project.
+2. Build the command line version using the "sonic3air_cmd" target in the Xcode project.
+	- This build requires all of the same dependencies that you would have with the cmake version, so install SDL, libogg and libvorbis via homebrew with "brew install <name>" commands. The project is expecting them in /opt/local/lib/, which is where brew installs them by default.
+	- The binary will be copied into the same place that cmake would put it. 
+3. Run the command line version with -pack to get the packaged game data bin files.
+4. Copy the gamedata.bin and enginedata.bin files into the data/ subfolder in the _xcode folder. The contents of this folder will be copied into the compiled application bundle.
+5. Also copy scripts.bin in there too, it's in the /saves/ folder after you run the development version. And metadata.json from somewhere.
+6. Switch the scheme at the top of Xcode to "sonic3air EndUser" and Build.
+	- If building for an actual release, you will want to use the "Archive" feature in Xcode so the build can be signed, notarized and exported from the archive.

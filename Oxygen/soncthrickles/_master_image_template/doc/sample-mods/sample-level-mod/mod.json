@@ -1,0 +1,11 @@
+{
+	"Metadata":
+	{
+		"Name": "Sample Level Mod",
+		"Author": "Eukaryot",
+		"Description": "An example how a level mod basically looks like. The start of Sonic's path in IceCap Zone Act 2 gets changed by this.",
+		"URL": "https://sonic3air.org",
+		"ModVersion": "1.0.0.0",
+		"GameVersion": "20.04.26.0"
+	}
+}

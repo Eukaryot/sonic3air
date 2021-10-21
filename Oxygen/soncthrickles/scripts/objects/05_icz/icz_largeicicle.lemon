@@ -1,0 +1,99 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Large Icicle (in ICZ)                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b194) end(0x08b194)
+function void fn08b194()
+{
+	Object.InitWithUpdateAddress(0x08b198)
+}
+
+
+//# address-hook(0x08b198) end(0x08b1ac)
+function void fn08b198()
+{
+	setupObjectAttributesFull(0x08b27a)
+	objA0.update_address = 0x08b1ae
+	objA0.hitbox_extends.y = 0x10
+}
+
+
+//# address-hook(0x08b1ae) end(0x08b1d0)
+function void fn08b1ae()
+{
+	fn08b26a()
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x70)
+	{
+		objA0.update_address = 0x08b1d4
+		objA0.countdown_value = 0x0f
+		objA0.countdown_callback = 0x08b1ec
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b1d4) end(0x08b1e8)
+function void fn08b1d4()
+{
+	D0 = 0x02
+	if (global.framecounter & 0x01)
+		D0.s16 = -D0.s16
+
+	objA0.position.x.u16 += D0.u16
+	Object.CountdownAndTrigger()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b1ec) end(0x08b1f8)
+function void fn08b1ec()
+{
+	objA0.update_address = 0x08b1fa
+	u8[A0 + 0x28] = 0x82
+}
+
+
+//# address-hook(0x08b1fa) end(0x08b224)
+function void fn08b1fa()
+{
+	UpdateMovementSimple()
+	fn00fc12()
+	if (D1.s16 < 0)
+	{
+		objA0.update_address = 0x08b228
+		u8[A0 + 0x28] = 0
+		spawnSimpleChildObjects(0x08b292)
+		playSound(0x5d)
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b228) end(0x08b22c)
+function void fn08b228()
+{
+	fn08b26a()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b26a) end(0x08b274)
+function void fn08b26a()
+{
+	D1 = 0x1b
+	D2 = 0x20
+	D3 = 0x20
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}

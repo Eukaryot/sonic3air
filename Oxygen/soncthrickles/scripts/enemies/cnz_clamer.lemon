@@ -1,0 +1,172 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Clamer enemy from Carnival Night Zone                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x088fb4) end(0x088fb4)
+function void fn088fb4()
+{
+	Object.InitWithUpdateAddress(0x088fba)
+}
+
+
+//# address-hook(0x088fba) end(0x088fd0)
+function void fn088fba()
+{
+	// Targets:
+	//  - 0x088fdc	-> objA0.base_state = 0x00
+	//  - 0x088fec	-> objA0.base_state = 0x02
+	//  - 0x08904e	-> objA0.base_state = 0x04
+	//  - 0x089064	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x088fd4, objA0.base_state)
+
+	Object.loadSpritePatterns(0x089168)
+	fn085208()
+}
+
+
+//# address-hook(0x088fdc) end(0x088fe8)
+function void fn088fdc()
+{
+	A1 = 0x089124
+	if (fn084fa4())
+		return
+
+	spawnChildObjects(0x089148)
+}
+
+
+//# address-hook(0x088fec) end(0x08904c)
+function void fn088fec()
+{
+	if ((objA0.flags38 & 0x01) == 0)
+	{
+		CheckDistanceToPlayers()
+		if (D2.u16 < 0x60)
+		{
+			if (objA0.render_flags & render_flag.FLIP_X)
+			{
+				D0.u16 -= 2
+			}
+			if (D0.u16 == 0)
+			{
+				objA0.base_state = 0x06
+				objA0.countdown_callback = 0x089056
+				objA0.animation.frame = 0
+				objA0.animation.timer = 0
+				return
+			}
+		}
+
+		A1 = 0x089170
+		fn0845a0()
+	}
+	else
+	{
+		objA0.base_state = 0x04
+		u8[A0 + 0x28] = 0
+		objA0.flags38 &= ~0x01
+		objA0.countdown_callback = 0x089056
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+	}
+}
+
+
+//# address-hook(0x08904e) end(0x089052)
+function void fn08904e()
+{
+	Object.animationProgress(0x089179)
+}
+
+
+//# address-hook(0x089056) end(0x089062)
+function void fn089056()
+{
+	objA0.base_state = 0x02
+	u8[A0 + 0x28] = 0x0a
+}
+
+
+//# address-hook(0x089064) end(0x089088)
+function void fn089064()
+{
+	A1 = 0x089185
+	fn0845a0()
+
+	if (D2.u16 != 0 && objA0.animation.sprite == 8 && u8[A0 + 0x04] & 0x80)
+	{
+		A2 = 0x089150
+		SpawnProjectileChildObjectsInDir()
+	}
+}
+
+
+//# address-hook(0x08908c) end(0x0890a8)
+function void fn08908c()
+{
+	setupObjectAttributesBasic(0x089136)
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.render_flags = u8[A1 + 0x04]
+	objA0.sprite_attributes = 0
+	objA0.update_address = 0x0890aa
+}
+
+
+//# address-hook(0x0890aa) end(0x0890c4)
+function void fn0890aa()
+{
+	fn085870()
+	if (!_equal())
+	{
+		objA0.update_address = 0x0890c8
+		fn0890d8()
+
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		u8[A1 + 0x38] |= 0x01
+	}
+	fn084934()
+}
+
+
+//# address-hook(0x0890c8) end(0x0890d6)
+function void fn0890c8()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x0890aa
+	}
+}
+
+
+//# address-hook(0x0890d8) end(0x089122)
+function void fn0890d8()
+{
+	D0.u16 = 0x0800
+	u8[A1 + 0x2a] &= ~0x01
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.s16 = -D0.s16
+		u8[A1 + 0x2a] |= 0x01
+	}
+	u8[A1 + 0x05] = 0x02
+	objA1.position.y.u16 += 6
+	objA1.velocity.x = D0.u16
+	objA1.velocity.y = -0x800
+	u16[A1 + 0x1c] = D0.u16
+	objA1.state = char.state.STRAIGHTJUMP
+	objA1.flags2a |= char.flag.IN_AIR
+	u8[A1 + 0x40] = 0
+
+	playSound(0xb1)
+}

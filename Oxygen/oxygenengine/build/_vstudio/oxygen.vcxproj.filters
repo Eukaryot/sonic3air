@@ -1,0 +1,790 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="helper">
+      <UniqueIdentifier>{21b01d52-3b17-40ff-a1b8-e7ed4bdab68b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_shader">
+      <UniqueIdentifier>{af91a17d-75a8-43be-a4ca-acaf62fdb3e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering">
+      <UniqueIdentifier>{4aa49916-044e-4b8e-80b0-91a7cbd46ed6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering\parts">
+      <UniqueIdentifier>{3be48333-f20c-4fde-ba94-8c455d9233a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering\utils">
+      <UniqueIdentifier>{d3c52cf0-8f00-480f-8f02-63ff30588b05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering\hardware">
+      <UniqueIdentifier>{de361638-d9ff-4a77-8c81-bcd42f32c888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering\hardware\shaders">
+      <UniqueIdentifier>{5deef7ad-6389-4ab8-98f5-02398dd27146}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering\software">
+      <UniqueIdentifier>{92d5eaed-a935-4f84-aa4f-c19c11b24241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application">
+      <UniqueIdentifier>{21562859-fe9b-4ad5-b02a-3b4e4a26a4de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\overlays">
+      <UniqueIdentifier>{d335829c-5df2-4473-9b69-698ccbc7576c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\audio">
+      <UniqueIdentifier>{6f77dc35-24c0-4aff-9678-a807d538adbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\input">
+      <UniqueIdentifier>{a6c89d84-bd89-4e61-8668-1e8b4cd1f1ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\video">
+      <UniqueIdentifier>{b996c87c-fe62-499a-866f-9fd958520910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation">
+      <UniqueIdentifier>{d130f137-1382-40e5-93f3-c42f915638c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation\sound">
+      <UniqueIdentifier>{9a52daaf-bfdf-4ef8-8084-593987417e6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation\analyse">
+      <UniqueIdentifier>{7a58b2aa-00c2-4adb-9700-33a243eea190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{2f8f51cf-6e63-45aa-b331-70c7a2f83820}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{1a6fb333-fe3a-4e1f-af20-540374f54e8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="drawing">
+      <UniqueIdentifier>{f7e88c35-532b-4eea-87c3-1252bbda7c22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="drawing\opengl">
+      <UniqueIdentifier>{2e766e20-79b7-4d5e-b0f8-f7a28f3f6d1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="drawing\software">
+      <UniqueIdentifier>{4f74a5ca-d4eb-4c32-9534-db0a341b1e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\modding">
+      <UniqueIdentifier>{e9bf568d-17dd-45d5-bf97-8ea49867a253}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{7114b4f1-cc30-4e6e-8ce0-01e658297cd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{cd1dd681-89a8-4de8-82d2-1dda90aa914b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\menu">
+      <UniqueIdentifier>{5a120995-958b-4501-af44-c7b8548fd325}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application\gameview">
+      <UniqueIdentifier>{966bc23b-1c4a-4d58-830f-bf7ddf86fe96}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\JsonHelper.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\FileHelper.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\Log.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\Utils.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\Geometry.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\RenderResources.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\PaletteManager.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\PatternManager.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\PlaneManager.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderParts.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\SpriteManager.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\ComponentSprite.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteSprite.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\HardwareRenderer.cpp">
+      <Filter>rendering\hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\HardwareRenderResources.cpp">
+      <Filter>rendering\hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\DebugDrawPlaneShader.cpp">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderComponentSpriteShader.cpp">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPaletteSpriteShader.cpp">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPlaneShader.cpp">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderVdpSpriteShader.cpp">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.cpp">
+      <Filter>rendering\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\Application.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\mainview\GameView.cpp">
+      <Filter>application\gameview</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\DebugLogView.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\DebugSidePanel.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\MemoryHexView.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\SaveStateMenu.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioPlayer.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\EmulationAudioSource.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\OggAudioSource.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\input\ControlsIn.cpp">
+      <Filter>application\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\input\InputRecorder.cpp">
+      <Filter>application\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp">
+      <Filter>application\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\EmulatorInterface.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\CodeExec.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptBindings.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptRuntime.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\LogDisplay.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\SaveStateSerializer.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\Simulation.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\blip_buf.cpp">
+      <Filter>simulation\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\sn76489.cpp">
+      <Filter>simulation\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\SoundDriver.cpp">
+      <Filter>simulation\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\ym2612.cpp">
+      <Filter>simulation\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteBase.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\GameRecorder.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp">
+      <Filter>simulation\analyse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\pch.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\Configuration.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\PackageFileCrawler.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp">
+      <Filter>rendering\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioOutBase.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\PersistentData.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\base\PlatformFunctions.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\DrawCollection.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawer.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\DrawCommand.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerTexture.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\Upscaler.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.cpp">
+      <Filter>drawing\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.cpp">
+      <Filter>drawing\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\Drawer.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\DrawerTexture.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.cpp">
+      <Filter>drawing\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp">
+      <Filter>drawing\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioCollection.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\OverlayManager.cpp">
+      <Filter>rendering\parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\base\CrashHandler.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\modding\Mod.cpp">
+      <Filter>application\modding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\modding\ModManager.cpp">
+      <Filter>application\modding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioSourceManager.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\ProfilingView.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\SoundEmulation.cpp">
+      <Filter>simulation\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioSourceBase.cpp">
+      <Filter>application\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\file\FilePackage.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\AndroidJavaInterface.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp">
+      <Filter>application\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp">
+      <Filter>application\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp">
+      <Filter>application\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp">
+      <Filter>application\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptProgram.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\overlays\BackdropView.cpp">
+      <Filter>application\overlays</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp">
+      <Filter>application\input</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\JsonHelper.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\Log.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\Utils.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\FileHelper.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\Geometry.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\Renderer.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\RenderResources.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\PaletteManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\PatternManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\PlaneManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderParts.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\SpriteManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\BufferTexture.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\ComponentSprite.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteSprite.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\HardwareRenderer.h">
+      <Filter>rendering\hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\HardwareRenderResources.h">
+      <Filter>rendering\hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\DebugDrawPlaneShader.h">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderComponentSpriteShader.h">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPaletteSpriteShader.h">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPlaneShader.h">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderVdpSpriteShader.h">
+      <Filter>rendering\hardware\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.h">
+      <Filter>rendering\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\Application.h">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\mainview\GameView.h">
+      <Filter>application\gameview</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\DebugLogView.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\DebugSidePanel.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\MemoryHexView.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\SaveStateMenu.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioPlayer.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioSourceBase.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\EmulationAudioSource.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\OggAudioSource.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\input\ControlsIn.h">
+      <Filter>application\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\input\InputRecorder.h">
+      <Filter>application\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\video\VideoOut.h">
+      <Filter>application\video</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\EmulatorInterface.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\CodeExec.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptBindings.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptRuntime.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\LogDisplay.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\Runtime.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\Simulation.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\blip_buf.h">
+      <Filter>simulation\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\sn76489.h">
+      <Filter>simulation\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundDriver.h">
+      <Filter>simulation\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\ym2612.h">
+      <Filter>simulation\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteBase.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\EngineMain.h">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\DebuggingInterfaces.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\GameRecorder.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h">
+      <Filter>simulation\analyse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\pch.h" />
+    <ClInclude Include="..\..\source\oxygen\application\Configuration.h">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\PackageFileCrawler.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h">
+      <Filter>rendering\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioOutBase.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h">
+      <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\PersistentData.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\base\PlatformFunctions.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\GameProfile.h">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawCollection.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawer.h">
+      <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawCommand.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawerTexture.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerTexture.h">
+      <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawerInterface.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\Upscaler.h">
+      <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\Drawer.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioCollection.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\OverlayManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\base\CrashHandler.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.h">
+      <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\Profiling.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\modding\Mod.h">
+      <Filter>application\modding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\modding\ModManager.h">
+      <Filter>application\modding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioSourceManager.h">
+      <Filter>application\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\ProfilingView.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundChipWrite.h">
+      <Filter>simulation\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundEmulation.h">
+      <Filter>simulation\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\file\FilePackage.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.h">
+      <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\GameLoader.h">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\AndroidJavaInterface.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h">
+      <Filter>application\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h">
+      <Filter>application\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h">
+      <Filter>application\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h">
+      <Filter>application\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptProgram.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\overlays\BackdropView.h">
+      <Filter>application\overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h">
+      <Filter>application\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderPartsDefinitions.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Oxygen.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\debugdraw_plane.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\postfx_blur.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\render_plane.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\render_sprite_component.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\render_sprite_palette.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\render_sprite_vdp.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\simple_copy_screen.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\simple_rect_colored.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\simple_rect_depthwrite.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\simple_rect_overdraw.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\simple_rect_textured.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\simple_rect_textured_uv.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\simple_rect_vertexcolor.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\upscaler_hqx.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\upscaler_soft.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\upscaler_xbrz-freescale-pass0.shader">
+      <Filter>_shader</Filter>
+    </None>
+    <None Include="..\data\shader\upscaler_xbrz-freescale-pass1.shader">
+      <Filter>_shader</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,51 @@
+
+=== Build under Emscripten via docker ===
+
+Make sure docker is installed.
+Use the included Dockerfile to build a docker container named llvm_emscripten:
+	- cd ./Oxygen/soncthrickles/build/_emscripten
+	- docker build -t emscripten_gl .
+
+Go back to the root of the repository if you aren't already there:
+	- cd ../../../../
+
+Setup and build with Emscripten, sharing the entire repo (current directory) with it:
+	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/soncthrickles/build/_emscripten/build; emmake cmake -DCMAKE_BUILD_TYPE=Release ..; emmake cmake --build ."
+
+
+Package the files (Development):
+	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/soncthrickles/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload ___internal@/sonic3air/___internal config.json@/sonic3air/config.json data@/sonic3air/data oxygenproject.json@/sonic3air/oxygenproject.json scripts@/sonic3air/scripts --use-preload-cache"
+
+
+Package the files (End user):
+	With audioremastered.bin
+	------------------------
+	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/soncthrickles/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload config.json@/sonic3air/config.json audiodata.bin@/sonic3air/data/audiodata.bin audioremaster.bin@/sonic3air/data/audioremaster.bin enginedata.bin@/sonic3air/data/enginedata.bin gamedata.bin@/sonic3air/data/gamedata.bin data/metadata.json@/sonic3air/data/metadata.json data/font@/sonic3air/data/font saves/scripts.bin@/sonic3air/data/scripts.bin config.json@/sonic3air/config.json --use-preload-cache"
+	
+	Without audioremaster.bin (Extra downloads option will let user download it from the server)
+	-------------------------
+	- docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) --name sonic3air_build emscripten_gl /bin/bash -c "cd /src/Oxygen/soncthrickles/; python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload config.json@/sonic3air/config.json audiodata.bin@/sonic3air/data/audiodata.bin enginedata.bin@/sonic3air/data/enginedata.bin gamedata.bin@/sonic3air/data/gamedata.bin data/metadata.json@/sonic3air/data/metadata.json data/font@/sonic3air/data/font saves/scripts.bin@/sonic3air/data/scripts.bin config.json@/sonic3air/config.json --use-preload-cache"
+
+
+=== Build under Emscripten directly ===
+If you already used the docker container, do not follow these instructions. Emscripten might share your local LLVM compiler environment, this can introduce unintended side effects if you have things defined at the system level for Linux builds that you would not want set for WebAssembly builds. For example, if you were compiling via emscripten on macOS, it will think it's compiling for macOS and use platform specific code.
+
+Make sure emscripten is installed. Enable emscripten via the emsdk_env shell script included with it.
+
+Setup and build with Emscripten:
+	- cd ./Oxygen/soncthrickles/build/_emscripten/build
+	- emmake cmake -DCMAKE_BUILD_TYPE=Release ..
+	- emmake cmake --build .
+
+Package the files (Development):
+	- python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload ___internal@/sonic3air/___internal config.json@/sonic3air/config.json data@/sonic3air/data oxygenproject.json@/sonic3air/oxygenproject.json scripts@/sonic3air/scripts --use-preload-cache
+
+Package the files (End user):
+	- python3 /emsdk/upstream/emscripten/tools/file_packager.py build/_emscripten/dist/sonic3air.data --js-output=build/_emscripten/dist/loader.js --preload config.json@/sonic3air/config.json audiodata.bin@/sonic3air/data/audiodata.bin audioremaster.bin@/sonic3air/data/audioremaster.bin enginedata.bin@/sonic3air/data/enginedata.bin gamedata.bin@/sonic3air/data/gamedata.bin data/metadata.json@/sonic3air/data/metadata.json data/font@/sonic3air/data/font saves/scripts.bin@/sonic3air/data/scripts.bin config.json@/sonic3air/config.json --use-preload-cache
+
+=== Enduser build ===
+Uncomment the line add_compile_definitions(PLATFORM_ENDUSER) in CMakeLists.txt. Or you can define it as an argument to cmake when you build.
+
+=== Run WebAssembly Builds ===
+
+Host the output on a web server that supports the correct MIME type for .wasm files. Launch sonic3air_web.html

@@ -1,0 +1,85 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+// Defines
+include _defines/?
+
+// Utility
+include utility/?
+
+// Menus
+include menus/?
+
+// General stuff
+include general/?
+include general/bluesphere/?
+
+// Main game
+include maingame/?
+include maingame/character/?
+include maingame/hud/?
+include maingame/outro/?
+
+// Level update
+include level/?
+include level/01_aiz/?
+include level/02_hcz/?
+include level/03_mgz/?
+include level/04_cnz/?
+include level/05_icz/?
+include level/06_lbz/?
+include level/07_mhz/?
+include level/08_fbz/?
+include level/09_soz/?
+include level/10_lrz/?
+include level/11_hpz/?
+include level/12_ssz/?
+include level/13_dez/?
+include level/14_ddz/?
+include level/outro/?
+include level/bonus_gs/?
+include level/bonus_gm/?
+include level/bonus_sm/?
+include level/special/?
+include level/competition/?
+
+// Objects
+include objects/?
+include objects/basics/?
+include objects/effects/?
+include objects/level/?
+include objects/misc/?
+include objects/01_aiz/?
+include objects/02_hcz/?
+include objects/03_mgz/?
+include objects/04_cnz/?
+include objects/05_icz/?
+include objects/06_lbz/?
+include objects/07_mhz/?
+include objects/08_fbz/?
+include objects/09_soz/?
+include objects/10_lrz/?
+include objects/11_hpz/?
+include objects/12_ssz/?
+include objects/13_dez/?
+include objects/14_ddz/?
+include objects/bonus_gs/?
+include objects/bonus_gm/?
+
+// Enemies
+include enemies/?
+
+// Bosses
+include bosses/?
+
+#if STANDALONE
+include standalone/?
+include standalone/rendering/?
+include standalone/resources/?
+#endif

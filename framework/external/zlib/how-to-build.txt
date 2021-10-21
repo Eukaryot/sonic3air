@@ -1,0 +1,8 @@
+
+Build for Windows with Visual Studio 2019
+
+zlib & minizip
+	- Uses a custom Visual Studio Solution "_vstudio/zlib.sln"
+	- Static Build
+	- Build as Debug + Release, for x86 + x64
+	- Afterwards execute "copy_libvorbis.bat" to copy headers and libs in place

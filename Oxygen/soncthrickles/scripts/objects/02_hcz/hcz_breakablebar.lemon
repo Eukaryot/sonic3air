@@ -1,0 +1,413 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x01ed26) end(0x01edaa)
+function void fn01ed26()
+{
+	objA0.mapping_offset = 0x21cdca
+	objA0.sprite_attributes = 0x43ca
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	u16[A0 + 0x30] = u32(objA0.subtype2c & 0x0f) * 0x3c
+
+	D1.u16 = (objA0.subtype2c & 0x30) >> 2
+	A1 = 0x01ed1a + D1.s16
+	D0 = 0
+	if (s8[A0 + 0x2c] < 0)
+	{
+		u16[A0 + 0x36] = u8[(A1+=1)-1]
+		u16[A0 + 0x38] = u8[(A1+=1)-1]
+		objA0.box_size.x = u8[(A1+=1)-1]
+		objA0.box_size.y = 4
+		objA0.animation.sprite = u8[(A1+=1)-1] + 4
+
+		objA0.update_address = 0x01ef64
+		fn01ef64()
+	}
+	else
+	{
+		u16[A0 + 0x36] = u8[(A1+=1)-1]
+		u16[A0 + 0x38] = u8[(A1+=1)-1]
+		objA0.box_size.x = 4
+		objA0.box_size.y = u8[(A1+=1)-1]
+		objA0.animation.sprite = u8[(A1+=1)-1]
+
+		objA0.update_address = 0x01edb0
+		fn01edb0()
+	}
+}
+
+
+//# address-hook(0x01edb0) end(0x01ede8)
+function void fn01edb0()
+{
+	A2 = A0 + 0x32
+	if (u16[A0 + 0x30] != 0 && u16[A2] != 0)
+	{
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			fn01eeec()
+			return
+		}
+	}
+
+	A1 = 0xffffb000
+	D1.u16 = control.pad1
+	D2 = 0
+	fn01edec()
+
+	++A2
+	A1 = 0xffffb04a
+	D1.u16 = control.pad2
+	D2 = 1
+	fn01edec()
+
+	if (objA0.value3a != 0)
+	{
+		fn01eeec()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x01edec) end(0x01eeea)
+function void fn01edec()
+{
+	if (u8[A2] != 0)
+	{
+		D0.u16 = objA0.position.y.u16 - u16[A0 + 0x36]
+		if (D1 & 0x0100)
+		{
+			--objA1.position.y.u16
+			if (D0.u16 >= objA1.position.y.u16)
+			{
+				objA1.position.y.u16 = D0.u16
+			}
+		}
+
+		D0.u16 += u16[A0 + 0x38]
+		if (D1 & 0x0200)
+		{
+			++objA1.position.y.u16
+			if (D0.u16 < objA1.position.y.u16)
+			{
+				objA1.position.y.u16 = D0.u16
+			}
+		}
+
+		D1.u16 &= 0x70
+		if (D1.u16 == 0)
+			return
+
+		u8[A2] = 0
+		u8[A2 + 0x02] = 0x3c
+		u8[0xfffff7c7] &= ~(1 << D2.u8)
+		u8[A1 + 0x2e] &= 0xfe
+		if ((objA0.subtype2c & 0x40) == 0)
+		{
+			objA0.value3a = 0x01
+		}
+		return
+	}
+
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		return
+	}
+
+	D1 = objA0.box_size.y
+	D0.u16 = objA0.position.y.u16 - D1.u16
+	D2.u16 = objA1.position.y.u16
+	if (D2.u16 >= D0.u16)
+	{
+		D0.u16 += D1.u16 * 2
+		if (D2.u16 < D0.u16)
+		{
+			D0.u16 = objA0.position.x.u16 + 0x14
+			if (D0.u16 < objA1.position.x.u16 && D0.u16 + 0x10 >= objA1.position.x.u16)
+			{
+				if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+				{
+					D0.u16 = objA0.position.y.u16 - u16[A0 + 0x36]
+					if (D0.u16 >= objA1.position.y.u16)
+					{
+						objA1.position.y.u16 = D0.u16
+					}
+					D0.u16 += u16[A0 + 0x38]
+					if (D0.u16 < objA1.position.y.u16)
+					{
+						objA1.position.y.u16 = D0.u16
+					}
+
+					objA1.velocity.x = 0
+					objA1.velocity.y = 0
+					D0.u16 = objA0.position.x.u16 + 0x14
+					objA1.position.x.u16 = D0.u16
+					objA1.state = char.state.HOLDING_ON
+					objA1.flags2a &= ~char.flag.FACING_LEFT
+					u8[A1 + 0x2e] = 0x01
+					u8[0xfffff7c7] |= (1 << (D2.u8 & 7))
+					u8[A2] = 0x01
+				}
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x01eeec) end(0x01ef3a)
+function void fn01eeec()
+{
+	if (u8[A0 + 0x32] != 0)
+	{
+		u8[0xffffb02e] &= 0xfe
+	}
+	if (u8[A0 + 0x33] != 0)
+	{
+		u8[0xffffb078] &= 0xfe
+	}
+
+	u8[0xfffff7c7] = 0
+	objA0.value32 = 0
+	objA0.update_address = 0x01ef3e
+	objA0.animation.sprite = 0x03
+	objA0.velocity.x = 0x0400
+	objA0.velocity.y = 0
+
+	A4 = 0x01f108
+	A2 = 0x01f0f0
+	D1 = (objA0.box_size.y >> 2) - 1
+	fn01f188()
+
+	fn01ef3e()
+}
+
+
+//# address-hook(0x01ef3e) end(0x01ef5e)
+function void fn01ef3e()
+{
+	if (u8[A0 + 0x3f] != 0)
+	{
+		--u8[A0 + 0x3f]
+	}
+	else
+	{
+		UpdateMovementStraightSimple()
+		objA0.velocity.y += 8
+	}
+
+	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
+	{
+		Object.DespawnAndUnload()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x01ef64) end(0x01ef9c)
+function void fn01ef64()
+{
+	A2 = A0 + 0x32
+	if (u16[A0 + 0x30] != 0 && u16[A2] != 0)
+	{
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			fn01f09a()
+			return
+		}
+	}
+
+	A1 = 0xffffb000
+	D1.u16 = control.pad1
+	D2 = 0
+	fn01efa0()
+
+	++A2
+	A1 = 0xffffb04a
+	D1.u16 = control.pad2
+	D2 = 1
+	fn01efa0()
+
+	if (objA0.value3a != 0)
+	{
+		fn01f09a()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x01efa0) end(0x01f098)
+function void fn01efa0()
+{
+	if (u8[A2] != 0)
+	{
+		D0.u16 = objA0.position.x.u16 - u16[A0 + 0x36]
+		if (D1 & 0x0400)
+		{
+			--objA1.position.x.u16
+			if (D0.u16 >= objA1.position.x.u16)
+			{
+				objA1.position.x.u16 = D0.u16
+			}
+		}
+
+		D0.u16 += u16[A0 + 0x38]
+		if (D1 & 0x0800)
+		{
+			++objA1.position.x.u16
+			if (D0.u16 < objA1.position.x.u16)
+			{
+				objA1.position.x.u16 = D0.u16
+			}
+		}
+
+		D1.u16 &= 0x70
+		if (D1.u16 == 0)
+			return
+
+		u8[A2] = 0
+		u8[A2 + 0x02] = 0x3c
+		u8[0xfffff7c7] &= ~(1 << D2.u8)
+		u8[A1 + 0x2e] &= 0xfe
+		if ((objA0.subtype2c & 0x40) == 0)
+		{
+			objA0.value3a = 0x01
+		}
+		return
+	}
+
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		return
+	}
+
+	D1 = objA0.box_size.x
+	D0.u16 = objA0.position.x.u16 - D1.u16
+	D2.u16 = objA1.position.x.u16
+	if (D2.u16 >= D0.u16)
+	{
+		D0.u16 += D1.u16 * 2
+		if (D2.u16 < D0.u16)
+		{
+			D0.u16 = objA0.position.y.u16 - 0x14
+			if (D0.u16 < objA1.position.y.u16)
+			{
+				D0.u16 += 0x10
+				if (D0.u16 >= objA1.position.y.u16)
+				{
+					if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+					{
+						D0.u16 = objA0.position.x.u16
+						D0.u16 -= u16[A0 + 0x36]
+						if (D0.u16 >= objA1.position.x.u16)
+						{
+							objA1.position.x.u16 = D0.u16
+						}
+						D0.u16 += u16[A0 + 0x38]
+						if (D0.u16 < objA1.position.x.u16)
+						{
+							objA1.position.x.u16 = D0.u16
+						}
+						objA1.velocity.x = 0
+						objA1.velocity.y = 0
+						D0.u16 = objA0.position.y.u16 - 0x14
+						objA1.position.y.u16 = D0.u16
+						objA1.state = char.state.HANGING
+						u8[A1 + 0x2e] = 0x01
+						u8[0xfffff7c7] |= (1 << D2.u8)
+						u8[A2] = 0x01
+					}
+				}
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x01f09a) end(0x01f0ec)
+function void fn01f09a()
+{
+	if (u8[A0 + 0x32] != 0)
+	{
+		u8[0xffffb02e] &= 0xfe
+	}
+	if (u8[A0 + 0x33] != 0)
+	{
+		u8[0xffffb078] &= 0xfe
+	}
+
+	u8[0xfffff7c7] = 0
+	objA0.value32 = 0
+
+	objA0.update_address = 0x01ef3e
+	objA0.animation.sprite = 0x07
+	objA0.velocity.x = 0
+	objA0.velocity.y = -0x400
+
+	A4 = 0x01f148
+	A2 = 0x01f0f0
+	D1 = (objA0.box_size.x >> 2) - 1
+	fn01f188()
+
+	fn01ef3e()
+}
+
+
+//# address-hook(0x01f188) end(0x01f1fc)
+function void fn01f188()
+{
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+	D4.u16 = objA0.sprite_priority
+	A1 = A0
+
+	while (true)
+	{
+		objA1.update_address = objA0.update_address
+		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		D0.u16 = u16[(A4+=2)-2] +D2.u16
+		objA1.position.x.u16 = D0.u16
+		D0.u16 = u16[(A4+=2)-2] +D3.u16
+		objA1.position.y.u16 = D0.u16
+		u16[A1 + 0x08] = D4.u16
+		u8[A1 + 0x07] = 0x04
+		u8[A1 + 0x06] = 0x04
+		u8[A1 + 0x22] = objA0.animation.sprite
+		objA1.velocity.x = objA0.velocity.x
+		objA1.velocity.y = objA0.velocity.y
+		u8[A1 + 0x3f] = u8[(A2+=1)-1]
+
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+
+		if (!allocDynamicObjectAfterA0())
+			break
+	}
+
+	playSound(0x59)
+}

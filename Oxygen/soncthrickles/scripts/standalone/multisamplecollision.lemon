@@ -1,0 +1,178 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Notes on multi-sample collision:
+// This introduces more precision in collision checks against the ground, especially when the ground is highly curved.
+// There are some occurences in the game where we have sharp curves in the terrain and the player is going very fast,
+// which can lead to a sudden stop (e.g. ICZ quarter-pipe slopes) or even clipping into a wall (at one place in CNZ 1).
+// We want to do the more precise collision checks there, but not in general, as this introduces some known problems:
+//  a) Going backwards in loopings (like ICZ 2) is broken this way for some reason
+//  b) The higher precision emphasizes some unwanted effects (like a shift to the right at the vertical edge in SOZ in some places, and ICZ quarter-pipes acting differently)
+// For that reason, the multi-sample collision is strictly limited to only some selected locations.
+
+function bool Standalone.useMultiSampleCollision()
+{
+	if (!Game.getSetting(SETTING_FIX_GLITCHES))
+		return false
+
+	u32 tablePointer = 0x817000
+
+	// Setup the lookup table if not done already
+	if (u16[tablePointer] != (global.zone_act | 0x8080))		// Add 0x8080 mainly to avoid having 0x0000 for AIZ 1
+	{
+		u32 backupA1 = A1
+		u16[tablePointer] = (global.zone_act | 0x8080)
+		A1 = tablePointer + 4
+
+		if (global.zone_act == 0x0001)
+		{
+			// AIZ 2
+			Standalone.MultiSampleCollision.addRect(0x3900, 0x01e0, 0x4000, 0x02a0)
+		}
+		else if (global.zone_act == 0x0100)
+		{
+			// HCZ 1
+			//Standalone.MultiSampleCollision.addRect(0x1300, 0x0620, 0x13a0, 0x06a0)	// Introduced a new problem: Using the hand launcher, then rolling immediately causes a sudden stop
+			Standalone.MultiSampleCollision.addRect(0x1a60, 0x08a0, 0x1ae0, 0x0920)
+			Standalone.MultiSampleCollision.addRect(0x1da0, 0x07a0, 0x1e20, 0x0820)
+			Standalone.MultiSampleCollision.addRect(0x1ae0, 0x0520, 0x1b60, 0x05a0)
+			Standalone.MultiSampleCollision.addRect(0x1f20, 0x0420, 0x1fa0, 0x04a0)
+			Standalone.MultiSampleCollision.addRect(0x2790, 0x0620, 0x2840, 0x06a0)
+		}
+		else if (global.zone_act == 0x0101)
+		{
+			// HCZ 2
+			Standalone.MultiSampleCollision.addRect(0x1700, 0x0380, 0x1800, 0x0480)
+		}
+		else if (global.zone_act == 0x0200)
+		{
+			// MGZ 1
+			Standalone.MultiSampleCollision.addRect(0x0880, 0x04c0, 0x0960, 0x0540)
+			Standalone.MultiSampleCollision.addRect(0x11c0, 0x01c0, 0x1240, 0x0240)
+		}
+		else if (global.zone_act == 0x0300)
+		{
+			// CNZ 1
+			Standalone.MultiSampleCollision.addRect(0x0b60, 0x06e0, 0x0be0, 0x0760)
+			Standalone.MultiSampleCollision.addRect(0x1260, 0x0900, 0x12e0, 0x0960)
+			Standalone.MultiSampleCollision.addRect(0x1290, 0x0540, 0x1340, 0x0600)
+		}
+		else if (global.zone_act == 0x0301)
+		{
+			// CNZ 2
+			Standalone.MultiSampleCollision.addRect(0x2a60, 0x05e0, 0x2ae0, 0x0660)
+		}
+		else if (global.zone_act == 0x0501)
+		{
+			// ICZ 2
+
+			// Do not use this for the quarter-pipes (note: there are few more than those out-commented below),
+			// it leads to some unwanted bahavior:
+			//  - The character is is most cases launched up into the air in a 90° angle instead of something like 85°
+			//  - When coming from right quickly (e.g. when spindashing), the character often directly follows the terrain instead of going over the 90° edge
+
+			//Standalone.MultiSampleCollision.addRect(0x0b70, 0x0460, 0x0bf0, 0x04e0)
+			//Standalone.MultiSampleCollision.addRect(0x18f0, 0x05e0, 0x1970, 0x0660)
+			//Standalone.MultiSampleCollision.addRect(0x1ef0, 0x05e0, 0x1f70, 0x0660)
+			//Standalone.MultiSampleCollision.addRect(0x25f0, 0x01e0, 0x2670, 0x0260)
+			//Standalone.MultiSampleCollision.addRect(0x2b70, 0x0460, 0x2bf0, 0x04e0)
+			//Standalone.MultiSampleCollision.addRect(0x2b70, 0x0a60, 0x2bf0, 0x0ae0)
+			//Standalone.MultiSampleCollision.addRect(0x2df0, 0x04e0, 0x2e70, 0x0560)
+			//Standalone.MultiSampleCollision.addRect(0x3570, 0x0460, 0x35f0, 0x04e0)
+			//Standalone.MultiSampleCollision.addRect(0x3ef0, 0x06e0, 0x3f70, 0x0760)
+
+			Standalone.MultiSampleCollision.addRect(0x3a80, 0x05b0, 0x3b80, 0x06a0)
+		}
+		else if (global.zone_act == 0x0600)
+		{
+			// LBZ 1
+			Standalone.MultiSampleCollision.addRect(0x2b80, 0x0780, 0x2c30, 0x0820)
+		}
+		else if (global.zone_act == 0x0601)
+		{
+			// LBZ 2
+			Standalone.MultiSampleCollision.addRect(0x1070, 0x0668, 0x10f0, 0x06d0)
+			Standalone.MultiSampleCollision.addRect(0x1720, 0x03e0, 0x17b0, 0x0460)
+			Standalone.MultiSampleCollision.addRect(0x17a0, 0x05a0, 0x1820, 0x0620)
+			Standalone.MultiSampleCollision.addRect(0x2aa0, 0x01e0, 0x2b60, 0x0260)
+		}
+		else if (global.zone_act == 0x0901)
+		{
+			// LRZ 2
+			Standalone.MultiSampleCollision.addRect(0x2780, 0x01e0, 0x2880, 0x0260)		// Added so that ramps make you go straight up here, and especially not under the block that crushes you
+		}
+
+		u16[tablePointer + 2] = (A1 - (tablePointer + 4)) / 8
+
+		A1 = backupA1
+	}
+
+	// Ignore if character is going slow anyway
+	s16 vx = char.velocity.x >> 8
+	s16 vy = char.velocity.y >> 8
+	if (abs(vx) < 4 && abs(vy) < 4)
+		return false
+
+	// Check for defined locations
+	u16 px = char.position.x.u16 + vx / 2
+	u16 py = char.position.y.u16 + vy / 2
+	u16 count = u16[tablePointer + 2]
+	u32 ptr = tablePointer + 4
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (px >= u16[ptr] && px < u16[ptr+4] && py >= u16[ptr+2] && py < u16[ptr+6])
+		{
+			return true
+		}
+		ptr += 8
+	}
+	return false
+
+
+	// Old code that checks for chunk type
+	//  -> Unfortunately, this is not that reliable, so we don't use it any more
+	//u16 offset = ((char.position.y.u16 + (char.velocity.y >> 8)) >> 5) & level.chunksize.bitmask
+	//u32 address = 0xffff0000 + u16[0xffff8008 + offset] + ((char.position.x.u16 + (char.velocity.x >> 8)) >> 7)
+	//u8 chunkType = u8[address]
+	//if (global.zone_act == 0x0100)
+	//{
+	//	// HCZ 1
+	//	return (chunkType == 0x2d || chunkType == 0x2e)
+	//}
+	//else if (global.zone_act == 0x0501)
+	//{
+	//	// ICZ 1
+	//	return (chunkType == 0x20)
+	//}
+}
+
+
+function void Standalone.MultiSampleCollision.addRect(u16 x1, u16 y1, u16 x2, u16 y2)
+{
+	u16[A1]   = x1
+	u16[A1+2] = y1
+	u16[A1+4] = x2
+	u16[A1+6] = y2
+	A1 += 8
+}
+
+
+function void Standalone.debugOutputMultiSampleCollision()
+{
+	u32 tablePointer = 0x817000
+	u16 count = u16[tablePointer + 2]
+	u32 ptr = tablePointer + 4
+	for (u16 i = 0; i < count; ++i)
+	{
+		debugDrawOutlineRect(u16[ptr], u16[ptr+2], u16[ptr+4]-u16[ptr], u16[ptr+6]-u16[ptr+2], 0xc000ff00)
+		debugDrawRect(u16[ptr], u16[ptr+2], u16[ptr+4]-u16[ptr], u16[ptr+6]-u16[ptr+2], 0x2000ff00)
+		ptr += 8
+	}
+}

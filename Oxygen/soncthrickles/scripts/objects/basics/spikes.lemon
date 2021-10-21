@@ -1,0 +1,327 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Spikes                                                //
+//-------------------------------------------------------//
+
+//# address-hook(0x023f84) end(0x024022)
+function void Spikes.Init()
+{
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	D0.u16 = (objA0.subtype2c & 0xf0) >> 3
+	if (competition_mode.active)
+	{
+		fn024034()
+	}
+	else
+	{
+		A1 = 0x023f74 + D0.u16
+		objA0.box_size.x = u8[(A1+=1)-1]
+		objA0.box_size.y = u8[(A1+=1)-1]
+		objA0.update_address = 0x024090
+		objA0.mapping_offset = 0x024456
+		objA0.sprite_attributes = (global.zone == 4) ? 0x0200 : 0x049c		// Flying Battery Zone spikes are a bit different
+
+		D0.u16 >>= 1
+		objA0.animation.sprite = D0.u8
+		if (D0.u8 >= 4)
+		{
+			objA0.update_address = 0x0240e2
+			objA0.sprite_attributes = 0x0494
+		}
+		D0.u8 = objA0.flags2a
+		if (global.inv_gravity)
+		{
+			D0.u8 ^= 0x02
+		}
+		D0.u8 &= 0x02
+		if (D0.u8 != 0)
+		{
+			objA0.update_address = 0x02413e
+		}
+		u16[A0 + 0x3c] = 0x20
+		u16[A0 + 0x30] = objA0.position.x.u16
+		u16[A0 + 0x32] = objA0.position.y.u16
+		objA0.subtype2c = (objA0.subtype2c & 0x0f) * 2
+	}
+}
+
+
+//# address-hook(0x024034) end(0x02408e)
+function void fn024034()
+{
+	A1 = 0x024024 + D0.s16
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	objA0.update_address = 0x02418e
+	objA0.mapping_offset = 0x024566
+	objA0.sprite_attributes = 0x0391
+	D0.u16 >>= 1
+	objA0.animation.sprite = D0.u8
+	if (D0.u8 >= 4)
+	{
+		objA0.update_address = 0x0241dc
+	}
+	if (objA0.flags2a & 0x02)
+	{
+		objA0.update_address = 0x024234
+	}
+	u16[A0 + 0x30] = objA0.position.x.u16
+	u16[A0 + 0x32] = objA0.position.y.u16
+	objA0.subtype2c = (objA0.subtype2c & 0x0f) * 2
+}
+
+
+//# address-hook(0x024090) end(0x0240dc)
+function void Spikes.Update()
+{
+	fn0242b6()
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	if (objA0.flags2a & 0x08)
+	{
+		A1 = 0xffffb000
+		DamageCharacter()
+	}
+
+	if (objA0.flags2a & 0x10)
+	{
+		A1 = 0xffffb04a
+		DamageCharacter()
+	}
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x0240e2) end(0x024138)
+function void fn0240e2()
+{
+	fn0242b6()
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	D6.u16 &= 0x03
+	if (D6.u16 != 0)
+	{
+		D0.u8 = D6.u8 & 0x01
+		if (D0.u8 != 0)
+		{
+			A1 = 0xffffb000
+			DamageCharacter()
+			objA0.flags2a &= ~0x20
+		}
+		D6.u8 &= 0x02
+		if (D6.u8 != 0)
+		{
+			A1 = 0xffffb04a
+			DamageCharacter()
+			objA0.flags2a &= ~0x40
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x02413e) end(0x024188)
+function void fn02413e()
+{
+	fn0242b6()
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	D6.u16 &= 0x0c
+	if (D6.u16 != 0)
+	{
+		D0.u8 = D6.u8 & 0x04
+		if (D0.u8 != 0)
+		{
+			A1 = 0xffffb000
+			DamageCharacter()
+		}
+
+		D6.u8 &= 0x08
+		if (D6.u8 != 0)
+		{
+			A1 = 0xffffb04a
+			DamageCharacter()
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x024280) end(0x0242b4)
+function void DamageCharacter()
+{
+	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+	{
+		if (u8[A1 + 0x34] == 0 && u8[A1 + 0x05] < 4)
+		{
+			D3 = u32[A1 + 0x14]
+			D0 = s32(objA1.velocity.y) << 8
+			D3 -= D0
+			u32[A1 + 0x14] = D3
+			A2 = A0
+			A0 = A1
+
+			// Hurt character
+			Character.GettingHurt()
+			A0 = A2
+		}
+	}
+}
+
+
+//# address-hook(0x0242b6) end(0x0242c0)
+function void fn0242b6()
+{
+	// Targets:
+	//  - 0x0242cc	-> objA0.subtype2c = 0x00	(original subtype: 0x00)
+	//  - 0x0242ce	-> objA0.subtype2c = 0x02	(original subtype: 0x01)
+	//  - 0x0242e2	-> objA0.subtype2c = 0x04	(original subtype: 0x02)
+	//  - 0x024356	-> objA0.subtype2c = 0x06	(original subtype: 0x03)
+	//  - 0x029139	-> objA0.subtype2c = 0x08	(original subtype: 0x04)
+	//  - 0x0242ea	-> objA0.subtype2c = 0x0c	(original subtype: 0x06)
+	//  - 0x027404	-> objA0.subtype2c = 0x18	(original subtype: 0x0c)
+	//  - 0x029139	-> objA0.subtype2c = 0x1c	(original subtype: 0x0e)
+	call tableLookupAddress(0x0242c4, objA0.subtype2c)
+}
+
+
+//# address-hook(0x0242cc) end(0x0242cc)
+function void fn0242cc()
+{
+	// Empty
+}
+
+
+//# address-hook(0x0242ce) end(0x0242e0)
+function void fn0242ce()
+{
+	fn0242f6()
+	objA0.position.y.u16 = u16[A0 + 0x32] + u8[A0 + 0x34]
+}
+
+
+//# address-hook(0x0242e2) end(0x0242f4)
+function void fn0242e2()
+{
+	fn0242f6()
+	objA0.position.x.u16 = u16[A0 + 0x30] + u8[A0 + 0x34]
+}
+
+
+//# address-hook(0x0242f6) end(0x024354)
+function void fn0242f6()
+{
+	if (u16[A0 + 0x38] != 0)
+	{
+		--u16[A0 + 0x38]
+		if (u16[A0 + 0x38] == 0 && objA0.render_flags & render_flag.VISIBLE)
+		{
+			playSound(SFX_SPIKESMOVE)
+		}
+	}
+	else
+	{
+		if (u16[A0 + 0x36] != 0)
+		{
+			u16[A0 + 0x34] -= 0x800
+			if (s16[A0 + 0x34] < 0)
+			{
+				u16[A0 + 0x34] = 0
+				u16[A0 + 0x36] = 0
+				u16[A0 + 0x38] = 0x3c
+			}
+		}
+		else
+		{
+			u16[A0 + 0x34] += 0x800
+			if (u16[A0 + 0x34] >= 0x2000)
+			{
+				u16[A0 + 0x34] = 0x2000
+				u16[A0 + 0x36] = 1
+				u16[A0 + 0x38] = 0x3c
+			}
+		}
+	}
+}
+
+
+
+// FBZ Spikes
+
+//# address-hook(0x024356) end(0x024388)
+function void fn024356()
+{
+	D3.u8 = objA0.flags2a & 0x60
+	if (D3.u8 != 0)
+	{
+		// Spikes are being pushed
+		D2.u16 = objA0.position.x.u16
+
+		A1 = 0xffffb000
+		D0.u8 = u8[A0 + 0x3e]
+		D6 = 5
+		fn02438a()
+
+		A1 = 0xffffb04a
+		D0.u8 = u8[A0 + 0x3f]
+		D6 = 6
+		fn02438a()
+	}
+
+	u8[A0 + 0x3e] = u8[0xffffb02a]
+	u8[A0 + 0x3f] = u8[0xffffb074]
+}
+
+
+//# address-hook(0x02438a) end(0x0243b8)
+function void fn02438a()
+{
+	// Pushable?
+	if ((D3 & (1 << D6)) && (D2.u16 >= objA1.position.x.u16) && (D0 & 0x20))
+	{
+		--u16[A0 + 0x3a]
+		if (s16[A0 + 0x3a] < 0)
+		{
+			u16[A0 + 0x3a] = Game.getSetting(SETTING_FASTER_PUSH) ? 6 : 16
+			if (u16[A0 + 0x3c] != 0)
+			{
+				--u16[A0 + 0x3c]
+				++objA0.position.x.u16
+				++objA1.position.x.u16
+			}
+		}
+	}
+}

@@ -1,0 +1,588 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x23a03c) end(0x23a048)
+function void fn23a03c()
+{
+	u16[0xffffee68] = u16[0xffffee60]
+	u16[0xffffee6c] = u16[0xffffee64]
+}
+
+
+//# address-hook(0x23a04a) end(0x23a062)
+function void fn23a04a()
+{
+	u16[0xfffff61e] = u16[0xffffee6c] - 0x70
+	u16[0xfffff620] = u16[0xffffee74] - 0x70
+}
+
+
+//# address-hook(0x23a080) end(0x23a09c)
+function void fn23a080()
+{
+	D1.u16 = u16[A1]
+	u16[(A1+=2)-2] = D0.u16
+	D0.u16 -= D1.u16
+	if (D0.s16 < 0)
+	{
+		D0.s16 = -D0.s16
+		if (D0.u16 >= D2.u16)
+		{
+			D0.u16 -= D3.u16
+		}
+		u16[(A1+=2)-2] -= D0.u16
+	}
+	else
+	{
+		if (D0.u16 >= D2.u16)
+		{
+			D0.u16 -= D3.u16
+		}
+		u16[(A1+=2)-2] += D0.u16
+	}
+}
+
+
+
+//# address-hook(0x23a73e) end(0x23a746)
+function void fn23a73e()
+{
+	fn23a7d0()
+	A4 = 0x23aa58
+	fn23a764()
+}
+
+
+
+// Azure Lake
+
+//# address-hook(0x23a63c) end(0x23a686)
+function void fn23a63c()
+{
+	fn23a03c()
+	D0.u16 = camera.foreground.x.u16
+	u16[0xffffeeb4] = D0.u16
+	u16[0xffffeeb6] = D0.u16
+	D0.u16 = u16[0xffffee68]
+	u16[0xffffeeb8] = D0.u16
+	u16[0xffffeeba] = D0.u16
+
+	A1 = 0x23a928 + global.zone * 0x10
+	u16[0xffffeea8] = u16[(A1+=2)-2]
+	level.height.bitmask = u16[(A1+=2)-2]
+	level.height.tilemask = u16[(A1+=2)-2]
+	level.chunksize.bitmask = u16[(A1+=2)-2]
+	u16[0xffffeeb0] = u16[(A1+=2)-2]
+	D0.u16 = u16[(A1+=2)-2]
+	D2.u16 = u16[(A1+=2)-2]
+	D6.u16 = u16[(A1+=2)-2]
+	D1 = 0
+	D7.u16 = 0x8000
+	fn239bd6()
+}
+
+
+//# address-hook(0x23a68a) end(0x23a6a8)
+function void fn23a68a()
+{
+	fn23a03c()
+
+	D2.u16 = u16[0xffffeea8] + 1
+	D3.u16 = D2.u16
+	D2.u16 >>= 1
+	A1 = 0xffffeeb4
+
+	D0.u16 = camera.foreground.x.u16
+	fn23a080()
+
+	D0.u16 = u16[0xffffee68]
+	fn23a080()
+}
+
+
+// ...
+
+
+//# address-hook(0x23a6ac) end(0x23a6c8)
+function void fn23a6ac()
+{
+	// Used in CGZ
+	fn23a68a()
+	D2.u16 = level.height.bitmask + 1
+	D3.u16 = D2.u16
+	D2.u16 >>= 1
+	A1 = 0xffffeed2
+
+	D0.u16 = camera.foreground.y.u16
+	fn23a080()
+
+	D0.u16 = u16[0xffffee6c]
+	fn23a080()
+}
+
+
+//# address-hook(0x23a6cc) end(0x23a6d0)
+function void fn23a6cc()
+{
+	fn23a73e()
+	fn23a71a()
+}
+
+
+//# address-hook(0x23a6d2) end(0x23a6d6)
+function void fn23a6d2()
+{
+	fn23a748()
+	fn23a71a()
+}
+
+
+//# address-hook(0x23a6d8) end(0x23a6dc)
+function void fn23a6d8()
+{
+	fn23a796()
+	fn23a71a()
+}
+
+
+//# address-hook(0x23a6de) end(0x23a714)
+function void fn23a6de()
+{
+	// Loads the CGZ background
+	D0.u16 = camera.foreground.y.u16
+	level.display_routine = D0.u16
+	u16[0xffffeed4] = D0.u16
+	D0.u16 = u16[0xffffee6c]
+	u16[0xffffeed6] = D0.u16
+	u16[0xffffeed8] = D0.u16
+
+	D0 = ((u8[0xfffffeda] + 1) << 8) - 0x70
+	u16[0xffffeeda] = u32(0x900000) / D0.u16
+
+	fn23a752()
+	fn23a71a()
+}
+
+
+//# address-hook(0x23a716) end(0x23a716)
+function void fn23a716()
+{
+	fn23a75c()
+	fn23a71a()
+}
+
+
+//# address-hook(0x23a71a) end(0x23a73a)
+function void fn23a71a()
+{
+	u32[0xffffee3a] = u32[0xfffff61e]
+	A1 = 0x23a934 + global.zone * 0x10
+	D2.u16 = u16[(A1+=2)-2]
+	D6.u16 = u16[(A1+=2)-2]
+	D0 = 0
+	D1 = 0
+	D7.u16 = 0xa000
+	fn239bd6()
+}
+
+
+
+// Balloon Park
+
+//# address-hook(0x23a748) end(0x23a750)
+function void fn23a748()
+{
+	fn23a88e()
+	A4 = 0x23aa6e
+	fn23a764()
+}
+
+
+
+// Chrome Gadget
+
+//# address-hook(0x23a752) end(0x23a75a)
+function void fn23a752()
+{
+	fn23a924()
+	A4 = 0x23aa7c
+	fn23a764()
+}
+
+
+//# address-hook(0x23a75c) end(0x23a760)
+function void fn23a75c()
+{
+	fn23a980()
+	A4 = 0x23aa86
+	fn23a764()
+}
+
+
+//# address-hook(0x23a764) end(0x23a792)
+function void fn23a764()
+{
+	A1 = 0xffffe000
+	A6 = A4
+	A5 = 0xffffa800
+	D0.u16 = camera.background.y.u16
+	D3.u16 = camera.foreground.x.u16
+	D1 = 0x6b
+	fn239e9c()
+
+	A4 = A6
+	A5 = 0xffffa900
+	D0.u16 = u16[0xffffee74] - 4
+	D3.u16 = u16[0xffffee68]
+	D1 = 0x73
+	fn239e9c()
+
+	fn23a04a()
+}
+
+
+// Desert Palace
+
+//# address-hook(0x23a796) end(0x23a7b6)
+function void fn23a796()
+{
+	fn23a8dc()
+
+	A1 = 0xffffe000
+	D0.u16 = camera.foreground.x.u16
+	D1.u16 = camera.background.x.u16
+	D2 = 0x1a
+	fn23a7ba()
+
+	D0.u16 = u16[0xffffee68]
+	D1.u16 = u16[0xffffee70]
+	D2 = 0x1c
+	fn23a7ba()
+
+	fn23a04a()
+}
+
+
+//# address-hook(0x23a7ba) end(0x23a7ce)
+function void fn23a7ba()
+{
+	D0.s16 = -D0.s16
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1.s16 = -D1.s16
+	D0.u16 = D1.u16
+	while (D2.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = D0
+		u32[(A1+=4)-4] = D0
+		u32[(A1+=4)-4] = D0
+		u32[(A1+=4)-4] = D0
+		--D2.s16
+	}
+}
+
+
+
+// Endless Mine (?)
+
+//# address-hook(0x23a7d0) end(0x23a806)
+function void fn23a7d0()
+{
+	D0.u16 = camera.foreground.y.u16
+	fn23a808()
+	camera.background.y.u16 = D0.u16
+
+	D0.u16 = u16[0xffffee6c]
+	fn23a808()
+	u16[0xffffee74] = D0.u16
+
+	level.display_routine += 0x03
+	u32[0xffffeed4] += 0x1000
+	A4 = 0x23be5a
+
+	A1 = 0xffffa800
+	D0.u16 = u16[0xffffeeb6]
+	fn23a81e()
+
+	A1 = 0xffffa900
+	D0.u16 = u16[0xffffeeba]
+	fn23a81e()
+}
+
+
+//# address-hook(0x23a808) end(0x23a81c)
+function void fn23a808()
+{
+	D0.u16 -= 0x0148
+	D0 = (D0 << 16)
+	D1 = D0.s32 >> 2
+	D0 -= D1
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 += 0x48
+}
+
+
+//# address-hook(0x23a81e) end(0x23a88c)
+function void fn23a81e()
+{
+	D0 = (D0.s32 << 16) >> 1
+	u32[A1 + 0x90] = D0
+	D0.s32 >>= 3
+	A5 = A1 + 0x0c
+	D1 = D0.s32 >> 2
+	D2 = D1
+	D3 = u32[0xffffeed4]
+	D4 = 5
+	while (D4.s16 >= 0)
+	{
+		D1 += D3
+		u16[A5-=2] = D1 >> 16
+		D1 += D2
+		--D4.s16
+	}
+
+	D1.u16 = u16[A5+0]
+	D2.u16 = u16[A5+2]
+	D3.u16 = u16[A5+4]
+	D4.u16 = u16[A5+6]
+	D5.u16 = u16[A5+8]
+	D6.u16 = u16[A5+10]
+	u16[(A5+=2)-2] = D2.u16
+	u16[(A5+=2)-2] = D6.u16
+	u16[(A5+=2)-2] = D1.u16
+	u16[(A5+=2)-2] = D4.u16
+	u16[(A5+=2)-2] = D3.u16
+	u16[A5] = D5.u16
+
+	A5 = A1 + 0x0c
+	D1 = D0
+	D2 = D1
+	D2.s32 >>= 1
+	D3 = 2
+	while (D3.s16 >= 0)
+	{
+		u16[(A5+=2)-2] = D1 >> 16
+		D1 += D2
+		--D3.s16
+	}
+
+	D1.u16 = (level.display_routine >> 3) & 0x3e
+	A6 = A4 + D1.s16
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1 = 0x3e
+	while (D1.s16 >= 0)
+	{
+		D2.u16 = u16[(A6+=2)-2]
+		D2.u16 += D0.u16
+		u16[(A5+=2)-2] = D2.u16
+		--D1.s16
+	}
+}
+
+
+//# address-hook(0x23a88e) end(0x23a8b4)
+function void fn23a88e()
+{
+	D0.u16 = camera.foreground.y.u16
+	fn23a8b6()
+	camera.background.y.u16 = D0.u16
+
+	D0.u16 = u16[0xffffee6c]
+	fn23a8b6()
+	u16[0xffffee74] = D0.u16
+
+	A1 = 0xffffa80e
+	D0.u16 = u16[0xffffeeb6]
+	fn23a8c2()
+
+	A1 = 0xffffa90e
+	D0.u16 = u16[0xffffeeba]
+	fn23a8c2()
+
+	fn23a8b6()
+}
+
+
+//# address-hook(0x23a8b6) end(0x23a8c0)
+function void fn23a8b6()
+{
+	D0.u16 = 0x90 + ((D0.s16 - 0x02c8) >> 1)
+}
+
+
+//# address-hook(0x23a8c2) end(0x23a8da)
+function void fn23a8c2()
+{
+	D0 = s32(D0 << 16) >> 1
+	D1 = D0.s32 >> 3
+	for (u8 i = 0; i < 7; ++i)
+	{
+		u16[A1-=2] = D0 >> 16
+		D0 -= D1
+	}
+}
+
+
+//# address-hook(0x23a8dc) end(0x23a910)
+function void fn23a8dc()
+{
+	D0.u16 = camera.foreground.y.u16
+	fn23a912()
+	camera.background.y.u16 = D0.u16
+
+	D0.u16 = u16[0xffffee6c]
+	fn23a912()
+	D0.u16 += 0x80
+	u16[0xffffee74] = D0.u16
+
+	D0.u16 = u16[0xffffeeb6]
+	fn23a91c()
+	camera.background.x.u16 = D0.u16
+	u16[0xffffeee2] = D1.u16
+
+	D0.u16 = u16[0xffffeeba]
+	fn23a91c()
+	u16[0xffffee70] = D0.u16
+	u16[0xffffeee4] = D1.u16
+}
+
+
+//# address-hook(0x23a912) end(0x23a91a)
+function void fn23a912()
+{
+	D0.u16 = (s16(D0.u16 - 0x0148) >> 4) + 8
+}
+
+
+//# address-hook(0x23a91c) end(0x23a922)
+function void fn23a91c()
+{
+	D0.s16 >>= 1
+	D1.u16 = D0.s16 >> 2
+}
+
+
+//# address-hook(0x23a924) end(0x23a95a)
+function void fn23a924()
+{
+	D0.u16 = u16[0xffffeed4]
+	fn23a94c()
+	camera.background.y.u16 = D0.u16
+
+	D0.u16 = u16[0xffffeed8]
+	fn23a94c()
+	u16[0xffffee74] = D0.u16
+
+	A1 = 0xffffa80a
+	D0.u16 = u16[0xffffeeb6]
+	fn23a95c()
+
+	A1 = 0xffffa90a
+	D0.u16 = u16[0xffffeeba]
+	fn23a95c()
+
+	fn23a94c()
+}
+
+
+//# address-hook(0x23a94c) end(0x23a95a)
+function void fn23a94c()
+{
+	if (D0.s16 >= 0)
+	{
+		D1.u16 = u16[0xffffeeda]
+		D0 = u32(D0.u16) * D1.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+	}
+	else
+	{
+		D0 = 0
+	}
+}
+
+
+//# address-hook(0x23a95c) end(0x23a97e)
+function void fn23a95c()
+{
+	D0 = s32(D0 << 16) >> 1
+	D1 = D0.s32 >> 2
+	for (u8 i = 0; i < 4; ++i)
+	{
+		u16[A1-=2] = D0 >> 16
+		D0 -= D1
+	}
+
+	D1.s32 >>= 2
+	D1 = (D1 << 16) + (D1 >> 16)
+	D1.u16 += 0x0100
+	u16[A1-=2] = D1.u16
+}
+
+
+
+// Endless Mine
+
+//# address-hook(0x23a980) end(0x23a9a6)
+function void fn23a980()
+{
+	D0.u16 = camera.foreground.y.u16
+	fn23a9a8()
+	camera.background.y.u16 = D0.u16
+
+	D0.u16 = u16[0xffffee6c]
+	fn23a9a8()
+	u16[0xffffee74] = D0.u16
+
+	A1 = 0xffffa800
+	D0.u16 = u16[0xffffeeb6]
+	fn23a9be()
+
+	A1 = 0xffffa900
+	D0.u16 = u16[0xffffeeba]
+	fn23a9be()
+
+	fn23a9a8()
+}
+
+
+//# address-hook(0x23a9a8) end(0x23a9bc)
+function void fn23a9a8()
+{
+	D0.u16 -= 0x0148
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 = 0
+	D1 = D0
+	D1.s32 >>= 2
+	D0 -= D1
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 += 0x48
+}
+
+
+//# address-hook(0x23a9be) end(0x23aa06)
+function void fn23a9be()
+{
+	D0 = s32(D0 << 16) >> 3
+	D1 = D0
+	u16[A1 + 0x0e] = D0 >> 16
+	D0 += D1
+	u16[A1 + 0x0c] = D0 >> 16
+	u16[A1 + 0x10] = D0 >> 16
+	D0 += D1
+	u16[A1 + 0x06] = D0 >> 16
+	u16[A1 + 0x0a] = D0 >> 16
+	u16[A1 + 0x12] = D0 >> 16
+	D0 += D1
+	u16[A1]        = D0 >> 16
+	u16[A1 + 0x04] = D0 >> 16
+	u16[A1 + 0x08] = D0 >> 16
+	D0 += D1
+	D0 = (D0 << 16) + (D0 >> 16)
+	u16[A1 + 0x02] = D0.u16
+}

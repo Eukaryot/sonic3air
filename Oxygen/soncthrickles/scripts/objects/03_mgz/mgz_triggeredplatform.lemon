@@ -1,0 +1,142 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x034574) end(0x0345fa)
+function void fn034574()
+{
+	D1.u16 = (objA0.subtype2c & 0xf0) >> 2
+	A1 = 0x034568 + D1.s16
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	objA0.animation.sprite = u8[(A1+=1)-1]
+	u16[A0 + 0x30] = u8[(A1+=1)-1]
+	D1.u16 >>= 2
+	u16[A0 + 0x34] = D1.u16
+	objA0.mapping_offset = 0x2339b2
+	objA0.sprite_attributes = 0x4001
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x36] = objA0.position.x.u16
+
+	if (D1.u16 != 0)
+	{
+		D0.u16 = objA0.subtype2c & 0x0f
+		A3 = 0xfffff7e0
+		if (u8[A3 + D0.s16] != 0)
+		{
+			D0.u16 = u16[A0 + 0x34]
+			if (objA0.flags2a & 0x01)
+			{
+				D0.s16 = -D0.s16
+			}
+
+			while (true)
+			{
+				objA0.position.y.u16 += D0.u16
+
+				--u16[A0 + 0x30]
+				if (u16[A0 + 0x30] == 0)
+					break
+			}
+			u8[A0 + 0x32] = 0xff
+		}
+
+		objA0.update_address = 0x03466e
+		fn03466e()
+	}
+	else
+	{
+		objA0.update_address = 0x034600
+		fn034600()
+	}
+}
+
+
+//# address-hook(0x034600) end(0x034668)
+function void fn034600()
+{
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	if (u8[A3 + D0.s16] != 0)
+	{
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			objA0.position.x.u16 = 0x7f00
+			u16[A0 + 0x36] = 0x7f00
+			objA0.respawn_entry = 0
+			camera.screenshake.state = 0
+		}
+		else
+		{
+			D0 = (objA0.flags2a & 0x01) ? -2 : 2
+			objA0.position.x.u16 += D0.u16
+			camera.screenshake.state = 0xffff
+		}
+	}
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u16 = u16[A0 + 0x36]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x03466e) end(0x0346dc)
+function void fn03466e()
+{
+	bool skipCheck = false
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	if (u8[A3 + D0.s16] != 0)
+	{
+		if (u8[A0 + 0x32] & 0x80)
+		{
+			skipCheck = true
+		}
+		else
+		{
+			u8[A0 + 0x32] = 1
+		}
+	}
+
+	if (!skipCheck && s8[A0 + 0x32] > 0)
+	{
+		D0.u16 = u16[A0 + 0x34]
+		if (objA0.flags2a & 0x01)
+		{
+			D0.s16 = -D0.s16
+		}
+		objA0.position.y.u16 += D0.u16
+
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			u8[A0 + 0x32] = 0xff
+			camera.screenshake.state = 0
+		}
+		else
+		{
+			camera.screenshake.state = 0xffff
+		}
+	}
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}

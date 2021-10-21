@@ -1,0 +1,94 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Spikey Ice Crystal                                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b4ca) end(0x08b4ca)
+function void fn08b4ca()
+{
+	Object.InitWithUpdateAddress(0x08b4ce)
+}
+
+
+//# address-hook(0x08b4ce) end(0x08b4e8)
+function void fn08b4ce()
+{
+	if (objA0.subtype2c == 0)
+	{
+		// Semi-circle variant that is hanging on many walls
+		A1 = 0x08b532
+		objA0.update_address = 0x085140   // That's just "Enemy.DrawOrUnload"
+	}
+	else
+	{
+		// Smaller round destructible variant (only in Knuckles' ICZ1 route)
+		A1 = 0x08b53e
+		objA0.update_address = 0x08b4ec
+	}
+
+	SetupObjectAttributesFull()
+}
+
+
+//# address-hook(0x08b4ec) end(0x08b526)
+function void fn08b4ec()
+{
+	D0 = u8[A0 + 0x29]
+	if (D0.u8 == 0)
+	{
+		Enemy.DrawOrUnload()
+		return
+	}
+
+	D0.u16 *= 2
+	A1 = 0xffff0000 + u16[0x08b52a + D0.s16]
+#if STANDALONE
+	// Also check for:
+	//  - Invulnerability frames
+	//  - And for the fire shield
+	if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0 && (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE) == 0)
+#else
+	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+#endif
+	{
+		A2 = A0
+		A0 = A1
+		Character.GettingHurt()
+		A0 = A2
+	}
+
+	spawnSimpleChildObjects(0x08b54a)
+	Object.TriggerUnloading()
+	playSound(0x80)
+	DrawObject()
+}
+
+
+//# address-hook(0x08b230) end(0x08b266)
+function void fn08b230()
+{
+	setupObjectAttributesFull(0x08b286)
+
+	objA0.update_address = 0x0856cc
+	u32[A0 + 0x30] = 0x08ab46
+	if (objA0.subtype2c < 0x06)
+	{
+		u32[A0 + 0x30] = 0x08ab3e
+	}
+
+	GetRandomNumber()
+	D0.u8 &= 0x03
+	objA0.animation.frame = D0.u8
+
+	D0 = 0
+	fn0852d0()
+}

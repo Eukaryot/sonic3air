@@ -1,0 +1,339 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Hidden Palace Zone                                    //
+//-------------------------------------------------------//
+
+//# address-hook(0x05a12e) end(0x05a152)
+function void InitLevelTiles.HPZ()
+{
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		move_area.right = 0x0aa0 + getScreenExtend()
+
+		#if STANDALONE
+			// Hide some chunks to the right
+			u8[0xffff8170] = 0
+			u8[0xffff81a4] = 0
+		#endif
+	}
+	else
+	{
+		if (u16[0xffffb014] < 0x0480)
+		{
+			move_area.left = 0x0aa0 - getScreenExtend()
+		}
+	}
+
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x05a158) end(0x05a19e)
+function void InitLevelScrolling.HPZ()
+{
+	if (level.display_routine == 0 && global.fade_timer == 0)
+	{
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x0656a8
+		}
+		u8[0xffffeed2] = 0xff
+	}
+
+	camera.foreground.y.u16 += camera.screenshake.offset
+
+	if (u16[0xffffeec4] != 0)
+	{
+		u16[0xffffeec4] = 0
+		A1 = 0xffff0000 + u16[A3 + 0x1c]
+		u8[A1 + 0x30] = 0x61
+		u8[A1 + 0x31] = 0x61
+		fn04ed62()
+	}
+	else
+	{
+		LoadTileContentDefault()
+	}
+}
+
+
+//# address-hook(0x05a1a4) end(0x05a206)
+function void UpdateLevelTiles.HPZ()
+{
+	u16[A3 + 0x18] = u16[A3 + 0x14]
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		A1 = 0xffff0000 + u16[A3 + 0x04]
+		u8[A1 + 0x03] = 0x8e
+		u8[A1 + 0x04] = 0x8f
+	}
+
+	if (u16[0xffffb010] < 0x0ec0)
+	{
+		fn05a32c()
+	}
+	else
+	{
+		level.scrolling_routine = 8
+		fn05a334()
+	}
+
+	fn04f2f6()
+
+	A1 = 0xffffa800
+	u16[A1+2] = u16[A1] & 0xfff0
+	u16[A1+6] = u16[A1+4] & 0xfff0
+
+	A4 = 0x05a39c
+	A5 = 0xffffa800
+	fn04ecec()
+
+	A4 = 0x05a3a0
+	A5 = 0xffffa808
+	fn04f0ce()
+}
+
+
+//# address-hook(0x05a20c) end(0x05a210)
+function void UpdateLevelScrolling.HPZ()
+{
+	D0.u16 = level.scrolling_routine
+	call 0x05a214 + D0.s16
+}
+
+
+//# address-hook(0x05a214) end(0x05a214)
+function void fn05a214()
+{
+	fn05a224()
+}
+
+//# address-hook(0x05a218) end(0x05a218)
+function void fn05a218()
+{
+	fn05a288()
+}
+
+//# address-hook(0x05a21c) end(0x05a21c)
+function void fn05a21c()
+{
+	fn05a2a6()
+}
+
+//# address-hook(0x05a220) end(0x05a220)
+function void fn05a220()
+{
+	fn05a30a()
+}
+
+
+//# address-hook(0x05a224) end(0x05a25e)
+function void fn05a224()
+{
+	if (u16[0xffffb010] >= 0x0ec0)
+	{
+		fn05a334()
+		fn04f2f6()
+
+		A1 = 0xffffa800
+		u16[A1+2] = u16[A1] & 0xfff0
+		u16[A1+6] = u16[A1+4] & 0xfff0
+
+		u16[0xffffeec8] = (D0.u16 + getScreenHeight()) & level.height.tilemask
+		u16[0xffffeeca] = 0x0f
+		level.scrolling_routine += 4
+
+		fn05a288()
+	}
+	else
+	{
+		fn05a32c()
+		fn05a262()
+	}
+}
+
+
+//# address-hook(0x05a262) end(0x05a282)
+function void fn05a262()
+{
+	A4 = 0x05a39c
+	A5 = 0xffffa800
+	D6 = 0x20
+	D5 = 2
+	fn04edf6()
+
+	A4 = 0x05a3a0
+	A5 = 0xffffa808
+	fn04f0ce()
+	UpdateScreenShake()
+}
+
+
+//# address-hook(0x05a288) end(0x05a288)
+function void fn05a288()
+{
+	fn05a334()
+	fn05a28c()
+}
+
+
+//# address-hook(0x05a28c) end(0x05a2a4)
+function void fn05a28c()
+{
+	A4 = 0x05a39c
+	A5 = 0xffffa7fc
+	D1.u16 = camera.background.y.u16
+	fn04f030()
+	if (_negative())
+	{
+		level.scrolling_routine += 4
+	}
+
+	fn05a2e4()
+}
+
+
+//# address-hook(0x05a2a6) end(0x05a2e0)
+function void fn05a2a6()
+{
+	if (u16[0xffffb010] < 0x0ec0)
+	{
+		fn05a32c()
+		fn04f2f6()
+
+		A1 = 0xffffa800
+		u16[A1+2] = u16[A1] & 0xfff0
+		u16[A1+6] = u16[A1+4] & 0xfff0
+
+		u16[0xffffeec8] = (D0.u16 + getScreenHeight()) & level.height.tilemask
+		u16[0xffffeeca] = 0x0f
+		level.scrolling_routine += 4
+
+		fn05a30e()
+	}
+	else
+	{
+		fn05a334()
+		fn05a2e4()
+	}
+}
+
+
+//# address-hook(0x05a2e4) end(0x05a304)
+function void fn05a2e4()
+{
+	A4 = 0x05a39c
+	A5 = 0xffffa800
+	D6 = 0x20
+	D5 = 0x02
+	fn04edf6()
+
+	A4 = 0x05a3a0
+	A5 = 0xffffa808
+	fn04f0ce()
+	UpdateScreenShake()
+}
+
+
+//# address-hook(0x05a30a) end(0x05a30a)
+function void fn05a30a()
+{
+	fn05a32c()
+	fn05a30e()
+}
+
+
+//# address-hook(0x05a30e) end(0x05a328)
+function void fn05a30e()
+{
+	A4 = 0x05a39c
+	A5 = 0xffffa7fc
+	D1.u16 = camera.background.y.u16
+	fn04f030()
+	if (_negative())
+	{
+		level.scrolling_routine = 0
+	}
+	fn05a262()
+}
+
+
+//# address-hook(0x05a32c) end(0x05a332)
+function void fn05a32c()
+{
+	D2.u16 = 0x0348
+	D3 = 0
+	UpdateBackground.HPZ()
+}
+
+
+//# address-hook(0x05a334) end(0x05a338)
+function void fn05a334()
+{
+	D2.u16 = 0x0e00
+	D3.u16 = 0x0700
+	UpdateBackground.HPZ()
+}
+
+
+//# address-hook(0x05a33c) end(0x05a39a)
+function void UpdateBackground.HPZ()
+{
+	D0.u16 = camera.foreground.y.u16 - camera.screenshake.offset + D3.u16
+	D0 <<= 16
+	D0.s32 >>= 4
+	D0 *= 3
+	D0 >>= 16
+	camera.background.y.u16 = D0.u16 + camera.screenshake.offset
+
+	D0.u16 = camera.foreground.x.u16 - D2.u16
+	D0 = (D0 << 16)
+	D2 = D0
+	D0.s32 >>= 4
+	D0 *= 3
+	D0 = (D0 << 16) + (D0 >> 16)
+	u16[0xffffa800] = D0.u16
+	u16[0xffffa808] = D0.u16
+
+	A1 = 0xffffa81c
+	D0 = D2
+	D2.s32 >>= 2
+	D0 -= D2
+	D2.s32 >>= 2
+	D1 = 8
+	while (D1.s16 >= 0)
+	{
+		u16[A1-=2] = D0 >> 16
+		D0 -= D2
+		--D1.s16
+	}
+
+	u16[0xffffa804] = u16[0xffffa81a]
+}
+
+
+
+// Some object used only in HPZ?
+
+//# address-hook(0x0656a8) end(0x0656d0)
+function void fn0656a8()
+{
+	D0.u16 = u16[A0 + 0x3a]
+	D1 = (camera.position.x.u16 >= 0x0460) ? 4 : 0
+	u16[A0 + 0x3a] = D1.u16
+	if (D1.u16 != D0.u16)
+	{
+		A1 = u32[0x0656d2 + D1.s16]
+		copyMemory(0xfffffc20, A1, 0x60)
+	}
+}

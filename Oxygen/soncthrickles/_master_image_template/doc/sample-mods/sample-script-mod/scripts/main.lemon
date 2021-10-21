@@ -1,0 +1,82 @@
+
+// This is a basic sample script that gives Tails unlimited flight in his Super/Hyper forms
+
+global u8 option.tails.flight_gravity
+global u8 option.require_super
+
+
+// Overload the original function "UpdateTailsFlight"
+
+function void UpdateTailsFlight()
+{
+#if !GAMEAPP
+	// Log a value to see:
+	//  - If this function gets called
+	//  - If Tails is Super/Hyper Tails
+	Log = super.active.tails
+#endif
+
+	if (super.active.tails != 0 || !option.require_super)
+	{
+		// This code makes sure that the original function won't ever reach a countdown value of zero when decreasing the value
+		if (tails.flight_countdown < 2)
+		{
+			tails.flight_countdown = 2
+		}
+	}
+	
+	char.velocity.y += option.tails.flight_gravity - 0x08	// 0x08 is the usual gravity for Tails during flight
+
+	// Execute the original function
+	base.UpdateTailsFlight()
+}
+
+
+
+// Also overload the original function "Init" that gets called by the engine after script loading
+
+function void Init()
+{
+	// Execute the original function
+	base.Init()
+
+#if !GAMEAPP
+	// Enable debug mode, but only when running in Oxygen
+	debug_mode.enabled = 1
+#endif
+}
+
+
+
+// This function is not used, it's only an example of how the "Renderer.drawCustomSpriteWithTransform" can be used
+
+function void example_drawWithTransform()
+{
+	u64 key = "charselect_sonic"
+	s32 px = 320
+	s32 py = 60
+	u8 atex = 0
+	u8 flags = 0x40
+	u16 renderQueue = 0xa000
+
+	// Rotation angle in radians, using a signed 16.16 fixed point number, i.e. 0x10000 equals 1 rad (around 57.3 degrees)
+	//  -> A full rotation needs (0x10000 / 0x400 * 2 * pi) = around 402 frames, or between 6 and 7 seconds
+	s32 rotation = s32(global.framecounter) * 0x400
+
+	// Sine and cosine using signed 16.16 as well fixed point number
+	s32 sin = sin_s32(rotation)
+	s32 cos = cos_s32(rotation)
+
+	// Scale, slowly changing over time, also using a sine curve
+	//  -> Note that this is also a 16.16 fixed point number, but stored as 64-bit because it's needed for the calculations below
+	//  -> And yes, we're using a non-uniform scaling (that is different in x and y direction)
+	s64 scaleX = 0x20000 + sin_s32(rotation / 3)
+	s64 scaleY = 0x20000 + cos_s32(rotation / 2)
+
+	// Build a rotation matrix while additional scaling applied
+	s32 m11 =  cos * scaleX / 0x10000
+	s32 m12 = -sin * scaleY / 0x10000
+	s32 m21 =  sin * scaleX / 0x10000
+	s32 m22 =  cos * scaleY / 0x10000
+	Renderer.drawCustomSpriteWithTransform(key, px, py, atex, flags, renderQueue, 0xffffffff, m11, m12, m21, m22)
+}

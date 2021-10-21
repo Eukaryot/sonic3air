@@ -1,0 +1,145 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Snow lying around in IceCap Zone                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b550) end(0x08b550)
+function void ICZSnow.Init()
+{
+	Object.InitWithUpdateAddress(0x08b554)
+}
+
+
+//# address-hook(0x08b554) end(0x08b56a)
+function void ICZSnow.Init2()
+{
+	D0 = objA0.subtype2c & ~0x80
+	A2 = 0x08b7f4 + D0.s16
+	objA0.update_address = u32[A2]
+	A1 = u32[A2+4]
+	A2 += 8
+	SetupObjectAttributesFull()
+}
+
+
+//# address-hook(0x08b56e) end(0x08b58c)
+function void ICZSnow.Update()
+{
+	A1 = 0x08b590
+	fn0858f8()
+	if (D0 != 0)
+	{
+		if (D0.u16 != 0)
+		{
+			if (fn08b598())
+				return
+		}
+		D0 = (D0 << 16) + (D0 >> 16)
+		if (D0.u16 != 0)
+		{
+			if (fn08b598())
+				return
+		}
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+//# translated(0x08b598) end(0x08b5da)
+function bool fn08b598()
+{
+	A3 = 0xffff0000 + D0.u16
+	u16[A0 + 0x44] = D0.u16
+
+#if STANDALONE
+	// Support Super Peel-Out as well
+	if (u8[A3 + 0x20] != char.state.SPINDASH && (u8[A3 + 0x3d] & 0x80) == 0)
+#else
+	if (u8[A3 + 0x20] != char.state.SPINDASH)
+#endif
+	{
+		if (u8[A3 + 0x2a] & char.flag.IN_AIR)
+			return false
+
+		// Get stopped if not fast enough to blow the snow away
+		D3.s16 = s16[A3 + 0x18]
+		if (abs(D3.s16) < 0x0600)
+		{
+			D3.s16 >>= 1
+			u16[A3 + 0x1c] = D3.u16
+			return false
+		}
+	}
+
+	u16[A0 + 0x44] = A3.u16
+	spawnChildObjects(0x08b84c)
+	Object.TriggerUnloading()
+	return true
+}
+
+
+// Get blown away by a character
+
+//# address-hook(0x08b768) end(0x08b78a)
+function void fn08b768()
+{
+	setupObjectAttributesMost(0x08b844)
+	objA0.update_address = 0x08b786
+	objA0.countdown_callback = 0x08b790
+	fn08b7a0()
+	MoveAndFlipWithParent()
+	fn08b786()
+}
+
+//# address-hook(0x08b786)
+function void fn08b786()
+{
+	Object.CountdownAndTrigger()
+	DrawObject()
+}
+
+
+//# address-hook(0x08b7a0) end(0x08b7da)
+function void fn08b7a0()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = u16[A1 + 0x44]
+	if (D0.u16 != 0)
+	{
+		A2 = 0xffff0000 + D0.u16
+		A3 = 0x08b7dc
+		D0 = objA0.subtype2c
+		objA0.countdown_value = D0.u16
+		u32[A0 + 0x18] = u32[A3 + D0.s16 * 2]
+		if (u8[A2 + 0x04] & render_flag.FLIP_X)
+		{
+			objA0.render_flags |= render_flag.FLIP_X
+			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA0.velocity.x = -objA0.velocity.x
+		}
+	}
+}
+
+
+//# address-hook(0x08b790) end(0x08b796)
+function void fn08b790()
+{
+	objA0.update_address = 0x08b798
+}
+
+
+//# address-hook(0x08b798) end(0x08b79c)
+function void fn08b798()
+{
+	MoveWithGravity20()
+	fn0850d4()
+}

@@ -1,0 +1,1053 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Shared Code for Bosses                                //
+//-------------------------------------------------------//
+
+//# address-hook(0x085ba8) end(0x085bc6)
+function void fn085ba8()
+{
+	objA0.update_address = 0x085bd6
+	objA0.flags38 |= 0x10
+	objA0.countdown_value = 119
+	objA0.countdown_callback = 0x085bda
+	level.wait_for_results = 0xff
+}
+
+
+//# address-hook(0x085bd6) end(0x085bd6)
+function void fn085bd6()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x085bda) end(0x085bf6)
+function void fn085bda()
+{
+	objA0.update_address = 0x085c00
+	level.boss_encounter = 0
+
+	// Spawn the sign post
+	//  -> One object with update address 0x0837b2
+	spawnSimpleChildObjects(0x085bfa)
+
+	addPatternLoadingCue(0x085bc8)
+
+	fn083c06()
+}
+
+
+
+//# address-hook(0x085c7e) end(0x085ca2)
+function void fn085c7e()
+{
+	move_area.left = camera.position.x.u16
+	if (move_area.bottom.target >= move_area.bottom.current)
+	{
+		level.vertical_wrap = move_area.bottom.target
+		if (camera.position.x.u16 >= u16[A0 + 0x3a])
+		{
+			A1 = objA0.countdown_callback
+			call A1
+		}
+	}
+}
+
+
+//# address-hook(0x085ca4) end(0x085d68)
+function void CheckForBossStart()
+{
+	// Condition 1: Countdown (can be zero from start)
+	if ((u8[A0 + 0x27] & 0x01) == 0)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value < 0)
+		{
+			u8[A0 + 0x27] |= 0x01
+			level.default_music.u8 = objA0.value26
+			playMusic(objA0.value26)
+		}
+	}
+
+	// Condition 2: Camera Y position
+	if ((u8[A0 + 0x27] & 0x02) == 0)
+	{
+		bool fulfilled = false
+		if (u8[A0 + 0x27] & 0x80)
+		{
+			fulfilled = (camera.position.y.u16 <= level.bossarea.bottom + 0x60)
+		}
+		else
+		{
+			fulfilled = (camera.position.y.u16 >= level.bossarea.top)
+			level.vertical_wrap = camera.position.y.u16		// To be overwritten if condition fulfilled
+		}
+
+		if (fulfilled)
+		{
+			u8[A0 + 0x27] |= 0x02
+			level.vertical_wrap = level.bossarea.top
+			move_area.bottom.target = level.bossarea.bottom
+		}
+	}
+
+	// Condition 3: Camera X position
+	if ((u8[A0 + 0x27] & 0x04) == 0)
+	{
+		bool fulfilled = false
+		if (u8[A0 + 0x27] & 0x40)
+		{
+			fulfilled = (camera.position.x.u16 > level.bossarea.right)
+			move_area.right = camera.position.x.u16
+		}
+		else
+		{
+			fulfilled = (camera.position.x.u16 >= level.bossarea.left)
+			move_area.left = camera.position.x.u16
+		}
+
+		if (fulfilled)
+		{
+			u8[A0 + 0x27] |= 0x04
+			move_area.left = level.bossarea.left
+			move_area.right = level.bossarea.right
+		}
+	}
+
+	// All conditions must be fulfilled to pass, and actually start the boss fight
+	if ((u8[A0 + 0x27] & 0x07) != 0x07)
+		return
+
+	u8[A0 + 0x27] = 0
+	u16[A0 + 0x1c] = 0
+	objA0.value26 = 0
+
+	A1 = objA0.countdown_callback
+	call A1
+}
+
+
+
+//# address-hook(0x085668) end(0x085692)
+function void fn085668()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		objA0.render_flags &= ~render_flag.VISIBLE
+		objA0.countdown_value = 119
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x085b0a
+		}
+
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+
+#if STANDALONE
+
+//# address-hook(0x08566a)
+function void fn08566a()
+{
+	// Same as above, but without music fade-out (used after Big Arms)
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		objA0.render_flags &= ~render_flag.VISIBLE
+		objA0.countdown_value = 119
+
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+#endif
+
+
+//# address-hook(0x085694) end(0x0856b0)
+function void fn085694()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		objA0.render_flags &= ~render_flag.VISIBLE
+		objA0.countdown_value = 119
+
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+
+//# address-hook(0x0856b2) end(0x0856bc)
+function void fn0856b2()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x0856c4) end(0x0856c8)
+function void fn0856c4()
+{
+	fn08459c()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x0856cc) end(0x0856cc)
+function void fn0856cc()
+{
+	Object.AnimationProgressByLocalA1()
+	fn0856d0()
+}
+
+
+//# address-hook(0x0856d0) end(0x0856d6)
+function void fn0856d0()
+{
+	UpdateMovementSimple()
+	fn0850d4()
+}
+
+
+//# address-hook(0x0856de) end(0x0856e4)
+function void fn0856de()
+{
+	UpdateMovementSimple()
+	fn085180()
+}
+
+
+//# address-hook(0x0856e8) end(0x0856ee)
+function void fn0856e8()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x0856f2) end(0x0856fc)
+function void fn0856f2()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+
+//# address-hook(0x085940) end(0x08594c)
+function void LoadPaletteLine1()
+{
+	// Loads palette colors 0x10 .. 0x1f
+	copyMemory(0xfffffc20, A1, 0x20)
+}
+
+
+function void loadPaletteLine1(u32 sourceAddress)
+{
+	// Loads palette colors 0x10 .. 0x1f
+	copyMemory(0xfffffc20, sourceAddress, 0x20)
+}
+
+
+
+function void Boss.updateHitFlashing(u8 numColors, u32 destAddresses, u32 sourceAddress)
+{
+	Boss.updateHitFlashing(numColors, destAddresses, sourceAddress, sourceAddress + numColors * 2, objA0.state)
+}
+
+function void Boss.updateHitFlashing(u8 numColors, u32 destAddresses, u32 sourceAddress1, u32 sourceAddress2)
+{
+	Boss.updateHitFlashing(numColors, destAddresses, sourceAddress1, sourceAddress2, objA0.state)
+}
+
+//# translated(0x085a90) end(0x085aac)
+function void Boss.updateHitFlashing(u8 numColors, u32 destAddresses, u32 sourceAddress1, u32 sourceAddress2, u8 flashcounter)
+{
+	// Update palette during flashing when boss got hit
+#if STANDALONE
+	if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+	{
+		u8 value = (flashcounter + 0x0f) & 0x0f
+		u16 blendFactor = (value <= 12) ? (value * 0x14) : ((0x10 - value) * 0x3c)
+		for (u8 i = 0; i < numColors; ++i)
+		{
+			u16 color1 = u16[sourceAddress1 + i * 2]
+			u16 color2 = u16[sourceAddress2 + i * 2]
+			u32 dst = 0xffff0000 + u16[destAddresses + i * 2]
+			u16[dst] = blendColorsPacked(color1, color2, blendFactor)
+		}
+	}
+	else
+#endif
+	{
+		if ((flashcounter & 0x01) == 0)
+			sourceAddress1 = sourceAddress2
+
+		for (u8 i = 0; i < numColors; ++i)
+		{
+			u32 dst = 0xffff0000 + u16[destAddresses + i * 2]
+			u16[dst] = u16[sourceAddress1 + i * 2]
+		}
+	}
+}
+
+
+
+// Not sure if this is shared code (taken from AIZ 2 boss)
+
+//# address-hook(0x0694a4) end(0x0694a4)
+function void fn0694a4()
+{
+	objA0.update_address = 0x0694d4
+	fn0694aa()
+}
+
+
+//# address-hook(0x0694aa) end(0x0694ce)
+function void fn0694aa()
+{
+	level.wait_for_results = 0xff
+	level.boss_encounter = 0
+
+	addPatternLoadingCue(0x083d74)
+
+	spawnSimpleChildObjects(0x069d8c)
+
+	u8[A1 + 0x04] |= render_flag.FLIP_Y
+	StartLoadingPatternsForZone()
+}
+
+
+//# address-hook(0x0694d4) end(0x069520)
+function void fn0694d4()
+{
+	if (level.wait_for_results)
+		return
+
+	objA0.update_address = 0x069526
+	stopCharacterWinPose(0xffffb000)
+	stopCharacterWinPose(0xffffb04a)
+
+	PlayMusicAfterLevelResults()
+	player1.control_override = 0xff
+	control.player1 = 0
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x0863c0
+	}
+
+	D0.u16 = u16[0xfffffa84] + 0x0158
+	screenmover_target.right = D0.u16
+	spawnSimpleChildObjects(0x084b00)
+}
+
+
+
+//# address-hook(0x083c06) end(0x083c18)
+function void fn083c06()
+{
+	// Cleanup after boss
+	//  -> Interesting read on this function: https://s3unlocked.blogspot.com/2017/09/after-boss-cleanup.html
+
+	A1 = 0xfffffe12		// Is this even needed?
+	D0 = (global.zone * 2) + global.act
+
+	// Targets:
+	//  - 0x083c7c		-> AIZ 1
+	//  - 0x083c90		-> AIZ 2
+	//  - 0x083ca6		-> HCZ 1
+	//  - 0x083ca8		-> HCZ 2
+	//  - 0x083caa		-> MGZ 1+2
+	//  - 0x083cb2		-> CNZ 1+2, FBZ 1+2, ICZ 1
+	//  - 0x083cb4		-> ICZ 2
+	//  - 0x083cc0		-> LBZ 1+2, MHZ 1+2
+	//  - 0x083ccc		-> SOZ and everything afterwards
+	call tableLookupAddress(0x083c1c, D0.u8 * 2)
+}
+
+
+//# address-hook(0x083c7c) end(0x083c8e)
+function void fn083c7c()
+{
+	// Loads palette colors 0x10 .. 0x3f
+	copyMemory(0xfffffc20, 0x0a8b7c, 0x60)
+}
+
+
+//# address-hook(0x083c90) end(0x083ca0)
+function void fn083c90()
+{
+	loadPaletteLine1(0x0a8bdc)
+
+	addPatternLoadingCue(0x083cce)
+}
+
+
+//# address-hook(0x083ca6) end(0x083ca6)
+function void fn083ca6()
+{
+}
+
+
+//# address-hook(0x083ca8) end(0x083cac)
+function void fn083ca8()
+{
+	addPatternLoadingCue(0x083d3a)
+}
+
+
+//# address-hook(0x083cb2) end(0x083cb2)
+function void fn083cb2()
+{
+}
+
+
+//# address-hook(0x083cb4) end(0x083cba)
+function void fn083cb4()
+{
+	loadPaletteLine1(0x0a91bc)
+}
+
+
+//# address-hook(0x083cc0) end(0x083cc6)
+function void fn083cc0()
+{
+#if STANDALONE
+	// Doing this in LBZ introduces a brief palette glitch
+	if (global.zone == 0x06)
+		return
+#endif
+
+	loadPaletteLine1(0x0a949c)
+}
+
+
+//# address-hook(0x083ccc) end(0x083ccc)
+function void fn083ccc()
+{
+}
+
+
+
+//# address-hook(0x083d84) end(0x083dac)
+function void fn083d84()
+{
+	// This lookup table returns "0x083e08 + objA0.subtype2c * 2" in all known cases
+	A1 = tableLookupAddress(0x083de6, objA0.subtype2c)
+	objA0.value39 = u8[A1]
+	objA0.value3a = u8[A1+1]
+	objA0.value3b = u8[A1+2]
+	u32 offset = u8[A1+3]
+
+	A1 = 0x083dae + offset
+	A2 = u32[A1]
+	objA0.update_address = A2
+	objA0.countdown_callback = u32[A1+4]
+	call A2
+}
+
+
+
+// On destruction
+
+//# address-hook(0x083e4c) end(0x083e6c)
+function void fn083e4c()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x20 || u32[A1] == 0)
+	{
+		Object.TriggerUnloading()
+	}
+	else
+	{
+		objA0.position.x.u16 = objA1.position.x.u16
+		objA0.position.y.u16 = objA1.position.y.u16
+		Object.CountdownAndTrigger()
+	}
+}
+
+
+//# address-hook(0x083e70) end(0x083ec2)
+function void fn083e70()
+{
+	if (s8(objA0.value39) >= 0)
+	{
+		--objA0.value39
+		if (objA0.value39 == 0)
+		{
+			Object.TriggerUnloading()
+			return
+		}
+	}
+
+	objA0.countdown_value = 2
+	fn083e84()
+}
+
+
+//# address-hook(0x083e84)
+function void fn083e84()
+{
+	spawnSimpleChildObjects(0x083fdc)
+	if (_equal())
+	{
+		fn083e90()
+	}
+}
+
+
+//# address-hook(0x083e90)
+function void fn083e90()
+{
+	GetRandomNumber()
+	D1 = objA0.value3a
+	D2 = D1.u16 * 2 - 1
+	D0.u16 = (D0.u16 & D2.u16) - D1.u16
+	objA1.position.x.u16 += D0.u16
+
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1 = objA0.value3b
+	D2.u16 = D1.u16 * 2 - 1
+	D0.u16 = (D0.u16 & D2.u16) - D1.u16
+	objA1.position.y.u16 += D0.u16
+}
+
+
+//# address-hook(0x083ec6) end(0x083eea)
+function void fn083ec6()
+{
+	--objA0.value39
+	if (objA0.value39 == 0)
+	{
+		Object.TriggerUnloading()
+		return
+	}
+
+	objA0.countdown_value = 0x02
+	spawnSimpleChildObjects(0x083ff6)
+	if (_equal())
+	{
+		u8[A1 + 0x05] = 0x02
+		u8[A1 + 0x0a] |= 0x80
+		fn083e90()
+	}
+}
+
+
+//# address-hook(0x083eec) end(0x083f04)
+function void fn083eec()
+{
+	--objA0.value39
+	if (objA0.value39 == 0)
+	{
+		Object.TriggerUnloading()
+	}
+	else
+	{
+		objA0.countdown_value = 2
+
+		// Create explosions
+		spawnSimpleChildObjects(0x083fe2)
+		if (_equal())
+		{
+			fn083e90()
+		}
+	}
+}
+
+
+//# address-hook(0x083f06) end(0x083f1e)
+function void fn083f06()
+{
+	--objA0.value39
+	if (objA0.value39 == 0)
+	{
+		Object.TriggerUnloading()
+		return
+	}
+
+	objA0.countdown_value = 0x02
+	spawnSimpleChildObjects(0x083fe8)
+	if (_equal())
+	{
+		fn083e90()
+	}
+}
+
+
+//# address-hook(0x083f22) end(0x083f46)
+function void fn083f22()
+{
+	objA0.countdown_value = 2
+	objA0.position.x.u16 = camera.position.x.u16 + getScreenWidth() / 2
+	objA0.position.y.u16 = camera.position.y.u16 + 0x70
+	objA0.subtype2c = 2
+	fn083d84()
+}
+
+
+//# address-hook(0x083f4a) end(0x083f4e)
+function void fn083f4a()
+{
+	setupObjectAttributesFull(0x083fb4)
+	fn083f52()
+}
+
+
+//# address-hook(0x083f80) end(0x083f98)
+function void fn083f80()
+{
+	setupObjectAttributesFull(0x083fb4)
+	objA0.update_address = 0x083f9e
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+
+	playSound(0xb4)
+	fn083f9e()
+}
+
+
+//# address-hook(0x083f9e) end(0x083fae)
+function void fn083f9e()
+{
+	D0.u16 = u16[0xffffeebc]
+	objA0.position.x.u16 -= D0.u16
+
+	A1 = 0x083fcc
+	fn0845a0()
+	DrawObject()
+}
+
+
+
+// Robotnik's capsule, main body object
+
+//# address-hook(0x067e28) end(0x067e36)
+function void fn067e28()
+{
+	// Targets:
+	//  - 0x067e92	-> objA0.base_state = 0x00
+	//  - 0x067eb4	-> objA0.base_state = 0x02
+	//  - 0x067e46	-> objA0.base_state = 0x04
+	//  - 0x067f04	-> objA0.base_state = 0x06
+	//  - 0x067f3e	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x067e3c, objA0.base_state)
+
+	DrawObject()
+}
+
+
+
+// Somehow related...
+
+//# address-hook(0x085e64) end(0x085e70)
+function void fn085e64()
+{
+	objA0.value39 = 7
+	objA0.update_address = 0x085e74
+	u8[0xfffffabf] = 0xff
+	fn085e74()
+}
+
+
+//# address-hook(0x085e74) end(0x085eae)
+function void fn085e74()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_value = u16[A0 + 0x3a]
+		fadePaletteToWhiteUniform()
+
+		--objA0.value39
+		if (s8[A0 + 0x39] >= 0)
+			return
+
+		if (objA0.subtype2c == 0)
+		{
+			u8[0xfffffabf] = 0
+			Object.TriggerUnloading()
+		}
+		else
+		{
+			objA0.update_address = 0x085ee6
+			objA0.flags38 |= 0x20
+		}
+	}
+}
+
+
+function void fadePaletteToWhiteUniform()
+{
+	fadeColorsToWhiteUniform(0xfffffc00, 0x40)
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		fadeColorsToWhiteUniform(0x802000, 0xc0)
+	}
+
+	globalComponentTintColorR = max(globalComponentTintColorR - 0x25, 0)
+	globalComponentTintColorG = max(globalComponentTintColorG - 0x25, 0)
+	globalComponentTintColorB = max(globalComponentTintColorB - 0x25, 0)
+	globalComponentAddedColorR = min(globalComponentAddedColorR + 0x25, 255)
+	globalComponentAddedColorG = min(globalComponentAddedColorG + 0x25, 255)
+	globalComponentAddedColorB = min(globalComponentAddedColorB + 0x25, 255)
+#endif
+}
+
+
+function void fadeColorsToWhiteUniform(u32 address, u8 numColors)
+{
+	A1 = address
+	for (u8 i = 0; i < numColors; ++i)
+	{
+		FadeColorToWhiteUniform()
+	}
+}
+
+
+//# address-hook(0x085eb4) end(0x085ee4)
+function void FadeColorToWhiteUniform()
+{
+	// Fade to white
+	u16 color = u16[A1]
+#if STANDALONE
+	color  = makeNormalPackedColor(color)
+#endif
+
+	if ((color & 0x0eee) != 0x0eee)
+	{
+		if ((color & 0x0e00) < 0x0e00)
+		{
+			color += 0x0200
+		}
+		if ((color & 0x00e0) < 0x00e0)
+		{
+			color += 0x0020
+		}
+		if ((color & 0x000e) < 0x000e)
+		{
+			color += 0x0002
+		}
+		u16[A1] = color
+	}
+	A1 += 2
+}
+
+
+//# address-hook(0x085ee6) end(0x085ef2)
+function void fn085ee6()
+{
+	objA0.value39 = 7
+	objA0.countdown_value = 3
+	objA0.update_address = 0x085ef8
+	fn085ef8()
+}
+
+
+//# address-hook(0x085ef8) end(0x085f24)
+function void fn085ef8()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.countdown_value = 3
+	fadePaletteTowardsTargetUniform()
+
+	--objA0.value39
+	if (s8[A0 + 0x39] < 0)
+	{
+		u8[0xfffffabf] = 0
+		Object.TriggerUnloading()
+	}
+}
+
+
+function void fadePaletteTowardsTargetUniform()
+{
+	fadeColorsTowardsTargetUniform(0xfffffc00, 0xfffffc80, 0x40)
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		fadeColorsTowardsTargetUniform(0x802000, 0x802180, 0xc0)
+	}
+
+	globalComponentTintColorB = min(globalComponentTintColorB + 0x25, 0xff)
+	globalComponentTintColorG = min(globalComponentTintColorG + 0x25, 0xff)
+	globalComponentTintColorR = min(globalComponentTintColorR + 0x25, 0xff)
+	globalComponentAddedColorR = max(globalComponentAddedColorR - 0x25, 0)
+	globalComponentAddedColorG = max(globalComponentAddedColorG - 0x25, 0)
+	globalComponentAddedColorB = max(globalComponentAddedColorB - 0x25, 0)
+#endif
+}
+
+
+function void fadeColorsTowardsTargetUniform(u32 address, u32 targetAddress, u8 numColors)
+{
+	A1 = address
+	A2 = targetAddress
+	for (u8 i = 0; i < numColors; ++i)
+	{
+		FadeColorTowardsTargetUniform()
+	}
+}
+
+
+//# address-hook(0x085f2a) end(0x085f66)
+function void FadeColorTowardsTargetUniform()
+{
+	u16 color  = u16[A1]
+	u16 target = u16[A2]
+#if STANDALONE
+	color  = makeNormalPackedColor(color)
+	target = makeNormalPackedColor(target)
+#endif
+
+	if (color != target)
+	{
+		if ((color & 0x0e00) > (target & 0x0e00))
+		{
+			color -= 0x0200
+		}
+		if ((color & 0x00e0) > (target & 0x00e0))
+		{
+			color -= 0x0020
+		}
+		if ((color & 0x000e) > (target & 0x000e))
+		{
+			color -= 0x0002
+		}
+		u16[A1] = color
+	}
+	A1 += 2
+	A2 += 2
+}
+
+
+
+//# address-hook(0x085f86) end(0x085f86)
+function void AddScoreForBossEnemy()
+{
+	hud.dirty.timer = 0
+	AddScoreForBossEnemy_NoHudDirty()
+}
+
+
+//# address-hook(0x085f8a) end(0x085f9e)
+function void AddScoreForBossEnemy_NoHudDirty()
+{
+	objA0.countdown_value = 0x3f
+	addScore(100)
+	objA0.render_flags &= ~render_flag.VISIBLE
+}
+
+
+//# address-hook(0x085fa0) end(0x085fb6)
+function void UpdatePlayer1SpritePatterns()
+{
+	u32 backupA0 = A0
+	A0 = 0xffffb000
+	A1 = u32[0x085fb8 + char.character * 4]
+
+	// Targets:
+	//  - 0x012cb4	-> UpdateSonicSpritePatterns
+	//  - 0x015c6e	-> UpdateTailsSpritePatterns
+	//  - 0x01810e	-> UpdateKnucklesSpritePatterns
+	call A1
+	A0 = backupA0
+}
+
+
+
+// Robotnik (or Egg Robo) in his capsule
+//  -> Used in MGZ 2, ICZ 2, FBZ 2, and probably lots of other places
+
+//# address-hook(0x067e62) end(0x067e7c)
+function void fn067e62()
+{
+	// Targets:
+	//  - 0x067e92	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x067eb4	-> objA0.base_state = 0x02  -> Doing his normal thing, no special handling here
+	//  - 0x067ee4	-> objA0.base_state = 0x04  -> Defeated
+	//  - 0x067f04	-> objA0.base_state = 0x06  -> Rising up
+	//  - 0x067f3e	-> objA0.base_state = 0x08  -> Going right, out of the screen
+	call tableLookupAddress(0x067e82, objA0.base_state)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x20)
+	{
+		fn067e8c()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x067e8c) end(0x067e8c)
+function void fn067e8c()
+{
+	fn0852ae()
+}
+
+
+//# address-hook(0x067e92) end(0x067eae)
+function void fn067e92()
+{
+	setupObjectAttributesFull(0x068146)
+	fn069b2e()
+
+	objA0.animation.sprite = objA0.subtype2c
+	spawnChildObjects(0x068164)
+}
+
+
+//# address-hook(0x067eb4) end(0x067ee2)
+function void fn067eb4()
+{
+	MoveAndFlipWithParent()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+		return
+
+	objA0.base_state = 0x04
+	spawnChildObjects(0x083fee)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = 0x04
+	}
+}
+
+
+//# address-hook(0x067ee4) end(0x067f02)
+function void fn067ee4()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x38] & 0x10) == 0)
+	{
+		MoveAndFlipWithParent()
+	}
+	else
+	{
+		objA0.base_state = 0x06
+		objA0.animation.sprite = 0x0a
+	}
+}
+
+
+//# address-hook(0x067f04) end(0x067f18)
+function void fn067f04()
+{
+	D0.u16 = camera.position.y.u16 + 0x40
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		--objA0.position.y.u16
+
+	#if STANDALONE
+		// Faster after Knuckles' boss fight in MGZ 2
+		if (global.zone == 0x02 && isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			if ((objA0.position.y.u16 % 3) == 0)
+				--objA0.position.y.u16
+		}
+	#endif
+
+		return
+	}
+
+	objA0.base_state = 0x08
+	fn067f1e()
+}
+
+
+//# address-hook(0x067f1e) end(0x067f38)
+function void fn067f1e()
+{
+	// This function is also used by FBZ 2 boss after defeat
+
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.velocity.x = 0x0300
+	objA0.velocity.y = 0
+	objA0.countdown_value = 0x0100
+
+#if STANDALONE
+	// Faster in FBZ so he's definitely offscreen when level results start (and overwrite some his patterns in VRAM)
+	if (global.zone == 0x04)
+	{
+		objA0.velocity.x += getScreenExtend() * 4
+	}
+
+	// Same for Knuckles' boss fight in MGZ 2
+	if (global.zone == 0x02 && isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		objA0.velocity.x += getScreenExtend() * 6
+	}
+#endif
+
+	spawnChildObjects(0x0681b4)
+}
+
+
+//# address-hook(0x067f3e) end(0x067f56)
+function void fn067f3e()
+{
+	UpdateMovementStraightSimple()
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.flags38 |= 0x20
+	level.boss_encounter = 0
+	fn0852ae()
+}
+
+
+
+// Part of the cockpit
+
+//# address-hook(0x067f5c) end(0x067f6a)
+function void fn067f5c()
+{
+	// Targets:
+	//  - 0x067e92	-> objA0.base_state = 0x00
+	//  - 0x067eb4	-> objA0.base_state = 0x02
+	//  - 0x067ee4	-> objA0.base_state = 0x04
+	//  - 0x067f04	-> objA0.base_state = 0x06
+	//  - 0x067f3e	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x067f70, objA0.base_state)
+
+	DrawObject()
+}

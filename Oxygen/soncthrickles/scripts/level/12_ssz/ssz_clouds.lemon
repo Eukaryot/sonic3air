@@ -1,0 +1,41 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x057bb2) end(0x057c18)
+function void fn057bb2()
+{
+	objA0.update_address = 0x057bf6
+	objA0.render_flags = 0x40
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x30
+	objA0.sprite_priority = 0
+	objA0.sprite_attributes = 0xe310
+	objA0.mapping_offset = 0x058780
+	objA0.velocity.y = u16[A0 + 0x38]
+
+	GetRandomNumber()
+	u16[A0 + 0x30] = (D0.u16 & 0x0fff) + 0x0c00
+	fn057bf6()
+}
+
+
+//# address-hook(0x057bf6) end(0x057c18)
+function void fn057bf6()
+{
+	D0 = 0x1c00
+	D1 = 0x80
+	fn0465d6()
+
+	D0.u16 += objA0.velocity.y
+	u16[A0 + 0x38] = D0.u16
+	D0 = u32[A0 + 0x3e]
+	u32[A0 + 0x3a] -= D0
+	DrawObject()
+}

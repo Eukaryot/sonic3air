@@ -1,0 +1,167 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Fan (from Carnival Night Zone)                        //
+//-------------------------------------------------------//
+
+//# address-hook(0x031d90) end(0x031e32)
+function void fn031d90()
+{
+	objA0.mapping_offset = 0x231010
+	objA0.sprite_attributes = 0x43e8
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	u16[A0 + 0x30] = objA0.position.x.u16
+
+	D0.u16 = u16((objA0.subtype2c & 0x0f) + 4) << 4
+	u16[A0 + 0x36] = D0.u16
+	u16[A0 + 0x38] = D0.u16 + 0x30
+	D1.u16 = (objA0.subtype2c & 0x70) + 0x18
+	objA0.value32 = D1.u16
+	u16[A0 + 0x34] = D1.u16 * 2
+
+	D0.u8 = objA0.subtype2c
+	if (D0.s8 >= 0)
+	{
+		objA0.update_address = 0x031e68
+		return
+	}
+
+	D0.u16 = (objA0.subtype2c & 0x70) >> 4
+	objA0.animation.sprite = D0.u8
+	D1.u16 = (objA0.subtype2c & 0x70) + 0x10
+	objA0.box_size.x = D1.u8
+
+	if ((objA0.flags2a & 0x01) == 0)
+	{
+		objA0.update_address = 0x031e36
+		fn031e36()
+	}
+	else
+	{
+		objA0.update_address = 0x031e24
+		fn031e24()
+	}
+}
+
+
+//# address-hook(0x031e24)
+function void fn031e24()
+{
+	objA0.position.x.u16 = u16[A0 + 0x30] + u8[0xfffffe7c] - 0x30
+	fn031e36()
+}
+
+
+//# address-hook(0x031e36) end(0x031e62)
+function void fn031e36()
+{
+	D6 = 0
+	A1 = 0xffffb000
+	fn031e96()
+
+	A1 = 0xffffb04a
+	fn031e96()
+
+	if (D6.u16 != 0 && (level.framecounter.low & 0x1f) == 0)
+	{
+		playSound(0x72)
+	}
+
+	D0.u16 = u16[A0 + 0x30]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x031e68) end(0x031e90)
+function void fn031e68()
+{
+	D6 = 0
+	A1 = 0xffffb000
+	fn031e96()
+
+	A1 = 0xffffb04a
+	fn031e96()
+
+	if (D6.u16 != 0 && (level.framecounter.low & 0x1f) == 0)
+	{
+		playSound(0x72)
+	}
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x031e96) end(0x031f2e)
+function void fn031e96()
+{
+#if STANDALONE
+	if (debug_mode.state != 0)
+		return
+#endif
+
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + objA0.value32
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + u8[0xfffffe84] + u16[A0 + 0x36]
+	if (dx < u16[A0 + 0x34] && dy < u16[A0 + 0x38])
+	{
+	#if STANDALONE
+		// Also consider the "hurt" state
+		if (u8[A1 + 0x05] <= 0x04 && u8[A1 + 0x2e] == 0)
+		{
+			if (u8[A1 + 0x05] == 0x04)
+				u8[A1 + 0x05] = 0x02
+	#else
+		if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		{
+	#endif
+			D1.u16 = dy - u16[A0 + 0x36]
+			if (D1.s16 >= 0)
+			{
+				D1.u16 = (-1 - D1.s16) * 2
+			}
+
+			D1.u16 += u16[A0 + 0x36]
+			D1.s16 = -D1.s16
+			D1.s16 >>= 4
+			objA1.position.y.u16 += D1.u16
+			objA1.flags2a |= char.flag.IN_AIR
+			objA1.flags2a &= ~char.flag.CONTROL_LOCK
+			objA1.velocity.y = 0
+			u8[A1 + 0x2f] = 0
+			u8[A1 + 0x40] = 0
+
+			D6 = 1
+			u16[A1 + 0x1c] = 1
+		#if STANDALONE
+			if (u8[A1 + 0x27] == 0 || objA1.state == char.state.ROLLING)	// Prevent a rare glitch that makes Sonic roll over the fans
+		#else
+			if (u8[A1 + 0x27] == 0)
+		#endif
+			{
+				objA1.state = char.state.RUNNING
+				u8[A1 + 0x27] = 1
+				u8[A1 + 0x30] = 0x7f
+				u8[A1 + 0x31] = 8
+
+			#if STANDALONE
+				// Fix for bug when Tails carries other player and gets caught by the fan
+				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
+				{
+					u8[0xffffb02a] |= char.flag.IN_AIR
+					u8[0xffffb02e] = 0
+				}
+			#endif
+			}
+		}
+	}
+}

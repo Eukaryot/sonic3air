@@ -1,0 +1,1632 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Local defines for Slot Machine stage
+define slotmachine.rotation.u8	 =  u8[0xffffe400]
+define slotmachine.rotation.full = u16[0xffffe400]
+
+#if STANDALONE
+	define slotmachine.rings_collected = u8[0xffffe41a]
+#endif
+
+#if STANDALONE
+	// Make rotation slightly smoother, yet not completely smooth
+	define u8 slotmachine.rotation.rounded = (u8[0xffffe400] & 0xff)
+#else
+	define u8 slotmachine.rotation.rounded = (u8[0xffffe400] & 0xfc)
+#endif
+
+
+// Some notes:
+//  - Camera uses a (non-rotated) world coordinate system centered around (0x03c0, 0x03c0)
+//  - Each block is 24x24 pixels in size
+
+// Block types:
+//  - 0x00 = empty space
+//  - 0x01 = solid blue block
+//  - 0x02 = solid yellow block
+//  - 0x03 = solid red block
+//  - 0x04 = goal
+//  - 0x05 = bumper
+//  - 0x06 = "R", direction change
+//  - 0x07 = solid round white/red block
+//  - 0x08 = ring
+//  - 0x09 = slot catcher
+//  - 0x0a = yellow bumper (supposedly an animation state of the normal bumper)
+//  - 0x0b = blue bumper (?)
+//  - 0x0c = "R", direction change, highlighted
+//  - 0x0d = solid blue block (again?)
+//  - 0x0e = solid yellow block (again?)
+//  - 0x0f = solid red block (again?)
+//  - 0x10...0x13 = collected ring animations
+
+
+
+//# address-hook(0x059786) end(0x059798)
+function void InitLevelTiles.BonusSM()
+{
+	level.height.bitmask = 0x07ff
+	level.height.tilemask = 0x07f0
+	level.chunksize.bitmask = 0x3c
+}
+
+
+//# address-hook(0x05979a) end(0x05979e)
+function void UpdateLevelTiles.BonusSM()
+{
+	call 0x0597a2 + s16[0xffffeec0]
+}
+
+//# address-hook(0x0597a2) end(0x0597a2)
+function void fn0597a2()
+{
+	fn0597aa()
+}
+
+//# address-hook(0x0597a6) end(0x0597a6)
+function void fn0597a6()
+{
+	fn0597e4()
+}
+
+
+//# address-hook(0x0597aa) end(0x0597de)
+function void fn0597aa()
+{
+	u16[0xffffeec0] += 4
+
+	D1.u16 = 0x0400 - level.display_routine + camera.foreground.x.u16
+	u16[0xffffee98] = D1.u16
+	D1.u16 &= 0xfff0
+	u16[0xffffeea0] = D1.u16
+
+	D0.u16 = 0x0400 - u16[0xffffeed4] + camera.foreground.y.u16
+	u16[0xffffee9c] = D0.u16
+	D0.u16 &= level.height.tilemask
+	u16[0xffffeea2] = D0.u16
+
+	fn04ed6c()
+}
+
+
+//# address-hook(0x0597e4) end(0x05982c)
+function void fn0597e4()
+{
+	D1 = 0x20
+	D0.u16 = 0x0400 - level.display_routine + camera.foreground.x.u16
+	A1 = 0xffffee98
+	fn059832()
+
+	D0.u16 = 0x0400 - u16[0xffffeed4] + camera.foreground.y.u16
+	A1 = 0xffffee9c
+	fn059832()
+
+	A6 = 0xffffee98
+	A5 = 0xffffeea0
+	D1.u16 = u16[0xffffee9c]
+	D6 = 0x0f
+	LoadTileContentInDirX()
+
+	A6 = 0xffffee9c
+	A5 = 0xffffeea2
+	D1.u16 = u16[0xffffee98]
+	D6 = (getScreenWidth() + 31) / 16
+	LoadTileContentInDirY()
+}
+
+
+//# address-hook(0x059832) end(0x059848)
+function void fn059832()
+{
+	D0.u16 -= u16[A1]
+	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D0.u16 = abs(D0.s16)
+	D0.u16 = min(D0.u16, D1.u16)
+	if (D2.u8 != 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	u16[A1] += D0.u16
+}
+
+
+//# address-hook(0x05984a) end(0x059864)
+function void InitLevelScrolling.BonusSM()
+{
+	zeroMemory(0xffffa800, 0x200)
+	D1 = 0
+	D0 = 0
+	camera.background.y = 0
+	Level.InitialTilesFill()
+
+	fn059990()
+}
+
+
+//# address-hook(0x059868) end(0x05998c)
+function void UpdateLevelScrolling.BonusSM()
+{
+	// This function updates background patterns and the scroll offsets (foreground and background)
+
+	D0 = (s16[0xffffe402] < 0) ? -0x400 : 0x400
+	D0 += u32[0xffffeed8]
+	if (D0.s32 < -0x8000)
+	{
+		D0 = -0x8000
+	}
+	else if (D0.s32 > 0x8000)
+	{
+		D0 = 0x8000
+	}
+	u32[0xffffeed8] = D0
+	camera.background.y += D0
+	camera.background.y.u16 &= 0xff
+
+#if STANDALONE
+	A0 = 0xffff1000
+#else
+	A0 = 0x00ff1000		// This actually makes no difference, except for verification
+#endif
+	u32[0xffffef74] = A0
+	u16[0xffff1000] = 0
+	u16[0xffffeed6] = 0
+
+	for (u8 i = 0; i < 8; ++i)
+	{
+		A5 = 0x0599de + i * 0x14
+		A6 = 0xffffa820 + i * 0x0c
+
+		D0.u16 = u16[A5]
+		D1 = u32[A5 + 0x02]
+
+		if ((u64(u32[A6]) + u64(D1)) >= 0x100000000)	// Carry flag check, maybe this can be done easier?
+		{
+			u32[A6] += D1
+			u16[A6] += D0.u16
+			u8[A6 + 0x0a] = 0xff
+		}
+		else
+		{
+			u32[A6] += D1
+			D1.u16 = u16[A6] - D0.u16
+			if (D1.s16 >= 0)
+			{
+				u16[A6] = D1.u16
+				u8[A6 + 0x0a] = 0xff
+			}
+		}
+
+		D5.u16 = u16[A5 + 0x0a]
+		if (D5.u16 == 0 || u16[0xffffeed6] == 0)
+		{
+			--u16[A6 + 0x04]
+			if (s16[A6 + 0x04] < 0 || u16[A6 + 0x0a] != 0)
+			{
+				if (s16[A6 + 0x04] < 0)
+				{
+					u16[A6 + 0x04] = u16[A5 + 0x06]
+				}
+
+				++u16[A6 + 0x06]
+				if (u16[A6 + 0x06] >= u16[A5 + 0x08])
+				{
+					u16[A6 + 0x06] = 0
+				}
+
+				u16[A6 + 0x0a] = 0
+				u8[0xffffeed6] = 0xff
+				if (D5.u16 == 0)
+				{
+					u16[A6 + 0x08] += u16[A5]
+				}
+				else
+				{
+					if (u8[A6 + 0x07] & 0x01)
+					{
+						D5.u16 += u16[A5 + 0x0c]
+					}
+
+					D2.u16 = u16[A5]
+					D0.u16 = u16[A5 + 0x10]
+					D6.u16 = u16[A5 + 0x12]
+					D3.u16 = u16[A6 + 0x06]
+					D1 = u16(D2.u16 * D3.u16)
+
+					push(A5)
+					push(D6)
+					push(D5)
+					push(D1)
+
+					fn04ecaa()
+
+					D1 = pop()
+					D5 = pop()
+					D6 = pop()
+					A5 = pop()
+
+					if (u16[A5 + 0x0e] != 0)
+					{
+						D0.u16 += 0x10
+						D5.u16 += 0x0100
+						fn04ecaa()
+					}
+				}
+			}
+		}
+	}
+
+	A1 = 0xffffa800
+	A5 = 0xffffa820
+	for (u8 i = 0; i < 8; ++i)
+	{
+		D1.u16 = u16[A5] + u16[A5 + 8]
+		u16[A1]        = D1.u16
+		objA1.position.x.u16 = D1.u16
+		A1 += 2
+		A5 += 0x0c
+	}
+
+	fn059990()
+}
+
+
+//# address-hook(0x059990) end(0x0599bc)
+function void fn059990()
+{
+	A1 = 0xffffe000		// Location of linewise scroll offsets
+	A4 = 0x0599be
+	A5 = 0xffffa800
+	D0.u16 = camera.background.y.u16
+	D1.u16 = getScreenHeight() - 1
+	D3.u16 = u16[0xffffee98]
+	fn04f0de()
+
+	scrolloffset.y.planeA = u16[0xffffee9c]
+	scrolloffset.y.planeB = camera.background.y.u16
+
+	signalMultiReturn()
+}
+
+
+
+// Called directly from main game update loop
+
+//# address-hook(0x04b356) end(0x04b48e)
+function void BonusSM.RenderRotatingMaze()
+{
+#if STANDALONE
+	// We need to draw objects further away as well, so a larger lookup table is needed
+	//  -> We need a square of 20x20 blocks instead of only 16x16 blocks
+	//  -> Use shared memory for this, namely the start (that is also used by Blue Spheres, temporarily as well)
+	u32 lookupTableAddress = 0x800000
+	u16 lookupTableSize = 0x14
+#else
+	u32 lookupTableAddress = 0xffff7800
+	u16 lookupTableSize = 0x10
+#endif
+
+	s16 cameraX = camera.position.x.u16 + getScreenExtend()		// This is a bit ugly, but it works
+	s16 cameraY = camera.position.y.u16
+
+	fn04b4c4()
+	fn04b592()
+
+	// The following code updates the positions of blocks around, depending on current rotation
+	A1 = lookupTableAddress
+	u8 angle = slotmachine.rotation.rounded
+	s32 sine   = lookupSin(angle)
+	s32 cosine = lookupCos(angle)
+	s32 stepX = cosine * 0x18
+	s32 stepY = sine   * 0x18
+	D2.s16 = -(cameraX % 0x18) - (0x0c * (lookupTableSize - 1))
+	D3.s16 = -(cameraY % 0x18) - (0x0c * (lookupTableSize - 1))
+
+	for (u8 row = 0; row < lookupTableSize; ++row)
+	{
+		s32 px = cosine * D2.s16 - sine * D3.s16
+		s32 py = cosine * D3.s16 + sine * D2.s16
+
+		for (u8 col = 0; col < lookupTableSize; ++col)
+		{
+			s16[A1]   = px >> 8
+			s16[A1+2] = py >> 8
+			px += stepX
+			py += stepY
+			A1 += 4
+			//debugDrawRect(camera.foreground.x.u16 + s16[A1] - 4 + getScreenWidth() / 2, camera.foreground.y.u16 + s16[A1+2] - 4 + getScreenHeight() / 2, 9, 9, 0xe000ff00)
+		}
+
+		D3.u16 += 0x18
+	}
+
+	// The following code draws the blocks (as sprites)
+	A0 = 0xffff3000
+	A0 += ((cameraX / 0x18) + (0x10 - lookupTableSize) / 2)
+	A0 += ((cameraY / 0x18) + (0x10 - lookupTableSize) / 2) * 0x80
+
+	A4 = lookupTableAddress
+	D5 = u8[0xfffff62c]
+	A2 = 0xfffff800 + D5.u16 * 8
+
+	for (u8 row = 0; row < lookupTableSize; ++row)
+	{
+		for (u8 col = 0; col < lookupTableSize; ++col)
+		{
+			// Get the block type
+			u8 blockType = u8[A0]
+			++A0
+			if (blockType != 0 && blockType <= 0x13)
+			{
+				// The explicit cast to s16 is needed due to a bug in lemonscript, sorry...
+				s16 px = s16(u16[A4]   + getScreenWidth() / 2)
+				s16 py = s16(u16[A4+2] + getScreenHeight() / 2)
+				if (px >= -0x10 && px < getScreenWidth() + 0x10 && py >= -0x10 && py < getScreenHeight() + 0x10)
+				{
+					A5 = 0xffff7000 + blockType * 8
+					A1 = tableLookupAddress(u32[A5], u16[A5+4] * 2)
+					A3 = 0xffff0000 + u16[A5+6]
+					D1 = u8[A1] - 1
+					++A1
+					D3.u16 = px + 0x80
+					D2.u16 = py + 0x80
+
+				#if STANDALONE
+					if (blockType == 0x08)
+					{
+						// Custom smoother ring animations
+						u8 animFrame = ((static_rings.animframe * 8 + 7 - static_rings.animtimer) / 4) % 8
+						u64 key = stringformat("ring_0%d", animFrame)
+						Renderer.drawCustomSprite(key, px, py, 0x00, 0, 0x9000)
+					}
+					else
+				#endif
+					{
+						fn04b490()
+					}
+				}
+			}
+			A4 += 4
+		}
+		A0 += 0x80 - lookupTableSize
+	}
+
+	u8[0xfffff62c] = D5.u8
+}
+
+
+//# address-hook(0x04b490) end(0x04b4c2)
+function void fn04b490()
+{
+	while (D5.u8 != 0x50 && D1.s16 >= 0)
+	{
+		u16 py = D2.u16 + s8[A1]
+		u8 size = u8[A1+1]
+
+		++D5.u8
+	#if STANDALONE
+		// A1 may be an odd address here -- this is not a problem for standalone, but it is on real hardware or in emulator
+		D0.u16 = u16[A1+2]
+	#else
+		D0.u16 = (u16(u8[A1+2]) << 8) + u8[A1+3]
+	#endif
+		u16 index = A3.u16 + D0.u16
+
+	#if STANDALONE
+		u16 px = D3.u16 + s8[A1+4]
+	#else
+		D0.u16 = (D3.u16 + s8[A1+4]) & 0x01ff
+		if (D0.u16 == 0)
+		{
+			++D0.u16
+		}
+		u16 px = D0.u16
+	#endif
+
+		u16[A2]   = py
+		 u8[A2+2] = size
+		u16[A2+4] = index
+		u16[A2+6] = px
+
+	#if STANDALONE
+		Renderer.drawVdpSprite(px - 0x80, py - 0x80, size, index, 0x9000)
+	#endif
+
+		A1 += 5
+		A2 += 8
+		--D1.s16
+	}
+}
+
+
+//# address-hook(0x04b4c4) end(0x04b54e)
+function void fn04b4c4()
+{
+	D0 = (slotmachine.rotation.u8 >> 2) & 0x0f
+	A1 = 0xffff700c
+	for (u8 i = 0; i < 3; ++i)
+	{
+		u16[A1] = D0.u16
+		A1 += 8
+	}
+	A1 = 0xffff706c
+	for (u8 i = 0; i < 3; ++i)
+	{
+		u16[A1] = D0.u16
+		A1 += 8
+	}
+
+	// This updates animations of the blocks
+	A1 = 0xffff7005
+	--u8[0xfffffeb0]
+	if (s8[0xfffffeb0] < 0)
+	{
+		u8[0xfffffeb0] = 1
+	#if STANDALONE
+		// Slow down animation of "Goal" blocks on highest anti-flicker setting
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+			u8[0xfffffeb0] = 0x0f
+	#endif
+
+		++u8[A1 + 0x20]
+		if (u8[A1 + 0x20] >= 3)
+			u8[A1 + 0x20] = 0
+		++u8[0xfffffeb1]
+		if (u8[0xfffffeb1] >= 6)
+			u8[0xfffffeb1] = 0
+	}
+
+	u8[A1 + 0x48] = u8[0xfffffeb1]
+	u8[A1 + 0x40] = static_rings.animframe
+	--u8[0xfffffeb4]
+	if (s8[0xfffffeb4] < 0)
+	{
+		u8[0xfffffeb4] = 3
+		u8[0xfffffeb5] = (u8[0xfffffeb5] + 1) & 0x03
+	}
+	u8[A1 + 0x38] = u8[0xfffffeb5]
+}
+
+
+//# address-hook(0x04b57c) end(0x04b590)
+function void fn04b57c()
+{
+	A2 = 0xffff7400
+	D0.u16 = 0x1f
+	while (D0.s16 >= 0 && u8[A2] != 0)
+	{
+		A2 += 8
+		--D0.s16
+	}
+	_setZeroFlagByValue(u8[A2])
+}
+
+
+//# address-hook(0x04b592) end(0x04b5b0)
+function void fn04b592()
+{
+	A0 = 0xffff7400
+	D7.u16 = 0x1f
+	while (D7.s16 >= 0)
+	{
+		D0 = u8[A0]
+		if (D0.u8 != 0)
+		{
+			D0.u16 *= 4
+
+			// Targets:
+			//  - 0x04b5c2	-> Animation of a collected ring
+			//  - 0x04b5f2	-> Animation of a bumper
+			//  - 0x04b626	-> Animation of an "R" block after touch
+			//  - 0x04b65a	-> Animation of a solid block (blue, yellow, red) after touch
+			A1 = u32[0x04b5ae + D0.s16]
+			call A1
+		}
+		A0 += 8
+		--D7.s16
+	}
+}
+
+
+//# address-hook(0x04b5c2) end(0x04b5ea)
+function void fn04b5c2()
+{
+	// Ring animation
+	--u8[A0 + 0x02]
+	if (s8[A0 + 0x02] < 0)
+	{
+		u8[A0 + 0x02] = 0x05
+		D0 = u8[A0 + 0x03]
+		++u8[A0 + 0x03]
+		A1 = u32[A0 + 0x04]
+		D0.u8 = u8[0x04b5ec + D0.s16]
+		u8[A1] = D0.u8
+		if (u8[A1] == 0)
+		{
+			u32[A0] = 0
+			u32[A0 + 0x04] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x04b5f2) end(0x04b620)
+function void fn04b5f2()
+{
+	// Bumper animation
+	--u8[A0 + 0x02]
+	if (s8[A0 + 0x02] < 0)
+	{
+		u8[A0 + 0x02] = 0x01
+		D0 = u8[A0 + 0x03]
+		++u8[A0 + 0x03]
+		A1 = u32[A0 + 0x04]
+		D0.u8 = u8[0x04b622 + D0.s16]
+		if (D0.u8 == 0)
+		{
+			u32[A0] = 0
+			u32[A0 + 0x04] = 0
+			u8[A1] = 0x05
+		}
+		else
+		{
+			u8[A1] = D0.u8
+		}
+	}
+}
+
+
+//# address-hook(0x04b626) end(0x04b654)
+function void fn04b626()
+{
+	// "R" block animation
+	--u8[A0 + 0x02]
+	if (s8[A0 + 0x02] < 0)
+	{
+		u8[A0 + 0x02] = 0x07
+		D0 = u8[A0 + 0x03]
+		++u8[A0 + 0x03]
+		A1 = u32[A0 + 0x04]
+		D0.u8 = u8[0x04b656 + D0.s16]
+		if (D0.u8 == 0)
+		{
+			u8[A1] = 0x06
+			u32[A0] = 0
+			u32[A0 + 0x04] = 0
+		}
+		else
+		{
+			u8[A1] = D0.u8
+		}
+	}
+}
+
+
+//# address-hook(0x04b65a) end(0x04b686)
+function void fn04b65a()
+{
+	// Solid block (blue, yellow, red) animation
+	--u8[A0 + 0x02]
+	if (s8[A0 + 0x02] < 0)
+	{
+		u8[A0 + 0x02] = 0x01
+		D0 = u8[A0 + 0x03]
+		++u8[A0 + 0x03]
+		A1 = u32[A0 + 0x04]
+		u8[A1] = u8[0x04b688 + D0.u8]
+		if (u8[A1] == 0)
+		{
+			u8[A1] = u8[A0 + 0x04]
+			u32[A0] = 0
+			u32[A0 + 0x04] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x04bf62) end(0x04bf94)
+function void fn04bf62()
+{
+	objA0.position.x.u16 = 0x0460
+	objA0.position.y.u16 = 0x0430
+	objA0.mapping_offset = 0x04c2a0
+	objA0.sprite_attributes = 0x0481
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x80
+
+	objA0.update_address = 0x04bf9a
+	fn04bf9a()
+}
+
+
+//# address-hook(0x04bf9a) end(0x04c012)
+function void fn04bf9a()
+{
+	D0.u8 = slotmachine.rotation.rounded
+	LookupSinCos()
+	A1 = 0xffffb000
+	s32 px = 0x0460 - objA1.position.x.u16
+	s32 py = 0x0430 - objA1.position.y.u16
+	D2.s32 = (px * D1.s16 - py * D0.s16) >> 8
+	D3.s32 = (px * D0.s16 + py * D1.s16) >> 8
+	D2.u16 += objA1.position.x.u16
+	D3.u16 += objA1.position.y.u16
+	objA0.position.x.u16 = D2.u16
+	objA0.position.y.u16 = D3.u16
+	level.display_routine = D2.u16
+	u16[0xffffeed4] = D3.u16
+
+	A2 = A0 + 0x34
+	A1 = 0xffffb000
+	fn04c014()
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 0x01
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 0x06)
+		{
+			objA0.animation.sprite = 0
+		}
+	}
+}
+
+
+//# address-hook(0x04c014) end(0x04c01a)
+function void fn04c014()
+{
+	// Targets:
+	//  - 0x04c026	-> u16[A2] = 0x00
+	//  - 0x04c21c	-> u16[A2] = 0x02
+	//  - 0x04c250	-> u16[A2] = 0x04
+	//  - 0x04c292	-> u16[A2] = 0x06
+	call tableLookupAddress(0x04c01e, u16[A2])
+}
+
+
+//# address-hook(0x04c026) end(0x04c0a8)
+function void fn04c026()
+{
+	if (u8[A1 + 0x2e] != 0 || u16[0xffffe406] != 0)
+		return
+
+	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x18
+	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x18
+	if (dx < 0x30 && dy < 0x30)
+	{
+		objA1.position.x.u16 = 0x0460
+		objA1.position.y.u16 = 0x0430
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		u16[A1 + 0x1c] = 0
+		u8[A1 + 0x2e] = 0x81
+		u16[(A2+=2)-2] += 2
+		u16[A2] = 0x78
+		objA0.value42 = A1.u16
+		u8[0xfffff650] = 0x01
+		if (u8[0xffffe408] == 0x18)
+		{
+			u8[0xffffe408] = 0x08
+			objA0.value32 = 0
+			u16[0xffffe406] = 0xffff
+			objA0.countdown_value = 0xffff
+		}
+	}
+}
+
+
+
+
+// Inside the slot machine
+
+//# address-hook(0x04c0aa) end(0x04c21a)
+function void fn04c0aa()
+{
+	if (s16[0xffffe40c] < 0)
+	{
+		if (objA0.countdown_value < 0)
+		{
+			objA0.countdown_value = 100
+		}
+
+		if (objA0.countdown_value != 0)
+		{
+			if ((level.framecounter.low & 0x01) == 0 || u16[A0 + 0x30] >= 0x10)
+			{
+				++u16[0xffffe404]
+				return
+			}
+			if (!allocDynamicObjectStd())
+			{
+				++u16[0xffffe404]
+				return
+			}
+
+			// Spawn a spike ball
+			objA1.update_address = 0x04c374
+			u32[A1 + 0x0c] = 0x04c3e6
+			u16[A1 + 0x0a] = 0x2490
+			u8[A1 + 0x04] = render_flag.WORLD
+			u8[A1 + 0x07] = 0x10
+			u16[A1 + 0x08] = 0x0200
+			u16[A1 + 0x40] = 0x1e
+			u16[A1 + 0x32] = objA0.value32
+			objA0.value32 += 0x90
+			u16[A1 + 0x3c] = objA0.position.x.u16
+			u16[A1 + 0x3e] = objA0.position.y.u16
+
+			D0.u16 = u16[A1 + 0x32]
+			LookupSinCos()
+			D1.s16 >>= 1
+			D1.u16 += u16[A1 + 0x3c]
+			u16[A1 + 0x34] = D1.u16
+			objA1.position.x.u16 = D1.u16
+			D0.s16 >>= 1
+			D0.u16 += u16[A1 + 0x3e]
+			u16[A1 + 0x38] = D0.u16
+			objA1.position.y.u16 = D0.u16
+
+			A2 = A0 + 0x30
+			u32[A1 + 0x2e] = A2
+			u16[A1 + 0x42] = objA0.value42
+			++u16[A0 + 0x30]
+			--objA0.countdown_value
+		}
+
+		if (u16[A0 + 0x30] != 0)
+		{
+			++u16[0xffffe404]
+			return
+		}
+	}
+	else if (s16[0xffffe40c] > 0)
+	{
+		if ((level.framecounter.low & 0x01) == 0 || u16[A0 + 0x30] >= 0x10)
+			return
+
+		if (!allocDynamicObjectStd())
+			return
+
+		// Spawn a ring
+		objA1.update_address = 0x01a9ee
+		u8[A1 + 0x04] = render_flag.WORLD
+		u8[A1 + 0x07] = 0x08
+		u16[A1 + 0x08] = 0x0180
+		u16[A1 + 0x0a] = 0x26bc
+		u32[A1 + 0x0c] = 0x01a99a
+		u16[A1 + 0x32] = objA0.value32
+		objA0.value32 += 0x89
+		u16[A1 + 0x3c] = objA0.position.x.u16
+		u16[A1 + 0x3e] = objA0.position.y.u16
+		u16[A1 + 0x40] = 0x1a
+
+		D0.u16 = u16[A1 + 0x32]
+		LookupSinCos()
+		D1.u16 = u16[A1 + 0x3c] + (D1.s16 >> 1)
+		u16[A1 + 0x34] = D1.u16
+		objA1.position.x.u16 = D1.u16
+		D0.u16 = u16[A1 + 0x3e] + (D0.s16 >> 1)
+		u16[A1 + 0x38] = D0.u16
+		objA1.position.y.u16 = D0.u16
+
+		A2 = A0 + 0x30
+		u32[A1 + 0x2e] = A2
+		u16[A1 + 0x42] = objA0.value42
+		++u16[A0 + 0x30]
+		--u16[0xffffe40c]
+	}
+
+	if (u16[A0 + 0x30] == 0)
+	{
+		fn04c23e()
+	}
+}
+
+
+//# address-hook(0x04c21c) end(0x04c23c)
+function void fn04c21c()
+{
+	objA0.value42 = A1.u16
+	if (u8[0xffffe408] == 0x18)
+	{
+		fn04c0aa()
+	}
+	else
+	{
+		if ((global.framecounter.low & 0x0f) == 0)
+		{
+			playSound(0xb7)
+		}
+	}
+}
+
+
+
+//# address-hook(0x04c23e) end(0x04c24e)
+function void fn04c23e()
+{
+	u16[A0 + 0x30] = 0
+	u16[A2] += 2
+	u16[A2+2] = 0x08
+	u8[0xfffff650] = 0
+}
+
+
+//# address-hook(0x04c250) end(0x04c290)
+function void fn04c250()
+{
+	D0.u16 = slotmachine.rotation.u8 & 0x3c
+	if (D0.u16 == 0)
+	{
+		D0.u8 = slotmachine.rotation.u8 & 0xfc
+		LookupSinCos()
+		D0.s16 <<= 2
+		D1.s16 <<= 2
+		objA1.velocity.x = D0.u16
+		objA1.velocity.y = D1.u16
+		u8[A1 + 0x2e] = 0
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
+
+		s16[0xffffe402] = -s16[0xffffe402]
+		u16[(A2+=2)-2] += 2
+		u16[A2] = 8
+	}
+}
+
+
+//# address-hook(0x04c292) end(0x04c29e)
+function void fn04c292()
+{
+	--u16[A2 + 0x02]
+	if (s16[A2 + 0x02] < 0)
+	{
+		u16[A2] = 0
+		u16[0xffffe406] = 0
+	}
+}
+
+
+
+// Single spike ball (when you get 3 Robotniks)
+
+//# address-hook(0x04c374) end(0x04c3e0)
+function void fn04c374()
+{
+	D1 = u16[A0 + 0x3c] << 16
+	objA0.countdown_callback -= s32(objA0.countdown_callback - D1) >> 4
+	objA0.position.x.u16 = u16[A0 + 0x34]
+
+	D1 = objA0.value3e << 16
+	u32[A0 + 0x38] -= s32(u32[A0 + 0x38] - D1) >> 4
+	objA0.position.y.u16 = u16[A0 + 0x38]
+
+	--u16[A0 + 0x40]
+	if (u16[A0 + 0x40] == 0)
+	{
+		A1 = u32[A0 + 0x2e]
+		--u16[A1]
+		if (u16[0xffffe404] >= 0x05)
+		{
+			u16[0xffffe404] = 0
+			playSound(0x37)
+		}
+
+		if (ring_counter != 0)
+		{
+			--ring_counter
+			hud.dirty.rings |= 0x81
+		}
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x04c3f0) end(0x04c3f8)
+function void BonusSM.UpdateSlotMachine()
+{
+	A4 = 0xffffe408
+	D0 = u8[A4]
+	call 0x04c3fc + D0.s16
+}
+
+//# address-hook(0x04c3fc) end(0x04c3fc)
+function void fn04c3fc()
+{
+	fn04c416()
+}
+
+//# address-hook(0x04c400) end(0x04c400)
+function void fn04c400()
+{
+	fn04c462()
+}
+
+//# address-hook(0x04c404) end(0x04c404)
+function void fn04c404()
+{
+	fn04c480()
+}
+
+//# address-hook(0x04c408) end(0x04c408)
+function void fn04c408()
+{
+	fn04c540()
+}
+
+//# address-hook(0x04c40c) end(0x04c40c)
+function void fn04c40c()
+{
+	fn04c576()
+}
+
+//# address-hook(0x04c414) end(0x04c414)
+function void fn04c414()
+{
+}
+
+
+//# address-hook(0x04c416) end(0x04c460)
+function void fn04c416()
+{
+	zeroMemory(A4, 0x12)
+	D0.u8 = global.framecounter.low
+	u8[A4 + 0x06] = D0.u8
+	D0.u8 = (D0.u8 >> 3) + (D0.u8 << 5)
+	u8[A4 + 0x0a] = D0.u8
+	D0.u8 = (D0.u8 >> 3) + (D0.u8 << 5)
+	u8[A4 + 0x0e] = D0.u8
+	u8[A4 + 0x07] = 0x08
+	u8[A4 + 0x0b] = 0x08
+	u8[A4 + 0x0f] = 0x08
+	u8[A4 + 0x08] = 0x08
+	u8[A4 + 0x0c] = 0x08
+	u8[A4 + 0x10] = 0x08
+	u8[A4 + 0x01] = 0x01
+	u8[A4] += 4
+}
+
+
+//# address-hook(0x04c462) end(0x04c47e)
+function void fn04c462()
+{
+	fn04c6d6()
+	if (u8[A4 + 0x01] != 0)
+		return
+
+	u8[A4] = 0x18
+	u16[A4 + 0x08] = 0
+	u16[A4 + 0x0c] = 0
+	u16[A4 + 0x10] = 0
+}
+
+
+//# address-hook(0x04c480) end(0x04c53e)
+function void fn04c480()
+{
+	u8[A4 + 0x08] = 0x30 + (global.framecounter.low & 0x07) - 4
+	u8[A4 + 0x0c] = 0x30 + ((global.framecounter.low >> 4) & 0x07) - 4
+	u8[A4 + 0x10] = 0x30 + (u8[0xfffffe0e] & 0x07) - 4
+	u8[A4 + 0x01] = 2
+	u8[A4 + 0x03] = 0
+	u8[A4 + 0x09] = 0
+	u8[A4 + 0x0d] = 0
+	u8[A4 + 0x11] = 0
+	u8[A4] += 4
+
+	D0.u8 = global.framecounter.low
+	D0.u8 = (D0.u8 >> 3) + (D0.u8 << 5)
+	A2 = 0x04c8b4
+	while (true)
+	{
+		if (D0.u8 < u8[A2])
+		{
+			D0.u8 -= u8[A2]
+			break
+		}
+
+		D0.u8 -= u8[A2]
+		A2 += 3
+	}
+
+	// Original outcome probabilities:
+	//  -   4 out of 256	-> 3x Jackpot (enforced triple)
+	//  -   9 out of 256	-> 3x Sonic (enforced triple)
+	//  -   4 out of 256	-> 3x Knuckles (enforced triple)
+	//  -  18 out of 256	-> 3x Robotnik (enforced triple)
+	//  -   9 out of 256	-> 3x Tails (enforced triple)
+	//  -  15 out of 256	-> 3x Ring (enforced triple)
+	//  -  15 out of 256	-> 3x Bar (enforced triple)
+	//  - 182 out of 256	-> Random individual wheel outcomes, see below
+
+	// For S3AIR, probabilities are slightly changed (see "ROMManipulation.BonusSM.Probabilities()" function):
+	//  -   7 out of 256	-> 3x Jackpot (enforced triple)
+	//  -   9 out of 256	-> 3x Sonic (enforced triple)
+	//  -   9 out of 256	-> 3x Knuckles (enforced triple)
+	//  -  15 out of 256	-> 3x Robotnik (enforced triple)
+	//  -   9 out of 256	-> 3x Tails (enforced triple)
+	//  -  15 out of 256	-> 3x Ring (enforced triple)
+	//  -  15 out of 256	-> 3x Bar (enforced triple)
+	//  - 177 out of 256	-> Random individual wheel outcomes, see below
+
+	if (u8[A2] != 0xff)
+	{
+		// Enforce three of a kind
+		u8[A4 + 0x04] = u8[A2 + 0x01]
+		u8[A4 + 0x05] = u8[A2 + 0x02]
+		return
+	}
+
+	// Here's where the slot wheel outcome gets determined (if not enforcing three of a kind)
+	GetRandomNumber()
+	D0.u16 = (D0.u16 + global.framecounter.u16) >> 4
+
+	// Wheel values:
+	//  - 0x00 = Jackpot
+	//  - 0x01 = Sonic
+	//  - 0x02 = Tails
+	//  - 0x03 = Knuckles
+	//  - 0x04 = Robotnik
+	//  - 0x05 = Ring
+	//  - 0x06 = Bar
+
+	// Concrete outcomes:
+	// - Left:   0x00, 0x01, 0x02, 0x05, 0x04, 0x06, 0x03, 0x05		-> Double chance for Ring
+	// - Center: 0x00, 0x01, 0x02, 0x05, 0x04, 0x06, 0x01, 0x03		-> Double chance for Sonic
+	// - Right:  0x00, 0x01, 0x02, 0x05, 0x04, 0x06, 0x05, 0x03		-> Double chance for Ring
+
+	u8 wheelL = u8[0x04c8dc + ((D0.u16 >> 6) & 0x07)]
+	u8 wheelC = u8[0x04c8d4 + ((D0.u16 >> 3) & 0x07)]
+	u8 wheelR = u8[0x04c8cc + (D0.u16 & 0x07)]
+
+	u8[A4 + 0x04] = wheelR
+	u8[A4 + 0x05] = (wheelC << 4) | wheelL
+}
+
+
+//# address-hook(0x04c540) end(0x04c574)
+function void fn04c540()
+{
+	fn04c6d6()
+	if (u8[A4 + 0x01] != 0)
+		return
+
+	u8[A4 + 0x08] += 0x30
+	u8[A4 + 0x0c] += 0x30
+	u8[A4 + 0x10] += 0x30
+	u8[A4 + 0x01] = (global.framecounter.low & 0x0f) + 0x0c
+	u8[A4 + 0x02] = 0
+	u8[A4] += 4
+}
+
+
+//# address-hook(0x04c576) end(0x04c5b0)
+function void fn04c576()
+{
+	fn04c6d6()
+
+	// u8[A4 + 0x09], u8[A4 + 0x0d] and u8[A4 + 0x11] store the current animation routine of the three wheels:
+	//  - 0x00: still spinning
+	//  - 0x04: slowing down
+	//  - 0x08: coming to a halt
+	//  - 0x0c: stopped
+	if (u8[A4 + 0x09] == 0x0c && u8[A4 + 0x0d] == 0x0c && u8[A4 + 0x11] == 0x0c)
+	{
+		// Do evaluation now
+		fn04c6bc()
+		return
+	}
+
+	D0 = u8[A4 + 0x03]
+	A1 = A4 + D0.u16 + 6
+	A3 = 0x04c8cc + D0.u16 * 2
+	D0 = u8[A1 + 0x03]
+	call 0x04c5b4 + D0.s16
+}
+
+//# address-hook(0x04c5b4) end(0x04c5b4)
+function void fn04c5b4()
+{
+	fn04c602()
+}
+
+//# address-hook(0x04c5b8) end(0x04c5b8)
+function void fn04c5b8()
+{
+	fn04c63e()
+}
+
+//# address-hook(0x04c5bc) end(0x04c5bc)
+function void fn04c5bc()
+{
+	fn04c6a8()
+}
+
+//# address-hook(0x04c5c0) end(0x04c5c0)
+function void fn04c5c0()
+{
+}
+
+
+//# address-hook(0x04c5c4) end(0x04c5de)
+function void fn04c5c4()
+{
+	D1.u16 = u16[A4 + 0x04]
+	D0.u8 = u8[A4 + 0x03]
+	if (D0.u8 != 0)
+	{
+		D1.u16 >>= D0
+	}
+	D1.u16 &= 0x07
+	if (D1.s8 > 6)
+	{
+		D1.u8 -= 2
+	}
+}
+
+
+//# address-hook(0x04c5e0) end(0x04c600)
+function void fn04c5e0()
+{
+	D2.u16 = 0xfff0
+	D1.u16 &= 0x0f
+	D0.u8 = u8[A4 + 0x03]
+	if (D0.u8 != 0)
+	{
+		D1.u16 <<= D0
+		D2 = (D2 << D0) | (D2 >> (16 - D0))
+	}
+
+	u16[A4 + 0x04] = ((u16[A4 + 0x04] & D2.u16) | D1.u16) & 0x0777
+}
+
+
+//# address-hook(0x04c602) end(0x04c63c)
+function void fn04c602()
+{
+	if (u8[A4 + 0x03] == 0)
+	{
+		if (s8[A4 + 0x01] >= 0)
+			return
+	}
+	else
+	{
+		if (s8[A1 - 0x01] < 8)
+			return
+	}
+
+	fn04c5c4()
+
+	D0.u16 = ((u16[A1] - 0xa0) >> 8) & 0x07
+	D0.u8 = u8[A3 + D0.s16]
+	if (D0.u8 == D1.u8)
+	{
+		u8[A1 + 0x03] += 4
+		u8[A1 + 0x02] = 0x60
+	}
+}
+
+
+//# address-hook(0x04c63e) end(0x04c6a6)
+function void fn04c63e()
+{
+	fn04c5c4()
+
+	D0.u16 = ((u16[A1] + 0xf0) & 0x0700) >> 8
+	D0.u8 = u8[A3 + D0.s16]
+	if (D1.u8 != D0.u8)
+	{
+		if (u8[A1 + 0x02] > 0x20)
+		{
+			u8[A1 + 0x02] -= 0x0c
+		}
+		if (s8[A1 + 0x02] > 0x18 && u8[A1 + 0x01] <= 0x80)
+		{
+			u8[A1 + 0x02] -= 2
+		}
+		return
+	}
+
+	D0.u16 = u16[A1] + 0x80
+	D1.u16 = (D0.u16 & 0x0700) - 0x10
+	u16[A1] = D1.u16
+	D0.u16 = (D0.u16 >> 8) & 0x07
+	D1.u8 = u8[A3 + D0.s16]
+	fn04c5e0()
+
+	u8[A1 + 0x02] = 0xf8
+	u8[A1 + 0x03] += 4
+}
+
+
+//# address-hook(0x04c6a8) end(0x04c6b8)
+function void fn04c6a8()
+{
+	if (u8[A1 + 0x01] == 0)
+	{
+		u8[A1 + 0x02] = 0
+		u8[A1 + 0x03] += 4
+	}
+}
+
+
+//# address-hook(0x04c6ba) end(0x04c6ba)
+function void fn04c6ba()
+{
+}
+
+
+//# address-hook(0x04c6bc) end(0x04c6d4)
+function void fn04c6bc()
+{
+	u16[A4 + 0x08] = 0
+	u16[A4 + 0x0c] = 0
+	u16[A4 + 0x10] = 0
+	u8[A4 + 0x01] = 0
+
+	fn04c7a2()
+	u8[A4] = 0x18
+}
+
+
+
+//# address-hook(0x04c6d6) end(0x04c6ec)
+function void fn04c6d6()
+{
+	// Update wheel graphics
+	//  -> u8[A4 + 0x03] alternates between 0x00, 0x04 and 0x08, depending on which wheel to update next
+	D0 = u8[A4 + 0x03]
+	A1 = A4 + D0.u16 + 6
+	A3 = 0x04c8cc + D0.u16 * 2
+	call 0x04c6f0 + D0.u16
+}
+
+//# address-hook(0x04c6f0) end(0x04c6f0)
+function void fn04c6f0()
+{
+	fn04c706()
+}
+
+//# address-hook(0x04c6f4) end(0x04c6f4)
+function void fn04c6f4()
+{
+	fn04c712()
+}
+
+//# address-hook(0x04c6f8) end(0x04c704)
+function void fn04c6f8()
+{
+	u8[A4 + 0x03] = 0
+	--u8[A4 + 0x01]
+	D2.u16 = 0x4400
+	fn04c71a()
+}
+
+
+//# address-hook(0x04c706) end(0x04c70e)
+function void fn04c706()
+{
+	u8[A4 + 0x03] += 4
+	D2.u16 = 0x4000
+	fn04c71a()
+}
+
+
+//# address-hook(0x04c712) end(0x04c716)
+function void fn04c712()
+{
+	u8[A4 + 0x03] += 4
+	D2.u16 = 0x4200
+	fn04c71a()
+}
+
+
+//# address-hook(0x04c71a) end(0x04c77a)
+function void fn04c71a()
+{
+	D0.u16 = u16[A1] & 0x07f8
+	u16[A1] -= s8[A1 + 0x02]
+	D3.u16 = u16[A1] & 0x07f8
+	if (D3.u16 == D0.u16)
+		return
+
+	fn04c77c()
+
+	A1 = 0xffff7c00
+	for (u8 i = 0; i < 0x20; ++i)
+	{
+		u32[A1]         = u32[A2]
+		u32[A1 + 0x80]  = u32[A2 + 0x80]
+		u32[A1 + 0x100] = u32[A2 + 0x100]
+		u32[A1 + 0x180] = u32[A2 + 0x180]
+
+		A1 += 4
+		A2 += 4
+		D3.u8 += 8
+		if (D3.u8 == 0)
+		{
+			D3.u16 = (D3.u16 + 0x0100) & 0x0700
+			fn04c77c()
+		}
+	}
+
+	updateSpritePattern(0xffff7c00, D2.u16, 0x100)
+}
+
+
+//# address-hook(0x04c77c) end(0x04c7a0)
+function void fn04c77c()
+{
+	D0.u16 = (D3.u16 >> 8) & 0x07
+	D0.u16 = u8[A3 + D0.s16] & 0x07
+	D0.u16 = (D0.u16 >> 7) + (D0.u16 << 9)
+
+	A2 = 0x158cae + D0.u16
+	D0.u16 = (D3.u16 & 0xf8) >> 1
+	A2 += D0.u16
+}
+
+
+//# address-hook(0x04c7a2) end(0x04c7c4)
+function void fn04c7a2()
+{
+	// The three symbols in the slot machine are stored in
+	//  - u8[A4 + 0x05] - lower nybble  = left slot
+	//  - u8[A4 + 0x05] - higher nybble = center slot
+	//  - u8[A4 + 0x04] - lower nybble  = right slot
+
+	D2.u16 = (u8[A4 + 0x05] & 0xf0) >> 4
+	D3.u16 = (u8[A4 + 0x05] & 0x0f)
+	D0 =  (D2.u8 == u8[A4 + 0x04]) ? 4 : 0
+	D0 += (D3.u8 == u8[A4 + 0x04]) ? 8 : 0
+	call 0x04c7c8 + D0.s16
+}
+
+//# address-hook(0x04c7c8) end(0x04c7c8)
+function void fn04c7c8()
+{
+	// Right slot is not equal to any of the two others
+	fn04c838()
+}
+
+//# address-hook(0x04c7cc) end(0x04c7cc)
+function void fn04c7cc()
+{
+	// Right slot is equal to center slot
+	fn04c80e()
+}
+
+//# address-hook(0x04c7d0) end(0x04c7d0)
+function void fn04c7d0()
+{
+	// Right slot is equal to left slot
+	fn04c7e0()
+}
+
+//# address-hook(0x04c7d4) end(0x04c7de)
+function void fn04c7d4()
+{
+	// This gets called when you got three of a kind
+#if STANDALONE
+	if (D2.u16 == 0)
+	{
+		// Jackpot! Five bucks ... Wait, that's a different game
+		Game.setAchievementComplete(ACHIEVEMENT_SM_JACKPOT)
+	}
+#endif
+
+	D0.u16 = D2.u16
+	fn04c88e()
+	u16[A4 + 0x04] = D0.u16
+}
+
+
+//# address-hook(0x04c7e0) end(0x04c80c)
+function void fn04c7e0()
+{
+	if (D3.u8 == 0)
+	{
+		D0.u16 = D2.u16
+		fn04c88e()
+		u16[A4 + 0x04] = D0.u16 * 4
+	}
+	else if (D2.u8 == 0)
+	{
+		D0.u16 = D3.u16
+		fn04c88e()
+		u16[A4 + 0x04] = D0.u16 * 2
+	}
+	else
+	{
+		fn04c838()
+	}
+}
+
+
+//# address-hook(0x04c80e) end(0x04c836)
+function void fn04c80e()
+{
+	if (D2.u8 == 0)
+	{
+		D0.u16 = D3.u16
+		fn04c88e()
+		u16[A4 + 0x04] = D0.u16 * 4
+	}
+	else if (D3.u8 == 0)
+	{
+		D0.u16 = D2.u16
+		fn04c88e()
+		u16[A4 + 0x04] = D0.u16 * 2
+	}
+	else
+	{
+		fn04c838()
+	}
+}
+
+
+//# address-hook(0x04c838) end(0x04c88a)
+function void fn04c838()
+{
+	if (D3.u8 == D2.u8)
+	{
+		if (u8[A4 + 0x04] == 0)
+		{
+			D0.u16 = D2.u16
+			fn04c88e()
+			u16[A4 + 0x04] = D0.u16 * 2
+			return
+		}
+		else if (D2.u8 == 0)
+		{
+			D0.u16 = u8[A4 + 0x04] & 0x0f
+			fn04c88e()
+			u16[A4 + 0x04] = D0.u16 * 4
+			return
+		}
+	}
+
+	// Handling for "bar"
+	D0 = 0
+	if (u8[A4 + 0x04] == 0x06)
+	{
+		D0.u16 += 2
+	}
+	if (D2.u8 == 0x06)
+	{
+		D0.u16 += 2
+	}
+	if (D3.u8 == 0x06)
+	{
+		D0.u16 += 2
+	}
+	u16[A4 + 0x04] = D0.u16
+	fn04c88e()
+}
+
+
+//# address-hook(0x04c88e) end(0x04c89a)
+function void fn04c88e()
+{
+	// Determine the reward (you only get it if there's three of a kind)
+	//  - 100	when D0.u16 == 0x00  -> Jackpot
+	//  -  30	when D0.u16 == 0x01  -> Sonic
+	//  -  20	when D0.u16 == 0x02  -> Tails
+	//  -  25	when D0.u16 == 0x03  -> Knuckles
+	//  -  -1	when D0.u16 == 0x04  -> Robotnik
+	//  -  10	when D0.u16 == 0x05  -> Ring
+	//  -   8	when D0.u16 == 0x06  -> Bar
+	D0.u16 = u16[0x04c8a4 + D0.u16 * 2]
+}
+
+//# address-hook(0x04c89c) end(0x04c89e)
+function void fn04c89c()
+{
+	D0.u16 *= 4
+}
+
+//# address-hook(0x04c8a0) end(0x04c8a2)
+function void fn04c8a0()
+{
+	D0.u16 *= 2
+}
+
+
+
+// Special ring update for this bonus stage
+
+//# address-hook(0x01a9ee) end(0x01a9f8)
+function void fn01a9ee()
+{
+	// Targets:
+	//  - 0x01aa02	-> objA0.base_state = 0x00	-> Flying towards player
+	//  - 0x01aa56	-> objA0.base_state = 0x02	-> Collected animation
+	//  - 0x01aa62	-> objA0.base_state = 0x04	-> Despawn
+	call tableLookupAddress(0x01a9fc, objA0.base_state)
+}
+
+
+//# address-hook(0x01aa02) end(0x01aa50)
+function void fn01aa02()
+{
+	D1 = u32(u16[A0 + 0x3c]) << 16
+	D0 = objA0.countdown_callback - D1
+	D0.s32 >>= 4
+	objA0.countdown_callback -= D0
+	objA0.position.x.u16 = u16[A0 + 0x34]
+
+	D1 = u32(objA0.value3e) << 16
+	D0 = u32[A0 + 0x38] - D1
+	D0.s32 >>= 4
+	u32[A0 + 0x38] -= D0
+	objA0.position.y.u16 = u16[A0 + 0x38]
+
+	Object.animationUpdate(0x01aa66)
+
+	--u16[A0 + 0x40]
+	if (u16[A0 + 0x40] == 0)
+	{
+		A1 = u32[A0 + 0x2e]
+		--u16[A1]
+
+#if STANDALONE
+		SlotMachine.collectRing()
+
+		// Save position relative to the center, for we have to update it from now on once per frame
+		s16[A0 + 0x46] = objA0.position.x.u16 - 0x460
+		s16[A0 + 0x48] = objA0.position.y.u16 - 0x430
+#else
+		CollectRing()
+#endif
+
+		objA0.base_state += 2
+		fn01aa56()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x01aa56) end(0x01aa5e)
+function void fn01aa56()
+{
+#if STANDALONE
+	// Reposition the ring to prevent a small graphics glitch that happens in the original
+	//  (when the player moves out of the center, the ring effect would start to move)
+	if (u16[0xffffb010] != 0x460 || u16[0xffffb014] != 0x430)
+	{
+		u8 angle = slotmachine.rotation.u8 & 0xfc
+		s32 sine   = lookupSin(angle)
+		s32 cosine = lookupCos(angle)
+		s16 bx = 0x460 - u16[0xffffb010]
+		s16 by = 0x430 - u16[0xffffb014]
+		objA0.position.x.u16 = camera.foreground.x.u16 + getScreenWidth() / 2 + s16[A0 + 0x46] + ((bx * cosine - by * sine) >> 8)
+		objA0.position.y.u16 = camera.foreground.y.u16 + getScreenHeight() / 2 + s16[A0 + 0x48] + ((bx * sine + by * cosine) >> 8)
+	}
+#endif
+
+	Object.animationUpdate(0x01a992)
+	DrawObject()
+}
+
+
+//# address-hook(0x01aa62) end(0x01aa62)
+function void fn01aa62()
+{
+	UnloadObject()
+}

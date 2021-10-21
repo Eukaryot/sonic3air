@@ -1,0 +1,5 @@
+{
+	"cutscene_knuckles_4_0x01": { "File": "_atlas.bmp", "Rect": "0,0,32,40", "Center": "16,20" },
+	"cutscene_knuckles_4_0x02": { "File": "_atlas.bmp", "Rect": "32,0,32,40", "Center": "16,20" },
+	"cutscene_knuckles_4_0x03": { "File": "_atlas.bmp", "Rect": "64,0,32,40", "Center": "16,20" }
+}

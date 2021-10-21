@@ -1,0 +1,2370 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Blue Sphere Game (S&K + Sonic 1 lock-on)              //
+//-------------------------------------------------------//
+
+define bluespheregame.fully_unlocked	=  u8[0xffffffa0]	// Set to 1 if S&K is locked-on to Sonic 1 (or when played in S3AIR)
+define bluespheregame.current_stage		= u32[0xffffffa6]	// Starting with 0, so it's the shown level number minus one
+define bluespheregame.menu_selection	=  u8[0xffffffaa]
+define bluespheregame.shown_difficulty	=  u8[0xffffffac]	// Shown difficulty in results after perfect (counts up in the screen)
+define bluespheregame.difficulty_level	=  u8[0xffffffad]	// Actual difficulty
+
+
+#if STANDALONE
+function void BlueSphereGame.applyTailsPalette(u32 targetPaletteLineAddress)
+{
+	u16[targetPaletteLineAddress + 0x42] = 0x0eee
+	u16[targetPaletteLineAddress + 0x44] = 0x02ae
+	u16[targetPaletteLineAddress + 0x46] = 0x008c
+	u16[targetPaletteLineAddress + 0x4c] = 0x008e
+	u16[targetPaletteLineAddress + 0x4e] = 0x026a
+	u16[targetPaletteLineAddress + 0x58] = 0x0ecc
+	u16[targetPaletteLineAddress + 0x5a] = 0x0caa
+	u16[targetPaletteLineAddress + 0x5c] = 0x0866
+}
+#endif
+
+
+//# address-hook(0x000418) end(0x000436)
+function void BlueSphereGame()
+{
+#if !STANDALONE
+	call 0x00043a
+	u8[0xffffff9f] = D4.u8
+
+	call 0x00111a
+	call 0x0012ce
+	call 0x0010ae
+#endif
+
+	u8[0xffffffa1] = 0
+	global.game_mode = 0x2c
+
+	while (true)
+	{
+		// See "GameModeControlLoop" for more information
+		D0.u16 = global.game_mode & 0x7c
+		A0 = u32[0x0004c6 + D0.u16]
+		call A0
+	}
+}
+
+
+//# address-hook(0x04c8e4) end(0x04c97c)
+function void fn04c8e4()
+{
+	kosinski.queue_size = 0
+	zeroMemory(0xffffff10, 0x6c)
+
+	ClearPatternLoadingQueue()
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setPlayfieldSizeInPixels(512, 256)
+	VDP.Config.setupWindowPlane(false, 0)
+	VDP.Config.setVerticalScrolling(false, 0xff)
+	VDP.Config.setBackdropColor(0x20)
+	VDP.Config.setRenderingModeConfiguration(false)
+	water.fullscreen = 0
+	level.water_present = 0
+
+	fn0011ca()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	fn01aa6e()
+	zeroMemory(0xfffffc00, 0x100)
+
+	global.zone_act = 0
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+}
+
+
+function void BlueSphere.setGeneratedStage(u32 number)
+{
+	u8[0xffffffa2] = number & 0x7f
+	u8[0xffffffa3] = (number * 3 + 1) % 0x7f
+	u8[0xffffffa4] = (number * 5 + 2) % 0x7e
+	u8[0xffffffa5] = (number * 7 + 3) % 0x7d
+}
+
+
+//# address-hook(0x04c97e) end(0x04cb18)
+function void fn04c97e()
+{
+#if STANDALONE
+	// Assuming a white screen here
+	globalComponentAddedColorR = 0xff
+	globalComponentAddedColorG = 0xff
+	globalComponentAddedColorB = 0xff
+#endif
+
+	playMusic(MUSIC_CTRL_FADEOUT)
+	FadeOutScreenBlocking()
+
+	fn04c8e4()
+	fn04cca6()
+
+#if STANDALONE
+	// Try to load progress from SRAM
+	SRAM.load(0xffffffa6, 0x50, 4)		// Writing to the address of bluespheregame.current_stage
+	System.loadPersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
+
+	// Switch to the correct seed for this stage
+	BlueSphere.setGeneratedStage(bluespheregame.current_stage)
+#endif
+
+	A2 = 0xfffffc80
+	fn04cb1a()
+
+	Nemesis.loadDataToVRAM(0x0dde34, 0xb7e0)
+	Nemesis.loadDataToVRAM(0x189c7c, 0x32e0)
+
+	Kosinski.decompress(0x187d1c, 0xffff0000)
+	Kosinski.decompress(0x188f1e, A1)
+	updateSpritePattern(0xffff0000, 0, A1.u16 >> 1)
+
+	Kosinski.decompress(0x1897de, 0xffff4000)
+	updateSpritePattern(0xffff4000, 0xa9c0, 0x06d0)
+
+	Enigma.decompress(0x187cb0, 0xffff8000, 0x2000)
+
+	//copyRectToVRAM(0xffff8000, 0xc380, 0x28, 0x10)	// Should be the same as below, needs to be tested
+	A1 = 0xffff8000
+	D0 = 0x43800003
+	D1 = 0x27
+	D2 = 0x0f
+	CopyRectToVRAM()
+
+	Enigma.decompress(0x189c4e, 0xffff8000, 0x4197)
+
+	//copyRectToVRAM(0xffff8000, 0xe09c, 0x0c, 0x08)	// Should be the same as below, but something is wrong
+	A1 = 0xffff8000
+	D0 = 0x609c0003
+	D1 = 0x0b
+	D2 = 0x07
+	CopyRectToVRAM()
+
+	A1 = 0x04cc62
+	if (u8[0xffffffa1] == 0)
+	{
+		A1 = 0x04cc36
+		levelselect.characters = CHARS_SONIC_ALONE
+		scrolloffset.y.both = 0xfff0fff8
+	}
+
+	D2.u16 = 0x0100
+	D6.u16 = 0x05bf
+	fn05b318()
+	if (bluespheregame.fully_unlocked == 0)
+	{
+		scrolloffset.y.both = 0xfff0fff8
+	}
+
+	u32[0xffffb000] = 0x04ceaa
+	u32[0xffffb04a] = 0x04da30
+	u32[0xffffb094] = 0x04d986
+	UpdateGameObjects()
+	RenderSprites()
+
+	playMusic(0x28)
+
+	VDP.Config.setActiveDisplay(true)
+
+	Menu.FadeInAfterInit()
+
+	while (true)
+	{
+		global.frame_state = 0x1a
+		Kosinski.ProcessDecompressionQueue()
+
+		waitForNextFrame()
+
+		fn04cc96()
+		UpdateGameObjects()
+		RenderSprites()
+		Kosinski.ProcessModules()
+
+		if (global.game_mode != 0x2c)
+			break
+	}
+}
+
+
+//# address-hook(0x04cca6) end(0x04ccfc)
+function void fn04cca6()
+{
+	// This seems to be a check for Sonic 1 lock-on
+	// Signatures:
+	//  - "GM MK-1079 -0" for Sonic 3
+	//  - "GM 00001009-0" for Sonic 1 (I guess) - accepted signature #1
+	//  - "GM 00004049-0" for Sonic 1 (I guess) - accepted signature #2
+	//  - There must be two more from 0x04cd18 on, but it looks much less like ASCII characters
+
+	// Skip in standalone, act as if it's Sonic 1
+#if !STANDALONE
+	A1 = 0x04ccfe
+	D1 = 3
+	while (true)
+	{
+		A0 = 0x200180	// Address of the lock-on game's signature
+		D3 = 0
+		for (u8 i = 0; i < 0x0d; ++i)
+		{
+			if (u8[A1] != u8[A0])
+			{
+				D3 = 1
+				break
+			}
+			++A0
+			++A1
+		}
+
+		if (D3.u8 == 0)
+			break
+
+		--D1.s16
+		if (D1.s16 < 0)
+		{
+			// No match
+			bluespheregame.fully_unlocked = 0
+			u8[0xffffffab] = 0xff
+			fn04cd18()
+			return
+		}
+	}
+#endif
+
+	// Matched one of the signatures
+	bluespheregame.fully_unlocked = 1
+	if (u8[0xffffffa1] == 0)
+	{
+		u8[0xffffffab] = 0
+		bluespheregame.current_stage = 0
+		u32[0xffffffa2] = 0x010203
+	}
+}
+
+
+//# address-hook(0x04cb1a) end(0x04cb34)
+function void fn04cb1a()
+{
+	A1 = (u8[0xffffffab] == 0) ? 0x04cb36 : 0x04cbb6
+	copyMemory(A2, A1, 0x80)
+
+#if STANDALONE
+	if (levelselect.characters == CHARS_TAILS_ALONE)
+	{
+		// Manipulate the palette for Tails
+		BlueSphereGame.applyTailsPalette(A2)
+	}
+#endif
+}
+
+
+//# address-hook(0x04cc96) end(0x04cca4)
+function void fn04cc96()
+{
+	// Update scrolling of the marquee text
+	A1 = 0xffffe000
+	for (u8 i = 0; i < 0x40; ++i)
+	{
+		u16[A1] -= 2
+		A1 += 4
+	}
+}
+
+
+
+// Used when a ROM is locked on that allows only a single stage
+
+//# address-hook(0x04cd18) end(0x04ce6c)
+function void fn04cd18()
+{
+	A1 = 0x200180
+	D1 = 0x0a
+	while (D1.s16 >= 0)
+	{
+		D0.u8 = u8[A1] - 0x30
+		if (D0.u8 != 0 && D0.u8 < 0x0a)
+			break
+
+		++A1
+		--D1.s16
+	}
+
+	D2 = 0
+	while (D1.s16 >= 0)
+	{
+		D0.u8 = u8[(A1+=1)-1] - 0x30
+		if (D0.u8 < 0x0a)
+		{
+			D0.u8 &= 0x0f
+			D2 = u32(D2.u16) * 0x0a
+			D2.u16 += D0.u16
+		}
+		--D1.s16
+	}
+
+	D2.u16 &= 0x7fff
+	D6 = D2.u16 & 0x3f
+	A2 = 0x04ce6e
+	D0 = u32[0x20011c]
+	D1 = 0x0e
+	while (D1.s16 >= 0)
+	{
+		--D1.s16
+		if (D0 == u32[(A2+=4)-4])
+			break
+	}
+
+	D1.u16 = (0x0e - D1.u16) & 0x0f
+	D6.u16 <<= 4
+	D6.u8 |= D1.u8
+	D0.u16 = (D2.u16 >> 6) & 0x0f
+	D6.u16 <<= 4
+	D6.u8 |= D0.u8
+	D1.u8 = u8[0x200150] & 0x01
+	D6 <<= 1
+	D6.u8 |= D1.u8
+
+	A1 = 0x20011a
+	D0 = u8[(A1+=1)-1] - 0x30
+	D0 = u32(D0.u16) * 0x0a
+	D1.u8 = u8[(A1+=1)-1] - 0x30
+	D0.u8 = (D0.u8 + D1.u8 - 0x58) & 0x07
+	D6 <<= 3
+	D6.u8 |= D0.u8
+	D2.u16 = (D2.u16 >> 10) & 0x1f
+	D6 <<= 5
+	D6.u8 |= D2.u8
+	D0.u16 = u16[0x2001a4]
+	D0.u8 >>= 3
+	D0.u8 &= 0x03
+	D6 <<= 2
+	D6.u8 |= D0.u8
+	D1 = (u16[0x200114] != 0x4547) ? 1 : 0
+
+	D6 <<= 1
+	D6.u8 |= D1.u8
+	D1.u8 = u8[0xffffff9f] & 0x01
+	D6 <<= 1
+	D6.u8 |= D1.u8
+	D6 &= 0x07ffffff
+
+	bluespheregame.current_stage = D6
+	BlueSphere.setGeneratedStage(bluespheregame.current_stage)
+}
+
+
+//# address-hook(0x04ceaa) end(0x04ceb0)
+function void fn04ceaa()
+{
+	if (u8[0xffffffa1] != 0)
+	{
+		fn04cef8()
+	}
+	else
+	{
+		objA0.update_address = 0x04ceb6
+		fn04ceb6()
+	}
+}
+
+
+//# address-hook(0x04ceb6) end(0x04cef4)
+function void fn04ceb6()
+{
+#if !STANDALONE
+	if (u8[0x000000] != 0)	// Does this make any sense at all?
+		return
+#endif
+
+	// For standalone, wait briefly (to prevent glitches) instead of requiring A+B+C buttons
+#if STANDALONE
+	if (global.framecounter > 30)
+#else
+	if (control.pad1.state == CONTROL_ABC)
+#endif
+	{
+		control.pad1.pressed = 0
+		D0 = 0xffffffff
+		bluespheres.blue_remaining = D0.u16
+		bluespheres.rings_remaining = D0.u16
+		playSound(0x63)
+
+	#if !STANDALONE
+		set_status_register(0x2700)
+	#endif
+		A1 = 0x04cc62
+		D2.u16 = 0x0100
+		D6.u16 = 0x05bf
+		fn05b318()
+	#if !STANDALONE
+		set_status_register(0x2300)
+	#endif
+
+		fn04cef8()
+	}
+}
+
+
+//# address-hook(0x04cef8) end(0x04cf80)
+function void fn04cef8()
+{
+	objA0.update_address = 0x04cf82
+	u32[0xffffb1bc] = 0x04d03e
+	u16[0xffffb1d0] = 0xc0
+	u8[0xffffffa1] = 0x01
+	bluespheregame.menu_selection = 0
+	u32[0xffffbd4c] = 0x04d64e
+	u32[0xffffbd96] = 0x04d64e
+	u8[0xffffbd9a] |= 0x01
+
+	if (bluespheregame.fully_unlocked != 0)
+	{
+		u16[0xffffb1d0] = 0xb0
+		u32[0xffffb534] = 0x04d2f4
+		u16[0xffffb548] = 0x0144
+		u32[0xffffb8f6] = 0x04d302
+		u16[0xffffb90a] = 0x0144
+		u32[0xffffbd02] = 0x04d610
+		bluespheregame.menu_selection = 1
+	}
+	else
+	{
+		if (bluespheres.blue_remaining == 0 && bluespheres.rings_remaining == 0)
+		{
+			u32[0xffffb8f6] = 0x04d302
+			u16[0xffffb90a] = 0x0144
+		}
+	}
+}
+
+
+//# address-hook(0x04cf82) end(0x04d03c)
+function void fn04cf82()
+{
+	if (bluespheregame.fully_unlocked != 0)
+	{
+		if (scrolloffset.y.planeA != 0)
+		{
+			++scrolloffset.y.planeA
+			if ((u8[0xfffff617] & 0x01) == 0)
+			{
+				++scrolloffset.y.planeB
+			}
+
+			A1 = 0xffffb094
+			D1 = 0x03
+			while (D1.s16 >= 0)
+			{
+				--u16[A1 + 0x14]
+				A1 += 0x4a
+				--D1.s16
+			}
+		}
+
+		if ((u8[0xffffffa1] & 0x80) == 0)
+		{
+			if (control.pad1.pressed & CONTROL_UP)
+			{
+				if (bluespheregame.menu_selection != 0)
+				{
+					--bluespheregame.menu_selection
+					playSound(0x89)
+				}
+			}
+
+			if (control.pad1.pressed & CONTROL_DOWN)
+			{
+				if (bluespheregame.menu_selection < 2)
+				{
+					++bluespheregame.menu_selection
+					playSound(0x89)
+
+					if (bluespheregame.menu_selection == 2)
+					{
+						u8[0xffffffa1] |= 0x80
+						control.pad1.pressed = 0
+					}
+				}
+			}
+		}
+
+		if (bluespheregame.menu_selection != 1)
+			return
+	}
+
+	if (control.pad1.pressed == CONTROL_START)
+	{
+		global.stage_type = 0
+		bluespheres.minigame_mode = 1
+		global.characters = levelselect.characters
+		lives_counter = 0x03
+		global.sk_bluespheres = 0
+		global.next_bluespheres = 0
+		global.game_mode = 0x34
+	}
+}
+
+
+
+// Level text
+
+//# address-hook(0x04d03e) end(0x04d098)
+function void fn04d03e()
+{
+	objA0.mapping_offset = 0x04d7be
+	objA0.sprite_attributes = 0x854e
+	objA0.position.x.u16 = 0x0120
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x14
+	objA0.box_size.y = 0x08
+#if STANDALONE
+	objA0.position.x.u16 += getScreenExtend()
+#endif
+
+	D3.u16 = objA0.position.y.u16 + 0x10
+	A1 = A0
+	u8[A1 + 0x6c] = 0x0a
+	D2.u16 = 0xf7
+	D1 = 0x0a
+	while (D1.s16 >= 0)
+	{
+		A1 += 0x4a
+		u32[A1] = 0x04d5b4
+		u16[A1 + 0x10] = D2.u16 + getScreenExtend()
+		u16[A1 + 0x14] = D3.u16
+		D2.u16 += 8
+		--D1.s16
+	}
+	u8[A1 + 0x22] = 0x0b
+
+	objA0.update_address = 0x04d09e
+	fn04d09e()
+}
+
+
+
+//# address-hook(0x04d09e) end(0x04d0f0)
+function void fn04d09e()
+{
+	if (bluespheregame.fully_unlocked != 0)
+	{
+		if (bluespheregame.menu_selection == 0) != (u8[0xffffffab] == 0)
+		{
+			D1 = (bluespheregame.current_stage + 1) & 0x07ffffff
+			fn04d13a()
+
+			objA0.animation.sprite = 0
+			DrawObject()
+			return
+		}
+	}
+
+	D1 = u32[0xffffffa2]
+	D1.u8 <<= 1
+	D1.u16 <<= 1
+	D1 = (D1 << 16) + (D1 >> 16)
+	D1.u8 <<= 1
+	D1.u16 >>= 1
+	D1 = (D1 << 16) + (D1 >> 16)
+	D1 >>= 2
+	D1 &= 0x0fffffff
+	fn04d0f6()
+
+	objA0.animation.sprite = 1
+	DrawObject()
+}
+
+
+//# address-hook(0x04d0f6) end(0x04d138)
+function void fn04d0f6()
+{
+	D1 &= 0x0fffffff
+	A1 = A0 + 0x4a
+	A2 = 0x04d21c
+	D6 = 8
+
+	while (D6.s16 >= 0)
+	{
+		A1 += 0x4a
+		D2 = 0
+		D3 = u32[(A2+=4)-4]
+		while (true)
+		{
+			D1 -= D3
+			if (D1.s32 < 0)
+				break
+
+			++D2.u16
+		}
+
+		D1 += D3
+		u8[A1 + 0x22] = D2.u8
+		--D6.s16
+	}
+
+	D2.u16 = 0xf7
+	D1 = 10
+	A1 = A0
+	while (D1.s16 >= 0)
+	{
+		A1 += 0x4a
+		u16[A1 + 0x10] = D2.u16 + getScreenExtend()
+		D2.u16 += 8
+		--D1.s16
+	}
+}
+
+
+//# address-hook(0x04d13a) end(0x04d1a8)
+function void fn04d13a()
+{
+	D1 &= 0x07ffffff
+	A1 = A0 + 0x4a
+	A2 = 0x04d21c
+	D6 = 8
+	D4 = 0
+
+	while (D6.s16 >= 0)
+	{
+		A1 += 0x4a
+		D2 = 0
+		D3 = u32[(A2+=4)-4]
+
+		while (true)
+		{
+			D1 -= D3
+			if (D1.s32 < 0)
+				break
+
+			++D2.u16
+		}
+
+		D1 += D3
+		if (D2.u16 != 0 && D4.u16 == 0)
+		{
+			D4.u16 = D6.u16
+			++D4.u16
+		}
+		if (D4.u16 == 0)
+		{
+			D2 = 0x0a
+		}
+		u8[A1 + 0x22] = D2.u8
+		--D6.s16
+	}
+
+	D2.u16 = 0xf7
+	D0.u16 = D4.u16 - 9
+	D0.s16 = -D0.s16
+	D1.u16 = D0.u16
+	D0.u16 <<= 2
+	D2.u16 += D0.u16
+	A1 = A0
+	while (D1.s16 >= 0)
+	{
+		A1 += 0x4a
+		u16[A1 + 0x10] = D2.u16 + getScreenExtend()
+		--D1.s16
+	}
+
+	while (D4.s16 >= 0)
+	{
+		A1 += 0x4a
+		D2.u16 += 8
+		u16[A1 + 0x10] = D2.u16 + getScreenExtend()
+		--D4.s16
+	}
+}
+
+
+
+//# address-hook(0x04d1aa) end(0x04d216)
+function void fn04d1aa()
+{
+	// Update shown digits
+	D1 &= 0xff
+	A1 = A0 + 0x4a
+	A2 = 0x04d238
+	D6 = 1
+	D4 = 0
+	while (D6.s16 >= 0)
+	{
+		A1 += 0x4a
+		D2 = 0
+		D3 = u32[(A2+=4)-4]
+		while (D1 >= D3)
+		{
+			D1 -= D3
+			++D2.u16
+		}
+
+		if (D2.u16 != 0 && D4.u16 == 0)
+		{
+			D4.u16 = D6.u16
+			++D4.u16
+		}
+		if (D4.u16 == 0)
+		{
+			D2 = 10
+		}
+		u8[A1 + 0x22] = D2.u8
+		--D6.s16
+	}
+
+	D2.u16 = 0x0113 + getScreenExtend()
+	D0.u16 = 2 - D4.u16
+	D1.u16 = D0.u16
+	D0.u16 <<= 2
+	D2.u16 += D0.u16
+
+	A1 = A0
+	while (D1.s16 >= 0)
+	{
+		A1 += 0x4a
+		u16[A1 + 0x10] = D2.u16
+		--D1.s16
+	}
+
+	while (D4.s16 >= 0)
+	{
+		A1 += 0x4a
+		D2.u16 += 8
+		u16[A1 + 0x10] = D2.u16
+		--D4.s16
+	}
+}
+
+
+
+// ?
+
+//# address-hook(0x04d240) end(0x04d266)
+function void fn04d240()
+{
+	D6 = 0x0b
+	A2 = 0x04d294
+	while (D6.s16 >= 0)
+	{
+		A1 += 0x4a
+		D4 = 0
+		D2.u16 = u16[(A2+=2)-2]
+		D3 = u32[(A2+=4)-4]
+		u16 flagX = 0
+		while (true)
+		{
+			flagX = (D1 < D3) ? 1 : 0
+			D1 -= D3
+			D0.u16 -= D2.u16 + flagX
+			if (D0.s16 < 0)
+				break
+
+			++D4.u16
+		}
+
+		D1 += D3
+		D0.u16 += D2.u16 + flagX
+		u8[A1 + 0x22] = D4.u8
+		--D6.s16
+	}
+}
+
+
+//# address-hook(0x04d268) end(0x04d292)
+function void fn04d268()
+{
+	A1 = A0
+	D0 = 0
+	D1 = 0
+	D6 = 0x0b
+	A2 = 0x04d294
+
+	while (D6.s16 >= 0)
+	{
+		A1 += 0x4a
+		D4 = u8[A1 + 0x22]
+		D2.u16 = u16[(A2+=2)-2]
+		D3 = u32[(A2+=4)-4]
+		--D4.u16
+		while (D4.s16 >= 0)
+		{
+			u16 flagX = (u64(D1) + u64(D3)) >> 32
+			D1 += D3
+			D0.u16 += D2.u16 + flagX
+			--D4.s16
+		}
+		--D6.s16
+	}
+}
+
+
+//# address-hook(0x04d2f4) end(0x04d300)
+function void fn04d2f4()
+{
+	objA0.update_address = 0x04d3ce
+	D2 = 0x04d5fa
+	fn04d30e()
+}
+
+
+//# address-hook(0x04d302) end(0x04d308)
+function void fn04d302()
+{
+	objA0.update_address = 0x04d362
+	D2 = 0x04d5e4
+	fn04d30e()
+}
+
+
+//# address-hook(0x04d30e) end(0x04d35c)
+function void fn04d30e()
+{
+	objA0.mapping_offset = 0x04d7be
+	objA0.sprite_attributes = 0x854e
+	objA0.position.x.u16 = 0xd4 + getScreenExtend()
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x14
+	objA0.box_size.y = 0x08
+	objA0.animation.sprite = 2
+
+	A2 = 0x04d2dc
+	A1 = A0
+	D1 = 0x0b
+	while (D1.s16 >= 0)
+	{
+		A1 += 0x4a
+		u32[A1] = D2
+		u16[A1 + 0x10] = u16[A2] - 0x0c + getScreenExtend()
+		u16[A1 + 0x14] = objA0.position.y.u16
+		A2 += 2
+		--D1.s16
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x04d362) end(0x04d3c8)
+function void fn04d362()
+{
+	if (s8[0xffffffa1] < 0)
+		return
+
+	A2 = 0xffffe400
+	u32[A2] = bluespheregame.current_stage
+	if (u8[0xffffffab] != 0)
+	{
+		u32[A2] += 0x07654321
+	}
+	u32[A2] &= 0x07ffffff
+
+	D6 = 1
+	fn04d5a0()
+
+	D0.u16 = D4.u16 & 0x3f
+	if (u8[0xffffffab] != 0)
+	{
+		D0.u16 |= 0x40
+	}
+	D0.u16 ^= 0x55
+	D1 = (bluespheregame.current_stage + 0x01234567) & 0x07ffffff
+	D1 = (D1 << 16) + (D1 >> 16)
+	D4.u16 <<= 5
+	D4.u16 &= 0xf800
+	D1.u16 |= D4.u16
+	D1 = (D1 << 16) + (D1 >> 16)
+	D1 = (D1 >> 6) + (D1 << 26)
+	D1 ^= 0xaaaaaaaa
+
+	A1 = A0
+	fn04d240()
+
+	DrawObject()
+}
+
+
+
+// Code entry
+
+//# address-hook(0x04d3ce) end(0x04d482)
+function void fn04d3ce()
+{
+	if ((u8[0xffffffa1] & 0x80) == 0)
+	{
+		u16[A0 + 0x30] = 0
+		return
+	}
+
+	if (control.pad1.pressed == CONTROL_START)
+	{
+		fn04d488()
+	}
+
+	A1 = A0
+	D0.u16 = u16[A0 + 0x30] + 1
+	D0 = u32(D0.u16) * 0x4a
+	A1 += D0.u16
+	u16[A1 + 0x0a] = 0x854e
+
+	D1.u8 = control.pad1.pressed
+#if STANDALONE
+	D1.u8 ^= 0x03	// Reverse up/down, it just feels wrong otherwise
+#endif
+	if (D1 & CONTROL_UP)
+	{
+		--u8[A1 + 0x22]
+		if (u8[A1 + 0x22] == -1)
+			u8[A1 + 0x22] = 9
+	}
+	if (D1 & CONTROL_DOWN)
+	{
+		++u8[A1 + 0x22]
+		if (u8[A1 + 0x22] >= 10)
+			u8[A1 + 0x22] = 0
+	}
+	if (D1 & CONTROL_LEFT)
+	{
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == -1)
+			u16[A0 + 0x30] = 11
+	}
+	if (D1 & CONTROL_RIGHT)
+	{
+		++u16[A0 + 0x30]
+		if (u16[A0 + 0x30] >= 12)
+			u16[A0 + 0x30] = 0
+	}
+
+	if (u8[0xffffffa1] & 0x80)
+	{
+		A1 = A0
+		D0.u16 = u16[A0 + 0x30] + 1
+		D0 = u32(D0.u16) * 0x4a
+		A1 += D0.u16
+		u16[A1 + 0x0a] = 0x8562
+	}
+
+	if (control.pad1.pressed & CONTROL_DPAD)
+	{
+		playSound(0x89)
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x04d488) end(0x04d59e)
+function void fn04d488()
+{
+	fn04d268()
+
+	D0.u16 ^= 0x55
+	D2.u16 = D0.u16
+	D0.u16 &= 0x3f
+	D1 ^= 0xaaaaaaaa
+	D1 = (D1 << 6) + (D1 >> 26)
+	D1 = (D1 << 16) + (D1 >> 16)
+	D3.u16 = (D1.u16 & 0xf800) >> 5
+	D3.u16 |= D0.u16
+	D3.u16 &= 0x07ff
+	D1 = (D1 << 16) + (D1 >> 16)
+	D1 -= 0x01234567
+	D2.u16 &= 0x40
+	if (D2.u16 != 0)
+	{
+		D1 += 0x07654321
+	}
+	D1 &= 0x07ffffff
+	u32[0xffffe400] = D1
+
+	A2 = 0xffffe400
+	D6 = 1
+	fn04d5a0()
+
+	D4.u16 &= 0x07ff
+	if (D3.u16 != D4.u16)
+	{
+		// Entered an invalid code
+		playSound(0xb2)
+	}
+	else
+	{
+		// Code is valid
+		u8[0xffffffab] = 0
+		if (D2.u16 != 0)
+		{
+			D1 -= 0x07654321
+			D1 &= 0x07ffffff
+			u8[0xffffffab] = 0xff
+		}
+
+		bluespheregame.current_stage = D1
+		BlueSphere.setGeneratedStage(bluespheregame.current_stage)
+
+	#if STANDALONE
+		// Save progress to SRAM
+		SRAM.save(0xffffffa6, 0x50, 4)		// Copying from the address of bluespheregame.current_stage
+		System.savePersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
+	#endif
+
+		A2 = 0xfffffc00
+		fn04cb1a()
+
+		playSound(0x63)
+	}
+
+	u8[0xffffffa1] &= 0x7f
+	bluespheregame.menu_selection = 1
+}
+
+
+//# address-hook(0x04d5a0) end(0x04d5b2)
+function void fn04d5a0()
+{
+	D4 = 0
+	while (D6.s16 >= 0)
+	{
+		D5.u16 = u16[(A2+=2)-2]
+		D4.u16 ^= D5.u16
+		if (D4.u16 & 1)
+		{
+			D4.u16 >>= 1
+			D4.u16 ^= 0x8810
+		}
+		else
+		{
+			D4.u16 >>= 1
+		}
+
+		--D6.s16
+	}
+}
+
+
+
+// Level number (and stars around)
+
+//# address-hook(0x04d5b4) end(0x04d5b6)
+function void fn04d5b4()
+{
+	fn04d5c2()
+	objA0.update_address = 0x04d5bc
+	fn04d5bc()
+}
+
+
+//# address-hook(0x04d5bc) end(0x04d5bc)
+function void fn04d5bc()
+{
+	DrawObject()
+}
+
+
+//# address-hook(0x04d5c2) end(0x04d5e2)
+function void fn04d5c2()
+{
+	objA0.mapping_offset = 0x04d8ae
+	objA0.sprite_attributes = 0x854e
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x08
+}
+
+
+
+// Code display
+
+//# address-hook(0x04d5e4) end(0x04d5e6)
+function void fn04d5e4()
+{
+	fn04d5c2()
+	objA0.update_address = 0x04d5ec
+	fn04d5ec()
+}
+
+
+//# address-hook(0x04d5ec) end(0x04d5f4)
+function void fn04d5ec()
+{
+	if ((u8[0xffffffa1] & 0x80) == 0)
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x04d5fa) end(0x04d5fc)
+function void fn04d5fa()
+{
+	fn04d5c2()
+	objA0.update_address = 0x04d602
+	fn04d602()
+}
+
+
+//# address-hook(0x04d602) end(0x04d60a)
+function void fn04d602()
+{
+	if (u8[0xffffffa1] & 0x80)
+	{
+		DrawObject()
+	}
+}
+
+
+
+// Text "Start"
+
+//# address-hook(0x04d610) end(0x04d642)
+function void fn04d610()
+{
+	objA0.mapping_offset = 0x04d7be
+	objA0.sprite_attributes = 0x854e
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0x0128
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x14
+	objA0.box_size.y = 0x08
+	objA0.animation.sprite = 0x03
+
+	objA0.update_address = 0x04d648
+	fn04d648()
+}
+
+
+//# address-hook(0x04d648) end(0x04d648)
+function void fn04d648()
+{
+	DrawObject()
+}
+
+
+
+// The bumper-like balls that show the current player color
+
+//# address-hook(0x04d64e) end(0x04d6b2)
+function void fn04d64e()
+{
+	objA0.mapping_offset = 0x04d926
+	objA0.sprite_attributes = (levelselect.characters == CHARS_KNUCKLES_ALONE) ? 0x8598 : 0xe598
+#if STANDALONE
+	if (levelselect.characters == CHARS_TAILS_ALONE)
+		objA0.sprite_attributes = 0xc598
+#endif
+
+	objA0.position.x.u16 = ((objA0.render_flags & 0x01) ? 0x140 : 0x100) + getScreenExtend()
+	objA0.position.y.u16 = (bluespheregame.fully_unlocked == 0) ? 0xbe : 0x0126
+	u32[A0 + 0x30] = (objA0.render_flags & 0x01) ? 0x04d7b2 : 0x04d7a6
+	objA0.sprite_priority = 0
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x08
+
+	objA0.update_address = 0x04d6b8
+	fn04d6b8()
+}
+
+
+//# address-hook(0x04d6b8) end(0x04d7a0)
+function void fn04d6b8()
+{
+#if STANDALONE
+	// Do the following only once in total, i.e. only for the right object
+	if (objA0.render_flags & 0x01)
+	{
+		if (levelselect.characters == CHARS_TAILS_ALONE)
+		{
+			// Manipulate the palette for Tails
+			BlueSphereGame.applyTailsPalette(0xfffffc00)
+		}
+
+		// Render the BG logo in the right colors again
+		Renderer.drawCustomSprite("sklogo", getScreenWidth() / 2, 40 - scrolloffset.y.planeB, 0x00, 0, 0x1700)
+	}
+#endif
+
+	if (bluespheregame.fully_unlocked != 0)
+	{
+		A1 = u32[A0 + 0x30]
+		D0 = bluespheregame.menu_selection * 4
+		D2.u16 = u16[A1 + D0.s16] + getScreenExtend()
+		D3.u16 = u16[A1 + D0.s16 + 2]
+
+		// Update velocity-x
+		bool skipPart = false
+		if (D2.u16 == objA0.position.x.u16)
+		{
+			D0.u16 = objA0.velocity.x + 0x80
+			if (D0.u16 <= 0x0100)
+			{
+				D1 = 0
+				objA0.velocity.x = D1.u16
+				skipPart = true
+			}
+		}
+
+		if (!skipPart)
+		{
+			D1.u16 = 0x40
+			if (D2.s16 < s16[A0 + 0x10])
+			{
+				D1.s16 = -D1.s16
+				if (objA0.velocity.x >= 0)
+				{
+					D1.u16 *= 4
+				}
+			}
+			else
+			{
+				if (objA0.velocity.x < 0)
+				{
+					D1.u16 *= 4
+				}
+			}
+		}
+		objA0.velocity.x += D1.u16
+
+		// Update velocity-y
+		skipPart = false
+		if (D3.u16 == objA0.position.y.u16)
+		{
+			D0.u16 = objA0.velocity.y + 0x0100
+			if (D0.u16 <= 0x0200)
+			{
+				D1 = 0
+				objA0.velocity.y = D1.u16
+				skipPart = true
+			}
+		}
+
+		if (!skipPart)
+		{
+			D1.u16 = 0x80
+			if (D3.s16 < s16[A0 + 0x14])
+			{
+				D1.s16 = -D1.s16
+				if (objA0.velocity.y >= 0)
+				{
+					D1.u16 *= 4
+				}
+			}
+			else
+			{
+				if (objA0.velocity.y < 0)
+				{
+					D1.u16 *= 4
+				}
+			}
+		}
+		objA0.velocity.y += D1.u16
+
+		UpdateMovementStraightSimple()
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 2
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x07
+	}
+
+#if STANDALONE
+	if (control.pad1.pressed & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
+	{
+		if ((objA0.render_flags & 0x01) == 0)		// Only consider first of the two objects
+		{
+			if (bluespheregame.menu_selection == 1)
+			{
+				// Back to the main menu
+				playSound(0xad)
+
+				u32 backupA0 = A0
+				FadeOutScreenBlocking()
+				A0 = backupA0
+
+				Game.returnToMainMenu()
+				yieldExecution()
+			}
+			else if (bluespheregame.menu_selection == 2)
+			{
+				fn04d488()
+			}
+		}
+		DrawObject()
+		return
+	}
+#endif
+
+	if (control.pad1.pressed & CONTROL_ABC)
+	{
+		D0.u16 = objA0.sprite_attributes
+		if (D0.u16 == 0x8598)
+		{
+			levelselect.characters = CHARS_SONIC_ALONE
+			objA0.sprite_attributes = 0xe598
+		}
+		else
+	#if STANDALONE
+		if (D0.u16 == 0xe598)
+		{
+			levelselect.characters = CHARS_TAILS_ALONE
+			objA0.sprite_attributes = 0xc598
+		}
+		else
+	#endif
+		{
+			levelselect.characters = CHARS_KNUCKLES_ALONE
+			objA0.sprite_attributes = 0x8598
+		}
+	}
+
+	DrawObject()
+}
+
+
+
+// Animations for the four characters in background
+
+//# address-hook(0x04d986) end(0x04d9e8)
+function void fn04d986()
+{
+	A2 = 0x04d976
+	A1 = A0
+	D1 = 3
+	while (D1.s16 >= 0)
+	{
+		u32[A1 + 0x0c] = 0x188e7c
+		u16[A1 + 0x0a] = 0x20fe
+		u16[A1 + 0x10] = u16[(A2+=2)-2] + getScreenExtend()
+		u16[A1 + 0x14] = u16[(A2+=2)-2]
+		if (u8[0xffffffa1] != 0 && bluespheregame.fully_unlocked != 0)
+		{
+			u16[A1 + 0x14] -= 0x10
+		}
+		u16[A1 + 0x08] = 0x0180
+		u8[A1 + 0x07] = 0x10
+		u8[A1 + 0x06] = 0x10
+		u32[A1] = 0x04d9ec
+		u8[A1 + 0x20] = D1.u8
+		D0.u16 = D1.u16 * 2
+
+		// Targets:
+		//  - 0x04da1f	-> D0.u16 = 0x00
+		//  - 0x04da1a	-> D0.u16 = 0x02
+		//  - 0x04da15	-> D0.u16 = 0x04
+		//  - 0x04da0c	-> D0.u16 = 0x06
+		A3 = tableLookupAddress(0x04da04, D0.u16)
+		u8[A1 + 0x22] = u8[A3]
+
+		A1 += 0x4a
+		--D1.s16
+	}
+
+	fn04d9ec()
+}
+
+
+//# address-hook(0x04d9ec) end(0x04d9fe)
+function void fn04d9ec()
+{
+	if (bluespheregame.fully_unlocked != 0)
+	{
+		A1 = 0x04da04
+		Object.AlternativeAnimationUpdate()
+	}
+	DrawObject()
+}
+
+
+
+// Copyright text
+
+//# address-hook(0x04da30) end(0x04da5c)
+function void fn04da30()
+{
+	objA0.mapping_offset = 0x04da68
+	objA0.sprite_attributes = 0x85b2
+	objA0.position.x.u16 = 0x0180 + getScreenExtend() * 2
+	objA0.position.y.u16 = 0x0152
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x2c
+	objA0.box_size.y = 0x04
+
+	objA0.update_address = 0x04da62
+	fn04da62()
+}
+
+
+//# address-hook(0x04da62) end(0x04da62)
+function void fn04da62()
+{
+	DrawObject()
+
+#if STANDALONE
+	Renderer.drawCustomSprite("title_screen_cr", getScreenWidth() - 92, 206, 0x00, 0, 0x9fff)
+#endif
+}
+
+
+
+
+//-------------------------------------------------------//
+// Results Screen                                        //
+//-------------------------------------------------------//
+
+//# address-hook(0x04da7e) end(0x04dde6)
+function void fn04da7e()
+{
+	playMusic(MUSIC_CTRL_FADEOUT)
+#if STANDALONE
+	changeMusicTempo(0)
+#endif
+	fn04c8e4()
+
+	copyMemory(0xfffffc80, 0x04de08, 0x80)
+
+	Kosinski.decompress(0x15bac0, 0xffff0000)
+	Kosinski.decompress(0x15c130, A1)
+	updateSpritePattern(0xffff0000, 0x3b80, A1.u16 >> 1)
+
+	Kosinski.decompress(0x1897de, 0xffff4000)
+	updateSpritePattern(0xffff4000, 0xa9c0, 0x06d0)
+
+	Nemesis.loadDataToVRAM(0x0dde34, 0xb7e0)
+	Nemesis.loadDataToVRAM(0x189c7c, 0x32e0)
+
+	A1 = 0x04de88
+	D2.u16 = 0x030a
+	D6.u16 = 0x85bf
+	fn05b318()
+
+	Enigma.decompress(0x189c4e, 0xffff8000, 0x6197)
+
+	fn04dea2()
+
+	bluespheregame.menu_selection = 1
+	u32[0xffffb000] = 0x04def8
+	u32[0xffffb04a] = 0x04df86
+	u32[0xffffb1bc] = 0x04d03e
+	u16[0xffffb1d0] = 0x90
+	u32[0xffffb862] = 0x04e012
+
+	UpdateGameObjects()
+	RenderSprites()
+
+	playMusic(0x29)
+	VDP.Config.setActiveDisplay(true)
+
+	BlueSpheres.FadeIn()
+
+	while (true)
+	{
+		global.frame_state = 0x1a
+		Kosinski.ProcessDecompressionQueue()
+		waitForNextFrame()
+
+		UpdateGameObjects()
+		RenderSprites()
+		Kosinski.ProcessModules()
+		if (global.game_mode != 0x30)
+			break
+	}
+
+	if (bluespheres.rings_remaining != 0)
+	{
+		if (s8[0xffffffab] >= 0 && bluespheregame.fully_unlocked != 0)
+		{
+			// Next stage
+			BlueSphereGame.advanceStages(1)
+		}
+		return
+	}
+
+	playMusic(MUSIC_CTRL_FADEOUT)
+	FadeOutScreenBlocking()
+	fn04c8e4()
+
+	zeroMemory(0xfffffa80, 0x80)
+	copyMemory(0xfffffc80, 0x0a8a3c, 0x20)
+	copyMemory(0xfffffca0, 0x0a8afc, 0x20)
+	copyMemory(0xfffffcc0, 0x04de68, 0x20)
+	copyMemory(0xfffffce0, 0x060aba, 0x20)
+
+	Nemesis.loadDataToVRAM(0x189c7c, 0x0000)
+
+	A1 = 0x04dde8
+	Nemesis.LoadMultipleToVRAM()
+
+	Kosinski.decompress(0x16416e, 0xffff0000)
+	Kosinski.decompress(0x0de364, A1)
+	Kosinski.decompress(0x17fcbc, A1)
+	Kosinski.decompress(0x163248, A1)
+	Kosinski.decompress(0x15fdde, A1)
+
+	updateSpritePattern(0xffff0000, 0x3000, A1.u16 >> 1)
+
+	Enigma.decompress(0x189c4e, 0xffff8000, 0x4000)
+
+	fn04dea2()
+
+	u32[0xffffb04a] = 0x04d03e
+	u16[0xffffb05e] = 0xc0
+	u32[0xffffb3c2] = 0x04e0a4
+
+	UpdateGameObjects()
+	RenderSprites()
+
+	super.active = 0
+	super.palettefx.state = 0
+	global.characters = CHARS_SONIC_ALONE
+	playMusic(0x2c)
+
+	VDP.Config.setActiveDisplay(true)
+
+	Menu.FadeInAfterInit()
+
+	while (true)
+	{
+		global.frame_state = 0x1a
+		Kosinski.ProcessDecompressionQueue()
+		waitForNextFrame()
+
+		UpdateGameObjects()
+		RenderSprites()
+		Kosinski.ProcessModules()
+		UpdatePaletteEffects.SuperForm()
+
+		if ((bluespheregame.shown_difficulty == u8[0xffffffad]) && control.pad1.pressed != 0)
+			break
+	}
+
+	if (s8[0xffffffab] >= 0 && bluespheregame.fully_unlocked != 0)
+	{
+		// Advance 10 stages
+		BlueSphereGame.advanceStages(10)
+	}
+}
+
+
+function void BlueSphereGame.advanceStages(u8 numStages)
+{
+	bluespheregame.current_stage += numStages
+
+	A2 = 0xffffffa2
+	for (u8 i = 0; i < numStages; ++i)
+	{
+		u32[A2] += 0x01030507
+		u8[A2] &= 0x7f
+		if (u8[A2+1] >= 0x7f)
+			u8[A2+1] -= 0x7f
+		if (u8[A2+2] >= 0x7e)
+			u8[A2+2] -= 0x7e
+		if (u8[A2+3] >= 0x7d)
+			u8[A2+3] -= 0x7d
+	}
+
+#if STANDALONE
+	// Save progress to SRAM
+	SRAM.save(0xffffffa6, 0x50, 4)		// Copying from the address of bluespheregame.current_stage
+	System.savePersistentData(0xffffffa6, "SRAM_BlueSphereProgress", 4)
+#endif
+}
+
+
+//# address-hook(0x04dea2) end(0x04deda)
+function void fn04dea2()
+{
+	A2 = 0x04dedc
+	for (u8 i = 0; i < 0x0e; ++i)
+	{
+		D0.u16 = u16[(A2+=2)-2]
+		D0 = (D0 << 16) + 0x03
+		copyRectToVRAM(0xffff8000, VDPHelper.getVRAMAddressFromWriteCode(D0), 0x0c, 0x08)
+	}
+
+	// Don't do the following in standalone
+#if !STANDALONE
+	scrolloffset.y.planeB = 0x10
+	A1 = 0xffffe002
+	for (u8 y = 0; y < getScreenHeight(); ++y)
+	{
+		u16[A1] -= 0x10
+		A1 += 4
+	}
+#endif
+}
+
+
+//# address-hook(0x04def8) end(0x04defe)
+function void fn04def8()
+{
+	u16[A0 + 0x30] = 0x012c
+	objA0.update_address = 0x04df04
+	fn04df04()
+}
+
+
+//# address-hook(0x04df04) end(0x04df50)
+function void fn04df04()
+{
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		if (bluespheres.rings_remaining == 0)
+		{
+		#if !STANDALONE
+			set_status_register(0x2700)
+		#endif
+			A1 = 0x04de9a
+			D2.u16 = 0x049a
+			D6.u16 = 0x85bf
+			fn05b318()
+		#if !STANDALONE
+			set_status_register(0x2300)
+		#endif
+
+			playSound(0xac)
+			u16[A0 + 0x30] = 0x012c
+		}
+		objA0.update_address = 0x04df52
+	}
+
+	if (bluespheres.rings_remaining != 0 && control.pad1.pressed != 0)
+	{
+		global.game_mode = 0x2c
+	}
+}
+
+
+
+//# address-hook(0x04df52) end(0x04df84)
+function void fn04df52()
+{
+	if (bluespheres.rings_remaining == 0)
+	{
+		--u16[A0 + 0x30]
+		if (s16[A0 + 0x30] < 0)
+		{
+			global.game_mode = 0x2c
+		}
+	}
+
+	if (control.pad1.pressed != 0)
+	{
+		global.game_mode = 0x2c
+	}
+
+	D0.u8 = global.framecounter.low & 0x0f
+	if (D0.u8 == 0)
+	{
+		A1 = 0xffffe120
+		D1 = 0x0f
+		while (D1.s16 >= 0)
+		{
+			u16[A1] ^= 0x0100
+			A1 += 4
+			--D1.s16
+		}
+	}
+}
+
+
+
+// Character
+
+//# address-hook(0x04df86) end(0x04dfe8)
+function void fn04df86()
+{
+	objA0.sprite_attributes = 0x8680
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0x0100
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+
+	if (global.characters == CHARS_SONIC_ALONE)
+	{
+		objA0.mapping_offset = 0x146620
+		objA0.state = 0x13
+
+		objA0.update_address = 0x04dfee
+		fn04dfee()
+	}
+	else
+#if STANDALONE
+	if (global.characters == CHARS_TAILS_ALONE)
+	{
+		objA0.mapping_offset = 0x148eb8
+		objA0.state = 0x13
+		objA0.sprite_attributes = 0x86a0
+
+		objA0.update_address = 0x04dffe
+		fn04dffe()
+	}
+	else
+#endif
+	{
+		objA0.mapping_offset = 0x14a8d6
+		objA0.state = 0x24
+		copyMemory(0xfffffc80, 0x0a8afc, 0x20)
+
+		objA0.update_address = 0x04e000
+		fn04e000()
+	}
+}
+
+
+//# address-hook(0x04dfee) end(0x04dffa)
+function void fn04dfee()
+{
+	UpdateSonicAnimation()
+	UpdateSonicSpritePatterns()
+	DrawObject()
+}
+
+
+#if STANDALONE
+//# address-hook(0x04dffe)
+function void fn04dffe()
+{
+	UpdateTailsAnimation()
+	UpdateTailsSpritePatterns()
+	DrawObject()
+}
+#endif
+
+
+//# address-hook(0x04e000) end(0x04e00c)
+function void fn04e000()
+{
+	UpdateKnucklesAnimation()
+	UpdateKnucklesSpritePatterns()
+	DrawObject()
+}
+
+
+
+// Emeralds
+
+//# address-hook(0x04e012) end(0x04e056)
+function void fn04e012()
+{
+	A1 = A0
+	D0 = 0
+	D2 = 0
+	D1 = 6
+	while (D1.s16 >= 0)
+	{
+		u32[A1] = 0x04e074
+		u32[A1 + 0x0c] = 0x04e316
+		u16[A1 + 0x0a] = 0x01dc
+		u16[A1 + 0x08] = 0x80
+		u8[A1 + 0x07] = 0x18
+		u8[A1 + 0x06] = 0x18
+		u8[A1 + 0x26] = D0.u8
+		D0.u8 += 0x24
+		u8[A1 + 0x22] = D2.u8
+		++D2.u8
+		A1 += 0x4a
+		--D1.s16
+	}
+
+	objA0.update_address = 0x04e05c
+	fn04e05c()
+}
+
+
+//# address-hook(0x04e05c) end(0x04e070)
+function void fn04e05c()
+{
+	D0.u8 = u8[A0 + 0x27]
+	LookupSinCos()
+	D0.s16 <<= 4
+	D0.u16 += 0x4000
+	slotmachine.rotation.full = D0.u16
+	++u8[A0 + 0x27]
+	fn04e074()
+}
+
+
+//# address-hook(0x04e074) end(0x04e09e)
+function void fn04e074()
+{
+	D0.u8 = objA0.value26
+	LookupSinCos()
+	D2.u16 = slotmachine.rotation.full
+	D1.s32 = s32(D1.s16) * D2.s16
+	D0.s32 = s32(D0.s16) * D2.s16
+	objA0.position.x.u16 = (D1 >> 16) + 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = (D0 >> 16) + 0x0100
+	++objA0.value26
+
+	DrawObject()
+}
+
+
+
+// Result screen after Perfect
+
+//# address-hook(0x04e0a4) end(0x04e110)
+function void fn04e0a4()
+{
+	// "Difficulty" text
+	objA0.mapping_offset = 0x04d7be
+	objA0.sprite_attributes = 0x854e
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0x0140
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x28
+	objA0.box_size.y = 0x08
+	objA0.animation.sprite = 0x04
+
+	A1 = A0
+	u8[A1 + 0x6c] = 10
+	D2.u16 = 0x0114 + getScreenExtend()
+	D3.u16 = objA0.position.y.u16 + 0x10
+
+	for (u8 i = 0; i < 4; ++i)
+	{
+		// Create the stars and digits
+		//  -> Note that they will get updated in "fn04d1aa"
+		A1 += 0x4a
+		u32[A1] = 0x04e1aa
+		u16[A1 + 0x10] = D2.u16
+		u16[A1 + 0x14] = D3.u16
+		D2.u16 += 8
+	}
+
+	u8[A1 + 0x22] = 0x0b
+	u16[A0 + 0x30] = 0x1d
+	objA0.update_address = 0x04e116
+	fn04e116()
+}
+
+
+//# address-hook(0x04e116) end(0x04e15a)
+function void fn04e116()
+{
+	D1 = bluespheregame.shown_difficulty + 1
+	fn04d1aa()
+
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		u16[A0 + 0x30] = 0x1d
+		D1.u8 = bluespheregame.shown_difficulty
+		if (D1.u8 != bluespheregame.difficulty_level)
+		{
+			++bluespheregame.shown_difficulty
+			fn04e160()
+			playSound(0xa7)
+		}
+	}
+
+	objA0.animation.sprite = (bluespheregame.shown_difficulty != 0x0c) ? 4 : 5
+	DrawObject()
+}
+
+
+//# address-hook(0x04e160) end(0x04e178)
+function void fn04e160()
+{
+	if (allocDynamicObjectStd())
+	{
+		D1 = (bluespheregame.shown_difficulty - 1) * 4
+		u32[A1] = u32[0x04e17a + D1.u16]
+	}
+}
+
+
+//# address-hook(0x04e1aa) end(0x04e1ae)
+function void fn04e1aa()
+{
+	fn04d5c2()
+	objA0.update_address = 0x04e1b4
+	fn04e1b4()
+}
+
+
+//# address-hook(0x04e1b4) end(0x04e1be)
+function void fn04e1b4()
+{
+	if (bluespheregame.shown_difficulty != 0x0c)
+	{
+		DrawObject()
+	}
+}
+
+
+
+// Sonic in Perfect screen
+
+//# address-hook(0x04e1c4) end(0x04e1fc)
+function void fn04e1c4()
+{
+	objA0.mapping_offset = 0x146620
+	objA0.sprite_attributes = 0x8680
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0x0120
+	objA0.render_flags |= 0x01
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.state = 0x13
+
+	objA0.update_address = 0x04e202
+	fn04e202()
+}
+
+
+//# address-hook(0x04e202) end(0x04e21c)
+function void fn04e202()
+{
+	if (super.active)
+	{
+		objA0.mapping_offset = 0x146816
+		objA0.state = 0x1f
+		objA0.update_address = 0x04e222
+		u16[A0 + 0x30] = 0x14
+	}
+	fn04e222()
+}
+
+
+//# address-hook(0x04e222) end(0x04e234)
+function void fn04e222()
+{
+	if (s8[0xfffff65f] < 0)
+	{
+		--u16[A0 + 0x30]
+		if (s16[A0 + 0x30] < 0)
+		{
+			objA0.state = 0x05
+			objA0.update_address = 0x04e23a
+		}
+	}
+	fn04e23a()
+}
+
+
+//# address-hook(0x04e23a) end(0x04e246)
+function void fn04e23a()
+{
+	UpdateSonicAnimation()
+	UpdateSonicSpritePatterns()
+	DrawObject()
+}
+
+
+//# address-hook(0x04e24c) end(0x04e25e)
+function void fn04e24c()
+{
+	// Sonic going Super at MAX difficulty
+	super.palettefx.state = 1
+	super.palettefx.timer = 0x0f
+	super.active = 1
+	UnloadObject()
+}
+
+
+
+// Tails in Perfect screen
+
+//# address-hook(0x04e264) end(0x04e296)
+function void fn04e264()
+{
+	objA0.mapping_offset = 0x04e2a2
+	objA0.sprite_attributes = 0xa7a0
+	objA0.position.x.u16 = 0xfc + getScreenExtend()
+	objA0.position.y.u16 = 0x011b
+	objA0.render_flags |= 0x01
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+
+	objA0.update_address = 0x04e29c
+	fn04e29c()
+}
+
+
+//# address-hook(0x04e29c) end(0x04e29c)
+function void fn04e29c()
+{
+	DrawObject()
+}
+
+
+
+// Knuckles in Perfect screen
+
+//# address-hook(0x04e2b8) end(0x04e2ea)
+function void fn04e2b8()
+{
+	objA0.mapping_offset = 0x14a8d6
+	objA0.sprite_attributes = 0xa6a0
+	objA0.position.x.u16 = 0x0138 + getScreenExtend()
+	objA0.position.y.u16 = 0x0118
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.state = 0x24
+
+	objA0.update_address = 0x04e2f0
+	fn04e2f0()
+}
+
+
+//# address-hook(0x04e2f0) end(0x04e310)
+function void fn04e2f0()
+{
+	UpdateKnucklesAnimation()
+	D0 = objA0.animation.sprite
+	if (D0.u8 != u8[A0 + 0x30])
+	{
+		u8[A0 + 0x30] = D0.u8
+		D4.u16 = 0xd400
+		fn018122()
+	}
+	DrawObject()
+}
+
+
+
+// Robotnik in Perfect screen
+// (is this code actually part of an outro?)
+
+//# address-hook(0x05fb56) end(0x05fb8e)
+function void fn05fb56()
+{
+	objA0.mapping_offset = 0x060a14
+	objA0.sprite_attributes = 0x2232
+	objA0.render_flags |= 0x01
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x20
+	objA0.update_address = 0x05fb90
+	objA0.position.x.u16 = 0x0168 + getScreenExtend()
+	objA0.position.y.u16 = 0x0108
+}
+
+
+//# address-hook(0x05fb90) end(0x05fb9a)
+function void fn05fb90()
+{
+	Object.animationProgress(0x0602c6)
+	DrawObject()
+}
+
+
+
+// Mecha Sonic in Perfect screen
+
+//# address-hook(0x07cfa4) end(0x07cfbc)
+function void fn07cfa4()
+{
+	// Targets:
+	//  - 0x07cfc6	-> objA0.base_state = 0x00
+	//  - 0x07cfee	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x07cfc2, objA0.base_state)
+
+	Object.loadSpritePatterns(0x07d4d6)
+	DrawObject()
+}
+
+
+//# address-hook(0x07cfc6) end(0x07cfee)
+function void fn07cfc6()
+{
+	A1 = 0x07d3ea
+	fn084fa4()	// TODO: This is only "translated" for a reason!
+
+	objA0.sprite_attributes = 0x43f4
+	objA0.render_flags &= ~0x04
+	objA0.render_flags |= 0x01
+	objA0.position.x.u16 = 0xd8 + getScreenExtend()
+	objA0.position.y.u16 = 0x0104
+}
+
+
+//# address-hook(0x07cfee)
+function void fn07cfee()
+{
+}
+
+
+
+// Egg Robo and the Egg Mobile in Perfect screen
+
+//# address-hook(0x0680a4) end(0x0680e6)
+function void fn0680a4()
+{
+	objA0.update_address = 0x0680ec
+	objA0.mapping_offset = 0x06820c
+	objA0.sprite_attributes = 0x226f
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x20
+	objA0.animation.sprite = 0x0a
+	objA0.position.x.u16 = 0x0188 + getScreenExtend()
+	objA0.position.y.u16 = 0xc0
+	fn0685e2()
+
+	spawnChildObjects(0x0681c4)
+}
+
+
+//# address-hook(0x0680ec) end(0x0680f8)
+function void fn0680ec()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	DrawObject()
+}
+
+
+//# address-hook(0x0680fe) end(0x068116)
+function void fn0680fe()
+{
+	objA0.update_address = 0x068118
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x08
+}
+
+
+//# address-hook(0x068118) end(0x068128)
+function void fn068118()
+{
+	MoveAndFlipWithParent()
+	Object.animationProgress(0x0681d0)
+	DrawObject()
+}
+
+
+
+// Animals in Perfect screen
+
+//# address-hook(0x02cd26) end(0x02cd30)
+function void fn02cd26()
+{
+	spawnSimpleChildObjects(0x02cd36)
+	UnloadObject()
+}
+
+
+//# address-hook(0x02cd3c) end(0x02cd58)
+function void fn02cd3c()
+{
+	objA0.update_address = 0x02cd6e
+	objA0.mapping_offset = 0x02ceba
+	objA0.sprite_attributes = 0x22c1
+	A1 = 0x02cd5e
+	fn02ce76()
+	fn06001e()
+}
+
+
+//# address-hook(0x02cd6e) end(0x02cd7e)
+function void fn02cd6e()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x02cd84
+	}
+	fn02cea2()
+	DrawObject()
+}
+
+
+//# address-hook(0x02cd84) end(0x02cd94)
+function void fn02cd84()
+{
+	fn02cea2()
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	DrawObject()
+}
+
+
+//# address-hook(0x02cd9a) end(0x02cda4)
+function void fn02cd9a()
+{
+
+	spawnSimpleChildObjects(0x02cdaa)
+	UnloadObject()
+}
+
+
+//# address-hook(0x02cdb0) end(0x02cdd8)
+function void fn02cdb0()
+{
+	objA0.update_address = 0x02cdea
+	objA0.mapping_offset = 0x02ced8
+	objA0.sprite_attributes = 0x22cf
+	objA0.render_flags |= 0x01
+	A1 = 0x02cdda
+	fn02ce76()
+	u16[A0 + 0x3a] = objA0.position.y.u16
+}
+
+
+//# address-hook(0x02cdea) end(0x02ce26)
+function void fn02cdea()
+{
+	UpdateMovementSimple()
+	objA0.animation.sprite = 1
+	if (objA0.velocity.y >= 0)
+	{
+		objA0.animation.sprite = 0
+		D0.u16 = objA0.position.y.u16
+		if (D0.u16 >= u16[A0 + 0x3a])
+		{
+			objA0.position.y.u16 = u16[A0 + 0x3a]
+			GetRandomNumber()
+			objA0.velocity.y = -((D0.u16 & 0x01ff) + 0x0100)
+		}
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x02ce2c) end(0x02ce36)
+function void fn02ce2c()
+{
+	spawnSimpleChildObjects(0x02ce3c)
+	UnloadObject()
+}
+
+
+//# address-hook(0x02ce42) end(0x02ce64)
+function void fn02ce42()
+{
+	objA0.update_address = 0x02cdea
+	objA0.mapping_offset = 0x02cf32
+	objA0.sprite_attributes = 0x22e1
+	A1 = 0x02ce66
+	fn02ce76()
+	u16[A0 + 0x3a] = objA0.position.y.u16
+}
+
+
+//# address-hook(0x02ce76) end(0x02cea0)
+function void fn02ce76()
+{
+	A1 += objA0.subtype2c * 2
+	objA0.position.x.u16 = u16[(A1+=2)-2] + getScreenExtend()
+	objA0.position.y.u16 = u16[(A1+=2)-2]
+	objA0.countdown_value = objA0.subtype2c * 4
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0200
+}
+
+
+//# address-hook(0x02cea2) end(0x02ceb8)
+function void fn02cea2()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 2
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x01
+	}
+}
+
+
+
+// Master Emerald in Perfect screen
+
+//# address-hook(0x07cff0) end(0x07d03c)
+function void fn07cff0()
+{
+	objA0.mapping_offset = 0x07d712
+	objA0.sprite_attributes = 0x61ee
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x18
+	objA0.animation.sprite = 0x02
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = u16[0x07d03e + objA0.subtype2c]
+
+	// Is the code at 0x07d042 ever used...?
+	objA0.update_address = (global.super_emeralds == 7) ? 0x07d042 : 0x07d050
+}
+
+
+//# address-hook(0x07d050) end(0x07d050)
+function void fn07d050()
+{
+	DrawObject()
+}
+
+
+
+// Sonic & Knuckles Logo in Perfect screen
+
+//# address-hook(0x05face) end(0x05fb12)
+function void fn05face()
+{
+	objA0.mapping_offset = 0x060644
+	objA0.sprite_attributes = 0x6180
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x14
+	objA0.update_address = 0x05fb14
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0xa0
+
+	if (allocDynamicObjectStd())
+	{
+		u32[A1] = 0x05fb1a
+		u16[A1 + 0x46] = A0.u16
+	}
+}
+
+
+//# address-hook(0x05fb14) end(0x05fb14)
+function void fn05fb14()
+{
+	DrawObject()
+}
+
+
+//# address-hook(0x05fb1a) end(0x05fb52)
+function void fn05fb1a()
+{
+	if ((global.region_code & 0x80) == 0)
+	{
+		fn05ec36()
+		return
+	}
+
+	objA0.mapping_offset = 0x060938
+	objA0.sprite_attributes = 0x61c8
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x04
+	objA0.animation.sprite = 0x02
+
+	objA0.update_address = 0x084920
+	A1 = 0x05f520
+	fn05ffd4()
+}

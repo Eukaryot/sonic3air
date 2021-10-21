@@ -1,0 +1,115 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Large Bumper on the walls                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x049aae) end(0x049ad4)
+function void fn049aae()
+{
+	objA0.mapping_offset = 0x049c0a
+	objA0.sprite_attributes = 0xe2eb
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x14
+	objA0.box_size.y = 0x3c
+	objA0.sprite_priority = 0x0280
+
+	objA0.update_address = 0x049ada
+	fn049ada()
+}
+
+
+//# address-hook(0x049ada) end(0x049b1c)
+function void fn049ada()
+{
+	D1.u16 = 0x23
+	D2.u16 = 0x40
+	D3.u16 = 0x41
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	D6.u16 &= 0x03
+	if (D6.u16 != 0)
+	{
+		D0.u16 = D6.u16 & 0x01
+		if (D0.u16 != 0)
+		{
+			A1 = 0xffffb000
+			D5 = 5
+			fn049b76()
+		}
+
+		D6.u16 &= 0x02
+		if (D6.u16 != 0)
+		{
+			A1 = 0xffffb04a
+			D5 = 6
+			fn049b76()
+		}
+	}
+
+	Object.animationUpdate(0x049bf6)
+	fn049b22()
+}
+
+
+//# address-hook(0x049b22) end(0x049b48)
+function void fn049b22()
+{
+	D0.u16 = (objA0.position.y.u16 & 0xff80) - level.despawn_position.y
+	if (D0.u16 <= 0x0200)
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x049b76) end(0x049bf4)
+function void fn049b76()
+{
+	playSound(0xaa)
+
+	u8[A1 + 0x2a] &= ~0x01
+	objA1.velocity.x = 0x0800
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+	if (D0.s16 < 0)
+	{
+		u8[A1 + 0x2a] |= 0x01
+		objA1.velocity.x = -objA1.velocity.x
+	}
+
+	objA0.flags2a &= ~(1 << D5.u8)
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+	u8[A1 + 0x2f] = 0
+	u8[A1 + 0x40] = 0
+	u16[A1 + 0x1c] = 1
+	if (u8[A1 + 0x27] == 0)
+		u8[A1 + 0x27] = 1
+
+	u8[A1 + 0x20] = 0
+	u8[A1 + 0x30] = 0xff
+	u8[A1 + 0x31] = 0x04
+	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+		s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+
+	objA0.state = 0x01
+}

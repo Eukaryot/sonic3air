@@ -1,0 +1,223 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x041cc2) end(0x041d2c)
+function void fn041cc2()
+{
+	objA0.mapping_offset = 0x041eae
+	objA0.sprite_attributes = 0x43bd
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x08
+	objA0.sprite_priority = 0x0280
+	u8[A0 + 0x28] = 0xc6
+
+	D0.u16 = objA0.respawn_entry
+	if (D0.u16 != 0)
+	{
+		A2 = 0xffff0000 + D0.u16
+		if (u8[A2] & 0x01)
+		{
+			D5.u16 = (objA0.subtype2c & 0x7f) << 4
+			D4 = 0
+			D3.u16 = objA0.position.y.u16 + D5.u16 - 0x90
+
+			while (D5.s16 > 0)
+			{
+				fn041e1a()
+				D3.u16 -= 0x0100
+				D5.u16 -= 0x0100
+			}
+
+			u16[A1 + 0x48] = objA0.respawn_entry
+			UnloadObject()
+			return
+		}
+	}
+
+	objA0.update_address = 0x041d32
+	fn041d32()
+}
+
+
+//# address-hook(0x041d32) end(0x041d56)
+function void fn041d32()
+{
+	A1 = 0xffffb000
+	if (u8[A0 + 0x29] & 0x01)
+	{
+		u8[A0 + 0x29] &= ~0x01
+		fn041d5c()
+	}
+
+	A1 = 0xffffb04a
+	if (u8[A0 + 0x29] & 0x02)
+	{
+		u8[A0 + 0x29] &= ~0x02
+		fn041d5c()
+	}
+
+	fn01b662()
+}
+
+
+//# address-hook(0x041d5c) end(0x041df2)
+function void fn041d5c()
+{
+	if (u8[A1 + 0x20] != 2)
+		return
+
+	objA1.velocity.x = -objA1.velocity.x
+	objA1.velocity.y = -objA1.velocity.y
+	D4.u16 = (objA0.subtype2c & 0x7f) << 4
+	D5.u16 = D4.u16
+	D3.u16 = objA0.position.y.u16 - 0x90
+
+	while (D5.s16 >= 0)
+	{
+		fn041e1a()
+		D3.u16 -= 0x0100
+		D5.u16 -= 0x0100
+	}
+
+	u16[A1 + 0x48] = objA0.respawn_entry
+	A4 = 0x041e96
+	objA0.update_address = 0x041df4
+
+	++objA0.animation.sprite
+	objA0.sprite_priority = 0
+	playSound(0x59)
+
+	fn0216b8()
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x18
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] |= 0x01
+	}
+
+	if (s8[A0 + 0x2c] < 0)
+	{
+		u16[0xffffeec4] = 0xffff
+	}
+	else
+	{
+		u16[0xffffeec6] = 0xffff
+	}
+	u8[A0 + 0x28] = 0
+	u8[A0 + 0x29] = 0
+}
+
+
+//# address-hook(0x041df4) end(0x041e14)
+function void fn041df4()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x18
+	if (objA0.velocity.y >= 0x0400 && s8[A0 + 0x04] >= 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x041e1a) end(0x041e68)
+function void fn041e1a()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x041e6a
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = D3.u16
+		u8[A1 + 0x04] = objA0.render_flags
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u16[A1 + 0x08] = 0x80
+		u8[A1 + 0x07] = 0x0c
+		u8[A1 + 0x06] = 0x80
+		u16[A1 + 0x30] = D4.u16
+		u8[A1 + 0x22] = 0x02
+		u8[A1 + 0x2c] = objA0.subtype2c
+	}
+}
+
+
+//# address-hook(0x041e6a) end(0x041e90)
+function void fn041e6a()
+{
+	if (u16[A0 + 0x30] != 0)
+	{
+		objA0.position.y.u16 += 4
+		u16[A0 + 0x30] -= 4
+	}
+
+	if ((u8[A0 - 0x01fb] & 0x0f) == 0 && s8[A0 + 0x04] < 0)
+	{
+		playSound(0xc8)
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+
+// Rising sand
+
+//# address-hook(0x0569ba) end(0x0569da)
+function void fn0569ba()
+{
+	// u32[0xffffee9c] is the current height of the sand
+	level.dualplanecollision = 0xff
+	u32[0xffffee9c] += 0xa000
+	u16[0xffffee40] = -(s16[0xffffee9c] + 0x02e0)
+	u16[0xffffee3e] = 0x1930
+}
+
+
+//# address-hook(0x04efbc) end(0x04efc8)
+function void fn04efbc()
+{
+	push(D2.u16)
+	push(D1.u16)
+
+	fn04efca()
+
+	D1 = s16(pop())
+	D2 = s16(pop())
+
+	if (!_negative())
+	{
+		fn04efca()
+	}
+}
+
+
+//# address-hook(0x04efca) end(0x04eff4)
+function void fn04efca()
+{
+	D2.u16 &= 0xfff0
+	D3.u16 = (D2.u16 + 0x01f0) & 0xfff0
+	D0.u16 = u16[0xffffeec8]
+	if (D0.u16 >= D2.u16 && D0.u16 <= D3.u16)
+	{
+		D6 = 0x10
+		LoadTileContentSingleRow()
+	}
+
+	u16[0xffffeec8] -= 0x10
+	--u16[0xffffeeca]
+	_setNegativeFlagByValue(s16[0xffffeeca])
+}

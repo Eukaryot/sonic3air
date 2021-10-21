@@ -1,0 +1,65 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x06d104) end(0x06d138)
+function void fn06d104()
+{
+#if STANDALONE
+	// Very slightly blend between colors
+	//  -> Doesn't look that great, so it's just for few frames
+	//  -> Maybe this needs some changes to the sunset palettes and timings to work better?
+	u16 offset = objA0.value39
+	u32 src1 = 0x364896 + offset * 0x10
+	if (objA0.countdown_value >= 4 || offset == 0x1e)
+	{
+		copyMemory(0xfffffc60, src1, 0x20)
+	}
+	else
+	{
+		u32 src2 = 0x364896 + (offset + 2) * 0x10
+		for (u8 i = 0; i < 0x20; i += 2)
+		{
+			u16[0xfffffc60 + i] = blendColorsPacked(u16[src2 + i], u16[src1 + i], objA0.countdown_value * 0x40)
+		}
+	}
+
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+#else
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	u16 offset = objA0.value39
+	A1 = 0x364896 + offset * 0x10
+	copyMemory(0xfffffc60, A1, 0x20)
+#endif
+
+	objA0.countdown_value = u16[0x06d14c + offset]
+	objA0.value39 += 2
+	if (objA0.value39 >= 0x20)
+	{
+		fn06d13c()
+	}
+}
+
+
+
+// This is used by Sonic/Tails, but also for Knuckles
+
+//# address-hook(0x06d13c) end(0x06d146)
+function void fn06d13c()
+{
+	D0.u16 = 0x0300
+	TriggerNextZone()
+	UnloadObject()
+}

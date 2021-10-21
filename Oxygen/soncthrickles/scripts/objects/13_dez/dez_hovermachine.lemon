@@ -1,0 +1,134 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// DEZ Hover Machine                                     //
+//-------------------------------------------------------//
+
+//# address-hook(0x04945c) end(0x0494d4)
+function void fn04945c()
+{
+	objA0.mapping_offset = 0x0495d8
+	objA0.sprite_attributes = 0x230d
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+
+	if (allocDynamicObjectAfterA0())
+	{
+		// Spawn the black orb
+		objA1.update_address = 0x0494ea
+		u8[A1 + 0x04] = objA0.render_flags
+		u8[A1 + 0x06] = 0x10
+		u8[A1 + 0x07] = 0x10
+		u16[A1 + 0x08] = 0x0280
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		objA1.position.x.u16 = objA0.position.x.u16 + 0x20
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x22] = 0x02
+		u16[A1 + 0x44] = objA0.position.x.u16
+	}
+
+	objA0.update_address = 0x0494da
+	fn0494da()
+}
+
+
+//# address-hook(0x0494da) end(0x0494e4)
+function void fn0494da()
+{
+	++objA0.animation.sprite
+	objA0.animation.sprite &= 0x01
+	DrawOrUnloadObject()
+}
+
+
+
+// Black orb sub-object (the one that does the actual work)
+
+//# address-hook(0x0494ea) end(0x049524)
+function void fn0494ea()
+{
+	D0.u8 = objA0.value26
+	objA0.sprite_priority = (D0.s8 >= 0) ? 0x200 : 0x300
+	objA0.value26 += 2
+	LookupSinCos()
+	objA0.position.x.u16 = u16[A0 + 0x44] + (D1.s16 >> 3)
+
+	A1 = 0xffffb000
+	fn04952a()
+
+	A1 = 0xffffb04a
+	fn04952a()
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x04952a) end(0x0495d6)
+function void fn04952a()
+{
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x40
+	if (D0.u16 < 0x80)
+	{
+		LookupSinCos()
+		D0.s16 = (D0.s16 >> 2) + 0x20
+		D2.u16 = D0.u16 + 0x20
+		D1 = objA1.position.y.u16 - objA0.position.y.u16 + D0.u16
+
+		if (D1.u16 < D2.u16 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+		{
+			D1.u16 -= D0.u16
+			if (D1.s16 >= 0)
+			{
+				D1.u16 = (D1.u16 ^ 0xffff) * 2
+			}
+			D1.u16 += D0.u16
+			D1.s16 = (-D1.s16) >> 4
+			objA1.position.y.u16 += D1.u16
+			objA1.velocity.y = 0
+			objA1.flags2a |= char.flag.IN_AIR
+			objA1.flags2a &= ~char.flag.CONTROL_LOCK
+			u8[A1 + 0x2f] = 0
+			u8[A1 + 0x40] = 0
+			u16[A1 + 0x1c] = 0x01
+
+		#if STANDALONE
+			// Remove spindash flag
+			u8[A1 + 0x3d] = 0
+		#endif
+
+			if ((level.framecounter.low & 0x0f) == 0)
+			{
+				playSound(0xd9)
+			}
+
+			if (u8[A1 + 0x27] == 0)
+			{
+				objA1.state = char.state.RUNNING
+				u8[A1 + 0x27] = 0x01
+				u8[A1 + 0x30] = 0x7f
+				u8[A1 + 0x31] = 0x08
+
+			#if STANDALONE
+				// Fix for bug when Tails carries other player and gets caught by the hover effect
+				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
+				{
+					u8[0xffffb02a] |= char.flag.IN_AIR
+					u8[0xffffb02e] = 0
+				}
+			#endif
+			}
+		}
+	}
+}

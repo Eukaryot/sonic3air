@@ -1,0 +1,85 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03c946) end(0x03c96c)
+function void fn03c946()
+{
+	objA0.mapping_offset = 0x03ca06
+	objA0.sprite_attributes = 0x040a
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x04
+	objA0.sprite_priority = 0x80
+
+	objA0.update_address = 0x03c972
+	fn03c972()
+}
+
+
+//# address-hook(0x03c972) end(0x03c97e)
+function void fn03c972()
+{
+	A1 = 0xffffb000
+	fn03c984()
+
+	A1 = 0xffffb04a
+	fn03c984()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03c984) end(0x03c9ba)
+function void fn03c984()
+{
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	if (D0.u16 < 0x20)
+	{
+		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x18
+		if (D0.u16 < 0x20)
+		{
+			if (debug_mode.state == 0)
+			{
+				u16[A0 + 0x30] = 0x1e
+				objA0.update_address = 0x03c9bc
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x03c9bc) end(0x03c9de)
+function void fn03c9bc()
+{
+	++objA0.animation.sprite
+	objA0.animation.sprite &= 1
+
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		objA0.update_address = 0x03c9e4
+		u8[A0 + 0x28] = 0x8b
+		AddAsDynamicObject()
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03c9e4) end(0x03ca00)
+function void fn03c9e4()
+{
+	objA0.update_address = 0x01e5e0
+	objA0.base_state = 0x06
+	u8[A0 + 0x28] = 0
+	u8[A0 + 0x29] = 0
+
+	playSound(0xb4)
+	SmallExplosion.BaseUpdate()
+}

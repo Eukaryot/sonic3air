@@ -1,0 +1,223 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Object that spawns the boss
+
+//# address-hook(0x055f48) end(0x055f4e)
+function void fn055f48()
+{
+	call 0x055f52 + objA0.base_state
+}
+
+
+//# address-hook(0x055f52) end(0x055f52)
+function void fn055f52()
+{
+	fn055f5e()
+}
+
+//# address-hook(0x055f56) end(0x055f56)
+function void fn055f56()
+{
+	fn055f6e()
+}
+
+//# address-hook(0x055f5a) end(0x055f5a)
+function void fn055f5a()
+{
+	fn055f7c()
+}
+
+
+//# address-hook(0x055f5e) end(0x055f6a)
+function void fn055f5e()
+{
+	if (camera.screenshake.state != 0)
+		return
+
+	objA0.countdown_value = 0x3c
+	objA0.base_state += 4
+	fn055f6e()
+}
+
+
+//# address-hook(0x055f6e) end(0x055f96)
+function void fn055f6e()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value != 0)
+		return
+
+	u8[0xffffeed4] = 0xff
+	objA0.base_state += 4
+	fn055f7c()
+}
+
+
+//# address-hook(0x055f7c) end(0x055f96)
+function void fn055f7c()
+{
+	// Waiting for door maybe...?
+	if (u16[0xffffeed4] == 0)
+	{
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x076a12
+		}
+		UnloadObject()
+	}
+}
+
+
+
+// This object causes a sprite masking below the walking area
+//  -> It hides e.g. parts of the door and of the boss when it's rising
+
+//# address-hook(0x055f98) end(0x055fb8)
+function void fn055f98()
+{
+	objA0.update_address = 0x055fbe
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x24
+	objA0.sprite_priority = 0x0200
+	objA0.mapping_offset = 0x05611e
+	objA0.position.y.u16 = 0x0a00
+	fn055fbe()
+}
+
+
+//# address-hook(0x055fbe) end(0x055fd4)
+function void fn055fbe()
+{
+	if (global.act != 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.position.x.u16 = camera.position.x.u16
+	u8[0xffffef3a] = 0xff
+
+#if STANDALONE
+	// TODO: Add sprite mask below y = 0x0a00
+#else
+	DrawObject()
+#endif
+}
+
+
+
+// The actual door object
+
+//# address-hook(0x055fda) end(0x05600c)
+function void fn055fda()
+{
+	objA0.update_address = 0x056012
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x24
+	objA0.sprite_priority = 0x0380
+	objA0.sprite_attributes = 0xc029
+	objA0.mapping_offset = 0x05611e
+	objA0.velocity.x = 0x439c
+	objA0.velocity.y = 0x09d4
+	objA0.animation.sprite = 0x01
+	fn056012()
+}
+
+
+//# address-hook(0x056012) end(0x05602e)
+function void fn056012()
+{
+	objA0.render_flags &= ~0x80
+	if (u16[0xffffeed4] == 0)
+		return
+
+	playSound(0x8f)
+	level.display_routine = 0xf6
+	objA0.update_address = 0x056034
+	fn056034()
+}
+
+
+//# address-hook(0x056034) end(0x056050)
+function void fn056034()
+{
+	D0 = 1
+	fn0560a2()
+
+	if (objA0.countdown_value >= 0x58)
+	{
+		objA0.countdown_value = 0x58
+		u16[0xffffeed4] = 0
+		objA0.update_address = 0x056056
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x056056) end(0x056078)
+function void fn056056()
+{
+	if (global.act != 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.render_flags &= ~0x80
+	if (u16[0xffffeed4] == 0)
+		return
+
+	playSound(0x8f)
+	objA0.update_address = 0x05607e
+	fn05607e()
+}
+
+
+//# address-hook(0x05607e) end(0x05609c)
+function void fn05607e()
+{
+	D0 = -1
+	fn0560a2()
+
+	if (objA0.countdown_value < 0)
+	{
+		objA0.countdown_value = 0
+		level.display_routine = 0xfd
+		u16[0xffffeed4] = 0
+		objA0.update_address = 0x056012
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x0560a2) end(0x0560da)
+function void fn0560a2()
+{
+	D1.u16 = level.framecounter & 0x03
+	if (D1.u16 == 0)
+	{
+		D0.u16 *= 2
+	}
+	objA0.countdown_value += D0.u16
+
+	D0.u16 = objA0.velocity.y + objA0.countdown_value
+	objA0.position.y.u16 = D0.u16
+
+	A1 = 0x04f438
+	D0.u16 = objA0.countdown_value & 0x3f
+	D0.u16 = (u8[A1 + D0.s16] & 0x01) + objA0.velocity.x
+	objA0.position.x.u16 = D0.u16
+
+	#if STANDALONE
+		// Mask out sprites below the ground, but except the leftmost part (because of HUD and the sand pit)
+		Renderer.addSpriteMask(160, 160, getScreenWidth()-160, 64, 0xd000, 1)
+	#endif
+}

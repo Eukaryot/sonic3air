@@ -1,0 +1,157 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(Sonic3AIR)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(WORKSPACE_DIR ../../../..)
+
+#add_definitions(-DDEBUG)
+add_definitions(-D__EMSCRIPTEN__)
+add_definitions(-DRMX_USE_GLES2)
+add_compile_definitions(PLATFORM_ENDUSER)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+	# GCC only
+	set(CMAKE_CXX_FLAGS_DEBUG "-g2")		# Include debug information
+	set(CMAKE_CXX_FLAGS_RELEASE "-g0")		# Leave out debug information
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")		# Full optimization
+	add_compile_options(-Wno-psabi)
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+
+	# Clang only
+	#SET(CMAKE_C_COMPILER   "/usr/bin/clang")
+	#SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+	#SET(CMAKE_AR      "/usr/bin/llvm-ar" CACHE PATH "archive")
+	#SET(CMAKE_LINKER  "/usr/bin/llvm-ld" CACHE PATH "linker")
+	#SET(CMAKE_NM      "/usr/bin/llvm-nm" CACHE PATH "nm")
+	#SET(CMAKE_OBJDUMP "/usr/bin/llvm-objdump" CACHE PATH "objdump")
+	#SET(CMAKE_RANLIB  "/usr/bin/llvm-ranlib" CACHE PATH "ranlib")
+
+endif()
+
+set (CMAKE_CXX_FLAGS "-s USE_VORBIS=1 -s USE_SDL=2 -s FULL_ES2=1 -s FORCE_FILESYSTEM=1 -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s USE_ZLIB=1")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js")
+
+include_directories(${WORKSPACE_DIR}/framework/external/sdl/SDL2/include)
+include_directories(${WORKSPACE_DIR}/librmx/source)
+include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
+include_directories(${WORKSPACE_DIR}/Oxygen/oxygenengine/source)
+include_directories(${WORKSPACE_DIR}/Oxygen/soncthrickles/source)
+include_directories(${WORKSPACE_DIR}/Oxygen/soncthrickles/source/external)
+include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
+
+
+# rmxbase
+
+file(GLOB RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp
+						  ${WORKSPACE_DIR}/librmx/source/rmxbase/jsoncpp/*.cpp)
+
+add_library(rmxbase ${RMXBASE_SOURCES})
+
+#target_precompile_headers(rmxbase PRIVATE rmxbase.h)	# Requires CMake 3.16
+
+#target_link_libraries(rmxbase stdc++fs)
+#target_link_libraries(rmxbase zlibstatic)
+
+
+# rmxmedia
+
+file(GLOB RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp)
+
+add_library(rmxmedia ${RMXMEDIA_SOURCES})
+
+target_link_libraries(rmxmedia rmxbase)
+#target_link_libraries(rmxmedia SDL2)
+#target_link_libraries(rmxmedia ${OPENGL_gl_LIBRARY})
+
+
+
+# rmxext_oggvorbis
+
+file(GLOB RMXEXT_OGGVORBIS_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxext_oggvorbis/*.cpp)
+
+add_library(rmxext_oggvorbis ${RMXEXT_OGGVORBIS_SOURCES})
+
+target_link_libraries(rmxext_oggvorbis rmxmedia)
+
+
+# lemonscript
+
+file(GLOB_RECURSE LEMONSCRIPT_SOURCES ${WORKSPACE_DIR}/Oxygen/lemonscript/source/lemon/*.cpp)
+
+add_library(lemonscript ${LEMONSCRIPT_SOURCES})
+
+target_link_libraries(lemonscript rmxbase)
+
+
+
+# TODO: There might be better ways to differentiate between development and enduser versions of oxygen;
+#       e.g. use a "Release-Enduser" build configuration like in the Visual Studio project
+
+# oxygen_development
+
+#file(GLOB_RECURSE OXYGEN_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/*.cpp)
+
+#add_library(oxygen_development ${OXYGEN_SOURCES})
+
+#target_link_libraries(oxygen_development rmxmedia)
+#target_link_libraries(oxygen_development rmxext_oggvorbis)
+#target_link_libraries(oxygen_development lemonscript)
+
+
+
+# oxygen_enduser
+
+file(GLOB_RECURSE OXYGEN_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/*.cpp
+	${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip/ioapi.c
+	${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip/unzip.c)
+
+add_library(oxygen_enduser ${OXYGEN_SOURCES})
+
+target_compile_definitions(oxygen_enduser PUBLIC ENDUSER)
+
+target_link_libraries(oxygen_enduser rmxmedia)
+target_link_libraries(oxygen_enduser rmxext_oggvorbis)
+target_link_libraries(oxygen_enduser lemonscript)
+
+
+
+# OxygenApp
+
+#file(GLOB_RECURSE ENGINEAPP_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/engineapp/*.cpp)
+
+# TODO: CMake seems to use a different working directory for this, so "Oxygen" is intentionally missing here
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKSPACE_DIR}/oxygenengine")
+
+#add_executable(OxygenApp ${ENGINEAPP_SOURCES})
+
+#target_link_libraries(OxygenApp oxygen_development)
+
+#set_target_properties(OxygenApp PROPERTIES OUTPUT_NAME "oxygenapp_linux.html")
+
+
+
+
+# Sonic3AIR
+
+file(GLOB_RECURSE SONIC3AIR_SOURCES ${WORKSPACE_DIR}/Oxygen/soncthrickles/source/sonic3air/*.cpp)
+
+# TODO: CMake seems to use a different working directory for this, so "Oxygen" is intentionally missing here
+SET(CMAKE_EXECUTABLE_SUFFIX ".js")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKSPACE_DIR}/soncthrickles/build/_emscripten/dist")
+
+add_executable(Sonic3AIR ${SONIC3AIR_SOURCES})
+
+target_compile_definitions(Sonic3AIR PUBLIC ENDUSER)
+
+#target_link_libraries(Sonic3AIR SDL2)
+target_link_libraries(Sonic3AIR oxygen_enduser)
+#target_link_libraries(Sonic3AIR discord_game_sdk_source)
+
+set_target_properties(Sonic3AIR PROPERTIES OUTPUT_NAME "sonic3air_web")
+
+
+

@@ -1,0 +1,254 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Trap door used in HCZ, CNZ and DEZ (and possibly elsewhere)
+
+//# address-hook(0x030e24) end(0x030e86)
+function void fn030e24()
+{
+	if (objA0.subtype2c & 0x80)
+	{
+		D0 = objA0.subtype2c
+		fn030fd2()
+		return
+	}
+
+	objA0.animation.sprite = objA0.subtype2c
+	A1 = 0x030e18 + objA0.subtype2c * 4
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	objA0.sprite_attributes = u16[(A1+=2)-2]
+	objA0.mapping_offset = 0x030f86
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0300
+	objA0.value32 = objA0.position.y.u16
+
+	u16[A0 + 0x34] = objA0.position.x.u16 - 0x200
+	u16[A0 + 0x36] = objA0.position.x.u16 + 0x18
+	if (objA0.flags2a & 0x01)
+	{
+		u16[A0 + 0x34] += 0x1e8
+		u16[A0 + 0x36] += 0x1e8
+	}
+
+	objA0.update_address = 0x030e8c
+	fn030e8c()
+}
+
+
+//# address-hook(0x030e8c) end(0x030f52)
+function void fn030e8c()
+{
+	if ((objA0.flags2a & 0x01) == 0)
+	{
+		D2.u16 = u16[A0 + 0x34]
+		D3.u16 = (objA0.flags38 == 0) ? objA0.position.x.u16 : u16[A0 + 0x36]
+	}
+	else
+	{
+		D2.u16 = (objA0.flags38 == 0) ? objA0.position.x.u16 : u16[A0 + 0x34]
+		D3.u16 = u16[A0 + 0x36]
+	}
+
+	D4.u16 = objA0.value32 - 0x20
+	D5.u16 = objA0.value32 + 0x20
+#if STANDALONE
+	// Special handling for this certain door in DEZ 1 (end of the turbine room)
+	if (global.zone_act == 0x0b00 && objA0.position.x.u16 == 0x2990 && objA0.value32 == 0x0840)
+	{
+		D4.u16 -= 0x20
+		D5.u16 += 0x20
+	}
+#endif
+
+#if STANDALONE
+	//debugDrawRect(D2.u16, D4.u16, D3.u16 - D2.u16, D5.u16 - D4.u16, 0x80ff0000)
+#endif
+
+	// This tells us after the following checks if any character is inside to test rectangle
+	objA0.flags38 = 0
+
+	A1 = 0xffffb000
+	fn030f58()
+
+	A1 = 0xffffb04a
+	fn030f58()
+
+	if (objA0.flags38 != 0)
+	{
+		u16 maxOffset = 0x40
+	#if STANDALONE
+		// Special handling for another certain door in DEZ 1
+		if (global.zone_act == 0x0b00 && objA0.position.x.u16 == 0x2e30 && objA0.value32 == 0x06a0)
+			maxOffset = 0x48
+	#endif
+
+		// Inside
+		if (u16[A0 + 0x30] != maxOffset)
+		{
+			u16[A0 + 0x30] += 8
+			if (u16[A0 + 0x30] == maxOffset)
+			{
+				playSound(0x58)
+			}
+			objA0.position.y.u16 = objA0.value32 - u16[A0 + 0x30]
+		}
+	}
+	else
+	{
+		// Outside
+		if (u16[A0 + 0x30] != 0)
+		{
+			u16[A0 + 0x30] -= 8
+			if (u16[A0 + 0x30] == 0)
+			{
+				playSound(0x58)
+			}
+			objA0.position.y.u16 = objA0.value32 - u16[A0 + 0x30]
+		}
+	}
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x030f58) end(0x030f84)
+function void fn030f58()
+{
+	D0.u16 = objA1.position.x.u16
+	if (D0.s16 >= D2.s16 && D0.u16 < D3.u16)
+	{
+		D0.u16 = objA1.position.y.u16
+		if (D0.u16 >= D4.u16 && D0.u16 < D5.u16 && s8[A1 + 0x2e] >= 0)
+		{
+			objA0.flags38 = 1
+		}
+	}
+}
+
+
+//# address-hook(0x030fd2) end(0x03102e)
+function void fn030fd2()
+{
+	D0.u16 &= 0x7f
+
+	objA0.animation.sprite = D0.u8
+	A1 = 0x030fce + D0.s16 * 4
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	objA0.sprite_attributes = u16[(A1+=2)-2]
+	objA0.mapping_offset = 0x031108
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0200
+	objA0.value32 = objA0.position.x.u16
+
+	D2.u16 = objA0.position.y.u16 - 0x100
+	D3.u16 = objA0.position.y.u16 + 0x18
+	if (objA0.flags2a & 0x02)
+	{
+		D2.u16 += 0xe8
+		D3.u16 += 0xe8
+	}
+
+	u16[A0 + 0x34] = D2.u16
+	u16[A0 + 0x36] = D3.u16
+	objA0.update_address = 0x031034
+	fn031034()
+}
+
+
+//# address-hook(0x031034) end(0x0310d4)
+function void fn031034()
+{
+	if ((objA0.flags2a & 0x02) == 0)
+	{
+		D2.u16 = u16[A0 + 0x34]
+		D3.u16 = objA0.position.y.u16
+		if (objA0.flags38 != 0)
+		{
+			D3.u16 = u16[A0 + 0x36]
+		}
+	}
+	else
+	{
+		D2.u16 = objA0.position.y.u16
+		D3.u16 = u16[A0 + 0x36]
+		if (objA0.flags38 != 0)
+		{
+			D2.u16 = u16[A0 + 0x34]
+		}
+	}
+
+	D4.u16 = objA0.value32 - 0x20
+	D5.u16 = objA0.value32 + 0x20
+	objA0.flags38 = 0
+
+	A1 = 0xffffb000
+	fn0310da()
+
+	A1 = 0xffffb04a
+	fn0310da()
+
+	if (objA0.flags38 != 0)
+	{
+		if (u16[A0 + 0x30] != 0x40)
+		{
+			u16[A0 + 0x30] += 8
+			D0.u16 = u16[A0 + 0x30]
+			if (objA0.flags2a & 0x01)
+			{
+				D0.s16 = -D0.s16
+			}
+			objA0.position.x.u16 = objA0.value32 + D0.u16
+		}
+	}
+	else
+	{
+		if (u16[A0 + 0x30] != 0)
+		{
+			u16[A0 + 0x30] -= 8
+			D0.u16 = u16[A0 + 0x30]
+			if (objA0.flags2a & 0x01)
+			{
+				D0.s16 = -D0.s16
+			}
+			objA0.position.x.u16 = objA0.value32 + D0.u16
+		}
+	}
+
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0310da) end(0x031106)
+function void fn0310da()
+{
+	D0.u16 = objA1.position.y.u16
+	if (D0.s16 >= D2.s16 && D0.u16 < D3.u16)
+	{
+		D0.u16 = objA1.position.x.u16
+		if (D0.u16 >= D4.u16 && D0.u16 < D5.u16 && s8[A1 + 0x2e] >= 0)
+		{
+			objA0.flags38 = 0x01
+		}
+	}
+}

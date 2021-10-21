@@ -1,0 +1,62 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Object that looks like an upside-down version of the SOZ collapsing platform
+
+//# address-hook(0x041f44) end(0x041f8a)
+function void fn041f44()
+{
+	objA0.mapping_offset = 0x041fc8
+	objA0.sprite_attributes = 0x4001
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+
+	if (objA0.subtype2c != 0)
+	{
+		objA0.box_size.x = 0x20
+		objA0.box_size.y = 0x08
+		objA0.animation.sprite = 1
+
+		objA0.update_address = 0x041fac
+		fn041fac()
+	}
+	else
+	{
+		objA0.box_size.x = 0x10
+		objA0.box_size.y = 0x18
+
+		objA0.update_address = 0x041f90
+		fn041f90()
+	}
+}
+
+
+//# address-hook(0x041f90) end(0x041fa6)
+function void fn041f90()
+{
+	D1.u16 = 0x1b
+	D2.u16 = 0x18
+	D3.u16 = 0x19
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x041fac) end(0x041fc2)
+function void fn041fac()
+{
+	D1.u16 = 0x2b
+	D2.u16 = 0x08
+	D3.u16 = 0x09
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}

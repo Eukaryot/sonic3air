@@ -1,0 +1,399 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Level transition after MHZ 2 result screen            //
+//-------------------------------------------------------//
+
+//# address-hook(0x08638a) end(0x0863be)
+function void fn08638a()
+{
+	A1 = 0xffffb000
+	fn08639c()
+
+	A1 = 0xffffb04a
+	if (objA1.render_flags & render_flag.VISIBLE)
+	{
+		fn08639c()
+	}
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
+}
+
+
+function void fn08639c()
+{
+	D0.u16 = objA0.position.x.u16
+	if (D0.u16 < objA1.position.x.u16)
+	{
+		u8[A1 + 0x04] |= render_flag.FLIP_X
+		u8[A1 + 0x2a] |= 0x01
+	}
+	else
+	{
+		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		u8[A1 + 0x2a] &= ~0x01
+	}
+}
+
+
+
+// Pattern loading for flying battery
+
+//# address-hook(0x054e9c) end(0x054f62)
+function void fn054e9c()
+{
+	D1.u16 = 0x4280
+	D2.u16 = 0x0280
+	fn04ef56()
+	if (_negative())
+	{
+		u32[0xffffee98] = 0x400000
+		D0.u16 = 0x80
+		u16[0xffffeea2] = D0.u16
+		u16[0xffffee9c] = D0.u16
+		fn054f8c()
+
+		A1 = 0xffffa800
+		u16[A1+2] = u16[A1] & 0xfff0
+		u32[A1+4] = 0
+		u16[A1+10] = u16[A1+8] & 0xfff0
+
+		// Loads palette colors 0x10 .. 0x1f
+		copyMemory(0xfffffc20, 0x0550de, 0x20)
+
+		A5 = 0xffffa80c
+		u32[A5] = 0
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x05583e
+			u16[A1 + 0x30] = 0x04c0
+			u16[A1 + 0x3a] = 0x4000
+
+			if (allocDynamicObjectAfterA1())
+			{
+				objA1.update_address = 0x055814
+				u16[(A5+=2)-2] = A1.u16
+
+				if (allocDynamicObjectAfterA1())
+				{
+					objA1.update_address = 0x055814
+					u16[(A5+=2)-2] = A1.u16
+				}
+			}
+		}
+
+		push(A3)
+		push(A2)
+		push(A0)
+		push(D7)
+		Kosinski.addToDMAQueue(0x159f10, 0xa000)
+		D7 = pop()
+		A0 = pop()
+		A2 = pop()
+		A3 = pop()
+
+		// Configure H-Int to set a different scroll-y offset in between
+		//  -> The same approach is used in AIZ 2 blimb sequence already
+		u16[0xfffffff6] = 0x4ef9
+		irq_table.lineupdate = 0x050056
+		h_int.line = 0x80
+		VDP.Config.enableHInt(true)
+		u16[0xffffeec0] += 4
+	}
+}
+
+
+//# address-hook(0x054f64) end(0x054f88)
+function void fn054f64()
+{
+	fn054f8c()
+
+	A4 = 0x0550da
+	A6 = 0xffffa800
+	D5 = 2
+	D6.u16 = u16[0xffffeea2]
+	fn04ee20()
+
+	A4 = 0x0550d6
+	A6 = 0xffffa804
+	D5 = 2
+	D6.u16 = camera.foreground.y.old
+	fn04ee20()
+}
+
+
+
+// Used for propellers
+
+//# address-hook(0x054f8c) end(0x055006)
+function void fn054f8c()
+{
+	u16[0xffffa808] = camera.foreground.x.u16
+	D0.u16 = camera.foreground.x.u16 + u16[0xffffee98] + 0x01e0
+	D2.u16 = u16[0xffffa800]
+	u16[0xffffa800] = D0.u16
+	D1.u16 = u16[0xffffee9c]
+	A1 = 0xffffb000
+	if (u8[A1 + 0x2e] == 0x81)
+	{
+		D3.u16 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x02dc : 0x02cd
+		D4.u16 = u16[0xffffeede] - D1.u16
+		objA1.position.y.u16 += D4.u16
+		D2.u16 -= D0.u16
+		objA1.position.x.u16 += D2.u16
+	}
+
+	u16[0xffffeede] = D1.u16
+	D1.s16 = 0x0158 - D1.s16
+	A1 = 0xffffa80c
+
+	D2.u16 = 0x46b8
+	fn054fec()
+
+	D2.u16 = 0x45b8
+	fn054fec()
+}
+
+
+function void fn054fec()
+{
+	D3.u16 = u16[(A1+=2)-2]
+	if (D3.u16 != 0)
+	{
+		A5 = 0xffff0000 + D3.u16
+		D2.u16 -= D0.u16
+		if (D2.s16 >= 0)
+		{
+		#if STANDALONE
+			// Avoid too early clipping in widescreen
+			D2.u16 = ((D2.u16 + 0x1c) & 0x01ff) + 0x40
+		#else
+			D2.u16 = (D2.u16 + 0x5c) & 0x01ff
+		#endif
+			u16[A5 + 0x10] = D2.u16
+			u16[A5 + 0x14] = D1.u16
+		}
+	}
+}
+
+
+
+// Flying Battery (controls vertical movement and propellers)
+
+//# address-hook(0x055814) end(0x055826)
+function void fn055814()
+{
+	objA0.update_address = 0x05582e
+	objA0.sprite_priority = 0x0380
+	objA0.sprite_attributes = 0xa500
+	objA0.mapping_offset = 0x055908
+	fn05582e()
+}
+
+
+//# address-hook(0x05582e) end(0x055838)
+function void fn05582e()
+{
+	Object.animationUpdate(0x055a3c)
+	DrawObject()
+}
+
+
+//# address-hook(0x05583e) end(0x0558c0)
+function void fn05583e()
+{
+	++u8[A0 + 0x3c]
+	u32[A0 + 0x38] += 0xc0
+	D0 = u32[A0 + 0x38]
+	u32[0xffffee98] -= D0
+	if (u16[0xffffeec4] != 0 && u32[A0 + 0x2e] == 0x2800)
+	{
+		D0.u16 = objA0.value32
+		D1.u16 = u8[A0 + 0x3c] & 0x03
+		if (D1.u16 == 0)
+		{
+			++objA0.value32
+		}
+	}
+	else
+	{
+		D0 = 0x2800
+		D1 = 0xc0
+		fn0465d6()
+	}
+
+	u16[0xffffee9c] = D0.u16 + u16[0xffffeea2] + 5
+	if (u8[0xfffffaa9] == 0 && s16[0xffffee98] <= -0x03e6)
+	{
+		u8[0xfffffaa9] = 0xff
+		u8[0xffffeec4] = 0xff
+		player1.camera_lock = 0xff
+	}
+
+	D0.u16 = (level.framecounter - 1) & 0x0f
+	if (D0.u16 == 0)
+	{
+		playSound(0xbd)
+	}
+}
+
+
+
+//# address-hook(0x076310) end(0x076350)
+function void fn076310()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.update_address = 0x076356
+	objA0.flags2a &= ~0x80
+	objA0.flags38 &= ~0x10
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.velocity.x = 0x0400
+	objA0.velocity.y = 0
+
+	spawnChildObjects(0x0681b4)
+
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		// Load Egg Robo head
+		fn067b1c()
+	}
+}
+
+
+//# address-hook(0x076356) end(0x0763ac)
+function void fn076356()
+{
+	playSoundRepeatedly(0xbe)
+	fn08638a()
+
+	D0.u16 = camera.position.x.u16 + 0x80
+	D1 = (D0.u16 < objA0.position.x.u16) ? -0x10 : 0
+	moveWithGravity(D1.u16)
+
+	D0.u16 = camera.position.y.u16 - 0x40
+	if (D0.u16 >= objA0.position.y.u16)
+	{
+		objA0.update_address = 0x0763b2
+		objA0.flags38 |= 0x20
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x0863c0
+		}
+	}
+
+	D0.u16 = u16[0xffffeebc]
+	objA0.position.x.u16 -= D0.u16
+	DrawObject()
+}
+
+
+//# address-hook(0x0763b2) end(0x0763d2)
+function void fn0763b2()
+{
+	A1 = 0xffffb000
+	if (objA1.position.x.u16 < 0x4778)
+	{
+		fn086334()
+		return
+	}
+
+	objA0.update_address = 0x0763d8
+	control.player1 = 0
+
+	A1 = 0xffffb000
+	StopObjectA1()
+}
+
+
+//# address-hook(0x0763d8) end(0x076402)
+function void fn0763d8()
+{
+	control.player1 = 0x0101
+	control.pad2 = 0x0101
+	if (u8[0xfffffaa9] == 0)
+		return
+
+	objA0.update_address = 0x076404
+	control.player1 = 0x2020
+
+	A1 = 0xffffb000
+	objA1.velocity.x = 0x0200
+}
+
+
+//# address-hook(0x076404) end(0x076450)
+function void fn076404()
+{
+	control.player1 = 0x2000
+	A1 = 0xffffb000
+	if (objA1.velocity.y < 0)
+		return
+
+	objA0.update_address = 0x076456
+	StopObjectA1()
+
+	u8[A1 + 0x04] |= render_flag.FLIP_X
+	objA1.state = char.state.HOLDING_ON
+	u8[A1 + 0x2a] |= 0x01
+	u8[A1 + 0x2e] = 0x81
+	objA0.countdown_value = 0x5f
+
+	playSound(0x4a)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x07646e
+	}
+	fn076456()
+}
+
+
+//# address-hook(0x076456) end(0x076468)
+function void fn076456()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	D0.u16 = 0x0400
+	TriggerNextZone()
+	UnloadObject()
+
+#if STANDALONE
+	Game.endSkippableCutscene()
+#endif
+}
+
+
+//# address-hook(0x07646e) end(0x076490)
+function void fn07646e()
+{
+	objA0.update_address = 0x076492
+	A1 = 0xffffb04a
+	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x20] = 0x20
+	u8[A1 + 0x04] &= ~render_flag.FLIP_X
+	u8[A1 + 0x2a] &= ~0x01
+}
+
+
+//# address-hook(0x076492) end(0x07649e)
+function void fn076492()
+{
+	A1 = 0xffffb04a
+	++objA1.position.x.u16
+	--objA1.position.y.u16
+}

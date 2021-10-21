@@ -1,0 +1,422 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\oxygen\application\Application.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioCollection.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioOutBase.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioPlayer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioSourceBase.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\AudioSourceManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\EmulationAudioSource.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\audio\OggAudioSource.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\Configuration.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\GameLoader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\input\ControlsIn.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\input\InputRecorder.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\mainview\GameView.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\menu\OxygenMenu.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\modding\Mod.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\modding\ModManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\BackdropView.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\DebugLogView.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\DebugSidePanel.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\MemoryHexView.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\ProfilingView.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\SaveStateMenu.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
+    <ClCompile Include="..\..\source\oxygen\base\CrashHandler.cpp" />
+    <ClCompile Include="..\..\source\oxygen\base\PlatformFunctions.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\DrawCollection.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\DrawCommand.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\Drawer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\DrawerTexture.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerTexture.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\Upscaler.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\file\FilePackage.cpp" />
+    <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp" />
+    <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
+    <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\PackageFileCrawler.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
+    <ClCompile Include="..\..\source\oxygen\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\FileHelper.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\JsonHelper.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\Log.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\Utils.cpp" />
+    <ClCompile Include="..\..\source\oxygen\platform\AndroidJavaInterface.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\Geometry.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\HardwareRenderer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\HardwareRenderResources.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\DebugDrawPlaneShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderComponentSpriteShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPaletteSpriteShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPlaneShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\hardware\shaders\RenderVdpSpriteShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\OverlayManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\PaletteManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\PatternManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\PlaneManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\RenderParts.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\parts\SpriteManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\RenderResources.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\ComponentSprite.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteSprite.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteBase.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\CodeExec.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\EmulatorInterface.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\GameRecorder.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptBindings.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptProgram.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptRuntime.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\LogDisplay.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\PersistentData.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\SaveStateSerializer.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\Simulation.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\blip_buf.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\sn76489.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\SoundDriver.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\SoundEmulation.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\sound\ym2612.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\oxygen\application\Application.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioCollection.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioOutBase.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioPlayer.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioSourceBase.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\AudioSourceManager.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\EmulationAudioSource.h" />
+    <ClInclude Include="..\..\source\oxygen\application\audio\OggAudioSource.h" />
+    <ClInclude Include="..\..\source\oxygen\application\Configuration.h" />
+    <ClInclude Include="..\..\source\oxygen\application\EngineMain.h" />
+    <ClInclude Include="..\..\source\oxygen\application\GameLoader.h" />
+    <ClInclude Include="..\..\source\oxygen\application\GameProfile.h" />
+    <ClInclude Include="..\..\source\oxygen\application\input\ControlsIn.h" />
+    <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h" />
+    <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h" />
+    <ClInclude Include="..\..\source\oxygen\application\input\InputRecorder.h" />
+    <ClInclude Include="..\..\source\oxygen\application\mainview\GameView.h" />
+    <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h" />
+    <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h" />
+    <ClInclude Include="..\..\source\oxygen\application\menu\OxygenMenu.h" />
+    <ClInclude Include="..\..\source\oxygen\application\modding\Mod.h" />
+    <ClInclude Include="..\..\source\oxygen\application\modding\ModManager.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\BackdropView.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\CheatSheetOverlay.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\DebugLogView.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\DebugSidePanel.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\MemoryHexView.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\ProfilingView.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\SaveStateMenu.h" />
+    <ClInclude Include="..\..\source\oxygen\application\overlays\TouchControlsOverlay.h" />
+    <ClInclude Include="..\..\source\oxygen\application\video\VideoOut.h" />
+    <ClInclude Include="..\..\source\oxygen\base\CrashHandler.h" />
+    <ClInclude Include="..\..\source\oxygen\base\PlatformFunctions.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawCollection.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawCommand.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\Drawer.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawerTexture.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\DrawerInterface.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawer.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerTexture.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\Upscaler.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.h" />
+    <ClInclude Include="..\..\source\oxygen\file\FilePackage.h" />
+    <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
+    <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />
+    <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\PackageFileCrawler.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\Transform2D.h" />
+    <ClInclude Include="..\..\source\oxygen\pch.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\BitStream.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\FileHelper.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\JsonHelper.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\Log.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\Utils.h" />
+    <ClInclude Include="..\..\source\oxygen\platform\AndroidJavaInterface.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\Geometry.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\HardwareRenderer.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\HardwareRenderResources.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\DebugDrawPlaneShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderComponentSpriteShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPaletteSpriteShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderPlaneShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\hardware\shaders\RenderVdpSpriteShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\OverlayManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\PaletteManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\PatternManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\PlaneManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderParts.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderPartsDefinitions.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\SpriteManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\Renderer.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\RenderResources.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\BufferTexture.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\ComponentSprite.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteSprite.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteBase.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\CodeExec.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\DebuggingInterfaces.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\EmulatorInterface.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\GameRecorder.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptBindings.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptProgram.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptRuntime.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\LogDisplay.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\PersistentData.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\Runtime.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\Simulation.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\blip_buf.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\sn76489.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundChipWrite.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundDriver.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\SoundEmulation.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\sound\ym2612.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\debugdraw_plane.shader" />
+    <None Include="..\data\shader\postfx_blur.shader" />
+    <None Include="..\data\shader\render_plane.shader" />
+    <None Include="..\data\shader\render_sprite_component.shader" />
+    <None Include="..\data\shader\render_sprite_palette.shader" />
+    <None Include="..\data\shader\render_sprite_vdp.shader" />
+    <None Include="..\data\shader\simple_copy_screen.shader" />
+    <None Include="..\data\shader\simple_rect_colored.shader" />
+    <None Include="..\data\shader\simple_rect_depthwrite.shader" />
+    <None Include="..\data\shader\simple_rect_overdraw.shader" />
+    <None Include="..\data\shader\simple_rect_textured.shader" />
+    <None Include="..\data\shader\simple_rect_textured_uv.shader" />
+    <None Include="..\data\shader\simple_rect_vertexcolor.shader" />
+    <None Include="..\data\shader\upscaler_hqx.shader" />
+    <None Include="..\data\shader\upscaler_soft.shader" />
+    <None Include="..\data\shader\upscaler_xbrz-freescale-pass0.shader" />
+    <None Include="..\data\shader\upscaler_xbrz-freescale-pass1.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Oxygen.natvis" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1E137789-9E2E-45DD-AEF2-96BD3A6F4E02}</ProjectGuid>
+    <RootNamespace>genplusgx</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>oxygen</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="oxygen.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+    <IntDir>tmp\oxygen_$(Configuration)_$(BuildCode)\</IntDir>
+    <TargetName>oxygen</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>oxygen</TargetName>
+    <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+    <IntDir>tmp\oxygen_$(Configuration)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+    <IntDir>tmp\oxygen_$(Configuration)_$(BuildCode)\</IntDir>
+    <TargetName>oxygen</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>oxygen</TargetName>
+    <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+    <IntDir>tmp\oxygen_$(Configuration)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../../lemonscript/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>oxygen/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript_svn/lib/$(BuildCode);../../source/helper/zlib/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../../lemonscript/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>oxygen/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript_svn/lib/$(BuildCode);../../source/helper/zlib/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../../lemonscript/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>oxygen/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript_svn/lib/$(BuildCode);../../source/helper/zlib/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../source;../../../lemonscript/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>oxygen/pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lemonscript_svn/lib/$(BuildCode);../../source/helper/zlib/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lemonscript.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

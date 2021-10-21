@@ -1,0 +1,234 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// ICZ Huge Block                                        //
+//-------------------------------------------------------//
+
+//# address-hook(0x08a44a) end(0x08a46a)
+function void ICZHugeBlock.Init()
+{
+	D0 = objA0.base_state
+	D1.u16 = u16[0x08a46e + D0.s16]
+
+	u16 positionBackup = objA0.position.x.u16
+
+	// Calls one of the following:
+	//  - 0x08a488
+	//  - 0x08a4c4
+	//  - 0x08a4d6
+	//  - 0x08a4de
+	//  - 0x08a504
+	//  - 0x08a50c
+	//  - 0x08a51c
+	//  - 0x08a586
+	//  - 0x08a596
+	//  - 0x08a5ac
+	//  - 0x08a5c8
+	//  - 0x08a5e4
+
+	call 0x08a46e + D1.s16
+
+	D1 = 0x2b
+	D2 = 0x70
+	D3 = 0x70
+	D4.u16 = positionBackup
+	fn01dc56()
+
+	Object.DrawOrUnload()
+}
+
+
+//# address-hook(0x08a488) end(0x08a4c2)
+function void fn08a488()
+{
+	setupObjectAttributesFull(0x08a626)
+	objA0.hitbox_extends.y = 0x70
+	objA0.value3e = objA0.position.y.u16
+	objA0.countdown_value = 0x1f
+	if (objA0.subtype2c < 0x03)
+	{
+		objA0.animation.sprite = 0x0c
+		spawnChildObjects(0x08a638)
+	}
+
+	objA0.base_state = objA0.subtype2c * 2
+}
+
+
+//# address-hook(0x08a4c4) end(0x08a4d4)
+function void fn08a4c4()
+{
+	if (objA0.flags2a & 0x18)
+	{
+		objA0.base_state = 0x0c
+	}
+}
+
+
+//# address-hook(0x08a4d6) end(0x08a4dc)
+function void fn08a4d6()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x0c
+	}
+}
+
+
+//# address-hook(0x08a4de) end(0x08a502)
+function void fn08a4de()
+{
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+	if (D2.u16 >= 0x28)
+	{
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D0.u16 -= 2
+		}
+
+		if (D0.u16 != 0)
+		{
+			objA0.base_state = 0x10
+		}
+	}
+}
+
+
+//# address-hook(0x08a504) end(0x08a50a)
+function void fn08a504()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x10
+	}
+}
+
+
+//# address-hook(0x08a50c) end(0x08a516)
+function void fn08a50c()
+{
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x08a51c) end(0x08a54a)
+function void fn08a51c()
+{
+	D0.u16 = objA0.velocity.y - 0x20
+	if (D0.s16 > -0x400)
+	{
+		objA0.velocity.y = D0.u16
+	}
+
+	UpdateMovementStraightSimple()
+	fn00fc12()
+	if (D1.s16 < 0)
+	{
+		fn08a540()
+	}
+}
+
+
+//# address-hook(0x08a586) end(0x08a594)
+function void fn08a586()
+{
+	objA0.position.y.u16 += 8
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		fn08a540()
+	}
+}
+
+
+//# address-hook(0x08a596) end(0x08a596)
+function void fn08a596()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08a5ac) end(0x08a5c4)
+function void fn08a5ac()
+{
+	D0.u16 = objA0.position.y.u16 - 1
+	if (D0.u16 > objA0.value3e)
+	{
+		objA0.position.y.u16 = D0.u16
+	}
+	else
+	{
+		objA0.countdown_value = 0x5f
+		objA0.base_state = objA0.subtype2c * 2
+	}
+}
+
+
+//# address-hook(0x08a5c8) end(0x08a5e0)
+function void fn08a5c8()
+{
+	D0.u16 = objA0.position.y.u16 + 1
+	if (D0.u16 < objA0.value3e)
+	{
+		objA0.position.y.u16 = D0.u16
+	}
+	else
+	{
+		objA0.countdown_value = 0x5f
+		objA0.base_state = objA0.subtype2c * 2
+	}
+}
+
+
+//# address-hook(0x08a5e4) end(0x08a602)
+function void fn08a5e4()
+{
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.u16 -= 2
+	}
+	if (D0.u16 == 0)
+	{
+		objA0.base_state = 0x14
+	}
+}
+
+
+
+// Not sure what this is -- could be some other object?
+
+//# address-hook(0x08a604) end(0x08a60e)
+function void fn08a604()
+{
+	objA0.update_address = 0x08a612
+
+	setupObjectAttributesBasic(0x08a632)
+
+	fn08a612()
+}
+
+
+//# address-hook(0x08a612) end(0x08a622)
+function void fn08a612()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = objA1.position.y.u16 + 0xb0
+	objA0.position.y.u16 = D0.u16
+	fn084920()
+}

@@ -1,0 +1,282 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Blaster (tank enemy from FBZ)                         //
+//-------------------------------------------------------//
+
+//# address-hook(0x08948e) end(0x0894a2)
+function void Blaster.Init()
+{
+	Object.InitWithUpdateAddress(0x0089494)
+}
+
+
+//# address-hook(0x089494) end(0x0894a2)
+function void fn089494()
+{
+	// Targets:
+	//  - 0x0894b6	-> objA0.base_state = 0x00
+	//  - 0x0894f2	-> objA0.base_state = 0x02
+	//  - 0x089552	-> objA0.base_state = 0x04
+	//  - 0x08957a	-> objA0.base_state = 0x06
+	//  - 0x0895a4	-> objA0.base_state = 0x08
+	//  - 0x0895c6	-> objA0.base_state = 0x0a
+	//  - 0x0895ec	-> objA0.base_state = 0x0c
+	//  - 0x0895fa	-> objA0.base_state = 0x0e
+	call tableLookupAddress(0x0894a6, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x0894b6) end(0x0894ee)
+function void fn0894b6()
+{
+	setupObjectAttributesFull(0x0896fc)
+	if (objA0.render_flags & render_flag.FLIP_Y)
+	{
+		objA0.render_flags &= ~0x02
+		u8[A0 + 0x3c] = 0xff
+	}
+
+	objA0.hitbox_extends.y = 0x0e
+	objA0.countdown_value = objA0.subtype2c * 2
+	u16[A0 + 0x3a] = objA0.subtype2c * 4
+	objA0.countdown_callback = 0x08953c
+
+	D4.s16 = -0x80
+	fn085416()
+}
+
+
+//# address-hook(0x0894f2) end(0x08953a)
+function void fn0894f2()
+{
+	if (fn0896d6())
+		return
+
+	CheckDistanceToPlayers()
+	if (D1.u16 == 0 && D2.u16 < 0x80)
+	{
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D0.u16 -= 2
+		}
+		if (D0.u16 == 0)
+		{
+			objA0.base_state = 0x06
+			objA0.animation.sprite = 0
+			objA0.value39 = 0x10
+			return
+		}
+	}
+
+	A1 = 0x08975e
+	fn0845a0()
+	UpdateMovementStraightSimple()
+	fn0848b6()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08953c) end(0x089550)
+function void fn08953c()
+{
+	objA0.base_state = 0x04
+	objA0.countdown_value = 0x20
+	objA0.countdown_callback = 0x08955a
+}
+
+
+//# address-hook(0x089552) end(0x089556)
+function void fn089552()
+{
+	if (fn0896d6())
+		return
+
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08955a) end(0x089564)
+function void fn08955a()
+{
+	objA0.velocity.x = -objA0.velocity.x
+	objA0.render_flags ^= 0x01
+	objA0.countdown_value = u16[A0 + 0x3a]
+	fn08956a()
+}
+
+
+//# address-hook(0x08956a) end(0x089578)
+function void fn08956a()
+{
+	objA0.base_state = 0x02
+	objA0.countdown_callback = 0x08953c
+}
+
+
+//# address-hook(0x08957a) end(0x0895a0)
+function void fn08957a()
+{
+	if (fn0896d6())
+		return
+
+	--objA0.value39
+	if (s8[A0 + 0x39] >= 0)
+		return
+
+	objA0.base_state = 0x08
+	objA0.countdown_callback = 0x08956a
+
+	spawnChildObjects(0x089726)
+
+	A2 = 0x08972e
+	SpawnProjectileChildObjectsInDir()
+}
+
+
+//# address-hook(0x0895a4) end(0x0895c4)
+function void fn0895a4()
+{
+	if (fn0896d6())
+		return
+
+	A1 = 0x089768
+	fn0845a0()
+	if (D2.u16 != 0 && objA0.animation.frame == 6)
+	{
+		A2 = 0x089746
+		SpawnProjectileChildObjectsInDir()
+	}
+}
+
+
+//# address-hook(0x0895c6) end(0x0895ea)
+function void fn0895c6()
+{
+	objA0.velocity.y -= 0x20
+	UpdateMovementStraightSimple()
+	fn00fc12()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 += D1.u16
+		objA0.base_state = 0x0c
+		objA0.velocity.y = 0
+	}
+}
+
+
+//# address-hook(0x0895ec) end(0x0895f8)
+function void fn0895ec()
+{
+	if (u8[0xfffff7c1] == 0)
+	{
+		objA0.base_state = 0x0e
+	}
+}
+
+
+//# address-hook(0x0895fa) end(0x089624)
+function void fn0895fa()
+{
+	objA0.velocity.y += 0x20
+	UpdateMovementStraightSimple()
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		objA0.position.y.u16 += D1.u16
+		objA0.base_state = u8[A0 + 0x3d]
+		objA0.velocity.x = objA0.value3e
+		objA0.velocity.y = 0
+	}
+}
+
+
+//# address-hook(0x089626) end(0x08963c)
+function void fn089626()
+{
+	setupObjectAttributesBasic(0x089708)
+	objA0.update_address = 0x08963e
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+}
+
+
+//# address-hook(0x08963e) end(0x08964a)
+function void fn08963e()
+{
+	MoveAndFlipWithParent()
+	Object.animationProgress(0x089763)
+	DrawObject()
+}
+
+
+//# address-hook(0x089650) end(0x08965e)
+function void fn089650()
+{
+	// Targets:
+	//  - 0x089666	-> objA0.base_state = 0x00
+	//  - 0x08968a	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x089662, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x089666) end(0x089684)
+function void fn089666()
+{
+	setupObjectAttributesFull(0x0896fc)
+	objA0.countdown_callback = 0x08969e
+	objA0.hitbox_extends.y = 0x0e
+	D0 = 0x08
+	fn0852d0()
+	fn084b6e()
+}
+
+
+//# address-hook(0x08968a) end(0x089698)
+function void fn08968a()
+{
+	MoveWithGravity20()
+	if (objA0.velocity.y >= 0)
+	{
+		Object.TriggerOnGroundHit()
+	}
+}
+
+
+//# address-hook(0x08969e) end(0x0896d4)
+function void fn08969e()
+{
+	objA0.update_address = 0x089494
+	objA0.base_state = 0x02
+	objA0.countdown_value = 0x3f
+	u16[A0 + 0x3a] = 0x7f
+	objA0.countdown_callback = 0x08953c
+	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80
+	objA0.velocity.y = 0
+}
+
+
+//# translated(0x0896d6) end(0x0896fa)
+function bool fn0896d6()
+{
+	if (u8[A0 + 0x3c] != 0 && u8[0xfffff7c1] != 0)
+	{
+		u8[A0 + 0x3d] = objA0.base_state
+		objA0.base_state = 0x0a
+		objA0.value3e = objA0.velocity.x
+		objA0.velocity.x = 0
+		return true
+	}
+	return false
+}

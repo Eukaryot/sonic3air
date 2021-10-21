@@ -1,0 +1,429 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x081fda) end(0x081fe8)
+function void fn081fda()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x081fee) end(0x082030)
+function void fn081fee()
+{
+	setupObjectAttributesFull(0x0831f0)
+
+	spawnSimpleChildObjects(0x083250)
+
+	if (objA0.subtype2c == 0)
+	{
+		objA0.update_address = 0x082038
+		u16[A0 + 0x3c] = 0xc006
+		fn082aa6()
+	}
+	else
+	{
+		objA0.update_address = 0x082060
+		objA0.position.y.u16 += u16[0x082032 + objA0.value39 * 2]
+		objA0.countdown_value = objA0.value39 * 16
+		fn081fda()
+	}
+}
+
+
+//# address-hook(0x082038) end(0x082046)
+function void fn082038()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		objA0.update_address = 0x08204c
+		playSound(0xb6)
+	}
+	fn08204c()
+}
+
+
+//# address-hook(0x08204c) end(0x08205c)
+function void fn08204c()
+{
+	objA0.position.x.u16 -= u16[0xfffffaae] + 2
+	fn082b06()
+	Object.DrawOrUnload()
+}
+
+
+//# address-hook(0x082060) end(0x08209a)
+function void fn082060()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.update_address = 0x08209e
+		u8[A0 + 0x3c] = 0x40
+		fn082aa6()
+
+		objA0.velocity.x = 0x0200
+		objA0.countdown_value = 0x0b
+		objA0.countdown_callback = 0x0820b6
+	}
+
+	fn081fda()
+}
+
+
+//# address-hook(0x08209e) end(0x0820b2)
+function void fn08209e()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.y.u16 = objA1.position.y.u16
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+	fn084920()
+}
+
+
+//# address-hook(0x0820b6) end(0x0820ce)
+function void fn0820b6()
+{
+	objA0.update_address = 0x0820d0
+	objA0.base_state = 0
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x0820f8
+}
+
+
+//# address-hook(0x0820d0) end(0x0820e2)
+function void fn0820d0()
+{
+	// Targets:
+	//  - 0x0820ee	-> objA0.base_state = 0x00
+	//  - 0x082122	-> objA0.base_state = 0x02
+	//  - 0x08213e	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x0820e8, objA0.base_state)
+
+	fn082b06()
+	DrawObject()
+}
+
+
+//# address-hook(0x0820ee) end(0x0820f4)
+function void fn0820ee()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x0820f8) end(0x08211c)
+function void fn0820f8()
+{
+	objA0.base_state = 0x02
+	objA0.countdown_value = 0x1f
+	u8[A0 + 0x0a] |= 0x80
+	objA0.sprite_priority = 0x0180
+	D0 = objA0.value39
+	u8[A0 + 0x40] = u8[0x08211e + D0.s16]
+}
+
+
+//# address-hook(0x082122) end(0x08213a)
+function void fn082122()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state = 0x04
+	}
+
+	u8[A0 + 0x3c] += u8[A0 + 0x40]
+	fn082aa6()
+	fn082abc()
+}
+
+
+//# address-hook(0x08213e) end(0x082146)
+function void fn08213e()
+{
+	fn082a82()
+	fn082aa6()
+	fn082abc()
+}
+
+
+
+// Exhaust effect
+
+//# address-hook(0x08214a) end(0x082158)
+function void fn08214a()
+{
+	setupObjectAttributesBasic(0x0831fc)
+	objA0.update_address = 0x08215c
+
+	fn082ad8()
+	fn08215c()
+}
+
+
+//# address-hook(0x08215c) end(0x08215c)
+function void fn08215c()
+{
+	fn082ad8()
+	fn082160()
+}
+
+
+//# address-hook(0x082160) end(0x08218a)
+function void fn082160()
+{
+	fn085a5a()
+	if ((global.framecounter.low & 0x07) == 0)
+	{
+		spawnSimpleChildObjects(0x083256)
+	}
+
+	if ((global.framecounter.low & 0x02) == 0)
+	{
+		MoveWithParent()
+		fn084920()
+	}
+	else
+	{
+		objA0.render_flags &= ~render_flag.VISIBLE
+		fn08494e()
+	}
+}
+
+
+
+// Smoke effect
+
+//# address-hook(0x08218e) end(0x0821be)
+function void fn08218e()
+{
+	setupObjectAttributesBasic(0x083202)
+
+	objA0.update_address = 0x0821c2
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	A1 = 0xffff0000 + u16[A1 + 0x46]
+	D0.u8 = u8[A1 + 0x3c]
+	LookupSinCos()
+	objA0.velocity.x = -D0.s16
+	objA0.velocity.y = -D1.s16
+	fn0821c2()
+}
+
+
+//# address-hook(0x0821c2) end(0x0821d8)
+function void fn0821c2()
+{
+	objA0.position.x.u16 -= u16[0xfffffaae]
+
+	A1 = 0x0832b4
+	fn0845a0()
+
+	UpdateMovementStraightSimple()
+	DrawOrUnloadObject()
+}
+
+
+
+//# address-hook(0x0829a0) end(0x0829d0)
+function void fn0829a0()
+{
+	D0 = u32[0xfffffa82] + s32[0xfffffa8a]
+	if (D0 <= 0x060000)
+	{
+		u32[0xfffffa82] = D0
+	}
+	D1 = u32[0xfffffa86]
+	D2 = D1
+	D1 += D0
+	u32[0xfffffa86] = D1
+	D0 = (D0 << 16) + (D0 >> 16)
+	u16[0xffffeed8] += D0.u16
+	D1 = (D1 << 16) + (D1 >> 16)
+	D2 = (D2 << 16) + (D2 >> 16)
+	D1.u16 -= D2.u16
+	u16[0xfffffa90] = D1.u16
+}
+
+
+
+//# address-hook(0x082a82) end(0x082aa4)
+function void fn082a82()
+{
+	if (global.framecounter.low & 0x03)
+	{
+		// Rotate towards player
+		A1 = A0
+		A2 = 0xffffb000
+		fn08622c()
+
+		D0.u8 -= u8[A0 + 0x3c]
+	#if STANDALONE
+		if (D0.s8 == 0)
+			return
+	#endif
+		D1.s16 = (D0.s8 < 0) ? -2 : 2
+		u8[A0 + 0x3c] += D1.u8
+	}
+}
+
+
+//# address-hook(0x082aa6) end(0x082aba)
+function void fn082aa6()
+{
+	// Update animation of missile by its rotation
+
+	D0.u8 = (u8[A0 + 0x3c] + 0x10) >> 5
+	u8[A0 + 0x3d] = D0.u8
+	objA0.animation.sprite = 8 + D0.u8
+}
+
+
+//# address-hook(0x082abc) end(0x082ad2)
+function void fn082abc()
+{
+	D0.u8 = u8[A0 + 0x3c]
+	LookupSinCos()
+	objA0.velocity.x = D0.u16 * 2
+	objA0.velocity.y = D1.u16 * 2
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x082ad8) end(0x082af4)
+function void fn082ad8()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0 = u8[A1 + 0x3d]
+	objA0.animation.sprite = 0x10 + D0.u8
+	objA0.value42 = u16[0x082af6 + D0.s16 * 2]
+}
+
+
+//# address-hook(0x082b06) end(0x082b80)
+function void fn082b06()
+{
+	// Collision check for missiles
+
+#if STANDALONE
+	bool isSuperActive = isMainCharacter(CHARACTER_TAILS) ? super.active.tails : super.active
+#else
+	bool isSuperActive = super.active
+#endif
+	if (!isSuperActive)
+		return
+
+	u8 jumpLocation = 0
+	if (s8[A0 + 0x04] < 0 && objA0.subtype2c != 0)
+	{
+		D0.u16 = u16[0xfffffaa4]
+		if (D0.u16 != 0)
+		{
+			A1 = 0xffff0000 + D0.u16
+			if (u8[A1 + 0x28] == 0)
+			{
+				A2 = 0x082bb4
+				fn085898()
+				if (!_equal())
+				{
+					--u8[A1 + 0x29]
+					u8[A1 + 0x28] = 0xff
+					jumpLocation = 0x082b78
+				}
+			}
+		}
+	}
+
+	if (jumpLocation == 0)
+	{
+		A1 = 0xffffb000
+		if (u8[A1 + 0x34] == 0)
+		{
+			// Targets:
+			//  - 0x082bcc	-> u8[A0 + 0x3d] = 0x00
+			//  - 0x082bd4	-> u8[A0 + 0x3d] = 0x01
+			//  - 0x082bdc	-> u8[A0 + 0x3d] = 0x02
+			//  - 0x082bd4	-> u8[A0 + 0x3d] = 0x03
+			//  - 0x082bcc	-> u8[A0 + 0x3d] = 0x04
+			//  - 0x082bd4	-> u8[A0 + 0x3d] = 0x05
+			//  - 0x082bdc	-> u8[A0 + 0x3d] = 0x06
+			//  - 0x082bd4	-> u8[A0 + 0x3d] = 0x07
+			A2 = tableLookupAddress(0x082bbc, u8[A0 + 0x3d] * 2)
+
+			fn0858c8()
+			if (!_equal())
+			{
+				jumpLocation = 0x082b6e
+			}
+		}
+	}
+
+	if (jumpLocation == 0x082b6e)
+	{
+		A1 = 0xffffb000
+		u8[A1 + 0x34] = 0x59
+		jumpLocation = 0x082b78
+	}
+	else
+	{
+		D0.u16 = u16[A0 + 0x46]
+		if (D0.u16 != 0)
+		{
+			A1 = 0xffff0000 + D0.u16
+			if (u8[A1 + 0x2a] & 0x80)
+			{
+				jumpLocation = 0x082b84
+			}
+		}
+	}
+
+	if (jumpLocation == 0x082b78)
+	{
+		D0.u16 = u16[A0 + 0x46]
+		if (D0.u16 != 0)
+		{
+			A1 = 0xffff0000 + D0.u16
+			--u8[A1 + 0x39]
+		}
+		jumpLocation = 0x082b84
+	}
+
+	if (jumpLocation == 0x082b84)
+	{
+		fn082b84()
+	}
+}
+
+
+//# address-hook(0x082b84) end(0x082bb2)
+function void fn082b84()
+{
+	objA0.update_address = 0x08565e
+	objA0.countdown_value = 0x03
+	objA0.countdown_callback = 0x085088
+
+	spawnSimpleChildObjects(0x083fee)
+	if (_equal())
+	{
+		u8[A1 + 0x2c] = 0x06
+	}
+	objA0.flags2a |= 0x80
+}

@@ -1,0 +1,305 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{13AFDEC3-A272-4577-8DF5-B6AF731760A8}</ProjectGuid>
+    <RootNamespace>rmxbase</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="librmx.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="librmx.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="librmx.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="librmx.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+    <IntDir>$(ProjectName)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+    <IntDir>$(ProjectName)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+    <IntDir>$(ProjectName)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(ProjectDir)..\..\lib\$(BuildCode)\</OutDir>
+    <IntDir>$(ProjectName)_$(BuildCode)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(TargetPath)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message />
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message />
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(TargetPath)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message />
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message />
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat />
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(TargetPath)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message />
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message />
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(TargetPath)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message />
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message />
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\CleanWindowsInclude.h" />
+    <ClInclude Include="..\..\source\export.h" />
+    <ClInclude Include="..\..\source\PlatformDefinitions.h" />
+    <ClInclude Include="..\..\source\rmxbase.h" />
+    <ClInclude Include="..\..\source\rmxbase\Basics.h" />
+    <ClInclude Include="..\..\source\rmxbase\BinarySerializer.h" />
+    <ClInclude Include="..\..\source\rmxbase\Bitmap.h" />
+    <ClInclude Include="..\..\source\rmxbase\Box2.h" />
+    <ClInclude Include="..\..\source\rmxbase\Box3.h" />
+    <ClInclude Include="..\..\source\rmxbase\CArray.h" />
+    <ClInclude Include="..\..\source\rmxbase\Color.h" />
+    <ClInclude Include="..\..\source\rmxbase\ErrorHandler.h" />
+    <ClInclude Include="..\..\source\rmxbase\FileIO.h" />
+    <ClInclude Include="..\..\source\rmxbase\FileSystem.h" />
+    <ClInclude Include="..\..\source\rmxbase\GlobalObjectPtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\allocator.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\assertions.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\config.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\forwards.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\json.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\json_features.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\reader.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\value.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\version.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\writer.h" />
+    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json_tool.h" />
+    <ClInclude Include="..\..\source\rmxbase\JsonHelper.h" />
+    <ClInclude Include="..\..\source\rmxbase\FileProvider.h" />
+    <ClInclude Include="..\..\source\rmxbase\ObjectPool.h" />
+    <ClInclude Include="..\..\source\rmxbase\RmxDeflate.h" />
+    <ClInclude Include="..\..\source\rmxbase\FileCrawler.h" />
+    <ClInclude Include="..\..\source\rmxbase\FileHandle.h" />
+    <ClInclude Include="..\..\source\rmxbase\InputStream.h" />
+    <ClInclude Include="..\..\source\rmxbase\Line.h" />
+    <ClInclude Include="..\..\source\rmxbase\Mat3.h" />
+    <ClInclude Include="..\..\source\rmxbase\Mat4.h" />
+    <ClInclude Include="..\..\source\rmxbase\Math.h" />
+    <ClInclude Include="..\..\source\rmxbase\OutputStream.h" />
+    <ClInclude Include="..\..\source\rmxbase\Plane.h" />
+    <ClInclude Include="..\..\source\rmxbase\Ray.h" />
+    <ClInclude Include="..\..\source\rmxbase\RC4Encryption.h" />
+    <ClInclude Include="..\..\source\rmxbase\Rect.h" />
+    <ClInclude Include="..\..\source\rmxbase\SingleInstance.h" />
+    <ClInclude Include="..\..\source\rmxbase\SinglePtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\Singleton.h" />
+    <ClInclude Include="..\..\source\rmxbase\SmartPtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\Sort.h" />
+    <ClInclude Include="..\..\source\rmxbase\StringImpl.h" />
+    <ClInclude Include="..\..\source\rmxbase\String.h" />
+    <ClInclude Include="..\..\source\rmxbase\Tools.h" />
+    <ClInclude Include="..\..\source\rmxbase\Types.h" />
+    <ClInclude Include="..\..\source\rmxbase\Vec2.h" />
+    <ClInclude Include="..\..\source\rmxbase\Vec3.h" />
+    <ClInclude Include="..\..\source\rmxbase\Vec4.h" />
+    <ClInclude Include="..\..\source\rmxbase\VectorBinarySerializer.h" />
+    <ClInclude Include="..\..\source\rmxbase\ZlibDeflate.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\rmxbase\Basics.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\BinarySerializer.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\Bitmap.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\BitmapCodecBMP.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\BitmapCodecICO.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\BitmapCodecJPG.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\BitmapCodecPNG.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\Color.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\ErrorHandler.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\FileIO.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\FileSystem.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_reader.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_value.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_writer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\JsonHelper.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\FileProvider.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\RmxDeflate.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\FileCrawler.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\FileHandle.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\InputStream.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\Math.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\OutputStream.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\RC4Encryption.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\String.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\Tools.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\VectorBinarySerializer.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\ZlibDeflate.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\rmxbase\jsoncpp\json_valueiterator.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

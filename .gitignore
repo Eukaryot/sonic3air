@@ -1,0 +1,83 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Misc
+bin/
+.vscode/
+
+# Visual Studio built files
+*.aps
+*.pdb
+*.idb
+*.tlog
+.vs
+
+# SDL2 Visual Studio generated files
+/framework/external/sdl/SDL2/VisualC/x64
+/framework/external/sdl/SDL2/VisualC/Win32
+/framework/external/sdl/SDL2/VisualC/*/x64
+/framework/external/sdl/SDL2/VisualC/*/Win32
+/framework/external/sdl/SDL2/VisualC/tests/*/x64
+/framework/external/sdl/SDL2/VisualC/tests/*/Win32
+/framework/external/sdl/SDL2/VisualC/tests/*/*.bmp
+/framework/external/sdl/SDL2/VisualC/tests/*/*.bmp
+/framework/external/sdl/SDL2/VisualC/tests/loopwave/sample.wav
+/framework/external/sdl/SDL2/VisualC/tests/testoverlay2/moose.dat
+
+# Oxygen
+/Oxygen/oxygenengine/OxygenApp
+/Oxygen/soncthrickles/Sonic3AIR
+/Oxygen/soncthrickles/source/_cmake/build/*
+/Oxygen/soncthrickles/___internal/analysis/*
+/Oxygen/soncthrickles/saves/scripts.bin
+/Oxygen/soncthrickles/saves/rec
+/Oxygen/soncthrickles/enginedata.bin
+/Oxygen/soncthrickles/gamedata.bin
+
+# Xcode
+/Oxygen/soncthrickles/build/_xcode/sonic3air.xcodeproj/project.xcworkspace/xcuserdata/*
+/Oxygen/soncthrickles/build/_xcode/sonic3air.xcodeproj/xcuserdata/*
+/Oxygen/soncthrickles/build/_xcode/data/font
+/Oxygen/soncthrickles/build/_xcode/data/*.bin
+/Oxygen/soncthrickles/build/_xcode/data/metadata.json
+mac_dist
+
+# Web
+/Oxygen/soncthrickles/build/_emscripten/build
+/Oxygen/soncthrickles/build/_emscripten/dist/loader.js
+/Oxygen/soncthrickles/build/_emscripten/dist/sonic3air.data
+/Oxygen/soncthrickles/build/_emscripten/dist/sonic3air_web.js
+/Oxygen/soncthrickles/build/_emscripten/dist/sonic3air_web.wasm
+
+# Android
+/Oxygen/soncthrickles/build/_android/local.properties

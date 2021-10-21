@@ -1,0 +1,1088 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Yellow bumper objects in CGZ
+
+//# address-hook(0x032c6a) end(0x032d14)
+function void fn032c6a()
+{
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x40
+	objA0.animation.sprite = (objA0.subtype2c >> 4) & 0x07
+	if (objA0.animation.sprite != 0)
+	{
+		objA0.box_size.y = 0x80
+	}
+
+	u32[A0] = 0x032c92
+	fn032c92()
+}
+
+
+//# address-hook(0x032c92) end(0x032d14)
+function void fn032c92()
+{
+	D1.u16 = 0x10
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+
+	push(D4)
+	push(D3)
+	push(D2)
+	push(D1)
+	A1 = 0xffffb000
+	D6 = 3
+	fn01dccc()
+
+	if (D4.u8 == 0x01 && (u8[A1 + 0x2a] & 0x02))
+	{
+		D1.u8 = objA0.flags2a
+		D0.u16 = objA0.position.x.u16 - u16[A1 + 0x10]
+		if (D0.s16 >= 0)
+		{
+			D1.u8 ^= 0x01
+		}
+		D1.u8 &= 0x01
+		if (D1.u8 == 0)
+		{
+			fn032d16()
+		}
+	}
+
+	D1 = pop()
+	D2 = pop()
+	D3 = pop()
+	D4 = pop()
+	A1 = 0xffffb04a
+	D6 = 4
+	fn01dccc()
+
+	if (D4.u8 == 0x01 && (u8[A1 + 0x2a] & 0x02))
+	{
+		D1.u8 = objA0.flags2a
+		D0.u16 = objA0.position.x.u16 - u16[A1 + 0x10]
+		if (D0.s16 >= 0)
+		{
+			D1.u8 ^= 0x01
+		}
+		D1.u8 &= 0x01
+		if (D1.u8 == 0)
+		{
+			fn032d16()
+		}
+	}
+}
+
+
+//# address-hook(0x032d16) end(0x032dec)
+function void fn032d16()
+{
+	if (u8[A1 + 0x05] >= 0x04)
+		return
+
+	u16[A1 + 0x1a] = 0x0400
+	if ((objA0.flags2a & 0x01) == 0)
+	{
+		u8[A1 + 0x2a] &= ~0x01
+		s16[A1 + 0x18] = 0x800
+	}
+	else
+	{
+		u8[A1 + 0x2a] |= 0x01
+		s16[A1 + 0x18] = -0x800
+	}
+	u16[A1 + 0x32] = 0x0f
+	u16[A1 + 0x1c] = u16[A1 + 0x18]
+	if ((u8[A1 + 0x2a] & 0x04) == 0)
+	{
+		u8[A1 + 0x20] = 0
+	}
+
+	if (objA0.subtype2c & 0x80)
+	{
+		u16[A1 + 0x1a] = 0
+	}
+	if (objA0.subtype2c & 0x01)
+	{
+		u16[A1 + 0x1c] = 0x01
+		u8[A1 + 0x27] = 0x01
+		u8[A1 + 0x20] = 0
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3
+		u8[A1 + 0x31] = 0x08
+		if (u8[A1 + 0x2a] & 0x01)
+		{
+			s8[A1 + 0x27] = -s8[A1 + 0x27]
+			s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+		}
+	}
+
+	D0.u8 = objA0.subtype2c & 0x0c
+	if (D0.u8 == 0x04)
+	{
+		u8[A1 + 0x46] = 0x0c
+		u8[A1 + 0x47] = 0x0d
+	}
+	if (D0.u8 == 0x08)
+	{
+		u8[A1 + 0x46] = 0x0e
+		u8[A1 + 0x47] = 0x0f
+	}
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+
+	objA0.flags2a &= ~0x20
+	objA0.flags2a &= ~0x40
+	playSound(0x7b)
+}
+
+
+
+
+// Large moving platform in CGZ
+
+//# address-hook(0x035a7a) end(0x035b10)
+function void fn035a7a()
+{
+	objA0.mapping_offset = 0x035bbc
+	objA0.sprite_attributes = 0x6300
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x08
+	objA0.value32 = objA0.position.y.u16
+	objA0.flags2a |= 0x80
+
+	if (allocDynamicObjectAfterA0())
+	{
+		u32[A1] = 0x035b90
+		u16[A1 + 0x10] = objA0.position.x.u16 - 0x10
+		u16[A1 + 0x14] = objA0.position.y.u16 + 0x0c
+		u8[A1 + 0x28] = 0xa6
+		u16[A1 + 0x3e] = A0.u16
+
+		if (allocDynamicObjectAfterA0())
+		{
+			u32[A1] = 0x035ba6
+			u16[A1 + 0x10] = objA0.position.x.u16 + 0x10
+			u16[A1 + 0x14] = objA0.position.y.u16 + 0x14
+			u8[A1 + 0x28] = 0xa6
+			u16[A1 + 0x3e] = A0.u16
+		}
+	}
+
+	u32[A0] = 0x035b16
+	fn035b16()
+}
+
+
+//# address-hook(0x035b16) end(0x035b8a)
+function void fn035b16()
+{
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 != 0)
+	{
+		u16[A0 + 0x36] += (D0.u8 == 0x18) ? 0x100 : 0x80
+		if (u16[A0 + 0x36] >= 0x8000)
+		{
+			u16[A0 + 0x36] = 0x8000
+		}
+	}
+	else if (u16[A0 + 0x36] != 0)
+	{
+		u16[A0 + 0x36] -= 0x0100
+		if (s16[A0 + 0x36] < 0)
+		{
+			u16[A0 + 0x36] = 0
+		}
+	}
+	objA0.position.y.u16 = objA0.value32 + u8[A0 + 0x36]
+
+	D1 = objA0.box_size.x + 7
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	++objA0.animation.sprite
+	objA0.animation.sprite &= 0x03
+	DrawObject()
+}
+
+
+//# address-hook(0x035b90) end(0x035ba0)
+function void fn035b90()
+{
+	A1 = 0xffff0000 + objA0.value3e
+	objA0.position.y.u16 = u16[A1 + 0x14] + 0x08
+	AddAsDynamicObject()
+}
+
+
+//# address-hook(0x035ba6) end(0x035bb6)
+function void fn035ba6()
+{
+	A1 = 0xffff0000 + objA0.value3e
+	objA0.position.y.u16 = u16[A1 + 0x14] + 0x10
+	AddAsDynamicObject()
+}
+
+
+
+// Spring in DPZ
+
+//# address-hook(0x022d54) end(0x022d9e)
+function void fn022d54()
+{
+	objA0.mapping_offset = 0x02375c
+	objA0.sprite_attributes = 0x04a4
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0200
+	objA0.value32 = objA0.position.x.u16
+	u16[A0 + 0x34] = objA0.position.y.u16
+
+	D0.u16 = (objA0.subtype2c >> 3) & 0x0e
+	call tableLookupAddress(0x022da0, D0.u16)
+
+	u16[A0 + 0x30] = 0xf800
+}
+
+
+//# address-hook(0x023b38) end(0x023c0e)
+function void fn023b38()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		u32[A1] = 0x023ed0
+		u32[A1 + 0x0c] = 0x023f4a
+		u16[A1 + 0x0a] = 0x0391
+		if (global.zone == 0x12)
+		{
+			u32[A1 + 0x0c] = 0x023f52
+		}
+		u8[A1 + 0x2c] = objA0.subtype2c
+
+		D0.u16 = (objA0.subtype2c >> 2) & 0x1c
+		A2 = 0x023b18 + D0.u16
+		u8[A1 + 0x07] = u8[(A2+=1)-1]
+		u8[A1 + 0x06] = u8[(A2+=1)-1]
+		D0.u8 = u8[(A2+=1)-1]
+		u8[A1 + 0x22] = D0.u8
+		if (u8[A1 + 0x22] == 0)
+		{
+			u32[A1] = 0x023f2a
+		}
+		objA0.subtype2c &= 0xf0
+		objA0.subtype2c |= u8[(A2+=1)-1]
+		u16[A1 + 0x10] = objA0.position.x.u16
+		u16[A1 + 0x14] = objA0.position.y.u16
+
+		D2 = 0
+		D3 = 0
+		if (D0.u8 == 0x01)
+		{
+			D2 = 0x0c
+			if ((objA0.flags2a & 0x01) == 0)
+			{
+				D2.s16 = -D2.s16
+			}
+			u16[A1 + 0x10] += D2.u16
+		}
+		if (D0.u8 == 0x02)
+		{
+			D3 = 0x0b
+			u16[A1 + 0x14] += D3.u16
+		}
+		if (D0.u8 == 0x03)
+		{
+			D3 = -0x0b
+			u16[A1 + 0x14] += D3.u16
+		}
+		u16[A1 + 0x30] = D2.u16
+		u16[A1 + 0x32] = D3.u16
+		if (objA0.flags2a & 0x02)
+		{
+			objA0.flags2a &= ~0x02
+			u8[A0 + 0x3c] = 0x01
+		}
+		u8[A1 + 0x2a] = objA0.flags2a
+		u8[A1 + 0x04] = objA0.render_flags | 0x04
+		u16[A1 + 0x08] = 0x0200
+		u16[A1 + 0x3e] = A0.u16
+		objA0.value3e = A1.u16
+	}
+
+	fn022d54()
+	fn023c12()
+}
+
+
+
+// Unknown (some kind of spring...?)
+
+//# address-hook(0x023c12) end(0x023c20)
+function void fn023c12()
+{
+	D0.u16 = (objA0.subtype2c >> 3) & 0x0e
+
+	// Targets:
+	//  - 0x023c88	-> D0.u16 = 0x06
+	//  - 0x023ca4	-> D0.u16 = 0x0c
+	//  - 0x023cc0	-> D0.u16 = 0x0e
+	call tableLookupAddress(0x023c24, D0.u16)
+}
+
+
+//# address-hook(0x023c88) end(0x023c88)
+function void fn023c88()
+{
+	u32[A0] = 0x023c8e
+	fn023c8e()
+}
+
+
+//# address-hook(0x023c8e) end(0x023ca0)
+function void fn023c8e()
+{
+	fn023cdc()
+	objA0.position.y.u16 = u16[A0 + 0x34] + u8[A0 + 0x36]
+	fn0230de()
+}
+
+
+//# address-hook(0x023ca4) end(0x023ca4)
+function void fn023ca4()
+{
+	u32[A0] = 0x023caa
+	fn023caa()
+}
+
+
+//# address-hook(0x023caa) end(0x023cbc)
+function void fn023caa()
+{
+	fn023cdc()
+	objA0.position.x.u16 = u8[A0 + 0x36] + objA0.value32
+	fn022f46()
+}
+
+
+//# address-hook(0x023cc0) end(0x023cc0)
+function void fn023cc0()
+{
+	u32[A0] = 0x023cc6
+	fn023cc6()
+}
+
+
+//# address-hook(0x023cc6) end(0x023cd8)
+function void fn023cc6()
+{
+	fn023cdc()
+	objA0.position.x.u16 = u8[A0 + 0x36] + objA0.value32
+	fn023374()
+}
+
+
+//# address-hook(0x023cdc) end(0x023ece)
+function void fn023cdc()
+{
+	if (s8[A0 + 0x2c] >= 0)
+	{
+		if (u16[A0 + 0x3a] != 0)
+		{
+			--u16[A0 + 0x3a]
+			if (u16[A0 + 0x3a] == 0 && s8[A0 + 0x04] < 0)
+			{
+				playSound(0x52)
+			}
+		}
+		else
+		{
+			if (u16[A0 + 0x38] != 0)
+			{
+				u16[A0 + 0x36] -= 0x0800
+				if (s16[A0 + 0x36] < 0)
+				{
+					u16[A0 + 0x36] = 0
+					u16[A0 + 0x38] = 0
+					u16[A0 + 0x3a] = 0x3c
+				}
+			}
+			else
+			{
+				u16[A0 + 0x36] += 0x0800
+				if (u16[A0 + 0x36] >= 0x1800)
+				{
+					u16[A0 + 0x36] = 0x1800
+					u16[A0 + 0x38] = 0x01
+					u16[A0 + 0x3a] = 0x3c
+				}
+			}
+		}
+		return
+	}
+
+	if (u8[A0 + 0x3c] != 0)
+	{
+		if (u16[A0 + 0x3a] != 0)
+		{
+			--u16[A0 + 0x3a]
+			if (u16[A0 + 0x3a] == 0)
+			{
+				u16[A0 + 0x38] = 0
+			}
+		}
+		else
+		{
+			if (u16[A0 + 0x38] == 0)
+			{
+				if (u16[A0 + 0x36] == 0)
+					return
+
+				u16[A0 + 0x36] -= 0x0800
+				if (u16[A0 + 0x36] > 0)
+					return
+
+				u16[A0 + 0x36] = 0
+				D0.u8 = objA0.subtype2c & 0xf0
+				if (D0.u8 == 0xe0)
+				{
+					objA0.position.y.u16 += 0x16
+					objA0.flags2a ^= 0x02
+					objA0.render_flags ^= 0x02
+					objA0.subtype2c &= 0x0f
+					objA0.subtype2c |= 0xf0
+					u32[A0] = 0x023c12
+					A1 = 0xffff0000 + objA0.value3e
+					s16[A1 + 0x32] = -s16[A1 + 0x32]
+				}
+				if (D0.u8 == 0xf0)
+				{
+					objA0.position.y.u16 -= 0x16
+					objA0.flags2a ^= 0x02
+					objA0.render_flags ^= 0x02
+					objA0.subtype2c &= 0x0f
+					objA0.subtype2c |= 0xe0
+					u32[A0] = 0x023c12
+					A1 = 0xffff0000 + objA0.value3e
+					s16[A1 + 0x32] = -s16[A1 + 0x32]
+				}
+			}
+			else
+			{
+				u16[A0 + 0x36] += 0x0800
+				if (u16[A0 + 0x36] >= 0x1800)
+				{
+					u16[A0 + 0x36] = 0x1800
+					u16[A0 + 0x3a] = 0xb4
+				}
+			}
+		}
+	}
+	else
+	{
+		if (u16[A0 + 0x3a] != 0)
+		{
+			--u16[A0 + 0x3a]
+			if (u16[A0 + 0x3a] == 0)
+			{
+				u16[A0 + 0x38] = 0
+			}
+		}
+		else
+		{
+			if (u16[A0 + 0x38] != 0)
+			{
+				u16[A0 + 0x36] -= 0x0800
+				if (s16[A0 + 0x36] < 0)
+				{
+					u16[A0 + 0x36] = 0
+					u16[A0 + 0x3a] = 0xb4
+				}
+			}
+			else
+			{
+				if (u16[A0 + 0x36] == 0x1800)
+					return
+
+				u16[A0 + 0x36] += 0x0800
+				if (u16[A0 + 0x36] < 0x1800)
+					return
+
+				u16[A0 + 0x36] = 0x1800
+				D0.u8 = objA0.subtype2c & 0xf0
+				if (D0.u8 == 0xe0)
+				{
+					objA0.position.y.u16 += 0x16
+					objA0.flags2a ^= 0x02
+					objA0.render_flags ^= 0x02
+					objA0.subtype2c &= 0x0f
+					objA0.subtype2c |= 0xf0
+					u32[A0] = 0x023c12
+					A1 = 0xffff0000 + objA0.value3e
+					s16[A1 + 0x32] = -s16[A1 + 0x32]
+				}
+				if (D0.u8 == 0xf0)
+				{
+					objA0.position.y.u16 -= 0x16
+					objA0.flags2a ^= 0x02
+					objA0.render_flags ^= 0x02
+					objA0.subtype2c &= 0x0f
+					objA0.subtype2c |= 0xe0
+					u32[A0] = 0x023c12
+					A1 = 0xffff0000 + objA0.value3e
+					s16[A1 + 0x32] = -s16[A1 + 0x32]
+				}
+			}
+		}
+	}
+}
+
+
+
+// Unknown
+
+//# address-hook(0x023ed0) end(0x023f24)
+function void fn023ed0()
+{
+	A1 = 0xffff0000 + objA0.value3e
+	D2.u16 = u16[A1 + 0x10] + u16[A0 + 0x30]
+	D3.u16 = u16[A1 + 0x14] + objA0.value32
+	objA0.position.x.u16 = D2.u16
+	objA0.position.y.u16 = D3.u16
+
+	if (objA0.subtype2c & 0x80)
+	{
+		D1.u16 = objA0.subtype2c & 0x0f
+		if (u8[0xfffff7e0 + D1.u16] != 0)
+		{
+			u16[A1 + 0x38] = 0x01
+		}
+	}
+
+	D1 = objA0.box_size.x + 7
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawObject()
+}
+
+
+
+// BPZ Moving Bars
+
+//# address-hook(0x035bf8) end(0x035c6c)
+function void fn035bf8()
+{
+	objA0.mapping_offset = 0x035d5a
+	objA0.sprite_attributes = 0x0300
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x30
+	objA0.box_size.y = 0x10
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.render_flags |= 0x40
+	objA0.position.y.frac = 0x01
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0
+
+	D0.u16 = objA0.subtype2c << 8
+	u16[A0 + 0x38] = D0.u16
+	objA0.flags2a |= 0x80
+	if (objA0.flags2a & 0x01)
+	{
+		u16[A0 + 0x34] = D0.u16
+		objA0.value3a = 0x01
+
+		u32[A0] = 0x035cca
+		fn035cca()
+	}
+	else
+	{
+		u32[A0] = 0x035c72
+		fn035c72()
+	}
+}
+
+
+//# address-hook(0x035c72) end(0x035cc4)
+function void fn035c72()
+{
+	fn035d22()
+
+	A2 = A0 + 0x18
+	D0.u16 = u16[A0 + 0x30]
+	D1.s16 = s8[A0 + 0x34]
+	D0.u16 -= D1.u16
+	u16[A2] = D0.u16
+	D0.u16 = u16[A0 + 0x30]
+	D1.s16 >>= 1
+	D0.u16 -= D1.u16
+	objA0.position.x.u16 = D0.u16
+	D1.u16 += 0x08
+	objA0.box_size.x = D1.u8
+	u16[A2 + 0x04] = 0
+	if (D1.u16 >= 0x20)
+	{
+		u16[A2 + 0x04] = 0x01
+	}
+	D1.u16 += 0x07
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16
+	++D3.u16
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawObject()
+}
+
+
+//# address-hook(0x035cca) end(0x035d1c)
+function void fn035cca()
+{
+	fn035d22()
+
+	A2 = A0 + 0x18
+	D0.u16 = u16[A0 + 0x30]
+	D1.s16 = s8[A0 + 0x34]
+	D0.u16 += D1.u16
+	u16[A2] = D0.u16
+	D0.u16 = u16[A0 + 0x30]
+	D1.s16 >>= 1
+	D0.u16 += D1.u16
+	objA0.position.x.u16 = D0.u16
+	D1.u16 += 0x08
+	objA0.box_size.x = D1.u8
+	u16[A2 + 0x04] = 0
+	if (D1.u16 >= 0x20)
+	{
+		u16[A2 + 0x04] = 0x01
+	}
+	D1.u16 += 0x07
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16
+	++D3.u16
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawObject()
+}
+
+
+//# address-hook(0x035d22) end(0x035d58)
+function void fn035d22()
+{
+	if (objA0.value3a == 0)
+	{
+		D0.u16 = u16[A0 + 0x38]
+		u16[A0 + 0x34] += 0x80
+		if (D0.u16 <= u16[A0 + 0x34])
+		{
+			u16[A0 + 0x34] = D0.u16
+			objA0.value3a = 0x01
+		}
+	}
+	else
+	{
+		u16[A0 + 0x34] -= 0x80
+		if (u16[A0 + 0x34] <= 0)
+		{
+			u16[A0 + 0x34] = 0
+			objA0.value3a = 0
+		}
+	}
+}
+
+
+
+// Balloon
+
+//# address-hook(0x035d80) end(0x035dac)
+function void fn035d80()
+{
+	objA0.mapping_offset = 0x035e9a
+	objA0.sprite_attributes = 0x6300
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	u8[A0 + 0x28] = 0xd7
+
+	u32[A0] = 0x035db2
+	fn035db2()
+}
+
+
+//# address-hook(0x035db2) end(0x035dda)
+function void fn035db2()
+{
+	A1 = 0xffffb000
+	if (u8[A0 + 0x29] & 0x01)
+	{
+		fn035dde()
+	}
+	A1 = 0xffffb04a
+	if (u8[A0 + 0x29] & 0x02)
+	{
+		fn035dde()
+	}
+	u8[A0 + 0x29] = 0
+
+	fn035e4c()
+}
+
+
+//# address-hook(0x035dde) end(0x035e46)
+function void fn035dde()
+{
+	D1.u16 = objA0.position.x.u16
+	D2.u16 = objA0.position.y.u16
+	D1.u16 -= u16[A1 + 0x10]
+	D2.u16 -= u16[A1 + 0x14]
+	LookupAngleByVector()
+	D1.u8 = D0.u8 - 0x20
+	if (D1.u8 < 0x40)
+	{
+		u16[A1 + 0x1a] = 0xf700
+		objA0.state = 0x01
+	}
+	else
+	{
+		LookupSinCos()
+		D1.s32 = s32(D1.s16) * -0x0480
+		D1.s32 >>= 8
+		u16[A1 + 0x18] = D1.u16
+		D0.s32 = s32(D0.s16) * -0x0480
+		D0.s32 >>= 8
+		u16[A1 + 0x1a] = D0.u16
+		objA0.state = 0x02
+	}
+
+	u8[A1 + 0x2a] |= 0x02
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+	u8[A1 + 0x40] = 0
+	playSound(0x7b)
+}
+
+
+//# address-hook(0x035e4c) end(0x035e6e)
+function void fn035e4c()
+{
+	Object.animationUpdate(0x035e74)
+	if (objA0.animation.sprite >= 0x05 && objA0.animation.sprite < 0x07)
+	{
+		AddAsDynamicObject()
+	}
+	DrawObject()
+}
+
+
+
+// Unknown
+
+//# address-hook(0x036a1a) end(0x036a32)
+function void fn036a1a()
+{
+	Object.animationUpdate(0x036a58)
+	if (objA0.base_state == 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+
+// Object dropping water in EMZ
+
+//# address-hook(0x0380f8) end(0x03814a)
+function void fn0380f8()
+{
+	objA0.mapping_offset = 0x038252
+	objA0.sprite_attributes = 0x6300
+	objA0.render_flags = 0x04
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x08
+	objA0.hitbox_extends.x = 0x04
+	objA0.hitbox_extends.y = 0x04
+
+	if (objA0.flags2a & 0x01)
+	{
+		objA0.sprite_attributes = 0xc300
+		objA0.animation.sprite = 0x03
+
+		u32[A0] = 0x01abc6
+		DrawObject()
+	}
+	else
+	{
+		u32[A0] = 0x038150
+		fn038150()
+	}
+}
+
+
+//# address-hook(0x038150) end(0x038188)
+function void fn038150()
+{
+	D0.u8 = (level.framecounter.low + objA0.subtype2c) & 0x7f
+	if (D0.u8 == 0)
+	{
+		if (allocDynamicObjectAfterA0())
+		{
+			D0 = 0x2c
+			while (D0.s16 >= 0)
+			{
+				u16[A1 + D0.s16] = u16[A0 + D0.s16]
+				D0.u16 -= 2
+			}
+
+			u32[A1] = 0x03818e
+			u16[A1 + 0x0a] = 0x4300
+			u8[A1 + 0x22] = 0x01
+			D0 = 0
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x03818e) end(0x0381ec)
+function void fn03818e()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x08
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		u32[A0] = 0x038234
+		objA0.velocity.x = 0x0100
+		objA0.velocity.y = -objA0.velocity.y >> 2
+		objA0.animation.sprite = 0x02
+		fn0381f2()
+		fn0381f2()
+		fn0381f2()
+	}
+
+	if (level.vertical_wrap == 0xff00)
+	{
+		D0.u16 = level.height.bitmask
+		objA0.position.y.u16 &= D0.u16
+	}
+
+	D0.u16 = move_area.bottom.current + 0x60
+	if (D0.s16 < s16[A0 + 0x14])
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x0381f2) end(0x038232)
+function void fn0381f2()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		D0 = 0x2c
+		while (D0.s16 >= 0)
+		{
+			u16[A1 + D0.s16] = u16[A0 + D0.s16]
+			D0.u16 -= 2
+		}
+		GetRandomNumber()
+		D1.u16 = D0.u16
+		D0.u16 &= 0x01ff
+		D0.u16 -= 0x0100
+		u16[A1 + 0x18] = D0.u16
+		D1.u16 = (D1.u16 >> 12) & 0x0f
+		D1.u16 += 0x1a
+		u8[A1 + 0x3c] = D1.u8
+		objA0.velocity.y -= 0x10
+		D0 = 0
+	}
+}
+
+
+//# address-hook(0x038234) end(0x03824c)
+function void fn038234()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 8
+	--u8[A0 + 0x3c]
+	if (u8[A0 + 0x3c] == 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+
+// Sand Platform in DPZ
+
+//# address-hook(0x035f3a) end(0x036020)
+function void fn035f3a()
+{
+	objA0.mapping_offset = 0x03609a
+	objA0.sprite_attributes = 0x4280
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0200
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x10
+	if (objA0.subtype2c != 0)
+	{
+		objA0.mapping_offset = 0x0360d6
+		objA0.box_size.x = 0x30
+		u8[A0 + 0x3d] = 0x0f
+	}
+	u8[A0 + 0x3c] = u8[A0 + 0x3d]
+	objA0.flags2a |= 0x80
+
+	u32[A0] = 0x035f8c
+	fn035f8c()
+}
+
+
+//# address-hook(0x035f8c) end(0x036020)
+function void fn035f8c()
+{
+	if (objA0.state == 0)
+	{
+		if (objA0.flags2a & 0x18)
+		{
+			objA0.value3a = 0x01
+		}
+		if (objA0.value3a != 0)
+		{
+			--u8[A0 + 0x3c]
+			if (s8[A0 + 0x3c] < 0 && objA0.state == 0)
+			{
+				u8[A0 + 0x3c] = u8[A0 + 0x3d]
+				objA0.value3a = 0
+				objA0.state = 0x01
+			}
+		}
+	}
+
+	Object.animationUpdate(0x036046)
+
+	D0 = objA0.animation.sprite
+	D3.u8 = u8[0x036026 + D0.s16]
+	if (D3.u8 == 0)
+	{
+		A1 = 0xffffb000
+		if (objA0.flags2a & 0x08)
+		{
+			objA0.flags2a &= ~0x08
+			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] |= 0x02
+		}
+
+		A1 = 0xffffb04a
+		if (objA0.flags2a & 0x10)
+		{
+			objA0.flags2a &= ~0x10
+			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] |= 0x02
+		}
+	}
+	else
+	{
+		D1 = objA0.box_size.x
+		D4.u16 = objA0.position.x.u16
+		PlatformCheckClimbOn()
+	}
+
+	DrawObject()
+}
+
+
+
+// Unknown in DPZ
+
+//# address-hook(0x0362a2) end(0x0362c2)
+function void fn0362a2()
+{
+	objA0.mapping_offset = 0x036350
+	objA0.sprite_attributes = 0x4280
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x08
+
+	u32[A0] = 0x0362ce
+	fn0362ce()
+}
+
+
+//# address-hook(0x0362ce) end(0x03634a)
+function void fn0362ce()
+{
+	D1.u16 = 0x0c
+	D3.u16 = 0x02
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	A2 = 0xfffffc5c
+	objA0.animation.sprite = 0
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0 + D0.u16
+	D3 = 0
+
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 == 0)
+	{
+		u8[A3] &= ~(u8(1) << D3.u8)
+		u32[A2] = 0x2e000a
+	}
+	else
+	{
+		if (u8[A3] == 0)
+		{
+			playSound(0x5b)
+			objA0.animation.timer = 0
+		}
+
+		u8[A3] |= (u8(1) << D3.u8)
+		objA0.animation.sprite = 0x01
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 0x03
+			D0.u16 = u16[A2]
+			u32[A2] = 0x2e000a
+			if (D0.u16 == 0x2e)
+			{
+				u32[A2] = 0x0c2e0a0e
+			}
+		}
+	}
+
+	DrawObject()
+}

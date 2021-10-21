@@ -1,0 +1,135 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Place in MHZ and SSZ where wind blows from below      //
+//-------------------------------------------------------//
+
+
+//# address-hook(0x03fb90) end(0x03fba6)
+function void fn03fb90()
+{
+	D0.u16 = (objA0.subtype2c & 0x7f) * 8
+	u16[A0 + 0x36] = D0.u16
+	u16[A0 + 0x38] = D0.u16 + 0x10
+
+	objA0.update_address = 0x03fbac
+	fn03fbac()
+}
+
+
+//# address-hook(0x03fbac) end(0x03fbbe)
+function void fn03fbac()
+{
+	D2 = 0
+	A1 = 0xffffb000
+	fn03fbc4()
+
+	A1 = 0xffffb04a
+	fn03fbc4()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03fbc4) end(0x03fcd2)
+function void fn03fbc4()
+{
+	if (u8[A1 + 0x05] >= 0x04)
+		return
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x40
+	if (D0.u16 >= 0x80)
+		return
+
+	if (u8[A1 + 0x2e] != 0)
+	{
+		A3 = 0xffff0000 + u16[A1 + 0x42]
+		if (u32[A3] != 0x03f51c && u32[A3] != 0x03f572)
+			return
+
+		D1 = 0
+		D1.u16 = u8[0xfffffe84] + objA1.position.y.u16 + u16[A0 + 0x36] - objA0.position.y.u16
+		if (D1.s16 >= 0 && D1.u16 < u16[A0 + 0x38])
+		{
+			D1.u16 -= u16[A0 + 0x36]
+			if (D1.s16 >= 0)
+			{
+				D1.u16 ^= 0xffff
+				D1.u16 *= 2
+			}
+
+			D1.u16 += u16[A0 + 0x36]
+			D1.s16 = -D1.s16
+			D1.s16 >>= 6
+			objA1.position.y.u16 += D1.u16
+			if (D2.u16 == 0)
+			{
+				D2 = 1
+				u16[A3 + 0x14] += D1.u16
+			}
+		}
+	}
+	else
+	{
+		D1 = u8[0xfffffe84] + objA1.position.y.u16 - objA0.position.y.u16 + 0x40
+		if (D1.s16 >= 0 && D1.u16 < 0x50)
+		{
+			D1.u16 -= 0x40
+			if (D1.s16 >= 0)
+			{
+				D1.u16 ^= 0xffff
+				D1.u16 *= 2
+			}
+
+			D1.u16 += 0x40
+			D1.s16 = -D1.s16
+			D1.s16 >>= 6
+			objA1.position.y.u16 += D1.u16
+			objA1.flags2a |= char.flag.IN_AIR
+			objA1.flags2a &= ~char.flag.ON_OBJECT
+			objA1.velocity.y = 0
+			u8[A1 + 0x2f] = 0
+			u8[A1 + 0x40] = 0
+
+			D0.u8 = global.framecounter & 0x0f
+			if (D0.u8 == 0)
+			{
+				playSound(0xce)
+			}
+
+		#if STANDALONE
+			// Fix for bug when Tails carries other player and gets caught by the upwind
+			if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
+			{
+				u8[0xffffb02a] |= char.flag.IN_AIR
+				u8[0xffffb02e] = 0
+			}
+		#endif
+
+			if (s8[A0 + 0x2c] < 0)
+			{
+				u16[A1 + 0x1c] = 1
+				objA1.state = char.state.LIFTED
+			}
+			else
+			{
+				u16[A1 + 0x1c] = 1
+				if (u8[A1 + 0x27] == 0)
+				{
+					u8[A1 + 0x27] = 1
+					u8[A1 + 0x20] = 0
+					u8[A1 + 0x30] = 0x7f
+					u8[A1 + 0x31] = 8
+				}
+			}
+		}
+	}
+}

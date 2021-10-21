@@ -1,0 +1,101 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Audio                                                 //
+//-------------------------------------------------------//
+
+//# address-hook(0x001358) end(0x001378)
+function void PlayMusic()
+{
+	#if STANDALONE
+	{
+		//debugLog(stringformat("PlayMusic: 0x%02x", D0.u8))
+		Standalone.playAudio(D0.u8)
+	}
+	#else
+	{
+		EmulatorDebug.onPlaySound(D0.u8)
+
+		// We can't put the complete function into lemon script, as it needs z80 cycles progression
+		u16[0xa11100] = 0x0100
+		call 0x001360
+	}
+	#endif
+}
+
+function void playMusic(u8 soundId)
+{
+	D0 = soundId
+	PlayMusic()
+}
+
+
+//# address-hook(0x001380) end(0x0013c0)
+function void PlaySound()
+{
+	#if STANDALONE
+	{
+		//debugLog(stringformat("PlaySound: 0x%02x", D0.u8))
+		Standalone.playAudio(D0.u8)
+	}
+	#else
+	{
+		EmulatorDebug.onPlaySound(D0.u8)
+
+		// We can't put the complete function into lemon script, as it needs z80 cycles progression
+		u16[0xa11100] = 0x0100
+		call 0x001388
+	}
+	#endif
+}
+
+function void playSound(u8 soundId)
+{
+	D0 = soundId
+	PlaySound()
+}
+
+
+//# address-hook(0x0013c2) end(0x0013e2)
+function void ChangeMusicTempo()
+{
+	#if STANDALONE
+	{
+		// Calculate actual speedup from input value (using a 16.16 fixed point number)
+		u32 relativeSpeed = 0x10000
+		if (D0.u8 > 0)
+		{
+			u8 extraUpdateFrequency = D0.u8 / 2		// Each X frames, a second music update will be done in that frame
+			relativeSpeed += 0x10000 / extraUpdateFrequency
+		}
+		Standalone.setFastMusicFlagWithSpeedup(FastMusicFlag.MUSIC_TEMPO, relativeSpeed)
+	}
+	#else
+	{
+		// We can't put the complete function into lemon script, as it needs z80 cycles progression
+		u16[0xa11100] = 0x0100
+		call 0x0013ca
+	}
+	#endif
+}
+
+function void changeMusicTempo(u8 value)
+{
+	// Meaning of parameter "value"
+	//  - it is 0 to disable the music speedup, or higher to enable it
+	//  - it is in all known use-cases a multiple of 8 (though technical requirement seems only to be a multiple of 2)
+	//  - it makes the music receive an additional update every "value / 2" frames
+	//  - so values closer to 0 make the music play faster and faster, higher values reduce the speedup effect
+	//  - a common value is 8, leading to a speedup of 25% (additional update every 4 frames, so speed up factor is 5/4)
+
+	D0 = value
+	ChangeMusicTempo()
+}

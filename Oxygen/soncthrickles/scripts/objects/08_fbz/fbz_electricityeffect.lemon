@@ -1,0 +1,64 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Electricity effect
+
+//# address-hook(0x03b1fc) end(0x03b232)
+function void fn03b1fc()
+{
+	if (u8[0xfffff7c1] != 0)
+	{
+		++objA0.animation.sprite
+		if (objA0.animation.sprite > 4)
+			objA0.animation.sprite = 1
+
+		if ((level.framecounter.low & 0x0f) == 0 && u8[A0 + 0x04] & 0x80)
+		{
+			playSound(0xd9)
+		}
+
+		DrawOrUnloadObject()
+	}
+	else
+	{
+		CheckForUnloadObject()
+	}
+}
+
+
+
+// Fast glowing lights
+
+//# address-hook(0x03b238) end(0x03b256)
+function void fn03b238()
+{
+	if (u8[0xfffff7c1] != 0)
+	{
+	#if STANDALONE
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+		{
+			// Always show the lights, no flickering
+			objA0.animation.sprite = 5
+		}
+		else
+	#endif
+		{
+			// Toggle on/off each frame
+			++objA0.animation.sprite
+			if (objA0.animation.sprite > 6)
+				objA0.animation.sprite = 5
+		}
+		DrawOrUnloadObject()
+	}
+	else
+	{
+		CheckForUnloadObject()
+	}
+}

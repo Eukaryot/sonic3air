@@ -1,0 +1,30 @@
+{
+	// Metadata
+	"ShortName":  "Sonic 3 A.I.R.",
+	"FullName":   "Sonic 3 - Angel Island Revisited",
+
+	// ROM
+	"Rom":        "Sonic_Knuckles_wSonic3.bin",
+	"RomCheck":   "size=0x400000, overwrite=0x2001f0:0x4a, checksum=0x0c06aa82",
+	"RomAutoDiscover":
+	{
+		"SteamGameName": "Sonic 3 & Knuckles",
+		"SteamRomName":  "Sonic_Knuckles_wSonic3.bin"
+	},
+
+	// Paths
+	"GameDataPath": "../../data",
+
+	// Scripts
+	"MainScript": "main.lemon",
+	"CompileScripts": "1",
+	
+	// Data packages
+	"DataPackages":
+	{
+		"enginedata.bin":    { "Required": true },
+		"gamedata.bin":      { "Required": true },
+		"audiodata.bin":     { "Required": true },
+		"audioremaster.bin": { "Required": false }		
+	}
+}

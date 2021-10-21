@@ -1,0 +1,56 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// After-images in Super form                            //
+//-------------------------------------------------------//
+
+//# address-hook(0x01a494) end(0x01a4ca)
+function void AfterImages.Init()
+{
+#if STANDALONE
+	// Effect is not used, we have our own after-images affect
+	UnloadObject()
+	return
+#endif
+
+	objA0.mapping_offset = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x14a8d6 : 0x146816
+	objA0.sprite_attributes = 0x0680
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.render_flags = render_flag.WORLD
+
+	objA0.update_address = 0x01a4d0
+	AfterImages.Update()
+}
+
+
+//# address-hook(0x01a4d0) end(0x01a516)
+function void AfterImages.Update()
+{
+	if (super.active == 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	D0.u16 = posbackup.offset.player1
+	D0.u8 -= (level.framecounter.low & 0x01) ? 0x14 : 0x0c
+	A1 = 0xffffe500 + D0.s16
+	objA0.position.x.u16 = u16[(A1+=2)-2]
+	objA0.position.y.u16 = u16[(A1+=2)-2]
+	A1 = 0xffffe400
+	u8[A0 + 0x0a] = u8[A1 + D0.s16 + 0x03]
+	objA0.animation.sprite = u8[0xffffb022]
+	objA0.render_flags = u8[0xffffb004]
+	objA0.sprite_priority = u16[0xffffb008]
+	DrawObject()
+}

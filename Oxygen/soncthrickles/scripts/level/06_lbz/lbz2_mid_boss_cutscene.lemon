@@ -1,0 +1,790 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Cutscene: Death Egg launching                         //
+//-------------------------------------------------------//
+
+// Egg Mobile
+
+//# address-hook(0x08d29c) end(0x08d2b0)
+function void fn08d29c()
+{
+	level.display_routine = A0.u16
+	setupObjectAttributesFull(0x08d562)
+
+	objA0.update_address = 0x08d2b6
+	objA0.render_flags |= render_flag.FLIP_X
+	fn08d2b6()
+}
+
+
+//# address-hook(0x08d2b6) end(0x08d33e)
+function void fn08d2b6()
+{
+	D0 = u8[A0 + 0x29]
+	if (D0.u8 != 0)
+	{
+		u8[A0 + 0x29] = 0
+		if (D0.u8 != 2)
+		{
+			A1 = 0xffffb000
+			if (u8[A1 + 0x2e] == 0)
+			{
+				objA0.update_address = 0x08d370
+				objA0.velocity.y = -0x100
+				objA0.countdown_value = 0x3f
+				objA0.countdown_callback = 0x08d344
+
+				u8[A1 + 0x04] &= ~render_flag.FLIP_X
+				u8[A1 + 0x0a] |= 0x80
+				objA1.state = char.state.STANDING
+				objA1.flags2a &= ~char.flag.FACING_LEFT
+				u8[A1 + 0x2e] = 0x83
+
+				playSound(0xd0)
+
+				u8[0xfffff7ff] = 0xff
+				screenmover_target.right = 0x6000
+
+				spawnSimpleChildObjects(0x084b00)
+
+				spawnChildObjects(0x0681b4)
+
+				fn08d53e()
+
+			#if STANDALONE
+				Game.startSkippableCutscene()
+			#endif
+			}
+		}
+	}
+
+	Enemy.DrawOrUnload()
+
+#if STANDALONE
+	LBZ2MidBossCutscene.stopTailsFromSuicide()
+#endif
+}
+
+
+#if STANDALONE
+function void LBZ2MidBossCutscene.stopTailsFromSuicide()
+{
+	if (camera.position.x.u16 >= 0x3bc8)
+	{
+		u32 backupA0 = A0
+		A0 = 0xffffb04a
+		RespawnTails()
+		A0 = backupA0
+	}
+	else if (u16[0xffffb05a] >= 0x3bb0)
+	{
+		u16[0xffffb05a] = 0x3bb0
+		u16[0xffffb05e] = min(u16[0xffffb05e], 0x0630)
+		u16[0xffffb062] = 0
+		u16[0xffffb066] = 0
+		tails.ai_routine = 0x0a
+	}
+}
+#endif
+
+
+//# address-hook(0x08d344) end(0x08d364)
+function void fn08d344()
+{
+	objA0.update_address = 0x08d36a
+	u16[A0 + 0x3a] = objA0.position.y.u16
+	objA0.velocity.x = 0x0100
+	objA0.countdown_value = 0x01df
+	objA0.countdown_callback = 0x08d38a
+#if STANDALONE
+	// For Knuckles, skip the Knuckles cutscene and just launch the Death Egg
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		objA0.countdown_value = 0x015f
+		objA0.countdown_callback = 0x08d450
+	}
+#endif
+
+	fn0685e2()
+}
+
+
+//# address-hook(0x08d36a) end(0x08d36a)
+function void fn08d36a()
+{
+	fn0847e6()
+	fn08d370()
+}
+
+
+//# address-hook(0x08d370) end(0x08d384)
+function void fn08d370()
+{
+	UpdateMovementStraightSimple()
+	fn08d506()
+	Object.CountdownAndTrigger()
+	fn08d53e()
+	Enemy.DrawOrUnload()
+
+#if STANDALONE
+	LBZ2MidBossCutscene.stopTailsFromSuicide()
+#endif
+}
+
+
+//# address-hook(0x08d38a) end(0x08d39c)
+function void fn08d38a()
+{
+	objA0.countdown_value = 0x3f
+	objA0.velocity.x = 0
+	objA0.countdown_callback = 0x08d39e
+}
+
+
+//# address-hook(0x08d39e) end(0x08d3aa)
+function void fn08d39e()
+{
+	objA0.update_address = 0x08d3ac
+	objA0.velocity.x = 0x0100
+}
+
+
+//# address-hook(0x08d3ac) end(0x08d3ec)
+function void fn08d3ac()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08d506()
+
+	A1 = 0xffff0000 + u16[0xfffffaa4]
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+	if (D0.u16 < 0x50)
+	{
+		u8[A1 + 0x38] |= 0x02
+		objA0.update_address = 0x08d36a
+		objA0.countdown_value = 0x1f
+		objA0.countdown_callback = 0x08d3f2
+	}
+
+	fn08d53e()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08d3f2) end(0x08d40c)
+function void fn08d3f2()
+{
+	objA0.update_address = 0x08d40e
+	objA0.velocity.x = -0x200
+	objA0.velocity.y = -0x200
+	playSound(0x49)
+}
+
+
+//# address-hook(0x08d40e) end(0x08d44a)
+function void fn08d40e()
+{
+	MoveWithGravity20()
+	fn08d506()
+
+	if (objA0.velocity.y >= 0 && objA0.position.y.u16 >= u16[A0 + 0x3a])
+	{
+		objA0.update_address = 0x08d36a
+		objA0.velocity.x = 0
+		objA0.countdown_value = 0x5f
+		objA0.countdown_callback = 0x08d450
+		fn0685e2()
+	}
+
+	fn08d53e()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08d450) end(0x08d46c)
+function void fn08d450()
+{
+	// Launch of the Death Egg
+	objA0.update_address = 0x08d36a
+	camera.screenshake.state.hi = 0xff
+	u8[0xffffeec6] = 0xff
+	objA0.countdown_value = 0xff
+	objA0.countdown_callback = 0x08d46e
+}
+
+
+//# address-hook(0x08d46e) end(0x08d47a)
+function void fn08d46e()
+{
+	objA0.update_address = 0x08d47c
+	objA0.velocity.x = 0x0100
+}
+
+
+//# address-hook(0x08d47c) end(0x08d4c6)
+function void fn08d47c()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08d506()
+
+	if (objA0.position.x.u16 >= 0x4440)
+	{
+		// Character jumps out of the mobile
+		objA0.update_address = 0x08d4cc
+		camera.screenshake.state = 0
+
+		A1 = 0xffffb000
+		objA1.velocity.x = -0x100
+		objA1.velocity.y = -0x600
+		objA1.state = char.state.ROLLING
+		objA1.flags2a |= char.flag.IN_AIR
+		u8[A1 + 0x2e] = 0
+		u8[A1 + 0x40] = 0
+
+	#if STANDALONE
+		Game.endSkippableCutscene()
+
+		// Create blocker elements so the player cannot fall off the platform
+		for (u16 i = 0; i < 4; ++i)
+		{
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x01ec18
+				objA1.position.x.u16 = (i / 2) ? 0x44e3 : 0x437d
+				objA1.position.y.u16 = (i % 2) ? 0x06c0 : 0x05c0
+				objA1.subtype2c = 0x1f
+			}
+		}
+	#endif
+	}
+
+	fn08d53e()
+	DrawObject()
+}
+
+
+//# address-hook(0x08d4cc) end(0x08d500)
+function void fn08d4cc()
+{
+	if (u8[A0 + 0x04] & 0x80)
+	{
+		fn0847e6()
+		UpdateMovementStraightSimple()
+		fn085160()
+		return
+	}
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x0729ba
+		objA1.position.x.u16 = 0x44a0
+		objA1.position.y.u16 = 0x0780
+		fn0852ae()
+	}
+}
+
+
+//# address-hook(0x08d506) end(0x08d520)
+function void fn08d506()
+{
+	A1 = 0xffffb000
+	objA1.position.x.u16 = objA0.position.x.u16 - 4
+	objA1.position.y.u16 = objA0.position.y.u16 - 0x12
+}
+
+
+//# address-hook(0x08d53e) end(0x08d556)
+function void fn08d53e()
+{
+	A1 = 0xffffb000
+	D0 = u8[A1 + 0x38]
+#if STANDALONE
+	// Special treatment for Knuckles
+	if (D0 == CHARACTER_KNUCKLES)
+	{
+		u8[A1 + 0x22] = 0x56
+		D0 = 0
+	}
+	else
+#endif
+	{
+		u8[A1 + 0x22] = u8[0x08d55c + D0.s16]
+	}
+
+	A2 = 0xffff0000 + u16[0x08d55e + D0.s16 * 2]
+	u8[A2] = 0
+	UpdatePlayer1SpritePatterns()
+}
+
+
+
+// Knuckles
+
+//# address-hook(0x0628aa) end(0x0628cc)
+function void fn0628aa()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	// Targets:
+	//  - 0x00628e0	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x006290e	-> objA0.base_state = 0x02  -> Waiting
+	//  - 0x0062928	-> objA0.base_state = 0x04  -> Boxing
+	//  - 0x0062942	-> objA0.base_state = 0x06  -> Knuckles chuckles
+	//  - 0x0062964	-> objA0.base_state = 0x08  -> Losing his balance when Death Egg starts
+	//  - 0x00629a8	-> objA0.base_state = 0x0a  -> Falling into the water
+	//  - 0x00629c0	-> objA0.base_state = 0x0c  -> ...aaand he's gone
+	call tableLookupAddress(0x0628d2, objA0.base_state)
+
+	Object.loadSpritePatterns(0x06666a)
+	fn085208()
+}
+
+
+//# address-hook(0x0628e0) end(0x062908)
+function void fn0628e0()
+{
+	A1 = 0x0663ba
+	if (fn084fa4())
+		return
+
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.animation.sprite = 0x20
+	fn065dd6()
+
+	CutsceneKnuckles.loadPalette()
+
+	A2 = 0x066592
+	SpawnIdenticalChildObjects()
+}
+
+
+//# address-hook(0x06290e) end(0x062926)
+function void fn06290e()
+{
+	if (objA0.flags38 & 0x02)
+	{
+		objA0.base_state = 0x04
+		objA0.countdown_callback = 0x062932
+	}
+}
+
+
+//# address-hook(0x062928) end(0x06292c)
+function void fn062928()
+{
+	A1 = 0x0666d2
+	fn0845a0()
+}
+
+
+//# address-hook(0x062932) end(0x06293e)
+function void fn062932()
+{
+	objA0.base_state = 0x06
+	objA0.render_flags &= ~render_flag.FLIP_X
+	fn062056()
+}
+
+
+//# address-hook(0x062942) end(0x06295e)
+function void fn062942()
+{
+	if (camera.screenshake.state.hi != 0)
+	{
+		objA0.base_state = 0x08
+		u32[A0 + 0x30] = 0x06669a
+		objA0.animation.timer = 0
+		objA0.animation.frame = 0
+	}
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x062964) end(0x0629a6)
+function void fn062964()
+{
+	if ((objA0.flags38 & 0x08) == 0)
+	{
+		objA0.position.y.u16 += u16[0xffffeee6]
+		Object.AnimationProgressByLocalA1()
+		return
+	}
+
+	objA0.base_state = 0x0a
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.animation.sprite = 9
+	objA0.velocity.x = 0x200
+	objA0.velocity.y = -0x100
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b0a
+	}
+}
+
+
+//# address-hook(0x0629a8) end(0x0629ba)
+function void fn0629a8()
+{
+	if (objA0.position.y.u16 >= water.height.current)
+	{
+		playSound(0x39)
+		objA0.base_state = 0x0c
+	}
+
+	fn0629c0()
+}
+
+
+//# address-hook(0x0629c0) end(0x0629c8)
+function void fn0629c0()
+{
+	objA0.position.y.u16 += u16[0xffffeee6]
+	MoveWithGravity20()
+}
+
+
+//# address-hook(0x0629ce) end(0x0629f8)
+function void fn0629ce()
+{
+	setupObjectAttributesFull(0x06641a)
+	objA0.update_address = 0x062a0a
+
+	D0 = objA0.subtype2c
+	u32[A0 + 0x3e] = u32[0x0629fa + D0.s16 * 2]
+	objA0.position.y.u16 += D0.u16 * 16
+	u16[A0 + 0x3a] = objA0.position.x.u16
+}
+
+
+//# address-hook(0x062a0a) end(0x062a22)
+function void fn062a0a()
+{
+	if (camera.screenshake.state.hi != 0)
+	{
+		objA0.update_address = 0x062a28
+		objA0.velocity.x = objA0.value3e
+		objA0.value39 = 0x06
+	}
+	fn0850d4()
+}
+
+
+//# address-hook(0x062a28) end(0x062a98)
+function void fn062a28()
+{
+	D0.u16 = u16[0xffffeee6]
+	objA0.position.y.u16 += D0.u16
+	D0.u16 = objA0.position.x.u16
+	D1.u16 = u16[A0 + 0x40]
+	D2.u8 = (D0.u16 < u16[A0 + 0x3a]) ? 0xff : 0x00
+	if (D2.u8 == 0)
+	{
+		D1.s16 = -D1.s16
+	}
+	objA0.velocity.x += D1.u16
+
+	if (D2.u8 != u8[A0 + 0x3c])
+	{
+		u8[A0 + 0x3c] = D2.u8
+		if (objA0.value39 == 0x03)
+		{
+			D0 = objA0.subtype2c
+			u32[A0 + 0x3e] = u32[0x062a9e + D0.s16 * 2]
+			objA0.velocity.x = objA0.value3e
+		}
+
+		--objA0.value39
+		if (objA0.value39 == 0)
+		{
+			objA0.update_address = 0x062aae
+			A1 = 0xffff0000 + u16[A0 + 0x46]
+			u8[A1 + 0x38] |= 0x08
+		}
+	}
+
+	UpdateMovementStraightSimple()
+	if (objA0.subtype2c == 0)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		objA1.position.x.u16 = objA0.position.x.u16
+	}
+	fn0850d4()
+}
+
+
+//# address-hook(0x062aae) end(0x062abc)
+function void fn062aae()
+{
+	objA0.position.y.u16 += u16[0xffffeee6]
+	MoveWithGravity20()
+	fn0850d4()
+}
+
+
+
+// Death Egg Movement?
+
+//# address-hook(0x05480c) end(0x0549c4)
+function void fn05480c()
+{
+	D3.u16 = camera.screenshake.offset
+	D0.u16 = camera.foreground.y.u16 - camera.screenshake.offset - 0x05f0 - u16[0xffffeed4] - u16[0xffffeed8]
+	D1.u16 = D0.u16
+	D0 = (D0 << 16)
+	D0.s32 >>= 1
+	D2 = D0
+	D2.s32 >>= 3
+	D0 -= D2
+	D2.s32 >>= 2
+	D0 -= D2
+	D0 = (D0 << 16) + (D0 >> 16)
+	D2.u16 = D0.u16
+	D0.u16 = D0.u16 + 0x02c0 - u16[0xffffeebe] + D3.u16
+	if (D0.s16 < 0)
+	{
+		D3 = 0
+		D4.s16 = D0.s16
+		while (D4.s16 < 0)
+		{
+			D3.u16 += 0x100
+			D4.u16 += 0x100
+		}
+
+		u16[0xffffeea0] = max(u16[0xffffeea0], D3.u16)
+	}
+
+	if (u16[0xffffeebe] == 0 && D0.u16 == 0x100)
+	{
+		u16[0xffffeebe] = 0x100
+	}
+
+	D0.u16 += u16[0xffffeea0]
+	camera.background.y.u16 = D0.u16
+	if (u16[0xffffeea0] != 0)
+	{
+		while (D0.u16 >= 0x100)
+		{
+			D0.u16 -= 0x100
+		}
+		camera.background.y.u16 = D0.u16
+	}
+
+	if (s16[0xffffee9c] >= 0)
+	{
+		D2.u16 -= D1.u16
+		if (D2.s16 < 0)
+		{
+			D2.u16 = 0x7fff
+		}
+	}
+	else
+	{
+		D2.u16 = 0x7fff
+	}
+
+	u16[0xffffeee2] = D2.u16
+	D0.u16 = camera.foreground.x.u16
+	D0 = (D0 << 16)
+	D1 = D0
+	D3 = D0
+	D3.s32 >>= 6
+	D4 = D3
+	D4.s32 >>= 3
+	D3 -= D4
+	D4 = 0x1f
+	A1 = 0xffffa8ac
+
+	while (D4.s16 >= 0)
+	{
+		u16[A1-=2] = D1 >> 16
+		D1 -= D3
+		u16[A1-=2] = D1 >> 16
+		D1 -= D3
+		--D4.s16
+	}
+
+	if (D2.s16 < 0x40)
+	{
+		A1 = 0xffffa82c
+		A5 = 0xffffa82c
+		D3.u16 = (0x40 - D2.s16) << 6
+		A6 = 0x26f460 + D3.u16
+		D1.u16 = D2.u16 - 1
+		D3 = 0
+		while (D1.s16 >= 0)
+		{
+			D3.u8 = u8[(A6+=1)-1]
+			u16[(A1+=2)-2] = u16[A5 + D3.s16 * 2]
+			--D1.s16
+		}
+	}
+
+	A1 = 0xffffa8ec
+	D1 = D0.s32 >> 1
+	D3 = D1.s32 >> 3
+	D4 = 6
+	while (D4.s16 >= 0)
+	{
+		D1 -= D3
+		--D4.s16
+	}
+
+	D3 = 0x5f - D2.u16
+	if (D3.s16 >= 0)
+	{
+		D1 = (D1 << 16) + (D1 >> 16)
+		while (D3.s16 >= 0)
+		{
+			u16[A1-=2] = D1.u16
+			--D3.s16
+		}
+	}
+
+	A1 = 0xffffa80c
+	A5 = 0x23ef34
+	D1 = D0.s32 >> 6
+	D3 = D1
+	D4 = u32[0xffffa9e2]
+	u32[0xffffa9e2] += 0x0e00
+	D5 = 0x0c
+	while (D5.s16 >= 0)
+	{
+		D6.u16 = u16[(A5+=2)-2]
+		D1 += D4
+		u16[A1 + D6.s16] = D1 >> 16
+		D1 += D3
+		--D5.s16
+	}
+
+	A1 = 0xffffa810
+	A5 = 0xffffa800
+	D1 = 0x03
+	while (D1.s16 >= 0)
+	{
+		u32[(A5+=4)-4] = u32[(A1+=4)-4]
+		--D1.s16
+	}
+
+	D1 = D0.s32 >> 4
+	D3 = D1.s32 >> 1
+	A1 = 0xffffa826
+	u16[(A1+=2)-2] = D1 >> 16
+	D1 += D3
+	u16[(A1+=2)-2] = D1 >> 16
+	D1 += D3
+	u16[(A1+=2)-2] = D1 >> 16
+
+	D0 = 0x5f - D2.u16
+	if (D0.u16 >= 0x60)
+	{
+		D0.u16 = 0x5f
+	}
+
+	A1 = 0xffffa8ec
+	A5 = 0x04f778
+	D1.u16 = (level.framecounter >> 1) & 0x7e
+	A5 += D1.u16
+	while (D0.s16 >= 0)
+	{
+		A1 -= 2
+		A5 -= 2
+		u16[A1] += u16[A5]
+		--D0.s16
+	}
+}
+
+
+//# address-hook(0x0549c6) end(0x054a92)
+function void fn0549c6()
+{
+	if (u8[0xffffb005] >= 0x06)
+		return
+
+	if (player1.camera_lock)
+	{
+		D0.u16 = u16[0xffffb010] - camera.position.x.u16 - getScreenWidth() / 2
+		if (D0.s16 >= 0)
+		{
+			camera.position.x.u16 += D0.u16
+		}
+
+		// Camera reached boss fight area?
+		if (camera.position.x.u16 >= 0x4390 - getScreenExtend() || camera.position.y.u16 >= 0x0668)
+		{
+			player1.camera_lock = 0
+		}
+	}
+
+	if (u16[0xffffeee0] != 0)
+	{
+		--u16[0xffffeee0]
+	}
+	else
+	{
+		if (camera.position.x.u16 >= 0x4390 - getScreenExtend())
+		{
+			#if STANDALONE
+			{
+				// TODO: It would be nice to limit the character move area independently from the camera
+				move_area.left = 0x4390 - getScreenExtend()
+				move_area.right = 0x4390 + getScreenExtend()
+			}
+			#else
+			{
+				move_area.left = move_area.right
+			}
+			#endif
+		}
+
+		if (camera.position.y.u16 >= 0x0668)
+		{
+			level.vertical_wrap = move_area.bottom.current
+		}
+
+		A1 = 0xffffeed4
+		D1 = u16[0xffffeea2]
+		u32[A1] += D1
+		D0.u16 = u16[A1] - u16[A1 + 0x08]
+		u16[A1 + 0x08] = u16[A1]
+
+		D1.u16 = 0x2200
+		if (player1.camera_lock == 0)
+		{
+			D1 = u32[0xffffee9c]
+		}
+		u32[A1 + 0x04] += D1
+
+		D1.u16 = u16[A1 + 0x04] - u16[A1 + 0x0a]
+		u16[A1 + 0x0a] = u16[A1 + 0x04]
+		if (player1.camera_lock != 0)
+		{
+			A5 = 0xffff0000 + level.display_routine
+			u16[A5 + 0x14] += D0.u16
+			camera.position.y.u16 += D0.u16
+		}
+
+		D2.u16 = water.height.target + D0.u16 + D1.u16
+		if (D2.u16 >= 0x0f00)
+		{
+			D2.u16 = 0x0f80
+		}
+		water.height.target = D2.u16
+		u16[0xffffeee6] = D0.u16
+		u16[0xffffeee6] += D1.u16
+	}
+}

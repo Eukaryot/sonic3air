@@ -1,0 +1,130 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Tar pit (in MGZ and competition mode's Azure Lake)    //
+//-------------------------------------------------------//
+
+//# address-hook(0x032a78) end(0x032aa8)
+function void fn032a78()
+{
+	objA0.box_size.x = objA0.subtype2c * 8
+	u16[A0 + 0x30] = objA0.position.y.u16
+	objA0.flags38 = 0x30
+	objA0.value3a = 0x30
+	objA0.flags2a |= 0x80
+
+	if (competition_mode.active)
+	{
+		objA0.update_address = 0x032b8c
+		fn032b8c()
+	}
+	else
+	{
+		objA0.update_address = 0x032aae
+		fn032aae()
+	}
+}
+
+
+//# address-hook(0x032aae) end(0x032b8a)
+function void fn032aae()
+{
+	if (debug_mode.state == 0)
+	{
+	#if STANDALONE
+		// Make the highest position where you can stand on the tar a little bit higher
+		// (call it personal preference, but this always bugged me)
+		u8 maxValue = 0x34
+	#else
+		u8 maxValue = 0x30
+	#endif
+
+		// Check first character
+		A1 = 0xffffb000
+		if ((objA0.flags2a & 0x08) == 0)
+		{
+			if (objA0.flags38 < maxValue)
+			{
+				objA0.flags38 += 2
+			}
+
+			A2 = 0xffff0000 + u16[A1 + 0x42]
+			if ((u8[A1 + 0x2a] & 0x08) && u32[A2] == 0x032aae)
+			{
+				objA0.flags38 = u8[A2 + 0x38]
+			}
+		}
+		else
+		{
+			if (objA0.flags38 == 0)
+			{
+				objA0.flags38 = maxValue
+				fn032b76()
+				return
+			}
+
+			--objA0.flags38
+		}
+
+		D1 = objA0.box_size.x
+		D3 = objA0.flags38
+		D6 = 3
+		D4.u16 = objA0.position.x.u16
+		PlatformCheckClimbOnForCharacterA1()
+
+		// Check second character
+		A1 = 0xffffb04a
+		if ((objA0.flags2a & 0x10) == 0)
+		{
+			if (objA0.value3a < maxValue)
+			{
+				objA0.value3a += 2
+			}
+			A2 = 0xffff0000 + u16[A1 + 0x42]
+
+			if ((u8[A1 + 0x2a] & 0x08) && u32[A2] == 0x032aae)
+			{
+				objA0.value3a = u8[A2 + 0x3a]
+			}
+		}
+		else
+		{
+			if (objA0.value3a == 0)
+			{
+				objA0.value3a = maxValue
+				fn032b76()
+				return
+			}
+			--objA0.value3a
+		}
+
+		D1 = objA0.box_size.x
+		D3 = objA0.value3a
+		D6 = 4
+		D4.u16 = objA0.position.x.u16
+		PlatformCheckClimbOnForCharacterA1()
+	}
+
+	CheckForUnloadObject()
+}
+
+
+function void fn032b76()
+{
+	D1.u8 ^= 0xff
+	objA0.flags2a &= D1.u8
+
+	u32 backupA0 = A0
+	A2 = A0
+	A0 = A1
+	Character.Die()
+	A0 = backupA0
+}

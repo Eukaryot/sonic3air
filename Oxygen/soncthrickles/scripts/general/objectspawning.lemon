@@ -1,0 +1,879 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Dynamic object management                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x01b690) end(0x01b696)
+function void DynamicObjectsLoading()
+{
+	// This usually calls "fn01b69e()"
+	u32 address = 0x01b69a + dynobjects.routine
+	call address
+}
+
+
+//# address-hook(0x01b69a) end(0x01b69a)
+function void fn01b69a()
+{
+	DynamicObjectsLoading.Init()
+}
+
+//# address-hook(0x01b69e) end(0x01b69e)
+function void fn01b69e()
+{
+	DynamicObjectsLoading.UpdateDefault()
+}
+
+//# address-hook(0x01b6a6) end(0x01b6a6)
+function void fn01b6a6()
+{
+	// Empty function for all levels that do not use dynamic object loading (e.g. some bonus stages and competition mode)
+}
+
+
+//# address-hook(0x01b6a8) end(0x01b9fe)
+function void DynamicObjectsLoading.Init()
+{
+	// First object type table is used in Sonic 3 levels + FBZ, and the bonus stages
+	// Second object type table is used in MHZ, SOZ and everything afterwards
+	bool useFirstObjectTypeTable = (global.zone < 0x16 && (global.zone <= 0x06 || global.zone >= 0x0e))
+	level.object_type_table = useFirstObjectTypeTable ? 0x094ea2 : 0x0952a2
+
+	dynobjects.routine += 4			// Use "DynamicObjectsLoading.UpdateDefault()"
+	if (global.in_extra_stage == 0)
+	{
+		zeroMemory(0xffffeb00, 0x300)
+	}
+
+	// Values for the object table base address (stored into A0):
+	//  - 0x1e44da		-> AIZ 1 (i.e. the technical act 1 = until everything gets set on fire)
+	//  - 0x1e4876		-> AIZ 2
+	//  - 0x1e6090		-> HCZ 1
+	//  - 0x1e6990		-> HCZ 2
+	//  - 0x1e8088		-> MGZ 1
+	//  - 0x1e932c		-> MGZ 2
+	//  - 0x1ea0c2		-> CNZ 1
+	//  - 0x1eac38		-> CNZ 2
+	//  - 0x1ee3ca		-> ICZ 1 (probably only the technical act 1)
+	//  - 0x1ee9a6		-> ICZ 2
+	//  - 0x1efc42		-> LBZ 1
+	//  - 0x1f065c		-> LBZ 2
+	//     ...
+	u8 offset = global.zone * 8 + global.act * 4
+	A0 = u32[0x1e3d98 + offset]
+#if STANDALONE
+	LevelObjectTableBuilder.buildObjects()
+#endif
+
+	bool useDefault = false
+	if (global.zone <= 0x12 && competition_mode.active == 0)
+	{
+		useDefault = true
+	}
+	else if (global.zone == 0x14)
+	{
+		useDefault = true
+	}
+	else if (global.zone >= 0x16 && global.zone_act != 0x1701)
+	{
+		useDefault = true
+	}
+
+	if (useDefault)
+	{
+		dynobjects.addr.begin = A0
+		dynobjects.addr.end = A0
+
+		u32 defaultA3 = 0xffffeb00
+		if (global.zone == 0x14)
+		{
+			// Special handling for Glowing Spheres bonus stage
+			//  -> It uses object spawning (unlike the other bonus stages), but may not change the actual object respawn table
+			zeroMemory(0xffff8400, 0x200)
+			defaultA3 = 0xffff8400
+		}
+
+		A3 = defaultA3
+		D6.u16 = max(0, s16(camera.position.x.u16 - 0x80)) & 0xff80
+		A0 = dynobjects.addr.end
+		while (u16[A0] < D6.u16)
+		{
+			A0 += 6
+			++A3
+		}
+		dynobjects.addr.end = A0
+		dynobjects.respawn.end = A3.u16
+
+		A3 = defaultA3
+		A0 = dynobjects.addr.begin
+		D6.u16 -= 0x80
+		if (D6.s16 >= 0)
+		{
+			while (u16[A0] < D6.u16)
+			{
+				A0 += 6
+				++A3
+			}
+		}
+		dynobjects.addr.begin = A0
+		dynobjects.respawn.begin = A3.u16
+
+		dynobjects.areastart.x = 0xffff
+		dynobjects.areastart.y = camera.position.y.u16 & 0xff80
+
+		DynamicObjectsLoading.UpdateDefault()
+	}
+	else
+	{
+		// Load all objects at once and don't unload them
+		// This is used by:
+		//  - HPZ if entered by giant ring (see check below)
+		//  - Bonus stages GM and SM (but not GS)
+		//  - Competition mode
+		bool isHPZviaGiantRing = (global.zone_act == 0x1701)
+
+		dynobjects.routine += 8		// Empty dynamic objects loading routine
+		if (allocDynamicObjectStd())
+		{
+			A3 = 0xfffff712
+			A4 = level.object_type_table
+			D6.u16 = isHPZviaGiantRing ? 0x1780 : 0x0800
+
+			while (D6.u16 > u16[A0])
+			{
+				ObjectSpawning.SpawnFixedObject()
+				if (!_equal())
+					break
+			}
+		}
+
+		if (isHPZviaGiantRing)
+		{
+			level.despawn_position.x = (camera.position.x.u16 - 0x80) & 0xff80
+		}
+		else
+		{
+			level.despawn_position.x = 0
+		}
+	}
+}
+
+
+//# address-hook(0x01b7f2) end(0x01b9fe)
+function void DynamicObjectsLoading.UpdateDefault()
+{
+	level.despawn_position.x = (camera.position.x.u16 - 0x80) & 0xff80
+	level.despawn_position.y = (camera.position.y.u16 - 0x80) & 0xff80
+
+	A4 = level.object_type_table
+	D3.u16 = (camera.position.y.u16 & 0xff80) - 0x80
+	D4.u16 = (camera.position.y.u16 & 0xff80) + 0x200
+
+	bool considerLevelWrap = false
+	if (level.vertical_wrap & 0x8000)
+	{
+		A6 = 0x01ba40
+		if (D3.s16 < 0)
+		{
+			D3.u16 &= level.height.bitmask
+			considerLevelWrap = true
+		}
+		else if (D4.u16 > level.height.bitmask + 1)
+		{
+			D4.u16 &= level.height.bitmask
+			considerLevelWrap = true
+		}
+	}
+	else
+	{
+		A6 = 0x01ba92
+		if (D3.s16 < 0)
+			D3 = 0
+	}
+
+	D5.u16 = 0x0fff
+
+	// React to camera movement in x-direction
+	s16 newAreaStartX = camera.position.x.u16 & 0xff80
+	if (newAreaStartX != dynobjects.areastart.x)
+	{
+		if (newAreaStartX < s16(dynobjects.areastart.x))
+		{
+			// Load objects to the left
+			A0 = dynobjects.addr.begin
+			A3 = 0xffff0000 + dynobjects.respawn.begin
+			s16 px = newAreaStartX - 0x80
+			if (px >= 0)
+			{
+				if (allocDynamicObjectStd())
+				{
+					while (s16[A0-6] > px)
+					{
+						A0 -= 6
+						--A3
+						bool success = conditionalSpawnDynamicObject(considerLevelWrap, false)
+						if (!success)
+						{
+						#if STANDALONE
+							A0 += 6
+						#else
+							// To me, it looks like the original game code is incorrect here
+							//  -> I double-checked it and this here really seems to be what the original does, so it's not a bug in 86K-to-script translation
+							//      (when comparing to original, note that "conditionalSpawnDynamicObject" does not increase A0 by 6 itself, but the function at A6 does in all cases)
+							//  -> But adding 12 here leads to a subtle bug that desyncs dynobjects.addr.begin and dynobjects.respawn.begin
+							//  -> Subtle because it happens only rarely, as "conditionalSpawnDynamicObject" usually won't fail
+							A0 += 12
+						#endif
+							++A3
+							break
+						}
+					}
+				}
+			}
+			dynobjects.addr.begin = A0
+			dynobjects.respawn.begin = A3.u16
+
+			px = newAreaStartX + 0x280
+			while (s16[dynobjects.addr.end-6] >= px)
+			{
+				dynobjects.addr.end -= 6
+				--dynobjects.respawn.end
+			}
+		}
+		else
+		{
+			// Load objects to the right
+			A0 = dynobjects.addr.end
+			A3 = 0xffff0000 + dynobjects.respawn.end
+			s16 px = newAreaStartX + 0x280
+			if (allocDynamicObjectStd())
+			{
+				while (u16[A0] < u16(px))
+				{
+					bool success = conditionalSpawnDynamicObject(considerLevelWrap, false)
+					A0 += 6
+					++A3
+					if (!success)
+						break
+				}
+			}
+			dynobjects.addr.end = A0
+			dynobjects.respawn.end = A3.u16
+
+			px = newAreaStartX - 0x80
+			if (px >= 0)
+			{
+				while (u16(px) > u16[dynobjects.addr.begin])
+				{
+					dynobjects.addr.begin += 6
+					++dynobjects.respawn.begin
+				}
+			}
+		}
+		dynobjects.areastart.x = newAreaStartX
+	}
+
+	// React to camera movement in y-direction
+	s16 newAreaStartY = camera.position.y.u16 & 0xff80
+	if (newAreaStartY != dynobjects.areastart.y)
+	{
+		s16 py = newAreaStartY
+		if (level.vertical_wrap & 0x8000)
+		{
+		#if STANDALONE
+			// This seems to fix the occasionally missing corner sprite in SOZ 2's first rising sand section (and some other places where spawning can potentially fail)
+			//  -> For the missing corner sprite specifically, it seems to be somewhat reproducible this way:
+			//      - Go through the first part of the rising sand section without moving too much
+			//      - When reaching the breakable rock at (0x1ec0, 0x0080), briefly push towards it, then jump over with reduced jump height it while holding left (so you just make it over the rock)
+			//      - Jump again up the steps and stay on the left side until the sand stops, then go right to the corner sprite
+			py &= level.height.bitmask
+			dynobjects.areastart.y &= level.height.bitmask
+		#endif
+			if (newAreaStartY < s16(dynobjects.areastart.y))
+			{
+				if (newAreaStartY == 0 && dynobjects.areastart.y != 0x80)
+				{
+					// Load objects below (this happens after the camera went down and crossed the wrapping border)
+					py += 0x180
+				}
+				else
+				{
+					// Load objects above
+					py -= 0x80
+				}
+			}
+			else
+			{
+				if (dynobjects.areastart.y == 0 && newAreaStartY != 0x80)
+				{
+					// Load objects above (this happens when the camera went up and crossed the wrapping border)
+					py -= 0x80
+				}
+				else
+				{
+					// Load objects below
+					py += 0x180
+				}
+			}
+			py &= level.height.bitmask
+		}
+		else
+		{
+			if (newAreaStartY < s16(dynobjects.areastart.y))
+			{
+				py -= 0x80
+				if (py < 0)
+				{
+					dynobjects.areastart.y = 0
+					return
+				}
+			}
+			else
+			{
+				// Load objects below
+				py += 0x180
+				if (py > level.height.bitmask)
+				{
+					dynobjects.areastart.y = newAreaStartY
+					return
+				}
+			}
+		}
+
+		if (allocDynamicObjectStd())
+		{
+			D3.u16 = py
+			D4.u16 = py + 0x80
+			A0 = dynobjects.addr.begin
+			A3 = 0xffff0000 + dynobjects.respawn.begin
+			D7 = dynobjects.addr.end - dynobjects.addr.begin
+			while (D7 != 0)
+			{
+				if (!conditionalSpawnDynamicObject(false, true))
+					break
+
+				A0 += 6
+				++A3
+				D7 -= 6
+			}
+		}
+	}
+
+	dynobjects.areastart.y = newAreaStartY
+}
+
+
+//# address-hook(0x01ba0c) end(0x01ba3c)
+function void ObjectSpawning.SpawnFixedObject()
+{
+	u16 px			 = u16[A0]
+	u16 py			 = u16[A0+2] & 0x0fff
+	u8 flipFlags	 = (u16[A0+2] >> 13) & 0x03
+	u8 objectType	 = u8[A0+4]
+	u8 objectSubtype = u8[A0+5]
+
+	u32[A1] = u32[A4 + u16(objectType) * 4]
+	objA1.position.x.u16 = px
+	objA1.position.y.u16 = py
+	u8[A1 + 0x04] = flipFlags
+	u8[A1 + 0x2a] = flipFlags
+	u8[A1 + 0x2c] = objectSubtype
+	objA1.respawn_entry = A3.u16
+	A0 += 6
+
+	AllocDynamicObjectAfterA1()
+}
+
+
+//# address-hook(0x01ba40) end(0x01ba90)
+function void fn01ba40()
+{
+	bool result = conditionalSpawnDynamicObject(true, false)
+	_setZeroFlagByValue(result == 0)
+	A0 += 6
+}
+
+//# address-hook(0x01ba92) end(0x01baf0)
+function void fn01ba92()
+{
+	bool result = conditionalSpawnDynamicObject(false, false)
+	_setZeroFlagByValue(result == 0)
+	A0 += 6
+}
+
+function bool conditionalSpawnDynamicObject(bool considerLevelWrap, bool forceYPositionCheck)
+{
+	// Check for flag in respawn table entry
+	if (u8[A3] & 0x80)
+		return true
+
+	u16 px			 = u16[A0]
+	u16 py			 = u16[A0+2] & D5.u16		// D5.u16 is usually 0x0fff here
+	u8 flipFlags	 = (u16[A0+2] >> 13) & 0x03
+	bool checkYPos	 = (u16[A0+2] & 0x8000) == 0
+	u8 objectType	 = u8[A0+4]
+	u8 objectSubtype = u8[A0+5]
+
+	if (checkYPos || forceYPositionCheck)
+	{
+		if (considerLevelWrap)
+		{
+			if (py < D3.u16 && py > D4.u16)
+			{
+				return true
+			}
+		}
+		else
+		{
+			if (py < D3.u16 || py > D4.u16)
+			{
+				return true
+			}
+		}
+	}
+
+	u32 updateAddress = u32[A4 + u16(objectType) * 4]
+
+	// Set flag in respawn table entry
+	u8[A3] |= 0x80
+
+	u32[A1] = updateAddress
+	objA1.position.x.u16 = px
+	objA1.position.y.u16 = py
+	u8[A1 + 0x04] = flipFlags
+	u8[A1 + 0x2a] = flipFlags
+	u8[A1 + 0x2c] = objectSubtype
+	objA1.respawn_entry = A3.u16
+
+	return allocDynamicObjectAfterA1()
+}
+
+
+
+//-------------------------------------------------------//
+// Child object spawn                                    //
+//-------------------------------------------------------//
+
+function void spawnChildObjects(u32 address)
+{
+	A2 = address
+	SpawnChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnChildObjects")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[A2]))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", i * 2))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat("0x%02x", u8[A2+4]))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat("0x%02x", u8[A2+5]))
+				ROMDataAnalyser.endObject()
+				A2 += 6
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
+}
+
+//# address-hook(0x084060) end(0x0840ae)
+function void SpawnChildObjects()
+{
+	// This is the most common of the various child spawning functions, but it's kind of limited.
+	// Stored data per child:
+	//  - Update routine
+	//  - Offset relative to parent
+
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8								// Simple enumeration of children (in steps of 2)
+		u16[A1 + 0x46] = A0.u16								// Reference to parent
+
+		s8 offset_x = s8[A2+4]
+		s8 offset_y = s8[A2+5]
+		u8[A1 + 0x42] = offset_x
+		u8[A1 + 0x43] = offset_y
+		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+		A2 += 6
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}
+
+
+//# translated(0x0840b0) end(0x084112)
+function void SpawnProjectileChildObjects()
+{
+	// Used only in some cases, seems to always spawn some kind of projectile or similar.
+	// Stored data per child:
+	//  - Update routine
+	//  - Offset relative to parent
+	//  - 3 additional u32 values -- what are those for?
+	//  - Velocity
+
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		// Basic initialization as above
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+		u16[A1 + 0x46] = A0.u16
+
+		u32[A1 + 0x3e] = u32[A2+4]
+		u32[A1 + 0x30] = u32[A2+8]
+		u32[A1 + 0x34] = u32[A2+12]
+
+		s8 offset_x = s8[A2+16]
+		s8 offset_y = s8[A2+17]
+		s8[A1 + 0x42] = offset_x
+		s8[A1 + 0x43] = offset_y
+		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+		objA1.velocity.x = s16[A2+18]
+		objA1.velocity.y = s16[A2+20]
+
+		A2 += 22
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}
+
+
+//# address-hook(0x084114) end(0x084164)
+function void SpawnIdenticalChildObjects()
+{
+	// Same as SpawnChildObjects, but spawns multiple of the same child object instead of using different definitions for each child.
+	// Stored data, shared for all children:
+	//  - Update routine
+	//  - Offset relative to parent
+
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		// Basic initialization as above
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+		u16[A1 + 0x46] = A0.u16
+
+		s8 offset_x = s8[A2+4]
+		s8 offset_y = s8[A2+5]
+		s8[A1 + 0x42] = offset_x
+		s8[A1 + 0x43] = offset_y
+		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}
+
+
+//# address-hook(0x084166) end(0x0841a4)
+function void SpawnChildObjectChain()
+{
+	// Spawns a double-linked chain of identical child objects.
+	// Stored data, shared for all children:
+	//  - Update routine
+
+	A3 = A0
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		// Add references to parent as usual, but also register there as a child, forming a double-linked list
+		u16[A1 + 0x46] = A3.u16
+		u16[A3 + 0x44] = A1.u16
+		A3 = A1
+
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}
+
+
+//# address-hook(0x0841a6) end(0x08421e)
+function void SpawnProjectileChildObjectsInDir()
+{
+	// Same as SpawnProjectileChildObjects, but takes parent's orientation into account.
+	// Stored data per child:
+	//  - Update routine
+	//  - Offset relative to parent
+	//  - 3 additional u32 values -- what are those for?
+	//  - Velocity
+
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		// Basic initialization as above
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+		u16[A1 + 0x46] = A0.u16
+
+		u32[A1 + 0x3e] = u32[A2+4]
+		u32[A1 + 0x30] = u32[A2+8]
+		u32[A1 + 0x34] = u32[A2+12]
+
+		s8 offset_x = s8[A2+16]
+		s8 offset_y = s8[A2+17]
+		s8[A1 + 0x42] = offset_x
+		s8[A1 + 0x43] = offset_y
+		objA1.position.x.u16 = objA0.position.x.u16 + ((objA0.render_flags & render_flag.FLIP_X) ? -offset_x : offset_x)
+		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+		objA1.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -s16[A2+18] : s16[A2+18]
+		objA1.velocity.y = s16[A2+20]
+
+		A2 += 22
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}
+
+
+function void spawnSimpleChildObjects(u32 address)
+{
+	A2 = address
+	SpawnSimpleChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnSimpleChildObjects")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", u16[address] + 1))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[address + 2]))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
+}
+
+//# address-hook(0x084220) end(0x084256)
+function void SpawnSimpleChildObjects()
+{
+	// Very commonly child spawning function, spawns multiple of the same but with different subtypes.
+	// Stored data, shared for all children:
+	//  - Update routine
+
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		// Basic initialization as above
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+		u16[A1 + 0x46] = A0.u16
+
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+
+		D2.u16 += 2
+	}
+
+	D0 = 0		// Actually needed in one instance (DEZ end bosses)
+	_setZeroFlagByValue(false)
+}
+
+
+//# address-hook(0x0842a8) end(0x0842e6)
+function void SpawnChildObjectHierarchy()
+{
+	// Spawns a hierarchy of identical child objects, like SpawnChildObjectChain does.
+	// Only difference is that this function here does not create a linked list, but gives all children a pointer to the root.
+	// Stored data, shared for all children:
+	//  - Update routine
+
+	A3 = A0
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		// Add references to the direct parent and to the root
+		u16[A1 + 0x46] = A3.u16
+		u16[A1 + 0x44] = A0.u16
+		A3 = A1
+
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}
+
+
+//# address-hook(0x0842e8) end(0x084326)
+function void SpawnUniqueChildObjectHierarchy()
+{
+	// Similar to SpawnChildObjectHierarchy, but this is not spawning identical children.
+	// Stored data per child:
+	//  - Update routine
+
+	A3 = A0
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		u16[A1 + 0x46] = A3.u16
+		u16[A1 + 0x44] = A0.u16
+		A3 = A1
+
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+
+		A2 += 4
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}
+
+
+//# address-hook(0x084328) end(0x084386)
+function void SpawnChildObjectsInDir()
+{
+	// Used only in some cases, as a variant of SpawnChildObjects that takes parent's orientation into account.
+	// Stored data per child:
+	//  - Update routine
+	//  - Offset relative to parent
+
+	D2 = 0
+	u16 count = u16[A2] + 1
+	A2 += 2
+
+	for (u16 i = 0; i < count; ++i)
+	{
+		if (!allocDynamicObjectAfterA0())
+			return
+
+		// Basic initialization as above
+		u32[A1] = u32[A2]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.subtype2c = D2.u8
+		u16[A1 + 0x46] = A0.u16
+
+		s8 offset_x = s8[A2+4]
+		s8 offset_y = s8[A2+5]
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			u8[A1 + 0x04] |= render_flag.FLIP_X
+			offset_x = -offset_x
+		}
+		s8[A1 + 0x42] = offset_x
+		u8[A1 + 0x43] = offset_y
+		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+		A2 += 6
+		D2.u16 += 2
+	}
+
+	_setZeroFlagByValue(false)
+}

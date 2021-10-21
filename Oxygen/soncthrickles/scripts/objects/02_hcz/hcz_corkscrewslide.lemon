@@ -1,0 +1,284 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03907c) end(0x039096)
+function void fn03907c()
+{
+	D0.u16 = (objA0.subtype2c & 0x7f) * 8
+	A1 = 0x03903c + D0.s16
+	u16[A0 + 0x30] = u16[(A1+=2)-2]
+	objA0.value32 = u16[(A1+=2)-2]
+	u32[A0 + 0x40] = u32[(A1+=4)-4]
+
+	objA0.update_address = 0x03909c
+	fn03909c()
+}
+
+
+//# address-hook(0x03909c) end(0x0390bc)
+function void fn03909c()
+{
+	A1 = 0xffffb000
+	A4 = A0 + 0x34
+	fn0390c2()
+
+	A1 = 0xffffb04a
+	A4 = A0 + 0x3a
+	fn0390c2()
+
+	D0.u8 = u8[A0 + 0x34] + objA0.value3a
+	if (D0.u8 == 0)
+	{
+		CheckForUnloadObject()
+	}
+}
+
+
+//# address-hook(0x0390c2) end(0x0390f0)
+function void fn0390c2()
+{
+	// Targets:
+	//  - 0x039102	-> u8[A4] = 0x00
+	//  - 0x03925c	-> u8[A4] = 0x02
+	//  - 0x0392b6	-> u8[A4] = 0x04
+	//  - 0x0392ee	-> u8[A4] = 0x06
+	//  - 0x03931e	-> u8[A4] = 0x08
+	//  - 0x03935e	-> u8[A4] = 0x0a
+	//  - 0x03938e	-> u8[A4] = 0x0c
+	//  - 0x0393be	-> u8[A4] = 0x0e
+	call tableLookupAddress(0x0390f2, u8[A4])
+
+	if (u8[A4] != 0)
+	{
+		fn039208()
+
+		D0 = u16[A4 + 0x02]
+		D0.u16 = D0 / 0x60
+		A2 = u32[A0 + 0x40]
+		u8[A4] = u8[A2 + D0.s16]
+		if (u8[A4] == 0)
+		{
+			u8[A1 + 0x2e] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x039102) end(0x039206)
+function void fn039102()
+{
+	if (debug_mode.state == 0)
+	{
+		if (s8[A0 + 0x2c] < 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+			D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
+			if (D0.u16 >= 0x20 || D1.u16 >= 0x10)
+				return
+
+			if (u8[A1 + 0x2e] != 0 || s16[A1 + 0x1c] >= 0)
+				return
+		}
+		else
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 8
+			D1.u16 = objA1.position.y.u16 - objA0.position.y.u16
+			if (D0.u16 >= 0x10 || D1.u16 >= 0x30)
+				return
+
+			if (u8[A1 + 0x2e] != 0)
+				return
+
+			if (objA0.flags2a & 0x01)
+			{
+				if (s16[A1 + 0x1c] >= 0 || objA1.velocity.x >= 0)
+					return
+
+				s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+			}
+			else
+			{
+				if (s16[A1 + 0x1c] < 0)
+					return
+			}
+		}
+
+		u8[A4] += 2
+
+		u8[A1 + 0x2e] = 0x01
+		u8[A1 + 0x1e] = 0x0e
+		u8[A1 + 0x1f] = 0x07
+		u8[A1 + 0x20] = 0x02
+		u8[A1 + 0x2a] |= 0x04
+		u8[A1 + 0x2a] &= ~0x20
+		u8[A1 + 0x26] = 0x28
+		D1.u16 = objA1.position.y.u16 - objA0.value32
+		u16[A4 + 0x02] = D1.u16
+	}
+}
+
+
+//# address-hook(0x039208) end(0x03925a)
+function void fn039208()
+{
+	D0.u8 = u8[A1 + 0x26]
+	LookupSinCos()
+	D1.s32 = s32(D1.s16) * s16[A1 + 0x1c]
+	D1.s32 >>= 8
+	objA1.velocity.x = D1.u16
+	D0.s32 = s32(D0.s16) * s16[A1 + 0x1c]
+	D0.s32 >>= 8
+	objA1.velocity.y = D0.u16
+	D0.u8 = u8[A1 + 0x26]
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * 0x50
+	D0.s32 >>= 8
+	if (s16[A1 + 0x1c] >= 0)
+	{
+		if (D0.s16 < 0)
+		{
+			D0.s32 >>= 2
+		}
+		if (s16[A1 + 0x1c] < 0x1800)
+		{
+			u16[A1 + 0x1c] += D0.u16
+		}
+	}
+	else
+	{
+		if (D0.s16 >= 0)
+		{
+			D0.s32 >>= 2
+		}
+		u16[A1 + 0x1c] += D0.u16
+	}
+}
+
+
+//# address-hook(0x03925c) end(0x0392b4)
+function void fn03925c()
+{
+	D0.u16 = u16[A4 + 0x02] - 0x16
+	if (D0.s16 < 0)
+	{
+		if (s16[A1 + 0x1c] < 0)
+		{
+			u8[A4] = 0
+			u8[A1 + 0x2e] = 0
+			u8[A1 + 0x26] = 0x70
+
+			fn039208()
+			return
+		}
+
+		D0 = 0
+	}
+
+	D0 = u32(D0.u16) * 0xdd
+	D0.u16 >>= 8
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * -0x2800
+	D0 >>= 16
+	objA1.position.x.u16 = D0.u16 + u16[A0 + 0x30]
+	objA1.position.y.u16 = u16[A4 + 0x02] + objA0.value32
+	D0.s32 = objA1.velocity.y
+	D0.s32 <<= 8
+	u32[A4 + 0x02] += D0
+}
+
+
+//# address-hook(0x0392b6) end(0x0392ec)
+function void fn0392b6()
+{
+	D0.u16 = u16[A4 + 0x02]
+	D0 = u32(D0.u16) * 0xaa
+	D0.s16 >>= 8
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * -0x2800
+	D0 >>= 16
+	objA1.position.x.u16 = D0.u16 + u16[A0 + 0x30]
+	objA1.position.y.u16 = u16[A4 + 0x02] + objA0.value32
+	D0.s32 = objA1.velocity.y
+	D0.s32 <<= 8
+	u32[A4 + 0x02] += D0
+}
+
+
+//# address-hook(0x0392ee) end(0x03931c)
+function void fn0392ee()
+{
+	D0.u16 = u16[A4 + 0x02] - 0xc0
+	D0.s32 = s32(D0.s16) * 0xaa
+	D0.s32 >>= 8
+	objA1.position.x.u16 = D0.u16 + u16[A0 + 0x30]
+	objA1.position.y.u16 = u16[A4 + 0x02] + objA0.value32
+	D0.s32 = objA1.velocity.y
+	D0.s32 <<= 8
+	u32[A4 + 0x02] += D0
+}
+
+
+//# address-hook(0x03931e) end(0x03935c)
+function void fn03931e()
+{
+	D0.u16 = u16[A4 + 0x02] - 0x0180
+	D0 = u32(D0.u16) * 0xaa
+	D0.s16 >>= 8
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * -0x2800
+	D0 >>= 16
+	objA1.position.x.u16 = D0.u16 + u16[A0 + 0x30] + 0x0100
+	objA1.position.y.u16 = u16[A4 + 0x02] + objA0.value32
+	D0.s32 = objA1.velocity.y
+	D0.s32 <<= 8
+	u32[A4 + 0x02] += D0
+}
+
+
+//# address-hook(0x03935e) end(0x03938c)
+function void fn03935e()
+{
+	D0.u16 = u16[A4 + 0x02] - 0x0240
+	D0.s32 = s32(D0.s16) * 0xaa
+	D0.s32 >>= 8
+	objA1.position.x.u16 = D0.u16 + u16[A0 + 0x30]
+	objA1.position.y.u16 = u16[A4 + 0x02] + objA0.value32
+	D0.s32 = objA1.velocity.y
+	D0.s32 <<= 8
+	u32[A4 + 0x02] += D0
+}
+
+
+//# address-hook(0x03938e) end(0x0393bc)
+function void fn03938e()
+{
+	D0.u16 = u16[A4 + 0x02] - 0x0240
+	D0.s32 = s32(D0.s16) * 0xaa
+	D0.s32 >>= 8
+	objA1.position.x.u16 = D0.u16 + u16[A0 + 0x30]
+	objA1.position.y.u16 = u16[A4 + 0x02] + objA0.value32
+	D0.s32 = objA1.velocity.y
+	D0.s32 <<= 8
+	u32[A4 + 0x02] += D0
+}
+
+
+//# address-hook(0x0393be) end(0x0393ec)
+function void fn0393be()
+{
+	D0.u16 = u16[A4 + 0x02] - 0x0540
+	D0.s32 = s32(D0.s16) * 0xaa
+	D0.s32 >>= 8
+	objA1.position.x.u16 = D0.u16 + u16[A0 + 0x30]
+	objA1.position.y.u16 = u16[A4 + 0x02] + objA0.value32
+	D0.s32 = objA1.velocity.y
+	D0.s32 <<= 8
+	u32[A4 + 0x02] += D0
+}

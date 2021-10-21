@@ -1,0 +1,380 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Penguin (from IceCap Zone)                            //
+//-------------------------------------------------------//
+
+//# address-hook(0x08bade) end(0x08bade)
+function void Penguin.Init()
+{
+	Object.InitWithUpdateAddress(0x08bae4)
+}
+
+
+//# address-hook(0x08bae4) end(0x08bafa)
+function void Penguin.Update()
+{
+	// Targets:
+	//  - 0x08bb0e	-> objA0.base_state = 0x00
+	//  - 0x08bb6a	-> objA0.base_state = 0x02
+	//  - 0x08bc04	-> objA0.base_state = 0x04
+	//  - 0x08bc1e	-> objA0.base_state = 0x06
+	//  - 0x08bc6c	-> objA0.base_state = 0x08
+	//  - 0x08bcba	-> objA0.base_state = 0x0a
+	//  - 0x08bcf4	-> objA0.base_state = 0x0c
+	//  - 0x08bd3c	-> objA0.base_state = 0x0e
+	call tableLookupAddress(0x08bafe, objA0.base_state)
+
+	Object.loadSpritePatterns(0x08be02)
+	fn085208()
+}
+
+
+//# address-hook(0x08bc04) end(0x08bc04)
+function void fn08bc04()
+{
+	fn085636()
+}
+
+
+//# address-hook(0x08bc1e) end(0x08bc22)
+function void fn08bc1e()
+{
+	MoveWithGravity20()
+	Object.TriggerOnGroundHit()
+}
+
+
+//# address-hook(0x08bc6c) end(0x08bc90)
+function void fn08bc6c()
+{
+	fn08bd88()
+	if (D1.s16 < -2)
+	{
+		objA0.velocity.x = -objA0.velocity.x
+    	s16[A0 + 0x40] = -s16[A0 + 0x40]
+    	objA0.render_flags ^= 0x01
+	}
+	else if (D1.s16 >= 12)
+	{
+		objA0.base_state = 0x06
+    	objA0.hitbox_extends.y = 0x0b
+    	objA0.countdown_callback = 0x08bc26
+	}
+	else
+	{
+		objA0.position.y.u16 += D1.u16
+		fn08bd9c()
+		fn08bdc2()
+		UpdateMovementStraightSimple()
+		Object.CountdownAndTrigger()
+	}
+}
+
+
+//# address-hook(0x08bd88) end(0x08bd96)
+function void fn08bd88()
+{
+	D3.u16 = objA0.velocity.x
+	D3.s32 = D3.s16
+	D3 <<= 8
+	D3 += objA0.position.x
+	D3 = (D3 << 16) + (D3 >> 16)
+	CheckGroundCollisionFixedX()
+}
+
+
+//# address-hook(0x08bd9c) end(0x08bdb0)
+function void fn08bd9c()
+{
+	D0 = 4
+	if (D3.u8 != 0)
+	{
+		D3.u8 >>= 3
+		D3.u16 &= 0x0f
+		D0.u8 = u8[0x08bdb2 + D3.s16]
+	}
+	objA0.animation.sprite = D0.u8
+}
+
+
+//# address-hook(0x08bdc2) end(0x08bdd8)
+function void fn08bdc2()
+{
+	if (objA0.countdown_value & 0x03)
+		return
+
+	playSound(0xc8)
+	spawnChildObjects(0x08bdfa)
+}
+
+
+//# address-hook(0x08bcba) end(0x08bcd8)
+function void fn08bcba()
+{
+	fn08bd88()
+	if (D1.s16 < -2)
+	{
+		objA0.velocity.x = -objA0.velocity.x
+    	s16[A0 + 0x40] = -s16[A0 + 0x40]
+    	objA0.render_flags ^= 0x01
+	}
+	else if (D1.s16 >= 12)
+	{
+		objA0.base_state = 0x06
+    	objA0.hitbox_extends.y = 0x0b
+    	objA0.countdown_callback = 0x08bc26
+	}
+	else
+	{
+		objA0.position.y.u16 += D1.u16
+		UpdateMovementStraightSimple()
+		Object.AnimationProgressByLocalA1()
+	}
+}
+
+
+//# address-hook(0x08bcf4) end(0x08bd3a)
+function void fn08bcf4()
+{
+	objA0.velocity.x += u16[A0 + 0x40]
+	if (objA0.velocity.x != 0)
+	{
+		fn08bd88()
+		if (D1.s16 >= -2 && D1.s16 < 12)
+		{
+			objA0.position.y.u16 += D1.u16
+			UpdateMovementStraightSimple()
+			return
+		}
+	}
+
+	objA0.base_state = 0x0e
+	D0 = objA0.subtype2c
+	objA0.countdown_value = D0.u16
+	objA0.countdown_callback = 0x08bb24
+	objA0.render_flags ^= 0x01
+}
+
+
+//# address-hook(0x08bd3c) end(0x08bd3c)
+function void fn08bd3c()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08bb0e) end(0x08bb1e)
+function void fn08bb0e()
+{
+	A1 = 0x08bddc
+	if (fn084fa4())
+		return
+
+	if (objA0.render_flags & render_flag.FLIP_Y)
+	{
+		objA0.render_flags &= ~render_flag.FLIP_Y
+		u8[A0 + 0x0a] |= 0x80
+	}
+
+	fn08bb24()
+}
+
+
+//# address-hook(0x08bb24) end(0x08bb68)
+function void fn08bb24()
+{
+	objA0.base_state = 0x02
+	objA0.hitbox_extends.x = 0x04
+	objA0.hitbox_extends.y = 0x0f
+	objA0.flags38 &= ~0x20
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+	objA0.countdown_value = 0
+	u32[A0 + 0x30] = 0x08be0a
+	objA0.countdown_callback = 0x08bbf4
+	D0 = (objA0.render_flags & render_flag.FLIP_X) ? 2 : -2
+	u16[A0 + 0x40] = D0.u16
+}
+
+
+//# address-hook(0x08bb6a) end(0x08bc02)
+function void fn08bb6a()
+{
+	fn084700()
+	if (!_equal())
+	{
+		if (objA0.flags2e <= 0x02)
+		{
+			CheckGroundCollision()
+			if (D3.u8 != 0)
+			{
+				if (objA0.render_flags & render_flag.FLIP_X)
+				{
+					D3 ^= 0x40
+				}
+				if ((D3 & 0x40) == 0)
+				{
+					objA0.base_state = 0x0e
+					objA0.countdown_value = 0x40
+					objA0.countdown_callback = 0x08bbac
+					fn08bbf4()
+					return
+				}
+			}
+
+			fn08bbac()
+			return
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x40]
+	D1.u16 = objA0.velocity.x + D0.u16
+	objA0.velocity.x = D1.u16
+	UpdateMovementStraightSimple()
+	fn0848b6()
+}
+
+
+//# address-hook(0x08bbac)
+function void fn08bbac()
+{
+	objA0.base_state = 0x04
+	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x200 : -0x200
+	s16[A0 + 0x40]   = (objA0.render_flags & render_flag.FLIP_X) ? -0x40 : 0x40
+	u32[A0 + 0x30] = 0x08be11
+	objA0.countdown_callback = 0x08bc08
+}
+
+
+
+//# address-hook(0x08bbf4)
+function void fn08bbf4()
+{
+	objA0.velocity.x = -objA0.velocity.x
+	s16[A0 + 0x40] = -s16[A0 + 0x40]
+	objA0.render_flags ^= 0x01
+}
+
+
+//# address-hook(0x08bc08) end(0x08bc1c)
+function void fn08bc08()
+{
+	objA0.base_state = 0x06
+	objA0.hitbox_extends.y = 0x0b
+	objA0.countdown_callback = 0x08bc26
+}
+
+
+//# address-hook(0x0848b6) end(0x0848e6)
+function void fn0848b6()
+{
+	D3 = s16(objA0.velocity.x) << 8
+	D3 += objA0.position.x
+	D3 = (D3 << 16) + (D3 >> 16)
+	CheckGroundCollisionFixedX()
+
+	if (D1.s16 >= -1 && D1.s16 < 12)
+	{
+		objA0.position.y.u16 += D1.u16
+		_setZeroFlagByValue(0)
+	}
+	else
+	{
+		A1 = objA0.countdown_callback
+		call A1
+		_setZeroFlagByValue(1)
+	}
+}
+
+
+//# address-hook(0x08bc26) end(0x08bc6a)
+function void fn08bc26()
+{
+	D4.u8 = abs(D3.s8) & 0xf8
+	if (D4.u8 != 0)
+	{
+		if (objA0.velocity.x >= 0)
+		{
+			D3 ^= 0x40
+		}
+		if ((D3 & 0x40) == 0)
+		{
+			objA0.velocity.x = -objA0.velocity.x
+			s16[A0 + 0x40] = -s16[A0 + 0x40]
+			objA0.render_flags ^= 0x01
+		}
+	}
+
+	objA0.base_state = 0x08
+	objA0.countdown_value = 0x20
+	objA0.countdown_callback = 0x08bc94
+	objA0.velocity.y = 0
+}
+
+
+//# address-hook(0x08bc94) end(0x08bcb8)
+function void fn08bc94()
+{
+	objA0.base_state = 0x0a
+	D0 = 0x08
+	D0.u8 -= objA0.animation.sprite
+	objA0.animation.frame = D0.u8
+	objA0.animation.timer = 0
+	u32[A0 + 0x30] = 0x08be16
+	objA0.countdown_callback = 0x08bcdc
+}
+
+
+//# address-hook(0x08bd40) end(0x08bd82)
+function void fn08bd40()
+{
+	setupObjectAttributesFull(0x08bdee)
+	MoveAndFlipWithParent()
+	D0 = objA0.subtype2c
+	if (D0.u8 != 0)
+	{
+		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		D0.u16 <<= 2
+		--D0.u16
+		objA0.countdown_value = D0.u16
+		objA0.countdown_callback = 0x08bd6c
+	}
+	else
+	{
+		fn08bd6c()
+	}
+}
+
+//# address-hook(0x08bd6c)
+function void fn08bd6c()
+{
+	objA0.update_address = 0x08bd7a
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	fn08bd7a()
+}
+
+//# address-hook(0x08bd7a)
+function void fn08bd7a()
+{
+	Object.animationProgress(0x08be1f)
+	DrawObject()
+}
+
+
+//# address-hook(0x08bcdc) end(0x08bcf2)
+function void fn08bcdc()
+{
+	objA0.base_state = 0x0c
+	objA0.animation.sprite = 0
+	objA0.hitbox_extends.y = 0x0f
+	objA0.position.y.u16 -= 0x04
+}

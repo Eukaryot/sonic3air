@@ -1,0 +1,204 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Suddenly appearing sand wall                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x040b16) end(0x040b42)
+function void fn040b16()
+{
+	objA0.mapping_offset = 0x040d10
+	objA0.sprite_attributes = 0x4432
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x34
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x30] = 0x19
+
+	objA0.update_address = 0x040b48
+	fn040b48()
+}
+
+
+//# address-hook(0x040b48) end(0x040b5e)
+function void fn040b48()
+{
+	D1 = objA0.subtype2c
+	D2.u16 = objA0.subtype2c * 2
+
+	A1 = 0xffffb000
+	fn040b62()
+
+	A1 = 0xffffb04a
+	fn040b62()
+
+	fn040c0e()
+}
+
+
+//# address-hook(0x040b62) end(0x040bc8)
+function void fn040b62()
+{
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	if (D0.u16 < D2.u16)
+	{
+		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0xa4
+		if (D0.u16 < 0xc0)
+		{
+			if (debug_mode.state == 0)
+			{
+				objA0.render_flags |= 0x40
+				u16[A0 + 0x16] = 2
+
+				A2 = A0 + 0x18
+				u16[(A2+=2)-2] = objA0.position.x.u16
+				u16[(A2+=2)-2] = objA0.position.y.u16
+				u16[(A2+=2)-2] = 9
+				u16[(A2+=2)-2] = objA0.position.x.u16
+				u16[(A2+=2)-2] = objA0.position.y.u16
+				u16[(A2+=2)-2] = 0
+				objA0.animation.timer = 3
+
+				playSound(0x47)
+				objA0.update_address = 0x040bca
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x040bca) end(0x040c08)
+function void fn040bca()
+{
+	A2 = A0 + 0x18
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 3
+		++u8[A0 + 0x1d]
+		if (u8[A0 + 0x1d] >= 13)
+		{
+			u8[A0 + 0x1d] = 9
+		}
+	}
+
+	objA0.position.y.u16 -= 4
+	objA0.state.both = objA0.position.y.u16
+
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		objA0.render_flags &= ~0x40
+		u16[A0 + 0x16] = 0
+		objA0.update_address = 0x040c2a
+	}
+
+	fn040c0e()
+}
+
+
+//# address-hook(0x040c0e) end(0x040c24)
+function void fn040c0e()
+{
+	D1.u16 = 0x17
+	D2.u16 = 0x34
+	D3.u16 = 0x35
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x040c2a) end(0x040ce6)
+function void fn040c2a()
+{
+	D1.u16 = 0x17
+	D2.u16 = 0x34
+	D3.u16 = 0x35
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	bool crumble = false
+
+	if (D6 & 0x01)
+	{
+		A1 = 0xffffb000
+		crumble = (u8[A1 + 0x20] == 0x02)
+	}
+
+	if (D6 & 0x02 && !crumble)
+	{
+		A1 = 0xffffb04a
+		crumble = (u8[A1 + 0x20] == 0x02)
+	}
+
+	if (crumble)
+	{
+		objA1.velocity.x >>= 1
+		s16[A1 + 0x1c] >>= 1
+
+		playSound(0x82)
+
+		objA0.update_address = 0x040cec
+		objA0.animation.timer = 5
+		objA0.animation.sprite = 1
+
+		A1 = 0xffffb000
+		if (objA0.flags2a & 0x08)
+		{
+			objA0.flags2a &= ~0x08
+			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] |= 0x02
+		}
+
+		if (objA0.flags2a & 0x20)
+		{
+			objA0.flags2a &= ~0x20
+			u8[A1 + 0x2a] &= ~0x20
+		}
+
+		A1 = 0xffffb04a
+		if (objA0.flags2a & 0x10)
+		{
+			objA0.flags2a &= ~0x10
+			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] |= 0x02
+		}
+
+		if (objA0.flags2a & 0x40)
+		{
+			objA0.flags2a &= ~0x40
+			u8[A1 + 0x2a] &= ~0x20
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x040cec) end(0x040d0a)
+function void fn040cec()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 5
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 9)
+		{
+			objA0.position.x.u16 = 0x7f00
+		}
+	}
+
+	DrawOrUnloadObject()
+}

@@ -1,0 +1,255 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Cutscene with Knuckles after AIZ 2 Boss               //
+//-------------------------------------------------------//
+
+//# address-hook(0x065bd4) end(0x065bf6)
+function void fn065bd4()
+{
+	// This is also used in CNZ 2
+
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+#if STANDALONE
+	// Also unload for other characters in Time Attack, which skips Knuckles cutscenes anyway
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
+
+	setupObjectAttributesFull(0x066402)
+	objA0.update_address = 0x065c04
+	objA0.position.y.u16 += 4
+
+	addPatternLoadingCue(0x065bfc)
+}
+
+
+
+// Knuckles in action again!
+
+//# address-hook(0x061f98) end(0x061fb0)
+function void fn061f98()
+{
+	// Targets:
+	//  - 0x061fc2	-> objA0.base_state = 0x00
+	//  - 0x062014	-> objA0.base_state = 0x02
+	//  - 0x062022	-> objA0.base_state = 0x04
+	//  - 0x06206e	-> objA0.base_state = 0x06
+	//  - 0x0620aa	-> objA0.base_state = 0x08
+	//  - 0x0620e4	-> objA0.base_state = 0x0a
+	call tableLookupAddress(0x061fb6, objA0.base_state)
+
+	Object.loadSpritePatternsForVDP(0x06666a)
+	DrawObject()
+}
+
+
+//# address-hook(0x061fc2) end(0x062012)
+function void fn061fc2()
+{
+	A1 = 0x0663ba
+	if (fn084fa4())
+		return
+
+	objA0.position.x.u16 = 0x4b8e
+	objA0.position.y.u16 = 0x017d
+	objA0.render_flags |= render_flag.FLIP_X
+	fn065dd6()
+
+	objA0.countdown_value = 119
+	objA0.countdown_callback = 0x06201a
+
+	CutsceneKnuckles.loadPalette()
+
+	spawnSimpleChildObjects(0x06655a)
+
+	if (_equal())
+	{
+		objA1.position.x.u16 = 0x4b08
+		objA1.position.y.u16 = 0x0178
+	}
+}
+
+
+//# address-hook(0x06206e) end(0x062074)
+function void fn06206e()
+{
+	Object.AnimationProgressByLocalA1()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x0620e4) end(0x0620e4)
+function void fn0620e4()
+{
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x0620ea) end(0x06210c)
+function void fn0620ea()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.box_size.x = 0x08
+	D1 = 0x13
+	D2.u16 = 0x20
+	D3.u16 = 0x40
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+}
+
+
+//# address-hook(0x062158) end(0x062158)
+function void fn062158()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x06201a) end(0x062020)
+function void fn06201a()
+{
+	objA0.base_state = 0x04
+}
+
+
+//# address-hook(0x0625a6) end(0x0625ba)
+function void fn0625a6()
+{
+	objA0.base_state = 0x08
+	objA0.countdown_value = 0x7f
+	objA0.countdown_callback = 0x0625ca
+	fn062080()
+}
+
+
+//# address-hook(0x06207a) end(0x06207a)
+function void fn06207a()
+{
+	objA0.base_state = 0x08
+	fn062080()
+}
+
+
+//# address-hook(0x062080) end(0x062086)
+function void fn062080()
+{
+	objA0.velocity.x = -0x100
+	objA0.velocity.y = -0x400
+	fn06208c()
+}
+
+
+//# address-hook(0x06208c) end(0x0620a8)
+function void fn06208c()
+{
+	u32[A0 + 0x30] = 0x0666af
+	objA0.animation.timer = 0
+	objA0.animation.frame = 0
+	objA0.animation.sprite = 0x08
+	objA0.hitbox_extends.y = 0x13
+}
+
+
+//# address-hook(0x01e6ec) end(0x01e718)
+function void fn01e6ec()
+{
+	objA0.mapping_offset = 0x01e758
+	objA0.sprite_attributes = 0x85a0
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x0c
+	objA0.animation.sprite = 0
+
+	objA0.update_address = 0x01e71e
+	fn01e71e()
+}
+
+
+//# address-hook(0x01e71e) end(0x01e72c)
+function void fn01e71e()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) >= 0)
+		return
+
+	objA0.animation.timer = 3
+	objA0.update_address = 0x01e732
+	fn01e732()
+}
+
+
+//# address-hook(0x01e732) end(0x01e752)
+function void fn01e732()
+{
+	UpdateMovementStraightSimple()
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		++objA0.animation.sprite
+		if (objA0.animation.sprite == 5)
+		{
+			UnloadObject()
+			return
+		}
+	}
+	DrawObject()
+}
+
+
+
+//# address-hook(0x0863c0) end(0x0863e6)
+function void fn0863c0()
+{
+	// Tails there?
+	if (u32[0xffffb04a] == 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	player2.control_override = 1
+	tails.control_counter = 0
+
+	objA0.update_address = 0x0863d6
+	fn0863d6()
+}
+
+
+//# address-hook(0x0863d6)
+function void fn0863d6()
+{
+	if (player2.control_override != 0)
+	{
+		control.tails = 0
+	}
+	else
+	{
+		control.pad2 = 0
+		UnloadObject()
+	}
+}

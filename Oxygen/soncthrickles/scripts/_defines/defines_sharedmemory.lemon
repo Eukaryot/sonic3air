@@ -1,0 +1,61 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Shared memory usage                                   //
+//-------------------------------------------------------//
+
+// Total available shared memory address space:
+// 0x800000 .. 0x8fffff (= 1 MB)
+
+
+// 0x800000 .. 0x800fff
+// Buffer for temporary use
+//  -> In Blue Spheres for data exchange with C++ code
+//  -> In Slot Machine stage rendering
+//  -> For credits data generation
+
+
+// Random number for the current game, for monitor and special stages randomization
+define global.game_random_base	=  u8[0x801000]
+
+// Random number for current level, gets reset on each restart incl. death
+define global.level_random_base	=  u8[0x801001]
+
+// Used in Time Attack to write the extended animation sprite to (supporting Drop Dash & Peel-Out sprites)
+define timeattack.animSpriteEx	= u16[0x801002]
+
+
+// 0x801100 .. 0x8011ff
+// Additional save slots data, a block of 0x20 bytes for each of the 8 slots
+//  - Currently only the first 4 bytes are used, for storing the score
+
+
+// 0x802000 .. 0x8025ff
+// Additional palettes (palette lines 4 to 15)
+//  - 0x802000 .. 0x80217f	-> Primary palette, with fading applied (continuation of 0xfffffc00)
+//  - 0x802180 .. 0x8022ff	-> Primary palette, with no fading applied (continuation of 0xfffffc80)
+//  - 0x802300 .. 0x80247f	-> Secondary palette, with fading applied (continuation of 0xfffff080)
+//  - 0x802480 .. 0x8025ff	-> Secondary palette, with no fading applied (continuation of 0xfffff000)
+
+// Usage of additional palette lines:
+//  - Palette lines 4+5: Sonic palette
+//  - Palette lines 6+7: Tails palette
+//  - Palette lines 8+9: Knuckles palette (also used for Cutscene Knuckles)
+
+
+
+// 0x810000 .. 0x813fff	-> Level object placement table
+// 0x814000 .. 0x816fff	-> Level ring placement table
+
+// 0x817000 .. 0x817fff	-> Multi-sample collision region table
+
+// 0x818000 .. 0x81807f	-> Vertical scroll offsets buffer, 32 * 2 words (used instead of 0xffffeeea .. 0xffffef39)
+// 0x818080				-> Single flag that is set to 1 if 0x818000 should be used at all

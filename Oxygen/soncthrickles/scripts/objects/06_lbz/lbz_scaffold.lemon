@@ -1,0 +1,40 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Scaffold object (in LBZ 2 mid-boss cutscene for Sonic & Tails)
+
+//# address-hook(0x062ac2) end(0x062ae8)
+function void fn062ac2()
+{
+	setupObjectAttributesFull(0x066426)
+
+	if (objA0.render_flags & render_flag.FLIP_Y)
+	{
+		objA0.render_flags &= ~render_flag.FLIP_Y
+		u8[A0 + 0x0a] |= 0x80
+	}
+
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		objA0.render_flags &= ~render_flag.FLIP_X
+		objA0.sprite_priority = 0
+	}
+
+	objA0.update_address = 0x062aee
+	fn062aee()
+}
+
+
+//# address-hook(0x062aee) end(0x062af6)
+function void fn062aee()
+{
+	objA0.position.y.u16 += u16[0xffffeee6]
+	DrawOrUnloadObject()
+}

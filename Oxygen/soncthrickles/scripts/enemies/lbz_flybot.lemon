@@ -1,0 +1,284 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Fly Bot (from Launch Base Zone)                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x08c966) end(0x08c966)
+function void fn08c966()
+{
+	Object.InitWithUpdateAddress(0x08c96c)
+}
+
+
+//# address-hook(0x08c96c) end(0x08c982)
+function void fn08c96c()
+{
+	// Targets:
+	//  - 0x08c994	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x08c9b2	-> objA0.base_state = 0x02  -> Flying
+	//  - 0x08ca16	-> objA0.base_state = 0x04  -> Beginning attack
+	//  - 0x08ca60	-> objA0.base_state = 0x06  -> Attacking (flying down)
+	//  - 0x08ca96	-> objA0.base_state = 0x08  -> Flying up
+	//  - 0x08cada	-> objA0.base_state = 0x0a  -> Turning around and flying back again
+	call tableLookupAddress(0x08c988, objA0.base_state)
+	if (checkForMultiReturn())
+		return
+
+	Object.loadSpritePatterns(0x08cb22)
+	fn085208()
+}
+
+
+//# address-hook(0x08c994) end(0x08c9b0)
+function void fn08c994()
+{
+	A1 = 0x08cb10
+	if (fn084fa4())
+	{
+		signalMultiReturn()
+		return
+	}
+
+	u32[A0 + 0x30] = 0x08cb2a
+	u8[A0 + 0x42] = 0
+	u8[A0 + 0x43] = 0xc0
+}
+
+
+//# address-hook(0x08c9b2) end(0x08ca14)
+function void fn08c9b2()
+{
+	A1 = 0xffffb000
+	D0.u16 = 0x0200
+	D1 = 0x10
+	fn08548e()
+
+	D0.u16 = 0x0100
+	D1 = 0x10
+	fn0854ba()
+
+	UpdateMovementStraightSimple()
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+
+	if (D1.u16 != 0 && D2.u16 < 0x60)
+	{
+		objA0.base_state = 0x04
+		objA0.velocity.y = 0
+		u16[A0 + 0x44] = objA0.position.y.u16
+		objA0.animation.frame = 0
+		objA0.animation.timer = 0
+		u32[A0 + 0x30] = 0x08cb36
+		objA0.countdown_callback = 0x08ca22
+	}
+	else
+	{
+		fn084b6e()
+		Object.AnimationProgressByLocalA1()
+	}
+}
+
+
+//# address-hook(0x08ca16) end(0x08ca1c)
+function void fn08ca16()
+{
+	UpdateMovementStraightSimple()
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x08ca22) end(0x08ca5e)
+function void fn08ca22()
+{
+	objA0.base_state = 0x06
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+
+	if (D0.u16 == 0)
+	{
+		D1.s16 = -0x200
+		objA0.render_flags &= ~render_flag.FLIP_X
+	}
+	else
+	{
+		D1.s16 = 0x200
+		objA0.render_flags |= render_flag.FLIP_X
+	}
+
+	objA0.velocity.x = D1.u16
+	u32[A0 + 0x30] = 0x08cb3f
+	objA0.velocity.y = 0x0200
+	objA0.countdown_value = 0x20
+}
+
+
+//# address-hook(0x08ca60) end(0x08ca94)
+function void fn08ca60()
+{
+	UpdateMovementStraightSimple()
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		CheckDistanceToPlayers()
+		if (D1.u16 == 0)
+		{
+			objA0.base_state = 0x08
+			u32[A0 + 0x30] = 0x08cb4b
+			objA0.animation.frame = 0
+			objA0.animation.timer = 0
+			objA0.velocity.y = -objA0.velocity.y
+			return
+		}
+	}
+
+	Object.AnimationProgressByLocalA1()
+}
+
+
+//# address-hook(0x08ca96) end(0x08cad8)
+function void fn08ca96()
+{
+	UpdateMovementStraightSimple()
+	D0.u16 = objA0.position.y.u16
+	if (D0.u16 >= u16[A0 + 0x44])
+	{
+		Object.AnimationProgressByLocalA1()
+		return
+	}
+
+	objA0.base_state = 0x0a
+	u32[A0 + 0x30] = 0x08cb2a
+	objA0.animation.frame = 0
+	objA0.animation.timer = 0
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x08cb08
+}
+
+
+//# address-hook(0x08cada) end(0x08cb02)
+function void fn08cada()
+{
+	A1 = 0xffffb000
+	D0.u16 = 0x0200
+	D1 = 0x10
+	fn08548e()
+
+	D0.u16 = 0x0100
+	D1 = 0x10
+	fn0854ba()
+
+	UpdateMovementStraightSimple()
+	fn084b6e()
+	Object.AnimationProgressByLocalA1()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08cb08) end(0x08cb0e)
+function void fn08cb08()
+{
+	objA0.base_state = 0x02
+}
+
+
+
+//-------------------------------------------------------//
+// Fly Bot Alert                                         //
+//-------------------------------------------------------//
+
+//# address-hook(0x029446) end(0x029464)
+function void FlyBotAlert.Init()
+{
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+	u8[A0 + 0x28] = 0xd7
+
+	objA0.update_address = 0x02946a
+	FlyBotAlert.Update()
+}
+
+
+//# address-hook(0x02946a) end(0x029502)
+function void FlyBotAlert.Update()
+{
+	if (u16[A0 + 0x30] != 0)
+	{
+		// Countdown until alert stops
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] != 0)
+		{
+			if ((objA0.subtype2c & 0x01) != 0 && u16[A0 + 0x30] == 0x41)
+			{
+				FlyBotAlert.CallFlyBot()
+			}
+
+			D0.u16 = u16[A0 + 0x30] & 0xff1f
+			if (D0.u8 == 0)
+			{
+				playSound(0x86)
+			}
+			return
+		}
+
+		u16[0xfffff7f4] = 0
+	}
+	else
+	{
+		// Check if any character is in collision
+		if (u8[A0 + 0x29] != 0)
+		{
+			u8[A0 + 0x29] = 0
+			u16[A0 + 0x30] = 0x81
+			u16[0xfffff7f4] = 1
+			if ((objA0.subtype2c & 0x01) == 0)
+			{
+				FlyBotAlert.CallFlyBot()
+			}
+			return
+		}
+	}
+
+	AddAsDynamicObject()
+	CheckForUnloadObject()
+}
+
+
+function void FlyBotAlert.CallFlyBot()
+{
+#if STANDALONE
+	// No spawn of bonus counter got too high, so this can't get abused any more
+	if (score.bonus_counter >= 4)
+		return
+#endif
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x08c966
+
+		// Note: offsetX is always -0xc0 or 0xc0, offsetY is always -0x60
+		D0.u16 = (objA0.subtype2c * 4) & 0x0c
+		s16 offsetX = u16[0x029508 + D0.s16]
+		s16 offsetY = u16[0x02950a + D0.s16]
+	#if STANDALONE
+		// Flybot spawns on screen without that
+		offsetX = (offsetX > 0) ? (getScreenWidth() / 2 + 0x20) : (-s16(getScreenWidth()) / 2 - 0x10)
+	#endif
+
+		A2 = 0xffffb000
+		objA1.position.x.u16 = u16[A2 + 0x10] + offsetX
+		objA1.position.y.u16 = u16[A2 + 0x14] + offsetY
+	}
+}

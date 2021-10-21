@@ -1,0 +1,157 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03bbee) end(0x03bd14)
+function void fn03bbee()
+{
+	D0.u16 = (objA0.subtype2c >> 4) & 0x07
+	objA0.state = D0.u8
+	D0.u16 &= 0x06
+	objA0.box_size.x = u8[0x03bbe8 + D0.s16]
+	objA0.box_size.y = u8[0x03bbe9 + D0.s16]
+	objA0.mapping_offset = 0x03bd8e
+	objA0.sprite_attributes = 0x23d2
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	Object.animationUpdate(0x03bd5e)
+	if (s8[A0 + 0x2c] < 0)
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			if (u8[A2] & 0x01)
+			{
+				objA0.position.y.u16 += 0x40
+				objA0.update_address = 0x03bcf2
+				fn03bcf2()
+				return
+			}
+		}
+
+		objA0.update_address = 0x03bd1a
+		fn03bd1a()
+	}
+	else
+	{
+		objA0.update_address = 0x03bc72
+		fn03bc72()
+	}
+}
+
+
+//# address-hook(0x03bc72) end(0x03bcec)
+function void fn03bc72()
+{
+	D0.u16 = objA0.subtype2c & 0x0f
+	A3 = 0xfffff7e0
+	if (u8[A3 + D0.s16] != 0)
+	{
+		objA0.update_address = 0x03bc92
+		playSound(0x8f)
+
+		fn03bc92()
+	}
+	else
+	{
+		fn03bcf2()
+	}
+}
+
+
+//# address-hook(0x03bc92)
+function void fn03bc92()
+{
+	u8 change = 1
+#if STANDALONE
+	if (Game.getSetting(SETTING_FBZ_SCREWDOORS))
+	{
+		// Only make the short types faster
+		change = ((objA0.subtype2c & 0x20) || (objA0.subtype2c & 0x40) == 0) ? 2 : 1
+	}
+#endif
+	objA0.flags2e += change
+	if (objA0.flags2e >= 0x80)
+	{
+		objA0.update_address = 0x03bcf2
+	}
+
+	D0 = objA0.flags2e
+	if (objA0.subtype2c & 0x10)
+	{
+		D0.s16 = -D0.s16
+	}
+
+	if (objA0.subtype2c & 0x20)
+	{
+		objA0.position.x.u16 = u16[A0 + 0x44] + (D0.s16 >> 1)
+	}
+	else if (objA0.subtype2c & 0x40)
+	{
+		objA0.position.x.u16 = u16[A0 + 0x44] + D0.s16
+	}
+	else
+	{
+		objA0.position.y.u16 = u16[A0 + 0x46] + (D0.s16 >> 1)
+	}
+
+	Object.animationUpdate(0x03bd5e)
+
+	fn03bcf2()
+}
+
+
+//# address-hook(0x03bcf2) end(0x03bd14)
+function void fn03bcf2()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x03bd1a) end(0x03bd5a)
+function void fn03bd1a()
+{
+	A1 = 0xffffb000
+	D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x20
+	if (D0.u16 >= 0x40)
+	{
+		fn03bcf2()
+		return
+	}
+
+	D0.s16 = objA1.position.x.u16 - objA0.position.x.u16
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s16 = -D0.s16
+	}
+	if (D0.s16 < 0x40)
+	{
+		fn03bcf2()
+		return
+	}
+
+	if (objA0.respawn_entry)
+	{
+		A2 = 0xffff0000 + objA0.respawn_entry
+		u8[A2] |= 0x01
+	}
+
+	objA0.update_address = 0x03bc92
+	fn03bc92()
+}

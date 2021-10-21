@@ -1,0 +1,2332 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Game mode: Main game                                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x005fb2) end(0x0067b4)
+function void GameMode.MainGame()
+{
+@005fb2:
+#if STANDALONE
+	if (global.in_extra_stage == 0 && checkpoint.number == 0)
+	{
+		Standalone.onLevelStart()
+	}
+#endif
+
+	initializeMainGame()
+
+	if (competition_mode.active == 0)
+	{
+		// For any normal zone, except for AIZ 1 startup (for all characters):
+		// Start loading patterns
+		if (global.zone < 0x0e && (global.zone_act != 0x0000 || checkpoint.number != 0))
+		{
+			StartLoadingPatternsForZone()
+		}
+
+		palette_fade.range = 0x202f		// Only palette entries 0x10...0x3f
+		SetPaletteFadedOut()
+
+		global.fade_timer = 0x16
+		u16[0xffffb27e] = 0x16
+		control.pad1 = 0x7f00
+		control.pad2 = 0x7f00
+		checkpoint.number &= 0x7f
+		global.game_mode &= ~0x80
+
+		// Here comes the main game loop!
+		#if !STANDALONE
+		{
+			// We prefer to do a jump to asm here instead of executing the main loop in lemon script
+			jump 0x00650c
+		}
+		#endif
+
+		while (true)
+		{
+			UpdateGamePause()
+		@EntryPoint_GamePaused:
+
+			global.frame_state = 0x08
+			Kosinski.ProcessDecompressionQueue()
+
+			// End point for a single frame
+			//  -> Right here we place the entry point for the standalone version
+			waitForNextFrame()
+		@EntryPoint:
+
+			++level.framecounter
+
+		#if STANDALONE
+			// Try to process as much Kosinski decompression as possible
+			//  -> It's important to do this at the beginning of a frame, not at the end (like with the "Kosinski.ProcessModules()"),
+			//     otherwise Egg Robo sprites will get loaded too early in (at least) MHZ 2 and in MGZ 2 S/T boss with Knuckles
+			while (kosinski.queue_size + kosinski.waiting_modules > 0)
+			{
+				Kosinski.ProcessDecompressionQueue()
+				Kosinski.ProcessModules()
+			}
+		#endif
+
+			UpdateRollingDemo()
+			UpdatePaletteEffects()
+			UpdateSpecialScrolling()
+
+			DynamicObjectsLoading()
+			UpdateGameObjects()
+
+			if (level.restart)
+			{
+				jump @005fb2
+			}
+
+			UpdateCamera()
+			UpdateLevelDisplay()
+			UpdateWater()
+			UpdateListOfRingsAround()
+
+			if (global.zone == 0x09)
+			{
+				fn01cacc()
+			}
+
+			LevelTilesAnimation()
+			LoadRequiredSpritePatterns()
+
+			Kosinski.ProcessModules()
+
+			UpdateOscillatingNumbers()
+			UpdateGlobalRingAnimation()
+			RenderSprites()
+
+			if (global.zone == 0x15)	// Slot Machine bonus stage
+			{
+				BonusSM.RenderRotatingMaze()
+				BonusSM.UpdateSlotMachine()
+			}
+
+			// When game mode changed, get out of here
+			if (global.game_mode != 0x08 && global.game_mode != 0x0c)
+				return
+
+			if (global.game_mode == 0x08)
+			{
+				// Handling for rolling demo
+				if (level.restart || global.demo_countdown == 0)
+					break
+			}
+		}
+	}
+	else
+	{
+		// Competition mode
+		u16[0xffffff7e] = 0
+		if (debug_mode.unlocked && u8[0xffffff7c] == 0xa0)
+		{
+			u16[0xffffff7e] = levelselect.soundtest << 8
+		}
+
+		palette_fade.range = 0x003f
+		SetPaletteFadedOut()
+		global.fade_timer = 0x16
+		u16[0xffffff7c] = 0
+		global.game_mode &= ~0x80
+
+		while (true)
+		{
+		// 0x006678:
+			UpdateGamePause()
+
+			global.frame_state = 0x08
+			Kosinski.ProcessDecompressionQueue()
+			waitForNextFrame()
+
+		@EntryPointCompetition:
+			++level.framecounter
+
+			u16 counter = 4
+			while (true)
+			{
+				UpdateRollingDemo()
+				UpdateGameObjects()
+				UpdateCamera()
+
+				--counter
+				if (counter == 0)
+					break
+
+				bool carry = (u32(u16[0xffffff7c]) + u16[0xffffff7e]) >= 0x10000
+				u16[0xffffff7c] += u16[0xffffff7e]
+				if (!carry)
+				{
+					--counter
+					if (counter == 0)
+						break
+				}
+
+			#if STANDALONE
+				// Run the loop only once per frame, and only to this point
+				//  -> The rest (in else-part) won't get executed on standalone
+				break
+
+			#else
+
+				UpdateGamePause()
+
+				u16[0xa11100] = 0x0100
+				UpdateControllers()
+				u16[0xa11100] = 0
+
+				u16[0xfffffb00] = 0
+				u32[0xfffffbfc] = 0xfffffb00
+
+				for (A5 = 0xffffac00; A5 < 0xffffb000; A5 += 0x80)
+				{
+					u16[A5] = 0
+				}
+			#endif
+			}
+
+			if (level.restart != 0)
+			{
+				jump @005fb2
+			}
+
+			UpdateLevelDisplay()
+			LevelTilesAnimation()
+			RenderSprites()
+			UpdatePaletteEffects()
+			LoadRequiredSpritePatterns()
+			Kosinski.ProcessModules()
+
+			// When game mode changed, get out of here
+			if (global.game_mode != 0x08 && global.game_mode != 0x0c)
+				return
+
+			if (global.game_mode == 0x08)
+			{
+				// Handling for rolling demo
+				if (level.restart || global.demo_countdown == 0)
+					break
+			}
+		}
+	}
+
+	// The following is shared code for both cases (starting from 0x0065e0 and 0x00675c)
+	if (global.game_mode == 0x08)
+	{
+		global.game_mode = 0
+		return
+	}
+
+	// The rest here looks like it's dead code
+	assert(false, "Entered what is supposed to be dead code")
+
+	global.demo_countdown = 60
+	palette_fade.range = 0x003f
+	u16[0xfffff794] = 0
+
+	while (global.demo_countdown != 0)
+	{
+		global.frame_state = 0x08
+		waitForNextFrame()
+
+		UpdateRollingDemo()
+		UpdateGameObjects()
+		UpdateCamera()
+		UpdateLevelDisplay()
+		RenderSprites()
+		DynamicObjectsLoading()
+		Kosinski.ProcessModules()
+
+		--u16[0xfffff794]
+		if (s16[0xfffff794] < 0)
+		{
+			u16[0xfffff794] = 2
+			FadeOutPalette()
+		}
+	}
+}
+
+
+//# address-hook(0x0013e4) end(0x0014e4)
+function void UpdateGamePause()
+{
+#if !GAMEAPP
+	// This is only used in outro; and there's no actual need to prevent game pause there
+	if (global.pause_disabled)
+		return
+#endif
+
+	if (lives_counter <= 0)
+	{
+		global.game.paused = false
+		return
+	}
+
+#if GAMEAPP
+	// In game app, global.game.paused will never be true -- instead, the whole script execution will get paused
+
+	// Start button pressed?
+	if (control.pad1.pressed & CONTROL_START)
+	{
+		if (global.game_mode == 0x0c && isSonicIntro() && global.level_started == 0)
+		{
+			// Skip AIZ 1 Sonic intro
+			//  -> Note that the Knuckles intro has its own handler
+			timer.alldata = 0
+			checkpoint.number = 1
+			checkpoint.x = 0x13a0
+			checkpoint.y = 0x041a
+			Checkpoint.SaveCurrentState()
+			checkpoint.camera.x = 0x1308
+			checkpoint.camera.y = 0x0390
+			level.restart = 1
+		}
+		else
+		{
+			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb005] <= 0x04) && !competition_mode.active
+			Game.onGamePause(canRestart)
+		}
+	}
+
+#else
+
+	if (!global.game.paused)
+	{
+		// Start button pressed?
+		if ((control.pad1.pressed & CONTROL_START) == 0)
+			return
+
+		// Entering game pause
+		global.game.paused = true
+	}
+
+	syncZ80_variantB(0x01)
+
+	while (true)
+	{
+		global.frame_state = 0x10
+		waitForNextFrame()
+	@EntryPoint:
+
+		if (pausecheats.unlocked)
+		{
+			if (control.pad1.pressed & CONTROL_A)
+			{
+				global.game_mode = 0x04
+				break
+			}
+
+			if (control.pad1.state & CONTROL_B || control.pad1.pressed & CONTROL_C)
+			{
+				// Single step
+				global.game.paused = true
+				syncZ80_variantB(0x80)
+				return
+			}
+		}
+
+		// In competition mode, button B during pause quits the stage
+		if (global.zone >= 0x0e && global.zone <= 0x12)
+		{
+			if ((control.pad1.pressed & CONTROL_B) && s8[0xffffff8b] < 0)
+			{
+				global.game_mode = 0xc0
+				break
+			}
+		}
+
+		if (control.pad1.pressed & CONTROL_START)
+			break
+	}
+
+	syncZ80_variantB(0x80)
+
+	global.game.paused = false
+#endif
+}
+
+
+
+//-------------------------------------------------------//
+// Initialization                                        //
+//-------------------------------------------------------//
+
+function void initializeMainGame()
+{
+	global.game_mode |= 0x80
+	if (s16(global.rolling_demo) >= 0)
+	{
+		playSound(MUSIC_CTRL_FADEOUT)
+	}
+#if STANDALONE
+	// Reset music tempo
+	Standalone.setFastMusicFlag(FastMusicFlag.MUSIC_TEMPO, false)
+	Standalone.setFastMusicFlag(FastMusicFlag.SUPER_THEME, false)
+
+	// Just to be sure this is not active
+	Game.endSkippableCutscene()
+
+	Input.setTouchInputMode(TOUCH_INPUT_MODE_NORMAL_CONTROLS)
+
+#if GAMEAPP
+	Game.setUnderwaterAudioEffect(0)
+#endif
+#endif
+
+	global.pause_disabled = 0
+	kosinski.queue_size = 0
+	zeroMemory(0xffffff10, 0x1b * 4)
+	ClearPatternLoadingQueue()
+
+	if (global.zone_act == 0x0d01)
+	{
+		FadeScreenToWhiteBlocking()
+
+	#if STANDALONE
+		// Avoid some black frames when screen should stay white
+		VDP.Config.setActiveDisplay(false)
+	#endif
+	}
+	else if (global.zone_act == 0x1701 && global.in_extra_stage != 0)
+	{
+		// Hidden Palace when entered through a giant ring
+		FadeScreenToWhiteBlocking()
+
+	#if STANDALONE
+		// Avoid some black frames when screen should stay white
+		VDP.Config.setActiveDisplay(false)
+	#endif
+	}
+	else
+	{
+		FadeOutScreenBlocking()
+
+	#if STANDALONE
+		global.zone_act = Game.onFadedOutLoadingZone(global.zone_act)
+	#endif
+	}
+
+	#if STANDALONE
+	{
+		Renderer.resetSprites()
+
+		if (Game.isTimeAttack())
+		{
+			// Don't use "isMainCharacter" or similar here, it's not initialized yet
+			if (global.zone_act == 0x0701 && levelselect.characters != CHARS_KNUCKLES_ALONE)
+			{
+				// MHZ 2: Start after the initial cutscene
+				// TODO: The checkpoint number gets reset to 0 later in initialization again
+				//     -> This is fine for Time Attack in MHZ 2, but not in other cases like Time Attack in SSZ
+				checkpoint.number = 7
+				checkpoint.x = 0x052a
+				checkpoint.y = 0x05ac
+			}
+		}
+
+		if (!Game.getSetting(SETTING_CONTINUE_MUSIC))
+		{
+			// Stop music
+			Audio.stopChannel(0)
+		}
+	}
+	#endif
+
+	if (s16(global.rolling_demo) >= 0)
+	{
+	#if !STANDALONE
+		set_status_register(0x2700)
+	#endif
+		fn0011ca()
+	#if !STANDALONE
+		set_status_register(0x2300)
+	#endif
+
+		level.framecounter = 0
+		if (checkpoint.number != 0)
+		{
+			if (global.stage_type == 0)
+			{
+				global.zone_act = checkpoint.zone_act
+				global.zone_act.apparent = checkpoint.zone_act.apparent
+			}
+			else
+			{
+				global.zone_act = level.backup.zone_act
+				global.zone_act.apparent = u16[0xffffff9c]
+			}
+		}
+
+		if (global.zone_act != 0x0401 || checkpoint.number != 6)
+		{
+			A2 = MainGame.getLevelDataPointer()
+			D0 = u8[A2]
+			if (D0.u8 != 0)
+			{
+				requestLoadingPatterns(D0.u8)
+			}
+		}
+
+		SetGlobalCharacters()
+
+		if (isSonicIntro())
+		{
+			D0 = 1
+			FillPatternLoadingCues()
+
+			requestLoadingPatterns(0x0a)
+		}
+		else if (competition_mode.active)
+		{
+			D0 = 6
+			// Isn't requestLoadingPatterns misisng here?
+		}
+		else
+		{
+			if (isMainCharacter(CHARACTER_SONIC))		// Sonic
+			{
+				requestLoadingPatterns(0x01)
+			}
+			else if (isMainCharacter(CHARACTER_TAILS))	// Tails - or Miles
+			{
+				requestLoadingPatterns((global.region_code & 0x80) ? 0x07 : 0x52)
+			}
+			else 										// Must be Knuckles then
+			{
+				requestLoadingPatterns(0x05)
+			}
+		}
+	}
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	zeroMemory(0xfffff628, 0x16 * 4)
+	zeroMemory(0xfffff700, 0x100)
+	zeroMemory(0xfffffe6e, 0x13 * 4)
+	zeroMemory(0xfffffa80, 0x80)
+
+	fn01aa6e()
+
+	VDP.Config.setVerticalScrolling(false, 0xff)	// Good old horizontal scrolling mode
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setSpriteAttributeTableBase(0xf800)
+	VDP.Config.setPlayfieldSizeInPixels(512, 256)
+	VDP.Config.enableHInt(false)
+	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	VDP.Config.setBackdropColor(0x20)
+	VDP.Config.setRenderingModeConfiguration(false)
+
+	if (debug_mode.unlocked && control.pad1.state & CONTROL_A)
+	{
+		debug_mode.enabled.u8 = true
+	}
+
+	if (competition_mode.active)
+	{
+		u16[0xfffffff6] = 0x4ef9		// Machine code for "jump"
+		irq_table.lineupdate = 0x000d10
+
+		VDP.Config.enableHInt(true)
+		VDP.Config.setNameTableBasePlaneA(0x8000)
+		VDP.Config.setNameTableBasePlaneB(0xa000)
+		h_int.configuration = 0x8a6b	// H-INT at 0x6b = 107 (near the vertical screen center)
+
+		if (global.zone == 0x0f)
+			VDP.Config.setPlayfieldSizeInPixels(512, 512)
+		else
+			VDP.Config.setPlayfieldSizeInPixels(1024, 256)
+	}
+	else
+	{
+		h_int.configuration = 0x8aff
+	}
+	Renderer.configureHInt()
+
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+
+	Level.loadPaletteData((global.characters == CHARS_KNUCKLES_ALONE) ? 5 : 3)
+	Level.InitializeWater()
+
+	zeroMemory(0xfffff0a0, 0x60)
+
+	if (level.water_present)
+	{
+		VDP.Config.enableHInt(true)
+	}
+
+	if (s16(global.rolling_demo) >= 0)
+	{
+		bool isKnucklesIntro = (global.zone_act == 0x0700 && global.characters == CHARS_KNUCKLES_ALONE && global.lock_on_state != 0 && checkpoint.number == 0)
+	#if STANDALONE
+		isKnucklesIntro = (Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 && global.zone_act == 0x0000 && global.characters == CHARS_KNUCKLES_ALONE && checkpoint.number == 0 && !Game.isTimeAttack())
+	#endif
+
+		u8 musicId
+		if (global.zone_act == 0x0001 && checkpoint.number == 3)
+		{
+			musicId = 0x01
+		}
+		else if (isKnucklesIntro)
+		{
+		#if STANDALONE
+			// Enforce S&K version of Knuckles' theme
+			Audio.playAudio("1f", AudioContext.CONTEXT_MUSIC)
+			musicId = 0
+		#else
+			musicId = 0x1f
+		#endif
+		}
+		else
+		{
+		#if STANDALONE
+			// Check if this is the S/T outro
+			if (global.zone_act == 0x0d01)
+			{
+				playMusic(0x26)		// Play Sonic 3 credits (instead of Sky Sanctuary)
+			}
+			else
+			{
+				// Bug fix for second parts of AIZ 1 and ICZ 1
+				musicId = u8[0x005f82 + global.zone * 2 + global.act.apparent]
+			}
+		#else
+			musicId = u8[0x005f82 + global.zone * 2 + global.act]
+		#endif
+		}
+
+		level.default_music = musicId
+		if (musicId != 0)
+		{
+			playMusic(musicId)
+		}
+
+		bool isAnyIntro = false
+		if (global.zone_act == 0)
+		{
+			isAnyIntro = isSonicIntro()
+		}
+		if (isKnucklesIntro)
+		{
+			// This loads the critters graphics, though it does not seem to make a difference if this is done or not...
+		#if !STANDALONE
+			set_status_register(0x2700)
+		#endif
+			Nemesis.loadDataToVRAM(0x1935a8, 0xb000)
+			Nemesis.loadDataToVRAM(0x193308, 0xb240)
+			isAnyIntro = true
+		}
+
+		if (!isAnyIntro && global.zone_act != 0x1701 && !level.skip_titlecard)
+		{
+			// Spawn title card
+			u32[0xffffb250] = 0x02d690
+
+			while (true)
+			{
+				global.frame_state = 0x0c
+				Kosinski.ProcessDecompressionQueue()
+				waitForNextFrame()
+
+				UpdateGameObjects()
+				RenderSprites()
+				LoadRequiredSpritePatterns()
+				Kosinski.ProcessModules()
+				if (u16[0xffffb298] == 0 && u32[0xfffff680] == 0)
+					break
+			}
+		}
+
+		level.skip_titlecard = false
+	#if !STANDALONE
+		set_status_register(0x2700)
+	#endif
+		ResetScoreDisplay()
+	#if !STANDALONE
+		set_status_register(0x2300)
+	#endif
+	}
+
+	Level.loadNonfadingPaletteData(0x03)
+
+	fn01bc60()
+
+	UpdateCamera()
+	fn007812()
+	fn01c2b0()
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+	InitLevelDisplay()
+#if !STANDALONE
+	set_status_register(0x2300)
+#endif
+
+	fn028c80()
+	fn0076a6()
+	UpdateWater()
+
+	u16[0xffffff7c] = control.pad2
+	control.player1 = 0
+	control.tails = 0
+	control.pad1 = 0
+	control.pad2 = 0
+	player1.control_override = 1
+	player2.control_override = 1
+	global.level_started = 0
+	if (level.water_present && global.zone == 0x01)
+	{
+		u32[0xffffcf82] = 0x01f202
+		u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
+		u8[0xffffb19e] = 1
+	}
+	else if (global.zone == 0x07)
+	{
+		u32[0xffffb128] = 0x03da00		// MHZ leaves effect
+	}
+
+	if (checkpoint.number == 0)
+	{
+		ring_counter = 0
+		timer.alldata = 0
+		extra_lives_granted = 0
+		u16[0xfffffed0] = 0
+		u32[0xfffffed2] = 0
+	#if STANDALONE
+		if (!Game.getSetting(SETTING_MAINTAIN_SHIELDS))
+	#endif
+		{
+			global.shields_backup_1 = 0
+		}
+
+		if (global.zone_act == 0x1600 || global.zone_act == 0x1700)
+		{
+			global.in_extra_stage = 0
+		}
+		else if (global.zone < 0x13 || (global.zone > 0x15 && global.zone_act != 0x1701))
+		{
+			global.shields_backup_2 = 0
+			global.in_extra_stage = 0
+		}
+	}
+
+	global.time_over = 0
+	debug_mode.state = 0
+	level.restart = 0
+#if !STANDALONE
+	unused.teleport_timer = 0
+	unused.teleport_active = 0
+#endif
+	u16[0xfffffec8] = 0
+	u16[0xfffffeca] = 0
+	u16[0xfffffecc] = 0
+	u16[0xfffffece] = 0
+	u16[0xfffffede] = 0
+	u8[0xfffffe65] = 0
+	super.active = 0
+	ResetOscillatingNumbers()
+
+	hud.dirty.score = 0x01
+	hud.dirty.rings = 0x01
+	hud.dirty.timer = 0x01
+	global.level_started = 1
+
+	if (global.zone_act == 0x0d01 || global.zone_act == 0x1701)
+	{
+		// Special handling for S/T Outro and HPZ emerald cave
+		hud.dirty.timer = 0
+		global.level_started = 0
+	}
+
+	fn0067ee()
+	DynamicObjectsLoading()
+	UpdateListOfRingsAround()
+
+	fn01cacc()
+
+	UpdateGameObjects()
+	RenderSprites()
+	LevelTilesAnimation()
+	global.demo_countdown = 1800	// 30 seconds
+	Level.InitializeWater.Part2()
+
+	zeroMemory(0xfffff0a0, 0x60)
+
+	player1.control_override = 0
+	player2.control_override = 0
+	fn0075d2()
+
+#if STANDALONE
+	// Just in case active display got disabled before (when entering Hidden Palace through a Giant Ring)
+	VDP.Config.setActiveDisplay(true)
+#endif
+}
+
+
+function bool isSonicIntro()
+{
+	if (global.zone_act == 0x0000 && checkpoint.number == 0 && isMainCharacter(CHARACTER_SONIC))
+	{
+	#if STANDALONE
+		return !Game.isTimeAttack()
+	#else
+		return true
+	#endif
+	}
+	return false
+}
+
+
+function u32 MainGame.getLevelDataPointer()
+{
+	if (global.zone_act == 0x0000 && !isSonicIntro())
+	{
+		D0.u16 = 0x00d0		// The result of plugging in "global.zone_act == 0x0d00" below
+	}
+	else
+	{
+		D0.u16 = global.zone * 16 + global.act * 8
+	}
+	return u32(0x091f0c) + D0.u16 * 3
+}
+
+
+
+//# address-hook(0x0067b6) end(0x0067ec)
+function void SetGlobalCharacters()
+{
+	if (global.game_mode != 0x88 && competition_mode.active == 0)
+	{
+		global.characters = levelselect.characters
+	#if STANDALONE
+		// Handle Knuckles & Tails
+		useKnucklesAndTails = (global.characters == 4)
+		global.characters = min(global.characters, 3)
+	#endif
+	}
+	else if (global.zone == 0x07)	// MHZ
+	{
+		global.characters = CHARS_KNUCKLES_ALONE
+	}
+	else if (global.lock_on_state == 0)
+	{
+		global.characters = CHARS_SONIC_AND_TAILS
+	}
+	else
+	{
+		global.characters = CHARS_SONIC_ALONE
+	}
+}
+
+
+//# address-hook(0x003dbe) end(0x003dd8)
+function void fn003dbe()
+{
+	// Copies to somewhere inside the palette at 0xfffffc80 = primary palette without fading applied
+	copyPaletteDataFromTable(D0.u16, 0xfc80)
+}
+
+function void Level.loadNonfadingPaletteData(u8 index)
+{
+	copyPaletteDataFromTable(index, 0xfc80)
+}
+
+
+//# address-hook(0x003dda) end(0x003df0)
+function void Level.LoadPaletteData()
+{
+	// Copies to somewhere inside the palette at 0xfffffc00 = primary palette with fading applied
+	copyPaletteDataFromTable(D0.u16, 0xfc00)
+}
+
+function void Level.loadPaletteData(u8 index)
+{
+	copyPaletteDataFromTable(index, 0xfc00)
+}
+
+
+//# address-hook(0x003df2) end(0x003e0c)
+function void fn003df2()
+{
+	// Copies to somewhere inside the palette at 0xfffff080 = secondary palette with fading applied
+	copyPaletteDataFromTable(D0.u16, 0xf080)
+}
+
+
+//# address-hook(0x003e0e) end(0x003e28)
+function void fn003e0e()
+{
+	// Copies to somewhere inside the palette at 0xfffff000 = secondary palette without fading applied
+	copyPaletteDataFromTable(D0.u16, 0xf000)
+}
+
+
+function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
+{
+	// This function copies palette data from a table in ROM to RAM, index references one of multiple palette descriptors in ROM.
+	// Some noticable values for index:
+	//  - index = 0x03		-> Main palette line 0 (includes characters, Sonic/Tails version)
+	//  - index = 0x04		-> Level Select
+	//  - index = 0x05		-> Main palette line 0 (includes characters, Knuckles version)
+	//  - index = 0x0a		-> AIZ 1 Sonic intro palette (palette lines 1..3)
+	//  - index = 0x0b		-> AIZ 2 level palette
+	//  - index = 0x0c		-> HCZ 1 level palette
+	//  - index = 0x0d		-> HCZ 2 level palette
+	//  - index = 0x0e		-> MGZ 1 level palette
+	//  - index = 0x0f		-> MGZ 2 level palette
+	//  - index = 0x10		-> CNZ 1 level palette
+	//  - index = 0x11		-> CNZ 2 level palette
+	//  - index = 0x12		-> FBZ 1 level palette
+	//  - index = 0x13		-> FBZ 2 level palette
+	//  - index = 0x14		-> ICZ 1 level palette
+	//  - index = 0x15		-> ICZ 2 level palette
+	//  - index = 0x16		-> LBZ 1 level palette
+	//  - index = 0x17		-> LBZ 2 level palette
+	//  - index = 0x18		-> MHZ 1 level palette
+	//  - index = 0x19		-> MHZ 2 level palette
+	//  - index = 0x1a		-> SOZ 1 level palette
+	//  - index = 0x1b		-> SOZ 2 level palette
+	//  - index = 0x1c		-> LRZ 1 level palette
+	//  - index = 0x1d		-> LRZ 2 level palette
+	//  - index = 0x1e		-> SSZ   level palette
+	//  - index = 0x1f		-> Unknown (maybe Knuckles' SSZ act level palette?)
+	//  - index = 0x20		-> DEZ 1 level palette
+	//  - index = 0x21		-> DEZ 2 level palette
+	//  - index = 0x22		-> DDZ   level palette
+	//  - index = 0x25		-> Unknown
+	//  - index = 0x26		-> Competition mode ALZ
+	//  - index = 0x28		-> Competition mode BPZ
+	//  - index = 0x2a		-> AIZ 1 level palette (palette lines 1..3)
+	//  - index = 0x2b		-> AIZ 1 underwater palette (all palette lines)
+	//  - index = 0x2c		-> AIZ 2 underwater palette
+	//  - index = 0x2d		-> LBZ 1 underwater palette -- not used in the game
+	//  - index = 0x2e		-> LBZ 2 underwater palette
+	//  - index = 0x30		-> Used in AIZ
+	//  - index = 0x31		-> HCZ 1 underwater palette
+	//  - index = 0x32		-> HCZ 2 underwater palette
+	//  - index = 0x33		-> GM bonus stage palette (palette lines 1..3)
+	//  - index = 0x34		-> Competition mode DPZ
+	//  - index = 0x35		-> Competition mode CGZ
+	//  - index = 0x36		-> Competition mode EMZ
+	//  - index = 0x37		-> GS bonus stage palette (palette lines 1..3)
+	//  - index = 0x38		-> SM bonus stage palette (palette lines 1..3)
+	//  - index = 0x39		-> ICZ 2 underwater palette (all palette lines)
+	//  - index = 0x3a		-> CNZ 2 underwater palette
+	//  - index = 0x3f		-> HPZ level palette (palette lines 1..3)
+	//  - index = 0x40		-> Unknown
+
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		// We'd usually load Sonic's palette for all characters into palette line 0,
+		// to avoid weird color changes for Knuckles like red CNZ balloons.
+		// There are exceptions, though...
+		if (global.zone_act == 0x1701 && isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			// Fix for leftmost Super Emerald: Use Knuckles' palette in the emerald cave
+			if (index == 0x03)
+			{
+				index = 0x05
+			}
+		}
+		else
+		{
+			// Use Sonic's palette instead of Knuckles'
+			if (index == 0x05)
+			{
+				index = 0x03
+			}
+		}
+	}
+#endif
+
+	A1 = 0x0a872c + index * 8
+	u32 source = u32[A1]					// Something between 0x0a893c and 0x0a9d9c
+	u32 dest   = 0xffff0000 + u16[A1+4]		// Either 0xfffffc00 or 0xfffffc20
+	u16 bytes  = (u16[A1+6] + 1) * 4		// Can be 0x20, 0x60, 0x80 (referring to 16, 48 or all 64 palette entries)
+
+	dest += ramAddress - 0xfc00				// With this, dest can be changed to non-faded palette and/or secondary palette
+	copyMemory(dest, source, bytes)
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		//debugLogColors(stringformat("PaletteDataTable #0x%02x", index), source, bytes / 2)
+
+		if (!ROMDataAnalyser.hasEntry("PaletteDataTable", A1))
+		{
+			ROMDataAnalyser.beginEntry("PaletteDataTable", A1)
+			ROMDataAnalyser.addKeyValue("index",  stringformat("0x%02x", index))
+			ROMDataAnalyser.addKeyValue("source", stringformat("0x%06x", source))
+			ROMDataAnalyser.addKeyValue("dest",   stringformat("0x%04x", u16[A1+4]))
+			ROMDataAnalyser.addKeyValue("bytes",  stringformat("0x%04x", bytes))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		u8 paletteVariant = 0xff
+		if (index == 0x03 || index == 0x05)
+		{
+			paletteVariant = 0
+		}
+		else if (index == 0x2b || index == 0x2c)
+		{
+			paletteVariant = 1
+		}
+		else if (index == 0x39)
+		{
+			paletteVariant = 2
+		}
+		else if (index == 0x31 || index == 0x32)
+		{
+			paletteVariant = 3
+		}
+		else if (index == 0x2d  || index == 0x2e || index == 0x3a)
+		{
+			paletteVariant = 4
+		}
+
+		if (paletteVariant != 0xff)
+		{
+			if (paletteVariant == 0)
+			{
+				// Load all characters' normal (non-underwater) palettes, either to fading or non-fading palette buffer
+				dest = (ramAddress == 0xfc00) ? 0x802000 : 0x802180
+				loadCharacterPalette(CHARACTER_SONIC,    dest + 0x00, 0)
+				loadCharacterPalette(CHARACTER_TAILS,    dest + 0x40, 0)
+				loadCharacterPalette(CHARACTER_KNUCKLES, dest + 0x80, 0)
+			}
+			else
+			{
+				// Load all characters' underwater palettes, either to fading or non-fading palette buffer
+				dest = (ramAddress == 0xf080) ? 0x802300 : 0x802480
+				loadCharacterPalette(CHARACTER_SONIC,    dest + 0x00, paletteVariant)
+				loadCharacterPalette(CHARACTER_TAILS,    dest + 0x40, paletteVariant)
+				loadCharacterPalette(CHARACTER_KNUCKLES, dest + 0x80, paletteVariant)
+			}
+		}
+	}
+#endif
+}
+
+
+//# address-hook(0x007892) end(0x007a48)
+function void Level.InitializeWater()
+{
+	bool levelHasWater = false
+	if (global.zone_act == 0x0000 || global.zone == 0x01 || global.zone_act == 0x0501 || global.zone_act == 0x0601)
+	{
+		levelHasWater = true
+	}
+	else if (global.zone_act == 0x0001)		// Angel Island 2
+	{
+		levelHasWater = (global.zone_act.apparent != 0x01 || !isMainCharacter(CHARACTER_KNUCKLES))
+	#if STANDALONE
+		if (!levelHasWater && checkpoint.number != 0)	// Checkpoint 0 is Knuckles' start
+		{
+			// Knuckles presumably on Sonic's path?
+			u16 px = (global.stage_type == 0) ? checkpoint.x : u16[0xfffffe4c]
+			u16 py = (global.stage_type == 0) ? (checkpoint.y & 0x7fff) : u16[0xfffffe4e]
+			if (px < 0x1400)
+			{
+				// Start area of AIZ 2
+				levelHasWater = (py < 0x0400)
+			}
+			else
+			{
+				levelHasWater = (py < 0x0620)
+			}
+		}
+	#endif
+	}
+	else if (global.zone_act == 0x0301)		// Carnival Night 2
+	{
+		levelHasWater = !isMainCharacter(CHARACTER_KNUCKLES)
+	}
+
+	if (!levelHasWater)
+	{
+		level.water_present = 0
+		water.height.current = 0x1000
+		water.height.next = 0x1000
+		water.height.target = 0x1000
+	}
+	else
+	{
+		level.water_present = 1
+		competition_mode.active = 0
+
+		u16[0xfffffff6] = 0x4ef9	// Machine code for "jump"
+		if (global.zone == 0x01)
+		{
+			irq_table.lineupdate = 0x001024
+		}
+		else if (u16[0xffffffd6] >= 0x1000)
+		{
+			irq_table.lineupdate = 0x000f00
+		}
+		else
+		{
+			irq_table.lineupdate = 0x000dd8
+		}
+
+		water.palette.source = 0x0074e0
+
+		u16 offset = global.zone * 4 + global.act * 2
+		u16 waterHeight = u16[0x006d2c + offset]
+		water.height.current = waterHeight
+		water.height.next = waterHeight
+		water.height.target = waterHeight
+
+		water.transition_counter = 0
+		water.fullscreen = 0
+		water.height.changerate = 1
+
+		Level.InitializeWater.Part2()
+	}
+}
+
+
+//# address-hook(0x00796c)
+function void Level.InitializeWater.Part2()
+{
+	if (level.water_present)
+	{
+		if (global.zone_act == 0x0000)			// AIZ 1
+		{
+			D0 = 0x2b
+		}
+		else if (global.zone_act == 0x0001)		// AIZ 2
+		{
+			D0 = 0x2c
+			water.palette.source = 0x007502
+		}
+		else if (global.zone_act == 0x0100)		// HCZ 1
+		{
+			D0 = 0x31
+			water.palette.source = 0x007554
+		}
+		else if (global.zone_act == 0x0101)		// HCZ 2
+		{
+			D0 = 0x32
+			water.palette.source = 0x007554
+		}
+		else if (global.zone_act == 0x0301)		// CNZ 2
+		{
+			D0 = 0x3a
+			water.palette.source = 0x00752a
+		}
+		else if (global.zone_act == 0x0501)		// ICZ 2
+		{
+			D0 = 0x39
+			water.palette.source = 0x00752a
+		}
+		else if (global.zone_act == 0x0600)		// LBZ 1
+		{
+			D0 = 0x2d
+			water.palette.source = 0x007554
+		}
+		else									// LBZ 2
+		{
+			D0 = 0x2e
+			water.palette.source = 0x00757e
+		}
+
+		D1.u16 = D0.u16
+		fn003df2()
+
+		D0.u16 = D1.u16
+		fn003e0e()
+
+		if (checkpoint.number != 0)
+		{
+			water.fullscreen = checkpoint.water.fullscreen
+		}
+
+	#if STANDALONE
+		if (!EXTENDED_CHARACTER_PALETTES)
+	#endif
+		{
+			if (global.characters == CHARS_KNUCKLES_ALONE)
+			{
+				// Copying in Knuckles' colors into underwater palette
+				A1 = 0x007a4a + global.zone * 6
+				copyMemory(0xfffff004, A1, 6)
+				copyMemory(0xfffff084, A1, 6)
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0076a6) end(0x0076e4)
+function void fn0076a6()
+{
+	A1 = 0x098100 + global.zone * 8 + global.act * 4
+	D0 = u32[A1]
+	u32[0xfffff7b4] = D0
+	if (D0 >= 0x260000)
+	{
+		D0 += 0x600
+		u32[0xfffff7b8] = D0
+		u32[0xfffff796] = u32[0xfffff7b4]
+	}
+	else
+	{
+		++D0
+		u32[0xfffff7b8] = D0
+		u32[0xfffff796] = u32[0xfffff7b4]
+	}
+}
+
+
+//# address-hook(0x01bc60) end(0x01bcc2)
+function void fn01bc60()
+{
+	u8[0xffffee30] = 0
+	u8[0xffffee08] = 0
+	player1.camera_lock = 0
+	player2.camera_lock = 0
+	u8[0xffffee39] = 0
+	camera.update_routine = 0
+	outro.wait_time = 0
+	u16[0xfffff662] = 0
+
+	A0 = 0x01bcc6 + global.zone * 16 + global.act * 8
+	u16 minX = u16[A0]
+	u16 maxX = u16[A0+2]
+	u16 minY = u16[A0+4]
+	u16 maxY = u16[A0+6]
+#if STANDALONE
+	// Some corrections
+	if (global.zone_act == 0x0000)	// AIZ 1
+	{
+		minX = 0x12e0
+	}
+	else if (global.zone == 0x13)	// Gumball Machine bonus stage
+	{
+		minX -= getScreenExtend()
+		maxX -= getScreenExtend()
+	}
+#endif
+
+	move_area.left = minX
+	move_area.right = maxX
+	u16[0xffffee0c] = minX
+	u16[0xffffee0e] = maxX
+	u16[0xffffee1c] = minX
+	u16[0xffffee1e] = maxX
+
+	level.vertical_wrap = minY
+	move_area.bottom.current = maxY
+	u16[0xffffee10] = minY
+	move_area.bottom.target = maxY
+	u16[0xffffee20] = minY
+	u16[0xffffee22] = maxY
+
+	camera.yoffset.player = 0x60
+	camera.yoffset.tails = 0x60
+	u16[0xffffeea8] = 0xffff
+	level.height.bitmask = 0xffff
+	SetupCharacterAtStartPosition()
+}
+
+
+//# address-hook(0x01be46) end(0x01bfae)
+function void SetupCharacterAtStartPosition()
+{
+	if (checkpoint.number != 0)
+	{
+		SetupCharacterAtLastCheckpoint()
+		D1.u16 = u16[0xffffb010]
+		D0.u16 = u16[0xffffb014]
+	}
+	else
+	{
+		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x1e3cd8 : 0x1e3c18
+		A1 += global.zone * 8 + global.act * 4
+		D1 = u16[A1]
+		D0 = u16[A1+2]
+		u16[0xffffb010] = D1.u16
+		u16[0xffffb014] = D0.u16
+
+		if (global.zone_act == 0x0000)
+		{
+			if (isSonicIntro())
+			{
+				D1.u16 = 0
+				D0.u16 = 0x420
+				u16[0xffffb010] = 0x0040
+				u16[0xffffb014] = 0x0420
+				move_area.left = 0
+				u16[0xffffee0c] = 0
+				u16[0xffffee1c] = 0
+			}
+		#if STANDALONE
+			else if (isMainCharacter(CHARACTER_KNUCKLES) && (Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 || Game.isTimeAttack()))
+			{
+				// First set the desired camera position, then character position gets calculated after the if-else-blocks
+				//  -> Camera positions here should be the same as in "fn0634ca"
+				if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
+				{
+					u16[0xffffb010] = 0x1830
+					u16[0xffffb014] = 0x0119
+					D1.u16 = 0x1768
+					D0.u16 = 0x0090
+					move_area.bottom.current = D0.u16
+					move_area.bottom.target = D0.u16
+				}
+				else
+				{
+					D1.u16 = 0x1390
+					D0.u16 = 0x0380
+				}
+				D1.u16 += getScreenWidth() / 2
+				D0.u16 += 96
+			}
+		#endif
+		}
+		else if (global.zone_act == 0x0300)
+		{
+			if (isMainCharacter(CHARACTER_KNUCKLES))
+			{
+			#if STANDALONE
+				if (level.start_location == 1)
+				{
+					u16[0xffffb010] = 0x0018
+					u16[0xffffb014] = 0x0600
+					D1.u16 = 0x0018
+					D0.u16 = 0x0600
+				}
+				else
+			#endif
+				{
+					D1.u16 += 0xb0
+				}
+			}
+		}
+		else if (global.zone_act == 0x0500)
+		{
+			if (isMainCharacter(CHARACTER_TAILS))
+			{
+				u16[0xffffb010] = 0x3780
+				u16[0xffffb014] = 0x01e0
+				camera.position.x.u16 = 0x36f0
+				camera.position.y.u16 = 0x0200
+				move_area.left  = 0x35a0
+				u16[0xffffee0c] = 0x35a0
+				u16[0xffffee1c] = 0x35a0
+				level.vertical_wrap = 0x0200
+				u16[0xffffee10] = 0x0200
+				u16[0xffffee20] = 0x0200
+				u16[0xffffee60] = 0x36f0
+				u16[0xffffee64] = 0x0200
+				return
+			}
+		#if STANDALONE
+			else if (isMainCharacter(CHARACTER_KNUCKLES))
+			{
+				if (level.start_location == 1)
+				{
+					// Use Tails' start
+					u16[0xffffb010] = 0x3780
+					u16[0xffffb014] = 0x01e0
+					camera.position.x.u16 = 0x36f0
+					camera.position.y.u16 = 0x0200
+					move_area.left  = 0x35a0
+					u16[0xffffee0c] = 0x35a0
+					u16[0xffffee1c] = 0x35a0
+					level.vertical_wrap = 0x0200
+					u16[0xffffee10] = 0x0200
+					u16[0xffffee20] = 0x0200
+					u16[0xffffee60] = 0x36f0
+					u16[0xffffee64] = 0x0200
+					return
+				}
+			}
+		#endif
+		}
+	#if STANDALONE
+		else if (global.zone_act == 0x0601)
+		{
+			if (isMainCharacter(CHARACTER_KNUCKLES) && getNumPlayers() == 2)
+			{
+				// Move Knuckles a bit to the right in LBZ 2 to make space for Tails
+				u16[0xffffb010] += 0x10
+				D1.u16 += 0x10
+			}
+		}
+	#endif
+		else if (global.zone_act == 0x0700)
+		{
+			if (!isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0)
+			{
+				move_area.left  = 0x00c0
+				u16[0xffffee0c] = 0x00c0
+				u16[0xffffee1c] = 0x00c0
+				D1.u16 = 0x0160
+			}
+		}
+		else if (global.zone_act == 0x0900)
+		{
+			if (isMainCharacter(CHARACTER_KNUCKLES))
+			{
+				D1.u16 += 0xb0
+			}
+		}
+		else if (global.zone_act == 0x0b00 || global.zone_act == 0x1601)
+		{
+			D1.u16 += 0xb0 + getScreenExtend()
+		}
+	#if STANDALONE
+		else if (global.zone == 0x13)
+		{
+			// Gumball Machine:
+			// Do not allow for jumping in first frame
+			u8[0xffffb000 + 0x20] = char.state.STANDING
+			u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+			u8[0xffffb04a + 0x20] = char.state.STANDING
+			u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
+		}
+		else if (global.zone == 0x15)
+		{
+			// Slot Machine
+			D1.u16 -= getScreenExtend()
+		}
+	#endif
+	}
+
+	D1.s16 = max(D1.s16 - getScreenWidth() / 2, 0)
+	if (competition_mode.active == 0)
+	{
+	#if STANDALONE
+		// Avoid exact tile edges
+		//  -> This was particularly added in to avoid glitches in first pixel row after exiting first Giant Ring in AIZ 2
+		//     (There's probably a better solution, that generally solves this type of glitches when going left in AIZ 2)
+		if ((D1.u16 & 0x0f) == 0)
+			++D1.u16
+	#endif
+		D1.u16 = min(D1.u16, move_area.right)
+	}
+
+	camera.position.x.u16 = D1.u16
+	u16[0xffffee60] = D1.u16
+
+	D0.s16 = clamp(D0.s16 - 96, 0, s16(move_area.bottom.current))
+	camera.position.y.u16 = D0.u16
+	u16[0xffffee64] = D0.u16
+}
+
+
+//# address-hook(0x02d234) end(0x02d336)
+function void SetupCharacterAtLastCheckpoint()
+{
+	if (global.stage_type == 0)
+	{
+		checkpoint.number		 = checkpoint.number.backup
+		global.zone_act			 = checkpoint.zone_act
+		global.zone_act.apparent = checkpoint.zone_act.apparent
+		u16[0xffffb010]			 = checkpoint.x
+		u16[0xffffb014]			 = checkpoint.y
+	#if STANDALONE
+		if (checkpoint.y & 0x8000)
+		{
+			u16[0xffffb014] &= 0x7fff
+			u8[0xffffb02a] |= char.flag.FACING_LEFT
+		}
+	#endif
+
+		if (global.in_extra_stage)
+		{
+			ring_counter = checkpoint.rings
+			extra_lives_granted = checkpoint.lives_granted
+		}
+		else
+		{
+			ring_counter = 0
+			extra_lives_granted = 0
+		}
+
+		timer.alldata = checkpoint.time
+		timer.frames = 59
+		--timer.seconds
+		u16[0xffffb00a] = checkpoint.sprite_attr
+		u16[0xffffb046] = checkpoint.layer_flags
+
+		camera.update_routine = checkpoint.camera_routine
+		move_area.bottom.current = checkpoint.move_area.bottom
+		move_area.bottom.target = checkpoint.move_area.bottom
+		camera.position.x.u16 = checkpoint.camera.x
+		camera.position.y.u16 = checkpoint.camera.y
+
+		if (level.water_present)
+		{
+			water.height.next = checkpoint.water.height
+			water.fullscreen = checkpoint.water.fullscreen
+		}
+	}
+	else
+	{
+		global.stage_type = 0
+		global.zone_act = level.backup.zone_act
+		global.zone_act.apparent = u16[0xffffff9c]
+		u16[0xffffb010] = u16[0xfffffe4c]
+		u16[0xffffb014] = u16[0xfffffe4e]
+		ring_counter = u16[0xfffffe50]
+		extra_lives_granted = u8[0xfffffe61]
+		timer.alldata = u32[0xfffffe52]
+		timer.frames = 59
+		--timer.seconds
+		u16[0xffffb00a] = u16[0xfffffe56]
+		u16[0xffffb046] = u16[0xfffffe58]
+
+		camera.update_routine = u8[0xfffffe64]
+		move_area.bottom.current = u16[0xfffffe62]
+		move_area.bottom.target = u16[0xfffffe62]
+		camera.position.x.u16 = u16[0xfffffe5a]
+		camera.position.y.u16 = u16[0xfffffe5c]
+
+		if (level.water_present)
+		{
+			water.height.next = u16[0xfffffe5e]
+			water.fullscreen = u8[0xfffffe60]
+		}
+	}
+}
+
+
+
+//# address-hook(0x007812) end(0x007890)
+function void fn007812()
+{
+	A4 = MainGame.getLevelDataPointer()
+	A1 = u32[A4] & 0x00ffffff
+	u32 firstSource = A1
+	D4.u16 = u16[A1]
+	Kosinski.addToDMAQueue(A1, 0x0000)
+
+	A1 = u32[A4+4] & 0x00ffffff
+	if (A1 != firstSource)
+	{
+		Kosinski.addToDMAQueue(A1, D4.u16)
+	}
+
+	while (true)
+	{
+		global.frame_state = 0x0c
+		Kosinski.ProcessDecompressionQueue()
+		waitForNextFrame()
+
+		LoadRequiredSpritePatterns()
+		Kosinski.ProcessModules()
+		if (kosinski.waiting_modules == 0)
+			break
+	}
+}
+
+
+//# address-hook(0x01c2b0) end(0x01c360)
+function void fn01c2b0()
+{
+	A2 = MainGame.getLevelDataPointer()
+
+	D0 = u32[A2+8] & 0x00ffffff
+	D7 = D0
+	Kosinski.decompress(D0, 0xffff9000)
+
+	D0 = u32[A2+12] & 0x00ffffff
+	if (D7 != D0)
+	{
+		Kosinski.decompress(D0, A1)
+	}
+
+	D0 = u32[A2+16] & 0x00ffffff
+	D7 = D0
+	Kosinski.decompress(D0, 0xffff0000)
+
+	D0 = u32[A2+20] & 0x00ffffff
+	if (D7 != D0)
+	{
+		Kosinski.decompress(D0, A1)
+	}
+	fn01c362()
+
+	D1.u8 = u8[A2]
+	D0 = u8[A2+4]
+	if (D0.u8 != 0 && D1.u8 != D0.u8)
+	{
+		requestLoadingPatterns(D0.u8)
+	}
+
+	// Load level palette
+	Level.loadNonfadingPaletteData(u8[A2+8])
+
+#if STANDALONE
+	//// Copy 16 palette entries from 0x10 to 0x90, primarily for the rings
+	//// TODO: Here is not a good place to do this, as
+	////  - 1.) the primary palette has to be updated when fully underwater
+	////  - 2.) fading effects won't work this way
+	//for (u8 i = 0; i < 0x10; ++i)
+	//{
+	//	Renderer.setPaletteEntryPacked(0x90 + i, u16[0xfffffca0 + i * 2])
+	//	Renderer.setSecondaryPaletteEntryPacked(0x90 + i, u16[0xfffff020 + i * 2])
+	//}
+#endif
+}
+
+
+//# address-hook(0x01c362) end(0x01c388)
+function void fn01c362()
+{
+	// Load content of level chunks
+	//  -> This includes both foreground and background chunks
+	u8 offset = global.zone * 8 + global.act * 4
+	A0 = u32[0x09d5c0 + offset]
+	copyMemory(0xffff8000, A0, 0x1000)
+
+#if STANDALONE
+	Standalone.loadRawLevelData("%s_layout", global.zone_act, 0xffff8000)
+#endif
+}
+
+
+
+//# address-hook(0x04ff00) end(0x04ff08)
+function void fn04ff00()
+{
+	u32 bytes = (D1.u16 + 1) * 2
+	fillMemory_u16(A1, bytes, 0x005b)
+	A1 += bytes
+}
+
+
+//# address-hook(0x028c80) end(0x028db6)
+function void fn028c80()
+{
+	if (global.zone_act == 0x0100)
+	{
+		fn0279d4()
+	}
+	else if (global.zone_act == 0x0101)
+	{
+		u8[0xfffff7f1] = 0x20
+		u8[0xfffff7f3] = 0x40
+	}
+	else if (global.zone == 0x03)
+	{
+		u8[0xfffff7f1] = 0x40
+		u8[0xfffff7f2] = 0
+		u8[0xfffff7f4] = 0
+		u8[0xfffff7f6] = 0
+		u8[0xfffff7f8] = 2
+		u8[0xfffff7fa] = 2
+		u8[0xfffff7fc] = 2
+		u8[0xfffff7fe] = 1
+	}
+	else if (global.zone_act == 0x0600)
+	{
+		u8[0xfffff7f3] = 0x20
+	}
+	else if (global.zone_act == 0x0601)
+	{
+		fn02807a()
+		u8[0xfffff7f1] = 0x10
+	}
+	else if (global.zone == 0x07)
+	{
+		u8[0xfffff7f1] = 0x20
+		u8[0xfffff7f3] = 0x40
+	}
+	else if (global.zone == 0x08)
+	{
+		u8[0xfffff7f1] = 0xff
+	}
+	else if (global.zone_act == 0x0900)
+	{
+		u8[0xfffff7f1] = 0xff
+		u8[0xfffff7f3] = 0xff
+	}
+	else if (global.zone_act == 0x1000)
+	{
+		u8[0xfffff7f1] = 0x40
+		u8[0xfffff7f3] = 0x40
+	}
+	else if (global.zone == 0x14)
+	{
+		Kosinski.decompress(0x156c08, 0xffff1000)
+		Kosinski.decompress(0x1574e8, 0xffff7000)
+
+		A1 = 0xffff6000
+		A2 = 0xffff7000
+		D0 = 0x0b
+		while (D0.s16 >= 0)
+		{
+			copyMemory(A1, A2, 0x80)
+			copyMemory(A1 + 0x80, A2, 0x80)
+			A1 += 0x100
+			A2 += 0x80
+			--D0.s16
+		}
+
+		Kosinski.decompress(0x1578f8, 0xffff7800)
+	}
+	else if (global.zone_act == 0x1600)
+	{
+		u8[0xfffff7f1] = 0xff
+		u8[0xfffff7f3] = 0xff
+	}
+}
+
+
+//# address-hook(0x0076e6) end(0x0076f8)
+function void ResetOscillatingNumbers()
+{
+	copyMemory(0xfffffe6e, 0x0076fa, 0x42)
+}
+
+
+//# address-hook(0x00773c) end(0x007790)
+function void UpdateOscillatingNumbers()
+{
+	if (competition_mode.active == 0 && u8[0xffffb005] >= 0x06)
+		return
+
+	A1 = 0xfffffe6e
+	A2 = 0x007792
+	D3 = u16[A1]
+	A1 += 2
+
+	for (u32 bit = 0x8000; bit > 0; bit >>= 1)
+	{
+		D2.u16 = u16[(A2+=2)-2]
+		D4.u16 = u16[(A2+=2)-2]
+
+		if ((D3 & bit) == 0)
+		{
+			D0.u16 = u16[A1+2] + D2.u16
+			u16[A1+2] = D0.u16
+			u16[A1] += D0.u16
+
+			if (D4.u8 <= u8[A1])
+			{
+				D3 |= bit
+			}
+		}
+		else
+		{
+			D0.u16 = u16[A1+2] - D2.u16
+			u16[A1+2] = D0.u16
+			u16[A1] += D0.u16
+
+			if (D4.u8 > u8[A1])
+			{
+				D3 &= ~bit
+			}
+		}
+
+		A1 += 4
+	}
+	u16[0xfffffe6e] = D3.u16
+}
+
+
+
+//# address-hook(0x0067ee) end(0x0069b6)
+function void fn0067ee()
+{
+	u32[0xffffb094] = 0x006c2c
+	InitializeGameCharacters()
+	RestoreShield()
+	if (checkpoint.number != 0 || global.stage_type != 0)
+		return
+
+	A1 = 0xffffb000
+	A2 = 0xffffb04a
+	if (global.zone_act == 0x0000)
+	{
+		// Angel Island Zone
+		if (isSonicIntro())
+		{
+			// Trigger intro
+			u32[0xffffb172] = 0x067472
+			global.level_started = 0
+		}
+	#if STANDALONE
+		else if (isMainCharacter(CHARACTER_KNUCKLES) && Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 && !Game.isTimeAttack())
+		{
+			u32[0xffffb172] = 0x063446
+		}
+	#endif
+	}
+	else if (global.zone_act == 0x0100)
+	{
+		// Hydrocity Zone
+		objA1.state = char.state.FALLING_PANIC
+		if (global.characters == CHARS_KNUCKLES_ALONE)
+		{
+			u16[A1 + 0x20] = 0x2121
+			u8[A1 + 0x23] = 1
+			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
+		}
+		objA1.flags2a |= char.flag.IN_AIR
+		if (global.characters == CHARS_TAILS_ALONE)
+		{
+			u8[A1 + 0x40] = 0x01
+		}
+		if (u32[A2] != 0)
+		{
+			u8[A2 + 0x20] = char.state.FALLING_PANIC
+			u8[A2 + 0x2a] |= char.flag.IN_AIR
+			u8[A2 + 0x40] = 0x01
+		}
+	}
+	else if (global.zone_act == 0x0200)
+	{
+		// Marble Garden Zone
+		objA1.state = char.state.FALLING_PANIC
+		objA1.flags2a |= char.flag.IN_AIR
+		if (u32[A2] != 0)
+		{
+			u8[A2 + 0x20] = char.state.FALLING_PANIC
+			u8[A2 + 0x2a] |= char.flag.IN_AIR
+		}
+	}
+	else if (global.zone_act == 0x0300)
+	{
+		// Carnival Night Zone
+		bool spawnAITails = (global.characters == CHARS_SONIC_ALONE)	// Excluding Sonic & Tails
+	#if STANDALONE
+		if (level.start_location == 1 && isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			spawnAITails = true
+		}
+	#endif
+		if (spawnAITails)
+		{
+			u32[0xffffb04a] = 0x01365c
+			u16[0xffffb05a] = u16[0xffffb010]
+			u16[0xffffb05e] = u16[0xffffb014]
+			tails.ai_routine = 0
+		}
+		else if (isMainCharacter(CHARACTER_TAILS))
+		{
+			tails.ai_routine = 0x20
+		}
+		else if (isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			u32[0xffffb172] = 0x044a0c
+		}
+	}
+	else if (global.zone_act == 0x0500)
+	{
+		// IceCap Zone
+		if (isMainCharacter(CHARACTER_SONIC))
+		{
+			u32[0xffffb172] = 0x0396e4
+		}
+		else if (isMainCharacter(CHARACTER_TAILS))
+		{
+			u32[0xffffb172] = 0x039b66
+		}
+	#if STANDALONE
+		else if (isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			if (level.start_location == 1)
+			{
+				// Use Tails' start
+				u32[0xffffb172] = 0x039b66
+			}
+		}
+	#endif
+	}
+	else if (global.zone_act == 0x0600)
+	{
+		// Launch Base Zone
+		u32[0xffffb172] = 0x039a40
+	}
+	else if (global.zone_act == 0x0700)
+	{
+		// Mushroom Hill Zone
+		if (isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			objA1.state = char.state.FALLING_PANIC
+			objA1.flags2a |= char.flag.IN_AIR
+		}
+		else if (global.lock_on_state == 0)
+		{
+			// Add Tails
+			if (global.characters == CHARS_SONIC_ALONE)
+			{
+				u32[0xffffb04a] = 0x01365c
+				u16[0xffffb05a] = u16[0xffffb010]
+				u16[0xffffb05e] = u16[0xffffb014]
+				tails.ai_routine = 0
+			}
+			else if (isMainCharacter(CHARACTER_TAILS))
+			{
+				tails.ai_routine = 0x20
+			}
+		}
+	}
+	else if (global.zone_act == 0x0800)
+	{
+		// Sandopolis Zone
+		u32[0xffffb172] = 0x041fee
+		objA1.state = char.state.ROLLING
+		objA1.flags2a |= char.flag.IN_AIR
+		if (u32[A2] != 0)
+		{
+			u8[A2 + 0x20] = char.state.ROLLING
+			u8[A2 + 0x2a] |= char.flag.IN_AIR
+		}
+	}
+	else if (global.zone_act == 0x0900)
+	{
+		// Lava Reef Zone
+		if (global.characters != CHARS_KNUCKLES_ALONE)
+		{
+			objA1.state = char.state.FALLING_PANIC
+			objA1.flags2a |= char.flag.IN_AIR
+			if (u32[A2] != 0)
+			{
+				u8[A2 + 0x20] = char.state.FALLING_PANIC
+				u8[A2 + 0x2a] |= char.flag.IN_AIR
+			}
+		}
+		else
+		{
+			u32[0xffffb172] = 0x044a0c
+		}
+	}
+	else if (global.zone_act == 0x0b00)
+	{
+		// Death Egg Zone
+		u32[0xffffb172] = 0x044a0c
+	}
+	else if (global.zone_act == 0x1600)
+	{
+		// Lava Reef boss act
+		objA1.state = char.state.FALLING_PANIC
+		objA1.flags2a |= char.flag.IN_AIR
+		if (u32[A2] != 0)
+		{
+			u8[A2 + 0x20] = char.state.FALLING_PANIC
+			u8[A2 + 0x2a] |= char.flag.IN_AIR
+		}
+	}
+	else if (global.zone_act == 0x1601)
+	{
+		// Hidden Palace Zone
+		u32[0xffffb172] = 0x044a0c
+	}
+}
+
+
+//# address-hook(0x0069b8) end(0x006a74)
+function void RestoreShield()
+{
+	if (global.zone_act == 0x0d01)	// No shields in outro
+		return
+
+	if (global.zone >= 0x0e && global.zone < 0x16)
+	{
+		// Shield allowed in Gumball Machine and Glowing Spheres bonus stages
+		if (global.zone != 0x13 && global.zone != 0x14)
+			return
+	}
+
+	// Restore shield
+	u8 shieldMask = 0x70
+#if STANDALONE
+	if (Game.getSetting(SETTING_SHIELD_TYPES) != 1)
+		shieldMask = 0x71	// Support classic shield
+#endif
+	A1 = 0xffffb000
+	u8 shieldFlags = global.shields_backup_1 & shieldMask
+	global.shields_backup_1 = 0
+	if (shieldFlags == 0)
+	{
+		shieldFlags = global.shields_backup_2 & shieldMask
+		global.shields_backup_2 = 0
+	}
+
+	if (shieldFlags & char.bonus.SHIELD_FIRE)
+	{
+		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_FIRE)
+		u32[0xffffcce8] = 0x0195a6
+		u16[0xffffcd2a] = A1.u16
+	}
+	else if (shieldFlags & char.bonus.SHIELD_LIGHTNING)
+	{
+		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_LIGHTNING)
+		u32[0xffffcce8] = 0x0196c2
+		u16[0xffffcd2a] = A1.u16
+	}
+	else if (shieldFlags & char.bonus.SHIELD_BUBBLE)
+	{
+		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_BUBBLE)
+		u32[0xffffcce8] = 0x0198be
+		u16[0xffffcd2a] = A1.u16
+	}
+#if STANDALONE
+	else if ((Game.getSetting(SETTING_SHIELD_TYPES) != 1) && (shieldFlags & char.bonus.ANY_SHIELD))
+	{
+		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
+		u32[0xffffcce8] = 0x0194ce
+		u16[0xffffcd2a] = A1.u16
+	}
+#endif
+}
+
+
+//# address-hook(0x006a76) end(0x006bd6)
+function void InitializeGameCharacters()
+{
+	// One of the bonus stages?
+	if (global.zone_act >= 0x1300 && global.zone_act < 0x1600)
+	{
+		hud.dirty.timer = 0
+
+		if (global.zone_act == 0x1400)
+		{
+			u32[0xffffb172] = 0x049eee
+			u16[0xffffb182] = 0x78
+			u16[0xffffb186] = 0xf30
+			ring_counter = checkpoint.rings
+			extra_lives_granted = checkpoint.lives_granted
+			hud.dirty.rings = 1
+		}
+		else if (global.zone == 0x15)
+		{
+			u8[0xffffe408] = 0
+			u16[0xffffe406] = 0
+			u32[0xffffb000] = 0x04b958
+			fn04b6aa()
+			u8[0xffffee30] = 0xff
+			return
+		}
+	}
+
+	if (competition_mode.active)
+	{
+		D0.u8 = u8[0xffffffea]
+		fn006bd8()
+
+		u32[0xffffb000] = D1
+		u8[0xffffb038] = u8[0xffffffea]
+		u16[0xffffb05a] = u16[0xffffb010]
+		u16[0xffffb05e] = u16[0xffffb014]
+		u32[0xffffcc54] = 0x018f86
+
+		if (competition_mode.multiplay)
+		{
+			D0.u8 = u8[0xffffffeb]
+			fn006bd8()
+
+			u32[0xffffb04a] = D1
+			u8[0xffffb082] = u8[0xffffffeb]
+			u32[0xffffcc9e] = 0x018f86
+		}
+
+		fn006bf6()
+		return
+	}
+
+	bool spawnSecondPlayerTails = false
+	if (global.characters == CHARS_SONIC_AND_TAILS || global.characters == CHARS_SONIC_ALONE)
+	{
+		// Spawn Sonic
+		u32[0xffffb000] = 0x010a94
+		u32[0xffffcc54] = 0x018b3e
+		u32[0xffffcce8] = 0x0194ce
+		u16[0xffffcd2a] = 0xb000
+
+		// Also spawn Tails if needed
+		spawnSecondPlayerTails = (global.characters == CHARS_SONIC_AND_TAILS)
+	}
+	else if (global.characters == CHARS_TAILS_ALONE)
+	{
+		// Spawn Tails
+		u32[0xffffb000] = 0x01365c
+		u32[0xffffcc9e] = 0x018b3e
+		u16[0xffffb014] += 4
+		tails.ai_routine = 0
+	}
+	else if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		// Spawn Knuckles
+		u32[0xffffb000] = 0x016444
+		u32[0xffffcc54] = 0x018b3e
+
+	#if STANDALONE
+		// Also spawn Tails if needed -- except for Knuckles' final fight in SSZ
+		spawnSecondPlayerTails = (isSecondCharacter(CHARACTER_TAILS) && global.zone_act != 0x0a01)
+	#endif
+	}
+	else
+		assert(false, "Unsupported character selection")	// "global.characters" value not supported
+
+	if (spawnSecondPlayerTails)
+	{
+		u32[0xffffb04a] = 0x01365c
+		u16[0xffffb05a] = u16[0xffffb010] - 0x20
+		u16[0xffffb05e] = u16[0xffffb014] + 4
+		u32[0xffffcc9e] = 0x018b3e
+		tails.ai_routine = 0
+	}
+}
+
+
+//# address-hook(0x006bd8) end(0x006bf4)
+function void fn006bd8()
+{
+	// Only used in competition mode
+	D1 = (D0.u8 == 1) ? 0x013102 : 0x0105c4
+}
+
+
+//# address-hook(0x006bf6) end(0x006c0a)
+function void fn006bf6()
+{
+	// Only used in competition mode
+	copyMemory(0xfffffca0, 0x006c0c, 0x20)
+
+#if STANDALONE
+	// Overwrite Knuckles' (pink) colors
+	u16[0xfffffca0 + 0x04] = 0x064e
+	u16[0xfffffca0 + 0x06] = 0x020c
+	u16[0xfffffca0 + 0x08] = 0x0206
+#endif
+}
+
+
+//# address-hook(0x04b6aa) end(0x04b720)
+function void fn04b6aa()
+{
+	zeroMemory(0xffff3000, 0x4000)
+
+	A1 = 0xffff4020
+	A0 = 0x1e4080
+	u16[0xffffb010] = u16[(A0+=2)-2]
+	u16[0xffffb014] = u16[(A0+=2)-2]
+
+	D1 = 0x1f
+	while (D1.s16 >= 0)
+	{
+		D2 = 0x1f
+		while (D2.s16 >= 0)
+		{
+			u8[(A1+=1)-1] = u8[(A0+=1)-1]
+			--D2.s16
+		}
+
+		A1 += 0x60
+		--D1.s16
+	}
+
+	A1 = 0xffff7008
+	A0 = 0x04b722
+	D1 = 0x12
+	while (D1.s16 >= 0)
+	{
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u16[(A1+=2)-2] = 0
+		u8[A1 - 1] = u8[A0 - 4]
+		u16[(A1+=2)-2] = u16[(A0+=2)-2]
+		--D1.s16
+	}
+
+	zeroMemory(0xffff7400, 0x100)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x04bf62
+	}
+}
+
+
+
+//# address-hook(0x01cacc) end(0x01cad6)
+function void fn01cacc()
+{
+	// This function seems to have a special function for LRZ
+
+	// Targets:
+	//  - 0x01cade	-> u8[0xfffffe65] = 0x00
+	//  - 0x01cb20	-> u8[0xfffffe65] = 0x02
+	call tableLookupAddress(0x01cada, u8[0xfffffe65])
+}
+
+
+//# address-hook(0x01cade) end(0x01cb1e)
+function void fn01cade()
+{
+	u8[0xfffffe65] += 2
+	A1 = (global.act == 0) ? 0x0cad00 : 0x0cb81a
+	D4.u16 = camera.position.x.u16 - 8
+	if (D4.s16 <= 0)
+		D4 = 1
+
+	while (D4.u16 > u16[A1 + 2])
+	{
+		A1 += 6
+	}
+
+	u32[0xfffffe66] = A1
+	D4.u16 += getScreenWidth() + 0x10
+
+	while (D4.u16 > u16[A1 + 2])
+	{
+		A1 += 6
+	}
+
+	u32[0xfffffe6a] = A1
+}
+
+
+//# address-hook(0x01cb20) end(0x01cb66)
+function void fn01cb20()
+{
+	A1 = u32[0xfffffe66]
+	D4.u16 = camera.position.x.u16 - 8
+	if (D4.s16 <= 0)
+		D4 = 1
+
+	while (D4.u16 > u16[A1 + 2])
+	{
+		A1 += 6
+	}
+	while (D4.u16 <= u16[A1 - 4])
+	{
+		A1 -= 6
+	}
+
+	u32[0xfffffe66] = A1
+	A2 = u32[0xfffffe6a]
+	D4.u16 += getScreenWidth() + 0x10
+
+	while (D4.u16 > u16[A2 + 2])
+	{
+		A2 += 6
+	}
+	while (D4.u16 <= u16[A2 - 4])
+	{
+		A2 -= 6
+	}
+	u32[0xfffffe6a] = A2
+}
+
+
+//# address-hook(0x0075d2) end(0x0075f8)
+function void fn0075d2()
+{
+	D0.u16 = u16[0xffffef7a] * 4
+	A0 = u32[0x0075fa + D0.u16]
+	rolling_demo.input_timer = u8[A0]
+	++A0
+	u32[0xffffef52] = A0
+	rolling_demo.last_input = 0
+	control.pad1 = 0x8000
+	control.pad2 = 0x8000
+	u8[0xffffef50] = 0xff
+}
+
+
+
+//# address-hook(0x04f33c) end(0x04f34c)
+function void UpdateSpecialScrolling()
+{
+	// Update of auto-scrolling (and similar)
+	if (u8[0xffffb005] < 0x06)
+	{
+		// Call targets:
+		//  - 0x04f366	-> level.special_scrolling == 0x00	-> Default, does nothing at all
+		//  - 0x0502c6	-> level.special_scrolling == 0x04	-> AIZ 2 blimp sequence
+		//  - 0x054cb0	-> level.special_scrolling == 0x08	-> MHZ 1 just before boss
+		//  - 0x05560c	-> level.special_scrolling == 0x0c	-> MHZ 2 auto-scrolling during boss fight
+		//  - 0x0569ba	-> level.special_scrolling == 0x10	-> SOZ 2 rising sand triggered by sand cork destruction
+		//  - 0x059e46	-> level.special_scrolling == 0x14	-> LRZ 2 boss auto-scrolling sequence
+
+		A0 = u32[0x04f34e + level.special_scrolling]
+		call A0
+	}
+}
+
+
+//# address-hook(0x04f366) end(0x04f366)
+function void fn04f366()
+{
+}
+
+
+
+// Score
+
+function void addScore(u32 value)
+{
+	hud.dirty.score = 1
+	player.score = min(player.score + value, 999999)
+
+	// Time for an extra life?
+	if (player.score >= player.next_life_score)
+	{
+		player.next_life_score += 5000
+		gainExtraLife()
+	}
+
+#if STANDALONE
+	if (player.score >= 100000)
+	{
+		Game.setAchievementComplete(ACHIEVEMENT_SCORE)
+	}
+#endif
+}
+
+
+//# address-hook(0x00dcca) end(0x00dd04)
+function void AddScore()
+{
+	addScore(D0)
+}
+
+
+
+// Rings (used by giant ring granting 50 rings, and inside bonus stages)
+
+//# address-hook(0x0860f2) end(0x086148)
+function void AddRings()
+{
+	ring_counter = min(ring_counter + D0.u16, 999)
+	u16[0xfffffec8] = min(u16[0xfffffec8] + D0.u16, 999)
+	hud.dirty.rings |= 0x01
+
+	if (checkForExtraLifeByRings())
+	{
+		++u16[0xfffffecc]
+		gainExtraLife()
+	}
+	else
+	{
+		playMusic(SFX_RING)
+	}
+}

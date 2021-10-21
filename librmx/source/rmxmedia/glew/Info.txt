@@ -1,0 +1,6 @@
+This is taken directly from the glew website:
+http://glew.sourceforge.net/
+
+You can find more information, its license etc. right there.
+
+Note that the library is reduced to only what's needed by librmx.

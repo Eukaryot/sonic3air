@@ -1,0 +1,5 @@
+{
+	// Sonic drop dash sprites
+	"sonic_dropdash_0": { "File": "character_sonic_dropdash.bmp", "Rect":  "0,0,32,32", "Center": "16,16" },
+	"sonic_dropdash_1": { "File": "character_sonic_dropdash.bmp", "Rect": "32,0,32,32", "Center": "16,16" }
+}

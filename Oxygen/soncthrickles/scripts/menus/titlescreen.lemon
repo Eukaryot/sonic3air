@@ -1,0 +1,1037 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// SEGA Logo Screen                                      //
+//-------------------------------------------------------//
+
+global s16 airHighlightAnimationTimer
+
+
+//# address-hook(0x00076e) end(0x00077e)
+function void fn00076e()
+{
+	fn000c50()
+	if (global.demo_countdown != 0)
+	{
+		--global.demo_countdown
+	}
+}
+
+
+//# address-hook(0x000780) end(0x0007b4)
+function void fn000780()
+{
+	if ((global.framecounter & 0x0f) == 0)
+	{
+		syncZ80_variantA()
+		UpdateControllers()
+		u16[0xa11100] = 0
+	}
+
+	if (global.demo_countdown != 0)
+	{
+		--global.demo_countdown
+	}
+
+	VInt.CheckIfInterruptedKosinski()
+}
+
+
+//# address-hook(0x0043d4) end(0x0043fe)
+function void fn0043d4()
+{
+	if (titleintro.frames == 1)
+	{
+		D0.s16 = s8[0x004400 + titleintro.animstep]
+		if (D0.s16 < 0)
+		{
+			// White screen
+			titleintro.animstep = 12
+		#if STANDALONE
+			titleintro.frames = 40
+		#else
+			titleintro.frames = 3
+		#endif
+		}
+		else
+		{
+			fn00440c()
+			++titleintro.animstep
+		}
+	}
+}
+
+
+//# address-hook(0x00440c) end(0x0044fe)
+function void fn00440c()
+{
+	D7.u16 = D0.u16
+	A2 = 0x004500 + D0.s16 * 12
+	D3.u16 = 0x2c60
+	D0 = u32[A2]
+	A2 += 4
+
+	if (D7.u16 >= 7)
+	{
+		if (D7.u16 > 7)
+		{
+			Kosinski.decompress(D0 & 0x00ffffff, 0xffff0000)
+			D3.u16 = A1.u16 >> 1
+		}
+
+		u16 targetInVRAM = (u8[0xffffffbc] == 0) ? 0 : 0x6000
+		updateSpritePattern(0xffff0000, targetInVRAM, D3.u16)
+	}
+
+	A0 = u32[A2]
+	A2 += 4
+	copyMemory(0xfffffc80, A0, 0x40)
+
+	A1 = 0xffff8000
+	A0 = u32[A2]
+	A2 += 4
+	D0.u16 = (u8[0xffffffbc] == 0 || D7.u16 < 7) ? 0 : 0x0300
+	Enigma.Decompress()
+	if (D7.u16 < 7)
+	{
+	#if !STANDALONE
+		if ((global.region_code & 0x80) == 0)
+	#endif
+		{
+			// Hide the trademark symbol
+			u32[0xffff83ac] = 0
+		}
+	}
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+	copyRectToVRAM(0xffff8000, (u8[0xffffffbc] == 0) ? 0xc000 : 0xe000, 0x28, 0x1c)
+#if !STANDALONE
+	set_status_register(0x2300)
+#endif
+}
+
+
+
+//-------------------------------------------------------//
+// Title Screen Main Function                            //
+//-------------------------------------------------------//
+
+//# address-hook(0x003e32) end(0x004342)
+function void TitleScreen()
+{
+	playMusic(MUSIC_CTRL_FADEOUT)
+	kosinski.queue_size = 0
+
+	zeroMemory(0xffffff10, 0x6c)
+#if GAMEAPP
+	// Setup region code according to settings
+	global.region_code = Game.getSetting(SETTING_REGION_CODE)
+#endif
+
+	ClearPatternLoadingQueue()
+	global.zone_act = 0
+	FadeOutScreenBlocking()
+
+#if STANDALONE
+	u32 ptr = 0x003e32
+	zeroMemory(ptr, 8)
+#else
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setPlayfieldSizeInPixels(512, 256)
+	VDP.Config.setupWindowPlane(false, 0)			// Disable window plane
+	VDP.Config.setVerticalScrolling(false, 0xff)	// Good old horizontal scrolling mode
+	VDP.Config.setBackdropColor(0)
+	VDP.Config.setRenderingModeConfiguration(false)
+
+	water.fullscreen = 0
+	level.water_present = 0
+
+	fn0011ca()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	zeroMemory(0xfffff700, 0x100)
+	zeroMemory(0xffffee00, 0x100)
+
+#if STANDALONE
+	Renderer.resetSprites()
+
+	// Move planes a bit to the right
+	for (u8 i = 0; i < getScreenHeight(); ++i)
+		u32[0xffffe000 + i*4] = getScreenExtend() * 0x10001
+#endif
+
+	fn01aa6e()
+
+	zeroMemory(0xfffffc00, 0x100)
+
+	checkpoint.number = 0
+	global.stage_type = 0
+	debug_mode.state = 0
+	global.rolling_demo = 0
+	u16[0xfffff634] = 0
+	competition_mode.active = 0
+	global.level_started = 0
+	debug_mode.enabled.u8 = 0
+	competition_mode.active = 0
+	u16[0xffffffe4] = 0
+	u16[0xffffffe6] = 0
+	bluespheres.minigame_mode = 0
+	global.demo_countdown = 359		// 6 seconds (minus one frame)
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+
+#if STANDALONE
+	if (Game.getSetting(SETTING_TITLE_SCREEN))
+#else
+	if (global.lock_on_state != 0)
+#endif
+	{
+		// Sonic & Knuckles title screen
+		TitleScreen_SK()
+		return
+	}
+
+	Kosinski.decompress(0x350d26, 0xffff0000)	// After this, A1 points to where uncompressed data ends
+	updateSpritePattern(0xffff0000, 0x0000, A1.u16 >> 1)
+
+	Enigma.decompress(0x34f6a0, 0xffff8000, 0x0000)
+
+#if !STANDALONE
+	if ((global.region_code & 0x80) == 0)
+#endif
+	{
+		// Hide the trademark symbol
+		u32[0xffff83ac] = 0
+	}
+
+	copyRectToVRAM(0xffff8000, 0xc000, 0x28, 0x1c)
+
+	copyMemory(0xfffffc80, 0x00460c, 0x20)
+
+	global.demo_countdown = 240		// 4 seconds
+	VDP.Config.setActiveDisplay(true)
+	Menu.FadeInAfterInit()
+
+#if STANDALONE
+	// Stop any music that might be playing or restarting (this can happen after aborting a rolling demo)
+	playMusic(MUSIC_CTRL_STOP)
+#endif
+	playMusic(0xff)
+
+	global.demo_countdown = 180		// 3 seconds
+	while (global.demo_countdown != 0)
+	{
+		global.frame_state = 0x14
+		waitForNextFrame()
+	@EntryPoint_003fd2:
+
+		if (control.pad1.pressed & CONTROL_START)
+			break
+
+	#if STANDALONE
+		Renderer.resetSprites()
+		Renderer.drawCustomSprite("original_game_by", getScreenWidth() / 2 - 85, 60, 0x00, 0, 0x2000, 0, 96)
+	#endif
+	}
+
+#if !STANDALONE
+	playMusic(0xfe)
+#endif
+
+	// While loop: SEGA logo background fade from white to black
+	A1 = 0x00459c
+	while (true)
+	{
+		global.frame_state = 0x02
+		waitForNextFrame()
+
+		copyMemory(0xfffffc00, A1, 0x0e)
+		if (u16[A1] == 0)
+			break
+
+		A1 += 0x0e
+
+	#if STANDALONE
+		Renderer.resetSprites()
+		if (u8[0xfffffc01] & 0x0e)
+			Renderer.drawCustomSprite("original_game_by", getScreenWidth() / 2 - 85, 60, 0x00, 0, 0x2000, 0, u16(u8[0xfffffc01] & 0x0e) * 96 / 0x0e)
+	#endif
+	}
+
+	outro.wait_time = 0
+	u16[0xfffff662] = 0
+	u8[0xffffffbc] = 0xff
+	titleintro.frames = 0
+	titleintro.animstep = 1
+	D0 = 1
+	fn00440c()
+
+	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900
+#if STANDALONE
+	// Slightly increase the wait time until demo starts
+	global.demo_countdown += 20
+#endif
+
+	Kosinski.addToDecompressionQueue(0x351c86, 0xffff0000)
+	playMusic(0x25)
+
+	// While loop: Intro sequence with Sonic running towards the camera
+	while (true)
+	{
+		global.frame_state = 0x04
+		Kosinski.ProcessDecompressionQueue()
+
+		waitForNextFrame()
+
+	#if STANDALONE
+		// Overwrite two frames with custom widescreen versions
+		if (titleintro.animstep == 7)
+		{
+			Renderer.drawCustomSprite("intro_wideframe1", getScreenExtend() - 40, 0, 0x00, 0, 0x5000)
+		}
+		else if (titleintro.animstep == 8)
+		{
+			Renderer.drawCustomSprite("intro_wideframe2", getScreenExtend() - 40, 0, 0x00, 0, 0x5000)
+		}
+
+		if (control.pad1.pressed)
+		{
+			u8[ptr] = control.pad1.pressed
+			++ptr
+		}
+	#endif
+
+		fn0043d4()
+		UpdateGameObjects()
+		RenderSprites()
+		LoadRequiredSpritePatterns()
+
+		if (control.pad1.pressed & CONTROL_START)
+			break
+
+		if (titleintro.animstep >= 12)
+			break
+	}
+
+	// White screen
+	titleintro.animstep = 12
+	fillMemory_u16(0xfffffc00, 0x80, 0x0eee)
+
+#if STANDALONE
+	titleintro.frames = 15
+	for (u8 k = 0; k < titleintro.frames; ++k)
+	{
+		global.frame_state = 0x04
+		waitForNextFrame()
+	}
+
+	// This is to make sure screen stays white in the next frame even if skipping the intro
+	VDP.Config.setActiveDisplay(false)
+#else
+	titleintro.frames = 3
+	global.frame_state = 0x04
+	waitForNextFrame()
+#endif
+
+	// Fill the planes with decompressed screen content
+	Kosinski.decompress(0x359fc6, 0xffff0000)	// After this, A1 points to where uncompressed data ends
+	updateSpritePattern(0xffff0000, 0x0000, A1.u16 >> 1)
+
+	Enigma.decompress(0x350018, 0xffff8000, 0x8000)
+	copyRectToVRAM(0xffff8000, 0xc000, 0x28, 0x1c)
+
+	Enigma.decompress(0x350112, 0xffff8000, 0x4000)
+	copyRectToVRAM(0xffff8000, 0xe000, 0x28, 0x1c)
+
+	global.frame_state = 0x04
+	waitForNextFrame()
+
+#if STANDALONE
+	VDP.Config.setActiveDisplay(true)
+#endif
+
+	copyMemory(0xfffffc80, 0x0047ac, 0x80)
+
+	// Load patterns used in title screen
+	{
+		// Large banner
+		Nemesis.loadDataToVRAM(0x35026c, 0xa000)
+
+		// Menu options
+		Nemesis.loadDataToVRAM(0x004d2a, 0xd000)
+
+		// Wiggling finger, twinkle, Tails & Tornado in BG
+		Nemesis.loadDataToVRAM(0x2c49cc, 0x8000)
+
+		// "& Knuckles"
+		Nemesis.loadDataToVRAM(0x0d6498, 0x9800)
+	}
+
+	u32[0xffffb000] = 0x00482c
+	u32[0xffffb04a] = 0x004a5c
+	u32[0xffffb0de] = 0x004a1e
+	u32[0xffffb128] = 0x004ae4
+	u32[0xffffb172] = 0x004b54
+	u32[0xffffb1bc] = 0x004bb2
+	u32[0xffffb206] = 0x00496a
+	titleintro.frames = 0
+
+	#if STANDALONE
+		global.whiteflash_timeout = 25
+		airHighlightAnimationTimer = 0
+
+		// This is needed for the background to be shown in first frame at all (when VDP sprite rendering seems to be disabled)
+		Renderer.resetSprites()
+		Renderer.drawCustomSprite("bg_title_screen", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+	#endif
+
+	while (true)
+	{
+		global.frame_state = 0x04
+		waitForNextFrame()
+	@EntryPoint:
+
+		UpdateGameObjects()
+		RenderSprites()
+		LoadRequiredSpritePatterns()
+
+	#if STANDALONE
+		// Allow the player to press Start before the logo animation is finished already; only wait for the short white flash to finish
+		if (global.whiteflash_timeout > 0)
+			continue
+	#else
+		if (u32[0xffffb094] == 0)
+			continue
+	#endif
+
+		if (global.demo_countdown == 0)
+			break
+
+		if ((control.pad1.pressed | control.pad2.pressed) & CONTROL_START)
+		{
+			global.game_mode = 0x0c
+			lives_counter = 3
+			u8[0xfffffec6] = 3
+			ring_counter = 0
+			timer.alldata = 0
+			player.score = 0
+			u16[0xfffffed0] = 0
+			u32[0xfffffed2] = 0
+			u32[0xfffffed6] = 0
+			continues_counter = 0
+			player.next_life_score = 5000
+			u32[0xffffffc4] = 5000
+
+			playSound(MUSIC_CTRL_FADEOUT)
+
+		#if STANDALONE
+			// In S3AIR, there is no choice, sorry...
+			global.game_mode = 0x4c
+
+		#else
+			D0 = u8[0xffffff86]
+			if (D0.u8 == 0)
+			{
+				// Data Select
+				global.game_mode = 0x4c
+			}
+			else if (D0.u8 == 1)
+			{
+				// Competition Mode
+				global.game_mode = 0x38
+			}
+			else
+			{
+				// Level Select
+				global.game_mode = 0x28
+			}
+		#endif
+			return
+		}
+	}
+
+	// Start rolling demo
+	playSound(MUSIC_CTRL_FADEOUT)
+
+	u16[0xffffef7a] = global.demo_number
+	D0.u16 = (global.demo_number & 0x07) * 2
+	D0.u16 = u16[0x004344 + D0.u16]
+	global.zone_act = D0.u16
+	global.zone_act.apparent = D0.u16
+	checkpoint.zone_act = D0.u16
+
+	++global.demo_number
+	if (global.lock_on_state == 0)
+	{
+		if (global.demo_number == 3)		// Skip Knuckles in MHZ demo
+		{
+			global.demo_number = 4
+		}
+		else if (global.demo_number >= 7)	// We've got 7 demos in total
+		{
+			global.demo_number = 0
+		}
+	}
+	else
+	{
+		if (global.demo_number >= 3)		// Restrict to first four demos
+		{
+			global.demo_number = 0
+		}
+	}
+
+	if (D0.s16 < 0)
+	{
+		// Blue Spheres rolling demo
+		global.game_mode = 0x34
+		global.next_bluespheres = 1
+		global.sk_bluespheres = 1
+		global.zone = 0x07
+		u16[0xffffffb0] = 0
+		u32[0xffffffb2] = 0
+		u16[0xffffffb6] = 0
+		u8[0xffffffb8] = 0
+		u8[0xffffffb3] = 0x02
+	}
+	else
+	{
+		// Normal Game rolling demo
+		global.game_mode = 0x08
+	}
+
+	global.rolling_demo = 1
+	lives_counter = 3
+	u8[0xfffffec6] = 3
+	ring_counter = 0
+	timer.alldata = 0
+	player.score = 0
+	u16[0xfffffed0] = 0
+	u32[0xfffffed2] = 0
+	u32[0xfffffed6] = 0
+	player.next_life_score = 5000
+	u32[0xffffffc4] = 5000
+}
+
+
+
+// Called from VInt
+
+//# address-hook(0x0007ba) end(0x0007d8)
+function void fn0007ba()
+{
+	fn004352()
+	fn000c50()
+
+	u16[0xfffff748] = control.pad1
+	fn0017d8()
+
+	if (global.demo_countdown != 0)
+		--global.demo_countdown
+
+#if STANDALONE
+	// White flash effect fade
+	if (global.whiteflash_timeout > 0)
+	{
+		--global.whiteflash_timeout
+
+		u16 blendFactor = u16(global.whiteflash_timeout) * 0xff / 25
+		blendFactor = 0xff - (0xff - blendFactor) * (0xff - blendFactor) / 0xff
+		u32 paletteAddress = (water.fullscreen) ? 0xfffff080 : 0xfffffc00
+
+		for (u8 i = 0; i < 0x40; ++i)
+		{
+			u32 originalColor = unpackColor(u16[paletteAddress + i * 2])
+			u32 color = blendColors(originalColor, 0xffffff, blendFactor)
+			if (i & 0x0f)
+				color |= 0xff000000
+			Renderer.setPaletteEntry(i, color)
+		}
+
+		globalComponentTintColorR = 0xff - blendFactor
+		globalComponentTintColorG = 0xff - blendFactor
+		globalComponentTintColorB = 0xff - blendFactor
+		globalComponentAddedColorR = blendFactor
+		globalComponentAddedColorG = blendFactor
+		globalComponentAddedColorB = blendFactor
+	}
+#endif
+}
+
+//# address-hook(0x004352) end(0x0043d2)
+function void fn004352()
+{
+	// Used in small intro sequence after SEGA logo (Sonic running towards camera)
+	//  -> Update palette
+	//  -> Alternate between two frames displayed in both plane A and plane B at the same time
+
+	if (titleintro.frames != 0)
+	{
+		--titleintro.frames
+		return
+	}
+
+#if STANDALONE
+	// Compensate for missing lag frames -- but we're playing everything still a bit faster here
+	// The exact number of frames would be:
+	//  - 15	-> titleintro.animstep == 1
+	//  -  5	-> titleintro.animstep == 2 .. 5
+	//  -  7	-> titleintro.animstep == 6
+	//  - 16	-> titleintro.animstep == 7
+	//  - 12	-> titleintro.animstep == 8
+	//  - 11	-> titleintro.animstep == 9
+	//  - 10	-> titleintro.animstep == 10
+	//  -  3	-> titleintro.animstep == 11
+
+	titleintro.frames = 4
+	if (titleintro.animstep == 1)
+	{
+		titleintro.frames = 12
+	}
+	else if (titleintro.animstep >= 2 && titleintro.animstep <= 6)
+	{
+		titleintro.frames = 6
+	}
+	else if (titleintro.animstep >= 7 && titleintro.animstep <= 10)
+	{
+		titleintro.frames = 10
+	}
+	else if (titleintro.animstep == 11)
+	{
+		titleintro.frames = 6
+	}
+	--titleintro.frames
+
+#else
+	titleintro.frames = 3
+#endif
+
+	if (titleintro.animstep >= 12)
+	{
+		copyMemory(0xfffffc00, 0xfffffc80, 0x80)
+
+		VDP.Config.setNameTableBasePlaneA(0xc000)
+		VDP.Config.setNameTableBasePlaneB(0xe000)
+	}
+	else
+	{
+		copyMemory(0xfffffc00, 0xfffffc80, 0x40)
+
+		u8[0xffffffbc] ^= 0xff
+		if (u8[0xffffffbc] != 0)
+		{
+			VDP.Config.setNameTableBasePlaneA(0xc000)
+			VDP.Config.setNameTableBasePlaneB(0xc000)
+		}
+		else
+		{
+			VDP.Config.setNameTableBasePlaneA(0xe000)
+			VDP.Config.setNameTableBasePlaneB(0xe000)
+		}
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Objects in Title Screen                               //
+//-------------------------------------------------------//
+
+// Banner ("Sonic 3 - Sonic The Hedgehog")
+
+//# address-hook(0x00482c) end(0x004866)
+function void fn00482c()
+{
+	objA0.mapping_offset = 0x3501e0
+	objA0.sprite_attributes = 0xe500
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x40
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0xf0
+	objA0.velocity.y = 0x0400
+	u32[A0 + 0x30] = 0xffa00000
+
+	objA0.update_address = 0x00486c
+	fn00486c()
+}
+
+
+//# address-hook(0x00486c) end(0x0048d8)
+function void fn00486c()
+{
+	D2.u8 = u8[A0 + 0x34]
+	u32[A0 + 0x30] += objA0.velocity.y << 8
+	D0.u16 = u16[A0 + 0x30]
+	u8[A0 + 0x34] = 0
+	D1.u16 = 0x40
+
+	if (D0.u16 == 0 && objA0.velocity.y == 0xffa5)
+	{
+		objA0.update_address = 0x0048dc
+		u32[0xffffb094] = 0x004924
+	}
+	else
+	{
+		if (D0.s16 >= 0)
+		{
+
+			u8[A0 + 0x34] = 0xff
+			D1.u16 = 0xffc0
+		}
+
+		objA0.velocity.y += D1.u16
+		if (D2.u8 != u8[A0 + 0x34])
+		{
+			objA0.velocity.y >>= 1
+		}
+	}
+
+	D0.s16 = 0xd4 - s16[A0 + 0x30]
+	objA0.position.y.u16 = D0.u16
+#if STANDALONE
+	// Move it down
+	objA0.position.y.u16 += 0x1c
+#else
+
+	// Movement of Sonic and the ring around him
+	if (scrolloffset.y.planeA != 0x10)
+	{
+		++scrolloffset.y.planeA
+	}
+#endif
+
+	fn0048dc()
+}
+
+
+//# address-hook(0x0048dc) end(0x0048fe)
+function void fn0048dc()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 9
+		objA0.animation.frame = (objA0.animation.frame + 4) & 0x1c
+	}
+
+	u32[0xfffffcda] = u32[0x004904 + objA0.animation.frame]
+	DrawObject()
+
+#if STANDALONE
+	// Here is a good place to draw the widescreen background
+	Renderer.drawCustomSprite("bg_title_screen", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+
+	// Also draw the "Angel Island Revisited" text and others
+	++airHighlightAnimationTimer
+	s16 time = airHighlightAnimationTimer - 80
+
+	u16 px = getScreenWidth() / 2
+	u16 py = objA0.position.y.u16 - 53
+	Renderer.drawCustomSprite("title_screen_air", px, py, 0x00, SPRITE_FLAG_PRIO, 0xa000)
+
+	if (time > 0)
+	{
+		if (time < 65)
+		{
+			u8 alpha = (time < 20) ? (time * 255 / 20) : ((65 - time) * 255 / 45)
+			Renderer.drawCustomSprite("title_screen_air_h", px, py, 0x00, SPRITE_FLAG_PRIO, 0xa001, 0, alpha)
+		}
+
+		Renderer.drawCustomSprite("title_screen_start", getScreenWidth() / 2, 208 + max((50 - time) * 2, 0), 0x00, 0, 0x9f7e)
+	}
+
+	Renderer.drawCustomSprite("title_screen_cr", getScreenWidth() - 88, 204, 0x00, 0, 0x9f7e)
+
+	// Clear "Sonic The Hedgehog" text in VRAM
+	for (u16 x = 0xb000; x < 0xb700; x += 0x80)
+		for (u16 y = 0; y < 0x40; y += 2)
+			setVRAM(x + y, 0)
+#endif
+}
+
+
+
+// Menu items
+
+//# address-hook(0x004a5c) end(0x004a82)
+function void fn004a5c()
+{
+#if STANDALONE
+	// Leave this out in S3AIR
+	UnloadObject()
+	return
+#endif
+
+	objA0.position.x.u16 = 0xf0 + getScreenExtend()
+	objA0.position.y.u16 = 0x0140
+	objA0.mapping_offset = 0x004c9c
+	objA0.sprite_attributes = 0xc680
+	u8[0xffffff86] &= 0x01
+	objA0.animation.sprite = u8[0xffffff86]
+
+	objA0.update_address = 0x004a88
+	fn004a88()
+}
+
+
+//# address-hook(0x004a88) end(0x004ade)
+function void fn004a88()
+{
+	D2 = u8[0xffffff86]
+
+	D0.u8 = control.pad1.pressed | control.pad2.pressed
+	if (D0 & CONTROL_UP)
+	{
+		--D2.u8
+		if (D2.s8 < 0)
+		{
+			D2.u8 = (levelselect.unlocked) ? 2 : 1
+		}
+	}
+	if (D0 & CONTROL_DOWN)
+	{
+		++D2.u8
+		if (levelselect.unlocked)
+		{
+			if (D2.u8 >= 3)
+				D2 = 0
+		}
+		else
+		{
+			D2.u8 &= 0x01
+		}
+	}
+
+	objA0.animation.sprite = D2.u8
+	u8[0xffffff86] = D2.u8
+
+	if ((D0.u8 & 0x03) != 0)
+	{
+		playSound(0x5b)
+	}
+	DrawObject()
+}
+
+
+
+// Trademark
+
+//# address-hook(0x004924) end(0x004956)
+function void fn004924()
+{
+	objA0.mapping_offset = 0x3501e0
+	objA0.sprite_attributes = 0xe500
+	objA0.position.x.u16 = 0x0188 + getScreenExtend()
+	objA0.position.y.u16 = 0xec
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x04
+	objA0.animation.sprite = 1
+
+#if STANDALONE
+	// Move it down
+	objA0.position.y.u16 += 0x1c
+#endif
+
+	objA0.update_address = 0x00495c
+	fn00495c()
+}
+
+
+//# address-hook(0x00495c) end(0x004968)
+function void fn00495c()
+{
+	// Trademark -- leave this out in S3AIR for all regions
+#if !STANDALONE
+	if (global.region_code & 0x80)
+	{
+		DrawObject()
+	}
+#endif
+}
+
+
+
+// "& Knuckles" logo -- all you need for a meme
+
+//# address-hook(0x00496a) end(0x004996)
+function void fn00496a()
+{
+#if STANDALONE
+	// Leave this out in S3AIR
+	UnloadObject()
+	return
+#endif
+
+	objA0.mapping_offset = 0x0049ae
+	objA0.sprite_attributes = 0xe4c0
+	objA0.position.x.u16 = 0x0120 + getScreenExtend()
+	objA0.position.y.u16 = 0x0108
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x54
+	objA0.box_size.y = 0x0c
+
+	objA0.update_address = 0x00499c
+	fn00499c()
+}
+
+
+//# address-hook(0x00499c) end(0x0049a8)
+function void fn00499c()
+{
+	D0.u16 = u16[0xffffb014] + 0x5c
+	objA0.position.y.u16 = D0.u16
+	DrawObject()
+}
+
+
+
+// Copyright
+
+//# address-hook(0x004a1e) end(0x004a50)
+function void fn004a1e()
+{
+	objA0.mapping_offset = 0x004c9c
+	objA0.sprite_attributes = 0xe680
+	objA0.position.x.u16 = 0x0158 + getScreenExtend() * 2
+	objA0.position.y.u16 = 0x014c
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x04
+	objA0.animation.sprite = 3
+
+	objA0.update_address = 0x004a56
+	fn004a56()
+}
+
+
+//# address-hook(0x004a56) end(0x004a56)
+function void fn004a56()
+{
+	DrawObject()
+}
+
+
+
+// Sonic's hand wiggling
+
+//# address-hook(0x004ae4) end(0x004b10)
+function void fn004ae4()
+{
+	objA0.mapping_offset = 0x004f8c
+	objA0.sprite_attributes = 0xa400
+	objA0.position.x.u16 = 0x0148 + getScreenExtend()
+	objA0.position.y.u16 = 0xdc
+	objA0.sprite_priority = 0x0180
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x1c
+
+	objA0.update_address = 0x004b16
+	fn004b16()
+}
+
+
+//# address-hook(0x004b16) end(0x004b2e)
+function void fn004b16()
+{
+	D0.u16 = 0xdc - scrolloffset.y.planeA
+	objA0.position.y.u16 = D0.u16
+
+	Object.animationUpdate(0x004b34)
+	DrawObject()
+}
+
+
+
+// Sonic's eye blinking
+
+//# address-hook(0x004b54) end(0x004b80)
+function void fn004b54()
+{
+	objA0.mapping_offset = 0x004f8c
+	objA0.sprite_attributes = 0xa400
+	objA0.position.x.u16 = 0xf8 + getScreenExtend()
+	objA0.position.y.u16 = 0xc8
+	objA0.sprite_priority = 0x0180
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x18
+
+	objA0.update_address = 0x004b86
+	fn004b86()
+}
+
+
+//# address-hook(0x004b86) end(0x004b9e)
+function void fn004b86()
+{
+	D0.u16 = 0xc8 - scrolloffset.y.planeA
+	objA0.position.y.u16 = D0.u16
+
+	A1 = 0x004ba4
+	Object.AlternativeAnimationUpdate()
+	DrawObject()
+}
+
+
+
+// Tails in the Tornado
+
+//# address-hook(0x004bb2) end(0x004cde)
+function void fn004bb2()
+{
+	objA0.mapping_offset = 0x004fe8
+	objA0.sprite_attributes = 0x6400
+	objA0.position.x.u16 = 0
+	objA0.position.y.u16 = 0xc0
+	objA0.sprite_priority = 0x0380
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x08
+
+	objA0.update_address = 0x004be4
+	fn004be4()
+}
+
+
+//# address-hook(0x004be4) end(0x004c3e)
+function void fn004be4()
+{
+	if (u8[A0 + 0x30] == 0)
+	{
+		++objA0.position.x.u16
+		if (objA0.position.x.u16 == 0x0240)
+		{
+			u8[A0 + 0x30] = 1
+			objA0.flags2a |= 0x01
+			objA0.position.y.u16 = 0xd0
+		}
+	}
+	else
+	{
+		--objA0.position.x.u16
+		if (objA0.position.x.u16 == 0)
+		{
+			u8[A0 + 0x30] = 0
+			objA0.flags2a &= ~0x01
+			objA0.position.y.u16 = 0xc0
+		}
+	}
+
+	Object.animationUpdate(0x004c44)
+	DrawObject()
+}

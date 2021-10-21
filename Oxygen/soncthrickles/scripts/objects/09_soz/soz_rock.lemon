@@ -1,0 +1,146 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x041702) end(0x041728)
+function void fn041702()
+{
+	objA0.mapping_offset = 0x04182e
+	objA0.sprite_attributes = 0x43d9
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0280
+
+	objA0.update_address = 0x04172e
+	fn04172e()
+}
+
+
+//# address-hook(0x04172e) end(0x0417a4)
+function void fn04172e()
+{
+	u8[A0 + 0x30] = u8[0xffffb020]
+	u8[A0 + 0x31] = u8[0xffffb06a]
+	D1.u16 = 0x23
+	D2.u16 = 0x10
+	D3.u16 = 0x11
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 == 0)
+	{
+		DrawOrUnloadObject()
+	}
+	else if (D0.u8 == 0x18)
+	{
+		if (u8[A0 + 0x30] != 0x02 && u8[A0 + 0x31] != 0x02)
+		{
+			DrawOrUnloadObject()
+			return
+		}
+
+		A1 = 0xffffb000
+		D0.u8 = u8[A0 + 0x30]
+		fn0417a6()
+
+		A1 = 0xffffb04a
+		D0.u8 = u8[A0 + 0x31]
+		fn0417a6()
+
+		fn0417f6()
+	}
+	else
+	{
+		D1.u8 = D0.u8 & 0x08
+		if (D1.u8 == 0)
+		{
+			fn0417de()
+			return
+		}
+
+		if (u8[A0 + 0x30] != 0x02)
+		{
+			DrawOrUnloadObject()
+			return
+		}
+
+		A1 = 0xffffb000
+		D0.u8 = 2
+		fn0417a6()
+
+		fn0417f6()
+	}
+}
+
+
+//# address-hook(0x0417a6) end(0x0417dc)
+function void fn0417a6()
+{
+	if (D0.u8 == 2)
+	{
+		u8[A1 + 0x2a] |= 0x04
+		u8[A1 + 0x1e] = 0x0e
+		u8[A1 + 0x1f] = 0x07
+		objA1.state = char.state.ROLLING
+		objA1.velocity.y = -0x300
+	}
+
+	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x05] = 0x02
+}
+
+
+//# address-hook(0x0417de) end(0x0417f4)
+function void fn0417de()
+{
+	if ((D0.u8 & 0x10) == 0 || u8[A0 + 0x31] != 2)
+	{
+		DrawOrUnloadObject()
+	}
+	else
+	{
+		A1 = 0xffffb04a
+		D0.u8 = 2
+		fn0417a6()
+
+		fn0417f6()
+	}
+}
+
+
+//# address-hook(0x0417f6) end(0x041804)
+function void fn0417f6()
+{
+	objA0.flags2a &= 0xe7
+	playSound(0x6e)
+
+	objA0.update_address = 0x04180a
+	fn04180a()
+}
+
+
+//# address-hook(0x04180a) end(0x041828)
+function void fn04180a()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 5
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 5)
+		{
+			objA0.position.x.u16 = 0x7f00
+		}
+	}
+
+	DrawOrUnloadObject()
+}

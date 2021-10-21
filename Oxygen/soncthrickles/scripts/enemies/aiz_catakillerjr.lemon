@@ -1,0 +1,191 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Catakiller Jr. (from AIZ)                             //
+//-------------------------------------------------------//
+
+//# address-hook(0x0876ca) end(0x0876de)
+function void CatakillerJr.Init()
+{
+	Object.InitWithUpdateAddress(0x0876d0)
+}
+
+
+//# address-hook(0x0876d0)
+function void CatakillerJr.BaseUpdate()
+{
+	// Targets:
+	//  - 0x0876ec	-> objA0.base_state = 0x00
+	//  - 0x087728	-> objA0.base_state = 0x04
+	//  - 0x087758	-> objA0.base_state = 0x06
+	//  - 0x08777a	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x0876e2, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08777a) end(0x087788)
+function void fn08777a()
+{
+	fn0847e6()
+	if (D3.u16 != 0)
+	{
+		fn087702()
+	}
+	else
+	{
+		UpdateMovementStraightSimple()
+		fn08783e()
+	}
+}
+
+
+//# address-hook(0x0876ec) end(0x087726)
+function void fn0876ec()
+{
+	setupObjectAttributesFull(0x087862)
+	objA0.velocity.x = -0x100
+	A2 = 0x087898
+	SpawnIdenticalChildObjects()
+	fn087702()
+}
+
+//# address-hook(0x087702)
+function void fn087702()
+{
+	objA0.base_state = 0x04
+	objA0.value39 = 3
+	objA0.value3e = 0x80
+	objA0.velocity.y = 0x80
+	u16[A0 + 0x40] = 8
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x08778c) end(0x08779c)
+function void fn08778c()
+{
+	// Targets:
+	//  - 0x0877ac	-> objA0.base_state = 0x00
+	//  - 0x0877d8	-> objA0.base_state = 0x02
+	//  - 0x087728	-> objA0.base_state = 0x04
+	//  - 0x087758	-> objA0.base_state = 0x06
+	//  - 0x08777a	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x0877a2, objA0.base_state)
+
+	D0 = 0
+	fn084a04()
+}
+
+
+
+// Probably something more general
+
+//# address-hook(0x0877ac) end(0x0877c2)
+function void fn0877ac()
+{
+	A1 = tableLookupAddress(0x0877c6, objA0.subtype2c)
+	D0 = objA0.subtype2c >> 1
+	objA0.value2f = u8[0x0877d2 + D0.u16]
+	SetupObjectAttributesFull()
+}
+
+
+//# address-hook(0x0877d8) end(0x087806)
+function void fn0877d8()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.base_state = 0x04
+	D1 = 0x40 - (objA0.subtype2c + 2) * 4
+	objA0.countdown_value = D1.u16
+	objA0.countdown_callback = 0x087854
+	objA0.velocity.x = -0x100
+	fn087702()
+}
+
+
+//# address-hook(0x087728) end(0x087756)
+function void fn087728()
+{
+	fn08486e()
+	if (_equal())
+	{
+		UpdateMovementStraightSimple()
+		fn08783e()
+	}
+	else
+	{
+		objA0.base_state = 0x06
+		D0.u16 = 0x100
+		objA0.value3e = D0.u16
+		objA0.velocity.y = D0.u16
+		u16[A0 + 0x40] = 8
+		objA0.flags38 &= ~0x01
+	}
+}
+
+
+//# address-hook(0x087758) end(0x087776)
+function void fn087758()
+{
+	fn0847e6()
+	if (D3.u16 != 0)
+	{
+		objA0.base_state = 0x08
+		objA0.velocity.x = -objA0.velocity.x
+		objA0.render_flags ^= 0x01
+	}
+	UpdateMovementStraightSimple()
+	fn08783e()
+}
+
+
+//# address-hook(0x08783e) end(0x087852)
+function void fn08783e()
+{
+	if (objA0.update_address == 0x08778c && objA0.subtype2c < 6)
+	{
+		Object.CountdownAndTrigger()
+	}
+}
+
+
+//# address-hook(0x087854) end(0x08785e)
+function void fn087854()
+{
+	objA0.countdown_value = 0x1a
+	spawnChildObjects(0x0878a0)
+}
+
+
+//# address-hook(0x08780a) end(0x087826)
+function void fn08780a()
+{
+	setupObjectAttributesBasic(0x087892)
+	objA0.update_address = 0x08782c
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.flags2b |= 0x10
+	fn084920()
+}
+
+
+//# address-hook(0x08782c) end(0x087838)
+function void fn08782c()
+{
+	MoveAndFlipWithParent()
+	A1 = 0x0878a8
+	fn0845a0()
+	fn084920()
+}

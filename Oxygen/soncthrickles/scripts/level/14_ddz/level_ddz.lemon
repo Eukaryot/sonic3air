@@ -1,0 +1,884 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Doomsday Zone                                         //
+//-------------------------------------------------------//
+
+//# address-hook(0x05956c) end(0x05958e)
+function void InitLevelTiles.DDZ()
+{
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x081492
+	}
+
+	u16[0xffffee98] = 0
+	u16[0xffffeea0] = 0
+	u16[0xffffee9c] = 0
+	u16[0xffffeea2] = 0
+	D1 = 0
+	D0 = 0
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x059594) end(0x05959c)
+function void UpdateLevelTiles.DDZ()
+{
+	fn059648()
+
+	D4.u16 = u16[0xffffeec0]
+	call 0x0595a0 + s16[0xffffeec0]
+}
+
+//# address-hook(0x0595a0) end(0x0595a0)
+function void fn0595a0()
+{
+	fn0595b0()
+}
+
+//# address-hook(0x0595a4) end(0x0595a4)
+function void fn0595a4()
+{
+	fn0595c0()
+}
+
+//# address-hook(0x0595a8) end(0x0595a8)
+function void fn0595a8()
+{
+	fn0595ee()
+}
+
+//# address-hook(0x0595ac) end(0x0595ac)
+function void fn0595ac()
+{
+	fn059602()
+}
+
+
+//# address-hook(0x0595b0) end(0x0595bc)
+function void fn0595b0()
+{
+	if (level.display_routine == 0)
+		return
+
+	fn059672()
+	u16[0xffffeec0] += 4
+	fn0595c0()
+}
+
+
+//# address-hook(0x0595c0) end(0x0595ec)
+function void fn0595c0()
+{
+	if (level.display_routine == 0x0200)
+	{
+		if (D0.u16 >= 0x0400 || D1.u16 >= 0x0220)
+		{
+			fn059614()
+		}
+		else
+		{
+			fn05961e()
+		}
+	}
+	else
+	{
+		fn059672()
+		fn059614()
+
+		u16[0xffffeec8] = 0xf0
+		u16[0xffffeeca] = 0x0f
+		u16[0xffffeec0] += 4
+		fn0595f0()
+	}
+}
+
+
+//# address-hook(0x0595ee) end(0x0595ee)
+function void fn0595ee()
+{
+	fn059614()
+	fn0595f0()
+}
+
+
+//# address-hook(0x0595f0) end(0x059600)
+function void fn0595f0()
+{
+	D1 = 0
+	D2 = 0
+	fn04ef56()
+	if (_negative())
+	{
+		u16[0xffffeec0] += 4
+	}
+}
+
+
+//# address-hook(0x059602) end(0x059612)
+function void fn059602()
+{
+	if (D0.u16 >= 0x0400 && D0.u16 < 0x0800 && D1.u16 < 0x0220)
+	{
+		fn05961e()
+	}
+	else
+	{
+		fn059614()
+	}
+}
+
+
+//# address-hook(0x059614) end(0x05961c)
+function void fn059614()
+{
+	u16[0xffffee98] = D2.u16
+	u16[0xffffee9c] = D3.u16
+}
+
+
+//# address-hook(0x05961e) end(0x059640)
+function void fn05961e()
+{
+	A6 = 0xffffee98
+	A5 = 0xffffeea0
+	D1.u16 = u16[0xffffee9c]
+	D6 = 0x0f
+	LoadTileContentInDirX()
+
+	A6 = 0xffffee9c
+	A5 = 0xffffeea2
+	D1.u16 = u16[0xffffee98]
+	D6 = (getScreenWidth() + 31) / 16
+	LoadTileContentInDirY()
+}
+
+
+//# address-hook(0x059646) end(0x059646)
+function void fn059646()
+{
+}
+
+
+//# address-hook(0x059648) end(0x059670)
+function void fn059648()
+{
+	D2.u16 = u16[0xffffee98]
+	D3.u16 = u16[0xffffee9c]
+	D0.u16 = camera.foreground.x.u16 - u16[0xffffeed4] + level.display_routine
+	D1.u16 = camera.foreground.y.u16 - u16[0xffffeed6] + 0x0100
+	u16[0xffffee98] = D0.u16
+	u16[0xffffee9c] = D1.u16
+}
+
+
+//# address-hook(0x059672) end(0x05968c)
+function void fn059672()
+{
+	D4.u16 = u16[0xffffee98]
+	u16[0xffffeea0] = u16[0xffffee98] & 0xfff0
+	u16[0xffffeea2] = u16[0xffffee9c] & level.height.tilemask
+}
+
+
+//# address-hook(0x05968e) end(0x0596a4)
+function void InitScrolling.DDZ()
+{
+	u16[0xffffa800] = 0
+	fn0596ea()
+	fn04f2f6()
+
+	D1 = 0
+	Level.InitialTilesFill()
+	fn0596bc()
+}
+
+
+//# address-hook(0x0596a6) end(0x0596b6)
+function void UpdateLevelScrolling.DDZ()
+{
+	fn0596ea()
+
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1 = 0
+	D6 = 0x20
+	LoadTileContentInDirY()
+
+	fn0596bc()
+}
+
+
+//# address-hook(0x0596bc) end(0x0596e8)
+function void fn0596bc()
+{
+	A1 = 0xffffe000		// Location of linewise scroll offsets
+	A4 = 0x059716
+	A5 = 0xffffa800
+	D0.u16 = camera.background.y.u16
+	D1.u16 = getScreenHeight() - 1
+	D3.u16 = u16[0xffffee98]
+	fn04f0de()
+
+	scrolloffset.y.planeA = u16[0xffffee9c]
+	scrolloffset.y.planeB = camera.background.y.u16
+
+	signalMultiReturn()
+}
+
+
+//# address-hook(0x0596ea) end(0x059714)
+function void fn0596ea()
+{
+	camera.background.y.u16 = s16(camera.foreground.y.u16) >> 1
+	D0.u16 = u16[0xffffeed8]
+	D0 = (D0 << 16)
+	D0.s32 >>= 4
+	D1 = D0.s32 >> 3
+	A1 = 0xffffa80e
+	D2 = 5
+	while (D2.s16 >= 0)
+	{
+		u16[A1-=2] = D0 >> 16
+		D0 -= D1
+		--D2.s16
+	}
+}
+
+
+
+// Object that makes Sonic go super?
+
+//# address-hook(0x081492) end(0x081512)
+function void fn081492()
+{
+	fn082742()
+
+	// Targets:
+	//  - 0x081554	-> objA0.base_state = 0x00
+	//  - 0x08160a	-> objA0.base_state = 0x02
+	//  - 0x08167c	-> objA0.base_state = 0x04
+	//  - 0x0816f4	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x081514, objA0.base_state)
+
+	D0.u16 = u16[0xfffffabc]
+	D1.u16 = debug_mode.state
+	u16[0xfffffabc] = D1.u16
+	D0.u16 ^= D1.u16
+	if (D0.u16 != 0)
+	{
+		fn08151c()
+	}
+
+	if (D1.u16 == 0)
+	{
+		fn082920()
+		fn0829d2()
+
+		if (u8[0xfffffab8] & 0x02)
+		{
+			objA0.update_address = 0x0816fc
+			objA0.flags38 |= 0x08
+
+			u32[0xfffffa86] = camera.position.x
+			D0 = camera.position.x.u16
+			screenmover_target.left = D0.u16
+			move_area.left = D0.u16
+			move_area.right = D0.u16
+			screenmover_target.right = D0.u16 + getScreenWidth()
+
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x084a76
+			}
+
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = 0x084a48
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x081554) end(0x0815fc)
+function void fn081554()
+{
+	objA0.base_state = 0x02
+	u16[0xfffffa8e] = A0.u16
+	objA0.countdown_value = 0x17
+	objA0.velocity.x = 0x0400
+	player1.camera_lock = 0xff
+	level.boss_encounter = 1
+	u32[0xfffffa82] = 0x010000
+	u32[0xfffffa8a] = 0x0800
+
+	A1 = 0xffffb000
+	u8[A1 + 0x0a] |= 0x80
+	objA1.state = char.state.ROLLING
+	u8[A1 + 0x2a] = 0
+	u8[A1 + 0x2e] = 0x81
+	objA0.position.x.u16 = camera.position.x.u16 - 0x20
+	objA0.position.y.u16 = camera.position.y.u16 + 0x20
+
+	copyMemory(0xfffffab0, 0x081602, 0x08)
+	level.vertical_wrap = 0
+	move_area.bottom.current = 0x0120
+	move_area.bottom.target = 0x0120
+
+	A1 = 0xffffb04a
+	zeroMemory(0xffffb04a, 0x48)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x082722
+	}
+
+	Kosinski.addToDMAQueue(0x18322a, 0x5b60)
+
+#if STANDALONE
+	// Start with 50 rings now already, that looks better and prevents an unnecessary music tempo change
+	ring_counter = 50
+#endif
+}
+
+
+//# address-hook(0x08160a) end(0x081676)
+function void fn08160a()
+{
+	MoveWithGravity20()
+
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	// Hyper transformation
+	objA0.base_state = 0x04
+	objA0.flags38 |= 0x80
+
+#if !STANDALONE
+	// Rings already got set to 50 in standalone, see "fn081554"
+	ring_counter += 50
+#endif
+
+	super.palettefx.state = 1
+	super.palettefx.timer = 0x0f
+#if STANDALONE
+	if (isMainCharacter(CHARACTER_TAILS))
+	{
+		super.active.tails = 1
+	}
+	else
+#endif
+	{
+		super.active = 1
+	}
+	super.ring_dec.frames = 60
+	u32[0xffffb00c] = 0x146816		// "char.mapping_offset"
+#if STANDALONE
+	if (isMainCharacter(CHARACTER_TAILS))
+	{
+		u8[0xffffb020] = char.state.TAILS_TRANSFORM
+	}
+	else
+#endif
+	{
+		u8[0xffffb020] = char.state.TRANSFORMING
+	}
+	u8[0xffffb02e] = 0x81
+	global.move.speedcap = 0xa00
+	global.move.acceleration = 0x30
+	global.move.deceleration = 0x100
+	u8[0xffffb035] = 0
+	u8[0xffffb02b] |= char.bonus.INVINCIBLE
+
+#if STANDALONE
+	playSound(0x9f)
+#else
+	playSound(0x46)
+#endif
+}
+
+
+//# address-hook(0x08167c) end(0x0816ee)
+function void fn08167c()
+{
+	objA0.velocity.y -= 0x20
+	UpdateMovementStraightSimple()
+
+	A1 = 0xffffb000
+	if (u8[A1 + 0x2e] != 0)
+		return
+
+	objA0.base_state = 0x06
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	objA0.flags38 |= 0x04
+	u8[A1 + 0x2e] = 0x01
+	objA1.state = char.state.RUNNING
+#if STANDALONE
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+		objA1.state = char.state.KNUX_FLYCLIMB
+#endif
+	objA1.velocity.x = 0x1000
+	u16[A1 + 0x1c] = 0x1000
+
+	if (global.super_emeralds != 7)
+	{
+		u32[0xffffcbc0] = 0x08242a
+	}
+	else
+	{
+		fn05fcce()
+		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
+		u32[0xffffcbc0] = 0x01a494		// After-images effect
+	}
+
+	addPatternLoadingCue(0x083d64)
+}
+
+
+//# address-hook(0x0816f4) end(0x0816f8)
+function void fn0816f4()
+{
+	fn082772()
+	fn0828b2()
+}
+
+
+
+//# address-hook(0x0829d2) end(0x082a80)
+function void fn0829d2()
+{
+	A1 = 0xffffb000
+	D0.u16 = camera.position.x.u16
+	D1.u16 = D0.u16
+	D2.u16 = objA0.position.x.u16
+	objA1.position.x.u16 = D2.u16
+	if (objA0.flags38 & 0x08)
+	{
+		D3.u16 = D2.u16
+		D0.u16 += 0x80
+		D2.u16 -= D0.u16
+		if (D2.s16 < 0)
+		{
+			D1.u16 += D2.u16
+			if (D1.s16 >= s16(move_area.left))
+			{
+				camera.position.x.u16 = D1.u16
+			}
+			else
+			{
+				camera.position.x.u16 = move_area.left
+			}
+		}
+		else
+		{
+			D0.u16 += 0x20
+			D3.u16 -= D0.u16
+			if (D3.s16 > 0)
+			{
+				D1.u16 += D3.u16
+				if (D1.s16 < s16[0xffffee16])
+				{
+					camera.position.x.u16 = D1.u16
+				}
+				else
+				{
+					camera.position.x.u16 = move_area.right
+				}
+			}
+		}
+	}
+
+	D0.u16 = camera.position.y.u16
+	D1.u16 = D0.u16
+	D2.u16 = objA0.position.y.u16
+	objA1.position.y.u16 = D2.u16
+	if (objA0.flags38 & 0x04)
+	{
+		D3.u16 = D2.u16
+		D0.u16 += 0x60
+		D2.u16 -= D0.u16
+		if (D2.s16 < 0)
+		{
+			D1.u16 += D2.u16
+			if (D1.s16 >= s16(level.vertical_wrap))
+			{
+				camera.position.y.u16 = D1.u16
+			}
+			else
+			{
+				camera.position.y.u16 = level.vertical_wrap
+			}
+			return
+		}
+
+		D0.u16 += 0x20
+		D3.u16 -= D0.u16
+		if (D3.s16 > 0)
+		{
+			D1.u16 += D3.u16
+			if (D1.s16 < s16(move_area.bottom.current))
+			{
+				camera.position.y.u16 = D1.u16
+			}
+			else
+			{
+				camera.position.y.u16 = move_area.bottom.current
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x08151c) end(0x081552)
+function void fn08151c()
+{
+	if (D1.u16 == 0)
+	{
+		A1 = 0xffffb000
+		objA0.position.x.u16 = objA1.position.x.u16
+		objA0.position.y.u16 = objA1.position.y.u16
+		u8[A1 + 0x2e] = 1
+		u8[A1 + 0x20] = 0
+		objA1.velocity.x = 0x0800
+		u16[A1 + 0x1c] = 0x0800
+	}
+	else
+	{
+		move_area.left = 0
+		move_area.right = 0x7fff
+	}
+}
+
+
+
+//# address-hook(0x082722) end(0x08273c)
+function void fn082722()
+{
+	D1.u16 = u16[A0 + 0x3a]
+	D0 = (ring_counter <= 10) ? 8 : 0
+	if (D0.u16 == D1.u16)
+		return
+
+	// Faster music when rings get low
+	u16[A0 + 0x3a] = D0.u16
+	changeMusicTempo(D0.u8)
+}
+
+
+//# address-hook(0x082742) end(0x082770)
+function void fn082742()
+{
+#if STANDALONE
+	bool isSuperActive = isMainCharacter(CHARACTER_TAILS) ? super.active.tails : super.active
+#else
+	bool isSuperActive = super.active
+#endif
+	if ((objA0.flags38 & 0x80) && !isSuperActive)
+	{
+		objA0.update_address = 0x08179e
+		objA0.velocity.x = 0
+		objA0.velocity.y = 0
+
+		A1 = 0xffffb000
+		objA1.state = char.state.GOT_HURT
+		u8[A1 + 0x2e] = 0x81
+	}
+}
+
+
+//# address-hook(0x082772) end(0x082830)
+function void fn082772()
+{
+	bool goto0827a8 = false
+	A1 = 0xffffb000
+	if (u8[A1 + 0x34] != 0)
+	{
+		u8[A1 + 0x26] += 0x10
+		if (u8[A1 + 0x34] < 0x1e)
+		{
+			goto0827a8 = true
+		}
+		else
+		{
+			objA0.velocity.x = 0
+			objA0.velocity.y = 0
+			D2 = u32[0xfffffa82] >> 8
+			D2.s16 = -D2.s16
+			D3 = 0
+		}
+	}
+	else
+	{
+		u8[A1 + 0x26] = 0
+		u8[A1 + 0x2a] = 0
+		goto0827a8 = true
+	}
+
+	if (goto0827a8)
+	{
+		D0 = 0x40
+		D2 = objA0.velocity.x
+		D3 = 0
+		if (D2.u16 != 0)
+		{
+			if (D2.s16 >= 0)
+			{
+				D0.s16 = -D0.s16
+				D2.u16 += D0.u16
+				if (D2.s16 < 0)
+				{
+					D2 = 0
+				}
+			}
+			else
+			{
+				D2.u16 += D0.u16
+				if (D2.s16 > 0)
+				{
+					D2 = 0
+				}
+			}
+			objA0.velocity.x = D2.u16
+		}
+
+		D0 = 0x40
+		D3.u16 = objA0.velocity.y
+		if (D3.u16 != 0)
+		{
+			if (D3.s16 >= 0)
+			{
+				D0.s16 = -D0.s16
+				D3.u16 += D0.u16
+				if (D3.s16 < 0)
+				{
+					D3 = 0
+				}
+			}
+			else
+			{
+				D3.u16 += D0.u16
+				if (D3.s16 > 0)
+				{
+					D3 = 0
+				}
+			}
+			objA0.velocity.y = D3.u16
+		}
+
+		// Evaluate player input
+		if (control.pad1 != 0 && player1.control_override == 0)
+		{
+			D0.u16 = (control.pad1.state & CONTROL_DPAD) * 4
+			if (control.pad1.pressed & CONTROL_ABC)
+			{
+				if (u8[A1 + 0x34] == 0)
+				{
+					// Values there are vectors in the pressed direction of length 0x0600 (incl. diagonals, and with opposites cancelling out)
+					D2.s16 = s16[0x082872 + D0.u16]
+					D3.s16 = s16[0x082874 + D0.u16]
+				#if STANDALONE
+					// Weaken the effect to make the boss fights harder
+					D2.s16 = D2.s16 * 3/5
+					D3.s16 = D3.s16 * 3/5
+				#endif
+					objA0.velocity.x = D2.s16
+					objA0.velocity.y = D3.s16
+				}
+			}
+			if (D0.u16 != 0)
+			{
+				D4.s16 = u16[0x082832 + D0.u16]
+				D5.s16 = u16[0x082834 + D0.u16]
+				D2.s16 += D4.s16
+				D3.s16 += D5.s16
+			}
+		}
+	}
+
+	objA1.velocity.x = D2.u16
+	objA1.velocity.y = D3.u16
+}
+
+
+//# address-hook(0x0828b2) end(0x08291e)
+function void fn0828b2()
+{
+	if (D2.u16 != 0)
+	{
+		D0 = objA0.position.x
+		D1.u16 = camera.position.x.u16
+		D2.s32 = D2.s16
+		D2 <<= 8
+		D0 += D2
+		D0 = (D0 << 16) + (D0 >> 16)
+		D4.u16 = level.bossarea.left
+		D1.u16 += D4.u16
+		if (D0.u16 >= D1.u16)
+		{
+			D5.u16 = level.bossarea.right - D4.u16
+			D1.u16 += D5.u16
+			objA0.flags38 |= 0x02
+			if (D0.u16 < D1.u16)
+			{
+				objA0.flags38 &= ~0x02
+				D0 = (D0 << 16) + (D0 >> 16)
+				objA0.position.x = D0
+			}
+		}
+	}
+
+	if (D3.u16 != 0)
+	{
+		D0 = objA0.position.y
+		D1.u16 = camera.position.y.u16
+		D3.s32 = D3.s16
+		D3 <<= 8
+		D0 += D3
+		D0 = (D0 << 16) + (D0 >> 16)
+		D4.u16 = level.bossarea.top
+		D1.u16 += D4.u16
+		if (D0.u16 >= D1.u16)
+		{
+			D5.u16 = level.bossarea.bottom - D4.u16
+			D1.u16 += D5.u16
+			if (D0.u16 < D1.u16)
+			{
+				D0 = (D0 << 16) + (D0 >> 16)
+				objA0.position.y = D0
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x082920) end(0x08299e)
+function void fn082920()
+{
+	D0 = u32[0xfffffa82] + s32[0xfffffa8a]
+	D2 = 0x060000
+	D1.u16 = u16[0xfffffa8e]
+	if (D1.u16 != 0)
+	{
+		A1 = 0xffff0000 + D1.u16
+		if (u8[A1 + 0x38] & 0x02)
+		{
+			D1.u16 = objA1.velocity.x
+			if (D1.s16 > 0)
+			{
+				D1.s32 = D1.s16
+				D1 <<= 4
+				D0 += D1
+				D2 = 0x080000
+			}
+		}
+	}
+
+	if (D0.s32 > D2.s32)
+	{
+		D0 = D2
+	}
+	if (D0.s32 > 0x010000)
+	{
+		u32[0xfffffa82] = D0
+	}
+
+	D1 = camera.position.x
+	D2 = D1
+	D1 += D0
+	D1 &= 0x7fffffff
+	camera.position.x = D1
+	D0 = (D0 << 16) + (D0 >> 16)
+	u16[0xffffeed8] += D0.u16
+	D1 = (D1 << 16) + (D1 >> 16)
+	D2 = (D2 << 16) + (D2 >> 16)
+	move_area.left = D1.u16
+	D3.u16 = u16[A0 + 0x3c]
+	D3.u16 += D1.u16
+	move_area.right = D3.u16
+	D1.u16 -= D2.u16
+	u16[0xfffffa90] = D1.u16
+	D2.u16 = objA0.position.x.u16
+	D2.u16 += D1.u16
+	objA0.position.x.u16 = D2.u16
+}
+
+
+
+// Used only in DDZ as it seems
+
+//# address-hook(0x01bbbe) end(0x01bc5e)
+function void fn01bbbe()
+{
+	D6.u16 = (camera.position.x.u16 + 0x0400) & 0xff80
+	if (D6.u16 == dynobjects.areastart.x)
+		return
+
+	if (D6.s16 < s16[0xfffff76e])
+	{
+		dynobjects.areastart.x = D6.u16
+		A1 = dynobjects.addr.begin
+		A3 = 0xffff0000 + dynobjects.respawn.begin
+		D6.u16 -= 0x80
+		if (D6.s16 >= 0)
+		{
+			while (D6.s16 < s16[A1 - 6])
+			{
+				A1 -= 6
+				--A3
+			}
+		}
+		dynobjects.addr.begin = A1
+		dynobjects.respawn.begin = A3.u16
+
+		A1 = dynobjects.addr.end
+		A3 = 0xffff0000 + dynobjects.respawn.end
+		D6.u16 += 0x0300
+		while (D6.s16 <= s16[A1 - 6])
+		{
+			A1 -= 6
+			--A3
+		}
+		dynobjects.addr.end = A1
+		dynobjects.respawn.end = A3.u16
+	}
+	else
+	{
+		dynobjects.areastart.x = D6.u16
+		A1 = dynobjects.addr.end
+		A3 = 0xffff0000 + dynobjects.respawn.end
+		D6.u16 += 0x0280
+		while (D6.u16 > u16[A1])
+		{
+			A1 += 6
+			++A3
+		}
+		dynobjects.addr.end = A1
+		dynobjects.respawn.end = A3.u16
+
+		A1 = dynobjects.addr.begin
+		A3 = 0xffff0000 + dynobjects.respawn.begin
+		D6.u16 -= 0x0300
+		if (D6.s16 >= 0)
+		{
+			while (D6.u16 > u16[A1])
+			{
+				A1 += 6
+				++A3
+			}
+		}
+		dynobjects.addr.begin = A1
+		dynobjects.respawn.begin = A3.u16
+	}
+}

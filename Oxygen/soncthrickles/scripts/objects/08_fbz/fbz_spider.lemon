@@ -1,0 +1,214 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03d090) end(0x03d0f0)
+function void fn03d090()
+{
+	objA0.mapping_offset = 0x03d2fc
+	objA0.sprite_attributes = 0x2339
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x60
+	objA0.sprite_priority = 0x80
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 0x01
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[(A2+=2)-2] = 0
+	objA0.animation.sprite = 0x0a
+
+	u16[A0 + 0x38] = objA0.subtype2c * 4
+
+	objA0.update_address = 0x03d0f6
+	fn03d0f6()
+}
+
+
+//# address-hook(0x03d0f6) end(0x03d118)
+function void fn03d0f6()
+{
+	// Waiting for main character
+	A1 = 0xffffb000
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	if (D0.u16 < 0x20 && debug_mode.state == 0)
+	{
+		objA0.update_address = 0x03d11e
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03d11e) end(0x03d1ac)
+function void fn03d11e()
+{
+	// Going down to grab character
+	if (u16[A0 + 0x34] < 0x40)
+	{
+	#if STANDALONE
+		// A little bit faster please
+		u16[A0 + 0x34] += 2
+	#else
+		++u16[A0 + 0x34]
+	#endif
+	}
+
+	objA0.position.y.u16 = u16[A0 + 0x34] + u16[A0 + 0x46]
+	objA0.velocity.y = objA0.position.y.u16
+	u8[A0 + 0x1d] = (u16[A0 + 0x34] + 7) >> 3
+
+	A1 = 0xffffb000
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	if (D0.u16 < 0x20)
+	{
+		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 5
+		if (D0.u16 < 0x14)
+		{
+			if ((u8[A1 + 0x2a] & 0x02) == 0)
+			{
+				u8[A1 + 0x20] = 0x0e
+				u8[A1 + 0x2e] = 0xc1
+				u8[A1 + 0x3d] = 0
+				u8[A1 + 0x2a] = 0
+				objA1.velocity.x = 0
+				objA1.velocity.y = 0
+				u8[A1 + 0x1e] = u8[A1 + 0x44]
+				u8[A1 + 0x1f] = u8[A1 + 0x45]
+
+				objA0.update_address = 0x03d1b2
+			}
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03d1b2) end(0x03d21a)
+function void fn03d1b2()
+{
+	u16[0xffffb010] = objA0.position.x.u16
+	u16[0xffffb014] = objA0.position.y.u16 + 0x10
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03d2f6
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u8[A1 + 0x04] = objA0.render_flags
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u16[A1 + 0x08] = 0x0280
+		u8[A1 + 0x07] = 0x18
+		u8[A1 + 0x06] = 0x18
+		u8[A1 + 0x22] = 0x0b
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	objA0.animation.sprite = 9
+	objA0.update_address = 0x03d220
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03d220) end(0x03d272)
+function void fn03d220()
+{
+	if (u16[A0 + 0x34] != 0)
+	{
+	#if STANDALONE
+		// A little bit faster please
+		u16[A0 + 0x34] -= 2
+	#else
+		--u16[A0 + 0x34]
+	#endif
+
+		if (u16[A0 + 0x34] == 0)
+		{
+			objA0.update_address = 0x03d278
+		}
+	}
+
+	objA0.position.y.u16 = u16[A0 + 0x34] + u16[A0 + 0x46]
+	objA0.velocity.y = objA0.position.y.u16
+	u8[A0 + 0x1d] = (u16[A0 + 0x34] + 7) >> 3
+
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16
+	u16[0xffffb010] = objA0.position.x.u16
+	u16[0xffffb014] = objA0.position.y.u16 + 0x10
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03d278) end(0x03d2f0)
+function void fn03d278()
+{
+	if (u8[A0 + 0x36] == 0)
+	{
+		// Accelerate
+	#if STANDALONE
+		// A little bit faster please
+		u32[A0 + 0x30] += 0x2000
+	#else
+		u32[A0 + 0x30] += 0x1000
+	#endif
+
+		D0.u16 = objA0.position.x.u16 - u16[A0 + 0x44]
+		if (D0.s16 >= s16[A0 + 0x38])
+		{
+			u8[A0 + 0x36] = 0x01
+		}
+	}
+	else
+	{
+		// Decelerate
+	#if STANDALONE
+		// A little bit faster please
+		u32[A0 + 0x30] -= 0x2000
+	#else
+		u32[A0 + 0x30] -= 0x1000
+	#endif
+
+		if (u32[A0 + 0x30] == 0)
+		{
+			A1 = 0xffffb000
+			u8[A1 + 0x20] = 0
+			u8[A1 + 0x2e] = 0
+			u8[A1 + 0x2a] |= 0x02
+			objA0.update_address = 0x03d2f6
+			objA0.animation.sprite = 0x0a
+			A1 = 0xffff0000 + u16[A0 + 0x3c]
+			u8[A1 + 0x22] = 0
+		}
+	}
+
+	objA0.position.x += u32[A0 + 0x30]
+	objA0.velocity.x = objA0.position.x.u16
+
+	A1 = 0xffff0000 + u16[A0 + 0x3c]
+	objA1.position.x.u16 = objA0.position.x.u16
+	u16[0xffffb010] = objA0.position.x.u16
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03d2f6) end(0x03d2f6)
+function void fn03d2f6()
+{
+	DrawOrUnloadObject()
+}

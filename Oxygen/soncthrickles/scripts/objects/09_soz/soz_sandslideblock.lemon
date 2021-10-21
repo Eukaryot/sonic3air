@@ -1,0 +1,177 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x040276) end(0x0402c6)
+function void fn040276()
+{
+	objA0.mapping_offset = 0x04043a
+	objA0.sprite_attributes = 0x43c0
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x0c
+	objA0.sprite_priority = 0x0200
+
+	D0 = objA0.subtype2c * 8
+	objA0.position.x.u16 += D0.u16
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+	u16[A0 + 0x30] = u16[A0 + 0x44]
+	D0.u16 = (D0.u16 & 0xff80) + 0x0300
+	objA0.value32 = D0.u16
+
+	objA0.update_address = 0x0402cc
+	fn0402cc()
+}
+
+
+//# address-hook(0x0402cc) end(0x0402fe)
+function void fn0402cc()
+{
+	if (u16[A0 + 0x34] != 0)
+	{
+		--u16[A0 + 0x34]
+		if (u16[A0 + 0x34] != 0)
+			return
+
+		if (u8[0xfffffe84] != 0)
+		{
+			u16[A0 + 0x34] = 0x01
+			--u16[A0 + 0x36]
+			return
+		}
+	}
+
+	D0 = u8[0xfffffe84] + u16[A0 + 0x46]
+	objA0.position.y.u16 = D0.u16
+
+	fn040302()
+	fn0403b0()
+}
+
+
+//# address-hook(0x040302) end(0x04036c)
+function void fn040302()
+{
+	--u16[A0 + 0x36]
+	if (s16[A0 + 0x36] < 0)
+	{
+		u16[A0 + 0x36] = 0x7f
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x04036e
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16
+			u8[A1 + 0x04] = objA0.render_flags
+			u32[A1 + 0x0c] = objA0.mapping_offset
+			u16[A1 + 0x0a] = objA0.sprite_attributes
+			u16[A1 + 0x08] = 0x0280
+			u8[A1 + 0x07] = 0x18
+			u8[A1 + 0x06] = 0x0c
+
+			D0 = objA0.subtype2c * 16
+			u16[A1 + 0x34] = D0.u16
+			u16[A1 + 0x30] = u16[A0 + 0x30]
+			u16[A1 + 0x32] = objA0.value32
+		}
+		u16[A0 + 0x34] = 0x01
+	}
+}
+
+
+//# address-hook(0x04036e) end(0x0403a0)
+function void fn04036e()
+{
+	u16 backup_px = objA0.position.x.u16
+	UpdateMovementSimple()
+	if (objA0.velocity.y >= 0x0200)
+	{
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 += D1.u16
+			objA0.update_address = 0x0403dc
+			objA0.velocity.x = -0x100
+			objA0.velocity.y = 0
+		}
+	}
+
+	D4.u16 = backup_px
+	fn0403a2()
+}
+
+
+//# address-hook(0x0403a2) end(0x0403aa)
+function void fn0403a2()
+{
+	D1.u16 = 0x18
+	D3.u16 = 0x0d
+	PlatformCheckClimbOn()
+	fn0403b0()
+}
+
+
+//# address-hook(0x0403b0) end(0x0403d6)
+function void fn0403b0()
+{
+	D0.u16 = (u16[A0 + 0x30] & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= objA0.value32)
+	{
+		DrawObject()
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x0403dc) end(0x04040a)
+function void fn0403dc()
+{
+	--u16[A0 + 0x34]
+	if (u16[A0 + 0x34] == 0)
+	{
+		u16[A0 + 0x46] = objA0.position.y.u16
+		objA0.velocity.x = 0
+		objA0.update_address = 0x04040c
+	}
+
+	u16 backup_px = objA0.position.x.u16
+	UpdateMovementStraightSimple()
+	CheckGroundCollision()
+	objA0.position.y.u16 += D1.u16
+
+	D4.u16 = backup_px
+	fn0403a2()
+}
+
+
+//# address-hook(0x04040c) end(0x040436)
+function void fn04040c()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 8
+
+	D0.u16 = u16[A0 + 0x46] + 0x12
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.position.x.u16 = 0x7f00
+		u16[A0 + 0x30] = 0x7f00
+	}
+
+	D4.u16 = objA0.position.x.u16
+	fn0403a2()
+}

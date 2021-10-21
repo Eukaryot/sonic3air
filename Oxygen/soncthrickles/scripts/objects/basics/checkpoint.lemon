@@ -1,0 +1,462 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Checkpoint (a.k.a. Starpost)                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x02cfa8) end(0x02cfb2)
+function void Checkpoint.BaseUpdate()
+{
+	// Can lead to:
+	//  - 0x02cfc0	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x02d012	-> objA0.base_state = 0x02	-> Inactive
+	//  - 0x02d0f8	-> objA0.base_state = 0x04	-> Active
+	//  - 0x02d10a	-> objA0.base_state = 0x06	-> Head spinning (used only by this child object)
+	//  - 0x02d47e	-> objA0.base_state = 0x08	-> Bonus stage stars animating (used only by these child objects)
+	call tableLookupAddress(0x02cfb6, objA0.base_state)
+}
+
+
+//# address-hook(0x02cfc0) end(0x02d00c)
+function void fn02cfc0()
+{
+#if STANDALONE
+	// No checkpoints in Time Attack, as they serve no purpose there
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
+
+	objA0.base_state += 2
+	objA0.mapping_offset = 0x02d348
+	objA0.sprite_attributes = 0x05ec
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x28
+	objA0.sprite_priority = 0x280
+
+	A2 = 0xffff0000 + u16[A0 + 0x48]
+	if ((u8[A2] & 0x01) || (checkpoint.number & 0x7f) >= (objA0.subtype2c & 0x7f))
+	{
+		u8[A2] |= 0x01
+		objA0.state = 0x02
+	}
+
+	fn02d012()
+}
+
+
+//# address-hook(0x02d012) end(0x02d024)
+function void fn02d012()
+{
+	if (debug_mode.state == 0)
+	{
+		A3 = 0xffffb000
+		D1.u8 = checkpoint.number
+		fn02d028()
+	}
+
+	fn02d0f8()
+}
+
+
+//# address-hook(0x02d028) end(0x02d0f6)
+function void fn02d028()
+{
+#if STANDALONE
+	// Skip this when restart was triggered
+	//  -> Otherwise the "Restart Level" function won't work correctly when directly in front of a checkpoint
+	if (level.restart == 1)
+		return
+#endif
+
+	D1.u8 &= 0x7f
+	D2.u8 = objA0.subtype2c & 0x7f
+	if (D1.u8 < D2.u8)
+	{
+		u16 dx = u16[A3 + 0x10] - objA0.position.x.u16 + 8
+		u16 dy = u16[A3 + 0x14] - objA0.position.y.u16 + 0x40
+		if (dx < 0x10 && dy < 0x68)
+		{
+			// Activate checkpoint now
+			playSound(0x63)
+			if (allocDynamicObjectStd())
+			{
+				// Spawn the checkpoint's spinning head
+				objA1.update_address = 0x02cfa8
+				u8[A1 + 0x04] = render_flag.WORLD
+				u8[A1 + 0x05] = 0x06
+				u8[A1 + 0x06] = 8
+				u8[A1 + 0x07] = 8
+				u16[A1 + 0x08] = 0x200
+				u16[A1 + 0x0a] = u16[A0 + 0x0a]
+				u32[A1 + 0x0c] = u32[A0 + 0x0c]
+				u8[A1 + 0x22] = 2
+				u16[A1 + 0x30] = objA0.position.x.u16
+				u16[A1 + 0x32] = objA0.position.y.u16 - 0x14
+				u16[A1 + 0x36] = 0x20
+				u16[A1 + 0x3e] = A0.u16
+
+			#if STANDALONE
+				if (!Game.isTimeAttack())
+			#endif
+				{
+					if (ring_counter >= 20)
+					{
+						fn02d3c8()
+					}
+				}
+			}
+
+			objA0.state = 0x01
+			fn02d164()
+
+			objA0.base_state = 0x04
+			A2.s32 = s16[A0 + 0x48]
+			u8[A2] |= 0x01
+		}
+	}
+	else if (objA0.state == 0)
+	{
+		objA0.state = 0x02
+	}
+}
+
+
+//# address-hook(0x02d0f8) end(0x02d104)
+function void fn02d0f8()
+{
+	Object.animationUpdate(0x02d338)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x02d10a) end(0x02d15e)
+function void fn02d10a()
+{
+	--u16[A0 + 0x36]
+	if (s16[A0 + 0x36] < 0)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x3e]
+		if (u32[A1] == 0x2cfa8)
+		{
+			u8[A1 + 0x20] = 2
+			u8[A1 + 0x22] = 0
+		}
+		UnloadObject()
+	}
+	else
+	{
+		u8 angle = objA0.value26 - 0x40
+		s16 dx = (s32(lookupCos(angle)) * 0xc00) >> 16
+		s16 dy = (s32(lookupSin(angle)) * 0xc00) >> 16
+		objA0.position.x.u16 = u16[A0 + 0x30] + dx
+		objA0.position.y.u16 = u16[A0 + 0x32] + dy
+		objA0.value26 -= 0x10
+
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x02d164) end(0x02d1ca)
+function void fn02d164()
+{
+	checkpoint.number = objA0.subtype2c
+	checkpoint.x = objA0.position.x.u16
+	checkpoint.y = objA0.position.y.u16
+#if STANDALONE
+	// Use uppermost flag in checkpoint.y for checkpoints where character should face left instead of right
+	if (objA0.subtype2c & 0x80)
+	{
+		checkpoint.number &= 0x7f
+		checkpoint.y |= 0x8000
+	}
+#endif
+	Checkpoint.SaveCurrentState()
+}
+
+
+//# address-hook(0x02d176)
+function void Checkpoint.SaveCurrentState()
+{
+	checkpoint.number.backup = checkpoint.number
+	checkpoint.zone_act = global.zone_act
+	checkpoint.zone_act.apparent = global.zone_act.apparent
+	checkpoint.sprite_attr = u16[0xffffb00a]
+	checkpoint.layer_flags = u16[0xffffb046]
+	checkpoint.rings = ring_counter
+	checkpoint.lives_granted = extra_lives_granted
+	checkpoint.time = timer.alldata
+	checkpoint.camera_routine = camera.update_routine
+	checkpoint.move_area.bottom = move_area.bottom.current
+	checkpoint.camera.x = camera.position.x.u16
+	checkpoint.camera.y = camera.position.y.u16
+	checkpoint.water.height = water.height.next
+	checkpoint.water.fullscreen = water.fullscreen
+}
+
+
+function u8 Checkpoint.selectBonusStage()
+{
+	// S3&K combined: All three bonus stages available
+	// S&K alone: Only first two bonus stages available
+	u16 stagesAvailable = (global.lock_on_state == 0) ? 3 : 2
+
+	// Stages:
+	//  0 = Slot Machine
+	//  1 = Glowing Spheres
+	//  2 = Gumball Machine
+	u8 stage = ((ring_counter - 20) / 15) % stagesAvailable
+	return stage
+}
+
+
+
+//# address-hook(0x02d1cc) end(0x02d232)
+function void fn02d1cc()
+{
+	// This is used only for Special Stages
+	level.backup.checkpoint = checkpoint.number
+	level.backup.zone_act = global.zone_act
+	u16[0xffffff9c] = global.zone_act.apparent
+	u16[0xfffffe4c] = objA0.position.x.u16
+	u16[0xfffffe4e] = objA0.position.y.u16
+	u16[0xfffffe56] = u16[0xffffb00a]
+	u16[0xfffffe58] = u16[0xffffb046]
+	u16[0xfffffe50] = ring_counter
+	u8[0xfffffe61] = extra_lives_granted
+	u32[0xfffffe52] = timer.alldata
+	u8[0xfffffe64] = camera.update_routine
+	u16[0xfffffe62] = move_area.bottom.current
+	u16[0xfffffe5a] = camera.position.x.u16
+	u16[0xfffffe5c] = camera.position.y.u16
+	u16[0xfffffe5e] = water.height.next
+	u8[0xfffffe60] = water.fullscreen
+	global.shields_backup_2 = u8[0xffffb02b]
+}
+
+
+//# address-hook(0x02d3c8) end(0x02d478)
+function void fn02d3c8()
+{
+	// Select bonus stage
+	u8 stage = Checkpoint.selectBonusStage()
+
+	// Spawn stars
+	for (u8 i = 0; i < 4; ++i)
+	{
+		if (!allocDynamicObjectStd())
+			break
+
+		objA1.update_address = objA0.update_address
+		u8[A1 + 0x04] = render_flag.WORLD
+		u8[A1 + 0x05] = 8
+		u8[A1 + 0x07] = 8
+		u16[A1 + 0x08] = objA0.sprite_priority
+		u16[A1 + 0x0a] = 0x05ec
+		u32[A1 + 0x0c] = 0x02d3aa
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16 - 0x30
+		objA1.velocity.x = -0x400
+		objA1.velocity.y = 0
+		u8[A1 + 0x22] = 1
+		u16[A1 + 0x30] = objA1.position.x.u16
+		u16[A1 + 0x32] = objA1.position.y.u16
+		u16[A1 + 0x34] = i * 0x40
+
+	#if STANDALONE
+		// Save selected bonus stage, so it makes no difference whether the player collects or loses rings until jumping in
+		u8[A1 + 0x48] = stage
+	#endif
+	}
+
+	if (stage == 0)
+	{
+		// Slot machine
+		A1 = 0x187c4e
+	}
+	else if (stage == 1)
+	{
+		// Glowing spheres
+		A1 = 0x187b8a
+	}
+	else
+	{
+		// Gumball machine
+		A1 = 0x187bec
+	}
+	Kosinski.addToDMAQueue(A1, 0xbd80)
+}
+
+
+//# address-hook(0x02d47e) end(0x02d5c0)
+function void fn02d47e()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		// This seems to get entered once for each of the four stars -- is this intended...?
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			global.stage_type = 2
+
+		#if STANDALONE
+			// Use previously selected bonus stage
+			u8 stage = u8[A0 + 0x48]
+		#else
+			u8 stage = Checkpoint.selectBonusStage()
+		#endif
+			if (stage == 0)
+			{
+				// Slot machine
+				D1.u16 = 0x1500
+			}
+			else if (stage == 1)
+			{
+				// Glowing spheres
+				D1.u16 = 0x1400
+			}
+			else
+			{
+				// Gumball machine
+				D1.u16 = 0x1300
+			}
+
+			global.zone_act = D1.u16
+			global.zone_act.apparent = D1.u16
+			checkpoint.rings = ring_counter
+			checkpoint.lives_granted = extra_lives_granted
+			checkpoint.number = 0
+			level.restart.u8 = 1
+
+			// Backup of shields active before entering the Special Stage
+			D0.u8 = u8[0xffffb02b] & 0x71
+			global.shields_backup_1 = D0.u8
+			global.shields_backup_2 = D0.u8
+			global.in_extra_stage = 1
+			fn01bb7e()
+		}
+
+		u8[A0 + 0x29] = 0
+	}
+
+	u16[A0 + 0x34] += 10
+	u8 angle = u16[A0 + 0x34]
+	D0.s16 = lookupSin(angle) >> 5
+	D1.s16 = lookupCos(angle) >> 3
+	D3.u16 = D1.u16
+	D2.u16 = (u16[A0 + 0x34] & 0x3e0) >> 5
+	if (D2.s16 > 0x10)
+		D1.s16 = -D1.s16
+
+	D2.u16 &= 0x0f
+	if (D2.s16 > 0x08)
+	{
+		D2.s16 = -D2.s16
+		D2.u16 &= 0x07
+	}
+
+	D4 = 0
+	D5 = 2
+	while (D5.s16 >= 0)
+	{
+		D2.u16 >>= 1
+		if (D2.u16 != 0)
+		{
+			D4.u16 += D1.u16
+		}
+		D1.s16 <<= 1
+		--D5.s16
+	}
+
+	D4.s16 >>= 4
+	D0.u16 += D4.u16
+	++u16[A0 + 0x36]
+	D1.u16 = u16[A0 + 0x36]
+
+	if (D1.u16 != 0x80)
+	{
+		bool goto02d56a = false
+		if (D1.s16 > 0x180)
+		{
+			D1.s16 = 0x200 - D1.s16
+			if (D1.s16 < 0)
+			{
+				UnloadObject()
+				return
+			}
+
+			goto02d56a = true
+		}
+		else if (D1.s16 <= 0x80)
+		{
+			goto02d56a = true
+		}
+
+		if (goto02d56a)
+		{
+			D0.s32 = s32(D0.s16) * D1.s16
+			D3.s32 = s32(D3.s16) * D1.s16
+			D0.s16 >>= 7
+			D3.s16 >>= 7
+		}
+	}
+	else
+	{
+		u8[A0 + 0x28] = 0xd8
+	}
+
+	objA0.position.x.u16 = u16[A0 + 0x30] + D3.u16
+	objA0.position.y.u16 = objA0.value32 + D0.u16
+	++objA0.animation.frame
+	D0.u16 = (objA0.animation.frame & 0x06) >> 1
+	if (D0.u16 == 3)
+		D0 = 1
+	objA0.animation.sprite = D0.u8
+	fn01b662()
+}
+
+
+//# address-hook(0x01bb7e) end(0x01bbbc)
+function void fn01bb7e()
+{
+	// Reset all respawn entries for the actually instanced objects, so they will respawn when returning to the main game
+	A1 = 0xffffb0de
+	for (u8 i = 0; i < 0x5a; ++i)
+	{
+		A1 += 0x4a
+		if (u32[A1] != 0 && objA1.respawn_entry != 0)
+		{
+			A2 = 0xffff0000 + objA1.respawn_entry
+			u8[A2] &= ~0x80
+		}
+	}
+
+	A2 = 0xffffef80
+	D1.u16 = u16[(A2+=2)-2]
+	while (D1.s16 > 0)
+	{
+		while (true)
+		{
+			D0.u16 = u16[(A2+=2)-2]
+			if (D0.u16 != 0)
+				break
+		}
+
+		A1.s32 = D0.s16
+		u16[A1] = 0xffff
+		u16[A2-2] = 0
+		--u16[0xffffef80]
+		--D1.s16
+	}
+}

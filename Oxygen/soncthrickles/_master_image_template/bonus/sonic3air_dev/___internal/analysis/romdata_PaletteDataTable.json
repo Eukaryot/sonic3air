@@ -1,0 +1,348 @@
+{
+	"PaletteDataTable" : 
+	{
+		"0x0a8744" : 
+		{
+			"bytes" : "0x0020",
+			"dest" : "0xfc00",
+			"index" : "0x03",
+			"source" : "0x0a8a3c"
+		},
+		"0x0a874c" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xfc00",
+			"index" : "0x04",
+			"source" : "0x0a8a7c"
+		},
+		"0x0a8754" : 
+		{
+			"bytes" : "0x0020",
+			"dest" : "0xfc00",
+			"index" : "0x05",
+			"source" : "0x0a8afc"
+		},
+		"0x0a877c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x0a",
+			"source" : "0x0a8b1c"
+		},
+		"0x0a8784" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x0b",
+			"source" : "0x0a8bdc"
+		},
+		"0x0a878c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x0c",
+			"source" : "0x0a8d9c"
+		},
+		"0x0a8794" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x0d",
+			"source" : "0x0a8dfc"
+		},
+		"0x0a879c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x0e",
+			"source" : "0x0a8f5c"
+		},
+		"0x0a87a4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x0f",
+			"source" : "0x0a8f5c"
+		},
+		"0x0a87ac" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x10",
+			"source" : "0x0a8fbc"
+		},
+		"0x0a87b4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x11",
+			"source" : "0x0a8fbc"
+		},
+		"0x0a87bc" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x12",
+			"source" : "0x0a909c"
+		},
+		"0x0a87c4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x13",
+			"source" : "0x0a90fc"
+		},
+		"0x0a87cc" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x14",
+			"source" : "0x0a915c"
+		},
+		"0x0a87d4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x15",
+			"source" : "0x0a91bc"
+		},
+		"0x0a87dc" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x16",
+			"source" : "0x0a929c"
+		},
+		"0x0a87e4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x17",
+			"source" : "0x0a92fc"
+		},
+		"0x0a87ec" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x18",
+			"source" : "0x0a943c"
+		},
+		"0x0a87f4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x19",
+			"source" : "0x0a949c"
+		},
+		"0x0a87fc" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x1a",
+			"source" : "0x0a94fc"
+		},
+		"0x0a8804" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x1b",
+			"source" : "0x0a955c"
+		},
+		"0x0a880c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x1c",
+			"source" : "0x0a967c"
+		},
+		"0x0a8814" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x1d",
+			"source" : "0x0a96dc"
+		},
+		"0x0a881c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x1e",
+			"source" : "0x0a973c"
+		},
+		"0x0a8824" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x1f",
+			"source" : "0x0a979c"
+		},
+		"0x0a882c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x20",
+			"source" : "0x0a98bc"
+		},
+		"0x0a8834" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x21",
+			"source" : "0x0a991c"
+		},
+		"0x0a883c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x22",
+			"source" : "0x0a997c"
+		},
+		"0x0a8854" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x25",
+			"source" : "0x0a985c"
+		},
+		"0x0a885c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x26",
+			"source" : "0x0a99dc"
+		},
+		"0x0a886c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x28",
+			"source" : "0x0a9a3c"
+		},
+		"0x0a887c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x2a",
+			"source" : "0x0a8b7c"
+		},
+		"0x0a8884" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xfc00",
+			"index" : "0x2b",
+			"source" : "0x0a8c9c"
+		},
+		"0x0a888c" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xfc00",
+			"index" : "0x2c",
+			"source" : "0x0a8d1c"
+		},
+		"0x0a889c" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xf000",
+			"index" : "0x2e",
+			"source" : "0x0a935c"
+		},
+		"0x0a88ac" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x30",
+			"source" : "0x0a8c3c"
+		},
+		"0x0a88b4" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xfc00",
+			"index" : "0x31",
+			"source" : "0x0a8e5c"
+		},
+		"0x0a88bc" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xf000",
+			"index" : "0x32",
+			"source" : "0x0a8edc"
+		},
+		"0x0a88c4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x33",
+			"source" : "0x0a9bbc"
+		},
+		"0x0a88cc" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x34",
+			"source" : "0x0a9a9c"
+		},
+		"0x0a88d4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x35",
+			"source" : "0x0a9afc"
+		},
+		"0x0a88dc" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x36",
+			"source" : "0x0a9b5c"
+		},
+		"0x0a88e4" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x37",
+			"source" : "0x0a9c1c"
+		},
+		"0x0a88ec" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x38",
+			"source" : "0x0a9c7c"
+		},
+		"0x0a88f4" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xf000",
+			"index" : "0x39",
+			"source" : "0x0a921c"
+		},
+		"0x0a88fc" : 
+		{
+			"bytes" : "0x0080",
+			"dest" : "0xfc00",
+			"index" : "0x3a",
+			"source" : "0x0a901c"
+		},
+		"0x0a891c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x3e",
+			"source" : "0x0a9cdc"
+		},
+		"0x0a8924" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfca0",
+			"index" : "0x3f",
+			"source" : "0x0a9d3c"
+		},
+		"0x0a892c" : 
+		{
+			"bytes" : "0x0060",
+			"dest" : "0xfc20",
+			"index" : "0x40",
+			"source" : "0x0a9d9c"
+		}
+	}
+}

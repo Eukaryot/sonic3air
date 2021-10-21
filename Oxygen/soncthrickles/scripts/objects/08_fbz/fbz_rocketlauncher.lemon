@@ -1,0 +1,110 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03c7ec) end(0x03c822)
+function void fn03c7ec()
+{
+	objA0.mapping_offset = 0x03c906
+	objA0.sprite_attributes = 0x232b
+	objA0.render_flags |= 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x04
+	objA0.sprite_priority = 0x0280
+	D0 = objA0.subtype2c * 4
+	objA0.countdown_value = D0.u16
+	u16[A0 + 0x30] = D0.u16
+
+	objA0.update_address = 0x03c828
+	fn03c828()
+}
+
+
+//# address-hook(0x03c828) end(0x03c8b0)
+function void fn03c828()
+{
+	if (s8[A0 + 0x04] < 0)
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value < 0)
+		{
+			objA0.countdown_value = u16[A0 + 0x30]
+
+			if (allocDynamicObjectAfterA0())
+			{
+				objA1.update_address = 0x03c8d4
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16
+				u8[A1 + 0x04] = objA0.render_flags
+				u32[A1 + 0x0c] = objA0.mapping_offset
+				u16[A1 + 0x0a] = 0x232b
+				u16[A1 + 0x08] = 0x0300
+				u8[A1 + 0x07] = 0x10
+				u8[A1 + 0x06] = 0x04
+				u8[A1 + 0x28] = 0x9b
+				objA1.velocity.x = 0x0400
+				if ((objA0.flags2a & 0x01) == 0)
+				{
+					objA1.velocity.x = -objA1.velocity.x
+				}
+				playSound(0x67)
+			}
+
+			objA0.update_address = 0x03c8b6
+			objA0.animation.sprite = 0x07
+			objA0.animation.timer = 0x1f
+
+			fn03c8b6()
+			return
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03c8b6) end(0x03c8ce)
+function void fn03c8b6()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		--objA0.animation.sprite
+		if (objA0.animation.sprite == 0)
+		{
+			objA0.update_address = 0x03c828
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03c8d4) end(0x03c900)
+function void fn03c8d4()
+{
+	D0.u8 = level.framecounter.low & 0x03
+	if (D0.u8 == 0)
+	{
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x01
+	}
+
+	if (s8[A0 + 0x04] < 0)
+	{
+		UpdateMovementStraightSimple()
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}

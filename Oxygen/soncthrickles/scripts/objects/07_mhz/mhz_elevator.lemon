@@ -1,0 +1,448 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x03e23e) end(0x03e29c)
+function void fn03e23e()
+{
+	objA0.mapping_offset = 0x03e720
+	objA0.sprite_attributes = 0x0424
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x80
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x3c] = objA0.position.y.u16
+
+	D1 = 3
+	u16[A0 + 0x16] = D1.u16
+	--D1.u8
+	A2 = A0 + 0x18
+	A3 = 0x03e29e
+
+	while (D1.s16 >= 0)
+	{
+		D0.u16 = u16[(A3+=2)-2]
+		D0.u16 += objA0.position.x.u16
+		u16[(A2+=2)-2] = D0.u16
+		D0.u16 = u16[(A3+=2)-2]
+		D0.u16 += objA0.position.y.u16
+		u16[(A2+=2)-2] = D0.u16
+		u16[(A2+=2)-2] = u16[(A3+=2)-2]
+		--D1.s16
+	}
+
+	objA0.animation.sprite = 4
+	fn03e2b0()
+}
+
+
+//# address-hook(0x03e2b0) end(0x03e378)
+function void fn03e2b0()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03e472
+		objA1.position.x.u16 = objA0.position.x.u16 - 0x32
+		objA1.position.y.u16 = objA0.position.y.u16 + 0x3a
+		u16[A1 + 0x2e] = objA0.position.x.u16
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u16[A1 + 0x0a] = objA0.sprite_attributes
+		u8[A1 + 0x04] |= 0x04
+		u16[A1 + 0x08] = objA0.sprite_priority
+		u8[A1 + 0x07] = 0x0c
+		u8[A1 + 0x06] = 0x30
+		u16[A1 + 0x46] = A0.u16
+		u8[A1 + 0x22] = 0x02
+		u16[A1 + 0x36] = 0x34
+
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x03e472
+			u8[A1 + 0x04] |= 0x04
+			u8[A1 + 0x04] |= render_flag.FLIP_X
+			u8[A1 + 0x06] = 0x30
+			u8[A1 + 0x07] = 0x0c
+			u16[A1 + 0x08] = objA0.sprite_priority
+			u16[A1 + 0x0a] = objA0.sprite_attributes
+			u32[A1 + 0x0c] = objA0.mapping_offset
+			objA1.position.x.u16 = objA0.position.x.u16 + 0x32
+			objA1.position.y.u16 = objA0.position.y.u16 + 0x3a
+			u8[A1 + 0x22] = 0x02
+			u16[A1 + 0x2e] = objA0.position.x.u16
+			u16[A1 + 0x36] = 0x36
+			u16[A1 + 0x46] = A0.u16
+		}
+	}
+
+	objA0.update_address = 0x03e37e
+	fn03e37e()
+}
+
+
+//# address-hook(0x03e37e) end(0x03e45c)
+function void fn03e37e()
+{
+	// u16[A0 + 0x34] = left pull down
+	// u16[A0 + 0x36] = right pull down
+
+	A2 = A0 + 0x18
+	D2.u16 = (u16[A0 + 0x34] + u16[A0 + 0x36]) >> 1
+	D0.u16 = 0x40 - D2.s16
+	u8[A2 + 0x05] = (D0.u16 <= 0x20) ? 1 : 0
+
+	D1.u16 = D0.u16
+	D3.u16 = D2.u16
+	D2.u16 -= u16[A0 + 0x38]
+	if (D2.u16 != 0)
+	{
+		if (D2.s16 < 0)
+		{
+			if (D2.u16 != -4)
+			{
+				D0.u16 = (D0.u16 + objA0.position.y.u16) & 0x0e
+				if (D0.u16 == 2)
+				{
+					objA0.position.y.u16 -= 2
+				}
+			}
+			else
+			{
+				D0.u16 = (D0.u16 + objA0.position.y.u16) & 0x0e
+				if (D0.u16 == 2)
+				{
+					objA0.position.y.u16 -= 2
+				}
+				else if (D0.u16 == 4)
+				{
+					objA0.position.y.u16 -= 4
+				}
+			}
+		}
+		else
+		{
+			D2.u16 = D0.u16 + objA0.position.y.u16
+
+			bool goto03e3f8 = false
+			if (D2.u16 != 4)
+			{
+				goto03e3f8 = ((D2.u16 & 0x0e) == 0)
+			}
+			else
+			{
+				D2.u16 += 2
+				if ((D2.u16 & 0x0e) == 0)
+				{
+					D2.u16 -= 2
+    				goto03e3f8 = ((D2.u16 & 0x0e) == 0)
+				}
+				else
+				{
+					goto03e3f8 = true
+				}
+			}
+
+			if (goto03e3f8)
+			{
+				if (D2.u16 != u16[A0 + 0x3c])
+				{
+					u16[A0 + 0x3c] = D2.u16
+					if (objA0.subtype2c != 0)
+					{
+						--objA0.subtype2c
+					}
+				}
+			}
+		}
+	}
+
+	u16[A0 + 0x38] = D3.u16
+	D1.u16 += objA0.position.y.u16
+	D0.u16 = D1.u16
+	u16[A2 + 0x02] = D0.u16
+	D0.u16 += 0x38
+	u16[A2 + 0x08] = D0.u16
+	u16[A2 + 0x0e] = D0.u16
+	D1.u16 = u8[0x03e462 + D1.u16 & 0x0f] + 0x10
+	D0.s16 = objA0.position.x.u16 - D1.s16
+	u16[A2 + 0x06] = D0.u16
+	D1.u16 += objA0.position.x.u16
+	u16[A2 + 0x0c] = D1.u16
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03e472) end(0x03e4e6)
+function void fn03e472()
+{
+	objA0.value3a = 0
+	A3 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = u16[A0 + 0x34] + u16[A3 + 0x14] - 6
+	objA0.position.y.u16 = D0.u16
+	fn03e4ec()
+
+	D1 = 0x18
+	if (objA0.value3a != 0)
+	{
+		if (u8[A3 + 0x2c] != 0 && u16[A0 + 0x34] < 0x40)
+		{
+			u16[A0 + 0x34] += 4
+			D1 = 0x1c
+		}
+	}
+	else
+	{
+		if (u16[A0 + 0x34] != 0)
+		{
+			u16[A0 + 0x34] -= 4
+			D1 = 0x14
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x36]
+	u16[A3 + D0.s16] = u16[A0 + 0x34]
+	if (Game.getSetting(SETTING_MHZ_ELEVATOR))
+	{
+		// Much faster movement of the elevator
+		u16[A3 + D0.s16] *= 2
+	}
+
+	objA0.animation.sprite = 3
+	if (D1.u16 <= u16[A0 + 0x34])
+	{
+		D1.u16 += 0x10
+		objA0.animation.sprite = (D1.u16 <= u16[A0 + 0x34]) ? 7 : 2
+	}
+
+	D0.u16 = objA0.countdown_value
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x03e4ec) end(0x03e504)
+function void fn03e4ec()
+{
+	A3 = 0xffff0000 + u16[A0 + 0x46]
+
+	A1 = 0xffffb04a
+	A2 = A0 + 0x31
+	D0.u16 = control.tails
+	fn03e508()
+
+	A1 = 0xffffb000
+	--A2
+	D0.u16 = control.player1
+	fn03e508()
+}
+
+
+//# address-hook(0x03e508) end(0x03e596)
+function void fn03e508()
+{
+	if (u8[A2] == 0)
+	{
+		fn03e682()
+		return
+	}
+
+	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+	{
+		D1.u16 = D0.u16 & CONTROL_ABC
+		if (D1.u8 == 0)
+		{
+		#if STANDALONE
+			// AI Tails should better not be able to use the pulleys
+			if (A1 == 0xffffb04a && tails.control_counter == 0)
+				D0.u16 &= ~0x0202
+		#endif
+			fn03e5f2()
+			return
+		}
+
+		u8[A1 + 0x2e] = 0
+		u8[A2] = 0
+		u8[A2 + 0x02] = 0x12
+
+		D0.u16 &= 0x0f00
+		if (D0.u16 != 0)
+		{
+			u8[A2 + 0x02] = 0x3c
+		}
+		if (D0 & 0x0400)	// CONTROL_LEFT
+		{
+			objA1.velocity.x = -0x200
+		}
+		if (D0 & 0x0800)	// CONTROL_RIGHT
+		{
+			objA1.velocity.x = 0x200
+		}
+
+		objA1.velocity.y = -0x380
+		u8[A1 + 0x1e] = 0x0e
+		u8[A1 + 0x1f] = 0x07
+		objA1.state = char.state.ROLLING
+		objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+		u8[A1 + 0x40] = 0x01
+	}
+	else
+	{
+		u8[A1 + 0x2e] = 0
+		u8[A2] = 0
+		u8[A2 + 0x02] = 0x3c
+	}
+}
+
+
+//# address-hook(0x03e598) end(0x03e5e6)
+function void fn03e598()
+{
+	// Check for cheat (disabled in standalone)
+#if !STANDALONE
+	if (A1 == 0xffffb000 && D0.u8 != 0)
+	{
+		D1 = u8[A0 + 0x40]
+		if (D0.u8 == u8[0x03e5e8 + D1.s16])
+		{
+			++u8[A0 + 0x40]
+			D1.u8 = u8[0x03e5e9 + D1.s16]
+			if (D1.u8 != 0)
+				return
+
+			D1 = 0
+			D1.u16 = -0x20
+			A4 = 0xffff0000 + D1.u16
+			if (u16[A4 - 0x32] == 0)
+			{
+				if (u16[A4] == 0)
+				{
+					D0.u16 = D1.u16
+					u8[A0 + 0x40] = 0
+					return
+				}
+				A4 += 2
+			}
+
+			D1 = 1
+			u8[A4] = D1.u8
+			u8[A4+1] = D1.u8
+			D1.u16 = D0.u16
+			playSound(SFX_RING)
+
+			D0.u16 = D1.u16
+		}
+		u8[A0 + 0x40] = 0
+	}
+#endif
+}
+
+
+//# address-hook(0x03e5f2) end(0x03e652)
+function void fn03e5f2()
+{
+	// Check for cheat first
+	fn03e598()
+
+	if (D0 & 0x0400)	// CONTROL_LEFT
+	{
+		objA1.flags2a |= char.flag.FACING_LEFT
+	}
+	if (D0 & 0x0800)	// CONTROL_RIGHT
+	{
+		objA1.flags2a &= ~char.flag.FACING_LEFT
+	}
+
+	D1.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
+	u8[A1 + 0x04] &= 0xfc
+	u8[A1 + 0x04] |= D1.u8
+
+	if (D0 & 0x0200)	// CONTROL_DOWN held
+	{
+		objA0.value3a = 0x01
+		D1.u8 = 0x91
+	}
+	else
+	{
+		D1.u8 = 0x90
+	}
+
+	if (D0 & 0x0002)	// CONTROL_DOWN pressed
+	{
+		if (u8[A3 + 0x2c] != 0)
+		{
+			playSound(0x88)
+		}
+	}
+
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16 + 0x42
+	fn03e658()
+}
+
+
+//# address-hook(0x03e658) end(0x03e680)
+function void fn03e658()
+{
+	D0.u16 = u16[A0 + 0x34]
+	if (D0.u16 != 0)
+	{
+		D1.u8 = (D0.u16 >= 0x20) ? 0x92 : 0x91
+	}
+
+	u8[A1 + 0x22] = D1.u8
+	D0 = u8[A1 + 0x22]
+
+	u32 backupA2 = A2
+	SetCharacterSpritePatterns()
+	A2 = backupA2
+}
+
+
+//# address-hook(0x03e682) end(0x03e71e)
+function void fn03e682()
+{
+	if (u8[A2 + 0x02] != 0)
+	{
+		--u8[A2 + 0x02]
+		if (u8[A2 + 0x02] != 0)
+			return
+	}
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 - 0x30
+	if (D0.u16 < 0x20 && D1.u16 < 0x18)
+	{
+		if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
+		{
+			if (objA1.velocity.y > 0)
+			{
+			#if STANDALONE
+				// Ignore for Tails while he's carrying the main player
+				if (A1 == 0xffffb04a && tails.carrying)
+					return
+			#endif
+
+				objA1.velocity.x = 0
+				objA1.velocity.y = 0
+				u16[A1 + 0x1c] = 0
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16 + 0x42
+				objA1.state = char.state.HANGING
+				u8[A1 + 0x2e] = 0x03
+				u8[A1 + 0x3d] = 0
+				u8[A1 + 0x04] &= 0xfd
+
+				u8[A2] = 1
+				D1.u8 = 0x90
+
+				playSound(0x4a)
+				fn03e658()
+			}
+		}
+	}
+}

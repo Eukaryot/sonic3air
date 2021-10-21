@@ -1,0 +1,927 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+#if STANDALONE
+function u8 BossHPZKnuckles.chooseMusicTrack()
+{
+	u8 option = Game.getSetting(SETTING_AUDIO_HPZ_MUSIC)
+	if (option == 0)
+		return 0xf4		// Knuckles' theme from S3
+	else if (option == 1)
+		return 0xf5		// Knuckles' theme from S&K
+	else if (option == 2)
+		return 0xf6		// Mini-boss theme from S3
+	return 0x1f		// Fallback value, should not get reached
+}
+#endif
+
+
+//# address-hook(0x063cfc) end(0x063d14)
+function void fn063cfc()
+{
+	A1 = A0
+	objA1.update_address = 0x063d1a
+
+	A2 = 0xffffbde0
+	u16[0xfffffaa4] = A2.u16
+	copyMemory(A2, A1, 0x4a)
+
+	UnloadObject()
+
+#if STANDALONE
+	// Change the level chunks a little bit, so the prophecy picture is only there once
+	u8[0xffff81e5] = 0x48
+	u8[0xffff8218] = 0x42
+	u8[0xffff8219] = 0x49
+	u8[0xffff824d] = 0x4a
+	u8[0xffff824e] = 0x4c
+#endif
+}
+
+
+//# address-hook(0x063d1a) end(0x063dd2)
+function void fn063d1a()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	A1 = 0x063cec
+	if (InitBoss(0x063d2e))
+		return
+
+	StartBossFight()
+#if STANDALONE
+	level.boss_encounter = 3	// Usually only 0 or 1, but we're using a value of 3 here for "chooseFittingMusic"
+#endif
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085ca4
+		u32[A1 + 0x34] = 0x063dd4
+		u16[A1 + 0x2e] = 0x78
+		u8[A1 + 0x27] = u8[A0 + 0x27]
+
+		u8[A1 + 0x26] = 0x1f
+	#if STANDALONE
+		u8[A1 + 0x26] = BossHPZKnuckles.chooseMusicTrack()
+	#endif
+	}
+
+	objA0.update_address = 0x063de0
+	objA0.mapping_offset = 0x14a8d6
+	objA0.sprite_attributes = 0x24da
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.hitbox_extends.x = 0x09
+	objA0.hitbox_extends.y = 0x13
+	objA0.render_flags = render_flag.WORLD | render_flag.FLIP_X
+	objA0.animation.sprite = 0xd8
+	boss.remaining_hits = 8
+	u32[A0 + 0x30] = 0x066771
+	u16[A0 + 0x44] = 0
+
+	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
+
+	CutsceneKnuckles.loadPalette()
+
+#if STANDALONE
+	// Change palette to fit
+	//u16[0xfffffc24] = 0x064e
+	//u16[0xfffffc26] = 0x020c
+	//u16[0xfffffc28] = 0x0206
+	//u16[0xfffffc2a] = 0x0080
+	//u16[0xfffffc2c] = 0x000e
+	//u16[0xfffffc2e] = 0x0008
+#endif
+
+	u16[0xfffffc2c] = 0x88
+
+	level.bossarea.left -= getScreenExtend()
+	level.bossarea.right += getScreenExtend()
+}
+
+
+//# address-hook(0x063dd4) end(0x063dda)
+function void fn063dd4()
+{
+	u8[0xfffffab8] |= 0x01
+	Object.TriggerUnloading()
+}
+
+
+//# address-hook(0x063de0) end(0x063dfa)
+function void fn063de0()
+{
+	// This is Knuckles' main update function
+	//  -> Used during the fight, but also for the cutscene later on
+
+	// Regular update
+	// Targets:
+	//  - 0x063e7c	-> objA0.base_state = 0x00  -> Standing there, shadow boxing
+	//  - 0x063eda	-> objA0.base_state = 0x02  -> Reacting to player...?
+	//  - 0x063f3c	-> objA0.base_state = 0x04  -> Kneeling and blocking a spindash attack
+	//  - ?			-> objA0.base_state = 0x06  -> Unused?
+	//  - 0x064016	-> objA0.base_state = 0x08  -> Cowering before jump
+	//  - 0x06403a	-> objA0.base_state = 0x0a  -> Jumping for a glide attack
+	//  - 0x064090	-> objA0.base_state = 0x0c  -> Gliding
+	//  - 0x064102	-> objA0.base_state = 0x0e  -> Falling down after glide
+	//  - 0x06414c	-> objA0.base_state = 0x10  -> Landing after glide
+	//  - 0x064184	-> objA0.base_state = 0x12  -> Getting into a spindash attack
+	//  - 0x0641ec	-> objA0.base_state = 0x14  -> Rolling
+	//  - 0x064258	-> objA0.base_state = 0x16  -> Knuckles got hit
+	//  - 0x0642f0	-> objA0.base_state = 0x18  -> Knuckles got defeated
+	//  - 0x064350	-> objA0.base_state = 0x1a  -> Laying there defeated... poor Knuckles
+	//  - 0x06438a	-> objA0.base_state = 0x1c  -> Explosions from the right
+	//  - 0x0643be	-> objA0.base_state = 0x1e  -> Getting up to see what happened
+	//  - 0x0643ea	-> objA0.base_state = 0x20  -> Very briefly just standing there
+	//  - 0x064422	-> objA0.base_state = 0x22  -> Running to the right, out of the screen
+	//  - 0x064460	-> objA0.base_state = 0x24  -> Threatening Robotnik
+	//  - 0x06451e	-> objA0.base_state = 0x26  -> Jumping up to the Master Emerald
+	//  - 0x064574	-> objA0.base_state = 0x28  -> Very briefly just looking up
+	//  - 0x064594	-> objA0.base_state = 0x2a  -> Jumping up to the Master Emerald
+	//  - 0x0645d4	-> objA0.base_state = 0x2c  -> Threatening Robotnik again
+	//  - 0x064610	-> objA0.base_state = 0x2e  -> Walking a bit to the right
+	//  - 0x064668	-> objA0.base_state = 0x30  -> Preparing jump
+	//  - 0x064692	-> objA0.base_state = 0x32  -> Jumping towards Robotnik
+	//  - 0x0646fb	-> objA0.base_state = 0x34  -> Rebound after hit
+	//  - 0x064758	-> objA0.base_state = 0x36  -> Walking right, following Robotnik
+	//  - 0x0647cb	-> objA0.base_state = 0x38  -> Jumping to the Master Emerald
+	//  - 0x06480a	-> objA0.base_state = 0x3a  -> Hanging on there
+	//  - 0x064846	-> objA0.base_state = 0x3c  -> Getting electro shocked
+	//  - 0x06487c	-> objA0.base_state = 0x3e  -> Falling off
+	//  - 0x0648b2	-> objA0.base_state = 0x40  -> Hit the ground, laying there
+	//  - 0x0648e2	-> objA0.base_state = 0x42  -> Start of ground collapse
+	//  - 0x0648f2	-> objA0.base_state = 0x44  -> Ground collapsing
+	//  - 0x064952	-> objA0.base_state = 0x46  -> Falling down
+	//  - 0x064984	-> objA0.base_state = 0x48  -> Hit the ground down there
+	//  - 0x0649ae	-> objA0.base_state = 0x4a  -> Gaining consciousness again
+	//  - 0x0649d6	-> objA0.base_state = 0x4c  -> Briefly standing there
+	//  - 0x064a00	-> objA0.base_state = 0x4e  -> Walking to the door
+	//  - 0x064a36	-> objA0.base_state = 0x50  -> Shortly waiting, then winking at Sonic/Tails
+	//  - 0x064a6e	-> objA0.base_state = 0x52  -> Standing in front of the door, then smashing it
+	//  - 0x064ac0	-> objA0.base_state = 0x54  -> Running to the left, out of the screen
+	//  - 0x064b10	-> objA0.base_state = 0x56  -> Waiting for player and later the camera
+	//  - 0x064b6a	-> objA0.base_state = 0x58  -> Jumping onto the teleporter
+	//  - 0x064bb8	-> objA0.base_state = 0x5a  -> Laying there while the teleporter charges
+	//  - 0x064bfa	-> objA0.base_state = 0x5c  -> Getting teleported
+	call tableLookupAddress(0x063e1e, objA0.base_state)
+
+	// Animation sprite loading
+	// Targets:
+	//  - 0x063e06	-> u16[A0 + 0x44] = 0x00	-> Use animation sprite from "real" Knuckles
+	//  - 0x063e0a	-> u16[A0 + 0x44] = 0x02	-> Use special animation sprite for this cutscene
+	//  - 0x063e14	-> u16[A0 + 0x44] = 0x04	-> Use special animation sprite for this cutscene
+	call tableLookupAddress(0x063e00, u16[A0 + 0x44])
+
+	DrawObject()
+}
+
+
+//# address-hook(0x063e06) end(0x063e06)
+function void fn063e06()
+{
+	fn0661e0()
+}
+
+
+//# address-hook(0x063e0a) end(0x063e0e)
+function void fn063e0a()
+{
+	Object.loadSpritePatterns(0x066682)
+}
+
+
+//# address-hook(0x063e14) end(0x063e18)
+function void fn063e14()
+{
+	Object.loadSpritePatterns(0x06668a)
+}
+
+
+//# address-hook(0x063e7c) end(0x063eba)
+function void fn063e7c()
+{
+	fn084688()
+	if (D2.s16 < 0 && u8[0xfffffab8] & 0x01)
+	{
+		D0.u8 = objA0.value39 + 1
+	#if !STANDALONE
+		// Reduce wait time in standalone
+		if (D0.u8 >= 2)		// Number of additional animation loops until Knuckles starts a spindash
+	#endif
+		{
+			fn0641c4()
+			return
+		}
+		objA0.value39 = D0.u8
+	}
+
+	CheckDistanceToPlayers()
+	fn066094()
+	if (D3.u16 < 0x40 && D2.u16 < 0x30)
+	{
+		fn063f20()
+	}
+}
+
+
+//# address-hook(0x063ebe) end(0x063ed4)
+function void fn063ebe()
+{
+	objA0.base_state = 0
+	objA0.value39 = 0
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+
+	A1 = 0x066771
+	fn084580()
+}
+
+
+//# address-hook(0x063eda) end(0x063f0c)
+function void fn063eda()
+{
+	fn08450e()
+	CheckDistanceToPlayers()
+	fn066094()
+
+	if (D3.u16 < 0x10 && D2.u16 < 0x20 && u8[A1 + 0x20] != 2)
+	{
+		fn063ff8()
+		return
+	}
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn064066()
+	}
+	else
+	{
+		A3 = 0x063f10
+		fn0660be()
+	}
+}
+
+
+//# address-hook(0x063f20) end(0x063f36)
+function void fn063f20()
+{
+	objA0.base_state = 0x02
+	objA0.animation.sprite = 0xda
+	objA0.countdown_value = 119
+
+	A1 = 0x0667ad
+	fn084580()
+}
+
+
+//# address-hook(0x063f3c) end(0x063f66)
+function void fn063f3c()
+{
+	fn06615a()
+	if (objA0.velocity.x != 0)
+	{
+		D1.u16 = u16[A0 + 0x40]
+		D0.u16 = objA0.velocity.x + D1.u16
+		objA0.velocity.x = D0.u16
+		UpdateMovementStraightSimple()
+	}
+
+	fn084688()
+	if (!_negative())
+	{
+		A3 = 0x063f6a
+		fn0660be()
+	}
+}
+
+
+//# address-hook(0x063f7a) end(0x063fd2)
+function void fn063f7a()
+{
+	// Reaction to Sonic's spindash attack
+	objA0.base_state = 0x04
+	objA0.countdown_callback = 0x063ebe
+	D3.u16 = 0x02c0
+	D4.u16 = -0x20
+	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+	{
+		D3.s16 = -D3.s16
+		D4.s16 = -D4.s16
+	}
+	objA0.velocity.x = D3.u16
+	u16[A0 + 0x40] = D4.u16
+	D0.u16 = objA1.velocity.x
+	D1.u16 = 0x100
+	D2.u16 = -0x100
+	if (D0.s16 >= D2.s16 && D0.s16 < D1.s16)
+	{
+		if (D0.s16 < 0)
+		{
+			D1.u16 = D2.u16
+		}
+		D0.u16 = D1.u16
+	}
+	objA1.velocity.x = -D0.s16
+	objA1.velocity.y = -objA1.velocity.y
+	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+
+	A1 = 0x0667b4
+	fn084580()
+}
+
+
+//# address-hook(0x063fd8) end(0x063fe4)
+function void fn063fd8()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn063ebe()
+	}
+	else
+	{
+		A3 = 0x063fe8
+		fn0660be()
+	}
+}
+
+
+//# address-hook(0x063ff8) end(0x064012)
+function void fn063ff8()
+{
+	if (u8[A1 + 0x34] != 0)
+		return
+
+	objA0.base_state = 0x06
+	objA0.animation.sprite = 0xde
+	objA0.countdown_value = 7
+	fn0660ae()
+}
+
+
+//# address-hook(0x064016) end(0x064016)
+function void fn064016()
+{
+	fn08450e()
+}
+
+
+//# address-hook(0x06401c) end(0x064034)
+function void fn06401c()
+{
+	objA0.base_state = 0x0a
+	objA0.velocity.y = -0x600
+#if STANDALONE
+	// Sometimes jump less high
+	if (getRandomNumber() % 3 == 0)
+		objA0.velocity.y = -0x540
+#endif
+	playSound(0x62)
+
+	A1 = 0x0667c1
+	fn084580()
+}
+
+
+//# address-hook(0x06403a) end(0x064052)
+function void fn06403a()
+{
+	fn08450e()
+	UpdateMovementSimple()
+	if (objA0.velocity.y >= 0)
+	{
+		fn0640dc()
+	}
+	else
+	{
+		A3 = 0x064056
+		fn0660be()
+	}
+}
+
+
+//# address-hook(0x064066) end(0x06408a)
+function void fn064066()
+{
+	objA0.base_state = 0x08
+	CheckDistanceToPlayers()
+	fn066094()
+
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	objA0.countdown_callback = 0x06401c
+
+	A1 = 0x0667cc
+	fn084580()
+}
+
+
+//# address-hook(0x064090) end(0x0640c8)
+function void fn064090()
+{
+	// Check against borders
+	fn06615a()
+
+	UpdateMovementStraightSimple()
+	if (objA0.velocity.x == 0)
+	{
+		// Stop gliding
+		fn064132()
+		return
+	}
+
+	CheckDistanceToPlayers()
+	if (D2.u16 >= 0x30)
+	{
+		bool faceLeft = ((objA0.render_flags & render_flag.FLIP_X) != 0)
+		if (faceLeft != (D0.u16 == 0))
+		{
+			// Stop gliding when player is behind him (and not close any more)
+			fn064132()
+			return
+		}
+	}
+
+	A3 = 0x0640cc
+	fn0660be()
+}
+
+
+//# address-hook(0x0640dc) end(0x064100)
+function void fn0640dc()
+{
+	objA0.base_state = 0x0c
+	objA0.animation.sprite = 0xc0
+	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -0x400 : 0x400
+	objA0.velocity.y = 0x80
+}
+
+
+//# address-hook(0x064102) end(0x06411e)
+function void fn064102()
+{
+	fn084688()
+	UpdateMovementSimple()
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		fn064164()
+	}
+	else
+	{
+		A3 = 0x064122
+		fn0660be()
+	}
+}
+
+
+//# address-hook(0x064132) end(0x064146)
+function void fn064132()
+{
+	objA0.base_state = 0x0e
+	objA0.render_flags ^= render_flag.FLIP_X
+	objA0.velocity.x = 0
+
+	A1 = 0x0667d4
+	fn084580()
+}
+
+
+//# address-hook(0x06414c) end(0x064160)
+function void fn06414c()
+{
+	fn08450e()
+	CheckDistanceToPlayers()
+	fn066094()
+
+	A3 = 0x063f10
+	fn0660be()
+}
+
+
+//# address-hook(0x064164) end(0x06417e)
+function void fn064164()
+{
+	objA0.position.y.u16 += D1.u16
+	objA0.base_state = 0x10
+	objA0.velocity.y = 0
+	objA0.countdown_callback = 0x063ebe
+
+	A1 = 0x0667e0
+	fn084580()
+}
+
+
+//# address-hook(0x064184) end(0x0641c0)
+function void fn064184()
+{
+	if ((global.framecounter.low & 0x0f) == 0)
+	{
+		playSound(0x3c)
+	}
+
+	fn08450e()
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn064222()
+		return
+	}
+
+	if (objA0.countdown_value == 0x2b)
+	{
+		objA0.flags38 &= ~0x01
+		spawnSimpleChildObjects(0x0665fc)
+	}
+
+	A3 = 0x064056
+	fn0660be()
+}
+
+
+//# address-hook(0x0641c4) end(0x0641e6)
+function void fn0641c4()
+{
+	objA0.base_state = 0x12
+	CheckDistanceToPlayers()
+	fn066094()
+
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	objA0.countdown_value = 0x3b
+
+	A1 = 0x0667f5
+	fn084580()
+}
+
+
+//# address-hook(0x0641ec) end(0x06421e)
+function void fn0641ec()
+{
+	fn08450e()
+	fn06615a()
+
+	if (objA0.velocity.x == 0)
+	{
+		objA0.render_flags ^= 0x01
+		objA0.position.y.u16 -= 4
+		fn063ebe()
+	}
+	else
+	{
+		objA0.velocity.x += u16[A0 + 0x40]
+		UpdateMovementStraightSimple()
+
+		A3 = 0x064056
+		fn0660be()
+	}
+}
+
+
+//# address-hook(0x064222) end(0x064252)
+function void fn064222()
+{
+	objA0.base_state = 0x14
+	objA0.flags38 |= 0x01
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.u16 = -0x800
+		D1.u16 = 0x10
+	}
+	else
+	{
+		D0.u16 = 0x800
+		D1.u16 = -0x10
+	}
+	objA0.velocity.x = D0.u16
+	u16[A0 + 0x40] = D1.u16
+	objA0.position.y.u16 += 4
+
+	A1 = 0x0667c1
+	fn084580()
+}
+
+
+//# address-hook(0x064258) end(0x06429a)
+function void fn064258()
+{
+	fn08450e()
+	fn06615a()
+	UpdateMovementSimple()
+
+	if (objA0.velocity.y < 0)
+		return
+
+	CheckGroundCollision()
+	if (D1.s16 >= 0)
+		return
+
+	objA0.position.y.u16 += D1.u16
+
+	D0.u16 = abs(s16(camera.position.x.u16 + getScreenWidth() / 2 - objA0.position.x.u16))
+	if (D0.u16 < 0x60 + getScreenExtend() / 2)
+	{
+		fn0641c4()
+	}
+	else
+	{
+		fn064066()
+	}
+}
+
+
+//# address-hook(0x06429e) end(0x0642ea)
+function void fn06429e()
+{
+#if STANDALONE
+	// Do nothing if character can't deal damage right now
+	if (u8[A1 + 0x34] > 0)	// "char.invuln.countdown"
+		return
+#endif
+
+	// Knuckles got hit
+	objA0.flags38 |= 0x01
+	playSound(0x5d)
+
+	D1.u16 = objA1.position.x.u16 - objA0.position.x.u16
+	objA0.velocity.x = (D1.s16 >= 0) ? -0x300 : 0x300
+	objA0.velocity.y = -0x300
+
+	--boss.remaining_hits
+	if (boss.remaining_hits == 0)
+	{
+		// Defeated
+		fn064310()
+	}
+	else
+	{
+		objA0.base_state = 0x16
+		u16[A0 + 0x44] = 0
+		objA0.mapping_offset = 0x14a8d6
+		objA0.animation.sprite = 0x8d
+
+		A1 = 0x0667bc
+		fn084580()
+	}
+}
+
+
+//# address-hook(0x0642f0) end(0x06430e)
+function void fn0642f0()
+{
+	fn06615a()
+	UpdateMovementSimple()
+	if (objA0.velocity.y < 0)
+		return
+
+	CheckGroundCollision()
+	if (D1.s16 < 0)
+	{
+		fn064356()
+	}
+}
+
+
+//# address-hook(0x064310) end(0x06434e)
+function void fn064310()
+{
+	objA0.base_state = 0x18
+	hud.dirty.timer = 0
+	u16[A0 + 0x44] = 2
+	objA0.mapping_offset = 0x066f36
+	objA0.animation.sprite = 2
+	objA0.flags38 |= 0x10
+	level.default_music.u8 = 0x14
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b30
+		u8[A1 + 0x2c] = 0x14
+	}
+}
+
+
+//# address-hook(0x064350) end(0x064350)
+function void fn064350()
+{
+	fn084688()
+}
+
+
+//# address-hook(0x064356) end(0x064384)
+function void fn064356()
+{
+	objA0.position.y.u16 += D1.u16
+	objA0.base_state = 0x1a
+	objA0.countdown_callback = 0x0643a4
+	playSound(0x90)
+
+	A1 = 0x06680a
+	fn084580()
+
+	Kosinski.addToDMAQueue(0x174a86, 0xa000)
+}
+
+
+//# address-hook(0x06438a) end(0x0643a2)
+function void fn06438a()
+{
+	if ((global.framecounter.low & 0x1f) == 0)
+	{
+		playSound(0x59)
+	}
+
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		fn0643c6()
+	}
+}
+
+
+
+// Something more general?
+
+//# address-hook(0x066094) end(0x0660a4)
+function void fn066094()
+{
+	if (D0.u16 != 0)
+		objA0.render_flags &= ~0x01
+	else
+		objA0.render_flags |= 0x01
+}
+
+
+//# address-hook(0x0660a6) end(0x0660b8)
+function void fn0660a6()
+{
+	// Check against "char.invuln.countdown" and invincibility
+	if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+	{
+		Enemy.DamageCharacter()
+	}
+}
+
+
+//# address-hook(0x0660ae)
+function void fn0660ae()
+{
+	// Only check against invincibility, but not invulnerability frames
+	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
+	{
+		Enemy.DamageCharacter()
+	}
+}
+
+
+//# address-hook(0x0660be) end(0x06612c)
+function void fn0660be()
+{
+	A1 = 0x066152
+	fn0858f8()
+	if (D0 == 0)
+		return
+
+	if (D0.u16 != 0)
+	{
+		u32 backupD0 = D0
+		fn0660e2()
+		D0 = backupD0
+	}
+
+	D0 = (D0 << 16) + (D0 >> 16)
+	if (D0.u16 != 0)
+	{
+		fn0660e2()
+	}
+}
+
+
+function void fn0660e2()
+{
+	if (objA0.flags38 & 0x10)
+		return
+
+	A1 = 0xffff0000 + D0.u16
+	s16 diffX = s16(objA1.position.x.u16 - objA0.position.x.u16)
+	s16 diffY = s16(objA1.position.y.u16 - objA0.position.y.u16)
+
+	bool facingToPlayer = ((objA0.render_flags & render_flag.FLIP_X) != 0) != (diffX < 0)
+	bool hitByPlayer = (facingToPlayer || abs(diffY) >= 0x10)
+#if STANDALONE
+	if (objA0.animation.sprite == 0xc0)
+	{
+		hitByPlayer = facingToPlayer
+	}
+#endif
+
+	if (hitByPlayer)
+	{
+		// Hit by player
+		fn066134()
+	}
+	else if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) && (u8[A1 + 0x20] != char.state.ROLLING))
+	{
+		// Oh no! Knuckles hurt himself attacking the invincible player
+		fn06429e()
+	}
+	else
+	{
+		// Hit player
+
+		// Targets:
+		//  - 0x0660a6
+		A4 = u32[A3]
+		call A4
+	}
+}
+
+
+//# address-hook(0x066134) end(0x06614a)
+function void fn066134()
+{
+	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) && (u8[A1 + 0x20] != char.state.ROLLING))
+	{
+		// Oh no! Knuckles hurt himself attacking the invincible player
+		fn06429e()
+	}
+	else
+	{
+		// Player or Knuckles gets hit, depending on A3
+
+		// Targets:
+		//  - 0x0660a6
+		//  - (plus 0x0660ae also looks like it could be a target)
+		//  - 0x06429e
+		A4 = u32[A3 + 0x08]
+		call A4
+	}
+}
+
+
+//# address-hook(0x06615a) end(0x066188)
+function void fn06615a()
+{
+	if (objA0.velocity.x != 0)
+	{
+	#if STANDALONE
+		u16 borderDistance = getScreenExtend()
+	#else
+		u16 borderDistance = 0x10
+	#endif
+
+		if (objA0.velocity.x > 0)
+		{
+			D0.u16 = camera.position.x.u16 + getScreenWidth() - borderDistance
+			if (D0.u16 <= objA0.position.x.u16)
+			{
+				objA0.velocity.x = 0
+			}
+		}
+		else
+		{
+			D0.u16 = camera.position.x.u16 + borderDistance
+			if (D0.u16 >= objA0.position.x.u16)
+			{
+				objA0.velocity.x = 0
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0661e0) end(0x066234)
+function void fn0661e0()
+{
+	if (objA0.value3a != objA0.animation.sprite)
+	{
+		objA0.value3a = objA0.animation.sprite
+
+		// Same as normal Knuckles
+		updateMultipleSpritePatterns(0x1200e0, 0x14bd0a, 0x9b40, objA0.animation.sprite)
+	}
+}
+
+
+//# address-hook(0x066236) end(0x06628a)
+function void fn066236()
+{
+	if (objA0.animation.sprite != objA0.value3a)
+	{
+		objA0.value3a = objA0.animation.sprite
+		updateMultipleSpritePatterns(0x18a604, 0x018ee2, 0xa000, objA0.animation.sprite)
+	}
+}

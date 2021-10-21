@@ -1,0 +1,346 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Rhinobot (from AIZ)                                   //
+//-------------------------------------------------------//
+
+//# address-hook(0x086e56) end(0x086e56)
+function void Rhinobot.Init()
+{
+	Object.InitWithUpdateAddress(0x086e5c)
+}
+
+
+//# address-hook(0x086e5c) end(0x086e72)
+function void Rhinobot.BaseUpdate()
+{
+	// Targets:
+	//  - 0x086e7e	-> objA0.base_state = 0x00
+	//  - 0x086ec4	-> objA0.base_state = 0x02
+	//  - 0x086eea	-> objA0.base_state = 0x04
+	//  - 0x086eee	-> objA0.base_state = 0x06
+	u32 address = tableLookupAddress(0x086e76, objA0.base_state)
+	if (address == 0x086e7e)
+	{
+		if (fn086e7e())
+			return
+	}
+	else
+	{
+		call address
+	}
+
+	Object.loadSpritePatternsForVDP(0x087132)
+	fn085208()
+}
+
+
+//# translated(0x086e7e) end(0x086ec2)
+function bool fn086e7e()
+{
+	A1 = 0x0870fe
+	if (fn084fa4())
+		return true
+
+	objA0.hitbox_extends.x = 0x08
+	objA0.hitbox_extends.y = 0x10
+	D0.u16 = -0x10
+	D1.u16 = -0x300
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D0.s16 = -D0.s16
+		D1.s16 = -D1.s16
+		objA0.flags38 |= 0x08
+		objA0.flags38 |= 0x04
+	}
+	u16[A0 + 0x40] = D0.u16
+	objA0.value3e = D1.u16
+	objA0.countdown_callback = 0x086f40
+	return false
+}
+
+
+//# address-hook(0x086ec4) end(0x086ee6)
+function void fn086ec4()
+{
+	A3 = 0x086f92
+	if (fn0870a4())
+		return
+
+	A3 = 0x086f74
+	if (fn0870ca())
+		return
+
+	objA0.velocity.x += s16[A0 + 0x40]
+	UpdateMovementStraightSimple()
+
+	fn086ff8()
+	fn08701c()
+}
+
+
+//# address-hook(0x086ff8) end(0x08701a)
+function void fn086ff8()
+{
+	D0.u16 = objA0.velocity.x
+	if (D0.u16 != 0)
+	{
+		if (objA0.flags38 & 0x04)
+		{
+			if (D0.s16 < s16[A0 + 0x3e])
+				return
+		}
+		else
+		{
+			if (D0.s16 > s16[A0 + 0x3e])
+				return
+		}
+	}
+
+	A1 = objA0.countdown_callback
+	call A1
+}
+
+
+//# address-hook(0x086f40) end(0x086f56)
+function void fn086f40()
+{
+	objA0.flags38 ^= 0x04
+	objA0.countdown_callback = 0x086f58
+	s16[A0 + 0x40] = -s16[A0 + 0x40]
+	s16[A0 + 0x3e] = -s16[A0 + 0x3e]
+}
+
+
+//# address-hook(0x086f58) end(0x086f72)
+function void fn086f58()
+{
+	objA0.flags38 ^= 0x08
+	objA0.render_flags ^= render_flag.FLIP_X
+	objA0.flags38 &= ~0x02
+	objA0.countdown_callback = 0x086f40
+}
+
+
+//# address-hook(0x08701c) end(0x0870a2)
+function void fn08701c()
+{
+	bool goto087084 = false
+
+	D1 = 0
+	if (objA0.flags38 & 0x08)
+	{
+		if (objA0.flags38 & 0x04)
+		{
+			if (objA0.velocity.x <= 0x80)
+			{
+				D1 = 1
+			}
+		}
+		else if (objA0.velocity.x > 0x280)
+		{
+			D1 = 1
+		}
+		else
+		{
+			D1 = 2
+			if ((objA0.flags38 & 0x02) == 0)
+			{
+				objA0.flags38 |= 0x02
+				goto087084 = true
+			}
+		}
+	}
+	else
+	{
+		if ((objA0.flags38 & 0x04) == 0)
+		{
+			if (objA0.velocity.x > -0x80)
+			{
+				D1 = 1
+			}
+		}
+		else if (objA0.velocity.x <= -0x280)
+		{
+			D1 = 1
+		}
+		else
+		{
+			D1 = 2
+			if ((objA0.flags38 & 0x02) == 0)
+			{
+				objA0.flags38 |= 0x02
+				goto087084 = true
+			}
+		}
+	}
+
+	if (goto087084)
+	{
+		objA0.animation.sprite = D1.u8
+		playSound(0x48)
+
+		spawnChildObjects(0x087122)
+		if (_equal())
+		{
+			u32[A1 + 0x30] = 0x08713a
+		}
+	}
+	else
+	{
+		objA0.animation.sprite = D1.u8
+	}
+}
+
+
+//# translated(0x0870a4) end(0x0870c8)
+function bool fn0870a4()
+{
+	CheckDistanceToPlayers()
+
+	if (D3.u16 <= 0x20 && D2.u16 <= 0x60)
+	{
+		if ((objA0.flags38 & 0x08) == 0)
+		{
+			D0.u16 -= 2
+		}
+
+		if (D0.u16 != 0)
+		{
+			call A3
+			return true
+		}
+	}
+	return false
+}
+
+
+//# address-hook(0x086f92) end(0x086fcc)
+function void fn086f92()
+{
+	objA0.base_state = 0x04
+	objA0.animation.sprite = 0
+	objA0.countdown_value = 0x20
+	objA0.countdown_callback = 0x086fce
+	objA0.flags38 |= 0x02
+	playSound(0x48)
+
+	spawnChildObjects(0x08712a)
+	if (_equal())
+	{
+		u32[A1 + 0x30] = 0x08714a
+	}
+}
+
+
+//# address-hook(0x086eea) end(0x086eea)
+function void fn086eea()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x086eee) end(0x086ef6)
+function void fn086eee()
+{
+	A3 = 0x086fe8
+	if (fn0870ca())
+		return
+
+	UpdateMovementStraightSimple()
+}
+
+
+//# translated(0x0870ca) end(0x0870fc)
+function bool fn0870ca()
+{
+	D0 = (objA0.flags38 & 0x08) ? 4 : -4
+	D3.u16 = objA0.position.x.u16 + D0.u16
+	u32 backupA3 = A3
+	CheckGroundCollisionFixedX()
+	A3 = backupA3
+
+	if (D1.s16 >= -1 && D1.s16 < 12)
+	{
+		objA0.position.y.u16 += D1.u16
+		return false
+	}
+
+	call A3
+	return true
+}
+
+
+//# address-hook(0x086fce) end(0x086fe6)
+function void fn086fce()
+{
+	objA0.base_state = 0x06
+	objA0.velocity.x = (objA0.flags38 & 0x08) ? 0x400 : -0x400
+}
+
+
+//# address-hook(0x086fe8) end(0x086ff4)
+function void fn086fe8()
+{
+	objA0.base_state = 0x02
+	objA0.animation.sprite = 0
+	fn086f74()
+}
+
+
+//# address-hook(0x086f74) end(0x086f90)
+function void fn086f74()
+{
+	if ((objA0.flags38 & 0x08) == 0)
+		objA0.flags38 |= 0x04
+	else
+		objA0.flags38 &= ~0x04
+
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	fn086f58()
+}
+
+
+//# address-hook(0x086efc) end(0x086f1e)
+//# translated(0x086f26) end(0x086f26)
+function void Rhinobot.DustEffect()
+{
+	// No dust effect in AIZ Act 2
+	if (global.zone_act == 0x0001)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		MoveAndFlipWithParent()
+
+		// Targets:
+		//  - 0x086f2c	-> objA0.base_state = 0x00
+		//  - 0x086f3c	-> objA0.base_state = 0x02
+		call tableLookupAddress(0x086f22, objA0.base_state)
+
+		Object.loadSpritePatterns(0x087132)
+		fn084972()
+	}
+}
+
+
+//# address-hook(0x086f2c) end(0x086f3c)
+function void fn086f2c()
+{
+	A1 = 0x087110
+	if (fn084fa4())
+		return
+
+	objA0.countdown_callback = 0x08522c
+	Object.AnimationProgressByLocalA1()
+}

@@ -1,0 +1,5016 @@
+{
+	"ChildSpawnList" : 
+	{
+		"0x02cd36" : 
+		{
+			"count" : "4",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x02cd3c"
+		},
+		"0x02cdaa" : 
+		{
+			"count" : "4",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x02cdb0"
+		},
+		"0x02ce3c" : 
+		{
+			"count" : "4",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x02ce42"
+		},
+		"0x0601b2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0xf0",
+				"subtype" : "0x00",
+				"update_routine" : "0x05ebc6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0601ba" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe0",
+				"offset_y" : "0x2b",
+				"subtype" : "0x00",
+				"update_routine" : "0x05ea52"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0601c2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf0",
+				"subtype" : "0x00",
+				"update_routine" : "0x05eb32"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0601ca" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x05ecb4"
+		},
+		"0x0601d0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x05ebf0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0601d8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf6",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x05ec3c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0601f0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x05f31c"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x05f3aa"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x05f410"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x060204" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x05f3ea"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06022e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfa",
+				"offset_y" : "0x07",
+				"subtype" : "0x00",
+				"update_routine" : "0x05ed6a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0613f8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x060d58"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x24",
+				"subtype" : "0x02",
+				"update_routine" : "0x060e4c"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x061044"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xc8",
+				"offset_y" : "0xd4",
+				"subtype" : "0x06",
+				"update_routine" : "0x060ffe"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xd4",
+				"subtype" : "0x08",
+				"update_routine" : "0x060ffe"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x38",
+				"offset_y" : "0xd4",
+				"subtype" : "0x0a",
+				"update_routine" : "0x060ffe"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xd8",
+				"subtype" : "0x0c",
+				"update_routine" : "0x060ffe"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x061424" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xd0",
+				"offset_y" : "0xe8",
+				"subtype" : "0x00",
+				"update_routine" : "0x060dac"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xe8",
+				"subtype" : "0x02",
+				"update_routine" : "0x060dac"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xe8",
+				"subtype" : "0x04",
+				"update_routine" : "0x060dac"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x30",
+				"offset_y" : "0xe8",
+				"subtype" : "0x06",
+				"update_routine" : "0x060dac"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06143e" : 
+		{
+			"count" : "16",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06101e"
+		},
+		"0x061444" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x060eba"
+		},
+		"0x06144a" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0610b6"
+		},
+		"0x062280" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x084aa4"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x084a48"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06655a" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0620ea"
+		},
+		"0x066560" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe0",
+				"offset_y" : "0x94",
+				"subtype" : "0x00",
+				"update_routine" : "0x062458"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x066568" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x084aa4"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x084a76"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x084a48"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06657c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xc0",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x0627c6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x066584" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xf0",
+				"subtype" : "0x00",
+				"update_routine" : "0x06282a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06658c" : 
+		{
+			"count" : "4",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06285a"
+		},
+		"0x06659a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x18",
+				"subtype" : "0x00",
+				"update_routine" : "0x061f60"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0665a2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x065bd4"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0665aa" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x061d4c"
+		},
+		"0x0665b0" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x062f72"
+		},
+		"0x0665b6" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06300c"
+		},
+		"0x0665bc" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x0632ca"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0665c4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x065b0e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xcd",
+				"subtype" : "0x02",
+				"update_routine" : "0x065a8c"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xe0",
+				"offset_y" : "0x1d",
+				"subtype" : "0x04",
+				"update_routine" : "0x065b42"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x1d",
+				"subtype" : "0x06",
+				"update_routine" : "0x065b42"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x1d",
+				"subtype" : "0x08",
+				"update_routine" : "0x065b42"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x1d",
+				"subtype" : "0x0a",
+				"update_routine" : "0x065b42"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x28",
+				"offset_y" : "0x1d",
+				"subtype" : "0x0c",
+				"update_routine" : "0x065b42"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0665f0" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x065b70"
+		},
+		"0x0665f6" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0659cc"
+		},
+		"0x0665fc" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x064c24"
+		},
+		"0x066602" : 
+		{
+			"count" : "16",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0652a2"
+		},
+		"0x066608" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x23",
+				"subtype" : "0x00",
+				"update_routine" : "0x06502e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x066610" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x065138"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xd0",
+				"subtype" : "0x02",
+				"update_routine" : "0x06515e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06661e" : 
+		{
+			"count" : "15",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06518a"
+		},
+		"0x066638" : 
+		{
+			"count" : "5",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x065226"
+		},
+		"0x06663e" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0655b2"
+		},
+		"0x066644" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06563a"
+		},
+		"0x06664a" : 
+		{
+			"count" : "32",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x065602"
+		},
+		"0x066650" : 
+		{
+			"count" : "10",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06395c"
+		},
+		"0x066656" : 
+		{
+			"count" : "8",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x063694"
+		},
+		"0x06665c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xec",
+				"subtype" : "0x00",
+				"update_routine" : "0x0638dc"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x066664" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x063916"
+		},
+		"0x067a5a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xde",
+				"offset_y" : "0x2c",
+				"subtype" : "0x00",
+				"update_routine" : "0x06777a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x067a62" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x38",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x067824"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0x18",
+				"subtype" : "0x02",
+				"update_routine" : "0x067862"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x067a70" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x18",
+				"subtype" : "0x00",
+				"update_routine" : "0x0678a0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x067a78" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x061d4c"
+		},
+		"0x067a7e" : 
+		{
+			"count" : "7",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x067900"
+		},
+		"0x068164" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x067aca"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06816c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x067b66"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x068174" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x067b96"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06817c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x067c38"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x068184" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x067cd2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06818c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xec",
+				"subtype" : "0x00",
+				"update_routine" : "0x067d42"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06819c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfa",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x067e62"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0681a4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x067f5c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0681ac" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x067f7a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0681b4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x1e",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x068062"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0681bc" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe0",
+				"subtype" : "0x00",
+				"update_routine" : "0x067d0a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0681c4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x0680fe"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06905c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x20",
+				"subtype" : "0x00",
+				"update_routine" : "0x0686be"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xdc",
+				"offset_y" : "0x08",
+				"subtype" : "0x02",
+				"update_routine" : "0x06870a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069072" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe0",
+				"subtype" : "0x00",
+				"update_routine" : "0x06872c"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x09",
+				"offset_y" : "0xe4",
+				"subtype" : "0x02",
+				"update_routine" : "0x06872c"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x12",
+				"offset_y" : "0xe8",
+				"subtype" : "0x04",
+				"update_routine" : "0x06872c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069086" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe0",
+				"subtype" : "0x00",
+				"update_routine" : "0x068c12"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x09",
+				"offset_y" : "0xe4",
+				"subtype" : "0x02",
+				"update_routine" : "0x068c12"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x12",
+				"offset_y" : "0xe8",
+				"subtype" : "0x04",
+				"update_routine" : "0x068c12"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0690a8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x06880a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x04",
+				"subtype" : "0x02",
+				"update_routine" : "0x068c96"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0690b6" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x9c",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x0688f4"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xac",
+				"offset_y" : "0x04",
+				"subtype" : "0x02",
+				"update_routine" : "0x0688f4"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xbc",
+				"offset_y" : "0x04",
+				"subtype" : "0x04",
+				"update_routine" : "0x0688f4"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xd4",
+				"offset_y" : "0x03",
+				"subtype" : "0x06",
+				"update_routine" : "0x0688f4"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0690d0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x068994"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0690d8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xdc",
+				"subtype" : "0x00",
+				"update_routine" : "0x068d88"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xe4",
+				"subtype" : "0x02",
+				"update_routine" : "0x068d88"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xe4",
+				"subtype" : "0x04",
+				"update_routine" : "0x068d88"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0xec",
+				"subtype" : "0x06",
+				"update_routine" : "0x068d88"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0xec",
+				"subtype" : "0x08",
+				"update_routine" : "0x068d88"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0xfc",
+				"subtype" : "0x0a",
+				"update_routine" : "0x068d88"
+			},
+			"6" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0xfc",
+				"subtype" : "0x0c",
+				"update_routine" : "0x068d88"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069104" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x083f22"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06910c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x068e98"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0xf0",
+				"subtype" : "0x02",
+				"update_routine" : "0x068e98"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x14",
+				"subtype" : "0x04",
+				"update_routine" : "0x068e98"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x0c",
+				"subtype" : "0x06",
+				"update_routine" : "0x068e98"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d18" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x069622"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x069622"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d26" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x069738"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d2e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x0699c0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d36" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xd0",
+				"subtype" : "0x00",
+				"update_routine" : "0x069996"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d3e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x03",
+				"offset_y" : "0x05",
+				"subtype" : "0x00",
+				"update_routine" : "0x069844"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d46" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x07",
+				"subtype" : "0x00",
+				"update_routine" : "0x069844"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d4e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfd",
+				"offset_y" : "0x05",
+				"subtype" : "0x00",
+				"update_routine" : "0x069844"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d56" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x0698d2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d5e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06995a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d66" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf0",
+				"subtype" : "0x00",
+				"update_routine" : "0x069a3a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf0",
+				"subtype" : "0x02",
+				"update_routine" : "0x069a3a"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x08",
+				"subtype" : "0x04",
+				"update_routine" : "0x069a3a"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x08",
+				"subtype" : "0x06",
+				"update_routine" : "0x069a3a"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x18",
+				"subtype" : "0x08",
+				"update_routine" : "0x069a3a"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x18",
+				"subtype" : "0x0a",
+				"update_routine" : "0x069a3a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x069d8c" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x086540"
+		},
+		"0x06ad4e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0x18",
+				"subtype" : "0x00",
+				"update_routine" : "0x06a2ba"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xe8",
+				"subtype" : "0x02",
+				"update_routine" : "0x06a2ba"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0x18",
+				"subtype" : "0x04",
+				"update_routine" : "0x06a2ba"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0xe8",
+				"subtype" : "0x06",
+				"update_routine" : "0x06a2ba"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x24",
+				"subtype" : "0x08",
+				"update_routine" : "0x06a4a8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06ad6e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06a51e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06ad76" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06a460"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06ad7e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06a4c8"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x06a4c8"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x06a4c8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06ad92" : 
+		{
+			"count" : "30",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06a65c"
+		},
+		"0x06ad98" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06a710"
+		},
+		"0x06adaa" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0xf4",
+				"subtype" : "0x00",
+				"update_routine" : "0x06a8c6"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x0c",
+				"subtype" : "0x02",
+				"update_routine" : "0x06a8c6"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0xf4",
+				"subtype" : "0x04",
+				"update_routine" : "0x06a8c6"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x0c",
+				"subtype" : "0x06",
+				"update_routine" : "0x06a8c6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06adc4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xdc",
+				"subtype" : "0x00",
+				"update_routine" : "0x06a8ee"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x06a8ee"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x06a8ee"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x30",
+				"subtype" : "0x06",
+				"update_routine" : "0x06a8ee"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x30",
+				"subtype" : "0x08",
+				"update_routine" : "0x06a8ee"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06bd8a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x23",
+				"offset_y" : "0x12",
+				"subtype" : "0x00",
+				"update_routine" : "0x06b5c4"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x1b",
+				"offset_y" : "0x0a",
+				"subtype" : "0x02",
+				"update_routine" : "0x06b5c4"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x13",
+				"offset_y" : "0x0a",
+				"subtype" : "0x04",
+				"update_routine" : "0x06b5c4"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x1c",
+				"subtype" : "0x06",
+				"update_routine" : "0x06b75c"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x24",
+				"subtype" : "0x08",
+				"update_routine" : "0x06b1a8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06bdb2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06b77c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06bdba" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06b26e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06bdc2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06b3de"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06bdca" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06b456"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x06b456"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06bde6" : 
+		{
+			"count" : "20",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06b50c"
+		},
+		"0x06bdec" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x067e28"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d7c0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x0f",
+				"subtype" : "0x00",
+				"update_routine" : "0x06cc46"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0x10",
+				"subtype" : "0x02",
+				"update_routine" : "0x06c948"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x18",
+				"subtype" : "0x04",
+				"update_routine" : "0x06ceb0"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x18",
+				"subtype" : "0x06",
+				"update_routine" : "0x06ceb0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d7da" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe9",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06c9e8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d7e2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x06cf20"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d7fa" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06cc72"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d812" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06cce6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d81a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06cd42"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d822" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0xec",
+				"subtype" : "0x00",
+				"update_routine" : "0x06cfbe"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x08",
+				"subtype" : "0x02",
+				"update_routine" : "0x06cfbe"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x08",
+				"subtype" : "0x04",
+				"update_routine" : "0x06cfbe"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06d83e" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06d16a"
+		},
+		"0x06d844" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06d1be"
+		},
+		"0x06e2c2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x2c",
+				"subtype" : "0x00",
+				"update_routine" : "0x06dbca"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x1c",
+				"subtype" : "0x02",
+				"update_routine" : "0x06de26"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06e2d0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x18",
+				"subtype" : "0x00",
+				"update_routine" : "0x06def8"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x18",
+				"subtype" : "0x02",
+				"update_routine" : "0x06def8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06e2e6" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x28",
+				"subtype" : "0x00",
+				"update_routine" : "0x06df62"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x2c",
+				"subtype" : "0x02",
+				"update_routine" : "0x06df62"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x3c",
+				"subtype" : "0x04",
+				"update_routine" : "0x06df62"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06e2fa" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x06dfb4"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06e302" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x083d84"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06e30a" : 
+		{
+			"count" : "9",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06dff0"
+		},
+		"0x06edcc" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x14",
+				"subtype" : "0x00",
+				"update_routine" : "0x06e82c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06eddc" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x4c",
+				"subtype" : "0x00",
+				"update_routine" : "0x06eada"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06ede4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x54",
+				"subtype" : "0x00",
+				"update_routine" : "0x06eada"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x54",
+				"subtype" : "0x02",
+				"update_routine" : "0x06eada"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06edf2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06e936"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x06e936"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06ee00" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06ebac"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x06ebac"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06fa76" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x06f10e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x06f10e"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x04",
+				"update_routine" : "0x06f10e"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xdc",
+				"subtype" : "0x06",
+				"update_routine" : "0x06efda"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x08",
+				"update_routine" : "0x06f060"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x0a",
+				"update_routine" : "0x06f178"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x0c",
+				"update_routine" : "0x06f178"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06faa8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x06f0ce"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x06fab0" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x06f74c"
+		},
+		"0x0703d0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x06ffdc"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x07002a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0703de" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0862ae"
+		},
+		"0x0703ec" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x070192"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x070ee0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xd0",
+				"offset_y" : "0x48",
+				"subtype" : "0x00",
+				"update_routine" : "0x070948"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x30",
+				"offset_y" : "0x48",
+				"subtype" : "0x02",
+				"update_routine" : "0x070948"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xd8",
+				"subtype" : "0x04",
+				"update_routine" : "0x070afc"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x070ef4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe0",
+				"subtype" : "0x00",
+				"update_routine" : "0x070a46"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x070f04" : 
+		{
+			"count" : "9",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x070b8c"
+		},
+		"0x070f0a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x070bd0"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x08",
+				"subtype" : "0x02",
+				"update_routine" : "0x070bd0"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x20",
+				"subtype" : "0x04",
+				"update_routine" : "0x070bd0"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x20",
+				"subtype" : "0x06",
+				"update_routine" : "0x070bd0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x070f24" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xf0",
+				"subtype" : "0x00",
+				"update_routine" : "0x070bfe"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xf0",
+				"subtype" : "0x02",
+				"update_routine" : "0x070bfe"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x10",
+				"subtype" : "0x04",
+				"update_routine" : "0x070bfe"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x10",
+				"subtype" : "0x06",
+				"update_routine" : "0x070bfe"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x071984" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf2",
+				"offset_y" : "0xf5",
+				"subtype" : "0x00",
+				"update_routine" : "0x071446"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x0e",
+				"offset_y" : "0xf5",
+				"subtype" : "0x02",
+				"update_routine" : "0x071446"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x12",
+				"subtype" : "0x04",
+				"update_routine" : "0x071446"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf2",
+				"offset_y" : "0xf5",
+				"subtype" : "0x06",
+				"update_routine" : "0x071446"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x0e",
+				"offset_y" : "0xf5",
+				"subtype" : "0x08",
+				"update_routine" : "0x071446"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x0e",
+				"subtype" : "0x0a",
+				"update_routine" : "0x071446"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0719aa" : 
+		{
+			"count" : "8",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0714b8"
+		},
+		"0x0719b0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0xf4",
+				"subtype" : "0x00",
+				"update_routine" : "0x07168a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0xf4",
+				"subtype" : "0x02",
+				"update_routine" : "0x07168a"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x0c",
+				"subtype" : "0x04",
+				"update_routine" : "0x07168a"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x0c",
+				"subtype" : "0x06",
+				"update_routine" : "0x07168a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07296e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x072596"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x073766" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x07308e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x30",
+				"subtype" : "0x02",
+				"update_routine" : "0x0730f8"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x5c",
+				"subtype" : "0x04",
+				"update_routine" : "0x073100"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07377a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x073138"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x073138"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x10",
+				"subtype" : "0x04",
+				"update_routine" : "0x073138"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x10",
+				"subtype" : "0x06",
+				"update_routine" : "0x073138"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x073794" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x073138"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x073138"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x10",
+				"subtype" : "0x04",
+				"update_routine" : "0x073138"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x10",
+				"subtype" : "0x06",
+				"update_routine" : "0x073138"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0xe0",
+				"subtype" : "0x08",
+				"update_routine" : "0x073138"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0xe0",
+				"subtype" : "0x0a",
+				"update_routine" : "0x073138"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0737c2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x07321a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0737d2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x20",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x07333a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0737da" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x30",
+				"subtype" : "0x00",
+				"update_routine" : "0x073364"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x30",
+				"subtype" : "0x02",
+				"update_routine" : "0x073364"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0737f0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xec",
+				"subtype" : "0x00",
+				"update_routine" : "0x073164"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0737f8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x073192"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x073192"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x073806" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x072d24"
+		},
+		"0x07380c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x072e9e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x28",
+				"subtype" : "0x02",
+				"update_routine" : "0x072e9e"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x90",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x072e9e"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xb8",
+				"offset_y" : "0x28",
+				"subtype" : "0x06",
+				"update_routine" : "0x072e9e"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0x10",
+				"subtype" : "0x08",
+				"update_routine" : "0x072e9e"
+			},
+			"5" : 
+			{
+				"offset_x" : "0xdc",
+				"offset_y" : "0xf8",
+				"subtype" : "0x0a",
+				"update_routine" : "0x072e9e"
+			},
+			"6" : 
+			{
+				"offset_x" : "0xb0",
+				"offset_y" : "0x1c",
+				"subtype" : "0x0c",
+				"update_routine" : "0x072e9e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x073838" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x072f4c"
+		},
+		"0x07383e" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x072fb2"
+		},
+		"0x07414c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x073e0e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0x90",
+				"subtype" : "0x02",
+				"update_routine" : "0x073ea2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07415a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x70",
+				"offset_y" : "0xe8",
+				"subtype" : "0x00",
+				"update_routine" : "0x073d74"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x074162" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0x38",
+				"subtype" : "0x00",
+				"update_routine" : "0x073c0a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0x38",
+				"subtype" : "0x02",
+				"update_routine" : "0x073c0a"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x38",
+				"subtype" : "0x04",
+				"update_routine" : "0x073c0a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x074176" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe8",
+				"subtype" : "0x00",
+				"update_routine" : "0x073c82"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x073c82"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x08",
+				"subtype" : "0x04",
+				"update_routine" : "0x073c82"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x074190" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x073a92"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x074198" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x073ba0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0741a0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x073bf6"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x073bf6"
+			},
+			"10" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xfa",
+				"subtype" : "0x14",
+				"update_routine" : "0x073ba0"
+			},
+			"11" : 
+			{
+				"offset_x" : "0x06",
+				"offset_y" : "0xf8",
+				"subtype" : "0x16",
+				"update_routine" : "0x073ba0"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x08",
+				"subtype" : "0x04",
+				"update_routine" : "0x073bf6"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x08",
+				"subtype" : "0x06",
+				"update_routine" : "0x073bf6"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf0",
+				"subtype" : "0x08",
+				"update_routine" : "0x073bf6"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf0",
+				"subtype" : "0x0a",
+				"update_routine" : "0x073bf6"
+			},
+			"6" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x10",
+				"subtype" : "0x0c",
+				"update_routine" : "0x073bf6"
+			},
+			"7" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x10",
+				"subtype" : "0x0e",
+				"update_routine" : "0x073bf6"
+			},
+			"8" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x06",
+				"subtype" : "0x10",
+				"update_routine" : "0x073ba0"
+			},
+			"9" : 
+			{
+				"offset_x" : "0x06",
+				"offset_y" : "0x08",
+				"subtype" : "0x12",
+				"update_routine" : "0x073ba0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x075122" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x24",
+				"subtype" : "0x00",
+				"update_routine" : "0x0749d0"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0xec",
+				"subtype" : "0x02",
+				"update_routine" : "0x0749ae"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe8",
+				"subtype" : "0x04",
+				"update_routine" : "0x074b9e"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x38",
+				"offset_y" : "0xec",
+				"subtype" : "0x06",
+				"update_routine" : "0x074bc0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07513c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0xcc",
+				"subtype" : "0x00",
+				"update_routine" : "0x074c00"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x075144" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xd6",
+				"offset_y" : "0xfe",
+				"subtype" : "0x00",
+				"update_routine" : "0x074afa"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xb6",
+				"offset_y" : "0xfe",
+				"subtype" : "0x02",
+				"update_routine" : "0x074afa"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x074a9a"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xc0",
+				"offset_y" : "0xfe",
+				"subtype" : "0x06",
+				"update_routine" : "0x074c24"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07515e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0xd4",
+				"subtype" : "0x00",
+				"update_routine" : "0x074d14"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0xd4",
+				"subtype" : "0x02",
+				"update_routine" : "0x074d14"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x2c",
+				"offset_y" : "0xe8",
+				"subtype" : "0x04",
+				"update_routine" : "0x074d14"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0xfc",
+				"subtype" : "0x06",
+				"update_routine" : "0x074d14"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0xfc",
+				"subtype" : "0x08",
+				"update_routine" : "0x074d14"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07517e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x074d48"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x075186" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x074e12"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07518e" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x074e30"
+		},
+		"0x075e84" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x0757c0"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x0757c0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x075e98" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x075ad4"
+		},
+		"0x076976" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x076502"
+		},
+		"0x07697c" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0764d0"
+		},
+		"0x076982" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x18",
+				"subtype" : "0x00",
+				"update_routine" : "0x07665e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xd4",
+				"offset_y" : "0x18",
+				"subtype" : "0x02",
+				"update_routine" : "0x07665e"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x11",
+				"offset_y" : "0xaf",
+				"subtype" : "0x04",
+				"update_routine" : "0x076520"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x21",
+				"offset_y" : "0xf0",
+				"subtype" : "0x06",
+				"update_routine" : "0x0764a0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07699c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x067cd2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0769a4" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x076604"
+		},
+		"0x0769aa" : 
+		{
+			"count" : "4",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x076636"
+		},
+		"0x0769b0" : 
+		{
+			"count" : "6",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0766ca"
+		},
+		"0x0773de" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x40",
+				"subtype" : "0x00",
+				"update_routine" : "0x077022"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0773e6" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0xe4",
+				"subtype" : "0x00",
+				"update_routine" : "0x076f46"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x076f46"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0773f4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x084a76"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x084a48"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0782fa" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xec",
+				"subtype" : "0x00",
+				"update_routine" : "0x077cb4"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x40",
+				"subtype" : "0x02",
+				"update_routine" : "0x077d1a"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x20",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x077d82"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x06",
+				"update_routine" : "0x077ffc"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x24",
+				"subtype" : "0x08",
+				"update_routine" : "0x077dd8"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe4",
+				"subtype" : "0x0a",
+				"update_routine" : "0x067cd2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07832c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xd2",
+				"subtype" : "0x00",
+				"update_routine" : "0x077df8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x078334" : 
+		{
+			"count" : "20",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x077e7c"
+		},
+		"0x078d98" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x078a28"
+		},
+		"0x078d9e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf4",
+				"subtype" : "0x00",
+				"update_routine" : "0x078a70"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe7",
+				"offset_y" : "0xf4",
+				"subtype" : "0x02",
+				"update_routine" : "0x078a70"
+			},
+			"10" : 
+			{
+				"offset_x" : "0x12",
+				"offset_y" : "0x0c",
+				"subtype" : "0x14",
+				"update_routine" : "0x078a70"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x19",
+				"offset_y" : "0xf4",
+				"subtype" : "0x04",
+				"update_routine" : "0x078a70"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x22",
+				"subtype" : "0x06",
+				"update_routine" : "0x078a70"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x22",
+				"subtype" : "0x08",
+				"update_routine" : "0x078a70"
+			},
+			"5" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x36",
+				"subtype" : "0x0a",
+				"update_routine" : "0x078a70"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x36",
+				"subtype" : "0x0c",
+				"update_routine" : "0x078a70"
+			},
+			"7" : 
+			{
+				"offset_x" : "0xee",
+				"offset_y" : "0x04",
+				"subtype" : "0x0e",
+				"update_routine" : "0x078a70"
+			},
+			"8" : 
+			{
+				"offset_x" : "0x12",
+				"offset_y" : "0x04",
+				"subtype" : "0x10",
+				"update_routine" : "0x078a70"
+			},
+			"9" : 
+			{
+				"offset_x" : "0xee",
+				"offset_y" : "0x0c",
+				"subtype" : "0x12",
+				"update_routine" : "0x078a70"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07961a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x0792ac"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x0c",
+				"subtype" : "0x02",
+				"update_routine" : "0x0792ac"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x0c",
+				"subtype" : "0x04",
+				"update_routine" : "0x0792ac"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x0c",
+				"subtype" : "0x06",
+				"update_routine" : "0x0792ac"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x04",
+				"subtype" : "0x08",
+				"update_routine" : "0x0792ac"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x04",
+				"subtype" : "0x0a",
+				"update_routine" : "0x0792ac"
+			},
+			"6" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0x04",
+				"subtype" : "0x0c",
+				"update_routine" : "0x0792ac"
+			},
+			"7" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0x04",
+				"subtype" : "0x0e",
+				"update_routine" : "0x0792ac"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07964c" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x079374"
+		},
+		"0x079652" : 
+		{
+			"count" : "4",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0790ac"
+		},
+		"0x079658" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x079142"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x079142"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf0",
+				"subtype" : "0x04",
+				"update_routine" : "0x079142"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x06",
+				"update_routine" : "0x079142"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x079672" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0791d4"
+		},
+		"0x079678" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x079278"
+		},
+		"0x07967e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x18",
+				"subtype" : "0x00",
+				"update_routine" : "0x0793a8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x079686" : 
+		{
+			"count" : "18",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0794de"
+		},
+		"0x07a18c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xee",
+				"subtype" : "0x00",
+				"update_routine" : "0x079be6"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xeb",
+				"offset_y" : "0x01",
+				"subtype" : "0x02",
+				"update_routine" : "0x079c0c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07a19a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xe8",
+				"subtype" : "0x00",
+				"update_routine" : "0x079aae"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xc9",
+				"subtype" : "0x02",
+				"update_routine" : "0x079b7e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07a1a8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x079bac"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07a1b0" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x079d28"
+		},
+		"0x07a1b6" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x079e6c"
+		},
+		"0x07a1bc" : 
+		{
+			"count" : "10",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x079e9c"
+		},
+		"0x07a69e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x1e",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x07a558"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07ab80" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x07ab8e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x07ab8e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07d474" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07c9ba"
+		},
+		"0x07d480" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07c902"
+		},
+		"0x07d486" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07c8fe"
+		},
+		"0x07d48c" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07c948"
+		},
+		"0x07d492" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x07c886"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07d49a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x07c78e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07d4a2" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07c7d4"
+		},
+		"0x07d4a8" : 
+		{
+			"count" : "8",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07c726"
+		},
+		"0x07d4ae" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf9",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x07c744"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07d4bc" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x23",
+				"subtype" : "0x00",
+				"update_routine" : "0x07ccfe"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07d4c4" : 
+		{
+			"count" : "4",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07ce6c"
+		},
+		"0x07d4ca" : 
+		{
+			"count" : "16",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07ce90"
+		},
+		"0x07d4d0" : 
+		{
+			"count" : "3",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07cf14"
+		},
+		"0x07ef8e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x07e768"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07ef96" : 
+		{
+			"count" : "8",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07e80e"
+		},
+		"0x07ef9c" : 
+		{
+			"count" : "8",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07e916"
+		},
+		"0x07efa2" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07eab6"
+		},
+		"0x07efa8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xd8",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x07eacc"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x28",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x07eacc"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07efbc" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x07e74a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07efc4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x1e",
+				"subtype" : "0x00",
+				"update_routine" : "0x07e97e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07efcc" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07ea6c"
+		},
+		"0x07efd2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x07eb0e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x07eb0e"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x18",
+				"subtype" : "0x04",
+				"update_routine" : "0x07eb0e"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x18",
+				"subtype" : "0x06",
+				"update_routine" : "0x07eb0e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07fc8c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x07f71c"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x07f782"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07fc9a" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07f336"
+		},
+		"0x07fca0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x14",
+				"subtype" : "0x00",
+				"update_routine" : "0x07f64a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x0c",
+				"subtype" : "0x02",
+				"update_routine" : "0x07f398"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x07fcae" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x07f6fa"
+		},
+		"0x07fcb4" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf7",
+				"subtype" : "0x00",
+				"update_routine" : "0x07f60a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf4",
+				"subtype" : "0x02",
+				"update_routine" : "0x07f60a"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf7",
+				"subtype" : "0x04",
+				"update_routine" : "0x07f60a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x081310" : 
+		{
+			"count" : "2",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x080b22"
+		},
+		"0x081316" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf0",
+				"subtype" : "0x00",
+				"update_routine" : "0x080ce2"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe0",
+				"offset_y" : "0xf0",
+				"subtype" : "0x02",
+				"update_routine" : "0x080ce2"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x20",
+				"offset_y" : "0xf0",
+				"subtype" : "0x04",
+				"update_routine" : "0x080ce2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08132a" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0808ae"
+		},
+		"0x081330" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x23",
+				"subtype" : "0x00",
+				"update_routine" : "0x0804b0"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x3b",
+				"subtype" : "0x02",
+				"update_routine" : "0x0806da"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x083250" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08214a"
+		},
+		"0x083256" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08218e"
+		},
+		"0x08325c" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x081e3c"
+		},
+		"0x083262" : 
+		{
+			"count" : "3",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x081f36"
+		},
+		"0x083268" : 
+		{
+			"count" : "3",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x081e82"
+		},
+		"0x08326e" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x081f14"
+		},
+		"0x083b2e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x18",
+				"subtype" : "0x00",
+				"update_routine" : "0x083a24"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x083b36" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0839a2"
+		},
+		"0x083b3c" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x02cce0"
+		},
+		"0x083fdc" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x083f4a"
+		},
+		"0x083fe2" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x083f76"
+		},
+		"0x083fe8" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x083f80"
+		},
+		"0x083fee" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x083d84"
+		},
+		"0x083ff6" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x01e5e0"
+		},
+		"0x084b00" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x084a48"
+		},
+		"0x084b0c" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x084aa4"
+		},
+		"0x084b12" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x084ad2"
+		},
+		"0x085bfa" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0837b2"
+		},
+		"0x085de8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x084a48"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x084aa4"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x084ad2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x086b5c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xdc",
+				"subtype" : "0x00",
+				"update_routine" : "0x08671c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x086b64" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x24",
+				"subtype" : "0x00",
+				"update_routine" : "0x08675c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x086b6c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0xdc",
+				"subtype" : "0x00",
+				"update_routine" : "0x086802"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0xdc",
+				"subtype" : "0x02",
+				"update_routine" : "0x086802"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x086b7a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x0867d6"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x0867d6"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf8",
+				"subtype" : "0x04",
+				"update_routine" : "0x0867d6"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xf8",
+				"subtype" : "0x06",
+				"update_routine" : "0x0867d6"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0xf8",
+				"subtype" : "0x08",
+				"update_routine" : "0x0867d6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x086b9a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x086820"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x086820"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xfc",
+				"subtype" : "0x04",
+				"update_routine" : "0x086820"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xfc",
+				"subtype" : "0x06",
+				"update_routine" : "0x086820"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xfc",
+				"subtype" : "0x08",
+				"update_routine" : "0x086820"
+			},
+			"5" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x0a",
+				"update_routine" : "0x086820"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0xfc",
+				"subtype" : "0x0c",
+				"update_routine" : "0x086820"
+			},
+			"7" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0xfc",
+				"subtype" : "0x0e",
+				"update_routine" : "0x086820"
+			},
+			"8" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0xfc",
+				"subtype" : "0x10",
+				"update_routine" : "0x086820"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x087122" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x086efc"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08712a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x086efc"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0878a0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08780a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x087bb2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x20",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x087abc"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x087ee6" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x087d4c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x087eee" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x14",
+				"subtype" : "0x00",
+				"update_routine" : "0x087dae"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x087ef6" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x087e1a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x087efe" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x087e48"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xfa",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x087e48"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x06",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x087e48"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x00",
+				"subtype" : "0x06",
+				"update_routine" : "0x087e48"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x00",
+				"subtype" : "0x08",
+				"update_routine" : "0x087e48"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x087f1e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x087e90"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x088b2c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0xea",
+				"subtype" : "0x00",
+				"update_routine" : "0x0887f6"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0xea",
+				"subtype" : "0x02",
+				"update_routine" : "0x0887f6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x088b3a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x088820"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x088b42" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08894c"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x08894c"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x08894c"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0xea",
+				"subtype" : "0x06",
+				"update_routine" : "0x08894c"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0xea",
+				"subtype" : "0x08",
+				"update_routine" : "0x08894c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x088e1e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x088c7c"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x0c",
+				"subtype" : "0x02",
+				"update_routine" : "0x088c7c"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf4",
+				"subtype" : "0x04",
+				"update_routine" : "0x088d30"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x088f9c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf7",
+				"offset_y" : "0xf5",
+				"subtype" : "0x00",
+				"update_routine" : "0x088f50"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089148" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x08908c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089352" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x089256"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08946c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x0893e8"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x03",
+				"subtype" : "0x02",
+				"update_routine" : "0x08942e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089726" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe5",
+				"offset_y" : "0xea",
+				"subtype" : "0x00",
+				"update_routine" : "0x089626"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089b24" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x0899b4"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089ea8" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xdc",
+				"subtype" : "0x00",
+				"update_routine" : "0x089c5c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089eb0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x089d78"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x089d78"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf8",
+				"subtype" : "0x04",
+				"update_routine" : "0x089d78"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xf8",
+				"subtype" : "0x06",
+				"update_routine" : "0x089d78"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0xf8",
+				"subtype" : "0x08",
+				"update_routine" : "0x089d78"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089ed0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x089ce2"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x089ce2"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xfc",
+				"subtype" : "0x04",
+				"update_routine" : "0x089ce2"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0xfc",
+				"subtype" : "0x06",
+				"update_routine" : "0x089ce2"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0xfc",
+				"subtype" : "0x08",
+				"update_routine" : "0x089ce2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089ef0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x089d44"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x089d44"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xfc",
+				"subtype" : "0x04",
+				"update_routine" : "0x089d44"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xfc",
+				"subtype" : "0x06",
+				"update_routine" : "0x089d44"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0xfc",
+				"subtype" : "0x08",
+				"update_routine" : "0x089d44"
+			},
+			"5" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x0a",
+				"update_routine" : "0x089d44"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089f16" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x089650"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x089650"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x089f24" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x089a5a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x089a5a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08a42a" : 
+		{
+			"count" : "6",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08a1d4"
+		},
+		"0x08a430" : 
+		{
+			"count" : "9",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08a20c"
+		},
+		"0x08a436" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x08a304"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08a638" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08a604"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08aae2" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08a7ae"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08aaea" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x08a8dc"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x08a8dc"
+			},
+			"10" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x08",
+				"subtype" : "0x14",
+				"update_routine" : "0x08a8dc"
+			},
+			"11" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x08",
+				"subtype" : "0x16",
+				"update_routine" : "0x08a8dc"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0xf8",
+				"subtype" : "0x04",
+				"update_routine" : "0x08a8dc"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0xf8",
+				"subtype" : "0x06",
+				"update_routine" : "0x08a8dc"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x00",
+				"subtype" : "0x08",
+				"update_routine" : "0x08a8dc"
+			},
+			"5" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x00",
+				"subtype" : "0x0a",
+				"update_routine" : "0x08a8dc"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x00",
+				"subtype" : "0x0c",
+				"update_routine" : "0x08a8dc"
+			},
+			"7" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x00",
+				"subtype" : "0x0e",
+				"update_routine" : "0x08a8dc"
+			},
+			"8" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x08",
+				"subtype" : "0x10",
+				"update_routine" : "0x08a8dc"
+			},
+			"9" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x08",
+				"subtype" : "0x12",
+				"update_routine" : "0x08a8dc"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08b164" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x08",
+				"subtype" : "0x00",
+				"update_routine" : "0x08aea4"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x08aed4"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x08aeea"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08b292" : 
+		{
+			"count" : "12",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08b230"
+		},
+		"0x08b480" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x08b432"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x08",
+				"subtype" : "0x02",
+				"update_routine" : "0x08b432"
+			},
+			"10" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x14",
+				"update_routine" : "0x08b432"
+			},
+			"11" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x16",
+				"update_routine" : "0x08b432"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xf8",
+				"subtype" : "0x04",
+				"update_routine" : "0x08b432"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xf8",
+				"subtype" : "0x06",
+				"update_routine" : "0x08b432"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x08",
+				"subtype" : "0x08",
+				"update_routine" : "0x08b432"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x08",
+				"subtype" : "0x0a",
+				"update_routine" : "0x08b432"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x0c",
+				"update_routine" : "0x08b432"
+			},
+			"7" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x0e",
+				"update_routine" : "0x08b432"
+			},
+			"8" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x10",
+				"update_routine" : "0x08b432"
+			},
+			"9" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x12",
+				"update_routine" : "0x08b432"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08b54a" : 
+		{
+			"count" : "12",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08b230"
+		},
+		"0x08b84c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x08b768"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xf8",
+				"subtype" : "0x02",
+				"update_routine" : "0x08b768"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x08b768"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x00",
+				"subtype" : "0x06",
+				"update_routine" : "0x08b768"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0x00",
+				"subtype" : "0x08",
+				"update_routine" : "0x08b768"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0x00",
+				"subtype" : "0x0a",
+				"update_routine" : "0x08b768"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08bad0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xc8",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08b8c2"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x38",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x08b8c2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08bdfa" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x08bd40"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08c28a" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08c17c"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x07",
+				"subtype" : "0x02",
+				"update_routine" : "0x08c17c"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0x04",
+				"subtype" : "0x04",
+				"update_routine" : "0x08c11e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08c704" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x08c692"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x08c692"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf0",
+				"subtype" : "0x04",
+				"update_routine" : "0x08c692"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0x00",
+				"subtype" : "0x06",
+				"update_routine" : "0x08c692"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08c90e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x0c",
+				"subtype" : "0x00",
+				"update_routine" : "0x08c7de"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08c916" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x54",
+				"subtype" : "0x00",
+				"update_routine" : "0x08c8c6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08c91e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x54",
+				"subtype" : "0x00",
+				"update_routine" : "0x08c8c6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08c926" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x54",
+				"subtype" : "0x00",
+				"update_routine" : "0x08c8c6"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08d264" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x0723e0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08d9c0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x10",
+				"subtype" : "0x00",
+				"update_routine" : "0x08d602"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08dcde" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08dc14"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08dfae" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08df3c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08e40a" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08e236"
+		},
+		"0x08ed66" : 
+		{
+			"count" : "5",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08eb8e"
+		},
+		"0x08ed74" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x08ec74"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x04",
+				"subtype" : "0x02",
+				"update_routine" : "0x08ec74"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x04",
+				"subtype" : "0x04",
+				"update_routine" : "0x08ec74"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08f072" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x08ef3c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08f07a" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08f00e"
+		},
+		"0x08f646" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xdc",
+				"subtype" : "0x00",
+				"update_routine" : "0x08f438"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08f64e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x00",
+				"update_routine" : "0x08f45e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x08f45e"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x10",
+				"offset_y" : "0xfc",
+				"subtype" : "0x04",
+				"update_routine" : "0x08f45e"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xf0",
+				"offset_y" : "0xfc",
+				"subtype" : "0x06",
+				"update_routine" : "0x08f45e"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x18",
+				"offset_y" : "0xfc",
+				"subtype" : "0x08",
+				"update_routine" : "0x08f45e"
+			},
+			"5" : 
+			{
+				"offset_x" : "0xe8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x0a",
+				"update_routine" : "0x08f45e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08f674" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x08f11e"
+		},
+		"0x08fa0e" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf8",
+				"subtype" : "0x00",
+				"update_routine" : "0x08f7a4"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08fa16" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x08f8f0"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x02",
+				"update_routine" : "0x08f8f0"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x08f8f0"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x06",
+				"update_routine" : "0x08f8f0"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x08fa30" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xf2",
+				"subtype" : "0x00",
+				"update_routine" : "0x08f95c"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x090048" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x04",
+				"subtype" : "0x00",
+				"update_routine" : "0x08fe8e"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x0c",
+				"offset_y" : "0x04",
+				"subtype" : "0x02",
+				"update_routine" : "0x08fe8e"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xf8",
+				"offset_y" : "0xfc",
+				"subtype" : "0x04",
+				"update_routine" : "0x08fe8e"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x08",
+				"offset_y" : "0xfc",
+				"subtype" : "0x06",
+				"update_routine" : "0x08fe8e"
+			},
+			"4" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xfc",
+				"subtype" : "0x08",
+				"update_routine" : "0x08fe8e"
+			},
+			"5" : 
+			{
+				"offset_x" : "0xfc",
+				"offset_y" : "0x04",
+				"subtype" : "0x0a",
+				"update_routine" : "0x08fe8e"
+			},
+			"6" : 
+			{
+				"offset_x" : "0x04",
+				"offset_y" : "0x04",
+				"subtype" : "0x0c",
+				"update_routine" : "0x08fe8e"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x090626" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0x1c",
+				"subtype" : "0x00",
+				"update_routine" : "0x09039a"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0x1c",
+				"subtype" : "0x02",
+				"update_routine" : "0x09039a"
+			},
+			"2" : 
+			{
+				"offset_x" : "0xdc",
+				"offset_y" : "0x1c",
+				"subtype" : "0x04",
+				"update_routine" : "0x09039a"
+			},
+			"3" : 
+			{
+				"offset_x" : "0x24",
+				"offset_y" : "0x1c",
+				"subtype" : "0x06",
+				"update_routine" : "0x09039a"
+			},
+			"4" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0xdc",
+				"subtype" : "0x08",
+				"update_routine" : "0x09039a"
+			},
+			"5" : 
+			{
+				"offset_x" : "0x1c",
+				"offset_y" : "0xdc",
+				"subtype" : "0x0a",
+				"update_routine" : "0x09039a"
+			},
+			"6" : 
+			{
+				"offset_x" : "0xdc",
+				"offset_y" : "0xdc",
+				"subtype" : "0x0c",
+				"update_routine" : "0x09039a"
+			},
+			"7" : 
+			{
+				"offset_x" : "0x24",
+				"offset_y" : "0xdc",
+				"subtype" : "0x0e",
+				"update_routine" : "0x09039a"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x09067a" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0862ae"
+		},
+		"0x090fe4" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x090734"
+		},
+		"0x090fea" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x090d78"
+		},
+		"0x090ff0" : 
+		{
+			"count" : "7",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x090dfc"
+		},
+		"0x0919d0" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0xf4",
+				"offset_y" : "0x1c",
+				"subtype" : "0x00",
+				"update_routine" : "0x0916a8"
+			},
+			"1" : 
+			{
+				"offset_x" : "0xe4",
+				"offset_y" : "0xfc",
+				"subtype" : "0x02",
+				"update_routine" : "0x0916ee"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x0919e6" : 
+		{
+			"count" : "1",
+			"function" : "SpawnSimpleChildObjects",
+			"update_routine" : "0x0917c0"
+		},
+		"0x091c2c" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x14",
+				"subtype" : "0x00",
+				"update_routine" : "0x091ad2"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x091c34" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x00",
+				"subtype" : "0x00",
+				"update_routine" : "0x091ba8"
+			},
+			"function" : "SpawnChildObjects"
+		},
+		"0x091eec" : 
+		{
+			"0" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0x14",
+				"subtype" : "0x00",
+				"update_routine" : "0x091d52"
+			},
+			"1" : 
+			{
+				"offset_x" : "0x00",
+				"offset_y" : "0xec",
+				"subtype" : "0x02",
+				"update_routine" : "0x091d52"
+			},
+			"2" : 
+			{
+				"offset_x" : "0x14",
+				"offset_y" : "0x00",
+				"subtype" : "0x04",
+				"update_routine" : "0x091e5a"
+			},
+			"3" : 
+			{
+				"offset_x" : "0xec",
+				"offset_y" : "0x00",
+				"subtype" : "0x06",
+				"update_routine" : "0x091e5a"
+			},
+			"function" : "SpawnChildObjects"
+		}
+	}
+}

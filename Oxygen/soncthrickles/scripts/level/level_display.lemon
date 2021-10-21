@@ -1,0 +1,1167 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Level display                                         //
+//-------------------------------------------------------//
+
+//# address-hook(0x01c2aa) end(0x01c2aa)
+function void InitLevelDisplay()
+{
+	InitLevelDisplay_impl()
+}
+
+
+//# address-hook(0x04e35c) end(0x04e406)
+function void InitLevelDisplay_impl()
+{
+	level.dualplanecollision = 0
+	knuckles.preventclimbing &= ~0x80
+	u32[0xffffeea4] = 0
+	level.special_scrolling = 0
+	u32[0xffffeebc] = 0
+	u32[0xffffeec0] = 0
+	u32[0xffffeec4] = 0
+	camera.screenshake.state = 0
+	camera.screenshake.offset = 0
+	camera.screenshake.prev_offset = 0
+	u32[0xffffef74] = 0
+	camera.hyper_knux_shake = 0
+	u16[0xffffef68] = 0
+	u16[0xffffef6c] = 0
+	u16[0xfffffac0] = 0
+	u16[0xffffef70] = 0
+	global.fade_timer = 0
+	u32[0xffffeed2] = 0
+	u32[0xffffeed6] = 0
+	u32[0xffffeeda] = 0
+	u32[0xffffeede] = 0
+	level.height.bitmask = 0x0fff
+	level.height.tilemask = 0x0ff0
+	level.chunksize.bitmask = 0x7c
+	camera.foreground.x.u16 = camera.position.x.u16
+	camera.foreground.y.u16 = camera.position.y.u16
+
+	A0 = 0xfffff100
+	A2 = 0xffff9000
+
+	u16 offset = global.zone * 32 + global.act * 8
+
+	// Part 1
+	//  - Initial filling of foreground tiles in plane A buffer
+	//  - Addition level initialization
+	{
+		A3 = 0xffff8008		// Base address for chunk data in RAM
+		D7.u16 = 0xc000		// Plane A (foreground) name table base
+
+		// Calls a "InitLevelTiles" variant
+		A1 = u32[0x04e458 + offset]
+		call A1
+	}
+
+	// Part 2
+	//  - Initial setting of scroll offsets for both foreground and background
+	//  - Initial filling of patterns in plane B buffer
+	//  - Setup of movement boundaries
+	{
+		A3 = 0xffff800a		// Base address for secondary chunk data in RAM (rarely used)
+		D7.u16 = 0xe000		// Plane B (background) name table base
+
+		// Calls a "InitLevelScrolling" variant
+		A1 = u32[0x04e45c + offset]
+		call A1
+	}
+
+	if (checkForMultiReturn())
+		return
+
+	scrolloffset.y.planeA = camera.foreground.y.u16
+	scrolloffset.y.planeB = camera.background.y.u16
+}
+
+
+//# address-hook(0x04e408) end(0x04e456)
+function void UpdateLevelDisplay()
+{
+	{
+		// Setting D6 to a fixed value is not done in the original code, but we do it here.
+		//  - If we don't, its value is basically "undefined", though it's used in some places like "LoadTileContentSingleLine".
+		//  - Leaving it "undefined" will introduce a graphics glitch in the Slot Machine right after loading (and will also break verification there).
+		D6 = 0x20	// Formerly 0x0e
+
+		// Here's the problem: I don't know if this maybe breaks something else.
+		// Several months ago, I had first added it, but then out-commented it again, and now can't remember why.
+		//  - The emulator does currently *not* do this as well in this specific location (0x04e408), though this was added before and got out-commented as well.
+		//  - Maybe this way we can find other places where it makes a difference if we explicitly set the value or not.
+
+		// Some new insights as of January 2019:
+		// It seems to control the number of tiles that will be refreshed.
+		// In Slot Machine, the value of 0x0e that I originally used is too low, so it's 0x20 now
+	}
+
+	// Update camera position
+	camera.foreground.x.u16 = camera.position.x.u16
+	camera.foreground.y.u16 = camera.position.y.u16
+	Level.UpdateHyperKnucklesScreenShake()
+
+	A0 = 0xfffff100
+	A2 = 0xffff9000
+
+	assert((global.act & 0xfc) == 0, "Unsupported act number")	// If this ever fails, offset calculation has to be rewritten (also in Init function)
+	u16 offset = global.zone * 32 + global.act * 8
+
+	// Part 1
+	//  - Usually loads foreground tile content into plane A buffer
+	//  - Can do other things as well, like a general level update
+	{
+		A3 = 0xffff8008		// Base address for chunk data in RAM
+		D7.u16 = 0xc000		// Plane A (foreground) name table base
+
+		// Calls a "UpdateLevelTiles" variant
+		A1 = u32[0x04e468 + offset]
+		call A1
+	}
+
+	// Part 2
+	//  - Updates scroll offsets of both foreground and background
+	//  - Usually also updates the background, often with plane B buffer pattern updates
+	//  - Can also update movement boundaries
+	{
+		A3 = 0xffff800a		// Base address for secondary chunk data in RAM (rarely used)
+		D7.u16 = 0xe000		// Plane B (background) name table base
+
+		// Calls a "UpdateLevelScrolling" variant
+		A1 = u32[0x04e46c + offset]
+		call A1
+	}
+
+	if (checkForMultiReturn())
+		return
+
+	scrolloffset.y.planeA = camera.foreground.y.u16
+	scrolloffset.y.planeB = camera.background.y.u16			// This is half the camera.position.y, but seems to be in pixels
+}
+
+
+//# address-hook(0x04e758) end(0x04e7a4)
+function void UpdatePlanePatterns()
+{
+	writePlanePatterns(0xfffff100)
+
+	D0 = u32[0xffffef74]
+	if (D0 != 0)
+	{
+		writePlanePatterns(D0)
+	}
+}
+
+function void writePlanePatterns(u32 sourceAddress)
+{
+	A0 = sourceAddress
+	while (true)
+	{
+		D0.u16 = u16[A0]
+		if (D0.u16 == 0)
+			break
+
+		u16[A0] = 0
+		D1.u16 = u16[A0 + 2]
+		A0 += 4
+		if (D1.u16 & 0x8000)
+		{
+			D1.u16 &= 0x7fff
+
+			// Write one column of tiles = two columns of patterns
+			VDP.setWriteIncrement(0x80)
+			WriteDataToVRAM()
+			D0.u16 += 2
+			WriteDataToVRAM()
+		}
+		else
+		{
+			// Write one row of tiles = two rows of patterns
+			VDP.setWriteIncrement(2)
+			WriteDataToVRAM()
+			D0.u16 += 0x80
+			WriteDataToVRAM()
+		}
+	}
+
+	VDP.setWriteIncrement(2)
+}
+
+
+//# address-hook(0x04e7a6) end(0x04e7c0)
+function void WriteDataToVRAM()
+{
+	u16 bytes = (D1.u16 + 1) * 4
+	VDP.setupVRAMWrite(D0.u16)
+	VDP.copyToVRAM(A0, bytes)
+	A0 += bytes
+}
+
+
+
+//# address-hook(0x04e7c2) end(0x04e7d8)
+function void ReadDataFromVRAM()
+{
+	// Read from VDP
+#if STANDALONE
+	VDP.setupVRAMWrite(D0.u16)
+#else
+	u32[0xc00004] = VDPHelper.getDirectWriteCode(D0.u16, 0)
+#endif
+
+	while (D1.s16 >= 0)
+	{
+		u32[A0] = VDP.readData32()
+		A0 += 4
+		--D1.s16
+	}
+}
+
+
+
+//# address-hook(0x04e92a) end(0x04e96a)
+function void LoadTileContentInDirX()
+{
+	u16 oldOffset = u16[A5]
+	u16 newOffset = u16[A6] & 0xfff0
+	u16[A5] = newOffset
+
+	// Anything to do?
+	s16 diff = oldOffset - newOffset
+	if (diff == 0)
+		return
+
+	// Note that there are cases where s8(diff) is actually >= 0, though diff is not (MHZ2 boss fight)
+	if (s8(diff) >= 0)
+	{
+		// Screen moved left
+		D0.u16 = newOffset
+	}
+	else
+	{
+		// Screen moved right
+		diff = -diff
+		D0.u16 = oldOffset + (getScreenWidth() + 31) / 16 * 16
+	}
+	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
+
+	//debugLog(stringformat("LoadTileContentInDirX (%d lines): posX=0x%04x, posY=0x%04x, lines=0x%02x", u8[0xffffeea4] ? 2 : 1, D0, D1, D6.u16))
+
+	u32 backupD1 = D1
+	u32 backupD6 = D6
+	LoadTileContentSingleRow()
+	D1 = backupD1
+	D6 = backupD6
+
+	if (u8[0xffffeea4] != 0)
+	{
+		D0.u16 += 0x10
+		LoadTileContentSingleRow()
+	}
+}
+
+
+//# address-hook(0x04e9ae) end(0x04eab6)
+function void LoadTileContentSingleRow()
+{
+	u16 camera_py = D1.u16
+	u16 tileIndex = (camera_py >> 4) & 0x0f		// Tile index mod 16
+	D2.u16 = (tileIndex & 0x07) * 0x10			// Tile start position inside chunk
+
+	D1.u16 = (camera_py >> 5) & level.chunksize.bitmask
+	UpdateChunkLinePointerX()
+
+	u16 tilesNeeded = D6.u16
+	u16 tilesRemaining = 0x10 - tileIndex		// That's how many tiles can be read from the current (double) chunk
+
+	if (tilesNeeded <= tilesRemaining)
+	{
+		fillPlanePatternsX(tileIndex << 8, tilesNeeded)
+	}
+	else
+	{
+		fillPlanePatternsX(tileIndex << 8, tilesRemaining)
+		fillPlanePatternsX(0, tilesNeeded - tilesRemaining)
+	}
+}
+
+
+function void fillPlanePatternsX(u16 additionalOffset, u16 tiles)
+{
+	// Each entry into the table at A0 (starting at 0xfffff100) consists of:
+	//  - one word for the VRAM address where the data should be written to
+	//  - one word for the number of tiles (minus one); note that one tile is two patterns; upmost bit gets set in any case here
+	//  - n words, one per pattern (= two per tile), with the actual pattern content to be written to VRAM
+	//  - n words more, now for the second line of patterns inside the tiles
+
+#if STANDALONE
+	// Check for limits, to avoid uncontrolled memory accesses like the crash bug that can happen in Knuckles' path in LRZ 1
+	if (A0 < 0xfffff100 || A0 >= 0xfffff580)
+		return
+	if (A0 + 4 + tiles * 8 > 0xfffff580)
+		tiles = (u32(0xfffff580) - (A0 + 4)) / 8
+#endif
+
+	u16[A0]   = ((D0.u16 >> 2) & 0x7c) + D7.u16 + additionalOffset
+	u16[A0+2] = (tiles - 1) | 0x8000
+	A0 += 4
+	A1 = A0
+	A0 += tiles * 4
+
+	for (u16 i = 0; i < tiles; ++i)
+	{
+		u16 tile = u16[A5 + D2.u16]
+		u32 base = A2 + (tile & 0x03ff) * 8
+
+		u32 pattern1 = (u16[base] << 16) + u16[base + 4]
+		u32 pattern2 = (u16[base + 2] << 16) + u16[base + 6]
+
+		// Check for flip Y
+		if (tile & 0x0800)
+		{
+			pattern1 = ((pattern1 >> 16) + (pattern1 << 16)) ^ 0x10001000
+			pattern2 = ((pattern2 >> 16) + (pattern2 << 16)) ^ 0x10001000
+		}
+
+		// Check for flip X
+		if (tile & 0x0400)
+		{
+			u32[A0] = pattern1 ^ 0x08000800
+			u32[A1] = pattern2 ^ 0x08000800
+		}
+		else
+		{
+			u32[A0] = pattern2
+			u32[A1] = pattern1
+		}
+
+		A0 += 4
+		A1 += 4
+
+		D2.u16 = (D2.u16 + 0x10) & 0x70
+		if (D2.u16 == 0)
+		{
+			D1.u16 = (D1.u16 + 4) & level.chunksize.bitmask
+			UpdateChunkLinePointerX()
+		}
+	}
+
+	u16[A0] = 0
+}
+
+
+//# address-hook(0x04eab8) end(0x04ead6)
+function void UpdateChunkLinePointerX()
+{
+	// Updates A5, so it points to the right line of tiles
+
+	u32 levelLayoutBase = A3
+	u16 tileStartX = D0.u16						// World position
+	u16 chunkPosX = (s16(tileStartX) >> 7)		// In coordinates counting whole chunks
+	u16 tileInsideChunkX = (tileStartX >> 4) & 0x07
+	u16 chunkLineOffset = D1.u16
+
+	// In some weird cases, chunkAddress can be in ROM area
+	//  -> Load HCZ 2, go into debug mode, and scroll up right
+	//  -> Though this is probably a bug, we build our calculation to do exactly that as well
+	u32 chunkAddress = s16[levelLayoutBase + chunkLineOffset]
+	chunkAddress = (chunkAddress & 0xffff0000) | u16(chunkAddress + chunkPosX)	// Applying this only to lower 16 bits is relevant for HPZ background
+	u16 chunkType = u8[chunkAddress]
+	A5 = 0xffff0000 + chunkType * 0x80 + tileInsideChunkX * 2
+}
+
+
+
+//# address-hook(0x04ead8) end(0x04eb20)
+function void LoadTileContentInDirY()
+{
+	u16 oldOffset = u16[A5]
+	u16 newOffset = u16[A6] & level.height.tilemask
+	u16[A5] = newOffset
+
+	// Anything to do?
+	s16 diff = oldOffset - newOffset
+	if (diff == 0)
+		return
+
+	// Note that there are cases where s8(diff) is actually zero here, though diff is not (e.g. LBZ1 cutscene before boss)
+	if (s8(diff) >= 0)
+	{
+		// Screen moved up
+		D0.u16 = newOffset
+	}
+	else
+	{
+		// Screen moved down
+		diff = -diff
+		D0.u16 = (oldOffset + 0xf0) & level.height.tilemask		// 0xf0 = 240 = screen height + 16
+	}
+	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
+
+	//debugLog(stringformat("LoadTileContentInDirY (%d lines): posX=0x%04x, posY=0x%04x, rows=0x%02x", u8[0xffffeea4] ? 2 : 1, D0, D1, D6.u16))
+
+	u32 backupD1 = D1
+	u32 backupD6 = D6
+	LoadTileContentSingleLine()
+	D1 = backupD1
+	D6 = backupD6
+
+	if (u8[0xffffeea4] != 0)
+	{
+		D0.u16 = (D0.u16 + 0x10) & level.height.tilemask
+		LoadTileContentSingleLine()
+	}
+}
+
+
+
+//# address-hook(0x04eb22) end(0x04eb68)
+function void fn04eb22()
+{
+	// Updates background sprite patterns in some zones (e.g. AIZ 1 and MHZ)
+	u16 oldOffset = u16[A5]
+	u16 newOffset = u16[A6] & level.height.tilemask
+	u16[A5] = newOffset
+
+	// Anything to do?
+	s16 diff = oldOffset - newOffset
+	if (diff == 0)
+		return
+
+	// Note that there are cases where s8(diff) is actually zero here, though diff is not
+	if (s8(diff) >= 0)
+	{
+		// Screen moved up
+		D0.u16 = newOffset
+	}
+	else
+	{
+		// Screen moved down
+		diff = -diff
+		D0.u16 = (oldOffset + 0xf0) & level.height.tilemask		// 0xf0 = 240 = screen height + 16
+		D1 = (D1 << 16) + (D1 >> 16)
+	}
+	u8[0xffffeea4] = ((diff & 0x30) != 0x10) ? 0xff : 0x00
+
+	u16 backupD1 = D1.u16
+	u16 backupD6 = D6.u16
+	LoadTileContentSingleLine()
+	D1.u16 = backupD1
+	D6.u16 = backupD6
+
+	if (u8[0xffffeea4] != 0)
+	{
+		D0.u16 = (D0.u16 + 0x10) & level.height.tilemask
+		LoadTileContentSingleLine()
+	}
+}
+
+
+//# address-hook(0x04eb6c) end(0x04ec46)
+function void LoadTileContentSingleLine()
+{
+	// D0.u16 = camera_py
+	// D1.u16 = camera_px
+	// D6.u16 = width in tiles of the area to load
+	// D7.u16 = base VRAM address here, e.g. 0xc000
+
+	u16 camera_px = D1.u16
+	u16 tileIndex = (camera_px >> 4) & 0x1f
+	D2.u16 = (tileIndex & 0x07) * 2			// Tile start position inside chunk
+
+	D1.s16 = s16(camera_px) >> 7
+	UpdateChunkLinePointerY()
+
+	u16 tilesNeeded = D6.u16
+	u16 tilesRemaining = 0x20 - ((camera_px >> 4) & 0x1f)
+
+	if (tilesNeeded <= tilesRemaining)
+	{
+		fillPlanePatternsY(tileIndex * 4, tilesNeeded)
+	}
+	else
+	{
+		s16 backup = tilesNeeded - tilesRemaining
+		fillPlanePatternsY(tileIndex * 4, tilesRemaining)
+		fillPlanePatternsY(0, backup)
+	}
+}
+
+
+function void fillPlanePatternsY(u16 additionalOffset, u16 tiles)
+{
+	// Each entry into the table at A0 (starting at 0xfffff100) consists of:
+	//  - one word for the VRAM address where the data should be written to
+	//  - one word for the number of tiles (minus one); note that one tile is two patterns
+	//  - n words, one per pattern (= two per tile), with the actual pattern content to be written to VRAM
+	//  - n words more, now for the second line of patterns inside the tiles
+
+#if STANDALONE
+	// Check for limits, to avoid uncontrolled memory accesses like the crash bug that can happen in Knuckles' path in LRZ 1
+	if (A0 < 0xfffff100 || A0 >= 0xfffff580)
+		return
+	if (A0 + 4 + tiles * 8 > 0xfffff580)
+		tiles = (u32(0xfffff580) - (A0 + 4)) / 8
+#endif
+
+	u16 vramAddress = ((D0.u16 & 0xf0) * 0x10) + D7.u16 + additionalOffset
+	u16[A0]   = vramAddress
+	u16[A0+2] = tiles - 1
+	A0 += 4
+
+	A1 = A0
+	A0.u16 += tiles * 4
+	D6.u16 = tiles - 1
+	FillPlanePatternsY_partial()
+}
+
+
+//# address-hook(0x04ebf2)
+function void FillPlanePatternsY_partial()
+{
+	u16 rows = D6.u16 + 1
+	for (u16 row = 0; row < rows; ++row)
+	{
+		u16 tile = u16[A5 + D2.u16]
+		u32 base = A2 + (tile & 0x03ff) * 8
+
+		u32 pattern1 = u32[base]
+		u32 pattern2 = u32[base + 4]
+
+		if (tile & 0x0400)
+		{
+			pattern1 = ((pattern1 << 16) + (pattern1 >> 16)) ^ 0x08000800
+			pattern2 = ((pattern2 << 16) + (pattern2 >> 16)) ^ 0x08000800
+		}
+
+		if (tile & 0x0800)
+		{
+			u32[A0] = pattern1 ^ 0x10001000
+			u32[A1] = pattern2 ^ 0x10001000
+		}
+		else
+		{
+			u32[A0] = pattern2
+			u32[A1] = pattern1
+		}
+
+		A0 += 4
+		A1 += 4
+
+		D2.u16 = (D2.u16 + 0x02) & 0x0e
+		if (D2.u16 == 0)
+		{
+			++D1.u16
+			fn04ec54()
+		}
+	}
+
+	u16[A0] = 0
+}
+
+
+//# address-hook(0x04ec48) end(0x04ec50)
+function void UpdateChunkLinePointerY()
+{
+	// Updates A5, so it points to the right line of tiles
+
+	u32 levelLayoutBase = A3
+	u16 tileStartY = D0.u16					// World position
+	u16 chunkPosY = (tileStartY >> 7)		// In coordinates counting whole chunks
+	u16 chunkLineOffset = (chunkPosY * 4) & level.chunksize.bitmask
+	u32 chunkLineStart = 0xffff0000 + u16[levelLayoutBase + chunkLineOffset]
+
+	A4 = chunkLineStart
+	fn04ec54()
+}
+
+//# address-hook(0x04ec54) end(0x04ec68)
+function void fn04ec54()
+{
+	// Uses cached A4 from recent call of "UpdateChunkLinePointerY()"
+	// Unfortunately the following calculation has to be this complicated, to handle both the following situations:
+	//  - CNZ 1 after mini-boss fight (potential u16 underflow of RAM address)
+	//  - ICZ 1 entering cave (potential u16 overflow of RAM address)
+	u32 address = (A4 & 0xffff0000) + u16(A4.u16 + D1.u16)
+	A5 = 0xffff0000 + u8[address] * 0x80 + (D0.u16 & 0x70)
+}
+
+
+//# address-hook(0x04ecaa) end(0x04ecca)
+function void fn04ecaa()
+{
+	// Seems to be used by the Slot Machine bonus stage only
+
+	D2.u16 = ((D1.s16 >> 4) * 2) & 0x0e
+
+	u16 vramAddress = D5.u16
+	u16 tiles = D6.u16
+	u16[A0] = vramAddress
+	u16[A0+2] = tiles - 1
+	A0 += 4
+
+	A1 = A0
+	D5.u16 = tiles * 4
+	A0 += D5.u16
+	D1.s16 >>= 7
+	UpdateChunkLinePointerY()
+
+	D6.u16 = tiles - 1
+	FillPlanePatternsY_partial()
+}
+
+
+//# address-hook(0x04ecce) end(0x04ecea)
+function void Level.InitialTilesFill()
+{
+	// This function is called in each "InitLevelTiles" and "InitLevelScrolling" variant
+
+	u8 counter = 0x10
+	while (counter > 0)
+	{
+		u32 backupA0 = A0
+		u32 backupD0 = D0
+		u32 backupD1 = D1
+
+		D6 = 0x20
+		LoadTileContentSingleLine()
+		UpdatePlanePatterns()
+
+		A0 = backupA0
+		D0 = backupD0 + 0x10
+		D1 = backupD1
+		--counter
+	}
+}
+
+
+//# address-hook(0x04ecec) end(0x04ed16)
+function void fn04ecec()
+{
+	D2.u16 = u16[(A4+=2)-2]
+	u8 counter = 0x10
+	while (counter > 0)
+	{
+		while (D0.u16 >= D2.u16)
+		{
+			D2.u16 += u16[A4]
+			A4 += 2
+			A5 += 4
+		}
+
+		D1.u16 = u16[A5]
+		D6 = 0x20
+
+		u32 backupD0 = D0
+		u32 backupD2 = D2
+		u32 backupA0 = A0
+		u32 backupA4 = A4
+		u32 backupA5 = A5
+
+		LoadTileContentSingleLine()
+		UpdatePlanePatterns()
+
+		D0 = backupD0
+		D2 = backupD2
+		A0 = backupA0
+		A4 = backupA4
+		A5 = backupA5
+
+		D0.u16 += 0x10
+		--counter
+	}
+}
+
+
+//# address-hook(0x04f0ce) end(0x04f158)
+function void fn04f0ce()
+{
+	A1 = 0xffffe000		// Location of linewise scroll offsets
+	D0.u16 = camera.background.y.u16
+	D1.u16 = getScreenHeight() - 1
+	D3.u16 = camera.foreground.x.u16
+	fn04f0de()
+}
+
+
+//# address-hook(0x04f0de)
+function void fn04f0de()
+{
+	// This function writes scroll offsets
+	//  - Destination is A1, which is usually 0xffffe000 here
+
+	bool flag = false
+	while (true)
+	{
+		D2.u16 = u16[(A4+=2)-2]
+		flag = (D2.u16 & 0x8000) != 0
+		D2.u16 &= 0x7fff
+
+		D0.s16 -= D2.u16
+		if (D0.s16 < 0)
+			break
+
+		if (flag)
+			A5.u16 += D2.u16 * 2
+		else
+			A5 += 2
+	}
+
+	if (flag)
+	{
+		D2.u16 += D0.u16
+		A5.u16 += D2.u16 * 2
+	}
+
+	D0.s16 = -D0.s16
+	D2.u16 = D1.u16 - D0.u16
+	if (D2.s16 < 0)
+	{
+		D0.u16 = D1.u16 + 1
+	}
+
+	D3 = (-D3.s16) << 16
+	--D0.u16
+
+	while (true)
+	{
+		if (flag)
+		{
+			while (D0.s16 >= 0)
+			{
+				D3.s16 = -s16[(A5+=2)-2]
+				u32[A1] = D3
+				A1 += 4
+				--D0.s16
+			}
+		}
+		else
+		{
+			D3.s16 = -s16[(A5+=2)-2]
+
+		#if STANDALONE
+			// Screen extend needed for Knuckles' good ending outro, and only there
+			//  -> This here would break e.g. the earthquake section in MGZ 2
+			if (global.zone_act == 0x0a01)
+				D3.s16 += getScreenExtend()
+		#endif
+
+			while (D0.s16 >= 0)
+			{
+				u32[A1] = D3
+				A1 += 4
+				--D0.s16
+			}
+		}
+
+		if (D2.s16 < 0)
+			break
+
+		D0.u16 = u16[(A4+=2)-2]
+		flag = (D0.u16 & 0x8000) != 0
+		D0.u16 &= 0x7fff
+		D3.u16 = D2.u16
+		D2.u16 -= D0.u16
+		if (D2.s16 >= 0)
+			--D0.u16
+		else
+			D0.u16 = D3.u16
+	}
+}
+
+
+//# address-hook(0x04f2da) end(0x04f2f4)
+function void Level.GetCameraPosition()
+{
+	// D0 and D1 get used after this function, e.g. in "Level.InitialTilesFill()"
+	D1.u16 = camera.foreground.x.u16
+	D0.u16 = camera.foreground.y.u16 & level.height.tilemask
+
+	camera.foreground.x.old = D1.u16 & 0xfff0
+	camera.foreground.y.old = D0.u16
+}
+
+
+
+//-------------------------------------------------------//
+// Tile Loading                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x04ed5e) end(0x04ed60)
+function void fn04ed5e()
+{
+	D6 = 0x20
+	fn04ed64()
+}
+
+
+//# address-hook(0x04ed62) end(0x04ed62)
+function void fn04ed62()
+{
+	// Prepare tiles/patterns
+	//  -> E.g. to update due to indoor/outdoor change in LBZ
+	D6 = (getScreenWidth() + 31) / 16
+	fn04ed64()
+}
+
+
+//# address-hook(0x04ed64) end(0x04ed68)
+function void fn04ed64()
+{
+	D1.u16 = camera.foreground.x.u16
+	D0.u16 = camera.foreground.y.u16
+	fn04ed6c()
+}
+
+
+//# address-hook(0x04ed6c) end(0x04ed8e)
+function void fn04ed6c()
+{
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+	u32 backupD1 = D1
+	u32 backupD6 = D6
+	u32 backupA0 = A0
+
+	u8 counter = 15
+	while (counter > 0)
+	{
+		u32 backupD0 = D0
+
+		LoadTileContentSingleLine()
+		UpdatePlanePatterns()
+
+		D0 = backupD0 + 0x10
+		D1 = backupD1
+		D6 = backupD6
+		A0 = backupA0
+		--counter
+	}
+#if !STANDALONE
+	set_status_register(0x2300)
+#endif
+}
+
+
+//# address-hook(0x04ed90) end(0x04edb0)
+function void LoadTileContentDefault()
+{
+	A6 = 0xffffee80		// Address of camera.foreground.x
+	A5 = 0xffffee88		// Address of camera.foreground.x.old
+	D1.u16 = camera.foreground.y.u16
+	D6 = 0x0f
+	LoadTileContentInDirX()
+
+	A6 = 0xffffee84		// Address of camera.foreground.y
+	A5 = 0xffffee8a		// Address of camera.foreground.y.old
+	D1.u16 = camera.foreground.x.u16
+	D6 = (getScreenWidth() + 31) / 16
+	LoadTileContentInDirY()
+}
+
+
+
+
+//# address-hook(0x04f2f6) end(0x04f312)
+function void fn04f2f6()
+{
+	D1.u16 = camera.background.x.u16
+	D2.u16 = camera.background.x.u16 & 0xfff0
+	D0.u16 = camera.background.y.u16 & level.height.tilemask
+
+	camera.background.x.old = D2.u16
+	camera.background.y.old = D0.u16
+}
+
+
+
+// Background
+
+//# address-hook(0x04edb4) end(0x04edd4)
+function void UpdateBackgroundTiles.General()
+{
+	A6 = 0xffffee8c		// Address of camera.background.x
+	A5 = 0xffffee94		// Address of camera.background.x.old
+	D1.u16 = camera.background.y.u16
+	D6 = 0x0f
+	LoadTileContentInDirX()
+
+	A6 = 0xffffee90		// Address of camera.background.y
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	D1.u16 = camera.background.x.u16
+	D6 = (getScreenWidth() + 31) / 16
+	LoadTileContentInDirY()
+}
+
+
+//# address-hook(0x04edf6) end(0x04ee1c)
+function void fn04edf6()
+{
+	push(A5)
+	push(A4)
+	push(D5)
+
+	A6 = 0xffffee90		// Address of camera.background.y
+	fn04ee84()
+
+	A5 = 0xffffee96		// Address of camera.background.y.old
+	fn04eb22()
+
+	D5 = pop()
+	A4 = pop()
+	A6 = pop()
+
+	D6.u16 = camera.background.y.old
+	if (s16(camera.background.y.u16) < 0)
+	{
+		D6.u16 = camera.background.y.u16 & 0xfff0
+	}
+
+	fn04ee20()
+}
+
+
+
+//# address-hook(0x04ee20) end(0x04ee82)
+function void fn04ee20()
+{
+	D1.u16 = D6.u16
+	while (true)
+	{
+		D6.u16 -= u16[A4]
+		A4 += 2
+		if (D6.s16 < 0)
+			break
+
+		D0.u16 = u16[A6] & 0xfff0
+		u16[A6 + 2] = D0.u16
+		A6 += 4
+		--D5.u16
+	}
+
+	D6.s16 = -D6.s16
+	D6.u16 >>= 4
+	D4 = 0x0f
+	D4.u16 -= D6.u16
+	if (D4.s16 < 0)
+	{
+		D4 = 0
+		D6 = 0x0f
+	}
+
+	while (true)
+	{
+		u16 backupD1 = D1.u16
+		u16 backupD4 = D4.u16
+		u16 backupD5 = D5.u16
+		u16 backupD6 = D6.u16
+		u32 backupA4 = A4
+		u32 backupA6 = A6
+
+		A5 = A6 + 2
+		LoadTileContentInDirX()
+
+		A4 = backupA4
+		A6 = backupA6
+		D1.u16 = backupD1
+		D4.u16 = backupD4
+		D5.u16 = backupD5
+		D6.u16 = backupD6
+
+		A6 += 4
+		if (D4.u16 == 0)
+			break
+
+		D6.u16 <<= 4
+		D1.u16 += D6.u16
+		--D5.u16
+		D6.u16 = u16[(A4+=2)-2] >> 4
+		D0.u16 = D4.u16
+		D4.u16 -= D6.u16
+		if (D4.s16 < 0)
+		{
+			D6.u16 = D0.u16
+			D4 = 0
+		}
+	}
+
+	while (true)
+	{
+		--D5.u16
+		if (D5.u16 == 0)
+			break
+
+		D0.u16 = u16[(A6+=2)-2] & 0xfff0
+		u16[(A6+=2)-2] = D0.u16
+	}
+}
+
+
+//# address-hook(0x04ee84) end(0x04ee9c)
+function void fn04ee84()
+{
+	D2.u16 = u16[A4]
+	A4 += 2
+	D0.u16 = u16[A6]
+	fn04ee8e()
+
+	D0.u16 += 0xe0
+	fn04ee8e()
+}
+
+function void fn04ee8e()
+{
+	while (s16(D0.u16 - D2.u16) >= 0)
+	{
+		D2.u16 += u16[A4]
+		A4 += 2
+		A5 += 4
+	}
+
+	D1.u16 = u16[A5]
+	D1 = (D1 << 16) + (D1 >> 16)
+}
+
+
+//# address-hook(0x04ef56) end(0x04ef8e)
+function void fn04ef56()
+{
+	// This loads background patterns
+	//  -> s16[0xffffeeca] seems to tell us how many pattern lines are remaining
+	//  -> Looks like we can load not more than two such lines in a frame
+
+	u16 backupD1 = D1.u16
+	u16 backupD2 = D2.u16
+	fn04ef64()
+	D1.u16 = backupD1
+	D2.u16 = backupD2
+
+	if (s16[0xffffeeca] >= 0)
+	{
+		fn04ef64()
+	}
+	_setNegativeFlagByValue(s16[0xffffeeca])
+}
+
+
+//# address-hook(0x04ef64)
+function void fn04ef64()
+{
+	D2.u16 &= level.height.tilemask
+	D3.u16 = (D2.u16 + 0xf0) & level.height.tilemask
+	D0.u16 = u16[0xffffeec8]
+	if (D0.u16 >= D2.u16 && D0.u16 <= D3.u16)
+	{
+		D6 = 0x20
+		LoadTileContentSingleLine()
+	}
+
+	u16[0xffffeec8] -= 0x10
+	--u16[0xffffeeca]
+	_setNegativeFlagByValue(s16[0xffffeeca])
+}
+
+
+
+#if STANDALONE
+
+// Helper functions to fill parts of a plane (A or B) with foreground chunk content
+//  -> For the whole visible screen, call e.g.:
+//      fillPlaneA_Default(camera.foreground.x.u16, camera.foreground.y.u16, getScreenWidth(), getScreenHeight())
+
+function void fillPlane_Default(u16 planeVramBaseAddress, u32 startX, u32 startY, u32 width, u32 height, u16 cameraX, u16 cameraY)
+{
+	// Crop to screen rect
+	{
+		u32 right = cameraX + getScreenWidth()
+		u32 bottom = cameraY + getScreenHeight()
+
+		if (startX >= right || startX + width < cameraX)
+			return
+		if (startY >= bottom || startY + height < cameraY)
+			return
+
+		width = min(right - startX, width)
+		height = min(bottom - startY, height)
+
+		if (startX < cameraX)
+		{
+			width -= (cameraX - startX)
+			startX = cameraX
+		}
+		if (startY < cameraY)
+		{
+			height -= (cameraY - startY)
+			startY = cameraY
+		}
+	}
+
+	u32 minTileX = startX / 16
+	u32 maxTileX = (startX + width + 15) / 16
+	u32 minTileY = startY / 16
+	u32 maxTileY = (startY + height + 15) / 16
+
+	for (u32 y = minTileY; y <= maxTileY; ++y)
+	{
+		for (u32 x = minTileX; x <= maxTileX; ++x)
+		{
+			u32 tileInPlaneX = x & 0x1f
+			u32 tileInPlaneY = y & 0x0f
+
+			u16 lineBase0 = planeVramBaseAddress + tileInPlaneX * 4 + (tileInPlaneY*2) * 0x80
+			u16 lineBase1 = planeVramBaseAddress + tileInPlaneX * 4 + (tileInPlaneY*2+1) * 0x80
+
+			// Chunk coordinates
+			u32 chunkColumn = x / 8
+			u32 chunkRow    = (y / 8) & 0x1f
+
+			u32 chunkAddress = 0xffff0000 + u16[0xffff8008 + chunkRow * 4] + chunkColumn
+			u8  chunkType = u8[chunkAddress]
+
+			// Tile coordinates inside chunk
+			u32 tileColumn = x % 8
+			u32 tileRow = y % 8
+
+			u32 tileAddress = 0xffff0000 + u16[0x00f02a + chunkType * 2] + tileRow * 16 + tileColumn * 2
+			u16 tile = u16[tileAddress]
+
+			// Access tile graphics (consisting of 2x2 sprite patterns)
+			u32 tilePatternBaseAddress = 0xffff9000 + (tile & 0x03ff) * 8
+
+			bool flipX = (tile & 0x0400) != 0
+			bool flipY = (tile & 0x0800) != 0
+			u32 mx = flipX ? 2 : 0
+			u32 my = flipY ? 4 : 0
+			u16 xorMask = (tile & 0x0c00) << 1
+
+			// Write 2x2 sprite patterns of this tile
+			setVRAM(lineBase0 + 0, u16[tilePatternBaseAddress     + mx + my] ^ xorMask)
+			setVRAM(lineBase0 + 2, u16[tilePatternBaseAddress + 2 - mx + my] ^ xorMask)
+			setVRAM(lineBase1 + 0, u16[tilePatternBaseAddress + 4 + mx - my] ^ xorMask)
+			setVRAM(lineBase1 + 2, u16[tilePatternBaseAddress + 6 - mx - my] ^ xorMask)
+		}
+	}
+}
+
+function void fillPlaneA_Default(u32 worldX, u32 worldY, u32 width, u32 height)
+{
+	fillPlane_Default(0xc000, worldX, worldY, width, height, camera.foreground.x.u16, camera.foreground.y.u16)
+}
+
+function void fillPlaneB_Default(u32 startX, u32 startY, u32 width, u32 height)
+{
+	fillPlane_Default(0xe000, startX, startY, width, height, camera.background.x.u16, camera.background.y.u16)
+}
+
+#endif

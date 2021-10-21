@@ -1,0 +1,20 @@
+{
+	"cutscene_knuckles_2_0x01": { "File": "_atlas.bmp", "Rect": "0,4,40,32", "Center": "20,16" },
+	"cutscene_knuckles_2_0x02": { "File": "_atlas.bmp", "Rect": "40,4,40,32", "Center": "20,16" },
+	"cutscene_knuckles_2_0x03": { "File": "_atlas.bmp", "Rect": "80,4,40,32", "Center": "20,11" },
+	"cutscene_knuckles_2_0x04": { "File": "_atlas.bmp", "Rect": "120,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x05": { "File": "_atlas.bmp", "Rect": "160,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x06": { "File": "_atlas.bmp", "Rect": "200,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x07": { "File": "_atlas.bmp", "Rect": "240,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x08": { "File": "_atlas.bmp", "Rect": "280,8,40,24", "Center": "20,4" },
+	"cutscene_knuckles_2_0x09": { "File": "_atlas.bmp", "Rect": "324,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0a": { "File": "_atlas.bmp", "Rect": "364,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0b": { "File": "_atlas.bmp", "Rect": "404,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0c": { "File": "_atlas.bmp", "Rect": "444,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0d": { "File": "_atlas.bmp", "Rect": "484,4,32,32", "Center": "12,12" },
+	"cutscene_knuckles_2_0x0e": { "File": "_atlas.bmp", "Rect": "524,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x0f": { "File": "_atlas.bmp", "Rect": "564,0,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x10": { "File": "_atlas.bmp", "Rect": "600,0,40,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x11": { "File": "_atlas.bmp", "Rect": "4,40,32,40", "Center": "12,20" },
+	"cutscene_knuckles_2_0x12": { "File": "_atlas.bmp", "Rect": "44,40,32,40", "Center": "12,20" }
+}

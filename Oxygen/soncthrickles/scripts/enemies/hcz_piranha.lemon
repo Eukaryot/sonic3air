@@ -1,0 +1,298 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x087f56) end(0x087f56)
+function void fn087f56()
+{
+	Object.InitWithUpdateAddress(0x087f5c)
+}
+
+
+//# address-hook(0x087f5c) end(0x087f7a)
+function void fn087f5c()
+{
+	// Targets:
+	//  - 0x087f88	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x087fac	-> objA0.base_state = 0x02  -> Swimming towards the player
+	//  - 0x088024	-> objA0.base_state = 0x04  -> Jumping through the air
+	//  - 0x088062	-> objA0.base_state = 0x06  -> Holding on to the player
+	call tableLookupAddress(0x087f80, objA0.base_state)
+
+	if ((objA0.flags2a & 0x80) == 0)
+	{
+		Enemy.DrawOrUnload()
+	}
+	else
+	{
+		fn085732()
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x087f88) end(0x087faa)
+function void fn087f88()
+{
+	setupObjectAttributesFull(0x08826c)
+	u32[A0 + 0x30] = 0x088278
+	objA0.value42 = 0
+
+	if (objA0.render_flags & render_flag.FLIP_Y)
+	{
+		objA0.render_flags &= ~render_flag.FLIP_Y
+		u8[A0 + 0x0a] |= 0x80
+	}
+}
+
+
+//# address-hook(0x087fac) end(0x088022)
+function void fn087fac()
+{
+	fn08813a()
+	Object.AnimationProgressByLocalA1()
+	CheckDistanceToPlayers()
+
+	if ((global.framecounter & 0x07) == 0)
+	{
+		objA0.position.y.u16 += (D1.u16 == 0) ? -1 : 1
+	}
+
+	D4.u16 = objA0.position.y.u16
+	D5.u16 = water.height.current + 8
+	if (D4.u16 <= D5.u16 && (u8[A1 + 0x2a] & 0x40) == 0)
+	{
+		objA0.base_state = 0x04
+		if (D0.u16 == 0)
+		{
+			objA0.velocity.x = -0x200
+			objA0.render_flags &= ~render_flag.FLIP_X
+		}
+		else
+		{
+			objA0.velocity.x = 0x200
+			objA0.render_flags |= render_flag.FLIP_X
+		}
+		objA0.velocity.y = -0x400
+	}
+	else
+	{
+		D0.u16 = 0x0200
+		D1.u16 = 0x08
+		fn08548e()
+		fn084b6e()
+		UpdateMovementStraightSimple()
+	}
+}
+
+
+//# address-hook(0x088024) end(0x088060)
+function void fn088024()
+{
+	fn08813a()
+	Object.AnimationProgressByLocalA1()
+
+	if (objA0.velocity.y >= 0)
+	{
+		D0.u16 = objA0.position.y.u16
+		if (D0.u16 >= water.height.current)
+		{
+			D0.u16 = objA0.velocity.y - 0x20
+			objA0.velocity.y = D0.u16
+			if (objA0.velocity.y <= 0)
+			{
+				objA0.base_state = 0x02
+				objA0.velocity.y = 0
+			}
+			else
+			{
+				UpdateMovementStraightSimple()
+			}
+			return
+		}
+	}
+
+	MoveWithGravity20()
+}
+
+
+//# address-hook(0x088062) end(0x088138)
+function void fn088062()
+{
+	objA0.animation.sprite = (global.framecounter & 0x04) ? 2 : 0
+
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u8[A1 + 0x05] != 0x04 && u8[A1 + 0x20] != 0x02 && u8[A1 + 0x20] != 0x09)
+	{
+		fn085838()
+		if (_equal())
+		{
+			if (objA0.flags38 & 0x04)
+			{
+				control.player1 = control.pad1 & 0x8c8c
+			}
+
+			D0.u16 = objA1.position.x.u16
+			D1.s16 = s8[A0 + 0x42]
+			D2.u8 = objA0.flags38 & 0x01
+			D3.u8 = u8[A1 + 0x04] & 0x01
+			D3.u8 ^= D2.u8
+			if (D3.u8 != 0)
+			{
+				objA0.render_flags ^= 0x01
+				objA0.flags38 ^= 0x01
+				s8[A0 + 0x42] = -s8[A0 + 0x42]
+			}
+
+			D0.u16 += D1.u16
+			objA0.position.x.u16 = D0.u16
+			D0.u16 = objA1.position.y.u16
+			D1.s16 = s8[A0 + 0x43]
+			if (D1.s16 < 0 && u8[A1 + 0x20] == 0x08)
+			{
+				D1.u16 += 0x10
+			}
+			D0.u16 += D1.u16
+			objA0.position.y.u16 = D0.u16
+
+			fn0881fe()
+			if (_equal())
+				return
+		}
+	}
+
+	if (objA0.flags38 & 0x04)
+	{
+		objA0.flags38 &= ~0x04
+		player1.control_override = 0
+	}
+
+	objA0.update_address = 0x0856d0
+	objA0.animation.sprite = 2
+	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -0x200 : 0x200
+	objA0.velocity.y = -0x200
+}
+
+
+//# address-hook(0x08813a) end(0x0881e8)
+function void fn08813a()
+{
+	D0.u8 = u8[A0 + 0x29]
+	if (D0.u8 == 0)
+		return
+
+	u8[A0 + 0x29] = 0
+	D2.u16 = D0.u16 & 0x03
+	A2 = 0x0881e6 + D2.u16 * 4
+	A1 = 0xffff0000 + u16[(A2+=2)-2]
+	u16[A0 + 0x44] = A1.u16
+
+	D1.u16 = objA0.position.y.u16 - objA1.position.y.u16
+	if (D1.s16 < -0x10 || D1.s16 >= 0x10)
+		return
+
+	fn0857c2()
+	if (!_equal())
+	{
+		fn0881f6()
+		return
+	}
+
+	if (D2.u16 == 0x01)
+	{
+		control.player1 = 0
+		player1.control_override = 0xff
+		objA0.flags38 |= 0x04
+	}
+
+	A3 = 0xffff0000 + u16[(A2+=2)-2]
+	objA0.value3e = A3.u16
+	u16[A0 + 0x46] = u16[A3]
+	objA0.base_state = 0x06
+	objA0.sprite_priority = 0
+	objA0.countdown_value = 0x3c
+
+	D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
+	u8[A0 + 0x42] = D0.u8
+	objA0.render_flags &= ~render_flag.FLIP_X
+	if (D0.s16 < 0)
+	{
+		objA0.render_flags |= render_flag.FLIP_X
+	}
+
+	D0.u16 = objA0.position.y.u16 - objA1.position.y.u16
+	u8[A0 + 0x43] = D0.u8
+	objA0.flags38 &= ~0x01
+	if (u8[A1 + 0x04] & 0x01)
+	{
+		objA0.flags38 |= 0x01
+	}
+}
+
+
+//# address-hook(0x0881f6) end(0x0881fc)
+function void fn0881f6()
+{
+	objA0.flags2a |= 0x80
+}
+
+
+//# address-hook(0x0881fe) end(0x08826a)
+function void fn0881fe()
+{
+#if STANDALONE
+	// Invulnerability frames should shake off the pirhana
+	if (u8[A1 + 0x34] > 0)
+	{
+		D0 = 1
+	}
+	else
+#endif
+	{
+		--objA0.countdown_value
+		if (objA0.countdown_value < 0)
+		{
+			objA0.countdown_value = 0x3b
+			hud.dirty.rings |= 0x01
+			objA0.flags38 |= 0x80
+
+			if (ring_counter == 0)
+			{
+				A2 = A0
+				A1 = 0xffff0000 + u16[A0 + 0x44]
+				A0 = A1
+				Character.Die()
+				A0 = A2
+				D0 = 1
+			}
+			else
+			{
+				D0.u16 = ring_counter - 1
+				if (D0.u16 == 0 || ring_counter == 10 || ring_counter == 100)
+				{
+					hud.dirty.rings |= 0x80
+				}
+				ring_counter = D0.u16
+				playSound(SFX_RING)
+				D0 = 0
+			}
+		}
+		else
+		{
+			if (objA0.flags38 & 0x80)
+			{
+				objA0.flags38 &= ~0x80
+				hud.dirty.rings &= 0xfe
+			}
+			D0 = 0
+		}
+	}
+
+	_setZeroFlagByValue(D0)
+}

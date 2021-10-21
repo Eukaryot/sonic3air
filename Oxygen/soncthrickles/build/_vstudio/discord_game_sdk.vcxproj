@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{CB43BC88-6CC9-4286-9E69-6AD1807505BE}</ProjectGuid>
+    <RootNamespace>discordgamesdk</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\oxygenengine\build\_vstudio\oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\oxygenengine\build\_vstudio\oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\oxygenengine\build\_vstudio\oxygen.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\oxygenengine\build\_vstudio\oxygen.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>tmp\discord_game_sdk_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>tmp\discord_game_sdk_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>tmp\discord_game_sdk_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>tmp\discord_game_sdk_$(Configuration)_$(BuildCode)\</IntDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)lib\Release_$(BuildCode)\discord_game_sdk.lib $(SolutionDir)lib\Release-Enduser_$(BuildCode) /y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)lib\Release_$(BuildCode)\discord_game_sdk.lib $(SolutionDir)lib\Release-Enduser_$(BuildCode) /y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\achievement_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\activity_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\application_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\core.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\image_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\lobby_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\network_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\overlay_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\relationship_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\storage_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\store_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\types.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\user_manager.cpp" />
+    <ClCompile Include="..\..\source\external\discord_game_sdk\cpp\voice_manager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\achievement_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\activity_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\application_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\core.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\discord.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\event.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\ffi.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\image_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\lobby_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\network_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\overlay_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\relationship_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\storage_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\store_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\types.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\user_manager.h" />
+    <ClInclude Include="..\..\source\external\discord_game_sdk\cpp\voice_manager.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

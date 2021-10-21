@@ -1,0 +1,282 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Auto-spin object                                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x01e7e2) end(0x01e850)
+function void fn01e7e2()
+{
+	objA0.mapping_offset = 0x01d05a
+	objA0.sprite_attributes = 0x06bc
+	objA0.render_flags |= render_flag.WORLD
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x80
+	objA0.sprite_priority = 0x280
+	if ((objA0.subtype2c & 0x04) == 0)
+	{
+		fn01e85c()
+		return
+	}
+
+	objA0.animation.sprite = objA0.subtype2c & 0x07
+	D0.u16 = (objA0.subtype2c & 0x03) * 2
+	objA0.value32 = u16[0x01e854 + D0.s16]
+	D1.u16 = objA0.position.y.u16
+
+	A1 = 0xffffb000
+	if (D1.u16 < objA1.position.y.u16)
+	{
+		u8[A0 + 0x34] = 1
+	}
+	A1 = 0xffffb04a
+	if (D1.u16 < objA1.position.y.u16)
+	{
+		u8[A0 + 0x35] = 1
+	}
+
+	objA0.update_address = 0x01e9e6
+	fn01e9e6()
+}
+
+
+//# address-hook(0x01e85c) end(0x01e8c0)
+function void fn01e85c()
+{
+	D0.u16 = objA0.subtype2c & 0x03
+	objA0.animation.sprite = D0.u8
+	objA0.value32 = u16[0x01e854 + D0.s16 * 2]
+	D1.u16 = objA0.position.x.u16
+
+	A1 = 0xffffb000
+	if (D1.u16 < objA1.position.x.u16)
+	{
+		u8[A0 + 0x34] = 1
+	}
+
+	A1 = 0xffffb04a
+	if (D1.u16 < objA1.position.x.u16)
+	{
+		u8[A0 + 0x35] = 1
+	}
+
+	objA0.update_address = 0x01e896
+	fn01e896()
+}
+
+
+//# address-hook(0x01e896)
+function void fn01e896()
+{
+	if (debug_mode.state == 0)
+	{
+		D1.u16 = objA0.position.x.u16
+		A2 = A0 + 0x34
+
+		A1 = 0xffffb000
+		fn01e8c6()
+
+		A1 = 0xffffb04a
+		if (tails.ai_routine != 0x04)
+		{
+			fn01e8c6()
+		}
+
+		CheckForUnloadObject()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x01e8c6) end(0x01e9b4)
+function void fn01e8c6()
+{
+	if (u8[(A2+=1)-1] == 0)
+	{
+		if (D1.u16 > objA1.position.x.u16)
+			return
+
+		u8[A2 - 1] = 1
+		D2.u16 = objA0.position.y.u16 - objA0.value32
+		D3.u16 = objA0.position.y.u16 + objA0.value32
+		if (objA1.position.y.u16 < D2.u16 || objA1.position.y.u16 >= D3.u16)
+			return
+		if (objA0.subtype2c & 0x20 && u8[A1 + 0x2a] & char.flag.IN_AIR)
+			return
+
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				u16[A1 + 0x1c] = 0x580
+				u8[A1 + 0x3d] = 0x01 + (objA0.subtype2c & 0x80)
+			}
+			fn01e9b6()
+		}
+		else
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				u8[A1 + 0x3d] = 0
+			}
+		}
+	}
+	else
+	{
+		if (D1.u16 <= objA1.position.x.u16)
+			return
+
+		u8[A2 - 1] = 0
+		D2.u16 = objA0.position.y.u16 - objA0.value32
+		D3.u16 = objA0.position.y.u16 + objA0.value32
+		if (objA1.position.y.u16 < D2.u16 || objA1.position.y.u16 >= D3.u16)
+			return
+		if (objA0.subtype2c & 0x20 && u8[A1 + 0x2a] & char.flag.IN_AIR)
+			return
+
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				s16[A1 + 0x1c] = -0x580
+				u8[A1 + 0x3d] = 0x01 + (objA0.subtype2c & 0x80)
+			}
+			fn01e9b6()
+		}
+		else
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				u8[A1 + 0x3d] = 0
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x01e9b6) end(0x01e9e4)
+function void fn01e9b6()
+{
+	if (u8[A1 + 0x2a] & char.flag.ROLLING)
+		return
+
+	objA1.position.y.u16 += 5
+	u8[A1 + 0x1e] = 14
+	u8[A1 + 0x1f] = 7
+	objA1.state = char.state.ROLLING
+	objA1.flags2a |= char.flag.ROLLING
+	playSound(0x3c)
+}
+
+
+//# address-hook(0x01e9e6) end(0x01ea0e)
+function void fn01e9e6()
+{
+	if (debug_mode.state == 0)
+	{
+		D1.u16 = objA0.position.y.u16
+		A2 = A0 + 0x34
+
+		A1 = 0xffffb000
+		fn01ea14()
+
+		A1 = 0xffffb04a
+		if (tails.ai_routine != 0x04)
+		{
+			fn01ea14()
+		}
+
+		CheckForUnloadObject()
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x01ea14) end(0x01eb30)
+function void fn01ea14()
+{
+	if (u8[(A2+=1)-1] == 0)
+	{
+		if (D1.u16 > objA1.position.y.u16)
+			return
+
+		u8[A2 - 1] = 1
+		D2.u16 = objA0.position.x.u16 - objA0.value32
+		D3.u16 = objA0.position.x.u16 + objA0.value32
+		if (objA1.position.x.u16 < D2.u16 || objA1.position.x.u16 >= D3.u16)
+			return
+		if (objA0.subtype2c & 0x20 && u8[A1 + 0x2a] & char.flag.IN_AIR)
+			return
+
+		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				u8[A1 + 0x3d] = 0x01 + (objA0.subtype2c & 0x80)
+				if (objA0.subtype2c & 0x40)
+				{
+					objA1.flags2a &= ~char.flag.IN_AIR
+					u8[A1 + 0x26] = 0x40
+					u16[A1 + 0x1c] = objA1.velocity.y
+					objA1.velocity.x = 0
+				}
+			}
+			fn01e9b6()
+		}
+		else
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				u8[A1 + 0x3d] = 0
+			}
+		}
+	}
+	else
+	{
+		if (D1.u16 <= objA1.position.y.u16)
+			return
+
+		u8[A2 - 1] = 0
+		D2.u16 = objA0.position.x.u16 - objA0.value32
+		D3.u16 = objA0.position.x.u16 + objA0.value32
+		if (objA1.position.x.u16 < D2.u16 || objA1.position.x.u16 >= D3.u16)
+			return
+		if ((objA0.subtype2c & 0x20) && (u8[A1 + 0x2a] & char.flag.IN_AIR))
+			return
+
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				u8[A1 + 0x3d] = 0x01 + (objA0.subtype2c & 0x80)
+				if (objA0.subtype2c & 0x40)
+				{
+					objA1.flags2a &= ~char.flag.IN_AIR
+					u8[A1 + 0x26] = 0x40
+				}
+			}
+			fn01e9b6()
+		}
+		else
+		{
+			if ((objA0.subtype2c & 0x10) == 0)
+			{
+				u8[A1 + 0x3d] = 0
+			}
+		}
+	}
+}

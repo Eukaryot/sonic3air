@@ -1,0 +1,135 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x019348) end(0x019378)
+function void fn019348()
+{
+#if STANDALONE
+	// Do not create these stars in outro
+	if (global.zone_act == 0x0d01)
+	{
+		UnloadObject()
+		return
+	}
+#endif
+
+	Kosinski.addToDMAQueue(0x14c652, 0xf380)
+
+	A1 = A0
+	for (u8 i = 0; i < 4; ++i)
+	{
+		objA1.update_address = 0x01937c
+		u8[A1 + 0x26] = i * 0x40
+		u8[A1 + 0x24] = i + 1
+		A1 += 0x4a
+	}
+
+	fn01937c()
+}
+
+
+//# address-hook(0x01937c) end(0x0193c4)
+function void fn01937c()
+{
+	if (kosinski.waiting_modules != 0)
+		return
+
+	--objA0.animation.timer
+	if (objA0.animation.timer != 0)
+		return
+
+	objA0.mapping_offset = 0x01948c
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x18
+	objA0.box_size.y = 0x18
+	objA0.sprite_attributes = 0x079c
+	objA0.animation.sprite = 0x06
+
+	if (A0 == 0xffffcd7c)
+	{
+		objA0.update_address = 0x0193ca
+		fn0193ca()
+	}
+	else
+	{
+		objA0.update_address = 0x0193ec
+		fn0193ec()
+	}
+}
+
+
+//# address-hook(0x0193ca) end(0x0193e6)
+function void fn0193ca()
+{
+	if (objA0.state != 0)
+	{
+		objA0.state = 0
+		objA0.position.x.u16 = u16[0xffffb010]
+		objA0.position.y.u16 = u16[0xffffb014]
+
+		D2 = 2
+		Effects.CreateSparks()
+
+		// Create a short flash
+		global.whiteflash_timeout = 4
+	}
+	fn0193ec()
+}
+
+
+//# address-hook(0x0193ec) end(0x019486)
+function void fn0193ec()
+{
+	if (super.active)
+	{
+		--objA0.animation.timer
+		if (s8(objA0.animation.timer) < 0)
+		{
+			objA0.animation.timer = 1
+			++objA0.animation.sprite
+			if (objA0.animation.sprite >= 3)
+			{
+				objA0.animation.sprite = 0
+				u16[A0 + 0x30] = 0
+				u16[A0 + 0x34] = 0
+			}
+		}
+
+		D0.u8 = objA0.value26
+		objA0.value26 -= 0x10
+		LookupSinCos()
+		D0.s16 <<= 3
+		D1.s16 <<= 3
+		objA0.velocity.x = D0.u16
+		objA0.velocity.y = D1.u16
+		u16[A0 + 0x30] += objA0.velocity.x
+		u16[A0 + 0x34] += objA0.velocity.y
+
+		D2.s16 = s8[A0 + 0x30]
+		if (u8[0xffffb02a] & 0x01)
+			D2.s16 = -D2.s16
+		objA0.position.x.u16 = u16[0xffffb010] + D2.s16
+		objA0.position.y.u16 = u16[0xffffb014] + s8[A0 + 0x34]
+		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[0xffffb00a] & 0x8000)
+
+	#if STANDALONE
+		// Do not render stars if Sonic is outside the screen (e.g. MGZ 2 boss)
+		if (u8[0xffffb004] & render_flag.VISIBLE)
+	#endif
+		{
+			DrawObject()
+		}
+	}
+	else
+	{
+		UnloadObject()
+	}
+}

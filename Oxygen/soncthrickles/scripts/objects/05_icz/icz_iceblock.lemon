@@ -1,0 +1,113 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// ICZ Breakable Ice Block                               //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b36c) end(0x08b36c)
+function void fn08b36c()
+{
+	Object.InitWithUpdateAddress(0x08b370)
+}
+
+
+//# address-hook(0x08b370) end(0x08b37e)
+function void fn08b370()
+{
+	objA0.update_address = 0x08b384
+	setupObjectAttributesFull(0x08b46c)
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x08b384) end(0x08b3a4)
+function void fn08b384()
+{
+	objA0.value3a = u8[0xffffb020]
+	objA0.value3b = u8[0xffffb06a]
+
+	D1 = 0x23
+	D2 = 0x10
+	D3 = 0x10
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	fn08b3aa()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x08b3aa) end(0x08b430)
+function void fn08b3aa()
+{
+	// Note that this differs from the original code (usage of A2)
+	//  -> Needed for standalone to fix the known bugs here
+
+	// Any character on top rolling?
+	A2 = 0
+	if ((objA0.flags2a & 0x08) && objA0.value3a == char.state.ROLLING)
+	{
+		A1 = 0xffffb000
+		if (objA0.flags2a & 0x10)
+		{
+			A2 = 0xffffb04a
+		}
+	}
+	else if ((objA0.flags2a & 0x10) && objA0.value3b == char.state.ROLLING)
+	{
+		A1 = 0xffffb04a
+	#if STANDALONE
+		if (objA0.flags2a & 0x08)
+		{
+			A2 = 0xffffb000
+		}
+	#endif
+	}
+	else
+	{
+		return
+	}
+
+	u8[A1 + 0x05] = 0x02
+	objA1.velocity.y = -0x300
+	u8[A1 + 0x1e] = 0x0e
+	u8[A1 + 0x1f] = 0x07
+	objA1.state = char.state.ROLLING
+	objA1.flags2a |= char.flag.IN_AIR
+	objA1.flags2a |= char.flag.ROLLING
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+
+	if (A2 != 0)
+	{
+		u8[A2 + 0x2a] |= char.flag.IN_AIR
+		u8[A2 + 0x2a] &= ~char.flag.ON_OBJECT
+	}
+
+	spawnChildObjects(0x08b480)
+	playSound(0x6e)
+	Object.TriggerUnloading()
+}
+
+
+// Breaking the ice
+
+//# address-hook(0x08b432) end(0x08b468)
+function void fn08b432()
+{
+	setupObjectAttributesMost(0x08b478)
+	objA0.update_address = 0x0856cc
+	u32[A0 + 0x30] = (objA0.subtype2c >= 0x0c) ? 0x08ab3e :0x08ab34
+
+	objA0.animation.frame = getRandomNumber() & 0x03
+
+	D0 = 0
+	fn0852d0()
+}

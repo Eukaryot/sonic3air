@@ -1,0 +1,500 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x02fef6) end(0x02ff24)
+function void fn02fef6()
+{
+	if (objA0.subtype2c != 0)
+	{
+		objA0.update_address = 0x030294
+		return
+	}
+
+	if (u16[0xffffb014] < 0x0500)
+	{
+		UnloadObject()
+		return
+	}
+
+	Kosinski.addToDMAQueue(0x390c02, 0xa000)
+
+	objA0.update_address = 0x02ff2a
+	fn02ff2a()
+}
+
+
+//# address-hook(0x02ff2a) end(0x02ff76)
+function void fn02ff2a()
+{
+	if (kosinski.waiting_modules != 0)
+		return
+
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0300
+	objA0.mapping_offset = 0x22ee10
+	objA0.sprite_attributes = 0x4500
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x20
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 0x01
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	u16[A0 + 0x30] = 0x20
+
+	objA0.update_address = 0x02ff7c
+	fn02ff7c()
+}
+
+
+//# address-hook(0x02ff7c) end(0x030006)
+function void fn02ff7c()
+{
+	D0.u16 = u16[0xffffb010] - 0x60
+	if (D0.u16 >= objA0.position.x.u16)
+	{
+		objA0.update_address = 0x03003c
+		playSound(0x57)
+
+		A3 = 0x03000c
+		D2.u16 = objA0.position.x.u16 + 0x60
+		D3.u16 = objA0.position.y.u16
+		D1 = 7
+		while (D1.s16 >= 0)
+		{
+			if (!allocDynamicObjectAfterA0())
+				break
+
+			objA1.update_address = 0x03011a
+			u32[A1 + 0x0c] = 0x22ef0e
+			u16[A1 + 0x0a] = 0x4558
+			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
+			objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
+			u16[A1 + 0x08] = 0x0380
+			u8[A1 + 0x07] = 0x18
+			u8[A1 + 0x06] = 0x18
+			objA1.velocity.x = u16[(A3+=2)-2]
+			objA1.velocity.y = u16[(A3+=2)-2]
+			u8[A1 + 0x22] = D1.u8
+
+			--D1.s16
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x03003c) end(0x030100)
+function void fn03003c()
+{
+	if (u16[A0 + 0x30] != 0)
+	{
+		--u16[A0 + 0x30]
+		objA0.position.x.u16 += 0x08
+	}
+
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x0301de
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		D0.u16 = level.framecounter
+
+		GetRandomNumber()
+		D1.u16 = D0.u16
+		D0.u16 = (D0.u16 & 0x0f) * 8 - 0x50
+		objA1.position.x.u16 += D0.u16
+		objA1.position.y.u16 += 0x18
+		D1.u16 = (D1.u16 >> 4) & 0x03
+		u16[A1 + 0x0a] = (D1.u16 == 0) ? 0x045c : 0x4530
+		u8[A1 + 0x20] = D1.u8
+		u16[A1 + 0x08] = 0x0380
+		u8[A1 + 0x07] = 0x18
+		u8[A1 + 0x06] = 0x18
+		objA1.velocity.x = 0x0400
+		objA1.velocity.y = 0
+	}
+
+	A2 = A0 + 0x18
+	u16[(A2+=2)-2] = objA0.position.x.u16
+	u16[(A2+=2)-2] = objA0.position.y.u16
+	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
+	{
+		u8[0xfffff650] = 0
+		playSound(0xe3)
+		playSound(0xe4)
+
+		u16[A0 + 0x30] = 0x96
+		objA0.update_address = 0x030106
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x030106) end(0x030114)
+function void fn030106()
+{
+	--u16[A0 + 0x30]
+	if (s16[A0 + 0x30] < 0)
+	{
+		fn02f77c()
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x03011a) end(0x0301a2)
+function void fn03011a()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 2
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x07
+	}
+
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x38
+	D0.u16 = water.height.current
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.velocity.y = 0
+		objA0.velocity.x >>= 2
+		objA0.update_address = 0x0301a8
+
+		if (allocDynamicObjectAfterA0())
+		{
+			objA1.update_address = 0x03023e
+			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+			u8[A1 + 0x06] = 0x18
+			u8[A1 + 0x07] = 0x18
+			u16[A1 + 0x08] = 0x0200
+			u16[A1 + 0x0a] = 0x2530
+			u32[A1 + 0x0c] = 0x22ee10
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = water.height.current
+			u8[A1 + 0x20] = 0x08
+		}
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x0301a8) end(0x0301d8)
+function void fn0301a8()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 9
+		++objA0.animation.sprite
+		objA0.animation.sprite &= 0x07
+	}
+
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 8
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x0301de) end(0x030216)
+function void fn0301de()
+{
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x28
+
+	D0.u16 = water.height.current
+	if (D0.u16 < objA0.position.y.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+		objA0.update_address = 0x03021c
+		objA0.state += 0x04
+	}
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		Object.animationUpdate(0x030260)
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x03021c) end(0x030238)
+function void fn03021c()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		Object.animationUpdate(0x030260)
+		if (objA0.base_state == 0)
+		{
+			DrawObject()
+			return
+		}
+	}
+
+	UnloadObject()
+}
+
+
+//# address-hook(0x03023e) end(0x03025a)
+function void fn03023e()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		A1 = 0x030260
+		Object.AlternativeAnimationUpdate()
+		if (objA0.base_state == 0)
+		{
+			DrawObject()
+			return
+		}
+	}
+
+	UnloadObject()
+}
+
+
+//# address-hook(0x030294) end(0x0302e0)
+function void fn030294()
+{
+	u16 dx = u16[0xffffb010] - objA0.position.x.u16 + 0x30
+	u16 dy = u16[0xffffb014] - objA0.position.y.u16 + 0x40
+	if (dx < 0x60 && dy < 0x10)
+	{
+		Kosinski.addToDMAQueue(0x391394, 0xa000)
+		objA0.animation.sprite = 1
+		u8[0xffffb02e] = 0x81
+		u8[0xffffb078] = 0x81
+
+		objA0.update_address = 0x0302e6
+		fn0302e6()
+		return
+	}
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x0302e6) end(0x030332)
+function void fn0302e6()
+{
+	if (kosinski.waiting_modules != 0)
+	{
+		u16[0xffffb014] -= 8
+		u16[0xffffb05e] -= 8
+		return
+	}
+
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0300
+	objA0.mapping_offset = 0x22ee10
+	objA0.sprite_attributes = 0x4500
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x60
+	u16[A0 + 0x30] = 0x60
+
+	// Removed unnecessary hiding while moving through the transparent tube
+	// Thank to Fred Bronze for pointing out that this is not needed at all! (https://s3unlocked.blogspot.de/2017/12/sonic-eraser.html)
+	if (!Game.getSetting(SETTING_HCZ_WATERPIPE))
+	{
+		u8[0xffffb020] = 0x1c
+		u8[0xffffb06a] = 0x1c
+	}
+
+	objA0.update_address = 0x030338
+	fn030338()
+}
+
+
+//# address-hook(0x030338) end(0x0303e8)
+function void fn030338()
+{
+	if (Game.getSetting(SETTING_HCZ_WATERPIPE))
+	{
+		// Move characters to the center, to avoid otherwise possible clipping at the border
+		for (u32 i = 0xffffb010; i <= 0xffffb05a; i += 0x4a)
+		{
+			s16 dx = s16(u16[i] - objA0.position.x.u16)
+			if (dx < -8)
+				++u16[i]
+			else if (dx > 8)
+				--u16[i]
+		}
+	}
+
+	if (u16[A0 + 0x30] != 0)
+	{
+		--u16[A0 + 0x30]
+		objA0.position.y.u16 -= 8
+	}
+
+	u16[0xffffb014] -= 8
+	u16[0xffffb05e] -= 8
+	if (u16[A0 + 0x30] <= 0x28)
+	{
+		u8[0xffffb020] = 0x1a
+		u8[0xffffb06a] = 0x1a
+		objA0.update_address = 0x03041a
+
+		playSound(0x57)
+		u8[0xfffff650] = 1
+
+		A3 = 0x0303ea
+		D2.u16 = objA0.position.x.u16
+		D3.u16 = objA0.position.y.u16 - 0x80
+		D1 = 0x07
+		while (D1.s16 >= 0)
+		{
+			if (!allocDynamicObjectAfterA0())
+				break
+
+			objA1.update_address = 0x03011a
+			u32[A1 + 0x0c] = 0x22ef0e
+			u16[A1 + 0x0a] = 0x4558
+			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
+			objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
+			u16[A1 + 0x08] = 0x0280
+			u8[A1 + 0x07] = 0x18
+			u8[A1 + 0x06] = 0x18
+			objA1.velocity.x = u16[(A3+=2)-2]
+			objA1.velocity.y = u16[(A3+=2)-2]
+			u8[A1 + 0x22] = D1.u8
+
+			--D1.s16
+		}
+	}
+}
+
+
+//# address-hook(0x03041a) end(0x0304d4)
+function void fn03041a()
+{
+	if (u16[A0 + 0x30] != 0)
+	{
+		objA0.velocity.y = -0xa00
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			objA0.update_address = 0x03052a
+
+			A1 = 0xffffb000
+			u8[A1 + 0x2e] = 0
+			objA1.velocity.x = 0
+			objA1.velocity.y = -0xc00
+			u8[A1 + 0x40] = 0
+
+			A1 = 0xffffb04a
+			u8[A1 + 0x2e] = 0
+			objA1.velocity.x = 0
+			objA1.velocity.y = -0xc00
+			u8[A1 + 0x40] = 0
+
+			objA0.velocity.y = -0x800
+		}
+	}
+
+	u16[0xffffb014] -= 0x0a
+	u16[0xffffb05e] -= 0x0a
+	UpdateMovementStraightSimple()
+	objA0.velocity.y += 0x48
+
+	if (allocDynamicObjectAfterA0())
+	{
+		GetRandomNumber()
+		D1.u16 = D0.u16
+		D2.u16 = D0.u16
+
+		fn0304da()
+		objA1.position.x.u16 += 0x10
+		D1.u16 = (D1.u16 & 0x0f) * 64
+		objA1.velocity.x = D1.u16
+		objA1.velocity.y = -0x700
+		D2.u16 = D0.u16
+
+		if (allocDynamicObjectAfterA0())
+		{
+			fn0304da()
+			objA1.position.x.u16 -= 0x10
+			D1.s16 = -D1.s16
+			objA1.velocity.x = D1.u16
+			objA1.velocity.y = -0x700
+		}
+	}
+
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x0304da) end(0x030528)
+function void fn0304da()
+{
+	objA1.update_address = 0x0301de
+	u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+	u8[A1 + 0x06] = 0x18
+	u8[A1 + 0x07] = 0x18
+	u16[A1 + 0x08] = 0x0380
+	u32[A1 + 0x0c] = objA0.mapping_offset
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16 - 0x50
+
+	D2.u16 = (D2.u16 >> 4) & 0x03
+	u16[A1 + 0x0a] = (D2.u16 == 0) ? 0x045c : 0x4530
+	u8[A1 + 0x20] = D2.u8
+}
+
+
+//# address-hook(0x03052a) end(0x03057a)
+function void fn03052a()
+{
+	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
+	{
+		playSound(0xe4)
+		playSound(0xe3)
+		playSound(0xe4)
+
+		u8[0xfffff650] = 0
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+
+		u16[A0 + 0x30] = 0x1e
+		objA0.update_address = 0x030106
+	}
+	else
+	{
+		UpdateMovementStraightSimple()
+		objA0.velocity.y += 0x48
+		DrawOrUnloadObject()
+	}
+}

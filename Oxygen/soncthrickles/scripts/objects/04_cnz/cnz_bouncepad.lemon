@@ -1,0 +1,86 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Small bumper-like object on floors and ceilings       //
+//-------------------------------------------------------//
+
+//# address-hook(0x032990) end(0x0329a0)
+function void fn032990()
+{
+	u16[A0 + 0x34] = objA0.subtype2c
+	objA0.value32 = objA0.subtype2c * 2
+
+	objA0.update_address = 0x0329a6
+	fn0329a6()
+}
+
+
+//# address-hook(0x0329a6) end(0x0329b2)
+function void fn0329a6()
+{
+	A1 = 0xffffb000
+	fn0329b8()
+
+	A1 = 0xffffb04a
+	fn0329b8()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x0329b8) end(0x032a72)
+function void fn0329b8()
+{
+#if STANDALONE
+	if (debug_mode.state)
+		return
+#endif
+
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + u16[A0 + 0x34]
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x14
+	if (D0.u16 < objA0.value32 && D1.u16 < 0x28 && u8[A1 + 0x05] < 0x04)
+	{
+		if ((objA0.flags2a & char.flag.FACING_LEFT) == 0)
+		{
+			objA1.flags2a &= ~char.flag.FACING_LEFT
+			objA1.velocity.x = 0x800
+		}
+		else
+		{
+			objA1.flags2a |= char.flag.FACING_LEFT
+			objA1.velocity.x = -0x800
+		}
+
+		objA1.velocity.y = (objA0.flags2a & 0x02) ? 0x800 : -0x800
+		u16[A1 + 0x1c] = objA1.velocity.x
+		u16[A1 + 0x32] = 0x0f
+
+		if ((u8[A1 + 0x2a] & char.flag.ROLLING) == 0)
+		{
+			u8[A1 + 0x20] = 0
+		}
+
+		if (s8[A1 + 0x27] == 0)
+		{
+			u8[A1 + 0x20] = 0
+			s8[A1 + 0x27] = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? -1 : 1
+			u8[A1 + 0x30] = 0x03
+			u8[A1 + 0x31] = 0x08
+		}
+
+		u8[A1 + 0x40] = 0
+		objA1.flags2a |= char.flag.IN_AIR
+		objA1.flags2a &= ~char.flag.CONTROL_LOCK
+		u8[A1 + 0x2a] &= ~0x20
+
+		playSound(0x7b)
+	}
+}

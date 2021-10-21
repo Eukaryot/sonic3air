@@ -1,0 +1,120 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Small enemy disguised as a rock in LRZ                //
+//-------------------------------------------------------//
+
+//# address-hook(0x08fae6) end(0x08fae6)
+function void fn08fae6()
+{
+	Object.InitWithUpdateAddress(0x08faec)
+}
+
+
+//# address-hook(0x08faec) end(0x08fb36)
+function void fn08faec()
+{
+	// Targets:
+	//  - 0x08fb42	-> objA0.base_state = 0x00
+	//  - 0x08fb4c	-> objA0.base_state = 0x02
+	//  - 0x08fb70	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08fb3c, objA0.base_state)
+
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x0280)
+	{
+		if (objA0.flags2a & 0x80)
+		{
+			fn08594e()
+			return
+		}
+
+		D1 = 0x17
+		D2 = 0x0c
+		D3 = 0x0b
+		D4.u16 = objA0.position.x.u16
+		fn01dc56()
+
+		DrawObject()
+	}
+	else
+	{
+		fn08594e()
+		Enemy.UnloadDelayed()
+	}
+}
+
+
+//# address-hook(0x08fb42) end(0x08fb46)
+function void fn08fb42()
+{
+	setupObjectAttributesFull(0x08fbc4)
+}
+
+
+//# address-hook(0x08fb4c) end(0x08fb6e)
+function void fn08fb4c()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x40)
+	{
+		objA0.base_state = 0x04
+		u32[A0 + 0x30] = 0x08fc30
+		objA0.countdown_callback = 0x08fb76
+	}
+}
+
+
+//# address-hook(0x08fb70) end(0x08fb70)
+function void fn08fb70()
+{
+	fn08459c()
+}
+
+
+//# address-hook(0x08fb76) end(0x08fb8a)
+function void fn08fb76()
+{
+	objA0.update_address = 0x01e5e0
+	objA0.flags2a |= 0x80
+#if STANDALONE
+	// Do not spawn an animal & floating points, as you won't get points...
+	objA0.base_state = 0x02
+#else
+	objA0.base_state = 0
+#endif
+
+	A2 = 0x08fbd6
+	SpawnProjectileChildObjects()
+}
+
+
+
+// Projectiles
+
+//# address-hook(0x08fb90) end(0x08fbb2)
+function void fn08fb90()
+{
+	A1 = u32[A0 + 0x3e]
+	SetupObjectAttributesBasic()
+	objA0.flags2b |= 0x08
+	objA0.update_address = 0x086d5e
+	objA0.animation.sprite = 6 + (objA0.subtype2c >> 2)
+	fn085180()
+}
+
+
+//# address-hook(0x08fbb8) end(0x08fbbe)
+function void fn08fbb8()
+{
+	UpdateMovementSimple()
+	Object.AnimationProgressByLocalA1()
+}

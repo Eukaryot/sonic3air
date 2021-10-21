@@ -1,0 +1,61 @@
+
+
+function void main()
+{
+	runTests()
+}
+
+
+
+// --- Tests --- //
+
+function void runTests()
+{
+	if (!testA())
+		debugLog("Test A failed")
+	if (!testB())
+		debugLog("Test B failed")
+	if (!testC())
+		debugLog("Test C failed")
+	if (!testD())
+		debugLog("Test D failed")
+	if (!testE())
+		debugLog("Test E failed")
+}
+
+function bool testA()
+{
+	s16 a = 9
+	a += (a < 0) ? 8 : -8
+	return (a == 1)
+}
+
+function bool testB()
+{
+	u16 a = 14
+	s16 b = -5
+	return (a + b == 9) && (b + a == 9)
+}
+
+function bool testC()
+{
+	u32 a = 0xfffff4e4
+	u16 result = (0xfffff580 - (a + 4)) / 8
+	return (result == 0x13)
+}
+
+function bool testD()
+{
+	s16 a = -30
+	s16 b = 9
+	s32 result = s32(a << 16) / b
+	return (result == -218453)
+}
+
+function bool testE()
+{
+	u8[0x04] = 0xbb
+	u8 result = (u8[0x04] &= 0xfc)
+	return (result == 0xb8)
+}
+

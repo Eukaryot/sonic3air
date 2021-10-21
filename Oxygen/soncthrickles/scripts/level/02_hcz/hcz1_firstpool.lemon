@@ -1,0 +1,182 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// First pool in HCZ 1
+
+// Waterfront object, including some "dry background"
+
+//# address-hook(0x02fda4) end(0x02fe58)
+function void fn02fda4()
+{
+	objA0.mapping_offset = 0x22e60c
+	objA0.sprite_attributes = 0x437a
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x40
+	objA0.box_size.y = 0x20
+	objA0.animation.sprite = 2
+
+	if (allocDynamicObjectAfterA0())
+	{
+		// Create door object
+		objA1.update_address = 0x02feb2
+		objA1.position.x.u16 = objA0.position.x.u16 - 0x30
+		objA1.position.y.u16 = objA0.position.y.u16
+		u32[A1 + 0x0c] = 0x22e76c
+		u16[A1 + 0x0a] = 0x43d4
+		u8[A1 + 0x07] = 0x10
+		u8[A1 + 0x06] = 0x20
+		u8[A1 + 0x04] = render_flag.WORLD
+		u16[A1 + 0x08] = 0x0280
+		u8[A1 + 0x22] = 0x01
+
+		u16[A0 + 0x3c] = A1.u16
+	}
+
+	u8[0xfffff7c7] = 3
+	objA0.update_address = 0x02fe34
+	fn02fe34()
+}
+
+
+//# address-hook(0x02fe34) end(0x02fe58)
+function void fn02fe34()
+{
+	if (level.trigger00 != 0)
+	{
+		objA0.animation.sprite = 3
+		objA0.animation.timer = 1
+		objA0.update_address = 0x02fe5e
+		u8[0xfffff7c7] = 0
+		u8[0xfffff650] = 1
+	}
+
+	DrawOrUnloadObject()
+
+#if STANDALONE
+	// Use some evil wizardry to overwrite plane patterns to represent the dry tunnel to the right
+	Game.changePlanePatternRectAtex(0x0420, 0x0580, 0x100, 0x40, 1, 0x20)
+#endif
+}
+
+
+//# address-hook(0x02fe5e) end(0x02feac)
+function void fn02fe5e()
+{
+	// Move waterfront every second frame only
+	//  -> The rest of the effect is done by animation and palette rotation
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 1
+		++objA0.animation.sprite
+		if (objA0.animation.sprite == 2)
+		{
+			objA0.position.x.u16 += 0x20
+		#if !STANDALONE
+			if (objA0.position.x.u16 == 0x0580 && objA0.position.y.u16 == 0x05a0)
+			{
+				objA0.position.x.u16 -= 0x20
+				objA0.position.y.u16 -= 0x20
+			}
+		#endif
+		}
+		objA0.animation.sprite &= 0x01
+	}
+
+	if (objA0.position.x.u16 >= 0x0980)
+	{
+		objA0.position.x.u16 = 0x7f00
+	}
+
+#if STANDALONE
+
+	checkForUnloadObjectAtPosition(objA0.position.x.u16)
+
+	u16 baseX = objA0.position.x.u16 - 0x30 + ((objA0.animation.sprite == 1) ? 0x10 : 0)
+	u16 baseY = objA0.position.y.u16
+
+	s16 offset = (objA0.position.x.u16 >= 0x0480) ? 0x20 : (objA0.animation.sprite < 2) ? 0x10 : 0
+	for (; offset >= 0; offset -= 0x10)
+	{
+		u16 px = baseX - offset
+		u16 py = baseY - offset * 2
+
+		Renderer.drawCustomSprite("hcz_waterfront", px, py, 0x00, SPRITE_FLAG_WORLDSPACE, 0x9fff)
+
+		// Change everything to the left to wet, and everything to the right to dry
+		px += 0x20
+		for (u8 line = 0; line < 2; ++line)
+		{
+			u16 minLeft = (py == 0x560) ? 0x05d0 : (py == 0x570) ? 0x05a0 : 0x0400
+			u16 maxRight = (py < 0x5a0) ? 0x0900 : 0x07a0
+
+			u16 left  = clamp(px - 0x200, minLeft, maxRight)
+			u16 mid   = clamp(px, minLeft, maxRight)
+			u16 right = clamp(px + 0x200, minLeft, maxRight)
+
+			Game.changePlanePatternRectAtex(left, py, mid - left, 0x10, 1, 0x30)
+			Game.changePlanePatternRectAtex(mid, py, right - mid, 0x10, 1, 0x20)
+
+			//debugDrawRect(left, py, mid - left, 0x10, 0x600000ff)
+			//debugDrawRect(mid, py, right - mid, 0x10, 0x60ff0000)
+
+			py += 0x10
+		}
+	}
+
+#else
+	DrawOrUnloadObject()
+#endif
+}
+
+
+
+// Door
+
+//# address-hook(0x02feb2) end(0x02fef0)
+function void fn02feb2()
+{
+	if (level.trigger00 != 0)
+	{
+		objA0.update_address = 0x02febe
+		fn02febe()
+	}
+	else
+	{
+		fn02fed2()
+	}
+}
+
+
+//# address-hook(0x02febe)
+function void fn02febe()
+{
+	objA0.position.y.u16 -= 0x10
+	if (objA0.position.y.u16 == 0x0560)
+	{
+		objA0.position.x.u16 = 0x7f00
+	}
+
+	fn02fed2()
+}
+
+
+function void fn02fed2()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+
+	DrawOrUnloadObject()
+}

@@ -1,0 +1,341 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// (Short) Segment of a horizontal collapsing bridge
+
+//# address-hook(0x044c44) end(0x044c70)
+function void fn044c44()
+{
+	objA0.update_address = 0x044c76
+	objA0.render_flags |= 0x04
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x20
+	objA0.sprite_priority = 0x0180
+	objA0.sprite_attributes = 0xc2f4
+	objA0.mapping_offset = 0x046958
+	objA0.flags2a |= 0x80
+	fn044c76()
+}
+
+
+//# address-hook(0x044c76) end(0x044d20)
+function void fn044c76()
+{
+	D1 = 0x20
+	D2 = 0x10
+	D3 = 0x09
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	if (s8[A0 + 0x2c] >= 0 && objA0.flags2a & 0x18)
+	{
+		A1 = (objA0.flags2a & 0x08) ? 0xffffb000 : 0xffffb04a
+
+		D1 = 0x18
+		D2 = 0x10
+		D3.u16 = 0x0102
+		D4.u16 = objA0.position.x.u16
+		objA0.flags2e = (D4.u16 >= objA1.position.x.u16) ? 0xff : 0x00
+		if (objA0.flags2e)
+		{
+			D1.s16 = -D1.s16
+			D2.s16 = -D2.s16
+			D3.u16 = (D3.u16 >> 8) + (D3.u16 << 8)
+		}
+		D1.u16 += D4.u16
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D3.u16 = (D3.u16 >> 8) + (D3.u16 << 8)
+		}
+
+		D4 = 6
+		D5 = 3
+		if (allocDynamicObjectAfterA0())
+		{
+			while (D5.s16 >= 0)
+			{
+				objA1.update_address = 0x045052
+				u8[A1 + 0x04] = objA0.render_flags
+				objA1.position.x.u16 = D1.u16
+				objA1.position.y.u16 = objA0.position.y.u16
+				u8[A1 + 0x22] = D3.u8
+				u16[A1 + 0x2e] = D4.u16
+				D1.u16 -= D2.u16
+				D3.u16 = (D3.u16 >> 8) + (D3.u16 << 8)
+				D4.u16 += 6
+
+				if (!allocDynamicObjectAfterA1())
+					break
+
+				--D5.s16
+			}
+		}
+
+		objA0.update_address = 0x044d22
+		u16[A0 + 0x30] = 0x06
+		objA0.value32 = 0x20
+	}
+	else
+	{
+		DrawOrUnloadObject()
+	}
+}
+
+
+//# address-hook(0x044d22) end(0x044d5a)
+function void fn044d22()
+{
+	--u16[A0 + 0x30]
+	if (u16[A0 + 0x30] == 0)
+	{
+		u16[A0 + 0x30] = 6
+		objA0.value32 -= 8
+		if (objA0.value32 == 0)
+		{
+			objA0.position.x.u16 = 0x7fff
+		}
+		D0 = 8
+		if (objA0.flags2e == 0)
+		{
+			D0.s16 = -D0.s16
+		}
+		objA0.position.x.u16 += D0.u16
+	}
+
+	D1.u16 = objA0.value32
+	D2 = 0x10
+	D3 = 0x09
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	CheckForUnloadObject()
+}
+
+
+
+// Segment of a skewed non-collapsing bridge
+
+//# address-hook(0x044d60) end(0x044d92)
+function void fn044d60()
+{
+	objA0.update_address = 0x044d98
+	objA0.render_flags |= 0x44
+	objA0.box_size.y = 0x20
+	objA0.box_size.x = 0x40
+	objA0.sprite_priority = 0x0180
+	objA0.sprite_attributes = 0xc2f4
+	objA0.mapping_offset = 0x046958
+	objA0.animation.sprite = 0x03
+	objA0.flags2a |= 0x80
+	fn044d98()
+}
+
+
+//# address-hook(0x044d98) end(0x044eb8)
+function void fn044d98()
+{
+	D0.u8 = objA0.flags2a
+	u16 backupD0 = D0.u16
+	D1 = 0x40
+	A2 = 0x046658
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+	D0.u16 = backupD0
+
+	if (D0 & 0x08)
+	{
+		A1 = 0xffffb000
+		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		{
+			u8[A1 + 0x2a] &= ~0x02
+		}
+	}
+	if (D0 & 0x10)
+	{
+		A1 = 0xffffb04a
+		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		{
+			u8[A1 + 0x2a] &= ~0x02
+		}
+	}
+	if (s8[A0 + 0x2c] >= 0)
+	{
+		D0.u16 = objA0.flags2a & 0x18
+		if (D0.u16 != 0)
+		{
+			A1 = (D0 & 0x08) ? 0xffffb000 : 0xffffb04a
+			D1 = 0x38
+			D2 = 0x10
+			D3.u16 = 0x0405
+			D6 = 0xfffffff8
+			D4.u16 = objA0.position.x.u16
+			objA0.flags2e = (D4.u16 >= objA1.position.x.u16) ? 0xff : 0x00
+			if (objA0.flags2e)
+			{
+				D1.s16 = -D1.s16
+				D2.s16 = -D2.s16
+				D3.u16 = (D3.u16 >> 8) + (D3.u16 << 8)
+				D6.s32 = -D6.s32
+			}
+			D1.u16 += D4.u16
+			if (objA0.render_flags & render_flag.FLIP_X)
+			{
+				D3.u16 = (D3.u16 >> 8) + (D3.u16 << 8)
+				D6.s32 = -D6.s32
+			}
+			if (D6.s32 >= 0)
+			{
+				D6 += 8
+			}
+			D4 = 0x06
+			D5 = 0x07
+			D7 = (D7 << 16) + (D7 >> 16)
+
+			if (allocDynamicObjectAfterA0())
+			{
+				while (D5.s16 >= 0)
+				{
+					objA1.update_address = 0x045052
+					D7.u16 = objA0.render_flags & 0xbf
+					u8[A1 + 0x04] = D7.u8
+					objA1.position.x.u16 = D1.u16
+					D7.u16 = objA0.position.y.u16 + D6.u16
+					objA1.position.y.u16 = D7.u16
+					u8[A1 + 0x22] = D3.u8
+					u16[A1 + 0x2e] = D4.u16
+					D1.u16 -= D2.u16
+					D3.u16 = (D3.u16 >> 8) + (D3.u16 << 8)
+					D4.u16 += 0x06
+					if ((D5 & 0x01) == 0)
+					{
+						if (D6.s32 >= 0)
+						{
+							D6.u16 -= 8
+						}
+						else
+						{
+							D6.u16 += 8
+						}
+					}
+
+					if (!allocDynamicObjectAfterA1())
+						break
+					--D5.s16
+				}
+			}
+
+			D7 = (D7 << 16) + (D7 >> 16)
+			objA0.update_address = 0x044eba
+			u16[A0 + 0x30] = 0x06
+			objA0.value32 = 0x40
+			objA0.countdown_callback = 0x046658
+			return
+		}
+	}
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x044eba) end(0x044f4c)
+function void fn044eba()
+{
+	--u16[A0 + 0x30]
+	if (u16[A0 + 0x30] == 0)
+	{
+		u16[A0 + 0x30] = 6
+		objA0.countdown_callback += 4
+		objA0.value32 -= 8
+		if (objA0.value32 == 0)
+		{
+			objA0.position.x.u16 = 0x7fff
+		}
+
+		D0 = 8
+		D1 = 2
+		if (objA0.flags2e == 0)
+		{
+			D0.s16 = -D0.s16
+			D1.s16 = -D1.s16
+		}
+		if (objA0.render_flags & render_flag.FLIP_X)
+		{
+			D1.s16 = -D1.s16
+		}
+		objA0.position.x.u16 += D0.u16
+		objA0.position.y.u16 -= D1.u16
+	}
+
+	D0.u8 = objA0.flags2a
+	u16 backupD0 = D0.u16
+	D1.u16 = objA0.value32
+	A2 = objA0.countdown_callback
+	D4.u16 = objA0.position.x.u16
+	fn01e2fe()
+
+	D0.u16 = backupD0
+	if (D0 & 0x08)
+	{
+		A1 = 0xffffb000
+		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		{
+			u8[A1 + 0x2a] &= ~0x02
+		}
+	}
+	if (D0 & 0x10)
+	{
+		A1 = 0xffffb04a
+		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		{
+			u8[A1 + 0x2a] &= ~0x02
+		}
+	}
+
+	CheckForUnloadObject()
+}
+
+
+
+// Segment of a collapsing bridge
+
+//# address-hook(0x045052) end(0x045076)
+function void fn045052()
+{
+	objA0.update_address = 0x04507e
+	objA0.render_flags |= 0x80
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x08
+	objA0.sprite_priority = 0x0200
+	objA0.sprite_attributes = 0xc2f4
+	objA0.mapping_offset = 0x046958
+	fn04507e()
+}
+
+
+//# address-hook(0x04507e) end(0x04509e)
+function void fn04507e()
+{
+	if (s8[A0 + 0x04] >= 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	D0.u16 = objA0.countdown_value
+	if (D0.u16 != 0)
+	{
+		--D0.u16
+		objA0.countdown_value = D0.u16
+	}
+	else
+	{
+		UpdateMovementSimple()
+	}
+	DrawObject()
+}

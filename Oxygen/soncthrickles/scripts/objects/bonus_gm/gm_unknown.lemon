@@ -1,0 +1,238 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Balls inside the machine (only a visual effect)
+
+//# address-hook(0x060ffe) end(0x06100e)
+function void fn060ffe()
+{
+	setupObjectAttributesFull(0x06138c)
+
+	objA0.update_address = 0x061012
+	fn061362()
+	fn061012()
+}
+
+
+//# address-hook(0x061012) end(0x061018)
+function void fn061012()
+{
+	MoveWithParent()
+	DrawObject()
+}
+
+
+
+//# address-hook(0x06101e) end(0x06102e)
+function void fn06101e()
+{
+	setupObjectAttributesFull(0x0613d4)
+	objA0.update_address = 0x061032
+	fn061320()
+	fn061032()
+}
+
+
+//# address-hook(0x061032) end(0x06103e)
+function void fn061032()
+{
+	--objA0.flags2e
+	if (s8[A0 + 0x2e] < 0)
+	{
+		objA0.update_address = 0x0856d0
+	}
+	DrawObject()
+}
+
+
+
+//# address-hook(0x061320) end(0x061340)
+function void fn061320()
+{
+	D0 = 0
+	objA0.flags2e = objA0.subtype2c
+	A1 = 0x061342 + objA0.subtype2c
+	objA0.position.x.u16 += s8[(A1+=1)-1]
+	objA0.position.y.u16 += s8[(A1+=1)-1]
+}
+
+
+//# address-hook(0x061362) end(0x061382)
+function void fn061362()
+{
+	D0 = u16(objA0.subtype2c - 6) >> 1
+	D0.u8 = u8[0x061388 + D0.u16]
+	objA0.animation.sprite = D0.u8
+	if (D0.u8 == 0x16)
+	{
+		spawnSimpleChildObjects(0x06144a)
+	}
+}
+
+
+
+// Check for exiting?
+
+//# address-hook(0x061044) end(0x06104a)
+function void fn061044()
+{
+	objA0.position.y.u16 += 0x02a0
+	objA0.update_address = 0x061050
+	fn061050()
+}
+
+
+//# address-hook(0x061050) end(0x0610ac)
+function void fn061050()
+{
+	--u16[0xffff2020]
+	A1 = 0x0610ae
+	fn0858f8()
+	if (D0.u16 == 0)
+	{
+		D0 = (D0 << 16) + (D0 >> 16)
+		if (D0.u16 == 0)
+			return
+
+		A1 = 0xffffb04a
+		UnloadObjectA1()
+		return
+	}
+
+	global.zone_act = checkpoint.zone_act
+	global.zone_act.apparent = checkpoint.zone_act.apparent
+	checkpoint.number = checkpoint.number.backup
+	global.stage_type = 0
+	level.restart.u8 = 1
+	checkpoint.rings = ring_counter
+	checkpoint.lives_granted = extra_lives_granted
+	global.shields_backup_1 = u8[0xffffb02b] & 0x71
+}
+
+
+
+// And the main gum machine...?
+
+//# address-hook(0x0610b6) end(0x0610c0)
+function void fn0610b6()
+{
+	setupObjectAttributesFull(0x0613ec)
+	objA0.update_address = 0x0610c6
+	fn0610c6()
+}
+
+
+//# address-hook(0x0610c6) end(0x0610da)
+function void fn0610c6()
+{
+	u8[0xffffef3a] = 0xff
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+	DrawObject()
+}
+
+
+
+// Another thing
+
+//# address-hook(0x060eba) end(0x060eca)
+function void fn060eba()
+{
+	setupObjectAttributesFull(0x0613e0)
+	objA0.update_address = 0x060ece
+	fn0612a8()
+	fn060ece()
+}
+
+
+//# address-hook(0x060ece) end(0x060f28)
+function void fn060ece()
+{
+	D0.u16 = objA0.velocity.y + 0x10
+	if (D0.u16 <= 0x0200)
+	{
+		objA0.velocity.y = D0.u16
+	}
+
+	UpdateMovementStraightSimple()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u16 = objA1.position.y.u16
+	if (D0.u16 > objA0.position.y.u16)
+	{
+		objA0.position.y.u16 = D0.u16
+	}
+	else
+	{
+		D0.u16 += 0x10
+		if (D0.u16 <= objA0.position.y.u16)
+		{
+			fn0610e0()
+			if (!_equal())
+			{
+				UnloadObject()
+				return
+			}
+		}
+	}
+
+	D0.u16 = camera.position.y.u16 + 0x0240
+	if (D0.u16 >= objA0.position.y.u16)
+	{
+		Object.AnimationProgressByLocalA1()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x0610e0) end(0x0610ee)
+function void fn0610e0()
+{
+	A1 = 0x0610f0
+	fn0858f8()
+	_setZeroFlagByValue(D0)
+	if (D0 != 0)
+	{
+		fn0610f8()
+	}
+}
+
+
+//# address-hook(0x0612a8) end(0x0612de)
+function void fn0612a8()
+{
+	GetRandomNumber()
+	D0.u16 &= 0x0f
+	if (D0.u16 == 0)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		if (u8[A1 + 0x38] & 0x80)
+		{
+			D0 = 3
+		}
+		else
+		{
+			u8[A1 + 0x38] |= 0x80
+		}
+	}
+
+	D0.u8 = u8[0x0612e0 + D0.s16]
+	objA0.subtype2c = D0.u8
+	if (D0.u8 == 0x04)
+	{
+		u8[A0 + 0x28] = 0xd7
+	}
+	D0.u16 <<= 2
+	u32[A0 + 0x30] = u32[0x0612f0 + D0.s16]
+}

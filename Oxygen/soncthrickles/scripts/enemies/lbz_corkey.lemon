@@ -1,0 +1,209 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Corkey (the small laser cannon from LBZ)              //
+//-------------------------------------------------------//
+
+//# address-hook(0x08c746) end(0x08c77a)
+function void fn08c746()
+{
+	setupObjectAttributesFull(0x08c8f4)
+	D0 = (objA0.render_flags & render_flag.FLIP_X) ? 1 : -1
+	u16[A0 + 0x40] = D0.u16
+	D0.u8 = objA0.subtype2c
+	objA0.value2f = D0.u8
+	objA0.countdown_callback = 0x08c7bc
+	objA0.subtype2c = D0.u8 * 2
+	spawnChildObjects(0x08c90e)
+	fn08c780()
+}
+
+
+//# address-hook(0x08c780) end(0x08c79a)
+function void fn08c780()
+{
+	GetRandomNumber()
+	D0.u16 &= 0x3f
+	D1.u16 = D0.u16 & 0x30
+	if (D1.u16 == 0)
+		D0.u16 |= 0x30
+	u16[A0 + 0x3a] = D0.u16
+}
+
+
+//# address-hook(0x08c728) end(0x08c728)
+function void fn08c728()
+{
+	Object.InitWithUpdateAddress(0x08c72e)
+}
+
+
+//# address-hook(0x08c72e) end(0x08c73c)
+function void fn08c72e()
+{
+	// Targets:
+	//  - 0x08c746	-> objA0.base_state = 0x00
+	//  - 0x08c79c	-> objA0.base_state = 0x02
+	//  - 0x08c7cc	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08c740, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08c79c) end(0x08c7ba)
+function void fn08c79c()
+{
+	--u16[A0 + 0x3a]
+	if (s16[A0 + 0x3a] >= 0)
+	{
+		D0.u16 = u16[A0 + 0x40]
+		objA0.position.x.u16 += D0.u16
+		Object.CountdownAndTrigger()
+	}
+	else
+	{
+		objA0.base_state = 0x04
+		objA0.flags38 |= 0x02
+	}
+}
+
+
+//# address-hook(0x08c7bc) end(0x08c7ca)
+function void fn08c7bc()
+{
+	s16[A0 + 0x40] = -s16[A0 + 0x40]
+	objA0.flags2e = 0
+	objA0.value2f = objA0.subtype2c
+}
+
+
+//# address-hook(0x08c7cc) end(0x08c7dc)
+function void fn08c7cc()
+{
+	if (objA0.flags38 & 0x02)
+		return
+
+	objA0.base_state = 0x02
+	fn08c780()
+}
+
+
+//# address-hook(0x08c7de) end(0x08c7ec)
+function void fn08c7de()
+{
+	// Loading up the laser
+
+	// Targets:
+	//  - 0x08c7f8	-> objA0.base_state = 0x00
+	//  - 0x08c802	-> objA0.base_state = 0x02
+	//  - 0x08c82c	-> objA0.base_state = 0x04
+	//  - 0x08c8a8	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x08c7f0, objA0.base_state)
+
+	fn084920()
+}
+
+
+//# address-hook(0x08c7f8) end(0x08c7fc)
+function void fn08c7f8()
+{
+	setupObjectAttributesBasic(0x08c900)
+}
+
+
+//# address-hook(0x08c802) end(0x08c82a)
+function void fn08c802()
+{
+	MoveAndFlipWithParent()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x38] & 0x02)
+	{
+		objA0.base_state = 0x04
+		objA0.countdown_callback = 0x08c88c
+		u32[A0 + 0x30] = 0x08c92e
+	}
+}
+
+
+//# address-hook(0x08c82c) end(0x08c88a)
+function void fn08c82c()
+{
+	fn084700()
+	if (D2.s16 < 0)
+	{
+		if (objA0.value2f == 4)
+		{
+			spawnChildObjects(0x08c916)
+			u32[A1 + 0x30] = 0x08c933
+		}
+		else if (objA0.value2f == 5)
+		{
+			spawnChildObjects(0x08c91e)
+			u32[A1 + 0x30] = 0x08c93c
+		}
+		else if (objA0.value2f == 6)
+		{
+			spawnChildObjects(0x08c926)
+			u32[A1 + 0x30] = 0x08c945
+		}
+	}
+}
+
+
+//# address-hook(0x08c8a8) end(0x08c8a8)
+function void fn08c8a8()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08c88c) end(0x08c8a6)
+function void fn08c88c()
+{
+	objA0.base_state = 0x06
+	objA0.animation.sprite = 2
+	objA0.countdown_value = 7
+	objA0.countdown_callback = 0x08c8ae
+}
+
+
+//# address-hook(0x08c8ae) end(0x08c8c4)
+function void fn08c8ae()
+{
+	objA0.base_state = 0x02
+	objA0.animation.sprite = 1
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	u8[A1 + 0x38] &= ~0x02
+}
+
+
+
+// The laser itself
+
+//# address-hook(0x08c8c6) end(0x08c8e0)
+function void fn08c8c6()
+{
+	setupObjectAttributesMost(0x08c906)
+	objA0.update_address = 0x08c8e6
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	playSound(0x5e)
+	fn08c8e6()
+}
+
+
+//# address-hook(0x08c8e6) end(0x08c8f0)
+function void fn08c8e6()
+{
+	++u16[A0 + 0x3a]
+	fn08459c()
+	fn084934()
+}

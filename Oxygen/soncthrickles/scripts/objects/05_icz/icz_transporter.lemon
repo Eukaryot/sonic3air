@@ -1,0 +1,105 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Transporter in ICZ1 start with Knuckles
+
+//# address-hook(0x053ad4) end(0x053b9c)
+function void fn053ad4()
+{
+	if (!allocDynamicObjectAfterA0())
+		return
+
+	objA0.update_address = 0x053ba2
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.y = 0x10
+	objA0.box_size.x = 0x20
+	objA0.sprite_priority = 0x80
+	objA0.sprite_attributes = 0x2347
+	objA0.mapping_offset = 0x363c44
+	objA0.position.x.u16 = 0x3640
+	objA0.position.y.u16 = 0x0670
+	objA0.animation.sprite = 0x1a
+	objA0.value3e = u16[0xffffb014]
+	u16[A0 + 0x3c] = A1.u16
+
+	objA1.update_address = 0x0459b4
+	u8[A1 + 0x04] = (render_flag.COMPOUND | render_flag.WORLD)
+	u8[A1 + 0x05] = 0xff
+	u8[A1 + 0x06] = 0x80
+	u8[A1 + 0x07] = 0x18
+	u16[A1 + 0x08] = 0x80
+	u16[A1 + 0x0a] = 0x255e
+	u32[A1 + 0x0c] = 0x046b3c
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16
+	u16[A1 + 0x16] = 0x02
+	u16[A1 + 0x44] = objA0.position.y.u16 - 0x80
+	u8[A1 + 0x46] = 0x18
+	u16[A1 + 0x48] = A0.u16
+
+	fn053ba2()
+}
+
+
+//# address-hook(0x053ba2) end(0x053bfe)
+function void fn053ba2()
+{
+	A1 = 0xfffffcb0
+	u16[A1] = 0x0ea2
+	u16[A1 + 0x04] = 0x0e80
+
+	A1 = 0xffffb000
+	u8[A1 + 0x2e] = 0x01
+	u8[A1 + 0x20] = 0x02
+	u8[A1 + 0x2a] |= 0x04
+
+	A1 = 0xffffb000
+	D0 = 0x020000
+	D1 = 0x0800
+	fn0465d6()
+
+	D0.u16 += objA0.value3e
+	objA1.position.y.u16 = D0.u16
+	if (s32[A0 + 0x2e] >= 0)
+	{
+		u8[A1 + 0x2e] = 0
+		u8[A1 + 0x20] = 0
+		objA0.update_address = 0x053bd4
+		fn053bd4()
+	}
+	else
+	{
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x053bd4)
+function void fn053bd4()
+{
+	if (camera.foreground.x.u16 >= 0x3780)
+	{
+		A1 = 0xfffffc30
+		u16[A1] = 0x2c
+		u16[A1 + 0x04] = 0
+		UnloadObject()
+	}
+	else
+	{
+		D1 = 0x23
+		D2 = 0x10
+		D3 = 0x01
+		D4.u16 = objA0.position.x.u16
+		fn01dc56()
+		DrawObject()
+	}
+}
+
+

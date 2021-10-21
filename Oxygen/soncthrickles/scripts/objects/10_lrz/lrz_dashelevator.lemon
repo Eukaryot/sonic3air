@@ -1,0 +1,182 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x042f1a) end(0x042f72)
+function void fn042f1a()
+{
+	objA0.mapping_offset = 0x043096
+	objA0.sprite_attributes = 0x03a1
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x20
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x80
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	D1 = 0
+	D0.u8 = objA0.subtype2c
+	if (D0.u8 & 0x80)
+	{
+		D1 = 0x20
+		u16[A0 + 0x30] = D1.u16
+	}
+	D0.u16 &= 0x7f
+	D0.u16 <<= 3
+	u16[A0 + 0x34] = D0.u16
+
+	if (objA0.flags2a & 0x01)
+	{
+		objA0.flags2a &= ~0x01
+		u16[A0 + 0x30] = D0.u16
+		u16[A0 + 0x30] -= D1.u16
+		u16[A0 + 0x46] -= D0.u16
+	}
+
+	objA0.update_address = 0x042f78
+	fn042f78()
+}
+
+
+//# address-hook(0x042f78) end(0x043016)
+function void fn042f78()
+{
+	D5 = 0
+	A2 = A0 + 0x2e
+	A1 = 0xffffb000
+	D6 = 3
+	fn04301c()
+
+	++A2
+	A1 = 0xffffb04a
+	D6 = 4
+	fn04301c()
+
+	D0 = u32[A0 + 0x30]
+	D5 = (D5 << 16) + (D5 >> 16)
+	D5.s32 >>= 3
+	D0 += D5
+	if (D0.s32 < 0)
+	{
+		D0 = 0
+		D5 = 0
+	}
+	D1 = objA0.countdown_callback
+	if (D0 >= D1)
+	{
+		D0 = D1
+		D5 = 0
+	}
+
+	u32[A0 + 0x30] = D0
+	D0 = (D0 << 16) + (D0 >> 16)
+	D0.u16 += u16[A0 + 0x46]
+	objA0.position.y.u16 = D0.u16
+
+	D0.u8 = level.framecounter.low & 0x03
+	if (D0.u8 == 0 && D5 != 0)
+	{
+		if (D5.s32 < 0)
+		{
+			++objA0.animation.sprite
+			if (objA0.animation.sprite >= 3)
+			{
+				objA0.animation.sprite = 0
+			}
+		}
+		else
+		{
+			--objA0.animation.sprite
+			if (objA0.animation.sprite == 0xff)
+			{
+				objA0.animation.sprite = 2
+			}
+		}
+
+		D0.u8 = level.framecounter.low & 0x0f
+		if (D0.u8 == 0)
+		{
+			playSound(0xd7)
+		}
+	}
+
+	D1.u16 = 0x2b
+	D2.u16 = 0x08
+	D3.u16 = 0x09
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x04301c) end(0x043094)
+function void fn04301c()
+{
+	if (u8[A2] == 0)
+	{
+		if (objA0.flags2a & (1 << D6.u8))
+		{
+		#if STANDALONE
+			// Allow Super Peel-Out as well
+			if (objA1.state == char.state.SPINDASH || u8[A1 + 0x3d] & 0x80)
+		#else
+			if (objA1.state == char.state.SPINDASH)
+		#endif
+			{
+				objA1.position.x.u16 = objA0.position.x.u16
+				u8[A2] = 1
+			}
+		}
+		return
+	}
+
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+	{
+	#if STANDALONE
+		// Allow Super Peel-Out as well
+		if (objA1.state == char.state.ROLLING || objA1.state == char.state.SPINDASH || u8[A1 + 0x3d] & 0x80)
+	#else
+		if (objA1.state == char.state.ROLLING || objA1.state == char.state.SPINDASH)
+	#endif
+		{
+			objA1.position.x.u16 = objA0.position.x.u16
+			D0.u16 = u16[A1 + 0x1c]
+			if (D0.u16 != 0)
+			{
+				if (D0.s16 < 0)
+				{
+					D0.u16 += 0x40
+					if (D0.s16 > 0)
+					{
+						D0 = 0
+					}
+				}
+				else
+				{
+					D0.u16 -= 0x40
+					if (D0.s16 < 0)
+					{
+						D0 = 0
+					}
+				}
+				u16[A1 + 0x1c] = D0.u16
+			}
+
+			D0 = 8 + u8[A1 + 0x3e]		// This is "char.spindash_charge"
+			if ((u8[A1 + 0x2a] & char.flag.FACING_LEFT) == 0)
+			{
+				D0.s16 = -D0.s16
+			}
+			D5.u16 += D0.u16
+			return
+		}
+	}
+
+	objA1.velocity.x = 0
+	u8[A2] = 0
+}

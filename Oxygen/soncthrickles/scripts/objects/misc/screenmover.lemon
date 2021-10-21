@@ -1,0 +1,87 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// These functions move the screen movement borders outside increasingly fast
+
+
+//# address-hook(0x084a48) end(0x084a70)
+function void fn084a48()
+{
+	// Move right, accelerate by a quarter of a pixel per frame
+	u32[A0 + 0x30] += 0x4000
+	D0.u16 = move_area.right + u16[A0 + 0x30]
+	if (D0.u16 < screenmover_target.right)
+	{
+		move_area.right = D0.u16
+	}
+	else
+	{
+		move_area.right = screenmover_target.right
+		UnloadObject()
+	}
+}
+
+
+
+//# address-hook(0x084a76) end(0x084a9e)
+function void fn084a76()
+{
+	// Move left, accelerate by a quarter of a pixel per frame
+	u32[A0 + 0x30] += 0x4000
+	D0.u16 = move_area.left - u16[A0 + 0x30]
+	if (D0.s16 > s16(screenmover_target.left))
+	{
+		move_area.left = D0.u16
+	}
+	else
+	{
+		move_area.left = screenmover_target.left
+		UnloadObject()
+	}
+}
+
+
+
+//# address-hook(0x084aa4) end(0x084acc)
+function void fn084aa4()
+{
+	// Move up, accelerate by a quarter of a pixel per frame
+	u32[A0 + 0x30] += 0x4000
+	D0.u16 = level.vertical_wrap - u16[A0 + 0x30]
+	if (D0.s16 > s16(screenmover_target.top))
+	{
+		level.vertical_wrap = D0.u16
+	}
+	else
+	{
+		level.vertical_wrap = screenmover_target.top
+		UnloadObject()
+	}
+}
+
+
+
+//# address-hook(0x084ad2) end(0x084afa)
+function void fn084ad2()
+{
+	// Move down, accelerate by half a pixel per frame
+	u32[A0 + 0x30] += 0x8000
+	D1 = u16[A0 + 0x30]
+	D0.u16 = move_area.bottom.current + D1.u16
+	if (D0.s16 <= s16(screenmover_target.bottom))
+	{
+		move_area.bottom.current = D0.u16
+	}
+	else
+	{
+		move_area.bottom.current = screenmover_target.bottom
+		UnloadObject()
+	}
+}

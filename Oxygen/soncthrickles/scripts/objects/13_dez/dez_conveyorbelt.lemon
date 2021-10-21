@@ -1,0 +1,55 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x047816) end(0x04783c)
+function void fn047816()
+{
+	D0.u16 = (objA0.subtype2c & 0x7f) * 8
+	objA0.value32 = D0.u16
+	u16[A0 + 0x34] = D0.u16 * 2
+	s16[A0 + 0x30] = (objA0.flags2a & 0x01) ? -2 : 2
+
+	objA0.update_address = 0x047842
+	fn047842()
+}
+
+
+//# address-hook(0x047842) end(0x04784e)
+function void fn047842()
+{
+	A1 = 0xffffb000
+	fn047854()
+
+	A1 = 0xffffb04a
+	fn047854()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x047854) end(0x047890)
+function void fn047854()
+{
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + objA0.value32
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
+
+	if (D0.u16 < u16[A0 + 0x34] && D1.u16 < 0x60)
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = u16[A0 + 0x30]
+			if (D1.u16 >= 0x30)
+			{
+				D0.s16 = -D0.s16
+			}
+			objA1.position.x.u16 += D0.u16
+		}
+	}
+}

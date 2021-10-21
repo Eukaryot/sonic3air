@@ -1,0 +1,456 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Skorp enemy from Sandopolis Zone                      //
+//-------------------------------------------------------//
+
+//# address-hook(0x08e650) end(0x08e650)
+function void Skorp.Init()
+{
+	Object.InitWithUpdateAddress(0x08e656)
+}
+
+
+//# address-hook(0x08e656) end(0x08e664)
+function void Skorp.Update()
+{
+	// Targets:
+	//  - 0x08e670	-> objA0.base_state = 0x00
+	//  - 0x08e6b8	-> objA0.base_state = 0x02
+	//  - 0x08e732	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x08e66a, objA0.base_state)
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08e670) end(0x08e6b2)
+function void fn08e670()
+{
+	setupObjectAttributesFull(0x08ea48)
+
+	objA0.hitbox_extends.y = 0x0b
+	objA0.countdown_callback = 0x08e706
+	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80
+	objA0.countdown_value = objA0.subtype2c - 1
+	u16[A0 + 0x3a] = objA0.subtype2c * 2 - 1
+
+	A2 = 0x08ea5a
+	SpawnChildObjectChain()
+}
+
+
+//# address-hook(0x08e6b8) end(0x08e700)
+function void fn08e6b8()
+{
+	A1 = 0xffffb000
+	CheckDistanceToObjectA1()
+
+	D4.u8 = (objA0.render_flags & render_flag.FLIP_X) ? 0xff : 0x00
+	if (D0.u16 != 0)
+	{
+		D4.u8 ^= 0xff
+	}
+	if (D4.u8 == 0)
+	{
+		if (D2.u16 >= 0x20 && D2.u16 < 0x80 && D3.u16 < 0x28)
+		{
+			fn08e718()
+			return
+		}
+	}
+
+	Object.animationProgress(0x08ea60)
+	UpdateMovementStraightSimple()
+
+	fn0848b6()
+	if (_equal())
+	{
+		Object.CountdownAndTrigger()
+	}
+}
+
+
+//# address-hook(0x08e706) end(0x08e716)
+function void fn08e706()
+{
+	objA0.velocity.x = -objA0.velocity.x
+	objA0.render_flags ^= 0x01
+	objA0.countdown_value = u16[A0 + 0x3a]
+}
+
+
+//# address-hook(0x08e718) end(0x08e730)
+function void fn08e718()
+{
+	objA0.base_state = 0x04
+	objA0.flags38 |= 0x02
+	objA0.value3e = objA1.position.x.u16
+	u16[A0 + 0x40] = objA1.position.y.u16
+}
+
+
+//# address-hook(0x08e732) end(0x08e742)
+function void fn08e732()
+{
+	if ((objA0.flags38 & 0x02) == 0)
+	{
+		objA0.base_state = 0x02
+	}
+}
+
+
+//# address-hook(0x08e744) end(0x08e772)
+function void fn08e744()
+{
+	// Targets:
+	//  - 0x08e78c	-> objA0.base_state = 0x00
+	//  - 0x08e7d4	-> objA0.base_state = 0x02
+	//  - 0x08e828	-> objA0.base_state = 0x04
+	//  - 0x08e868	-> objA0.base_state = 0x06
+	//  - 0x08e88c	-> objA0.base_state = 0x08
+	//  - 0x08e8c4	-> objA0.base_state = 0x0a
+	//  - 0x08e8be	-> objA0.base_state = 0x0c
+	//  - 0x08e8be	-> objA0.base_state = 0x0e
+	//  - 0x08e918	-> objA0.base_state = 0x10
+	//  - 0x08e958	-> objA0.base_state = 0x12
+	call tableLookupAddress(0x08e778, objA0.base_state)
+
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		if (objA0.subtype2c == 0x0a)
+		{
+			AddAsDynamicObject()
+		}
+		DrawObject()
+	}
+	else
+	{
+		Object.TriggerUnloading()
+	}
+}
+
+
+//# address-hook(0x08e78c) end(0x08e7d0)
+function void fn08e78c()
+{
+	setupObjectAttributesBasic(0x08ea54)
+
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D0.u8 = objA0.subtype2c
+	if (D0.u8 == 0)
+	{
+		u8[A0 + 0x42] = 0x08
+		u8[A0 + 0x43] = 0xf0
+		u16[A1 + 0x44] = u16[A0 + 0x46]
+	}
+
+	u16[A0 + 0x44] = u16[A1 + 0x44]
+	if (D0.u8 == 0x0a)
+	{
+		objA0.animation.sprite = 4
+		objA0.sprite_priority = 0x0100
+		u8[A0 + 0x28] = 0x87
+	}
+
+	fn08e982()
+	fn08e7d4()
+}
+
+
+//# address-hook(0x08e7d4) end(0x08e826)
+function void fn08e7d4()
+{
+	fn084b82()
+	if (objA0.subtype2c != 0)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x44]
+		if (u8[A1 + 0x38] & 0x02)
+		{
+			objA0.base_state = 0x04
+			objA0.countdown_callback = 0x08e87c
+
+			A1 = 0xffff0000 + u16[A0 + 0x44]
+			u8[A1 + 0x38] &= 0xf3
+		}
+		else
+		{
+			fn08ea1c()
+
+			D2 = 5
+			fn084c72()
+		}
+	}
+	else
+	{
+		MoveAndFlipWithParent()
+
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		objA0.position.y.u16 -= u8[A1 + 0x22]
+	}
+}
+
+
+//# address-hook(0x08e828) end(0x08e85c)
+function void fn08e828()
+{
+	D0 = objA0.subtype2c >> 1
+	D1.u8 = u8[0x08e862 + D0.s16]
+	D2.u8 = u8[A0 + 0x3c] - 8
+	if (D2.u8 <= D1.u8)
+	{
+		objA0.base_state = 0x06
+		D2.u8 = D1.u8
+		if (D0.u8 == 5)
+		{
+			A1 = 0xffff0000 + u16[A0 + 0x44]
+			u8[A1 + 0x38] |= 0x08
+		}
+	}
+
+	u8[A0 + 0x3c] = D2.u8
+	D2 = 5
+	fn084c72()
+}
+
+
+//# address-hook(0x08e868) end(0x08e87a)
+function void fn08e868()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u8[A1 + 0x38] & 0x08)
+	{
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+
+//# address-hook(0x08e87c) end(0x08e882)
+function void fn08e87c()
+{
+	objA0.base_state = 0x08
+}
+
+
+//# address-hook(0x08e884) end(0x08e88a)
+function void fn08e884()
+{
+	objA0.base_state = 0x10
+}
+
+
+//# address-hook(0x08e88c) end(0x08e8b8)
+function void fn08e88c()
+{
+	D0.u8 = u8[A0 + 0x3c] + 0x10
+	if (D0.s8 < 0)
+	{
+		objA0.base_state = 0x0c
+		objA0.countdown_value = 0x0f
+		objA0.countdown_callback = 0x08e8ca
+
+		fn08e9a4()
+		D0.u8 = 0x80
+	}
+	u8[A0 + 0x3c] = D0.u8
+
+	D2 = 5
+	fn084c72()
+}
+
+
+//# address-hook(0x08e8be) end(0x08e8c4)
+function void fn08e8be()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08e8c4)
+function void fn08e8c4()
+{
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08e8ca) end(0x08e8de)
+function void fn08e8ca()
+{
+	objA0.base_state = 0x0a
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x08e8e0
+}
+
+
+//# address-hook(0x08e8e0) end(0x08e8fc)
+function void fn08e8e0()
+{
+	objA0.base_state = 0x0e
+	objA0.velocity.x = -objA0.velocity.x
+	objA0.velocity.y = -objA0.velocity.y
+	objA0.countdown_value = 0x0f
+	objA0.countdown_callback = 0x08e8fe
+}
+
+
+//# address-hook(0x08e8fe) end(0x08e916)
+function void fn08e8fe()
+{
+	objA0.base_state = 0x04
+	objA0.countdown_callback = 0x08e884
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	u8[A1 + 0x38] &= ~0x08
+}
+
+
+//# address-hook(0x08e918) end(0x08e94c)
+function void fn08e918()
+{
+	D0 = objA0.subtype2c >> 1
+	D1.u8 = u8[0x08e952 + D0.s16]
+	D2.u8 = u8[A0 + 0x3c] + 8
+	if (D2.u8 >= D1.u8)
+	{
+		objA0.base_state = 0x12
+		D2.u8 = D1.u8
+		if (D0.u8 == 5)
+		{
+			A1 = 0xffff0000 + u16[A0 + 0x44]
+			u8[A1 + 0x38] |= 0x04
+		}
+	}
+
+	u8[A0 + 0x3c] = D2.u8
+
+	D2 = 5
+	fn084c72()
+}
+
+
+//# address-hook(0x08e958) end(0x08e980)
+function void fn08e958()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if ((u8[A1 + 0x38] & 0x04) == 0)
+		return
+
+	objA0.base_state = 0x02
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	u8[A1 + 0x38] &= ~0x02
+	objA0.value3b = 0
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x08e982) end(0x08e990)
+function void fn08e982()
+{
+	D0 = objA0.subtype2c >> 1
+	u8[A0 + 0x3c] = u8[0x08e992 + D0.s16]
+}
+
+
+//# address-hook(0x08e9a4) end(0x08e9ce)
+function void fn08e9a4()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	D0.u16 = u16[A1 + 0x3e] - objA0.position.x.u16
+	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
+	D0.u16 = abs(D0.s16)
+
+	D1.u16 = u16[A1 + 0x40] - objA0.position.y.u16
+	D3.u8 = (D1.s16 < 0) ? 0xff : 0x00
+	D1.u16 = abs(D1.s16)
+
+	// Targets:
+	//  - 0x08e9de	-> objA0.subtype2c = 0x02
+	//  - 0x08e9e6	-> objA0.subtype2c = 0x04
+	//  - 0x08e9ee	-> objA0.subtype2c = 0x06
+	//  - 0x08e9f6	-> objA0.subtype2c = 0x08
+	//  - 0x08ea02	-> objA0.subtype2c = 0x0a
+	call tableLookupAddress(0x08e9d2, objA0.subtype2c)
+}
+
+
+//# address-hook(0x08e9de) end(0x08e9e2)
+function void fn08e9de()
+{
+	D4.u16 = 0x3333
+	fn08e9fa()
+}
+
+//# address-hook(0x08e9e6) end(0x08e9ea)
+function void fn08e9e6()
+{
+	D4.u16 = 0x6666
+	fn08e9fa()
+}
+
+//# address-hook(0x08e9ee) end(0x08e9f2)
+function void fn08e9ee()
+{
+	D4.u16 = 0x9999
+	fn08e9fa()
+}
+
+//# address-hook(0x08e9f6) end(0x08e9f6)
+function void fn08e9f6()
+{
+	D4.u16 = 0xcccc
+	fn08e9fa()
+}
+
+
+//# address-hook(0x08e9fa) end(0x08ea00)
+function void fn08e9fa()
+{
+	D0 = (u32(D0.u16) * D4.u16) >> 16
+	D1 = (u32(D1.u16) * D4.u16) >> 16
+	fn08ea02()
+}
+
+
+//# address-hook(0x08ea02) end(0x08ea1a)
+function void fn08ea02()
+{
+	D0.s16 <<= 4
+	if (D2.u8 != 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.velocity.x = D0.u16
+
+	D1.s16 <<= 4
+	if (D3.u8 != 0)
+	{
+		D1.s16 = -D1.s16
+	}
+	objA0.velocity.y = D1.u16
+}
+
+
+//# address-hook(0x08ea1c) end(0x08ea46)
+function void fn08ea1c()
+{
+	--objA0.value3b
+	if (s8[A0 + 0x3b] < 0)
+	{
+		objA0.value3b = 0x10
+		objA0.flags38 ^= 0x01
+	}
+	if ((objA0.value3b & 0x01) == 0)
+	{
+		u8[A0 + 0x3c] += (objA0.flags38 & 0x01) ? 1 : -1
+	}
+}

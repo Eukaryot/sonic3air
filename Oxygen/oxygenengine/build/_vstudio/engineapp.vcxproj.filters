@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\source\engineapp\main.cpp" />
+    <ClCompile Include="..\..\source\engineapp\EngineDelegate.cpp" />
+    <ClCompile Include="..\..\source\engineapp\audio\AudioOut.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\engineapp\GameApp.cpp" />
+    <ClCompile Include="..\..\source\engineapp\ConfigurationImpl.cpp" />
+    <ClCompile Include="..\..\source\engineapp\experiments\Experiments.cpp">
+      <Filter>experiments</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\engineapp\pch.h" />
+    <ClInclude Include="..\..\source\engineapp\EngineDelegate.h" />
+    <ClInclude Include="..\..\source\engineapp\audio\AudioOut.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\engineapp\GameApp.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource.h">
+      <Filter>_resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\engineapp\ConfigurationImpl.h" />
+    <ClInclude Include="..\..\source\engineapp\experiments\Experiments.h">
+      <Filter>experiments</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="audio">
+      <UniqueIdentifier>{c5675729-977b-4986-a196-5e4e250139f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_resources">
+      <UniqueIdentifier>{39233ef8-b347-47ad-bcbf-5b3ae58da530}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="experiments">
+      <UniqueIdentifier>{afc9e891-c8f2-4c3c-a753-57adeca0086a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="oxygen.rc">
+      <Filter>_resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\engineapp\version.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\___internal\oxygen_icon.ico">
+      <Filter>_resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

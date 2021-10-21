@@ -1,0 +1,345 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Controllable Tails in MGZ 2 boss fight                //
+//-------------------------------------------------------//
+
+//# address-hook(0x0162d8) end(0x016442)
+function void fn0162d8()
+{
+	objA0.position.x.u16 = camera.position.x.u16 + 0x40
+	objA0.position.y.u16 = camera.position.y.u16 + 0x0100
+
+	if (global.characters != CHARS_TAILS_ALONE)
+	{
+		A1 = 0xffffb04a
+		if (s8[A1 + 0x04] >= 0)
+		{
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.position.y.u16 = objA0.position.y.u16 - 1
+			u32[0xffffb04a] = 0x01365c
+
+			tails.ai_routine = 0x12
+			tails.carrying = 0
+			tails.catch_timeout = 0
+
+		#if STANDALONE
+			// This prevents a bug that makes Tails die just before the main boss fight starts
+			player2.control_override = 0
+		#endif
+		}
+
+		u16[A0 + 0x30] = 360
+		objA0.update_address = 0x016334
+		fn016334()
+	}
+	else
+	{
+		u16[A0 + 0x30] = 360
+		objA0.update_address = 0x0163f4
+		fn0163f4()
+	}
+}
+
+
+//# address-hook(0x016334)
+function void fn016334()
+{
+	--u16[A0 + 0x30]
+	if (u16[A0 + 0x30] == 0)
+	{
+		objA0.update_address = 0x016340
+	}
+
+	fn016340()
+}
+
+
+//# address-hook(0x016340)
+function void fn016340()
+{
+	if (!tails.carrying)
+	{
+		A1 = 0xffffb000
+		if (objA1.position.y.u16 > objA0.position.y.u16)
+		{
+			objA1.position.y.u16 = objA0.position.y.u16
+			if (tails.ai_routine >= 0x14)
+			{
+				objA0.position.x.u16 = objA1.position.x.u16
+			}
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			objA1.groundspeed = 0
+			u8[A1 + 0x05] = 0x02
+			u8[A1 + 0x3d] = 0
+		}
+	}
+
+	if (s8[0xffffb004] >= 0 && u8[0xffffb005] == 0x02)
+	{
+		A1 = 0xffffb04a
+	#if STANDALONE
+		// Without this, Tails can spawn from above, particularly in cases when the fix from "fn0162d8()" is needed
+		if (objA1.position.y.u16 >= 0x0798 && objA1.position.y.u16 < objA0.position.y.u16 - 0x80)
+		{
+			objA1.position.y.u16 = objA0.position.y.u16
+		}
+	#endif
+
+		if (objA1.position.y.u16 > objA0.position.y.u16)
+		{
+			tails.ai_routine = 0x12
+			if (u16[A0 + 0x30] == 0)
+			{
+				objA1.position.x.u16 = objA0.position.x.u16
+				objA1.position.y.u16 = objA0.position.y.u16
+				u8[A1 + 0x05] = 0x02
+				u8[A1 + 0x2e] = 0
+				u8[A1 + 0x3d] = 0
+				tails.ai_routine = 0x14
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0163f4)
+function void fn0163f4()
+{
+	--u16[A0 + 0x30]
+	if (u16[A0 + 0x30] == 0)
+	{
+		objA0.update_address = 0x01640a
+		A1 = 0xffffb000
+		objA1.position.x.u16 = objA0.position.x.u16
+	}
+
+	fn01640a()
+}
+
+
+//# address-hook(0x01640a)
+function void fn01640a()
+{
+	A1 = 0xffffb000
+	D0.u16 = objA0.position.y.u16
+	if (D0.u16 < objA1.position.y.u16)
+	{
+		objA1.position.y.u16 = D0.u16 + 8
+		if (u16[A0 + 0x30] == 0)
+		{
+			objA1.position.y.u16 = D0.u16
+			u8[A1 + 0x05] = 2
+			u8[A1 + 0x2e] = 0
+			u8[A1 + 0x3d] = 0
+			tails.ai_routine = 0x1a
+		}
+	}
+}
+
+
+
+// Direct control input
+
+//# address-hook(0x01414c) end(0x0141ee)
+function void fn01414c()
+{
+	tails.flight_countdown = 0xf0
+	if (tails.control_counter != 0)
+	{
+		if (!tails.carrying)
+		{
+			fn0142e2()
+			return
+		}
+	}
+	else
+	{
+		control.tails = 0
+		if (!tails.carrying)
+		{
+			fn0142e2()
+			return
+		}
+
+		u8[0xfffffaac] = 0
+		if (control.pad1.state & CONTROL_DOWN)
+		{
+			++tails.up_press_timer
+			if (tails.up_press_timer >= 0xc0)
+			{
+				tails.up_press_timer = 0
+				control.tails |= 0x7070
+			}
+		}
+		else if (control.pad1.state & CONTROL_UP)
+		{
+			#if STANDALONE
+				// Just go constantly up
+				//  -> This is the same behavior as in rest of standalone, but an intentional change to the original
+				control.tails |= 0x7070
+			#else
+				++tails.up_press_timer
+				if (tails.up_press_timer >= 0x20)
+				{
+					tails.up_press_timer = 0
+					control.tails |= 0x7070
+				}
+			#endif
+		}
+		else
+		{
+			++tails.up_press_timer
+			if (tails.up_press_timer >= 0x58)
+			{
+				tails.up_press_timer = 0
+				control.tails |= 0x7070
+			}
+		}
+
+		D0.u8 = control.pad1.state & (CONTROL_LEFT | CONTROL_RIGHT)
+		D0.u8 |= control.tails.state
+		control.tails.state = D0.u8
+	}
+
+	A2 = 0xfffff73e
+	A1 = 0xffffb000
+	D0.u16 = control.pad1
+	Tails.UpdateCarrySonic()
+}
+
+
+//# address-hook(0x0141f2) end(0x014216)
+function void fn0141f2()
+{
+	objA0.value2f = 0x01
+	u8[A0 + 0x25] = 0xf0
+	objA0.flags2a = 0x02
+	objA0.velocity.x = 0
+	objA0.velocity.y = 0
+	objA0.groundspeed = 0
+	tails.ai_routine = 0x1c
+	fn01421c()
+}
+
+
+//# address-hook(0x01421c) end(0x014252)
+function void fn01421c()
+{
+	tails.control_counter = 0
+	u8[A0 + 0x25] = 0xf0
+	control.tails = 0
+	D0.u8 = level.framecounter.low & 0x07
+	if (D0.u8 == 0)
+	{
+		control.tails |= 0x7070
+	}
+	D0.u16 = camera.position.y.u16 + 0x90
+	if (D0.u16 >= objA0.position.y.u16)
+	{
+		tails.ai_routine = 0x1e
+	}
+}
+
+
+//# address-hook(0x014254) end(0x01425a)
+function void fn014254()
+{
+	u8[A0 + 0x25] = 0xf0
+}
+
+
+
+// Catch Sonic
+
+//# address-hook(0x0142e2) end(0x0143b6)
+function void fn0142e2()
+{
+	if (u8[0xfffffaac] == 0)
+	{
+		A1 = 0xffffb000
+		bool skipPart = false
+		if (u8[A1 + 0x04] & render_flag.VISIBLE)
+		{
+			if (tails.control_counter != 0)
+			{
+				skipPart = true
+			}
+			else if (objA1.velocity.y < 0x0300)
+			{
+				skipPart = true
+				objA0.velocity.x = 0
+				if (objA0.velocity.y < 0x0200)
+				{
+					++tails.up_press_timer
+					if (tails.up_press_timer >= 0x58)
+					{
+						tails.up_press_timer = 0
+						control.tails = 0x7070
+					}
+					else
+					{
+						control.tails = 0
+					}
+				}
+				else
+				{
+					control.tails = 0x7070
+				}
+			}
+		}
+
+		if (!skipPart)
+		{
+			// Fly towards Sonic
+			u8[0xfffffaac] = 0xff
+
+			D1.u16 = abs(s16(objA1.position.y.u16 - objA0.position.y.u16)) >> 2
+			D1.u16 += D1.u16 >> 1
+			screenmover_target.left = D1.u16
+
+			D1.u16 = abs(s16(objA1.position.x.u16 - objA0.position.x.u16)) >> 2
+			screenmover_target.right = D1.u16
+		}
+	}
+	else
+	{
+		control.tails = 0
+		A1 = 0xffffb000
+		D0.u16 = objA0.position.x.u16
+		D1.u16 = objA0.position.y.u16 - 0x10
+		D2.u16 = screenmover_target.right
+		objA0.flags2a &= ~0x01
+
+		if (D0.u16 >= objA1.position.x.u16)
+		{
+			objA0.flags2a |= 0x01
+			D2.s16 = -D2.s16
+		}
+		objA0.velocity.x += D2.u16
+
+		if (D1.u16 < objA1.position.y.u16)
+		{
+			D2.u16 = screenmover_target.left
+			if (D1.u16 >= objA1.position.y.u16)
+			{
+				D2.s16 = -D2.s16
+			}
+			objA0.velocity.y += D2.u16
+		}
+	}
+
+	A2 = 0xfffff73e
+	A1 = 0xffffb000
+	D0.u16 = control.pad1
+	Tails.UpdateCarrySonic()
+}

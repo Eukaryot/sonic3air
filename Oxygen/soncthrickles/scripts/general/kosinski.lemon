@@ -1,0 +1,368 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Kosinski Decompression                                //
+//-------------------------------------------------------//
+
+function void Kosinski.decompress(u32 compressedSourceAddress, u32 outputAddress)
+{
+	A0 = compressedSourceAddress
+	A1 = outputAddress
+	Kosinski.Decompress()
+}
+
+
+// For game app, these two are implemented in C++ for performance reasons
+#if !GAMEAPP
+
+//# address-hook(0x001a32) end(0x001ad0)
+function void Kosinski.Decompress()
+{
+	u32 originalA1 = A1
+	D5.u16 = u8[A0] + (u16(u8[A0+1]) << 8)
+	A0 += 2
+	D4 = 0x0f
+
+	while (true)
+	{
+		// Just copy one byte of data for each bit set until we get a cleared bit
+		while (Kosinski.readBit() == 1)
+		{
+			u8[A1] = u8[A0]
+			++A0
+			++A1
+		}
+
+		u16 length = 0
+		s16 offset = 0xffff
+		if (Kosinski.readBit() == 0)
+		{
+			// Copy something between 2 and 5 bytes with an 8-bit large offset
+			u8 result1 = Kosinski.readBit()
+			u8 result2 = Kosinski.readBit()
+			length = (result1 * 2) + result2 + 2
+			offset = 0xff00 + u8[A0]
+			++A0
+		}
+		else
+		{
+			u8 bits1 = u8[A0]		// Lower 8 bits of the offset
+			u8 bits2 = u8[A0+1]		// Its upper 5 bits are bits 8..12 of the offset, its lower 3 bits are the length
+			A0 += 2
+
+			u8 bits2a = bits2 & 0xf8
+			u8 bits2b = bits2 & 0x07
+			offset = 0xe000 + (u16(bits2a) << 5) + bits1
+
+			if (bits2b == 0)
+			{
+				u8 value = u8[A0]
+				++A0
+				if (value == 0)
+					break
+				if (value == 1)
+					continue
+
+				length = u16(value) + 1
+			}
+			else
+			{
+				length = bits2b + 2
+			}
+		}
+
+		//debugLog(stringformat("offset = 0x%02x, length = 0x%02x, at 0x%06x (A1=0x%06x, orig=0x%06x)", s16(offset), length, A0, A1 + offset, originalA1))
+		//assert(A1 + offset >= originalA1, stringformat("Kosinski decompression is accessing data outside of what was written before (position=0x%04x, offset0x%04x) at roughly 0x%06x, this could cause some unintended behavior", A1 - originalA1, offset, A0))
+		while (length > 0)
+		{
+			u8[A1] = u8[A1 + offset]
+			++A1
+			--length
+		}
+	}
+}
+
+
+function u8 Kosinski.readBit()
+{
+	u8 bit = (D5 & 1)
+	D5.u16 >>= 1
+
+	--D4.s16
+	if (D4.s16 < 0)
+	{
+		// Read next word
+		D5.u16 = u8[A0] + (u16(u8[A0+1]) << 8)
+		A0 += 2
+		D4 = 0x0f
+	}
+	return bit
+}
+
+#endif
+
+
+
+/*
+// Special standalone implementation -- this is only for testing; also this is implemented in S3AIR C++
+function void uncompressKosinskiData(u32 sourceAddress, u16 targetInVRAM)
+{
+	u32 backupA0 = A0
+	u32 backupA1 = A1
+
+	// Get the decompressed size
+	u16 size = u16[sourceAddress]
+	if (size == 0xa000)
+		size = 0x8000
+
+	A0 = sourceAddress + 2
+	while (size > 0)
+	{
+		Kosinski.decompress(A0, 0xffffd000)
+
+		if (size < 0x1000)
+		{
+			VDP.copyToVRAMbyDMA(0xffffd000, targetInVRAM, size)
+			size = 0
+		}
+		else
+		{
+			VDP.copyToVRAMbyDMA(0xffffd000, targetInVRAM, 0x1000)
+			targetInVRAM += 0x1000
+			size -= 0x1000
+			A0 += 8		// This is needed, but why...?
+		}
+	}
+
+	A0 = backupA0
+	A1 = backupA1
+}
+*/
+
+
+
+function void Kosinski.addToDMAQueue(u32 sourceAddress, u16 targetInVRAM)
+{
+//#if STANDALONE
+//	// Just for testing
+//	if (sourceAddress == 0x36ad8a)
+//	{
+//		uncompressKosinskiData(sourceAddress, targetInVRAM)
+//		return
+//	}
+//#endif
+
+	A1 = sourceAddress
+	D2.u16 = targetInVRAM
+	Kosinski.AddToDMAQueue()
+}
+
+
+//# address-hook(0x001ad2) end(0x001b26)
+function void Kosinski.AddToDMAQueue()
+{
+#if STANDALONE
+	//debugLog(stringformat("Kosinski.AddToDMAQueue: src=%06x, dst=%04x", A1, D2.u16))
+#endif
+
+	A2 = 0xffffff64
+	if (u32[A2] == 0)
+	{
+		// You will be taken care of right away!
+		Kosinski.PrepareNextModules()
+	}
+	else
+	{
+		// Just append to the DMA queue
+		A2 += 6
+		while (u32[A2] != 0)
+		{
+			A2 += 6
+
+			// This check is a security feature not present in original code
+			if (A2 >= 0xffffff7c)
+			{
+				assert(false, "Can't add another item to the Kosinski DMA queue")
+				return
+			}
+		}
+
+		u32[A2] = A1		// Source location of compressed data
+		u16[A2+4] = D2.u16	// Destination address in VRAM where to put the decompressed data
+	}
+}
+
+
+function void Kosinski.addMultipleToDMAQueue(u32 sourceAddress)
+{
+	u16 count = u16[sourceAddress] + 1
+	A6 = sourceAddress + 2
+	for (u16 i = 0; i < count; ++i)
+	{
+		Kosinski.addToDMAQueue(u32[A6], u16[A6+4])
+		A6 += 6
+	}
+}
+
+
+//# address-hook(0x001aea)
+function void Kosinski.PrepareNextModules()
+{
+	// Get the decompressed size
+	u16 size = u16[A1]
+	if (size == 0xa000)
+		size = 0x8000
+
+	// We have to split into modules of 0x1000 bytes
+	kosinski.waiting_modules = (size >> 12)
+	size &= 0x0fff
+	if (size == 0)
+		size = 0x1000
+	else
+		++kosinski.waiting_modules
+
+	kosinski.decompr_words = size / 2
+
+	A1 += 2
+	u32[0xffffff64] = A1		// Source location of compressed data
+	u16[0xffffff68] = D2.u16	// Destination address in VRAM where to put the decompressed data
+}
+
+
+//# address-hook(0x001b28) end(0x001bd6)
+function void Kosinski.ProcessModules()
+{
+	// Anything to do at all?
+	if (kosinski.waiting_modules == 0)
+		return
+
+	if ((kosinski.waiting_modules & 0x80) == 0)
+	{
+		// Data has to be decompressed first
+		if (kosinski.queue_size < 4)
+		{
+			Kosinski.addToDecompressionQueue(u32[0xffffff64], 0xffffd000)
+
+			// Set decompressed flag
+			kosinski.waiting_modules |= 0x80
+		}
+	}
+	else
+	{
+		// Data is already decompressed, and stored in 0xffffd000
+
+		// Do not process modules until decompression is done
+		if (kosinski.queue_size > 0)
+			return
+
+		// Clear decompressed flag
+		kosinski.waiting_modules &= 0x7f
+		--kosinski.waiting_modules
+
+		// Use 0x1000 bytes (= 0x800 words) decompressed size for all but the last module
+		u16 lengthInWords = (kosinski.waiting_modules == 0) ? kosinski.decompr_words : 0x800
+		u16 targetInVRAM = u16[0xffffff68]
+		u16[0xffffff68] += lengthInWords * 2
+		D0 = (u32[0xffffff64] - u32[0xffffff40]) & 0x0f
+		u32[0xffffff64] = u32[0xffffff40] + D0
+
+		// Copy to VRAM
+		updateSpritePattern(0xffffd000, targetInVRAM, lengthInWords)
+
+		// All modules finished?
+		if (kosinski.waiting_modules == 0)
+		{
+			// Move everything one slot ahead
+			u32[0xffffff64] = u32[0xffffff6a]
+			u16[0xffffff68] = u16[0xffffff6e]
+			u32[0xffffff6a] = u32[0xffffff70]
+			u16[0xffffff6e] = u16[0xffffff74]
+			u32[0xffffff70] = u32[0xffffff76]
+			u16[0xffffff74] = u16[0xffffff7a]
+			u32[0xffffff76] = 0
+			u16[0xffffff7a] = 0
+
+			// Prepare next item from the DMA queue
+			D0 = u32[0xffffff64]
+			if (D0 != 0)
+			{
+				A1 = D0
+				D2.u16 = u16[0xffffff68]
+				Kosinski.PrepareNextModules()
+			}
+		}
+	}
+}
+
+
+function void Kosinski.addToDecompressionQueue(u32 compressedSourceAddress, u32 outputAddress)
+{
+	A1 = compressedSourceAddress
+	A2 = outputAddress
+	Kosinski.AddToDecompressionQueue()
+}
+
+//# address-hook(0x001bd8) end(0x001bee)
+function void Kosinski.AddToDecompressionQueue()
+{
+#if STANDALONE
+	//debugLog(stringformat("Kosinski.AddToDecompressionQueue: src=%06x, dst=%06x (%d entries)", A1, A2, kosinski.queue_size))
+#endif
+
+	u32 address = 0xffffff40 + kosinski.queue_size * 8
+	u32[address] = A1
+	u32[address + 4] = A2
+	++kosinski.queue_size
+}
+
+
+//# address-hook(0x001c1a) end(0x001d16)
+function void Kosinski.ProcessDecompressionQueue()
+{
+#if !STANDALONE
+	if (kosinski.queue_size & 0x8000)
+	{
+		// Handling in case the queue processing is already in progress
+		//  (not translated by intent)
+		jump 0x001cfc
+	}
+#endif
+
+	// Anything to do at all?
+	if (kosinski.queue_size == 0)
+		return
+
+	// Decompression in progress
+	kosinski.queue_size |= 0x8000
+
+	A2 = 0xffffff3e
+	Kosinski.decompress(u32[0xffffff40], u32[0xffffff44])
+
+	// Decompression done
+	kosinski.queue_size &= 0x7fff
+	--kosinski.queue_size
+
+	if (kosinski.queue_size == 0)
+	{
+		u32[0xffffff40] = A0
+		u32[0xffffff44] = A1
+	}
+	else
+	{
+		// Move everything one slot ahead (up to three queued elements left)
+		u32[0xffffff40] = u32[0xffffff48]
+		u32[0xffffff44] = u32[0xffffff4c]
+		u32[0xffffff48] = u32[0xffffff50]
+		u32[0xffffff4c] = u32[0xffffff54]
+		u32[0xffffff50] = u32[0xffffff58]
+		u32[0xffffff54] = u32[0xffffff5c]
+	}
+}

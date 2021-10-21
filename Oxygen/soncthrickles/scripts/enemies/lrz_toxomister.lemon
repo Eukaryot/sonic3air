@@ -1,0 +1,313 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Toxomister enemy from Lava Reef Zone                  //
+//-------------------------------------------------------//
+
+//# address-hook(0x08fd30) end(0x08fd30)
+function void Toxomister.Init()
+{
+	Object.InitWithUpdateAddress(0x08fd36)
+}
+
+
+//# address-hook(0x08fd36) end(0x08fd72)
+function void Toxomister.PostInit()
+{
+	setupObjectAttributesFull(0x09002e)
+
+	objA0.update_address = 0x08fd76
+	objA0.render_flags |= 0x40
+	u16[A0 + 0x16] = 0x01
+
+	A1 = A0 + 0x18
+	u16[(A1+=2)-2] = objA0.position.x.u16
+	D0.u16 = objA0.position.y.u16
+	D0.u16 += (objA0.render_flags & render_flag.FLIP_Y) ? -0x18 : 0x18
+	u16[(A1+=2)-2] = D0.u16
+	u16[(A1+=2)-2] = 0
+
+	fn08ff72()
+	Toxomister.Update()
+}
+
+
+//# address-hook(0x08fd76) end(0x08fd9a)
+function void Toxomister.Update()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		objA0.update_address = 0x08fda0
+		objA0.countdown_value = 0x1f
+		objA0.countdown_callback = 0x08fdb0
+	}
+
+	fn08ff5a()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08fda0) end(0x08fdaa)
+function void fn08fda0()
+{
+	fn08ff5a()
+	Object.CountdownAndTrigger()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08fdb0) end(0x08fdb6)
+function void fn08fdb0()
+{
+	objA0.update_address = 0x08fd76
+	fn08ff72()
+}
+
+
+//# address-hook(0x08fdba) end(0x08fdc8)
+function void fn08fdba()
+{
+	// Targets:
+	//  - 0x08fdd8	-> objA0.base_state = 0x00
+	//  - 0x08fe06	-> objA0.base_state = 0x02
+	//  - 0x08fe26	-> objA0.base_state = 0x04
+	//  - 0x08fe06	-> objA0.base_state = 0x06
+	//  - 0x08fe50	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x08fdce, objA0.base_state)
+
+	fn08495e()
+}
+
+
+//# address-hook(0x08fdd8) end(0x08fe00)
+function void fn08fdd8()
+{
+	setupObjectAttributesBasic(0x09003a)
+
+	u8[A0 + 0x28] = 0xd8
+	objA0.hitbox_extends.y = 0x18
+	objA0.countdown_value = 0x6f
+	objA0.countdown_callback = 0x08fe10
+
+	spawnChildObjects(0x090048)
+}
+
+
+//# address-hook(0x08fe06) end(0x08fe0a)
+function void fn08fe06()
+{
+	fn08ff8c()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08fe10) end(0x08fe24)
+function void fn08fe10()
+{
+	objA0.base_state = 0x04
+	objA0.velocity.y = 0x40
+	objA0.countdown_callback = 0x08fe36
+}
+
+
+//# address-hook(0x08fe26) end(0x08fe30)
+function void fn08fe26()
+{
+	fn08ff8c()
+	UpdateMovementStraightSimple()
+	Object.TriggerOnGroundHit()
+}
+
+
+//# address-hook(0x08fe36) end(0x08fe4e)
+function void fn08fe36()
+{
+	objA0.base_state = 0x06
+	objA0.velocity.y = 0
+	objA0.countdown_value = 0x7f
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+}
+
+
+//# address-hook(0x08fe50) end(0x08fe88)
+function void fn08fe50()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u8[A1 + 0x20] != 9)
+	{
+		fn085838()
+		if (!_equal())
+		{
+			Object.TriggerUnloading()
+			return
+		}
+
+		A1 = 0xffff0000 + u16[A0 + 0x44]
+		objA0.position.x.u16 = objA1.position.x.u16
+		objA0.position.y.u16 = objA1.position.y.u16
+
+		fn08ffe0()
+		fn0881fe()
+		if (_equal())
+			return
+	}
+
+	objA0.flags38 |= 0x04
+	Object.TriggerUnloading()
+}
+
+
+//# address-hook(0x08fe8e) end(0x08fec2)
+function void fn08fe8e()
+{
+	setupObjectAttributesBasic(0x09003a)
+
+	objA0.update_address = 0x08fec8
+	u32[A0 + 0x30] = 0x090074
+	D0.u8 = 0x0c - objA0.subtype2c
+	objA0.subtype2c = D0.u8
+	objA0.value2f = D0.u8 * 4
+	objA0.countdown_callback = 0x08fed4
+	fn08494e()
+}
+
+
+//# address-hook(0x08fec8) end(0x08fece)
+function void fn08fec8()
+{
+	Object.CountdownAndTrigger()
+	fn08494e()
+}
+
+
+//# address-hook(0x08fed4) end(0x08feda)
+function void fn08fed4()
+{
+	objA0.update_address = 0x08fedc
+}
+
+
+//# address-hook(0x08fedc) end(0x08ff3c)
+function void fn08fedc()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		MoveWithParent()
+		Object.AnimationProgressByLocalA1()
+
+		D0.u8 = (global.framecounter.low & 0x01) ? 0xff : 0x00
+		if (objA0.subtype2c & 0x01)
+		{
+			D0.u8 ^= 0xff
+		}
+		if (D0.u8 == 0)
+		{
+			fn084920()
+		}
+		return
+	}
+
+	objA0.velocity.x = 0
+	if (u8[A1 + 0x38] & 0x04)
+	{
+		fn090002()
+	}
+
+	objA0.velocity.y = 0
+	objA0.update_address = 0x08ff42
+	u32[A0 + 0x30] = 0x090085
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	fn0850d4()
+}
+
+
+//# address-hook(0x08ff42) end(0x08ff54)
+function void fn08ff42()
+{
+	objA0.velocity.y -= 0x10
+	UpdateMovementStraightSimple()
+	Object.AnimationProgressByLocalA1()
+	fn0850d4()
+}
+
+
+//# address-hook(0x08ff5a) end(0x08ff6c)
+function void fn08ff5a()
+{
+	if ((global.framecounter.low & 0x07) == 0)
+	{
+		CheckDistanceToPlayers()
+		fn084b5c()
+	}
+}
+
+
+//# address-hook(0x08ff72) end(0x08ff8a)
+function void fn08ff72()
+{
+	playSound(0x97)
+
+	A2 = 0x090040
+	SpawnChildObjectsInDir()
+	if (_equal())
+	{
+		u16[A0 + 0x44] = A1.u16
+	}
+}
+
+
+//# address-hook(0x08ff8c) end(0x08ffd2)
+function void fn08ff8c()
+{
+	D0.u8 = u8[A0 + 0x29]
+	if (D0.u8 == 0)
+		return
+
+	u8[A0 + 0x29] = 0
+	A1 = 0x08ffd0 + (D0.u8 & 0x03) * 4
+	A2 = 0xffff0000 + u16[(A1+=2)-2]
+	if (u8[A2 + 0x20] == 0x02 || u8[A2 + 0x2b] & 0x40)
+		return
+
+	u16[A0 + 0x44] = A2.u16
+	A2 = 0xffff0000 + u16[(A1+=2)-2]
+	objA0.value3e = A2.u16
+	u16[A0 + 0x3a] = u16[A2]
+	objA0.base_state = 0x08
+	objA0.countdown_value = 0x3b
+}
+
+
+//# address-hook(0x08ffe0) end(0x090000)
+function void fn08ffe0()
+{
+	D0.s16 = objA1.velocity.x >> 3
+	objA1.velocity.x -= D0.u16
+
+	D0 = (u8[A1 + 0x2a] & char.flag.IN_AIR) ? 0x1a : 0x1c
+	D1.s16 = s16[A1 + D0.s16] >> 3
+	u16[A1 + D0.s16] -= D1.u16
+}
+
+
+//# address-hook(0x090002) end(0x09001e)
+function void fn090002()
+{
+	D0 = u16[0x090020 + objA0.subtype2c]
+	A2 = 0xffff0000 + u16[A1 + 0x44]
+	if ((u8[A2 + 0x04] & 0x01) == 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.velocity.x = D0.u16
+}

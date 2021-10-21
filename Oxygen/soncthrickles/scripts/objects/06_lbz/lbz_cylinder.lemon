@@ -1,0 +1,158 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Launch Base Zone large spinning cylinder              //
+//-------------------------------------------------------//
+
+//# address-hook(0x02c3ae) end(0x02c3c4)
+function void fn02c3ae()
+{
+	D0 = objA0.subtype2c
+	objA0.value32 = D0.u16
+	D0.s16 = -D0.s16
+	u16[A0 + 0x30] = D0.u16
+	objA0.box_size.x = 0x80
+
+	objA0.update_address = 0x02c3ca
+	fn02c3ca()
+}
+
+
+//# address-hook(0x02c3ca) end(0x02c3e2)
+function void fn02c3ca()
+{
+	A1 = 0xffffb000
+	A2 = 0xfffff7b0
+	D6 = 3
+	fn02c3e8()
+
+	A1 = 0xffffb04a
+	A2 = 0xfffff7b1
+	++D6.u8
+	fn02c3e8()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x02c3e8) end(0x02c516)
+function void fn02c3e8()
+{
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		// Character is not on the cylinder
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+		if (D0.s16 >= s16[A0 + 0x30] && D0.s16 < s16[A0 + 0x32])
+		{
+			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x53
+			if (D0.u16 < 0xa6)
+			{
+				if (D0.u16 < 0x53)
+				{
+					if (objA1.velocity.y < 0)
+						return
+				}
+				else
+				{
+					if (objA1.velocity.y > 0x38)
+						return
+				}
+
+				if (u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
+				{
+					if (D0.u16 < 0x08)
+					{
+						u8[A2] = 0x81
+					}
+					else if (D0.u16 >= 0x9e)
+					{
+						u8[A2] = 0x01
+					}
+
+					LetSonicClimbOnObject()
+
+				#if STANDALONE
+					// Reset vertical velocity
+					//  -> This is only added to prevent bubble shield bounces, which mess up the character animation
+					s16[A1 + 0x1a] = 0
+				#endif
+					u8[A1 + 0x2d] = 0x80
+					u16[A1 + 0x20] = 0x01
+					if (u16[A1 + 0x1c] == 0)
+					{
+						u16[A1 + 0x1c] = 0x01
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		// Character is on the cylinder
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+			if (D0.s16 >= s16[A0 + 0x30] && D0.s16 < s16[A0 + 0x32])
+			{
+				if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
+					return
+
+				D0.u8 = u8[A2]
+				LookupSinCos()
+				D2 = 0x4000 + (u16(u8[A1 + 0x1e]) << 8)
+				D1.s32 = s32(D1.s16) * D2.s16
+				D1 = (D1 << 16) + (D1 >> 16)
+				D1.u16 += objA0.position.y.u16
+				objA1.position.y.u16 = D1.u16
+
+				D0.u8 = u8[A2] + 0x80
+				u8[A1 + 0x27] = D0.u8		// Set x-rotation of character
+				u8[A2] += 2
+				if (u16[A1 + 0x1c] == 0)
+				{
+					u16[A1 + 0x1c] = 0x01
+					u8[A1 + 0x2d] = 0x81
+				}
+				else
+				{
+					u8[A1 + 0x2d] = 0x80
+				}
+
+				if (D0.s8 < 0)
+					u8[A1 + 0x0a] &= ~0x80
+				else
+					u8[A1 + 0x0a] |= 0x80
+
+			#if STANDALONE
+				// Prevent non-rotated standing animation, whcih looks buggy
+				// (can be triggered in original by rolling and getting to a halt on the cylinder)
+				if (objA1.state == char.state.STANDING)
+					objA1.state = char.state.RUNNING
+			#endif
+				return
+			}
+		}
+		else
+		{
+			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16
+			if (D0.s16 >= 0)
+			{
+				objA1.velocity.y = 0x0400
+			}
+		}
+
+		objA0.flags2a &= ~(1 << D6.u8)
+		objA1.flags2a |= char.flag.IN_AIR
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x30] = 0
+		u8[A1 + 0x31] = 0x04
+	}
+}

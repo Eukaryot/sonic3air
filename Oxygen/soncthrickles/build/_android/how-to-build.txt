@@ -1,0 +1,16 @@
+
+Preparation:
+- Go to "app/src/main/assets" and copy from the soncthrickles main directory:
+	- data (you can leave out the audio data to make builds faster during development)
+	- scripts
+	- config.json
+
+
+Build with Android Studio:
+- Open Android Studio (last tested with version 4.1.1)
+- Open this directory as project
+- Review "abiFilters" setting in "app/build.gradle"
+	- For development it may be set to just one architecture to avoid long build times
+	- For final builds, either disable the setting or enable all four target architectures
+- Let Gradle do its sync, then Make, and Run
+

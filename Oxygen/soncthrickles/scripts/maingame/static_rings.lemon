@@ -1,0 +1,328 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Static rings                                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x0077d2) end(0x007810)
+function void UpdateGlobalRingAnimation()
+{
+	// Update for static rings
+	{
+		--static_rings.animtimer
+		if (static_rings.animtimer == 0xff)
+		{
+			static_rings.animtimer = 7
+			static_rings.animframe = (static_rings.animframe + 1) % 4
+		}
+	}
+
+	// Update for spilled rings animation
+	if (spilled_rings.speed != 0)
+	{
+		spilled_rings.progress += spilled_rings.speed
+		spilled_rings.animframe = (spilled_rings.progress >> 9) % 4
+		--spilled_rings.speed
+	}
+
+	// This seems to be some global counter, only used by AIZ Swing Vines apparently
+	u16[0xfffffeba] += 0x180
+}
+
+
+//# address-hook(0x00e8aa) end(0x00e8b4)
+function void UpdateListOfRingsAround()
+{
+	// Targets:
+	//  - 0x00e8be	-> rings.update_routine = 0x00	-> Initialization
+	//  - 0x00e942	-> rings.update_routine = 0x02	-> Regular update
+	//  - 0x00e9ca	-> rings.update_routine = 0x04	-> Regular update for Glowing Spheres stage
+	call tableLookupAddress(0x00e8b8, rings.update_routine)
+}
+
+
+//# address-hook(0x00e8be) end(0x00e940)
+function void InitStaticRings()
+{
+	rings.update_routine += 2
+	fn00eb1a()
+
+	if (global.zone == 0x14)	// Glowing Spheres bonus stage
+	{
+		rings.update_routine += 2
+
+		A1 = rings.around.first
+		A2 = 0xffff8600
+		D4.u16 = camera.position.y.u16 - 8
+		if (D4.s16 <= 0)
+			D1 = 1
+
+		while (D4.u16 > u16[A1 + 2])
+		{
+			A1 += 4
+			A2 += 2
+		}
+		rings.around.first = A1
+		rings.around.first.state = A2.u16
+		D4.u16 += 0xf0
+
+		while (D4.u16 > u16[A1 + 2])
+		{
+			A1 += 4
+		}
+		rings.around.last = A1
+	}
+	else
+	{
+		A1 = rings.around.first
+		A2 = 0xffffe700
+		D4.u16 = camera.position.x.u16 - 8
+		if (D4.s16 <= 0)
+			D4 = 1
+
+		while (D4.u16 > u16[A1])
+		{
+			A1 += 4
+			A2 += 2
+		}
+		rings.around.first = A1
+		rings.around.first.state = A2.u16
+		D4.u16 += 0x150
+
+		while (D4.u16 > u16[A1])
+		{
+			A1 += 4
+		}
+		rings.around.last = A1
+	}
+}
+
+
+//# address-hook(0x00e942) end(0x00e992)
+function void UpdateListOfRingsAround_Default()
+{
+	UpdateStaticRingsAnimation()
+
+	s16 borderLeft = 8		// Use 8 pixels of border for the ring radius, so rings don't pop in
+	s16 borderRight = 8
+#if STANDALONE
+	// We can extend that borders a little further, to avoid rings not getting collected when the player outruns the camera
+	if (u16[0xffffb010] < camera.position.x.u16 + 0x20)
+		borderLeft += 0x20
+	if (u16[0xffffb010] >= camera.position.x.u16 + getScreenWidth() - 0x20)
+		borderRight += 0x20
+#endif
+
+	A1 = rings.around.first
+	A2 = 0xffff0000 + rings.around.first.state
+	D4.u16 = max(s16(camera.position.x.u16) - borderLeft, 1)
+
+	while (D4.u16 > u16[A1])
+	{
+		A1 += 4
+		A2 += 2
+	}
+	while (D4.u16 <= u16[A1 - 4])
+	{
+		A1 -= 4
+		A2 -= 2
+	}
+
+	rings.around.first = A1
+	rings.around.first.state = A2
+	A2 = rings.around.last
+	D4.u16 += getScreenWidth() + borderLeft + borderRight
+
+	while (D4.u16 > u16[A2])
+	{
+		A2 += 4
+	}
+	while (D4.u16 <= u16[A2 - 4])
+	{
+		A2 -= 4
+	}
+	rings.around.last = A2
+}
+
+
+//# address-hook(0x00e994) end(0x00e9c8)
+function void UpdateStaticRingsAnimation()
+{
+	u16 numRings = u16[0xffffef80]
+	u32 ringPointer = 0xffffef82
+	while (numRings > 0)
+	{
+		if (u16[ringPointer] != 0)
+		{
+			A1 = 0xffff0000 + u16[ringPointer]
+			--u8[A1]
+			if (u8[A1] == 0)
+			{
+				u8[A1] = 6
+				++u8[A1+1]
+				if (u8[A1+1] == 8)
+				{
+					u16[A1] = 0xffff
+					u16[ringPointer] = 0
+					--u16[0xffffef80]
+				}
+			}
+			--numRings
+		}
+		ringPointer += 2
+	}
+}
+
+
+//# address-hook(0x00e9ca) end(0x00ea1e)
+function void UpdateListOfRingsAround_VerticalLayout()
+{
+	// This function is used e.g. in Glowing Spheres bonus stage
+
+	UpdateStaticRingsAnimation()
+
+	A1 = rings.around.first
+	A2 = 0xffff0000 + rings.around.first.state
+	D4.u16 = max(s16(camera.position.y.u16) - 8, 1)
+
+	while (D4.u16 > u16[A1 + 2])
+	{
+		A1 += 4
+		A2 += 2
+	}
+	while (D4.u16 <= u16[A1 - 2])
+	{
+		A1 -= 4
+		A2 -= 2
+	}
+
+	rings.around.first = A1
+	rings.around.first.state = A2.u16
+	A2 = rings.around.last
+	D4.u16 += getScreenHeight() + 16		// Add 2x border of 8 pixels for the ring radius
+
+	while (D4.u16 > u16[A2 + 2])
+	{
+		A2 += 4
+	}
+	while (D4.u16 <= u16[A2 - 2])
+	{
+		A2 -= 4
+	}
+	rings.around.last = A2
+}
+
+
+//# address-hook(0x00eb1a) end(0x00eb84)
+function void fn00eb1a()
+{
+	if (!global.in_extra_stage)	// Don't clear when returning from special/bonus stage
+	{
+		zeroMemory(0xffffe700, 0x400)
+	}
+
+	zeroMemory(0xffffef80, 0x80)
+
+	if (global.zone == 0x14)
+	{
+		zeroMemory(0xffff8600, 0x400)
+	}
+
+	u16 offset = global.zone * 8 + global.act * 4
+	A1 = u32[0x1e3e58 + offset]
+#if STANDALONE
+	LevelRingsTableBuilder.buildRings()
+#endif
+	rings.around.first = A1
+
+	// Count static rings
+	A1 += 4
+	D5 = 0
+	while (D5 < 0x200)
+	{
+		if (u16[(A1+=4)-4] & 0x8000)
+			break
+
+		++D5.u16
+	}
+
+	level.total_rings = D5.u16
+	u16[0xffffff06] = 0
+}
+
+
+//# address-hook(0x00eb86) end(0x00ebec)
+function void RenderStaticRings()
+{
+	A0 = rings.around.first
+	u32 numRings = (rings.around.last - rings.around.first) / 4
+	if (numRings != 0)
+	{
+		A4 = 0xffff0000 + rings.around.first.state
+		A1 = 0x00ebee
+		D5.u16 = 0xf0
+		u16 camera_x = u16[A3]		// Usually camera.foreground.x
+		u16 camera_y = u16[A3+4]	// Usually camera.foreground.y
+
+		while (numRings > 0)
+		{
+			u16 ringAnimationState = u16[A4]
+			if (ringAnimationState != 0xffff)
+			{
+				D1.u16 = (u16[A0+2] - camera_y + 8) & level.height.bitmask
+				if (D1.u16 < D5.u16)
+				{
+					D1.u16 += 0x78
+					D0.u16 = u16[A0] - camera_x + 0x80
+
+					u8 animFrame = ringAnimationState & 0xff
+					if (animFrame == 0)
+					{
+						// For non-collected rings, use rotating animation
+						animFrame = static_rings.animframe
+					}
+					u32 src = A1 + animFrame * 8
+
+					u16 px = u16[src + 6] + D0.u16
+					u16 py = u16[src + 0] + D1.u16
+					u8 size = u8[src + 3]
+					u16 index = u16[src + 4]
+
+				#if STANDALONE
+					if ((ringAnimationState & 0xff) == 0)
+					{
+						// Custom smoother ring animations
+						animFrame = ((static_rings.animframe * 8 + 7 - static_rings.animtimer) / 4) % 8
+						u64 key = stringformat("ring_0%d", animFrame)
+						u16 x = D0.u16 - 0x80
+						u16 y = D1.u16 - 0x80
+						Renderer.drawCustomSprite(key, x, y, 0x00, 0, 0xa000)
+					}
+					else
+					{
+						Renderer.drawVdpSprite(px - 0x80, py - 0x80, size, index, 0xc000)
+					}
+				#endif
+
+					u16[A6 + 0] = py
+					 u8[A6 + 2] = size
+					u16[A6 + 4] = index
+					u16[A6 + 6] = px
+					A6 += 8
+					--D7.u16
+				}
+			}
+			A4 += 2
+			A0 += 4
+			--numRings
+		}
+	}
+}

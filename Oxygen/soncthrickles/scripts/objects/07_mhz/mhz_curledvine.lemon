@@ -1,0 +1,223 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Curled Vine                                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x03e836) end(0x03e89c)
+function void fn03e836()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x03e9a6
+		objA1.position.x.u16 = objA0.position.x.u16
+		objA1.position.y.u16 = objA0.position.y.u16
+		u32[A1 + 0x0c] = 0x03ea4c
+		u16[A1 + 0x0a] = 0x4353
+		u8[A1 + 0x04] |= 0x04
+		u16[A1 + 0x08] = 0x0280
+		u8[A1 + 0x07] = 0x40
+		u8[A1 + 0x06] = 0x30
+		u8[A1 + 0x04] |= 0x40
+		u16[A1 + 0x16] = 0x08
+
+		u32[A0 + 0x32] = 0xfff40000
+		objA0.flags2a |= 0x80
+		u16[A0 + 0x46] = A1.u16
+
+		objA0.update_address = 0x03e8a2
+		fn03e8a2()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x03e8a2) end(0x03e8d0)
+function void fn03e8a2()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D1 = 0
+	if (objA0.flags2a & 0x18)
+	{
+		D1.u8 = 1 + max(u8[A0 + 0x36], u8[A0 + 0x37])
+	}
+
+	D2 = u8[0x03e8f6 + D1.s16]
+	u16[A7-=2] = D2.u16
+	D1.u16 <<= 2
+	D0 = u32[0x03e8d2 + D1.s16]
+
+	fn03e900()
+}
+
+
+//# address-hook(0x03e900) end(0x03e93a)
+function void fn03e900()
+{
+	D4 = u32[A0 + 0x32]
+	if (D4 != D0)
+	{
+		if (D4 >= D0)
+			D4 -= 0x010000
+		else
+			D4 += 0x010000
+	}
+
+	u32[A0 + 0x32] = D4
+	D1 = D4.s32 >> 1
+	D2.u16 = objA0.position.x.u16 - 0x38
+	D3.u16 = objA0.position.y.u16
+	D5 = 0x0a0000
+	D6 = 7
+	A2 = A1 + 0x18
+	u32[A7-=4] = D1
+	fn03e952()
+}
+
+
+//# address-hook(0x03e9a6) end(0x03e9a6)
+function void fn03e9a6()
+{
+	DrawObject()
+}
+
+
+//# address-hook(0x03e9ac) end(0x03e9c4)
+function void fn03e9ac()
+{
+#if STANDALONE
+	if (debug_mode.state)
+		return
+#endif
+
+	u32 backupD4 = D4
+	u32 backupD3 = D3
+	u32 backupD2 = D2
+	u32 backupD1 = D1
+
+	A1 = 0xffffb04a
+	D6 = 4
+	D5 = 0x37
+	fn03e9c6()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb000
+	--D6.u8
+	D5 = 0x36
+	fn03e9c6()
+}
+
+
+//# address-hook(0x03e9c6) end(0x03ea4a)
+function void fn03e9c6()
+{
+#if STANDALONE
+	// Completely ignore characters with control flags 0x01 and 0x03 set
+	//  -> This is the case when hanging on a mushroom parachute
+	if ((u8[A1 + 0x2e] & 0x03) == 0x03)
+		return
+#endif
+
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D2.u16)
+			{
+				D0.u16 >>= 4
+				u8[A0 + D5.s16] = D0.u8
+				D0.u16 *= 6
+				D0.u16 = u16[A2 + D0.s16 + 0x1a] - 8
+				D1 = u8[A1 + 0x1e]
+				D0.u16 -= D1.u16
+				objA1.position.y.u16 = D0.u16
+				D4 = 0
+				return
+			}
+		}
+
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA0.flags2a &= ~(1 << D6.u8)
+		u8[A0 + D5.s16] = 0
+		D4 = 0
+	}
+	else
+	{
+		if (objA1.velocity.y >= 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D2.u16)
+			{
+				D0.u16 = (D0.u16 >> 4) * 6
+				D0.u16 = u16[A2 + D0.s16 + 0x1a] - 8
+				fn01e45a()
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x03e952)
+//# translated(0x03e93c) end(0x03e9a0)
+function void fn03e952()
+{
+	while (true)
+	{
+		u16[(A2+=2)-2] = D2.u16
+		u16[(A2+=2)-2] = D3.u16
+		A2 += 2
+		D5 += D4
+		D1 = u32[(A7+=4)-4]
+		D4 += D1
+		--D6.s16
+		if (D6.s16 < 0)
+			break
+
+		u32[A7-=4] = D1
+		D5 = (D5 << 16) + (D5 >> 16)
+		D0.u16 = D5.u16
+		D5 = (D5 << 16) + (D5 >> 16)
+		LookupSinCos()
+		D1.s16 >>= 4
+		D0.s16 >>= 4
+		D2.u16 += D1.u16
+		D3.u16 += D0.u16
+	}
+
+	D2.u16 = u16[(A7+=2)-2]
+	D1.u16 = 0x40
+	D3 = 8
+	D4.u16 = objA0.position.x.u16
+	A2 = A1
+
+	fn03e9ac()
+
+	u16 dx = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (dx > 0x0280)
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		UnloadObjectA1()
+		UnloadObject()
+	}
+}

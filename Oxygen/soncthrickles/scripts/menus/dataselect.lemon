@@ -1,0 +1,1609 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Data Select Screen                                    //
+//-------------------------------------------------------//
+
+#if STANDALONE
+	define u8 DataSelect.CONTROLS_ACCEPT = 0xc0		// = CONTROL_START | CONTROL_A		-> Excluding CONTROL_C, which is is [X] on an Xbox Controller, or Square on a PlayStation controller
+	define u8 DataSelect.CONTROLS_CANCEL = 0x10		// = CONTROL_B
+#else
+	define u8 DataSelect.CONTROLS_ACCEPT = 0xe0		// = CONTROL_START | CONTROL_A | CONTROL_C
+	define u8 DataSelect.CONTROLS_CANCEL = 0x10		// = CONTROL_B
+#endif
+
+
+//# address-hook(0x00c006) end(0x00c028)
+function void fn00c006()
+{
+	A3 = A1
+	Kosinski.decompress(A0, A1)
+
+	D1 = A3 & 0xffffff
+	D3 = (A1 - A3) >> 1
+	D2.u16 = A2.u16
+
+	A3 = A1
+	UpdateSpritePattern()
+	A1 = A3
+}
+
+
+//# address-hook(0x00c10c) end(0x00c10c)
+function void DataSelect.SharedGameSlotContinue()	// This might be a misnomer...
+{
+	competition_mode.active = 0
+	fn00c110()
+}
+
+
+//# address-hook(0x00c110) end(0x00c152)
+function void fn00c110()
+{
+	lives_counter = 3
+	continues_counter = 0
+	u8[0xfffffec6] = 3
+	checkpoint.number = 0
+	global.stage_type = 0
+	ring_counter = 0
+	timer.alldata = 0
+	player.score = 0
+	u16[0xfffffed0] = 0
+	u32[0xfffffed2] = 0
+	u32[0xfffffed6] = 0
+	player.next_life_score = 5000
+	u32[0xffffffc4] = 5000
+}
+
+
+//# address-hook(0x00c56e) end(0x00c56e)
+function void fn00c56e()
+{
+}
+
+
+//# address-hook(0x00c890) end(0x00c95c)
+function void fn00c890()
+{
+	D0.u16 = level.framecounter & 0x0c
+	A2 = 0x200000 + u32[0x3a216a + D0.s16]
+	D7.u16 = 0xc21a
+	A0 = 0xffffe6ac
+	D6 = 7
+	while (D6.s16 >= 0)
+	{
+		A1 = (s8[A0] >= 0) ? A2 : 0x3a20de
+		D0.u16 = D7.u16
+		fn00c87e()
+
+		D1 = 9
+		D2 = 6
+		fn001506()
+
+		D7.u16 += 0x1a
+		A0 += 10
+		--D6.s16
+	}
+
+	A3 = 0xffffb128
+	D7.u16 = 0xca20
+	A0 = 0xffffe6ac
+	D3 = 7
+	while (D3.s16 >= 0)
+	{
+		D0.u16 = D7.u16 - 2
+		fn00c87e()
+
+		VDP.setupVRAMWrite(VDPHelper.getVRAMAddressFromWriteCode(D0))
+		VDP.writeData16(0x82b1)
+
+		if (s8[A0] >= 0)
+		{
+			if (u8[A3 + 0x3a] == u8[A3 + 0x37] && u8[A3 + 0x3b] != 0)
+			{
+				A1 = 0x00db36
+				D0.u16 = D7.u16
+				fn00d9f4()
+			}
+			else
+			{
+				A1 = 0x00db31
+				D0.u16 = D7.u16 - 2
+				fn00d9f4()
+
+				D0.u16 = u16[A3 + 0x36] * 2
+				D1 = u8[0x00c95e + D0.s16]
+				if (D1.s8 < 0)
+				{
+					D1.u16 = 0x8000
+				}
+				else
+				{
+					D1.u16 += 0xa562
+				}
+				VDP.writeData16(D1.u16)
+
+				D1 = 0xa562 + u8[0x00c95f + D0.s16]
+				VDP.writeData16(D1.u16)
+			}
+		}
+		else
+		{
+			A1 = 0x00db2b
+			D0.u16 = D7.u16
+			fn00d9f4()
+		}
+
+		D7.u16 += 0x1a
+		A0 += 10
+		A3 += 0x4a
+		--D3.s16
+	}
+
+	fn00c97a()
+}
+
+
+//# address-hook(0x00c97a) end(0x00ca12)
+function void fn00c97a()
+{
+	A2 = 0x00da8a
+	A3 = 0xffffb128
+	D7.u16 = 0xd220
+	A0 = 0xffffe6ac
+	D6 = 7
+
+	while (D6.s16 >= 0)
+	{
+		bool saveGameSlotUsed = (u8[A0] & 0x80) == 0
+		u16 characters = u16[A3 + 0x34]
+		if (!saveGameSlotUsed)
+		{
+			characters = 0
+		}
+		else if (characters == 0)	// Handle Sonic & Tails - show Sonic's icons
+		{
+			characters = 1
+		}
+	#if STANDALONE
+		else
+		{
+			characters = min(characters, 3)		// Handle Knuckles & Tails - show Knuckles' icons
+		}
+	#endif
+
+		// Draw icons for lives & continues
+		A1 = A2 + characters * 32
+		D0.u16 = D7.u16
+		fn00c87e()
+		D1 = 2
+		D2 = 4
+		fn001506()
+
+		// Draw lives & continues numbers
+		if (!saveGameSlotUsed)
+		{
+			A1 = 0x00db08
+			D0.u16 = D7.u16 + 6
+			fn00c87e()
+			D1 = 1
+			D2 = 4
+			fn001506()
+		}
+		else
+		{
+			D0.u8 = u8[A3 + 0x3e]
+			fn00ca14()
+
+			D0.u16 = D7.u16 + 6
+			fn00c87e()
+			D1 = 1
+			D2 = 1
+			fn001506()
+
+			D0.u8 = u8[A3 + 0x3f]
+			fn00ca14()
+
+			D0.u16 = D7.u16 + 0x0306
+			fn00c87e()
+			D1 = 1
+			D2 = 1
+			fn001506()
+		}
+
+		D7.u16 += 0x1a
+		A0 += 10
+		A3 += 0x4a
+		--D6.s16
+	}
+}
+
+
+//# address-hook(0x00ca14) end(0x00ca4a)
+function void fn00ca14()
+{
+	// Display of lives / continues
+	D1 = 0
+	while (D0.s8 >= 10)
+	{
+		++D1.u16
+		D0.u8 -= 10
+	}
+
+	A1 = 0xffffeeea		// Start address of vertical scroll offsets, looks like we're abusing this for something else here
+	D1.u16 = (D1.u16 == 0) ? 0x28 : (D1.u16 << 2)
+	u16[A1] = u16[0x00ca4c + D1.s16]
+	u16[A1 + 0x04] = u16[0x00ca4e + D1.s16]
+	D0.u16 = D0.u8 * 4
+	u16[A1 + 0x02] = u16[0x00ca4c + D0.s16]
+	u16[A1 + 0x06] = u16[0x00ca4e + D0.s16]
+}
+
+
+function void DataSelect.setup()
+{
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.setActiveDisplay(false)
+	fn0011ca()
+
+	VDP.setWriteIncrement(1)
+	VDP.fillVRAMbyDMA(0, 0xd000, 0x2000)
+	VDP.setWriteIncrement(2)
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xe000)
+	VDP.Config.setNameTableBasePlaneB(0xc000)
+	VDP.Config.setNameTableBasePlaneW(0xe000)
+	VDP.Config.setBackdropColor(0)
+	VDP.Config.setVerticalScrolling(false, 0)	// Horizontal scrolling mode without scroll mask
+	VDP.Config.setRenderingModeConfiguration(false)
+	VDP.Config.setPlayfieldSizeInPixels(1024, 256)
+	VDP.Config.setupWindowPlane(true, 0)
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+	level.framecounter = 0
+	u16[0xffffeee2] = 0
+	u16[0xffffeee4] = 0
+
+	Enigma.decompress(0x39d2a2, 0xffff0000, 0x0001)
+	copyRectToVRAM(0xffff0000, 0xe000, 0x28, 0x1c)
+
+	Enigma.decompress(0x3a2020, 0xffff0000, 0x829f)
+
+	A0 = 0x00cd58
+	fn00c866()
+
+	Nemesis.loadDataToVRAM(0x0ca5e0, 0xac40)
+
+	A1 = 0x00db1c
+	D0.u16 = 0xcc06
+	fn00d9f4()
+
+	D0.u16 = 0xcc0c
+	fn00d9f4()
+
+	D0.u16 = 0xccec
+	fn00d9f4()
+
+	A0 = 0x39d4a4
+	A1 = 0xffff0000
+	A2 = 0xffff0020
+	fn00c006()
+
+	u32[0xffffef44] = 0x00c56e
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	A0 = 0x3a23aa
+	A1 = 0xffff0000
+	A2 = 0xffff53e0
+	fn00c006()
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	A0 = 0x15a774
+	A1 = 0xffff0000
+	A2 = 0xffff8a80
+	fn00c006()
+
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+	copyMemory(0xfffffc80, 0x39d262, 0x20)
+	copyMemory(0xfffffca0, 0x00ca78, 0x40)
+
+	A0 = 0xffffb000
+	A1 = 0x00d13e
+	D0 = 0x0b
+	while (D0.s16 >= 0)
+	{
+		objA0.update_address = u32[(A1+=4)-4]
+		objA0.sprite_attributes = 0x829f
+		objA0.mapping_offset = 0x00ce0e
+		objA0.position.x.u16 = u16[A1] + getScreenExtend()		// Adding the screen extend only really has an effect on the "Data Select" text
+		u16[A0 + 0x12] = u16[(A1+=2)-2]
+		objA0.position.y.u16 = u16[(A1+=2)-2]
+		objA0.animation.sprite = u8[(A1+=1)-1]
+		objA0.flags2e = u8[(A1+=1)-1]
+		objA0.render_flags = render_flag.COMPOUND
+
+		A0 += 0x4a
+		--D0.s16
+	}
+
+	fn01aa6e()
+	UpdateGameObjects()
+	RenderSprites()
+
+	copyMemory(0xfffffce0, 0xfffffc60, 0x20)
+	zeroMemory(0xfffffc60, 0x20)
+
+	Kosinski.decompress(0x20c7e0, 0xffff0000)
+
+	copyMemory(0xffff2300, 0xffff2bc0, 0x1180)
+
+	Kosinski.decompress(0x15cd62, 0xffff3480)	// After this, A1 points to where uncompressed data ends
+	Kosinski.decompress(0x15edb2, A1)
+
+	A0 = A1 - 0x08c0
+	copyMemory(A1, A0, 0x540)
+
+	playMusic(0x2f)
+	u32[0xffffef44] = 0x00c890
+	global.frame_state = 0x1e
+	waitForNextFrame()
+
+#if STANDALONE
+	camera.foreground.x.u16 -= getScreenExtend()
+	u16[0xffffe002] += getScreenExtend()
+
+	// Quick scroll-in effect
+	//u8[0xffffffff] = 12		// No worries, this RAM address is safe to use
+	//camera.foreground.x.u16 -= 360
+#endif
+
+	VDP.Config.setActiveDisplay(true)
+}
+
+
+function void DataSelect.update()
+{
+	while (true)
+	{
+		global.frame_state = 0x1e
+		waitForNextFrame()
+	@EntryPoint:
+
+	#if STANDALONE
+		DataSelect.drawCustomPlanes()
+
+		// Quick scroll-in effect
+		//if (u8[0xffffffff] > 0)
+		//{
+		//	--u8[0xffffffff]
+		//	camera.foreground.x.u16 += 30
+		//}
+	#endif
+
+		++level.framecounter
+		UpdateGameObjects()
+		u16[0xffffe002] = -camera.foreground.x.u16
+		RenderSprites()
+
+		A0 = 0xfffffc42
+		++u16[0xffffe666]
+		if (u16[0xffffe666] >= 3)
+			u16[0xffffe666] = 0
+
+	#if STANDALONE
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) >= 1)
+		{
+			// This version is a bit less flickery
+			copyMemory(A0, 0x00ca9a, 0x1e)
+			if (u16[0xffffe666] != 0)
+			{
+				for (u8 i = 0; i < 0x1e; i += 2)
+				{
+					u16 weight = abs(s16[0xffffe666] - 2) + 1
+
+					// Mix color with white
+					u16 r = u16[A0+i] & 0x0e
+					u16 g = (u16[A0+i] >> 4) & 0x0e
+					u16 b = (u16[A0+i] >> 8) & 0x0e
+					r = (r * weight + 0x0e * (3 - weight)) / 3
+					g = (g * weight + 0x0e * (3 - weight)) / 3
+					b = (b * weight + 0x0e * (3 - weight)) / 3
+					u16[A0+i] = r + (g << 4) + (b << 8)
+				}
+			}
+		}
+		else
+	#endif
+		if (u16[0xffffe666] == 0)
+		{
+			fillMemory_u16(A0, 0x1e, 0x0eee)
+		}
+		else
+		{
+			copyMemory(A0, 0x00ca9a, 0x1e)
+		}
+
+		if (global.game_mode != 0x4c)
+			break
+	}
+
+	playSound(0xaf)
+}
+
+
+
+//# address-hook(0x00c570) end(0x00c860)
+function void DataSelectScreen()
+{
+	FadeOutScreenBlocking()
+
+#if STANDALONE
+	Game.onScreenFadedOutBeforeDataSelect()
+	InitSaveSlots()
+#endif
+
+	DataSelect.setup()
+
+	Menu.FadeInAfterInit()
+
+	DataSelect.update()
+}
+
+
+//# address-hook(0x00c866) end(0x00c87c)
+function void fn00c866()
+{
+	D7.u16 = u16[(A0+=2)-2]
+	while (D7.s16 >= 0)
+	{
+		A1 = u32[(A0+=4)-4]
+		D0.u16 = u16[(A0+=2)-2]
+		fn00c87e()
+
+		D1.u16 = u16[(A0+=2)-2]
+		D2.u16 = u16[(A0+=2)-2]
+		fn001506()
+
+		--D7.s16
+	}
+}
+
+
+//# address-hook(0x00c87e) end(0x00c88e)
+function void fn00c87e()
+{
+	D0 = VDPHelper.getDirectVRAMWriteCode(D0.u16)
+}
+
+
+
+// Inside V-Int
+
+//# address-hook(0x000c3e) end(0x000c4a)
+function void fn000c3e()
+{
+	fn000c50()
+
+	// Known targets:
+	//  - 0x00a85c		-> Empty function, used in competition mode menu
+	//  - 0x00c56e		-> Empty function, used in Data Select screen
+	//  - 0x00c890		-> Unknown
+	//  - 0x02df62		-> Empty function, used in Blue Spheres special stage
+	A0 = u32[0xffffef44]
+	call A0
+
+	fn0017f4()
+	VInt.CheckIfInterruptedKosinski()
+}
+
+
+//# address-hook(0x00a85c) end(0x00a85c)
+function void fn00a85c()
+{
+}
+
+
+
+//-------------------------------------------------------//
+// Selection Frame                                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x00d1b6) end(0x00d1f4)
+function void fn00d1b6()
+{
+	D0.u16 = 0xa8 + getScreenExtend()
+	D1 = 0
+	D2 = dataselect.slot_selected - 1
+	while (D2.s16 >= 0)
+	{
+		D4 = 0x0c
+		while (D4.s16 >= 0)
+		{
+			if (D0.u16 > 0x0118 + getScreenExtend() && D1.u16 <= 0x02b8 + getScreenExtend())
+			{
+				D1.u16 += 8
+			}
+			else
+			{
+				D0.u16 += 8
+			}
+			--D4.s16
+		}
+		--D2.s16
+	}
+
+	u16[A0 + 0x12] = D0.u16
+	camera.foreground.x.u16 = D1.u16
+	u16[0xffffe002] = -D1.s16
+
+	objA0.update_address = 0x00d1fa
+	fn00d1fa()
+}
+
+
+//# address-hook(0x00d1fa) end(0x00d30a)
+function void fn00d1fa()
+{
+#if STANDALONE
+	if (u16[0xffffeee4] == 0 && (control.pad1.pressed & DataSelect.CONTROLS_CANCEL || Input.buttonPressed(BUTTON_BACK)))
+#else
+	if (u16[0xffffeee4] == 0 && (control.pad1.pressed & DataSelect.CONTROLS_CANCEL))
+#endif
+	{
+		// Back to the intro / title screen
+		global.game_mode = 0x04
+
+	#if STANDALONE
+		playSound(0xad)
+
+		u32 backupA0 = A0
+		FadeOutScreenBlocking()
+		A0 = backupA0
+
+		// Do not fade out music in this case, Data Select music is meant to kept playing
+		Game.returnToMainMenu()
+		yieldExecution()
+	#endif
+	}
+	else if (u16[0xffffeee2] == 0)
+	{
+		bool skipPart = false
+		if (u16[A0 + 0x30] == 0)
+		{
+			D0 = 0
+			if (control.pad1.pressed & CONTROL_LEFT)
+			{
+				if (u16[0xffffeee4] == 0 || dataselect.slot_selected != 1)
+				{
+					if (dataselect.slot_selected != 0)
+					{
+						--dataselect.slot_selected
+						u8 sfx = (u16[0xffffeee4] != 0) ? 0x7b : 0xb7
+						playSound(sfx)
+						D0 = -8
+					}
+				}
+			}
+
+			if (control.pad1.pressed & CONTROL_RIGHT)
+			{
+				if (dataselect.slot_selected != 9)
+				{
+					++dataselect.slot_selected
+					u8 sfx = (u16[0xffffeee4] != 0) ? 0x7b : 0xb7
+					playSound(sfx)
+					D0 = 8
+				}
+			}
+
+			objA0.countdown_value = D0.u16
+			if (objA0.countdown_value != 0)
+			{
+				u16[A0 + 0x30] = 0x0d
+			}
+			else
+			{
+				skipPart = true
+			}
+		}
+
+		if (!skipPart)
+		{
+			D0.u16 = u16[A0 + 0x12]		// Position of cursor on screen
+			s16 moveStep = objA0.countdown_value
+
+			D0.s16 += moveStep
+			if (moveStep >= 0)
+			{
+				if (D0.s16 > s16(0x120 + getScreenExtend()))
+				{
+					camera.foreground.x.u16 += moveStep
+					if (s16(camera.foreground.x.u16) > s16(0x2c0 - getScreenExtend()))
+					{
+						camera.foreground.x.u16 -= moveStep
+					}
+					else
+					{
+						D0.s16 -= moveStep
+					}
+				}
+			}
+			else
+			{
+				if (D0.s16 < s16(0x120 + getScreenExtend()))
+				{
+					camera.foreground.x.u16 += moveStep
+					if (s16(camera.foreground.x.u16) < -s16(getScreenExtend()))
+					{
+						camera.foreground.x.u16 -= moveStep
+					}
+					else
+					{
+						D0.s16 -= moveStep
+					}
+				}
+			}
+
+			u16[A0 + 0x12] = D0.u16
+			--u16[A0 + 0x30]
+		}
+	}
+
+	D2 = 0
+	if (dataselect.slot_selected == 0)
+	{
+		D2.s16 = 8
+	}
+	else if (dataselect.slot_selected == 9)
+	{
+		D2.s16 = -8
+	}
+
+	D2.u16 += u16[A0 + 0x12]
+	objA0.position.x.u16 = D2.u16
+
+	// Determine size of the cursor (large or small)
+	objA0.animation.sprite = (D2.u16 >= 0xf0 + getScreenExtend() && D2.u16 <= 0x148 + getScreenExtend()) ? 1 : 2
+
+	if (level.framecounter.low & 0x04)
+	{
+		DrawObject()
+	}
+}
+
+
+
+function void DataSelect.sharedNewGameStartup()
+{
+	global.game_mode = 0x0c
+	global.zone_act = 0
+	global.zone_act.apparent = 0
+	global.next_bluespheres = 0
+	u16[0xfffffe17] = 0			// Possibly not needed at all
+	u16[0xffffffb0] = 0
+	u32[0xffffffb2] = 0
+	u16[0xffffffb6] = 0
+	u8[0xffffffb8] = 0
+	level.giantrings_clear = 0
+	global.traded_emeralds = 0
+
+#if STANDALONE
+	if (!Game.isTimeAttack())
+	{
+		// Intentionally not using the (more deterministic) "getRandomNumber" here
+		global.game_random_base = 1 + (System.rand() % 0xff)		// Avoid the 0 value
+	}
+#endif
+}
+
+
+
+// Character icon for "No Save"
+
+//# address-hook(0x00d30c) end(0x00d39a)
+function void fn00d30c()
+{
+	u8[A0 + 0x1d] = 0x0f
+	objA0.animation.sprite = u16[0xffffef4c] + 4
+
+	if (dataselect.slot_selected == 0 && u16[0xffffb078] == 0 && u16[0xffffeee4] == 0)
+	{
+		if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
+		{
+			levelselect.characters = u16[0xffffef4c]
+
+			DataSelect.sharedNewGameStartup()
+
+			global.active_saveslot = 0
+			DataSelect.SharedGameSlotContinue()
+
+			DrawObject()
+			return
+		}
+
+		D0.u16 = u16[0xffffef4c]
+		fn00d6d0()
+		u16[0xffffef4c] = D0.u16
+
+		objA0.animation.sprite = D0.u8 + 4
+		u16[A0 + 0x16] = 1
+		if (level.framecounter.low & 0x10)
+		{
+			fn00d69e()
+			return
+		}
+	}
+
+	u16[A0 + 0x16] = 0
+	fn00d69e()
+}
+
+
+
+// This object is used for
+//  - Character sprites in the save slots... but not the "no save" slot
+//  - Active slot's zone preview
+//  - Also updates scrolling
+
+//# address-hook(0x00d39e) end(0x00d426)
+function void fn00d39e()
+{
+	if (allocDynamicObjectAfterA0())
+	{
+		objA1.update_address = 0x00d70c
+		u16[A1 + 0x48] = A0.u16
+	}
+
+	D0 = 0xffffe6ac + (u32(objA0.flags2e) * 10)
+	u32[A0 + 0x30] = D0
+	A1 = D0
+	u8[A0 + 0x35] = u8[A1 + 0x02] >> 4
+	u8[A0 + 0x37] = u8[A1 + 0x03]
+	objA0.value3a = u8[A1 + 0x03]
+	objA0.value3b = u8[A1] & 0x03
+
+	D0.u16 = u16[A1 + 0x06]
+	A2 = 0xffffffb2
+	fn00da1e()
+
+	u8[A0 + 0x3c] = D1.u8
+	u8[A0 + 0x3d] = D2.u8
+	if (u8[A1 + 0x09] == 0 && u8[A1 + 0x08] < 3)
+	{
+		u8[A1 + 0x08] = 3
+		u32 backupA1 = A1
+		u8[0xffffef56] = 0xff
+		SaveGameSlot()
+		A1 = backupA1
+	}
+
+	u8[A0 + 0x3e] = u8[A1 + 0x08]
+	u8[A0 + 0x3f] = u8[A1 + 0x09]
+
+	objA0.update_address = 0x00d42c
+	fn00d42c()
+}
+
+
+//# address-hook(0x00d42c) end(0x00d69a)
+function void fn00d42c()
+{
+	u16[A0 + 0x16] = 0
+	A1 = u32[A0 + 0x30]
+
+	D0.u8 = dataselect.slot_selected - 1
+	if (D0.u8 != objA0.flags2e)
+	{
+		u8[A0 + 0x37] = u8[A1 + 0x03]
+		u16[A0 + 0x38] = 0
+	}
+	else
+	{
+		u8 result = fn00d458()
+		if (result == 0)
+			return
+
+		if (result == 1)
+		{
+			if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
+			{
+				levelselect.characters = u16[A0 + 0x34]
+
+				// Initialize the new save state
+				u32[A1] = 0
+				 u8[A1 + 0x02] = (levelselect.characters << 4)
+				u32[A1 + 0x04] = 0
+				u16[A1 + 0x08] = 0x0300
+
+				DataSelect.sharedNewGameStartup()
+				global.active_saveslot = A1
+				DataSelect.SharedGameSlotContinue()
+
+			#if STANDALONE
+				u8[A1 + 0x01] = global.game_random_base
+			#endif
+
+				u8[0xffffef56] = 0xff
+				SaveGameSlot()
+				DrawObject()
+				return
+			}
+
+			D0.u16 = u16[A0 + 0x34]
+			fn00d6d0()
+			u16[A0 + 0x34] = D0.u16
+
+			u16[A0 + 0x16] = (level.framecounter.low & 0x10) ? 1 : 0
+		}
+	}
+
+	objA0.animation.sprite = u16[A0 + 0x34] + 4
+	fn00d69e()
+}
+
+
+function bool fn00d458()
+{
+	// Result values:
+	//  - 0 = Abort outer function
+	//  - 1 = Allow character selection (up/down)
+	//  - 2 = Continue normally outside
+
+	if (u8[A1] & 0x80)
+	{
+		// Empty save slot
+		u8[A0 + 0x1d] = 0x0f
+		objA0.animation.frame = 0
+		if (u16[0xffffb078] != 0 || u16[0xffffeee4] != 0)
+		{
+			return 2
+		}
+		else
+		{
+			return 1
+		}
+	}
+	else
+	{
+		// Used save slot
+		D1.u16 = u16[A0 + 0x36]
+		fn00d96a()
+
+		objA0.animation.frame = 0x17
+		D1.u16 = u16[A0 + 0x36]
+		if (D1.u8 == objA0.value3a && objA0.value3b != 0)
+		{
+			// This gets entered only for completed games
+			if (objA0.value3b == 1)
+			{
+				++objA0.animation.frame
+			}
+			else if (objA0.value3b == 2)
+			{
+				objA0.animation.frame += 2
+			}
+			else
+			{
+				objA0.animation.frame += 4
+			}
+
+			if (objA0.value3b == 1 || objA0.value3b == 2)
+			{
+				if (u16[A0 + 0x34] >= CHARS_TAILS_ALONE)	// It feels strange that this is the same for Tails and Knuckles
+				{
+					objA0.animation.frame = 0x23
+				}
+			}
+		}
+
+		if (u16[A0 + 0x38] == 0 && objA0.value3b == 0)
+		{
+			if (u16[0xffffb078] != 0)
+			{
+				return 2
+			}
+
+			u8[A0 + 0x1d] = 0
+		}
+		else
+		{
+			if (u16[A0 + 0x38] == 0)
+			{
+				objA0.flags38 = 0xff
+			}
+
+			if (u16[0xffffb078] != 0)
+			{
+				return 2
+			}
+
+			if (u16[0xffffeee4] != 0)
+			{
+				u8[A0 + 0x1d] = 0
+				u16[A0 + 0x16] = 2
+				return 2
+			}
+
+			if (u16[A0 + 0x34] >= CHARS_KNUCKLES_ALONE)		// Originally this is only an equality check
+			{
+				D6 = 0x0b
+			}
+			else if (u16[A0 + 0x34] == CHARS_TAILS_ALONE || objA0.value3b < 2)
+			{
+				D6 = 0x0c
+			}
+			else
+			{
+				D6 = 0x0d
+			}
+
+			D1.u16 = u16[A0 + 0x36]
+			if (control.pad1.pressed & CONTROL_DOWN)
+			{
+				playSound(0x5b)
+				--D1.u16
+				if (D1.s16 < 0)
+				{
+					D1.u16 = D6.u16
+				}
+			}
+			else if (control.pad1.pressed & CONTROL_UP)
+			{
+				playSound(0x5b)
+				++D1.u16
+				if (D1.u16 > D6.u16)
+				{
+					D1 = 0
+				}
+			}
+
+			u16[A0 + 0x36] = D1.u16
+			u8[A0 + 0x1d] = (level.framecounter.low & 0x10) ? 0x1a : 0
+		}
+
+		u16[A0 + 0x16] = 2
+		if (u16[0xffffeee4] != 0)
+		{
+			return 2
+		}
+		if ((control.pad1.pressed & DataSelect.CONTROLS_ACCEPT) == 0)
+		{
+			return 2
+		}
+
+		level.giantrings_clear.u16 = u16[A1 + 0x04]
+		if (objA0.value3b == 0)
+		{
+			D0.u8 = u8[A1 + 0x03]
+		}
+		else
+		{
+			D0.u16 = u16[A0 + 0x36]
+			if (D0.u8 >= objA0.value3a)
+			{
+				return 2
+			}
+			level.giantrings_clear = 0
+		}
+		fn00da4e()
+
+		global.zone_act = D0.u16
+		global.zone_act.apparent = D0.u16
+		levelselect.characters  = (u8[A1 + 0x02] >> 4)
+		global.next_bluespheres = (u8[A1 + 0x02] & 0x0f)
+
+		D0 = u16[A1 + 0x06]
+		A2 = 0xffffffb2
+		fn00da1e()
+		global.chaos_emeralds = D1.u8
+		global.super_emeralds = D2.u8
+	#if STANDALONE
+		global.game_random_base = u8[A1 + 0x01]
+		if (global.game_random_base == 0)
+		{
+			// Intentionally not using the (more deterministic) "getRandomNumber" here
+			global.game_random_base = 1 + (System.rand() % 0xff)		// Avoid the 0 value
+		}
+	#endif
+
+		global.active_saveslot = A1
+		DataSelect.SharedGameSlotContinue()
+
+		D0.u8 = u8[A1 + 0x08]
+		if ((D0.u8 == 0) || (D0.u8 < 3 && u8[A1 + 0x09] == 0))
+		{
+			u8[A1 + 0x08] = 3
+			if (u8[A1 + 0x09] > 0)
+				--u8[A1 + 0x09]
+		}
+
+		lives_counter = u8[A1 + 0x08]
+		continues_counter = u8[A1 + 0x09]
+
+	#if STANDALONE
+		if (continues_counter >= 5)
+		{
+			Game.setAchievementComplete(ACHIEVEMENT_CONTINUES)
+		}
+
+		// Load additional data
+		u32 slotIndex = (A1 - 0xffffe6ac) / 0x0a
+		u32 address = 0x801100 + slotIndex * 0x20
+		if (u8[A1] == 0)
+		{
+			// Load score, but only for non-completed games
+			player.score = u32[address]
+			player.next_life_score = (player.score / 5000 + 1) * 5000
+		}
+	#endif
+
+		u8[0xffffef56] = 0xff
+		SaveGameSlot()
+		global.game_mode = 0x0c
+		DrawObject()
+		return 0
+	}
+}
+
+
+//# address-hook(0x00d69e) end(0x00d6ca)
+function void fn00d69e()
+{
+	// Used by all character icons, the zone preview image, and Robotnik
+	objA0.position.x.u16 = u16[A0 + 0x12] - camera.foreground.x.u16
+	objA0.velocity.x = objA0.position.x.u16
+	objA0.velocity.y = objA0.position.y.u16
+	u16[A0 + 0x1e] = objA0.position.x.u16
+	objA0.state.both = objA0.position.y.u16
+	if (u8[A0 + 0x1d] == 0x1a)
+	{
+		objA0.velocity.y -= 8
+	}
+
+#if STANDALONE
+	// Prevent too early clipping
+	objA0.box_size.x = 0x18
+#endif
+
+	// Note that "Knuckles & Tails" uses objA0.animation.sprite == 8
+	//  -> We handle that in Standalone.onDrawVdpSpriteCompound
+
+	DrawObject()
+}
+
+
+//# address-hook(0x00d6d0) end(0x00d70a)
+function void fn00d6d0()
+{
+	// Character selection
+	u8 character = D0.u8
+	if (u16[0xffffb07a] == 0)
+	{
+		u8 maxCharacterSelection = 3
+	#if STANDALONE
+		// Knuckles & Tails
+		if (Game.isSecretUnlocked(SECRET_KNUX_AND_TAILS))
+		{
+			maxCharacterSelection = 4
+		}
+	#endif
+
+		if (control.pad1.pressed & CONTROL_UP)
+		{
+			character = (character < maxCharacterSelection) ? (character + 1) : 0
+			playSound(0x5b)
+		}
+		else if (control.pad1.pressed & CONTROL_DOWN)
+		{
+			character = (character > 0) ? (character - 1) : maxCharacterSelection
+			playSound(0x5b)
+		}
+	}
+	D0 = character
+}
+
+
+
+//-------------------------------------------------------//
+// Emeralds                                              //
+//-------------------------------------------------------//
+
+//# address-hook(0x00d70c) end(0x00d77c)
+function void fn00d70c()
+{
+	objA0.render_flags = render_flag.COMPOUND
+	objA0.sprite_attributes = 0x829f
+	objA0.mapping_offset = 0x00ce0e
+	objA0.box_size.x = 0x40
+	u16[A0 + 0x16] = 0x07
+
+	A1 = 0xffff0000 + objA0.respawn_entry
+	A2 = u32[A1 + 0x30]
+	D4.u16 = u16[A2 + 0x06]
+	D0.u16 = objA1.position.x.u16
+	D1.u16 = objA1.position.y.u16
+	objA0.position.x.u16 = D0.u16
+	objA0.position.y.u16 = D1.u16
+
+	A1 = A0 + 0x18
+	D2 = 0x10
+	D3 = 6
+	while (D3.s16 >= 0)
+	{
+		u8[A1 + 0x05] = 0
+		D6 = 0
+		D4.u16 = (D4.u16 << 2) + (D4.u16 >> 14)
+		D5.u16 = D4.u16 & 0x03
+		if (D5.u16 != 0)
+		{
+			if (D5.u16 == 3)
+			{
+				D6 = 0x0c
+			}
+
+			D6.u8 += D2.u8
+			u16[A1] = D0.u16
+			u16[A1 + 0x02] = D1.u16
+			u8[A1 + 0x05] = D6.u8
+		}
+
+		++D2.u16
+		A1 += 6
+		--D3.s16
+	}
+
+	DrawObject()
+}
+
+
+
+// Robotnik
+
+//# address-hook(0x00d782) end(0x00d788)
+function void fn00d782()
+{
+	call 0x00d78c + objA0.base_state
+}
+
+//# address-hook(0x00d78c) end(0x00d78c)
+function void fn00d78c()
+{
+	fn00d7a4()
+}
+
+//# address-hook(0x00d790) end(0x00d790)
+function void fn00d790()
+{
+	fn00d7c0()
+}
+
+//# address-hook(0x00d794) end(0x00d794)
+function void fn00d794()
+{
+	fn00d7ea()
+}
+
+//# address-hook(0x00d798) end(0x00d798)
+function void fn00d798()
+{
+	fn00d884()
+}
+
+//# address-hook(0x00d79c) end(0x00d79c)
+function void fn00d79c()
+{
+	fn00d8a4()
+}
+
+//# address-hook(0x00d7a0) end(0x00d7a0)
+function void fn00d7a0()
+{
+	fn00d8c4()
+}
+
+
+//# address-hook(0x00d7a4) end(0x00d7bc)
+function void fn00d7a4()
+{
+	objA0.render_flags = render_flag.COMPOUND
+	objA0.box_size.x = 0x30
+	u16[A0 + 0x16] = 0x01
+	u8[A0 + 0x1d] = 0x08
+	objA0.base_state += 4
+	fn00d7c0()
+
+#if STANDALONE
+	// Remove that red mark on his forehead
+	setVRAM(0x6e8c, 0xaaaa)
+	setVRAM(0x6e90, 0xaaaa)
+	setVRAM(0x71ac, 0xaaaa)
+	setVRAM(0x71b0, 0xaaaa)
+#endif
+}
+
+
+//# address-hook(0x00d7c0) end(0x00d7e6)
+function void fn00d7c0()
+{
+	if (dataselect.slot_selected == 9)
+	{
+		if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
+		{
+			playSound(0x63)
+			u8[0xffffeee4] = 0xff
+			objA0.base_state += 4
+		}
+	}
+
+#if STANDALONE
+	if (Input.buttonPressed(BUTTON_Y) && dataselect.slot_selected >= 1)
+	{
+		playSound(0x63)
+		u8[0xffffeee4] = 0xff
+		objA0.base_state += 4
+	}
+#endif
+
+	fn00d69e()
+}
+
+
+//# address-hook(0x00d7ea) end(0x00d84e)
+function void fn00d7ea()
+{
+	fn00d912()
+	fn00d94a()
+
+	if (u16[0xffffb078] == 0)
+	{
+		if (control.pad1.pressed & DataSelect.CONTROLS_CANCEL)
+		{
+			fn00d854()
+			return
+		}
+	#if STANDALONE
+		if (Input.buttonPressed(BUTTON_Y))
+		{
+			fn00d854()
+			return
+		}
+	#endif
+
+		if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
+		{
+			if (dataselect.slot_selected == 9)
+			{
+				fn00d854()
+				return
+			}
+
+			D0 = dataselect.slot_selected - 1
+			D0 = 0xffffe6ac + u32(D0.u16) * 10
+			u32[A0 + 0x2e] = D0
+			A1 = D0
+			if (u8[A1] & 0x80)
+			{
+				fn00d854()
+				return
+			}
+
+			playSound(0x63)
+			u8[0xffffeee2] = 0xff
+			objA0.base_state += 8
+		}
+	}
+
+	D0.u16 = u16[0xffffb05a]
+	objA0.position.x.u16 = D0.u16
+	objA0.velocity.x = D0.u16
+	objA0.velocity.y = objA0.position.y.u16
+
+	DrawObject()
+}
+
+
+//# address-hook(0x00d854) end(0x00d880)
+function void fn00d854()
+{
+	objA0.animation.timer = 0
+	objA0.animation.frame = 0
+	u8[A0 + 0x25] = 0
+	u8[A0 + 0x28] = 0
+	objA0.animation.sprite = 0x0d
+	u8[A0 + 0x1d] = 0x08
+
+	u16[A0 + 0x12] = u16[0xffffb05a] + camera.foreground.x.u16
+	objA0.base_state += 4
+
+	fn00d69e()
+}
+
+
+//# address-hook(0x00d884) end(0x00d8a0)
+function void fn00d884()
+{
+	u16[0xffffeee4] = 0
+	D0.u16 = u16[A0 + 0x12]
+#if STANDALONE
+	if (D0.u16 >= 0x0448 || D0.u16 >= camera.foreground.x.u16 + getScreenWidth() + 150)
+	{
+		D0.u16 = 0x0448
+		objA0.base_state = 0x04
+	}
+	else
+	{
+		D0.u16 += 0x0c
+	}
+	u16[A0 + 0x12] = D0.u16
+#else
+	if (D0.u16 >= 0x0448)
+	{
+		objA0.base_state = 0x04
+	}
+	else
+	{
+		D0.u16 += 8
+		u16[A0 + 0x12] = D0.u16
+	}
+#endif
+
+	fn00d69e()
+}
+
+
+//# address-hook(0x00d8a4) end(0x00d8be)
+function void fn00d8a4()
+{
+	fn00d912()
+	fn00d94a()
+
+	if (u8[A0 + 0x1d] == 0x0b)
+	{
+		u8[A0 + 0x1d] = 0x0c
+		objA0.base_state += 4
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x00d8c4) end(0x00d90c)
+function void fn00d8c4()
+{
+	fn00d912()
+
+	if ((control.pad1.pressed & CONTROL_RIGHT) == 0)
+	{
+		if ((control.pad1.pressed & CONTROL_LEFT) == 0)
+		{
+			DrawObject()
+			return
+		}
+
+		playSound(0x68)
+
+		// Clear save slot
+		A1 = u32[A0 + 0x2e]
+		u16[A1] = 0x8000
+		u32[A1 + 0x02] = 0
+		u16[A1 + 0x06] = 0
+		u16[A1 + 0x08] = 0x0300
+	#if STANDALONE
+		zeroMemory(0x801100 + 0x20 * u32(dataselect.slot_selected - 1), 0x20)
+	#endif
+		u8[0xffffef56] = 0xff
+
+		SaveGameSlot()
+	}
+
+	objA0.base_state = 0x08
+	u16[0xffffeee2] = 0
+	fn00d854()
+}
+
+
+//# address-hook(0x00d912) end(0x00d938)
+function void fn00d912()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 5
+		while (true)
+		{
+			D0 = objA0.animation.frame
+			++objA0.animation.frame
+
+			D0.u8 = u8[0x00d93a + D0.s16]
+			if ((D0.u8 & 0x80) == 0)
+				break
+
+			objA0.animation.frame = 0
+		}
+		objA0.animation.sprite = D0.u8
+	}
+}
+
+
+//# address-hook(0x00d94a) end(0x00d968)
+function void fn00d94a()
+{
+	--u8[A0 + 0x25]
+	if (s8[A0 + 0x25] < 0)
+	{
+		u8[A0 + 0x25] = 0x03
+		++u8[A0 + 0x28]
+		D0.u8 = (u8[A0 + 0x28] & 0x03) + 8
+		u8[A0 + 0x1d] = D0.u8
+	}
+}
+
+
+
+//# address-hook(0x00d96a) end(0x00d9f2)
+function void fn00d96a()
+{
+	// Updates the zone preview image for the save game slots in use
+
+	// D1.u8		  -> Currently shown image (0 for AIZ, etc., plus one after last zone after playthrough complete)
+	// objA0.value3a  -> Default shown image, and also the highest possible number for D1.u8
+	// objA0.value3b  -> Playthrough status (0: not played through, 1: without all emeralds, 2: with all Chaos Emeralds, 3: with all Super Emeralds)
+	// u16[A0 + 0x34] -> Character selection (see CHARS_*) constants
+	u8 shownImage = D1.u8
+	u8 defaultImage = objA0.value3a
+	u8 playthroughStatus = objA0.value3b
+	u8 characters = u16[A0 + 0x34]
+
+	if (shownImage == defaultImage && playthroughStatus != 0)
+	{
+		if (characters <= CHARS_SONIC_ALONE || playthroughStatus == 3)
+		{
+			A2 = 0x00cab8 + (playthroughStatus - 1) * 32
+			copyMemory(0xfffffc60, A2, 0x20)
+			return
+		}
+
+		D1 = (characters >= CHARS_KNUCKLES_ALONE) ? 0x0e : 0x10
+		if (playthroughStatus != 1)
+		{
+			++D1.u16
+		}
+
+		D2.u16 = 0xa380
+	}
+	else
+	{
+		D2.u16 = 0xb740
+	}
+
+	u32 backupA1 = A1
+	u16 backupD1 = D1.u16
+	D1 = 0xffff0000 + (u32(D1.u16) * 0x08c0)
+	updateSpritePattern(D1, D2.u16, 0x0460)
+	A1 = backupA1
+
+	A2 = 0x00cb18 + backupD1 * 32
+	copyMemory(0xfffffc60, A2, 0x20)
+}
+
+
+
+//# address-hook(0x00d9f4) end(0x00da1c)
+function void fn00d9f4()
+{
+	u16 vramAddress = D0.u16
+	VDP.setupVRAMWrite(vramAddress)
+
+	D5.u16 = 0xa552
+	D6 = 0
+	while (true)
+	{
+		D6.u8 = u8[A1]
+		++A1
+		if (D6.s8 < 0)
+			break
+
+		if (D6.u8 == 0)
+		{
+			VDP.writeData16(0x8000)
+		}
+		else
+		{
+			VDP.writeData16(D5.u16 + D6.u16)
+		}
+	}
+}
+
+
+
+//# address-hook(0x00da1e) end(0x00da4c)
+function void fn00da1e()
+{
+	global.traded_emeralds = 0
+	D1 = 0
+	D2 = 0
+	D3 = 6
+	while (D3.s16 >= 0)
+	{
+		D0.u16 = (D0.u16 << 2) + (D0.u16 >> 14)
+		D4.u16 = D0.u16 & 0x03
+		u8[A2] = D4.u8
+
+		if (D4.u16 != 0)
+		{
+			++D1.u16
+			if (D4.u16 == 3)
+			{
+				++D2.u16
+			}
+		}
+		if (D4.u16 >= 2)
+		{
+			global.traded_emeralds = 0xff
+		}
+
+		++A2
+		--D3.s16
+	}
+}
+
+
+//# address-hook(0x00da4e) end(0x00da6c)
+function void fn00da4e()
+{
+	if (u16[A0 + 0x34] >= CHARS_KNUCKLES_ALONE && D0.u8 == 0x0b)
+	{
+		// Choose Knuckles' version of Sky Sanctuary
+		D0.u16 = 0x0a01
+	}
+	else
+	{
+		// Lookup correct zone and act to start
+		D0.u16 = u16[0x00da6e + (D0.u8 & 0x0f) * 2]
+	}
+}
+
+
+
+#if STANDALONE
+function void DataSelect.drawCustomPlanes()
+{
+	// Draw our own widescreen version of the background
+	// TODO: The actual background still gets rendered, though it's not visible at all
+	//  -> Maybe the plane W is used here?
+	Renderer.drawCustomSprite("bg_dataselect", getScreenExtend() - 40, 0, 0x00, 0, 0x2000)
+
+	// Custom rendering of plane B (which is not the background here) to ignore the wrapping
+	s16 px = s16(camera.foreground.x.u16)
+	if (px < 0)
+	{
+		Renderer.enableDefaultPlane(2, false)
+		Renderer.setupPlane(-px, 0, getScreenWidth() + px, getScreenHeight(), 0x10, 0, 0x3000)
+	}
+	else if (px > 0x400 - getScreenWidth())
+	{
+		Renderer.enableDefaultPlane(2, false)
+		Renderer.setupPlane(0, 0, 0x400 - px, getScreenHeight(), 0x10, 0, 0x3000)
+	}
+}
+#endif

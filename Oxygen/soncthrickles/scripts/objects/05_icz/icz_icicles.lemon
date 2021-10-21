@@ -1,0 +1,110 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Icicles (in ICZ)                                      //
+//-------------------------------------------------------//
+
+
+//-------------------------------------------------------//
+// Static (non-falling) icicles                          //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b2a0) end(0x08b2a0)
+function void fn08b2a0()
+{
+	Object.InitWithUpdateAddress(0x08b2a4)
+}
+
+
+//# address-hook(0x08b2a4) end(0x08b2d8)
+function void fn08b2a4()
+{
+	setupObjectAttributesFull(0x08b350)
+	if (objA0.subtype2c == 0)
+	{
+		objA0.update_address = 0x08b2da
+		A2 = (objA0.render_flags & render_flag.FLIP_Y) ? 0x08b364 : 0x08b35c
+		SpawnChildObjects()
+	}
+	else
+	{
+		objA0.update_address = 0x08b2ee
+		u8[A0 + 0x28] = 0x92
+	}
+}
+
+
+//# address-hook(0x08b2da) end(0x08b2ea)
+function void fn08b2da()
+{
+	D1 = 0x17
+	D2 = 0x08
+	D3 = 0x08
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b330) end(0x08b34a)
+function void fn08b330()
+{
+	u8[A0 + 0x28] = 0x98
+	AddAsDynamicObject()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		UnloadObject()
+	}
+}
+
+
+
+//-------------------------------------------------------//
+// Falling Icicles                                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x08b2ee) end(0x08b30c)
+function void FallingIcicle.Update()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x40)
+	{
+		objA0.update_address = 0x08b310
+		objA0.countdown_value = 0x0f		// I'd guess this is a timer (see "Object.CountdownAndTrigger")
+		objA0.countdown_callback = 0x08b328	// And this is called when the timer has elapsed
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b310) end(0x08b324)
+function void FallingIcicle.Shake()
+{
+	// Shaking effect
+	D0 = (global.framecounter & 0x01) ? -2 : 2
+	objA0.position.x.u16 += D0.u16
+
+	// Update timer
+	Object.CountdownAndTrigger()
+
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08b328) end(0x08b32e)
+function void FallingIcicle.StartFalling()
+{
+	objA0.update_address = 0x0856de
+}
+
+
+// While falling, "fn0856de()" is called

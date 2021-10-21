@@ -1,0 +1,323 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Air Bubbles                                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x02f938) end(0x02f942)
+function void fn02f938()
+{
+	// Targets:
+	//  - 0x02f952	-> objA0.base_state = 0x00
+	//  - 0x02f9b0	-> objA0.base_state = 0x02
+	//  - 0x02f9ca	-> objA0.base_state = 0x04
+	//  - 0x02fa2c	-> objA0.base_state = 0x06
+	//  - 0x02fa4a	-> objA0.base_state = 0x08
+	//  - 0x02fa50	-> objA0.base_state = 0x0a
+	call tableLookupAddress(0x02f946, objA0.base_state)
+}
+
+
+//# address-hook(0x02f952) end(0x02f9ac)
+function void fn02f952()
+{
+	objA0.base_state += 2
+	objA0.mapping_offset = 0x02fcb2
+	objA0.sprite_attributes = 0x045c
+	objA0.render_flags = render_flag.WORLD | render_flag.VISIBLE
+	objA0.box_size.x = 0x10
+#if STANDALONE
+	objA0.box_size.y = 0x10
+#endif
+	objA0.sprite_priority = 0x80
+
+	D0.u8 = objA0.subtype2c
+	if (objA0.subtype2c & 0x80)
+	{
+		objA0.base_state += 8
+		D0.u16 &= 0x7f
+		u8[A0 + 0x32] = D0.u8
+		u8[A0 + 0x33] = D0.u8
+		objA0.state = 0x08
+		fn02fa50()
+		return
+	}
+	else
+	{
+		objA0.state = D0.u8
+		u16[A0 + 0x30] = objA0.position.x.u16
+		objA0.velocity.y = -0x88
+		GetRandomNumber()
+		objA0.value26 = D0.u8
+		fn02f9b0()
+	}
+}
+
+
+//# address-hook(0x02f9b0) end(0x02fac4)
+function void fn02f9b0()
+{
+	Object.animationUpdate(0x02fc7e)
+	if (objA0.animation.sprite == 6)
+	{
+		objA0.flags2e = 0x01
+	}
+	fn02f9ca()
+}
+
+
+//# address-hook(0x02f9ca) end(0x02fa44)
+function void fn02f9ca()
+{
+	D0.u16 = water.height.current
+	if (D0.u16 >= objA0.position.y.u16)
+	{
+		objA0.base_state = 0x06
+		objA0.state += 0x04
+	}
+	else
+	{
+		D0.u8 = objA0.value26
+		++objA0.value26
+		D0.u16 &= 0x7f
+
+		A1 = 0x01831e
+		D0.u16 = u16[A0 + 0x30] + s8[A1 + D0.s16]
+		objA0.position.x.u16 = D0.u16
+
+		if (objA0.flags2e != 0)
+		{
+			fn02fba8()
+		}
+
+		if (objA0.base_state != 0x06)
+		{
+			UpdateMovementStraightSimple()
+			if (objA0.render_flags & render_flag.VISIBLE)
+			{
+				DrawObject()
+			}
+			else
+			{
+				UnloadObject()
+			}
+			return
+		}
+	}
+
+	fn02fa2c()
+}
+
+
+//# address-hook(0x02fa2c) end(0x02fa44)
+function void fn02fa2c()
+{
+	Object.animationUpdate(0x02fc7e)
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x02fa4a) end(0x02fa4a)
+function void fn02fa4a()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x02fa50) end(0x02fb90)
+function void fn02fa50()
+{
+	bool spawnBubbles = false
+
+	if (u16[A0 + 0x36] == 0)
+	{
+		if (objA0.position.y.u16 <= water.height.current || (objA0.render_flags & render_flag.VISIBLE) == 0)
+		{
+			fn02fb5c()
+			return
+		}
+
+		--u16[A0 + 0x38]
+		if (s16[A0 + 0x38] < 0)
+		{
+			u16[A0 + 0x36] = 1
+			while (true)
+			{
+				GetRandomNumber()
+				D1.u16 = D0.u16
+				D0.u16 &= 0x07
+				if (D0.u16 < 0x06)
+					break
+			}
+
+			u8[A0 + 0x34] = D0.u8	// Number of bubbles to spawn
+			D1.u16 &= 0x0c
+			A1 = 0x02fb96 + D1.u16
+			u32[A0 + 0x3c] = A1
+			--u8[A0 + 0x32]
+			if (s8[A0 + 0x32] < 0)
+			{
+				u8[A0 + 0x32] = u8[A0 + 0x33]
+				u8[A0 + 0x36] |= 0x80
+			}
+
+			spawnBubbles = true
+		}
+	}
+	else
+	{
+		--u16[A0 + 0x38]
+		if (s16[A0 + 0x38] < 0)
+		{
+			spawnBubbles = true
+		}
+	}
+
+	if (spawnBubbles)
+	{
+		GetRandomNumber()
+		D0.u16 &= 0x1f
+		u16[A0 + 0x38] = D0.u16
+
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = objA0.update_address
+			objA1.position.x.u16 = objA0.position.x.u16 + (getRandomNumber() & 0x0f) - 8
+			objA1.position.y.u16 = objA0.position.y.u16
+
+			A2 = u32[A0 + 0x3c]		// Pattern table for bubbles spawning
+			D0 = u8[A0 + 0x34]		// Bubble index
+			u8[A1 + 0x2c] = u8[A2 + D0.s16]
+
+			if (u8[A0 + 0x36] & 0x80)
+			{
+				if ((getRandomNumber() & 0x03) == 0 || u8[A0 + 0x34] == 0)
+				{
+					// Check if a big bubble just got spawned
+					if ((u8[A0 + 0x36] & 0x40) == 0)
+					{
+						// Enforce a big bubble
+						u8[A1 + 0x2c] = 0x02
+						u8[A0 + 0x36] |= 0x40
+					}
+				}
+			}
+		}
+
+		--u8[A0 + 0x34]
+		if (s8[A0 + 0x34] < 0)
+		{
+			D0.u16 = 0x80 + (getRandomNumber() & 0x7f)
+			u16[A0 + 0x38] += D0.u16
+			u16[A0 + 0x36] = 0
+		}
+	}
+
+	Object.animationUpdate(0x02fc7e)
+	fn02fb5c()
+}
+
+
+//# address-hook(0x02fb5c)
+function void fn02fb5c()
+{
+	D0.u16 = (objA0.position.x.u16 & 0xff80) - level.despawn_position.x
+	if (D0.u16 <= 0x0280)
+	{
+		if (objA0.position.y.u16 > water.height.current)
+		{
+			DrawObject()
+		}
+	}
+	else
+	{
+		if (objA0.respawn_entry)
+		{
+			A2 = 0xffff0000 + objA0.respawn_entry
+			u8[A2] &= ~0x80
+		}
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x02fba8) end(0x02fc7c)
+function void fn02fba8()
+{
+	A1 = 0xffffb000
+	fn02fbb2()
+
+	A1 = 0xffffb04a
+	fn02fbb2()
+}
+
+
+//# address-hook(0x02fbb2)
+function void fn02fbb2()
+{
+	if (u8[A1 + 0x2e] & 0x80)
+		return
+
+	D0.u16 = objA1.position.x.u16
+	D1.u16 = objA0.position.x.u16
+	if (D0.u16 <= D1.u16 - 0x10 || D0.u16 > D1.u16 + 0x10)
+		return
+
+	D0.u16 = objA1.position.y.u16
+	D1.u16 = objA0.position.y.u16
+	if (D0.u16 <= D1.u16 || D0.u16 > D1.u16 + 0x10)
+		return
+
+	if (u8[A1 + 0x2b] & 0x40)
+		return
+
+	// Collect bubble
+	UpdateMusicOnWaterTransition()
+
+	playSound(0x38)
+
+	objA1.velocity.x = 0
+	objA1.velocity.y = 0
+	u16[A1 + 0x1c] = 0
+	u8[A1 + 0x20] = 0x15
+	u16[A1 + 0x32] = 0x23
+	u8[A1 + 0x40] = 0
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
+
+	if (u8[A1 + 0x2a] & char.flag.ROLLING)
+	{
+		if (u32[A1] == 0x010a94)
+		{
+			u8[A1 + 0x2a] &= ~0x04
+			u8[A1 + 0x1e] = 0x13
+			u8[A1 + 0x1f] = 0x09
+			objA1.position.y.u16 -= 0x05
+		}
+		else
+		{
+			u8[A1 + 0x1e] = 0x0f
+			u8[A1 + 0x1f] = 0x09
+			--objA1.position.y.u16
+		}
+	}
+	if (objA0.base_state != 0x06)
+	{
+		objA0.base_state = 0x06
+		objA0.state += 0x04
+	}
+}

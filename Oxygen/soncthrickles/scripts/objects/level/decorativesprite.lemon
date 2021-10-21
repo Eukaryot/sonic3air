@@ -1,0 +1,37 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Decorative Sprite (used in several levels)            //
+//-------------------------------------------------------//
+
+//# address-hook(0x02b928) end(0x02b962)
+function void fn02b928()
+{
+	objA0.mapping_offset = 0x02ba9a
+	objA0.render_flags |= render_flag.WORLD
+	objA0.animation.sprite = objA0.subtype2c
+
+	A1 = 0x02b968 + objA0.subtype2c * 6
+	objA0.sprite_attributes = u16[A1]
+	objA0.sprite_priority = u16[A1+2]
+	objA0.box_size.x = u8[A1+4]
+	objA0.box_size.y = u8[A1+5]
+
+	objA0.update_address = 0x02b962
+	fn02b962()
+}
+
+
+//# address-hook(0x02b962) end(0x02b962)
+function void fn02b962()
+{
+	DrawOrUnloadObject()
+}

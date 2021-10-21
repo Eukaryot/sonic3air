@@ -1,0 +1,415 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Water splash effect & Spindash dust cloud             //
+//-------------------------------------------------------//
+
+//# address-hook(0x018b3e) end(0x018b48)
+function void fn018b3e()
+{
+	// Targets:
+	//  - 0x018b54	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x018baa	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x018cb2	-> objA0.base_state = 0x04	-> Unloading
+	//  - 0x018cb6	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x018b4c, objA0.base_state)
+}
+
+
+//# address-hook(0x018b54) end(0x018ba4)
+function void fn018b54()
+{
+	objA0.base_state += 2
+	objA0.mapping_offset = 0x018df4
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x10
+	objA0.sprite_attributes = 0x07e0
+	objA0.value42 = 0xb000
+	u16[A0 + 0x40] = 0xfc00
+
+	if (A0 != 0xffffcc54)
+	{
+		// Effect object for Tails
+		objA0.flags38 = 1
+		if (global.characters != CHARS_TAILS_ALONE)
+		{
+			objA0.sprite_attributes = 0x07f0
+			objA0.value42 = 0xb04a
+			u16[A0 + 0x40] = 0xfe00
+		}
+	}
+
+	fn018baa()
+}
+
+
+//# address-hook(0x018baa) end(0x018bba)
+function void fn018baa()
+{
+	A2 = 0xffff0000 + u16[A0 + 0x42]
+
+	// Targets:
+	//  - 0x018c94	-> objA0.state = 0x00  -> Inactive (though the target function still does stuff)
+	//  - 0x018bc8	-> objA0.state = 0x01  -> Water splash update
+	//  - 0x018c20	-> objA0.state = 0x02  -> Spindash dust cloud
+	//  - 0x018c84	-> objA0.state = 0x03  -> Braking dust cloud
+	//  - 0x018bec	-> objA0.state = 0x04  -> Snow splash effect (start of LBZ 1)
+	call tableLookupAddress(0x018bbe, objA0.state * 2)
+}
+
+
+//# address-hook(0x018bc8) end(0x018be8)
+function void fn018bc8()
+{
+	objA0.position.y.u16 = water.height.current
+	if (objA0.state.former == 0)
+	{
+		objA0.position.x.u16 = u16[A2 + 0x10]
+		objA0.flags2a = 0
+		objA0.sprite_attributes &= 0x7fff
+	}
+	fn018c94()
+}
+
+
+//# address-hook(0x018bec) end(0x018c1a)
+function void fn018bec()
+{
+	// Snow splash effect (in LBZ 1)
+	if (objA0.state.former == 0)
+	{
+		objA0.position.x.u16 = u16[A2 + 0x10]
+		objA0.flags2a = 0
+		objA0.sprite_attributes &= 0x7fff
+	}
+
+	Object.animationUpdate(0x018dc0)
+	D6 = 0x2c2280
+	fn018d70()
+	DrawObject()
+}
+
+
+//# address-hook(0x018c20) end(0x018c82)
+function void fn018c20()
+{
+	// The first check is against "sonic.drown_countdown"
+	//  -> Deactivate this while the drown countdown is shown, because the digits use the same VRAM as this effect here
+	if (u8[A2 + 0x2c] < 12 || u8[A2 + 0x05] >= 4)
+	{
+		objA0.state = 0
+		return
+	}
+
+#if STANDALONE
+	// Check if not spindashing any more
+	if (u8[A2 + 0x3d] == 0 || u8[A2 + 0x3d] & 0x80)
+	{
+		// Play rest of animation for the drop dash...
+		//  -> Except if rolling state stopped suddenly, usually because of an interaction with the object Sonic landed on, e.g. the SSZ spinning disc
+		//  -> Unfortunately, this does not prevent the dust cloud from being visible for one frame in some cases
+		if (objA0.animation.frame == 0x07 || u8[A2 + 0x20] != char.state.ROLLING)
+		{
+			objA0.state = 0
+			return
+		}
+	}
+	else
+	{
+		objA0.position.x.u16 = u16[A2 + 0x10]
+		objA0.position.y.u16 = u16[A2 + 0x14]
+		objA0.flags2a = u8[A2 + 0x2a] & char.flag.FACING_LEFT
+	}
+#else
+	// Check if not spindashing any more
+	if (u8[A2 + 0x3d] == 0)
+	{
+		objA0.state = 0
+		return
+	}
+
+	objA0.position.x.u16 = u16[A2 + 0x10]
+	objA0.position.y.u16 = u16[A2 + 0x14]
+	objA0.flags2a = u8[A2 + 0x2a] & char.flag.FACING_LEFT
+#endif
+
+	D1 = 4
+	if (global.inv_gravity)
+	{
+		objA0.flags2a |= 0x02
+		D1.s16 = -D1.s16
+	}
+	if (objA0.flags38 != 0)
+	{
+		objA0.position.y.u16 -= D1.u16
+	}
+
+	if (objA0.state.former == 0)
+	{
+		if (u16[A2 + 0x0a] & 0x8000)
+			objA0.sprite_attributes |= 0x8000
+		else
+			objA0.sprite_attributes &= 0x7fff
+	}
+	fn018c94()
+}
+
+
+//# address-hook(0x018c84) end(0x018c92)
+//# translated(0x018caa) end(0x018cb0)
+function void fn018c84()
+{
+	// The first check is against "sonic.drown_countdown"
+	if (u8[A2 + 0x2c] < 12 || (objA0.flags2a & 0x40))
+	{
+		objA0.state = 0
+		return
+	}
+
+	fn018c94()
+}
+
+
+//# address-hook(0x018c94) end(0x018ca4)
+function void fn018c94()
+{
+	// Just update the animation and render
+	Object.animationUpdate(0x018dc0)
+	fn018d6a()
+	DrawObject()
+}
+
+
+//# address-hook(0x018cb2) end(0x018cb2)
+function void fn018cb2()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x018cb6) end(0x018d68)
+function void fn018cb6()
+{
+	A2 = 0xffff0000 + u16[A0 + 0x42]
+	D1 = 0x10
+	if (u8[A2 + 0x20] != 0x0d)
+	{
+		bool b = true
+		if (u8[A2 + 0x38] == 2)
+		{
+			D1 = 0x06
+			b = (u8[A2 + 0x2f] != 3)
+		}
+
+		if (b)
+		{
+			objA0.base_state = 0x02
+			u8[A0 + 0x36] = 0
+			return
+		}
+	}
+
+	--u8[A0 + 0x36]
+	if (s8[A0 + 0x36] < 0)
+	{
+		u8[A0 + 0x36] = 3
+		if ((u8[A2 + 0x2a] & 0x40) == 0)
+		{
+			if (allocDynamicObjectStd())
+			{
+				objA1.update_address = objA0.update_address
+				objA1.position.x.u16 = u16[A2 + 0x10]
+				objA1.position.y.u16 = u16[A2 + 0x14]
+				if (objA0.flags38 != 0)
+				{
+					D1.u16 -= 4
+				}
+				if (global.inv_gravity)
+					D1.s16 = -D1.s16
+
+				objA1.position.y.u16 += D1.u16
+				u8[A1 + 0x04] = objA0.render_flags
+				u8[A1 + 0x05] += 2
+				u8[A1 + 0x07] = 4
+				u16[A1 + 0x08] = 0x80
+				u16[A1 + 0x0a] = (u16[A0 + 0x0a] & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+				u32[A1 + 0x0c] = u32[A0 + 0x0c]
+				u8[A1 + 0x20] = 3
+				u8[A1 + 0x2a] = 0
+				u16[A1 + 0x42] = objA0.value42
+			}
+		}
+	}
+
+	fn018d6a()
+}
+
+
+//# address-hook(0x018d6a) end(0x018d6a)
+function void fn018d6a()
+{
+	D6 = 0x18a604
+	fn018d70()
+}
+
+
+//# address-hook(0x018d70) end(0x018dbe)
+function void fn018d70()
+{
+	if (u8[A0 + 0x34] != objA0.animation.sprite)
+	{
+		u8[A0 + 0x34] = objA0.animation.sprite
+
+		u32 sourceBase   = D6
+		u32 tableAddress = 0x018ee2
+		u16 targetInVRAM = u16[A0 + 0x40]
+		updateMultipleSpritePatterns(sourceBase, tableAddress, targetInVRAM, objA0.animation.sprite)
+	}
+}
+
+
+
+// Competition mode
+
+//# address-hook(0x018f86) end(0x018f90)
+function void fn018f86()
+{
+	// Targets:
+	//  - 0x018f9c	-> objA0.base_state = 0x00
+	//  - 0x018fd2	-> objA0.base_state = 0x02
+	//  - 0x019060	-> objA0.base_state = 0x04
+	//  - 0x019064	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x018f94, objA0.base_state)
+}
+
+
+//# address-hook(0x018f9c) end(0x018fcc)
+function void fn018f9c()
+{
+	objA0.base_state += 0x02
+	objA0.mapping_offset = 0x01910c
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 0x10
+	objA0.sprite_attributes = 0x07e0
+	objA0.value42 = 0xb000
+	if (A0.u16 != 0xcc54)
+	{
+		objA0.value42 = 0xb04a
+	}
+	fn018fd2()
+}
+
+
+//# address-hook(0x018fd2) end(0x018fe2)
+function void fn018fd2()
+{
+	A2 = 0xffff0000 + objA0.value42
+
+	// Targets:
+	//  - 0x018fee	-> objA0.state = 0x00
+	//  - 0x018ff6	-> objA0.state = 0x02
+	//  - 0x01903e	-> objA0.state = 0x03
+	call tableLookupAddress(0x018fe6, objA0.state * 2)
+}
+
+
+//# address-hook(0x018fee) end(0x018ff4)
+function void fn018fee()
+{
+	objA0.animation.sprite = 0
+	fn019046()
+}
+
+
+//# address-hook(0x018ff6) end(0x01903c)
+function void fn018ff6()
+{
+	if (u8[A2 + 0x2c] < 0x0c || u8[A2 + 0x05] >= 0x04 || u8[A2 + 0x3d] == 0)
+	{
+		objA0.state = 0
+		return
+	}
+
+	objA0.position.x.u16 = u16[A2 + 0x10]
+	objA0.position.y.u16 = u16[A2 + 0x14]
+	objA0.flags2a = u8[A2 + 0x2a] & 0x01
+	if (objA0.state.former == 0)
+	{
+		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+	}
+	fn019046()
+}
+
+
+//# address-hook(0x01903e) end(0x01905e)
+function void fn01903e()
+{
+	if (u8[A2 + 0x2c] >= 0x0c)
+	{
+		fn019046()
+	}
+	else
+	{
+		objA0.state = 0
+	}
+}
+
+
+//# address-hook(0x019046)
+function void fn019046()
+{
+	Object.animationUpdate(0x0190f2)
+	DrawObject()
+}
+
+
+//# address-hook(0x019060) end(0x019060)
+function void fn019060()
+{
+	UnloadObject()
+}
+
+
+//# address-hook(0x019064) end(0x0190f0)
+function void fn019064()
+{
+	A2 = 0xffff0000 + objA0.value42
+	if (u8[A2 + 0x20] != 0x0d)
+	{
+		objA0.base_state = 0x02
+		u8[A0 + 0x36] = 0
+		return
+	}
+
+	objA0.animation.sprite = 0
+	--u8[A0 + 0x36]
+	if (s8[A0 + 0x36] < 0)
+	{
+		u8[A0 + 0x36] = 0x03
+		if (allocDynamicObjectStd())
+		{
+			u32[A1] = u32[A0]
+			u8[A1 + 0x04] = objA0.render_flags
+			u8[A1 + 0x05] += 0x02
+			u8[A1 + 0x07] = 0x04
+			u16[A1 + 0x08] = 0x80
+			u16[A1 + 0x0a] = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+			u32[A1 + 0x0c] = objA0.mapping_offset
+			u16[A1 + 0x10] = u16[A2 + 0x10]
+			u16[A1 + 0x14] = u16[A2 + 0x14] + 0x0c
+			u8[A1 + 0x20] = 0x03
+			u8[A1 + 0x2a] = 0
+			u16[A1 + 0x42] = objA0.value42
+		}
+	}
+}

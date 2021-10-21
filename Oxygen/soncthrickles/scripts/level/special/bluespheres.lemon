@@ -1,0 +1,2861 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Blue Spheres Special Stage                            //
+//-------------------------------------------------------//
+
+//# address-hook(0x0081c6) end(0x00858e)
+function void SpecialStage()
+{
+#if STANDALONE
+	playMusic(MUSIC_CTRL_FADEOUT)
+#else
+	playMusic(MUSIC_CTRL_STOP)
+#endif
+
+	kosinski.queue_size = 0
+	zeroMemory(0xffffff10, 0x6c)
+
+	ClearPatternLoadingQueue()
+	FadeScreenToWhiteBlocking()
+
+#if STANDALONE
+	// Add a small artificial delay here
+	for (u8 i = 0; i < 12; ++i)
+		yieldInWhiteScreen()
+#else
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setPlayfieldSizeInPixels(512, 256)
+	VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+	VDP.Config.setVerticalScrolling(false, 0)
+	VDP.Config.setBackdropColor(0x20)
+	VDP.Config.setRenderingModeConfiguration(false)
+	water.fullscreen = 0
+
+	fn0011ca()
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+	zeroMemory(0xfffffe6e, 0x4c)
+	zeroMemory(0xffffe400, 0x100)
+
+	u32[0xfffffe66] = 0
+	u32[0xfffffe6a] = 0
+
+	fn01aa6e()
+
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+
+	// Load special stage palette
+	//  -> Character colors is the 8 colors from 0xfffffc90 (for Sonic/Knuckles) and 0xfffffcb0 (for Tails)
+	copyMemory(0xfffffc80, 0x00896e, 0x100)
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		copyMemory(0xfffffc90, 0x0089ee, 0x10)
+	}
+
+#if STANDALONE
+	for (u8 player = 0; player < getNumPlayers(); ++player)
+	{
+		u8 character = getPlayerCharacter(player)
+		u64 paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+		u16 numColors = System.loadExternalPaletteData(paletteKey, 0, 0x800000, 0x20)
+		if (numColors > 0)
+		{
+			u32 dest = 0x802180 + character * 0x40
+			for (u16 i = 0; i < numColors; ++i)
+			{
+				u16[dest + i * 2] = packColor(u32[0x800000 + i * 4])
+			}
+		}
+	}
+#endif
+
+	Nemesis.loadDataToVRAM(0x0b07b8, 0x0000)
+
+	fn0085b0()
+
+	Enigma.decompress(0x0aef54, 0xffff5500, 0x0000)
+	copyRectToVRAM(0xffff5500, 0xc000, 0x28, 0x1c)
+
+	Nemesis.loadDataToVRAM(0x0ad904, 0xd000)
+	Nemesis.loadDataToVRAM(0x0adf60, 0xb4e0)
+	Nemesis.loadDataToVRAM(0x0aeed0, 0xb360)
+	Nemesis.loadDataToVRAM(0x0ad472, 0xabe0)
+	Nemesis.loadDataToVRAM(0x0ad5f4, 0xdf00)
+	Nemesis.loadDataToVRAM(0x0ad650, 0xf020)
+
+	A0 = 0x0ad650
+	A4 = 0xffffe020
+	fn0015cc()
+
+	Nemesis.loadDataToVRAM(0x0ad7bc, 0xb120)
+	Nemesis.loadDataToVRAM(0x0ad430, 0xf400)
+
+	copyRectToVRAM(0x008d2c, 0xc084, 0x08, 0x03)
+	copyRectToVRAM(0x008d2c, 0xc0bc, 0x08, 0x03)
+
+	Enigma.decompress(0x0aedb0, 0xffff0000, 0x459b)
+	copyRectToVRAM(0xffff0000, 0xe000, 0x40, 0x20)
+
+	Kosinski.decompress(0x0b2e36, 0xffff0000)
+
+	fn009ea0()
+	fn00a0e6()
+
+	global.level_started = 0
+	bluespheres.bs_hud_dirty = 0xff
+	bluespheres.rings_flags = 0x80
+	bluespheres.current_gamespeed = 0x1000
+	bluespheres.speedup_countdown = BlueSpheres.useGeneratedStages() ? 2700 : 1800
+	camera.foreground.x.u16 = 0
+	camera.foreground.y.u16 = 0
+	level.height.bitmask = 0xffff
+
+	u32[0xffffb000] = 0x008faa
+	if (getNumPlayers() >= 2)
+	{
+		u32[0xffffb04a] = 0x009212
+	}
+	u32[0xffffb094] = 0x008df8
+	u32[0xffffb0de] = 0x008e40
+	UpdateGameObjects()
+
+	fn009d9e()
+	fn009dde()
+	RenderSprites()
+
+	BlueSpheres.RenderSpheres()
+	fn009d5e()
+
+	u8[0xffffe433] = 0x01
+	global.frame_state = 0x1c
+
+	waitForNextFrame()
+
+	u8[0xffffe433] = 0
+	VDP.Config.setRenderingModeConfiguration(true)		// Enable shadow/highlight palette mode
+
+	global.demo_countdown = 1800
+	fn0075d2()
+
+#if STANDALONE
+	if (BlueSpheres.useGeneratedStages())
+	{
+		playMusic(0xf8)		// Different music track, one that speeds up the music only every 45 (instead of 30) seconds
+	}
+	else
+#endif
+	{
+		playMusic(0x1c)
+	}
+
+	VDP.Config.setActiveDisplay(true)
+	BlueSpheres.FadeIn()
+
+	while (true)
+	{
+		UpdateGamePause()
+		global.frame_state = 0x1c
+		Kosinski.ProcessDecompressionQueue()
+
+		waitForNextFrame()
+	@EntryPoint:
+
+		++level.framecounter
+		UpdateRollingDemo()
+		UpdateGameObjects()
+
+		fn009d9e()
+		fn009dde()
+		RenderSprites()
+
+		BlueSpheres.RenderSpheres()
+		BlueSpheres.RenderCharacterSprites()
+		fn009d5e()
+		fn009b62()
+
+	#if GAMEAPP
+		BlueSpheres.renderCustomGround()
+		BlueSpheres.renderCustomCharacterShadows()
+	#else
+	#if STANDALONE
+		Renderer.setViewport(getScreenExtend(), 0, 320, 224, 0x0000)
+	#endif
+	#endif
+
+		LoadRequiredSpritePatterns()
+		Kosinski.ProcessModules()
+
+		if (global.rolling_demo && global.demo_countdown == 0)
+			break
+
+		if (global.game_mode != 0x34)	// Blue Spheres game mode
+			break
+
+	#if STANDALONE
+		// Only needed to support restart from the Pause Menu
+		//  -> Not used at the moment, so nevermind
+		if (level.restart)
+		{
+			global.game_mode = 0x0c
+			return
+		}
+	#endif
+	}
+
+	if (global.rolling_demo)
+	{
+		global.game_mode = 0
+	}
+
+	global.demo_countdown = 60
+	palette_fade.range = 0x003f
+	u16[0xfffff794] = 0
+
+	while (true)
+	{
+		global.frame_state = 0x1c
+
+		waitForNextFrame()
+
+		UpdateRollingDemo()
+		UpdateGameObjects()
+
+		fn009d9e()
+		fn009dde()
+		RenderSprites()
+
+		BlueSpheres.RenderSpheres()
+		fn009d5e()
+		fn009b62()
+
+	#if GAMEAPP
+		BlueSpheres.renderCustomGround()
+		BlueSpheres.renderCustomCharacterShadows()
+	#else
+	#if STANDALONE
+		Renderer.setViewport(getScreenExtend(), 0, 320, 224, 0x0000)
+	#endif
+	#endif
+
+		LoadRequiredSpritePatterns()
+		Kosinski.ProcessModules()
+
+		--u16[0xfffff794]
+		if (s16[0xfffff794] < 0)
+		{
+			u16[0xfffff794] = 2
+			FadePaletteToWhite()
+		}
+
+		if (global.demo_countdown == 0)
+			break
+	}
+}
+
+
+function bool BlueSpheres.useGeneratedStages()
+{
+#if STANDALONE
+	if (Game.getSetting(SETTING_RANDOM_SPECIALSTAGES))
+		return true
+#endif
+	return (bluespheres.minigame_mode != 0)
+}
+
+
+function u8 BlueSpheres.getNextOpenStageIndex()
+{
+	if (debug_mode.unlocked && (control.pad1.state & CONTROL_A))
+	{
+		D0 = levelselect.soundtest
+	}
+	else
+	{
+		bool hasSuperEmerald = (global.lock_on_state == 0 && global.sk_bluespheres)
+		u8 emeraldCount = hasSuperEmerald ? global.super_emeralds : global.chaos_emeralds
+
+		D0 = global.next_bluespheres
+		if (emeraldCount < 7)
+		{
+			D1 = 5
+			D2 = hasSuperEmerald ? 2 : 0
+
+			while (u8[0xffffffb2 + D0.u16] != D2.u8)
+			{
+				++D0.u16
+				if (D0.u16 >= 7)
+				{
+					D0 = 0
+					--D1.s16
+					if (D1.s16 < 0)
+					{
+						D0 = 7
+						break
+					}
+				}
+			}
+		}
+	}
+
+	D0.u16 &= 0x07
+	return D0.u8
+}
+
+
+//# address-hook(0x0085b0) end(0x0087b8)
+function void fn0085b0()
+{
+	bool useSKLayouts = (global.lock_on_state != 0 || global.sk_bluespheres)
+	bool useGeneratedStage = BlueSpheres.useGeneratedStages()
+	bool isGeneratedStageInMainGame = (useGeneratedStage && bluespheres.minigame_mode == 0)
+
+	if (!useGeneratedStage)
+	{
+		// Main game stages
+		Kosinski.decompress(u32[0x1e4078], 0xffff0000)
+
+		global.next_bluespheres = BlueSpheres.getNextOpenStageIndex()
+
+		// Load level layout, either from S3 or S&K
+		A2 = useSKLayouts ? 0x008590 : 0x25e2d8
+		A2 = u32[A2 + global.next_bluespheres * 4]
+		if (!useSKLayouts)
+		{
+			A2 += 0x200000
+		}
+
+		zeroMemory(0xfffff000, 0x100)
+		copyMemory(0xfffff100, A2, 0x400)
+		zeroMemory(0xfffff500, 0x100)
+		A2 += 0x400
+
+		u16[0xffffe426] = u16[A2]
+		bluespheres.position.x = u16[A2+2]
+		bluespheres.position.y = u16[A2+4]
+		bluespheres.rings_remaining = u16[A2+6]
+
+		A1 = u32[0x0088ba + global.next_bluespheres * 0x10]
+		if (useSKLayouts)
+		{
+			A1 += 0x0130
+		}
+	}
+	else
+	{
+		// Bluespheres mini-game mode
+		Kosinski.decompress(u32[0x1e407c], 0xffff0000)	// Loads lookup data for the 0x80 quarter layouts, total size is 0x900 bytes
+
+		zeroMemory(0xfffff000, 0x600)
+
+	#if STANDALONE
+		if (isGeneratedStageInMainGame)
+		{
+			// Most of the "magic numbers" you see are more or less arbitrary numbers
+			u32 stageNumber = 0x13571113 + u32(global.game_random_base) * 0x09070503 + global.next_bluespheres + global.sk_bluespheres * 8
+
+			// Limit difficulty to a maximum value of 6, as higher ones tend to get kind of unfair if you can't just try them over and over again
+			u8 difficulty = 0xff
+			while (difficulty > 6)
+			{
+				stageNumber += 0x050b030f
+				BlueSphere.setGeneratedStage(stageNumber)
+
+				difficulty = 0
+				for (u8 quarter = 0; quarter < 4; ++quarter)
+				{
+					u16 type = u8[0xffffffa2 + quarter] & 0x7f
+					if (type == 0x6d)		// Do not allow type 0x6d specifically, because it is EVIL!
+						difficulty += 0x10
+					difficulty += u8[0xffff0080 + type]
+				}
+			}
+		}
+
+		if (bluespheres.minigame_mode == 0)
+		{
+			global.next_bluespheres = BlueSpheres.getNextOpenStageIndex()
+		}
+		else
+	#endif
+		{
+			global.next_bluespheres = 0
+		}
+
+		bluespheres.direction = 0x40
+		u8[0xffffe427] = 0
+		bluespheres.position.x = 0x1000
+		bluespheres.position.y = 0x0300
+		bluespheres.rings_remaining = 0
+		u16[0xffffffac] = 0
+
+		// To build the generated stage, cycle through 4 quarters that get selected individually
+		for (u8 quarter = 0; quarter < 4; ++quarter)
+		{
+			u16 type = u8[0xffffffa2 + quarter] & 0x7f
+			bluespheres.rings_remaining += u8[0xffff0000 + type]
+			u16[0xffffffac] += u8[0xffff0080 + type]				// Affects the difficulty (stored in upper byte)
+
+			A2 = 0xffff0100 + (type << 8)
+			A1 = 0x0087ba + quarter * 8
+			D3.u16 = u16[A1]
+			D4.u16 = u16[A1+2]
+			D5.u16 = u16[A1+4]
+			D0.u16 = u16[A1+6]
+
+			A3 = 0xfffff100 + D0.u16
+			for (u8 y = 0; y < 0x10; ++y)
+			{
+				u16 offset = D4.u16
+				for (u8 x = 0; x < 0x10; ++x)
+				{
+					u8[A3 + x] = u8[A2 + offset]
+					offset += D3.u16
+				}
+				A3 += 0x20
+				D4.u16 += D5.u16
+			}
+		}
+
+		A1 = u32[0x0088ba + (u8[0xffffffa4] & 0x07) * 0x10]
+		if (u8[0xffffffa4] & 0x08)
+		{
+			A1 += 0x0130
+		}
+	}
+
+	// Load colors
+	u32[0xffffe446] = A1
+	A2 = 0xfffffc80
+	copyMemory(A2 + 0x70, A1, 0x10)			// Ground colors
+	copyMemory(A2 + 0x50, A1 + 0x20, 6)		// Emerald colors
+
+#if STANDALONE
+	if (isGeneratedStageInMainGame)
+	{
+		// Overwrite the emerald colors with teh correct ones
+		A1 = u32[0x0088ba + global.next_bluespheres * 0x10]
+		if (useSKLayouts)
+		{
+			A1 += 0x0130
+		}
+		copyMemory(A2 + 0x50, A1 + 0x20, 6)
+	}
+#endif
+}
+
+
+//# address-hook(0x0087da) end(0x008818)
+function void fn0087da()
+{
+	if (u8[0xffffe433] == 0)
+	{
+		D0.u16 = u16[0xffffe420]
+		if (D0.u16 >= 0x10)
+		{
+			if (s8[0xffffe42a] >= 0)
+				return
+
+			D0.u16 = u8[0xffffe42f]
+		}
+
+		D0.u16 = 0x10 - (D0.u16 & 0x0e)
+		A1 = u32[0xffffe446] + D0.u16
+		copyMemory(0xfffffc70, A1, 0x10)
+	}
+}
+
+
+//# address-hook(0x00881a) end(0x0088b4)
+function void fn00881a()
+{
+	A1 = 0x0088b6
+	D0.u16 = u16[0xffffe420]
+	if (D0.u8 != u8[0xffffe42c])
+	{
+		u8[0xffffe42c] = D0.u8
+		D0.u16 <<= 3
+		A3 = u32[A1 + D0.s16]
+
+		// Direct VRAM write
+		VDP.setupVRAMWrite(0xc19e)
+		VDP.copyToVRAM(A3 + 0x010e, 0x14)
+
+		A3 += 0x0140
+		u16 vramAddress = 0xc200
+		for (u8 y = 0; y < 0x18; ++y)
+		{
+			VDP.setupVRAMWrite(vramAddress)
+			VDP.copyToVRAM(A3, 0x50)
+			vramAddress += 0x80
+			A3 += 0x50
+		}
+	}
+
+	if (bluespheres.bs_hud_dirty)
+	{
+		bluespheres.bs_hud_dirty = 0
+		D0 = 0x40860003
+		D1.u16 = bluespheres.blue_remaining
+		fn008c5e()
+	}
+
+	if (bluespheres.rings_flags & 0x80)
+	{
+		bluespheres.rings_flags &= ~0x80
+		D0 = 0x40be0003
+		D1.u16 = (bluespheres.minigame_mode || Game.getSetting(SETTING_BS_COUNTDOWN_RINGS)) ? bluespheres.rings_remaining : bluespheres.rings_collected
+		fn008c5e()
+	}
+}
+
+
+//# address-hook(0x008c5e) end(0x008cac)
+function void fn008c5e()
+{
+	// Update of blue spheres counter in HUD
+
+	u16 vramAddress = VDPHelper.getVRAMAddressFromWriteCode(D0)
+	A1 = 0x008cb4
+	A2 = 0x008cae
+	D6 = 2
+
+	while (D6.s16 >= 0)
+	{
+		D2 = 0
+		D3.u16 = u16[(A2+=2)-2]
+		while (true)
+		{
+			D1.u16 -= D3.u16
+			if (D1.s16 < 0)
+				break
+
+			++D2.u16
+		}
+
+		D1.u16 += D3.u16
+		A3 = A1 + D2.s16 * 4
+
+		VDP.setupVRAMWrite(vramAddress)
+		VDP.writeData32(u32[A3])
+
+		VDP.setupVRAMWrite(vramAddress + 0x80)
+		VDP.writeData32(u32[A3 + 0x28])
+
+		VDP.setupVRAMWrite(vramAddress + 0x100)
+		VDP.writeData32(u32[A3 + 0x50])
+
+		vramAddress += 4
+		--D6.s16
+	}
+}
+
+
+//# address-hook(0x008d5c) end(0x008d76)
+function void fn008d5c()
+{
+	A1 = A0
+	D0.u16 = (0xcf82 - A0.u16) >> 6
+	D0.u16 = u8[0x008d78 + D0.s16]
+	while (D0.s16 >= 0)
+	{
+		A1 += 0x4a
+		--D0.s16
+		if (u32[A1] == 0)
+			break
+	}
+	_setZeroFlagByValue(0)	// Is this correct?
+}
+
+
+
+// HUD: Icons next to ring and spheres counters
+
+//# address-hook(0x008df8) end(0x008e2a)
+function void fn008df8()
+{
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x80
+	objA0.sprite_priority = 0
+	objA0.mapping_offset = 0x008e30
+	objA0.sprite_attributes = 0xc589
+	objA0.position.x.u16 = 0x120 + getScreenExtend()
+	objA0.position.y.u16 = 0x94
+	objA0.update_address = 0x008e2a
+	DrawObject()
+}
+
+
+//# address-hook(0x008e2a) end(0x008e2a)
+function void fn008e2a()
+{
+	DrawObject()
+}
+
+
+
+// "Get Blue Spheres" text (consists of two objects)
+
+//# address-hook(0x008e40) end(0x008e56)
+function void fn008e40()
+{
+	fn008d5c()
+	if (_equal())
+	{
+		objA1.update_address = 0x008e5c
+		u8[A1 + 0x2a] |= 0x01
+		u8[A1 + 0x22] = 0x01
+	}
+	fn008e5c()
+}
+
+
+//# address-hook(0x008e5c) end(0x008e8e)
+function void fn008e5c()
+{
+	objA0.box_size.x = 0x80
+	objA0.box_size.y = 0x80
+	objA0.sprite_priority = 0
+	objA0.mapping_offset = 0x008f5e
+	objA0.sprite_attributes = 0xa55f
+	objA0.position.x.u16 = 0x120 + getScreenExtend()
+	objA0.position.y.u16 = 0xe8
+	objA0.value32 = 0xb4
+
+	objA0.update_address = 0x008e94
+	fn008e94()
+}
+
+
+//# address-hook(0x008e94) end(0x008ee6)
+function void fn008e94()
+{
+	if (objA0.value32 != 0)
+	{
+		// Still waiting
+		--objA0.value32
+	}
+	else
+	{
+		if (u16[A0 + 0x30] >= 0xc0 + getScreenExtend())
+		{
+			// Change text to "Perfect" in case it's needed afterwards
+			objA0.update_address = 0x008eec
+			objA0.animation.sprite += 2
+			if (bluespheres.movement_speed == 0)
+			{
+				// Player did not press [up], but it's time to start nonetheless
+				bluespheres.going_forward = 1
+				bluespheres.started_running = 1
+			}
+		}
+		else
+		{
+			u16[A0 + 0x30] += 0x10
+		}
+
+		// Update position during animation
+		D0.u16 = 0x120 + getScreenExtend()
+		D0.s16 += (objA0.flags2a & 0x01) ? s16[A0 + 0x30] : -s16[A0 + 0x30]
+		objA0.position.x.u16 = D0.u16
+	}
+
+	DrawObject()
+}
+
+
+//# address-hook(0x008eec) end(0x008f1e)
+function void fn008eec()
+{
+	if (bluespheres.rings_remaining != 0)
+		return
+
+	u16[A0 + 0x30] -= 0x10
+	if (u16[A0 + 0x30] == 0)
+	{
+		objA0.update_address = 0x008f24
+		objA0.value32 = 0xb4
+	}
+
+	D0.u16 = 0x120 + getScreenExtend()
+	D0.s16 += (objA0.flags2a & 0x01) ? s16[A0 + 0x30] : -s16[A0 + 0x30]
+	objA0.position.x.u16 = D0.u16
+
+	DrawObject()
+}
+
+
+//# address-hook(0x008f24) end(0x008f58)
+function void fn008f24()
+{
+	if (objA0.value32 != 0)
+	{
+		--objA0.value32
+		DrawObject()
+		return
+	}
+
+	if (u16[A0 + 0x30] < 0xc0 + getScreenExtend())
+	{
+		u16[A0 + 0x30] += 0x10
+	}
+
+	D0.u16 = 0x120 + getScreenExtend()
+	D0.s16 += (objA0.flags2a & 0x01) ? s16[A0 + 0x30] : -s16[A0 + 0x30]
+	objA0.position.x.u16 = D0.u16
+
+	DrawObject()
+}
+
+
+
+// Main character
+
+//# address-hook(0x008faa) end(0x009038)
+function void fn008faa()
+{
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0200
+	objA0.mapping_offset = 0x0abdfc
+	objA0.sprite_attributes = 0x87d4
+
+	if (global.characters == CHARS_TAILS_ALONE)
+	{
+		objA0.mapping_offset = 0x2908ba
+		objA0.sprite_attributes = 0xa7eb
+
+		fn008d5c()
+		if (_equal())
+		{
+			// Spawn tails object
+			objA1.update_address = 0x009444
+			u16[A1 + 0x3e] = A0.u16
+		}
+	}
+
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		objA0.mapping_offset = 0x0ad302
+		objA0.sprite_attributes = 0x87d4
+	}
+
+	u16[A0 + 0x30] = 0xa0
+	objA0.value32 = 0x70
+	u16[A0 + 0x34] = 0
+	u16[A0 + 0x36] = -0x800
+	u16[A0 + 0x38] = 0
+
+	fn00950c()
+	objA0.value3a = 0xff
+
+	objA0.update_address = 0x00903e
+	fn00903e()
+}
+
+
+//# address-hook(0x00903e) end(0x00919e)
+function void fn00903e()
+{
+	if (bluespheres.speedup_countdown != 0)
+	{
+		--bluespheres.speedup_countdown
+		if (bluespheres.speedup_countdown == 0)
+		{
+			// Increase speed (up to four times)
+			bluespheres.speedup_countdown = BlueSpheres.useGeneratedStages() ? 2700 : 1800
+			if (bluespheres.current_gamespeed < 0x2000)
+			{
+				bluespheres.current_gamespeed += 0x400
+
+				// Tempo values are (in that order):
+				//  0x20, 0x18, 0x10, 0x08
+				//  -> The music speed steps are: normal speed, +1/16, +1/12, +1/8, +1/4
+				//  -> Each for 30 seconds (or 45 seconds for generated stages)
+				D0.u8 = 0x48 - (bluespheres.current_gamespeed >> 8) * 2
+				changeMusicTempo(D0.u8)
+			}
+		}
+	}
+
+	fn009580()
+
+	D0 = 0x0c
+	if (bluespheres.movement_speed != 0)
+	{
+		u16[A0 + 0x24] += bluespheres.movement_speed >> 5
+		D0 = objA0.animation.timer
+		if (D0.s8 < 0)
+		{
+			D0.u8 += 0x0c
+		}
+		else if (D0.u8 >= 0x0c)
+		{
+			D0.u8 -= 0x0c
+		}
+	}
+
+	objA0.animation.timer = D0.u8
+	if (u8[0xffffe432] & 0x80)
+	{
+		A1 = 0x0091f6
+		if (bluespheres.movement_speed == 0)
+		{
+			D0.u16 = level.framecounter.low & 0x03
+		}
+	}
+	else
+	{
+		A1 = 0x0091e8
+	}
+
+	objA0.animation.sprite = u8[A1 + D0.s16]
+	if ((u8[0xffffe432] & 0x80) == 0 && u8[0xffffe44c] == 0 && (control.pad1.pressed & CONTROL_ABC))
+	{
+		u8[0xffffe432] = 1
+	}
+
+	D0.u8 = bluespheres.direction & 0x3f
+	if (D0.u8 == 0)
+	{
+		if (u8[0xffffe432] == 1)
+		{
+			u32[A0 + 0x40] = 0xfff00000
+			u8[0xffffe432] = 0x80
+			bluespheres.next_direction = 0
+			playSound(0x62)
+		}
+
+		if (u8[0xffffe432] & 0x80)
+		{
+			D0 = u32[A0 + 0x3c] + u32[A0 + 0x40]
+			if (D0.s32 >= 0)
+			{
+				D0 = 0
+				u32[A0 + 0x40] = 0
+				u8[0xffffe432] = 0
+			}
+
+			u32[A0 + 0x40] += bluespheres.current_gamespeed << 4
+			u32[A0 + 0x3c] = D0
+			D0 = (D0 << 16) + (D0 >> 16)
+			D0.u16 -= 0x800
+			u16[A0 + 0x36] = D0.u16
+		}
+	}
+
+	fn00950c()
+	fn00953e()
+	DrawObject()
+
+	if (isMainCharacter(CHARACTER_TAILS))
+	{
+		A2 = 0x2908d2
+		D6 = 0x28f95a
+		D4.u16 = 0xfd60
+	}
+	else if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		A2 = 0x0ad31a
+		D6 = 0x0abf22
+		D4.u16 = 0xfa80
+	}
+	else
+	{
+		A2 = 0x0abe14
+		D6 = 0x0aaa7c
+		D4.u16 = 0xfa80
+	}
+
+	fn0091a2()
+}
+
+
+//# address-hook(0x0091a2) end(0x0091e6)
+function void fn0091a2()
+{
+	if (objA0.value3a != objA0.animation.sprite)
+	{
+		objA0.value3a = objA0.animation.sprite
+		updateMultipleSpritePatterns(D6, A2, D4.u16, objA0.animation.sprite)
+	}
+}
+
+
+
+// Second character Tails
+
+//# address-hook(0x009212) end(0x009274)
+function void fn009212()
+{
+	objA0.render_flags = 0x04
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0180
+	objA0.mapping_offset = 0x2908ba
+	objA0.sprite_attributes = 0xa7eb
+	u16[A0 + 0x30] = 0xa0
+	objA0.value32 = 0x70
+	u16[A0 + 0x34] = 0
+	u16[A0 + 0x36] = 0xf800
+	u16[A0 + 0x38] = 0xffe0
+	objA0.value3a = 0xff
+
+	fn0093e2()
+
+	fn008d5c()
+	if (_equal())
+	{
+		objA1.update_address = 0x009444
+		u16[A1 + 0x3e] = A0.u16
+	}
+
+	objA0.update_address = 0x00927a
+	fn00927a()
+}
+
+
+//# address-hook(0x00927a) end(0x009378)
+function void fn00927a()
+{
+	D0 = 0x0c
+	D1.u16 = bluespheres.movement_speed
+	if (D1.u16 != 0)
+	{
+		D1.s16 >>= 5
+		u16[A0 + 0x24] += D1.u16
+		D0 = objA0.animation.timer
+		if (D0.s8 < 0)
+		{
+			D0.u8 += 0x0c
+		}
+		else if (D0.u8 >= 0x0c)
+		{
+			D0.u8 -= 0x0c
+		}
+	}
+	objA0.animation.timer = D0.u8
+
+	A1 = 0x0091e8
+	if (u8[0xffffe440] != 0)
+	{
+		A1 = 0x009204
+		D1.u16 = bluespheres.movement_speed
+		if (D1.u16 == 0)
+		{
+			D0.u8 = level.framecounter.low
+			D0.u16 &= 0x03
+		}
+	}
+	objA0.animation.sprite = u8[A1 + D0.s16]
+
+	fn009402()
+
+	if (u8[A0 + 0x44] == 0x05 && u8[0xffffe44c] == 0 && s8[0xffffe440] >= 0)
+	{
+		if ((bluespheres.direction & 0x3f) == 0)
+		{
+			u32[A0 + 0x40] = 0xffe80000
+			u8[0xffffe440] = 0x81
+			playSound(0xb1)
+		}
+	}
+
+	fn00937c()
+	D0.u16 &= 0x70
+	if (D0.u16 != 0 && u8[0xffffe440] == 0)
+	{
+		u32[A0 + 0x40] = 0xfff00000
+		u8[0xffffe440] = 0x80
+		playSound(0x62)
+	}
+
+	if (s8[0xffffe440] < 0)
+	{
+		D0 = u32[A0 + 0x3c] + u32[A0 + 0x40]
+		if (D0.s32 >= 0)
+		{
+			D0 = 0
+			u32[A0 + 0x40] = 0
+			u8[0xffffe440] = 0
+		}
+		D1.s32 = s16(bluespheres.current_gamespeed) << 4
+		u32[A0 + 0x40] += D1
+		u32[A0 + 0x3c] = D0
+		D0 = (D0 << 16) + (D0 >> 16)
+		D0.u16 -= 0x800
+		u16[A0 + 0x36] = D0.u16
+	}
+
+	fn00953e()
+	DrawObject()
+
+	A2 = 0x2908d2
+	D6 = 0x28f95a
+	D4.u16 = 0xfd60
+	fn0091a2()
+}
+
+
+//# address-hook(0x00937c) end(0x0093e0)
+function void fn00937c()
+{
+	D0.u16 = posbackup.offset.player1
+	A1 = 0xffffe500 + D0.s16
+	u16[A1] = control.pad1
+	u8[A1 + 0x02] = u8[0xffffe432]
+	u8[0xffffee27] += 4
+	D0.u8 = control.pad2.state & 0x7f
+	if (D0.u8 != 0)
+	{
+		tails.control_counter = 600
+	}
+	if (tails.control_counter != 0)
+	{
+		--tails.control_counter
+		D0.u16 = control.pad2
+		return
+	}
+
+	A1 = 0xffffe500
+	D1.u16 = 0x10
+	D0.u16 = posbackup.offset.player1
+	D0.u8 -= D1.u8
+	D2.u8 = u8[A1 + D0.u16 + 0x02]
+	D0.u8 -= 4
+	D1.u8 = u8[A1 + D0.u16 + 0x02]
+	D0 = (D2.u8 == 0x81 || D1.s8 >= 0) ? 0 : 0x70
+}
+
+
+//# address-hook(0x0093e2) end(0x009400)
+function void fn0093e2()
+{
+	zeroMemory(0xffffe500, 0x100)
+	posbackup.offset.player1 = 0
+	tails.control_counter = 0
+}
+
+
+//# address-hook(0x009402) end(0x009442)
+function void fn009402()
+{
+	D0.u16 = ((bluespheres.position.x + 0x80) >> 8) & 0x1f
+	D1.u16 = ((bluespheres.position.y + 0x80) >> 8) & 0x1f
+	D1.u16 <<= 5
+	D1.u8 |= D0.u8
+
+	A1 = 0xfffff100 + D1.u16
+	A2 = A0 + 0x44
+	u8[A2] = u8[A2 + 0x01]
+	u8[A2 + 0x01] = u8[A2 + 0x02]
+	u8[A2 + 0x02] = u8[A2 + 0x03]
+	u8[A2 + 0x03] = u8[A1]
+}
+
+
+
+// Tails' tails
+
+//# address-hook(0x009444) end(0x009482)
+function void fn009444()
+{
+	objA0.render_flags = render_flag.WORLD
+	objA0.box_size.x = 0x10
+	objA0.box_size.y = 0x10
+	objA0.sprite_priority = 0x0100
+	objA0.mapping_offset = 0x2910e8
+	objA0.sprite_attributes = 0xa7b0
+	u16[A0 + 0x30] = getScreenWidth() / 2
+	objA0.value32 = 0x70
+	objA0.value3a = 0xff
+	objA0.animation.sprite = 1
+
+	objA0.update_address = 0x009488
+	fn009488()
+}
+
+
+//# address-hook(0x009488) end(0x0094d2)
+function void fn009488()
+{
+	A1 = 0xffff0000 + objA0.value3e
+	objA0.position.x.u16 = objA1.position.x.u16
+	objA0.position.y.u16 = objA1.position.y.u16
+
+	D0.u16 = 0x2aaa
+	D1.s16 = bluespheres.movement_speed
+	if (D1.s16 >= 0)
+	{
+		D0.u16 += D1.s16
+	}
+
+	u32 result = u32(u16[A0 + 0x24]) + u32(D0.u16)
+	u16[A0 + 0x24] = u16(result)
+	if (result & 0x10000)	// Carry flag check
+	{
+		++objA0.animation.sprite
+		if (objA0.animation.sprite >= 15)
+		{
+			objA0.animation.sprite = 1
+		}
+	}
+
+	DrawObject()
+
+	A2 = 0x291106
+	D6 = 0x2909e8
+	D4.u16 = 0xf600
+	fn0091a2()
+}
+
+
+
+//# address-hook(0x0094d6) end(0x0094fa)
+function void BlueSpheres.RenderCharacterSprites()
+{
+	A3 = 0x0094fc
+	for (u8 i = 0; i < getNumPlayers(); ++i)
+	{
+		u16[A6]   = u16[A3]
+		 u8[A6+2] =  u8[A3+2]
+		u16[A6+4] = u16[A3+4]
+		u16[A6+6] = u16[A3+6]
+		A6 += 8
+		A3 += 8
+	}
+}
+
+
+//# address-hook(0x00950c) end(0x00953c)
+function void fn00950c()
+{
+	D0.u16 = u16[0xffffe404]
+	A1 = 0xffffe40e
+	fn00a24c()
+
+	D0.u16 = u16[0xffffe402]
+	A1 = 0xffffe40a
+	fn00a24c()
+
+	D0.u16 = u16[0xffffe400]
+	A1 = 0xffffe406
+	fn00a24c()
+
+	D0.u16 = 0xe0
+	A1 = 0xffffe41c
+	fn00a24c()
+}
+
+
+//# address-hook(0x00953e) end(0x00957e)
+function void fn00953e()
+{
+	D1.u16 = u16[A0 + 0x34]
+	D2.u16 = u16[A0 + 0x36]
+	D0.u16 = u16[A0 + 0x38]
+
+	fn00a1dc()
+	fn00a1b2()
+	fn00a188()
+
+	D0.u16 += 0x0100
+	D2.u16 += 0x0980
+	fn00a206()
+
+	D1.s32 = D1.s16
+	D1 <<= 8
+	D1.s16 = D1.s32 / D0.s16
+	D2.s32 = D2.s16
+	D2 <<= 8
+	D2.s16 = D2.s32 / D0.s16
+	D1.u16 += u16[A0 + 0x30]
+	objA0.position.x.u16 = D1.u16 + getScreenExtend()
+	D2.u16 += objA0.value32
+	objA0.position.y.u16 = D2.u16
+}
+
+
+//# address-hook(0x009580) end(0x00972c)
+function void fn009580()
+{
+	if (u8[0xffffe433] != 0)
+	{
+		if (u8[0xffffe433] < 0x61)
+		{
+			D1 = 8
+			bluespheres.direction += 8
+			++u8[0xffffe433]
+			return
+		}
+
+		D0.u16 = (bluespheres.position.x | bluespheres.position.y) & 0xe0
+		if (D0.u16 != 0)
+		{
+			u8[0xffffe433] = 0
+		}
+	}
+
+	D3.u16 = (bluespheres.direction & 0x40) ? bluespheres.position.x : bluespheres.position.y
+	D3.u16 &= 0xe0
+	D2 = 0
+	if (bluespheres.next_direction != 0 && D3.u16 == 0)
+	{
+		if ((u8[0xffffe432] & 0x80) == 0)
+		{
+			bluespheres.direction += bluespheres.next_direction
+			if ((bluespheres.direction & 0x3f) != 0)
+				return
+
+			bluespheres.next_direction = 0
+			if (bluespheres.movement_speed != 0)
+			{
+				u8[0xffffe430] = 1
+			}
+		}
+	}
+	else
+	{
+		if (D3.u16 != 0)
+		{
+			u8[0xffffe430] = 0
+		}
+	}
+
+	D1.u8 = control.pad1.state
+	D2.s16 = bluespheres.movement_speed
+	if (u8[0xffffe44c] == 0)
+	{
+		if (u8[0xffffe42b] == 0)
+		{
+			if (D1 & CONTROL_UP)
+			{
+				bluespheres.going_forward = 1
+				bluespheres.started_running = 1
+			}
+
+			// Acceleration / deceleration
+			if (bluespheres.going_forward)
+			{
+				bluespheres.movement_speed = min(bluespheres.movement_speed + 0x200, s16(bluespheres.current_gamespeed))
+			}
+			else if (bluespheres.started_running)
+			{
+				if (bluespheres.movement_speed < 0)
+				{
+					bluespheres.movement_speed = max(bluespheres.movement_speed - 0x200, -s16(bluespheres.current_gamespeed))
+				}
+				else
+				{
+					bluespheres.movement_speed = min(bluespheres.movement_speed + 0x200, s16(bluespheres.current_gamespeed))
+				}
+			}
+			D2.s16 = bluespheres.movement_speed
+		}
+
+		if (u8[0xffffe430] == 0)
+		{
+			if (D1 & CONTROL_LEFT)
+			{
+				bluespheres.next_direction = 4
+			}
+			if (D1 & CONTROL_RIGHT)
+			{
+				bluespheres.next_direction = -4
+			}
+		}
+
+		if (u8[0xffffe42b] != 0)
+		{
+			D0.u16 = (bluespheres.direction & 0x40) ? bluespheres.position.x : bluespheres.position.y
+			if ((D0.u16 & 0xe0) == 0)
+			{
+				D0.u16 = ((bluespheres.position.x + 0x80) >> 8) & 0x1f
+				D1.u16 = ((bluespheres.position.y + 0x80) >> 8) & 0x1f
+				D1.u16 = (D1.u16 << 5) | D0.u16
+				if (D1.u16 != u16[0xffffe44e])
+				{
+					u8[0xffffe42b] = 0
+					bluespheres.movement_speed = (bluespheres.movement_speed >= 0) ? -bluespheres.current_gamespeed : bluespheres.current_gamespeed
+					return
+				}
+			}
+
+			if (bluespheres.movement_speed == 0)
+			{
+				u8[0xffffe42b] = 0
+				bluespheres.going_forward = 1
+				bluespheres.movement_speed = (bluespheres.movement_speed >= 0) ? -bluespheres.current_gamespeed : bluespheres.current_gamespeed
+			}
+			else
+			{
+				D2.s16 = -D2.s16
+			}
+		}
+	}
+
+	if (u8[0xffffe432] == 0x81)
+	{
+		D2.s16 *= 2
+	}
+
+	D0.u8 = bluespheres.direction
+	LookupSinCos()
+	D0.s32 = s32(D0.s16) * D2.s16
+	D1.s32 = s32(D1.s16) * D2.s16
+	bluespheres.position.x -= D0 >> 16
+	bluespheres.position.y -= D1 >> 16
+
+	if ((u8[0xffffe432] & 0x80) == 0 && u8[0xffffe44c] == 0)
+	{
+		fn00972e()
+	}
+}
+
+
+//# address-hook(0x00972e) end(0x0098ae)
+function void fn00972e()
+{
+	A1 = 0xfffff100
+	D0.u16 = ((bluespheres.position.x + 0x80) >> 8) & 0x1f
+	D1.u16 = ((bluespheres.position.y + 0x80) >> 8) & 0x1f
+	D1.u16 <<= 5
+	D1.u8 |= D0.u8
+	A1 += D1.s16
+	D2.u8 = u8[A1]
+
+	if (D2.u8 == 1)
+	{
+		// Ran into red sphere
+		D0.u16 = (bluespheres.position.x | bluespheres.position.y) & 0xe0
+		if (D0.u16 == 0 && u8[0xffffe433] == 0)
+		{
+			// Game over
+			u8[0xffffe433] = 1
+			global.game_mode = (bluespheres.minigame_mode == 0) ? 0x48 : 0x2c
+			if (global.stage_type != 0)
+			{
+				global.zone_act = level.backup.zone_act
+				checkpoint.number |= 0x80
+			}
+			playSound(0x6a)
+		}
+	}
+	else if (D2.u8 == 2)
+	{
+		// Approaching blue sphere
+		fn009dca()
+		if (_equal())
+		{
+			u8[A2] = 2
+			u32[A2 + 0x04] = A1
+		}
+		playSound(0x65)
+	}
+	else if (D2.u8 == 3)
+	{
+		// Running into bumber
+		if (u8[0xffffe42b] == 0)
+		{
+			u16[0xffffe44e] = D1.u16
+			u8[0xffffe42b] = 1
+			bluespheres.going_forward = 0
+			playSound(0xaa)
+		}
+	}
+	else if (D2.u8 == 4)
+	{
+		// Collecting ring
+		//  -> Gets collected already when approaching the position
+		fn009dca()
+		if (_equal())
+		{
+			u8[A2] = 1
+			u32[A2 + 0x04] = A1
+		}
+
+		if (bluespheres.rings_remaining != 0)
+		{
+			--bluespheres.rings_remaining
+			if (bluespheres.rings_remaining == 0)
+			{
+				playMusic(0x68)
+			}
+		}
+
+		++bluespheres.rings_collected
+		bluespheres.rings_flags |= 0x80
+
+		u8 soundId = 0x33
+		if (bluespheres.minigame_mode == 0)
+		{
+			if (bluespheres.rings_collected >= 50 && (bluespheres.rings_flags & 0x01) == 0)
+			{
+				bluespheres.rings_flags |= 0x01
+				++continues_counter
+				playMusic(0xac)
+
+			#if STANDALONE
+				if (continues_counter >= 5)
+				{
+					Game.setAchievementComplete(ACHIEVEMENT_CONTINUES)
+				}
+			#endif
+				return
+			}
+
+			if (bluespheres.rings_collected >= 100)
+			{
+				bool grantExtraLife = false
+				if ((bluespheres.rings_flags & 0x02) == 0)
+				{
+					bluespheres.rings_flags |= 0x02
+					grantExtraLife = true
+				}
+				else if (bluespheres.rings_collected >= 200 && (bluespheres.rings_flags & 0x04) == 0)
+				{
+					bluespheres.rings_flags |= 0x04
+					grantExtraLife = true
+				}
+
+				if (grantExtraLife)
+				{
+				#if STANDALONE
+					if (Game.getSetting(SETTING_INFINITE_LIVES))
+					{
+						lives_counter = 3
+					}
+					else
+					{
+						lives_counter = min(lives_counter + 1, 99)
+						soundId = 0xb9
+					}
+				#else
+					++lives_counter
+					soundId = 0xb9
+				#endif
+				}
+			}
+		}
+
+		playSound(soundId)
+	}
+	else if (D2.u8 == 5)
+	{
+		// Yellow spring sphere
+		if (u8[0xffffe44c] == 0 && (u8[0xffffe432] & 0x80) == 0)
+		{
+			D0.u8 = bluespheres.direction & 0x3f
+			if (D0.u8 == 0)
+			{
+				u32[A0 + 0x40] = 0xffe80000
+				u8[0xffffe432] = 0x81
+				playSound(0xb1)
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0098f0) end(0x009af2)
+function void BlueSpheres.RenderSpheres()
+{
+	A5 = 0x0098b0 + ((bluespheres.direction & 0xc0) >> 2)
+	D1 = 0
+	if ((bluespheres.direction & 0x40) == 0)
+	{
+		D1.u8 = bluespheres.position.y >> 8
+		D0.u16 = bluespheres.position.y
+		D2.u16 = bluespheres.position.x & 0x0100
+		D0.u16 += D2.u16
+	}
+	else
+	{
+		D1.u8 = bluespheres.position.x >> 8
+		D0.u16 = bluespheres.position.x + 0x0100
+		D2.u16 = bluespheres.position.y & 0x0100
+		D0.u16 += D2.u16
+	}
+
+	if (s8(bluespheres.direction) >= 0)
+	{
+		D0.s16 = 0x1f - D0.s16
+		D2.u16 = D0.u16 & 0xe0
+		if (D2.u16 != 0)
+		{
+			++D1.u8
+		}
+	}
+
+	D0.u16 = (D0.u16 >> 5) & 0x0f
+	u16[0xffffe420] = D0.u16
+	u8[0xffffe42f] = D0.u8
+
+	D0.u16 = bluespheres.direction & 0x38
+	if (D0.u16 != 0)
+	{
+		u16[0xffffe420] = (D0.u16 >> 3) + 0x0f
+	}
+
+#if GAMEAPP
+
+	BlueSpheres.renderCustomSpheres()
+
+#else
+
+	// Usual case is A0 = 0x009af4, except after all blue spheres got collected
+	A0 = (bluespheres.lifted_height == 0) ? 0x009af4 : 0x009b18
+
+	D5.u16 = (u16[A5 + 0x02] + D1.u16) & u16[A5 + 0x0a]
+	D0.u16 = u16[0xffffe420] * 4
+	A1 = u32[0xffff0000 + D0.u16]		// Pointer to lookup table for sphere positions and distances
+	D6.u16 = u16(u8[0xfffff62c]) * 8
+	D7 = 0x4f - u8[0xfffff62c]
+	A6 = 0xfffff800 + D6.u16
+	D2 = 0x0f
+
+	bool directionFlag = ((bluespheres.direction & 0x40) == 0)
+	while (D2.s16 >= 0)
+	{
+		D0 = (directionFlag ? bluespheres.position.x : bluespheres.position.y) >> 8
+		D4.u16 = (u16[A5] + D0.u16) & u16[A5 + 0x06]
+		D3 = 0x0e
+
+		while (D3.s16 >= 0)
+		{
+			// Distance values are around [0x18, 0x57]
+			u16 distance = u16[A1]
+
+			if (directionFlag)
+				D0.u16 = (D5.u16 << 5) | D4.u8
+			else
+				D0.u16 = (D4.u16 << 5) | D5.u8
+
+			// Sphere types:
+			//  - 0x00 = none / empty
+			//  - 0x01 = red sphere
+			//  - 0x02 = blue sphere
+			//  - 0x03 = bumper sphere
+			//  - 0x04 = ring
+			//  - 0x05 = yellow sphere
+			//  - 0x06 = ring (collected, part 1)
+			//  - 0x07 = ring (collected, part 2)
+			//  - 0x08 = ring (collected, part 3)
+			//  - 0x09 = ring (collected, part 4)
+			//  - 0x0a = blue sphere (during collection)
+			//  - 0x0b = Chaos Emerald
+			u8 sphereType = u8[0xfffff100 + D0.s16]
+
+			D1.u16 = distance & 0x7c
+			if (sphereType != 0 && D1.u16 != 0)
+			{
+				u16 size = (D1.u16 >> 2) - 6
+				if (size < 0x10)		// Filter out what's too small, i.e. completely behind the horizon
+				{
+					D0.u16 = u8(sphereType) * 8
+					A3 = u32[0xffffe480 + D0.s16]
+					D6.u16 = u16[0xffffe480 + D0.s16 + 4]
+					if (distance >= 0x54)	// Draw as non-priority sprite if partly behind the horizon
+					{
+						D6.u16 &= 0x7fff
+					}
+
+					D0.u16 = u16[0xffffe480 + D0.s16 + 6]
+					D1 = (D0.u16 & 0x8000) ? 0 : size
+					D1.u16 += (D0.u16 & 0x7fff)
+					A3 += u16[A3 + D1.s16 * 2]
+
+					// A3 = Pointer to sprite data
+					D1.u16 = u16[A3] - 1
+					A3 += 2
+					if (D1.s16 >= 0)
+					{
+						call A0		// One of "BlueSpheres.RenderSingleSphere*"
+						if (D7.s16 < 0)
+							return
+					}
+				}
+			}
+
+			A1 += 6
+			D4.u16 = (D4.u16 + u16[A5 + 0x04]) & u16[A5 + 0x06]
+			--D3.s16
+		}
+
+		D5.u16 = (D5.u16 + u16[A5 + 0x08]) & u16[A5 + 0x0a]
+		--D2.s16
+	}
+
+#endif
+}
+
+
+//# address-hook(0x009af4) end(0x009b16)
+function void BlueSpheres.RenderSingleSphereA()
+{
+	s16 baseX = s16[A1+2]
+	s16 baseY = s16[A1+4]
+
+	while (D7.s16 >= 0 && D1.s16 >= 0)
+	{
+		u16[A6]   = baseY + s8[A3]
+		 u8[A6+2] = u8[A3+1]
+		u16[A6+4] = u16[A3+2] + D6.u16
+		u16[A6+6] = baseX + u16[A3+4] + getScreenExtend()
+
+	#if STANDALONE
+		Renderer.drawVdpSprite((s16[A6+6] & 0x01ff) - 0x80, s16[A6] - 0x80, u8[A6+2], u16[A6+4], 0x8000)
+	#endif
+
+		A6 += 8
+		A3 += 6
+		--D7.u16
+		--D1.s16
+	}
+}
+
+
+// TODO: This function does not verify!
+//# address-hook(0x009b18) end(0x009b60)
+function void BlueSpheres.RenderSingleSphereB()
+{
+	// Used when all blue spheres got collected and the spheres all fly up
+	s16 baseX = s16[A1+2]
+	s16 baseY = s16[A1+4]
+
+	while (D7.s16 >= 0 && D1.s16 >= 0)
+	{
+		u16[A6]   = baseY + s8[A3] - bluespheres.lifted_height
+		 u8[A6+2] = u8[A3+1]
+		u16[A6+4] = u16[A3+2] + D6.u16
+
+		u16 backupD1 = D1.u16
+		D0.u16 = baseX + 0x120 - u16[A3+4]
+		D1.u16 = bluespheres.lifted_height + 0x100
+		D0.s32 = (s32(D0.s16) * D1.s16) >> 8
+		D0.u16 += 0x120
+		if (D0.u16 >= 0x1d0)
+			D0.u16 = 1
+		u16[A6+6] = D0.u16 + getScreenExtend()
+		D1.u16 = backupD1
+
+	#if STANDALONE
+		Renderer.drawVdpSprite((s16[A6+6] & 0x01ff) - 0x80, s16[A6] - 0x80, u8[A6+2], u16[A6+4], 0x8000)
+	#endif
+
+		A6 += 8
+		A3 += 6
+		--D7.u16
+		--D1.s16
+	}
+}
+
+
+//# address-hook(0x009b62) end(0x009d1c)
+function void fn009b62()
+{
+	if (u8[0xffffe44c] == 1)
+	{
+	#if STANDALONE
+		if (bluespheres.rings_remaining == 0)
+		{
+			Game.setAchievementComplete(ACHIEVEMENT_BS_PERFECT)
+		}
+	#endif
+
+		// First lift all the spheres before going on
+		if (bluespheres.lifted_height < 0x100)
+		{
+			if (bluespheres.lifted_height == 0)
+			{
+				playMusic(0x66)
+			}
+			bluespheres.lifted_height += (bluespheres.lifted_height >= 0x7d) ? 4 : (bluespheres.lifted_height >= 0x3e) ? 3 : 2
+			return
+		}
+
+		// Spawn the emerald
+		++u8[0xffffe44c]
+		zeroMemory(0xfffff100, 0x400)
+
+		D0.u8 = bluespheres.direction
+		LookupSinCos()
+		D2.u16 = bluespheres.position.x
+		D3.u16 = bluespheres.position.y
+		D0.s16 <<= 3
+		D1.s16 <<= 3
+		D2.u16 -= D0.u16
+		D3.u16 -= D1.u16
+
+		A1 = 0xfffff100
+		D0.u16 = ((D2.u16 + 0x80) >> 8) & 0x1f
+		D1.u16 = ((D3.u16 + 0x80) >> 8) & 0x1f
+		D1.u16 = (D1.u16 << 5) | D0.u16
+		u8[A1 + D1.s16] = (global.sk_bluespheres) ? 0x0d : 0x0b
+		u16[0xffffe44e] = D1.u16
+		u16[0xffffe428] = 0x0800
+		u8[0xffffe44d] = 0x78
+
+		D0 = (bluespheres.minigame_mode == 0) ? global.next_bluespheres : u8[0xffffffa4]
+		A1 = 0x009d1e + (D0.s16 & 0x07) * 8
+		copyMemory(0xfffffc64, A1, 0x08)
+
+		A1 = (global.sk_bluespheres) ? 0x0ae99e : 0x0ae3ec
+		Kosinski.addToDMAQueue(A1, 0xb4e0)
+	}
+	else if (u8[0xffffe44c] == 2)
+	{
+		if (kosinski.waiting_modules == 0)
+		{
+			u16[0xffffe44a] = 0
+			--u8[0xffffe44d]
+			if (u8[0xffffe44d] == 0)
+			{
+				++u8[0xffffe44c]
+				playMusic(0x2b)
+			}
+		}
+	}
+	else if (u8[0xffffe44c] == 3)
+	{
+		D0.u16 = ((bluespheres.position.x + 0x80) >> 8) & 0x1f
+		D1.u16 = ((bluespheres.position.y + 0x80) >> 8) & 0x1f
+		D1.u16 = (D1.u16 << 5) | D0.u16
+		if (D1.u16 == u16[0xffffe44e])
+		{
+			D0.u16 = (bluespheres.position.x | bluespheres.position.y) & 0xe0
+			if (D0.u16 == 0)
+			{
+				if (bluespheres.minigame_mode == 0)
+				{
+					// Update either global.chaos_emeralds or global.super_emeralds
+					A2 = (global.sk_bluespheres) ? 0xffffffb1 : 0xffffffb0
+					if (u8[A2] < 7)
+					{
+						++u8[A2]
+						A1 = 0xffffffb2
+						D0 = global.next_bluespheres
+						u8[A1 + D0.s16] |= 0x01
+					}
+				}
+
+				++u8[0xffffe44c]
+				u8[0xffffe433] = 1
+				global.game_mode = (bluespheres.minigame_mode != 0) ? 0x30 : 0x48
+
+				if (global.stage_type != 0)
+				{
+					global.zone_act = level.backup.zone_act
+					checkpoint.number |= 0x80
+				}
+
+				playSound(0x6a)
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x009d5e) end(0x009d9c)
+function void fn009d5e()
+{
+	if (bluespheres.direction & 0x40)
+		D0.u16 = bluespheres.position.x - u16[0xffffe434]
+	else
+		D0.u16 = bluespheres.position.y - u16[0xffffe436]
+
+	if (s8(bluespheres.direction) >= 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	D0.s16 >>= 2
+	scrolloffset.y.planeB += D0.u16
+
+#if STANDALONE
+	// Change scroll offsets in order to move planes to the right
+	u16[0xffffe000] = getScreenExtend()
+#endif
+	u16[0xffffe002] = bluespheres.direction * 4
+	u16[0xffffe434] = bluespheres.position.x
+	u16[0xffffe436] = bluespheres.position.y
+}
+
+
+//# address-hook(0x009d9e) end(0x009dc8)
+function void fn009d9e()
+{
+	A1 = 0xffffe487
+	--static_rings.animtimer
+	if (s8[0xfffffeb2] < 0)
+	{
+		static_rings.animtimer = 7
+		static_rings.animframe += 0x10
+		if (static_rings.animframe >= 0x30)
+			static_rings.animframe = 0
+	}
+	u8[A1 + 0x20] = static_rings.animframe
+}
+
+
+//# address-hook(0x009dca) end(0x009ddc)
+function void fn009dca()
+{
+	_setZeroFlagByValue(1)
+
+	A2 = 0xffffa400
+	D0.u16 = 0x1f
+	while (D0.s16 >= 0)
+	{
+		if (u8[A2] == 0)
+		{
+			_setZeroFlagByValue(0)
+			break
+		}
+
+		A2 += 8
+		--D0.s16
+	}
+}
+
+
+//# address-hook(0x009dde) end(0x009dfa)
+function void fn009dde()
+{
+	A0 = 0xffffa400
+	D7.u16 = 0x1f
+	while (D7.s16 >= 0)
+	{
+		D0 = u8[A0]
+		if (D0.u8 != 0)
+		{
+			D0.u16 *= 4
+			A1 = u32[0x009df8 + D0.s16]
+			call A1
+		}
+
+		A0 += 8
+		--D7.s16
+	}
+}
+
+
+//# address-hook(0x009e04) end(0x009e2c)
+function void fn009e04()
+{
+	--u8[A0+2]
+	if (s8[A0+2] >= 0)
+		return
+
+	u8[A0+2] = 5
+	D0 = u8[A0+3]
+	++u8[A0+3]
+	A1 = u32[A0+4]
+
+	u8[A1] = u8[0x009e2e + D0.s16]
+	if (u8[A1] == 0)
+	{
+		u32[A0] = 0
+		u32[A0+4] = 0
+	}
+}
+
+
+//# address-hook(0x009e34) end(0x009e86)
+function void fn009e34()
+{
+	--u8[A0+2]
+	if (s8[A0+2] >= 0)
+		return
+
+	u8[A0+2] = 0x09
+	A1 = u32[A0+4]
+	if (u8[A1] == 0x02)
+	{
+		BlueSpheres.OnBlueSphereCollected()
+		u8[A1] = 0x0a
+
+		fn009ebc()
+		if (!_equal())
+		{
+			u8[A1] = 4
+			u32[A0] = 0
+			u32[A0+4] = 0
+		}
+	}
+	else
+	{
+		u8[A0+2] = 0
+		D0.u16 = (bluespheres.position.x | bluespheres.position.y) & 0xe0
+		if (D0.u16 != 0)
+		{
+			if (u8[A1] == 0x0a)
+				u8[A1] = 1
+
+			u32[A0] = 0
+			u32[A0+4] = 0
+		}
+	}
+}
+
+
+//# address-hook(0x009e88) end(0x009e9e)
+function void BlueSpheres.OnBlueSphereCollected()
+{
+	bluespheres.bs_hud_dirty = 0xff
+	--bluespheres.blue_remaining
+	if (bluespheres.blue_remaining == 0)
+	{
+		u8[0xffffe44c] = 1
+	}
+}
+
+
+//# address-hook(0x009ea0) end(0x009eba)
+function void fn009ea0()
+{
+#if STANDALONE
+	if (CHEAT_ONE_BLUE_SPHERE)
+	{
+		bluespheres.blue_remaining = 1
+		return
+	}
+#endif
+
+	// Count the number of blue spheres
+	A3 = 0xfffff100
+	D1 = 0
+	D0.u16 = 0x03ff
+	while (D0.s16 >= 0)
+	{
+		if (u8[A3] == 2)
+		{
+			++D1.u16
+		}
+		++A3
+		--D0.s16
+	}
+	bluespheres.blue_remaining = D1.u16
+}
+
+
+//# address-hook(0x009ebc) end(0x009f42)
+function void fn009ebc()
+{
+	// This function creates rings from a region of spheres (when all border spheres got turned red)
+
+	_setZeroFlagByValue(0)	// Default result
+
+	// A1 is the address of the currently collected blue sphere
+	A2 = 0xfffff100		// Pointer to level layout, will stay at this address this whole function
+	D5 = A1 - A2		// Position of the currently collected blue sphere (D5 = x + y * 0x20)
+	fn009f44()
+
+	D6 = 0
+	A4 = 0xffffa500
+	D1 = A5 - A4
+	if (D1 == 0)
+		return
+
+	// Convert region to rings
+	//  -> The words between A4 (inclusive) and A5 (exclusive) are the positions of encapsulated blue spheres
+	//  -> Each one of these will make its 8 neighbors turn into rings, if they are blue or red spheres
+
+	while (D1.u16 > 0)
+	{
+		D5.u16 = u16[A4]
+		A4 += 2
+
+		// Have a look at the eight neighboring positions
+		A3 = 0x00a0ca		// Values stored here as s16: -0x21, -0x20, -0x1f, -0x01, 0x01, 0x01f, 0x20, 0x21
+		for (u8 i = 0; i < 8; ++i)
+		{
+			D2.u16 = (D5.u16 + s16[A3]) & 0x03ff
+			A3 += 2
+			if (u8[A2 + D2.u16] == 0x02)	// Blue sphere?
+			{
+				BlueSpheres.OnBlueSphereCollected()
+
+				// Make it a ring
+				u8[A2 + D2.u16] = 0x04
+
+				// Enqueue this position to the end of the list, so its neighbors get converted as well
+				//  -> This mechanism makes this essentially a flood-fill algorithm
+				u16[A5] = D2.u16
+				A5 += 2
+				D1.u16 += 2
+			}
+		}
+		D1.u16 -= 2
+	}
+
+	A4 = 0xffffa500
+	D1 = A5 - A4
+	if (D1 == 0)	// Can this condition ever be true? A5 is definitely larger than A4 here
+		return
+
+	while (D1.u16 > 0)
+	{
+		D5.u16 = u16[A4]
+		A4 += 2
+
+		// Have a look at the eight neighboring positions
+		A3 = 0x00a0ca
+		for (u8 i = 0; i < 8; ++i)
+		{
+			D2.u16 = (u16[A3] + D5.u16) & 0x03ff
+			A3 += 2
+			if (u8[A2 + D2.u16] == 0x01)	// Red sphere?
+			{
+				// Make it a ring
+				u8[A2 + D2.u16] = 0x04
+			}
+		}
+		D1.u16 -= 2
+	}
+
+	playSound(0xb9)
+	D1 = 1
+	_setZeroFlagByValue(1)
+}
+
+
+//# address-hook(0x009f44) end(0x00a0c8)
+function void fn009f44()
+{
+	A5 = 0xffffa500		// Pointer to end of output list, initially empty, will hold positions of all blue spheres turned into rings when returning
+
+	// Look at the neighboring 8 positions
+	//  -> D5 is the position of the currently collected blue sphere
+	{
+		A3 = 0x00a0ca		// Pointer to 8 hard-coded relative offsets of neighbors
+		u8 counter = 0
+		for (u8 i = 0; i < 8; ++i)
+		{
+			D1.u16 = (D5.u16 + s16[A3]) & 0x03ff
+			A3 += 2
+			if (u8[A2 + D1.u16] == 0x0a)		// Is this the blue sphere that gets collected right now?
+			{
+				// Turn into a red sphere
+				//  -> This seems to be dead code?
+				u8[A2 + D1.u16] = 0x01
+			}
+			else if (u8[A2 + D1.u16] == 0x02)	// Is this a different blue sphere?
+			{
+				++counter
+			}
+		}
+
+		// This is the number of blue spheres around, there must be at least 1 to proceed
+		if (counter == 0)
+			return
+	}
+
+	// Count the number of non-empty positions in a straight line along negative and positive x direction
+	//  -> Note that this (somewhat unnecessarily) also counts the current position, and even counts it twice
+	{
+		u8 counter = 0
+		D1.u16 = D5.u16
+		for (u8 i = 0; i < 0x10; ++i)
+		{
+			++counter
+			--D1.u16
+			if (u8[A2 + D1.u16] == 0)
+				break
+		}
+		D1.u16 = D5.u16
+		for (u8 i = 0; i < 0x10; ++i)
+		{
+			++counter
+			++D1.u16
+			if (u8[A2 + D1.u16] == 0)
+				break
+		}
+
+		// To proceed, there must be at least 3 non-empty positions next to each other (comparing to 4 because we counted current position twice)
+		if (counter < 4)
+			return
+	}
+
+	// Same as above, but now in y direction
+	{
+		u8 counter = 0
+		D1.u16 = D5.u16
+		for (u8 i = 0; i < 0x10; ++i)
+		{
+			++counter
+			D1.u16 -= 0x20
+			if (u8[A2 + D1.u16] == 0)
+				break
+		}
+		D1.u16 = D5.u16
+		for (u8 i = 0; i < 0x10; ++i)
+		{
+			++counter
+			D1.u16 += 0x20
+			if (u8[A2 + D1.u16] == 0)
+				break
+		}
+
+		if (counter < 4)
+			return
+	}
+
+	A4 = 0xffffa600		// Buffer for temporary use as a stack, we store data about positions that get marked in the following algorithm
+	u8 stackSize = 0	// Counts number of entries on the stack (see A4)
+
+	// Current state (in addition to states saved on the stack) consists of these three variables:
+	D3 = 0x00			// Offset of a direction in A4, can have values 0x00, 0x02, ..., 0x0a
+	D4 = 0x06			// Offset of a different direction in A4, usually in right angle to D3
+	D0.u16 = D5.u16		// This is still the position of the currently collected blue sphere
+
+	while (true)
+	{
+		// Look at one of the 4 direct neighbor positions to the current position
+		//  -> At 0x00a0da, the following s16 values are stored: -0x01, -0x20, 0x01, 0x20, -0x01, -0x20
+		D1.u16 = (D0.u16 + s16[0x00a0da + D4.u16]) & 0x03ff
+		u8 neighborType = u8[A2 + D1.u16]
+
+		if (neighborType == 0x01)
+		{
+			// Neighbor is a red sphere that is not yet marked
+			bool accepted = true
+			if (stackSize >= 2)		// If we got at most one entry on the stack so far, go on without further checks
+			{
+				// I guess this way, we will ignore circles of 2 * 2 red spheres
+				u16 diff = abs(D1.u16 - u16[A4 - 0x06])
+				accepted = (diff != 0x01 && diff != 0x20)
+			}
+
+			if (accepted)
+			{
+			#if STANDALONE
+				// Check whether there's at least one blue sphere near this red sphere
+				//  -> This is done to avoid the issue that D.A. Garden describes here: https://www.youtube.com/watch?v=e1gfYFq8KkM
+				accepted = false
+				for (u8 i = 0; i < 8; ++i)
+				{
+					u16 position = (D0.u16 + s16[0x00a0ca + i * 2]) & 0x03ff
+					if (u8[A2 + position] == 0x02)		// Accept blue spheres only
+					{
+						accepted = true
+						break
+					}
+				}
+				if (accepted)
+			#endif
+				{
+					// Temporarily mark this position; the mark tells us whether the position is on the stack already
+					u8[A2 + D0.u16] |= 0x80
+
+					// Add an entry to the stack
+					u8[A4]    = D3.u8
+					u8[A4+1]  = D4.u8
+					u16[A4+2] = D0.u16
+					A4 += 4
+					++stackSize
+
+					// Continue at the neighbor, and create a new state to check:
+					//  - Starting at the neighbor's position
+					//  - Checking all direction except where we just came from
+					D0.u16 = D1.u16
+					D3.u16 = (D4.u16 - 2) & 0x06	// Limit direction = direction change relative to current direction by 90°
+					D4.u16 = D3.u16 + 4				// Current direction = opposite of new limit direction
+					continue
+				}
+			}
+		}
+		else if (neighborType == 0x8a)
+		{
+			// Reached the currently collected blue sphere again
+			push(A4)
+			push(D4)
+			push(D3)
+			push(D0)
+
+			// Go through the entire stack (except for the entry at the very bottom, which represents the start position)
+			D4.u16 = D5.u16 - D0.u16
+			A4 = 0xffffa600 + 0x06
+			D2.u16 = u16[A4] - D5.u16
+			D3.u16 = D5.u16
+
+			// Find first direction change in the stack
+			while (true)
+			{
+				D0.u16 = u16[A4] - D3.u16
+				A4 += 4
+				if (D0.u16 != D2.u16)
+					break
+
+				D3.u16 += D0.u16
+			}
+
+			if (D4.s16 == D0.s16 || D4.s16 == D2.s16)
+			{
+				// Step into the start position is either:
+				//  - the first turn's direction (e.g. red spheres built something like the edge of an L-shape, and the start position is the inner corner)
+				//  - the start direction (red spheres made a loop that enters the start position straight from behind)
+				//     -> In these cases, the position in direction of first turn is expected to be a blue sphere
+				D0.u16 = D5.u16 + D0.s16
+			}
+			else
+			{
+				// Step into the start position is neither of the above
+				//  -> The position in diagonal direction (namely start direction + first turn) is expected to be a blue sphere
+				D0.u16 = D5.u16 + D0.s16 + D2.s16
+			}
+
+			// Now check if it's really a blue sphere
+			if (u8[A2 + D0.u16] == 0x02)
+			{
+			#if STANDALONE
+				// Perform an additional sanity check, just to be sure - and to solve an original game bug from S&K
+				//  -> This is just a workaround, better fix whatever is wrong with the actual algorithm
+				//  -> I suppose the real bug is that D0.u16 is not necessarily the right position to check, it can be on the wrong side;
+				//      considering whether the red sphere ring is CW or CCW and using that info to decide on where to put D0.u16 could do the trick
+				//  -> In fact, with the following fix that bug is really rare, it only can (but still does) happen when traversing a very large region
+				//      of blue spheres in just the right way
+				bool accepted = true
+				if (Game.getSetting(SETTING_FIX_GLITCHES))
+				{
+					for (u8 i = 0; i < 8; ++i)
+					{
+						u16 position = (D0.u16 + s16[0x00a0ca + i * 2]) & 0x03ff
+						if (u8[A2 + position] == 0)
+						{
+							accepted = false
+							break
+						}
+					}
+				}
+				if (accepted)
+			#endif
+				{
+					BlueSpheres.OnBlueSphereCollected()
+
+					// Make it a ring
+					u8[A2 + D0.u16] = 0x04
+
+					// Store position in the output list
+					u16[A5] = D0.u16
+					A5 += 2
+				}
+			}
+
+			D0 = pop()
+			D3 = pop()
+			D4 = pop()
+			A4 = pop()
+		}
+
+		// Reached a position where it's no use to on, because there's neither a (not yet visited) red sphere nor the currently collected blue sphere; proceed by either:
+		//  - Rotating current direction by 90° and check this one; i.e. do not enter the next while loop at all
+		//  - If all directions got checked for the current position, take the next entry from the stack and continue with it (possibly multiple times if all directions of the top-of-stack already got checked, too)
+		//  - In case the stack is empty, we're done with all checks
+		D4.u16 -= 2
+		while (D4.s16 < D3.s16)
+		{
+			// We're done if stack is empty
+			if (stackSize == 0)
+				return
+
+			// Pop topmost entry from the stack
+			A4 -= 4
+			--stackSize
+			D3     = u8[A4]
+			D4     = u8[A4+1]
+			D0.u16 = u16[A4+2]
+
+			u8[A2 + D0.u16] &= 0x7f		// Remove mark again
+			D4.u16 -= 2
+		}
+	}
+}
+
+
+//# address-hook(0x00a0e6) end(0x00a108)
+function void fn00a0e6()
+{
+	copyMemory(0xffffe480, 0x00a10a, 0x70)
+	zeroMemory(0xffffa400, 0x100)
+}
+
+
+//# address-hook(0x00a188) end(0x00a1b0)
+function void fn00a188()
+{
+	D0 = (D0 << 16) + (D0 >> 16)
+	D3.u16 = D1.u16
+	D4.u16 = D2.u16
+	D0.u16 = u16[0xffffe40e]
+	D3.s32 = s32(D3.s16) * D0.s16
+	D4.s32 = s32(D4.s16) * D0.s16
+	D0.u16 = u16[0xffffe410]
+	D1.s32 = s32(D1.s16) * D0.s16
+	D2.s32 = s32(D2.s16) * D0.s16
+	D1 -= D4
+	D1 *= 4
+	D1 = (D1 << 16) + (D1 >> 16)
+	D2 += D3
+	D2 *= 4
+	D2 = (D2 << 16) + (D2 >> 16)
+	D0 = (D0 << 16) + (D0 >> 16)
+}
+
+
+//# address-hook(0x00a1b2) end(0x00a1da)
+function void fn00a1b2()
+{
+	D2 = (D2 << 16)
+	D3.u16 = D0.u16
+	D4.u16 = D1.u16
+	D2.u16 = u16[0xffffe40a]
+	D3.s32 = s32(D3.s16) * D2.s16
+	D4.s32 = s32(D4.s16) * D2.s16
+	D2.u16 = u16[0xffffe40c]
+	D0.s32 = s32(D0.s16) * D2.s16
+	D1.s32 = s32(D1.s16) * D2.s16
+	D0 -= D4
+	D0 *= 4
+	D0 = (D0 << 16) + (D0 >> 16)
+	D1 += D3
+	D1 *= 4
+	D1 = (D1 << 16) + (D1 >> 16)
+	D2 = (D2 << 16) + (D2 >> 16)
+}
+
+
+//# address-hook(0x00a1dc) end(0x00a204)
+function void fn00a1dc()
+{
+	D1 = (D1 << 16)
+	D3.u16 = D0.u16
+	D4.u16 = D2.u16
+	D1.u16 = u16[0xffffe406]
+	D3.s32 = s32(D3.s16) * D1.s16
+	D4.s32 = s32(D4.s16) * D1.s16
+	D1.u16 = u16[0xffffe408]
+	D0.s32 = s32(D0.s16) * D1.s16
+	D2.s32 = s32(D2.s16) * D1.s16
+	D0 -= D4
+	D0 *= 4
+	D0 = (D0 << 16) + (D0 >> 16)
+	D2 += D3
+	D2 *= 4
+	D2 = (D2 << 16) + (D2 >> 16)
+	D1 = (D1 << 16) + (D1 >> 16)
+}
+
+
+//# address-hook(0x00a206) end(0x00a22e)
+function void fn00a206()
+{
+	D1 = (D1 << 16)
+	D3.u16 = D0.u16
+	D4.u16 = D2.u16
+	D1.u16 = u16[0xffffe41c]
+	D3.s32 = s32(D3.s16) * D1.s16
+	D4.s32 = s32(D4.s16) * D1.s16
+	D1.u16 = u16[0xffffe41e]
+	D0.s32 = s32(D0.s16) * D1.s16
+	D2.s32 = s32(D2.s16) * D1.s16
+	D0 -= D4
+	D0 *= 4
+	D0 = (D0 << 16) + (D0 >> 16)
+	D2 += D3
+	D2 *= 4
+	D2 = (D2 << 16) + (D2 >> 16)
+	D1 = (D1 << 16) + (D1 >> 16)
+}
+
+
+
+//# address-hook(0x00a24c) end(0x00a262)
+function void fn00a24c()
+{
+	u16 offset1 = (D0.u16 * 2) & 0x01fe
+	u16 offset2 = (offset1 + 0x80) & 0x01fe
+	u16[(A1+=2)-2] = u16[0x00a264 + offset1]
+	u16[(A1+=2)-2] = u16[0x00a264 + offset2]
+}
+
+
+
+//# address-hook(0x02df62) end(0x02df62)
+function void fn02df62()
+{
+}
+
+
+
+// Blue Spheres Results Screen
+
+//# address-hook(0x02df64) end(0x02e2be)
+function void fn02df64()
+{
+	playMusic(MUSIC_CTRL_FADEOUT)
+
+	u8[0xffffef6e] = global.next_bluespheres
+
+	bool goToNextStage = true
+#if STANDALONE
+	if (Game.getSetting(SETTING_BS_REPEAT_ON_FAIL))
+	{
+		// Do not go to next stage if failed this stage
+		goToNextStage = (u8[0xffffe44c] != 0)
+	}
+#endif
+	if (goToNextStage)
+	{
+		// Go the next special stage
+		D0.u8 = global.next_bluespheres
+		D1.u8 = u8[0xffffef70]
+		if (D1.u8 != 0)
+		{
+			D0.u8 = D1.u8 & 0x7f
+		}
+		else
+		{
+			++D0.u8
+			if (D0.u8 >= 7)
+				D0 = 0
+		}
+		global.next_bluespheres = D0.u8
+	}
+
+#if !STANDALONE
+	set_status_register(0x2700)
+#endif
+
+	VDP.Config.setActiveDisplay(false)
+	fn0011ca()
+
+	VDP.Config.enableHInt(false)
+	VDP.Config.setNameTableBasePlaneA(0xc000)
+	VDP.Config.setNameTableBasePlaneB(0xe000)
+	VDP.Config.setVerticalScrolling(false, 0xff)
+	VDP.Config.setRenderingModeConfiguration(false)
+	VDP.Config.setPlayfieldSizeInPixels(512, 256)
+
+	zeroMemory(0xffffac00, 0x400)
+	zeroMemory(0xffffb000, 0x2000)
+
+	u16[0xfffffb00] = 0
+	u32[0xfffffbfc] = 0xfffffb00
+	u16[0xffffef56] = 0
+	CheckSaveGameSlotAfterBlueSpheres()
+
+	competition_mode.active = 0
+	u16[0xfffff100] = 0
+	gfx.plane_update_routine = 0
+	hud.dirty.timer = 0
+	global.fade_timer = 0
+	u16[0xffffef6a] = global.zone_act
+
+	addPatternLoadingCue(0x02e310)
+
+	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)
+
+	// Choose text: "Super" or "Hyper"
+	if (isMainCharacter(CHARACTER_SONIC))
+	{
+		A1 = (global.super_emeralds < 7) ? 0x15b374 : 0x15b678
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		if (Game.getSetting(SETTING_HYPER_TAILS))
+		{
+			A1 = (global.super_emeralds < 7) ? 0x15b374 : 0x15b678
+		}
+		else
+		{
+			A1 = 0x15b374
+		}
+	}
+	else
+	{
+		A1 = (global.super_emeralds < 7) ? 0x15b4f6 : 0x15b7ea
+	}
+	Kosinski.addToDMAQueue(A1, 0xa1e0)
+
+	if (isMainCharacter(CHARACTER_SONIC))
+	{
+		A1 = 0x15b95c
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		A1 = (global.region_code & 0x80) ? 0x39ab6a : 0x39aa18
+	}
+	else
+	{
+		A1 = 0x0d67f0
+	}
+	Kosinski.addToDMAQueue(A1, 0x9e20)
+
+	Kosinski.addToDMAQueue(0x15babe, 0xa460)
+
+	u32[0xffffef44] = 0x02df62
+
+	while (true)
+	{
+		global.frame_state = 0x1e
+		Kosinski.ProcessDecompressionQueue()
+
+		waitForNextFrame()
+
+		LoadRequiredSpritePatterns()
+		Kosinski.ProcessModules()
+
+		if (kosinski.waiting_modules == 0 && u32[0xfffff680] == 0)
+			break
+	}
+
+#if STANDALONE
+	Renderer.resetSprites()
+#endif
+
+	ResetScoreDisplay()
+	hud.dirty.score = 0x01
+
+	copyMemory(0xfffffc00, 0x02e318, 0x80)
+	copyMemory(0xfffffc80, 0x02e318, 0x80)
+
+#if STANDALONE
+	globalComponentTintColorR = 0xff
+	globalComponentTintColorG = 0xff
+	globalComponentTintColorB = 0xff
+	globalComponentAddedColorR = 0
+	globalComponentAddedColorG = 0
+	globalComponentAddedColorB = 0
+#endif
+
+	fn02e2c0()
+
+	if (global.lock_on_state == 0 && global.sk_bluespheres)
+	{
+		copyMemory(0xfffffc00, 0x02e318, 0x20)
+		copyMemory(0xfffffc20, 0x02e318, 0x20)
+		copyMemory(0xfffffc80, 0x02e318, 0x20)
+		copyMemory(0xfffffca0, 0x02e318, 0x20)
+	#if STANDALONE
+		// This is needed to avoid the red Super Emerald's colors from being corrupted
+		u16[0xfffffc24] = 0x0eee
+		u16[0xfffffc26] = 0x0eee
+		u16[0xfffffc28] = 0x0eee
+	#endif
+
+		fn02e2c0()
+
+		fillMemory_u32(0xfffffc40, 0x40, 0x0ccc0ccc)
+		copyMemory(0xfffffcc0, 0x0a9d5c, 0x40)
+		copyMemory(0xffff8000, 0x0a7924, 0x1000)
+
+		Kosinski.decompress(0x1bfbea, 0xffff0000)	// After this, A1 points to where uncompressed data ends
+		Kosinski.decompress(0x1c71fe, A1)
+		Kosinski.decompress(0x1becf8, 0xffff9000)	// Same here
+		Kosinski.decompress(0x1c30fc, A1)
+
+		D4.u16 = u16[0x1bee58]
+		Kosinski.addToDMAQueue(0x1bee58, 0x0000)
+		Kosinski.addToDMAQueue(0x1c3f2c, D4.u16)
+
+		requestLoadingPatterns(0x48)
+
+		global.zone_act = 0x1701
+		camera.position.x.u16 = 0x15a0 - getScreenExtend()
+		camera.position.y.u16 = 0x0240
+		dynobjects.routine = 0
+
+		DynamicObjectsLoading()
+		camera.position.x.u16 = u16[0x02e398 + u8[0xffffef6e] * 2] - getScreenExtend()
+
+	#if !STANDALONE
+		set_status_register(0x2700)
+	#endif
+		InitLevelDisplay()
+	#if !STANDALONE
+		set_status_register(0x2300)
+	#endif
+
+		if (bluespheres.blue_remaining == 0)
+		{
+			D0.u8 = u8[0xffffef6e] | 0x80
+			u8[0xfffffac0] = D0.u8
+			u8[0xfffffac1] = 0xff
+		}
+	}
+
+	fn01aa6e()
+	u16[0xffffef68] = 0x98
+	u8[0xffffef6c] = 0xff
+	u32[0xffffb940] = 0x02e3b8
+
+	VDP.Config.setActiveDisplay(true)
+
+	while (true)
+	{
+		global.frame_state = 0x08
+		Kosinski.ProcessDecompressionQueue()
+
+		waitForNextFrame()
+
+		++level.framecounter
+		D1.u16 = u16[0xffffe666] + 1
+		if (D1.u16 >= 3)
+			D1 = 0
+		u16[0xffffe666] = D1.u16
+
+		UpdateGameObjects()
+		if (global.lock_on_state == 0 && global.sk_bluespheres)
+		{
+			UpdateLevelDisplay()
+		}
+
+		RenderSprites()
+		LoadRequiredSpritePatterns()
+		Kosinski.ProcessModules()
+
+		if (global.fade_timer > 0)
+		{
+			--global.fade_timer
+			FadeInFromWhite()
+		}
+
+		if (global.game_mode != 0x48)
+			break
+	}
+
+	global.zone_act = u16[0xffffef6a]
+}
+
+
+//# address-hook(0x02e2c0) end(0x02e30e)
+function void fn02e2c0()
+{
+	if (global.characters == CHARS_KNUCKLES_ALONE)
+	{
+		// Load palette colors for Knuckles
+		//  -> Original uses pink colors, standalone uses corrected ones
+		A0 = 0xfffffc04
+	#if STANDALONE
+		D0 = 0x064e020c
+	#else
+		D0 = 0x084e040c
+	#endif
+		u32[A0] = D0
+		u32[A0 + 0x80] = D0
+
+		A0 += 4
+		D0 = 0x02060080
+		if (global.lock_on_state == 0 && global.sk_bluespheres)
+		{
+			D0.u16 = 0x00ee
+		}
+		u32[A0] = D0
+		u32[A0 + 0x80] = D0
+	}
+	else
+	{
+		if (global.lock_on_state == 0 && global.sk_bluespheres)
+		{
+			u16[0xfffffc2a] = 0x00ee
+			u16[0xfffffcaa] = 0x00ee
+		}
+	}
+}
+
+
+//# address-hook(0x003c82) end(0x003ca2)
+function void BlueSpheres.FadeIn()
+{
+	palette_fade.range = 0x003f
+	SetPaletteToWhite()
+
+	s16 countdown = 0x15
+	while (countdown >= 0)
+	{
+		global.frame_state = 0x12
+		waitForNextFrame()
+
+		FadeInFromWhite()
+		LoadRequiredSpritePatterns()
+		--countdown
+
+	#if GAMEAPP
+		UpdateGameObjects()
+		RenderSprites()
+
+		if (global.game_mode != 0x30)	// Not in results screen of Blue Spheres mode
+		{
+			BlueSpheres.RenderSpheres()
+			BlueSpheres.renderCustomGround()
+			BlueSpheres.renderCustomCharacterShadows()
+		}
+	#else
+	#if STANDALONE
+		if (global.game_mode != 0x30)	// Not in results screen of Blue Spheres mode
+		{
+			Renderer.setViewport(getScreenExtend(), 0, 320, 224, 0x0000)
+		}
+	#endif
+	#endif
+	}
+}
+
+
+#if GAMEAPP
+
+function void BlueSpheres.renderCustomGround()
+{
+	// Disable rendering of plane B prio
+	Renderer.enableDefaultPlane(3, false)
+
+	// Render glow effect for background
+	if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
+	{
+		Renderer.drawCustomSprite("bluespheres_glow_background", getScreenWidth() / 2, 20, 0x00, 0, 0x2000)
+	}
+
+	// Manually render the HUD parts of this plane (blue spheres and rings counter)
+	Renderer.setupPlane(0, 0, 160, 32, 0x11, 3, 0x2f00)
+	Renderer.setupPlane(getScreenWidth()-160, 0, 160, 32, 0x11, 3, 0x2f00)
+
+	// Render our own version of the ground
+	u32 fieldColorBaseAddress = u32[0xffffe446]
+	Game.renderBlueSpheresGround(bluespheres.position.x, bluespheres.position.y, bluespheres.direction, u16[fieldColorBaseAddress], u16[fieldColorBaseAddress+8])
+	Renderer.drawCustomSprite(Game.getBlueSpheresGroundSprite(1), 0, 0, 0x00,    0, 0x3000)
+	Renderer.drawCustomSprite(Game.getBlueSpheresGroundSprite(0), 0, 0, 0x00, 0x10, 0x3000)		// With flag to draw as fully opaque (rendering optimization)
+
+	// Render glow effect on top
+	if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
+	{
+		Renderer.drawCustomSprite("bluespheres_glow_foreground", getScreenWidth() / 2, 30, 0x00, 0, 0x3100)
+	}
+}
+
+
+function void BlueSpheres.renderCustomCharacterShadows()
+{
+	if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
+	{
+		Renderer.drawCustomSprite(getNumPlayers() < 2 ? "bluespheres_shadow_1P_smooth" : "bluespheres_shadow_2P_smooth", 142 + getScreenExtend(), 148, 0x00, 0, 0x3100)
+	}
+	else
+	{
+		Renderer.drawCustomSprite(getNumPlayers() < 2 ? "bluespheres_shadow_1P_pixel" : "bluespheres_shadow_2P_pixel", 142 + getScreenExtend(), 148, 0x00, 0, 0x3100)
+	}
+}
+
+
+function void Game.writeBlueSpheresData()
+{
+	// This function exists only for legacy mod compatibility
+	u32 ptr = 0x800000
+	Game.writeBlueSpheresData(ptr, 0xfffff100, bluespheres.position.x, bluespheres.position.y, bluespheres.direction)
+}
+
+function void BlueSpheres.renderCustomSpheres()
+{
+	u32 ptr = 0x800000
+	Game.writeBlueSpheresData(ptr, 0xfffff100, bluespheres.position.x, bluespheres.position.y, bluespheres.direction)
+
+	u16 count = u16[ptr]
+	ptr += 2
+	for (u16 i = 0; i < count; ++i)
+	{
+		// Read sphere properties
+		u16 px = u16[ptr] + getScreenExtend() - 40
+		u16 py = u16[ptr+2]
+		u16 size = u16[ptr+4]
+		u8 sphereType = u8[ptr+6]
+		ptr += 7
+
+		// Size of sphere (0 = largest at 32x32, 0x0f = smallest at 8x8, the last ones include 3x 2 duplicates, which makes only 13 different sizes in total, with 2 pixels size difference between them)
+		u8 form
+		if (size < 0x1740)
+			form = 0x0f
+		else if (size < 0x18a0)
+			form = 0x0e
+		else if (size < 0x1a10)
+			form = 0x0d
+		else if (size < 0x1b90)
+			form = 0x0c
+		else if (size < 0x1d30)
+			form = 0x0b
+		else if (size < 0x1f00)
+			form = 0x0a
+		else if (size < 0x2100)
+			form = 0x09
+		else if (size < 0x2330)
+			form = 0x08
+		else if (size < 0x25a0)
+			form = 0x07
+		else if (size < 0x2960)
+			form = 0x06
+		else if (size < 0x2c80)
+			form = 0x05
+		else if (size < 0x3180)
+			form = 0x04
+		else if (size < 0x35c0)
+			form = 0x03
+		else if (size < 0x3c80)
+			form = 0x02
+		else if (size < 0x4500)
+			form = 0x01
+		else
+			form = 0x00
+
+		py -= (16 - form) * 2/3 + 1
+
+		// Lift spheres when stage was won
+		py -= bluespheres.lifted_height
+
+		bool behindHorizon = (size < 0x1b00)
+		u16 renderQueue = (behindHorizon ? 0x2000 : 0x9000) + size / 0x100
+		u8 alpha = (sphereType == 0x0a) ? 0xa0 : 0xff
+		u32 fog = clamp(s32(0x100000) / size - 0x68, 0, 0x80) * 0x010101
+
+		D0.u16 = u8(sphereType) * 8
+		A3 = u32[0xffffe480 + D0.s16]
+		D6.u16 = u16[0xffffe480 + D0.s16 + 4]
+
+		D0.u16 = u16[0xffffe480 + D0.s16 + 6]
+		D1 = (D0.u16 & 0x8000) ? 0 : (form * 2)
+		D1.u16 += D0.u16 * 2
+		A3 += u16[A3 + D1.s16]
+
+		D1.u16 = u16[A3] - 1	// This is always 0, except for Super Emeralds
+		A3 += 2
+		while (D1.s16 >= 0)
+		{
+			if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
+			{
+				Renderer.drawVdpSpriteWithTint(px + u16[A3+4], py + s8[A3], u8[A3+1], u16[A3+2] + D6.u16, renderQueue, (0xffffff - fog) + (u32(alpha) << 24), fog)
+			}
+			else
+			{
+				Renderer.drawVdpSprite(px + u16[A3+4], py + s8[A3], u8[A3+1], u16[A3+2] + D6.u16, renderQueue)
+			}
+
+			A3 += 6
+			--D1.s16
+		}
+	}
+}
+
+#endif

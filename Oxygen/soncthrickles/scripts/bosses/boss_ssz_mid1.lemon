@@ -1,0 +1,494 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// SSZ Sonic/Tails mid-level boss 1 (Green Hill Zone)    //
+//-------------------------------------------------------//
+
+function s16 BossMidSSZ1.getMovementSpeed()
+{
+#if STANDALONE
+	// Make him slightly faster in widescreen
+	return 0x100 + getScreenExtend() * 5
+#else
+	return 0x100
+#endif
+}
+
+function u16 BossMidSSZ1.getMoveTime()
+{
+	// Note that this refers to the move time from center to an edge
+#if STANDALONE
+	// Make him cover more distance in widescreen, and take into account the velocity
+	//  -> Using a value of 0x24 instead of the correct 0x20 to avoid a dead spot where boss can't hit you on the left
+	u16 distanceToCover = 0x24 + getScreenExtend() / 2
+	return distanceToCover * 0x100 / abs(objA0.velocity.x)
+#else
+	return 0x20
+#endif
+}
+
+
+//# address-hook(0x07a20e) end(0x07a28e)
+function void fn07a20e()
+{
+#if STANDALONE
+	if (Game.isTimeAttack())
+	{
+		u8[0xffffeed2] = 0xff
+		UnloadObject()
+		return
+	}
+#endif
+
+	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	level.boss_encounter = 1
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x07a294
+	playMusic(MUSIC_CTRL_FADEOUT)
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x085b30
+		u8[A1 + 0x2c] = 0x19
+	}
+
+	objA0.position.x.u16 = camera.position.x.u16 + 0x0110 + getScreenExtend()
+	objA0.position.y.u16 = camera.position.y.u16 - 0x40
+	u16[0xfffffa88] = 0
+
+	requestLoadingPatterns(0x7b)
+
+	Kosinski.addToDMAQueue(0x17edb4, 0x8d00)
+
+	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
+
+	loadPaletteLine1(0x07d850)
+}
+
+
+//# address-hook(0x07a294) end(0x07a29a)
+function void fn07a294()
+{
+	objA0.update_address = 0x07a29c
+}
+
+
+//# address-hook(0x07a29c) end(0x07a2ae)
+function void fn07a29c()
+{
+	// Targets:
+	//  - 0x07a2c0	-> objA0.base_state = 0x00		-> Initialization
+	//  - 0x07a2f0	-> objA0.base_state = 0x02		-> Entering from above
+	//  - 0x07a32c	-> objA0.base_state = 0x04		-> Going towards the center
+	//  - 0x07a35e	-> objA0.base_state = 0x06		-> Extending the ball chain
+	//  - 0x07a388	-> objA0.base_state = 0x08		-> Swinging & moving
+	//  - 0x07a3a8	-> objA0.base_state = 0x0a		-> Swinging without moving
+	call tableLookupAddress(0x07a2b4, objA0.base_state)
+
+	fn07a5a0()
+	Enemy.DrawDynamicObject()
+}
+
+
+//# address-hook(0x07a2c0) end(0x07a2ea)
+function void fn07a2c0()
+{
+	setupObjectAttributesFull(0x07a64e)
+
+	boss.remaining_hits = 8
+	objA0.velocity.y = 0x0100
+	objA0.countdown_value = 0x67
+	objA0.countdown_callback = 0x07a2fc
+
+	spawnChildObjects(0x0681bc)
+}
+
+
+//# address-hook(0x07a2f0) end(0x07a2f6)
+function void fn07a2f0()
+{
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x07a2fc) end(0x07a32a)
+function void fn07a2fc()
+{
+	objA0.base_state = 0x04
+#if STANDALONE
+	objA0.velocity.x = -BossMidSSZ1.getMovementSpeed() / 2
+#else
+	objA0.velocity.x = -BossMidSSZ1.getMovementSpeed()
+#endif
+
+	spawnChildObjects(0x07a69e)
+
+	D0.u16 = 0xc0
+	objA0.value3e = D0.u16
+	objA0.velocity.y = D0.u16
+	u16[A0 + 0x40] = 0x10
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x07a32c) end(0x07a35c)
+function void fn07a32c()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+
+	D0.u16 = camera.position.x.u16 + getScreenWidth() / 2
+	if (D0.u16 >= objA0.position.x.u16)
+	{
+		objA0.base_state = 0x06
+		objA0.flags38 |= 0x40
+		A2 = 0x07a684
+		SpawnUniqueChildObjectHierarchy()
+	}
+}
+
+
+//# address-hook(0x07a35e) end(0x07a386)
+function void fn07a35e()
+{
+	if (objA0.flags38 & 0x04)
+	{
+		objA0.base_state = 0x08
+		objA0.flags38 &= ~0x40
+		objA0.velocity.x = -BossMidSSZ1.getMovementSpeed()
+		objA0.countdown_value = BossMidSSZ1.getMoveTime() - 1
+	#if STANDALONE
+		// Original S3&K version moves with usual speed here, but shorter time
+		//  -> S3AIR changes that to use double time, but moving much slower, as this is closer to Sonic 1 GHZ boss
+		objA0.velocity.x /= 4
+		objA0.countdown_value = objA0.countdown_value * 4 + 3
+	#endif
+		objA0.countdown_callback = 0x07a39a
+	}
+}
+
+
+//# address-hook(0x07a388) end(0x07a394)
+function void fn07a388()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x07a39a) end(0x07a3a6)
+function void fn07a39a()
+{
+	objA0.base_state = 0x0a
+	objA0.flags38 |= 0x40
+
+#if STANDALONE
+	objA0.render_flags ^= 0x01
+#endif
+}
+
+
+//# address-hook(0x07a3a8) end(0x07a3cc)
+function void fn07a3a8()
+{
+#if STANDALONE
+	// Keep on hovering
+	fn0847e6()
+	char.position.y += s32(char.velocity.y) << 8
+#endif
+
+	if (objA0.flags38 & 0x08)
+	{
+		objA0.flags38 &= ~0x08
+		objA0.base_state = 0x08
+		objA0.flags38 &= ~0x40
+	#if STANDALONE
+		objA0.velocity.x = (objA0.velocity.x < 0) ? BossMidSSZ1.getMovementSpeed() : -BossMidSSZ1.getMovementSpeed()
+	#else
+		objA0.velocity.x = -objA0.velocity.x
+		objA0.render_flags ^= 0x01
+	#endif
+		objA0.countdown_value = BossMidSSZ1.getMoveTime() * 2 - 1
+	}
+}
+
+
+//# address-hook(0x07a3ce) end(0x07a3e4)
+function void fn07a3ce()
+{
+	objA0.update_address = 0x07a3e6
+	objA0.render_flags |= 0x01
+	objA0.velocity.x = 0x0400
+	objA0.velocity.y = 0
+}
+
+
+//# address-hook(0x07a3e6) end(0x07a422)
+function void fn07a3e6()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+	{
+		UpdateMovementStraightSimple()
+		DrawObject()
+		return
+	}
+
+	level.boss_encounter = 0
+	objA0.flags38 |= 0x10
+	u8[0xfffffa89] = 0xff
+	u8[0xffffeed2] = 0xff
+
+	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
+	requestLoadingPatterns(0x32)
+
+	Object.TriggerUnloading()
+}
+
+
+//# address-hook(0x07a428) end(0x07a438)
+function void fn07a428()
+{
+	// Targets:
+	//  - 0x07a446	-> objA0.base_state = 0x00
+	//  - 0x07a460	-> objA0.base_state = 0x02
+	//  - 0x07a482	-> objA0.base_state = 0x04
+	//  - 0x07a496	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x07a43e, objA0.base_state)
+
+	D0 = 0
+	fn0849c6()
+}
+
+
+//# address-hook(0x07a446) end(0x07a45c)
+function void fn07a446()
+{
+	setupObjectAttributesFull(0x07a660)
+	u8[A0 + 0x43] = 0x1a
+	objA0.value3a = 0x01
+	fn07a634()
+}
+
+
+//# address-hook(0x07a460) end(0x07a480)
+function void fn07a460()
+{
+	objA0.position.y.u16 += 2
+	--objA0.countdown_value
+	if (objA0.countdown_value < 0)
+	{
+		objA0.base_state += 2
+		if (objA0.subtype2c == 0x0a)
+		{
+			A1 = 0xffff0000 + u16[A0 + 0x44]
+			u8[A1 + 0x38] |= 0x04
+		}
+	}
+}
+
+
+//# address-hook(0x07a482) end(0x07a494)
+function void fn07a482()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x44]
+	if (u8[A1 + 0x38] & 0x04)
+	{
+		objA0.base_state = 0x06
+	}
+}
+
+
+//# address-hook(0x07a496) end(0x07a4ca)
+function void fn07a496()
+{
+	// s8[A0 + 0x3c] is the current angle of the chain link and wrecking ball, inside range -0x40 .. 0x40
+	// s8[A0 + 0x3a] is the current direction of angular movement (can be only -1 or 1)
+
+	bool directionChange = (u8[A0 + 0x3c] <= 0x40)
+	D0.u8 = u8[A0 + 0x3c] - 0x40
+	if (D0.u8 < 0x80)
+	{
+		s8[A0 + 0x3a] = -s8[A0 + 0x3a]
+		A1 = 0xffff0000 + u16[A0 + 0x44]
+	#if STANDALONE
+		if (s16[A1 + 0x18] > 0)
+	#else
+		if (u8[A1 + 0x04] & 0x01)
+	#endif
+		{
+			directionChange = !directionChange
+		}
+		if (!directionChange)
+		{
+			// Make Mecha Sonic turn around now and fly over to the other side
+			u8[A1 + 0x38] |= 0x08
+		}
+	}
+	s8[A0 + 0x3c] += s8[A0 + 0x3a]
+
+	MoveWithParent()
+}
+
+
+
+// Chain link
+
+//# address-hook(0x07a4d0) end(0x07a4e0)
+function void fn07a4d0()
+{
+	// Targets:
+	//  - 0x07a4ec	-> objA0.base_state = 0x00
+	//  - 0x07a460	-> objA0.base_state = 0x02
+	//  - 0x07a500	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x07a4e6, objA0.base_state)
+
+	D0 = 0
+	fn0849c6()
+}
+
+
+//# address-hook(0x07a4ec) end(0x07a4fa)
+function void fn07a4ec()
+{
+	fn07a634()
+	objA0.value3a = 0x04
+	setupObjectAttributesFull(0x07a66c)
+}
+
+//# address-hook(0x07a500) end(0x07a50e)
+function void fn07a500()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+#if STANDALONE
+	if (u32[A1] == 0x07a428)
+	{
+		// This is the first chain link element, directly connected to the capsule
+		// ...and a good place to translate the linear angular movement into something more like actual Sonic 1 GHZ boss
+		s8[A0 + 0x3c] = lookupSin(s8[A1 + 0x3c]) / 4
+	}
+	else
+#endif
+	{
+		// Get angle from parent object in linked list
+		s8[A0 + 0x3c] = s8[A1 + 0x3c]
+	}
+	D2.u8 = objA0.value3a
+	fn084c42()
+}
+
+
+
+// The wrecking ball
+
+//# address-hook(0x07a514) end(0x07a538)
+function void fn07a514()
+{
+	// Targets:
+	//  - 0x07a544	-> objA0.base_state = 0x00
+	//  - 0x07a460	-> objA0.base_state = 0x02
+	//  - 0x07a500	-> objA0.base_state = 0x04
+	call tableLookupAddress(0x07a53e, objA0.base_state)
+
+	objA0.animation.sprite = (global.framecounter.low & 0x01) ? 1 : 0
+	D0 = 0
+	fn084a04()
+}
+
+
+//# address-hook(0x07a544) end(0x07a552)
+function void fn07a544()
+{
+	fn07a634()
+	objA0.value3a = 0x03
+	setupObjectAttributesFull(0x07a678)
+}
+
+
+
+// Not sure if still part of the wrecking ball?
+
+//# address-hook(0x07a558) end(0x07a562)
+function void fn07a558()
+{
+	setupObjectAttributesBasic(0x07a65a)
+	objA0.update_address = 0x07a568
+	fn07a568()
+}
+
+
+//# address-hook(0x07a568) end(0x07a59a)
+function void fn07a568()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if ((u8[A1 + 0x2a] & 0x80) == 0)
+	{
+		if (u8[A1 + 0x38] & 0x40 || global.framecounter.low & 0x01)
+			return
+
+		MoveAndFlipWithParent()
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x07a5a0) end(0x07a61c)
+function void fn07a5a0()
+{
+	if (u8[A0 + 0x28] != 0)
+		return
+
+	D0.u8 = boss.remaining_hits
+	if (D0.u8 == 0)
+	{
+		objA0.update_address = 0x085668
+		objA0.countdown_callback = 0x07a3ce
+
+		spawnChildObjects(0x083fee)
+		if (_equal())
+		{
+			u8[A1 + 0x2c] = 0x04
+		}
+
+		AddScoreForBossEnemy_NoHudDirty()
+		return
+	}
+
+	if (objA0.state == 0)
+	{
+		objA0.state = 0x20
+		playSound(0x6e)
+		objA0.flags2a |= 0x40
+	}
+
+	Boss.updateHitFlashing(3, 0x07a622, 0x07a628, 0x07a62c)
+
+	--objA0.state
+	if (objA0.state == 0)
+	{
+		objA0.flags2a &= ~0x40
+		u8[A0 + 0x28] = u8[A0 + 0x25]
+	}
+}
+
+
+//# address-hook(0x07a634) end(0x07a640)
+function void fn07a634()
+{
+	objA0.countdown_value = u16[0x07a642 + objA0.subtype2c]
+}

@@ -1,0 +1,50 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Floating Points Display                               //
+//-------------------------------------------------------//
+
+//# address-hook(0x02cce0) end(0x02cd06)
+function void FloatingPoints.Init()
+{
+	objA0.mapping_offset = 0x02cf50
+	objA0.sprite_attributes = 0x85e4
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	objA0.box_size.x = 8
+	objA0.velocity.y = -0x300
+
+	objA0.update_address = 0x02cd0c
+	FloatingPoints.Update()
+}
+
+
+//# address-hook(0x02cd0c) end(0x02cd20)
+function void FloatingPoints.Update()
+{
+	if (objA0.velocity.y >= 0)
+	{
+		UnloadObject()
+	}
+	else
+	{
+		UpdateMovementStraightSimple()
+		objA0.velocity.y += 0x18
+		DrawObject()
+	}
+}
+
+
+//# address-hook(0x02c9da) end(0x02c9da)
+function void fn02c9da()
+{
+	UnloadObject()
+}

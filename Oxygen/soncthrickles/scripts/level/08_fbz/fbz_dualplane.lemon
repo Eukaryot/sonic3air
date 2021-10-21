@@ -1,0 +1,288 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x0532b6) end(0x0532dc)
+function void fn0532b6()
+{
+	objA0.update_address = 0x0532e0
+	objA0.box_size.y = 0x11
+	objA0.flags2a |= 0x80
+	move_area.right = 0x32b8
+	level.vertical_wrap = isMainCharacter(CHARACTER_TAILS) ? 0x40 : 0x3c
+
+	fn0532e0()
+}
+
+
+//# address-hook(0x0532e0) end(0x0532ea)
+function void fn0532e0()
+{
+	if (u16[0xffffb010] < 0x2e80)
+	{
+		fn0533a4()
+	}
+	else
+	{
+	#if STANDALONE
+		level.trigger0f = 0
+	#endif
+
+		objA0.update_address = 0x0532f0
+		fn0532f0()
+	}
+}
+
+
+//# address-hook(0x0532f0) end(0x05331c)
+function void fn0532f0()
+{
+	level.dualplanecollision = 0xff
+
+	s32 moveX = 0x7800
+	s32 moveY = 0xa000
+#if STANDALONE
+	// Move faster if player reached the end already
+	//  -> We're misusing the "level.trigger0f" variable for the current extra speed-up value
+	if (u16[0xffffb010] >= 0x3280 && u16[0xffffb014] <= 0x0300 && (level.framecounter & 0x03) == 0 && level.trigger0f < 0x80)
+	{
+		++level.trigger0f
+	}
+	u32[0xffffee98] += moveX * level.trigger0f / 0x80
+	u32[0xffffee9c] += moveY * level.trigger0f / 0x80
+#endif
+	u32[0xffffee98] += moveX
+	u32[0xffffee9c] += moveY
+
+	if (u16[0xffffee9c] < 0x05d0)
+	{
+		fn05333a()
+	}
+	else
+	{
+		u16[0xffffee9c] = 0x05d0
+		u16[0xffffee98] = 0x045c
+		level.dualplanecollision = 0
+		objA0.update_address = 0x053322
+		fn053322()
+	}
+}
+
+
+//# address-hook(0x053322) end(0x053334)
+function void fn053322()
+{
+	D0.u16 = level.vertical_wrap
+	if (D0.u16 == camera.position.y.u16)
+	{
+		move_area.bottom.current = D0.u16
+		move_area.bottom.target = D0.u16
+		objA0.update_address = 0x05333a
+	}
+	fn05333a()
+}
+
+
+//# address-hook(0x05333a) end(0x0533a2)
+function void fn05333a()
+{
+	if (u16[0xffffb014] < 0x0280)
+	{
+		move_area.left = camera.position.x.u16
+	}
+
+	if (level.vertical_wrap == move_area.bottom.current)
+	{
+		if (move_area.left + getScreenExtend() * 2 == move_area.right)
+		{
+			u16[0xffffeec8] = 0xf0
+			u16[0xffffeeca] = 0x0f
+			u16[0xffffeec0] += 4
+
+			objA0.update_address = 0x053372
+			fn053372()
+			return
+		}
+	}
+
+	fn0533a4()
+}
+
+
+//# address-hook(0x053372)
+function void fn053372()
+{
+	if (u16[0xffffeec0] == 0x0c)
+	{
+		if (allocDynamicObjectStd())
+		{
+			// Spawn boss
+			objA1.update_address = 0x0705ea
+		}
+
+		camera.screenshake.state = 0
+		u8[0xffffeed8] = 0xff
+		objA0.update_address = 0x0533a4
+
+		D0.u16 = 0x31c0
+		D4.u16 = 0x31c0
+		D1.u16 = 0x0690
+		fn0533b8()
+	}
+	else
+	{
+		fn0533a4()
+	}
+}
+
+
+//# address-hook(0x0533a4) end(0x0533b4)
+function void fn0533a4()
+{
+	D4.u16 = objA0.position.x.u16
+	D0.u16 = 0x31c0 + u16[0xffffee98]
+	D1.u16 = 0x0690 - u16[0xffffee9c]
+	fn0533b8()
+}
+
+
+//# address-hook(0x0533b8) end(0x0533c8)
+function void fn0533b8()
+{
+	objA0.position.x.u16 = D0.u16
+	objA0.position.y.u16 = D1.u16
+
+	D1.u16 = 0x04c0
+	D2 = 0x11
+	D3 = 0x11
+	PlatformCheckClimbOn()
+}
+
+
+
+// Closing "door"
+
+//# address-hook(0x0533ce) end(0x0533fa)
+function void fn0533ce()
+{
+	objA0.update_address = 0x053400
+	objA0.render_flags = 0x44
+	objA0.box_size.y = 0xff
+	objA0.box_size.x = 0x20
+	objA0.sprite_priority = 0x0300
+	objA0.sprite_attributes = 0xc3d5
+	objA0.mapping_offset = 0x053518
+	u16[A0 + 0x16] = 0x02
+	fn053400()
+}
+
+
+//# address-hook(0x053400) end(0x05349c)
+function void fn053400()
+{
+	D4.u16 = 0x2de0 + u16[0xffffee98]
+	objA0.position.x.u16 = D4.u16
+	D0.u16 = D4.u16 - 0x0200
+	D1.u16 = D4.u16
+	if (u16[A0 + 0x30] != 0)
+	{
+		D1.u16 += 0x28
+	}
+	D5.u16 = 0x0580 - u16[0xffffee9c]
+	D2.u16 = D5.u16
+	D3.u16 = D5.u16
+	D2.u16 += 0x80
+	D3.u16 += 0x0100
+	u16[A0 + 0x30] = 0
+
+	A1 = 0xffffb000
+	fn0534a2()
+
+	A1 = 0xffffb04a
+	fn0534a2()
+
+	if (u16[A0 + 0x30] != 0)
+	{
+		if (objA0.countdown_value < 0x40)
+		{
+			objA0.countdown_value += 8
+		}
+	}
+	else
+	{
+		if (objA0.countdown_value != 0)
+		{
+			objA0.countdown_value -= 8
+			if (objA0.countdown_value == 0)
+			{
+				playSound(0xc9)
+			}
+		}
+	}
+
+	D5.u16 -= objA0.countdown_value
+	objA0.position.y.u16 = D5.u16
+	A1 = A0 + 0x18
+	D5.u16 += 0x80
+	D0 = 1
+	while (D0.s16 >= 0)
+	{
+		u16[A1] = D4.u16
+		u16[A1 + 0x02] = D5.u16
+		D5.u16 -= 0x0100
+		A1 += 6
+		--D0.s16
+	}
+
+	D1 = 0x2b
+	D2.u16 = 0x0100
+	D3.u16 = 0x0100
+	fn01dc56()
+	DrawObject()
+}
+
+
+//# address-hook(0x0534a2) end(0x0534c4)
+function void fn0534a2()
+{
+	// Opening
+	D6.u16 = objA1.position.x.u16
+	if (D6.s16 >= D0.s16 && D6.u16 < D1.u16)
+	{
+		D6.u16 = objA1.position.y.u16
+		if (D6.u16 >= D2.u16 && D6.u16 < D3.u16)
+		{
+			if (s8[A1 + 0x2e] >= 0)
+			{
+				u8[A0 + 0x30] = 0xff
+			}
+		}
+	}
+}
+
+
+//# address-hook(0x0534c6) end(0x053512)
+function void fn0534c6()
+{
+	objA0.update_address = 0x01abc6
+	objA0.render_flags = 0x40
+	objA0.box_size.y = 0x0c
+	objA0.box_size.x = 0x2c
+	objA0.sprite_priority = 0x0380
+	objA0.sprite_attributes = 0x63a3
+	objA0.mapping_offset = 0x053518
+
+	D0.u16 = objA0.countdown_value * 6
+	A1 = 0x0535cc + D0.u16
+	objA0.countdown_value = u16[(A1+=2)-2]
+	u16[A0 + 0x30] = u16[(A1+=2)-2]
+	D0.u16 = u16[A1]
+	objA0.animation.sprite = D0.u8
+	DrawObject()
+}

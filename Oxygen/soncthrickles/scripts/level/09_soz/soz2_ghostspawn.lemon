@@ -1,0 +1,568 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+function bool isGhostSpawnEnabled()
+{
+#if STANDALONE
+	return (!Game.getSetting(SETTING_DISABLE_GHOST_SPAWN) && !Game.isTimeAttack())
+#else
+	return true
+#endif
+}
+
+
+//# address-hook(0x08f0b8) end(0x08f0c4)
+function void fn08f0b8()
+{
+	objA0.update_address = 0x08f0ca
+	objA0.position.x.u16 = 0x0120
+	objA0.position.y.u16 = 0xa0
+	fn08f0ca()
+}
+
+
+//# address-hook(0x08f0ca) end(0x08f116)
+function void fn08f0ca()
+{
+	// Ghost spawning can be disabled altogether
+	if (!isGhostSpawnEnabled())
+		return
+
+	// For Sonic & Tails, the ghosts are not free from the start already
+	if (!isMainCharacter(CHARACTER_KNUCKLES) && checkpoint.number == 0)
+		return
+
+	// Check light state
+	if (u8[0xfffff7c3] != 0)
+	{
+		D0 = u8[0xfffff7c3]
+		D0.u8 = u8[0x08f118 + D0.s16]
+		D1.u8 = u8[0xfffffaad]
+		if (D1.u8 >= D0.u8)
+			return
+
+		--u16[A0 + 0x3a]
+		if (s16[A0 + 0x3a] >= 0)
+			return
+
+		++D1.u8
+		u8[0xfffffaad] = D1.u8
+		if (D1.u8 < D0.u8)
+		{
+			u16[A0 + 0x3a] = 0x3f
+		}
+
+		spawnSimpleChildObjects(0x08f674)
+	}
+	else
+	{
+		u8[0xfffffaad] = 0
+	}
+}
+
+
+
+// Ghost
+
+//# address-hook(0x08f11e) end(0x08f194)
+function void fn08f11e()
+{
+	// Targets:
+	//  - 0x08f1ac	-> objA0.base_state = 0x00
+	//  - 0x08f1fe	-> objA0.base_state = 0x04
+	//  - 0x08f226	-> objA0.base_state = 0x06
+	//  - 0x08f26e	-> objA0.base_state = 0x08
+	//  - 0x08f2be	-> objA0.base_state = 0x0a
+	//  - 0x08f2e0	-> objA0.base_state = 0x0c
+	//  - 0x08f322	-> objA0.base_state = 0x0e
+	//  - 0x08f36e	-> objA0.base_state = 0x10
+	call tableLookupAddress(0x08f19a, objA0.base_state)
+	if (checkForMultiReturn())
+		return
+
+	Object.loadSpritePatterns(0x08f67a)
+
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		bool goto08f174 = false
+		if (u8[0xfffff7c3] == 0)
+		{
+			goto08f174 = true
+		}
+		else
+		{
+			fn085870()
+			if (!_equal())
+			{
+				fn0857c2()
+				if (!_equal())
+				{
+					goto08f174 = true
+				}
+				else
+				{
+					if (u8[A1 + 0x34] == 0)
+					{
+						Enemy.DamageCharacter()
+					}
+					AddAsDynamicObject()
+				}
+			}
+			else
+			{
+				AddAsDynamicObject()
+			}
+		}
+
+		if (goto08f174)
+		{
+			objA0.update_address = 0x08f37a
+			objA0.countdown_callback = 0x08f16a
+
+			A1 = 0x08f6bf
+			fn084580()
+
+			playSound(0x8a)
+		}
+
+		DrawObject()
+	}
+	else
+	{
+		fn08f16a()
+	}
+}
+
+
+//# address-hook(0x08f16a)
+function void fn08f16a()
+{
+	--u8[0xfffffaad]
+	fn0851d8()
+}
+
+
+//# address-hook(0x08f1ac) end(0x08f1f2)
+function void fn08f1ac()
+{
+	A1 = 0x08f61c
+	if (fn084fa4())
+	{
+		signalMultiReturn()
+		return
+	}
+
+	objA0.render_flags &= ~0x04
+	objA0.render_flags |= 0x80
+	u8[A0 + 0x42] = u8[0xfffff7c3]
+	u8[A0 + 0x43] = u8[0xfffffaad]
+
+	fn08f538()
+	playSound(0x92)
+
+	fn08459c()
+	if (D2.u16 != 0)
+	{
+		if (u8[0xfffff7c3] == 5)	// That's the final light state
+		{
+			// Let ghosts attack
+			fn08f1f4()
+			return
+		}
+		objA0.base_state = 0x04
+	}
+}
+
+
+//# address-hook(0x08f1f4) end(0x08f1fa)
+function void fn08f1f4()
+{
+	objA0.base_state = 0x0c
+	fn08f58e()
+}
+
+
+//# address-hook(0x08f1fe) end(0x08f224)
+function void fn08f1fe()
+{
+	fn08459c()
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08f4f0()
+
+	D0.u8 = u8[0xfffff7c3]
+	if (D0.u8 != u8[A0 + 0x42])
+	{
+		objA0.base_state = 0x06
+	}
+}
+
+
+//# address-hook(0x08f226) end(0x08f264)
+function void fn08f226()
+{
+	fn08459c()
+	fn0847e6()
+	if (D3.u16 == 0)
+	{
+		UpdateMovementStraightSimple()
+		fn08f4f0()
+		return
+	}
+
+	objA0.base_state = 0x08
+	D0 = u8[0xfffff7c3]
+	D1.u8 = u8[0x08f268 + D0.s16]
+	if (D1.u8 == 0)
+		return
+
+	u8[A0 + 0x42] = D0.u8
+	if (D0.u8 == 0x05)
+	{
+		fn08f1f4()
+		return
+	}
+
+	objA0.base_state = 0x04
+	fn08f58e()
+}
+
+
+//# address-hook(0x08f26e) end(0x08f2b0)
+function void fn08f26e()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08f4f0()
+	fn08459c()
+	if (!_equal())
+	{
+		if (objA0.animation.frame == 2)
+		{
+			objA0.base_state = 0x0a
+
+			D0.u8 = u8[0xfffff7c3]
+			u8[A0 + 0x42] = D0.u8
+			D0.u16 = (D0.u16 * 2) & 0x0c
+			A1 = u32[0x08f2b2 + D0.s16]
+			objA0.animation.sprite = u8[A1]
+
+			fn084580()
+		}
+	}
+}
+
+
+//# address-hook(0x08f2be) end(0x08f2de)
+function void fn08f2be()
+{
+	fn0847e6()
+	UpdateMovementStraightSimple()
+	fn08f4f0()
+	fn08459c()
+	if (D2.u16 != 0)
+	{
+		objA0.base_state = 0x04
+	}
+}
+
+
+
+// Attacking
+
+//# address-hook(0x08f2e0) end(0x08f320)
+function void fn08f2e0()
+{
+	fn08459c()
+	fn0847e6()
+	UpdateMovementStraightSimple()
+
+	bool attackNow = false
+	if (objA0.velocity.x >= 0)
+	{
+		attackNow = (objA0.position.x.u16 > 0x01a0 + (getScreenWidth() - 320))
+	}
+	else
+	{
+		attackNow = (objA0.position.x.u16 < 0xa0)
+	}
+
+	if (attackNow)
+	{
+		objA0.base_state = 0x0e
+		objA0.render_flags ^= 0x01
+		objA0.velocity.x = -objA0.velocity.x
+		objA0.countdown_value = 0x3b
+	}
+}
+
+
+//# address-hook(0x08f322) end(0x08f36c)
+function void fn08f322()
+{
+	fn08459c()
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.base_state = 0x10
+	u8[A0 + 0x28] = 0xd7
+	objA0.render_flags |= 0x04
+
+	objA0.position.x.u16 = camera.position.x.u16 + objA0.position.x.u16 - 0x80
+	objA0.position.y.u16 = camera.position.y.u16 + objA0.position.y.u16 - 0x80
+	objA0.velocity.y = 0x0100
+}
+
+
+//# address-hook(0x08f36e) end(0x08f374)
+function void fn08f36e()
+{
+	fn08459c()
+	UpdateMovementStraightSimple()
+}
+
+
+//# address-hook(0x08f37a) end(0x08f38a)
+function void fn08f37a()
+{
+	fn08459c()
+	Object.loadSpritePatterns(0x08f67a)
+	DrawObject()
+}
+
+
+//# address-hook(0x08f390) end(0x08f3b8)
+function void fn08f390()
+{
+	D0 = objA0.subtype2c
+	A1 = u32[0x08f3be + D0.s16]
+	fn0858f8()
+	if (D0.u16 == 0)
+		return
+
+	D0 = objA0.subtype2c
+	A1 = u32[0x08f3c6 + D0.s16]
+	call A1
+
+	UnloadObject()
+}
+
+
+//# address-hook(0x08f3de) end(0x08f3e2)
+function void fn08f3de()
+{
+	addPatternLoadingCue(0x08f3e8)
+}
+
+
+//# address-hook(0x08f3f0) end(0x08f3f0)
+function void fn08f3f0()
+{
+	fn02f77c()
+}
+
+
+//# address-hook(0x08f3f6) end(0x08f436)
+function void fn08f3f6()
+{
+	setupObjectAttributesFull(0x08f62e)
+
+	objA0.update_address = 0x089c14
+	objA0.subtype2c = 0x03
+
+	spawnChildObjects(0x08f646)
+
+	bool isCapsuleOpen = (checkpoint.number != 0 || isMainCharacter(CHARACTER_KNUCKLES) || !isGhostSpawnEnabled())
+	if (isCapsuleOpen)
+	{
+		objA0.update_address = 0x089c54
+		objA0.animation.sprite = 0x01
+		objA0.flags38 |= 0x20
+	}
+}
+
+
+//# address-hook(0x08f438) end(0x08f45c)
+function void fn08f438()
+{
+	setupObjectAttributesBasic(0x086b3e)
+
+	bool canNotBeOpened = (checkpoint.number != 0 || !isGhostSpawnEnabled())
+	if (canNotBeOpened)
+	{
+		objA0.update_address = 0x086754
+		objA0.animation.sprite = 0x0c
+	}
+	else
+	{
+		objA0.update_address = 0x08672a
+	}
+}
+
+
+//# address-hook(0x08f45e) end(0x08f482)
+function void fn08f45e()
+{
+	// Targets:
+	//  - 0x08f48e	-> objA0.base_state = 0x00
+	//  - 0x08f4d8	-> objA0.base_state = 0x02
+	call tableLookupAddress(0x08f488, objA0.base_state)
+
+	if (objA0.subtype2c == 0)
+	{
+		Object.loadSpritePatterns(0x08f67a)
+		fn0851b4()
+	}
+	else
+	{
+		Object.DrawOrUnload()
+	}
+}
+
+
+//# address-hook(0x08f48e) end(0x08f4ba)
+function void fn08f48e()
+{
+	A1 = 0x08f4c0 + objA0.subtype2c * 2
+	objA0.velocity.x = u16[(A1+=2)-2]
+	u16[A0 + 0x40] = u16[(A1+=2)-2]
+	fn084b6e()
+	if (objA0.subtype2c == 0)
+	{
+		A1 = 0x08f61c
+		fn084fa4()
+	}
+	else
+	{
+		setupObjectAttributesFull(0x08f63a)
+	}
+}
+
+
+//# address-hook(0x08f4d8) end(0x08f4ea)
+function void fn08f4d8()
+{
+	Object.animationProgress(0x08f68e)
+	objA0.velocity.y += u16[A0 + 0x40]
+	UpdateMovementStraightSimple()
+}
+
+
+
+//# address-hook(0x08f4f0) end(0x08f512)
+function void fn08f4f0()
+{
+	D0.u16 = objA0.position.x.u16
+	if (objA0.velocity.x >= 0)
+	{
+		if (D0.u16 > 0x01a0 + (getScreenWidth() - 320))
+		{
+			objA0.render_flags ^= 0x01
+			objA0.velocity.x = -objA0.velocity.x
+		}
+	}
+	else
+	{
+		if (D0.u16 < 0xa0)
+		{
+			objA0.render_flags ^= 0x01
+			objA0.velocity.x = -objA0.velocity.x
+		}
+	}
+}
+
+
+//# address-hook(0x08f514) end(0x08f532)
+function void fn08f514()
+{
+	// Ghosts got freed from the capsule
+	checkpoint.number = 1
+
+	A1 = 0x1e3c5c
+	checkpoint.x = u16[(A1+=2)-2]
+	checkpoint.y = u16[(A1+=2)-2]
+	Checkpoint.SaveCurrentState()
+
+	spawnChildObjects(0x08f64e)
+}
+
+
+//# address-hook(0x08f538) end(0x08f572)
+function void fn08f538()
+{
+	GetRandomNumber()
+	D0.u16 = (D0.u16 & 0xff) - 0x7f
+	objA0.position.x.u16 += D0.u16
+	D1 = u8[0xfffff7c3] * 2
+	D2.u16 = u16[0x08f582 + D1.s16]
+	if (D0.u16 < 0x0120)
+	{
+		objA0.render_flags |= 0x01
+		D2.s16 = -D2.s16
+	}
+	objA0.velocity.x = D2.u16
+	D1.u16 &= 0x0c
+	u32[A0 + 0x30] = u32[0x08f576 + D1.s16]
+	fn08f58e()
+}
+
+
+//# address-hook(0x08f58e) end(0x08f5c6)
+function void fn08f58e()
+{
+	D0 = u8[0xfffff7c3] * 2
+	D1.u16 = u16[0x08f582 + D0.s16]
+	if (objA0.velocity.x >= 0)
+	{
+		D1.s16 = -D1.s16
+	}
+	objA0.velocity.x = D1.u16
+	D0.u16 *= 2
+	A1 = u32[0x08f5c8 + D0.s16]
+	objA0.flags38 &= ~0x01
+
+	call A1
+	if (objA0.velocity.y < 0)
+	{
+		objA0.flags38 |= 0x01
+		D0.s16 = -D0.s16
+	}
+	objA0.velocity.y = D0.u16
+}
+
+
+//# address-hook(0x08f5e0) end(0x08f5ee)
+function void fn08f5e0()
+{
+	D0.u16 = 0x40
+	objA0.value3e = D0.u16
+	u16[A0 + 0x40] = 0x04
+}
+
+
+//# address-hook(0x08f5f0) end(0x08f604)
+function void fn08f5f0()
+{
+	D0.u16 = 0x80
+	objA0.value3e = D0.u16
+	u16[A0 + 0x40] = 0x08
+	objA0.flags38 &= ~0x01
+}
+
+
+//# address-hook(0x08f606) end(0x08f61a)
+function void fn08f606()
+{
+	D0.u16 = 0xc0
+	objA0.value3e = D0.u16
+	u16[A0 + 0x40] = 0x10
+	objA0.flags38 &= ~0x01
+}

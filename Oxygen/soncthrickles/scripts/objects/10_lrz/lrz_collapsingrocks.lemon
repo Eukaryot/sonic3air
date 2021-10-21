@@ -1,0 +1,177 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Rock formation collapsing when stepping on it         //
+//-------------------------------------------------------//
+
+//# address-hook(0x039c50) end(0x039ca2)
+function void fn039c50()
+{
+	objA0.update_address = 0x039ca8
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x80
+	objA0.mapping_offset = 0x039e7a
+	objA0.sprite_attributes = 0xc0d3
+
+	D0.u16 = ((objA0.subtype2c & 0x0f) << 4) + 8
+	u8[A0 + 0x30] = D0.u8
+	D1.u16 = (objA0.subtype2c & 0xf0) >> 2
+	A1 = 0x039ca4 + D1.s16
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	objA0.animation.sprite = u8[(A1+=1)-1]
+	objA0.subtype2c = u8[(A1+=1)-1]
+	objA0.hitbox_extends.y = 0x1c
+
+	fn039ca8()
+}
+
+
+//# address-hook(0x039ca8) end(0x039ce2)
+function void fn039ca8()
+{
+	if (u8[A0 + 0x32] != 0)
+	{
+		if (u8[A0 + 0x30] == 0)
+		{
+			fn039d84()
+			return
+		}
+		--u8[A0 + 0x30]
+	}
+
+	D0.u8 = objA0.flags2a & 0x18
+	if (D0.u8 != 0)
+	{
+		u8[A0 + 0x32] = 0x01
+	}
+
+	D1 = objA0.box_size.x
+	D3 = objA0.hitbox_extends.y
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+	DrawOrUnloadObject()
+}
+
+
+//# address-hook(0x039ce8) end(0x039d14)
+function void fn039ce8()
+{
+	D1 = objA0.box_size.x
+	D3 = objA0.hitbox_extends.y
+	D4.u16 = objA0.position.x.u16
+	PlatformCheckClimbOn()
+
+	--u8[A0 + 0x30]
+	if (u8[A0 + 0x30] != 0)
+		return
+
+	A1 = 0xffffb000
+	D6 = 3
+	fn039d1a()
+
+	A1 = 0xffffb04a
+	D6 = 4
+	fn039d1a()
+
+	UnloadObject()
+}
+
+
+//# address-hook(0x039d1a) end(0x039d3c)
+function void fn039d1a()
+{
+	if (objA0.flags2a & (1 << D6.u8))
+	{
+		objA0.flags2a &= ~(1 << D6.u8)
+		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~0x20
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x21] = 0x01
+	}
+}
+
+
+//# address-hook(0x039d3e) end(0x039d7e)
+function void fn039d3e()
+{
+	if (u8[A0 + 0x30] != 0)
+	{
+		--u8[A0 + 0x30]
+		DrawObject()
+		return
+	}
+
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		D0.u8 = (objA0.animation.sprite + 1) & 3
+		D0.u8 += u8[A0 + 0x34]
+		objA0.animation.sprite = D0.u8
+	}
+
+	UpdateMovementSimple()
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x039d84) end(0x039e1a)
+function void fn039d84()
+{
+	u8[A0 + 0x30] = 0x2a
+	A3 = 0x039e20
+
+	objA0.update_address = 0x039ce8
+	D4 = 0x039d3e
+	D1.u16 = u16[(A3+=2)-2]
+	D5.u8 = objA0.render_flags
+	D2.u16 = objA0.position.x.u16
+	D3.u16 = objA0.position.y.u16
+
+	while (true)
+	{
+		if (!allocDynamicObjectAfterA0())
+			break
+
+		u32[A1] = D4
+		u32[A1 + 0x0c] = objA0.mapping_offset
+		u8[A1 + 0x04] = D5.u8
+		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
+		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
+		u8[A1 + 0x22] = u8[(A3+=1)-1]
+		u16[A1 + 0x0a] = objA0.sprite_attributes | 0x8000
+		u16[A1 + 0x08] = 0x80
+		u8[A1 + 0x07] = 0x20
+		u8[A1 + 0x30] = u8[(A3+=1)-1]
+		D0.u8 = u8[A1 + 0x22] & 0xfc
+		u8[A1 + 0x34] = D0.u8
+		--D1.s16
+		if (D1.s16 < 0)
+			break
+	}
+
+	if (objA0.respawn_entry)
+	{
+		A1 = 0xffff0000 + objA0.respawn_entry
+		u8[A1] &= ~0x80
+		objA0.respawn_entry = 0
+	}
+
+	playSound(0x59)
+}

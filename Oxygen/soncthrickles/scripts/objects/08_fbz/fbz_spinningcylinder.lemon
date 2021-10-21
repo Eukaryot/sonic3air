@@ -1,0 +1,262 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x039f2e) end(0x039f78)
+function void fn039f2e()
+{
+	bool flag = (objA0.subtype2c & 0x80)
+	u16[A0 + 0x2c] = (objA0.subtype2c & 0x7f) * 8
+
+	if (flag)
+	{
+		objA0.update_address = 0x03a0b0
+		fn03a0b0()
+	}
+	else
+	{
+		objA0.update_address = 0x039f58
+		fn039f58()
+	}
+}
+
+
+
+// Horizontal cylinder
+
+//# address-hook(0x039f58) end(0x039f78)
+function void fn039f58()
+{
+	D4.u16 = u16[A0 + 0x2c]
+	D5.u16 = D4.u16 * 2
+
+	A1 = 0xffffb000
+	A2 = 0xfffff7b0
+	D6 = 3
+	fn039f7e()
+
+	A1 = 0xffffb04a
+	A2 = 0xfffff7b1
+	++D6.u8
+	fn039f7e()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x039f7e) end(0x03a0ae)
+function void fn039f7e()
+{
+	bool isInside = (objA0.flags2a >> D6.u8) & 1
+	if (!isInside)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D4.u16
+		if (D0.u16 < D5.u16)
+		{
+			if (!Game.getSetting(SETTING_FBZ_ENTERCYLINDER))
+			{
+				D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x50
+				if (D0.u16 < 0x18)
+				{
+					u8[A2 + 0x02] = 0x28
+				}
+			}
+
+			if (u8[A2 + 0x02] != 0)
+			{
+				--u8[A2 + 0x02]
+				return
+			}
+
+			D0.u16 = objA0.position.y.u16 + 0x3c
+			D2.u16 = objA1.position.y.u16
+			D1.u16 = D2.u16 + s8[A1 + 0x1e] + 4
+			if (D0.u16 <= D1.u16)
+			{
+				D0.u16 -= D1.u16
+				if (D0.u16 >= 0xfff0)
+				{
+					if (u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
+					{
+						D2.u16 += D0.u16
+						D2.u16 += 0x03
+						objA1.position.y.u16 = D2.u16
+						LetSonicClimbOnObject()
+						u8[A1 + 0x2d] = 0x80
+						u16[A1 + 0x20] = 0x01
+						u8[A2] = 0
+						u8[A2 + 0x02] = 0
+						if (u16[A1 + 0x1c] == 0)
+						{
+							u16[A1 + 0x1c] = 0x01
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D4.u16
+			if (D0.u16 < D5.u16)
+			{
+				if ((u8[A1 + 0x2a] & 0x08) == 0)
+					return
+
+				D0.u8 = u8[A2]
+				LookupSinCos()
+				D1.s32 = s32(D1.s16) * 0x2800
+				D1 = (D1 << 16) + (D1 >> 16)
+				D2.u16 = objA0.position.y.u16 + D1.u16
+				D1 = u8[A1 + 0x1e]
+				D1.u16 -= 0x13
+				D2.u16 -= D1.u16
+				objA1.position.y.u16 = D2.u16
+				D0.u8 = u8[A2]
+				u8[A1 + 0x27] = D0.u8
+				u8[A2] += 0x04
+				if (u16[A1 + 0x1c] == 0)
+				{
+					u16[A1 + 0x1c] = 0x01
+				}
+				return
+			}
+		}
+		else
+		{
+			D0.u8 = u8[A2] + 0x20
+			if (D0.u8 < 0x40)
+			{
+				objA1.velocity.y >>= 1
+			}
+			else
+			{
+				objA1.velocity.y = 0
+			}
+		}
+
+		u8[A1 + 0x2a] &= ~0x08
+		objA0.flags2a &= ~(1 << D6.u8)
+		u8[A1 + 0x30] = 0
+		u8[A1 + 0x31] = 0x04
+		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2d] = 0
+	}
+}
+
+
+
+// Vertical cylinder
+
+//# address-hook(0x03a0b0) end(0x03a0d0)
+function void fn03a0b0()
+{
+	D4.u16 = u16[A0 + 0x2c]
+	D5.u16 = D4.u16 * 2
+
+	A1 = 0xffffb000
+	A2 = 0xfffff7b0
+	D6 = 3
+	fn03a0d6()
+
+	A1 = 0xffffb04a
+	A2 = 0xfffff7b1
+	++D6.u8
+	fn03a0d6()
+
+	CheckForUnloadObject()
+}
+
+
+//# address-hook(0x03a0d6) end(0x03a21a)
+function void fn03a0d6()
+{
+	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x80
+		if (D0.u16 >= 0x0100)
+			return
+
+		D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + D4.u16
+		if (D1.u16 >= D5.u16)
+			return
+
+		if (u8[A1 + 0x05] >= 0x06 || debug_mode.state != 0 || s8[A1 + 0x2e] < 0)
+			return
+
+		if (D0.u16 >= 0x20 && D0.u16 < 0xe0)
+			return
+
+		fn033c34()
+		u8[A1 + 0x26] = 0xc0
+		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		u8[A1 + 0x2a] &= ~0x01
+		u8[A2] = 0
+
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
+		if (D0.s16 < 0)
+		{
+			u8[A2] = 0x80
+		}
+		u16[A1 + 0x1c] = objA1.velocity.y
+		s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+
+		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16
+		if (D0.s16 < 0)
+		{
+			u8[A1 + 0x26] = 0x40
+			s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+		}
+		u8[A1 + 0x2e] |= 0x40
+		u8[A1 + 0x2e] |= 0x02
+		u16[A1 + 0x20] = 0x01
+		u8[A1 + 0x27] = 0
+		u8[A2 + 0x02] = 0
+	}
+
+	D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + D4.u16
+	if (D1.u16 >= D5.u16)
+	{
+		u8[A1 + 0x2e] = 0
+		u8[A1 + 0x2a] &= ~0x08
+		objA0.flags2a &= ~(1 << D6.u8)
+		u8[A1 + 0x27] = 0x01
+		u8[A1 + 0x30] = 0
+		u8[A1 + 0x31] = 0x04
+		u8[A1 + 0x2a] |= 0x02
+		return
+	}
+
+	if ((u8[A1 + 0x2a] & 0x08) == 0)
+		return
+
+	if (objA1.velocity.y >= 0)
+		u8[A1 + 0x04] |= render_flag.FLIP_Y
+	else
+		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+
+	D0.u8 = u8[A2]
+	LookupSinCos()
+	D1.s32 = s32(D1.s16) * 0x6800
+	D1 = (D1 << 16) + (D1 >> 16)
+	D2.u16 = objA0.position.x.u16 + D1.u16
+	D1 = u8[A1 + 0x1e]
+	D1.u16 -= 0x13
+	D2.u16 -= D1.u16
+	objA1.position.x.u16 = D2.u16
+	D2 = u8[A2]
+	u8[A2] += 4
+	D2.u16 = D2 / 0x0b
+	u8[A1 + 0x22] = u8[0x03a220 + D2.s16]
+	D0 = u8[A1 + 0x22]
+	SetCharacterSpritePatterns()
+}
+

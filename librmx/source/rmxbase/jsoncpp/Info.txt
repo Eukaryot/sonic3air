@@ -1,0 +1,11 @@
+This is taken directly from the jsoncpp Github repository:
+https://github.com/open-source-parsers/jsoncpp/
+
+You can find more information, its license etc. right there.
+
+Note that the library is reduced to only what's needed by librmx.
+
+Also there's small changes in this distribution here, namely that all includes like
+	#include <json/*.h>
+got changed to
+	#include "json/*.h"

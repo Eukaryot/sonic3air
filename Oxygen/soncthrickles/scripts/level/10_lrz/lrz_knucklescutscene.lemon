@@ -1,0 +1,483 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Knuckles cutscene in LRZ 2, just before boss act      //
+//-------------------------------------------------------//
+
+//# address-hook(0x063a6a) end(0x063a86)
+function void fn063a6a()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	// Targets:
+	//  - 0x063a96	-> objA0.base_state = 0x00
+	//  - 0x063aca	-> objA0.base_state = 0x02
+	//  - 0x063ae8	-> objA0.base_state = 0x04
+	//  - 0x063b10	-> objA0.base_state = 0x06
+	//  - 0x063b20	-> objA0.base_state = 0x08
+	call tableLookupAddress(0x063a8c, objA0.base_state)
+
+	fn0661e0()
+	DrawObject()
+}
+
+
+//# address-hook(0x063a96) end(0x063ac4)
+function void fn063a96()
+{
+	A1 = 0x0663ba
+	if (fn084fa4())
+		return
+
+	objA0.render_flags |= 0x01
+	objA0.mapping_offset = 0x14a8d6
+	objA0.animation.sprite = 0x56
+	objA0.position.x.u16 = 0x3a38
+	objA0.position.y.u16 = 0xec
+
+	CutsceneKnuckles.loadPalette()
+}
+
+
+//# address-hook(0x063aca) end(0x063ae0)
+function void fn063aca()
+{
+	if ((u8[0xfffffab8] & 0x02) == 0)
+		return
+
+	objA0.base_state = 0x04
+	objA0.animation.sprite = 0xde
+	objA0.countdown_callback = 0x063af2
+	fn063ae8()
+}
+
+
+//# address-hook(0x063ae8) end(0x063aec)
+function void fn063ae8()
+{
+	A1 = 0x066891
+	fn08468c()
+}
+
+
+//# address-hook(0x063af2) end(0x063b0a)
+function void fn063af2()
+{
+	objA0.base_state = 0x06
+	u8[0xfffffab8] |= 0x04
+	objA0.countdown_callback = 0x063b1a
+
+	A1 = 0x0668a7
+	fn084580()
+}
+
+
+//# address-hook(0x063b10) end(0x063b14)
+function void fn063b10()
+{
+	A1 = 0x0668a7
+	fn08468c()
+}
+
+
+//# address-hook(0x063b1a) end(0x063b20)
+function void fn063b1a()
+{
+	objA0.base_state = 0x08
+}
+
+
+//# address-hook(0x063b20)
+function void fn063b20()
+{
+}
+
+
+
+//# address-hook(0x063b22) end(0x063b3a)
+function void fn063b22()
+{
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+	objA0.update_address = 0x063b40
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x0863c0
+	}
+	fn063b40()
+}
+
+
+//# address-hook(0x063b40) end(0x063b8e)
+function void fn063b40()
+{
+	A1 = 0xffffb000
+	A2 = 0x063b94
+	fn0858c8()
+	if (_equal())
+		return
+
+	objA0.update_address = 0x063b9c
+	move_area.left = camera.position.x.u16
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x061d4c
+		objA1.subtype2c = 0x24
+	}
+
+	fn065dd6()
+
+	if (allocDynamicObjectStd())
+	{
+		objA1.update_address = 0x063c3e
+	}
+
+	Kosinski.addToDMAQueue(0x172214, 0xa000)
+}
+
+
+//# address-hook(0x063b9c) end(0x063bbc)
+function void fn063b9c()
+{
+	A1 = 0xffffb000
+	if (objA1.position.x.u16 < 0x39b0)
+		return
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
+
+	objA0.update_address = 0x063bbe
+	player1.control_override = 0xff
+	StopObjectA1()
+	control.player1 = 0
+}
+
+
+//# address-hook(0x063bbe) end(0x063bf2)
+function void fn063bbe()
+{
+	A1 = 0xffffb000
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+		return
+
+#if STANDALONE
+	Game.endSkippableCutscene()
+#endif
+
+	objA0.update_address = 0x063bf4
+	u8[0xfffffab8] |= 0x01
+	move_area.left = 0
+	player1.camera_lock = 0xff
+	player1.control_override = 0
+	u8[A1 + 0x2e] = 0x81
+	u8[A1 + 0x20] = 0x07
+}
+
+
+//# address-hook(0x063bf4) end(0x063c12)
+function void fn063bf4()
+{
+	camera.position.y.u16 -= 2
+	if (camera.position.y.u16 > 0x90)
+		return
+
+	objA0.update_address = 0x063c14
+	u8[0xfffffab8] |= 0x02
+}
+
+
+//# address-hook(0x063c14) end(0x063c38)
+function void fn063c14()
+{
+	if (u16[0xffffb014] < 0x04c0)
+		return
+
+	level.skip_titlecard = 0xff
+	u16[0xffffef5e] = ring_counter
+	u32[0xffffef60] = timer.alldata
+	global.shields_backup_2 = u8[0xffffb02b]
+	D0.u16 = 0x1600
+	TriggerNextZone()
+}
+
+
+//# address-hook(0x063c3e) end(0x063c64)
+function void fn063c3e()
+{
+	setupObjectAttributesFull(0x06647a)
+
+	objA0.update_address = 0x063c66
+	objA0.position.x.u16 = 0x3a08
+	objA0.position.y.u16 = 0xe2
+	objA0.hitbox_extends.y = 0x1f
+	u16[A0 + 0x46] = A0.u16
+}
+
+
+//# address-hook(0x063c66) end(0x063c7a)
+function void fn063c66()
+{
+	if (u8[0xfffffab8] & 0x04)
+	{
+		objA0.update_address = 0x063c80
+		objA0.velocity.x = -0x200
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x063c80) end(0x063ca6)
+function void fn063c80()
+{
+	playSoundRepeatedly(0x69)
+	fn065ed4()
+	fn065efe()
+	UpdateMovementStraightSimple()
+	CheckGroundCollision()
+
+	if (D1.s16 >= 0)
+	{
+		objA0.update_address = 0x063cac
+	}
+	DrawObject()
+}
+
+
+//# address-hook(0x063cac) end(0x063ce6)
+function void fn063cac()
+{
+	playSoundRepeatedly(0x69)
+	fn065ed4()
+	fn065efe()
+	MoveWithGravity20()
+
+	if (objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 < 0)
+		{
+			objA0.velocity.y = -0x100
+			camera.screenshake.state = 0x14
+			playSound(0x59)
+		}
+	}
+	DrawObject()
+}
+
+
+
+// Sonic getting hit by falling rock
+
+//# address-hook(0x065ed4) end(0x065efc)
+function void fn065ed4()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 4
+		D0.u8 = objA0.animation.frame + 1
+		objA0.animation.frame = D0.u8
+		objA0.render_flags = (objA0.render_flags & 0xfc) | (D0.u8 & 0x03)
+	}
+}
+
+
+//# address-hook(0x065efe) end(0x065f82)
+function void fn065efe()
+{
+	A1 = 0xffffb000
+	D2 = 0
+	D3 = 0x3c
+	D4 = 0xffffff8d
+#if STANDALONE
+	if (isMainCharacter(CHARACTER_TAILS))	// Choose the right animation for Tails
+		D4 = 0xffffff8a
+#endif
+	fn065f84()
+
+	A1 = 0xffffb04a
+	D2 = 1
+	D3 = 0x3d
+	D4 = 0xffffff8a
+	fn065f84()
+
+	A1 = 0xffffb000
+	D2 = 0
+	D3 = 0x3c
+	fn065f2e()
+
+	A1 = 0xffffb04a
+	D2 = 1
+	D3 = 0x3d
+	fn065f2e()
+}
+
+
+function void fn065f2e()
+{
+	if ((objA0.flags38 & (1 << D2.u8)) == 0)
+		return
+
+	--u8[A1 + 0x24]
+	if (s8[A1 + 0x24] < 0)
+	{
+		u8[A1 + 0x24] = 8
+		D0.u8 = u8[A1 + 0x23]
+		++u8[A1 + 0x23]
+		D0.u8 &= 0x03
+		D1.u8 = u8[A1 + 0x04] & 0xfc
+		D1.u8 |= D0.u8
+		u8[A1 + 0x04] = D1.u8
+	}
+
+	D0.u8 = u8[A0 + D3.s16]
+	u8[A0 + D3.s16] += 2
+	LookupSinCos()
+	D0.s16 >>= 3
+	D1.s16 >>= 3
+	D2.u16 = objA0.position.x.u16 + D0.u16
+	D3.u16 = objA0.position.y.u16 + D1.u16
+	objA1.position.x.u16 = D2.u16
+	objA1.position.y.u16 = D3.u16
+}
+
+
+//# address-hook(0x065f84) end(0x065fd4)
+function void fn065f84()
+{
+	if (objA0.flags38 & (1 << D2.u8))
+		return
+
+	A2 = 0x065fd6
+	fn0858c8()
+	if (!_equal())
+	{
+		objA0.flags38 |= (1 << D2.u8)
+		u16 backupD3 = D3.u16
+		player1.camera_lock = 0
+		hud.dirty.timer = 0
+		objA1.state = char.state.RUNNING
+		u8[A1 + 0x22] = D4.u8
+		u8[A1 + 0x23] = 0
+		u8[A1 + 0x24] = 0
+		u8[A1 + 0x2e] = 0x83
+
+		u32 backupA1 = A1
+		fn085fc4()
+		A2 = backupA1
+		A1 = A0
+		fn08622c()
+
+		D3.u16 = backupD3
+		u8[A0 + D3.s16] = D0.u8
+	}
+}
+
+
+
+// This code is used also by some bosses, it calculates the angle towards a target object
+
+//# address-hook(0x08622c) end(0x08626a)
+function void fn08622c()
+{
+	s16 dx = s16(u16[A2 + 0x10] - objA1.position.x.u16)
+	s16 dy = s16(u16[A2 + 0x14] - objA1.position.y.u16)
+
+	D0 = abs(dx)
+	D1 = abs(dy)
+	D2 = (dx < 0) ? 8 : 0
+	D3 = (dy < 0) ? 4 : 0
+
+	D4 = 0
+	if (D1.u16 < D0.u16)
+	{
+		u32 tmp = D0
+		D0 = D1
+		D1 = tmp
+		D4 = 2
+	}
+
+	if (D1.u16 == 0)
+		return
+
+	D0.u16 <<= 5
+	D0.u16 = D0 / D1.u16
+	D3.u16 += D2.u16
+	D4.u16 += D3.u16
+
+	// Targets:
+	//  - 0x08627e	-> D4.u16 = 0x00
+	//  - 0x086280	-> D4.u16 = 0x02
+	//  - 0x086288	-> D4.u16 = 0x04
+	//  - 0x086290	-> D4.u16 = 0x06
+	//  - 0x086296	-> D4.u16 = 0x08
+	//  - 0x08629a	-> D4.u16 = 0x0a
+	//  - 0x0862a0	-> D4.u16 = 0x0c
+	//  - 0x0862a6	-> D4.u16 = 0x0e
+	call tableLookupAddress(0x08626e, D4.u16)
+}
+
+//# address-hook(0x08627e) end(0x08627e)
+function void fn08627e()
+{
+}
+
+//# address-hook(0x086280) end(0x086286)
+function void fn086280()
+{
+	D0.u16 = 0x40 - D0.u16
+}
+
+//# address-hook(0x086288) end(0x08628e)
+function void fn086288()
+{
+	D0.u16 = 0x80 - D0.u16
+}
+
+//# address-hook(0x086290) end(0x086294)
+function void fn086290()
+{
+	D0.u16 += 0x40
+}
+
+//# address-hook(0x086296) end(0x086298)
+function void fn086296()
+{
+	D0.s16 = -D0.s16
+}
+
+//# address-hook(0x08629a) end(0x08629e)
+function void fn08629a()
+{
+	D0.u16 += 0xc0
+}
+
+//# address-hook(0x0862a0) end(0x0862a4)
+function void fn0862a0()
+{
+	D0.u16 += 0x80
+}
+
+//# address-hook(0x0862a6) end(0x0862ac)
+function void fn0862a6()
+{
+	D0.u16 = 0xc0 - D0.u16
+}

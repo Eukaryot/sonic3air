@@ -1,0 +1,169 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//# address-hook(0x041176) end(0x0411d2)
+function void fn041176()
+{
+	objA0.mapping_offset = 0x0412e0
+	objA0.sprite_attributes = 0x4001
+	objA0.render_flags |= 0x04
+	objA0.sprite_priority = 0x0280
+	u16[A0 + 0x44] = objA0.position.x.u16
+	u16[A0 + 0x46] = objA0.position.y.u16
+
+	D0 = (objA0.subtype2c >> 2) & 0x1c
+	A2 = 0x04116a + D0.u16
+	objA0.box_size.x = u8[A2]
+	objA0.box_size.y = u8[A2+1]
+	objA0.animation.sprite = u8[A2+2]
+	u8[A0 + 0x34] = u8[A2+3]
+
+	// Targets:
+	//  - 0x04126e	-> (objA0.subtype2c & 0x0f) = 0x00
+	//  - 0x041270	-> (objA0.subtype2c & 0x0f) = 0x01
+	//  - 0x04127c	-> (objA0.subtype2c & 0x0f) = 0x02
+	//  - 0x041288	-> (objA0.subtype2c & 0x0f) = 0x03
+	//  - 0x0412a8	-> (objA0.subtype2c & 0x0f) = 0x04
+	//  - 0x0412b4	-> (objA0.subtype2c & 0x0f) = 0x05
+	A1 = tableLookupAddress(0x041210, (objA0.subtype2c & 0x0f) * 2)
+	u32[A0 + 0x30] = A1
+
+	objA0.update_address = 0x0411d8
+	fn0411d8()
+}
+
+
+//# address-hook(0x0411d8) end(0x04120a)
+//# translated(0x04121e) end(0x04126c)
+function void fn0411d8()
+{
+	u16 backup_px = objA0.position.x.u16
+	A1 = u32[A0 + 0x30]
+	call A1
+
+	D4.u16 = backup_px
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	fn01dc56()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	D6.u8 &= u8[A0 + 0x34]
+	if (D6.u8 != 0)
+	{
+		if (objA0.animation.sprite == 1)
+		{
+			if (D6.u8 & 0x10)
+			{
+				A1 = 0xffffb000
+				DamageCharacter()
+			}
+
+			if (D6.u8 & 0x20)
+			{
+				A1 = 0xffffb04a
+				DamageCharacter()
+			}
+		}
+		else
+		{
+			if (D6.u8 & 0x04)
+			{
+				A1 = 0xffffb000
+				DamageCharacter()
+			}
+
+			if (D6.u8 & 0x08)
+			{
+				A1 = 0xffffb04a
+				DamageCharacter()
+			}
+		}
+	}
+
+	D0.u16 = u16[A0 + 0x44]
+	DrawOrUnloadObjectByD0()
+}
+
+
+//# address-hook(0x04126e) end(0x04126e)
+function void fn04126e()
+{
+}
+
+
+//# address-hook(0x041270) end(0x04127a)
+function void fn041270()
+{
+	D0 = u8[0xfffffe78] - 0x20
+	fn041294()
+}
+
+
+//# address-hook(0x04127c) end(0x041286)
+function void fn04127c()
+{
+	D0 = u8[0xfffffe8c] - 0x40
+	fn041294()
+}
+
+
+//# address-hook(0x041288) end(0x041290)
+function void fn041288()
+{
+	D0 = u8[0xfffffea8] * 2 - 0x80
+	fn041294()
+}
+
+
+//# address-hook(0x041294) end(0x0412a6)
+function void fn041294()
+{
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.position.x.u16 = u16[A0 + 0x44] + D0.s16
+}
+
+
+//# address-hook(0x0412a8) end(0x0412b2)
+function void fn0412a8()
+{
+	D0 = u8[0xfffffe78] - 0x20
+	fn0412cc()
+}
+
+
+//# address-hook(0x0412b4) end(0x0412be)
+function void fn0412b4()
+{
+	D0 = u8[0xfffffe8c] - 0x40
+	fn0412cc()
+}
+
+
+//# address-hook(0x0412c0) end(0x0412c8)
+function void fn0412c0()
+{
+	D0 = u8[0xfffffea8] * 2 - 0x80
+	fn0412cc()
+}
+
+
+//# address-hook(0x0412cc) end(0x0412de)
+function void fn0412cc()
+{
+	if (objA0.flags2a & 0x01)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.position.y.u16 = u16[A0 + 0x46] + D0.s16
+}

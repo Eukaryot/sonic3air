@@ -1,0 +1,263 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Cluckoid enemy from MHZ                               //
+//-------------------------------------------------------//
+
+//# address-hook(0x08e17e) end(0x08e17e)
+function void fn08e17e()
+{
+	Object.InitWithUpdateAddress(0x08e184)
+}
+
+
+//# address-hook(0x08e184) end(0x08e19c)
+function void fn08e184()
+{
+	// Targets:
+	//  - 0x08e1aa	-> objA0.base_state = 0x00
+	//  - 0x08e1be	-> objA0.base_state = 0x02
+	//  - 0x08e1e2	-> objA0.base_state = 0x04
+	//  - 0x08e21a	-> objA0.base_state = 0x06
+	call tableLookupAddress(0x08e1a2, objA0.base_state)
+
+	Object.loadSpritePatterns(0x08e410)
+	fn085208()
+}
+
+
+//# address-hook(0x08e1aa) end(0x08e1b8)
+function void fn08e1aa()
+{
+	A1 = 0x08e3d8
+	if (fn084fa4())
+		return
+
+	A2 = 0x08e402
+	SpawnChildObjectsInDir()
+}
+
+
+//# address-hook(0x08e1be) end(0x08e1e0)
+function void fn08e1be()
+{
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x80 && D3.u16 < 0x40)
+	{
+		objA0.base_state = 0x04
+		objA0.countdown_callback = 0x08e20c
+	}
+}
+
+
+//# address-hook(0x08e1e2) end(0x08e206)
+function void fn08e1e2()
+{
+	if (objA0.animation.sprite >= 7)
+	{
+		if ((objA0.flags38 & 0x80) == 0)
+		{
+			objA0.flags38 |= 0x80
+			playSound(0x97)
+		}
+
+		fn08e37c()
+		fn08e2d4()
+	}
+
+	A1 = 0x08e418
+	fn0845a0()
+}
+
+
+//# address-hook(0x08e20c) end(0x08e218)
+function void fn08e20c()
+{
+	objA0.base_state = 0x06
+	objA0.countdown_value = 0x60
+}
+
+
+//# address-hook(0x08e21a) end(0x08e234)
+function void fn08e21a()
+{
+	--objA0.countdown_value
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.base_state = 0x02
+	objA0.animation.sprite = 0
+	objA0.flags38 &= ~0x80
+}
+
+
+//# address-hook(0x08e2be) end(0x08e2ce)
+function void fn08e2be()
+{
+	setupObjectAttributesFull(0x08e3ea)
+
+	objA0.update_address = 0x08e2ce
+	fn08e2ce()
+}
+
+
+//# address-hook(0x08e2ce)
+function void fn08e2ce()
+{
+	fn084920()
+}
+
+
+//# address-hook(0x08e2d4) end(0x08e2e4)
+function void fn08e2d4()
+{
+	if ((global.framecounter & 0x07) == 0)
+	{
+		spawnSimpleChildObjects(0x08e40a)
+	}
+}
+
+
+//# address-hook(0x08e37c) end(0x08e3d6)
+function void fn08e37c()
+{
+	A1 = 0xffffb000
+	fn08e388()
+
+	A1 = 0xffffb04a
+	fn08e388()
+}
+
+
+function void fn08e388()
+{
+	if (u8[A1 + 0x20] != 0x08 && u8[A1 + 0x3d] == 0 && u8[A1 + 0x2e] == 0)
+	{
+		CheckDistanceToObjectA1()
+		if (D2.u16 < 0x0100 && D3.u16 < 0x40)
+		{
+			D4.u16 = D0.u16
+			if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+			{
+				D4.u16 -= 2
+			}
+
+			if (D4.u16 != 0)
+			{
+				D2.u16 = 0x10 - ((D2.u16 >> 4) & 0x0f)
+				if (D0.u16 == 0)
+					D2.s16 = -D2.s16
+				objA1.position.x.u16 += D2.u16
+			}
+		}
+	}
+}
+
+
+
+// Leaves blown away
+
+//# address-hook(0x08e236) end(0x08e24a)
+function void fn08e236()
+{
+	setupObjectAttributesFull(0x08e3f6)
+
+	objA0.update_address = 0x08e250
+	if (fn08e2ea())
+		return
+
+	DrawObject()
+}
+
+
+//# address-hook(0x08e250) end(0x08e2b8)
+function void fn08e250()
+{
+	if (objA0.render_flags & render_flag.VISIBLE)
+	{
+		D1 = 0
+		D0.u16 = objA0.velocity.x + u16[A0 + 0x40]
+		if (D0.s16 >= -0x80 && D0.s16 <= 0x80)
+		{
+			D1 |= 0x01
+		}
+		else
+		{
+			objA0.velocity.x = D0.u16
+		}
+
+		D0.u16 = objA0.velocity.y + 8
+		if (D0.s16 >= 0x80)
+		{
+			D1 |= 0x02
+		}
+		else
+		{
+			objA0.velocity.y = D0.u16
+		}
+
+		if (D1.u8 == 0x03)
+		{
+			objA0.update_address = 0x03dbe0
+			u16[A0 + 0x34] = 0x02
+		}
+
+		MHZSingleLeaf.SharedUpdate()
+		UpdateMovementStraightSimple()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# translated(0x08e2ea) end(0x08e35e)
+function bool fn08e2ea()
+{
+	GetRandomNumber()
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	D1.u16 = D0.u16
+	D2 = u16(u8[A1 + 0x2c]) << 5
+	A2 = 0x08e438 + D2.u16
+	D1.u16 &= 0x1c
+	A2 += D1.u16
+	D2.u16 = u16[(A2+=2)-2]
+	D3.u16 = u16[(A2+=2)-2]
+	if (D3.u16 != 0)
+	{
+		D0.u16 = u16[0x08e364 + (D0.s16 & 0x06)]
+		D4.u16 = -0x20
+		if ((u8[A1 + 0x04] & 0x01) == 0)
+		{
+			objA0.render_flags |= render_flag.FLIP_X
+			D0.s16 = -D0.s16
+			D2.s16 = -D2.s16
+			D4.s16 = -D4.s16
+		}
+		objA0.velocity.x = D0.u16
+		objA0.position.x.u16 += D2.u16
+		objA0.position.y.u16 += D3.u16
+		u16[A0 + 0x40] = D4.u16
+		D0 = (D0 << 16) + (D0 >> 16)
+		D2 = (D0.s16 < 0) ? 4 : 0
+		D0.u16 &= 0x06
+		objA0.velocity.y = u16[0x08e36c + D0.s16]
+		objA0.mapping_offset = u32[0x08e374 + D2.s16]
+		return false
+	}
+	else
+	{
+		UnloadObject()
+		return true
+	}
+}

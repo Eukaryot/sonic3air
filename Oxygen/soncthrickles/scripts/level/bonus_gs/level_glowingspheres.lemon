@@ -1,0 +1,347 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Glowing Spheres bonus stage                           //
+//-------------------------------------------------------//
+
+//# address-hook(0x059724) end(0x05972a)
+function void InitLevelTiles.BonusGS()
+{
+	Level.GetCameraPosition()
+	Level.InitialTilesFill()
+}
+
+
+//# address-hook(0x059736) end(0x059746)
+function void InitLevelScrolling.BonusGS()
+{
+	fn05975c()
+	fn04f2f6()
+	Level.InitialTilesFill()
+	WriteScrollOffsets()
+}
+
+
+//# address-hook(0x059730) end(0x059730)
+function void UpdateLevelTiles.BonusGS()
+{
+	LoadTileContentDefault()
+}
+
+
+//# address-hook(0x05974c) end(0x059756)
+function void UpdateLevelScrolling.BonusGS()
+{
+	fn05975c()
+	UpdateBackgroundTiles.General()
+	WriteScrollOffsets()
+}
+
+
+//# address-hook(0x05975c) end(0x059784)
+function void fn05975c()
+{
+	camera.background.y.u16 = camera.foreground.y.u16 >> 3
+
+	D0.s16 = camera.foreground.x.u16 - 160
+	D0.s16 += D0.s16 >> 2
+	D0.s16 >>= 1
+	D0.s16 += 0x60
+	camera.background.x.u16 = D0.u16
+}
+
+
+//# address-hook(0x0284fe) end(0x0285cc)
+function void LevelTilesAnim.BonusGS()
+{
+	A4 = 0xfffff7f0
+	if (u8[A4 + 2] != 0)
+	{
+		fn0285ee()
+		return
+	}
+
+	D0.u16 = u16[A4 + 4]
+	u16[A4 + 4] -= 4
+	u16[A4 + 4] &= 0x7f
+
+	A2 = 0xffff6000 + D0.s16
+	A3 = 0xffff7000
+	D1 = 2
+	while (D1.s16 >= 0)
+	{
+		D0 = 3
+		while (D0.s16 >= 0)
+		{
+			copyMemory(A3, A2, 0x80)
+			A3 += 0x80
+			A2 += 0x100
+			--D0.s16
+		}
+
+		A3 = A3 + 0x80
+		--D1.s16
+	}
+
+	A3 = 0xffff7200
+	D7 = 0
+	D6 = 2
+	while (D6.s16 >= 0)
+	{
+		D5 = 3
+		while (D5.s16 >= 0)
+		{
+			A1 = 0xffff7000
+			A2 = A1
+			A1.u16 += u16[0x0285ce + D7.s16]
+			A2.u16 += u16[0x0285d6 + D7.s16]
+			D2 = 0xffffffff
+			D3 = 0
+			D4 = 7
+			while (D4.s16 >= 0)
+			{
+				D0 = u32[(A1+=4)-4] & D2
+				D1 = u32[(A2+=4)-4] & D3
+				D0 |= D1
+				u32[(A3+=4)-4] = D0
+				D2.s32 <<= 4
+				D3.s32 <<= 4
+				D3.u16 |= 0x0f
+				--D4.s16
+			}
+
+			D7.u16 += 2
+			--D5.s16
+		}
+		A3 = A3 + 0x0200
+		--D6.s16
+	}
+
+	++u8[A4 + 2]
+	fn028624()
+}
+
+
+//# address-hook(0x0285ee) end(0x02861e)
+function void fn0285ee()
+{
+	fn02863e()
+
+	++u8[A4 + 2]
+	if (u8[A4 + 2] >= 0x04)
+	{
+		u8[A4 + 2] = 0
+		u16[A4] += 0x0280
+		if (u16[A4] >= 0x5000)
+			u16[A4] = 0
+
+		updateSpritePattern(0xffff7000, 0x1d20, 0x03c0)
+	}
+
+	fn028624()
+}
+
+
+//# address-hook(0x028624) end(0x02862e)
+function void fn028624()
+{
+	A2 = 0x028c2c
+	A3 = 0xfffff7f6
+	fn0286e8()
+}
+
+
+//# address-hook(0x02863e) end(0x0286e2)
+function void fn02863e()
+{
+	D0 = u8[A4 + 2] - 1
+	A3 = 0xffff7000 + D0.u16 * 640
+	D3.u16 = D0.u16 * 4
+
+	A1 = 0x028632 + D3.s16
+	D3.u8 = u8[(A1+=1)-1]
+	D4.u8 = u8[(A1+=1)-1]
+	D5.u8 = u8[(A1+=1)-1]
+	D6.u8 = u8[(A1+=1)-1]
+
+	A1 = 0xffff1000 + u16[A4]
+	D2.u16 = 0x01ff
+	while (D2.s16 >= 0)
+	{
+		D0.u8 = u8[(A1+=1)-1]
+		if (D0.u8 != 0)
+		{
+			D1.u8 = D0.u8
+			D0.u8 &= 0xf0
+			if (D0.u8 != 0)
+			{
+				u8[A3] &= 0x0f
+				D0.u8 += D3.u8
+				u8[A3] |= D0.u8
+			}
+
+			D1.u8 &= 0x0f
+			if (D1.u8 != 0)
+			{
+				u8[A3] &= 0xf0
+				D1.u8 += D4.u8
+				u8[A3] |= D1.u8
+			}
+		}
+		++A3
+		--D2.s16
+	}
+
+	D2.u16 = 0x7f
+	while (D2.s16 >= 0)
+	{
+		D0.u8 = u8[(A1+=1)-1]
+		if (D0.u8 != 0)
+		{
+			D1.u8 = D0.u8
+			D0.u8 &= 0xf0
+			if (D0.u8 != 0)
+			{
+				u8[A3] &= 0x0f
+				if (D0.s8 >= 0)
+				{
+					D0.u8 += D3.u8
+				}
+				else
+				{
+					D0.u8 -= D5.u8
+				}
+				u8[A3] |= D0.u8
+			}
+
+			D1.u8 &= 0x0f
+			if (D1.u8 != 0)
+			{
+				u8[A3] &= 0xf0
+				if ((D1 & 0x08) == 0)
+				{
+					D1.u8 += D4.u8
+				}
+				else
+				{
+					D1.u8 -= D6.u8
+				}
+				u8[A3] |= D1.u8
+			}
+		}
+		++A3
+		--D2.s16
+	}
+}
+
+
+
+//# address-hook(0x002918) end(0x0029a6)
+function void LevelPaletteUpdate.BonusGS()
+{
+	--u16[0xfffff634]
+	if (s16[0xfffff634] < 0)
+	{
+		u16[0xfffff634] = 0
+		D0.u16 = u16[0xfffff632]
+		u16[0xfffff632] += 0x0e
+		if (u16[0xfffff632] >= 0xfc)
+		{
+			u16[0xfffff632] = 0
+		}
+		A0 = 0xffff7800
+		A1 = 0xfffffc70
+		A0 = A0 + D0.s16
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u16[(A1+=2)-2] = u16[(A0+=2)-2]
+	}
+
+	--u16[0xfffff658]
+	if (s16[0xfffff658] < 0)
+	{
+		u16[0xfffff658] = 0x03
+		D0.u16 = u16[0xfffff652]
+		u16[0xfffff652] += 0x0a
+		if (u16[0xfffff652] >= 0x03e8)
+		{
+			u16[0xfffff652] = 0
+		}
+		A0 = 0xffff78fc
+		A1 = 0xfffffc42
+		A0 = A0 + D0.s16
+		u32[(A1+=4)-4] = u32[A0 + 0x50]
+		u32[(A1+=4)-4] = u32[A0 + 0x54]
+		u16[(A1+=2)-2] = u16[A0 + 0x58]
+		u32[(A1+=4)-4] = u32[A0 + 0x28]
+		u32[(A1+=4)-4] = u32[A0 + 0x2c]
+		u16[(A1+=2)-2] = u16[A0 + 0x30]
+		u32[(A1+=4)-4] = u32[A0]
+		u32[(A1+=4)-4] = u32[A0 + 0x04]
+		u16[(A1+=2)-2] = objA0.sprite_priority
+	}
+}
+
+
+//# address-hook(0x0029a8) end(0x002a4e)
+function void LevelPaletteUpdate.BonusSM()
+{
+#if STANDALONE
+	// Slow down animation on highest anti-flicker setting
+	if ((level.framecounter & 0x03) != 0)
+		return
+#endif
+
+	if (s8[0xfffff650] > 0)
+	{
+		--u16[0xfffff658]
+		if (s16[0xfffff658] < 0)
+		{
+			u16[0xfffff658] = 0
+
+			D0.u16 = u16[0xfffff652]
+			u16[0xfffff652] += 8
+			if (u16[0xfffff652] >= 0x78)
+				u16[0xfffff652] = 0
+
+			copyMemory(0xfffffc54, 0x003660 + D0.u16, 8)
+
+			D0.u16 = u16[0xfffff654]
+			u16[0xfffff654] += 2
+			if (u16[0xfffff654] >= 0x0c)
+				u16[0xfffff654] = 0
+
+			A0 = 0x0036e0
+			u16[0xfffffc5c] = u16[A0 + D0.u16]
+			u16[0xfffffc7c] = u16[A0 + D0.u16]
+		}
+	}
+	else if (s8[0xfffff650] == 0)
+	{
+		--u16[0xfffff634]
+		if (s16[0xfffff634] < 0)
+		{
+			u16[0xfffff634] = 3
+
+			D0.u16 = u16[0xfffff632]
+			u16[0xfffff632] += 8
+			if (u16[0xfffff632] >= 0x40)
+				u16[0xfffff632] = 0
+
+			A0 = 0x003620
+			u32[0xfffffc54] = u32[A0 + D0.s16]
+			u32[0xfffffc58] = u32[A0 + D0.s16 + 4]
+			u16[0xfffffc5c] = 0x0e02
+			u16[0xfffffc7c] = 0x0e02
+		}
+	}
+}

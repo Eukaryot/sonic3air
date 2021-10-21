@@ -1,0 +1,40 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Just a line of blocks to walk on
+// Seen in HCZ 2 wall chase
+
+//# address-hook(0x01f392) end(0x01f3c4)
+function void fn01f392()
+{
+	objA0.animation.sprite = objA0.subtype2c
+	A1 = 0x01f38a + objA0.subtype2c * 2
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	objA0.mapping_offset = 0x21d04a
+	objA0.sprite_attributes = 0x43d4
+	objA0.render_flags |= render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+
+	objA0.update_address = 0x01f3ca
+	fn01f3ca()
+}
+
+
+//# address-hook(0x01f3ca) end(0x01f3e6)
+function void fn01f3ca()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = objA0.box_size.y + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+	DrawOrUnloadObject()
+}

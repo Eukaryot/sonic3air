@@ -1,0 +1,178 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2021 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Star Pointer (from IceCap Zone)                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x08be2e) end(0x08be2e)
+function void StarPointer.Init()
+{
+	Object.InitWithUpdateAddress(0x08be34)
+}
+
+
+//# address-hook(0x08be34) end(0x08be68)
+function void StarPointer.Update()
+{
+	setupObjectAttributesFull(0x08bf8e)
+	objA0.update_address = 0x08be74
+	if (objA0.render_flags & render_flag.FLIP_Y)
+	{
+		objA0.render_flags &= ~render_flag.FLIP_Y
+		u8[A0 + 0x0a] |= 0x80
+	}
+
+	D0 = objA0.subtype2c & 0x06
+	D4.u16 = u16[0x08be6c + D0.s16]
+	fn085416()
+
+	A2 = 0x08bfa0
+	SpawnIdenticalChildObjects()
+}
+
+
+
+//# address-hook(0x08be74) end(0x08bea2)
+function void fn08be74()
+{
+	UpdateMovementStraightSimple()
+	CheckDistanceToPlayers()
+	if (D2.u16 < 0x80)
+	{
+		if (objA0.render_flags & render_flag.FLIP_X)
+			D0.u16 -= 2
+
+		if (D0.u16 == 0)
+		{
+			objA0.update_address = 0x08bea6
+			objA0.flags38 |= 0x02
+		}
+	}
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08bea6) end(0x08beac)
+function void fn08bea6()
+{
+	UpdateMovementStraightSimple()
+	Enemy.DrawOrUnload()
+}
+
+
+//# address-hook(0x08beb0) end(0x08bee0)
+function void fn08beb0()
+{
+	setupObjectAttributesBasic(0x08bf9a)
+	objA0.flags2b |= 0x08
+	objA0.hitbox_extends.x = 0x08
+	objA0.update_address = 0x08bee6
+	D0 = objA0.subtype2c >> 1
+	u8[A0 + 0x3c] = u8[0x08bee2 + D0.s16]
+	objA0.countdown_callback = 0x08bf64
+}
+
+
+//# address-hook(0x08bee6) end(0x08bf48)
+function void fn08bee6()
+{
+	if ((global.framecounter & 0x01) == 0)
+	{
+		A1 = 0xffff0000 + u16[A0 + 0x46]
+		if (u8[A1 + 0x04] & 0x01)
+			++u8[A0 + 0x3c]
+		else
+			--u8[A0 + 0x3c]
+
+		if (u8[A0 + 0x3c] == 0 && u8[A1 + 0x38] & 0x02)
+		{
+			// Shoot off one of the orbiting spiked spheres as separate object
+			objA0.update_address = 0x08bf4c
+			D0.s16 = objA1.velocity.x << 1
+			objA0.velocity.x = D0.u16
+			if (objA0.velocity.x < 0)
+			{
+				u32[A0 + 0x30] = 0x0848fe
+				s16[A0 + 0x44] = -8
+			}
+			else
+			{
+				u32[A0 + 0x30] = 0x0848e8
+				s16[A0 + 0x44] = 8
+			}
+		}
+	}
+
+	fn08bf80()
+	D2 = 4
+	fn084c42()
+	fn084934()
+}
+
+
+//# address-hook(0x08bf80) end(0x08bf8c)
+function void fn08bf80()
+{
+	if (u8[A0 + 0x28] == 0)
+	{
+		A1 = objA0.countdown_callback
+		call A1
+	}
+}
+
+
+//# address-hook(0x08bf64) end(0x08bf72)
+function void fn08bf64()
+{
+	objA0.update_address = 0x08bf74
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+}
+
+
+
+// Spiked sphere
+
+//# address-hook(0x08bf4c) end(0x08bf60)
+function void fn08bf4c()
+{
+	UpdateMovementStraightSimple()
+
+	D3.u16 = u16[A0 + 0x44]
+	A1 = u32[A0 + 0x30]
+	call A1
+
+	fn08bf80()
+	fn085180()
+}
+
+
+//# address-hook(0x0848fe) end(0x084912)
+function void fn0848fe()
+{
+	fn00fe3c()
+	if (D1.s16 >= 0)
+		return
+
+	objA0.position.x.u16 += D1.u16
+	A1 = objA0.countdown_callback
+	call A1
+}
+
+
+
+// Dissolving of spiked spheres
+
+//# address-hook(0x08bf74) end(0x08bf7c)
+function void fn08bf74()
+{
+	Object.animationProgress(0x08bfa8)
+	fn085180()
+}
