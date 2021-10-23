@@ -81,3 +81,9 @@ mac_dist
 
 # Android
 /Oxygen/soncthrickles/build/_android/local.properties
+
+# Discord Game SDL binaries
+!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.dll
+!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.lib
+!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.dylib
+!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.so
