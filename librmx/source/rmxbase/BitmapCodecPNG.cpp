@@ -340,7 +340,7 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 
 				// 32-bit RGB + alpha
 				case 6:
-					memcpy(dst, src, width*4);
+					memcpy(dst, src, width*sizeof(uint32));
 					break;
 			}
 		}

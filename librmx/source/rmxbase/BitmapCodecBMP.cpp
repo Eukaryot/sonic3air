@@ -184,7 +184,7 @@ bool BitmapCodecBMP::encode(const Bitmap& bitmap, OutputStream& stream)
 		uint32* src = &bitmap.mData[(height-y-1)*width];
 		for (int x = 0; x < width; ++x)
 			output[x] = RGBA_to_BGRA(src[x]);
-		stream.write(output, width*4);
+		stream.write(output, width*sizeof(uint32));
 	}
 
 	delete[] output;
