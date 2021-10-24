@@ -47,7 +47,11 @@ namespace detail
 		if (nullptr == inputStream)
 			return 0;
 
+#ifdef __MINGW64__
 		return (unsigned int)inputStream->read(buf, (size_t)size);
+#else
+		return (uLong)inputStream->read(buf, (size_t)size);
+#endif
 	}
 
 	ZPOS64_T tellFile(voidpf opaque, voidpf stream)
