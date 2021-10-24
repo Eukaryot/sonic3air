@@ -44,7 +44,8 @@ External libraries and code used in this project:
 ## How to build
 
 For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/soncthrickles":
-* Windows: "build/\_vstudio"
+* Windows - Visual Studio : "build/\_vstudio"
+* Windows - MSYS2 : "build/\_make_msys2"
 * Mac:     "build/\_xcode"
 * Linux:   "build/\_cmake"
 * Android: "build/\_android"
