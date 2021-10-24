@@ -10,4 +10,4 @@ pacman -S make git mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2
 ```
 make PLATFORM=Windows
 ```
-Output will be at `bin/Windows/sonic3air.nro`.
+Output will be at `bin/Windows/sonic3air.exe`.
