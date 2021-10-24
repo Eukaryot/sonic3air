@@ -17,7 +17,7 @@
 	#pragma comment(lib, "minizip.lib")
 #endif
 
-#ifdef __MSYS2__
+#ifdef __MINGW64__
 	typedef uint64_t ZPOS64_T;
 #endif
 
@@ -37,7 +37,7 @@ namespace detail
 		return 0;
 	}
 
-#ifdef __MSYS2__
+#ifdef __MINGW64__
 	unsigned int  readFile(voidpf opaque, voidpf stream, void* buf, unsigned int  size)
 #else
 	uLong readFile(voidpf opaque, voidpf stream, void* buf, uLong size)
@@ -285,7 +285,7 @@ const ZipFileProvider::ContainedFile* ZipFileProvider::readFile(const std::wstri
 		return containedFile;
 	}
 
-#ifdef __MSYS2__
+#ifdef __MINGW64__
 	int result = unzLocateFile(mInternal.mZipFile, *WString(fileEntry.mPath + fileEntry.mFilename).toString(), (unzFileNameComparer)1);
 #else
 	int result = unzLocateFile(mInternal.mZipFile, *WString(fileEntry.mPath + fileEntry.mFilename).toString(), 1);
