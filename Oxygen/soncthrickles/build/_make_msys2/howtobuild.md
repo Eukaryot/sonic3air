@@ -1,12 +1,12 @@
 # Building using Make on MSYS2
 
 ## Windows
-1. Install the following packages using pacman:
+1. Install the following packages using pacman on a MINGW64 prompt ( Windows Start Menu/MSYS2 64-bit/MSYS2 MinGW 64-bit ) :
 ```
 pacman -Syu
 pacman -S make git mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-minizip-git mingw-w64-x86_64-libswift mingw-w64-x86_64-glew mingw-w64-x86_64-glm mingw-w64-x86_64-libogg mingw-w64-x86_64-opus mingw-w64-x86_64-libvorbis mingw-w64-x86_64-libtheora mingw-w64-x86_64-zlib
 ```
-2. In this directory (Oxygen/soncthrickles/build/_make_msys2):
+2. Run this command in this directory (Oxygen/soncthrickles/build/_make_msys2) :
 ```
 make PLATFORM=Windows
 ```
