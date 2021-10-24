@@ -20,6 +20,10 @@
 	#pragma comment(lib, "minizip.lib")
 #endif
 
+#ifdef __MINGW64__
+	typedef uint64_t ZPOS64_T;
+#endif
+
 #include "unzip.h"
 
 
