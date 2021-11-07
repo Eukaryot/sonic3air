@@ -47,5 +47,8 @@ Package the files (End user):
 Uncomment the line add_compile_definitions(PLATFORM_ENDUSER) in CMakeLists.txt. Or you can define it as an argument to cmake when you build.
 
 === Run WebAssembly Builds ===
-
 Host the output on a web server that supports the correct MIME type for .wasm files. Launch sonic3air_web.html
+
+=== Other notes ===
+The file manager launched when you exit the web port is a fork of the React FileManager project which adds BrowserFS support. A compiled copy is provided in the /dist/ directory. The source code to the fork is here in the event that anyone wants to modify it further:
+https://github.com/Sappharad/filemanager
