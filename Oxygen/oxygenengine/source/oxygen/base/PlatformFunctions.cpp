@@ -8,7 +8,10 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/helper/HighResolutionTimer.h"
 #include "oxygen/helper/Log.h"
+
+#include <thread>
 
 #ifdef PLATFORM_WINDOWS
 	#include <CleanWindowsInclude.h>
@@ -136,6 +139,108 @@ namespace
 	}
 }
 
+
+
+void PlatformFunctions::preciseDelay(double milliseconds)
+{
+	// This function is based on work by Sewer56, and used with his permission here
+	//  -> For the original, see https://github.com/Sewer56/sonic3air
+
+	const double timerGranularity = getTimerGranularityMilliseconds();	// As a side effect, this function sets the optimal timer granularity
+
+	HighResolutionTimer timer;
+	timer.start();
+	while (true)
+	{
+		const double timeLeft = milliseconds - timer.getSecondsSinceStart() * 1000.0;
+		if (timeLeft <= 0.0)
+			break;
+
+		const double sleepTimeLeft = timeLeft - timerGranularity;
+
+		// Don't spin on mobile platforms, accept some imprecision to avoid battery drain
+		#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MACOS) || defined(PLATFORM_LINUX)
+		{
+			// Spin if below granularity
+			if (sleepTimeLeft < 0.0)
+			{
+				double lastYieldTimeMs = std::numeric_limits<double>::max();
+				while (true)
+				{
+					const double timeLeft = milliseconds - timer.getSecondsSinceStart() * 1000.0;
+					if (timeLeft <= 0.0)
+						break;
+
+					if (timeLeft > lastYieldTimeMs)		// Otherwise it's essentially busy waiting
+					{
+						HighResolutionTimer yieldTimer;
+						yieldTimer.start();
+						std::this_thread::yield();
+						lastYieldTimeMs = yieldTimer.getSecondsSinceStart();
+					}
+				}
+				break;
+			}
+		}
+		#endif
+
+		// Is the remaining time rounded down to full milliseconds above the timer granularity?
+		if (sleepTimeLeft >= 1.0)
+		{
+			// Sleep the thread if above granularity
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)sleepTimeLeft));
+		}
+		else
+		{
+			// Yield the thread if below granularity
+			std::this_thread::yield();
+		}
+	}
+}
+
+double PlatformFunctions::getTimerGranularityMilliseconds()
+{
+	// This function is based on work by Sewer56, and used with his permission here
+	//  -> For the original, see https://github.com/Sewer56/sonic3air
+
+	static double timerGranularity = 0.0;
+	static bool initialized = false;
+	if (!initialized)
+	{
+	#ifdef PLATFORM_WINDOWS
+		// Query range of possible timer granularities and use the minimum if possible
+		const HINSTANCE hLibrary = LoadLibrary("NTDLL.dll");
+		if (nullptr != hLibrary)
+		{
+			typedef NTSTATUS(NTAPI* pQueryTimerResolution)(PULONG MinimumResolution, PULONG MaximumResolution, PULONG CurrentResolution);
+			typedef NTSTATUS(NTAPI* pSetTimerResolution)(ULONG RequestedResolution, BOOLEAN Set, PULONG ActualResolution);
+
+			pSetTimerResolution setFunction = (pSetTimerResolution)GetProcAddress(hLibrary, "NtSetTimerResolution");
+			pQueryTimerResolution queryFunction = (pQueryTimerResolution)GetProcAddress(hLibrary, "NtQueryTimerResolution");
+			if (nullptr != setFunction && nullptr != queryFunction)
+			{
+				// Note that these resolutions are measured in units of 100 nanoseconds
+				ULONG minResolution, maxResolution, actualResolution;
+				queryFunction(&minResolution, &maxResolution, &actualResolution);
+				const NTSTATUS status = setFunction(maxResolution, TRUE, &actualResolution);
+				if (status == 0)
+				{
+					timerGranularity = actualResolution / 10000.0;	// Convert to milliseconds
+					initialized = true;
+				}
+			}
+		}
+	#endif
+
+		// For other platforms, or when something went wrong, assume a timer granularity of 1 millisecond
+		if (!initialized)
+		{
+			timerGranularity = 1.0;
+			initialized = true;
+		}
+	}
+	return timerGranularity;
+}
 
 void PlatformFunctions::changeWorkingDirectory(const std::string& execCallPath)
 {

@@ -59,7 +59,7 @@ void Profiling::pushRegion(uint16 id)
 
 	mRegionStack.push_back(region);
 	region->mOnStack = true;
-	region->mTimer.Start();
+	region->mTimer.resumeTiming();
 
 	if (region->mParent == nullptr)
 	{
@@ -81,7 +81,7 @@ void Profiling::popRegion(uint16 id)
 
 	mRegionStack.pop_back();
 	region->mOnStack = false;
-	region->mTimer.Stop();
+	region->mTimer.pauseTiming();
 }
 
 void Profiling::nextFrame(int simulationFrameNumber)
@@ -90,7 +90,7 @@ void Profiling::nextFrame(int simulationFrameNumber)
 
 	for (Region* region : mAllRegions)
 	{
-		const double lastTime = region->mTimer.GetCurrentSeconds();		// For root timer (which is usually still running), this will perform a stop and immediate restart
+		const double lastTime = region->mTimer.getAccumulatedSecondsAndRestart();	// For root timer (which is usually still running), this will perform a stop and immediate restart
 		while (region->mFrameTimes.size() >= MAX_FRAMES)
 			region->mFrameTimes.pop_front();
 		region->mFrameTimes.emplace_back();
@@ -98,7 +98,7 @@ void Profiling::nextFrame(int simulationFrameNumber)
 		frame.mInclusiveTime = lastTime;
 		frame.mExclusiveTime = lastTime;
 		region->mAccumulatedTime += lastTime;
-		region->mTimer.Reset();
+		region->mTimer.resetTiming();
 	}
 	for (Region* region : mAllRegions)
 	{
@@ -107,7 +107,7 @@ void Profiling::nextFrame(int simulationFrameNumber)
 			region->mParent->mFrameTimes.back().mExclusiveTime -= region->mFrameTimes.back().mExclusiveTime;
 		}
 	}
-	mRootRegion.mTimer.Start();		// Needed for first frame
+	mRootRegion.mTimer.resumeTiming();		// Needed for first frame to start timing
 
 	static const PerFrameData dummy;
 	const PerFrameData& oldData = mAdditionalData.mFrames.empty() ? dummy : mAdditionalData.mFrames.back();

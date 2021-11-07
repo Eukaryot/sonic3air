@@ -389,11 +389,10 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						case SDLK_F11:
 						{
 							HighResolutionTimer timer;
-							timer.Start();
+							timer.start();
 							if (mSimulation.reloadScripts(true))
 							{
-								timer.Stop();
-								setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.GetCurrentSeconds()));
+								setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.getSecondsSinceStart()));
 							}
 							break;
 						}

@@ -23,6 +23,7 @@
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/helper/Utils.h"
 
 
 namespace option

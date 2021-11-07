@@ -55,6 +55,8 @@ Application::Application() :
 	Profiling::registerRegion(ProfilingRegion::AUDIO,				 "Audio",		Color::RED);
 	Profiling::registerRegion(ProfilingRegion::RENDERING,			 "Rendering",	Color::BLUE);
 	Profiling::registerRegion(ProfilingRegion::FRAMESYNC,			 "Frame Sync",	Color(0.3f, 0.3f, 0.3f));
+
+	mApplicationTimer.start();
 }
 
 Application::~Application()
@@ -528,29 +530,32 @@ void Application::render()
 	{
 		Profiling::pushRegion(ProfilingRegion::FRAMESYNC);
 
-		const float tickLengthMilliseconds = 1000.0f / mSimulation->getSimulationFrequency();
+		const double currentTime = mApplicationTimer.getSecondsSinceStart() * 1000.0;
+		const double tickLengthMilliseconds = 1000.0 / (double)mSimulation->getSimulationFrequency();
 		const bool usingFramecap = (drawer.getType() != Drawer::Type::OPENGL || Configuration::instance().mFrameSync != 1);
-		int delay = 0;
 		if (usingFramecap)
 		{
-			const uint32 currentTicks = SDL_GetTicks();
-			delay = (int)mNextRefreshTicks - currentTicks;
-			if (delay < 0 || delay > (int)std::ceil(tickLengthMilliseconds))
+			double delay = mNextRefreshTime - currentTime;
+			if (delay < 0.0 || delay > tickLengthMilliseconds)
 			{
-				mNextRefreshTicks = (float)currentTicks + tickLengthMilliseconds;
+				// No delay in these cases
+				mNextRefreshTime = currentTime + tickLengthMilliseconds;
 			}
 			else
 			{
-				mNextRefreshTicks += tickLengthMilliseconds;
+				mNextRefreshTime += tickLengthMilliseconds;
+				PlatformFunctions::preciseDelay(delay);
 			}
 		}
 		else
 		{
-			// This should not be necessary if VSync is *really* on
-			delay = 3 - (int)((float)Profiling::getRootRegion().mTimer.GetCurrentSeconds() * 1000.0f);
+			// Rely on V-Sync, but still use a minimum delay in case it's off
+			double delay = tickLengthMilliseconds - Profiling::getRootRegion().mTimer.getAccumulatedSeconds() * 1000.0;
+			if (delay >= 1.0)
+			{
+				SDL_Delay(1);	// No precise timing should be needed here
+			}
 		}
-		if (delay > 0 && delay <= (int)std::ceil(tickLengthMilliseconds))
-			SDL_Delay(delay);
 
 		if (mIsVeryFirstFrameForLogging)
 		{

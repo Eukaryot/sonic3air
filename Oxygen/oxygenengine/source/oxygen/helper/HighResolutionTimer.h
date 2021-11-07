@@ -11,20 +11,34 @@
 #include <chrono>
 
 
-struct HighResolutionTimer
+class HighResolutionTimer
 {
+public:
+	void reset();
+	void start();
+
+	inline bool isRunning() const  { return mRunning; }
+	double getSecondsSinceStart() const;
+
+protected:
 	typedef std::chrono::time_point<std::chrono::high_resolution_clock> TimePoint;
 	typedef std::chrono::duration<double> Duration;
 
 	TimePoint mStart;
-	Duration mCurrentTime = Duration::zero();
-	Duration mLastTime = Duration::zero();
 	bool mRunning = false;
+};
 
-	void Reset();
-	void Restart();
-	void Start();
-	void Stop();
-	double GetCurrentSeconds();
-	double GetLastSeconds() const;
+
+class AccumulativeTimer : protected HighResolutionTimer
+{
+public:
+	void resetTiming();
+	void resumeTiming();
+	void pauseTiming();
+
+	double getAccumulatedSeconds() const;
+	double getAccumulatedSecondsAndRestart();
+
+private:
+	Duration mAccumulatedTime;
 };

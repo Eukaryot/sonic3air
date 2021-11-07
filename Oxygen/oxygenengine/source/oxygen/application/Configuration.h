@@ -126,7 +126,7 @@ public:
 	int   mDisplayIndex = 0;
 	RenderMethod mRenderMethod = RenderMethod::UNDEFINED;
 	bool  mAutoDetectRenderMethod = true;
-	int   mFrameSync = 1;
+	int   mFrameSync = 1;				// 0: V-Sync off, 1: V-Sync On, 2: V-Sync + Framecap
 	int   mUpscaling = 0;
 	int   mBackdrop = 0;
 	int   mFiltering = 0;

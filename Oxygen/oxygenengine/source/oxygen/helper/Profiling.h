@@ -50,7 +50,7 @@ public:
 		std::string mName;
 		Color mColor;
 
-		HighResolutionTimer mTimer;
+		AccumulativeTimer mTimer;
 		std::deque<Frame> mFrameTimes;
 		double mAverageTime = 0.0;
 
