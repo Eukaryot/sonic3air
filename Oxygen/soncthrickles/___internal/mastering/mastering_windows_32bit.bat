@@ -18,7 +18,7 @@ mkdir "%outputDir%"
 :: Make sure the needed binaries are all up-to-date
 
 %msbuildPath% ..\oxygenengine\_vstudio\oxygenengine.sln /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
-%msbuildPath% _vstudio\soncthrickles.sln /property:Configuration=Release-Enduser /property:Platform=Win32 -verbosity:minimal
+%msbuildPath% build\_vstudio\sonic3air.sln /property:Configuration=Release-Enduser /property:Platform=Win32 -verbosity:minimal
 
 
 

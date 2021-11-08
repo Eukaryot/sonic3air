@@ -11,7 +11,7 @@ mkdir "%outputDir%\data"
 
 
 :: Make sure the Release build is up-to-date
-%msbuildPath% _vstudio/soncthrickles.sln /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
+%msbuildPath% build/_vstudio/sonic3air.sln /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
 
 :: Build data packages and meta data
 "bin\Release_x86\Sonic3AIR.exe" -pack
