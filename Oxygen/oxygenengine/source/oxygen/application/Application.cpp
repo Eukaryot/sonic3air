@@ -782,6 +782,13 @@ bool Application::updateLoading()
 					return false;
 				}
 
+				// If the application was only started to perform nativization, then exit now
+				if (Configuration::instance().mRunScriptNativization != 0)
+				{
+					FTX::System->quit();
+					return false;
+				}
+
 				// Startup game
 				EngineMain::getDelegate().startupGame();
 

@@ -155,6 +155,8 @@ public:
 	int mScriptOptimizationLevel = 3;
 	std::wstring mCompiledScriptSavePath;
 	bool mEnableROMDataAnalyzer = false;
+	int mRunScriptNativization = 0;			// 0: Disabled, 1: Run nativization, 2: Nativization done
+	std::wstring mScriptNativizationOutput;
 
 	// Mod settings
 	std::map<uint64, Mod> mModSettings;

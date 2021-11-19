@@ -201,7 +201,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 		}
 	}
 
-	const Configuration& config = Configuration::instance();
+	Configuration& config = Configuration::instance();
 	lemon::GlobalsLookup globalsLookup;
 	globalsLookup.addDefinitionsFromModule(mInternal.mCoreModule);
 
@@ -320,10 +320,12 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 
 	mInternal.mProgram.setOptimizationLevel(config.mScriptOptimizationLevel);
 
-#if defined(DEBUG)
 	// Optional code nativization
-//	mInternal.mProgram.runNativization(mInternal.mScriptModule, L"source/sonic3air/_nativized/NativizedCode.inc", EmulatorInterface::instance());
-#endif
+	if (config.mRunScriptNativization == 1 && !config.mScriptNativizationOutput.empty())
+	{
+		mInternal.mProgram.runNativization(mInternal.mScriptModule, config.mScriptNativizationOutput, EmulatorInterface::instance());
+		config.mRunScriptNativization = 2;		// Marked as done
+	}
 
 	// Scan for function pragmas defining hooks
 	evaluateFunctionPragmas();
