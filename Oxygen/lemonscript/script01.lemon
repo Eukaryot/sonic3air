@@ -2,6 +2,30 @@
 
 function void main()
 {
+	u8 a = 0
+	if (a == 1)
+	{
+		Log = 1
+	}
+	else if (a == 2)
+		Log = 2
+	else if (a != 0)
+		if (a == 3)
+			Log = 3
+		else
+		{
+		}
+
+	if (a != 0)
+		if (a == 3)
+			Log = 3
+		else
+		{
+		}
+	else
+		Log = 0
+
+
 	runTests()
 }
 
@@ -21,6 +45,8 @@ function void runTests()
 		debugLog("Test D failed")
 	if (!testE())
 		debugLog("Test E failed")
+
+	debugLog("Done with all tests")
 }
 
 function bool testA()

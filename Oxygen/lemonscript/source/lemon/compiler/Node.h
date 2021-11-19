@@ -35,7 +35,6 @@ namespace lemon
 			EXTERNAL,
 			STATEMENT,
 			IF_STATEMENT,
-			ELSE_STATEMENT,
 			WHILE_STATEMENT,
 			FOR_STATEMENT
 		};
@@ -247,16 +246,6 @@ namespace lemon
 		TokenPtr<StatementToken> mConditionToken;
 		NodePtr<Node> mContentIf;
 		NodePtr<Node> mContentElse;
-	};
-
-
-	class ElseStatementNode : public Node
-	{
-	public:
-		static const Type TYPE = Type::ELSE_STATEMENT;
-
-	public:
-		inline ElseStatementNode() : Node(TYPE) {}
 	};
 
 

@@ -434,10 +434,6 @@ namespace lemon
 				break;
 			}
 
-			case Node::Type::ELSE_STATEMENT:
-				CHECK_ERROR(false, "Else statement not allowed here", node.getLineNumber());
-				break;
-
 			default:
 				break;
 		}

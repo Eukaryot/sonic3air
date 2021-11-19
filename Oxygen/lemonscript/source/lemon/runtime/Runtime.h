@@ -56,6 +56,17 @@ namespace lemon
 	};
 
 
+	class API_EXPORT Environment	// This is meant to be derived from, if needed, to provide custom information
+	{
+	public:
+		inline explicit Environment(uint64 type) : mType(type) {}
+		inline uint64 getType() const  { return mType; }
+
+	private:
+		uint64 mType = 0;	// Can be used to differentiate between various implementations
+	};
+
+
 	class API_EXPORT RuntimeDetailHandler
 	{
 	public:
@@ -93,8 +104,11 @@ namespace lemon
 		};
 
 	public:
-		inline static ControlFlow* getActiveControlFlow() { return mActiveControlFlow; }
-		inline static Runtime* getActiveRuntime() { return (nullptr == mActiveControlFlow) ? nullptr : &mActiveControlFlow->getRuntime(); }
+		inline static ControlFlow* getActiveControlFlow()	{ return mActiveControlFlow; }
+		inline static Runtime* getActiveRuntime()			{ return (nullptr == mActiveControlFlow) ? nullptr : &mActiveControlFlow->getRuntime(); }
+
+		inline static const Environment* getActiveEnvironment()					{ return mActiveEnvironment; }
+		inline static void setActiveEnvironment(const Environment* environment)	{ mActiveEnvironment = environment; }
 
 	public:
 		Runtime();
@@ -126,7 +140,8 @@ namespace lemon
 		void setGlobalVariableValue(const Variable& variable, int64 value);
 		int64* accessGlobalVariableValue(const Variable& variable);
 
-		inline const ControlFlow& getMainControlFlow() const  { return *mMainControlFlow; }
+		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
+		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }
 
 		void callFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
@@ -143,6 +158,7 @@ namespace lemon
 
 	private:
 		inline static ControlFlow* mActiveControlFlow = nullptr;
+		inline static const Environment* mActiveEnvironment = nullptr;
 
 	private:
 		const Program* mProgram = nullptr;
@@ -157,7 +173,9 @@ namespace lemon
 
 		StringLookup mStrings;
 
-		ControlFlow* mMainControlFlow = nullptr;
+		// TODO: Add functions to create / destroy control flows, otherwise we're stuck with just the main control flow
+		std::vector<ControlFlow*> mControlFlows;		// Contains at least one control flow at all times = the main control flow at index 0
+		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
 	};
 
 }

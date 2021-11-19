@@ -41,6 +41,20 @@ namespace lemon
 	}
 
 
+	struct Compiler::NodesIterator
+	{
+		BlockNode& mBlockNode;
+		size_t mCurrentIndex = 0;
+
+		inline NodesIterator(BlockNode& blockNode) : mBlockNode(blockNode) {}
+		inline void operator++()		{ ++mCurrentIndex; }
+		inline Node& operator*() const	{ return mBlockNode.mNodes[mCurrentIndex]; }
+		inline bool valid() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()); }
+		inline Node* peek() const		{ return (mCurrentIndex + 1 < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex + 1] : nullptr; }
+		inline void eraseCurrent()		{ mBlockNode.mNodes.erase(mCurrentIndex); --mCurrentIndex; }
+	};
+
+
 	std::pair<uint32, std::wstring> Compiler::LineNumberTranslation::translateLineNumber(uint32 lineNumber) const
 	{
 		if (mIntervals.empty())
@@ -442,7 +456,7 @@ namespace lemon
 		std::vector<size_t> indicesToErase;
 		indicesToErase.reserve(nodes.size() / 2);
 
-		// Cycle through all top-level nodes to find the functions
+		// Cycle through all top-level nodes to find global definitions (functions, global variables, defines)
 		for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex)
 		{
 			Node& node = nodes[nodeIndex];
@@ -554,7 +568,6 @@ namespace lemon
 							{
 								define.mContent.add(tokens[i]);
 							}
-
 							break;
 						}
 
@@ -667,89 +680,15 @@ namespace lemon
 		functionCompiler.buildOpcodesForFunction(content);
 	}
 
-	void Compiler::formSingleStatement(BlockNode& blockNode, size_t index)
-	{
-		CHECK_ERROR(index < blockNode.mNodes.size(), "Expected another node to form statement of", blockNode.mNodes.back().getLineNumber());
-
-		Node& node = blockNode.mNodes[index];
-		switch (node.getType())
-		{
-			case Node::Type::BLOCK:
-			{
-				// Everything okay already, nothing left to do
-				break;
-			}
-
-			case Node::Type::IF_STATEMENT:
-			{
-				IfStatementNode& isn = node.as<IfStatementNode>();
-				uint32 nodeCount = 2;
-
-				formSingleStatement(blockNode, index+1);
-				isn.mContentIf = blockNode.mNodes[index+1];
-
-				// Check for else
-				if (index+2 < blockNode.mNodes.size() && blockNode.mNodes[index+2].getType() == Node::Type::ELSE_STATEMENT)
-				{
-					formSingleStatement(blockNode, index+3);
-					isn.mContentElse = blockNode.mNodes[index+3];
-					nodeCount = 4;
-				}
-
-				blockNode.mNodes.erase(index+1, nodeCount-1);
-				break;
-			}
-
-			case Node::Type::ELSE_STATEMENT:
-			{
-				CHECK_ERROR(false, "Else in wrong location", node.getLineNumber());
-				break;
-			}
-
-			case Node::Type::WHILE_STATEMENT:
-			{
-				WhileStatementNode& wsn = node.as<WhileStatementNode>();
-
-				formSingleStatement(blockNode, index+1);
-				wsn.mContent = blockNode.mNodes[index+1];
-
-				blockNode.mNodes.erase(index+1);
-				break;
-			}
-
-			case Node::Type::FOR_STATEMENT:
-			{
-				ForStatementNode& fsn = node.as<ForStatementNode>();
-
-				formSingleStatement(blockNode, index+1);
-				fsn.mContent = blockNode.mNodes[index+1];
-
-				blockNode.mNodes.erase(index+1);
-				break;
-			}
-
-			default:
-			{
-			/*
-				// Replace single statement with block node
-				BlockNode& newBlockNode = NodeFactory::create<BlockNode>();
-				newBlockNode.setLineNumber(node.getLineNumber());
-				newBlockNode.mNodes.push_back(&node);
-				blockNode.mNodes[index] = newBlockNode;
-			*/
-				break;
-			}
-		}
-	}
-
 	void Compiler::processUndefinedNodesInBlock(BlockNode& blockNode, ScriptFunction& function, ScopeContext& scopeContext)
 	{
 		// Block start: Create new scope
 		scopeContext.beginScope();
 
-		for (size_t i = 0; i < blockNode.mNodes.size(); ++i)
+		for (NodesIterator nodesIterator(blockNode); nodesIterator.valid(); ++nodesIterator)
 		{
-			Node& node = blockNode.mNodes[i];
+			Node& node = *nodesIterator;
+			const size_t nodeIndex = nodesIterator.mCurrentIndex;
 			switch (node.getType())
 			{
 				case Node::Type::BLOCK:
@@ -761,60 +700,14 @@ namespace lemon
 				case Node::Type::UNDEFINED:
 				{
 					UndefinedNode& un = node.as<UndefinedNode>();
-					Node* newNode = processUndefinedNode(un, function, scopeContext);
+					Node* newNode = processUndefinedNode(un, function, scopeContext, nodesIterator);
 					if (newNode != nullptr)
 					{
 						newNode->setLineNumber(node.getLineNumber());
 
-						// Special case: after 'else', we allow for another statement (especially an 'if')
-						if (newNode->getType() == Node::Type::ELSE_STATEMENT)
-						{
-							un.mTokenList.erase(0);
-							if (!un.mTokenList.empty())
-							{
-								Node* newNode2 = processUndefinedNode(un, function, scopeContext);
-								if (newNode2 != nullptr)
-								{
-									newNode2->setLineNumber(node.getLineNumber());
-									blockNode.mNodes.insert(*newNode2, i+1);
-								}
-							}
-						}
-
 						// Replace undefined node
-						blockNode.mNodes.replace(*newNode, i);
+						blockNode.mNodes.replace(*newNode, nodeIndex);
 					}
-					break;
-				}
-
-				default:
-					break;
-			}
-
-			// End scope if requested (needed by for-loops)
-			scopeContext.onNodeProcessed();
-		}
-
-		// Post-process to merge if, else, while with the according block(s) or statement
-		for (size_t i = 0; i < blockNode.mNodes.size(); ++i)
-		{
-			Node& node = blockNode.mNodes[i];
-			switch (node.getType())
-			{
-				// TODO: Recursion for blocks needed?
-				// ...
-
-				case Node::Type::IF_STATEMENT:
-				case Node::Type::WHILE_STATEMENT:
-				case Node::Type::FOR_STATEMENT:
-				{
-					formSingleStatement(blockNode, i);
-					break;
-				}
-
-				case Node::Type::ELSE_STATEMENT:
-				{
-					CHECK_ERROR(false, "Else in wrong location", node.getLineNumber());
 					break;
 				}
 
@@ -827,7 +720,7 @@ namespace lemon
 		scopeContext.endScope();
 	}
 
-	Node* Compiler::processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext)
+	Node* Compiler::processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator)
 	{
 		const uint32 lineNumber = undefinedNode.getLineNumber();
 		TokenList& tokens = undefinedNode.mTokenList;
@@ -913,12 +806,51 @@ namespace lemon
 					IfStatementNode& node = NodeFactory::create<IfStatementNode>();
 					node.mConditionToken = tokens[1].as<StatementToken>();
 					tokens.erase(1);
+
+					// Go on with the next node, which must be either a block or a statement
+					{
+						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
+						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'if' line", node.getLineNumber());
+						node.mContentIf = newNode;
+						nodesIterator.eraseCurrent();
+					}
+
+					// Also check for 'else'
+					{
+						Node* nextNode = nodesIterator.peek();
+						if (nullptr != nextNode && nextNode->getType() == Node::Type::UNDEFINED)
+						{
+							UndefinedNode& nextNodeUndefined = nextNode->as<UndefinedNode>();
+							if (nextNodeUndefined.mTokenList.size() >= 1 && nextNodeUndefined.mTokenList[0].getType() == Token::Type::KEYWORD && nextNodeUndefined.mTokenList[0].as<KeywordToken>().mKeyword == Keyword::ELSE)
+							{
+								// Special case: 'else if' (or anything where there's a statement directly after the 'else')
+								if (nextNodeUndefined.mTokenList.size() >= 2)
+								{
+									// Remove the 'else' here and treat the rest as a normal statement, as if it was on the next line
+									nextNodeUndefined.mTokenList.erase(0);
+								}
+								else
+								{
+									// Normal handling for 'else'
+									++nodesIterator;
+									nodesIterator.eraseCurrent();
+								}
+
+								Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
+								CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'else' line", node.getLineNumber());
+								node.mContentElse = newNode;
+								nodesIterator.eraseCurrent();
+							}
+						}
+					}
+
 					return &node;
 				}
 
 				case Keyword::ELSE:
 				{
-					return &NodeFactory::create<ElseStatementNode>();
+					CHECK_ERROR(false, "Found 'else' without a corresponding 'if'", lineNumber);
+					break;
 				}
 
 				case Keyword::WHILE:
@@ -932,6 +864,14 @@ namespace lemon
 					WhileStatementNode& node = NodeFactory::create<WhileStatementNode>();
 					node.mConditionToken = tokens[1].as<StatementToken>();
 					tokens.erase(1);
+
+					// Go on with the next node, which must be either a block or a statement
+					{
+						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
+						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'while' line", node.getLineNumber());
+						node.mContent = newNode;
+						nodesIterator.eraseCurrent();
+					}
 					return &node;
 				}
 
@@ -961,7 +901,7 @@ namespace lemon
 					CHECK_ERROR(numSemicolons == 2, "Expected exactly two semicolons in 'for' loop header", lineNumber);
 
 					// Create new scope, should end after the next node (counting both this and the next one)
-					scopeContext.beginScope(2);
+					scopeContext.beginScope();
 
 					TokenPtr<StatementToken> statements[3];
 					for (int i = 0; i < 3; ++i)
@@ -989,6 +929,16 @@ namespace lemon
 					node.mInitialToken   = statements[0];
 					node.mConditionToken = statements[1];
 					node.mIterationToken = statements[2];
+
+					// Go on with the next node, which must be either a block or a statement
+					{
+						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
+						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'for' line", node.getLineNumber());
+						node.mContent = newNode;
+						nodesIterator.eraseCurrent();
+					}
+
+					scopeContext.endScope();
 					return &node;
 				}
 
@@ -1021,6 +971,34 @@ namespace lemon
 			return &node;
 		}
 
+		return nullptr;
+	}
+
+	Node* Compiler::gatherNextStatement(NodesIterator& nodesIterator, ScriptFunction& function, ScopeContext& scopeContext)
+	{
+		++nodesIterator;
+		if (nodesIterator.valid())
+		{
+			Node& nextNode = *nodesIterator;
+			switch (nextNode.getType())
+			{
+				case Node::Type::BLOCK:
+				{
+					processUndefinedNodesInBlock(nextNode.as<BlockNode>(), function, scopeContext);
+					return &nextNode;
+				}
+
+				case Node::Type::UNDEFINED:
+				{
+					UndefinedNode& un = nextNode.as<UndefinedNode>();
+					Node* newNode = processUndefinedNode(un, function, scopeContext, nodesIterator);
+					return newNode;
+				}
+
+				default:
+					break;
+			}
+		}
 		return nullptr;
 	}
 

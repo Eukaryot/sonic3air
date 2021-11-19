@@ -255,14 +255,14 @@ int main(int argc, char** argv)
 	Program program;
 	program.addModule(module);
 
-#if 1
+#if 0
 	// Run nativization
 	program.runNativization(module, L"source/NativizedCode.inc", memoryAccess);
 #endif
 
 	try
 	{
-	#if 1
+	#if 0
 		// Use nativization
 		static NativizedOpcodeProvider instance(&createNativizedCodeLookup);
 		program.mNativizedOpcodeProvider = instance.isValid() ? &instance : nullptr;

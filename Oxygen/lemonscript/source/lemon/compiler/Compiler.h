@@ -75,36 +75,26 @@ namespace lemon
 		struct ScopeContext
 		{
 			std::vector<LocalVariable*> mLocalVariables;
-			std::vector<std::pair<size_t, uint32>> mScopeStack;		// Number of local variables for each scope on the stack + number of nodes until scope ends
+			std::vector<size_t> mScopeStack;			// Number of local variables for each scope on the stack
 
 			ScopeContext()
 			{
 				mScopeStack.reserve(4);
 			}
 
-			inline void beginScope(uint32 autoEndAfterNodes = 0)
+			inline void beginScope()
 			{
-				mScopeStack.emplace_back(mLocalVariables.size(), autoEndAfterNodes);
+				mScopeStack.emplace_back(mLocalVariables.size());
 			}
 
 			inline void endScope()
 			{
-				mLocalVariables.resize(mScopeStack.back().first);
+				mLocalVariables.resize(mScopeStack.back());
 				mScopeStack.pop_back();
 			}
-
-			inline void onNodeProcessed()
-			{
-				while (!mScopeStack.empty() && mScopeStack.back().second > 0)
-				{
-					--mScopeStack.back().second;
-					if (mScopeStack.back().second > 0)
-						break;
-
-					endScope();
-				}
-			}
 		};
+
+		struct NodesIterator;
 
 	private:
 		bool loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, int inclusionDepth);
@@ -116,9 +106,9 @@ namespace lemon
 		void processGlobalDefinitions(BlockNode& rootNode);
 		ScriptFunction& processFunctionHeader(Node& node, const TokenList& tokens);
 		void processSingleFunction(FunctionNode& functionNode);
-		void formSingleStatement(BlockNode& blockNode, size_t index);
 		void processUndefinedNodesInBlock(BlockNode& blockNode, ScriptFunction& function, ScopeContext& scopeContext);
-		Node* processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext);
+		Node* processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator);
+		Node* gatherNextStatement(NodesIterator& nodesIterator, ScriptFunction& function, ScopeContext& scopeContext);
 		void processTokens(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 
 	private:

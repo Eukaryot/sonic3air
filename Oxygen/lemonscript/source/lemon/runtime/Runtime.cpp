@@ -103,19 +103,28 @@ namespace lemon
 
 
 
-	Runtime::Runtime() :
-		mMainControlFlow(new ControlFlow(*this))
+	Runtime::Runtime()
 	{
+		// Create default control flow
+		mControlFlows.push_back(new ControlFlow(*this));
+		mSelectedControlFlow = mControlFlows[0];
 	}
 
 	Runtime::~Runtime()
 	{
-		delete mMainControlFlow;
+		for (ControlFlow* controlFlow : mControlFlows)
+		{
+			delete controlFlow;
+		}
 	}
 
 	void Runtime::reset()
 	{
-		mMainControlFlow->reset();
+		for (ControlFlow* controlFlow : mControlFlows)
+		{
+			controlFlow->reset();	// Existing control flows are only reset, not destroyed
+		}
+		mSelectedControlFlow = mControlFlows[0];	// Reset to main control flow
 
 		mRuntimeFunctions.clear();
 		mRuntimeFunctionsMapped.clear();
@@ -147,7 +156,11 @@ namespace lemon
 	void Runtime::setProgram(const Program& program)
 	{
 		mProgram = &program;
-		mMainControlFlow->mProgram = &program;
+		for (ControlFlow* controlFlow : mControlFlows)
+		{
+			controlFlow->mProgram = &program;
+		}
+
 		reset();
 
 		// Assign initial values to global variables
@@ -161,13 +174,19 @@ namespace lemon
 				mGlobalVariables[index] = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue : 0;
 			}
 		}
-		mMainControlFlow->mGlobalVariables = &mGlobalVariables[0];
+		for (ControlFlow* controlFlow : mControlFlows)
+		{
+			controlFlow->mGlobalVariables = &mGlobalVariables[0];
+		}
 	}
 
     void Runtime::setMemoryAccessHandler(MemoryAccessHandler* handler)
 	{
 		mMemoryAccessHandler = handler;
-		mMainControlFlow->mMemoryAccessHandler = mMemoryAccessHandler;
+		for (ControlFlow* controlFlow : mControlFlows)
+		{
+			controlFlow->mMemoryAccessHandler = mMemoryAccessHandler;
+		}
 	}
 
 	void Runtime::setRuntimeDetailHandler(RuntimeDetailHandler* handler)
@@ -259,11 +278,11 @@ namespace lemon
 	void Runtime::callFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex)
 	{
 		// Push new state to call stack
-		ControlFlow::State& state = *mMainControlFlow->mCallStack.add();
+		ControlFlow::State& state = *mSelectedControlFlow->mCallStack.add();
 		state.mRuntimeFunction = &runtimeFunction;
 		state.mBaseCallIndex = baseCallIndex;
 		state.mProgramCounter = runtimeFunction.getFirstRuntimeOpcode();
-		state.mLocalVariablesStart = mMainControlFlow->mLocalVariablesSize;
+		state.mLocalVariablesStart = mSelectedControlFlow->mLocalVariablesSize;
 	}
 
 	void Runtime::callFunction(const Function& function, size_t baseCallIndex)
@@ -282,8 +301,8 @@ namespace lemon
 				const UserDefinedFunction& func = static_cast<const UserDefinedFunction&>(function);
 
 				// Directly execute it
-				mActiveControlFlow = mMainControlFlow;
-				func.execute(UserDefinedFunction::Context(*mMainControlFlow));
+				mActiveControlFlow = mSelectedControlFlow;
+				func.execute(UserDefinedFunction::Context(*mSelectedControlFlow));
 				mActiveControlFlow = nullptr;
 				break;
 			}
@@ -313,9 +332,9 @@ namespace lemon
 		//		numLocalVars += (int)func.mOpcodes[i].mParameter;
 		//	}
 		//}
-		memset(&mMainControlFlow->mLocalVariablesBuffer[mMainControlFlow->mLocalVariablesSize], 0, numLocalVars * sizeof(int64));
-		mMainControlFlow->mLocalVariablesSize += numLocalVars;
-		mMainControlFlow->mCallStack.back().mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(offset);
+		memset(&mSelectedControlFlow->mLocalVariablesBuffer[mSelectedControlFlow->mLocalVariablesSize], 0, numLocalVars * sizeof(int64));
+		mSelectedControlFlow->mLocalVariablesSize += numLocalVars;
+		mSelectedControlFlow->mCallStack.back().mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(offset);
 		return true;
 	}
 
@@ -341,11 +360,11 @@ namespace lemon
 
 	bool Runtime::returnFromFunction()
 	{
-		if (mMainControlFlow->mCallStack.count == 0)
+		if (mSelectedControlFlow->mCallStack.count == 0)
 			return false;
 
-		mMainControlFlow->mLocalVariablesSize = mMainControlFlow->mCallStack.back().mLocalVariablesStart;
-		mMainControlFlow->mCallStack.pop_back();
+		mSelectedControlFlow->mLocalVariablesSize = mSelectedControlFlow->mCallStack.back().mLocalVariablesStart;
+		mSelectedControlFlow->mCallStack.pop_back();
 		return true;
 	}
 
@@ -354,13 +373,13 @@ namespace lemon
 		stepsLimit *= (sizeof(RuntimeOpcode) + 8);		// Rough estimate for average runtime opcode size
 
 		result.mStepsExecuted = 0;
-		if (mMainControlFlow->mCallStack.count == 0)
+		if (mSelectedControlFlow->mCallStack.count == 0)
 		{
 			result.mResult = ExecuteResult::HALT;
 			return;
 		}
 
-		ControlFlow::State& state = mMainControlFlow->mCallStack.back();
+		ControlFlow::State& state = mSelectedControlFlow->mCallStack.back();
 		const uint8*& programCounter = state.mProgramCounter;
 		const RuntimeOpcodeBuffer& runtimeOpcodeBuffer = state.mRuntimeFunction->mRuntimeOpcodeBuffer;
 
@@ -373,23 +392,23 @@ namespace lemon
 			return;
 		}
 
-		mActiveControlFlow = mMainControlFlow;
-		RMX_CHECK(mMainControlFlow->mValueStackPtr >= mMainControlFlow->mValueStackStart, "Value stack error: Removed elements from empty stack", mMainControlFlow->mValueStackPtr = mMainControlFlow->mValueStackStart);
-		RMX_CHECK(mMainControlFlow->mValueStackPtr < &mMainControlFlow->mValueStackBuffer[0x78], "Value stack error: Too many elements", mMainControlFlow->mValueStackPtr = &mMainControlFlow->mValueStackBuffer[0x77]);
+		mActiveControlFlow = mSelectedControlFlow;
+		RMX_CHECK(mSelectedControlFlow->mValueStackPtr >= mSelectedControlFlow->mValueStackStart, "Value stack error: Removed elements from empty stack", mSelectedControlFlow->mValueStackPtr = mSelectedControlFlow->mValueStackStart);
+		RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[0x78], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
 
 		result.mResult = ExecuteResult::CONTINUE;
-		mMainControlFlow->mLastStepState.mRuntimeFunction = state.mRuntimeFunction;
-		mMainControlFlow->mCurrentLocalVariables = &mMainControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart];
+		mSelectedControlFlow->mLastStepState.mRuntimeFunction = state.mRuntimeFunction;
+		mSelectedControlFlow->mCurrentLocalVariables = &mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart];
 
 		RuntimeOpcodeContext context;
-		context.mControlFlow = mMainControlFlow;
+		context.mControlFlow = mSelectedControlFlow;
 		context.mOpcode = (const RuntimeOpcode*)programCounter;
 
 		const uint8* programCounterInitial = programCounter;
 		while (true)
 		{
 			// Update location for the next step
-			mMainControlFlow->mLastStepState.mProgramCounter = (uint8*)context.mOpcode;
+			mSelectedControlFlow->mLastStepState.mProgramCounter = (uint8*)context.mOpcode;
 
 			// Optimization: Do multiple opcodes in a row without overheads if possible
 			if (context.mOpcode->mSuccessiveHandledOpcodes >= 4)
@@ -419,8 +438,8 @@ namespace lemon
 				{
 					case Opcode::Type::JUMP_CONDITIONAL:
 					{
-						--mMainControlFlow->mValueStackPtr;
-						if (*mMainControlFlow->mValueStackPtr != 0)
+						--mSelectedControlFlow->mValueStackPtr;
+						if (*mSelectedControlFlow->mValueStackPtr != 0)
 							break;
 
 						// Fallthrough to unconditional jump
@@ -450,7 +469,7 @@ namespace lemon
 						if (context.mOpcode->mFlags & RuntimeOpcode::FLAG_CALL_INLINE_RESOLVED)
 						{
 							const UserDefinedFunction& func = *context.mOpcode->getParameter<const UserDefinedFunction*>();
-							func.execute(UserDefinedFunction::Context(*mMainControlFlow));
+							func.execute(UserDefinedFunction::Context(*mSelectedControlFlow));
 							break;
 						}
 						else
@@ -475,21 +494,21 @@ namespace lemon
 
 					case Opcode::Type::EXTERNAL_CALL:
 					{
-						--mMainControlFlow->mValueStackPtr;
+						--mSelectedControlFlow->mValueStackPtr;
 						result.mResult = ExecuteResult::EXTERNAL_CALL;
 						result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
-						result.mCallTarget = *mMainControlFlow->mValueStackPtr;
+						result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
 						mActiveControlFlow = nullptr;
 						return;
 					}
 
 					case Opcode::Type::EXTERNAL_JUMP:
 					{
-						--mMainControlFlow->mValueStackPtr;
+						--mSelectedControlFlow->mValueStackPtr;
 						returnFromFunction();
 						result.mResult = ExecuteResult::EXTERNAL_JUMP;
 						result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
-						result.mCallTarget = *mMainControlFlow->mValueStackPtr;
+						result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
 						mActiveControlFlow = nullptr;
 						return;
 					}
@@ -509,7 +528,7 @@ namespace lemon
 		RMX_ASSERT(nullptr != result.mRuntimeOpcode, "No runtime opcode given in 'lemon::Runtime::handleResultCall'");
 
 		// Consider base function call, if additional data says so
-		const size_t baseCallIndex = (result.mRuntimeOpcode->mFlags & RuntimeOpcode::FLAG_CALL_IS_BASE_CALL) ? (mMainControlFlow->getState().mBaseCallIndex + 1) : 0;
+		const size_t baseCallIndex = (result.mRuntimeOpcode->mFlags & RuntimeOpcode::FLAG_CALL_IS_BASE_CALL) ? (mSelectedControlFlow->getState().mBaseCallIndex + 1) : 0;
 
 		const constexpr uint8 FLAG_RESOLVED_RUNTIME_FUNC = (RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED | RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC);
 		if ((result.mRuntimeOpcode->mFlags & FLAG_RESOLVED_RUNTIME_FUNC) == FLAG_RESOLVED_RUNTIME_FUNC)
@@ -571,7 +590,7 @@ namespace lemon
 
 	void Runtime::getLastStepLocation(ControlFlow::Location& outLocation) const
 	{
-		mMainControlFlow->getLastStepLocation(outLocation);
+		mSelectedControlFlow->getLastStepLocation(outLocation);
 	}
 
 	bool Runtime::serializeState(VectorBinarySerializer& serializer, std::string* outError)
@@ -589,9 +608,12 @@ namespace lemon
 
 		if (serializer.isReading())
 		{
-			// Reset only the control flow, no full reset is needed here
+			// Reset only the control flows, no full reset is needed here
 			//  -> In fact it would even cause issues down the line, as this is not meant to e.g. invalidate cached runtime functions
-			mMainControlFlow->reset();
+			for (ControlFlow* controlFlow : mControlFlows)
+			{
+				controlFlow->reset();
+			}
 		}
 
 		// Signature and version number
@@ -617,77 +639,81 @@ namespace lemon
 		}
 
 		// Serialize call stack
-		serializer.serializeAs<uint32>(mMainControlFlow->mCallStack.count);
-		if (serializer.isReading())
+		// TODO: Support multiple control flows?
 		{
-			mMainControlFlow->mCallStack.resize(mMainControlFlow->mCallStack.count);
-			for (uint16 i = 0; i < mMainControlFlow->mCallStack.count; ++i)
+			ControlFlow& controlFlow = *mControlFlows[0];
+			serializer.serializeAs<uint32>(controlFlow.mCallStack.count);
+			if (serializer.isReading())
 			{
-				const std::string functionName = serializer.read<std::string>();
-				const uint64 nameHash = rmx::getMurmur2_64(functionName);
-				const uint32 signatureHash = serializer.read<uint32>();
-				const Function* function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
-				if (nullptr == function || function->getType() != Function::Type::SCRIPT)
+				controlFlow.mCallStack.resize(controlFlow.mCallStack.count);
+				for (uint16 i = 0; i < controlFlow.mCallStack.count; ++i)
 				{
-					if (nullptr != outError)
-						*outError = "Could not match function signature for script function of name '" + functionName + "'";
-					return false;
+					const std::string functionName = serializer.read<std::string>();
+					const uint64 nameHash = rmx::getMurmur2_64(functionName);
+					const uint32 signatureHash = serializer.read<uint32>();
+					const Function* function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
+					if (nullptr == function || function->getType() != Function::Type::SCRIPT)
+					{
+						if (nullptr != outError)
+							*outError = "Could not match function signature for script function of name '" + functionName + "'";
+						return false;
+					}
+					RuntimeFunction* runtimeFunction = getRuntimeFunction(static_cast<const ScriptFunction&>(*function));
+					controlFlow.mCallStack[i].mRuntimeFunction = runtimeFunction;
+					controlFlow.mCallStack[i].mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(serializer.read<uint32>());
+
+					controlFlow.mCallStack[i].mLocalVariablesStart = controlFlow.mLocalVariablesSize;
+					const size_t numLocalVars = serializer.read<uint32>();
+					for (size_t k = controlFlow.mLocalVariablesSize; k < controlFlow.mLocalVariablesSize + numLocalVars; ++k)
+					{
+						controlFlow.mLocalVariablesBuffer[k] = serializer.read<int64>();
+					}
+					controlFlow.mLocalVariablesSize += numLocalVars;
 				}
-				RuntimeFunction* runtimeFunction = getRuntimeFunction(static_cast<const ScriptFunction&>(*function));
-				mMainControlFlow->mCallStack[i].mRuntimeFunction = runtimeFunction;
-				mMainControlFlow->mCallStack[i].mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(serializer.read<uint32>());
 
-				mMainControlFlow->mCallStack[i].mLocalVariablesStart = mMainControlFlow->mLocalVariablesSize;
-				const size_t numLocalVars = serializer.read<uint32>();
-				for (size_t k = mMainControlFlow->mLocalVariablesSize; k < mMainControlFlow->mLocalVariablesSize + numLocalVars; ++k)
+				// Make corrections to the program counters for the case that the call points changed
+				for (uint16 i = 0; i < controlFlow.mCallStack.count - 1; ++i)
 				{
-					mMainControlFlow->mLocalVariablesBuffer[k] = serializer.read<int64>();
-				}
-				mMainControlFlow->mLocalVariablesSize += numLocalVars;
-			}
-
-			// Make corrections to the program counters for the case that the call points changed
-			for (uint16 i = 0; i < mMainControlFlow->mCallStack.count - 1; ++i)
-			{
-				const size_t opcodeIndex = (size_t)matchCallerProgramCounter(*mProgram, mMainControlFlow->mCallStack[i], mMainControlFlow->mCallStack[i + 1]);
-				mMainControlFlow->mCallStack[i].mProgramCounter = mMainControlFlow->mCallStack[i].mRuntimeFunction->translateToRuntimeProgramCounter(opcodeIndex);
-			}
-		}
-		else
-		{
-			for (uint16 i = 0; i < mMainControlFlow->mCallStack.count; ++i)
-			{
-				serializer.write(mMainControlFlow->mCallStack[i].mRuntimeFunction->mFunction->getName());
-				serializer.write(mMainControlFlow->mCallStack[i].mRuntimeFunction->mFunction->getSignatureHash());
-				serializer.writeAs<uint32>(mMainControlFlow->mCallStack[i].mRuntimeFunction->translateFromRuntimeProgramCounter(mMainControlFlow->mCallStack[i].mProgramCounter));
-
-				const size_t localVarsStart = mMainControlFlow->mCallStack[i].mLocalVariablesStart;
-				const size_t localVarsEnd = ((size_t)(i+1) < mMainControlFlow->mCallStack.count) ? mMainControlFlow->mCallStack[i+1].mLocalVariablesStart : mMainControlFlow->mLocalVariablesSize;
-				serializer.writeAs<uint32>(localVarsEnd - localVarsStart);
-				for (size_t k = localVarsStart; k < localVarsEnd; ++k)
-				{
-					serializer.writeAs<int64>(mMainControlFlow->mLocalVariablesBuffer[k]);
+					const size_t opcodeIndex = (size_t)matchCallerProgramCounter(*mProgram, controlFlow.mCallStack[i], controlFlow.mCallStack[i + 1]);
+					controlFlow.mCallStack[i].mProgramCounter = controlFlow.mCallStack[i].mRuntimeFunction->translateToRuntimeProgramCounter(opcodeIndex);
 				}
 			}
-		}
+			else
+			{
+				for (uint16 i = 0; i < controlFlow.mCallStack.count; ++i)
+				{
+					serializer.write(controlFlow.mCallStack[i].mRuntimeFunction->mFunction->getName());
+					serializer.write(controlFlow.mCallStack[i].mRuntimeFunction->mFunction->getSignatureHash());
+					serializer.writeAs<uint32>(controlFlow.mCallStack[i].mRuntimeFunction->translateFromRuntimeProgramCounter(controlFlow.mCallStack[i].mProgramCounter));
 
-		// Serialize value stack
-		if (serializer.isReading())
-		{
-			const uint32 size = serializer.read<uint32>();
-			mMainControlFlow->mValueStackPtr = &mMainControlFlow->mValueStackStart[size];
-			for (uint32 i = 0; i < size; ++i)
-			{
-				mMainControlFlow->mValueStackStart[i] = serializer.read<uint64>();
+					const size_t localVarsStart = controlFlow.mCallStack[i].mLocalVariablesStart;
+					const size_t localVarsEnd = ((size_t)(i+1) < controlFlow.mCallStack.count) ? controlFlow.mCallStack[i+1].mLocalVariablesStart : controlFlow.mLocalVariablesSize;
+					serializer.writeAs<uint32>(localVarsEnd - localVarsStart);
+					for (size_t k = localVarsStart; k < localVarsEnd; ++k)
+					{
+						serializer.writeAs<int64>(controlFlow.mLocalVariablesBuffer[k]);
+					}
+				}
 			}
-		}
-		else
-		{
-			const uint32 size = (uint32)mMainControlFlow->getValueStackSize();
-			serializer.write(size);
-			for (size_t i = 0; i < size; ++i)
+
+			// Serialize value stack
+			if (serializer.isReading())
 			{
-				serializer.write(mMainControlFlow->mValueStackStart[i]);
+				const uint32 size = serializer.read<uint32>();
+				controlFlow.mValueStackPtr = &controlFlow.mValueStackStart[size];
+				for (uint32 i = 0; i < size; ++i)
+				{
+					controlFlow.mValueStackStart[i] = serializer.read<uint64>();
+				}
+			}
+			else
+			{
+				const uint32 size = (uint32)controlFlow.getValueStackSize();
+				serializer.write(size);
+				for (size_t i = 0; i < size; ++i)
+				{
+					serializer.write(controlFlow.mValueStackStart[i]);
+				}
 			}
 		}
 
