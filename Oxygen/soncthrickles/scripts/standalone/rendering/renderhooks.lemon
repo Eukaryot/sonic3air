@@ -313,7 +313,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				return true
 			}
 
-			// Cutsceen Knuckles looking left and right in MHZ 1
+			// Cutscene Knuckles looking left and right in MHZ 1
 			if (objA0.update_address == 0x062fa2 || objA0.update_address == 0x062fca)
 			{
 				Standalone.renderCutsceneKnuckles(7, px, py, renderQueue)

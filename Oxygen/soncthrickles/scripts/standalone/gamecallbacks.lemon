@@ -27,7 +27,7 @@ function void Standalone.onLevelStart()
 		global.level_random_base = 1 + (System.rand() % 0xff)		// Avoid the 0 value
 	}
 
-	// Set controller LEDs (for game controllers that support it) depending on ccharacter selection
+	// Set controller LEDs (for game controllers that support it) depending on character selection
 	{
 		// Player 1
 		Input.setControllerLEDs(0, getCharacterColorsForControllerLEDs(clamp(levelselect.characters - 1, 0, 2)))
