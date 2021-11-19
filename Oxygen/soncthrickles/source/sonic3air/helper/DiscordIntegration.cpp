@@ -215,7 +215,7 @@ void DiscordIntegration::updateInfo(Game::Mode gameMode, uint32 subMode, Emulato
 						String initials = zone->mInitials;
 						initials.upperCase();
 						state += *initials;
-						const bool multipleActs = (zone->mActsFreeRoam >= 2);
+						const bool multipleActs = (zone->mActsNormal >= 2);
 						if (multipleActs)
 						{
 							state = state + " " + ((currentInfo.mZoneAct & 1) ? "2" : "1");
@@ -224,7 +224,7 @@ void DiscordIntegration::updateInfo(Game::Mode gameMode, uint32 subMode, Emulato
 					else
 					{
 						state += zone->mDisplayName;
-						const bool multipleActs = (zone->mActsFreeRoam >= 2);
+						const bool multipleActs = (zone->mActsNormal >= 2);
 						if (multipleActs)
 						{
 							state = state + " Act " + ((currentInfo.mZoneAct & 1) ? "2" : "1");

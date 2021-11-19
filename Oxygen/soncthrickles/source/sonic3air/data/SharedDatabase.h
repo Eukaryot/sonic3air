@@ -20,11 +20,11 @@ public:
 		std::string mShortName;
 		std::string mDisplayName;
 		uint8 mInternalIndex;
-		int mActsFreeRoam;
+		int mActsNormal;
 		int mActsTimeAttack;
 
-		inline Zone(const std::string& initials, const std::string& shortName, const std::string& displayName, uint8 index, int actsFreeRoam, int actsTimeAttack) :
-			mInitials(initials), mShortName(shortName), mDisplayName(displayName), mInternalIndex(index), mActsFreeRoam(actsFreeRoam), mActsTimeAttack(actsTimeAttack) {}
+		inline Zone(const std::string& initials, const std::string& shortName, const std::string& displayName, uint8 index, int actsNormal, int actsTimeAttack) :
+			mInitials(initials), mShortName(shortName), mDisplayName(displayName), mInternalIndex(index), mActsNormal(actsNormal), mActsTimeAttack(actsTimeAttack) {}
 	};
 
 	struct Setting

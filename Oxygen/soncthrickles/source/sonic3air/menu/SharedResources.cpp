@@ -160,7 +160,7 @@ namespace global
 		const std::vector<SharedDatabase::Zone>& zones = SharedDatabase::getAllZones();
 		for (const SharedDatabase::Zone& zone : zones)
 		{
-			const uint8 acts = std::max(zone.mActsFreeRoam, zone.mActsTimeAttack);
+			const uint8 acts = std::max(zone.mActsNormal, zone.mActsTimeAttack);
 			if (acts == 0)
 				continue;
 

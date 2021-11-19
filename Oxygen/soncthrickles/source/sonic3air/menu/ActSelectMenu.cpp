@@ -35,7 +35,7 @@ ActSelectMenu::ActSelectMenu(MenuBackground& menuBackground) :
 		for (size_t zoneIndex = 0; zoneIndex < zones.size(); ++zoneIndex)
 		{
 			const SharedDatabase::Zone& zone = zones[zoneIndex];
-			const int acts = zone.mActsFreeRoam;
+			const int acts = zone.mActsNormal;
 			if (acts > 0)
 			{
 				uint16 zoneId = zone.mInternalIndex << 8;
