@@ -357,56 +357,61 @@ void ControllerSetupMenu::render()
 			if (nullptr != device)
 			{
 				InputManager& inputManager = InputManager::instance();
-				const InputConfig::ControlMapping& mapping = device->mControlMappings[entry.mData - 0x10];
-				const bool assigningThis = (mCurrentlyAssigningButtonIndex == (entry.mData & 0x0f));
-
-				size_t numAssignmentsToShow = mapping.mAssignments.size();
-				if (assigningThis && !mAppendAssignment)
+				const size_t buttonIndex = entry.mData - 0x10;
+				RMX_ASSERT(buttonIndex < device->mControlMappings.size(), "Ohhhh!");
+				if (buttonIndex < device->mControlMappings.size())	// It's unclear how, but an invalid index is possible and led to crashes for some players
 				{
-					numAssignmentsToShow = mapping.mNumFixedAssignments;
-				}
+					const InputConfig::ControlMapping& mapping = device->mControlMappings[buttonIndex];
+					const bool assigningThis = (mCurrentlyAssigningButtonIndex == (entry.mData & 0x0f));
 
-				std::string assignmentsString1;
-				std::string assignmentsString2;
-				for (size_t k = 0; k < numAssignmentsToShow; ++k)
-				{
-					const InputConfig::Assignment& assignment = mapping.mAssignments[k];
-					String str;
-					assignment.getMappingString(str, device->mType);
-					if (k < mapping.mNumFixedAssignments)
+					size_t numAssignmentsToShow = mapping.mAssignments.size();
+					if (assigningThis && !mAppendAssignment)
 					{
-						if (!assignmentsString1.empty())
-							assignmentsString1 += ", ";
-						assignmentsString1 += *str;
+						numAssignmentsToShow = mapping.mNumFixedAssignments;
 					}
-					else
+
+					std::string assignmentsString1;
+					std::string assignmentsString2;
+					for (size_t k = 0; k < numAssignmentsToShow; ++k)
+					{
+						const InputConfig::Assignment& assignment = mapping.mAssignments[k];
+						String str;
+						assignment.getMappingString(str, device->mType);
+						if (k < mapping.mNumFixedAssignments)
+						{
+							if (!assignmentsString1.empty())
+								assignmentsString1 += ", ";
+							assignmentsString1 += *str;
+						}
+						else
+						{
+							if (!assignmentsString2.empty())
+								assignmentsString2 += ", ";
+							else if (!assignmentsString1.empty())
+								assignmentsString1 += ", ";
+							assignmentsString2 += *str;
+						}
+					}
+					if (assigningThis)
 					{
 						if (!assignmentsString2.empty())
 							assignmentsString2 += ", ";
 						else if (!assignmentsString1.empty())
 							assignmentsString1 += ", ";
-						assignmentsString2 += *str;
+						assignmentsString2 += "?";
 					}
-				}
-				if (assigningThis)
-				{
-					if (!assignmentsString2.empty())
-						assignmentsString2 += ", ";
-					else if (!assignmentsString1.empty())
-						assignmentsString1 += ", ";
-					assignmentsString2 += "?";
-				}
 
-				if (assignmentsString1.empty() && assignmentsString2.empty())
-				{
-					const Color grayColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.7f, color.b * 0.7f, color.a);
-					drawer.printText(font, Recti(baseX + 16, py, 0, 10), "none", 4, grayColor);
-				}
-				else
-				{
-					const Color cyanColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.9f, color.b * 0.9f, color.a);
-					drawer.printText(font, Recti(baseX + 16, py, 0, 10), assignmentsString1, 4, cyanColor);
-					drawer.printText(font, Recti(baseX + 16 + font.getWidth(assignmentsString1), py, 0, 10), assignmentsString2, 4, color);
+					if (assignmentsString1.empty() && assignmentsString2.empty())
+					{
+						const Color grayColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.7f, color.b * 0.7f, color.a);
+						drawer.printText(font, Recti(baseX + 16, py, 0, 10), "none", 4, grayColor);
+					}
+					else
+					{
+						const Color cyanColor = isSelected ? color : Color(color.r * 0.7f, color.g * 0.9f, color.b * 0.9f, color.a);
+						drawer.printText(font, Recti(baseX + 16, py, 0, 10), assignmentsString1, 4, cyanColor);
+						drawer.printText(font, Recti(baseX + 16 + font.getWidth(assignmentsString1), py, 0, 10), assignmentsString2, 4, color);
+					}
 				}
 			}
 
