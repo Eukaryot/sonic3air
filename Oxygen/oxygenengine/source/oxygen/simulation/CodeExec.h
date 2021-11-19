@@ -14,6 +14,7 @@
 class EmulatorInterface;
 namespace lemon
 {
+	class Environment;
 	class ScriptFunction;
 }
 
@@ -69,6 +70,22 @@ public:
 		bool mAnyChildFailed = false;
 	};
 
+	struct CallFrameTracking
+	{
+		std::vector<CallFrame> mCallFrames;
+		std::vector<size_t> mCallStack;			// Uses index in mCallFrames
+
+		inline void clear()  { mCallFrames.clear(); mCallStack.clear(); }
+
+		CallFrame& pushCallFrame(CallFrame::Type type);
+		CallFrame& pushCallFrameFailed(CallFrame::Type type);
+		void popCallFrame();
+		void writeCurrentCallStack(std::vector<uint64>& outCallStack);
+		void writeCurrentCallStack(std::vector<std::string>& outCallStack);
+		void processCallFrames();
+		size_t processCallFramesRecursive(size_t index);
+	};
+
 	struct Watch
 	{
 		struct Hit
@@ -117,7 +134,7 @@ public:
 	bool performFrameUpdate();
 	void yieldExecution();
 
-	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail);
+	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail, const lemon::Environment* environment = nullptr);
 
 	inline EmulatorInterface& getEmulatorInterface()	{ return mEmulatorInterface; }
 	inline LemonScriptRuntime& getLemonScriptRuntime()	{ return mLemonScriptRuntime; }
@@ -126,7 +143,7 @@ public:
 	void setupCallFrame(const std::string& functionName, const std::string& labelName = "");
 
 	void processCallFrames();
-	inline const std::vector<CallFrame>& getCallFrames() const  { return mCallFrames; }
+	inline const std::vector<CallFrame>& getCallFrames() const  { return mMainCallFrameTracking.mCallFrames; }
 
 	inline const std::vector<uint32>& getUnknownAddresses() const  { return mUnknownAddressesInOrder; }
 
@@ -140,7 +157,7 @@ public:
 private:
 	bool canExecute() const;
 	bool hasValidState() const;
-	void runScript(bool executeSingleFunction);
+	void runScript(bool executeSingleFunction, CallFrameTracking* callFrameTracking);
 
 	bool executeRuntimeSteps(size_t& stepsExecuted);
 	bool executeRuntimeStepsDev(size_t& stepsExecuted);
@@ -153,12 +170,7 @@ private:
 
 	void applyCallFramesToAdd();
 
-	size_t processCallFramesRecursive(size_t index);
-	CallFrame& pushCallFrame(CallFrame::Type type);
-	CallFrame& pushCallFrameFailed(CallFrame::Type type);
 	void popCallFrame();
-
-	void writeCurrentCallStack(std::vector<uint64>& outCallStack);
 	void writeCurrentCallStack(std::vector<std::string>& outCallStack);
 
 	uint32 getCurrentWatchValue(uint32 address, uint16 bytes) const;
@@ -180,8 +192,9 @@ private:
 	bool mCurrentlyRunningScript = false;
 	size_t mAccumulatedStepsOfCurrentFrame = 0;
 
-	std::vector<CallFrame> mCallFrames;
-	std::vector<size_t> mCallStack;			// Uses index in mCallFrames
+	CallFrameTracking* mActiveCallFrameTracking = nullptr;	// If this a null pointer, then no tracking is active
+	CallFrameTracking mMainCallFrameTracking;
+
 	LemonScriptRuntime::CallStackWithLabels mCallFramesToAdd;
 	bool mHasCallFramesToAdd = false;
 
