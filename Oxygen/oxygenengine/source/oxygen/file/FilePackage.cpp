@@ -24,9 +24,6 @@ bool FilePackage::loadPackage(const std::wstring& packageFilename, std::map<std:
 	if (inputStream->read(&content[0], PackageHeader::HEADER_SIZE) != PackageHeader::HEADER_SIZE)
 		return false;
 
-	// Unscramble package header
-	applyXorPatterns(&content[0], content.size());
-
 	VectorBinarySerializer serializer(true, content);
 	PackageHeader header;
 	if (!readPackageHeader(header, serializer))
@@ -40,9 +37,6 @@ bool FilePackage::loadPackage(const std::wstring& packageFilename, std::map<std:
 	content.resize(PackageHeader::HEADER_SIZE + header.mEntryHeaderSize);
 	if (inputStream->read(&content[PackageHeader::HEADER_SIZE], header.mEntryHeaderSize) != header.mEntryHeaderSize)
 		return false;
-
-	// Unscramble entry headers
-	applyXorPatterns(&content[PackageHeader::HEADER_SIZE], header.mEntryHeaderSize);
 
 	// Read entry headers
 	for (size_t i = 0; i < header.mNumEntries; ++i)
@@ -176,10 +170,6 @@ void FilePackage::createFilePackage(const std::wstring& packageFilename, const s
 		}
 	}
 
-	// Scramble things up (only the headers, not the actual file contents)
-	applyXorPatterns(&output[0], PackageHeader::HEADER_SIZE);
-	applyXorPatterns(&output[PackageHeader::HEADER_SIZE], entryHeaderSize);
-
 	// Save output file
 	FTX::FileSystem->saveFile(packageFilename, output);
 }
@@ -202,31 +192,4 @@ bool FilePackage::readPackageHeader(PackageHeader& outHeader, VectorBinarySerial
 
 	RMX_ASSERT(serializer.getReadPosition() == PackageHeader::HEADER_SIZE, "Got wrong package header size");
 	return true;
-}
-
-void FilePackage::applyXorPatterns(uint8* buffer, size_t bytes)
-{
-	static const constexpr uint32 XOR_PATTERNS[48] =
-	{
-		0x231c0c68, 0xecf14600, 0xac07a2e0, 0xef784066, 0xa3e6c71d, 0x5c3b0082, 0x03588b0c, 0x257a153a,
-		0x6e79f3ae, 0x620098cd, 0x872fd4b1, 0x151a22e2, 0xbeb99dc9, 0x4de7435a, 0x292489bd, 0x0d8a9124,
-		0xc69c605e, 0xf541ab68, 0x6364e28d, 0x895a9b00, 0x448db1d4, 0x2e2912eb, 0x5c1f9d3f, 0x9871abda,
-		0x1ac0dea9, 0xca4411bf, 0xb9dfdff2, 0xd77f651c, 0x25e06cb2, 0x7a8b135e, 0x75347e02, 0x2eb2c16b,
-		0x02bcabdd, 0x1f0cf1c4, 0x3f5e8b1f, 0xdf1a2877, 0xf9aa1b84, 0x755f092c, 0x9f605009, 0xecb5d2ff,
-		0xf40b30ea, 0x1e0fcb3f, 0x080d247c, 0xb4d9c94d, 0x810a2823, 0xa020feb2, 0x53f73f25, 0xe99b8ad4
-	};
-
-	while (bytes >= sizeof(XOR_PATTERNS))
-	{
-		for (int k = 0; k < 24; ++k)
-		{
-			((uint64*)buffer)[k] ^= ((uint64*)XOR_PATTERNS)[k];
-		}
-		buffer += sizeof(XOR_PATTERNS);
-		bytes -= sizeof(XOR_PATTERNS);
-	}
-	for (size_t k = 0; k < bytes; ++k)
-	{
-		buffer[k] ^= ((uint8*)XOR_PATTERNS)[k];
-	}
 }
