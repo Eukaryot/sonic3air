@@ -77,7 +77,7 @@ public:
 	void clearPackage(Package package);
 	bool loadFromJson(const std::wstring& basepath, const std::wstring& filename, Package package);
 
-	void determineActiveSourceRegistrations(bool preferOriginal);
+	void determineActiveSourceRegistrations(bool preferOriginalSoundtrack);
 
 	const AudioDefinition* getAudioDefinition(uint64 keyId) const;
 	SourceRegistration* getSourceRegistration(uint64 keyId) const;
