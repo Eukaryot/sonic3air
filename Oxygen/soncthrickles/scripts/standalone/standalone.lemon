@@ -15,18 +15,18 @@
 
 
 // Basic switches
-define bool DIRECT_OBJECT_RENDERING			  = 1	// Renders objects in a more direct way, similar to the characters
-define bool EXTENDED_CHARACTER_PALETTES		  = 1	// Make characters use their own, additional palette lines -- note that there are parts of the code that require this to be set!
+constant bool DIRECT_OBJECT_RENDERING		= 1		// Renders objects in a more direct way, similar to the characters
+constant bool EXTENDED_CHARACTER_PALETTES	= 1		// Make characters use their own, additional palette lines -- note that there are parts of the code that require this to be set!
 
 // Experimental modifications to the original game
-define bool MODIFICATION_TOGETHERNESS		  = 0	// Allows player 2 to instantly move to player 1 by pressing Y
+constant bool MODIFICATION_TOGETHERNESS		= 0		// Allows player 2 to instantly move to player 1 by pressing Y
 
 // Cheats
-define bool CHEAT_ONE_BLUE_SPHERE			  = 0	// If set, only a single blue sphere has to be collected in the special stages
+constant bool CHEAT_ONE_BLUE_SPHERE			= 0		// If set, only a single blue sphere has to be collected in the special stages
 
 // Debugging stuff
-define bool DEBUG_DISABLE_HUD				  = 0
-define bool DEBUG_DYNAMIC_COLLISIONS		  = 0
+constant bool DEBUG_DISABLE_HUD				= 0
+constant bool DEBUG_DYNAMIC_COLLISIONS		= 0
 
 
 

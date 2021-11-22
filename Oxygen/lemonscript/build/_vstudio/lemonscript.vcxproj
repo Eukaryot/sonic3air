@@ -66,6 +66,7 @@
     <ClInclude Include="..\..\source\lemon\compiler\TokenTypes.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Utility.h" />
     <ClInclude Include="..\..\source\lemon\pch.h" />
+    <ClInclude Include="..\..\source\lemon\program\Constant.h" />
     <ClInclude Include="..\..\source\lemon\program\DataType.h" />
     <ClInclude Include="..\..\source\lemon\program\Define.h" />
     <ClInclude Include="..\..\source\lemon\program\Function.h" />

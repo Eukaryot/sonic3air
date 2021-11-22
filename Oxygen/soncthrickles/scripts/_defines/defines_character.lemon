@@ -13,9 +13,9 @@
 //-------------------------------------------------------//
 
 #if STANDALONE
-	define u8 Character.look_up_down_delay = 75		// Shorter in S3AIR
+	constant u8 Character.look_up_down_delay = 75		// Shorter in S3AIR
 #else
-	define u8 Character.look_up_down_delay = 120
+	constant u8 Character.look_up_down_delay = 120
 #endif
 
 
@@ -32,11 +32,11 @@ define char.update_address		= u32[A0]
 
 // Render flags
 define char.render_flags		=  u8[A0 + 0x04]
-define u8 render_flag.FLIP_X	=  0x01		// Flipped horizontally
-define u8 render_flag.FLIP_Y	=  0x02		// Flipped vertically
-define u8 render_flag.WORLD		=  0x04		// Usually set, so the object is positioned in world, not on screen
-define u8 render_flag.COMPOUND	=  0x40		// Used for multiple child object rendering
-define u8 render_flag.VISIBLE	=  0x80		// Object visible on screen if set
+constant u8 render_flag.FLIP_X	=  0x01		// Flipped horizontally
+constant u8 render_flag.FLIP_Y	=  0x02		// Flipped vertically
+constant u8 render_flag.WORLD	=  0x04		// Usually set, so the object is positioned in world, not on screen
+constant u8 render_flag.COMPOUND=  0x40		// Used for multiple child object rendering
+constant u8 render_flag.VISIBLE	=  0x80		// Object visible on screen if set
 
 // Base state:
 //  0x00 = Shortly when getting visible after title card (?)
@@ -75,44 +75,44 @@ define char.state.former		=  u8[A0 + 0x21]	// Former state (mostly the same as c
 define char.state.both			= u16[A0 + 0x20]
 
 // State constants
-define u8 char.state.RUNNING			=  0x00		// Also used for hanging on horizontal poles in MHZ
-define u8 char.state.ROLLING			=  0x02		// For both rolling on ground and jumping
-define u8 char.state.STANDING			=  0x05
-define u8 char.state.BALANCING1			=  0x06
-define u8 char.state.LOOKING_UP			=  0x07
-define u8 char.state.COWERING			=  0x08
-define u8 char.state.SPINDASH			=  0x09
-define u8 char.state.BALANCING2			=  0x0c		// More panicky version of balancing
-define u8 char.state.BRAKING			=  0x0d
-define u8 char.state.LIFTED				=  0x0f		// Rotating while free falling, being lifted by propeller, etc.
-define u8 char.state.STRAIGHTJUMP		=  0x10		// Straight jump e.g. from a vertical spring
-define u8 char.state.HOLDING_ON			=  0x11		// Holding vertically, used on HCZ breakable bars and in MHZ 2 post-boss cutscene
-define u8 char.state.WIN_POSE			=  0x13
-define u8 char.state.HANGING			=  0x14
-define u8 char.state.BREATHE			=  0x15
-define u8 char.state.DIED				=  0x18
-define u8 char.state.GOT_HURT_PANIC		=  0x19		// With animated arms, used only in certain places (e.g. after snowboarding)
-define u8 char.state.GOT_HURT			=  0x1a		// With unanimated arms, this is the default
-define u8 char.state.FALLING_PANIC		=  0x1b		// Similar to the two above, used in HCZ waterslides
-define u8 char.state.DISAPPEARED		=  0x1c		// Used directly after entering a Giant Ring and inside a CNZ cannon; hides the shield as well
-define u8 char.state.TRANSFORMING		=  0x1f		// Super or hyper transformation
+constant u8 char.state.RUNNING			=  0x00		// Also used for hanging on horizontal poles in MHZ
+constant u8 char.state.ROLLING			=  0x02		// For both rolling on ground and jumping
+constant u8 char.state.STANDING			=  0x05
+constant u8 char.state.BALANCING1		=  0x06
+constant u8 char.state.LOOKING_UP		=  0x07
+constant u8 char.state.COWERING			=  0x08
+constant u8 char.state.SPINDASH			=  0x09
+constant u8 char.state.BALANCING2		=  0x0c		// More panicky version of balancing
+constant u8 char.state.BRAKING			=  0x0d
+constant u8 char.state.LIFTED			=  0x0f		// Rotating while free falling, being lifted by propeller, etc.
+constant u8 char.state.STRAIGHTJUMP		=  0x10		// Straight jump e.g. from a vertical spring
+constant u8 char.state.HOLDING_ON		=  0x11		// Holding vertically, used on HCZ breakable bars and in MHZ 2 post-boss cutscene
+constant u8 char.state.WIN_POSE			=  0x13
+constant u8 char.state.HANGING			=  0x14
+constant u8 char.state.BREATHE			=  0x15
+constant u8 char.state.DIED				=  0x18
+constant u8 char.state.GOT_HURT_PANIC	=  0x19		// With animated arms, used only in certain places (e.g. after snowboarding)
+constant u8 char.state.GOT_HURT			=  0x1a		// With unanimated arms, this is the default
+constant u8 char.state.FALLING_PANIC	=  0x1b		// Similar to the two above, used in HCZ waterslides
+constant u8 char.state.DISAPPEARED		=  0x1c		// Used directly after entering a Giant Ring and inside a CNZ cannon; hides the shield as well
+constant u8 char.state.TRANSFORMING		=  0x1f		// Super or hyper transformation
 
-define u8 char.state.SONIC_DROPDASH		=  0x20		// Sonic with charged drop dash (only in standalone!)
-define u8 char.state.SONIC_HANGON		=  0x22		// Sonic hanging with Tails
-define u8 char.state.TAILS_FLYDOWN		=  0x20		// Tails flying down
-define u8 char.state.TAILS_FLYUP		=  0x21		// Tails flying up
-define u8 char.state.TAILS_CARRYDOWN	=  0x22		// Tails flying down, carrying other player
-define u8 char.state.TAILS_CARRYUP		=  0x23		// Tails flying up, carrying other player
-define u8 char.state.TAILS_FLYTIRED		=  0x24		// Tails flying tired
-define u8 char.state.TAILS_SWIMDOWN		=  0x25		// Tails swimming down
-define u8 char.state.TAILS_SWIMUP		=  0x26		// Tails swimming up
-define u8 char.state.TAILS_SWIMCARRY	=  0x27		// Tails swimming, carrying other player
-define u8 char.state.TAILS_SWIMTIRED	=  0x28		// Tails swimming tired
-define u8 char.state.TAILS_TRANSFORM	=  0x29		// Super transformation for Tails
-define u8 char.state.KNUX_FLYCLIMB		=  0x20		// Knuckles flying or climbing
-define u8 char.state.KNUX_FALLING		=  0x21		// Knuckles falling after flight
-define u8 char.state.KNUX_STANDUP		=  0x22		// Knuckles standing up after flying (when sliding)
-define u8 char.state.KNUX_STANDUP2		=  0x23		// Knuckles standing up after flying and falling
+constant u8 char.state.SONIC_DROPDASH	=  0x20		// Sonic with charged drop dash (only in standalone!)
+constant u8 char.state.SONIC_HANGON		=  0x22		// Sonic hanging with Tails
+constant u8 char.state.TAILS_FLYDOWN	=  0x20		// Tails flying down
+constant u8 char.state.TAILS_FLYUP		=  0x21		// Tails flying up
+constant u8 char.state.TAILS_CARRYDOWN	=  0x22		// Tails flying down, carrying other player
+constant u8 char.state.TAILS_CARRYUP	=  0x23		// Tails flying up, carrying other player
+constant u8 char.state.TAILS_FLYTIRED	=  0x24		// Tails flying tired
+constant u8 char.state.TAILS_SWIMDOWN	=  0x25		// Tails swimming down
+constant u8 char.state.TAILS_SWIMUP		=  0x26		// Tails swimming up
+constant u8 char.state.TAILS_SWIMCARRY	=  0x27		// Tails swimming, carrying other player
+constant u8 char.state.TAILS_SWIMTIRED	=  0x28		// Tails swimming tired
+constant u8 char.state.TAILS_TRANSFORM	=  0x29		// Super transformation for Tails
+constant u8 char.state.KNUX_FLYCLIMB	=  0x20		// Knuckles flying or climbing
+constant u8 char.state.KNUX_FALLING		=  0x21		// Knuckles falling after flight
+constant u8 char.state.KNUX_STANDUP		=  0x22		// Knuckles standing up after flying (when sliding)
+constant u8 char.state.KNUX_STANDUP2	=  0x23		// Knuckles standing up after flying and falling
 
 // Animation
 define char.animation.sprite	=  u8[A0 + 0x22]	// Currently shown animation sprite
@@ -130,23 +130,23 @@ define char.rotation.x			=  u8[A0 + 0x27]	// Rotation around screen x vector
 
 // Flags
 define char.flags					=  u8[A0 + 0x2a]
-define u8 char.flag.FACING_LEFT		=  0x01			// Facing left
-define u8 char.flag.IN_AIR			=  0x02			// In the air (not touching ground)
-define u8 char.flag.ROLLING			=  0x04			// Rolling (either on ground or in the air)
-define u8 char.flag.ON_OBJECT		=  0x08			// On an object (platform, bridge, corkscrew, monitor, etc.); the object's address is stored in "char.object_standing_on"
-define u8 char.flag.CONTROL_LOCK	=  0x10			// Control lock (after rolling then jumping)
-define u8 char.flag.PUSHING			=  0x20			// Pushing against wall or an object
-define u8 char.flag.UNDERWATER		=  0x40			// Under water
+constant u8 char.flag.FACING_LEFT	=  0x01			// Facing left
+constant u8 char.flag.IN_AIR		=  0x02			// In the air (not touching ground)
+constant u8 char.flag.ROLLING		=  0x04			// Rolling (either on ground or in the air)
+constant u8 char.flag.ON_OBJECT		=  0x08			// On an object (platform, bridge, corkscrew, monitor, etc.); the object's address is stored in "char.object_standing_on"
+constant u8 char.flag.CONTROL_LOCK	=  0x10			// Control lock (after rolling then jumping)
+constant u8 char.flag.PUSHING		=  0x20			// Pushing against wall or an object
+constant u8 char.flag.UNDERWATER	=  0x40			// Under water
 
 // Bonus effects
 define char.bonus_effect				=  u8[A0 + 0x2b]
-define u8 char.bonus.ANY_SHIELD			=  0x01
-define u8 char.bonus.INVINCIBLE			=  0x02
-define u8 char.bonus.SPEED_UP			=  0x04
-define u8 char.bonus.SHIELD_FIRE		=  0x10
-define u8 char.bonus.SHIELD_LIGHTNING	=  0x20
-define u8 char.bonus.SHIELD_BUBBLE		=  0x40
-define u8 char.bonus.INFINITE_INERTIA	=  0x80
+constant u8 char.bonus.ANY_SHIELD		=  0x01
+constant u8 char.bonus.INVINCIBLE		=  0x02
+constant u8 char.bonus.SPEED_UP			=  0x04
+constant u8 char.bonus.SHIELD_FIRE		=  0x10
+constant u8 char.bonus.SHIELD_LIGHTNING	=  0x20
+constant u8 char.bonus.SHIELD_BUBBLE	=  0x40
+constant u8 char.bonus.INFINITE_INERTIA	=  0x80
 
 // Drowning countdown
 define char.drown_countdown		=  u8[A0 + 0x2c]	// In seconds; when not in water (or immune), this is 30; terror music starts below 12

@@ -8,7 +8,7 @@
 
 
 
-define u32 CreditsDataGenerator.startAddress = 0x800000
+constant u32 CreditsDataGenerator.startAddress = 0x800000
 
 
 function u32 CreditsDataGenerator.build(u8 creditsIndex)

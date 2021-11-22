@@ -227,6 +227,9 @@
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h">
       <Filter>lemon\runtime</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\Constant.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

@@ -66,6 +66,7 @@ namespace lemon
 		BLOCK_END,
 		FUNCTION,
 		GLOBAL,
+		CONSTANT,
 		DEFINE,
 		RETURN,
 		CALL,

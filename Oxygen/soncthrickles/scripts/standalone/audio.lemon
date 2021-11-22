@@ -8,15 +8,15 @@
 
 
 
-define u8 SoundRegType.TYPE_MUSIC  = 0		// Looping, uses music channel (0)
-define u8 SoundRegType.TYPE_JINGLE = 1		// Not looping, uses jingle channel (1) and aborts or pauses music
-define u8 SoundRegType.TYPE_SOUND  = 2		// Sound effect (can be one-shot playback or continuous)
+constant u8 SoundRegType.TYPE_MUSIC  = 0		// Looping, uses music channel (0)
+constant u8 SoundRegType.TYPE_JINGLE = 1		// Not looping, uses jingle channel (1) and aborts or pauses music
+constant u8 SoundRegType.TYPE_SOUND  = 2		// Sound effect (can be one-shot playback or continuous)
 
-define u8 AudioContext.CONTEXT_MUSIC = 0x00		// Use music volume setting
-define u8 AudioContext.CONTEXT_SOUND = 0x01		// Use sound volume setting
+constant u8 AudioContext.CONTEXT_MUSIC = 0x00		// Use music volume setting
+constant u8 AudioContext.CONTEXT_SOUND = 0x01		// Use sound volume setting
 
-define u8 FastMusicFlag.MUSIC_TEMPO = 0x01
-define u8 FastMusicFlag.SUPER_THEME = 0x02
+constant u8 FastMusicFlag.MUSIC_TEMPO = 0x01
+constant u8 FastMusicFlag.SUPER_THEME = 0x02
 
 global u8 fastMusicFlags
 global u8 alternatingRingSoundState

@@ -119,7 +119,7 @@ namespace lemon
 
 	GlobalVariable& Module::addGlobalVariable(const std::string& identifier, const DataTypeDefinition* dataType)
 	{
-		// TODO: Add an alloc buffer for this
+		// TODO: Add an object pool for this
 		GlobalVariable& variable = *new GlobalVariable();
 		addGlobalVariable(variable, identifier, dataType);
 		return variable;
@@ -127,7 +127,7 @@ namespace lemon
 
 	UserDefinedVariable& Module::addUserDefinedVariable(const std::string& identifier, const DataTypeDefinition* dataType)
 	{
-		// TODO: Add an alloc buffer for this
+		// TODO: Add an object pool for this
 		UserDefinedVariable& variable = *new UserDefinedVariable();
 		addGlobalVariable(variable, identifier, dataType);
 		return variable;
@@ -135,7 +135,7 @@ namespace lemon
 
 	ExternalVariable& Module::addExternalVariable(const std::string& identifier, const DataTypeDefinition* dataType)
 	{
-		// TODO: Add an alloc buffer for this
+		// TODO: Add an object pool for this
 		ExternalVariable& variable = *new ExternalVariable();
 		addGlobalVariable(variable, identifier, dataType);
 		return variable;
@@ -158,6 +158,16 @@ namespace lemon
 	void Module::destroyLocalVariable(LocalVariable& variable)
 	{
 		mLocalVariablesPool.destroyObject(variable);
+	}
+
+	Constant& Module::addConstant(const std::string& name, const DataTypeDefinition* dataType, uint64 value)
+	{
+		Constant& constant = mConstantPool.createObject();
+		constant.mName = name;
+		constant.mDataType = dataType;
+		constant.mValue = value;
+		mConstants.emplace_back(&constant);
+		return constant;
 	}
 
 	Define& Module::addDefine(const std::string& name, const DataTypeDefinition* dataType)
@@ -187,10 +197,11 @@ namespace lemon
 		//  - 0x02 = Variable size of opcode parameter serialization + dumping backwards compatibility with older versions, as it's not really needed
 		//  - 0x03 = Added opcode flags and deflate compression
 		//  - 0x04 = Added source information to function serialization
+		//  - 0x05 = Added serialization of constants
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x04;
+		uint16 version = 0x05;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -449,6 +460,33 @@ namespace lemon
 				serializer.write(variable.getName());
 				DataTypeHelper::writeDataType(serializer, variable.getDataType());
 				serializer.writeAs<int64>(globalVariable.mInitialValue);
+			}
+		}
+
+		// Serialize constants
+		if (version >= 0x05)
+		{
+			uint32 numberOfConstants = (uint32)mConstants.size();
+			serializer & numberOfConstants;
+
+			if (serializer.isReading())
+			{
+				for (uint32 i = 0; i < numberOfConstants; ++i)
+				{
+					const std::string name = serializer.read<std::string>();
+					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
+					const uint64 value = serializer.read<uint64>();
+					Constant& constant = addConstant(name, dataType, value);
+				}
+			}
+			else
+			{
+				for (Constant* constant : mConstants)
+				{
+					serializer.write(constant->getName());
+					DataTypeHelper::writeDataType(serializer, constant->getDataType());
+					serializer.write(constant->mValue);
+				}
 			}
 		}
 

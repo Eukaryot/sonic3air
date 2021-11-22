@@ -25,36 +25,36 @@
 //  if (Game.getSetting(SETTING_XYZ))
 
 // General settings affecting game mechanics
-define u32  SETTING_FIX_GLITCHES			= 0x00000101	// Fix various gameplay glitches, especially exploitable glitches (but not visual glitches)
-define u32  SETTING_NO_CONTROL_LOCK			= 0x00000201	// Control lock after roll + jump removed
-define u32  SETTING_TAILS_ASSIST_MODE		= 0x00000401	// Allow for control of Tails' flight by first player: 0 = off, 1 = Sonic 3 style, 2 = Hybrid style, 3 = Mania style
-define u32  SETTING_CANCEL_FLIGHT			= 0x00000501	// Cancel Tails' flight with down + jump
-define u32  SETTING_SUPER_CANCEL			= 0x00000601	// Cancel transformations with Y button
-define u32  SETTING_INSTA_SHIELD			= 0x00000701	// Insta-Shield move for Sonic
-define u32  SETTING_LEVELRESULT_SCORE		= 0x00001201	// Increasingly faster counting in level results if score was very large
-define u32  SETTING_HYPER_TAILS				= 0x00001301	// Split up Super Tails into Super form (without flickies) and Hyper form (as usual)
-define u32  SETTING_SHIELD_TYPES			= 0x00001401	// Shields: 0 = Classic, 1 = Elemental, 2 = All shields, 3 = Upgrading
+constant u32 SETTING_FIX_GLITCHES				= 0x00000101	// Fix various gameplay glitches, especially exploitable glitches (but not visual glitches)
+constant u32 SETTING_NO_CONTROL_LOCK			= 0x00000201	// Control lock after roll + jump removed
+constant u32 SETTING_TAILS_ASSIST_MODE			= 0x00000401	// Allow for control of Tails' flight by first player: 0 = off, 1 = Sonic 3 style, 2 = Hybrid style, 3 = Mania style
+constant u32 SETTING_CANCEL_FLIGHT				= 0x00000501	// Cancel Tails' flight with down + jump
+constant u32 SETTING_SUPER_CANCEL				= 0x00000601	// Cancel transformations with Y button
+constant u32 SETTING_INSTA_SHIELD				= 0x00000701	// Insta-Shield move for Sonic
+constant u32 SETTING_LEVELRESULT_SCORE			= 0x00001201	// Increasingly faster counting in level results if score was very large
+constant u32 SETTING_HYPER_TAILS				= 0x00001301	// Split up Super Tails into Super form (without flickies) and Hyper form (as usual)
+constant u32 SETTING_SHIELD_TYPES				= 0x00001401	// Shields: 0 = Classic, 1 = Elemental, 2 = All shields, 3 = Upgrading
 
 // Level-specific gameplay settings
-define u32  SETTING_AIZ_BLIMPSEQUENCE		= 0x00010101	// Different pattern for AIZ 2 blimp bombing
-define u32  SETTING_AIZ_INTRO_KNUCKLES		= 0x00010301	// AIZ 1 intro for Knuckles -- under construction, so it's off for now
-define u32  SETTING_HCZ_WATERPIPE			= 0x00020101	// Character stays visible in tube
-define u32  SETTING_LBZ_TUBETRANSPORT		= 0x00060101	// Faster tube transport start/end
-define u32  SETTING_LBZ_CUPELEVATOR			= 0x00060201	// Allow jump moves when jumping out of cup elevator
-define u32  SETTING_LBZ_BIGARMS				= 0x00060301	// Spawn Big Arms boss for Sonic & Tails as well
-define u32  SETTING_MHZ_ELEVATOR			= 0x00070101	// Faster elevator movement
-define u32  SETTING_FBZ_ENTERCYLINDER		= 0x00080101	// Allow for entering the horizontal spinning cylinders from above
-define u32  SETTING_FBZ_SCREWDOORS			= 0x00080201	// Faster opening screw doors
-define u32  SETTING_FASTER_PUSH				= 0x00090101	// SOZ rocks and FBZ spikes can be pushed a bit faster
-define u32  SETTING_SOZ_PYRAMID				= 0x00090201	// Faster rising of pyramid
-define u32  SETTING_LRZ2_BOSS				= 0x000a0101	// LRZ 2 boss change: reduced hit count
+constant u32 SETTING_AIZ_BLIMPSEQUENCE			= 0x00010101	// Different pattern for AIZ 2 blimp bombing
+constant u32 SETTING_AIZ_INTRO_KNUCKLES			= 0x00010301	// AIZ 1 intro for Knuckles -- under construction, so it's off for now
+constant u32 SETTING_HCZ_WATERPIPE				= 0x00020101	// Character stays visible in tube
+constant u32 SETTING_LBZ_TUBETRANSPORT			= 0x00060101	// Faster tube transport start/end
+constant u32 SETTING_LBZ_CUPELEVATOR			= 0x00060201	// Allow jump moves when jumping out of cup elevator
+constant u32 SETTING_LBZ_BIGARMS				= 0x00060301	// Spawn Big Arms boss for Sonic & Tails as well
+constant u32 SETTING_MHZ_ELEVATOR				= 0x00070101	// Faster elevator movement
+constant u32 SETTING_FBZ_ENTERCYLINDER			= 0x00080101	// Allow for entering the horizontal spinning cylinders from above
+constant u32 SETTING_FBZ_SCREWDOORS				= 0x00080201	// Faster opening screw doors
+constant u32 SETTING_FASTER_PUSH				= 0x00090101	// SOZ rocks and FBZ spikes can be pushed a bit faster
+constant u32 SETTING_SOZ_PYRAMID				= 0x00090201	// Faster rising of pyramid
+constant u32 SETTING_LRZ2_BOSS					= 0x000a0101	// LRZ 2 boss change: reduced hit count
 
 // Purely visual or audio settings (only those with no effect on simulation at all)
-define u32  SETTING_EXTENDED_HUD			= 0x80000101	// More detailed time display in HUD
-define u32  SETTING_SMOOTH_ROTATION			= 0x80000201	// Smooth rotation
-define u32  SETTING_SPEEDUP_AFTERIMGS		= 0x80000301	// After-images when speed shoes are active
-define u32  SETTING_PLAYER2_OFFSCREEN		= 0x80000401	// Offscreen rendering for second player
-define u32  SETTING_BS_VISUAL_STYLE			= 0x80009103	// Render glow effect in Blue Spheres (flag 0x02), render filtered (flag 0x01)
+constant u32 SETTING_EXTENDED_HUD				= 0x80000101	// More detailed time display in HUD
+constant u32 SETTING_SMOOTH_ROTATION			= 0x80000201	// Smooth rotation
+constant u32 SETTING_SPEEDUP_AFTERIMGS			= 0x80000301	// After-images when speed shoes are active
+constant u32 SETTING_PLAYER2_OFFSCREEN			= 0x80000401	// Offscreen rendering for second player
+constant u32 SETTING_BS_VISUAL_STYLE			= 0x80009103	// Render glow effect in Blue Spheres (flag 0x02), render filtered (flag 0x01)
 
 
 
@@ -63,37 +63,37 @@ define u32  SETTING_BS_VISUAL_STYLE			= 0x80009103	// Render glow effect in Blue
 //-------------------------------------------------------//
 
 // Unlockables
-define u32  SETTING_KNUCKLES_AND_TAILS		= 0x00008100	// This is not used any more; instead there is "SECRET_KNUX_AND_TAILS" and the global variable "useKnucklesAndTails"
-define u32  SETTING_DROPDASH				= 0x00008200	// Drop Dash move for Sonic; setting is active if player has the secret unlocked *and* chose to activate the Drop Dash in the options
-define u32  SETTING_SUPER_PEELOUT			= 0x00008300	// Super Peel-Out move for Sonic; setting is active if player has the secret unlocked *and* chose to activate the Super Peel-Out in the options
-define u32  SETTING_DEBUG_MODE				= 0x00008400	// Debug Mode
-define u32  SETTING_TITLE_SCREEN			= 0x00008500	// Title screen selection: Sonic 3 or S&K
+constant u32 SETTING_KNUCKLES_AND_TAILS			= 0x00008100	// This is not used any more; instead there is "SECRET_KNUX_AND_TAILS" and the global variable "useKnucklesAndTails"
+constant u32 SETTING_DROPDASH					= 0x00008200	// Drop Dash move for Sonic; setting is active if player has the secret unlocked *and* chose to activate the Drop Dash in the options
+constant u32 SETTING_SUPER_PEELOUT				= 0x00008300	// Super Peel-Out move for Sonic; setting is active if player has the secret unlocked *and* chose to activate the Super Peel-Out in the options
+constant u32 SETTING_DEBUG_MODE					= 0x00008400	// Debug Mode
+constant u32 SETTING_TITLE_SCREEN				= 0x00008500	// Title screen selection: Sonic 3 or S&K
 
 // Options
-define u32  SETTING_INFINITE_LIVES			= 0x00000800	// No life counting at all any more
-define u32  SETTING_INFINITE_TIME			= 0x00000900	// Timer won't stop at 9'59"99
-define u32  SETTING_RANDOM_MONITORS			= 0x00000c00	// Randomize monitors: 0 = no change, 1 = random shields, 2 = all monitors randomized
-define u32  SETTING_RANDOM_SPECIALSTAGES	= 0x00000d00	// Use generated special stages
-define u32  SETTING_BUBBLE_SHIELD_BOUNCE	= 0x00001500	// Bubble Shield bouncing behavior more like Mania
-define u32  SETTING_CAMERA_OUTRUN			= 0x00001800	// Allow for out-running the camera
-define u32  SETTING_EXTENDED_CAMERA			= 0x00001900	// Extended camera, similar to Sonic CD
-define u32  SETTING_MAINTAIN_SHIELDS		= 0x00002100	// Maintain shields between zones
-define u32  SETTING_MONITOR_STYLE			= 0x00002200	// Sonic 3 (when 0) or Sonic 2 (when 1) monitors
-define u32  SETTING_BS_REPEAT_ON_FAIL		= 0x00009100	// Repeat the same special stage again if failed
-define u32  SETTING_DISABLE_GHOST_SPAWN		= 0x00090100	// No ghost spawning in SOZ 2
+constant u32 SETTING_INFINITE_LIVES				= 0x00000800	// No life counting at all any more
+constant u32 SETTING_INFINITE_TIME				= 0x00000900	// Timer won't stop at 9'59"99
+constant u32 SETTING_RANDOM_MONITORS			= 0x00000c00	// Randomize monitors: 0 = no change, 1 = random shields, 2 = all monitors randomized
+constant u32 SETTING_RANDOM_SPECIALSTAGES		= 0x00000d00	// Use generated special stages
+constant u32 SETTING_BUBBLE_SHIELD_BOUNCE		= 0x00001500	// Bubble Shield bouncing behavior more like Mania
+constant u32 SETTING_CAMERA_OUTRUN				= 0x00001800	// Allow for out-running the camera
+constant u32 SETTING_EXTENDED_CAMERA			= 0x00001900	// Extended camera, similar to Sonic CD
+constant u32 SETTING_MAINTAIN_SHIELDS			= 0x00002100	// Maintain shields between zones
+constant u32 SETTING_MONITOR_STYLE				= 0x00002200	// Sonic 3 (when 0) or Sonic 2 (when 1) monitors
+constant u32 SETTING_BS_REPEAT_ON_FAIL			= 0x00009100	// Repeat the same special stage again if failed
+constant u32 SETTING_DISABLE_GHOST_SPAWN		= 0x00090100	// No ghost spawning in SOZ 2
 
 // Purely visual settings (only those with no effect on simulation at all)
-define u32  SETTING_HIDDEN_MONITOR_HINT		= 0x80000500	// Show a hint where the hidden monitors for signposts are
-define u32  SETTING_SUPERFAST_RUNANIM		= 0x80000600	// Super fast running animation
-define u32  SETTING_LIVES_DISPLAY			= 0x80002300	// Lives display location: 0 for auto, 1 for lower left, 2 for upper right
-define u32  SETTING_BS_COUNTDOWN_RINGS		= 0x80009000	// Count remaining rings down in Blue Spheres instead of counting collected rings up
-define u32  SETTING_CONTINUE_MUSIC			= 0x8000a000	// Continue music when restarting a level
-define u32  SETTING_UNDERWATER_AUDIO		= 0x8000a100	// Low-pass audio effect when underwater
-define u32  SETTING_ICZ_NIGHTTIME			= 0x80050200	// Use night time palette for ICZ 1 start
-define u32  SETTING_CNZ_PROTOTYPE_MUSIC		= 0x80041100	// Use Sonic 3 prototype music for CNZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
-define u32  SETTING_ICZ_PROTOTYPE_MUSIC		= 0x80051100	// Use Sonic 3 prototype music for ICZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
-define u32  SETTING_LBZ_PROTOTYPE_MUSIC		= 0x80061100	// Use Sonic 3 prototype music for LBZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
-define u32  SETTING_SSZ_BOSS_TRACKS			= 0x800c0100	// Use Sonic 1 & 2 boss music in SSZ
+constant u32 SETTING_HIDDEN_MONITOR_HINT		= 0x80000500	// Show a hint where the hidden monitors for signposts are
+constant u32 SETTING_SUPERFAST_RUNANIM			= 0x80000600	// Super fast running animation
+constant u32 SETTING_LIVES_DISPLAY				= 0x80002300	// Lives display location: 0 for auto, 1 for lower left, 2 for upper right
+constant u32 SETTING_BS_COUNTDOWN_RINGS			= 0x80009000	// Count remaining rings down in Blue Spheres instead of counting collected rings up
+constant u32 SETTING_CONTINUE_MUSIC				= 0x8000a000	// Continue music when restarting a level
+constant u32 SETTING_UNDERWATER_AUDIO			= 0x8000a100	// Low-pass audio effect when underwater
+constant u32 SETTING_ICZ_NIGHTTIME				= 0x80050200	// Use night time palette for ICZ 1 start
+constant u32 SETTING_CNZ_PROTOTYPE_MUSIC		= 0x80041100	// Use Sonic 3 prototype music for CNZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
+constant u32 SETTING_ICZ_PROTOTYPE_MUSIC		= 0x80051100	// Use Sonic 3 prototype music for ICZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
+constant u32 SETTING_LBZ_PROTOTYPE_MUSIC		= 0x80061100	// Use Sonic 3 prototype music for LBZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
+constant u32 SETTING_SSZ_BOSS_TRACKS			= 0x800c0100	// Use Sonic 1 & 2 boss music in SSZ
 
 
 
@@ -104,20 +104,20 @@ define u32  SETTING_SSZ_BOSS_TRACKS			= 0x800c0100	// Use Sonic 1 & 2 boss music
 // Code to copy:
 //  if (Game.getSetting(SETTING_XYZ))
 
-define u32  SETTING_GFX_ANTIFLICKER				= 0x00001a01
-define u32  SETTING_LEVELLAYOUTS				= 0x00002002	// Select level layouts (incl. object and ring placements): 0 = Sonic 3 alone, 1 = Sonic 3 & Knuckles, 2 = Sonic 3 A.I.R.
-define u32  SETTING_REGION_CODE					= 0x00003080	// Region code: Flag 0x80 is set outside of Japan, 0x40 for PAL regions
-define u32  SETTING_TIME_ATTACK_GHOSTS			= 0x00003103
+constant u32 SETTING_GFX_ANTIFLICKER			= 0x00001a01
+constant u32 SETTING_LEVELLAYOUTS				= 0x00002002	// Select level layouts (incl. object and ring placements): 0 = Sonic 3 alone, 1 = Sonic 3 & Knuckles, 2 = Sonic 3 A.I.R.
+constant u32 SETTING_REGION_CODE				= 0x00003080	// Region code: Flag 0x80 is set outside of Japan, 0x40 for PAL regions
+constant u32 SETTING_TIME_ATTACK_GHOSTS			= 0x00003103
 
 // Config options with no effect on simulation
-define u32  SETTING_AUDIO_TITLE_THEME			= 0x80400100
-define u32  SETTING_AUDIO_EXTRALIFE_JINGLE		= 0x80400201
-define u32  SETTING_AUDIO_INVINCIBILITY_THEME	= 0x80400301
-define u32  SETTING_AUDIO_SUPER_THEME			= 0x80400404
-define u32  SETTING_AUDIO_MINIBOSS_THEME		= 0x80400501
-define u32  SETTING_AUDIO_KNUCKLES_THEME		= 0x80400601
-define u32  SETTING_AUDIO_HPZ_MUSIC				= 0x80400701
-define u32  SETTING_AUDIO_OUTRO					= 0x80400801
-define u32  SETTING_AUDIO_COMPETITION_MENU		= 0x80400900
-define u32  SETTING_AUDIO_CONTINUE_SCREEN		= 0x80400a01
+constant u32 SETTING_AUDIO_TITLE_THEME			= 0x80400100
+constant u32 SETTING_AUDIO_EXTRALIFE_JINGLE		= 0x80400201
+constant u32 SETTING_AUDIO_INVINCIBILITY_THEME	= 0x80400301
+constant u32 SETTING_AUDIO_SUPER_THEME			= 0x80400404
+constant u32 SETTING_AUDIO_MINIBOSS_THEME		= 0x80400501
+constant u32 SETTING_AUDIO_KNUCKLES_THEME		= 0x80400601
+constant u32 SETTING_AUDIO_HPZ_MUSIC			= 0x80400701
+constant u32 SETTING_AUDIO_OUTRO				= 0x80400801
+constant u32 SETTING_AUDIO_COMPETITION_MENU		= 0x80400900
+constant u32 SETTING_AUDIO_CONTINUE_SCREEN		= 0x80400a01
 

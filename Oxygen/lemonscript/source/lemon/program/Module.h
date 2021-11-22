@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/program/Constant.h"
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
 #include "lemon/program/StoredString.h"
@@ -48,6 +49,9 @@ namespace lemon
 		UserDefinedVariable& addUserDefinedVariable(const std::string& name, const DataTypeDefinition* dataType);
 		ExternalVariable& addExternalVariable(const std::string& name, const DataTypeDefinition* dataType);
 
+		// Constants
+		Constant& addConstant(const std::string& name, const DataTypeDefinition* dataType, uint64 value);
+
 		// Defines
 		Define& addDefine(const std::string& name, const DataTypeDefinition* dataType);
 
@@ -80,6 +84,10 @@ namespace lemon
 		uint32 mFirstVariableId = 0;
 		std::vector<Variable*> mGlobalVariables;
 		ObjectPool<LocalVariable, 16> mLocalVariablesPool;
+
+		// Constants
+		std::vector<Constant*> mConstants;
+		ObjectPool<Constant, 64> mConstantPool;
 
 		// Defines
 		std::vector<Define*> mDefines;

@@ -19,6 +19,7 @@ namespace lemon
 		mFunctionsByName.clear();
 		mGlobalVariablesByName.clear();
 		mDefinesByName.clear();
+		mConstantsByName.clear();
 	}
 
 	void GlobalsLookup::addDefinitionsFromModule(const Module& module)
@@ -30,6 +31,10 @@ namespace lemon
 		for (Variable* variable : module.mGlobalVariables)
 		{
 			registerVariable(*variable);
+		}
+		for (Constant* constant : module.mConstants)
+		{
+			registerConstant(*constant);
 		}
 		for (Define* define : module.mDefines)
 		{
@@ -63,6 +68,18 @@ namespace lemon
 	void GlobalsLookup::registerVariable(Variable& variable)
 	{
 		mGlobalVariablesByName[variable.getNameHash()] = &variable;
+	}
+
+	const Constant* GlobalsLookup::getConstantByName(uint64 nameHash) const
+	{
+		const auto it = mConstantsByName.find(nameHash);
+		return (it == mConstantsByName.end()) ? nullptr : it->second;
+	}
+
+	void GlobalsLookup::registerConstant(Constant& constant)
+	{
+		const uint64 nameHash = rmx::getMurmur2_64(constant.getName());
+		mConstantsByName[nameHash] = &constant;
 	}
 
 	const Define* GlobalsLookup::getDefineByName(uint64 nameHash) const

@@ -36,6 +36,7 @@ namespace lemon
 		{
 			{ rmx::getMurmur2_64(String("function")),	Keyword::FUNCTION },
 			{ rmx::getMurmur2_64(String("global")),		Keyword::GLOBAL },
+			{ rmx::getMurmur2_64(String("constant")),	Keyword::CONSTANT },
 			{ rmx::getMurmur2_64(String("define")),		Keyword::DEFINE },
 			{ rmx::getMurmur2_64(String("return")),		Keyword::RETURN },
 			{ rmx::getMurmur2_64(String("call")),		Keyword::CALL },
@@ -57,7 +58,17 @@ namespace lemon
 			"switch",
 			"case",
 			"select",
-			"choose"
+			"choose",
+			"do",
+			"const",
+			"fixed",
+			"static",
+			"virtual",
+			"override",
+			"function",
+			"enum",
+			"struct",
+			"class"
 		};
 		static std::map<uint64, std::string> reservedKeywordLookup;
 
@@ -215,10 +226,12 @@ namespace lemon
 			else if (firstCharacter == '"')
 			{
 				// It is a string
-				ParserHelper::collectStringLiteral(&input[pos + 1], length - pos - 1, mBufferString, lineNumber);
+				++pos;
+				size_t charactersRead;
+				ParserHelper::collectStringLiteral(&input[pos], length - pos, mBufferString, charactersRead, lineNumber);
 				StringLiteralParserToken& token = outTokens.create<StringLiteralParserToken>();
 				token.mString = mBufferString;
-				pos += mBufferString.length() + 2;
+				pos += charactersRead + 1;
 			}
 			else
 			{

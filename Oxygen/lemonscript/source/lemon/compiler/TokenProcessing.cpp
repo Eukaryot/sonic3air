@@ -454,8 +454,8 @@ namespace lemon
 	{
 		mLineNumber = lineNumber;
 
-		// Process defines
-		processDefines(tokensRoot);
+		// Process constants & defines
+		processConstantsAndDefines(tokensRoot);
 
 		// Split by parentheses
 		//  -> Each linear token list represents contents of one pair of parenthesis, plus one for the whole root
@@ -501,13 +501,22 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::processDefines(TokenList& tokens)
+	void TokenProcessing::processConstantsAndDefines(TokenList& tokens)
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
 				const uint64 identifierHash = rmx::getMurmur2_64(tokens[i].as<IdentifierToken>().mIdentifier);
+
+				const Constant* constant = mContext.mGlobalsLookup.getConstantByName(identifierHash);
+				if (nullptr != constant)
+				{
+					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
+					token.mDataType = constant->getDataType();
+					token.mValue = constant->getValue();
+				}
+
 				const Define* define = mContext.mGlobalsLookup.getDefineByName(identifierHash);
 				if (nullptr != define)
 				{

@@ -45,7 +45,7 @@ namespace lemon
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
 
 	private:
-		void processDefines(TokenList& tokens);
+		void processConstantsAndDefines(TokenList& tokens);
 		void processParentheses(TokenList& tokens, std::vector<TokenList*>& outLinearTokenLists);
 		void processCommaSeparators(std::vector<TokenList*>& linearTokenLists);
 

@@ -575,9 +575,9 @@ function void fn05a79e()
 // Floor collision
 
 #if STANDALONE
-	define s16 DEZBoss.FloorCollision.extra_width = 0x20	// Needed for widescreen, otherwise parts of the floor on the right are not solid; must be multiple of 0x20, but not more than 0x40
+	constant s16 DEZBoss.FloorCollision.extra_width = 0x20	// Needed for widescreen, otherwise parts of the floor on the right are not solid; must be multiple of 0x20, but not more than 0x40
 #else
-	define s16 DEZBoss.FloorCollision.extra_width = 0
+	constant s16 DEZBoss.FloorCollision.extra_width = 0
 #endif
 
 

@@ -72,19 +72,35 @@ namespace lemon
 			}
 		}
 
-		inline static void collectStringLiteral(const char* input, size_t length, std::string& output, uint32 lineNumber)
+		inline static void collectStringLiteral(const char* input, size_t length, std::string& output, size_t& outCharactersRead, uint32 lineNumber)
 		{
 			output.clear();
 			size_t pos;
 			for (pos = 0; pos < length; ++pos)
 			{
-				const char ch = input[pos];
-				if (ch != '"')
-					output += ch;
-				else
+				char ch = input[pos];
+
+				// Use backslash as escape character
+				if (ch == '\\' && pos+1 < length)
+				{
+					++pos;
+					ch = input[pos];
+					if (ch == 'n')
+						ch = '\n';
+					else if (ch == 'r')
+						ch = '\r';
+					else if (ch == 't')
+						ch = '\t';
+				}
+				else if (ch == '"')
+				{
 					break;
+				}
+
+				output += ch;
 			}
 			CHECK_ERROR(pos < length, "String literal exceeds line", lineNumber);
+			outCharactersRead = pos;
 		}
 
 		inline static void collectPreprocessorCondition(const char* input, size_t length, std::string& output)
@@ -138,7 +154,11 @@ namespace lemon
 		{
 			for (size_t pos = 0; pos < length; ++pos)
 			{
-				if (input[pos] == '"')
+				if (input[pos] == '\\' && pos+1 < length)
+				{
+					++pos;
+				}
+				else if (input[pos] == '"')
 				{
 					return pos + 1;
 				}

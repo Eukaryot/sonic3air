@@ -526,10 +526,29 @@ namespace lemon
 							break;
 						}
 
+						case Keyword::CONSTANT:
+						{
+							CHECK_ERROR(tokens.size() >= 5, "Syntax error in constant definition", node.getLineNumber());
+							CHECK_ERROR(tokens[1].getType() == Token::Type::VARTYPE, "Expected a type in constant definition", node.getLineNumber());
+							CHECK_ERROR(tokens[2].getType() == Token::Type::IDENTIFIER, "Expected an identifier for constant definition", node.getLineNumber());
+							CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", node.getLineNumber());
+
+							// TODO: Support all statements that result in a compile-time constant
+							CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", node.getLineNumber());
+
+							const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
+							const std::string identifier = tokens[2].as<IdentifierToken>().mIdentifier;
+							const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
+
+							Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
+							mGlobalsLookup.registerConstant(constant);
+							break;
+						}
+
 						case Keyword::DEFINE:
 						{
 							size_t offset = 1;
-							const DataTypeDefinition* dataType = nullptr;		// Not specified
+							const DataTypeDefinition* dataType = nullptr;	// Not specified
 
 							// Typename is optional
 							if (offset < tokens.size() && tokens[offset].getType() == Token::Type::VARTYPE)

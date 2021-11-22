@@ -1,9 +1,11 @@
 
 
+constant u8 ONE = 1
+
 function void main()
 {
 	u8 a = 0
-	if (a == 1)
+	if (a == ONE)
 	{
 		Log = 1
 	}

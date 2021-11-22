@@ -12,14 +12,14 @@
 // Standalone-specific functions and callbacks           //
 //-------------------------------------------------------//
 
-define u8 SPRITE_FLAG_FLIP_X		 = 0x01
-define u8 SPRITE_FLAG_FLIP_Y		 = 0x02
-define u8 SPRITE_FLAG_WORLDSPACE	 = 0x20
-define u8 SPRITE_FLAG_PRIO			 = 0x40
-define u8 SPRITE_FLAG_NO_GLOBAL_TINT = 0x80
+constant u8 SPRITE_FLAG_FLIP_X		 = 0x01
+constant u8 SPRITE_FLAG_FLIP_Y		 = 0x02
+constant u8 SPRITE_FLAG_WORLDSPACE	 = 0x20
+constant u8 SPRITE_FLAG_PRIO			 = 0x40
+constant u8 SPRITE_FLAG_NO_GLOBAL_TINT = 0x80
 
-define u16 CHAR_ANIMSPRITE_SONIC_DROPDASH = 0x100
-define u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x102
+constant u16 CHAR_ANIMSPRITE_SONIC_DROPDASH = 0x100
+constant u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x102
 
 
 function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
