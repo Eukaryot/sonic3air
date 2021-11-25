@@ -205,12 +205,9 @@ void GameApp::openTitleScreen()
 
 void GameApp::openMainMenu()
 {
-	if (mCurrentState == State::INGAME || mCurrentState == State::TIME_ATTACK_RESULTS)
-	{
-		Application::instance().getSimulation().setRunning(false);
-		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
-		AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
-	}
+	Application::instance().getSimulation().setRunning(false);
+	AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
+	AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
 
 	if (mPauseMenu->getParent() == mGameView)
 		mGameView->removeChild(mPauseMenu);
