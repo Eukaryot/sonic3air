@@ -33,7 +33,14 @@ function void fn060c56()
 		A1 += 4
 	}
 
-	spawnChildObjects(0x0613f8)
+	// "spawnChildObjects(0x0613f8)" replaced by:
+	spawnChildObject(0x060d58, 0x00, 0, 0)
+	spawnChildObject(0x060e4c, 0x02, 0, 36)
+	spawnChildObject(0x061044, 0x04, 0, 0)
+	spawnChildObject(0x060ffe, 0x06, -56, -44)
+	spawnChildObject(0x060ffe, 0x08, 0, -44)
+	spawnChildObject(0x060ffe, 0x0a, 56, -44)
+	spawnChildObject(0x060ffe, 0x0c, 0, -40)
 
 	fn060cb8()
 }
@@ -181,7 +188,9 @@ function void fn060e5c()
 	{
 		objA0.update_address = 0x060e8c
 		objA0.countdown_callback = 0x060ea2
-		spawnSimpleChildObjects(0x061444)
+
+		// "spawnSimpleChildObjects(0x061444)" replaced by:
+		spawnSimpleChildObjects(0x060eba, 1)
 	}
 
 	MoveWithParent()

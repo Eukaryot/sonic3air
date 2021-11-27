@@ -77,7 +77,8 @@ function void fn0891f2()
 	objA0.countdown_value = 0x04
 	objA0.countdown_callback = 0x089212
 
-	spawnChildObjects(0x089352)
+	// "spawnChildObjects(0x089352)" replaced by:
+	spawnChildObject(0x089256, 0x00, 0, 0)
 }
 
 

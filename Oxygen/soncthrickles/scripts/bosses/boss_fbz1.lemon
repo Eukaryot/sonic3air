@@ -58,7 +58,14 @@ function void fn06eea8()
 
 	loadPaletteLine1(0x06fac0)
 
-	spawnChildObjects(0x06fa76)
+	// "spawnChildObjects(0x06fa76)" replaced by:
+	spawnChildObject(0x06f10e, 0x00, -16, -8)
+	spawnChildObject(0x06f10e, 0x02, 16, -8)
+	spawnChildObject(0x06f10e, 0x04, 0, -8)
+	spawnChildObject(0x06efda, 0x06, 0, -36)
+	spawnChildObject(0x06f060, 0x08, 0, -8)
+	spawnChildObject(0x06f178, 0x0a, 0, 0)
+	spawnChildObject(0x06f178, 0x0c, 0, 0)
 }
 
 
@@ -115,7 +122,8 @@ function void fn06ef76()
 		return
 	objA0.flags38 &= ~0x80
 
-	spawnChildObjects(0x06faa8)
+	// "spawnChildObjects(0x06faa8)" replaced by:
+	spawnChildObject(0x06f0ce, 0x00, 0, -8)
 }
 
 
@@ -139,9 +147,22 @@ function void fn06ef88()
 	}
 	fn085ba8()
 
-	spawnSimpleChildObjects(0x06fab0)
-	spawnChildObjects(0x089ed0)
-	spawnChildObjects(0x086b7a)
+	// "spawnSimpleChildObjects(0x06fab0)" replaced by:
+	spawnSimpleChildObjects(0x06f74c, 1)
+
+	// "spawnChildObjects(0x089ed0)" replaced by:
+	spawnChildObject(0x089ce2, 0x00, 0, -4)
+	spawnChildObject(0x089ce2, 0x02, 16, -4)
+	spawnChildObject(0x089ce2, 0x04, -16, -4)
+	spawnChildObject(0x089ce2, 0x06, 28, -4)
+	spawnChildObject(0x089ce2, 0x08, -28, -4)
+
+	// "spawnChildObjects(0x086b7a)" replaced by:
+	spawnChildObject(0x0867d6, 0x00, 0, -8)
+	spawnChildObject(0x0867d6, 0x02, -16, -8)
+	spawnChildObject(0x0867d6, 0x04, 16, -8)
+	spawnChildObject(0x0867d6, 0x06, -24, -8)
+	spawnChildObject(0x0867d6, 0x08, 24, -8)
 }
 
 
@@ -1246,7 +1267,9 @@ function void fn06f994()
 			objA0.update_address = 0x06ef88
 			objA0.flags2a |= 0x80
 
-			spawnChildObjects(0x083fee)
+			// "spawnChildObjects(0x083fee)" replaced by:
+			spawnChildObject(0x083d84, 0x00, 0, 0)
+
 			AddScoreForBossEnemy()
 			return
 		}

@@ -17,7 +17,8 @@ function void fn0643a4()
 	objA0.countdown_value = 0x7f
 	camera.screenshake.state.hi = 0xff
 
-	spawnSimpleChildObjects(0x066602)
+	// "spawnSimpleChildObjects(0x066602)" replaced by:
+	spawnSimpleChildObjects(0x0652a2, 16)
 }
 
 
@@ -39,7 +40,8 @@ function void fn0643c6()
 	objA0.animation.sprite = 0x06
 	objA0.countdown_value = 0x0f
 
-	spawnSimpleChildObjects(0x066644)
+	// "spawnSimpleChildObjects(0x066644)" replaced by:
+	spawnSimpleChildObjects(0x06563a, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0xff
@@ -596,7 +598,8 @@ function void fn0648fa()
 
 	for (u8 i = 0; i < 2; ++i)
 	{
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x14
@@ -628,7 +631,8 @@ function void fn064964()
 	u8[0xffffeec4] = 0xff
 	camera.screenshake.state = 0x14
 
-	spawnSimpleChildObjects(0x06663e)
+	// "spawnSimpleChildObjects(0x06663e)" replaced by:
+	spawnSimpleChildObjects(0x0655b2, 1)
 
 #if STANDALONE
 	// Change characters to the falling animations
@@ -683,7 +687,8 @@ function void fn0649b4()
 	A1 = 0x06684f
 	fn084580()
 
-	spawnSimpleChildObjects(0x066644)
+	// "spawnSimpleChildObjects(0x066644)" replaced by:
+	spawnSimpleChildObjects(0x06563a, 1)
 }
 
 
@@ -1177,8 +1182,11 @@ function void fn064e88()
 	objA0.position.x.u16 = 0x1640
 	objA0.position.y.u16 = 0x02d0
 
-	spawnChildObjects(0x068184)
-	spawnChildObjects(0x066608)
+	// "spawnChildObjects(0x068184)" replaced by:
+	spawnChildObject(0x067cd2, 0x00, 0, -28)
+
+	// "spawnChildObjects(0x066608)" replaced by:
+	spawnChildObject(0x06502e, 0x00, 0, 35)
 
 	fn064ec4()
 }
@@ -1216,7 +1224,8 @@ function void fn064f04()
 	objA0.velocity.x = 0
 	fn0685e2()
 
-	spawnChildObjects(0x0681b4)
+	// "spawnChildObjects(0x0681b4)" replaced by:
+	spawnChildObject(0x068062, 0x00, 30, 0)
 }
 
 
@@ -1277,7 +1286,8 @@ function void fn064fa0()
 		objA0.velocity.x = 0x0190
 		objA0.flags38 &= ~0x10
 
-		spawnChildObjects(0x0681b4)
+		// "spawnChildObjects(0x0681b4)" replaced by:
+		spawnChildObject(0x068062, 0x00, 30, 0)
 	}
 
 	fn066372()
@@ -1410,7 +1420,9 @@ function void fn06502e()
 	setupObjectAttributesFull(0x0664fa)
 	objA0.update_address = 0x065048
 
-	spawnChildObjects(0x066610)
+	// "spawnChildObjects(0x066610)" replaced by:
+	spawnChildObject(0x065138, 0x00, 0, 0)
+	spawnChildObject(0x06515e, 0x02, 0, -48)
 }
 
 
@@ -1446,8 +1458,11 @@ function void fn065068()
 			camera.screenshake.state = 0x14
 			playSound(0xcc)
 
-			spawnSimpleChildObjects(0x06661e)
-			spawnSimpleChildObjects(0x066638)
+			// "spawnSimpleChildObjects(0x06661e)" replaced by:
+			spawnSimpleChildObjects(0x06518a, 15)
+
+			// "spawnSimpleChildObjects(0x066638)" replaced by:
+			spawnSimpleChildObjects(0x065226, 5)
 
 			fn0650d4()
 			return
@@ -1957,7 +1972,9 @@ function void fn0655ce()
 
 	if (u8[0xfffffaa2] != 0)
 	{
-		spawnSimpleChildObjects(0x06664a)
+		// "spawnSimpleChildObjects(0x06664a)" replaced by:
+		spawnSimpleChildObjects(0x065602, 32)
+
 		Object.TriggerUnloading()
 	}
 	DrawObject()

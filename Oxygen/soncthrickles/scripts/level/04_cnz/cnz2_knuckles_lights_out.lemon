@@ -70,7 +70,8 @@ function void fn0622e4()
 
 	CutsceneKnuckles.loadPalette()
 
-	spawnChildObjects(0x066560)
+	// "spawnChildObjects(0x066560)" replaced by:
+	spawnChildObject(0x062458, 0x00, -32, -108)
 }
 
 

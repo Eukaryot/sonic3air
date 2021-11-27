@@ -98,7 +98,10 @@ function void fn076b30()
 {
 	objA0.base_state = 0x04
 	u8[0xffffeed4] = 0xff
-	spawnChildObjects(0x0773e6)
+
+	// "spawnChildObjects(0x0773e6)" replaced by:
+	spawnChildObject(0x076f46, 0x00, -12, -28)
+	spawnChildObject(0x076f46, 0x02, 0, 0)
 }
 
 
@@ -167,7 +170,8 @@ function void fn076b44()
 	objA0.countdown_value = 0x3e
 	objA0.countdown_callback = 0x076b86
 
-	spawnChildObjects(0x0773de)
+	// "spawnChildObjects(0x0773de)" replaced by:
+	spawnChildObject(0x077022, 0x00, 0, 64)
 }
 
 
@@ -517,7 +521,11 @@ function void fn076e5c()
 #endif
 
 	objA0.update_address = 0x076e94
-	spawnChildObjects(0x0773f4)
+
+	// "spawnChildObjects(0x0773f4)" replaced by:
+	spawnChildObject(0x084a76, 0x00, 0, 0)
+	spawnChildObject(0x084a48, 0x02, 0, 0)
+
 	player1.control_override = 0xff
 
 	if (allocDynamicObjectStd())
@@ -881,7 +889,8 @@ function void fn0772f6()
 		move_area.left = camera.position.x.u16
 		move_area.right = camera.position.x.u16 + getScreenExtend() * 2
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

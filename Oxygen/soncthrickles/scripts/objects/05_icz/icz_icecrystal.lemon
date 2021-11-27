@@ -66,7 +66,9 @@ function void fn08b4ec()
 		A0 = A2
 	}
 
-	spawnSimpleChildObjects(0x08b54a)
+	// "spawnSimpleChildObjects(0x08b54a)" replaced by:
+	spawnSimpleChildObjects(0x08b230, 12)
+
 	Object.TriggerUnloading()
 	playSound(0x80)
 	DrawObject()

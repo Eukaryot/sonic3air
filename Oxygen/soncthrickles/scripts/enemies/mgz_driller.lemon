@@ -71,7 +71,9 @@ function void fn088480()
 	objA0.hitbox_extends.y = 0x28
 	fn0685e2()
 
-	spawnChildObjects(0x088b2c)
+	// "spawnChildObjects(0x088b2c)" replaced by:
+	spawnChildObject(0x0887f6, 0x00, -28, -22)
+	spawnChildObject(0x0887f6, 0x02, 28, -22)
 }
 
 
@@ -215,7 +217,8 @@ function void fn088820()
 //# address-hook(0x088a32) end(0x088a60)
 function void fn088a32()
 {
-	spawnChildObjects(0x088b3a)
+	// "spawnChildObjects(0x088b3a)" replaced by:
+	spawnChildObject(0x088820, 0x00, 0, 0)
 	if (_equal())
 	{
 		GetRandomNumber()
@@ -243,7 +246,9 @@ function void fn088a62()
 			objA1.update_address = 0x0887da
 		}
 
-		spawnChildObjects(0x083fee)
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
+
 		AddScoreForBossEnemy()
 		return
 	}

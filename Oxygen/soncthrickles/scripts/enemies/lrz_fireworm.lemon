@@ -49,7 +49,9 @@ function void fn08f77a()
 		return
 
 	objA0.base_state = 0x04
-	spawnChildObjects(0x08fa0e)
+
+	// "spawnChildObjects(0x08fa0e)" replaced by:
+	spawnChildObject(0x08f7a4, 0x00, 0, -8)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = objA0.subtype2c
@@ -118,7 +120,13 @@ function void fn08f812()
 function void fn08f81e()
 {
 	objA0.animation.sprite = 1
-	spawnChildObjects(0x08fa16)
+
+	// "spawnChildObjects(0x08fa16)" replaced by:
+	spawnChildObject(0x08f8f0, 0x00, 0, 0)
+	spawnChildObject(0x08f8f0, 0x02, 0, 0)
+	spawnChildObject(0x08f8f0, 0x04, 0, 0)
+	spawnChildObject(0x08f8f0, 0x06, 0, 0)
+
 	fn08f82e()
 }
 
@@ -239,7 +247,9 @@ function void fn08f948()
 //# address-hook(0x08f94e) end(0x08f958)
 function void fn08f94e()
 {
-	spawnChildObjects(0x08fa30)
+	// "spawnChildObjects(0x08fa30)" replaced by:
+	spawnChildObject(0x08f95c, 0x00, 0, -14)
+
 	fn08f82e()
 }
 

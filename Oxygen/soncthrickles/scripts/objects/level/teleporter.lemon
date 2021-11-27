@@ -844,7 +844,9 @@ function void fn045a72()
 		if (objA1.position.x.u16 <= objA0.position.x.u16)
 		{
 			objA0.value32 = 0x20
-			spawnChildObjects(0x083fee)
+
+			// "spawnChildObjects(0x083fee)" replaced by:
+			spawnChildObject(0x083d84, 0x00, 0, 0)
 		}
 	}
 

@@ -72,7 +72,8 @@ function void fn08cb9e()
 
 	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
 
-	spawnChildObjects(0x06817c)
+	// "spawnChildObjects(0x06817c)" replaced by:
+	spawnChildObject(0x067c38, 0x00, 0, -28)
 
 	A2 = 0x08d254
 	SpawnIdenticalChildObjects()
@@ -160,7 +161,8 @@ function void fn08cc84()
 	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
 	screenmover_target.right = 0x3ea0
 
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 }
 
 
@@ -209,7 +211,8 @@ function void fn08cce8()
 
 	Kosinski.addToDMAQueue(0x375358, 0x9ac0)
 
-	spawnChildObjects(0x0681b4)
+	// "spawnChildObjects(0x0681b4)" replaced by:
+	spawnChildObject(0x068062, 0x00, 30, 0)
 }
 
 
@@ -460,7 +463,8 @@ function void fn062678()
 
 	CutsceneKnuckles.loadPalette()
 
-	spawnChildObjects(0x06657c)
+	// "spawnChildObjects(0x06657c)" replaced by:
+	spawnChildObject(0x0627c6, 0x00, -64, 0)
 }
 
 
@@ -518,7 +522,8 @@ function void fn062778()
 	u8[0xffffb078] = 0
 	screenmover_target.right = 0x3b60 + getScreenExtend() * 2
 
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 
 	move_area.bottom.target = 0x0148
 	fn0851e4()
@@ -594,7 +599,9 @@ function void fn0626f4()
 	objA0.countdown_callback = 0x062726
 	playSound(0x51)
 
-	spawnChildObjects(0x066584)
+	// "spawnChildObjects(0x066584)" replaced by:
+	spawnChildObject(0x06282a, 0x00, -8, -16)
+
 
 	addPatternLoadingCue(0x083d64)
 }
@@ -641,7 +648,8 @@ function void fn06273e()
 	objA0.countdown_value = 0x5f
 	objA0.countdown_callback = 0x062760
 
-	spawnSimpleChildObjects(0x06658c)
+	// "spawnSimpleChildObjects(0x06658c)" replaced by:
+	spawnSimpleChildObjects(0x06285a, 4)
 }
 
 
@@ -737,7 +745,9 @@ function void fn08cd9c()
 	objA0.flags38 |= 0x08
 	playSound(0x50)
 
-	spawnChildObjects(0x08d264)
+	// "spawnChildObjects(0x08d264)" replaced by:
+	spawnChildObject(0x0723e0, 0x00, 0, 0)
+
 	fn0852ae()
 }
 

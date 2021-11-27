@@ -34,7 +34,9 @@ function void fn087a42()
 	setupObjectAttributesFull(0x087ba0)
 	u32[A0 + 0x30] = 0x087bba
 
-	spawnChildObjects(0x087bb2)
+	// "spawnChildObjects(0x087bb2)" replaced by:
+	spawnChildObject(0x087abc, 0x00, 32, 0)
+
 	++objA0.value39
 	fn087a5e()
 }

@@ -41,7 +41,7 @@ function void fn06fd38()
 	setupObjectAttributesFull(0x070396)
 
 	boss.remaining_hits = 0x7f
-	objA0.value39 = 0x06
+	objA0.value39 = 6			// Laser shots until the thing blows up by itself
 	level.boss_encounter = 1
 	screenmover_target.bottom = move_area.bottom.target
 	move_area.left = 0x2900
@@ -57,13 +57,17 @@ function void fn06fd38()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn music controller
 		objA1.update_address = 0x085b30
 		u8[A1 + 0x2c] = 0x2e
 	}
 
-	spawnChildObjects(0x0703d0)
+	// "spawnChildObjects(0x0703d0)" replaced by:
+	spawnChildObject(0x06ffdc, 0x00, 0, 0)
+	spawnChildObject(0x07002a, 0x02, 0, 0)
 
-	spawnSimpleChildObjects(0x0703de)
+	// "spawnSimpleChildObjects(0x0703de)" replaced by:
+	spawnSimpleChildObjects(0x0862ae, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x49
@@ -124,7 +128,7 @@ function void fn06fe28()
 {
 	// Count down the remaining laser shots
 	--objA0.value39
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 	{
 		objA0.flags38 |= 0x08
 		objA0.flags2a &= ~0x40
@@ -151,7 +155,9 @@ function void fn06fe3a()
 	objA0.flags38 &= ~0x02
 	objA0.velocity.y = 0
 
-	spawnChildObjects(0x0703ec)
+	// "spawnChildObjects(0x0703ec)" replaced by:
+	spawnChildObject(0x070192, 0x00, 0, 8)
+
 	fn06fe54()
 }
 
@@ -325,7 +331,9 @@ function void fn06fffa()
 	{
 		objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
 		objA0.animation.sprite = 3
-		spawnChildObjects(0x083fee)
+
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
 	}
 	DrawObject()
 }
@@ -432,8 +440,8 @@ function void fn070192()
 function void fn0701b4()
 {
 	MoveWithParent()
-
 	fn084700()
+
 #if STANDALONE
 	// Make the laser shoot faster
 	objA0.flags2e = min(objA0.flags2e, 0x08)
@@ -468,7 +476,7 @@ function void fn0701ee()
 	objA0.animation.sprite = 6
 	u32[A0 + 0x30] = 0x070406
 	objA0.position.y.u16 += 0x3c
-	objA0.countdown_value = 0x1
+	objA0.countdown_value = 1
 	objA0.countdown_callback = 0x070262
 	playSound(0x54)
 }
@@ -514,7 +522,8 @@ function void fn070262()
 		objA1.update_address = 0x08642e
 	}
 
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		objA1.position.y.u16 += 0x60
@@ -558,7 +567,6 @@ function void fn0702d6()
 }
 
 
-
 //# address-hook(0x0702ea) end(0x07031e)
 function void fn0702ea()
 {
@@ -586,6 +594,7 @@ function void fn070330()
 
 	if (objA0.state == 0)
 	{
+		// Character hit the laser
 		objA0.state = 0x20
 		playSound(0x6e)
 	}
@@ -594,6 +603,7 @@ function void fn070330()
 	--objA0.state
 	if (objA0.state == 0)
 	{
+		// Flashing ends
 		u8[A0 + 0x28] = u8[A0 + 0x25]
 		boss.remaining_hits = 0x7f
 	}

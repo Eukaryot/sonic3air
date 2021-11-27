@@ -74,7 +74,9 @@ function void fn075220()
 	u32[A0 + 0x30] = 0x075eae
 	objA0.hitbox_extends.y = 0x18
 
-	spawnChildObjects(0x075e84)
+	// "spawnChildObjects(0x075e84)" replaced by:
+	spawnChildObject(0x0757c0, 0x00, 0, 0)
+	spawnChildObject(0x0757c0, 0x02, 0, 0)
 
 	if (allocDynamicObjectStd())
 	{
@@ -875,7 +877,8 @@ function void fn075a94()
 				objA0.animation.sprite = D0.u8
 				if (D0.u8 < 5)
 				{
-					spawnSimpleChildObjects(0x075e98)
+					// "spawnSimpleChildObjects(0x075e98)" replaced by:
+					spawnSimpleChildObjects(0x075ad4, 1)
 				}
 			}
 		}
@@ -1001,7 +1004,8 @@ function void fn075d80()
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x0757ba
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x10

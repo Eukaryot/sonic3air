@@ -166,7 +166,9 @@ function void fn08783e()
 function void fn087854()
 {
 	objA0.countdown_value = 0x1a
-	spawnChildObjects(0x0878a0)
+
+	// "spawnChildObjects(0x0878a0)" replaced by:
+	spawnChildObject(0x08780a, 0x00, 0, 0)
 }
 
 

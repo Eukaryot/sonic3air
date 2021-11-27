@@ -331,7 +331,19 @@ function void fn0787e0()
 		objA1.update_address = 0x078aa8
 	}
 
-	spawnChildObjects(0x078d9e)
+	// "spawnChildObjects(0x078d9e)" replaced by:
+	spawnChildObject(0x078a70, 0x00, 0, -12)
+	spawnChildObject(0x078a70, 0x02, -25, -12)
+	spawnChildObject(0x078a70, 0x04, 25, -12)
+	spawnChildObject(0x078a70, 0x06, -12, 34)
+	spawnChildObject(0x078a70, 0x08, 12, 34)
+	spawnChildObject(0x078a70, 0x0a, -8, 54)
+	spawnChildObject(0x078a70, 0x0c, 8, 54)
+	spawnChildObject(0x078a70, 0x0e, -18, 4)
+	spawnChildObject(0x078a70, 0x10, 18, 4)
+	spawnChildObject(0x078a70, 0x12, -18, 12)
+	spawnChildObject(0x078a70, 0x14, 18, 12)
+
 	fn085ba8()
 }
 
@@ -725,7 +737,8 @@ function void fn078b86()
 	objA0.countdown_value = 0x0f
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 6
@@ -813,7 +826,9 @@ function void fn078c60()
 	objA0.flags38 |= 0x80
 	objA0.countdown_callback = 0x0787e0
 
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
+
 	fn08594e()
 	AddScoreForBossEnemy()
 }
@@ -866,7 +881,8 @@ function void fn078cf4()
 		objA0.state = 0x20
 		playSound(0x6e)
 
-		spawnSimpleChildObjects(0x078d98)
+		// "spawnSimpleChildObjects(0x078d98)" replaced by:
+		spawnSimpleChildObjects(0x078a28, 1)
 	}
 
 	--objA0.state

@@ -84,13 +84,15 @@ function void fn06e4f2()
 	objA0.velocity.x = -0x100
 	fn0685e2()
 
-	spawnChildObjects(0x0681a4)
+	// "spawnChildObjects(0x0681a4)" replaced by:
+	spawnChildObject(0x067f5c, 0x00, 0, -8)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x09
 	}
 
-	spawnChildObjects(0x06edcc)
+	// "spawnChildObjects(0x06edcc)" replaced by:
+	spawnChildObject(0x06e82c, 0x00, 0, 20)
 
 	A2 = 0x06edd4
 	SpawnIdenticalChildObjects()
@@ -210,7 +212,10 @@ function void fn06e632()
 	objA0.flags38 |= 0x04
 	objA0.countdown_value = 0xff
 	objA0.countdown_callback = 0x06e650
-	spawnChildObjects(0x06ede4)
+
+	// "spawnChildObjects(0x06ede4)" replaced by:
+	spawnChildObject(0x06eada, 0x00, -12, 84)
+	spawnChildObject(0x06eada, 0x02, 12, 84)
 }
 
 
@@ -273,7 +278,10 @@ function void fn06e6c6()
 	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x06e6e4
-	spawnChildObjects(0x06ee00)
+
+	// "spawnChildObjects(0x06ee00)" replaced by:
+	spawnChildObject(0x06ebac, 0x00, -20, 0)
+	spawnChildObject(0x06ebac, 0x02, 20, 0)
 }
 
 
@@ -292,7 +300,8 @@ function void fn06e6e4()
 		objA1.position.y.u16 = 0x02e0
 	}
 
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 }
 
 
@@ -316,8 +325,11 @@ function void fn06e724()
 	screenmover_target.right = level.bossarea.left + 0x0310
 #endif
 
-	spawnSimpleChildObjects(0x084b0c)
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b0c)" replaced by:
+	spawnSimpleChildObjects(0x084aa4, 1)
+
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 
 #if STANDALONE
 	// Exchange rightmost chunks
@@ -613,7 +625,10 @@ function void fn06e9e2()
 	else
 	{
 		objA0.base_state = 0x06
-		spawnChildObjects(0x06eddc)
+
+		// "spawnChildObjects(0x06eddc)" replaced by:
+		spawnChildObject(0x06eada, 0x00, 0, 76)
+
 		u8[A1 + 0x2c] = objA0.subtype2c
 	}
 }
@@ -884,7 +899,10 @@ function void fn06ed22()
 		return
 
 	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
-	spawnChildObjects(0x06edf2)
+
+	// "spawnChildObjects(0x06edf2)" replaced by:
+	spawnChildObject(0x06e936, 0x00, -8, 0)
+	spawnChildObject(0x06e936, 0x02, 8, 0)
 }
 
 

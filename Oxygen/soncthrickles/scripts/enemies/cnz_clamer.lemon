@@ -41,7 +41,8 @@ function void fn088fdc()
 	if (fn084fa4())
 		return
 
-	spawnChildObjects(0x089148)
+	// "spawnChildObjects(0x089148)" replaced by:
+	spawnChildObject(0x08908c, 0x00, 0, -8)
 }
 
 

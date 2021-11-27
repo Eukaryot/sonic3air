@@ -48,7 +48,9 @@ function void Jawz.Update()
 	fn0857c2()
 	if (_equal())
 	{
-		spawnChildObjects(0x06bdb2)
+		// "spawnChildObjects(0x06bdb2)" replaced by:
+		spawnChildObject(0x06b77c, 0x00, 0, 0)
+
 		Object.TriggerUnloading()
 	}
 	else

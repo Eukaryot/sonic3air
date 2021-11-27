@@ -74,8 +74,14 @@ function void fn068a94()
 
 	fn06859c()
 
-	spawnChildObjects(0x06905c)
-	spawnChildObjects(0x069086)
+	// "spawnChildObjects(0x06905c)" replaced by:
+	spawnChildObject(0x0686be, 0x00, 0, 32)
+	spawnChildObject(0x06870a, 0x02, -36, 8)
+
+	// "spawnChildObjects(0x069086)" replaced by:
+	spawnChildObject(0x068c12, 0x00, 0, -32)
+	spawnChildObject(0x068c12, 0x02, 9, -28)
+	spawnChildObject(0x068c12, 0x04, 18, -24)
 }
 
 
@@ -117,7 +123,11 @@ function void fn068afe()
 	objA0.value39 = 8
 	playSound(0x4f)
 
-	spawnChildObjects(0x0690b6)
+	// "spawnChildObjects(0x0690b6)" replaced by:
+	spawnChildObject(0x0688f4, 0x00, -100, 4)
+	spawnChildObject(0x0688f4, 0x02, -84, 4)
+	spawnChildObject(0x0688f4, 0x04, -68, 4)
+	spawnChildObject(0x0688f4, 0x06, -44, 3)
 }
 
 
@@ -235,7 +245,12 @@ function void fn068bf6()
 function void fn068c02()
 {
 	fn085ba8()
-	spawnChildObjects(0x06910c)
+
+	// "spawnChildObjects(0x06910c)" replaced by:
+	spawnChildObject(0x068e98, 0x00, -16, -8)
+	spawnChildObject(0x068e98, 0x02, 12, -16)
+	spawnChildObject(0x068e98, 0x04, -16, 20)
+	spawnChildObject(0x068e98, 0x06, 16, 12)
 }
 
 
@@ -283,7 +298,10 @@ function void fn068c64()
 	objA0.base_state = 0x08
 	objA0.countdown_callback = 0x068c84
 	u32[A0 + 0x30] = 0x069136
-	spawnChildObjects(0x0690a8)
+
+	// "spawnChildObjects(0x0690a8)" replaced by:
+	spawnChildObject(0x06880a, 0x00, 0, 4)
+	spawnChildObject(0x068c96, 0x02, 0, 4)
 }
 
 
@@ -406,13 +424,23 @@ function void fn068d5e()
 function void fn068d70()
 {
 	playSound(0x4e)
-	spawnChildObjects(0x0690d8)
+
+	// Spawn explosions
+	// "spawnChildObjects(0x0690d8)" replaced by:
+	spawnChildObject(0x068d88, 0x00, 0, -36)
+	spawnChildObject(0x068d88, 0x02, 8, -28)
+	spawnChildObject(0x068d88, 0x04, -8, -28)
+	spawnChildObject(0x068d88, 0x06, 4, -20)
+	spawnChildObject(0x068d88, 0x08, -4, -20)
+	spawnChildObject(0x068d88, 0x0a, 4, -4)
+	spawnChildObject(0x068d88, 0x0c, -4, -4)
+
 	Object.TriggerUnloading()
 }
 
 
 
-// Explosion (used by AIZ 1 mini-boss rockets)
+// Explosion (used by AIZ 1 mini-boss rockets, LBZ 2 Big Arms, and the LRZ 2 boss during auto-scrolling)
 
 //# address-hook(0x068d88) end(0x068d92)
 function void fn068d88()
@@ -595,8 +623,8 @@ function void Boss.AIZ1.RegularUpdate()
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0
 
-		// Spawns one 0x083d84
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x10
@@ -632,7 +660,13 @@ function void fn069482()
 	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
 	objA0.flags38 |= 0x10
 
-	spawnChildObjects(0x069d66)
+	// "spawnChildObjects(0x069d66)" replaced by:
+	spawnChildObject(0x069a3a, 0x00, -16, -16)
+	spawnChildObject(0x069a3a, 0x02, 16, -16)
+	spawnChildObject(0x069a3a, 0x04, -16, 8)
+	spawnChildObject(0x069a3a, 0x06, 16, 8)
+	spawnChildObject(0x069a3a, 0x08, -12, 24)
+	spawnChildObject(0x069a3a, 0x0a, 12, 24)
 }
 
 
@@ -771,8 +805,18 @@ function void fn0687b6()
 	--objA0.value39
 
 	// Spawn rocket
-	A2 = (objA0.value39 != 1) ? 0x06909a : 0x0690a8
-	SpawnChildObjects()
+	if (objA0.value39 == 1)
+	{
+		// "spawnChildObjects(0x0690a8)" replaced by:
+		spawnChildObject(0x06880a, 0x00, 0, 4)
+		spawnChildObject(0x068c96, 0x02, 0, 4)
+	}
+	else
+	{
+		// "spawnChildObjects(0x06909a)" replaced by:
+		spawnChildObject(0x06880a, 0x00, 0, 4)
+		spawnChildObject(0x068844, 0x02, 0, 4)
+	}
 }
 
 
@@ -780,7 +824,7 @@ function void fn0687b6()
 function void fn0687dc()
 {
 	Object.CountdownAndTrigger()
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 		return
 
 	objA0.base_state = 0x0a

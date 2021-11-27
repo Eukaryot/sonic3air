@@ -47,7 +47,13 @@ function void fn07767c()
 	loadPaletteLine1(0x0784a0)
 	copyMemory(0xfffffc60, 0x0784c0, 0x20)
 
-	spawnChildObjects(0x0782fa)
+	// "spawnChildObjects(0x0782fa)" replaced by:
+	spawnChildObject(0x077cb4, 0x00, 0, -20)
+	spawnChildObject(0x077d1a, 0x02, 0, 64)
+	spawnChildObject(0x077d82, 0x04, 32, 0)
+	spawnChildObject(0x077ffc, 0x06, 0, 0)
+	spawnChildObject(0x077dd8, 0x08, 0, 36)
+	spawnChildObject(0x067cd2, 0x0a, 0, -28)
 
 	A2 = 0x078320
 	SpawnChildObjectHierarchy()
@@ -216,7 +222,9 @@ function void fn077848()
 		}
 
 		objA0.flags38 &= ~0x10
-		spawnChildObjects(0x0681b4)
+
+		// "spawnChildObjects(0x0681b4)" replaced by:
+		spawnChildObject(0x068062, 0x00, 30, 0)
 	}
 
 	DrawObject()
@@ -791,7 +799,8 @@ function void fn077df8()
 	setupObjectAttributesFull(0x0782d2)
 	objA0.update_address = 0x077e16
 
-	spawnSimpleChildObjects(0x078334)
+	// "spawnSimpleChildObjects(0x078334)" replaced by:
+	spawnSimpleChildObjects(0x077e7c, 20)
 
 	u16[A0 + 0x44] = A1.u16
 	fn077e16()
@@ -809,7 +818,9 @@ function void fn077e16()
 		objA0.countdown_value = 0x08
 		playSound(0x5e)
 
-		spawnChildObjects(0x07833a)
+		// "spawnChildObjects(0x07833a)" replaced by:
+		spawnChildObject(0x077fce, 0x00, 0, -20)
+		spawnChildObject(0x077f3e, 0x02, 4, -10)
 
 		fn077e74()
 	}
@@ -1085,7 +1096,8 @@ function void fn07806c()
 	u16[0xfffffa82] = 0x0200
 	playSound(0x53)
 
-	spawnChildObjects(0x07832c)
+	// "spawnChildObjects(0x07832c)" replaced by:
+	spawnChildObject(0x077df8, 0x00, -24, -46)
 }
 
 
@@ -1242,7 +1254,8 @@ function void fn0781e4()
 		objA0.countdown_callback = 0x07780a
 		u16[0xffffeec6] = 0x55
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 
 		D0.u16 = camera.position.x.u16
 		move_area.left = D0.u16

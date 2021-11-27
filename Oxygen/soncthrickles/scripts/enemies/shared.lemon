@@ -640,7 +640,10 @@ function void fn085da8()
 //# address-hook(0x085de0)
 function void fn085de0()
 {
-	spawnChildObjects(0x085de8)
+	// "spawnChildObjects(0x085de8)" replaced by:
+	spawnChildObject(0x084a48, 0x00, 0, 0)		// Screen mover
+	spawnChildObject(0x084aa4, 0x02, 0, 0)		// Screen mover for the upper border
+	spawnChildObject(0x084ad2, 0x04, 0, 0)
 }
 
 

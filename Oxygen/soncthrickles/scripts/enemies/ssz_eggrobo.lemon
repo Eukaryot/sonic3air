@@ -119,7 +119,8 @@ function void fn0915f6()
 	D0.u8 = global.framecounter.low & 0x0f
 	if (D0.u8 == 0 && s8[A0 + 0x04] < 0)
 	{
-		spawnSimpleChildObjects(0x0919e6)
+		// "spawnSimpleChildObjects(0x0919e6)" replaced by:
+		spawnSimpleChildObjects(0x0917c0, 1)
 
 		--objA0.value39
 		if (s8[A0 + 0x39] < 0)
@@ -131,7 +132,9 @@ function void fn0915f6()
 			u8[A0 + 0x0a] &= ~0x80
 			objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x300 : -0x300
 
-			spawnChildObjects(0x0919d0)
+			// "spawnChildObjects(0x0919d0)" replaced by:
+			spawnChildObject(0x0916a8, 0x00, -12, 28)
+			spawnChildObject(0x0916ee, 0x02, -28, -4)
 		}
 	}
 
@@ -362,7 +365,11 @@ function void fn0918c4()
 
 	setupObjectAttributesFull(0x0919a6)
 	objA0.update_address = 0x09159a
-	spawnChildObjects(0x0919d0)
+
+	// "spawnChildObjects(0x0919d0)" replaced by:
+	spawnChildObject(0x0916a8, 0x00, -12, 28)
+	spawnChildObject(0x0916ee, 0x02, -28, -4)
+
 	fn0918e2()
 }
 

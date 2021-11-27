@@ -184,10 +184,9 @@ function void fn04a0c6()
 {
 	A1 = 0xffff0000 + objA0.value3e
 
-	D0.s16 = objA1.position.y.u16 + (lookupSin(objA0.value26) >> 4)
-	objA0.position.y.u16 = D0.u16
+	objA0.position.y.u16 = objA1.position.y.u16 + (lookupSin(objA0.value26) >> 4)
 	D0 = (objA0.value26 + 0x10) >> 5
-	objA0.animation.sprite = u8[0x04a110 + D0.s16]
+	objA0.animation.sprite = u8[0x04a110 + D0.u16]
 	objA0.value26 += 0x84
 	objA0.position.x.u16 += 2
 	if (objA0.position.x.u16 > 0x0178)

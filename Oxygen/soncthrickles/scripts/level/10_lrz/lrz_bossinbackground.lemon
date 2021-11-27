@@ -66,7 +66,16 @@ function void fn078fae()
 	objA0.countdown_value = 0x011f
 	objA0.countdown_callback = 0x079034
 
-	spawnChildObjects(0x07961a)
+	// Spawn missiles
+	// "spawnChildObjects(0x07961a)" replaced by:
+	spawnChildObject(0x0792ac, 0x00, -12, 12)
+	spawnChildObject(0x0792ac, 0x02, 12, 12)
+	spawnChildObject(0x0792ac, 0x04, -20, 12)
+	spawnChildObject(0x0792ac, 0x06, 20, 12)
+	spawnChildObject(0x0792ac, 0x08, -20, 4)
+	spawnChildObject(0x0792ac, 0x0a, 20, 4)
+	spawnChildObject(0x0792ac, 0x0c, -24, 4)
+	spawnChildObject(0x0792ac, 0x0e, 24, 4)
 }
 
 
@@ -118,7 +127,8 @@ function void fn079054()
 	objA0.countdown_value = 0
 	objA0.velocity.x = 0x0200
 
-	spawnSimpleChildObjects(0x079652)
+	// "spawnSimpleChildObjects(0x079652)" replaced by:
+	spawnSimpleChildObjects(0x0790ac, 4)
 }
 
 
@@ -168,8 +178,14 @@ function void fn0790d8()
 	objA0.update_address = 0x07910a
 	playSound(0x9d)
 
-	spawnSimpleChildObjects(0x079672)
-	spawnChildObjects(0x079658)
+	// "spawnSimpleChildObjects(0x079672)" replaced by:
+	spawnSimpleChildObjects(0x0791d4, 2)
+
+	// "spawnChildObjects(0x079658)" replaced by:
+	spawnChildObject(0x079142, 0x00, -16, 0)
+	spawnChildObject(0x079142, 0x02, 16, 0)
+	spawnChildObject(0x079142, 0x04, 0, -16)
+	spawnChildObject(0x079142, 0x06, 0, 16)
 }
 
 
@@ -191,7 +207,9 @@ function void fn07910a()
 		u16[0xffffeee0] = 0x0480
 		playSound(0x4e)
 
-		spawnSimpleChildObjects(0x079686)
+		// "spawnSimpleChildObjects(0x079686)" replaced by:
+		spawnSimpleChildObjects(0x0794de, 18)
+
 		Object.TriggerUnloading()
 	}
 }
@@ -250,7 +268,8 @@ function void fn0791d4()
 	objA0.update_address = 0x0791fe
 	objA0.position.y.u16 = u16[0x0791fa + objA0.subtype2c]
 
-	spawnSimpleChildObjects(0x079678)
+	// "spawnSimpleChildObjects(0x079678)" replaced by:
+	spawnSimpleChildObjects(0x079278, 1)
 }
 
 
@@ -271,10 +290,20 @@ function void fn0791fe()
 	objA0.countdown_value = 0x1f
 	objA0.position.y.u16 += 0x08
 
-	spawnChildObjects(0x0690d8)
+	// Spawn explosions
+	// "spawnChildObjects(0x0690d8)" replaced by:
+	spawnChildObject(0x068d88, 0x00, 0, -36)
+	spawnChildObject(0x068d88, 0x02, 8, -28)
+	spawnChildObject(0x068d88, 0x04, -8, -28)
+	spawnChildObject(0x068d88, 0x06, 4, -20)
+	spawnChildObject(0x068d88, 0x08, -4, -20)
+	spawnChildObject(0x068d88, 0x0a, 4, -4)
+	spawnChildObject(0x068d88, 0x0c, -4, -4)
+
 	objA0.position.y.u16 += 0x18
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 
 	if (objA0.subtype2c != 0)
 	{
@@ -376,7 +405,8 @@ function void fn079346()
 	objA0.update_address = 0x07935e
 	playSound(0xa0)
 
-	spawnSimpleChildObjects(0x07964c)
+	// "spawnSimpleChildObjects(0x07964c)" replaced by:
+	spawnSimpleChildObjects(0x079374, 1)
 }
 
 
@@ -453,10 +483,11 @@ function void fn0794de()
 //# address-hook(0x0794f8) end(0x079510)
 function void fn0794f8()
 {
-	if (objA0.velocity.y >= 0 || global.framecounter.low & 0x03)
-		return
-
-	spawnChildObjects(0x07967e)
+	if (objA0.velocity.y < 0 && (global.framecounter.low & 0x03) == 0)
+	{
+		// "spawnChildObjects(0x07967e)" replaced by:
+		spawnChildObject(0x0793a8, 0x00, 0, 24)
+	}
 }
 
 

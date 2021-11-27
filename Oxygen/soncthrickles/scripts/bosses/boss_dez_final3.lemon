@@ -55,8 +55,12 @@ function void fn080184()
 		objA1.update_address = 0x08642e
 	}
 
-	spawnChildObjects(0x06817c)
-	spawnChildObjects(0x081330)
+	// "spawnChildObjects(0x06817c)" replaced by:
+	spawnChildObject(0x067c38, 0x00, 0, -28)
+
+	// "spawnChildObjects(0x081330)" replaced by:
+	spawnChildObject(0x0804b0, 0x00, 0, 35)
+	spawnChildObject(0x0806da, 0x02, 0, 59)
 }
 
 
@@ -74,7 +78,9 @@ function void fn0801d8()
 	objA0.base_state = 0x04
 	objA0.velocity.x = 0x500
 
-	spawnChildObjects(0x0681b4)
+	// "spawnChildObjects(0x0681b4)" replaced by:
+	spawnChildObject(0x068062, 0x00, 30, 0)
+
 	fn0685e2()
 }
 
@@ -237,7 +243,8 @@ function void fn08030e()
 
 	for (u8 i = 0; i < 4; ++i)
 	{
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = (i < 2) ? 0x16 : 0x18
@@ -405,7 +412,8 @@ function void fn080e2c()
 		objA0.countdown_value = 0x2f
 		objA0.countdown_callback = 0x08029c
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

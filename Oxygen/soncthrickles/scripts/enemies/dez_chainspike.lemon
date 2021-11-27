@@ -51,7 +51,11 @@ function void fn091c62()
 	u16[A0 + 0x3c] = D1.u16
 	objA0.countdown_callback = 0x091ca6
 
-	spawnChildObjects(0x091eec)
+	// "spawnChildObjects(0x091eec)" replaced by:
+	spawnChildObject(0x091d52, 0x00, 0, 20)
+	spawnChildObject(0x091d52, 0x02, 0, -20)
+	spawnChildObject(0x091e5a, 0x04, 20, 0)
+	spawnChildObject(0x091e5a, 0x06, -20, 0)
 }
 
 

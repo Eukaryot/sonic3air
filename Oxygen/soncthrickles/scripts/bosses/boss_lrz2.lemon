@@ -85,7 +85,9 @@ function void fn07981e()
 	objA0.velocity.y = -0x580
 	playSound(0x7a)
 
-	spawnChildObjects(0x07a18c)
+	// "spawnChildObjects(0x07a18c)" replaced by:
+	spawnChildObject(0x079be6, 0x00, 0, -18)
+	spawnChildObject(0x079c0c, 0x02, -21, 1)
 }
 
 
@@ -132,7 +134,7 @@ function void fn0798c6()
 	// Entered once per shot, and once afterwards
 
 	--objA0.value39		// Number of shots left
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 	{
 		// Shoot another bomb
 		u16[A0 + 0x3a] -= 0x10
@@ -140,7 +142,9 @@ function void fn0798c6()
 
 		playSound(0x98)
 
-		spawnChildObjects(0x07a19a)
+		// "spawnChildObjects(0x07a19a)" replaced by:
+		spawnChildObject(0x079aae, 0x00, 0, -24)
+		spawnChildObject(0x079b7e, 0x02, 0, -55)
 	}
 	else
 	{
@@ -389,7 +393,8 @@ function void fn079ac4()
 
 	if ((global.framecounter.low & 0x03) == 0)
 	{
-		spawnChildObjects(0x07a1a8)
+		// "spawnChildObjects(0x07a1a8)" replaced by:
+		spawnChildObject(0x079bac, 0x00, 0, 16)
 	}
 
 	MoveWithGravity20()
@@ -576,7 +581,8 @@ function void fn079ec4()
 
 function void fn079ee6()
 {
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -606,7 +612,8 @@ function void fn079f58()
 			u16[0xfffffa84] = 0
 			u8[0xffffeec6] = 0xff
 
-			spawnSimpleChildObjects(0x083fee)
+			// "spawnSimpleChildObjects(0x083fee)" replaced by:
+			spawnSimpleChildObjects(0x083d84, 1)
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x04

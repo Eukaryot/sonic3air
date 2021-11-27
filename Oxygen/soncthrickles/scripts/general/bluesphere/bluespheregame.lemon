@@ -2125,7 +2125,8 @@ function void fn0680a4()
 	objA0.position.y.u16 = 0xc0
 	fn0685e2()
 
-	spawnChildObjects(0x0681c4)
+	// "spawnChildObjects(0x0681c4)" replaced by:
+	spawnChildObject(0x0680fe, 0x00, 0, -28)
 }
 
 
@@ -2163,7 +2164,9 @@ function void fn068118()
 //# address-hook(0x02cd26) end(0x02cd30)
 function void fn02cd26()
 {
-	spawnSimpleChildObjects(0x02cd36)
+	// "spawnSimpleChildObjects(0x02cd36)" replaced by:
+	spawnSimpleChildObjects(0x02cd3c, 4)
+
 	UnloadObject()
 }
 
@@ -2206,8 +2209,9 @@ function void fn02cd84()
 //# address-hook(0x02cd9a) end(0x02cda4)
 function void fn02cd9a()
 {
+	// "spawnSimpleChildObjects(0x02cdaa)" replaced by:
+	spawnSimpleChildObjects(0x02cdb0, 4)
 
-	spawnSimpleChildObjects(0x02cdaa)
 	UnloadObject()
 }
 
@@ -2248,7 +2252,9 @@ function void fn02cdea()
 //# address-hook(0x02ce2c) end(0x02ce36)
 function void fn02ce2c()
 {
-	spawnSimpleChildObjects(0x02ce3c)
+	// "spawnSimpleChildObjects(0x02ce3c)" replaced by:
+	spawnSimpleChildObjects(0x02ce42, 4)
+
 	UnloadObject()
 }
 

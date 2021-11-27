@@ -592,9 +592,15 @@ function void fn05dc2c()
 #endif
 	fn06001e()
 
-	spawnSimpleChildObjects(0x0601ca)
-	spawnChildObjects(0x0601d0)
-	spawnChildObjects(0x0601d8)
+	// "spawnSimpleChildObjects(0x0601ca)" replaced by:
+	spawnSimpleChildObjects(0x05ecb4, 2)
+
+	// "spawnChildObjects(0x0601d0)" replaced by:
+	spawnChildObject(0x05ebf0, 0x00, 28, 0)
+
+	// "spawnChildObjects(0x0601d8)" replaced by:
+	spawnChildObject(0x05ec3c, 0x00, -10, 12)
+
 	if (outro.ending_type >= 0)
 		spawnChildObjects(0x0601e0)
 }
@@ -642,9 +648,14 @@ function void fn05dca6()
 
 	loadPaletteLine1(0x060a9a)
 
-	spawnChildObjects(0x06022e)
+	// "spawnChildObjects(0x06022e)" replaced by:
+	spawnChildObject(0x05ed6a, 0x00, -6, 7)
+
 	if (outro.ending_type >= 0)
-		spawnChildObjects(0x06020c)
+	{
+		// "spawnChildObjects(0x06020c)" replaced by:
+		spawnChildObject(0x05ed36, 0x00, -16, 5)
+	}
 }
 
 
@@ -768,8 +779,11 @@ function void fn05dfee()
 	Game.startSkippableCutscene()
 #endif
 
-	spawnSimpleChildObjects(0x0601ca)
-	spawnChildObjects(0x0601d0)
+	// "spawnSimpleChildObjects(0x0601ca)" replaced by:
+	spawnSimpleChildObjects(0x05ecb4, 2)
+
+	// "spawnChildObjects(0x0601d0)" replaced by:
+	spawnChildObject(0x05ebf0, 0x00, 28, 0)
 
 	u8[0xfffffab8] &= ~0x01
 
@@ -946,7 +960,8 @@ function void fn05e1c2()
 
 	fn05fd88()
 
-	spawnChildObjects(0x0601ba)
+	// "spawnChildObjects(0x0601ba)" replaced by:
+	spawnChildObject(0x05ea52, 0x00, -32, 43)
 	if (_equal())
 	{
 		u8[A1 + 0x38] |= 0x04

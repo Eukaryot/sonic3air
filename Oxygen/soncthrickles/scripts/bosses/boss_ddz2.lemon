@@ -305,13 +305,14 @@ function void fn081d72()
 	A1 = 0x081db4 + D0.s16
 	objA0.value42 = u16[(A1+=2)-2]
 	u16[A0 + 0x44] = u16[(A1+=2)-2]
-	u32[A0 + 0x30] = u32[0x081dc0 + D0.s16]
+	u32[A0 + 0x30] = u32[0x081dc0 + D0.u16]
 	D0.u16 >>= 2
-	objA0.animation.sprite = u8[0x081db0 + D0.s16]
+	objA0.animation.sprite = u8[0x081db0 + D0.u16]
 	if (D0.u16 != 0)
 		return
 
-	spawnChildObjects(0x08327a)
+	// "spawnChildObjects(0x08327a)" replaced by:
+	spawnChildObject(0x081cc6, 0x00, 28, -4)
 }
 
 
@@ -334,7 +335,8 @@ function void fn081dcc()
 		D0 = u16(objA0.subtype2c) * 2
 		u32[A0 + 0x18] = u32[0x081e1c + D0.s16]
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04
@@ -388,7 +390,9 @@ function void fn0824f4()
 	objA0.position.y.u16 = D0.u16
 	playSound(0x81)
 
-	spawnChildObjects(0x083294)
+	// "spawnChildObjects(0x083294)" replaced by:
+	spawnChildObject(0x082588, 0x00, 8, 0)
+	spawnChildObject(0x0825bc, 0x02, -24, 0)
 }
 
 
@@ -579,13 +583,15 @@ function void fn08303e()
 	objA0.value42 = 0x40
 	u16[A0 + 0x44] = 0x40
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x0e
 	}
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x0e
@@ -621,7 +627,8 @@ function void fn08307c()
 	}
 	else
 	{
-		spawnSimpleChildObjects(0x08328e)
+		// "spawnSimpleChildObjects(0x08328e)" replaced by:
+		spawnSimpleChildObjects(0x08249a, 4)
 	}
 }
 

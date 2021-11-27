@@ -27,7 +27,9 @@ function void fn0630e0()
 	}
 	else
 	{
-		spawnChildObjects(0x0665bc)
+		// "spawnChildObjects(0x0665bc)" replaced by:
+		spawnChildObject(0x0632ca, 0x00, -8, 0)
+
 		Object.TriggerUnloading()
 	}
 }
@@ -64,7 +66,8 @@ function void fn063134()
 	u8[0xffffeee8] = 0xff
 	CutsceneKnuckles.loadPalette()
 
-	spawnChildObjects(0x0665bc)
+	// "spawnChildObjects(0x0665bc)" replaced by:
+	spawnChildObject(0x0632ca, 0x00, -8, 0)
 }
 
 

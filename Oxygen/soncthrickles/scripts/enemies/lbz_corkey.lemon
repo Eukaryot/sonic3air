@@ -22,7 +22,10 @@ function void fn08c746()
 	objA0.value2f = D0.u8
 	objA0.countdown_callback = 0x08c7bc
 	objA0.subtype2c = D0.u8 * 2
-	spawnChildObjects(0x08c90e)
+
+	// "spawnChildObjects(0x08c90e)" replaced by:
+	spawnChildObject(0x08c7de, 0x00, 0, 12)
+
 	fn08c780()
 }
 
@@ -142,17 +145,23 @@ function void fn08c82c()
 	{
 		if (objA0.value2f == 4)
 		{
-			spawnChildObjects(0x08c916)
+			// "spawnChildObjects(0x08c916)" replaced by:
+			spawnChildObject(0x08c8c6, 0x00, -4, 84)
+
 			u32[A1 + 0x30] = 0x08c933
 		}
 		else if (objA0.value2f == 5)
 		{
-			spawnChildObjects(0x08c91e)
+			// "spawnChildObjects(0x08c91e)" replaced by:
+			spawnChildObject(0x08c8c6, 0x00, 4, 84)
+
 			u32[A1 + 0x30] = 0x08c93c
 		}
 		else if (objA0.value2f == 6)
 		{
-			spawnChildObjects(0x08c926)
+			// "spawnChildObjects(0x08c926)" replaced by:
+			spawnChildObject(0x08c8c6, 0x00, 0, 84)
+
 			u32[A1 + 0x30] = 0x08c945
 		}
 	}

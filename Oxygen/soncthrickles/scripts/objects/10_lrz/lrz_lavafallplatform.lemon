@@ -52,7 +52,9 @@ function void fn079c72()
 		return
 
 	objA0.update_address = 0x079c9e
-	spawnSimpleChildObjects(0x07a1b0)
+
+	// "spawnSimpleChildObjects(0x07a1b0)" replaced by:
+	spawnSimpleChildObjects(0x079d28, 1)
 	if (_equal())
 	{
 		objA1.position.y.u16 += 0xc0
@@ -86,7 +88,8 @@ function void fn079c9e()
 //# address-hook(0x079cb4) end(0x079ccc)
 function void fn079cb4()
 {
-	spawnSimpleChildObjects(0x07a1b0)
+	// "spawnSimpleChildObjects(0x07a1b0)" replaced by:
+	spawnSimpleChildObjects(0x079d28, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = objA0.subtype2c
@@ -222,7 +225,8 @@ function void fn079d44()
 	objA0.sprite_priority = 0x0180
 	objA0.velocity.y = 0x80
 
-	spawnSimpleChildObjects(0x07a1b6)
+	// "spawnSimpleChildObjects(0x07a1b6)" replaced by:
+	spawnSimpleChildObjects(0x079e6c, 1)
 
 	fn079d6e()
 }
@@ -351,7 +355,8 @@ function bool fn079ffe()
 	if (_equal())
 		return false
 
-	spawnSimpleChildObjects(0x07a1bc)
+	// "spawnSimpleChildObjects(0x07a1bc)" replaced by:
+	spawnSimpleChildObjects(0x079e9c, 10)
 
 	Object.TriggerUnloading()
 	fn08594e()

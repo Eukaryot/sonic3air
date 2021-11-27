@@ -54,9 +54,11 @@ function void fn08d2b6()
 				u8[0xfffff7ff] = 0xff
 				screenmover_target.right = 0x6000
 
-				spawnSimpleChildObjects(0x084b00)
+				// "spawnSimpleChildObjects(0x084b00)" replaced by:
+				spawnSimpleChildObjects(0x084a48, 1)
 
-				spawnChildObjects(0x0681b4)
+				// "spawnChildObjects(0x0681b4)" replaced by:
+				spawnChildObject(0x068062, 0x00, 30, 0)
 
 				fn08d53e()
 

@@ -18,7 +18,10 @@ function void fn08b89a()
 	setupObjectAttributesFull(0x08babc)
 	objA0.update_address = 0x08b8b6
 	u16[A0 + 0x30] = objA0.position.y.u16
-	spawnChildObjects(0x08bad0)
+
+	// "spawnChildObjects(0x08bad0)" replaced by:
+	spawnChildObject(0x08b8c2, 0x00, -56, 0)
+	spawnChildObject(0x08b8c2, 0x02, 56, 0)
 }
 
 

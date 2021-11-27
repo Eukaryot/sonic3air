@@ -115,8 +115,16 @@ function void Boss.ICZ1.UpdateState00()
 	objA0.value3e = 0x200 + (108 * getScreenExtend() / 40)
 #endif
 
-	spawnSimpleChildObjects(0x0719aa)
-	spawnChildObjects(0x071984)
+	// "spawnSimpleChildObjects(0x0719aa)" replaced by:
+	spawnSimpleChildObjects(0x0714b8, 8)
+
+	// "spawnChildObjects(0x071984)" replaced by:
+	spawnChildObject(0x071446, 0x00, -14, -11)
+	spawnChildObject(0x071446, 0x02, 14, -11)
+	spawnChildObject(0x071446, 0x04, 0, 18)
+	spawnChildObject(0x071446, 0x06, -14, -11)
+	spawnChildObject(0x071446, 0x08, 14, -11)
+	spawnChildObject(0x071446, 0x0a, 0, 14)
 }
 
 
@@ -253,7 +261,7 @@ function void Boss.ICZ1.UpdateState0a()
 function void Boss.ICZ1.GotoState0e()
 {
 	--objA0.value39
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 	{
 		Boss.ICZ1.GotoState0a()
 		return
@@ -353,7 +361,11 @@ function void fn0713e8()
 		}
 	}
 
-	spawnChildObjects(0x0719b0)
+	// "spawnChildObjects(0x0719b0)" replaced by:
+	spawnChildObject(0x07168a, 0x00, -12, -12)
+	spawnChildObject(0x07168a, 0x02, 12, -12)
+	spawnChildObject(0x07168a, 0x04, -12, 12)
+	spawnChildObject(0x07168a, 0x06, 12, 12)
 }
 
 
@@ -844,7 +856,10 @@ function void Boss.ICZ1.RegularUpdate()
 		// Boss beaten
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x0713e8
-		spawnChildObjects(0x083fee)
+
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
+
 		AddScoreForBossEnemy()
 
 	#if STANDALONE

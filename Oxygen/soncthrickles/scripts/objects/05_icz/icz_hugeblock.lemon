@@ -56,7 +56,9 @@ function void fn08a488()
 	if (objA0.subtype2c < 0x03)
 	{
 		objA0.animation.sprite = 0x0c
-		spawnChildObjects(0x08a638)
+
+		// "spawnChildObjects(0x08a638)" replaced by:
+		spawnChildObject(0x08a604, 0x00, 0, 0)
 	}
 
 	objA0.base_state = objA0.subtype2c * 2

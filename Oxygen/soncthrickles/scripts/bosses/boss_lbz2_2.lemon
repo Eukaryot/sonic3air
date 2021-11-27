@@ -57,9 +57,16 @@ function void fn0729de()
 		}
 	}
 
-	spawnChildObjects(0x06817c)
-	spawnChildObjects(0x0737f0)
-	spawnChildObjects(0x073766)
+	// "spawnChildObjects(0x06817c)" replaced by:
+	spawnChildObject(0x067c38, 0x00, 0, -28)
+
+	// "spawnChildObjects(0x0737f0)" replaced by:
+	spawnChildObject(0x073164, 0x00, 0, -20)
+
+	// "spawnChildObjects(0x073766)" replaced by:
+	spawnChildObject(0x07308e, 0x00, 0, 8)
+	spawnChildObject(0x0730f8, 0x02, 0, 48)
+	spawnChildObject(0x073100, 0x04, 0, 92)
 
 	A2 = 0x0737e8
 	SpawnIdenticalChildObjects()
@@ -394,7 +401,9 @@ function void fn073100()
 	objA0.countdown_callback = 0x073128
 	u16[A0 + 0x3c] = 0x02
 
-	spawnChildObjects(0x0737da)
+	// "spawnChildObjects(0x0737da)" replaced by:
+	spawnChildObject(0x073364, 0x00, -20, 48)
+	spawnChildObject(0x073364, 0x02, 20, 48)
 }
 
 
@@ -601,18 +610,11 @@ function void fn0732ba()
 //# address-hook(0x0732f6) end(0x073334)
 function void fn0732f6()
 {
-	if ((global.framecounter & 0x01) == 0)
-	{
-		spawnChildObjects(0x0737d2)
-		u32[A1 + 0x30] = 0x073851
-		fn0734e4()
-	}
-	else
-	{
-		spawnChildObjects(0x0737d2)
-		u32[A1 + 0x30] = 0x073857
-		fn0734e4()
-	}
+	// "spawnChildObjects(0x0737d2)" replaced by:
+	spawnChildObject(0x07333a, 0x00, 32, 0)
+
+	u32[A1 + 0x30] = (global.framecounter & 0x01) ? 0x073857 : 0x073851
+	fn0734e4()
 
 	UpdateMovementStraightSimple()
 	Enemy.DrawOrUnload()
@@ -722,7 +724,10 @@ function void fn0733fc()
 			{
 				push(D1)
 				push(D0)
-				spawnChildObjects(0x0737c2)
+
+				// "spawnChildObjects(0x0737c2)" replaced by:
+				spawnChildObject(0x07321a, 0x00, -8, 0)
+
 				D0 = pop()
 				D1 = pop()
 			}
@@ -788,7 +793,9 @@ function void fn0734fa()
 		D0.u16 = u16[A0 + 0x3c]
 		objA0.flags38 |= (1 << D0.u8)
 
-		spawnChildObjects(0x083fee)
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
+
 		u8[A1 + 0x2c] = 0x04
 
 	#if STANDALONE
@@ -846,7 +853,9 @@ function void fn0734fa()
 			u8[A0 + 0x40] = 0x0f
 			objA0.flags2a |= 0x20
 
-			spawnChildObjects(0x0737f8)
+			// "spawnChildObjects(0x0737f8)" replaced by:
+			spawnChildObject(0x073192, 0x00, -16, 0)
+			spawnChildObject(0x073192, 0x02, 16, 0)
 		}
 	}
 
@@ -871,22 +880,33 @@ function void fn07361e()
 	if (u8[A1 + 0x38] & (1 << D0.u8))
 	{
 		objA0.flags2a |= 0x80
-		if (D0.u16 == 2)
-		{
-			u32[A0 + 0x3e] = 0x0736c6
-			A2 = 0x073794
-		}
-		else
-		{
-			u32[A0 + 0x3e] = 0x0736c2
-			A2 = 0x07377a
-		}
+		bool flag = (D0.u16 == 2)
+		u32[A0 + 0x3e] = (flag) ? 0x0736c6 : 0x0736c2
 
 		objA0.countdown_value = 0x10
 		objA0.update_address = 0x0730f2
 
-		spawnChildObjects(A2)
-		spawnChildObjects(0x083fee)
+		if (flag)
+		{
+			// "spawnChildObjects(0x073794)" replaced by:
+			spawnChildObject(0x073138, 0x00, -16, -8)
+			spawnChildObject(0x073138, 0x02, 16, -8)
+			spawnChildObject(0x073138, 0x04, -16, 16)
+			spawnChildObject(0x073138, 0x06, 16, 16)
+			spawnChildObject(0x073138, 0x08, -20, -32)
+			spawnChildObject(0x073138, 0x0a, 20, -32)
+		}
+		else
+		{
+			// "spawnChildObjects(0x07377a)" replaced by:
+			spawnChildObject(0x073138, 0x00, -16, -4)
+			spawnChildObject(0x073138, 0x02, 16, -4)
+			spawnChildObject(0x073138, 0x04, -16, 16)
+			spawnChildObject(0x073138, 0x06, 16, 16)
+		}
+
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
 	}
 	else
 	{

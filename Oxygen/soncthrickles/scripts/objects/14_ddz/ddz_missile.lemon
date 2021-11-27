@@ -24,7 +24,8 @@ function void fn081fee()
 {
 	setupObjectAttributesFull(0x0831f0)
 
-	spawnSimpleChildObjects(0x083250)
+	// "spawnSimpleChildObjects(0x083250)" replaced by:
+	spawnSimpleChildObjects(0x08214a, 1)
 
 	if (objA0.subtype2c == 0)
 	{
@@ -193,7 +194,8 @@ function void fn082160()
 	fn085a5a()
 	if ((global.framecounter.low & 0x07) == 0)
 	{
-		spawnSimpleChildObjects(0x083256)
+		// "spawnSimpleChildObjects(0x083256)" replaced by:
+		spawnSimpleChildObjects(0x08218e, 1)
 	}
 
 	if ((global.framecounter.low & 0x02) == 0)
@@ -420,7 +422,8 @@ function void fn082b84()
 	objA0.countdown_value = 0x03
 	objA0.countdown_callback = 0x085088
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06

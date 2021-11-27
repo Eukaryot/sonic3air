@@ -42,7 +42,11 @@ function void fn08bfd4()
 	setupObjectAttributesFull(0x08c266)
 	objA0.countdown_value = 0x20
 	objA0.countdown_callback = 0x08c00e
-	spawnChildObjects(0x08c28a)
+
+	// "spawnChildObjects(0x08c28a)" replaced by:
+	spawnChildObject(0x08c17c, 0x00, -8, 0)
+	spawnChildObject(0x08c17c, 0x02, -8, 7)
+	spawnChildObject(0x08c11e, 0x04, -8, 4)
 }
 
 

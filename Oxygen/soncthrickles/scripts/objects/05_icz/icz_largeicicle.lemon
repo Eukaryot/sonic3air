@@ -73,7 +73,10 @@ function void fn08b1fa()
 	{
 		objA0.update_address = 0x08b228
 		u8[A0 + 0x28] = 0
-		spawnSimpleChildObjects(0x08b292)
+
+		// "spawnSimpleChildObjects(0x08b292)" replaced by:
+		spawnSimpleChildObjects(0x08b230, 12)
+
 		playSound(0x5d)
 	}
 	Enemy.DrawOrUnload()

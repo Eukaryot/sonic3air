@@ -52,7 +52,8 @@ function void fn089f7e()
 	objA0.base_state = u8[0x089fb2 + D0.u16]
 	if (D0.u16 == 0)
 	{
-		spawnChildObjects(0x08a436)
+		// "spawnChildObjects(0x08a436)" replaced by:
+		spawnChildObject(0x08a304, 0x00, -16, 16)
 	}
 }
 
@@ -299,7 +300,9 @@ function void fn08a036()
 				if (objA0.subtype2c == 0)
 					return
 
-				spawnSimpleChildObjects(0x08a42a)
+				// "spawnSimpleChildObjects(0x08a42a)" replaced by:
+				spawnSimpleChildObjects(0x0837b2, 1)
+
 				if (allocDynamicObjectAfterA0())
 				{
 					// Create spring

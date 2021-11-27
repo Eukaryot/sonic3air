@@ -43,7 +43,10 @@ function void fn088bc0()
 {
 	setupObjectAttributesFull(0x088dfa)
 
-	spawnChildObjects(0x088e1e)
+	// "spawnChildObjects(0x088e1e)" replaced by:
+	spawnChildObject(0x088c7c, 0x00, -16, 12)
+	spawnChildObject(0x088c7c, 0x02, 16, 12)
+	spawnChildObject(0x088d30, 0x04, 0, -12)
 }
 
 

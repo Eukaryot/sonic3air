@@ -131,13 +131,14 @@ function void fn08957a()
 		return
 
 	--objA0.value39
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 		return
 
 	objA0.base_state = 0x08
 	objA0.countdown_callback = 0x08956a
 
-	spawnChildObjects(0x089726)
+	// "spawnChildObjects(0x089726)" replaced by:
+	spawnChildObject(0x089626, 0x00, -27, -22)
 
 	A2 = 0x08972e
 	SpawnProjectileChildObjectsInDir()

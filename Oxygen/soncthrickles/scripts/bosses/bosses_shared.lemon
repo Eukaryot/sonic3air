@@ -340,7 +340,8 @@ function void fn0694aa()
 
 	addPatternLoadingCue(0x083d74)
 
-	spawnSimpleChildObjects(0x069d8c)
+	// "spawnSimpleChildObjects(0x069d8c)" replaced by:
+	spawnSimpleChildObjects(0x086540, 1)
 
 	u8[A1 + 0x04] |= render_flag.FLIP_Y
 	StartLoadingPatternsForZone()
@@ -366,9 +367,10 @@ function void fn0694d4()
 		objA1.update_address = 0x0863c0
 	}
 
-	D0.u16 = u16[0xfffffa84] + 0x0158
-	screenmover_target.right = D0.u16
-	spawnSimpleChildObjects(0x084b00)
+	screenmover_target.right = u16[0xfffffa84] + 0x0158
+
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 }
 
 
@@ -518,7 +520,8 @@ function void fn083e70()
 //# address-hook(0x083e84)
 function void fn083e84()
 {
-	spawnSimpleChildObjects(0x083fdc)
+	// "spawnSimpleChildObjects(0x083fdc)" replaced by:
+	spawnSimpleChildObjects(0x083f4a, 1)
 	if (_equal())
 	{
 		fn083e90()
@@ -554,7 +557,9 @@ function void fn083ec6()
 	}
 
 	objA0.countdown_value = 0x02
-	spawnSimpleChildObjects(0x083ff6)
+
+	// "spawnSimpleChildObjects(0x083ff6)" replaced by:
+	spawnSimpleChildObjects(0x01e5e0, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x05] = 0x02
@@ -576,8 +581,8 @@ function void fn083eec()
 	{
 		objA0.countdown_value = 2
 
-		// Create explosions
-		spawnSimpleChildObjects(0x083fe2)
+		// "spawnSimpleChildObjects(0x083fe2)" replaced by:
+		spawnSimpleChildObjects(0x083f76, 1)		// Create explosions
 		if (_equal())
 		{
 			fn083e90()
@@ -597,7 +602,9 @@ function void fn083f06()
 	}
 
 	objA0.countdown_value = 0x02
-	spawnSimpleChildObjects(0x083fe8)
+
+	// "spawnSimpleChildObjects(0x083fe8)" replaced by:
+	spawnSimpleChildObjects(0x083f80, 1)
 	if (_equal())
 	{
 		fn083e90()
@@ -689,7 +696,7 @@ function void fn085e74()
 		fadePaletteToWhiteUniform()
 
 		--objA0.value39
-		if (s8[A0 + 0x39] >= 0)
+		if (s8(objA0.value39) >= 0)
 			return
 
 		if (objA0.subtype2c == 0)
@@ -931,7 +938,9 @@ function void fn067e92()
 	fn069b2e()
 
 	objA0.animation.sprite = objA0.subtype2c
-	spawnChildObjects(0x068164)
+
+	// "spawnChildObjects(0x068164)" replaced by:
+	spawnChildObject(0x067aca, 0x00, 0, -28)
 }
 
 
@@ -944,7 +953,9 @@ function void fn067eb4()
 		return
 
 	objA0.base_state = 0x04
-	spawnChildObjects(0x083fee)
+
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04
@@ -1017,7 +1028,8 @@ function void fn067f1e()
 	}
 #endif
 
-	spawnChildObjects(0x0681b4)
+	// "spawnChildObjects(0x0681b4)" replaced by:
+	spawnChildObject(0x068062, 0x00, 30, 0)
 }
 
 

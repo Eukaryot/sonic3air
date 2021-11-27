@@ -41,7 +41,8 @@ function void fn08ea88()
 	objA0.flags38 |= 0x80
 	u32[A0 + 0x30] = 0x08ed8c
 
-	spawnSimpleChildObjects(0x08ed66)
+	// "spawnSimpleChildObjects(0x08ed66)" replaced by:
+	spawnSimpleChildObjects(0x08eb8e, 5)
 
 	fn08eaaa()
 }
@@ -89,7 +90,10 @@ function void fn08ead2()
 	{
 		playSound(0x6c)
 
-		spawnChildObjects(0x08ed74)
+		// "spawnChildObjects(0x08ed74)" replaced by:
+		spawnChildObject(0x08ec74, 0x00, 0, 4)
+		spawnChildObject(0x08ec74, 0x02, -4, 4)
+		spawnChildObject(0x08ec74, 0x04, 4, 4)
 	}
 }
 
@@ -113,7 +117,11 @@ function void fn08eb2e()
 	if (objA0.flags38 & 0x80)
 	{
 		playSound(0x6c)
-		spawnChildObjects(0x08ed74)
+
+		// "spawnChildObjects(0x08ed74)" replaced by:
+		spawnChildObject(0x08ec74, 0x00, 0, 4)
+		spawnChildObject(0x08ec74, 0x02, -4, 4)
+		spawnChildObject(0x08ec74, 0x04, 4, 4)
 	}
 }
 

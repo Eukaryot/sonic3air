@@ -511,27 +511,36 @@ function void SpawnChildObjects()
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+		s8 offset_x = s8[A2 + 4]
+		s8 offset_y = s8[A2 + 5]
+
+		if (!spawnChildObject(updateAddress, D2.u8, offset_x, offset_y))
 			return
-
-		u32[A1] = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8								// Simple enumeration of children (in steps of 2)
-		u16[A1 + 0x46] = A0.u16								// Reference to parent
-
-		s8 offset_x = s8[A2+4]
-		s8 offset_y = s8[A2+5]
-		u8[A1 + 0x42] = offset_x
-		u8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
 
 		A2 += 6
 		D2.u16 += 2
 	}
+}
+
+function bool spawnChildObject(u32 updateAddress, u8 subtype, s8 offset_x, s8 offset_y)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	u32[A1] = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+	u16[A1 + 0x46] = A0.u16								// Reference to parent
+
+	u8[A1 + 0x42] = offset_x
+	u8[A1 + 0x43] = offset_y
+	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
 
 	_setZeroFlagByValue(false)
+	return true
 }
 
 
@@ -733,21 +742,24 @@ function void SpawnSimpleChildObjects()
 	// Stored data, shared for all children:
 	//  - Update routine
 
-	D2 = 0
 	u16 count = u16[A2] + 1
-	A2 += 2
+	u32 updateAddress = u32[A2+2]
+	spawnSimpleChildObjects(updateAddress, count)
+}
 
+function void spawnSimpleChildObjects(u32 updateAddress, u16 count)
+{
+	D2 = 0
 	for (u16 i = 0; i < count; ++i)
 	{
 		if (!allocDynamicObjectAfterA0())
 			return
 
-		// Basic initialization as above
-		u32[A1] = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
+		u32[A1] = updateAddress
+		objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
+		objA1.subtype2c = D2.u8								// A simple enumeration of children (in steps of 2)
+		u16[A1 + 0x46] = A0.u16								// Reference to parent
 
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16

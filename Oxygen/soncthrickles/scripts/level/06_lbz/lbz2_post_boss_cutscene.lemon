@@ -117,7 +117,8 @@ function void fn072c0a()
 			u8[A1 + 0x2a] &= ~0x01
 			control.player1 = 0x0101
 
-			spawnSimpleChildObjects(0x073806)
+			// "spawnSimpleChildObjects(0x073806)" replaced by:
+			spawnSimpleChildObjects(0x072d24, 2)
 		}
 		else
 		{
@@ -253,7 +254,8 @@ function void fn072d78()
 //# address-hook(0x072d92) end(0x072de4)
 function void fn072d92()
 {
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		objA1.position.x.u16 = 0x4430
@@ -317,7 +319,14 @@ function void fn072e2e()
 	objA0.value39 = 0
 	objA0.countdown_value = 0
 
-	spawnChildObjects(0x07380c)
+	// "spawnChildObjects(0x07380c)" replaced by:
+	spawnChildObject(0x072e9e, 0x00, 0, 0)
+	spawnChildObject(0x072e9e, 0x02, -16, 40)
+	spawnChildObject(0x072e9e, 0x04, -112, 0)
+	spawnChildObject(0x072e9e, 0x06, -72, 40)
+	spawnChildObject(0x072e9e, 0x08, 24, 16)
+	spawnChildObject(0x072e9e, 0x0a, -36, -8)
+	spawnChildObject(0x072e9e, 0x0c, -80, 28)
 
 #if STANDALONE
 	if (Game.getSetting(SETTING_LBZ_BIGARMS))
@@ -406,7 +415,8 @@ function void fn072ef8()
 	D0.u8 = global.framecounter & 0x0f
 	if (D0.u8 == 0)
 	{
-		spawnSimpleChildObjects(0x073838)
+		// "spawnSimpleChildObjects(0x073838)" replaced by:
+		spawnSimpleChildObjects(0x072f4c, 1)
 
 		GetRandomNumber()
 		objA1.position.x.u16 += (D0.u16 & 0x1f) - 0x10
@@ -441,7 +451,8 @@ function void fn072f4c()
 	objA0.countdown_value = 0x7f
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 
-	spawnSimpleChildObjects(0x07383e)
+	// "spawnSimpleChildObjects(0x07383e)" replaced by:
+	spawnSimpleChildObjects(0x072fb2, 1)
 
 	fn072f7a()
 }

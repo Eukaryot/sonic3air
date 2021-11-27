@@ -113,7 +113,9 @@ function void fn08bdc2()
 		return
 
 	playSound(0xc8)
-	spawnChildObjects(0x08bdfa)
+
+	// "spawnChildObjects(0x08bdfa)" replaced by:
+	spawnChildObject(0x08bd40, 0x00, 0, 12)
 }
 
 

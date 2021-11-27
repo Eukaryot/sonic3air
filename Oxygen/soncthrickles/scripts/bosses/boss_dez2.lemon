@@ -30,7 +30,10 @@ function void fn07f06c()
 	requestLoadingPatterns(0x76)
 	Kosinski.addToDMAQueue(0x181002, 0x7140)
 	loadPaletteLine1(0x07fd08)
-	spawnChildObjects(0x07fc8c)
+
+	// "spawnChildObjects(0x07fc8c)" replaced by:
+	spawnChildObject(0x07f71c, 0x00, 0, 0)
+	spawnChildObject(0x07f782, 0x02, 0, 0)
 }
 
 
@@ -79,11 +82,13 @@ function void fn07f10e()
 	objA0.countdown_value = 0xbf
 	objA0.countdown_callback = 0x07f15a
 
-	spawnSimpleChildObjects(0x07fc9a)
+	// "spawnSimpleChildObjects(0x07fc9a)" replaced by:
+	spawnSimpleChildObjects(0x07f336, 1)
 
 	if (u32[0xffffb04a] != 0)	// Is Tails here as well?
 	{
-		spawnSimpleChildObjects(0x07fc9a)
+		// "spawnSimpleChildObjects(0x07fc9a)" replaced by:
+		spawnSimpleChildObjects(0x07f336, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x02
@@ -142,7 +147,9 @@ function void fn07f194()
 		A1 = 0x07fcd4
 		fn084580()
 
-		spawnChildObjects(0x07fca0)
+		// "spawnChildObjects(0x07fca0)" replaced by:
+		spawnChildObject(0x07f64a, 0x00, 0, 20)
+		spawnChildObject(0x07f398, 0x02, 0, 12)
 	}
 	else
 	{
@@ -208,7 +215,9 @@ function void fn07f220()
 
 	spawnSimpleChildObjects(0x07fcce)
 	spawnSimpleChildObjects(0x07fcc8)
-	spawnSimpleChildObjects(0x083fee)
+
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 
 	playMusic(MUSIC_CTRL_FADEOUT)
 }
@@ -225,7 +234,8 @@ function void fn07f266()
 		objA0.position.x.u16 = 0x35d0
 		objA0.position.y.u16 = 0x0328
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 	}
 }
 
@@ -485,7 +495,8 @@ function void fn07f4b8()
 //# address-hook(0x07f4c0) end(0x07f4e8)
 function void fn07f4c0()
 {
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -502,7 +513,11 @@ function void fn07f4c0()
 //# address-hook(0x07f4ee) end(0x07f4f6)
 function void fn07f4ee()
 {
-	spawnChildObjects(0x07fcb4)
+	// "spawnChildObjects(0x07fcb4)" replaced by:
+	spawnChildObject(0x07f60a, 0x00, -16, -9)
+	spawnChildObject(0x07f60a, 0x02, 0, -12)
+	spawnChildObject(0x07f60a, 0x04, 16, -9)
+
 	Object.TriggerUnloading()
 }
 
@@ -701,7 +716,8 @@ function void fn07f64a()
 	objA0.update_address = 0x07f66c
 	u32[A0 + 0x30] = 0x07fcef
 
-	spawnSimpleChildObjects(0x07fcae)
+	// "spawnSimpleChildObjects(0x07fcae)" replaced by:
+	spawnSimpleChildObjects(0x07f6fa, 1)
 
 	fn084934()
 }
@@ -920,7 +936,8 @@ function void fn07f79c()
 		objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
 		objA0.animation.sprite = 0x15
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x06
@@ -1336,7 +1353,8 @@ function void fn07fb92()
 			u8[0xfffffab8] |= 0x01
 			objA0.countdown_callback = 0x07f210
 
-			spawnSimpleChildObjects(0x083fee)
+			// "spawnSimpleChildObjects(0x083fee)" replaced by:
+			spawnSimpleChildObjects(0x083d84, 1)
 
 			if (allocDynamicObjectStd())
 			{

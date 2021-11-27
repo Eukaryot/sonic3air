@@ -50,10 +50,20 @@ function void fn075f50()
 	requestLoadingPatterns(0x7b)
 	loadPaletteLine1(0x0769d4)
 
-	spawnChildObjects(0x07699c)
-	spawnChildObjects(0x076982)
-	spawnSimpleChildObjects(0x07697c)
-	spawnSimpleChildObjects(0x076976)
+	// "spawnChildObjects(0x07699c)" replaced by:
+	spawnChildObject(0x067cd2, 0x00, 0, -28)
+
+	// "spawnChildObjects(0x076982)" replaced by:
+	spawnChildObject(0x07665e, 0x00, -20, 24)
+	spawnChildObject(0x07665e, 0x02, -44, 24)
+	spawnChildObject(0x076520, 0x04, 17, -81)
+	spawnChildObject(0x0764a0, 0x06, 33, -16)
+
+	// "spawnSimpleChildObjects(0x07697c)" replaced by:
+	spawnSimpleChildObjects(0x0764d0, 1)
+
+	// "spawnSimpleChildObjects(0x076976)" replaced by:
+	spawnSimpleChildObjects(0x076502, 2)
 }
 
 
@@ -168,7 +178,9 @@ function void fn0760c4()
 	}
 
 	screenmover_target.right = 0x45a0
-	spawnSimpleChildObjects(0x084b00)
+
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 }
 
 
@@ -214,7 +226,9 @@ function void fn076164()
 		camera.screenshake.state = 0x14
 		objA0.countdown_callback = 0x0761b2
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
+
 		AddScoreForBossEnemy()
 	}
 
@@ -236,7 +250,8 @@ function void fn0761b2()
 
 	addPatternLoadingCue(0x076a04)
 
-	spawnSimpleChildObjects(0x0769b0)
+	// "spawnSimpleChildObjects(0x0769b0)" replaced by:
+	spawnSimpleChildObjects(0x0766ca, 6)
 }
 
 
@@ -318,11 +333,13 @@ function void fn076270()
 	screenmover_target.right = 0x5000
 	objA0.flags38 &= ~0x20
 
-	spawnChildObjects(0x07699c)
+	// "spawnChildObjects(0x07699c)" replaced by:
+	spawnChildObject(0x067cd2, 0x00, 0, -28)
 
 	addPatternLoadingCue(0x083d7c)
 
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 }
 
 
@@ -405,8 +422,11 @@ function void fn076520()
 	objA0.update_address = 0x07654a
 	boss.remaining_hits = 1
 
-	spawnSimpleChildObjects(0x0769a4)
-	spawnSimpleChildObjects(0x0769aa)
+	// "spawnSimpleChildObjects(0x0769a4)" replaced by:
+	spawnSimpleChildObjects(0x076604, 2)
+
+	// "spawnSimpleChildObjects(0x0769aa)" replaced by:
+	spawnSimpleChildObjects(0x076636, 4)
 
 	fn07654a()
 }
@@ -453,7 +473,9 @@ function void fn07654a()
 		u8[A1 + 0x2c] = 0x19
 	}
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
+
 	u8[0xfffff7c1] = 0
 }
 
@@ -636,7 +658,8 @@ function void fn076782()
 				objA1.update_address = 0x0768b6
 			}
 
-			spawnSimpleChildObjects(0x083fee)
+			// "spawnSimpleChildObjects(0x083fee)" replaced by:
+			spawnSimpleChildObjects(0x083d84, 1)
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x20

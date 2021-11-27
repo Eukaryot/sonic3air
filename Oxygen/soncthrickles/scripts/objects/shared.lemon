@@ -813,9 +813,9 @@ function void fn085b1e()
 //# address-hook(0x085b30) end(0x085b3e)
 function void fn085b30()
 {
-	objA0.countdown_value = 90
 	playMusic(MUSIC_CTRL_FADEOUT)
 
+	objA0.countdown_value = 90
 	objA0.update_address = 0x085b44
 	fn085b44()
 }

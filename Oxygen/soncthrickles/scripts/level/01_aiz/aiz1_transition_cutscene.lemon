@@ -127,8 +127,14 @@ function void fn06857a()
 	objA0.countdown_callback = 0x0685be
 	objA0.base_state = 0x06
 
-	spawnChildObjects(0x06905c)
-	spawnChildObjects(0x069072)
+	// "spawnChildObjects(0x06905c)" replaced by:
+	spawnChildObject(0x0686be, 0x00, 0, 32)
+	spawnChildObject(0x06870a, 0x02, -36, 8)
+
+	// "spawnChildObjects(0x069072)" replaced by:
+	spawnChildObject(0x06872c, 0x00, 0, -32)
+	spawnChildObject(0x06872c, 0x02, 9, -28)
+	spawnChildObject(0x06872c, 0x04, 18, -24)
 
 	fn06859c()
 }
@@ -195,7 +201,9 @@ function void fn06862e()
 {
 	objA0.countdown_value = 0x10
 	objA0.countdown_callback = 0x068646
-	spawnChildObjects(0x069104)
+
+	// "spawnChildObjects(0x069104)" replaced by:
+	spawnChildObject(0x083f22, 0x00, 0, 0)
 }
 
 

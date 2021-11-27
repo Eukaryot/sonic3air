@@ -779,7 +779,9 @@ function void fn05c972()
 	objA0.velocity.x = 0x0600
 	fn0685e2()
 
-	spawnChildObjects(0x0919d0)
+	// "spawnChildObjects(0x0919d0)" replaced by:
+	spawnChildObject(0x0916a8, 0x00, -12, 28)
+	spawnChildObject(0x0916ee, 0x02, -28, -4)
 
 	Kosinski.addToDMAQueue(0x17b17e, 0xa000)
 }

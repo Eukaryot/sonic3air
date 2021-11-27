@@ -83,13 +83,19 @@ function void fn06af32()
 	objA0.countdown_value = 0xef
 	objA0.countdown_callback = 0x06af80
 
-	spawnChildObjects(0x06bdec)
+	// "spawnChildObjects(0x06bdec)" replaced by:
+	spawnChildObject(0x067e28, 0x00, 0, 12)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x05
 	}
 
-	spawnChildObjects(0x06bd8a)
+	// "spawnChildObjects(0x06bd8a)" replaced by:
+	spawnChildObject(0x06b5c4, 0x00, 35, 18)
+	spawnChildObject(0x06b5c4, 0x02, 27, 10)
+	spawnChildObject(0x06b5c4, 0x04, 19, 10)
+	spawnChildObject(0x06b75c, 0x06, 0, 28)
+	spawnChildObject(0x06b1a8, 0x08, 0, 36)
 }
 
 
@@ -199,7 +205,7 @@ function void fn06b08e()
 {
 	objA0.countdown_value = 0x5f
 	--objA0.value39
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 	{
 		objA0.flags38 |= 0x02
 		return
@@ -260,7 +266,8 @@ function void fn06b0e8()
 	}
 #endif
 
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 
 	if (allocDynamicObjectStd())
 	{
@@ -363,7 +370,9 @@ function void fn06b212()
 {
 	objA0.base_state = 0x06
 	u32[A0 + 0x30] = 0x06bdfb
-	spawnChildObjects(0x06bdba)
+
+	// "spawnChildObjects(0x06bdba)" replaced by:
+	spawnChildObject(0x06b26e, 0x00, 0, 0)
 }
 
 
@@ -434,8 +443,12 @@ function void fn06b2aa()
 	u32[A0 + 0x30] = 0x06be0c
 	objA0.countdown_callback = 0x06b2f8
 
-	spawnChildObjects(0x06bdca)
-	spawnSimpleChildObjects(0x06bde6)
+	// "spawnChildObjects(0x06bdca)" replaced by:
+	spawnChildObject(0x06b456, 0x00, -4, 0)
+	spawnChildObject(0x06b456, 0x02, 4, 0)
+
+	// "spawnSimpleChildObjects(0x06bde6)" replaced by:
+	spawnSimpleChildObjects(0x06b50c, 20)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x44] = u16[A1 + 0x46]
@@ -457,7 +470,8 @@ function void fn06b2f8()
 	objA0.velocity.y = -0x100
 	objA0.countdown_callback = 0x06b32e
 
-	spawnChildObjects(0x06bdc2)
+	// "spawnChildObjects(0x06bdc2)" replaced by:
+	spawnChildObject(0x06b3de, 0x00, 0, 0)
 }
 
 
@@ -636,7 +650,9 @@ function void fn06b4c4()
 
 	if (objA0.subtype2c == 0)
 	{
-		spawnChildObjects(0x06bdca)
+		// "spawnChildObjects(0x06bdca)" replaced by:
+		spawnChildObject(0x06b456, 0x00, -4, 0)
+		spawnChildObject(0x06b456, 0x02, 4, 0)
 	}
 }
 
@@ -833,7 +849,9 @@ function void fn06b6e6()
 	else
 	{
 		objA0.base_state = 0x0a
-		spawnChildObjects(0x06bdd8)
+
+		// "spawnChildObjects(0x06bdd8)" replaced by:
+		spawnChildObject(0x06b4a2, 0x00, 0, 0)
 	}
 }
 
@@ -865,10 +883,14 @@ function void fn06b734()
 //# address-hook(0x06b73a) end(0x06b756)
 function void fn06b73a()
 {
-	spawnSimpleChildObjects(0x06bde0)
 	playSound(0x4e)
 
-	spawnChildObjects(0x06bdb2)
+	// "spawnSimpleChildObjects(0x06bde0)" replaced by:
+	spawnSimpleChildObjects(0x06b4c4, 5)
+
+	// "spawnChildObjects(0x06bdb2)" replaced by:
+	spawnChildObject(0x06b77c, 0x00, 0, 0)
+
 	Object.TriggerUnloading()
 }
 

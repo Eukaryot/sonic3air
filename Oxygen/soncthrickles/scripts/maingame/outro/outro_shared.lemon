@@ -371,7 +371,8 @@ function void fn05ea74()
 	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x02
 
-	spawnChildObjects(0x0601c2)
+	// "spawnChildObjects(0x0601c2)" replaced by:
+	spawnChildObject(0x05eb32, 0x00, 0, -16)
 }
 
 
@@ -597,7 +598,10 @@ function void fn05f26c()
 		u16[A1 + 0x46] = A0.u16
 	}
 
-	spawnChildObjects(0x0601f0)
+	// "spawnChildObjects(0x0601f0)" replaced by:
+	spawnChildObject(0x05f31c, 0x00, 0, 0)
+	spawnChildObject(0x05f3aa, 0x02, 0, 0)
+	spawnChildObject(0x05f410, 0x04, 0, 0)
 }
 
 
@@ -661,7 +665,8 @@ function void fn05f3aa()
 	A1 = 0x05f3d2
 	fn05fefe()
 
-	spawnChildObjects(0x060204)
+	// "spawnChildObjects(0x060204)" replaced by:
+	spawnChildObject(0x05f3ea, 0x00, -16, 8)
 }
 
 

@@ -72,7 +72,8 @@ function void fn061362()
 	objA0.animation.sprite = D0.u8
 	if (D0.u8 == 0x16)
 	{
-		spawnSimpleChildObjects(0x06144a)
+		// "spawnSimpleChildObjects(0x06144a)" replaced by:
+		spawnSimpleChildObjects(0x0610b6, 1)
 	}
 }
 

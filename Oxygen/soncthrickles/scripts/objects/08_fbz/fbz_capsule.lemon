@@ -13,7 +13,9 @@ function void fn089bdc()
 {
 	setupObjectAttributesFull(0x089e78)
 	objA0.update_address = 0x089c14
-	spawnChildObjects(0x089ea8)
+
+	// "spawnChildObjects(0x089ea8)" replaced by:
+	spawnChildObject(0x089c5c, 0x00, 0, -36)
 
 	if (objA0.respawn_entry)
 	{
@@ -44,13 +46,19 @@ function void fn089c14()
 		}
 		fn089dac()
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x08
 		}
 
-		spawnChildObjects(0x089eb0)
+		// "spawnChildObjects(0x089eb0)" replaced by:
+		spawnChildObject(0x089d78, 0x00, 0, -8)
+		spawnChildObject(0x089d78, 0x02, -16, -8)
+		spawnChildObject(0x089d78, 0x04, 16, -8)
+		spawnChildObject(0x089d78, 0x06, -24, -8)
+		spawnChildObject(0x089d78, 0x08, 24, -8)
 	}
 
 	fn089c54()
@@ -168,7 +176,7 @@ function void fn089d18()
 //# address-hook(0x089d44) end(0x089d72)
 function void fn089d44()
 {
-	// Spawn rings
+	// Make this a ring from the capsule
 	setupObjectAttributesFull(0x089e9c)
 	objA0.update_address = 0x01a64a
 
@@ -225,7 +233,12 @@ function void fn089dac()
 //# address-hook(0x089dc4) end(0x089dc8)
 function void fn089dc4()
 {
-	spawnChildObjects(0x089ed0)
+	// "spawnChildObjects(0x089ed0)" replaced by:
+	spawnChildObject(0x089ce2, 0x00, 0, -4)
+	spawnChildObject(0x089ce2, 0x02, 16, -4)
+	spawnChildObject(0x089ce2, 0x04, -16, -4)
+	spawnChildObject(0x089ce2, 0x06, 28, -4)
+	spawnChildObject(0x089ce2, 0x08, -28, -4)
 }
 
 
@@ -234,15 +247,27 @@ function void fn089dcc()
 {
 	// Rings
 	playSound(0xb9)
-	spawnChildObjects(0x089ef0)
+
+	// "spawnChildObjects(0x089ef0)" replaced by:
+	spawnChildObject(0x089d44, 0x00, -8, -4)
+	spawnChildObject(0x089d44, 0x02, 8, -4)
+	spawnChildObject(0x089d44, 0x04, 16, -4)
+	spawnChildObject(0x089d44, 0x06, -16, -4)
+	spawnChildObject(0x089d44, 0x08, 24, -4)
+	spawnChildObject(0x089d44, 0x0a, -24, -4)
 }
 
 
 //# address-hook(0x089dde) end(0x089dea)
 function void fn089dde()
 {
-	spawnChildObjects(0x089f16)
-	spawnChildObjects(0x089f24)
+	// "spawnChildObjects(0x089f16)" replaced by:
+	spawnChildObject(0x089650, 0x00, -24, -4)
+	spawnChildObject(0x089650, 0x02, 24, -4)
+
+	// "spawnChildObjects(0x089f24)" replaced by:
+	spawnChildObject(0x089a5a, 0x00, -8, -4)
+	spawnChildObject(0x089a5a, 0x02, 8, -4)
 }
 
 

@@ -61,7 +61,8 @@ function void fn0742a8()
 
 	Kosinski.addToDMAQueue(0x376874, 0x7b20)
 
-	spawnChildObjects(0x068184)
+	// "spawnChildObjects(0x068184)" replaced by:
+	spawnChildObject(0x067cd2, 0x00, 0, -28)
 }
 
 
@@ -78,7 +79,11 @@ function void fn074314()
 	objA0.base_state = 0x06
 	objA0.animation.sprite = 8
 
-	spawnChildObjects(0x075122)
+	// "spawnChildObjects(0x075122)" replaced by:
+	spawnChildObject(0x0749d0, 0x00, 20, 36)
+	spawnChildObject(0x0749ae, 0x02, 12, -20)
+	spawnChildObject(0x074b9e, 0x04, 0, -24)
+	spawnChildObject(0x074bc0, 0x06, 56, -20)
 }
 
 
@@ -95,7 +100,8 @@ function void fn07432a()
 	u8[A0 + 0x28] = 0x0f
 	objA0.render_flags ^= 0x01
 
-	spawnChildObjects(0x07513c)
+	// "spawnChildObjects(0x07513c)" replaced by:
+	spawnChildObject(0x074c00, 0x00, 4, -52)
 
 	fn074360()
 }
@@ -491,7 +497,12 @@ function void fn0746d8()
 	objA0.animation.sprite = 5
 	objA0.flags38 |= 0x10
 
-	spawnChildObjects(0x07515e)
+	// "spawnChildObjects(0x07515e)" replaced by:
+	spawnChildObject(0x074d14, 0x00, -12, -44)
+	spawnChildObject(0x074d14, 0x02, 20, -44)
+	spawnChildObject(0x074d14, 0x04, 44, -24)
+	spawnChildObject(0x074d14, 0x06, -12, -4)
+	spawnChildObject(0x074d14, 0x08, 20, -4)
 }
 
 
@@ -585,7 +596,9 @@ function void fn074768()
 	Kosinski.addToDMAQueue(0x15fddc, 0xa5c0)
 
 	objA0.flags38 &= ~0x20
-	spawnChildObjects(0x068184)
+
+	// "spawnChildObjects(0x068184)" replaced by:
+	spawnChildObject(0x067cd2, 0x00, 0, -28)
 }
 
 
@@ -606,7 +619,9 @@ function void fn0747d6()
 	objA0.velocity.x = 0x200
 	fn0685e2()
 
-	spawnChildObjects(0x0681b4)
+	// "spawnChildObjects(0x0681b4)" replaced by:
+	spawnChildObject(0x068062, 0x00, 30, 0)
+
 	DrawObject()
 }
 
@@ -644,7 +659,9 @@ function void fn07481c()
 	objA0.countdown_callback = 0x0748a0
 	objA0.flags38 &= ~0x08
 
-	spawnChildObjects(0x07517e)
+	// "spawnChildObjects(0x07517e)" replaced by:
+	spawnChildObject(0x074d48, 0x00, 0, 8)
+
 	DrawObject()
 }
 
@@ -800,7 +817,11 @@ function void fn0749ec()
 	u8[A0 + 0x42] = 0x14
 	u8[A0 + 0x43] = 0xfa
 
-	spawnChildObjects(0x075144)
+	// "spawnChildObjects(0x075144)" replaced by:
+	spawnChildObject(0x074afa, 0x00, -42, -2)
+	spawnChildObject(0x074afa, 0x02, -74, -2)
+	spawnChildObject(0x074a9a, 0x04, 0, 0)
+	spawnChildObject(0x074c24, 0x06, -64, -2)
 }
 
 
@@ -1230,7 +1251,15 @@ function void fn074d90()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u8[A1 + 0x38] |= 0x08
 
-	spawnChildObjects(0x0690d8)
+	// Spawn explosions
+	// "spawnChildObjects(0x0690d8)" replaced by:
+	spawnChildObject(0x068d88, 0x00, 0, -36)
+	spawnChildObject(0x068d88, 0x02, 8, -28)
+	spawnChildObject(0x068d88, 0x04, -8, -28)
+	spawnChildObject(0x068d88, 0x06, 4, -20)
+	spawnChildObject(0x068d88, 0x08, -4, -20)
+	spawnChildObject(0x068d88, 0x0a, 4, -4)
+	spawnChildObject(0x068d88, 0x0c, -4, -4)
 
 	D0.u16 = 0x1000
 	screenmover_target.bottom = D0.u16
@@ -1238,7 +1267,10 @@ function void fn074d90()
 	screenmover_target.right = 0x6000
 	screenmover_target.top = 0
 
-	spawnChildObjects(0x085de8)
+	// "spawnChildObjects(0x085de8)" replaced by:
+	spawnChildObject(0x084a48, 0x00, 0, 0)		// Screen mover for the right border
+	spawnChildObject(0x084aa4, 0x02, 0, 0)		// Screen mover for the upper border
+	spawnChildObject(0x084ad2, 0x04, 0, 0)
 }
 
 
@@ -1250,9 +1282,10 @@ function void fn074dea()
 		return
 
 	--objA0.value39
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 	{
-		spawnSimpleChildObjects(0x07518e)
+		// "spawnSimpleChildObjects(0x07518e)" replaced by:
+		spawnSimpleChildObjects(0x074e30, 1)
 	}
 	else
 	{
@@ -1290,7 +1323,8 @@ function void fn074e30()
 	objA0.countdown_value = 0x60
 	objA0.countdown_callback = 0x074e70
 
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04
@@ -1388,7 +1422,8 @@ function void fn074fd2()
 		objA0.countdown_callback = 0x0746d8
 		AddScoreForBossEnemy()
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04
@@ -1398,7 +1433,8 @@ function void fn074fd2()
 			stopCharacterWinPose(0xffffb000)
 		}
 
-		spawnChildObjects(0x075186)
+		// "spawnChildObjects(0x075186)" replaced by:
+		spawnChildObject(0x074e12, 0x00, 0, 16)
 
 #if STANDALONE
 		// Release main character if he was grabbed (can happen if second character makes the final hit)

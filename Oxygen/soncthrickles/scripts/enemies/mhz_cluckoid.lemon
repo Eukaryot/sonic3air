@@ -121,7 +121,8 @@ function void fn08e2d4()
 {
 	if ((global.framecounter & 0x07) == 0)
 	{
-		spawnSimpleChildObjects(0x08e40a)
+		// "spawnSimpleChildObjects(0x08e40a)" replaced by:
+		spawnSimpleChildObjects(0x08e236, 1)
 	}
 }
 

@@ -98,7 +98,14 @@ function void fn08fdd8()
 	objA0.countdown_value = 0x6f
 	objA0.countdown_callback = 0x08fe10
 
-	spawnChildObjects(0x090048)
+	// "spawnChildObjects(0x090048)" replaced by:
+	spawnChildObject(0x08fe8e, 0x00, -12, 4)
+	spawnChildObject(0x08fe8e, 0x02, 12, 4)
+	spawnChildObject(0x08fe8e, 0x04, -8, -4)
+	spawnChildObject(0x08fe8e, 0x06, 8, -4)
+	spawnChildObject(0x08fe8e, 0x08, 0, -4)
+	spawnChildObject(0x08fe8e, 0x0a, -4, 4)
+	spawnChildObject(0x08fe8e, 0x0c, 4, 4)
 }
 
 

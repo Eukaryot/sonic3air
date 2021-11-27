@@ -69,7 +69,8 @@ function void fn068962()
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 	if (objA0.subtype2c == 0x06)
 	{
-		spawnChildObjects(0x0690d0)
+		// "spawnChildObjects(0x0690d0)" replaced by:
+		spawnChildObject(0x068994, 0x00, 0, 0)
 	}
 }
 

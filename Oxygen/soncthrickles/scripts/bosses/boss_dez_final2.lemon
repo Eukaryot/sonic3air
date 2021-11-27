@@ -553,13 +553,15 @@ function bool fn080f3a()
 	}
 	objA0.flags38 &= ~0x20
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x16
 	}
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x16
@@ -607,7 +609,8 @@ function void fn080ffa()
 	D0.u8 = (global.framecounter.low & 0x03)	// Needs to be saved in D0
 	if (D0.u8 == 0)
 	{
-		spawnSimpleChildObjects(0x08132a)
+		// "spawnSimpleChildObjects(0x08132a)" replaced by:
+		spawnSimpleChildObjects(0x0808ae, 1)
 	}
 }
 

@@ -18,7 +18,11 @@ function void fn08ad04()
 	setupObjectAttributesFull(0x08b138)
 	objA0.update_address = 0x08ad20
 
-	spawnChildObjects(0x08b164)
+	// "spawnChildObjects(0x08b164)" replaced by:
+	spawnChildObject(0x08aea4, 0x00, 0, 8)
+	spawnChildObject(0x08aed4, 0x02, 28, -8)
+	spawnChildObject(0x08aeea, 0x04, 0, 0)
+
 	u16[A0 + 0x46] = A1.u16
 }
 
@@ -324,10 +328,11 @@ function void fn08ae0c()
 				return
 			}
 
-			D0.s16 >>= 2
-			D0.s16 = -D0.s16
-			objA0.velocity.y = D0.u16
-			spawnChildObjects(0x08b17e)
+			objA0.velocity.y = -(D0.s16 >> 2)
+
+			// "spawnChildObjects(0x08b17e)" replaced by:
+			spawnChildObject(0x08bd40, 0x00, 28, 16)
+			spawnChildObject(0x08bd40, 0x02, 20, 16)
 		}
 	}
 	fn085160()
@@ -544,7 +549,10 @@ function void fn08b114()
 
 	u16[A0 + 0x2a] = objA0.position.x.u16
 	u16[A0 + 0x2c] = objA0.position.y.u16
-	spawnSimpleChildObjects(0x08b178)
+
+	// "spawnSimpleChildObjects(0x08b178)" replaced by:
+	spawnSimpleChildObjects(0x08af3e, 8)
+
 	fn0852ae()
 }
 

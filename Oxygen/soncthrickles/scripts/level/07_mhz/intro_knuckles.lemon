@@ -130,8 +130,8 @@ function void fn0634ca()
 		u32[A1] = 0x063682
 	}
 
-	// Spawn the 8 critters (with update routine 0x063694)
-	spawnSimpleChildObjects(0x066656)
+	// "spawnSimpleChildObjects(0x066656)" replaced by:
+	spawnSimpleChildObjects(0x063694, 8)		// Spawn the 8 critters
 
 	copyMemory(0xfffffca0, 0x066a32, 0x20)
 }
@@ -484,7 +484,9 @@ function void fn063790()
 	objA0.position.y.u16 = camera.position.y.u16 - 0x40
 
 	playSound(0x51)
-	spawnChildObjects(0x06665c)
+
+	// "spawnChildObjects(0x06665c)" replaced by:
+	spawnChildObject(0x0638dc, 0x00, 0, -20)
 
 	addPatternLoadingCue(0x083d64)
 	Kosinski.addToDMAQueue(0x165000, 0xa5c0)
@@ -538,7 +540,9 @@ function void fn063846()
 			u32[A1] = 0x085e64
 			u16[A1 + 0x3a] = 0x07
 			u8[A1 + 0x2c] = 0xff
-			spawnSimpleChildObjects(0x066650)
+
+			// "spawnSimpleChildObjects(0x066650)" replaced by:
+			spawnSimpleChildObjects(0x06395c, 10)
 		}
 	}
 
@@ -583,7 +587,8 @@ function void fn0638ec()
 
 	if ((global.framecounter.low & 0x07) == 0)
 	{
-		spawnSimpleChildObjects(0x066664)
+		// "spawnSimpleChildObjects(0x066664)" replaced by:
+		spawnSimpleChildObjects(0x063916, 1)
 	}
 	fn084920()
 }
@@ -653,7 +658,9 @@ function void fn0639c8()
 	objA0.position.y.u16 = camera.position.y.u16 - 0x60
 	playMusic(0x19)
 
-	spawnChildObjects(0x0919d0)
+	// "spawnChildObjects(0x0919d0)" replaced by:
+	spawnChildObject(0x0916a8, 0x00, -12, 28)
+	spawnChildObject(0x0916ee, 0x02, -28, -4)
 
 	Kosinski.addToDMAQueue(0x17b17e, 0xa000)
 }

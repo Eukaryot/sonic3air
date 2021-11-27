@@ -92,7 +92,9 @@ function void fn06751a()
 	objA0.base_state = 0x04
 	objA0.velocity.x = 0x300
 	objA0.velocity.y = 0x600
-	spawnChildObjects(0x067a5a)
+
+	// "spawnChildObjects(0x067a5a)" replaced by:
+	spawnChildObject(0x06777a, 0x00, -34, 44)		// The Tornado
 }
 
 
@@ -186,7 +188,8 @@ function void fn0675fa()
 	objA0.countdown_value = 0x05
 	if (objA0.position.x.u16 >= 0x80)
 	{
-		spawnChildObjects(0x067a70)
+		// "spawnChildObjects(0x067a70)" replaced by:
+		spawnChildObject(0x0678a0, 0x00, 0, 24)
 	}
 }
 
@@ -277,7 +280,9 @@ function void fn0676c6()
 	else
 	{
 		objA0.base_state = 0x18
-		spawnSimpleChildObjects(0x067a78)
+
+		// "spawnSimpleChildObjects(0x067a78)" replaced by:
+		spawnSimpleChildObjects(0x061d4c, 1)
 	}
 }
 
@@ -320,7 +325,9 @@ function void fn067704()
 
 	copyMemory(0xfffffc60, 0x067aaa, 0x20)
 
-	spawnSimpleChildObjects(0x067a7e)
+	// "spawnSimpleChildObjects(0x067a7e)" replaced by:
+	spawnSimpleChildObjects(0x067900, 7)
+
 	Object.TriggerUnloading()
 }
 
@@ -342,7 +349,9 @@ function void fn06777a()
 	Kosinski.addToDMAQueue(0x382624, 0xa520)	// Tornado incl. Tails
 	Kosinski.addToDMAQueue(0x387ca6, 0xb620)	// Chaos Emeralds (for later)
 
-	spawnChildObjects(0x067a62)
+	// "spawnChildObjects(0x067a62)" replaced by:
+	spawnChildObject(0x067824, 0x00, 56, 4)
+	spawnChildObject(0x067862, 0x02, 24, 24)
 }
 
 
@@ -660,7 +669,9 @@ function void fn061dbe()
 	objA0.position.y.u16 = 0x0440
 
 	fn065dd6()
-	spawnChildObjects(0x06659a)
+
+	// "spawnChildObjects(0x06659a)" replaced by:
+	spawnChildObject(0x061f60, 0x00, 0, 24)
 }
 
 

@@ -74,7 +74,9 @@ function void fn062bc0()
 	}
 
 	objA0.base_state = 0x06
-	spawnSimpleChildObjects(0x0665b0)
+
+	// "spawnSimpleChildObjects(0x0665b0)" replaced by:
+	spawnSimpleChildObjects(0x062f72, 1)
 
 	fn062be4()
 }
@@ -359,7 +361,8 @@ function void fn062e28()
 {
 	setupObjectAttributesFull(0x06644a)
 
-	spawnSimpleChildObjects(0x0665b6)
+	// "spawnSimpleChildObjects(0x0665b6)" replaced by:
+	spawnSimpleChildObjects(0x06300c, 1)
 
 	if (checkpoint.number == 0 && !isMainCharacter(CHARACTER_KNUCKLES))
 		objA0.update_address = 0x062e5c
@@ -382,7 +385,8 @@ function void fn062e5c()
 	objA0.update_address = 0x062e92
 	Kosinski.addToDMAQueue(0x1695c0, 0xa000)
 
-	spawnSimpleChildObjects(0x0665aa)
+	// "spawnSimpleChildObjects(0x0665aa)" replaced by:
+	spawnSimpleChildObjects(0x061d4c, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x1c

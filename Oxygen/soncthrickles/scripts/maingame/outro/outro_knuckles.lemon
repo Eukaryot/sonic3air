@@ -59,7 +59,9 @@ function void fn05e70e()
 	objA0.position.x.u16 = camera.position.x.u16 + 0xc0
 	objA0.position.y.u16 = camera.position.y.u16 + 0x0110
 
-	spawnChildObjects(0x0601ba)
+	// "spawnChildObjects(0x0601ba)" replaced by:
+	spawnChildObject(0x05ea52, 0x00, -32, 43)
+
 	u32[A0 + 0x30] = 0x060236
 
 	fn05fe82()
@@ -69,7 +71,8 @@ function void fn05e70e()
 		objA0.animation.sprite = 0x04
 		u32[A0 + 0x30] = 0x06023f
 
-		spawnChildObjects(0x0601b2)
+		// "spawnChildObjects(0x0601b2)" replaced by:
+		spawnChildObject(0x05ebc6, 0x00, 4, -16)
 
 		Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
 
@@ -181,9 +184,14 @@ function void fn05e890()
 	A1 = 0x060253
 	fn084580()
 
-	spawnChildObjects(0x0601d8)
-	spawnSimpleChildObjects(0x0601ca)
-	spawnChildObjects(0x0601d0)
+	// "spawnChildObjects(0x0601d8)" replaced by:
+	spawnChildObject(0x05ec3c, 0x00, -10, 12)
+
+	// "spawnSimpleChildObjects(0x0601ca)" replaced by:
+	spawnSimpleChildObjects(0x05ecb4, 2)
+
+	// "spawnChildObjects(0x0601d0)" replaced by:
+	spawnChildObject(0x05ebf0, 0x00, 28, 0)
 }
 
 
@@ -213,7 +221,8 @@ function void fn05e916()
 	objA0.velocity.x = 0x0100
 	objA0.velocity.y = 0
 
-	spawnChildObjects(0x06022e)
+	// "spawnChildObjects(0x06022e)" replaced by:
+	spawnChildObject(0x05ed6a, 0x00, -6, 7)
 
 	loadPaletteLine1(0x060a9a)
 }
@@ -686,7 +695,8 @@ function void fn05f74e()
 	copyMemory(0xfffffca0, 0x07d850, 0x20)
 	fn05fda4()
 
-	spawnSimpleChildObjects(0x07d48c)
+	// "spawnSimpleChildObjects(0x07d48c)" replaced by:
+	spawnSimpleChildObjects(0x07c948, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x80
@@ -716,7 +726,9 @@ function void fn05f7cc()
 	copyMemory(0xfffffc20, 0x07d850, 0x20)
 
 	objA0.flags38 |= 0x40
-	spawnChildObjects(0x07d492)
+
+	// "spawnChildObjects(0x07d492)" replaced by:
+	spawnChildObject(0x07c886, 0x00, -4, 12)
 }
 
 

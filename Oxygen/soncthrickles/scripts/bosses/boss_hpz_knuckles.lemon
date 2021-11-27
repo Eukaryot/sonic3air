@@ -544,7 +544,9 @@ function void fn064184()
 	if (objA0.countdown_value == 0x2b)
 	{
 		objA0.flags38 &= ~0x01
-		spawnSimpleChildObjects(0x0665fc)
+
+		// "spawnSimpleChildObjects(0x0665fc)" replaced by:
+		spawnSimpleChildObjects(0x064c24, 1)
 	}
 
 	A3 = 0x064056

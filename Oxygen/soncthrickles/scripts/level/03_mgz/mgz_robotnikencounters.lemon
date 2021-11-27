@@ -69,13 +69,18 @@ function void fn06bfca()
 	objA0.flags38 |= 0x08
 	objA0.velocity.y = -0x800
 
-	spawnChildObjects(0x06819c)
+	// "spawnChildObjects(0x06819c)" replaced by:
+	spawnChildObject(0x067e62, 0x00, -6, 4)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x09
 	}
 
-	spawnChildObjects(0x06d7c0)
+	// "spawnChildObjects(0x06d7c0)" replaced by:
+	spawnChildObject(0x06cc46, 0x00, -20, 15)
+	spawnChildObject(0x06c948, 0x02, -28, 16)
+	spawnChildObject(0x06ceb0, 0x04, 8, 24)
+	spawnChildObject(0x06ceb0, 0x06, -12, 24)
 }
 
 
@@ -121,7 +126,7 @@ function void fn06c07e()
 	if ((objA0.flags2a & 0x40) == 0)
 	{
 		fn08486e()
-		if (s8[A0 + 0x39] >= 0)
+		if (s8(objA0.value39) >= 0)
 		{
 			UpdateMovementStraightSimple()
 			return
@@ -230,7 +235,8 @@ function void fn06c962()
 		u8[A0 + 0x0a] &= ~0x80
 	}
 
-	spawnChildObjects(0x06d7da)
+	// "spawnChildObjects(0x06d7da)" replaced by:
+	spawnChildObject(0x06c9e8, 0x00, -23, 0)
 }
 
 
@@ -367,7 +373,8 @@ function void fn06ca62()
 
 				objA0.flags38 &= ~0x20
 
-				spawnChildObjects(0x06d7fa)
+				// "spawnChildObjects(0x06d7fa)" replaced by:
+				spawnChildObject(0x06cc72, 0x00, 12, 0)
 			}
 			else
 			{
@@ -377,13 +384,13 @@ function void fn06ca62()
 
 				fn06d42e()
 
-				// This spawns the chain
-				spawnChildObjects(0x06d812)
+				// "spawnChildObjects(0x06d812)" replaced by:
+				spawnChildObject(0x06cce6, 0x00, 0, 0)		// Spawn the chain
 
 				playSound(0x59)
 
-				// This creates the debris spawner
-				spawnSimpleChildObjects(0x06d83e)
+				// "spawnSimpleChildObjects(0x06d83e)" replaced by:
+				spawnSimpleChildObjects(0x06d16a, 1)		// Debris spawner
 
 				fn06cb04()
 			}
@@ -407,7 +414,9 @@ function void fn06ca62()
 function void fn06cb04()
 {
 	objA0.flags38 &= ~0x20
-	spawnChildObjects(0x06d7fa)
+
+	// "spawnChildObjects(0x06d7fa)" replaced by:
+	spawnChildObject(0x06cc72, 0x00, 12, 0)
 }
 
 
@@ -466,14 +475,17 @@ function void fn06cbce()
 	objA0.countdown_callback = 0x06cc0e
 	fn06d4dc()
 
-	spawnChildObjects(0x06d812)
+	// "spawnChildObjects(0x06d812)" replaced by:
+	spawnChildObject(0x06cce6, 0x00, 0, 0)		// Spawn the chain
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x02
 	}
 	playSound(0x59)
 
-	spawnSimpleChildObjects(0x06d83e)
+	// "spawnSimpleChildObjects(0x06d83e)" replaced by:
+	spawnSimpleChildObjects(0x06d16a, 1)		// Debris spawner
+
 	fn06cb04()
 }
 
@@ -599,7 +611,9 @@ function void fn06cd12()
 function void fn06cd32()
 {
 	objA0.countdown_value = 0x04
-	spawnChildObjects(0x06d81a)
+
+	// "spawnChildObjects(0x06d81a)" replaced by:
+	spawnChildObject(0x06cd42, 0x00, 0, 0)
 }
 
 
@@ -695,7 +709,8 @@ function void fn06ceb0()
 		}
 	}
 
-	spawnChildObjects(0x06d7e2)
+	// "spawnChildObjects(0x06d7e2)" replaced by:
+	spawnChildObject(0x06cf20, 0x00, 0, 16)
 }
 
 

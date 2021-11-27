@@ -85,7 +85,9 @@ function void fn06da5a()
 	objA0.countdown_value = 0x011f
 	objA0.countdown_callback = 0x06daa0
 
-	spawnChildObjects(0x06e2c2)
+	// "spawnChildObjects(0x06e2c2)" replaced by:
+	spawnChildObject(0x06dbca, 0x00, 0, 44)
+	spawnChildObject(0x06de26, 0x02, 0, 28)
 }
 
 
@@ -134,11 +136,9 @@ function void fn06dae0()
 	objA0.countdown_callback = 0x06db0e
 	objA0.flags38 &= ~0x08
 
-	A1 = 0x06e390
 	A2 = 0xfffffade
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
-	u16[A2] = 0
+	copyMemory(A2, 0x06e390, 8)
+	u16[A2+8] = 0
 	u32[0xfffffada] = 0x06e164
 }
 
@@ -166,7 +166,10 @@ function void fn06db20()
 	objA0.flags38 |= 0x40
 	objA0.value3b = 0x7f
 
-	spawnChildObjects(0x06e2e6)
+	// "spawnChildObjects(0x06e2e6)" replaced by:
+	spawnChildObject(0x06df62, 0x00, -4, 40)
+	spawnChildObject(0x06df62, 0x02, 4, 44)
+	spawnChildObject(0x06df62, 0x04, -4, 60)
 }
 
 
@@ -210,7 +213,8 @@ function void fn06db86()
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x06dbae
 
-	spawnSimpleChildObjects(0x06e30a)
+	// "spawnSimpleChildObjects(0x06e30a)" replaced by:
+	spawnSimpleChildObjects(0x06dff0, 9)
 }
 
 
@@ -292,7 +296,8 @@ function void fn06dc50()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
 	{
-		spawnChildObjects(0x06e302)
+		// "spawnChildObjects(0x06e302)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
 
 		u8[A1 + 0x2c] = 0x06
 		u8[A0 + 0x28] = 0
@@ -424,7 +429,8 @@ function void fn06dc50()
 	}
 	else
 	{
-		spawnChildObjects(0x06e2fa)
+		// "spawnChildObjects(0x06e2fa)" replaced by:
+		spawnChildObject(0x06dfb4, 0x00, 0, -4)
 		if (_equal())
 		{
 			if (objA0.velocity.x >= 0)
@@ -454,7 +460,8 @@ function void fn06dc50()
 //# address-hook(0x06ddf2) end(0x06de24)
 function void fn06ddf2()
 {
-	spawnChildObjects(0x06e302)
+	// "spawnChildObjects(0x06e302)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -697,7 +704,9 @@ function void fn06e0b0()
 				u16[0xfffffc34] = 0x20
 				u8[0xffffeec6] = 0xff
 
-				spawnChildObjects(0x06e302)
+				// "spawnChildObjects(0x06e302)" replaced by:
+				spawnChildObject(0x083d84, 0x00, 0, 0)
+
 				AddScoreForBossEnemy()
 				return
 			}
@@ -736,11 +745,11 @@ function void fn06e128()
 //# address-hook(0x06e164) end(0x06e172)
 function void fn06e164()
 {
-	A2 = 0x06e3e8
-	u32[(A1+=4)-4] = u32[(A2+=4)-4]
-	u32[(A1+=4)-4] = u32[(A2+=4)-4]
+	copyMemory(A1, 0x06e3e8, 8)
 
-	spawnChildObjects(0x06e2d0)
+	// "spawnChildObjects(0x06e2d0)" replaced by:
+	spawnChildObject(0x06def8, 0x00, -20, 24)
+	spawnChildObject(0x06def8, 0x02, 20, 24)
 }
 
 

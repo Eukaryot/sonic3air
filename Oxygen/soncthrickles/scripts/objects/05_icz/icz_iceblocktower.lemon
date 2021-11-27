@@ -140,11 +140,25 @@ function bool fn08ac80()
 		{
 			objA1.velocity.x = D0.s16
 			s16[A1 + 0x1c] = D0.s16
-			objA0.flags2a &= ~(1 << D1.u8)
 			u8[A1 + 0x2a] &= ~(1 << D1.u8)
+
+			objA0.flags2a &= ~(1 << D1.u8)
 			objA0.flags38 |= 0x01
 
-			spawnChildObjects(0x08aaea)
+			// "spawnChildObjects(0x08aaea)" replaced by:
+			spawnChildObject(0x08a8dc, 0x00, -12, -8)
+			spawnChildObject(0x08a8dc, 0x02, -4, -8)
+			spawnChildObject(0x08a8dc, 0x04, 4, -8)
+			spawnChildObject(0x08a8dc, 0x06, 12, -8)
+			spawnChildObject(0x08a8dc, 0x08, -12, 0)
+			spawnChildObject(0x08a8dc, 0x0a, -4, 0)
+			spawnChildObject(0x08a8dc, 0x0c, 4, 0)
+			spawnChildObject(0x08a8dc, 0x0e, 12, 0)
+			spawnChildObject(0x08a8dc, 0x10, -12, 8)
+			spawnChildObject(0x08a8dc, 0x12, -4, 8)
+			spawnChildObject(0x08a8dc, 0x14, 4, 8)
+			spawnChildObject(0x08a8dc, 0x16, 12, 8)
+
 			fn08594e()
 			Object.TriggerUnloading()
 			playSound(SFX_COLLAPSE)

@@ -78,7 +78,8 @@ function void fn07b2dc()
 		objA0.velocity.x = -0x800
 		objA0.flags38 |= 0x04
 
-		spawnSimpleChildObjects(0x07d47a)
+		// "spawnSimpleChildObjects(0x07d47a)" replaced by:
+		spawnSimpleChildObjects(0x07c902, 2)
 
 		BossMecha1.setBossArea()
 
@@ -101,7 +102,9 @@ function void fn07b2dc()
 		}
 	}
 
-	spawnSimpleChildObjects(0x07d474)
+	// "spawnSimpleChildObjects(0x07d474)" replaced by:
+	spawnSimpleChildObjects(0x07c9ba, 1)
+
 	AllocDynamicObjectStd()
 }
 
@@ -291,7 +294,8 @@ function void fn07b544()
 	objA0.velocity.y = 0
 	objA0.flags38 |= 0x04
 
-	spawnSimpleChildObjects(0x07d486)
+	// "spawnSimpleChildObjects(0x07d486)" replaced by:
+	spawnSimpleChildObjects(0x07c8fe, 2)
 }
 
 
@@ -449,7 +453,8 @@ function void fn07b6ee()
 			objA0.flags38 |= 0x04
 			playSound(0x96)
 
-			spawnSimpleChildObjects(0x07d480)
+			// "spawnSimpleChildObjects(0x07d480)" replaced by:
+			spawnSimpleChildObjects(0x07c902, 1)
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x08
@@ -614,7 +619,8 @@ function void fn07b888()
 	A1 = 0x07d842
 	fn07c678()
 
-	spawnSimpleChildObjects(0x07d48c)
+	// "spawnSimpleChildObjects(0x07d48c)" replaced by:
+	spawnSimpleChildObjects(0x07c948, 1)
 
 	playSound(0x96)
 
@@ -655,7 +661,8 @@ function void fn07b888()
 				objA1.update_address = 0x08642e
 			}
 
-			spawnSimpleChildObjects(0x07d4d0)
+			// "spawnSimpleChildObjects(0x07d4d0)" replaced by:
+			spawnSimpleChildObjects(0x07cf14, 3)
 		}
 	}
 }
@@ -957,7 +964,8 @@ function void fn07d35a()
 	AddScoreForBossEnemy()
 	objA0.countdown_value = 0x7f
 
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04

@@ -316,7 +316,8 @@ function void fn065794()
 		objA1.update_address = 0x066072
 	}
 
-	spawnSimpleChildObjects(0x0665f6)
+	// "spawnSimpleChildObjects(0x0665f6)" replaced by:
+	spawnSimpleChildObjects(0x0659cc, 1)
 }
 
 
@@ -531,7 +532,14 @@ function void fn0659cc()
 	objA0.countdown_value = 0x0100
 	global.random.seed = global.framecounter
 
-	spawnChildObjects(0x0665c4)
+	// "spawnChildObjects(0x0665c4)" replaced by:
+	spawnChildObject(0x065b0e, 0x00, 0, 0)
+	spawnChildObject(0x065a8c, 0x02, 0, -51)
+	spawnChildObject(0x065b42, 0x04, -32, 29)
+	spawnChildObject(0x065b42, 0x06, -16, 29)
+	spawnChildObject(0x065b42, 0x08, 8, 29)
+	spawnChildObject(0x065b42, 0x0a, 16, 29)
+	spawnChildObject(0x065b42, 0x0c, 40, 29)
 
 	copyMemory(0xfffffce0, 0xfffffc60, 0x20)
 
@@ -802,7 +810,9 @@ function void fn066054()
 		return
 
 	playSound(0xa0)
-	spawnSimpleChildObjects(0x0665f0)
+
+	// "spawnSimpleChildObjects(0x0665f0)" replaced by:
+	spawnSimpleChildObjects(0x065b70, 1)
 }
 
 

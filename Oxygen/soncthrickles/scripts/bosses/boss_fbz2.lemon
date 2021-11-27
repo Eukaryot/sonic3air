@@ -62,14 +62,18 @@ function void fn07065c()
 	objA0.position.x.u16 = camera.foreground.x.u16 + getScreenWidth() / 2
 	objA0.position.y.u16 = camera.foreground.y.u16 - 0x60
 
-	spawnChildObjects(0x0681ac)
+	// "spawnChildObjects(0x0681ac)" replaced by:
+	spawnChildObject(0x067f7a, 0x00, 0, 4)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x0b
 		objA0.value3e = A1.u16
 	}
 
-	spawnChildObjects(0x070ee0)
+	// "spawnChildObjects(0x070ee0)" replaced by:
+	spawnChildObject(0x070948, 0x00, -48, 72)
+	spawnChildObject(0x070948, 0x02, 48, 72)
+	spawnChildObject(0x070afc, 0x04, 0, -40)
 }
 
 
@@ -222,7 +226,11 @@ function void fn070836()
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x070854
 
-	spawnChildObjects(0x070f0a)
+	// "spawnChildObjects(0x070f0a)" replaced by:
+	spawnChildObject(0x070bd0, 0x00, -20, 8)
+	spawnChildObject(0x070bd0, 0x02, 20, 8)
+	spawnChildObject(0x070bd0, 0x04, -16, 32)
+	spawnChildObject(0x070bd0, 0x06, 16, 32)
 }
 
 
@@ -251,7 +259,9 @@ function void fn070870()
 	}
 
 	screenmover_target.right = 0x2fdc + getScreenExtend()
-	spawnSimpleChildObjects(0x084b00)
+
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 
 #if STANDALONE
 	// Add chunks with an actual collision near the capsule
@@ -288,7 +298,8 @@ function void fn0708aa()
 	move_area.bottom.target = 0x1000
 	screenmover_target.right = 0x3738
 
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 
 	Kosinski.addMultipleToDMAQueue(0x07091c)
 
@@ -350,7 +361,9 @@ function void fn070948()
 function void fn070966()
 {
 	setupObjectAttributesBasic(0x070e98)
-	spawnChildObjects(0x070ef4)
+
+	// "spawnChildObjects(0x070ef4)" replaced by:
+	spawnChildObject(0x070a46, 0x00, 0, -32)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (objA0.subtype2c == 0)
@@ -413,7 +426,12 @@ function void fn0709a8()
 	}
 	else
 	{
-		spawnChildObjects(0x070f24)
+		// "spawnChildObjects(0x070f24)" replaced by:
+		spawnChildObject(0x070bfe, 0x00, -8, -16)
+		spawnChildObject(0x070bfe, 0x02, 8, -16)
+		spawnChildObject(0x070bfe, 0x04, -8, 16)
+		spawnChildObject(0x070bfe, 0x06, 8, 16)
+
 		fn0852ae()
 	}
 }
@@ -568,7 +586,8 @@ function void fn070b18()
 			objA0.countdown_value = 0x5f
 			objA0.countdown_callback = 0x070b06
 
-			spawnSimpleChildObjects(0x070f04)
+			// "spawnSimpleChildObjects(0x070f04)" replaced by:
+			spawnSimpleChildObjects(0x070b8c, 9)
 		}
 	}
 	else
@@ -968,7 +987,8 @@ function void fn067f9a()
 	setupObjectAttributesFull(0x068146)
 	objA0.animation.sprite = objA0.subtype2c
 
-	spawnChildObjects(0x068174)
+	// "spawnChildObjects(0x068174)" replaced by:
+	spawnChildObject(0x067b96, 0x00, 0, -28)
 }
 
 
@@ -983,7 +1003,9 @@ function void fn067fb6()
 		return
 
 	objA0.base_state = 0x04
-	spawnChildObjects(0x083fee)
+
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04

@@ -40,7 +40,8 @@ function void fn072400()
 
 	loadPaletteLine1(0x07299a)
 
-	spawnChildObjects(0x07296e)
+	// "spawnChildObjects(0x07296e)" replaced by:
+	spawnChildObject(0x072596, 0x00, 0, 0)
 
 	A2 = 0x072976
 	SpawnChildObjectChain()
@@ -441,7 +442,10 @@ function void fn072840()
 		{
 			objA0.update_address = 0x085694
 			objA0.countdown_callback = 0x072562
-			spawnChildObjects(0x083fee)
+
+			// "spawnChildObjects(0x083fee)" replaced by:
+			spawnChildObject(0x083d84, 0x00, 0, 0)
+
 			if (!isMainCharacter(CHARACTER_KNUCKLES))
 			{
 				AddScoreForBossEnemy()
@@ -596,7 +600,9 @@ function void fn08cf80()
 	move_area.right = u16[(A1+=2)-2]
 	fn08d0ea()
 
-	spawnChildObjects(0x08d26c)
+	// "spawnChildObjects(0x08d26c)" replaced by:
+	spawnChildObject(0x08d046, 0x00, -32, 0)
+	spawnChildObject(0x08d046, 0x02, 32, 0)
 
 	objA0.update_address = 0x08cfb2
 	fn08cfb2()
@@ -636,8 +642,11 @@ function void fn08cfc8()
 #endif
 	hud.dirty.timer = 0
 
-	spawnSimpleChildObjects(0x084b12)
-	spawnSimpleChildObjects(0x08d27a)
+	// "spawnSimpleChildObjects(0x084b12)" replaced by:
+	spawnSimpleChildObjects(0x084ad2, 1)
+
+	// "spawnSimpleChildObjects(0x08d27a)" replaced by:
+	spawnSimpleChildObjects(0x08d0ae, 5)
 }
 
 
@@ -701,7 +710,8 @@ function void fn08d082()
 	objA0.flags38 |= 0x08
 	playSound(0x50)
 
-	spawnChildObjects(0x08d264)
+	// "spawnChildObjects(0x08d264)" replaced by:
+	spawnChildObject(0x0723e0, 0x00, 0, 0)
 	if (_equal())
 	{
 		A2 = 0xffff0000 + u16[A0 + 0x46]
@@ -718,10 +728,9 @@ function void fn08d0ae()
 	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
 	objA0.countdown_value = 0xff
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
-
-	D0 = objA0.subtype2c
-	objA0.position.x.u16 = u16[0x08d0e0 + D0.s16]
+	objA0.position.x.u16 = u16[0x08d0e0 + objA0.subtype2c]
 	objA0.position.y.u16 = 0x0a20
 
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 }

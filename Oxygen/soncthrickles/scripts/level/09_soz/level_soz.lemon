@@ -420,7 +420,7 @@ function void fn055d94()
 			{
 				camera.screenshake.state = 0x08
 				s16[0xffffee9c] = 0x0280
-			
+
 			#if STANDALONE
 				Game.endSkippableCutscene()
 			#endif

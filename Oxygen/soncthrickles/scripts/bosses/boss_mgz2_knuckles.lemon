@@ -85,13 +85,18 @@ function void fn06c72a()
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x06c788
 
-	spawnChildObjects(0x06819c)
+	// "spawnChildObjects(0x06819c)" replaced by:
+	spawnChildObject(0x067e62, 0x00, -6, 4)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x09
 	}
 
-	spawnChildObjects(0x06d7c0)
+	// "spawnChildObjects(0x06d7c0)" replaced by:
+	spawnChildObject(0x06cc46, 0x00, -20, 15)
+	spawnChildObject(0x06c948, 0x02, -28, 16)
+	spawnChildObject(0x06ceb0, 0x04, 8, 24)
+	spawnChildObject(0x06ceb0, 0x06, -12, 24)
 }
 
 
@@ -141,7 +146,9 @@ function void fn06c7d8()
 	if (objA0.countdown_value == 0x28)
 	{
 		playSound(0x59)
-		spawnSimpleChildObjects(0x06d83e)
+
+		// "spawnSimpleChildObjects(0x06d83e)" replaced by:
+		spawnSimpleChildObjects(0x06d16a, 1)
 	}
 
 	UpdateMovementStraightSimple()
@@ -184,7 +191,9 @@ function void fn06c83c()
 	if (objA0.countdown_value == 0x48)
 	{
 		playSound(0x59)
-		spawnSimpleChildObjects(0x06d83e)
+
+		// "spawnSimpleChildObjects(0x06d83e)" replaced by:
+		spawnSimpleChildObjects(0x06d16a, 1)
 	}
 
 	UpdateMovementStraightSimple()
@@ -219,7 +228,10 @@ function void fn06c890()
 	objA0.countdown_callback = 0x06c8b4
 	objA0.flags38 |= 0x10
 
-	spawnChildObjects(0x06d822)
+	// "spawnChildObjects(0x06d822)" replaced by:
+	spawnChildObject(0x06cfbe, 0x00, 12, -20)
+	spawnChildObject(0x06cfbe, 0x02, -16, 8)
+	spawnChildObject(0x06cfbe, 0x04, 20, 8)
 }
 
 
@@ -240,7 +252,8 @@ function void fn06c8b4()
 	D0.u16 = level.bossarea.left + getScreenWidth() - 0x28
 	screenmover_target.right = D0.u16
 
-	spawnSimpleChildObjects(0x084b00)
+	// "spawnSimpleChildObjects(0x084b00)" replaced by:
+	spawnSimpleChildObjects(0x084a48, 1)
 }
 
 
@@ -321,8 +334,8 @@ function void fn06d1a6()
 
 	objA0.countdown_value = 0x03
 
-	// This creates the debris objects
-	spawnSimpleChildObjects(0x06d844)
+	// "spawnSimpleChildObjects(0x06d844)" replaced by:
+	spawnSimpleChildObjects(0x06d1be, 1)
 }
 
 
@@ -495,5 +508,6 @@ function void fn06d51a()
 	}
 	playSound(0x59)
 
-	spawnSimpleChildObjects(0x06d83e)
+	// "spawnSimpleChildObjects(0x06d83e)" replaced by:
+	spawnSimpleChildObjects(0x06d16a, 1)
 }

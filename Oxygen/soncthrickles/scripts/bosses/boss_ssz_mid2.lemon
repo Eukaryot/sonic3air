@@ -101,7 +101,8 @@ function void fn07a72c()
 	objA0.flags38 = 0x27
 	objA0.value3a = 0x27
 
-	spawnChildObjects(0x0681bc)
+	// "spawnChildObjects(0x0681bc)" replaced by:
+	spawnChildObject(0x067d0a, 0x00, 0, -32)
 
 	if (allocDynamicObjectStd())
 	{
@@ -512,7 +513,10 @@ function void fn07ab56()
 		--u8[A0 + 0x31]
 		u8[A0 + 0x33] = 0x10
 		u16[0xfffffafc] = 0x1e
-		spawnChildObjects(0x07ab80)
+
+		// "spawnChildObjects(0x07ab80)" replaced by:
+		spawnChildObject(0x07ab8e, 0x00, -12, -4)
+		spawnChildObject(0x07ab8e, 0x02, -24, -4)
 	}
 }
 
@@ -649,7 +653,8 @@ function void fn07acf2()
 		u8[0xfffffa88] = 0xff	// Make all of the decoys pop now
 		objA0.flags38 = 0
 
-		spawnChildObjects(0x083fee)
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

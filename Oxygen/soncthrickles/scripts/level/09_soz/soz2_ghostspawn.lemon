@@ -59,7 +59,8 @@ function void fn08f0ca()
 			u16[A0 + 0x3a] = 0x3f
 		}
 
-		spawnSimpleChildObjects(0x08f674)
+		// "spawnSimpleChildObjects(0x08f674)" replaced by:
+		spawnSimpleChildObjects(0x08f11e, 1)
 	}
 	else
 	{
@@ -378,7 +379,8 @@ function void fn08f3f6()
 	objA0.update_address = 0x089c14
 	objA0.subtype2c = 0x03
 
-	spawnChildObjects(0x08f646)
+	// "spawnChildObjects(0x08f646)" replaced by:
+	spawnChildObject(0x08f438, 0x00, 0, -36)
 
 	bool isCapsuleOpen = (checkpoint.number != 0 || isMainCharacter(CHARACTER_KNUCKLES) || !isGhostSpawnEnabled())
 	if (isCapsuleOpen)
@@ -491,7 +493,13 @@ function void fn08f514()
 	checkpoint.y = u16[(A1+=2)-2]
 	Checkpoint.SaveCurrentState()
 
-	spawnChildObjects(0x08f64e)
+	// "spawnChildObjects(0x08f64e)" replaced by:
+	spawnChildObject(0x08f45e, 0x00, -8, -4)
+	spawnChildObject(0x08f45e, 0x02, 8, -4)
+	spawnChildObject(0x08f45e, 0x04, 16, -4)
+	spawnChildObject(0x08f45e, 0x06, -16, -4)
+	spawnChildObject(0x08f45e, 0x08, 24, -4)
+	spawnChildObject(0x08f45e, 0x0a, -24, -4)
 }
 
 

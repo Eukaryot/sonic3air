@@ -45,7 +45,9 @@ function void fn087bec()
 	{
 		objA0.render_flags &= ~render_flag.FLIP_Y
 		objA0.base_state = 0x0a
-		spawnChildObjects(0x087f1e)
+
+		// "spawnChildObjects(0x087f1e)" replaced by:
+		spawnChildObject(0x087e90, 0x00, 0, 0)
 	}
 
 	objA0.hitbox_extends.x = 0x10
@@ -58,7 +60,8 @@ function void fn087bec()
 	D4.u16 = 0xff80
 	fn085416()
 
-	spawnChildObjects(0x087ee6)
+	// "spawnChildObjects(0x087ee6)" replaced by:
+	spawnChildObject(0x087d4c, 0x00, 4, 0)
 }
 
 
@@ -156,7 +159,12 @@ function void fn087cfa()
 	objA0.flags38 |= 0x01
 	objA0.countdown_value = 0x03
 
-	spawnChildObjects(0x087efe)
+	// "spawnChildObjects(0x087efe)" replaced by:
+	spawnChildObject(0x087e48, 0x00, 4, -8)
+	spawnChildObject(0x087e48, 0x02, -6, 0)
+	spawnChildObject(0x087e48, 0x04, 6, 0)
+	spawnChildObject(0x087e48, 0x06, -8, 0)
+	spawnChildObject(0x087e48, 0x08, 8, 0)
 }
 
 
@@ -217,7 +225,9 @@ function void fn087d5e()
 
 	playSound(0xa2)
 
-	spawnChildObjects(0x087eee)
+	// "spawnChildObjects(0x087eee)" replaced by:
+	spawnChildObject(0x087dae, 0x00, -4, 20)
+
 	fn085180()
 }
 
@@ -267,7 +277,8 @@ function void fn087de8()
 	if (global.framecounter & 0x03)
 		return
 
-	spawnChildObjects(0x087ef6)
+	// "spawnChildObjects(0x087ef6)" replaced by:
+	spawnChildObject(0x087e1a, 0x00, 0, 4)
 	if (_equal())
 	{
 		GetRandomNumber()

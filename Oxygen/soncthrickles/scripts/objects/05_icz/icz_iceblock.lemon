@@ -91,7 +91,20 @@ function void fn08b3aa()
 		u8[A2 + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 
-	spawnChildObjects(0x08b480)
+	// "spawnChildObjects(0x08b480)" replaced by:
+	spawnChildObject(0x08b432, 0x00, 0, -8)
+	spawnChildObject(0x08b432, 0x02, 0, 8)
+	spawnChildObject(0x08b432, 0x04, -16, -8)
+	spawnChildObject(0x08b432, 0x06, 16, -8)
+	spawnChildObject(0x08b432, 0x08, -16, 8)
+	spawnChildObject(0x08b432, 0x0a, 16, 8)
+	spawnChildObject(0x08b432, 0x0c, 0, 0)
+	spawnChildObject(0x08b432, 0x0e, 0, 0)
+	spawnChildObject(0x08b432, 0x10, 0, 0)
+	spawnChildObject(0x08b432, 0x12, 0, 0)
+	spawnChildObject(0x08b432, 0x14, 0, 0)
+	spawnChildObject(0x08b432, 0x16, 0, 0)
+
 	playSound(0x6e)
 	Object.TriggerUnloading()
 }

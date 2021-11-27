@@ -81,7 +81,15 @@ function bool fn08b598()
 	}
 
 	u16[A0 + 0x44] = A3.u16
-	spawnChildObjects(0x08b84c)
+
+	// "spawnChildObjects(0x08b84c)" replaced by:
+	spawnChildObject(0x08b768, 0x00, -8, -8)
+	spawnChildObject(0x08b768, 0x02, 8, -8)
+	spawnChildObject(0x08b768, 0x04, -24, 0)
+	spawnChildObject(0x08b768, 0x06, -8, 0)
+	spawnChildObject(0x08b768, 0x08, 8, 0)
+	spawnChildObject(0x08b768, 0x0a, 24, 0)
+
 	Object.TriggerUnloading()
 	return true
 }

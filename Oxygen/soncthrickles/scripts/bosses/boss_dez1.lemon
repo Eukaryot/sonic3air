@@ -45,8 +45,11 @@ function void fn07ddb4()
 	u16[A0 + 0x3a] = 0x4000
 	u16[A0 + 0x3c] = 0x8000
 
-	spawnChildObjects(0x07ef8e)
-	spawnSimpleChildObjects(0x07ef96)
+	// "spawnChildObjects(0x07ef8e)" replaced by:
+	spawnChildObject(0x07e768, 0x00, 0, -4)
+
+	// "spawnSimpleChildObjects(0x07ef96)" replaced by:
+	spawnSimpleChildObjects(0x07e80e, 8)
 
 	requestLoadingPatterns(0x7b)
 	Kosinski.addToDMAQueue(0x1805a0, 0x8000)
@@ -248,7 +251,8 @@ function void fn07dfa2()
 {
 	if ((global.framecounter.low & 0x07) == 0)
 	{
-		spawnSimpleChildObjects(0x07efa2)
+		// "spawnSimpleChildObjects(0x07efa2)" replaced by:
+		spawnSimpleChildObjects(0x07eab6, 1)
 	}
 	Object.CountdownAndTrigger()
 }
@@ -262,7 +266,10 @@ function void fn07dfb8()
 	objA0.countdown_callback = 0x07dfde
 	u8[0xffffeec4] = 0xff
 
-	spawnChildObjects(0x07efa8)
+	// "spawnChildObjects(0x07efa8)" replaced by:
+	spawnChildObject(0x07eacc, 0x00, -40, 0)
+	spawnChildObject(0x07eacc, 0x02, 40, 0)
+
 	DrawObject()
 }
 
@@ -512,7 +519,13 @@ function void fn07e23c()
 		objA1.update_address = 0x07e25c
 	}
 	objA0.flags38 |= 0x20
-	spawnChildObjects(0x07efd2)
+
+	// "spawnChildObjects(0x07efd2)" replaced by:
+	spawnChildObject(0x07eb0e, 0x00, -16, 0)
+	spawnChildObject(0x07eb0e, 0x02, 16, 0)
+	spawnChildObject(0x07eb0e, 0x04, -12, 24)
+	spawnChildObject(0x07eb0e, 0x06, 12, 24)
+
 	fn085ba8()
 }
 
@@ -775,7 +788,8 @@ function void fn07e4ce()
 	objA0.countdown_callback = 0x07e52a
 	objA0.update_address = 0x07e51c
 
-	spawnChildObjects(0x07efbc)
+	// "spawnChildObjects(0x07efbc)" replaced by:
+	spawnChildObject(0x07e74a, 0x00, 0, 4)
 
 	fn07e51c()
 }
@@ -1252,13 +1266,16 @@ function void fn07e8e2()
 		return
 	}
 
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
 	}
 
-	spawnSimpleChildObjects(0x07ef9c)
+	// "spawnSimpleChildObjects(0x07ef9c)" replaced by:
+	spawnSimpleChildObjects(0x07e916, 8)
+
 	Object.TriggerUnloading()
 }
 
@@ -1366,7 +1383,9 @@ function void fn07ea12()
 	if (objA0.animation.sprite >= 0x22)
 	{
 		objA0.update_address = 0x07ea3c
-		spawnSimpleChildObjects(0x07efcc)
+
+		// "spawnSimpleChildObjects(0x07efcc)" replaced by:
+		spawnSimpleChildObjects(0x07ea6c, 2)
 	}
 
 	u8[A0 + 0x43] += 8
@@ -1805,7 +1824,8 @@ function void fn07ee36()
 
 		for (u8 i = 0; i < 2; ++i)
 		{
-			spawnChildObjects(0x083fee)
+			// "spawnChildObjects(0x083fee)" replaced by:
+			spawnChildObject(0x083d84, 0x00, 0, 0)
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x0e
@@ -1836,7 +1856,8 @@ function void fn07ee88()
 		{
 			objA0.flags38 |= 0x02
 
-			spawnChildObjects(0x07efc4)
+			// "spawnChildObjects(0x07efc4)" replaced by:
+			spawnChildObject(0x07e97e, 0x00, 0, 30)
 		}
 	}
 	else
@@ -1845,7 +1866,9 @@ function void fn07ee88()
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x07e23c
 
-		spawnChildObjects(0x083fee)
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
+
 		AddScoreForBossEnemy()
 	}
 }

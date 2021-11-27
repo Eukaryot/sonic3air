@@ -935,7 +935,7 @@ function void fn05427c()
 		A3 = backupA3
 
 		level.scrolling_routine = 0
-	
+
 	#if STANDALONE
 		// Enforce a full screen refresh of plane A to get rid of wrong tiles being shown
 		fillPlaneA_Default(camera.position.x.u16, camera.position.y.u16, getScreenWidth(), getScreenHeight())

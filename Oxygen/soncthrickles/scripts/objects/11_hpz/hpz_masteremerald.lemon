@@ -39,7 +39,9 @@ function void fn0906a0()
 		if (D1.s16 < 0)
 		{
 			objA0.value26 = 0xff
-			spawnSimpleChildObjects(0x090fe4)
+
+			// "spawnSimpleChildObjects(0x090fe4)" replaced by:
+			spawnSimpleChildObjects(0x090734, 1)
 			break
 		}
 	}

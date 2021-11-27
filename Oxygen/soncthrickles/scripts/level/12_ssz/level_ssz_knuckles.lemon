@@ -815,9 +815,15 @@ function void fn07ca3a()
 		u8[A1 + 0x2c] = 0x19
 	}
 
-	spawnChildObjects(0x068184)
-	spawnChildObjects(0x07d4bc)
-	spawnChildObjects(0x0681b4)
+	// "spawnChildObjects(0x068184)" replaced by:
+	spawnChildObject(0x067cd2, 0x00, 0, -28)
+
+	// "spawnChildObjects(0x07d4bc)" replaced by:
+	spawnChildObject(0x07ccfe, 0x00, 0, 35)
+
+	// "spawnChildObjects(0x0681b4)" replaced by:
+	spawnChildObject(0x068062, 0x00, 30, 0)
+
 	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)
 
 	DrawObject()
@@ -968,7 +974,8 @@ function void fn07cbce()
 		objA0.countdown_value = 0x3f
 		objA0.countdown_callback = 0x07cc26
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 	}
 
 	DrawObject()
@@ -978,7 +985,9 @@ function void fn07cbce()
 //# address-hook(0x07cc26) end(0x07cc34)
 function void fn07cc26()
 {
-	spawnSimpleChildObjects(0x07d4c4)
+	// "spawnSimpleChildObjects(0x07d4c4)" replaced by:
+	spawnSimpleChildObjects(0x07ce6c, 4)
+
 	objA0.flags38 |= 0x30
 	Object.TriggerUnloading()
 }
@@ -1062,7 +1071,10 @@ function void fn07ccfe()
 	setupObjectAttributesFull(0x0664fa)
 	objA0.sprite_priority = 0
 	objA0.update_address = 0x07cd22
-	spawnChildObjects(0x066610)
+
+	// "spawnChildObjects(0x066610)" replaced by:
+	spawnChildObject(0x065138, 0x00, 0, 0)
+	spawnChildObject(0x06515e, 0x02, 0, -48)
 }
 
 

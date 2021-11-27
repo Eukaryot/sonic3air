@@ -22,7 +22,10 @@ function void fn06c2be()
 	objA0.countdown_callback = 0x06c2e2
 	objA0.sprite_priority = 0x0200
 
-	spawnChildObjects(0x06d822)
+	// "spawnChildObjects(0x06d822)" replaced by:
+	spawnChildObject(0x06cfbe, 0x00, 12, -20)
+	spawnChildObject(0x06cfbe, 0x02, -16, 8)
+	spawnChildObject(0x06cfbe, 0x04, 20, 8)
 }
 
 
@@ -111,13 +114,18 @@ function void fn06c354()
 	requestLoadingPatterns(0x6d)
 	loadPaletteLine1(0x06d97c)
 
-	spawnChildObjects(0x06819c)
+	// "spawnChildObjects(0x06819c)" replaced by:
+	spawnChildObject(0x067e62, 0x00, -6, 4)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x09
 	}
 
-	spawnChildObjects(0x06d7c0)
+	// "spawnChildObjects(0x06d7c0)" replaced by:
+	spawnChildObject(0x06cc46, 0x00, -20, 15)
+	spawnChildObject(0x06c948, 0x02, -28, 16)
+	spawnChildObject(0x06ceb0, 0x04, 8, 24)
+	spawnChildObject(0x06ceb0, 0x06, -12, 24)
 }
 
 
@@ -366,7 +374,8 @@ function void fn06c614()
 	objA0.countdown_value = 0x9f
 	objA0.countdown_callback = 0x06c646
 
-	spawnChildObjects(0x06d836)
+	// "spawnChildObjects(0x06d836)" replaced by:
+	spawnChildObject(0x06cff4, 0x00, 0, 0)
 }
 
 

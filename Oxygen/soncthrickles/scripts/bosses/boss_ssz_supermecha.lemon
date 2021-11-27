@@ -31,7 +31,8 @@ function void fn07b996()
 	objA0.flags38 |= 0x50
 	playMusic(0x1a)
 
-	spawnChildObjects(0x07d492)
+	// "spawnChildObjects(0x07d492)" replaced by:
+	spawnChildObject(0x07c886, 0x00, -4, 12)
 
 	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
 }
@@ -65,8 +66,16 @@ function void fn07ba00()
 	objA0.countdown_value = 0x3b
 	objA0.flags38 |= 0x04
 
-	A2 = (objA0.render_flags & render_flag.FLIP_X) ? 0x07d47a : 0x07d486
-	SpawnSimpleChildObjects()
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		// "spawnSimpleChildObjects(0x07d47a)" replaced by:
+		spawnSimpleChildObjects(0x07c902, 2)
+	}
+	else
+	{
+		// "spawnSimpleChildObjects(0x07d486)" replaced by:
+		spawnSimpleChildObjects(0x07c8fe, 2)
+	}
 }
 
 
@@ -197,7 +206,8 @@ function void fn07bb7c()
 	A1 = 0x07d9ea
 	fn07c678()
 
-	spawnSimpleChildObjects(0x07d48c)
+	// "spawnSimpleChildObjects(0x07d48c)" replaced by:
+	spawnSimpleChildObjects(0x07c948, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x08
@@ -282,7 +292,9 @@ function void fn07bc32()
 		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
 		objA0.position.y.u16 += 0x20
 		objA0.countdown_callback = 0x07bc70
-		spawnSimpleChildObjects(0x07d4ca)
+
+		// "spawnSimpleChildObjects(0x07d4ca)" replaced by:
+		spawnSimpleChildObjects(0x07ce90, 16)
 	}
 }
 
@@ -390,7 +402,7 @@ function void fn07bd30()
 	{
 		u16[A0 + 0x3a] = 0x1f
 		--objA0.value39
-		if (s8[A0 + 0x39] >= 0)
+		if (s8(objA0.value39) >= 0)
 		{
 			playSound(0x4e)
 		}
@@ -586,7 +598,8 @@ function void fn07bed2()
 	fn084580()
 	objA0.flags38 |= 0x40
 
-	spawnChildObjects(0x07d49a)
+	// "spawnChildObjects(0x07d49a)" replaced by:
+	spawnChildObject(0x07c78e, 0x00, 20, -4)
 }
 
 
@@ -739,7 +752,8 @@ function void fn07c06e()
 		fn084580()
 		objA0.flags38 |= 0x40
 
-		spawnChildObjects(0x07d49a)
+		// "spawnChildObjects(0x07d49a)" replaced by:
+		spawnChildObject(0x07c78e, 0x00, 20, -4)
 	}
 	else
 	{
@@ -1002,10 +1016,12 @@ function void fn07c37a()
 function void fn07c39e()
 {
 	objA0.countdown_value = 0x2f
-	spawnChildObjects(0x07d4ae)
+
+	// "spawnChildObjects(0x07d4ae)" replaced by:
+	spawnChildObject(0x07c744, 0x00, -7, -8)
 
 	--objA0.value39
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 		return
 
 	u8[A1 + 0x2c] = 0x08
@@ -1333,7 +1349,8 @@ function void fn07c6f0()
 
 	playSound(0x98)
 
-	spawnSimpleChildObjects(0x07d4a8)
+	// "spawnSimpleChildObjects(0x07d4a8)" replaced by:
+	spawnSimpleChildObjects(0x07c726, 8)
 }
 
 
@@ -1435,7 +1452,9 @@ function void fn07c79c()
 	if (u8[A1 + 0x22] != 0x12)
 		return
 
-	spawnSimpleChildObjects(0x07d4a2)
+	// "spawnSimpleChildObjects(0x07d4a2)" replaced by:
+	spawnSimpleChildObjects(0x07c7d4, 1)
+
 	DrawObject()
 }
 
@@ -1652,7 +1671,8 @@ function void fn07cf14()
 		objA0.position.x.u16 = camera.position.x.u16 + 0xa0
 		objA0.position.y.u16 = camera.position.y.u16 + 0xd0
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x0c
@@ -1665,7 +1685,8 @@ function void fn07cf14()
 		objA0.position.y.u16 += 0x30
 		objA0.velocity.x = (D0.u8 == 0) ? -2 : 2
 
-		spawnSimpleChildObjects(0x083fee)
+		// "spawnSimpleChildObjects(0x083fee)" replaced by:
+		spawnSimpleChildObjects(0x083d84, 1)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x1e
@@ -1739,7 +1760,7 @@ function void fn07d0e0()
 	fadePaletteTowardsTargetUniform()
 
 	--objA0.value39
-	if (s8[A0 + 0x39] >= 0)
+	if (s8(objA0.value39) >= 0)
 		return
 
 	copyMemory(0xfffffc00, 0xfffffc80, 0x80)

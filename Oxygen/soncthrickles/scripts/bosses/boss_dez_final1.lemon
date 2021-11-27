@@ -198,7 +198,8 @@ function void fn07fef6()
 			u16[A1 + 0x46] = A0.u16
 		}
 
-		spawnSimpleChildObjects(0x081310)
+		// "spawnSimpleChildObjects(0x081310)" replaced by:
+		spawnSimpleChildObjects(0x080b22, 2)
 	}
 }
 
@@ -572,7 +573,10 @@ function void fn080b66()
 	objA0.base_state = 0x02
 	objA0.value39 = 0x03
 
-	spawnChildObjects(0x081316)
+	// "spawnChildObjects(0x081316)" replaced by:
+	spawnChildObject(0x080ce2, 0x00, 0, -16)
+	spawnChildObject(0x080ce2, 0x02, -32, -16)
+	spawnChildObject(0x080ce2, 0x04, 32, -16)
 
 	objA0.value42 = (objA0.subtype2c == 0) ? -0x80 : 0x80
 	objA0.position.y.u16 = 0xe3
@@ -871,7 +875,8 @@ function void fn081140()
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -938,7 +943,8 @@ function void fn081206()
 {
 	objA0.update_address = 0x080584
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04

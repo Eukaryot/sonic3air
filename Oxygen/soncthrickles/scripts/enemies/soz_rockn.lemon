@@ -60,7 +60,9 @@ function void fn08edc0()
 	}
 
 	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80
-	spawnChildObjects(0x08f072)
+
+	// "spawnChildObjects(0x08f072)" replaced by:
+	spawnChildObject(0x08ef3c, 0x00, 0, -8)
 }
 
 
@@ -204,7 +206,8 @@ function void fn08ef94()
 	objA0.base_state = 0x04
 	objA0.countdown_value = 0x07
 
-	spawnSimpleChildObjects(0x08f07a)
+	// "spawnSimpleChildObjects(0x08f07a)" replaced by:
+	spawnSimpleChildObjects(0x08f00e, 1)
 }
 
 

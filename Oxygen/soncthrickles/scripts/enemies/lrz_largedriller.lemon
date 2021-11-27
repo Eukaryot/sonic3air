@@ -39,7 +39,8 @@ function void fn0900f0()
 		u8[A0 + 0x0a] |= 0x80
 	}
 
-	spawnSimpleChildObjects(0x09067a)
+	// "spawnSimpleChildObjects(0x09067a)" replaced by:
+	spawnSimpleChildObjects(0x0862ae, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x8b
@@ -58,7 +59,16 @@ function void fn0900f0()
 	Kosinski.addToDMAQueue(0x16f928, 0xa5c0)
 	addPatternLoadingCue(0x083d64)
 	loadPaletteLine1(0x090680)
-	spawnChildObjects(0x090626)
+
+	// "spawnChildObjects(0x090626)" replaced by:
+	spawnChildObject(0x09039a, 0x00, -28, 28)
+	spawnChildObject(0x09039a, 0x02, 28, 28)
+	spawnChildObject(0x09039a, 0x04, -36, 28)
+	spawnChildObject(0x09039a, 0x06, 36, 28)
+	spawnChildObject(0x09039a, 0x08, -28, -36)
+	spawnChildObject(0x09039a, 0x0a, 28, -36)
+	spawnChildObject(0x09039a, 0x0c, -36, -36)
+	spawnChildObject(0x09039a, 0x0e, 36, -36)
 }
 
 
@@ -179,7 +189,8 @@ function void fn0902fe()
 	objA0.countdown_value = 0x7f
 	objA0.countdown_callback = 0x090352
 
-	spawnSimpleChildObjects(0x083fee)
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 }
 
 

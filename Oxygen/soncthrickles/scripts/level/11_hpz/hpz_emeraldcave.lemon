@@ -224,7 +224,8 @@ function void fn090a94()
 	objA0.countdown_value = 0x021f
 	global.traded_emeralds = 0xff
 
-	spawnSimpleChildObjects(0x090fea)
+	// "spawnSimpleChildObjects(0x090fea)" replaced by:
+	spawnSimpleChildObjects(0x090d78, 1)
 }
 
 
@@ -477,7 +478,8 @@ function void fn090d78()
 
 	playSound(0xb8)
 
-	spawnSimpleChildObjects(0x090ff0)
+	// "spawnSimpleChildObjects(0x090ff0)" replaced by:
+	spawnSimpleChildObjects(0x090dfc, 7)
 
 	fn090da2()
 }

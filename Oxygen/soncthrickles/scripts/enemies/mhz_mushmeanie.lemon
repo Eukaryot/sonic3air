@@ -41,7 +41,9 @@ function void fn08db1e()
 	setupObjectAttributesFull(0x08dcca)
 	objA0.value39 = 0x02
 	objA0.hitbox_extends.y = 0x12
-	spawnChildObjects(0x08dcde)
+
+	// "spawnChildObjects(0x08dcde)" replaced by:
+	spawnChildObject(0x08dc14, 0x00, 0, 0)
 }
 
 

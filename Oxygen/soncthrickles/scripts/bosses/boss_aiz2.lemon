@@ -96,13 +96,17 @@ function void fn06926c()
 	boss.remaining_hits = 8
 	objA0.render_flags |= render_flag.FLIP_X
 
-	spawnChildObjects(0x06818c)
+	// "spawnChildObjects(0x06818c)" replaced by:
+	spawnChildObject(0x067d42, 0x00, 0, -20)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x08
 	}
 
-	spawnChildObjects(0x069d18)
+	// "spawnChildObjects(0x069d18)" replaced by:
+	spawnChildObject(0x069622, 0x00, 20, -4)
+	spawnChildObject(0x069622, 0x02, -20, -4)
+
 	fn0692a0()
 }
 
@@ -124,7 +128,8 @@ function void fn0692a0()
 		objA0.render_flags |= render_flag.FLIP_X
 	}
 
-	spawnChildObjects(0x069d2e)
+	// "spawnChildObjects(0x069d2e)" replaced by:
+	spawnChildObject(0x0699c0, 0x00, 0, 0)
 }
 
 
@@ -224,7 +229,9 @@ function void fn069302()
 	u8[A0 + 0x0a] |= 0x80
 	u8[A0 + 0x28] = 0x16
 	objA0.countdown_callback = 0x06933a
-	spawnChildObjects(0x069d36)
+
+	// "spawnChildObjects(0x069d36)" replaced by:
+	spawnChildObject(0x069996, 0x00, 0, -48)
 }
 
 
@@ -459,7 +466,9 @@ function void fn0695ce()
 	D0.u16 = 0x1000
 	screenmover_target.bottom = D0.u16
 	move_area.bottom.target = D0.u16
-	spawnSimpleChildObjects(0x084b12)
+
+	// "spawnSimpleChildObjects(0x084b12)" replaced by:
+	spawnSimpleChildObjects(0x084ad2, 1)
 }
 
 
@@ -507,7 +516,8 @@ function void fn06965a()
 		objA0.sprite_priority = 0x0280
 	}
 
-	spawnChildObjects(0x069d26)
+	// "spawnChildObjects(0x069d26)" replaced by:
+	spawnChildObject(0x069738, 0x00, -28, 0)
 }
 
 
@@ -760,7 +770,9 @@ function void fn06989e()
 //# address-hook(0x0698bc) end(0x0698c0)
 function void fn0698bc()
 {
-	spawnChildObjects(0x069d56)
+	// "spawnChildObjects(0x069d56)" replaced by:
+	spawnChildObject(0x0698d2, 0x00, 0, 0)
+
 	fn0698c6()
 }
 
@@ -792,13 +804,21 @@ function void fn069b5e()
 {
 	D0.u16 = u16[A0 + 0x26] >> 1
 
-	// Targets:
-	//  - 0x069d3e	-> D0.u16 = 0x00
-	//  - 0x069d46	-> D0.u16 = 0x02
-	//  - 0x069d46	-> D0.u16 = 0x04
-	//  - 0x069d4e	-> D0.u16 = 0x06
-	A2 = tableLookupAddress(0x069b72, D0.u16)
-	spawnChildObjects(A2)
+	if (D0.u16 == 0x00)
+	{
+		// "spawnChildObjects(0x069d3e)" replaced by:
+		spawnChildObject(0x069844, 0x00, 3, 5)
+	}
+	else if (D0.u16 == 0x02 || D0.u16 == 0x04)
+	{
+		// "spawnChildObjects(0x069d46)" replaced by:
+		spawnChildObject(0x069844, 0x00, 0, 7)
+	}
+	else
+	{
+		// "spawnChildObjects(0x069d4e)" replaced by:
+		spawnChildObject(0x069844, 0x00, -3, 5)
+	}
 }
 
 
@@ -849,7 +869,9 @@ function void fn067d68()
 {
 	setupObjectAttributesFull(0x068146)
 	objA0.animation.sprite = objA0.subtype2c
-	spawnChildObjects(0x06816c)
+
+	// "spawnChildObjects(0x06816c)" replaced by:
+	spawnChildObject(0x067b66, 0x00, 0, -28)
 }
 
 
@@ -864,7 +886,9 @@ function void fn067d84()
 		return
 
 	objA0.base_state = 0x04
-	spawnSimpleChildObjects(0x083fee)
+
+	// "spawnSimpleChildObjects(0x083fee)" replaced by:
+	spawnSimpleChildObjects(0x083d84, 1)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = (global.zone != 0x00) ? 0x04 : 0x12
@@ -956,7 +980,8 @@ function void fn0693fa()
 
 	fn069c94()
 
-	spawnChildObjects(0x069d2e)
+	// "spawnChildObjects(0x069d2e)" replaced by:
+	spawnChildObject(0x0699c0, 0x00, 0, 0)
 	u8[A1 + 0x2c] = 0x02
 }
 
@@ -1030,10 +1055,10 @@ function void fn069914()
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 	{
-		D0.u8 = global.framecounter & 0x03
-		if (D0.u8 == 0)
+		if ((global.framecounter & 0x03) == 0)
 		{
-			spawnChildObjects(0x069d5e)
+			// "spawnChildObjects(0x069d5e)" replaced by:
+			spawnChildObject(0x06995a, 0x00, 0, 0)
 		}
 		Enemy.DrawDynamicObject()
 	}

@@ -108,7 +108,8 @@ function void fn07a2c0()
 	objA0.countdown_value = 0x67
 	objA0.countdown_callback = 0x07a2fc
 
-	spawnChildObjects(0x0681bc)
+	// "spawnChildObjects(0x0681bc)" replaced by:
+	spawnChildObject(0x067d0a, 0x00, 0, -32)
 }
 
 
@@ -124,13 +125,13 @@ function void fn07a2f0()
 function void fn07a2fc()
 {
 	objA0.base_state = 0x04
-#if STANDALONE
-	objA0.velocity.x = -BossMidSSZ1.getMovementSpeed() / 2
-#else
 	objA0.velocity.x = -BossMidSSZ1.getMovementSpeed()
+#if STANDALONE
+	objA0.velocity.x /= 2
 #endif
 
-	spawnChildObjects(0x07a69e)
+	// "spawnChildObjects(0x07a69e)" replaced by:
+	spawnChildObject(0x07a558, 0x00, 30, 0)
 
 	D0.u16 = 0xc0
 	objA0.value3e = D0.u16
@@ -459,7 +460,8 @@ function void fn07a5a0()
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x07a3ce
 
-		spawnChildObjects(0x083fee)
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

@@ -64,7 +64,9 @@ function void fn08dd52()
 	setupObjectAttributesFull(0x08df96)
 
 	u32[A0 + 0x30] = 0x08dfce
-	spawnChildObjects(0x08dfae)
+
+	// "spawnChildObjects(0x08dfae)" replaced by:
+	spawnChildObject(0x08df3c, 0x00, 0, 0)
 
 	A2 = 0x08dfb6
 	SpawnChildObjectChain()

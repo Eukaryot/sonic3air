@@ -42,7 +42,8 @@ function void fn091a0c()
 	u16[A0 + 0x3a] = objA0.subtype2c * 2 - 1
 	objA0.countdown_callback = 0x091ab0
 
-	spawnChildObjects(0x091c2c)
+	// "spawnChildObjects(0x091c2c)" replaced by:
+	spawnChildObject(0x091ad2, 0x00, 0, 20)
 
 	D0 = 0x40
 	objA0.value3e = D0.u16
@@ -105,7 +106,8 @@ function void fn091ad2()
 	setupObjectAttributesBasic(0x091c26)
 	objA0.update_address = 0x091aec
 
-	spawnChildObjects(0x091c34)
+	// "spawnChildObjects(0x091c34)" replaced by:
+	spawnChildObject(0x091ba8, 0x00, 0, 0)
 }
 
 

@@ -75,11 +75,13 @@ function void fn06215e()
 	screenmover_target.right = move_area.right
 	move_area.right = 0x3940	// Could be moved right, but then you can see bricks with broken palette
 
-	spawnChildObjects(0x0665a2)
+	// "spawnChildObjects(0x0665a2)" replaced by:
+	spawnChildObject(0x065bd4, 0x00, 0, 12)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 2
 	}
+
 	objA0.position.x.u16 += 0x9e
 }
 
@@ -157,7 +159,9 @@ function void fn062242()
 
 	loadPaletteLine1(0x0a8dfc)
 
-	spawnChildObjects(0x062280)
+	// "spawnChildObjects(0x062280)" replaced by:
+	spawnChildObject(0x084aa4, 0x00, 0, 0)		// Screen mover for the upper border
+	spawnChildObject(0x084a48, 0x02, 0, 0)		// Screen mover for the right border
 
 	if (allocDynamicObjectStd())
 	{

@@ -47,7 +47,8 @@ function void fn08657a()
 
 	if ((objA0.render_flags & render_flag.FLIP_Y) == 0)
 	{
-		spawnChildObjects(0x086b5c)
+		// "spawnChildObjects(0x086b5c)" replaced by:
+		spawnChildObject(0x08671c, 0x00, 0, -36)
 	}
 	else
 	{
@@ -59,8 +60,12 @@ function void fn08657a()
 		u16[A0 + 0x3a] = 1
 		fn0685e2()
 
-		spawnChildObjects(0x086b64)
-		spawnChildObjects(0x086b6c)
+		// "spawnChildObjects(0x086b64)" replaced by:
+		spawnChildObject(0x08675c, 0x00, 0, 36)
+
+		// "spawnChildObjects(0x086b6c)" replaced by:
+		spawnChildObject(0x086802, 0x00, -20, -36)
+		spawnChildObject(0x086802, 0x02, 20, -36)
 	}
 }
 
@@ -91,9 +96,26 @@ function void fn0865de()
 	objA0.countdown_value = 0x40
 	level.capsule_opened = 0xff
 
-	spawnChildObjects(0x086b7a)
-	spawnChildObjects(0x086b9a)
-	spawnChildObjects(0x083fee)
+	// "spawnChildObjects(0x086b7a)" replaced by:
+	spawnChildObject(0x0867d6, 0x00, 0, -8)
+	spawnChildObject(0x0867d6, 0x02, -16, -8)
+	spawnChildObject(0x0867d6, 0x04, 16, -8)
+	spawnChildObject(0x0867d6, 0x06, -24, -8)
+	spawnChildObject(0x0867d6, 0x08, 24, -8)
+
+	// "spawnChildObjects(0x086b9a)" replaced by:
+	spawnChildObject(0x086820, 0x00, 0, -4)
+	spawnChildObject(0x086820, 0x02, -8, -4)
+	spawnChildObject(0x086820, 0x04, 8, -4)
+	spawnChildObject(0x086820, 0x06, 16, -4)
+	spawnChildObject(0x086820, 0x08, -16, -4)
+	spawnChildObject(0x086820, 0x0a, -24, -4)
+	spawnChildObject(0x086820, 0x0c, 24, -4)
+	spawnChildObject(0x086820, 0x0e, -4, -4)
+	spawnChildObject(0x086820, 0x10, 4, -4)
+
+	// "spawnChildObjects(0x083fee)" replaced by:
+	spawnChildObject(0x083d84, 0x00, 0, 0)
 
 	u8[A1 + 0x2c] = 0x08
 }
@@ -640,7 +662,9 @@ function void fn08b5dc()
 			objA1.velocity.x = 0x0800
 			u16[A1 + 0x1c] = 0x0800
 
-			spawnChildObjects(0x08b872)
+			// "spawnChildObjects(0x08b872)" replaced by:
+			spawnChildObject(0x08b768, 0x00, 0, -8)
+			spawnChildObject(0x08b768, 0x02, 0, 8)
 		}
 		Object.TriggerUnloading()
 	}
@@ -665,7 +689,12 @@ function void fn08b616()
 			objA1.velocity.x = 0x0800
 			u16[A1 + 0x1c] = 0x0800
 
-			spawnChildObjects(0x08b880)
+			// "spawnChildObjects(0x08b880)" replaced by:
+			spawnChildObject(0x08b768, 0x00, -8, -8)
+			spawnChildObject(0x08b768, 0x02, 0, 8)
+			spawnChildObject(0x08b768, 0x04, 8, -8)
+			spawnChildObject(0x08b768, 0x06, 8, 8)
+
 			if (objA0.subtype2c & 0x80)
 			{
 				D0.u16 = 0x0600

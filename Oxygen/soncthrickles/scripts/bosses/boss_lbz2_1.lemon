@@ -61,7 +61,9 @@ function void fn073906()
 	}
 #endif
 
-	spawnChildObjects(0x07414c)
+	// "spawnChildObjects(0x07414c)" replaced by:
+	spawnChildObject(0x073e0e, 0x00, 0, -8)
+	spawnChildObject(0x073ea2, 0x02, -24, -112)
 
 	requestLoadingPatterns(0x77)
 
@@ -94,7 +96,8 @@ function void fn073960()
 	A2 = 0x07418a
 	SpawnChildObjectChain()
 
-	spawnChildObjects(0x07415a)
+	// "spawnChildObjects(0x07415a)" replaced by:
+	spawnChildObject(0x073d74, 0x00, 112, -24)
 }
 
 
@@ -146,7 +149,11 @@ function void fn07399e()
 	objA0.velocity.y = -0x40
 	objA0.countdown_value = 0xdf
 	objA0.countdown_callback = 0x0739f2
-	spawnChildObjects(0x074162)
+
+	// "spawnChildObjects(0x074162)" replaced by:
+	spawnChildObject(0x073c0a, 0x00, -24, 56)
+	spawnChildObject(0x073c0a, 0x02, 24, 56)
+	spawnChildObject(0x073c0a, 0x04, 0, 56)
 }
 
 
@@ -325,7 +332,8 @@ function void fn073b3c()
 		return
 	}
 
-	spawnChildObjects(0x074198)
+	// "spawnChildObjects(0x074198)" replaced by:
+	spawnChildObject(0x073ba0, 0x00, 0, 16)
 }
 
 
@@ -336,7 +344,19 @@ function void fn073b82()
 	objA0.flags2a |= 0x80
 	playSound(0x6e)
 
-	spawnChildObjects(0x0741a0)
+	// "spawnChildObjects(0x0741a0)" replaced by:
+	spawnChildObject(0x073bf6, 0x00, -8, -8)
+	spawnChildObject(0x073bf6, 0x02, 8, -8)
+	spawnChildObject(0x073bf6, 0x04, -8, 8)
+	spawnChildObject(0x073bf6, 0x06, 8, 8)
+	spawnChildObject(0x073bf6, 0x08, -16, -16)
+	spawnChildObject(0x073bf6, 0x0a, 16, -16)
+	spawnChildObject(0x073bf6, 0x0c, -16, 16)
+	spawnChildObject(0x073bf6, 0x0e, 16, 16)
+	spawnChildObject(0x073ba0, 0x10, -8, 6)
+	spawnChildObject(0x073ba0, 0x12, 6, 8)
+	spawnChildObject(0x073ba0, 0x14, -8, -6)
+	spawnChildObject(0x073ba0, 0x16, 6, -8)
 }
 
 
@@ -436,7 +456,10 @@ function void fn073c6a()
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 		return
 
-	spawnChildObjects(0x074176)
+	// "spawnChildObjects(0x074176)" replaced by:
+	spawnChildObject(0x073c82, 0x00, 0, -24)
+	spawnChildObject(0x073c82, 0x02, 0, -8)
+	spawnChildObject(0x073c82, 0x04, 0, 8)
 }
 
 
@@ -740,11 +763,13 @@ function void fn073eee()
 //# address-hook(0x073f1c) end(0x073f38)
 function void fn073f1c()
 {
-	spawnChildObjects(0x074190)
+	// "spawnChildObjects(0x074190)" replaced by:
+	spawnChildObject(0x073a92, 0x00, 0, 0)
+
 	D0.u8 = objA0.value39
 	++objA0.value39
 	D0.u16 &= 0x07
-	u8[A1 + 0x2c] = u8[0x073f3a + D0.s16]
+	u8[A1 + 0x2c] = u8[0x073f3a + D0.u16]
 }
 
 
@@ -817,7 +842,8 @@ function void fn073fe2()
 			objA0.velocity.y = -0x200
 			objA0.countdown_callback = 0x073a6a
 
-			spawnChildObjects(0x083fee)
+			// "spawnChildObjects(0x083fee)" replaced by:
+			spawnChildObject(0x083d84, 0x00, 0, 0)
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x04
@@ -825,7 +851,8 @@ function void fn073fe2()
 
 			screenmover_target.right = 0x3ab8
 
-			spawnSimpleChildObjects(0x084b00)
+			// "spawnSimpleChildObjects(0x084b00)" replaced by:
+			spawnSimpleChildObjects(0x084a48, 1)
 		}
 		else
 		{
