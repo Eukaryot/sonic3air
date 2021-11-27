@@ -32,6 +32,7 @@ void ScrollOffsetsManager::reset()
 	for (int index = 0; index < 4; ++index)
 	{
 		mSets[index] = { 0 };
+		mInterpolatedSets[index] = { 0 };
 	}
 }
 
@@ -39,18 +40,6 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 {
 	if (refreshParameters.mHasNewSimulationFrame)
 	{
-		if (refreshParameters.mUsingFrameInterpolation)
-		{
-			for (int index = 0; index < 2; ++index)
-			{
-				for (int k = 0; k < 0x100; ++k)
-					mInterpolatedSets[index].mLastScrollOffsetsH[k] = mSets[index].mScrollOffsetsH[k];
-				for (int k = 0; k < 0x20; ++k)
-					mInterpolatedSets[index].mLastScrollOffsetsV[k] = mSets[index].mScrollOffsetsV[k];
-				mInterpolatedSets[index].mValid = false;
-			}
-		}
-
 		// Horizontal scrolling
 		for (int index = 0; index < 4; ++index)
 		{
@@ -141,8 +130,8 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 			const uint16 halfPositionH = mPlaneManager.getPlayfieldSizeInPixels().x / 2;
 			const uint16 positionMaskV = mPlaneManager.getPlayfieldSizeInPixels().y - 1;
 			const uint16 halfPositionV = mPlaneManager.getPlayfieldSizeInPixels().y / 2;
-			
-			for (int index = 0; index < 2; ++index)
+
+			for (int index = 0; index < 4; ++index)
 			{
 				const int verticalDifference = mSets[index].mScrollOffsetsV[0] - mInterpolatedSets[index].mLastScrollOffsetsV[0];
 				for (int k = 0; k < 0x100; ++k)
@@ -164,39 +153,50 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 				}
 			}
 		}
+
+		for (int index = 0; index < 4; ++index)
+		{
+			mInterpolatedSets[index].mValid = (refreshParameters.mUsingFrameInterpolation && mInterpolatedSets[index].mHasLastScrollOffsets);
+		}
 	}
 
 	if (refreshParameters.mUsingFrameInterpolation)
 	{
-		const int32 interpolationFactor = roundToInt((1.0f - refreshParameters.mInterFramePosition) * 256.0f);
+		const float interpolationFactor = (1.0f - refreshParameters.mInterFramePosition);
 		const uint16 positionMaskH = mPlaneManager.getPlayfieldSizeInPixels().x - 1;
 		const uint16 positionMaskV = mPlaneManager.getPlayfieldSizeInPixels().y - 1;
 
-		for (int index = 0; index < 2; ++index)
+		for (int index = 0; index < 4; ++index)
 		{
-			const int verticalDifference = -(((int32)mInterpolatedSets[index].mDifferenceScrollOffsetsV[0] * interpolationFactor + 0x80) >> 8);
+			const int verticalDifference = -roundToInt((float)mInterpolatedSets[index].mDifferenceScrollOffsetsV[0] * interpolationFactor);
 			for (int k = 0; k < 0x100; ++k)
 			{
 				const int oldK = clamp(k + verticalDifference, 0, 223);
-				mInterpolatedSets[index].mInterpolatedScrollOffsetsH[k] = (mSets[index].mScrollOffsetsH[oldK] - (((int32)mInterpolatedSets[index].mDifferenceScrollOffsetsH[oldK] * interpolationFactor + 0x80) >> 8)) & positionMaskH;
+				mInterpolatedSets[index].mInterpolatedScrollOffsetsH[k] = (mSets[index].mScrollOffsetsH[oldK] - roundToInt((float)mInterpolatedSets[index].mDifferenceScrollOffsetsH[oldK] * interpolationFactor)) & positionMaskH;
 			}
 			for (int k = 0; k < 0x20; ++k)
 			{
-				mInterpolatedSets[index].mInterpolatedScrollOffsetsV[k] = (mSets[index].mScrollOffsetsV[k] - (((int32)mInterpolatedSets[index].mDifferenceScrollOffsetsV[k] * interpolationFactor + 0x80) >> 8)) & positionMaskV;
+				mInterpolatedSets[index].mInterpolatedScrollOffsetsV[k] = (mSets[index].mScrollOffsetsV[k] - roundToInt((float)mInterpolatedSets[index].mDifferenceScrollOffsetsV[k] * interpolationFactor)) & positionMaskV;
 			}
 		}
-	}
-	for (int index = 0; index < 2; ++index)
-	{
-		mInterpolatedSets[index].mValid = refreshParameters.mUsingFrameInterpolation;
 	}
 }
 
 void ScrollOffsetsManager::preFrameUpdate()
 {
 	// Reset this again on each frame
-	for (int k = 0; k < 4; ++k)
-		mSets[k].mHorizontalScrollNoRepeat = false;
+	for (int index = 0; index < 4; ++index)
+		mSets[index].mHorizontalScrollNoRepeat = false;
+
+	// Backup scroll offsets before frame update
+	for (int index = 0; index < 4; ++index)
+	{
+		InterpolatedScrollOffsetSet& interpolatedSet = mInterpolatedSets[index];
+		memcpy(interpolatedSet.mLastScrollOffsetsH, mSets[index].mScrollOffsetsH, sizeof(interpolatedSet.mLastScrollOffsetsH));
+		memcpy(interpolatedSet.mLastScrollOffsetsV, mSets[index].mScrollOffsetsV, sizeof(interpolatedSet.mLastScrollOffsetsV));
+		interpolatedSet.mValid = false;
+		interpolatedSet.mHasLastScrollOffsets = true;
+	}
 }
 
 void ScrollOffsetsManager::postFrameUpdate()
@@ -248,7 +248,7 @@ const uint16* ScrollOffsetsManager::getScrollOffsetsH(int setIndex) const
 	}
 
 	RMX_ASSERT(setIndex >= 0 && setIndex < 4, "Invalid scroll offset set index " << setIndex);
-	if (setIndex < 2 && mInterpolatedSets[setIndex].mValid)
+	if (mInterpolatedSets[setIndex].mValid)
 		return mInterpolatedSets[setIndex].mInterpolatedScrollOffsetsH;
 	return mSets[setIndex].mScrollOffsetsH;
 }
@@ -262,7 +262,7 @@ const uint16* ScrollOffsetsManager::getScrollOffsetsV(int setIndex) const
 	}
 
 	RMX_ASSERT(setIndex >= 0 && setIndex < 4, "Invalid scroll offset set index " << setIndex);
-	if (setIndex < 2 && mInterpolatedSets[setIndex].mValid)
+	if (mInterpolatedSets[setIndex].mValid)
 		return mInterpolatedSets[setIndex].mInterpolatedScrollOffsetsV;
 	return mSets[setIndex].mScrollOffsetsV;
 }

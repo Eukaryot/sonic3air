@@ -250,7 +250,7 @@ bool ModManager::scanMods()
 			Mod* mod = it->second;
 			mod->mDirty = false;
 
-			// TODO: Check if mod got changed since last scan 
+			// TODO: Check if mod got changed since last scan
 			//  -> Having a different modification date of "mod.json" should be a good enough lightweight test
 			//  -> If changed, reload mod; and if it's active, reload content as well
 
@@ -320,7 +320,7 @@ bool ModManager::scanMods()
 	}
 
 	// Sort mod list
-	std::sort(mAllMods.begin(), mAllMods.end(), &detail::CompareMods); 
+	std::sort(mAllMods.begin(), mAllMods.end(), &detail::CompareMods);
 
 	return anyChange;
 }

@@ -73,6 +73,7 @@ private:
 	struct InterpolatedScrollOffsetSet
 	{
 		bool mValid = false;
+		bool mHasLastScrollOffsets = false;
 		uint16 mInterpolatedScrollOffsetsH[0x100] = { 0 };
 		uint16 mInterpolatedScrollOffsetsV[0x20] = { 0 };
 		uint16 mLastScrollOffsetsH[0x100] = { 0 };
@@ -80,5 +81,5 @@ private:
 		int16 mDifferenceScrollOffsetsH[0x100] = { 0 };
 		int16 mDifferenceScrollOffsetsV[0x20] = { 0 };
 	};
-	InterpolatedScrollOffsetSet mInterpolatedSets[2];
+	InterpolatedScrollOffsetSet mInterpolatedSets[4];
 };

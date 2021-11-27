@@ -431,7 +431,10 @@ function void renderNextObject()
 	#endif
 
 	#if STANDALONE
-		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (objA0.update_address != 0x04a0c6)	// Explicitly disable sprite interpolation for the Glowing Spheres energy beam, as it ruins the effect
+			Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		else
+			Renderer.clearSpriteTag()
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
 			return
 	#endif

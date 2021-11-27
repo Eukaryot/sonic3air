@@ -65,6 +65,12 @@ void VideoOut::reset()
 	mActiveRenderer->reset();
 }
 
+void VideoOut::handleActiveModsChanged()
+{
+	// Better reset everything, as sprite references might have become invalid and should be removed
+	reset();
+}
+
 void VideoOut::createRenderer(bool reset)
 {
 	setActiveRenderer(Configuration::instance().mRenderMethod != Configuration::RenderMethod::OPENGL_FULL, reset);

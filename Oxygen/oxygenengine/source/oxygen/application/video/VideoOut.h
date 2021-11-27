@@ -28,6 +28,8 @@ public:
 	void shutdown();
 	void reset();
 
+	void handleActiveModsChanged();
+
 	void createRenderer(bool reset);
 	void destroyRenderer();
 	void setActiveRenderer(bool useSoftwareRenderer, bool reset);

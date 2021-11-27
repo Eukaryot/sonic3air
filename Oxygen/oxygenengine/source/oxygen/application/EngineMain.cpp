@@ -116,6 +116,9 @@ void EngineMain::onActiveModsChanged()
 	// Update the resource cache -> palettes, raw data
 	ResourcesCache::instance().loadAllResources();
 
+	// Update video
+	mVideoOut.handleActiveModsChanged();
+
 	// Update audio
 	mAudioOut->handleActiveModsChanged();
 
