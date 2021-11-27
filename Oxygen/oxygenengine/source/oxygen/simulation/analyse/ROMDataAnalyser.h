@@ -50,6 +50,8 @@ private:
 	void saveDataToJSONs(const std::wstring& filepath);
 	void recursiveSaveDataToJSON(Json::Value& outJson, const Object& object);
 
+	void processData();
+
 private:
 	std::map<uint64, Category> mCategories;
 

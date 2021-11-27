@@ -16,6 +16,11 @@ ROMDataAnalyser::ROMDataAnalyser()
 {
 	// Load files
 	loadDataFromJSONs(Configuration::instance().mAnalysisDir);
+
+#ifdef DEBUG
+	// Just for generating some data for development
+//	processData();
+#endif
 }
 
 ROMDataAnalyser::~ROMDataAnalyser()
@@ -221,4 +226,54 @@ void ROMDataAnalyser::recursiveSaveDataToJSON(Json::Value& outJson, const Object
 		recursiveSaveDataToJSON(childJson, pair.second);
 		outJson[pair.first] = childJson;
 	}
+}
+
+void ROMDataAnalyser::processData()
+{
+#ifdef DEBUG
+	String output[2];
+	String entryOutput;
+	for (const auto& pair : mCategories[16289744412002469748].mEntries)
+	{
+		entryOutput.clear();
+		const Object& parent = pair.second.mContent;
+		const auto& keyValue = parent.mKeyValuePairs;
+
+		if (*mapFind(keyValue, std::string("function")) == "SpawnChildObjects")
+		{
+			for (size_t index = 0; ; ++index)
+			{
+				const Object* child = mapFind(parent.mChildObjects, std::to_string(index));
+				if (nullptr == child)
+					break;
+
+				const uint32 updateAddress = (uint32)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("update_routine")));
+				const uint8 subType = (uint8)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("subtype")));
+				const int offset_x = (int8)(uint8)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("offset_x")));
+				const int offset_y = (int8)(uint8)rmx::parseInteger(*mapFind(child->mKeyValuePairs, std::string("offset_y")));
+
+				entryOutput << "spawnChildObject(" << rmx::hexString(updateAddress, 6) << ", " << rmx::hexString(subType, 2) << ", " << offset_x << ", " << offset_y << ")\r\n";
+			}
+
+			if (entryOutput.nonEmpty())
+			{
+				output[0] << "\r\n";
+				output[0] << "// \"spawnChildObjects(" << rmx::hexString(pair.first, 6) << ")\" replaced by:\r\n";
+				output[0] << entryOutput;
+				output[0] << "\r\n\r\n";
+			}
+		}
+		else if (*mapFind(keyValue, std::string("function")) == "SpawnSimpleChildObjects")
+		{
+			const uint32 updateAddress = (uint32)rmx::parseInteger(*mapFind(keyValue, std::string("update_routine")));
+			const uint8 count = (uint8)rmx::parseInteger(*mapFind(keyValue, std::string("count")));
+
+			output[1] << "\r\n";
+			output[1] << "// \"spawnSimpleChildObjects(" << rmx::hexString(pair.first, 6) << ")\" replaced by:\r\n";
+			output[1] << "spawnSimpleChildObjects(" << rmx::hexString(updateAddress, 6) << ", " << count << ")\r\n\r\n";
+		}
+	}
+	output[0].saveFile("___internal/analysis/romdata_out_SpawnChildObjects.lemon");
+	output[1].saveFile("___internal/analysis/romdata_out_SpawnSimpleChildObjects.lemon");
+#endif
 }
