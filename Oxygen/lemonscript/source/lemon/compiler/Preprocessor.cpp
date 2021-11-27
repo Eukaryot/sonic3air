@@ -251,7 +251,7 @@ namespace lemon
 				case ParserToken::Type::IDENTIFIER:
 				{
 					const std::string& identifier = parserToken.as<IdentifierParserToken>().mIdentifier;
-					
+
 					// Unknown preprocessor definitions are okay, they automatically evaluate to 0
 					tokenList.createBack<ConstantToken>().mValue = (nullptr != mPreprocessorDefinitions) ? mPreprocessorDefinitions->getValue(identifier) : 0;
 					break;

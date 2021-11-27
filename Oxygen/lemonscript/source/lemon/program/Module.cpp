@@ -183,7 +183,7 @@ namespace lemon
 	{
 		return &mStringLiterals.getOrAddString(str);
 	}
-	
+
 	const StoredString* Module::addStringLiteral(const std::string& str, uint64 hash)
 	{
 		return &mStringLiterals.getOrAddString(str, hash);

@@ -74,7 +74,7 @@ namespace rmx
 		const Sint64 totalSize = SDL_RWsize(context);
 		if (totalSize == 0)
 			return true;
-	
+
 		if (totalSize > 0)	// Otherwise size could not be determined
 		{
 			outData.reserve((size_t)totalSize);

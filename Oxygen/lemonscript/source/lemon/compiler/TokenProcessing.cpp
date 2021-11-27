@@ -118,7 +118,7 @@ namespace lemon
 				{
 					return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
 				}
-				
+
 				const uint8 a = (uint8)DataTypeHelper::getBaseType(original);
 				const uint8 b = (uint8)DataTypeHelper::getBaseType(target);
 				const uint8 sizeA = a & 0x07;

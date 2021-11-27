@@ -959,7 +959,7 @@ namespace lemon
 					}
 					break;
 				}
-			
+
 			}
 
 			for (size_t i = oldNumAssignments; i < assignments.size(); ++i)
@@ -1020,7 +1020,7 @@ namespace lemon
 				{
 					Assignment::Node& node = *nodeStack.back();
 					nodeStack.pop_back();
-				
+
 					switch (node.mType)
 					{
 						case Assignment::Node::Type::VALUE_STACK:

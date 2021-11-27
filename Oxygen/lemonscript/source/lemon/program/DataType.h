@@ -93,7 +93,7 @@ namespace lemon
 			DataTypeDefinition(Class::INTEGER, bytes), mSemantics(semantics), mIsSigned(isSigned)
 		{
 		}
-	
+
 		const std::string& toString() const override;
 	};
 

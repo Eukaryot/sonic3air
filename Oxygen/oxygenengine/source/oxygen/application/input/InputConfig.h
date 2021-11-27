@@ -35,7 +35,7 @@ public:
 		inline Assignment()  {}
 		inline Assignment(Type type, uint32 index) : mType(type), mIndex(index)  {}
 		inline bool operator==(const Assignment& other) const  { return (mType == other.mType && mIndex == other.mIndex); }
-		
+
 		void getMappingString(String& outString, DeviceType deviceType) const;
 		static bool setFromMappingString(Assignment& output, const String& mappingString, DeviceType deviceType);
 	};

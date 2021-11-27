@@ -516,7 +516,7 @@ namespace lemon
 					default:
 						throw std::runtime_error("Unhandled opcode");
 				}
-			
+
 				context.mOpcode = (const RuntimeOpcode*)programCounter;
 			}
 		}

@@ -323,7 +323,7 @@ public:
 						write.mFrameNumber = mFrameNumber;
 					}
 				}
-					
+
 				// Type 0: Non-DAC writes
 				// Type 1: DAC writes
 				static std::deque<SoundChipWrite> dumpedWrites[2];
@@ -642,10 +642,10 @@ private:
 	void zUpdateMusic()
 	{
 		TempoWait();
-		
+
 		mCycles += 255;
 		zDoMusicFadeOut();
-		
+
 		mCycles += 255;
 		zDoMusicFadeIn();
 
@@ -818,7 +818,7 @@ private:
 
 				mCycles += 255;
 				zFMSendFreq();
-				
+
 				mCycles += 150;
 				zFMNoteOn();
 			}
@@ -931,7 +931,7 @@ private:
 		c = l;
 		mCycles += 420;
 		zWriteFMIorII();
-	
+
 		mCycles += 150;
 	}
 
@@ -1071,7 +1071,7 @@ private:
 			// zStoreDuration:
 			mCycles += 345;
 			zComputeNoteDuration();
-		
+
 			track.SavedDuration = a;
 			mCycles += 285;
 		}
@@ -2641,7 +2641,7 @@ private:
 				mCycles += 285;
 			}
 			mCycles += 150;
-			
+
 			c = a & 0x7f;
 			a = read8(de);
 			mCycles += 525;
@@ -2758,7 +2758,7 @@ private:
 		// zSetVoiceDoUpload:
 		mCycles += 255;
 		zSendFMInstrument();
-		
+
 		de = backup_de;
 		mCycles += 300;
 	}
@@ -3166,7 +3166,7 @@ private:
 
 		mCycles += 255;
 		zUpdateFreq();
-		
+
 		mCycles += 255;
 		if (zDoModulation())
 			return;
@@ -3394,7 +3394,7 @@ private:
 					mDACPlaybackState = DACPlaybackState::PLAYBACK;
 					break;
 				}
-		
+
 				case DACPlaybackState::PLAYBACK:
 				{
 					if ((zDACIndex & 0x80) == 0)	// Playing flag was cleared
@@ -3418,7 +3418,7 @@ private:
 
 							// Disable DAC
 							writeFMI(0x2b, 0, 0x108f);
-					
+
 							mDACPlaybackState = DACPlaybackState::IDLE;
 							return;
 						}

@@ -64,11 +64,11 @@ namespace rmx
 				//  -> This somewhat defeats the purpose of the whole optimization by using Murmur2...
 				memcpy(&k, data64, sizeof(uint64_t));
 				++data64;
-				k *= m; 
-				k ^= k >> r; 
-				k *= m; 
+				k *= m;
+				k ^= k >> r;
+				k *= m;
 				h ^= k;
-				h *= m; 
+				h *= m;
 			}
 		}
 		else
@@ -77,11 +77,11 @@ namespace rmx
 			while (data64 != end)
 			{
 				uint64 k = *data64++;
-				k *= m; 
-				k ^= k >> r; 
-				k *= m; 
+				k *= m;
+				k ^= k >> r;
+				k *= m;
 				h ^= k;
-				h *= m; 
+				h *= m;
 			}
 		}
 

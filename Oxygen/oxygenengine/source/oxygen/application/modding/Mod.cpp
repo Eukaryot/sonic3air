@@ -47,7 +47,7 @@ void Mod::loadFromJson(const Json::Value& json)
 				std::string displayName;
 				std::string variableName;
 				std::string defaultValue;
-			
+
 				JsonHelper jsonHelper(content);
 				jsonHelper.tryReadString("Category", categoryName);
 				jsonHelper.tryReadString("InternalName", internalName);
@@ -96,7 +96,7 @@ void Mod::loadFromJson(const Json::Value& json)
 						continue;
 
 					const std::string valueString = it2.key().asString();
-				
+
 					Setting::Option& option = vectorAdd(setting.mOptions);
 					option.mDisplayName = it2->asString();
 					option.mValue = (uint32)rmx::parseInteger(valueString);

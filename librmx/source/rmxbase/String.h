@@ -75,7 +75,7 @@ public:
 	void copy(const CHAR* str);
 	void copy(const std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>>& str);
 	void copy(const std::basic_string_view<CHAR>& str);
-	
+
 	void swap(StringTemplate& other);
 
 	void add(const StringTemplate& str);

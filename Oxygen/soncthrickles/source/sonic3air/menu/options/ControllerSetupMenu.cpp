@@ -342,7 +342,7 @@ void ControllerSetupMenu::render()
 
 		const std::string& text = entry.mOptions.empty() ? entry.mText : entry.mOptions[entry.mSelectedIndex].mText;
 		const bool isSelected = ((int)line == mMenuEntries.mSelectedEntryIndex);
-		
+
 		Color color = isSelected ? Color::YELLOW : Color::WHITE;
 		color.a *= alpha;
 

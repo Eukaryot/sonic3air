@@ -18,7 +18,7 @@
 ** Copyright (C) 2001, 2002, 2003 Jarek Burczynski (bujar at mame dot net)
 ** Copyright (C) 1998 Tatsuyuki Satoh , MultiArcadeMachineEmulator development
 **
-** Version 1.4 (final beta) 
+** Version 1.4 (final beta)
 **
 ** Additional code & fixes by Eke-Eke for Genesis Plus GX
 **
@@ -48,7 +48,7 @@
 **  - adjusted lowest EG rates increment values
 **  - fixed Attack Rate not being updated in some specific cases (Batman & Robin intro)
 **  - fixed EG behavior when Attack Rate is maximal
-**  - fixed EG behavior when SL=0 (Mega Turrican tracks 03,09...) or/and Key ON occurs at minimal attenuation 
+**  - fixed EG behavior when SL=0 (Mega Turrican tracks 03,09...) or/and Key ON occurs at minimal attenuation
 **  - implemented EG output immediate changes on register writes
 **  - fixed YM2612 initial values (after the reset): fixes missing intro in B.O.B
 **  - implemented Detune overflow (Ariel, Comix Zone, Shaq Fu, Spiderman & many other games using GEMS sound engine)

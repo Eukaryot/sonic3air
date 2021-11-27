@@ -137,5 +137,5 @@ namespace rmx
 	public:
 		static bool load(AudioBuffer* buffer, const String& source, const String& params);
 	};
-	
+
 }

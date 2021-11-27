@@ -93,7 +93,7 @@ void CustomAudioMixer::performAudioMix(const MixerParameters& parameters)
 			// Update accumulator
 			//  -> It is the sum of the last n input values (where n = effect)
 			data.mAccumulator += (int64)(inputValue - historyValue);
-			
+
 			// Get the average and use it as output
 			output[i] = (int32)(data.mAccumulator / divisor);
 

@@ -22,7 +22,7 @@ class InputFeeder
 {
 public:
 	virtual ~InputFeeder();
-	
+
 	void registerAtInputManager(InputManager& inputManager);
 	void unregisterAtInputManager();
 

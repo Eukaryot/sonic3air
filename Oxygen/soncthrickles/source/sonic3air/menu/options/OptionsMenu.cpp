@@ -618,7 +618,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		std::map<size_t, std::string>& titles = tab.mTitles;
 
 		titles[entries.size()] = "$Hints";
-		
+
 		entries.addEntry("Open Manual in web browser", option::_OPEN_MANUAL);
 	}
 
@@ -763,7 +763,7 @@ void OptionsMenu::initialize()
 			++mActiveTab;
 			mActiveTabAnimated = (float)mActiveTab;
 		}
-	
+
 		mTabMenuEntries[0].mOptions[Tab::Id::MODS].mVisible = anyModOptions;
 		mTabMenuEntries[0].mSelectedIndex = mActiveTab;
 	}
@@ -1099,7 +1099,7 @@ void OptionsMenu::render()
 				if (isBack)
 				{
 					pendingTitle = nullptr;
-				}	 
+				}
 				if (nullptr != pendingTitle)
 				{
 					if (*pendingTitle == "$Hints")

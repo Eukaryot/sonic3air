@@ -298,7 +298,7 @@ namespace rmx
 		}
 	}
 
-	
+
 
 	JobWorkerThread::JobWorkerThread(JobManager& jobManager, int index) :
 		mJobManager(jobManager)

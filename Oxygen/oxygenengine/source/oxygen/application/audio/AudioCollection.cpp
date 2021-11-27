@@ -169,7 +169,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			}
 			else if (key == "Source" && !value.empty())
 			{
-				sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS : 
+				sourceType = (value == "EmulationContinuous") ? SourceRegistration::Type::EMULATION_CONTINUOUS :
 							 (value == "EmulationDirect") ? SourceRegistration::Type::EMULATION_DIRECT : SourceRegistration::Type::EMULATION_BUFFERED;
 			}
 			else if (key == "Address" && !value.empty())
