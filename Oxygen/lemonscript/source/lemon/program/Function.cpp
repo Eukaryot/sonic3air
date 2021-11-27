@@ -136,6 +136,14 @@ namespace lemon
 		setParametersByTypes(functionWrapper.getParameterTypes());
 	}
 
+	UserDefinedFunction& UserDefinedFunction::setParameterInfo(size_t index, const std::string& identifier)
+	{
+		RMX_ASSERT(index < mParameters.size(), "Invalid parameter index " << index);
+		RMX_ASSERT(mParameters[index].mIdentifier.empty(), "Parameter identifier is already set for index " << index);
+		mParameters[index].mIdentifier = identifier;
+		return *this;
+	}
+
 	void UserDefinedFunction::execute(const Context context) const
 	{
 		RuntimeDetailHandler* runtimeDetailHandler = context.mControlFlow.getRuntime().getRuntimeDetailHandler();

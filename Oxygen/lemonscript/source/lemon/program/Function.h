@@ -142,6 +142,8 @@ namespace lemon
 		inline virtual ~UserDefinedFunction()  { delete mFunctionWrapper; }
 
 		void setFunction(const FunctionWrapper& functionWrapper);
+		UserDefinedFunction& setParameterInfo(size_t index, const std::string& identifier);
+
 		void execute(const Context context) const;
 
 	public:
