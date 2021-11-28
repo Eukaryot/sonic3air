@@ -12,28 +12,30 @@
 
 void OverlayManager::preFrameUpdate()
 {
-	clearDebugDrawRects();
+	clearDebugDrawRects();	// Clear both contexts
 	mCurrentContext = Context::INSIDE_FRAME;
 }
 
 void OverlayManager::postFrameUpdate()
 {
+	clearDebugDrawRects(Context::OUTSIDE_FRAME);
 	mCurrentContext = Context::OUTSIDE_FRAME;
 }
 
 void OverlayManager::clearDebugDrawRects()
 {
-	mDebugDrawRects.clear();
+	for (int i = 0; i < NUM_CONTEXTS; ++i)
+		mDebugDrawRects[i].clear();
 }
 
 void OverlayManager::clearDebugDrawRects(Context context)
 {
-	// TODO: Implement this
+	mDebugDrawRects[(int)context].clear();
 }
 
 void OverlayManager::addDebugDrawRect(const Recti& rect, const Color& color)
 {
-	DebugDrawRect& ddr = vectorAdd(mDebugDrawRects);
+	DebugDrawRect& ddr = vectorAdd(mDebugDrawRects[(int)mCurrentContext]);
 	ddr.mRect = rect;
 	ddr.mColor = color;
 	ddr.mContext = mCurrentContext;

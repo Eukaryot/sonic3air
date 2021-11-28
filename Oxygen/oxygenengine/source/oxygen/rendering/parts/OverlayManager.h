@@ -16,9 +16,10 @@ class OverlayManager
 public:
 	enum class Context
 	{
-		INSIDE_FRAME,	// Rendered during frame simulation
-		OUTSIDE_FRAME	// Rendered outside of frame simulation, e.g. for debug side panel update
+		INSIDE_FRAME = 0,	// Rendered during frame simulation
+		OUTSIDE_FRAME = 1	// Rendered outside of frame simulation, e.g. for debug side panel update
 	};
+	static const size_t NUM_CONTEXTS = 2;
 
 	struct DebugDrawRect
 	{
@@ -31,12 +32,13 @@ public:
 	void preFrameUpdate();
 	void postFrameUpdate();
 
-	inline const std::vector<DebugDrawRect>& getDebugDrawRects() const  { return mDebugDrawRects; }
+	inline const std::vector<DebugDrawRect>& getDebugDrawRects(Context context) const  { return mDebugDrawRects[(int)context]; }
+
 	void clearDebugDrawRects();
 	void clearDebugDrawRects(Context context);
 	void addDebugDrawRect(const Recti& rect, const Color& color = Color(1.0f, 0.0f, 1.0f, 0.75f));
 
 private:
 	Context mCurrentContext = Context::OUTSIDE_FRAME;
-	std::vector<DebugDrawRect> mDebugDrawRects;
+	std::vector<DebugDrawRect> mDebugDrawRects[NUM_CONTEXTS];	// One list per context (see "Context" enum)
 };

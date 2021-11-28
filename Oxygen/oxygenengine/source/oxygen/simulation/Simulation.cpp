@@ -473,7 +473,9 @@ void Simulation::stopSingleStepContinue()
 
 void Simulation::refreshDebugging()
 {
+	VideoOut::instance().preRefreshDebugging();
 	mCodeExec.executeScriptFunction("OxygenCallback.setupCustomSidePanelEntries", false);
+	VideoOut::instance().postRefreshDebugging();
 }
 
 uint32 Simulation::saveGameRecording(WString* outFilename)

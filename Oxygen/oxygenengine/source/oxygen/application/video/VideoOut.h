@@ -49,6 +49,9 @@ public:
 
 	void blurGameScreen();
 
+	void preRefreshDebugging();
+	void postRefreshDebugging();
+
 	void renderDebugDraw(int debugDrawMode, const Recti& rect);
 	void dumpDebugDraw(int debugDrawMode);
 
@@ -95,4 +98,7 @@ private:
 
 	std::vector<Geometry*> mGeometries;
 	GeometryFactory mGeometryFactory;
+
+	bool mDebugDrawRenderingRequested = false;
+	bool mPreviouslyHadOutsideFrameDebugDraws = false;
 };

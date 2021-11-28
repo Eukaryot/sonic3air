@@ -63,6 +63,9 @@ void VideoOut::reset()
 {
 	mRenderParts->reset();
 	mActiveRenderer->reset();
+
+	mDebugDrawRenderingRequested = false;
+	mPreviouslyHadOutsideFrameDebugDraws = false;
 }
 
 void VideoOut::handleActiveModsChanged()
@@ -150,7 +153,9 @@ void VideoOut::preFrameUpdate()
 		refreshParameters.mSkipThisFrame = true;
 		mRenderParts->refresh(refreshParameters);
 	}
+
 	mFrameState = FrameState::INSIDE_FRAME;
+	mDebugDrawRenderingRequested = false;
 }
 
 void VideoOut::postFrameUpdate()
@@ -160,6 +165,7 @@ void VideoOut::postFrameUpdate()
 	// Signal for rendering
 	mFrameState = FrameState::FRAME_READY;
 	mLastFrameTicks = SDL_GetTicks();
+	mDebugDrawRenderingRequested = false;
 }
 
 void VideoOut::setInterFramePosition(float position)
@@ -173,7 +179,7 @@ bool VideoOut::updateGameScreen()
 
 	// Only render something if a frame simulation was completed in the meantime
 	const bool hasNewSimulationFrame = (mFrameState == FrameState::FRAME_READY);
-	if (!hasNewSimulationFrame && !mUsingFrameInterpolation)
+	if (!hasNewSimulationFrame && !mUsingFrameInterpolation && !mDebugDrawRenderingRequested)
 	{
 		// No update
 		return false;
@@ -400,22 +406,26 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 
 	// Insert debug draw rects
 	{
-		const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = RenderParts::instance().getOverlayManager().getDebugDrawRects();
-		if (!debugDrawRects.empty())
+		const OverlayManager& overlayManager = RenderParts::instance().getOverlayManager();
+		for (int i = 0; i < OverlayManager::NUM_CONTEXTS; ++i)
 		{
-			const Vec2i offset = getInterpolatedWorldSpaceOffset();
-			for (const OverlayManager::DebugDrawRect& debugDrawRect : debugDrawRects)
+			const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = overlayManager.getDebugDrawRects((OverlayManager::Context)i);
+			if (!debugDrawRects.empty())
 			{
-				// Translate rect
-				Recti screenRect;
-				screenRect.x = debugDrawRect.mRect.x - offset.x;
-				screenRect.y = debugDrawRect.mRect.y - offset.y;
-				screenRect.width = debugDrawRect.mRect.width;
-				screenRect.height = debugDrawRect.mRect.height;
+				const Vec2i offset = getInterpolatedWorldSpaceOffset();
+				for (const OverlayManager::DebugDrawRect& debugDrawRect : debugDrawRects)
+				{
+					// Translate rect
+					Recti screenRect;
+					screenRect.x = debugDrawRect.mRect.x - offset.x;
+					screenRect.y = debugDrawRect.mRect.y - offset.y;
+					screenRect.width = debugDrawRect.mRect.width;
+					screenRect.height = debugDrawRect.mRect.height;
 
-				Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, debugDrawRect.mColor);
-				geometry.mRenderQueue = 0xffff;		// Always on top
-				geometries.push_back(&geometry);
+					Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, debugDrawRect.mColor);
+					geometry.mRenderQueue = 0xffff;		// Always on top
+					geometries.push_back(&geometry);
+				}
 			}
 		}
 	}
@@ -436,6 +446,18 @@ void VideoOut::renderGameScreen()
 
 	// Render them
 	mActiveRenderer->renderGameScreen(mGeometries);
+}
+
+void VideoOut::preRefreshDebugging()
+{
+	mRenderParts->getOverlayManager().clearDebugDrawRects(OverlayManager::Context::OUTSIDE_FRAME);
+}
+
+void VideoOut::postRefreshDebugging()
+{
+	const bool hasOutsideFrameDebugDraws = !mRenderParts->getOverlayManager().getDebugDrawRects(OverlayManager::Context::OUTSIDE_FRAME).empty();
+	mDebugDrawRenderingRequested = hasOutsideFrameDebugDraws || !mPreviouslyHadOutsideFrameDebugDraws;
+	mPreviouslyHadOutsideFrameDebugDraws = hasOutsideFrameDebugDraws;
 }
 
 void VideoOut::renderDebugDraw(int debugDrawMode, const Recti& rect)
