@@ -18,7 +18,6 @@
 #include "sonic3air/menu/overlays/SkippableCutsceneWindow.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/data/SharedDatabase.h"
-#include "sonic3air/debug/DebugSidePanelAdditions.h"
 #include "sonic3air/Game.h"
 
 #include "oxygen/application/Application.h"
@@ -84,16 +83,6 @@ void GameApp::initialize()
 	{
 		mApplicationContextMenu = createChild<ApplicationContextMenu>();
 	}
-
-#ifndef ENDUSER
-	{
-		DebugSidePanel* debugSidePanel = Application::instance().getDebugSidePanel();
-		if (nullptr != debugSidePanel)
-			s3air::registerDebugSidePanelAdditions(*debugSidePanel);
-		else
-			RMX_ERROR("No debug side panel instance found", );
-	}
-#endif
 }
 
 void GameApp::deinitialize()

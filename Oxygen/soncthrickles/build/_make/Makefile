@@ -232,7 +232,6 @@ SOURCES	+=	\
 			Oxygen/soncthrickles/source/sonic3air/data/PlayerRecorder \
 			Oxygen/soncthrickles/source/sonic3air/data/SharedDatabase \
 			Oxygen/soncthrickles/source/sonic3air/data/TimeAttackData \
-			Oxygen/soncthrickles/source/sonic3air/debug/DebugSidePanelAdditions \
 			Oxygen/soncthrickles/source/sonic3air/EngineDelegate \
 			Oxygen/soncthrickles/source/sonic3air/Game \
 			Oxygen/soncthrickles/source/sonic3air/generator/ResourceScriptGenerator \

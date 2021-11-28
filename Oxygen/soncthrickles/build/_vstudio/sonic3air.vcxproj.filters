@@ -10,9 +10,6 @@
     <Filter Include="data">
       <UniqueIdentifier>{42163305-1062-4b89-bda4-c1d0beec816a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="debug">
-      <UniqueIdentifier>{0227d73b-36b6-4c9e-adb4-87ce02b2cfd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="generator">
       <UniqueIdentifier>{2ffc19d3-51ef-4726-91ed-a0f64d0d407e}</UniqueIdentifier>
     </Filter>
@@ -59,9 +56,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.cpp">
       <Filter>scriptimpl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.cpp">
-      <Filter>debug</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.cpp">
       <Filter>generator</Filter>
@@ -161,9 +155,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.h">
       <Filter>scriptimpl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.h">
-      <Filter>debug</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h">
       <Filter>generator</Filter>

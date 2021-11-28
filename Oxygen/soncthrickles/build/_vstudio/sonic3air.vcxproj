@@ -34,7 +34,6 @@
     <ClCompile Include="..\..\source\sonic3air\data\PlayerRecorder.cpp" />
     <ClCompile Include="..\..\source\sonic3air\data\SharedDatabase.cpp" />
     <ClCompile Include="..\..\source\sonic3air\data\TimeAttackData.cpp" />
-    <ClCompile Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.cpp" />
     <ClCompile Include="..\..\source\sonic3air\EngineDelegate.cpp" />
     <ClCompile Include="..\..\source\sonic3air\Game.cpp" />
     <ClCompile Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.cpp" />
@@ -71,7 +70,6 @@
     <ClInclude Include="..\..\source\sonic3air\data\PlayerRecorder.h" />
     <ClInclude Include="..\..\source\sonic3air\data\SharedDatabase.h" />
     <ClInclude Include="..\..\source\sonic3air\data\TimeAttackData.h" />
-    <ClInclude Include="..\..\source\sonic3air\debug\DebugSidePanelAdditions.h" />
     <ClInclude Include="..\..\source\sonic3air\EngineDelegate.h" />
     <ClInclude Include="..\..\source\sonic3air\Game.h" />
     <ClInclude Include="..\..\source\sonic3air\generator\ResourceScriptGenerator.h" />

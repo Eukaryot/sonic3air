@@ -124,7 +124,6 @@
 		9E0C5EF5247DD809000105D0 /* GameUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDC245F88D200114DEB /* GameUtils.cpp */; };
 		9E0C5EF6247DD80C000105D0 /* DiscordIntegration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDF245F88D200114DEB /* DiscordIntegration.cpp */; };
 		9E0C5EF7247DD813000105D0 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE2245F88D200114DEB /* Game.cpp */; };
-		9E0C5EF8247DD819000105D0 /* DebugSidePanelAdditions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE6245F88D200114DEB /* DebugSidePanelAdditions.cpp */; };
 		9E0C5EFA247DD82A000105D0 /* RuntimeFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B56245F886B00114DEB /* RuntimeFunction.cpp */; };
 		9E0C5EFB247DD82C000105D0 /* StandardLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B59245F886B00114DEB /* StandardLibrary.cpp */; };
 		9E0C5EFC247DD82F000105D0 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B5B245F886B00114DEB /* Runtime.cpp */; };
@@ -241,7 +240,6 @@
 		9E1499D524CE613F0015EC7C /* Nativizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1499CD24CE613F0015EC7C /* Nativizer.cpp */; };
 		9E1499D624CE613F0015EC7C /* Nativizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1499CD24CE613F0015EC7C /* Nativizer.cpp */; };
 		9E1D5F5F2475733F003B1774 /* Preprocessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B70245F886B00114DEB /* Preprocessor.cpp */; };
-		9E1D5F602475733F003B1774 /* DebugSidePanelAdditions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE6245F88D200114DEB /* DebugSidePanelAdditions.cpp */; };
 		9E1D5F612475733F003B1774 /* BitmapCodecBMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AB8245F882600114DEB /* BitmapCodecBMP.cpp */; };
 		9E1D5F622475733F003B1774 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85CB245F89C400114DEB /* AudioPlayer.cpp */; };
 		9E1D5F632475733F003B1774 /* SharedDatabase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BD5245F88D200114DEB /* SharedDatabase.cpp */; };
@@ -583,7 +581,6 @@
 		9E6E80C2245F88D400114DEB /* GameUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDC245F88D200114DEB /* GameUtils.cpp */; };
 		9E6E80C3245F88D400114DEB /* DiscordIntegration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDF245F88D200114DEB /* DiscordIntegration.cpp */; };
 		9E6E80C5245F88D400114DEB /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE2245F88D200114DEB /* Game.cpp */; };
-		9E6E80C7245F88D400114DEB /* DebugSidePanelAdditions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE6245F88D200114DEB /* DebugSidePanelAdditions.cpp */; };
 		9E6E85EF245F89C400114DEB /* DrawCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E852A245F89C300114DEB /* DrawCommand.cpp */; };
 		9E6E85F0245F89C400114DEB /* SoftwareDrawerTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E852E245F89C300114DEB /* SoftwareDrawerTexture.cpp */; };
 		9E6E85F1245F89C400114DEB /* Blitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8530245F89C300114DEB /* Blitter.cpp */; };
@@ -1346,8 +1343,6 @@
 		9E6E7BE1245F88D200114DEB /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		9E6E7BE2245F88D200114DEB /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
 		9E6E7BE3245F88D200114DEB /* version.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = version.inc; sourceTree = "<group>"; };
-		9E6E7BE5245F88D200114DEB /* DebugSidePanelAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugSidePanelAdditions.h; sourceTree = "<group>"; };
-		9E6E7BE6245F88D200114DEB /* DebugSidePanelAdditions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DebugSidePanelAdditions.cpp; sourceTree = "<group>"; };
 		9E6E8518245F89C300114DEB /* GameApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameApp.cpp; sourceTree = "<group>"; };
 		9E6E8519245F89C300114DEB /* pch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pch.h; sourceTree = "<group>"; };
 		9E6E851A245F89C300114DEB /* ConfigurationImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfigurationImpl.h; sourceTree = "<group>"; };
@@ -2184,7 +2179,6 @@
 				9E6E7BA6245F88D200114DEB /* ConfigurationImpl.cpp */,
 				9E6E7BA5245F88D200114DEB /* ConfigurationImpl.h */,
 				9E6E7BD1245F88D200114DEB /* data */,
-				9E6E7BE4245F88D200114DEB /* debug */,
 				9E6E7BAE245F88D200114DEB /* EngineDelegate.cpp */,
 				9E6E7BAF245F88D200114DEB /* EngineDelegate.h */,
 				9E6E7BE2245F88D200114DEB /* Game.cpp */,
@@ -2300,15 +2294,6 @@
 				9E6E7BE0245F88D200114DEB /* GameUtils.h */,
 			);
 			path = helper;
-			sourceTree = "<group>";
-		};
-		9E6E7BE4245F88D200114DEB /* debug */ = {
-			isa = PBXGroup;
-			children = (
-				9E6E7BE5245F88D200114DEB /* DebugSidePanelAdditions.h */,
-				9E6E7BE6245F88D200114DEB /* DebugSidePanelAdditions.cpp */,
-			);
-			path = debug;
 			sourceTree = "<group>";
 		};
 		9E6E8515245F895C00114DEB /* oxygenengine */ = {
@@ -3066,7 +3051,6 @@
 				9E0C5F3F247DDFE0000105D0 /* VertexArrayObject.cpp in Sources */,
 				9E7E28D925EF21370021AE3A /* ZipFileProvider.cpp in Sources */,
 				9E0C5F0C247DDF96000105D0 /* Token.cpp in Sources */,
-				9E0C5EF8247DD819000105D0 /* DebugSidePanelAdditions.cpp in Sources */,
 				9E0C5F1F247DDFC9000105D0 /* OutputStream.cpp in Sources */,
 				9E0C5EE7247DD7D7000105D0 /* TimeAttackResultsMenu.cpp in Sources */,
 				9E0C5EBC247DD723000105D0 /* SpriteManager.cpp in Sources */,
@@ -3208,7 +3192,6 @@
 			files = (
 				9E1D5F5F2475733F003B1774 /* Preprocessor.cpp in Sources */,
 				9E7E291225EF26AF0021AE3A /* unzip.c in Sources */,
-				9E1D5F602475733F003B1774 /* DebugSidePanelAdditions.cpp in Sources */,
 				9E265016254B0A4D0000A100 /* core.cpp in Sources */,
 				9E1D5F612475733F003B1774 /* BitmapCodecBMP.cpp in Sources */,
 				9E1D5F622475733F003B1774 /* AudioPlayer.cpp in Sources */,
@@ -3456,7 +3439,6 @@
 			files = (
 				9E6E7B93245F886B00114DEB /* Preprocessor.cpp in Sources */,
 				9E7E291125EF26AF0021AE3A /* unzip.c in Sources */,
-				9E6E80C7245F88D400114DEB /* DebugSidePanelAdditions.cpp in Sources */,
 				9E265015254B0A4D0000A100 /* core.cpp in Sources */,
 				9E6E7B2C245F882600114DEB /* BitmapCodecBMP.cpp in Sources */,
 				9E6E8634245F89C400114DEB /* AudioPlayer.cpp in Sources */,
