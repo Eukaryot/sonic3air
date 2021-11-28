@@ -125,6 +125,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 
 		// Read definition from JSON
 		AudioDefinition::Type type = AudioDefinition::Type::SOUND;
+		std::string displayName;
 		WString audioFilename;
 		uint32 sourceAddress = 0;
 		uint32 contentOffset = 0;
@@ -139,7 +140,11 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			const std::string key = it.key().asString();
 			const std::string value = it->asString();
 
-			if (key == "Type")
+			if (key == "Name")
+			{
+				displayName = value;
+			}
+			else if (key == "Type")
 			{
 				if (value == "Music")
 				{
@@ -223,6 +228,10 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		{
 			// Definition already exists, ignore the properties that are not specifying the source
 		}
+
+		// Set or overwrite values in audio definition
+		if (!displayName.empty())
+			audioDefinition->mDisplayName = displayName;
 
 		// Add audio source
 		SourceRegistration& sourceRegistration = vectorAdd(audioDefinition->mSources);

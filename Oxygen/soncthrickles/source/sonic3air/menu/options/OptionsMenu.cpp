@@ -1215,6 +1215,13 @@ void OptionsMenu::render()
 						drawer.printText(font, Recti(center - arrowDistance, py, 0, 10), "<", 5, color);
 					if (canGoRight)
 						drawer.printText(font, Recti(center + arrowDistance, py, 0, 10), ">", 5, color);
+
+					// Additional test for sound test
+					if (entry.mData == option::SOUND_TEST)
+					{
+						py += 13;
+						drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), mSoundTestAudioDefinitions[entry.selected().mValue]->mDisplayName, 5, color);
+					}
 				}
 
 				if (isSelected)

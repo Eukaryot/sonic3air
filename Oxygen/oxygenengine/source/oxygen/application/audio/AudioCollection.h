@@ -60,6 +60,7 @@ public:
 
 		uint64 mKeyId = 0;
 		std::string mKeyString;
+		std::string mDisplayName;
 		Type mType = Type::SOUND;
 		uint8 mChannel = 0xff;
 
