@@ -167,12 +167,12 @@ void EngineMain::switchToRenderMethod(Configuration::RenderMethod newRenderMetho
 	VideoOut::instance().createRenderer(true);
 }
 
-void EngineMain::setVSyncMode(int mode)
+void EngineMain::setVSyncMode(Configuration::FrameSyncType frameSyncMode)
 {
 	Configuration& config = Configuration::instance();
 	if ((config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL) || (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT))
 	{
-		if (mode >= 1)
+		if (frameSyncMode >= Configuration::FrameSyncType::VSYNC_ON)
 		{
 			// First try adaptive V-Sync; if that's not supported, use regular V-Sync
 			if (SDL_GL_SetSwapInterval(-1) < 0)
@@ -499,7 +499,7 @@ bool EngineMain::createWindow()
 	videoConfig.resizeable = true;
 	videoConfig.autoclearscreen = useOpenGL;
 	videoConfig.autoswapbuffers = false;
-	videoConfig.vsync = (config.mFrameSync >= 1);
+	videoConfig.vsync = (config.mFrameSync >= Configuration::FrameSyncType::VSYNC_ON);
 	videoConfig.iconResource = appMetaData.mWindowsIconResource;
 
 	SDL_SetHint(SDL_HINT_RENDER_VSYNC, videoConfig.vsync ? "1" : "0");

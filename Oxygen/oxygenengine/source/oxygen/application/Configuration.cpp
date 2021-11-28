@@ -318,12 +318,9 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		// Graphics
 		tryReadRenderMethod(rootHelper, mFailSafeMode, mRenderMethod, mAutoDetectRenderMethod);
 
-		int windowMode = 0;
-		rootHelper.tryReadInt("Fullscreen", windowMode);
-		mWindowMode = (WindowMode)windowMode;
-
+		rootHelper.tryReadAsInt("Fullscreen", mWindowMode);
 		rootHelper.tryReadInt("DisplayIndex", mDisplayIndex);
-		rootHelper.tryReadInt("FrameSync", mFrameSync);
+		rootHelper.tryReadAsInt("FrameSync", mFrameSync);
 		rootHelper.tryReadInt("Upscaling", mUpscaling);
 		rootHelper.tryReadInt("Backdrop", mBackdrop);
 		rootHelper.tryReadInt("Filtering", mFiltering);
@@ -430,7 +427,7 @@ void Configuration::saveSettings()
 		// Graphics
 		root["Fullscreen"] = (int)mWindowMode;
 		root["DisplayIndex"] = mDisplayIndex;
-		root["FrameSync"] = mFrameSync;
+		root["FrameSync"] = (int)mFrameSync;
 		root["Upscaling"] = mUpscaling;
 		root["Backdrop"] = mBackdrop;
 		root["Filtering"] = mFiltering;

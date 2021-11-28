@@ -240,12 +240,12 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 					case 'h':
 					{
-						int& frameSync = Configuration::instance().mFrameSync;
-						frameSync = (frameSync + 1) % 3;
+						Configuration::FrameSyncType& frameSync = Configuration::instance().mFrameSync;
+						frameSync = Configuration::FrameSyncType(((int)frameSync + 1) % (int)Configuration::FrameSyncType::_NUM);
 						EngineMain::instance().setVSyncMode(frameSync);
 
-						static const std::string FRAME_SYNC_NAME[] = { "V-Sync Off", "VSync On", "V-Sync + FPS Cap" };
-						setLogDisplay("Frame Sync: " + FRAME_SYNC_NAME[frameSync]);
+						static const std::string FRAME_SYNC_NAME[(int)Configuration::FrameSyncType::_NUM] = { "V-Sync Off", "VSync On", "V-Sync + FPS Cap", "Frame Interpolation" };
+						setLogDisplay("Frame Sync: " + FRAME_SYNC_NAME[(int)frameSync]);
 						break;
 					}
 				}

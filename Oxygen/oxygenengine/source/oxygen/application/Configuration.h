@@ -32,6 +32,15 @@ public:
 		EXCLUSIVE_FULLSCREEN
 	};
 
+	enum class FrameSyncType
+	{
+		VSYNC_OFF,
+		VSYNC_ON,
+		VSYNC_FRAMECAP,
+		FRAME_INTERPOLATION,
+		_NUM
+	};
+
 	struct VirtualGamepad
 	{
 		float mOpacity = 0.8f;
@@ -126,7 +135,7 @@ public:
 	int   mDisplayIndex = 0;
 	RenderMethod mRenderMethod = RenderMethod::UNDEFINED;
 	bool  mAutoDetectRenderMethod = true;
-	int   mFrameSync = 1;				// 0: V-Sync off, 1: V-Sync On, 2: V-Sync + Framecap
+	FrameSyncType mFrameSync = FrameSyncType::VSYNC_ON;
 	int   mUpscaling = 0;
 	int   mBackdrop = 0;
 	int   mFiltering = 0;

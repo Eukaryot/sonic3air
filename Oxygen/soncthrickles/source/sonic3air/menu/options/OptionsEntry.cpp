@@ -68,6 +68,14 @@ void OptionEntry::loadValue()
 			break;
 		}
 
+		case OptionEntry::Type::CONFIG_ENUM_8:
+		{
+			uint8* ptr = reinterpret_cast<uint8*>(mValuePointer);
+			const uint32 value = (uint32)*ptr;
+			mGameMenuEntry->setSelectedIndexByValue(value);
+			break;
+		}
+
 		case OptionEntry::Type::CONFIG_PERCENT:
 		{
 			float* ptr = reinterpret_cast<float*>(mValuePointer);
@@ -126,6 +134,13 @@ void OptionEntry::applyValue()
 		{
 			int* ptr = reinterpret_cast<int*>(mValuePointer);
 			*ptr = (int)value;
+			break;
+		}
+
+		case OptionEntry::Type::CONFIG_ENUM_8:
+		{
+			uint8* ptr = reinterpret_cast<uint8*>(mValuePointer);
+			*ptr = (uint8)value;
 			break;
 		}
 

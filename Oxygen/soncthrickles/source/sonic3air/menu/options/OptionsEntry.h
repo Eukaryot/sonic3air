@@ -126,6 +126,7 @@ public:
 		SETTING,			// Bound to a setting in SharedDatabase
 		SETTING_BITMASK,	// Same as above, but treat values as bitmasks
 		CONFIG_INT,			// Bound to an int value
+		CONFIG_ENUM_8,		// Bound to an enum value with uint8 size
 		CONFIG_PERCENT,		// Bound to a float value in 0.0f...1.0f represented by percent values 0...100 in the game menu entry
 		MOD_SETTING			// Bound to a mod setting
 	};

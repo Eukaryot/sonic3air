@@ -532,7 +532,7 @@ void Application::render()
 
 		const double currentTime = mApplicationTimer.getSecondsSinceStart() * 1000.0;
 		const double tickLengthMilliseconds = 1000.0 / (double)mSimulation->getSimulationFrequency();
-		const bool usingFramecap = (drawer.getType() != Drawer::Type::OPENGL || Configuration::instance().mFrameSync != 1);
+		const bool usingFramecap = (drawer.getType() != Drawer::Type::OPENGL || Configuration::instance().mFrameSync != Configuration::FrameSyncType::VSYNC_ON) && (Configuration::instance().mFrameSync != Configuration::FrameSyncType::FRAME_INTERPOLATION);
 		if (usingFramecap)
 		{
 			double delay = mNextRefreshTime - currentTime;

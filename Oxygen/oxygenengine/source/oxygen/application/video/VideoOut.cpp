@@ -169,10 +169,7 @@ void VideoOut::setInterFramePosition(float position)
 
 bool VideoOut::updateGameScreen()
 {
-	#if 0
-		// This is highly experimental stuff
-		mUsingFrameInterpolation = FTX::keyState(SDLK_LCTRL);
-	#endif
+	mUsingFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
 
 	// Only render something if a frame simulation was completed in the meantime
 	const bool hasNewSimulationFrame = (mFrameState == FrameState::FRAME_READY);

@@ -48,7 +48,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		ConfigurationImpl& config = ConfigurationImpl::instance();
 
-		setupOptionEntryInt(option::FRAME_SYNC,					&config.mFrameSync);
+		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
+
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
 		setupOptionEntryInt(option::FILTERING,					&config.mFiltering);
@@ -912,7 +913,7 @@ void OptionsMenu::update(float timeElapsed)
 								}
 								if (selectedData == option::FRAME_SYNC)
 								{
-									EngineMain::instance().setVSyncMode(selectedEntry.selected().mValue);
+									EngineMain::instance().setVSyncMode((Configuration::FrameSyncType)selectedEntry.selected().mValue);
 								}
 							}
 							break;
@@ -1317,6 +1318,14 @@ void OptionsMenu::setupOptionEntryInt(option::Option optionId, int* valuePointer
 	OptionEntry& optionEntry = mOptionEntries[optionId];
 	optionEntry.mOptionId = optionId;
 	optionEntry.mType = OptionEntry::Type::CONFIG_INT;
+	optionEntry.mValuePointer = valuePointer;
+}
+
+void OptionsMenu::setupOptionEntryEnum8(option::Option optionId, void* valuePointer)
+{
+	OptionEntry& optionEntry = mOptionEntries[optionId];
+	optionEntry.mOptionId = optionId;
+	optionEntry.mType = OptionEntry::Type::CONFIG_ENUM_8;
 	optionEntry.mValuePointer = valuePointer;
 }
 

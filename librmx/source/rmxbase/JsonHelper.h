@@ -31,6 +31,18 @@ namespace rmx
 		bool tryReadFloat(const std::string& key, float& output);
 		bool tryReadStringArray(const std::string& key, std::vector<std::string>& output);
 
+		template<typename T>
+		bool tryReadAsInt(const std::string& key, T& output)
+		{
+			int value = 0;
+			if (tryReadInt(key, value))
+			{
+				output = static_cast<T>(value);
+				return true;
+			}
+			return false;
+		}
+
 	public:
 		const Json::Value& mJson;
 	};

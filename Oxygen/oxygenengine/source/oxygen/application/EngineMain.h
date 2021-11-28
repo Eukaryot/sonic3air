@@ -102,7 +102,7 @@ public:
 
 	uint32 getPlatformFlags() const;
 	void switchToRenderMethod(Configuration::RenderMethod newRenderMethod);
-	void setVSyncMode(int mode);
+	void setVSyncMode(Configuration::FrameSyncType frameSyncMode);
 
 private:
 	bool startupEngine();
