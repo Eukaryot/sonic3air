@@ -125,6 +125,7 @@ function void UpdateLevelDisplay()
 		D7.u16 = 0xc000		// Plane A (foreground) name table base
 
 		// Calls a "UpdateLevelTiles" variant
+		//  -> The naming is not really correct for what these functions do (skdisasm calls it "ScreenEvent")
 		A1 = u32[0x04e468 + offset]
 		call A1
 	}
@@ -138,6 +139,7 @@ function void UpdateLevelDisplay()
 		D7.u16 = 0xe000		// Plane B (background) name table base
 
 		// Calls a "UpdateLevelScrolling" variant
+		//  -> The naming is not really correct for what these functions do (skdisasm calls it "BackgroundEvent")
 		A1 = u32[0x04e46c + offset]
 		call A1
 	}
@@ -700,13 +702,17 @@ function void fn04f0de()
 	// This function writes scroll offsets
 	//  - Destination is A1, which is usually 0xffffe000 here
 
+	// For the plane A scroll offsets (in the upper 16 bits of each u32 of the destination at A1), use the input in D3.s16
+	//  -> These scroll offsets are going to be the same for all lines in this routine
+	D3 = (-D3.s16) << 16
+
 	bool flag = false
 	while (true)
 	{
-		D2.u16 = u16[(A4+=2)-2]
+		D2.u16 = u16[A4]
+		A4 += 2
 		flag = (D2.u16 & 0x8000) != 0
 		D2.u16 &= 0x7fff
-
 		D0.s16 -= D2.u16
 		if (D0.s16 < 0)
 			break
@@ -719,39 +725,40 @@ function void fn04f0de()
 
 	if (flag)
 	{
-		D2.u16 += D0.u16
-		A5.u16 += D2.u16 * 2
+		D2.s16 += D0.s16
+		A5.u16 += D2.s16 * 2
 	}
 
 	D0.s16 = -D0.s16
 	D2.u16 = D1.u16 - D0.u16
-	if (D2.s16 < 0)
-	{
-		D0.u16 = D1.u16 + 1
-	}
+	if (D2.s16 >= 0)
+		--D0.u16
+	else
+		D0.u16 = D1.u16
 
-	D3 = (-D3.s16) << 16
-	--D0.u16
-
+	// Then go through all lines: Calculate the plane B scroll offset (in the lower 16 bits) and assign the combined value
 	while (true)
 	{
 		if (flag)
 		{
-			while (D0.s16 >= 0)
+			// Copy over some plane B scroll offsets from A5 (and negate them in the process)
+			for (; D0.s16 >= 0; --D0.s16)
 			{
-				D3.s16 = -s16[(A5+=2)-2]
+				D3.s16 = -s16[A5]
+				A5 += 2
 				u32[A1] = D3
 				A1 += 4
-				--D0.s16
 			}
 		}
 		else
 		{
-			D3.s16 = -s16[(A5+=2)-2]
+			// Assign the same plane B scroll offset value multiple times (negated, again)
+			D3.s16 = -s16[A5]
+			A5 += 2
 
 		#if STANDALONE
 			// Screen extend needed for Knuckles' good ending outro, and only there
-			//  -> This here would break e.g. the earthquake section in MGZ 2
+			//  -> If done in general, this here would break e.g. the earthquake section in MGZ 2
 			if (global.zone_act == 0x0a01)
 				D3.s16 += getScreenExtend()
 		#endif
@@ -767,11 +774,12 @@ function void fn04f0de()
 		if (D2.s16 < 0)
 			break
 
-		D0.u16 = u16[(A4+=2)-2]
+		D0.u16 = u16[A4]
+		A4 += 2
 		flag = (D0.u16 & 0x8000) != 0
 		D0.u16 &= 0x7fff
 		D3.u16 = D2.u16
-		D2.u16 -= D0.u16
+		D2.s16 -= D0.s16
 		if (D2.s16 >= 0)
 			--D0.u16
 		else
