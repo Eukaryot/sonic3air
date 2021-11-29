@@ -394,6 +394,9 @@
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp">
       <Filter>application\input</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -730,60 +733,66 @@
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderPartsDefinitions.h">
       <Filter>rendering\parts</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\SpacesManager.h">
+      <Filter>rendering\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h">
+      <Filter>resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\data\shader\debugdraw_plane.shader">
+    <None Include="..\..\data\shader\debugdraw_plane.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\postfx_blur.shader">
+    <None Include="..\..\data\shader\postfx_blur.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_plane.shader">
+    <None Include="..\..\data\shader\render_plane.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_sprite_component.shader">
+    <None Include="..\..\data\shader\render_sprite_component.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_sprite_palette.shader">
+    <None Include="..\..\data\shader\render_sprite_palette.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\render_sprite_vdp.shader">
+    <None Include="..\..\data\shader\render_sprite_vdp.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_copy_screen.shader">
+    <None Include="..\..\data\shader\simple_copy_screen.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_colored.shader">
+    <None Include="..\..\data\shader\simple_rect_colored.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_depthwrite.shader">
+    <None Include="..\..\data\shader\simple_rect_depthwrite.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_overdraw.shader">
+    <None Include="..\..\data\shader\simple_rect_overdraw.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_textured.shader">
+    <None Include="..\..\data\shader\simple_rect_textured.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_textured_uv.shader">
+    <None Include="..\..\data\shader\simple_rect_textured_uv.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\simple_rect_vertexcolor.shader">
+    <None Include="..\..\data\shader\simple_rect_vertexcolor.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_hqx.shader">
+    <None Include="..\..\data\shader\upscaler_hqx.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_soft.shader">
+    <None Include="..\..\data\shader\upscaler_soft.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_xbrz-freescale-pass0.shader">
+    <None Include="..\..\data\shader\upscaler_xbrz-freescale-pass0.shader">
       <Filter>_shader</Filter>
     </None>
-    <None Include="..\data\shader\upscaler_xbrz-freescale-pass1.shader">
+    <None Include="..\..\data\shader\upscaler_xbrz-freescale-pass1.shader">
       <Filter>_shader</Filter>
     </None>
   </ItemGroup>

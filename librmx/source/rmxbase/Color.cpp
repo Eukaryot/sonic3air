@@ -37,6 +37,14 @@ uint32 Color::getRGBA32() const
 		 + ((uint32)(::saturate(a) * 255));
 }
 
+uint32 Color::getARGB32() const
+{
+	return ((uint32)(::saturate(r) * 255) << 16)
+		 + ((uint32)(::saturate(g) * 255) << 8)
+		 + ((uint32)(::saturate(b) * 255))
+		 + ((uint32)(::saturate(a) * 255) << 24);
+}
+
 uint32 Color::getABGR32() const
 {
 	return ((uint32)(::saturate(r) * 255))
@@ -45,12 +53,30 @@ uint32 Color::getABGR32() const
 		 + ((uint32)(::saturate(a) * 255) << 24);
 }
 
+void Color::setByEncoding(uint32 color, Encoding encoding)
+{
+	switch (encoding)
+	{
+		case Encoding::RGBA_32:  setRGBA32(color);  break;
+		case Encoding::ARGB_32:  setARGB32(color);  break;
+		case Encoding::ABGR_32:  setABGR32(color);  break;
+	}
+}
+
 void Color::setRGBA32(uint32 colorRGBA)
 {
 	r = (float)((colorRGBA >> 24) & 0xff) / 255.0f;
 	g = (float)((colorRGBA >> 16) & 0xff) / 255.0f;
 	b = (float)((colorRGBA >> 8)  & 0xff) / 255.0f;
 	a = (float)((colorRGBA)       & 0xff) / 255.0f;
+}
+
+void Color::setARGB32(uint32 colorARGB)
+{
+	r = (float)((colorARGB >> 16) & 0xff) / 255.0f;
+	g = (float)((colorARGB >> 8)  & 0xff) / 255.0f;
+	b = (float)((colorARGB)       & 0xff) / 255.0f;
+	a = (float)((colorARGB >> 24) & 0xff) / 255.0f;
 }
 
 void Color::setABGR32(uint32 colorABGR)

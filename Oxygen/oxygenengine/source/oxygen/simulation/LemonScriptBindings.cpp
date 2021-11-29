@@ -988,7 +988,7 @@ namespace
 	void setWorldSpaceOffset(int32 px, int32 py)
 	{
 		// Note that this is needed for world space sprite masking, not only debug drawing
-		RenderParts::instance().getSpriteManager().setWorldSpaceOffset(Vec2i(px, py));
+		RenderParts::instance().getSpacesManager().setWorldSpaceOffset(Vec2i(px, py));
 	}
 
 	void debugDrawRect(int32 px, int32 py, int32 sx, int32 sy)
@@ -1000,6 +1000,16 @@ namespace
 	{
 		const Color rgba(((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, (color & 0xff) / 255.0f, ((color >> 24) & 0xff) / 255.0f);
 		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, sx, sy), rgba);
+	}
+
+	void drawText(uint64 fontKey, int32 px, int32 py, uint64 text, uint32 color, int8 alignment, uint16 renderQueue, bool useWorldSpace)
+	{
+		const std::string* fontKeyString = detail::tryResolveString(fontKey);
+		const std::string* textString = detail::tryResolveString(text);
+		if (nullptr != fontKeyString && nullptr != textString)
+		{
+			RenderParts::instance().getOverlayManager().addText(*fontKeyString, fontKey, Vec2i(px, py), *textString, text, Color::fromABGR32(color), (int)alignment, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
+		}
 	}
 
 
@@ -1694,6 +1704,21 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "addedG")
 			.setParameterInfo(5, "addedB");
 
+		// Debug draw rects & texts
+		module.addUserDefinedFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags);
+		module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect), defaultFlags);
+		module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect2), defaultFlags);
+
+		module.addUserDefinedFunction("Renderer.drawText", lemon::wrap(&drawText), defaultFlags)
+			.setParameterInfo(0, "fontKey")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "text")
+			.setParameterInfo(4, "color")
+			.setParameterInfo(5, "alignment")
+			.setParameterInfo(6, "renderQueue")
+			.setParameterInfo(7, "useWorldSpace");
+
 
 		// Audio
 		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
@@ -1753,13 +1778,6 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog), defaultFlags);
 		module.addUserDefinedFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags);
-
-		// Debug draw
-		{
-			module.addUserDefinedFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags);
-			module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect), defaultFlags);
-			module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect2), defaultFlags);
-		}
 
 		// Debug keys
 		for (int i = 0; i < 10; ++i)

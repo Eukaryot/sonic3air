@@ -79,7 +79,7 @@ DebugSidePanel::~DebugSidePanel()
 
 void DebugSidePanel::initialize()
 {
-	mSmallFont.load("data/font/freefont_sampled.json", 0.0f);
+	mSmallFont.loadFromFile("data/font/freefont_sampled.json");
 	mSmallFont.setShadow(true, Vec2f(1.0f, 1.0f), 0.0f);
 }
 

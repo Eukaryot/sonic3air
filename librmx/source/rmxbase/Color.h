@@ -23,9 +23,17 @@ public:
 	static const Color MAGENTA;
 	static const Color TRANSPARENT;
 
+	enum class Encoding
+	{
+		RGBA_32,
+		ARGB_32,
+		ABGR_32
+	};
+
 public:
-	inline static Color fromRGBA32(uint32 colorRGBA)  { return Color(colorRGBA); }
-	inline static Color fromABGR32(uint32 colorABGR)  { return Color(colorABGR, true); }
+	inline static Color fromRGBA32(uint32 colorRGBA)  { return Color(colorRGBA, Encoding::RGBA_32); }
+	inline static Color fromARGB32(uint32 colorARGB)  { return Color(colorARGB, Encoding::ARGB_32); }
+	inline static Color fromABGR32(uint32 colorABGR)  { return Color(colorABGR, Encoding::ABGR_32); }
 
 	static Color interpolateColor(const Color& c0, const Color& c1, float factor);
 
@@ -33,13 +41,18 @@ public:
 	inline Color() {}
 	inline Color(const Vec4f& vec) : Vec4f(vec) {}
 	inline Color(float r_, float g_, float b_, float a_ = 1.0f) : Vec4f(r_, g_, b_, a_) {}
+	Color(uint32 color, Encoding encoding) : Vec4f(true)  { setByEncoding(color, encoding); }
 
 	inline void set(const Color& color) { r = color.r; g = color.g; b = color.b; a = color.a; }
 	inline void set(float r_, float g_, float b_, float a_ = 1.0f) { r = r_; g = g_; b = b_; a = a_; }
 
 	uint32 getRGBA32() const;			// R is the highest 8 bits, A is the lowest 8 bits
+	uint32 getARGB32() const;			// A is the highest 8 bits, G is the lowest 8 bits
 	uint32 getABGR32() const;			// A is the highest 8 bits, R is the lowest 8 bits
+
+	void setByEncoding(uint32 color, Encoding encoding);
 	void setRGBA32(uint32 colorRGBA);	// R is the highest 8 bits, A is the lowest 8 bits
+	void setARGB32(uint32 colorARGB);	// A is the highest 8 bits, B is the lowest 8 bits
 	void setABGR32(uint32 colorABGR);	// A is the highest 8 bits, R is the lowest 8 bits
 
 	inline void setGray(float gray, float alpha = 1.0f) { r = gray; g = gray; b = gray; a = alpha; }
@@ -64,6 +77,5 @@ public:
 	const Color& operator*=(float factor);
 
 private:
-	inline explicit Color(uint32 colorRGBA) : Vec4f(true)	  { setRGBA32(colorRGBA); }
-	inline Color(uint32 colorABGR, bool dummy) : Vec4f(true)  { setABGR32(colorABGR); }
+	inline explicit Color(uint32 colorRGBA) : Vec4f(true)  { setRGBA32(colorRGBA); }
 };

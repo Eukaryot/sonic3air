@@ -102,12 +102,12 @@ public:
 	};
 
 public:
-	Font();
+	inline Font() {}
 	Font(const String& filename, float size);
-	Font(float size);
+	explicit Font(float size);
 	~Font();
 
-	void load(const String& filename, float size);
+	bool loadFromFile(const String& filename, float size = 0.0f);
 	void setSize(float size);
 	void setShadow(bool enable, const Vec2f offset = Vec2f(1,1), float blur = 1.0f, float alpha = 1.0f);
 	void addFontProcessor(FontProcessor& processor);
@@ -129,15 +129,18 @@ public:
 	void print(int x, int y, int w, int h, const StringReader& text, int alignment = 1);
 	void print(const Rectf& rect, const StringReader& text, int alignment = 1);
 
-	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& rect, const StringReader& text, int alignment = 1, int spacing = 0);
+	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment = 1, int spacing = 0);
+	void printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing = 0);
+
+	static Vec2i applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment);
 
 private:
-	void rebuildFontSource();
+	bool rebuildFontSource();
 
 private:
 	FontSource* mFontSource = nullptr;
 	FontKey mKey;
-	float mAdvance;
+	float mAdvance = 0.0f;
 
 public:
 	struct API_EXPORT CodecList

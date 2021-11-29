@@ -145,6 +145,9 @@ public:
 
 	TRect operator+(const Vec2<TYPE>& vec) const { return TRect(x + vec.x, y + vec.y, width, height); }
 	TRect operator-(const Vec2<TYPE>& vec) const { return TRect(x - vec.x, y - vec.y, width, height); }
+
+	TRect& operator+=(const Vec2<TYPE>& vec)  { x += vec.x; y += vec.y; return *this; }
+	TRect& operator-=(const Vec2<TYPE>& vec)  { x -= vec.x; y -= vec.y; return *this; }
 };
 
 

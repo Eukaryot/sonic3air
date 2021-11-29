@@ -298,13 +298,26 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 		case Geometry::Type::RECT:
 		{
 			const RectGeometry& rg = static_cast<const RectGeometry&>(geometry);
-			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
-			BitmapWrapper gameScreenWrapper(gameScreenBitmap);
+			BitmapWrapper gameScreenWrapper(mGameScreenTexture.accessBitmap());
 
 			Blitter::Options options;
 			options.mUseAlphaBlending = true;
 
 			Blitter::blitColor(gameScreenWrapper, rg.mRect, rg.mColor, options);
+			break;
+		}
+
+		case Geometry::Type::TEXTURED_RECT:
+		{
+			const TexturedRectGeometry& tg = static_cast<const TexturedRectGeometry&>(geometry);
+			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
+			BitmapWrapper gameScreenWrapper(gameScreenBitmap);
+			BitmapWrapper inputWrapper(tg.mDrawerTexture.accessBitmap());
+
+			Blitter::Options options;
+			options.mUseAlphaBlending = true;
+
+			Blitter::blitBitmap(gameScreenWrapper, tg.mRect.getPos(), inputWrapper, Recti(0, 0, tg.mRect.width, tg.mRect.height), options);
 			break;
 		}
 

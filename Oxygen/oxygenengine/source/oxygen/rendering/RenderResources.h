@@ -9,6 +9,7 @@
 #pragma once
 
 #include <rmxmedia.h>
+#include "oxygen/resources/PrintedTextCache.h"
 #include "oxygen/resources/SpriteCache.h"
 
 
@@ -18,5 +19,6 @@ public:
 	void loadSpriteCache(bool fullReload = false);
 
 public:
+	PrintedTextCache mPrintedTextCache;
 	SpriteCache mSpriteCache;
 };

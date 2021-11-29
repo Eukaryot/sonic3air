@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "oxygen/rendering/parts/SpacesManager.h"
 #include "oxygen/resources/SpriteCache.h"
 #include "oxygen/helper/Transform2D.h"
 
@@ -17,11 +18,7 @@ class PatternManager;
 class SpriteManager
 {
 public:
-	enum class Space
-	{
-		SCREEN,
-		WORLD
-	};
+	using Space = SpacesManager::Space;
 
 	struct SpriteInfo
 	{
@@ -103,7 +100,7 @@ public:
 	};
 
 public:
-	SpriteManager(PatternManager& patternManager);
+	SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager);
 
 	void reset();
 	void resetSprites();
@@ -124,9 +121,6 @@ public:
 	inline uint16 getSpriteAttributeTableBase() const  { return mSpriteAttributeTableBase; }
 	inline void setSpriteAttributeTableBase(uint16 vramAddress)  { mSpriteAttributeTableBase = vramAddress; }
 
-	const Vec2i& getWorldSpaceOffset() const  { return mWorldSpaceOffset; }
-	void setWorldSpaceOffset(const Vec2i& offset);
-
 public:
 	bool mLegacyVdpSpriteMode = false;
 
@@ -135,10 +129,10 @@ private:
 
 private:
 	PatternManager& mPatternManager;
+	SpacesManager& mSpacesManager;
 
 	bool mResetSprites = false;
 	Space mLogicalSpriteSpace = Space::SCREEN;
-	Vec2i mWorldSpaceOffset;
 
 	struct SpriteSets
 	{

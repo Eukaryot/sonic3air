@@ -14,7 +14,7 @@
 RenderParts::RenderParts() :
 	mPlaneManager(mPatternManager),
 	mScrollOffsetsManager(mPlaneManager),
-	mSpriteManager(mPatternManager)
+	mSpriteManager(mPatternManager, mSpacesManager)
 {
 	for (int i = 0; i < 8; ++i)
 		mLayerRendering[i] = true;

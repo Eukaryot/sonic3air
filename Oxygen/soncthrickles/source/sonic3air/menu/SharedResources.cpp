@@ -16,6 +16,7 @@
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/PackageFileCrawler.h"
 #include "oxygen/rendering/utils/PaletteBitmap.h"
+#include "oxygen/resources/ResourcesCache.h"
 
 
 namespace
@@ -113,28 +114,36 @@ namespace global
 
 	void loadSharedResources()
 	{
-		mFont3Pure.load("data/font/smallfont.json", 0.0f);
+		ResourcesCache& resourcesCache = ResourcesCache::instance();
+		resourcesCache.registerFontSource("smallfont");
+		resourcesCache.registerFontSource("freefont_pixeled_tiny");
+		resourcesCache.registerFontSource("freefont_pixeled_small");
+		resourcesCache.registerFontSource("sonic3_fontB");
+		resourcesCache.registerFontSource("freefont_pixeled");
+		resourcesCache.registerFontSource("sonic3_fontC");
 
-		mFont3.load("data/font/smallfont.json", 0.0f);
+		mFont3Pure.loadFromFile("data/font/smallfont.json");
+
+		mFont3.loadFromFile("data/font/smallfont.json");
 		mFont3.addFontProcessor(gOutlineFontProcessorTransparent);
 
-		mFont4.load("data/font/freefont_pixeled_tiny.json", 0.0f);
+		mFont4.loadFromFile("data/font/freefont_pixeled_tiny.json");
 		mFont4.addFontProcessor(gOutlineFontProcessor);
 		mFont4.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont5.load("data/font/freefont_pixeled_small.json", 0.0f);
+		mFont5.loadFromFile("data/font/freefont_pixeled_small.json");
 		mFont5.addFontProcessor(gOutlineFontProcessor);
 		mFont5.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont7.load("data/font/sonic3_fontB.json", 0.0f);
+		mFont7.loadFromFile("data/font/sonic3_fontB.json");
 		mFont7.addFontProcessor(gOutlineFontProcessor);
 		mFont7.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont10.load("data/font/freefont_pixeled.json", 0.0f);
+		mFont10.loadFromFile("data/font/freefont_pixeled.json");
 		mFont10.addFontProcessor(gOutlineFontProcessor);
 		mFont10.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont18.load("data/font/sonic3_fontC.json", 0.0f);
+		mFont18.loadFromFile("data/font/sonic3_fontC.json");
 		mFont18.addFontProcessor(gOutlineFontProcessor);
 		mFont18.setShadow(true, Vec2f(1.0f, 0.5f), 0.5f);
 

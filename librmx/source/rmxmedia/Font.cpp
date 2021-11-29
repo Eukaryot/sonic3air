@@ -30,21 +30,14 @@ FontSource* FontSourceBitmapFactory::construct(const FontSourceKey& key)
 }
 
 
-Font::Font()
-{
-	mAdvance = 0.0f;
-}
-
 Font::Font(const String& filename, float size)
 {
-	mAdvance = 0.0f;
-	load(filename, size);
+	loadFromFile(filename, size);
 }
 
 Font::Font(float size)
 {
-	mAdvance = 0.0f;
-	load(nullptr, size);
+	loadFromFile("", size);
 }
 
 Font::~Font()
@@ -52,11 +45,11 @@ Font::~Font()
 	delete mFontSource;
 }
 
-void Font::load(const String& name, float size)
+bool Font::loadFromFile(const String& name, float size)
 {
 	mKey.mName = name;
 	mKey.mSize = size;
-	rebuildFontSource();
+	return rebuildFontSource();
 }
 
 void Font::setSize(float size)
@@ -283,7 +276,14 @@ void Font::print(const Rectf& rect, const StringReader& text, int alignment)
 	FTX::Painter->print(*this, rect, text, alignment);
 }
 
-void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& rect, const StringReader& text, int alignment, int spacing)
+void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment, int spacing)
+{
+	Recti innerRect;
+	printBitmap(outBitmap, innerRect, text, spacing);
+	outDrawPosition = applyAlignment(drawRect, innerRect, alignment);
+}
+
+void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing)
 {
 	// Render text into a bitmap
 	if (nullptr == mFontSource || text.mLength == 0)
@@ -325,46 +325,52 @@ void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& r
 		outBitmap.insertBlend(extendedTypeInfo.mDrawPosition.x - boundsMin.x, extendedTypeInfo.mDrawPosition.y - boundsMin.y, *extendedTypeInfo.mBitmap);
 	}
 
+	// Write inner rect
+	outInnerRect.setPos(boundsMin);
+	outInnerRect.width = 0;
+	for (size_t i = 0; i < text.mLength; ++i)
+	{
+		const FontSource::GlyphInfo* info = mFontSource->getGlyph(text[i]);
+		if (nullptr != info)
+		{
+			outInnerRect.width += info->advance;
+		}
+	}
+	outInnerRect.height = mFontSource->getHeight();
+}
+
+Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment)
+{
 	// Apply alignment
-	outDrawPosition = Vec2i(rect.x, rect.y) + boundsMin;
+	Vec2i outPosition = drawRect.getPos() - innerRect.getPos();
 	const int alignX = (alignment - 1) % 3;
 	const int alignY = (alignment - 1) / 3;
 	if (alignX > 0)
 	{
-		int width = 0;
-		for (size_t i = 0; i < text.mLength; ++i)
-		{
-			const FontSource::GlyphInfo* info = mFontSource->getGlyph(text[i]);
-			if (nullptr != info)
-			{
-				width += info->advance;
-			}
-		}
-
 		if (alignX == 1)
 		{
-			outDrawPosition.x += (rect.width - width) / 2;
+			outPosition.x += (drawRect.width - innerRect.width) / 2;
 		}
 		else
 		{
-			outDrawPosition.x += rect.width - width;
+			outPosition.x += drawRect.width - innerRect.width;
 		}
 	}
 	if (alignY > 0)
 	{
-		const int height = mFontSource->getHeight();
 		if (alignY == 1)
 		{
-			outDrawPosition.y += (rect.height - height) / 2;
+			outPosition.y += (drawRect.height - innerRect.height) / 2;
 		}
 		else
 		{
-			outDrawPosition.y += rect.height - height;
+			outPosition.y += drawRect.height - innerRect.height;
 		}
 	}
+	return outPosition;
 }
 
-void Font::rebuildFontSource()
+bool Font::rebuildFontSource()
 {
 	delete mFontSource;
 	mFontSource = nullptr;
@@ -373,6 +379,7 @@ void Font::rebuildFontSource()
 	{
 		mFontSource = factory->construct(mKey);
 		if (nullptr != mFontSource)
-			return;
+			return true;
 	}
+	return false;
 }

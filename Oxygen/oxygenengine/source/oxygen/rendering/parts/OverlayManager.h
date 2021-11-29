@@ -8,12 +8,14 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "oxygen/rendering/parts/SpacesManager.h"
 
 
 class OverlayManager
 {
 public:
+	using Space = SpacesManager::Space;
+
 	enum class Context
 	{
 		INSIDE_FRAME = 0,	// Rendered during frame simulation
@@ -25,6 +27,21 @@ public:
 	{
 		Recti mRect;
 		Color mColor;
+		Space mSpace = Space::WORLD;
+		Context mContext = Context::OUTSIDE_FRAME;
+	};
+
+	struct Text
+	{
+		std::string mFontKeyString;
+		uint64 mFontKeyHash = 0;
+		Vec2i mPosition;
+		std::string mTextString;
+		uint64 mTextHash = 0;
+		Color mColor;
+		int mAlignment = 1;
+		uint16 mRenderQueue = 0xffff;
+		Space mSpace = Space::WORLD;
 		Context mContext = Context::OUTSIDE_FRAME;
 	};
 
@@ -33,12 +50,16 @@ public:
 	void postFrameUpdate();
 
 	inline const std::vector<DebugDrawRect>& getDebugDrawRects(Context context) const  { return mDebugDrawRects[(int)context]; }
+	inline const std::vector<Text>& getTexts(Context context) const  { return mTexts[(int)context]; }
 
-	void clearDebugDrawRects();
-	void clearDebugDrawRects(Context context);
+	void clear();
+	void clearContext(Context context);
+
 	void addDebugDrawRect(const Recti& rect, const Color& color = Color(1.0f, 0.0f, 1.0f, 0.75f));
+	void addText(const std::string& fontKeyString, uint64 fontKeyHash, const Vec2i& position, const std::string& textString, uint64 textHash, const Color& color, int alignment, uint16 renderQueue, Space space);
 
 private:
 	Context mCurrentContext = Context::OUTSIDE_FRAME;
 	std::vector<DebugDrawRect> mDebugDrawRects[NUM_CONTEXTS];	// One list per context (see "Context" enum)
+	std::vector<Text> mTexts[NUM_CONTEXTS];
 };

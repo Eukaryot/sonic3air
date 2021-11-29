@@ -108,6 +108,7 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderParts.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\RenderPartsDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\ScrollOffsetsManager.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\parts\SpacesManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\SpriteManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\Renderer.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\RenderResources.h" />
@@ -219,6 +221,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteBase.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h" />
@@ -242,23 +245,23 @@
     <ClInclude Include="..\..\source\oxygen\simulation\sound\ym2612.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\data\shader\debugdraw_plane.shader" />
-    <None Include="..\data\shader\postfx_blur.shader" />
-    <None Include="..\data\shader\render_plane.shader" />
-    <None Include="..\data\shader\render_sprite_component.shader" />
-    <None Include="..\data\shader\render_sprite_palette.shader" />
-    <None Include="..\data\shader\render_sprite_vdp.shader" />
-    <None Include="..\data\shader\simple_copy_screen.shader" />
-    <None Include="..\data\shader\simple_rect_colored.shader" />
-    <None Include="..\data\shader\simple_rect_depthwrite.shader" />
-    <None Include="..\data\shader\simple_rect_overdraw.shader" />
-    <None Include="..\data\shader\simple_rect_textured.shader" />
-    <None Include="..\data\shader\simple_rect_textured_uv.shader" />
-    <None Include="..\data\shader\simple_rect_vertexcolor.shader" />
-    <None Include="..\data\shader\upscaler_hqx.shader" />
-    <None Include="..\data\shader\upscaler_soft.shader" />
-    <None Include="..\data\shader\upscaler_xbrz-freescale-pass0.shader" />
-    <None Include="..\data\shader\upscaler_xbrz-freescale-pass1.shader" />
+    <None Include="..\..\data\shader\debugdraw_plane.shader" />
+    <None Include="..\..\data\shader\postfx_blur.shader" />
+    <None Include="..\..\data\shader\render_plane.shader" />
+    <None Include="..\..\data\shader\render_sprite_component.shader" />
+    <None Include="..\..\data\shader\render_sprite_palette.shader" />
+    <None Include="..\..\data\shader\render_sprite_vdp.shader" />
+    <None Include="..\..\data\shader\simple_copy_screen.shader" />
+    <None Include="..\..\data\shader\simple_rect_colored.shader" />
+    <None Include="..\..\data\shader\simple_rect_depthwrite.shader" />
+    <None Include="..\..\data\shader\simple_rect_overdraw.shader" />
+    <None Include="..\..\data\shader\simple_rect_textured.shader" />
+    <None Include="..\..\data\shader\simple_rect_textured_uv.shader" />
+    <None Include="..\..\data\shader\simple_rect_vertexcolor.shader" />
+    <None Include="..\..\data\shader\upscaler_hqx.shader" />
+    <None Include="..\..\data\shader\upscaler_soft.shader" />
+    <None Include="..\..\data\shader\upscaler_xbrz-freescale-pass0.shader" />
+    <None Include="..\..\data\shader\upscaler_xbrz-freescale-pass1.shader" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />

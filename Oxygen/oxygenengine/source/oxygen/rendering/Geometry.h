@@ -20,6 +20,7 @@ public:
 		PLANE,
 		SPRITE,
 		RECT,
+		TEXTURED_RECT,
 		EFFECT_BLUR,
 		VIEWPORT
 	};
@@ -78,6 +79,18 @@ public:
 };
 
 
+class TexturedRectGeometry : public Geometry
+{
+public:
+	inline TexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color) : Geometry(Type::TEXTURED_RECT), mRect(rect), mDrawerTexture(drawerTexture), mColor(color) {}
+
+public:
+	Recti mRect;
+	DrawerTexture& mDrawerTexture;
+	Color mColor;
+};
+
+
 class EffectBlurGeometry : public Geometry
 {
 public:
@@ -116,6 +129,11 @@ public:
 		return mRectGeometryBuffer.createObject(rect, color);
 	}
 
+	TexturedRectGeometry& createTexturedRectGeometry(const Recti& rect, DrawerTexture& drawerTexture, const Color& color)
+	{
+		return mTexturedRectGeometryBuffer.createObject(rect, drawerTexture, color);
+	}
+
 	EffectBlurGeometry& createEffectBlurGeometry(int blurValue)
 	{
 		return mEffectBlurGeometryBuffer.createObject(blurValue);
@@ -130,19 +148,21 @@ public:
 	{
 		switch (geometry.getType())
 		{
-			case Geometry::Type::UNDEFINED:	  break;	// This should never happen anyways
-			case Geometry::Type::PLANE:		  mPlaneGeometryBuffer.destroyObject(static_cast<PlaneGeometry&>(geometry));			break;
-			case Geometry::Type::SPRITE:	  mSpriteGeometryBuffer.destroyObject(static_cast<SpriteGeometry&>(geometry));			break;
-			case Geometry::Type::RECT:		  mRectGeometryBuffer.destroyObject(static_cast<RectGeometry&>(geometry));				break;
-			case Geometry::Type::EFFECT_BLUR: mEffectBlurGeometryBuffer.destroyObject(static_cast<EffectBlurGeometry&>(geometry));	break;
-			case Geometry::Type::VIEWPORT:	  mViewportGeometryBuffer.destroyObject(static_cast<ViewportGeometry&>(geometry));		break;
+			case Geometry::Type::UNDEFINED:		break;	// This should never happen anyways
+			case Geometry::Type::PLANE:			mPlaneGeometryBuffer.destroyObject(static_cast<PlaneGeometry&>(geometry));				 break;
+			case Geometry::Type::SPRITE:		mSpriteGeometryBuffer.destroyObject(static_cast<SpriteGeometry&>(geometry));			 break;
+			case Geometry::Type::RECT:			mRectGeometryBuffer.destroyObject(static_cast<RectGeometry&>(geometry));				 break;
+			case Geometry::Type::TEXTURED_RECT:	mTexturedRectGeometryBuffer.destroyObject(static_cast<TexturedRectGeometry&>(geometry)); break;
+			case Geometry::Type::EFFECT_BLUR:	mEffectBlurGeometryBuffer.destroyObject(static_cast<EffectBlurGeometry&>(geometry));	 break;
+			case Geometry::Type::VIEWPORT:		mViewportGeometryBuffer.destroyObject(static_cast<ViewportGeometry&>(geometry));		 break;
 		}
 	}
 
 private:
-	ObjectPool<PlaneGeometry, 16>	  mPlaneGeometryBuffer;
-	ObjectPool<SpriteGeometry, 64>	  mSpriteGeometryBuffer;
-	ObjectPool<RectGeometry, 64>	  mRectGeometryBuffer;
-	ObjectPool<EffectBlurGeometry, 4> mEffectBlurGeometryBuffer;
-	ObjectPool<ViewportGeometry, 4>	  mViewportGeometryBuffer;
+	ObjectPool<PlaneGeometry, 16>		 mPlaneGeometryBuffer;
+	ObjectPool<SpriteGeometry, 64>		 mSpriteGeometryBuffer;
+	ObjectPool<RectGeometry, 64>		 mRectGeometryBuffer;
+	ObjectPool<TexturedRectGeometry, 64> mTexturedRectGeometryBuffer;
+	ObjectPool<EffectBlurGeometry, 4>	 mEffectBlurGeometryBuffer;
+	ObjectPool<ViewportGeometry, 4>		 mViewportGeometryBuffer;
 };

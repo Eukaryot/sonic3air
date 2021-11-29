@@ -31,8 +31,9 @@ void SpriteManager::SpriteSets::swap(SpriteSets& other)
 }
 
 
-SpriteManager::SpriteManager(PatternManager& patternManager) :
-	mPatternManager(patternManager)
+SpriteManager::SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager) :
+	mPatternManager(patternManager),
+	mSpacesManager(spacesManager)
 {
 	reset();
 }
@@ -151,11 +152,12 @@ void SpriteManager::refresh()
 	std::reverse(mSprites.begin(), mSprites.end());
 
 	// Process coordinates of all sprites
+	const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
 	for (SpriteInfo* sprite : mSprites)
 	{
 		if (sprite->mCoordinatesSpace == SpriteManager::Space::WORLD)
 		{
-			sprite->mPosition -= mWorldSpaceOffset;
+			sprite->mPosition -= worldSpaceOffset;
 		}
 	}
 }
@@ -339,11 +341,6 @@ void SpriteManager::setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& posi
 {
 	mSpriteTag = spriteTag;
 	mTaggedSpritePosition = position;
-}
-
-void SpriteManager::setWorldSpaceOffset(const Vec2i& offset)
-{
-	mWorldSpaceOffset = offset;
 }
 
 void SpriteManager::checkSpriteTag(SpriteInfo& sprite)

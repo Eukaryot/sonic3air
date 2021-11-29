@@ -17,6 +17,7 @@
 #include "oxygen/rendering/hardware/HardwareRenderer.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
@@ -131,7 +132,7 @@ void VideoOut::setScreenSize(uint32 width, uint32 height)
 
 Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
 {
-	Vec2i offset = mRenderParts->getSpriteManager().getWorldSpaceOffset();
+	Vec2i offset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 	if (mUsingFrameInterpolation)
 	{
 		const Vec2f interpolatedDifference = Vec2f(mLastWorldSpaceOffset - offset) * (1.0f - mInterFramePosition);
@@ -143,7 +144,7 @@ Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
 void VideoOut::preFrameUpdate()
 {
 	mRenderParts->preFrameUpdate();
-	mLastWorldSpaceOffset = mRenderParts->getSpriteManager().getWorldSpaceOffset();
+	mLastWorldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 
 	// Skipped frames without rendering?
 	if (mFrameState == FrameState::FRAME_READY)
@@ -239,6 +240,9 @@ void VideoOut::clearGeometries()
 		mGeometryFactory.destroy(*geometry);
 	}
 	mGeometries.clear();
+
+	// Regularly cleanup old cache items -- it's safe now that no geometry references a texture in there any more
+	RenderResources::instance().mPrintedTextCache.regularCleanup();
 }
 
 void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
@@ -312,6 +316,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	// Add sprite geometries
 	SpriteManager& spriteManager = mRenderParts->getSpriteManager();
 	{
+		const Vec2i worldSpaceOffset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
 		const auto& sprites = spriteManager.getSprites();
 		for (auto spriteIterator = sprites.begin(); spriteIterator != sprites.end(); ++spriteIterator)
 		{
@@ -350,7 +355,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 					else if (sprite.mLogicalSpace == SpriteManager::Space::WORLD)
 					{
 						// Assume sprite is standing still in world space, i.e. moving entirely with camera
-						difference = mLastWorldSpaceOffset - spriteManager.getWorldSpaceOffset();
+						difference = mLastWorldSpaceOffset - worldSpaceOffset;
 					}
 					else
 					{
@@ -407,23 +412,48 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	// Insert debug draw rects
 	{
 		const OverlayManager& overlayManager = RenderParts::instance().getOverlayManager();
+		const Vec2i worldSpaceOffset = getInterpolatedWorldSpaceOffset();
 		for (int i = 0; i < OverlayManager::NUM_CONTEXTS; ++i)
 		{
 			const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = overlayManager.getDebugDrawRects((OverlayManager::Context)i);
-			if (!debugDrawRects.empty())
+			for (const OverlayManager::DebugDrawRect& debugDrawRect : debugDrawRects)
 			{
-				const Vec2i offset = getInterpolatedWorldSpaceOffset();
-				for (const OverlayManager::DebugDrawRect& debugDrawRect : debugDrawRects)
+				// Translate rect
+				Recti screenRect = debugDrawRect.mRect;
+				if (debugDrawRect.mSpace == SpacesManager::Space::WORLD)
 				{
-					// Translate rect
-					Recti screenRect;
-					screenRect.x = debugDrawRect.mRect.x - offset.x;
-					screenRect.y = debugDrawRect.mRect.y - offset.y;
-					screenRect.width = debugDrawRect.mRect.width;
-					screenRect.height = debugDrawRect.mRect.height;
+					screenRect -= worldSpaceOffset;
+				}
 
-					Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, debugDrawRect.mColor);
-					geometry.mRenderQueue = 0xffff;		// Always on top
+				Geometry& geometry = mGeometryFactory.createRectGeometry(screenRect, debugDrawRect.mColor);
+				geometry.mRenderQueue = 0xffff;		// Always on top
+				geometries.push_back(&geometry);
+			}
+
+			const std::vector<OverlayManager::Text>& texts = overlayManager.getTexts((OverlayManager::Context)i);
+			for (const OverlayManager::Text& text : texts)
+			{
+				// Translate position
+				Vec2i screenPosition = text.mPosition;
+				if (text.mSpace == SpacesManager::Space::WORLD)
+				{
+					screenPosition -= worldSpaceOffset;
+				}
+
+				Font* font = ResourcesCache::instance().getFontByKey(text.mFontKeyString, text.mFontKeyHash);
+				if (nullptr != font)
+				{
+					PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
+					PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(text.mFontKeyHash, text.mTextHash);
+					if (nullptr == cacheItem)
+					{
+						cacheItem = &cache.addCacheItem(*font, text.mFontKeyHash, text.mTextString, text.mTextHash);
+					}
+					const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
+					const Recti rect(drawPosition, cacheItem->mTexture.getSize());
+
+					Geometry& geometry = mGeometryFactory.createTexturedRectGeometry(rect, cacheItem->mTexture, text.mColor);
+					geometry.mRenderQueue = text.mRenderQueue;
 					geometries.push_back(&geometry);
 				}
 			}
@@ -450,7 +480,7 @@ void VideoOut::renderGameScreen()
 
 void VideoOut::preRefreshDebugging()
 {
-	mRenderParts->getOverlayManager().clearDebugDrawRects(OverlayManager::Context::OUTSIDE_FRAME);
+	mRenderParts->getOverlayManager().clearContext(OverlayManager::Context::OUTSIDE_FRAME);
 }
 
 void VideoOut::postRefreshDebugging()
