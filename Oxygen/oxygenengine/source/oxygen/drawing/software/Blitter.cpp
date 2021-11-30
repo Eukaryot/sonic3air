@@ -116,7 +116,7 @@ namespace blitterinternal
 			}
 			else
 			{
-				memcpy(dst, src, sourceRect.width * 4);
+				memcpy(dst, src, sourceRect.width * sizeof(uint32));
 			}
 		}
 	}
@@ -163,7 +163,7 @@ namespace blitterinternal
 			if (sourceY == lastSourceY)
 			{
 				// Just copy the content from the last line, as it's the contents again
-				memcpy(destData, lastDestData, destRect.width * 4);
+				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
 			}
 			else
 			{
@@ -204,7 +204,7 @@ namespace blitterinternal
 						}
 						else
 						{
-							memcpy(buffer, sourceData, sourceRect.width * 4);
+							memcpy(buffer, sourceData, sourceRect.width * sizeof(uint32));
 						}
 					}
 
@@ -319,7 +319,7 @@ void Blitter::blitColor(BitmapWrapper& destBitmap, Recti destRect, const Color& 
 		for (int line = 1; line < destRect.height; ++line)
 		{
 			uint32* dst = destBitmap.getPixelPointer(destRect.x, destRect.y + line);
-			memcpy(dst, firstLine, (size_t)destRect.width * 4);
+			memcpy(dst, firstLine, (size_t)destRect.width * sizeof(uint32));
 		}
 	}
 	else if (color.a > 0.0f)

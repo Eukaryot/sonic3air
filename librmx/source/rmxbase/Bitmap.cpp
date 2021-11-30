@@ -51,7 +51,7 @@ void Bitmap::copy(const Bitmap& source)
 		mHeight = source.mHeight;
 		mData = new uint32[mWidth*mHeight];
 	}
-	memcpy(mData, source.mData, mWidth*mHeight*4);
+	memcpy(mData, source.mData, mWidth*mHeight*sizeof(uint32));
 }
 
 void Bitmap::copy(const Bitmap& source, const Recti& rect)
@@ -86,7 +86,7 @@ void Bitmap::copy(void* source, int wid, int hgt)
 	mWidth = wid;
 	mHeight = hgt;
 	mData = new uint32[mWidth*mHeight];
-	memcpy(mData, source, mWidth*mHeight*4);
+	memcpy(mData, source, mWidth*mHeight*sizeof(uint32));
 }
 
 void Bitmap::create(int wid, int hgt)
@@ -120,7 +120,7 @@ void Bitmap::clear(uint32 color)
 	for (int x = 0; x < mWidth; ++x)
 		mData[x] = color;
 	for (int y = 1; y < mHeight; ++y)
-		memcpy(&mData[y*mWidth], mData, mWidth*4);
+		memcpy(&mData[y*mWidth], mData, mWidth*sizeof(uint32));
 }
 
 void Bitmap::clear(const Color& color)
@@ -507,7 +507,7 @@ void Bitmap::mirrorVertical()
 		return;
 	uint32* mData2 = new uint32[mWidth*mHeight];
 	for (int y = 0; y < mHeight; ++y)
-		memcpy(&mData2[y*mWidth], &mData[(mHeight-y-1)*mWidth], mWidth*4);
+		memcpy(&mData2[y*mWidth], &mData[(mHeight-y-1)*mWidth], mWidth*sizeof(uint32));
 	delete[] mData;
 	mData = mData2;
 }
@@ -810,7 +810,7 @@ void Bitmap::privateInit()
 
 inline void Bitmap::memcpyRect(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt)
 {
-	wid *= 4;			// 4 Bytes per pixel
+	wid *= sizeof(uint32);			// 4 Bytes per pixel
 	for (int y = 0; y < hgt; ++y)
 		memcpy(&dst[y*dwid], &src[y*swid], wid);
 }

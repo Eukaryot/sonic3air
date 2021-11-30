@@ -35,7 +35,7 @@
 #include "oxygen/simulation/Simulation.h"
 
 
-static const float MOUSE_HIDE_TIME = 1.0f;	// Seconds until mouse cursor gets hidden after last movement
+constexpr float MOUSE_HIDE_TIME = 1.0f;	// Seconds until mouse cursor gets hidden after last movement
 
 
 Application::Application() :
