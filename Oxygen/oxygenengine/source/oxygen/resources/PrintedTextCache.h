@@ -16,10 +16,20 @@ class Font;
 class PrintedTextCache : public SingleInstance<PrintedTextCache>
 {
 public:
-	struct CacheItem
+	struct Key
 	{
 		uint64 mFontKeyHash = 0;
 		uint64 mTextHash = 0;
+		int8 mSpacing = 0;
+
+		inline Key() {}
+		inline Key(uint64 fontKeyHash, uint64 textHash, int8 spacing) : mFontKeyHash(fontKeyHash), mTextHash(textHash), mSpacing(spacing) {}
+		inline uint64 combined() const  { return mFontKeyHash ^ mTextHash ^ mSpacing; }
+	};
+
+	struct CacheItem
+	{
+		Key mKey;
 		DrawerTexture mTexture;
 		Recti mInnerRect;
 		bool mRecentlyUsed = true;
@@ -30,8 +40,8 @@ public:
 	~PrintedTextCache();
 
 	void clear();
-	CacheItem* getCacheItem(uint64 fontKeyHash, uint64 textHash);
-	CacheItem& addCacheItem(Font& font, uint64 fontKeyHash, const std::string& textString, uint64 textHash);
+	CacheItem* getCacheItem(const Key& key);
+	CacheItem& addCacheItem(const Key& key, Font& font, const std::string& textString);
 
 	void regularCleanup();
 

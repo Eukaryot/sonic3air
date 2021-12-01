@@ -40,6 +40,7 @@ public:
 		uint64 mTextHash = 0;
 		Color mColor;
 		int mAlignment = 1;
+		int mSpacing = 0;
 		uint16 mRenderQueue = 0xffff;
 		Space mSpace = Space::WORLD;
 		Context mContext = Context::OUTSIDE_FRAME;
@@ -56,7 +57,7 @@ public:
 	void clearContext(Context context);
 
 	void addDebugDrawRect(const Recti& rect, const Color& color = Color(1.0f, 0.0f, 1.0f, 0.75f));
-	void addText(const std::string& fontKeyString, uint64 fontKeyHash, const Vec2i& position, const std::string& textString, uint64 textHash, const Color& color, int alignment, uint16 renderQueue, Space space);
+	void addText(const std::string& fontKeyString, uint64 fontKeyHash, const Vec2i& position, const std::string& textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space);
 
 private:
 	Context mCurrentContext = Context::OUTSIDE_FRAME;

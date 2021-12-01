@@ -400,9 +400,10 @@ void HardwareRenderer::renderGeometry(const Geometry& geometry)
 			transform.z = tg.mRect.width / (float)mGameResolution.x * 2.0f;
 			transform.w = tg.mRect.height / (float)mGameResolution.y * 2.0f;
 
-			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(false, false);
+			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(true, false);
 			shader.bind();
 			shader.setParam("Transform", transform);
+			shader.setParam("TintColor", tg.mColor);
 			shader.setTexture("Texture", texture->getTextureHandle(), GL_TEXTURE_2D);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			break;

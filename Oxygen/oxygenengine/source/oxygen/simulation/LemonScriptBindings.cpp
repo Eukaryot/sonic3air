@@ -793,9 +793,9 @@ namespace
 		RenderParts::instance().getSpriteManager().drawVdpSprite(Vec2i(px, py), encodedSize, patternIndex, renderQueue, Color(1.0f, 1.0f, 1.0f, (float)alpha / 255.0f));
 	}
 
-	void Renderer_drawVdpSpriteWithTint(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, uint32 tintColor, uint32 addedColor)
+	void Renderer_drawVdpSpriteTinted(int16 px, int16 py, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, uint32 tintColor, uint32 addedColor)
 	{
-		RenderParts::instance().getSpriteManager().drawVdpSprite(Vec2i(px, py), encodedSize, patternIndex, renderQueue, Color::fromABGR32(tintColor), Color::fromABGR32(addedColor));
+		RenderParts::instance().getSpriteManager().drawVdpSprite(Vec2i(px, py), encodedSize, patternIndex, renderQueue, Color::fromRGBA32(tintColor), Color::fromRGBA32(addedColor));
 	}
 
 	bool Renderer_hasCustomSprite(uint64 key)
@@ -838,16 +838,16 @@ namespace
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color(1.0f, 1.0f, 1.0f, (float)alpha / 255.0f), (float)angle / 128.0f * PI_FLOAT);
 	}
 
-	void Renderer_drawCustomSprite3(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tint, int32 scale)
+	void Renderer_drawCustomSpriteTinted(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scale)
 	{
-		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromABGR32(tint), (float)angle / 128.0f * PI_FLOAT, (float)scale / 65536.0f);
+		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, (float)scale / 65536.0f);
 	}
 
-	void Renderer_drawCustomSpriteWithTransform(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint32 tint, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
+	void Renderer_drawCustomSpriteTransformed(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
 	{
 		Transform2D transformation;
 		transformation.setByMatrix((float)transform11 / 65536.0f, (float)transform12 / 65536.0f, (float)transform21 / 65536.0f, (float)transform22 / 65536.0f);
-		RenderParts::instance().getSpriteManager().drawCustomSpriteWithTransform(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromABGR32(tint), transformation);
+		RenderParts::instance().getSpriteManager().drawCustomSpriteWithTransform(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), transformation);
 	}
 
 	void Renderer_extractCustomSprite(uint64 key, uint64 categoryName, uint8 spriteNumber, uint8 atex)
@@ -998,17 +998,17 @@ namespace
 
 	void debugDrawRect2(int32 px, int32 py, int32 sx, int32 sy, uint32 color)
 	{
-		const Color rgba(((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, (color & 0xff) / 255.0f, ((color >> 24) & 0xff) / 255.0f);
-		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, sx, sy), rgba);
+		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, sx, sy), Color::fromRGBA32(color));
 	}
 
-	void drawText(uint64 fontKey, int32 px, int32 py, uint64 text, uint32 color, int8 alignment, uint16 renderQueue, bool useWorldSpace)
+	void Renderer_drawText(uint64 fontKey, int32 px, int32 py, uint64 text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace)
 	{
+		RMX_CHECK(alignment >= 1 && alignment <= 9, "Invalid alignment " << alignment << " used for drawing text, fallback to alignment = 1", alignment = 1);
 		const std::string* fontKeyString = detail::tryResolveString(fontKey);
 		const std::string* textString = detail::tryResolveString(text);
 		if (nullptr != fontKeyString && nullptr != textString)
 		{
-			RenderParts::instance().getOverlayManager().addText(*fontKeyString, fontKey, Vec2i(px, py), *textString, text, Color::fromABGR32(color), (int)alignment, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
+			RenderParts::instance().getOverlayManager().addText(*fontKeyString, fontKey, Vec2i(px, py), *textString, text, Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
 		}
 	}
 
@@ -1182,7 +1182,7 @@ namespace
 		const std::string* string = detail::tryResolveString(stringHash);
 		if (nullptr != string)
 		{
-			Application::instance().getDebugSidePanel()->addLine(*string, (int)indent, Color::fromABGR32(color));
+			Application::instance().getDebugSidePanel()->addLine(*string, (int)indent, Color::fromRGBA32(color));
 		}
 	}
 
@@ -1566,7 +1566,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "renderQueue")
 			.setParameterInfo(5, "alpha");
 
-		module.addUserDefinedFunction("Renderer.drawVdpSpriteWithTint", lemon::wrap(&Renderer_drawVdpSpriteWithTint), defaultFlags)
+		module.addUserDefinedFunction("Renderer.drawVdpSpriteTinted", lemon::wrap(&Renderer_drawVdpSpriteTinted), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "encodedSize")
@@ -1630,7 +1630,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(6, "angle")
 			.setParameterInfo(7, "alpha");
 
-		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite3), defaultFlags)
+		module.addUserDefinedFunction("Renderer.drawCustomSpriteTinted", lemon::wrap(&Renderer_drawCustomSpriteTinted), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
@@ -1638,17 +1638,17 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "flags")
 			.setParameterInfo(5, "renderQueue")
 			.setParameterInfo(6, "angle")
-			.setParameterInfo(7, "tint")
+			.setParameterInfo(7, "tintColor")
 			.setParameterInfo(8, "scale");
 
-		module.addUserDefinedFunction("Renderer.drawCustomSpriteWithTransform", lemon::wrap(&Renderer_drawCustomSpriteWithTransform), defaultFlags)
+		module.addUserDefinedFunction("Renderer.drawCustomSpriteTransformed", lemon::wrap(&Renderer_drawCustomSpriteTransformed), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
 			.setParameterInfo(3, "atex")
 			.setParameterInfo(4, "flags")
 			.setParameterInfo(5, "renderQueue")
-			.setParameterInfo(6, "tint")
+			.setParameterInfo(6, "tintColor")
 			.setParameterInfo(7, "transform11")
 			.setParameterInfo(8, "transform12")
 			.setParameterInfo(9, "transform21")
@@ -1709,15 +1709,16 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect), defaultFlags);
 		module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect2), defaultFlags);
 
-		module.addUserDefinedFunction("Renderer.drawText", lemon::wrap(&drawText), defaultFlags)
+		module.addUserDefinedFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
 			.setParameterInfo(0, "fontKey")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
 			.setParameterInfo(3, "text")
-			.setParameterInfo(4, "color")
+			.setParameterInfo(4, "tintColor")
 			.setParameterInfo(5, "alignment")
-			.setParameterInfo(6, "renderQueue")
-			.setParameterInfo(7, "useWorldSpace");
+			.setParameterInfo(6, "spacing")
+			.setParameterInfo(7, "renderQueue")
+			.setParameterInfo(8, "useWorldSpace");
 
 
 		// Audio

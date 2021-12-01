@@ -9,6 +9,34 @@
 
 
 //-------------------------------------------------------//
+// C++ bindings that got removed                         //
+//-------------------------------------------------------//
+
+function void Renderer.drawVdpSpriteWithTint(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue, u32 tintColor, u32 addedColor)
+{
+	// Convert colors from 0xAABBGGRR to 0xRRGGBBAA
+	tintColor = convertColors32(tintColor)
+	addedColor = convertColors32(addedColor)
+	Renderer.drawVdpSpriteTinted(px, py, encodedSize, patternIndex, renderQueue, tintColor, addedColor)
+}
+
+function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
+{
+	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
+	tintColor = convertColors32(tintColor)
+	Renderer.drawCustomSpriteTinted(key, px, py, atex, flags, renderQueue, angle, tintColor, scale)
+}
+
+function void Renderer.drawCustomSpriteWithTransform(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
+{
+	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
+	tintColor = convertColors32(tintColor)
+	Renderer.drawCustomSpriteTransformed(key, px, py, atex, flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
+}
+
+
+
+//-------------------------------------------------------//
 // Functions that got proper names                       //
 //-------------------------------------------------------//
 

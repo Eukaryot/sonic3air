@@ -443,11 +443,12 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 				Font* font = ResourcesCache::instance().getFontByKey(text.mFontKeyString, text.mFontKeyHash);
 				if (nullptr != font)
 				{
+					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, text.mSpacing);
 					PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
-					PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(text.mFontKeyHash, text.mTextHash);
+					PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
 					if (nullptr == cacheItem)
 					{
-						cacheItem = &cache.addCacheItem(*font, text.mFontKeyHash, text.mTextString, text.mTextHash);
+						cacheItem = &cache.addCacheItem(key, *font, text.mTextString);
 					}
 					const Vec2i drawPosition = Font::applyAlignment(Recti(screenPosition, Vec2i(0, 0)), cacheItem->mInnerRect, text.mAlignment);
 					const Recti rect(drawPosition, cacheItem->mTexture.getSize());

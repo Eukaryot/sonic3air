@@ -302,7 +302,7 @@ function u32 getRandomNumber()
 // Color formats used:
 //  - Original hardware's packed colors (9-bit):	0000 BBB0 GGG0 RRR0
 //  - S3AIR's extended packed colors (15-bit):		1BBB BBGG GGGR RRRR
-//  - Mostly only for calculations, 24-bit color:	0000 0000 BBBB BBBB GGGG GGGG RRRR RRRR
+//  - Mostly only for calculations, 24-bit BGR:		0000 0000 BBBB BBBB GGGG GGGG RRRR RRRR
 
 function u32 unpackColor(u16 color)
 {
@@ -348,7 +348,7 @@ function u16 blendColorsPacked(u16 colorA, u16 colorB, u16 blendFactor)
 {
 	u32 unpackedA = unpackColor(colorA)
 	u32 unpackedB = unpackColor(colorB)
-	u32 unpackedResult = blendColors(unpackedA, unpackedB, blendFactor)
+	u32 unpackedResult = blendColors_BGR32(unpackedA, unpackedB, blendFactor)
 #if STANDALONE
 	return packColorExt(unpackedResult)
 #else
@@ -356,12 +356,32 @@ function u16 blendColorsPacked(u16 colorA, u16 colorB, u16 blendFactor)
 #endif
 }
 
-function u32 blendColors(u32 colorA, u32 colorB, u16 blendFactor)
+function u32 blendColors(u32 colorA, u32 colorB, u16 blendFactor)	// Deprecated because it's ambiguous
+{
+	return blendColors_BGR32(colorA, colorB, blendFactor)
+}
+
+function u32 blendColors_BGR32(u32 colorA, u32 colorB, u16 blendFactor)
 {
 	u32 r = ( (colorA        & 0xff) * (0x100 - blendFactor) + ( colorB        & 0xff) * blendFactor + 0x80) >> 8
 	u32 g = (((colorA >> 8)  & 0xff) * (0x100 - blendFactor) + ((colorB >> 8)  & 0xff) * blendFactor + 0x80) >> 8
 	u32 b = (((colorA >> 16) & 0xff) * (0x100 - blendFactor) + ((colorB >> 16) & 0xff) * blendFactor + 0x80) >> 8
 	return r + (g << 8) + (b << 16)
+}
+
+function u32 blendColors_RGBA32(u32 colorA, u32 colorB, u16 blendFactor)
+{
+	u32 r = (((colorA >> 24) & 0xff) * (0x100 - blendFactor) + ((colorB >> 24) & 0xff) * blendFactor + 0x80) >> 8
+	u32 g = (((colorA >> 16) & 0xff) * (0x100 - blendFactor) + ((colorB >> 16) & 0xff) * blendFactor + 0x80) >> 8
+	u32 b = (((colorA >> 8)  & 0xff) * (0x100 - blendFactor) + ((colorB >> 8)  & 0xff) * blendFactor + 0x80) >> 8
+	u32 a = ( (colorA        & 0xff) * (0x100 - blendFactor) + ( colorB        & 0xff) * blendFactor + 0x80) >> 8
+	return (r << 24) + (g << 16) + (b << 8) + a
+}
+
+function u32 convertColors32(u32 color)
+{
+	// Convert from ABGR32 to RGBA32 and vice versa
+	return ((color & 0x000000ff) << 24) + ((color & 0x0000ff00) << 8) + ((color & 0x00ff0000) >> 8) + ((color & 0xff000000) >> 24)
 }
 
 

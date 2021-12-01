@@ -557,7 +557,7 @@ function void fn0007ba()
 		for (u8 i = 0; i < 0x40; ++i)
 		{
 			u32 originalColor = unpackColor(u16[paletteAddress + i * 2])
-			u32 color = blendColors(originalColor, 0xffffff, blendFactor)
+			u32 color = blendColors_BGR32(originalColor, 0xffffff, blendFactor)
 			if (i & 0x0f)
 				color |= 0xff000000
 			Renderer.setPaletteEntry(i, color)

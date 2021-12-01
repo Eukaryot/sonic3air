@@ -23,9 +23,9 @@ void PrintedTextCache::clear()
 	mCacheItems.clear();
 }
 
-PrintedTextCache::CacheItem* PrintedTextCache::getCacheItem(uint64 fontKeyHash, uint64 textHash)
+PrintedTextCache::CacheItem* PrintedTextCache::getCacheItem(const Key& key)
 {
-	const auto it = mCacheItems.find(fontKeyHash ^ textHash);
+	const auto it = mCacheItems.find(key.combined());
 	if (it == mCacheItems.end())
 		return nullptr;
 
@@ -34,16 +34,15 @@ PrintedTextCache::CacheItem* PrintedTextCache::getCacheItem(uint64 fontKeyHash, 
 	return &cacheItem;
 }
 
-PrintedTextCache::CacheItem& PrintedTextCache::addCacheItem(Font& font, uint64 fontKeyHash, const std::string& textString, uint64 textHash)
+PrintedTextCache::CacheItem& PrintedTextCache::addCacheItem(const Key& key, Font& font, const std::string& textString)
 {
-	CacheItem& cacheItem = mCacheItems[fontKeyHash ^ textHash];
-	cacheItem.mFontKeyHash = fontKeyHash;
-	cacheItem.mTextHash = textHash;
+	CacheItem& cacheItem = mCacheItems[key.combined()];
+	cacheItem.mKey = key;
 	cacheItem.mRecentlyUsed = true;
 
 	EngineMain::instance().getDrawer().createTexture(cacheItem.mTexture);
 	Bitmap& bitmap = cacheItem.mTexture.accessBitmap();
-	font.printBitmap(bitmap, cacheItem.mInnerRect, textString);
+	font.printBitmap(bitmap, cacheItem.mInnerRect, textString, key.mSpacing);
 	cacheItem.mTexture.bitmapUpdated();
 	return cacheItem;
 }

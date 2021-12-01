@@ -316,6 +316,7 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 
 			Blitter::Options options;
 			options.mUseAlphaBlending = true;
+			options.mTintColor = tg.mColor;
 
 			Blitter::blitBitmap(gameScreenWrapper, tg.mRect.getPos(), inputWrapper, Recti(0, 0, tg.mRect.width, tg.mRect.height), options);
 			break;

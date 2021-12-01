@@ -94,8 +94,8 @@ namespace blitterinternal
 		}
 	}
 
-	template<bool SWAP_RED_BLUE>
-	void blitBitmap(BitmapWrapper& destBitmap, Vec2i destPosition, const BitmapWrapper& sourceBitmap, Recti sourceRect)
+	template<bool SWAP_RED_BLUE, bool USE_TINT_COLOR>
+	void blitBitmap(BitmapWrapper& destBitmap, Vec2i destPosition, const BitmapWrapper& sourceBitmap, Recti sourceRect, uint32 tintColor)
 	{
 		uint32* srcBase = sourceBitmap.getPixelPointer(sourceRect.x, sourceRect.y);
 		uint32* dstBase = destBitmap.getPixelPointer(destPosition.x, destPosition.y);
@@ -107,22 +107,46 @@ namespace blitterinternal
 
 			if (SWAP_RED_BLUE)
 			{
-				for (int x = 0; x < sourceRect.width; ++x)
+				if (USE_TINT_COLOR)
 				{
-					*dst = convertPixel<SWAP_RED_BLUE>(*src);
-					src += 4;
-					dst += 4;
+					for (int x = 0; x < sourceRect.width; ++x)
+					{
+						*dst = convertPixel<SWAP_RED_BLUE>(multiplyColors(*(uint32*)src, tintColor));
+						src += 4;
+						dst += 4;
+					}
+				}
+				else
+				{
+					for (int x = 0; x < sourceRect.width; ++x)
+					{
+						*dst = convertPixel<SWAP_RED_BLUE>(*src);
+						src += 4;
+						dst += 4;
+					}
 				}
 			}
 			else
 			{
-				memcpy(dst, src, sourceRect.width * 4);
+				if (USE_TINT_COLOR)
+				{
+					for (int x = 0; x < sourceRect.width; ++x)
+					{
+						*dst = multiplyColors(*(uint32*)src, tintColor);
+						src += 4;
+						dst += 4;
+					}
+				}
+				else
+				{
+					memcpy(dst, src, sourceRect.width * 4);
+				}
 			}
 		}
 	}
 
-	template<bool SWAP_RED_BLUE>
-	void blitBitmapWithBlending(BitmapWrapper& destBitmap, Vec2i destPosition, const BitmapWrapper& sourceBitmap, Recti sourceRect)
+	template<bool SWAP_RED_BLUE, bool USE_TINT_COLOR>
+	void blitBitmapWithBlending(BitmapWrapper& destBitmap, Vec2i destPosition, const BitmapWrapper& sourceBitmap, Recti sourceRect, uint32 tintColor)
 	{
 		uint32* srcBase = sourceBitmap.getPixelPointer(sourceRect.x, sourceRect.y);
 		uint32* dstBase = destBitmap.getPixelPointer(destPosition.x, destPosition.y);
@@ -132,11 +156,24 @@ namespace blitterinternal
 			uint8* src = (uint8*)(&srcBase[y * sourceBitmap.mSize.x]);
 			uint8* dst = (uint8*)(&dstBase[y * destBitmap.mSize.x]);
 
-			for (int x = 0; x < sourceRect.width; ++x)
+			if (USE_TINT_COLOR)
 			{
-				blendColors<SWAP_RED_BLUE>(dst, src);
-				src += 4;
-				dst += 4;
+				for (int x = 0; x < sourceRect.width; ++x)
+				{
+					uint32 tinted = multiplyColors(*(uint32*)src, tintColor);
+					blendColors<SWAP_RED_BLUE>(dst, (uint8*)&tinted);
+					src += 4;
+					dst += 4;
+				}
+			}
+			else
+			{
+				for (int x = 0; x < sourceRect.width; ++x)
+				{
+					blendColors<SWAP_RED_BLUE>(dst, src);
+					src += 4;
+					dst += 4;
+				}
 			}
 		}
 	}
@@ -357,28 +394,58 @@ void Blitter::blitBitmap(BitmapWrapper& destBitmap, Vec2i destPosition, const Bi
 	if (!blitterinternal::cropBlitRect(destPosition, sourceRect, destBitmap.mSize, sourceBitmap.mSize))
 		return;
 
-	if (!options.mUseAlphaBlending)
+	if (options.mTintColor == Color::WHITE)
 	{
-		// No blending
-		if (options.mSwapRedBlue)
+		if (!options.mUseAlphaBlending)
 		{
-			blitterinternal::blitBitmap<true>(destBitmap, destPosition, sourceBitmap, sourceRect);
+			// No blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmap<true, false>(destBitmap, destPosition, sourceBitmap, sourceRect, 0xffffffff);
+			}
+			else
+			{
+				blitterinternal::blitBitmap<false, false>(destBitmap, destPosition, sourceBitmap, sourceRect, 0xffffffff);
+			}
 		}
 		else
 		{
-			blitterinternal::blitBitmap<false>(destBitmap, destPosition, sourceBitmap, sourceRect);
+			// Alpha blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmapWithBlending<true, false>(destBitmap, destPosition, sourceBitmap, sourceRect, 0xffffffff);
+			}
+			else
+			{
+				blitterinternal::blitBitmapWithBlending<false, false>(destBitmap, destPosition, sourceBitmap, sourceRect, 0xffffffff);
+			}
 		}
 	}
 	else
 	{
-		// Alpha blending
-		if (options.mSwapRedBlue)
+		if (!options.mUseAlphaBlending)
 		{
-			blitterinternal::blitBitmapWithBlending<true>(destBitmap, destPosition, sourceBitmap, sourceRect);
+			// No blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmap<true, true>(destBitmap, destPosition, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
+			else
+			{
+				blitterinternal::blitBitmap<false, true>(destBitmap, destPosition, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
 		}
 		else
 		{
-			blitterinternal::blitBitmapWithBlending<false>(destBitmap, destPosition, sourceBitmap, sourceRect);
+			// Alpha blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmapWithBlending<true, true>(destBitmap, destPosition, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
+			else
+			{
+				blitterinternal::blitBitmapWithBlending<false, true>(destBitmap, destPosition, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
 		}
 	}
 }
