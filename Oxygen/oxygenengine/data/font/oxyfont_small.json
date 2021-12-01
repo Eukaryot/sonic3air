@@ -4,7 +4,7 @@
 	"lineheight": "10",
 	"space": "1",
 
-	"texture": "freefont_pixeled_small.png",
+	"texture": "oxyfont_small.png",
 	"characters":
 	{
 		" ": "67 1 4 1",

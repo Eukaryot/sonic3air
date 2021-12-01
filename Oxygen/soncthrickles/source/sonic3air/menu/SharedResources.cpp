@@ -115,11 +115,14 @@ namespace global
 	void loadSharedResources()
 	{
 		ResourcesCache& resourcesCache = ResourcesCache::instance();
+		resourcesCache.registerFontSource("monofont");
+		resourcesCache.registerFontSource("oxyfont_light");
+		resourcesCache.registerFontSource("oxyfont_regular");
+		resourcesCache.registerFontSource("oxyfont_small");
+		resourcesCache.registerFontSource("oxyfont_tiny");
+		resourcesCache.registerFontSource("oxyfont_tiny_narrow");
 		resourcesCache.registerFontSource("smallfont");
-		resourcesCache.registerFontSource("freefont_pixeled_tiny");
-		resourcesCache.registerFontSource("freefont_pixeled_small");
 		resourcesCache.registerFontSource("sonic3_fontB");
-		resourcesCache.registerFontSource("freefont_pixeled");
 		resourcesCache.registerFontSource("sonic3_fontC");
 
 		mFont3Pure.loadFromFile("data/font/smallfont.json");
@@ -127,11 +130,11 @@ namespace global
 		mFont3.loadFromFile("data/font/smallfont.json");
 		mFont3.addFontProcessor(gOutlineFontProcessorTransparent);
 
-		mFont4.loadFromFile("data/font/freefont_pixeled_tiny.json");
+		mFont4.loadFromFile("data/font/oxyfont_tiny.json");
 		mFont4.addFontProcessor(gOutlineFontProcessor);
 		mFont4.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont5.loadFromFile("data/font/freefont_pixeled_small.json");
+		mFont5.loadFromFile("data/font/oxyfont_small.json");
 		mFont5.addFontProcessor(gOutlineFontProcessor);
 		mFont5.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
@@ -139,7 +142,7 @@ namespace global
 		mFont7.addFontProcessor(gOutlineFontProcessor);
 		mFont7.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
-		mFont10.loadFromFile("data/font/freefont_pixeled.json");
+		mFont10.loadFromFile("data/font/oxyfont_regular.json");
 		mFont10.addFontProcessor(gOutlineFontProcessor);
 		mFont10.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
 
