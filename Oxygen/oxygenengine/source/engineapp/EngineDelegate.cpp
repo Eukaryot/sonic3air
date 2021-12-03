@@ -114,14 +114,14 @@ Font& EngineDelegate::getDebugFont(int size)
 	{
 		static Font font10;
 		if (font10.getHeight() == 0)
-			font10.load("data/font/freefont_pixeled.json", 0.0f);
+			font10.loadFromFile("data/font/freefont_pixeled.json", 0.0f);
 		return font10;
 	}
 	else
 	{
 		static Font font3;
 		if (font3.getHeight() == 0)
-			font3.load("data/font/smallfont.json", 0.0f);
+			font3.loadFromFile("data/font/smallfont.json", 0.0f);
 		return font3;
 	}
 }
