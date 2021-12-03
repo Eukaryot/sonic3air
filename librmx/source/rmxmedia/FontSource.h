@@ -28,10 +28,10 @@ public:
 	virtual ~FontSource() {}
 	virtual const GlyphInfo* getGlyph(uint32 unicode);
 
-	int getAscender()	{ return mAscender; }
-	int getDescender()	{ return mDescender; }
-	int getHeight()		{ return mAscender + mDescender; }
-	int getLineHeight()	{ return mLineHeight; }
+	inline int getAscender() const	 { return mAscender; }
+	inline int getDescender() const	 { return mDescender; }
+	inline int getHeight() const	 { return mAscender + mDescender; }
+	inline int getLineHeight() const { return mLineHeight; }
 
 protected:
 	virtual bool fillGlyphInfo(GlyphInfo& info)  { return false; }

@@ -326,8 +326,9 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	}
 
 	// Write inner rect
-	outInnerRect.setPos(boundsMin);
-	outInnerRect.width = 0;
+	outInnerRect.x = -boundsMin.x;
+	outInnerRect.y = -boundsMin.y;
+	outInnerRect.width = (text.mLength - 1) * spacing;
 	for (size_t i = 0; i < text.mLength; ++i)
 	{
 		const FontSource::GlyphInfo* info = mFontSource->getGlyph(text[i]);
