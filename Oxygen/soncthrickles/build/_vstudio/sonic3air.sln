@@ -25,7 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lemonscript", "..\..\..\lem
 		{13AFDEC3-A272-4577-8DF5-B6AF731760A8} = {13AFDEC3-A272-4577-8DF5-B6AF731760A8}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygencore", "..\..\..\oxygenengine\build\_vstudio\oxygencore.vcxproj", "{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygen_netcore", "..\..\..\oxygenengine\build\_vstudio\oxygen_netcore.vcxproj", "{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rmxbase", "..\..\..\..\librmx\build\_vstudio\rmxbase.vcxproj", "{13AFDEC3-A272-4577-8DF5-B6AF731760A8}"
 EndProject

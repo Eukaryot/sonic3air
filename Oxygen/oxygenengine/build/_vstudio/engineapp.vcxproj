@@ -48,7 +48,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F6771A16-17FA-4082-BE87-25D5DF87EA54}</ProjectGuid>
-    <RootNamespace>genplusgx</RootNamespace>
+    <RootNamespace>oxygen</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>engineapp</ProjectName>
   </PropertyGroup>

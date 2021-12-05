@@ -229,7 +229,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -258,7 +258,7 @@ exit /b 0</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -287,7 +287,7 @@ exit /b 0</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -316,7 +316,7 @@ exit /b 0</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -345,7 +345,7 @@ exit /b 0</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/Release_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/Release_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -375,7 +375,7 @@ exit /b 0</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../../lemonscript/lib/$(BuildCode);../../../oxygenengine/build/_vstudio/lib/Release_$(BuildCode);$(SolutionDir)lib/$(Configuration)_$(BuildCode);$(SolutionDir)lib/Release_$(BuildCode);$(SolutionDir)../../source/external/discord_game_sdk/lib/x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;discord_game_sdk.lib;discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>

@@ -16,7 +16,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "engineapp", "engineapp.vcxp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lemonscript", "..\..\..\lemonscript\build\_vstudio\lemonscript.vcxproj", "{7F7D8740-C72D-44E2-A8A9-50265C4E8BD4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygencore", "oxygencore.vcxproj", "{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygen_netcore", "oxygen_netcore.vcxproj", "{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

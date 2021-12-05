@@ -19,18 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\oxygencore\pch.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionManager.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\LowLevelPackets.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\NetConnection.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\ServerClientBase.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\Sockets.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\oxygencore\pch.cpp">
+    <ClCompile Include="..\..\source\oxygen_netcore\network\ConnectionManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen_netcore\network\NetConnection.cpp" />
+    <ClCompile Include="..\..\source\oxygen_netcore\network\ServerClientBase.cpp" />
+    <ClCompile Include="..\..\source\oxygen_netcore\network\Sockets.cpp" />
+    <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}</ProjectGuid>
-    <RootNamespace>genplusgx</RootNamespace>
+    <RootNamespace>oxygen</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>oxygencore</ProjectName>
+    <ProjectName>oxygen_netcore</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -81,23 +90,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
-    <IntDir>tmp\oxygencore_$(Configuration)_$(BuildCode)\</IntDir>
-    <TargetName>oxygencore</TargetName>
+    <IntDir>tmp\oxygen_netcore_$(Configuration)_$(BuildCode)\</IntDir>
+    <TargetName>oxygen_netcore</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>oxygencore</TargetName>
+    <TargetName>oxygen_netcore</TargetName>
     <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
-    <IntDir>tmp\oxygencore_$(Configuration)_$(BuildCode)\</IntDir>
+    <IntDir>tmp\oxygen_netcore_$(Configuration)_$(BuildCode)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
-    <IntDir>tmp\oxygencore_$(Configuration)_$(BuildCode)\</IntDir>
-    <TargetName>oxygencore</TargetName>
+    <IntDir>tmp\oxygen_netcore_$(Configuration)_$(BuildCode)\</IntDir>
+    <TargetName>oxygen_netcore</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>oxygencore</TargetName>
+    <TargetName>oxygen_netcore</TargetName>
     <OutDir>$(ProjectDir)lib\$(Configuration)_$(BuildCode)\</OutDir>
-    <IntDir>tmp\oxygencore_$(Configuration)_$(BuildCode)\</IntDir>
+    <IntDir>tmp\oxygen_netcore_$(Configuration)_$(BuildCode)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,7 +116,7 @@
       <PreprocessorDefinitions>DEBUG;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>oxygencore/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>oxygen_netcore/pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -127,7 +136,7 @@
       <PreprocessorDefinitions>DEBUG;MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>oxygencore/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>oxygen_netcore/pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -147,7 +156,7 @@
       <AdditionalIncludeDirectories>../../source;../../../lemonscript/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>oxygencore/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>oxygen_netcore/pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -167,7 +176,7 @@
       <AdditionalIncludeDirectories>../../source;../../../lemonscript/source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MAXPATHLEN=256;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>oxygencore/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>oxygen_netcore/pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>

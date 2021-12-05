@@ -268,7 +268,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1E137789-9E2E-45DD-AEF2-96BD3A6F4E02}</ProjectGuid>
-    <RootNamespace>genplusgx</RootNamespace>
+    <RootNamespace>oxygen</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>oxygen</ProjectName>
   </PropertyGroup>

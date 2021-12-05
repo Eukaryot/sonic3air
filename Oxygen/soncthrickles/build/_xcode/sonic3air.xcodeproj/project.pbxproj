@@ -1549,8 +1549,8 @@
 		9E82C77826BDF29A00ADDBD3 /* BackdropView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackdropView.h; sourceTree = "<group>"; };
 		9E82C78126BDF33D00ADDBD3 /* LemonScriptProgram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LemonScriptProgram.cpp; sourceTree = "<group>"; };
 		9E82C78226BDF33D00ADDBD3 /* LemonScriptProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LemonScriptProgram.h; sourceTree = "<group>"; };
-		9E82C79026BDF3C500ADDBD3 /* pch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pch.cpp; path = ../../../../../../oxygenengine/source/oxygencore/pch.cpp; sourceTree = "<group>"; };
-		9E82C79126BDF3C500ADDBD3 /* pch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pch.h; path = ../../../../../../oxygenengine/source/oxygencore/pch.h; sourceTree = "<group>"; };
+		9E82C79026BDF3C500ADDBD3 /* pch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pch.cpp; path = ../../../../../../oxygenengine/source/oxygen_netcore/pch.cpp; sourceTree = "<group>"; };
+		9E82C79126BDF3C500ADDBD3 /* pch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pch.h; path = ../../../../../../oxygenengine/source/oxygen_netcore/pch.h; sourceTree = "<group>"; };
 		9E82C7BB26BDF88F00ADDBD3 /* DrawerHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawerHelper.h; sourceTree = "<group>"; };
 		9E82C7BC26BDF8B100ADDBD3 /* ControllerSetupMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControllerSetupMenu.cpp; sourceTree = "<group>"; };
 		9E82C7BD26BDF8B100ADDBD3 /* ControllerSetupMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControllerSetupMenu.h; sourceTree = "<group>"; };
@@ -2309,7 +2309,7 @@
 			children = (
 				9E6E8517245F89C300114DEB /* engineapp */,
 				9E6E8527245F89C300114DEB /* oxygen */,
-				9E82C78726BDF3A600ADDBD3 /* oxygencore */,
+				9E82C78726BDF3A600ADDBD3 /* oxygen_netcore */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -2737,13 +2737,13 @@
 			path = minizip;
 			sourceTree = "<group>";
 		};
-		9E82C78726BDF3A600ADDBD3 /* oxygencore */ = {
+		9E82C78726BDF3A600ADDBD3 /* oxygen_netcore */ = {
 			isa = PBXGroup;
 			children = (
 				9E82C79026BDF3C500ADDBD3 /* pch.cpp */,
 				9E82C79126BDF3C500ADDBD3 /* pch.h */,
 			);
-			path = oxygencore;
+			path = oxygen_netcore;
 			sourceTree = "<group>";
 		};
 		9EB0699724807A9C0080AC49 /* oxygenApp_MacApp */ = {
