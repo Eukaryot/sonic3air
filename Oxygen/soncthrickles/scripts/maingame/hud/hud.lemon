@@ -182,7 +182,7 @@ function void RenderHUD()
 			u16 px = useMobilePosition ? (getScreenWidth() - baseX - 0x30) : baseX
 			u16 py = useMobilePosition ? baseY : 200
 
-			u64 characterName
+			string characterName
 			if (getMainCharacter() == CHARACTER_SONIC)
 				characterName = "sonic"
 			else if (getMainCharacter() == CHARACTER_TAILS)

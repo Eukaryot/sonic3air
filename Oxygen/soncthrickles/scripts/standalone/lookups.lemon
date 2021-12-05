@@ -8,7 +8,7 @@
 
 
 
-function u64 getZoneInitials(u8 zone)
+function string getZoneInitials(u8 zone)
 {
 	// This expects internal zone index
 	if (zone == 0x00)
@@ -43,20 +43,20 @@ function u64 getZoneInitials(u8 zone)
 }
 
 
-function u64 getZoneActInitials(u16 zoneAndAct)
+function string getZoneActInitials(u16 zoneAndAct)
 {
-	u64 zoneInitials = getZoneInitials(zoneAndAct >> 8)
-	if (zoneInitials == 0)
+	string zoneInitials = getZoneInitials(zoneAndAct >> 8)
+	if (zoneInitials == "")
 		return 0
 
 	return stringformat("%s%d", zoneInitials, (zoneAndAct & 0x01) ? 2 : 1)
 }
 
 
-function u32 Standalone.loadRawLevelData(u64 format, u16 zoneAndAct, u32 targetAddress)
+function u32 Standalone.loadRawLevelData(string format, u16 zoneAndAct, u32 targetAddress)
 {
-	u64 key = stringformat(format, getZoneActInitials(zoneAndAct))
-	if (key == 0)
+	string key = stringformat(format, getZoneActInitials(zoneAndAct))
+	if (key == "")
 		return 0
 
 	bool allowOriginalData = Game.isTimeAttack() || (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)

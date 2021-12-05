@@ -351,7 +351,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 // Helper functions
 
-function u64 getCharacterBonusTextIcon(u8 character)
+function string getCharacterBonusTextIcon(u8 character)
 {
 	return (character == CHARACTER_KNUCKLES) ? "hud_bonus_icon_red" : (character == CHARACTER_TAILS) ? "hud_bonus_icon_orange" : "hud_bonus_icon_blue"
 }

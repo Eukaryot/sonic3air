@@ -10,7 +10,7 @@
 
 #if STANDALONE
 
-function u64 getCharacterPaletteKey(u8 character)
+function string getCharacterPaletteKey(u8 character)
 {
 	return (character == CHARACTER_SONIC) ? "character_palette_sonic" : (character == CHARACTER_TAILS) ? "character_palette_tails" : "character_palette_knuckles"
 }
@@ -192,7 +192,7 @@ function void UpdatePaletteEffects.SuperForm()
 	//  - Variant for modded palettes
 
 #if STANDALONE
-	u64 characterKey = getCharacterPaletteKey(getMainCharacter())
+	string characterKey = getCharacterPaletteKey(getMainCharacter())
 	bool isNormalPaletteModded = System.hasExternalPaletteData(characterKey, 0)		// Check line index 0, for the normal form palette
 	bool isSuperPaletteModded = System.hasExternalPaletteData(characterKey, 5)		// Check line index 5, for Super/Hyper form palette
 	if (isSuperPaletteModded)
