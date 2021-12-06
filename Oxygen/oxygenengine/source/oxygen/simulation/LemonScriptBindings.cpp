@@ -913,7 +913,25 @@ namespace
 
 	void Audio_playAudio1(uint64 sfxId, uint8 contextId)
 	{
-		EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+		const bool success = EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+		if (!success)
+		{
+			// Audio collections expect lowercase IDs, so we might need to do the conversion here first
+			const std::string* textString = detail::tryResolveString(sfxId);
+			if (nullptr != textString)
+			{
+				// Does the string contain any uppercase letters?
+				const auto it = std::find_if(textString->begin(), textString->end(), [](char ch) { return (ch >= 'A' && ch <= 'Z'); } );
+				if (it != textString->end())
+				{
+					// Convert to lowercase and try again
+					String str = *textString;
+					str.lowerCase();
+					sfxId = rmx::getMurmur2_64(str);
+					EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+				}
+			}
+		}
 	}
 
 	void Audio_playAudio2(uint64 sfxId)

@@ -72,9 +72,9 @@ bool AudioOutBase::isPlayingSfxId(uint64 sfxId) const
 	return mAudioPlayer.isPlayingSfxId(sfxId);
 }
 
-void AudioOutBase::playAudioBase(uint64 sfxId, uint8 contextId)
+bool AudioOutBase::playAudioBase(uint64 sfxId, uint8 contextId)
 {
-	mAudioPlayer.playAudio(sfxId, contextId);
+	return mAudioPlayer.playAudio(sfxId, contextId);
 }
 
 void AudioOutBase::playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId)

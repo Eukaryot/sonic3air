@@ -54,7 +54,7 @@ public:
 
 	bool isPlayingSfxId(uint64 sfxId) const;
 
-	void playAudioBase(uint64 sfxId, uint8 contextId);
+	bool playAudioBase(uint64 sfxId, uint8 contextId);
 	void playOverride(uint64 sfxId, uint8 contextId, uint8 channelId, uint8 overriddenChannelId);
 	void stopChannel(uint8 channelId);
 	void fadeInChannel(uint8 channelId, float length);
