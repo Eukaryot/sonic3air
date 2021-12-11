@@ -18,7 +18,7 @@ namespace highlevel
 
 	class RequestBase
 	{
-	friend class NetConnection;
+	friend class ::NetConnection;
 
 	public:
 		virtual ~RequestBase();

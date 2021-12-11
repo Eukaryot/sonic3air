@@ -29,8 +29,6 @@ public:
 		uint64 mLastResendTimestamp = 0;
 		int mResendCounter = 0;
 		bool mConfirmed = false;
-
-		// TODO: Add data relevant for re-sending, like last send timestamp
 	};
 
 public:
