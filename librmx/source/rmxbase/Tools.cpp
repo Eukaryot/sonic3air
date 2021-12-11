@@ -13,29 +13,50 @@
 namespace rmx
 {
 
-	static const constexpr uint64 FNV1a_START_VALUE = 0xcbf29ce484222325;
-	static const constexpr uint64 FNV1a_MAGIC_PRIME = 0x00000100000001b3;
+	uint32 getFNV1a_32(const uint8* data, size_t bytes)
+	{
+		uint32 hash = FNV1a_32_START_VALUE;
+		for (size_t i = 0; i < bytes; ++i)
+		{
+			hash = (hash ^ data[i]) * FNV1a_32_MAGIC_PRIME;
+		}
+		return hash;
+	}
+
+	uint32 startFNV1a_32()
+	{
+		return FNV1a_32_START_VALUE;
+	}
+
+	uint32 addToFNV1a_32(uint32 hash, const uint8* data, size_t bytes)
+	{
+		for (size_t i = 0; i < bytes; ++i)
+		{
+			hash = (hash ^ data[i]) * FNV1a_32_MAGIC_PRIME;
+		}
+		return hash;
+	}
 
 	uint64 getFNV1a_64(const uint8* data, size_t bytes)
 	{
-		uint64 hash = FNV1a_START_VALUE;
+		uint64 hash = FNV1a_64_START_VALUE;
 		for (size_t i = 0; i < bytes; ++i)
 		{
-			hash = (hash ^ data[i]) * FNV1a_MAGIC_PRIME;
+			hash = (hash ^ data[i]) * FNV1a_64_MAGIC_PRIME;
 		}
 		return hash;
 	}
 
 	uint64 startFNV1a_64()
 	{
-		return FNV1a_START_VALUE;
+		return FNV1a_64_START_VALUE;
 	}
 
 	uint64 addToFNV1a_64(uint64 hash, const uint8* data, size_t bytes)
 	{
 		for (size_t i = 0; i < bytes; ++i)
 		{
-			hash = (hash ^ data[i]) * FNV1a_MAGIC_PRIME;
+			hash = (hash ^ data[i]) * FNV1a_64_MAGIC_PRIME;
 		}
 		return hash;
 	}

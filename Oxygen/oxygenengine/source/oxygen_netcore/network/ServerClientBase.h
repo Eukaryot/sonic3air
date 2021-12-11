@@ -8,26 +8,28 @@
 
 #pragma once
 
-#include "oxygen_netcore/network/Sockets.h"
+#include "oxygen_netcore/network/ConnectionListener.h"
+#include "oxygen_netcore/network/IDProvider.h"
 
 class ConnectionManager;
 class NetConnection;
 
 
-class ServerClientBase
+class ServerClientBase : public ConnectionListenerInterface
 {
+protected:
+	static uint64 getCurrentTimestamp();
+
 protected:
 	bool updateReceivePackets(ConnectionManager& connectionManager);
 
+protected:
 	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) = 0;
+	virtual void destroyNetConnection(NetConnection& connection) = 0;
 
 protected:
-	struct ConnectionIDProvider
-	{
-		uint16 getNextID();
-		uint16 mNextID = 1;
-	};
+	IDProvider<uint16> mConnectionIDProvider;
 
-protected:
-	ConnectionIDProvider mConnectionIDProvider;
+private:
+	void handleConnectionStartPacket(ConnectionManager& connectionManager, const ReceivedPacket& receivedPacket);
 };

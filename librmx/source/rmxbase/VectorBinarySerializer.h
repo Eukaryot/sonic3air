@@ -19,6 +19,7 @@ public:
 	inline size_t getReadPosition() const  { return mReadPosition; }
 	inline size_t getRemaining() const	   { return mBuffer.size() - mReadPosition; }
 
+	inline const std::vector<uint8>& getBuffer() const	 { return mBuffer; }
 	inline uint8* getBufferPointer(size_t offset) const	 { return &mBuffer[offset]; }
 
 	inline bool hasError() const  { return mHasError; }
@@ -40,13 +41,13 @@ public:
 	void serialize(int64& value);
 	void serialize(float& value);
 	void serialize(double& value);
-	void serialize(std::string& value, size_t stringLengthLimit = 256);
+	void serialize(std::string& value, size_t stringLengthLimit = 0xffffffff);
 	void serialize(std::wstring& value);
 	void serialize(String& value);
 	void serialize(WString& value);
 
 	// Warning: the "bytesLimit" value must stay consistent between serialization and deserialization
-	void serializeData(std::vector<uint8>& data, uint32 bytesLimit = 0xffffffff);
+	void serializeData(std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
 
 	template <typename T>
 	void serializeArraySize(std::vector<T>& value, uint16 arraySizeLimit = 0xffff)

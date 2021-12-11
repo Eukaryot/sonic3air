@@ -50,6 +50,7 @@ void randomize()
 	time_t t;
 	time(&t);
 	srand((unsigned int)t);
+	(void)rand();		// Skip the first random result, which might be just the seed again
 }
 
 void randomize(unsigned int seed)

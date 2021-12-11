@@ -150,7 +150,7 @@ void VectorBinarySerializer::serialize(std::string& value, size_t stringLengthLi
 {
 	if (mReading)
 	{
-		const uint32 length = read<uint32>();
+		const size_t length = (stringLengthLimit <= 0xff) ? static_cast<uint16>(read<uint8>()) : (stringLengthLimit <= 0xffff) ? static_cast<uint16>(read<uint8>()) : read<uint32>();
 
 		// Limit length of strings
 		if (length > stringLengthLimit)
@@ -164,19 +164,27 @@ void VectorBinarySerializer::serialize(std::string& value, size_t stringLengthLi
 			return;
 		}
 
-		value.resize((size_t)length);
-		if (length > 0)
-		{
-			read(&value[0], (size_t)length);
-		}
+		value.resize(length);
 	}
 	else
 	{
-		writeAs<uint32>(value.length());
-		if (!value.empty())
+		if (stringLengthLimit <= 0xff)
 		{
-			write(&value[0], value.length());
+			write((uint8)value.length());
 		}
+		else if (stringLengthLimit <= 0xffff)
+		{
+			write((uint16)value.length());
+		}
+		else
+		{
+			write((uint32)value.length());
+		}
+	}
+
+	if (!value.empty())
+	{
+		serialize(&value[0], value.length());
 	}
 }
 
@@ -237,21 +245,21 @@ void VectorBinarySerializer::serialize(WString& value)
 	if (mReading)
 	{
 		value.expand((int)read<uint32>());
-		read(value.accessData(), value.length() * sizeof(wchar_t));			// TODO: This is not compatible among different platfoms!
+		read(value.accessData(), value.length() * sizeof(wchar_t));			// TODO: This is not compatible among different platforms!
 	}
 	else
 	{
 		writeAs<uint32>(value.length());
 		if (!value.empty())
-			write(value.accessData(), value.length() * sizeof(wchar_t));	// TODO: This is not compatible among different platfoms!
+			write(value.accessData(), value.length() * sizeof(wchar_t));	// TODO: This is not compatible among different platforms!
 	}
 }
 
-void VectorBinarySerializer::serializeData(std::vector<uint8>& data, uint32 bytesLimit)
+void VectorBinarySerializer::serializeData(std::vector<uint8>& data, size_t bytesLimit)
 {
 	if (isReading())
 	{
-		const uint32 numBytes = (bytesLimit <= 0xff) ? static_cast<uint16>(read<uint8>()) : (bytesLimit <= 0xffff) ? static_cast<uint16>(read<uint8>()) : read<uint32>();
+		const size_t numBytes = (bytesLimit <= 0xff) ? static_cast<uint16>(read<uint8>()) : (bytesLimit <= 0xffff) ? static_cast<uint16>(read<uint8>()) : read<uint32>();
 
 		// Limit number of bytes
 		if (numBytes > bytesLimit)
@@ -282,6 +290,7 @@ void VectorBinarySerializer::serializeData(std::vector<uint8>& data, uint32 byte
 			write((uint32)data.size());
 		}
 	}
+
 	if (!data.empty())
 	{
 		serialize(&data[0], data.size());

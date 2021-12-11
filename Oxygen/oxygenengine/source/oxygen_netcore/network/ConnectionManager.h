@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "oxygen_netcore/network/Sockets.h"
+#include "oxygen_netcore/network/internal/ReceivedPacket.h"
 
-class NetConnection;
+struct ConnectionListenerInterface;
 
 
 class ConnectionManager
@@ -18,27 +18,30 @@ class ConnectionManager
 friend class NetConnection;
 
 public:
-	struct ReceivedPacket
+	struct DebugSettings
 	{
-		std::vector<uint8> mContent;
-		uint16 mLowLevelSignature = 0;
-		SocketAddress mSenderAddress;
-		NetConnection* mConnection = nullptr;
+		float mSendingPacketLoss = 0.0f;	// Fraction of "lost" packets in sending
 	};
+	DebugSettings mDebugSettings;
 
 public:
-	explicit ConnectionManager(UDPSocket& socket);
+	ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, uint8 highLevelMinimumProtocolVersion, uint8 highLevelMaximumProtocolVersion);
 
 	inline UDPSocket& getSocket() const  { return mSocket; }
+	inline ConnectionListenerInterface& getListener() const  { return mListener; }
 
+	inline uint8 getHighLevelMinimumProtocolVersion() const  { return mHighLevelMinimumProtocolVersion; }
+	inline uint8 getHighLevelMaximumProtocolVersion() const  { return mHighLevelMaximumProtocolVersion; }
+
+	void updateConnections(uint64 currentTimestamp);
 	bool updateReceivePackets();	// TODO: This is meant to be executed by a thread later on
 
 	void syncPacketQueues();
 
 	inline bool hasAnyPacket() const  { return !mReceivedPackets.mSyncedQueue.empty(); }
-	const ReceivedPacket* getNextPacket();
+	ReceivedPacket* getNextReceivedPacket();
 
-	bool hasConnectionTo(uint64 senderKey) const;
+	NetConnection* findConnectionTo(uint64 senderKey) const;
 
 protected:
 	// Only meant to be called from the NetConnection
@@ -50,11 +53,15 @@ private:
 	{
 		std::deque<ReceivedPacket*> mWorkerQueue;	// Used by the worker thread that adds packets
 		std::deque<ReceivedPacket*> mSyncedQueue;	// Used by the main thread that reads packets
-		std::vector<ReceivedPacket*> mToBeReturned;
+		ReceivedPacket::Dump mToBeReturned;
 	};
 
 private:
 	UDPSocket& mSocket;
+	ConnectionListenerInterface& mListener;
+
+	uint8 mHighLevelMinimumProtocolVersion = 1;
+	uint8 mHighLevelMaximumProtocolVersion = 1;
 
 	std::unordered_map<uint16, NetConnection*> mActiveConnections;		// Using local connection ID as key
 	std::unordered_map<uint64, NetConnection*> mConnectionsBySender;	// Using a sender key (= hash for the sender address + remote connection ID) as key

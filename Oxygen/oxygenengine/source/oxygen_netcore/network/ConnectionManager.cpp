@@ -12,8 +12,11 @@
 #include "oxygen_netcore/network/NetConnection.h"
 
 
-ConnectionManager::ConnectionManager(UDPSocket& socket) :
-	mSocket(socket)
+ConnectionManager::ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, uint8 highLevelMinimumProtocolVersion, uint8 highLevelMaximumProtocolVersion) :
+	mSocket(socket),
+	mListener(listener),
+	mHighLevelMinimumProtocolVersion(highLevelMinimumProtocolVersion),
+	mHighLevelMaximumProtocolVersion(highLevelMaximumProtocolVersion)
 {
 }
 
@@ -29,6 +32,15 @@ void ConnectionManager::removeConnection(NetConnection& connection)
 	mConnectionsBySender.erase(connection.getSenderKey());
 
 	// TODO: Remove all queued packets for this connection
+}
+
+void ConnectionManager::updateConnections(uint64 currentTimestamp)
+{
+	// TODO: An unordered_map is not really optimal for iterating
+	for (auto& pair : mActiveConnections)
+	{
+		pair.second->updateConnection(currentTimestamp);
+	}
 }
 
 bool ConnectionManager::updateReceivePackets()
@@ -119,34 +131,31 @@ void ConnectionManager::syncPacketQueues()
 
 	// Cleanup packets previously marked to be returned
 	{
-		for (ReceivedPacket* receivedPacket : mReceivedPackets.mToBeReturned)
+		for (const ReceivedPacket* receivedPacket : mReceivedPackets.mToBeReturned.mPackets)
 		{
-			mReceivedPacketPool.returnObject(*receivedPacket);
+			mReceivedPacketPool.returnObject(*const_cast<ReceivedPacket*>(receivedPacket));
 		}
-		mReceivedPackets.mToBeReturned.clear();
+		mReceivedPackets.mToBeReturned.mPackets.clear();
 	}
 
 	// TODO: Mutex can be unlocked here
 }
 
-const ConnectionManager::ReceivedPacket* ConnectionManager::getNextPacket()
+ReceivedPacket* ConnectionManager::getNextReceivedPacket()
 {
 	if (mReceivedPackets.mSyncedQueue.empty())
 		return nullptr;
 
 	ReceivedPacket* receivedPacket = mReceivedPackets.mSyncedQueue.front();
 	mReceivedPackets.mSyncedQueue.pop_front();
-	mReceivedPackets.mToBeReturned.push_back(receivedPacket);
+
+	// Set the "dump" instance that packets get returned to when they have been processed completely
+	receivedPacket->setDump(&mReceivedPackets.mToBeReturned);
 	return receivedPacket;
 }
 
-bool ConnectionManager::hasConnectionTo(uint64 senderKey) const
+NetConnection* ConnectionManager::findConnectionTo(uint64 senderKey) const
 {
-	// Check if already connected to that sender (i.e. whether it sent the StartConnectionPacket twice)
 	const auto it = mConnectionsBySender.find(senderKey);
-	if (it == mConnectionsBySender.end())
-		return false;
-
-	const NetConnection::State state = it->second->getState();
-	return (state == NetConnection::State::CONNECTED || state == NetConnection::State::REQUESTED_CONNECTION);
+	return (it == mConnectionsBySender.end()) ? nullptr : it->second;
 }

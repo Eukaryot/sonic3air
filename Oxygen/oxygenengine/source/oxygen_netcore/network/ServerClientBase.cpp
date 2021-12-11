@@ -12,88 +12,137 @@
 #include "oxygen_netcore/network/LowLevelPackets.h"
 #include "oxygen_netcore/network/NetConnection.h"
 
+#include <chrono>
+
 
 namespace
 {
 	static const constexpr uint16 LOWLEVEL_PROTOCOL_MINIMUM_VERSION = 1;
 	static const constexpr uint16 LOWLEVEL_PROTOCOL_MAXIMUM_VERSION = 1;
+
+	struct ProtocolVersionChecker
+	{
+		enum class Result
+		{
+			SUCCESS,		// Found a protocol version both can support
+			ERROR_TOO_OLD,	// Remote protocol version is lower than anything we can support
+			ERROR_TOO_NEW	// Remote protocol version is higher than anything we can support
+		};
+
+		static Result chooseVersion(uint8& outVersion, uint8 localMinVersion, uint8 localMaxVersion, uint8 remoteMinVersion, uint8 remoteMaxVersion)
+		{
+			// Use the highest version both can support
+			outVersion = std::min(remoteMaxVersion, localMaxVersion);
+			if (outVersion < localMinVersion)
+			{
+				return Result::ERROR_TOO_OLD;
+			}
+			else if (outVersion < remoteMinVersion)
+			{
+				return Result::ERROR_TOO_NEW;
+			}
+			else
+			{
+				return Result::SUCCESS;
+			}
+		}
+	};
 }
 
 
-uint16 ServerClientBase::ConnectionIDProvider::getNextID()
+uint64 ServerClientBase::getCurrentTimestamp()
 {
-	const uint16 result = mNextID;
-	++mNextID;
-	if (mNextID == 0)	// Skip the zero
-		++mNextID;
-	return result;
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
-
 
 bool ServerClientBase::updateReceivePackets(ConnectionManager& connectionManager)
 {
 	// Check the socket for new packets
 	if (!connectionManager.updateReceivePackets())
-	{
 		return false;
-	}
 
 	connectionManager.syncPacketQueues();
 
 	// Handle incoming packets
 	while (connectionManager.hasAnyPacket())
 	{
-		const ConnectionManager::ReceivedPacket* receivedPacket = connectionManager.getNextPacket();
+		ReceivedPacket* receivedPacket = connectionManager.getNextReceivedPacket();
 		if (nullptr == receivedPacket)
+		{
+			// Handled all current packets
 			break;
+		}
 
-		VectorBinarySerializer serializer(true, receivedPacket->mContent);
-		serializer.skip(2);		// Skip low level signature, it can be found in "ReceivedPacket::mLowLevelSignature"
 		if (nullptr == receivedPacket->mConnection)
 		{
 			// It's a connection start request
-			const uint16 remoteConnectionID = serializer.read<uint16>();
-			serializer.skip(2);		// Skip the other connection ID, as it's invalid anyways (it's only in there to have all low-level packets share the same header)
-
-			lowlevel::StartConnectionPacket packet;
-			if (packet.serializeContent(serializer))
-			{
-				if (packet.mLowLevelProtocolVersion < LOWLEVEL_PROTOCOL_MINIMUM_VERSION || packet.mLowLevelProtocolVersion > LOWLEVEL_PROTOCOL_MAXIMUM_VERSION)
-				{
-					// TODO: Handle unsupported protocol version
-					continue;
-				}
-
-				const uint64 senderKey = NetConnection::buildSenderKey(receivedPacket->mSenderAddress, remoteConnectionID);
-				if (connectionManager.hasConnectionTo(senderKey))
-				{
-					// Ignore packet, we already have a connection established
-					continue;
-				}
-
-				// Create a new connection
-				const uint16 localConnectionID = mConnectionIDProvider.getNextID();
-				NetConnection* connection = createNetConnection(connectionManager, receivedPacket->mSenderAddress);
-				if (nullptr != connection)
-				{
-					connection->acceptIncomingConnection(connectionManager, localConnectionID, remoteConnectionID, receivedPacket->mSenderAddress, senderKey);
-				}
-				else
-				{
-					// TODO: Send back an error
-				}
-			}
+			handleConnectionStartPacket(connectionManager, *receivedPacket);
 		}
 		else
 		{
 			// It's packet for a connection
-			serializer.skip(4);		// Skip the connection IDs, they got evaluated already
-			if (serializer.getRemaining() > 0)
-			{
-				receivedPacket->mConnection->handleLowLevelPacket(receivedPacket->mLowLevelSignature, serializer);
-			}
+			receivedPacket->mConnection->handleLowLevelPacket(*receivedPacket);
+		}
+
+		if (receivedPacket->mShouldBeReturned)
+		{
+			receivedPacket->returnToDump();
+		}
+	}
+	return true;
+}
+
+void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connectionManager, const ReceivedPacket& receivedPacket)
+{
+	VectorBinarySerializer serializer(true, receivedPacket.mContent);
+	serializer.skip(2);		// Skip low level signature, it can be found in "ReceivedPacket::mLowLevelSignature"
+	const uint16 remoteConnectionID = serializer.read<uint16>();
+	serializer.skip(2);		// Skip the other connection ID, as it's invalid anyways (it's only in there to have all low-level packets share the same header)
+
+	lowlevel::StartConnectionPacket packet;
+	if (!packet.serializePacket(serializer, LOWLEVEL_PROTOCOL_MINIMUM_VERSION))
+	{
+		// Error in packet format, just ignore packet
+		return;
+	}
+
+	uint8 lowLevelVersion = 0;
+	uint8 highLevelVersion = 0;
+	const ProtocolVersionChecker::Result resultLowLevel = ProtocolVersionChecker::chooseVersion(lowLevelVersion, LOWLEVEL_PROTOCOL_MINIMUM_VERSION, LOWLEVEL_PROTOCOL_MAXIMUM_VERSION, packet.mLowLevelMinimumProtocolVersion, packet.mLowLevelMaximumProtocolVersion);
+	const ProtocolVersionChecker::Result resultHighLevel = ProtocolVersionChecker::chooseVersion(highLevelVersion, connectionManager.getHighLevelMinimumProtocolVersion(), connectionManager.getHighLevelMaximumProtocolVersion(), packet.mHighLevelMinimumProtocolVersion, packet.mHighLevelMaximumProtocolVersion);
+	if (resultLowLevel != ProtocolVersionChecker::Result::SUCCESS || resultHighLevel != ProtocolVersionChecker::Result::SUCCESS)
+	{
+		// TODO: Send back an error (and maybe differentiate teh cases)
+		return;
+	}
+
+	const uint64 senderKey = NetConnection::buildSenderKey(receivedPacket.mSenderAddress, remoteConnectionID);
+	NetConnection* connection = connectionManager.findConnectionTo(senderKey);
+	if (nullptr != connection)
+	{
+		if (connection->isConnectedTo(connection->getLocalConnectionID(), remoteConnectionID, senderKey))
+		{
+			// Resend the AcceptConnectionPacket, as it seems the last one got lost
+			connection->sendAcceptConnectionPacket();
+		}
+		else
+		{
+			// Destroy that old connection
+			connection->clear();
+			destroyNetConnection(*connection);
 		}
 	}
 
-	return true;
+	// Create a new connection
+	const uint16 localConnectionID = mConnectionIDProvider.getNextID();
+	connection = createNetConnection(connectionManager, receivedPacket.mSenderAddress);
+	if (nullptr != connection)
+	{
+		connection->setProtocolVersions(lowLevelVersion, highLevelVersion);
+		connection->acceptIncomingConnection(connectionManager, localConnectionID, remoteConnectionID, receivedPacket.mSenderAddress, senderKey);
+	}
+	else
+	{
+		// TODO: Send back an error
+	}
 }

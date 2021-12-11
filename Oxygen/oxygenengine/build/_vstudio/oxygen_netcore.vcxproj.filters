@@ -17,6 +17,27 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\ServerClientBase.h">
       <Filter>network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\IDProvider.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\HighLevelPacketBase.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacket.h">
+      <Filter>network\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.h">
+      <Filter>network\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacketCache.h">
+      <Filter>network\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\RequestBase.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionListener.h">
+      <Filter>network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />
@@ -32,10 +53,22 @@
     <ClCompile Include="..\..\source\oxygen_netcore\network\ServerClientBase.cpp">
       <Filter>network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.cpp">
+      <Filter>network\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen_netcore\network\internal\SentPacketCache.cpp">
+      <Filter>network\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen_netcore\network\RequestBase.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="network">
       <UniqueIdentifier>{5d036cf8-8783-4986-b471-164010611080}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network\internal">
+      <UniqueIdentifier>{2fe35194-420c-4f7c-937b-3cc66e3f7371}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
