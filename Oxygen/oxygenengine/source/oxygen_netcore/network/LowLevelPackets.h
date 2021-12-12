@@ -74,6 +74,32 @@ namespace lowlevel
 	};
 
 
+	struct ErrorPacket : public PacketBase
+	{
+		enum class ErrorCode : uint8
+		{
+			// The errors marking with (*) are sent without an actual establishes connection - that means they do not include a proper local connection ID and just re-use the received remote connection ID
+			UNKNOWN					= 0,
+			CONNECTION_INVALID		= 1,	// (*) Received a packet with an unknown connection ID
+			UNSUPPORTED_VERSION		= 2,	// (*) Received a start connection packet that uses protocol versions that can't be supported
+			TOO_MANY_CONNECTIONS	= 3,	// (*) Remote server / client has too many active connections already
+		};
+		ErrorCode mErrorCode = ErrorCode::UNKNOWN;
+		uint32 mParameter = 0;
+
+		static const constexpr uint16 SIGNATURE = 0xf584;
+		virtual uint16 getSignature() const override  { return SIGNATURE; }
+
+		inline ErrorPacket() {}
+		inline ErrorPacket(ErrorCode errorCode, uint32 parameter = 0) : mErrorCode(errorCode), mParameter(parameter) {}
+
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		{
+			serializer.serializeAs<uint8>(mErrorCode);
+		}
+	};
+
+
 	struct HighLevelPacket : public PacketBase
 	{
 		struct Flags

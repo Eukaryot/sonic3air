@@ -10,6 +10,10 @@
 
 #include "oxygen_netcore/network/internal/ReceivedPacket.h"
 
+namespace lowlevel
+{
+	struct PacketBase;
+}
 struct ConnectionListenerInterface;
 
 
@@ -29,6 +33,7 @@ public:
 
 	inline UDPSocket& getSocket() const  { return mSocket; }
 	inline ConnectionListenerInterface& getListener() const  { return mListener; }
+	inline size_t getNumActiveConnections() const			 { return mActiveConnections.size(); }
 
 	inline uint8 getHighLevelMinimumProtocolVersion() const  { return mHighLevelMinimumProtocolVersion; }
 	inline uint8 getHighLevelMaximumProtocolVersion() const  { return mHighLevelMaximumProtocolVersion; }
@@ -41,12 +46,18 @@ public:
 	inline bool hasAnyPacket() const  { return !mReceivedPackets.mSyncedQueue.empty(); }
 	ReceivedPacket* getNextReceivedPacket();
 
+	bool sendPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress);
+	bool sendConnectionlessLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, const SocketAddress& remoteAddress, uint16 localConnectionID, uint16 remoteConnectionID);
+
 	NetConnection* findConnectionTo(uint64 senderKey) const;
 
 protected:
 	// Only meant to be called from the NetConnection
 	void addConnection(NetConnection& connection);
 	void removeConnection(NetConnection& connection);
+
+	// Internal
+	uint16 getFreeLocalConnectionID();
 
 private:
 	struct SyncedPacketQueue
@@ -64,6 +75,8 @@ private:
 	uint8 mHighLevelMaximumProtocolVersion = 1;
 
 	std::unordered_map<uint16, NetConnection*> mActiveConnections;		// Using local connection ID as key
+	std::vector<NetConnection*> mActiveConnectionsLookup;				// Using the lowest n bits of the local connection ID as index
+	uint16 mBitmaskForActiveConnectionsLookup = 0;
 	std::unordered_map<uint64, NetConnection*> mConnectionsBySender;	// Using a sender key (= hash for the sender address + remote connection ID) as key
 	SyncedPacketQueue mReceivedPackets;
 

@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionManager.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\HighLevelPacketBase.h" />
-    <ClInclude Include="..\..\source\oxygen_netcore\network\IDProvider.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacket.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacketCache.h" />

@@ -312,7 +312,11 @@ bool UDPSocket::bindToPort(uint16 port)
 	result = ::bind(mInternal->mSocket, addressInfo->ai_addr, (int)addressInfo->ai_addrlen);
 	if (result < 0)
 	{
+	#ifdef _WIN32
+		RMX_ERROR("bind failed with error: " << WSAGetLastError(), );
+	#else
 		RMX_ERROR("bind failed with error: " << result, );
+	#endif
 		::freeaddrinfo(addressInfo);
 		close();
 		return false;
@@ -322,7 +326,7 @@ bool UDPSocket::bindToPort(uint16 port)
 	mInternal->mLocalPort = port;
 
 	// Setup socket options
-	int bufsize = 0x20000;
+	int bufsize = MAX_DATAGRAM_SIZE * 8;	// This would be 256 KB, enough to hold multiple large datagrams
 	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&bufsize, sizeof(bufsize));
 	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&bufsize, sizeof(bufsize));
 	return true;
@@ -435,10 +439,7 @@ bool UDPSocket::receiveBlocking(ReceiveResult& outReceiveResult)
 	if (!isValid())
 		return false;
 
-#ifdef _WIN32
-	return receiveInternal(outReceiveResult);
-
-#else
+#ifndef _WIN32
 	if (!mInternal->mIsBlockingSocket)
 	{
 		// Set to blocking
@@ -446,9 +447,9 @@ bool UDPSocket::receiveBlocking(ReceiveResult& outReceiveResult)
 		fcntl(mInternal->mSocket, F_SETFL, flags & ~O_NONBLOCK);
 		mInternal->mIsBlockingSocket = true;
 	}
+#endif
 
 	return receiveInternal(outReceiveResult);
-#endif
 }
 
 bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
@@ -456,7 +457,8 @@ bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 	size_t bytesRead = 0;
 	while (true)
 	{
-		const constexpr size_t CHUNK_SIZE = 0x1000;
+		// TODO: Reading a datagram in multiple chunks does not work, at least on Windows, so this whole while-loop is kind of pointless...
+		const constexpr size_t CHUNK_SIZE = MAX_DATAGRAM_SIZE;
 		outReceiveResult.mBuffer.resize(bytesRead + CHUNK_SIZE);
 
 		sockaddr_storage& senderAddress = *reinterpret_cast<sockaddr_storage*>(outReceiveResult.mSenderAddress.accessSockAddr());

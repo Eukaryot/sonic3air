@@ -56,18 +56,18 @@ void NetConnection::setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 hig
 	mHighLevelProtocolVersion = highLevelProtocolVersion;
 }
 
-bool NetConnection::startConnectTo(ConnectionManager& connectionManager, uint16 localConnectionID, const SocketAddress& remoteAddress)
+bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress)
 {
 	clear();
 
 	mState = State::REQUESTED_CONNECTION;
 	mConnectionManager = &connectionManager;
-	mLocalConnectionID = localConnectionID;
-	mRemoteConnectionID = 0;	// Not yet set
+	mLocalConnectionID = 0;			// Not yet set, see "addConnection" below
+	mRemoteConnectionID = 0;		// Not yet set
 	mRemoteAddress = remoteAddress;
-	mSenderKey = 0;				// Not yet set as it depends on the remote connection ID
+	mSenderKey = 0;					// Not yet set as it depends on the remote connection ID
 
-	mConnectionManager->addConnection(*this);
+	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
 
 	// Send a low-level message to establish the connection
 	{
@@ -94,19 +94,20 @@ bool NetConnection::isConnectedTo(uint16 localConnectionID, uint16 remoteConnect
 	return (nullptr != mConnectionManager && mState == State::CONNECTED && localConnectionID == mLocalConnectionID && remoteConnectionID == mRemoteConnectionID && senderKey == mSenderKey);
 }
 
-void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManager, uint16 localConnectionID, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey)
+void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey)
 {
 	clear();
 
 	mState = State::CONNECTED;
 	mConnectionManager = &connectionManager;
-	mLocalConnectionID = localConnectionID;
+	mLocalConnectionID = 0;			// Not yet set, see "addConnection" below
 	mRemoteConnectionID = remoteConnectionID;
 	mRemoteAddress = remoteAddress;
 	mSenderKey = senderKey;
 	RMX_ASSERT(senderKey == buildSenderKey(mRemoteAddress, mRemoteConnectionID), "Previously calculated sender key is the wrong one");
 
-	mConnectionManager->addConnection(*this);
+	std::cout << "Accepting connection from " << mRemoteAddress.toString() << std::endl;
+	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
 
 	// Send back a response
 	sendAcceptConnectionPacket();
@@ -189,21 +190,11 @@ void NetConnection::unregisterRequest(highlevel::RequestBase& request)
 
 bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
 {
-	#ifdef DEBUG
-	{
-		if (mConnectionManager->mDebugSettings.mSendingPacketLoss > 0.0f)
-		{
-			if (randomf() < mConnectionManager->mDebugSettings.mSendingPacketLoss)
-			{
-				// Act as if the packet was sent successfully
-				return true;
-			}
-		}
-	}
-	#endif
+	if (nullptr == mConnectionManager)
+		return false;
 
 	mLastMessageSentTimestamp = mCurrentTimestamp;
-	return getSocket()->sendData(mSendBuffer, mRemoteAddress);
+	return mConnectionManager->sendPacketData(content, mRemoteAddress);
 }
 
 void NetConnection::writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket)

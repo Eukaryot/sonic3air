@@ -18,28 +18,19 @@ ConnectionManager::ConnectionManager(UDPSocket& socket, ConnectionListenerInterf
 	mHighLevelMinimumProtocolVersion(highLevelMinimumProtocolVersion),
 	mHighLevelMaximumProtocolVersion(highLevelMaximumProtocolVersion)
 {
-}
-
-void ConnectionManager::addConnection(NetConnection& connection)
-{
-	mActiveConnections[connection.getLocalConnectionID()] = &connection;
-	mConnectionsBySender[connection.getSenderKey()] = &connection;
-}
-
-void ConnectionManager::removeConnection(NetConnection& connection)
-{
-	mActiveConnections.erase(connection.getLocalConnectionID());
-	mConnectionsBySender.erase(connection.getSenderKey());
-
-	// TODO: Remove all queued packets for this connection
+	mActiveConnections.reserve(32);
+	mActiveConnectionsLookup.resize(32);
+	mBitmaskForActiveConnectionsLookup = (uint16)(mActiveConnectionsLookup.size() - 1);
 }
 
 void ConnectionManager::updateConnections(uint64 currentTimestamp)
 {
-	// TODO: An unordered_map is not really optimal for iterating
-	for (auto& pair : mActiveConnections)
+	for (NetConnection* connection : mActiveConnectionsLookup)
 	{
-		pair.second->updateConnection(currentTimestamp);
+		if (nullptr != connection)
+		{
+			connection->updateConnection(currentTimestamp);
+		}
 	}
 }
 
@@ -81,33 +72,53 @@ bool ConnectionManager::updateReceivePackets()
 		}
 		else
 		{
-			// TODO: Explicitly check the known = valid signature types here?
+			// TODO: Explicitly check the known (= valid) signature types here?
 
 			const uint16 remoteConnectionID = serializer.read<uint16>();
 			const uint16 localConnectionID = serializer.read<uint16>();
-			const auto it = mActiveConnections.find(localConnectionID);
-			if (it == mActiveConnections.end())
+			if (localConnectionID == 0)
 			{
-				// Unknown connection
-				// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+				// Invalid connection
+				if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
+				{
+					// TODO: Evaluate the error code
+					RMX_ASSERT(false, "Received error packet");
+				}
 			}
 			else
 			{
-				NetConnection& connection = *it->second;
-				if (connection.getRemoteConnectionID() != remoteConnectionID && lowLevelSignature != lowlevel::AcceptConnectionPacket::SIGNATURE)
+				// Find the connection in our list of active connections
+				NetConnection* connection = mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup];
+				if (nullptr == connection)
 				{
 					// Unknown connection
-					// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+					if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
+					{
+						// It's an error packet, don't send anything back
+						// TODO: Evaluate the error code
+					}
+					else
+					{
+						// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+					}
 				}
 				else
 				{
-					// Store for later evaluation
-					ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
-					receivedPacket.mContent = received.mBuffer;
-					receivedPacket.mLowLevelSignature = lowLevelSignature;
-					receivedPacket.mSenderAddress = received.mSenderAddress;
-					receivedPacket.mConnection = &connection;
-					mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
+					if (connection->getRemoteConnectionID() != remoteConnectionID && lowLevelSignature != lowlevel::AcceptConnectionPacket::SIGNATURE)
+					{
+						// Unknown or invalid connection
+						// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+					}
+					else
+					{
+						// Store for later evaluation
+						ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
+						receivedPacket.mContent = received.mBuffer;
+						receivedPacket.mLowLevelSignature = lowLevelSignature;
+						receivedPacket.mSenderAddress = received.mSenderAddress;
+						receivedPacket.mConnection = connection;
+						mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
+					}
 				}
 			}
 		}
@@ -154,8 +165,109 @@ ReceivedPacket* ConnectionManager::getNextReceivedPacket()
 	return receivedPacket;
 }
 
+bool ConnectionManager::sendPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress)
+{
+	#ifdef DEBUG
+	{
+		if (mDebugSettings.mSendingPacketLoss > 0.0f)
+		{
+			if (randomf() < mDebugSettings.mSendingPacketLoss)
+			{
+				// Act as if the packet was sent successfully
+				return true;
+			}
+		}
+	}
+	#endif
+
+	return mSocket.sendData(data, remoteAddress);
+}
+
+bool ConnectionManager::sendConnectionlessLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, const SocketAddress& remoteAddress, uint16 localConnectionID, uint16 remoteConnectionID)
+{
+	// Write low-level packet header
+	static std::vector<uint8> sendBuffer;
+	sendBuffer.clear();
+
+	VectorBinarySerializer serializer(false, sendBuffer);
+	serializer.write(lowLevelPacket.getSignature());
+	serializer.write(localConnectionID);
+	serializer.write(remoteConnectionID);
+	lowLevelPacket.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_MINIMUM_PROTOCOL_VERSION);
+
+	return sendPacketData(sendBuffer, remoteAddress);
+}
+
 NetConnection* ConnectionManager::findConnectionTo(uint64 senderKey) const
 {
 	const auto it = mConnectionsBySender.find(senderKey);
 	return (it == mConnectionsBySender.end()) ? nullptr : it->second;
+}
+
+void ConnectionManager::addConnection(NetConnection& connection)
+{
+	const uint16 localConnectionID = getFreeLocalConnectionID();
+	RMX_CHECK(localConnectionID != 0, "Error in connection management: Could not assign a valid connection ID", return);
+
+	connection.mLocalConnectionID = localConnectionID;
+	mActiveConnections[localConnectionID] = &connection;
+	mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup] = &connection;
+	mConnectionsBySender[connection.getSenderKey()] = &connection;
+}
+
+void ConnectionManager::removeConnection(NetConnection& connection)
+{
+	// This method gets called from "NetConnection::clear", so it's safe to assume the connection gets cleaned up internally already
+	mActiveConnections.erase(connection.getLocalConnectionID());
+	mActiveConnectionsLookup[connection.getLocalConnectionID() & mBitmaskForActiveConnectionsLookup] = nullptr;
+	mConnectionsBySender.erase(connection.getSenderKey());
+
+	// TODO: Maybe reduce size of "mActiveConnectionsLookup" again if there's only few connections left - and if this does not produce any conflicts
+}
+
+uint16 ConnectionManager::getFreeLocalConnectionID()
+{
+	// Make sure the lookup is always large enough (not filled by more than 75%)
+	if (mActiveConnections.size() + 1 >= mActiveConnectionsLookup.size() * 3/4)
+	{
+		const size_t oldSize = mActiveConnectionsLookup.size();
+		const size_t newSize = std::min<size_t>(mActiveConnectionsLookup.size() * 2, 32);
+		mActiveConnectionsLookup.resize(newSize);
+		mBitmaskForActiveConnectionsLookup = (uint16)(mActiveConnectionsLookup.size() - 1);
+
+		// Move all entries whose index does not fit any more
+		for (size_t k = 0; k < oldSize; ++k)
+		{
+			NetConnection* foundConnection = mActiveConnectionsLookup[k];
+			if (nullptr != foundConnection)
+			{
+				const uint16 newIndex = foundConnection->getLocalConnectionID() & mBitmaskForActiveConnectionsLookup;
+				if (newIndex != k)
+				{
+					mActiveConnectionsLookup[newIndex] = foundConnection;
+					mActiveConnectionsLookup[k] = nullptr;
+				}
+			}
+		}
+	}
+
+	// Get a new random local connection ID candidate
+	static_assert(RAND_MAX >= 0xff);
+	uint16 localConnectionID = (rand() & 0xff) + ((rand() & 0xff) << 8);
+	for (size_t tries = 0; tries < mActiveConnectionsLookup.size(); ++tries)
+	{
+		// Exclude 0, as it would be an invalid connection ID
+		if (localConnectionID != 0)
+		{
+			// Check if it's free in the lookup
+			const uint16 index = localConnectionID & mBitmaskForActiveConnectionsLookup;
+			if (nullptr == mActiveConnectionsLookup[index])
+			{
+				// We're good to go
+				return localConnectionID;
+			}
+		}
+		++localConnectionID;
+	}
+	return 0;
 }

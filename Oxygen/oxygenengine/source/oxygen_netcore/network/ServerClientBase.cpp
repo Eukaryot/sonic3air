@@ -112,7 +112,10 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 	const ProtocolVersionChecker::Result resultHighLevel = ProtocolVersionChecker::chooseVersion(highLevelVersion, connectionManager.getHighLevelMinimumProtocolVersion(), connectionManager.getHighLevelMaximumProtocolVersion(), packet.mHighLevelMinimumProtocolVersion, packet.mHighLevelMaximumProtocolVersion);
 	if (resultLowLevel != ProtocolVersionChecker::Result::SUCCESS || resultHighLevel != ProtocolVersionChecker::Result::SUCCESS)
 	{
-		// TODO: Send back an error (and maybe differentiate teh cases)
+		// Send back an error
+		const bool localIsTooOld = (resultLowLevel == ProtocolVersionChecker::Result::ERROR_TOO_NEW || resultHighLevel == ProtocolVersionChecker::Result::ERROR_TOO_NEW);
+		lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::UNSUPPORTED_VERSION, localIsTooOld ? 1 : 0);
+		connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);
 		return;
 	}
 
@@ -124,25 +127,36 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 		{
 			// Resend the AcceptConnectionPacket, as it seems the last one got lost
 			connection->sendAcceptConnectionPacket();
+			return;
 		}
-		else
+
+		// Destroy that old connection
+		connection->clear();
+		destroyNetConnection(*connection);
+	}
+	else
+	{
+		// Check if another connection would reach the limit of concurrent connections
+		if (connectionManager.getNumActiveConnections() + 1 >= 0x100)	// Not a hard limit, but should be good enough for now
 		{
-			// Destroy that old connection
-			connection->clear();
-			destroyNetConnection(*connection);
+			lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::TOO_MANY_CONNECTIONS);
+			connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);
+			return;
 		}
 	}
 
 	// Create a new connection
-	const uint16 localConnectionID = mConnectionIDProvider.getNextID();
 	connection = createNetConnection(connectionManager, receivedPacket.mSenderAddress);
 	if (nullptr != connection)
 	{
+		// Setup connection
 		connection->setProtocolVersions(lowLevelVersion, highLevelVersion);
-		connection->acceptIncomingConnection(connectionManager, localConnectionID, remoteConnectionID, receivedPacket.mSenderAddress, senderKey);
+		connection->acceptIncomingConnection(connectionManager, remoteConnectionID, receivedPacket.mSenderAddress, senderKey);
 	}
 	else
 	{
-		// TODO: Send back an error
+		// Send back an error
+		lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::CONNECTION_INVALID);
+		connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);
 	}
 }

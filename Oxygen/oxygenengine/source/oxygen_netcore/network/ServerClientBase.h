@@ -9,7 +9,6 @@
 #pragma once
 
 #include "oxygen_netcore/network/ConnectionListener.h"
-#include "oxygen_netcore/network/IDProvider.h"
 
 class ConnectionManager;
 class NetConnection;
@@ -26,9 +25,6 @@ protected:
 protected:
 	virtual NetConnection* createNetConnection(ConnectionManager& connectionManager, const SocketAddress& senderAddress) = 0;
 	virtual void destroyNetConnection(NetConnection& connection) = 0;
-
-protected:
-	IDProvider<uint16> mConnectionIDProvider;
 
 private:
 	void handleConnectionStartPacket(ConnectionManager& connectionManager, const ReceivedPacket& receivedPacket);

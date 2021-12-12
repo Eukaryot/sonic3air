@@ -17,9 +17,6 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\ServerClientBase.h">
       <Filter>network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen_netcore\network\IDProvider.h">
-      <Filter>network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen_netcore\network\HighLevelPacketBase.h">
       <Filter>network</Filter>
     </ClInclude>

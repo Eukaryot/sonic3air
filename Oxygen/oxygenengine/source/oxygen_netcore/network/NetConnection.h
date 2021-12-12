@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "oxygen_netcore/network/IDProvider.h"
 #include "oxygen_netcore/network/RequestBase.h"
 #include "oxygen_netcore/network/internal/ReceivedPacketCache.h"
 #include "oxygen_netcore/network/internal/SentPacketCache.h"
@@ -20,6 +19,7 @@ class ConnectionManager;
 class NetConnection
 {
 friend class ServerClientBase;
+friend class ConnectionManager;
 friend class highlevel::RequestBase;
 
 public:
@@ -51,9 +51,9 @@ public:
 	uint8 getHighLevelProtocolVersion() const	{ return mHighLevelProtocolVersion; }
 	void setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 highLevelProtocolVersion);
 
-	bool startConnectTo(ConnectionManager& connectionManager, uint16 localConnectionID, const SocketAddress& remoteAddress);
+	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress);
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
-	void acceptIncomingConnection(ConnectionManager& connectionManager, uint16 localConnectionID, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey);
+	void acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey);
 	void sendAcceptConnectionPacket();
 
 	bool sendPacket(highlevel::PacketBase& packet);

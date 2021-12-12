@@ -123,6 +123,8 @@ private:
 class UDPSocket
 {
 public:
+	static const constexpr size_t MAX_DATAGRAM_SIZE = 0x8000;	// That's 32 KB (the actual limit is somewhat close to 64 KB, but let's play safe here)
+
 	struct ReceiveResult
 	{
 		std::vector<uint8> mBuffer;
