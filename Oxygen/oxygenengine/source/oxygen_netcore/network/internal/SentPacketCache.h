@@ -8,40 +8,23 @@
 
 #pragma once
 
-#include <rmxbase.h>
-
-namespace lowlevel
-{
-	struct HighLevelPacket;
-}
+#include "oxygen_netcore/network/internal/SentPacket.h"
 
 
 class SentPacketCache
 {
 public:
-	struct CacheItem
-	{
-		// TODO: Some kind of pooling / instance management would be nice for these, or at least their content
-
-		std::vector<uint8> mContent;
-
-		uint64 mInitialTimestamp = 0;
-		uint64 mLastResendTimestamp = 0;
-		int mResendCounter = 0;
-		bool mConfirmed = false;
-	};
-
-public:
 	void clear();
 	uint32 getNextUniquePacketID() const;
 
-	void addPacket(uint32 uniquePacketID, const std::vector<uint8>& content, uint64 currentTimestamp);
+	void addPacket(SentPacket& sentPacket, bool isStartConnectionPacket = false);
+
 	void onPacketReceiveConfirmed(uint32 uniquePacketID);
 
-	void updateResend(std::vector<CacheItem*>& outItemsToResend, uint64 currentTimestamp);
+	void updateResend(std::vector<SentPacket*>& outPacketsToResend, uint64 currentTimestamp);
 
 private:
 	uint32 mQueueStartUniquePacketID = 1;
 	uint32 mNextUniquePacketID = 1;			// This should always be "mQueueStartUniquePacketID + mQueue.size()"
-	std::deque<CacheItem> mQueue;
+	std::deque<SentPacket*> mQueue;
 };

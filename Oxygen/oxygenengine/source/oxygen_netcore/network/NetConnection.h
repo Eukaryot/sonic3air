@@ -69,7 +69,7 @@ private:
 
 	bool sendPacketInternal(const std::vector<uint8>& content);
 	void writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket);
-	bool sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket);
+	bool sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, std::vector<uint8>& buffer);
 	bool sendHighLevelPacket(highlevel::PacketBase& packet, uint8 flags, uint32& outUniquePacketID);
 	bool sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID);
 
@@ -100,5 +100,5 @@ private:
 
 	// For temporary use (these are members to avoid frequent reallocations)
 	std::vector<uint8> mSendBuffer;
-	std::vector<SentPacketCache::CacheItem*> mItemsToResend;
+	std::vector<SentPacket*> mPacketsToResend;
 };

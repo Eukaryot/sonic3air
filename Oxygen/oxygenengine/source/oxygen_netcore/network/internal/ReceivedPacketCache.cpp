@@ -18,13 +18,11 @@ ReceivedPacketCache::~ReceivedPacketCache()
 
 void ReceivedPacketCache::clear()
 {
-	// Return all received packets
+	// Remove references to all received packets still in the queue
 	for (CacheItem& item : mQueue)
 	{
-		item.mReceivedPacket->mShouldBeReturned = false;
-		item.mReceivedPacket->returnToDump();
+		item.mReceivedPacket->decReferenceCounter();
 	}
-
 	mQueue.clear();
 	mLastExtractedUniquePacketID = 0;
 }
@@ -82,7 +80,7 @@ bool ReceivedPacketCache::enqueuePacket(ReceivedPacket& receivedPacket, const lo
 	itemToFill->mReceivedPacket = &receivedPacket;
 
 	// Retain packet while it's referenced in the queue
-	receivedPacket.mShouldBeReturned = false;
+	receivedPacket.incReferenceCounter();
 
 	// Now the packet was enqueued, and we can't do more here right now
 	return true;
@@ -98,8 +96,8 @@ bool ReceivedPacketCache::extractPacket(CacheItem& outExtractionResult)
 		return false;
 
 	RMX_ASSERT(item.mPacketHeader.mUniquePacketID == mLastExtractedUniquePacketID + 1, "Detected a mismatch in unique packet IDs");
+	// Note that the reference counter does not get decreased here, the caller of this method takes over the reference
 	outExtractionResult = item;
-	item.mReceivedPacket->mShouldBeReturned = true;
 
 	mQueue.pop_front();
 	++mLastExtractedUniquePacketID;

@@ -84,10 +84,9 @@ bool ServerClientBase::updateReceivePackets(ConnectionManager& connectionManager
 			receivedPacket->mConnection->handleLowLevelPacket(*receivedPacket);
 		}
 
-		if (receivedPacket->mShouldBeReturned)
-		{
-			receivedPacket->returnToDump();
-		}
+		// Return the packet if nobody increased the reference counter meanwhile
+		//  -> E.g. the ReceivedPacketCache does this when adding a high-level packet into its queue of pending packets
+		receivedPacket->decReferenceCounter();
 	}
 	return true;
 }

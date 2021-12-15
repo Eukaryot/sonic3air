@@ -35,6 +35,15 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionListener.h">
       <Filter>network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\serverclient\Packets.h">
+      <Filter>serverclient</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\serverclient\ProtocolVersion.h">
+      <Filter>serverclient</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacket.h">
+      <Filter>network\internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />
@@ -66,6 +75,9 @@
     </Filter>
     <Filter Include="network\internal">
       <UniqueIdentifier>{2fe35194-420c-4f7c-937b-3cc66e3f7371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="serverclient">
+      <UniqueIdentifier>{4967edf5-66d2-47bb-84cc-f6f49009d990}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

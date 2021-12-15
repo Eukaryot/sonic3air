@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "oxygen_netcore/network/internal/SentPacketCache.h"
 #include "oxygen_netcore/network/internal/ReceivedPacket.h"
 
 namespace lowlevel
@@ -55,6 +56,7 @@ protected:
 	// Only meant to be called from the NetConnection
 	void addConnection(NetConnection& connection);
 	void removeConnection(NetConnection& connection);
+	SentPacket& rentSentPacket();
 
 	// Internal
 	uint16 getFreeLocalConnectionID();
@@ -80,5 +82,6 @@ private:
 	std::unordered_map<uint64, NetConnection*> mConnectionsBySender;	// Using a sender key (= hash for the sender address + remote connection ID) as key
 	SyncedPacketQueue mReceivedPackets;
 
+	RentableObjectPool<SentPacket> mSentPacketPool;
 	RentableObjectPool<ReceivedPacket> mReceivedPacketPool;
 };

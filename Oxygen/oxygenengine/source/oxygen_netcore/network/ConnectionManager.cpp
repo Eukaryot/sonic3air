@@ -160,8 +160,10 @@ ReceivedPacket* ConnectionManager::getNextReceivedPacket()
 	ReceivedPacket* receivedPacket = mReceivedPackets.mSyncedQueue.front();
 	mReceivedPackets.mSyncedQueue.pop_front();
 
-	// Set the "dump" instance that packets get returned to when they have been processed completely
-	receivedPacket->setDump(&mReceivedPackets.mToBeReturned);
+	// Packet initialization:
+	//  - Set the "dump" instance that packets get returned to when the reference counter reaches zero
+	//  - Start with a reference count of 1
+	receivedPacket->initializeWithDump(&mReceivedPackets.mToBeReturned);
 	return receivedPacket;
 }
 
@@ -223,6 +225,13 @@ void ConnectionManager::removeConnection(NetConnection& connection)
 	mConnectionsBySender.erase(connection.getSenderKey());
 
 	// TODO: Maybe reduce size of "mActiveConnectionsLookup" again if there's only few connections left - and if this does not produce any conflicts
+}
+
+SentPacket& ConnectionManager::rentSentPacket()
+{
+	SentPacket& sentPacket = mSentPacketPool.rentObject();
+	sentPacket.initializeWithPool(mSentPacketPool);
+	return sentPacket;
 }
 
 uint16 ConnectionManager::getFreeLocalConnectionID()
