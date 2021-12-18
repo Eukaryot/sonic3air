@@ -23,6 +23,7 @@ protected:
 	void saveSettingsInternal(Json::Value& root, SettingsType settingsType) override;
 
 private:
+	void loadSharedSettingsConfig(JsonHelper& rootHelper);
 	void loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType, bool isDeprecatedJson);
 
 public:
@@ -36,4 +37,13 @@ public:
 
 	// Settings game version
 	std::string mGameVersionInSettings;
+
+	// Game server
+	struct GameServer
+	{
+		bool mConnectToServer = false;
+		std::string mServerURL;
+		int mServerPort = 0;
+	};
+	GameServer mGameServer;
 };

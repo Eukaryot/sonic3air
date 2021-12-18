@@ -8,10 +8,12 @@
 
 #pragma once
 
-#include "oxygen/resources/ResourcesCache.h"
-#include "sonic3air/helper/BlueSpheresRendering.h"
+#include "sonic3air/client/GameClient.h"
 #include "sonic3air/data/PlayerProgress.h"
 #include "sonic3air/data/PlayerRecorder.h"
+#include "sonic3air/helper/BlueSpheresRendering.h"
+
+#include "oxygen/resources/ResourcesCache.h"
 
 namespace lemon
 {
@@ -122,9 +124,10 @@ private:
 	BlueSpheresRendering mBlueSpheresRendering;
 	PlayerProgress mPlayerProgress;
 	PlayerRecorder mPlayerRecorder;
+	GameClient mGameClient;
 
-	uint16 mLastZoneAndAct;
-	uint8  mLastCharacters;
+	uint16 mLastZoneAndAct = 0;
+	uint8  mLastCharacters = 0;
 
 	bool mReceivedTimeAttackFinished = false;
 	bool mReturnToMenuTriggered = false;

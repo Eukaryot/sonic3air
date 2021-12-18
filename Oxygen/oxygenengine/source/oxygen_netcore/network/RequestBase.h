@@ -24,7 +24,7 @@ namespace highlevel
 		enum class State
 		{
 			NONE,		// Request was not sent
-			SENT,		// Request was sent, but no respisne was received
+			SENT,		// Request was sent, but no response was received
 			SUCCESS,	// Request was sent and got a response
 			FAILED		// Request was sent, but received an error as response
 		};
@@ -33,7 +33,7 @@ namespace highlevel
 		virtual ~RequestBase();
 
 		inline State getState() const	{ return mState; }
-		inline bool hasResponse() const	{ return (mState <= State::SENT); }
+		inline bool hasResponse() const	{ return (mState >= State::SUCCESS); }
 		inline bool hasError() const	{ return (mState == State::FAILED); }
 
 	protected:

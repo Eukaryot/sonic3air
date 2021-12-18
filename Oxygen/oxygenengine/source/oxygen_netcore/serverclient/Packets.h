@@ -53,7 +53,7 @@ namespace network
 	};
 
 
-	class AppUpdateCheck : public highlevel::RequestBase
+	class AppUpdateCheckRequest : public highlevel::RequestBase
 	{
 		struct QueryData
 		{

@@ -26,6 +26,8 @@ void ConfigurationImpl::preLoadInitialization()
 
 bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 {
+	loadSharedSettingsConfig(jsonHelper);
+
 	// Add special preprocessor define
 	//  -> Used to query whether it's the game build (i.e. not the Oxygen App), and to get its build number
 	mPreprocessorDefinitions.setDefinition("GAMEAPP", BUILD_NUMBER);
@@ -56,6 +58,21 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 	return true;
 }
 
+void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
+{
+	// Game server
+	{
+		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
+		if (!gameServerJson.isNull())
+		{
+			JsonHelper jsonHelper(gameServerJson);
+			jsonHelper.tryReadBool("ConnectToServer", mGameServer.mConnectToServer);
+			jsonHelper.tryReadString("ServerURL", mGameServer.mServerURL);
+			jsonHelper.tryReadInt("ServerPort", mGameServer.mServerPort);
+		}
+	}
+}
+
 void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType, bool isDeprecatedJson)
 {
 	if (!isDeprecatedJson && settingsType == SettingsType::STANDARD)
@@ -73,6 +90,8 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 				loadSettingsInternal(deprecatedJsonHelper, settingsType, true);
 			}
 		}
+
+		loadSharedSettingsConfig(rootHelper);
 	}
 
 	// Audio

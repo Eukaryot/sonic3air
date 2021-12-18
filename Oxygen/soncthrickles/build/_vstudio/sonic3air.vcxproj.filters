@@ -34,6 +34,9 @@
     <Filter Include="_nativized">
       <UniqueIdentifier>{08f6d9c0-554c-44b7-80ce-85ac88afe488}</UniqueIdentifier>
     </Filter>
+    <Filter Include="client">
+      <UniqueIdentifier>{5e5e5db6-45b6-422c-ba5a-723d5e2c95a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp">
@@ -130,6 +133,12 @@
     <ClCompile Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.cpp">
       <Filter>menu\options</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\client\GameClient.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\client\UpdateCheck.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -225,6 +234,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.h">
       <Filter>menu\options</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\client\GameClient.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\client\UpdateCheck.h">
+      <Filter>client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

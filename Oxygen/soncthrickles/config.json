@@ -32,6 +32,15 @@
 	// Audio
 	"AudioSampleRate": "48000",
 
+	// Game server
+	"GameServer":
+	{
+		"ConnectToServer": "0",
+		//"ServerURL": "sonic3air.org",
+		"ServerURL": "127.0.0.1",	// For local testing
+		"ServerPort": "21094"
+	},
+
 	// Input recorder
 	"InputRecorder":
 	{

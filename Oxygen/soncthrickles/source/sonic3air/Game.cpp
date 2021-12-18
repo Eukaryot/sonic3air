@@ -98,6 +98,7 @@ void Game::startup()
 {
 	mPlayerProgress.load();
 	mBlueSpheresRendering.startup();
+	mGameClient.setupClient();
 
 	DiscordIntegration::startup();
 }
@@ -111,6 +112,9 @@ void Game::shutdown()
 
 void Game::update(float timeElapsed)
 {
+	// Update game client
+	mGameClient.updateClient(timeElapsed);
+
 	// Discord rich presence update
 	{
 		mTimeoutUntilDiscordRefresh -= timeElapsed;
