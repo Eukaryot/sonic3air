@@ -28,6 +28,7 @@ NetConnection::~NetConnection()
 void NetConnection::clear()
 {
 	mState = State::EMPTY;
+	mTimeoutStart = 0;
 
 	for (auto& pair : mOpenRequests)
 	{
@@ -75,7 +76,6 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 
 		// Get a new packet instance to fill
 		SentPacket& sentPacket = mConnectionManager->rentSentPacket();
-		sentPacket.mInitialTimestamp = mCurrentTimestamp;
 
 		// Build packet
 		lowlevel::StartConnectionPacket packet;
@@ -92,7 +92,7 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 		}
 
 		// Add the packet to the cache, so it can be resent if needed
-		mSentPacketCache.addPacket(sentPacket, true);
+		mSentPacketCache.addPacket(sentPacket, mCurrentTimestamp, true);
 	}
 	return true;
 }
@@ -102,31 +102,11 @@ bool NetConnection::isConnectedTo(uint16 localConnectionID, uint16 remoteConnect
 	return (nullptr != mConnectionManager && mState == State::CONNECTED && localConnectionID == mLocalConnectionID && remoteConnectionID == mRemoteConnectionID && senderKey == mSenderKey);
 }
 
-void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey)
+void NetConnection::disconnect(DisconnectReason disconnectReason)
 {
 	clear();
-
-	mState = State::CONNECTED;
-	mConnectionManager = &connectionManager;
-	mLocalConnectionID = 0;			// Not yet set, see "addConnection" below
-	mRemoteConnectionID = remoteConnectionID;
-	mRemoteAddress = remoteAddress;
-	mSenderKey = senderKey;
-	RMX_ASSERT(senderKey == buildSenderKey(mRemoteAddress, mRemoteConnectionID), "Previously calculated sender key is the wrong one");
-
-	std::cout << "Accepting connection from " << mRemoteAddress.toString() << std::endl;
-	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
-
-	// Send back a response
-	sendAcceptConnectionPacket();
-}
-
-void NetConnection::sendAcceptConnectionPacket()
-{
-	lowlevel::AcceptConnectionPacket packet;
-	packet.mLowLevelProtocolVersion = mLowLevelProtocolVersion;
-	packet.mHighLevelProtocolVersion = mHighLevelProtocolVersion;
-	sendLowLevelPacket(packet, mSendBuffer);
+	mState = State::DISCONNECTED;
+	mDisconnectReason = disconnectReason;
 }
 
 bool NetConnection::sendPacket(highlevel::PacketBase& packet)
@@ -143,7 +123,7 @@ bool NetConnection::sendRequest(highlevel::RequestBase& request)
 		return false;
 	}
 
-	request.mState = highlevel::RequestBase::State::PENDING;
+	request.mState = highlevel::RequestBase::State::SENT;
 
 	// Send query packet
 	lowlevel::RequestQueryPacket highLevelPacket;
@@ -173,6 +153,23 @@ void NetConnection::updateConnection(uint64 currentTimestamp)
 {
 	mCurrentTimestamp = currentTimestamp;
 
+	// Update timeout
+	if (mSentPacketCache.hasUnconfirmedPackets() && mTimeoutStart != 0)
+	{
+		if (mCurrentTimestamp >= mTimeoutStart + TIMEOUT_SECONDS * 1000)
+		{
+			// Trigger timeout
+			std::cout << "Disconnect due to timeout" << std::endl;
+			disconnect(DisconnectReason::TIMEOUT);
+			return;
+		}
+	}
+	else
+	{
+		// Not waiting for any confirmations, so reset timeout
+		mTimeoutStart = mCurrentTimestamp;
+	}
+
 	// Update resending
 	mPacketsToResend.clear();
 	mSentPacketCache.updateResend(mPacketsToResend, currentTimestamp);
@@ -182,112 +179,43 @@ void NetConnection::updateConnection(uint64 currentTimestamp)
 		sendPacketInternal(sentPacket->mContent);
 	}
 
-	// TODO: Check for timeout of the connection
-	//  -> This happens when we did not receive any packets for a while despite waiting for responses
-
 	// TODO: Send a heartbeat every now and then
 	//  -> But only if a heartbeat is even needed
 	//  -> E.g. it can be omitted for a connection to a public server that does not send other packets than direct responses
 
 }
 
-void NetConnection::unregisterRequest(highlevel::RequestBase& request)
+void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey)
 {
-	mOpenRequests.erase(request.mUniqueRequestID);
+	clear();
+
+	mState = State::CONNECTED;
+	mConnectionManager = &connectionManager;
+	mLocalConnectionID = 0;			// Not yet set, see "addConnection" below
+	mRemoteConnectionID = remoteConnectionID;
+	mRemoteAddress = remoteAddress;
+	mSenderKey = senderKey;
+	RMX_ASSERT(senderKey == buildSenderKey(mRemoteAddress, mRemoteConnectionID), "Previously calculated sender key is the wrong one");
+
+	std::cout << "Accepting connection from " << mRemoteAddress.toString() << std::endl;
+	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
+
+	// Send back a response
+	sendAcceptConnectionPacket();
 }
 
-bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
+void NetConnection::sendAcceptConnectionPacket()
 {
-	if (nullptr == mConnectionManager)
-		return false;
-
-	mLastMessageSentTimestamp = mCurrentTimestamp;
-	return mConnectionManager->sendPacketData(content, mRemoteAddress);
-}
-
-void NetConnection::writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket)
-{
-	// Write shared header for all low-level packets
-	serializer.write(lowLevelPacket.getSignature());
-	serializer.write(mLocalConnectionID);
-	serializer.write(mRemoteConnectionID);
-	lowLevelPacket.serializePacket(serializer, mLowLevelProtocolVersion);
-}
-
-bool NetConnection::sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, std::vector<uint8>& buffer)
-{
-	// Write low-level packet header
-	buffer.clear();
-	VectorBinarySerializer serializer(false, buffer);
-	writeLowLevelPacketContent(serializer, lowLevelPacket);
-
-	// And send it
-	return sendPacketInternal(buffer);
-}
-
-bool NetConnection::sendHighLevelPacket(highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID)
-{
-	// Build the low-level packet header for a generic high-level packet
-	//  -> This header has no special members of its own, only the shared ones
-	lowlevel::HighLevelPacket lowLevelPacket;
-	return sendHighLevelPacket(lowLevelPacket, highLevelPacket, flags, outUniquePacketID);
-}
-
-bool NetConnection::sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID)
-{
-	lowLevelPacket.mPacketType = highLevelPacket.getPacketType();
-	lowLevelPacket.mPacketFlags = flags;
-
-	const bool sendReliably = true;		// TODO: Make this an actual option for sending high-level packets
-	if (sendReliably)
-	{
-		lowLevelPacket.mUniquePacketID = mSentPacketCache.getNextUniquePacketID();
-
-		// Get a new packet instance to fill
-		SentPacket& sentPacket = mConnectionManager->rentSentPacket();
-		sentPacket.mInitialTimestamp = mCurrentTimestamp;
-
-		// Write low-level packet header
-		sentPacket.mContent.clear();
-		VectorBinarySerializer serializer(false, sentPacket.mContent);
-		writeLowLevelPacketContent(serializer, lowLevelPacket);
-
-		// Now for the high-level packet content
-		highLevelPacket.serializePacket(serializer, mHighLevelProtocolVersion);
-
-		// And send it
-		if (!sendPacketInternal(sentPacket.mContent))
-		{
-			sentPacket.returnToPool();
-			return false;
-		}
-
-		// Add the packet to the cache, so it can be resent if needed
-		mSentPacketCache.addPacket(sentPacket);
-	}
-	else
-	{
-		lowLevelPacket.mUniquePacketID = 0;
-
-		// Write low-level packet header
-		mSendBuffer.clear();
-		VectorBinarySerializer serializer(false, mSendBuffer);
-		writeLowLevelPacketContent(serializer, lowLevelPacket);
-
-		// Now for the high-level packet content
-		highLevelPacket.serializePacket(serializer, mHighLevelProtocolVersion);
-
-		// And send it
-		if (!sendPacketInternal(mSendBuffer))
-			return false;
-	}
-
-	outUniquePacketID = lowLevelPacket.mUniquePacketID;
-	return true;
+	lowlevel::AcceptConnectionPacket packet;
+	packet.mLowLevelProtocolVersion = mLowLevelProtocolVersion;
+	packet.mHighLevelProtocolVersion = mHighLevelProtocolVersion;
+	sendLowLevelPacket(packet, mSendBuffer);
 }
 
 void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 {
+	// Reset timeout whenever any packet got received
+	mTimeoutStart = mCurrentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// TODO: It would be nice to use the actual timestamp of receiving the packet here, which happened previously already
 
 	VectorBinarySerializer serializer(true, receivedPacket.mContent);
@@ -378,6 +306,99 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 			return;
 		}
 	}
+}
+
+void NetConnection::unregisterRequest(highlevel::RequestBase& request)
+{
+	mOpenRequests.erase(request.mUniqueRequestID);
+}
+
+bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
+{
+	if (nullptr == mConnectionManager)
+		return false;
+
+	mLastMessageSentTimestamp = mCurrentTimestamp;
+	return mConnectionManager->sendPacketData(content, mRemoteAddress);
+}
+
+void NetConnection::writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket)
+{
+	// Write shared header for all low-level packets
+	serializer.write(lowLevelPacket.getSignature());
+	serializer.write(mLocalConnectionID);
+	serializer.write(mRemoteConnectionID);
+	lowLevelPacket.serializePacket(serializer, mLowLevelProtocolVersion);
+}
+
+bool NetConnection::sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, std::vector<uint8>& buffer)
+{
+	// Write low-level packet header
+	buffer.clear();
+	VectorBinarySerializer serializer(false, buffer);
+	writeLowLevelPacketContent(serializer, lowLevelPacket);
+
+	// And send it
+	return sendPacketInternal(buffer);
+}
+
+bool NetConnection::sendHighLevelPacket(highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID)
+{
+	// Build the low-level packet header for a generic high-level packet
+	//  -> This header has no special members of its own, only the shared ones
+	lowlevel::HighLevelPacket lowLevelPacket;
+	return sendHighLevelPacket(lowLevelPacket, highLevelPacket, flags, outUniquePacketID);
+}
+
+bool NetConnection::sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID)
+{
+	lowLevelPacket.mPacketType = highLevelPacket.getPacketType();
+	lowLevelPacket.mPacketFlags = flags;
+
+	if (highLevelPacket.isReliablePacket())
+	{
+		lowLevelPacket.mUniquePacketID = mSentPacketCache.getNextUniquePacketID();
+
+		// Get a new packet instance to fill
+		SentPacket& sentPacket = mConnectionManager->rentSentPacket();
+
+		// Write low-level packet header
+		sentPacket.mContent.clear();
+		VectorBinarySerializer serializer(false, sentPacket.mContent);
+		writeLowLevelPacketContent(serializer, lowLevelPacket);
+
+		// Now for the high-level packet content
+		highLevelPacket.serializePacket(serializer, mHighLevelProtocolVersion);
+
+		// And send it
+		if (!sendPacketInternal(sentPacket.mContent))
+		{
+			sentPacket.returnToPool();
+			return false;
+		}
+
+		// Add the packet to the cache, so it can be resent if needed
+		mSentPacketCache.addPacket(sentPacket, mCurrentTimestamp);
+	}
+	else
+	{
+		lowLevelPacket.mUniquePacketID = 0;
+
+		// Write low-level packet header
+		mSendBuffer.clear();
+		VectorBinarySerializer serializer(false, mSendBuffer);
+		writeLowLevelPacketContent(serializer, lowLevelPacket);
+
+		// Now for the high-level packet content
+		highLevelPacket.serializePacket(serializer, mHighLevelProtocolVersion);
+
+		// And send it
+		if (!sendPacketInternal(mSendBuffer))
+			return false;
+	}
+
+	outUniquePacketID = lowLevelPacket.mUniquePacketID;
+	return true;
 }
 
 void NetConnection::handleHighLevelPacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID)

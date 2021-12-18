@@ -16,9 +16,8 @@ struct SentPacket
 public:
 	std::vector<uint8> mContent;
 	uint64 mInitialTimestamp = 0;
-	uint64 mLastResendTimestamp = 0;
+	uint64 mLastSendTimestamp = 0;
 	int mResendCounter = 0;
-	bool mConfirmed = false;
 
 public:
 	inline void initializeWithPool(RentableObjectPool<SentPacket>& pool)

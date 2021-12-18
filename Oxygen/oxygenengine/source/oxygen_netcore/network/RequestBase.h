@@ -23,16 +23,17 @@ namespace highlevel
 	public:
 		enum class State
 		{
-			PENDING,
-			SUCCESS,
-			FAILED
+			NONE,		// Request was not sent
+			SENT,		// Request was sent, but no respisne was received
+			SUCCESS,	// Request was sent and got a response
+			FAILED		// Request was sent, but received an error as response
 		};
 
 	public:
 		virtual ~RequestBase();
 
 		inline State getState() const	{ return mState; }
-		inline bool hasResponse() const	{ return (mState != State::PENDING); }
+		inline bool hasResponse() const	{ return (mState <= State::SENT); }
 		inline bool hasError() const	{ return (mState == State::FAILED); }
 
 	protected:
@@ -43,7 +44,7 @@ namespace highlevel
 	private:
 		NetConnection* mRegisteredAtConnection = nullptr;
 		uint32 mUniqueRequestID = 0;	// This is just the unique packet ID used for the query when it gets sent
-		State mState = State::PENDING;
+		State mState = State::NONE;
 	};
 
 

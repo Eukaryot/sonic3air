@@ -34,18 +34,26 @@
 
 void Sockets::startupSockets()
 {
+	if (mIsInitialized)
+		return;
+
 #ifdef _WIN32
 	WSADATA wsaData;
 	const int result = ::WSAStartup((WORD)0x0202, &wsaData);
 	RMX_CHECK(result == 0, "WSAStartup failed with error: " << result, );
 #endif
+	mIsInitialized = true;
 }
 
 void Sockets::shutdownSockets()
 {
+	if (!mIsInitialized)
+		return;
+
 #ifdef _WIN32
 	::WSACleanup();
 #endif
+	mIsInitialized = false;
 }
 
 
@@ -390,7 +398,14 @@ bool UDPSocket::sendData(const uint8* data, size_t length, const SocketAddress& 
 		return false;
 
 	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, (sockaddr*)destinationAddress.getSockAddr(), (int)sizeof(sockaddr_storage));
-	return (result >= 0);
+	if (result >= 0)
+		return true;
+
+#ifdef _WIN32
+	const int errorCode = WSAGetLastError();
+	std::cout << "sendto failed with error: " << errorCode << std::endl;
+#endif
+	return false;
 }
 
 bool UDPSocket::sendData(const std::vector<uint8>& data, const SocketAddress& destinationAddress)

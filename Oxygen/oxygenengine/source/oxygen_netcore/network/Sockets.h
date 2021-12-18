@@ -16,6 +16,9 @@ class Sockets
 public:
 	static void startupSockets();
 	static void shutdownSockets();
+
+private:
+	static inline bool mIsInitialized = false;
 };
 
 

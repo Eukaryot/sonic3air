@@ -28,6 +28,7 @@ namespace highlevel
 
 	public:
 		virtual uint32 getPacketType() const = 0;
+		virtual bool isReliablePacket() const { return true; }
 
 	protected:
 		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) = 0;

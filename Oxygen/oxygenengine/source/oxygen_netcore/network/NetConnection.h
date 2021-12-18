@@ -23,12 +23,21 @@ friend class ConnectionManager;
 friend class highlevel::RequestBase;
 
 public:
+	static const constexpr int TIMEOUT_SECONDS = 30;
+
 	enum class State
 	{
 		EMPTY,
 		REQUESTED_CONNECTION,
 		CONNECTED,
 		DISCONNECTED
+	};
+
+	enum class DisconnectReason
+	{
+		UNKNOWN,	// No reason given
+		MANUAL,		// Manually disconnected
+		TIMEOUT		// Automatic disconnect after timeout
 	};
 
 public:
@@ -53,8 +62,7 @@ public:
 
 	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress);
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
-	void acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey);
-	void sendAcceptConnectionPacket();
+	void disconnect(DisconnectReason disconnectReason = DisconnectReason::MANUAL);
 
 	bool sendPacket(highlevel::PacketBase& packet);
 	bool sendRequest(highlevel::RequestBase& request);
@@ -65,20 +73,27 @@ public:
 	void updateConnection(uint64 currentTimestamp);
 
 private:
+	// Called by ServerClientBase
+	void acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey);
+	void sendAcceptConnectionPacket();
+	void handleLowLevelPacket(ReceivedPacket& receivedPacket);
+
+	// Called by RequestBsae
 	void unregisterRequest(highlevel::RequestBase& request);
 
+	// Internal use
 	bool sendPacketInternal(const std::vector<uint8>& content);
 	void writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket);
 	bool sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, std::vector<uint8>& buffer);
 	bool sendHighLevelPacket(highlevel::PacketBase& packet, uint8 flags, uint32& outUniquePacketID);
 	bool sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID);
 
-	void handleLowLevelPacket(ReceivedPacket& receivedPacket);		// To be called by ServerClientBase
 	void handleHighLevelPacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID);
 	void processExtractedHighLevelPacket(const ReceivedPacketCache::CacheItem& extracted);
 
 private:
 	State mState = State::EMPTY;
+	DisconnectReason mDisconnectReason = DisconnectReason::UNKNOWN;
 	ConnectionManager* mConnectionManager = nullptr;
 	uint16 mLocalConnectionID = 0;
 	uint16 mRemoteConnectionID = 0;
@@ -90,6 +105,7 @@ private:
 	uint64 mCurrentTimestamp = 0;
 	uint64 mLastMessageSentTimestamp = 0;
 	uint64 mLastMessageReceivedTimestamp = 0;
+	uint64 mTimeoutStart = 0;
 
 	// Packet tracking
 	SentPacketCache mSentPacketCache;

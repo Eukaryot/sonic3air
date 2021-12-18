@@ -17,14 +17,15 @@ public:
 	void clear();
 	uint32 getNextUniquePacketID() const;
 
-	void addPacket(SentPacket& sentPacket, bool isStartConnectionPacket = false);
+	void addPacket(SentPacket& sentPacket, uint64 currentTimestamp, bool isStartConnectionPacket = false);
 
 	void onPacketReceiveConfirmed(uint32 uniquePacketID);
 
+	inline bool hasUnconfirmedPackets() const  { return !mQueue.empty(); }
 	void updateResend(std::vector<SentPacket*>& outPacketsToResend, uint64 currentTimestamp);
 
 private:
 	uint32 mQueueStartUniquePacketID = 1;
-	uint32 mNextUniquePacketID = 1;			// This should always be "mQueueStartUniquePacketID + mQueue.size()"
-	std::deque<SentPacket*> mQueue;
+	uint32 mNextUniquePacketID = 1;		// This should always be "mQueueStartUniquePacketID + mQueue.size()"
+	std::deque<SentPacket*> mQueue;		// Can contain null pointers, anmely at the positions of packets that were already confirmed by the receiver
 };
