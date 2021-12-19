@@ -38,6 +38,7 @@ namespace lemon
 			{ rmx::getMurmur2_64(String("global")),		Keyword::GLOBAL },
 			{ rmx::getMurmur2_64(String("constant")),	Keyword::CONSTANT },
 			{ rmx::getMurmur2_64(String("define")),		Keyword::DEFINE },
+			{ rmx::getMurmur2_64(String("declare")),	Keyword::DECLARE },
 			{ rmx::getMurmur2_64(String("return")),		Keyword::RETURN },
 			{ rmx::getMurmur2_64(String("call")),		Keyword::CALL },
 			{ rmx::getMurmur2_64(String("jump")),		Keyword::JUMP },

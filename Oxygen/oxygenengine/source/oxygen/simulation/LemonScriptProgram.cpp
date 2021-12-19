@@ -119,6 +119,13 @@ void LemonScriptProgram::startup()
 	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
 	//           and this in turn is the reason why there's a need for this separate startup function at all...
 	mInternal.mLemonScriptBindings.registerBindings(mInternal.mCoreModule);
+
+	// Optionally dump the core module script bindings into a generated script file for reference
+	Configuration& config = Configuration::instance();
+	if (!config.mDumpCppDefinitionsOutput.empty())
+	{
+		mInternal.mCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
+	}
 }
 
 LemonScriptBindings& LemonScriptProgram::getLemonScriptBindings()

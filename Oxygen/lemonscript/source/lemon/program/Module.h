@@ -36,6 +36,8 @@ namespace lemon
 
 		void startCompiling(const GlobalsLookup& globalsLookup);
 
+		void dumpDefinitionsToScriptFile(const std::wstring& filename);
+
 		// Functions
 		inline const std::vector<ScriptFunction*>& getScriptFunctions() const { return mScriptFunctions; }
 		const Function* getFunctionByUniqueId(uint64 uniqueId) const;

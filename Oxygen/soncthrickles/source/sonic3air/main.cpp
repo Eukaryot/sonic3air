@@ -38,6 +38,7 @@ struct Arguments
 {
 	bool mPack = false;
 	bool mNativize = false;
+	bool mDumpCppDefinitions = false;
 };
 
 void readArguments(Arguments& outArguments, int argc, char** argv)
@@ -53,6 +54,10 @@ void readArguments(Arguments& outArguments, int argc, char** argv)
 		else if (parameter == "-nativize")
 		{
 			outArguments.mNativize = true;
+		}
+		else if (parameter == "-dumpcppdefinitions")
+		{
+			outArguments.mDumpCppDefinitions = true;
 		}
 	}
 #endif
@@ -127,6 +132,10 @@ int main(int argc, char** argv)
 		{
 			Configuration::instance().mRunScriptNativization = 1;
 			Configuration::instance().mScriptNativizationOutput = L"source/sonic3air/_nativized/NativizedCode.inc";
+		}
+		if (arguments.mDumpCppDefinitions)
+		{
+			Configuration::instance().mDumpCppDefinitionsOutput = L"source/sonic3air/_nativized/NativizedCode.inc";
 		}
 
 		myMain.execute(argc, argv);

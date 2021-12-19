@@ -590,6 +590,13 @@ namespace lemon
 							break;
 						}
 
+						case Keyword::DECLARE:
+						{
+							// Completely ignore this line, we don't evaluate declarations at all (yet)
+							// TODO: However, it could make sense to check them just to see if there's a matching function definition at all
+							break;
+						}
+
 						default:
 							break;
 					}

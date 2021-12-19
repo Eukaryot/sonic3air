@@ -68,6 +68,7 @@ namespace lemon
 		GLOBAL,
 		CONSTANT,
 		DEFINE,
+		DECLARE,
 		RETURN,
 		CALL,
 		JUMP,

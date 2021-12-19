@@ -77,6 +77,31 @@ namespace lemon
 		}
 	}
 
+	void Module::dumpDefinitionsToScriptFile(const std::wstring& filename)
+	{
+		String content;
+		content << "// This file was auto-generated from the definitions in lemon script module '" << getModuleName() << "'.\r\n";
+		content << "\r\n";
+		
+		for (const Function* function : mFunctions)
+		{
+			content << "\r\n";
+			content << "declare func " << function->getReturnType()->toString() << " " << function->getName() << "(";
+			for (size_t i = 0; i < function->getParameters().size(); ++i)
+			{
+				if (i != 0)
+					content << ", ";
+				const Function::Parameter& parameter = function->getParameters()[i];
+				content << parameter.mType->toString();
+				if (!parameter.mIdentifier.empty())
+					content << " " << parameter.mIdentifier;
+			}
+			content << ")\r\n";
+		}
+
+		content.saveFile(filename);
+	}
+
 	const Function* Module::getFunctionByUniqueId(uint64 uniqueId) const
 	{
 		RMX_ASSERT(mModuleId == (uniqueId & 0xffffffffffff0000ull), "Function unique ID is not valid for this module");
