@@ -126,12 +126,11 @@ function void PostFrameUpdate()
 				Standalone.drawCharacterSprite(char.character, 1, px, py, true)
 
 				// Tails' tails
-				// TODO: This leads to a crash
-				//if (u16[0xffffcc3a] != 0)
-				//{
-				//	A0 = 0xffffcc0a
-				//	Standalone.drawCharacterSprite(CHARACTER_TAILS, 2, px, py, true)
-				//}
+				if (u16[0xffffcc3a] != 0)
+				{
+					A0 = 0xffffcc0a
+					Standalone.drawCharacterSprite(CHARACTER_TAILS, 2, px, py, true)
+				}
 			}
 		}
 	}
