@@ -1,4 +1,4 @@
-This file was auto-generated from the definitions in lemon script module 'OxygenCore'.
+// This file was auto-generated from the definitions in lemon script module 'OxygenCore'.
 
 
 declare func s8 min(s8, s8)

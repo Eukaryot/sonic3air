@@ -43,9 +43,9 @@ struct Arguments
 void readArguments(Arguments& outArguments, int argc, char** argv)
 {
 #if !defined(ENDUSER) && !defined(PLATFORM_ANDROID)
-	if (argc == 2)
+	for (int i = 0; i < argc; ++i)
 	{
-		const std::string parameter(argv[1]);
+		const std::string parameter(argv[i]);
 		if (parameter == "-pack")
 		{
 			outArguments.mPack = true;
@@ -118,7 +118,8 @@ int main(int argc, char** argv)
 	if (arguments.mPack)
 	{
 		performPacking();
-		return 0;
+		if (!arguments.mNativize && !arguments.mDumpCppDefinitions)		// In case multiple arguments got combined, the others would got ignored without this check
+			return 0;
 	}
 
 	try
@@ -131,10 +132,12 @@ int main(int argc, char** argv)
 		{
 			Configuration::instance().mRunScriptNativization = 1;
 			Configuration::instance().mScriptNativizationOutput = L"source/sonic3air/_nativized/NativizedCode.inc";
+			Configuration::instance().mExitAfterScriptLoading = true;
 		}
 		if (arguments.mDumpCppDefinitions)
 		{
-			Configuration::instance().mDumpCppDefinitionsOutput = L"source/sonic3air/_nativized/NativizedCode.inc";
+			Configuration::instance().mDumpCppDefinitionsOutput = L"scripts/_reference/cpp_core_functions.lemon";
+			Configuration::instance().mExitAfterScriptLoading = true;
 		}
 
 		myMain.execute(argc, argv);
