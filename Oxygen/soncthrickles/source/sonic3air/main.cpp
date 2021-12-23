@@ -6,7 +6,6 @@
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#define RMX_LIB
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
 #include "sonic3air/version.inc"

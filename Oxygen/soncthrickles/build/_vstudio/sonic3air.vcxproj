@@ -43,7 +43,7 @@
     <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp" />
     <ClCompile Include="..\..\source\sonic3air\helper\GameUtils.cpp" />
     <ClCompile Include="..\..\source\sonic3air\main.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\ExtrasMenu.cpp" />
@@ -63,6 +63,9 @@
     <ClCompile Include="..\..\source\sonic3air\menu\SharedResources.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\TimeAttackMenu.cpp" />
     <ClCompile Include="..\..\source\sonic3air\menu\TimeAttackResultsMenu.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\scriptimpl\ScriptImplementations.cpp" />
     <ClCompile Include="..\..\source\sonic3air\_nativized\NativizedCode.cpp" />
     <ClInclude Include="..\..\source\sonic3air\audio\AudioOut.h" />

@@ -139,6 +139,7 @@
     <ClCompile Include="..\..\source\sonic3air\client\UpdateCheck.cpp">
       <Filter>client</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
