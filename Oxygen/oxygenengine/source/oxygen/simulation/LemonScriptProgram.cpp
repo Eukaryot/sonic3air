@@ -331,7 +331,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 	if (config.mRunScriptNativization == 1 && !config.mScriptNativizationOutput.empty())
 	{
 		mInternal.mProgram.runNativization(mInternal.mScriptModule, config.mScriptNativizationOutput, EmulatorInterface::instance());
-		config.mRunScriptNativization = 2;		// Marked as done
+		config.mRunScriptNativization = 2;		// Mark as done
 	}
 
 	// Scan for function pragmas defining hooks

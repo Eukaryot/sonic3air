@@ -782,8 +782,8 @@ bool Application::updateLoading()
 					return false;
 				}
 
-				// If the application was only started to perform nativization, then exit now
-				if (Configuration::instance().mRunScriptNativization != 0)
+				// If the application was only started to e.g. perform nativization, then exit now
+				if (Configuration::instance().mExitAfterScriptLoading)
 				{
 					FTX::System->quit();
 					return false;
