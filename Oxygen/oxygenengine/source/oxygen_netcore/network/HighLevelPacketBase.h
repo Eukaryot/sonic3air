@@ -51,7 +51,10 @@ namespace highlevel
 
 
 #define HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE(_name_) \
-	static inline const std::string PACKET_NAME = _name_; \
-	static const constexpr uint32 PACKET_TYPE = rmx::compileTimeFNV_32(_name_); \
-	virtual uint32 getPacketType() const override  { return PACKET_TYPE; } \
-	static inline highlevel::PacketTypeRegistration mPacketTypeRegistration { PACKET_TYPE, PACKET_NAME };
+	public: \
+		static inline const std::string PACKET_NAME = _name_; \
+		static const constexpr uint32 PACKET_TYPE = rmx::compileTimeFNV_32(_name_); \
+		virtual uint32 getPacketType() const override  { return PACKET_TYPE; } \
+	private: \
+		static inline highlevel::PacketTypeRegistration mPacketTypeRegistration { PACKET_TYPE, PACKET_NAME }; \
+	public:

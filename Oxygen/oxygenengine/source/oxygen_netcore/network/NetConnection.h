@@ -40,6 +40,15 @@ public:
 		TIMEOUT		// Automatic disconnect after timeout
 	};
 
+	struct SendFlags
+	{
+		enum Flags
+		{
+			NONE = 0x00,
+			UNRELIABLE = 0x01		// Enforce sending as a lightweight packet, without resending and confirmation from the receiver
+		};
+	};
+
 public:
 	static uint64 buildSenderKey(const SocketAddress& remoteAddress, uint16 remoteConnectionID);
 
@@ -64,7 +73,7 @@ public:
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
 	void disconnect(DisconnectReason disconnectReason = DisconnectReason::MANUAL);
 
-	bool sendPacket(highlevel::PacketBase& packet);
+	bool sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags = SendFlags::NONE);
 	bool sendRequest(highlevel::RequestBase& request);
 	bool respondToRequest(highlevel::RequestBase& request, uint32 uniqueRequestID);
 
@@ -85,8 +94,8 @@ private:
 	bool sendPacketInternal(const std::vector<uint8>& content);
 	void writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket);
 	bool sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, std::vector<uint8>& buffer);
-	bool sendHighLevelPacket(highlevel::PacketBase& packet, uint8 flags, uint32& outUniquePacketID);
-	bool sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID);
+	bool sendHighLevelPacket(highlevel::PacketBase& packet, SendFlags::Flags flags, uint32& outUniquePacketID);
+	bool sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, SendFlags::Flags flags, uint32& outUniquePacketID);
 
 	void handleHighLevelPacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID);
 	void processExtractedHighLevelPacket(const ReceivedPacketCache::CacheItem& extracted);

@@ -109,10 +109,10 @@ void NetConnection::disconnect(DisconnectReason disconnectReason)
 	mDisconnectReason = disconnectReason;
 }
 
-bool NetConnection::sendPacket(highlevel::PacketBase& packet)
+bool NetConnection::sendPacket(highlevel::PacketBase& packet, SendFlags::Flags flags)
 {
 	uint32 unused;
-	return sendHighLevelPacket(packet, 0, unused);
+	return sendHighLevelPacket(packet, flags, unused);
 }
 
 bool NetConnection::sendRequest(highlevel::RequestBase& request)
@@ -127,7 +127,7 @@ bool NetConnection::sendRequest(highlevel::RequestBase& request)
 
 	// Send query packet
 	lowlevel::RequestQueryPacket highLevelPacket;
-	if (!sendHighLevelPacket(highLevelPacket, request.getQueryPacket(), 0, request.mUniqueRequestID))
+	if (!sendHighLevelPacket(highLevelPacket, request.getQueryPacket(), SendFlags::NONE, request.mUniqueRequestID))
 		return false;
 
 	// Register here
@@ -141,7 +141,7 @@ bool NetConnection::respondToRequest(highlevel::RequestBase& request, uint32 uni
 	lowlevel::RequestResponsePacket highLevelPacket;
 	highLevelPacket.mUniqueRequestID = uniqueRequestID;
 	uint32 unused;
-	return sendHighLevelPacket(highLevelPacket, request.getResponsePacket(), 0, unused);
+	return sendHighLevelPacket(highLevelPacket, request.getResponsePacket(), SendFlags::NONE, unused);
 }
 
 bool NetConnection::readPacket(highlevel::PacketBase& packet, VectorBinarySerializer& serializer) const
@@ -342,7 +342,7 @@ bool NetConnection::sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, std
 	return sendPacketInternal(buffer);
 }
 
-bool NetConnection::sendHighLevelPacket(highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID)
+bool NetConnection::sendHighLevelPacket(highlevel::PacketBase& highLevelPacket, SendFlags::Flags flags, uint32& outUniquePacketID)
 {
 	// Build the low-level packet header for a generic high-level packet
 	//  -> This header has no special members of its own, only the shared ones
@@ -350,12 +350,15 @@ bool NetConnection::sendHighLevelPacket(highlevel::PacketBase& highLevelPacket, 
 	return sendHighLevelPacket(lowLevelPacket, highLevelPacket, flags, outUniquePacketID);
 }
 
-bool NetConnection::sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, uint8 flags, uint32& outUniquePacketID)
+bool NetConnection::sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, SendFlags::Flags flags, uint32& outUniquePacketID)
 {
-	lowLevelPacket.mPacketType = highLevelPacket.getPacketType();
-	lowLevelPacket.mPacketFlags = flags;
+	if (nullptr == mConnectionManager)
+		return false;
 
-	if (highLevelPacket.isReliablePacket())
+	lowLevelPacket.mPacketType = highLevelPacket.getPacketType();
+	lowLevelPacket.mPacketFlags = 0;
+
+	if (highLevelPacket.isReliablePacket() && (flags & SendFlags::UNRELIABLE) == 0)
 	{
 		lowLevelPacket.mUniquePacketID = mSentPacketCache.getNextUniquePacketID();
 
@@ -437,7 +440,7 @@ void NetConnection::handleHighLevelPacket(ReceivedPacket& receivedPacket, const 
 	else
 	{
 		// Not tracked: Simply forward it as-is to the listener
-		ReceivedPacketEvaluation evaluation(*this, highLevelPacket.mPacketType, serializer);
+		ReceivedPacketEvaluation evaluation(*this, highLevelPacket.mPacketType, serializer, 0);
 		mConnectionManager->getListener().onReceivedPacket(evaluation);
 	}
 }
@@ -453,7 +456,7 @@ void NetConnection::processExtractedHighLevelPacket(const ReceivedPacketCache::C
 		default:
 		{
 			// Generic high-level packet
-			ReceivedPacketEvaluation evaluation(*this, extracted.mPacketHeader.mPacketType, newSerializer);
+			ReceivedPacketEvaluation evaluation(*this, extracted.mPacketHeader.mPacketType, newSerializer, extracted.mPacketHeader.mUniquePacketID);
 			mConnectionManager->getListener().onReceivedPacket(evaluation);
 			break;
 		}

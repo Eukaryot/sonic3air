@@ -17,6 +17,8 @@ public:
 	static void startupSockets();
 	static void shutdownSockets();
 
+	static bool resolveToIP(const std::string& hostName, std::string& outIP);
+
 private:
 	static inline bool mIsInitialized = false;
 };

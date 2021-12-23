@@ -56,6 +56,57 @@ void Sockets::shutdownSockets()
 	mIsInitialized = false;
 }
 
+bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP)
+{
+	// Resolve host name to an IP
+	addrinfo* addrInfo = nullptr;
+	addrinfo hintsAddrInfo = {};
+	if (::getaddrinfo(hostName.c_str(), nullptr, &hintsAddrInfo, &addrInfo) == 0)
+	{
+		addrinfo* firstAddrInfo = addrInfo;
+
+		// Prefer IPv4 if possible
+		bool ipv4 = false;
+		bool ipv6 = false;
+		for (; nullptr != addrInfo; addrInfo = addrInfo->ai_next)
+		{
+			if (AF_INET == addrInfo->ai_family)
+			{
+				ipv4 = true;
+			}
+			if (AF_INET6 == addrInfo->ai_family)
+			{
+				ipv6 = true;
+			}
+		}
+		const int aiFamily = ipv4 ? AF_INET : AF_INET6;
+
+		for (addrInfo = firstAddrInfo; nullptr != addrInfo; addrInfo = addrInfo->ai_next)
+		{
+			if (aiFamily == addrInfo->ai_family)
+			{
+				sockaddr_storage* sockAddrStorage = reinterpret_cast<sockaddr_storage*>(addrInfo->ai_addr);
+				if (nullptr != sockAddrStorage)
+				{
+					char nodeBuffer[NI_MAXHOST] = {};
+					char serviceBuffer[NI_MAXSERV] = {};
+					if (::getnameinfo(reinterpret_cast<struct sockaddr*>(sockAddrStorage), sizeof(struct sockaddr_storage), nodeBuffer, sizeof(nodeBuffer), serviceBuffer, sizeof(serviceBuffer), NI_NUMERICHOST | NI_NUMERICSERV) == 0)
+					{
+						// Got a result
+						outIP = nodeBuffer;
+						return true;
+					}
+					break;
+				}
+			}
+		}
+		::freeaddrinfo(firstAddrInfo);
+	}
+
+	// Failed
+	return false;
+}
+
 
 bool SocketAddress::operator==(const SocketAddress& other) const
 {
@@ -432,9 +483,6 @@ bool UDPSocket::receiveNonBlocking(ReceiveResult& outReceiveResult)
 		}
 	}
 
-	// Return true as there was no error
-	return true;
-
 #else
 	if (mInternal->mIsBlockingSocket)
 	{
@@ -443,9 +491,12 @@ bool UDPSocket::receiveNonBlocking(ReceiveResult& outReceiveResult)
 		fcntl(mInternal->mSocket, F_SETFL, flags | O_NONBLOCK);
 		mInternal->mIsBlockingSocket = false;
 	}
+	receiveInternal(outReceiveResult);
 
-	return receiveInternal(outReceiveResult);
 #endif
+
+	// Return true as there was no error
+	return true;
 }
 
 bool UDPSocket::receiveBlocking(ReceiveResult& outReceiveResult)

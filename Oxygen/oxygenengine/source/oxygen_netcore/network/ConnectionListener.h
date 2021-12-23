@@ -26,10 +26,11 @@ struct ReceivedPacketEvaluation
 {
 	NetConnection& mConnection;
 	uint32 mPacketType;
+	uint32 mUniquePacketID;
 	VectorBinarySerializer& mSerializer;
 
-	inline ReceivedPacketEvaluation(NetConnection& connection, uint32 packetType, VectorBinarySerializer& serializer) :
-		mConnection(connection), mPacketType(packetType), mSerializer(serializer)
+	inline ReceivedPacketEvaluation(NetConnection& connection, uint32 packetType, VectorBinarySerializer& serializer, uint32 uniquePacketID) :
+		mConnection(connection), mPacketType(packetType), mSerializer(serializer), mUniquePacketID(uniquePacketID)
 	{}
 
 	bool readPacket(highlevel::PacketBase& packet) const
