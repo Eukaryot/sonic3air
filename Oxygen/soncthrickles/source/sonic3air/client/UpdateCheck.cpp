@@ -8,10 +8,10 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/client/UpdateCheck.h"
+#include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/version.inc"
 
 #include "oxygen_netcore/network/NetConnection.h"
-#include "oxygen_netcore/serverclient/Packets.h"
 
 
 namespace
@@ -81,6 +81,9 @@ void UpdateCheck::performUpdate()
 			}
 			break;
 		}
+
+		default:
+			break;
 	}
 }
 
@@ -95,7 +98,7 @@ void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeature
 		}
 	}
 
-	if (supportsUpdate)
+	if (supportsUpdate && ConfigurationImpl::instance().mGameServer.mEnableUpdateCheck)
 	{
 		if (mState == State::INACTIVE)
 			mState = State::READY_TO_START;

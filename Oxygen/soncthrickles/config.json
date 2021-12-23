@@ -38,7 +38,9 @@
 		"ConnectToServer": "0",
 		//"ServerURL": "sonic3air.org",
 		"ServerURL": "127.0.0.1",	// For local testing
-		"ServerPort": "21094"
+		"ServerPort": "21094",
+		"EnableUpdateCheck": "0",
+		"EnableGhostSync": "1"
 	},
 
 	// Input recorder

@@ -15,6 +15,7 @@
 
 GameClient::GameClient() :
 	mConnectionManager(mSocket, *this, network::HIGHLEVEL_MINIMUM_PROTOCOL_VERSION, network::HIGHLEVEL_MAXIMUM_PROTOCOL_VERSION),
+	mGhostSync(mServerConnection),
 	mUpdateCheck(mServerConnection)
 {
 }
@@ -36,7 +37,14 @@ void GameClient::setupClient()
 			RMX_ERROR("Socket bind to any port failed", return);
 
 		// Start connection
-		mServerConnection.startConnectTo(mConnectionManager, SocketAddress(config.mGameServer.mServerURL, (uint16)config.mGameServer.mServerPort));
+		SocketAddress serverAddress;
+		{
+			std::string serverIP;
+			if (!Sockets::resolveToIP(config.mGameServer.mServerURL, serverIP))
+				RMX_ERROR("Unable to resolve server URL " << config.mGameServer.mServerURL, return);
+			serverAddress.set(serverIP, (uint16)config.mGameServer.mServerPort);
+		}
+		mServerConnection.startConnectTo(mConnectionManager, serverAddress);
 		mState = State::STARTED;
 	}
 }
@@ -72,12 +80,16 @@ void GameClient::updateClient(float timeElapsed)
 				case highlevel::RequestBase::State::SUCCESS:
 				{
 					// Evaluate response
+					mGhostSync.evaluateServerFeaturesResponse(mGetServerFeaturesRequest);
 					mUpdateCheck.evaluateServerFeaturesResponse(mGetServerFeaturesRequest);
 
 					// Ready for actual online feature use
 					mState = State::READY;
 					break;
 				}
+
+				default:
+					break;
 			}
 			break;
 		}
@@ -85,8 +97,19 @@ void GameClient::updateClient(float timeElapsed)
 		case State::READY:
 		{
 			// Regular update for the update check, so we stay updated on updates
+			mGhostSync.performUpdate();
 			mUpdateCheck.performUpdate();
 			break;
 		}
+
+		default:
+			break;
 	}
+}
+
+bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
+{
+	if (mGhostSync.onReceivedPacket(evaluation))
+		return true;
+	return false;
 }

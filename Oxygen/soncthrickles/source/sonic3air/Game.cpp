@@ -422,6 +422,9 @@ void Game::onPostUpdateFrame()
 	// Update player recorder
 	mPlayerRecorder.onPostUpdateFrame();
 
+	// Update ghost sync
+	GameClient::instance().getGhostSync().onPostUpdateFrame();
+
 	// Check for unlocked hidden secrets
 	//  - SECRET_LEVELSELECT	unlocked when u8[0x02219e] changes from 0xb2 to 0x14
 	//  - SECRET_TITLE_SK		unlocked when u8[0x065fde] changes from 0x08 to 0x93

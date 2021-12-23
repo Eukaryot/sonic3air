@@ -139,6 +139,9 @@
     <ClCompile Include="..\..\source\sonic3air\client\UpdateCheck.cpp">
       <Filter>client</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\client\GhostSync.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\pch.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +243,9 @@
       <Filter>client</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\client\UpdateCheck.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\client\GhostSync.h">
       <Filter>client</Filter>
     </ClInclude>
   </ItemGroup>

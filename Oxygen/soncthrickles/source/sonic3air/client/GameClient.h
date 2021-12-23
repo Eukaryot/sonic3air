@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "sonic3air/client/GhostSync.h"
 #include "sonic3air/client/UpdateCheck.h"
 
 #include "oxygen_netcore/network/ServerClientBase.h"
@@ -20,6 +21,9 @@ class GameClient : public ServerClientBase, public SingleInstance<GameClient>
 public:
 	GameClient();
 	~GameClient();
+
+	GhostSync& getGhostSync() { return mGhostSync; }
+	UpdateCheck& getUpdateCheck() { return mUpdateCheck; }
 
 	void setupClient();
 	void updateClient(float timeElapsed);
@@ -36,6 +40,8 @@ protected:
 		RMX_ASSERT(false, "This should never get called");
 	}
 
+	virtual bool onReceivedPacket(ReceivedPacketEvaluation& evaluation) override;
+
 private:
 	enum class State
 	{
@@ -50,6 +56,7 @@ private:
 	NetConnection mServerConnection;
 	State mState = State::NONE;
 
+	GhostSync mGhostSync;
 	UpdateCheck mUpdateCheck;
 	network::GetServerFeaturesRequest mGetServerFeaturesRequest;
 };

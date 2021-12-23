@@ -44,6 +44,8 @@ public:
 		bool mConnectToServer = false;
 		std::string mServerURL;
 		int mServerPort = 0;
+		bool mEnableUpdateCheck = false;
+		bool mEnableGhostSync = false;
 	};
 	GameServer mGameServer;
 };

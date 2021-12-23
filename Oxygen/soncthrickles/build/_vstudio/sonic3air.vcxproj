@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\source\sonic3air\audio\AudioOut.cpp" />
     <ClCompile Include="..\..\source\sonic3air\audio\CustomAudioMixer.cpp" />
     <ClCompile Include="..\..\source\sonic3air\client\GameClient.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\client\GhostSync.cpp" />
     <ClCompile Include="..\..\source\sonic3air\client\UpdateCheck.cpp" />
     <ClCompile Include="..\..\source\sonic3air\ConfigurationImpl.cpp" />
     <ClCompile Include="..\..\source\sonic3air\data\PlayerProgress.cpp" />
@@ -71,6 +72,7 @@
     <ClInclude Include="..\..\source\sonic3air\audio\AudioOut.h" />
     <ClInclude Include="..\..\source\sonic3air\audio\CustomAudioMixer.h" />
     <ClInclude Include="..\..\source\sonic3air\client\GameClient.h" />
+    <ClInclude Include="..\..\source\sonic3air\client\GhostSync.h" />
     <ClInclude Include="..\..\source\sonic3air\client\UpdateCheck.h" />
     <ClInclude Include="..\..\source\sonic3air\ConfigurationImpl.h" />
     <ClInclude Include="..\..\source\sonic3air\data\PlayerProgress.h" />

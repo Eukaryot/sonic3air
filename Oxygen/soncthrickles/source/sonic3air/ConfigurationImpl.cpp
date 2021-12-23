@@ -69,6 +69,8 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 			jsonHelper.tryReadBool("ConnectToServer", mGameServer.mConnectToServer);
 			jsonHelper.tryReadString("ServerURL", mGameServer.mServerURL);
 			jsonHelper.tryReadInt("ServerPort", mGameServer.mServerPort);
+			jsonHelper.tryReadBool("EnableUpdateCheck", mGameServer.mEnableUpdateCheck);
+			jsonHelper.tryReadBool("EnableGhostSync", mGameServer.mEnableGhostSync);
 		}
 	}
 }
