@@ -208,6 +208,8 @@ namespace network
 		bool mIsReplicatedData = false;		// If true, this is replicated data that gets cached on the server; otherwise it's just a message to broadcast
 		uint32 mChannelHash = 0;
 		uint32 mSubChannelHash = 0;			// Can stay 0 if posting to the main channel
+		uint32 mMessageType = 0;
+		uint8 mMessageVersion = 0;
 		std::vector<uint8> mMessage;
 
 		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
@@ -215,6 +217,8 @@ namespace network
 			serializer.serialize(mIsReplicatedData);
 			serializer.serialize(mChannelHash);
 			serializer.serialize(mSubChannelHash);
+			serializer.serialize(mMessageType);
+			serializer.serialize(mMessageVersion);
 			serializer.serializeData(mMessage, 0x400);
 		}
 	};

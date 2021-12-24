@@ -26,6 +26,7 @@ public:
 	struct DebugSettings
 	{
 		float mSendingPacketLoss = 0.0f;	// Fraction of "lost" packets in sending
+		float mReceivingPacketLoss = 0.0f;	// Fraction of "lost" packets in receiving
 	};
 	DebugSettings mDebugSettings;
 

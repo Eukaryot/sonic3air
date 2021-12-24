@@ -39,13 +39,19 @@ public:
 	std::string mGameVersionInSettings;
 
 	// Game server
+	struct GhostSync
+	{
+		bool mEnabled = false;
+		std::string mChannelName;
+		bool mShowOffscreenGhosts = false;
+	};
 	struct GameServer
 	{
 		bool mConnectToServer = false;
-		std::string mServerURL;
+		std::string mServerHostName;
 		int mServerPort = 0;
 		bool mEnableUpdateCheck = false;
-		bool mEnableGhostSync = false;
+		GhostSync mGhostSync;
 	};
 	GameServer mGameServer;
 };

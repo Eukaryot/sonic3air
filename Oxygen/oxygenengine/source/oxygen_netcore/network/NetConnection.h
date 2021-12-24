@@ -23,7 +23,8 @@ friend class ConnectionManager;
 friend class highlevel::RequestBase;
 
 public:
-	static const constexpr int TIMEOUT_SECONDS = 30;
+	static const constexpr int TIMEOUT_SECONDS = 30;	// Timeout after 30 seconds without getting any response despite waiting for one
+	static const constexpr int STALE_SECONDS = 5 * 60;	// Stale connection after 5 minutes if there was no communication at all in that time
 
 	enum class State
 	{
@@ -37,15 +38,16 @@ public:
 	{
 		UNKNOWN,	// No reason given
 		MANUAL,		// Manually disconnected
-		TIMEOUT		// Automatic disconnect after timeout
+		TIMEOUT,	// Automatic disconnect after timeout (because a reliably sent packet was not confirmed for too long)
+		STALE,		// Automatic disconnect after connection was not used for a while
 	};
 
 	struct SendFlags
 	{
 		enum Flags
 		{
-			NONE = 0x00,
-			UNRELIABLE = 0x01		// Enforce sending as a lightweight packet, without resending and confirmation from the receiver
+			NONE		= 0x00,
+			UNRELIABLE	= 0x01,		// Enforce sending as a lightweight packet, without resending and confirmation from the receiver
 		};
 	};
 
@@ -69,7 +71,7 @@ public:
 	uint8 getHighLevelProtocolVersion() const	{ return mHighLevelProtocolVersion; }
 	void setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 highLevelProtocolVersion);
 
-	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress);
+	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress, uint64 currentTimestamp);
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
 	void disconnect(DisconnectReason disconnectReason = DisconnectReason::MANUAL);
 
@@ -83,7 +85,7 @@ public:
 
 private:
 	// Called by ServerClientBase
-	void acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey);
+	void acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp);
 	void sendAcceptConnectionPacket();
 	void handleLowLevelPacket(ReceivedPacket& receivedPacket);
 
@@ -115,6 +117,8 @@ private:
 	uint64 mLastMessageSentTimestamp = 0;
 	uint64 mLastMessageReceivedTimestamp = 0;
 	uint64 mTimeoutStart = 0;
+	uint64 mLast100msUpdate = 0;
+	uint64 mLast1000msUpdate = 0;
 
 	// Packet tracking
 	SentPacketCache mSentPacketCache;

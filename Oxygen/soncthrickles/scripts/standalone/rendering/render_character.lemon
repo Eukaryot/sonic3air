@@ -222,7 +222,8 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				key = stringformat("sonic_dropdash_%d", animationSpriteEx - CHAR_ANIMSPRITE_SONIC_DROPDASH)
 			}
 		}
-		timeattack.animSpriteEx = animationSpriteEx
+		if (isPlayer1)
+			timeattack.animSpriteEx = animationSpriteEx
 
 		if (key == 0)
 		{

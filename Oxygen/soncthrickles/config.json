@@ -35,12 +35,15 @@
 	// Game server
 	"GameServer":
 	{
-		"ConnectToServer": "0",
-		//"ServerURL": "sonic3air.org",
-		"ServerURL": "127.0.0.1",	// For local testing
-		"ServerPort": "21094",
+		"ConnectToServer": "1",
+		"ServerAddress": "gameserver.sonic3air.org:21094",
 		"EnableUpdateCheck": "0",
-		"EnableGhostSync": "1"
+		"GhostSync":
+		{
+			"Enabled": "1",				// Enable the ghost sync feature by setting this to "1" -- this requires "ConnectToServer" to be enabled
+			"ChannelName": "world",		// To use your own private channel, enter an arbitrary string here; "world" is the default channel
+			"ShowOffscreenGhosts": "1"	// Show other players on the screen border while they're not on the screen
+		}
 	},
 
 	// Input recorder

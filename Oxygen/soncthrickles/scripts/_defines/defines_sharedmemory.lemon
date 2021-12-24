@@ -29,7 +29,7 @@ define global.game_random_base	=  u8[0x801000]
 // Random number for current level, gets reset on each restart incl. death
 define global.level_random_base	=  u8[0x801001]
 
-// Used in Time Attack to write the extended animation sprite to (supporting Drop Dash & Peel-Out sprites)
+// Used in Time Attack and Ghost Sync to write the extended animation sprite to (supporting Drop Dash & Peel-Out sprites)
 define timeattack.animSpriteEx	= u16[0x801002]
 
 

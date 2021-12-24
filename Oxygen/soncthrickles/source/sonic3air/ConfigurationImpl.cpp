@@ -65,12 +65,38 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
 		if (!gameServerJson.isNull())
 		{
-			JsonHelper jsonHelper(gameServerJson);
-			jsonHelper.tryReadBool("ConnectToServer", mGameServer.mConnectToServer);
-			jsonHelper.tryReadString("ServerURL", mGameServer.mServerURL);
-			jsonHelper.tryReadInt("ServerPort", mGameServer.mServerPort);
-			jsonHelper.tryReadBool("EnableUpdateCheck", mGameServer.mEnableUpdateCheck);
-			jsonHelper.tryReadBool("EnableGhostSync", mGameServer.mEnableGhostSync);
+			// General game server settings
+			JsonHelper gameServerHelper(gameServerJson);
+			gameServerHelper.tryReadBool("ConnectToServer", mGameServer.mConnectToServer);
+
+			std::string serverAddress;
+			if (gameServerHelper.tryReadString("ServerAddress", serverAddress))
+			{
+				String str = serverAddress;
+				const int pos = str.findChar(':', 0, +1);
+				if (pos >= 0 && pos < str.length())
+				{
+					mGameServer.mServerHostName = *str.getSubString(0, pos);
+					mGameServer.mServerPort = str.getSubString(pos+1, str.length() - (pos+1)).parseInt();
+				}
+				else
+				{
+					mGameServer.mServerHostName = *str;
+					mGameServer.mServerPort = 21094;	// That's the default port
+				}
+			}
+
+			gameServerHelper.tryReadBool("EnableUpdateCheck", mGameServer.mEnableUpdateCheck);
+			
+			// Ghost sync settings
+			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
+			if (!ghostSyncJson.isNull())
+			{
+				JsonHelper jsonHelper(ghostSyncJson);
+				jsonHelper.tryReadBool("Enabled", mGameServer.mGhostSync.mEnabled);
+				jsonHelper.tryReadString("ChannelName", mGameServer.mGhostSync.mChannelName);
+				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServer.mGhostSync.mShowOffscreenGhosts);
+			}
 		}
 	}
 }

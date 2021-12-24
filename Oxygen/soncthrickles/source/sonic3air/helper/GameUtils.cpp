@@ -49,9 +49,9 @@ namespace s3air
 		}
 	}
 
-	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, uint16* globalFrameNumber)
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, float moveDirectionRadians, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, uint16* globalFrameNumber, bool enableOffscreen)
 	{
-		const uint8 atex = 0x40 + characterIndex * 0x20;
+			const uint8 atex = 0x40 + characterIndex * 0x20;
 		int px = position.x;
 		int py = position.y;
 		float angle = (float)rotation / 128.0f * PI_FLOAT;
@@ -67,6 +67,7 @@ namespace s3air
 		}
 
 		bool showAtBorder = false;
+		if (enableOffscreen)
 		{
 			const int width = VideoOut::instance().getScreenWidth();
 			const int height = VideoOut::instance().getScreenHeight();
@@ -130,8 +131,8 @@ namespace s3air
 		{
 			if (animationSprite >= 0x96 && animationSprite <= 0x98)
 			{
-				// For rolling, estimate the velocity and derive the movement angle
-				angle = std::atan2((float)velocity.y, (float)velocity.x);
+				// For rolling, use the movement angle as tails angle
+				angle = moveDirectionRadians;
 				flags = 0;
 			}
 
@@ -165,6 +166,11 @@ namespace s3air
 			spriteManager.drawCustomSprite(key, Vec2i(px, py), atex, flags | 0x40, 0xe000, color, 0.0f, 0.4f);
 		else
 			spriteManager.drawCustomSprite(key, Vec2i(px, py), atex, flags, 0x9eff, color);
+	}
+
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, uint16* globalFrameNumber, bool enableOffscreen)
+	{
+		drawPlayerSprite(emulatorInterface, characterIndex, position, std::atan2((float)velocity.y, (float)velocity.x), animationSprite, flags, rotation, color, globalFrameNumber, enableOffscreen);
 	}
 
 }

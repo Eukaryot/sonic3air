@@ -17,6 +17,12 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 
 
+namespace
+{
+	static const constexpr uint32 GHOSTSYNC_BROADCAST_MESSAGE_TYPE = rmx::compileTimeFNV_32("S3AIR_GhostSync");
+}
+
+
 bool GhostSync::isActive() const
 {
 	return (mState == State::JOINED_CHANNEL);
@@ -61,12 +67,13 @@ void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesR
 		}
 	}
 
-	if (supportsUpdate && ConfigurationImpl::instance().mGameServer.mEnableGhostSync)
+	const ConfigurationImpl::GhostSync& ghostSyncConfig = ConfigurationImpl::instance().mGameServer.mGhostSync;
+	if (supportsUpdate && ghostSyncConfig.mEnabled)
 	{
 		if (mState == State::INACTIVE)
 		{
 			// Join channel
-			mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-world";
+			mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ghostSyncConfig.mChannelName;
 			mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
 			mJoinChannelRequest.mQuery.mSubChannelName.clear();
 			mJoinChannelRequest.mQuery.mSubChannelHash = 0;
@@ -88,6 +95,10 @@ bool GhostSync::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 		{
 			network::ChannelMessagePacket packet;
 			if (!evaluation.readPacket(packet))
+				return false;
+
+			// Ignore messages of the wrong type or with an unsupported version
+			if (packet.mMessageType != GHOSTSYNC_BROADCAST_MESSAGE_TYPE || packet.mMessageVersion != 1)
 				return false;
 
 			PlayerData* playerData = nullptr;
@@ -120,6 +131,7 @@ bool GhostSync::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 			{
 				playerData->mGhostDataQueue.emplace_back();
 				serializeGhostData(serializer, playerData->mGhostDataQueue.back());
+				playerData->mGhostDataQueue.back().mValid = true;
 			}
 			
 			return true;
@@ -154,6 +166,10 @@ void GhostSync::updateSending()
 	mOwnGhostData.mSprite = EmulatorInterface::instance().readMemory16(0x801002);
 	mOwnGhostData.mRotation = EmulatorInterface::instance().readMemory8(0xffffb026);
 
+	const float vx = (float)(int16)EmulatorInterface::instance().readMemory16(0xffffb018);
+	const float vy = (float)(int16)EmulatorInterface::instance().readMemory16(0xffffb01a);
+	mOwnGhostData.mMoveDirection = (uint8)roundToInt(std::atan2(vy, vx) * 128.0f / PI_FLOAT);
+
 	// Set flags accordingly
 	mOwnGhostData.mFlags = (EmulatorInterface::instance().readMemory8(0xffffb004) & 0x03);
 	if (EmulatorInterface::instance().readMemory16(0xffffb00a) & 0x8000)					 { mOwnGhostData.mFlags |= GhostData::FLAG_PRIORITY; }
@@ -180,6 +196,8 @@ void GhostSync::updateSending()
 		packet.mIsReplicatedData = false;
 		packet.mChannelHash = mJoinedChannelHash;
 		packet.mSubChannelHash = mJoinedSubChannelHash;
+		packet.mMessageType = GHOSTSYNC_BROADCAST_MESSAGE_TYPE;
+		packet.mMessageVersion = 1;
 		mServerConnection.sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
 
 		mOwnUnsentGhostData.clear();
@@ -193,14 +211,17 @@ void GhostSync::updateGhostPlayers()
 	for (auto& pair : mGhostPlayers)
 	{
 		PlayerData& playerData = pair.second;
-
-		// TODO: Filter out players in other zones
-
 		if (playerData.mGhostDataQueue.empty())
-			continue;
-
-		playerData.mShownGhostData = playerData.mGhostDataQueue.front();
-		playerData.mGhostDataQueue.pop_front();
+		{
+			// Draw last frame's ghost data once again, if that one is valid
+			if (!playerData.mShownGhostData.mValid)
+				continue;
+		}
+		else
+		{
+			playerData.mShownGhostData = playerData.mGhostDataQueue.front();
+			playerData.mGhostDataQueue.pop_front();
+		}
 
 		const GhostData& ghostData = playerData.mShownGhostData;
 		if (ghostData.mZoneAndAct != mOwnGhostData.mZoneAndAct)
@@ -249,20 +270,31 @@ void GhostSync::updateGhostPlayers()
 				py -= (levelHeightBitmask + 1);
 		}
 
-		uint16 frameNumber = 0;	// TODO
-		const Vec2i velocity = /*(frameNumber > 0) ? (ghostData.mPosition - recording.mFrames[frameNumber-1].mPosition) :*/ Vec2i(0, 1);	// TODO
-		s3air::drawPlayerSprite(EmulatorInterface::instance(), ghostData.mCharacter, Vec2i(px, py), velocity, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &frameNumber);
+		s3air::drawPlayerSprite(EmulatorInterface::instance(), ghostData.mCharacter, Vec2i(px, py), (float)ghostData.mMoveDirection / 128.0f * PI_FLOAT, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &mFrameCounter, ConfigurationImpl::instance().mGameServer.mGhostSync.mShowOffscreenGhosts);
 	}
+
+	++mFrameCounter;
 }
 
 void GhostSync::serializeGhostData(VectorBinarySerializer& serializer, GhostData& ghostData)
 {
 	serializer.serialize(ghostData.mCharacter);
 	serializer.serialize(ghostData.mZoneAndAct);
+
 	if (ghostData.mZoneAndAct != 0xffff)
 	{
 		serializer.serializeAs<int16>(ghostData.mPosition.x);
 		serializer.serializeAs<int16>(ghostData.mPosition.y);
+
+		if (ghostData.mCharacter == 1)	// Only for Tails
+		{
+			serializer.serialize(ghostData.mMoveDirection);
+		}
+		else if (serializer.isReading())
+		{
+			ghostData.mMoveDirection = 0;
+		}
+
 		serializer.serialize(ghostData.mSprite);
 		serializer.serialize(ghostData.mRotation);
 		serializer.serialize(ghostData.mFlags);

@@ -26,12 +26,14 @@ public:
 			FLAG_LAYER = 0x08,			// From "u8[A0 + 0x46]", which is either 0x0c or 0x0e
 			FLAG_ACT_TRANSITION = 0x10	// Used when act number and apparent act number differ
 		};
+		bool   mValid = false;
 		uint8  mCharacter = 0;
 		uint16 mZoneAndAct = 0;		// This is always the apparent zone and act
 		Vec2i  mPosition;
 		uint16 mSprite = 0;
 		uint8  mRotation = 0;
 		uint8  mFlags = 0;
+		uint8  mMoveDirection = 0;	// Only needed for Tails, it's not set for other characters
 	};
 
 public:
@@ -79,4 +81,5 @@ private:
 	network::BroadcastChannelMessagePacket mBroadcastChannelMessagePacket;
 
 	std::unordered_map<uint32, PlayerData> mGhostPlayers;
+	uint16 mFrameCounter = 0;
 };

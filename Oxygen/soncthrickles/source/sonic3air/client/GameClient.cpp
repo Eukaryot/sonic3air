@@ -18,6 +18,11 @@ GameClient::GameClient() :
 	mGhostSync(mServerConnection),
 	mUpdateCheck(mServerConnection)
 {
+#if defined(DEBUG) && 0
+	// Just for testing / debugging
+	mConnectionManager.mDebugSettings.mSendingPacketLoss = 0.2f;
+	mConnectionManager.mDebugSettings.mReceivingPacketLoss = 0.2f;
+#endif
 }
 
 GameClient::~GameClient()
@@ -28,7 +33,7 @@ GameClient::~GameClient()
 void GameClient::setupClient()
 {
 	const ConfigurationImpl& config = ConfigurationImpl::instance();
-	if (config.mGameServer.mConnectToServer && !config.mGameServer.mServerURL.empty())
+	if (config.mGameServer.mConnectToServer && !config.mGameServer.mServerHostName.empty())
 	{
 		Sockets::startupSockets();
 
@@ -40,11 +45,11 @@ void GameClient::setupClient()
 		SocketAddress serverAddress;
 		{
 			std::string serverIP;
-			if (!Sockets::resolveToIP(config.mGameServer.mServerURL, serverIP))
-				RMX_ERROR("Unable to resolve server URL " << config.mGameServer.mServerURL, return);
+			if (!Sockets::resolveToIP(config.mGameServer.mServerHostName, serverIP))
+				RMX_ERROR("Unable to resolve server URL " << config.mGameServer.mServerHostName, return);
 			serverAddress.set(serverIP, (uint16)config.mGameServer.mServerPort);
 		}
-		mServerConnection.startConnectTo(mConnectionManager, serverAddress);
+		mServerConnection.startConnectTo(mConnectionManager, serverAddress, getCurrentTimestamp());
 		mState = State::STARTED;
 	}
 }

@@ -49,6 +49,7 @@ private:
 		uint16 mSprite = 0;
 		uint8  mRotation = 0;
 		uint8  mFlags = 0;
+		// TODO: Adding velocity direction (as angle) would make sense here for Tails, to get smoother tails movement while rolling & jumping
 	};
 	struct Recording
 	{

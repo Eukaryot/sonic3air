@@ -150,7 +150,7 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 	{
 		// Setup connection
 		connection->setProtocolVersions(lowLevelVersion, highLevelVersion);
-		connection->acceptIncomingConnection(connectionManager, remoteConnectionID, receivedPacket.mSenderAddress, senderKey);
+		connection->acceptIncomingConnection(connectionManager, remoteConnectionID, receivedPacket.mSenderAddress, senderKey, getCurrentTimestamp());
 	}
 	else
 	{

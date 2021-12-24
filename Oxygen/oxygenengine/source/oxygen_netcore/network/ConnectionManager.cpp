@@ -18,8 +18,8 @@ ConnectionManager::ConnectionManager(UDPSocket& socket, ConnectionListenerInterf
 	mHighLevelMinimumProtocolVersion(highLevelMinimumProtocolVersion),
 	mHighLevelMaximumProtocolVersion(highLevelMaximumProtocolVersion)
 {
-	mActiveConnections.reserve(32);
-	mActiveConnectionsLookup.resize(32);
+	mActiveConnections.reserve(8);
+	mActiveConnectionsLookup.resize(8);
 	mBitmaskForActiveConnectionsLookup = (uint16)(mActiveConnectionsLookup.size() - 1);
 }
 
@@ -29,6 +29,7 @@ void ConnectionManager::updateConnections(uint64 currentTimestamp)
 	{
 		if (nullptr != connection)
 		{
+			// Update connection
 			connection->updateConnection(currentTimestamp);
 		}
 	}
@@ -56,6 +57,12 @@ bool ConnectionManager::updateReceivePackets()
 		// Ignore too small packets
 		if (received.mBuffer.size() < 6)
 			continue;
+
+	#ifdef DEBUG
+		// Simulate packet loss
+		if (mDebugSettings.mReceivingPacketLoss > 0.0f && randomf() < mDebugSettings.mReceivingPacketLoss)
+			continue;
+	#endif
 
 		// Received a packet, check its signature
 		VectorBinarySerializer serializer(true, received.mBuffer);
@@ -169,18 +176,14 @@ ReceivedPacket* ConnectionManager::getNextReceivedPacket()
 
 bool ConnectionManager::sendPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress)
 {
-	#ifdef DEBUG
+#ifdef DEBUG
+	// Simulate packet loss
+	if (mDebugSettings.mSendingPacketLoss > 0.0f && randomf() < mDebugSettings.mSendingPacketLoss)
 	{
-		if (mDebugSettings.mSendingPacketLoss > 0.0f)
-		{
-			if (randomf() < mDebugSettings.mSendingPacketLoss)
-			{
-				// Act as if the packet was sent successfully
-				return true;
-			}
-		}
+		// Act as if the packet was sent successfully
+		return true;
 	}
-	#endif
+#endif
 
 	return mSocket.sendData(data, remoteAddress);
 }
@@ -240,7 +243,7 @@ uint16 ConnectionManager::getFreeLocalConnectionID()
 	if (mActiveConnections.size() + 1 >= mActiveConnectionsLookup.size() * 3/4)
 	{
 		const size_t oldSize = mActiveConnectionsLookup.size();
-		const size_t newSize = std::min<size_t>(mActiveConnectionsLookup.size() * 2, 32);
+		const size_t newSize = std::max<size_t>(mActiveConnectionsLookup.size() * 2, 32);
 		mActiveConnectionsLookup.resize(newSize);
 		mBitmaskForActiveConnectionsLookup = (uint16)(mActiveConnectionsLookup.size() - 1);
 

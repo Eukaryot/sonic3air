@@ -57,7 +57,7 @@ void NetConnection::setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 hig
 	mHighLevelProtocolVersion = highLevelProtocolVersion;
 }
 
-bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress)
+bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress, uint64 currentTimestamp)
 {
 	clear();
 
@@ -67,6 +67,9 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 	mRemoteConnectionID = 0;		// Not yet set
 	mRemoteAddress = remoteAddress;
 	mSenderKey = 0;					// Not yet set as it depends on the remote connection ID
+
+	mCurrentTimestamp = currentTimestamp;
+	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Set here just to start with a valid timestamp
 
 	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
 
@@ -153,39 +156,59 @@ void NetConnection::updateConnection(uint64 currentTimestamp)
 {
 	mCurrentTimestamp = currentTimestamp;
 
-	// Update timeout
-	if (mSentPacketCache.hasUnconfirmedPackets() && mTimeoutStart != 0)
+	// Updates that need to be called only every 100 milliseconds
+	if (mCurrentTimestamp >= mLast100msUpdate + 100)
 	{
-		if (mCurrentTimestamp >= mTimeoutStart + TIMEOUT_SECONDS * 1000)
+		mLast100msUpdate = mCurrentTimestamp;
+
+		// Update resending
+		mPacketsToResend.clear();
+		mSentPacketCache.updateResend(mPacketsToResend, currentTimestamp);
+
+		for (const SentPacket* sentPacket : mPacketsToResend)
 		{
-			// Trigger timeout
-			std::cout << "Disconnect due to timeout" << std::endl;
-			disconnect(DisconnectReason::TIMEOUT);
-			return;
+			sendPacketInternal(sentPacket->mContent);
 		}
+
+		// Updates that need to be called only every second
+		if (mCurrentTimestamp >= mLast1000msUpdate + 1000)
+		{
+			mLast1000msUpdate = mCurrentTimestamp;
+
+			// Update timeout
+			if (mSentPacketCache.hasUnconfirmedPackets() && mTimeoutStart != 0)
+			{
+				if (mCurrentTimestamp >= mTimeoutStart + TIMEOUT_SECONDS * 1000)
+				{
+					// Trigger timeout
+					std::cout << "Disconnect due to timeout" << std::endl;
+					disconnect(DisconnectReason::TIMEOUT);
+					return;
+				}
+			}
+			else
+			{
+				// Not waiting for any confirmations, so reset timeout
+				mTimeoutStart = mCurrentTimestamp;
+			}
+
+			// Even if no timeout is running, check if this connection is stale (i.e. there was no communication for some minutes)
+			if (mCurrentTimestamp >= mLastMessageReceivedTimestamp + STALE_SECONDS * 1000)
+			{
+				// Trigger disconnect
+				std::cout << "Disconnect due to stale connection" << std::endl;
+				disconnect(DisconnectReason::STALE);
+				return;
+			}
+		}
+
+		// TODO: Send a heartbeat every now and then
+		//  -> But only if a heartbeat is even needed (the client should send one regularly, the server only sends a response back)
+
 	}
-	else
-	{
-		// Not waiting for any confirmations, so reset timeout
-		mTimeoutStart = mCurrentTimestamp;
-	}
-
-	// Update resending
-	mPacketsToResend.clear();
-	mSentPacketCache.updateResend(mPacketsToResend, currentTimestamp);
-
-	for (const SentPacket* sentPacket : mPacketsToResend)
-	{
-		sendPacketInternal(sentPacket->mContent);
-	}
-
-	// TODO: Send a heartbeat every now and then
-	//  -> But only if a heartbeat is even needed
-	//  -> E.g. it can be omitted for a connection to a public server that does not send other packets than direct responses
-
 }
 
-void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey)
+void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp)
 {
 	clear();
 
@@ -196,6 +219,9 @@ void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManage
 	mRemoteAddress = remoteAddress;
 	mSenderKey = senderKey;
 	RMX_ASSERT(senderKey == buildSenderKey(mRemoteAddress, mRemoteConnectionID), "Previously calculated sender key is the wrong one");
+
+	mCurrentTimestamp = currentTimestamp;
+	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Because we just received a packet
 
 	std::cout << "Accepting connection from " << mRemoteAddress.toString() << std::endl;
 	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
