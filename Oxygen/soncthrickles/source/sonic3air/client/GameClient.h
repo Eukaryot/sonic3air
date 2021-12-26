@@ -51,10 +51,14 @@ private:
 	};
 
 private:
+	void startConnectingToServer(uint64 currentTimestamp);
+
+private:
 	UDPSocket mSocket;
 	ConnectionManager mConnectionManager;
 	NetConnection mServerConnection;
 	State mState = State::NONE;
+	uint64 mLastConnectionAttemptTimestamp = 0;
 
 	GhostSync mGhostSync;
 	UpdateCheck mUpdateCheck;

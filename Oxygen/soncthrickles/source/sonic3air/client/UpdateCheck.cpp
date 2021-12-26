@@ -92,7 +92,7 @@ void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeature
 	bool supportsUpdate = false;
 	for (const network::GetServerFeaturesRequest::Response::Feature& feature : request.mResponse.mFeatures)
 	{
-		if (feature.mIdentifier == "app-update-check" && feature.mVersion >= 1)
+		if (feature.mIdentifier == "app-update-check" && feature.mVersions.contains(1))
 		{
 			supportsUpdate = true;
 		}

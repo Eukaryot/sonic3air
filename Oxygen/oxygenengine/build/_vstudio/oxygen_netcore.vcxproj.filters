@@ -44,6 +44,9 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacket.h">
       <Filter>network\internal</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\VersionRange.h">
+      <Filter>network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />

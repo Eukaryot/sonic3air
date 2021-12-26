@@ -10,6 +10,7 @@
 
 #include "oxygen_netcore/network/internal/SentPacketCache.h"
 #include "oxygen_netcore/network/internal/ReceivedPacket.h"
+#include "oxygen_netcore/network/VersionRange.h"
 
 namespace lowlevel
 {
@@ -31,14 +32,13 @@ public:
 	DebugSettings mDebugSettings;
 
 public:
-	ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, uint8 highLevelMinimumProtocolVersion, uint8 highLevelMaximumProtocolVersion);
+	ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange);
 
 	inline UDPSocket& getSocket() const  { return mSocket; }
 	inline ConnectionListenerInterface& getListener() const  { return mListener; }
 	inline size_t getNumActiveConnections() const			 { return mActiveConnections.size(); }
 
-	inline uint8 getHighLevelMinimumProtocolVersion() const  { return mHighLevelMinimumProtocolVersion; }
-	inline uint8 getHighLevelMaximumProtocolVersion() const  { return mHighLevelMaximumProtocolVersion; }
+	inline VersionRange<uint8> getHighLevelProtocolVersionRange() const  { return mHighLevelProtocolVersionRange; }
 
 	void updateConnections(uint64 currentTimestamp);
 	bool updateReceivePackets();	// TODO: This is meant to be executed by a thread later on
@@ -73,9 +73,7 @@ private:
 private:
 	UDPSocket& mSocket;
 	ConnectionListenerInterface& mListener;
-
-	uint8 mHighLevelMinimumProtocolVersion = 1;
-	uint8 mHighLevelMaximumProtocolVersion = 1;
+	VersionRange<uint8> mHighLevelProtocolVersionRange = { 1, 1 };
 
 	std::unordered_map<uint16, NetConnection*> mActiveConnections;		// Using local connection ID as key
 	std::vector<NetConnection*> mActiveConnectionsLookup;				// Using the lowest n bits of the local connection ID as index

@@ -12,11 +12,10 @@
 #include "oxygen_netcore/network/NetConnection.h"
 
 
-ConnectionManager::ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, uint8 highLevelMinimumProtocolVersion, uint8 highLevelMaximumProtocolVersion) :
+ConnectionManager::ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange) :
 	mSocket(socket),
 	mListener(listener),
-	mHighLevelMinimumProtocolVersion(highLevelMinimumProtocolVersion),
-	mHighLevelMaximumProtocolVersion(highLevelMaximumProtocolVersion)
+	mHighLevelProtocolVersionRange(highLevelProtocolVersionRange)
 {
 	mActiveConnections.reserve(8);
 	mActiveConnectionsLookup.resize(8);
@@ -198,7 +197,7 @@ bool ConnectionManager::sendConnectionlessLowLevelPacket(lowlevel::PacketBase& l
 	serializer.write(lowLevelPacket.getSignature());
 	serializer.write(localConnectionID);
 	serializer.write(remoteConnectionID);
-	lowLevelPacket.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_MINIMUM_PROTOCOL_VERSION);
+	lowLevelPacket.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.mMinimum);
 
 	return sendPacketData(sendBuffer, remoteAddress);
 }

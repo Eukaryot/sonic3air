@@ -14,7 +14,7 @@
 
 
 GameClient::GameClient() :
-	mConnectionManager(mSocket, *this, network::HIGHLEVEL_MINIMUM_PROTOCOL_VERSION, network::HIGHLEVEL_MAXIMUM_PROTOCOL_VERSION),
+	mConnectionManager(mSocket, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
 	mGhostSync(mServerConnection),
 	mUpdateCheck(mServerConnection)
 {
@@ -32,8 +32,8 @@ GameClient::~GameClient()
 
 void GameClient::setupClient()
 {
-	const ConfigurationImpl& config = ConfigurationImpl::instance();
-	if (config.mGameServer.mConnectToServer && !config.mGameServer.mServerHostName.empty())
+	const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
+	if (config.mConnectToServer && !config.mServerHostName.empty())
 	{
 		Sockets::startupSockets();
 
@@ -42,14 +42,7 @@ void GameClient::setupClient()
 			RMX_ERROR("Socket bind to any port failed", return);
 
 		// Start connection
-		SocketAddress serverAddress;
-		{
-			std::string serverIP;
-			if (!Sockets::resolveToIP(config.mGameServer.mServerHostName, serverIP))
-				RMX_ERROR("Unable to resolve server URL " << config.mGameServer.mServerHostName, return);
-			serverAddress.set(serverIP, (uint16)config.mGameServer.mServerPort);
-		}
-		mServerConnection.startConnectTo(mConnectionManager, serverAddress, getCurrentTimestamp());
+		startConnectingToServer(getCurrentTimestamp());
 		mState = State::STARTED;
 	}
 }
@@ -66,7 +59,17 @@ void GameClient::updateClient(float timeElapsed)
 	mConnectionManager.updateConnections(currentTimestamp);
 
 	if (mServerConnection.getState() != NetConnection::State::CONNECTED)
+	{
+		if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
+		{
+			// Try connecting once again after a minute
+			if (currentTimestamp > mLastConnectionAttemptTimestamp + 60000)
+			{
+				startConnectingToServer(currentTimestamp);
+			}
+		}
 		return;
+	}
 
 	switch (mState)
 	{
@@ -117,4 +120,18 @@ bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	if (mGhostSync.onReceivedPacket(evaluation))
 		return true;
 	return false;
+}
+
+void GameClient::startConnectingToServer(uint64 currentTimestamp)
+{
+	SocketAddress serverAddress;
+	{
+		const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
+		std::string serverIP;
+		if (!Sockets::resolveToIP(config.mServerHostName, serverIP))
+			RMX_ERROR("Unable to resolve server URL " << config.mServerHostName, return);
+		serverAddress.set(serverIP, (uint16)config.mServerPort);
+	}
+	mServerConnection.startConnectTo(mConnectionManager, serverAddress, currentTimestamp);
+	mLastConnectionAttemptTimestamp = currentTimestamp;
 }

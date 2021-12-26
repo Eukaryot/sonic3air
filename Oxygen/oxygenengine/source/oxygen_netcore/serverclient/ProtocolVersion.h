@@ -20,6 +20,5 @@ namespace network
 	//  - If a larger change is made that would break compatibility even with the extension of the packet serialization
 	//     as described above, the minimum version needs to be set to that new version number as well.
 
-	static const uint8 HIGHLEVEL_MINIMUM_PROTOCOL_VERSION = 1;
-	static const uint8 HIGHLEVEL_MAXIMUM_PROTOCOL_VERSION = 1;
+	static const VersionRange<uint8> HIGHLEVEL_PROTOCOL_VERSION_RANGE { 1, 1 };
 }

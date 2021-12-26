@@ -29,6 +29,7 @@ public:
 		bool   mValid = false;
 		uint8  mCharacter = 0;
 		uint16 mZoneAndAct = 0;		// This is always the apparent zone and act
+		uint16 mFrameCounter = 0;
 		Vec2i  mPosition;
 		uint16 mSprite = 0;
 		uint8  mRotation = 0;
@@ -74,12 +75,10 @@ private:
 
 	network::JoinChannelRequest mJoinChannelRequest;
 	uint32 mJoinedChannelHash = 0;
-	uint32 mJoinedSubChannelHash = 0;
 
 	GhostData mOwnGhostData;
 	std::deque<GhostData> mOwnUnsentGhostData;
 	network::BroadcastChannelMessagePacket mBroadcastChannelMessagePacket;
 
 	std::unordered_map<uint32, PlayerData> mGhostPlayers;
-	uint16 mFrameCounter = 0;
 };

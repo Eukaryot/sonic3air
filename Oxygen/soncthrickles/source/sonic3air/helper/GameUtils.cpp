@@ -49,9 +49,9 @@ namespace s3air
 		}
 	}
 
-	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, float moveDirectionRadians, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, uint16* globalFrameNumber, bool enableOffscreen)
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, float moveDirectionRadians, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen)
 	{
-			const uint8 atex = 0x40 + characterIndex * 0x20;
+		const uint8 atex = 0x40 + characterIndex * 0x20;
 		int px = position.x;
 		int py = position.y;
 		float angle = (float)rotation / 128.0f * PI_FLOAT;
@@ -168,7 +168,7 @@ namespace s3air
 			spriteManager.drawCustomSprite(key, Vec2i(px, py), atex, flags, 0x9eff, color);
 	}
 
-	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, uint16* globalFrameNumber, bool enableOffscreen)
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen)
 	{
 		drawPlayerSprite(emulatorInterface, characterIndex, position, std::atan2((float)velocity.y, (float)velocity.x), animationSprite, flags, rotation, color, globalFrameNumber, enableOffscreen);
 	}

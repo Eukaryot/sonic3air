@@ -17,8 +17,7 @@
 
 namespace
 {
-	static const constexpr uint16 LOWLEVEL_PROTOCOL_MINIMUM_VERSION = 1;
-	static const constexpr uint16 LOWLEVEL_PROTOCOL_MAXIMUM_VERSION = 1;
+	static const constexpr VersionRange<uint8> LOWLEVEL_PROTOCOL_VERSION_RANGE { 1, 1 };
 
 	struct ProtocolVersionChecker
 	{
@@ -29,15 +28,15 @@ namespace
 			ERROR_TOO_NEW	// Remote protocol version is higher than anything we can support
 		};
 
-		static Result chooseVersion(uint8& outVersion, uint8 localMinVersion, uint8 localMaxVersion, uint8 remoteMinVersion, uint8 remoteMaxVersion)
+		static Result chooseVersion(uint8& outVersion, VersionRange<uint8> localVersionRange, VersionRange<uint8> remoteVersionRange)
 		{
 			// Use the highest version both can support
-			outVersion = std::min(remoteMaxVersion, localMaxVersion);
-			if (outVersion < localMinVersion)
+			outVersion = std::min(remoteVersionRange.mMaximum, localVersionRange.mMaximum);
+			if (outVersion < localVersionRange.mMinimum)
 			{
 				return Result::ERROR_TOO_OLD;
 			}
-			else if (outVersion < remoteMinVersion)
+			else if (outVersion < remoteVersionRange.mMinimum)
 			{
 				return Result::ERROR_TOO_NEW;
 			}
@@ -99,7 +98,7 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 	serializer.skip(2);		// Skip the other connection ID, as it's invalid anyways (it's only in there to have all low-level packets share the same header)
 
 	lowlevel::StartConnectionPacket packet;
-	if (!packet.serializePacket(serializer, LOWLEVEL_PROTOCOL_MINIMUM_VERSION))
+	if (!packet.serializePacket(serializer, LOWLEVEL_PROTOCOL_VERSION_RANGE.mMinimum))
 	{
 		// Error in packet format, just ignore packet
 		return;
@@ -107,8 +106,8 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 
 	uint8 lowLevelVersion = 0;
 	uint8 highLevelVersion = 0;
-	const ProtocolVersionChecker::Result resultLowLevel = ProtocolVersionChecker::chooseVersion(lowLevelVersion, LOWLEVEL_PROTOCOL_MINIMUM_VERSION, LOWLEVEL_PROTOCOL_MAXIMUM_VERSION, packet.mLowLevelMinimumProtocolVersion, packet.mLowLevelMaximumProtocolVersion);
-	const ProtocolVersionChecker::Result resultHighLevel = ProtocolVersionChecker::chooseVersion(highLevelVersion, connectionManager.getHighLevelMinimumProtocolVersion(), connectionManager.getHighLevelMaximumProtocolVersion(), packet.mHighLevelMinimumProtocolVersion, packet.mHighLevelMaximumProtocolVersion);
+	const ProtocolVersionChecker::Result resultLowLevel = ProtocolVersionChecker::chooseVersion(lowLevelVersion, LOWLEVEL_PROTOCOL_VERSION_RANGE, packet.mLowLevelProtocolVersionRange);
+	const ProtocolVersionChecker::Result resultHighLevel = ProtocolVersionChecker::chooseVersion(highLevelVersion, connectionManager.getHighLevelProtocolVersionRange(), packet.mHighLevelProtocolVersionRange);
 	if (resultLowLevel != ProtocolVersionChecker::Result::SUCCESS || resultHighLevel != ProtocolVersionChecker::Result::SUCCESS)
 	{
 		// Send back an error

@@ -82,10 +82,8 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 
 		// Build packet
 		lowlevel::StartConnectionPacket packet;
-		packet.mLowLevelMinimumProtocolVersion = lowlevel::PacketBase::LOWLEVEL_MINIMUM_PROTOCOL_VERSION;
-		packet.mLowLevelMaximumProtocolVersion = lowlevel::PacketBase::LOWLEVEL_MAXIMUM_PROTOCOL_VERSION;
-		packet.mHighLevelMinimumProtocolVersion = mConnectionManager->getHighLevelMinimumProtocolVersion();
-		packet.mHighLevelMaximumProtocolVersion = mConnectionManager->getHighLevelMaximumProtocolVersion();
+		packet.mLowLevelProtocolVersionRange = lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS;
+		packet.mHighLevelProtocolVersionRange = mConnectionManager->getHighLevelProtocolVersionRange();
 
 		// And send it
 		if (!sendLowLevelPacket(packet, sentPacket.mContent))
@@ -254,7 +252,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 		case lowlevel::AcceptConnectionPacket::SIGNATURE:
 		{
 			lowlevel::AcceptConnectionPacket packet;
-			if (!packet.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_MINIMUM_PROTOCOL_VERSION))
+			if (!packet.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.mMinimum))
 				return;
 
 			if (mState != State::REQUESTED_CONNECTION)
@@ -264,8 +262,8 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 			}
 
 			// Check if protocol versions are really supported
-			if (packet.mLowLevelProtocolVersion < lowlevel::PacketBase::LOWLEVEL_MINIMUM_PROTOCOL_VERSION || packet.mLowLevelProtocolVersion > lowlevel::PacketBase::LOWLEVEL_MAXIMUM_PROTOCOL_VERSION ||
-				packet.mHighLevelProtocolVersion < mConnectionManager->getHighLevelMinimumProtocolVersion() || packet.mHighLevelProtocolVersion > mConnectionManager->getHighLevelMaximumProtocolVersion())
+			if (!lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.contains(packet.mLowLevelProtocolVersion) ||
+				!mConnectionManager->getHighLevelProtocolVersionRange().contains(packet.mHighLevelProtocolVersion))
 			{
 				std::cout << "Received accept connection packet with unsupported protocol version (low-level = " << packet.mLowLevelProtocolVersion << ", high-level = " << packet.mLowLevelProtocolVersion << ")" << std::endl;
 				// TODO: Send back an error?

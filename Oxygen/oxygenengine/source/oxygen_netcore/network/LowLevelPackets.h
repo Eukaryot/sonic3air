@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "oxygen_netcore/network/VersionRange.h"
 
 
 namespace lowlevel
@@ -20,8 +20,7 @@ namespace lowlevel
 	struct PacketBase
 	{
 	public:
-		static const constexpr uint8 LOWLEVEL_MINIMUM_PROTOCOL_VERSION = 1;
-		static const constexpr uint8 LOWLEVEL_MAXIMUM_PROTOCOL_VERSION = 1;
+		static const constexpr VersionRange<uint8> LOWLEVEL_PROTOCOL_VERSIONS { 1, 1 };
 
 	public:
 		bool serializePacket(VectorBinarySerializer& serializer, uint8 protocolVersion)
@@ -40,28 +39,24 @@ namespace lowlevel
 
 	struct StartConnectionPacket : public PacketBase
 	{
-		int8 mLowLevelMinimumProtocolVersion = 0;
-		int8 mLowLevelMaximumProtocolVersion = 0;
-		int8 mHighLevelMinimumProtocolVersion = 0;
-		int8 mHighLevelMaximumProtocolVersion = 0;
+		VersionRange<uint8> mLowLevelProtocolVersionRange;
+		VersionRange<uint8> mHighLevelProtocolVersionRange;
 
 		static const constexpr uint16 SIGNATURE = 0x87a1;
 		virtual uint16 getSignature() const override  { return SIGNATURE; }
 
 		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
 		{
-			serializer.serialize(mLowLevelMinimumProtocolVersion);
-			serializer.serialize(mLowLevelMaximumProtocolVersion);
-			serializer.serialize(mHighLevelMinimumProtocolVersion);
-			serializer.serialize(mHighLevelMaximumProtocolVersion);
+			mLowLevelProtocolVersionRange.serialize(serializer);
+			mHighLevelProtocolVersionRange.serialize(serializer);
 		}
 	};
 
 
 	struct AcceptConnectionPacket : public PacketBase
 	{
-		int8 mLowLevelProtocolVersion = 0;
-		int8 mHighLevelProtocolVersion = 0;
+		uint8 mLowLevelProtocolVersion = 0;
+		uint8 mHighLevelProtocolVersion = 0;
 
 		static const constexpr uint16 SIGNATURE = 0x1b22;
 		virtual uint16 getSignature() const override  { return SIGNATURE; }

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen_netcore/network/RequestBase.h"
+#include "oxygen_netcore/network/VersionRange.h"
 
 
 // Concrete packets for communication between Oxygen server and client
@@ -31,10 +32,10 @@ namespace network
 			struct Feature
 			{
 				std::string mIdentifier;
-				uint8 mVersion = 1;
+				VersionRange<uint8> mVersions;
 
 				inline Feature() {}
-				inline Feature(const char* identifier, uint8 version) : mIdentifier(identifier), mVersion(version) {}
+				inline Feature(const char* identifier, uint8 minVersion, uint8 maxVersion) : mIdentifier(identifier), mVersions(minVersion, maxVersion) {}
 			};
 			std::vector<Feature> mFeatures;
 
@@ -44,7 +45,7 @@ namespace network
 				for (Feature& feature : mFeatures)
 				{
 					serializer.serialize(feature.mIdentifier, 0xff);
-					serializer.serialize(feature.mVersion);
+					feature.mVersions.serialize(serializer);
 				}
 			}
 		};
@@ -102,15 +103,11 @@ namespace network
 		{
 			uint32 mChannelHash = 0;
 			std::string mChannelName;
-			uint32 mSubChannelHash = 0;
-			std::string mSubChannelName;
 
 			inline void serializeData(VectorBinarySerializer& serializer, uint8 protocolVersion)
 			{
 				serializer.serialize(mChannelHash);
 				serializer.serialize(mChannelName, 0xff);
-				serializer.serialize(mSubChannelHash);
-				serializer.serialize(mSubChannelName, 0xff);
 			}
 		};
 
@@ -133,12 +130,10 @@ namespace network
 		struct QueryData
 		{
 			uint32 mChannelHash = 0;
-			uint32 mSubChannelHash = 0;
 
 			inline void serializeData(VectorBinarySerializer& serializer, uint8 protocolVersion)
 			{
 				serializer.serialize(mChannelHash);
-				serializer.serialize(mSubChannelHash);
 			}
 		};
 
@@ -160,12 +155,10 @@ namespace network
 		struct QueryData
 		{
 			uint32 mChannelHash = 0;
-			uint32 mSubChannelHash = 0;
 
 			inline void serializeData(VectorBinarySerializer& serializer, uint8 protocolVersion)
 			{
 				serializer.serialize(mChannelHash);
-				serializer.serialize(mSubChannelHash);
 			}
 		};
 
@@ -176,7 +169,6 @@ namespace network
 			{
 				uint32 mPlayerID = 0;
 				std::vector<uint8> mChannelReplicatedData;
-				std::vector<uint8> mSubChannelReplicatedData;
 			};
 			std::vector<PlayerInfo> mPlayers;
 
@@ -190,7 +182,6 @@ namespace network
 					{
 						serializer.serialize(player.mPlayerID);
 						serializer.serializeData(player.mChannelReplicatedData, 0x400);
-						serializer.serializeData(player.mSubChannelReplicatedData, 0x400);
 					}
 				}
 			}
@@ -207,7 +198,6 @@ namespace network
 
 		bool mIsReplicatedData = false;		// If true, this is replicated data that gets cached on the server; otherwise it's just a message to broadcast
 		uint32 mChannelHash = 0;
-		uint32 mSubChannelHash = 0;			// Can stay 0 if posting to the main channel
 		uint32 mMessageType = 0;
 		uint8 mMessageVersion = 0;
 		std::vector<uint8> mMessage;
@@ -216,7 +206,6 @@ namespace network
 		{
 			serializer.serialize(mIsReplicatedData);
 			serializer.serialize(mChannelHash);
-			serializer.serialize(mSubChannelHash);
 			serializer.serialize(mMessageType);
 			serializer.serialize(mMessageVersion);
 			serializer.serializeData(mMessage, 0x400);

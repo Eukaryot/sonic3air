@@ -20,6 +20,7 @@
 namespace
 {
 	static const constexpr uint32 GHOSTSYNC_BROADCAST_MESSAGE_TYPE = rmx::compileTimeFNV_32("S3AIR_GhostSync");
+	static const constexpr uint8 GHOSTSYNC_BROADCAST_MESSAGE_VERSION = 1;
 }
 
 
@@ -41,7 +42,6 @@ void GhostSync::performUpdate()
 			{
 				mState = State::JOINED_CHANNEL;
 				mJoinedChannelHash = mJoinChannelRequest.mQuery.mChannelHash;
-				mJoinedSubChannelHash = mJoinChannelRequest.mQuery.mSubChannelHash;
 				mGhostPlayers.clear();
 			}
 			else
@@ -61,7 +61,7 @@ void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesR
 	bool supportsUpdate = false;
 	for (const network::GetServerFeaturesRequest::Response::Feature& feature : request.mResponse.mFeatures)
 	{
-		if (feature.mIdentifier == "channel-broadcasting" && feature.mVersion >= 1)
+		if (feature.mIdentifier == "channel-broadcasting" && feature.mVersions.contains(1))
 		{
 			supportsUpdate = true;
 		}
@@ -75,8 +75,6 @@ void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesR
 			// Join channel
 			mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ghostSyncConfig.mChannelName;
 			mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
-			mJoinChannelRequest.mQuery.mSubChannelName.clear();
-			mJoinChannelRequest.mQuery.mSubChannelHash = 0;
 			mServerConnection.sendRequest(mJoinChannelRequest);
 			mState = State::JOINING_CHANNEL;
 		}
@@ -98,7 +96,7 @@ bool GhostSync::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 				return false;
 
 			// Ignore messages of the wrong type or with an unsupported version
-			if (packet.mMessageType != GHOSTSYNC_BROADCAST_MESSAGE_TYPE || packet.mMessageVersion != 1)
+			if (packet.mMessageType != GHOSTSYNC_BROADCAST_MESSAGE_TYPE || packet.mMessageVersion != GHOSTSYNC_BROADCAST_MESSAGE_VERSION)
 				return false;
 
 			PlayerData* playerData = nullptr;
@@ -146,7 +144,7 @@ void GhostSync::onPostUpdateFrame()
 		return;
 
 	// Nothing to do outside of main game
-	const bool isMainGame = true;//(EmulatorInterface::instance().readMemory8(0xfffff600) == 0x0c);		// TODO: Out-commented just for testing with the demos
+	const bool isMainGame = (EmulatorInterface::instance().readMemory8(0xfffff600) == 0x0c);
 	const bool hasStarted = ((int8)EmulatorInterface::instance().readMemory8(0xfffff711) > 0);
 
 	if (isMainGame && hasStarted)
@@ -159,22 +157,24 @@ void GhostSync::onPostUpdateFrame()
 void GhostSync::updateSending()
 {
 	// Collect data from simulation
-	mOwnGhostData.mCharacter = EmulatorInterface::instance().readMemory8(0xffffb038);
-	mOwnGhostData.mZoneAndAct = EmulatorInterface::instance().readMemory16(0xffffee4e);
-	mOwnGhostData.mPosition.x = EmulatorInterface::instance().readMemory16(0xffffb010);
-	mOwnGhostData.mPosition.y = EmulatorInterface::instance().readMemory16(0xffffb014);
-	mOwnGhostData.mSprite = EmulatorInterface::instance().readMemory16(0x801002);
-	mOwnGhostData.mRotation = EmulatorInterface::instance().readMemory8(0xffffb026);
+	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
+	mOwnGhostData.mCharacter = emulatorInterface.readMemory8(0xffffb038);
+	mOwnGhostData.mZoneAndAct = emulatorInterface.readMemory16(0xffffee4e);
+	mOwnGhostData.mFrameCounter = emulatorInterface.readMemory16(0xfffffe04);
+	mOwnGhostData.mPosition.x = emulatorInterface.readMemory16(0xffffb010);
+	mOwnGhostData.mPosition.y = emulatorInterface.readMemory16(0xffffb014);
+	mOwnGhostData.mSprite = emulatorInterface.readMemory16(0x801002);
+	mOwnGhostData.mRotation = emulatorInterface.readMemory8(0xffffb026);
 
-	const float vx = (float)(int16)EmulatorInterface::instance().readMemory16(0xffffb018);
-	const float vy = (float)(int16)EmulatorInterface::instance().readMemory16(0xffffb01a);
+	const float vx = (float)(int16)emulatorInterface.readMemory16(0xffffb018);
+	const float vy = (float)(int16)emulatorInterface.readMemory16(0xffffb01a);
 	mOwnGhostData.mMoveDirection = (uint8)roundToInt(std::atan2(vy, vx) * 128.0f / PI_FLOAT);
 
 	// Set flags accordingly
-	mOwnGhostData.mFlags = (EmulatorInterface::instance().readMemory8(0xffffb004) & 0x03);
-	if (EmulatorInterface::instance().readMemory16(0xffffb00a) & 0x8000)					 { mOwnGhostData.mFlags |= GhostData::FLAG_PRIORITY; }
-	if (EmulatorInterface::instance().readMemory8(0xffffb046) == 0x0e)						 { mOwnGhostData.mFlags |= GhostData::FLAG_LAYER; }
-	if (EmulatorInterface::instance().readMemory16(0xfffffe10) != mOwnGhostData.mZoneAndAct) { mOwnGhostData.mFlags |= GhostData::FLAG_ACT_TRANSITION; }
+	mOwnGhostData.mFlags = (emulatorInterface.readMemory8(0xffffb004) & 0x03);
+	if (emulatorInterface.readMemory16(0xffffb00a) & 0x8000)					 { mOwnGhostData.mFlags |= GhostData::FLAG_PRIORITY; }
+	if (emulatorInterface.readMemory8(0xffffb046) == 0x0e)						 { mOwnGhostData.mFlags |= GhostData::FLAG_LAYER; }
+	if (emulatorInterface.readMemory16(0xfffffe10) != mOwnGhostData.mZoneAndAct) { mOwnGhostData.mFlags |= GhostData::FLAG_ACT_TRANSITION; }
 
 	mOwnUnsentGhostData.emplace_back(mOwnGhostData);
 	if (mOwnUnsentGhostData.size() >= 6)
@@ -195,9 +195,8 @@ void GhostSync::updateSending()
 
 		packet.mIsReplicatedData = false;
 		packet.mChannelHash = mJoinedChannelHash;
-		packet.mSubChannelHash = mJoinedSubChannelHash;
 		packet.mMessageType = GHOSTSYNC_BROADCAST_MESSAGE_TYPE;
-		packet.mMessageVersion = 1;
+		packet.mMessageVersion = GHOSTSYNC_BROADCAST_MESSAGE_VERSION;
 		mServerConnection.sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
 
 		mOwnUnsentGhostData.clear();
@@ -206,7 +205,12 @@ void GhostSync::updateSending()
 
 void GhostSync::updateGhostPlayers()
 {
+	if (mGhostPlayers.empty())
+		return;
+
 	// TODO: Check own player's state and whether showing others even makes sense
+
+	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 
 	for (auto& pair : mGhostPlayers)
 	{
@@ -230,8 +234,8 @@ void GhostSync::updateGhostPlayers()
 			continue;
 		}
 
-		int px = ghostData.mPosition.x - EmulatorInterface::instance().readMemory16(0xffffee80);
-		int py = ghostData.mPosition.y - EmulatorInterface::instance().readMemory16(0xffffee84);
+		int px = ghostData.mPosition.x - emulatorInterface.readMemory16(0xffffee80);
+		int py = ghostData.mPosition.y - emulatorInterface.readMemory16(0xffffee84);
 
 		// Level section fixes for AIZ 1 and ICZ 1
 		if ((ghostData.mZoneAndAct & 0xff00) == 0x0000)
@@ -262,18 +266,18 @@ void GhostSync::updateGhostPlayers()
 		}
 
 		// Consider vertical level wrap
-		if (EmulatorInterface::instance().readMemory16(0xffffee18) != 0)
+		if (emulatorInterface.readMemory16(0xffffee18) != 0)
 		{
-			const int levelHeightBitmask = EmulatorInterface::instance().readMemory16(0xffffeeaa);
+			const int levelHeightBitmask = emulatorInterface.readMemory16(0xffffeeaa);
 			py &= levelHeightBitmask;
 			if (py >= levelHeightBitmask / 2)
 				py -= (levelHeightBitmask + 1);
 		}
 
-		s3air::drawPlayerSprite(EmulatorInterface::instance(), ghostData.mCharacter, Vec2i(px, py), (float)ghostData.mMoveDirection / 128.0f * PI_FLOAT, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &mFrameCounter, ConfigurationImpl::instance().mGameServer.mGhostSync.mShowOffscreenGhosts);
+		const float moveDirAngle = (float)ghostData.mMoveDirection / 128.0f * PI_FLOAT;
+		const bool enableOffscreen = ConfigurationImpl::instance().mGameServer.mGhostSync.mShowOffscreenGhosts;
+		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &ghostData.mFrameCounter, enableOffscreen);
 	}
-
-	++mFrameCounter;
 }
 
 void GhostSync::serializeGhostData(VectorBinarySerializer& serializer, GhostData& ghostData)
@@ -283,6 +287,7 @@ void GhostSync::serializeGhostData(VectorBinarySerializer& serializer, GhostData
 
 	if (ghostData.mZoneAndAct != 0xffff)
 	{
+		serializer.serializeAs<int16>(ghostData.mFrameCounter);
 		serializer.serializeAs<int16>(ghostData.mPosition.x);
 		serializer.serializeAs<int16>(ghostData.mPosition.y);
 
