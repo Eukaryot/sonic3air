@@ -11,7 +11,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/DrawerTexture.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/RenderResources.h"
 #include "oxygen/rendering/hardware/HardwareRenderer.h"
@@ -41,13 +41,13 @@ void VideoOut::startup()
 {
 	mGameResolution = Configuration::instance().mGameScreen;
 
-	LOG_INFO("VideoOut: Setup of game screen");
+	RMX_LOG_INFO("VideoOut: Setup of game screen");
 	EngineMain::instance().getDrawer().createTexture(mGameScreenTexture);
 	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
 
 	if (nullptr == mRenderParts)
 	{
-		LOG_INFO("VideoOut: Creating render parts");
+		RMX_LOG_INFO("VideoOut: Creating render parts");
 		mRenderParts = new RenderParts();
 		mRenderParts->setFullEmulation(Configuration::instance().mFullEmulationRendering);
 	}
@@ -92,10 +92,10 @@ void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
 	{
 		if (nullptr == mSoftwareRenderer)
 		{
-			LOG_INFO("VideoOut: Creating software renderer");
+			RMX_LOG_INFO("VideoOut: Creating software renderer");
 			mSoftwareRenderer = new SoftwareRenderer(*mRenderParts, mGameScreenTexture);
 
-			LOG_INFO("VideoOut: Renderer initialization");
+			RMX_LOG_INFO("VideoOut: Renderer initialization");
 			mSoftwareRenderer->initialize();
 		}
 		mActiveRenderer = mSoftwareRenderer;
@@ -104,10 +104,10 @@ void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
 	{
 		if (nullptr == mHardwareRenderer)
 		{
-			LOG_INFO("VideoOut: Creating hardware renderer");
+			RMX_LOG_INFO("VideoOut: Creating hardware renderer");
 			mHardwareRenderer = new HardwareRenderer(*mRenderParts, mGameScreenTexture);
 
-			LOG_INFO("VideoOut: Renderer initialization");
+			RMX_LOG_INFO("VideoOut: Renderer initialization");
 			mHardwareRenderer->initialize();
 		}
 		mActiveRenderer = mHardwareRenderer;

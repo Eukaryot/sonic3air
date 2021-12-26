@@ -80,7 +80,7 @@
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\FileHelper.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\JsonHelper.cpp" />
-    <ClCompile Include="..\..\source\oxygen\helper\Log.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\Logging.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Utils.cpp" />
     <ClCompile Include="..\..\source\oxygen\platform\AndroidJavaInterface.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\Geometry.cpp" />
@@ -190,7 +190,7 @@
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h" />
     <ClInclude Include="..\..\source\oxygen\helper\FileHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\JsonHelper.h" />
-    <ClInclude Include="..\..\source\oxygen\helper\Log.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\Logging.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Utils.h" />
     <ClInclude Include="..\..\source\oxygen\platform\AndroidJavaInterface.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\Geometry.h" />

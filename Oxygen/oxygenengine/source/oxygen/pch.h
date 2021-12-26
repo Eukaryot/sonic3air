@@ -14,4 +14,4 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/Drawer.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"

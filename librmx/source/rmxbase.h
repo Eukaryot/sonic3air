@@ -65,6 +65,7 @@
 #include "rmxbase/ZlibDeflate.h"
 #include "rmxbase/Color.h"
 #include "rmxbase/Bitmap.h"
+#include "rmxbase/Logging.h"
 
 
 // Library linking via pragma

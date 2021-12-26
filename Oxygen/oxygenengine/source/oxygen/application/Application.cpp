@@ -29,7 +29,7 @@
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/base/PlatformFunctions.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
@@ -75,7 +75,7 @@ void Application::initialize()
 
 	if (nullptr == mGameView)
 	{
-		LOG_INFO("Adding game view");
+		RMX_LOG_INFO("Adding game view");
 		mGameView = new GameView(*mSimulation);
 		addChild(mGameView);
 		mBackdropView = createChild<BackdropView>();
@@ -85,7 +85,7 @@ void Application::initialize()
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
-		LOG_INFO("Adding debug views");
+		RMX_LOG_INFO("Adding debug views");
 		mDebugSidePanel = createChild<DebugSidePanel>();
 		createChild<MemoryHexView>();
 		createChild<DebugLogView>();
@@ -105,13 +105,13 @@ void Application::initialize()
 	mLogDisplayFont.setSize(15.0f);
 	mLogDisplayFont.setShadow(true);
 
-	LOG_INFO("Application initialization complete");
+	RMX_LOG_INFO("Application initialization complete");
 }
 
 void Application::deinitialize()
 {
-	LOG_INFO("");
-	LOG_INFO("--- SHUTDOWN ---");
+	RMX_LOG_INFO("");
+	RMX_LOG_INFO("--- SHUTDOWN ---");
 
 	// Remove all children, as they must not get deleted automatically (which would be the case if they stay added as children)
 	while (!mChildren.empty())
@@ -133,7 +133,7 @@ void Application::sdlEvent(const SDL_Event& ev)
 {
 	GuiBase::sdlEvent(ev);
 
-	//LOG_INFO("SDL event: type = " << ev.type);
+	//RMX_LOG_INFO("SDL event: type = " << ev.type);
 
 	// Inform input manager as well
 	if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP)		// TODO: Also add joystick events?
@@ -195,7 +195,7 @@ void Application::sdlEvent(const SDL_Event& ev)
 void Application::keyboard(const rmx::KeyboardEvent& ev)
 {
 	// Debug only
-	//LOG_INFO(*String(0, "Keyboard event: key=0x%08x, scancode=0x%04x", ev.key, ev.scancode));
+	//RMX_LOG_INFO(*String(0, "Keyboard event: key=0x%08x, scancode=0x%04x", ev.key, ev.scancode));
 
 	GuiBase::keyboard(ev);
 
@@ -389,7 +389,7 @@ void Application::update(float timeElapsed)
 {
 	if (mIsVeryFirstFrameForLogging)
 	{
-		LOG_INFO("Start of first application update call");
+		RMX_LOG_INFO("Start of first application update call");
 	}
 
 	// Global slow motion for debugging menu transitions etc.
@@ -471,7 +471,7 @@ void Application::update(float timeElapsed)
 
 	if (mIsVeryFirstFrameForLogging)
 	{
-		LOG_INFO("End of first application render call");
+		RMX_LOG_INFO("End of first application render call");
 	}
 }
 
@@ -481,7 +481,7 @@ void Application::render()
 
 	if (mIsVeryFirstFrameForLogging)
 	{
-		LOG_INFO("Start of first application render call");
+		RMX_LOG_INFO("Start of first application render call");
 	}
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
@@ -559,7 +559,7 @@ void Application::render()
 
 		if (mIsVeryFirstFrameForLogging)
 		{
-			LOG_INFO("First present screen call");
+			RMX_LOG_INFO("First present screen call");
 		}
 
 		drawer.presentScreen();
@@ -583,8 +583,8 @@ void Application::render()
 
 	if (mIsVeryFirstFrameForLogging)
 	{
-		LOG_INFO("End of first application render call");
-		LOG_INFO("Ready to go");
+		RMX_LOG_INFO("End of first application render call");
+		RMX_LOG_INFO("Ready to go");
 		mIsVeryFirstFrameForLogging = false;
 	}
 }
@@ -772,10 +772,10 @@ bool Application::updateLoading()
 			case GameLoader::UpdateResult::SUCCESS:
 			{
 				// The simulation startup may fail, and this should lead to the application not starting at all
-				LOG_INFO("Simulation startup");
+				RMX_LOG_INFO("Simulation startup");
 				if (!mSimulation->startup())
 				{
-					LOG_INFO("Simulation startup failed");
+					RMX_LOG_INFO("Simulation startup failed");
 
 					// TODO: Handle this better
 					FTX::System->quit();
@@ -792,7 +792,7 @@ bool Application::updateLoading()
 				// Startup game
 				EngineMain::getDelegate().startupGame();
 
-				LOG_INFO("Adding game app instance");
+				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
 				addChild(mGameApp);
 				break;

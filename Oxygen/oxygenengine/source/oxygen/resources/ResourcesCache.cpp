@@ -14,7 +14,7 @@
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/helper/PackageFileCrawler.h"
 
 
@@ -66,7 +66,7 @@ bool ResourcesCache::loadRom()
 	// If still not loaded, search for Steam installation of the game
 	if (!loaded && !gameProfile.mRomAutoDiscover.mSteamRomName.empty())
 	{
-		LOG_INFO("Trying to find Steam ROM");
+		RMX_LOG_INFO("Trying to find Steam ROM");
 		romPath = PlatformFunctions::tryGetSteamRomPath(gameProfile.mRomAutoDiscover.mSteamRomName);
 		if (!romPath.empty())
 		{

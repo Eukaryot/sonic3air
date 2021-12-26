@@ -23,7 +23,7 @@
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/RenderResources.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
@@ -267,10 +267,10 @@ bool EngineMain::startupEngine()
 
 	// Startup logging
 	{
-		Log::startup(config.mAppDataPath + L"logfile.txt");
-		LOG_INFO("--- STARTUP ---");
-		LOG_INFO("Logging started");
-		LOG_INFO("Application version: " << appMetaData.mBuildVersion);
+		oxygen::Logging::startup(config.mAppDataPath + L"logfile.txt");
+		RMX_LOG_INFO("--- STARTUP ---");
+		RMX_LOG_INFO("Logging started");
+		RMX_LOG_INFO("Application version: " << appMetaData.mBuildVersion);
 
 		String commandLine;
 		for (std::string& arg : mArguments)
@@ -279,8 +279,8 @@ bool EngineMain::startupEngine()
 				commandLine.add(' ');
 			commandLine.add(arg);
 		}
-		LOG_INFO("Command line:  " << commandLine.toStdString());
-		LOG_INFO("App data path: " << WString(config.mAppDataPath).toStdString());
+		RMX_LOG_INFO("Command line:  " << commandLine.toStdString());
+		RMX_LOG_INFO("App data path: " << WString(config.mAppDataPath).toStdString());
 	}
 
 	// Load configuration and settings
@@ -288,12 +288,12 @@ bool EngineMain::startupEngine()
 		return false;
 
 	// Setup file system
-	LOG_INFO("File system setup");
+	RMX_LOG_INFO("File system setup");
 	if (!initFileSystem())
 		return false;
 
 	// System
-	LOG_INFO("System initialization...");
+	RMX_LOG_INFO("System initialization...");
 	if (!FTX::System->initialize())
 	{
 		RMX_ERROR("System initialization failed", );
@@ -301,42 +301,42 @@ bool EngineMain::startupEngine()
 	}
 
 	// Video
-	LOG_INFO("Video initialization...");
+	RMX_LOG_INFO("Video initialization...");
 	if (!createWindow())
 	{
 		RMX_ERROR("Unable to create window" << (config.mFailSafeMode ? " in fail-safe mode" : "") << " with error: " << SDL_GetError(), );
 		return false;
 	}
 
-	LOG_INFO("Startup of VideoOut");
+	RMX_LOG_INFO("Startup of VideoOut");
 	mVideoOut.startup();
 
 	// Input manager startup after config is loaded
-	LOG_INFO("Input initialization...");
+	RMX_LOG_INFO("Input initialization...");
 	InputManager::instance().startup();
 
-	LOG_INFO("Startup of ControlsIn");
+	RMX_LOG_INFO("Startup of ControlsIn");
 	mControlsIn.startup();
 
 	// Audio
-	LOG_INFO("Audio initialization...");
+	RMX_LOG_INFO("Audio initialization...");
 	FTX::Audio->initialize(config.mAudioSampleRate, 2, 1024);
 
-	LOG_INFO("Startup of AudioOut");
+	RMX_LOG_INFO("Startup of AudioOut");
 	mAudioOut = &EngineMain::getDelegate().createAudioOut();
 	mAudioOut->startup();
 
 	// Done
-	LOG_INFO("Engine startup successful");
+	RMX_LOG_INFO("Engine startup successful");
 	return true;
 }
 
 void EngineMain::run()
 {
 	// Run RMX application
-	LOG_INFO("");
-	LOG_INFO("--- MAIN LOOP ---");
-	LOG_INFO("Starting main application loop");
+	RMX_LOG_INFO("");
+	RMX_LOG_INFO("--- MAIN LOOP ---");
+	RMX_LOG_INFO("Starting main application loop");
 
 	Application application;
 	FTX::System->run(application);
@@ -359,22 +359,22 @@ void EngineMain::shutdown()
 	mDrawer.shutdown();
 
 	// Cleanup system
-	LOG_INFO("System shutdown");
+	RMX_LOG_INFO("System shutdown");
 	FTX::Audio->exit();
 	FTX::System->exit();
 
 	mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
-	Log::shutdown();
+	oxygen::Logging::shutdown();
 }
 
 bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 {
-	LOG_INFO("Initializing configuration");
+	RMX_LOG_INFO("Initializing configuration");
 	Configuration& config = Configuration::instance();
 	config.initialization();
 
-	LOG_INFO("Loading configuration");
+	RMX_LOG_INFO("Loading configuration");
 #ifdef PLATFORM_MAC
 	config.loadConfiguration(config.mGameDataPath + L"/config.json");
 #else
@@ -392,13 +392,13 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		}
 		if (!config.mProjectPath.empty())
 		{
-			LOG_INFO("Loading game profile");
+			RMX_LOG_INFO("Loading game profile");
 			const bool loadedProject = mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
 			RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 		}
 	}
 
-	LOG_INFO("Loading settings");
+	RMX_LOG_INFO("Loading settings");
 	const bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
 	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
@@ -411,7 +411,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	// Evaluate fail-safe mode
 	if (config.mFailSafeMode)
 	{
-		LOG_INFO("Using fail-safe mode");
+		RMX_LOG_INFO("Using fail-safe mode");
 		config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;	// Should already be set actually, but why not play it safe
 	}
 	else if (config.mRenderMethod == Configuration::RenderMethod::UNDEFINED)
@@ -432,7 +432,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	config.mGameRecording = 0;
 #endif
 
-	LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
+	RMX_LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
 			 (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Using opengl-soft renderer" : "Using opengl-full renderer"));
 	return true;
 }
@@ -508,7 +508,7 @@ bool EngineMain::createWindow()
 	// Load app icon
 	if (!appMetaData.mIconFile.empty())
 	{
-		LOG_INFO("Loading application icon...");
+		RMX_LOG_INFO("Loading application icon...");
 		FileHelper::loadBitmap(videoConfig.iconBitmap, appMetaData.mIconFile);
 	}
 #endif
@@ -516,7 +516,7 @@ bool EngineMain::createWindow()
 	if (useOpenGL)
 	{
 		// Set SDL OpenGL attributes
-		LOG_INFO("Setup of OpenGL attributes...");
+		RMX_LOG_INFO("Setup of OpenGL attributes...");
 	#ifndef RMX_USE_GLES2
 		{
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -589,29 +589,29 @@ bool EngineMain::createWindow()
 			}
 		}
 
-		LOG_INFO("Creating window...");
+		RMX_LOG_INFO("Creating window...");
 		mSDLWindow = SDL_CreateWindow(*videoConfig.caption, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), videoConfig.rect.width, videoConfig.rect.height, flags);
 		if (nullptr == mSDLWindow)
 		{
 			return false;
 		}
 
-		LOG_INFO("Retrieving actual window size...");
+		RMX_LOG_INFO("Retrieving actual window size...");
 		SDL_GetWindowSize(mSDLWindow, &videoConfig.rect.width, &videoConfig.rect.height);
 		SDL_ShowCursor(!videoConfig.hidecursor);
 
 		if (useOpenGL)
 		{
-			LOG_INFO("Creating OpenGL context...");
+			RMX_LOG_INFO("Creating OpenGL context...");
 			SDL_GLContext context = SDL_GL_CreateContext(mSDLWindow);
 			if (nullptr != context)
 			{
-				LOG_INFO("Vsync setup...");
+				RMX_LOG_INFO("Vsync setup...");
 				setVSyncMode(config.mFrameSync);
 			}
 			else
 			{
-				LOG_INFO("Failed to create OpenGL context, fallback to pure software renderer");
+				RMX_LOG_INFO("Failed to create OpenGL context, fallback to pure software renderer");
 				config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
 				// TODO: In this case, the SDL window was created with SDL_WINDOW_OPENGL flag, but that does not seem to be a problem
 			}
@@ -635,7 +635,7 @@ bool EngineMain::createWindow()
 	// Set window icon (using a Windows-specific method)
 	if (videoConfig.iconResource != 0)
 	{
-		LOG_INFO("Setting window icon (Windows)...");
+		RMX_LOG_INFO("Setting window icon (Windows)...");
 		PlatformFunctions::setAppIcon(videoConfig.iconResource);
 	}
 #endif
@@ -644,7 +644,7 @@ bool EngineMain::createWindow()
 	// Set window icon (using SDL functionality)
 	if (nullptr != videoConfig.iconBitmap.getData() || videoConfig.iconSource.nonEmpty())
 	{
-		LOG_INFO("Setting window icon from loaded bitmap...");
+		RMX_LOG_INFO("Setting window icon from loaded bitmap...");
 		Bitmap tmp;
 		Bitmap* bitmap = &videoConfig.iconBitmap;
 		if (bitmap->mData == nullptr)

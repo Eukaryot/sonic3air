@@ -8,7 +8,7 @@
 
 #include "../rmxmedia.h"
 
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS)
 	#pragma warning(disable: 4005)	// Macro redefinition of APIENTRY
 
 	#if defined(__GNUC__)
@@ -16,11 +16,14 @@
 	#else
 		#include <SDL/SDL_syswm.h>
 	#endif
+
+	#define WIN32_LEAN_AND_MEAN
 	#include "../CleanWindowsInclude.h"
-#endif
-#ifdef PLATFORM_WEB
+
+#elif defined(PLATFORM_WEB)
 	#include <emscripten.h>
 	#include <emscripten/html5.h>
+
 #endif
 
 

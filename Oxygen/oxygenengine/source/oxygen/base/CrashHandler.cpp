@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/base/CrashHandler.h"
 #include "oxygen/base/PlatformFunctions.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 #ifdef PLATFORM_WINDOWS
 	#include <windows.h>

@@ -187,6 +187,9 @@
     <ClInclude Include="..\..\source\rmxbase\ObjectPool.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\Logging.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\Math.cpp">
@@ -270,6 +273,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\ZlibDeflate.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\Logging.cpp">
+      <Filter>Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/file/FileStructureTree.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 
 struct PackedFileProvDetail
@@ -80,7 +80,7 @@ PackedFileProvider::PackedFileProvider(const std::wstring& packageFilename) :
 	mLoaded = FilePackage::loadPackage(packageFilename, mPackedFiles, mInputStream, true);	// TODO: Use streaming instead of loading all content right away
 	if (mLoaded)
 	{
-		LOG_INFO("Loaded file package '" << WString(packageFilename).toStdString() << "' with " << mPackedFiles.size() << " entries");
+		RMX_LOG_INFO("Loaded file package '" << WString(packageFilename).toStdString() << "' with " << mPackedFiles.size() << " entries");
 
 		// Setup file structure tree
 		for (const auto& pair : mPackedFiles)
@@ -92,7 +92,7 @@ PackedFileProvider::PackedFileProvider(const std::wstring& packageFilename) :
 	}
 	else
 	{
-		LOG_INFO("Failed to load file package '" << WString(packageFilename).toStdString() << "'");
+		RMX_LOG_INFO("Failed to load file package '" << WString(packageFilename).toStdString() << "'");
 	}
 }
 

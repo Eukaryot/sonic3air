@@ -14,7 +14,7 @@
 #include "oxygen/drawing/DrawCollection.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 
 namespace softwaredrawer

@@ -10,6 +10,7 @@
 #include "oxygen_netcore/network/Sockets.h"
 
 #ifdef _WIN32
+	#define WIN32_LEAN_AND_MEAN
 	#include <winsock2.h>
 	#include <Ws2tcpip.h>
 	#undef ERROR
@@ -454,7 +455,7 @@ bool UDPSocket::sendData(const uint8* data, size_t length, const SocketAddress& 
 
 #ifdef _WIN32
 	const int errorCode = WSAGetLastError();
-	std::cout << "sendto failed with error: " << errorCode << std::endl;
+	RMX_LOG_INFO("sendto failed with error: " << errorCode);
 #endif
 	return false;
 }

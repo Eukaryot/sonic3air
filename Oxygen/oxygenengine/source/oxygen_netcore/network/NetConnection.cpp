@@ -75,7 +75,7 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 
 	// Send a low-level message to establish the connection
 	{
-		std::cout << "Starting connection to " << mRemoteAddress.toString() << std::endl;
+		RMX_LOG_INFO("Starting connection to " << mRemoteAddress.toString());
 
 		// Get a new packet instance to fill
 		SentPacket& sentPacket = mConnectionManager->rentSentPacket();
@@ -179,7 +179,7 @@ void NetConnection::updateConnection(uint64 currentTimestamp)
 				if (mCurrentTimestamp >= mTimeoutStart + TIMEOUT_SECONDS * 1000)
 				{
 					// Trigger timeout
-					std::cout << "Disconnect due to timeout" << std::endl;
+					RMX_LOG_INFO("Disconnect due to timeout");
 					disconnect(DisconnectReason::TIMEOUT);
 					return;
 				}
@@ -194,7 +194,7 @@ void NetConnection::updateConnection(uint64 currentTimestamp)
 			if (mCurrentTimestamp >= mLastMessageReceivedTimestamp + STALE_SECONDS * 1000)
 			{
 				// Trigger disconnect
-				std::cout << "Disconnect due to stale connection" << std::endl;
+				RMX_LOG_INFO("Disconnect due to stale connection");
 				disconnect(DisconnectReason::STALE);
 				return;
 			}
@@ -221,7 +221,7 @@ void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManage
 	mCurrentTimestamp = currentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Because we just received a packet
 
-	std::cout << "Accepting connection from " << mRemoteAddress.toString() << std::endl;
+	RMX_LOG_INFO("Accepting connection from " << mRemoteAddress.toString());
 	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
 
 	// Send back a response
@@ -265,13 +265,13 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 			if (!lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.contains(packet.mLowLevelProtocolVersion) ||
 				!mConnectionManager->getHighLevelProtocolVersionRange().contains(packet.mHighLevelProtocolVersion))
 			{
-				std::cout << "Received accept connection packet with unsupported protocol version (low-level = " << packet.mLowLevelProtocolVersion << ", high-level = " << packet.mLowLevelProtocolVersion << ")" << std::endl;
+				RMX_LOG_INFO("Received accept connection packet with unsupported protocol version (low-level = " << packet.mLowLevelProtocolVersion << ", high-level = " << packet.mLowLevelProtocolVersion << ")");
 				// TODO: Send back an error?
 				return;
 			}
 			setProtocolVersions(packet.mLowLevelProtocolVersion, packet.mHighLevelProtocolVersion);
 
-			std::cout << "Connection established to " << mRemoteAddress.toString() << std::endl;
+			RMX_LOG_INFO("Connection established to " << mRemoteAddress.toString());
 
 			// Set remote connection ID, as it was not known before
 			//  -> Unfortunately, we have to get in a somewhat awkward way, as it was skipped in deserialization before
@@ -293,7 +293,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 
 			if (mState != State::CONNECTED)
 			{
-				std::cout << "Received high-level packet while not connected from " << mRemoteAddress.toString() << std::endl;
+				RMX_LOG_INFO("Received high-level packet while not connected from " << mRemoteAddress.toString());
 				return;
 			}
 
@@ -310,7 +310,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 
 			if (mState != State::CONNECTED)
 			{
-				std::cout << "Received high-level packet while not connected from " << mRemoteAddress.toString() << std::endl;
+				RMX_LOG_INFO("Received high-level packet while not connected from " << mRemoteAddress.toString());
 				return;
 			}
 

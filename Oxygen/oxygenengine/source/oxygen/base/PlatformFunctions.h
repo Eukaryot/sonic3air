@@ -14,6 +14,7 @@
 	#undef NO
 #endif
 
+
 class PlatformFunctions
 {
 public:
@@ -57,5 +58,4 @@ public:
 	static void openURLExternal(const std::string& url);
 
 	static bool isDebuggerPresent();
-	static void debugLog(const std::string& string);
 };

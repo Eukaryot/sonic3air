@@ -90,7 +90,7 @@
     <ClCompile Include="..\..\source\oxygen\helper\FileHelper.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\helper\Log.cpp">
+    <ClCompile Include="..\..\source\oxygen\helper\Logging.cpp">
       <Filter>helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\helper\Utils.cpp">
@@ -405,7 +405,7 @@
     <ClInclude Include="..\..\source\oxygen\helper\JsonHelper.h">
       <Filter>helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\helper\Log.h">
+    <ClInclude Include="..\..\source\oxygen\helper\Logging.h">
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\Utils.h">

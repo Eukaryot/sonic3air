@@ -10,7 +10,7 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
 #include "oxygen/simulation/LogDisplay.h"
 
@@ -154,13 +154,13 @@ namespace
 		if (controllerName.nonEmpty() && controllerName != joystickName)
 		{
 			if (index >= 0)
-				LOG_INFO("Controller #" << (index+1) << ": \"" << *joystickName << "\" (alternative name: \"" << *controllerName << "\")");
+				RMX_LOG_INFO("Controller #" << (index+1) << ": \"" << *joystickName << "\" (alternative name: \"" << *controllerName << "\")");
 			controllerName.lowerCase();
 		}
 		else
 		{
 			if (index >= 0)
-				LOG_INFO("Controller #" << (index+1) << ": \"" << *joystickName << "\"");
+				RMX_LOG_INFO("Controller #" << (index+1) << ": \"" << *joystickName << "\"");
 			controllerName.clear();
 		}
 		joystickName.lowerCase();
@@ -593,7 +593,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 		// Log input mapping as JSON
 		{
 			static const String mappingKeys[12] = { "Up", "Down", "Left", "Right", "A", "B", "X", "Y", "Start", "Back" };
-			LOG_INFO("{");
+			RMX_LOG_INFO("{");
 			for (size_t controlIndex = 0; controlIndex < device.mControlMappings.size(); ++controlIndex)
 			{
 				String line = String("\t\"") + mappingKeys[controlIndex] + "\": [ ";
@@ -628,10 +628,10 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 				line << " ]";
 				if (controlIndex < device.mControlMappings.size() - 1)
 					line << ",";
-				LOG_INFO(*line);
+				RMX_LOG_INFO(*line);
 			}
-			LOG_INFO("}");
-			LOG_INFO("");
+			RMX_LOG_INFO("}");
+			RMX_LOG_INFO("");
 		}
 
 		// Add to device definitions

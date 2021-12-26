@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/helper/FileHelper.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/DrawerTexture.h"
@@ -140,12 +140,12 @@ bool FileHelper::loadShader(Shader& shader, const std::wstring& filename, const 
 
 	if (shader.load(content, techname, additionalDefines))
 	{
-		LOG_INFO("Loaded shader '" << WString(filename).toStdString() << "'");
+		RMX_LOG_INFO("Loaded shader '" << WString(filename).toStdString() << "'");
 	}
 	else
 	{
-		LOG_INFO("Error(s) loading shader '" << WString(filename).toStdString() << "':");
-		LOG_INFO(shader.getCompileLog().toStdString());
+		RMX_LOG_INFO("Error(s) loading shader '" << WString(filename).toStdString() << "':");
+		RMX_LOG_INFO(shader.getCompileLog().toStdString());
 	}
 	return true;
 }

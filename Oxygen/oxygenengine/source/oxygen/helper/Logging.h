@@ -11,19 +11,12 @@
 #include <rmxbase.h>
 
 
-class Log
+namespace oxygen
 {
-public:
-	static void startup(const std::wstring& filename);
-	static void shutdown();
-
-	static void log(const std::string& string);
-};
-
-
-#define LOG_INFO(_message_) \
-	{ \
-		std::ostringstream stream; \
-		stream << _message_; \
-		Log::log(stream.str()); \
-	}
+	class Logging
+	{
+	public:
+		static void startup(const std::wstring& filename);
+		static void shutdown();
+	};
+}

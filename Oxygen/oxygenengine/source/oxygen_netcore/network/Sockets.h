@@ -19,6 +19,9 @@ public:
 
 	static bool resolveToIP(const std::string& hostName, std::string& outIP);
 
+public:
+	static inline rmx::ErrorHandling::LoggerInterface* mLogger = nullptr;
+
 private:
 	static inline bool mIsInitialized = false;
 };

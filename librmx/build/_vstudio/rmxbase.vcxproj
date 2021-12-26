@@ -229,6 +229,7 @@
     <ClInclude Include="..\..\source\rmxbase\jsoncpp\json_tool.h" />
     <ClInclude Include="..\..\source\rmxbase\JsonHelper.h" />
     <ClInclude Include="..\..\source\rmxbase\FileProvider.h" />
+    <ClInclude Include="..\..\source\rmxbase\Logging.h" />
     <ClInclude Include="..\..\source\rmxbase\ObjectPool.h" />
     <ClInclude Include="..\..\source\rmxbase\RmxDeflate.h" />
     <ClInclude Include="..\..\source\rmxbase\FileCrawler.h" />
@@ -281,6 +282,7 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\JsonHelper.cpp" />
     <ClCompile Include="..\..\source\rmxbase\FileProvider.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\Logging.cpp" />
     <ClCompile Include="..\..\source\rmxbase\RmxDeflate.cpp" />
     <ClCompile Include="..\..\source\rmxbase\FileCrawler.cpp" />
     <ClCompile Include="..\..\source\rmxbase\FileHandle.cpp" />

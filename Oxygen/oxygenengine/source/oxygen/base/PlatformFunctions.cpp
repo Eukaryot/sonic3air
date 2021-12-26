@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/HighResolutionTimer.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 #include <thread>
 
@@ -126,14 +126,14 @@ namespace
 		for (const WString& searchPath : searchPaths)
 		{
 			WString romFilename = searchPath + localPath;
-			LOG_INFO("Searching ROM at location: " << romFilename.toStdString());
+			RMX_LOG_INFO("Searching ROM at location: " << romFilename.toStdString());
 
 			if (FTX::FileSystem->exists(*romFilename))
 			{
-				LOG_INFO("Success!");
+				RMX_LOG_INFO("Success!");
 				return *romFilename;
 			}
-			LOG_INFO("Not found");
+			RMX_LOG_INFO("Not found");
 		}
 		return WString();
 	}
@@ -328,7 +328,7 @@ std::wstring PlatformFunctions::tryGetSteamRomPath(const std::wstring& romName)
 	const std::wstring steamPath = getSteamInstallationPath();
 	if (!steamPath.empty())
 	{
-		LOG_INFO("Steam installation found: " << WString(steamPath).toStdString());
+		RMX_LOG_INFO("Steam installation found: " << WString(steamPath).toStdString());
 		std::vector<WString> searchPaths;
 		searchPaths.push_back(steamPath);
 		const WString baseInstallFolder = getSteamBaseInstallFolder(steamPath + L"/config/config.vdf");
@@ -538,13 +538,5 @@ bool PlatformFunctions::isDebuggerPresent()
 	return IsDebuggerPresent() != 0;
 #else
 	return false;
-#endif
-}
-
-void PlatformFunctions::debugLog(const std::string& string)
-{
-	// Assuming the string does not contain line ending already
-#ifdef PLATFORM_WINDOWS
-	OutputDebugString((string + "\r\n").c_str());
 #endif
 }

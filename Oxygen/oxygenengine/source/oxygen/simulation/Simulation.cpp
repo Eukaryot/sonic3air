@@ -18,7 +18,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/base/PlatformFunctions.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/simulation/GameRecorder.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -48,11 +48,11 @@ bool Simulation::startup()
 {
 	Configuration& config = Configuration::instance();
 
-	LOG_INFO("Setup of EmulatorInterface");
+	RMX_LOG_INFO("Setup of EmulatorInterface");
 	mCodeExec.startup();
 
 	// Load scripts
-	LOG_INFO("Loading scripts");
+	RMX_LOG_INFO("Loading scripts");
 	bool success = mCodeExec.reloadScripts(true, true, false);
 
 	// Optionally load save state
@@ -63,7 +63,7 @@ bool Simulation::startup()
 		if (!success)
 			loadState(config.mSaveStatesDir + config.mLoadSaveState + L".state");
 	}
-	LOG_INFO("Runtime environment ready");
+	RMX_LOG_INFO("Runtime environment ready");
 
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
@@ -76,11 +76,11 @@ bool Simulation::startup()
 		// Try the long and short name
 		if (mGameRecorder.loadRecording(L"gamerecording.bin"))
 		{
-			LOG_INFO("Playback of 'gamerecording.bin'");
+			RMX_LOG_INFO("Playback of 'gamerecording.bin'");
 		}
 		else if (mGameRecorder.loadRecording(L"gamerec.bin"))
 		{
-			LOG_INFO("Playback of 'gamerec.bin'");
+			RMX_LOG_INFO("Playback of 'gamerec.bin'");
 		}
 
 		if (mGameRecorder.isPlaying())
@@ -96,7 +96,7 @@ bool Simulation::startup()
 
 void Simulation::shutdown()
 {
-	LOG_INFO("Simulation shutdown");
+	RMX_LOG_INFO("Simulation shutdown");
 	mInputRecorder.shutdown();
 
 	mIsRunning = false;

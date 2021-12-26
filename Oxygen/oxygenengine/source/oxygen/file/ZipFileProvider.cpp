@@ -9,7 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/file/ZipFileProvider.h"
 #include "oxygen/file/FileStructureTree.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 
 // Other platforms than Windows with Visual C++ need to the zlib library dependency into their build separately
@@ -129,11 +129,11 @@ ZipFileProvider::ZipFileProvider(const std::wstring& zipFilename) :
 
 	if (mLoaded)
 	{
-		LOG_INFO("Loaded ZIP file '" << WString(zipFilename).toStdString() << "' with " << (uint32)mContainedFiles.size() << " entries");
+		RMX_LOG_INFO("Loaded ZIP file '" << WString(zipFilename).toStdString() << "' with " << (uint32)mContainedFiles.size() << " entries");
 	}
 	else
 	{
-		LOG_INFO("Failed to load zip file '" << WString(zipFilename).toStdString() << "'");
+		RMX_LOG_INFO("Failed to load zip file '" << WString(zipFilename).toStdString() << "'");
 	}
 }
 

@@ -14,7 +14,7 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/base/PlatformFunctions.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/RenderResources.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/PersistentData.h"
@@ -28,7 +28,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 	{
 		case State::UNLOADED:
 		{
-			LOG_INFO("Loading ROM...");
+			RMX_LOG_INFO("Loading ROM...");
 			if (!ResourcesCache::instance().loadRom())
 			{
 			#if defined(PLATFORM_ANDROID)
@@ -44,7 +44,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 				}
 			#endif
 
-				LOG_INFO("ROM loading failed");
+				RMX_LOG_INFO("ROM loading failed");
 
 			#if defined(PLATFORM_WINDOWS)
 				const GameProfile& gameProfile = GameProfile::instance();
@@ -79,7 +79,7 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 
 			#endif
 			}
-			LOG_INFO("ROM found at: " << WString(Configuration::instance().mLastRomPath).toStdString());
+			RMX_LOG_INFO("ROM found at: " << WString(Configuration::instance().mLastRomPath).toStdString());
 
 			mState = State::ROM_LOADED;
 			return UpdateResult::CONTINUE_IMMEDIATE;
@@ -120,19 +120,19 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 		case State::ROM_LOADED:
 		{
 			// Initialize mods
-			LOG_INFO("Mod manager initialization...");
+			RMX_LOG_INFO("Mod manager initialization...");
 			ModManager::instance().startup();
 
 			// Load sprites
-			LOG_INFO("Loading sprites");
+			RMX_LOG_INFO("Loading sprites");
 			VideoOut::instance().getRenderResources().loadSpriteCache();
 
 			// Load resources
-			LOG_INFO("Resource cache loading...");
+			RMX_LOG_INFO("Resource cache loading...");
 			ResourcesCache::instance().loadAllResources();
 
 			// Load persistent data
-			LOG_INFO("Persistent data loading...");
+			RMX_LOG_INFO("Persistent data loading...");
 			PersistentData::instance().loadFromFile(Configuration::instance().mPersistentDataFilename);
 
 			// Load audio definitions

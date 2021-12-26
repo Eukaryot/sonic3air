@@ -14,7 +14,7 @@
 	#include "oxygen/application/Configuration.h"
 	#include "oxygen/base/PlatformFunctions.h"
 	#include "oxygen/helper/FileHelper.h"
-	#include "oxygen/helper/Log.h"
+	#include "oxygen/helper/Logging.h"
 
 	#include <jni.h>
 
@@ -22,7 +22,7 @@
 	{
 		JNIEXPORT void JNICALL Java_org_eukaryot_sonic3air_GameActivity_receivedRomContent(JNIEnv* env, jclass jclazz, jboolean success, jbyteArray data)
 		{
-			LOG_INFO("C++ receive ROM content... " << (success ? "success" : "failure"));
+			RMX_LOG_INFO("C++ receive ROM content... " << (success ? "success" : "failure"));
 			AndroidJavaInterface& instance = AndroidJavaInterface::instance();
 			if (success)
 			{
@@ -41,7 +41,7 @@
 		JNIEXPORT void JNICALL Java_org_eukaryot_sonic3air_GameActivity_gotApkPath(JNIEnv* env, jclass jclazz, jstring path)
 		{
 			const char* str = env->GetStringUTFChars(path, 0);
-			LOG_INFO("C++ APK path = " << str);
+			RMX_LOG_INFO("C++ APK path = " << str);
 
 			FileHelper::extractZipFile(String(str).toStdWString(), Configuration::instance().mAppDataPath + L"apkContent/");
 			env->ReleaseStringUTFChars(path, str);

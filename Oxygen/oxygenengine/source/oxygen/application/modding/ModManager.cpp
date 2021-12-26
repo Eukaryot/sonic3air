@@ -12,7 +12,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/file/ZipFileProvider.h"
 #include "oxygen/helper/JsonHelper.h"
-#include "oxygen/helper/Log.h"
+#include "oxygen/helper/Logging.h"
 
 
 namespace detail
@@ -270,7 +270,7 @@ bool ModManager::scanMods()
 
 			if (errorMessage.empty())
 			{
-				LOG_INFO("Found mod: '" << name << "'");
+				RMX_LOG_INFO("Found mod: '" << name << "'");
 				mod->mState = Mod::State::INACTIVE;
 
 				// Load mod meta data from JSON
@@ -278,7 +278,7 @@ bool ModManager::scanMods()
 			}
 			else
 			{
-				LOG_INFO("Could not load mod: '" << name << "'");
+				RMX_LOG_INFO("Could not load mod: '" << name << "'");
 				mod->mState = Mod::State::FAILED;
 				mod->mFailedMessage = errorMessage;
 			}
@@ -400,13 +400,13 @@ bool ModManager::processModZipFile(const std::wstring& zipLocalPath)
 		mZipFileProviders[zipLocalPath] = provider;
 
 		// Done
-		LOG_INFO("Loaded mod zip file: " << WString(zipLocalPath).toStdString());
+		RMX_LOG_INFO("Loaded mod zip file: " << WString(zipLocalPath).toStdString());
 		return true;
 	}
 	else
 	{
 		// Failure
-		LOG_INFO("Failed to load mod zip file: " << WString(zipLocalPath).toStdString());
+		RMX_LOG_INFO("Failed to load mod zip file: " << WString(zipLocalPath).toStdString());
 		delete provider;
 		return false;
 	}

@@ -11,6 +11,7 @@
 #include <codecvt>
 
 #ifdef PLATFORM_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
 	#include "../CleanWindowsInclude.h"
 
 	//#define USE_VISTA_STYLE	// Not defined to reduce external dependencies -- espcially considering that the Vista-style message box code does not even seem to work!
