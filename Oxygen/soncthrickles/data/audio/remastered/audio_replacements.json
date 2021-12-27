@@ -1,8 +1,8 @@
 {
-	"01":			{ "Name": "Angle Island 1",        "File": "01.ogg", "Type": "Music", "LoopStart": "43190" },
-	"01_fast":		{ "Name": "Angle Island 1 (fast)", "File": "01_fast.ogg", "Type": "Music", "LoopStart": "34552" },
-	"02":			{ "Name": "Angle Island 2",        "File": "02.ogg", "Type": "Music", "LoopStart": "21111" },
-	"02_fast":		{ "Name": "Angle Island 2 (fast)", "File": "02_fast.ogg", "Type": "Music", "LoopStart": "16889" },
+	"01":			{ "Name": "Angel Island 1",        "File": "01.ogg", "Type": "Music", "LoopStart": "43190" },
+	"01_fast":		{ "Name": "Angel Island 1 (fast)", "File": "01_fast.ogg", "Type": "Music", "LoopStart": "34552" },
+	"02":			{ "Name": "Angel Island 2",        "File": "02.ogg", "Type": "Music", "LoopStart": "21111" },
+	"02_fast":		{ "Name": "Angel Island 2 (fast)", "File": "02_fast.ogg", "Type": "Music", "LoopStart": "16889" },
 
 	"03":			{ "Name": "Hydrocity 1",        "File": "03.ogg", "Type": "Music", "LoopStart": "39507" },
 	"03_fast":		{ "Name": "Hydrocity 1 (fast)", "File": "03_fast.ogg", "Type": "Music", "LoopStart": "31606" },

@@ -5,8 +5,8 @@
 	//----------------------------------------------//
 
 	// AIZ
-	"01": { "Name": "Angle Island 1", "Source": "EmulationDirect", "Type": "Music" },
-	"02": { "Name": "Angle Island 2", "Source": "EmulationDirect", "Type": "Music" },
+	"01": { "Name": "Angel Island 1", "Source": "EmulationDirect", "Type": "Music" },
+	"02": { "Name": "Angel Island 2", "Source": "EmulationDirect", "Type": "Music" },
 
 	// HCZ
 	"03": { "Name": "Hydrocity 1", "Source": "EmulationDirect", "Type": "Music" },
