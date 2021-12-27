@@ -8,8 +8,9 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/client/GhostSync.h"
-#include "sonic3air/ConfigurationImpl.h"
+#include "sonic3air/data/SharedDatabase.h"
 #include "sonic3air/helper/GameUtils.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/NetConnection.h"
@@ -36,17 +37,65 @@ void GhostSync::performUpdate()
 
 	switch (mState)
 	{
+		case State::READY_TO_JOIN:
+		{
+			const char* subChannelName = getDesiredSubChannelName();
+			if (nullptr != subChannelName)
+			{
+				// Join channel
+				mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ConfigurationImpl::instance().mGameServer.mGhostSync.mChannelName + "-" + subChannelName;
+				mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
+				mServerConnection.sendRequest(mJoinChannelRequest);
+
+				mJoiningSubChannelName = subChannelName;
+				mState = State::JOINING_CHANNEL;
+			}
+			break;
+		}
+
 		case State::JOINING_CHANNEL:
 		{
-			if (mJoinChannelRequest.mResponse.mSuccessful)
+			if (mJoinChannelRequest.hasResponse())
 			{
-				mState = State::JOINED_CHANNEL;
-				mJoinedChannelHash = mJoinChannelRequest.mQuery.mChannelHash;
-				mGhostPlayers.clear();
+				if (mJoinChannelRequest.hasSuccess() && mJoinChannelRequest.mResponse.mSuccessful)
+				{
+					mState = State::JOINED_CHANNEL;
+					mJoinedChannelHash = mJoinChannelRequest.mQuery.mChannelHash;
+					mGhostPlayers.clear();
+				}
+				else
+				{
+					mState = State::FAILED;
+				}
 			}
-			else
+			break;
+		}
+
+		case State::JOINED_CHANNEL:
+		{
+			// Check if the channel changed
+			const char* subChannelName = getDesiredSubChannelName();
+			if (mJoiningSubChannelName != subChannelName)
 			{
-				mState = State::FAILED;
+				mLeaveChannelRequest.mQuery.mChannelHash = mJoinedChannelHash;
+				mServerConnection.sendRequest(mLeaveChannelRequest);
+
+				mJoiningSubChannelName = nullptr;
+				mState = State::LEAVING_CHANNEL;
+			}
+			break;
+		}
+
+		case State::LEAVING_CHANNEL:
+		{
+			if (mLeaveChannelRequest.hasResponse())
+			{
+				mJoinedChannelHash = 0;
+				mGhostPlayers.clear();
+				mState = State::READY_TO_JOIN;
+
+				// Update once again right away
+				performUpdate();
 			}
 			break;
 		}
@@ -67,16 +116,12 @@ void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesR
 		}
 	}
 
-	const ConfigurationImpl::GhostSync& ghostSyncConfig = ConfigurationImpl::instance().mGameServer.mGhostSync;
-	if (supportsUpdate && ghostSyncConfig.mEnabled)
+	if (supportsUpdate && ConfigurationImpl::instance().mGameServer.mGhostSync.mEnabled)
 	{
 		if (mState == State::INACTIVE)
 		{
-			// Join channel
-			mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ghostSyncConfig.mChannelName;
-			mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
-			mServerConnection.sendRequest(mJoinChannelRequest);
-			mState = State::JOINING_CHANNEL;
+			// TODO: Leave channel if already joined one
+			mState = State::READY_TO_JOIN;
 		}
 	}
 	else
@@ -212,6 +257,7 @@ void GhostSync::updateGhostPlayers()
 
 	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 
+	std::vector<uint32> playersToRemove;
 	for (auto& pair : mGhostPlayers)
 	{
 		PlayerData& playerData = pair.second;
@@ -220,6 +266,14 @@ void GhostSync::updateGhostPlayers()
 			// Draw last frame's ghost data once again, if that one is valid
 			if (!playerData.mShownGhostData.mValid)
 				continue;
+
+			// Remove ghost without any updates after some seconds
+			++playerData.mTimeout;
+			if (playerData.mTimeout > 10 * 60)
+			{
+				playersToRemove.push_back(pair.first);
+				continue;
+			}
 		}
 		else
 		{
@@ -278,6 +332,24 @@ void GhostSync::updateGhostPlayers()
 		const bool enableOffscreen = ConfigurationImpl::instance().mGameServer.mGhostSync.mShowOffscreenGhosts;
 		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &ghostData.mFrameCounter, enableOffscreen);
 	}
+
+	for (uint32 id : playersToRemove)
+	{
+		mGhostPlayers.erase(id);
+	}
+}
+
+const char* GhostSync::getDesiredSubChannelName() const
+{
+	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
+	const uint16 zoneAndAct = emulatorInterface.readMemory16(0xffffee4e);
+
+	const SharedDatabase::Zone* zone = SharedDatabase::getZoneByInternalIndex(zoneAndAct >> 8);
+	if (nullptr != zone)
+	{
+		return zone->mInitials.c_str();		// This stays valid, so it's safe to return a const char*
+	}
+	return nullptr;
 }
 
 void GhostSync::serializeGhostData(VectorBinarySerializer& serializer, GhostData& ghostData)

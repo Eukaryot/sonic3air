@@ -34,6 +34,7 @@ namespace highlevel
 
 		inline State getState() const	{ return mState; }
 		inline bool hasResponse() const	{ return (mState >= State::SUCCESS); }
+		inline bool hasSuccess() const	{ return (mState == State::SUCCESS); }
 		inline bool hasError() const	{ return (mState == State::FAILED); }
 
 	protected:

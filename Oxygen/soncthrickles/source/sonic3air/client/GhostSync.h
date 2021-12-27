@@ -54,8 +54,10 @@ private:
 	enum class State
 	{
 		INACTIVE,
+		READY_TO_JOIN,
 		JOINING_CHANNEL,
 		JOINED_CHANNEL,
+		LEAVING_CHANNEL,
 		FAILED
 	};
 
@@ -64,9 +66,11 @@ private:
 		uint32 mPlayerID;
 		std::deque<GhostData> mGhostDataQueue;
 		GhostData mShownGhostData;
+		int mTimeout = 0;
 	};
 
 private:
+	const char* getDesiredSubChannelName() const;
 	void serializeGhostData(VectorBinarySerializer& serializer, GhostData& ghostData);
 
 private:
@@ -74,7 +78,9 @@ private:
 	State mState = State::INACTIVE;
 
 	network::JoinChannelRequest mJoinChannelRequest;
+	network::LeaveChannelRequest mLeaveChannelRequest;
 	uint32 mJoinedChannelHash = 0;
+	const char* mJoiningSubChannelName = nullptr;
 
 	GhostData mOwnGhostData;
 	std::deque<GhostData> mOwnUnsentGhostData;

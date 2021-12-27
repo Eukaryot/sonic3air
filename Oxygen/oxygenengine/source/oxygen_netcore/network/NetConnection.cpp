@@ -120,8 +120,8 @@ bool NetConnection::sendRequest(highlevel::RequestBase& request)
 {
 	if (nullptr != request.mRegisteredAtConnection)
 	{
-		RMX_ASSERT(false, "Request can't get sent twice");
-		return false;
+		// Request was already sent before and is still an open request; invalidate it
+		request.mRegisteredAtConnection->unregisterRequest(request);
 	}
 
 	request.mState = highlevel::RequestBase::State::SENT;
@@ -334,6 +334,8 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 
 void NetConnection::unregisterRequest(highlevel::RequestBase& request)
 {
+	RMX_ASSERT(this == request.mRegisteredAtConnection, "Unregistering request at the wrong connection");
+	request.mRegisteredAtConnection = nullptr;
 	mOpenRequests.erase(request.mUniqueRequestID);
 }
 
@@ -520,6 +522,8 @@ void NetConnection::processExtractedHighLevelPacket(const ReceivedPacketCache::C
 					ReceivedRequestEvaluation evaluation(*this, request);
 					mConnectionManager->getListener().onReceivedRequestError(evaluation);
 				}
+
+				it->second->mRegisteredAtConnection = nullptr;
 				mOpenRequests.erase(it);
 			}
 			break;
