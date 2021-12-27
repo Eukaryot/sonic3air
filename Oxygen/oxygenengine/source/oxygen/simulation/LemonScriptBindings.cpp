@@ -194,17 +194,6 @@ namespace
 		return result;
 	}
 
-	uint16 get_status_register()
-	{
-		// Dummy implementation, only exists for compatibility
-		return 0;
-	}
-
-	void set_status_register(uint16 parameter)
-	{
-		// Dummy implementation, only exists for compatibility
-	}
-
 
 	uint32 System_loadPersistentData(uint32 targetAddress, uint64 key, uint32 maxBytes)
 	{
@@ -350,9 +339,9 @@ namespace
 		debugLogInternal(valueString);
 	}
 
-	void debugLog(uint64 stringHash)
+	void debugLog(uint64 string)
 	{
-		const std::string* str = detail::tryResolveString(stringHash);
+		const std::string* str = detail::tryResolveString(string);
 		if (nullptr != str)
 		{
 			debugLogInternal(*str);
@@ -1009,14 +998,14 @@ namespace
 		RenderParts::instance().getSpacesManager().setWorldSpaceOffset(Vec2i(px, py));
 	}
 
-	void debugDrawRect(int32 px, int32 py, int32 sx, int32 sy)
+	void debugDrawRect(int32 px, int32 py, int32 width, int32 height)
 	{
-		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, sx, sy));
+		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height));
 	}
 
-	void debugDrawRect2(int32 px, int32 py, int32 sx, int32 sy, uint32 color)
+	void debugDrawRect2(int32 px, int32 py, int32 width, int32 height, uint32 color)
 	{
-		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, sx, sy), Color::fromRGBA32(color));
+		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height), Color::fromRGBA32(color));
 	}
 
 	void Renderer_drawText(uint64 fontKey, int32 px, int32 py, uint64 text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace)
@@ -1081,14 +1070,14 @@ namespace
 		return Configuration::instance().mEnableROMDataAnalyzer;
 	}
 
-	bool ROMDataAnalyser_hasEntry(uint64 categoryHash, uint32 address)
+	bool ROMDataAnalyser_hasEntry(uint64 category, uint32 address)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* categoryName = detail::tryResolveString(categoryHash);
+				const std::string* categoryName = detail::tryResolveString(category);
 				if (nullptr != categoryName)
 				{
 					return analyser->hasEntry(*categoryName, address);
@@ -1098,14 +1087,14 @@ namespace
 		return false;
 	}
 
-	void ROMDataAnalyser_beginEntry(uint64 categoryHash, uint32 address)
+	void ROMDataAnalyser_beginEntry(uint64 category, uint32 address)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* categoryName = detail::tryResolveString(categoryHash);
+				const std::string* categoryName = detail::tryResolveString(category);
 				if (nullptr != categoryName)
 				{
 					analyser->beginEntry(*categoryName, address);
@@ -1126,15 +1115,15 @@ namespace
 		}
 	}
 
-	void ROMDataAnalyser_addKeyValue(uint64 keyHash, uint64 valueHash)
+	void ROMDataAnalyser_addKeyValue(uint64 key, uint64 value)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* keyString = detail::tryResolveString(keyHash);
-				const std::string* valueString = detail::tryResolveString(valueHash);
+				const std::string* keyString = detail::tryResolveString(key);
+				const std::string* valueString = detail::tryResolveString(value);
 				if (nullptr != keyString && nullptr != valueString)
 				{
 					analyser->addKeyValue(*keyString, *valueString);
@@ -1143,14 +1132,14 @@ namespace
 		}
 	}
 
-	void ROMDataAnalyser_beginObject(uint64 keyHash)
+	void ROMDataAnalyser_beginObject(uint64 key)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* keyString = detail::tryResolveString(keyHash);
+				const std::string* keyString = detail::tryResolveString(key);
 				if (nullptr != keyString)
 				{
 					analyser->beginObject(*keyString);
@@ -1171,23 +1160,23 @@ namespace
 		}
 	}
 
-	bool System_SidePanel_setupCustomCategory(uint64 shortNameHash, uint64 fullNameHash)
+	bool System_SidePanel_setupCustomCategory(uint64 shortName, uint64 fullName)
 	{
-		const std::string* shortName = detail::tryResolveString(shortNameHash);
-		const std::string* fullName = detail::tryResolveString(fullNameHash);
-		if (nullptr == shortName || nullptr == fullName)
+		const std::string* shortNameString = detail::tryResolveString(shortName);
+		const std::string* fullNameString = detail::tryResolveString(fullName);
+		if (nullptr == shortNameString || nullptr == fullNameString)
 			return false;
 
-		return Application::instance().getDebugSidePanel()->setupCustomCategory(*fullName, (*shortName)[0]);
+		return Application::instance().getDebugSidePanel()->setupCustomCategory(*fullNameString, (*shortNameString)[0]);
 	}
 
-	bool System_SidePanel_addOption(uint64 stringHash, bool defaultValue)
+	bool System_SidePanel_addOption(uint64 string, bool defaultValue)
 	{
-		const std::string* string = detail::tryResolveString(stringHash);
-		if (nullptr == string)
+		const std::string* str = detail::tryResolveString(string);
+		if (nullptr == str)
 			return false;
 
-		return Application::instance().getDebugSidePanel()->addOption(*string, defaultValue);
+		return Application::instance().getDebugSidePanel()->addOption(*str, defaultValue);
 	}
 
 	void System_SidePanel_addEntry(uint64 key)
@@ -1195,18 +1184,18 @@ namespace
 		return Application::instance().getDebugSidePanel()->addEntry(key);
 	}
 
-	void System_SidePanel_addLine1(uint64 stringHash, int8 indent, uint32 color)
+	void System_SidePanel_addLine1(uint64 string, int8 indent, uint32 color)
 	{
-		const std::string* string = detail::tryResolveString(stringHash);
-		if (nullptr != string)
+		const std::string* str = detail::tryResolveString(string);
+		if (nullptr != str)
 		{
-			Application::instance().getDebugSidePanel()->addLine(*string, (int)indent, Color::fromRGBA32(color));
+			Application::instance().getDebugSidePanel()->addLine(*str, (int)indent, Color::fromRGBA32(color));
 		}
 	}
 
-	void System_SidePanel_addLine2(uint64 stringHash, int8 indent)
+	void System_SidePanel_addLine2(uint64 string, int8 indent)
 	{
-		System_SidePanel_addLine1(stringHash, indent, 0xffffffff);
+		System_SidePanel_addLine1(string, indent, 0xffffffff);
 	}
 
 	bool System_SidePanel_isEntryHovered(uint64 key)
@@ -1214,9 +1203,9 @@ namespace
 		return Application::instance().getDebugSidePanel()->isEntryHovered(key);
 	}
 
-	void System_writeDisplayLine(uint64 stringHash)
+	void System_writeDisplayLine(uint64 string)
 	{
-		const std::string* str = detail::tryResolveString(stringHash);
+		const std::string* str = detail::tryResolveString(string);
 		if (nullptr != str)
 		{
 			LogDisplay::instance().setLogDisplay(*str, 2.0f);
@@ -1270,10 +1259,17 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		module.addUserDefinedFunction("_negative", lemon::wrap(&checkFlags_negative), defaultFlags);
 
 		// Explictly set flags
-		module.addUserDefinedFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags);
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int8>), defaultFlags);
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int16>), defaultFlags);
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int32>), defaultFlags);
+		module.addUserDefinedFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int8>), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int16>), defaultFlags)
+			.setParameterInfo(0, "value");
+
+		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int32>), defaultFlags)
+			.setParameterInfo(0, "value");
 
 
 		// Memory access
@@ -1305,10 +1301,6 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		// Push and pop
 		module.addUserDefinedFunction("push", lemon::wrap(&push), defaultFlags);
 		module.addUserDefinedFunction("pop", lemon::wrap(&pop), defaultFlags);
-
-		// Status registers (for compatibility only)
-		module.addUserDefinedFunction("get_status_register", lemon::wrap(&get_status_register), defaultFlags);
-		module.addUserDefinedFunction("set_status_register", lemon::wrap(&set_status_register), defaultFlags);
 
 
 		// Persistent data
@@ -1723,9 +1715,22 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(5, "addedB");
 
 		// Debug draw rects & texts
-		module.addUserDefinedFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags);
-		module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect), defaultFlags);
-		module.addUserDefinedFunction("debugDrawRect", lemon::wrap(&debugDrawRect2), defaultFlags);
+		module.addUserDefinedFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py");
+
+		module.addUserDefinedFunction("Debug.drawRect", lemon::wrap(&debugDrawRect), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height");
+
+		module.addUserDefinedFunction("Debug.drawRect", lemon::wrap(&debugDrawRect2), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height")
+			.setParameterInfo(4, "color");
 
 		module.addUserDefinedFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
 			.setParameterInfo(0, "fontKey")
@@ -1779,8 +1784,11 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 
 		// Misc
-		module.addUserDefinedFunction("Mods.isModActive", lemon::wrap(&Mods_isModActive), defaultFlags);
-		module.addUserDefinedFunction("Mods.getModPriority", lemon::wrap(&Mods_getModPriority), defaultFlags);
+		module.addUserDefinedFunction("Mods.isModActive", lemon::wrap(&Mods_isModActive), defaultFlags)
+			.setParameterInfo(0, "modName");
+
+		module.addUserDefinedFunction("Mods.getModPriority", lemon::wrap(&Mods_getModPriority), defaultFlags)
+			.setParameterInfo(0, "modName");
 	}
 
 	// Debug features
@@ -1795,8 +1803,14 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			var.mSetter = std::bind(logSetter, std::placeholders::_1, true);
 		}
 
-		module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog), defaultFlags);
-		module.addUserDefinedFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags);
+		module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog), defaultFlags)
+			.setParameterInfo(0, "string");
+
+		module.addUserDefinedFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags)
+			.setParameterInfo(0, "name")
+			.setParameterInfo(1, "startAddress")
+			.setParameterInfo(2, "numColors");
+
 
 		// Debug keys
 		for (int i = 0; i < 10; ++i)
@@ -1805,31 +1819,71 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			var.mGetter = std::bind(debugKeyGetter, i);
 		}
 
+
 		// Watches
-		module.addUserDefinedFunction("debugWatch", lemon::wrap(&debugWatch), defaultFlags);
+		module.addUserDefinedFunction("debugWatch", lemon::wrap(&debugWatch), defaultFlags)
+			.setParameterInfo(0, "address")
+			.setParameterInfo(1, "bytes");
+
 
 		// Dump to file
-		module.addUserDefinedFunction("debugDumpToFile", lemon::wrap(&debugDumpToFile), defaultFlags);
+		module.addUserDefinedFunction("debugDumpToFile", lemon::wrap(&debugDumpToFile), defaultFlags)
+			.setParameterInfo(0, "filename")
+			.setParameterInfo(1, "startAddress")
+			.setParameterInfo(2, "bytes");
+
 
 		// ROM data analyser
-		module.addUserDefinedFunction("ROMDataAnalyser.isEnabled",   lemon::wrap(&ROMDataAnalyser_isEnabled), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.hasEntry",    lemon::wrap(&ROMDataAnalyser_hasEntry), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.beginEntry",  lemon::wrap(&ROMDataAnalyser_beginEntry), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.endEntry",    lemon::wrap(&ROMDataAnalyser_endEntry), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.addKeyValue", lemon::wrap(&ROMDataAnalyser_addKeyValue), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.beginObject", lemon::wrap(&ROMDataAnalyser_beginObject), defaultFlags);
-		module.addUserDefinedFunction("ROMDataAnalyser.endObject",   lemon::wrap(&ROMDataAnalyser_endObject), defaultFlags);
+		module.addUserDefinedFunction("ROMDataAnalyser.isEnabled", lemon::wrap(&ROMDataAnalyser_isEnabled), defaultFlags);
+
+		module.addUserDefinedFunction("ROMDataAnalyser.hasEntry", lemon::wrap(&ROMDataAnalyser_hasEntry), defaultFlags)
+			.setParameterInfo(0, "category")
+			.setParameterInfo(1, "address");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.beginEntry", lemon::wrap(&ROMDataAnalyser_beginEntry), defaultFlags)
+			.setParameterInfo(0, "category")
+			.setParameterInfo(1, "address");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.endEntry", lemon::wrap(&ROMDataAnalyser_endEntry), defaultFlags);
+
+		module.addUserDefinedFunction("ROMDataAnalyser.addKeyValue", lemon::wrap(&ROMDataAnalyser_addKeyValue), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "value");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.beginObject", lemon::wrap(&ROMDataAnalyser_beginObject), defaultFlags)
+			.setParameterInfo(0, "key");
+
+		module.addUserDefinedFunction("ROMDataAnalyser.endObject", lemon::wrap(&ROMDataAnalyser_endObject), defaultFlags);
+
 
 		// Debug side panel
-		module.addUserDefinedFunction("System.SidePanel.setupCustomCategory", lemon::wrap(&System_SidePanel_setupCustomCategory), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addOption", lemon::wrap(&System_SidePanel_addOption), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addEntry", lemon::wrap(&System_SidePanel_addEntry), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine1), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine2), defaultFlags);
-		module.addUserDefinedFunction("System.SidePanel.isEntryHovered", lemon::wrap(&System_SidePanel_isEntryHovered), defaultFlags);
+		module.addUserDefinedFunction("System.SidePanel.setupCustomCategory", lemon::wrap(&System_SidePanel_setupCustomCategory), defaultFlags)
+			.setParameterInfo(0, "shortName")
+			.setParameterInfo(1, "fullName");
+
+		module.addUserDefinedFunction("System.SidePanel.addOption", lemon::wrap(&System_SidePanel_addOption), defaultFlags)
+			.setParameterInfo(0, "string")
+			.setParameterInfo(1, "defaultValue");
+
+		module.addUserDefinedFunction("System.SidePanel.addEntry", lemon::wrap(&System_SidePanel_addEntry), defaultFlags)
+			.setParameterInfo(0, "key");
+
+		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine1), defaultFlags)
+			.setParameterInfo(0, "string")
+			.setParameterInfo(1, "indent")
+			.setParameterInfo(2, "color");
+
+		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine2), defaultFlags)
+			.setParameterInfo(0, "string")
+			.setParameterInfo(1, "indent");
+
+		module.addUserDefinedFunction("System.SidePanel.isEntryHovered", lemon::wrap(&System_SidePanel_isEntryHovered), defaultFlags)
+			.setParameterInfo(0, "key");
+
 
 		// This is not really debugging-related, as it's meant to be written in non-developer environment as well
-		module.addUserDefinedFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags);
+		module.addUserDefinedFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags)
+			.setParameterInfo(0, "string");
 	}
 
 	// Register game-specific script bindings

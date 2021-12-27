@@ -690,6 +690,21 @@ function void syncZ80_variantB(u8 value)
 
 
 //-------------------------------------------------------//
+// Dummy functions needed for compatibility              //
+//-------------------------------------------------------//
+
+function u16 get_status_register()
+{
+	return 0
+}
+
+function void set_status_register(u16 param)
+{
+}
+
+
+
+//-------------------------------------------------------//
 // Handling of "multiple returns" (like "A7 += 4")       //
 //-------------------------------------------------------//
 

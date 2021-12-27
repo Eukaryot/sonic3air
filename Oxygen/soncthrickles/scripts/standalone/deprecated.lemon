@@ -9,7 +9,7 @@
 
 
 //-------------------------------------------------------//
-// C++ bindings that got removed                         //
+// C++ bindings that got removed or renamed              //
 //-------------------------------------------------------//
 
 function void Renderer.drawVdpSpriteWithTint(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue, u32 tintColor, u32 addedColor)
@@ -32,6 +32,18 @@ function void Renderer.drawCustomSpriteWithTransform(u64 key, s16 px, s16 py, u8
 	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
 	tintColor = convertColors32(tintColor)
 	Renderer.drawCustomSpriteTransformed(key, px, py, atex, flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
+}
+
+function void debugDrawRect(s32 px, s32 py, s32 width, s32 height)
+{
+	Debug.drawRect(px, py, width, height)
+}
+
+function void debugDrawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
+{
+	// Convert color from 0xAABBGGRR to 0xRRGGBBAA
+	color = convertColors32(color)
+	Debug.drawRect(px, py, width, height, color)
 }
 
 

@@ -86,7 +86,7 @@ namespace lemon
 		for (const Function* function : mFunctions)
 		{
 			content << "\r\n";
-			content << "declare func " << function->getReturnType()->toString() << " " << function->getName() << "(";
+			content << "declare function " << function->getReturnType()->toString() << " " << function->getName() << "(";
 			for (size_t i = 0; i < function->getParameters().size(); ++i)
 			{
 				if (i != 0)
