@@ -39,48 +39,33 @@ namespace
 {
 	const constexpr float CUTSCENE_SKIPPING_SPEED = 4.0f;	// Should be more or less "unique", not one of the debug game speeds (3.0f or 5.0f)
 
-	const std::string* tryResolveString(uint64 stringKey)
+	void setDiscordDetails(lemon::StringRef text)
 	{
-		lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-		RMX_ASSERT(nullptr != runtime, "No active lemon script runtime");
-
-		const lemon::StoredString* str = runtime->resolveStringByKey(stringKey);
-		RMX_CHECK(nullptr != str, "Could not resolve string from key", return nullptr);
-
-		return &str->getString();
+		if (text.isValid())
+			DiscordIntegration::setModdedDetails(*text);
 	}
 
-	void setDiscordDetails(uint64 stringKey)
+	void setDiscordState(lemon::StringRef text)
 	{
-		const std::string* str = tryResolveString(stringKey);
-		if (nullptr != str)
-			DiscordIntegration::setModdedDetails(*str);
+		if (text.isValid())
+			DiscordIntegration::setModdedState(*text);
 	}
 
-	void setDiscordState(uint64 stringKey)
+	void setDiscordLargeImage(lemon::StringRef imageName)
 	{
-		const std::string* str = tryResolveString(stringKey);
-		if (nullptr != str)
-			DiscordIntegration::setModdedState(*str);
+		if (imageName.isValid())
+			DiscordIntegration::setModdedLargeImage(*imageName);
 	}
 
-	void setDiscordLargeImage(uint64 stringKey)
+	void setDiscordSmallImage(lemon::StringRef imageName)
 	{
-		const std::string* str = tryResolveString(stringKey);
-		if (nullptr != str)
-			DiscordIntegration::setModdedLargeImage(*str);
+		if (imageName.isValid())
+			DiscordIntegration::setModdedSmallImage(*imageName);
 	}
 
-	void setDiscordSmallImage(uint64 stringKey)
+	bool isModdedSound(uint8 sfxId)
 	{
-		const std::string* str = tryResolveString(stringKey);
-		if (nullptr != str)
-			DiscordIntegration::setModdedSmallImage(*str);
-	}
-
-	bool isModdedSound(uint8 id)
-	{
-		return AudioOut::instance().isModdedSound(id);
+		return AudioOut::instance().isModdedSound(sfxId);
 	}
 
 	void setUnderwaterAudioEffect(uint8 value)
@@ -160,41 +145,107 @@ void Game::registerScriptBindings(lemon::Module& module)
 	const uint8 defaultFlags = lemon::UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
 	const uint8 noInlineExecution = 0;
 
-	module.addUserDefinedFunction("Game.getSetting", lemon::wrap(*this, &Game::useSetting), defaultFlags);
-	module.addUserDefinedFunction("Game.isSecretUnlocked", lemon::wrap(*this, &Game::isSecretUnlocked), defaultFlags);
-	module.addUserDefinedFunction("Game.triggerRestart", lemon::wrap(*this, &Game::triggerRestart), defaultFlags);
-	module.addUserDefinedFunction("Game.onGamePause", lemon::wrap(*this, &Game::onGamePause), defaultFlags);
-	module.addUserDefinedFunction("Game.allowRestartInGamePause", lemon::wrap(*this, &Game::allowRestartInGamePause), defaultFlags);
-	module.addUserDefinedFunction("Game.onLevelStart", lemon::wrap(*this, &Game::onLevelStart), defaultFlags);
-	module.addUserDefinedFunction("Game.onZoneActCompleted", lemon::wrap(*this, &Game::onZoneActCompleted), defaultFlags);
-	module.addUserDefinedFunction("Game.onTriggerNextZone", lemon::wrap(*this, &Game::onTriggerNextZone), defaultFlags);
-	module.addUserDefinedFunction("Game.onFadedOutLoadingZone", lemon::wrap(*this, &Game::onFadedOutLoadingZone), defaultFlags);
-	module.addUserDefinedFunction("Game.onCharacterDied", lemon::wrap(*this, &Game::onCharacterDied), noInlineExecution);			// No inline execution as this function manipulated the call stack
-	module.addUserDefinedFunction("Game.onScreenFadedOutBeforeDataSelect", lemon::wrap(*this, &Game::onScreenFadedOutBeforeDataSelect), defaultFlags);
-	module.addUserDefinedFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
-	module.addUserDefinedFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
-	module.addUserDefinedFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
-	module.addUserDefinedFunction("Game.onTimeAttackFinish", lemon::wrap(*this, &Game::onTimeAttackFinish), defaultFlags);
-	module.addUserDefinedFunction("Game.changePlanePatternRectAtex", lemon::wrap(*this, &Game::changePlanePatternRectAtex), defaultFlags);
-	module.addUserDefinedFunction("Game.renderBlueSpheresGround", lemon::wrap(*this, &Game::renderBlueSpheresGround), defaultFlags);
-	module.addUserDefinedFunction("Game.getBlueSpheresGroundSprite", lemon::wrap(*this, &Game::getBlueSpheresGroundSprite), defaultFlags);
-	module.addUserDefinedFunction("Game.writeBlueSpheresData", lemon::wrap(*this, &Game::writeBlueSpheresData), defaultFlags);
-	module.addUserDefinedFunction("Game.getAchievementValue", lemon::wrap(*this, &Game::getAchievementValue), defaultFlags);
-	module.addUserDefinedFunction("Game.setAchievementValue", lemon::wrap(*this, &Game::setAchievementValue), defaultFlags);
-	module.addUserDefinedFunction("Game.isAchievementComplete", lemon::wrap(*this, &Game::isAchievementComplete), defaultFlags);
-	module.addUserDefinedFunction("Game.setAchievementComplete", lemon::wrap(*this, &Game::setAchievementComplete), defaultFlags);
-	module.addUserDefinedFunction("Game.startSkippableCutscene", lemon::wrap(*this, &Game::startSkippableCutscene), defaultFlags);
-	module.addUserDefinedFunction("Game.endSkippableCutscene", lemon::wrap(*this, &Game::endSkippableCutscene), defaultFlags);
+	// Game
+	{
+		module.addUserDefinedFunction("Game.getSetting", lemon::wrap(*this, &Game::useSetting), defaultFlags)
+			.setParameterInfo(0, "settingId");
+
+		module.addUserDefinedFunction("Game.isSecretUnlocked", lemon::wrap(*this, &Game::isSecretUnlocked), defaultFlags)
+			.setParameterInfo(0, "secretId");
+
+		module.addUserDefinedFunction("Game.triggerRestart", lemon::wrap(*this, &Game::triggerRestart), defaultFlags);
+
+		module.addUserDefinedFunction("Game.onGamePause", lemon::wrap(*this, &Game::onGamePause), defaultFlags)
+			.setParameterInfo(0, "canRestart");
+
+		module.addUserDefinedFunction("Game.allowRestartInGamePause", lemon::wrap(*this, &Game::allowRestartInGamePause), defaultFlags)
+			.setParameterInfo(0, "canRestart");
+
+		module.addUserDefinedFunction("Game.onLevelStart", lemon::wrap(*this, &Game::onLevelStart), defaultFlags);
+
+		module.addUserDefinedFunction("Game.onZoneActCompleted", lemon::wrap(*this, &Game::onZoneActCompleted), defaultFlags)
+			.setParameterInfo(0, "zoneAndAct");
+
+		module.addUserDefinedFunction("Game.onTriggerNextZone", lemon::wrap(*this, &Game::onTriggerNextZone), defaultFlags)
+			.setParameterInfo(0, "zoneAndAct");
+
+		module.addUserDefinedFunction("Game.onFadedOutLoadingZone", lemon::wrap(*this, &Game::onFadedOutLoadingZone), defaultFlags)
+			.setParameterInfo(0, "zoneAndAct");
+
+		module.addUserDefinedFunction("Game.onCharacterDied", lemon::wrap(*this, &Game::onCharacterDied), noInlineExecution)		// No inline execution as this function manipulated the call stack
+			.setParameterInfo(0, "playerIndex");
+
+		module.addUserDefinedFunction("Game.onScreenFadedOutBeforeDataSelect", lemon::wrap(*this, &Game::onScreenFadedOutBeforeDataSelect), defaultFlags);
+		module.addUserDefinedFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
+		module.addUserDefinedFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
+		module.addUserDefinedFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
+		module.addUserDefinedFunction("Game.onTimeAttackFinish", lemon::wrap(*this, &Game::onTimeAttackFinish), defaultFlags);
+
+		module.addUserDefinedFunction("Game.changePlanePatternRectAtex", lemon::wrap(*this, &Game::changePlanePatternRectAtex), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "width")
+			.setParameterInfo(3, "height")
+			.setParameterInfo(4, "planeIndex")
+			.setParameterInfo(5, "atex");
+
+		module.addUserDefinedFunction("Game.renderBlueSpheresGround", lemon::wrap(*this, &Game::renderBlueSpheresGround), defaultFlags)
+			.setParameterInfo(0, "px")
+			.setParameterInfo(1, "py")
+			.setParameterInfo(2, "rotation")
+			.setParameterInfo(3, "fieldColorA")
+			.setParameterInfo(4, "fieldColorB");
+
+		module.addUserDefinedFunction("Game.getBlueSpheresGroundSprite", lemon::wrap(*this, &Game::getBlueSpheresGroundSprite), defaultFlags)
+			.setParameterInfo(0, "part");
+
+		module.addUserDefinedFunction("Game.writeBlueSpheresData", lemon::wrap(*this, &Game::writeBlueSpheresData), defaultFlags)
+			.setParameterInfo(0, "targetAddress")
+			.setParameterInfo(1, "sourceAddress")
+			.setParameterInfo(2, "px")
+			.setParameterInfo(3, "py")
+			.setParameterInfo(4, "rotation");
+
+		module.addUserDefinedFunction("Game.getAchievementValue", lemon::wrap(*this, &Game::getAchievementValue), defaultFlags)
+			.setParameterInfo(0, "achievementId");
+
+		module.addUserDefinedFunction("Game.setAchievementValue", lemon::wrap(*this, &Game::setAchievementValue), defaultFlags)
+			.setParameterInfo(0, "achievementId")
+			.setParameterInfo(1, "value");
+
+		module.addUserDefinedFunction("Game.isAchievementComplete", lemon::wrap(*this, &Game::isAchievementComplete), defaultFlags)
+			.setParameterInfo(0, "achievementId");
+
+		module.addUserDefinedFunction("Game.setAchievementComplete", lemon::wrap(*this, &Game::setAchievementComplete), defaultFlags)
+			.setParameterInfo(0, "achievementId");
+
+		module.addUserDefinedFunction("Game.startSkippableCutscene", lemon::wrap(*this, &Game::startSkippableCutscene), defaultFlags);
+		module.addUserDefinedFunction("Game.endSkippableCutscene", lemon::wrap(*this, &Game::endSkippableCutscene), defaultFlags);
+	}
 
 	// Discord
-	module.addUserDefinedFunction("Game.setDiscordDetails", lemon::wrap(&setDiscordDetails), defaultFlags);
-	module.addUserDefinedFunction("Game.setDiscordState", lemon::wrap(&setDiscordState), defaultFlags);
-	module.addUserDefinedFunction("Game.setDiscordLargeImage", lemon::wrap(&setDiscordLargeImage), defaultFlags);
-	module.addUserDefinedFunction("Game.setDiscordSmallImage", lemon::wrap(&setDiscordSmallImage), defaultFlags);
+	{
+		module.addUserDefinedFunction("Game.setDiscordDetails", lemon::wrap(&setDiscordDetails), defaultFlags)
+			.setParameterInfo(0, "text");
+
+		module.addUserDefinedFunction("Game.setDiscordState", lemon::wrap(&setDiscordState), defaultFlags)
+			.setParameterInfo(0, "text");
+
+		module.addUserDefinedFunction("Game.setDiscordLargeImage", lemon::wrap(&setDiscordLargeImage), defaultFlags)
+			.setParameterInfo(0, "imageName");
+
+		module.addUserDefinedFunction("Game.setDiscordSmallImage", lemon::wrap(&setDiscordSmallImage), defaultFlags)
+			.setParameterInfo(0, "imageName");
+	}
 
 	// Audio
-	module.addUserDefinedFunction("Game.isModdedSound", lemon::wrap(&isModdedSound), defaultFlags);
-	module.addUserDefinedFunction("Game.setUnderwaterAudioEffect", lemon::wrap(&setUnderwaterAudioEffect), defaultFlags);
+	{
+		module.addUserDefinedFunction("Game.isModdedSound", lemon::wrap(&isModdedSound), defaultFlags)
+			.setParameterInfo(0, "sfxId");
+
+		module.addUserDefinedFunction("Game.setUnderwaterAudioEffect", lemon::wrap(&setUnderwaterAudioEffect), defaultFlags)
+			.setParameterInfo(0, "value");
+	}
 
 	ScriptImplementations::registerScriptBindings(module);
 }

@@ -69,11 +69,11 @@ declare function u64 stringformat(u64, u64, u64, u64, u64, u64, u64, u64)
 
 declare function u64 stringformat(u64, u64, u64, u64, u64, u64, u64, u64, u64)
 
-declare function u32 strlen(u64)
+declare function u32 strlen(u64 string)
 
-declare function u8 getchar(u64, u32)
+declare function u8 getchar(u64 string, u32 index)
 
-declare function u64 substring(u64, u32, u32)
+declare function u64 substring(u64 string, u32 index, u32 length)
 
 declare function void assert(u8, u64)
 
@@ -349,25 +349,25 @@ declare function s8 System.SidePanel.isEntryHovered(u64 key)
 
 declare function void System.writeDisplayLine(u64 string)
 
-declare function u32 Game.getSetting(u32)
+declare function u32 Game.getSetting(u32 settingId)
 
-declare function s8 Game.isSecretUnlocked(u32)
+declare function s8 Game.isSecretUnlocked(u32 secretId)
 
 declare function void Game.triggerRestart()
 
-declare function void Game.onGamePause(u8)
+declare function void Game.onGamePause(u8 canRestart)
 
-declare function void Game.allowRestartInGamePause(u8)
+declare function void Game.allowRestartInGamePause(u8 canRestart)
 
 declare function void Game.onLevelStart()
 
-declare function void Game.onZoneActCompleted(u16)
+declare function void Game.onZoneActCompleted(u16 zoneAndAct)
 
-declare function u16 Game.onTriggerNextZone(u16)
+declare function u16 Game.onTriggerNextZone(u16 zoneAndAct)
 
-declare function u16 Game.onFadedOutLoadingZone(u16)
+declare function u16 Game.onFadedOutLoadingZone(u16 zoneAndAct)
 
-declare function s8 Game.onCharacterDied(u8)
+declare function s8 Game.onCharacterDied(u8 playerIndex)
 
 declare function void Game.onScreenFadedOutBeforeDataSelect()
 
@@ -379,37 +379,37 @@ declare function s8 Game.isTimeAttack()
 
 declare function s8 Game.onTimeAttackFinish()
 
-declare function void Game.changePlanePatternRectAtex(u16, u16, u16, u16, u8, u8)
+declare function void Game.changePlanePatternRectAtex(u16 px, u16 py, u16 width, u16 height, u8 planeIndex, u8 atex)
 
-declare function void Game.renderBlueSpheresGround(u16, u16, u8, u16, u16)
+declare function void Game.renderBlueSpheresGround(u16 px, u16 py, u8 rotation, u16 fieldColorA, u16 fieldColorB)
 
-declare function u64 Game.getBlueSpheresGroundSprite(u8)
+declare function u64 Game.getBlueSpheresGroundSprite(u8 part)
 
-declare function void Game.writeBlueSpheresData(u32, u32, u16, u16, u8)
+declare function void Game.writeBlueSpheresData(u32 targetAddress, u32 sourceAddress, u16 px, u16 py, u8 rotation)
 
-declare function s32 Game.getAchievementValue(u32)
+declare function s32 Game.getAchievementValue(u32 achievementId)
 
-declare function void Game.setAchievementValue(u32, s32)
+declare function void Game.setAchievementValue(u32 achievementId, s32 value)
 
-declare function s8 Game.isAchievementComplete(u32)
+declare function s8 Game.isAchievementComplete(u32 achievementId)
 
-declare function void Game.setAchievementComplete(u32)
+declare function void Game.setAchievementComplete(u32 achievementId)
 
 declare function void Game.startSkippableCutscene()
 
 declare function void Game.endSkippableCutscene()
 
-declare function void Game.setDiscordDetails(u64)
+declare function void Game.setDiscordDetails(u64 text)
 
-declare function void Game.setDiscordState(u64)
+declare function void Game.setDiscordState(u64 text)
 
-declare function void Game.setDiscordLargeImage(u64)
+declare function void Game.setDiscordLargeImage(u64 imageName)
 
-declare function void Game.setDiscordSmallImage(u64)
+declare function void Game.setDiscordSmallImage(u64 imageName)
 
-declare function s8 Game.isModdedSound(u8)
+declare function s8 Game.isModdedSound(u8 sfxId)
 
-declare function void Game.setUnderwaterAudioEffect(u8)
+declare function void Game.setUnderwaterAudioEffect(u8 value)
 
 declare function void Kosinski.Decompress()
 
@@ -417,6 +417,6 @@ declare function void WriteScrollOffsets()
 
 declare function void WriteScrollOffsetsFlipped()
 
-declare function u32 putNybbles(u32, u16, u8)
+declare function u32 putNybbles(u32 input, u16 count, u8 value)
 
-declare function void uncompressKosinskiData(u32, u16)
+declare function void uncompressKosinskiData(u32 sourceAddress, u16 targetInVRAM)

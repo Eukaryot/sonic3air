@@ -75,17 +75,16 @@ namespace
 
 	DebugNotificationInterface* gDebugNotificationInterface = nullptr;
 
-	void scriptAssert1(uint8 condition, uint64 text)
+	void scriptAssert1(uint8 condition, lemon::StringRef text)
 	{
 		if (!condition)
 		{
 			std::string locationText = LemonScriptRuntime::getCurrentScriptLocationString();
 			RMX_ASSERT(!locationText.empty(), "No active lemon script runtime");
 
-			const std::string* textString = (text == 0) ? nullptr : detail::tryResolveString(text);
-			if (nullptr != textString)
+			if (text.isValid())
 			{
-				RMX_ERROR("Script assertion failed:\n'" << *textString << "'.\nIn " << locationText << ".", );
+				RMX_ERROR("Script assertion failed:\n'" << *text << "'.\nIn " << locationText << ".", );
 			}
 			else
 			{
@@ -96,7 +95,7 @@ namespace
 
 	void scriptAssert2(uint8 condition)
 	{
-		scriptAssert1(condition, 0);
+		scriptAssert1(condition, lemon::StringRef());
 	}
 
 
@@ -201,7 +200,7 @@ namespace
 		return detail::loadData(targetAddress, data, 0, maxBytes);
 	}
 
-	void System_savePersistentData(uint32 sourceAddress, uint64 key, uint32 bytes)
+	void System_savePersistentData(uint32 sourceAddress, lemon::StringRef key, uint32 bytes)
 	{
 		const size_t size = (size_t)bytes;
 		std::vector<uint8> data;
@@ -209,11 +208,10 @@ namespace
 		const uint8* src = EmulatorInterface::instance().getMemoryPointer(sourceAddress, false, bytes);
 		memcpy(&data[0], src, size);
 
-		const std::string* keyString = detail::tryResolveString(key);
-		if (nullptr == keyString)
-			return;
-
-		PersistentData::instance().setData(*keyString, data);
+		if (key.isValid())
+		{
+			PersistentData::instance().setData(*key, data);
+		}
 	}
 
 	uint32 SRAM_load(uint32 address, uint16 offset, uint16 bytes)
@@ -227,26 +225,19 @@ namespace
 	}
 
 
-	void System_setupCallFrame2(uint64 functionName, uint64 labelName)
+	void System_setupCallFrame2(lemon::StringRef functionName, lemon::StringRef labelName)
 	{
-		const std::string* functionNameString = detail::tryResolveString(functionName);
-		if (nullptr == functionNameString)
+		if (!functionName.isValid())
 			return;
-
-		const std::string* labelNameString = nullptr;
-		if (labelName != 0)
-		{
-			labelNameString = detail::tryResolveString(labelName);
-		}
 
 		CodeExec* codeExec = CodeExec::getActiveInstance();
 		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
-		codeExec->setupCallFrame(*functionNameString, (nullptr == labelNameString) ? "" : *labelNameString);
+		codeExec->setupCallFrame(*functionName, labelName.isValid() ? *labelName : "");
 	}
 
-	void System_setupCallFrame1(uint64 functionName)
+	void System_setupCallFrame1(lemon::StringRef functionName)
 	{
-		System_setupCallFrame2(functionName, 0);
+		System_setupCallFrame2(functionName, lemon::StringRef());
 	}
 
 	uint32 System_rand()
@@ -339,21 +330,19 @@ namespace
 		debugLogInternal(valueString);
 	}
 
-	void debugLog(uint64 string)
+	void debugLog(lemon::StringRef string)
 	{
-		const std::string* str = detail::tryResolveString(string);
-		if (nullptr != str)
+		if (string.isValid())
 		{
-			debugLogInternal(*str);
+			debugLogInternal(*string);
 		}
 	}
 
-	void debugLogColors(uint64 name, uint32 startAddress, uint8 numColors)
+	void debugLogColors(lemon::StringRef name, uint32 startAddress, uint8 numColors)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			const std::string* str = detail::tryResolveString(name);
-			if (nullptr == str)
+			if (!name.isValid())
 				return;
 
 			CodeExec* codeExec = CodeExec::getActiveInstance();
@@ -361,7 +350,7 @@ namespace
 			EmulatorInterface& emulatorInterface = codeExec->getEmulatorInterface();
 
 			LogDisplay::ColorLogEntry entry;
-			entry.mName = *str;
+			entry.mName = *name;
 			entry.mColors.reserve(numColors);
 			for (uint8 i = 0; i < numColors; ++i)
 			{
@@ -839,15 +828,14 @@ namespace
 		RenderParts::instance().getSpriteManager().drawCustomSpriteWithTransform(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), transformation);
 	}
 
-	void Renderer_extractCustomSprite(uint64 key, uint64 categoryName, uint8 spriteNumber, uint8 atex)
+	void Renderer_extractCustomSprite(uint64 key, lemon::StringRef categoryName, uint8 spriteNumber, uint8 atex)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			const std::string* categoryNameString = detail::tryResolveString(categoryName);
-			if (nullptr == categoryNameString)
-				return;
-
-			SpriteCache::instance().dumpSprite(key, *categoryNameString, spriteNumber, atex);
+			if (categoryName.isValid())
+			{
+				SpriteCache::instance().dumpSprite(key, *categoryName, spriteNumber, atex);
+			}
 		}
 	}
 
@@ -948,13 +936,12 @@ namespace
 		EngineMain::instance().getAudioOut().playOverride(sfxId, contextId, channelId, overriddenChannelId);
 	}
 
-	void Audio_enableAudioModifier(uint8 channel, uint8 context, uint64 postfix, uint32 relativeSpeed)
+	void Audio_enableAudioModifier(uint8 channel, uint8 context, lemon::StringRef postfix, uint32 relativeSpeed)
 	{
-		const std::string* postfixString = detail::tryResolveString(postfix);
-		if (nullptr == postfixString)
-			return;
-
-		EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, *postfixString, (float)relativeSpeed / 65536.0f);
+		if (postfix.isValid())
+		{
+			EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, *postfix, (float)relativeSpeed / 65536.0f);
+		}
 	}
 
 	void Audio_disableAudioModifier(uint8 channel, uint8 context)
@@ -963,29 +950,28 @@ namespace
 	}
 
 
-	const Mod* getActiveModByNameHash(uint64 modName)
+	const Mod* getActiveModByNameHash(lemon::StringRef modName)
 	{
-		const std::string* modNameString = detail::tryResolveString(modName);
-		if (nullptr == modNameString)
+		if (!modName.isValid())
 			return nullptr;
 
 		// TODO: This can be optimized with a lookup map by mod name hash (which we already have from the parameter)
 		const auto& activeMods = ModManager::instance().getActiveMods();
 		for (const Mod* mod : activeMods)
 		{
-			if (mod->mDisplayName == *modNameString)
+			if (mod->mDisplayName == *modName)
 				return mod;
 		}
 		return nullptr;
 	}
 
-	uint8 Mods_isModActive(uint64 modName)
+	uint8 Mods_isModActive(lemon::StringRef modName)
 	{
 		const Mod* mod = getActiveModByNameHash(modName);
 		return (nullptr != mod);
 	}
 
-	int32 Mods_getModPriority(uint64 modName)
+	int32 Mods_getModPriority(lemon::StringRef modName)
 	{
 		const Mod* mod = getActiveModByNameHash(modName);
 		return (nullptr != mod) ? (int32)mod->mActivePriority : -1;
@@ -1008,14 +994,12 @@ namespace
 		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height), Color::fromRGBA32(color));
 	}
 
-	void Renderer_drawText(uint64 fontKey, int32 px, int32 py, uint64 text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace)
+	void Renderer_drawText(lemon::StringRef fontKey, int32 px, int32 py, lemon::StringRef text, uint32 tintColor, uint8 alignment, int8 spacing, uint16 renderQueue, bool useWorldSpace)
 	{
 		RMX_CHECK(alignment >= 1 && alignment <= 9, "Invalid alignment " << alignment << " used for drawing text, fallback to alignment = 1", alignment = 1);
-		const std::string* fontKeyString = detail::tryResolveString(fontKey);
-		const std::string* textString = detail::tryResolveString(text);
-		if (nullptr != fontKeyString && nullptr != textString)
+		if (fontKey.isValid() && text.isValid())
 		{
-			RenderParts::instance().getOverlayManager().addText(*fontKeyString, fontKey, Vec2i(px, py), *textString, text, Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
+			RenderParts::instance().getOverlayManager().addText(*fontKey, fontKey.mHash, Vec2i(px, py), *text, text.mHash, Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
 		}
 	}
 
@@ -1045,7 +1029,7 @@ namespace
 	}
 
 
-	void debugDumpToFile(uint64 filename, uint32 startAddress, uint32 bytes)
+	void debugDumpToFile(lemon::StringRef filename, uint32 startAddress, uint32 bytes)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
@@ -1055,12 +1039,11 @@ namespace
 			const bool isValid = emulatorInterface.isValidMemoryRegion(startAddress, bytes);
 			RMX_CHECK(isValid, "No valid memory region for debugDumpToFile: startAddress = " << rmx::hexString(startAddress, 6) << ", bytes = " << rmx::hexString(bytes, 2), return);
 
-			const std::string* str = detail::tryResolveString(filename);
-			if (nullptr == str)
-				return;
-
-			const uint8* src = emulatorInterface.getMemoryPointer(startAddress, false, bytes);
-			FTX::FileSystem->saveFile(*str, src, (size_t)bytes);
+			if (filename.isValid())
+			{
+				const uint8* src = emulatorInterface.getMemoryPointer(startAddress, false, bytes);
+				FTX::FileSystem->saveFile(*filename, src, (size_t)bytes);
+			}
 		}
 	}
 
@@ -1070,34 +1053,32 @@ namespace
 		return Configuration::instance().mEnableROMDataAnalyzer;
 	}
 
-	bool ROMDataAnalyser_hasEntry(uint64 category, uint32 address)
+	bool ROMDataAnalyser_hasEntry(lemon::StringRef category, uint32 address)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* categoryName = detail::tryResolveString(category);
-				if (nullptr != categoryName)
+				if (category.isValid())
 				{
-					return analyser->hasEntry(*categoryName, address);
+					return analyser->hasEntry(*category, address);
 				}
 			}
 		}
 		return false;
 	}
 
-	void ROMDataAnalyser_beginEntry(uint64 category, uint32 address)
+	void ROMDataAnalyser_beginEntry(lemon::StringRef category, uint32 address)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* categoryName = detail::tryResolveString(category);
-				if (nullptr != categoryName)
+				if (category.isValid())
 				{
-					analyser->beginEntry(*categoryName, address);
+					analyser->beginEntry(*category, address);
 				}
 			}
 		}
@@ -1115,34 +1096,31 @@ namespace
 		}
 	}
 
-	void ROMDataAnalyser_addKeyValue(uint64 key, uint64 value)
+	void ROMDataAnalyser_addKeyValue(lemon::StringRef key, lemon::StringRef value)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* keyString = detail::tryResolveString(key);
-				const std::string* valueString = detail::tryResolveString(value);
-				if (nullptr != keyString && nullptr != valueString)
+				if (key.isValid() && value.isValid())
 				{
-					analyser->addKeyValue(*keyString, *valueString);
+					analyser->addKeyValue(*key, *value);
 				}
 			}
 		}
 	}
 
-	void ROMDataAnalyser_beginObject(uint64 key)
+	void ROMDataAnalyser_beginObject(lemon::StringRef key)
 	{
 		if (Configuration::instance().mEnableROMDataAnalyzer)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
 			{
-				const std::string* keyString = detail::tryResolveString(key);
-				if (nullptr != keyString)
+				if (key.isValid())
 				{
-					analyser->beginObject(*keyString);
+					analyser->beginObject(*key);
 				}
 			}
 		}
@@ -1160,23 +1138,18 @@ namespace
 		}
 	}
 
-	bool System_SidePanel_setupCustomCategory(uint64 shortName, uint64 fullName)
+	bool System_SidePanel_setupCustomCategory(lemon::StringRef shortName, lemon::StringRef fullName)
 	{
-		const std::string* shortNameString = detail::tryResolveString(shortName);
-		const std::string* fullNameString = detail::tryResolveString(fullName);
-		if (nullptr == shortNameString || nullptr == fullNameString)
+		if (!shortName.isValid())
 			return false;
-
-		return Application::instance().getDebugSidePanel()->setupCustomCategory(*fullNameString, (*shortNameString)[0]);
+		return Application::instance().getDebugSidePanel()->setupCustomCategory(*fullName, (*shortName)[0]);
 	}
 
-	bool System_SidePanel_addOption(uint64 string, bool defaultValue)
+	bool System_SidePanel_addOption(lemon::StringRef string, bool defaultValue)
 	{
-		const std::string* str = detail::tryResolveString(string);
-		if (nullptr == str)
+		if (!string.isValid())
 			return false;
-
-		return Application::instance().getDebugSidePanel()->addOption(*str, defaultValue);
+		return Application::instance().getDebugSidePanel()->addOption(*string, defaultValue);
 	}
 
 	void System_SidePanel_addEntry(uint64 key)
@@ -1184,16 +1157,15 @@ namespace
 		return Application::instance().getDebugSidePanel()->addEntry(key);
 	}
 
-	void System_SidePanel_addLine1(uint64 string, int8 indent, uint32 color)
+	void System_SidePanel_addLine1(lemon::StringRef string, int8 indent, uint32 color)
 	{
-		const std::string* str = detail::tryResolveString(string);
-		if (nullptr != str)
+		if (string.isValid())
 		{
-			Application::instance().getDebugSidePanel()->addLine(*str, (int)indent, Color::fromRGBA32(color));
+			Application::instance().getDebugSidePanel()->addLine(*string, (int)indent, Color::fromRGBA32(color));
 		}
 	}
 
-	void System_SidePanel_addLine2(uint64 string, int8 indent)
+	void System_SidePanel_addLine2(lemon::StringRef string, int8 indent)
 	{
 		System_SidePanel_addLine1(string, indent, 0xffffffff);
 	}
@@ -1203,12 +1175,11 @@ namespace
 		return Application::instance().getDebugSidePanel()->isEntryHovered(key);
 	}
 
-	void System_writeDisplayLine(uint64 string)
+	void System_writeDisplayLine(lemon::StringRef string)
 	{
-		const std::string* str = detail::tryResolveString(string);
-		if (nullptr != str)
+		if (string.isValid())
 		{
-			LogDisplay::instance().setLogDisplay(*str, 2.0f);
+			LogDisplay::instance().setLogDisplay(*string, 2.0f);
 		}
 	}
 

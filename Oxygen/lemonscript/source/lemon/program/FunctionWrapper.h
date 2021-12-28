@@ -28,6 +28,7 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint32>();
 		template<> const DataTypeDefinition* getDataType<int64>();
 		template<> const DataTypeDefinition* getDataType<uint64>();
+		template<> const DataTypeDefinition* getDataType<StringRef>();
 	}
 
 
@@ -495,6 +496,13 @@ namespace lemon
 			static inline T popStack(const UserDefinedFunction::Context context)
 			{
 				return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
+			}
+
+			template<>
+			static inline StringRef popStack(const UserDefinedFunction::Context context)
+			{
+				const uint64 stringHash = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
+				return StringRef(stringHash, context.mControlFlow.getRuntime().resolveStringByKey(stringHash));
 			}
 		};
 

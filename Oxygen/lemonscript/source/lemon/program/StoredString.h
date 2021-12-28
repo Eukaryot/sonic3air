@@ -57,4 +57,19 @@ namespace lemon
 		size_t mNumEntries = 0;
 	};
 
+
+	struct API_EXPORT StringRef
+	{
+		uint64 mHash = 0;
+		const StoredString* mStoredString = nullptr;
+
+		inline StringRef() {}
+		inline explicit StringRef(uint64 hash) : mHash(hash) {}
+		inline StringRef(uint64 hash, const StoredString* storedString) : mHash(hash), mStoredString(storedString) {}
+
+		inline bool isValid() const  { return (nullptr != mStoredString); }
+		inline const std::string* operator->() const  { return &mStoredString->getString(); }
+		inline const std::string& operator*() const   { return mStoredString->getString(); }
+	};
+
 }
