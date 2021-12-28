@@ -433,7 +433,9 @@ namespace lemon
 								storedString = mModule.addStringLiteral(str, hash);
 								CHECK_ERROR(nullptr != storedString, "Failed to create new string literal, there's possibly too many (more than 65536)", 0);
 							}
-							node.mTokenList.createBack<ConstantToken>().mValue = storedString->getHash();
+							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
+							constantToken.mValue = storedString->getHash();
+							//constantToken.mDataType = &PredefinedDataTypes::STRING;
 							break;
 						}
 						case ParserToken::Type::IDENTIFIER:

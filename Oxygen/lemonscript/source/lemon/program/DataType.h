@@ -89,10 +89,9 @@ namespace lemon
 		Semantics mSemantics = Semantics::DEFAULT;
 		bool mIsSigned = false;
 
-		IntegerDataType(size_t bytes, Semantics semantics, bool isSigned) :
+		inline IntegerDataType(size_t bytes, Semantics semantics, bool isSigned) :
 			DataTypeDefinition(Class::INTEGER, bytes), mSemantics(semantics), mIsSigned(isSigned)
-		{
-		}
+		{}
 
 		const std::string& toString() const override;
 	};

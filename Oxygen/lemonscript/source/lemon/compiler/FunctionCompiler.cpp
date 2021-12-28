@@ -10,6 +10,7 @@
 #include "lemon/compiler/FunctionCompiler.h"
 #include "lemon/compiler/Node.h"
 #include "lemon/compiler/TokenTypes.h"
+#include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/Program.h"
 
@@ -179,35 +180,14 @@ namespace lemon
 
 	void FunctionCompiler::addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType)
 	{
-		// Both integers?
-		if (sourceType->mClass == DataTypeDefinition::Class::INTEGER && targetType->mClass == DataTypeDefinition::Class::INTEGER)
+		const int castType = TypeCasting::getCastType(sourceType, targetType);
+		if (castType >= 0)
 		{
-			const uint8 sourceBits = (uint8)DataTypeHelper::getBaseType(sourceType);
-			const uint8 targetBits = (uint8)DataTypeHelper::getBaseType(targetType);
-
-			// Size is between 0 and 3 (for 8-bit, 16-bit, 32-bit, 64-bit)
-			//  -> We are silently treating INT_CONST as INT_64 by ignoring flag 0x04
-			const uint8 sourceSize = (sourceBits & 0x03);
-			const uint8 targetSize = (targetBits & 0x03);
-
-			// No need for an opcode if size does not change at all
-			if (sourceSize != targetSize)
-			{
-				uint8 castType = (sourceSize << 4) + targetSize;
-
-				// Recognize signed up-cast
-				const bool isSourceSigned = (sourceBits & 0x08) != 0;
-				if (isSourceSigned && targetSize > sourceSize)
-				{
-					castType += 0x80;
-				}
-
-				addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, castType);
-			}
+			addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, castType);
 		}
 		else
 		{
-			CHECK_ERROR(false, "Cannot cast from " << sourceType->toString() << " to " << targetType->toString(), mLineNumber);
+			CHECK_ERROR(castType != -2, "Cannot cast from " << sourceType->toString() << " to " << targetType->toString(), mLineNumber);
 		}
 	}
 

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "lemon/program/Variable.h"
-#include "lemon/compiler/Definitions.h"
+#include "lemon/compiler/Operators.h"
 
 
 namespace lemon
@@ -33,10 +33,6 @@ namespace lemon
 				mGlobalsLookup(globalsLookup), mLocalVariables(localVariables), mFunction(function)
 			{}
 		};
-
-	public:
-		static uint8 getOperatorPriority(Operator op);		// Lower values mean higher priority, e.g. multiply is lower than addition
-		static bool isOperatorAssociative(Operator op);
 
 	public:
 		inline TokenProcessing(const Context& context) : mContext(context) {}

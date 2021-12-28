@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include "lemon/compiler/Utility.h"
 #include "lemon/compiler/Definitions.h"
+#include "lemon/compiler/Operators.h"
+#include "lemon/compiler/Utility.h"
 
 
 namespace lemon

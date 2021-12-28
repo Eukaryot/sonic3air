@@ -9,6 +9,7 @@
 #pragma once
 
 #include "lemon/compiler/Definitions.h"
+#include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
 
 

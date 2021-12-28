@@ -9,6 +9,7 @@
 #include "lemon/pch.h"
 #include "lemon/compiler/TokenProcessing.h"
 #include "lemon/compiler/TokenTypes.h"
+#include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
 
@@ -18,391 +19,15 @@ namespace lemon
 
 	namespace
 	{
-		static const uint8 operatorPriorityLookup[] =
-		{
-			15,	 // ASSIGN
-			15,	 // ASSIGN_PLUS
-			15,	 // ASSIGN_MINUS
-			15,	 // ASSIGN_MULTIPLY
-			15,	 // ASSIGN_DIVIDE
-			15,	 // ASSIGN_MODULO
-			15,	 // ASSIGN_SHIFT_LEFT
-			15,	 // ASSIGN_SHIFT_RIGHT
-			15,	 // ASSIGN_AND
-			15,	 // ASSIGN_OR
-			15,	 // ASSIGN_XOR
-			6,	 // BINARY_PLUS
-			6,	 // BINARY_MINUS
-			5,	 // BINARY_MULTIPLY
-			5,	 // BINARY_DIVIDE
-			5,	 // BINARY_MODULO
-			7,	 // BINARY_SHIFT_LEFT
-			7,	 // BINARY_SHIFT_RIGHT
-			10,	 // BINARY_AND
-			12,	 // BINARY_OR
-			11,	 // BINARY_XOR
-			13,	 // LOGICAL_AND
-			14,	 // LOGICAL_OR
-			3,   // UNARY_NOT
-			3,   // UNARY_BITNOT
-			3,	 // UNARY_DECREMENT (actually 2 for post-, 3 for pre-decrement)
-			3,	 // UNARY_INCREMENT (same here)
-			9,	 // COMPARE_EQUAL
-			9,	 // COMPARE_NOT_EQUAL
-			8,	 // COMPARE_LESS
-			8,	 // COMPARE_LESS_OR_EQUAL
-			8,	 // COMPARE_GREATER
-			8,	 // COMPARE_GREATER_OR_EQUAL
-			15,	 // QUESTIONMARK
-			15,	 // COLON
-			18,	 // SEMICOLON_SEPARATOR (only in 'for' statements, otherwise ignored)
-			17,	 // COMMA_SEPARATOR (should be evaluated separatedly, after all others)
-			2,	 // PARENTHESIS_LEFT
-			2,	 // PARENTHESIS_RIGHT
-			2,	 // BRACKET_LEFT
-			2	 // BRACKET_RIGHT
-		};
-		static_assert(sizeof(operatorPriorityLookup) == (size_t)Operator::_NUM_OPERATORS, "Update operator priority lookup");
-
-		static const bool operatorAssociativityLookup[] =
-		{
-			// "false" = left to right
-			// "true" = right to left
-			false,		// Priority 0 (unused)
-			false,		// Priority 1 (reserved for :: operator)
-			false,		// Priority 2 (parentheses)
-			true,		// Priority 3 (unary operators)
-			false,		// Priority 4 (reserved for element access)
-			false,		// Priority 5 (multiplication, division)
-			false,		// Priority 6 (addition, subtraction)
-			false,		// Priority 7 (shifts)
-			false,		// Priority 8 (comparisons)
-			false,		// Priority 9 (comparisons)
-			false,		// Priority 10 (bitwise AND)
-			false,		// Priority 11 (bitwise XOR)
-			false,		// Priority 12 (bitwise OR)
-			false,		// Priority 13 (logical AND)
-			false,		// Priority 14 (logical OR)
-			true,		// Priority 15 (assignments and trinary operator)
-			true,		// Priority 16 (reserved for throw)
-			false		// Priority 17 (comma separator)
-		};
-
-		uint8 getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target)
-		{
-			const uint8 CANNOT_CAST = 0xff;
-			if (original == target)
-			{
-				// No cast required at all
-				return 0;
-			}
-
-			if (original->mClass == DataTypeDefinition::Class::INTEGER && target->mClass == DataTypeDefinition::Class::INTEGER)
-			{
-				const IntegerDataType& originalInt = original->as<IntegerDataType>();
-				const IntegerDataType& targetInt = target->as<IntegerDataType>();
-
-				// Is one type undefined?
-				if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-				{
-					// Const may get cast to everything
-					return 1;
-				}
-				if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-				{
-					// Can this happen at all?
-					return 1;
-				}
-
-				if (originalInt.mBytes == targetInt.mBytes)
-				{
-					return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
-				}
-
-				const uint8 a = (uint8)DataTypeHelper::getBaseType(original);
-				const uint8 b = (uint8)DataTypeHelper::getBaseType(target);
-				const uint8 sizeA = a & 0x07;
-				const uint8 sizeB = b & 0x07;
-				if (originalInt.mBytes < targetInt.mBytes)
-				{
-					// Up cast
-					return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (sizeB - sizeA);
-				}
-				else
-				{
-					// Down cast
-					return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (sizeB - sizeA);
-				}
-			}
-			else
-			{
-				// No cast between non-integers
-				return CANNOT_CAST;
-			}
-		}
-
-		struct BinaryOperatorSignature
-		{
-			const DataTypeDefinition* mLeft;
-			const DataTypeDefinition* mRight;
-			const DataTypeDefinition* mResult;
-			inline BinaryOperatorSignature(const DataTypeDefinition* left, const DataTypeDefinition* right, const DataTypeDefinition* result) : mLeft(left), mRight(right), mResult(result) {}
-		};
-
-		uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right)
-		{
-			const uint8 prioLeft = getImplicitCastPriority(left, signature.mLeft);
-			const uint8 prioRight = getImplicitCastPriority(right, signature.mRight);
-			if (prioLeft < prioRight)
-			{
-				return ((uint16)prioRight << 8) + (uint16)prioLeft;
-			}
-			else
-			{
-				return ((uint16)prioLeft << 8) + (uint16)prioRight;
-			}
-		}
-
-		uint32 getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target)
-		{
-			if (original.size() != target.size())
-				return 0xffffffff;
-
-			const size_t size = original.size();
-			static std::vector<uint8> priorities;	// Not multi-threading safe
-			priorities.resize(size);
-
-			for (size_t i = 0; i < size; ++i)
-			{
-				priorities[i] = getImplicitCastPriority(original[i], target[i].mType);
-			}
-
-			// Highest priority should be first
-			std::sort(priorities.begin(), priorities.end(), std::greater<uint8>());
-
-			uint32 result = 0;
-			for (size_t i = 0; i < std::min<size_t>(size, 4); ++i)
-			{
-				result |= (priorities[i] << (24 - i * 8));
-			}
-			return result;
-		}
-
-		enum class OperatorType
-		{
-			ASSIGNMENT,
-			SYMMETRIC,
-			COMPARISON,
-			TRINARY,
-			UNKNOWN
-		};
-
-		OperatorType getOperatorType(Operator op)
-		{
-			switch (op)
-			{
-				case Operator::ASSIGN:
-				case Operator::ASSIGN_PLUS:
-				case Operator::ASSIGN_MINUS:
-				case Operator::ASSIGN_MULTIPLY:
-				case Operator::ASSIGN_DIVIDE:
-				case Operator::ASSIGN_MODULO:
-				case Operator::ASSIGN_SHIFT_LEFT:	// TODO: Special handling required
-				case Operator::ASSIGN_SHIFT_RIGHT:	// TODO: Special handling required
-				case Operator::ASSIGN_AND:
-				case Operator::ASSIGN_OR:
-				case Operator::ASSIGN_XOR:
-				{
-					return OperatorType::ASSIGNMENT;
-				}
-
-				case Operator::BINARY_PLUS:
-				case Operator::BINARY_MINUS:
-				case Operator::BINARY_MULTIPLY:
-				case Operator::BINARY_DIVIDE:
-				case Operator::BINARY_MODULO:
-				case Operator::BINARY_SHIFT_LEFT:	// TODO: Special handling required
-				case Operator::BINARY_SHIFT_RIGHT:	// TODO: Special handling required
-				case Operator::BINARY_AND:
-				case Operator::BINARY_OR:
-				case Operator::BINARY_XOR:
-				case Operator::LOGICAL_AND:
-				case Operator::LOGICAL_OR:
-				case Operator::COLON:
-				{
-					return OperatorType::SYMMETRIC;
-				}
-
-				case Operator::COMPARE_EQUAL:
-				case Operator::COMPARE_NOT_EQUAL:
-				case Operator::COMPARE_LESS:
-				case Operator::COMPARE_LESS_OR_EQUAL:
-				case Operator::COMPARE_GREATER:
-				case Operator::COMPARE_GREATER_OR_EQUAL:
-				{
-					return OperatorType::COMPARISON;
-				}
-
-				case Operator::QUESTIONMARK:
-				{
-					return OperatorType::TRINARY;
-				}
-
-				default:
-				{
-					return OperatorType::UNKNOWN;
-				}
-			}
-		}
-
-		bool getBestSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right, const BinaryOperatorSignature** outSignature)
-		{
-			static const std::vector<BinaryOperatorSignature> signaturesSymmetric =
-			{
-				// TODO: This is oversimplified, there are cases like multiply and left-shift (and probably also add / subtract) that require different handling
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
-			};
-			static const std::vector<BinaryOperatorSignature> signaturesComparison =
-			{
-				// Result types are always bool
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::BOOL),
-				BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL)
-			};
-			static const std::vector<BinaryOperatorSignature> signaturesTrinary =
-			{
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-				BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
-			};
-
-			const std::vector<BinaryOperatorSignature>* signatures = nullptr;
-			bool exactMatchLeftRequired = false;
-
-			switch (getOperatorType(op))
-			{
-				case OperatorType::ASSIGNMENT:
-				{
-					signatures = &signaturesSymmetric;
-					exactMatchLeftRequired = true;
-					break;
-				}
-
-				case OperatorType::SYMMETRIC:
-				{
-					signatures = &signaturesSymmetric;
-					break;
-				}
-
-				case OperatorType::COMPARISON:
-				{
-					signatures = &signaturesComparison;
-					break;
-				}
-
-				case OperatorType::TRINARY:
-				{
-					signatures = &signaturesTrinary;
-					break;
-				}
-
-				default:
-				{
-					// This should never happen
-					CHECK_ERROR_NOLINE(false, "Unknown operator type");
-				}
-			}
-
-			uint16 bestPriority = 0xff00;
-			for (const BinaryOperatorSignature& signature : *signatures)
-			{
-				if (exactMatchLeftRequired)
-				{
-					if (signature.mLeft != left)
-						continue;
-				}
-
-				const uint16 priority = getPriorityOfSignature(signature, left, right);
-				if (priority < bestPriority)
-				{
-					bestPriority = priority;
-					*outSignature = &signature;
-				}
-			}
-			return (bestPriority != 0xff00);
-		}
-
-		const char* operatorCharacters[] =
-		{
-			"=",	// ASSIGN
-			"+=",	// ASSIGN_PLUS
-			"-=",	// ASSIGN_MINUS
-			"*=",	// ASSIGN_MULTIPLY
-			"/=",	// ASSIGN_DIVIDE
-			"%=",	// ASSIGN_MODULO
-			"<<=",	// ASSIGN_SHIFT_LEFT
-			">>=",	// ASSIGN_SHIFT_RIGHT
-			"&=",	// ASSIGN_AND
-			"|=",	// ASSIGN_OR
-			"^=",	// ASSIGN_XOR
-			"+",	// BINARY_PLUS
-			"-",	// BINARY_MINUS
-			"*",	// BINARY_MULTIPLY
-			"/",	// BINARY_DIVIDE
-			"%",	// BINARY_MODULO
-			"<<",	// BINARY_SHIFT_LEFT
-			">>",	// BINARY_SHIFT_RIGHT
-			"&",	// BINARY_AND
-			"|",	// BINARY_OR
-			"^",	// BINARY_XOR
-			"&&",	// LOGICAL_AND
-			"||",	// LOGICAL_OR
-			"",		// UNARY_NOT
-			"",		// UNARY_BITNOT
-			"-",	// UNARY_DECREMENT
-			"+",	// UNARY_INCREMENT
-			"==",	// COMPARE_EQUAL
-			"!=",	// COMPARE_NOT_EQUAL
-			"<",	// COMPARE_LESS
-			"<=",	// COMPARE_LESS_OR_EQUAL
-			">",	// COMPARE_GREATER
-			">=",	// COMPARE_GREATER_OR_EQUAL
-			"?",	// QUESTIONMARK
-			":",	// COLON
-			";",	// SEMICOLON_SEPARATOR
-			",",	// COMMA_SEPARATOR
-			"(",	// PARENTHESIS_LEFT
-			")",	// PARENTHESIS_RIGHT
-			"[",	// BRACKET_LEFT
-			"]",	// BRACKET_RIGHT
-		};
-
 		std::string getOperatorNotAllowedErrorMessage(Operator op)
 		{
 			if (op >= Operator::UNARY_NOT && op <= Operator::UNARY_INCREMENT)
 			{
-				return std::string("Unary operator ") + operatorCharacters[(int)op] + " is not allowed here";
+				return std::string("Unary operator ") + OperatorHelper::getOperatorCharacters(op) + " is not allowed here";
 			}
 			else if (op <= Operator::COLON)
 			{
-				return std::string("Binary operator ") + operatorCharacters[(int)op] + " is not allowed here";
+				return std::string("Binary operator ") + OperatorHelper::getOperatorCharacters(op) + " is not allowed here";
 			}
 			else
 			{
@@ -438,17 +63,6 @@ namespace lemon
 		}
 	}
 
-
-	uint8 TokenProcessing::getOperatorPriority(Operator op)
-	{
-		return operatorPriorityLookup[(size_t)op];
-	}
-
-	bool TokenProcessing::isOperatorAssociative(Operator op)
-	{
-		const uint8 priority = operatorPriorityLookup[(size_t)op];
-		return operatorAssociativityLookup[priority];
-	}
 
 	void TokenProcessing::processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType)
 	{
@@ -901,8 +515,8 @@ namespace lemon
 					const Operator op = tokens[i].as<OperatorToken>().mOperator;
 					CHECK_ERROR((i > 0 && i < tokens.size()-1) && (op != Operator::SEMICOLON_SEPARATOR), getOperatorNotAllowedErrorMessage(op), mLineNumber);
 
-					const uint8 priority = operatorPriorityLookup[(size_t)op];
-					const bool isLower = (priority == bestPriority) ? operatorAssociativityLookup[priority] : (priority < bestPriority);
+					const uint8 priority = OperatorHelper::getOperatorPriority(op);
+					const bool isLower = (priority == bestPriority) ? OperatorHelper::isOperatorAssociative(op) : (priority < bestPriority);
 					if (isLower)
 					{
 						bestPriority = priority;
@@ -1038,7 +652,7 @@ namespace lemon
 					uint32 bestPriority = 0xff000000;
 					for (const Function* candidateFunction : functions)
 					{
-						const uint32 priority = getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+						const uint32 priority = TypeCasting::getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
 						if (priority < bestPriority)
 						{
 							bestPriority = priority;
@@ -1086,20 +700,20 @@ namespace lemon
 			case Token::Type::BINARY_OPERATION:
 			{
 				BinaryOperationToken& bot = token.as<BinaryOperationToken>();
-				const OperatorType opType = getOperatorType(bot.mOperator);
-				const DataTypeDefinition* expectedType = (opType == OperatorType::SYMMETRIC) ? resultType : nullptr;
+				const OperatorHelper::OperatorType opType = OperatorHelper::getOperatorType(bot.mOperator);
+				const DataTypeDefinition* expectedType = (opType == OperatorHelper::OperatorType::SYMMETRIC) ? resultType : nullptr;
 
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
-				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
+				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
 
 				// Choose best fitting signature
-				const BinaryOperatorSignature* signature = nullptr;
-				const bool result = getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
-				CHECK_ERROR(result, "Can not implicitly cast between types '" << leftDataType->toString() << "' and '" << rightDataType->toString() << "'", mLineNumber);
+				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
+				const bool result = TypeCasting::getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
+				CHECK_ERROR(result, "Cannot implicitly cast between types '" << leftDataType->toString() << "' and '" << rightDataType->toString() << "'", mLineNumber);
 
 				token.mDataType = signature->mResult;
 
-				if (opType != OperatorType::TRINARY)
+				if (opType != OperatorHelper::OperatorType::TRINARY)
 				{
 					if (leftDataType->mClass == DataTypeDefinition::Class::INTEGER && rightDataType->mClass == DataTypeDefinition::Class::INTEGER)
 					{
@@ -1133,7 +747,7 @@ namespace lemon
 				assignStatementDataType(*vct.mArgument, token.mDataType);
 
 				// Check if types fit together at all
-				CHECK_ERROR(getImplicitCastPriority(vct.mArgument->mDataType, vct.mDataType) != 0xff, "Explicit cast not possible", mLineNumber);
+				CHECK_ERROR(TypeCasting::getImplicitCastPriority(vct.mArgument->mDataType, vct.mDataType) != 0xff, "Explicit cast not possible", mLineNumber);
 				break;
 			}
 
