@@ -33,6 +33,8 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\Sockets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\VersionRange.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\pch.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\serverclient\ChannelBroadcastPackets.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\serverclient\FileTransferPackets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\serverclient\Packets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\serverclient\ProtocolVersion.h" />
   </ItemGroup>
