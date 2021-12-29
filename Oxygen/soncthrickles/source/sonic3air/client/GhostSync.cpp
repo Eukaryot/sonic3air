@@ -330,7 +330,7 @@ void GhostSync::updateGhostPlayers()
 
 		const float moveDirAngle = (float)ghostData.mMoveDirection / 128.0f * PI_FLOAT;
 		const bool enableOffscreen = ConfigurationImpl::instance().mGameServer.mGhostSync.mShowOffscreenGhosts;
-		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &ghostData.mFrameCounter, enableOffscreen);
+		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, ghostData.mFlags & 0x0f, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &ghostData.mFrameCounter, enableOffscreen, playerData.mPlayerID);
 	}
 
 	for (uint32 id : playersToRemove)

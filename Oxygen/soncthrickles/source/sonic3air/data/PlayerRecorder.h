@@ -62,6 +62,7 @@ private:
 		int    mRank = 0;
 		uint32 mTime = 0;
 		bool   mVisible = true;
+		size_t mIndex = 0;			// Only valid during playback
 		std::vector<Frame> mFrames;
 	};
 

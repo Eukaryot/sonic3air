@@ -155,6 +155,7 @@ void PlayerRecorder::initPlayback(const std::wstring& filename)
 			Recording& recording = vectorAdd(mCurrentPlaybacks);
 			recording.mFilename = filename;
 			recording.mVisible = ((int)mCurrentPlaybacks.size() <= mMaxGhosts);
+			recording.mIndex = mCurrentPlaybacks.size() - 1;
 
 			bool success = false;
 			VectorBinarySerializer serializer(true, buffer);
@@ -356,7 +357,7 @@ void PlayerRecorder::updatePlayback(const Recording& recording, uint16 frameNumb
 
 	const uint8 character = (recording.mCategory >> 4) - 1;
 	const Vec2i velocity = (frameNumber > 0) ? (frame.mPosition - recording.mFrames[frameNumber-1].mPosition) : Vec2i(0, 1);
-	s3air::drawPlayerSprite(EmulatorInterface::instance(), character, Vec2i(px, py), velocity, frame.mSprite, frame.mFlags, frame.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &frameNumber);
+	s3air::drawPlayerSprite(EmulatorInterface::instance(), character, Vec2i(px, py), velocity, frame.mSprite, frame.mFlags, frame.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &frameNumber, true, 0x99990000 + recording.mIndex * 0x10);
 }
 
 bool PlayerRecorder::serializeRecording(VectorBinarySerializer& serializer, Recording& recording)

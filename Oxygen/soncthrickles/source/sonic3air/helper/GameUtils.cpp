@@ -49,7 +49,7 @@ namespace s3air
 		}
 	}
 
-	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, float moveDirectionRadians, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen)
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, float moveDirectionRadians, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen, uint64 spriteTagBaseValue)
 	{
 		const uint8 atex = 0x40 + characterIndex * 0x20;
 		int px = position.x;
@@ -125,6 +125,7 @@ namespace s3air
 			}
 		}
 		SpriteManager& spriteManager = VideoOut::instance().getRenderParts().getSpriteManager();
+		const Vec2i renderPos(px, py);
 
 		// Tails' tails sprite
 		if (characterIndex == 1)
@@ -154,23 +155,25 @@ namespace s3air
 
 			if (key != 0)
 			{
+				spriteManager.setSpriteTagWithPosition(spriteTagBaseValue + 1, renderPos);
 				if (showAtBorder)
-					spriteManager.drawCustomSprite(key, Vec2i(px, py), atex, flags | 0x40, 0xe000, color, angle, 0.4f);
+					spriteManager.drawCustomSprite(key, renderPos, atex, flags | 0x40, 0xe000, color, angle, 0.4f);
 				else
-					spriteManager.drawCustomSprite(key, Vec2i(px, py), atex, flags, 0x9eff, color, angle);
+					spriteManager.drawCustomSprite(key, renderPos, atex, flags, 0x9eff, color, angle);
 			}
 		}
 
 		// Main sprite
+		spriteManager.setSpriteTagWithPosition(spriteTagBaseValue, renderPos);
 		if (showAtBorder)
-			spriteManager.drawCustomSprite(key, Vec2i(px, py), atex, flags | 0x40, 0xe000, color, 0.0f, 0.4f);
+			spriteManager.drawCustomSprite(key, renderPos, atex, flags | 0x40, 0xe000, color, 0.0f, 0.4f);
 		else
-			spriteManager.drawCustomSprite(key, Vec2i(px, py), atex, flags, 0x9eff, color);
+			spriteManager.drawCustomSprite(key, renderPos, atex, flags, 0x9eff, color);
 	}
 
-	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen)
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen, uint64 spriteTagBaseValue)
 	{
-		drawPlayerSprite(emulatorInterface, characterIndex, position, std::atan2((float)velocity.y, (float)velocity.x), animationSprite, flags, rotation, color, globalFrameNumber, enableOffscreen);
+		drawPlayerSprite(emulatorInterface, characterIndex, position, std::atan2((float)velocity.y, (float)velocity.x), animationSprite, flags, rotation, color, globalFrameNumber, enableOffscreen, spriteTagBaseValue);
 	}
 
 }
