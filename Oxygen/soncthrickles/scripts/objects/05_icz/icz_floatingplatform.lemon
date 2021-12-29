@@ -301,7 +301,7 @@ function void fn08a036()
 					return
 
 				// "spawnSimpleChildObjects(0x08a42a)" replaced by:
-				spawnSimpleChildObjects(0x0837b2, 1)
+				spawnSimpleChildObjects(0x08a1d4, 6)
 
 				if (allocDynamicObjectAfterA0())
 				{
