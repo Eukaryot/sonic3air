@@ -17,33 +17,33 @@ namespace lemon
 	class OpcodeHelper
 	{
 	public:
-		static BaseType getCastExecType(CastType castType)
+		static BaseType getCastExecType(BaseCastType castType)
 		{
 			switch (castType)
 			{
 				// Cast down (signed or unsigned makes no difference here)
-				case CastType::INT16_TO_INT8:  return BaseType::INT_8;
-				case CastType::INT32_TO_INT8:  return BaseType::INT_8;
-				case CastType::INT64_TO_INT8:  return BaseType::INT_8;
-				case CastType::INT32_TO_INT16: return BaseType::INT_16;
-				case CastType::INT64_TO_INT16: return BaseType::INT_16;
-				case CastType::INT64_TO_INT32: return BaseType::INT_32;
+				case BaseCastType::INT_16_TO_8:  return BaseType::INT_8;
+				case BaseCastType::INT_32_TO_8:  return BaseType::INT_8;
+				case BaseCastType::INT_64_TO_8:  return BaseType::INT_8;
+				case BaseCastType::INT_32_TO_16: return BaseType::INT_16;
+				case BaseCastType::INT_64_TO_16: return BaseType::INT_16;
+				case BaseCastType::INT_64_TO_32: return BaseType::INT_32;
 
 				// Cast up (value is unsigned -> adding zeroes)
-				case CastType::UINT8_TO_INT16:  return BaseType::UINT_8;
-				case CastType::UINT8_TO_INT32:  return BaseType::UINT_8;
-				case CastType::UINT8_TO_INT64:  return BaseType::UINT_8;
-				case CastType::UINT16_TO_INT32: return BaseType::UINT_16;
-				case CastType::UINT16_TO_INT64: return BaseType::UINT_16;
-				case CastType::UINT32_TO_INT64: return BaseType::UINT_32;
+				case BaseCastType::UINT_8_TO_16:  return BaseType::UINT_8;
+				case BaseCastType::UINT_8_TO_32:  return BaseType::UINT_8;
+				case BaseCastType::UINT_8_TO_64:  return BaseType::UINT_8;
+				case BaseCastType::UINT_16_TO_32: return BaseType::UINT_16;
+				case BaseCastType::UINT_16_TO_64: return BaseType::UINT_16;
+				case BaseCastType::UINT_32_TO_64: return BaseType::UINT_32;
 
 				// Cast up (value is signed -> adding highest bit)
-				case CastType::SINT8_TO_INT16:  return BaseType::INT_8;
-				case CastType::SINT8_TO_INT32:  return BaseType::INT_8;
-				case CastType::SINT8_TO_INT64:  return BaseType::INT_8;
-				case CastType::SINT16_TO_INT32: return BaseType::INT_16;
-				case CastType::SINT16_TO_INT64: return BaseType::INT_16;
-				case CastType::SINT32_TO_INT64: return BaseType::INT_32;
+				case BaseCastType::SINT_8_TO_16:  return BaseType::INT_8;
+				case BaseCastType::SINT_8_TO_32:  return BaseType::INT_8;
+				case BaseCastType::SINT_8_TO_64:  return BaseType::INT_8;
+				case BaseCastType::SINT_16_TO_32: return BaseType::INT_16;
+				case BaseCastType::SINT_16_TO_64: return BaseType::INT_16;
+				case BaseCastType::SINT_32_TO_64: return BaseType::INT_32;
 
 				default:
 					throw std::runtime_error("Unrecognized cast type");
@@ -53,7 +53,7 @@ namespace lemon
 
 		static BaseType getCastExecType(const Opcode& opcode)
 		{
-			return OpcodeHelper::getCastExecType(static_cast<CastType>(opcode.mParameter));
+			return OpcodeHelper::getCastExecType(static_cast<BaseCastType>(opcode.mParameter));
 		}
 	};
 

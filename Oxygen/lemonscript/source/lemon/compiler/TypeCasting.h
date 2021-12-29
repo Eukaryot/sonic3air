@@ -31,7 +31,7 @@ namespace lemon
 
 	public:
 		static uint8 getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target);
-		static int getCastType(const DataTypeDefinition* original, const DataTypeDefinition* target);
+		static BaseCastType getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target);
 
 		static uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right);
 		static uint32 getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target);

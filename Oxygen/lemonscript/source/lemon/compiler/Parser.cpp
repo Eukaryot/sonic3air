@@ -29,7 +29,7 @@ namespace lemon
 			{ rmx::getMurmur2_64(String("u16")),	&PredefinedDataTypes::UINT_16 },
 			{ rmx::getMurmur2_64(String("u32")),	&PredefinedDataTypes::UINT_32 },
 			{ rmx::getMurmur2_64(String("u64")),	&PredefinedDataTypes::UINT_64 },
-			{ rmx::getMurmur2_64(String("string")),	&PredefinedDataTypes::UINT_64 }		// Only a synonym for u64
+			{ rmx::getMurmur2_64(String("string")),	&PredefinedDataTypes::STRING }
 		};
 
 		static const std::map<uint64, Keyword> keywordLookup =

@@ -29,31 +29,34 @@ namespace lemon
 		INT_CONST = 0x1f			// Constants have an undefined int type
 	};
 
-	enum class CastType : uint8
+	enum class BaseCastType : uint8
 	{
-		// Cast down (signed or unsigned makes no difference here)
-		INT16_TO_INT8 = 0x10,
-		INT32_TO_INT8 = 0x20,
-		INT64_TO_INT8 = 0x30,
-		INT32_TO_INT16 = 0x21,
-		INT64_TO_INT16 = 0x31,
-		INT64_TO_INT32 = 0x32,
+		INVALID = 0xff,
+		NONE    = 0x00,
 
 		// Cast up (value is unsigned -> adding zeroes)
-		UINT8_TO_INT16  = 0x01,
-		UINT8_TO_INT32  = 0x02,
-		UINT8_TO_INT64  = 0x03,
-		UINT16_TO_INT32 = 0x12,
-		UINT16_TO_INT64 = 0x13,
-		UINT32_TO_INT64 = 0x23,
+		UINT_8_TO_16  = 0x01,	// 0x00 * 4 + 0x01
+		UINT_8_TO_32  = 0x02,	// 0x00 * 4 + 0x02
+		UINT_8_TO_64  = 0x03,	// 0x00 * 4 + 0x03
+		UINT_16_TO_32 = 0x06,	// 0x01 * 4 + 0x02
+		UINT_16_TO_64 = 0x07,	// 0x01 * 4 + 0x03
+		UINT_32_TO_64 = 0x0b,	// 0x02 * 4 + 0x03
+
+		// Cast down (signed or unsigned makes no difference here)
+		INT_16_TO_8  = 0x04,	// 0x01 * 4 + 0x00
+		INT_32_TO_8  = 0x08,	// 0x02 * 4 + 0x00
+		INT_64_TO_8  = 0x0c,	// 0x03 * 4 + 0x00
+		INT_32_TO_16 = 0x09,	// 0x02 * 4 + 0x01
+		INT_64_TO_16 = 0x0d,	// 0x03 * 4 + 0x01
+		INT_64_TO_32 = 0x0e,	// 0x03 * 4 + 0x02
 
 		// Cast up (value is signed -> adding highest bit)
-		SINT8_TO_INT16  = 0x80 + 0x01,
-		SINT8_TO_INT32  = 0x80 + 0x02,
-		SINT8_TO_INT64  = 0x80 + 0x03,
-		SINT16_TO_INT32 = 0x80 + 0x12,
-		SINT16_TO_INT64 = 0x80 + 0x13,
-		SINT32_TO_INT64 = 0x80 + 0x23
+		SINT_8_TO_16  = 0x11,	// 0x10 + 0x00 * 4 + 0x01
+		SINT_8_TO_32  = 0x12,	// 0x10 + 0x00 * 4 + 0x02
+		SINT_8_TO_64  = 0x13,	// 0x10 + 0x00 * 4 + 0x03
+		SINT_16_TO_32 = 0x16,	// 0x10 + 0x01 * 4 + 0x02
+		SINT_16_TO_64 = 0x17,	// 0x10 + 0x01 * 4 + 0x03
+		SINT_32_TO_64 = 0x1b	// 0x10 + 0x02 * 4 + 0x03
 	};
 
 
@@ -63,7 +66,8 @@ namespace lemon
 		enum class Class
 		{
 			VOID,
-			INTEGER
+			INTEGER,
+			STRING
 		};
 
 		Class mClass = Class::VOID;
@@ -96,6 +100,15 @@ namespace lemon
 		const std::string& toString() const override;
 	};
 
+	struct StringDataType : public DataTypeDefinition
+	{
+		inline StringDataType() :
+			DataTypeDefinition(Class::STRING, 8)
+		{}
+
+		const std::string& toString() const override;
+	};
+
 
 	struct PredefinedDataTypes
 	{
@@ -112,6 +125,8 @@ namespace lemon
 		inline static const IntegerDataType CONST_INT = IntegerDataType(8, IntegerDataType::Semantics::CONSTANT, true);
 		//inline static const IntegerDataType BOOL	  = IntegerDataType(1, IntegerDataType::Semantics::BOOLEAN, false);
 		inline static const IntegerDataType& BOOL	  = UINT_8;
+
+		inline static const StringDataType STRING     = StringDataType();
 	};
 
 

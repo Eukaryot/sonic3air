@@ -17,6 +17,12 @@ namespace lemon
 
 	uint8 TypeCasting::getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target)
 	{
+		// Treat string type as u64
+		if (original == &PredefinedDataTypes::STRING)
+			original = &PredefinedDataTypes::UINT_64;
+		if (target == &PredefinedDataTypes::STRING)
+			target = &PredefinedDataTypes::UINT_64;
+
 		if (original == target)
 		{
 			// No cast required at all
@@ -67,9 +73,13 @@ namespace lemon
 		}
 	}
 
-	int TypeCasting::getCastType(const DataTypeDefinition* original, const DataTypeDefinition* target)
+	BaseCastType TypeCasting::getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target)
 	{
-		// TODO: Unify this with "getImplicitCastPriority"
+		// Treat string type as u64
+		if (original == &PredefinedDataTypes::STRING)
+			original = &PredefinedDataTypes::UINT_64;
+		if (target == &PredefinedDataTypes::STRING)
+			target = &PredefinedDataTypes::UINT_64;
 
 		uint8 sourceBits = 0xff;
 		uint8 targetBits = 0xff;
@@ -86,31 +96,31 @@ namespace lemon
 		{
 			// Size is between 0 and 3 (for 8-bit, 16-bit, 32-bit, 64-bit)
 			//  -> We are silently treating INT_CONST as INT_64 by ignoring flag 0x04
-			const uint8 sourceSize = (sourceBits & 0x03);
-			const uint8 targetSize = (targetBits & 0x03);
+			const uint8 sourceSizeBits = (sourceBits & 0x03);
+			const uint8 targetSizeBits = (targetBits & 0x03);
 
 			// No need for an opcode if size does not change at all
-			if (sourceSize != targetSize)
+			if (sourceSizeBits != targetSizeBits)
 			{
-				uint8 castType = (sourceSize << 4) + targetSize;
+				uint8 castTypeBits = (sourceSizeBits << 2) + targetSizeBits;
 
 				// Recognize signed up-cast
 				const bool isSourceSigned = (sourceBits & 0x08) != 0;
-				if (isSourceSigned && targetSize > sourceSize)
+				if (isSourceSigned && targetSizeBits > sourceSizeBits)
 				{
-					castType += 0x80;
+					castTypeBits += 0x10;
 				}
 
-				return castType;
+				return (BaseCastType)castTypeBits;
 			}
 			else
 			{
-				return -1;	// No cast needed
+				return BaseCastType::NONE;	// No cast needed
 			}
 		}
 		else
 		{
-			return -2;	// Error: Invalid cast
+			return BaseCastType::INVALID;
 		}
 	}
 
@@ -165,7 +175,8 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
 			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)	// TODO: Strings need their own binary operations (and only few of them make actual sense...)
 		};
 		static const std::vector<BinaryOperatorSignature> signaturesComparison =
 		{
@@ -177,7 +188,8 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL)
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::BOOL)	// TODO: Strings need their own comparison operations
 		};
 		static const std::vector<BinaryOperatorSignature> signaturesTrinary =
 		{
@@ -188,7 +200,8 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8)
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)
 		};
 
 		const std::vector<BinaryOperatorSignature>* signatures = nullptr;

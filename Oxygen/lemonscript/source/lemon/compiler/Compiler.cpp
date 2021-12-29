@@ -435,7 +435,7 @@ namespace lemon
 							}
 							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
 							constantToken.mValue = storedString->getHash();
-							//constantToken.mDataType = &PredefinedDataTypes::STRING;
+							constantToken.mDataType = &PredefinedDataTypes::STRING;
 							break;
 						}
 						case ParserToken::Type::IDENTIFIER:

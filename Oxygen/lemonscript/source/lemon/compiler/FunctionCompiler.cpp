@@ -180,14 +180,17 @@ namespace lemon
 
 	void FunctionCompiler::addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType)
 	{
-		const int castType = TypeCasting::getCastType(sourceType, targetType);
-		if (castType >= 0)
+		const BaseCastType castType = TypeCasting::getBaseCastType(sourceType, targetType);
+		if (castType != BaseCastType::NONE)
 		{
-			addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, castType);
-		}
-		else
-		{
-			CHECK_ERROR(castType != -2, "Cannot cast from " << sourceType->toString() << " to " << targetType->toString(), mLineNumber);
+			if (castType != BaseCastType::INVALID)
+			{
+				addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, (int64)castType);
+			}
+			else
+			{
+				CHECK_ERROR(false, "Cannot cast from " << sourceType->toString() << " to " << targetType->toString(), mLineNumber);
+			}
 		}
 	}
 

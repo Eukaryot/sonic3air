@@ -52,4 +52,10 @@ namespace lemon
 		}
 	}
 
+	const std::string& StringDataType::toString() const
+	{
+		static const std::string TYPE_STRING = "string";
+		return TYPE_STRING;
+	}
+
 }
