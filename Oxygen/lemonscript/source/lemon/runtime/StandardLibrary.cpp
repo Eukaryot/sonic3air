@@ -173,11 +173,11 @@ namespace lemon
 			return (int32)roundToInt(std::cos((float)x / (float)0x10000) * (float)0x10000);
 		}
 
-		uint64 stringformat(StringRef fmt, int argv, uint64* args)
+		StringRef stringformat(StringRef fmt, int argv, uint64* args)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
-			RMX_CHECK(fmt.isValid(), "Unable to resolve format string", return 0);
+			RMX_CHECK(fmt.isValid(), "Unable to resolve format string", return StringRef());
 
 			const std::string& fmtString = *fmt;
 			const int length = (int)fmtString.length();
@@ -285,51 +285,51 @@ namespace lemon
 				}
 			}
 
-			return runtime->addString(result.mBuffer, result.mLength);
+			return StringRef(runtime->addString(result.mBuffer, result.mLength));
 		}
 
-		uint64 stringformat1(StringRef fmt, uint64 arg1)
+		StringRef stringformat1(StringRef fmt, uint64 arg1)
 		{
 			return stringformat(fmt, 1, &arg1);
 		}
 
-		uint64 stringformat2(StringRef fmt, uint64 arg1, uint64 arg2)
+		StringRef stringformat2(StringRef fmt, uint64 arg1, uint64 arg2)
 		{
 			uint64 args[] = { arg1, arg2 };
 			return stringformat(fmt, 2, args);
 		}
 
-		uint64 stringformat3(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3)
+		StringRef stringformat3(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3)
 		{
 			uint64 args[] = { arg1, arg2, arg3 };
 			return stringformat(fmt, 3, args);
 		}
 
-		uint64 stringformat4(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
+		StringRef stringformat4(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4 };
 			return stringformat(fmt, 4, args);
 		}
 
-		uint64 stringformat5(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
+		StringRef stringformat5(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5 };
 			return stringformat(fmt, 5, args);
 		}
 
-		uint64 stringformat6(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
+		StringRef stringformat6(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6 };
 			return stringformat(fmt, 6, args);
 		}
 
-		uint64 stringformat7(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
+		StringRef stringformat7(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
 			return stringformat(fmt, 7, args);
 		}
 
-		uint64 stringformat8(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
+		StringRef stringformat8(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
 			return stringformat(fmt, 8, args);

@@ -772,6 +772,7 @@ namespace lemon
 
 					// Note that return type is not known here yet
 					ReturnNode& node = NodeFactory::create<ReturnNode>();
+					node.setLineNumber(lineNumber);
 
 					if (tokens.size() > 1)
 					{
@@ -794,6 +795,7 @@ namespace lemon
 						ExternalNode& node = NodeFactory::create<ExternalNode>();
 						node.mStatementToken = tokens[1].as<StatementToken>();
 						node.mSubType = (keyword == Keyword::CALL) ? ExternalNode::SubType::EXTERNAL_CALL : ExternalNode::SubType::EXTERNAL_JUMP;
+						node.setLineNumber(lineNumber);
 						tokens.erase(1);
 						return &node;
 					}
@@ -803,6 +805,7 @@ namespace lemon
 
 						JumpNode& node = NodeFactory::create<JumpNode>();
 						node.mLabelToken = tokens[1].as<LabelToken>();
+						node.setLineNumber(lineNumber);
 						tokens.erase(1);
 						return &node;
 					}
@@ -814,13 +817,17 @@ namespace lemon
 				case Keyword::BREAK:
 				{
 					CHECK_ERROR(tokens.size() == 1, "There must be no token after 'break' keyword", lineNumber);
-					return &NodeFactory::create<BreakNode>();
+					BreakNode& newNode = NodeFactory::create<BreakNode>();
+					newNode.setLineNumber(lineNumber);
+					return &newNode;
 				}
 
 				case Keyword::CONTINUE:
 				{
 					CHECK_ERROR(tokens.size() == 1, "There must be no token after 'continue' keyword", lineNumber);
-					return &NodeFactory::create<ContinueNode>();
+					ContinueNode& newNode = NodeFactory::create<ContinueNode>();
+					newNode.setLineNumber(lineNumber);
+					return &newNode;
 				}
 
 				case Keyword::IF:
@@ -833,12 +840,14 @@ namespace lemon
 
 					IfStatementNode& node = NodeFactory::create<IfStatementNode>();
 					node.mConditionToken = tokens[1].as<StatementToken>();
+					node.setLineNumber(lineNumber);
 					tokens.erase(1);
 
 					// Go on with the next node, which must be either a block or a statement
 					{
 						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
 						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'if' line", node.getLineNumber());
+						newNode->setLineNumber(node.getLineNumber());
 						node.mContentIf = newNode;
 						nodesIterator.eraseCurrent();
 					}
@@ -866,6 +875,7 @@ namespace lemon
 
 								Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
 								CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'else' line", node.getLineNumber());
+								newNode->setLineNumber(node.getLineNumber());
 								node.mContentElse = newNode;
 								nodesIterator.eraseCurrent();
 							}
@@ -891,12 +901,14 @@ namespace lemon
 
 					WhileStatementNode& node = NodeFactory::create<WhileStatementNode>();
 					node.mConditionToken = tokens[1].as<StatementToken>();
+					node.setLineNumber(lineNumber);
 					tokens.erase(1);
 
 					// Go on with the next node, which must be either a block or a statement
 					{
 						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
 						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'while' line", node.getLineNumber());
+						newNode->setLineNumber(node.getLineNumber());
 						node.mContent = newNode;
 						nodesIterator.eraseCurrent();
 					}
@@ -957,11 +969,13 @@ namespace lemon
 					node.mInitialToken   = statements[0];
 					node.mConditionToken = statements[1];
 					node.mIterationToken = statements[2];
+					node.setLineNumber(lineNumber);
 
 					// Go on with the next node, which must be either a block or a statement
 					{
 						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
 						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'for' line", node.getLineNumber());
+						newNode->setLineNumber(node.getLineNumber());
 						node.mContent = newNode;
 						nodesIterator.eraseCurrent();
 					}
@@ -982,6 +996,7 @@ namespace lemon
 
 			LabelNode& node = NodeFactory::create<LabelNode>();
 			node.mLabel = tokens[0].as<LabelToken>().mName;
+			node.setLineNumber(lineNumber);
 			return &node;
 		}
 		else
@@ -995,6 +1010,7 @@ namespace lemon
 
 			StatementNode& node = NodeFactory::create<StatementNode>();
 			node.mStatementToken = tokens[0].as<StatementToken>();
+			node.setLineNumber(lineNumber);
 			tokens.erase(0);
 			return &node;
 		}
@@ -1020,6 +1036,7 @@ namespace lemon
 				{
 					UndefinedNode& un = nextNode.as<UndefinedNode>();
 					Node* newNode = processUndefinedNode(un, function, scopeContext, nodesIterator);
+					newNode->setLineNumber(un.getLineNumber());
 					return newNode;
 				}
 

@@ -24,6 +24,6 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint32>()		{ return &PredefinedDataTypes::UINT_32; }
 		template<> const DataTypeDefinition* getDataType<int64>()		{ return &PredefinedDataTypes::INT_64; }
 		template<> const DataTypeDefinition* getDataType<uint64>()		{ return &PredefinedDataTypes::UINT_64; }
-		template<> const DataTypeDefinition* getDataType<StringRef>()	{ return &PredefinedDataTypes::UINT_64; }	// TODO: Should be replaced with the string type
+		template<> const DataTypeDefinition* getDataType<StringRef>()	{ return &PredefinedDataTypes::STRING; }
 	}
 }

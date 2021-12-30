@@ -39,7 +39,7 @@ function string getZoneInitials(u8 zone)
 		return "dez"
 	if (zone == 0x0c)
 		return "ddz"
-	return 0
+	return ""
 }
 
 
@@ -47,7 +47,7 @@ function string getZoneActInitials(u16 zoneAndAct)
 {
 	string zoneInitials = getZoneInitials(zoneAndAct >> 8)
 	if (zoneInitials == "")
-		return 0
+		return ""
 
 	return stringformat("%s%d", zoneInitials, (zoneAndAct & 0x01) ? 2 : 1)
 }

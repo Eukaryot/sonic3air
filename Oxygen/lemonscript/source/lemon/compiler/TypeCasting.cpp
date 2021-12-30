@@ -17,16 +17,20 @@ namespace lemon
 
 	uint8 TypeCasting::getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target)
 	{
-		// Treat string type as u64
-		if (original == &PredefinedDataTypes::STRING)
-			original = &PredefinedDataTypes::UINT_64;
-		if (target == &PredefinedDataTypes::STRING)
-			target = &PredefinedDataTypes::UINT_64;
-
 		if (original == target)
 		{
 			// No cast required at all
 			return 0;
+		}
+
+		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
+		if (original == &PredefinedDataTypes::STRING)
+			original = &PredefinedDataTypes::UINT_64;
+
+		if (original == target)
+		{
+			// It's a conversion from string to u64
+			return 1;
 		}
 
 		if (original->mClass == DataTypeDefinition::Class::INTEGER && target->mClass == DataTypeDefinition::Class::INTEGER)
@@ -75,11 +79,12 @@ namespace lemon
 
 	BaseCastType TypeCasting::getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target)
 	{
-		// Treat string type as u64
+		if (original == target)
+			return BaseCastType::NONE;
+
+		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
 		if (original == &PredefinedDataTypes::STRING)
 			original = &PredefinedDataTypes::UINT_64;
-		if (target == &PredefinedDataTypes::STRING)
-			target = &PredefinedDataTypes::UINT_64;
 
 		uint8 sourceBits = 0xff;
 		uint8 targetBits = 0xff;

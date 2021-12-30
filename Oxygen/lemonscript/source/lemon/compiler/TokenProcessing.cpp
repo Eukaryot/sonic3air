@@ -47,6 +47,9 @@ namespace lemon
 
 		bool tryReplaceConstants(const ConstantToken& constLeft, const ConstantToken& constRight, Operator op, int64& outValue)
 		{
+			if (constLeft.mDataType == &PredefinedDataTypes::STRING || constRight.mDataType == &PredefinedDataTypes::STRING)
+				return false;
+
 			switch (op)
 			{
 				case Operator::BINARY_PLUS:			outValue = constLeft.mValue + constRight.mValue;	return true;
@@ -579,7 +582,14 @@ namespace lemon
 		{
 			case Token::Type::CONSTANT:
 			{
-				token.mDataType = (nullptr != resultType) ? resultType : &PredefinedDataTypes::CONST_INT;
+				if (token.mDataType == &PredefinedDataTypes::STRING)
+				{
+					token.mDataType = &PredefinedDataTypes::STRING;
+				}
+				else
+				{
+					token.mDataType = (nullptr != resultType) ? resultType : &PredefinedDataTypes::CONST_INT;
+				}
 				break;
 			}
 

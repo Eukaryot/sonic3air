@@ -23,7 +23,7 @@ function void HUD.drawDigit(u8 digit, u16 px, u16 py, u16 renderQueue)
 	Renderer.drawCustomSprite(stringformat("hud_digit_%d", digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
 }
 
-function void HUD.drawNumber(u64 stringMask, u32 number, u16 px, u16 py, u16 renderQueue)
+function void HUD.drawNumber(string stringMask, u32 number, u16 px, u16 py, u16 renderQueue)
 {
 	while (true)
 	{

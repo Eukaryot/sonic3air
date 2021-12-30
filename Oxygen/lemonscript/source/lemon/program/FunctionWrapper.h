@@ -17,7 +17,7 @@ namespace lemon
 
 	namespace traits
 	{
-		template<typename T> const DataTypeDefinition* getDataType()	{ return T::UNKNOWN_TYPE; }
+		template<typename T> const DataTypeDefinition* getDataType()  { return T::UNKNOWN_TYPE; }
 		template<> const DataTypeDefinition* getDataType<void>();
 		template<> const DataTypeDefinition* getDataType<bool>();
 		template<> const DataTypeDefinition* getDataType<int8>();
@@ -38,9 +38,15 @@ namespace lemon
 		// Return type handlers for functions
 
 		template<typename R>
-		void handleResult(R result, const UserDefinedFunction::Context context)
+		static inline void handleResult(R result, const UserDefinedFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack(traits::getDataType<R>(), result);
+		};
+
+		template<>
+		static inline void handleResult(StringRef result, const UserDefinedFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.mHash);
 		};
 
 		template<typename R>
