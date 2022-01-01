@@ -38,16 +38,14 @@ namespace lemon
 		// Return type handlers for functions
 
 		template<typename R>
-		static inline void handleResult(R result, const UserDefinedFunction::Context context)
+		void handleResult(R result, const UserDefinedFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack(traits::getDataType<R>(), result);
 		};
 
 		template<>
-		static inline void handleResult(StringRef result, const UserDefinedFunction::Context context)
-		{
-			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.mHash);
-		};
+		void handleResult<StringRef>(StringRef result, const UserDefinedFunction::Context context);
+
 
 		template<typename R>
 		struct ReturnTypeHandler0
@@ -489,6 +487,15 @@ namespace lemon
 
 		// Function wrappers
 
+		template<typename T>
+		T popStackGeneric(const UserDefinedFunction::Context context)
+		{
+			return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
+		}
+
+		template<>
+		StringRef popStackGeneric(const UserDefinedFunction::Context context);
+
 		template<typename R>
 		class FunctionWrapperBase : public UserDefinedFunction::FunctionWrapper
 		{
@@ -501,14 +508,7 @@ namespace lemon
 			template<typename T>
 			static inline T popStack(const UserDefinedFunction::Context context)
 			{
-				return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
-			}
-
-			template<>
-			static inline StringRef popStack(const UserDefinedFunction::Context context)
-			{
-				const uint64 stringHash = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
-				return StringRef(stringHash, context.mControlFlow.getRuntime().resolveStringByKey(stringHash));
+				return popStackGeneric<T>(context);
 			}
 		};
 

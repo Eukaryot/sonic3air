@@ -26,4 +26,20 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint64>()		{ return &PredefinedDataTypes::UINT_64; }
 		template<> const DataTypeDefinition* getDataType<StringRef>()	{ return &PredefinedDataTypes::STRING; }
 	}
+
+	namespace internal
+	{
+		template<>
+		void handleResult(StringRef result, const UserDefinedFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.mHash);
+		};
+
+		template<>
+		StringRef popStackGeneric(const UserDefinedFunction::Context context)
+		{
+			const uint64 stringHash = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
+			return StringRef(stringHash, context.mControlFlow.getRuntime().resolveStringByKey(stringHash));
+		}
+	}
 }
