@@ -566,7 +566,7 @@ function void fn04d09e()
 {
 	if (bluespheregame.fully_unlocked != 0)
 	{
-		if (bluespheregame.menu_selection == 0) != (u8[0xffffffab] == 0)
+		if ((bluespheregame.menu_selection == 0) != (u8[0xffffffab] == 0))
 		{
 			D1 = (bluespheregame.current_stage + 1) & 0x07ffffff
 			fn04d13a()
