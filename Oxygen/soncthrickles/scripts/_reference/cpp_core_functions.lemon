@@ -53,29 +53,29 @@ declare function s16 cos_s16(s16)
 
 declare function s32 cos_s32(s32)
 
-declare function u64 stringformat(u64, u64)
+declare function string stringformat(string, u64)
 
-declare function u64 stringformat(u64, u64, u64)
+declare function string stringformat(string, u64, u64)
 
-declare function u64 stringformat(u64, u64, u64, u64)
+declare function string stringformat(string, u64, u64, u64)
 
-declare function u64 stringformat(u64, u64, u64, u64, u64)
+declare function string stringformat(string, u64, u64, u64, u64)
 
-declare function u64 stringformat(u64, u64, u64, u64, u64, u64)
+declare function string stringformat(string, u64, u64, u64, u64, u64)
 
-declare function u64 stringformat(u64, u64, u64, u64, u64, u64, u64)
+declare function string stringformat(string, u64, u64, u64, u64, u64, u64)
 
-declare function u64 stringformat(u64, u64, u64, u64, u64, u64, u64, u64)
+declare function string stringformat(string, u64, u64, u64, u64, u64, u64, u64)
 
-declare function u64 stringformat(u64, u64, u64, u64, u64, u64, u64, u64, u64)
+declare function string stringformat(string, u64, u64, u64, u64, u64, u64, u64, u64)
 
-declare function u32 strlen(u64 string)
+declare function u32 strlen(string string)
 
-declare function u8 getchar(u64 string, u32 index)
+declare function u8 getchar(string string, u32 index)
 
-declare function u64 substring(u64 string, u32 index, u32 length)
+declare function u64 substring(string string, u32 index, u32 length)
 
-declare function void assert(u8, u64)
+declare function void assert(u8, string)
 
 declare function void assert(u8)
 
@@ -107,15 +107,15 @@ declare function u32 pop()
 
 declare function u32 System.loadPersistentData(u32 targetAddress, u64 key, u32 bytes)
 
-declare function void System.savePersistentData(u32 sourceAddress, u64 key, u32 bytes)
+declare function void System.savePersistentData(u32 sourceAddress, string key, u32 bytes)
 
 declare function u32 SRAM.load(u32 address, u16 offset, u16 bytes)
 
 declare function void SRAM.save(u32 address, u16 offset, u16 bytes)
 
-declare function void System.setupCallFrame(u64 functionName)
+declare function void System.setupCallFrame(string functionName)
 
-declare function void System.setupCallFrame(u64 functionName, u64 labelName)
+declare function void System.setupCallFrame(string functionName, string labelName)
 
 declare function u32 System.rand()
 
@@ -265,7 +265,7 @@ declare function void Renderer.drawCustomSpriteTinted(u64 key, s16 px, s16 py, u
 
 declare function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
 
-declare function void Renderer.extractCustomSprite(u64 key, u64 categoryName, u8 spriteNumber, u8 atex)
+declare function void Renderer.extractCustomSprite(u64 key, string categoryName, u8 spriteNumber, u8 atex)
 
 declare function void Renderer.addSpriteMask(s16 px, s16 py, s16 width, s16 height, u16 renderQueue, u8 priorityFlag)
 
@@ -289,7 +289,7 @@ declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height)
 
 declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
 
-declare function void Renderer.drawText(u64 fontKey, s32 px, s32 py, u64 text, u32 tintColor, u8 alignment, s8 spacing, u16 renderQueue, s8 useWorldSpace)
+declare function void Renderer.drawText(string fontKey, s32 px, s32 py, string text, u32 tintColor, u8 alignment, s8 spacing, u16 renderQueue, s8 useWorldSpace)
 
 declare function s8 Audio.isPlayingAudio(u64 id)
 
@@ -305,49 +305,49 @@ declare function void Audio.fadeOutChannel(u8 channel, u16 length)
 
 declare function void Audio.playOverride(u64 sfxId, u8 contextId, u8 channelId, u8 overriddenChannelId)
 
-declare function void Audio.enableAudioModifier(u8 channel, u8 context, u64 postfix, u32 relativeSpeed)
+declare function void Audio.enableAudioModifier(u8 channel, u8 context, string postfix, u32 relativeSpeed)
 
 declare function void Audio.disableAudioModifier(u8 channel, u8 context)
 
-declare function u8 Mods.isModActive(u64 modName)
+declare function u8 Mods.isModActive(string modName)
 
-declare function s32 Mods.getModPriority(u64 modName)
+declare function s32 Mods.getModPriority(string modName)
 
-declare function void debugLog(u64 string)
+declare function void debugLog(string string)
 
-declare function void debugLogColors(u64 name, u32 startAddress, u8 numColors)
+declare function void debugLogColors(string name, u32 startAddress, u8 numColors)
 
 declare function void debugWatch(u32 address, u16 bytes)
 
-declare function void debugDumpToFile(u64 filename, u32 startAddress, u32 bytes)
+declare function void debugDumpToFile(string filename, u32 startAddress, u32 bytes)
 
 declare function s8 ROMDataAnalyser.isEnabled()
 
-declare function s8 ROMDataAnalyser.hasEntry(u64 category, u32 address)
+declare function s8 ROMDataAnalyser.hasEntry(string category, u32 address)
 
-declare function void ROMDataAnalyser.beginEntry(u64 category, u32 address)
+declare function void ROMDataAnalyser.beginEntry(string category, u32 address)
 
 declare function void ROMDataAnalyser.endEntry()
 
-declare function void ROMDataAnalyser.addKeyValue(u64 key, u64 value)
+declare function void ROMDataAnalyser.addKeyValue(string key, string value)
 
-declare function void ROMDataAnalyser.beginObject(u64 key)
+declare function void ROMDataAnalyser.beginObject(string key)
 
 declare function void ROMDataAnalyser.endObject()
 
-declare function s8 System.SidePanel.setupCustomCategory(u64 shortName, u64 fullName)
+declare function s8 System.SidePanel.setupCustomCategory(string shortName, string fullName)
 
-declare function s8 System.SidePanel.addOption(u64 string, s8 defaultValue)
+declare function s8 System.SidePanel.addOption(string string, s8 defaultValue)
 
 declare function void System.SidePanel.addEntry(u64 key)
 
-declare function void System.SidePanel.addLine(u64 string, s8 indent, u32 color)
+declare function void System.SidePanel.addLine(string string, s8 indent, u32 color)
 
-declare function void System.SidePanel.addLine(u64 string, s8 indent)
+declare function void System.SidePanel.addLine(string string, s8 indent)
 
 declare function s8 System.SidePanel.isEntryHovered(u64 key)
 
-declare function void System.writeDisplayLine(u64 string)
+declare function void System.writeDisplayLine(string string)
 
 declare function u32 Game.getSetting(u32 settingId)
 
@@ -399,13 +399,13 @@ declare function void Game.startSkippableCutscene()
 
 declare function void Game.endSkippableCutscene()
 
-declare function void Game.setDiscordDetails(u64 text)
+declare function void Game.setDiscordDetails(string text)
 
-declare function void Game.setDiscordState(u64 text)
+declare function void Game.setDiscordState(string text)
 
-declare function void Game.setDiscordLargeImage(u64 imageName)
+declare function void Game.setDiscordLargeImage(string imageName)
 
-declare function void Game.setDiscordSmallImage(u64 imageName)
+declare function void Game.setDiscordSmallImage(string imageName)
 
 declare function s8 Game.isModdedSound(u8 sfxId)
 
