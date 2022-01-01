@@ -11,11 +11,12 @@
 #include "lemon/program/Function.h"
 #include "lemon/compiler/Operators.h"
 
-struct DataTypeDefinition;
-
 
 namespace lemon
 {
+	struct DataTypeDefinition;
+	struct GlobalCompilerConfig;
+
 	class TypeCasting
 	{
 	public:
@@ -30,11 +31,16 @@ namespace lemon
 		};
 
 	public:
-		static uint8 getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target);
-		static BaseCastType getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target);
+		inline explicit TypeCasting(const GlobalCompilerConfig& config) : mConfig(config) {}
 
-		static uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right);
-		static uint32 getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target);
-		static bool getBestSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right, const BinaryOperatorSignature** outSignature);
+		uint8 getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target);
+		BaseCastType getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target);
+
+		uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right);
+		uint32 getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target);
+		bool getBestSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right, const BinaryOperatorSignature** outSignature);
+
+	private:
+		const GlobalCompilerConfig& mConfig;
 	};
 }

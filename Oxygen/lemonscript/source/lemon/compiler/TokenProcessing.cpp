@@ -662,7 +662,7 @@ namespace lemon
 					uint32 bestPriority = 0xff000000;
 					for (const Function* candidateFunction : functions)
 					{
-						const uint32 priority = TypeCasting::getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+						const uint32 priority = TypeCasting(mConfig).getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
 						if (priority < bestPriority)
 						{
 							bestPriority = priority;
@@ -718,7 +718,7 @@ namespace lemon
 
 				// Choose best fitting signature
 				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
-				const bool result = TypeCasting::getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
+				const bool result = TypeCasting(mConfig).getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
 				CHECK_ERROR(result, "Cannot implicitly cast between types '" << leftDataType->toString() << "' and '" << rightDataType->toString() << "'", mLineNumber);
 
 				token.mDataType = signature->mResult;
@@ -757,7 +757,7 @@ namespace lemon
 				assignStatementDataType(*vct.mArgument, token.mDataType);
 
 				// Check if types fit together at all
-				CHECK_ERROR(TypeCasting::getImplicitCastPriority(vct.mArgument->mDataType, vct.mDataType) != 0xff, "Explicit cast not possible", mLineNumber);
+				CHECK_ERROR(TypeCasting(mConfig).getImplicitCastPriority(vct.mArgument->mDataType, vct.mDataType) != 0xff, "Explicit cast not possible", mLineNumber);
 				break;
 			}
 

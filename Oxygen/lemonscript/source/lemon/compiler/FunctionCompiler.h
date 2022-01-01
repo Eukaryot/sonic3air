@@ -13,25 +13,19 @@
 
 namespace lemon
 {
-
 	class ScriptFunction;
 	class Node;
 	class BlockNode;
 	class StatementToken;
 	class BinaryOperationToken;
+	struct GlobalCompilerConfig;
 
 	class FunctionCompiler
 	{
 	friend struct OpcodeBuilder;
 
 	public:
-		struct Configuration
-		{
-			const DataTypeDefinition* mExternalAddressType = nullptr;
-		};
-
-	public:
-		FunctionCompiler(ScriptFunction& function, const Configuration& config);
+		FunctionCompiler(ScriptFunction& function, const GlobalCompilerConfig& config);
 
 		void processParameters();
 		void buildOpcodesForFunction(const BlockNode& blockNode);
@@ -65,7 +59,7 @@ namespace lemon
 
 	private:
 		ScriptFunction& mFunction;
-		const Configuration& mConfig;
+		const GlobalCompilerConfig& mConfig;
 		std::vector<Opcode>& mOpcodes;
 		uint32 mLineNumber = 0;		// For error output
 	};

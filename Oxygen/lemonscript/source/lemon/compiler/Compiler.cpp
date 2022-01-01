@@ -86,7 +86,7 @@ namespace lemon
 	Compiler::Compiler(Module& module, GlobalsLookup& globalsLookup) :
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
-		mPreprocessor(*new Preprocessor())
+		mPreprocessor(*new Preprocessor(mGlobalCompilerConfig))
 	{
 	}
 
@@ -94,7 +94,7 @@ namespace lemon
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
 		mCompileOptions(compileOptions),
-		mPreprocessor(*new Preprocessor())
+		mPreprocessor(*new Preprocessor(mGlobalCompilerConfig))
 	{
 	}
 
@@ -107,6 +107,7 @@ namespace lemon
 	{
 		mErrors.clear();
 		mModule.startCompiling(mGlobalsLookup);
+		mGlobalCompilerConfig.mExternalAddressType = mCompileOptions.mExternalAddressType;
 
 		// Read input file(s)
 		std::vector<std::string_view> inputLines;
@@ -376,9 +377,12 @@ namespace lemon
 			// Check for pragma
 			if (parserTokens[0].getType() == ParserToken::Type::PRAGMA)
 			{
-				PragmaNode& node = addNode<PragmaNode>(blockStack, lineNumber);
-				node.mContent.swap(parserTokens[0].as<PragmaParserToken>().mContent);
-
+				std::string& content = parserTokens[0].as<PragmaParserToken>().mContent;
+				if (!processGlobalPragma(content))
+				{
+					PragmaNode& node = addNode<PragmaNode>(blockStack, lineNumber);
+					node.mContent.swap(content);
+				}
 				isUndefined = false;
 			}
 
@@ -700,10 +704,7 @@ namespace lemon
 		processUndefinedNodesInBlock(content, function, scopeContext);
 
 		// Build opcodes out of nodes inside the function's block
-		FunctionCompiler::Configuration config;
-		config.mExternalAddressType = mCompileOptions.mExternalAddressType;
-
-		FunctionCompiler functionCompiler(function, config);
+		FunctionCompiler functionCompiler(function, mGlobalCompilerConfig);
 		functionCompiler.processParameters();
 		functionCompiler.buildOpcodesForFunction(content);
 	}
@@ -762,7 +763,9 @@ namespace lemon
 				case Keyword::RETURN:
 				{
 					// Process tokens
-					TokenProcessing(TokenProcessing::Context(mGlobalsLookup, scopeContext.mLocalVariables, &function)).processTokens(tokens, lineNumber);
+					const TokenProcessing::Context context(mGlobalsLookup, scopeContext.mLocalVariables, &function);
+					TokenProcessing tokenProcessing(context, mGlobalCompilerConfig);
+					tokenProcessing.processTokens(tokens, lineNumber);
 
 					if (tokens.size() > 1)
 					{
@@ -832,6 +835,9 @@ namespace lemon
 
 				case Keyword::IF:
 				{
+					if (mGlobalCompilerConfig.mScriptFeatureLevel >= 2)
+						CHECK_ERROR(tokens.size() >= 2 && isOperator(tokens[1], Operator::PARENTHESIS_LEFT), "Expected parentheses after 'if' keyword", lineNumber);
+
 					// Process tokens
 					processTokens(tokens, function, scopeContext, lineNumber);
 
@@ -1049,8 +1055,28 @@ namespace lemon
 
 	void Compiler::processTokens(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, uint32 lineNumber, const DataTypeDefinition* resultType)
 	{
-		TokenProcessing::Context context(mGlobalsLookup, scopeContext.mLocalVariables, &function);
-		TokenProcessing(context).processTokens(tokens, lineNumber, resultType);
+		const TokenProcessing::Context context(mGlobalsLookup, scopeContext.mLocalVariables, &function);
+		TokenProcessing tokenProcessing(context, mGlobalCompilerConfig);
+		tokenProcessing.processTokens(tokens, lineNumber, resultType);
+	}
+
+	bool Compiler::processGlobalPragma(const std::string& content)
+	{
+		static const std::string PREFIX_FEATURE_LEVEL = "script-feature-level(";
+		String str(content);
+		str.trimWhitespace();
+		if (str.startsWith(PREFIX_FEATURE_LEVEL.c_str()) && str.endsWith(")"))
+		{
+			str.remove(0, PREFIX_FEATURE_LEVEL.size());
+			str.remove(str.length() - 1, 1);
+			const uint64 value = rmx::parseInteger(str);
+			if (value > 0)
+			{
+				mGlobalCompilerConfig.mScriptFeatureLevel = (uint32)value;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

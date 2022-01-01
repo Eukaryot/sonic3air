@@ -20,7 +20,8 @@
 namespace lemon
 {
 
-	Preprocessor::Preprocessor()
+	Preprocessor::Preprocessor(const GlobalCompilerConfig& config) :
+		mConfig(config)
 	{
 	}
 
@@ -265,7 +266,8 @@ namespace lemon
 			GlobalsLookup globalsLookup;
 			std::vector<LocalVariable*> localVariables;
 			TokenProcessing::Context tokenProcessingContext(globalsLookup, localVariables, nullptr);
-			TokenProcessing(tokenProcessingContext).processForPreprocessor(tokenList, mLineNumber);
+			TokenProcessing tokenProcessing(tokenProcessingContext, mConfig);
+			tokenProcessing.processForPreprocessor(tokenList, mLineNumber);
 		}
 
 		// Now traverse the tree recursively

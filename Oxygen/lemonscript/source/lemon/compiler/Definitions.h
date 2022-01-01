@@ -11,6 +11,13 @@
 
 namespace lemon
 {
+	struct DataTypeDefinition;
+
+	struct GlobalCompilerConfig
+	{
+		uint32 mScriptFeatureLevel = 1;
+		const DataTypeDefinition* mExternalAddressType = nullptr;
+	};
 
 	enum class Keyword : uint8
 	{

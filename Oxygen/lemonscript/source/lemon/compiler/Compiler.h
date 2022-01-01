@@ -9,6 +9,7 @@
 #pragma once
 
 #include "lemon/program/Opcode.h"
+#include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/PreprocessorDefinition.h"
 
 
@@ -111,10 +112,14 @@ namespace lemon
 		Node* gatherNextStatement(NodesIterator& nodesIterator, ScriptFunction& function, ScopeContext& scopeContext);
 		void processTokens(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 
+		// Misc
+		bool processGlobalPragma(const std::string& content);
+
 	private:
 		Module& mModule;
 		GlobalsLookup& mGlobalsLookup;
 		CompileOptions mCompileOptions;
+		GlobalCompilerConfig mGlobalCompilerConfig;
 		Preprocessor& mPreprocessor;		// Must stay alive as it holds the modified code lines
 
 		struct ScriptFile

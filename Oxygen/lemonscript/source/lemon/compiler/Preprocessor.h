@@ -15,11 +15,12 @@ namespace lemon
 {
 	class Parser;
 	class StatementToken;
+	struct GlobalCompilerConfig;
 
 	class Preprocessor
 	{
 	public:
-		Preprocessor();
+		Preprocessor(const GlobalCompilerConfig& config);
 
 		void processLines(std::vector<std::string_view>& lines);
 
@@ -33,6 +34,7 @@ namespace lemon
 		int64 evaluateConditionToken(const StatementToken& token) const;
 
 	private:
+		const GlobalCompilerConfig& mConfig;
 		std::string mBufferString;
 		uint32 mLineNumber;
 	};

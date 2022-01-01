@@ -19,6 +19,7 @@ namespace lemon
 	class LocalVariable;
 	class TokenList;
 	class StatementToken;
+	struct GlobalCompilerConfig;
 
 	class TokenProcessing
 	{
@@ -35,7 +36,7 @@ namespace lemon
 		};
 
 	public:
-		inline TokenProcessing(const Context& context) : mContext(context) {}
+		inline TokenProcessing(const Context& context, const GlobalCompilerConfig& config) : mContext(context), mConfig(config) {}
 
 		void processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
@@ -61,6 +62,7 @@ namespace lemon
 
 	private:
 		const Context& mContext;
+		const GlobalCompilerConfig& mConfig;
 		uint32 mLineNumber = 0;
 	};
 

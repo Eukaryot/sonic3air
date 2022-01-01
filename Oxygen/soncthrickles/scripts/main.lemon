@@ -7,6 +7,16 @@
 */
 
 
+//# script-feature-level(2)
+
+// Script feature levels
+//  - Highers level can introduce additional script language features, but can also be stricter in what is reported as an error by the compiler
+//  - Level 1 is the original version (until Dec 2021)
+//  - Changes for level 2:
+//     - string as a dedicated type; no conversion from u64 to string is possible any more, but string to u64 is still fine
+//     - the condition after 'if' must be put in parentheses, like in C/C++
+
+
 include all_includes
 
 

@@ -91,7 +91,7 @@ namespace lemon
 	};
 
 
-	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const Configuration& config) :
+	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const GlobalCompilerConfig& config) :
 		mFunction(function),
 		mConfig(config),
 		mOpcodes(function.mOpcodes)
@@ -180,7 +180,7 @@ namespace lemon
 
 	void FunctionCompiler::addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType)
 	{
-		const BaseCastType castType = TypeCasting::getBaseCastType(sourceType, targetType);
+		const BaseCastType castType = TypeCasting(mConfig).getBaseCastType(sourceType, targetType);
 		if (castType != BaseCastType::NONE)
 		{
 			if (castType != BaseCastType::INVALID)

@@ -8,6 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/TypeCasting.h"
+#include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/DataType.h"
 
@@ -24,12 +25,18 @@ namespace lemon
 		}
 
 		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
+		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
 		if (original == &PredefinedDataTypes::STRING)
 			original = &PredefinedDataTypes::UINT_64;
+		if (mConfig.mScriptFeatureLevel < 2)
+		{
+			if (target == &PredefinedDataTypes::STRING)
+				target = &PredefinedDataTypes::UINT_64;
+		}
 
 		if (original == target)
 		{
-			// It's a conversion from string to u64
+			// It's a conversion between string and u64
 			return 1;
 		}
 
@@ -83,8 +90,14 @@ namespace lemon
 			return BaseCastType::NONE;
 
 		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
+		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
 		if (original == &PredefinedDataTypes::STRING)
 			original = &PredefinedDataTypes::UINT_64;
+		if (mConfig.mScriptFeatureLevel < 2)
+		{
+			if (target == &PredefinedDataTypes::STRING)
+				target = &PredefinedDataTypes::UINT_64;
+		}
 
 		uint8 sourceBits = 0xff;
 		uint8 targetBits = 0xff;
