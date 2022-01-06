@@ -34,7 +34,7 @@ function u16 getScreenExtend()
 	// This is actually "(getScreenWidth() - 320) / 2"
 #if STANDALONE
 	return 40
-else
+#else
 	return 0
 #endif
 }
