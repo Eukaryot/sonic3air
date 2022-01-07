@@ -10,6 +10,7 @@
 
 #include "oxygen_netcore/serverclient/Packets.h"
 
+class GameClient;
 struct ReceivedPacketEvaluation;
 
 
@@ -38,7 +39,7 @@ public:
 	};
 
 public:
-	inline GhostSync(NetConnection& serverConnection) : mServerConnection(serverConnection) {}
+	inline GhostSync(GameClient& gameClient) : mGameClient(gameClient) {}
 
 	bool isActive() const;
 
@@ -74,7 +75,7 @@ private:
 	void serializeGhostData(VectorBinarySerializer& serializer, GhostData& ghostData);
 
 private:
-	NetConnection& mServerConnection;
+	GameClient& mGameClient;
 	State mState = State::INACTIVE;
 
 	network::JoinChannelRequest mJoinChannelRequest;

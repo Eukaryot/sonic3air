@@ -86,8 +86,6 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 				}
 			}
 
-			gameServerHelper.tryReadBool("EnableUpdateCheck", mGameServer.mEnableUpdateCheck);
-			
 			// Ghost sync settings
 			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
 			if (!ghostSyncJson.isNull())

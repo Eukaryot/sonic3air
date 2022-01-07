@@ -8,6 +8,7 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/client/GhostSync.h"
+#include "sonic3air/client/GameClient.h"
 #include "sonic3air/data/SharedDatabase.h"
 #include "sonic3air/helper/GameUtils.h"
 #include "sonic3air/ConfigurationImpl.h"
@@ -45,7 +46,7 @@ void GhostSync::performUpdate()
 				// Join channel
 				mJoinChannelRequest.mQuery.mChannelName = "sonic3air-ghostsync-" + ConfigurationImpl::instance().mGameServer.mGhostSync.mChannelName + "-" + subChannelName;
 				mJoinChannelRequest.mQuery.mChannelHash = (uint32)rmx::getMurmur2_64(mJoinChannelRequest.mQuery.mChannelName);
-				mServerConnection.sendRequest(mJoinChannelRequest);
+				mGameClient.getServerConnection().sendRequest(mJoinChannelRequest);
 
 				mJoiningSubChannelName = subChannelName;
 				mState = State::JOINING_CHANNEL;
@@ -78,7 +79,7 @@ void GhostSync::performUpdate()
 			if (mJoiningSubChannelName != subChannelName)
 			{
 				mLeaveChannelRequest.mQuery.mChannelHash = mJoinedChannelHash;
-				mServerConnection.sendRequest(mLeaveChannelRequest);
+				mGameClient.getServerConnection().sendRequest(mLeaveChannelRequest);
 
 				mJoiningSubChannelName = nullptr;
 				mState = State::LEAVING_CHANNEL;
@@ -242,7 +243,7 @@ void GhostSync::updateSending()
 		packet.mChannelHash = mJoinedChannelHash;
 		packet.mMessageType = GHOSTSYNC_BROADCAST_MESSAGE_TYPE;
 		packet.mMessageVersion = GHOSTSYNC_BROADCAST_MESSAGE_VERSION;
-		mServerConnection.sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
+		mGameClient.getServerConnection().sendPacket(packet, NetConnection::SendFlags::UNRELIABLE);
 
 		mOwnUnsentGhostData.clear();
 	}

@@ -66,13 +66,13 @@ private:
 		enum Id
 		{
 			MODS	 = 0,
-			DISPLAY	 = 1,
-			AUDIO	 = 2,
-			VISUALS	 = 3,
-			GAMEPLAY = 4,
-			CONTROLS = 5,
-			TWEAKS	 = 6,
-			INFO	 = 7,
+			SYSTEM	 = 1,
+			DISPLAY	 = 2,
+			AUDIO	 = 3,
+			VISUALS	 = 4,
+			GAMEPLAY = 5,
+			CONTROLS = 6,
+			TWEAKS	 = 7,
 			_NUM
 		};
 

@@ -13,8 +13,10 @@
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/audio/AudioOut.h"
+#include "sonic3air/client/UpdateCheck.h"
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/Game.h"
+#include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
@@ -29,13 +31,21 @@
 namespace option
 {
 	static const std::string TEXT_NOT_AVAILABLE = "not available";
+}
 
-	static const std::vector<std::string> HINT_TEXTS =
+namespace
+{
+	const String& getVersionString(uint32 buildNumber)
 	{
-		"Have a look at the ", "#Manual", " for an overview",
-		"$of ", "#controller setup", ", ", "#new character moves",
-		"$and ", "#graphics troubleshooting"
-	};
+		static uint32 cachedBuildNumber = 0xffffffff;
+		static String cachedBuildString;
+		if (cachedBuildNumber != buildNumber || cachedBuildNumber == 0xffffffff)
+		{
+			cachedBuildNumber = buildNumber;
+			cachedBuildString.format("v%02x.%02x.%02x.%x", (buildNumber >> 24) & 0xff, (buildNumber >> 16) & 0xff, (buildNumber >> 8) & 0xff, buildNumber & 0xff);
+		}
+		return cachedBuildString;
+	}
 }
 
 
@@ -118,9 +128,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::DEBUG_MODE,				SharedDatabase::Setting::SETTING_DEBUG_MODE);
 		setupOptionEntry(option::TITLE_SCREEN,				SharedDatabase::Setting::SETTING_TITLE_SCREEN);
 
-		//setupOptionEntry(option::LEVELMUSIC_CNZ,			SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
-		//setupOptionEntry(option::LEVELMUSIC_ICZ,			SharedDatabase::Setting::SETTING_ICZ_PROTOTYPE_MUSIC);
-		//setupOptionEntry(option::LEVELMUSIC_LBZ,			SharedDatabase::Setting::SETTING_LBZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ1,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_CNZ2,	SharedDatabase::Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
 		setupOptionEntryBitmask(option::LEVELMUSIC_ICZ1,	SharedDatabase::Setting::SETTING_ICZ_PROTOTYPE_MUSIC);
@@ -132,13 +139,13 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	// Build up tab menu entries
 	mTabMenuEntries.addEntry("", option::_TAB_SELECTION)
 		.addOption("MODS",     Tab::Id::MODS)
+		.addOption("SYSTEM",   Tab::Id::SYSTEM)
 		.addOption("DISPLAY",  Tab::Id::DISPLAY)
 		.addOption("AUDIO",    Tab::Id::AUDIO)
 		.addOption("VISUALS",  Tab::Id::VISUALS)
 		.addOption("GAMEPLAY", Tab::Id::GAMEPLAY)
 		.addOption("CONTROLS", Tab::Id::CONTROLS)
-		.addOption("TWEAKS",   Tab::Id::TWEAKS)
-		.addOption("INFO",     Tab::Id::INFO);
+		.addOption("TWEAKS",   Tab::Id::TWEAKS);
 
 	for (int i = 0; i < Tab::Id::_NUM; ++i)
 	{
@@ -148,6 +155,22 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	}
 
 	// Mods tab needs to be rebuilt each time again
+
+	// System tab
+	{
+		Tab& tab = mTabs[Tab::Id::SYSTEM];
+		GameMenuEntries& entries = tab.mMenuEntries;
+		std::map<size_t, std::string>& titles = tab.mTitles;
+
+		titles[entries.size()] = "Update";
+
+		entries.addEntry("Check for updates", option::_CHECK_FOR_UPDATE);
+
+		titles[entries.size()] = "More Info";
+
+		entries.addEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
+		entries.addEntry("Open Manual", option::_OPEN_MANUAL);
+	}
 
 	// Display tab
 	{
@@ -612,17 +635,6 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Japan (\"Miles\")", 0x00);
 	}
 
-	// Info tab
-	{
-		Tab& tab = mTabs[Tab::Id::INFO];
-		GameMenuEntries& entries = tab.mMenuEntries;
-		std::map<size_t, std::string>& titles = tab.mTitles;
-
-		titles[entries.size()] = "$Hints";
-
-		entries.addEntry("Open Manual in web browser", option::_OPEN_MANUAL);
-	}
-
 	for (int i = 1; i < Tab::Id::_NUM; ++i)		// Exclude "Mods" tab
 	{
 		GameMenuEntries& entries = mTabs[i].mMenuEntries;
@@ -965,6 +977,18 @@ void OptionsMenu::update(float timeElapsed)
 						break;
 					}
 
+					case option::_CHECK_FOR_UPDATE:
+					{
+						GameClient::instance().getUpdateCheck().startUpdateCheck();
+						break;
+					}
+
+					case option::_OPEN_HOMEPAGE:
+					{
+						PlatformFunctions::openURLExternal("https://sonic3air.org/");
+						break;
+					}
+
 					case option::_OPEN_MANUAL:
 					{
 						PlatformFunctions::openURLExternal("https://sonic3air.org/Manual.pdf");
@@ -1103,45 +1127,60 @@ void OptionsMenu::render()
 				}
 				if (nullptr != pendingTitle)
 				{
-					if (*pendingTitle == "$Hints")
-					{
-						// Show hint text
-						py += 16;
-						int px = baseX - 152;
-						for (size_t k = 0; k < option::HINT_TEXTS.size(); ++k)
-						{
-							const char* text = option::HINT_TEXTS[k].c_str();
-							if (text[0] == '$')
-							{
-								px = baseX - 152;
-								py += 12;
-								++text;
-							}
-							const bool highlighted = (text[0] == '#');
-							if (highlighted)
-							{
-								++text;
-							}
-							const int width = global::mFont7.getWidth(text);
-							drawer.printText(global::mFont7, Recti(px, py, width, 10), text, 1, (highlighted) ? Color(0.5f, 1.0f, 0.75f, tabAlpha) : Color(0.8f, 0.8f, 0.8f, tabAlpha));
-							px += width;
-						}
-						py += 16;
-						py += 8;
-					}
-					else
-					{
-						// Show title
-						py += (sectionIterator != tab.mSections.end()) ? 4 : 15;
-						drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), ("* " + *pendingTitle + " *"), 5, Color(0.6f, 0.8f, 1.0f, tabAlpha));
-						py += 18;
+					// Show title
+					py += (sectionIterator != tab.mSections.end()) ? 4 : 15;
+					drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), ("* " + *pendingTitle + " *"), 5, Color(0.6f, 0.8f, 1.0f, tabAlpha));
+					py += 18;
 
-						if (line > 1)
+					if (*pendingTitle == "Update")
+					{
+						// Show current version
+						drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Your Game Version:", 4, Color::WHITE);
+						drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), "v" BUILD_STRING, 6, Color(0.8f, 1.0f, 0.8f));
+						py += 12;
+						UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
+						switch (updateCheck.getState())
 						{
-							// Refresh position for scrolling once after text, except if it was the first
-							currentAbsoluteY1 = py - startY;
+							case UpdateCheck::State::INACTIVE:
+							case UpdateCheck::State::FAILED:
+							{
+								drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color::RED);
+								break;
+							}
+							case UpdateCheck::State::SEND_QUERY:
+							case UpdateCheck::State::WAITING_FOR_RESPONSE:
+							{
+								drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "No connection to server", 5, Color::WHITE);
+								break;
+							}
+							case UpdateCheck::State::HAS_RESPONSE:
+							{
+								if (updateCheck.hasUpdate())
+								{
+									drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Update available:", 4, Color::WHITE);
+									drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), getVersionString(updateCheck.getResponse()->mAvailableAppVersion), 6, Color(1.0f, 1.0f, 0.6f));
+								}
+								else
+								{
+									drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "You're using the latest version", 5, Color(0.8f, 1.0f, 0.8f));
+								}
+								break;
+							}
+							default:
+							{
+								drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Last check for updates: unknown", 5, Color(1.0f, 1.0f, 1.0f));
+								break;
+							}
 						}
+						py += 20;
 					}
+
+					if (line > 1)
+					{
+						// Refresh position for scrolling once after text, except if it was the first
+						currentAbsoluteY1 = py - startY;
+					}
+
 					pendingTitle = nullptr;
 				}
 

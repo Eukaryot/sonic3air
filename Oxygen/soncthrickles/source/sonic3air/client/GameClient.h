@@ -22,8 +22,9 @@ public:
 	GameClient();
 	~GameClient();
 
-	GhostSync& getGhostSync() { return mGhostSync; }
-	UpdateCheck& getUpdateCheck() { return mUpdateCheck; }
+	NetConnection& getServerConnection() { return mServerConnection; }
+	GhostSync& getGhostSync()			 { return mGhostSync; }
+	UpdateCheck& getUpdateCheck()		 { return mUpdateCheck; }
 
 	void setupClient();
 	void updateClient(float timeElapsed);

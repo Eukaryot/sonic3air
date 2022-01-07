@@ -16,7 +16,7 @@ class NetConnection;
 
 class ServerClientBase : public ConnectionListenerInterface
 {
-protected:
+public:
 	static uint64 getCurrentTimestamp();
 
 protected:

@@ -15,8 +15,8 @@
 
 GameClient::GameClient() :
 	mConnectionManager(mSocket, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
-	mGhostSync(mServerConnection),
-	mUpdateCheck(mServerConnection)
+	mGhostSync(*this),
+	mUpdateCheck(*this)
 {
 #if defined(DEBUG) && 0
 	// Just for testing / debugging

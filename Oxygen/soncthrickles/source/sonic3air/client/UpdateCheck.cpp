@@ -8,6 +8,7 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/client/UpdateCheck.h"
+#include "sonic3air/client/GameClient.h"
 #include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/version.inc"
 
@@ -39,10 +40,30 @@ namespace
 
 bool UpdateCheck::hasUpdate() const
 {
-	if (mState == State::HAS_RESPONSE)
+	if (mState != State::HAS_RESPONSE)
 		return false;
 
 	return mAppUpdateCheckRequest.mResponse.mHasUpdate;
+}
+
+const network::AppUpdateCheckRequest::Response* UpdateCheck::getResponse() const
+{
+	if (!hasUpdate())
+		return nullptr;
+
+	return &mAppUpdateCheckRequest.mResponse;
+}
+
+void UpdateCheck::startUpdateCheck()
+{
+	if (mState != State::READY_TO_START)
+		return;
+
+	// No update check if the last update check in the last 60 seconds
+	if (mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 60 * 1000)
+		return;
+
+	mState = State::SEND_QUERY;
 }
 
 void UpdateCheck::performUpdate()
@@ -52,15 +73,16 @@ void UpdateCheck::performUpdate()
 
 	switch (mState)
 	{
-		case State::READY_TO_START:
+		case State::SEND_QUERY:
 		{
 			mAppUpdateCheckRequest.mQuery.mAppName = "sonic3air";
 			mAppUpdateCheckRequest.mQuery.mPlatform = ::getPlatformName();
 			mAppUpdateCheckRequest.mQuery.mReleaseChannel = "test";		// TODO: Differentiate between "stable", "preview", "test"
 			mAppUpdateCheckRequest.mQuery.mInstalledAppVersion = BUILD_NUMBER;
 			mAppUpdateCheckRequest.mQuery.mInstalledContentVersion = BUILD_NUMBER;
-			mServerConnection.sendRequest(mAppUpdateCheckRequest);
+			mGameClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);
 
+			mLastUpdateCheckTimestamp = mGameClient.getCurrentTimestamp();
 			mState = State::WAITING_FOR_RESPONSE;
 			break;
 		}
@@ -98,7 +120,7 @@ void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeature
 		}
 	}
 
-	if (supportsUpdate && ConfigurationImpl::instance().mGameServer.mEnableUpdateCheck)
+	if (supportsUpdate)
 	{
 		if (mState == State::INACTIVE)
 			mState = State::READY_TO_START;

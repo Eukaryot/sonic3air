@@ -110,6 +110,8 @@ namespace option
 		SPECIAL_STAGE_REPEAT,
 		REGION,
 
+		_CHECK_FOR_UPDATE,
+		_OPEN_HOMEPAGE,
 		_OPEN_MANUAL,
 		_BACK,
 		_NUM

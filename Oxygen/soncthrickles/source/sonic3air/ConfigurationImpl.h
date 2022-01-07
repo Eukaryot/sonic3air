@@ -50,7 +50,6 @@ public:
 		bool mConnectToServer = false;
 		std::string mServerHostName;
 		int mServerPort = 0;
-		bool mEnableUpdateCheck = false;
 		GhostSync mGhostSync;
 	};
 	GameServer mGameServer;

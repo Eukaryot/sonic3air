@@ -10,29 +10,37 @@
 
 #include "oxygen_netcore/serverclient/Packets.h"
 
+class GameClient;
+
 
 class UpdateCheck
 {
 public:
-	inline UpdateCheck(NetConnection& serverConnection) : mServerConnection(serverConnection) {}
-
-	bool hasUpdate() const;
-
-	void performUpdate();
-	void evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest& request);
-
-private:
 	enum class State
 	{
 		INACTIVE,
 		READY_TO_START,
+		SEND_QUERY,
 		WAITING_FOR_RESPONSE,
 		HAS_RESPONSE,
 		FAILED
 	};
 
+public:
+	inline UpdateCheck(GameClient& gameClient) : mGameClient(gameClient) {}
+
+	inline State getState() const  { return mState; }
+	bool hasUpdate() const;
+	const network::AppUpdateCheckRequest::Response* getResponse() const;
+
+	void startUpdateCheck();
+
+	void performUpdate();
+	void evaluateServerFeaturesResponse(const network::GetServerFeaturesRequest& request);
+
 private:
-	NetConnection& mServerConnection;
+	GameClient& mGameClient;
 	State mState = State::INACTIVE;
 	network::AppUpdateCheckRequest mAppUpdateCheckRequest;
+	uint64 mLastUpdateCheckTimestamp = 0;
 };

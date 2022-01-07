@@ -37,7 +37,6 @@
 	{
 		"ConnectToServer": "1",
 		"ServerAddress": "gameserver.sonic3air.org:21094",
-		"EnableUpdateCheck": "0",
 		"GhostSync":
 		{
 			"Enabled": "1",				// Enable the ghost sync feature by setting this to "1" -- this requires "ConnectToServer" to be enabled
