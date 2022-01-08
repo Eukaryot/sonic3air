@@ -54,7 +54,7 @@ private:
 	State mState = State::INACTIVE;
 	OptionsMenu& mOptionsMenu;
 	GameMenuEntries mMenuEntries;
-	GameMenuEntries::Entry* mControllerSelectEntry = nullptr;
+	GameMenuEntry* mControllerSelectEntry = nullptr;
 	GameMenuEntries mAssignmentType;
 	uint32 mLastGamepadsChangeCounter = 0;
 

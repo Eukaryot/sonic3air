@@ -48,9 +48,9 @@ private:
 	MenuBackground* mMenuBackground = nullptr;
 
 	GameMenuEntries mMenuEntries;
-	GameMenuEntries::Entry* mZoneEntry = nullptr;
-	GameMenuEntries::Entry* mActEntry = nullptr;
-	GameMenuEntries::Entry* mCharacterEntry = nullptr;
+	GameMenuEntry* mZoneEntry = nullptr;
+	GameMenuEntry* mActEntry = nullptr;
+	GameMenuEntry* mCharacterEntry = nullptr;
 
 	State mState = State::INACTIVE;
 	float mVisibility = 0.0f;

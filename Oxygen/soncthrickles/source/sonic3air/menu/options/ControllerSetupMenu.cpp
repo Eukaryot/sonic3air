@@ -67,7 +67,7 @@ void ControllerSetupMenu::initialize()
 {
 	mMenuEntries.reserve(16);
 	{
-		GameMenuEntries::Entry& entry = mMenuEntries.addEntry("", ::CONTROLLER_SELECT);
+		GameMenuEntry& entry = mMenuEntries.addEntry("", ::CONTROLLER_SELECT);
 		mControllerSelectEntry = &entry;
 		refreshGamepadList(true);
 	}
@@ -206,7 +206,7 @@ void ControllerSetupMenu::update(float timeElapsed)
 			{
 				if (buttonEffect == ButtonEffect::ACCEPT)
 				{
-					const GameMenuEntries::Entry& selectedEntry = mMenuEntries.selected();
+					const GameMenuEntry& selectedEntry = mMenuEntries.selected();
 					switch (selectedEntry.mData)
 					{
 						case ::ASSIGN_ALL:
@@ -577,7 +577,7 @@ void ControllerSetupMenu::refreshGamepadList(bool forceUpdate)
 	{
 		mLastGamepadsChangeCounter = changeCounter;
 
-		GameMenuEntries::Entry& entry = *mControllerSelectEntry;
+		GameMenuEntry& entry = *mControllerSelectEntry;
 		const int oldValue = entry.hasSelected() ? entry.selected().mValue : 0;		// Default value 0 = select first controller if something goes wrong
 		if (Application::instance().hasKeyboard())
 		{

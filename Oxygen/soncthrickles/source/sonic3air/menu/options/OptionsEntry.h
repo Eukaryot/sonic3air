@@ -139,7 +139,7 @@ public:
 
 public:
 	option::Option mOptionId = option::_NUM;
-	GameMenuEntries::Entry* mGameMenuEntry = nullptr;
+	GameMenuEntry* mGameMenuEntry = nullptr;
 
 	Type mType = Type::UNDEFINED;
 	SharedDatabase::Setting::Type mSetting = SharedDatabase::Setting::INVALID;

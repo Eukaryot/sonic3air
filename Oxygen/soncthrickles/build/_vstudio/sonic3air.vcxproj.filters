@@ -143,6 +143,9 @@
       <Filter>client</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\pch.cpp" />
+    <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.cpp">
+      <Filter>menu\options</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\client\GhostSync.h">
       <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.h">
+      <Filter>menu\options</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,17 @@
 #include "oxygen/application/input/InputManager.h"
 
 
-GameMenuEntries::Option& GameMenuEntries::Entry::addOptionRef(const std::string& text, uint32 value)
+void GameMenuEntry::performRenderEntry(RenderContext& renderContext)
+{
+	renderContext.mCurrentPosition.y += mMarginAbove;
+
+	// Call virtual method
+	renderEntry(renderContext);
+
+	renderContext.mCurrentPosition.y += mMarginBelow;
+}
+
+GameMenuEntry::Option& GameMenuEntry::addOptionRef(const std::string& text, uint32 value)
 {
 	Option& option = vectorAdd(mOptions);
 	option.mText = text;
@@ -23,27 +33,27 @@ GameMenuEntries::Option& GameMenuEntries::Entry::addOptionRef(const std::string&
 	return option;
 }
 
-GameMenuEntries::Entry& GameMenuEntries::Entry::addOption(const std::string& text, uint32 value)
+GameMenuEntry& GameMenuEntry::addOption(const std::string& text, uint32 value)
 {
 	addOptionRef(text, value);
 	return *this;
 }
 
-GameMenuEntries::Entry& GameMenuEntries::Entry::addNumberOptions(int minValue, int maxValue, int step)
+GameMenuEntry& GameMenuEntry::addNumberOptions(int minValue, int maxValue, int step)
 {
 	for (int value = minValue; value <= maxValue; value += step)
 		addOptionRef(std::to_string(value), value);
 	return *this;
 }
 
-GameMenuEntries::Entry& GameMenuEntries::Entry::addPercentageOptions(int minValue, int maxValue, int step)
+GameMenuEntry& GameMenuEntry::addPercentageOptions(int minValue, int maxValue, int step)
 {
 	for (int value = minValue; value <= maxValue; value += step)
 		addOptionRef(std::to_string(value) + '%', value);
 	return *this;
 }
 
-GameMenuEntries::Option* GameMenuEntries::Entry::getOptionByValue(uint32 value)
+GameMenuEntry::Option* GameMenuEntry::getOptionByValue(uint32 value)
 {
 	for (size_t i = 0; i < mOptions.size(); ++i)
 	{
@@ -53,19 +63,23 @@ GameMenuEntries::Option* GameMenuEntries::Entry::getOptionByValue(uint32 value)
 	return nullptr;
 }
 
-void GameMenuEntries::Entry::setVisible(bool visible)
+void GameMenuEntry::setVisible(bool visible)
 {
-	// Note: This should not be mixed with "setEnabled"
-	mVisibility = visible ? Visibility::VISIBLE : Visibility::INVISIBLE;
+	if (visible)
+		mVisibilityFlags |= (uint8)VisibilityFlag::VISIBLE;
+	else
+		mVisibilityFlags &= ~(uint8)VisibilityFlag::VISIBLE;
 }
 
-void GameMenuEntries::Entry::setEnabled(bool enabled)
+void GameMenuEntry::setInteractable(bool interactable)
 {
-	// Note: This should not be mixed with "setVisible"
-	mVisibility = enabled ? Visibility::VISIBLE : Visibility::DISABLED;
+	if (interactable)
+		mVisibilityFlags |= (uint8)VisibilityFlag::INTERACTABLE;
+	else
+		mVisibilityFlags &= ~(uint8)VisibilityFlag::INTERACTABLE;
 }
 
-bool GameMenuEntries::Entry::setSelectedIndexByValue(uint32 value)
+bool GameMenuEntry::setSelectedIndexByValue(uint32 value)
 {
 	if (mOptions.empty())
 		return false;
@@ -88,7 +102,7 @@ bool GameMenuEntries::Entry::setSelectedIndexByValue(uint32 value)
 	return false;
 }
 
-void GameMenuEntries::Entry::sanitizeSelectedIndex()
+void GameMenuEntry::sanitizeSelectedIndex()
 {
 	if (mSelectedIndex >= mOptions.size())
 	{
@@ -97,6 +111,18 @@ void GameMenuEntries::Entry::sanitizeSelectedIndex()
 }
 
 
+
+GameMenuEntries::~GameMenuEntries()
+{
+	clear();
+}
+
+void GameMenuEntries::clear()
+{
+	for (GameMenuEntry* entry : mEntries)
+		delete entry;
+	mEntries.clear();
+}
 
 void GameMenuEntries::reserve(size_t count)
 {
@@ -108,27 +134,27 @@ void GameMenuEntries::resize(size_t count)
 	mEntries.resize(count);
 }
 
-GameMenuEntries::Entry& GameMenuEntries::addEntry(const std::string& text, uint32 data)
+GameMenuEntry* GameMenuEntries::getEntryByData(uint32 data)
 {
-	Entry& entry = vectorAdd(mEntries);
-	entry.mText = text;
-	entry.mData = data;
-	return entry;
-}
-
-GameMenuEntries::Entry* GameMenuEntries::getEntryByData(uint32 data)
-{
-	for (Entry& entry : mEntries)
+	for (GameMenuEntry* entry : mEntries)
 	{
-		if (entry.mData == data)
-			return &entry;
+		if (entry->mData == data)
+			return entry;
 	}
 	return nullptr;
 }
 
-void GameMenuEntries::insert(const Entry& toCopy, size_t index)
+GameMenuEntry& GameMenuEntries::addEntry(const std::string& text, uint32 data)
 {
-	mEntries.insert(mEntries.begin() + index, toCopy);
+	GameMenuEntry* entry = new GameMenuEntry(text, data);
+	mEntries.push_back(entry);
+	return *entry;
+}
+
+void GameMenuEntries::insert(const GameMenuEntry& toCopy, size_t index)
+{
+	GameMenuEntry* newEntry = new GameMenuEntry(toCopy);
+	mEntries.insert(mEntries.begin() + index, newEntry);
 }
 
 void GameMenuEntries::erase(size_t index)
@@ -195,8 +221,8 @@ GameMenuEntries::UpdateResult GameMenuEntries::update()
 						mSelectedEntryIndex = (int)mEntries.size() - 1;
 					}
 
-					// Continue for invisible and unavailable entries, so they get skipped
-					if (mEntries[mSelectedEntryIndex].mVisibility == Visibility::VISIBLE)
+					// Continue for invisible and non-interactable entries, so they get skipped
+					if (mEntries[mSelectedEntryIndex]->isFullyInteractable())
 						break;
 				}
 			}
@@ -213,8 +239,8 @@ GameMenuEntries::UpdateResult GameMenuEntries::update()
 						mSelectedEntryIndex = 0;
 					}
 
-					// Continue for invisible and unavailable entries, so they get skipped
-					if (mEntries[mSelectedEntryIndex].mVisibility == Visibility::VISIBLE)
+					// Continue for invisible and non-interactable entries, so they get skipped
+					if (mEntries[mSelectedEntryIndex]->isFullyInteractable())
 						break;
 				}
 			}
@@ -225,7 +251,7 @@ GameMenuEntries::UpdateResult GameMenuEntries::update()
 		{
 			if (optionChange < 0)
 			{
-				auto& entry = mEntries[mSelectedEntryIndex];
+				GameMenuEntry& entry = *mEntries[mSelectedEntryIndex];
 				if (!entry.mOptions.empty())
 				{
 					int index = (int)entry.mSelectedIndex;
@@ -245,7 +271,7 @@ GameMenuEntries::UpdateResult GameMenuEntries::update()
 			}
 			else
 			{
-				auto& entry = mEntries[mSelectedEntryIndex];
+				GameMenuEntry& entry = *mEntries[mSelectedEntryIndex];
 				if (!entry.mOptions.empty())
 				{
 					int index = (int)entry.mSelectedIndex;
@@ -277,7 +303,7 @@ bool GameMenuEntries::setSelectedIndexByValue(uint32 value)
 	int difference = 0x7fffffff;
 	for (size_t i = 0; i < mEntries.size(); ++i)
 	{
-		const int diff = std::abs((int)(mEntries[i].mData - value));
+		const int diff = std::abs((int)(mEntries[i]->mData - value));
 		if (diff < difference)
 		{
 			mSelectedEntryIndex = (int)i;

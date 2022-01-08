@@ -31,7 +31,7 @@ void OptionEntry::loadValue()
 			const uint32 value = Game::instance().getSetting(mSetting, true);
 			for (size_t index = 0; index < mGameMenuEntry->mOptions.size(); ++index)
 			{
-				GameMenuEntries::Option& option = mGameMenuEntry->mOptions[index];
+				GameMenuEntry::Option& option = mGameMenuEntry->mOptions[index];
 				const bool setBits = (option.mValue & 0x80000000) != 0;
 				const uint32 bitmask = (option.mValue & 0x7fffffff);
 				if (setBits)

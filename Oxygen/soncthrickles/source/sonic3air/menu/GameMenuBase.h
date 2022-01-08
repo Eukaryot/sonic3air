@@ -11,14 +11,13 @@
 #include <rmxmedia.h>
 
 
-class GameMenuEntries
+class GameMenuEntry
 {
 public:
-	enum class Visibility
+	enum class VisibilityFlag : uint8
 	{
-		INVISIBLE,	// Entry or option is not visible and can't be selected
-		DISABLED,	// Entry or option is greyed out and can't be selected
-		VISIBLE,	// Entry or option is visible and can be selected
+		VISIBLE		 = 0x01,
+		INTERACTABLE = 0x02,
 	};
 
 	struct Option
@@ -29,39 +28,73 @@ public:
 		bool mVisible = true;
 	};
 
-	struct Entry
+	struct AnimationData	// Free-to-use data for anything animation related
 	{
-		struct AnimationData	// Free-to-use data for anything animation related
-		{
-			float mVisibility = 0.0f;
-			float mHighlight = 0.0f;
-			Vec2f mOffset;
-		};
-
-		std::string mText;
-		uint32 mData = 0;
-		std::vector<Option> mOptions;
-		size_t mSelectedIndex = 0;
-		Visibility mVisibility = Visibility::VISIBLE;
-		AnimationData mAnimation;
-
-		Option& addOptionRef(const std::string& text, uint32 value = 0);
-		Entry& addOption(const std::string& text, uint32 value = 0);
-		Entry& addNumberOptions(int minValue, int maxValue, int step);
-		Entry& addPercentageOptions(int minValue, int maxValue, int step);
-		Option* getOptionByValue(uint32 value);
-
-		bool isVisible() const  { return mVisibility != Visibility::INVISIBLE; }
-		bool isEnabled() const  { return mVisibility == Visibility::VISIBLE; }
-		void setVisible(bool visible);
-		void setEnabled(bool enabled);
-
-		inline bool hasSelected() const  { return mSelectedIndex < mOptions.size(); }
-		inline const Option& selected() const  { return mOptions[mSelectedIndex]; }
-		bool setSelectedIndexByValue(uint32 value);
-		void sanitizeSelectedIndex();
+		float mVisibility = 0.0f;
+		float mHighlight = 0.0f;
+		Vec2f mOffset;
 	};
 
+	struct RenderContext
+	{
+		Drawer* mDrawer = nullptr;
+		Vec2i mCurrentPosition;
+
+		template<typename T> T& as()  { return *static_cast<T*>(this); }
+	};
+
+public:
+	std::string mText;
+	uint32 mData = 0;
+
+	std::vector<Option> mOptions;
+	size_t mSelectedIndex = 0;
+
+	int mMarginAbove = 0;
+	int mMarginBelow = 0;
+
+	AnimationData mAnimation;
+
+public:
+	inline GameMenuEntry() {}
+	inline GameMenuEntry(const std::string& text, uint32 data) : mText(text), mData(data) {}
+	virtual ~GameMenuEntry() {}
+
+	void performRenderEntry(RenderContext& renderContext);
+
+	inline GameMenuEntry& initEntry(const std::string& text, uint32 data)  { mText = text; mData = data; return *this; }
+
+	inline uint32 getMenuEntryType() const  { return mMenuEntryType; }
+
+	Option& addOptionRef(const std::string& text, uint32 value = 0);
+	GameMenuEntry& addOption(const std::string& text, uint32 value = 0);
+	GameMenuEntry& addNumberOptions(int minValue, int maxValue, int step);
+	GameMenuEntry& addPercentageOptions(int minValue, int maxValue, int step);
+	Option* getOptionByValue(uint32 value);
+
+	inline bool isVisible() const			{ return (mVisibilityFlags & (uint8)VisibilityFlag::VISIBLE) != 0; }
+	inline bool isInteractable() const		{ return (mVisibilityFlags & (uint8)VisibilityFlag::INTERACTABLE) != 0; }
+	inline bool isFullyInteractable() const	{ return isVisible() && isInteractable(); }
+	void setVisible(bool visible);
+	void setInteractable(bool interactable);
+
+	inline bool hasSelected() const  { return mSelectedIndex < mOptions.size(); }
+	inline const Option& selected() const  { return mOptions[mSelectedIndex]; }
+	bool setSelectedIndexByValue(uint32 value);
+	void sanitizeSelectedIndex();
+
+protected:
+	virtual void renderEntry(RenderContext& renderContext) {}
+
+protected:
+	uint32 mMenuEntryType = 0;
+	uint8 mVisibilityFlags = (uint8)VisibilityFlag::VISIBLE | (uint8)VisibilityFlag::INTERACTABLE;
+};
+
+
+class GameMenuEntries
+{
+public:
 	enum class Navigation
 	{
 		VERTICAL,
@@ -80,31 +113,42 @@ public:
 	Navigation mNavigation = Navigation::VERTICAL;
 
 public:
-	inline const std::vector<Entry>& getEntries() const  { return mEntries; }
+	~GameMenuEntries();
 
-	inline void clear()  { mEntries.clear(); }
+	inline const std::vector<GameMenuEntry*>& getEntries() const  { return mEntries; }
+
+	void clear();
 	void reserve(size_t count);
 	void resize(size_t count);
-	Entry& addEntry(const std::string& text = "", uint32 data = 0);
-	Entry* getEntryByData(uint32 data);
 
-	void insert(const Entry& toCopy, size_t index);
+	GameMenuEntry* getEntryByData(uint32 data);
+
+	GameMenuEntry& addEntry(const std::string& text = "", uint32 data = 0);
+
+	template<typename T> T& addEntry()
+	{
+		T* entry = new T();
+		mEntries.push_back(entry);
+		return *entry;
+	}
+
+	void insert(const GameMenuEntry& toCopy, size_t index);
 	void erase(size_t index);
 
 	inline bool empty() const	{ return mEntries.empty(); }
 	inline size_t size() const	{ return mEntries.size(); }
-	inline Entry& operator[](size_t index)  { return mEntries[index]; }
-	inline const Entry& operator[](size_t index) const  { return mEntries[index]; }
+	inline GameMenuEntry& operator[](size_t index)  { return *mEntries[index]; }
+	inline const GameMenuEntry& operator[](size_t index) const  { return *mEntries[index]; }
 
 	UpdateResult update();
 
 	inline bool hasSelected() const  { return (mSelectedEntryIndex < (int)mEntries.size()); }
-	inline Entry& selected()  { return mEntries[mSelectedEntryIndex]; }
+	inline GameMenuEntry& selected()  { return *mEntries[mSelectedEntryIndex]; }
 	bool setSelectedIndexByValue(uint32 value);
 	void sanitizeSelectedIndex();
 
 private:
-	std::vector<Entry> mEntries;
+	std::vector<GameMenuEntry*> mEntries;
 };
 
 

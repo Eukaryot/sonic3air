@@ -34,6 +34,8 @@ public:
 	void onEnteredFromIngame();
 	void removeControllerSetupMenu();
 
+	const AudioCollection::AudioDefinition* getSoundTestAudioDefinition(uint32 index) const;
+
 private:
 	enum class State
 	{
@@ -75,10 +77,7 @@ private:
 			TWEAKS	 = 7,
 			_NUM
 		};
-
 		GameMenuEntries mMenuEntries;
-		std::map<size_t, std::string> mSections;
-		std::map<size_t, std::string> mTitles;
 	};
 	Tab mTabs[Tab::Id::_NUM];
 	size_t mActiveTab = 0;
@@ -86,8 +85,8 @@ private:
 	GameMenuEntries* mActiveMenu = &mTabMenuEntries;
 
 	std::vector<OptionEntry> mOptionEntries;
-	std::vector<GameMenuEntries::Entry*> mUnlockedSecretsEntries[2];
-	GameMenuEntries::Entry* mGamepadAssignmentEntries[2] = { nullptr };
+	std::vector<GameMenuEntry*> mUnlockedSecretsEntries[2];
+	GameMenuEntry* mGamepadAssignmentEntries[2] = { nullptr };
 
 	uint32 mLastGamepadsChangeCounter = 0;
 	std::vector<const AudioCollection::AudioDefinition*> mSoundTestAudioDefinitions;

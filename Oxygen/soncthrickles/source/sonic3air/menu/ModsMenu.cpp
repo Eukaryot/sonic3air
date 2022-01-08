@@ -305,8 +305,8 @@ void ModsMenu::update(float timeElapsed)
 					const int diff = menuEntries.mSelectedEntryIndex - previousSelectedEntryIndex;
 					if (diff == -1 || diff == 1)
 					{
-						GameMenuEntries::Entry& menuEntryA = menuEntries[previousSelectedEntryIndex];
-						GameMenuEntries::Entry& menuEntryB = menuEntries[menuEntries.mSelectedEntryIndex];
+						GameMenuEntry& menuEntryA = menuEntries[previousSelectedEntryIndex];
+						GameMenuEntry& menuEntryB = menuEntries[menuEntries.mSelectedEntryIndex];
 
 						// Exchange entry with previous one, effectively moving that one
 						std::swap(menuEntryA, menuEntryB);
@@ -368,7 +368,7 @@ void ModsMenu::update(float timeElapsed)
 					const bool makeActive = (mActiveTab != 0);
 					Tab& newTab = mTabs[1 - mActiveTab];
 
-					GameMenuEntries::Entry& entry = menuEntries.selected();
+					GameMenuEntry& entry = menuEntries.selected();
 					ModEntry& modEntry = mModEntries[entry.mData];
 					modEntry.mMakeActive = makeActive;
 
@@ -417,7 +417,7 @@ void ModsMenu::update(float timeElapsed)
 	{
 		for (size_t i = 0; i < mTabs[tabIndex].mMenuEntries.size(); ++i)
 		{
-			GameMenuEntries::Entry& entry = mTabs[tabIndex].mMenuEntries[i];
+			GameMenuEntry& entry = mTabs[tabIndex].mMenuEntries[i];
 			if (entry.mAnimation.mOffset.x != 0.0f || entry.mAnimation.mOffset.y != 0.0f)
 			{
 				moveFloatTowards(entry.mAnimation.mOffset.x, 0.0f, timeElapsed * 6.0f);
@@ -778,7 +778,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 		return false;
 
 	ModManager& modManager = ModManager::instance();
-	const std::vector<GameMenuEntries::Entry>& menuEntries = mTabs[0].mMenuEntries.getEntries();
+	const std::vector<GameMenuEntry*>& menuEntries = mTabs[0].mMenuEntries.getEntries();
 
 	// Build new active mods list
 	//  -> Here again, reverse order
@@ -787,7 +787,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 
 	for (auto it = menuEntries.rbegin(); it != menuEntries.rend(); ++it)
 	{
-		const ModEntry& modEntry = mModEntries[it->mData];
+		const ModEntry& modEntry = mModEntries[(*it)->mData];
 		if (modEntry.mMakeActive)
 		{
 			activeMods.push_back(modEntry.mMod);

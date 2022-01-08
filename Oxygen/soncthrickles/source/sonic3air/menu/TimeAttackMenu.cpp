@@ -122,7 +122,7 @@ bool TimeAttackMenu::canBeRemoved()
 void TimeAttackMenu::initialize()
 {
 	// Update Max Control unlocking
-	GameMenuEntries::Option* option = mCharacterEntry->getOptionByValue((uint32)CharacterOption::SONIC_MAXCONTROL);
+	GameMenuEntry::Option* option = mCharacterEntry->getOptionByValue((uint32)CharacterOption::SONIC_MAXCONTROL);
 	RMX_CHECK(nullptr != option, "Option for Max Control not found", );
 	if (nullptr != option)
 	{
