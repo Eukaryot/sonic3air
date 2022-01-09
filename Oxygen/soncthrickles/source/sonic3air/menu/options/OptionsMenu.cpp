@@ -1076,7 +1076,63 @@ void OptionsMenu::render()
 	{
 		const int startY = anchorY + 30 - mScrolling.getScrollOffsetYInt();
 
-		// Tab titles
+		// Tab contents
+		{
+			drawer.pushScissor(Recti(0, anchorY + 30, (int)mRect.width, (int)mRect.height - anchorY - 30));
+
+			const int minTabIndex = (int)std::floor(mActiveTabAnimated);
+			const int maxTabIndex = (int)std::ceil(mActiveTabAnimated);
+
+			for (int tabIndex = minTabIndex; tabIndex <= maxTabIndex; ++tabIndex)
+			{
+				Tab& tab = mTabs[tabIndex];
+				const bool isModsTab = (tabIndex == Tab::Id::MODS);
+				const float tabAlpha = alpha * (1.0f - std::fabs(tabIndex - mActiveTabAnimated));
+				const int baseX = anchorX + roundToInt((tabIndex - mActiveTabAnimated) * 250);
+
+				renderContext.mCurrentPosition.set(baseX, startY + 12);
+				renderContext.mTabAlpha = tabAlpha;
+				renderContext.mIsModsTab = isModsTab;
+
+				for (size_t line = 1; line < tab.mMenuEntries.size(); ++line)
+				{
+					GameMenuEntry& entry = tab.mMenuEntries[line];
+					if (!entry.isVisible())
+					{
+						// Skip hidden entries
+						continue;
+					}
+
+					if (entry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE)
+					{
+						if (!isTitleShown(tabIndex, (int)line))
+						{
+							// Skip this title
+							continue;
+						}
+					}
+
+					const int currentAbsoluteY1 = renderContext.mCurrentPosition.y - startY;
+					renderContext.mIsSelected = (mActiveMenu == &tab.mMenuEntries && (int)line == tab.mMenuEntries.mSelectedEntryIndex);
+
+					// Render this game menu entry
+					entry.performRenderEntry(renderContext);
+
+					if (renderContext.mIsSelected)
+					{
+						// TODO: Add back in that selecting the first interactable entry scrolls up to the top
+						const int currentAbsoluteY2 = renderContext.mCurrentPosition.y - startY;
+						mScrolling.setCurrentSelection(currentAbsoluteY1 - 30, currentAbsoluteY2 + 45);
+					}
+
+					renderContext.mCurrentPosition.y += isModsTab ? 13 : 16;
+				}
+			}
+
+			drawer.popScissor();
+		}
+
+		// Tab titles (must be rendered afterwards because it's meant to be on top)
 		{
 			// Background
 			drawer.drawRect(Recti(anchorX - 200, anchorY - 6, 400, 48), global::mOptionsTopBar, Color(1.0f, 1.0f, 1.0f, alpha));
@@ -1118,62 +1174,6 @@ void OptionsMenu::render()
 			{
 				mScrolling.setCurrentSelection(0, py);
 			}
-		}
-
-		// Tab contents
-		{
-			drawer.pushScissor(Recti(0, anchorY + 30, (int)mRect.width, (int)mRect.height - anchorY - 30));
-
-			const int minTabIndex = (int)std::floor(mActiveTabAnimated);
-			const int maxTabIndex = (int)std::ceil(mActiveTabAnimated);
-
-			for (int tabIndex = minTabIndex; tabIndex <= maxTabIndex; ++tabIndex)
-			{
-				Tab& tab = mTabs[tabIndex];
-				const bool isModsTab = (tabIndex == Tab::Id::MODS);
-				const float tabAlpha = alpha * (1.0f - std::fabs(tabIndex - mActiveTabAnimated));
-				const int baseX = anchorX + roundToInt((tabIndex - mActiveTabAnimated) * 250);
-
-				renderContext.mCurrentPosition.set(baseX, startY + 12);
-				renderContext.mTabAlpha = tabAlpha;
-				renderContext.mIsModsTab = isModsTab;
-
-				for (size_t line = 1; line < tab.mMenuEntries.size(); ++line)
-				{
-					GameMenuEntry& entry = tab.mMenuEntries[line];
-					if (!entry.isVisible())
-					{
-						// Skip hidden entries
-						continue;
-					}
-
-					if (entry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE)
-					{
-						if (!isTitleShown(tabIndex, (int)line))
-						{
-							// Skip this title
-							continue;
-						}
-					}
-
-					const int currentAbsoluteY1 = renderContext.mCurrentPosition.y - startY;
-					renderContext.mIsSelected = (mActiveMenu == &tab.mMenuEntries && (int)line == tab.mMenuEntries.mSelectedEntryIndex);
-				
-					// Render this game menu entry
-					entry.performRenderEntry(renderContext);
-
-					if (renderContext.mIsSelected)
-					{
-						// TODO: Add back in that selecting the first interactable entry scrolls up to the top
-						const int currentAbsoluteY2 = renderContext.mCurrentPosition.y - startY;
-						mScrolling.setCurrentSelection(currentAbsoluteY1 - 30, currentAbsoluteY2 + 45);
-					}
-
-					renderContext.mCurrentPosition.y += isModsTab ? 13 : 16;
-				}
-			}
-
-			drawer.popScissor();
 		}
 
 		drawer.performRendering();
