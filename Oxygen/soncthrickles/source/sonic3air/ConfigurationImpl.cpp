@@ -67,8 +67,6 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 		{
 			// General game server settings
 			JsonHelper gameServerHelper(gameServerJson);
-			gameServerHelper.tryReadBool("ConnectToServer", mGameServer.mConnectToServer);
-
 			std::string serverAddress;
 			if (gameServerHelper.tryReadString("ServerAddress", serverAddress))
 			{

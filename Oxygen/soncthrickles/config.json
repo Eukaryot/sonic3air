@@ -35,7 +35,6 @@
 	// Game server
 	"GameServer":
 	{
-		"ConnectToServer": "1",
 		"ServerAddress": "gameserver.sonic3air.org:21094",
 		"GhostSync":
 		{

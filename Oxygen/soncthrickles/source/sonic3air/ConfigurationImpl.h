@@ -47,7 +47,6 @@ public:
 	};
 	struct GameServer
 	{
-		bool mConnectToServer = false;
 		std::string mServerHostName;
 		int mServerPort = 0;
 		GhostSync mGhostSync;

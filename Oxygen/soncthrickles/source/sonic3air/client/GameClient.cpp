@@ -33,7 +33,7 @@ GameClient::~GameClient()
 void GameClient::setupClient()
 {
 	const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
-	if (config.mConnectToServer && !config.mServerHostName.empty())
+	if (!config.mServerHostName.empty())
 	{
 		Sockets::startupSockets();
 
