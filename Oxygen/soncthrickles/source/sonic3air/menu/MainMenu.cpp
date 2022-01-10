@@ -126,10 +126,6 @@ bool MainMenu::canBeRemoved()
 
 void MainMenu::initialize()
 {
-#if defined(ENDUSER)
-	const bool devMode = EngineMain::instance().getDelegate().useDeveloperFeatures();
-	mMenuEntries.getEntryByData(mainmenu::TIME_ATTACK)->setInteractable(!devMode);
-#endif
 }
 
 void MainMenu::deinitialize()
