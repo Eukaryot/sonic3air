@@ -278,6 +278,10 @@ function void fn07a446()
 	setupObjectAttributesFull(0x07a660)
 	u8[A0 + 0x43] = 0x1a
 	objA0.value3a = 0x01
+#if STANDALONE
+	objA0.sprite_attributes -= 0x2000	// Fix for wrong palette line usage, thanks to Legobouwer
+#endif
+
 	fn07a634()
 }
 
@@ -365,6 +369,9 @@ function void fn07a4ec()
 	fn07a634()
 	objA0.value3a = 0x04
 	setupObjectAttributesFull(0x07a66c)
+#if STANDALONE
+	objA0.sprite_attributes -= 0x2000	// Fix for wrong palette line usage, thanks to Legobouwer
+#endif
 }
 
 //# address-hook(0x07a500) end(0x07a50e)

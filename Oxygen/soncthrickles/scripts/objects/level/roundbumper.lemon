@@ -35,7 +35,11 @@ function void fn032df2()
 	if (competition_mode.active)
 	{
 		objA0.mapping_offset = 0x2322ee
+	#if STANDALONE
+		objA0.sprite_attributes = 0x0300	// Fix for wrong palette line usage, thanks to Legobouwer
+	#else
 		objA0.sprite_attributes = 0x2300
+	#endif
 		objA0.update_address = 0x032ff0
 		fn032ff0()
 		return
