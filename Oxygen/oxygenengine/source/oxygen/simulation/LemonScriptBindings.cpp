@@ -59,17 +59,6 @@ namespace
 			memcpy(dst, &data[offset], bytes);
 			return bytes;
 		}
-
-		const std::string* tryResolveString(uint64 stringKey)
-		{
-			lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-			RMX_ASSERT(nullptr != runtime, "No active lemon script runtime");
-
-			const lemon::StoredString* str = runtime->resolveStringByKey(stringKey);
-			RMX_CHECK(nullptr != str, "Could not resolve string from key", return nullptr);
-
-			return &str->getString();
-		}
 	}
 
 
@@ -894,18 +883,24 @@ namespace
 		if (!success)
 		{
 			// Audio collections expect lowercase IDs, so we might need to do the conversion here first
-			const std::string* textString = detail::tryResolveString(sfxId);
-			if (nullptr != textString)
+			lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
+			if (nullptr != runtime)
 			{
-				// Does the string contain any uppercase letters?
-				const auto it = std::find_if(textString->begin(), textString->end(), [](char ch) { return (ch >= 'A' && ch <= 'Z'); } );
-				if (it != textString->end())
+				const lemon::StoredString* str = runtime->resolveStringByKey(sfxId);
+				if (nullptr != str)
 				{
-					// Convert to lowercase and try again
-					String str = *textString;
-					str.lowerCase();
-					sfxId = rmx::getMurmur2_64(str);
-					EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+					const std::string& textString = str->getString();
+
+					// Does the string contain any uppercase letters?
+					const auto it = std::find_if(textString.begin(), textString.end(), [](char ch) { return (ch >= 'A' && ch <= 'Z'); } );
+					if (it != textString.end())
+					{
+						// Convert to lowercase and try again
+						String str = textString;
+						str.lowerCase();
+						sfxId = rmx::getMurmur2_64(str);
+						EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
+					}
 				}
 			}
 		}
