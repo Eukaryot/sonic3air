@@ -237,6 +237,9 @@
     <ClInclude Include="..\..\include\SDL_hints.h">
       <Filter>API Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\SDL_hidapi.h">
+      <Filter>API Headers</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\SDL_joystick.h">
       <Filter>API Headers</Filter>
     </ClInclude>
@@ -484,9 +487,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\haptic\SDL_haptic_c.h">
       <Filter>haptic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\hidapi\SDL_hidapi.h">
-      <Filter>hidapi</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\joystick\SDL_gamecontrollerdb.h">
       <Filter>joystick</Filter>
@@ -749,6 +749,9 @@
     <ClInclude Include="..\..\src\render\software\SDL_rotate.h">
       <Filter>render\software</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\render\software\SDL_triangle.h">
+      <Filter>render\software</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\power\SDL_syspower.h">
       <Filter>power</Filter>
     </ClInclude>
@@ -818,6 +821,7 @@
     <ClInclude Include="..\..\src\SDL_assert_c.h" />
     <ClInclude Include="..\..\src\SDL_hints_c.h" />
     <ClInclude Include="..\..\src\SDL_internal.h" />
+    <ClInclude Include="..\..\src\hidapi\SDL_hidapi_c.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\audio\wasapi\SDL_wasapi.c" />
@@ -1057,9 +1061,6 @@
     <ClCompile Include="..\..\src\joystick\windows\SDL_dinputjoystick.c">
       <Filter>joystick\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\joystick\windows\SDL_mmjoystick.c">
-      <Filter>joystick\windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\joystick\windows\SDL_rawinputjoystick.c">
       <Filter>joystick\windows</Filter>
     </ClCompile>
@@ -1198,7 +1199,7 @@
     <ClCompile Include="..\..\src\thread\SDL_thread.c">
       <Filter>thread</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\thread\windows\SDL_syscond_srw.c">
+    <ClCompile Include="..\..\src\thread\windows\SDL_syscond_cv.c">
       <Filter>thread\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\thread\windows\SDL_sysmutex.c">
@@ -1301,6 +1302,9 @@
       <Filter>render\software</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\render\software\SDL_rotate.c">
+      <Filter>render\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\render\software\SDL_triangle.c">
       <Filter>render\software</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\power\SDL_power.c">

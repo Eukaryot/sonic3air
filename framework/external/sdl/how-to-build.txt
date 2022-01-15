@@ -4,7 +4,7 @@ Build for Windows with Visual Studio 2019
 SDL2
 	- Open the Visual Studio Solution at "SDL2\VisualC\SDL.sln"
 	- Changed needed after download
-		1.) Switch to static library build for project SDL2 (alle Configurations):
+		1.) Switch to static library build for project SDL2 (all configurations):
 			 General -> Configuration Type = "Static library (.lib)"
 		2.) Link statically against the VC++ runtime, for projects SDL2 and SDL2main:
 			 C/C++ -> Code Generation -> Runtime Library = "Multi-threaded (/MT)" (yes, also for Debug)
