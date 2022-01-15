@@ -27,7 +27,7 @@
 		"ServerAddress": "gameserver.sonic3air.org:21094",
 		"GhostSync":
 		{
-			"Enabled": "0",				// Enable the ghost sync feature; this requires "ConnectToServer" to be enabled
+			"Enabled": "0",				// Enable the ghost sync feature by setting this to "1"
 			"ChannelName": "world",		// To use your own private channel, enter an arbitrary string here; "world" is the default channel
 			"ShowOffscreenGhosts": "1"	// Show other players on the screen border while they're not on the screen
 		}
