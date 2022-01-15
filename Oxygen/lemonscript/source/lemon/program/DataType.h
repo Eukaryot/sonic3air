@@ -63,7 +63,7 @@ namespace lemon
 
 	struct DataTypeDefinition
 	{
-		enum class Class
+		enum class Class : uint8
 		{
 			VOID,
 			INTEGER,
@@ -78,6 +78,7 @@ namespace lemon
 
 		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
 
+		virtual uint32 getDataTypeHash() const  { return 0; }	// Upper 8 bits should always be the value of mClass
 		virtual const std::string& toString() const;
 	};
 
@@ -97,6 +98,7 @@ namespace lemon
 			DataTypeDefinition(Class::INTEGER, bytes), mSemantics(semantics), mIsSigned(isSigned)
 		{}
 
+		uint32 getDataTypeHash() const override;
 		const std::string& toString() const override;
 	};
 
@@ -106,6 +108,7 @@ namespace lemon
 			DataTypeDefinition(Class::STRING, 8)
 		{}
 
+		uint32 getDataTypeHash() const override  { return ((uint32)Class::STRING) << 24; }
 		const std::string& toString() const override;
 	};
 
@@ -139,7 +142,7 @@ namespace lemon
 			{
 				return BaseType::VOID;
 			}
-			else
+			else if (dataType->mClass == DataTypeDefinition::Class::INTEGER)
 			{
 				const IntegerDataType& integerType = dataType->as<IntegerDataType>();
 				if (integerType.mSemantics == IntegerDataType::Semantics::BOOLEAN)
@@ -156,6 +159,13 @@ namespace lemon
 					result = (BaseType)((uint8)result + 0x08);
 				return result;
 			}
+			else if (dataType->mClass == DataTypeDefinition::Class::STRING)
+			{
+				return BaseType::UINT_64;
+			}
+
+			RMX_ASSERT(false, "Unsupported type");
+			return BaseType::VOID;
 		}
 
 		static const DataTypeDefinition* getDefinitionFromBaseType(BaseType baseType)
@@ -179,16 +189,26 @@ namespace lemon
 
 		static inline const DataTypeDefinition* readDataType(VectorBinarySerializer& serializer)
 		{
-			// TODO: How about some more sophisticated serialization...?
+			// TODO: We definitely need a more sophisticated serialization to support more data types
 			const BaseType baseType = (BaseType)serializer.read<uint8>();
-			return getDefinitionFromBaseType(baseType);
+			if ((uint8)baseType == 0x40)	// Some dumb placeholder magic number for string
+				return &PredefinedDataTypes::STRING;
+			else
+				return getDefinitionFromBaseType(baseType);
 		}
 
 		static inline void writeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition* const dataTypeDefinition)
 		{
-			// TODO: How about some more sophisticated serialization...?
-			const BaseType baseType = getBaseType(dataTypeDefinition);
-			serializer.writeAs<uint8>(baseType);
+			// TODO: We definitely need a more sophisticated serialization to support more data types
+			if (dataTypeDefinition == &PredefinedDataTypes::STRING)
+			{
+				serializer.write<uint8>(0x40);	// The same dumb magic number as above
+			}
+			else
+			{
+				const BaseType baseType = getBaseType(dataTypeDefinition);
+				serializer.writeAs<uint8>(baseType);
+			}
 		}
 
 		static inline void serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition)

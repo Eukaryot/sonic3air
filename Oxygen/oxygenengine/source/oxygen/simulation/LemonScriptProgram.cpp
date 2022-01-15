@@ -234,7 +234,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 				{
 					VectorBinarySerializer serializer(true, buffer);
 					scriptsLoaded = mInternal.mScriptModule.serialize(serializer);
-					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts", );
+					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
 				}
 			}
 		#endif

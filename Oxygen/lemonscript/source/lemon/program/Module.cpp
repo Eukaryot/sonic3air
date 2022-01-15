@@ -223,10 +223,11 @@ namespace lemon
 		//  - 0x03 = Added opcode flags and deflate compression
 		//  - 0x04 = Added source information to function serialization
 		//  - 0x05 = Added serialization of constants
+		//  - 0x06 = Support for string data type in serialization - this breaks compatibility with older versions
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x05;
+		uint16 version = 0x06;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -235,7 +236,7 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x03)
+			if (version < 0x06)
 				return false;	// Loading older versions is not supported
 		}
 		else
@@ -291,11 +292,8 @@ namespace lemon
 						uint32 lastLineNumber = 0;
 
 						// Source information
-						if (version >= 0x04)
-						{
-							serializer.serialize(scriptFunc.mSourceFilename);
-							serializer.serialize(scriptFunc.mSourceBaseLineOffset);
-						}
+						serializer.serialize(scriptFunc.mSourceFilename);
+						serializer.serialize(scriptFunc.mSourceBaseLineOffset);
 
 						// Opcodes
 						size_t count = (size_t)serializer.read<uint32>();
@@ -489,7 +487,6 @@ namespace lemon
 		}
 
 		// Serialize constants
-		if (version >= 0x05)
 		{
 			uint32 numberOfConstants = (uint32)mConstants.size();
 			serializer & numberOfConstants;

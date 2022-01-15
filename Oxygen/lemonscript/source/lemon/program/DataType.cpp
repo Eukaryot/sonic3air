@@ -20,6 +20,17 @@ namespace lemon
 		return TYPE_STRING_VOID;
 	}
 
+	uint32 IntegerDataType::getDataTypeHash() const
+	{
+		static const constexpr uint32 baseHash = ((uint32)Class::INTEGER) << 24;
+		switch (mSemantics)
+		{
+			case IntegerDataType::Semantics::BOOLEAN:	return baseHash + (uint32)BaseType::BOOL;
+			case IntegerDataType::Semantics::CONSTANT:	return baseHash + (uint32)BaseType::INT_CONST;
+			default:									return baseHash + mBytes + ((uint32)mIsSigned * 0x80);
+		}
+	}
+
 	const std::string& IntegerDataType::toString() const
 	{
 		switch (mSemantics)
