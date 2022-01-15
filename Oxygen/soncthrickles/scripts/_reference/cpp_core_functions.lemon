@@ -53,27 +53,27 @@ declare function s16 cos_s16(s16)
 
 declare function s32 cos_s32(s32)
 
-declare function string stringformat(string, u64)
+declare function string stringformat(string format, u64 arg1)
 
-declare function string stringformat(string, u64, u64)
+declare function string stringformat(string format, u64 arg1, u64 arg2)
 
-declare function string stringformat(string, u64, u64, u64)
+declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3)
 
-declare function string stringformat(string, u64, u64, u64, u64)
+declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4)
 
-declare function string stringformat(string, u64, u64, u64, u64, u64)
+declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5)
 
-declare function string stringformat(string, u64, u64, u64, u64, u64, u64)
+declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, u64 arg6)
 
-declare function string stringformat(string, u64, u64, u64, u64, u64, u64, u64)
+declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, u64 arg6, u64 arg7)
 
-declare function string stringformat(string, u64, u64, u64, u64, u64, u64, u64, u64)
+declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, u64 arg6, u64 arg7, u64 arg8)
 
-declare function u32 strlen(string string)
+declare function u32 strlen(string str)
 
-declare function u8 getchar(string string, u32 index)
+declare function u8 getchar(string str, u32 index)
 
-declare function u64 substring(string string, u32 index, u32 length)
+declare function u64 substring(string str, u32 index, u32 length)
 
 declare function void assert(u8, string)
 
@@ -105,7 +105,7 @@ declare function void push(u32)
 
 declare function u32 pop()
 
-declare function u32 System.loadPersistentData(u32 targetAddress, u64 key, u32 bytes)
+declare function u32 System.loadPersistentData(u32 targetAddress, string key, u32 bytes)
 
 declare function void System.savePersistentData(u32 sourceAddress, string key, u32 bytes)
 
@@ -123,15 +123,15 @@ declare function u32 System.getPlatformFlags()
 
 declare function s8 System.hasPlatformFlag(u32 flag)
 
-declare function s8 System.hasExternalRawData(u64 key)
+declare function s8 System.hasExternalRawData(string key)
 
-declare function u32 System.loadExternalRawData(u64 key, u32 targetAddress, u32 offset, u32 maxBytes, s8 loadOriginalData, s8 loadModdedData)
+declare function u32 System.loadExternalRawData(string key, u32 targetAddress, u32 offset, u32 maxBytes, s8 loadOriginalData, s8 loadModdedData)
 
-declare function u32 System.loadExternalRawData(u64 key, u32 targetAddress)
+declare function u32 System.loadExternalRawData(string key, u32 targetAddress)
 
-declare function s8 System.hasExternalPaletteData(u64 key, u8 line)
+declare function s8 System.hasExternalPaletteData(string key, u8 line)
 
-declare function u16 System.loadExternalPaletteData(u64 key, u8 line, u32 targetAddress, u8 maxColors)
+declare function u16 System.loadExternalPaletteData(string key, u8 line, u32 targetAddress, u8 maxColors)
 
 declare function u16 Input.getController(u8 controllerIndex)
 
@@ -313,7 +313,7 @@ declare function u8 Mods.isModActive(string modName)
 
 declare function s32 Mods.getModPriority(string modName)
 
-declare function void debugLog(string string)
+declare function void debugLog(string text)
 
 declare function void debugLogColors(string name, u32 startAddress, u8 numColors)
 
@@ -337,17 +337,17 @@ declare function void ROMDataAnalyser.endObject()
 
 declare function s8 System.SidePanel.setupCustomCategory(string shortName, string fullName)
 
-declare function s8 System.SidePanel.addOption(string string, s8 defaultValue)
+declare function s8 System.SidePanel.addOption(string text, s8 defaultValue)
 
 declare function void System.SidePanel.addEntry(u64 key)
 
-declare function void System.SidePanel.addLine(string string, s8 indent, u32 color)
+declare function void System.SidePanel.addLine(string text, s8 indent, u32 color)
 
-declare function void System.SidePanel.addLine(string string, s8 indent)
+declare function void System.SidePanel.addLine(string text, s8 indent)
 
 declare function s8 System.SidePanel.isEntryHovered(u64 key)
 
-declare function void System.writeDisplayLine(string string)
+declare function void System.writeDisplayLine(string text)
 
 declare function u32 Game.getSetting(u32 settingId)
 

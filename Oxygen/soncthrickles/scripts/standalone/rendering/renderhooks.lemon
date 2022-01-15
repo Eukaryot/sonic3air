@@ -423,7 +423,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			if (Renderer.hasCustomSprite(key))
 			{
 				// Check if there's also a custom palette
-				u64 paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+				string paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
 				if (System.hasExternalPaletteData(paletteKey, 0))
 				{
 					atex = 0x40 + character * 0x20

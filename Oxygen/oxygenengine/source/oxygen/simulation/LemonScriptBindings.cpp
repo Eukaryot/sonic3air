@@ -194,9 +194,9 @@ namespace
 	}
 
 
-	uint32 System_loadPersistentData(uint32 targetAddress, uint64 key, uint32 maxBytes)
+	uint32 System_loadPersistentData(uint32 targetAddress, lemon::StringRef key, uint32 maxBytes)
 	{
-		const std::vector<uint8>& data = PersistentData::instance().getData(key);
+		const std::vector<uint8>& data = PersistentData::instance().getData(key.mHash);
 		return detail::loadData(targetAddress, data, 0, maxBytes);
 	}
 
@@ -256,15 +256,15 @@ namespace
 		return (System_getPlatformFlags() & flag) != 0;
 	}
 
-	bool System_hasExternalRawData(uint64 key)
+	bool System_hasExternalRawData(lemon::StringRef key)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key);
+		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.mHash);
 		return !rawDataVector.empty();
 	}
 
-	uint32 System_loadExternalRawData1(uint64 key, uint32 targetAddress, uint32 offset, uint32 maxBytes, bool loadOriginalData, bool loadModdedData)
+	uint32 System_loadExternalRawData1(lemon::StringRef key, uint32 targetAddress, uint32 offset, uint32 maxBytes, bool loadOriginalData, bool loadModdedData)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key);
+		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.mHash);
 		const ResourcesCache::RawData* rawData = nullptr;
 		for (int i = (int)rawDataVector.size() - 1; i >= 0; --i)
 		{
@@ -283,20 +283,20 @@ namespace
 		return detail::loadData(targetAddress, rawData->mContent, offset, maxBytes);
 	}
 
-	uint32 System_loadExternalRawData2(uint64 key, uint32 targetAddress)
+	uint32 System_loadExternalRawData2(lemon::StringRef key, uint32 targetAddress)
 	{
 		return System_loadExternalRawData1(key, targetAddress, 0, 0, true, true);
 	}
 
-	bool System_hasExternalPaletteData(uint64 key, uint8 line)
+	bool System_hasExternalPaletteData(lemon::StringRef key, uint8 line)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key, line);
+		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.mHash, line);
 		return (nullptr != palette);
 	}
 
-	uint16 System_loadExternalPaletteData(uint64 key, uint8 line, uint32 targetAddress, uint8 maxColors)
+	uint16 System_loadExternalPaletteData(lemon::StringRef key, uint8 line, uint32 targetAddress, uint8 maxColors)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key, line);
+		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.mHash, line);
 		if (nullptr == palette)
 			return 0;
 
@@ -330,11 +330,11 @@ namespace
 		debugLogInternal(valueString);
 	}
 
-	void debugLog(lemon::StringRef string)
+	void debugLog(lemon::StringRef text)
 	{
-		if (string.isValid())
+		if (text.isValid())
 		{
-			debugLogInternal(*string);
+			debugLogInternal(*text);
 		}
 	}
 
@@ -1145,11 +1145,11 @@ namespace
 		return Application::instance().getDebugSidePanel()->setupCustomCategory(*fullName, (*shortName)[0]);
 	}
 
-	bool System_SidePanel_addOption(lemon::StringRef string, bool defaultValue)
+	bool System_SidePanel_addOption(lemon::StringRef text, bool defaultValue)
 	{
-		if (!string.isValid())
+		if (!text.isValid())
 			return false;
-		return Application::instance().getDebugSidePanel()->addOption(*string, defaultValue);
+		return Application::instance().getDebugSidePanel()->addOption(*text, defaultValue);
 	}
 
 	void System_SidePanel_addEntry(uint64 key)
@@ -1157,17 +1157,17 @@ namespace
 		return Application::instance().getDebugSidePanel()->addEntry(key);
 	}
 
-	void System_SidePanel_addLine1(lemon::StringRef string, int8 indent, uint32 color)
+	void System_SidePanel_addLine1(lemon::StringRef text, int8 indent, uint32 color)
 	{
-		if (string.isValid())
+		if (text.isValid())
 		{
-			Application::instance().getDebugSidePanel()->addLine(*string, (int)indent, Color::fromRGBA32(color));
+			Application::instance().getDebugSidePanel()->addLine(*text, (int)indent, Color::fromRGBA32(color));
 		}
 	}
 
-	void System_SidePanel_addLine2(lemon::StringRef string, int8 indent)
+	void System_SidePanel_addLine2(lemon::StringRef str, int8 indent)
 	{
-		System_SidePanel_addLine1(string, indent, 0xffffffff);
+		System_SidePanel_addLine1(str, indent, 0xffffffff);
 	}
 
 	bool System_SidePanel_isEntryHovered(uint64 key)
@@ -1175,11 +1175,11 @@ namespace
 		return Application::instance().getDebugSidePanel()->isEntryHovered(key);
 	}
 
-	void System_writeDisplayLine(lemon::StringRef string)
+	void System_writeDisplayLine(lemon::StringRef text)
 	{
-		if (string.isValid())
+		if (text.isValid())
 		{
-			LogDisplay::instance().setLogDisplay(*string, 2.0f);
+			LogDisplay::instance().setLogDisplay(*text, 2.0f);
 		}
 	}
 
@@ -1775,7 +1775,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		}
 
 		module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog), defaultFlags)
-			.setParameterInfo(0, "string");
+			.setParameterInfo(0, "text");
 
 		module.addUserDefinedFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags)
 			.setParameterInfo(0, "name")
@@ -1833,19 +1833,19 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(1, "fullName");
 
 		module.addUserDefinedFunction("System.SidePanel.addOption", lemon::wrap(&System_SidePanel_addOption), defaultFlags)
-			.setParameterInfo(0, "string")
+			.setParameterInfo(0, "text")
 			.setParameterInfo(1, "defaultValue");
 
 		module.addUserDefinedFunction("System.SidePanel.addEntry", lemon::wrap(&System_SidePanel_addEntry), defaultFlags)
 			.setParameterInfo(0, "key");
 
 		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine1), defaultFlags)
-			.setParameterInfo(0, "string")
+			.setParameterInfo(0, "text")
 			.setParameterInfo(1, "indent")
 			.setParameterInfo(2, "color");
 
 		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine2), defaultFlags)
-			.setParameterInfo(0, "string")
+			.setParameterInfo(0, "text")
 			.setParameterInfo(1, "indent");
 
 		module.addUserDefinedFunction("System.SidePanel.isEntryHovered", lemon::wrap(&System_SidePanel_isEntryHovered), defaultFlags)
@@ -1854,7 +1854,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		// This is not really debugging-related, as it's meant to be written in non-developer environment as well
 		module.addUserDefinedFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags)
-			.setParameterInfo(0, "string");
+			.setParameterInfo(0, "text");
 	}
 
 	// Register game-specific script bindings

@@ -173,15 +173,15 @@ namespace lemon
 			return (int32)roundToInt(std::cos((float)x / (float)0x10000) * (float)0x10000);
 		}
 
-		StringRef stringformat(StringRef fmt, int argv, uint64* args)
+		StringRef stringformat(StringRef format, int argv, uint64* args)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
-			RMX_CHECK(fmt.isValid(), "Unable to resolve format string", return StringRef());
+			RMX_CHECK(format.isValid(), "Unable to resolve format string", return StringRef());
 
-			const std::string& fmtString = *fmt;
-			const int length = (int)fmtString.length();
-			const char* fmtPtr = fmtString.c_str();
+			const std::string& formatString = *format;
+			const int length = (int)formatString.length();
+			const char* fmtPtr = formatString.c_str();
 			const char* fmtEnd = fmtPtr + length;
 
 			static FastStringStream result;
@@ -288,51 +288,51 @@ namespace lemon
 			return StringRef(runtime->addString(result.mBuffer, result.mLength));
 		}
 
-		StringRef stringformat1(StringRef fmt, uint64 arg1)
+		StringRef stringformat1(StringRef format, uint64 arg1)
 		{
-			return stringformat(fmt, 1, &arg1);
+			return stringformat(format, 1, &arg1);
 		}
 
-		StringRef stringformat2(StringRef fmt, uint64 arg1, uint64 arg2)
+		StringRef stringformat2(StringRef format, uint64 arg1, uint64 arg2)
 		{
 			uint64 args[] = { arg1, arg2 };
-			return stringformat(fmt, 2, args);
+			return stringformat(format, 2, args);
 		}
 
-		StringRef stringformat3(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3)
+		StringRef stringformat3(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3)
 		{
 			uint64 args[] = { arg1, arg2, arg3 };
-			return stringformat(fmt, 3, args);
+			return stringformat(format, 3, args);
 		}
 
-		StringRef stringformat4(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
+		StringRef stringformat4(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4 };
-			return stringformat(fmt, 4, args);
+			return stringformat(format, 4, args);
 		}
 
-		StringRef stringformat5(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
+		StringRef stringformat5(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5 };
-			return stringformat(fmt, 5, args);
+			return stringformat(format, 5, args);
 		}
 
-		StringRef stringformat6(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
+		StringRef stringformat6(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6 };
-			return stringformat(fmt, 6, args);
+			return stringformat(format, 6, args);
 		}
 
-		StringRef stringformat7(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
+		StringRef stringformat7(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
-			return stringformat(fmt, 7, args);
+			return stringformat(format, 7, args);
 		}
 
-		StringRef stringformat8(StringRef fmt, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
+		StringRef stringformat8(StringRef format, uint64 arg1, uint64 arg2, uint64 arg3, uint64 arg4, uint64 arg5, uint64 arg6, uint64 arg7, uint64 arg8)
 		{
 			uint64 args[] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
-			return stringformat(fmt, 8, args);
+			return stringformat(format, 8, args);
 		}
 
 		uint32 strlen(StringRef string)
@@ -398,24 +398,75 @@ namespace lemon
 		module.addUserDefinedFunction("cos_s16", lemon::wrap(&functions::cos_s16), flags);
 		module.addUserDefinedFunction("cos_s32", lemon::wrap(&functions::cos_s32), flags);
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat1), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat2), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat3), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat4), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat5), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat6), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat7), flags);
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat8), flags);
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat1), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat2), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat3), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat4), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat5), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat6), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5")
+			.setParameterInfo(6, "arg6");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat7), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5")
+			.setParameterInfo(6, "arg6")
+			.setParameterInfo(7, "arg7");
+
+		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat8), flags)
+			.setParameterInfo(0, "format")
+			.setParameterInfo(1, "arg1")
+			.setParameterInfo(2, "arg2")
+			.setParameterInfo(3, "arg3")
+			.setParameterInfo(4, "arg4")
+			.setParameterInfo(5, "arg5")
+			.setParameterInfo(6, "arg6")
+			.setParameterInfo(7, "arg7")
+			.setParameterInfo(8, "arg8");
 
 		module.addUserDefinedFunction("strlen", lemon::wrap(&functions::strlen), flags)
-			.setParameterInfo(0, "string");
+			.setParameterInfo(0, "str");
 
 		module.addUserDefinedFunction("getchar", lemon::wrap(&functions::getchar), flags)
-			.setParameterInfo(0, "string")
+			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index");
 
 		module.addUserDefinedFunction("substring", lemon::wrap(&functions::substring), flags)
-			.setParameterInfo(0, "string")
+			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index")
 			.setParameterInfo(2, "length");
 	}
