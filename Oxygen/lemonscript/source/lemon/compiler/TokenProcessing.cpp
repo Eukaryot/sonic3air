@@ -333,7 +333,28 @@ namespace lemon
 
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
 					token.mFunctionName = functionName;
-					token.mParenthesis = tokens[i+1].as<ParenthesisToken>();
+
+					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+					if (!content.empty())
+					{
+						if (content[0].getType() == Token::Type::COMMA_SEPARATED)
+						{
+							const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
+							token.mParameters.reserve(tokenLists.size());
+							for (const TokenList& tokenList : tokenLists)
+							{
+								CHECK_ERROR(tokenList.size() == 1, "Function parameter content must be one token", mLineNumber);
+								CHECK_ERROR(tokenList[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
+								vectorAdd(token.mParameters) = tokenList[0].as<StatementToken>();
+							}
+						}
+						else
+						{
+							CHECK_ERROR(content.size() == 1, "Function parameter content must be one token", mLineNumber);
+							CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
+							vectorAdd(token.mParameters) = content[0].as<StatementToken>();
+						}
+					}
 					tokens.erase(i+1);
 				}
 			}
@@ -603,36 +624,13 @@ namespace lemon
 			case Token::Type::FUNCTION:
 			{
 				FunctionToken& ft = token.as<FunctionToken>();
-				std::vector<StatementToken*> parameterTokens;	// TODO: For this and "parameterTypes" below, use some kind of buffer for std::vectors?
-
-				TokenList& content = ft.mParenthesis->mContent;
-				if (!content.empty())
-				{
-					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
-					{
-						const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
-						parameterTokens.reserve(tokenLists.size());
-						for (const TokenList& tokens : tokenLists)
-						{
-							CHECK_ERROR(tokens.size() == 1, "Function parameter content must be one token", mLineNumber);
-							CHECK_ERROR(tokens[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-							parameterTokens.push_back(&tokens[0].as<StatementToken>());
-						}
-					}
-					else
-					{
-						CHECK_ERROR(content.size() == 1, "Function parameter content must be one token", mLineNumber);
-						CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-						parameterTokens.push_back(&content[0].as<StatementToken>());
-					}
-				}
 
 				// Assign types
 				std::vector<const DataTypeDefinition*> parameterTypes;
-				parameterTypes.reserve(parameterTokens.size());
-				for (size_t i = 0; i < parameterTokens.size(); ++i)
+				parameterTypes.reserve(ft.mParameters.size());
+				for (size_t i = 0; i < ft.mParameters.size(); ++i)
 				{
-					const DataTypeDefinition* type = assignStatementDataType(*parameterTokens[i], nullptr);
+					const DataTypeDefinition* type = assignStatementDataType(*ft.mParameters[i], nullptr);
 					parameterTypes.push_back(type);
 				}
 

@@ -505,6 +505,7 @@ namespace lemon
 					case Operator::BINARY_AND:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_AND);	break;
 					case Operator::BINARY_OR:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
 					case Operator::BINARY_XOR:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
+
 					case Operator::COMPARE_EQUAL:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_EQ);	break;
 					case Operator::COMPARE_NOT_EQUAL:		 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_NEQ);	break;
 					case Operator::COMPARE_LESS:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_LT);	break;
@@ -624,26 +625,11 @@ namespace lemon
 			case Token::Type::FUNCTION:
 			{
 				const FunctionToken& ft = token.as<FunctionToken>();
-				const TokenList& content = ft.mParenthesis->mContent;
 
-				if (!content.empty())
+				// TODO: Check parameters vs. function signature?
+				for (const TokenPtr<StatementToken>& token : ft.mParameters)
 				{
-					// TODO: Check parameters vs. function signature
-					CHECK_ERROR(content.size() == 1, "More than one token left in function parameters", mLineNumber);
-					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
-					{
-						for (const TokenList& tokens : content[0].as<CommaSeparatedListToken>().mContent)
-						{
-							CHECK_ERROR(tokens.size() == 1, "More than one token left between commas", mLineNumber);
-							CHECK_ERROR(tokens[0].isStatement(), "Expected a statement as function parameter", mLineNumber);
-							compileTokenTreeToOpcodes(tokens[0].as<StatementToken>());
-						}
-					}
-					else
-					{
-						CHECK_ERROR(content[0].isStatement(), "Expected a statement as function parameter", mLineNumber);
-						compileTokenTreeToOpcodes(content[0].as<StatementToken>());
-					}
+					compileTokenTreeToOpcodes(*token);
 				}
 
 				// Using the data type parameter here to encode whether or not this is a base function call

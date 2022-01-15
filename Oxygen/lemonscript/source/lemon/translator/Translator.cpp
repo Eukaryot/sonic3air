@@ -349,13 +349,11 @@ namespace lemon
 					CppWriter::addIdentifier(line, ft.mFunctionName);
 					line << "(";
 
-					// TODO: Is this parameter list actually used as a list, or only a single comma-separated value in each case anyways?
-					const TokenList& parameters = ft.mParenthesis->mContent;
-					for (size_t k = 0; k < parameters.size(); ++k)
+					for (size_t k = 0; k < ft.mParameters.size(); ++k)
 					{
 						if (k > 0)
 							line << ", ";
-						translateTokenInternal(line, static_cast<const StatementToken&>(parameters[k]));
+						translateTokenInternal(line, ft.mParameters[k]);
 					}
 
 					line << ")";

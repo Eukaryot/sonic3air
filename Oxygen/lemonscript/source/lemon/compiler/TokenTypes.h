@@ -187,7 +187,7 @@ namespace lemon
 		std::string mFunctionName;
 		const Function* mFunction = nullptr;
 		bool mIsBaseCall = false;
-		TokenPtr<ParenthesisToken> mParenthesis;
+		std::vector<TokenPtr<StatementToken>> mParameters;
 	};
 
 
