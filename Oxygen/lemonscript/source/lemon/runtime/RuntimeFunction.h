@@ -30,8 +30,11 @@ namespace lemon
 
 		inline const std::vector<RuntimeOpcode*>& getOpcodePointers() const  { return mOpcodePointers; }
 
+		void clear();
 		void reserveForOpcodes(size_t numOpcodes);
 		RuntimeOpcode& addOpcode(size_t parameterSize);
+
+		void copyFrom(const RuntimeOpcodeBuffer& other);
 
 	public:
 		std::vector<RuntimeOpcode*> mOpcodePointers;	// Direct pointers to runtime opcodes

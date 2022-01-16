@@ -100,6 +100,10 @@ namespace lemon
 
 	Compiler::~Compiler()
 	{
+		// Free some memory again, by shrinking at least the largest pools
+		genericmanager::Manager<Node>::shrinkAllPools();
+		genericmanager::Manager<Token>::shrinkAllPools();
+
 		delete &mPreprocessor;
 	}
 
@@ -449,6 +453,20 @@ namespace lemon
 						}
 					}
 				}
+
+
+				static int nodesAdded = 0;
+				static int nodesThreshold = 0x1b000;
+				static int counters1[64] = { 0 };
+				static int counters2[64] = { 0 };
+				++counters1[std::min<size_t>(parserTokens.size(), 63)];
+				++counters2[std::min<size_t>(node.mTokenList.size(), 63)];
+				++nodesAdded;
+				if (nodesAdded >= nodesThreshold)
+				{
+					nodesThreshold += 0x1000;
+				}
+
 			}
 		}
 

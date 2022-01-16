@@ -77,7 +77,7 @@ namespace lemon
 	};
 
 
-	class TokenList : public genericmanager::ElementList<Token, 32>
+	class TokenList : public genericmanager::ElementList<Token, 16>
 	{
 	};
 

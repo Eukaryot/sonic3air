@@ -56,16 +56,7 @@ public:
 		// Free all pages
 		for (Page& page : mPages)
 		{
-			for (size_t i = 0; i < page.mSize; ++i)
-			{
-				Item& item = page.mItems[i];
-				if (item.mIsConstructed)
-				{
-					// Call object's destructor
-					item.mObject.~T();
-				}
-			}
-			free(page.mItems);
+			freePage(page);
 		}
 
 		// Clear arrays of pages and free objects
@@ -77,7 +68,7 @@ public:
 	{
 		// Get total number of reserved objects
 		size_t totalNumberOfObjects = 0;
-		for (Page& page : mPages)
+		for (const Page& page : mPages)
 		{
 			totalNumberOfObjects += page.mSize;
 		}
@@ -109,20 +100,35 @@ public:
 		return !item.mIsUsed;
 	}
 
+	inline void shrink()
+	{
+		// Perform shrinking only if there's more than 50% unused items
+		size_t totalNumberOfObjects = 0;
+		for (const Page& page : mPages)
+		{
+			totalNumberOfObjects += page.mSize;
+		}
+
+		if (mFreeItems.size() > totalNumberOfObjects / 2)
+		{
+			shrinkInternal();
+		}
+	}
+
 protected:
 	// An item is our little management struct that includes an object and some additional info needed
 	struct Item
 	{
 		T mObject;
-		bool mIsUsed;			// Set if object is currently used
-		bool mIsConstructed;	// Set if constructor was called in the object
+		bool mIsUsed = false;			// Set if object is currently used
+		bool mIsConstructed = false;	// Set if constructor was called in the object
 	};
 
 	// A page is basically an array of items that all get allocated as one chunk of memory
 	struct Page
 	{
-		size_t mSize;
-		Item* mItems;
+		size_t mSize = 0;
+		Item* mItems = nullptr;
 	};
 
 protected:
@@ -284,6 +290,61 @@ protected:
 
 		// Free the object
 		freeObject(object);
+	}
+
+private:
+	inline void freePage(Page& page)
+	{
+		for (size_t i = 0; i < page.mSize; ++i)
+		{
+			Item& item = page.mItems[i];
+			if (item.mIsConstructed)
+			{
+				// Call object's destructor
+				item.mObject.~T();
+			}
+		}
+		free(page.mItems);
+	}
+
+	inline void shrinkInternal()
+	{
+		// Remove all pages that are completely empty, but always leave the first page
+		for (int i = (int)mPages.size() - 1; i > 0; --i)
+		{
+			Page& page = mPages[i];
+			bool anyUsed = false;
+			for (size_t k = 0; k < page.mSize; ++k)
+			{
+				if (page.mItems[k].mIsUsed)
+				{
+					anyUsed = true;
+					break;
+				}
+			}
+
+			if (!anyUsed)
+			{
+				// Remove this page
+				freePage(page);
+				vectorRemoveSwap(mPages, i);
+			}
+		}
+
+		// Rebuild the free items list from scratch
+		mFreeItems.clear();
+		for (Page& page : mPages)
+		{
+			for (size_t i = 0; i < page.mSize; ++i)
+			{
+				Item& item = page.mItems[i];
+				if (!item.mIsUsed)
+				{
+					mFreeItems.push_back(&item);
+				}
+			}
+		}
+		std::reverse(mFreeItems.begin(), mFreeItems.end());
 	}
 
 private:

@@ -25,11 +25,22 @@ namespace lemon
 		delete[] mBuffer;
 	}
 
+	void RuntimeOpcodeBuffer::clear()
+	{
+		mSize = 0;
+		mOpcodePointers.clear();
+		// Not touching the reserved memory here
+	}
+
 	void RuntimeOpcodeBuffer::reserveForOpcodes(size_t numOpcodes)
 	{
-		delete[] mBuffer;
-		mReserved = numOpcodes * (sizeof(RuntimeOpcode) + 16);	// Estimate for maximum size
-		mBuffer = new uint8[mReserved];
+		const size_t memoryRequired = numOpcodes * (sizeof(RuntimeOpcode) + 16);	// Estimate for maximum size
+		if (memoryRequired > mReserved)
+		{
+			delete[] mBuffer;
+			mReserved = memoryRequired;
+			mBuffer = new uint8[mReserved];
+		}
 	}
 
 	RuntimeOpcode& RuntimeOpcodeBuffer::addOpcode(size_t parameterSize)
@@ -52,6 +63,25 @@ namespace lemon
 		return runtimeOpcode;
 	}
 
+	void RuntimeOpcodeBuffer::copyFrom(const RuntimeOpcodeBuffer& other)
+	{
+		delete[] mBuffer;
+		mBuffer = new uint8[other.mSize];
+		mSize = other.mSize;
+		mReserved = other.mSize;
+		memcpy(mBuffer, other.mBuffer, mSize);
+
+		mOpcodePointers.resize(other.mOpcodePointers.size());
+		for (size_t k = 0; k < mOpcodePointers.size(); ++k)
+		{
+			size_t offset = (size_t)((uint8*)other.mOpcodePointers[k] - other.mBuffer);
+			mOpcodePointers[k] = (RuntimeOpcode*)(mBuffer + offset);
+
+			offset = (size_t)((uint8*)other.mOpcodePointers[k]->mNext - other.mBuffer);
+			mOpcodePointers[k]->mNext = (RuntimeOpcode*)(mBuffer + offset);
+		}
+	}
+
 
 	void RuntimeFunction::build(const Runtime& runtime)
 	{
@@ -67,16 +97,20 @@ namespace lemon
 		static std::vector<OpcodeProcessor::OpcodeData> opcodeData;
 		OpcodeProcessor::buildOpcodeData(opcodeData, *mFunction);
 
+		// Using a static buffer as temporary buffer before knowing the final size
+		static RuntimeOpcodeBuffer tempBuffer;
+		tempBuffer.clear();
+		tempBuffer.reserveForOpcodes(numOpcodes);
+
 		// Create the runtime opcodes
-		mRuntimeOpcodeBuffer.reserveForOpcodes(numOpcodes);
 		mProgramCounterByOpcodeIndex.resize(numOpcodes, 0xffffffff);
 
 		for (size_t i = 0; i < numOpcodes; )
 		{
-			const size_t start = mRuntimeOpcodeBuffer.size();
+			const size_t start = tempBuffer.size();
 
 			int numOpcodesConsumed = 1;
-			createRuntimeOpcode(mRuntimeOpcodeBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, numOpcodesConsumed, runtime);
+			createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, numOpcodesConsumed, runtime);
 			for (int k = 0; k < numOpcodesConsumed; ++k)
 			{
 				mProgramCounterByOpcodeIndex[k + i] = start;
@@ -85,7 +119,7 @@ namespace lemon
 		}
 
 		// Translation of jumps
-		const std::vector<RuntimeOpcode*>& runtimeOpcodePointers = mRuntimeOpcodeBuffer.getOpcodePointers();
+		const std::vector<RuntimeOpcode*>& runtimeOpcodePointers = tempBuffer.getOpcodePointers();
 		for (size_t i = 0; i < runtimeOpcodePointers.size(); ++i)
 		{
 			RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
@@ -133,13 +167,16 @@ namespace lemon
 				//  -> But only do that for jumps forward, otherwise it messes with the tracking of steps executed too much, leading to buggy behavior
 				//  -> In fact, the steps counting is quite imprecise for the forward jumps, as they're counted as if everything in between would have been executed (but that's going to be ignored for performance's sake...)
 				const size_t targetOffset = (size_t)runtimeOpcode.mNext->getParameter<uint32>();
-				const size_t ownOffset = (size_t)((uint8*)&runtimeOpcode - mRuntimeOpcodeBuffer.getStart());
+				const size_t ownOffset = (size_t)((uint8*)&runtimeOpcode - tempBuffer.getStart());
 				if (targetOffset > ownOffset)
 				{
-					runtimeOpcode.mNext = (RuntimeOpcode*)(mRuntimeOpcodeBuffer.getStart() + targetOffset);
+					runtimeOpcode.mNext = (RuntimeOpcode*)(tempBuffer.getStart() + targetOffset);
 				}
 			}
 		}
+
+		// Copy the results over
+		mRuntimeOpcodeBuffer.copyFrom(tempBuffer);
 	}
 
 	size_t RuntimeFunction::translateFromRuntimeProgramCounter(const uint8* runtimeProgramCounter) const
