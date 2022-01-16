@@ -61,12 +61,21 @@ namespace
 				}
 			}
 			bitmap.insertBlend(insetX, insetY, data.mBitmap);
-			const int pixels = bitmap.getPixelCount();
-			for (int i = 0; i < pixels; ++i)
+			for (int y = 0; y < bitmap.mHeight; ++y)
 			{
-				float colorIntensity = (float)(bitmap.mData[i] & 0xff) / 255.0f;
-				colorIntensity *= interpolate(0.65f, 1.0f, saturate((float)(i / bitmap.mWidth) / (float)bitmap.mHeight * 2.0f));
-				bitmap.mData[i] = (bitmap.mData[i] & 0xff000000) | ((int)(colorIntensity * 255.5f) * 0x10101);
+				uint32* pixelPtr = bitmap.getPixelPointer(0, y);
+				const float shadingFactor = interpolate(0.65f, 1.0f, saturate((float)y / (float)bitmap.mHeight * 2.0f));
+				for (int x = 0; x < bitmap.mWidth; ++x)
+				{
+					float colorR = (float)((*pixelPtr) & 0xff);
+					float colorG = (float)((*pixelPtr >> 8) & 0xff);
+					float colorB = (float)((*pixelPtr >> 16) & 0xff);
+					colorR *= shadingFactor;
+					colorG *= shadingFactor;
+					colorB *= shadingFactor;
+					*pixelPtr = (uint32)(colorR + 0.5f) | ((uint32)(colorG + 0.5f) << 8) | ((uint32)(colorB + 0.5f) << 16) | (*pixelPtr & 0xff000000);
+					++pixelPtr;
+				}
 			}
 			data.mBitmap = bitmap;
 		}
