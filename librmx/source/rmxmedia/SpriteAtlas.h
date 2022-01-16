@@ -51,7 +51,7 @@ private:
 	static bool compareSpriteInfoBySize(const SpriteInfo& first, const SpriteInfo& second);
 
 protected:
-	Vec2i mPageSize = Vec2i(512, 512);
+	Vec2i mPageSize = Vec2i(512, 128);		// That size is a bit small for usual text rendering, but okay for pixelized rendering as used by Oxygen
 	int mPadding = 1;
 
 	struct Node

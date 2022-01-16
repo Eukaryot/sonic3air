@@ -44,6 +44,8 @@ public:
 	int getWidth() const			{ return mSize.x; }
 	int getHeight() const			{ return mSize.y; }
 
+	void clearBitmap();
+
 	Bitmap& accessBitmap();
 	void bitmapUpdated();
 	void setupAsRenderTarget(uint32 width, uint32 height);

@@ -39,6 +39,12 @@ void DrawerTexture::setImplementation(DrawerTextureImplementation* implementatio
 	}
 }
 
+void DrawerTexture::clearBitmap()
+{
+	mBitmap.clear();
+	invalidate();
+}
+
 Bitmap& DrawerTexture::accessBitmap()
 {
 	return mBitmap;

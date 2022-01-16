@@ -77,8 +77,8 @@ namespace lemon
 		Type mType = Type::NOP;
 		BaseType mDataType = BaseType::VOID;
 		uint8 mFlags = 0;
-		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
 		uint32 mLineNumber = 0;
+		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
 	};
 
 }

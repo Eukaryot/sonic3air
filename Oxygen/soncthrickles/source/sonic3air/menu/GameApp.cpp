@@ -67,8 +67,6 @@ void GameApp::initialize()
 	// Init shared resources
 	global::loadSharedResources();
 
-	FileHelper::loadTexture(mDisclaimerTexture, L"data/images/menu/disclaimer.png");
-
 	mGameView = &Application::instance().getGameView();
 	Simulation& simulation = Application::instance().getSimulation();
 	simulation.setRunning(false);
@@ -121,6 +119,7 @@ void GameApp::update(float timeElapsed)
 		mStateTimeout -= timeElapsed;
 		if (mStateTimeout <= 0.0f)
 		{
+			mDisclaimerTexture.clearBitmap();	// Unload to save on RAM
 			gotoPhase(1);
 		}
 	}
@@ -167,6 +166,12 @@ void GameApp::render()
 
 	if (mCurrentState == State::DISCLAIMER)
 	{
+		// Load disclaimer is not done already
+		if (!mDisclaimerTexture.isValid())
+		{
+			FileHelper::loadTexture(mDisclaimerTexture, L"data/images/menu/disclaimer.png");
+		}
+
 		const Rectf rect = RenderUtils::getLetterBoxRect(FTX::screenRect(), (float)mDisclaimerTexture.getWidth() / (float)mDisclaimerTexture.getHeight());
 		drawer.setBlendMode(DrawerBlendMode::NONE);
 		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
