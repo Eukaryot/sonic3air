@@ -27,7 +27,7 @@ namespace lemon
 		{
 			case IntegerDataType::Semantics::BOOLEAN:	return baseHash + (uint32)BaseType::BOOL;
 			case IntegerDataType::Semantics::CONSTANT:	return baseHash + (uint32)BaseType::INT_CONST;
-			default:									return baseHash + mBytes + ((uint32)mIsSigned * 0x80);
+			default:									return baseHash + (uint32)mBytes + ((uint32)mIsSigned * 0x80);
 		}
 	}
 

@@ -1067,7 +1067,7 @@ namespace lemon
 		str.trimWhitespace();
 		if (str.startsWith(PREFIX_FEATURE_LEVEL.c_str()) && str.endsWith(")"))
 		{
-			str.remove(0, PREFIX_FEATURE_LEVEL.size());
+			str.remove(0, (int)PREFIX_FEATURE_LEVEL.size());
 			str.remove(str.length() - 1, 1);
 			const uint64 value = rmx::parseInteger(str);
 			if (value > 0)
