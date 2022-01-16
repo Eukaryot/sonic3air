@@ -16,11 +16,11 @@ namespace rmx
 {
 	struct KeyboardEvent
 	{
-		int key;
-		uint32 scancode;
-		uint16 modifiers;
-		bool state;
-		bool repeat;
+		int key = 0;
+		uint32 scancode = 0;
+		uint16 modifiers = 0;
+		bool state = false;
+		bool repeat = false;
 	};
 
 	struct TextInputEvent
@@ -39,8 +39,8 @@ namespace rmx
 
 	struct MouseEvent
 	{
-		MouseButton button;
-		bool state;
+		MouseButton button = MouseButton::Left;
+		bool state = false;
 		Vec2i position;
 	};
 

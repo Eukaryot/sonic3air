@@ -906,7 +906,7 @@ namespace lemon
 				{
 					const bool conditionMet = (firstOpcode.mParameter != 0);
 					const Opcode& condJumpOpcode = mOpcodes[condJumpPosition];
-					uint64 jumpTarget = conditionMet ? (uint64)(condJumpPosition + 1) : condJumpOpcode.mParameter;
+					uint64 jumpTarget = conditionMet ? ((uint64)condJumpPosition + 1) : condJumpOpcode.mParameter;
 
 					// Check for a shortcut (as this is not ruled out at that point)
 					if (mOpcodes[(size_t)jumpTarget].mType == Opcode::Type::JUMP)

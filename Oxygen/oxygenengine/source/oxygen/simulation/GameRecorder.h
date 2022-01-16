@@ -16,7 +16,7 @@ class GameRecorder
 public:
 	struct PlaybackResult
 	{
-		uint16 mInputs[2];
+		uint16 mInputs[2] = { 0, 0 };
 		std::vector<uint8>* mData = nullptr;
 	};
 

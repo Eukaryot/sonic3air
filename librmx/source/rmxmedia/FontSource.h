@@ -17,11 +17,11 @@ class API_EXPORT FontSource
 public:
 	struct GlyphInfo
 	{
-		uint32 unicode;
+		uint32 unicode = 0;
 		Bitmap bitmap;
-		int leftIndent;
-		int topIndent;
-		int advance;
+		int leftIndent = 0;
+		int topIndent = 0;
+		int advance = 0;
 	};
 
 public:

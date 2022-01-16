@@ -90,25 +90,25 @@ public:
 	{
 		struct Hit
 		{
-			uint32 mWrittenValue;
-			uint32 mAddress;
-			uint16 mBytes;
+			uint32 mWrittenValue = 0;
+			uint32 mAddress = 0;
+			uint16 mBytes = 0;
 			Location mLocation;
 			std::vector<uint64> mCallStack;
 		};
 
 		std::vector<Hit> mHits;
-		uint32 mAddress;
-		uint16 mBytes;
-		bool mPersistent;
-		uint32 mInitialValue;
+		uint32 mAddress = 0;
+		uint16 mBytes = 0;
+		bool mPersistent = false;
+		uint32 mInitialValue = 0;
 		Location mLastHitLocation;
 	};
 
 	struct VRAMWrite
 	{
-		uint16 mAddress;
-		uint16 mSize;
+		uint16 mAddress = 0;
+		uint16 mSize = 0;
 		Location mLocation;
 		std::vector<uint64> mCallStack;
 	};

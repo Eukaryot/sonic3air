@@ -236,6 +236,7 @@ uint64 SharedDatabase::setupCharacterSprite(uint8 character, uint16 animationSpr
 		uint32 mappingOffset;
 		switch (character)
 		{
+			default:
 			case 0:		// Sonic
 				sourceBase    = (animationSprite >= 0xda) ? 0x140060 : 0x100000;
 				tableAddress  = (superActive) ? 0x148378 : 0x148182;

@@ -177,11 +177,11 @@ namespace lemon
 				{
 					const char ch = input[i];
 					if (ch >= '0' && ch <= '9')
-						result = result * 16 + (ch - '0');
+						result = result * 16 + (int64)(ch - '0');
 					else if (ch >= 'A' && ch <= 'F')
-						result = result * 16 + (ch - 'A') + 10;
+						result = result * 16 + (int64)(ch - 'A') + 10;
 					else if (ch >= 'a' && ch <= 'f')
-						result = result * 16 + (ch - 'a') + 10;
+						result = result * 16 + (int64)(ch - 'a') + 10;
 					else
 						CHECK_ERROR(false, "Invalid hexadecimal number", lineNumber);
 				}

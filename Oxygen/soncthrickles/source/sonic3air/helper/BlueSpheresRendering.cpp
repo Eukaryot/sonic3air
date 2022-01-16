@@ -470,8 +470,8 @@ void BlueSpheresRendering::performLookupCalculations()
 
 	struct CachedPixelData
 	{
-		bool mHitsGround;
-		float mFogAlpha;
+		bool mHitsGround = false;
+		float mFogAlpha = 0.0f;
 		Vec3f mHitPosition;
 		Vec3f mHitTangentX;
 		Vec3f mHitTangentY;

@@ -63,7 +63,7 @@ public:
 			_NUM
 		};
 
-		DeviceType mDeviceType;
+		DeviceType mDeviceType = DeviceType::KEYBOARD;
 		std::string mIdentifier;
 		std::map<uint64, std::string> mDeviceNames;		// Uses string hash as key
 		ControlMapping mMappings[(size_t)Button::_NUM];

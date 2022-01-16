@@ -179,19 +179,15 @@ public:
 	void jumpToBeginOfDataBlock(DataBlockInfo& dataBlockInfo);
 	void jumpToEndOfDataBlock(DataBlockInfo& dataBlockInfo);
 
-
 private:
 	void tokenSerialization(uint32 token, const char* name);
 
 	void readPortable(void* address, size_t bytes, bool checkEndianness);
 	void writePortable(const void* address, size_t bytes, bool checkEndianness);
 
-
 private:
-	std::istream*	mInputStream;
-	std::ostream*	mOutputStream;
-	TokenMode		mTokenMode;
-	bool			mIsLittleEndianMachine;
-
-
+	std::istream* mInputStream = nullptr;
+	std::ostream* mOutputStream = nullptr;
+	TokenMode	  mTokenMode = TOKEN_FLAG_NONE;
+	bool		  mIsLittleEndianMachine = true;
 };

@@ -31,9 +31,9 @@ private:
 
 	struct ChannelData
 	{
-		int32 mOutputBuffer[OUTPUT_BUFFER_SIZE];
-		int32 mHistoryBuffer[ACCUMULATION_BUFFER_SIZE];		// Cyclic buffer
-		size_t mIndexInHistory = 0;							// Index of next value in history buffer
+		int32 mOutputBuffer[OUTPUT_BUFFER_SIZE] = { 0 };
+		int32 mHistoryBuffer[ACCUMULATION_BUFFER_SIZE] = { 0 };	// Cyclic buffer
+		size_t mIndexInHistory = 0;								// Index of next value in history buffer
 		int64 mAccumulator = 0;
 	};
 	ChannelData mChannelData[MAX_NUM_CHANNELS];

@@ -202,11 +202,11 @@ namespace rmx
 			uint64 nextDigit;
 			const char ch = input[pos];
 			if (ch >= '0' && ch <= '9')
-				nextDigit = (ch - '0');
+				nextDigit = (uint64)(ch - '0');
 			else if (base == 16 && ch >= 'A' && ch <= 'F')
-				nextDigit = (ch - 'A') + 10;
+				nextDigit = (uint64)(ch - 'A') + 10;
 			else if (base == 16 && ch >= 'a' && ch <= 'f')
-				nextDigit = (ch - 'a') + 10;
+				nextDigit = (uint64)(ch - 'a') + 10;
 			else
 				break;
 

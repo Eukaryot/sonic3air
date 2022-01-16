@@ -30,8 +30,8 @@ private:
 	std::vector<uint8> mVisibilityLookup;
 	std::vector<uint8> mStraightIntensityLookup[0x20];
 	std::vector<uint8> mRotationIntensityLookup[0x0f];
-	int mNumPureSkyRows;
-	int mNumPureGroundRows;
+	int mNumPureSkyRows = 0;
+	int mNumPureGroundRows = 0;
 	int mPureRowsForWidth = 0;
 
 	bool mLastFiltering = false;

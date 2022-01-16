@@ -24,7 +24,7 @@ namespace rmx
 	public:
 		struct MixerParameters
 		{
-			int32* mOutputBuffers[2];		// One for each channel
+			int32* mOutputBuffers[2] = { nullptr, nullptr };	// One for each channel
 			size_t mOutputSamples = 0;
 			const SDL_AudioSpec* mOutputFormat = nullptr;
 			float mAccumulatedVolume = 1.0f;

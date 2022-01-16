@@ -32,11 +32,11 @@ private:
 	struct Internal;
 	Internal& mInternal;
 
-	blip_t* blips[2];  /* Blip Buffer resampling */
+	blip_t* blips[2] = { nullptr, nullptr };  /* Blip Buffer resampling */
 
 	/* FM output buffer (large enough to hold a whole frame at original chips rate) */
-	int fm_buffer[1080 * 2];
-	int fm_last[2];
+	int fm_buffer[1080 * 2] = { 0 };
+	int fm_last[2] = { 0, 0 };
 	int* fm_ptr = nullptr;
 
 	/* Cycle-accurate FM samples */

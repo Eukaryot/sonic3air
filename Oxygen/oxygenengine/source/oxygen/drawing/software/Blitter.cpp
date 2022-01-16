@@ -197,7 +197,7 @@ namespace blitterinternal
 			const int sourceY = sourceRect.y + lineIndex * sourceRect.height / destRect.height;
 			uint32* destData = destBitmap.getPixelPointer(destRect.x, destY);
 
-			if (sourceY == lastSourceY)
+			if (sourceY == lastSourceY && nullptr != lastDestData)
 			{
 				// Just copy the content from the last line, as it's the contents again
 				memcpy(destData, lastDestData, destRect.width * 4);

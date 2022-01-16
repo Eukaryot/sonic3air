@@ -40,7 +40,7 @@ public:
 	{
 		std::string  mTitle;
 		std::wstring mIconFile;
-		int			 mWindowsIconResource;
+		int			 mWindowsIconResource = 0;
 		std::string	 mBuildVersion;
 		std::wstring mAppDataFolder;
 	};

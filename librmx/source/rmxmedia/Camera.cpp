@@ -322,14 +322,14 @@ void Camera::setCameraView() const
 	glLoadIdentity();
 	if (mOrthoMode)
 	{
-		glOrtho(mOrtho[0], mOrtho[1], mOrtho[2], mOrtho[3], mClipNear, mClipFar);
+		glOrtho((GLdouble)mOrtho[0], (GLdouble)mOrtho[1], (GLdouble)mOrtho[2], (GLdouble)mOrtho[3], (GLdouble)mClipNear, (GLdouble)mClipFar);
 	}
 	else
 	{
-		glFrustum(-tan(deg2rad(mHalfFov[0])) * mClipNear,
-				   tan(deg2rad(mHalfFov[1])) * mClipNear,
-				  -tan(deg2rad(mHalfFov[2])) * mClipNear,
-				   tan(deg2rad(mHalfFov[3])) * mClipNear, mClipNear, mClipFar);
+		glFrustum((GLdouble)-tan(deg2rad(mHalfFov[0])) * mClipNear,
+				  (GLdouble) tan(deg2rad(mHalfFov[1])) * mClipNear,
+				  (GLdouble)-tan(deg2rad(mHalfFov[2])) * mClipNear,
+				  (GLdouble) tan(deg2rad(mHalfFov[3])) * mClipNear, (GLdouble)mClipNear, (GLdouble)mClipFar);
 	}
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

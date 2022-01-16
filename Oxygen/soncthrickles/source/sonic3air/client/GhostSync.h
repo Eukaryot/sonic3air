@@ -64,7 +64,7 @@ private:
 
 	struct PlayerData
 	{
-		uint32 mPlayerID;
+		uint32 mPlayerID = 0;
 		std::deque<GhostData> mGhostDataQueue;
 		GhostData mShownGhostData;
 		int mTimeout = 0;
