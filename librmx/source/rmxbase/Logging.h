@@ -32,18 +32,23 @@ namespace rmx
 	class StdCoutLogger final : public LoggerBase
 	{
 	public:
+		explicit StdCoutLogger(bool addTimestamp = false);
 		void log(LogLevel logLevel, const std::string& string) override;
+
+	private:
+		bool mAddTimestamp = false;
 	};
 
 
 	class FileLogger final : public LoggerBase
 	{
 	public:
-		FileLogger(const std::wstring& filename);
+		FileLogger(const std::wstring& filename, bool addTimestamp = false);
 		void log(LogLevel logLevel, const std::string& string) override;
 
 	private:
 		FileHandle mFileHandle;
+		bool mAddTimestamp = false;
 	};
 
 

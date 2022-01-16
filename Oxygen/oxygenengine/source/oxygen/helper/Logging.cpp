@@ -85,7 +85,7 @@ namespace oxygen
 	void Logging::startup(const std::wstring& filename)
 	{
 		rmx::Logging::addLogger(*new rmx::StdCoutLogger());
-		rmx::Logging::addLogger(*new rmx::FileLogger(filename));
+		rmx::Logging::addLogger(*new rmx::FileLogger(filename, true));
 
 		// Register as logger and message box callback for rmx error handling
 		rmx::ErrorHandling::mLogger = &mErrorLogger;

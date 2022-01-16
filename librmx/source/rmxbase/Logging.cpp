@@ -15,13 +15,44 @@
 	#include <android/log.h>
 #endif
 
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+
 
 namespace rmx
 {
+	namespace detail
+	{
+		std::string getTimestampString()
+		{
+			time_t now = time(0);
+			struct tm tstruct;
+			char buf[80];
+		#if defined(PLATFORM_WINDOWS)
+			localtime_s(&tstruct, &now);
+		#else
+			tstruct = *localtime(&now);
+		#endif
+			strftime(buf, sizeof(buf), "[%Y-%m-%d %T] ", &tstruct);
+			return buf;
+		}
+	}
+
+
+	StdCoutLogger::StdCoutLogger(bool addTimestamp) :
+		mAddTimestamp(addTimestamp)
+	{
+	}
 
 	void StdCoutLogger::log(LogLevel logLevel, const std::string& string)
 	{
 		// Write to std::cout
+		if (mAddTimestamp)
+		{
+			std::cout << detail::getTimestampString();
+		}
 		std::cout << string << "\r\n";
 		std::cout << std::flush;
 
@@ -39,7 +70,8 @@ namespace rmx
 	}
 
 
-	FileLogger::FileLogger(const std::wstring& filename)
+	FileLogger::FileLogger(const std::wstring& filename, bool addTimestamp) :
+		mAddTimestamp(addTimestamp)
 	{
 		// Create directory if needed
 		const size_t slashPosition = filename.find_last_of(L"/\\");
@@ -53,6 +85,12 @@ namespace rmx
 
 	void FileLogger::log(LogLevel logLevel, const std::string& string)
 	{
+		if (mAddTimestamp)
+		{
+			std::string timestampString = detail::getTimestampString();
+			mFileHandle.write(timestampString.c_str(), timestampString.length());
+		}
+
 		// Write to file
 		mFileHandle.write(string.c_str(), string.length());
 		mFileHandle.write("\r\n", 2);
