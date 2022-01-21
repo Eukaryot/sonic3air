@@ -18,6 +18,8 @@ function u8 BossHPZKnuckles.chooseMusicTrack()
 		return 0xf5		// Knuckles' theme from S&K
 	else if (option == 2)
 		return 0xf6		// Mini-boss theme from S3
+	else if (option == 3)
+		return 0xf9		// Knuckles' theme from S3 prototype
 	return 0x1f		// Fallback value, should not get reached
 }
 #endif

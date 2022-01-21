@@ -312,6 +312,12 @@ function void Standalone.playAudio(u8 sfxId)
 				soundRegType = SoundRegType.TYPE_MUSIC
 			}
 		}
+		else if (sfxId == 0xf9)
+		{
+			// Knuckles' Theme (S3 prototype version enforced)
+			soundKey = "1f_proto"
+			soundRegType = SoundRegType.TYPE_MUSIC
+		}
 
 		// Support for Sonic 3 prototype music
 		if (sfxId == 0x07 && (Game.getSetting(SETTING_CNZ_PROTOTYPE_MUSIC) & 0x01))

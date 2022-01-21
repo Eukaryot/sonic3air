@@ -319,7 +319,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<OptionsMenuEntry>().initEntry("In Hidden Palace:", option::HPZ_MUSIC)
 			.addOption("Sonic 3", 0)
 			.addOption("Sonic & Knuckles", 1)
-			.addOption("S3 + S&K Mini-Boss", 2);
+			.addOption("S3 + S&K Mini-Boss", 2)
+			.addOption("S3 Prototype", 3);
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("Sky Sanctuary Bosses:", option::SSZ_BOSSTRACKS)
 			.addOption("Normal Boss Music", 0)
