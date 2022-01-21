@@ -507,7 +507,6 @@ function void fn081f94()
 		if (u16[0xffffb010] >= objA0.position.x.u16)
 		{
 			// Launch 3 new missiles
-			debugWatch(A0 + 0x39, 1)
 			objA0.value39 = 2
 			for (u8 i = 0; i < 3; ++i)
 			{

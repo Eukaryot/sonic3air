@@ -132,9 +132,6 @@ function void fn010628()
 //# address-hook(0x010740) end(0x0107ec)
 function void fn010740()
 {
-	if (A0 == 0xffffb04a)
-		debugWatch(A0 + 0x04, 1)
-
 	if (debug_mode.enabled && A0 == 0xffffb000 && (control.pad1.pressed & CONTROL_B))
 	{
 		debug_mode.state = 0x01
