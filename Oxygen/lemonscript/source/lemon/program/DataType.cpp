@@ -13,9 +13,8 @@
 namespace lemon
 {
 
-	const std::string& DataTypeDefinition::toString() const
+	const std::string& VoidDataType::toString() const
 	{
-		RMX_ASSERT(mClass == Class::VOID, "Base class call to 'DataTypeDefinition::toString' is only allowed for the void type");
 		static const std::string TYPE_STRING_VOID = "void";
 		return TYPE_STRING_VOID;
 	}

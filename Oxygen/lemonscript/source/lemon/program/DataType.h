@@ -78,8 +78,18 @@ namespace lemon
 
 		template<typename T> const T& as() const  { return static_cast<const T&>(*this); }
 
-		virtual uint32 getDataTypeHash() const  { return 0; }	// Upper 8 bits should always be the value of mClass
-		virtual const std::string& toString() const;
+		virtual uint32 getDataTypeHash() const = 0;
+		virtual const std::string& toString() const = 0;
+	};
+
+	struct VoidDataType : public DataTypeDefinition
+	{
+		inline VoidDataType() :
+			DataTypeDefinition(Class::VOID, 0)
+		{}
+
+		uint32 getDataTypeHash() const override  { return 0; }
+		const std::string& toString() const override;
 	};
 
 	struct IntegerDataType : public DataTypeDefinition
@@ -108,14 +118,15 @@ namespace lemon
 			DataTypeDefinition(Class::STRING, 8)
 		{}
 
-		uint32 getDataTypeHash() const override  { return ((uint32)Class::STRING) << 24; }
+		// Rather unfortunately, the data type hash for string needs to be the same as for u64, for feature level 1 compatibility regarding function overloading
+		uint32 getDataTypeHash() const override  { return 0x01000008; }
 		const std::string& toString() const override;
 	};
 
 
 	struct PredefinedDataTypes
 	{
-		inline static const DataTypeDefinition VOID   = DataTypeDefinition(DataTypeDefinition::Class::VOID, 0);
+		inline static const VoidDataType VOID		  = VoidDataType();
 
 		inline static const IntegerDataType UINT_8	  = IntegerDataType(1, IntegerDataType::Semantics::DEFAULT, false);
 		inline static const IntegerDataType UINT_16	  = IntegerDataType(2, IntegerDataType::Semantics::DEFAULT, false);
