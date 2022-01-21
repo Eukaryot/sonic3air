@@ -394,7 +394,9 @@ function void renderNextObject()
 			{
 				u16 backup = D6.u16
 				++spriteTag
+			#if STANDALONE
 				Renderer.setSpriteTagWithPosition(spriteTag, D0.u16, D1.u16)
+			#endif
 				writeToSpriteTableCompound(renderQueue)
 				D6.u16 = backup
 			}

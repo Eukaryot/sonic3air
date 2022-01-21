@@ -47,17 +47,16 @@ function void fn034800()
 
 		D2.u16 = objA0.position.x.u16 - 0x24
 		D3.u16 = objA0.position.y.u16 + 0x28
-		D0 = 7
-		while (D0.s16 >= 0)
+		for (u8 i = 0; i < 8; ++i)
 		{
-			u16[(A2+=2)-2] = D2.u16
-			u16[(A2+=2)-2] = D3.u16
-			u16[(A2+=2)-2] = 5
+			u16[A2]   = D2.u16
+			u16[A2+2] = D3.u16
+			u16[A2+4] = 5
 			D2.u16 -= 0x18
 			D3.u16 += 0x30
-			--D0.s16
+			A2 += 6
 		}
-		u16[A2 - 0x02] = 6
+		u16[A2-2] = 6
 		objA0.value3e = A1.u16
 	}
 
@@ -281,19 +280,19 @@ function void fn034b22()
 	s8 sign = (objA0.flags2a & 0x01) ? 1 : -1
 
 	A1 = 0xffff0000 + objA0.value3e
-	D0 = 0
-	D0.u16 = u16[A0 + 0x3c] + 0x18
-	u32 modulo = u16(D0 % 0x30)
-	D0 = u16(D0 / 0x30) + (modulo << 16)
-	u16[A1 + 0x16] = D0.u16
-	D1.u16 = D0.u16
+	D0 = u16[A0 + 0x3c] + 0x18
+	u16 numSections = D0 / 0x30
+	u16 remainder = D0 % 0x30
+
+	u16[A1 + 0x16] = numSections
+	D1.u16 = numSections
+
 	A2 = A1 + 0x18
-	D2.u16 = objA0.position.x.u16 + 0x0c * sign
-	D3.u16 = objA0.position.y.u16 - 0x08
-	D0 = (D0 << 16) + (D0 >> 16)
+	u16 px = objA0.position.x.u16 + 0x0c * sign
+	u16 py = objA0.position.y.u16 - 0x08
 	if (D1.u16 == 8)
 	{
-		D0.u16 = 0x30
+		remainder = 0x30
 		D1 = 7
 	}
 	else
@@ -301,20 +300,33 @@ function void fn034b22()
 		++u16[A1 + 0x16]
 	}
 
-	D3.u16 += D0.u16
-	D0.u16 >>= 1
-	D2.u16 += D0.u16 * sign
-	while (D1.s16 >= 0)
+	py += remainder
+	px += (remainder >> 1) * sign
+#if STANDALONE
+	// Add the compound object's sub-sprites in reverse order, which works better for frame interpolation
+	A2 += D1.u8 * 6
+	for (u8 i = 0; i <= D1.u8; ++i)
 	{
-		u16[(A2+=2)-2] = D2.u16
-		u16[(A2+=2)-2] = D3.u16
-		u16[(A2+=2)-2] = 5
-		D2.u16 += 0x18 * sign
-		D3.u16 += 0x30
-		--D1.s16
+		u16[A2]   = px
+		u16[A2+2] = py
+		u16[A2+4] = 5
+		px += 0x18 * sign
+		py += 0x30
+		A2 -= 6
 	}
-
-	u16[A2 - 0x02] = 6
+	A2 = A1 + 0x18 + 6
+#else
+	for (u8 i = 0; i <= D1.u8; ++i)
+	{
+		u16[A2]   = px
+		u16[A2+2] = py
+		u16[A2+4] = 5
+		px += 0x18 * sign
+		py += 0x30
+		A2 += 6
+	}
+#endif
+	u16[A2-2] = 6
 }
 
 
