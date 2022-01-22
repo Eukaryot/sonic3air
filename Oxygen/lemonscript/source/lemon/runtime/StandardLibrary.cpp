@@ -359,6 +359,14 @@ namespace lemon
 			const std::string part = string->substr(index, length);
 			return runtime->addString(part);
 		}
+
+		StringRef getStringFromHash(uint64 hash)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const StoredString* str = runtime->resolveStringByKey(hash);
+			return (nullptr == str) ? StringRef() : StringRef(hash, str);
+		}
 	}
 
 
@@ -469,5 +477,8 @@ namespace lemon
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index")
 			.setParameterInfo(2, "length");
+
+		module.addUserDefinedFunction("getStringFromHash", lemon::wrap(&functions::getStringFromHash), flags)
+			.setParameterInfo(0, "hash");
 	}
 }
