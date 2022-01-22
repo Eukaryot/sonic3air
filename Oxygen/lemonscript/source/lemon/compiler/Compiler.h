@@ -10,6 +10,7 @@
 
 #include "lemon/program/Opcode.h"
 #include "lemon/compiler/Definitions.h"
+#include "lemon/compiler/Errors.h"
 #include "lemon/compiler/PreprocessorDefinition.h"
 
 
@@ -39,7 +40,13 @@ namespace lemon
 			};
 			std::vector<Interval> mIntervals;
 
-			std::pair<uint32, std::wstring> translateLineNumber(uint32 lineNumber) const;
+			struct TranslationResult
+			{
+				std::wstring mFilename;
+				uint32 mLineNumber = 0;
+			};
+
+			TranslationResult translateLineNumber(uint32 lineNumber) const;
 			void push(uint32 currentLineNumber, const std::wstring& filename, uint32 lineOffsetInFile);
 		};
 
@@ -56,7 +63,7 @@ namespace lemon
 		{
 			std::string mMessage;
 			std::wstring mFilename;
-			uint32 mLineNumber = 0;
+			CompilerError mError;
 		};
 
 	public:

@@ -66,7 +66,6 @@ public:
 
 private:
 	static std::string buildScriptLocationString(lemon::Runtime& runtime);
-	bool loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename, const lemon::PreprocessorDefinitionMap& preprocessorDefinitions);
 
 private:
 	struct Internal;

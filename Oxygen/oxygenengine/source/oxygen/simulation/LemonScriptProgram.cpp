@@ -157,17 +157,28 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 		const bool compileSuccess = compiler.loadScript(filename);
 		if (!compileSuccess && !compiler.getErrors().empty())
 		{
-			for (const auto& error : compiler.getErrors())
+			for (const lemon::Compiler::ErrorMessage& error : compiler.getErrors())
 			{
-				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mFilename).toString(), error.mLineNumber));
+				LogDisplay::instance().addLogError(String(0, "Compile error: %s (in '%s', line %d)", error.mMessage.c_str(), *WString(error.mFilename).toString(), error.mError.mLineNumber));
 			}
 
-			const auto& error = compiler.getErrors().front();
-			std::string text = "Script compile error:\n" + error.mMessage + "\n";
+			const lemon::Compiler::ErrorMessage& error = compiler.getErrors().front();
+			std::string text = error.mMessage + ".";	// Because error messages usually don't end with a dot
+			switch (error.mError.mCode)
+			{
+				case lemon::CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH:
+				{
+					text += " It's possible the module requires a newer game version.";
+					break;
+				}
+				default:
+					break;
+			}
+			text = "Script compile error:\n" + text + "\n\n";
 			if (error.mFilename.empty())
-				text += "in module " + module.getModuleName();
+				text += "Caused in module " + module.getModuleName() + ".";
 			else
-				text += "in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mLineNumber) + ", of module '" + module.getModuleName() + "'";
+				text += "Caused in file '" + WString(error.mFilename).toStdString() + "', line " + std::to_string(error.mError.mLineNumber) + ", of module '" + module.getModuleName() + "'.";
 			RMX_ERROR(text, );
 			return false;
 		}

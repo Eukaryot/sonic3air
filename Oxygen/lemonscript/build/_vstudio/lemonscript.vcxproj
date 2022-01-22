@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\Errors.h" />
     <ClInclude Include="..\..\source\lemon\compiler\FunctionCompiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Node.h" />

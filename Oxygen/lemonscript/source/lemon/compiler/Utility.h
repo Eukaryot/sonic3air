@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "lemon/compiler/Errors.h"
 
 
 #ifdef DEBUG
@@ -29,7 +29,6 @@
 	} \
 }
 
-
 #define CHECK_ERROR(expression, errorMessage, lineNumber) \
 { \
 	if (!(expression)) \
@@ -41,6 +40,14 @@
 	} \
 }
 
+#define REPORT_ERROR_CODE(errorCode, data1, data2, errorMessage) \
+{ \
+	LEMON_DEBUG_BREAK(errorMessage); \
+	std::ostringstream stream; \
+	stream << errorMessage; \
+	throw CompilerException(stream.str().c_str(), errorCode, data1, data2); \
+}
+
 
 namespace lemon
 {
@@ -48,10 +55,23 @@ namespace lemon
 	class CompilerException : public std::runtime_error
 	{
 	public:
-		inline CompilerException(const std::string& message, uint32 lineNumber = 0) : std::runtime_error(message), mLineNumber(lineNumber) {}
+		inline CompilerException(const std::string& message, uint32 lineNumber = 0) :
+			std::runtime_error(message)
+		{
+			mError.mLineNumber = lineNumber;
+		}
+
+		inline CompilerException(const std::string& message, CompilerError::Code errorCode, uint64 data1, uint64 data2, uint32 lineNumber = 0) :
+			std::runtime_error(message)
+		{
+			mError.mCode = errorCode;
+			mError.mData1 = data1;
+			mError.mData2 = data2;
+			mError.mLineNumber = lineNumber;
+		}
 
 	public:
-		uint32 mLineNumber;
+		CompilerError mError;
 	};
 
 }

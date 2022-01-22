@@ -55,12 +55,13 @@ namespace lemon
 	};
 
 
-	std::pair<uint32, std::wstring> Compiler::LineNumberTranslation::translateLineNumber(uint32 lineNumber) const
+	Compiler::LineNumberTranslation::TranslationResult Compiler::LineNumberTranslation::translateLineNumber(uint32 lineNumber) const
 	{
+		TranslationResult result;
 		if (mIntervals.empty())
 		{
 			CHECK_ERROR_NOLINE(false, "Error resolving line number");
-			return std::make_pair<uint32, std::wstring>(0, L"");
+			return result;
 		}
 
 		// TODO: Possible optimization with binary search
@@ -69,8 +70,9 @@ namespace lemon
 			++index;
 
 		const Interval& interval = mIntervals[index];
-		const uint32 originalLineNumber = lineNumber - interval.mStartLineNumber + interval.mLineOffsetInFile;
-		return std::make_pair(originalLineNumber, interval.mFilename);
+		result.mFilename = interval.mFilename;
+		result.mLineNumber = lineNumber - interval.mStartLineNumber + interval.mLineOffsetInFile;
+		return result;
 	}
 
 	void Compiler::LineNumberTranslation::push(uint32 currentLineNumber, const std::wstring& filename, uint32 lineOffsetInFile)
@@ -182,11 +184,12 @@ namespace lemon
 		}
 		catch (const CompilerException& e)
 		{
-			const auto& pair = mLineNumberTranslation.translateLineNumber(e.mLineNumber);
+			const auto& translated = mLineNumberTranslation.translateLineNumber(e.mError.mLineNumber);
 			ErrorMessage& error = vectorAdd(mErrors);
 			error.mMessage = e.what();
-			error.mFilename = pair.second;
-			error.mLineNumber = pair.first + 1;	// Add one because line numbers always start at 1 for user display
+			error.mFilename = translated.mFilename;
+			error.mError = e.mError;
+			error.mError.mLineNumber = translated.mLineNumber + 1;	// Add one because line numbers always start at 1 for user display
 		}
 
 		mFunctionNodes.clear();		// All entries got invalid anyway with root node destruction
@@ -254,7 +257,7 @@ namespace lemon
 			ErrorMessage& error = vectorAdd(mErrors);
 			error.mMessage = e.what();
 			error.mFilename = filename;
-			error.mLineNumber = e.mLineNumber;
+			error.mError = e.mError;
 			return false;
 		}
 
@@ -698,9 +701,9 @@ namespace lemon
 		}
 
 		// Set source metadata
-		const auto& pair = mLineNumberTranslation.translateLineNumber(lineNumber);
-		function.mSourceFilename = pair.second;
-		function.mSourceBaseLineOffset = lineNumber - pair.first;
+		const auto& translated = mLineNumberTranslation.translateLineNumber(lineNumber);
+		function.mSourceFilename = translated.mFilename;
+		function.mSourceBaseLineOffset = lineNumber - translated.mLineNumber;
 
 		return function;
 	}
@@ -1090,6 +1093,12 @@ namespace lemon
 			const uint64 value = rmx::parseInteger(str);
 			if (value > 0)
 			{
+				// Don't allow a higher script feature level than actually supported
+				const constexpr uint32 MAX_SCRIPT_FEATURE_LEVEL = 2;
+				if (value > MAX_SCRIPT_FEATURE_LEVEL)
+				{
+					REPORT_ERROR_CODE(CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH, value, MAX_SCRIPT_FEATURE_LEVEL, "Script uses feature level " << value << ", but the highest supported level is " << MAX_SCRIPT_FEATURE_LEVEL);
+				}
 				mGlobalCompilerConfig.mScriptFeatureLevel = (uint32)value;
 			}
 			return true;

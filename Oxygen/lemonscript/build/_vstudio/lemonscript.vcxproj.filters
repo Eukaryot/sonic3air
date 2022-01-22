@@ -242,6 +242,9 @@
     <ClInclude Include="..\..\source\lemon\compiler\Operators.h">
       <Filter>lemon\compiler</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Errors.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />
