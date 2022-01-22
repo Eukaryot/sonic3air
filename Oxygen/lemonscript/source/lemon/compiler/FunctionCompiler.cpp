@@ -506,7 +506,12 @@ namespace lemon
 					case Operator::BINARY_OR:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
 					case Operator::BINARY_XOR:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
 
-					case Operator::COMPARE_EQUAL:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_EQ);	break;
+					case Operator::COMPARE_EQUAL:
+						compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_EQ);
+						if (consumeResult && mConfig.mScriptFeatureLevel >= 2)
+							CHECK_ERROR(false, "Result of comparison is not used, this is certainly a mistake in the script", mLineNumber);
+						break;
+
 					case Operator::COMPARE_NOT_EQUAL:		 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_NEQ);	break;
 					case Operator::COMPARE_LESS:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_LT);	break;
 					case Operator::COMPARE_LESS_OR_EQUAL:	 compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_LE);	break;
