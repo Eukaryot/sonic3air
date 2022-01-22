@@ -573,22 +573,6 @@ function void fn0679b8()
 }
 
 
-function void UpdatePaletteEffects.UpdateSuperSonic.Original(u8 characterVersion)
-{
-	// Note that this is used for Tails as well, but only to update Sonic's palette (affects the Flickies!)
-	--super.palettefx.timer
-	if (super.palettefx.timer < 0)
-	{
-		UpdatePaletteEffects.SuperForm.applyGeneral(characterVersion, 0x00398e)
-
-		super.palettefx.timer = 6
-		super.palettefx.frame += 6
-		if (super.palettefx.frame >= 54)
-			super.palettefx.frame = 36
-	}
-}
-
-
 //# address-hook(0x067a08) end(0x067a1e)
 function void fn067a08()
 {
