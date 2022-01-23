@@ -134,7 +134,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(Configuration)_$(BuildCode);../../../lemonscript/lib/$(BuildCode);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -155,7 +155,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(Configuration)_$(BuildCode);../../../lemonscript/lib/$(BuildCode);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -176,7 +176,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(Configuration)_$(BuildCode);../../../lemonscript/lib/$(BuildCode);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -197,7 +197,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib/$(Configuration)_$(BuildCode);../../../lemonscript/lib/$(BuildCode);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lemonscript.lib;oxygencore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lemonscript.lib;oxygen_netcore.lib;oxygen.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>

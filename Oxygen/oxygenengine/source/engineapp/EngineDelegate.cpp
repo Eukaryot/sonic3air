@@ -114,7 +114,7 @@ Font& EngineDelegate::getDebugFont(int size)
 	{
 		static Font font10;
 		if (font10.getHeight() == 0)
-			font10.loadFromFile("data/font/freefont_pixeled.json", 0.0f);
+			font10.loadFromFile("data/font/oxyfont_regular.json", 0.0f);
 		return font10;
 	}
 	else
