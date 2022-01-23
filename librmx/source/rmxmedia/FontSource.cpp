@@ -92,7 +92,7 @@ FontSourceBitmap::FontSourceBitmap(const String& jsonFilename)
 {
 	// Read JSON file
 	Json::Value root = rmx::JsonHelper::loadFile(*jsonFilename.toWString());
-	RMX_CHECK(!root.isNull(), "Failed to load bitmap font JSON file at '" << jsonFilename << "'");
+	RMX_CHECK(!root.isNull(), "Failed to load bitmap font JSON file at '" << *jsonFilename << "'", );
 
 	rmx::JsonHelper rootHelper(root);
 	rootHelper.tryReadInt("ascender", mAscender);
@@ -106,12 +106,12 @@ FontSourceBitmap::FontSourceBitmap(const String& jsonFilename)
 
 	std::string textureName;
 	rootHelper.tryReadString("texture", textureName);
-	RMX_CHECK(!textureName.empty(), "Texture field is missing or empty in bitmap font JSON file at '" << jsonFilename << "'");
+	RMX_CHECK(!textureName.empty(), "Texture field is missing or empty in bitmap font JSON file at '" << *jsonFilename << "'", );
 
 	Bitmap bitmap(parentPath + "/" + textureName);
 	if (bitmap.empty())
 	{
-		RMX_ERROR("Failed to load font bitmap from '" << parentPath << "/" << textureName << "' (referenced in '" << jsonFilename << "')", );
+		RMX_ERROR("Failed to load font bitmap from '" << parentPath << "/" << textureName << "' (referenced in '" << *jsonFilename << "')", );
 		return;
 	}
 
