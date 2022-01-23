@@ -113,13 +113,13 @@ SOURCES	+=	\
 			Oxygen/lemonscript/source/lemon/compiler/Compiler \
 			Oxygen/lemonscript/source/lemon/compiler/FunctionCompiler \
 			Oxygen/lemonscript/source/lemon/compiler/Node \
+			Oxygen/lemonscript/source/lemon/compiler/Operators \
 			Oxygen/lemonscript/source/lemon/compiler/Parser \
 			Oxygen/lemonscript/source/lemon/compiler/ParserHelper \
 			Oxygen/lemonscript/source/lemon/compiler/Preprocessor \
 			Oxygen/lemonscript/source/lemon/compiler/Token \
 			Oxygen/lemonscript/source/lemon/compiler/TokenProcessing \
-			Oxygen/lemonscript/source/lemon/compiler/Utility \
-			Oxygen/lemonscript/source/lemon/pch \
+			Oxygen/lemonscript/source/lemon/compiler/TypeCasting \
 			Oxygen/lemonscript/source/lemon/program/DataType \
 			Oxygen/lemonscript/source/lemon/program/Function \
 			Oxygen/lemonscript/source/lemon/program/FunctionWrapper \
@@ -139,6 +139,7 @@ SOURCES	+=	\
 			Oxygen/lemonscript/source/lemon/translator/Nativizer \
 			Oxygen/lemonscript/source/lemon/translator/SourceCodeWriter \
 			Oxygen/lemonscript/source/lemon/translator/Translator \
+			Oxygen/lemonscript/source/lemon/pch \
 			Oxygen/oxygenengine/source/oxygen/application/Application \
 			Oxygen/oxygenengine/source/oxygen/application/audio/AudioCollection \
 			Oxygen/oxygenengine/source/oxygen/application/audio/AudioOutBase \
@@ -152,11 +153,17 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/application/GameLoader \
 			Oxygen/oxygenengine/source/oxygen/application/GameProfile \
 			Oxygen/oxygenengine/source/oxygen/application/input/ControlsIn \
+			Oxygen/oxygenengine/source/oxygen/application/input/InputConfig \
 			Oxygen/oxygenengine/source/oxygen/application/input/InputManager \
 			Oxygen/oxygenengine/source/oxygen/application/input/InputRecorder \
 			Oxygen/oxygenengine/source/oxygen/application/mainview/GameView \
+			Oxygen/oxygenengine/source/oxygen/application/menu/GameSetupScreen \
+			Oxygen/oxygenengine/source/oxygen/application/menu/MenuItems \
+			Oxygen/oxygenengine/source/oxygen/application/menu/OxygenMenu \
 			Oxygen/oxygenengine/source/oxygen/application/modding/Mod \
 			Oxygen/oxygenengine/source/oxygen/application/modding/ModManager \
+			Oxygen/oxygenengine/source/oxygen/application/overlays/BackdropView \
+			Oxygen/oxygenengine/source/oxygen/application/overlays/CheatSheetOverlay \
 			Oxygen/oxygenengine/source/oxygen/application/overlays/DebugLogView \
 			Oxygen/oxygenengine/source/oxygen/application/overlays/DebugSidePanel \
 			Oxygen/oxygenengine/source/oxygen/application/overlays/DebugSidePanelCategory \
@@ -183,12 +190,11 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/helper/FileHelper \
 			Oxygen/oxygenengine/source/oxygen/helper/HighResolutionTimer \
 			Oxygen/oxygenengine/source/oxygen/helper/JsonHelper \
-			Oxygen/oxygenengine/source/oxygen/helper/Log \
+			Oxygen/oxygenengine/source/oxygen/helper/Logging \
 			Oxygen/oxygenengine/source/oxygen/helper/PackageFileCrawler \
 			Oxygen/oxygenengine/source/oxygen/helper/Profiling \
 			Oxygen/oxygenengine/source/oxygen/helper/Transform2D \
 			Oxygen/oxygenengine/source/oxygen/helper/Utils \
-			Oxygen/oxygenengine/source/oxygen/pch \
 			Oxygen/oxygenengine/source/oxygen/platform/AndroidJavaInterface \
 			Oxygen/oxygenengine/source/oxygen/rendering/Geometry \
 			Oxygen/oxygenengine/source/oxygen/rendering/parts/OverlayManager \
@@ -208,6 +214,7 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/RenderUtils \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/SpriteBase \
 			Oxygen/oxygenengine/source/oxygen/rendering/utils/SpriteDump \
+			Oxygen/oxygenengine/source/oxygen/resources/PrintedTextCache \
 			Oxygen/oxygenengine/source/oxygen/resources/ResourcesCache \
 			Oxygen/oxygenengine/source/oxygen/resources/SpriteCache \
 			Oxygen/oxygenengine/source/oxygen/simulation/analyse/ROMDataAnalyser \
@@ -215,6 +222,7 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/simulation/EmulatorInterface \
 			Oxygen/oxygenengine/source/oxygen/simulation/GameRecorder \
 			Oxygen/oxygenengine/source/oxygen/simulation/LemonScriptBindings \
+			Oxygen/oxygenengine/source/oxygen/simulation/LemonScriptProgram \
 			Oxygen/oxygenengine/source/oxygen/simulation/LemonScriptRuntime \
 			Oxygen/oxygenengine/source/oxygen/simulation/LogDisplay \
 			Oxygen/oxygenengine/source/oxygen/simulation/PersistentData \
@@ -225,8 +233,20 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen/simulation/sound/SoundDriver \
 			Oxygen/oxygenengine/source/oxygen/simulation/sound/SoundEmulation \
 			Oxygen/oxygenengine/source/oxygen/simulation/sound/ym2612 \
+			Oxygen/oxygenengine/source/oxygen_netcore/network/ConnectionManager \
+			Oxygen/oxygenengine/source/oxygen_netcore/network/NetConnection \
+			Oxygen/oxygenengine/source/oxygen_netcore/network/RequestBase \
+			Oxygen/oxygenengine/source/oxygen_netcore/network/ServerClientBase \
+			Oxygen/oxygenengine/source/oxygen_netcore/network/Sockets \
+			Oxygen/oxygenengine/source/oxygen_netcore/network/internal/ReceivedPacketCache \
+			Oxygen/oxygenengine/source/oxygen_netcore/network/internal/SentPacketCache \
+			Oxygen/oxygenengine/source/oxygen/pch \
+			Oxygen/oxygenengine/source/oxygen_netcore/pch \
 			Oxygen/soncthrickles/source/sonic3air/audio/AudioOut \
 			Oxygen/soncthrickles/source/sonic3air/audio/CustomAudioMixer \
+			Oxygen/soncthrickles/source/sonic3air/client/GameClient \
+			Oxygen/soncthrickles/source/sonic3air/client/GhostSync \
+			Oxygen/soncthrickles/source/sonic3air/client/UpdateCheck \
 			Oxygen/soncthrickles/source/sonic3air/ConfigurationImpl \
 			Oxygen/soncthrickles/source/sonic3air/data/PlayerProgress \
 			Oxygen/soncthrickles/source/sonic3air/data/PlayerRecorder \
@@ -236,8 +256,8 @@ SOURCES	+=	\
 			Oxygen/soncthrickles/source/sonic3air/Game \
 			Oxygen/soncthrickles/source/sonic3air/generator/ResourceScriptGenerator \
 			Oxygen/soncthrickles/source/sonic3air/helper/BlueSpheresRendering \
-			Oxygen/soncthrickles/source/sonic3air/helper/GameUtils \
 			Oxygen/soncthrickles/source/sonic3air/helper/DiscordIntegration \
+			Oxygen/soncthrickles/source/sonic3air/helper/GameUtils \
 			Oxygen/soncthrickles/source/sonic3air/main \
 			Oxygen/soncthrickles/source/sonic3air/menu/ActSelectMenu \
 			Oxygen/soncthrickles/source/sonic3air/menu/context/ApplicationContextMenu \
@@ -248,8 +268,10 @@ SOURCES	+=	\
 			Oxygen/soncthrickles/source/sonic3air/menu/MainMenu \
 			Oxygen/soncthrickles/source/sonic3air/menu/MenuBackground \
 			Oxygen/soncthrickles/source/sonic3air/menu/ModsMenu \
+			Oxygen/soncthrickles/source/sonic3air/menu/options/ControllerSetupMenu \
 			Oxygen/soncthrickles/source/sonic3air/menu/options/OptionsEntry \
 			Oxygen/soncthrickles/source/sonic3air/menu/options/OptionsMenu \
+			Oxygen/soncthrickles/source/sonic3air/menu/options/OptionsMenuEntries \
 			Oxygen/soncthrickles/source/sonic3air/menu/overlays/SecretUnlockedWindow \
 			Oxygen/soncthrickles/source/sonic3air/menu/overlays/SkippableCutsceneWindow \
 			Oxygen/soncthrickles/source/sonic3air/menu/PauseMenu \
@@ -258,6 +280,7 @@ SOURCES	+=	\
 			Oxygen/soncthrickles/source/sonic3air/menu/TimeAttackResultsMenu \
 			Oxygen/soncthrickles/source/sonic3air/scriptimpl/ScriptImplementations \
 			Oxygen/soncthrickles/source/sonic3air/_nativized/NativizedCode \
+			Oxygen/soncthrickles/source/sonic3air/pch \
 			librmx/source/rmxbase/Basics \
 			librmx/source/rmxbase/BinarySerializer \
 			librmx/source/rmxbase/Bitmap \
@@ -277,6 +300,7 @@ SOURCES	+=	\
 			librmx/source/rmxbase/jsoncpp/json_value \
 			librmx/source/rmxbase/jsoncpp/json_writer \
 			librmx/source/rmxbase/JsonHelper \
+			librmx/source/rmxbase/Logging \
 			librmx/source/rmxbase/Math \
 			librmx/source/rmxbase/OutputStream \
 			librmx/source/rmxbase/RC4Encryption \
@@ -286,7 +310,6 @@ SOURCES	+=	\
 			librmx/source/rmxbase/Tools \
 			librmx/source/rmxbase/VectorBinarySerializer \
 			librmx/source/rmxbase/ZlibDeflate \
-			librmx/source/rmxext_oggtheora/OggLoaderTheora \
 			librmx/source/rmxext_oggvorbis/OggLoader \
 			librmx/source/rmxext_oggvorbis/rmxext_oggvorbis \
 			librmx/source/rmxmedia/AppFramework \
@@ -304,16 +327,11 @@ SOURCES	+=	\
 			librmx/source/rmxmedia/FTX_System \
 			librmx/source/rmxmedia/GLTools \
 			librmx/source/rmxmedia/GuiBase \
-			librmx/source/rmxmedia/GuiButton \
-			librmx/source/rmxmedia/GuiImage \
-			librmx/source/rmxmedia/GuiInputField \
-			librmx/source/rmxmedia/GuiLabel \
 			librmx/source/rmxmedia/JobManager \
 			librmx/source/rmxmedia/Painter \
 			librmx/source/rmxmedia/rmxmedia \
 			librmx/source/rmxmedia/Shader \
 			librmx/source/rmxmedia/SpriteAtlas \
-			librmx/source/rmxmedia/StdResources \
 			librmx/source/rmxmedia/Texture \
 			librmx/source/rmxmedia/Thread \
 			librmx/source/rmxmedia/VertexArrayObject \
