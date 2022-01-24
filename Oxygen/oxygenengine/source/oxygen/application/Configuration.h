@@ -159,6 +159,9 @@ public:
 	std::wstring mInputRecorderInput;
 	std::wstring mInputRecorderOutput;
 
+	// Misc
+	bool mMirrorMode = false;
+
 	// Internal
 	bool mForceCompileScripts = false;
 	int mScriptOptimizationLevel = 3;

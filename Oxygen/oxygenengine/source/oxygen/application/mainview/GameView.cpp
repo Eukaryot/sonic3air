@@ -596,16 +596,14 @@ void GameView::render()
 	// Here goes the real rendering
 	drawer.setRenderTarget(mFinalGameTexture, gameScreenRect);
 	drawer.setBlendMode(DrawerBlendMode::NONE);
-#if 0
-	// Test: Lazy version of a simple mirror mode
-	//  -> TODO: ControlsIn needs to support mirror mode as well
-	if (drawer.getType() != Drawer::Type::SOFTWARE)
+
+	// Simple mirror mode implementation: Just mirror the whole screen
+	if (Configuration::instance().mMirrorMode)
 	{
 		const Recti drawRect(gameScreenRect.x + gameScreenRect.width, gameScreenRect.y, -gameScreenRect.width, gameScreenRect.height);
 		drawer.drawRect(drawRect, videoOut.getGameScreenTexture());
 	}
 	else
-#endif
 	{
 		drawer.drawRect(gameScreenRect, videoOut.getGameScreenTexture());
 	}

@@ -56,6 +56,8 @@ void ControlsIn::update(bool readControllers)
 	if (!readControllers)
 		return;
 
+	const bool switchLeftRight = Configuration::instance().mMirrorMode;
+
 	// Update controllers
 	for (int controllerIndex = 0; controllerIndex < 2; ++controllerIndex)
 	{
@@ -70,6 +72,10 @@ void ControlsIn::update(bool readControllers)
 			{
 				inputFlags |= pair.second;
 			}
+		}
+		if (switchLeftRight)
+		{
+			inputFlags = (inputFlags & 0xfff3) | ((inputFlags & (uint16)Button::LEFT) << 1) | ((inputFlags & (uint16)Button::RIGHT) >> 1);
 		}
 
 		// Remove all inputs from our list of ignored input that are currently not pressed
