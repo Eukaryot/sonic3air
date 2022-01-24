@@ -62,19 +62,15 @@ namespace lemon
 				return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
 			}
 
-			const uint8 a = (uint8)DataTypeHelper::getBaseType(original);
-			const uint8 b = (uint8)DataTypeHelper::getBaseType(target);
-			const uint8 sizeA = a & 0x07;
-			const uint8 sizeB = b & 0x07;
 			if (originalInt.mBytes < targetInt.mBytes)
 			{
 				// Up cast
-				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (sizeB - sizeA);
+				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
 			}
 			else
 			{
 				// Down cast
-				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (sizeB - sizeA);
+				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
 			}
 		}
 		else
@@ -99,36 +95,19 @@ namespace lemon
 				target = &PredefinedDataTypes::UINT_64;
 		}
 
-		uint8 sourceBits = 0xff;
-		uint8 targetBits = 0xff;
-		if (original->mClass == DataTypeDefinition::Class::INTEGER)
+		if (original->mClass == DataTypeDefinition::Class::INTEGER && target->mClass == DataTypeDefinition::Class::INTEGER)
 		{
-			sourceBits = (uint8)DataTypeHelper::getBaseType(original);
-		}
-		if (target->mClass == DataTypeDefinition::Class::INTEGER)
-		{
-			targetBits = (uint8)DataTypeHelper::getBaseType(target);
-		}
-
-		if (sourceBits != 0xff && targetBits != 0xff)
-		{
-			// Size is between 0 and 3 (for 8-bit, 16-bit, 32-bit, 64-bit)
-			//  -> We are silently treating INT_CONST as INT_64 by ignoring flag 0x04
-			const uint8 sourceSizeBits = (sourceBits & 0x03);
-			const uint8 targetSizeBits = (targetBits & 0x03);
+			const IntegerDataType& originalInt = original->as<IntegerDataType>();
+			const IntegerDataType& targetInt = target->as<IntegerDataType>();
 
 			// No need for an opcode if size does not change at all
-			if (sourceSizeBits != targetSizeBits)
+			if (originalInt.mBytes != targetInt.mBytes)
 			{
-				uint8 castTypeBits = (sourceSizeBits << 2) + targetSizeBits;
-
-				// Recognize signed up-cast
-				const bool isSourceSigned = (sourceBits & 0x08) != 0;
-				if (isSourceSigned && targetSizeBits > sourceSizeBits)
+				uint8 castTypeBits = (originalInt.mSizeBits << 2) + targetInt.mSizeBits;
+				if (originalInt.mIsSigned && targetInt.mBytes > originalInt.mBytes)		// Recognize signed up-cast
 				{
 					castTypeBits += 0x10;
 				}
-
 				return (BaseCastType)castTypeBits;
 			}
 			else

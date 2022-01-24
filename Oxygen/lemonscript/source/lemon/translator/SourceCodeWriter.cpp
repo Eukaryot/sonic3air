@@ -59,26 +59,30 @@ namespace lemon
 		writeLine(line);
 	}
 
-	void CppWriter::addDataType(String& line, BaseType dataType)
-	{
-		switch (dataType)
-		{
-			case BaseType::VOID:	line << "void";		break;
-			case BaseType::INT_8:	line << "int8";		break;
-			case BaseType::UINT_8:	line << "uint8";	break;
-			case BaseType::INT_16:	line << "int16";	break;
-			case BaseType::UINT_16:	line << "uint16";	break;
-			case BaseType::INT_32:	line << "int32";	break;
-			case BaseType::UINT_32:	line << "uint32";	break;
-			case BaseType::INT_64:	line << "int64";	break;
-			case BaseType::UINT_64:	line << "uint64";	break;
-			default:				line << "<unknown_type>";	break;
-		}
-	}
-
 	void CppWriter::addDataType(String& line, const DataTypeDefinition* dataType)
 	{
-		addDataType(line, DataTypeHelper::getBaseType(dataType));
+		if (dataType->mClass == DataTypeDefinition::Class::VOID)
+		{
+			line << "void";
+		}
+		else if (dataType->mClass == DataTypeDefinition::Class::INTEGER)
+		{
+			const IntegerDataType& integerType = dataType->as<IntegerDataType>();
+			if (integerType.mSemantics == IntegerDataType::Semantics::BOOLEAN)
+			{
+				line << "bool";
+			}
+			else
+			{
+				switch (integerType.mBytes)
+				{
+					case 1:  line << (integerType.mIsSigned ? "int8"  : "uint8" );  break;
+					case 2:  line << (integerType.mIsSigned ? "int16" : "uint16");  break;
+					case 4:  line << (integerType.mIsSigned ? "int32" : "uint32");  break;
+					case 8:  line << (integerType.mIsSigned ? "int64" : "uint64");  break;
+				}
+			}
+		}
 	}
 
 	void CppWriter::addIdentifier(String& line, const std::string& identifier)

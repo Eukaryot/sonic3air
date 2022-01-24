@@ -103,9 +103,13 @@ namespace lemon
 
 		Semantics mSemantics = Semantics::DEFAULT;
 		bool mIsSigned = false;
+		uint8 mSizeBits = 0;	// 0 for 8-bit data types, 1 for 16-bit, 2 for 32-bit, 3 for 64-bit
 
 		inline IntegerDataType(size_t bytes, Semantics semantics, bool isSigned) :
-			DataTypeDefinition(Class::INTEGER, bytes), mSemantics(semantics), mIsSigned(isSigned)
+			DataTypeDefinition(Class::INTEGER, bytes),
+			mSemantics(semantics),
+			mSizeBits((bytes == 1) ? 0 : (bytes == 2) ? 1 : (bytes == 4) ? 2 : 3),
+			mIsSigned(isSigned)
 		{}
 
 		uint32 getDataTypeHash() const override;
