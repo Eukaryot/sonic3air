@@ -712,6 +712,7 @@ namespace lemon
 	{
 		BlockNode& content = *functionNode.mContent;
 		ScriptFunction& function = *functionNode.mFunction;
+		function.mStartLineNumber = functionNode.getLineNumber();
 
 		// Build scope context for processing
 		ScopeContext scopeContext;

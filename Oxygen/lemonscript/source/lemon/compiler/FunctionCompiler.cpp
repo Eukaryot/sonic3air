@@ -104,6 +104,8 @@ namespace lemon
 		if (mFunction.mLocalVariablesById.empty())
 			return;
 
+		mLineNumber = mFunction.mStartLineNumber;
+
 		// Create scope
 		addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, mFunction.mLocalVariablesById.size());
 

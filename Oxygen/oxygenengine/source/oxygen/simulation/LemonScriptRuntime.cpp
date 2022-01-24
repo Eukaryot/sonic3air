@@ -121,13 +121,12 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string* outFunctionName, 
 	if (nullptr == location.mFunction)
 		return false;
 
-	const auto& opcodes = location.mFunction->mOpcodes;
 	if (nullptr != outFunctionName)
 		*outFunctionName = location.mFunction->getName();
 	if (nullptr != outFileName)
 		*outFileName = location.mFunction->mSourceFilename;
 	if (nullptr != outLineNumber)
-		*outLineNumber = ((location.mProgramCounter < opcodes.size()) ? opcodes[location.mProgramCounter].mLineNumber : opcodes.back().mLineNumber) - location.mFunction->mSourceBaseLineOffset;
+		*outLineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	if (nullptr != outModuleName)
 		*outModuleName = location.mFunction->getModule().getModuleName();
 	return true;
@@ -338,10 +337,16 @@ std::string LemonScriptRuntime::buildScriptLocationString(lemon::Runtime& runtim
 	if (nullptr == location.mFunction)
 		return "";
 
-	const auto& opcodes = location.mFunction->mOpcodes;
 	const std::string& functionName = location.mFunction->getName();
 	const std::wstring& fileName = location.mFunction->mSourceFilename;
-	uint32 lineNumber = ((location.mProgramCounter < opcodes.size()) ? opcodes[location.mProgramCounter].mLineNumber : opcodes.back().mLineNumber) - location.mFunction->mSourceBaseLineOffset;
+	const uint32 lineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	const std::string& moduleName = location.mFunction->getModule().getModuleName();
 	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";	return std::string();
+}
+
+uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter)
+{
+	const auto& opcodes = function.mOpcodes;
+	const uint32 lineNumber = (programCounter < opcodes.size()) ? opcodes[programCounter].mLineNumber : opcodes.back().mLineNumber;
+	return (lineNumber < function.mSourceBaseLineOffset) ? 0 : (lineNumber - function.mSourceBaseLineOffset);
 }

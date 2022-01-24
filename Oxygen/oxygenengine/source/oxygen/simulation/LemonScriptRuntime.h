@@ -66,6 +66,7 @@ public:
 
 private:
 	static std::string buildScriptLocationString(lemon::Runtime& runtime);
+	static uint32 getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter);
 
 private:
 	struct Internal;

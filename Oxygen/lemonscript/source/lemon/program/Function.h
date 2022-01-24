@@ -107,6 +107,7 @@ namespace lemon
 
 		// Source
 		std::wstring mSourceFilename;
+		uint32 mStartLineNumber = 0;
 		uint32 mSourceBaseLineOffset = 0;	// Offset translating from the full line number (when all includes are fully resolved) to line number inside the original script file
 
 	private:
