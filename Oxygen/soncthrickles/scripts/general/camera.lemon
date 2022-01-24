@@ -142,7 +142,7 @@ function void UpdateCameraPositionX()
 	}
 
 #if STANDALONE
-	if (Game.getSetting(SETTING_EXTENDED_CAMERA))
+	if (Game.getSetting(SETTING_EXTENDED_CAMERA) != 0 && global.game_mode != 0x08)	// Disable in rolling demo, as it breaks MGZ
 	{
 		if (global.level_started <= 0 || global.stage_type != 0)	// First is relevant e.g. for AIZ 1 Sonic intro
 		{
