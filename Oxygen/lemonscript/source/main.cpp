@@ -221,7 +221,7 @@ int main(int argc, char** argv)
 		{
 			for (const Compiler::ErrorMessage& error : compiler.getErrors())
 			{
-				RMX_ERROR("Compile error in line " << error.mLineNumber << ":\n" << error.mMessage, );
+				RMX_ERROR("Compile error in line " << error.mError.mLineNumber << ":\n" << error.mMessage, );
 			}
 			return 0;
 		}

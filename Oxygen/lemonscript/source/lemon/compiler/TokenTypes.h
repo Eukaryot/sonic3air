@@ -159,6 +159,7 @@ namespace lemon
 		Operator mOperator = Operator::_INVALID;
 		TokenPtr<StatementToken> mLeft;
 		TokenPtr<StatementToken> mRight;
+		const Function* mFunction = nullptr;	// Usually a null pointer, except if a certain function is enforced
 	};
 
 

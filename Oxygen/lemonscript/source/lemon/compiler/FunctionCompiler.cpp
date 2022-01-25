@@ -476,6 +476,15 @@ namespace lemon
 			case Token::Type::BINARY_OPERATION:
 			{
 				const BinaryOperationToken& bot = token.as<BinaryOperationToken>();
+				if (nullptr != bot.mFunction)
+				{
+					// Treat this just like a function call
+					compileTokenTreeToOpcodes(*bot.mLeft);
+					compileTokenTreeToOpcodes(*bot.mRight);
+					addOpcode(Opcode::Type::CALL, (BaseType)0, bot.mFunction->getNameAndSignatureHash());
+					break;
+				}
+
 				switch (bot.mOperator)
 				{
 					case Operator::ASSIGN:

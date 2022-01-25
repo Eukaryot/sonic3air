@@ -18,6 +18,9 @@ namespace lemon
 	class API_EXPORT StandardLibrary
 	{
 	public:
+		inline static std::string BUILTIN_NAME_STRING_OPERATOR_PLUS = "#builtin_string_operator_plus";
+
+	public:
 		static void registerBindings(Module& module);
 	};
 }

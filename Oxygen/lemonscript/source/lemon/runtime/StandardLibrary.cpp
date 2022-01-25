@@ -24,12 +24,14 @@ namespace
 
 		void addChar(char ch)
 		{
+			RMX_CHECK(mLength < 0x100, "Too long string", return);
 			mBuffer[mLength] = ch;
 			++mLength;
 		}
 
 		void addString(const char* str, int length)
 		{
+			RMX_CHECK(mLength + length <= 0x100, "Too long string", return);
 			memcpy(&mBuffer[mLength], str, length);
 			mLength += length;
 		}
@@ -48,12 +50,14 @@ namespace
 		{
 			if (value < 0)
 			{
+				RMX_CHECK(mLength < 0x100, "Too long string", return);
 				mBuffer[mLength] = '-';
 				++mLength;
 				value = -value;
 			}
 			else if (value == 0)
 			{
+				RMX_CHECK(mLength < 0x100, "Too long string", return);
 				mBuffer[mLength] = '0';
 				++mLength;
 				return;
@@ -68,6 +72,7 @@ namespace
 			}
 			for (int64 digitBase = digitMax / 10; digitBase > 0; digitBase /= 10)
 			{
+				RMX_CHECK(mLength < 0x100, "Too long string", return);
 				mBuffer[mLength] = '0' + (char)((value / digitBase) % 10);
 				++mLength;
 			}
@@ -80,6 +85,7 @@ namespace
 			{
 				++shift;
 			}
+			RMX_CHECK(mLength + shift <= 0x100, "Too long string", return);
 			for (--shift; shift >= 0; --shift)
 			{
 				const int binValue = (value >> shift) & 0x01;
@@ -95,22 +101,13 @@ namespace
 			{
 				shift += 4;
 			}
+			RMX_CHECK(mLength + shift / 4 <= 0x100, "Too long string", return);
 			for (shift -= 4; shift >= 0; shift -= 4)
 			{
 				const int hexValue = (value >> shift) & 0x0f;
 				mBuffer[mLength] = (hexValue <= 9) ? ('0' + (char)hexValue) : ('a' + (char)(hexValue - 10));
 				++mLength;
 			}
-		}
-
-		std::string getStdString() const
-		{
-			return std::string(mBuffer, mLength);
-		}
-
-		uint64 getHash() const
-		{
-			return rmx::getMurmur2_64((uint8*)mBuffer, (size_t)mLength);
 		}
 
 	public:
@@ -122,6 +119,23 @@ namespace
 
 namespace lemon
 {
+	namespace builtins
+	{
+		StringRef string_operator_plus(StringRef str1, StringRef str2)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return StringRef());
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return StringRef());
+			
+			static FastStringStream result;
+			result.clear();
+			result.addString(*str1);
+			result.addString(*str2);
+			return StringRef(runtime->addString(result.mBuffer, result.mLength));
+		}
+	}
+
 	namespace functions
 	{
 		template<typename T>
@@ -373,6 +387,11 @@ namespace lemon
 	void StandardLibrary::registerBindings(lemon::Module& module)
 	{
 		const uint8 flags = UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
+
+		// Register built-in functions, which are directly references by the compiler
+		{
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS, lemon::wrap(&builtins::string_operator_plus), flags);
+		}
 
 		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<int8>), flags);
 		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<uint8>), flags);

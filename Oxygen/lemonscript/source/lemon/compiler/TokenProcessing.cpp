@@ -12,6 +12,7 @@
 #include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/runtime/StandardLibrary.h"
 
 
 namespace lemon
@@ -375,6 +376,7 @@ namespace lemon
 					CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
 					const DataTypeDefinition* dataType = tokens[i].as<VarTypeToken>().mDataType;
+					CHECK_ERROR(dataType->mClass == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->toString() << "'", mLineNumber);
 
 					MemoryAccessToken& token = tokens.createReplaceAt<MemoryAccessToken>(i);
 					token.mDataType = dataType;
@@ -714,6 +716,18 @@ namespace lemon
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
 				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
 
+				// Special handling for adding two strings
+				if (bot.mOperator == Operator::BINARY_PLUS && leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)
+				{
+					// TODO: How about some kind of caching for that specific function?
+					const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS));
+					CHECK_ERROR(functions.size() != 0, "Unable to find built-in function '" << StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS << "'", mLineNumber);
+					CHECK_ERROR(functions.size() == 1, "Multiple definitions for built-in function '" << StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS << "'", mLineNumber);
+					bot.mFunction = functions[0];
+					token.mDataType = &PredefinedDataTypes::STRING;
+					break;
+				}
+
 				// Choose best fitting signature
 				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
 				const bool result = TypeCasting(mConfig).getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
@@ -742,7 +756,6 @@ namespace lemon
 						}
 					}
 				}
-
 				break;
 			}
 
