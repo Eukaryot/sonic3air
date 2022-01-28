@@ -27,7 +27,6 @@
 	"WindowSize": "1200 x 740",
 	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
 	"Filtering": "0",				// Can be toggled with Alt + F
-	"FullEmulationRendering": "1",	// Can be toggled with R key
 
 	// Audio
 	"AudioSampleRate": "48000",
