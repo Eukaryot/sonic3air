@@ -134,6 +134,40 @@ namespace lemon
 			result.addString(*str2);
 			return StringRef(runtime->addString(result.mBuffer, result.mLength));
 		}
+
+		bool string_operator_less(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (*str1 < *str2);
+		}
+
+		bool string_operator_less_or_equal(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (*str1 <= *str2);
+		}
+
+		bool string_operator_greater(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (*str1 > *str2);
+		}
+
+		bool string_operator_greater_or_equal(StringRef str1, StringRef str2)
+		{
+			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
+			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
+			return (*str1 >= *str2);
+		}
+
+		uint32 string_length(StringRef str)
+		{
+			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
+			return (uint32)str->length();
+		}
 	}
 
 	namespace functions
@@ -384,13 +418,27 @@ namespace lemon
 	}
 
 
+
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS("#builtin_string_operator_plus");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS("#builtin_string_operator_less");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL("#builtin_string_operator_less_equal");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER("#builtin_string_operator_greater");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL("#builtin_string_operator_greater_equal");
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_LENGTH("#builtin_string_length");
+
+
 	void StandardLibrary::registerBindings(lemon::Module& module)
 	{
 		const uint8 flags = UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
 
-		// Register built-in functions, which are directly references by the compiler
+		// Register built-in functions, which are directly referenced by the compiler
 		{
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS, lemon::wrap(&builtins::string_operator_plus), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.mName, lemon::wrap(&builtins::string_operator_plus), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.mName, lemon::wrap(&builtins::string_operator_less), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.mName, lemon::wrap(&builtins::string_operator_less_or_equal), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER.mName, lemon::wrap(&builtins::string_operator_greater), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL.mName, lemon::wrap(&builtins::string_operator_greater_or_equal), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_LENGTH.mName, lemon::wrap(&builtins::string_length), flags);
 		}
 
 		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<int8>), flags);

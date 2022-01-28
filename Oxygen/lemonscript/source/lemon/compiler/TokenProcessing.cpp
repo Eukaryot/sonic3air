@@ -329,13 +329,62 @@ namespace lemon
 				// Must be a round parenthesis, not a bracket
 				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::PARENTHESIS)
 				{
-					const std::string functionName = tokens[i].as<IdentifierToken>().mIdentifier;
-					CHECK_ERROR(!mContext.mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(functionName)).empty() || String(functionName).startsWith("base."), "Unknown function name '" + functionName + "'", mLineNumber);
+					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+					const std::string& functionName = tokens[i].as<IdentifierToken>().mIdentifier;
+					const uint64 nameHash = rmx::getMurmur2_64(functionName);
+					bool isBaseCall = false;
+					const Function* function = nullptr;
+					const Variable* thisPointer = nullptr;
+
+					bool isValidFunctionCall = false;
+					if (!mContext.mGlobalsLookup.getFunctionsByName(nameHash).empty())
+					{
+						// Is it a global function
+						isValidFunctionCall = true;
+					}
+					else if (rmx::startsWith(functionName, "base."))
+					{
+						// It's a base call
+						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName(), "Base call goes to a different function", mLineNumber);
+						isValidFunctionCall = true;
+						isBaseCall = true;
+					}
+					else
+					{
+						// Special handling for "string.length()"
+						//  -> TODO: Generalize this to pave the way for other kinds of "method calls"
+						if (rmx::endsWith(functionName, ".length") && content.empty())
+						{
+							const std::string variableName = functionName.substr(0, functionName.length() - 7);
+							const Variable* variable = findVariable(variableName);
+							if (nullptr != variable)
+							{
+								if (variable->getDataType() == &PredefinedDataTypes::STRING)
+								{
+									const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(StandardLibrary::BUILTIN_NAME_STRING_LENGTH.mHash);
+									if (!functions.empty())
+									{
+										function = functions[0];
+										thisPointer = variable;
+										isValidFunctionCall = true;
+									}
+								}
+							}
+						}
+					}
+					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" + functionName + "'", mLineNumber);
 
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
 					token.mFunctionName = functionName;
+					token.mNameHash = nameHash;
+					token.mIsBaseCall = isBaseCall;
+					
+					if (nullptr != function)
+					{
+						token.mFunction = function;
+						token.mDataType = function->getReturnType();
+					}
 
-					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 					if (!content.empty())
 					{
 						if (content[0].getType() == Token::Type::COMMA_SEPARATED)
@@ -355,6 +404,12 @@ namespace lemon
 							CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
 							vectorAdd(token.mParameters) = content[0].as<StatementToken>();
 						}
+					}
+					if (nullptr != thisPointer)
+					{
+						VariableToken& variableToken = vectorAdd(token.mParameters).create<VariableToken>();
+						variableToken.mVariable = thisPointer;
+						variableToken.mDataType = thisPointer->getDataType();
 					}
 					tokens.erase(i+1);
 				}
@@ -415,16 +470,7 @@ namespace lemon
 			if (token.getType() == Token::Type::IDENTIFIER)
 			{
 				const std::string& name = token.as<IdentifierToken>().mIdentifier;
-
-				// Search for local variables first
-				const Variable* variable = findLocalVariable(name);
-				if (nullptr == variable)
-				{
-					// Maybe it's a global variable
-					const uint64 nameHash = rmx::getMurmur2_64(name);
-					variable = mContext.mGlobalsLookup.getGlobalVariableByName(nameHash);
-				}
-
+				const Variable* variable = findVariable(name);
 				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " + name, mLineNumber);
 
 				VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
@@ -636,11 +682,15 @@ namespace lemon
 					parameterTypes.push_back(type);
 				}
 
+				// In special cases, we might have determined the function already before
+				//  -> Then there's nothing left to do for now
+				if (nullptr != ft.mFunction)
+					break;
+
 				// Find out which function signature actually fits
 				RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
 				const Function* function = mContext.mFunction;
-				String functionName(ft.mFunctionName);
-				if (functionName.startsWith("base.") && functionName.getSubString(5, -1) == function->getName())
+				if (ft.mIsBaseCall)
 				{
 					// Base call must use the same function signature as the current one
 					CHECK_ERROR(parameterTypes.size() == function->getParameters().size(), "Base function call has different parameter count", mLineNumber);
@@ -648,13 +698,11 @@ namespace lemon
 					{
 						CHECK_ERROR(parameterTypes[i] == function->getParameters()[i].mType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
 					}
-
-					// Make this a call to itself, the runtime system will resolve that to a base call to whatever is the actual base function
-					ft.mIsBaseCall = true;
+					// So not change "function" itself in this case
 				}
 				else
 				{
-					const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(functionName));
+					const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(ft.mNameHash);
 					CHECK_ERROR(!functions.empty(), "Unknown function name '" + ft.mFunctionName + "'", mLineNumber);
 
 					// Find best-fitting correct function overload
@@ -716,16 +764,33 @@ namespace lemon
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
 				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
 
-				// Special handling for adding two strings
-				if (bot.mOperator == Operator::BINARY_PLUS && leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)
+				if (mConfig.mScriptFeatureLevel >= 2)
 				{
-					// TODO: How about some kind of caching for that specific function?
-					const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS));
-					CHECK_ERROR(functions.size() != 0, "Unable to find built-in function '" << StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS << "'", mLineNumber);
-					CHECK_ERROR(functions.size() == 1, "Multiple definitions for built-in function '" << StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS << "'", mLineNumber);
-					bot.mFunction = functions[0];
-					token.mDataType = &PredefinedDataTypes::STRING;
-					break;
+					// Special handling for certain operations with two strings
+					if (leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)
+					{
+						StandardLibrary::FunctionName* functionName = nullptr;
+						switch (bot.mOperator)
+						{
+							case Operator::BINARY_PLUS:				 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS;  break;
+							case Operator::COMPARE_LESS:			 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS;  break;
+							case Operator::COMPARE_LESS_OR_EQUAL:	 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL;  break;
+							case Operator::COMPARE_GREATER:			 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER;  break;
+							case Operator::COMPARE_GREATER_OR_EQUAL: functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL;  break;
+							default: break;
+						}
+
+						if (nullptr != functionName)
+						{
+							// TODO: How about some kind of caching for that specific function?
+							const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(functionName->mHash);
+							CHECK_ERROR(functions.size() != 0, "Unable to find built-in function '" << functionName->mName << "'", mLineNumber);
+							CHECK_ERROR(functions.size() == 1, "Multiple definitions for built-in function '" << functionName->mName << "'", mLineNumber);
+							bot.mFunction = functions[0];
+							token.mDataType = &PredefinedDataTypes::STRING;
+							break;
+						}
+					}
 				}
 
 				// Choose best fitting signature
@@ -776,6 +841,19 @@ namespace lemon
 				break;
 		}
 		return token.mDataType;
+	}
+
+	const Variable* TokenProcessing::findVariable(const std::string& name)
+	{
+		// Search for local variables first
+		const Variable* variable = findLocalVariable(name);
+		if (nullptr == variable)
+		{
+			// Maybe it's a global variable
+			const uint64 nameHash = rmx::getMurmur2_64(name);
+			variable = mContext.mGlobalsLookup.getGlobalVariableByName(nameHash);
+		}
+		return variable;
 	}
 
 	LocalVariable* TokenProcessing::findLocalVariable(const std::string& name)

@@ -58,6 +58,7 @@ namespace lemon
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
 
+		const Variable* findVariable(const std::string& name);
 		LocalVariable* findLocalVariable(const std::string& name);
 
 	private:

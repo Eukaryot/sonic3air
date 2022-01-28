@@ -18,7 +18,21 @@ namespace lemon
 	class API_EXPORT StandardLibrary
 	{
 	public:
-		inline static std::string BUILTIN_NAME_STRING_OPERATOR_PLUS = "#builtin_string_operator_plus";
+		struct FunctionName
+		{
+			std::string mName;
+			uint64 mHash = 0;
+
+			inline explicit FunctionName(const std::string& name) : mName(name), mHash(rmx::getMurmur2_64(name)) {}
+		};
+
+	public:
+		static FunctionName BUILTIN_NAME_STRING_OPERATOR_PLUS;
+		static FunctionName BUILTIN_NAME_STRING_OPERATOR_LESS;
+		static FunctionName BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL;
+		static FunctionName BUILTIN_NAME_STRING_OPERATOR_GREATER;
+		static FunctionName BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL;
+		static FunctionName BUILTIN_NAME_STRING_LENGTH;
 
 	public:
 		static void registerBindings(Module& module);

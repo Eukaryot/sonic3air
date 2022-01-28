@@ -1,9 +1,14 @@
 
+//# script-feature-level(2)
+
 
 constant u8 ONE = 1
 
 function void main()
 {
+	string hello = "Hello " + "World!"
+	Log = hello.length()
+
 	u8 a = 0
 	if (a == ONE)
 	{
