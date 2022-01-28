@@ -87,7 +87,9 @@ function void TitleScreen_SK()
 			break
 	}
 
+#if !STANDALONE
 	playMusic(0xfe)
+#endif
 
 	copyMemory(0xfffffc80, 0x005588, 0x80)
 
