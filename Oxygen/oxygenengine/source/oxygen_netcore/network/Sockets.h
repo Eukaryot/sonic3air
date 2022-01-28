@@ -113,10 +113,12 @@ public:
 	~TCPSocket();
 
 	bool isValid() const;
-
-	// TODO: Add "setupServer" for TCP server
-	bool connectTo(const std::string& serverAddress, uint16 serverPort);
 	void close();
+
+	bool setupServer(uint16 serverPort);
+	bool acceptConnection(TCPSocket& outSocket);
+
+	bool connectTo(const std::string& serverAddress, uint16 serverPort);
 
 	bool sendData(const uint8* data, size_t length);
 
@@ -143,10 +145,10 @@ public:
 	~UDPSocket();
 
 	bool isValid() const;
+	void close();
 
 	bool bindToPort(uint16 port);
 	bool bindToAnyPort();
-	void close();
 
 	bool sendData(const uint8* data, size_t length, const SocketAddress& destinationAddress);
 	bool sendData(const std::vector<uint8>& data, const SocketAddress& destinationAddress);

@@ -188,6 +188,123 @@ bool TCPSocket::isValid() const
 	return (nullptr != mInternal && mInternal->mSocket >= 0);
 }
 
+void TCPSocket::close()
+{
+	if (!isValid())
+		return;
+
+#ifdef _WIN32
+	int status = ::shutdown(mInternal->mSocket, SD_BOTH);
+	if (status == 0)
+	{
+		status = ::closesocket(mInternal->mSocket);
+	}
+#else
+	int status = shutdown(mInternal->mSocket, SHUT_RDWR);
+	if (status == 0)
+	{
+		status = ::close(mInternal->mSocket);
+	}
+#endif
+
+	mInternal->mSocket = INVALID_SOCKET;
+}
+
+bool TCPSocket::setupServer(uint16 serverPort)
+{
+	if (nullptr == mInternal)
+	{
+		mInternal = new Internal();
+	}
+	else
+	{
+		close();
+	}
+
+	// Create a socket
+	mInternal->mSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	RMX_CHECK(mInternal->mSocket >= 0, "socket failed with error: " << mInternal->mSocket, return false);
+
+	// Setup the socket
+	SocketAddress address("127.0.0.1", serverPort);
+	int result = bind(mInternal->mSocket, (SOCKADDR*)address.getSockAddr(), 128);
+	if (result < 0)
+	{
+	#ifdef _WIN32
+		RMX_ERROR("bind failed with error: " << WSAGetLastError(), );
+	#else
+		RMX_ERROR("bind failed with error: " << result, );
+	#endif
+		close();
+		return false;
+	}
+
+	// Setup for listening to incoming connections
+	result = ::listen(mInternal->mSocket, SOMAXCONN);
+	if (result < 0)
+	{
+	#ifdef _WIN32
+		RMX_ERROR("listen failed with error: " << WSAGetLastError(), );
+	#else
+		RMX_ERROR("listen failed with error: " << result, );
+	#endif
+		close();
+		return false;
+	}
+
+	return true;
+}
+
+bool TCPSocket::acceptConnection(TCPSocket& outSocket)
+{
+	fd_set socketSet;
+	FD_ZERO(&socketSet);
+	FD_SET(mInternal->mSocket, &socketSet);
+	timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 10000;
+	const int result = ::select(0, &socketSet, nullptr, nullptr, &timeout);
+	if (result < 0)
+	{
+	#ifdef _WIN32
+		RMX_ERROR("select failed with error: " << WSAGetLastError(), );
+	#else
+		RMX_ERROR("select failed with error: " << result, );
+	#endif
+		return false;
+	}
+
+	if (result == 0)
+	{
+		// No incoming connection
+		return false;
+	}
+
+	// Accept connection, creating a new socket
+	if (nullptr == outSocket.mInternal)
+	{
+		outSocket.mInternal = new Internal();
+	}
+	else
+	{
+		outSocket.close();
+	}
+
+	outSocket.mInternal->mSocket = INVALID_SOCKET;
+	outSocket.mInternal->mSocket = ::accept(mInternal->mSocket, nullptr, nullptr);
+	if (outSocket.mInternal->mSocket < 0)
+	{
+	#ifdef _WIN32
+		RMX_ERROR("accept failed with error: " << WSAGetLastError(), );
+	#else
+		RMX_ERROR("accept failed with error: " << outSocket.mInternal->mSocket, );
+	#endif
+		outSocket.mInternal->mSocket = INVALID_SOCKET;
+		return false;
+	}
+	return true;
+}
+
 bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort)
 {
 	if (nullptr == mInternal)
@@ -233,28 +350,6 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort)
 
 	::freeaddrinfo(addressInfos);
 	return (mInternal->mSocket >= 0);
-}
-
-void TCPSocket::close()
-{
-	if (!isValid())
-		return;
-
-#ifdef _WIN32
-	int status = ::shutdown(mInternal->mSocket, SD_BOTH);
-	if (status == 0)
-	{
-		status = ::closesocket(mInternal->mSocket);
-	}
-#else
-	int status = shutdown(mInternal->mSocket, SHUT_RDWR);
-	if (status == 0)
-	{
-		status = ::close(mInternal->mSocket);
-	}
-#endif
-
-	mInternal->mSocket = INVALID_SOCKET;
 }
 
 bool TCPSocket::sendData(const uint8* data, size_t length)
@@ -330,6 +425,29 @@ UDPSocket::~UDPSocket()
 bool UDPSocket::isValid() const
 {
 	return (nullptr != mInternal && mInternal->mSocket >= 0);
+}
+
+void UDPSocket::close()
+{
+	if (!isValid())
+		return;
+
+#ifdef _WIN32
+	int status = shutdown(mInternal->mSocket, SD_BOTH);
+	if (status == 0)
+	{
+		status = closesocket(mInternal->mSocket);
+	}
+#else
+	int status = shutdown(mInternal->mSocket, SHUT_RDWR);
+	if (status == 0)
+	{
+		status = ::close(mInternal->mSocket);
+	}
+#endif
+
+	mInternal->mSocket = INVALID_SOCKET;
+	mInternal->mLocalPort = 0;
 }
 
 bool UDPSocket::bindToPort(uint16 port)
@@ -419,29 +537,6 @@ bool UDPSocket::bindToAnyPort()
 	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&bufsize, sizeof(bufsize));
 	::setsockopt(mInternal->mSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&bufsize, sizeof(bufsize));
 	return true;
-}
-
-void UDPSocket::close()
-{
-	if (!isValid())
-		return;
-
-#ifdef _WIN32
-	int status = shutdown(mInternal->mSocket, SD_BOTH);
-	if (status == 0)
-	{
-		status = closesocket(mInternal->mSocket);
-	}
-#else
-	int status = shutdown(mInternal->mSocket, SHUT_RDWR);
-	if (status == 0)
-	{
-		status = ::close(mInternal->mSocket);
-	}
-#endif
-
-	mInternal->mSocket = INVALID_SOCKET;
-	mInternal->mLocalPort = 0;
 }
 
 bool UDPSocket::sendData(const uint8* data, size_t length, const SocketAddress& destinationAddress)
