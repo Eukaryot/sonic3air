@@ -42,7 +42,8 @@ namespace lemon
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
 
 	private:
-		void processConstantsAndDefines(TokenList& tokens);
+		void processDefines(TokenList& tokens);
+		void processConstants(TokenList& tokens);
 		void processParentheses(TokenList& tokens, std::vector<TokenList*>& outLinearTokenLists);
 		void processCommaSeparators(std::vector<TokenList*>& linearTokenLists);
 
@@ -58,8 +59,8 @@ namespace lemon
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
 
-		const Variable* findVariable(const std::string& name);
-		LocalVariable* findLocalVariable(const std::string& name);
+		const Variable* findVariable(uint64 nameHash);
+		LocalVariable* findLocalVariable(uint64 nameHash);
 
 	private:
 		const Context& mContext;

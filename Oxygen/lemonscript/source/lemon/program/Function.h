@@ -91,6 +91,8 @@ namespace lemon
 
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
 
+		uint64 addToCompiledHash(uint64 hash) const;
+
 	public:
 		// Variables
 		std::map<std::string, LocalVariable*> mLocalVariablesByIdentifier;

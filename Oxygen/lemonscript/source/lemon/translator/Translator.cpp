@@ -346,7 +346,7 @@ namespace lemon
 				case Token::Type::FUNCTION:
 				{
 					const FunctionToken& ft = token.as<FunctionToken>();
-					CppWriter::addIdentifier(line, ft.mFunctionName);
+					CppWriter::addIdentifier(line, ft.mFunction->getName());
 					line << "(";
 
 					for (size_t k = 0; k < ft.mParameters.size(); ++k)

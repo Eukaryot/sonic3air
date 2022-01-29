@@ -117,7 +117,9 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		{
 			IdentifierToken& token = token_.as<IdentifierToken>();
 			DataTypeHelper::serializeDataType(serializer, token.mDataType);
-			serializer.serialize(token.mIdentifier);
+			serializer.serialize(token.mName);
+			if (serializer.isReading())
+				token.mNameHash = rmx::getMurmur2_64(token.mName);
 			break;
 		}
 

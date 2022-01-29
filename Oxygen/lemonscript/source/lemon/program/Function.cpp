@@ -17,6 +17,63 @@ namespace lemon
 {
 	namespace detail
 	{
+		// This data hasher implementation uses a mixture of Murmur2 (which is faster for larger chunks of memory)
+		// and FNV1a (which can be used to accumulate the chunk hashes easily)
+		//  -> TODO: Some accumulative implementation of Murmur2 would be nice for this
+		//  -> TODO: Move this somewhere else?
+		struct QuickDataHasher
+		{
+			uint64 mHash = 0;
+			uint8 mChunk[0x1000];
+			size_t mSize = 0;
+
+			QuickDataHasher()
+			{
+				mHash = rmx::startFNV1a_64();
+			}
+
+			explicit QuickDataHasher(uint64 initialHash) :
+				mHash(initialHash)
+			{
+			}
+
+			uint64 getHash()
+			{
+				flush();
+				return mHash;
+			}
+
+			void flush()
+			{
+				if (mSize > 0)
+				{
+					uint64 chunkHash = rmx::getMurmur2_64(mChunk, mSize);
+					mHash = rmx::addToFNV1a_64(mHash, (uint8*)&chunkHash, sizeof(chunkHash));
+					mSize = 0;
+				}
+			}
+
+			void prepareNextData(size_t maximumExpectedSize)
+			{
+				if (mSize + maximumExpectedSize > 0x1000)
+				{
+					flush();
+				}
+			}
+
+			void addData(uint8 value)
+			{
+				mChunk[mSize] = value;
+				++mSize;
+			}
+
+			void addData(uint64 value)
+			{
+				memcpy(&mChunk[mSize], &value, sizeof(value));
+				++mSize;
+			}
+		};
+
 		uint32 getVoidSignatureHash()
 		{
 			uint32 value = PredefinedDataTypes::VOID.getDataTypeHash();
@@ -94,6 +151,7 @@ namespace lemon
 
 		LocalVariable& variable = mModule->createLocalVariable();
 		variable.mName = identifier;
+		variable.mNameHash = rmx::getMurmur2_64(identifier);
 		variable.mDataType = dataType;
 
 		mLocalVariablesByIdentifier.emplace(identifier, &variable);
@@ -130,6 +188,20 @@ namespace lemon
 			}
 		}
 		return nullptr;
+	}
+
+	uint64 ScriptFunction::addToCompiledHash(uint64 hash) const
+	{
+		detail::QuickDataHasher dataHasher(hash);
+		for (const Opcode& opcode : mOpcodes)
+		{
+			dataHasher.prepareNextData(10);
+			dataHasher.addData((uint8)opcode.mType);
+			dataHasher.addData((uint8)opcode.mDataType);
+			if (opcode.mParameter != 0)
+				dataHasher.addData((uint64)opcode.mParameter);
+		}
+		return dataHasher.getHash();
 	}
 
 

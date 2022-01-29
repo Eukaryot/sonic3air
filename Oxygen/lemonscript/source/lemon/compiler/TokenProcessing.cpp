@@ -72,17 +72,24 @@ namespace lemon
 	{
 		mLineNumber = lineNumber;
 
-		// Process constants & defines
-		processConstantsAndDefines(tokensRoot);
+		// Process defines early, as they can introduce new tokens that need to be considered in the following steps
+		processDefines(tokensRoot);
 
-		// Split by parentheses
-		//  -> Each linear token list represents contents of one pair of parenthesis, plus one for the whole root
+		// Process constants
+		processConstants(tokensRoot);
+
+		// Build linear token lists that can mostly be processed individually
+		//  -> Each linear token list represents contents of one pair of parenthesis, or a comma-separated part in there -- plus there's always one linear token list for the whole root
+		//  -> They are sorted so that inner token lists have a lower index in "linearTokenLists" than their outer token list, so they're evaluated first
 		static std::vector<TokenList*> linearTokenLists;	// Not multi-threading safe
 		linearTokenLists.clear();
-		processParentheses(tokensRoot, linearTokenLists);
+		{
+			// Split by parentheses
+			processParentheses(tokensRoot, linearTokenLists);
 
-		// Split by commas
-		processCommaSeparators(linearTokenLists);
+			// Split by commas
+			processCommaSeparators(linearTokenLists);
+		}
 
 		// We do the other processing steps on each linear token list individually
 		for (TokenList* tokenList : linearTokenLists)
@@ -105,8 +112,7 @@ namespace lemon
 	{
 		mLineNumber = lineNumber;
 
-		// Split by parentheses
-		//  -> Each linear token list represents contents of one pair of parenthesis, plus one for the whole root
+		// Build linear token lists that can mostly be processed individually
 		static std::vector<TokenList*> linearTokenLists;	// Not multi-threading safe
 		linearTokenLists.clear();
 		processParentheses(tokensRoot, linearTokenLists);
@@ -119,22 +125,13 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::processConstantsAndDefines(TokenList& tokens)
+	void TokenProcessing::processDefines(TokenList& tokens)
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
-				const uint64 identifierHash = rmx::getMurmur2_64(tokens[i].as<IdentifierToken>().mIdentifier);
-
-				const Constant* constant = mContext.mGlobalsLookup.getConstantByName(identifierHash);
-				if (nullptr != constant)
-				{
-					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
-					token.mDataType = constant->getDataType();
-					token.mValue = constant->getValue();
-				}
-
+				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mNameHash;
 				const Define* define = mContext.mGlobalsLookup.getDefineByName(identifierHash);
 				if (nullptr != define)
 				{
@@ -145,6 +142,24 @@ namespace lemon
 					}
 
 					// TODO: Add implicit cast if necessary
+				}
+			}
+		}
+	}
+
+	void TokenProcessing::processConstants(TokenList& tokens)
+	{
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			{
+				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mNameHash;
+				const Constant* constant = mContext.mGlobalsLookup.getConstantByName(identifierHash);
+				if (nullptr != constant)
+				{
+					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
+					token.mDataType = constant->getDataType();
+					token.mValue = constant->getValue();
 				}
 			}
 		}
@@ -295,8 +310,9 @@ namespace lemon
 						CHECK_ERROR(varType->mClass != DataTypeDefinition::Class::VOID, "void variables not allowed", mLineNumber);
 
 						// Create new variable
-						const std::string& identifier = tokens[i+1].as<IdentifierToken>().mIdentifier;
-						CHECK_ERROR(nullptr == findLocalVariable(identifier), "Variable name already used", mLineNumber);
+						const IdentifierToken& identifierToken = tokens[i+1].as<IdentifierToken>();
+						const std::string& identifier = identifierToken.mName;
+						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mNameHash), "Variable name already used", mLineNumber);
 
 						// Variable may already exist in function (but not in scope, we just checked that)
 						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
@@ -309,6 +325,7 @@ namespace lemon
 
 						VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 						token.mVariable = variable;
+						token.mDataType = variable->getDataType();
 
 						tokens.erase(i+1);
 					}
@@ -330,8 +347,9 @@ namespace lemon
 				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::PARENTHESIS)
 				{
 					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-					const std::string& functionName = tokens[i].as<IdentifierToken>().mIdentifier;
-					const uint64 nameHash = rmx::getMurmur2_64(functionName);
+					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+					const std::string& functionName = identifierToken.mName;
+					const uint64 nameHash = identifierToken.mNameHash;
 					bool isBaseCall = false;
 					const Function* function = nullptr;
 					const Variable* thisPointer = nullptr;
@@ -356,7 +374,7 @@ namespace lemon
 						if (rmx::endsWith(functionName, ".length") && content.empty())
 						{
 							const std::string variableName = functionName.substr(0, functionName.length() - 7);
-							const Variable* variable = findVariable(variableName);
+							const Variable* variable = findVariable(rmx::getMurmur2_64(variableName));
 							if (nullptr != variable)
 							{
 								if (variable->getDataType() == &PredefinedDataTypes::STRING)
@@ -374,17 +392,10 @@ namespace lemon
 					}
 					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" + functionName + "'", mLineNumber);
 
+					// Create function token
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
-					token.mFunctionName = functionName;
-					token.mNameHash = nameHash;
-					token.mIsBaseCall = isBaseCall;
-					
-					if (nullptr != function)
-					{
-						token.mFunction = function;
-						token.mDataType = function->getReturnType();
-					}
 
+					// Build list of parameters
 					if (!content.empty())
 					{
 						if (content[0].getType() == Token::Type::COMMA_SEPARATED)
@@ -412,6 +423,62 @@ namespace lemon
 						variableToken.mDataType = thisPointer->getDataType();
 					}
 					tokens.erase(i+1);
+
+					// Assign types
+					std::vector<const DataTypeDefinition*> parameterTypes;
+					parameterTypes.reserve(token.mParameters.size());
+					for (size_t i = 0; i < token.mParameters.size(); ++i)
+					{
+						const DataTypeDefinition* type = assignStatementDataType(*token.mParameters[i], nullptr);
+						parameterTypes.push_back(type);
+					}
+
+					// If the function was not determined already, do that now
+					if (nullptr == function)
+					{
+						// Find out which function signature actually fits
+						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
+						if (isBaseCall)
+						{
+							// Base call must use the same function signature as the current one
+							CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
+							for (size_t i = 0; i < parameterTypes.size(); ++i)
+							{
+								CHECK_ERROR(parameterTypes[i] == mContext.mFunction->getParameters()[i].mType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
+							}
+
+							// Use the very same function again, as a base call
+							function = mContext.mFunction;
+							token.mIsBaseCall = true;
+						}
+						else
+						{
+							const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(nameHash);
+							CHECK_ERROR(!functions.empty(), "Unknown function name '" + functionName + "'", mLineNumber);
+
+							// Find best-fitting correct function overload
+							function = nullptr;
+							uint32 bestPriority = 0xff000000;
+							for (const Function* candidateFunction : functions)
+							{
+								const uint32 priority = TypeCasting(mConfig).getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+								if (priority < bestPriority)
+								{
+									bestPriority = priority;
+									function = candidateFunction;
+								}
+							}
+							CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" + functionName + "', the number or types of parameters passed are wrong", mLineNumber);
+						}
+
+						// TODO: Perform implicit casts for parameters here?
+					}
+
+					if (nullptr != function)
+					{
+						token.mFunction = function;
+						token.mDataType = function->getReturnType();
+					}
 				}
 			}
 		}
@@ -437,6 +504,8 @@ namespace lemon
 					token.mDataType = dataType;
 					token.mAddress = content[0].as<StatementToken>();
 					tokens.erase(i+1);
+
+					assignStatementDataType(*token.mAddress, &PredefinedDataTypes::UINT_32);
 				}
 			}
 		}
@@ -469,12 +538,13 @@ namespace lemon
 			Token& token = tokens[i];
 			if (token.getType() == Token::Type::IDENTIFIER)
 			{
-				const std::string& name = token.as<IdentifierToken>().mIdentifier;
-				const Variable* variable = findVariable(name);
-				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " + name, mLineNumber);
+				const IdentifierToken& identifierToken = token.as<IdentifierToken>();
+				const Variable* variable = findVariable(identifierToken.mNameHash);
+				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " + identifierToken.mName, mLineNumber);
 
 				VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 				token.mVariable = variable;
+				token.mDataType = variable->getDataType();
 			}
 		}
 	}
@@ -651,11 +721,7 @@ namespace lemon
 		{
 			case Token::Type::CONSTANT:
 			{
-				if (token.mDataType == &PredefinedDataTypes::STRING)
-				{
-					token.mDataType = &PredefinedDataTypes::STRING;
-				}
-				else
+				if (token.mDataType != &PredefinedDataTypes::STRING)
 				{
 					token.mDataType = (nullptr != resultType) ? resultType : &PredefinedDataTypes::CONST_INT;
 				}
@@ -664,75 +730,19 @@ namespace lemon
 
 			case Token::Type::VARIABLE:
 			{
-				// Use variable data type
-				token.mDataType = token.as<VariableToken>().mVariable->getDataType();
+				// Nothing to do, data type was already set when creating the token
 				break;
 			}
 
 			case Token::Type::FUNCTION:
 			{
-				FunctionToken& ft = token.as<FunctionToken>();
-
-				// Assign types
-				std::vector<const DataTypeDefinition*> parameterTypes;
-				parameterTypes.reserve(ft.mParameters.size());
-				for (size_t i = 0; i < ft.mParameters.size(); ++i)
-				{
-					const DataTypeDefinition* type = assignStatementDataType(*ft.mParameters[i], nullptr);
-					parameterTypes.push_back(type);
-				}
-
-				// In special cases, we might have determined the function already before
-				//  -> Then there's nothing left to do for now
-				if (nullptr != ft.mFunction)
-					break;
-
-				// Find out which function signature actually fits
-				RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-				const Function* function = mContext.mFunction;
-				if (ft.mIsBaseCall)
-				{
-					// Base call must use the same function signature as the current one
-					CHECK_ERROR(parameterTypes.size() == function->getParameters().size(), "Base function call has different parameter count", mLineNumber);
-					for (size_t i = 0; i < parameterTypes.size(); ++i)
-					{
-						CHECK_ERROR(parameterTypes[i] == function->getParameters()[i].mType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
-					}
-					// So not change "function" itself in this case
-				}
-				else
-				{
-					const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(ft.mNameHash);
-					CHECK_ERROR(!functions.empty(), "Unknown function name '" + ft.mFunctionName + "'", mLineNumber);
-
-					// Find best-fitting correct function overload
-					function = nullptr;
-					uint32 bestPriority = 0xff000000;
-					for (const Function* candidateFunction : functions)
-					{
-						const uint32 priority = TypeCasting(mConfig).getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
-						if (priority < bestPriority)
-						{
-							bestPriority = priority;
-							function = candidateFunction;
-						}
-					}
-					CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" + ft.mFunctionName + "', the number or types of parameters passed are wrong", mLineNumber);
-				}
-
-				// TODO: Perform implicit casts for parameters here?
-
-				ft.mFunction = function;
-				ft.mDataType = function->getReturnType();
+				// Nothing to do, "processFunctionCalls" cared about everything already
 				break;
 			}
 
 			case Token::Type::MEMORY_ACCESS:
 			{
-				MemoryAccessToken& mat = token.as<MemoryAccessToken>();
-				assignStatementDataType(*mat.mAddress, &PredefinedDataTypes::UINT_32);
-
-				// Data type of the memory access token itself was already set on creation
+				// Nothing to do, "processMemoryAccesses" cared about everything already
 				break;
 			}
 
@@ -843,24 +853,23 @@ namespace lemon
 		return token.mDataType;
 	}
 
-	const Variable* TokenProcessing::findVariable(const std::string& name)
+	const Variable* TokenProcessing::findVariable(uint64 nameHash)
 	{
 		// Search for local variables first
-		const Variable* variable = findLocalVariable(name);
+		const Variable* variable = findLocalVariable(nameHash);
 		if (nullptr == variable)
 		{
 			// Maybe it's a global variable
-			const uint64 nameHash = rmx::getMurmur2_64(name);
 			variable = mContext.mGlobalsLookup.getGlobalVariableByName(nameHash);
 		}
 		return variable;
 	}
 
-	LocalVariable* TokenProcessing::findLocalVariable(const std::string& name)
+	LocalVariable* TokenProcessing::findLocalVariable(uint64 nameHash)
 	{
 		for (LocalVariable* var : mContext.mLocalVariables)
 		{
-			if (var->getName() == name)
+			if (var->getNameHash() == nameHash)
 				return var;
 		}
 		return nullptr;

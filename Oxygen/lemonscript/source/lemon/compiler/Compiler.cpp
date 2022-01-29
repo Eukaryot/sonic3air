@@ -171,6 +171,19 @@ namespace lemon
 				processSingleFunction(*node);
 			}
 
+		#if 0
+			// Just for debugging: Build compiled hash
+			{
+				uint64 hash = rmx::startFNV1a_64();
+				for (ScriptFunction* function : mModule.getScriptFunctions())
+				{
+					hash = function->addToCompiledHash(hash);
+				}
+				mModule.setCompiledCodeHash(hash);
+				RMX_LOG_INFO("Hash for module '" << mModule.getModuleName() << "' = " << rmx::hexString(hash, 16));
+			}
+		#endif
+
 			// Optional translation
 			if (!mCompileOptions.mOutputTranslatedSource.empty())
 			{
@@ -451,7 +464,9 @@ namespace lemon
 						}
 						case ParserToken::Type::IDENTIFIER:
 						{
-							node.mTokenList.createBack<IdentifierToken>().mIdentifier.swap(parserToken.as<IdentifierParserToken>().mIdentifier);
+							IdentifierToken& token = node.mTokenList.createBack<IdentifierToken>();
+							token.mName.swap(parserToken.as<IdentifierParserToken>().mIdentifier);
+							token.mNameHash = rmx::getMurmur2_64(token.mName);
 							break;
 						}
 					}
@@ -538,7 +553,7 @@ namespace lemon
 							++offset;
 
 							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in global variable definition", node.getLineNumber());
-							const std::string identifier = tokens[offset].as<IdentifierToken>().mIdentifier;
+							const std::string identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
 							// Create global variable
@@ -564,7 +579,7 @@ namespace lemon
 							CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", node.getLineNumber());
 
 							const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
-							const std::string identifier = tokens[2].as<IdentifierToken>().mIdentifier;
+							const std::string identifier = tokens[2].as<IdentifierToken>().mName;
 							const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
 
 							Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
@@ -585,7 +600,7 @@ namespace lemon
 							}
 
 							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier for define", node.getLineNumber());
-							const std::string identifier = tokens[offset].as<IdentifierToken>().mIdentifier;
+							const std::string identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
 							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", node.getLineNumber());
@@ -646,7 +661,7 @@ namespace lemon
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in function definition", lineNumber);
-		const std::string functionName = tokens[offset].as<IdentifierToken>().mIdentifier;
+		const std::string functionName = tokens[offset].as<IdentifierToken>().mName;
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::PARENTHESIS_LEFT), "Expected opening parentheses in function definition", lineNumber);
@@ -673,7 +688,7 @@ namespace lemon
 
 				++offset;
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected identifier in function parameter definition", lineNumber);
-				parameters.back().mIdentifier = tokens[offset].as<IdentifierToken>().mIdentifier;
+				parameters.back().mIdentifier = tokens[offset].as<IdentifierToken>().mName;
 
 				++offset;
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::OPERATOR, "Expected comma or closing parentheses after function parameter definition", lineNumber);

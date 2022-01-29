@@ -102,7 +102,8 @@ namespace lemon
 		inline IdentifierToken() : StatementToken(TYPE) {}
 
 	public:
-		std::string mIdentifier;
+		std::string mName;
+		uint64 mNameHash = 0;
 	};
 
 
@@ -185,8 +186,6 @@ namespace lemon
 		inline FunctionToken() : StatementToken(TYPE) {}
 
 	public:
-		std::string mFunctionName;
-		uint64 mNameHash = 0;
 		const Function* mFunction = nullptr;
 		bool mIsBaseCall = false;
 		std::vector<TokenPtr<StatementToken>> mParameters;

@@ -65,6 +65,9 @@ namespace lemon
 		// Serialization
 		bool serialize(VectorBinarySerializer& serializer);
 
+		inline uint64 getCompiledCodeHash() const     { return mCompiledCodeHash; }
+		inline void setCompiledCodeHash(uint64 hash)  { mCompiledCodeHash = hash; }
+
 	private:
 		void addFunctionInternal(Function& func);
 		void addGlobalVariable(Variable& variable, const std::string& name, const DataTypeDefinition* dataType);
@@ -97,6 +100,9 @@ namespace lemon
 
 		// String literals
 		StringLookup mStringLiterals;
+
+		// Misc
+		uint64 mCompiledCodeHash = 0;
 	};
 
 }
