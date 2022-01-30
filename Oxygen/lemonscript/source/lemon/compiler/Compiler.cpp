@@ -55,36 +55,6 @@ namespace lemon
 	};
 
 
-	Compiler::LineNumberTranslation::TranslationResult Compiler::LineNumberTranslation::translateLineNumber(uint32 lineNumber) const
-	{
-		TranslationResult result;
-		if (mIntervals.empty())
-		{
-			CHECK_ERROR_NOLINE(false, "Error resolving line number");
-			return result;
-		}
-
-		// TODO: Possible optimization with binary search
-		size_t index = 0;
-		while (index+1 < mIntervals.size() && mIntervals[index+1].mStartLineNumber < lineNumber)
-			++index;
-
-		const Interval& interval = mIntervals[index];
-		result.mFilename = interval.mFilename;
-		result.mLineNumber = lineNumber - interval.mStartLineNumber + interval.mLineOffsetInFile;
-		return result;
-	}
-
-	void Compiler::LineNumberTranslation::push(uint32 currentLineNumber, const std::wstring& filename, uint32 lineOffsetInFile)
-	{
-		const bool updateLastEntry = (!mIntervals.empty() && mIntervals.back().mStartLineNumber == currentLineNumber);
-		Interval& interval = updateLastEntry ? mIntervals.back() : vectorAdd(mIntervals);
-		interval.mStartLineNumber = currentLineNumber;
-		interval.mFilename = filename;
-		interval.mLineOffsetInFile = lineOffsetInFile;
-	}
-
-
 	Compiler::Compiler(Module& module, GlobalsLookup& globalsLookup) :
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
@@ -328,6 +298,7 @@ namespace lemon
 	{
 		// Parse text lines and build blocks hierarchy
 		Parser parser;
+		ParserTokenList parserTokens;
 
 		std::vector<BlockNode*> blockStack = { &rootNode };
 		uint32 lineNumber = 0;
@@ -337,19 +308,10 @@ namespace lemon
 			++lineNumber;	// First line will have number 1
 
 			// Parse text line
-			ParserTokenList parserTokens;
+			parserTokens.clear();
 			parser.splitLineIntoTokens(line, lineNumber, parserTokens);
 			if (parserTokens.empty())
 				continue;
-
-			// Collect all string literals
-			for (size_t i = 0; i < parserTokens.size(); ++i)
-			{
-				if (parserTokens[i].getType() == ParserToken::Type::STRING_LITERAL)
-				{
-					mModule.addStringLiteral(parserTokens[i].as<StringLiteralParserToken>().mString);
-				}
-			}
 
 			// Check for block begin and end
 			bool isUndefined = true;
@@ -415,31 +377,39 @@ namespace lemon
 							node.mTokenList.createBack<KeywordToken>().mKeyword = parserToken.as<KeywordParserToken>().mKeyword;
 							break;
 						}
+
 						case ParserToken::Type::VARTYPE:
 						{
 							node.mTokenList.createBack<VarTypeToken>().mDataType = parserToken.as<VarTypeParserToken>().mDataType;
 							break;
 						}
+
 						case ParserToken::Type::OPERATOR:
 						{
 							node.mTokenList.createBack<OperatorToken>().mOperator = parserToken.as<OperatorParserToken>().mOperator;
 							break;
 						}
+
 						case ParserToken::Type::LABEL:
 						{
 							node.mTokenList.createBack<LabelToken>().mName.swap(parserToken.as<LabelParserToken>().mName);
 							break;
 						}
+
 						case ParserToken::Type::PRAGMA:
 						{
 							// Just ignore this one
 							break;
 						}
+
 						case ParserToken::Type::CONSTANT:
 						{
-							node.mTokenList.createBack<ConstantToken>().mValue = parserToken.as<ConstantParserToken>().mValue;
+							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
+							constantToken.mValue = parserToken.as<ConstantParserToken>().mValue;
+							constantToken.mDataType = &PredefinedDataTypes::CONST_INT;
 							break;
 						}
+
 						case ParserToken::Type::STRING_LITERAL:
 						{
 							const std::string_view str = parserToken.as<StringLiteralParserToken>().mString;
@@ -456,10 +426,11 @@ namespace lemon
 							constantToken.mDataType = &PredefinedDataTypes::STRING;
 							break;
 						}
+
 						case ParserToken::Type::IDENTIFIER:
 						{
 							IdentifierToken& token = node.mTokenList.createBack<IdentifierToken>();
-							token.mName = parserToken.as<IdentifierParserToken>().mIdentifier;
+							token.mName.swap(parserToken.as<IdentifierParserToken>().mIdentifier);
 							token.mNameHash = rmx::getMurmur2_64(token.mName);
 							break;
 						}

@@ -114,6 +114,9 @@
     <ClCompile Include="..\..\source\lemon\program\ConstantArray.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\LineNumberTranslation.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
@@ -250,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\program\Constant.h">
       <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\LineNumberTranslation.h">
+      <Filter>lemon\compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

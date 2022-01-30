@@ -11,6 +11,7 @@
 #include "lemon/program/Opcode.h"
 #include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/Errors.h"
+#include "lemon/compiler/LineNumberTranslation.h"
 #include "lemon/compiler/PreprocessorDefinition.h"
 
 
@@ -30,26 +31,6 @@ namespace lemon
 	class API_EXPORT Compiler
 	{
 	public:
-		struct LineNumberTranslation
-		{
-			struct Interval
-			{
-				uint32 mStartLineNumber = 0;	// End line number is the start of the next item minus one
-				std::wstring mFilename;
-				uint32 mLineOffsetInFile = 0;
-			};
-			std::vector<Interval> mIntervals;
-
-			struct TranslationResult
-			{
-				std::wstring mFilename;
-				uint32 mLineNumber = 0;
-			};
-
-			TranslationResult translateLineNumber(uint32 lineNumber) const;
-			void push(uint32 currentLineNumber, const std::wstring& filename, uint32 lineOffsetInFile);
-		};
-
 		struct CompileOptions
 		{
 			PreprocessorDefinitionMap mPreprocessorDefinitions;

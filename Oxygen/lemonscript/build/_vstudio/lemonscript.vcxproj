@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\FunctionCompiler.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\LineNumberTranslation.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Node.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Operators.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Parser.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="..\..\source\lemon\compiler\Errors.h" />
     <ClInclude Include="..\..\source\lemon\compiler\FunctionCompiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\LineNumberTranslation.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Node.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Definitions.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Operators.h" />
