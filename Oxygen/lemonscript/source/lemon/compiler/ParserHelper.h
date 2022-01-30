@@ -19,14 +19,41 @@ namespace lemon
 	class ParserHelper
 	{
 	public:
+		struct Lookup
+		{
+			constexpr Lookup() :
+				mIsDigit(),
+				mIsLetter(),
+				mIsDigitOrLetter(),
+				mIsIdentifierCharacter()
+			{
+				for (size_t i = 0; i < 0x100; ++i)
+				{
+					const char ch = (char)i;
+					mIsDigit[i] = (ch >= '0' && ch <= '9');
+					mIsLetter[i] = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+					mIsDigitOrLetter[i] = mIsDigit[i] || mIsLetter[i];
+					mIsIdentifierCharacter[i] = mIsDigit[i] || mIsLetter[i] || (ch == '_') || (ch == '.');
+				}
+			}
+
+			bool mIsDigit[0x100];
+			bool mIsLetter[0x100];
+			bool mIsDigitOrLetter[0x100];
+			bool mIsIdentifierCharacter[0x100];
+		};
+
+		inline static Lookup mLookup;
+
+
 		inline static bool isDigit(char ch)
 		{
-			return (ch >= '0' && ch <= '9');
+			return mLookup.mIsDigit[(size_t)ch];
 		}
 
 		inline static bool isLetter(char ch)
 		{
-			return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+			return mLookup.mIsLetter[(size_t)ch];
 		}
 
 		inline static bool isOperatorCharacter(char ch)
@@ -36,41 +63,38 @@ namespace lemon
 
 		inline static void collectNumber(const char* input, size_t length, std::string& output)
 		{
-			output.clear();
-			for (size_t pos = 0; pos < length; ++pos)
+			size_t pos = 0;
+			for (; pos < length; ++pos)
 			{
-				const char ch = input[pos];
-				if (isDigit(ch) || isLetter(ch))
-					output += ch;
-				else
+				if (!mLookup.mIsDigitOrLetter[(size_t)input[pos]])
 					break;
 			}
+			output.clear();
+			output.append(input, pos);
 		}
 
 		inline static void collectIdentifier(const char* input, size_t length, std::string& output)
 		{
-			output.clear();
-			for (size_t pos = 0; pos < length; ++pos)
+			size_t pos = 0;
+			for (; pos < length; ++pos)
 			{
-				const char ch = input[pos];
-				if (isDigit(ch) || isLetter(ch) || (ch == '_') || (ch == '.'))
-					output += ch;
-				else
+				if (!mLookup.mIsIdentifierCharacter[(size_t)input[pos]])
 					break;
 			}
+			output.clear();
+			output.append(input, pos);
 		}
 
 		inline static void collectOperators(const char* input, size_t length, std::string& output)
 		{
-			output.clear();
-			for (size_t pos = 0; pos < length; ++pos)
+			size_t pos = 0;
+			for (; pos < length; ++pos)
 			{
-				const char ch = input[pos];
-				if (isOperatorCharacter(ch))
-					output += ch;
-				else
+				if (!mOperatorLookup.isOperatorCharacter(input[pos]))
 					break;
 			}
+			output.clear();
+			output.append(input, pos);
 		}
 
 		inline static void collectStringLiteral(const char* input, size_t length, std::string& output, size_t& outCharactersRead, uint32 lineNumber)

@@ -409,7 +409,7 @@ namespace lemon
 							const bool hasOpcodeFlags = (opcode.mFlags != 0);
 							const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber <= lastLineNumber + 2) ? (opcode.mLineNumber - lastLineNumber) : 3;
 
-							const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | (hasDataType ? 0x200 : 0) | (hasOpcodeFlags ? 0x400 : 0) | ((uint16)lineNumberBits << 11);
+							const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | ((uint16)hasDataType * 0x200) | ((uint16)hasOpcodeFlags * 0x400) | ((uint16)lineNumberBits << 11);
 							serializer.write(typeAndFlags);
 
 							switch (parameterBits)
