@@ -311,15 +311,14 @@ namespace lemon
 
 						// Create new variable
 						const IdentifierToken& identifierToken = tokens[i+1].as<IdentifierToken>();
-						const std::string& identifier = identifierToken.mName;
 						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mNameHash), "Variable name already used", mLineNumber);
 
 						// Variable may already exist in function (but not in scope, we just checked that)
 						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-						LocalVariable* variable = mContext.mFunction->getLocalVariableByIdentifier(identifier);
+						LocalVariable* variable = mContext.mFunction->getLocalVariableByIdentifier(identifierToken.mNameHash);
 						if (nullptr == variable)
 						{
-							variable = &mContext.mFunction->addLocalVariable(identifier, varType, mLineNumber);
+							variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, identifierToken.mNameHash, varType, mLineNumber);
 						}
 						mContext.mLocalVariables.push_back(variable);
 
@@ -348,7 +347,7 @@ namespace lemon
 				{
 					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
-					const std::string& functionName = identifierToken.mName;
+					const std::string_view functionName = identifierToken.mName;
 					const uint64 nameHash = identifierToken.mNameHash;
 					bool isBaseCall = false;
 					const Function* function = nullptr;
@@ -373,7 +372,7 @@ namespace lemon
 						//  -> TODO: Generalize this to pave the way for other kinds of "method calls"
 						if (rmx::endsWith(functionName, ".length") && content.empty())
 						{
-							const std::string variableName = functionName.substr(0, functionName.length() - 7);
+							const std::string_view variableName = functionName.substr(0, functionName.length() - 7);
 							const Variable* variable = findVariable(rmx::getMurmur2_64(variableName));
 							if (nullptr != variable)
 							{
@@ -390,7 +389,7 @@ namespace lemon
 							}
 						}
 					}
-					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" + functionName + "'", mLineNumber);
+					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" << functionName << "'", mLineNumber);
 
 					// Create function token
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
@@ -454,7 +453,7 @@ namespace lemon
 						else
 						{
 							const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(nameHash);
-							CHECK_ERROR(!functions.empty(), "Unknown function name '" + functionName + "'", mLineNumber);
+							CHECK_ERROR(!functions.empty(), "Unknown function name '" << functionName << "'", mLineNumber);
 
 							// Find best-fitting correct function overload
 							function = nullptr;
@@ -468,7 +467,7 @@ namespace lemon
 									function = candidateFunction;
 								}
 							}
-							CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" + functionName + "', the number or types of parameters passed are wrong", mLineNumber);
+							CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" << functionName << "', the number or types of parameters passed are wrong", mLineNumber);
 						}
 
 						// TODO: Perform implicit casts for parameters here?
@@ -540,7 +539,7 @@ namespace lemon
 			{
 				const IdentifierToken& identifierToken = token.as<IdentifierToken>();
 				const Variable* variable = findVariable(identifierToken.mNameHash);
-				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " + identifierToken.mName, mLineNumber);
+				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName, mLineNumber);
 
 				VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 				token.mVariable = variable;

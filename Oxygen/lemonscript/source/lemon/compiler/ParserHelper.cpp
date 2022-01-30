@@ -81,7 +81,7 @@ namespace lemon
 		if (mInitialized)
 			return;
 
-		const std::map<std::string, Operator> operatorStrings =
+		const std::vector<std::pair<std::string_view, Operator>> operatorStrings =
 		{
 			{ "=",   Operator::ASSIGN },
 			{ "+=",  Operator::ASSIGN_PLUS },
@@ -134,7 +134,7 @@ namespace lemon
 
 		for (const auto& pair : operatorStrings)
 		{
-			const std::string& string = pair.first;
+			const std::string_view& string = pair.first;
 			Entry* parentEntry = nullptr;
 			for (size_t i = 0; i < string.length(); ++i)
 			{

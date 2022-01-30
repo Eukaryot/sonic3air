@@ -108,6 +108,8 @@ namespace lemon
 		// Create default control flow
 		mControlFlows.push_back(new ControlFlow(*this));
 		mSelectedControlFlow = mControlFlows[0];
+
+		mRuntimeOpcodesPool.setPageSize(0x40000);
 	}
 
 	Runtime::~Runtime()
@@ -129,6 +131,7 @@ namespace lemon
 		mRuntimeFunctions.clear();
 		mRuntimeFunctionsMapped.clear();
 		mRuntimeFunctionsBySignature.clear();
+		mRuntimeOpcodesPool.clear();
 		mStrings.clear();
 
 		if (nullptr != mProgram)
@@ -638,14 +641,14 @@ namespace lemon
 				controlFlow.mCallStack.resize(controlFlow.mCallStack.count);
 				for (uint16 i = 0; i < controlFlow.mCallStack.count; ++i)
 				{
-					const std::string functionName = serializer.read<std::string>();
+					const std::string_view functionName = serializer.readStringView();
 					const uint64 nameHash = rmx::getMurmur2_64(functionName);
 					const uint32 signatureHash = serializer.read<uint32>();
 					const Function* function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
 					if (nullptr == function || function->getType() != Function::Type::SCRIPT)
 					{
 						if (nullptr != outError)
-							*outError = "Could not match function signature for script function of name '" + functionName + "'";
+							*outError = "Could not match function signature for script function of name '" + std::string(functionName) + "'";
 						return false;
 					}
 					RuntimeFunction* runtimeFunction = getRuntimeFunction(static_cast<const ScriptFunction&>(*function));

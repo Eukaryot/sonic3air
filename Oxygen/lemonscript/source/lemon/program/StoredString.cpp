@@ -12,6 +12,11 @@
 
 namespace lemon
 {
+	StringLookup::StringLookup()
+	{
+		mMemoryPool.setPageSize(0x2000);
+	}
+
 	void StringLookup::clear()
 	{
 		for (size_t k = 0; k < HASH_TABLE_SIZE; ++k)
@@ -113,7 +118,7 @@ namespace lemon
 			for (uint32 i = 0; i < numberOfEntries; ++i)
 			{
 				const uint64 hash = serializer.read<uint64>();
-				const std::string str = serializer.read<std::string>();
+				const std::string_view str = serializer.readStringView();
 				getOrAddString(str, hash);
 			}
 		}

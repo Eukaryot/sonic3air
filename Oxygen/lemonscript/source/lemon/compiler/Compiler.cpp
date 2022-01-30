@@ -332,7 +332,7 @@ namespace lemon
 		std::vector<BlockNode*> blockStack = { &rootNode };
 		uint32 lineNumber = 0;
 
-		for (const std::string_view& line : lines)
+		for (const std::string_view line : lines)
 		{
 			++lineNumber;	// First line will have number 1
 
@@ -442,7 +442,7 @@ namespace lemon
 						}
 						case ParserToken::Type::STRING_LITERAL:
 						{
-							const std::string& str = parserToken.as<StringLiteralParserToken>().mString;
+							const std::string_view str = parserToken.as<StringLiteralParserToken>().mString;
 							const uint64 hash = rmx::getMurmur2_64(str);
 							const StoredString* storedString = mGlobalsLookup.getStringLiteralByHash(hash);
 							if (nullptr == storedString)
@@ -459,7 +459,7 @@ namespace lemon
 						case ParserToken::Type::IDENTIFIER:
 						{
 							IdentifierToken& token = node.mTokenList.createBack<IdentifierToken>();
-							token.mName.swap(parserToken.as<IdentifierParserToken>().mIdentifier);
+							token.mName = parserToken.as<IdentifierParserToken>().mIdentifier;
 							token.mNameHash = rmx::getMurmur2_64(token.mName);
 							break;
 						}
@@ -533,7 +533,7 @@ namespace lemon
 							++offset;
 
 							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in global variable definition", node.getLineNumber());
-							const std::string identifier = tokens[offset].as<IdentifierToken>().mName;
+							const std::string_view identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
 							// Create global variable
@@ -559,7 +559,7 @@ namespace lemon
 							CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", node.getLineNumber());
 
 							const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
-							const std::string identifier = tokens[2].as<IdentifierToken>().mName;
+							const std::string_view identifier = tokens[2].as<IdentifierToken>().mName;
 							const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
 
 							Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
@@ -580,7 +580,7 @@ namespace lemon
 							}
 
 							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier for define", node.getLineNumber());
-							const std::string identifier = tokens[offset].as<IdentifierToken>().mName;
+							const std::string_view identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
 							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", node.getLineNumber());
@@ -641,7 +641,7 @@ namespace lemon
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in function definition", lineNumber);
-		const std::string functionName = tokens[offset].as<IdentifierToken>().mName;
+		const std::string_view functionName = tokens[offset].as<IdentifierToken>().mName;
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::PARENTHESIS_LEFT), "Expected opening parentheses in function definition", lineNumber);
@@ -669,6 +669,7 @@ namespace lemon
 				++offset;
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected identifier in function parameter definition", lineNumber);
 				parameters.back().mIdentifier = tokens[offset].as<IdentifierToken>().mName;
+				parameters.back().mNameHash = tokens[offset].as<IdentifierToken>().mNameHash;
 
 				++offset;
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::OPERATOR, "Expected comma or closing parentheses after function parameter definition", lineNumber);
@@ -691,8 +692,8 @@ namespace lemon
 		// Create new variables for parameters
 		for (const Function::Parameter& parameter : function.getParameters())
 		{
-			CHECK_ERROR(nullptr == function.getLocalVariableByIdentifier(parameter.mIdentifier), "Parameter name already used", lineNumber);
-			function.addLocalVariable(parameter.mIdentifier, parameter.mType, lineNumber);
+			CHECK_ERROR(nullptr == function.getLocalVariableByIdentifier(parameter.mNameHash), "Parameter name already used", lineNumber);
+			function.addLocalVariable(parameter.mIdentifier, parameter.mNameHash, parameter.mType, lineNumber);
 		}
 
 		// Set source metadata

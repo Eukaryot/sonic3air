@@ -81,6 +81,7 @@ namespace lemon
 	friend class OpcodeExec;
 	friend class OptimizedOpcodeExec;
 	friend class NativizedCode;
+	friend class RuntimeFunction;
 	friend struct RuntimeOpcodeContext;
 
 	public:
@@ -166,6 +167,7 @@ namespace lemon
 		std::vector<RuntimeFunction> mRuntimeFunctions;
 		std::unordered_map<const ScriptFunction*, RuntimeFunction*> mRuntimeFunctionsMapped;
 		std::unordered_map<uint64, std::vector<RuntimeFunction*>> mRuntimeFunctionsBySignature;   // Key is the hashed function name + signature hash
+		rmx::OneTimeAllocPool mRuntimeOpcodesPool;
 
 		std::vector<int64> mGlobalVariables;
 

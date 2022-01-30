@@ -113,6 +113,8 @@ public:
 		return value;
 	}
 
+	std::string_view readStringView(size_t stringLengthLimit = 0xffffffff);
+
 	template <typename T>
 	void write(const T& value)
 	{

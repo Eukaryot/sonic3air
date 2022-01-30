@@ -61,40 +61,37 @@ namespace lemon
 			return mOperatorLookup.isOperatorCharacter(ch);
 		}
 
-		inline static void collectNumber(const char* input, size_t length, std::string& output)
+		inline static size_t collectNumber(const char* input, size_t length)
 		{
 			size_t pos = 0;
 			for (; pos < length; ++pos)
 			{
 				if (!mLookup.mIsDigitOrLetter[(size_t)input[pos]])
-					break;
+					return pos;
 			}
-			output.clear();
-			output.append(input, pos);
+			return pos;
 		}
 
-		inline static void collectIdentifier(const char* input, size_t length, std::string& output)
+		inline static size_t collectIdentifier(const char* input, size_t length)
 		{
 			size_t pos = 0;
 			for (; pos < length; ++pos)
 			{
 				if (!mLookup.mIsIdentifierCharacter[(size_t)input[pos]])
-					break;
+					return pos;
 			}
-			output.clear();
-			output.append(input, pos);
+			return pos;
 		}
 
-		inline static void collectOperators(const char* input, size_t length, std::string& output)
+		inline static size_t collectOperators(const char* input, size_t length)
 		{
 			size_t pos = 0;
 			for (; pos < length; ++pos)
 			{
 				if (!mOperatorLookup.isOperatorCharacter(input[pos]))
-					break;
+					return pos;
 			}
-			output.clear();
-			output.append(input, pos);
+			return pos;
 		}
 
 		inline static void collectStringLiteral(const char* input, size_t length, std::string& output, size_t& outCharactersRead, uint32 lineNumber)

@@ -31,6 +31,7 @@ namespace lemon
 		{
 			const DataTypeDefinition* mType = nullptr;
 			std::string mIdentifier;
+			uint64 mNameHash = 0;
 		};
 		typedef std::vector<Parameter> ParameterList;
 
@@ -81,12 +82,12 @@ namespace lemon
 		inline const Module& getModule() const	{ return *mModule; }
 		inline void setModule(Module& module)	{ mModule = &module; }
 
-		LocalVariable* getLocalVariableByIdentifier(const std::string& identifier) const;
+		LocalVariable* getLocalVariableByIdentifier(uint64 nameHash) const;
 		LocalVariable& getLocalVariableById(uint32 id) const;
-		LocalVariable& addLocalVariable(const std::string& identifier, const DataTypeDefinition* dataType, uint32 lineNumber);
+		LocalVariable& addLocalVariable(std::string_view identifier, uint64 nameHash, const DataTypeDefinition* dataType, uint32 lineNumber);
 
-		bool getLabel(const std::string& labelName, size_t& outOffset) const;
-		void addLabel(const std::string& labelName, size_t offset);
+		bool getLabel(std::string_view labelName, size_t& outOffset) const;
+		void addLabel(std::string_view labelName, size_t offset);
 		const std::string* findLabelByOffset(size_t offset) const;
 
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
@@ -95,14 +96,14 @@ namespace lemon
 
 	public:
 		// Variables
-		std::map<std::string, LocalVariable*> mLocalVariablesByIdentifier;
+		std::map<uint64, LocalVariable*> mLocalVariablesByIdentifier;
 		std::vector<LocalVariable*> mLocalVariablesById;
 
 		// Code
 		std::vector<Opcode> mOpcodes;
 
 		// Labels
-		std::map<std::string, uint32> mLabels;
+		std::map<std::string, uint32> mLabels;	// TODO: Better use the string hash as key
 
 		// Pragmas
 		std::vector<std::string> mPragmas;

@@ -111,7 +111,7 @@ namespace lemon
 		return mFunctions[uniqueId & 0xffff];
 	}
 
-	ScriptFunction& Module::addScriptFunction(const std::string& name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters)
+	ScriptFunction& Module::addScriptFunction(std::string_view name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters)
 	{
 		ScriptFunction& func = mScriptFunctionPool.createObject();
 		func.setModule(*this);
@@ -125,7 +125,7 @@ namespace lemon
 		return func;
 	}
 
-	UserDefinedFunction& Module::addUserDefinedFunction(const std::string& name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags)
+	UserDefinedFunction& Module::addUserDefinedFunction(std::string_view name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags)
 	{
 		UserDefinedFunction& func = mUserDefinedFunctionPool.createObject();
 		func.mName = name;
@@ -145,34 +145,34 @@ namespace lemon
 		mFunctions.push_back(&func);
 	}
 
-	GlobalVariable& Module::addGlobalVariable(const std::string& identifier, const DataTypeDefinition* dataType)
+	GlobalVariable& Module::addGlobalVariable(std::string_view identifier, const DataTypeDefinition* dataType)
 	{
 		// TODO: Add an object pool for this
 		GlobalVariable& variable = *new GlobalVariable();
-		addGlobalVariable(variable, identifier, dataType);
+		addGlobalVariable(variable, identifier, rmx::getMurmur2_64(identifier), dataType);
 		return variable;
 	}
 
-	UserDefinedVariable& Module::addUserDefinedVariable(const std::string& identifier, const DataTypeDefinition* dataType)
+	UserDefinedVariable& Module::addUserDefinedVariable(std::string_view identifier, const DataTypeDefinition* dataType)
 	{
 		// TODO: Add an object pool for this
 		UserDefinedVariable& variable = *new UserDefinedVariable();
-		addGlobalVariable(variable, identifier, dataType);
+		addGlobalVariable(variable, identifier, rmx::getMurmur2_64(identifier), dataType);
 		return variable;
 	}
 
-	ExternalVariable& Module::addExternalVariable(const std::string& identifier, const DataTypeDefinition* dataType)
+	ExternalVariable& Module::addExternalVariable(std::string_view identifier, const DataTypeDefinition* dataType)
 	{
 		// TODO: Add an object pool for this
 		ExternalVariable& variable = *new ExternalVariable();
-		addGlobalVariable(variable, identifier, dataType);
+		addGlobalVariable(variable, identifier, rmx::getMurmur2_64(identifier), dataType);
 		return variable;
 	}
 
-	void Module::addGlobalVariable(Variable& variable, const std::string& name, const DataTypeDefinition* dataType)
+	void Module::addGlobalVariable(Variable& variable, std::string_view name, uint64 nameHash, const DataTypeDefinition* dataType)
 	{
 		variable.mName = name;
-		variable.mNameHash = rmx::getMurmur2_64(name);
+		variable.mNameHash = nameHash;
 		variable.mDataType = dataType;
 		variable.mId = mFirstVariableId + (uint32)mGlobalVariables.size() + ((uint32)variable.mType << 28);
 		mGlobalVariables.emplace_back(&variable);
@@ -188,7 +188,7 @@ namespace lemon
 		mLocalVariablesPool.destroyObject(variable);
 	}
 
-	Constant& Module::addConstant(const std::string& name, const DataTypeDefinition* dataType, uint64 value)
+	Constant& Module::addConstant(std::string_view name, const DataTypeDefinition* dataType, uint64 value)
 	{
 		Constant& constant = mConstantPool.createObject();
 		constant.mName = name;
@@ -198,7 +198,7 @@ namespace lemon
 		return constant;
 	}
 
-	ConstantArray& Module::addConstantArray(const std::string& name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size)
+	ConstantArray& Module::addConstantArray(std::string_view name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size)
 	{
 		ConstantArray& constantArray = mConstantArrayPool.createObject();
 		constantArray.mName = name;
@@ -208,7 +208,7 @@ namespace lemon
 		return constantArray;
 	}
 
-	Define& Module::addDefine(const std::string& name, const DataTypeDefinition* dataType)
+	Define& Module::addDefine(std::string_view name, const DataTypeDefinition* dataType)
 	{
 		Define& define = mDefinePool.createObject();
 		define.mName = name;
@@ -217,12 +217,12 @@ namespace lemon
 		return define;
 	}
 
-	const StoredString* Module::addStringLiteral(const std::string& str)
+	const StoredString* Module::addStringLiteral(std::string_view str)
 	{
 		return &mStringLiterals.getOrAddString(str);
 	}
 
-	const StoredString* Module::addStringLiteral(const std::string& str, uint64 hash)
+	const StoredString* Module::addStringLiteral(std::string_view str, uint64 hash)
 	{
 		return &mStringLiterals.getOrAddString(str, hash);
 	}
@@ -282,7 +282,7 @@ namespace lemon
 				if (serializer.isReading())
 				{
 					const Function::Type type = (Function::Type)serializer.read<uint8>();
-					const std::string name = serializer.read<std::string>();
+					const std::string_view name = serializer.readStringView();
 
 					const DataTypeDefinition* returnType = DataTypeHelper::readDataType(serializer);
 					Function::ParameterList parameters;
@@ -345,16 +345,16 @@ namespace lemon
 						count = (size_t)serializer.read<uint32>();
 						for (size_t k = 0; k < count; ++k)
 						{
-							const std::string identifier = serializer.read<std::string>();
+							const std::string_view identifier = serializer.readStringView();
 							const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
-							scriptFunc.addLocalVariable(identifier, dataType, 0);
+							scriptFunc.addLocalVariable(identifier, rmx::getMurmur2_64(identifier), dataType, 0);
 						}
 
 						// Labels
 						count = (size_t)serializer.read<uint32>();
 						for (size_t k = 0; k < count; ++k)
 						{
-							const std::string name = serializer.read<std::string>();
+							const std::string_view name = serializer.readStringView();
 							const uint32 offset = serializer.read<uint32>();
 							scriptFunc.addLabel(name, (size_t)offset);
 						}
@@ -466,7 +466,7 @@ namespace lemon
 			const uint32 numberOfGlobals = serializer.read<uint32>();
 			for (uint32 i = 0; i < numberOfGlobals; ++i)
 			{
-				const std::string name = serializer.read<std::string>();
+				const std::string_view name = serializer.readStringView();
 				const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
 				const int64 initialValue = serializer.read<int64>();
 				GlobalVariable& globalVariable = addGlobalVariable(name, dataType);
@@ -508,7 +508,7 @@ namespace lemon
 			{
 				for (uint32 i = 0; i < numberOfConstants; ++i)
 				{
-					const std::string name = serializer.read<std::string>();
+					const std::string_view name = serializer.readStringView();
 					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
 					const uint64 value = serializer.read<uint64>();
 					Constant& constant = addConstant(name, dataType, value);
@@ -534,7 +534,7 @@ namespace lemon
 			{
 				for (uint32 i = 0; i < numberOfDefines; ++i)
 				{
-					const std::string name = serializer.read<std::string>();
+					const std::string_view name = serializer.readStringView();
 					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
 
 					Define& define = addDefine(name, dataType);

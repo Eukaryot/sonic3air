@@ -58,22 +58,22 @@ namespace lemon
 				{
 					if (line[pos] == '#')
 					{
-						const String rest = line.substr(pos + 1);
-						if (rest.startsWith("if ") && rest.length() >= 4)
+						const std::string_view rest = line.substr(pos + 1);
+						if (rmx::startsWith(rest, "if ") && rest.length() >= 4)
 						{
-							const bool isTrue = evaluateConditionString(&(*rest)[3], rest.length() - 3, parser);
+							const bool isTrue = evaluateConditionString(&rest[3], rest.length() - 3, parser);
 							const bool inheritedIgnored = (openBlocks.empty()) ? false : openBlocks.back().mIgnored;
 							PreprocessorBlock& block = vectorAdd(openBlocks);
 							block.mIgnored = !isTrue;
 							block.mInheritedIgnored = inheritedIgnored;
 						}
-						else if (rest.startsWith("else"))
+						else if (rmx::startsWith(rest, "else"))
 						{
 							CHECK_ERROR(!openBlocks.empty(), "Found no #if for #else", mLineNumber);
 							PreprocessorBlock& block = openBlocks.back();
 							block.mIgnored = !block.mIgnored;
 						}
-						else if (rest.startsWith("endif"))
+						else if (rmx::startsWith(rest, "endif"))
 						{
 							CHECK_ERROR(!openBlocks.empty(), "Found no #if for #endif", mLineNumber);
 							openBlocks.pop_back();
@@ -251,10 +251,10 @@ namespace lemon
 				}
 				case ParserToken::Type::IDENTIFIER:
 				{
-					const std::string& identifier = parserToken.as<IdentifierParserToken>().mIdentifier;
+					const std::string_view identifier = parserToken.as<IdentifierParserToken>().mIdentifier;
 
 					// Unknown preprocessor definitions are okay, they automatically evaluate to 0
-					tokenList.createBack<ConstantToken>().mValue = (nullptr != mPreprocessorDefinitions) ? mPreprocessorDefinitions->getValue(identifier) : 0;
+					tokenList.createBack<ConstantToken>().mValue = (nullptr != mPreprocessorDefinitions) ? mPreprocessorDefinitions->getValue(rmx::getMurmur2_64(identifier)) : 0;
 					break;
 				}
 			}

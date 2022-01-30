@@ -34,13 +34,14 @@ namespace lemon
 		void reserveForOpcodes(size_t numOpcodes);
 		RuntimeOpcode& addOpcode(size_t parameterSize);
 
-		void copyFrom(const RuntimeOpcodeBuffer& other);
+		void copyFrom(const RuntimeOpcodeBuffer& other, rmx::OneTimeAllocPool& memoryPool);
 
 	public:
 		std::vector<RuntimeOpcode*> mOpcodePointers;	// Direct pointers to runtime opcodes
 
 	private:
 		uint8* mBuffer = nullptr;
+		bool mSelfManagedBuffer = false;
 		size_t mSize = 0;		// In bytes
 		size_t mReserved = 0;	// In bytes
 	};
@@ -49,7 +50,7 @@ namespace lemon
 	class API_EXPORT RuntimeFunction
 	{
 	public:
-		void build(const Runtime& runtime);
+		void build(Runtime& runtime);
 
 		const uint8* getFirstRuntimeOpcode() const	{ return mRuntimeOpcodeBuffer.getStart(); }
 

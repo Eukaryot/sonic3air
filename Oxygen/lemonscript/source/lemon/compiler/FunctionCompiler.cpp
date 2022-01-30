@@ -113,7 +113,7 @@ namespace lemon
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
 		{
 			const Function::Parameter& parameter = mFunction.getParameters()[index];
-			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mIdentifier);
+			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mNameHash);
 			RMX_ASSERT(nullptr != variable, "Variable not found");
 			RMX_ASSERT(variable->getDataType() == parameter.mType, "Variable has wrong type");
 
@@ -242,7 +242,7 @@ namespace lemon
 
 				size_t offset = 0xffffffff;
 				if (!mFunction.getLabel(jumpNode.mLabelToken->mName, offset))
-					CHECK_ERROR(false, "Jump target label not found: " + jumpNode.mLabelToken->mName, node.getLineNumber());
+					CHECK_ERROR(false, "Jump target label not found: " << jumpNode.mLabelToken->mName, node.getLineNumber());
 
 				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32, offset);
 				break;

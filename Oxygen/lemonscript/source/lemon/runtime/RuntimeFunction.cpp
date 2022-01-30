@@ -22,7 +22,8 @@ namespace lemon
 
 	RuntimeOpcodeBuffer::~RuntimeOpcodeBuffer()
 	{
-		delete[] mBuffer;
+		if (mSelfManagedBuffer)
+			delete[] mBuffer;
 	}
 
 	void RuntimeOpcodeBuffer::clear()
@@ -37,9 +38,12 @@ namespace lemon
 		const size_t memoryRequired = numOpcodes * (sizeof(RuntimeOpcode) + 16);	// Estimate for maximum size
 		if (memoryRequired > mReserved)
 		{
-			delete[] mBuffer;
+			if (mSelfManagedBuffer)
+				delete[] mBuffer;
+
 			mReserved = memoryRequired;
 			mBuffer = new uint8[mReserved];
+			mSelfManagedBuffer = true;
 		}
 	}
 
@@ -63,10 +67,13 @@ namespace lemon
 		return runtimeOpcode;
 	}
 
-	void RuntimeOpcodeBuffer::copyFrom(const RuntimeOpcodeBuffer& other)
+	void RuntimeOpcodeBuffer::copyFrom(const RuntimeOpcodeBuffer& other, rmx::OneTimeAllocPool& memoryPool)
 	{
-		delete[] mBuffer;
-		mBuffer = new uint8[other.mSize];
+		if (mSelfManagedBuffer)
+			delete[] mBuffer;
+
+		mBuffer = memoryPool.allocateMemory(other.mSize);
+		mSelfManagedBuffer = false;
 		mSize = other.mSize;
 		mReserved = other.mSize;
 		memcpy(mBuffer, other.mBuffer, mSize);
@@ -83,7 +90,7 @@ namespace lemon
 	}
 
 
-	void RuntimeFunction::build(const Runtime& runtime)
+	void RuntimeFunction::build(Runtime& runtime)
 	{
 		// First check if it is built already
 		if (!mRuntimeOpcodeBuffer.empty() || mFunction->mOpcodes.empty())
@@ -175,8 +182,8 @@ namespace lemon
 			}
 		}
 
-		// Copy the results over
-		mRuntimeOpcodeBuffer.copyFrom(tempBuffer);
+		// Copy the results over, using memory from the shared memory pool
+		mRuntimeOpcodeBuffer.copyFrom(tempBuffer, runtime.mRuntimeOpcodesPool);
 	}
 
 	size_t RuntimeFunction::translateFromRuntimeProgramCounter(const uint8* runtimeProgramCounter) const

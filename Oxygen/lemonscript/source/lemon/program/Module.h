@@ -43,28 +43,28 @@ namespace lemon
 		inline const std::vector<ScriptFunction*>& getScriptFunctions() const { return mScriptFunctions; }
 		const Function* getFunctionByUniqueId(uint64 uniqueId) const;
 
-		ScriptFunction& addScriptFunction(const std::string& name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters = nullptr);
-		UserDefinedFunction& addUserDefinedFunction(const std::string& name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags = 0);
+		ScriptFunction& addScriptFunction(std::string_view name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters = nullptr);
+		UserDefinedFunction& addUserDefinedFunction(std::string_view name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags = 0);
 
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
-		GlobalVariable& addGlobalVariable(const std::string& name, const DataTypeDefinition* dataType);
-		UserDefinedVariable& addUserDefinedVariable(const std::string& name, const DataTypeDefinition* dataType);
-		ExternalVariable& addExternalVariable(const std::string& name, const DataTypeDefinition* dataType);
+		GlobalVariable& addGlobalVariable(std::string_view name, const DataTypeDefinition* dataType);
+		UserDefinedVariable& addUserDefinedVariable(std::string_view name, const DataTypeDefinition* dataType);
+		ExternalVariable& addExternalVariable(std::string_view name, const DataTypeDefinition* dataType);
 
 		// Constants
-		Constant& addConstant(const std::string& name, const DataTypeDefinition* dataType, uint64 value);
+		Constant& addConstant(std::string_view name, const DataTypeDefinition* dataType, uint64 value);
 
 		// Constant arrays
-		ConstantArray& addConstantArray(const std::string& name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size);
+		ConstantArray& addConstantArray(std::string_view name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size);
 
 		// Defines
-		Define& addDefine(const std::string& name, const DataTypeDefinition* dataType);
+		Define& addDefine(std::string_view name, const DataTypeDefinition* dataType);
 
 		// String literals
 		const StringLookup& getStringLiterals() const  { return mStringLiterals; }
-		const StoredString* addStringLiteral(const std::string& str);
-		const StoredString* addStringLiteral(const std::string& str, uint64 hash);
+		const StoredString* addStringLiteral(std::string_view str);
+		const StoredString* addStringLiteral(std::string_view str, uint64 hash);
 
 		// Serialization
 		bool serialize(VectorBinarySerializer& serializer);
@@ -74,7 +74,7 @@ namespace lemon
 
 	private:
 		void addFunctionInternal(Function& func);
-		void addGlobalVariable(Variable& variable, const std::string& name, const DataTypeDefinition* dataType);
+		void addGlobalVariable(Variable& variable, std::string_view name, uint64 nameHash, const DataTypeDefinition* dataType);
 		LocalVariable& createLocalVariable();
 		void destroyLocalVariable(LocalVariable& variable);
 

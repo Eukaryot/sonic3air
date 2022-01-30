@@ -31,6 +31,8 @@ namespace lemon
 	class API_EXPORT StringLookup
 	{
 	public:
+		StringLookup();
+
 		inline size_t size() const { return mNumEntries; }
 
 		void clear();

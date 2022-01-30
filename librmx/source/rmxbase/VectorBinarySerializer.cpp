@@ -296,6 +296,24 @@ void VectorBinarySerializer::serializeData(std::vector<uint8>& data, size_t byte
 	}
 }
 
+std::string_view VectorBinarySerializer::readStringView(size_t stringLengthLimit)
+{
+	const size_t length = (stringLengthLimit <= 0xff) ? static_cast<size_t>(read<uint8>()) : (stringLengthLimit <= 0xffff) ? static_cast<size_t>(read<uint16>()) : read<uint32>();
+
+	// Limit length of strings
+	if (length > stringLengthLimit)
+	{
+		mHasError = true;
+	}
+	if (mHasError || length == 0)
+	{
+		return std::string_view();
+	}
+
+	const char* ptr = (const char*)readAccess(length);
+	return std::string_view(ptr, length);
+}
+
 void VectorBinarySerializer::write(std::string_view value, size_t stringLengthLimit)
 {
 	if (stringLengthLimit <= 0xff)

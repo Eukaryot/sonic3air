@@ -130,9 +130,9 @@ namespace lemon
 		}
 	}
 
-	LocalVariable* ScriptFunction::getLocalVariableByIdentifier(const std::string& identifier) const
+	LocalVariable* ScriptFunction::getLocalVariableByIdentifier(uint64 nameHash) const
 	{
-		const auto it = mLocalVariablesByIdentifier.find(identifier);
+		const auto it = mLocalVariablesByIdentifier.find(nameHash);
 		return (it == mLocalVariablesByIdentifier.end()) ? nullptr : it->second;
 	}
 
@@ -141,20 +141,20 @@ namespace lemon
 		return *mLocalVariablesById[id];
 	}
 
-	LocalVariable& ScriptFunction::addLocalVariable(const std::string& identifier, const DataTypeDefinition* dataType, uint32 lineNumber)
+	LocalVariable& ScriptFunction::addLocalVariable(std::string_view identifier, uint64 nameHash, const DataTypeDefinition* dataType, uint32 lineNumber)
 	{
 		// Check if it already exists!
-		if (mLocalVariablesByIdentifier.count(identifier))
+		if (mLocalVariablesByIdentifier.count(nameHash))
 		{
 			CHECK_ERROR(false, "Variable already exists", lineNumber);
 		}
 
 		LocalVariable& variable = mModule->createLocalVariable();
 		variable.mName = identifier;
-		variable.mNameHash = rmx::getMurmur2_64(identifier);
+		variable.mNameHash = nameHash;
 		variable.mDataType = dataType;
 
-		mLocalVariablesByIdentifier.emplace(identifier, &variable);
+		mLocalVariablesByIdentifier.emplace(nameHash, &variable);
 
 		variable.mId = (uint32)mLocalVariablesById.size();
 		mLocalVariablesById.emplace_back(&variable);
@@ -162,9 +162,9 @@ namespace lemon
 		return variable;
 	}
 
-	bool ScriptFunction::getLabel(const std::string& labelName, size_t& outOffset) const
+	bool ScriptFunction::getLabel(std::string_view labelName, size_t& outOffset) const
 	{
-		const auto it = mLabels.find(labelName);
+		const auto it = mLabels.find(std::string(labelName));
 		if (it == mLabels.end())
 			return false;
 
@@ -172,9 +172,9 @@ namespace lemon
 		return true;
 	}
 
-	void ScriptFunction::addLabel(const std::string& labelName, size_t offset)
+	void ScriptFunction::addLabel(std::string_view labelName, size_t offset)
 	{
-		mLabels[labelName] = (uint32)offset;
+		mLabels[std::string(labelName)] = (uint32)offset;
 	}
 
 	const std::string* ScriptFunction::findLabelByOffset(size_t offset) const
@@ -217,6 +217,7 @@ namespace lemon
 		RMX_ASSERT(index < mParameters.size(), "Invalid parameter index " << index);
 		RMX_ASSERT(mParameters[index].mIdentifier.empty(), "Parameter identifier is already set for index " << index);
 		mParameters[index].mIdentifier = identifier;
+		mParameters[index].mNameHash = rmx::getMurmur2_64(identifier);
 		return *this;
 	}
 
