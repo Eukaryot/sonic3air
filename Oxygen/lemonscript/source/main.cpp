@@ -67,7 +67,7 @@ void logValueStr(int64 key)
 	const StoredString* storedString = runtime->resolveStringByKey((uint64)key);
 	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 
-	std::cout << storedString->getString().c_str() << std::endl;
+	std::cout << storedString->getString() << std::endl;
 }
 
 void debugLog(uint64 stringHash)
@@ -78,7 +78,7 @@ void debugLog(uint64 stringHash)
 	const StoredString* storedString = runtime->resolveStringByKey((uint64)stringHash);
 	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 
-	std::cout << storedString->getString().c_str() << std::endl;
+	std::cout << storedString->getString() << std::endl;
 }
 
 uint32 valueD0 = 0;
