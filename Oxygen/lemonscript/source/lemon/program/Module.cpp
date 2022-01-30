@@ -85,6 +85,9 @@ namespace lemon
 		
 		for (const Function* function : mFunctions)
 		{
+			if (function->getName()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
+				continue;
+
 			content << "\r\n";
 			content << "declare function " << function->getReturnType()->toString() << " " << function->getName() << "(";
 			for (size_t i = 0; i < function->getParameters().size(); ++i)
@@ -193,6 +196,16 @@ namespace lemon
 		constant.mValue = value;
 		mConstants.emplace_back(&constant);
 		return constant;
+	}
+
+	ConstantArray& Module::addConstantArray(const std::string& name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size)
+	{
+		ConstantArray& constantArray = mConstantArrayPool.createObject();
+		constantArray.mName = name;
+		constantArray.mElementDataType = elementDataType;
+		constantArray.setContent(values, size);
+		mConstantArrays.emplace_back(&constantArray);
+		return constantArray;
 	}
 
 	Define& Module::addDefine(const std::string& name, const DataTypeDefinition* dataType)

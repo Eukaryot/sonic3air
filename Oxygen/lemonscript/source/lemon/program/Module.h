@@ -9,6 +9,7 @@
 #pragma once
 
 #include "lemon/program/Constant.h"
+#include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
 #include "lemon/program/StoredString.h"
@@ -54,6 +55,9 @@ namespace lemon
 		// Constants
 		Constant& addConstant(const std::string& name, const DataTypeDefinition* dataType, uint64 value);
 
+		// Constant arrays
+		ConstantArray& addConstantArray(const std::string& name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size);
+
 		// Defines
 		Define& addDefine(const std::string& name, const DataTypeDefinition* dataType);
 
@@ -93,6 +97,10 @@ namespace lemon
 		// Constants
 		std::vector<Constant*> mConstants;
 		ObjectPool<Constant, 64> mConstantPool;
+
+		// Constant arrays
+		std::vector<ConstantArray*> mConstantArrays;
+		ObjectPool<ConstantArray, 16> mConstantArrayPool;
 
 		// Defines
 		std::vector<Define*> mDefines;

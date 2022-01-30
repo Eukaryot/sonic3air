@@ -161,9 +161,12 @@ namespace lemon
 	{
 		try
 		{
-			// Build a node hierarchy
+			// Parse all lines and make nodes out of them that form a node hierarchy
 			BlockNode rootNode;
-			compileLinesToNode(rootNode, lines);
+			buildNodesFromCodeLines(rootNode, lines);
+
+			// Identify all globals definitions (functions, global variables)
+			processGlobalDefinitions(rootNode);
 
 			// Process and compile function contents
 			for (FunctionNode* node : mFunctionNodes)
@@ -207,15 +210,6 @@ namespace lemon
 
 		mFunctionNodes.clear();		// All entries got invalid anyway with root node destruction
 		return false;
-	}
-
-	void Compiler::compileLinesToNode(BlockNode& outNode, const std::vector<std::string_view>& lines)
-	{
-		// Parse all lines and make nodes out of them
-		buildNodesFromCodeLines(outNode, lines);
-
-		// Identify all globals definitions (functions, global variables)
-		processGlobalDefinitions(outNode);
 	}
 
 	bool Compiler::loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, int inclusionDepth)

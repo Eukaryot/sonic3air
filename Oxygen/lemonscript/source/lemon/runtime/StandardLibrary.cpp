@@ -431,6 +431,12 @@ namespace lemon
 	{
 		const uint8 flags = UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
 
+		// Just a test!
+		{
+			const uint64 primes[20] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 53, 59, 61, 67, 71 };
+			module.addConstantArray("LEMONSCRIPT_PRIME_NUMBER_LOOKUP", &PredefinedDataTypes::INT_16, primes, 20);
+		}
+
 		// Register built-in functions, which are directly referenced by the compiler
 		{
 			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.mName, lemon::wrap(&builtins::string_operator_plus), flags);

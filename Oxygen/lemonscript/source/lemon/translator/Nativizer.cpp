@@ -293,7 +293,7 @@ namespace lemon
 					case Node::Type::MEMORY_FIXED:
 					{
 						const bool swapBytes = (node.mValue & 0x01) != 0;
-						const size_t bytes = DataTypeHelper::getDefinitionFromBaseType(node.mDataType)->mBytes;
+						const size_t bytes = DataTypeHelper::getSizeOfBaseType(node.mDataType);
 						if (swapBytes && bytes >= 2)
 						{
 							line += *String(0, "swapBytes%d(", bytes * 8);
@@ -463,16 +463,16 @@ namespace lemon
 			const Opcode& readMemoryOpcode = opcodes[1];
 			const bool consumeInput = (readMemoryOpcode.mParameter == 0);
 			const uint64 address = firstOpcode.mParameter;
-			const BaseType dataType = readMemoryOpcode.mDataType;
+			const BaseType baseType = readMemoryOpcode.mDataType;
 
 			MemoryAccessHandler::SpecializationResult result;
-			memoryAccessHandler.getDirectAccessSpecialization(result, address, DataTypeHelper::getDefinitionFromBaseType(dataType)->mBytes, false);
+			memoryAccessHandler.getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(baseType), false);
 			if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
 			{
 				outInfo.mConsumedOpcodes = 2;
 				outInfo.mType = Opcode::Type::NOP;
 				outInfo.mSpecialType = OpcodeSubtypeInfo::SpecialType::FIXED_MEMORY_READ;
-				outInfo.mSubtypeData |= ((uint32)dataType) << 16;		// Data type, including signed/unsigned
+				outInfo.mSubtypeData |= ((uint32)baseType) << 16;		// Data type, including signed/unsigned
 				if (result.mSwapBytes)
 					outInfo.mSubtypeData |= 0x0001;						// Flag to signal that byte swap is needed
 				if (!consumeInput)

@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\source\lemon\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\ConstantArray.cpp" />
     <ClCompile Include="..\..\source\lemon\program\DataType.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Function.cpp" />
     <ClCompile Include="..\..\source\lemon\program\FunctionWrapper.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="..\..\source\lemon\compiler\Utility.h" />
     <ClInclude Include="..\..\source\lemon\pch.h" />
     <ClInclude Include="..\..\source\lemon\program\Constant.h" />
+    <ClInclude Include="..\..\source\lemon\program\ConstantArray.h" />
     <ClInclude Include="..\..\source\lemon\program\DataType.h" />
     <ClInclude Include="..\..\source\lemon\program\Define.h" />
     <ClInclude Include="..\..\source\lemon\program\Function.h" />

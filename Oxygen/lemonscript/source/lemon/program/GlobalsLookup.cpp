@@ -36,6 +36,10 @@ namespace lemon
 		{
 			registerConstant(*constant);
 		}
+		for (ConstantArray* constantArray : module.mConstantArrays)
+		{
+			registerConstantArray(*constantArray);
+		}
 		for (Define* define : module.mDefines)
 		{
 			registerDefine(*define);
@@ -80,6 +84,18 @@ namespace lemon
 	{
 		const uint64 nameHash = rmx::getMurmur2_64(constant.getName());
 		mConstantsByName[nameHash] = &constant;
+	}
+
+	const ConstantArray* GlobalsLookup::getConstantArrayByName(uint64 nameHash) const
+	{
+		const auto it = mConstantArraysByName.find(nameHash);
+		return (it == mConstantArraysByName.end()) ? nullptr : it->second;
+	}
+
+	void GlobalsLookup::registerConstantArray(ConstantArray& constantArray)
+	{
+		const uint64 nameHash = rmx::getMurmur2_64(constantArray.getName());
+		mConstantArraysByName[nameHash] = &constantArray;
 	}
 
 	const Define* GlobalsLookup::getDefineByName(uint64 nameHash) const

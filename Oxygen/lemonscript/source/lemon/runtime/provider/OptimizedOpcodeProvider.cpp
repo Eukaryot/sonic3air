@@ -327,7 +327,7 @@ namespace lemon
 							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableById(variableId));
 							runtimeOpcode.setParameter(value);
 
-							switch (DataTypeHelper::getDefinitionFromBaseType(opcodes[0].mDataType)->mBytes)
+							switch (DataTypeHelper::getSizeOfBaseType(opcodes[0].mDataType))
 							{
 								case 1:  runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_EXTERNAL_DISCARD<uint8>;   break;
 								case 2:  runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_EXTERNAL_DISCARD<uint16>;  break;
@@ -383,7 +383,7 @@ namespace lemon
 				{
 					uint64 address = opcodes[0].mParameter;
 					MemoryAccessHandler::SpecializationResult result;
-					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getDefinitionFromBaseType(opcodes[1].mDataType)->mBytes, false);
+					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcodes[1].mDataType), false);
 					if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
 					{
 						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
@@ -415,7 +415,7 @@ namespace lemon
 				{
 					uint64 address = opcodes[0].mParameter;
 					MemoryAccessHandler::SpecializationResult result;
-					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getDefinitionFromBaseType(opcodes[1].mDataType)->mBytes, true);
+					runtime.getMemoryAccessHandler()->getDirectAccessSpecialization(result, address, DataTypeHelper::getSizeOfBaseType(opcodes[1].mDataType), true);
 					if (result.mResult == MemoryAccessHandler::SpecializationResult::HAS_SPECIALIZATION)
 					{
 						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "lemon/program/Constant.h"
+#include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
 #include "lemon/program/StoredString.h"
@@ -39,6 +40,10 @@ namespace lemon
 		const Constant* getConstantByName(uint64 nameHash) const;
 		void registerConstant(Constant& constant);
 
+		// Constant arrays
+		const ConstantArray* getConstantArrayByName(uint64 nameHash) const;
+		void registerConstantArray(ConstantArray& constantArray);
+
 		// Defines
 		const Define* getDefineByName(uint64 nameHash) const;
 		void registerDefine(Define& define);
@@ -57,6 +62,9 @@ namespace lemon
 
 		// Constants
 		std::unordered_map<uint64, Constant*> mConstantsByName;
+
+		// Constant arrays
+		std::unordered_map<uint64, ConstantArray*> mConstantArraysByName;
 
 		// Defines
 		std::unordered_map<uint64, Define*> mDefinesByName;

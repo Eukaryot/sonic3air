@@ -172,12 +172,12 @@ namespace lemon
 
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter)
 	{
-		Opcode& opcode = vectorAdd(mOpcodes);
-		opcode.mType = type;
-		opcode.mDataType = DataTypeHelper::getBaseType(dataType);
-		opcode.mParameter = parameter;
-		opcode.mLineNumber = mLineNumber;
-		return opcode;
+		BaseType baseType = dataType->mBaseType;
+		if (dataType->mClass == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
+		{
+			baseType = BaseType::BOOL;
+		}
+		return addOpcode(type, baseType, parameter);
 	}
 
 	void FunctionCompiler::addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType)

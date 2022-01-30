@@ -15,18 +15,25 @@ namespace lemon
 {
 	struct DataTypeDefinition;
 
-	class API_EXPORT Constant
+	class API_EXPORT ConstantArray
 	{
 	friend class Module;
 
 	public:
 		inline const std::string& getName() const  { return mName; }
-		inline const DataTypeDefinition* getDataType() const  { return mDataType; }
-		inline uint64 getValue() const  { return mValue; }
+		inline const DataTypeDefinition* getElementDataType() const  { return mElementDataType; }
+		
+		inline size_t getSize() const  { return mData.size(); }
+		void setSize(size_t size);
+
+		void setContent(const uint64* values, size_t size);
+
+		uint64 getElement(size_t index) const;
+		void setElement(size_t index, uint64 value);
 
 	private:
 		std::string mName;
-		const DataTypeDefinition* mDataType = nullptr;
-		uint64 mValue = 0;
+		const DataTypeDefinition* mElementDataType = nullptr;
+		std::vector<uint64> mData;
 	};
 }

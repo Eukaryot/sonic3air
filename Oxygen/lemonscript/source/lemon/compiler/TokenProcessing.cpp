@@ -523,7 +523,7 @@ namespace lemon
 					const DataTypeDefinition* targetType = tokens[i].as<VarTypeToken>().mDataType;
 
 					ValueCastToken& token = tokens.createReplaceAt<ValueCastToken>(i);
-					token.mArgument = tokens[i + 1].as<ParenthesisToken>();
+					token.mArgument = tokens[i+1].as<ParenthesisToken>();
 					token.mDataType = targetType;
 					tokens.erase(i+1);
 				}
@@ -566,7 +566,7 @@ namespace lemon
 						if (i == 0)
 							continue;
 
-						Token& leftToken = tokens[i - 1];
+						Token& leftToken = tokens[i-1];
 						if (!leftToken.isStatement())
 							continue;
 
@@ -574,7 +574,7 @@ namespace lemon
 						token.mOperator = op;
 						token.mArgument = &leftToken.as<StatementToken>();
 
-						tokens.erase(i - 1);
+						tokens.erase(i-1);
 						break;
 					}
 
@@ -601,19 +601,19 @@ namespace lemon
 						// Minus could be binary or unary... let's find out
 						if (op == Operator::BINARY_MINUS && i > 0)
 						{
-							Token& leftToken = tokens[i - 1];
+							Token& leftToken = tokens[i-1];
 							if (leftToken.getType() != Token::Type::OPERATOR)
 								continue;
 						}
 
-						Token& rightToken = tokens[i + 1];
+						Token& rightToken = tokens[i+1];
 						CHECK_ERROR(rightToken.isStatement(), "Right of operator is no statement", mLineNumber);
 
 						UnaryOperationToken& token = tokens.createReplaceAt<UnaryOperationToken>(i);
 						token.mOperator = op;
 						token.mArgument = &rightToken.as<StatementToken>();
 
-						tokens.erase(i + 1);
+						tokens.erase(i+1);
 						break;
 					}
 
@@ -624,7 +624,7 @@ namespace lemon
 						if ((size_t)(i+1) == tokens.size())
 							continue;
 
-						Token& rightToken = tokens[i + 1];
+						Token& rightToken = tokens[i+1];
 						if (!rightToken.isStatement())
 							continue;
 
@@ -632,7 +632,7 @@ namespace lemon
 						token.mOperator = op;
 						token.mArgument = &rightToken.as<StatementToken>();
 
-						tokens.erase(i + 1);
+						tokens.erase(i+1);
 						break;
 					}
 

@@ -75,7 +75,6 @@ namespace lemon
 
 		bool loadCodeLines(std::vector<std::string_view>& outLines, const std::wstring& path);
 		bool compileLines(const std::vector<std::string_view>& lines);
-		void compileLinesToNode(BlockNode& outNode, const std::vector<std::string_view>& lines);
 
 		inline const std::vector<ErrorMessage>& getErrors() const  { return mErrors; }
 
@@ -139,7 +138,6 @@ namespace lemon
 		std::vector<ScriptFile*> mScriptFiles;
 		ObjectPool<ScriptFile,64> mScriptFilesPool;
 
-		std::string mScriptContent;
 		std::vector<FunctionNode*> mFunctionNodes;
 		LineNumberTranslation mLineNumberTranslation;
 		std::wstring mCurrentScriptFilename;
