@@ -109,12 +109,12 @@ namespace rmx
 		const uint8* data8 = (const uint8*)data64;
 		switch (bytes & 0x07)
 		{
-			case 7:  h ^= ((uint64)data8[6]) << 48;
-			case 6:  h ^= ((uint64)data8[5]) << 40;
-			case 5:  h ^= ((uint64)data8[4]) << 32;
-			case 4:  h ^= ((uint64)data8[3]) << 24;
-			case 3:  h ^= ((uint64)data8[2]) << 16;
-			case 2:  h ^= ((uint64)data8[1]) << 8;
+			case 7:  h ^= ((uint64)data8[6]) << 48;  [[fallthrough]];
+			case 6:  h ^= ((uint64)data8[5]) << 40;  [[fallthrough]];
+			case 5:  h ^= ((uint64)data8[4]) << 32;  [[fallthrough]];
+			case 4:  h ^= ((uint64)data8[3]) << 24;  [[fallthrough]];
+			case 3:  h ^= ((uint64)data8[2]) << 16;  [[fallthrough]];
+			case 2:  h ^= ((uint64)data8[1]) << 8;   [[fallthrough]];
 			case 1:  h ^= ((uint64)data8[0]);
 				h *= m;
 		};
@@ -144,7 +144,18 @@ namespace rmx
 	uint64 getMurmur2_64(const std::wstring& str)
 	{
 		// Note that this is *not* platform-independent
-		return getMurmur2_64((uint8*)&str[0], str.length() * sizeof(wchar_t));
+		return getMurmur2_64((const uint8*)&str[0], str.length() * sizeof(wchar_t));
+	}
+
+	uint64 getMurmur2_64(const std::string_view& str)
+	{
+		return getMurmur2_64((const uint8*)str.data(), str.length() * sizeof(char));
+	}
+
+	uint64 getMurmur2_64(const std::wstring_view& str)
+	{
+		// Note that this is *not* platform-independent
+		return getMurmur2_64((const uint8*)str.data(), str.length() * sizeof(wchar_t));
 	}
 
 	uint32 getCRC32(const uint8* data, size_t bytes)
@@ -235,42 +246,66 @@ namespace rmx
 		return str.str();
 	}
 
-	bool startsWith(const std::string& fullString, const std::string& prefix)
+
+	template<typename STRING>
+	bool stringStartsWith(const STRING& fullString, const STRING& prefix)
 	{
 		if (fullString.length() < prefix.length())
 			return false;
-		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(char)) != 0)
+		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(fullString[0])) != 0)
 			return false;
 		return true;
+	}
+
+	template<typename STRING>
+	bool stringEndsWith(const STRING& fullString, const STRING& suffix)
+	{
+		if (fullString.length() < suffix.length())
+			return false;
+		const size_t offset = fullString.length() - suffix.length();
+		if (memcmp((void*)&fullString[offset], (void*)&suffix[0], suffix.length() * sizeof(fullString[0])) != 0)
+			return false;
+		return true;
+	}
+
+	bool startsWith(const std::string& fullString, const std::string& prefix)
+	{
+		return stringStartsWith<std::string>(fullString, prefix);
 	}
 
 	bool startsWith(const std::wstring& fullString, const std::wstring& prefix)
 	{
-		if (fullString.length() < prefix.length())
-			return false;
-		if (memcmp((void*)&fullString[0], (void*)&prefix[0], prefix.length() * sizeof(wchar_t)) != 0)
-			return false;
-		return true;
+		return stringStartsWith<std::wstring>(fullString, prefix);
 	}
 
-	bool endsWith(const std::string& fullString, const std::string& suffix)
+	bool startsWith(const std::string_view& fullString, const std::string_view& prefix)
 	{
-		if (fullString.length() < suffix.length())
-			return false;
-		const size_t offset = fullString.length() - suffix.length();
-		if (memcmp((void*)&fullString[offset], (void*)&suffix[0], suffix.length() * sizeof(char)) != 0)
-			return false;
-		return true;
+		return stringStartsWith<std::string_view>(fullString, prefix);
 	}
 
-	bool endsWith(const std::wstring& fullString, const std::wstring& suffix)
+	bool startsWith(const std::wstring_view& fullString, const std::wstring_view& prefix)
 	{
-		if (fullString.length() < suffix.length())
-			return false;
-		const size_t offset = fullString.length() - suffix.length();
-		if (memcmp((void*)&fullString[offset], (void*)&suffix[0], suffix.length() * sizeof(wchar_t)) != 0)
-			return false;
-		return true;
+		return stringStartsWith<std::wstring_view>(fullString, prefix);
+	}
+
+	bool endsWith(const std::string& fullString, const std::string& prefix)
+	{
+		return stringEndsWith<std::string>(fullString, prefix);
+	}
+
+	bool endsWith(const std::wstring& fullString, const std::wstring& prefix)
+	{
+		return stringEndsWith<std::wstring>(fullString, prefix);
+	}
+
+	bool endsWith(const std::string_view& fullString, const std::string_view& prefix)
+	{
+		return stringEndsWith<std::string_view>(fullString, prefix);
+	}
+
+	bool endsWith(const std::wstring_view& fullString, const std::wstring_view& prefix)
+	{
+		return stringEndsWith<std::wstring_view>(fullString, prefix);
 	}
 
 }

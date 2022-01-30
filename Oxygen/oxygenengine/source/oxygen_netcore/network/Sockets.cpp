@@ -227,7 +227,7 @@ bool TCPSocket::setupServer(uint16 serverPort)
 
 	// Setup the socket
 	SocketAddress address("127.0.0.1", serverPort);
-	int result = bind(mInternal->mSocket, (SOCKADDR*)address.getSockAddr(), 128);
+	int result = bind(mInternal->mSocket, (sockaddr*)address.getSockAddr(), 128);
 	if (result < 0)
 	{
 	#ifdef _WIN32

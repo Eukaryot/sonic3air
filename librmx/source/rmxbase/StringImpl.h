@@ -1039,143 +1039,153 @@ TEMPLATE bool STRING::readUnicode(const uint8* data, size_t datasize, UnicodeEnc
 		#undef IF_ENCODING
 	}
 
-	#define ABORT { clear(); return false; }
-
-	MemInputStream blob(data, datasize);
-	uint32 code;
-
-	if (encoding == UnicodeEncoding::ASCII)
+	if (encoding == UnicodeEncoding::ASCII && sizeof(CHAR) == 1)
 	{
-		// ASCII
-		size_t len = blob.getRemaining();
-		expand(len);
-		mLength = (int)len;
-		for (size_t pos = 0; pos < len; ++pos)
-			mData[pos] = (CHAR)(blob.read<uint8>());
+		// Just copy over the data
+		expand(datasize);
+		mLength = (int)datasize;
+		memcpy(mData, data, datasize);
 	}
-	else if (encoding == UnicodeEncoding::UTF8)
+	else
 	{
-		// UTF-8
-		blob.tryRead(*ByteOrderMark_UTF8, ByteOrderMark_UTF8.length());
-		int remaining = (int)blob.getRemaining();
-		expand(remaining);
+		MemInputStream blob(data, datasize);
+		uint32 code;
 
-		// TODO: Use "WString::readUTF8"
-		uint8 values[4];
-		while (remaining > 0)
+		#define ABORT { clear(); return false; }
+
+		if (encoding == UnicodeEncoding::ASCII)
 		{
-			blob >> values[0];
-			--remaining;
+			// ASCII
+			size_t len = blob.getRemaining();
+			expand(len);
+			mLength = (int)len;
+			for (size_t pos = 0; pos < len; ++pos)
+				mData[pos] = (CHAR)(blob.read<uint8>());
+		}
+		else if (encoding == UnicodeEncoding::UTF8)
+		{
+			// UTF-8
+			blob.tryRead(*ByteOrderMark_UTF8, ByteOrderMark_UTF8.length());
+			int remaining = (int)blob.getRemaining();
+			expand(remaining);
 
-			if (values[0] <= 0x7f)
+			// TODO: Use "WString::readUTF8"
+			uint8 values[4];
+			while (remaining > 0)
 			{
-				mData[mLength] = (CHAR)values[0];
-				++mLength;
-			}
-			else if (values[0] <= 0xbf)
-			{
-				ABORT;		// No valid first byte of a sequence
-			}
-			else if (values[0] <= 0xc1)
-			{
-				ABORT;		// Forbidden alternative encoding for 0x00 to 0x7f
-			}
-			else if (values[0] <= 0xf4)
-			{
-				int seqLength = (values[0] <= 0xdf) ? 2 : (values[0] <= 0xef) ? 3 : 4;
-				remaining -= (seqLength - 1);
-				if (remaining < 0)
-					ABORT;
+				blob >> values[0];
+				--remaining;
 
-				for (int k = 1; k < seqLength; ++k)
+				if (values[0] <= 0x7f)
 				{
-					blob >> values[k];
-					if (values[k] < 0x80 || values[k] >= 0xc0)
-						ABORT;		// Additional bytes of a sequence always begin with bits 10xxxxxx
-					values[k] &= 0x3f;
+					mData[mLength] = (CHAR)values[0];
+					++mLength;
 				}
+				else if (values[0] <= 0xbf)
+				{
+					ABORT;		// No valid first byte of a sequence
+				}
+				else if (values[0] <= 0xc1)
+				{
+					ABORT;		// Forbidden alternative encoding for 0x00 to 0x7f
+				}
+				else if (values[0] <= 0xf4)
+				{
+					int seqLength = (values[0] <= 0xdf) ? 2 : (values[0] <= 0xef) ? 3 : 4;
+					remaining -= (seqLength - 1);
+					if (remaining < 0)
+						ABORT;
 
-				if (seqLength == 2)
-					code = ((uint32)(values[0] & 0x1f) << 6) + ((uint32)values[1]);
-				else if (seqLength == 3)
-					code = ((uint32)(values[0] & 0x0f) << 12) + ((uint32)values[1] << 6) + ((uint32)values[2]);
+					for (int k = 1; k < seqLength; ++k)
+					{
+						blob >> values[k];
+						if (values[k] < 0x80 || values[k] >= 0xc0)
+							ABORT;		// Additional bytes of a sequence always begin with bits 10xxxxxx
+						values[k] &= 0x3f;
+					}
+
+					if (seqLength == 2)
+						code = ((uint32)(values[0] & 0x1f) << 6) + ((uint32)values[1]);
+					else if (seqLength == 3)
+						code = ((uint32)(values[0] & 0x0f) << 12) + ((uint32)values[1] << 6) + ((uint32)values[2]);
+					else
+						code = ((uint32)(values[0] & 0x07) << 18) + ((uint32)values[1] << 12) + ((uint32)values[2] << 6) + ((uint32)values[3]);
+
+					mData[mLength] = rmx::StringTraits<CHAR>::fromUnicode(code);
+					++mLength;
+				}
 				else
-					code = ((uint32)(values[0] & 0x07) << 18) + ((uint32)values[1] << 12) + ((uint32)values[2] << 6) + ((uint32)values[3]);
+				{
+					ABORT;		// Result would be a code beyond the valid unicode region (i.e. something from 0x140000 on)
+				}
+			}
+		}
+		else if (encoding == UnicodeEncoding::UTF16LE || encoding == UnicodeEncoding::UTF16BE)
+		{
+			// UTF-16
+			const String& bom = (encoding == UnicodeEncoding::UTF16LE) ? ByteOrderMark_UTF16LE : ByteOrderMark_UTF16BE;
+			blob.tryRead(*bom, bom.length());
+			size_t remaining = blob.getRemaining() / 2;
+			expand(remaining);
+
+			uint16 value;
+			while (remaining > 0)
+			{
+				blob >> value;
+				if (encoding == UnicodeEncoding::UTF16BE)
+					value = swapBytes16(value);
+				--remaining;
+
+				if (value <= 0xd7ff || value >= 0xe000)
+				{
+					code = value;
+				}
+				else
+				{
+					if (remaining < 1)
+						ABORT;
+
+					uint16 second;
+					blob >> second;
+					if (encoding == UnicodeEncoding::UTF16BE)
+						second = swapBytes16(second);
+					--remaining;
+					code = 0x10000 + ((value - 0xd800) << 10) + (second - 0xdc00);
+				}
 
 				mData[mLength] = rmx::StringTraits<CHAR>::fromUnicode(code);
 				++mLength;
 			}
-			else
-			{
-				ABORT;		// Result would be a code beyond the valid unicode region (i.e. something from 0x140000 on)
-			}
 		}
-	}
-	else if (encoding == UnicodeEncoding::UTF16LE || encoding == UnicodeEncoding::UTF16BE)
-	{
-		// UTF-16
-		const String& bom = (encoding == UnicodeEncoding::UTF16LE) ? ByteOrderMark_UTF16LE : ByteOrderMark_UTF16BE;
-		blob.tryRead(*bom, bom.length());
-		size_t remaining = blob.getRemaining() / 2;
-		expand(remaining);
-
-		uint16 value;
-		while (remaining > 0)
+		else if (encoding == UnicodeEncoding::UTF32LE || encoding == UnicodeEncoding::UTF32BE)
 		{
-			blob >> value;
-			if (encoding == UnicodeEncoding::UTF16BE)
-				value = swapBytes16(value);
-			--remaining;
+			// UTF-32
+			const String& bom = (encoding == UnicodeEncoding::UTF32LE) ? ByteOrderMark_UTF32LE : ByteOrderMark_UTF32BE;
+			blob.tryRead(*bom, bom.length());
+			size_t len = blob.getRemaining() / 4;
+			expand(len);
+			mLength = (int)len;
 
-			if (value <= 0xd7ff || value >= 0xe000)
+			if (encoding == UnicodeEncoding::UTF32LE)
 			{
-				code = value;
+				for (size_t pos = 0; pos < len; ++pos)
+				{
+					blob >> code;
+					mData[pos] = rmx::StringTraits<CHAR>::fromUnicode(code);
+				}
 			}
 			else
 			{
-				if (remaining < 1)
-					ABORT;
-
-				uint16 second;
-				blob >> second;
-				if (encoding == UnicodeEncoding::UTF16BE)
-					second = swapBytes16(second);
-				--remaining;
-				code = 0x10000 + ((value - 0xd800) << 10) + (second - 0xdc00);
+				for (size_t pos = 0; pos < len; ++pos)
+				{
+					blob >> code;
+					mData[pos] = rmx::StringTraits<CHAR>::fromUnicode(swapBytes32(code));
+				}
 			}
-
-			mData[mLength] = rmx::StringTraits<CHAR>::fromUnicode(code);
-			++mLength;
 		}
+
+		#undef ABORT
 	}
-	else if (encoding == UnicodeEncoding::UTF32LE || encoding == UnicodeEncoding::UTF32BE)
-	{
-		// UTF-32
-		const String& bom = (encoding == UnicodeEncoding::UTF32LE) ? ByteOrderMark_UTF32LE : ByteOrderMark_UTF32BE;
-		blob.tryRead(*bom, bom.length());
-		size_t len = blob.getRemaining() / 4;
-		expand(len);
-		mLength = (int)len;
-
-		if (encoding == UnicodeEncoding::UTF32LE)
-		{
-			for (size_t pos = 0; pos < len; ++pos)
-			{
-				blob >> code;
-				mData[pos] = rmx::StringTraits<CHAR>::fromUnicode(code);
-			}
-		}
-		else
-		{
-			for (size_t pos = 0; pos < len; ++pos)
-			{
-				blob >> code;
-				mData[pos] = rmx::StringTraits<CHAR>::fromUnicode(swapBytes32(code));
-			}
-		}
-	}
-
-	#undef ABORT
 
 	mData[mLength] = 0;
 	return true;
