@@ -114,7 +114,7 @@ namespace lemon
 				{
 					if (isInBlockComment)
 					{
-						if (ParserHelper::findEndOfBlockComment(line, pos))
+						if (ParserHelper::findEndOfBlockComment(line.data(), line.length(), pos))
 						{
 							// Block comment ends here
 							eraseFromLine(line, modifiedLine, blockCommentStart, pos - blockCommentStart);

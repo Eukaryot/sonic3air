@@ -76,8 +76,8 @@ public:
 
 	static void updateInfo(Game::Mode gameMode, uint32 subMode, EmulatorInterface& emulatorInterface);
 
-	static void setModdedDetails(const std::string& text);
-	static void setModdedState(const std::string& text);
-	static void setModdedLargeImage(const std::string& imageName);
-	static void setModdedSmallImage(const std::string& imageName);
+	static void setModdedDetails(std::string_view text);
+	static void setModdedState(std::string_view text);
+	static void setModdedLargeImage(std::string_view imageName);
+	static void setModdedSmallImage(std::string_view imageName);
 };

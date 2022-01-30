@@ -119,6 +119,9 @@ public:
 		serialize(const_cast<T&>(value));
 	}
 
+	void write(std::string_view value, size_t stringLengthLimit = 0xffffffff);
+	void write(std::wstring_view value);
+
 	template <typename T, typename S>
 	void writeAs(const S& value)
 	{

@@ -19,14 +19,14 @@ public:
 	void load();
 	void save();
 
-	void addSprite(const PaletteSprite& paletteSprite, const std::string& categoryName, uint8 spriteNumber, uint8 atex);
-	void addSpriteWithTranslation(const PaletteSprite& paletteSprite, const std::string& categoryName, uint8 spriteNumber, uint8 atex);
+	void addSprite(const PaletteSprite& paletteSprite, std::string_view categoryName, uint8 spriteNumber, uint8 atex);
+	void addSpriteWithTranslation(const PaletteSprite& paletteSprite, std::string_view categoryName, uint8 spriteNumber, uint8 atex);
 
 private:
 	struct Category;
 
-	Category& getOrCreateCategory(const std::string& categoryName);
-	void saveSpriteAtlas(const std::string& categoryName);
+	Category& getOrCreateCategory(std::string_view categoryName);
+	void saveSpriteAtlas(std::string_view categoryName);
 
 private:
 	struct Entry

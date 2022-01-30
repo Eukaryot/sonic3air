@@ -17,12 +17,12 @@ public:
 	ROMDataAnalyser();
 	~ROMDataAnalyser();
 
-	bool hasEntry(const std::string& categoryName, uint32 address) const;
-	void beginEntry(const std::string& categoryName, uint32 address);
+	bool hasEntry(std::string_view categoryName, uint32 address) const;
+	void beginEntry(std::string_view categoryName, uint32 address);
 	void endEntry();
 
-	void addKeyValue(const std::string& key, const std::string& value);
-	void beginObject(const std::string& key);
+	void addKeyValue(std::string_view key, std::string_view value);
+	void beginObject(std::string_view key);
 	void endObject();
 
 private:
@@ -42,12 +42,12 @@ private:
 	};
 
 private:
-	Category* findCategory(const std::string& categoryName, bool create);
-	Entry* findEntry(const std::string& categoryName, uint32 address, bool create, Category** outCategory = nullptr);
+	Category* findCategory(std::string_view categoryName, bool create);
+	Entry* findEntry(std::string_view categoryName, uint32 address, bool create, Category** outCategory = nullptr);
 
-	void loadDataFromJSONs(const std::wstring& filepath);
+	void loadDataFromJSONs(std::wstring_view filepath);
 	void recursiveLoadDataFromJSON(const Json::Value& json, Object& outObject);
-	void saveDataToJSONs(const std::wstring& filepath);
+	void saveDataToJSONs(std::wstring_view filepath);
 	void recursiveSaveDataToJSON(Json::Value& outJson, const Object& object);
 
 	void processData();

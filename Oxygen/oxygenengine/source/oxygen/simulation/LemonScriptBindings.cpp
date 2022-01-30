@@ -300,7 +300,7 @@ namespace
 	}
 
 
-	void debugLogInternal(const std::string& valueString)
+	void debugLogInternal(std::string_view valueString)
 	{
 		uint32 lineNumber = 0;
 		const bool success = LemonScriptRuntime::getCurrentScriptFunction(nullptr, nullptr, &lineNumber, nullptr);
@@ -889,7 +889,7 @@ namespace
 				const lemon::StoredString* str = runtime->resolveStringByKey(sfxId);
 				if (nullptr != str)
 				{
-					const std::string& textString = str->getString();
+					const std::string_view textString = str->getString();
 
 					// Does the string contain any uppercase letters?
 					const auto it = std::find_if(textString.begin(), textString.end(), [](char ch) { return (ch >= 'A' && ch <= 'Z'); } );

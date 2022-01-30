@@ -329,7 +329,7 @@ DebugSidePanelCategory& DebugSidePanel::createGameCategory(size_t identifier, co
 	return category;
 }
 
-bool DebugSidePanel::setupCustomCategory(const std::string& header, char shortCharacter)
+bool DebugSidePanel::setupCustomCategory(std::string_view header, char shortCharacter)
 {
 	// Search for the category
 	mSetupCustomCategory = nullptr;
@@ -363,7 +363,7 @@ bool DebugSidePanel::setupCustomCategory(const std::string& header, char shortCh
 	return ((size_t)index == mActiveCategoryIndex);
 }
 
-bool DebugSidePanel::addOption(const std::string& text, bool defaultValue)
+bool DebugSidePanel::addOption(std::string_view text, bool defaultValue)
 {
 	if (nullptr == mSetupCustomCategory)
 		return false;
@@ -379,7 +379,7 @@ void DebugSidePanel::addEntry(uint64 key)
 	return mSetupCustomCategory->addEntry(key);
 }
 
-void DebugSidePanel::addLine(const std::string& text, int indent, const Color& color)
+void DebugSidePanel::addLine(std::string_view text, int indent, const Color& color)
 {
 	if (nullptr == mSetupCustomCategory)
 		return;
@@ -395,12 +395,12 @@ bool DebugSidePanel::isEntryHovered(uint64 key)
 	return mSetupCustomCategory->isEntryHovered(key);
 }
 
-DebugSidePanelCategory& DebugSidePanel::addCategory(size_t identifier, const std::string& header, char shortCharacter)
+DebugSidePanelCategory& DebugSidePanel::addCategory(size_t identifier, std::string_view header, char shortCharacter)
 {
 	DebugSidePanelCategory* category = new DebugSidePanelCategory();
 	category->mIdentifier = identifier;
 	category->mHeader = header;
-	category->mShortCharacter = shortCharacter ? shortCharacter : header[0];
+	category->mShortCharacter = shortCharacter ? shortCharacter : header.empty() ? 0 : header[0];
 
 	mCategories.push_back(category);
 	return *category;

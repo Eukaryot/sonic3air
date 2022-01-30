@@ -74,9 +74,9 @@ public:
 	CustomDebugSidePanelCategory();
 
 	void onSetup();
-	bool addOption(const std::string& text, bool defaultValue);
+	bool addOption(std::string_view text, bool defaultValue);
 	void addEntry(uint64 key);
-	void addLine(const std::string& text, int indent, const Color& color);
+	void addLine(std::string_view text, int indent, const Color& color);
 	bool isEntryHovered(uint64 key);
 
 	void buildCategoryContent(DebugSidePanel::Builder& builder, Drawer& drawer, uint64 mouseOverKey);

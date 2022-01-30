@@ -28,7 +28,7 @@ void CustomDebugSidePanelCategory::onSetup()
 	}
 }
 
-bool CustomDebugSidePanelCategory::addOption(const std::string& text, bool defaultValue)
+bool CustomDebugSidePanelCategory::addOption(std::string_view text, bool defaultValue)
 {
 	// Exists already?
 	for (Option& option : mOptions)
@@ -74,7 +74,7 @@ void CustomDebugSidePanelCategory::addEntry(uint64 key)
 	mEntriesNeedSorting = true;
 }
 
-void CustomDebugSidePanelCategory::addLine(const std::string& text, int indent, const Color& color)
+void CustomDebugSidePanelCategory::addLine(std::string_view text, int indent, const Color& color)
 {
 	if (nullptr == mCurrentEntry)
 		return;

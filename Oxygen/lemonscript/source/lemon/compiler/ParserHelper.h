@@ -150,7 +150,7 @@ namespace lemon
 					if (input[pos+1] == '*')
 					{
 						pos += 2;
-						if (findEndOfBlockComment(input, pos))
+						if (findEndOfBlockComment(input, length, pos))
 						{
 							--pos;	// Go back one characters, as the for-loop will skip it again
 							continue;
@@ -162,9 +162,9 @@ namespace lemon
 			}
 		}
 
-		inline static bool findEndOfBlockComment(const std::string_view& input, size_t& pos)
+		inline static bool findEndOfBlockComment(const char* input, size_t length, size_t& pos)
 		{
-			for (; pos + 1 < input.length(); ++pos)
+			for (; pos + 1 < length; ++pos)
 			{
 				if (input[pos] == '*' && input[pos + 1] == '/')
 				{

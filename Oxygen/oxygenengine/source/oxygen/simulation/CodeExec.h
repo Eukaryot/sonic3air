@@ -140,7 +140,7 @@ public:
 	inline LemonScriptRuntime& getLemonScriptRuntime()	{ return mLemonScriptRuntime; }
 	inline LemonScriptProgram& getLemonScriptProgram()	{ return mLemonScriptProgram; }
 
-	void setupCallFrame(const std::string& functionName, const std::string& labelName = "");
+	void setupCallFrame(std::string_view functionName, std::string_view labelName = "");
 
 	void processCallFrames();
 	inline const std::vector<CallFrame>& getCallFrames() const  { return mMainCallFrameTracking.mCallFrames; }
@@ -171,7 +171,6 @@ private:
 	void applyCallFramesToAdd();
 
 	void popCallFrame();
-	void writeCurrentCallStack(std::vector<std::string>& outCallStack);
 
 	uint32 getCurrentWatchValue(uint32 address, uint16 bytes) const;
 

@@ -37,7 +37,7 @@ namespace rmx
 		mManagedFileProviders.clear();
 	}
 
-	bool FileSystem::exists(const std::wstring& filename)
+	bool FileSystem::exists(std::wstring_view filename)
 	{
 		mTempPath2 = normalizePath(filename, mTempPath2, false);
 		for (MountPoint& mountPoint : mMountPoints)
@@ -52,7 +52,7 @@ namespace rmx
 		return false;
 	}
 
-	uint64 FileSystem::getFileSize(const std::wstring& filename)
+	uint64 FileSystem::getFileSize(std::wstring_view filename)
 	{
 		mTempPath2 = normalizePath(filename, mTempPath2, false);
 		for (MountPoint& mountPoint : mMountPoints)
@@ -68,7 +68,7 @@ namespace rmx
 		return 0;
 	}
 
-	bool FileSystem::readFile(const std::wstring& filename, std::vector<uint8>& outData)
+	bool FileSystem::readFile(std::wstring_view filename, std::vector<uint8>& outData)
 	{
 		mTempPath2 = normalizePath(filename, mTempPath2, false);
 		for (MountPoint& mountPoint : mMountPoints)
@@ -83,14 +83,14 @@ namespace rmx
 		return false;
 	}
 
-	bool FileSystem::saveFile(const std::wstring& filename, const void* data, size_t size)
+	bool FileSystem::saveFile(std::wstring_view filename, const void* data, size_t size)
 	{
 		// TODO: Use file providers here as well
 		mTempPath2 = normalizePath(filename, mTempPath2, false);
 		return FileIO::saveFile(mTempPath2, data, size);
 	}
 
-	InputStream* FileSystem::createInputStream(const std::wstring& filename)
+	InputStream* FileSystem::createInputStream(std::wstring_view filename)
 	{
 		mTempPath2 = normalizePath(filename, mTempPath2, false);
 		for (MountPoint& mountPoint : mMountPoints)
@@ -106,14 +106,14 @@ namespace rmx
 		return nullptr;
 	}
 
-	void FileSystem::createDirectory(const std::wstring& path)
+	void FileSystem::createDirectory(std::wstring_view path)
 	{
 		// TODO: Use file providers here as well
 		mTempPath2 = normalizePath(path, mTempPath2, true);
 		FileIO::createDirectory(mTempPath2);
 	}
 
-	void FileSystem::listFiles(const std::wstring& path, bool recursive, std::vector<rmx::FileIO::FileEntry>& outEntries)
+	void FileSystem::listFiles(std::wstring_view path, bool recursive, std::vector<rmx::FileIO::FileEntry>& outEntries)
 	{
 		mTempPath2 = normalizePath(path, mTempPath2, false);
 		for (MountPoint& mountPoint : mMountPoints)
@@ -134,7 +134,7 @@ namespace rmx
 		}
 	}
 
-	void FileSystem::listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<rmx::FileIO::FileEntry>& outEntries)
+	void FileSystem::listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<rmx::FileIO::FileEntry>& outEntries)
 	{
 		mTempPath2 = normalizePath(filemask, mTempPath2, false);
 		for (MountPoint& mountPoint : mMountPoints)
@@ -155,7 +155,7 @@ namespace rmx
 		}
 	}
 
-	void FileSystem::listDirectories(const std::wstring& path, std::vector<std::wstring>& outEntries)
+	void FileSystem::listDirectories(std::wstring_view path, std::vector<std::wstring>& outEntries)
 	{
 		mTempPath2 = normalizePath(path, mTempPath2, true);
 		for (MountPoint& mountPoint : mMountPoints)
@@ -186,37 +186,37 @@ namespace rmx
 		}
 	}
 
-	bool FileSystem::exists(const std::string& path)
+	bool FileSystem::exists(std::string_view path)
 	{
 		return exists(String(path).toStdWString());
 	}
 
-	uint64 FileSystem::getFileSize(const std::string& filename)
+	uint64 FileSystem::getFileSize(std::string_view filename)
 	{
 		return getFileSize(String(filename).toStdWString());
 	}
 
-	bool FileSystem::readFile(const std::string& filename, std::vector<uint8>& outData)
+	bool FileSystem::readFile(std::string_view filename, std::vector<uint8>& outData)
 	{
 		return readFile(String(filename).toStdWString(), outData);
 	}
 
-	bool FileSystem::saveFile(const std::wstring& filename, const std::vector<uint8>& data)
+	bool FileSystem::saveFile(std::wstring_view filename, const std::vector<uint8>& data)
 	{
 		return saveFile(filename, data.empty() ? nullptr : &data[0], data.size());
 	}
 
-	bool FileSystem::saveFile(const std::string& filename, const std::vector<uint8>& data)
+	bool FileSystem::saveFile(std::string_view filename, const std::vector<uint8>& data)
 	{
 		return saveFile(String(filename).toStdWString(), data);
 	}
 
-	bool FileSystem::saveFile(const std::string& filename, const void* data, size_t size)
+	bool FileSystem::saveFile(std::string_view filename, const void* data, size_t size)
 	{
 		return saveFile(String(filename).toStdWString(), data, size);
 	}
 
-	InputStream* FileSystem::createInputStream(const std::string& filename)
+	InputStream* FileSystem::createInputStream(std::string_view filename)
 	{
 		return createInputStream(String(filename).toStdWString());
 	}
@@ -232,7 +232,7 @@ namespace rmx
 		mMountPoints.clear();
 	}
 
-	void FileSystem::addMountPoint(FileProvider& fileProvider, const std::wstring& mountPoint, const std::wstring& prefixReplacement, int priority)
+	void FileSystem::addMountPoint(FileProvider& fileProvider, std::wstring_view mountPoint, std::wstring_view prefixReplacement, int priority)
 	{
 		MountPoint& newMountPoint = vectorAdd(mMountPoints);
 		newMountPoint.mFileProvider = &fileProvider;
@@ -253,7 +253,7 @@ namespace rmx
 		FileIO::normalizePath(path, isDirectory);
 	}
 
-	const std::wstring& FileSystem::normalizePath(const std::wstring& path, std::wstring& tempBuffer, bool isDirectory)
+	std::wstring_view FileSystem::normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory)
 	{
 		return FileIO::normalizePath(path, tempBuffer, isDirectory);
 	}
@@ -263,17 +263,17 @@ namespace rmx
 		return FileIO::getCurrentDirectory();
 	}
 
-	void FileSystem::setCurrentDirectory(const std::wstring& path)
+	void FileSystem::setCurrentDirectory(std::wstring_view path)
 	{
 		FileIO::setCurrentDirectory(path);
 	}
 
-	void FileSystem::splitPath(const std::string& path, std::string* directory, std::string* name, std::string* extension)
+	void FileSystem::splitPath(std::string_view path, std::string* directory, std::string* name, std::string* extension)
 	{
 		FileIO::splitPath(path, directory, name, extension);
 	}
 
-	void FileSystem::splitPath(const std::wstring& path, std::wstring* directory, std::wstring* name, std::wstring* extension)
+	void FileSystem::splitPath(std::wstring_view path, std::wstring* directory, std::wstring* name, std::wstring* extension)
 	{
 		FileIO::splitPath(path, directory, name, extension);
 	}
@@ -299,25 +299,8 @@ namespace rmx
 
 		if (mountPoint.mNeedsPrefixConversion)
 		{
-			tempPath = mountPoint.mPrefixReplacement + inPath.substr(mountPoint.mMountPoint.length());
-			return &tempPath;
-		}
-		else
-		{
-			// No change
-			return &inPath;
-		}
-	}
-
-	const std::wstring* FileSystem::removeMountPointPath(const MountPoint& mountPoint, const std::wstring& inPath, std::wstring& tempPath) const
-	{
-		// Check if path starts with the mount point
-		if (!mountPoint.mPrefixReplacement.empty() && !startsWith(inPath, mountPoint.mPrefixReplacement))
-			return nullptr;
-
-		if (mountPoint.mNeedsPrefixConversion)
-		{
-			tempPath = mountPoint.mMountPoint + inPath.substr(mountPoint.mPrefixReplacement.length());
+			tempPath = mountPoint.mPrefixReplacement;
+			tempPath.append(inPath.substr(mountPoint.mMountPoint.length()));
 			return &tempPath;
 		}
 		else

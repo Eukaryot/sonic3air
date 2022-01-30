@@ -271,7 +271,7 @@ namespace lemon
 		// Build output
 		for (uint32 fileLineIndex = 0; fileLineIndex < (uint32)fileLines.size(); ++fileLineIndex)
 		{
-			const std::string_view& line = fileLines[fileLineIndex];
+			const std::string_view line = fileLines[fileLineIndex];
 
 			// Resolve include
 			if (line.rfind("include ", 0) == 0)

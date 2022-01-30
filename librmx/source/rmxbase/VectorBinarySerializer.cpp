@@ -221,7 +221,6 @@ void VectorBinarySerializer::serialize(std::wstring& value)
 				pointer[i] = (uint16)value[i];
 		#endif
 		}
-
 	}
 }
 
@@ -294,6 +293,45 @@ void VectorBinarySerializer::serializeData(std::vector<uint8>& data, size_t byte
 	if (!data.empty())
 	{
 		serialize(&data[0], data.size());
+	}
+}
+
+void VectorBinarySerializer::write(std::string_view value, size_t stringLengthLimit)
+{
+	if (stringLengthLimit <= 0xff)
+	{
+		writeAs<uint8>(value.size());
+	}
+	else if (stringLengthLimit <= 0xffff)
+	{
+		writeAs<uint16>(value.size());
+	}
+	else
+	{
+		writeAs<uint32>(value.size());
+	}
+
+	if (!value.empty())
+	{
+		write(&value[0], value.length());
+	}
+}
+
+void VectorBinarySerializer::write(std::wstring_view value)
+{
+	writeAs<uint32>(value.length());
+	if (!value.empty())
+	{
+		// Write with 2 bytes per character -- TODO: expand to 4 bytes, or encode differently, like UTF-8 instead?
+	#ifdef PLATFORM_WINDOWS
+		static_assert(sizeof(wchar_t) == 2);
+		write(&value[0], value.length() * sizeof(wchar_t));
+	#else
+		const size_t size = value.length() * 2;
+		uint16* pointer = (uint16*)writeAccess(size);
+		for (size_t i = 0; i < value.length(); ++i)
+			pointer[i] = (uint16)value[i];
+	#endif
 	}
 }
 

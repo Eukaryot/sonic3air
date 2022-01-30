@@ -18,14 +18,14 @@ struct StringReader
 	const wchar_t* mWString = nullptr;
 	size_t mLength = 0;
 
-	StringReader(const char* str)			   : mString(str), mLength(strlen(str)) {}
-	StringReader(const wchar_t* str)		   : mWString(str), mLength(wcslen(str)) {}
-	StringReader(const String& str)			   : mString(*str), mLength(str.length()) {}
-	StringReader(const WString& str)		   : mWString(*str), mLength(str.length()) {}
-	StringReader(const std::string& str)	   : mString(str.c_str()), mLength(str.length()) {}
-	StringReader(const std::wstring& str)	   : mWString(str.c_str()), mLength(str.length()) {}
-	StringReader(const std::string_view& str)  : mString(str.data()), mLength(str.length()) {}
-	StringReader(const std::wstring_view& str) : mWString(str.data()), mLength(str.length()) {}
+	StringReader(const char* str)		  : mString(str), mLength(strlen(str)) {}
+	StringReader(const wchar_t* str)	  : mWString(str), mLength(wcslen(str)) {}
+	StringReader(const String& str)		  : mString(*str), mLength(str.length()) {}
+	StringReader(const WString& str)	  : mWString(*str), mLength(str.length()) {}
+	StringReader(const std::string& str)  : mString(str.c_str()), mLength(str.length()) {}
+	StringReader(const std::wstring& str) : mWString(str.c_str()), mLength(str.length()) {}
+	StringReader(std::string_view str)	  : mString(str.data()), mLength(str.length()) {}
+	StringReader(std::wstring_view str)	  : mWString(str.data()), mLength(str.length()) {}
 
 	uint32 operator[](size_t index) const  { return (nullptr != mString) ? (uint32)(uint8)mString[index] : (uint32)mWString[index]; }
 };

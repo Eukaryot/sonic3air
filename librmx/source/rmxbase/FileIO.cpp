@@ -98,8 +98,9 @@ namespace rmx
 			}
 		}
 
-		void listDirectoryContentInternal(std::vector<FileIO::FileEntry>* outFileEntries, std::vector<std::wstring>* outSubDirectories, const std::wstring& basePath, const std::wstring& filemask, bool recursive)
+		void listDirectoryContentInternal(std::vector<FileIO::FileEntry>* outFileEntries, std::vector<std::wstring>* outSubDirectories, std::wstring_view basePath_, std::wstring_view filemask, bool recursive)
 		{
+			const std::wstring basePath(basePath_);
 			std::vector<std::wstring> subDirectoriesBuffer;
 			std::vector<std::wstring>& subDirectories = (nullptr != outSubDirectories) ? *outSubDirectories : subDirectoriesBuffer;
 
@@ -107,7 +108,7 @@ namespace rmx
 
 			// Find files
 			_wfinddata_t fileinfo;
-			intptr_t handle = _wfindfirst(filemask.empty() ? (basePath + L"*").c_str() : (basePath + filemask).c_str(), &fileinfo);
+			intptr_t handle = _wfindfirst(filemask.empty() ? (basePath + L"*").c_str() : (basePath + std::wstring(filemask)).c_str(), &fileinfo);
 			bool success = (handle != -1);
 			while (success)
 			{
@@ -179,7 +180,7 @@ namespace rmx
 					{
 						// Check for wildcard match
 						const WString filename = String(name).toWString();
-						if (filemask.empty() || matchesPattern(*filename, filemask.c_str()))
+						if (filemask.empty() || matchesPattern(*filename, filemask.data()))
 						{
 							FileIO::FileEntry& entry = vectorAdd(*outFileEntries);
 							entry.mFilename = filename.toStdWString();
@@ -208,7 +209,7 @@ namespace rmx
 	}
 
 
-	bool FileIO::exists(const std::wstring& path)
+	bool FileIO::exists(std::wstring_view path)
 	{
 	#ifdef USE_STD_FILESYSTEM
 		return std_filesystem::exists(path);
@@ -218,13 +219,13 @@ namespace rmx
 	#endif
 	}
 
-	uint64 FileIO::getFileSize(const std::wstring& filename)
+	uint64 FileIO::getFileSize(std::wstring_view filename)
 	{
 		FileHandle file(filename, FILE_ACCESS_READ);
 		return file.getSize();
 	}
 
-	bool FileIO::readFile(const std::wstring& filename, std::vector<uint8>& outData)
+	bool FileIO::readFile(std::wstring_view filename, std::vector<uint8>& outData)
 	{
 		// Read from file system
 	#ifdef USE_UTF8_PATHS
@@ -247,7 +248,7 @@ namespace rmx
 		return true;
 	}
 
-	bool FileIO::saveFile(const std::wstring& filename, const void* data, size_t size)
+	bool FileIO::saveFile(std::wstring_view filename, const void* data, size_t size)
 	{
 		// Create directory if needed
 		const size_t slashPosition = filename.find_last_of(L"/\\");
@@ -272,7 +273,7 @@ namespace rmx
 		return true;
 	}
 
-	InputStream* FileIO::createInputStream(const std::wstring& filename)
+	InputStream* FileIO::createInputStream(std::wstring_view filename)
 	{
 		InputStream* inputStream = new FileInputStream(filename);
 		if (!inputStream->valid())
@@ -283,22 +284,22 @@ namespace rmx
 		return inputStream;
 	}
 
-	void FileIO::createDirectory(const std::wstring& path)
+	void FileIO::createDirectory(std::wstring_view path)
 	{
 		// TODO: Use file providers here as well
 		createDir(path, true);
 	}
 
-	void FileIO::listFiles(const std::wstring& path, bool recursive, std::vector<FileEntry>& outFileEntries)
+	void FileIO::listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries)
 	{
-		std::wstring basePath = path;
+		std::wstring basePath = std::wstring(path);
 		normalizePath(basePath, true);
 		listDirectoryContentInternal(&outFileEntries, nullptr, basePath, L"", recursive);
 	}
 
-	void FileIO::listFilesByMask(const std::wstring& filemask_, bool recursive, std::vector<FileEntry>& outFileEntries)
+	void FileIO::listFilesByMask(std::wstring_view filemask_, bool recursive, std::vector<FileEntry>& outFileEntries)
 	{
-		std::wstring filemask = filemask_;
+		std::wstring filemask = std::wstring(filemask_);
 		normalizePath(filemask, false);
 
 		std::wstring basePath;
@@ -321,9 +322,9 @@ namespace rmx
 		listDirectoryContentInternal(&outFileEntries, nullptr, basePath, mask, recursive);
 	}
 
-	void FileIO::listDirectories(const std::wstring& path, std::vector<std::wstring>& outDirectories)
+	void FileIO::listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories)
 	{
-		std::wstring basePath = path;
+		std::wstring basePath = std::wstring(path);
 		normalizePath(basePath, true);
 		listDirectoryContentInternal(nullptr, &outDirectories, basePath, L"", false);
 	}
@@ -337,7 +338,7 @@ namespace rmx
 		path = normalizePath(path, tempBuffer, isDirectory);
 	}
 
-	const std::wstring& FileIO::normalizePath(const std::wstring& path, std::wstring& tempBuffer, bool isDirectory)
+	std::wstring_view FileIO::normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory)
 	{
 		if (path.empty())
 			return path;
@@ -358,7 +359,7 @@ namespace rmx
 			}
 
 			// Backward slashes count as a change, we want to correct that to forward slashes
-			if (path[pos] == L'\\')
+			if (pos < path.length() && path[pos] == L'\\')
 			{
 				anyChange = true;
 			}
@@ -455,14 +456,14 @@ namespace rmx
 	#endif
 	}
 
-	void FileIO::setCurrentDirectory(const std::wstring& path)
+	void FileIO::setCurrentDirectory(std::wstring_view path)
 	{
 	#ifdef USE_STD_FILESYSTEM
 		std_filesystem::current_path(path);
 	#endif
 	}
 
-	void FileIO::splitPath(const std::string& path, std::string* directory, std::string* name, std::string* extension)
+	void FileIO::splitPath(std::string_view path, std::string* directory, std::string* name, std::string* extension)
 	{
 		const std::size_t slash = path.find_last_of("/\\");
 		if (nullptr != directory)
@@ -490,7 +491,7 @@ namespace rmx
 		}
 	}
 
-	void FileIO::splitPath(const std::wstring& path, std::wstring* directory, std::wstring* name, std::wstring* extension)
+	void FileIO::splitPath(std::wstring_view path, std::wstring* directory, std::wstring* name, std::wstring* extension)
 	{
 		const std::size_t slash = path.find_last_of(L"/\\");
 		if (nullptr != directory)
@@ -518,7 +519,7 @@ namespace rmx
 		}
 	}
 
-	bool FileIO::matchesMask(const std::wstring& filename, const std::wstring& filemask)
+	bool FileIO::matchesMask(std::wstring_view filename, std::wstring_view filemask)
 	{
 		const WString mask(filemask);
 
@@ -543,13 +544,13 @@ namespace rmx
 		return true;
 	}
 
-	void FileIO::filterMaskMatches(std::vector<FileIO::FileEntry>& fileEntries, const std::wstring& filemask)
+	void FileIO::filterMaskMatches(std::vector<FileIO::FileEntry>& fileEntries, std::wstring_view filemask)
 	{
 		if (fileEntries.empty())
 			return;
 
 		const size_t position = filemask.find_last_of(L'/');
-		const std::wstring mask = (position == std::wstring::npos) ? filemask : filemask.substr(position + 1);
+		const std::wstring_view mask = (position == std::wstring::npos) ? filemask : filemask.substr(position + 1);
 
 		size_t insertionIndex = 0;
 		for (size_t index = 0; index < fileEntries.size(); ++index)

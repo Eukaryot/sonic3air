@@ -490,7 +490,7 @@ bool CodeExec::executeScriptFunction(const std::string& functionName, bool showE
 	return false;
 }
 
-void CodeExec::setupCallFrame(const std::string& functionName, const std::string& labelName)
+void CodeExec::setupCallFrame(std::string_view functionName, std::string_view labelName)
 {
 	mCallFramesToAdd.emplace_back(functionName, labelName);
 	mHasCallFramesToAdd = true;

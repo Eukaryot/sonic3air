@@ -237,19 +237,9 @@ namespace lemon
 		return mStrings.getStringByHash(key);
 	}
 
-	uint64 Runtime::addString(const std::string& str)
+	uint64 Runtime::addString(std::string_view str)
 	{
-		return addString(str.c_str(), str.length());
-	}
-
-	uint64 Runtime::addString(const std::string_view& str)
-	{
-		return addString(str.data(), str.length());
-	}
-
-	uint64 Runtime::addString(const char* str, size_t length)
-	{
-		return mStrings.getOrAddString(str, length).getHash();
+		return mStrings.getOrAddString(str).getHash();
 	}
 
 	int64 Runtime::getGlobalVariableValue(const Variable& variable)

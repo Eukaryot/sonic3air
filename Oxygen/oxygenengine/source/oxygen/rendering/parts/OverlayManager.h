@@ -57,7 +57,7 @@ public:
 	void clearContext(Context context);
 
 	void addDebugDrawRect(const Recti& rect, const Color& color = Color(1.0f, 0.0f, 1.0f, 0.75f));
-	void addText(const std::string& fontKeyString, uint64 fontKeyHash, const Vec2i& position, const std::string& textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space);
+	void addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space);
 
 private:
 	Context mCurrentContext = Context::OUTSIDE_FRAME;

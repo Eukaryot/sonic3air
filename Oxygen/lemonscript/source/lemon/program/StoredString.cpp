@@ -27,6 +27,7 @@ namespace lemon
 		}
 		mEntryPool.clear();
 		mNumEntries = 0;
+		mMemoryPool.clear();
 	}
 
 	const StoredString* StringLookup::getStringByHash(uint64 hash) const
@@ -44,12 +45,12 @@ namespace lemon
 		return nullptr;
 	}
 
-	const StoredString& StringLookup::getOrAddString(const std::string& str)
+	const StoredString& StringLookup::getOrAddString(std::string_view str)
 	{
 		return getOrAddString(str, rmx::getMurmur2_64(str));
 	}
 
-	const StoredString& StringLookup::getOrAddString(const std::string& str, uint64 hash)
+	const StoredString& StringLookup::getOrAddString(std::string_view str, uint64 hash)
 	{
 		TableEntry** ptr = &mTable[hash & HASH_TABLE_BITMASK];
 		while (nullptr != *ptr)
@@ -63,31 +64,26 @@ namespace lemon
 		}
 
 		// Add new string
-		TableEntry& newEntry = mEntryPool.createObject();
-		newEntry.mStoredString.mString = str;
-		newEntry.mStoredString.mHash = hash;
-		*ptr = &newEntry;
-		++mNumEntries;
-		return newEntry.mStoredString;
-	}
-
-	const StoredString& StringLookup::getOrAddString(const char* str, size_t length)
-	{
-		const uint64 hash = rmx::getMurmur2_64((const uint8*)str, length);
-		TableEntry** ptr = &mTable[hash & HASH_TABLE_BITMASK];
-		while (nullptr != *ptr)
+		const char* strContent = nullptr;
+		if (str.empty())
 		{
-			if ((*ptr)->mStoredString.mHash == hash)
+			const char* EMPTY_STRING = "";
+			strContent = EMPTY_STRING;
+		}
+		else
+		{
+			uint8* memory = mMemoryPool.allocateMemory(str.length());
+			if (nullptr == memory)
 			{
-				// It's already added
-				return (*ptr)->mStoredString;
+				static StoredString EMPTY_STORED_STRING;
+				return EMPTY_STORED_STRING;
 			}
-			ptr = &(*ptr)->mNext;
+			memcpy(memory, str.data(), str.length());
+			strContent = (const char*)memory;
 		}
 
-		// Add new string
 		TableEntry& newEntry = mEntryPool.createObject();
-		newEntry.mStoredString.mString.append(str, length);
+		newEntry.mStoredString.mStringView = std::string_view(strContent, str.length());
 		newEntry.mStoredString.mHash = hash;
 		*ptr = &newEntry;
 		++mNumEntries;

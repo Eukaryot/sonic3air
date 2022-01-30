@@ -147,12 +147,12 @@ namespace rmx
 		return getMurmur2_64((const uint8*)&str[0], str.length() * sizeof(wchar_t));
 	}
 
-	uint64 getMurmur2_64(const std::string_view& str)
+	uint64 getMurmur2_64(std::string_view str)
 	{
 		return getMurmur2_64((const uint8*)str.data(), str.length() * sizeof(char));
 	}
 
-	uint64 getMurmur2_64(const std::wstring_view& str)
+	uint64 getMurmur2_64(std::wstring_view str)
 	{
 		// Note that this is *not* platform-independent
 		return getMurmur2_64((const uint8*)str.data(), str.length() * sizeof(wchar_t));
@@ -278,12 +278,12 @@ namespace rmx
 		return stringStartsWith<std::wstring>(fullString, prefix);
 	}
 
-	bool startsWith(const std::string_view& fullString, const std::string_view& prefix)
+	bool startsWith(std::string_view fullString, std::string_view prefix)
 	{
 		return stringStartsWith<std::string_view>(fullString, prefix);
 	}
 
-	bool startsWith(const std::wstring_view& fullString, const std::wstring_view& prefix)
+	bool startsWith(std::wstring_view fullString, std::wstring_view prefix)
 	{
 		return stringStartsWith<std::wstring_view>(fullString, prefix);
 	}
@@ -298,12 +298,12 @@ namespace rmx
 		return stringEndsWith<std::wstring>(fullString, prefix);
 	}
 
-	bool endsWith(const std::string_view& fullString, const std::string_view& prefix)
+	bool endsWith(std::string_view fullString, std::string_view prefix)
 	{
 		return stringEndsWith<std::string_view>(fullString, prefix);
 	}
 
-	bool endsWith(const std::wstring_view& fullString, const std::wstring_view& prefix)
+	bool endsWith(std::wstring_view fullString, std::wstring_view prefix)
 	{
 		return stringEndsWith<std::wstring_view>(fullString, prefix);
 	}

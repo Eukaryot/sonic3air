@@ -50,7 +50,7 @@ public:
 	inline const ScriptLogEntryMap& getScriptLogEntries() const  { return mScriptLogEntries; }
 	void clearScriptLogValues();
 	void clearScriptLogValue(const std::string& key);
-	ScriptLogSingleEntry& updateScriptLogValue(const std::string& key, const std::string& value);
+	ScriptLogSingleEntry& updateScriptLogValue(std::string_view key, std::string_view value);
 
 	// Debug color log
 	inline const ColorLogEntryArray& getColorLogEntries() const { return mColorLogEntries; }

@@ -19,7 +19,7 @@ namespace lemon
 	class Parser
 	{
 	public:
-		void splitLineIntoTokens(const std::string_view& input, uint32 lineNumber, ParserTokenList& outTokens);
+		void splitLineIntoTokens(std::string_view input, uint32 lineNumber, ParserTokenList& outTokens);
 
 	private:
 		std::string mBufferString;

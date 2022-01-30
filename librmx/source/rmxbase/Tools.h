@@ -43,8 +43,8 @@ namespace rmx
 	uint64 getMurmur2_64(const WString& str);
 	uint64 getMurmur2_64(const std::string& str);
 	uint64 getMurmur2_64(const std::wstring& str);
-	uint64 getMurmur2_64(const std::string_view& str);
-	uint64 getMurmur2_64(const std::wstring_view& str);
+	uint64 getMurmur2_64(std::string_view str);
+	uint64 getMurmur2_64(std::wstring_view str);
 
 	// Calculate CRC32 checksum for data
 	uint32 getCRC32(const uint8* data, size_t bytes);
@@ -64,11 +64,11 @@ namespace rmx
 	// Check if an std::string starts/ends with a given other string
 	bool startsWith(const std::string& fullString, const std::string& prefix);
 	bool startsWith(const std::wstring& fullString, const std::wstring& prefix);
-	bool startsWith(const std::string_view& fullString, const std::string_view& prefix);
-	bool startsWith(const std::wstring_view& fullString, const std::wstring_view& prefix);
+	bool startsWith(std::string_view fullString, std::string_view prefix);
+	bool startsWith(std::wstring_view fullString, std::wstring_view prefix);
 	bool endsWith(const std::string& fullString, const std::string& suffix);
 	bool endsWith(const std::wstring& fullString, const std::wstring& suffix);
-	bool endsWith(const std::string_view& fullString, const std::string_view& prefix);
-	bool endsWith(const std::wstring_view& fullString, const std::wstring_view& prefix);
+	bool endsWith(std::string_view fullString, std::string_view prefix);
+	bool endsWith(std::wstring_view fullString, std::wstring_view prefix);
 
 }

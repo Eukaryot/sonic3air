@@ -132,7 +132,7 @@ namespace lemon
 	}
 
 
-	void Parser::splitLineIntoTokens(const std::string_view& input, uint32 lineNumber, ParserTokenList& outTokens)
+	void Parser::splitLineIntoTokens(std::string_view input, uint32 lineNumber, ParserTokenList& outTokens)
 	{
 		const size_t length = input.length();
 

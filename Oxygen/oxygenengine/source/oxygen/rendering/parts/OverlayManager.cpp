@@ -42,7 +42,7 @@ void OverlayManager::addDebugDrawRect(const Recti& rect, const Color& color)
 	ddr.mContext = mCurrentContext;
 }
 
-void OverlayManager::addText(const std::string& fontKeyString, uint64 fontKeyHash, const Vec2i& position, const std::string& textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space)
+void OverlayManager::addText(std::string_view fontKeyString, uint64 fontKeyHash, const Vec2i& position, std::string_view textString, uint64 textHash, const Color& color, int alignment, int spacing, uint16 renderQueue, Space space)
 {
 	Text& newText = vectorAdd(mTexts[(int)mCurrentContext]);
 	newText.mFontKeyString = fontKeyString;

@@ -33,7 +33,7 @@ public:
 public:
 	static bool getCurrentScriptFunction(std::string* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName);
 	static std::string getCurrentScriptLocationString();
-	static const std::string* tryResolveStringHash(uint64 hash);
+	static const std::string_view* tryResolveStringHash(uint64 hash);
 
 public:
 	LemonScriptRuntime(LemonScriptProgram& program, EmulatorInterface& emulatorInterface);

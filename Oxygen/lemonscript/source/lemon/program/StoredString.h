@@ -19,11 +19,11 @@ namespace lemon
 	friend class StringLookup;
 
 	public:
-		inline const std::string& getString() const  { return mString; }
-		inline uint64 getHash() const				 { return mHash; }
+		inline const std::string_view& getString() const { return mStringView; }
+		inline uint64 getHash() const					 { return mHash; }
 
 	private:
-		std::string mString;
+		std::string_view mStringView;
 		uint64 mHash = 0;		// 64-bit hash of the string
 	};
 
@@ -35,9 +35,8 @@ namespace lemon
 
 		void clear();
 		const StoredString* getStringByHash(uint64 hash) const;
-		const StoredString& getOrAddString(const std::string& str);
-		const StoredString& getOrAddString(const std::string& str, uint64 hash);
-		const StoredString& getOrAddString(const char* str, size_t length);
+		const StoredString& getOrAddString(std::string_view str);
+		const StoredString& getOrAddString(std::string_view str, uint64 hash);
 
 		void addFromLookup(const StringLookup& other);
 
@@ -55,6 +54,7 @@ namespace lemon
 		ObjectPool<TableEntry, 64> mEntryPool;
 		TableEntry* mTable[HASH_TABLE_SIZE] = { nullptr };	// Using lowest 10 bits of the key as index
 		size_t mNumEntries = 0;
+		rmx::OneTimeAllocPool mMemoryPool;
 	};
 
 
@@ -68,8 +68,8 @@ namespace lemon
 		inline StringRef(uint64 hash, const StoredString* storedString) : mHash(hash), mStoredString(storedString) {}
 
 		inline bool isValid() const  { return (nullptr != mStoredString); }
-		inline const std::string* operator->() const  { return &mStoredString->getString(); }
-		inline const std::string& operator*() const   { return mStoredString->getString(); }
+		inline const std::string_view* operator->() const  { return &mStoredString->getString(); }
+		inline const std::string_view& operator*() const   { return mStoredString->getString(); }
 	};
 
 }

@@ -32,12 +32,12 @@ ROMDataAnalyser::~ROMDataAnalyser()
 	}
 }
 
-bool ROMDataAnalyser::hasEntry(const std::string& categoryName, uint32 address) const
+bool ROMDataAnalyser::hasEntry(std::string_view categoryName, uint32 address) const
 {
 	return (nullptr != const_cast<ROMDataAnalyser*>(this)->findEntry(categoryName, address, false));
 }
 
-void ROMDataAnalyser::beginEntry(const std::string& categoryName, uint32 address)
+void ROMDataAnalyser::beginEntry(std::string_view categoryName, uint32 address)
 {
 	RMX_CHECK(nullptr == mCurrentCategory, "ROMDataAnalyser: Don't call \"beginEntry\" without closing old entry with \"endEntry\"", );
 	RMX_CHECK(nullptr == mCurrentEntry,    "ROMDataAnalyser: Don't call \"beginEntry\" without closing old entry with \"endEntry\"", );
@@ -58,19 +58,19 @@ void ROMDataAnalyser::endEntry()
 	mCurrentObjectStack.clear();
 }
 
-void ROMDataAnalyser::addKeyValue(const std::string& key, const std::string& value)
+void ROMDataAnalyser::addKeyValue(std::string_view key, std::string_view value)
 {
 	RMX_CHECK(!mCurrentObjectStack.empty(), "ROMDataAnalyser: No current object when calling \"addKeyValue\"", return);
 
-	mCurrentObjectStack.back()->mKeyValuePairs[key] = value;
+	mCurrentObjectStack.back()->mKeyValuePairs[std::string(key)] = value;
 	mAnyChange = true;
 }
 
-void ROMDataAnalyser::beginObject(const std::string& key)
+void ROMDataAnalyser::beginObject(std::string_view key)
 {
 	RMX_CHECK(!mCurrentObjectStack.empty(), "ROMDataAnalyser: No current object when calling \"beginObject\"", return);
 
-	Object& child = mCurrentObjectStack.back()->mChildObjects[key];
+	Object& child = mCurrentObjectStack.back()->mChildObjects[std::string(key)];
 	mCurrentObjectStack.push_back(&child);
 	mAnyChange = true;
 }
@@ -82,7 +82,7 @@ void ROMDataAnalyser::endObject()
 	mCurrentObjectStack.pop_back();
 }
 
-ROMDataAnalyser::Category* ROMDataAnalyser::findCategory(const std::string& categoryName, bool create)
+ROMDataAnalyser::Category* ROMDataAnalyser::findCategory(std::string_view categoryName, bool create)
 {
 	const uint64 hash = rmx::getMurmur2_64(categoryName);
 	const auto it = mCategories.find(hash);
@@ -101,7 +101,7 @@ ROMDataAnalyser::Category* ROMDataAnalyser::findCategory(const std::string& cate
 	}
 }
 
-ROMDataAnalyser::Entry* ROMDataAnalyser::findEntry(const std::string& categoryName, uint32 address, bool create, Category** outCategory)
+ROMDataAnalyser::Entry* ROMDataAnalyser::findEntry(std::string_view categoryName, uint32 address, bool create, Category** outCategory)
 {
 	Category* category = findCategory(categoryName, create);
 	if (nullptr != outCategory)
@@ -125,19 +125,19 @@ ROMDataAnalyser::Entry* ROMDataAnalyser::findEntry(const std::string& categoryNa
 	}
 }
 
-void ROMDataAnalyser::loadDataFromJSONs(const std::wstring& filepath)
+void ROMDataAnalyser::loadDataFromJSONs(std::wstring_view filepath)
 {
 	mCategories.clear();
 
 	FileCrawler fc;
-	fc.addFiles(filepath + L"romdata_*.json");
+	fc.addFiles(std::wstring(filepath) + L"romdata_*.json");
 	for (size_t fileIndex = 0; fileIndex < fc.size(); ++fileIndex)
 	{
 		const FileCrawler::FileEntry* fileEntry = fc[fileIndex];
 		if (nullptr == fileEntry)
 			continue;
 
-		const std::wstring filename = filepath + fileEntry->mFilename;
+		const std::wstring filename = std::wstring(filepath) + fileEntry->mFilename;
 		Json::Value root = JsonHelper::loadFile(filename);
 		if (root.isNull())
 			continue;
@@ -170,7 +170,7 @@ void ROMDataAnalyser::recursiveLoadDataFromJSON(const Json::Value& json, Object&
 	}
 }
 
-void ROMDataAnalyser::saveDataToJSONs(const std::wstring& filepath)
+void ROMDataAnalyser::saveDataToJSONs(std::wstring_view filepath)
 {
 	for (const auto& pair : mCategories)
 	{
@@ -188,7 +188,7 @@ void ROMDataAnalyser::saveDataToJSONs(const std::wstring& filepath)
 		root[category.mName] = categoryJson;
 
 		// Save file
-		const std::wstring filename = filepath + L"romdata_" + *String(category.mName).toWString() + L".json";
+		const std::wstring filename = std::wstring(filepath) + L"romdata_" + *String(category.mName).toWString() + L".json";
 		JsonHelper::saveFile(filename, root);
 
 	#if 0

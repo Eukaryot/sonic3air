@@ -78,9 +78,9 @@ void SpriteDump::save()
 	JsonHelper::saveFile(Configuration::instance().mAnalysisDir + L"/spritedump/index.json", root);
 }
 
-void SpriteDump::addSprite(const PaletteSprite& paletteSprite, const std::string& categoryName, uint8 spriteNumber, uint8 atex)
+void SpriteDump::addSprite(const PaletteSprite& paletteSprite, std::string_view categoryName, uint8 spriteNumber, uint8 atex)
 {
-	String filename(0, *(WString(Configuration::instance().mAnalysisDir).toString() + "/spritedump/%s/%02x.bmp"), categoryName.c_str(), spriteNumber);
+	String filename(0, *(WString(Configuration::instance().mAnalysisDir).toString() + "/spritedump/%s/%02x.bmp"), categoryName.data(), spriteNumber);
 	if (!FTX::FileSystem->exists(*filename))
 	{
 		Color palette[0x100];
@@ -112,10 +112,10 @@ void SpriteDump::addSprite(const PaletteSprite& paletteSprite, const std::string
 	}
 }
 
-void SpriteDump::addSpriteWithTranslation(const PaletteSprite& paletteSprite, const std::string& categoryName, uint8 spriteNumber, uint8 atex)
+void SpriteDump::addSpriteWithTranslation(const PaletteSprite& paletteSprite, std::string_view categoryName, uint8 spriteNumber, uint8 atex)
 {
 	// Translate category key
-	std::string translatedName = categoryName;
+	std::string translatedName = std::string(categoryName);
 		 if (categoryName == "100000_148182_146620")  translatedName = "character_sonic";
 	else if (categoryName == "140060_148182_146620")  translatedName = "character_sonic";
 	else if (categoryName == "100000_148378_146816")  translatedName = "character_supersonic";
@@ -142,7 +142,7 @@ void SpriteDump::addSpriteWithTranslation(const PaletteSprite& paletteSprite, co
 	addSprite(paletteSprite, translatedName, spriteNumber, atex);
 }
 
-SpriteDump::Category& SpriteDump::getOrCreateCategory(const std::string& categoryName)
+SpriteDump::Category& SpriteDump::getOrCreateCategory(std::string_view categoryName)
 {
 	const uint64 keyHash = rmx::getMurmur2_64(categoryName);
 	const auto it = mCategories.find(keyHash);
@@ -158,14 +158,14 @@ SpriteDump::Category& SpriteDump::getOrCreateCategory(const std::string& categor
 	}
 }
 
-void SpriteDump::saveSpriteAtlas(const std::string& categoryName)
+void SpriteDump::saveSpriteAtlas(std::string_view categoryName)
 {
 	const auto it = mCategories.find(rmx::getMurmur2_64(categoryName));
 	if (it == mCategories.end())
 		return;
 
 	const Category& category = it->second;
-	const String path(0, *(WString(Configuration::instance().mAnalysisDir).toString() + "/spritedump/%s"), categoryName.c_str());
+	const String path(0, *(WString(Configuration::instance().mAnalysisDir).toString() + "/spritedump/%s"), categoryName.data());
 
 	std::vector<std::pair<PaletteBitmap, const Entry*>> bitmaps;
 	bitmaps.reserve(category.mEntries.size());
@@ -216,7 +216,7 @@ void SpriteDump::saveSpriteAtlas(const std::string& categoryName)
 			json << ",";
 		}
 		json << "\r\n\t\"" << categoryName << "_" << rmx::hexString(entry.mSpriteNumber, 2) << "\": ";
-		json << "{ \"File\": \"" + categoryName + ".bmp\", ";
+		json << "{ \"File\": \"" << categoryName << ".bmp\", ";
 		json << "\"Rect\": \"" << destPosition.x << "," << destPosition.y << "," << bitmap.mWidth << "," << bitmap.mHeight << "\", ";
 		json << "\"Center\": \"" << (-entry.mOffset.x) << "," << (-entry.mOffset.y) << "\" }";
 	}

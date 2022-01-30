@@ -43,10 +43,10 @@ void LogDisplay::clearScriptLogValue(const std::string& key)
 	mScriptLogEntries.erase(key);
 }
 
-LogDisplay::ScriptLogSingleEntry& LogDisplay::updateScriptLogValue(const std::string& key, const std::string& value)
+LogDisplay::ScriptLogSingleEntry& LogDisplay::updateScriptLogValue(std::string_view key, std::string_view value)
 {
 	const uint32 frameNumber = Application::instance().getSimulation().getFrameNumber();
-	ScriptLogEntry& entry = mScriptLogEntries[key];
+	ScriptLogEntry& entry = mScriptLogEntries[std::string(key)];
 	if (frameNumber != entry.mLastUpdate)
 	{
 		entry.mEntries.clear();

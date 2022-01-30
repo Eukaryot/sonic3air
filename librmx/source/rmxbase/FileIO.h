@@ -26,29 +26,29 @@ namespace rmx
 		};
 
 	public:
-		static bool exists(const std::wstring& path);
-		static uint64 getFileSize(const std::wstring& filename);
+		static bool exists(std::wstring_view path);
+		static uint64 getFileSize(std::wstring_view filename);
 
-		static bool readFile(const std::wstring& filename, std::vector<uint8>& outData);
-		static bool saveFile(const std::wstring& filename, const void* data, size_t size);
-		static InputStream* createInputStream(const std::wstring& filename);
+		static bool readFile(std::wstring_view filename, std::vector<uint8>& outData);
+		static bool saveFile(std::wstring_view filename, const void* data, size_t size);
+		static InputStream* createInputStream(std::wstring_view filename);
 
-		static void createDirectory(const std::wstring& path);
-		static void listFiles(const std::wstring& path, bool recursive, std::vector<FileEntry>& outFileEntries);
-		static void listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<FileEntry>& outFileEntries);
-		static void listDirectories(const std::wstring& path, std::vector<std::wstring>& outDirectories);
+		static void createDirectory(std::wstring_view path);
+		static void listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries);
+		static void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileEntry>& outFileEntries);
+		static void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);
 
 		static void normalizePath(std::wstring& path, bool isDirectory);
-		static const std::wstring& normalizePath(const std::wstring& path, std::wstring& tempBuffer, bool isDirectory);
+		static std::wstring_view normalizePath(std::wstring_view path, std::wstring& tempBuffer, bool isDirectory);
 
 		static std::wstring getCurrentDirectory();
-		static void setCurrentDirectory(const std::wstring& path);
+		static void setCurrentDirectory(std::wstring_view path);
 
-		static void splitPath(const std::string& path, std::string* directory, std::string* name, std::string* extension);
-		static void splitPath(const std::wstring& path, std::wstring* directory, std::wstring* name, std::wstring* extension);
+		static void splitPath(std::string_view path, std::string* directory, std::string* name, std::string* extension);
+		static void splitPath(std::wstring_view path, std::wstring* directory, std::wstring* name, std::wstring* extension);
 
-		static bool matchesMask(const std::wstring& filename, const std::wstring& filemask);
-		static void filterMaskMatches(std::vector<FileIO::FileEntry>& fileEntries, const std::wstring& filemask);
+		static bool matchesMask(std::wstring_view filename, std::wstring_view filemask);
+		static void filterMaskMatches(std::vector<FileIO::FileEntry>& fileEntries, std::wstring_view filemask);
 	};
 
 }

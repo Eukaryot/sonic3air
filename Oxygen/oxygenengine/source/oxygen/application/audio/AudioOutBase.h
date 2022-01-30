@@ -60,7 +60,7 @@ public:
 	void fadeInChannel(uint8 channelId, float length);
 	void fadeOutChannel(uint8 channelId, float length);
 
-	void enableAudioModifier(uint8 channelId, uint8 contextId, const std::string& postfix, float relativeSpeed);
+	void enableAudioModifier(uint8 channelId, uint8 contextId, std::string_view postfix, float relativeSpeed);
 	void disableAudioModifier(uint8 channelId, uint8 contextId);
 
 	void handleGameLoaded();

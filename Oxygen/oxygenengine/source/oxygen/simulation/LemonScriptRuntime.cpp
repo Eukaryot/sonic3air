@@ -141,7 +141,7 @@ std::string LemonScriptRuntime::getCurrentScriptLocationString()
 	return buildScriptLocationString(*runtime);
 }
 
-const std::string* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
+const std::string_view* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
 {
 	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 	if (nullptr == runtime)

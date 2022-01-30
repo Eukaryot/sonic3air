@@ -36,12 +36,7 @@ namespace
 			mLength += length;
 		}
 
-		void addString(const std::string& str)
-		{
-			addString(str.c_str(), (int)str.length());
-		}
-
-		void addString(const std::string_view& str)
+		void addString(std::string_view str)
 		{
 			addString(str.data(), (int)str.length());
 		}
@@ -132,7 +127,7 @@ namespace lemon
 			result.clear();
 			result.addString(*str1);
 			result.addString(*str2);
-			return StringRef(runtime->addString(result.mBuffer, result.mLength));
+			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
 		}
 
 		bool string_operator_less(StringRef str1, StringRef str2)
@@ -227,9 +222,9 @@ namespace lemon
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			RMX_CHECK(format.isValid(), "Unable to resolve format string", return StringRef());
 
-			const std::string& formatString = *format;
+			std::string_view formatString = *format;
 			const int length = (int)formatString.length();
-			const char* fmtPtr = formatString.c_str();
+			const char* fmtPtr = formatString.data();
 			const char* fmtEnd = fmtPtr + length;
 
 			static FastStringStream result;
@@ -333,7 +328,7 @@ namespace lemon
 				}
 			}
 
-			return StringRef(runtime->addString(result.mBuffer, result.mLength));
+			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
 		}
 
 		StringRef stringformat1(StringRef format, uint64 arg1)
@@ -404,7 +399,7 @@ namespace lemon
 			if (!string.isValid())
 				return 0;
 
-			const std::string part = string->substr(index, length);
+			const std::string_view part = string->substr(index, length);
 			return runtime->addString(part);
 		}
 

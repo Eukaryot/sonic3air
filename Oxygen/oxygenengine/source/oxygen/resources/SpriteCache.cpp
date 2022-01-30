@@ -203,7 +203,7 @@ const SpriteCache::CacheItem* SpriteCache::getSprite(uint64 key)
 	{
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			const std::string* str = LemonScriptRuntime::tryResolveStringHash(key);
+			const std::string_view* str = LemonScriptRuntime::tryResolveStringHash(key);
 			if (nullptr != str)
 			{
 				RMX_ERROR("Invalid cache key with string '" << *str << "' (hash is " << rmx::hexString(key) << ")", );
@@ -288,7 +288,7 @@ SpriteDump& SpriteCache::getSpriteDump()
 	return *mSpriteDump;
 }
 
-void SpriteCache::dumpSprite(uint64 key, const std::string& categoryKey, uint8 spriteNumber, uint8 atex)
+void SpriteCache::dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex)
 {
 	const auto it = mCachedSprites.find(key);
 	if (it != mCachedSprites.end())

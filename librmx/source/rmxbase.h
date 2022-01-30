@@ -43,6 +43,7 @@
 #include "rmxbase/Sort.h"
 #include "rmxbase/CArray.h"
 #include "rmxbase/ObjectPool.h"
+#include "rmxbase/OneTimeAllocPool.h"
 #include "rmxbase/SingleInstance.h"
 #include "rmxbase/Singleton.h"
 #include "rmxbase/SinglePtr.h"

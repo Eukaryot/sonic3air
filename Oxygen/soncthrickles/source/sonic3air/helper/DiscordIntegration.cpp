@@ -335,28 +335,28 @@ void DiscordIntegration::updateInfo(Game::Mode gameMode, uint32 subMode, Emulato
 #endif
 }
 
-void DiscordIntegration::setModdedDetails(const std::string& text)
+void DiscordIntegration::setModdedDetails(std::string_view text)
 {
 #ifdef SUPPORT_DISCORD
 	newInfo.mModdedDetails = text;
 #endif
 }
 
-void DiscordIntegration::setModdedState(const std::string& text)
+void DiscordIntegration::setModdedState(std::string_view text)
 {
 #ifdef SUPPORT_DISCORD
 	newInfo.mModdedState = text;
 #endif
 }
 
-void DiscordIntegration::setModdedLargeImage(const std::string& imageName)
+void DiscordIntegration::setModdedLargeImage(std::string_view imageName)
 {
 #ifdef SUPPORT_DISCORD
 	newInfo.mModdedLargeImage = imageName;
 #endif
 }
 
-void DiscordIntegration::setModdedSmallImage(const std::string& imageName)
+void DiscordIntegration::setModdedSmallImage(std::string_view imageName)
 {
 #ifdef SUPPORT_DISCORD
 	newInfo.mModdedSmallImage = imageName;

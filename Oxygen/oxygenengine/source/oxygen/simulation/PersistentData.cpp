@@ -56,7 +56,7 @@ const std::vector<uint8>& PersistentData::getData(uint64 keyHash) const
 	return (it == mEntries.end()) ? EMPTY : it->second.mData;
 }
 
-void PersistentData::setData(const std::string& key, const std::vector<uint8>& data)
+void PersistentData::setData(std::string_view key, const std::vector<uint8>& data)
 {
 	const uint64 keyHash = rmx::getMurmur2_64(key);
 	const auto it = mEntries.find(keyHash);

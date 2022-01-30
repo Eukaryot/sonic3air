@@ -54,14 +54,14 @@ public:
 
 	DebugSidePanelCategory& createGameCategory(size_t identifier, const std::string& header, char shortCharacter, const std::function<void(DebugSidePanelCategory&,Builder&,uint64)>& callback);
 
-	bool setupCustomCategory(const std::string& header, char shortCharacter);
-	bool addOption(const std::string& text, bool defaultValue);
+	bool setupCustomCategory(std::string_view header, char shortCharacter);
+	bool addOption(std::string_view text, bool defaultValue);
 	void addEntry(uint64 key);
-	void addLine(const std::string& text, int indent, const Color& color);
+	void addLine(std::string_view text, int indent, const Color& color);
 	bool isEntryHovered(uint64 key);
 
 private:
-	DebugSidePanelCategory& addCategory(size_t identifier, const std::string& header, char shortCharacter = 0);
+	DebugSidePanelCategory& addCategory(size_t identifier, std::string_view header, char shortCharacter = 0);
 	void buildInternalCategoryContent(DebugSidePanelCategory& category, Builder& builder, Drawer& drawer);
 
 private:

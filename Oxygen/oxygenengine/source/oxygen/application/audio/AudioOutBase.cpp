@@ -97,7 +97,7 @@ void AudioOutBase::fadeOutChannel(uint8 channelId, float length)
 	mAudioPlayer.fadeOutChannel(channelId, length);
 }
 
-void AudioOutBase::enableAudioModifier(uint8 channelId, uint8 contextId, const std::string& postfix, float relativeSpeed)
+void AudioOutBase::enableAudioModifier(uint8 channelId, uint8 contextId, std::string_view postfix, float relativeSpeed)
 {
 	mAudioPlayer.enableAudioModifier(channelId, contextId, postfix, relativeSpeed);
 }

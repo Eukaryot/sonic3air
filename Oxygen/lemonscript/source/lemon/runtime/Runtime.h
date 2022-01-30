@@ -132,9 +132,7 @@ namespace lemon
 
 		bool hasStringWithKey(uint64 key) const;
 		const StoredString* resolveStringByKey(uint64 key) const;
-		uint64 addString(const std::string& str);
-		uint64 addString(const std::string_view& str);
-		uint64 addString(const char* str, size_t length);
+		uint64 addString(std::string_view str);
 
 		int64 getGlobalVariableValue(const Variable& variable);
 		void setGlobalVariableValue(const Variable& variable, int64 value);

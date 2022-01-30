@@ -49,7 +49,7 @@ public:
 	uint64 setupSpriteFromROM(uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, ROMSpriteEncoding encoding, int16 indexOffset = 0);
 
 	SpriteDump& getSpriteDump();
-	void dumpSprite(uint64 key, const std::string& categoryKey, uint8 spriteNumber, uint8 atex);
+	void dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex);
 
 private:
 	struct SheetCache
