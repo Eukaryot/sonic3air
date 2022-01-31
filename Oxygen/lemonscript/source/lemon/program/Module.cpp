@@ -65,7 +65,7 @@ namespace lemon
 		if (mFunctions.empty())
 		{
 			// It's the same here as for variables, see below
-			mFirstFunctionId = globalsLookup.mNextFunctionId;
+			mFirstFunctionID = globalsLookup.mNextFunctionID;
 		}
 
 		if (mGlobalVariables.empty())
@@ -73,7 +73,12 @@ namespace lemon
 			// This here only makes sense if no global variables got set previously
 			//  -> That's because the existing global variables are likely part of the globals lookup already
 			//  -> Unfortunately, this is only safe to assume for the first module -- TODO: How to handle other cases?
-			mFirstVariableId = globalsLookup.mNextVariableId;
+			mFirstVariableID = globalsLookup.mNextVariableID;
+		}
+
+		if (mConstantArrays.empty())
+		{
+			mFirstConstantArrayID = globalsLookup.mNextConstantArrayID;
 		}
 	}
 
@@ -139,7 +144,7 @@ namespace lemon
 	void Module::addFunctionInternal(Function& func)
 	{
 		RMX_ASSERT(mFunctions.size() < 0x10000, "Too many functions in module");
-		func.mId = mFirstFunctionId + (uint32)mFunctions.size();
+		func.mID = mFirstFunctionID + (uint32)mFunctions.size();
 		func.mNameHash = rmx::getMurmur2_64(func.mName);
 		func.mNameAndSignatureHash = func.mNameHash + func.getSignatureHash();
 		mFunctions.push_back(&func);
@@ -174,7 +179,7 @@ namespace lemon
 		variable.mName = name;
 		variable.mNameHash = nameHash;
 		variable.mDataType = dataType;
-		variable.mId = mFirstVariableId + (uint32)mGlobalVariables.size() + ((uint32)variable.mType << 28);
+		variable.mID = mFirstVariableID + (uint32)mGlobalVariables.size() + ((uint32)variable.mType << 28);
 		mGlobalVariables.emplace_back(&variable);
 	}
 
@@ -203,6 +208,7 @@ namespace lemon
 		ConstantArray& constantArray = mConstantArrayPool.createObject();
 		constantArray.mName = name;
 		constantArray.mElementDataType = elementDataType;
+		constantArray.mID = mFirstConstantArrayID + (uint32)mConstantArrays.size();
 		constantArray.setContent(values, size);
 		mConstantArrays.emplace_back(&constantArray);
 		return constantArray;
@@ -269,8 +275,8 @@ namespace lemon
 		VectorBinarySerializer serializer(outerSerializer.isReading(), uncompressed);
 
 		// Serialize module
-		serializer & mFirstFunctionId;
-		serializer & mFirstVariableId;
+		serializer & mFirstFunctionID;
+		serializer & mFirstVariableID;
 
 		// Serialize functions
 		{
@@ -431,8 +437,8 @@ namespace lemon
 						}
 
 						// Local variables
-						serializer.writeAs<uint32>(scriptFunc.mLocalVariablesById.size());
-						for (const LocalVariable* var : scriptFunc.mLocalVariablesById)
+						serializer.writeAs<uint32>(scriptFunc.mLocalVariablesByID.size());
+						for (const LocalVariable* var : scriptFunc.mLocalVariablesByID)
 						{
 							serializer.write(var->getName());
 							DataTypeHelper::writeDataType(serializer, var->getDataType());

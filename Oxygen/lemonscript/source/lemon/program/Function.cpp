@@ -124,7 +124,7 @@ namespace lemon
 
 	ScriptFunction::~ScriptFunction()
 	{
-		for (LocalVariable* variable : mLocalVariablesById)
+		for (LocalVariable* variable : mLocalVariablesByID)
 		{
 			mModule->destroyLocalVariable(*variable);
 		}
@@ -136,9 +136,9 @@ namespace lemon
 		return (it == mLocalVariablesByIdentifier.end()) ? nullptr : it->second;
 	}
 
-	LocalVariable& ScriptFunction::getLocalVariableById(uint32 id) const
+	LocalVariable& ScriptFunction::getLocalVariableByID(uint32 id) const
 	{
-		return *mLocalVariablesById[id];
+		return *mLocalVariablesByID[id];
 	}
 
 	LocalVariable& ScriptFunction::addLocalVariable(std::string_view identifier, uint64 nameHash, const DataTypeDefinition* dataType, uint32 lineNumber)
@@ -156,8 +156,8 @@ namespace lemon
 
 		mLocalVariablesByIdentifier.emplace(nameHash, &variable);
 
-		variable.mId = (uint32)mLocalVariablesById.size();
-		mLocalVariablesById.emplace_back(&variable);
+		variable.mID = (uint32)mLocalVariablesByID.size();
+		mLocalVariablesByID.emplace_back(&variable);
 
 		return variable;
 	}

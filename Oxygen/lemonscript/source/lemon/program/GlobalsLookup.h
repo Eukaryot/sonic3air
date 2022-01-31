@@ -54,17 +54,18 @@ namespace lemon
 	private:
 		// Functions
 		std::unordered_map<uint64, std::vector<Function*>> mFunctionsByName;	// Key is the hashed function name
-		uint32 mNextFunctionId = 0;
+		uint32 mNextFunctionID = 0;
 
 		// Variables
 		std::unordered_map<uint64, Variable*> mGlobalVariablesByName;
-		uint32 mNextVariableId = 0;
+		uint32 mNextVariableID = 0;
 
 		// Constants
 		std::unordered_map<uint64, Constant*> mConstantsByName;
 
 		// Constant arrays
 		std::unordered_map<uint64, ConstantArray*> mConstantArraysByName;
+		uint32 mNextConstantArrayID = 0;
 
 		// Defines
 		std::unordered_map<uint64, Define*> mDefinesByName;

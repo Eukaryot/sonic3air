@@ -13,16 +13,16 @@
 namespace profiling
 {
 	Profiling::Region mRootRegion;
-	std::map<uint16, Profiling::Region> mRegionsById;		// Does not contain root region
+	std::map<uint16, Profiling::Region> mRegionsByID;		// Does not contain root region
 	std::vector<Profiling::Region*> mAllRegions;
 	std::vector<Profiling::Region*> mRegionStack;
 	Profiling::AdditionalData mAdditionalData;
 	int mAccumulatedFrames = 0;
 
-	Profiling::Region* getRegionById(uint16 id)
+	Profiling::Region* getRegionByID(uint16 id)
 	{
-		const auto it = mRegionsById.find(id);
-		return (it == mRegionsById.end()) ? nullptr : &it->second;
+		const auto it = mRegionsByID.find(id);
+		return (it == mRegionsByID.end()) ? nullptr : &it->second;
 	}
 }
 
@@ -42,9 +42,9 @@ void Profiling::startup()
 
 void Profiling::registerRegion(uint16 id, const char* name, const Color& color)
 {
-	RMX_ASSERT(mRegionsById.count(id) == 0, "Profiling region with id " << id << " registered twice, second time with name '" << name << "'");
+	RMX_ASSERT(mRegionsByID.count(id) == 0, "Profiling region with id " << id << " registered twice, second time with name '" << name << "'");
 
-	Profiling::Region& region = mRegionsById[id];
+	Profiling::Region& region = mRegionsByID[id];
 	region.mName = name;
 	region.mColor = color;
 	mAllRegions.push_back(&region);
@@ -52,7 +52,7 @@ void Profiling::registerRegion(uint16 id, const char* name, const Color& color)
 
 void Profiling::pushRegion(uint16 id)
 {
-	Region* region = getRegionById(id);
+	Region* region = getRegionByID(id);
 	RMX_ASSERT(nullptr != region, "Profiling region with id " << id << " not found");
 	RMX_ASSERT(!region->mOnStack, "Profiling region with name '" << region->mName << "' is already on the stack");
 	RMX_ASSERT(mRegionStack.size() >= 1, "Profiling region stack got emptied before");
@@ -74,7 +74,7 @@ void Profiling::pushRegion(uint16 id)
 
 void Profiling::popRegion(uint16 id)
 {
-	Region* region = getRegionById(id);
+	Region* region = getRegionByID(id);
 	RMX_ASSERT(nullptr != region, "Profiling region with id " << id << " not found");
 	RMX_ASSERT(mRegionStack.size() >= 2, "Can't pop another profiling region from stack, that would remove the root region");
 	RMX_ASSERT(mRegionStack.back() == region, "Profiling region to be popped must be top of stack");

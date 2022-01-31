@@ -39,6 +39,9 @@ namespace lemon
 		mGlobalVariables.clear();
 		mGlobalVariablesByName.clear();
 
+		// Constant arrays
+		mConstantArraysByID.clear();
+
 		// Defines
 		mDefines.clear();
 	}
@@ -59,7 +62,7 @@ namespace lemon
 		// Functions
 		for (Function* function : module.mFunctions)
 		{
-			RMX_ASSERT(mFunctions.size() == function->getId(), "Mismatch between expected (" << mFunctions.size() << ") and actual function ID (" << function->getId() << ")");
+			RMX_ASSERT(mFunctions.size() == function->getID(), "Mismatch between expected (" << mFunctions.size() << ") and actual function ID (" << function->getID() << ")");
 			mFunctions.push_back(function);
 			if (function->getType() == Function::Type::SCRIPT)
 				mScriptFunctions.push_back(static_cast<ScriptFunction*>(function));
@@ -72,7 +75,7 @@ namespace lemon
 		// Global variables
 		for (Variable* variable : module.mGlobalVariables)
 		{
-			RMX_ASSERT(mGlobalVariables.size() == (variable->getId() & 0x0fffffff), "Mismatch between expected and actual variable ID");
+			RMX_ASSERT(mGlobalVariables.size() == (variable->getID() & 0x0fffffff), "Mismatch between expected and actual variable ID");
 			mGlobalVariables.push_back(variable);
 			mGlobalVariablesByName[variable->getNameHash()] = variable;
 		}
@@ -91,7 +94,7 @@ namespace lemon
 		output.saveFile(outputFilename);
 	}
 
-	const Function* Program::getFunctionById(uint32 id) const
+	const Function* Program::getFunctionByID(uint32 id) const
 	{
 		return mFunctions[id];
 	}
@@ -112,7 +115,7 @@ namespace lemon
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
-	Variable& Program::getGlobalVariableById(uint32 id) const
+	Variable& Program::getGlobalVariableByID(uint32 id) const
 	{
 		return *mGlobalVariables[id & 0x0fffffff];
 	}

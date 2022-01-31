@@ -505,7 +505,7 @@ lemon::Variable* LemonScriptProgram::getGlobalVariableByHash(uint64 hash) const
 
 void LemonScriptProgram::resolveLocation(uint32 functionId, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber) const
 {
-	const lemon::Function* function = mInternal.mProgram.getFunctionById(functionId);
+	const lemon::Function* function = mInternal.mProgram.getFunctionByID(functionId);
 	if (nullptr == function)
 	{
 		scriptFilename = *String(0, "<unknown function id %d>", functionId);

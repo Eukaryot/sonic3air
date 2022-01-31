@@ -27,6 +27,7 @@ namespace lemon
 		};
 
 	public:
+		static FunctionName BUILTIN_NAME_CONSTANT_ARRAY_ACCESS;
 		static FunctionName BUILTIN_NAME_STRING_OPERATOR_PLUS;
 		static FunctionName BUILTIN_NAME_STRING_OPERATOR_LESS;
 		static FunctionName BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL;

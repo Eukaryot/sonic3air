@@ -62,7 +62,7 @@ namespace lemon
 			--context.mControlFlow->mValueStackPtr;
 			const int64 value = *context.mControlFlow->mValueStackPtr;
 			const uint32 variableId = context.getParameter<uint32>();
-			GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableById(variableId));
+			GlobalVariable& variable = static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(variableId));
 			variable.setValue(value);
 		}
 
@@ -262,7 +262,7 @@ namespace lemon
 						SELECT_EXEC_FUNC_BY_DATATYPE(OptimizedOpcodeExec::exec_OPT_EXTERNAL_ADD_CONSTANT, opcodes[0].mDataType);
 
 						const uint32 variableId = (uint32)opcodes[0].mParameter;
-						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableById(variableId));
+						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 						runtimeOpcode.setParameter(variable.mPointer);
 						runtimeOpcode.setParameter(opcodes[1].mParameter, 8);
 						outNumOpcodesConsumed = 3;
@@ -324,7 +324,7 @@ namespace lemon
 
 						case Variable::Type::GLOBAL:
 						{
-							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableById(variableId));
+							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
 							runtimeOpcode.setParameter(value);
 
 							switch (DataTypeHelper::getSizeOfBaseType(opcodes[0].mDataType))
@@ -339,7 +339,7 @@ namespace lemon
 
 						case Variable::Type::EXTERNAL:
 						{
-							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableById(variableId));
+							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 							runtimeOpcode.setParameter(variable.mPointer);
 
 							switch (variable.getDataType()->mBytes)

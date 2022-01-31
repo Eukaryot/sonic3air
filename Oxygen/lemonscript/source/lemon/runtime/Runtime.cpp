@@ -262,8 +262,8 @@ namespace lemon
 
 	int64* Runtime::accessGlobalVariableValue(const Variable& variable)
 	{
-		RMX_CHECK((variable.getId() & 0xf0000000) == 0x10000000, "Variable " << variable.getName() << " is not a global variable", return nullptr);
-		const uint32 index = variable.getId() & 0x0fffffff;
+		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName() << " is not a global variable", return nullptr);
+		const uint32 index = variable.getID() & 0x0fffffff;
 		RMX_CHECK(index < mGlobalVariables.size(), "Variable index " << index << " is not valid", return nullptr);
 		return &mGlobalVariables[index];
 	}
@@ -317,7 +317,7 @@ namespace lemon
 		callFunction(*runtimeFunction);
 
 		// Build up scope accordingly (all local variables will have a value of zero, though)
-		int numLocalVars = (int)func.mLocalVariablesById.size();
+		int numLocalVars = (int)func.mLocalVariablesByID.size();
 		//for (size_t i = 0; i < offset; ++i)
 		//{
 		//	if (func.mOpcodes[i].mType == Opcode::Type::MOVE_VAR_STACK)
@@ -725,7 +725,7 @@ namespace lemon
 					Variable* variable = mProgram->getGlobalVariableByName(nameHash);
 					if (nullptr != variable && variable->getType() == Variable::Type::GLOBAL)
 					{
-						const size_t index = variable->getId() & 0x0fffffff;
+						const size_t index = variable->getID() & 0x0fffffff;
 						RMX_CHECK(index < mGlobalVariables.size(), "Invalid global variable index", continue);
 						mGlobalVariables[index] = value;
 					}

@@ -101,13 +101,13 @@ namespace lemon
 	void FunctionCompiler::processParameters()
 	{
 		// Check if anything to do at all (note that parameters are also local variables)
-		if (mFunction.mLocalVariablesById.empty())
+		if (mFunction.mLocalVariablesByID.empty())
 			return;
 
 		mLineNumber = mFunction.mStartLineNumber;
 
 		// Create scope
-		addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, mFunction.mLocalVariablesById.size());
+		addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, mFunction.mLocalVariablesByID.size());
 
 		// Go through parameters in reverse order
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
@@ -118,7 +118,7 @@ namespace lemon
 			RMX_ASSERT(variable->getDataType() == parameter.mType, "Variable has wrong type");
 
 			// Assume the variable value is on the stack
-			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getId());
+			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getID());
 
 			// Pop value from stack (as SET_VARIABLE_VALUE opcode does not consume it)
 			addOpcode(Opcode::Type::MOVE_STACK, BaseType::VOID, -1);
@@ -634,7 +634,7 @@ namespace lemon
 			{
 				const VariableToken& vt = token.as<VariableToken>();
 				const Opcode::Type opcodeType = isLValue ? Opcode::Type::SET_VARIABLE_VALUE : Opcode::Type::GET_VARIABLE_VALUE;
-				addOpcode(opcodeType, vt.mDataType, vt.mVariable->getId());
+				addOpcode(opcodeType, vt.mDataType, vt.mVariable->getID());
 				break;
 			}
 

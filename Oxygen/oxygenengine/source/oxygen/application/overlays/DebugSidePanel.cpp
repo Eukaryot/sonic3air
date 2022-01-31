@@ -435,7 +435,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 				{
 					if (nullptr != callFrame.mFunction)
 					{
-						const uint32 key = (callFrame.mAddress != 0xffffffff) ? callFrame.mAddress : (0x80000000 + callFrame.mFunction->getId());
+						const uint32 key = (callFrame.mAddress != 0xffffffff) ? callFrame.mAddress : (0x80000000 + callFrame.mFunction->getID());
 						functions.emplace(key, callFrame.mFunction);
 					}
 				}
@@ -501,7 +501,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 							ignoreDepth = 0;
 					}
 
-					const uint64 key = (nullptr == callFrame.mFunction) ? INVALID_KEY : callFrame.mFunction->getId();
+					const uint64 key = (nullptr == callFrame.mFunction) ? INVALID_KEY : callFrame.mFunction->getID();
 					const bool isOpen = (callFrame.mAnyChildFailed || callFrame.mDepth < 2 || category.mOpenKeys.count(key) != 0);
 
 					std::string postfix;

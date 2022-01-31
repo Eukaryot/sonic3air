@@ -45,10 +45,12 @@ namespace lemon
 			registerDefine(*define);
 		}
 
-		RMX_ASSERT(mNextFunctionId == module.mFirstFunctionId, "Mismatch in function ID when adding module '" << module.getModuleName() << "' (" << mNextFunctionId << " vs. " << module.mFirstFunctionId << ")");
-		RMX_ASSERT(mNextVariableId == module.mFirstVariableId, "Mismatch in variable ID when adding module '" << module.getModuleName() << "' (" << mNextVariableId << " vs. " << module.mFirstVariableId << ")");
-		mNextFunctionId += (uint32)module.mFunctions.size();
-		mNextVariableId += (uint32)module.mGlobalVariables.size();
+		RMX_ASSERT(mNextFunctionID == module.mFirstFunctionID, "Mismatch in function ID when adding module '" << module.getModuleName() << "' (" << mNextFunctionID << " vs. " << module.mFirstFunctionID << ")");
+		RMX_ASSERT(mNextVariableID == module.mFirstVariableID, "Mismatch in variable ID when adding module '" << module.getModuleName() << "' (" << mNextVariableID << " vs. " << module.mFirstVariableID << ")");
+		RMX_ASSERT(mNextConstantArrayID == module.mFirstConstantArrayID, "Mismatch in constant array ID when adding module '" << module.getModuleName() << "' (" << mNextConstantArrayID << " vs. " << module.mFirstConstantArrayID << ")");
+		mNextFunctionID += (uint32)module.mFunctions.size();
+		mNextVariableID += (uint32)module.mGlobalVariables.size();
+		mNextConstantArrayID += (uint32)module.mConstantArrays.size();
 	}
 
 	const std::vector<Function*>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const

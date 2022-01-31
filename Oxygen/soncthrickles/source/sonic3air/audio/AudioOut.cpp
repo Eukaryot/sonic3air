@@ -75,14 +75,14 @@ void AudioOut::realtimeUpdate(float secondsPassed)
 	if (mMusicVolume != config.mMusicVolume)
 	{
 		mMusicVolume = config.mMusicVolume;
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::INGAME_MUSIC, mMusicVolume);
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::MENU_MUSIC, mMusicVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_MUSIC, mMusicVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_MUSIC, mMusicVolume);
 	}
 	if (mSoundVolume != config.mSoundVolume)
 	{
 		mSoundVolume = config.mSoundVolume;
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::INGAME_SOUND, mSoundVolume);
-		FTX::Audio->setAudioMixerVolumeById((int)AudioMixerId::MENU_SOUND, mSoundVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::INGAME_SOUND, mSoundVolume);
+		FTX::Audio->setAudioMixerVolumeByID((int)AudioMixerId::MENU_SOUND, mSoundVolume);
 	}
 
 	// Call base implementation

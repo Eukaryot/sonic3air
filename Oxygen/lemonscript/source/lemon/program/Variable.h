@@ -36,7 +36,7 @@ namespace lemon
 		inline Type getType() const  { return mType; }
 		inline const std::string& getName() const  { return mName; }
 		inline uint64 getNameHash() const  { return mNameHash; }
-		inline uint32 getId() const  { return mId; }
+		inline uint32 getID() const  { return mID; }
 		inline const DataTypeDefinition* getDataType() const  { return mDataType; }
 
 	protected:
@@ -46,7 +46,7 @@ namespace lemon
 		Type mType;
 		std::string mName;
 		uint64 mNameHash = 0;
-		uint32 mId = 0;
+		uint32 mID = 0;
 		const DataTypeDefinition* mDataType = nullptr;
 	};
 

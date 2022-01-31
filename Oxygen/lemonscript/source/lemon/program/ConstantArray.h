@@ -22,6 +22,7 @@ namespace lemon
 	public:
 		inline const std::string& getName() const  { return mName; }
 		inline const DataTypeDefinition* getElementDataType() const  { return mElementDataType; }
+		inline uint32 getID() const  { return mID; }
 		
 		inline size_t getSize() const  { return mData.size(); }
 		void setSize(size_t size);
@@ -34,6 +35,7 @@ namespace lemon
 	private:
 		std::string mName;
 		const DataTypeDefinition* mElementDataType = nullptr;
+		uint32 mID = 0;
 		std::vector<uint64> mData;
 	};
 }

@@ -246,7 +246,7 @@ namespace lemon
 
 							case Variable::Type::USER:
 							{
-								line += "static_cast<GlobalVariable&>(context.mControlFlow->mProgram->getGlobalVariableById(";
+								line += "static_cast<GlobalVariable&>(context.mControlFlow->mProgram->getGlobalVariableByID(";
 								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
 								if (isWrite)
 								{

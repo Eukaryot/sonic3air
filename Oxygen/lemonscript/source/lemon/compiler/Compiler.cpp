@@ -683,7 +683,7 @@ namespace lemon
 
 		// Build scope context for processing
 		ScopeContext scopeContext;
-		for (LocalVariable* localVariable : function.mLocalVariablesById)
+		for (LocalVariable* localVariable : function.mLocalVariablesByID)
 		{
 			// All local variables so far have to be parameters; add each to the scope
 			scopeContext.mLocalVariables.push_back(localVariable);

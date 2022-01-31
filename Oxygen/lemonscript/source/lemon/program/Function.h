@@ -40,7 +40,7 @@ namespace lemon
 
 	public:
 		inline Type getType() const  { return mType; }
-		inline uint32 getId() const  { return mId; }
+		inline uint32 getID() const  { return mID; }
 
 		inline const std::string& getName() const { return mName; }
 		inline uint64 getNameHash() const { return mNameHash; }
@@ -59,7 +59,7 @@ namespace lemon
 
 	protected:
 		Type mType;
-		uint32 mId = 0;
+		uint32 mID = 0;
 
 		// Metadata
 		std::string mName;
@@ -83,7 +83,7 @@ namespace lemon
 		inline void setModule(Module& module)	{ mModule = &module; }
 
 		LocalVariable* getLocalVariableByIdentifier(uint64 nameHash) const;
-		LocalVariable& getLocalVariableById(uint32 id) const;
+		LocalVariable& getLocalVariableByID(uint32 id) const;
 		LocalVariable& addLocalVariable(std::string_view identifier, uint64 nameHash, const DataTypeDefinition* dataType, uint32 lineNumber);
 
 		bool getLabel(std::string_view labelName, size_t& outOffset) const;
@@ -97,7 +97,7 @@ namespace lemon
 	public:
 		// Variables
 		std::map<uint64, LocalVariable*> mLocalVariablesByIdentifier;
-		std::vector<LocalVariable*> mLocalVariablesById;
+		std::vector<LocalVariable*> mLocalVariablesByID;
 
 		// Code
 		std::vector<Opcode> mOpcodes;

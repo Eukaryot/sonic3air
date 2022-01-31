@@ -83,14 +83,14 @@ namespace lemon
 		uint64 mModuleId = 0;
 
 		// Functions
-		uint32 mFirstFunctionId = 0;
+		uint32 mFirstFunctionID = 0;
 		std::vector<Function*> mFunctions;
 		std::vector<ScriptFunction*> mScriptFunctions;
 		ObjectPool<ScriptFunction, 64> mScriptFunctionPool;
 		ObjectPool<UserDefinedFunction, 16> mUserDefinedFunctionPool;
 
 		// Variables
-		uint32 mFirstVariableId = 0;
+		uint32 mFirstVariableID = 0;
 		std::vector<Variable*> mGlobalVariables;
 		ObjectPool<LocalVariable, 16> mLocalVariablesPool;
 
@@ -99,6 +99,7 @@ namespace lemon
 		ObjectPool<Constant, 64> mConstantPool;
 
 		// Constant arrays
+		uint32 mFirstConstantArrayID = 0;
 		std::vector<ConstantArray*> mConstantArrays;
 		ObjectPool<ConstantArray, 16> mConstantArrayPool;
 

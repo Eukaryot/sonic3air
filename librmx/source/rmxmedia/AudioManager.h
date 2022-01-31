@@ -82,11 +82,11 @@ namespace rmx
 			return *audioMixer;
 		}
 
-		AudioMixer* getAudioMixerById(int mixerId) const;
-		void deleteAudioMixerById(int mixerId);
+		AudioMixer* getAudioMixerByID(int mixerId) const;
+		void deleteAudioMixerByID(int mixerId);
 
-		float getAudioMixerVolumeById(int mixerId) const;
-		void setAudioMixerVolumeById(int mixerId, float relativeVolume);
+		float getAudioMixerVolumeByID(int mixerId) const;
+		void setAudioMixerVolumeByID(int mixerId, float relativeVolume);
 
 		bool addSound(const PlaybackOptions& playbackOptions, AudioReference& ref);
 		int addSound(AudioBuffer* audiobuffer, bool streaming = false);							// Deprecated

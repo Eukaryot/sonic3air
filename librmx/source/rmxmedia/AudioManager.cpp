@@ -195,27 +195,27 @@ namespace rmx
 		mRootMixer.setVolume(volume);
 	}
 
-	AudioMixer* AudioManager::getAudioMixerById(int mixerId) const
+	AudioMixer* AudioManager::getAudioMixerByID(int mixerId) const
 	{
 		const auto it = mAudioMixers.find(mixerId);
 		return (it == mAudioMixers.end()) ? nullptr : it->second;
 	}
 
-	void AudioManager::deleteAudioMixerById(int mixerId)
+	void AudioManager::deleteAudioMixerByID(int mixerId)
 	{
 		RMX_ASSERT(mixerId != 0, "Can't delete root audio mixer (with ID 0)");
 		mAudioMixers.erase(mixerId);
 	}
 
-	float AudioManager::getAudioMixerVolumeById(int mixerId) const
+	float AudioManager::getAudioMixerVolumeByID(int mixerId) const
 	{
-		const AudioMixer* audioMixer = getAudioMixerById(mixerId);
+		const AudioMixer* audioMixer = getAudioMixerByID(mixerId);
 		return (nullptr != audioMixer) ? audioMixer->getVolume() : 0.0f;
 	}
 
-	void AudioManager::setAudioMixerVolumeById(int mixerId, float relativeVolume)
+	void AudioManager::setAudioMixerVolumeByID(int mixerId, float relativeVolume)
 	{
-		AudioMixer* audioMixer = getAudioMixerById(mixerId);
+		AudioMixer* audioMixer = getAudioMixerByID(mixerId);
 		if (nullptr != audioMixer)
 		{
 			audioMixer->setVolume(relativeVolume);
@@ -227,7 +227,7 @@ namespace rmx
 		if (nullptr == playbackOptions.mAudioBuffer)
 			return false;
 
-		AudioMixer* audioMixer = getAudioMixerById(playbackOptions.mAudioMixerId);
+		AudioMixer* audioMixer = getAudioMixerByID(playbackOptions.mAudioMixerId);
 		if (nullptr == audioMixer)
 			return false;
 
@@ -377,7 +377,7 @@ namespace rmx
 		mAudioMixers[audioMixer.mMixerId] = &audioMixer;
 
 		// Register at (new) parent
-		AudioMixer* parent = getAudioMixerById(parentMixerId);
+		AudioMixer* parent = getAudioMixerByID(parentMixerId);
 		if (nullptr == parent)
 			parent = &mRootMixer;
 		parent->addChild(audioMixer);

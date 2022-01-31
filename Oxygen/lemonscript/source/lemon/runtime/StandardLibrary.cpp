@@ -10,6 +10,7 @@
 #include "lemon/runtime/StandardLibrary.h"
 #include "lemon/program/FunctionWrapper.h"
 #include "lemon/program/Module.h"
+#include "lemon/program/Program.h"
 
 
 namespace
@@ -116,6 +117,16 @@ namespace lemon
 {
 	namespace builtins
 	{
+		template<typename T>
+		T constant_array_access(uint32 id, uint32 index)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
+			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return 0);
+			return (T)constantArrays[id]->getElement(index);
+		}
+
 		StringRef string_operator_plus(StringRef str1, StringRef str2)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
@@ -414,6 +425,7 @@ namespace lemon
 
 
 
+	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_CONSTANT_ARRAY_ACCESS("#builtin_constant_array_access");
 	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS("#builtin_string_operator_plus");
 	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS("#builtin_string_operator_less");
 	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL("#builtin_string_operator_less_equal");
@@ -434,6 +446,15 @@ namespace lemon
 
 		// Register built-in functions, which are directly referenced by the compiler
 		{
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int8>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint8>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int16>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint16>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int32>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint32>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int64>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint64>), flags);
+
 			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.mName, lemon::wrap(&builtins::string_operator_plus), flags);
 			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.mName, lemon::wrap(&builtins::string_operator_less), flags);
 			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.mName, lemon::wrap(&builtins::string_operator_less_or_equal), flags);
