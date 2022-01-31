@@ -6,6 +6,9 @@ constant u8 ONE = 1
 
 function void main()
 {
+	for (u8 i = 0; i < 21; ++i)
+		debugLog(stringformat("[%d] = %d", i, LEMONSCRIPT_PRIME_NUMBER_LOOKUP[i]))
+
 	string hello = "Hello " + "World!"
 	Log = hello.length()
 

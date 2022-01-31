@@ -50,6 +50,7 @@ namespace lemon
 		void processVariableDefinitions(TokenList& tokens);
 		void processFunctionCalls(TokenList& tokens);
 		void processMemoryAccesses(TokenList& tokens);
+		void processArrayAccesses(TokenList& tokens);
 		void processExplicitCasts(TokenList& tokens);
 		void processIdentifiers(TokenList& tokens);
 

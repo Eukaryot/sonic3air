@@ -48,7 +48,7 @@ namespace lemon
 		Variable* getGlobalVariableByName(uint64 nameHash) const;
 
 		// Constant arrays
-		inline const std::vector<ConstantArray*>& getConstantArrays() const  { return mConstantArraysByID; }
+		inline const std::vector<ConstantArray*>& getConstantArrays() const  { return mConstantArrays; }
 
 		// Defines
 		inline const std::vector<Define*>& getDefines() const  { return mDefines; }
@@ -74,7 +74,7 @@ namespace lemon
 		std::unordered_map<uint64, Variable*> mGlobalVariablesByName;
 
 		// Constant arrays
-		std::vector<ConstantArray*> mConstantArraysByID;
+		std::vector<ConstantArray*> mConstantArrays;
 
 		// Defines
 		std::vector<Define*> mDefines;

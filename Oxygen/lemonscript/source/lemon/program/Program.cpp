@@ -40,7 +40,7 @@ namespace lemon
 		mGlobalVariablesByName.clear();
 
 		// Constant arrays
-		mConstantArraysByID.clear();
+		mConstantArrays.clear();
 
 		// Defines
 		mDefines.clear();
@@ -60,6 +60,8 @@ namespace lemon
 		mModules.push_back(&module);
 
 		// Functions
+		mFunctions.reserve(mFunctions.size() + module.mFunctions.size());
+		mScriptFunctions.reserve(mScriptFunctions.size() + module.mFunctions.size());	// This is possibly an overestimation, but that's okay
 		for (Function* function : module.mFunctions)
 		{
 			RMX_ASSERT(mFunctions.size() == function->getID(), "Mismatch between expected (" << mFunctions.size() << ") and actual function ID (" << function->getID() << ")");
@@ -73,6 +75,7 @@ namespace lemon
 		}
 
 		// Global variables
+		mGlobalVariables.reserve(mGlobalVariables.size() + module.mGlobalVariables.size());
 		for (Variable* variable : module.mGlobalVariables)
 		{
 			RMX_ASSERT(mGlobalVariables.size() == (variable->getID() & 0x0fffffff), "Mismatch between expected and actual variable ID");
@@ -80,7 +83,15 @@ namespace lemon
 			mGlobalVariablesByName[variable->getNameHash()] = variable;
 		}
 
+		// Constant arrays
+		mConstantArrays.reserve(mConstantArrays.size() + module.mConstantArrays.size());
+		for (ConstantArray* constantArray : module.mConstantArrays)
+		{
+			mConstantArrays.push_back(constantArray);
+		}
+
 		// Defines
+		mDefines.reserve(mDefines.size() + module.mDefines.size());
 		for (Define* define : module.mDefines)
 		{
 			mDefines.push_back(define);

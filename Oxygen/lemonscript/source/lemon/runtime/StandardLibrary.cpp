@@ -440,7 +440,7 @@ namespace lemon
 
 		// Just a test!
 		{
-			const uint64 primes[20] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 53, 59, 61, 67, 71 };
+			const uint64 primes[20] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 53, 59, 61, 67, 71, 73 };
 			module.addConstantArray("LEMONSCRIPT_PRIME_NUMBER_LOOKUP", &PredefinedDataTypes::INT_16, primes, 20);
 		}
 
