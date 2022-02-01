@@ -65,8 +65,30 @@ namespace lemon
 			}
 			return false;
 		}
+
+		void fillCachedBuiltinFunction(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const StandardLibrary::FunctionName& functionName, bool allowOnlyOne)
+		{
+			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
+			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
+			if (allowOnlyOne)
+				RMX_ASSERT(functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
+			outCached.mFunctions = functions;
+		}
 	}
 
+
+	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, const GlobalCompilerConfig& config) :
+		mGlobalsLookup(globalsLookup),
+		mConfig(config)
+	{
+		fillCachedBuiltinFunction(mBuiltinConstantArrayAccess,			globalsLookup, StandardLibrary::BUILTIN_NAME_CONSTANT_ARRAY_ACCESS, false);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorPlus,			globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorLess,			globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorLessOrEqual,	globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorGreater,		globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER, true);
+		fillCachedBuiltinFunction(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL, true);
+		fillCachedBuiltinFunction(mBuiltinStringLength,					globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_LENGTH, true);
+	}
 
 	void TokenProcessing::processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType)
 	{
@@ -133,7 +155,7 @@ namespace lemon
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
 				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mNameHash;
-				const Define* define = mContext.mGlobalsLookup.getDefineByName(identifierHash);
+				const Define* define = mGlobalsLookup.getDefineByName(identifierHash);
 				if (nullptr != define)
 				{
 					tokens.erase(i);
@@ -155,7 +177,7 @@ namespace lemon
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
 				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mNameHash;
-				const Constant* constant = mContext.mGlobalsLookup.getConstantByName(identifierHash);
+				const Constant* constant = mGlobalsLookup.getConstantByName(identifierHash);
 				if (nullptr != constant)
 				{
 					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
@@ -321,7 +343,7 @@ namespace lemon
 						{
 							variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, identifierToken.mNameHash, varType, mLineNumber);
 						}
-						mContext.mLocalVariables.push_back(variable);
+						mContext.mLocalVariables->push_back(variable);
 
 						VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 						token.mVariable = variable;
@@ -329,6 +351,7 @@ namespace lemon
 
 						tokens.erase(i+1);
 					}
+					break;
 				}
 
 				default:
@@ -355,7 +378,7 @@ namespace lemon
 					const Variable* thisPointer = nullptr;
 
 					bool isValidFunctionCall = false;
-					if (!mContext.mGlobalsLookup.getFunctionsByName(nameHash).empty())
+					if (!mGlobalsLookup.getFunctionsByName(nameHash).empty())
 					{
 						// Is it a global function
 						isValidFunctionCall = true;
@@ -375,18 +398,11 @@ namespace lemon
 						{
 							const std::string_view variableName = functionName.substr(0, functionName.length() - 7);
 							const Variable* variable = findVariable(rmx::getMurmur2_64(variableName));
-							if (nullptr != variable)
+							if (nullptr != variable && variable->getDataType() == &PredefinedDataTypes::STRING)
 							{
-								if (variable->getDataType() == &PredefinedDataTypes::STRING)
-								{
-									const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(StandardLibrary::BUILTIN_NAME_STRING_LENGTH.mHash);
-									if (!functions.empty())
-									{
-										function = functions[0];
-										thisPointer = variable;
-										isValidFunctionCall = true;
-									}
-								}
+								function = mBuiltinStringLength.mFunctions[0];
+								thisPointer = variable;
+								isValidFunctionCall = true;
 							}
 						}
 					}
@@ -453,7 +469,7 @@ namespace lemon
 						}
 						else
 						{
-							const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(nameHash);
+							const std::vector<Function*>& functions = mGlobalsLookup.getFunctionsByName(nameHash);
 							CHECK_ERROR(!functions.empty(), "Unknown function name '" << functionName << "'", mLineNumber);
 
 							// Find best-fitting correct function overload
@@ -522,7 +538,7 @@ namespace lemon
 				{
 					// Check the identifier
 					const uint64 arrayNameHash = tokens[i].as<IdentifierToken>().mNameHash;
-					const ConstantArray* constantArray = mContext.mGlobalsLookup.getConstantArrayByName(arrayNameHash);
+					const ConstantArray* constantArray = mGlobalsLookup.getConstantArrayByName(arrayNameHash);
 					if (nullptr != constantArray)
 					{
 						TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
@@ -530,15 +546,12 @@ namespace lemon
 						CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
 						const Function* matchingFunction = nullptr;
+						for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
 						{
-							const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(StandardLibrary::BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mHash);
-							for (const Function* function : functions)
+							if (function->getReturnType() == constantArray->getElementDataType())
 							{
-								if (function->getReturnType() == constantArray->getElementDataType())
-								{
-									matchingFunction = function;
-									break;
-								}
+								matchingFunction = function;
+								break;
 							}
 						}
 						if (nullptr == matchingFunction)
@@ -835,24 +848,20 @@ namespace lemon
 					// Special handling for certain operations with two strings
 					if (leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)
 					{
-						StandardLibrary::FunctionName* functionName = nullptr;
+						CachedBuiltinFunction* cachedBuiltinFunction = nullptr;
 						switch (bot.mOperator)
 						{
-							case Operator::BINARY_PLUS:				 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS;  break;
-							case Operator::COMPARE_LESS:			 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS;  break;
-							case Operator::COMPARE_LESS_OR_EQUAL:	 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL;  break;
-							case Operator::COMPARE_GREATER:			 functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER;  break;
-							case Operator::COMPARE_GREATER_OR_EQUAL: functionName = &StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL;  break;
+							case Operator::BINARY_PLUS:				 cachedBuiltinFunction = &mBuiltinStringOperatorPlus;  break;
+							case Operator::COMPARE_LESS:			 cachedBuiltinFunction = &mBuiltinStringOperatorLess;  break;
+							case Operator::COMPARE_LESS_OR_EQUAL:	 cachedBuiltinFunction = &mBuiltinStringOperatorLessOrEqual;  break;
+							case Operator::COMPARE_GREATER:			 cachedBuiltinFunction = &mBuiltinStringOperatorGreater;  break;
+							case Operator::COMPARE_GREATER_OR_EQUAL: cachedBuiltinFunction = &mBuiltinStringOperatorGreaterOrEqual;  break;
 							default: break;
 						}
 
-						if (nullptr != functionName)
+						if (nullptr != cachedBuiltinFunction)
 						{
-							// TODO: How about some kind of caching for that specific function?
-							const std::vector<Function*>& functions = mContext.mGlobalsLookup.getFunctionsByName(functionName->mHash);
-							CHECK_ERROR(functions.size() != 0, "Unable to find built-in function '" << functionName->mName << "'", mLineNumber);
-							CHECK_ERROR(functions.size() == 1, "Multiple definitions for built-in function '" << functionName->mName << "'", mLineNumber);
-							bot.mFunction = functions[0];
+							bot.mFunction = cachedBuiltinFunction->mFunctions[0];
 							token.mDataType = &PredefinedDataTypes::STRING;
 							break;
 						}
@@ -916,14 +925,14 @@ namespace lemon
 		if (nullptr == variable)
 		{
 			// Maybe it's a global variable
-			variable = mContext.mGlobalsLookup.getGlobalVariableByName(nameHash);
+			variable = mGlobalsLookup.getGlobalVariableByName(nameHash);
 		}
 		return variable;
 	}
 
 	LocalVariable* TokenProcessing::findLocalVariable(uint64 nameHash)
 	{
-		for (LocalVariable* var : mContext.mLocalVariables)
+		for (LocalVariable* var : *mContext.mLocalVariables)
 		{
 			if (var->getNameHash() == nameHash)
 				return var;

@@ -12,14 +12,14 @@
 #include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/Errors.h"
 #include "lemon/compiler/LineNumberTranslation.h"
-#include "lemon/compiler/PreprocessorDefinition.h"
+#include "lemon/compiler/Preprocessor.h"
+#include "lemon/compiler/TokenProcessing.h"
 
 
 namespace lemon
 {
 	class Module;
 	class GlobalsLookup;
-	class Preprocessor;
 	class ScriptFunction;
 	class LocalVariable;
 	class Node;
@@ -48,7 +48,6 @@ namespace lemon
 		};
 
 	public:
-		Compiler(Module& module, GlobalsLookup& globalsLookup);
 		Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
 		~Compiler();
 
@@ -107,7 +106,9 @@ namespace lemon
 		GlobalsLookup& mGlobalsLookup;
 		CompileOptions mCompileOptions;
 		GlobalCompilerConfig mGlobalCompilerConfig;
-		Preprocessor& mPreprocessor;		// Must stay alive as it holds the modified code lines
+
+		TokenProcessing mTokenProcessing;
+		Preprocessor mPreprocessor;
 
 		struct ScriptFile
 		{

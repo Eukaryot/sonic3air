@@ -15,12 +15,13 @@ namespace lemon
 {
 	class Parser;
 	class StatementToken;
+	class TokenProcessing;
 	struct GlobalCompilerConfig;
 
 	class Preprocessor
 	{
 	public:
-		Preprocessor(const GlobalCompilerConfig& config);
+		Preprocessor(const GlobalCompilerConfig& config, TokenProcessing& tokenProcessing);
 
 		void processLines(std::vector<std::string_view>& lines);
 
@@ -35,6 +36,7 @@ namespace lemon
 
 	private:
 		const GlobalCompilerConfig& mConfig;
+		TokenProcessing& mTokenProcessing;
 		std::string mBufferString;
 		uint32 mLineNumber;
 	};

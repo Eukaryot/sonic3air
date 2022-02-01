@@ -18,7 +18,6 @@
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/helper/Utils.h"
 
-#include <lemon/compiler/Compiler.h>
 #include <lemon/compiler/TokenManager.h>
 #include <lemon/program/GlobalsLookup.h>
 #include <lemon/program/Module.h>

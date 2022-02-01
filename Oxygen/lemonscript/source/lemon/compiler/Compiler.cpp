@@ -13,7 +13,6 @@
 #include "lemon/compiler/Parser.h"
 #include "lemon/compiler/ParserTokens.h"
 #include "lemon/compiler/Preprocessor.h"
-#include "lemon/compiler/TokenProcessing.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
@@ -55,18 +54,12 @@ namespace lemon
 	};
 
 
-	Compiler::Compiler(Module& module, GlobalsLookup& globalsLookup) :
-		mModule(module),
-		mGlobalsLookup(globalsLookup),
-		mPreprocessor(*new Preprocessor(mGlobalCompilerConfig))
-	{
-	}
-
 	Compiler::Compiler(Module& module, GlobalsLookup& globalsLookup, const CompileOptions& compileOptions) :
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
 		mCompileOptions(compileOptions),
-		mPreprocessor(*new Preprocessor(mGlobalCompilerConfig))
+		mTokenProcessing(globalsLookup, mGlobalCompilerConfig),
+		mPreprocessor(mGlobalCompilerConfig, mTokenProcessing)
 	{
 	}
 
@@ -75,8 +68,6 @@ namespace lemon
 		// Free some memory again, by shrinking at least the largest pools
 		genericmanager::Manager<Node>::shrinkAllPools();
 		genericmanager::Manager<Token>::shrinkAllPools();
-
-		delete &mPreprocessor;
 	}
 
 	bool Compiler::loadScript(const std::wstring& path)
@@ -752,9 +743,9 @@ namespace lemon
 				case Keyword::RETURN:
 				{
 					// Process tokens
-					const TokenProcessing::Context context(mGlobalsLookup, scopeContext.mLocalVariables, &function);
-					TokenProcessing tokenProcessing(context, mGlobalCompilerConfig);
-					tokenProcessing.processTokens(tokens, lineNumber);
+					mTokenProcessing.mContext.mFunction = &function;
+					mTokenProcessing.mContext.mLocalVariables = &scopeContext.mLocalVariables;
+					mTokenProcessing.processTokens(tokens, lineNumber);
 
 					if (tokens.size() > 1)
 					{
@@ -1044,9 +1035,9 @@ namespace lemon
 
 	void Compiler::processTokens(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, uint32 lineNumber, const DataTypeDefinition* resultType)
 	{
-		const TokenProcessing::Context context(mGlobalsLookup, scopeContext.mLocalVariables, &function);
-		TokenProcessing tokenProcessing(context, mGlobalCompilerConfig);
-		tokenProcessing.processTokens(tokens, lineNumber, resultType);
+		mTokenProcessing.mContext.mFunction = &function;
+		mTokenProcessing.mContext.mLocalVariables = &scopeContext.mLocalVariables;
+		mTokenProcessing.processTokens(tokens, lineNumber, resultType);
 	}
 
 	bool Compiler::processGlobalPragma(const std::string& content)

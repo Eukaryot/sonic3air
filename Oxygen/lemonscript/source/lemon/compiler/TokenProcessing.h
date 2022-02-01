@@ -14,11 +14,12 @@
 
 namespace lemon
 {
+	class Function;
+	class LocalVariable;
 	class GlobalsLookup;
 	class ScriptFunction;
-	class LocalVariable;
-	class TokenList;
 	class StatementToken;
+	class TokenList;
 	struct GlobalCompilerConfig;
 
 	class TokenProcessing
@@ -26,17 +27,20 @@ namespace lemon
 	public:
 		struct Context
 		{
-			GlobalsLookup& mGlobalsLookup;
-			std::vector<LocalVariable*>& mLocalVariables;
+			std::vector<LocalVariable*>* mLocalVariables = nullptr;
 			ScriptFunction* mFunction = nullptr;
+		};
 
-			inline Context(GlobalsLookup& globalsLookup, std::vector<LocalVariable*>& localVariables, ScriptFunction* function) :
-				mGlobalsLookup(globalsLookup), mLocalVariables(localVariables), mFunction(function)
-			{}
+		struct CachedBuiltinFunction
+		{
+			std::vector<Function*> mFunctions;
 		};
 
 	public:
-		inline TokenProcessing(const Context& context, const GlobalCompilerConfig& config) : mContext(context), mConfig(config) {}
+		Context mContext;
+
+	public:
+		TokenProcessing(GlobalsLookup& globalsLookup, const GlobalCompilerConfig& config);
 
 		void processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
@@ -64,9 +68,17 @@ namespace lemon
 		LocalVariable* findLocalVariable(uint64 nameHash);
 
 	private:
-		const Context& mContext;
+		GlobalsLookup& mGlobalsLookup;
 		const GlobalCompilerConfig& mConfig;
 		uint32 mLineNumber = 0;
+
+		CachedBuiltinFunction mBuiltinConstantArrayAccess;
+		CachedBuiltinFunction mBuiltinStringOperatorPlus;
+		CachedBuiltinFunction mBuiltinStringOperatorLess;
+		CachedBuiltinFunction mBuiltinStringOperatorLessOrEqual;
+		CachedBuiltinFunction mBuiltinStringOperatorGreater;
+		CachedBuiltinFunction mBuiltinStringOperatorGreaterOrEqual;
+		CachedBuiltinFunction mBuiltinStringLength;
 	};
 
 }
