@@ -8,6 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/program/ConstantArray.h"
+#include "lemon/program/DataType.h"
 
 
 namespace lemon
@@ -34,6 +35,71 @@ namespace lemon
 		if (index < mData.size())
 		{
 			mData[index] = value;
+		}
+	}
+
+	void ConstantArray::serializeData(VectorBinarySerializer& serializer)
+	{
+		serializer.serializeArraySize(mData);
+		if (serializer.isReading())
+		{
+			switch (mElementDataType->mBytes)
+			{
+				case 1:
+				{
+					for (uint64& value : mData)
+						value = (uint64)serializer.read<uint8>();
+					break;
+				}
+				case 2:
+				{
+					for (uint64& value : mData)
+						value = (uint64)serializer.read<uint16>();
+					break;
+				}
+				case 4:
+				{
+					for (uint64& value : mData)
+						value = (uint64)serializer.read<uint32>();
+					break;
+				}
+				case 8:
+				{
+					for (uint64& value : mData)
+						value = serializer.read<uint64>();
+					break;
+				}
+			}
+		}
+		else
+		{
+			switch (mElementDataType->mBytes)
+			{
+				case 1:
+				{
+					for (uint64& value : mData)
+						serializer.write<uint8>((uint8)value);
+					break;
+				}
+				case 2:
+				{
+					for (uint64& value : mData)
+						serializer.write<uint16>((uint16)value);
+					break;
+				}
+				case 4:
+				{
+					for (uint64& value : mData)
+						serializer.write<uint32>((uint32)value);
+					break;
+				}
+				case 8:
+				{
+					for (uint64& value : mData)
+						serializer.write(value);
+					break;
+				}
+			}
 		}
 	}
 }

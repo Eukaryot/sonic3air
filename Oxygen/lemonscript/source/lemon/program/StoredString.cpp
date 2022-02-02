@@ -15,6 +15,7 @@ namespace lemon
 	StringLookup::StringLookup()
 	{
 		mMemoryPool.setPageSize(0x2000);
+		getOrAddString("", 0);	// Register the empty string under hash 0, even though that's not the actual hash...
 	}
 
 	void StringLookup::clear()
@@ -33,6 +34,7 @@ namespace lemon
 		mEntryPool.clear();
 		mNumEntries = 0;
 		mMemoryPool.clear();
+		getOrAddString("", 0);	// Register the empty string under hash 0, even though that's not the actual hash...
 	}
 
 	const StoredString* StringLookup::getStringByHash(uint64 hash) const
@@ -74,6 +76,7 @@ namespace lemon
 		{
 			const char* EMPTY_STRING = "";
 			strContent = EMPTY_STRING;
+			hash = 0;	// Enforce hash 0 for empty strings
 		}
 		else
 		{

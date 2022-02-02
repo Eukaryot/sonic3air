@@ -4,10 +4,26 @@
 
 constant u8 ONE = 1
 
+constant array<u8> fibonacci =
+{
+	1, 1, 2, 3,
+	5, 8, 13, 21,	// Some numbers, in multiple lines
+	34, 55,
+}
+
+constant array<string> strings =
+{
+	"ABC", "DEF", "GHIJKL", "MNOP", "QRSTUV"
+}
+
+
 function void main()
 {
-	for (u8 i = 0; i < 21; ++i)
-		debugLog(stringformat("[%d] = %d", i, LEMONSCRIPT_PRIME_NUMBER_LOOKUP[i]))
+	for (u8 i = 0; i < 11; ++i)
+	{
+		debugLog(stringformat("[%d] = %d", i, fibonacci[i]))
+		//debugLog(stringformat("[%d] = %s", i, strings[i]))
+	}
 
 	string hello = "Hello " + "World!"
 	Log = hello.length()

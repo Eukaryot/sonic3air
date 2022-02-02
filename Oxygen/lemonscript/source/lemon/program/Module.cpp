@@ -209,7 +209,10 @@ namespace lemon
 		constantArray.mName = name;
 		constantArray.mElementDataType = elementDataType;
 		constantArray.mID = mFirstConstantArrayID + (uint32)mConstantArrays.size();
-		constantArray.setContent(values, size);
+		if (nullptr != values)
+			constantArray.setContent(values, size);
+		else if (size > 0)
+			constantArray.setSize(size);
 		mConstantArrays.emplace_back(&constantArray);
 		return constantArray;
 	}
@@ -527,6 +530,33 @@ namespace lemon
 					serializer.write(constant->getName());
 					DataTypeHelper::writeDataType(serializer, constant->getDataType());
 					serializer.write(constant->mValue);
+				}
+			}
+		}
+
+		// Serialize constant arrays
+		{
+			uint32 numberOfConstantArrays = (uint32)mConstantArrays.size();
+			serializer & numberOfConstantArrays;
+
+			// TODO: Serialize constant array data in a more compact way, unless they're actual 64-bit values
+			if (serializer.isReading())
+			{
+				for (uint32 i = 0; i < numberOfConstantArrays; ++i)
+				{
+					const std::string_view name = serializer.readStringView();
+					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
+					ConstantArray& constantArray = addConstantArray(name, dataType, nullptr, 0);
+					constantArray.serializeData(serializer);
+				}
+			}
+			else
+			{
+				for (ConstantArray* constantArray : mConstantArrays)
+				{
+					serializer.write(constantArray->getName());
+					DataTypeHelper::writeDataType(serializer, constantArray->getElementDataType());
+					constantArray->serializeData(serializer);
 				}
 			}
 		}

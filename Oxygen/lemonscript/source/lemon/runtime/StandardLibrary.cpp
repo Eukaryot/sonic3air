@@ -127,6 +127,16 @@ namespace lemon
 			return (T)constantArrays[id]->getElement(index);
 		}
 
+		template<>
+		StringRef constant_array_access(uint32 id, uint32 index)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
+			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return StringRef());
+			return StringRef(constantArrays[id]->getElement(index));
+		}
+
 		StringRef string_operator_plus(StringRef str1, StringRef str2)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
@@ -438,12 +448,6 @@ namespace lemon
 	{
 		const uint8 flags = UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
 
-		// Just a test!
-		{
-			const uint64 primes[20] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 53, 59, 61, 67, 71, 73 };
-			module.addConstantArray("LEMONSCRIPT_PRIME_NUMBER_LOOKUP", &PredefinedDataTypes::INT_16, primes, 20);
-		}
-
 		// Register built-in functions, which are directly referenced by the compiler
 		{
 			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int8>), flags);
@@ -454,6 +458,7 @@ namespace lemon
 			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint32>), flags);
 			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int64>), flags);
 			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint64>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<StringRef>), flags);
 
 			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.mName, lemon::wrap(&builtins::string_operator_plus), flags);
 			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.mName, lemon::wrap(&builtins::string_operator_less), flags);

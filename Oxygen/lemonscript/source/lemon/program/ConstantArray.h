@@ -32,6 +32,8 @@ namespace lemon
 		uint64 getElement(size_t index) const;
 		void setElement(size_t index, uint64 value);
 
+		void serializeData(VectorBinarySerializer& serializer);
+
 	private:
 		std::string mName;
 		const DataTypeDefinition* mElementDataType = nullptr;

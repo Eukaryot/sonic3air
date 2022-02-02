@@ -362,7 +362,7 @@ namespace lemon
 
 	void TokenProcessing::processFunctionCalls(TokenList& tokens)
 	{
-		for (size_t i = 0; i < tokens.size()-1; ++i)
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER && tokens[i+1].getType() == Token::Type::PARENTHESIS)
 			{
@@ -502,7 +502,7 @@ namespace lemon
 
 	void TokenProcessing::processMemoryAccesses(TokenList& tokens)
 	{
-		for (size_t i = 0; i < tokens.size()-1; ++i)
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::VARTYPE && tokens[i+1].getType() == Token::Type::PARENTHESIS)
 			{
@@ -529,7 +529,7 @@ namespace lemon
 
 	void TokenProcessing::processArrayAccesses(TokenList& tokens)
 	{
-		for (size_t i = 0; i < tokens.size()-1; ++i)
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER && tokens[i+1].getType() == Token::Type::PARENTHESIS)
 			{
@@ -582,7 +582,7 @@ namespace lemon
 
 	void TokenProcessing::processExplicitCasts(TokenList& tokens)
 	{
-		for (size_t i = 0; i < tokens.size()-1; ++i)
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::VARTYPE && tokens[i+1].getType() == Token::Type::PARENTHESIS)
 			{

@@ -513,19 +513,74 @@ namespace lemon
 						case Keyword::CONSTANT:
 						{
 							CHECK_ERROR(tokens.size() >= 5, "Syntax error in constant definition", node.getLineNumber());
-							CHECK_ERROR(tokens[1].getType() == Token::Type::VARTYPE, "Expected a type in constant definition", node.getLineNumber());
-							CHECK_ERROR(tokens[2].getType() == Token::Type::IDENTIFIER, "Expected an identifier for constant definition", node.getLineNumber());
-							CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", node.getLineNumber());
+							static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string("array"));
 
-							// TODO: Support all statements that result in a compile-time constant
-							CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", node.getLineNumber());
+							// Check for "constant array"
+							if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mNameHash == ARRAY_NAME_HASH)
+							{
+								CHECK_ERROR(tokens.size() == 7, "Syntax error in constant array definition", node.getLineNumber());
+								CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", node.getLineNumber());
+								CHECK_ERROR(tokens[3].getType() == Token::Type::VARTYPE, "Expected a type in <> in constant array definition", node.getLineNumber());
+								CHECK_ERROR(isOperator(tokens[4], Operator::COMPARE_GREATER), "Expected a type in <> in constant array definition", node.getLineNumber());
+								CHECK_ERROR(tokens[5].getType() == Token::Type::IDENTIFIER, "Expected identifier in constant array definition", node.getLineNumber());
+								CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assigment at the end of constant array definition", node.getLineNumber());
 
-							const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
-							const std::string_view identifier = tokens[2].as<IdentifierToken>().mName;
-							const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
+								CHECK_ERROR(nodeIndex+1 < nodes.size(), "Constant array definition as last node is not allowed", node.getLineNumber());
+								CHECK_ERROR(nodes[nodeIndex+1].getType() == Node::Type::BLOCK, "Expected block node after constant array header", node.getLineNumber());
 
-							Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
-							mGlobalsLookup.registerConstant(constant);
+								// Go through the block node and collect the values
+								static std::vector<uint64> values;
+								{
+									BlockNode& content = nodes[nodeIndex+1].as<BlockNode>();
+									values.clear();
+									values.reserve(0x20);
+									bool expectingComma = false;
+									for (size_t n = 0; n < content.mNodes.size(); ++n)
+									{
+										CHECK_ERROR(content.mNodes[n].getType() == Node::Type::UNDEFINED, "Syntax error inside constant array list of values", content.mNodes[n].getLineNumber());
+										UndefinedNode& listNode = content.mNodes[n].as<UndefinedNode>();
+										for (size_t i = 0; i < listNode.mTokenList.size(); ++i)
+										{
+											Token& token = listNode.mTokenList[i];
+											if (expectingComma)
+											{
+												CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
+												expectingComma = false;
+											}
+											else
+											{
+												CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
+												values.push_back(token.as<ConstantToken>().mValue);
+												expectingComma = true;
+											}
+										}
+									}
+								}
+
+								ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName, tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size());
+								mGlobalsLookup.registerConstantArray(constantArray);
+
+								// Erase block node pointer
+								//  -> For performance reasons, don't erase it here already, but all of these on one go later on
+								indicesToErase.push_back(nodeIndex + 1);
+								++nodeIndex;	// Skip next index
+							}
+							else
+							{
+								CHECK_ERROR(tokens[1].getType() == Token::Type::VARTYPE, "Expected a type in constant definition", node.getLineNumber());
+								CHECK_ERROR(tokens[2].getType() == Token::Type::IDENTIFIER, "Expected an identifier for constant definition", node.getLineNumber());
+								CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", node.getLineNumber());
+
+								// TODO: Support all statements that result in a compile-time constant
+								CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", node.getLineNumber());
+
+								const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
+								const std::string_view identifier = tokens[2].as<IdentifierToken>().mName;
+								const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
+
+								Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
+								mGlobalsLookup.registerConstant(constant);
+							}
 							break;
 						}
 
