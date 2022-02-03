@@ -184,6 +184,20 @@ namespace lemon
 					token.mDataType = constant->getDataType();
 					token.mValue = constant->getValue();
 				}
+				else
+				{
+					// TODO: This calls for some optimizations (going though an array and using string comparisons is not quite optimal)
+					for (const Constant& constant : *mContext.mLocalConstants)
+					{
+						if (constant.getName() == tokens[i].as<IdentifierToken>().mName)
+						{
+							ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
+							token.mDataType = constant.getDataType();
+							token.mValue = constant.getValue();
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

@@ -62,6 +62,7 @@ namespace lemon
 		struct ScopeContext
 		{
 			std::vector<LocalVariable*> mLocalVariables;
+			std::vector<Constant> mLocalConstants;
 			std::vector<size_t> mScopeStack;			// Number of local variables for each scope on the stack
 
 			ScopeContext()
@@ -97,6 +98,7 @@ namespace lemon
 		Node* processUndefinedNode(UndefinedNode& undefinedNode, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator);
 		Node* gatherNextStatement(NodesIterator& nodesIterator, ScriptFunction& function, ScopeContext& scopeContext);
 		void processTokens(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
+		void processConstantDefinition(TokenList& tokens, NodesIterator& nodesIterator, ScopeContext* scopeContext);
 
 		// Misc
 		bool processGlobalPragma(const std::string& content);

@@ -44,13 +44,30 @@ namespace lemon
 	{
 		BlockNode& mBlockNode;
 		size_t mCurrentIndex = 0;
+		std::vector<size_t> mIndicesToErase;
 
-		inline NodesIterator(BlockNode& blockNode) : mBlockNode(blockNode) {}
+		inline NodesIterator(BlockNode& blockNode) :
+			mBlockNode(blockNode)
+		{}
+
+		inline ~NodesIterator()
+		{
+			mBlockNode.mNodes.erase(mIndicesToErase);
+		}
+
 		inline void operator++()		{ ++mCurrentIndex; }
 		inline Node& operator*() const	{ return mBlockNode.mNodes[mCurrentIndex]; }
+		inline Node* operator->() const	{ return &mBlockNode.mNodes[mCurrentIndex]; }
 		inline bool valid() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()); }
 		inline Node* peek() const		{ return (mCurrentIndex + 1 < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex + 1] : nullptr; }
-		inline void eraseCurrent()		{ mBlockNode.mNodes.erase(mCurrentIndex); --mCurrentIndex; }
+
+		inline void eraseCurrent()
+		{
+			// For performance reasons, don't erase it here already, but all of these in one go later on
+			if (mIndicesToErase.empty())
+				mIndicesToErase.reserve(mBlockNode.mNodes.size() / 2);
+			mIndicesToErase.push_back(mCurrentIndex);
+		}
 	};
 
 
@@ -437,13 +454,11 @@ namespace lemon
 	{
 		NodeList& nodes = rootNode.mNodes;
 		std::vector<PragmaNode*> currentPragmas;
-		std::vector<size_t> indicesToErase;
-		indicesToErase.reserve(nodes.size() / 2);
 
 		// Cycle through all top-level nodes to find global definitions (functions, global variables, defines)
-		for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex)
+		for (NodesIterator nodesIterator(rootNode); nodesIterator.valid(); ++nodesIterator)
 		{
-			Node& node = nodes[nodeIndex];
+			Node& node = *nodesIterator;
 			if (node.getType() == Node::Type::PRAGMA)
 			{
 				currentPragmas.push_back(&node.as<PragmaNode>());
@@ -460,6 +475,7 @@ namespace lemon
 						case Keyword::FUNCTION:
 						{
 							// Next node must be a block node
+							const size_t nodeIndex = nodesIterator.mCurrentIndex;
 							CHECK_ERROR(nodeIndex+1 < nodes.size(), "Function definition as last node is not allowed", node.getLineNumber());
 							CHECK_ERROR(nodes[nodeIndex+1].getType() == Node::Type::BLOCK, "Expected block node after function header", node.getLineNumber());
 
@@ -475,9 +491,8 @@ namespace lemon
 							mFunctionNodes.push_back(&newNode);
 
 							// Erase block node pointer
-							//  -> For performance reasons, don't erase it here already, but all of these on one go later on
-							indicesToErase.push_back(nodeIndex + 1);
-							++nodeIndex;	// Skip next index
+							++nodesIterator;
+							nodesIterator.eraseCurrent();
 
 							// Add all pragmas associated with this function, i.e. all pragma nodes in front
 							for (PragmaNode* pragmaNode : currentPragmas)
@@ -512,75 +527,7 @@ namespace lemon
 
 						case Keyword::CONSTANT:
 						{
-							CHECK_ERROR(tokens.size() >= 5, "Syntax error in constant definition", node.getLineNumber());
-							static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string("array"));
-
-							// Check for "constant array"
-							if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mNameHash == ARRAY_NAME_HASH)
-							{
-								CHECK_ERROR(tokens.size() == 7, "Syntax error in constant array definition", node.getLineNumber());
-								CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", node.getLineNumber());
-								CHECK_ERROR(tokens[3].getType() == Token::Type::VARTYPE, "Expected a type in <> in constant array definition", node.getLineNumber());
-								CHECK_ERROR(isOperator(tokens[4], Operator::COMPARE_GREATER), "Expected a type in <> in constant array definition", node.getLineNumber());
-								CHECK_ERROR(tokens[5].getType() == Token::Type::IDENTIFIER, "Expected identifier in constant array definition", node.getLineNumber());
-								CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assigment at the end of constant array definition", node.getLineNumber());
-
-								CHECK_ERROR(nodeIndex+1 < nodes.size(), "Constant array definition as last node is not allowed", node.getLineNumber());
-								CHECK_ERROR(nodes[nodeIndex+1].getType() == Node::Type::BLOCK, "Expected block node after constant array header", node.getLineNumber());
-
-								// Go through the block node and collect the values
-								static std::vector<uint64> values;
-								{
-									BlockNode& content = nodes[nodeIndex+1].as<BlockNode>();
-									values.clear();
-									values.reserve(0x20);
-									bool expectingComma = false;
-									for (size_t n = 0; n < content.mNodes.size(); ++n)
-									{
-										CHECK_ERROR(content.mNodes[n].getType() == Node::Type::UNDEFINED, "Syntax error inside constant array list of values", content.mNodes[n].getLineNumber());
-										UndefinedNode& listNode = content.mNodes[n].as<UndefinedNode>();
-										for (size_t i = 0; i < listNode.mTokenList.size(); ++i)
-										{
-											Token& token = listNode.mTokenList[i];
-											if (expectingComma)
-											{
-												CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
-												expectingComma = false;
-											}
-											else
-											{
-												CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
-												values.push_back(token.as<ConstantToken>().mValue);
-												expectingComma = true;
-											}
-										}
-									}
-								}
-
-								ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName, tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size());
-								mGlobalsLookup.registerConstantArray(constantArray);
-
-								// Erase block node pointer
-								//  -> For performance reasons, don't erase it here already, but all of these on one go later on
-								indicesToErase.push_back(nodeIndex + 1);
-								++nodeIndex;	// Skip next index
-							}
-							else
-							{
-								CHECK_ERROR(tokens[1].getType() == Token::Type::VARTYPE, "Expected a type in constant definition", node.getLineNumber());
-								CHECK_ERROR(tokens[2].getType() == Token::Type::IDENTIFIER, "Expected an identifier for constant definition", node.getLineNumber());
-								CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", node.getLineNumber());
-
-								// TODO: Support all statements that result in a compile-time constant
-								CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", node.getLineNumber());
-
-								const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
-								const std::string_view identifier = tokens[2].as<IdentifierToken>().mName;
-								const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
-
-								Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
-								mGlobalsLookup.registerConstant(constant);
-							}
+							processConstantDefinition(tokens, nodesIterator, nullptr);
 							break;
 						}
 
@@ -644,8 +591,6 @@ namespace lemon
 				currentPragmas.clear();
 			}
 		}
-
-		nodes.erase(indicesToErase);
 	}
 
 	ScriptFunction& Compiler::processFunctionHeader(Node& node, const TokenList& tokens)
@@ -1025,6 +970,12 @@ namespace lemon
 					return &node;
 				}
 
+				case Keyword::CONSTANT:
+				{
+					processConstantDefinition(tokens, nodesIterator, &scopeContext);
+					break;
+				}
+
 				default:
 					break;
 			}
@@ -1092,7 +1043,94 @@ namespace lemon
 	{
 		mTokenProcessing.mContext.mFunction = &function;
 		mTokenProcessing.mContext.mLocalVariables = &scopeContext.mLocalVariables;
+		mTokenProcessing.mContext.mLocalConstants = &scopeContext.mLocalConstants;
 		mTokenProcessing.processTokens(tokens, lineNumber, resultType);
+	}
+
+	void Compiler::processConstantDefinition(TokenList& tokens, NodesIterator& nodesIterator, ScopeContext* scopeContext)
+	{
+		const uint32 lineNumber = nodesIterator->getLineNumber();
+		const bool isGlobalDefinition = (nullptr == scopeContext);
+		CHECK_ERROR(tokens.size() >= 5, "Syntax error in constant definition", lineNumber);
+		static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string("array"));
+
+		// Check for "constant array"
+		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mNameHash == ARRAY_NAME_HASH)
+		{
+			CHECK_ERROR(isGlobalDefinition, "Constant arrays can only be defined globally, not inside functions", lineNumber);
+			CHECK_ERROR(tokens.size() == 7, "Syntax error in constant array definition", lineNumber);
+			CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", lineNumber);
+			CHECK_ERROR(tokens[3].getType() == Token::Type::VARTYPE, "Expected a type in <> in constant array definition", lineNumber);
+			CHECK_ERROR(isOperator(tokens[4], Operator::COMPARE_GREATER), "Expected a type in <> in constant array definition", lineNumber);
+			CHECK_ERROR(tokens[5].getType() == Token::Type::IDENTIFIER, "Expected identifier in constant array definition", lineNumber);
+			CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assigment at the end of constant array definition", lineNumber);
+
+			Node* nextNode = nodesIterator.peek();
+			CHECK_ERROR(nullptr != nextNode, "Constant array definition as last node is not allowed", lineNumber);
+			CHECK_ERROR(nextNode->getType() == Node::Type::BLOCK, "Expected block node after constant array header", lineNumber);
+
+			// Go through the block node and collect the values
+			static std::vector<uint64> values;
+			{
+				BlockNode& content = nextNode->as<BlockNode>();
+				values.clear();
+				values.reserve(0x20);
+				bool expectingComma = false;
+				for (size_t n = 0; n < content.mNodes.size(); ++n)
+				{
+					CHECK_ERROR(content.mNodes[n].getType() == Node::Type::UNDEFINED, "Syntax error inside constant array list of values", content.mNodes[n].getLineNumber());
+					UndefinedNode& listNode = content.mNodes[n].as<UndefinedNode>();
+					for (size_t i = 0; i < listNode.mTokenList.size(); ++i)
+					{
+						Token& token = listNode.mTokenList[i];
+						if (expectingComma)
+						{
+							CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
+							expectingComma = false;
+						}
+						else
+						{
+							CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
+							values.push_back(token.as<ConstantToken>().mValue);
+							expectingComma = true;
+						}
+					}
+				}
+			}
+
+			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName, tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size());
+			mGlobalsLookup.registerConstantArray(constantArray);
+
+			// Erase block node pointer
+			++nodesIterator;
+			nodesIterator.eraseCurrent();
+		}
+		else
+		{
+			CHECK_ERROR(tokens[1].getType() == Token::Type::VARTYPE, "Expected a type in constant definition", lineNumber);
+			CHECK_ERROR(tokens[2].getType() == Token::Type::IDENTIFIER, "Expected an identifier for constant definition", lineNumber);
+			CHECK_ERROR(isOperator(tokens[3], Operator::ASSIGN), "Missing assignment in constant definition", lineNumber);
+
+			// TODO: Support all statements that result in a compile-time constant
+			CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", lineNumber);
+
+			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
+			const std::string_view identifier = tokens[2].as<IdentifierToken>().mName;
+			const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
+
+			if (isGlobalDefinition)
+			{
+				Constant& constant = mModule.addConstant(identifier, dataType, constantValue);
+				mGlobalsLookup.registerConstant(constant);
+			}
+			else
+			{
+				Constant& constant = vectorAdd(scopeContext->mLocalConstants);
+				constant.mName = identifier;
+				constant.mDataType = dataType;
+				constant.mValue = constantValue;
+			}
+		}
 	}
 
 	bool Compiler::processGlobalPragma(const std::string& content)

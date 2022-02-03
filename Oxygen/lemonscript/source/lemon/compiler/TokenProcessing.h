@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/program/Constant.h"
 #include "lemon/program/Variable.h"
 #include "lemon/compiler/Operators.h"
 
@@ -28,6 +29,7 @@ namespace lemon
 		struct Context
 		{
 			std::vector<LocalVariable*>* mLocalVariables = nullptr;
+			std::vector<Constant>* mLocalConstants = nullptr;
 			ScriptFunction* mFunction = nullptr;
 		};
 

@@ -17,6 +17,7 @@ namespace lemon
 
 	class API_EXPORT Constant
 	{
+	friend class Compiler;
 	friend class Module;
 
 	public:
