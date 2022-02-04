@@ -113,7 +113,7 @@ namespace lemon
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
 		{
 			const Function::Parameter& parameter = mFunction.getParameters()[index];
-			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mNameHash);
+			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mName.getHash());
 			RMX_ASSERT(nullptr != variable, "Variable not found");
 			RMX_ASSERT(variable->getDataType() == parameter.mType, "Variable has wrong type");
 
@@ -271,13 +271,13 @@ namespace lemon
 				const ReturnNode& returnNode = node.as<ReturnNode>();
 				if (returnNode.mStatementToken.valid())
 				{
-					CHECK_ERROR(mFunction.getReturnType()->mClass != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->mClass != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName().getString() << "' with 'void' return type cannot return a value", node.getLineNumber());
 					compileTokenTreeToOpcodes(*returnNode.mStatementToken);
 					addCastOpcodeIfNecessary(returnNode.mStatementToken->mDataType, mFunction.getReturnType());
 				}
 				else
 				{
-					CHECK_ERROR(mFunction.getReturnType()->mClass == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->toString() << " value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->mClass == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName().getString() << "' must return a " << mFunction.getReturnType()->toString() << " value", node.getLineNumber());
 				}
 				addOpcode(Opcode::Type::RETURN);
 				break;

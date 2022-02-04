@@ -11,6 +11,7 @@
 #include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -102,8 +103,7 @@ namespace lemon
 		inline IdentifierToken() : StatementToken(TYPE) {}
 
 	public:
-		std::string mName;
-		uint64 mNameHash = 0;
+		FlyweightString mName;
 	};
 
 

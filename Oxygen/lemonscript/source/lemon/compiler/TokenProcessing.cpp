@@ -154,7 +154,7 @@ namespace lemon
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
-				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mNameHash;
+				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mName.getHash();
 				const Define* define = mGlobalsLookup.getDefineByName(identifierHash);
 				if (nullptr != define)
 				{
@@ -176,8 +176,8 @@ namespace lemon
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
-				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mNameHash;
-				const Constant* constant = mGlobalsLookup.getConstantByName(identifierHash);
+				const FlyweightString identifier = tokens[i].as<IdentifierToken>().mName;
+				const Constant* constant = mGlobalsLookup.getConstantByName(identifier.getHash());
 				if (nullptr != constant)
 				{
 					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
@@ -186,10 +186,9 @@ namespace lemon
 				}
 				else
 				{
-					// TODO: This calls for some optimizations (going though an array and using string comparisons is not quite optimal)
 					for (const Constant& constant : *mContext.mLocalConstants)
 					{
-						if (constant.getName() == tokens[i].as<IdentifierToken>().mName)
+						if (constant.getName() == identifier)
 						{
 							ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
 							token.mDataType = constant.getDataType();
@@ -348,14 +347,14 @@ namespace lemon
 
 						// Create new variable
 						const IdentifierToken& identifierToken = tokens[i+1].as<IdentifierToken>();
-						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mNameHash), "Variable name already used", mLineNumber);
+						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mName.getHash()), "Variable name already used", mLineNumber);
 
 						// Variable may already exist in function (but not in scope, we just checked that)
 						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-						LocalVariable* variable = mContext.mFunction->getLocalVariableByIdentifier(identifierToken.mNameHash);
+						LocalVariable* variable = mContext.mFunction->getLocalVariableByIdentifier(identifierToken.mName.getHash());
 						if (nullptr == variable)
 						{
-							variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, identifierToken.mNameHash, varType, mLineNumber);
+							variable = &mContext.mFunction->addLocalVariable(identifierToken.mName, varType, mLineNumber);
 						}
 						mContext.mLocalVariables->push_back(variable);
 
@@ -385,14 +384,13 @@ namespace lemon
 				{
 					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
-					const std::string_view functionName = identifierToken.mName;
-					const uint64 nameHash = identifierToken.mNameHash;
+					const std::string_view functionName = identifierToken.mName.getString();
 					bool isBaseCall = false;
 					const Function* function = nullptr;
 					const Variable* thisPointer = nullptr;
 
 					bool isValidFunctionCall = false;
-					if (!mGlobalsLookup.getFunctionsByName(nameHash).empty())
+					if (!mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash()).empty())
 					{
 						// Is it a global function
 						isValidFunctionCall = true;
@@ -400,7 +398,7 @@ namespace lemon
 					else if (rmx::startsWith(functionName, "base."))
 					{
 						// It's a base call
-						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName(), "Base call goes to a different function", mLineNumber);
+						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call goes to a different function", mLineNumber);
 						isValidFunctionCall = true;
 						isBaseCall = true;
 					}
@@ -483,7 +481,7 @@ namespace lemon
 						}
 						else
 						{
-							const std::vector<Function*>& functions = mGlobalsLookup.getFunctionsByName(nameHash);
+							const std::vector<Function*>& functions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
 							CHECK_ERROR(!functions.empty(), "Unknown function name '" << functionName << "'", mLineNumber);
 
 							// Find best-fitting correct function overload
@@ -551,7 +549,7 @@ namespace lemon
 				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::BRACKET)
 				{
 					// Check the identifier
-					const uint64 arrayNameHash = tokens[i].as<IdentifierToken>().mNameHash;
+					const uint64 arrayNameHash = tokens[i].as<IdentifierToken>().mName.getHash();
 					const ConstantArray* constantArray = mGlobalsLookup.getConstantArrayByName(arrayNameHash);
 					if (nullptr != constantArray)
 					{
@@ -622,8 +620,8 @@ namespace lemon
 			if (token.getType() == Token::Type::IDENTIFIER)
 			{
 				const IdentifierToken& identifierToken = token.as<IdentifierToken>();
-				const Variable* variable = findVariable(identifierToken.mNameHash);
-				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName, mLineNumber);
+				const Variable* variable = findVariable(identifierToken.mName.getHash());
+				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
 
 				VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 				token.mVariable = variable;
@@ -948,7 +946,7 @@ namespace lemon
 	{
 		for (LocalVariable* var : *mContext.mLocalVariables)
 		{
-			if (var->getNameHash() == nameHash)
+			if (var->getName().getHash() == nameHash)
 				return var;
 		}
 		return nullptr;

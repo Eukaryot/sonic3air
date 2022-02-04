@@ -398,7 +398,7 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 					RMX_CHECK(entry.mValue.empty(), "Update hook must not have any value", continue);
 
 					// Create update hook
-					Hook& hook = addHook(Hook::Type::PRE_UPDATE, 0, function->getName());
+					Hook& hook = addHook(Hook::Type::PRE_UPDATE, 0);
 					hook.mFunction = function;
 				}
 				else if (entry.mArgument == "post-update-hook")
@@ -406,7 +406,7 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 					RMX_CHECK(entry.mValue.empty(), "Update hook must not have any value", continue);
 
 					// Create update hook
-					Hook& hook = addHook(Hook::Type::POST_UPDATE, 0, function->getName());
+					Hook& hook = addHook(Hook::Type::POST_UPDATE, 0);
 					hook.mFunction = function;
 				}
 				else if (entry.mArgument == "address-hook" || entry.mArgument == "translated")
@@ -418,7 +418,7 @@ void LemonScriptProgram::evaluateFunctionPragmas()
 					if (entry.mArgument == "address-hook")
 					{
 						// Create address hook
-						Hook& hook = addHook(Hook::Type::ADDRESS, address, function->getName());
+						Hook& hook = addHook(Hook::Type::ADDRESS, address);
 						hook.mFunction = function;
 					}
 				}
@@ -456,18 +456,18 @@ void LemonScriptProgram::evaluateDefines()
 					var.mBytes = (uint8)dataType.mBytes;
 					var.mSigned = dataType.as<lemon::IntegerDataType>().mIsSigned;
 
-					const int pos = String(var.mName).findChar('.', 0, 1);	// Position of the dot
-					var.mCategoryHash = (pos == -1) ? 0 : rmx::getMurmur2_64(var.mName.substr(0, pos));
+					const int pos = String(var.mName.getString()).findChar('.', 0, 1);	// Position of the dot
+					var.mCategoryHash = (pos == -1) ? 0 : rmx::getMurmur2_64(var.mName.getString().substr(0, pos));
 				}
 			}
 		}
 	}
 
 	// Sort alphabetically
-	std::sort(mGlobalDefines.begin(), mGlobalDefines.end(), [](const GlobalDefine& a, const GlobalDefine& b) { return a.mName < b.mName; } );
+	std::sort(mGlobalDefines.begin(), mGlobalDefines.end(), [](const GlobalDefine& a, const GlobalDefine& b) { return a.mName.getString() < b.mName.getString(); } );
 }
 
-LemonScriptProgram::Hook& LemonScriptProgram::addHook(Hook::Type type, uint32 address, const std::string& functionName)
+LemonScriptProgram::Hook& LemonScriptProgram::addHook(Hook::Type type, uint32 address)
 {
 	Hook* hook = nullptr;
 	if (type == Hook::Type::ADDRESS)
@@ -491,11 +491,10 @@ LemonScriptProgram::Hook& LemonScriptProgram::addHook(Hook::Type type, uint32 ad
 	return *hook;
 }
 
-const std::string& LemonScriptProgram::getFunctionNameByHash(uint64 hash) const
+std::string_view LemonScriptProgram::getFunctionNameByHash(uint64 hash) const
 {
-	static const std::string EMPTY_STRING;
 	const auto& list = mInternal.mProgram.getFunctionsByName(hash);
-	return list.empty() ? EMPTY_STRING : list[0]->getName();
+	return list.empty() ? std::string_view() : list[0]->getName().getString();
 }
 
 lemon::Variable* LemonScriptProgram::getGlobalVariableByHash(uint64 hash) const
@@ -528,11 +527,11 @@ void LemonScriptProgram::resolveLocation(const lemon::Function& function, uint32
 		}
 		else
 		{
-			scriptFilename = *String(0, "<invalid program counter %d in function '%s'>", programCounter, function.getName().c_str());
+			scriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().data(), function.getName().getString().length());
 		}
 	}
 	else
 	{
-		scriptFilename = *String(0, "<user-defined function '%s'>", function.getName().c_str());
+		scriptFilename = *String(0, "<user-defined function '%.*s'>", function.getName().getString().data(), function.getName().getString().length());
 	}
 }

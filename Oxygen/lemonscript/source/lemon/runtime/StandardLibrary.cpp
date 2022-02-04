@@ -450,22 +450,22 @@ namespace lemon
 
 		// Register built-in functions, which are directly referenced by the compiler
 		{
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int8>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint8>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int16>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint16>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int32>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint32>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<int64>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<uint64>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.mName, lemon::wrap(&builtins::constant_array_access<StringRef>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int8>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint8>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int16>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint16>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int32>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint32>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int64>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint64>), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<StringRef>), flags);
 
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.mName, lemon::wrap(&builtins::string_operator_plus), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.mName, lemon::wrap(&builtins::string_operator_less), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.mName, lemon::wrap(&builtins::string_operator_less_or_equal), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER.mName, lemon::wrap(&builtins::string_operator_greater), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL.mName, lemon::wrap(&builtins::string_operator_greater_or_equal), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_LENGTH.mName, lemon::wrap(&builtins::string_length), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less_or_equal), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater_or_equal), flags);
+			module.addUserDefinedFunction(BUILTIN_NAME_STRING_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::string_length), flags);
 		}
 
 		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<int8>), flags);

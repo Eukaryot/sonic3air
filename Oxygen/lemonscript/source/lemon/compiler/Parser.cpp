@@ -116,8 +116,8 @@ namespace lemon
 			}
 
 			// Check for "true", "false"
-			static const uint64 trueHash  = rmx::getMurmur2_64(std::string("true"));
-			static const uint64 falseHash = rmx::getMurmur2_64(std::string("false"));
+			static const uint64 trueHash  =  rmx::getMurmur2_64(std::string("true"));
+			static const uint64 falseHash =  rmx::getMurmur2_64(std::string("false"));
 			if (identifierHash == trueHash || identifierHash == falseHash)
 			{
 				ConstantParserToken& token = outTokens.create<ConstantParserToken>();
@@ -127,7 +127,7 @@ namespace lemon
 
 			// Just an identifier
 			IdentifierParserToken& token = outTokens.create<IdentifierParserToken>();
-			token.mIdentifier = identifier;
+			token.mName.set(identifier);
 		}
 	}
 
@@ -232,7 +232,7 @@ namespace lemon
 				size_t charactersRead;
 				ParserHelper::collectStringLiteral(&input[pos], length - pos, mBufferString, charactersRead, lineNumber);
 				StringLiteralParserToken& token = outTokens.create<StringLiteralParserToken>();
-				token.mString = mBufferString;
+				token.mString.set(mBufferString);
 				pos += charactersRead + 1;
 			}
 			else

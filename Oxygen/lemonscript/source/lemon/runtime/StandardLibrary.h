@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -24,6 +24,8 @@ namespace lemon
 			uint64 mHash = 0;
 
 			inline explicit FunctionName(const std::string& name) : mName(name), mHash(rmx::getMurmur2_64(name)) {}
+
+			inline FlyweightString makeFlyweightString() const  { FlyweightString str; str.set(mHash, mName); return str; }
 		};
 
 	public:

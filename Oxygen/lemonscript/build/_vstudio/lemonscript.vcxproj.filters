@@ -19,6 +19,9 @@
     <Filter Include="lemon\runtime\provider">
       <UniqueIdentifier>{a4f5d1ec-558c-40ad-aabc-d73ac59dd3f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lemon\utility">
+      <UniqueIdentifier>{24cc8bbf-111e-496d-a56b-0339bee81deb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp">
@@ -116,6 +119,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\compiler\LineNumberTranslation.cpp">
       <Filter>lemon\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp">
+      <Filter>lemon\utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\compiler\LineNumberTranslation.h">
       <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h">
+      <Filter>lemon\utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

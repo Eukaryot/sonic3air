@@ -94,7 +94,7 @@ const std::string& CodeExec::Location::toString() const
 			std::string scriptFilename;
 			uint32 lineNumber;
 			mCodeExec->getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
-			mResolvedString = mFunction->getName() + ", line " + std::to_string(lineNumber);
+			mResolvedString = std::string(mFunction->getName().getString()) + ", line " + std::to_string(lineNumber);
 		}
 	}
 	return mResolvedString;
@@ -146,7 +146,7 @@ void CodeExec::CallFrameTracking::writeCurrentCallStack(std::vector<uint64>& out
 	for (int i = (int)mCallStack.size() - 1; i >= 0; --i)
 	{
 		const lemon::Function* function = mCallFrames[mCallStack[i]].mFunction;
-		outCallStack.push_back((nullptr != function) ? function->getNameHash() : 0);
+		outCallStack.push_back((nullptr != function) ? function->getName().getHash() : 0);
 	}
 }
 
@@ -157,7 +157,7 @@ void CodeExec::CallFrameTracking::writeCurrentCallStack(std::vector<std::string>
 	for (int i = (int)mCallStack.size() - 1; i >= 0; --i)
 	{
 		const lemon::Function* function = mCallFrames[mCallStack[i]].mFunction;
-		outCallStack.push_back((nullptr != function) ? function->getName() : "");
+		outCallStack.push_back((nullptr != function) ? std::string(function->getName().getString()) : "");
 	}
 }
 

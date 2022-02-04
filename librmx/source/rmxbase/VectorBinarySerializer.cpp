@@ -311,7 +311,7 @@ std::string_view VectorBinarySerializer::readStringView(size_t stringLengthLimit
 	}
 
 	const char* ptr = (const char*)readAccess(length);
-	return std::string_view(ptr, length);
+	return (nullptr != ptr) ? std::string_view(ptr, length) : std::string_view();
 }
 
 void VectorBinarySerializer::write(std::string_view value, size_t stringLengthLimit)

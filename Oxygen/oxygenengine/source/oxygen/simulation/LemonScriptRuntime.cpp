@@ -109,7 +109,7 @@ struct LemonScriptRuntime::Internal
 
 
 
-bool LemonScriptRuntime::getCurrentScriptFunction(std::string* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName)
+bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName)
 {
 	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 	if (nullptr == runtime)
@@ -121,7 +121,7 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string* outFunctionName, 
 		return false;
 
 	if (nullptr != outFunctionName)
-		*outFunctionName = location.mFunction->getName();
+		*outFunctionName = location.mFunction->getName().getString();
 	if (nullptr != outFileName)
 		*outFileName = location.mFunction->mSourceFilename;
 	if (nullptr != outLineNumber)
@@ -296,7 +296,7 @@ void LemonScriptRuntime::getCallStackWithLabels(CallStackWithLabels& outCallStac
 		const std::string* labelName = location.mFunction->findLabelByOffset(location.mProgramCounter);
 		if (nullptr != labelName)
 		{
-			outCallStack.emplace_back(location.mFunction->getName(), *labelName);
+			outCallStack.emplace_back(location.mFunction->getName().getString(), *labelName);
 		}
 	}
 }
@@ -336,7 +336,7 @@ std::string LemonScriptRuntime::buildScriptLocationString(lemon::Runtime& runtim
 	if (nullptr == location.mFunction)
 		return "";
 
-	const std::string& functionName = location.mFunction->getName();
+	const std::string functionName(location.mFunction->getName().getString());
 	const std::wstring& fileName = location.mFunction->mSourceFilename;
 	const uint32 lineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	const std::string& moduleName = location.mFunction->getModule().getModuleName();

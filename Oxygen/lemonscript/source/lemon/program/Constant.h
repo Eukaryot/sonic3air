@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -21,12 +21,12 @@ namespace lemon
 	friend class Module;
 
 	public:
-		inline const std::string& getName() const  { return mName; }
+		inline FlyweightString getName() const  { return mName; }
 		inline const DataTypeDefinition* getDataType() const  { return mDataType; }
 		inline uint64 getValue() const  { return mValue; }
 
 	private:
-		std::string mName;
+		FlyweightString mName;
 		const DataTypeDefinition* mDataType = nullptr;
 		uint64 mValue = 0;
 	};

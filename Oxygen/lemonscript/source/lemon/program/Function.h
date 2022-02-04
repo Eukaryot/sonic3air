@@ -10,6 +10,7 @@
 
 #include "lemon/program/Opcode.h"
 #include "lemon/program/Variable.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -30,8 +31,7 @@ namespace lemon
 		struct Parameter
 		{
 			const DataTypeDefinition* mType = nullptr;
-			std::string mIdentifier;
-			uint64 mNameHash = 0;
+			FlyweightString mName;
 		};
 		typedef std::vector<Parameter> ParameterList;
 
@@ -42,8 +42,7 @@ namespace lemon
 		inline Type getType() const  { return mType; }
 		inline uint32 getID() const  { return mID; }
 
-		inline const std::string& getName() const { return mName; }
-		inline uint64 getNameHash() const { return mNameHash; }
+		inline FlyweightString getName() const { return mName; }
 		inline uint64 getNameAndSignatureHash() const { return mNameAndSignatureHash; }
 
 		const DataTypeDefinition* getReturnType() const  { return mReturnType; }
@@ -62,8 +61,7 @@ namespace lemon
 		uint32 mID = 0;
 
 		// Metadata
-		std::string mName;
-		uint64 mNameHash = 0;
+		FlyweightString mName;
 		uint64 mNameAndSignatureHash = 0;
 
 		// Signature
@@ -84,7 +82,7 @@ namespace lemon
 
 		LocalVariable* getLocalVariableByIdentifier(uint64 nameHash) const;
 		LocalVariable& getLocalVariableByID(uint32 id) const;
-		LocalVariable& addLocalVariable(std::string_view identifier, uint64 nameHash, const DataTypeDefinition* dataType, uint32 lineNumber);
+		LocalVariable& addLocalVariable(FlyweightString name, const DataTypeDefinition* dataType, uint32 lineNumber);
 
 		bool getLabel(std::string_view labelName, size_t& outOffset) const;
 		void addLabel(std::string_view labelName, size_t offset);

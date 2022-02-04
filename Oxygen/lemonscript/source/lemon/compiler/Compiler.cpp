@@ -420,13 +420,12 @@ namespace lemon
 
 						case ParserToken::Type::STRING_LITERAL:
 						{
-							const std::string_view str = parserToken.as<StringLiteralParserToken>().mString;
-							const uint64 hash = rmx::getMurmur2_64(str);
-							const StoredString* storedString = mGlobalsLookup.getStringLiteralByHash(hash);
+							const FlyweightString str = parserToken.as<StringLiteralParserToken>().mString;
+							const StoredString* storedString = mGlobalsLookup.getStringLiteralByHash(str.getHash());
 							if (nullptr == storedString)
 							{
-								// Add as a new string literal
-								storedString = mModule.addStringLiteral(str, hash);
+								// Add as a new string literal to the module
+								storedString = &mModule.addStringLiteral(str);
 								CHECK_ERROR(nullptr != storedString, "Failed to create new string literal, there's possibly too many (more than 65536)", 0);
 							}
 							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
@@ -438,8 +437,7 @@ namespace lemon
 						case ParserToken::Type::IDENTIFIER:
 						{
 							IdentifierToken& token = node.mTokenList.createBack<IdentifierToken>();
-							token.mName.swap(parserToken.as<IdentifierParserToken>().mIdentifier);
-							token.mNameHash = rmx::getMurmur2_64(token.mName);
+							token.mName = parserToken.as<IdentifierParserToken>().mName;
 							break;
 						}
 					}
@@ -510,7 +508,7 @@ namespace lemon
 							++offset;
 
 							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in global variable definition", node.getLineNumber());
-							const std::string_view identifier = tokens[offset].as<IdentifierToken>().mName;
+							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
 							// Create global variable
@@ -544,7 +542,7 @@ namespace lemon
 							}
 
 							CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier for define", node.getLineNumber());
-							const std::string_view identifier = tokens[offset].as<IdentifierToken>().mName;
+							const FlyweightString identifier = tokens[offset].as<IdentifierToken>().mName;
 							++offset;
 
 							CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::ASSIGN), "Expected '=' in define", node.getLineNumber());
@@ -603,7 +601,7 @@ namespace lemon
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected an identifier in function definition", lineNumber);
-		const std::string_view functionName = tokens[offset].as<IdentifierToken>().mName;
+		const FlyweightString functionName = tokens[offset].as<IdentifierToken>().mName;
 
 		++offset;
 		CHECK_ERROR(offset < tokens.size() && isOperator(tokens[offset], Operator::PARENTHESIS_LEFT), "Expected opening parentheses in function definition", lineNumber);
@@ -630,8 +628,7 @@ namespace lemon
 
 				++offset;
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected identifier in function parameter definition", lineNumber);
-				parameters.back().mIdentifier = tokens[offset].as<IdentifierToken>().mName;
-				parameters.back().mNameHash = tokens[offset].as<IdentifierToken>().mNameHash;
+				parameters.back().mName = tokens[offset].as<IdentifierToken>().mName;
 
 				++offset;
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::OPERATOR, "Expected comma or closing parentheses after function parameter definition", lineNumber);
@@ -654,8 +651,8 @@ namespace lemon
 		// Create new variables for parameters
 		for (const Function::Parameter& parameter : function.getParameters())
 		{
-			CHECK_ERROR(nullptr == function.getLocalVariableByIdentifier(parameter.mNameHash), "Parameter name already used", lineNumber);
-			function.addLocalVariable(parameter.mIdentifier, parameter.mNameHash, parameter.mType, lineNumber);
+			CHECK_ERROR(nullptr == function.getLocalVariableByIdentifier(parameter.mName.getHash()), "Parameter name already used", lineNumber);
+			function.addLocalVariable(parameter.mName, parameter.mType, lineNumber);
 		}
 
 		// Set source metadata
@@ -1055,7 +1052,7 @@ namespace lemon
 		static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string("array"));
 
 		// Check for "constant array"
-		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mNameHash == ARRAY_NAME_HASH)
+		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mName.getHash() == ARRAY_NAME_HASH)
 		{
 			CHECK_ERROR(isGlobalDefinition, "Constant arrays can only be defined globally, not inside functions", lineNumber);
 			CHECK_ERROR(tokens.size() == 7, "Syntax error in constant array definition", lineNumber);
@@ -1098,7 +1095,7 @@ namespace lemon
 				}
 			}
 
-			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName, tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size());
+			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName.getString(), tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size());
 			mGlobalsLookup.registerConstantArray(constantArray);
 
 			// Erase block node pointer
@@ -1115,7 +1112,7 @@ namespace lemon
 			CHECK_ERROR(tokens[4].getType() == Token::Type::CONSTANT, "", lineNumber);
 
 			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
-			const std::string_view identifier = tokens[2].as<IdentifierToken>().mName;
+			const FlyweightString identifier = tokens[2].as<IdentifierToken>().mName;
 			const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
 
 			if (isGlobalDefinition)

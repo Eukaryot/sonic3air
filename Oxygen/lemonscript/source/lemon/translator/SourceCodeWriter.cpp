@@ -45,7 +45,7 @@ namespace lemon
 		String line;
 		addDataType(line, function.getReturnType());
 		line << " ";
-		addIdentifier(line, function.getName());
+		addIdentifier(line, function.getName().getString());
 		line << "(";
 		for (size_t i = 0; i < function.getParameters().size(); ++i)
 		{
@@ -53,7 +53,7 @@ namespace lemon
 				line << ", ";
 			addDataType(line, function.getParameters()[i].mType);
 			line << " ";
-			addIdentifier(line, function.getParameters()[i].mIdentifier);
+			addIdentifier(line, function.getParameters()[i].mName.getString());
 		}
 		line << ")";
 		writeLine(line);
@@ -85,7 +85,7 @@ namespace lemon
 		}
 	}
 
-	void CppWriter::addIdentifier(String& line, const std::string& identifier)
+	void CppWriter::addIdentifier(String& line, std::string_view identifier)
 	{
 		for (size_t i = 0; i < identifier.length(); ++i)
 		{

@@ -11,6 +11,7 @@
 #include "oxygen/simulation/LemonScriptBindings.h"
 
 #include <lemon/compiler/PreprocessorDefinition.h>
+#include <lemon/utility/FlyweightString.h>
 
 
 namespace lemon
@@ -43,7 +44,7 @@ public:
 
 	struct GlobalDefine
 	{
-		std::string mName;
+		lemon::FlyweightString mName;
 		uint32 mAddress = 0;
 		uint8 mBytes = 0;
 		bool mSigned = false;
@@ -81,7 +82,7 @@ public:
 	const Hook* checkForAddressHook(uint32 address);
 	size_t getNumAddressHooks() const;
 
-	const std::string& getFunctionNameByHash(uint64 hash) const;
+	std::string_view getFunctionNameByHash(uint64 hash) const;
 	lemon::Variable* getGlobalVariableByHash(uint64 hash) const;
 	const std::vector<GlobalDefine>& getGlobalDefines() const  { return mGlobalDefines; }
 
@@ -95,7 +96,7 @@ private:
 	void evaluateFunctionPragmas();
 	void evaluateDefines();
 
-	Hook& addHook(Hook::Type type, uint32 address, const std::string& functionName);
+	Hook& addHook(Hook::Type type, uint32 address);
 
 private:
 	struct Internal;

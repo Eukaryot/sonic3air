@@ -31,7 +31,7 @@ public:
 	typedef std::vector<std::pair<std::string, std::string>> CallStackWithLabels;
 
 public:
-	static bool getCurrentScriptFunction(std::string* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName);
+	static bool getCurrentScriptFunction(std::string_view* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName);
 	static std::string getCurrentScriptLocationString();
 	static const std::string_view* tryResolveStringHash(uint64 hash);
 

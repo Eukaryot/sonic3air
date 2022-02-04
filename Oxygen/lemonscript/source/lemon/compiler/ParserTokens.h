@@ -11,6 +11,7 @@
 #include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/GenericManager.h"
 #include "lemon/program/DataType.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -134,7 +135,7 @@ namespace lemon
 		inline StringLiteralParserToken() : ParserToken(TYPE) {}
 
 	public:
-		std::string mString;
+		FlyweightString mString;
 	};
 
 
@@ -147,7 +148,7 @@ namespace lemon
 		inline IdentifierParserToken() : ParserToken(TYPE) {}
 
 	public:
-		std::string mIdentifier;
+		FlyweightString mName;
 	};
 
 

@@ -459,7 +459,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						}
 						if ((a.first & 0x80000000) && (b.first & 0x80000000))
 						{
-							return a.second->getName() < b.second->getName();
+							return a.second->getName().getString() < b.second->getName().getString();
 						}
 						else
 						{
@@ -475,7 +475,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					if (visualizationSorting && !filename.empty())
 						line << filename << " | ";
 					line << ((pair.first < 0x80000000) ? String(0, "0x%06x: ", pair.first) : "");
-					line << pair.second->getName();
+					line << pair.second->getName().getString();
 					if (!visualizationSorting && !filename.empty())
 						line << " | " << filename;
 					builder.addLine(line, Color::WHITE, 10);
@@ -490,7 +490,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 				for (const CodeExec::CallFrame& callFrame : callFrames)
 				{
 					// Ignore debugging stuff
-					if (nullptr != callFrame.mFunction && String(callFrame.mFunction->getName()).startsWith("debug"))
+					if (nullptr != callFrame.mFunction && rmx::startsWith(callFrame.mFunction->getName().getString(), "debug"))
 						continue;
 
 					if (ignoreDepth != 0)
@@ -531,7 +531,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 									(callFrame.mType == CodeExec::CallFrame::Type::SCRIPT_DIRECT) ? Color::WHITE : Color::YELLOW;
 						}
 						RMX_ASSERT(nullptr != callFrame.mFunction, "Invalid function pointer");
-						builder.addLine(callFrame.mFunction->getName() + postfix, color, indent, key);
+						builder.addLine(std::string(callFrame.mFunction->getName().getString()) + postfix, color, indent, key);
 					}
 				}
 				if (callFrames.size() == CodeExec::CALL_FRAMES_LIMIT)
@@ -587,8 +587,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						{
 							for (uint64 functionNameHash : hit.mCallStack)
 							{
-								const std::string& name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-								builder.addLine(String(0, "%s", name.c_str()), Color::fromABGR32(0xffc0c0c0), 32);
+								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
+								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
 							}
 						}
 					}
@@ -619,26 +619,27 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					builder.addSpacing(4);
 				}
 
+				const std::string_view& name = globalDefine.mName.getString();
 				switch (globalDefine.mBytes)
 				{
 					case 1:
 					{
 						const uint8 value = emulatorInterface.readMemory8(globalDefine.mAddress);
-						builder.addLine(String(0, "%s   = 0x%02x", globalDefine.mName.c_str(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%02x", name.data(), name.length(), value), color, indent, key);
 						break;
 					}
 
 					case 2:
 					{
 						const uint16 value = emulatorInterface.readMemory16(globalDefine.mAddress);
-						builder.addLine(String(0, "%s   = 0x%04x", globalDefine.mName.c_str(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%04x", name.data(), name.length(), value), color, indent, key);
 						break;
 					}
 
 					case 4:
 					{
 						const uint32 value = emulatorInterface.readMemory32(globalDefine.mAddress);
-						builder.addLine(String(0, "%s   = 0x%08x", globalDefine.mName.c_str(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%08x", name.data(), name.length(), value), color, indent, key);
 						break;
 					}
 				}
@@ -796,8 +797,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 				{
 					for (uint64 functionNameHash : write->mCallStack)
 					{
-						const std::string& name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-						builder.addLine(String(0, "%s", name.c_str()), Color::fromABGR32(0xffc0c0c0), 32);
+						const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
+						builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
 					}
 				}
 			}
@@ -834,8 +835,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						{
 							for (uint64 functionNameHash : singleEntry.mCallStack)
 							{
-								const std::string& name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
-								builder.addLine(String(0, "%s", name.c_str()), Color::fromABGR32(0xffc0c0c0), 32);
+								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
+								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
 							}
 						}
 					}

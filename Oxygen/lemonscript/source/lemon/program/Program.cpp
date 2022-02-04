@@ -69,7 +69,7 @@ namespace lemon
 			if (function->getType() == Function::Type::SCRIPT)
 				mScriptFunctions.push_back(static_cast<ScriptFunction*>(function));
 
-			mFunctionsByName[function->getNameHash()].push_back(function);
+			mFunctionsByName[function->getName().getHash()].push_back(function);
 			std::vector<Function*>& funcs = mFunctionsBySignature[function->getNameAndSignatureHash()];
 			funcs.insert(funcs.begin(), function);		// Insert as first
 		}
@@ -80,7 +80,7 @@ namespace lemon
 		{
 			RMX_ASSERT(mGlobalVariables.size() == (variable->getID() & 0x0fffffff), "Mismatch between expected and actual variable ID");
 			mGlobalVariables.push_back(variable);
-			mGlobalVariablesByName[variable->getNameHash()] = variable;
+			mGlobalVariablesByName[variable->getName().getHash()] = variable;
 		}
 
 		// Constant arrays

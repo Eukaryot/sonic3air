@@ -252,10 +252,10 @@ namespace lemon
 				}
 				case ParserToken::Type::IDENTIFIER:
 				{
-					const std::string_view identifier = parserToken.as<IdentifierParserToken>().mIdentifier;
+					const uint64 hash = parserToken.as<IdentifierParserToken>().mName.getHash();
 
 					// Unknown preprocessor definitions are okay, they automatically evaluate to 0
-					tokenList.createBack<ConstantToken>().mValue = (nullptr != mPreprocessorDefinitions) ? mPreprocessorDefinitions->getValue(rmx::getMurmur2_64(identifier)) : 0;
+					tokenList.createBack<ConstantToken>().mValue = (nullptr != mPreprocessorDefinitions) ? mPreprocessorDefinitions->getValue(hash) : 0;
 					break;
 				}
 			}

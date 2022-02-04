@@ -262,7 +262,7 @@ namespace lemon
 
 	int64* Runtime::accessGlobalVariableValue(const Variable& variable)
 	{
-		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName() << " is not a global variable", return nullptr);
+		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName().getString() << " is not a global variable", return nullptr);
 		const uint32 index = variable.getID() & 0x0fffffff;
 		RMX_CHECK(index < mGlobalVariables.size(), "Variable index " << index << " is not valid", return nullptr);
 		return &mGlobalVariables[index];
@@ -675,7 +675,7 @@ namespace lemon
 			{
 				for (uint16 i = 0; i < controlFlow.mCallStack.count; ++i)
 				{
-					serializer.write(controlFlow.mCallStack[i].mRuntimeFunction->mFunction->getName());
+					serializer.write(controlFlow.mCallStack[i].mRuntimeFunction->mFunction->getName().getString());
 					serializer.write(controlFlow.mCallStack[i].mRuntimeFunction->mFunction->getSignatureHash());
 					serializer.writeAs<uint32>(controlFlow.mCallStack[i].mRuntimeFunction->translateFromRuntimeProgramCounter(controlFlow.mCallStack[i].mProgramCounter));
 
@@ -737,7 +737,7 @@ namespace lemon
 				serializer.writeAs<uint32>(mGlobalVariables.size());
 				for (size_t i = 0; i < mGlobalVariables.size(); ++i)
 				{
-					serializer.write(mProgram->getGlobalVariables()[i]->getName());
+					serializer.write(mProgram->getGlobalVariables()[i]->getName().getString());
 					serializer.write<uint64>(mGlobalVariables[i]);
 				}
 			}

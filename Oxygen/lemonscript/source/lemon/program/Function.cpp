@@ -141,20 +141,19 @@ namespace lemon
 		return *mLocalVariablesByID[id];
 	}
 
-	LocalVariable& ScriptFunction::addLocalVariable(std::string_view identifier, uint64 nameHash, const DataTypeDefinition* dataType, uint32 lineNumber)
+	LocalVariable& ScriptFunction::addLocalVariable(FlyweightString name, const DataTypeDefinition* dataType, uint32 lineNumber)
 	{
 		// Check if it already exists!
-		if (mLocalVariablesByIdentifier.count(nameHash))
+		if (mLocalVariablesByIdentifier.count(name.getHash()))
 		{
 			CHECK_ERROR(false, "Variable already exists", lineNumber);
 		}
 
 		LocalVariable& variable = mModule->createLocalVariable();
-		variable.mName = identifier;
-		variable.mNameHash = nameHash;
+		variable.mName = name;
 		variable.mDataType = dataType;
 
-		mLocalVariablesByIdentifier.emplace(nameHash, &variable);
+		mLocalVariablesByIdentifier.emplace(name.getHash(), &variable);
 
 		variable.mID = (uint32)mLocalVariablesByID.size();
 		mLocalVariablesByID.emplace_back(&variable);
@@ -215,9 +214,8 @@ namespace lemon
 	UserDefinedFunction& UserDefinedFunction::setParameterInfo(size_t index, const std::string& identifier)
 	{
 		RMX_ASSERT(index < mParameters.size(), "Invalid parameter index " << index);
-		RMX_ASSERT(mParameters[index].mIdentifier.empty(), "Parameter identifier is already set for index " << index);
-		mParameters[index].mIdentifier = identifier;
-		mParameters[index].mNameHash = rmx::getMurmur2_64(identifier);
+		RMX_ASSERT(!mParameters[index].mName.isValid(), "Parameter identifier is already set for index " << index);
+		mParameters[index].mName.set(identifier);
 		return *this;
 	}
 

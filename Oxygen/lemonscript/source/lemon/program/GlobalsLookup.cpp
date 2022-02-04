@@ -62,7 +62,7 @@ namespace lemon
 
 	void GlobalsLookup::registerFunction(Function& function)
 	{
-		mFunctionsByName[function.getNameHash()].push_back(&function);
+		mFunctionsByName[function.getName().getHash()].push_back(&function);
 	}
 
 	const Variable* GlobalsLookup::getGlobalVariableByName(uint64 nameHash) const
@@ -73,7 +73,8 @@ namespace lemon
 
 	void GlobalsLookup::registerVariable(Variable& variable)
 	{
-		mGlobalVariablesByName[variable.getNameHash()] = &variable;
+		const uint64 nameHash = variable.getName().getHash();
+		mGlobalVariablesByName[nameHash] = &variable;
 	}
 
 	const Constant* GlobalsLookup::getConstantByName(uint64 nameHash) const
@@ -84,7 +85,7 @@ namespace lemon
 
 	void GlobalsLookup::registerConstant(Constant& constant)
 	{
-		const uint64 nameHash = rmx::getMurmur2_64(constant.getName());
+		const uint64 nameHash = constant.getName().getHash();
 		mConstantsByName[nameHash] = &constant;
 	}
 
@@ -96,7 +97,7 @@ namespace lemon
 
 	void GlobalsLookup::registerConstantArray(ConstantArray& constantArray)
 	{
-		const uint64 nameHash = rmx::getMurmur2_64(constantArray.getName());
+		const uint64 nameHash = constantArray.getName().getHash();
 		mConstantArraysByName[nameHash] = &constantArray;
 	}
 
@@ -108,7 +109,7 @@ namespace lemon
 
 	void GlobalsLookup::registerDefine(Define& define)
 	{
-		const uint64 nameHash = rmx::getMurmur2_64(define.getName());
+		const uint64 nameHash = define.getName().getHash();
 		mDefinesByName[nameHash] = &define;
 	}
 

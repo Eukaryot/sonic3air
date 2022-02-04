@@ -339,14 +339,14 @@ namespace lemon
 				case Token::Type::VARIABLE:
 				{
 					const VariableToken& vt = token.as<VariableToken>();
-					CppWriter::addIdentifier(line, vt.mVariable->getName());
+					CppWriter::addIdentifier(line, vt.mVariable->getName().getString());
 					break;
 				}
 
 				case Token::Type::FUNCTION:
 				{
 					const FunctionToken& ft = token.as<FunctionToken>();
-					CppWriter::addIdentifier(line, ft.mFunction->getName());
+					CppWriter::addIdentifier(line, ft.mFunction->getName().getString());
 					line << "(";
 
 					for (size_t k = 0; k < ft.mParameters.size(); ++k)

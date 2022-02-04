@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -20,7 +20,7 @@ namespace lemon
 	friend class Module;
 
 	public:
-		inline const std::string& getName() const  { return mName; }
+		inline FlyweightString getName() const  { return mName; }
 		inline const DataTypeDefinition* getElementDataType() const  { return mElementDataType; }
 		inline uint32 getID() const  { return mID; }
 		
@@ -35,7 +35,7 @@ namespace lemon
 		void serializeData(VectorBinarySerializer& serializer);
 
 	private:
-		std::string mName;
+		FlyweightString mName;
 		const DataTypeDefinition* mElementDataType = nullptr;
 		uint32 mID = 0;
 		std::vector<uint64> mData;

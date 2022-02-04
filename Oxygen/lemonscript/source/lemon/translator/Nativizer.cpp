@@ -1194,7 +1194,8 @@ namespace lemon
 
 		// Generate code for the assignments
 		{
-			std::string line = "// First occurrence: " + function.getName();
+			std::string line = "// First occurrence: ";
+			line.append(function.getName().getString());
 			if (opcodes[0].mLineNumber != 0)
 				line = line + ", line " + std::to_string(opcodes[0].mLineNumber - function.mSourceBaseLineOffset + 1);
 			writer.writeLine(line);
