@@ -113,7 +113,7 @@ namespace lemon
 		mDefinesByName[nameHash] = &define;
 	}
 
-	const StoredString* GlobalsLookup::getStringLiteralByHash(uint64 hash) const
+	const FlyweightString* GlobalsLookup::getStringLiteralByHash(uint64 hash) const
 	{
 		return mStringLiterals.getStringByHash(hash);
 	}

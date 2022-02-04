@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <rmxbase.h>
+
 
 namespace lemon
 {
@@ -23,6 +25,9 @@ namespace lemon
 			};
 
 		public:
+			FlyweightStringManager();
+
+		public:
 			rmx::OneTimeAllocPool mAllocPool;
 			std::unordered_map<uint64, Entry*> mEntryMap;
 		};
@@ -33,6 +38,7 @@ namespace lemon
 	{
 	public:
 		inline FlyweightString() {}
+		inline explicit FlyweightString(uint64 hash) { set(hash); }
 		inline FlyweightString(const char* str) { set(str); }
 		inline FlyweightString(std::string_view str) { set(str); }
 		inline FlyweightString(const std::string& str) { set(str); }
@@ -41,7 +47,9 @@ namespace lemon
 		inline bool isValid() const  { return (nullptr != mEntry); }
 		inline uint64 getHash() const  { return (nullptr != mEntry) ? mEntry->mHash : 0; }
 		std::string_view getString() const  { return (nullptr != mEntry) ? mEntry->mString : std::string_view(); }
+		const std::string_view& getStringRef() const  { return (nullptr != mEntry) ? mEntry->mString : EMPTY_STRING_VIEW; }
 
+		void set(uint64 hash);
 		void set(uint64 hash, std::string_view name);
 		void set(std::string_view name);
 
@@ -57,5 +65,6 @@ namespace lemon
 		detail::FlyweightStringManager::Entry* mEntry = nullptr;
 
 		inline static detail::FlyweightStringManager mManager;
+		inline static std::string_view EMPTY_STRING_VIEW;
 	};
 }

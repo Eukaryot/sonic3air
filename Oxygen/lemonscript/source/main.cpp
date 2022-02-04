@@ -64,7 +64,7 @@ void logValueStr(int64 key)
 	Runtime* runtime = Runtime::getActiveRuntime();
 	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
 
-	const StoredString* storedString = runtime->resolveStringByKey((uint64)key);
+	const FlyweightString* storedString = runtime->resolveStringByKey((uint64)key);
 	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 
 	std::cout << storedString->getString() << std::endl;
@@ -75,7 +75,7 @@ void debugLog(uint64 stringHash)
 	Runtime* runtime = Runtime::getActiveRuntime();
 	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
 
-	const StoredString* storedString = runtime->resolveStringByKey((uint64)stringHash);
+	const FlyweightString* storedString = runtime->resolveStringByKey((uint64)stringHash);
 	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 
 	std::cout << storedString->getString() << std::endl;

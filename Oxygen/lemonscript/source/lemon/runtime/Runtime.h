@@ -8,16 +8,14 @@
 
 #pragma once
 
-#include "lemon/program/StoredString.h"
+#include "lemon/program/StringRef.h"
 #include "lemon/runtime/ControlFlow.h"
-#include <unordered_map>
 
 
 namespace lemon
 {
 	class Function;
 	class Program;
-	class StoredString;
 	class UserDefinedFunction;
 	class Variable;
 	struct RuntimeOpcode;
@@ -132,7 +130,7 @@ namespace lemon
 		RuntimeFunction* getRuntimeFunctionBySignature(uint64 signatureHash, size_t index = 0);
 
 		bool hasStringWithKey(uint64 key) const;
-		const StoredString* resolveStringByKey(uint64 key) const;
+		const FlyweightString* resolveStringByKey(uint64 key) const;
 		uint64 addString(std::string_view str);
 
 		int64 getGlobalVariableValue(const Variable& variable);

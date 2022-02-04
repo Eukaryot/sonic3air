@@ -150,7 +150,7 @@ namespace lemon
 		inline LabelNode() : Node(TYPE) {}
 
 	public:
-		std::string mLabel;
+		FlyweightString mLabel;
 	};
 
 

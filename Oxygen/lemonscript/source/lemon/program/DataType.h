@@ -173,6 +173,7 @@ namespace lemon
 				case BaseType::INT_32:		return 4;
 				case BaseType::INT_64:		return 8;
 				case BaseType::INT_CONST:	return 8;
+				default: break;
 			}
 			return 0;
 		}

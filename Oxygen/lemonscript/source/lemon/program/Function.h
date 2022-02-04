@@ -74,6 +74,13 @@ namespace lemon
 	class ScriptFunction : public Function
 	{
 	public:
+		struct Label
+		{
+			FlyweightString mName;
+			uint32 mOffset = 0;
+		};
+
+	public:
 		inline ScriptFunction() : Function(Type::SCRIPT) {}
 		~ScriptFunction();
 
@@ -84,9 +91,9 @@ namespace lemon
 		LocalVariable& getLocalVariableByID(uint32 id) const;
 		LocalVariable& addLocalVariable(FlyweightString name, const DataTypeDefinition* dataType, uint32 lineNumber);
 
-		bool getLabel(std::string_view labelName, size_t& outOffset) const;
-		void addLabel(std::string_view labelName, size_t offset);
-		const std::string* findLabelByOffset(size_t offset) const;
+		bool getLabel(FlyweightString labelName, size_t& outOffset) const;
+		void addLabel(FlyweightString labelName, size_t offset);
+		const Label* findLabelByOffset(size_t offset) const;
 
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
 
@@ -101,7 +108,7 @@ namespace lemon
 		std::vector<Opcode> mOpcodes;
 
 		// Labels
-		std::map<std::string, uint32> mLabels;	// TODO: Better use the string hash as key
+		std::vector<Label> mLabels;
 
 		// Pragmas
 		std::vector<std::string> mPragmas;

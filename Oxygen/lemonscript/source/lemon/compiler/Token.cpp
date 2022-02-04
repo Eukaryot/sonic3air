@@ -101,7 +101,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::LABEL:
 		{
 			LabelToken& token = token_.as<LabelToken>();
-			serializer.serialize(token.mName);
+			token.mName.serialize(serializer);
 			break;
 		}
 

@@ -12,7 +12,7 @@
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
-#include "lemon/program/StoredString.h"
+#include "lemon/program/StringRef.h"
 #include <unordered_map>
 
 
@@ -49,7 +49,7 @@ namespace lemon
 		void registerDefine(Define& define);
 
 		// String literals
-		const StoredString* getStringLiteralByHash(uint64 hash) const;
+		const FlyweightString* getStringLiteralByHash(uint64 hash) const;
 
 	private:
 		// Functions

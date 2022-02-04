@@ -146,11 +146,11 @@ const std::string_view* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
 	if (nullptr == runtime)
 		return nullptr;
 
-	const lemon::StoredString* str = runtime->resolveStringByKey(hash);
+	const lemon::FlyweightString* str = runtime->resolveStringByKey(hash);
 	if (nullptr == str)
 		return nullptr;
 
-	return &str->getString();
+	return &str->getStringRef();
 }
 
 
@@ -293,10 +293,10 @@ void LemonScriptRuntime::getCallStackWithLabels(CallStackWithLabels& outCallStac
 	mInternal.mRuntime.getMainControlFlow().getCallStack(locations);
 	for (const lemon::ControlFlow::Location& location : locations)
 	{
-		const std::string* labelName = location.mFunction->findLabelByOffset(location.mProgramCounter);
-		if (nullptr != labelName)
+		const lemon::ScriptFunction::Label* label = location.mFunction->findLabelByOffset(location.mProgramCounter);
+		if (nullptr != label)
 		{
-			outCallStack.emplace_back(location.mFunction->getName().getString(), *labelName);
+			outCallStack.emplace_back(location.mFunction->getName().getString(), label->mName.getString());
 		}
 	}
 }

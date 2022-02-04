@@ -453,12 +453,11 @@ namespace lemon
 					tokens.erase(i+1);
 
 					// Assign types
-					std::vector<const DataTypeDefinition*> parameterTypes;
-					parameterTypes.reserve(token.mParameters.size());
+					static std::vector<const DataTypeDefinition*> parameterTypes;	// Not multi-threading safe
+					parameterTypes.resize(token.mParameters.size());
 					for (size_t i = 0; i < token.mParameters.size(); ++i)
 					{
-						const DataTypeDefinition* type = assignStatementDataType(*token.mParameters[i], nullptr);
-						parameterTypes.push_back(type);
+						parameterTypes[i] = assignStatementDataType(*token.mParameters[i], nullptr);
 					}
 
 					// If the function was not determined already, do that now

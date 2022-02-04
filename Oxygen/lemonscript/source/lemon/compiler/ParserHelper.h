@@ -43,7 +43,32 @@ namespace lemon
 			bool mIsIdentifierCharacter[0x100];
 		};
 
-		inline static Lookup mLookup;
+		struct DigitLookup
+		{
+			DigitLookup(bool hexadecimal)
+			{
+				for (int i = 0; i < 55; ++i)
+				{
+					const char ch = '0' + (char)i;
+					if (ch >= '0' && ch <= '9')
+						mValues[i] = (uint8)(ch - '0');
+					else if (hexadecimal && ch >= 'A' && ch <= 'F')
+						mValues[i] = (uint8)(ch - 'A') + 10;
+					else if (hexadecimal && ch >= 'a' && ch <= 'f')
+						mValues[i] = (uint8)(ch - 'a') + 10;
+					else
+						mValues[i] = 0x80;	// Uppermost bit encodes an invalid value
+				}
+			}
+
+			inline uint8 getValueByCharacter(char ch) const  { return (ch >= '0' && ch <= 'f') ? mValues[ch - '0'] : 0x80; }
+
+			uint8 mValues[55];		// Range from '0' (48) to 'f' (102)
+		};
+
+		inline static const Lookup mLookup;
+		inline static const DigitLookup mDigitLookupHex = DigitLookup(true);
+		inline static const DigitLookup mDigitLookupDec = DigitLookup(false);
 
 
 		inline static bool isDigit(char ch)
@@ -192,31 +217,28 @@ namespace lemon
 		inline static int64 parseInteger(const char* input, size_t length, uint32 lineNumber)
 		{
 			int64 result = 0;
+			uint8 errorCheck = 0;
 			if (length >= 3 && input[0] == '0' && input[1] == 'x')
 			{
 				for (size_t i = 2; i < length; ++i)
 				{
 					const char ch = input[i];
-					if (ch >= '0' && ch <= '9')
-						result = result * 16 + (int64)(ch - '0');
-					else if (ch >= 'A' && ch <= 'F')
-						result = result * 16 + (int64)(ch - 'A') + 10;
-					else if (ch >= 'a' && ch <= 'f')
-						result = result * 16 + (int64)(ch - 'a') + 10;
-					else
-						CHECK_ERROR(false, "Invalid hexadecimal number", lineNumber);
+					const uint8 value = mDigitLookupHex.getValueByCharacter(ch);
+					result = result * 16 + (int64)value;
+					errorCheck |= value;
 				}
+				CHECK_ERROR((errorCheck & 0x80) == 0, "Invalid hexadecimal number", lineNumber);
 			}
 			else
 			{
 				for (size_t i = 0; i < length; ++i)
 				{
 					const char ch = input[i];
-					if (ch >= '0' && ch <= '9')
-						result = result * 10 + (ch - '0');
-					else
-						CHECK_ERROR(false, "Invalid decimal number", lineNumber);
+					const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
+					result = result * 10 + (int64)value;
+					errorCheck |= value;
 				}
+				CHECK_ERROR((errorCheck & 0x80) == 0, "Invalid decimal number", lineNumber);
 			}
 			return result;
 		}

@@ -42,25 +42,25 @@ namespace
 	void setDiscordDetails(lemon::StringRef text)
 	{
 		if (text.isValid())
-			DiscordIntegration::setModdedDetails(*text);
+			DiscordIntegration::setModdedDetails(text.getString());
 	}
 
 	void setDiscordState(lemon::StringRef text)
 	{
 		if (text.isValid())
-			DiscordIntegration::setModdedState(*text);
+			DiscordIntegration::setModdedState(text.getString());
 	}
 
 	void setDiscordLargeImage(lemon::StringRef imageName)
 	{
 		if (imageName.isValid())
-			DiscordIntegration::setModdedLargeImage(*imageName);
+			DiscordIntegration::setModdedLargeImage(imageName.getString());
 	}
 
 	void setDiscordSmallImage(lemon::StringRef imageName)
 	{
 		if (imageName.isValid())
-			DiscordIntegration::setModdedSmallImage(*imageName);
+			DiscordIntegration::setModdedSmallImage(imageName.getString());
 	}
 
 	bool isModdedSound(uint8 sfxId)

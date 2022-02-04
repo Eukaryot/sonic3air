@@ -242,7 +242,7 @@ namespace lemon
 
 				size_t offset = 0xffffffff;
 				if (!mFunction.getLabel(jumpNode.mLabelToken->mName, offset))
-					CHECK_ERROR(false, "Jump target label not found: " << jumpNode.mLabelToken->mName, node.getLineNumber());
+					CHECK_ERROR(false, "Jump target label not found: " << jumpNode.mLabelToken->mName.getString(), node.getLineNumber());
 
 				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32, offset);
 				break;
@@ -799,11 +799,11 @@ namespace lemon
 				}
 
 				// Collect labels
-				for (auto& pair : mFunction.mLabels)
+				for (ScriptFunction::Label& label : mFunction.mLabels)
 				{
-					if ((size_t)pair.second < isOpcodeJumpTarget.size())
+					if ((size_t)label.mOffset < isOpcodeJumpTarget.size())
 					{
-						isOpcodeJumpTarget[(size_t)pair.second] = true;
+						isOpcodeJumpTarget[(size_t)label.mOffset] = true;
 					}
 				}
 			}
@@ -969,9 +969,9 @@ namespace lemon
 			static std::vector<size_t> openSeeds;
 			openSeeds.clear();
 			openSeeds.push_back(0);
-			for (const auto& pair : mFunction.mLabels)
+			for (const ScriptFunction::Label& label : mFunction.mLabels)
 			{
-				openSeeds.push_back(pair.second);
+				openSeeds.push_back((size_t)label.mOffset);
 			}
 
 			// Trace all reachable opcodes from our seeds
@@ -1096,9 +1096,9 @@ namespace lemon
 			}
 
 			// Update labels
-			for (auto& pair : mFunction.mLabels)
+			for (ScriptFunction::Label& label : mFunction.mLabels)
 			{
-				pair.second = ((size_t)pair.second < indexRemap.size()) ? indexRemap[(size_t)pair.second] : lastOpcode;
+				label.mOffset = ((size_t)label.mOffset < indexRemap.size()) ? (uint32)indexRemap[(size_t)label.mOffset] : (uint32)lastOpcode;
 			}
 
 			mOpcodes.resize(newSize);
@@ -1140,9 +1140,9 @@ namespace lemon
 		}
 
 		// Add label targets
-		for (const auto& pair : mFunction.mLabels)
+		for (const ScriptFunction::Label& label : mFunction.mLabels)
 		{
-			mOpcodes[pair.second].mFlags |= Opcode::Flag::LABEL;
+			mOpcodes[label.mOffset].mFlags |= Opcode::Flag::LABEL;
 		}
 
 		// Add jump targets

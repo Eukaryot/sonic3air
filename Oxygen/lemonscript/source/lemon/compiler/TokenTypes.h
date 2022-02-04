@@ -74,7 +74,7 @@ namespace lemon
 		inline LabelToken() : Token(TYPE) {}
 
 	public:
-		std::string mName;
+		FlyweightString mName;
 	};
 
 

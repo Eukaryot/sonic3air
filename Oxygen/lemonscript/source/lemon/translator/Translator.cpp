@@ -85,7 +85,7 @@ namespace lemon
 				{
 					const LabelNode& labelNode = node.as<LabelNode>();
 					writer.decreaseIndentation();
-					writer.writeLine(labelNode.mLabel + ":");
+					writer.writeLine(std::string(labelNode.mLabel.getString()) + ":");
 					writer.increaseIndentation();
 					break;
 				}
@@ -93,7 +93,7 @@ namespace lemon
 				case Node::Type::JUMP:
 				{
 					const JumpNode& jumpNode = node.as<JumpNode>();
-					writer.writeLine("goto " + jumpNode.mLabelToken->mName + ";");
+					writer.writeLine("goto " + std::string(jumpNode.mLabelToken->mName.getString()) + ";");
 					break;
 				}
 

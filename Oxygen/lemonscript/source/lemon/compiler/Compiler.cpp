@@ -400,7 +400,7 @@ namespace lemon
 
 						case ParserToken::Type::LABEL:
 						{
-							node.mTokenList.createBack<LabelToken>().mName.swap(parserToken.as<LabelParserToken>().mName);
+							node.mTokenList.createBack<LabelToken>().mName = parserToken.as<LabelParserToken>().mName;
 							break;
 						}
 
@@ -421,15 +421,14 @@ namespace lemon
 						case ParserToken::Type::STRING_LITERAL:
 						{
 							const FlyweightString str = parserToken.as<StringLiteralParserToken>().mString;
-							const StoredString* storedString = mGlobalsLookup.getStringLiteralByHash(str.getHash());
+							const FlyweightString* storedString = mGlobalsLookup.getStringLiteralByHash(str.getHash());
 							if (nullptr == storedString)
 							{
 								// Add as a new string literal to the module
-								storedString = &mModule.addStringLiteral(str);
-								CHECK_ERROR(nullptr != storedString, "Failed to create new string literal, there's possibly too many (more than 65536)", 0);
+								mModule.addStringLiteral(str);
 							}
 							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
-							constantToken.mValue = storedString->getHash();
+							constantToken.mValue = str.getHash();
 							constantToken.mDataType = &PredefinedDataTypes::STRING;
 							break;
 						}

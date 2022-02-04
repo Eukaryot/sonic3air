@@ -11,7 +11,7 @@
 #include "lemon/runtime/RuntimeFunction.h"
 #include "lemon/runtime/RuntimeOpcodeContext.h"
 #include "lemon/program/Program.h"
-#include "lemon/program/StoredString.h"
+#include "lemon/program/StringRef.h"
 
 
 namespace lemon
@@ -235,14 +235,16 @@ namespace lemon
 		return (nullptr != mStrings.getStringByHash(key));
 	}
 
-	const StoredString* Runtime::resolveStringByKey(uint64 key) const
+	const FlyweightString* Runtime::resolveStringByKey(uint64 key) const
 	{
 		return mStrings.getStringByHash(key);
 	}
 
 	uint64 Runtime::addString(std::string_view str)
 	{
-		return mStrings.getOrAddString(str).getHash();
+		const FlyweightString flyweightString(str);
+		mStrings.addString(flyweightString);
+		return flyweightString.getHash();
 	}
 
 	int64 Runtime::getGlobalVariableValue(const Variable& variable)

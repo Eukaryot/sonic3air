@@ -141,7 +141,7 @@ namespace lemon
 	{
 		for (const Module* module : mModules)
 		{
-			outStrings.addFromLookup(module->getStringLiterals());
+			outStrings.addFromList(module->getStringLiterals());
 		}
 	}
 

@@ -146,8 +146,8 @@ namespace lemon
 			
 			static FastStringStream result;
 			result.clear();
-			result.addString(*str1);
-			result.addString(*str2);
+			result.addString(str1.getStringRef());
+			result.addString(str2.getStringRef());
 			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
 		}
 
@@ -155,34 +155,34 @@ namespace lemon
 		{
 			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
 			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (*str1 < *str2);
+			return (str1.getString() < str2.getString());
 		}
 
 		bool string_operator_less_or_equal(StringRef str1, StringRef str2)
 		{
 			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
 			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (*str1 <= *str2);
+			return (str1.getString() <= str2.getString());
 		}
 
 		bool string_operator_greater(StringRef str1, StringRef str2)
 		{
 			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
 			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (*str1 > *str2);
+			return (str1.getString() > str2.getString());
 		}
 
 		bool string_operator_greater_or_equal(StringRef str1, StringRef str2)
 		{
 			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
 			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (*str1 >= *str2);
+			return (str1.getString() >= str2.getString());
 		}
 
 		uint32 string_length(StringRef str)
 		{
 			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
-			return (uint32)str->length();
+			return (uint32)str.getString().length();
 		}
 	}
 
@@ -243,7 +243,7 @@ namespace lemon
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			RMX_CHECK(format.isValid(), "Unable to resolve format string", return StringRef());
 
-			std::string_view formatString = *format;
+			std::string_view formatString = format.getString();
 			const int length = (int)formatString.length();
 			const char* fmtPtr = formatString.data();
 			const char* fmtEnd = fmtPtr + length;
@@ -289,7 +289,7 @@ namespace lemon
 					else if (fmtPtr[1] == 's')
 					{
 						// String argument
-						const StoredString* argStoredString = runtime->resolveStringByKey(args[0]);
+						const FlyweightString* argStoredString = runtime->resolveStringByKey(args[0]);
 						if (nullptr == argStoredString)
 							result.addString("<?>", 3);
 						else
@@ -401,16 +401,16 @@ namespace lemon
 
 		uint32 strlen(StringRef string)
 		{
-			return (string.isValid()) ? (uint32)string->length() : 0;
+			return (string.isValid()) ? (uint32)string.getString().length() : 0;
 		}
 
 		uint8 getchar(StringRef string, uint32 index)
 		{
 			if (!string.isValid())
 				return 0;
-			if (index >= string->length())
+			if (index >= string.getString().length())
 				return 0;
-			return (*string)[index];
+			return string.getString()[index];
 		}
 
 		uint64 substring(StringRef string, uint32 index, uint32 length)
@@ -420,7 +420,7 @@ namespace lemon
 			if (!string.isValid())
 				return 0;
 
-			const std::string_view part = string->substr(index, length);
+			const std::string_view part = string.getString().substr(index, length);
 			return runtime->addString(part);
 		}
 
@@ -428,8 +428,8 @@ namespace lemon
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
-			const StoredString* str = runtime->resolveStringByKey(hash);
-			return (nullptr == str) ? StringRef() : StringRef(hash, str);
+			const FlyweightString* str = runtime->resolveStringByKey(hash);
+			return (nullptr == str) ? StringRef() : StringRef(*str);
 		}
 	}
 

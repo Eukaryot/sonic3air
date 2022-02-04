@@ -73,7 +73,7 @@ namespace
 
 			if (text.isValid())
 			{
-				RMX_ERROR("Script assertion failed:\n'" << *text << "'.\nIn " << locationText << ".", );
+				RMX_ERROR("Script assertion failed:\n'" << text.getString() << "'.\nIn " << locationText << ".", );
 			}
 			else
 			{
@@ -185,7 +185,7 @@ namespace
 
 	uint32 System_loadPersistentData(uint32 targetAddress, lemon::StringRef key, uint32 maxBytes)
 	{
-		const std::vector<uint8>& data = PersistentData::instance().getData(key.mHash);
+		const std::vector<uint8>& data = PersistentData::instance().getData(key.getHash());
 		return detail::loadData(targetAddress, data, 0, maxBytes);
 	}
 
@@ -199,7 +199,7 @@ namespace
 
 		if (key.isValid())
 		{
-			PersistentData::instance().setData(*key, data);
+			PersistentData::instance().setData(key.getString(), data);
 		}
 	}
 
@@ -221,7 +221,7 @@ namespace
 
 		CodeExec* codeExec = CodeExec::getActiveInstance();
 		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
-		codeExec->setupCallFrame(*functionName, labelName.isValid() ? *labelName : "");
+		codeExec->setupCallFrame(functionName.getString(), labelName.getString());
 	}
 
 	void System_setupCallFrame1(lemon::StringRef functionName)
@@ -247,13 +247,13 @@ namespace
 
 	bool System_hasExternalRawData(lemon::StringRef key)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.mHash);
+		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.getHash());
 		return !rawDataVector.empty();
 	}
 
 	uint32 System_loadExternalRawData1(lemon::StringRef key, uint32 targetAddress, uint32 offset, uint32 maxBytes, bool loadOriginalData, bool loadModdedData)
 	{
-		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.mHash);
+		const std::vector<const ResourcesCache::RawData*>& rawDataVector = ResourcesCache::instance().getRawData(key.getHash());
 		const ResourcesCache::RawData* rawData = nullptr;
 		for (int i = (int)rawDataVector.size() - 1; i >= 0; --i)
 		{
@@ -279,13 +279,13 @@ namespace
 
 	bool System_hasExternalPaletteData(lemon::StringRef key, uint8 line)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.mHash, line);
+		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.getHash(), line);
 		return (nullptr != palette);
 	}
 
 	uint16 System_loadExternalPaletteData(lemon::StringRef key, uint8 line, uint32 targetAddress, uint8 maxColors)
 	{
-		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.mHash, line);
+		const ResourcesCache::Palette* palette = ResourcesCache::instance().getPalette(key.getHash(), line);
 		if (nullptr == palette)
 			return 0;
 
@@ -323,7 +323,7 @@ namespace
 	{
 		if (text.isValid())
 		{
-			debugLogInternal(*text);
+			debugLogInternal(text.getString());
 		}
 	}
 
@@ -339,7 +339,7 @@ namespace
 			EmulatorInterface& emulatorInterface = codeExec->getEmulatorInterface();
 
 			LogDisplay::ColorLogEntry entry;
-			entry.mName = *name;
+			entry.mName = name.getString();
 			entry.mColors.reserve(numColors);
 			for (uint8 i = 0; i < numColors; ++i)
 			{
@@ -823,7 +823,7 @@ namespace
 		{
 			if (categoryName.isValid())
 			{
-				SpriteCache::instance().dumpSprite(key, *categoryName, spriteNumber, atex);
+				SpriteCache::instance().dumpSprite(key, categoryName.getString(), spriteNumber, atex);
 			}
 		}
 	}
@@ -886,7 +886,7 @@ namespace
 			lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
 			if (nullptr != runtime)
 			{
-				const lemon::StoredString* str = runtime->resolveStringByKey(sfxId);
+				const lemon::FlyweightString* str = runtime->resolveStringByKey(sfxId);
 				if (nullptr != str)
 				{
 					const std::string_view textString = str->getString();
@@ -935,7 +935,7 @@ namespace
 	{
 		if (postfix.isValid())
 		{
-			EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, *postfix, (float)relativeSpeed / 65536.0f);
+			EngineMain::instance().getAudioOut().enableAudioModifier(channel, context, postfix.getString(), (float)relativeSpeed / 65536.0f);
 		}
 	}
 
@@ -950,11 +950,11 @@ namespace
 		if (!modName.isValid())
 			return nullptr;
 
-		// TODO: This can be optimized with a lookup map by mod name hash (which we already have from the parameter)
+		// TODO: This can be optimized with a lookup map by mod name hash - but this also requires the other mods' display name hashes
 		const auto& activeMods = ModManager::instance().getActiveMods();
 		for (const Mod* mod : activeMods)
 		{
-			if (mod->mDisplayName == *modName)
+			if (mod->mDisplayName == modName.getString())
 				return mod;
 		}
 		return nullptr;
@@ -994,7 +994,7 @@ namespace
 		RMX_CHECK(alignment >= 1 && alignment <= 9, "Invalid alignment " << alignment << " used for drawing text, fallback to alignment = 1", alignment = 1);
 		if (fontKey.isValid() && text.isValid())
 		{
-			RenderParts::instance().getOverlayManager().addText(*fontKey, fontKey.mHash, Vec2i(px, py), *text, text.mHash, Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
+			RenderParts::instance().getOverlayManager().addText(fontKey.getString(), fontKey.getHash(), Vec2i(px, py), text.getString(), text.getHash(), Color::fromRGBA32(tintColor), (int)alignment, (int)spacing, renderQueue, useWorldSpace ? OverlayManager::Space::WORLD : OverlayManager::Space::SCREEN);
 		}
 	}
 
@@ -1037,7 +1037,7 @@ namespace
 			if (filename.isValid())
 			{
 				const uint8* src = emulatorInterface.getMemoryPointer(startAddress, false, bytes);
-				FTX::FileSystem->saveFile(*filename, src, (size_t)bytes);
+				FTX::FileSystem->saveFile(filename.getString(), src, (size_t)bytes);
 			}
 		}
 	}
@@ -1057,7 +1057,7 @@ namespace
 			{
 				if (category.isValid())
 				{
-					return analyser->hasEntry(*category, address);
+					return analyser->hasEntry(category.getString(), address);
 				}
 			}
 		}
@@ -1073,7 +1073,7 @@ namespace
 			{
 				if (category.isValid())
 				{
-					analyser->beginEntry(*category, address);
+					analyser->beginEntry(category.getString(), address);
 				}
 			}
 		}
@@ -1100,7 +1100,7 @@ namespace
 			{
 				if (key.isValid() && value.isValid())
 				{
-					analyser->addKeyValue(*key, *value);
+					analyser->addKeyValue(key.getString(), value.getString());
 				}
 			}
 		}
@@ -1115,7 +1115,7 @@ namespace
 			{
 				if (key.isValid())
 				{
-					analyser->beginObject(*key);
+					analyser->beginObject(key.getString());
 				}
 			}
 		}
@@ -1137,14 +1137,14 @@ namespace
 	{
 		if (!shortName.isValid())
 			return false;
-		return Application::instance().getDebugSidePanel()->setupCustomCategory(*fullName, (*shortName)[0]);
+		return Application::instance().getDebugSidePanel()->setupCustomCategory(fullName.getString(), shortName.getString()[0]);
 	}
 
 	bool System_SidePanel_addOption(lemon::StringRef text, bool defaultValue)
 	{
 		if (!text.isValid())
 			return false;
-		return Application::instance().getDebugSidePanel()->addOption(*text, defaultValue);
+		return Application::instance().getDebugSidePanel()->addOption(text.getString(), defaultValue);
 	}
 
 	void System_SidePanel_addEntry(uint64 key)
@@ -1156,7 +1156,7 @@ namespace
 	{
 		if (text.isValid())
 		{
-			Application::instance().getDebugSidePanel()->addLine(*text, (int)indent, Color::fromRGBA32(color));
+			Application::instance().getDebugSidePanel()->addLine(text.getString(), (int)indent, Color::fromRGBA32(color));
 		}
 	}
 
@@ -1174,7 +1174,7 @@ namespace
 	{
 		if (text.isValid())
 		{
-			LogDisplay::instance().setLogDisplay(*text, 2.0f);
+			LogDisplay::instance().setLogDisplay(text.getString(), 2.0f);
 		}
 	}
 

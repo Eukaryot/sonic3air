@@ -12,7 +12,7 @@
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
-#include "lemon/program/StoredString.h"
+#include "lemon/program/StringRef.h"
 #include <unordered_map>
 
 
@@ -62,8 +62,8 @@ namespace lemon
 		Define& addDefine(FlyweightString name, const DataTypeDefinition* dataType);
 
 		// String literals
-		const StringLookup& getStringLiterals() const  { return mStringLiterals; }
-		const StoredString& addStringLiteral(FlyweightString str);
+		const std::vector<FlyweightString>& getStringLiterals() const  { return mStringLiterals; }
+		void addStringLiteral(FlyweightString str);
 
 		// Serialization
 		bool serialize(VectorBinarySerializer& serializer);
@@ -107,7 +107,7 @@ namespace lemon
 		ObjectPool<Define, 64> mDefinePool;
 
 		// String literals
-		StringLookup mStringLiterals;
+		std::vector<FlyweightString> mStringLiterals;
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;

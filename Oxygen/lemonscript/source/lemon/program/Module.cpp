@@ -224,9 +224,11 @@ namespace lemon
 		return define;
 	}
 
-	const StoredString& Module::addStringLiteral(FlyweightString str)
+	void Module::addStringLiteral(FlyweightString str)
 	{
-		return mStringLiterals.getOrAddString(str.getString(), str.getHash());
+		if (mStringLiterals.empty())
+			mStringLiterals.reserve(0x100);
+		mStringLiterals.push_back(str);
 	}
 
 	bool Module::serialize(VectorBinarySerializer& outerSerializer)
@@ -239,10 +241,11 @@ namespace lemon
 		//  - 0x04 = Added source information to function serialization
 		//  - 0x05 = Added serialization of constants
 		//  - 0x06 = Support for string data type in serialization - this breaks compatibility with older versions
+		//  - 0x07 = Several compatibility breaking changes and extensions (e.g. constant arrays)
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x06;
+		uint16 version = 0x07;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -251,7 +254,7 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x06)
+			if (version < 0x07)
 				return false;	// Loading older versions is not supported
 		}
 		else
@@ -358,7 +361,8 @@ namespace lemon
 						count = (size_t)serializer.read<uint32>();
 						for (size_t k = 0; k < count; ++k)
 						{
-							const std::string_view name = serializer.readStringView();
+							FlyweightString name;
+							name.serialize(serializer);
 							const uint32 offset = serializer.read<uint32>();
 							scriptFunc.addLabel(name, (size_t)offset);
 						}
@@ -444,10 +448,10 @@ namespace lemon
 
 						// Labels
 						serializer.writeAs<uint32>(scriptFunc.mLabels.size());
-						for (const auto& pair : scriptFunc.mLabels)
+						for (const ScriptFunction::Label& label : scriptFunc.mLabels)
 						{
-							serializer.write(pair.first);
-							serializer.write(pair.second);
+							label.mName.write(serializer);
+							serializer.write(label.mOffset);
 						}
 
 						// Pragmas
@@ -589,7 +593,13 @@ namespace lemon
 		}
 
 		// Serialize string literals
-		mStringLiterals.serialize(serializer);
+		{
+			serializer.serializeArraySize(mStringLiterals);
+			for (FlyweightString& str : mStringLiterals)
+			{
+				str.serialize(serializer);
+			}
+		}
 
 		if (!outerSerializer.isReading())
 		{

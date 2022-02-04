@@ -741,10 +741,10 @@
 		9E82C7C726BDFA3200ADDBD3 /* InputConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C7C326BDFA3100ADDBD3 /* InputConfig.cpp */; };
 		9E82C7C826BDFA3200ADDBD3 /* InputConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C7C326BDFA3100ADDBD3 /* InputConfig.cpp */; };
 		9E85ED5C246F7B9D001F1749 /* SetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E85ED5B246F7B9D001F1749 /* SetupViewController.m */; };
-		9E995D3A25F9CFAF00F4B934 /* StoredString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StoredString.cpp */; };
-		9E995D3B25F9CFAF00F4B934 /* StoredString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StoredString.cpp */; };
-		9E995D3C25F9CFAF00F4B934 /* StoredString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StoredString.cpp */; };
-		9E995D3D25F9CFAF00F4B934 /* StoredString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StoredString.cpp */; };
+		9E995D3A25F9CFAF00F4B934 /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
+		9E995D3B25F9CFAF00F4B934 /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
+		9E995D3C25F9CFAF00F4B934 /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
+		9E995D3D25F9CFAF00F4B934 /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
 		9E9EF33B24678BC900AAA00F /* OpenGLDrawerResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E9EF33A24678BC900AAA00F /* OpenGLDrawerResources.cpp */; };
 		9E9EF33E24678C0300AAA00F /* VertexArrayObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E9EF33D24678C0300AAA00F /* VertexArrayObject.cpp */; };
 		9EB0699A24807A9C0080AC49 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9EB0699924807A9C0080AC49 /* AppDelegate.mm */; };
@@ -1022,7 +1022,7 @@
 		9E0CCAB12518F7090007288E /* PlatformDefinitions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlatformDefinitions.h; sourceTree = "<group>"; };
 		9E0CCAB22518F7BF0007288E /* Opcode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Opcode.cpp; sourceTree = "<group>"; };
 		9E0CCAB32518F7BF0007288E /* OpcodeHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpcodeHelper.h; sourceTree = "<group>"; };
-		9E0CCAB42518F7BF0007288E /* StoredString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoredString.h; sourceTree = "<group>"; };
+		9E0CCAB42518F7BF0007288E /* StringRef.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringRef.h; sourceTree = "<group>"; };
 		9E0CCAB52518F7E40007288E /* ProfilingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProfilingView.h; sourceTree = "<group>"; };
 		9E0CCAB62518F7E40007288E /* ProfilingView.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ProfilingView.cpp; sourceTree = "<group>"; };
 		9E0CCAB72518FB440007288E /* NativizedCode.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = NativizedCode.inc; sourceTree = "<group>"; };
@@ -1560,7 +1560,7 @@
 		9E82C7C926BDFA5B00ADDBD3 /* RenderPartsDefinitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderPartsDefinitions.h; sourceTree = "<group>"; };
 		9E85ED5A246F7B9D001F1749 /* SetupViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SetupViewController.h; sourceTree = "<group>"; };
 		9E85ED5B246F7B9D001F1749 /* SetupViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SetupViewController.m; sourceTree = "<group>"; };
-		9E995D3925F9CFAF00F4B934 /* StoredString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StoredString.cpp; sourceTree = "<group>"; };
+		9E995D3925F9CFAF00F4B934 /* StringRef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringRef.cpp; sourceTree = "<group>"; };
 		9E9EF33924678BC900AAA00F /* OpenGLDrawerResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLDrawerResources.h; sourceTree = "<group>"; };
 		9E9EF33A24678BC900AAA00F /* OpenGLDrawerResources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLDrawerResources.cpp; sourceTree = "<group>"; };
 		9E9EF33C24678C0300AAA00F /* VertexArrayObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VertexArrayObject.h; sourceTree = "<group>"; };
@@ -2114,8 +2114,8 @@
 				9E0CCAB32518F7BF0007288E /* OpcodeHelper.h */,
 				9E6E7B61245F886B00114DEB /* Program.cpp */,
 				9E6E7B6A245F886B00114DEB /* Program.h */,
-				9E995D3925F9CFAF00F4B934 /* StoredString.cpp */,
-				9E0CCAB42518F7BF0007288E /* StoredString.h */,
+				9E995D3925F9CFAF00F4B934 /* StringRef.cpp */,
+				9E0CCAB42518F7BF0007288E /* StringRef.h */,
 				9E6E7B67245F886B00114DEB /* Variable.h */,
 			);
 			path = program;
@@ -3105,7 +3105,7 @@
 				9E0C5EA5247DD6BB000105D0 /* pch.cpp in Sources */,
 				9E0C5F1B247DDFC1000105D0 /* json_reader.cpp in Sources */,
 				9E0C5F2C247DDFE0000105D0 /* Font.cpp in Sources */,
-				9E995D3C25F9CFAF00F4B934 /* StoredString.cpp in Sources */,
+				9E995D3C25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E0C5EA1247DD6AD000105D0 /* ym2612.cpp in Sources */,
 				9E0C5EF5247DD809000105D0 /* GameUtils.cpp in Sources */,
 				9E0C5F17247DDFB9000105D0 /* FileHandle.cpp in Sources */,
@@ -3394,7 +3394,7 @@
 				9E1D5FFE2475733F003B1774 /* SoundDriver.cpp in Sources */,
 				9E1D5FFF2475733F003B1774 /* OggAudioSource.cpp in Sources */,
 				9E1D60002475733F003B1774 /* SpriteBase.cpp in Sources */,
-				9E995D3B25F9CFAF00F4B934 /* StoredString.cpp in Sources */,
+				9E995D3B25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E1D60012475733F003B1774 /* AppDelegate.mm in Sources */,
 				9E1D60022475733F003B1774 /* Drawer.cpp in Sources */,
 				9E1D60032475733F003B1774 /* RenderComponentSpriteShader.cpp in Sources */,
@@ -3641,7 +3641,7 @@
 				9E6E8606245F89C400114DEB /* SoundDriver.cpp in Sources */,
 				9E6E8630245F89C400114DEB /* OggAudioSource.cpp in Sources */,
 				9E6E861C245F89C400114DEB /* SpriteBase.cpp in Sources */,
-				9E995D3A25F9CFAF00F4B934 /* StoredString.cpp in Sources */,
+				9E995D3A25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E6E7A4C245F722F00114DEB /* AppDelegate.mm in Sources */,
 				9E6E85F5245F89C400114DEB /* Drawer.cpp in Sources */,
 				9E6E8611245F89C400114DEB /* RenderComponentSpriteShader.cpp in Sources */,
@@ -3855,7 +3855,7 @@
 				9E7E28F225EF217E0021AE3A /* FileProvider.cpp in Sources */,
 				9EB06A2C24808A780080AC49 /* PlaneManager.cpp in Sources */,
 				9EB069BF248088B20080AC49 /* Parser.cpp in Sources */,
-				9E995D3D25F9CFAF00F4B934 /* StoredString.cpp in Sources */,
+				9E995D3D25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E08784826326E3E0005AEAF /* Experiments.cpp in Sources */,
 				9EB069CE248088B20080AC49 /* json_writer.cpp in Sources */,
 				9E49B9C8260C31B300719EC5 /* GameSetupScreen.cpp in Sources */,

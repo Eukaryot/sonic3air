@@ -109,7 +109,7 @@ namespace lemon
 		inline LabelParserToken() : ParserToken(TYPE) {}
 
 	public:
-		std::string mName;
+		FlyweightString mName;
 	};
 
 

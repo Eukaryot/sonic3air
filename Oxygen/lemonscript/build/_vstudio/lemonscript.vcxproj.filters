@@ -102,7 +102,7 @@
     <ClCompile Include="..\..\source\lemon\program\DataType.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\lemon\program\StoredString.cpp">
+    <ClCompile Include="..\..\source\lemon\program\StringRef.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp">
@@ -215,7 +215,7 @@
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h">
       <Filter>lemon\translator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\lemon\program\StoredString.h">
+    <ClInclude Include="..\..\source\lemon\program\StringRef.h">
       <Filter>lemon\program</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h">

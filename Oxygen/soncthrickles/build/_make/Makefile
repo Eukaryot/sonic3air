@@ -127,7 +127,7 @@ SOURCES	+=	\
 			Oxygen/lemonscript/source/lemon/program/Module \
 			Oxygen/lemonscript/source/lemon/program/Opcode \
 			Oxygen/lemonscript/source/lemon/program/Program \
-			Oxygen/lemonscript/source/lemon/program/StoredString \
+			Oxygen/lemonscript/source/lemon/program/StringRef \
 			Oxygen/lemonscript/source/lemon/runtime/provider/DefaultOpcodeProvider \
 			Oxygen/lemonscript/source/lemon/runtime/provider/NativizedOpcodeProvider \
 			Oxygen/lemonscript/source/lemon/runtime/provider/OptimizedOpcodeProvider \

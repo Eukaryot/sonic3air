@@ -32,14 +32,15 @@ namespace lemon
 		template<>
 		void handleResult(StringRef result, const UserDefinedFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.mHash);
+			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.getHash());
 		};
 
 		template<>
 		StringRef popStackGeneric(const UserDefinedFunction::Context context)
 		{
 			const uint64 stringHash = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
-			return StringRef(stringHash, context.mControlFlow.getRuntime().resolveStringByKey(stringHash));
+			const FlyweightString* str = context.mControlFlow.getRuntime().resolveStringByKey(stringHash);
+			return (nullptr != str) ? StringRef(*str) : StringRef();
 		}
 	}
 }

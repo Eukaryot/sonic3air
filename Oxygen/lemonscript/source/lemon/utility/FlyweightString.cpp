@@ -12,9 +12,25 @@
 
 namespace lemon
 {
+	namespace detail
+	{
+		FlyweightStringManager::FlyweightStringManager()
+		{
+			mAllocPool.setPageSize(0x20000);
+		}
+	}
+
+
+	void FlyweightString::set(uint64 hash)
+	{
+		const auto it = mManager.mEntryMap.find(hash);
+		mEntry = (it == mManager.mEntryMap.end()) ? nullptr : it->second;
+	}
+
 	void FlyweightString::set(uint64 hash, std::string_view name)
 	{
 		using Entry = detail::FlyweightStringManager::Entry;
+
 		Entry*& entry = mManager.mEntryMap[hash];
 		if (nullptr == entry)
 		{
@@ -39,7 +55,7 @@ namespace lemon
 
 	void FlyweightString::set(std::string_view name)
 	{
-		set(rmx::getMurmur2_64(name), name);
+		set(name.empty() ? 0 : rmx::getMurmur2_64(name), name);
 	}
 
 	void FlyweightString::serialize(VectorBinarySerializer& serializer)

@@ -161,29 +161,34 @@ namespace lemon
 		return variable;
 	}
 
-	bool ScriptFunction::getLabel(std::string_view labelName, size_t& outOffset) const
+	bool ScriptFunction::getLabel(FlyweightString labelName, size_t& outOffset) const
 	{
-		const auto it = mLabels.find(std::string(labelName));
-		if (it == mLabels.end())
-			return false;
-
-		outOffset = it->second;
-		return true;
-	}
-
-	void ScriptFunction::addLabel(std::string_view labelName, size_t offset)
-	{
-		mLabels[std::string(labelName)] = (uint32)offset;
-	}
-
-	const std::string* ScriptFunction::findLabelByOffset(size_t offset) const
-	{
-		// Note that this won't handle multipe labels at the same position too well
-		for (const auto& pair : mLabels)
+		for (const Label& label : mLabels)
 		{
-			if (pair.second == offset)
+			if (label.mName == labelName)
 			{
-				return &pair.first;
+				outOffset = (size_t)label.mOffset;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void ScriptFunction::addLabel(FlyweightString labelName, size_t offset)
+	{
+		Label& label = vectorAdd(mLabels);
+		label.mName = labelName;
+		label.mOffset = (uint32)offset;
+	}
+
+	const ScriptFunction::Label* ScriptFunction::findLabelByOffset(size_t offset) const
+	{
+		// Note that this won't handle multiple labels at the same position too well
+		for (const Label& label : mLabels)
+		{
+			if (label.mOffset == offset)
+			{
+				return &label;
 			}
 		}
 		return nullptr;
