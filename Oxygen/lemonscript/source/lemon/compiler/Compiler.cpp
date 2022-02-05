@@ -1040,6 +1040,7 @@ namespace lemon
 		mTokenProcessing.mContext.mFunction = &function;
 		mTokenProcessing.mContext.mLocalVariables = &scopeContext.mLocalVariables;
 		mTokenProcessing.mContext.mLocalConstants = &scopeContext.mLocalConstants;
+		mTokenProcessing.mContext.mLocalConstantArrays = &scopeContext.mLocalConstantArrays;
 		mTokenProcessing.processTokens(tokens, lineNumber, resultType);
 	}
 
@@ -1053,13 +1054,12 @@ namespace lemon
 		// Check for "constant array"
 		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mName.getHash() == ARRAY_NAME_HASH)
 		{
-			CHECK_ERROR(isGlobalDefinition, "Constant arrays can only be defined globally, not inside functions", lineNumber);
 			CHECK_ERROR(tokens.size() == 7, "Syntax error in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", lineNumber);
 			CHECK_ERROR(tokens[3].getType() == Token::Type::VARTYPE, "Expected a type in <> in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[4], Operator::COMPARE_GREATER), "Expected a type in <> in constant array definition", lineNumber);
 			CHECK_ERROR(tokens[5].getType() == Token::Type::IDENTIFIER, "Expected identifier in constant array definition", lineNumber);
-			CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assigment at the end of constant array definition", lineNumber);
+			CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assignment at the end of constant array definition", lineNumber);
 
 			Node* nextNode = nodesIterator.peek();
 			CHECK_ERROR(nullptr != nextNode, "Constant array definition as last node is not allowed", lineNumber);
@@ -1094,8 +1094,15 @@ namespace lemon
 				}
 			}
 
-			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName.getString(), tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size());
-			mGlobalsLookup.registerConstantArray(constantArray);
+			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName.getString(), tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size(), isGlobalDefinition);
+			if (isGlobalDefinition)
+			{
+				mGlobalsLookup.registerConstantArray(constantArray);
+			}
+			else
+			{
+				scopeContext->mLocalConstantArrays.push_back(&constantArray);
+			}
 
 			// Erase block node pointer
 			++nodesIterator;

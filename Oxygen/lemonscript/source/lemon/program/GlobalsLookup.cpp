@@ -34,9 +34,9 @@ namespace lemon
 		{
 			registerConstant(*constant);
 		}
-		for (ConstantArray* constantArray : module.mConstantArrays)
+		for (size_t i = 0; i < module.mNumGlobalConstantArrays; ++i)
 		{
-			registerConstantArray(*constantArray);
+			registerConstantArray(*module.mConstantArrays[i]);
 		}
 		for (Define* define : module.mDefines)
 		{

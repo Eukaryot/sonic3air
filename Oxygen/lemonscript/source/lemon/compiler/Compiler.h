@@ -22,6 +22,7 @@ namespace lemon
 	class GlobalsLookup;
 	class ScriptFunction;
 	class LocalVariable;
+	class ConstantArray;
 	class Node;
 	class BlockNode;
 	class UndefinedNode;
@@ -61,9 +62,17 @@ namespace lemon
 	private:
 		struct ScopeContext
 		{
+			struct StackItem
+			{
+				size_t mNumLocalVariables = 0;
+				size_t mNumLocalConstants = 0;
+				size_t mNumLocalConstantArrays = 0;
+			};
+
 			std::vector<LocalVariable*> mLocalVariables;
 			std::vector<Constant> mLocalConstants;
-			std::vector<size_t> mScopeStack;			// Number of local variables for each scope on the stack
+			std::vector<ConstantArray*> mLocalConstantArrays;
+			std::vector<StackItem> mScopeStack;			// Number of local variables for each scope on the stack
 
 			ScopeContext()
 			{
@@ -72,12 +81,18 @@ namespace lemon
 
 			inline void beginScope()
 			{
-				mScopeStack.emplace_back(mLocalVariables.size());
+				StackItem& item = vectorAdd(mScopeStack);
+				item.mNumLocalVariables = mLocalVariables.size();
+				item.mNumLocalConstants = mLocalConstants.size();
+				item.mNumLocalConstantArrays = mLocalConstantArrays.size();
 			}
 
 			inline void endScope()
 			{
-				mLocalVariables.resize(mScopeStack.back());
+				const StackItem& item = mScopeStack.back();
+				mLocalVariables.resize(item.mNumLocalVariables);
+				mLocalConstants.resize(item.mNumLocalConstants);
+				mLocalConstantArrays.resize(item.mNumLocalConstantArrays);
 				mScopeStack.pop_back();
 			}
 		};

@@ -16,8 +16,9 @@
 namespace lemon
 {
 	class Function;
-	class LocalVariable;
+	class ConstantArray;
 	class GlobalsLookup;
+	class LocalVariable;
 	class ScriptFunction;
 	class StatementToken;
 	class TokenList;
@@ -30,6 +31,7 @@ namespace lemon
 		{
 			std::vector<LocalVariable*>* mLocalVariables = nullptr;
 			std::vector<Constant>* mLocalConstants = nullptr;
+			std::vector<ConstantArray*>* mLocalConstantArrays = nullptr;
 			ScriptFunction* mFunction = nullptr;
 		};
 

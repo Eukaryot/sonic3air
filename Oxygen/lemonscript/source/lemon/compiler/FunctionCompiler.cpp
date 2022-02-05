@@ -495,16 +495,16 @@ namespace lemon
 						break;
 					}
 
-					case Operator::ASSIGN_PLUS:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
-					case Operator::ASSIGN_MINUS:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
-					case Operator::ASSIGN_MULTIPLY:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_MUL);	break;
-					case Operator::ASSIGN_DIVIDE:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_DIV);	break;
-					case Operator::ASSIGN_MODULO:			 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_MOD);	break;
-					case Operator::ASSIGN_AND:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_AND);	break;
-					case Operator::ASSIGN_OR:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
-					case Operator::ASSIGN_XOR:				 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
-					case Operator::ASSIGN_SHIFT_LEFT:		 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_SHL);	break;
-					case Operator::ASSIGN_SHIFT_RIGHT:		 compileBinaryAssigmentToOpcodes(bot, Opcode::Type::ARITHM_SHR);	break;
+					case Operator::ASSIGN_PLUS:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
+					case Operator::ASSIGN_MINUS:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
+					case Operator::ASSIGN_MULTIPLY:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_MUL);	break;
+					case Operator::ASSIGN_DIVIDE:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_DIV);	break;
+					case Operator::ASSIGN_MODULO:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_MOD);	break;
+					case Operator::ASSIGN_AND:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_AND);	break;
+					case Operator::ASSIGN_OR:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
+					case Operator::ASSIGN_XOR:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
+					case Operator::ASSIGN_SHIFT_LEFT:		 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SHL);	break;
+					case Operator::ASSIGN_SHIFT_RIGHT:		 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SHR);	break;
 
 					case Operator::BINARY_PLUS:				 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_ADD);	break;
 					case Operator::BINARY_MINUS:			 compileBinaryOperationToOpcodes(bot, Opcode::Type::ARITHM_SUB);	break;
@@ -682,7 +682,7 @@ namespace lemon
 		}
 	}
 
-	void FunctionCompiler::compileBinaryAssigmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType)
+	void FunctionCompiler::compileBinaryAssignmentToOpcodes(const BinaryOperationToken& bot, Opcode::Type opcodeType)
 	{
 		// Special handling for memory access on left side
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")

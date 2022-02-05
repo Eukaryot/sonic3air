@@ -74,6 +74,17 @@ namespace lemon
 				RMX_ASSERT(functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
 			outCached.mFunctions = functions;
 		}
+
+		template<typename T>
+		T* findInList(const std::vector<T*>& list, uint64 nameHash)
+		{
+			for (T* item : list)
+			{
+				if (item->getName().getHash() == nameHash)
+					return item;
+			}
+			return nullptr;
+		}
 	}
 
 
@@ -576,43 +587,51 @@ namespace lemon
 				{
 					// Check the identifier
 					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+					const ConstantArray* constantArray = nullptr;
 					if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
 					{
-						const ConstantArray& constantArray = identifierToken.mResolved->as<ConstantArray>();
-						TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-						CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
-						CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
-
-						const Function* matchingFunction = nullptr;
-						for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
-						{
-							if (function->getReturnType() == constantArray.getElementDataType())
-							{
-								matchingFunction = function;
-								break;
-							}
-						}
-						if (nullptr == matchingFunction)
-							continue;
-
-					#ifdef DEBUG
-						const Function::ParameterList& parameterList = matchingFunction->getParameters();
-						RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mType == &PredefinedDataTypes::UINT_32 && parameterList[1].mType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
-					#endif
-
-						FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
-						token.mFunction = matchingFunction;
-						token.mParameters.resize(2);
-						ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
-						idToken.mValue = constantArray.getID();
-						idToken.mDataType = &PredefinedDataTypes::UINT_32;
-						token.mParameters[1] = content[0].as<StatementToken>();		// Array index
-						token.mDataType = matchingFunction->getReturnType();
-
-						assignStatementDataType(*token.mParameters[0], &PredefinedDataTypes::UINT_32);
-
-						tokens.erase(i+1);
+						constantArray = &identifierToken.mResolved->as<ConstantArray>();
 					}
+					else
+					{
+						// Check for local constant array
+						constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
+						CHECK_ERROR(nullptr != constantArray, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+					}
+
+					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+					CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
+					CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
+
+					const Function* matchingFunction = nullptr;
+					for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
+					{
+						if (function->getReturnType() == constantArray->getElementDataType())
+						{
+							matchingFunction = function;
+							break;
+						}
+					}
+					if (nullptr == matchingFunction)
+						continue;
+
+				#ifdef DEBUG
+					const Function::ParameterList& parameterList = matchingFunction->getParameters();
+					RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mType == &PredefinedDataTypes::UINT_32 && parameterList[1].mType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
+				#endif
+
+					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+					token.mFunction = matchingFunction;
+					token.mParameters.resize(2);
+					ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
+					idToken.mValue = constantArray->getID();
+					idToken.mDataType = &PredefinedDataTypes::UINT_32;
+					token.mParameters[1] = content[0].as<StatementToken>();		// Array index
+					token.mDataType = matchingFunction->getReturnType();
+
+					assignStatementDataType(*token.mParameters[0], &PredefinedDataTypes::UINT_32);
+
+					tokens.erase(i+1);
 				}
 			}
 		}
@@ -984,12 +1003,7 @@ namespace lemon
 
 	LocalVariable* TokenProcessing::findLocalVariable(uint64 nameHash)
 	{
-		for (LocalVariable* var : *mContext.mLocalVariables)
-		{
-			if (var->getName().getHash() == nameHash)
-				return var;
-		}
-		return nullptr;
+		return findInList(*mContext.mLocalVariables, nameHash);
 	}
 
 }

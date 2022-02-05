@@ -771,7 +771,7 @@ namespace lemon
 
 					if (!consumeInput)
 					{
-						// First add an assigment to push the address to the stack
+						// First add an assignment to push the address to the stack
 						const size_t parameterOffset = parameters.add(opcodeIndex, 8, ParameterInfo::Semantics::INTEGER);
 						Assignment& assignment = vectorAdd(assignments);
 						assignment.mDest   = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition);
@@ -996,7 +996,7 @@ namespace lemon
 			tempVars.reserve(0x20);
 
 			// This lookup is meant to mirror the stack (with index MAX_OPCODES representing the initial stack position)
-			//  -> It's used to track which assigment nodes consume the value written by which other assignment
+			//  -> It's used to track which assignment nodes consume the value written by which other assignment
 			//  -> This way, we can build pairs of nodes that can be linked together:
 			//      where possible, the writing node gets integrated directly as input for the reading node, without the need of having a temp var in between
 			static TempVar* tempVarLookup[MAX_OPCODES * 2];
@@ -1079,7 +1079,7 @@ namespace lemon
 				}
 			}
 
-			// Now evaluate which of the temp vars (or assigments if you will) are required to be written to the stack
+			// Now evaluate which of the temp vars (or assignments if you will) are required to be written to the stack
 			//  -> This is everything below the final stack position
 			for (int pos = lowestWrittenStackPosition; pos < stackPosition; ++pos)
 			{
@@ -1088,7 +1088,7 @@ namespace lemon
 				{
 					if (!tempVar->mReads.empty())
 					{
-						// Temp var has reads, which means it gets read by an assigment, but does not get consumed by it
+						// Temp var has reads, which means it gets read by an assignment, but does not get consumed by it
 						//  -> We need to output an additional stack write for it
 						tempVar->mOutputToStack = true;		// Note that this implies "mPreserve", as it only gets set when there's also reads
 					}
@@ -1130,7 +1130,7 @@ namespace lemon
 					read.mNode->mValue = nextTempVarNumber;
 				}
 
-				// And if the temp var needs to be written to the stack, add an additional assigment to do right that
+				// And if the temp var needs to be written to the stack, add an additional assignment to do right that
 				if (tempVar.mOutputToStack)
 				{
 					Assignment& assignment = vectorAdd(assignments);

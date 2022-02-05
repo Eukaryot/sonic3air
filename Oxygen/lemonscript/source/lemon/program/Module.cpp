@@ -201,7 +201,7 @@ namespace lemon
 		return constant;
 	}
 
-	ConstantArray& Module::addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size)
+	ConstantArray& Module::addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size, bool isGlobalDefinition)
 	{
 		ConstantArray& constantArray = mConstantArrayPool.createObject();
 		constantArray.mName = name;
@@ -212,6 +212,12 @@ namespace lemon
 		else if (size > 0)
 			constantArray.setSize(size);
 		mConstantArrays.emplace_back(&constantArray);
+
+		if (isGlobalDefinition)
+		{
+			RMX_ASSERT(mNumGlobalConstantArrays + 1 == mConstantArrays.size(), "Gap in global constant arrays list");
+			mNumGlobalConstantArrays = mConstantArrays.size();
+		}
 		return constantArray;
 	}
 
@@ -510,12 +516,12 @@ namespace lemon
 
 		// Serialize constants
 		{
-			uint32 numberOfConstants = (uint32)mConstants.size();
-			serializer & numberOfConstants;
+			size_t numberOfConstants = mConstants.size();
+			serializer.serializeAs<uint16>(numberOfConstants);
 
 			if (serializer.isReading())
 			{
-				for (uint32 i = 0; i < numberOfConstants; ++i)
+				for (size_t i = 0; i < numberOfConstants; ++i)
 				{
 					FlyweightString name;
 					name.serialize(serializer);
@@ -537,23 +543,24 @@ namespace lemon
 
 		// Serialize constant arrays
 		{
-			uint32 numberOfConstantArrays = (uint32)mConstantArrays.size();
-			serializer & numberOfConstantArrays;
+			size_t numberOfConstantArrays = mConstantArrays.size();
+			serializer.serializeAs<uint16>(numberOfConstantArrays);
 
-			// TODO: Serialize constant array data in a more compact way, unless they're actual 64-bit values
 			if (serializer.isReading())
 			{
-				for (uint32 i = 0; i < numberOfConstantArrays; ++i)
+				const size_t numGlobalConstantArrays = (size_t)serializer.read<uint16>();
+				for (size_t i = 0; i < numberOfConstantArrays; ++i)
 				{
 					FlyweightString name;
 					name.serialize(serializer);
 					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
-					ConstantArray& constantArray = addConstantArray(name, dataType, nullptr, 0);
+					ConstantArray& constantArray = addConstantArray(name, dataType, nullptr, 0, i < numGlobalConstantArrays);
 					constantArray.serializeData(serializer);
 				}
 			}
 			else
 			{
+				serializer.serializeAs<uint16>(mNumGlobalConstantArrays);
 				for (ConstantArray* constantArray : mConstantArrays)
 				{
 					constantArray->getName().write(serializer);
@@ -565,12 +572,12 @@ namespace lemon
 
 		// Serialize defines
 		{
-			uint32 numberOfDefines = (uint32)mDefines.size();
-			serializer & numberOfDefines;
+			size_t numberOfDefines = mDefines.size();
+			serializer.serializeAs<uint16>(numberOfDefines);
 
 			if (serializer.isReading())
 			{
-				for (uint32 i = 0; i < numberOfDefines; ++i)
+				for (size_t i = 0; i < numberOfDefines; ++i)
 				{
 					FlyweightString name;
 					name.serialize(serializer);

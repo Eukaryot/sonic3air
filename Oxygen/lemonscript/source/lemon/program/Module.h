@@ -56,7 +56,7 @@ namespace lemon
 		Constant& addConstant(FlyweightString name, const DataTypeDefinition* dataType, uint64 value);
 
 		// Constant arrays
-		ConstantArray& addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size);
+		ConstantArray& addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size, bool isGlobalDefinition);
 
 		// Defines
 		Define& addDefine(FlyweightString name, const DataTypeDefinition* dataType);
@@ -99,6 +99,7 @@ namespace lemon
 
 		// Constant arrays
 		uint32 mFirstConstantArrayID = 0;
+		size_t mNumGlobalConstantArrays = 0;
 		std::vector<ConstantArray*> mConstantArrays;
 		ObjectPool<ConstantArray, 16> mConstantArrayPool;
 
