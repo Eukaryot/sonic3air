@@ -25,6 +25,10 @@
 		</Expand>
 	</Type>
 
+	<Type Name="lemon::FlyweightString">
+		<DisplayString>{mEntry->mString}</DisplayString>
+	</Type>
+
 	<Type Name="lemon::DataTypeDefinition">
 		<DisplayString>{mClass}: {mBytes} bytes</DisplayString>
 	</Type>

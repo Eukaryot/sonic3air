@@ -11,6 +11,7 @@
 #include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
+#include "lemon/program/GlobalsLookup.h"
 #include "lemon/utility/FlyweightString.h"
 
 
@@ -104,6 +105,7 @@ namespace lemon
 
 	public:
 		FlyweightString mName;
+		const GlobalsLookup::Identifier* mResolved = nullptr;
 	};
 
 

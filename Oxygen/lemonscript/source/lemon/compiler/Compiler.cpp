@@ -421,8 +421,8 @@ namespace lemon
 						case ParserToken::Type::STRING_LITERAL:
 						{
 							const FlyweightString str = parserToken.as<StringLiteralParserToken>().mString;
-							const FlyweightString* storedString = mGlobalsLookup.getStringLiteralByHash(str.getHash());
-							if (nullptr == storedString)
+							const FlyweightString* existingString = mGlobalsLookup.getStringLiteralByHash(str.getHash());
+							if (nullptr == existingString)
 							{
 								// Add as a new string literal to the module
 								mModule.addStringLiteral(str);
@@ -512,7 +512,7 @@ namespace lemon
 
 							// Create global variable
 							GlobalVariable& variable = mModule.addGlobalVariable(identifier, dataType);
-							mGlobalsLookup.registerVariable(variable);
+							mGlobalsLookup.registerGlobalVariable(variable);
 
 							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
 							{

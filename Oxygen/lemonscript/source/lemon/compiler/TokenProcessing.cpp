@@ -94,6 +94,9 @@ namespace lemon
 	{
 		mLineNumber = lineNumber;
 
+		// Try to resolve identifiers
+		resolveIdentifiers(tokensRoot);
+
 		// Process defines early, as they can introduce new tokens that need to be considered in the following steps
 		processDefines(tokensRoot);
 
@@ -121,7 +124,7 @@ namespace lemon
 			processMemoryAccesses(*tokenList);
 			processArrayAccesses(*tokenList);
 			processExplicitCasts(*tokenList);
-			processIdentifiers(*tokenList);
+			processVariables(*tokenList);
 
 			processUnaryOperations(*tokenList);
 			processBinaryOperations(*tokenList);
@@ -148,25 +151,49 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::processDefines(TokenList& tokens)
+	void TokenProcessing::resolveIdentifiers(TokenList& tokens)
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
-				const uint64 identifierHash = tokens[i].as<IdentifierToken>().mName.getHash();
-				const Define* define = mGlobalsLookup.getDefineByName(identifierHash);
-				if (nullptr != define)
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				if (nullptr == identifierToken.mResolved)
 				{
+					const uint64 nameHash = identifierToken.mName.getHash();
+					identifierToken.mResolved = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+				}
+			}
+		}
+	}
+
+	void TokenProcessing::processDefines(TokenList& tokens)
+	{
+		bool anyDefineResolved = false;
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			{
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::DEFINE)
+				{
+					const Define& define = identifierToken.mResolved->as<Define>();
 					tokens.erase(i);
-					for (size_t k = 0; k < define->mContent.size(); ++k)
+					for (size_t k = 0; k < define.mContent.size(); ++k)
 					{
-						tokens.insert(define->mContent[k], i + k);
+						tokens.insert(define.mContent[k], i + k);
 					}
 
 					// TODO: Add implicit cast if necessary
+
+					anyDefineResolved = true;
 				}
 			}
+		}
+
+		if (anyDefineResolved)
+		{
+			resolveIdentifiers(tokens);
 		}
 	}
 
@@ -176,27 +203,29 @@ namespace lemon
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
 			{
-				const FlyweightString identifier = tokens[i].as<IdentifierToken>().mName;
-				const Constant* constant = mGlobalsLookup.getConstantByName(identifier.getHash());
-				if (nullptr != constant)
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				const Constant* constant = nullptr;
+				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT)
 				{
-					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
-					token.mDataType = constant->getDataType();
-					token.mValue = constant->getValue();
+					constant = &identifierToken.mResolved->as<Constant>();
 				}
 				else
 				{
-					for (const Constant& constant : *mContext.mLocalConstants)
+					for (const Constant& localConstant : *mContext.mLocalConstants)
 					{
-						if (constant.getName() == identifier)
+						if (localConstant.getName() == identifierToken.mName)
 						{
-							ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
-							token.mDataType = constant.getDataType();
-							token.mValue = constant.getValue();
+							constant = &localConstant;
 							break;
 						}
 					}
+					if (nullptr == constant)
+						continue;
 				}
+
+				ConstantToken& newToken = tokens.createReplaceAt<ConstantToken>(i);
+				newToken.mDataType = constant->getDataType();
+				newToken.mValue = constant->getValue();
 			}
 		}
 	}
@@ -390,7 +419,8 @@ namespace lemon
 					const Variable* thisPointer = nullptr;
 
 					bool isValidFunctionCall = false;
-					if (!mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash()).empty())
+					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+					if (!candidateFunctions.empty())
 					{
 						// Is it a global function
 						isValidFunctionCall = true;
@@ -480,13 +510,10 @@ namespace lemon
 						}
 						else
 						{
-							const std::vector<Function*>& functions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
-							CHECK_ERROR(!functions.empty(), "Unknown function name '" << functionName << "'", mLineNumber);
-
 							// Find best-fitting correct function overload
 							function = nullptr;
 							uint32 bestPriority = 0xff000000;
-							for (const Function* candidateFunction : functions)
+							for (const Function* candidateFunction : candidateFunctions)
 							{
 								const uint32 priority = TypeCasting(mConfig).getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
 								if (priority < bestPriority)
@@ -548,10 +575,10 @@ namespace lemon
 				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::BRACKET)
 				{
 					// Check the identifier
-					const uint64 arrayNameHash = tokens[i].as<IdentifierToken>().mName.getHash();
-					const ConstantArray* constantArray = mGlobalsLookup.getConstantArrayByName(arrayNameHash);
-					if (nullptr != constantArray)
+					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+					if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
 					{
+						const ConstantArray& constantArray = identifierToken.mResolved->as<ConstantArray>();
 						TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 						CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
 						CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
@@ -559,7 +586,7 @@ namespace lemon
 						const Function* matchingFunction = nullptr;
 						for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
 						{
-							if (function->getReturnType() == constantArray->getElementDataType())
+							if (function->getReturnType() == constantArray.getElementDataType())
 							{
 								matchingFunction = function;
 								break;
@@ -577,7 +604,7 @@ namespace lemon
 						token.mFunction = matchingFunction;
 						token.mParameters.resize(2);
 						ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
-						idToken.mValue = constantArray->getID();
+						idToken.mValue = constantArray.getID();
 						idToken.mDataType = &PredefinedDataTypes::UINT_32;
 						token.mParameters[1] = content[0].as<StatementToken>();		// Array index
 						token.mDataType = matchingFunction->getReturnType();
@@ -611,16 +638,26 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::processIdentifiers(TokenList& tokens)
+	void TokenProcessing::processVariables(TokenList& tokens)
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			Token& token = tokens[i];
 			if (token.getType() == Token::Type::IDENTIFIER)
 			{
-				const IdentifierToken& identifierToken = token.as<IdentifierToken>();
-				const Variable* variable = findVariable(identifierToken.mName.getHash());
-				CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+				// Check the identifier
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				const Variable* variable = nullptr;
+				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::GLOBAL_VARIABLE)
+				{
+					variable = &identifierToken.mResolved->as<Variable>();
+				}
+				else
+				{
+					// Check for local variable
+					variable = findLocalVariable(identifierToken.mName.getHash());
+					CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+				}
 
 				VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
 				token.mVariable = variable;
@@ -936,7 +973,11 @@ namespace lemon
 		if (nullptr == variable)
 		{
 			// Maybe it's a global variable
-			variable = mGlobalsLookup.getGlobalVariableByName(nameHash);
+			const GlobalsLookup::Identifier* resolvedIdentifier = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+			if (nullptr != resolvedIdentifier && resolvedIdentifier->getType() == GlobalsLookup::Identifier::Type::GLOBAL_VARIABLE)
+			{
+				variable = &resolvedIdentifier->as<Variable>();
+			}
 		}
 		return variable;
 	}

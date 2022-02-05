@@ -13,6 +13,8 @@
 
 #ifdef DEBUG
 	#define LEMON_DEBUG_BREAK(errorMessage) RMX_ERROR("Lemon script compilation failed:\n" << errorMessage, )
+#elif 0
+	#define LEMON_DEBUG_BREAK(errorMessage) if (rmx::ErrorHandling::isDebuggerAttached()) RMX_ERROR("Lemon script compilation failed:\n" << errorMessage, )
 #else
 	#define LEMON_DEBUG_BREAK(errorMessage)
 #endif

@@ -48,6 +48,8 @@ namespace lemon
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
 
 	private:
+		void resolveIdentifiers(TokenList& tokens);
+
 		void processDefines(TokenList& tokens);
 		void processConstants(TokenList& tokens);
 		void processParentheses(TokenList& tokens, std::vector<TokenList*>& outLinearTokenLists);
@@ -58,7 +60,7 @@ namespace lemon
 		void processMemoryAccesses(TokenList& tokens);
 		void processArrayAccesses(TokenList& tokens);
 		void processExplicitCasts(TokenList& tokens);
-		void processIdentifiers(TokenList& tokens);
+		void processVariables(TokenList& tokens);
 
 		void processUnaryOperations(TokenList& tokens);
 		void processBinaryOperations(TokenList& tokens);

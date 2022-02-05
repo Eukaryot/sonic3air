@@ -16,10 +16,8 @@ namespace lemon
 
 	void GlobalsLookup::clear()
 	{
+		mAllIdentifiers.clear();
 		mFunctionsByName.clear();
-		mGlobalVariablesByName.clear();
-		mDefinesByName.clear();
-		mConstantsByName.clear();
 	}
 
 	void GlobalsLookup::addDefinitionsFromModule(const Module& module)
@@ -30,7 +28,7 @@ namespace lemon
 		}
 		for (Variable* variable : module.mGlobalVariables)
 		{
-			registerVariable(*variable);
+			registerGlobalVariable(*variable);
 		}
 		for (Constant* constant : module.mConstants)
 		{
@@ -53,6 +51,11 @@ namespace lemon
 		mNextConstantArrayID += (uint32)module.mConstantArrays.size();
 	}
 
+	const GlobalsLookup::Identifier* GlobalsLookup::resolveIdentifierByHash(uint64 nameHash) const
+	{
+		return mapFind(mAllIdentifiers, nameHash);
+	}
+
 	const std::vector<Function*>& GlobalsLookup::getFunctionsByName(uint64 nameHash) const
 	{
 		static const std::vector<Function*> EMPTY_FUNCTIONS;
@@ -62,55 +65,32 @@ namespace lemon
 
 	void GlobalsLookup::registerFunction(Function& function)
 	{
-		mFunctionsByName[function.getName().getHash()].push_back(&function);
+		const uint64 nameHash = function.getName().getHash();
+		mFunctionsByName[nameHash].push_back(&function);
 	}
 
-	const Variable* GlobalsLookup::getGlobalVariableByName(uint64 nameHash) const
-	{
-		const auto it = mGlobalVariablesByName.find(nameHash);
-		return (it == mGlobalVariablesByName.end()) ? nullptr : it->second;
-	}
-
-	void GlobalsLookup::registerVariable(Variable& variable)
+	void GlobalsLookup::registerGlobalVariable(Variable& variable)
 	{
 		const uint64 nameHash = variable.getName().getHash();
-		mGlobalVariablesByName[nameHash] = &variable;
-	}
-
-	const Constant* GlobalsLookup::getConstantByName(uint64 nameHash) const
-	{
-		const auto it = mConstantsByName.find(nameHash);
-		return (it == mConstantsByName.end()) ? nullptr : it->second;
+		mAllIdentifiers[nameHash].set(&variable);
 	}
 
 	void GlobalsLookup::registerConstant(Constant& constant)
 	{
 		const uint64 nameHash = constant.getName().getHash();
-		mConstantsByName[nameHash] = &constant;
-	}
-
-	const ConstantArray* GlobalsLookup::getConstantArrayByName(uint64 nameHash) const
-	{
-		const auto it = mConstantArraysByName.find(nameHash);
-		return (it == mConstantArraysByName.end()) ? nullptr : it->second;
+		mAllIdentifiers[nameHash].set(&constant);
 	}
 
 	void GlobalsLookup::registerConstantArray(ConstantArray& constantArray)
 	{
 		const uint64 nameHash = constantArray.getName().getHash();
-		mConstantArraysByName[nameHash] = &constantArray;
-	}
-
-	const Define* GlobalsLookup::getDefineByName(uint64 nameHash) const
-	{
-		const auto it = mDefinesByName.find(nameHash);
-		return (it == mDefinesByName.end()) ? nullptr : it->second;
+		mAllIdentifiers[nameHash].set(&constantArray);
 	}
 
 	void GlobalsLookup::registerDefine(Define& define)
 	{
 		const uint64 nameHash = define.getName().getHash();
-		mDefinesByName[nameHash] = &define;
+		mAllIdentifiers[nameHash].set(&define);
 	}
 
 	const FlyweightString* GlobalsLookup::getStringLiteralByHash(uint64 hash) const
