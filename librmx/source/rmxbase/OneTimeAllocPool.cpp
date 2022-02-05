@@ -27,6 +27,8 @@ namespace rmx
 
 	uint8* OneTimeAllocPool::allocateMemory(size_t bytes)
 	{
+		// Always round up to a multiple of 8 bytes, to ensure correct memory alignment on 64-bit machines (avoiding SIGBUS fault on ARM)
+		bytes = ((bytes + 7) & ~(size_t)0x07);
 		if (bytes > mRemainingSize)
 		{
 			RMX_CHECK(bytes <= mPageSize, "Too large memory allocation of " << bytes << " bytes", return nullptr);
