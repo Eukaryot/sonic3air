@@ -116,8 +116,8 @@ namespace lemon
 			}
 
 			// Check for "true", "false"
-			static const uint64 trueHash  =  rmx::getMurmur2_64(std::string("true"));
-			static const uint64 falseHash =  rmx::getMurmur2_64(std::string("false"));
+			static const uint64 trueHash  =  rmx::getMurmur2_64(std::string_view("true"));
+			static const uint64 falseHash =  rmx::getMurmur2_64(std::string_view("false"));
 			if (identifierHash == trueHash || identifierHash == falseHash)
 			{
 				ConstantParserToken& token = outTokens.create<ConstantParserToken>();

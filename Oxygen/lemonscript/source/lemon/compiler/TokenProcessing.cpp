@@ -427,7 +427,7 @@ namespace lemon
 					const std::string_view functionName = identifierToken.mName.getString();
 					bool isBaseCall = false;
 					const Function* function = nullptr;
-					const Variable* thisPointer = nullptr;
+					const Variable* thisPointerVariable = nullptr;
 
 					bool isValidFunctionCall = false;
 					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
@@ -445,7 +445,7 @@ namespace lemon
 					}
 					else
 					{
-						// Special handling for "string.length()"
+						// Special handling for "string.length()" and "array.length()"
 						//  -> TODO: Generalize this to pave the way for other kinds of "method calls"
 						if (rmx::endsWith(functionName, ".length") && content.empty())
 						{
@@ -454,8 +454,21 @@ namespace lemon
 							if (nullptr != variable && variable->getDataType() == &PredefinedDataTypes::STRING)
 							{
 								function = mBuiltinStringLength.mFunctions[0];
-								thisPointer = variable;
+								thisPointerVariable = variable;
 								isValidFunctionCall = true;
+							}
+							else
+							{
+								const ConstantArray* constantArray = findConstantArray(rmx::getMurmur2_64(variableName));
+								if (nullptr != constantArray)
+								{
+									// This can simply be replaced with a compile-time constant
+									ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+									constantToken.mValue = (uint64)constantArray->getSize();
+									constantToken.mDataType = &PredefinedDataTypes::CONST_INT;
+									tokens.erase(i+1);
+									continue;
+								}
 							}
 						}
 					}
@@ -485,11 +498,11 @@ namespace lemon
 							vectorAdd(token.mParameters) = content[0].as<StatementToken>();
 						}
 					}
-					if (nullptr != thisPointer)
+					if (nullptr != thisPointerVariable)
 					{
 						VariableToken& variableToken = vectorAdd(token.mParameters).create<VariableToken>();
-						variableToken.mVariable = thisPointer;
-						variableToken.mDataType = thisPointer->getDataType();
+						variableToken.mVariable = thisPointerVariable;
+						variableToken.mDataType = thisPointerVariable->getDataType();
 					}
 					tokens.erase(i+1);
 
@@ -1004,6 +1017,22 @@ namespace lemon
 	LocalVariable* TokenProcessing::findLocalVariable(uint64 nameHash)
 	{
 		return findInList(*mContext.mLocalVariables, nameHash);
+	}
+
+	const ConstantArray* TokenProcessing::findConstantArray(uint64 nameHash)
+	{
+		// Search for local constant arrays first
+		const ConstantArray* constantArray = findInList(*mContext.mLocalConstantArrays, nameHash);
+		if (nullptr == constantArray)
+		{
+			// Maybe it's a global constant array
+			const GlobalsLookup::Identifier* resolvedIdentifier = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+			if (nullptr != resolvedIdentifier && resolvedIdentifier->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
+			{
+				constantArray = &resolvedIdentifier->as<ConstantArray>();
+			}
+		}
+		return constantArray;
 	}
 
 }

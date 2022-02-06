@@ -611,7 +611,7 @@ namespace lemon
 		if (!outerSerializer.isReading())
 		{
 			std::vector<uint8> compressed;
-			if (!ZlibDeflate::encode(compressed, &uncompressed[0], uncompressed.size()))
+			if (!ZlibDeflate::encode(compressed, &uncompressed[0], uncompressed.size(), 5))
 				return false;
 			outerSerializer.write(&compressed[0], compressed.size());
 		}

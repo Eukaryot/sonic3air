@@ -1049,7 +1049,7 @@ namespace lemon
 		const uint32 lineNumber = nodesIterator->getLineNumber();
 		const bool isGlobalDefinition = (nullptr == scopeContext);
 		CHECK_ERROR(tokens.size() >= 5, "Syntax error in constant definition", lineNumber);
-		static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string("array"));
+		static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string_view("array"));
 
 		// Check for "constant array"
 		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mName.getHash() == ARRAY_NAME_HASH)

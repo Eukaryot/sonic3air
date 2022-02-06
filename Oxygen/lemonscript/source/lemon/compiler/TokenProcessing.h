@@ -72,6 +72,7 @@ namespace lemon
 
 		const Variable* findVariable(uint64 nameHash);
 		LocalVariable* findLocalVariable(uint64 nameHash);
+		const ConstantArray* findConstantArray(uint64 nameHash);
 
 	private:
 		GlobalsLookup& mGlobalsLookup;

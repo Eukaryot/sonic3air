@@ -11,22 +11,30 @@ constant array<u8> fibonacci =
 	34, 55,
 }
 
-constant array<string> strings =
-{
-	"ABC", "DEF", "GHIJKL", "MNOP", "QRSTUV"
-}
-
 
 function void main()
 {
-	for (u8 i = 0; i < 11; ++i)
+	// Test for constant arrays & strings
 	{
-		debugLog(stringformat("[%d] = %d", i, fibonacci[i]))
-		//debugLog(stringformat("[%d] = %s", i, strings[i]))
+		for (u8 i = 0; i < 11; ++i)
+		{
+			debugLog(stringformat("[%d] = %d", i, fibonacci[i]))
+		}
+
+		constant array<string> strings =
+		{
+			"ABC", "DEF", "GHIJKL", "MNOP", "QRSTUV"
+		}
+
+		for (u8 i = 0; i < strings.length(); ++i)
+		{
+			debugLog(stringformat("[%d] = \"%s\"", i, strings[i]))
+		}
+
+		string hello = "Hello " + "World!"
+		Log = hello.length()
 	}
 
-	string hello = "Hello " + "World!"
-	Log = hello.length()
 
 	u8 a = 0
 	if (a == ONE)
