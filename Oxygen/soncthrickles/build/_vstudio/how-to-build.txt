@@ -16,23 +16,38 @@ PLEASE NOTE:
 
 >>> What you need
 
-Visual Studio 2019 (either Community or Pro edition) with the "Desktop development with C++"
+Visual Studio 2019 (Community or Professional edition) with the "Desktop development with C++"
 workload installed.
 
-The Visual Studio 2022 Preview should could as well, but isn't tested yet.
+Visual Studio 2022 should work as well, but isn't tested yet.
 
 
 
 >>> Build the external dependencies in "framework"
 
 Under "framework/external", you can find multiple libraries that S3AIR is built upon.
-Each of them needs to be built once following the "how-to-build.txt" in each library's directory.
+Each of them needs to be built once.
 
-If building from the S3AIR Github repository, you can ignore the "If downloaded xyz separately or
-updating it" part of the instructions, as these changes are already applied to the Visual Studio
-projects.
+The easiest way to do so is as follows:
 
-So you only need to build all required configurations, and then execute the copy scripts.
+- Open the batch script at "framework/external/build_externals_windows.bat" with a text editor
+	and change "msbuildPath" to point to your Visual Studio installation's MSBuild.exe.
+
+- Then execute the batch script.
+
+- If everything went fine, the "framework/lib" directory should now be populated with
+	sub-directories "x64", "x64d", "x86", "x86d" with each containing "libbogg", "libvorbis",
+	"minizip", "sdl", "zlib" and the respective .lib files inside those.
+
+Alternatively or in case of errors:
+
+- Have a look at the "how-to-build.txt" files inside the sub-directories of "framework/external"
+	for details on how to build manually. If building from the S3AIR Github repository, you can
+	ignore the "If downloaded xyz separately or updating it" part of the instructions, as these
+	changes are already applied to the Visual Studio projects.
+
+- When building manually, make sure to execute the copy scripts (like "copy_sdl.bat") for each
+	library.
 
 
 

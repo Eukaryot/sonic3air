@@ -26,7 +26,6 @@ copy "%InputDir%\win32\VS2015\Win32\Release\libogg.lib" %OutputDir%\lib\x86\libo
 copy "%InputDir%\win32\VS2015\x64\Debug\libogg.lib" %OutputDir%\lib\x64d\libogg
 copy "%InputDir%\win32\VS2015\x64\Release\libogg.lib" %OutputDir%\lib\x64\libogg
 
-rem -- Static build, i.e. no DLLs to copy
-
+:: Done
 echo.
-pause
+if "%1"=="" pause

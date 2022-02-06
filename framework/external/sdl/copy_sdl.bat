@@ -26,5 +26,6 @@ copy %InputDir%\VisualC\x64\Release\sdl2.lib %OutputDir%\lib\x64\sdl
 copy %InputDir%\VisualC\x64\Debug\sdl2main.lib %OutputDir%\lib\x64d\sdl
 copy %InputDir%\VisualC\x64\Release\sdl2main.lib %OutputDir%\lib\x64\sdl
 
+:: Done
 echo.
-pause
+if "%1"=="" pause

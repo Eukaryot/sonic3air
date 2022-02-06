@@ -32,5 +32,6 @@ copy %InputDir%\lib\Release_x86\minizip.lib %OutputDir%\lib\x86\minizip
 copy %InputDir%\lib\Debug_x64\minizip.lib %OutputDir%\lib\x64d\minizip
 copy %InputDir%\lib\Release_x64\minizip.lib %OutputDir%\lib\x64\minizip
 
+:: Done
 echo.
-pause
+if "%1"=="" pause

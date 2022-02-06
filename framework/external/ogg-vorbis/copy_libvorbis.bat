@@ -26,5 +26,6 @@ copy "%InputDir%\win32\VS2010\Win32\Release\*.lib" %OutputDir%\lib\x86\libvorbis
 copy "%InputDir%\win32\VS2010\x64\Debug\*.lib" %OutputDir%\lib\x64d\libvorbis
 copy "%InputDir%\win32\VS2010\x64\Release\*.lib" %OutputDir%\lib\x64\libvorbis
 
+:: Done
 echo.
-pause
+if "%1"=="" pause

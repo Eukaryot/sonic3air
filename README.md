@@ -43,13 +43,13 @@ External libraries and code used in this project:
 
 ## How to build
 
-For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/soncthrickles":
-* Windows: "build/\_vstudio"
-* Mac:     "build/\_xcode"
-* Linux:   "build/\_cmake"
-* Android: "build/\_android"
-* Web:     "build/\_emscripten"
-* Switch:  "build/\_make"
+For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/soncthrickles/build":
+* Windows: "_vstudio"
+* Mac:     "_xcode"
+* Linux:   "_cmake"
+* Android: "_android"
+* Web:     "_emscripten"
+* Switch:  "_make"
 
 
 ## Want to contribute?
