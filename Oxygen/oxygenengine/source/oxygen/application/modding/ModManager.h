@@ -21,6 +21,7 @@ public:
 
 	inline const std::vector<Mod*>& getAllMods() const	   { return mAllMods; }
 	inline const std::vector<Mod*>& getActiveMods() const  { return mActiveMods; }
+	inline const std::unordered_map<uint64, Mod*>& getActiveModsByNameHash() const  { return mActiveModsByNameHash; }
 
 	void startup();
 	void clear();
@@ -51,6 +52,7 @@ private:
 	std::wstring mBasePath;
 	std::vector<Mod*> mAllMods;
 	std::vector<Mod*> mActiveMods;
-	std::map<uint64, Mod*> mModsByLocalDirectoryHash;
+	std::unordered_map<uint64, Mod*> mActiveModsByNameHash;		// Each mod is registered by both its internal name and display name
+	std::unordered_map<uint64, Mod*> mModsByLocalDirectoryHash;
 	std::map<std::wstring, ZipFileProvider*> mZipFileProviders;
 };

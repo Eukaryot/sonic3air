@@ -10,7 +10,6 @@
 
 #include "oxygen/simulation/LemonScriptBindings.h"
 
-#include <lemon/compiler/PreprocessorDefinition.h>
 #include <lemon/utility/FlyweightString.h>
 
 
@@ -92,7 +91,7 @@ public:
 	static void resolveLocation(const lemon::Function& function, uint32 programCounter, std::string& scriptFilename, uint32& lineNumber);
 
 private:
-	bool loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename, const lemon::PreprocessorDefinitionMap& preprocessorDefinitions);
+	bool loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename);
 	void evaluateFunctionPragmas();
 	void evaluateDefines();
 

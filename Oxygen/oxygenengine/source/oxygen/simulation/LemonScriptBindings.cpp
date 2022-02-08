@@ -947,15 +947,11 @@ namespace
 
 	const Mod* getActiveModByNameHash(lemon::StringRef modName)
 	{
-		if (!modName.isValid())
-			return nullptr;
-
-		// TODO: This can be optimized with a lookup map by mod name hash - but this also requires the other mods' display name hashes
-		const auto& activeMods = ModManager::instance().getActiveMods();
-		for (const Mod* mod : activeMods)
+		if (modName.isValid())
 		{
-			if (mod->mDisplayName == modName.getString())
-				return mod;
+			Mod*const* modPtr = mapFind(ModManager::instance().getActiveModsByNameHash(), modName.getHash());
+			if (nullptr != modPtr)
+				return *modPtr;
 		}
 		return nullptr;
 	}

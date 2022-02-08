@@ -143,13 +143,12 @@ bool LemonScriptProgram::hasValidProgram() const
 	return !mInternal.mProgram.getModules().empty();
 }
 
-bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename, const lemon::PreprocessorDefinitionMap& preprocessorDefinitions)
+bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsLookup& globalsLookup, const std::wstring& filename)
 {
 	try
 	{
 		// Compile script source
 		lemon::Compiler::CompileOptions options;
-		options.mPreprocessorDefinitions = preprocessorDefinitions;
 		//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
 		//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
 		lemon::Compiler compiler(module, globalsLookup, options);
@@ -221,6 +220,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 
 	Configuration& config = Configuration::instance();
 	lemon::GlobalsLookup globalsLookup;
+	globalsLookup.mPreprocessorDefinitions = loadOptions.mPreprocessorDefinitions;
 	globalsLookup.addDefinitionsFromModule(mInternal.mCoreModule);
 
 	// Clear program here already - in case compilation fails, it would be broken otherwise
@@ -256,7 +256,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 				if (FTX::FileSystem->exists(filename))
 				{
 					// Compile module
-					scriptsLoaded = loadScriptModule(mInternal.mScriptModule, globalsLookup, *String(filename).toWString(), loadOptions.mPreprocessorDefinitions);
+					scriptsLoaded = loadScriptModule(mInternal.mScriptModule, globalsLookup, *String(filename).toWString());
 
 					// If there are no script functions at all, we consider that a failure
 					scriptsLoaded = scriptsLoaded && !mInternal.mScriptModule.getScriptFunctions().empty();
@@ -313,7 +313,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 				// Create and compile module
 				lemon::Module* module = new lemon::Module(mod->mName);
 				const std::wstring mainScriptFilename = mod->mFullPath + L"scripts/main.lemon";
-				const bool success = loadScriptModule(*module, globalsLookup, mainScriptFilename, loadOptions.mPreprocessorDefinitions);
+				const bool success = loadScriptModule(*module, globalsLookup, mainScriptFilename);
 				if (success)
 				{
 					mInternal.mModModules.push_back(module);

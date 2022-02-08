@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -16,8 +16,7 @@ namespace lemon
 
 	struct PreprocessorDefinition
 	{
-		std::string mIdentifierName;
-		uint64 mIdentifierHash = 0;
+		FlyweightString mIdentifier;
 		int64 mValue = 1;
 	};
 
@@ -47,14 +46,13 @@ namespace lemon
 			return (nullptr == definition) ? 0 : definition->mValue;
 		}
 
-		PreprocessorDefinition& setDefinition(uint64 hash, const std::string& name, int64 value = 1)
+		PreprocessorDefinition& setDefinition(FlyweightString name, int64 value = 1)
 		{
-			const auto it = mDefinitions.find(hash);
+			const auto it = mDefinitions.find(name.getHash());
 			if (it == mDefinitions.end())
 			{
-				PreprocessorDefinition& newDefinition = mDefinitions[hash];
-				newDefinition.mIdentifierHash = hash;
-				newDefinition.mIdentifierName = name;
+				PreprocessorDefinition& newDefinition = mDefinitions[name.getHash()];
+				newDefinition.mIdentifier = name;
 				newDefinition.mValue = value;
 				return newDefinition;
 			}
@@ -64,10 +62,9 @@ namespace lemon
 			}
 		}
 
-		inline PreprocessorDefinition* getDefinition(const std::string& name)					{ return getDefinition(rmx::getMurmur2_64(name)); }
-		inline const PreprocessorDefinition* getDefinition(const std::string& name) const		{ return getDefinition(rmx::getMurmur2_64(name)); }
-		inline int64 getValue(const std::string& name) const									{ return getValue(rmx::getMurmur2_64(name)); }
-		inline PreprocessorDefinition& setDefinition(const std::string& name, int64 value = 1)	{ return setDefinition(rmx::getMurmur2_64(name), name, value); }
+		inline PreprocessorDefinition* getDefinition(FlyweightString name)				{ return getDefinition(name.getHash()); }
+		inline const PreprocessorDefinition* getDefinition(FlyweightString name) const	{ return getDefinition(name.getHash()); }
+		inline int64 getValue(FlyweightString name) const								{ return getValue(name.getHash()); }
 
 	private:
 		std::map<uint64, PreprocessorDefinition> mDefinitions;

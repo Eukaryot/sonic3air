@@ -234,7 +234,7 @@ namespace lemon
 		// Your turn, preprocessor
 		try
 		{
-			mPreprocessor.mPreprocessorDefinitions = &mCompileOptions.mPreprocessorDefinitions;
+			mPreprocessor.mPreprocessorDefinitions = &mGlobalsLookup.mPreprocessorDefinitions;
 			mPreprocessor.processLines(fileLines);
 		}
 		catch (const CompilerException& e)

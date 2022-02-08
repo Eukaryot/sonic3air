@@ -34,7 +34,6 @@ namespace lemon
 	public:
 		struct CompileOptions
 		{
-			PreprocessorDefinitionMap mPreprocessorDefinitions;
 			const DataTypeDefinition* mExternalAddressType = &PredefinedDataTypes::UINT_64;
 			std::wstring mOutputCombinedSource;
 			std::wstring mOutputNativizedSource;

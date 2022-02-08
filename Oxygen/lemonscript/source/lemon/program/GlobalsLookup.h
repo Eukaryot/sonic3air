@@ -13,7 +13,7 @@
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
 #include "lemon/program/StringRef.h"
-#include <unordered_map>
+#include "lemon/compiler/PreprocessorDefinition.h"
 
 
 namespace lemon
@@ -23,6 +23,10 @@ namespace lemon
 	class GlobalsLookup
 	{
 	friend class Module;
+
+	public:
+		// Preprocessor definitions
+		PreprocessorDefinitionMap mPreprocessorDefinitions;
 
 	public:
 		struct Identifier

@@ -14,6 +14,7 @@
 namespace lemon
 {
 	class Parser;
+	class ParserTokenList;
 	class StatementToken;
 	class TokenProcessing;
 	struct GlobalCompilerConfig;
@@ -26,13 +27,15 @@ namespace lemon
 		void processLines(std::vector<std::string_view>& lines);
 
 	public:
-		const PreprocessorDefinitionMap* mPreprocessorDefinitions = nullptr;
+		PreprocessorDefinitionMap* mPreprocessorDefinitions = nullptr;
 		ObjectPool<std::string, 64> mModifiedLines;		// Buffer needed to store modified lines
 
 	private:
 		void eraseFromLine(std::string_view& line, std::string*& modifiedLine, size_t offset, size_t count);
 		bool evaluateConditionString(const char* characters, size_t len, Parser& parser);
-		int64 evaluateConditionToken(const StatementToken& token) const;
+		void processDefinition(const char* characters, size_t len, Parser& parser);
+		int64 evaluateConstantExpression(const ParserTokenList& parserTokens) const;
+		int64 evaluateConstantToken(const StatementToken& token) const;
 
 	private:
 		const GlobalCompilerConfig& mConfig;

@@ -150,7 +150,7 @@ namespace lemon
 			outCharactersRead = pos;
 		}
 
-		inline static void collectPreprocessorCondition(const char* input, size_t length, std::string& output)
+		inline static void collectPreprocessorStatement(const char* input, size_t length, std::string& output)
 		{
 			output.clear();
 			for (size_t pos = 0; pos < length; ++pos)

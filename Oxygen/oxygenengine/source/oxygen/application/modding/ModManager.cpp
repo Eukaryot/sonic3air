@@ -420,6 +420,15 @@ void ModManager::onActiveModsChanged(bool duringStartup)
 		mActiveMods[index]->mActivePriority = (uint32)index;
 	}
 
+	// Rebuild lookup map
+	mActiveModsByNameHash.clear();
+	for (Mod* mod : mActiveMods)
+	{
+		mActiveModsByNameHash.emplace(rmx::getMurmur2_64(mod->mName), mod);
+		if (mod->mDisplayName != mod->mName)
+			mActiveModsByNameHash.emplace(rmx::getMurmur2_64(mod->mDisplayName), mod);
+	}
+
 	if (!duringStartup)		// Not needed during startup, as the engine performs the necessary loading steps anyways afterwards
 	{
 		// Tell the engine so it can make the necessary updates in all systems

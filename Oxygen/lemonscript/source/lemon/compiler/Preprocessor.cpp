@@ -28,13 +28,18 @@ namespace lemon
 
 	void Preprocessor::processLines(std::vector<std::string_view>& lines)
 	{
-		struct PreprocessorBlock
+		struct BlockStack
 		{
-			bool mIgnored = false;
-			bool mInheritedIgnored = false;
+			struct Block
+			{
+				bool mIgnored = false;
+				bool mInheritedIgnored = false;
+			};
+			std::vector<Block> mOpenBlocks;
+			inline bool shouldIgnoreContent() const  { return !mOpenBlocks.empty() && (mOpenBlocks.back().mIgnored || mOpenBlocks.back().mInheritedIgnored); }
 		};
-		std::vector<PreprocessorBlock> openBlocks;
 
+		BlockStack blockStack;
 		Parser parser;
 		bool isInBlockComment = false;
 		size_t blockCommentStart = 0;
@@ -54,7 +59,7 @@ namespace lemon
 			}
 			else
 			{
-				// Check for preprocessor commands
+				// Check for preprocessor directives
 				for (size_t pos = 0; pos < length; ++pos)
 				{
 					if (line[pos] == '#')
@@ -63,25 +68,42 @@ namespace lemon
 						if (rmx::startsWith(rest, "if ") && rest.length() >= 4)
 						{
 							const bool isTrue = evaluateConditionString(&rest[3], rest.length() - 3, parser);
-							const bool inheritedIgnored = (openBlocks.empty()) ? false : openBlocks.back().mIgnored;
-							PreprocessorBlock& block = vectorAdd(openBlocks);
+							const bool inheritedIgnored = (blockStack.mOpenBlocks.empty()) ? false : blockStack.mOpenBlocks.back().mIgnored;
+							BlockStack::Block& block = vectorAdd(blockStack.mOpenBlocks);
 							block.mIgnored = !isTrue;
 							block.mInheritedIgnored = inheritedIgnored;
 						}
 						else if (rmx::startsWith(rest, "else"))
 						{
-							CHECK_ERROR(!openBlocks.empty(), "Found no #if for #else", mLineNumber);
-							PreprocessorBlock& block = openBlocks.back();
+							CHECK_ERROR(!blockStack.mOpenBlocks.empty(), "Found no #if for #else", mLineNumber);
+							BlockStack::Block& block = blockStack.mOpenBlocks.back();
 							block.mIgnored = !block.mIgnored;
 						}
 						else if (rmx::startsWith(rest, "endif"))
 						{
-							CHECK_ERROR(!openBlocks.empty(), "Found no #if for #endif", mLineNumber);
-							openBlocks.pop_back();
+							CHECK_ERROR(!blockStack.mOpenBlocks.empty(), "Found no #if for #endif", mLineNumber);
+							blockStack.mOpenBlocks.pop_back();
 						}
-						else
+						else if (!blockStack.shouldIgnoreContent())
 						{
-							CHECK_ERROR(false, "Invalid preprocessor command", mLineNumber);
+							if (rmx::startsWith(rest, "define ") && rest.length() >= 8)
+							{
+								if (!blockStack.shouldIgnoreContent())
+								{
+									processDefinition(&rest[7], rest.length() - 7, parser);
+								}
+							}
+							else if (rmx::startsWith(rest, "error ") && rest.length() >= 7)
+							{
+								if (!blockStack.shouldIgnoreContent())
+								{
+									CHECK_ERROR(false, rest.substr(6), mLineNumber);
+								}
+							}
+							else
+							{
+								CHECK_ERROR(false, "Invalid preprocessor directive", mLineNumber);
+							}
 						}
 
 						// Clear this line, it should be ignored by the parser
@@ -102,7 +124,7 @@ namespace lemon
 			}
 
 			// Check if inside an ignored region
-			if (!openBlocks.empty() && (openBlocks.back().mIgnored || openBlocks.back().mInheritedIgnored))
+			if (blockStack.shouldIgnoreContent())
 			{
 				// Clear this line, it should be ignored by the parser
 				line = std::string_view();
@@ -167,7 +189,7 @@ namespace lemon
 		}
 
 		// Using last line number for these errors
-		CHECK_ERROR(openBlocks.empty(), "Not all preprocessor blocks closed", mLineNumber);
+		CHECK_ERROR(blockStack.mOpenBlocks.empty(), "Not all preprocessor blocks closed", mLineNumber);
 		CHECK_ERROR(!isInBlockComment, "Still inside a block comment at end of file", mLineNumber);
 	}
 
@@ -202,11 +224,45 @@ namespace lemon
 	bool Preprocessor::evaluateConditionString(const char* characters, size_t len, Parser& parser)
 	{
 		// Parse input
-		ParserHelper::collectPreprocessorCondition(characters, len, mBufferString);
+		ParserHelper::collectPreprocessorStatement(characters, len, mBufferString);
 		CHECK_ERROR(!mBufferString.empty(), "Empty identifier after preprocessor #if", mLineNumber);
 		ParserTokenList parserTokens;
 		parser.splitLineIntoTokens(mBufferString, mLineNumber, parserTokens);
 
+		return (evaluateConstantExpression(parserTokens) != 0);
+	}
+
+	void Preprocessor::processDefinition(const char* characters, size_t len, Parser& parser)
+	{
+		// Parse input
+		ParserHelper::collectPreprocessorStatement(characters, len, mBufferString);
+		CHECK_ERROR(!mBufferString.empty(), "Empty identifier after preprocessor #if", mLineNumber);
+		ParserTokenList parserTokens;
+		parser.splitLineIntoTokens(mBufferString, mLineNumber, parserTokens);
+
+		// Check for identifier
+		CHECK_ERROR(!parserTokens.empty(), "Expected an identifier after #define", mLineNumber);
+		CHECK_ERROR(parserTokens[0].getType() == ParserToken::Type::IDENTIFIER, "Expected an identifier after #define", mLineNumber);
+		const FlyweightString identifierName = parserTokens[0].as<IdentifierParserToken>().mName;
+
+		// Check for value
+		int64 value = 1;
+		if (parserTokens.size() >= 2)
+		{
+			CHECK_ERROR(parserTokens.size() >= 3, "Assignment for #define expects using =", mLineNumber);
+			CHECK_ERROR(parserTokens[1].getType() == ParserToken::Type::OPERATOR && parserTokens[1].as<OperatorParserToken>().mOperator == Operator::ASSIGN, "Assignment for #define expects using =", mLineNumber);
+			parserTokens.erase(0, 2);
+			value = evaluateConstantExpression(parserTokens);
+		}
+
+		if (nullptr != mPreprocessorDefinitions)
+		{
+			mPreprocessorDefinitions->setDefinition(identifierName, value);
+		}
+	}
+
+	int64 Preprocessor::evaluateConstantExpression(const ParserTokenList& parserTokens) const
+	{
 		// Convert to tokens
 		TokenList tokenList;
 		tokenList.reserve(parserTokens.size());
@@ -217,12 +273,12 @@ namespace lemon
 			{
 				case ParserToken::Type::KEYWORD:
 				{
-					CHECK_ERROR(false, "Keyword is not allowed in preprocessor condition", mLineNumber);
+					CHECK_ERROR(false, "Keyword is not allowed in preprocessor statement", mLineNumber);
 					break;
 				}
 				case ParserToken::Type::VARTYPE:
 				{
-					CHECK_ERROR(false, "Type is not allowed in preprocessor condition", mLineNumber);
+					CHECK_ERROR(false, "Type is not allowed in preprocessor statement", mLineNumber);
 					break;
 				}
 				case ParserToken::Type::OPERATOR:
@@ -232,12 +288,12 @@ namespace lemon
 				}
 				case ParserToken::Type::LABEL:
 				{
-					CHECK_ERROR(false, "Label is not allowed in preprocessor condition", mLineNumber);
+					CHECK_ERROR(false, "Label is not allowed in preprocessor statement", mLineNumber);
 					break;
 				}
 				case ParserToken::Type::PRAGMA:
 				{
-					CHECK_ERROR(false, "Pragma is not allowed in preprocessor condition", mLineNumber);
+					CHECK_ERROR(false, "Pragma is not allowed in preprocessor statement", mLineNumber);
 					break;
 				}
 				case ParserToken::Type::CONSTANT:
@@ -247,7 +303,7 @@ namespace lemon
 				}
 				case ParserToken::Type::STRING_LITERAL:
 				{
-					CHECK_ERROR(false, "String is not allowed in preprocessor condition", mLineNumber);
+					CHECK_ERROR(false, "String is not allowed in preprocessor statement", mLineNumber);
 					break;
 				}
 				case ParserToken::Type::IDENTIFIER:
@@ -265,18 +321,22 @@ namespace lemon
 		{
 			// TODO: This extra context stuff is somewhat unnecessary here
 			std::vector<LocalVariable*> localVariables;
+			std::vector<Constant> localConstants;
+			std::vector<ConstantArray*> localConstantArrays;
 			mTokenProcessing.mContext.mFunction = nullptr;
 			mTokenProcessing.mContext.mLocalVariables = &localVariables;
+			mTokenProcessing.mContext.mLocalConstants = &localConstants;
+			mTokenProcessing.mContext.mLocalConstantArrays = &localConstantArrays;
 			mTokenProcessing.processForPreprocessor(tokenList, mLineNumber);
 		}
 
 		// Now traverse the tree recursively
 		CHECK_ERROR(tokenList.size() == 1, "Preprocessor condition must evaluate to a single statement", mLineNumber);
 		CHECK_ERROR(tokenList[0].isStatement(), "Preprocessor condition must evaluate to a statement", mLineNumber);
-		return (evaluateConditionToken(tokenList[0].as<StatementToken>()) != 0);
+		return evaluateConstantToken(tokenList[0].as<StatementToken>());
 	}
 
-	int64 Preprocessor::evaluateConditionToken(const StatementToken& token) const
+	int64 Preprocessor::evaluateConstantToken(const StatementToken& token) const
 	{
 		switch (token.getType())
 		{
@@ -291,7 +351,7 @@ namespace lemon
 				CHECK_ERROR(pt.mParenthesisType == ParenthesisType::PARENTHESIS, "Brackets are not allowed in preprocessor condition", mLineNumber);
 				CHECK_ERROR(pt.mContent.size() == 1, "Parenthesis must contain exactly one statement", mLineNumber);
 				CHECK_ERROR(pt.mContent[0].isStatement(), "Parenthesis must contain a statement", mLineNumber);
-				return evaluateConditionToken(pt.mContent[0].as<StatementToken>());
+				return evaluateConstantToken(pt.mContent[0].as<StatementToken>());
 			}
 
 			case Token::Type::BINARY_OPERATION:
@@ -299,14 +359,14 @@ namespace lemon
 				const BinaryOperationToken& bot = token.as<BinaryOperationToken>();
 				switch (bot.mOperator)
 				{
-					case Operator::LOGICAL_AND:				 return (evaluateConditionToken(*bot.mLeft) != 0) && (evaluateConditionToken(*bot.mRight) != 0) ? 1 : 0;
-					case Operator::LOGICAL_OR:				 return (evaluateConditionToken(*bot.mLeft) != 0) || (evaluateConditionToken(*bot.mRight) != 0) ? 1 : 0;
-					case Operator::COMPARE_EQUAL:			 return (evaluateConditionToken(*bot.mLeft) == evaluateConditionToken(*bot.mRight)) ? 1 : 0;
-					case Operator::COMPARE_NOT_EQUAL:		 return (evaluateConditionToken(*bot.mLeft) != evaluateConditionToken(*bot.mRight)) ? 1 : 0;
-					case Operator::COMPARE_LESS:			 return (evaluateConditionToken(*bot.mLeft) < evaluateConditionToken(*bot.mRight)) ? 1 : 0;
-					case Operator::COMPARE_LESS_OR_EQUAL:	 return (evaluateConditionToken(*bot.mLeft) <= evaluateConditionToken(*bot.mRight)) ? 1 : 0;
-					case Operator::COMPARE_GREATER:			 return (evaluateConditionToken(*bot.mLeft) > evaluateConditionToken(*bot.mRight)) ? 1 : 0;
-					case Operator::COMPARE_GREATER_OR_EQUAL: return (evaluateConditionToken(*bot.mLeft) >= evaluateConditionToken(*bot.mRight)) ? 1 : 0;
+					case Operator::LOGICAL_AND:				 return (evaluateConstantToken(*bot.mLeft) != 0) && (evaluateConstantToken(*bot.mRight) != 0) ? 1 : 0;
+					case Operator::LOGICAL_OR:				 return (evaluateConstantToken(*bot.mLeft) != 0) || (evaluateConstantToken(*bot.mRight) != 0) ? 1 : 0;
+					case Operator::COMPARE_EQUAL:			 return (evaluateConstantToken(*bot.mLeft) == evaluateConstantToken(*bot.mRight)) ? 1 : 0;
+					case Operator::COMPARE_NOT_EQUAL:		 return (evaluateConstantToken(*bot.mLeft) != evaluateConstantToken(*bot.mRight)) ? 1 : 0;
+					case Operator::COMPARE_LESS:			 return (evaluateConstantToken(*bot.mLeft) < evaluateConstantToken(*bot.mRight)) ? 1 : 0;
+					case Operator::COMPARE_LESS_OR_EQUAL:	 return (evaluateConstantToken(*bot.mLeft) <= evaluateConstantToken(*bot.mRight)) ? 1 : 0;
+					case Operator::COMPARE_GREATER:			 return (evaluateConstantToken(*bot.mLeft) > evaluateConstantToken(*bot.mRight)) ? 1 : 0;
+					case Operator::COMPARE_GREATER_OR_EQUAL: return (evaluateConstantToken(*bot.mLeft) >= evaluateConstantToken(*bot.mRight)) ? 1 : 0;
 					default:
 						CHECK_ERROR(false, "Operator not allowed in preprocessor condition", mLineNumber);
 						break;
@@ -319,7 +379,7 @@ namespace lemon
 				const UnaryOperationToken& uot = token.as<UnaryOperationToken>();
 				switch (uot.mOperator)
 				{
-					case Operator::UNARY_NOT:	 return (evaluateConditionToken(*uot.mArgument) == 0) ? 1 : 0;
+					case Operator::UNARY_NOT:  return (evaluateConstantToken(*uot.mArgument) == 0) ? 1 : 0;
 					default:
 						CHECK_ERROR(false, "Operator not allowed in preprocessor condition", mLineNumber);
 						break;
@@ -331,7 +391,7 @@ namespace lemon
 				CHECK_ERROR(false, "Token type not supported", mLineNumber);
 				break;
 		}
-		return false;
+		return 0;
 	}
 
 }
