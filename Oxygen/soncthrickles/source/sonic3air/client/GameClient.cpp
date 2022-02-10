@@ -14,7 +14,7 @@
 
 
 GameClient::GameClient() :
-	mConnectionManager(mSocket, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
+	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
 	mGhostSync(*this),
 	mUpdateCheck(*this)
 {
@@ -38,7 +38,7 @@ void GameClient::setupClient()
 		Sockets::startupSockets();
 
 		// Setup socket & connection manager
-		if (!mSocket.bindToAnyPort())
+		if (!mUDPSocket.bindToAnyPort())
 			RMX_ERROR("Socket bind to any port failed", return);
 
 		// Start connection

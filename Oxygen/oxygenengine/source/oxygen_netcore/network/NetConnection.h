@@ -28,10 +28,11 @@ public:
 
 	enum class State
 	{
-		EMPTY,
-		REQUESTED_CONNECTION,
-		CONNECTED,
-		DISCONNECTED
+		EMPTY,					// Not connected in any way
+		TCP_READY,				// Has a valid TCP socket, but not further setup yet
+		REQUESTED_CONNECTION,	// Sent a StartConnectionPacket, no response yet (only used on client side)
+		CONNECTED,				// Fully connected
+		DISCONNECTED			// Connection was lost or intentionally disconnected (see DisconnectReason)
 	};
 
 	enum class DisconnectReason
@@ -55,6 +56,7 @@ public:
 	static uint64 buildSenderKey(const SocketAddress& remoteAddress, uint16 remoteConnectionID);
 
 public:
+	NetConnection();
 	virtual ~NetConnection();
 
 	void clear();
@@ -65,12 +67,13 @@ public:
 	inline const SocketAddress& getRemoteAddress() const  { return mRemoteAddress; }
 	inline uint64 getSenderKey() const			{ return mSenderKey; }
 
-	UDPSocket* getSocket() const;
+	UDPSocket* getUDPSocket() const;
 
 	uint8 getLowLevelProtocolVersion() const	{ return mLowLevelProtocolVersion; }
 	uint8 getHighLevelProtocolVersion() const	{ return mHighLevelProtocolVersion; }
 	void setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 highLevelProtocolVersion);
 
+	void setupWithTCPSocket(ConnectionManager& connectionManager, TCPSocket& socketToMove, uint64 currentTimestamp);
 	bool startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress, uint64 currentTimestamp);
 	bool isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const;
 	void disconnect(DisconnectReason disconnectReason = DisconnectReason::MANUAL);
@@ -85,7 +88,8 @@ public:
 
 private:
 	// Called by ServerClientBase
-	void acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp);
+	void acceptIncomingConnectionUDP(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp);
+	void acceptIncomingConnectionTCP(ConnectionManager& connectionManager, uint16 remoteConnectionID, uint64 currentTimestamp);
 	void sendAcceptConnectionPacket();
 	void handleLowLevelPacket(ReceivedPacket& receivedPacket);
 
@@ -106,6 +110,9 @@ private:
 	State mState = State::EMPTY;
 	DisconnectReason mDisconnectReason = DisconnectReason::UNKNOWN;
 	ConnectionManager* mConnectionManager = nullptr;
+	bool mUsingTCP = false;
+	TCPSocket mTCPSocket;	// Used only if "mUsingTCP == true"
+
 	uint16 mLocalConnectionID = 0;
 	uint16 mRemoteConnectionID = 0;
 	SocketAddress mRemoteAddress;

@@ -62,6 +62,20 @@ bool ServerClientBase::updateReceivePackets(ConnectionManager& connectionManager
 
 	connectionManager.syncPacketQueues();
 
+	// Handle incoming TCP connections
+	std::list<TCPSocket>& incomingTCPConnections = connectionManager.getIncomingTCPConnections();
+	while (!incomingTCPConnections.empty())
+	{
+		// Create a new connection
+		NetConnection* connection = createNetConnection(connectionManager, SocketAddress());	// TODO: Fill in the actual sender address, in case some implementation wants to use it
+		if (nullptr != connection)
+		{
+			// Setup connection
+			connection->setupWithTCPSocket(connectionManager, incomingTCPConnections.front(), getCurrentTimestamp());
+		}
+		incomingTCPConnections.pop_front();
+	}
+
 	// Handle incoming packets
 	while (connectionManager.hasAnyPacket())
 	{
@@ -72,7 +86,7 @@ bool ServerClientBase::updateReceivePackets(ConnectionManager& connectionManager
 			break;
 		}
 
-		if (nullptr == receivedPacket->mConnection)
+		if (receivedPacket->mLowLevelSignature == lowlevel::StartConnectionPacket::SIGNATURE)
 		{
 			// It's a connection start request
 			handleConnectionStartPacket(connectionManager, *receivedPacket);
@@ -80,6 +94,7 @@ bool ServerClientBase::updateReceivePackets(ConnectionManager& connectionManager
 		else
 		{
 			// It's packet for a connection
+			RMX_ASSERT(nullptr != receivedPacket->mConnection, "Expected an assigned connection");
 			receivedPacket->mConnection->handleLowLevelPacket(*receivedPacket);
 		}
 
@@ -87,13 +102,14 @@ bool ServerClientBase::updateReceivePackets(ConnectionManager& connectionManager
 		//  -> E.g. the ReceivedPacketCache does this when adding a high-level packet into its queue of pending packets
 		receivedPacket->decReferenceCounter();
 	}
+
 	return true;
 }
 
 void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connectionManager, const ReceivedPacket& receivedPacket)
 {
 	VectorBinarySerializer serializer(true, receivedPacket.mContent);
-	serializer.skip(2);		// Skip low level signature, it can be found in "ReceivedPacket::mLowLevelSignature"
+	serializer.skip(2);		// Skip low level signature, it can be found in "ReceivedPacket::mLowLevelSignature" and was checked already
 	const uint16 remoteConnectionID = serializer.read<uint16>();
 	serializer.skip(2);		// Skip the other connection ID, as it's invalid anyways (it's only in there to have all low-level packets share the same header)
 
@@ -117,44 +133,55 @@ void ServerClientBase::handleConnectionStartPacket(ConnectionManager& connection
 		return;
 	}
 
-	const uint64 senderKey = NetConnection::buildSenderKey(receivedPacket.mSenderAddress, remoteConnectionID);
-	NetConnection* connection = connectionManager.findConnectionTo(senderKey);
-	if (nullptr != connection)
-	{
-		if (connection->isConnectedTo(connection->getLocalConnectionID(), remoteConnectionID, senderKey))
-		{
-			// Resend the AcceptConnectionPacket, as it seems the last one got lost
-			connection->sendAcceptConnectionPacket();
-			return;
-		}
-
-		// Destroy that old connection
-		connection->clear();
-		destroyNetConnection(*connection);
-	}
-	else
-	{
-		// Check if another connection would reach the limit of concurrent connections
-		if (connectionManager.getNumActiveConnections() + 1 >= 0x100)	// Not a hard limit, but should be good enough for now
-		{
-			lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::TOO_MANY_CONNECTIONS);
-			connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);
-			return;
-		}
-	}
-
-	// Create a new connection
-	connection = createNetConnection(connectionManager, receivedPacket.mSenderAddress);
+	// In case of a TCP connection, the NetConnection pointer was already set
+	NetConnection* connection = receivedPacket.mConnection;
 	if (nullptr != connection)
 	{
 		// Setup connection
 		connection->setProtocolVersions(lowLevelVersion, highLevelVersion);
-		connection->acceptIncomingConnection(connectionManager, remoteConnectionID, receivedPacket.mSenderAddress, senderKey, getCurrentTimestamp());
+		connection->acceptIncomingConnectionTCP(connectionManager, remoteConnectionID, getCurrentTimestamp());
 	}
 	else
 	{
-		// Send back an error
-		lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::CONNECTION_INVALID);
-		connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);
+		const uint64 senderKey = NetConnection::buildSenderKey(receivedPacket.mSenderAddress, remoteConnectionID);
+		connection = connectionManager.findConnectionTo(senderKey);
+		if (nullptr != connection)
+		{
+			if (connection->isConnectedTo(connection->getLocalConnectionID(), remoteConnectionID, senderKey))
+			{
+				// Resend the AcceptConnectionPacket, as it seems the last one got lost
+				connection->sendAcceptConnectionPacket();
+				return;
+			}
+
+			// Destroy that old connection
+			connection->clear();
+			destroyNetConnection(*connection);
+		}
+		else
+		{
+			// Check if another connection would reach the limit of concurrent connections
+			if (connectionManager.getNumActiveConnections() + 1 >= 0x100)	// Not a hard limit, but should be good enough for now
+			{
+				lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::TOO_MANY_CONNECTIONS);
+				connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);
+				return;
+			}
+		}
+
+		// Create a new connection
+		connection = createNetConnection(connectionManager, receivedPacket.mSenderAddress);
+		if (nullptr != connection)
+		{
+			// Setup connection
+			connection->setProtocolVersions(lowLevelVersion, highLevelVersion);
+			connection->acceptIncomingConnectionUDP(connectionManager, remoteConnectionID, receivedPacket.mSenderAddress, senderKey, getCurrentTimestamp());
+		}
+		else
+		{
+			// Send back an error
+			lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::CONNECTION_INVALID);
+			connectionManager.sendConnectionlessLowLevelPacket(errorPacket, receivedPacket.mSenderAddress, 0, remoteConnectionID);
+		}
 	}
 }

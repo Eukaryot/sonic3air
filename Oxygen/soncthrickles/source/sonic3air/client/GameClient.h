@@ -55,7 +55,7 @@ private:
 	void startConnectingToServer(uint64 currentTimestamp);
 
 private:
-	UDPSocket mSocket;
+	UDPSocket mUDPSocket;
 	ConnectionManager mConnectionManager;
 	NetConnection mServerConnection;
 	State mState = State::NONE;

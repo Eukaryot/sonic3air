@@ -22,6 +22,7 @@
 #else
 	// Use POSIX sockets
 	#include <sys/socket.h>
+	#include <sys/select.h>
 	#include <arpa/inet.h>
 	#include <netdb.h>  // Needed for getaddrinfo() and freeaddrinfo()
 	#include <unistd.h> // Needed for close()
@@ -171,8 +172,16 @@ void SocketAddress::assureIpPort() const
 struct TCPSocket::Internal
 {
 	SOCKET mSocket = INVALID_SOCKET;
+	SocketAddress mRemoteAddress;
+#ifndef _WIN32
+	bool mIsBlockingSocket = true;
+#endif
 };
 
+
+TCPSocket::TCPSocket()
+{
+}
 
 TCPSocket::~TCPSocket()
 {
@@ -208,6 +217,20 @@ void TCPSocket::close()
 #endif
 
 	mInternal->mSocket = INVALID_SOCKET;
+	mInternal->mRemoteAddress.clear();
+}
+
+const SocketAddress& TCPSocket::getRemoteAddress()
+{
+	if (nullptr != mInternal)
+		return mInternal->mRemoteAddress;
+	static SocketAddress EMPTY;
+	return EMPTY;
+}
+
+void TCPSocket::swapWith(TCPSocket& other)
+{
+	std::swap(mInternal, other.mInternal);
 }
 
 bool TCPSocket::setupServer(uint16 serverPort)
@@ -262,7 +285,7 @@ bool TCPSocket::acceptConnection(TCPSocket& outSocket)
 	FD_SET(mInternal->mSocket, &socketSet);
 	timeval timeout;
 	timeout.tv_sec = 0;
-	timeout.tv_usec = 10000;
+	timeout.tv_usec = 1000;
 	const int result = ::select(0, &socketSet, nullptr, nullptr, &timeout);
 	if (result < 0)
 	{
@@ -290,8 +313,11 @@ bool TCPSocket::acceptConnection(TCPSocket& outSocket)
 		outSocket.close();
 	}
 
+	sockaddr_storage& senderAddr = *reinterpret_cast<sockaddr_storage*>(outSocket.mInternal->mRemoteAddress.accessSockAddr());
+	socklen_t senderAddrSize = sizeof(sockaddr_storage);
+
 	outSocket.mInternal->mSocket = INVALID_SOCKET;
-	outSocket.mInternal->mSocket = ::accept(mInternal->mSocket, nullptr, nullptr);
+	outSocket.mInternal->mSocket = ::accept(mInternal->mSocket, (sockaddr*)&senderAddr, &senderAddrSize);
 	if (outSocket.mInternal->mSocket < 0)
 	{
 	#ifdef _WIN32
@@ -302,6 +328,8 @@ bool TCPSocket::acceptConnection(TCPSocket& outSocket)
 		outSocket.mInternal->mSocket = INVALID_SOCKET;
 		return false;
 	}
+
+	outSocket.mInternal->mRemoteAddress.onSockAddrSet();
 	return true;
 }
 
@@ -361,7 +389,66 @@ bool TCPSocket::sendData(const uint8* data, size_t length)
 	return (result >= 0);
 }
 
+bool TCPSocket::sendData(const std::vector<uint8>& data)
+{
+	if (data.empty())
+		return false;
+	return sendData(&data[0], data.size());
+}
+
 bool TCPSocket::receiveBlocking(ReceiveResult& outReceiveResult)
+{
+	outReceiveResult.mBuffer.clear();
+	if (!isValid())
+		return false;
+
+#ifndef _WIN32
+	if (!mInternal->mIsBlockingSocket)
+	{
+		// Set to blocking
+		const int flags = fcntl(mInternal->mSocket, F_GETFL, 0);
+		fcntl(mInternal->mSocket, F_SETFL, flags & ~O_NONBLOCK);
+		mInternal->mIsBlockingSocket = true;
+	}
+#endif
+
+	return receiveInternal(outReceiveResult);
+}
+
+bool TCPSocket::receiveNonBlocking(ReceiveResult& outReceiveResult)
+{
+	outReceiveResult.mBuffer.clear();
+	if (!isValid())
+		return false;
+
+#ifdef _WIN32
+	// Check if there's pending data at all
+	uint32 pendingDataSize = 0;
+	if (::ioctlsocket(mInternal->mSocket, FIONREAD, (u_long*)(&pendingDataSize)) == 0)
+	{
+		if (pendingDataSize > 0)
+		{
+			return receiveInternal(outReceiveResult);
+		}
+	}
+
+#else
+	if (mInternal->mIsBlockingSocket)
+	{
+		// Set to non-blocking
+		const int flags = fcntl(mInternal->mSocket, F_GETFL, 0);
+		fcntl(mInternal->mSocket, F_SETFL, flags | O_NONBLOCK);
+		mInternal->mIsBlockingSocket = false;
+	}
+	receiveInternal(outReceiveResult);
+
+#endif
+
+	// Return true as there was no error
+	return true;
+}
+
+bool TCPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 {
 	size_t bytesRead = 0;
 	while (true)
@@ -380,7 +467,7 @@ bool TCPSocket::receiveBlocking(ReceiveResult& outReceiveResult)
 				return true;
 			}
 			// Otherwise continue
-		}
+}
 		else if (result == 0)
 		{
 			// Done
@@ -562,6 +649,25 @@ bool UDPSocket::sendData(const std::vector<uint8>& data, const SocketAddress& de
 	return sendData(&data[0], data.size(), destinationAddress);
 }
 
+bool UDPSocket::receiveBlocking(ReceiveResult& outReceiveResult)
+{
+	outReceiveResult.mBuffer.clear();
+	if (!isValid())
+		return false;
+
+#ifndef _WIN32
+	if (!mInternal->mIsBlockingSocket)
+	{
+		// Set to blocking
+		const int flags = fcntl(mInternal->mSocket, F_GETFL, 0);
+		fcntl(mInternal->mSocket, F_SETFL, flags & ~O_NONBLOCK);
+		mInternal->mIsBlockingSocket = true;
+	}
+#endif
+
+	return receiveInternal(outReceiveResult);
+}
+
 bool UDPSocket::receiveNonBlocking(ReceiveResult& outReceiveResult)
 {
 	outReceiveResult.mBuffer.clear();
@@ -595,25 +701,6 @@ bool UDPSocket::receiveNonBlocking(ReceiveResult& outReceiveResult)
 	return true;
 }
 
-bool UDPSocket::receiveBlocking(ReceiveResult& outReceiveResult)
-{
-	outReceiveResult.mBuffer.clear();
-	if (!isValid())
-		return false;
-
-#ifndef _WIN32
-	if (!mInternal->mIsBlockingSocket)
-	{
-		// Set to blocking
-		const int flags = fcntl(mInternal->mSocket, F_GETFL, 0);
-		fcntl(mInternal->mSocket, F_SETFL, flags & ~O_NONBLOCK);
-		mInternal->mIsBlockingSocket = true;
-	}
-#endif
-
-	return receiveInternal(outReceiveResult);
-}
-
 bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 {
 	size_t bytesRead = 0;
@@ -623,9 +710,9 @@ bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 		const constexpr size_t CHUNK_SIZE = MAX_DATAGRAM_SIZE;
 		outReceiveResult.mBuffer.resize(bytesRead + CHUNK_SIZE);
 
-		sockaddr_storage& senderAddress = *reinterpret_cast<sockaddr_storage*>(outReceiveResult.mSenderAddress.accessSockAddr());
-		socklen_t senderAddressSize = sizeof(sockaddr_storage);
-		const int result = ::recvfrom(mInternal->mSocket, (char*)&outReceiveResult.mBuffer[bytesRead], CHUNK_SIZE, 0, (sockaddr*)&senderAddress, &senderAddressSize);
+		sockaddr_storage& senderAddr = *reinterpret_cast<sockaddr_storage*>(outReceiveResult.mSenderAddress.accessSockAddr());
+		socklen_t senderAddrSize = sizeof(sockaddr_storage);
+		const int result = ::recvfrom(mInternal->mSocket, (char*)&outReceiveResult.mBuffer[bytesRead], CHUNK_SIZE, 0, (sockaddr*)&senderAddr, &senderAddrSize);
 		if (result < 0)
 		{
 		#ifdef _WIN32

@@ -20,6 +20,10 @@ uint64 NetConnection::buildSenderKey(const SocketAddress& remoteAddress, uint16 
 	return remoteAddress.getHash() ^ remoteConnectionID;
 }
 
+NetConnection::NetConnection()
+{
+}
+
 NetConnection::~NetConnection()
 {
 	clear();
@@ -46,15 +50,32 @@ void NetConnection::clear()
 	mReceivedPacketCache.clear();
 }
 
-UDPSocket* NetConnection::getSocket() const
+UDPSocket* NetConnection::getUDPSocket() const
 {
-	return (nullptr == mConnectionManager) ? nullptr : &mConnectionManager->getSocket();
+	return (nullptr == mConnectionManager) ? nullptr : mConnectionManager->getUDPSocket();
 }
 
 void NetConnection::setProtocolVersions(uint8 lowLevelProtocolVersion, uint8 highLevelProtocolVersion)
 {
 	mLowLevelProtocolVersion = lowLevelProtocolVersion;
 	mHighLevelProtocolVersion = highLevelProtocolVersion;
+}
+
+void NetConnection::setupWithTCPSocket(ConnectionManager& connectionManager, TCPSocket& socketToMove, uint64 currentTimestamp)
+{
+	clear();
+
+	mState = State::TCP_READY;
+	mConnectionManager = &connectionManager;
+
+	mUsingTCP = true;
+	mTCPSocket.swapWith(socketToMove);
+	mRemoteAddress = mTCPSocket.getRemoteAddress();
+
+	mCurrentTimestamp = currentTimestamp;
+	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Set here just to start with a valid timestamp
+
+	mConnectionManager->addConnection(*this);
 }
 
 bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const SocketAddress& remoteAddress, uint64 currentTimestamp)
@@ -70,6 +91,18 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 
 	mCurrentTimestamp = currentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Set here just to start with a valid timestamp
+
+	// Use TCP if UDP is not available
+	if (!connectionManager.hasUDPSocket())
+	{
+		// Establish a TCP connection first
+		//  -> Note that this is a blocking call!
+		const bool success = mTCPSocket.connectTo(remoteAddress.getIP(), remoteAddress.getPort());
+		if (!success)
+			return false;
+
+		mUsingTCP = true;
+	}
 
 	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
 
@@ -206,7 +239,7 @@ void NetConnection::updateConnection(uint64 currentTimestamp)
 	}
 }
 
-void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp)
+void NetConnection::acceptIncomingConnectionUDP(ConnectionManager& connectionManager, uint16 remoteConnectionID, const SocketAddress& remoteAddress, uint64 senderKey, uint64 currentTimestamp)
 {
 	clear();
 
@@ -221,8 +254,22 @@ void NetConnection::acceptIncomingConnection(ConnectionManager& connectionManage
 	mCurrentTimestamp = currentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Because we just received a packet
 
-	RMX_LOG_INFO("Accepting connection from " << mRemoteAddress.toString());
+	RMX_LOG_INFO("Accepting connection via UDP from " << mRemoteAddress.toString());
 	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
+
+	// Send back a response
+	sendAcceptConnectionPacket();
+}
+
+void NetConnection::acceptIncomingConnectionTCP(ConnectionManager& connectionManager, uint16 remoteConnectionID, uint64 currentTimestamp)
+{
+	mState = State::CONNECTED;
+	mRemoteConnectionID = remoteConnectionID;
+
+	mCurrentTimestamp = currentTimestamp;
+	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Because we just received a packet
+
+	RMX_LOG_INFO("Accepting connection via TCP from " << mRemoteAddress.toString());
 
 	// Send back a response
 	sendAcceptConnectionPacket();
@@ -345,7 +392,14 @@ bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
 		return false;
 
 	mLastMessageSentTimestamp = mCurrentTimestamp;
-	return mConnectionManager->sendPacketData(content, mRemoteAddress);
+	if (mUsingTCP)
+	{
+		return mConnectionManager->sendTCPPacketData(content, mTCPSocket);
+	}
+	else
+	{
+		return mConnectionManager->sendUDPPacketData(content, mRemoteAddress);
+	}
 }
 
 void NetConnection::writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket)

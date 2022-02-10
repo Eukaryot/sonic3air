@@ -52,6 +52,12 @@ public:
 
 	inline bool isValid() const  { return (mHasSockAddr || mHasIpPort); }
 
+	inline void clear()
+	{
+		mHasSockAddr = false;
+		mHasIpPort = false;
+	}
+
 	inline void set(const std::string& ip, uint16 port)
 	{
 		mHasSockAddr = false;
@@ -110,10 +116,14 @@ public:
 	};
 
 public:
+	TCPSocket();
 	~TCPSocket();
 
 	bool isValid() const;
 	void close();
+
+	const SocketAddress& getRemoteAddress();
+	void swapWith(TCPSocket& other);
 
 	bool setupServer(uint16 serverPort);
 	bool acceptConnection(TCPSocket& outSocket);
@@ -121,8 +131,13 @@ public:
 	bool connectTo(const std::string& serverAddress, uint16 serverPort);
 
 	bool sendData(const uint8* data, size_t length);
+	bool sendData(const std::vector<uint8>& data);
 
 	bool receiveBlocking(ReceiveResult& outReceiveResult);
+	bool receiveNonBlocking(ReceiveResult& outReceiveResult);
+
+private:
+	bool receiveInternal(ReceiveResult& outReceiveResult);
 
 private:
 	struct Internal;

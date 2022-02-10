@@ -32,9 +32,12 @@ public:
 	DebugSettings mDebugSettings;
 
 public:
-	ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange);
+	ConnectionManager(UDPSocket* udpSocket, TCPSocket* tcpListenSocket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange);
 
-	inline UDPSocket& getSocket() const  { return mSocket; }
+	inline bool hasUDPSocket() const			  { return (nullptr != mUDPSocket); }
+	inline UDPSocket* getUDPSocket() const		  { return mUDPSocket; }
+	inline TCPSocket* getTCPListenSocket() const  { return mTCPListenSocket; }
+
 	inline ConnectionListenerInterface& getListener() const  { return mListener; }
 	inline size_t getNumActiveConnections() const			 { return mActiveConnections.size(); }
 
@@ -47,8 +50,10 @@ public:
 
 	inline bool hasAnyPacket() const  { return !mReceivedPackets.mSyncedQueue.empty(); }
 	ReceivedPacket* getNextReceivedPacket();
+	std::list<TCPSocket>& getIncomingTCPConnections()  { return mIncomingTCPConnections; }
 
-	bool sendPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress);
+	bool sendUDPPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress);
+	bool sendTCPPacketData(const std::vector<uint8>& data, TCPSocket& socket);
 	bool sendConnectionlessLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, const SocketAddress& remoteAddress, uint16 localConnectionID, uint16 remoteConnectionID);
 
 	NetConnection* findConnectionTo(uint64 senderKey) const;
@@ -60,6 +65,7 @@ protected:
 	SentPacket& rentSentPacket();
 
 	// Internal
+	void receivedPacketInternal(const std::vector<uint8>& buffer, const SocketAddress& senderAddress, NetConnection* connection);
 	uint16 getFreeLocalConnectionID();
 
 private:
@@ -71,7 +77,8 @@ private:
 	};
 
 private:
-	UDPSocket& mSocket;
+	UDPSocket* mUDPSocket = nullptr;		// Only set if UDP is used (or both UDP and TCP)
+	TCPSocket* mTCPListenSocket = nullptr;	// Only set if TCP is used (or both UDP and TCP)
 	ConnectionListenerInterface& mListener;
 	VersionRange<uint8> mHighLevelProtocolVersionRange = { 1, 1 };
 
@@ -79,7 +86,11 @@ private:
 	std::vector<NetConnection*> mActiveConnectionsLookup;				// Using the lowest n bits of the local connection ID as index
 	uint16 mBitmaskForActiveConnectionsLookup = 0;
 	std::unordered_map<uint64, NetConnection*> mConnectionsBySender;	// Using a sender key (= hash for the sender address + remote connection ID) as key
+
+	std::vector<NetConnection*> mTCPNetConnections;
+
 	SyncedPacketQueue mReceivedPackets;
+	std::list<TCPSocket> mIncomingTCPConnections;
 
 	RentableObjectPool<SentPacket> mSentPacketPool;
 	RentableObjectPool<ReceivedPacket> mReceivedPacketPool;

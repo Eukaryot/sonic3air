@@ -12,8 +12,9 @@
 #include "oxygen_netcore/network/NetConnection.h"
 
 
-ConnectionManager::ConnectionManager(UDPSocket& socket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange) :
-	mSocket(socket),
+ConnectionManager::ConnectionManager(UDPSocket* udpSocket, TCPSocket* tcpListenSocket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange) :
+	mUDPSocket(udpSocket),
+	mTCPListenSocket(tcpListenSocket),
 	mListener(listener),
 	mHighLevelProtocolVersionRange(highLevelProtocolVersionRange)
 {
@@ -36,100 +37,70 @@ void ConnectionManager::updateConnections(uint64 currentTimestamp)
 
 bool ConnectionManager::updateReceivePackets()
 {
-	for (int runs = 0; runs < 10; ++runs)
+	bool anyActivity = false;
+
+	// Update UDP
+	if (nullptr != mUDPSocket)
+	{
+		for (int runs = 0; runs < 10; ++runs)
+		{
+			// Receive next packet
+			static UDPSocket::ReceiveResult received;
+			const bool success = mUDPSocket->receiveNonBlocking(received);
+			if (!success)
+			{
+				// TODO: Handle error in socket
+				return false;
+			}
+
+			if (received.mBuffer.empty())
+			{
+				// Nothing to do at the moment
+				break;
+			}
+
+			anyActivity = true;
+			receivedPacketInternal(received.mBuffer, received.mSenderAddress, nullptr);
+		}
+	}
+
+	// Update TCP listen socket (server only)
+	if (nullptr != mTCPListenSocket)
+	{
+		// Accept new connections
+		for (int runs = 0; runs < 3; ++runs)
+		{
+			TCPSocket newSocket;
+			if (!mTCPListenSocket->acceptConnection(newSocket))
+				break;
+
+			RMX_LOG_INFO("Accepted TCP connection");
+			anyActivity = true;
+			mIncomingTCPConnections.emplace_back();
+			mIncomingTCPConnections.back().swapWith(newSocket);
+		}
+	}
+
+	// Update net connections' TCP sockets
+	for (NetConnection* connection : mTCPNetConnections)
 	{
 		// Receive next packet
-		static UDPSocket::ReceiveResult received;
-		const bool success = mSocket.receiveNonBlocking(received);
+		static TCPSocket::ReceiveResult received;
+		const bool success = connection->mTCPSocket.receiveNonBlocking(received);
 		if (!success)
 		{
 			// TODO: Handle error in socket
 			return false;
 		}
 
-		if (received.mBuffer.empty())
+		if (!received.mBuffer.empty())
 		{
-			// Nothing to do at the moment; tell the caller if any packet was received at all
-			return (runs > 0);
-		}
-
-		// Ignore too small packets
-		if (received.mBuffer.size() < 6)
-			continue;
-
-	#ifdef DEBUG
-		// Simulate packet loss
-		if (mDebugSettings.mReceivingPacketLoss > 0.0f && randomf() < mDebugSettings.mReceivingPacketLoss)
-			continue;
-	#endif
-
-		// Received a packet, check its signature
-		VectorBinarySerializer serializer(true, received.mBuffer);
-		const uint16 lowLevelSignature = serializer.read<uint16>();
-		if (lowLevelSignature == lowlevel::StartConnectionPacket::SIGNATURE)
-		{
-			// Store for later evaluation
-			ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
-			receivedPacket.mContent = received.mBuffer;
-			receivedPacket.mLowLevelSignature = lowLevelSignature;
-			receivedPacket.mSenderAddress = received.mSenderAddress;
-			receivedPacket.mConnection = nullptr;
-			mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
-		}
-		else
-		{
-			// TODO: Explicitly check the known (= valid) signature types here?
-
-			const uint16 remoteConnectionID = serializer.read<uint16>();
-			const uint16 localConnectionID = serializer.read<uint16>();
-			if (localConnectionID == 0)
-			{
-				// Invalid connection
-				if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
-				{
-					// TODO: Evaluate the error code
-					RMX_ASSERT(false, "Received error packet");
-				}
-			}
-			else
-			{
-				// Find the connection in our list of active connections
-				NetConnection* connection = mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup];
-				if (nullptr == connection)
-				{
-					// Unknown connection
-					if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
-					{
-						// It's an error packet, don't send anything back
-						// TODO: Evaluate the error code
-					}
-					else
-					{
-						// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
-					}
-				}
-				else
-				{
-					if (connection->getRemoteConnectionID() != remoteConnectionID && lowLevelSignature != lowlevel::AcceptConnectionPacket::SIGNATURE)
-					{
-						// Unknown or invalid connection
-						// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
-					}
-					else
-					{
-						// Store for later evaluation
-						ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
-						receivedPacket.mContent = received.mBuffer;
-						receivedPacket.mLowLevelSignature = lowLevelSignature;
-						receivedPacket.mSenderAddress = received.mSenderAddress;
-						receivedPacket.mConnection = connection;
-						mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
-					}
-				}
-			}
+			anyActivity = true;
+			receivedPacketInternal(received.mBuffer, connection->getRemoteAddress(), connection);
 		}
 	}
-	return true;
+
+	return anyActivity;
 }
 
 void ConnectionManager::syncPacketQueues()
@@ -173,7 +144,7 @@ ReceivedPacket* ConnectionManager::getNextReceivedPacket()
 	return receivedPacket;
 }
 
-bool ConnectionManager::sendPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress)
+bool ConnectionManager::sendUDPPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress)
 {
 #ifdef DEBUG
 	// Simulate packet loss
@@ -184,7 +155,22 @@ bool ConnectionManager::sendPacketData(const std::vector<uint8>& data, const Soc
 	}
 #endif
 
-	return mSocket.sendData(data, remoteAddress);
+	RMX_ASSERT(nullptr != mUDPSocket, "No UDP socket set");
+	return mUDPSocket->sendData(data, remoteAddress);
+}
+
+bool ConnectionManager::sendTCPPacketData(const std::vector<uint8>& data, TCPSocket& socket)
+{
+#ifdef DEBUG
+	// Simulate packet loss
+	if (mDebugSettings.mSendingPacketLoss > 0.0f && randomf() < mDebugSettings.mSendingPacketLoss)
+	{
+		// Act as if the packet was sent successfully
+		return true;
+	}
+#endif
+
+	return socket.sendData(data);
 }
 
 bool ConnectionManager::sendConnectionlessLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, const SocketAddress& remoteAddress, uint16 localConnectionID, uint16 remoteConnectionID)
@@ -199,7 +185,7 @@ bool ConnectionManager::sendConnectionlessLowLevelPacket(lowlevel::PacketBase& l
 	serializer.write(remoteConnectionID);
 	lowLevelPacket.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.mMinimum);
 
-	return sendPacketData(sendBuffer, remoteAddress);
+	return sendUDPPacketData(sendBuffer, remoteAddress);
 }
 
 NetConnection* ConnectionManager::findConnectionTo(uint64 senderKey) const
@@ -217,6 +203,11 @@ void ConnectionManager::addConnection(NetConnection& connection)
 	mActiveConnections[localConnectionID] = &connection;
 	mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup] = &connection;
 	mConnectionsBySender[connection.getSenderKey()] = &connection;
+
+	if (connection.mUsingTCP)
+	{
+		mTCPNetConnections.push_back(&connection);
+	}
 }
 
 void ConnectionManager::removeConnection(NetConnection& connection)
@@ -227,6 +218,18 @@ void ConnectionManager::removeConnection(NetConnection& connection)
 	mConnectionsBySender.erase(connection.getSenderKey());
 
 	// TODO: Maybe reduce size of "mActiveConnectionsLookup" again if there's only few connections left - and if this does not produce any conflicts
+
+	if (connection.mUsingTCP)
+	{
+		for (size_t index = 0; index < mTCPNetConnections.size(); ++index)
+		{
+			if (&connection == mTCPNetConnections[index])
+			{
+				mTCPNetConnections.erase(mTCPNetConnections.begin() + index);
+				break;
+			}
+		}
+	}
 }
 
 SentPacket& ConnectionManager::rentSentPacket()
@@ -234,6 +237,90 @@ SentPacket& ConnectionManager::rentSentPacket()
 	SentPacket& sentPacket = mSentPacketPool.rentObject();
 	sentPacket.initializeWithPool(mSentPacketPool);
 	return sentPacket;
+}
+
+void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer, const SocketAddress& senderAddress, NetConnection* connection)
+{
+	// Ignore too small packets
+	if (buffer.size() < 6)
+		return;
+
+#ifdef DEBUG
+	// Simulate packet loss
+	if (mDebugSettings.mReceivingPacketLoss > 0.0f && randomf() < mDebugSettings.mReceivingPacketLoss)
+		return;
+#endif
+
+	// Received a packet, check its signature
+	VectorBinarySerializer serializer(true, buffer);
+	const uint16 lowLevelSignature = serializer.read<uint16>();
+	if (lowLevelSignature == lowlevel::StartConnectionPacket::SIGNATURE)
+	{
+		// Store for later evaluation
+		ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
+		receivedPacket.mContent = buffer;
+		receivedPacket.mLowLevelSignature = lowLevelSignature;
+		receivedPacket.mSenderAddress = senderAddress;
+		receivedPacket.mConnection = connection;
+		mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
+	}
+	else
+	{
+		// TODO: Explicitly check the known (= valid) signature types here?
+
+		const uint16 remoteConnectionID = serializer.read<uint16>();
+		const uint16 localConnectionID = serializer.read<uint16>();
+		if (localConnectionID == 0)
+		{
+			// Invalid connection
+			if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
+			{
+				// TODO: Evaluate the error code
+				RMX_ASSERT(false, "Received error packet");
+			}
+		}
+		else
+		{
+			// We already know the connection for TCP, but not for UDP
+			if (nullptr == connection)
+			{
+				// Find the connection in our list of active connections
+				connection = mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup];
+			}
+
+			if (nullptr == connection)
+			{
+				// Unknown connection
+				if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
+				{
+					// It's an error packet, don't send anything back
+					// TODO: Evaluate the error code
+				}
+				else
+				{
+					// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+				}
+			}
+			else
+			{
+				if (connection->getRemoteConnectionID() != remoteConnectionID && lowLevelSignature != lowlevel::AcceptConnectionPacket::SIGNATURE)
+				{
+					// Unknown or invalid connection
+					// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+				}
+				else
+				{
+					// Store for later evaluation
+					ReceivedPacket& receivedPacket = mReceivedPacketPool.rentObject();
+					receivedPacket.mContent = buffer;
+					receivedPacket.mLowLevelSignature = lowLevelSignature;
+					receivedPacket.mSenderAddress = senderAddress;
+					receivedPacket.mConnection = connection;
+					mReceivedPackets.mWorkerQueue.emplace_back(&receivedPacket);
+				}
+			}
+		}
+	}
 }
 
 uint16 ConnectionManager::getFreeLocalConnectionID()
