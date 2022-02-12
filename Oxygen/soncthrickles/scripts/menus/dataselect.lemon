@@ -605,7 +605,9 @@ function void fn00d1fa()
 					}
 				}
 			}
-
+		#if STANDALONE
+			else	// Don't allow both left & right being pressed at the same time, as this leads to buggy behavior
+		#endif
 			if (control.pad1.pressed & CONTROL_RIGHT)
 			{
 				if (dataselect.slot_selected != 9)
