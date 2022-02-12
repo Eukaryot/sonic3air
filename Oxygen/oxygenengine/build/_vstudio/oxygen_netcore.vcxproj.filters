@@ -53,6 +53,9 @@
     <ClInclude Include="..\..\source\oxygen_netcore\serverclient\FileTransferPackets.h">
       <Filter>serverclient</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\CryptoFunctions.h">
+      <Filter>network\internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />
@@ -76,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen_netcore\network\RequestBase.cpp">
       <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen_netcore\network\internal\CryptoFunctions.cpp">
+      <Filter>network\internal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

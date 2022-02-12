@@ -10,6 +10,7 @@
 #include "oxygen_netcore/network/ConnectionManager.h"
 #include "oxygen_netcore/network/LowLevelPackets.h"
 #include "oxygen_netcore/network/NetConnection.h"
+#include "oxygen_netcore/network/internal/CryptoFunctions.h"
 
 
 ConnectionManager::ConnectionManager(UDPSocket* udpSocket, TCPSocket* tcpListenSocket, ConnectionListenerInterface& listener, VersionRange<uint8> highLevelProtocolVersionRange) :
@@ -95,8 +96,67 @@ bool ConnectionManager::updateReceivePackets()
 
 		if (!received.mBuffer.empty())
 		{
+			// Test for some very basic WebSocket support
+		#if 0
+			if (received.mBuffer.size() >= 0x80 && *(uint32*)&received.mBuffer[0] == *(uint32*)"GET ")
+			{
+				// Parse WebSocket handshake header
+				String input;
+				input.add((char*)&received.mBuffer[0], received.mBuffer.size());
+				String webSocketKey;
+				uint8 flags = 0;
+				String line;
+				int pos = 0;
+				while (pos < input.length())
+				{
+					pos = input.getLine(line, pos);
+					if (line == "Upgrade: websocket")
+					{
+						flags |= 0x01;
+					}
+					else if (line == "Connection: Upgrade")
+					{
+						flags |= 0x02;
+					}
+					else if (line.startsWith("Sec-WebSocket-Key: "))
+					{
+						line.remove(0, 19);
+					#if 1
+						webSocketKey = line;
+						flags |= 0x04;
+					#else
+						std::vector<uint8> buffer;
+						if (Crypto::decodeBase64(line.toStdString(), buffer))
+						{
+							webSocketKey.add((const char*)&buffer[0], buffer.size());
+							flags |= 0x04;
+						}
+					#endif
+					}
+				}
+				if ((flags & 0x07) == 0x07)
+				{
+					static const std::string GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+					uint32 sha1[5];
+					Crypto::buildSHA1(webSocketKey.toStdString() + GUID, sha1);
+					const std::string acceptString = Crypto::encodeBase64((const uint8*)sha1, sizeof(uint32) * 5);
+
+					String str;
+					str << "HTTP/1.1 101 Switching Protocols\r\n";
+					str << "Upgrade: websocket\r\n";
+					str << "Connection: Upgrade\r\n";
+					str << "Sec-WebSocket-Accept: " << acceptString << "\r\n";
+					str << "Sec-WebSocket-Protocol: oxygenserver\r\n";
+					str << "\r\n";
+					connection->mTCPSocket.sendData((const uint8*)str.getData(), str.length());
+				}
+			}
+			else
+		#endif
+			{
+				receivedPacketInternal(received.mBuffer, connection->getRemoteAddress(), connection);
+			}
 			anyActivity = true;
-			receivedPacketInternal(received.mBuffer, connection->getRemoteAddress(), connection);
 		}
 	}
 

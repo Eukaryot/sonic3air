@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionManager.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\HighLevelPacketBase.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\CryptoFunctions.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacket.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacket.h" />
@@ -40,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\network\ConnectionManager.cpp" />
+    <ClCompile Include="..\..\source\oxygen_netcore\network\internal\CryptoFunctions.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\SentPacketCache.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\NetConnection.cpp" />
