@@ -32,6 +32,9 @@ namespace lemon
 
 	void Module::clear()
 	{
+		// Preprocessor definitions
+		mPreprocessorDefinitions.clear();
+
 		// Functions
 		for (Function* func : mFunctions)
 		{
@@ -47,6 +50,12 @@ namespace lemon
 
 		// Variables
 		mGlobalVariables.clear();
+
+		// Constants
+		mConstants.clear();
+
+		// Constant arrays
+		mConstantArrays.clear();
 
 		// Defines
 		for (Define* define : mDefines)
@@ -108,6 +117,28 @@ namespace lemon
 		}
 
 		content.saveFile(filename);
+	}
+
+	void Module::registerNewPreprocessorDefinitions(PreprocessorDefinitionMap& preprocessorDefinitions)
+	{
+		for (uint64 hash : preprocessorDefinitions.getNewDefinitions())
+		{
+			const PreprocessorDefinition* definition = preprocessorDefinitions.getDefinition(hash);
+			RMX_ASSERT(nullptr != definition, "Invalid entry in PreprocessorDefinitionMap's new definitions set");
+			Constant& constant = addPreprocessorDefinition(definition->mIdentifier, definition->mValue);
+			mPreprocessorDefinitions.emplace_back(&constant);
+		}
+		preprocessorDefinitions.clearNewDefinitions();
+	}
+
+	Constant& Module::addPreprocessorDefinition(FlyweightString name, int64 value)
+	{
+		Constant& constant = mConstantPool.createObject();
+		constant.mName = name;
+		constant.mDataType = &PredefinedDataTypes::INT_64;
+		constant.mValue = value;
+		mPreprocessorDefinitions.emplace_back(&constant);
+		return constant;
 	}
 
 	const Function* Module::getFunctionByUniqueId(uint64 uniqueId) const
@@ -248,10 +279,11 @@ namespace lemon
 		//  - 0x05 = Added serialization of constants
 		//  - 0x06 = Support for string data type in serialization - this breaks compatibility with older versions
 		//  - 0x07 = Several compatibility breaking changes and extensions (e.g. constant arrays)
+		//  - 0x08 = Added preprocessor definitions
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x07;
+		uint16 version = 0x08;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -260,7 +292,7 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x07)
+			if (version < 0x08)
 				return false;	// Loading older versions is not supported
 		}
 		else
@@ -282,6 +314,31 @@ namespace lemon
 		// Serialize module
 		serializer & mFirstFunctionID;
 		serializer & mFirstVariableID;
+
+		// Serialize preprocessor definitions
+		{
+			size_t numberOfConstants = mPreprocessorDefinitions.size();
+			serializer.serializeAs<uint16>(numberOfConstants);
+
+			if (serializer.isReading())
+			{
+				for (size_t i = 0; i < numberOfConstants; ++i)
+				{
+					FlyweightString name;
+					name.serialize(serializer);
+					const uint64 value = serializer.read<uint64>();
+					addPreprocessorDefinition(name, value);
+				}
+			}
+			else
+			{
+				for (Constant* constant : mPreprocessorDefinitions)
+				{
+					constant->getName().write(serializer);
+					serializer.write(constant->mValue);
+				}
+			}
+		}
 
 		// Serialize functions
 		{
@@ -527,7 +584,7 @@ namespace lemon
 					name.serialize(serializer);
 					const DataTypeDefinition* dataType = DataTypeHelper::readDataType(serializer);
 					const uint64 value = serializer.read<uint64>();
-					Constant& constant = addConstant(name, dataType, value);
+					addConstant(name, dataType, value);
 				}
 			}
 			else

@@ -262,7 +262,6 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool performReinitRuntime, 
 
 	const Configuration& config = Configuration::instance();
 	LemonScriptProgram::LoadOptions options;
-	options.mPreprocessorDefinitions = config.mPreprocessorDefinitions;
 	options.mEnforceFullReload = enforceFullReload;
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;

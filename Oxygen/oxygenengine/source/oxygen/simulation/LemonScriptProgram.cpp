@@ -115,13 +115,20 @@ LemonScriptProgram::~LemonScriptProgram()
 
 void LemonScriptProgram::startup()
 {
+	Configuration& config = Configuration::instance();
+
 	// Register script bindings (user-defined variables and functions)
 	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
 	//           and this in turn is the reason why there's a need for this separate startup function at all...
 	mInternal.mLemonScriptBindings.registerBindings(mInternal.mCoreModule);
 
+	// Set preprocessor definitions in core module
+	for (const auto& pair : config.mPreprocessorDefinitions.getDefinitions())
+	{
+		mInternal.mCoreModule.addPreprocessorDefinition(pair.second.mIdentifier, pair.second.mValue);
+	}
+
 	// Optionally dump the core module script bindings into a generated script file for reference
-	Configuration& config = Configuration::instance();
 	if (!config.mDumpCppDefinitionsOutput.empty())
 	{
 		mInternal.mCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
@@ -220,7 +227,6 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 
 	Configuration& config = Configuration::instance();
 	lemon::GlobalsLookup globalsLookup;
-	globalsLookup.mPreprocessorDefinitions = loadOptions.mPreprocessorDefinitions;
 	globalsLookup.addDefinitionsFromModule(mInternal.mCoreModule);
 
 	// Clear program here already - in case compilation fails, it would be broken otherwise

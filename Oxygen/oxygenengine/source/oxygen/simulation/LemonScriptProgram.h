@@ -36,7 +36,6 @@ public:
 			ALL_MODS
 		};
 
-		lemon::PreprocessorDefinitionMap mPreprocessorDefinitions;
 		bool mEnforceFullReload = false;
 		ModuleSelection mModuleSelection = ModuleSelection::ALL_MODS;
 	};

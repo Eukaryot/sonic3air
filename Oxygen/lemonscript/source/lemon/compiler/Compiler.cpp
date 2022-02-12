@@ -236,6 +236,7 @@ namespace lemon
 		{
 			mPreprocessor.mPreprocessorDefinitions = &mGlobalsLookup.mPreprocessorDefinitions;
 			mPreprocessor.processLines(fileLines);
+			mModule.registerNewPreprocessorDefinitions(mGlobalsLookup.mPreprocessorDefinitions);
 		}
 		catch (const CompilerException& e)
 		{

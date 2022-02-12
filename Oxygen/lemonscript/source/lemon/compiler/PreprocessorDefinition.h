@@ -48,6 +48,7 @@ namespace lemon
 
 		PreprocessorDefinition& setDefinition(FlyweightString name, int64 value = 1)
 		{
+			mNewDefinitions.insert(name.getHash());
 			const auto it = mDefinitions.find(name.getHash());
 			if (it == mDefinitions.end())
 			{
@@ -62,12 +63,17 @@ namespace lemon
 			}
 		}
 
+		inline const std::map<uint64, PreprocessorDefinition>& getDefinitions() const	{ return mDefinitions; }
 		inline PreprocessorDefinition* getDefinition(FlyweightString name)				{ return getDefinition(name.getHash()); }
 		inline const PreprocessorDefinition* getDefinition(FlyweightString name) const	{ return getDefinition(name.getHash()); }
 		inline int64 getValue(FlyweightString name) const								{ return getValue(name.getHash()); }
 
+		inline void clearNewDefinitions()						  { mNewDefinitions.clear(); }
+		inline const std::set<uint64>& getNewDefinitions() const  { return mNewDefinitions; }
+
 	private:
 		std::map<uint64, PreprocessorDefinition> mDefinitions;
+		std::set<uint64> mNewDefinitions;
 	};
 
 }

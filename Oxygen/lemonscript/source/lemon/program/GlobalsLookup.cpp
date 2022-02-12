@@ -18,10 +18,19 @@ namespace lemon
 	{
 		mAllIdentifiers.clear();
 		mFunctionsByName.clear();
+
+		mNextFunctionID = 0;
+		mNextVariableID = 0;
+		mNextConstantArrayID = 0;
 	}
 
 	void GlobalsLookup::addDefinitionsFromModule(const Module& module)
 	{
+		for (Constant* constant : module.mPreprocessorDefinitions)
+		{
+			mPreprocessorDefinitions.setDefinition(constant->getName(), constant->getValue());
+			registerConstant(*constant);	// Also add as a normal constant to be able to access them outside of preprocessor directives as well
+		}
 		for (Function* function : module.mFunctions)
 		{
 			registerFunction(*function);

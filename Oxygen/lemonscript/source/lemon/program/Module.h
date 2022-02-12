@@ -19,6 +19,7 @@
 namespace lemon
 {
 	class GlobalsLookup;
+	class PreprocessorDefinitionMap;
 
 	class API_EXPORT Module
 	{
@@ -38,6 +39,10 @@ namespace lemon
 		void startCompiling(const GlobalsLookup& globalsLookup);
 
 		void dumpDefinitionsToScriptFile(const std::wstring& filename);
+
+		// Preprocessor definitions
+		void registerNewPreprocessorDefinitions(PreprocessorDefinitionMap& preprocessorDefinitions);
+		Constant& addPreprocessorDefinition(FlyweightString name, int64 value);
 
 		// Functions
 		inline const std::vector<ScriptFunction*>& getScriptFunctions() const { return mScriptFunctions; }
@@ -80,6 +85,9 @@ namespace lemon
 	private:
 		std::string mModuleName;
 		uint64 mModuleId = 0;
+
+		// Preprocessor definitions
+		std::vector<Constant*> mPreprocessorDefinitions;	// Re-using the Constant class here, and also mConstantPool
 
 		// Functions
 		uint32 mFirstFunctionID = 0;
