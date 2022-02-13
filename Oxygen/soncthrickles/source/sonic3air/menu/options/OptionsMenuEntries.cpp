@@ -231,5 +231,12 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext)
 	}
 	py += 20;
 
+	const bool useTextUpdateLink = updateCheck.hasUpdate();
+	if (mTextUpdateLink != useTextUpdateLink)
+	{
+		mTextUpdateLink = useTextUpdateLink;
+		mText = useTextUpdateLink ? "Open download page" : "Check for updates";
+	}
+
 	OptionsMenuEntry::renderEntry(renderContext);
 }

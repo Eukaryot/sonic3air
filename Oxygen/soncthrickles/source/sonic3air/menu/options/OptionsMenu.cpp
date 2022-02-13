@@ -988,7 +988,15 @@ void OptionsMenu::update(float timeElapsed)
 
 					case option::_CHECK_FOR_UPDATE:
 					{
-						GameClient::instance().getUpdateCheck().startUpdateCheck();
+						UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
+						if (updateCheck.hasUpdate())
+						{
+							PlatformFunctions::openURLExternal(updateCheck.getResponse()->mUpdateInfoURL.empty() ? "https://sonic3air.org" : updateCheck.getResponse()->mUpdateInfoURL);
+						}
+						else
+						{
+							updateCheck.startUpdateCheck();
+						}
 						break;
 					}
 
