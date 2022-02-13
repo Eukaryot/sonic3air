@@ -625,21 +625,21 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					case 1:
 					{
 						const uint8 value = emulatorInterface.readMemory8(globalDefine.mAddress);
-						builder.addLine(String(0, "%.*s   = 0x%02x", name.data(), name.length(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%02x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 2:
 					{
 						const uint16 value = emulatorInterface.readMemory16(globalDefine.mAddress);
-						builder.addLine(String(0, "%.*s   = 0x%04x", name.data(), name.length(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%04x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 
 					case 4:
 					{
 						const uint32 value = emulatorInterface.readMemory32(globalDefine.mAddress);
-						builder.addLine(String(0, "%.*s   = 0x%08x", name.data(), name.length(), value), color, indent, key);
+						builder.addLine(String(0, "%.*s   = 0x%08x", name.length(), name.data(), value), color, indent, key);
 						break;
 					}
 				}

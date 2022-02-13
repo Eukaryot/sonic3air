@@ -533,11 +533,11 @@ void LemonScriptProgram::resolveLocation(const lemon::Function& function, uint32
 		}
 		else
 		{
-			scriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().data(), function.getName().getString().length());
+			scriptFilename = *String(0, "<invalid program counter %d in function '%.*s'>", programCounter, function.getName().getString().length(), function.getName().getString().data());
 		}
 	}
 	else
 	{
-		scriptFilename = *String(0, "<user-defined function '%.*s'>", function.getName().getString().data(), function.getName().getString().length());
+		scriptFilename = *String(0, "<user-defined function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
 	}
 }
