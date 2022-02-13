@@ -740,9 +740,7 @@ namespace lemon
 				case Keyword::RETURN:
 				{
 					// Process tokens
-					mTokenProcessing.mContext.mFunction = &function;
-					mTokenProcessing.mContext.mLocalVariables = &scopeContext.mLocalVariables;
-					mTokenProcessing.processTokens(tokens, lineNumber);
+					processTokens(tokens, function, scopeContext, lineNumber);
 
 					if (tokens.size() > 1)
 					{
