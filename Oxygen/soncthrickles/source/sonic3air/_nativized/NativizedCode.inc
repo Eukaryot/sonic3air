@@ -3663,7 +3663,7 @@ static void exec_4e553ca78e2c941f(const RuntimeOpcodeContext context)
 	*context.getParameter<uint32*>(8) = (uint32)var1;
 }
 
-// First occurrence: fn00d1fa, line 621
+// First occurrence: fn00d1fa, line 623
 static void exec_5f62b0d573e624a9(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3674,7 +3674,7 @@ static void exec_5f62b0d573e624a9(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d1fa, line 636
+// First occurrence: fn00d1fa, line 638
 static void exec_89b744d811a5e8c1(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = (uint16)*context.getParameter<int16*>();
@@ -3683,7 +3683,7 @@ static void exec_89b744d811a5e8c1(const RuntimeOpcodeContext context)
 	*context.getParameter<int16*>(12) = (uint16)var2;
 }
 
-// First occurrence: fn00d1fa, line 637
+// First occurrence: fn00d1fa, line 639
 static void exec_4a45a1db24a3f4a1(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = (uint16)context.readLocalVariable<int16>(context.getParameter<uint32>());
@@ -3692,7 +3692,7 @@ static void exec_4a45a1db24a3f4a1(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d1fa, line 639
+// First occurrence: fn00d1fa, line 641
 static void exec_5bab1631d226639a(const RuntimeOpcodeContext context)
 {
 	const uint16 var1 = ((uint16)(context.readValueStack<uint16>(-1)) + (uint16)(context.getParameter<int64>()));
@@ -3700,7 +3700,7 @@ static void exec_5bab1631d226639a(const RuntimeOpcodeContext context)
 	context.moveValueStack(-1);
 }
 
-// First occurrence: fn00d1fa, line 641
+// First occurrence: fn00d1fa, line 643
 static void exec_d7d7d05b0bd59ebf(const RuntimeOpcodeContext context)
 {
 	const uint16 var1 = swapBytes16(*context.getParameter<uint16*>(8));
@@ -3709,7 +3709,7 @@ static void exec_d7d7d05b0bd59ebf(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, context.getParameter<int64>(), (uint16)var3);
 }
 
-// First occurrence: fn00d1fa, line 642
+// First occurrence: fn00d1fa, line 644
 static void exec_1d1894e02b4d76ad(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint16>(0, (uint16)swapBytes16(*context.getParameter<uint16*>()));
@@ -3717,7 +3717,7 @@ static void exec_1d1894e02b4d76ad(const RuntimeOpcodeContext context)
 	context.moveValueStack(2);
 }
 
-// First occurrence: fn00d1fa, line 642
+// First occurrence: fn00d1fa, line 644
 static void exec_e4d7b3e76d3916a5(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = ((uint16)(context.readValueStack<int16>(-2)) - (uint16)(context.readValueStack<int16>(-1)));
@@ -3725,7 +3725,7 @@ static void exec_e4d7b3e76d3916a5(const RuntimeOpcodeContext context)
 	context.moveValueStack(-2);
 }
 
-// First occurrence: fn00d1fa, line 644
+// First occurrence: fn00d1fa, line 646
 static void exec_8af2cb530c62d2f4(const RuntimeOpcodeContext context)
 {
 	const uint16 var1 = swapBytes16(*context.getParameter<uint16*>(8));
@@ -3734,7 +3734,7 @@ static void exec_8af2cb530c62d2f4(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, context.getParameter<int64>(), (uint16)var3);
 }
 
-// First occurrence: fn00d1fa, line 648
+// First occurrence: fn00d1fa, line 650
 static void exec_bc1f57eee02da242(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = (uint16)*context.getParameter<int16*>();
@@ -3743,7 +3743,7 @@ static void exec_bc1f57eee02da242(const RuntimeOpcodeContext context)
 	*context.getParameter<int16*>(12) = (uint16)var2;
 }
 
-// First occurrence: fn00d1fa, line 654
+// First occurrence: fn00d1fa, line 656
 static void exec_a7c46930c202e1ec(const RuntimeOpcodeContext context)
 {
 	const uint16 var1 = ((uint16)(context.readValueStack<uint16>(-1)) + (uint16)(context.getParameter<int64>()));
@@ -3751,7 +3751,7 @@ static void exec_a7c46930c202e1ec(const RuntimeOpcodeContext context)
 	context.moveValueStack(-1);
 }
 
-// First occurrence: fn00d1fa, line 657
+// First occurrence: fn00d1fa, line 659
 static void exec_feea614917bc3d90(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = (uint16)-(signed)context.readValueStack<int16>(-1);
@@ -3759,20 +3759,20 @@ static void exec_feea614917bc3d90(const RuntimeOpcodeContext context)
 	context.moveValueStack(-1);
 }
 
-// First occurrence: fn00d1fa, line 676
+// First occurrence: fn00d1fa, line 678
 static void exec_094681d2216b7965(const RuntimeOpcodeContext context)
 {
 	*context.getParameter<int16*>(8) = (uint16)context.getParameter<int64>();
 }
 
-// First occurrence: fn00d1fa, line 680
+// First occurrence: fn00d1fa, line 682
 static void exec_380619ddfe534cc8(const RuntimeOpcodeContext context)
 {
 	const int16 var1 = (uint16)-(signed)context.getParameter<int64>();
 	*context.getParameter<int16*>(8) = (uint16)var1;
 }
 
-// First occurrence: DataSelect.sharedNewGameStartup, line 715
+// First occurrence: DataSelect.sharedNewGameStartup, line 717
 static void exec_0ec75504afb9279d(const RuntimeOpcodeContext context)
 {
 	const uint32 var1 = ((uint32)(context.readValueStack<uint32>(-1)) % (uint32)(context.getParameter<int64>()));
@@ -3782,7 +3782,7 @@ static void exec_0ec75504afb9279d(const RuntimeOpcodeContext context)
 	context.moveValueStack(-2);
 }
 
-// First occurrence: fn00d30c, line 728
+// First occurrence: fn00d30c, line 730
 static void exec_af65953b02cb2abd(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = swapBytes16(*context.getParameter<uint16*>());
@@ -3793,14 +3793,14 @@ static void exec_af65953b02cb2abd(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var6, (uint8)var3);
 }
 
-// First occurrence: fn00d30c, line 734
+// First occurrence: fn00d30c, line 736
 static void exec_e4c47f28e8374967(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = swapBytes16(*context.getParameter<uint16*>());
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, context.getParameter<int64>(8), (uint16)var0);
 }
 
-// First occurrence: fn00d30c, line 749
+// First occurrence: fn00d30c, line 751
 static void exec_2a8a22d32d0da2d9(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -3810,7 +3810,7 @@ static void exec_2a8a22d32d0da2d9(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var5, (uint8)var2);
 }
 
-// First occurrence: fn00d30c, line 758
+// First occurrence: fn00d30c, line 760
 static void exec_f60de72af57f8200(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = 0;
@@ -3819,7 +3819,7 @@ static void exec_f60de72af57f8200(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var3, (uint16)var0);
 }
 
-// First occurrence: fn00d39e, line 778
+// First occurrence: fn00d39e, line 780
 static void exec_782803d55dabd970(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3830,7 +3830,7 @@ static void exec_782803d55dabd970(const RuntimeOpcodeContext context)
 	*context.getParameter<uint32*>(32) = (uint32)var8;
 }
 
-// First occurrence: fn00d39e, line 779
+// First occurrence: fn00d39e, line 781
 static void exec_2d7ee39442a406a8(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3839,7 +3839,7 @@ static void exec_2d7ee39442a406a8(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint32>(*context.mControlFlow, var3, (uint32)var0);
 }
 
-// First occurrence: fn00d39e, line 781
+// First occurrence: fn00d39e, line 783
 static void exec_b3a48993df862139(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3851,7 +3851,7 @@ static void exec_b3a48993df862139(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var8, (uint8)var5);
 }
 
-// First occurrence: fn00d39e, line 784
+// First occurrence: fn00d39e, line 786
 static void exec_b371657899fe40ae(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3862,7 +3862,7 @@ static void exec_b371657899fe40ae(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var6, (uint8)var3);
 }
 
-// First occurrence: fn00d39e, line 792
+// First occurrence: fn00d39e, line 794
 static void exec_f6b2f2b4a3e053da(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3872,7 +3872,7 @@ static void exec_f6b2f2b4a3e053da(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d42c, line 815
+// First occurrence: fn00d42c, line 817
 static void exec_d4a9d7bbf1121460(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = *context.getParameter<uint8*>();
@@ -3881,7 +3881,7 @@ static void exec_d4a9d7bbf1121460(const RuntimeOpcodeContext context)
 	*context.getParameter<uint8*>(8) = (uint8)var2;
 }
 
-// First occurrence: fn00d42c, line 816
+// First occurrence: fn00d42c, line 818
 static void exec_3f7191efbfeeba70(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -3892,7 +3892,7 @@ static void exec_3f7191efbfeeba70(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d42c, line 824
+// First occurrence: fn00d42c, line 826
 static void exec_d360df97349c9e40(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -3901,7 +3901,7 @@ static void exec_d360df97349c9e40(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d42c, line 831
+// First occurrence: fn00d42c, line 833
 static void exec_cc769e12b8390a7e(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3910,7 +3910,7 @@ static void exec_cc769e12b8390a7e(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, context.getParameter<int64>(16), (uint16)var3);
 }
 
-// First occurrence: fn00d42c, line 834
+// First occurrence: fn00d42c, line 836
 static void exec_0204b6fdff4c9647(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = 0;
@@ -3918,7 +3918,7 @@ static void exec_0204b6fdff4c9647(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint32>(*context.mControlFlow, var1, (uint32)var0);
 }
 
-// First occurrence: fn00d42c, line 835
+// First occurrence: fn00d42c, line 837
 static void exec_b316af0d5b89a7e5(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = swapBytes16(*context.getParameter<uint16*>());
@@ -3929,7 +3929,7 @@ static void exec_b316af0d5b89a7e5(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var6, (uint8)var3);
 }
 
-// First occurrence: fn00d42c, line 836
+// First occurrence: fn00d42c, line 838
 static void exec_68dabec593ebac50(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = 0;
@@ -3938,7 +3938,7 @@ static void exec_68dabec593ebac50(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint32>(*context.mControlFlow, var3, (uint32)var0);
 }
 
-// First occurrence: fn00d42c, line 844
+// First occurrence: fn00d42c, line 846
 static void exec_ae894f0a90d701bb(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = *context.getParameter<uint8*>();
@@ -3948,7 +3948,7 @@ static void exec_ae894f0a90d701bb(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var3, (uint8)var0);
 }
 
-// First occurrence: fn00d42c, line 861
+// First occurrence: fn00d42c, line 863
 static void exec_a602a040ffe6b4ce(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3961,7 +3961,7 @@ static void exec_a602a040ffe6b4ce(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var9, (uint8)var6);
 }
 
-// First occurrence: fn00d458, line 895
+// First occurrence: fn00d458, line 897
 static void exec_657e3b6f37dcf999(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -3972,7 +3972,7 @@ static void exec_657e3b6f37dcf999(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 898
+// First occurrence: fn00d458, line 900
 static void exec_bd90822d9928d367(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3983,7 +3983,7 @@ static void exec_bd90822d9928d367(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 900
+// First occurrence: fn00d458, line 902
 static void exec_d2fc6c25a6ae6029(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -3996,7 +3996,7 @@ static void exec_d2fc6c25a6ae6029(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, var8, (uint8)var5);
 }
 
-// First occurrence: fn00d458, line 898
+// First occurrence: fn00d458, line 900
 static void exec_ddc1ec5fa99de434(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4006,7 +4006,7 @@ static void exec_ddc1ec5fa99de434(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 913
+// First occurrence: fn00d458, line 915
 static void exec_14bab8f9f17ebdb5(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4016,7 +4016,7 @@ static void exec_14bab8f9f17ebdb5(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 948
+// First occurrence: fn00d458, line 950
 static void exec_080509cf74298d00(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4026,7 +4026,7 @@ static void exec_080509cf74298d00(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 962
+// First occurrence: fn00d458, line 964
 static void exec_a89095983d914e60(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = *context.getParameter<uint8*>();
@@ -4035,7 +4035,7 @@ static void exec_a89095983d914e60(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 975
+// First occurrence: fn00d458, line 977
 static void exec_b88d7f454a1b3621(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = (uint16)*context.getParameter<uint16*>();
@@ -4044,7 +4044,7 @@ static void exec_b88d7f454a1b3621(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 1003
+// First occurrence: fn00d458, line 1005
 static void exec_722d1e99b52c63fc(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -4055,7 +4055,7 @@ static void exec_722d1e99b52c63fc(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 1013
+// First occurrence: fn00d458, line 1015
 static void exec_6201ae173fd14653(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4065,7 +4065,7 @@ static void exec_6201ae173fd14653(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, context.getParameter<int64>(24), (uint16)var6);
 }
 
-// First occurrence: fn00d458, line 1014
+// First occurrence: fn00d458, line 1016
 static void exec_f9c1f6b9b7f2819a(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4075,7 +4075,7 @@ static void exec_f9c1f6b9b7f2819a(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, context.getParameter<int64>(24), (uint8)var5);
 }
 
-// First occurrence: fn00d458, line 1016
+// First occurrence: fn00d458, line 1018
 static void exec_fd6d2b5aa518a6e4(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4084,7 +4084,7 @@ static void exec_fd6d2b5aa518a6e4(const RuntimeOpcodeContext context)
 	*context.getParameter<uint32*>(16) = (uint32)var3;
 }
 
-// First occurrence: fn00d458, line 1022
+// First occurrence: fn00d458, line 1024
 static void exec_24de38ec5f960335(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4094,7 +4094,7 @@ static void exec_24de38ec5f960335(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, context.getParameter<int64>(8), (uint8)var3);
 }
 
-// First occurrence: fn00d458, line 1034
+// First occurrence: fn00d458, line 1036
 static void exec_62d690621d608d05(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -4102,7 +4102,7 @@ static void exec_62d690621d608d05(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 1037
+// First occurrence: fn00d458, line 1039
 static void exec_2d361b303c5ec508(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4113,7 +4113,7 @@ static void exec_2d361b303c5ec508(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 1041
+// First occurrence: fn00d458, line 1043
 static void exec_504ec1d8ea72e5de(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4122,7 +4122,7 @@ static void exec_504ec1d8ea72e5de(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint8>(*context.mControlFlow, context.getParameter<int64>(16), (uint8)var3);
 }
 
-// First occurrence: fn00d458, line 1051
+// First occurrence: fn00d458, line 1053
 static void exec_418ca037251ad010(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4131,7 +4131,7 @@ static void exec_418ca037251ad010(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint32>(context.getParameter<uint32>(24), (uint32)var4);
 }
 
-// First occurrence: fn00d458, line 1052
+// First occurrence: fn00d458, line 1054
 static void exec_e2ab939a01eb427b(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)context.readLocalVariable<uint32>(context.getParameter<uint32>());
@@ -4140,7 +4140,7 @@ static void exec_e2ab939a01eb427b(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint32>(context.getParameter<uint32>(20), (uint32)var4);
 }
 
-// First occurrence: fn00d458, line 1053
+// First occurrence: fn00d458, line 1055
 static void exec_821e800c00cd1a75(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4150,7 +4150,7 @@ static void exec_821e800c00cd1a75(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d458, line 1056
+// First occurrence: fn00d458, line 1058
 static void exec_8b8dfb4050dab92e(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)context.readLocalVariable<uint32>(context.getParameter<uint32>());
@@ -4158,7 +4158,7 @@ static void exec_8b8dfb4050dab92e(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint32>(*context.mControlFlow, context.getParameter<int64>(4), (uint32)var1);
 }
 
-// First occurrence: fn00d458, line 1057
+// First occurrence: fn00d458, line 1059
 static void exec_a2842ecc9ab88a4e(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = swapBytes32(*context.getParameter<uint32*>());
@@ -4169,7 +4169,7 @@ static void exec_a2842ecc9ab88a4e(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint32>(*context.mControlFlow, context.getParameter<int64>(24), (uint32)var6);
 }
 
-// First occurrence: fn00d69e, line 1074
+// First occurrence: fn00d69e, line 1076
 static void exec_c8c5c6762fee92af(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4182,7 +4182,7 @@ static void exec_c8c5c6762fee92af(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var8, (uint16)var5);
 }
 
-// First occurrence: fn00d69e, line 1075
+// First occurrence: fn00d69e, line 1077
 static void exec_1b8888c8ce44e8d5(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4193,7 +4193,7 @@ static void exec_1b8888c8ce44e8d5(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var6, (uint16)var3);
 }
 
-// First occurrence: fn00d69e, line 1081
+// First occurrence: fn00d69e, line 1083
 static void exec_710654f27000830d(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4203,7 +4203,7 @@ static void exec_710654f27000830d(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var2, (uint16)var5);
 }
 
-// First occurrence: fn00d6d0, line 1114
+// First occurrence: fn00d6d0, line 1116
 static void exec_efc50c7e6fe8c312(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4212,7 +4212,7 @@ static void exec_efc50c7e6fe8c312(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d6d0, line 1114
+// First occurrence: fn00d6d0, line 1116
 static void exec_55529bf12b93c46c(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4221,7 +4221,7 @@ static void exec_55529bf12b93c46c(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d6d0, line 1119
+// First occurrence: fn00d6d0, line 1121
 static void exec_061c6c4129da47cc(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4230,7 +4230,7 @@ static void exec_061c6c4129da47cc(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d6d0, line 1119
+// First occurrence: fn00d6d0, line 1121
 static void exec_626e3f1ba93f93ef(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4239,7 +4239,7 @@ static void exec_626e3f1ba93f93ef(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d70c, line 1141
+// First occurrence: fn00d70c, line 1143
 static void exec_8a1326e4d04aa707(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4249,7 +4249,7 @@ static void exec_8a1326e4d04aa707(const RuntimeOpcodeContext context)
 	*context.getParameter<uint32*>(24) = (uint32)var6;
 }
 
-// First occurrence: fn00d70c, line 1156
+// First occurrence: fn00d70c, line 1158
 static void exec_d2507bb3bb9b950b(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = (uint16)*context.getParameter<uint16*>();
@@ -4260,7 +4260,7 @@ static void exec_d2507bb3bb9b950b(const RuntimeOpcodeContext context)
 	*context.getParameter<uint16*>(32) = (uint16)var6;
 }
 
-// First occurrence: fn00d70c, line 1165
+// First occurrence: fn00d70c, line 1167
 static void exec_7e0d4ba884332b00(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -4269,7 +4269,7 @@ static void exec_7e0d4ba884332b00(const RuntimeOpcodeContext context)
 	*context.getParameter<uint8*>(16) = (uint8)var2;
 }
 
-// First occurrence: fn00d70c, line 1166
+// First occurrence: fn00d70c, line 1168
 static void exec_a7684a139c711ab7(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = (uint16)*context.getParameter<uint16*>();
@@ -4277,7 +4277,7 @@ static void exec_a7684a139c711ab7(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var1, (uint16)var0);
 }
 
-// First occurrence: fn00d782, line 1186
+// First occurrence: fn00d782, line 1188
 static void exec_470b1deb3b40006c(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4287,7 +4287,7 @@ static void exec_470b1deb3b40006c(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d7c0, line 1260
+// First occurrence: fn00d7c0, line 1262
 static void exec_66cfe51595388a2d(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = *context.getParameter<uint8*>();
@@ -4296,7 +4296,7 @@ static void exec_66cfe51595388a2d(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d854, line 1336
+// First occurrence: fn00d854, line 1338
 static void exec_5cf414505857407f(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = swapBytes16(*context.getParameter<uint16*>());
@@ -4307,7 +4307,7 @@ static void exec_5cf414505857407f(const RuntimeOpcodeContext context)
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var5, (uint16)var2);
 }
 
-// First occurrence: fn00d884, line 1349
+// First occurrence: fn00d884, line 1351
 static void exec_ef3ad40b2048c941(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint16>(0, (uint16)(uint16)*context.getParameter<uint16*>());
@@ -4315,7 +4315,7 @@ static void exec_ef3ad40b2048c941(const RuntimeOpcodeContext context)
 	context.moveValueStack(2);
 }
 
-// First occurrence: fn00d884, line 1349
+// First occurrence: fn00d884, line 1351
 static void exec_8ca3ddc263cc8ac4(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = ((uint16)(context.readValueStack<uint16>(-2)) + (uint16)(context.readValueStack<uint16>(-1)));
@@ -4324,14 +4324,14 @@ static void exec_8ca3ddc263cc8ac4(const RuntimeOpcodeContext context)
 	context.moveValueStack(-2);
 }
 
-// First occurrence: fn00d8c4, line 1407
+// First occurrence: fn00d8c4, line 1409
 static void exec_b2c5d19f220986cf(const RuntimeOpcodeContext context)
 {
 	const uint32 var1 = (uint32)*context.getParameter<uint32*>(8);
 	OpcodeExecUtils::writeMemory<uint16>(*context.mControlFlow, var1, (uint16)context.getParameter<int64>());
 }
 
-// First occurrence: fn00d8c4, line 1412
+// First occurrence: fn00d8c4, line 1414
 static void exec_b4b2eab37ac4f111(const RuntimeOpcodeContext context)
 {
 	const uint8 var2 = *context.getParameter<uint8*>(16);
@@ -4343,7 +4343,7 @@ static void exec_b4b2eab37ac4f111(const RuntimeOpcodeContext context)
 	context.moveValueStack(2);
 }
 
-// First occurrence: fn00d912, line 1429
+// First occurrence: fn00d912, line 1431
 static void exec_79343e2f2c242a12(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4354,7 +4354,7 @@ static void exec_79343e2f2c242a12(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d912, line 1437
+// First occurrence: fn00d912, line 1439
 static void exec_a204d49525d8c536(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = (uint16)*context.getParameter<int16*>();
@@ -4363,7 +4363,7 @@ static void exec_a204d49525d8c536(const RuntimeOpcodeContext context)
 	*context.getParameter<uint8*>(16) = (uint8)var4;
 }
 
-// First occurrence: fn00d912, line 1438
+// First occurrence: fn00d912, line 1440
 static void exec_a510f527a52f45d6(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -4373,7 +4373,7 @@ static void exec_a510f527a52f45d6(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d94a, line 1456
+// First occurrence: fn00d94a, line 1458
 static void exec_7505cdd796dfc9c3(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4384,7 +4384,7 @@ static void exec_7505cdd796dfc9c3(const RuntimeOpcodeContext context)
 	*context.getParameter<uint8*>(32) = (uint8)var7;
 }
 
-// First occurrence: fn00d96a, line 1473
+// First occurrence: fn00d96a, line 1475
 static void exec_29900a5337a99c55(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4393,7 +4393,7 @@ static void exec_29900a5337a99c55(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint8>(context.getParameter<uint32>(16), (uint8)var3);
 }
 
-// First occurrence: fn00d96a, line 1475
+// First occurrence: fn00d96a, line 1477
 static void exec_b3875b56b8cc3dc2(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4403,7 +4403,7 @@ static void exec_b3875b56b8cc3dc2(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint8>(context.getParameter<uint32>(16), (uint8)var4);
 }
 
-// First occurrence: fn00d96a, line 1477
+// First occurrence: fn00d96a, line 1479
 static void exec_d66746297549ee4c(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4412,7 +4412,7 @@ static void exec_d66746297549ee4c(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d96a, line 1477
+// First occurrence: fn00d96a, line 1479
 static void exec_f96d8916ac8add69(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4421,7 +4421,7 @@ static void exec_f96d8916ac8add69(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d96a, line 1479
+// First occurrence: fn00d96a, line 1481
 static void exec_8ad1294956f9835c(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4430,7 +4430,7 @@ static void exec_8ad1294956f9835c(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d96a, line 1481
+// First occurrence: fn00d96a, line 1483
 static void exec_7b7d2c4facec5f03(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4441,7 +4441,7 @@ static void exec_7b7d2c4facec5f03(const RuntimeOpcodeContext context)
 	*context.getParameter<uint32*>(20) = (uint32)var7;
 }
 
-// First occurrence: fn00d96a, line 1486
+// First occurrence: fn00d96a, line 1488
 static void exec_aec5913b2a237675(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4449,7 +4449,7 @@ static void exec_aec5913b2a237675(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d96a, line 1487
+// First occurrence: fn00d96a, line 1489
 static void exec_7106a2f45bfe4976(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)context.readLocalVariable<uint8>(context.getParameter<uint32>());
@@ -4458,7 +4458,7 @@ static void exec_7106a2f45bfe4976(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: fn00d96a, line 1505
+// First occurrence: fn00d96a, line 1507
 static void exec_adaae573ead3338a(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = (uint16)context.readLocalVariable<uint16>(context.getParameter<uint32>());
@@ -4467,7 +4467,7 @@ static void exec_adaae573ead3338a(const RuntimeOpcodeContext context)
 	*context.getParameter<uint32*>(20) = (uint32)var5;
 }
 
-// First occurrence: fn00d9f4, line 1521
+// First occurrence: fn00d9f4, line 1523
 static void exec_e0c06d58cdc47925(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)*context.getParameter<uint32*>();
@@ -4475,7 +4475,7 @@ static void exec_e0c06d58cdc47925(const RuntimeOpcodeContext context)
 	*context.getParameter<uint8*>(8) = (uint8)var1;
 }
 
-// First occurrence: fn00da4e, line 1582
+// First occurrence: fn00da4e, line 1584
 static void exec_100b27a171b4fe29(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -4486,7 +4486,7 @@ static void exec_100b27a171b4fe29(const RuntimeOpcodeContext context)
 	*context.getParameter<uint16*>(32) = (uint16)var8;
 }
 
-// First occurrence: DataSelect.drawCustomPlanes, line 1594
+// First occurrence: DataSelect.drawCustomPlanes, line 1596
 static void exec_3f148af9c4b9e971(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint16>(-1, (uint16)((uint16)(context.readValueStack<uint16>(-1)) - (uint16)(context.getParameter<int64>())));
@@ -4497,14 +4497,14 @@ static void exec_3f148af9c4b9e971(const RuntimeOpcodeContext context)
 	context.moveValueStack(4);
 }
 
-// First occurrence: DataSelect.drawCustomPlanes, line 1597
+// First occurrence: DataSelect.drawCustomPlanes, line 1599
 static void exec_204fe8f4ee8a2a38(const RuntimeOpcodeContext context)
 {
 	const uint16 var0 = swapBytes16(*context.getParameter<uint16*>());
 	context.writeLocalVariable<int16>(context.getParameter<uint32>(8), (uint16)var0);
 }
 
-// First occurrence: DataSelect.drawCustomPlanes, line 1601
+// First occurrence: DataSelect.drawCustomPlanes, line 1603
 static void exec_f2ddd97a18ab5ebf(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = (uint16)context.readLocalVariable<int16>(context.getParameter<uint32>());
@@ -4513,14 +4513,14 @@ static void exec_f2ddd97a18ab5ebf(const RuntimeOpcodeContext context)
 	context.moveValueStack(2);
 }
 
-// First occurrence: DataSelect.drawCustomPlanes, line 1601
+// First occurrence: DataSelect.drawCustomPlanes, line 1603
 static void exec_605daeddc54db30d(const RuntimeOpcodeContext context)
 {
 	const int16 var0 = (uint16)context.readLocalVariable<int16>(context.getParameter<uint32>());
 	context.writeValueStack<uint16>(-1, (uint16)((uint16)(context.readValueStack<uint16>(-1)) + (uint16)(var0)));
 }
 
-// First occurrence: DataSelect.drawCustomPlanes, line 1606
+// First occurrence: DataSelect.drawCustomPlanes, line 1608
 static void exec_48308cd1b5098c7e(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<int64>(0, (int64)0);
