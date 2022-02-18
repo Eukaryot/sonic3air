@@ -155,7 +155,7 @@ target_link_libraries(lemonscript rmxbase)
 
 
 
-# Oxygen Core Library
+# oxygen_netcore
 
 file(GLOB_RECURSE OXYGEN_NETCORE_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen_netcore/*.cpp)
 
@@ -169,7 +169,7 @@ target_link_libraries(oxygen_netcore rmxbase)
 
 
 
-# Oxygen Engine Library
+# oxygenengine
 
 file(GLOB_RECURSE OXYGEN_SOURCES ${WORKSPACE_DIR}/Oxygen/oxygenengine/source/oxygen/*.cpp)
 
