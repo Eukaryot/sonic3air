@@ -16,6 +16,12 @@
 #include "oxygen_netcore/serverclient/Packets.h"
 
 
+// Emscripten does not support UDP, so we need to use TCP (via WebSockets there)
+#if defined(PLATFORM_WEB)
+	#define GAME_CLIENT_USE_TCP
+#endif
+
+
 class GameClient : public ServerClientBase, public SingleInstance<GameClient>
 {
 public:

@@ -70,17 +70,30 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 			std::string serverAddress;
 			if (gameServerHelper.tryReadString("ServerAddress", serverAddress))
 			{
-				String str = serverAddress;
-				const int pos = str.findChar(':', 0, +1);
-				if (pos >= 0 && pos < str.length())
+				// Setup default ports, they might be overwritten
+				mGameServer.mServerPortUDP = 21094;
+				mGameServer.mServerPortTCP = 21095;
+
+				const String str = serverAddress;
+				const int colonPosition = str.findChar(':', 0, +1);
+				if (colonPosition >= 0 && colonPosition < str.length())
 				{
-					mGameServer.mServerHostName = *str.getSubString(0, pos);
-					mGameServer.mServerPort = str.getSubString(pos+1, str.length() - (pos+1)).parseInt();
+					mGameServer.mServerHostName = *str.getSubString(0, colonPosition);
+
+					const int hyphenPosition = str.findChar('-', colonPosition+1, +1);
+					if (hyphenPosition >= 0 && hyphenPosition < str.length())
+					{
+						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1, hyphenPosition-colonPosition-1).parseInt();
+						mGameServer.mServerPortTCP = str.getSubString(hyphenPosition+1).parseInt();
+					}
+					else
+					{
+						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1).parseInt();
+					}
 				}
 				else
 				{
 					mGameServer.mServerHostName = *str;
-					mGameServer.mServerPort = 21094;	// That's the default port
 				}
 			}
 

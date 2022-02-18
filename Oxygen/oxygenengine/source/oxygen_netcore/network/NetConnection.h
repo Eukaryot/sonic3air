@@ -110,8 +110,10 @@ private:
 	State mState = State::EMPTY;
 	DisconnectReason mDisconnectReason = DisconnectReason::UNKNOWN;
 	ConnectionManager* mConnectionManager = nullptr;
-	bool mUsingTCP = false;
-	TCPSocket mTCPSocket;	// Used only if "mUsingTCP == true"
+
+	bool mUsingTCP = false;				// Set for TCP connections; otherwise it's UDP
+	TCPSocket mTCPSocket;				// Used only if "mUsingTCP == true"
+	bool mIsWebSocketServer = false;	// Set if this is a WebSocket connection -- must be TCP then, and also server-side (no WebSocket client functionality implemented)
 
 	uint16 mLocalConnectionID = 0;
 	uint16 mRemoteConnectionID = 0;

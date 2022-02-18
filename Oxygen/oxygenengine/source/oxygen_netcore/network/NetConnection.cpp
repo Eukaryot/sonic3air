@@ -394,7 +394,7 @@ bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
 	mLastMessageSentTimestamp = mCurrentTimestamp;
 	if (mUsingTCP)
 	{
-		return mConnectionManager->sendTCPPacketData(content, mTCPSocket);
+		return mConnectionManager->sendTCPPacketData(content, mTCPSocket, mIsWebSocketServer);
 	}
 	else
 	{

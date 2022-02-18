@@ -53,7 +53,7 @@ public:
 	std::list<TCPSocket>& getIncomingTCPConnections()  { return mIncomingTCPConnections; }
 
 	bool sendUDPPacketData(const std::vector<uint8>& data, const SocketAddress& remoteAddress);
-	bool sendTCPPacketData(const std::vector<uint8>& data, TCPSocket& socket);
+	bool sendTCPPacketData(const std::vector<uint8>& data, TCPSocket& socket, bool isWebSocketServer);
 	bool sendConnectionlessLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, const SocketAddress& remoteAddress, uint16 localConnectionID, uint16 remoteConnectionID);
 
 	NetConnection* findConnectionTo(uint64 senderKey) const;

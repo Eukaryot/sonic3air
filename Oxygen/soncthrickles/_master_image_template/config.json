@@ -24,7 +24,7 @@
 	// Game server
 	"GameServer":
 	{
-		"ServerAddress": "gameserver.sonic3air.org:21094",
+		"ServerAddress": "gameserver.sonic3air.org:21094-21095",
 		"GhostSync":
 		{
 			"Enabled": "0",				// Enable the ghost sync feature by setting this to "1"

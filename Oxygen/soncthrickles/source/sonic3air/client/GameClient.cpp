@@ -14,7 +14,11 @@
 
 
 GameClient::GameClient() :
+#if defined(GAME_CLIENT_USE_TCP)
+	mConnectionManager(nullptr, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
+#else
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
+#endif
 	mGhostSync(*this),
 	mUpdateCheck(*this)
 {
@@ -37,9 +41,11 @@ void GameClient::setupClient()
 	{
 		Sockets::startupSockets();
 
+	#if !defined(GAME_CLIENT_USE_TCP)
 		// Setup socket & connection manager
 		if (!mUDPSocket.bindToAnyPort())
 			RMX_ERROR("Socket bind to any port failed", return);
+	#endif
 
 		// Start connection
 		startConnectingToServer(getCurrentTimestamp());
@@ -130,8 +136,14 @@ void GameClient::startConnectingToServer(uint64 currentTimestamp)
 		std::string serverIP;
 		if (!Sockets::resolveToIP(config.mServerHostName, serverIP))
 			RMX_ERROR("Unable to resolve server URL " << config.mServerHostName, return);
-		serverAddress.set(serverIP, (uint16)config.mServerPort);
+
+	#if defined(GAME_CLIENT_USE_TCP)
+		serverAddress.set(serverIP, (uint16)config.mServerPortTCP);
+	#else
+		serverAddress.set(serverIP, (uint16)config.mServerPortUDP);
+	#endif
 	}
+
 	mServerConnection.startConnectTo(mConnectionManager, serverAddress, currentTimestamp);
 	mLastConnectionAttemptTimestamp = currentTimestamp;
 }

@@ -48,7 +48,8 @@ public:
 	struct GameServer
 	{
 		std::string mServerHostName;
-		int mServerPort = 0;
+		int mServerPortUDP = 0;
+		int mServerPortTCP = 0;
 		GhostSync mGhostSync;
 	};
 	GameServer mGameServer;

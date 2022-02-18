@@ -122,6 +122,7 @@ public:
 	void makeSubString(const StringTemplate& str, int pos, int len);
 	void makeSubString(const StringTemplate& str, int pos);
 	CLASS getSubString(int pos, int len) const;
+	CLASS getSubString(int pos) const;
 
 	int split(CLASS** str_ptr, CHAR separator) const;
 	void split(std::vector<CLASS>& output, CHAR separator) const;

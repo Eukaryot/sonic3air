@@ -770,6 +770,11 @@ TEMPLATE CLASS STRING::getSubString(int pos, int len) const
 	return CLASS(&mData[pos], len);
 }
 
+TEMPLATE CLASS STRING::getSubString(int pos) const
+{
+	return getSubString(pos, mLength - pos);
+}
+
 TEMPLATE int STRING::split(CLASS** str_ptr, CHAR separator) const
 {
 	// Split string
