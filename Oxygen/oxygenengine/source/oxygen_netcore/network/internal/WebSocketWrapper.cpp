@@ -31,7 +31,7 @@ bool WebSocketWrapper::handleWebSocketHttpHeader(const std::vector<uint8>& recei
 		{
 			flags |= 0x01;
 		}
-		else if (line == "Connection: Upgrade")
+		else if (line.startsWith("Connection: Upgrade") || line.startsWith("Connection: keep-alive, Upgrade"))
 		{
 			flags |= 0x02;
 		}

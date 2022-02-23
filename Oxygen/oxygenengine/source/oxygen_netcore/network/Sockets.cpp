@@ -92,7 +92,7 @@ bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP)
 				{
 					char nodeBuffer[NI_MAXHOST] = {};
 					char serviceBuffer[NI_MAXSERV] = {};
-					if (::getnameinfo(reinterpret_cast<struct sockaddr*>(sockAddrStorage), sizeof(struct sockaddr_storage), nodeBuffer, sizeof(nodeBuffer), serviceBuffer, sizeof(serviceBuffer), NI_NUMERICHOST | NI_NUMERICSERV) == 0)
+					if (::getnameinfo(reinterpret_cast<sockaddr*>(sockAddrStorage), sizeof(sockaddr_storage), nodeBuffer, sizeof(nodeBuffer), serviceBuffer, sizeof(serviceBuffer), NI_NUMERICHOST | NI_NUMERICSERV) == 0)
 					{
 						// Got a result
 						outIP = nodeBuffer;
@@ -107,6 +107,7 @@ bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP)
 
 	// Failed
 	return false;
+#endif
 }
 
 
@@ -194,7 +195,7 @@ TCPSocket::~TCPSocket()
 
 bool TCPSocket::isValid() const
 {
-	return (nullptr != mInternal && mInternal->mSocket >= 0);
+	return (nullptr != mInternal && mInternal->mSocket != INVALID_SOCKET);
 }
 
 void TCPSocket::close()
@@ -244,14 +245,42 @@ bool TCPSocket::setupServer(uint16 serverPort)
 		close();
 	}
 
-	// Create a socket
-	mInternal->mSocket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	RMX_CHECK(mInternal->mSocket >= 0, "socket failed with error: " << mInternal->mSocket, return false);
+	addrinfo hints;
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
 
-	// Setup the socket
-	SocketAddress address("127.0.0.1", serverPort);
-	int result = bind(mInternal->mSocket, (sockaddr*)address.getSockAddr(), 128);
-	if (result < 0)
+	addrinfo* addr = nullptr;
+	const std::string portAsString = std::to_string(serverPort);
+	int result = ::getaddrinfo(nullptr, portAsString.c_str(), &hints, &addr);
+	if (result != 0)
+	{
+	#ifdef _WIN32
+		RMX_ERROR("getaddrinfo failed with error: " << WSAGetLastError(), );
+	#else
+		RMX_ERROR("getaddrinfo failed with error: " << result, );
+	#endif
+		return false;
+	}
+
+	// Create a socket
+	mInternal->mSocket = ::socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+	if (mInternal->mSocket == INVALID_SOCKET)
+	{
+	#ifdef _WIN32
+		RMX_ERROR("bind failed with error: " << WSAGetLastError(), );
+	#else
+		RMX_ERROR("bind failed with error: " << result, );
+	#endif
+		close();
+		return false;
+	}
+
+	// Bind socket
+	result = ::bind(mInternal->mSocket, addr->ai_addr, (int)addr->ai_addrlen);	
+	if (result != 0)
 	{
 	#ifdef _WIN32
 		RMX_ERROR("bind failed with error: " << WSAGetLastError(), );
@@ -264,7 +293,7 @@ bool TCPSocket::setupServer(uint16 serverPort)
 
 	// Setup for listening to incoming connections
 	result = ::listen(mInternal->mSocket, SOMAXCONN);
-	if (result < 0)
+	if (result != 0)
 	{
 	#ifdef _WIN32
 		RMX_ERROR("listen failed with error: " << WSAGetLastError(), );
@@ -349,7 +378,7 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort)
 	{
 		addrinfo hints;
 		memset(&hints, 0, sizeof(hints));
-		hints.ai_family = AF_UNSPEC;
+		hints.ai_family = AF_INET;
 		hints.ai_socktype = SOCK_STREAM;	// Needed for TCP
 		hints.ai_protocol = IPPROTO_TCP;	// Use TCP
 
@@ -361,11 +390,12 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort)
 	for (addrinfo* ptr = addressInfos; ptr != nullptr; ptr = ptr->ai_next)
 	{
 		// Create a socket
-		mInternal->mSocket = ::socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-		RMX_CHECK(mInternal->mSocket >= 0, "socket failed with error: " << mInternal->mSocket, return false);
+		int result = ::socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+		RMX_CHECK(result >= 0, "socket failed with error: " << result, return false);
+		mInternal->mSocket = result;
 
 		// Connect to server
-		const int result = ::connect(mInternal->mSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+		result = ::connect(mInternal->mSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 		if (result >= 0)
 		{
 			// Success!
@@ -377,7 +407,7 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort)
 	}
 
 	::freeaddrinfo(addressInfos);
-	return (mInternal->mSocket >= 0);
+	return (mInternal->mSocket != INVALID_SOCKET);
 }
 
 bool TCPSocket::sendData(const uint8* data, size_t length)
@@ -511,7 +541,7 @@ UDPSocket::~UDPSocket()
 
 bool UDPSocket::isValid() const
 {
-	return (nullptr != mInternal && mInternal->mSocket >= 0);
+	return (nullptr != mInternal && mInternal->mSocket != INVALID_SOCKET);
 }
 
 void UDPSocket::close()
@@ -520,16 +550,16 @@ void UDPSocket::close()
 		return;
 
 #ifdef _WIN32
-	int status = shutdown(mInternal->mSocket, SD_BOTH);
-	if (status == 0)
+	int result = shutdown(mInternal->mSocket, SD_BOTH);
+	if (result == 0)
 	{
-		status = closesocket(mInternal->mSocket);
+		result = closesocket(mInternal->mSocket);
 	}
 #else
-	int status = shutdown(mInternal->mSocket, SHUT_RDWR);
-	if (status == 0)
+	int result = shutdown(mInternal->mSocket, SHUT_RDWR);
+	if (result == 0)
 	{
-		status = ::close(mInternal->mSocket);
+		result = ::close(mInternal->mSocket);
 	}
 #endif
 
@@ -565,13 +595,14 @@ bool UDPSocket::bindToPort(uint16 port)
 	}
 
 	// Create a socket
-	mInternal->mSocket = ::socket(addressInfo->ai_family, addressInfo->ai_socktype, addressInfo->ai_protocol);
-	if (mInternal->mSocket < 0)
+	result = ::socket(addressInfo->ai_family, addressInfo->ai_socktype, addressInfo->ai_protocol);
+	if (result < 0)
 	{
 		RMX_ERROR("socket failed with error: " << mInternal->mSocket, );
 		::freeaddrinfo(addressInfo);
 		return false;
 	}
+	mInternal->mSocket = result;
 
 	// Setup the socket
 	result = ::bind(mInternal->mSocket, addressInfo->ai_addr, (int)addressInfo->ai_addrlen);

@@ -38,7 +38,7 @@ void ConnectionManager::updateConnections(uint64 currentTimestamp)
 
 bool ConnectionManager::updateReceivePackets()
 {
-	bool anyActivity = false;
+	bool anyActivity = !mReceivedPackets.mWorkerQueue.empty();
 
 	// Update UDP
 	if (nullptr != mUDPSocket)
