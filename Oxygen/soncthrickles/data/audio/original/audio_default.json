@@ -75,7 +75,7 @@
 	// Competition mode
 	"20": { "Name": "Azure Lake",    "Source": "Emulation", "Type": "Music" },
 	"21": { "Name": "Balloon Park",  "Source": "Emulation", "Type": "Music" },
-	"22": { "Name": "Deset Palace",  "Source": "Emulation", "Type": "Music" },
+	"22": { "Name": "Desert Palace", "Source": "Emulation", "Type": "Music" },
 	"23": { "Name": "Chrome Gadget", "Source": "Emulation", "Type": "Music" },
 	"24": { "Name": "Endless Mine",  "Source": "Emulation", "Type": "Music" },
 
