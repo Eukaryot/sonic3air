@@ -26,6 +26,7 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacket.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacketCache.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\WebSocketClient.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\WebSocketWrapper.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\LowLevelPackets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\NetConnection.h" />
@@ -45,6 +46,7 @@
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\CryptoFunctions.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\ReceivedPacketCache.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\SentPacketCache.cpp" />
+    <ClCompile Include="..\..\source\oxygen_netcore\network\internal\WebSocketClient.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\WebSocketWrapper.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\NetConnection.cpp" />
     <ClCompile Include="..\..\source\oxygen_netcore\network\RequestBase.cpp" />

@@ -11,6 +11,7 @@
 #include "oxygen_netcore/network/RequestBase.h"
 #include "oxygen_netcore/network/internal/ReceivedPacketCache.h"
 #include "oxygen_netcore/network/internal/SentPacketCache.h"
+#include "oxygen_netcore/network/internal/WebSocketClient.h"
 
 class ConnectionManager;
 
@@ -20,6 +21,7 @@ class NetConnection
 {
 friend class ServerClientBase;
 friend class ConnectionManager;
+friend class WebSocketClient;
 friend class highlevel::RequestBase;
 
 public:
@@ -50,6 +52,13 @@ public:
 			NONE		= 0x00,
 			UNRELIABLE	= 0x01,		// Enforce sending as a lightweight packet, without resending and confirmation from the receiver
 		};
+	};
+
+	enum class SocketType
+	{
+		UDP_SOCKET,		// UDP usage -- this is the default
+		TCP_SOCKET,		// TCP usage -- fallback if UDP is not available
+		WEB_SOCKET		// Emscripten web socket usage, used only on client side
 	};
 
 public:
@@ -96,7 +105,11 @@ private:
 	// Called by RequestBsae
 	void unregisterRequest(highlevel::RequestBase& request);
 
+	// Called by WebSocketClient
+	bool receivedWebSocketPacket(const std::vector<uint8>& content);
+
 	// Internal use
+	bool finishStartConnect();
 	bool sendPacketInternal(const std::vector<uint8>& content);
 	void writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket);
 	bool sendLowLevelPacket(lowlevel::PacketBase& lowLevelPacket, std::vector<uint8>& buffer);
@@ -111,9 +124,10 @@ private:
 	DisconnectReason mDisconnectReason = DisconnectReason::UNKNOWN;
 	ConnectionManager* mConnectionManager = nullptr;
 
-	bool mUsingTCP = false;				// Set for TCP connections; otherwise it's UDP
-	TCPSocket mTCPSocket;				// Used only if "mUsingTCP == true"
-	bool mIsWebSocketServer = false;	// Set if this is a WebSocket connection -- must be TCP then, and also server-side (no WebSocket client functionality implemented)
+	SocketType mSocketType = SocketType::UDP_SOCKET;
+	TCPSocket mTCPSocket;				// Used only for SocketType::TCP_SOCKET
+	WebSocketClient mWebSocketClient;	// Used only for SocketType::WEB_SOCKET
+	bool mIsWebSocketServer = false;	// Set on server side if is a WebSocket connection; used only for SocketType::TCP_SOCKET
 
 	uint16 mLocalConnectionID = 0;
 	uint16 mRemoteConnectionID = 0;

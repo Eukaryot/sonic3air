@@ -60,6 +60,12 @@ void Sockets::shutdownSockets()
 
 bool Sockets::resolveToIP(const std::string& hostName, std::string& outIP)
 {
+#ifdef __EMSCRIPTEN__
+	// Just return the input
+	outIP = hostName;
+	return true;
+#else
+
 	// Resolve host name to an IP
 	addrinfo* addrInfo = nullptr;
 	addrinfo hintsAddrInfo = {};
@@ -246,7 +252,7 @@ bool TCPSocket::setupServer(uint16 serverPort)
 	}
 
 	addrinfo hints;
-	ZeroMemory(&hints, sizeof(hints));
+	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;

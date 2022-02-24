@@ -238,8 +238,9 @@ void ConnectionManager::addConnection(NetConnection& connection)
 	mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup] = &connection;
 	mConnectionsBySender[connection.getSenderKey()] = &connection;
 
-	if (connection.mUsingTCP)
+	if (connection.mSocketType == NetConnection::SocketType::TCP_SOCKET)
 	{
+		// Register as a TCP connection & socket to be polled regularly
 		mTCPNetConnections.push_back(&connection);
 	}
 }
@@ -253,8 +254,9 @@ void ConnectionManager::removeConnection(NetConnection& connection)
 
 	// TODO: Maybe reduce size of "mActiveConnectionsLookup" again if there's only few connections left - and if this does not produce any conflicts
 
-	if (connection.mUsingTCP)
+	if (connection.mSocketType == NetConnection::SocketType::TCP_SOCKET)
 	{
+		// Unregister again
 		for (size_t index = 0; index < mTCPNetConnections.size(); ++index)
 		{
 			if (&connection == mTCPNetConnections[index])

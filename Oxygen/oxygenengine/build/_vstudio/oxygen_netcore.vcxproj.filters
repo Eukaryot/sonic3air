@@ -59,6 +59,9 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\WebSocketWrapper.h">
       <Filter>network\internal</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\internal\WebSocketClient.h">
+      <Filter>network\internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />
@@ -87,6 +90,9 @@
       <Filter>network\internal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen_netcore\network\internal\WebSocketWrapper.cpp">
+      <Filter>network\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen_netcore\network\internal\WebSocketClient.cpp">
       <Filter>network\internal</Filter>
     </ClCompile>
   </ItemGroup>

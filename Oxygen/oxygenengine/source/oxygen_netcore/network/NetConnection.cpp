@@ -20,7 +20,8 @@ uint64 NetConnection::buildSenderKey(const SocketAddress& remoteAddress, uint16 
 	return remoteAddress.getHash() ^ remoteConnectionID;
 }
 
-NetConnection::NetConnection()
+NetConnection::NetConnection() :
+	mWebSocketClient(*this)
 {
 }
 
@@ -48,6 +49,9 @@ void NetConnection::clear()
 
 	mSentPacketCache.clear();
 	mReceivedPacketCache.clear();
+
+	mTCPSocket.close();
+	mWebSocketClient.clear();
 }
 
 UDPSocket* NetConnection::getUDPSocket() const
@@ -68,7 +72,7 @@ void NetConnection::setupWithTCPSocket(ConnectionManager& connectionManager, TCP
 	mState = State::TCP_READY;
 	mConnectionManager = &connectionManager;
 
-	mUsingTCP = true;
+	mSocketType = NetConnection::SocketType::TCP_SOCKET;
 	mTCPSocket.swapWith(socketToMove);
 	mRemoteAddress = mTCPSocket.getRemoteAddress();
 
@@ -93,7 +97,22 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Set here just to start with a valid timestamp
 
 	// Use TCP if UDP is not available
-	if (!connectionManager.hasUDPSocket())
+	if (connectionManager.hasUDPSocket())
+	{
+		mSocketType = NetConnection::SocketType::UDP_SOCKET;
+	}
+	else if (mWebSocketClient.isAvailable())
+	{
+		if (!mWebSocketClient.connectTo(remoteAddress))
+			return false;
+
+		mSocketType = NetConnection::SocketType::WEB_SOCKET;
+
+		// Register connection, but don't call "finishStartConnect" yet
+		mConnectionManager->addConnection(*this);
+		return true;
+	}
+	else
 	{
 		// Establish a TCP connection first
 		//  -> Note that this is a blocking call!
@@ -101,34 +120,13 @@ bool NetConnection::startConnectTo(ConnectionManager& connectionManager, const S
 		if (!success)
 			return false;
 
-		mUsingTCP = true;
+		mSocketType = NetConnection::SocketType::TCP_SOCKET;
 	}
 
-	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
+	// Register connection; this will also set the local connection ID
+	mConnectionManager->addConnection(*this);
 
-	// Send a low-level message to establish the connection
-	{
-		RMX_LOG_INFO("Starting connection to " << mRemoteAddress.toString());
-
-		// Get a new packet instance to fill
-		SentPacket& sentPacket = mConnectionManager->rentSentPacket();
-
-		// Build packet
-		lowlevel::StartConnectionPacket packet;
-		packet.mLowLevelProtocolVersionRange = lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS;
-		packet.mHighLevelProtocolVersionRange = mConnectionManager->getHighLevelProtocolVersionRange();
-
-		// And send it
-		if (!sendLowLevelPacket(packet, sentPacket.mContent))
-		{
-			sentPacket.returnToPool();
-			return false;
-		}
-
-		// Add the packet to the cache, so it can be resent if needed
-		mSentPacketCache.addPacket(sentPacket, mCurrentTimestamp, true);
-	}
-	return true;
+	return finishStartConnect();
 }
 
 bool NetConnection::isConnectedTo(uint16 localConnectionID, uint16 remoteConnectionID, uint64 senderKey) const
@@ -386,20 +384,65 @@ void NetConnection::unregisterRequest(highlevel::RequestBase& request)
 	mOpenRequests.erase(request.mUniqueRequestID);
 }
 
+bool NetConnection::receivedWebSocketPacket(const std::vector<uint8>& content)
+{
+	if (nullptr == mConnectionManager)
+		return false;
+
+	mConnectionManager->receivedPacketInternal(content, mRemoteAddress, this);
+	return true;
+}
+
+bool NetConnection::finishStartConnect()
+{
+	// Send a low-level message to establish the connection
+	RMX_LOG_INFO("Starting connection to " << mRemoteAddress.toString());
+
+	// Get a new packet instance to fill
+	SentPacket& sentPacket = mConnectionManager->rentSentPacket();
+
+	// Build packet
+	lowlevel::StartConnectionPacket packet;
+	packet.mLowLevelProtocolVersionRange = lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS;
+	packet.mHighLevelProtocolVersionRange = mConnectionManager->getHighLevelProtocolVersionRange();
+
+	// And send it
+	if (!sendLowLevelPacket(packet, sentPacket.mContent))
+	{
+		sentPacket.returnToPool();
+		return false;
+	}
+
+	// Add the packet to the cache, so it can be resent if needed
+	mSentPacketCache.addPacket(sentPacket, mCurrentTimestamp, true);
+	return true;
+}
+
 bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
 {
 	if (nullptr == mConnectionManager)
 		return false;
 
 	mLastMessageSentTimestamp = mCurrentTimestamp;
-	if (mUsingTCP)
+
+	switch (mSocketType)
 	{
-		return mConnectionManager->sendTCPPacketData(content, mTCPSocket, mIsWebSocketServer);
+		case NetConnection::SocketType::UDP_SOCKET:
+		{
+			return mConnectionManager->sendUDPPacketData(content, mRemoteAddress);
+		}
+
+		case NetConnection::SocketType::TCP_SOCKET:
+		{
+			return mConnectionManager->sendTCPPacketData(content, mTCPSocket, mIsWebSocketServer);
+		}
+
+		case NetConnection::SocketType::WEB_SOCKET:
+		{
+			return mWebSocketClient.sendPacket(content);
+		}
 	}
-	else
-	{
-		return mConnectionManager->sendUDPPacketData(content, mRemoteAddress);
-	}
+	return false;
 }
 
 void NetConnection::writeLowLevelPacketContent(VectorBinarySerializer& serializer, lowlevel::PacketBase& lowLevelPacket)

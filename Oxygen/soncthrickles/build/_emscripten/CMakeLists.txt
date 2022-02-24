@@ -33,7 +33,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 set (CMAKE_CXX_FLAGS "-s USE_VORBIS=1 -s USE_SDL=2 -s FULL_ES2=1 -s FORCE_FILESYSTEM=1 -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s USE_ZLIB=1")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lidbfs.js -lwebsocket.js")
 
 include_directories(${WORKSPACE_DIR}/framework/external/sdl/SDL2/include)
 include_directories(${WORKSPACE_DIR}/librmx/source)
