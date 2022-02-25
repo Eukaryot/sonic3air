@@ -71,7 +71,7 @@ void UpdateCheck::startUpdateCheck()
 		return;
 
 	// No update check if the last update check in the last 60 seconds
-	if (mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 60 * 1000)
+	if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 60 * 1000)
 		return;
 
 	mState = State::SEND_QUERY;
