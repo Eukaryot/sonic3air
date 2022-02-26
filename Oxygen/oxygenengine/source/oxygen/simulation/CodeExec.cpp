@@ -551,6 +551,8 @@ void CodeExec::addWatch(uint32 address, uint16 bytes, bool persistent)
 
 void CodeExec::removeWatch(uint32 address, uint16 bytes)
 {
+	address &= 0x00ffffff;
+
 	// Try to find the watch
 	int index = -1;
 	for (int i = 0; i < (int)mWatches.size(); ++i)
