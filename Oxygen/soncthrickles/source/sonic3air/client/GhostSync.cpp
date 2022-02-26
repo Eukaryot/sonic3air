@@ -189,15 +189,8 @@ void GhostSync::onPostUpdateFrame()
 	if (mState != State::JOINED_CHANNEL)
 		return;
 
-	// Nothing to do outside of main game
-	const bool isMainGame = (EmulatorInterface::instance().readMemory8(0xfffff600) == 0x0c);
-	const bool hasStarted = ((int8)EmulatorInterface::instance().readMemory8(0xfffff711) > 0);
-
-	if (isMainGame && hasStarted)
-	{
-		updateSending();
-		updateGhostPlayers();
-	}
+	updateSending();
+	updateGhostPlayers();
 }
 
 void GhostSync::updateSending()
@@ -342,6 +335,11 @@ void GhostSync::updateGhostPlayers()
 
 const char* GhostSync::getDesiredSubChannelName() const
 {
+	const bool isMainGame = (EmulatorInterface::instance().readMemory8(0xfffff600) == 0x0c);
+	const bool hasStarted = ((int8)EmulatorInterface::instance().readMemory8(0xfffff711) > 0);
+	if (!isMainGame || !hasStarted)
+		return nullptr;
+
 	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 	const uint16 zoneAndAct = emulatorInterface.readMemory16(0xffffee4e);
 
