@@ -396,9 +396,9 @@ bool TCPSocket::connectTo(const std::string& serverAddress, uint16 serverPort)
 	for (addrinfo* ptr = addressInfos; ptr != nullptr; ptr = ptr->ai_next)
 	{
 		// Create a socket
-		int result = ::socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+		int result = (int)::socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 		RMX_CHECK(result >= 0, "socket failed with error: " << result, return false);
-		mInternal->mSocket = result;
+		mInternal->mSocket = (SOCKET)result;
 
 		// Connect to server
 		result = ::connect(mInternal->mSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
@@ -601,14 +601,14 @@ bool UDPSocket::bindToPort(uint16 port)
 	}
 
 	// Create a socket
-	result = ::socket(addressInfo->ai_family, addressInfo->ai_socktype, addressInfo->ai_protocol);
+	result = (int)::socket(addressInfo->ai_family, addressInfo->ai_socktype, addressInfo->ai_protocol);
 	if (result < 0)
 	{
 		RMX_ERROR("socket failed with error: " << mInternal->mSocket, );
 		::freeaddrinfo(addressInfo);
 		return false;
 	}
-	mInternal->mSocket = result;
+	mInternal->mSocket = (SOCKET)result;
 
 	// Setup the socket
 	result = ::bind(mInternal->mSocket, addressInfo->ai_addr, (int)addressInfo->ai_addrlen);

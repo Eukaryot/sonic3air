@@ -772,7 +772,7 @@ TEMPLATE CLASS STRING::getSubString(int pos, int len) const
 
 TEMPLATE CLASS STRING::getSubString(int pos) const
 {
-	return getSubString(pos, mLength - pos);
+	return getSubString(pos, (int)mLength - pos);
 }
 
 TEMPLATE int STRING::split(CLASS** str_ptr, CHAR separator) const

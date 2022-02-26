@@ -19,7 +19,7 @@ bool WebSocketWrapper::handleWebSocketHttpHeader(const std::vector<uint8>& recei
 
 	// Parse WebSocket handshake header
 	String input;
-	input.add((char*)&receivedData[0], receivedData.size());
+	input.add((char*)&receivedData[0], (int)receivedData.size());
 
 	uint8 flags = 0;
 	String line;
