@@ -13,7 +13,7 @@ ConfigurationImpl::ConfigurationImpl()
 bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 {
 	// Enable dev mode in any case
-	Configuration::instance().mDevMode = true;
+	Configuration::instance().mDevMode.mEnabled = true;
 
 	return true;
 }

@@ -500,10 +500,21 @@ void Configuration::saveSettings()
 void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 {
 	// Read dev mode setting first, as other settings rely on it
-	if (!mDevMode)	// If either config or settings set this to true, then it stays true
+	if (!mDevMode.mEnabled)	// If either config or settings set this to true, then it stays true
 	{
-		rootHelper.tryReadBool("DevMode", mDevMode);
-		rootHelper.tryReadBool("DebugMode", mDevMode);		// Not a mistake -- this is intentional
+		rootHelper.tryReadBool("DebugMode", mDevMode.mEnabled);		// Not a mistake -- this is intentional
+
+		Json::Value devModeJson = rootHelper.mJson["DevMode"];
+		if (devModeJson.isObject())
+		{
+			JsonHelper devModeHelper(devModeJson);
+			devModeHelper.tryReadBool("Enabled", mDevMode.mEnabled);
+
+			devModeHelper.tryReadString("LoadSaveState", mLoadSaveState);
+			devModeHelper.tryReadInt("LoadLevel", mLoadLevel);
+			devModeHelper.tryReadInt("UseCharacters", mUseCharacters);
+			mUseCharacters = clamp(mUseCharacters, 0, 4);
+		}
 	}
 
 	// Paths
@@ -520,7 +531,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	}
 	rootHelper.tryReadString("MainScriptName", mMainScriptName);
 
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		if (rootHelper.tryReadString("SaveStatesDir", mSaveStatesDir))
 		{
@@ -532,14 +543,6 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	rootHelper.tryReadInt("PlatformFlags", mPlatformFlags);
 
 	// Game
-	if (mDevMode)
-	{
-		rootHelper.tryReadString("LoadSaveState", mLoadSaveState);
-	}
-	rootHelper.tryReadInt("LoadLevel", mLoadLevel);
-	rootHelper.tryReadInt("UseCharacters", mUseCharacters);
-	mUseCharacters = clamp(mUseCharacters, 0, 4);
-
 	rootHelper.tryReadInt("StartPhase", mStartPhase);
 	rootHelper.tryReadInt("GameRecording", mGameRecording);
 	rootHelper.tryReadInt("GameRecPlayFrom", mGameRecPlayFrom);
@@ -553,7 +556,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 
 	// Video
 	tryParseWindowSize(rootHelper.mJson["WindowSize"].asString(), mWindowSize);
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		tryParseWindowSize(rootHelper.mJson["GameScreen"].asString(), mGameScreen);
 	}
@@ -568,7 +571,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	rootHelper.tryReadInt("AudioSampleRate", mAudioSampleRate);
 
 	// Input recorder
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		JsonHelper jsonHelper(rootHelper.mJson["InputRecorder"]);
 		jsonHelper.tryReadString("Playback", mInputRecorderInput);
@@ -577,7 +580,7 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 
 	// Script
 	rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
-	if (mDevMode)
+	if (mDevMode.mEnabled)
 	{
 		rootHelper.tryReadBool("EnableROMDataAnalyzer", mEnableROMDataAnalyzer);
 	}

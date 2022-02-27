@@ -194,7 +194,7 @@ bool EngineDelegate::allowModdedData()
 bool EngineDelegate::useDeveloperFeatures()
 {
 #if defined(ENDUSER)
-	return mConfiguration.mDevMode;
+	return mConfiguration.mDevMode.mEnabled;
 #else
 	return true;
 #endif

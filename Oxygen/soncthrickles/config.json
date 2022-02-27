@@ -11,14 +11,8 @@
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",
 
-	// Load save state
-	"LoadSaveState": "state_01",
-	//"LoadLevel": "0x0601",
-	//"UseCharacters": "2",			// 0: Sonic & Tails, 1: Sonic, 2: Tails, 3: Knuckles, 4: Knuckles & Tails
-
 	// Game
 	"StartPhase": "3",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
-	"DevMode": "1",
 	"GameRecording": "-1",
 	"GameRecPlayFrom": "0",
 	"GameRecIgnoreKeys": "0",
@@ -41,6 +35,18 @@
 			"ChannelName": "world-dev",	// To use your own private channel, enter an arbitrary string here; "world" is the default channel
 			"ShowOffscreenGhosts": "1"	// Show other players on the screen border while they're not on the screen
 		}
+	},
+	
+	// Dev mode
+	"DevMode":
+	{
+		// For infos on dev mode (developer mode) see Oxygen Handbook in "bonus/oxygenengine" folder
+		"Enabled": "1",					// Set to "1" to enable dev mode
+
+		"LoadSaveState": "state_01",	// Load save state (requires "StartPhase": "3")
+		//"LoadLevel": "0x0601",		// Load level (requires "StartPhase": "3")
+		//"UseCharacters": "2",			// Use character for level loading: 0: Sonic & Tails, 1: Sonic, 2: Tails, 3: Knuckles, 4: Knuckles & Tails
+		"": ""
 	},
 
 	// Input recorder

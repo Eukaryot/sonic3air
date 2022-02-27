@@ -41,6 +41,11 @@ public:
 		_NUM
 	};
 
+	struct DevModeSettings
+	{
+		bool mEnabled = false;
+	};
+
 	struct VirtualGamepad
 	{
 		float mOpacity = 0.8f;
@@ -119,14 +124,16 @@ public:
 
 	// Game
 	std::wstring mLoadSaveState;
-	int	   mLoadLevel = -1;
-	int	   mUseCharacters = 1;
-	int    mStartPhase = 0;
-	bool   mDevMode = false;
-	int    mSimulationFrequency = 60;
-	int    mGameRecording = -1;
-	int    mGameRecPlayFrom = 0;
-	bool   mGameRecIgnoreKeys = false;
+	int	 mLoadLevel = -1;
+	int	 mUseCharacters = 1;
+	int  mStartPhase = 0;
+	int  mSimulationFrequency = 60;
+	int  mGameRecording = -1;
+	int  mGameRecPlayFrom = 0;
+	bool mGameRecIgnoreKeys = false;
+
+	// Dev mode
+	DevModeSettings mDevMode;
 
 	// Video
 	WindowMode mWindowMode = WindowMode::WINDOWED;

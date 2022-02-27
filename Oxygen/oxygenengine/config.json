@@ -6,8 +6,11 @@
 	"LoadProject": "../soncthrickles",
 	//"LoadProject": "../oxygen_tje2",
 
-	// Load save state
-	//"LoadSaveState": "state_02",
+	// Dev mode
+	"DevMode":
+	{
+		//"LoadSaveState": "state_02"
+	},
 
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",

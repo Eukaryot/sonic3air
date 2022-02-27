@@ -3,8 +3,11 @@
 	// Path to game project to load (use relative path, prefer forward slashes)
 	"LoadProject": "../sonic3air_dev",
 
-	// Load save state
-	"LoadSaveState": "",
+	// Dev mode
+	"DevMode":
+	{
+		//"LoadSaveState": ""
+	},
 
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",

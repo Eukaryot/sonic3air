@@ -12,9 +12,6 @@
 	// Allow for dumping of a game simulation recording by pressing F2 (set to "1" to enforce this feature even in fail-safe mode)
 	"GameRecording": "-1",
 
-	// Set to "1" to enable developer mode (see Oxygen Handbook in "bonus/oxygenengine" folder for details)
-	"DevMode": "0",
-
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",
 
@@ -31,5 +28,11 @@
 			"ChannelName": "world",		// To use your own private channel, enter an arbitrary string here; "world" is the default channel
 			"ShowOffscreenGhosts": "1"	// Show other players on the screen border while they're not on the screen
 		}
+	},
+
+	// Dev mode
+	"DevMode":
+	{
+		"Enabled": "0"		// Set to "1" to enable developer mode (see Oxygen Handbook in "bonus/oxygenengine" folder for details)
 	}
 }
