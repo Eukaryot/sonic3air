@@ -390,7 +390,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							HighResolutionTimer timer;
 							timer.start();
-							if (mSimulation.reloadScripts(true))
+							if (mSimulation.triggerFullScriptsReload())
 							{
 								setLogDisplay(String(0, "Reloaded scripts in %0.2f sec", timer.getSecondsSinceStart()));
 							}

@@ -100,6 +100,9 @@ namespace lemon
 	{
 		const uint64 nameHash = define.getName().getHash();
 		mAllIdentifiers[nameHash].set(&define);
+
+		// Invalidate the "resolved" pointer in identifiers, as they possible got invalid by now
+		define.invalidateResolvedIdentifiers();
 	}
 
 	const FlyweightString* GlobalsLookup::getStringLiteralByHash(uint64 hash) const

@@ -44,17 +44,14 @@ namespace lemon
 	public:
 		virtual ~Token() {}
 
-		inline Type getType() const  { return mType; }
-		inline bool isStatement() const  { return ((int)mType & (int)Type::STATEMENT) != 0; }
+		inline Type getType() const  { return (Type)genericmanager::Element<Token>::getType(); }
+		inline bool isStatement() const  { return (genericmanager::Element<Token>::getType() & (uint32)Type::STATEMENT) != 0; }
 
 		template<typename T> const T& as() const  { return *static_cast<const T*>(this); }
 		template<typename T> T& as()  { return *static_cast<T*>(this); }
 
 	protected:
-		inline Token(Type type) : genericmanager::Element<Token>((uint32)type), mType(type) {}
-
-	private:
-		const Type mType;
+		inline Token(Type type) : genericmanager::Element<Token>((uint32)type) {}
 	};
 
 

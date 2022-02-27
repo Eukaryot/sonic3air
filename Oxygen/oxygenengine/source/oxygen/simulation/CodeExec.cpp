@@ -247,16 +247,24 @@ void CodeExec::cleanScriptDebug()
 	mVRAMWrites.clear();
 }
 
-bool CodeExec::reloadScripts(bool enforceFullReload, bool performReinitRuntime, bool hasSaveState)
+bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 {
-	// If the runtime is already active, save its current state
-	if (hasValidState() && mLemonScriptRuntime.getCallStackSize() != 0)
+	if (retainRuntimeState)
 	{
-		VectorBinarySerializer serializer(false, mSerializedRuntimeState);
-		if (!getLemonScriptRuntime().serializeRuntime(serializer))
+		// If the runtime is already active, save its current state
+		if (hasValidState() && mLemonScriptRuntime.getCallStackSize() != 0)
 		{
-			mSerializedRuntimeState.clear();
+			VectorBinarySerializer serializer(false, mSerializedRuntimeState);
+			if (!getLemonScriptRuntime().serializeRuntime(serializer))
+			{
+				mSerializedRuntimeState.clear();
+			}
 		}
+	}
+	else
+	{
+		// Clear the old serialization, it's not needed
+		mSerializedRuntimeState.clear();
 	}
 	mExecutionState = ExecutionState::INACTIVE;
 
@@ -271,27 +279,24 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool performReinitRuntime, 
 	{
 		mLemonScriptRuntime.onProgramUpdated();
 	}
+	cleanScriptDebug();
 
-	if (result && performReinitRuntime)
+	return result;
+}
+
+void CodeExec::restoreRuntimeState(bool hasSaveState)
+{
+	if (mSerializedRuntimeState.empty())
 	{
-		if (mSerializedRuntimeState.empty())
-		{
-			// We don't have a valid runtime state, so it has to be reloaded from ASM, or we have to reset
-			reinitRuntime(nullptr, hasSaveState ? CallStackInitPolicy::READ_FROM_ASM : CallStackInitPolicy::RESET);
-		}
-		else
-		{
-			// Scripts got reloaded in-game
-			reinitRuntime(nullptr, CallStackInitPolicy::READ_FROM_ASM, &mSerializedRuntimeState);
-			mSerializedRuntimeState.clear();	// Not needed any more now
-		}
+		// We don't have a valid runtime state, so it has to be reloaded from ASM, or we have to reset
+		reinitRuntime(nullptr, hasSaveState ? CallStackInitPolicy::READ_FROM_ASM : CallStackInitPolicy::RESET);
 	}
 	else
 	{
-		cleanScriptDebug();
+		// Scripts got reloaded in-game
+		reinitRuntime(nullptr, CallStackInitPolicy::READ_FROM_ASM, &mSerializedRuntimeState);
+		mSerializedRuntimeState.clear();	// Not needed any more now
 	}
-
-	return result;
 }
 
 void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enforcedCallStack, CallStackInitPolicy callStackInitPolicy, const std::vector<uint8>* serializedRuntimeState)

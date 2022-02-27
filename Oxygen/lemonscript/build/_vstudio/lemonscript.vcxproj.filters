@@ -123,6 +123,9 @@
     <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp">
       <Filter>lemon\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\program\Define.cpp">
+      <Filter>lemon\program</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">

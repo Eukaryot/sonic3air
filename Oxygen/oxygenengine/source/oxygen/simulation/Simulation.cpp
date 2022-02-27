@@ -53,7 +53,11 @@ bool Simulation::startup()
 
 	// Load scripts
 	RMX_LOG_INFO("Loading scripts");
-	bool success = mCodeExec.reloadScripts(true, true, false);
+	bool success = mCodeExec.reloadScripts(true, false);	// Note: First parameter could just as well be set to false
+	if (success)
+	{
+		mCodeExec.reinitRuntime(nullptr, CodeExec::CallStackInitPolicy::RESET);
+	}
 
 	// Optionally load save state
 	mStateLoaded.clear();
@@ -102,18 +106,13 @@ void Simulation::shutdown()
 	mIsRunning = false;
 }
 
-void Simulation::requireScriptReload()
+void Simulation::reloadScriptsAfterModsChange()
 {
-	// First variant immediately reloads the scripts
-#if 1
-	if (mCodeExec.reloadScripts(true, false, false))
+	// Immediate reload the scripts (while the loading text box is shown)
+	if (mCodeExec.reloadScripts(false, false))
 	{
 		mCodeExec.reinitRuntime(nullptr, CodeExec::CallStackInitPolicy::RESET);
 	}
-	mScriptReloadNeeded = false;
-#else
-	mScriptReloadNeeded = true;
-#endif
 }
 
 void Simulation::resetState()
@@ -136,7 +135,7 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	mStateLoaded.clear();
 
 	// Reload and initialize scripts as needed
-	if (mCodeExec.reloadScripts(mScriptReloadNeeded, false, false))		// Reload if flag is set, or if detecting changes in whether mod scripts should be active
+	if (mCodeExec.reloadScripts(false, false))
 	{
 		mCodeExec.reinitRuntime(enforcedCallStack, CodeExec::CallStackInitPolicy::RESET);
 	}
@@ -156,7 +155,6 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	const float tickLength = 1.0f / getSimulationFrequency();
 	const float tickAccumInitial = tickLength * 0.25f;		// You would usually except this to be zero, but that's a bit too far from the stable center
 
-	mScriptReloadNeeded = false;
 	mAccumulatedTime = tickAccumInitial;
 	mNextSingleStep = false;
 	mSingleStepContinue = false;
@@ -212,9 +210,17 @@ void Simulation::saveState(const std::wstring& filename)
 	mStateLoaded = filename;
 }
 
-bool Simulation::reloadScripts(bool enforceFullReload)
+bool Simulation::triggerFullScriptsReload()
 {
-	return mCodeExec.reloadScripts(enforceFullReload, true, !mStateLoaded.empty());
+	if (mCodeExec.reloadScripts(true, true))
+	{
+		mCodeExec.restoreRuntimeState(!mStateLoaded.empty());
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void Simulation::update(float timeElapsed)

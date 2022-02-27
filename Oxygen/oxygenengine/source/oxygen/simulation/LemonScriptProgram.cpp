@@ -215,8 +215,8 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 	}
 
 	// Check if there's anything to do at all
-	const bool completeReloadNeeded = (mInternal.mProgram.getModules().empty() || loadOptions.mEnforceFullReload);
-	if (!completeReloadNeeded)
+	const bool mainScriptReloadNeeded = (mInternal.mProgram.getModules().empty() || loadOptions.mEnforceFullReload);
+	if (!mainScriptReloadNeeded)
 	{
 		if (modsToLoad == mInternal.mLastModSelection)
 		{
@@ -233,7 +233,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 	mInternal.mProgram.clear();
 
 	// Load project's main script module, but only if a full reload is needed
-	if (completeReloadNeeded)
+	if (mainScriptReloadNeeded)
 	{
 		mInternal.mScriptModule.clear();
 

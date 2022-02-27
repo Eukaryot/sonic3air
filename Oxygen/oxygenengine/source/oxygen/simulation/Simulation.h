@@ -26,10 +26,10 @@ public:
 	bool startup();
 	void shutdown();
 
-	void requireScriptReload();
+	void reloadScriptsAfterModsChange();
 
-	inline void setRunning(bool running)  { mIsRunning = running; }
 	inline bool isRunning() const		  { return mIsRunning; }
+	inline void setRunning(bool running)  { mIsRunning = running; }
 
 	CodeExec& getCodeExec()				  { return mCodeExec; }
 	ROMDataAnalyser* getROMDataAnalyser() { return mROMDataAnalyser; }
@@ -42,7 +42,7 @@ public:
 	bool loadState(const std::wstring& filename, bool showError = true);
 	void saveState(const std::wstring& filename);
 
-	bool reloadScripts(bool enforceFullReload);
+	bool triggerFullScriptsReload();
 
 	inline uint32 getFrameNumber() const  { return mFrameNumber; }
 
@@ -69,8 +69,6 @@ private:
 	GameRecorder& mGameRecorder;
 	InputRecorder& mInputRecorder;
 	ROMDataAnalyser* mROMDataAnalyser = nullptr;
-
-	bool	mScriptReloadNeeded = false;
 
 	bool	mIsRunning = false;
 	float	mSimulationFrequencyOverride = 0.0f;

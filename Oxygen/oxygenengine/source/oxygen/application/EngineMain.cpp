@@ -123,7 +123,7 @@ void EngineMain::onActiveModsChanged()
 	mAudioOut->handleActiveModsChanged();
 
 	// Scripts need to be reloaded
-	Application::instance().getSimulation().requireScriptReload();
+	Application::instance().getSimulation().reloadScriptsAfterModsChange();
 }
 
 uint32 EngineMain::getPlatformFlags() const

@@ -53,11 +53,11 @@ namespace genericmanager
 		}
 
 	protected:
-		inline Element(Type type) : mType(type) {}
+		inline explicit Element(Type type) : mType(type) {}
 		inline virtual ~Element() {}
 
 	private:
-		Type mType;
+		const Type mType;
 		uint32 mReferenceCounter = 0;
 	};
 

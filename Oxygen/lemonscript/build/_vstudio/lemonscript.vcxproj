@@ -35,6 +35,7 @@
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\program\ConstantArray.cpp" />
     <ClCompile Include="..\..\source\lemon\program\DataType.cpp" />
+    <ClCompile Include="..\..\source\lemon\program\Define.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Function.cpp" />
     <ClCompile Include="..\..\source\lemon\program\FunctionWrapper.cpp" />
     <ClCompile Include="..\..\source\lemon\program\GlobalsLookup.cpp" />

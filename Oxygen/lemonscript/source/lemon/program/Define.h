@@ -9,6 +9,7 @@
 #pragma once
 
 #include "lemon/compiler/Token.h"
+#include "lemon/utility/FlyweightString.h"
 
 
 namespace lemon
@@ -21,6 +22,8 @@ namespace lemon
 	public:
 		inline FlyweightString getName() const  { return mName; }
 		inline const DataTypeDefinition* getDataType() const  { return mDataType; }
+
+		void invalidateResolvedIdentifiers();
 
 	public:
 		TokenList mContent;
