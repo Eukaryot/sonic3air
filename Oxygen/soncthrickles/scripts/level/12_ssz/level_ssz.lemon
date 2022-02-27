@@ -181,15 +181,21 @@ function void fn057344()
 	A2 = pop()
 	A3 = pop()
 
+	// Load in chunks for Death Egg in background
 	D0.u16 = u16[A3 - 0x08] - 3
+#if STANDALONE
+	// There's an error in the S3AIR level layout data, correct that here
+	if (D0.u16 == 0x34)
+		D0.u16 = 0x33
+#endif
 	A1 = 0xffff0000 + u16[A3]
-	u8[A1 + D0.s16] = 0x04
-	u8[A1 + D0.s16 + 0x01] = 0x05
-	u8[A1 + D0.s16 + 0x02] = 0x06
+	u8[A1 + D0.u16 + 0] = 0x04
+	u8[A1 + D0.u16 + 1] = 0x05
+	u8[A1 + D0.u16 + 2] = 0x06
 	A1 = 0xffff0000 + u16[A3 + 0x04]
-	u8[A1 + D0.s16] = 0x07
-	u8[A1 + D0.s16 + 0x01] = 0x08
-	u8[A1 + D0.s16 + 0x02] = 0x09
+	u8[A1 + D0.u16 + 0] = 0x07
+	u8[A1 + D0.u16 + 1] = 0x08
+	u8[A1 + D0.u16 + 2] = 0x09
 
 	copyMemory(0xfffffc20, 0x0577da, 0x20)
 	fn0574dc()
@@ -648,16 +654,12 @@ function void fn0578f0()
 	#if STANDALONE
 		if (level.results_done && camera.position.y.u16 <= 0x500)
 		{
-		/*
-			// Overwrite scroll offsets for plane A to move the Death Egg to the right
-			//  -> This does not make much sense actually, as less of the Death Egg is visible than in 320px; so I removed it again
-			//  -> However, something like this would be needed for ultra-wide resolutions
-			D0.s16 = -s16(camera.foreground.x.u16 - getScreenExtend() * 2)
+			// Overwrite scroll offsets for plane A to move the Death Egg depending on screen width
+			D0.s16 = -s16(camera.foreground.x.u16) + max(0, s16(getScreenExtend() - 40) + 8)
 			for (u8 line = 0; line < getScreenHeight(); ++line)
 			{
 				u16[0xffffe000 + line * 4] = D0
 			}
-		*/
 
 			// Also make sure to remove garbage values for plane A
 			VDP.Util.clearPatternRectInVRAM(0xc000, 0xd000, 0x80, 0x48, 0x5c)
