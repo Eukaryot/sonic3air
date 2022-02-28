@@ -50,6 +50,17 @@ void DebugSidePanel::Builder::addLine(const String& text, const Color& color, in
 	textLine.mLineSpacing = lineSpacing;
 }
 
+void DebugSidePanel::Builder::addOption(const String& text, bool value, const Color& color, int intend, uint64 key, int lineSpacing)
+{
+	TextLine& textLine = vectorAdd(mTextLines);
+	textLine.mText = text;
+	textLine.mColor = color;
+	textLine.mIntend = intend;
+	textLine.mKey = key;
+	textLine.mLineSpacing = lineSpacing;
+	textLine.mOptionValue = value ? 1 : 0;
+}
+
 void DebugSidePanel::Builder::addSpacing(int lineSpacing)
 {
 	TextLine& textLine = vectorAdd(mTextLines);
@@ -312,6 +323,15 @@ void DebugSidePanel::render()
 				drawer.drawRect(selectionRect, Color(1.0f, 1.0f, 0.0f, 0.5f));
 			}
 
+			if (line.mOptionValue >= 0)
+			{
+				drawer.printText(mSmallFont, textRect, (line.mOptionValue != 0) ? "[x" : "[ ", 1, line.mColor);
+				textRect.x += 10;
+				drawer.printText(mSmallFont, textRect, "]", 1, line.mColor);
+				textRect.x += 10;
+				textRect.width -= 20;
+			}
+
 			drawer.printText(mSmallFont, textRect, line.mText, 1, line.mColor);
 		}
 	}
@@ -422,12 +442,12 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			const bool visualizationSorting = (category.mOpenKeys.count(0x1000000000000002) > 0);
 			const bool showOpcodesExecuted  = (category.mOpenKeys.count(0x1000000000000003) > 0);
 
-			builder.addLine(String(0, "[%c] Show all hit functions", showAllHitFunctions ? 'x' : ' '), Color::CYAN, 0, 0x1000000000000001);
+			builder.addOption("Show all hit functions", showAllHitFunctions, Color::CYAN, 0, 0x1000000000000001);
 			builder.addSpacing(12);
 
 			if (showAllHitFunctions)
 			{
-				builder.addLine(String(0, "[%c] Sort by filename", visualizationSorting ? 'x' : ' '), Color::CYAN, 0, 0x1000000000000002);
+				builder.addOption("Sort by filename", visualizationSorting, Color::CYAN, 0, 0x1000000000000002);
 				builder.addSpacing(12);
 
 				std::map<uint32, const lemon::Function*> functions;
@@ -483,7 +503,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			}
 			else
 			{
-				builder.addLine(String(0, "[%c] Show profiling samples", showOpcodesExecuted ? 'x' : ' '), Color::CYAN, 0, 0x1000000000000003);
+				builder.addOption("Show profiling samples", showOpcodesExecuted, Color::CYAN, 0, 0x1000000000000003);
 				builder.addSpacing(12);
 
 				int ignoreDepth = 0;
@@ -662,7 +682,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								codeExec.removeWatch(globalDefine.mAddress, globalDefine.mBytes);
 							}
 						}
-						builder.addLine(String(0, "[%c] Watched", watched ? 'x' : ' '), color, indent + 20, key2);
+						builder.addOption("Watched", watched, color, indent + 20, key2);
 					}
 					builder.addSpacing(5);
 				}

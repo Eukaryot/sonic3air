@@ -109,7 +109,7 @@ void CustomDebugSidePanelCategory::buildCategoryContent(DebugSidePanel::Builder&
 				continue;
 
 			option.mChecked = mOpenKeys.count(option.mKey);
-			builder.addLine(String(0, "[%c] %s", option.mChecked ? 'x' : ' ', option.mText.c_str()), Color::CYAN, 0, option.mKey);
+			builder.addOption(option.mText, option.mChecked, Color::CYAN, 0, option.mKey);
 		}
 		builder.addSpacing(12);
 	}

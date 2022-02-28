@@ -27,6 +27,7 @@ public:
 
 	public:
 		void addLine(const String& text, const Color& color = Color::WHITE, int intend = 0, uint64 key = INVALID_KEY, int lineSpacing = 12);
+		void addOption(const String& text, bool value, const Color& color = Color::WHITE, int intend = 0, uint64 key = INVALID_KEY, int lineSpacing = 12);
 		void addSpacing(int lineSpacing);
 
 	private:
@@ -37,6 +38,7 @@ public:
 			int mIntend = 0;
 			uint64 mKey = INVALID_KEY;
 			int mLineSpacing = 12;
+			int mOptionValue = -1;
 		};
 		std::vector<TextLine> mTextLines;
 	};
