@@ -138,7 +138,6 @@ function void OxygenCallback.setupCustomSidePanelEntries()
 
 			if (System.SidePanel.isEntryHovered(address))
 			{
-				// TODO: Unfortunately, this does not work when simulation is paused
 				debugDrawRect(px - 15, py - 15, 31, 31, 0xc00080ff)
 			}
 		}
