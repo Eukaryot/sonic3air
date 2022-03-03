@@ -87,6 +87,7 @@
     <ClInclude Include="..\..\source\lemon\program\Opcode.h" />
     <ClInclude Include="..\..\source\lemon\program\OpcodeHelper.h" />
     <ClInclude Include="..\..\source\lemon\program\Program.h" />
+    <ClInclude Include="..\..\source\lemon\program\SourceFileInfo.h" />
     <ClInclude Include="..\..\source\lemon\program\StringRef.h" />
     <ClInclude Include="..\..\source\lemon\program\Variable.h" />
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h" />

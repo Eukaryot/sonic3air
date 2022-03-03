@@ -16,6 +16,7 @@ namespace lemon
 	namespace
 	{
 		static const std::vector<Function*> EMPTY_FUNCTIONS;
+		static const SourceFileInfo EMPTY_SOURCE_FILE_INFO;
 	}
 
 
@@ -67,6 +68,10 @@ namespace lemon
 
 		// String literals
 		mStringLiterals.clear();
+
+		// Clear source file infos
+		mSourceFileInfoPool.clear();
+		mAllSourceFiles.clear();
 	}
 
 	void Module::startCompiling(const GlobalsLookup& globalsLookup)
@@ -117,6 +122,16 @@ namespace lemon
 		}
 
 		content.saveFile(filename);
+	}
+
+	const SourceFileInfo& Module::addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename)
+	{
+		SourceFileInfo& sourceFileInfo = mSourceFileInfoPool.createObject();
+		sourceFileInfo.mFilename = filename;
+		sourceFileInfo.mFullPath = basepath + filename;
+		sourceFileInfo.mIndex = mAllSourceFiles.size();
+		mAllSourceFiles.push_back(&sourceFileInfo);
+		return sourceFileInfo;
 	}
 
 	void Module::registerNewPreprocessorDefinitions(PreprocessorDefinitionMap& preprocessorDefinitions)
@@ -280,10 +295,11 @@ namespace lemon
 		//  - 0x06 = Support for string data type in serialization - this breaks compatibility with older versions
 		//  - 0x07 = Several compatibility breaking changes and extensions (e.g. constant arrays)
 		//  - 0x08 = Added preprocessor definitions
+		//  - 0x09 = Added source file infos + more compact way of line number serialization
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x08;
+		uint16 version = 0x09;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -292,7 +308,7 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x08)
+			if (version < 0x09)
 				return false;	// Loading older versions is not supported
 		}
 		else
@@ -314,6 +330,29 @@ namespace lemon
 		// Serialize module
 		serializer & mFirstFunctionID;
 		serializer & mFirstVariableID;
+
+		// Serialize source file info
+		{
+			size_t numberOfSourceFiles = mAllSourceFiles.size();
+			serializer.serializeAs<uint16>(numberOfSourceFiles);
+
+			if (serializer.isReading())
+			{
+				std::wstring filename;
+				for (size_t i = 0; i < numberOfSourceFiles; ++i)
+				{
+					serializer.serialize(filename);
+					addSourceFileInfo(L"", filename);
+				}
+			}
+			else
+			{
+				for (const SourceFileInfo* sourceFileInfo : mAllSourceFiles)
+				{
+					serializer.write(sourceFileInfo->mFilename);
+				}
+			}
+		}
 
 		// Serialize preprocessor definitions
 		{
@@ -345,6 +384,7 @@ namespace lemon
 			uint32 numberOfFunctions = (uint32)mFunctions.size();
 			serializer & numberOfFunctions;
 
+			uint32 lastLineNumber = 0;
 			for (uint32 i = 0; i < numberOfFunctions; ++i)
 			{
 				if (serializer.isReading())
@@ -371,10 +411,10 @@ namespace lemon
 					{
 						// Create new script function
 						ScriptFunction& scriptFunc = addScriptFunction(name, returnType, &parameters);
-						uint32 lastLineNumber = 0;
 
 						// Source information
-						serializer.serialize(scriptFunc.mSourceFilename);
+						const size_t index = (size_t)serializer.read<uint16>();
+						scriptFunc.mSourceFileInfo = (index < mAllSourceFiles.size()) ? mAllSourceFiles[index] : &EMPTY_SOURCE_FILE_INFO;
 						serializer.serialize(scriptFunc.mSourceBaseLineOffset);
 
 						// Opcodes
@@ -390,7 +430,7 @@ namespace lemon
 							const uint8 parameterBits  = (uint8)(typeAndFlags >> 6) & 0x07;
 							const bool hasDataType     = (typeAndFlags & 0x200) != 0;
 							const bool hasOpcodeFlags  = (typeAndFlags & 0x400) != 0;
-							const uint8 lineNumberBits = (uint8)(typeAndFlags >> 11) & 0x03;
+							const uint8 lineNumberBits = (uint8)(typeAndFlags >> 11) & 0x1f;
 
 							switch (parameterBits)
 							{
@@ -406,7 +446,7 @@ namespace lemon
 
 							opcode.mDataType = hasDataType ? (BaseType)serializer.read<uint8>() : BaseType::VOID;
 							opcode.mFlags = hasOpcodeFlags ? serializer.read<uint8>() : 0;
-							opcode.mLineNumber = (lineNumberBits == 3) ? serializer.read<uint32>() : (lastLineNumber + lineNumberBits);
+							opcode.mLineNumber = (lineNumberBits == 31) ? serializer.read<uint32>() : (lastLineNumber + lineNumberBits);
 							lastLineNumber = opcode.mLineNumber;
 						}
 
@@ -458,10 +498,9 @@ namespace lemon
 					{
 						// Load script function
 						const ScriptFunction& scriptFunc = static_cast<const ScriptFunction&>(function);
-						uint32 lastLineNumber = 0;
 
 						// Source information
-						serializer.write(scriptFunc.mSourceFilename);
+						serializer.writeAs<uint16>(scriptFunc.mSourceFileInfo->mIndex);
 						serializer.write(scriptFunc.mSourceBaseLineOffset);
 
 						// Opcodes
@@ -478,7 +517,7 @@ namespace lemon
 														(opcode.mParameter == (int64)(int32)opcode.mParameter) ? 5 : 6;
 							const bool hasDataType    = (opcode.mDataType != BaseType::VOID);
 							const bool hasOpcodeFlags = (opcode.mFlags != 0);
-							const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber <= lastLineNumber + 2) ? (opcode.mLineNumber - lastLineNumber) : 3;
+							const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber < lastLineNumber + 31) ? (opcode.mLineNumber - lastLineNumber) : 31;
 
 							const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | ((uint16)hasDataType * 0x200) | ((uint16)hasOpcodeFlags * 0x400) | ((uint16)lineNumberBits << 11);
 							serializer.write(typeAndFlags);
@@ -496,7 +535,7 @@ namespace lemon
 								serializer.writeAs<uint8>(opcode.mDataType);
 							if (hasOpcodeFlags)
 								serializer.write(opcode.mFlags);
-							if (lineNumberBits == 3)
+							if (lineNumberBits == 31)
 								serializer.write(opcode.mLineNumber);
 							lastLineNumber = opcode.mLineNumber;
 						}

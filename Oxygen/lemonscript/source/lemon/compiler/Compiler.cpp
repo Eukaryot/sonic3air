@@ -181,7 +181,7 @@ namespace lemon
 			const auto& translated = mLineNumberTranslation.translateLineNumber(e.mError.mLineNumber);
 			ErrorMessage& error = vectorAdd(mErrors);
 			error.mMessage = e.what();
-			error.mFilename = translated.mFilename;
+			error.mFilename = translated.mSourceFileInfo->mFilename;
 			error.mError = e.mError;
 			error.mError.mLineNumber = translated.mLineNumber + 1;	// Add one because line numbers always start at 1 for user display
 		}
@@ -214,8 +214,11 @@ namespace lemon
 			return false;
 		}
 
+		// Register source file at module
+		const SourceFileInfo& sourceFileInfo = mModule.addSourceFileInfo(basepath, filename);
+
 		// Update line number translation
-		mLineNumberTranslation.push((uint32)outLines.size() + 1, filename, 0);
+		mLineNumberTranslation.push((uint32)outLines.size() + 1, sourceFileInfo, 0);
 
 		// Split input into lines
 		std::vector<std::string_view> fileLines;
@@ -292,7 +295,7 @@ namespace lemon
 				// Update line number translation
 				//  -> Back to this file
 				const uint32 currentLineNumber = (uint32)outLines.size() + 1;
-				mLineNumberTranslation.push(currentLineNumber, filename, fileLineIndex);
+				mLineNumberTranslation.push(currentLineNumber, sourceFileInfo, fileLineIndex);
 			}
 			else
 			{
@@ -657,7 +660,7 @@ namespace lemon
 
 		// Set source metadata
 		const auto& translated = mLineNumberTranslation.translateLineNumber(lineNumber);
-		function.mSourceFilename = translated.mFilename;
+		function.mSourceFileInfo = translated.mSourceFileInfo;
 		function.mSourceBaseLineOffset = lineNumber - translated.mLineNumber;
 
 		return function;

@@ -28,17 +28,17 @@ namespace lemon
 			++index;
 
 		const Interval& interval = mIntervals[index];
-		result.mFilename = interval.mFilename;
+		result.mSourceFileInfo = interval.mSourceFileInfo;
 		result.mLineNumber = lineNumber - interval.mStartLineNumber + interval.mLineOffsetInFile;
 		return result;
 	}
 
-	void LineNumberTranslation::push(uint32 currentLineNumber, const std::wstring& filename, uint32 lineOffsetInFile)
+	void LineNumberTranslation::push(uint32 currentLineNumber, const SourceFileInfo& sourceFileInfo, uint32 lineOffsetInFile)
 	{
 		const bool updateLastEntry = (!mIntervals.empty() && mIntervals.back().mStartLineNumber == currentLineNumber);
 		Interval& interval = updateLastEntry ? mIntervals.back() : vectorAdd(mIntervals);
 		interval.mStartLineNumber = currentLineNumber;
-		interval.mFilename = filename;
+		interval.mSourceFileInfo = &sourceFileInfo;
 		interval.mLineOffsetInFile = lineOffsetInFile;
 	}
 }

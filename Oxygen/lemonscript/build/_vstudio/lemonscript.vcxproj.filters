@@ -269,6 +269,9 @@
     <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h">
       <Filter>lemon\utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\SourceFileInfo.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

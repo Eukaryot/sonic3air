@@ -123,7 +123,7 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionN
 	if (nullptr != outFunctionName)
 		*outFunctionName = location.mFunction->getName().getString();
 	if (nullptr != outFileName)
-		*outFileName = location.mFunction->mSourceFilename;
+		*outFileName = location.mFunction->mSourceFileInfo->mFilename;
 	if (nullptr != outLineNumber)
 		*outLineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	if (nullptr != outModuleName)
@@ -337,7 +337,7 @@ std::string LemonScriptRuntime::buildScriptLocationString(lemon::Runtime& runtim
 		return "";
 
 	const std::string functionName(location.mFunction->getName().getString());
-	const std::wstring& fileName = location.mFunction->mSourceFilename;
+	const std::wstring& fileName = location.mFunction->mSourceFileInfo->mFilename;
 	const uint32 lineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	const std::string& moduleName = location.mFunction->getModule().getModuleName();
 	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";	return std::string();

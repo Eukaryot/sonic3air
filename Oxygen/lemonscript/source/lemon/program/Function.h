@@ -9,6 +9,7 @@
 #pragma once
 
 #include "lemon/program/Opcode.h"
+#include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/Variable.h"
 #include "lemon/utility/FlyweightString.h"
 
@@ -114,7 +115,7 @@ namespace lemon
 		std::vector<std::string> mPragmas;
 
 		// Source
-		std::wstring mSourceFilename;
+		const SourceFileInfo* mSourceFileInfo = nullptr;
 		uint32 mStartLineNumber = 0;
 		uint32 mSourceBaseLineOffset = 0;	// Offset translating from the full line number (when all includes are fully resolved) to line number inside the original script file
 

@@ -12,6 +12,7 @@
 #include "lemon/program/ConstantArray.h"
 #include "lemon/program/Define.h"
 #include "lemon/program/Function.h"
+#include "lemon/program/SourceFileInfo.h"
 #include "lemon/program/StringRef.h"
 #include <unordered_map>
 
@@ -39,6 +40,8 @@ namespace lemon
 		void startCompiling(const GlobalsLookup& globalsLookup);
 
 		void dumpDefinitionsToScriptFile(const std::wstring& filename);
+
+		const SourceFileInfo& addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename);
 
 		// Preprocessor definitions
 		void registerNewPreprocessorDefinitions(PreprocessorDefinitionMap& preprocessorDefinitions);
@@ -120,6 +123,8 @@ namespace lemon
 
 		// Misc
 		uint64 mCompiledCodeHash = 0;
+		ObjectPool<SourceFileInfo> mSourceFileInfoPool;
+		std::vector<SourceFileInfo*> mAllSourceFiles;
 	};
 
 }

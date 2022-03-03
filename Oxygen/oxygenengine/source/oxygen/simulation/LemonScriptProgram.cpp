@@ -528,7 +528,7 @@ void LemonScriptProgram::resolveLocation(const lemon::Function& function, uint32
 		const lemon::ScriptFunction& scriptFunc = static_cast<const lemon::ScriptFunction&>(function);
 		if (programCounter < scriptFunc.mOpcodes.size())
 		{
-			scriptFilename = *WString(scriptFunc.mSourceFilename).toString();
+			scriptFilename = *WString(scriptFunc.mSourceFileInfo->mFilename).toString();
 			lineNumber = scriptFunc.mOpcodes[programCounter].mLineNumber - scriptFunc.mSourceBaseLineOffset + 1;
 		}
 		else
