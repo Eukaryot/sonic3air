@@ -40,7 +40,7 @@ namespace
 }
 
 
-void DebugSidePanel::Builder::addLine(const String& text, const Color& color, int intend, uint64 key, int lineSpacing)
+DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addLine(const String& text, const Color& color, int intend, uint64 key, int lineSpacing)
 {
 	TextLine& textLine = vectorAdd(mTextLines);
 	textLine.mText = text;
@@ -48,9 +48,10 @@ void DebugSidePanel::Builder::addLine(const String& text, const Color& color, in
 	textLine.mIntend = intend;
 	textLine.mKey = key;
 	textLine.mLineSpacing = lineSpacing;
+	return textLine;
 }
 
-void DebugSidePanel::Builder::addOption(const String& text, bool value, const Color& color, int intend, uint64 key, int lineSpacing)
+DebugSidePanel::Builder::TextLine& DebugSidePanel::Builder::addOption(const String& text, bool value, const Color& color, int intend, uint64 key, int lineSpacing)
 {
 	TextLine& textLine = vectorAdd(mTextLines);
 	textLine.mText = text;
@@ -59,6 +60,7 @@ void DebugSidePanel::Builder::addOption(const String& text, bool value, const Co
 	textLine.mKey = key;
 	textLine.mLineSpacing = lineSpacing;
 	textLine.mOptionValue = value ? 1 : 0;
+	return textLine;
 }
 
 void DebugSidePanel::Builder::addSpacing(int lineSpacing)
@@ -470,8 +472,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					{
 						if (visualizationSorting)
 						{
-							const std::wstring& filenameA = (a.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(a.second)->mSourceFilename : L"";
-							const std::wstring& filenameB = (b.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(b.second)->mSourceFilename : L"";
+							const std::wstring& filenameA = (a.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(a.second)->mSourceFileInfo->mFilename : L"";
+							const std::wstring& filenameB = (b.second->getType() == lemon::Function::Type::SCRIPT) ? static_cast<const lemon::ScriptFunction*>(b.second)->mSourceFileInfo->mFilename : L"";
 							if (filenameA != filenameB)
 							{
 								return (filenameA < filenameB);
@@ -490,7 +492,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 				for (const auto& pair : sortedFunctions)
 				{
-					const String filename = (pair.second->getType() == lemon::Function::Type::SCRIPT) ? WString(static_cast<const lemon::ScriptFunction*>(pair.second)->mSourceFilename).toString() : "";
+					const String filename = (pair.second->getType() == lemon::Function::Type::SCRIPT) ? WString(static_cast<const lemon::ScriptFunction*>(pair.second)->mSourceFileInfo->mFilename).toString() : "";
 					String line;
 					if (visualizationSorting && !filename.empty())
 						line << filename << " | ";
@@ -598,10 +600,11 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					{
 						const auto& hit = watch.mHits[hitIndex];
 						const uint64 key = ((uint64)watch.mAddress << 32) + hitIndex;
+						Builder::TextLine* textLine;
 						if (watch.mBytes <= 4)
-							builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch.mBytes * 2).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch.mBytes * 2).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
 						else
-							builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
 
 						if (category.mOpenKeys.count(key) != 0)
 						{
