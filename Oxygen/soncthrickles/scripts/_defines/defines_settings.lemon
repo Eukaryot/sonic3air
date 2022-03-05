@@ -37,7 +37,7 @@ constant u32 SETTING_SHIELD_TYPES				= 0x00001401	// Shields: 0 = Classic, 1 = E
 
 // Level-specific gameplay settings
 constant u32 SETTING_AIZ_BLIMPSEQUENCE			= 0x00010101	// Different pattern for AIZ 2 blimp bombing
-constant u32 SETTING_AIZ_INTRO_KNUCKLES			= 0x00010301	// AIZ 1 intro for Knuckles -- under construction, so it's off for now
+constant u32 SETTING_AIZ_INTRO_KNUCKLES			= 0x00010301	// AIZ 1 intro for Knuckles
 constant u32 SETTING_HCZ_WATERPIPE				= 0x00020101	// Character stays visible in tube
 constant u32 SETTING_LBZ_TUBETRANSPORT			= 0x00060101	// Faster tube transport start/end
 constant u32 SETTING_LBZ_CUPELEVATOR			= 0x00060201	// Allow jump moves when jumping out of cup elevator
