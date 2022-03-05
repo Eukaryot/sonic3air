@@ -68,6 +68,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::TAILS_FLIGHT_CANCEL,		SharedDatabase::Setting::SETTING_CANCEL_FLIGHT);
 		setupOptionEntry(option::NO_CONTROL_LOCK,			SharedDatabase::Setting::SETTING_NO_CONTROL_LOCK);
 		setupOptionEntry(option::HYPER_TAILS,				SharedDatabase::Setting::SETTING_HYPER_TAILS);
+		setupOptionEntry(option::MAINTAIN_SHIELDS,			SharedDatabase::Setting::SETTING_MAINTAIN_SHIELDS);
 		setupOptionEntry(option::SHIELD_TYPES,				SharedDatabase::Setting::SETTING_SHIELD_TYPES);
 		setupOptionEntry(option::BUBBLE_SHIELD_BOUNCE,		SharedDatabase::Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
 		setupOptionEntry(option::SUPER_CANCEL,				SharedDatabase::Setting::SETTING_SUPER_CANCEL);
@@ -456,6 +457,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<OptionsMenuEntry>().initEntry("Lava Reef Act 2 Boss:", option::LRZ2_BOSS)
 			.addOption("8 hits", 1)
 			.addOption("14 hits (original)", 0);
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Keep Shield after Zone:", option::MAINTAIN_SHIELDS)
+			.addOption("Disabled", 0)
+			.addOption("Enabled", 1);
 
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Time Attack");
