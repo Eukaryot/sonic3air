@@ -403,7 +403,6 @@ function void LevelObjectTableBuilder.buildObjects_DEZ1()
 
 	if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
 	{
-		// TODO: This spring is not rendered correctly (they only are in Act 2)
 		LevelObjectTableBuilder.addObject(0x21b0, 0x0ad0, OBJECTTABLE2_5d, 0x00, LVLOBJ_FLIP_X)
 	}
 
