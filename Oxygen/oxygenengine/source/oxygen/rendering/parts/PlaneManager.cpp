@@ -220,6 +220,11 @@ const uint16* PlaneManager::getPlaneDataInVRAM(int planeIndex) const
 	return (const uint16*)(EmulatorInterface::instance().getVRam() + getPlaneBaseVRAMAddress(planeIndex));
 }
 
+size_t PlaneManager::getPlaneSizeInVRAM(int planeIndex) const
+{
+	return (size_t)(mPlayfieldSize.x * mPlayfieldSize.y * 2);
+}
+
 uint16 PlaneManager::getPatternVRAMAddress(int planeIndex, uint16 patternIndex) const
 {
 	return getPlaneBaseVRAMAddress(planeIndex) + patternIndex * 2;

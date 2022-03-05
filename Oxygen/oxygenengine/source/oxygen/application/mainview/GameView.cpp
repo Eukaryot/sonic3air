@@ -507,10 +507,11 @@ void GameView::update(float timeElapsed)
 			if (mDebugOutput >= 0)
 			{
 				// Get the mouse position inside the debug output
+				PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
 				Rectf rect;
 				if (mDebugOutput <= PlaneManager::PLANE_A)
 				{
-					const Vec2i playfieldSize = VideoOut::instance().getRenderParts().getPlaneManager().getPlayfieldSizeInPixels();
+					const Vec2i playfieldSize = planeManager.getPlayfieldSizeInPixels();
 					rect = RenderUtils::getLetterBoxRect(mRect, (float)playfieldSize.x / (float)playfieldSize.y);
 				}
 				else
@@ -525,8 +526,8 @@ void GameView::update(float timeElapsed)
 					LogDisplay::instance().updateScriptLogValue("~index", rmx::hexString(index, 4));
 					if (mDebugOutput < 2)
 					{
-						const uint16 address = VideoOut::instance().getRenderParts().getPlaneManager().getPatternVRAMAddress(mDebugOutput, index);
-						const uint16 pattern = VideoOut::instance().getRenderParts().getPlaneManager().getPatternAtIndex(mDebugOutput, index);
+						const uint16 address = planeManager.getPatternVRAMAddress(mDebugOutput, index);
+						const uint16 pattern = planeManager.getPatternAtIndex(mDebugOutput, index);
 						LogDisplay::instance().updateScriptLogValue("~addr", rmx::hexString(address, 4));
 						LogDisplay::instance().updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
 					}

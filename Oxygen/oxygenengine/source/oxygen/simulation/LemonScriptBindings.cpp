@@ -526,13 +526,15 @@ namespace
 		RMX_CHECK((bytes & 1) == 0, "Number of bytes in VDP_copyToVRAM must be divisible by two, but is " << bytes, bytes &= 0xfffe);
 		RMX_CHECK(uint32(mWriteAddress) + bytes <= 0x10000, "Invalid VRAM access from " << rmx::hexString(mWriteAddress, 8) << " to " << rmx::hexString(mWriteAddress+bytes-1, 8) << " in VDP_copyToVRAM", return);
 
-		if (nullptr != gDebugNotificationInterface)
-			gDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
-
 		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 		if (mWriteIncrement == 2)
 		{
 			// Optimized version of the code below
+			if (nullptr != gDebugNotificationInterface)
+			{
+				gDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
+			}
+
 			uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);
 			const uint16* src = (uint16*)(emulatorInterface.getMemoryPointer(address, false, bytes));
 			const uint16* end = src + (bytes / 2);
@@ -544,6 +546,12 @@ namespace
 		}
 		else
 		{
+			if (nullptr != gDebugNotificationInterface)
+			{
+				for (uint16 i = 0; i < bytes; i += 2)
+					gDebugNotificationInterface->onVRAMWrite(mWriteAddress + mWriteIncrement * i/2, 2);
+			}
+
 			for (uint16 i = 0; i < bytes; i += 2)
 			{
 				uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);

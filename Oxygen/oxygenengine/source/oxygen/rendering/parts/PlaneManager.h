@@ -57,6 +57,7 @@ public:
 
 	uint16 getPlaneBaseVRAMAddress(int planeIndex) const;
 	const uint16* getPlaneDataInVRAM(int planeIndex) const;
+	size_t getPlaneSizeInVRAM(int planeIndex) const;
 
 	uint16 getPatternVRAMAddress(int planeIndex, uint16 patternIndex) const;
 	uint16 getPatternAtIndex(int planeIndex, uint16 patternIndex) const;

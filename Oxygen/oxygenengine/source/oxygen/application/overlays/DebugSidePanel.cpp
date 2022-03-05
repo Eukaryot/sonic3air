@@ -14,6 +14,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/video/VideoOut.h"
+#include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
@@ -606,6 +607,24 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						else
 							textLine = &builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
 
+						// Just a test
+					#if 0
+						if (key == category.mChangedKey)
+						{
+							std::string scriptFilename;
+							uint32 lineNumber;
+							codeExec.getLemonScriptProgram().resolveLocation(*hit.mLocation.mFunction, (uint32)hit.mLocation.mProgramCounter, scriptFilename, lineNumber);
+							textLine->mCodeLocation = "\"" + scriptFilename + "\":" + std::to_string(lineNumber);
+
+							// TODO: The script file name needs to contains the full file path for this to work, not just the file name itself
+							//  -> Maybe store a list of source files in the module?
+							//  -> Also, this only makes sense if the sources are available, i.e. not for modules loaded from a serialized binary file
+						#if defined(PLATFORM_WINDOWS)
+							::system(("code -r -g " + textLine->mCodeLocation).c_str());
+						#endif
+						}
+					#endif
+
 						if (category.mOpenKeys.count(key) != 0)
 						{
 							for (uint64 functionNameHash : hit.mCallStack)
@@ -807,14 +826,62 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 		case CATEGORY_VRAM_WRITES:
 		{
+			const PlaneManager& planeManager = VideoOut::instance().getRenderParts().getPlaneManager();
+			const uint16 startAddressPlaneA = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_A);
+			const uint16 startAddressPlaneB = planeManager.getPlaneBaseVRAMAddress(PlaneManager::PLANE_B);
+			const uint16 endAddressPlaneA = startAddressPlaneA + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_A);
+			const uint16 endAddressPlaneB = startAddressPlaneB + (uint16)planeManager.getPlaneSizeInVRAM(PlaneManager::PLANE_B);
+			const ScrollOffsetsManager& scrollOffsetsManager = VideoOut::instance().getRenderParts().getScrollOffsetsManager();
+			const uint16 startAddressScrollOffsets = scrollOffsetsManager.getHorizontalScrollTableBase();
+			const uint16 endAddressScrollOffsets = startAddressScrollOffsets + 0x200;
+
 			// Create a sorted list
 			std::vector<CodeExec::VRAMWrite*> writes = codeExec.getVRAMWrites();
 			std::sort(writes.begin(), writes.end(), [](const CodeExec::VRAMWrite* a, const CodeExec::VRAMWrite* b) { return a->mAddress < b->mAddress; } );
 
+			const bool showPlaneA = (category.mOpenKeys.count(0x1000000000000001) == 0);
+			const bool showPlaneB = (category.mOpenKeys.count(0x1000000000000002) == 0);
+			const bool showScroll = (category.mOpenKeys.count(0x1000000000000003) == 0);
+			const bool showOthers = (category.mOpenKeys.count(0x1000000000000004) == 0);
+
+			builder.addOption("Plane A", showPlaneA, Color::CYAN, 0, 0x1000000000000001);
+			builder.addOption("Plane B", showPlaneB, Color::CYAN, 0, 0x1000000000000002);
+			builder.addOption("Scroll Offsets", showScroll, Color::CYAN, 0, 0x1000000000000003);
+			builder.addOption("Patterns and others", showOthers, Color::CYAN, 0, 0x1000000000000004);
+			builder.addSpacing(12);
+
 			for (const CodeExec::VRAMWrite* write : writes)
 			{
 				const uint64 key = ((uint64)write->mAddress << 32) + write->mSize;
-				builder.addLine(String(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString().c_str()), Color::WHITE, 0, key);
+				String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString().c_str());
+				Color color = Color::WHITE;
+				if (write->mAddress >= startAddressPlaneA && write->mAddress < endAddressPlaneA)
+				{
+					if (!showPlaneA)
+						continue;
+					line = String("[Plane A] ") + line;
+					color = Color::fromABGR32(0xffc0ffff);
+				}
+				else if (write->mAddress >= startAddressPlaneB && write->mAddress < endAddressPlaneB)
+				{
+					if (!showPlaneB)
+						continue;
+					line = String("[Plane B] ") + line;
+					color = Color::fromABGR32(0xffffc0ff);
+				}
+				else if (write->mAddress >= startAddressScrollOffsets && write->mAddress < endAddressScrollOffsets)
+				{
+					if (!showScroll)
+						continue;
+					line = String("[Scroll Offsets] ") + line;
+					color = Color::fromABGR32(0xffffffc0);
+				}
+				else
+				{
+					if (!showOthers)
+						continue;
+				}
+				builder.addLine(line, color, 0, key);
 
 				if (category.mOpenKeys.count(key) != 0)
 				{
