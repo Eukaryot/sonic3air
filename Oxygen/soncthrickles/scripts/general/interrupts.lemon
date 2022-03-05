@@ -251,7 +251,7 @@ function void VInt.Update.MainGame()
 	VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
 	u16[0xfffff640] = 0x83
 
-	// Update sprite attrribute data in VRAM
+	// Update sprite attribute data in VRAM
 	u32 spriteDataSourceAddress = 0xfffff800
 	if (competition_mode.active)
 	{
