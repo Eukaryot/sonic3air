@@ -645,12 +645,21 @@ namespace lemon
 				{
 					const std::string_view functionName = serializer.readStringView();
 					const uint64 nameHash = rmx::getMurmur2_64(functionName);
-					const uint32 signatureHash = serializer.read<uint32>();
+					uint32 signatureHash = serializer.read<uint32>();
 					const Function* function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
+				#if 1
+					// This is only added (in early 2022) for compatibility with older save states and can be removed again somewhere down the line
+					if (nullptr == function && signatureHash == 0xd202ef8d)		// Signature hash for void functions has changed
+					{
+						signatureHash = 0x76e88724;
+						function = mProgram->getFunctionBySignature(nameHash + signatureHash, 0);	// Note that this does not support function overloading, but maybe that's no problem at all
+					}
+				#endif
 					if (nullptr == function || function->getType() != Function::Type::SCRIPT)
 					{
 						if (nullptr != outError)
 							*outError = "Could not match function signature for script function of name '" + std::string(functionName) + "'";
+						controlFlow.mCallStack.clear();
 						return false;
 					}
 					RuntimeFunction* runtimeFunction = getRuntimeFunction(static_cast<const ScriptFunction&>(*function));
