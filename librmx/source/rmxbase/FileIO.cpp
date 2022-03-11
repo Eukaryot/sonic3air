@@ -212,7 +212,8 @@ namespace rmx
 	bool FileIO::exists(std::wstring_view path)
 	{
 	#ifdef USE_STD_FILESYSTEM
-		return std_filesystem::exists(path);
+		std_filesystem::path fspath(path.data());
+		return std_filesystem::exists(fspath);
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::exists");
 		return false;
@@ -459,7 +460,8 @@ namespace rmx
 	void FileIO::setCurrentDirectory(std::wstring_view path)
 	{
 	#ifdef USE_STD_FILESYSTEM
-		std_filesystem::current_path(path);
+		std_filesystem::path fspath(path.data());
+		std_filesystem::current_path(fspath);
 	#endif
 	}
 
