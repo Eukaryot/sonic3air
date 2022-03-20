@@ -198,8 +198,6 @@ bool VideoOut::updateGameScreen()
 	// Render a new image
 	renderGameScreen();
 
-	mRenderParts->setEnforceClearScreen(false);
-
 	// Game screen got updated
 	return true;
 }

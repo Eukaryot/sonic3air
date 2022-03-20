@@ -55,6 +55,7 @@ void RenderParts::preFrameUpdate()
 	mPaletteManager.preFrameUpdate();
 	mSpriteManager.preFrameUpdate();
 	mScrollOffsetsManager.preFrameUpdate();
+	mEnforceClearScreen = false;
 }
 
 void RenderParts::postFrameUpdate()
