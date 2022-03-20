@@ -17,6 +17,47 @@ namespace lemon
 	{
 		static const std::vector<Function*> EMPTY_FUNCTIONS;
 		static const SourceFileInfo EMPTY_SOURCE_FILE_INFO;
+
+		static BaseType DEFAULT_OPCODE_BASETYPES[(size_t)Opcode::Type::_NUM_TYPES] =
+		{
+			BaseType::VOID,			// NOP
+			BaseType::VOID,			// MOVE_STACK
+			BaseType::VOID,			// MOVE_VAR_STACK
+			BaseType::INT_CONST,	// PUSH_CONSTANT
+			BaseType::VOID,			// DUPLICATE
+			BaseType::VOID,			// EXCHANGE
+			BaseType::UINT_32,		// GET_VARIABLE_VALUE
+			BaseType::UINT_32,		// SET_VARIABLE_VALUE
+			BaseType::UINT_8,		// READ_MEMORY
+			BaseType::UINT_8,		// WRITE_MEMORY
+			BaseType::VOID,			// CAST_VALUE
+			BaseType::VOID,			// MAKE_BOOL
+			BaseType::UINT_32,		// ARITHM_ADD
+			BaseType::UINT_32,		// ARITHM_SUB
+			BaseType::UINT_32,		// ARITHM_MUL
+			BaseType::UINT_32,		// ARITHM_DIV
+			BaseType::UINT_32,		// ARITHM_MOD
+			BaseType::UINT_8,		// ARITHM_AND
+			BaseType::UINT_8,		// ARITHM_OR
+			BaseType::UINT_8,		// ARITHM_XOR
+			BaseType::UINT_32,		// ARITHM_SHL
+			BaseType::UINT_32,		// ARITHM_SHR
+			BaseType::INT_CONST,	// ARITHM_NEG
+			BaseType::UINT_8,		// ARITHM_NOT
+			BaseType::UINT_8,		// ARITHM_BITNOT
+			BaseType::UINT_8,		// COMPARE_EQ
+			BaseType::UINT_8,		// COMPARE_NEQ
+			BaseType::UINT_8,		// COMPARE_LT
+			BaseType::UINT_8,		// COMPARE_LE
+			BaseType::UINT_8,		// COMPARE_GT
+			BaseType::UINT_8,		// COMPARE_GE
+			BaseType::UINT_32,		// JUMP
+			BaseType::UINT_32,		// JUMP_CONDITIONAL
+			BaseType::VOID,			// CALL
+			BaseType::VOID,			// RETURN
+			BaseType::VOID,			// EXTERNAL_CALL
+			BaseType::VOID,			// EXTERNAL_JUMP
+		};
 	}
 
 
@@ -429,7 +470,7 @@ namespace lemon
 
 							const uint8 parameterBits  = (uint8)(typeAndFlags >> 6) & 0x07;
 							const bool hasDataType     = (typeAndFlags & 0x200) != 0;
-							const bool hasOpcodeFlags  = (typeAndFlags & 0x400) != 0;
+							const bool isSequenceBreak = (typeAndFlags & 0x400) != 0;
 							const uint8 lineNumberBits = (uint8)(typeAndFlags >> 11) & 0x1f;
 
 							switch (parameterBits)
@@ -444,8 +485,22 @@ namespace lemon
 								case 6:  opcode.mParameter = serializer.read<int64>();	break;
 							}
 
-							opcode.mDataType = hasDataType ? (BaseType)serializer.read<uint8>() : BaseType::VOID;
-							opcode.mFlags = hasOpcodeFlags ? serializer.read<uint8>() : 0;
+							opcode.mDataType = hasDataType ? (BaseType)serializer.read<uint8>() : DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType];
+
+							// Load / rebuild the two opcode flags that are actually needed during run-time (see "OpcodeProcessor::buildOpcodeData")
+							opcode.mFlags = isSequenceBreak ? Opcode::Flag::SEQ_BREAK : 0;
+							switch (opcode.mType)
+							{
+								case Opcode::Type::JUMP:
+								case Opcode::Type::JUMP_CONDITIONAL:
+								case Opcode::Type::CALL:
+								case Opcode::Type::RETURN:
+								case Opcode::Type::EXTERNAL_CALL:
+								case Opcode::Type::EXTERNAL_JUMP:
+									opcode.mFlags |= Opcode::Flag::CTRLFLOW;
+									break;
+							}
+
 							opcode.mLineNumber = (lineNumberBits == 31) ? serializer.read<uint32>() : (lastLineNumber + lineNumberBits);
 							lastLineNumber = opcode.mLineNumber;
 						}
@@ -515,11 +570,11 @@ namespace lemon
 														(opcode.mParameter == (int64)(int8)opcode.mParameter)  ? 3 :
 														(opcode.mParameter == (int64)(int16)opcode.mParameter) ? 4 :
 														(opcode.mParameter == (int64)(int32)opcode.mParameter) ? 5 : 6;
-							const bool hasDataType    = (opcode.mDataType != BaseType::VOID);
-							const bool hasOpcodeFlags = (opcode.mFlags != 0);
+							const bool hasDataType     = (opcode.mDataType != DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType]);
+							const bool isSequenceBreak = (opcode.mFlags & Opcode::Flag::SEQ_BREAK) != 0;
 							const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber < lastLineNumber + 31) ? (opcode.mLineNumber - lastLineNumber) : 31;
 
-							const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | ((uint16)hasDataType * 0x200) | ((uint16)hasOpcodeFlags * 0x400) | ((uint16)lineNumberBits << 11);
+							const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | ((uint16)hasDataType * 0x200) | ((uint16)isSequenceBreak * 0x400) | ((uint16)lineNumberBits << 11);
 							serializer.write(typeAndFlags);
 
 							switch (parameterBits)
@@ -533,8 +588,6 @@ namespace lemon
 
 							if (hasDataType)
 								serializer.writeAs<uint8>(opcode.mDataType);
-							if (hasOpcodeFlags)
-								serializer.write(opcode.mFlags);
 							if (lineNumberBits == 31)
 								serializer.write(opcode.mLineNumber);
 							lastLineNumber = opcode.mLineNumber;
