@@ -457,7 +457,7 @@ namespace
 		{
 			case WriteTarget::VRAM:
 			{
-				result = *(uint16*)(EmulatorInterface::instance().getVRam() + mWriteAddress);
+				result = EmulatorInterface::instance().readVRam16(mWriteAddress);
 				break;
 			}
 
@@ -494,8 +494,7 @@ namespace
 				if (nullptr != gDebugNotificationInterface)
 					gDebugNotificationInterface->onVRAMWrite(mWriteAddress, 2);
 
-				uint16* dst = (uint16*)(EmulatorInterface::instance().getVRam() + mWriteAddress);
-				*dst = value;
+				EmulatorInterface::instance().writeVRam16(mWriteAddress, value);
 				break;
 			}
 
@@ -535,13 +534,7 @@ namespace
 				gDebugNotificationInterface->onVRAMWrite(mWriteAddress, bytes);
 			}
 
-			uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);
-			const uint16* src = (uint16*)(emulatorInterface.getMemoryPointer(address, false, bytes));
-			const uint16* end = src + (bytes / 2);
-			for (; src != end; ++src, ++dst)
-			{
-				*dst = swapBytes16(*src);
-			}
+			emulatorInterface.copyFromMemoryToVRam(mWriteAddress, address, bytes);
 			mWriteAddress += bytes;
 		}
 		else
@@ -554,8 +547,8 @@ namespace
 
 			for (uint16 i = 0; i < bytes; i += 2)
 			{
-				uint16* dst = (uint16*)(emulatorInterface.getVRam() + mWriteAddress);
-				*dst = emulatorInterface.readMemory16(address);
+				const uint16 value = emulatorInterface.readMemory16(address);
+				EmulatorInterface::instance().writeVRam16(mWriteAddress, value);
 				mWriteAddress += mWriteIncrement;
 				address += 2;
 			}
@@ -569,12 +562,7 @@ namespace
 		if (nullptr != gDebugNotificationInterface)
 			gDebugNotificationInterface->onVRAMWrite(vramAddress, bytes);
 
-		uint16* dst = (uint16*)(EmulatorInterface::instance().getVRam() + vramAddress);
-		for (uint16 i = 0; i < bytes; i += 2)
-		{
-			*dst = fillValue;
-			++dst;
-		}
+		EmulatorInterface::instance().fillVRam(vramAddress, fillValue, bytes);
 		mWriteAddress = vramAddress + bytes;
 	}
 
@@ -684,12 +672,12 @@ namespace
 
 	uint16 getVRAM(uint16 vramAddress)
 	{
-		return *(uint16*)(&EmulatorInterface::instance().getVRam()[vramAddress]);
+		return EmulatorInterface::instance().readVRam16(vramAddress);
 	}
 
 	void setVRAM(uint16 vramAddress, uint16 value)
 	{
-		*(uint16*)(&EmulatorInterface::instance().getVRam()[vramAddress]) = value;
+		EmulatorInterface::instance().writeVRam16(vramAddress, value);
 	}
 
 

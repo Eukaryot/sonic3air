@@ -86,18 +86,19 @@ void main()
 	int atex = (patternIndex >> 9) & 0x30;
 #endif
 
-#ifdef USE_BUFFER_TEXTURES
-	int patternCacheLookupIndex = localX + localY * 8 + (patternIndex & 0x07ff) * 256;
-	int paletteIndex = atex + texelFetch(PatternCacheTexture, patternCacheLookupIndex).x;
-#else
 	int patternCacheLookupIndexX = localX + localY * 8;
-	#ifdef GL_ES
-		int patternCacheLookupIndexY = (patternIndex - int(patternIndex / 2048) * 2048);
-	#else
-		int patternCacheLookupIndexY = patternIndex & 0x07ff;
-	#endif
-	int paletteIndex = atex + int(texture(PatternCacheTexture, vec2((float(patternCacheLookupIndexX) + 0.5) / 256.0, (float(patternCacheLookupIndexY) + 0.5) / 2048.0)).x * 256.0);
+#ifdef GL_ES
+	int patternCacheLookupIndexY = (patternIndex - int(patternIndex / 2048) * 2048);
+#else
+	int patternCacheLookupIndexY = patternIndex & 0x07ff;
 #endif
+#ifdef USE_BUFFER_TEXTURES
+	int patternCacheLookupIndex = patternCacheLookupIndexX + patternCacheLookupIndexY * 64;
+	int paletteIndex = texelFetch(PatternCacheTexture, patternCacheLookupIndex).x;
+#else
+	int paletteIndex = int(texture(PatternCacheTexture, vec2((float(patternCacheLookupIndexX) + 0.5) / 64.0, (float(patternCacheLookupIndexY) + 0.5) / 2048.0)).x * 256.0);
+#endif
+	paletteIndex += atex;
 
 	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex) / 256.0, LocalOffset.z + 0.5));
 	color = vec4(AddedColor.rgb, 0.0) + color * TintColor;

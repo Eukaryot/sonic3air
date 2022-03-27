@@ -16,7 +16,8 @@
 
 void DebugDrawPlaneShader::initialize()
 {
-	FileHelper::loadShader(mShader, L"data/shader/debugdraw_plane.shader", "Standard");
+	const std::string additionalDefines = BufferTexture::supportsBufferTextures() ? "USE_BUFFER_TEXTURES" : "";
+	FileHelper::loadShader(mShader, L"data/shader/debugdraw_plane.shader", "Standard", additionalDefines);
 
 	mLocPlayfieldSize	= mShader.getUniformLocation("PlayfieldSize");
 	mLocIndexTex		= mShader.getUniformLocation("IndexTexture");

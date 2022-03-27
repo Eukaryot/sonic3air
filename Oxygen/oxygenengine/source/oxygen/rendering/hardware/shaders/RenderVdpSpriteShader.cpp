@@ -17,7 +17,7 @@
 
 void RenderVdpSpriteShader::initialize()
 {
-	std::string additionalDefines = BufferTexture::supportsBufferTextures() ? "USE_BUFFER_TEXTURES" : "";
+	const std::string additionalDefines = BufferTexture::supportsBufferTextures() ? "USE_BUFFER_TEXTURES" : "";
 	FileHelper::loadShader(mShader, L"data/shader/render_sprite_vdp.shader", "Standard", additionalDefines);
 }
 

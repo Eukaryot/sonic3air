@@ -41,7 +41,7 @@ public:
 	// Patterns
 	PaletteBitmap mPatternCacheBitmap;
 	BufferTexture mPatternCacheTexture;
-	bool mDirtyPattern[0x800] = { true };
+	bool mAllPatternsDirty = true;
 
 	// Planes
 	BufferTexture mPlanePatternsTexture[4];

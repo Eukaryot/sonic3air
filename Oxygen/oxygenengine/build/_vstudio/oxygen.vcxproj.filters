@@ -739,6 +739,9 @@
     <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h">
       <Filter>resources</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\ChangeBitSet.h">
+      <Filter>helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />

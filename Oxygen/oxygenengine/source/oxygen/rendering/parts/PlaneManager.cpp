@@ -129,7 +129,7 @@ void PlaneManager::refresh()
 
 			default:
 			{
-				const uint16* src = accessPlaneContent(index);
+				const uint16* src = getPlaneContent(index);
 				memcpy(buffer, src, numPatterns * sizeof(uint16));
 				if (isDeveloperMode)
 				{
@@ -237,20 +237,15 @@ uint16 PlaneManager::getPatternAtIndex(int planeIndex, uint16 patternIndex) cons
 		if (planeIndex == PLANE_DEBUG)
 			return patternIndex;
 	}
-	return *accessPlaneContent(planeIndex, patternIndex);
+	return *getPlaneContent(planeIndex, patternIndex);
 }
 
 void PlaneManager::setPatternAtIndex(int planeIndex, uint16 patternIndex, uint16 value)
 {
-	*accessPlaneContent(planeIndex, patternIndex) = value;
+	EmulatorInterface::instance().writeVRam16(getPatternVRAMAddress(planeIndex, patternIndex), value);
 }
 
-uint16* PlaneManager::accessPlaneContent(int planeIndex, uint16 patternIndex)
-{
-	return (uint16*)(EmulatorInterface::instance().getVRam() + getPatternVRAMAddress(planeIndex, patternIndex));
-}
-
-const uint16* PlaneManager::accessPlaneContent(int planeIndex, uint16 patternIndex) const
+const uint16* PlaneManager::getPlaneContent(int planeIndex, uint16 patternIndex) const
 {
 	return (uint16*)(EmulatorInterface::instance().getVRam() + getPatternVRAMAddress(planeIndex, patternIndex));
 }

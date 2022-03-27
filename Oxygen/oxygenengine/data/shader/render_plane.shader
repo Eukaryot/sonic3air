@@ -154,22 +154,24 @@ void main()
 
 #ifdef GL_ES
 	int atex = int((patternIndexH - int(patternIndexH / 0x80) * 0x80) / 0x20) * 0x10;
-	int flipVariation = int((patternIndexH - int(patternIndexH / 0x20) * 0x20) / 8);
+	localX = ((patternIndexH - int(patternIndexH / 0x10) * 0x10) < 0x08) ? localX : (7 - localX);
+	localY = ((patternIndexH - int(patternIndexH / 0x20) * 0x20) < 0x10) ? localY : (7 - localY);
 #else
 	int atex = (patternIndex >> 9) & 0x30;
-	int flipVariation = (patternIndex >> 11) & 0x03;
+	localX = ((patternIndex & 0x0800) == 0) ? localX : (7 - localX);
+	localY = ((patternIndex & 0x1000) == 0) ? localY : (7 - localY);
 #endif
 
-	int patternCacheLookupIndexX = localX + localY * 8 + flipVariation * 64;
+	int patternCacheLookupIndexX = localX + localY * 8;
 #ifdef GL_ES
 	int patternCacheLookupIndexY = patternIndexL + (patternIndexH - int(patternIndexH / 8) * 8) * 0x100;
 #else
 	int patternCacheLookupIndexY = patternIndex & 0x07ff;
 #endif
 #ifdef USE_BUFFER_TEXTURES
-	int paletteIndex = texelFetch(PatternCacheTexture, patternCacheLookupIndexX + patternCacheLookupIndexY * 256).x;
+	int paletteIndex = texelFetch(PatternCacheTexture, patternCacheLookupIndexX + patternCacheLookupIndexY * 64).x;
 #else
-	int paletteIndex = int(texture(PatternCacheTexture, vec2((float(patternCacheLookupIndexX) + 0.5) / 256.0, (float(patternCacheLookupIndexY) + 0.5) / 2048.0)).x * 256.0);
+	int paletteIndex = int(texture(PatternCacheTexture, vec2((float(patternCacheLookupIndexX) + 0.5) / 64.0, (float(patternCacheLookupIndexY) + 0.5) / 2048.0)).x * 256.0);
 #endif
 	paletteIndex += atex;
 

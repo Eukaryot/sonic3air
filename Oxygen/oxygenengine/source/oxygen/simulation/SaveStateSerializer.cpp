@@ -128,6 +128,8 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 		// RAM and VRAM
 		serializer.serialize(emulatorInterface.getRam(), 0x10000);
 		serializer.serialize(emulatorInterface.getVRam(), 0x10000);
+		if (serializer.isReading())
+			emulatorInterface.getVRamChangeBits().setAllBits();
 
 		// Shared memory
 		if (formatVersion >= 3)
@@ -281,6 +283,8 @@ bool SaveStateSerializer::readGensxState(VectorBinarySerializer& serializer)
 
 		// Load VRAM
 		serializer.serialize(emulatorInterface.getVRam(), 0x10000);
+		if (serializer.isReading())
+			emulatorInterface.getVRamChangeBits().setAllBits();
 
 		// Load CRAM
 		{

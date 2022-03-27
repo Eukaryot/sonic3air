@@ -18,24 +18,24 @@ namespace
 	#if !defined(RMX_USE_GLES2)
 		if (BufferTexture::supportsBufferTextures())
 		{
-			const int offset = firstPattern * 0x100;
-			const int size = (lastPattern - firstPattern + 1) * 0x100;
+			const int offset = firstPattern * 0x40;
+			const int size = (lastPattern - firstPattern + 1) * 0x40;
 			glBufferSubData(GL_TEXTURE_BUFFER, offset, size, bitmap.mData + offset);
 		}
 		else
 	#endif
 		{
-			// Is it the full image, or at last almost?
+			// Is it the full image, or at least most of it?
 			if (lastPattern - firstPattern >= 0x700)
 			{
 				// Update the whole texture
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0x100, 0x800, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap.mData);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 0x40, 0x800, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap.mData);
 			}
 			else
 			{
 				// Update only the changed lines
 				//  -> There's exactly one patterns per texture row
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, firstPattern, 0x100, (lastPattern - firstPattern + 1), GL_LUMINANCE, GL_UNSIGNED_BYTE, &bitmap.mData[firstPattern * 0x100]);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, firstPattern, 0x40, (lastPattern - firstPattern + 1), GL_LUMINANCE, GL_UNSIGNED_BYTE, &bitmap.mData[firstPattern * 0x40]);
 			}
 		}
 	}
@@ -59,8 +59,8 @@ void HardwareRenderResources::initialize()
 
 	// Patterns
 	{
-		mPatternCacheBitmap.create(0x100, 0x800);
-		mPatternCacheTexture.create(BufferTexture::PixelFormat::UINT_8, 0x100, 0x800);
+		mPatternCacheBitmap.create(0x40, 0x800);
+		mPatternCacheTexture.create(BufferTexture::PixelFormat::UINT_8, 0x40, 0x800);
 	}
 
 	// Planes & scrolling
@@ -109,6 +109,7 @@ void HardwareRenderResources::refresh()
 	{
 		PaletteBitmap& bitmap = mPatternCacheBitmap;
 		const PatternManager::CacheItem* patternCache = mRenderParts.getPatternManager().getPatternCache();
+		const ChangeBitSet<0x800>& patternChangeBits = mRenderParts.getPatternManager().getChangeBits();
 
 		mPatternCacheTexture.bindBuffer();
 		struct Range
@@ -122,31 +123,34 @@ void HardwareRenderResources::refresh()
 
 		for (int patternIndex = 0; patternIndex < 0x800; ++patternIndex)
 		{
-			// Skip all non-changed patterns
-			if (!patternCache[patternIndex].mChanged && !mDirtyPattern[patternIndex])
-				continue;
+			if (!mAllPatternsDirty)
+			{
+				// Skip all non-changed patterns
+				patternIndex = patternChangeBits.getNextSetBit(patternIndex);
+				if (patternIndex < 0)
+					break;
+			}
 
 			// Next collect as many successive changed patterns as possible
 			currentChanges.mFirst = patternIndex;
-			++patternIndex;
-			for (; patternIndex < 0x800; ++patternIndex)
+			if (mAllPatternsDirty)
 			{
-				if (!patternCache[patternIndex].mChanged && !mDirtyPattern[patternIndex])
-					break;
+				patternIndex = 0x800;
+			}
+			else
+			{
+				patternIndex = patternChangeBits.getNextClearedBit(patternIndex + 1);
+				if (patternIndex < 0)
+					patternIndex = 0x800;
 			}
 			currentChanges.mLast = patternIndex - 1;
 
 			// Update pattern data in bitmap for all changed patterns
 			for (int k = currentChanges.mFirst; k <= currentChanges.mLast; ++k)
 			{
-				uint8* dst = &bitmap.mData[k * 0x100];
-				for (int fv = 0; fv < 4; ++fv)
-				{
-					const uint8* src = patternCache[k].mFlipVariation[fv].mPixels;
-					memcpy(dst, src, 0x40);
-					dst += 0x40;
-				}
-				mDirtyPattern[k] = false;
+				const uint8* src = patternCache[k].mFlipVariation[0].mPixels;
+				uint8* dst = &bitmap.mData[k * 0x40];
+				memcpy(dst, src, 0x40);
 			}
 
 			// We got a new range of patterns to upload to GPU, but possibly also an old one
@@ -171,6 +175,7 @@ void HardwareRenderResources::refresh()
 				pendingChanges = currentChanges;
 			}
 		}
+		mAllPatternsDirty = false;
 
 		// Is there pending changes that need to be uploaded?
 		if (pendingChanges.valid())
@@ -221,8 +226,7 @@ void HardwareRenderResources::refresh()
 
 void HardwareRenderResources::setAllPatternsDirty()
 {
-	for (int patternIndex = 0; patternIndex < 0x800; ++patternIndex)
-		mDirtyPattern[patternIndex] = true;
+	mAllPatternsDirty = true;
 }
 
 const BufferTexture& HardwareRenderResources::getHScrollOffsetsTexture(int scrollOffsetsIndex) const

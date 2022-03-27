@@ -23,6 +23,7 @@ namespace emulatorinterface
 		uint8 mRom[0x400000] = { 0 };			// Up to 4 MB for the ROM
 		uint8 mRam[0x10000] = { 0 };			// 64 KB RAM
 		uint8 mVRam[0x10000] = { 0 };			// 64 KB Video RAM
+		ChangeBitSet<0x800> mVRamChangeBits;	// Each bit in there represents 32 bytes of VRAM; a bit is set if the respective part of VRAM got written
 		uint16 mVSRam[0x40] = { 0 };			// Buffer for vertical scroll offsets
 		uint8 mSharedMemory[0x100000] = { 0 };	// 1 MB of additional shared memory between script and C++ (usage similar to RAM, but not used by original code, obviously)
 		uint64 mSharedMemoryUsage = 0;			// Each bit represents 16 KB of shared memory and tells us if anything non-zero is written there at all
@@ -47,6 +48,8 @@ namespace emulatorinterface
 			}
 
 			memset(mRam, 0, sizeof(mRam));
+			memset(mVRam, 0, sizeof(mVRam));
+			mVRamChangeBits.setAllBits();		// Count all VRAM as changed
 			memset(mSharedMemory, 0, sizeof(mSharedMemory));
 			mSharedMemoryUsage = 0;
 			memset(mRegisters, 0, sizeof(mRegisters));
@@ -327,6 +330,56 @@ void EmulatorInterface::setFlagN(bool value)
 uint8* EmulatorInterface::getVRam()
 {
 	return mInternal.mVRam;
+}
+
+uint16 EmulatorInterface::readVRam16(uint16 vramAddress)
+{
+	return *(uint16*)(mInternal.mVRam + vramAddress);
+}
+
+void EmulatorInterface::writeVRam16(uint16 vramAddress, uint16 value)
+{
+	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
+	*dst = value;
+
+	// Mark as changed
+	mInternal.mVRamChangeBits.setBit(vramAddress >> 5);
+}
+
+void EmulatorInterface::fillVRam(uint16 vramAddress, uint16 fillValue, uint16 bytes)
+{
+	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
+	for (uint16 i = 0; i < bytes; i += 2)
+	{
+		*dst = fillValue;
+		++dst;
+	}
+
+	// Mark as changed
+	const size_t bitIndexStart = (vramAddress >> 5);
+	const size_t bitIndexEnd = ((vramAddress + bytes - 1) >> 5);
+	mInternal.mVRamChangeBits.setBitsInRange(bitIndexStart, bitIndexEnd);
+}
+
+void EmulatorInterface::copyFromMemoryToVRam(uint16 vramAddress, uint32 sourceAddress, uint16 bytes)
+{
+	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
+	const uint16* src = (uint16*)(mInternal.accessMemory<MEMORY_MODE_READ>(sourceAddress, bytes));
+	const uint16* end = src + (bytes / 2);
+	for (; src != end; ++src, ++dst)
+	{
+		*dst = swapBytes16(*src);
+	}
+
+	// Mark as changed
+	const size_t bitIndexStart = (vramAddress >> 5);
+	const size_t bitIndexEnd = ((vramAddress + bytes - 1) >> 5);
+	mInternal.mVRamChangeBits.setBitsInRange(bitIndexStart, bitIndexEnd);
+}
+
+ChangeBitSet<0x800>& EmulatorInterface::getVRamChangeBits()
+{
+	return mInternal.mVRamChangeBits;
 }
 
 uint16* EmulatorInterface::getVSRam()

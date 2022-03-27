@@ -78,8 +78,7 @@ public:
 	bool mAbstractionModeForPlaneA = false;
 
 private:
-	uint16* accessPlaneContent(int planeIndex, uint16 patternIndex = 0);
-	const uint16* accessPlaneContent(int planeIndex, uint16 patternIndex = 0) const;
+	const uint16* getPlaneContent(int planeIndex, uint16 patternIndex = 0) const;
 
 private:
 	PatternManager& mPatternManager;

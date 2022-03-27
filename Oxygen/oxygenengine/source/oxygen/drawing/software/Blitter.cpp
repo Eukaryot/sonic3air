@@ -199,7 +199,7 @@ namespace blitterinternal
 
 			if (sourceY == lastSourceY && nullptr != lastDestData)
 			{
-				// Just copy the content from the last line, as it's the contents again
+				// Just copy the content from the last line, as it's the same contents again
 				memcpy(destData, lastDestData, destRect.width * 4);
 			}
 			else
