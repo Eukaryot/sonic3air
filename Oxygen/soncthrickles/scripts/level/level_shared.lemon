@@ -213,6 +213,12 @@ function void UpdateScreenShake()
 			D0.u16 = level.framecounter & 0x3f
 			D1.u8 = u8[0x04f438 + D0.u16]
 		}
+
+	#if STANDALONE
+		// Reduce screen shake intensity on highest anti-flicker setting
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+			D1.s16 /= 2
+	#endif
 	}
 	camera.screenshake.offset = D1.s16
 }
@@ -237,17 +243,34 @@ function void Level.UpdateHyperKnucklesScreenShake()
 		else
 		{
 			--camera.hyper_knux_shake
-			camera.foreground.y.u16 += s8[0x04f424 + (camera.hyper_knux_shake & 0xff)] * 2/3
+			s16 shakeOffset = s8[0x04f424 + (camera.hyper_knux_shake & 0xff)] * 2/3
+
+			// Reduce screen shake intensity on highest anti-flicker setting
+			if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+				shakeOffset /= 2
+
+			camera.foreground.y.u16 += shakeOffset
 			if ((camera.hyper_knux_shake & 0xff00) == 0)
 				camera.hyper_knux_shake = 0
 		}
 	}
 	else
-#endif
+	{
+		--camera.hyper_knux_shake
+		s16 shakeOffset = s8[0x04f424 + camera.hyper_knux_shake]
+
+		// Reduce screen shake intensity on highest anti-flicker setting
+		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
+			shakeOffset /= 2
+
+		camera.foreground.x.u16 += shakeOffset
+	}
+#else
 	{
 		--camera.hyper_knux_shake
 		camera.foreground.x.u16 += s8[0x04f424 + camera.hyper_knux_shake]
 	}
+#endif
 }
 
 

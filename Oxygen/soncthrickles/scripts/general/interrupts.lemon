@@ -178,7 +178,15 @@ function void fn0007e0()
 #if STANDALONE
 function u16 VInt.getBlendFactorForScreenFlash()
 {
-	return min(u16(global.whiteflash_timeout + 1) * 0x60, 0xa0)
+	if (Game.getSetting(SETTING_GFX_ANTIFLICKER) <= 1)
+	{
+		return min(u16(global.whiteflash_timeout + 1) * 0x60, 0xa0)
+	}
+	else
+	{
+		// Heavily reduce flash intensity
+		return min(u16(global.whiteflash_timeout + 1) * 0x18, 0x28)
+	}
 }
 #endif
 
