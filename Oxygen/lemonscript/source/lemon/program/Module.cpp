@@ -499,6 +499,8 @@ namespace lemon
 								case Opcode::Type::EXTERNAL_JUMP:
 									opcode.mFlags |= Opcode::Flag::CTRLFLOW;
 									break;
+								default:
+									break;
 							}
 
 							opcode.mLineNumber = (lineNumberBits == 31) ? serializer.read<uint32>() : (lastLineNumber + lineNumberBits);
