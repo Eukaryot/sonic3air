@@ -21,7 +21,10 @@
 	// Game server
 	"GameServer":
 	{
-		"ServerAddress": "gameserver.sonic3air.org:21094-21095",
+		"ServerAddress": "gameserver.sonic3air.org",
+		"ServerPortUDP": "21094",		// Used by most platforms
+		"ServerPortTCP": "21095",		// Used only as a fallback for UDP
+		"ServerPortWSS": "21096",		// Used by the web version
 		"GhostSync":
 		{
 			"Enabled": "0",				// Enable the ghost sync feature by setting this to "1"

@@ -67,35 +67,10 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 		{
 			// General game server settings
 			JsonHelper gameServerHelper(gameServerJson);
-			std::string serverAddress;
-			if (gameServerHelper.tryReadString("ServerAddress", serverAddress))
-			{
-				// Setup default ports, they might be overwritten
-				mGameServer.mServerPortUDP = 21094;
-				mGameServer.mServerPortTCP = 21095;
-
-				const String str = serverAddress;
-				const int colonPosition = str.findChar(':', 0, +1);
-				if (colonPosition >= 0 && colonPosition < str.length())
-				{
-					mGameServer.mServerHostName = *str.getSubString(0, colonPosition);
-
-					const int hyphenPosition = str.findChar('-', colonPosition+1, +1);
-					if (hyphenPosition >= 0 && hyphenPosition < str.length())
-					{
-						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1, hyphenPosition-colonPosition-1).parseInt();
-						mGameServer.mServerPortTCP = str.getSubString(hyphenPosition+1).parseInt();
-					}
-					else
-					{
-						mGameServer.mServerPortUDP = str.getSubString(colonPosition+1).parseInt();
-					}
-				}
-				else
-				{
-					mGameServer.mServerHostName = *str;
-				}
-			}
+			gameServerHelper.tryReadString("ServerAddress", mGameServer.mServerHostName);
+			gameServerHelper.tryReadInt("ServerPortUDP", mGameServer.mServerPortUDP);
+			gameServerHelper.tryReadInt("ServerPortTCP", mGameServer.mServerPortTCP);
+			gameServerHelper.tryReadInt("ServerPortWSS", mGameServer.mServerPortWSS);
 
 			// Ghost sync settings
 			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];

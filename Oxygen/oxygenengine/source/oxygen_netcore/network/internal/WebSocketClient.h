@@ -36,6 +36,7 @@ private:
 
 private:
 	bool onWebSocketOpen(const EmscriptenWebSocketOpenEvent* webSocketEvent);
+	bool onWebSocketError(const EmscriptenWebSocketErrorEvent* webSocketEvent);
 	bool onWebSocketMessage(const EmscriptenWebSocketMessageEvent* webSocketEvent);
 
 private:

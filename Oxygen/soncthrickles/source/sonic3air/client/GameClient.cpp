@@ -14,10 +14,10 @@
 
 
 GameClient::GameClient() :
-#if defined(GAME_CLIENT_USE_TCP)
-	mConnectionManager(nullptr, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
-#else
+#if defined(GAME_CLIENT_USE_UDP)
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
+#else
+	mConnectionManager(nullptr, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
 #endif
 	mGhostSync(*this),
 	mUpdateCheck(*this)
@@ -41,7 +41,7 @@ void GameClient::setupClient()
 	{
 		Sockets::startupSockets();
 
-	#if !defined(GAME_CLIENT_USE_TCP)
+	#if defined(GAME_CLIENT_USE_UDP)
 		// Setup socket & connection manager
 		if (!mUDPSocket.bindToAnyPort())
 			RMX_ERROR("Socket bind to any port failed", return);
@@ -137,10 +137,12 @@ void GameClient::startConnectingToServer(uint64 currentTimestamp)
 		if (!Sockets::resolveToIP(config.mServerHostName, serverIP))
 			RMX_ERROR("Unable to resolve server URL " << config.mServerHostName, return);
 
-	#if defined(GAME_CLIENT_USE_TCP)
-		serverAddress.set(serverIP, (uint16)config.mServerPortTCP);
-	#else
+	#if defined(GAME_CLIENT_USE_UDP)
 		serverAddress.set(serverIP, (uint16)config.mServerPortUDP);
+	#elif defined(GAME_CLIENT_USE_TCP)
+		serverAddress.set(serverIP, (uint16)config.mServerPortTCP);
+	#elif defined(GAME_CLIENT_USE_WSS)
+		serverAddress.set(serverIP, (uint16)config.mServerPortWSS);
 	#endif
 	}
 

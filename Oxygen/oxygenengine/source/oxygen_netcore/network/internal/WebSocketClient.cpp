@@ -12,6 +12,13 @@
 #include "oxygen_netcore/network/NetConnection.h"
 
 
+namespace
+{
+	static const char* WEBSOCKET_PROTOCOL = "ws://";
+	//static const char* WEBSOCKET_PROTOCOL = "wss://";		// TODO: This is required for the web build when running on a https website
+}
+
+
 WebSocketClient::WebSocketClient(NetConnection& connection) :
 	mConnection(connection)
 {
@@ -46,7 +53,7 @@ bool WebSocketClient::connectTo(const SocketAddress& remoteAddress)
 	if (!emscripten_websocket_is_supported())
 		return false;
 
-	const std::string url = "ws://" + remoteAddress.getIP() + ":" + std::to_string(remoteAddress.getPort());
+	const std::string url = WEBSOCKET_PROTOCOL + remoteAddress.getIP() + ":" + std::to_string(remoteAddress.getPort());
 	EmscriptenWebSocketCreateAttributes attributes =
 	{
 		url.c_str(),
@@ -92,8 +99,7 @@ EM_BOOL WebSocketClient::webSocketOpenCallback(int eventType, const EmscriptenWe
 
 EM_BOOL WebSocketClient::webSocketErrorCallback(int eventType, const EmscriptenWebSocketErrorEvent* webSocketEvent, void* userData)
 {
-	// TODO: Implement this
-	return EM_TRUE;
+	return reinterpret_cast<WebSocketClient*>(userData)->onWebSocketError(webSocketEvent);
 }
 
 EM_BOOL WebSocketClient::webSocketCloseCallback(int eventType, const EmscriptenWebSocketCloseEvent* webSocketEvent, void* userData)
@@ -111,6 +117,12 @@ bool WebSocketClient::onWebSocketOpen(const EmscriptenWebSocketOpenEvent* webSoc
 {
 	RMX_LOG_INFO("onWebSocketOpen");
 	return mConnection.finishStartConnect();
+}
+
+bool WebSocketClient::onWebSocketError(const EmscriptenWebSocketErrorEvent* webSocketEvent)
+{
+	RMX_LOG_INFO("onWebSocketError");
+	return true;
 }
 
 bool WebSocketClient::onWebSocketMessage(const EmscriptenWebSocketMessageEvent* webSocketEvent)

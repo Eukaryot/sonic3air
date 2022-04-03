@@ -50,6 +50,7 @@ public:
 		std::string mServerHostName;
 		int mServerPortUDP = 0;
 		int mServerPortTCP = 0;
+		int mServerPortWSS = 0;
 		GhostSync mGhostSync;
 	};
 	GameServer mGameServer;
