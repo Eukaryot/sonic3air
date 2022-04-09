@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\source\oxygenserver\pch.h" />
+    <ClInclude Include="..\..\source\Shared.h">
+      <Filter>_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygenserver\subsystems\Channels.h">
+      <Filter>subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygenserver\server\Server.h">
+      <Filter>server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygenserver\server\ServerNetConnection.h">
+      <Filter>server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\PrivatePackets.h">
+      <Filter>_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygenserver\subsystems\VirtualDirectory.h">
+      <Filter>subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygenserver\Configuration.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\oxygenserver\main_server.cpp" />
+    <ClCompile Include="..\..\source\oxygenserver\pch.cpp" />
+    <ClCompile Include="..\..\source\oxygenserver\subsystems\Channels.cpp">
+      <Filter>subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygenserver\server\Server.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygenserver\server\ServerNetConnection.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygenserver\subsystems\VirtualDirectory.cpp">
+      <Filter>subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygenserver\Configuration.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="_shared">
+      <UniqueIdentifier>{2bf4508e-2bb1-4ab8-8ed6-a067a4aade8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="subsystems">
+      <UniqueIdentifier>{4e8bf536-cbc2-4861-b9a3-9d5553dc4cd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="server">
+      <UniqueIdentifier>{77fe760a-f82f-48f5-a91c-611793263c80}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

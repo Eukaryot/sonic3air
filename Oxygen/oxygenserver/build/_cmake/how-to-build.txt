@@ -1,0 +1,9 @@
+
+=== Build under Linux ===
+
+First make sure all packages are installed that are needed for building Sonic 3 A.I.R.
+
+Then setup and build with CMake:
+	- cd ./Oxygen/oxygenserver/source/_cmake/build
+	- cmake -DCMAKE_BUILD_TYPE=Release ..
+	- cmake --build .
