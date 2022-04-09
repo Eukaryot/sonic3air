@@ -32,11 +32,12 @@ namespace lemon
 		{
 			struct Block
 			{
-				bool mIgnored = false;
-				bool mInheritedIgnored = false;
+				bool mCondition = true;				// Whether the condition of this block is true, i.e. the block is going to be considered (if true) or ignored (if false)
+				bool mInheritedCondition = true;	// Set if the condition of all blocks above is true; not including this block's own condition
+				bool mCollapseParent = false;		// If set, removing this Block will also remove the parent block
 			};
 			std::vector<Block> mOpenBlocks;
-			inline bool shouldIgnoreContent() const  { return !mOpenBlocks.empty() && (mOpenBlocks.back().mIgnored || mOpenBlocks.back().mInheritedIgnored); }
+			inline bool shouldConsiderContent() const  { return mOpenBlocks.empty() || (mOpenBlocks.back().mCondition && mOpenBlocks.back().mInheritedCondition); }
 		};
 
 		BlockStack blockStack;
@@ -68,34 +69,51 @@ namespace lemon
 						if (rmx::startsWith(rest, "if ") && rest.length() >= 4)
 						{
 							const bool isTrue = evaluateConditionString(&rest[3], rest.length() - 3, parser);
-							const bool inheritedIgnored = (blockStack.mOpenBlocks.empty()) ? false : blockStack.mOpenBlocks.back().mIgnored;
+							const bool inheritedCondition = blockStack.shouldConsiderContent();
 							BlockStack::Block& block = vectorAdd(blockStack.mOpenBlocks);
-							block.mIgnored = !isTrue;
-							block.mInheritedIgnored = inheritedIgnored;
+							block.mCondition = isTrue;
+							block.mInheritedCondition = inheritedCondition;
 						}
 						else if (rmx::startsWith(rest, "else"))
 						{
 							CHECK_ERROR(!blockStack.mOpenBlocks.empty(), "Found no #if for #else", mLineNumber);
 							BlockStack::Block& block = blockStack.mOpenBlocks.back();
-							block.mIgnored = !block.mIgnored;
+							block.mCondition = !block.mCondition;
+						}
+						else if (rmx::startsWith(rest, "elif") && rest.length() >= 6)
+						{
+							CHECK_ERROR(!blockStack.mOpenBlocks.empty(), "Found no #if for #elif", mLineNumber);
+							BlockStack::Block& parentBlock = blockStack.mOpenBlocks.back();
+							parentBlock.mCondition = !parentBlock.mCondition;
+							const bool isTrue = evaluateConditionString(&rest[5], rest.length() - 5, parser);
+							const bool inheritedCondition = blockStack.shouldConsiderContent();
+							BlockStack::Block& block = vectorAdd(blockStack.mOpenBlocks);
+							block.mCondition = isTrue;
+							block.mInheritedCondition = inheritedCondition;
+							block.mCollapseParent = true;
 						}
 						else if (rmx::startsWith(rest, "endif"))
 						{
 							CHECK_ERROR(!blockStack.mOpenBlocks.empty(), "Found no #if for #endif", mLineNumber);
+							while (!blockStack.mOpenBlocks.empty() && blockStack.mOpenBlocks.back().mCollapseParent)
+							{
+								blockStack.mOpenBlocks.pop_back();
+							}
+							CHECK_ERROR(!blockStack.mOpenBlocks.empty(), "Something went wrong in evaluating #endif", mLineNumber);
 							blockStack.mOpenBlocks.pop_back();
 						}
-						else if (!blockStack.shouldIgnoreContent())
+						else if (blockStack.shouldConsiderContent())
 						{
 							if (rmx::startsWith(rest, "define ") && rest.length() >= 8)
 							{
-								if (!blockStack.shouldIgnoreContent())
+								if (blockStack.shouldConsiderContent())
 								{
 									processDefinition(&rest[7], rest.length() - 7, parser);
 								}
 							}
 							else if (rmx::startsWith(rest, "error ") && rest.length() >= 7)
 							{
-								if (!blockStack.shouldIgnoreContent())
+								if (blockStack.shouldConsiderContent())
 								{
 									CHECK_ERROR(false, rest.substr(6), mLineNumber);
 								}
@@ -124,7 +142,7 @@ namespace lemon
 			}
 
 			// Check if inside an ignored region
-			if (blockStack.shouldIgnoreContent())
+			if (!blockStack.shouldConsiderContent())
 			{
 				// Clear this line, it should be ignored by the parser
 				line = std::string_view();
