@@ -42,19 +42,25 @@ public:
 	virtual void render() override;
 
 	void startTransition(Target target);
+
 	void setPreviewZoneAndAct(uint8 zone, uint8 act, bool forceReset = false);
 	void showPreview(bool show, bool useTransition = true);
 
 	void openMainMenu();
 	void openActSelectMenu();
 	void openTimeAttackMenu();
-	void openOptions(bool noAnimation = false);
+	void openOptions(bool enteredInGame = false);
 	void openExtras();
 	void openMods();
+	void openGameStartedMenu();
 	void fadeToExit();
+
+	void setGameStartedMenu();
 
 private:
 	void openMenu(GameMenuBase& menu);
+	void skipTransition();
+	void updateTransition(float timeElapsed);
 	void updatePreview(float timeElapsed);
 
 private:
@@ -70,6 +76,7 @@ private:
 	ExtrasMenu* mExtrasMenu = nullptr;
 	ModsMenu* mModsMenu = nullptr;
 	GameMenuBase* mLastOpenedMenu = nullptr;
+	GameMenuBase* mGameStartedMenu = nullptr;
 
 	// Background
 	struct PreviewImage

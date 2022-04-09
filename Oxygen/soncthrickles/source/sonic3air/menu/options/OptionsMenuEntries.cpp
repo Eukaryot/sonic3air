@@ -185,14 +185,16 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 	}
 }
 
-void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext)
+void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 {
+	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
 	Drawer& drawer = *renderContext.mDrawer;
 	const int baseX = renderContext.mCurrentPosition.x;
 	int& py = renderContext.mCurrentPosition.y;
+	const float alpha = renderContext.mTabAlpha;
 
-	drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Your Game Version:", 4, Color::WHITE);
-	drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), "v" BUILD_STRING, 6, Color(0.8f, 1.0f, 0.8f));
+	drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Your Game Version:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
+	drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), "v" BUILD_STRING, 6, Color(0.8f, 1.0f, 0.8f, alpha));
 	py += 12;
 
 	UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
@@ -201,31 +203,31 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext)
 		case UpdateCheck::State::INACTIVE:
 		case UpdateCheck::State::FAILED:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color::RED);
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color(1.0f, 0.0f, 0.0f, alpha));
 			break;
 		}
 		case UpdateCheck::State::SEND_QUERY:
 		case UpdateCheck::State::WAITING_FOR_RESPONSE:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "No connection to server", 5, Color::WHITE);
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "No connection to server", 5, Color(1.0f, 1.0f, 1.0f, alpha));
 			break;
 		}
 		case UpdateCheck::State::HAS_RESPONSE:
 		{
 			if (updateCheck.hasUpdate())
 			{
-				drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Update available:", 4, Color::WHITE);
-				drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), getVersionString(updateCheck.getResponse()->mAvailableAppVersion), 6, Color(1.0f, 1.0f, 0.6f));
+				drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Update available:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
+				drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), getVersionString(updateCheck.getResponse()->mAvailableAppVersion), 6, Color(1.0f, 1.0f, 0.6f, alpha));
 			}
 			else
 			{
-				drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "You're using the latest version", 5, Color(0.8f, 1.0f, 0.8f));
+				drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "You're using the latest version", 5, Color(0.8f, 1.0f, 0.8f, alpha));
 			}
 			break;
 		}
 		default:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Last check for updates: unknown", 5, Color(1.0f, 1.0f, 1.0f));
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Last check for updates: unknown", 5, Color(1.0f, 1.0f, 1.0f, alpha));
 			break;
 		}
 	}

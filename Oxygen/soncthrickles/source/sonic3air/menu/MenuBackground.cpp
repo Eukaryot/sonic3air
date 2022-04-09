@@ -137,35 +137,7 @@ void MenuBackground::update(float timeElapsed)
 		mAnimationTimer -= 60.0f;
 
 	updatePreview(timeElapsed);
-
-	// Transitioning?
-	if (mInTransition)
-	{
-		mInTransition = false;
-
-		// Update layer movement
-		Layer* layers[3] = { &mLightLayer, &mBlueLayer, &mAlterLayer };
-		for (Layer* layer : layers)
-		{
-			if (layer->mDelay > 0.0f)
-			{
-				layer->mDelay = std::max(layer->mDelay - timeElapsed, 0.0f);
-				mInTransition = true;
-			}
-			else if (layer->mCurrentPosition != layer->mTargetPosition)
-			{
-				if (layer->mCurrentPosition < layer->mTargetPosition)
-				{
-					layer->mCurrentPosition = std::min(layer->mCurrentPosition + timeElapsed * layer->mMoveSpeed, layer->mTargetPosition);
-				}
-				else
-				{
-					layer->mCurrentPosition = std::max(layer->mCurrentPosition - timeElapsed * layer->mMoveSpeed, layer->mTargetPosition);
-				}
-				mInTransition = true;
-			}
-		}
-	}
+	updateTransition(timeElapsed);
 }
 
 void MenuBackground::render()
@@ -384,13 +356,20 @@ void MenuBackground::openTimeAttackMenu()
 	openMenu(*mTimeAttackMenu);
 }
 
-void MenuBackground::openOptions(bool noAnimation)
+void MenuBackground::openOptions(bool enteredInGame)
 {
 	openMenu(*mOptionsMenu);
 
-	if (noAnimation)
-		mOptionsMenu->onEnteredFromIngame();
-	showPreview(false, !noAnimation);
+	if (enteredInGame)
+	{
+		skipTransition();
+		if (nullptr == mGameStartedMenu)
+			mGameStartedMenu = mMainMenu;
+		mGameStartedMenu->setBaseState(GameMenuBase::BaseState::INACTIVE);
+	}
+
+	mOptionsMenu->setupOptionsMenu(enteredInGame);
+	showPreview(false, !enteredInGame);
 }
 
 void MenuBackground::openExtras()
@@ -403,9 +382,28 @@ void MenuBackground::openMods()
 	openMenu(*mModsMenu);
 }
 
+void MenuBackground::openGameStartedMenu()
+{
+	// Open either the menu that started the last in-game session (should be either the Main Menu, Act Select, Time Attack, or Extras)
+	if (nullptr != mGameStartedMenu && mGameStartedMenu != mMainMenu)
+	{
+		openMenu(*mGameStartedMenu);
+		skipTransition();
+	}
+	else
+	{
+		openMenu(*mMainMenu);
+	}
+}
+
 void MenuBackground::fadeToExit()
 {
 	startTransition(MenuBackground::Target::TITLE);
+}
+
+void MenuBackground::setGameStartedMenu()
+{
+	mGameStartedMenu = mLastOpenedMenu;
 }
 
 void MenuBackground::openMenu(GameMenuBase& menu)
@@ -418,6 +416,52 @@ void MenuBackground::openMenu(GameMenuBase& menu)
 	}
 
 	mLastOpenedMenu = &menu;
+}
+
+void MenuBackground::skipTransition()
+{
+	// Skip the transition entirely
+	if (mInTransition)
+	{
+		Layer* layers[3] = { &mLightLayer, &mBlueLayer, &mAlterLayer };
+		for (Layer* layer : layers)
+		{
+			layer->mDelay = 0.0f;
+			layer->mCurrentPosition = layer->mTargetPosition;
+		}
+		mInTransition = false;
+	}
+}
+
+void MenuBackground::updateTransition(float timeElapsed)
+{
+	if (mInTransition)
+	{
+		mInTransition = false;
+
+		// Update layer movement
+		Layer* layers[3] = { &mLightLayer, &mBlueLayer, &mAlterLayer };
+		for (Layer* layer : layers)
+		{
+			if (layer->mDelay > 0.0f)
+			{
+				layer->mDelay = std::max(layer->mDelay - timeElapsed, 0.0f);
+				mInTransition = true;
+			}
+			else if (layer->mCurrentPosition != layer->mTargetPosition)
+			{
+				if (layer->mCurrentPosition < layer->mTargetPosition)
+				{
+					layer->mCurrentPosition = std::min(layer->mCurrentPosition + timeElapsed * layer->mMoveSpeed, layer->mTargetPosition);
+				}
+				else
+				{
+					layer->mCurrentPosition = std::max(layer->mCurrentPosition - timeElapsed * layer->mMoveSpeed, layer->mTargetPosition);
+				}
+				mInTransition = true;
+			}
+		}
+	}
 }
 
 void MenuBackground::updatePreview(float timeElapsed)

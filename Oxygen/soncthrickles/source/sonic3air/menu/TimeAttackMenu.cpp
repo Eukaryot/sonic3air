@@ -97,6 +97,17 @@ GameMenuBase::BaseState TimeAttackMenu::getBaseState() const
 	}
 }
 
+void TimeAttackMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_MENU;  break;
+	}
+}
+
 void TimeAttackMenu::onFadeIn()
 {
 	mState = State::APPEAR;
@@ -320,6 +331,7 @@ void TimeAttackMenu::startGame()
 	const uint8 characters = clamp(mCharacterEntry->selected().mValue >> 4, 1, 3);
 	Game::instance().startIntoLevel(Game::Mode::TIME_ATTACK, mCharacterEntry->selected().mValue, mActEntry->selected().mValue, characters);
 	GameApp::instance().onStartGame();
+	mMenuBackground->setGameStartedMenu();
 
 	mMenuEntries.mSelectedEntryIndex = 0;
 }

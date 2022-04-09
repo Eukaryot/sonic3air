@@ -36,8 +36,9 @@ public:
 	void onStartGame();
 	void openTitleScreen();
 	void openMainMenu();
-	void openOptionsMenu(bool noBackgroundAnimation = false);
+	void openOptionsMenuInGame();
 	void onExitOptions();
+	void onFadedOutOptions();
 	void onExitExtras();
 	void onExitMods();
 	void onGamePaused(bool canRestart);

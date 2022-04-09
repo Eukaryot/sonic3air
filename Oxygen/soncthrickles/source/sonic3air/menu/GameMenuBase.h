@@ -81,7 +81,7 @@ public:
 	inline bool hasSelected() const  { return mSelectedIndex < mOptions.size(); }
 	inline const Option& selected() const  { return mOptions[mSelectedIndex]; }
 	bool setSelectedIndexByValue(uint32 value);
-	void sanitizeSelectedIndex();
+	bool sanitizeSelectedIndex(bool allowInvisibleEntries = false);
 
 protected:
 	virtual void renderEntry(RenderContext& renderContext) {}
@@ -145,7 +145,7 @@ public:
 	inline bool hasSelected() const  { return (mSelectedEntryIndex < (int)mEntries.size()); }
 	inline GameMenuEntry& selected()  { return *mEntries[mSelectedEntryIndex]; }
 	bool setSelectedIndexByValue(uint32 value);
-	void sanitizeSelectedIndex();
+	bool sanitizeSelectedIndex(bool allowNonInteractableEntries = false);
 
 private:
 	std::vector<GameMenuEntry*> mEntries;
@@ -173,6 +173,7 @@ public:
 	virtual void update(float timeElapsed) override;
 
 	virtual BaseState getBaseState() const { return BaseState::SHOW; }
+	virtual void setBaseState(BaseState baseState) {}
 	virtual void onFadeIn() {}
 	virtual bool canBeRemoved() { return false; }
 };

@@ -66,6 +66,17 @@ GameMenuBase::BaseState ModsMenu::getBaseState() const
 	}
 }
 
+void ModsMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_MENU;  break;
+	}
+}
+
 void ModsMenu::onFadeIn()
 {
 	mState = State::APPEAR;

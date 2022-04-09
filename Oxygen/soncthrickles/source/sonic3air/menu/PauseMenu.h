@@ -18,6 +18,7 @@ public:
 	~PauseMenu();
 
 	virtual BaseState getBaseState() const override;
+	virtual void setBaseState(BaseState baseState) override;
 	virtual void onFadeIn() override;
 	virtual bool canBeRemoved() override;
 

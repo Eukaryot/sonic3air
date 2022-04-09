@@ -664,7 +664,19 @@ GameMenuBase::BaseState OptionsMenu::getBaseState() const
 		case State::APPEAR:		   return BaseState::FADE_IN;
 		case State::SHOW:		   return BaseState::SHOW;
 		case State::FADE_TO_MENU:  return BaseState::FADE_OUT;
+		case State::FADE_TO_GAME:  return BaseState::FADE_OUT;
 		default:				   return BaseState::INACTIVE;
+	}
+}
+
+void OptionsMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_MENU;  break;
 	}
 }
 
@@ -821,6 +833,8 @@ void OptionsMenu::initialize()
 
 	// Fill gamepad lists
 	refreshGamepadLists(true);
+
+	mEnteredFromIngame = false;
 }
 
 void OptionsMenu::deinitialize()
@@ -1053,6 +1067,7 @@ void OptionsMenu::update(float timeElapsed)
 		mVisibility = saturate(mVisibility - timeElapsed * 6.0f);
 		if (mVisibility <= 0.0f)
 		{
+			GameApp::instance().onFadedOutOptions();
 			mState = State::INACTIVE;
 		}
 	}
@@ -1075,7 +1090,7 @@ void OptionsMenu::render()
 	int anchorX = 200;
 	int anchorY = 0;
 	float alpha = 1.0f;
-	if (mState != State::SHOW)
+	if (mState != State::SHOW && mState != State::FADE_TO_GAME)
 	{
 		anchorX += roundToInt((1.0f - mVisibility) * 300.0f);
 		alpha = mVisibility;
@@ -1119,10 +1134,28 @@ void OptionsMenu::render()
 
 					if (entry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE)
 					{
-						if (!isTitleShown(tabIndex, (int)line))
+						if (!isTitleShown(tabIndex, (int)line))		// TODO: This check might be obsolete now thanks to the else part below (but that needs to be tested first)
 						{
 							// Skip this title
 							continue;
+						}
+						else
+						{
+							// Automatically skip titles that don't have any real option below them
+							bool valid = false;
+							for (size_t nextLine = line + 1; nextLine < tab.mMenuEntries.size(); ++nextLine)
+							{
+								const GameMenuEntry& nextEntry = tab.mMenuEntries[nextLine];
+								if (nextEntry.getMenuEntryType() == TitleMenuEntry::MENU_ENTRY_TYPE || nextEntry.mData == option::_BACK)
+									break;
+								if (nextEntry.isFullyInteractable())
+								{
+									valid = true;
+									break;
+								}
+							}
+							if (!valid)
+								continue;
 						}
 					}
 
@@ -1190,6 +1223,17 @@ void OptionsMenu::render()
 			}
 		}
 
+		if (mEnteredFromIngame)
+		{
+			const Recti rect(0, 210, 400, 16);
+			drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
+			drawer.printText(global::mFont5, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+			drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
+			drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
+			drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
+			drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
+		}
+
 		drawer.performRendering();
 	}
 
@@ -1197,9 +1241,51 @@ void OptionsMenu::render()
 	GameMenuBase::render();
 }
 
-void OptionsMenu::onEnteredFromIngame()
+void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 {
-	// TODO: Disable options not available in-game
+	mEnteredFromIngame = enteredFromIngame;
+
+	// Hide options not available in-game
+	const int optionsHiddenIngame[] =
+	{
+		option::ANTI_FLICKER,
+		option::ICZ_NIGHTTIME,
+		option::MONITOR_STYLE,
+
+		option::LEVEL_LAYOUTS,
+		option::AIZ_BLIMPSEQUENCE,
+		option::LBZ_BIGARMS,
+		option::SOZ_GHOSTSPAWN,
+		option::LRZ2_BOSS,
+		option::TIMEATTACK_GHOSTS,
+		option::TIMEATTACK_INSTANTRESTART,
+
+		option::TITLE_SCREEN,
+		option::SHIELD_TYPES,
+		option::RANDOM_MONITORS,
+		option::RANDOM_SPECIALSTAGES,
+		option::SPECIAL_STAGE_REPEAT,
+		option::REGION,
+	};
+	for (int optionId : optionsHiddenIngame)
+	{
+		mOptionEntries[optionId].mGameMenuEntry->setVisible(!enteredFromIngame);
+	}
+	// TODO: This introduces some issues when the Mods options tab is active
+	//mTabMenuEntries[0].mOptions[Tab::Id::SYSTEM].mVisible = !enteredFromIngame;
+
+	// Corrections in case a now hidden entry was previously selected
+	{
+		mTabMenuEntries[0].sanitizeSelectedIndex();
+		mActiveTab = mTabMenuEntries[0].mSelectedIndex;
+		mActiveTabAnimated = (float)mActiveTab;
+
+		mTabs[mActiveTab].mMenuEntries.sanitizeSelectedIndex();
+		if (mTabs[mActiveTab].mMenuEntries.mSelectedEntryIndex == 0)
+		{
+			mActiveMenu = &mTabMenuEntries;
+		}
+	}
 }
 
 void OptionsMenu::removeControllerSetupMenu()
@@ -1326,5 +1412,5 @@ void OptionsMenu::goBack()
 	Configuration::instance().saveSettings();
 
 	GameApp::instance().onExitOptions();
-	mState = State::FADE_TO_MENU;
+	mState = mEnteredFromIngame ? State::FADE_TO_GAME : State::FADE_TO_MENU;
 }

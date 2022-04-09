@@ -102,12 +102,37 @@ bool GameMenuEntry::setSelectedIndexByValue(uint32 value)
 	return false;
 }
 
-void GameMenuEntry::sanitizeSelectedIndex()
+bool GameMenuEntry::sanitizeSelectedIndex(bool allowInvisibleEntries)
 {
 	if (mSelectedIndex >= mOptions.size())
 	{
-		mSelectedIndex = mOptions.empty() ? 0 : (mOptions.size() - 1);
+		if (mOptions.empty())
+			return false;
+
+		mSelectedIndex = mOptions.size() - 1;
 	}
+
+	if (!allowInvisibleEntries && !mOptions[mSelectedIndex].mVisible)
+	{
+		for (int index = (int)mSelectedIndex - 1; index >= 0; --index)
+		{
+			if (mOptions[index].mVisible)
+			{
+				mSelectedIndex = (size_t)index;
+				return true;
+			}
+		}
+		for (size_t index = mSelectedIndex + 1; index < mOptions.size(); ++index)
+		{
+			if (mOptions[index].mVisible)
+			{
+				mSelectedIndex = index;
+				return true;
+			}
+		}
+		return false;
+	}
+	return true;
 }
 
 
@@ -317,12 +342,37 @@ bool GameMenuEntries::setSelectedIndexByValue(uint32 value)
 	return false;
 }
 
-void GameMenuEntries::sanitizeSelectedIndex()
+bool GameMenuEntries::sanitizeSelectedIndex(bool allowNonInteractableEntries)
 {
 	if (mSelectedEntryIndex >= (int)mEntries.size())
 	{
-		mSelectedEntryIndex = mEntries.empty() ? 0 : (int)(mEntries.size() - 1);
+		if (mEntries.empty())
+			return false;
+
+		mSelectedEntryIndex = mEntries.size() - 1;
 	}
+
+	if (!allowNonInteractableEntries && !mEntries[mSelectedEntryIndex]->isFullyInteractable())
+	{
+		for (int index = (int)mSelectedEntryIndex - 1; index >= 0; --index)
+		{
+			if (mEntries[index]->isFullyInteractable())
+			{
+				mSelectedEntryIndex = index;
+				return true;
+			}
+		}
+		for (size_t index = mSelectedEntryIndex + 1; index < mEntries.size(); ++index)
+		{
+			if (mEntries[index]->isFullyInteractable())
+			{
+				mSelectedEntryIndex = index;
+				return true;
+			}
+		}
+		return false;
+	}
+	return true;
 }
 
 

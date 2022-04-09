@@ -78,6 +78,17 @@ GameMenuBase::BaseState ExtrasMenu::getBaseState() const
 	}
 }
 
+void ExtrasMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_MENU;  break;
+	}
+}
+
 void ExtrasMenu::onFadeIn()
 {
 	mState = State::APPEAR;
@@ -613,6 +624,7 @@ void ExtrasMenu::startCompetitionMode()
 	// Init simulation
 	Game::instance().startIntoCompetitionMode();
 	GameApp::instance().onStartGame();
+	mMenuBackground->setGameStartedMenu();
 }
 
 void ExtrasMenu::startBlueSphere()
@@ -620,6 +632,7 @@ void ExtrasMenu::startBlueSphere()
 	// Init simulation
 	Game::instance().startIntoBlueSphere();
 	GameApp::instance().onStartGame();
+	mMenuBackground->setGameStartedMenu();
 }
 
 void ExtrasMenu::startLevelSelect()
@@ -627,6 +640,7 @@ void ExtrasMenu::startLevelSelect()
 	// Init simulation
 	Game::instance().startIntoLevelSelect();
 	GameApp::instance().onStartGame();
+	mMenuBackground->setGameStartedMenu();
 }
 
 void ExtrasMenu::goBack()

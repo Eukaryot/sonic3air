@@ -86,6 +86,17 @@ GameMenuBase::BaseState ActSelectMenu::getBaseState() const
 	}
 }
 
+void ActSelectMenu::setBaseState(BaseState baseState)
+{
+	switch (baseState)
+	{
+		case BaseState::INACTIVE: mState = State::INACTIVE;  break;
+		case BaseState::FADE_IN:  mState = State::APPEAR;  break;
+		case BaseState::SHOW:	  mState = State::SHOW;  break;
+		case BaseState::FADE_OUT: mState = State::FADE_TO_MENU;  break;
+	}
+}
+
 void ActSelectMenu::onFadeIn()
 {
 	mState = State::APPEAR;
@@ -305,6 +316,7 @@ void ActSelectMenu::startGame()
 	// Init simulation
 	Game::instance().startIntoLevel(Game::Mode::ACT_SELECT, 0, mActEntry->selected().mValue, (uint8)mCharacterEntry->selected().mValue);
 	GameApp::instance().onStartGame();
+	mMenuBackground->setGameStartedMenu();
 
 	mMenuEntries.mSelectedEntryIndex = 0;
 }

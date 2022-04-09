@@ -22,6 +22,7 @@ public:
 	~OptionsMenu();
 
 	virtual BaseState getBaseState() const override;
+	virtual void setBaseState(BaseState baseState) override;
 	virtual void onFadeIn() override;
 	virtual bool canBeRemoved() override;
 
@@ -31,7 +32,7 @@ public:
 	virtual void update(float timeElapsed) override;
 	virtual void render() override;
 
-	void onEnteredFromIngame();
+	void setupOptionsMenu(bool enteredFromIngame);
 	void removeControllerSetupMenu();
 
 	const AudioCollection::AudioDefinition* getSoundTestAudioDefinition(uint32 index) const;
@@ -42,13 +43,13 @@ private:
 		INACTIVE,
 		APPEAR,
 		SHOW,
-		FADE_TO_MENU
+		FADE_TO_MENU,
+		FADE_TO_GAME
 	};
 
 private:
 	void setupOptionEntry(option::Option optionId, SharedDatabase::Setting::Type setting);
 	void setupOptionEntryBitmask(option::Option optionId, SharedDatabase::Setting::Type setting);
-	void setupOptionEntryBool(option::Option optionId, bool* valuePointer);
 	void setupOptionEntryInt(option::Option optionId, int* valuePointer);
 	void setupOptionEntryEnum8(option::Option optionId, void* valuePointer);
 	void setupOptionEntryPercent(option::Option optionId, float* valuePointer);
@@ -95,4 +96,5 @@ private:
 	State mState = State::INACTIVE;
 	float mVisibility = 0.0f;
 	GameMenuScrolling mScrolling;
+	bool mEnteredFromIngame = false;
 };

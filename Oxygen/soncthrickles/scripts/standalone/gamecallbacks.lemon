@@ -30,7 +30,7 @@ function void Standalone.onLevelStart()
 	// Set controller LEDs (for game controllers that support it) depending on character selection
 	{
 		// Player 1
-		Input.setControllerLEDs(0, getCharacterColorsForControllerLEDs(clamp(levelselect.characters - 1, 0, 2)))
+		Input.setControllerLEDs(0, getCharacterColorsForControllerLEDs(clamp(levelselect.characters, 1, 3) - 1))
 
 		// Player 2
 		if (levelselect.characters == CHARS_SONIC_AND_TAILS || levelselect.characters == 4)
@@ -64,6 +64,12 @@ function void Standalone.onRestartAtCheckpoint()
 	// Handle achievements
 	Game.setAchievementValue(ACHIEVEMENT_MGZ_GIANTRINGS, 0)
 	Game.setAchievementValue(ACHIEVEMENT_FBZ_FREE_ANIMALS, 0)
+}
+
+
+function void Standalone.onResumeAfterPause()
+{
+	// This is meant for mods, in case they want to check to changes made in the options menu
 }
 
 
