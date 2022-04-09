@@ -358,7 +358,7 @@ void ControllerSetupMenu::render()
 			{
 				InputManager& inputManager = InputManager::instance();
 				const size_t buttonIndex = entry.mData - 0x10;
-				RMX_ASSERT(buttonIndex < device->mControlMappings.size(), "Ohhhh!");
+				RMX_ASSERT(buttonIndex < device->mControlMappings.size(), "Invalid button index " << buttonIndex);
 				if (buttonIndex < device->mControlMappings.size())	// It's unclear how, but an invalid index is possible and led to crashes for some players
 				{
 					const InputConfig::ControlMapping& mapping = device->mControlMappings[buttonIndex];

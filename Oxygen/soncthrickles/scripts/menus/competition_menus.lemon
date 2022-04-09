@@ -1102,7 +1102,7 @@ function void fn00b656()
 	objA0.mapping_offset = 0x3a1aee
 	objA0.sprite_attributes = 0x25c9
 	D0 = 0
-	D1 = 0xffffffab
+	D1.s32 = -0x55
 	D2 = objA0.flags2e
 	while (D2.s16 >= 0)
 	{
