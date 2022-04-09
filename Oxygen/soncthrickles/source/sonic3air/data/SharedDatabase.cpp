@@ -24,7 +24,7 @@ std::vector<SharedDatabase::Secret> SharedDatabase::mSecrets;
 
 namespace detail
 {
-	void addSetting(std::unordered_map<uint32, SharedDatabase::Setting>& settings, SharedDatabase::Setting::Type id, const char* identifier, SharedDatabase::Setting::SerializationType serializationType)
+	void addSetting(std::unordered_map<uint32, SharedDatabase::Setting>& settings, SharedDatabase::Setting::Type id, const char* identifier, SharedDatabase::Setting::SerializationType serializationType, bool enforceAllowInTimeAttack = false)
 	{
 		SharedDatabase::Setting& setting = settings[(uint32)id];
 		setting.mSettingId = id;
@@ -33,6 +33,7 @@ namespace detail
 		setting.mDefaultValue = ((uint32)id & 0xff);
 		setting.mSerializationType = serializationType;
 		setting.mPurelyVisual = ((uint32)id & 0x80000000) != 0;
+		setting.mAllowInTimeAttack = enforceAllowInTimeAttack || setting.mPurelyVisual;
 	}
 }
 
@@ -65,6 +66,7 @@ void SharedDatabase::initialize()
 		#define ADD_SETTING(id) 			detail::addSetting(mSettings, id, #id, Setting::SerializationType::NONE);
 		#define ADD_SETTING_HIDDEN(id) 		detail::addSetting(mSettings, id, #id, Setting::SerializationType::HIDDEN);
 		#define ADD_SETTING_SERIALIZED(id) 	detail::addSetting(mSettings, id, #id, Setting::SerializationType::ALWAYS);
+		#define ADD_SETTING_ALLOW_TA(id) 	detail::addSetting(mSettings, id, #id, Setting::SerializationType::ALWAYS, true);
 
 		// These settings get saved in "settings.json" under their setting ID
 		ADD_SETTING_SERIALIZED(Setting::SETTING_FIX_GLITCHES);
@@ -90,8 +92,8 @@ void SharedDatabase::initialize()
 		ADD_SETTING_SERIALIZED(Setting::SETTING_RANDOM_MONITORS);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_RANDOM_SPECIALSTAGES);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_CAMERA_OUTRUN);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_EXTENDED_CAMERA);
+		ADD_SETTING_ALLOW_TA(Setting::SETTING_CAMERA_OUTRUN);			// Allowed in Time Attack, even though it's not purely visual (it has a minimal impact on gameplay simulation)
+		ADD_SETTING_ALLOW_TA(Setting::SETTING_EXTENDED_CAMERA);			// Same here
 		ADD_SETTING_SERIALIZED(Setting::SETTING_MAINTAIN_SHIELDS);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_BS_REPEAT_ON_FAIL);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_DISABLE_GHOST_SPAWN);
@@ -108,7 +110,7 @@ void SharedDatabase::initialize()
 		ADD_SETTING_SERIALIZED(Setting::SETTING_LBZ_PROTOTYPE_MUSIC);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_SSZ_BOSS_TRACKS);
 
-		ADD_SETTING_SERIALIZED(Setting::SETTING_GFX_ANTIFLICKER);
+		ADD_SETTING_ALLOW_TA(Setting::SETTING_GFX_ANTIFLICKER);			// Allowed in Time Attack
 		ADD_SETTING_SERIALIZED(Setting::SETTING_LEVELLAYOUTS);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_REGION_CODE);
 		ADD_SETTING_SERIALIZED(Setting::SETTING_TIME_ATTACK_GHOSTS);

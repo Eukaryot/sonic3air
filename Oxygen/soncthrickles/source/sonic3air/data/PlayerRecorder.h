@@ -56,7 +56,7 @@ private:
 		std::wstring mFilename;
 		uint16 mFormatVersion = 0;
 		uint32 mGameVersion = 0;
-		uint32 mSettings = 0;
+		std::vector<std::pair<uint32, uint8>> mSettings;
 		uint16 mZoneAndAct;
 		uint8  mCategory;
 		int    mRank = 0;

@@ -252,31 +252,38 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 {
+	const SharedDatabase::Setting* setting = SharedDatabase::getSetting(settingId);
+
 	if (!ignoreGameMode && isTimeAttackMode())
 	{
 		// In Time Attack, non-visual settings are always using the default value
 		if ((settingId & 0x80000000) == 0)
 		{
-			// Only exception are the "max control" settings
-			if (settingId == SharedDatabase::Setting::SETTING_DROPDASH || settingId == SharedDatabase::Setting::SETTING_SUPER_PEELOUT)
+			const bool explicitlyAllowInTimeAttack = (nullptr != setting && setting->mAllowInTimeAttack);
+			if (!explicitlyAllowInTimeAttack)
 			{
-				return (mSubMode == 0x11) ? 1 : 0;
-			}
-			else
-			{
-				return (settingId & 0xff);
+				// Only exception are the "max control" settings
+				if (settingId == SharedDatabase::Setting::SETTING_DROPDASH || settingId == SharedDatabase::Setting::SETTING_SUPER_PEELOUT)
+				{
+					return (mSubMode == 0x11) ? 1 : 0;
+				}
+				else
+				{
+					return (settingId & 0xff);
+				}
 			}
 		}
 	}
 
-	const SharedDatabase::Setting* setting = SharedDatabase::getSetting(settingId);
 	if (nullptr != setting)
 	{
 		return setting->mValue;
 	}
-
-	// Use default value
-	return (settingId & 0xff);
+	else
+	{
+		// Use default value
+		return (settingId & 0xff);
+	}
 }
 
 void Game::setSetting(uint32 settingId, uint32 value)

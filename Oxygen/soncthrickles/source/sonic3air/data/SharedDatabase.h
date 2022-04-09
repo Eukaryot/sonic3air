@@ -120,6 +120,7 @@ public:
 		mutable uint32 mValue = 0;
 		uint32 mDefaultValue = 0;
 		bool mPurelyVisual = false;
+		bool mAllowInTimeAttack = false;
 		SerializationType mSerializationType = SerializationType::NONE;
 	};
 
