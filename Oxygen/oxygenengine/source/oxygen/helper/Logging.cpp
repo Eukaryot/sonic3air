@@ -17,6 +17,9 @@ namespace
 
 	class ErrorLogger : public rmx::ErrorHandling::LoggerInterface, public rmx::ErrorHandling::MessageBoxInterface
 	{
+	public:
+		std::string mCaption;
+
 	protected:
 		void logMessage(rmx::ErrorSeverity errorSeverity, const std::string& message) override
 		{
@@ -52,15 +55,15 @@ namespace
 				}
 			}
 
-			std::string caption;
+			std::string caption = (errorSeverity == rmx::ErrorSeverity::ERROR) ? "Error" : "Warning";
+			if (!mCaption.empty())
+			{
+				caption = mCaption + " - " + caption;
+			}
+
 			if (rmx::ErrorHandling::isDebuggerAttached())
 			{
-				caption = "Assert Break";
 				text += "\n\nBreak here?";
-			}
-			else
-			{
-				caption = (errorSeverity == rmx::ErrorSeverity::ERROR) ? "Error" : "Warning";
 			}
 
 			PlatformFunctions::DialogButtons dialogButtons = PlatformFunctions::DialogButtons::OK_CANCEL;
@@ -95,5 +98,10 @@ namespace oxygen
 	void Logging::shutdown()
 	{
 		rmx::Logging::clear();
+	}
+	
+	void Logging::setAssertBreakCaption(const std::string& caption)
+	{
+		::mErrorLogger.mCaption = caption;
 	}
 }

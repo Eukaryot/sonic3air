@@ -18,5 +18,6 @@ namespace oxygen
 	public:
 		static void startup(const std::wstring& filename);
 		static void shutdown();
+		static void setAssertBreakCaption(const std::string& caption);
 	};
 }
