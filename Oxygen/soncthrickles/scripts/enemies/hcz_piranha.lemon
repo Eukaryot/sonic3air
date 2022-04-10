@@ -247,7 +247,7 @@ function void fn0881f6()
 function void fn0881fe()
 {
 #if STANDALONE
-	// Invulnerability frames should shake off the pirhana
+	// Invulnerability frames should shake off the piranha
 	if (u8[A1 + 0x34] > 0)
 	{
 		D0 = 1
