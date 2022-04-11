@@ -33,11 +33,34 @@ bool GhostSync::isActive() const
 
 void GhostSync::performUpdate()
 {
-	if (mState == State::INACTIVE)
+	if (!ConfigurationImpl::instance().mGameServer.mGhostSync.mEnabled)
+	{
+		// TODO: Undo registrations etc. if already connected before
 		return;
+	}
 
 	switch (mState)
 	{
+		case State::INACTIVE:
+		{
+			if (!mGameClient.isConnected())
+			{
+				mGameClient.connectToServer();
+			}
+			mState = State::CONNECTING;
+			break;
+		}
+
+		case State::CONNECTING:
+		{
+			// Wait for "evaluateServerFeaturesResponse" to be called, and only check for errors here
+			if (mGameClient.getConnectionState() == GameClient::ConnectionState::FAILED)
+			{
+				mState = State::FAILED;
+			}
+			break;
+		}
+
 		case State::READY_TO_JOIN:
 		{
 			const char* subChannelName = getDesiredSubChannelName();
@@ -119,7 +142,7 @@ void GhostSync::evaluateServerFeaturesResponse(const network::GetServerFeaturesR
 
 	if (supportsUpdate && ConfigurationImpl::instance().mGameServer.mGhostSync.mEnabled)
 	{
-		if (mState == State::INACTIVE)
+		if (mState <= State::CONNECTING)
 		{
 			// TODO: Leave channel if already joined one
 			mState = State::READY_TO_JOIN;

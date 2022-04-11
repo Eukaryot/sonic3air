@@ -55,6 +55,7 @@ private:
 	enum class State
 	{
 		INACTIVE,
+		CONNECTING,
 		READY_TO_JOIN,
 		JOINING_CHANNEL,
 		JOINED_CHANNEL,

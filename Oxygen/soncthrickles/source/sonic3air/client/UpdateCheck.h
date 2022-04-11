@@ -19,6 +19,7 @@ public:
 	enum class State
 	{
 		INACTIVE,
+		CONNECTING,
 		READY_TO_START,
 		SEND_QUERY,
 		WAITING_FOR_RESPONSE,

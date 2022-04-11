@@ -67,23 +67,50 @@ const network::AppUpdateCheckRequest::Response* UpdateCheck::getResponse() const
 
 void UpdateCheck::startUpdateCheck()
 {
-	if (mState != State::READY_TO_START)
-		return;
-
-	// No update check if the last update check in the last 60 seconds
-	if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 60 * 1000)
-		return;
-
-	mState = State::SEND_QUERY;
+	if (mState == State::INACTIVE || mState == State::FAILED)
+	{
+		// Start connecting, the rest is done later in "performUpdate"
+		mGameClient.connectToServer();
+		mState = State::CONNECTING;
+	}
 }
 
 void UpdateCheck::performUpdate()
 {
-	if (mState == State::INACTIVE)
+	if (!mGameClient.isConnected())
+	{
+		// TODO: Start a connection if needed
 		return;
+	}
 
 	switch (mState)
 	{
+		case State::INACTIVE:
+			return;
+
+		case State::CONNECTING:
+		{
+			// Wait for "evaluateServerFeaturesResponse" to be called, and only check for errors here
+			if (mGameClient.getConnectionState() == GameClient::ConnectionState::FAILED)
+			{
+				mState = State::FAILED;
+			}
+			break;
+		}
+
+		case State::READY_TO_START:
+		{
+			// No update check if the last update check in the last 60 seconds
+			if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 60 * 1000)
+			{
+				mState = State::INACTIVE;
+				return;
+			}
+
+			mState = State::SEND_QUERY;
+			[[fallthrough]];
+		}
+
 		case State::SEND_QUERY:
 		{
 			mAppUpdateCheckRequest.mQuery.mAppName = "sonic3air";
@@ -133,7 +160,7 @@ void UpdateCheck::evaluateServerFeaturesResponse(const network::GetServerFeature
 
 	if (supportsUpdate)
 	{
-		if (mState == State::INACTIVE)
+		if (mState <= State::CONNECTING)
 			mState = State::READY_TO_START;
 	}
 	else

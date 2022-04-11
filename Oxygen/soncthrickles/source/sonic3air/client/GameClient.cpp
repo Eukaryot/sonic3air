@@ -47,35 +47,110 @@ void GameClient::setupClient()
 			RMX_ERROR("Socket bind to any port failed", return);
 	#endif
 
-		// Start connection
-		startConnectingToServer(getCurrentTimestamp());
 		mState = State::STARTED;
 	}
 }
 
 void GameClient::updateClient(float timeElapsed)
 {
-	if (mServerConnection.getState() == NetConnection::State::EMPTY)
-		return;
-
-	// Check for new packets
-	updateReceivePackets(mConnectionManager);
-
 	const uint64 currentTimestamp = getCurrentTimestamp();
-	mConnectionManager.updateConnections(currentTimestamp);
+	if (mServerConnection.getState() != NetConnection::State::EMPTY)
+	{
+		// Check for new packets
+		updateReceivePackets(mConnectionManager);
+		mConnectionManager.updateConnections(currentTimestamp);
+	}
 
 	if (mServerConnection.getState() != NetConnection::State::CONNECTED)
 	{
-		if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
-		{
-			// Try connecting once again after a minute
-			if (currentTimestamp > mLastConnectionAttemptTimestamp + 60000)
-			{
-				startConnectingToServer(currentTimestamp);
-			}
-		}
-		return;
+		updateNotConnected(currentTimestamp);
 	}
+	else
+	{
+		updateConnected();
+	}
+
+	// Regular update for the sub-systems
+	mGhostSync.performUpdate();
+	mUpdateCheck.performUpdate();
+}
+
+void GameClient::connectToServer()
+{
+	if (mConnectionState == ConnectionState::NOT_CONNECTED || mConnectionState == ConnectionState::FAILED)
+	{
+		// Start connecting now
+		startConnectingToServer(getCurrentTimestamp());
+	}
+}
+
+bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
+{
+	if (mGhostSync.onReceivedPacket(evaluation))
+		return true;
+	return false;
+}
+
+void GameClient::startConnectingToServer(uint64 currentTimestamp)
+{
+	SocketAddress serverAddress;
+	{
+		const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
+		std::string serverIP;
+		if (!Sockets::resolveToIP(config.mServerHostName, serverIP))
+		{
+			mConnectionState = ConnectionState::FAILED;
+			return;
+		}
+
+	#if defined(GAME_CLIENT_USE_UDP)
+		serverAddress.set(serverIP, (uint16)config.mServerPortUDP);
+	#elif defined(GAME_CLIENT_USE_TCP)
+		serverAddress.set(serverIP, (uint16)config.mServerPortTCP);
+	#elif defined(GAME_CLIENT_USE_WSS)
+		serverAddress.set(serverIP, (uint16)config.mServerPortWSS);
+	#endif
+	}
+
+	mServerConnection.startConnectTo(mConnectionManager, serverAddress, currentTimestamp);
+	mLastConnectionAttemptTimestamp = currentTimestamp;
+	mConnectionState = ConnectionState::CONNECTING;
+}
+
+void GameClient::updateNotConnected(uint64 currentTimestamp)
+{
+	// TODO: This method certainly needs to handle more cases
+
+	switch (mConnectionState)
+	{
+		case ConnectionState::CONNECTING:
+		{
+			// Wait until connected
+			break;
+		}
+
+		case ConnectionState::ESTABLISHED:
+		{
+			// Connection was lost
+			mConnectionState = ConnectionState::NOT_CONNECTED;
+			break;
+		}
+	}
+
+	if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
+	{
+		// Try connecting once again after a minute
+		if (currentTimestamp > mLastConnectionAttemptTimestamp + 60000)
+		{
+			startConnectingToServer(currentTimestamp);
+		}
+	}
+}
+
+void GameClient::updateConnected()
+{
+	// Currently connected to server
+	mConnectionState = ConnectionState::ESTABLISHED;
 
 	switch (mState)
 	{
@@ -106,46 +181,14 @@ void GameClient::updateClient(float timeElapsed)
 					break;
 			}
 			break;
-		}
+}
 
 		case State::READY:
 		{
-			// Regular update for the update check, so we stay updated on updates
-			mGhostSync.performUpdate();
-			mUpdateCheck.performUpdate();
 			break;
 		}
 
 		default:
 			break;
 	}
-}
-
-bool GameClient::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
-{
-	if (mGhostSync.onReceivedPacket(evaluation))
-		return true;
-	return false;
-}
-
-void GameClient::startConnectingToServer(uint64 currentTimestamp)
-{
-	SocketAddress serverAddress;
-	{
-		const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
-		std::string serverIP;
-		if (!Sockets::resolveToIP(config.mServerHostName, serverIP))
-			RMX_ERROR("Unable to resolve server URL " << config.mServerHostName, return);
-
-	#if defined(GAME_CLIENT_USE_UDP)
-		serverAddress.set(serverIP, (uint16)config.mServerPortUDP);
-	#elif defined(GAME_CLIENT_USE_TCP)
-		serverAddress.set(serverIP, (uint16)config.mServerPortTCP);
-	#elif defined(GAME_CLIENT_USE_WSS)
-		serverAddress.set(serverIP, (uint16)config.mServerPortWSS);
-	#endif
-	}
-
-	mServerConnection.startConnectTo(mConnectionManager, serverAddress, currentTimestamp);
-	mLastConnectionAttemptTimestamp = currentTimestamp;
 }

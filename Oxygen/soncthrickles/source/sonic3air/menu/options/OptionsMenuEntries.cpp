@@ -200,7 +200,6 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 	UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
 	switch (updateCheck.getState())
 	{
-		case UpdateCheck::State::INACTIVE:
 		case UpdateCheck::State::FAILED:
 		{
 			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color(1.0f, 0.0f, 0.0f, alpha));
