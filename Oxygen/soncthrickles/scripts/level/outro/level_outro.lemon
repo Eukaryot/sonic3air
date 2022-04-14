@@ -807,19 +807,19 @@ function void fn05b0a8()
 {
 	camera.background.y.u16 = u16[0xffffee9c]
 	D0 = u32(u16[0xffffee98]) << 16
-	D1 = D0
-	D1.s32 >>= 4
+	D1.s32 = D0.s32 >> 4
 	A1 = 0xffffa800
 	D1 += u32[A1]
-	u32[(A1+=4)-4] += 0x0800
-	A1 += 0x10
+	u32[A1] += 0x0800
+	A1 += 0x14
 	D2 = 0x1f
 	while (D2.s16 >= 0)
 	{
-		u16[(A1+=2)-2] = D0 >> 16
-		u16[(A1+=2)-2] = D0 >> 16
-		u16[(A1+=2)-2] = D0 >> 16
-		u16[(A1+=2)-2] = D0 >> 16
+		u16[A1]   = D0 >> 16
+		u16[A1+2] = D0 >> 16
+		u16[A1+4] = D0 >> 16
+		u16[A1+6] = D0 >> 16
+		A1 += 8
 		D0 += D1
 		--D2.s16
 	}
@@ -828,8 +828,8 @@ function void fn05b0a8()
 	u16[A1 - 0x04] = u16[A1]
 	u16[A1 - 0x0c] = u16[A1]
 	u16[A1 - 0x08] = u16[A1 + 0x08]
-	u16[A1 - 0x02] = objA1.position.x.u16
-	u16[A1 - 0x0e] = objA1.velocity.x
+	u16[A1 - 0x02] = u16[A1 + 0x10]
+	u16[A1 - 0x0e] = u16[A1 + 0x18]
 	u16[A1 - 0x0a] = u16[A1 + 0x20]
 	u16[A1 - 0x06] = u16[A1 + 0x28]
 }
@@ -863,7 +863,6 @@ function void fn05b120()
 	copyMemory(A5, 0x0a97bc, 0x20)
 	copyMemory(A6, 0x0a97bc, 0x20)
 }
-
 
 
 

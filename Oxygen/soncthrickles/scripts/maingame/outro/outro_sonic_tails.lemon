@@ -226,9 +226,7 @@ function void fn05da74()
 
 	D0 = -0x20
 	u8[A1 + 0x42] = D0.u8
-	D1.u16 = objA1.position.x.u16
-	D1.u16 -= D0.u16
-	objA0.position.x.u16 = D1.u16
+	objA0.position.x.u16 = objA1.position.x.u16 - D0.s16
 
 	D0 = 0x2b
 	if (global.characters == CHARS_TAILS_ALONE)
@@ -237,9 +235,7 @@ function void fn05da74()
 		u8[0xffffcc0e] &= ~0x04
 	}
 	u8[A1 + 0x43] = D0.u8
-	D1.u16 = objA1.position.y.u16
-	D0.s16 = -D0.s16
-	D1.u16 += D0.u16
+	D1.u16 = objA1.position.y.u16 - D0.s16
 	objA0.position.y.u16 = D1.u16
 	u16[A0 + 0x3a] = D1.u16
 
