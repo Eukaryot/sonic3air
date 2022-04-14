@@ -577,33 +577,33 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 		case CATEGORY_WATCHES:
 		{
-			const std::vector<CodeExec::Watch>& watches = codeExec.getWatches();
-			for (const CodeExec::Watch& watch : watches)
+			const std::vector<CodeExec::Watch*>& watches = codeExec.getWatches();
+			for (const CodeExec::Watch* watch : watches)
 			{
 				// Display 0xffff???? instead of 0x00ff????
-				uint32 displayAddress = watch.mAddress;
+				uint32 displayAddress = watch->mAddress;
 				if ((displayAddress & 0x00ff0000) == 0x00ff0000)
 					displayAddress |= 0xff000000;
 
-				if (watch.mHits.empty())
+				if (watch->mHits.empty())
 				{
-					builder.addLine(String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch.mBytes), Color::fromABGR32(0xffa0a0a0));
-					if (watch.mBytes <= 4)
-						builder.addLine(String(0, "= %s at %s", rmx::hexString(watch.mInitialValue, watch.mBytes * 2).c_str(), watch.mLastHitLocation.toString().c_str()), Color::fromABGR32(0xffa0a0a0), 8);
+					builder.addLine(String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch->mBytes), Color::fromABGR32(0xffa0a0a0));
+					if (watch->mBytes <= 4)
+						builder.addLine(String(0, "= %s at %s", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str(), watch->mLastHitLocation.toString().c_str()), Color::fromABGR32(0xffa0a0a0), 8);
 				}
 				else
 				{
-					builder.addLine(String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch.mBytes), Color::WHITE);
-					if (watch.mBytes <= 4)
-						builder.addLine(String(0, "= %s initially", rmx::hexString(watch.mInitialValue, watch.mBytes * 2).c_str()), Color::WHITE, 8);
+					builder.addLine(String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch->mBytes), Color::WHITE);
+					if (watch->mBytes <= 4)
+						builder.addLine(String(0, "= %s initially", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str()), Color::WHITE, 8);
 
-					for (size_t hitIndex = 0; hitIndex < watch.mHits.size(); ++hitIndex)
+					for (size_t hitIndex = 0; hitIndex < watch->mHits.size(); ++hitIndex)
 					{
-						const auto& hit = watch.mHits[hitIndex];
-						const uint64 key = ((uint64)watch.mAddress << 32) + hitIndex;
+						const auto& hit = *watch->mHits[hitIndex];
+						const uint64 key = ((uint64)watch->mAddress << 32) + hitIndex;
 						Builder::TextLine* textLine;
-						if (watch.mBytes <= 4)
-							textLine = &builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch.mBytes * 2).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+						if (watch->mBytes <= 4)
+							textLine = &builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
 						else
 							textLine = &builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
 

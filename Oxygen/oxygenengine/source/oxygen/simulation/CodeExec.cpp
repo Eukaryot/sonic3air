@@ -400,11 +400,14 @@ bool CodeExec::performFrameUpdate()
 			// Sanity check: Make sure no one else changed the emulator interface's watches
 			RMX_ASSERT(mWatches.size() == mEmulatorInterface.getWatches().size(), "Watches got changed by someone");
 
-			// Reset watches
-			for (Watch& watch : mWatches)
+			// Reset watch hits
+			for (Watch* watch : mWatches)
 			{
-				watch.mInitialValue = getCurrentWatchValue(watch.mAddress, watch.mBytes);
-				watch.mHits.clear();
+				watch->mInitialValue = getCurrentWatchValue(watch->mAddress, watch->mBytes);
+				for (Watch::Hit* hit : watch->mHits)
+					mWatchHitPool.returnObject(*hit);
+				watch->mHits.clear();
+				watch->mLastHitLocation = Location();
 			}
 
 			// Reset VRAM writes
@@ -507,24 +510,26 @@ void CodeExec::processCallFrames()
 
 void CodeExec::clearWatches(bool clearPersistent)
 {
-	std::vector<std::pair<uint32, uint16>> readdWatches;
+	std::vector<std::pair<uint32, uint16>> reAddWatches;
 	if (!clearPersistent)
 	{
-		// Save persistent watched
-		readdWatches.reserve(mWatches.size());
-		for (const Watch& watch : mWatches)
+		// Save persistent watches
+		reAddWatches.reserve(mWatches.size());
+		for (const Watch* watch : mWatches)
 		{
-			if (watch.mPersistent)
+			if (watch->mPersistent)
 			{
-				readdWatches.emplace_back(watch.mAddress, watch.mBytes);
+				reAddWatches.emplace_back(watch->mAddress, watch->mBytes);
 			}
 		}
 	}
 
+	for (Watch* watch : mWatches)
+		deleteWatch(*watch);
 	mWatches.clear();
 	mEmulatorInterface.getWatches().clear();
 
-	for (const auto& pair : readdWatches)
+	for (const auto& pair : reAddWatches)
 	{
 		addWatch(pair.first, pair.second, true);
 	}
@@ -535,9 +540,9 @@ void CodeExec::addWatch(uint32 address, uint16 bytes, bool persistent)
 	address &= 0x00ffffff;
 
 	// Check if already exists
-	for (const Watch& watch : mWatches)
+	for (const Watch* watch : mWatches)
 	{
-		if (watch.mAddress == address && watch.mBytes == bytes)
+		if (watch->mAddress == address && watch->mBytes == bytes)
 			return;
 	}
 
@@ -547,11 +552,13 @@ void CodeExec::addWatch(uint32 address, uint16 bytes, bool persistent)
 	internalWatch.mBytes = bytes;
 
 	// Add a new watch here
-	Watch& watch = vectorAdd(mWatches);
+	Watch& watch = mWatchPool.rentObject();
 	watch.mAddress = address;
 	watch.mBytes = bytes;
 	watch.mPersistent = persistent;
 	watch.mInitialValue = getCurrentWatchValue(watch.mAddress, watch.mBytes);
+	watch.mHits.clear();
+	mWatches.push_back(&watch);
 }
 
 void CodeExec::removeWatch(uint32 address, uint16 bytes)
@@ -562,7 +569,7 @@ void CodeExec::removeWatch(uint32 address, uint16 bytes)
 	int index = -1;
 	for (int i = 0; i < (int)mWatches.size(); ++i)
 	{
-		if (mWatches[i].mAddress == address && mWatches[i].mBytes == bytes)
+		if (mWatches[i]->mAddress == address && mWatches[i]->mBytes == bytes)
 		{
 			index = i;
 			break;
@@ -572,6 +579,7 @@ void CodeExec::removeWatch(uint32 address, uint16 bytes)
 		return;
 
 	// Remove it here
+	deleteWatch(*mWatches[index]);
 	mWatches.erase(mWatches.begin() + index);
 
 	// Remove it in EmulatorInterface
@@ -943,6 +951,14 @@ uint32 CodeExec::getCurrentWatchValue(uint32 address, uint16 bytes) const
 	return 0;
 }
 
+void CodeExec::deleteWatch(Watch& watch)
+{
+	for (Watch::Hit* hit : watch.mHits)
+		mWatchHitPool.returnObject(*hit);
+	watch.mHits.clear();
+	mWatchPool.returnObject(watch);
+}
+
 void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
 {
 	if (watchIndex >= mWatches.size())	// This may happen if a watch gets added and changed in the same frame
@@ -951,14 +967,16 @@ void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
 	Location location;
 	getLastStepLocation(location);
 
-	Watch& watch = mWatches[watchIndex];
+	Watch& watch = *mWatches[watchIndex];
 	{
 		// Add hit
-		Watch::Hit& hit = vectorAdd(watch.mHits);
+		Watch::Hit& hit = mWatchHitPool.rentObject();
 		hit.mWrittenValue = (watch.mBytes <= 4) ? getCurrentWatchValue(watch.mAddress, watch.mBytes) : getCurrentWatchValue(hit.mAddress, hit.mBytes);
 		hit.mAddress = address;
 		hit.mBytes = bytes;
 		hit.mLocation = location;
+		watch.mHits.push_back(&hit);
+
 		if (nullptr != mActiveCallFrameTracking)
 			mActiveCallFrameTracking->writeCurrentCallStack(hit.mCallStack);
 		mWatchHitsThisUpdate.emplace_back(&watch, &hit);

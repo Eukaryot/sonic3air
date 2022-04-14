@@ -97,7 +97,7 @@ public:
 			std::vector<uint64> mCallStack;
 		};
 
-		std::vector<Hit> mHits;
+		std::vector<Hit*> mHits;
 		uint32 mAddress = 0;
 		uint16 mBytes = 0;
 		bool mPersistent = false;
@@ -148,7 +148,7 @@ public:
 
 	inline const std::vector<uint32>& getUnknownAddresses() const  { return mUnknownAddressesInOrder; }
 
-	inline const std::vector<Watch>& getWatches() const  { return mWatches; }
+	inline const std::vector<Watch*>& getWatches() const  { return mWatches; }
 	void clearWatches(bool clearPersistent = false);
 	void addWatch(uint32 address, uint16 bytes, bool persistent);
 	void removeWatch(uint32 address, uint16 bytes);
@@ -174,6 +174,7 @@ private:
 	void popCallFrame();
 
 	uint32 getCurrentWatchValue(uint32 address, uint16 bytes) const;
+	void deleteWatch(Watch& watch);
 
 private:
 	// Interface implementations
@@ -203,8 +204,11 @@ private:
 	std::set<uint32> mUnknownAddressesSet;
 	std::vector<uint32> mUnknownAddressesInOrder;
 
-	std::vector<Watch> mWatches;
+	std::vector<Watch*> mWatches;
 	std::vector<std::pair<Watch*, Watch::Hit*>> mWatchHitsThisUpdate;
+	RentableObjectPool<Watch, 32> mWatchPool;
+	RentableObjectPool<Watch::Hit, 32> mWatchHitPool;
+
 	std::vector<VRAMWrite*> mVRAMWrites;
 	RentableObjectPool<VRAMWrite, 32> mVRAMWritePool;
 
