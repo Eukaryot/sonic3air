@@ -89,29 +89,29 @@ namespace
 }
 
 
-bool FileHelper::loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename)
+bool FileHelper::loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, bool showError)
 {
 	std::vector<uint8> content;
 	if (!FTX::FileSystem->readFile(filename, content))
 	{
-		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': File not found", );
+		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': File not found", );
 		return false;
 	}
 
 	if (!bitmap.loadBMP(content))
 	{
-		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': Format not supported", );
+		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': Format not supported", );
 		return false;
 	}
 	return true;
 }
 
-bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename)
+bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool showError)
 {
 	std::vector<uint8> content;
 	if (!FTX::FileSystem->readFile(filename, content))
 	{
-		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': File not found", );
+		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': File not found", );
 		return false;
 	}
 
@@ -128,13 +128,13 @@ bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename)
 	Bitmap::LoadResult loadResult;
 	if (!bitmap.decode(stream, loadResult, *format))
 	{
-		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': Format not supported", );
+		RMX_CHECK(!showError, "Failed to load image file '" << *WString(filename).toString() << "': Format not supported", );
 		return false;
 	}
 	return true;
 }
 
-bool FileHelper::loadTexture(DrawerTexture& texture, const std::wstring& filename)
+bool FileHelper::loadTexture(DrawerTexture& texture, const std::wstring& filename, bool showError)
 {
 	if (!texture.isValid())
 	{
@@ -142,7 +142,7 @@ bool FileHelper::loadTexture(DrawerTexture& texture, const std::wstring& filenam
 	}
 
 	Bitmap& bitmap = texture.accessBitmap();
-	if (!loadBitmap(bitmap, filename))
+	if (!loadBitmap(bitmap, filename, showError))
 		return false;
 
 	texture.bitmapUpdated();
