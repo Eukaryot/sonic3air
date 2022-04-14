@@ -349,7 +349,7 @@ bool GameMenuEntries::sanitizeSelectedIndex(bool allowNonInteractableEntries)
 		if (mEntries.empty())
 			return false;
 
-		mSelectedEntryIndex = mEntries.size() - 1;
+		mSelectedEntryIndex = (int)mEntries.size() - 1;
 	}
 
 	if (!allowNonInteractableEntries && !mEntries[mSelectedEntryIndex]->isFullyInteractable())

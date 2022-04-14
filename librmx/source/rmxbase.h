@@ -65,7 +65,7 @@
 #include "rmxbase/RmxDeflate.h"
 #include "rmxbase/ZlibDeflate.h"
 #include "rmxbase/Color.h"
-#include "rmxbase/Bitmap.h"
+#include "rmxbase/BitmapCodecs.h"
 #include "rmxbase/Logging.h"
 
 

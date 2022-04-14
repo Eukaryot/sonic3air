@@ -193,6 +193,9 @@
     <ClInclude Include="..\..\source\rmxbase\OneTimeAllocPool.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\BitmapCodecs.h">
+      <Filter>Bitmap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\Math.cpp">

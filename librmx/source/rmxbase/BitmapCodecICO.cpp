@@ -32,8 +32,8 @@ struct IconDirEntry
 
 #define RETURN(errcode) \
 { \
-	bitmap.mError = errcode; \
-	return (errcode == Bitmap::Error::OK); \
+	outResult.mError = errcode; \
+	return (errcode == Bitmap::LoadResult::Error::OK); \
 }
 
 
@@ -48,7 +48,7 @@ bool BitmapCodecICO::canEncode(const String& format) const
 	return false;
 }
 
-bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream)
+bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadResult& outResult)
 {
 	MemInputStream mstream(stream);
 	const uint8* buffer = mstream.getCursor();
@@ -56,7 +56,7 @@ bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream)
 	IcoHeader header;
 	stream >> header;
 	if (header.idReserved != 0 || header.idType != 1)
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	const int imageCount = header.idCount;
 
@@ -89,7 +89,7 @@ bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream)
 	}
 
 	if (best_image == -1)
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	// Load icon
 	const IconDirEntry& bestEntry = entries[best_image];
@@ -111,9 +111,9 @@ bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream)
 	// Decode as BMP
 	MemInputStream bmpstream(mem, size+14, true);
 	BitmapCodecBMP codec;
-	bool result = codec.decode(bitmap, bmpstream);
+	bool result = codec.decode(bitmap, bmpstream, outResult);
 	if (!result)
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	// Add alpha channel
 	if (bpp < 32)
@@ -132,7 +132,7 @@ bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream)
 		}
 	}
 
-	RETURN(Bitmap::Error::OK);
+	RETURN(Bitmap::LoadResult::Error::OK);
 }
 
 bool BitmapCodecICO::encode(const Bitmap& bitmap, OutputStream& stream)

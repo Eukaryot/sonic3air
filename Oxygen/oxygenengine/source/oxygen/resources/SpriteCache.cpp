@@ -477,8 +477,6 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 					}
 					item.mSprite->mOffset = -center;
 				}
-
-				RMX_CHECK(success, "Failed to load sprite from '" << *WString(fullpath).toString() << "'", continue);
 			}
 		}
 	}

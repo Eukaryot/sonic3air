@@ -38,8 +38,8 @@ inline uint32 RGBA_to_BGRA(uint32 color)
 
 #define RETURN(errcode) \
 { \
-	bitmap.mError = errcode; \
-	return (errcode == Bitmap::Error::OK); \
+	outResult.mError = errcode; \
+	return (errcode == Bitmap::LoadResult::Error::OK); \
 }
 
 
@@ -54,13 +54,13 @@ bool BitmapCodecBMP::canEncode(const String& format) const
 	return (format == "bmp");
 }
 
-bool BitmapCodecBMP::decode(Bitmap& bitmap, InputStream& stream)
+bool BitmapCodecBMP::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadResult& outResult)
 {
 	// Read header
 	BmpHeader header;
 	stream >> header;
 	if (memcmp(header.signature, "BM", 2) != 0)
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	// Size
 	const int width = header.width;
@@ -151,7 +151,7 @@ bool BitmapCodecBMP::decode(Bitmap& bitmap, InputStream& stream)
 		}
 	}
 
-	RETURN(Bitmap::Error::OK);
+	RETURN(Bitmap::LoadResult::Error::OK);
 }
 
 bool BitmapCodecBMP::encode(const Bitmap& bitmap, OutputStream& stream)
@@ -188,7 +188,7 @@ bool BitmapCodecBMP::encode(const Bitmap& bitmap, OutputStream& stream)
 	}
 
 	delete[] output;
-	RETURN(Bitmap::Error::OK);
+	return true;
 }
 
 #undef RETURN

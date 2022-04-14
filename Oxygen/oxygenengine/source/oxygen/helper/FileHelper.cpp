@@ -93,28 +93,45 @@ bool FileHelper::loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& fi
 {
 	std::vector<uint8> content;
 	if (!FTX::FileSystem->readFile(filename, content))
+	{
+		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': File not found", );
 		return false;
+	}
 
-	return bitmap.loadBMP(content);
+	if (!bitmap.loadBMP(content))
+	{
+		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': Format not supported", );
+		return false;
+	}
+	return true;
 }
 
 bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename)
 {
 	std::vector<uint8> content;
 	if (!FTX::FileSystem->readFile(filename, content))
+	{
+		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': File not found", );
 		return false;
+	}
 
 	// Get file type
 	String format;
 	WString fname = filename;
-	int pos = fname.findChar(L'.', fname.length()-1, -1);
+	const int pos = fname.findChar(L'.', fname.length()-1, -1);
 	if (pos > 0)
 	{
 		format = fname.getSubString(pos+1, -1).toString();
 	}
 
 	MemInputStream stream(&content[0], (int)content.size());
-	return bitmap.decode(stream, *format);
+	Bitmap::LoadResult loadResult;
+	if (!bitmap.decode(stream, loadResult, *format))
+	{
+		RMX_ERROR("Failed to load image file '" << *WString(filename).toString() << "': Format not supported", );
+		return false;
+	}
+	return true;
 }
 
 bool FileHelper::loadTexture(DrawerTexture& texture, const std::wstring& filename)

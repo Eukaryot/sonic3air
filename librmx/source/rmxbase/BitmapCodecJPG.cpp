@@ -69,11 +69,11 @@ private:
 	inline void refillBitBuffer();
 	void decodeHuffmanDC(short* output, HuffmanTable* htab, short& prev_DC);
 	void decodeHuffmanAC(short* output, HuffmanTable* htab, int count);
-	Bitmap::Error readDQT(const uint8* mem, int size);
-	Bitmap::Error readDHT(const uint8* mem, int size);
-	Bitmap::Error readSOF(const uint8* mem, int size);
-	Bitmap::Error readSOS(const uint8* mem, int& size);
-	Bitmap::Error readJPEG(const uint8* buffer, size_t bufsize);
+	Bitmap::LoadResult::Error readDQT(const uint8* mem, int size);
+	Bitmap::LoadResult::Error readDHT(const uint8* mem, int size);
+	Bitmap::LoadResult::Error readSOF(const uint8* mem, int size);
+	Bitmap::LoadResult::Error readSOS(const uint8* mem, int& size);
+	Bitmap::LoadResult::Error readJPEG(const uint8* buffer, size_t bufsize);
 
 	// Part 2: Decode into bitmap
 	void applyIDCT(short* input, unsigned char* output);
@@ -83,7 +83,7 @@ private:
 
 public:
 	BitmapJPG();
-	bool decode(Bitmap& bitmap, const uint8* buffer, size_t bufsize);
+	bool decode(Bitmap& bitmap, const uint8* buffer, size_t bufsize, Bitmap::LoadResult& outResult);
 };
 
 
@@ -232,7 +232,7 @@ void BitmapJPG::decodeHuffmanAC(short* output, HuffmanTable* htab, int count)
 	}
 }
 
-Bitmap::Error BitmapJPG::readDQT(const uint8* mem, int size)
+Bitmap::LoadResult::Error BitmapJPG::readDQT(const uint8* mem, int size)
 {
 	// DQT: Define Quantization Table
 	int pos = 0;
@@ -240,16 +240,16 @@ Bitmap::Error BitmapJPG::readDQT(const uint8* mem, int size)
 	{
 		int num = (mem[pos] & 0x0f);
 		if (num >= 4)
-			return Bitmap::Error::INVALID_FILE;
+			return Bitmap::LoadResult::Error::INVALID_FILE;
 		if ((mem[pos] & 0xf0) != 0)
-			return Bitmap::Error::UNSUPPORTED;		// TODO: Support 16-bit QT
+			return Bitmap::LoadResult::Error::UNSUPPORTED;		// TODO: Support 16-bit QT
 		memcpy(qtable[num].data, mem+pos+1, 64);
 		pos += 65;
 	}
-	return Bitmap::Error::OK;
+	return Bitmap::LoadResult::Error::OK;
 }
 
-Bitmap::Error BitmapJPG::readDHT(const uint8* mem, int size)
+Bitmap::LoadResult::Error BitmapJPG::readDHT(const uint8* mem, int size)
 {
 	// DHT: Define Huffman Table
 	int pos = 0;
@@ -257,9 +257,9 @@ Bitmap::Error BitmapJPG::readDHT(const uint8* mem, int size)
 	{
 		int num = (mem[pos] & 0x0f);
 		if (num >= 4)
-			return Bitmap::Error::INVALID_FILE;
+			return Bitmap::LoadResult::Error::INVALID_FILE;
 		if ((mem[pos] & 0xe0) != 0)
-			return Bitmap::Error::INVALID_FILE;
+			return Bitmap::LoadResult::Error::INVALID_FILE;
 		bool isAC = ((mem[pos] & 0x10) != 0);
 		++pos;
 
@@ -287,21 +287,21 @@ Bitmap::Error BitmapJPG::readDHT(const uint8* mem, int size)
 			}
 		}
 	}
-	return Bitmap::Error::OK;
+	return Bitmap::LoadResult::Error::OK;
 }
 
-Bitmap::Error BitmapJPG::readSOF(const uint8* mem, int size)
+Bitmap::LoadResult::Error BitmapJPG::readSOF(const uint8* mem, int size)
 {
 	// SOF: Start Of Frame
 	if (mem[0] != 8)
-		return Bitmap::Error::INVALID_FILE;				// TODO: Support for higher precision
+		return Bitmap::LoadResult::Error::INVALID_FILE;				// TODO: Support for higher precision
 	height = GET_SHORT(mem+1);
 	width  = GET_SHORT(mem+3);
 	channels = mem[5];
 	if (width <= 0 || height <= 0)
-		return Bitmap::Error::INVALID_FILE;
+		return Bitmap::LoadResult::Error::INVALID_FILE;
 	if (channels != 1 && channels != 3)
-		return Bitmap::Error::UNSUPPORTED;				// TODO: Support for CMYK
+		return Bitmap::LoadResult::Error::UNSUPPORTED;				// TODO: Support for CMYK
 
 	// Channel infos
 	int pos = 6;
@@ -309,7 +309,7 @@ Bitmap::Error BitmapJPG::readSOF(const uint8* mem, int size)
 	{
 		char id = mem[pos];
 		if (id == 0 || id > 3)
-			return Bitmap::Error::UNSUPPORTED;			// TODO: Support for other formats
+			return Bitmap::LoadResult::Error::UNSUPPORTED;			// TODO: Support for other formats
 		int c = id-1;
 		channel[c].sample_x = (mem[pos+1] >> 4);
 		channel[c].sample_y = (mem[pos+1] & 0x0f);
@@ -340,23 +340,23 @@ Bitmap::Error BitmapJPG::readSOF(const uint8* mem, int size)
 	memset(coeff_buffer, 0, coeff_size * sizeof(short));
 
 	found_SOF = true;
-	return Bitmap::Error::OK;
+	return Bitmap::LoadResult::Error::OK;
 }
 
-Bitmap::Error BitmapJPG::readSOS(const uint8* mem, int& size)
+Bitmap::LoadResult::Error BitmapJPG::readSOS(const uint8* mem, int& size)
 {
 	// SOS: Start Of Scan
 	if (!found_SOF)
-		return Bitmap::Error::INVALID_FILE;
+		return Bitmap::LoadResult::Error::INVALID_FILE;
 	int count = mem[0];
 	if (!progressive && count != channels)
-		return Bitmap::Error::INVALID_FILE;
+		return Bitmap::LoadResult::Error::INVALID_FILE;
 	int pos = 1;
 	for (int i = 0; i < count; ++i)
 	{
 		char id = mem[pos];
 		if (id == 0 || id > 3)
-			return Bitmap::Error::UNSUPPORTED;		// TODO: Support for other formats
+			return Bitmap::LoadResult::Error::UNSUPPORTED;		// TODO: Support for other formats
 		int c = id-1;
 		channel[c].DC_number = (mem[pos+1] >> 4);
 		channel[c].AC_number = (mem[pos+1] & 0x0f);
@@ -393,7 +393,7 @@ Bitmap::Error BitmapJPG::readSOS(const uint8* mem, int& size)
 		else
 		{
 			if (count != 1)			// Assume that count is always 1...
-				return Bitmap::Error::INVALID_FILE;
+				return Bitmap::LoadResult::Error::INVALID_FILE;
 			int c = mem0[pos-5]-1;
 
 			for (int mcu = 0; mcu < MCU_count; ++mcu)
@@ -429,14 +429,14 @@ Bitmap::Error BitmapJPG::readSOS(const uint8* mem, int& size)
 				}
 	}
 	size = (int)(mem - mem0) - (32 - unused_bits) / 8 - 1;
-	return Bitmap::Error::OK;
+	return Bitmap::LoadResult::Error::OK;
 }
 
-Bitmap::Error BitmapJPG::readJPEG(const uint8* buffer, size_t bufsize)
+Bitmap::LoadResult::Error BitmapJPG::readJPEG(const uint8* buffer, size_t bufsize)
 {
 	// Read JPEG data stream
 	if (buffer[0] != 0xff || buffer[1] != JPG_SOI)
-		return Bitmap::Error::INVALID_FILE;
+		return Bitmap::LoadResult::Error::INVALID_FILE;
 
 	width = 0;
 	height = 0;
@@ -449,7 +449,7 @@ Bitmap::Error BitmapJPG::readJPEG(const uint8* buffer, size_t bufsize)
 	while (pos < (int)bufsize)
 	{
 		if (buffer[pos] != 0xff)
-			return Bitmap::Error::INVALID_FILE;
+			return Bitmap::LoadResult::Error::INVALID_FILE;
 		while (buffer[pos] == 0xff)
 			++pos;
 		int type = buffer[pos];
@@ -457,23 +457,23 @@ Bitmap::Error BitmapJPG::readJPEG(const uint8* buffer, size_t bufsize)
 		pos += 3;
 		const uint8* mem = &buffer[pos];
 
-		Bitmap::Error result = Bitmap::Error::OK;
+		Bitmap::LoadResult::Error result = Bitmap::LoadResult::Error::OK;
 		switch (type)
 		{
 			// APP0: Header with signature & version number
 			case JPG_APP0:
 				if (pos != 6)
-					return Bitmap::Error::INVALID_FILE;
+					return Bitmap::LoadResult::Error::INVALID_FILE;
 				if (strcmp((char*)mem, "JFIF") != 0)
-					return Bitmap::Error::INVALID_FILE;
+					return Bitmap::LoadResult::Error::INVALID_FILE;
 				if (mem[5] != 1 || mem[6] > 2)
-					return Bitmap::Error::INVALID_FILE;
+					return Bitmap::LoadResult::Error::INVALID_FILE;
 				break;
 
 			// EXPERIMENTAL (for my digicam images)
 			case JPG_APP1:
 				if (pos != 6)
-					return Bitmap::Error::INVALID_FILE;
+					return Bitmap::LoadResult::Error::INVALID_FILE;
 				break;
 
 			// DRI: Define Restart Interval
@@ -501,14 +501,14 @@ Bitmap::Error BitmapJPG::readJPEG(const uint8* buffer, size_t bufsize)
 			case JPG_SOS:
 				result = readSOS(mem, size);
 //				if (size==4088)
-				return Bitmap::Error::OK;		// !!!
+				return Bitmap::LoadResult::Error::OK;		// !!!
 				break;
 
 			// EOI: End Of Image
 			case JPG_EOI:
 				if (!found_SOS)
-					return Bitmap::Error::INVALID_FILE;
-				return Bitmap::Error::OK;
+					return Bitmap::LoadResult::Error::INVALID_FILE;
+				return Bitmap::LoadResult::Error::OK;
 
 			// COM: Text comment
 			case JPG_COM:
@@ -516,16 +516,16 @@ Bitmap::Error BitmapJPG::readJPEG(const uint8* buffer, size_t bufsize)
 
 			// Everything else is regarded as an error
 			default:
-				return Bitmap::Error::INVALID_FILE;
+				return Bitmap::LoadResult::Error::INVALID_FILE;
 		}
-		if (result != Bitmap::Error::OK)
+		if (result != Bitmap::LoadResult::Error::OK)
 			return result;
 
 		pos += size;
 		if (buffer[pos] != 0xff && buffer[pos+1] == 0xff)
 			++pos;
 	}
-	return Bitmap::Error::OK;
+	return Bitmap::LoadResult::Error::OK;
 }
 
 void BitmapJPG::applyIDCT(short* input, unsigned char* output)
@@ -781,12 +781,13 @@ void BitmapJPG::buildBitmap(Bitmap& bitmap)
 	return;
 }
 
-bool BitmapJPG::decode(Bitmap& bitmap, const uint8* buffer, size_t bufsize)
+bool BitmapJPG::decode(Bitmap& bitmap, const uint8* buffer, size_t bufsize, Bitmap::LoadResult& outResult)
 {
 	// Load JPEG from memory
-	bitmap.mError = readJPEG(buffer, bufsize);
-	if (bitmap.mError != Bitmap::Error::OK)
+	outResult.mError = readJPEG(buffer, bufsize);
+	if (outResult.mError != Bitmap::LoadResult::Error::OK)
 		return false;
+
 	buildBitmap(bitmap);
 	return true;
 }
@@ -803,12 +804,12 @@ bool BitmapCodecJPG::canEncode(const String& format) const
 	return false;
 }
 
-bool BitmapCodecJPG::decode(Bitmap& bitmap, InputStream& stream)
+bool BitmapCodecJPG::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadResult& outResult)
 {
 	// Load JPEG from memory
 	MemInputStream mstream(stream);
 	BitmapJPG codec;
-	return codec.decode(bitmap, mstream.getCursor(), mstream.getSize());
+	return codec.decode(bitmap, mstream.getCursor(), mstream.getSize(), outResult);
 }
 
 bool BitmapCodecJPG::encode(const Bitmap& bitmap, OutputStream& stream)

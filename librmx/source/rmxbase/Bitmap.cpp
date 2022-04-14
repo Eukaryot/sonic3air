@@ -13,24 +13,20 @@ Bitmap::CodecList Bitmap::mCodecs;
 
 Bitmap::Bitmap()
 {
-	privateInit();
 }
 
 Bitmap::Bitmap(const Bitmap& bitmap)
 {
-	privateInit();
 	copy(bitmap);
 }
 
 Bitmap::Bitmap(const String& filename)
 {
-	privateInit();
 	load(filename.toWString());
 }
 
 Bitmap::Bitmap(const WString& filename)
 {
-	privateInit();
 	load(filename);
 }
 
@@ -110,7 +106,9 @@ void Bitmap::clear()
 {
 	if (nullptr != mData)
 		delete[] mData;
-	privateInit();
+	mData = nullptr;
+	mWidth = 0;
+	mHeight = 0;
 }
 
 void Bitmap::clear(uint32 color)
@@ -228,7 +226,7 @@ void Bitmap::setPixel(int x, int y, float red, float green, float blue, float al
 					 + ((uint32)(saturate(alpha) * 255.0f) << 24);
 }
 
-bool Bitmap::decode(InputStream& stream, const char* format)
+bool Bitmap::decode(InputStream& stream, Bitmap::LoadResult& outResult, const char* format)
 {
 	// Load bitmap from memory
 	for (IBitmapCodec* codec : mCodecs.mList)
@@ -236,7 +234,7 @@ bool Bitmap::decode(InputStream& stream, const char* format)
 		if (nullptr != format && !codec->canDecode(format))
 			continue;
 
-		const bool result = codec->decode(*this, stream);
+		const bool result = codec->decode(*this, stream, outResult);
 		if (result)
 			return true;
 
@@ -334,7 +332,7 @@ uint8* Bitmap::convert(int format, int& size, uint32* palette)
 	return nullptr;
 }
 
-bool Bitmap::load(const WString& filename)
+bool Bitmap::load(const WString& filename, LoadResult* outResult)
 {
 	// Load from input stream
 	InputStream* stream = nullptr;
@@ -351,7 +349,8 @@ bool Bitmap::load(const WString& filename)
 
 	if (nullptr == stream)
 	{
-		mError = Bitmap::Error::FILE_NOT_FOUND;
+		if (nullptr != outResult)
+			outResult->mError = LoadResult::Error::FILE_NOT_FOUND;
 		return false;
 	}
 
@@ -361,12 +360,15 @@ bool Bitmap::load(const WString& filename)
 	if (pos > 0)
 		format.makeSubString(filename, pos+1, -1);
 
-	bool result = decode(*stream, *format.toString());
-	if (!result)
-		result = decode(*stream);
+	LoadResult loadResult;
+	bool success = decode(*stream, loadResult, *format.toString());
+	if (!success)
+		success = decode(*stream, loadResult);
+	if (nullptr != outResult)
+		*outResult = loadResult;
 
 	delete stream;
-	return result;
+	return success;
 }
 
 bool Bitmap::save(const WString& filename)
@@ -388,13 +390,7 @@ bool Bitmap::save(const WString& filename)
 	MemOutputStream s0(stream.getPosition());
 	result = stream.saveTo(s0);
 	result = s0.saveToFile(filename.toString());
-	if (!result)
-	{
-		mError = Bitmap::Error::FILE_NOT_FOUND;
-		return false;
-	}
-	mError = Bitmap::Error::OK;
-	return true;
+	return result;
 }
 
 void Bitmap::insert(int ax, int ay, const Bitmap& source)
@@ -797,15 +793,6 @@ void Bitmap::swap(Bitmap& other)
 	std::swap(mData, other.mData);
 	std::swap(mWidth, other.mWidth);
 	std::swap(mHeight, other.mHeight);
-	std::swap(mError, other.mError);
-}
-
-void Bitmap::privateInit()
-{
-	mData = nullptr;
-	mWidth = 0;
-	mHeight = 0;
-	mError = Bitmap::Error::OK;
 }
 
 inline void Bitmap::memcpyRect(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt)

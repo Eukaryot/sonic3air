@@ -54,8 +54,8 @@ struct PNGHeader
 
 #define RETURN(errcode) \
 { \
-	bitmap.mError = errcode; \
-	return (errcode == Bitmap::Error::OK); \
+	outResult.mError = errcode; \
+	return (errcode == Bitmap::LoadResult::Error::OK); \
 }
 
 
@@ -70,17 +70,17 @@ bool BitmapCodecPNG::canEncode(const String& format) const
 	return (format == "png");
 }
 
-bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
+bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadResult& outResult)
 {
 	// Load from PNG image data in memory
 	MemInputStream mstream(stream);
 	if (mstream.getRemaining() < 8)
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	const uint8* mem = mstream.getCursor();
 	const uint8* end = mstream.getCursor() + mstream.getRemaining();
 	if (memcmp(mem, PNGSignature, 8) != 0)
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 	mem += 8;
 
 	// Read header
@@ -100,14 +100,14 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 	{
 		// Length & chunk type
 		if ((size_t)(end - mem) < 8)
-			RETURN(Bitmap::Error::INVALID_FILE);
+			RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 		const uint8* chunkStart = mem;
 		const uint32 length = readUint32BE(mem);
 		const uint32 type   = readUint32BE(mem + 4);
 		mem += 8;
 		if ((size_t)(end - mem) < length + 4)
-			RETURN(Bitmap::Error::INVALID_FILE);
+			RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 		switch (type)
 		{
@@ -115,7 +115,7 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 			case PNG_IHDR:
 			{
 				if (length != 13)
-					RETURN(Bitmap::Error::FILE_ERROR);
+					RETURN(Bitmap::LoadResult::Error::FILE_ERROR);
 				memcpy(&header, mem, length);
 				width = swapBytes32(header.width);
 				height = swapBytes32(header.height);
@@ -154,17 +154,17 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 		const uint32 crc = rmx::getCRC32(chunkStart+4, length+4);
 		mem += length;
 		if (readUint32BE(mem) != crc)
-			RETURN(Bitmap::Error::INVALID_FILE);
+			RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 		mem += 4;
 	}
 
 	// Check for empty image data
 	if (content.empty())
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	// This function supports only 8-bit depth, nothing else
 	if (header.bitdepth != 8)
-		RETURN(Bitmap::Error::UNSUPPORTED);
+		RETURN(Bitmap::LoadResult::Error::UNSUPPORTED);
 
 	int bpp = 0;
 	switch (header.colortype)
@@ -175,7 +175,7 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 		case 4:  bpp = 2;  break;
 		case 6:  bpp = 4;  break;
 		default:
-			RETURN(Bitmap::Error::INVALID_FILE);
+			RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 	}
 	const int bytesPerLine = width * bpp;
 
@@ -184,18 +184,18 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 
 	int outsize = 0;
 	if ((content[0] & 15) != 8)		// Check zlib header for deflate algorithm
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	uint8* output = Deflate::decode(outsize, &content[2], (int)content.size() - 2);		// Skip the zlib header
 	if (nullptr == output)
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 #else
 
 	std::vector<uint8> outputMemory;
 	outputMemory.reserve(bytesPerLine * height + 0x4000);	// 0x4000 is the internal chunk size used by "ZlibDeflate::decode"
 	if (!ZlibDeflate::decode(outputMemory, &content[0], content.size()))
-		RETURN(Bitmap::Error::INVALID_FILE);
+		RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 	uint8* output = &outputMemory[0];
 	const int outsize = (int)outputMemory.size();
@@ -223,7 +223,7 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 		currentLineBuffer = &output[outpos+1];
 		outpos += bytesPerLine + 1;
 		if (outpos > outsize)
-			RETURN(Bitmap::Error::INVALID_FILE);
+			RETURN(Bitmap::LoadResult::Error::INVALID_FILE);
 
 		if (filter != 0)
 		{
@@ -349,7 +349,7 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream)
 #if !defined(USE_ZLIB)
 	delete[] output;
 #endif
-	RETURN(Bitmap::Error::OK);
+	RETURN(Bitmap::LoadResult::Error::OK);
 }
 
 bool BitmapCodecPNG::encode(const Bitmap& bitmap, OutputStream& stream)

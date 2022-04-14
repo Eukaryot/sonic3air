@@ -21,22 +21,27 @@
 class API_EXPORT Bitmap
 {
 public:
-	// Error codes
-	enum class Error : uint8
+	struct LoadResult
 	{
-		OK = 0,
-		FILE_NOT_FOUND,
-		INVALID_FILE,
-		NO_IMAGE_DATA,
-		UNSUPPORTED,
-		FILE_ERROR,
-		ERROR = 0xff	// Unknown or other error
+		// Error codes
+		enum class Error : uint8
+		{
+			OK = 0,			// No error
+			FILE_NOT_FOUND,
+			INVALID_FILE,
+			NO_IMAGE_DATA,
+			UNSUPPORTED,
+			FILE_ERROR,
+			ERROR = 0xff	// Unknown or other error
+		};
+		Error mError = Error::OK;
 	};
 
+public:
 	// Image data and properties
-	uint32* mData;
-	int mWidth, mHeight;
-	mutable Error mError;
+	uint32* mData = nullptr;
+	int mWidth = 0;
+	int mHeight = 0;
 
 public:
 	Bitmap();
@@ -79,12 +84,12 @@ public:
 	void setPixel(int x, int y, unsigned int color);
 	void setPixel(int x, int y, float red, float green, float blue, float alpha = 1.0f);
 
-	bool decode(InputStream& stream, const char* format = nullptr);
+	bool decode(InputStream& stream, LoadResult& outResult, const char* format = nullptr);
 	bool encode(OutputStream& stream, const char* format) const;
 
 	uint8* convert(int format, int& size, uint32* palette = nullptr);
 
-	bool load(const WString& filename);
+	bool load(const WString& filename, LoadResult* outResult = nullptr);
 	bool save(const WString& filename);
 
 	void insert(int ax, int ay, const Bitmap& source);
@@ -113,7 +118,6 @@ public:
 	Bitmap& operator=(const Bitmap& bmp)		 { copy(bmp); return *this; }
 
 private:
-	void privateInit();
 	void memcpyRect(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
 	void memcpyBlend(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
 	void convert2palette(uint8* output, int colors, uint32* palette);
@@ -125,51 +129,4 @@ public:
 		template<class CLASS> void add()  { mList.push_back(new CLASS()); }
 	};
 	static CodecList mCodecs;
-};
-
-
-
-class IBitmapCodec
-{
-public:
-	virtual bool canDecode(const String& format) const		  { return false; }
-	virtual bool canEncode(const String& format) const		  { return false; }
-	virtual bool decode(Bitmap& bitmap, InputStream& stream)  { return false; }
-	virtual bool encode(const Bitmap& bitmap, OutputStream& stream)  { return false; }
-};
-
-class API_EXPORT BitmapCodecBMP : public IBitmapCodec
-{
-public:
-	virtual bool canDecode(const String& format) const;
-	virtual bool canEncode(const String& format) const;
-	virtual bool decode(Bitmap& bitmap, InputStream& stream);
-	virtual bool encode(const Bitmap& bitmap, OutputStream& stream);
-};
-
-class API_EXPORT BitmapCodecPNG : public IBitmapCodec
-{
-public:
-	virtual bool canDecode(const String& format) const;
-	virtual bool canEncode(const String& format) const;
-	virtual bool decode(Bitmap& bitmap, InputStream& stream);
-	virtual bool encode(const Bitmap& bitmap, OutputStream& stream);
-};
-
-class API_EXPORT BitmapCodecJPG : public IBitmapCodec
-{
-public:
-	virtual bool canDecode(const String& format) const;
-	virtual bool canEncode(const String& format) const;
-	virtual bool decode(Bitmap& bitmap, InputStream& stream);
-	virtual bool encode(const Bitmap& bitmap, OutputStream& stream);
-};
-
-class API_EXPORT BitmapCodecICO : public IBitmapCodec
-{
-public:
-	virtual bool canDecode(const String& format) const;
-	virtual bool canEncode(const String& format) const;
-	virtual bool decode(Bitmap& bitmap, InputStream& stream);
-	virtual bool encode(const Bitmap& bitmap, OutputStream& stream);
 };
