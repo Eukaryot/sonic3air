@@ -265,7 +265,7 @@ function void fn01f6d0()
 		A1 = 0xffffb000
 		BlockerElement.KillCharacter()
 	}
-	if (D6.u8 &= 0x08)
+	if (D6.u8 & 0x08)
 	{
 		A1 = 0xffffb04a
 		BlockerElement.KillCharacter()

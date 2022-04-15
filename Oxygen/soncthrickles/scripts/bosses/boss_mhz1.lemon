@@ -575,7 +575,7 @@ function void fn0757d6()
 		D0.u8 = global.framecounter
 		if ((D0 & 0x01) == 0)
 		{
-			if ((D0.u8 &= 0x0f) == 0 && objA0.render_flags & render_flag.VISIBLE)
+			if ((D0.u8 & 0x0f) == 0 && objA0.render_flags & render_flag.VISIBLE)
 			{
 				if (allocDynamicObjectStd())
 				{
