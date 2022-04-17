@@ -69,8 +69,8 @@ void PauseMenu::onFadeIn()
 		mMenuEntries.clear();
 		mMenuEntries.reserve(3);
 		mMenuEntries.addEntry("Continue", 0);
-		//if (Game::instance().getCurrentMode() != Game::Mode::TIME_ATTACK)
-		//	mMenuEntries.addEntry("Options", 1);
+		if (Game::instance().getCurrentMode() != Game::Mode::TIME_ATTACK)
+			mMenuEntries.addEntry("Options", 1);
 		if (mRestartEnabled)
 			mMenuEntries.addEntry("Restart", 2);
 		mMenuEntries.addEntry("Exit Game", 3);
@@ -292,7 +292,7 @@ void PauseMenu::render()
 		{
 			const constexpr int LINE_HEIGHT = 15;
 
-			int px = screenWidth - 194 + roundToInt((1.0f - mDialogVisibility) * 80.0f) - (int)mMenuEntries.size() * 9;
+			int px = screenWidth - 191 + roundToInt((1.0f - mDialogVisibility) * 80.0f) - (int)mMenuEntries.size() * 9;
 			int py = screenHeight - 1 - (int)mDialogEntries.size() * LINE_HEIGHT;
 
 			if (mDialogEntries.size() <= 2)
@@ -324,7 +324,7 @@ void PauseMenu::render()
 
 		// Actual pause menu (upper & lower part)
 		{
-			const constexpr int LINE_HEIGHT = 28;
+			const constexpr int LINE_HEIGHT = 26;
 			const int rightAnchor = screenWidth + roundToInt((1.0f - mVisibility) * 160.0f);
 
 			Recti rect = Recti(rightAnchor - global::mPauseScreenUpperBG.getWidth(), 0, global::mPauseScreenUpperBG.getWidth(), global::mPauseScreenUpperBG.getHeight());
