@@ -192,10 +192,8 @@ function void SpecialStage()
 	#if GAMEAPP
 		BlueSpheres.renderCustomGround()
 		BlueSpheres.renderCustomCharacterShadows()
-	#else
-	#if STANDALONE
+	#elif STANDALONE
 		Renderer.setViewport(getScreenExtend(), 0, 320, 224, 0x0000)
-	#endif
 	#endif
 
 		LoadRequiredSpritePatterns()
@@ -2706,13 +2704,11 @@ function void BlueSpheres.FadeIn()
 			BlueSpheres.renderCustomGround()
 			BlueSpheres.renderCustomCharacterShadows()
 		}
-	#else
-	#if STANDALONE
+	#elif STANDALONE
 		if (global.game_mode != 0x30)	// Not in results screen of Blue Spheres mode
 		{
 			Renderer.setViewport(getScreenExtend(), 0, 320, 224, 0x0000)
 		}
-	#endif
 	#endif
 	}
 }
