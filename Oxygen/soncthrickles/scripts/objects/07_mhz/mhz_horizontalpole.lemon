@@ -103,18 +103,16 @@ function void fn03ed6e()
 
 				if (u8[A2 + 0x04] == 0x28)
 				{
-					u16[A1 + 0x20] = 0x1000
-					D0.u16 = u16[A3]
-					D1.u16 = D0.u16
-					D1.s16 >>= 1
-					D0.u16 += D1.u16
+					objA1.state = char.state.STRAIGHTJUMP
+					objA1.state.former = 0
+					D0.u16 = s16[A3] + (s16[A3] >> 1)
 					objA1.velocity.y = D0.u16
 					goto03ee8c = true
 				}
 
 				if (u8[A2 + 0x04] == 0x05)
 				{
-					u16[A1 + 0x20] = 0
+					objA1.state.both = 0
 					objA1.velocity.y = u16[A3]
 					goto03ee8c = true
 				}
@@ -124,10 +122,10 @@ function void fn03ed6e()
 					u8[A2] = 0
 					u8[A2 + 0x02] = 0x08
 					u8[A1 + 0x2e] &= 0xfc
-					u8[A1 + 0x2a] |= 0x02
 					u8[A1 + 0x40] = 0
 					u8[A1 + 0x3d] = 0
 					u8[A1 + 0x05] = 0x02
+					objA1.flags2a |= char.flag.IN_AIR
 					objA1.flags2a &= ~char.flag.CONTROL_LOCK
 					u8[A1 + 0x2f] = 0
 					u8[A1 + 0x27] = 0
@@ -145,22 +143,22 @@ function void fn03ed6e()
 			}
 
 			objA1.velocity.y = -0x500
-			if (u8[A1 + 0x2a] & 0x40)
+			if (objA1.flags2a & char.flag.UNDERWATER)
 			{
 				objA1.velocity.y = -0x200
 			}
 		}
 
 		u8[A2] = 0
-		u8[A2 + 2] = (u8[A1 + 0x2a] & 0x40) ? 0x3c : 0x1e
+		u8[A2 + 2] = (objA1.flags2a & char.flag.UNDERWATER) ? 0x3c : 0x1e
 
 		u8[A1 + 0x2e] &= 0xfc
-		u8[A1 + 0x2a] |= 0x02
 		u8[A1 + 0x40] = 0x01
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
-		u8[A1 + 0x20] = 0x02
-		u8[A1 + 0x2a] |= 0x04
+		objA1.state = char.state.ROLLING
+		objA1.flags2a |= objA1.flags2a
+		objA1.flags2a |= char.flag.ROLLING
 		objA1.flags2a &= ~char.flag.CONTROL_LOCK
 		u8[A1 + 0x27] = 0
 		return
@@ -254,14 +252,10 @@ function void fn03efba()
 		u8[A2 + 0x04] = D0.u8
 	}
 
-	D0 = u8[A2 + 0x04]
-	D0.u8 >>= 4
+	D0 = u8[A2 + 0x04] >> 4
 	D0.u8 += u8[A2 + 0x08]
 	D1.u8 = u8[0x03f01a + D0.s16]
 	u8[A1 + 0x22] = D1.u8
 	D0.u16 &= 0x0f
-	D1.u8 = u8[0x03f03a + D0.s16]
-	D1.s16 = D1.s8
-	D1.u16 += objA0.position.y.u16
-	objA1.position.y.u16 = D1.u16
+	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x03f03a + D0.u16]
 }
