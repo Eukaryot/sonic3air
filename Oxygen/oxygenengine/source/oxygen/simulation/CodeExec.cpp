@@ -558,6 +558,7 @@ void CodeExec::addWatch(uint32 address, uint16 bytes, bool persistent)
 	watch.mPersistent = persistent;
 	watch.mInitialValue = getCurrentWatchValue(watch.mAddress, watch.mBytes);
 	watch.mHits.clear();
+	watch.mLastHitLocation = Location();
 	mWatches.push_back(&watch);
 }
 
