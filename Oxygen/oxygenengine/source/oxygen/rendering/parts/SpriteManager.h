@@ -105,6 +105,7 @@ public:
 	void reset();
 	void resetSprites();
 	void preFrameUpdate();
+	void postFrameUpdate();
 	void refresh();
 
 	void drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor = Color::WHITE, const Color& addedColor = Color::TRANSPARENT);
@@ -126,6 +127,7 @@ public:
 
 private:
 	void checkSpriteTag(SpriteInfo& sprite);
+	void collectLegacySprites();
 
 private:
 	PatternManager& mPatternManager;

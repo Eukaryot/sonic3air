@@ -63,103 +63,77 @@ void SpriteManager::preFrameUpdate()
 	mTaggedSpritesThisFrame.clear();
 }
 
-void SpriteManager::refresh()
+void SpriteManager::postFrameUpdate()
 {
-	if (!mResetSprites)
-		return;
-
-	// Move over from "next" to "current" sprite sets
-	mCurrSpriteSets.swap(mNextSpriteSets);
-	mNextSpriteSets.clear();
-
-	mResetSprites = false;
-
-	if (EngineMain::getDelegate().useDeveloperFeatures())
+	if (mResetSprites)
 	{
-		mLegacyVdpSpriteMode = FTX::keyState('u') && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
+		// Move over from "next" to "current" sprite sets
+		mCurrSpriteSets.swap(mNextSpriteSets);
+		mNextSpriteSets.clear();
 
-		// In legacy mode, we collect current sprites from VRAM,
-		//  otherwise the sprites got added in "drawVdpSprite" already
-		if (mLegacyVdpSpriteMode)
+		mResetSprites = false;
+
+		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			// Collect sprites to render
-			mCurrSpriteSets.mVdpSprites.clear();
+			mLegacyVdpSpriteMode = FTX::keyState('u') && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT));
 
-			for (int link = 0;;)
+			// In legacy mode, we collect current sprites from VRAM, instead of the usual methods via script calls like "Renderer.drawVdpSprite"
+			if (mLegacyVdpSpriteMode)
 			{
-				const uint16* data = (uint16*)&EmulatorInterface::instance().getVRam()[mSpriteAttributeTableBase + link * 2];
+				collectLegacySprites();
+			}
+		}
 
-				VdpSpriteInfo& sprite = vectorAdd(mCurrSpriteSets.mVdpSprites);
-				sprite.mRenderQueue = 0x2000;
-				sprite.mPriorityFlag = (data[2] & 0x8000) != 0;
+		// Mix all types of sprites together in one sorted vector
+		mSprites.clear();
+		for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
+		{
+			mSprites.push_back(&sprite);
+		}
+		for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
+		{
+			mSprites.push_back(&sprite);
+		}
+		for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
+		{
+			mSprites.push_back(&sprite);
+		}
+		for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
+		{
+			mSprites.push_back(&sprite);
+		}
 
-				// Note that for accurate emulation, this would be 0x1ff instead of 0x3ff
-				//  -> But it limits effective maximum sprite x-position to 383 = 0x17f, which is a bit too low for widescreen with e.g. 400px
-				//  -> So we're taking an extra bit; looks like it is not used otherwise anyway
-				sprite.mPosition.x = (data[3] & 0x3ff) - 0x80;
-				sprite.mPosition.y = (data[0] & 0x1ff) - 0x80;
+		// Sorting only cares about render queue, not priority!
+		//  -> Because that's how the VDP works as well
+		std::stable_sort(mSprites.begin(), mSprites.end(),
+						 [](const SpriteInfo* a, const SpriteInfo* b) { return a->mRenderQueue > b->mRenderQueue; });
 
-				sprite.mSize.x = 1 + ((data[1] >> 10) & 3);
-				sprite.mSize.y = 1 + ((data[1] >> 8) & 3);
+		// Reverse order, so that the sprites "in front" are rendered last
+		//  -> Note that it makes a difference if this was removed and the sorting order changed, namely for sprites sharing the same render queue
+		std::reverse(mSprites.begin(), mSprites.end());
 
-				sprite.mFirstPattern = data[2];
-
-				// Update "last used atex" of patterns in cache (actually that's only needed for debug output)
-				{
-					const int patterns = sprite.mSize.x * sprite.mSize.y;
-					for (int k = 0; k < patterns; ++k)
-					{
-						mPatternManager.setLastUsedAtex(data[2] + k, (data[2] >> 9) & 0x70);
-					}
-				}
-
-				// Go to next sprite
-				link = (data[1] & 0x7f) << 2;
-				if ((link == 0) || (link >= 320))
-					break;
-				if (mCurrSpriteSets.mVdpSprites.size() >= 0x100)	// Sanity check
-					break;
+		// Process coordinates of all sprites
+		const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
+		for (SpriteInfo* sprite : mSprites)
+		{
+			if (sprite->mCoordinatesSpace == SpriteManager::Space::WORLD)
+			{
+				sprite->mPosition -= worldSpaceOffset;
 			}
 		}
 	}
-
-	// Mix all types of sprites together in one sorted vector
-	mSprites.clear();
-	for (VdpSpriteInfo& sprite : mCurrSpriteSets.mVdpSprites)
+	else
 	{
-		mSprites.push_back(&sprite);
-	}
-	for (PaletteSpriteInfo& sprite : mCurrSpriteSets.mPaletteSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (ComponentSpriteInfo& sprite : mCurrSpriteSets.mComponentSprites)
-	{
-		mSprites.push_back(&sprite);
-	}
-	for (SpriteMaskInfo& sprite : mCurrSpriteSets.mSpriteMasks)
-	{
-		mSprites.push_back(&sprite);
-	}
-
-	// Sorting only cares about render queue, not priority!
-	//  -> Because that's how the VDP works as well
-	std::stable_sort(mSprites.begin(), mSprites.end(),
-					 [](const SpriteInfo* a, const SpriteInfo* b) { return a->mRenderQueue > b->mRenderQueue; });
-
-	// Reverse order, so that the sprites "in front" are rendered last
-	//  -> Note that it makes a difference if this was removed and the sorting order changed, namely for sprites sharing the same render queue
-	std::reverse(mSprites.begin(), mSprites.end());
-
-	// Process coordinates of all sprites
-	const Vec2i worldSpaceOffset = mSpacesManager.getWorldSpaceOffset();
-	for (SpriteInfo* sprite : mSprites)
-	{
-		if (sprite->mCoordinatesSpace == SpriteManager::Space::WORLD)
+		// When maintaining sprites, make sure to reset sprite interpolation
+		for (SpriteInfo* sprite : mSprites)
 		{
-			sprite->mPosition -= worldSpaceOffset;
+			sprite->mLastPositionChange.clear();
 		}
 	}
+}
+
+void SpriteManager::refresh()
+{
 }
 
 void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor, const Color& addedColor)
@@ -356,5 +330,47 @@ void SpriteManager::checkSpriteTag(SpriteInfo& sprite)
 
 		TaggedSpriteData& data = mTaggedSpritesThisFrame[mSpriteTag];
 		data.mPosition = mTaggedSpritePosition;
+	}
+}
+
+void SpriteManager::collectLegacySprites()
+{
+	// Collect sprites to render
+	mCurrSpriteSets.mVdpSprites.clear();
+
+	for (int link = 0;;)
+	{
+		const uint16* data = (uint16*)&EmulatorInterface::instance().getVRam()[mSpriteAttributeTableBase + link * 2];
+
+		VdpSpriteInfo& sprite = vectorAdd(mCurrSpriteSets.mVdpSprites);
+		sprite.mRenderQueue = 0x2000;
+		sprite.mPriorityFlag = (data[2] & 0x8000) != 0;
+
+		// Note that for accurate emulation, this would be 0x1ff instead of 0x3ff
+		//  -> But it limits effective maximum sprite x-position to 383 = 0x17f, which is a bit too low for widescreen with e.g. 400px
+		//  -> So we're taking an extra bit; looks like it is not used otherwise anyway
+		sprite.mPosition.x = (data[3] & 0x3ff) - 0x80;
+		sprite.mPosition.y = (data[0] & 0x1ff) - 0x80;
+
+		sprite.mSize.x = 1 + ((data[1] >> 10) & 3);
+		sprite.mSize.y = 1 + ((data[1] >> 8) & 3);
+
+		sprite.mFirstPattern = data[2];
+
+		// Update "last used atex" of patterns in cache (actually that's only needed for debug output)
+		{
+			const int patterns = sprite.mSize.x * sprite.mSize.y;
+			for (int k = 0; k < patterns; ++k)
+			{
+				mPatternManager.setLastUsedAtex(data[2] + k, (data[2] >> 9) & 0x70);
+			}
+		}
+
+		// Go to next sprite
+		link = (data[1] & 0x7f) << 2;
+		if ((link == 0) || (link >= 320))
+			break;
+		if (mCurrSpriteSets.mVdpSprites.size() >= 0x100)	// Sanity check
+			break;
 	}
 }

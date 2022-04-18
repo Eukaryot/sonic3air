@@ -61,6 +61,7 @@ void RenderParts::preFrameUpdate()
 void RenderParts::postFrameUpdate()
 {
 	mOverlayManager.postFrameUpdate();
+	mSpriteManager.postFrameUpdate();
 	mScrollOffsetsManager.postFrameUpdate();
 }
 
