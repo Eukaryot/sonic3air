@@ -32,7 +32,6 @@ namespace global
 	extern Font mFont18;
 
 	extern DrawerTexture mGameLogo;
-	extern DrawerTexture mMainMenuBackgroundLeft;
 	extern DrawerTexture mMainMenuBackgroundSeparator;
 	extern DrawerTexture mDataSelectBackground;
 	extern DrawerTexture mDataSelectAltBackground;

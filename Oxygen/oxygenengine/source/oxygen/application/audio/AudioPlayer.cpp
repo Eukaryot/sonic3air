@@ -350,6 +350,19 @@ void AudioPlayer::stopAllSoundsByChannel(int channelId)
 	}
 }
 
+void AudioPlayer::stopAllSoundsByChannelAndContext(int channelId, int contextId)
+{
+	SoundIterator iterator(mPlayingSounds);
+	iterator.filterChannel(channelId);
+	iterator.filterContext(contextId);
+	while (PlayingSound* soundPtr = iterator.getNext())
+	{
+		// We're not actually stopping the sound, but just fading it out very fast
+		soundPtr->mAudioRef.setVolumeChange(-20.0f);
+		iterator.removeCurrent();
+	}
+}
+
 void AudioPlayer::fadeInChannel(int channelId, float length)
 {
 	SoundIterator iterator(mPlayingSounds);
@@ -503,7 +516,7 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 	// Stop all old sounds of this channel
 	if (channelId != 0xff && sourceReg->mType != SourceRegistration::Type::EMULATION_CONTINUOUS)
 	{
-		stopAllSoundsByChannel(channelId);
+		stopAllSoundsByChannelAndContext(channelId, contextId);
 	}
 
 	SourceRegistration* baseSourceReg = sourceReg;

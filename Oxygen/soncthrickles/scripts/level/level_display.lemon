@@ -1115,10 +1115,15 @@ function void fillPlane_Default(u16 planeVramBaseAddress, u32 startX, u32 startY
 		}
 	}
 
+	fillPlane_DefaultUncropped(planeVramBaseAddress, startX, startY, width, height)
+}
+
+function void fillPlane_DefaultUncropped(u16 planeVramBaseAddress, u32 startX, u32 startY, u32 width, u32 height)
+{
 	u32 minTileX = startX / 16
-	u32 maxTileX = (startX + width + 15) / 16
+	u32 maxTileX = min((startX + width + 15) / 16, minTileX + 31)
 	u32 minTileY = startY / 16
-	u32 maxTileY = (startY + height + 15) / 16
+	u32 maxTileY = min((startY + height + 15) / 16, minTileY + 15)
 
 	for (u32 y = minTileY; y <= maxTileY; ++y)
 	{

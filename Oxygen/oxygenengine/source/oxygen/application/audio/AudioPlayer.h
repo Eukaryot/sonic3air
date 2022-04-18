@@ -37,6 +37,7 @@ public:
 
 	void stopAllSounds(bool immediately = false);
 	void stopAllSoundsByChannel(int channelId);
+	void stopAllSoundsByChannelAndContext(int channelId, int contextId);
 
 	void fadeInChannel(int channelId, float length);
 	void fadeOutChannel(int channelId, float length);

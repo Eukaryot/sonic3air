@@ -1,0 +1,315 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2022 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// Main menu background                                 //
+//-------------------------------------------------------//
+
+function void MainMenu.Background()
+{
+#if 0
+
+	global.game_mode = 0x0c
+	global.zone_act = 0x0d01
+
+	// From "initializeMainGame()"
+	{
+		global.pause_disabled = 0
+		kosinski.queue_size = 0
+		zeroMemory(0xffffff10, 0x1b * 4)
+		ClearPatternLoadingQueue()
+
+		Renderer.resetSprites()
+
+		if (s16(global.rolling_demo) >= 0)
+		{
+			fn0011ca()
+
+			level.framecounter = 0
+
+			{
+				A2 = MainGame.getLevelDataPointer()
+				D0 = u8[A2]
+				if (D0.u8 != 0)
+				{
+					requestLoadingPatterns(D0.u8)
+				}
+			}
+
+			SetGlobalCharacters()
+		}
+
+		zeroMemory(0xffffac00, 0x400)
+		zeroMemory(0xffffb000, 0x2000)
+		zeroMemory(0xfffff628, 0x16 * 4)
+		zeroMemory(0xfffff700, 0x100)
+		zeroMemory(0xfffffe6e, 0x13 * 4)
+		zeroMemory(0xfffffa80, 0x80)
+
+		fn01aa6e()
+
+		VDP.Config.setVerticalScrolling(false, 0xff)	// Good old horizontal scrolling mode
+		VDP.Config.setNameTableBasePlaneA(0xc000)
+		VDP.Config.setNameTableBasePlaneB(0xe000)
+		VDP.Config.setSpriteAttributeTableBase(0xf800)
+		VDP.Config.setPlayfieldSizeInPixels(512, 256)
+		VDP.Config.enableHInt(false)
+		VDP.Config.setupWindowPlane(false, 0)	// Disable window plane
+		VDP.Config.setBackdropColor(0x20)
+		VDP.Config.setRenderingModeConfiguration(false)
+
+		if (debug_mode.unlocked && control.pad1.state & CONTROL_A)
+		{
+			debug_mode.enabled.u8 = true
+		}
+
+		h_int.configuration = 0x8aff
+		Renderer.configureHInt()
+
+		u16[0xfffffb00] = 0
+		u32[0xfffffbfc] = 0xfffffb00
+
+		Level.loadPaletteData((global.characters == CHARS_KNUCKLES_ALONE) ? 5 : 3)
+		Level.InitializeWater()
+
+		zeroMemory(0xfffff0a0, 0x60)
+
+		if (level.water_present)
+		{
+			VDP.Config.enableHInt(true)
+		}
+
+		{
+			level.default_music = 0
+			level.skip_titlecard = false
+			ResetScoreDisplay()
+		}
+
+		Level.loadNonfadingPaletteData(0x03)
+
+		fn01bc60()
+
+		UpdateCamera()
+		fn007812()
+		fn01c2b0()
+
+		InitLevelDisplay()
+
+		fn028c80()
+		fn0076a6()
+		UpdateWater()
+
+		u16[0xffffff7c] = control.pad2
+		control.player1 = 0
+		control.tails = 0
+		control.pad1 = 0
+		control.pad2 = 0
+		player1.control_override = 1
+		player2.control_override = 1
+		global.level_started = 0
+		if (level.water_present && global.zone == 0x01)
+		{
+			u32[0xffffcf82] = 0x01f202
+			u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
+			u8[0xffffb19e] = 1
+		}
+		else if (global.zone == 0x07)
+		{
+			u32[0xffffb128] = 0x03da00		// MHZ leaves effect
+		}
+
+		if (checkpoint.number == 0)
+		{
+			ring_counter = 0
+			timer.alldata = 0
+			extra_lives_granted = 0
+			u16[0xfffffed0] = 0
+			u32[0xfffffed2] = 0
+			global.shields_backup_2 = 0
+			global.in_extra_stage = 0
+		}
+
+		global.time_over = 0
+		debug_mode.state = 0
+		level.restart = 0
+
+		u16[0xfffffec8] = 0
+		u16[0xfffffeca] = 0
+		u16[0xfffffecc] = 0
+		u16[0xfffffece] = 0
+		u16[0xfffffede] = 0
+		u8[0xfffffe65] = 0
+		super.active = 0
+		ResetOscillatingNumbers()
+
+		hud.dirty.score = 0x01
+		hud.dirty.rings = 0x01
+		hud.dirty.timer = 0x01
+		global.level_started = 1
+
+		{
+			hud.dirty.timer = 0
+			global.level_started = 0
+		}
+
+		fn0067ee()
+		DynamicObjectsLoading()
+		UpdateListOfRingsAround()
+
+		fn01cacc()
+
+		UpdateGameObjects()
+		RenderSprites()
+		LevelTilesAnimation()
+		global.demo_countdown = 1800	// 30 seconds
+		Level.InitializeWater.Part2()
+
+		zeroMemory(0xfffff0a0, 0x60)
+
+		player1.control_override = 0
+		player2.control_override = 0
+		fn0075d2()
+	}
+
+	palette_fade.range = 0x202f		// Only palette entries 0x10...0x3f
+	SetPaletteFadedOut()
+
+	global.fade_timer = 0x16
+	u16[0xffffb27e] = 0x16
+	control.pad1 = 0x7f00
+	control.pad2 = 0x7f00
+	checkpoint.number &= 0x7f
+
+	while (true)
+	{
+		global.frame_state = 0x08
+		Kosinski.ProcessDecompressionQueue()
+
+		// End point for a single frame
+		//  -> Right here we place the entry point for the standalone version
+		waitForNextFrame()
+		++level.framecounter
+
+		// Try to process as much Kosinski decompression as possible
+		while (kosinski.queue_size + kosinski.waiting_modules > 0)
+		{
+			Kosinski.ProcessDecompressionQueue()
+			Kosinski.ProcessModules()
+		}
+
+		UpdatePaletteEffects()
+
+		UpdateGameObjects()
+
+		UpdateLevelDisplay()
+
+		LoadRequiredSpritePatterns()
+
+		Kosinski.ProcessModules()
+
+		RenderSprites()
+
+/*
+		for (u32 addr = 0; addr < 0x10000; addr += 2)
+			u16[0xffff0000 + addr] = getVRAM(addr)
+		debugDumpToFile("mmbg_vram.bin", 0xffff0000, 0x10000)
+		System.loadExternalRawData("mmbg_ram", 0xffff0000)
+*/
+		//debugDumpToFile("mmbg_ram.bin", 0xffff0000, 0x10000)
+	}
+
+#else
+
+	while (true)
+	{
+		global.game_mode = 0x0c
+		global.zone_act = 0x0d01
+	
+		// Load the required level patterns for the outro
+		//  -> This is essentially the same as "fn007812", but without the call to "waitForNextFrame", and hard-coded 0x1cfb44 to simplify things
+		{
+			A4 = MainGame.getLevelDataPointer()
+			A1 = 0x1cfb44
+			D4.u16 = u16[A1]
+			Kosinski.addToDMAQueue(A1, 0x0000)
+
+			while (true)
+			{
+				global.frame_state = 0x0c
+				Kosinski.ProcessDecompressionQueue()
+
+				LoadRequiredSpritePatterns()
+				Kosinski.ProcessModules()
+				if (kosinski.waiting_modules == 0)
+					break
+			}		
+		}
+
+		// Load level chunks and stuff
+		fn01c2b0()
+
+		// Load plane contents
+		camera.foreground.x.u16 = 0x0290
+		camera.foreground.y.u16 = 0
+		camera.background.x.u16 = 0
+		camera.background.y.u16 = 0x0800
+		fillPlane_DefaultUncropped(0xc000, camera.foreground.x.u16, camera.foreground.y.u16, 512, getScreenHeight())
+		fillPlane_DefaultUncropped(0xe000, camera.background.x.u16, camera.background.y.u16, 512, getScreenHeight())
+		camera.foreground.x.u16 += 6		// Move camera a few pixels to the right
+
+		// Write vertical scroll offsets to VSRAM
+		VDP.setupVSRAMWrite(0)
+		VDP.writeData16(0x4c)								// Foreground vertical scroll offset (Angel Island)
+		VDP.writeData16(camera.background.y.u16 & 0xff)		// Background vertical scroll offset (sky & ocean)
+
+		// Setup palette
+		copyPaletteDataFromTable(0x03, 0xfc00)
+		copyMemory(0xfffffc20, 0x05b16e, 0x20)
+		copyMemory(0xfffffc40, 0x0a97bc, 0x20)
+		copyMemory(0xfffffc60, 0x0a983c, 0x20)
+
+		u32[0xffffa800] = 0x00738000		// Basically a timer for the animation; don't start at 0, that doesn't look all that nice
+
+		while (true)
+		{
+			// Ocean palette effect
+			fn05928c()
+			VDP.copyToCRAMbyDMA(0xfffffc00, 0x0000, 0x80)
+
+			// Scrolling for water and clouds
+			{
+				fn05b0a8()
+				u32[0xffffa800] -= 0x0400	// Partially undo the scrolling progress, to make it slower
+
+				A4 = 0x05b15a
+				A5 = 0xffffa804
+				A1 = 0xffffe000		// Location of linewise scroll offsets
+				D0.u16 = 0x0300		// camera.background.y.u16 - 0x0500
+				D1.u16 = getScreenHeight() - 1
+				D3.u16 = camera.foreground.x.u16
+				fn04f0de()
+
+				// Manual correction for two lines with broken scrolling (also in outro)
+				u16[0xffffe0ee] = u16[0xffffe0f2]
+				u16[0xffffe16e] = u16[0xffffe172]
+				VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
+			}
+
+			yieldExecution()
+			++level.framecounter
+
+			// Only for debugging: Quick restart
+			//if (Input.buttonPressed(BUTTON_Y))
+			//	break
+		}
+	}
+
+#endif
+}

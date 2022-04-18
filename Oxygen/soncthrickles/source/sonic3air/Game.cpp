@@ -420,6 +420,16 @@ void Game::startIntoLevelSelect()
 	startIntoGameInternal();
 }
 
+void Game::startIntoMainMenuBG()
+{
+	mMode = Mode::MAIN_MENU_BG;
+
+	Simulation& simulation = Application::instance().getSimulation();
+	simulation.resetIntoGame("EntryFunctions.mainMenuBG");
+
+	startIntoGameInternal();
+}
+
 void Game::onPreUpdateFrame()
 {
 }
@@ -834,8 +844,8 @@ void Game::startIntoGameInternal()
 	simulation.setRunning(true);
 	simulation.setSpeed(simulation.getDefaultSpeed());
 
-	// Enforce fixed simulation frequency in Time Attack
-	if (mMode == Mode::TIME_ATTACK)
+	// Enforce fixed simulation frequency in Time Attack and for the Main Menu background
+	if (mMode == Mode::TIME_ATTACK || mMode != Mode::MAIN_MENU_BG)
 		simulation.setSimulationFrequencyOverride(60.0f);
 	else
 		simulation.disableSimulationFrequencyOverride();
@@ -844,9 +854,12 @@ void Game::startIntoGameInternal()
 
 	SharedDatabase::resetAchievementValues();
 
-	AudioOut::instance().moveMenuMusicToIngame();	// Needed only for the data select music to continue from main menu to data select
-	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
-	AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
+	if (mMode != Mode::MAIN_MENU_BG)
+	{
+		AudioOut::instance().moveMenuMusicToIngame();	// Needed only for the data select music to continue from main menu to data select
+		AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
+		AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_SOUND);
+	}
 
 	mPlayerRecorder.reset();
 	GameApp::instance().enableStillImageBlur(false);

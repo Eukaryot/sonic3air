@@ -91,6 +91,7 @@ private:
 
 	float mCurrentTime = 0.0f;
 	float mAnimationTimer = 0.0f;	// In seconds; loops back to zero after 1 minute
+	bool mAnimatedBackgroundActive = false;
 
 	float mPreviewVisibility = 0.0f;
 	float mPreviewVisibilityChange = 0.0f;

@@ -80,6 +80,7 @@ include bosses/?
 
 #if STANDALONE
 include standalone/?
+include standalone/mainmenu/?
 include standalone/rendering/?
 include standalone/resources/?
 #endif

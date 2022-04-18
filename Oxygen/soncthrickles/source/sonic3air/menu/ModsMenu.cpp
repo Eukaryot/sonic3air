@@ -11,6 +11,7 @@
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/audio/AudioOut.h"
+#include "sonic3air/Game.h"
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
@@ -811,6 +812,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	{
 		modManager.setActiveMods(activeMods);
 		modManager.saveActiveMods();
+		Game::instance().setCurrentMode(Game::Mode::UNDEFINED);		// Only used to signal MenuBackground that it needs to reload the animated background
 	}
 	return anyChange;
 }

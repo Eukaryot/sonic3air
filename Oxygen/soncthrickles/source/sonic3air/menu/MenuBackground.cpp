@@ -17,9 +17,12 @@
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/menu/TimeAttackMenu.h"
 #include "sonic3air/menu/options/OptionsMenu.h"
+#include "sonic3air/Game.h"
 
+#include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/mainview/GameView.h"
+#include "oxygen/simulation/Simulation.h"
 
 
 namespace detail
@@ -168,7 +171,26 @@ void MenuBackground::render()
 	{
 		if (titleLeft < titleRight)
 		{
-			detail::drawQuad(drawer, titleLeft, titleRight, global::mMainMenuBackgroundLeft);
+			if (Game::instance().getCurrentMode() != Game::Mode::MAIN_MENU_BG)
+			{
+				Game::instance().startIntoMainMenuBG();
+			}
+			else if (!mAnimatedBackgroundActive)
+			{
+				Application::instance().getSimulation().setRunning(true);
+			}
+			mAnimatedBackgroundActive = true;
+		}
+		else
+		{
+			if (mAnimatedBackgroundActive)
+			{
+				if (Game::instance().getCurrentMode() == Game::Mode::MAIN_MENU_BG)
+				{
+					Application::instance().getSimulation().setRunning(false);
+				}
+				mAnimatedBackgroundActive = false;
+			}
 		}
 
 		if (splitLight < splitBlue)

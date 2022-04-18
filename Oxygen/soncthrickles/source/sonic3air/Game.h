@@ -32,7 +32,8 @@ public:
 		ACT_SELECT,		// Act Select mode
 		TIME_ATTACK,	// Time Attack mode
 		COMPETITION,	// Competition mode
-		BLUE_SPHERE		// Blue Sphere game mode
+		BLUE_SPHERE,	// Blue Sphere game mode
+		MAIN_MENU_BG	// Main menu background
 	};
 
 public:
@@ -57,6 +58,7 @@ public:
 	void startIntoCompetitionMode();
 	void startIntoBlueSphere();
 	void startIntoLevelSelect();
+	void startIntoMainMenuBG();
 
 	void onPreUpdateFrame();
 	void onPostUpdateFrame();

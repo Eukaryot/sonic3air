@@ -97,8 +97,6 @@ void MainMenu::onFadeIn()
 	mMenuBackground->showPreview(false);
 	mMenuBackground->startTransition(MenuBackground::Target::SPLIT);
 
-	AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
-
 	// Play "Data Select" music inside this menu
 	AudioOut::instance().setMenuMusic(0x2f);
 
@@ -234,6 +232,7 @@ void MainMenu::update(float timeElapsed)
 			switch (mState)
 			{
 				case State::FADE_TO_TITLESCREEN:
+					mMenuBackground->setGameStartedMenu();
 					GameApp::instance().openTitleScreen();
 					break;
 
