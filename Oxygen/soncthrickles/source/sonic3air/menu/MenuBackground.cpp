@@ -22,6 +22,7 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/mainview/GameView.h"
+#include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
 
 
@@ -105,6 +106,7 @@ void MenuBackground::initialize()
 	mLightLayer.setPosition(1.0f);
 	mBlueLayer.setPosition(1.0f);
 	mAlterLayer.setPosition(0.0f);
+	mBackgroundLayer.setPosition(0.0f);
 
 	mTarget = Target::TITLE;
 	startTransition(Target::SPLIT);
@@ -179,6 +181,9 @@ void MenuBackground::render()
 			{
 				Application::instance().getSimulation().setRunning(true);
 			}
+			LemonScriptRuntime& runtime = Application::instance().getSimulation().getCodeExec().getLemonScriptRuntime();
+			runtime.setGlobalVariableValue("MainMenuBG.scrollOffset", roundToInt(-mBackgroundLayer.mCurrentPosition * 200.0f));
+			runtime.setGlobalVariableValue("MainMenuBG.logoPosition", roundToInt(interpolate(splitMin, splitMax, normalizedTitleRight) - 91.0f));
 			mAnimatedBackgroundActive = true;
 		}
 		else
@@ -259,18 +264,6 @@ void MenuBackground::render()
 
 	GuiBase::render();
 
-	if (titleLeft < titleRight)
-	{
-		const float alpha = std::min((titleRight - titleLeft) / (splitMax - splitMin) * 2.2f, 1.0f);
-
-		Recti rect = mRect;
-		rect.width = global::mGameLogo.getWidth();
-		rect.height = global::mGameLogo.getHeight();
-		rect.x = roundToInt(interpolate(splitMin, splitMax, normalizedTitleRight) - 91.0f) - rect.width / 2;
-		rect.y = -1;
-		drawer.drawRect(rect, global::mGameLogo, Color(1.0f, 1.0f, 1.0f, alpha));
-	}
-
 	drawer.performRendering();
 }
 
@@ -283,9 +276,11 @@ void MenuBackground::startTransition(Target target)
 	mLightLayer.mTargetPosition = 1.0f;
 	mBlueLayer.mTargetPosition = 1.5f;		// Far to the right
 	mAlterLayer.mTargetPosition = -1.0f;	// Far to the left
+	mBackgroundLayer.mTargetPosition = 0.0f;
 	mLightLayer.mDelay = 0.0f;
 	mBlueLayer.mDelay = 0.0f;
 	mAlterLayer.mDelay = 0.0f;
+	mBackgroundLayer.mDelay = 0.0f;
 
 	switch (target)
 	{
@@ -305,6 +300,7 @@ void MenuBackground::startTransition(Target target)
 		case Target::LIGHT:
 		{
 			mLightLayer.mTargetPosition = 0.0f;
+			mBackgroundLayer.mTargetPosition = -0.5f;
 			break;
 		}
 
@@ -312,6 +308,7 @@ void MenuBackground::startTransition(Target target)
 		{
 			mBlueLayer.mTargetPosition = 0.0f;
 			mLightLayer.mTargetPosition = -0.5f;	// Far to the left
+			mBackgroundLayer.mTargetPosition = -0.5f;
 			break;
 		}
 
@@ -320,6 +317,8 @@ void MenuBackground::startTransition(Target target)
 			mLightLayer.mTargetPosition = 1.5f;
 			mLightLayer.mDelay = 0.1f;
 			mAlterLayer.mTargetPosition = 1.0f;
+			mBackgroundLayer.mTargetPosition = 1.5f;
+			mBackgroundLayer.mDelay = 0.1f;
 			break;
 		}
 
@@ -445,7 +444,7 @@ void MenuBackground::skipTransition()
 	// Skip the transition entirely
 	if (mInTransition)
 	{
-		Layer* layers[3] = { &mLightLayer, &mBlueLayer, &mAlterLayer };
+		Layer* layers[4] = { &mLightLayer, &mBlueLayer, &mAlterLayer, &mBackgroundLayer };
 		for (Layer* layer : layers)
 		{
 			layer->mDelay = 0.0f;
@@ -462,7 +461,7 @@ void MenuBackground::updateTransition(float timeElapsed)
 		mInTransition = false;
 
 		// Update layer movement
-		Layer* layers[3] = { &mLightLayer, &mBlueLayer, &mAlterLayer };
+		Layer* layers[4] = { &mLightLayer, &mBlueLayer, &mAlterLayer, &mBackgroundLayer };
 		for (Layer* layer : layers)
 		{
 			if (layer->mDelay > 0.0f)

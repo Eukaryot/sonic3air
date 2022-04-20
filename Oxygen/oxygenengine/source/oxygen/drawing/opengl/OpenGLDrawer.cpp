@@ -183,10 +183,11 @@ namespace opengldrawer
 
 		GLuint setupTexture(DrawerTexture& drawerTexture)
 		{
-			OpenGLDrawerTexture& openGLDrawerTexture = *drawerTexture.getImplementation<OpenGLDrawerTexture>();
-			const GLuint textureHandle = openGLDrawerTexture.getTextureHandle();
+			OpenGLDrawerTexture* openGLDrawerTexture = drawerTexture.getImplementation<OpenGLDrawerTexture>();
+			RMX_CHECK(nullptr != openGLDrawerTexture, "Invalid OpenGL texture implementation", return 0);
+			const GLuint textureHandle = openGLDrawerTexture->getTextureHandle();
 
-			if (openGLDrawerTexture.mSamplingMode != mCurrentSamplingMode || openGLDrawerTexture.mWrapMode != mCurrentWrapMode)
+			if (openGLDrawerTexture->mSamplingMode != mCurrentSamplingMode || openGLDrawerTexture->mWrapMode != mCurrentWrapMode)
 			{
 				glBindTexture(GL_TEXTURE_2D, textureHandle);
 				switch (mCurrentSamplingMode)
@@ -219,8 +220,8 @@ namespace opengldrawer
 						break;
 					}
 				}
-				openGLDrawerTexture.mSamplingMode = mCurrentSamplingMode;
-				openGLDrawerTexture.mWrapMode = mCurrentWrapMode;
+				openGLDrawerTexture->mSamplingMode = mCurrentSamplingMode;
+				openGLDrawerTexture->mWrapMode = mCurrentWrapMode;
 			}
 			return textureHandle;
 		}

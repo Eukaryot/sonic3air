@@ -79,7 +79,7 @@ function void EntryFunctions.levelSelect()
 function void EntryFunctions.mainMenuBG()
 {
 	EntryFunctions.sharedInit()
-	System.setupCallFrame("MainMenu.Background")
+	System.setupCallFrame("MainMenuBG.Run")
 }
 
 

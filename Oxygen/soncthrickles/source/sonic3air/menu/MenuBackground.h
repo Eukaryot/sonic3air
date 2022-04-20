@@ -108,4 +108,5 @@ private:
 	Layer mLightLayer;
 	Layer mBlueLayer;
 	Layer mAlterLayer;
+	Layer mBackgroundLayer;
 };

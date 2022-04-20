@@ -99,7 +99,6 @@ namespace global
 	Font mFont10;
 	Font mFont18;
 
-	DrawerTexture mGameLogo;
 	DrawerTexture mMainMenuBackgroundSeparator;
 	DrawerTexture mDataSelectBackground;
 	DrawerTexture mDataSelectAltBackground;
@@ -158,7 +157,6 @@ namespace global
 		mFont18.addFontProcessor(gOutlineFontProcessor);
 		mFont18.setShadow(true, Vec2f(1.0f, 0.5f), 0.5f);
 
-		FileHelper::loadTexture(mGameLogo, L"data/images/menu/sonic3air_logo.png");
 		FileHelper::loadTexture(mMainMenuBackgroundSeparator, L"data/images/menu/mainmenu_bg_separator.png");
 		FileHelper::loadTexture(mDataSelectBackground, L"data/images/menu/dataselect_bg.png");
 		FileHelper::loadTexture(mDataSelectAltBackground, L"data/images/menu/dataselect_dark_bg.png");
