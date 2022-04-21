@@ -1,13 +1,10 @@
 {
-
-	// ----- HUD ----- //
-
 	// HUD texts
 	"hud_text_score":	  { "File": "hud_text_sprites.png", "Rect": "0,0,40,12" },
 	"hud_text_time":	  { "File": "hud_text_sprites.png", "Rect": "0,12,40,12" },
-	"hud_text_time_red":  { "File": "hud_text_sprites.png", "Rect": "40,12,1,1" },		// Empty pixel
+	"hud_text_time_red":  { "File": "hud_text_sprites.png", "Rect": "40,12,1,1" },		// Just an empty pixel in original, feel free to change this
 	"hud_text_rings":	  { "File": "hud_text_sprites.png", "Rect": "0,24,40,12" },
-	"hud_text_rings_red": { "File": "hud_text_sprites.png", "Rect": "40,24,1,1" },		// Empty pixel
+	"hud_text_rings_red": { "File": "hud_text_sprites.png", "Rect": "40,24,1,1" },		// Just an empty pixel in original, feel free to change this
 
 	// Additional texts for level results
 	"hud_text_ring":  { "File": "hud_text_sprites.png", "Rect": "0,24,32,12" },
@@ -63,5 +60,4 @@
 	"continue_icon_sonic":    { "File": "hud_text_sprites.png", "Rect": "0,82,20,24",  "Center": "12,24" },
 	"continue_icon_tails":    { "File": "hud_text_sprites.png", "Rect": "20,82,20,24", "Center": "10,24" },
 	"continue_icon_knuckles": { "File": "hud_text_sprites.png", "Rect": "40,82,20,24", "Center": "9,24" }
-
 }
