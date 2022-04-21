@@ -12,8 +12,8 @@
 // Main menu background                                 //
 //-------------------------------------------------------//
 
-global s16 MainMenuBG.scrollOffset
-global s16 MainMenuBG.logoPosition
+global s16 MainMenuBG.scrollOffset		// Scrolling x-position; usually 0, except during certain transitions
+global s16 MainMenuBG.logoPosition		// "Sonic 3 A.I.R." logo x-position
 
 function void MainMenuBG.Run()
 {
