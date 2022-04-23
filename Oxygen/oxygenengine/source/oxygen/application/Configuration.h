@@ -173,7 +173,7 @@ public:
 	bool mForceCompileScripts = false;
 	int mScriptOptimizationLevel = 3;
 	std::wstring mCompiledScriptSavePath;
-	bool mEnableROMDataAnalyzer = false;
+	bool mEnableROMDataAnalyser = false;
 	bool mExitAfterScriptLoading = false;
 	int mRunScriptNativization = 0;			// 0: Disabled, 1: Run nativization, 2: Nativization done
 	std::wstring mScriptNativizationOutput;

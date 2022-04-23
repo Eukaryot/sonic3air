@@ -514,6 +514,8 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 			devModeHelper.tryReadInt("LoadLevel", mLoadLevel);
 			devModeHelper.tryReadInt("UseCharacters", mUseCharacters);
 			mUseCharacters = clamp(mUseCharacters, 0, 4);
+
+			devModeHelper.tryReadBool("EnableROMDataAnalyser", mEnableROMDataAnalyser);
 		}
 	}
 
@@ -580,10 +582,6 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 
 	// Script
 	rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
-	if (mDevMode.mEnabled)
-	{
-		rootHelper.tryReadBool("EnableROMDataAnalyzer", mEnableROMDataAnalyzer);
-	}
 #if DEBUG
 	rootHelper.tryReadBool("CompileScripts", mForceCompileScripts);
 #endif

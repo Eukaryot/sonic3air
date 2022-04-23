@@ -1037,12 +1037,12 @@ namespace
 
 	bool ROMDataAnalyser_isEnabled()
 	{
-		return Configuration::instance().mEnableROMDataAnalyzer;
+		return Configuration::instance().mEnableROMDataAnalyser;
 	}
 
 	bool ROMDataAnalyser_hasEntry(lemon::StringRef category, uint32 address)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1058,7 +1058,7 @@ namespace
 
 	void ROMDataAnalyser_beginEntry(lemon::StringRef category, uint32 address)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1073,7 +1073,7 @@ namespace
 
 	void ROMDataAnalyser_endEntry()
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1085,7 +1085,7 @@ namespace
 
 	void ROMDataAnalyser_addKeyValue(lemon::StringRef key, lemon::StringRef value)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1100,7 +1100,7 @@ namespace
 
 	void ROMDataAnalyser_beginObject(lemon::StringRef key)
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
@@ -1115,7 +1115,7 @@ namespace
 
 	void ROMDataAnalyser_endObject()
 	{
-		if (Configuration::instance().mEnableROMDataAnalyzer)
+		if (Configuration::instance().mEnableROMDataAnalyser)
 		{
 			ROMDataAnalyser* analyser = Application::instance().getSimulation().getROMDataAnalyser();
 			if (nullptr != analyser)
