@@ -33,7 +33,6 @@ private:
 
 	float mTime = 0.0f;
 	bool mGameStopped = false;
-	bool mBlurActive = false;
 
 	int mYourTime = 0;
 	std::vector<int> mBetterTimes;

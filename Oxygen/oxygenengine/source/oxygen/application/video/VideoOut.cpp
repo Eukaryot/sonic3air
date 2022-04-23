@@ -485,7 +485,7 @@ void VideoOut::preRefreshDebugging()
 void VideoOut::postRefreshDebugging()
 {
 	const bool hasOutsideFrameDebugDraws = !mRenderParts->getOverlayManager().getDebugDrawRects(OverlayManager::Context::OUTSIDE_FRAME).empty();
-	mDebugDrawRenderingRequested = hasOutsideFrameDebugDraws || !mPreviouslyHadOutsideFrameDebugDraws;
+	mDebugDrawRenderingRequested = hasOutsideFrameDebugDraws || mPreviouslyHadOutsideFrameDebugDraws;
 	mPreviouslyHadOutsideFrameDebugDraws = hasOutsideFrameDebugDraws;
 }
 

@@ -473,10 +473,18 @@ void GameView::update(float timeElapsed)
 		mFadeValue = saturate(mFadeValue + timeElapsed * mFadeChange);
 	}
 
-	if (mBlurringStillImage && mBlurringTimeout > 0.0f)
+	if (mStillImage.mMode == StillImageMode::BLURRING)
 	{
-		mBlurringTimeout -= timeElapsed;
-		mBlurringStepTimer += timeElapsed;
+		if (mStillImage.mBlurringTimeout > 0.0f)
+		{
+			mStillImage.mBlurringTimeout -= timeElapsed;
+			mStillImage.mBlurringStepTimer += timeElapsed;
+		}
+		if (mStillImage.mBlurringTimeout <= 0.0f)
+		{
+			mStillImage.mBlurringTimeout = 0.0f;
+			mStillImage.mMode = StillImageMode::STILL_IMAGE;
+		}
 	}
 
 	// Debug output
@@ -553,12 +561,12 @@ void GameView::render()
 	mFinalGameTexture.setupAsRenderTarget(gameScreenRect.width, gameScreenRect.height);
 
 	// Refresh simulation output image
-	if (mBlurringStillImage)
+	if (mStillImage.mMode != StillImageMode::NONE)
 	{
-		const constexpr float REDUCTION = 0.0333f;	// Can't remember any more why this is 1/30...
-		if (mBlurringStepTimer >= REDUCTION)
+		const constexpr float REDUCTION = 0.0333f;	// One blur step every 1/30 second
+		if (mStillImage.mBlurringStepTimer >= REDUCTION)
 		{
-			mBlurringStepTimer -= REDUCTION;
+			mStillImage.mBlurringStepTimer -= REDUCTION;
 			videoOut.blurGameScreen();
 		}
 	}
@@ -735,27 +743,27 @@ void GameView::setFadedIn()
 {
 	mFadeValue = 1.0f;
 	mFadeChange = 0.0f;
-	setBlurringStillImage(false);
+	setStillImageMode(StillImageMode::NONE);
 }
 
 void GameView::startFadingIn(float fadeTime)
 {
 	mFadeValue = 0.0f;
 	mFadeChange = 1.0f / fadeTime;
-	setBlurringStillImage(false);
+	setStillImageMode(StillImageMode::NONE);
 }
 
 void GameView::startFadingOut(float fadeTime)
 {
 	mFadeChange = -1.0f / fadeTime;
-	setBlurringStillImage(false);
+	setStillImageMode(StillImageMode::NONE);
 }
 
-void GameView::setBlurringStillImage(bool enable, float timeout)
+void GameView::setStillImageMode(StillImageMode mode, float timeout)
 {
-	mBlurringStillImage = enable;
-	mBlurringTimeout = enable ? (timeout == 0.0f ? 3.0f : timeout) : 0.0f;
-	mBlurringStepTimer = 0.0f;
+	mStillImage.mMode = mode;
+	mStillImage.mBlurringTimeout = (mode != StillImageMode::NONE) ? (timeout == 0.0f ? 3.0f : timeout) : 0.0f;
+	mStillImage.mBlurringStepTimer = 0.0f;
 }
 
 void GameView::setLogDisplay(const String& string, float time)

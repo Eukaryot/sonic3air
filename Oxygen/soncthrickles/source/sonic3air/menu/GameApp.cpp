@@ -320,7 +320,7 @@ void GameApp::showTimeAttackResults(int hundreds, const std::vector<int>& otherT
 
 void GameApp::enableStillImageBlur(bool enable, float timeout)
 {
-	mGameView->setBlurringStillImage(enable, timeout);
+	mGameView->setStillImageMode(enable ? GameView::StillImageMode::BLURRING : GameView::StillImageMode::NONE, timeout);
 }
 
 void GameApp::showUnlockedWindow(SecretUnlockedWindow::EntryType entryType, const std::string& title, const std::string& content)
