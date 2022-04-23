@@ -64,6 +64,13 @@ public:
 		const lemon::ScriptFunction* mFunction = nullptr;	// Only really used for update hooks
 	};
 
+	enum class LoadScriptsResult
+	{
+		NO_CHANGE,
+		PROGRAM_CHANGED,
+		FAILED
+	};
+
 public:
 	LemonScriptProgram();
 	~LemonScriptProgram();
@@ -74,7 +81,7 @@ public:
 	lemon::Program& getInternalLemonProgram();
 
 	bool hasValidProgram() const;
-	bool loadScripts(const std::string& filename, const LoadOptions& loadOptions);
+	LoadScriptsResult loadScripts(const std::string& filename, const LoadOptions& loadOptions);
 
 	const Hook* checkForUpdateHook(bool post);
 	const Hook* checkForAddressHook(uint32 address);

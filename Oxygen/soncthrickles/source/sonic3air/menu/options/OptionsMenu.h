@@ -96,5 +96,7 @@ private:
 	State mState = State::INACTIVE;
 	float mVisibility = 0.0f;
 	GameMenuScrolling mScrolling;
+
 	bool mEnteredFromIngame = false;
+	bool mHasAnyModOptions = false;
 };

@@ -39,6 +39,7 @@ public:
 
 private:
 	void clearFullscreenBuffer(Framebuffer& buffer);
+	void clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer& buffer2);
 	void internalRefresh();
 	void renderGeometry(const Geometry& geometry);
 	void copyGameScreenToProcessingBuffer();

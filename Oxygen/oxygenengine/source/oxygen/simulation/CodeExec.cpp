@@ -274,14 +274,14 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
 	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
 
-	const bool result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
-	if (result)
+	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
+	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
 	{
 		mLemonScriptRuntime.onProgramUpdated();
 	}
 	cleanScriptDebug();
 
-	return result;
+	return (result != LemonScriptProgram::LoadScriptsResult::FAILED);
 }
 
 void CodeExec::restoreRuntimeState(bool hasSaveState)

@@ -197,7 +197,7 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 	return true;
 }
 
-bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOptions& loadOptions)
+LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std::string& filename, const LoadOptions& loadOptions)
 {
 	// Select script mods to load
 	std::vector<const Mod*> modsToLoad;
@@ -221,7 +221,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 		if (modsToLoad == mInternal.mLastModSelection)
 		{
 			// No change
-			return true;
+			return LoadScriptsResult::NO_CHANGE;
 		}
 	}
 
@@ -294,7 +294,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 		if (!scriptsLoaded)
 		{
 			// Failed to load scripts
-			return false;
+			return LoadScriptsResult::FAILED;
 		}
 	}
 
@@ -361,7 +361,7 @@ bool LemonScriptProgram::loadScripts(const std::string& filename, const LoadOpti
 	}
 
 	mInternal.mLastModSelection.swap(modsToLoad);
-	return true;
+	return LoadScriptsResult::PROGRAM_CHANGED;
 }
 
 const LemonScriptProgram::Hook* LemonScriptProgram::checkForUpdateHook(bool post)

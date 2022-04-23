@@ -590,7 +590,7 @@ void GameView::render()
 		drawer.setBlendMode(DrawerBlendMode::ALPHA);
 		drawer.performRendering();
 
-		GuiBase::render();
+		// No "GuiBase::render()" call here, as this would e.g. draw menus on top (and in wrong resolutions)
 		return;
 	}
 

@@ -54,6 +54,23 @@ function void MainMenuBG.Run()
 	u16 cameraForegroundX = camera.foreground.x.u16
 	u16 cameraBackgroundX = camera.background.x.u16
 
+	// Flip the right half of certain lines in plane B, to make the ocean waves look more seamless
+	constant array<u16> LINE_VRAM_ADDRESS =
+	{
+		0xec40, 0xecc0, 0xedc0
+	}
+	for (u16 lineIndex = 0; lineIndex < 3; ++lineIndex)
+	{
+		u16 addr = LINE_VRAM_ADDRESS[lineIndex]
+		for (u16 i = 0; i < 0x20; i += 2)
+		{
+			u16 pattern1 = getVRAM(addr + i)
+			u16 pattern2 = getVRAM(addr + 0x3e - i)
+			setVRAM(addr + i, pattern2 ^ 0x800)
+			setVRAM(addr + 0x3e - i, pattern1 ^ 0x800)
+		}
+	}
+
 	// Write vertical scroll offsets to VSRAM
 	VDP.setupVSRAMWrite(0)
 	VDP.writeData16(0x4c)								// Foreground vertical scroll offset (Angel Island)
@@ -81,7 +98,7 @@ function void MainMenuBG.Run()
 			u16[0xffffee98] = cameraBackgroundX + MainMenuBG.scrollOffset
 
 			fn05b0a8()
-			u32[0xffffa800] -= 0x0400	// Partially undo the scrolling progress, to make it slower
+			u32[0xffffa800] -= 0x0200	// Partially undo the scrolling progress, to make it slightly slower
 
 			A4 = 0x05b15a
 			A5 = 0xffffa804

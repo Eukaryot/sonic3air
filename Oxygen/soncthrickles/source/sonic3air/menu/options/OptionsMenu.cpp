@@ -787,6 +787,7 @@ void OptionsMenu::initialize()
 					++nextOptionId;
 				}
 			}
+			entries.addEntry<OptionsMenuEntry>().initEntry("Back", option::_BACK);
 		}
 
 		for (size_t k = 0; k < entries.size(); ++k)
@@ -796,14 +797,7 @@ void OptionsMenu::initialize()
 			optionEntry.mGameMenuEntry = &entry;
 		}
 
-		const bool anyModOptions = (nextOptionId > option::_NUM + 1);
-		if (!anyModOptions && mActiveTab == Tab::Id::MODS)
-		{
-			++mActiveTab;
-			mActiveTabAnimated = (float)mActiveTab;
-		}
-
-		mTabMenuEntries[0].mOptions[Tab::Id::MODS].mVisible = anyModOptions;
+		mHasAnyModOptions = (nextOptionId > option::_NUM + 1);
 		mTabMenuEntries[0].mSelectedIndex = mActiveTab;
 	}
 
@@ -1271,8 +1265,10 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 	{
 		mOptionEntries[optionId].mGameMenuEntry->setVisible(!enteredFromIngame);
 	}
-	// TODO: This introduces some issues when the Mods options tab is active
-	//mTabMenuEntries[0].mOptions[Tab::Id::SYSTEM].mVisible = !enteredFromIngame;
+
+	// Hide Mods and System tabs
+	mTabMenuEntries[0].mOptions[Tab::Id::MODS].mVisible = !enteredFromIngame && mHasAnyModOptions;
+	mTabMenuEntries[0].mOptions[Tab::Id::SYSTEM].mVisible = !enteredFromIngame;
 
 	// Corrections in case a now hidden entry was previously selected
 	{

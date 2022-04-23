@@ -66,8 +66,7 @@ void HardwareRenderer::initialize()
 
 void HardwareRenderer::reset()
 {
-	clearFullscreenBuffer(mGameScreenBuffer);
-	clearFullscreenBuffer(mProcessingBuffer);
+	clearFullscreenBuffers(mGameScreenBuffer, mProcessingBuffer);
 	mResources.setAllPatternsDirty();
 }
 
@@ -210,11 +209,47 @@ void HardwareRenderer::blurGameScreen()
 
 void HardwareRenderer::clearFullscreenBuffer(Framebuffer& buffer)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, buffer.getHandle());
-	glViewport(0, 0, mGameResolution.x, mGameResolution.y);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport_Recti(FTX::screenRect());
+	// Save current frame buffer and viewport
+	GLint previousFramebuffer = 0;
+	GLint previousViewport[4];
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousFramebuffer);
+	glGetIntegerv(GL_VIEWPORT, previousViewport);
+
+	// Now for the actual clearing
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, buffer.getHandle());
+		glViewport(0, 0, mGameResolution.x, mGameResolution.y);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	// Restore frame buffer and viewport
+	glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer);
+	glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
+}
+
+void HardwareRenderer::clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer& buffer2)
+{
+	// Save current frame buffer and viewport
+	GLint previousFramebuffer = 0;
+	GLint previousViewport[4];
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousFramebuffer);
+	glGetIntegerv(GL_VIEWPORT, previousViewport);
+
+	// Now for the actual clearing
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, buffer1.getHandle());
+		glViewport(0, 0, mGameResolution.x, mGameResolution.y);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, buffer2.getHandle());
+		glViewport(0, 0, mGameResolution.x, mGameResolution.y);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	// Restore frame buffer and viewport
+	glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer);
+	glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
 }
 
 void HardwareRenderer::internalRefresh()
