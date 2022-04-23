@@ -1254,16 +1254,17 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 		option::TIMEATTACK_GHOSTS,
 		option::TIMEATTACK_INSTANTRESTART,
 
+		option::DEBUG_MODE,
 		option::TITLE_SCREEN,
 		option::SHIELD_TYPES,
 		option::RANDOM_MONITORS,
 		option::RANDOM_SPECIALSTAGES,
 		option::SPECIAL_STAGE_REPEAT,
-		option::REGION,
+		option::REGION
 	};
 	for (int optionId : optionsHiddenIngame)
 	{
-		mOptionEntries[optionId].mGameMenuEntry->setVisible(!enteredFromIngame);
+		mOptionEntries[optionId].mGameMenuEntry->setVisible(!enteredFromIngame && mOptionEntries[optionId].mGameMenuEntry->isVisible());
 	}
 
 	// Hide Mods and System tabs
