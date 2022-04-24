@@ -28,6 +28,57 @@
 #include "oxygen/helper/Utils.h"
 
 
+namespace
+{
+	struct ConditionalOption
+	{
+		int mOptionId = 0;
+		bool mHideInGame = false;
+		bool mDependsOnSecret = false;
+		SharedDatabase::Secret::Type mSecret = (SharedDatabase::Secret::Type)0xff;
+
+		inline ConditionalOption(int optionId, bool hideInGame) : mOptionId(optionId), mHideInGame(hideInGame) {}
+		inline ConditionalOption(int optionId, bool hideInGame, SharedDatabase::Secret::Type secret) : mOptionId(optionId), mHideInGame(hideInGame), mDependsOnSecret(true), mSecret(secret) {}
+
+		bool shouldBeVisible(bool enteredFromIngame) const
+		{
+			if (mHideInGame && enteredFromIngame)
+				return false;
+			if (mDependsOnSecret && !PlayerProgress::instance().isSecretUnlocked(mSecret))
+				return false;
+			return true;
+		}
+	};
+
+	static const std::vector<ConditionalOption> CONDITIONAL_OPTIONS =
+	{
+		ConditionalOption(option::ANTI_FLICKER,				 true),
+		ConditionalOption(option::ICZ_NIGHTTIME,			 true),
+		ConditionalOption(option::MONITOR_STYLE,			 true),
+
+		ConditionalOption(option::LEVEL_LAYOUTS,			 true),
+		ConditionalOption(option::AIZ_BLIMPSEQUENCE,		 true),
+		ConditionalOption(option::LBZ_BIGARMS,				 true),
+		ConditionalOption(option::SOZ_GHOSTSPAWN,			 true),
+		ConditionalOption(option::LRZ2_BOSS,				 true),
+		ConditionalOption(option::TIMEATTACK_GHOSTS,		 true),
+		ConditionalOption(option::TIMEATTACK_INSTANTRESTART, true),
+
+		ConditionalOption(option::DROP_DASH, 				 false, SharedDatabase::Secret::SECRET_DROPDASH),
+		ConditionalOption(option::SUPER_PEELOUT,			 false, SharedDatabase::Secret::SECRET_SUPER_PEELOUT),
+
+		ConditionalOption(option::DEBUG_MODE,				 true,  SharedDatabase::Secret::SECRET_DEBUGMODE),
+		ConditionalOption(option::TITLE_SCREEN,				 true,  SharedDatabase::Secret::SECRET_TITLE_SK),
+		ConditionalOption(option::SHIELD_TYPES,				 true),
+		ConditionalOption(option::RANDOM_MONITORS,			 true),
+		ConditionalOption(option::RANDOM_SPECIALSTAGES,		 true),
+		ConditionalOption(option::SPECIAL_STAGE_REPEAT,		 true),
+		ConditionalOption(option::REGION,					 true),
+		ConditionalOption(option::GAME_SPEED,				 false, SharedDatabase::Secret::SECRET_GAME_SPEED)
+	};
+}
+
+
 OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	mMenuBackground(&menuBackground)
 {
@@ -697,17 +748,6 @@ void OptionsMenu::onFadeIn()
 		optionEntry.loadValue();
 	}
 
-	// Show / hide options
-	mOptionEntries[option::DROP_DASH].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DROPDASH));
-	mOptionEntries[option::SUPER_PEELOUT].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_SUPER_PEELOUT));
-	mOptionEntries[option::DEBUG_MODE].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DEBUGMODE));
-	mOptionEntries[option::TITLE_SCREEN].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_TITLE_SK));
-	mOptionEntries[option::GAME_SPEED].mGameMenuEntry->setVisible(PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_GAME_SPEED));
-#if defined(PLATFORM_ANDROID)
-	mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setVisible(false);
-	mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->setVisible(false);
-#endif
-
 	AudioOut::instance().setMenuMusic(0x2f);
 	mPlayingSoundTest = nullptr;
 }
@@ -1239,33 +1279,17 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 {
 	mEnteredFromIngame = enteredFromIngame;
 
-	// Hide options not available in-game
-	const int optionsHiddenIngame[] =
+	for (const ConditionalOption& option : CONDITIONAL_OPTIONS)
 	{
-		option::ANTI_FLICKER,
-		option::ICZ_NIGHTTIME,
-		option::MONITOR_STYLE,
-
-		option::LEVEL_LAYOUTS,
-		option::AIZ_BLIMPSEQUENCE,
-		option::LBZ_BIGARMS,
-		option::SOZ_GHOSTSPAWN,
-		option::LRZ2_BOSS,
-		option::TIMEATTACK_GHOSTS,
-		option::TIMEATTACK_INSTANTRESTART,
-
-		option::DEBUG_MODE,
-		option::TITLE_SCREEN,
-		option::SHIELD_TYPES,
-		option::RANDOM_MONITORS,
-		option::RANDOM_SPECIALSTAGES,
-		option::SPECIAL_STAGE_REPEAT,
-		option::REGION
-	};
-	for (int optionId : optionsHiddenIngame)
-	{
-		mOptionEntries[optionId].mGameMenuEntry->setVisible(!enteredFromIngame && mOptionEntries[optionId].mGameMenuEntry->isVisible());
+		const bool visible = option.shouldBeVisible(enteredFromIngame);
+		mOptionEntries[option.mOptionId].mGameMenuEntry->setVisible(visible);
 	}
+
+#if defined(PLATFORM_ANDROID)
+	// These options don't work on Android, so hide them
+	mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setVisible(false);
+	mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->setVisible(false);
+#endif
 
 	// Hide Mods and System tabs
 	mTabMenuEntries[0].mOptions[Tab::Id::MODS].mVisible = !enteredFromIngame && mHasAnyModOptions;
