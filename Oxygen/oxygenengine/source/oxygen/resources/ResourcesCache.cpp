@@ -170,7 +170,7 @@ Font* ResourcesCache::registerFontSource(const std::string& filename)
 	CachedFont& cachedFont = mCachedFonts[keyHash];
 	cachedFont.mKeyString = filename;
 	cachedFont.mKeyHash = keyHash;
-	
+
 	if (cachedFont.mFont.loadFromFile("data/font/" + filename + ".json"))
 	{
 		return &cachedFont.mFont;

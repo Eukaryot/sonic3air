@@ -142,7 +142,7 @@ namespace lemon
 		String content;
 		content << "// This file was auto-generated from the definitions in lemon script module '" << getModuleName() << "'.\r\n";
 		content << "\r\n";
-		
+
 		for (const Function* function : mFunctions)
 		{
 			if (function->getName().getString()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)

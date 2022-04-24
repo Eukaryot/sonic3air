@@ -37,7 +37,7 @@ function void MainMenuBG.Run()
 			Kosinski.ProcessModules()
 			if (kosinski.waiting_modules == 0)
 				break
-		}		
+		}
 	}
 
 	// Load level chunks and stuff

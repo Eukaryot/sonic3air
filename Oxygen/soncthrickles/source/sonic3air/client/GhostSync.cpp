@@ -200,7 +200,7 @@ bool GhostSync::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 				serializeGhostData(serializer, playerData->mGhostDataQueue.back());
 				playerData->mGhostDataQueue.back().mValid = true;
 			}
-			
+
 			return true;
 		}
 	}

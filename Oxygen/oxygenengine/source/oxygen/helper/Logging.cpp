@@ -99,7 +99,7 @@ namespace oxygen
 	{
 		rmx::Logging::clear();
 	}
-	
+
 	void Logging::setAssertBreakCaption(const std::string& caption)
 	{
 		::mErrorLogger.mCaption = caption;

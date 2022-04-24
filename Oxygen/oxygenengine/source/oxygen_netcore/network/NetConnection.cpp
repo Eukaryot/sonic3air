@@ -555,7 +555,7 @@ void NetConnection::handleHighLevelPacket(ReceivedPacket& receivedPacket, const 
 		while (mReceivedPacketCache.extractPacket(extracted))
 		{
 			processExtractedHighLevelPacket(extracted);
-			
+
 			// Remove the reference we took over from the ReceivedPacketCache
 			extracted.mReceivedPacket->decReferenceCounter();
 		}

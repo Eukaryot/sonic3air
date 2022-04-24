@@ -23,7 +23,7 @@ namespace lemon
 		inline FlyweightString getName() const  { return mName; }
 		inline const DataTypeDefinition* getElementDataType() const  { return mElementDataType; }
 		inline uint32 getID() const  { return mID; }
-		
+
 		inline size_t getSize() const  { return mData.size(); }
 		void setSize(size_t size);
 

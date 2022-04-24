@@ -285,7 +285,7 @@ bool TCPSocket::setupServer(uint16 serverPort)
 	}
 
 	// Bind socket
-	result = ::bind(mInternal->mSocket, addr->ai_addr, (int)addr->ai_addrlen);	
+	result = ::bind(mInternal->mSocket, addr->ai_addr, (int)addr->ai_addrlen);
 	if (result != 0)
 	{
 	#ifdef _WIN32

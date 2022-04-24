@@ -181,7 +181,7 @@ void GameClient::updateConnected()
 					break;
 			}
 			break;
-}
+		}
 
 		case State::READY:
 		{

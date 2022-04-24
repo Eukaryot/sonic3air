@@ -143,7 +143,7 @@ namespace lemon
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			RMX_CHECK(str1.isValid(), "Unable to resolve string", return StringRef());
 			RMX_CHECK(str2.isValid(), "Unable to resolve string", return StringRef());
-			
+
 			static FastStringStream result;
 			result.clear();
 			result.addString(str1.getStringRef());

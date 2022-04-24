@@ -30,7 +30,7 @@ void PatternManager::refresh()
 				if (changeBits.isBitSet(patternIndex))
 				{
 					CacheItem& cacheItem = mPatternCache[patternIndex];
-					
+
 					// Check for actual changes
 					//  -> This code is slightly optimized compared to a memcmp
 					const uint64* cache = (uint64*)cacheItem.mOriginalDataBackup;
