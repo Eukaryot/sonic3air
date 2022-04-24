@@ -852,11 +852,7 @@ function void fn023624()
 	{
 		objA1.flags2a &= ~char.flag.FACING_LEFT
 		objA1.position.x.u16 -= 6
-		#if STANDALONE
-			objA1.velocity.x = -s16[A0 + 0x30]		// Fix for the original game, thanks to GFX32
-		#else
-			objA1.velocity.x = -objA1.velocity.x
-		#endif
+		objA1.velocity.x = -s16[A0 + 0x30]		// Regression fix for diagonal springs: thanks to GFX32
 	}
 	else
 	{
