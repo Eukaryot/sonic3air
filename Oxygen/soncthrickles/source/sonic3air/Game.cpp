@@ -316,6 +316,16 @@ void Game::checkForUnlockedSecrets()
 	}
 }
 
+void Game::startIntoTitleScreen()
+{
+	mMode = Mode::TITLE_SCREEN;
+
+	Simulation& simulation = Application::instance().getSimulation();
+	simulation.resetState();
+
+	startIntoGameInternal();
+}
+
 void Game::startIntoDataSelect()
 {
 	mMode = Mode::NORMAL_GAME;
@@ -845,7 +855,7 @@ void Game::startIntoGameInternal()
 	simulation.setSpeed(simulation.getDefaultSpeed());
 
 	// Enforce fixed simulation frequency in Time Attack and for the Main Menu background
-	if (mMode == Mode::TIME_ATTACK || mMode != Mode::MAIN_MENU_BG)
+	if (mMode == Mode::TIME_ATTACK || mMode == Mode::MAIN_MENU_BG)
 		simulation.setSimulationFrequencyOverride(60.0f);
 	else
 		simulation.disableSimulationFrequencyOverride();

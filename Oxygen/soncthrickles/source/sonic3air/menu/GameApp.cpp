@@ -367,11 +367,7 @@ void GameApp::gotoPhase(int phaseNumber)
 		{
 			// Start with the intro & title screen
 			mCurrentState = State::TITLE_SCREEN;
-			Game::instance().setCurrentMode(Game::Mode::TITLE_SCREEN);
-			Simulation& simulation = Application::instance().getSimulation();
-			simulation.resetState();
-			simulation.setRunning(true);
-			simulation.setSpeed(simulation.getDefaultSpeed());
+			Game::instance().startIntoTitleScreen();
 			break;
 		}
 

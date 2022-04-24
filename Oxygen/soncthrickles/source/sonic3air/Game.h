@@ -50,6 +50,7 @@ public:
 
 	void checkForUnlockedSecrets();
 
+	void startIntoTitleScreen();
 	void startIntoDataSelect();
 	void startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 characters);
 	void restartLevel();
