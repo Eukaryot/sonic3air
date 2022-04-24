@@ -114,15 +114,7 @@ void MenuBackground::initialize()
 	mAnimationTimer = 0.0f;
 	setPreviewZoneAndAct(0, 0, true);
 
-	GameMenuManager& manager = GameApp::instance().getGameMenuManager();
-	if (nullptr == mLastOpenedMenu)
-	{
-		manager.addMenu(*mMainMenu);
-	}
-	else
-	{
-		manager.addMenu(*mLastOpenedMenu);
-	}
+	// Do not automatically open a menu here, that always needs to be done separately via a call like "openMainMenu"
 }
 
 void MenuBackground::deinitialize()

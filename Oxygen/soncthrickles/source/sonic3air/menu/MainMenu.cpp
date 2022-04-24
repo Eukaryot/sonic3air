@@ -97,6 +97,8 @@ void MainMenu::onFadeIn()
 	mMenuBackground->showPreview(false);
 	mMenuBackground->startTransition(MenuBackground::Target::SPLIT);
 
+	AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
+
 	// Play "Data Select" music inside this menu
 	AudioOut::instance().setMenuMusic(0x2f);
 
