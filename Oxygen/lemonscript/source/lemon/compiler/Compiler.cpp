@@ -1026,7 +1026,10 @@ namespace lemon
 				{
 					UndefinedNode& un = nextNode.as<UndefinedNode>();
 					Node* newNode = processUndefinedNode(un, function, scopeContext, nodesIterator);
-					newNode->setLineNumber(un.getLineNumber());
+					if (newNode != nullptr)
+					{
+						newNode->setLineNumber(un.getLineNumber());
+					}
 					return newNode;
 				}
 
