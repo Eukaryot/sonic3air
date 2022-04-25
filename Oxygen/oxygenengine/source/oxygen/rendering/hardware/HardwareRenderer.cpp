@@ -212,7 +212,7 @@ void HardwareRenderer::clearFullscreenBuffer(Framebuffer& buffer)
 	// Save current frame buffer and viewport
 	GLint previousFramebuffer = 0;
 	GLint previousViewport[4];
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousFramebuffer);
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
 	glGetIntegerv(GL_VIEWPORT, previousViewport);
 
 	// Now for the actual clearing
@@ -232,7 +232,7 @@ void HardwareRenderer::clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer&
 	// Save current frame buffer and viewport
 	GLint previousFramebuffer = 0;
 	GLint previousViewport[4];
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousFramebuffer);
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
 	glGetIntegerv(GL_VIEWPORT, previousViewport);
 
 	// Now for the actual clearing
