@@ -12,7 +12,7 @@
 	"PlatformFlags": "-1",
 
 	// Game
-	"StartPhase": "3",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
+	"StartPhase": "2",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
 	"GameRecording": "-1",
 	"GameRecPlayFrom": "0",
 	"GameRecIgnoreKeys": "0",
@@ -34,7 +34,7 @@
 		"ServerPortWSS": "21096",		// Used by the web version
 		"GhostSync":
 		{
-			"Enabled": "1",				// Enable the ghost sync feature by setting this to "1"
+			"Enabled": "0",				// Enable the ghost sync feature by setting this to "1"
 			"ChannelName": "world-dev",	// To use your own private channel, enter an arbitrary string here; "world" is the default channel
 			"ShowOffscreenGhosts": "1"	// Show other players on the screen border while they're not on the screen
 		}

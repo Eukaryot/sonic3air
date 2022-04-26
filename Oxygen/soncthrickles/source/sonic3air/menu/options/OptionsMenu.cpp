@@ -827,7 +827,6 @@ void OptionsMenu::initialize()
 					++nextOptionId;
 				}
 			}
-			entries.addEntry<OptionsMenuEntry>().initEntry("Back", option::_BACK);
 		}
 
 		for (size_t k = 0; k < entries.size(); ++k)
@@ -836,6 +835,8 @@ void OptionsMenu::initialize()
 			OptionEntry& optionEntry = mOptionEntries[entry.mData];
 			optionEntry.mGameMenuEntry = &entry;
 		}
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Back", option::_BACK);
 
 		mHasAnyModOptions = (nextOptionId > option::_NUM + 1);
 		mTabMenuEntries[0].mSelectedIndex = mActiveTab;

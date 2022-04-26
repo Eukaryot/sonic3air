@@ -135,6 +135,9 @@ void GameClient::updateNotConnected(uint64 currentTimestamp)
 			mConnectionState = ConnectionState::NOT_CONNECTED;
 			break;
 		}
+
+		default:
+			break;
 	}
 
 	if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
