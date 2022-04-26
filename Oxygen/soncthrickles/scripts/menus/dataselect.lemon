@@ -73,36 +73,30 @@ function void fn00c56e()
 //# address-hook(0x00c890) end(0x00c95c)
 function void fn00c890()
 {
+	// Render "New" or static noise for the slots
 	D0.u16 = level.framecounter & 0x0c
 	A2 = 0x200000 + u32[0x3a216a + D0.s16]
 	D7.u16 = 0xc21a
 	A0 = 0xffffe6ac
-	D6 = 7
-	while (D6.s16 >= 0)
+	for (u8 slot = 0; slot < 8; ++slot)
 	{
 		A1 = (s8[A0] >= 0) ? A2 : 0x3a20de
-		D0.u16 = D7.u16
-		fn00c87e()
-
+		D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16)
 		D1 = 9
 		D2 = 6
 		fn001506()
 
 		D7.u16 += 0x1a
 		A0 += 10
-		--D6.s16
 	}
 
 	A3 = 0xffffb128
 	D7.u16 = 0xca20
 	A0 = 0xffffe6ac
-	D3 = 7
-	while (D3.s16 >= 0)
+	for (u8 slot = 0; slot < 8; ++slot)
 	{
 		D0.u16 = D7.u16 - 2
-		fn00c87e()
-
-		VDP.setupVRAMWrite(VDPHelper.getVRAMAddressFromWriteCode(D0))
+		VDP.setupVRAMWrite(D0)
 		VDP.writeData16(0x82b1)
 
 		if (s8[A0] >= 0)
@@ -145,7 +139,6 @@ function void fn00c890()
 		D7.u16 += 0x1a
 		A0 += 10
 		A3 += 0x4a
-		--D3.s16
 	}
 
 	fn00c97a()
@@ -159,9 +152,7 @@ function void fn00c97a()
 	A3 = 0xffffb128
 	D7.u16 = 0xd220
 	A0 = 0xffffe6ac
-	D6 = 7
-
-	while (D6.s16 >= 0)
+	for (u8 slot = 0; slot < 8; ++slot)
 	{
 		bool saveGameSlotUsed = (u8[A0] & 0x80) == 0
 		u16 characters = u16[A3 + 0x34]
@@ -182,8 +173,7 @@ function void fn00c97a()
 
 		// Draw icons for lives & continues
 		A1 = A2 + characters * 32
-		D0.u16 = D7.u16
-		fn00c87e()
+		D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16)
 		D1 = 2
 		D2 = 4
 		fn001506()
@@ -192,8 +182,7 @@ function void fn00c97a()
 		if (!saveGameSlotUsed)
 		{
 			A1 = 0x00db08
-			D0.u16 = D7.u16 + 6
-			fn00c87e()
+			D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16 + 6)
 			D1 = 1
 			D2 = 4
 			fn001506()
@@ -203,8 +192,7 @@ function void fn00c97a()
 			D0.u8 = u8[A3 + 0x3e]
 			fn00ca14()
 
-			D0.u16 = D7.u16 + 6
-			fn00c87e()
+			D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16 + 6)
 			D1 = 1
 			D2 = 1
 			fn001506()
@@ -212,8 +200,7 @@ function void fn00c97a()
 			D0.u8 = u8[A3 + 0x3f]
 			fn00ca14()
 
-			D0.u16 = D7.u16 + 0x0306
-			fn00c87e()
+			D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16 + 0x306)
 			D1 = 1
 			D2 = 1
 			fn001506()
@@ -222,7 +209,6 @@ function void fn00c97a()
 		D7.u16 += 0x1a
 		A0 += 10
 		A3 += 0x4a
-		--D6.s16
 	}
 }
 
@@ -474,18 +460,38 @@ function void DataSelectScreen()
 //# address-hook(0x00c866) end(0x00c87c)
 function void fn00c866()
 {
+	// Setup the static slot frames in plane B
+
+	// Content at A0 = 0x00cd58 looks like this:
+	//   Index  RAM_source   VRAM_dst  width-1  height-1
+	//  -  0:   0xffff0222,  0xc102,   0x000a,  0x000b		-> Start of Sonic 3 Alone frame layout; "No Save" frame
+	//  -  1:   0xffff0000,  0xc118,   0x000c,  0x0014		-> Frames for first 6 save slots (S3 style)
+	//  -  2:   0xffff0000,  0xc132,   0x000c,  0x0014
+	//  -  3:   0xffff0000,  0xc14c,   0x000c,  0x0014
+	//  -  4:   0xffff0000,  0xc166,   0x000c,  0x0014
+	//  -  5:   0xffff0000,  0xc180,   0x000c,  0x0014
+	//  -  6:   0xffff0000,  0xc19a,   0x000c,  0x0014
+	//  -  7:   0xffff0104,  0xce98,   0x000c,  0x000a		-> Extensions for the first 6 save slots (S3K style)
+	//  -  8:   0xffff0104,  0xce32,   0x000c,  0x000a
+	//  -  9:   0xffff0104,  0xce4c,   0x000c,  0x000a
+	//  - 10:   0xffff0104,  0xce66,   0x000c,  0x000a
+	//  - 11:   0xffff0104,  0xce80,   0x000c,  0x000a
+	//  - 12:   0xffff0104,  0xce9a,   0x000c,  0x000a
+	//  - 13:   0xffff0000,  0xc1b4,   0x000c,  0x0014		-> 2 additional save slots (S3 style)
+	//  - 14:   0xffff0000,  0xc1ce,   0x000c,  0x0014
+	//  - 15:   0xffff0222,  0xc1e8,   0x000a,  0x000b		-> Robotnik's frame
+	//  - 16:   0xffff0104,  0xceb4,   0x000c,  0x000a		-> Extensions for the 2 additional save slots (S3K style)
+	//  - 17:   0xffff0104,  0xcece,   0x000c,  0x000a
+
 	D7.u16 = u16[(A0+=2)-2]
-	while (D7.s16 >= 0)
+	for (u16 index = 0; index <= D7.u16; ++index)
 	{
-		A1 = u32[(A0+=4)-4]
-		D0.u16 = u16[(A0+=2)-2]
-		fn00c87e()
-
-		D1.u16 = u16[(A0+=2)-2]
-		D2.u16 = u16[(A0+=2)-2]
+		A1 = u32[A0]										// Source in RAM
+		D0 = VDPHelper.getDirectVRAMWriteCode(u16[A0+4])	// Traget in VRAM
+		D1.u16 = u16[A0+6]									// Width (minus one)
+		D2.u16 = u16[A0+8]									// Height (minus one)
 		fn001506()
-
-		--D7.s16
+		A0 += 10
 	}
 }
 
@@ -508,7 +514,7 @@ function void fn000c3e()
 	// Known targets:
 	//  - 0x00a85c		-> Empty function, used in competition mode menu
 	//  - 0x00c56e		-> Empty function, used in Data Select screen
-	//  - 0x00c890		-> Unknown
+	//  - 0x00c890		-> Used in Data Select screen
 	//  - 0x02df62		-> Empty function, used in Blue Spheres special stage
 	A0 = u32[0xffffef44]
 	call A0

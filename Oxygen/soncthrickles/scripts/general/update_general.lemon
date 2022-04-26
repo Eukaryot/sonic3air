@@ -492,7 +492,7 @@ function void copyRectToVRAM(u32 source, u16 vramAddress, u16 width, u16 height)
 //# address-hook(0x001506) end(0x001524)
 function void fn001506()
 {
-	// Seems to be used only in Data Select
+	// This is used to draw the frames and the disabled slot image background (static noise or "New") in Data Select
 	u16 vramAddress = VDPHelper.getVRAMAddressFromWriteCode(D0)
 	u16 bytesPerLine = (D1.u16 + 1) * 2
 
