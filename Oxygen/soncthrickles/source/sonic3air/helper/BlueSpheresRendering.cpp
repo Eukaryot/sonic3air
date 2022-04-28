@@ -375,7 +375,7 @@ void BlueSpheresRendering::writeVisibleSpheresData(uint32 targetAddress, uint32 
 bool BlueSpheresRendering::loadLookupData()
 {
 	std::vector<uint8> data;
-	if (!FTX::FileSystem->readFile(L"data/cache/bluespheresrendering.bin", data))
+	if (!FTX::FileSystem->readFile(L"data/binary/bluespheresrendering.bin", data))
 		return false;
 
 	uint16 width, height;
@@ -682,7 +682,7 @@ void BlueSpheresRendering::performLookupCalculations()
 			serializer.writeAs<uint32>(compressed.size());
 			serializer.write(&compressed[0], compressed.size());
 
-			FTX::FileSystem->saveFile(L"data/cache/bluespheresrendering.bin", data);
+			FTX::FileSystem->saveFile(L"data/binary/bluespheresrendering.bin", data);
 		}
 	}
 
