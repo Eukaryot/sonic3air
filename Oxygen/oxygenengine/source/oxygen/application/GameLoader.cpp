@@ -46,38 +46,46 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 
 				RMX_LOG_INFO("ROM loading failed");
 
-			#if defined(PLATFORM_WINDOWS)
 				const GameProfile& gameProfile = GameProfile::instance();
-				const PlatformFunctions::DialogResult result = PlatformFunctions::showDialogBox(rmx::ErrorSeverity::INFO, PlatformFunctions::DialogButtons::OK_CANCEL, gameProfile.mFullName, "This game requires an original " + gameProfile.mRomAutoDiscover.mSteamGameName + " ROM to work.\nIf you have one, click OK and select it in the following dialog.\n\nSee the Manual for details.");
-				if (result == PlatformFunctions::DialogResult::CANCEL)
+				if (!gameProfile.mRomInfos.empty())
 				{
-					return UpdateResult::FAILURE;
-				}
+				#if defined(PLATFORM_WINDOWS)
+					const std::string text = "This game requires an original " + gameProfile.mRomInfos[0].mSteamGameName + " ROM to work.\nIf you have one, click OK and select it in the following dialog.\n\nSee the Manual for details.";
+					const PlatformFunctions::DialogResult result = PlatformFunctions::showDialogBox(rmx::ErrorSeverity::INFO, PlatformFunctions::DialogButtons::OK_CANCEL, gameProfile.mFullName, text);
+					if (result == PlatformFunctions::DialogResult::CANCEL)
+					{
+						return UpdateResult::FAILURE;
+					}
 
-				const std::wstring romPath = PlatformFunctions::openFileSelectionDialog(L"Select " + String(gameProfile.mRomAutoDiscover.mSteamGameName).toStdWString() + L" ROM", gameProfile.mRomAutoDiscover.mSteamRomName, L"Genesis ROM files (*.bin)\0*.bin\0All Files\0*.*\0\0");
-				const bool success = ResourcesCache::instance().loadRomFromFile(romPath);
-				if (success)
-				{
-					mState = State::ROM_LOADED;
-					return UpdateResult::CONTINUE_IMMEDIATE;
+					const std::wstring romPath = PlatformFunctions::openFileSelectionDialog(L"Select game ROM", L"", L"Genesis ROM files\0*.bin;*.68K\0All Files\0*.*\0\0");
+					const bool success = ResourcesCache::instance().loadRomFromFile(romPath);
+					if (success)
+					{
+						mState = State::ROM_LOADED;
+						return UpdateResult::CONTINUE_IMMEDIATE;
+					}
+					else
+					{
+						// How about another try?
+						mState = State::UNLOADED;
+						return UpdateResult::CONTINUE_IMMEDIATE;
+					}
+
+				#elif defined(PLATFORM_ANDROID)
+					javaInterface.openRomFileSelectionDialog();
+					mState = State::WAITING_FOR_ROM;
+					return UpdateResult::CONTINUE;
+
+				#else
+					RMX_ERROR("ROM could not be loaded!\nAn original " + gameProfile.mRomInfos[0].mSteamGameName + " ROM must be added manually. See the Manual for details.\n\nThe application will now close.", );
+					return UpdateResult::FAILURE;
+
+				#endif
 				}
 				else
 				{
-					// How about another try?
-					mState = State::UNLOADED;
-					return UpdateResult::CONTINUE_IMMEDIATE;
+					RMX_ERROR("ROM could not be loaded!\nAn original game ROM must be added manually. See the Manual for details.\n\nThe application will now close.", );
 				}
-
-			#elif defined(PLATFORM_ANDROID)
-				javaInterface.openRomFileSelectionDialog();
-				mState = State::WAITING_FOR_ROM;
-				return UpdateResult::CONTINUE;
-
-			#else
-				RMX_ERROR("ROM could not be loaded!\nAn original " + GameProfile::instance().mRomAutoDiscover.mSteamGameName + " ROM must be added manually. See the Manual for details.\n\nThe application will now close.", );
-				return UpdateResult::FAILURE;
-
-			#endif
 			}
 			RMX_LOG_INFO("ROM found at: " << WString(Configuration::instance().mLastRomPath).toStdString());
 

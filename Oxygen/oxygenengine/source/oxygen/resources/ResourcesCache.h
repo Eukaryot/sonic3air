@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "oxygen/application/GameProfile.h"
+
 
 class ResourcesCache : public SingleInstance<ResourcesCache>
 {
@@ -50,6 +52,10 @@ public:
 
 private:
 	bool loadRomFile(const std::wstring& filename);
+	bool loadRomFile(const std::wstring& filename, const GameProfile::RomInfo& romInfo);
+	bool loadRomMemory(const std::vector<uint8>& content);
+	uint64 getHeaderChecksum(const std::vector<uint8>& content);
+	bool applyRomModifications(const GameProfile::RomInfo& romInfo);
 	bool checkRomContent();
 	void saveRomToAppData();
 
@@ -58,6 +64,8 @@ private:
 
 private:
 	std::vector<uint8> mRom;	// This is the original, unmodified ROM (i.e. without any raw data injections or ROM writes)
+	const GameProfile::RomInfo* mLoadedRomInfo = nullptr;
+	std::map<const GameProfile::RomInfo*, std::vector<uint8>> mDiffFileCache;
 
 	std::map<uint64, std::vector<const RawData*>> mRawDataMap;
 	std::vector<const RawData*> mRomInjections;

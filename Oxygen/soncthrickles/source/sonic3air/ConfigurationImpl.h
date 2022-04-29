@@ -10,11 +10,15 @@
 
 #include "oxygen/application/Configuration.h"
 
+class GameProfile;
+
 
 class ConfigurationImpl : public ::Configuration
 {
 public:
 	inline static ConfigurationImpl& instance() { return static_cast<ConfigurationImpl&>(::Configuration::instance()); }
+
+	static void fillDefaultGameProfile(GameProfile& gameProfile);
 
 protected:
 	void preLoadInitialization() override;

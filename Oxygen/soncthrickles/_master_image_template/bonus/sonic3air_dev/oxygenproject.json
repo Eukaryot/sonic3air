@@ -1,15 +1,29 @@
 {
 	// Metadata
-	"ShortName":  "Sonic 3 A.I.R.",
-	"FullName":   "Sonic 3 - Angel Island Revisited",
+	"ShortName": "Sonic 3 A.I.R.",
+	"FullName":  "Sonic 3 - Angel Island Revisited",
 
 	// ROM
-	"Rom":        "Sonic_Knuckles_wSonic3.bin",
-	"RomCheck":   "size=0x400000, overwrite=0x2001f0:0x4a, checksum=0x0c06aa82",
-	"RomAutoDiscover":
+	"Rom":       "___internal/Sonic_Knuckles_wSonic3.bin",
+	"RomCheck":  "size=0x400000, checksum=0x78a067afdf44fb24",
+
+	// ROM infos
+	"RomInfos":
 	{
-		"SteamGameName": "Sonic 3 & Knuckles",
-		"SteamRomName":  "Sonic_Knuckles_wSonic3.bin"
+		"01_S3K_Steam":
+		{
+			"SteamGameName":  "Sonic 3 & Knuckles",
+			"SteamRomName":   "Sonic_Knuckles_wSonic3.bin",
+			"Overwrites":     "0x2001f0:0x4a",
+			"BlankRegions":   "0x000206-0x000297"
+		},
+		"02_S3D_Steam":
+		{
+			"SteamGameName":  "Sonic 3D",
+			"SteamRomName":   "SONIC3D_UE.68K",
+			"HeaderChecksum": "0xcdae83404263386e",
+			"DiffFileName":   "data/binary/romdiff_s3d.bin"
+		}
 	},
 
 	// Paths
@@ -18,13 +32,13 @@
 	// Scripts
 	"MainScript": "main.lemon",
 	"CompileScripts": "1",
-	
+
 	// Data packages
 	"DataPackages":
 	{
 		"enginedata.bin":    { "Required": true },
 		"gamedata.bin":      { "Required": true },
 		"audiodata.bin":     { "Required": true },
-		"audioremaster.bin": { "Required": false }		
+		"audioremaster.bin": { "Required": false }
 	}
 }

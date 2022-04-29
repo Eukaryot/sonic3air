@@ -52,10 +52,12 @@ namespace
 		return L"";
 	}
 
-	WString getSteamBaseInstallFolder(const std::wstring& steamConfigFilename)
+	void collectSteamInstallFolders(std::vector<WString>& outPaths, const std::wstring& steamPath)
 	{
+		// First try to get the base install folder from "config.vdf"
+		//  -> In my latest test, this did not work any more for me :(
 		WString text;
-		if (text.loadFile(steamConfigFilename))
+		if (text.loadFile(steamPath + L"/config/config.vdf"))
 		{
 			int pos = 0;
 			while (pos < text.length())
@@ -75,13 +77,42 @@ namespace
 						{
 							WString value = line.getSubString(i + 1, k - i - 1);
 							value.replace(L"\\\\", L"\\");
-							return value;
+							outPaths.push_back(value);
+							break;
 						}
 					}
 				}
 			}
 		}
-		return L"";
+
+		// Also check the "libraryfolders.vdf" for search paths
+		if (text.loadFile(steamPath + L"/config/libraryfolders.vdf"))
+		{
+			int pos = 0;
+			while (pos < text.length())
+			{
+				WString line;
+				pos = text.getLine(line, pos);
+				int i = line.findChar('"', 0, 1);
+				int k = line.findChar('"', i + 1, 1);
+				if (k + 1 < line.length() && line[i + 1] == 'p')
+				{
+					const WString key = line.getSubString(i + 1, k - i - 1);
+					if (key.startsWith(L"path"))
+					{
+						i = line.findChar('"', k + 1, 1);
+						k = line.findChar('"', i + 1, 1);
+						if (k < line.length())
+						{
+							WString value = line.getSubString(i + 1, k - i - 1);
+							value.replace(L"\\\\", L"\\");
+							value.replace(L"\\\\", L"\\");
+							outPaths.push_back(value);
+						}
+					}
+				}
+			}
+		}
 	}
 #endif
 
@@ -331,11 +362,7 @@ std::wstring PlatformFunctions::tryGetSteamRomPath(const std::wstring& romName)
 		RMX_LOG_INFO("Steam installation found: " << WString(steamPath).toStdString());
 		std::vector<WString> searchPaths;
 		searchPaths.push_back(steamPath);
-		const WString baseInstallFolder = getSteamBaseInstallFolder(steamPath + L"/config/config.vdf");
-		if (!baseInstallFolder.empty())
-		{
-			searchPaths.push_back(baseInstallFolder);
-		}
+		collectSteamInstallFolders(searchPaths, steamPath);
 		return *lookForROMFileInSearchPaths(searchPaths, WString(L"\\steamapps\\common\\Sega Classics\\uncompressed ROMs\\") + romName);
 	}
 	return L"";

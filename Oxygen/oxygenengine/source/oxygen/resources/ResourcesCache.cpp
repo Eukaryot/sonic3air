@@ -9,7 +9,6 @@
 #include "oxygen/pch.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/application/GameProfile.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/FileHelper.h"
@@ -32,10 +31,15 @@ bool ResourcesCache::loadRom()
 	// First have a look at the game's app data, where the ROM gets copied to after it was found once
 	if (!loaded && !config.mAppDataPath.empty())
 	{
-		romPath = config.mAppDataPath + L'/' + gameProfile.mRomAutoDiscover.mSteamRomName;
-		loaded = loadRomFile(romPath);
+		for (const GameProfile::RomInfo& romInfo : gameProfile.mRomInfos)
+		{
+			romPath = config.mAppDataPath + romInfo.mSteamRomName;
+			loaded = loadRomFile(romPath, romInfo);
+			if (loaded)
+				break;
+		}
 
-		// If ROM is found is one of the next steps, make sure to copy it into the app data folder afterwards
+		// If ROM is not found yet, but in one of the next steps, then make sure to copy it into the app data folder afterwards
 		saveRom = !loaded;
 	}
 
@@ -58,19 +62,29 @@ bool ResourcesCache::loadRom()
 	// Or is it the Steam ROM right inside the installation directory?
 	if (!loaded)
 	{
-		romPath = gameProfile.mRomAutoDiscover.mSteamRomName;
-		loaded = loadRomFile(romPath);
+		for (const GameProfile::RomInfo& romInfo : gameProfile.mRomInfos)
+		{
+			romPath = romInfo.mSteamRomName;
+			loaded = loadRomFile(romPath, romInfo);
+			if (loaded)
+				break;
+		}
 	}
 
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 	// If still not loaded, search for Steam installation of the game
-	if (!loaded && !gameProfile.mRomAutoDiscover.mSteamRomName.empty())
+	if (!loaded && !gameProfile.mRomInfos.empty())
 	{
 		RMX_LOG_INFO("Trying to find Steam ROM");
-		romPath = PlatformFunctions::tryGetSteamRomPath(gameProfile.mRomAutoDiscover.mSteamRomName);
-		if (!romPath.empty())
+		for (const GameProfile::RomInfo& romInfo : gameProfile.mRomInfos)
 		{
-			loaded = loadRomFile(romPath);
+			romPath = PlatformFunctions::tryGetSteamRomPath(romInfo.mSteamRomName);
+			if (!romPath.empty())
+			{
+				loaded = loadRomFile(romPath, romInfo);
+				if (loaded)
+					break;
+			}
 		}
 	}
 #endif
@@ -111,8 +125,7 @@ bool ResourcesCache::loadRomFromFile(const std::wstring& filename)
 
 bool ResourcesCache::loadRomFromMemory(const std::vector<uint8>& content)
 {
-	mRom = content;
-	if (!checkRomContent())
+	if (!loadRomMemory(content))
 		return false;
 
 	saveRomToAppData();
@@ -195,11 +208,113 @@ void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const
 bool ResourcesCache::loadRomFile(const std::wstring& filename)
 {
 	const GameProfile::RomCheck& romCheck = GameProfile::instance().mRomCheck;
+	std::vector<uint8> content;
+	content.reserve(romCheck.mSize > 0 ? romCheck.mSize : 0x400000);
+	if (!FTX::FileSystem->readFile(filename, content))
+		return false;
+
+	return loadRomMemory(content);
+}
+
+bool ResourcesCache::loadRomFile(const std::wstring& filename, const GameProfile::RomInfo& romInfo)
+{
+	const GameProfile::RomCheck& romCheck = GameProfile::instance().mRomCheck;
 	mRom.reserve(romCheck.mSize > 0 ? romCheck.mSize : 0x400000);
 	if (!FTX::FileSystem->readFile(filename, mRom))
 		return false;
 
-	return checkRomContent();
+	// If ROM info defines a required header checksum, make sure it fits (this is meant to be an early-out before doing the potentially expensive code below)
+	const uint64 headerChecksum = getHeaderChecksum(mRom);
+	if (romInfo.mHeaderChecksum != 0 && romInfo.mHeaderChecksum != headerChecksum)
+		return false;
+
+	if (applyRomModifications(romInfo))
+	{
+		if (checkRomContent())
+		{
+			mLoadedRomInfo = &romInfo;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ResourcesCache::loadRomMemory(const std::vector<uint8>& content)
+{
+	const uint64 headerChecksum = getHeaderChecksum(content);
+	for (const GameProfile::RomInfo& romInfo : GameProfile::instance().mRomInfos)
+	{
+		// If ROM info defines a required header checksum, make sure it fits (this is meant to be an early-out before doing the potentially expensive code below)
+		if (romInfo.mHeaderChecksum != 0 && romInfo.mHeaderChecksum != headerChecksum)
+			continue;
+
+		mRom = content;
+		if (applyRomModifications(romInfo))
+		{
+			if (checkRomContent())
+			{
+				mLoadedRomInfo = &romInfo;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+uint64 ResourcesCache::getHeaderChecksum(const std::vector<uint8>& content)
+{
+	if (content.empty())
+		return 0;
+	
+	// Regard the first 512 byte as header
+	return rmx::getMurmur2_64(&content[0], std::min<size_t>(512, content.size()));
+}
+
+bool ResourcesCache::applyRomModifications(const GameProfile::RomInfo& romInfo)
+{
+	if (!romInfo.mDiffFileName.empty())
+	{
+		// Load diff file if needed
+		std::vector<uint8>* content = nullptr;
+		const auto it = mDiffFileCache.find(&romInfo);
+		if (it == mDiffFileCache.end())
+		{
+			content = &mDiffFileCache[&romInfo];
+			FTX::FileSystem->readFile(romInfo.mDiffFileName, *content);
+		}
+		else
+		{
+			content = &it->second;
+		}
+
+		// Apply diff file by XORing it in
+		if (content->size() != mRom.size())
+			return false;
+
+		uint64* ptr = (uint64*)&mRom[0];
+		uint64* diff = (uint64*)&(*content)[0];
+		const size_t count = content->size() / 8;
+		for (size_t i = 0; i < count; ++i)
+		{
+			ptr[i] ^= diff[i];
+		}
+	}
+
+	for (auto& pair : romInfo.mBlankRegions)
+	{
+		if (pair.first > pair.second || pair.second >= mRom.size())
+			return false;
+		memset(&mRom[pair.first], 0, pair.second - pair.first + 1);
+	}
+
+	for (auto& pair : romInfo.mOverwrites)
+	{
+		if (pair.first >= mRom.size())
+			return false;
+		mRom[pair.first] = pair.second;
+	}
+
+	return true;
 }
 
 bool ResourcesCache::checkRomContent()
@@ -212,26 +327,23 @@ bool ResourcesCache::checkRomContent()
 			return false;
 	}
 
-	for (auto& pair : romCheck.mOverwrites)
-	{
-		RMX_CHECK(pair.first < mRom.size(), "Invalid overwrite address", continue);
-		mRom[pair.first] = pair.second;
-	}
-
 	if (romCheck.mChecksum != 0)
 	{
-		const uint32 crc = rmx::getCRC32(&mRom[0], mRom.size());
-		if (crc != romCheck.mChecksum)
+		const uint64 checksum = rmx::getMurmur2_64(&mRom[0], mRom.size());
+		if (checksum != romCheck.mChecksum)
 			return false;
 	}
+
+	// ROM check succeeded 
+	mDiffFileCache.clear();		// This cache is not needed again now
 	return true;
 }
 
 void ResourcesCache::saveRomToAppData()
 {
-	if (!GameProfile::instance().mRomAutoDiscover.mSteamRomName.empty())
+	if (nullptr != mLoadedRomInfo && !mLoadedRomInfo->mSteamRomName.empty())
 	{
-		const std::wstring filepath = Configuration::instance().mAppDataPath + L'/' + GameProfile::instance().mRomAutoDiscover.mSteamRomName;
+		const std::wstring filepath = Configuration::instance().mAppDataPath + mLoadedRomInfo->mSteamRomName;
 		const bool success = FTX::FileSystem->saveFile(filepath, mRom);
 		if (success)
 		{

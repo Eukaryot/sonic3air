@@ -15,6 +15,28 @@
 #include "oxygen/helper/JsonHelper.h"
 
 
+void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
+{
+	gameProfile.mShortName = "Sonic 3 A.I.R.";
+	gameProfile.mFullName = "Sonic 3 - Angel Island Revisited";
+
+	gameProfile.mRomCheck.mSize = 0x400000;
+	gameProfile.mRomCheck.mChecksum = 0x78a067afdf44fb24;
+
+	gameProfile.mRomInfos.resize(2);
+	gameProfile.mRomInfos[0].mSteamGameName = "Sonic 3 & Knuckles";
+	gameProfile.mRomInfos[0].mSteamRomName = L"Sonic_Knuckles_wSonic3.bin";
+	gameProfile.mRomInfos[0].mOverwrites.clear();
+	gameProfile.mRomInfos[0].mOverwrites.emplace_back(0x2001f0, 0x4a);
+	gameProfile.mRomInfos[0].mBlankRegions.clear();
+	gameProfile.mRomInfos[0].mBlankRegions.emplace_back(0x000206, 0x000297);
+
+	gameProfile.mRomInfos[1].mSteamGameName = "Sonic 3D";
+	gameProfile.mRomInfos[1].mSteamRomName = L"SONIC3D_UE.68K";
+	gameProfile.mRomInfos[1].mHeaderChecksum = 0xcdae83404263386e;
+	gameProfile.mRomInfos[1].mDiffFileName = L"data/binary/romdiff_s3d.bin";
+}
+
 void ConfigurationImpl::preLoadInitialization()
 {
 	SharedDatabase::initialize();
@@ -33,16 +55,7 @@ bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 	mPreprocessorDefinitions.setDefinition("GAMEAPP", BUILD_NUMBER);
 
 	// Setup the default game profile data accordingly
-	{
-		GameProfile& gameProfile = GameProfile::instance();
-		gameProfile.mShortName = "Sonic 3 A.I.R.";
-		gameProfile.mFullName = "Sonic 3 - Angel Island Revisited";
-		gameProfile.mRomAutoDiscover.mSteamGameName = "Sonic 3 & Knuckles";
-		gameProfile.mRomAutoDiscover.mSteamRomName = L"Sonic_Knuckles_wSonic3.bin";
-		gameProfile.mRomCheck.mSize = 0x400000;
-		gameProfile.mRomCheck.mOverwrites.emplace_back(0x2001f0, 0x4a);
-		gameProfile.mRomCheck.mChecksum = 0x0c06aa82;
-	}
+	fillDefaultGameProfile(GameProfile::instance());
 
 #ifndef ENDUSER
 	// Explicitly set a (non-empty) project path, so that "oxygenproject.json" gets loaded

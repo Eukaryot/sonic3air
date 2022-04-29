@@ -79,31 +79,61 @@ bool GameProfile::loadOxygenProjectFromJson(const Json::Value& jsonRoot)
 					}
 					else if (key == "checksum")
 					{
-						mRomCheck.mChecksum = (uint32)rmx::parseInteger(value);
-					}
-					else if (key == "overwrite")
-					{
-						const int pos = value.findChar(':', 0, 1);
-						if (pos >= 0 && pos < value.length())
-						{
-							const String address = value.getSubString(0, pos);
-							const String byteValue = value.getSubString(pos + 1, -1);
-							mRomCheck.mOverwrites.emplace_back((uint32)rmx::parseInteger(address), (uint8)rmx::parseInteger(byteValue));
-						}
+						mRomCheck.mChecksum = rmx::parseInteger(value);
 					}
 				}
 			}
 		}
 	}
 
-	// Load ROM auto-discover
+	// Load ROM infos
 	{
-		const Json::Value romAutoDiscoverJson = jsonRoot["RomAutoDiscover"];
-		if (!romAutoDiscoverJson.isNull())
+		mRomInfos.clear();
+		const Json::Value romCheckJson = jsonRoot["RomInfos"];
+		if (romCheckJson.isObject())
 		{
-			rmx::JsonHelper jsonHelper(romAutoDiscoverJson);
-			jsonHelper.tryReadString("SteamGameName", mRomAutoDiscover.mSteamGameName);
-			jsonHelper.tryReadString("SteamRomName", mRomAutoDiscover.mSteamRomName);
+			for (auto it = romCheckJson.begin(); it != romCheckJson.end(); ++it)
+			{
+				JsonHelper jsonHelper(*it);
+				RomInfo& romInfo = vectorAdd(mRomInfos);
+
+				jsonHelper.tryReadString("SteamGameName", romInfo.mSteamGameName);
+				jsonHelper.tryReadString("SteamRomName", romInfo.mSteamRomName);
+
+				std::string overwritesString;
+				if (jsonHelper.tryReadString("Overwrites", overwritesString))
+				{
+					String value = overwritesString;
+					const int pos = value.findChar(':', 0, 1);
+					if (pos >= 0 && pos < value.length())
+					{
+						const String address = value.getSubString(0, pos);
+						const String byteValue = value.getSubString(pos + 1, -1);
+						romInfo.mOverwrites.emplace_back((uint32)rmx::parseInteger(address), (uint8)rmx::parseInteger(byteValue));
+					}
+				}
+
+				std::string blankRegionsString;
+				if (jsonHelper.tryReadString("BlankRegions", blankRegionsString))
+				{
+					String value = blankRegionsString;
+					const int pos = value.findChar('-', 0, 1);
+					if (pos >= 0 && pos < value.length())
+					{
+						const String address1 = value.getSubString(0, pos);
+						const String address2 = value.getSubString(pos + 1, -1);
+						romInfo.mBlankRegions.emplace_back((uint32)rmx::parseInteger(address1), (uint32)rmx::parseInteger(address2));
+					}
+				}
+
+				std::string headerChecksumString;
+				if (jsonHelper.tryReadString("HeaderChecksum", headerChecksumString))
+				{
+					romInfo.mHeaderChecksum = rmx::parseInteger(headerChecksumString);
+				}
+
+				jsonHelper.tryReadString("DiffFileName", romInfo.mDiffFileName);
+			}
 		}
 	}
 

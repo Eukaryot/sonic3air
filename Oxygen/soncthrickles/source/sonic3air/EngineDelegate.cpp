@@ -8,6 +8,7 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
+#include "sonic3air/ConfigurationImpl.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/SharedResources.h"
@@ -87,16 +88,14 @@ bool EngineDelegate::onEnginePreStartup()
 
 bool EngineDelegate::setupCustomGameProfile()
 {
+	GameProfile& gameProfile = GameProfile::instance();
+
 #ifdef ENDUSER
 	// Setup game profile data -- this is done so that no oxygenproject.json is needed for the end-user version of S3AIR
-	GameProfile& gameProfile = GameProfile::instance();
+	ConfigurationImpl::fillDefaultGameProfile(gameProfile);
 
 	gameProfile.mAsmStackRange.first = 0xfffffd00;
 	gameProfile.mAsmStackRange.second = 0xfffffe00;
-
-	gameProfile.mRomCheck.mSize = 0x400000;
-	gameProfile.mRomCheck.mOverwrites.emplace_back(0x2001f0, 0x4a);
-	gameProfile.mRomCheck.mChecksum = 0x0c06aa82;
 
 	gameProfile.mDataPackages.clear();
 	gameProfile.mDataPackages.emplace_back(L"enginedata.bin",    true);
@@ -106,7 +105,7 @@ bool EngineDelegate::setupCustomGameProfile()
 #else
 
 	// Just load from the oxygenproject.json file
-	GameProfile::instance().loadOxygenProjectFromFile(L"oxygenproject.json");
+	gameProfile.loadOxygenProjectFromFile(L"oxygenproject.json");
 #endif
 
 	// Return true, so the engine won't load the oxygenprofile.json by itself
