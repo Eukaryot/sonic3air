@@ -143,7 +143,7 @@ namespace lemon
 			BlockNode rootNode;
 			buildNodesFromCodeLines(rootNode, lines);
 
-			// Identify all globals definitions (functions, global variables)
+			// Identify all globals definitions (functions, global variables, constants, defines)
 			processGlobalDefinitions(rootNode);
 
 			// Process and compile function contents
@@ -590,6 +590,17 @@ namespace lemon
 				}
 
 				currentPragmas.clear();
+			}
+		}
+
+		// Do some post-processing on the defines, to resolve situations where one define uses another one
+		for (Define* define : mModule.getDefines())
+		{
+			for (int iterationDepth = 0; ; ++iterationDepth)
+			{
+				if (!mTokenProcessing.resolveIdentifiers(define->mContent))
+					break;
+				CHECK_ERROR(iterationDepth < 10, "Too deep recursion in evaluating define '" << define->getName().getString() << "'", 0);
 			}
 		}
 	}

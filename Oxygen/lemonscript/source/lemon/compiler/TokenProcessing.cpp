@@ -162,8 +162,9 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::resolveIdentifiers(TokenList& tokens)
+	bool TokenProcessing::resolveIdentifiers(TokenList& tokens)
 	{
+		bool anyResolved = false;
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			if (tokens[i].getType() == Token::Type::IDENTIFIER)
@@ -173,9 +174,11 @@ namespace lemon
 				{
 					const uint64 nameHash = identifierToken.mName.getHash();
 					identifierToken.mResolved = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+					anyResolved = true;
 				}
 			}
 		}
+		return anyResolved;
 	}
 
 	void TokenProcessing::processDefines(TokenList& tokens)
