@@ -184,7 +184,7 @@ function void fn0371be()
 
 	if (u8[0xffffff8b] != 0)
 	{
-		if (s8[0xfffffe1e] < 0)
+		if (hud.dirty.timer & 0x80)
 		{
 			if (competition_mode.multiplay != 0)
 			{
@@ -206,7 +206,7 @@ function void fn0371be()
 		return
 	}
 
-	if (s8[0xfffffe1e] < 0 || u8[0xfffffedc] != u8[0xfffffeda])
+	if (hud.dirty.timer & 0x80 || u8[0xfffffedc] != u8[0xfffffeda])
 	{
 		--u16[0xffffeee8]
 		if (s16[0xffffeee8] >= 0)
@@ -226,7 +226,7 @@ function void fn0371be()
 	A1 = 0xffff7800
 	u32[A1 + D0.s16] = u32[0xffffee52]
 	u32[A1 + D0.s16 + 0x14] = u32[0xffffee56]
-	if (s8[0xfffffe1e] >= 0)
+	if ((hud.dirty.timer & 0x80) == 0)
 	{
 		u32[A1 + D0.s16] = 0x093b63
 	}
@@ -253,7 +253,7 @@ function void fn0371be()
 function void fn0373a4()
 {
 	D0.u8 = u8[0xfffffeda]
-	if (D0.u8 < u8[0xfffffedc] && s8[0xfffffe1e] >= 0)
+	if (D0.u8 < u8[0xfffffedc] && (hud.dirty.timer & 0x80) == 0)
 	{
 		objA0.state = 0x05
 		objA0.render_flags |= 0x08
@@ -397,7 +397,7 @@ function void fn037cdc()
 	A2 = 0xffff700a
 	A3 = 0xfffffe23
 	D1 = u8[0xffffee5c]
-	A4 = 0xfffffe1e
+	A4 = 0xfffffe1e		// Address of hud.dirty.timer
 	A5 = 0xffffee52
 	A6 = 0xffff7828
 	fn037d7c()

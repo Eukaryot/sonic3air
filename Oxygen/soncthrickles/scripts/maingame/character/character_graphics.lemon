@@ -497,8 +497,6 @@ function void UpdateTailsAnimation_inner()
 //# address-hook(0x017d30) end(0x017ef0)
 function void UpdateKnucklesAnimation()
 {
-	A1 = 0x017ef4
-
 	if (char.state != char.state.former)
 	{
 		char.state.former = char.state
@@ -507,7 +505,7 @@ function void UpdateKnucklesAnimation()
 		char.flags &= ~char.flag.PUSHING
 	}
 
-	A1.u16 += u16[A1 + char.state * 2]
+	A1 = tableLookupAddress(0x017ef4, char.state * 2)
 	D0.u8 = u8[A1]
 
 	if (D0.u8 < 0x80)

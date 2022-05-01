@@ -3248,6 +3248,12 @@ function void Character.cancelSuperTransformation()
 		updateSpritePattern(0x18f8e4, 0xf760, 0x50)
 	}
 
+	// Special handling for Knuckles while climbing - without this, he would change to a falling animation
+	if (char.character == CHARACTER_KNUCKLES && char.state == char.state.KNUX_FLYCLIMB)
+	{
+		char.state.former = char.state.KNUX_FLYCLIMB
+	}
+
 	Standalone.setFastMusicFlag(FastMusicFlag.SUPER_THEME, false)   // Disable fast music by Super Theme (if this was active)
 #endif
 }
