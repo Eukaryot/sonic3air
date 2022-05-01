@@ -30,6 +30,8 @@ public:
 public:
 	inline UpdateCheck(GameClient& gameClient) : mGameClient(gameClient) {}
 
+	void reset();
+
 	inline State getState() const  { return mState; }
 	bool hasUpdate() const;
 	const network::AppUpdateCheckRequest::Response* getResponse() const;

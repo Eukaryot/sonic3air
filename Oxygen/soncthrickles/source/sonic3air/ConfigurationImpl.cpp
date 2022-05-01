@@ -15,6 +15,21 @@
 #include "oxygen/helper/JsonHelper.h"
 
 
+namespace
+{
+	int getReleaseChannelValueForBuild()
+	{
+		const constexpr uint32 buildVariantHash = rmx::compileTimeFNV_32(BUILD_VARIANT);
+		if (buildVariantHash == rmx::compileTimeFNV_32("TEST"))
+			return 2;
+		else if (buildVariantHash == rmx::compileTimeFNV_32("PREVIEW") || buildVariantHash == rmx::compileTimeFNV_32("BETA"))	// Treat betas as previews
+			return 1;
+		else
+			return 0;
+	}
+}
+
+
 void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
 {
 	gameProfile.mShortName = "Sonic 3 A.I.R.";
@@ -30,6 +45,12 @@ void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
 	gameProfile.mRomInfos[0].mOverwrites.emplace_back(0x2001f0, 0x4a);
 	gameProfile.mRomInfos[0].mBlankRegions.clear();
 	gameProfile.mRomInfos[0].mBlankRegions.emplace_back(0x000206, 0x000297);
+}
+
+ConfigurationImpl::ConfigurationImpl()
+{
+	// Setup defaults
+	mGameServer.mUpdateCheck.mReleaseChannel = getReleaseChannelValueForBuild();
 }
 
 void ConfigurationImpl::preLoadInitialization()
@@ -80,7 +101,15 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 			gameServerHelper.tryReadInt("ServerPortTCP", mGameServer.mServerPortTCP);
 			gameServerHelper.tryReadInt("ServerPortWSS", mGameServer.mServerPortWSS);
 
-			// Ghost sync settings
+			// Update Check settings
+			const Json::Value& updateCheckJson = gameServerHelper.mJson["UpdateCheck"];
+			if (!updateCheckJson.isNull())
+			{
+				JsonHelper jsonHelper(updateCheckJson);
+				jsonHelper.tryReadInt("UpdateChannel", mGameServer.mUpdateCheck.mReleaseChannel);
+			}
+
+			// Ghost Sync settings
 			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
 			if (!ghostSyncJson.isNull())
 			{
@@ -285,7 +314,6 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 	// Game settings
 	{
 		Json::Value gameSettingsJson;
-
 		const auto& settingsMap = SharedDatabase::getSettings();
 		for (auto& pair : settingsMap)
 		{
@@ -294,10 +322,19 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 				continue;
 			if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && setting.mValue == setting.mDefaultValue)
 				continue;
-
 			gameSettingsJson[setting.mIdentifier] = setting.mValue;
 		}
-
 		root["GameSettings"] = gameSettingsJson;
+	}
+
+	// Game server
+	{
+		Json::Value gameServerJson;
+		{
+			Json::Value updateCheckJson;
+			updateCheckJson["ReleaseChannel"] = mGameServer.mUpdateCheck.mReleaseChannel;
+			gameServerJson["UpdateCheck"] = updateCheckJson;
+		}
+		root["GameServer"] = gameServerJson;
 	}
 }

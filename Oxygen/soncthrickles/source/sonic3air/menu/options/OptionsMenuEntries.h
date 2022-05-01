@@ -51,7 +51,12 @@ public:
 class OptionsMenuEntry : public GameMenuEntry
 {
 public:
+	OptionsMenuEntry& setUseSmallFont(bool useSmallFont);
+
 	void renderEntry(RenderContext& renderContext_) override;
+
+private:
+	bool mUseSmallFont = false;
 };
 
 

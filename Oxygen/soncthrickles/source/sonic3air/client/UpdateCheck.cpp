@@ -36,18 +36,23 @@ namespace
 	#endif
 	}
 
-	const char* getReleaseChannelNameForBuild()
+	const char* getReleaseChannelName()
 	{
-		const constexpr uint32 buildVariantHash = rmx::compileTimeFNV_32(BUILD_VARIANT);
-		if (buildVariantHash == rmx::compileTimeFNV_32("TEST"))
-			return "test";
-		else if (buildVariantHash == rmx::compileTimeFNV_32("PREVIEW") || buildVariantHash == rmx::compileTimeFNV_32("BETA"))	// Treat betas as previews
-			return "preview";
-		else
-			return "stable";
+		const char* RELEASE_CHANNEL_NAMES[3] = { "stable", "preview", "test" };
+		int& releaseChannel = ConfigurationImpl::instance().mGameServer.mUpdateCheck.mReleaseChannel;
+		releaseChannel = clamp(releaseChannel, 0, 2);
+		return RELEASE_CHANNEL_NAMES[releaseChannel];
 	}
 }
 
+
+void UpdateCheck::reset()
+{
+	if (mState == State::HAS_RESPONSE)
+		mState = State::READY_TO_START;
+	mAppUpdateCheckRequest = network::AppUpdateCheckRequest();
+	mLastUpdateCheckTimestamp = 0;
+}
 
 bool UpdateCheck::hasUpdate() const
 {
@@ -115,7 +120,7 @@ void UpdateCheck::performUpdate()
 		{
 			mAppUpdateCheckRequest.mQuery.mAppName = "sonic3air";
 			mAppUpdateCheckRequest.mQuery.mPlatform = ::getPlatformName();
-			mAppUpdateCheckRequest.mQuery.mReleaseChannel = ::getReleaseChannelNameForBuild();	// TODO: Save selection in config and make it configurable in Options
+			mAppUpdateCheckRequest.mQuery.mReleaseChannel = ::getReleaseChannelName();
 			mAppUpdateCheckRequest.mQuery.mInstalledAppVersion = BUILD_NUMBER;
 			mAppUpdateCheckRequest.mQuery.mInstalledContentVersion = BUILD_NUMBER;
 			mGameClient.getServerConnection().sendRequest(mAppUpdateCheckRequest);

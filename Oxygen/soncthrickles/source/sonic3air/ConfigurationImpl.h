@@ -20,6 +20,9 @@ public:
 
 	static void fillDefaultGameProfile(GameProfile& gameProfile);
 
+public:
+	ConfigurationImpl();
+
 protected:
 	void preLoadInitialization() override;
 	bool loadConfigurationInternal(JsonHelper& jsonHelper) override;
@@ -43,6 +46,10 @@ public:
 	std::string mGameVersionInSettings;
 
 	// Game server
+	struct UpdateCheck
+	{
+		int mReleaseChannel = 0;	// 0 = stable, 1 = preview, 2 = test builds
+	};
 	struct GhostSync
 	{
 		bool mEnabled = false;
@@ -55,6 +62,7 @@ public:
 		int mServerPortUDP = 0;
 		int mServerPortTCP = 0;
 		int mServerPortWSS = 0;
+		UpdateCheck mUpdateCheck;
 		GhostSync mGhostSync;
 	};
 	GameServer mGameServer;

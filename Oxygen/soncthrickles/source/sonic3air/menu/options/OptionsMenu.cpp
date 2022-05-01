@@ -88,6 +88,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 	{
 		ConfigurationImpl& config = ConfigurationImpl::instance();
 
+		setupOptionEntryInt(option::RELEASE_CHANNEL,			&config.mGameServer.mUpdateCheck.mReleaseChannel);
+
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
@@ -194,6 +196,12 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Update");
 		entries.addEntry<UpdateCheckMenuEntry>().initEntry("Check for updates", option::_CHECK_FOR_UPDATE);
+		entries.addEntry<OptionsMenuEntry>()
+			.setUseSmallFont(true)
+			.initEntry("", option::RELEASE_CHANNEL)
+			.addOption("Stable updates", 0)
+			.addOption("Stable & preview", 1)
+			.addOption("All incl. test builds", 2);
 
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
@@ -929,6 +937,13 @@ void OptionsMenu::update(float timeElapsed)
 					const uint32 selectedData = selectedEntry.mData;
 					switch (selectedData)
 					{
+						case option::RELEASE_CHANNEL:
+						{
+							mOptionEntries[selectedData].applyValue();
+							GameClient::instance().getUpdateCheck().reset();
+							break;
+						}
+
 						case option::WINDOW_MODE:
 						{
 							Application::instance().setWindowMode((Application::WindowMode)selectedEntry.selected().mValue);

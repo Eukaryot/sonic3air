@@ -112,6 +112,7 @@ namespace option
 		REGION,
 
 		_CHECK_FOR_UPDATE,
+		RELEASE_CHANNEL,
 		_OPEN_HOMEPAGE,
 		_OPEN_MANUAL,
 		_BACK,
