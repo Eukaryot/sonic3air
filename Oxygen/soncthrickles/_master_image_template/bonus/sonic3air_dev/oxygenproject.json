@@ -10,19 +10,12 @@
 	// ROM infos
 	"RomInfos":
 	{
-		"01_S3K_Steam":
+		"S3K_Steam":
 		{
 			"SteamGameName":  "Sonic 3 & Knuckles",
 			"SteamRomName":   "Sonic_Knuckles_wSonic3.bin",
 			"Overwrites":     "0x2001f0:0x4a",
 			"BlankRegions":   "0x000206-0x000297"
-		},
-		"02_S3D_Steam":
-		{
-			"SteamGameName":  "Sonic 3D",
-			"SteamRomName":   "SONIC3D_UE.68K",
-			"HeaderChecksum": "0xcdae83404263386e",
-			"DiffFileName":   "data/binary/romdiff_s3d.bin"
 		}
 	},
 
