@@ -98,5 +98,7 @@ private:
 	GameMenuScrolling mScrolling;
 
 	bool mEnteredFromIngame = false;
+	float mWarningMessageTimeout = 0.0f;
+
 	bool mHasAnyModOptions = false;
 };

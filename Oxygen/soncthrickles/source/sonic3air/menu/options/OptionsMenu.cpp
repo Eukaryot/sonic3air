@@ -1107,6 +1107,12 @@ void OptionsMenu::update(float timeElapsed)
 		}
 	}
 
+	// Update warning message timeout
+	if (mWarningMessageTimeout > 0.0f)
+	{
+		mWarningMessageTimeout = std::max(0.0f, mWarningMessageTimeout - timeElapsed);
+	}
+
 	// Check for changes in connected gamepads
 	refreshGamepadLists();
 
@@ -1258,9 +1264,10 @@ void OptionsMenu::render()
 			}
 		}
 
-		if (mEnteredFromIngame)
+		if (mEnteredFromIngame && mWarningMessageTimeout > 0.0f)
 		{
-			const Recti rect(0, 210, 400, 16);
+			const float visibility = saturate(mWarningMessageTimeout / 0.5f);
+			const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
 			drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
 			drawer.printText(global::mFont5, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
 			drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
@@ -1308,6 +1315,8 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 			mActiveMenu = &mTabMenuEntries;
 		}
 	}
+
+	mWarningMessageTimeout = enteredFromIngame ? 4.0f : 0.0f;		
 }
 
 void OptionsMenu::removeControllerSetupMenu()
