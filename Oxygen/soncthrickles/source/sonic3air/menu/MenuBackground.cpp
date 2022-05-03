@@ -173,9 +173,12 @@ void MenuBackground::render()
 			{
 				Application::instance().getSimulation().setRunning(true);
 			}
+
 			LemonScriptRuntime& runtime = Application::instance().getSimulation().getCodeExec().getLemonScriptRuntime();
-			runtime.setGlobalVariableValue("MainMenuBG.scrollOffset", roundToInt(-mBackgroundLayer.mCurrentPosition * 150.0f));
-			runtime.setGlobalVariableValue("MainMenuBG.logoPosition", roundToInt(interpolate(splitMin, splitMax, normalizedTitleRight) - 91.0f));
+			static const lemon::FlyweightString SCROLL_OFFSET_NAME("MainMenuBG.scrollOffset");
+			static const lemon::FlyweightString LOGO_POSITION_NAME("MainMenuBG.logoPosition");
+			runtime.setGlobalVariableValue_int64(SCROLL_OFFSET_NAME, roundToInt(-mBackgroundLayer.mCurrentPosition * 150.0f));
+			runtime.setGlobalVariableValue_int64(LOGO_POSITION_NAME, roundToInt(interpolate(splitMin, splitMax, normalizedTitleRight) - 91.0f));
 			mAnimatedBackgroundActive = true;
 		}
 		else

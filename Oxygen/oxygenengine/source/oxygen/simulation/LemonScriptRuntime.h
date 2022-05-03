@@ -51,15 +51,16 @@ public:
 	bool callAddressHook(uint32 address);
 
 	void callFunction(const lemon::ScriptFunction& function);
-	bool callFunctionByName(const std::string& functionName, bool showErrorOnFail = true);
-	bool callFunctionByNameAtLabel(const std::string& functionName, const std::string& labelName, bool showErrorOnFail = true);
+	bool callFunctionByName(lemon::FlyweightString functionName, bool showErrorOnFail = true);
+	bool callFunctionByNameAtLabel(lemon::FlyweightString functionName, lemon::FlyweightString labelName, bool showErrorOnFail = true);
 
 	size_t getCallStackSize() const;
 	void getCallStack(std::vector<const lemon::Function*>& outCallStack) const;
 	void getCallStackWithLabels(CallStackWithLabels& outCallStack) const;
 	const lemon::Function* getCurrentFunction() const;
 
-	void setGlobalVariableValue(const std::string& variableName, uint64 value);
+	int64 getGlobalVariableValue_int64(lemon::FlyweightString variableName);
+	void setGlobalVariableValue_int64(lemon::FlyweightString variableName, int64 value);
 
 	void getLastStepLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const;
 	std::string getOwnCurrentScriptLocationString() const;

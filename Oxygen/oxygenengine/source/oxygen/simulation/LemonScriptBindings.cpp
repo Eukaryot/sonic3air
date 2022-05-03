@@ -214,6 +214,16 @@ namespace
 	}
 
 
+	void System_callFunctionByName(lemon::StringRef functionName)
+	{
+		if (!functionName.isValid())
+			return;
+
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
+		codeExec->getLemonScriptRuntime().callFunctionByName(functionName, false);
+	}
+
 	void System_setupCallFrame2(lemon::StringRef functionName, lemon::StringRef labelName)
 	{
 		if (!functionName.isValid())
@@ -227,6 +237,20 @@ namespace
 	void System_setupCallFrame1(lemon::StringRef functionName)
 	{
 		System_setupCallFrame2(functionName, lemon::StringRef());
+	}
+
+	int64 System_getGlobalVariableValueByName(lemon::StringRef variableName)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return 0);
+		return codeExec->getLemonScriptRuntime().getGlobalVariableValue_int64(variableName);
+	}
+
+	void System_setGlobalVariableValueByName(lemon::StringRef variableName, int64 value)
+	{
+		CodeExec* codeExec = CodeExec::getActiveInstance();
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
+		codeExec->getLemonScriptRuntime().setGlobalVariableValue_int64(variableName, value);
 	}
 
 	uint32 System_rand()
@@ -1286,12 +1310,22 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 
 		// System
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1))	// Should not get inline executed
+		module.addUserDefinedFunction("System.callFunctionByName", lemon::wrap(&System_callFunctionByName))	// Should not get inline executed
 			.setParameterInfo(0, "functionName");
 
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))	// Should not get inline executed
+		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1))		// Should not get inline executed
+			.setParameterInfo(0, "functionName");
+
+		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))		// Should not get inline executed
 			.setParameterInfo(0, "functionName")
 			.setParameterInfo(1, "labelName");
+
+		module.addUserDefinedFunction("System.getGlobalVariableValueByName", lemon::wrap(&System_getGlobalVariableValueByName), defaultFlags)
+			.setParameterInfo(0, "variableName");
+
+		module.addUserDefinedFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByName), defaultFlags)
+			.setParameterInfo(0, "variableName")
+			.setParameterInfo(1, "parameter");
 
 		module.addUserDefinedFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);
 

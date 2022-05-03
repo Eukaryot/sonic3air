@@ -147,7 +147,7 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 		{
 			for (Mod::Setting& modSetting : modSettingCategory.mSettings)
 			{
-				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue(modSetting.mBinding, modSetting.mCurrentValue);
+				mCodeExec.getLemonScriptRuntime().setGlobalVariableValue_int64(modSetting.mBinding, modSetting.mCurrentValue);
 			}
 		}
 	}

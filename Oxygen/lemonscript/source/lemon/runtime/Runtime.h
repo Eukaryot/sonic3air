@@ -133,8 +133,8 @@ namespace lemon
 		const FlyweightString* resolveStringByKey(uint64 key) const;
 		uint64 addString(std::string_view str);
 
-		int64 getGlobalVariableValue(const Variable& variable);
-		void setGlobalVariableValue(const Variable& variable, int64 value);
+		int64 getGlobalVariableValue_int64(const Variable& variable);
+		void setGlobalVariableValue_int64(const Variable& variable, int64 value);
 		int64* accessGlobalVariableValue(const Variable& variable);
 
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
@@ -142,8 +142,8 @@ namespace lemon
 
 		void callFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
-		bool callFunctionAtLabel(const Function& function, const std::string& labelName);
-		bool callFunctionByName(const std::string& functionName, const std::string& labelName = "");
+		bool callFunctionAtLabel(const Function& function, FlyweightString labelName);
+		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
 		bool returnFromFunction();
 
 		void executeSteps(Runtime::ExecuteResult& result, size_t stepsLimit = 1000);

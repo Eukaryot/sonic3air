@@ -248,23 +248,23 @@ void LemonScriptRuntime::callFunction(const lemon::ScriptFunction& function)
 	mInternal.mRuntime.callFunction(function);
 }
 
-bool LemonScriptRuntime::callFunctionByName(const std::string& functionName, bool showErrorOnFail)
+bool LemonScriptRuntime::callFunctionByName(lemon::FlyweightString functionName, bool showErrorOnFail)
 {
 	return callFunctionByNameAtLabel(functionName, "", showErrorOnFail);
 }
 
-bool LemonScriptRuntime::callFunctionByNameAtLabel(const std::string& functionName, const std::string& labelName, bool showErrorOnFail)
+bool LemonScriptRuntime::callFunctionByNameAtLabel(lemon::FlyweightString functionName, lemon::FlyweightString labelName, bool showErrorOnFail)
 {
 	const bool success = mInternal.mRuntime.callFunctionByName(functionName, labelName);
 	if (!success && showErrorOnFail)
 	{
-		if (labelName.empty())
+		if (labelName.isEmpty())
 		{
-			RMX_ERROR("Failed to call function '" + functionName + "'", );
+			RMX_ERROR("Failed to call function '" << functionName.getString() << "'", );
 		}
 		else
 		{
-			RMX_ERROR("Failed to call label '" + labelName + "' in '" + functionName + "'", );
+			RMX_ERROR("Failed to call label '" << labelName.getString() << "' in '" << functionName.getString() << "'", );
 		}
 	}
 	return success;
@@ -307,12 +307,22 @@ const lemon::Function* LemonScriptRuntime::getCurrentFunction() const
 	return (nullptr == runtimeFunction) ? nullptr : runtimeFunction->mFunction;
 }
 
-void LemonScriptRuntime::setGlobalVariableValue(const std::string& variableName, uint64 value)
+int64 LemonScriptRuntime::getGlobalVariableValue_int64(lemon::FlyweightString variableName)
 {
-	lemon::Variable* variable = mProgram.getGlobalVariableByHash(rmx::getMurmur2_64(variableName));
+	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
 	if (nullptr != variable)
 	{
-		mInternal.mRuntime.setGlobalVariableValue(*variable, value);
+		return mInternal.mRuntime.getGlobalVariableValue_int64(*variable);
+	}
+	return 0;
+}
+
+void LemonScriptRuntime::setGlobalVariableValue_int64(lemon::FlyweightString variableName, int64 value)
+{
+	lemon::Variable* variable = mProgram.getGlobalVariableByHash(variableName.getHash());
+	if (nullptr != variable)
+	{
+		mInternal.mRuntime.setGlobalVariableValue_int64(*variable, value);
 	}
 }
 

@@ -247,13 +247,13 @@ namespace lemon
 		return flyweightString.getHash();
 	}
 
-	int64 Runtime::getGlobalVariableValue(const Variable& variable)
+	int64 Runtime::getGlobalVariableValue_int64(const Variable& variable)
 	{
 		const int64* valuePtr = accessGlobalVariableValue(variable);
 		return (nullptr == valuePtr) ? 0 : *valuePtr;
 	}
 
-	void Runtime::setGlobalVariableValue(const Variable& variable, int64 value)
+	void Runtime::setGlobalVariableValue_int64(const Variable& variable, int64 value)
 	{
 		int64* valuePtr = accessGlobalVariableValue(variable);
 		if (nullptr != valuePtr)
@@ -304,7 +304,7 @@ namespace lemon
 		}
 	}
 
-	bool Runtime::callFunctionAtLabel(const Function& function, const std::string& labelName)
+	bool Runtime::callFunctionAtLabel(const Function& function, FlyweightString labelName)
 	{
 		if (function.getType() != Function::Type::SCRIPT)
 			return false;
@@ -333,13 +333,13 @@ namespace lemon
 		return true;
 	}
 
-	bool Runtime::callFunctionByName(const std::string& functionName, const std::string& labelName)
+	bool Runtime::callFunctionByName(FlyweightString functionName, FlyweightString labelName)
 	{
-		const uint64 nameAndSignatureHash = rmx::getMurmur2_64(functionName) + Function::getVoidSignatureHash();
+		const uint64 nameAndSignatureHash = functionName.getHash() + Function::getVoidSignatureHash();
 		const Function* function = mProgram->getFunctionBySignature(nameAndSignatureHash);
 		if (nullptr != function)
 		{
-			if (labelName.empty())
+			if (labelName.isEmpty())
 			{
 				callFunction(*function);
 				return true;

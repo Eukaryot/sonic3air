@@ -45,6 +45,8 @@ namespace lemon
 		inline FlyweightString(const FlyweightString& other) : mEntry(other.mEntry) {}
 
 		inline bool isValid() const  { return (nullptr != mEntry); }
+		inline bool isEmpty() const  { return (nullptr == mEntry || mEntry->mString.empty()); }
+
 		inline uint64 getHash() const  { return (nullptr != mEntry) ? mEntry->mHash : 0; }
 		std::string_view getString() const  { return (nullptr != mEntry) ? mEntry->mString : std::string_view(); }
 		const std::string_view& getStringRef() const  { return (nullptr != mEntry) ? mEntry->mString : EMPTY_STRING_VIEW; }
