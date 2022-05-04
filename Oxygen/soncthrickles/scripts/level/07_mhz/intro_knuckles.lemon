@@ -415,8 +415,9 @@ function void fn063694()
 #if STANDALONE
 	if (global.zone_act == 0x0000)
 	{
+		objA0.hitbox_extends.y = 7		// Reduce hitbox size, otherwise they hop off in the air
 		objA0.position.x.u16 += camera.position.x.u16 - 0x0560
-		objA0.position.y.u16 += camera.position.y.u16 - 0x0948 - 0x10	// Additional offset 0x10 to make sure non of them falls through the underground
+		objA0.position.y.u16 += camera.position.y.u16 - 0x0948 - 0x10	// Additional offset 0x10 to make sure none of them falls through the underground
 		u16[A0 + 0x3a] += camera.position.x.u16 - 0x0560
 		u16[A0 + 0x3c] += camera.position.y.u16 - 0x0948
 	}
