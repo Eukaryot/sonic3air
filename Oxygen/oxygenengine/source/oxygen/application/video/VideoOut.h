@@ -79,6 +79,14 @@ private:
 		FRAME_READY			// Last frame was completed, waiting to be rendered
 	};
 
+	struct FrameInterpolation
+	{
+		bool mCurrentlyInterpolating = false;
+		bool mUseInterpolationLastUpdate = false;
+		bool mUseInterpolationThisUpdate = false;
+		float mInterFramePosition = 0.0f;
+	};
+
 private:
 	Renderer* mActiveRenderer = nullptr;
 	HardwareRenderer* mHardwareRenderer = nullptr;
@@ -92,8 +100,7 @@ private:
 	FrameState mFrameState = FrameState::OUTSIDE_FRAME;
 	uint32 mLastFrameTicks = 0;
 
-	bool mUsingFrameInterpolation = false;
-	float mInterFramePosition = 0.0f;
+	FrameInterpolation mFrameInterpolation;
 	Vec2i mLastWorldSpaceOffset;
 
 	std::vector<Geometry*> mGeometries;

@@ -65,6 +65,8 @@ void VideoOut::reset()
 	mRenderParts->reset();
 	mActiveRenderer->reset();
 
+	mFrameInterpolation.mUseInterpolationLastUpdate = false;
+	mFrameInterpolation.mUseInterpolationThisUpdate = false;
 	mDebugDrawRenderingRequested = false;
 	mPreviouslyHadOutsideFrameDebugDraws = false;
 }
@@ -133,9 +135,9 @@ void VideoOut::setScreenSize(uint32 width, uint32 height)
 Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
 {
 	Vec2i offset = mRenderParts->getSpacesManager().getWorldSpaceOffset();
-	if (mUsingFrameInterpolation)
+	if (mFrameInterpolation.mCurrentlyInterpolating)
 	{
-		const Vec2f interpolatedDifference = Vec2f(mLastWorldSpaceOffset - offset) * (1.0f - mInterFramePosition);
+		const Vec2f interpolatedDifference = Vec2f(mLastWorldSpaceOffset - offset) * (1.0f - mFrameInterpolation.mInterFramePosition);
 		offset += Vec2i(roundToInt(interpolatedDifference.x), roundToInt(interpolatedDifference.y));
 	}
 	return offset;
@@ -166,21 +168,23 @@ void VideoOut::postFrameUpdate()
 	// Signal for rendering
 	mFrameState = FrameState::FRAME_READY;
 	mLastFrameTicks = SDL_GetTicks();
+	mFrameInterpolation.mUseInterpolationLastUpdate = mFrameInterpolation.mUseInterpolationThisUpdate;
+	mFrameInterpolation.mUseInterpolationThisUpdate = true;		// Could be set differently, e.g. if we had a script binding to disable interpolation for an update
 	mDebugDrawRenderingRequested = false;
 }
 
 void VideoOut::setInterFramePosition(float position)
 {
-	mInterFramePosition = position;
+	mFrameInterpolation.mInterFramePosition = position;
 }
 
 bool VideoOut::updateGameScreen()
 {
-	mUsingFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
+	mFrameInterpolation.mCurrentlyInterpolating = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION && mFrameInterpolation.mUseInterpolationLastUpdate && mFrameInterpolation.mUseInterpolationThisUpdate);
 
 	// Only render something if a frame simulation was completed in the meantime
 	const bool hasNewSimulationFrame = (mFrameState == FrameState::FRAME_READY);
-	if (!hasNewSimulationFrame && !mUsingFrameInterpolation && !mDebugDrawRenderingRequested)
+	if (!hasNewSimulationFrame && !mFrameInterpolation.mCurrentlyInterpolating && !mDebugDrawRenderingRequested)
 	{
 		// No update
 		return false;
@@ -191,8 +195,8 @@ bool VideoOut::updateGameScreen()
 	RefreshParameters refreshParameters;
 	refreshParameters.mSkipThisFrame = false;
 	refreshParameters.mHasNewSimulationFrame = hasNewSimulationFrame;
-	refreshParameters.mUsingFrameInterpolation = mUsingFrameInterpolation;
-	refreshParameters.mInterFramePosition = mInterFramePosition;
+	refreshParameters.mUsingFrameInterpolation = mFrameInterpolation.mCurrentlyInterpolating;
+	refreshParameters.mInterFramePosition = mFrameInterpolation.mInterFramePosition;
 	mRenderParts->refresh(refreshParameters);
 
 	// Render a new image
@@ -343,7 +347,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 			if (accept)
 			{
 				sprite.mInterpolatedPosition = sprite.mPosition;
-				if (mUsingFrameInterpolation)
+				if (mFrameInterpolation.mCurrentlyInterpolating)
 				{
 					Vec2i difference;
 					if (sprite.mHasLastPosition)
@@ -362,7 +366,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 
 					if ((difference.x != 0 || difference.y != 0) && (abs(difference.x) < 0x40 && abs(difference.y) < 0x40))
 					{
-						const Vec2f interpolatedDifference = Vec2f(difference) * (1.0f - mInterFramePosition);
+						const Vec2f interpolatedDifference = Vec2f(difference) * (1.0f - mFrameInterpolation.mInterFramePosition);
 						sprite.mInterpolatedPosition -= Vec2i(roundToInt(interpolatedDifference.x), roundToInt(interpolatedDifference.y));
 					}
 				}
