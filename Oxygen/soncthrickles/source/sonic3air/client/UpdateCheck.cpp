@@ -48,8 +48,9 @@ namespace
 
 void UpdateCheck::reset()
 {
-	if (mState == State::HAS_RESPONSE)
+	if (mState > State::READY_TO_START && mState != State::FAILED)
 		mState = State::READY_TO_START;
+	mUpdateRequested = false;
 	mAppUpdateCheckRequest = network::AppUpdateCheckRequest();
 	mLastUpdateCheckTimestamp = 0;
 }
@@ -72,12 +73,13 @@ const network::AppUpdateCheckRequest::Response* UpdateCheck::getResponse() const
 
 void UpdateCheck::startUpdateCheck()
 {
-	if (mState == State::INACTIVE || mState == State::FAILED)
+	if (!mGameClient.isConnected())
 	{
 		// Start connecting, the rest is done later in "performUpdate"
 		mGameClient.connectToServer();
 		mState = State::CONNECTING;
 	}
+	mUpdateRequested = true;
 }
 
 void UpdateCheck::performUpdate()
@@ -105,12 +107,14 @@ void UpdateCheck::performUpdate()
 
 		case State::READY_TO_START:
 		{
-			// No update check if the last update check in the last 60 seconds
-			if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 60 * 1000)
-			{
-				mState = State::INACTIVE;
-				return;
-			}
+			if (!mUpdateRequested)
+				break;
+
+			mUpdateRequested = false;
+
+			// Don't start a new update check if the last one was in the last 20 seconds (for the same update channel)
+			if (mLastUpdateCheckTimestamp != 0 && mGameClient.getCurrentTimestamp() < mLastUpdateCheckTimestamp + 20 * 1000)
+				break;
 
 			mState = State::SEND_QUERY;
 			[[fallthrough]];

@@ -44,6 +44,7 @@ public:
 private:
 	GameClient& mGameClient;
 	State mState = State::INACTIVE;
+	bool mUpdateRequested = false;
 	network::AppUpdateCheckRequest mAppUpdateCheckRequest;
 	uint64 mLastUpdateCheckTimestamp = 0;
 };

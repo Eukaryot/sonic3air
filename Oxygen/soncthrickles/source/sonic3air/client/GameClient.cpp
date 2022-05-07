@@ -13,6 +13,24 @@
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
 
+namespace
+{
+	bool resolveGameServerHostName(const std::string& hostName, std::string& outServerIP)
+	{
+	#if !defined(GAME_CLIENT_USE_WSS)
+		// For UDP/TCP, try the "gameserver" subdomain first
+		//  -> This does not work for emscripten websockets, see implementation of "resolveToIp"
+		//  -> It allows for having different servers for UDP/TCP, and websockets
+		if (Sockets::resolveToIP("gameserver." + hostName, outServerIP))
+			return true;
+	#endif
+
+		// Use the host name itself
+		return Sockets::resolveToIP(hostName, outServerIP);
+	}
+}
+
+
 GameClient::GameClient() :
 #if defined(GAME_CLIENT_USE_UDP)
 	mConnectionManager(&mUDPSocket, nullptr, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE),
@@ -97,7 +115,7 @@ void GameClient::startConnectingToServer(uint64 currentTimestamp)
 	{
 		const ConfigurationImpl::GameServer& config = ConfigurationImpl::instance().mGameServer;
 		std::string serverIP;
-		if (!Sockets::resolveToIP(config.mServerHostName, serverIP))
+		if (!resolveGameServerHostName(config.mServerHostName, serverIP))
 		{
 			mConnectionState = ConnectionState::FAILED;
 			return;

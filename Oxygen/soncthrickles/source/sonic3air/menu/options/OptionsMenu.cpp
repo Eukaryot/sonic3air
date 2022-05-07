@@ -1056,6 +1056,7 @@ void OptionsMenu::update(float timeElapsed)
 					}
 
 					case option::_CHECK_FOR_UPDATE:
+					case option::RELEASE_CHANNEL:
 					{
 						UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
 						if (updateCheck.hasUpdate())

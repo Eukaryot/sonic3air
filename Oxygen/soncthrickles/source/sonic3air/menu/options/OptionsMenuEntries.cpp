@@ -216,7 +216,7 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 		case UpdateCheck::State::SEND_QUERY:
 		case UpdateCheck::State::WAITING_FOR_RESPONSE:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "No connection to server", 5, Color(1.0f, 1.0f, 1.0f, alpha));
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Connecting to server...", 5, Color(1.0f, 1.0f, 1.0f, alpha));
 			break;
 		}
 		case UpdateCheck::State::HAS_RESPONSE:
@@ -234,7 +234,7 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 		}
 		default:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Last check for updates: unknown", 5, Color(1.0f, 1.0f, 1.0f, alpha));
+			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Ready to check for updates", 5, Color(0.8f, 0.8f, 0.8f, alpha));
 			break;
 		}
 	}
