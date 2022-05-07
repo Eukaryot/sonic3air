@@ -99,6 +99,60 @@ namespace utils
 		}
 	}
 
+	uint32 getVersionNumberFromString(const std::string& versionString)
+	{
+		// Version string is expected to use the following format: "XX.XX.XX" or "XX.XX.XX.X" with X being decimal digits
+		if (versionString.length() < 8)
+			return 0;
+
+		// If there's a 'v' at the start, skip that one
+		size_t pos = 0;
+		if (versionString[0] == 'v')
+			++pos;
+
+		uint32 output = 0;
+		uint8 currentNumber = 0;
+		int currentNumDigits = 0;
+		int shiftOffset = 24;
+		for (; pos < versionString.length(); ++pos)
+		{
+			if (versionString[pos] == '.')
+			{
+				if (currentNumDigits == 0)
+					return 0;
+				if (shiftOffset <= 0)
+					return 0;
+				output |= ((uint32)currentNumber << shiftOffset);
+				shiftOffset -= 8;
+				currentNumber = 0;
+				currentNumDigits = 0;
+			}
+			else
+			{
+				const int digit = (versionString[pos] - '0');
+				if (digit < 0 || digit > 9)
+					return 0;
+				if (currentNumDigits >= 2)
+					return 0;
+				currentNumber = (currentNumber << 4) + digit;
+				++currentNumDigits;
+			}
+		}
+
+		if (currentNumDigits == 0)
+			return 0;
+		if (shiftOffset > 8)	// Both 0 and 8 are allowed
+			return 0;
+		output |= ((uint32)currentNumber << shiftOffset);
+
+		return output;
+	}
+
+	std::string getVersionStringFromNumber(uint32 versionNumber)
+	{
+		return String(0, "%02x.%02x.%02x.%x", (versionNumber >> 24) & 0xff, (versionNumber >> 16) & 0xff, (versionNumber >> 8) & 0xff, versionNumber & 0xff).toStdString();
+	}
+
 	void buildSpriteAtlas(const std::wstring& outputFilename, const std::wstring& imagesFileMask)
 	{
 		FileCrawler fc;

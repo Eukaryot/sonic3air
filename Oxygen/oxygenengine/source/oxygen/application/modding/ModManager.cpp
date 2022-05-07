@@ -13,6 +13,7 @@
 #include "oxygen/file/ZipFileProvider.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/helper/Utils.h"
 
 
 namespace detail
@@ -233,9 +234,10 @@ bool ModManager::scanMods()
 				Json::Value value = metadataJson["GameVersion"];
 				if (value.isString())
 				{
-					if (value.asString() > EngineMain::getDelegate().getAppMetaData().mBuildVersion)
+					const uint32 versionNumber = utils::getVersionNumberFromString(value.asString());
+					if (versionNumber != 0 && versionNumber > EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber)
 					{
-						errorMessage = "Mod '" + name + "' requires newer game version " + value.asString().c_str();
+						errorMessage = "Mod '" + name + "' requires newer game version v" + utils::getVersionStringFromNumber(versionNumber);
 					}
 				}
 			}

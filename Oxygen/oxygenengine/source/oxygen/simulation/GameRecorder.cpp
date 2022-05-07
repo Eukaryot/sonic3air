@@ -208,7 +208,7 @@ bool GameRecorder::saveRecording(const std::wstring& filename) const
 	const EngineDelegateInterface::AppMetaData& appMetaData = EngineMain::getDelegate().getAppMetaData();
 	const char SIGNATURE[] = "GRC1";
 	serializer.write(SIGNATURE, 4);
-	serializer.write(appMetaData.mBuildVersion.c_str(), 10);
+	serializer.write(appMetaData.mBuildVersionString.c_str(), 10);
 
 	// Game-specific
 	std::vector<uint8> buffer;

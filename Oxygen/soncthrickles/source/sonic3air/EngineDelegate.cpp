@@ -40,7 +40,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 		mAppMetaData.mTitle = "Sonic 3 A.I.R.";
 		mAppMetaData.mIconFile = L"data/images/icon.png";
 		mAppMetaData.mWindowsIconResource = 101;
-		mAppMetaData.mBuildVersion = BUILD_STRING;
+		mAppMetaData.mBuildVersionString = BUILD_STRING;
+		mAppMetaData.mBuildVersionNumber = BUILD_NUMBER;
 		mAppMetaData.mAppDataFolder = L"Sonic3AIR";
 	}
 	return mAppMetaData;

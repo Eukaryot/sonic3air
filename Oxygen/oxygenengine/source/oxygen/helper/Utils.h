@@ -20,6 +20,9 @@ namespace utils
 	void splitTextIntoLines(std::vector<std::string>& outLines, const std::string& text, Font& font, int maxLineWidth);
 	void shortenTextToFit(std::string& text, Font& font, int maxLineWidth);
 
+	uint32 getVersionNumberFromString(const std::string& versionString);
+	std::string getVersionStringFromNumber(uint32 versionNumber);
+
 	void buildSpriteAtlas(const std::wstring& outputFilename, const std::wstring& imagesFileMask);	// For 32-bit bitmaps (uses RMX SpriteAtlas)
 	void buildSpriteAtlas2(const std::wstring& outputFilename, const std::wstring& imagesFileMask);	// For 8-bit bitmaps (uses fixed grid)
 }

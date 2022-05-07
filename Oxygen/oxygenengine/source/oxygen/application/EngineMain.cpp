@@ -270,7 +270,7 @@ bool EngineMain::startupEngine()
 		oxygen::Logging::startup(config.mAppDataPath + L"logfile.txt");
 		RMX_LOG_INFO("--- STARTUP ---");
 		RMX_LOG_INFO("Logging started");
-		RMX_LOG_INFO("Application version: " << appMetaData.mBuildVersion);
+		RMX_LOG_INFO("Application version: " << appMetaData.mBuildVersionString);
 
 		String commandLine;
 		for (std::string& arg : mArguments)
