@@ -123,7 +123,7 @@ declare function void System.setupCallFrame(string functionName, string labelNam
 
 declare function s64 System.getGlobalVariableValueByName(string variableName)
 
-declare function void System.setGlobalVariableValueByName(string variableName, s64 parameter)
+declare function void System.setGlobalVariableValueByName(string variableName, s64 value)
 
 declare function u32 System.rand()
 

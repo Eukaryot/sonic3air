@@ -1325,7 +1325,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		module.addUserDefinedFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByName), defaultFlags)
 			.setParameterInfo(0, "variableName")
-			.setParameterInfo(1, "parameter");
+			.setParameterInfo(1, "value");
 
 		module.addUserDefinedFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);
 
