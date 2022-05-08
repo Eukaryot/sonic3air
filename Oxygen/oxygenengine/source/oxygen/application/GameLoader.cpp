@@ -57,7 +57,8 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 						return UpdateResult::FAILURE;
 					}
 
-					const std::wstring romPath = PlatformFunctions::openFileSelectionDialog(L"Select game ROM", L"", L"Genesis ROM files\0*.bin;*.68K\0All Files\0*.*\0\0");
+					const std::wstring title = L"Select " + String(gameProfile.mRomInfos[0].mSteamGameName).toStdWString() + L" ROM";
+					const std::wstring romPath = PlatformFunctions::openFileSelectionDialog(title, gameProfile.mRomInfos[0].mSteamRomName, L"Genesis ROM files (*.bin)\0*.bin\0All Files\0*.*\0\0");
 					const bool success = ResourcesCache::instance().loadRomFromFile(romPath);
 					if (success)
 					{
