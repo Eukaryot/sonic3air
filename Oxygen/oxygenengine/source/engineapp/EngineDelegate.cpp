@@ -9,7 +9,8 @@ const EngineDelegateInterface::AppMetaData& EngineDelegate::getAppMetaData()
 	if (mAppMetaData.mTitle.empty())
 	{
 		mAppMetaData.mTitle = "Oxygen Engine";
-		mAppMetaData.mBuildVersion = "pre-alpha";
+		mAppMetaData.mBuildVersionString = "0.1.0";		// Oxygen Engine currently doesn't use a version number to take serious in any way...
+		mAppMetaData.mBuildVersionNumber = 0x00010000;
 	}
 	mAppMetaData.mAppDataFolder = L"OxygenEngine";
 	return mAppMetaData;
