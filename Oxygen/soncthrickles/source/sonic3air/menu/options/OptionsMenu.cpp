@@ -52,6 +52,12 @@ namespace
 
 	static const std::vector<ConditionalOption> CONDITIONAL_OPTIONS =
 	{
+		ConditionalOption(option::SOUNDTRACK,				 true),
+		ConditionalOption(option::SOUND_TEST,				 true),
+		ConditionalOption(option::TITLE_THEME,				 true),
+		ConditionalOption(option::OUTRO_MUSIC,				 true),
+		ConditionalOption(option::COMPETITION_MENU_MUSIC,	 true),
+
 		ConditionalOption(option::ANTI_FLICKER,				 true),
 		ConditionalOption(option::ICZ_NIGHTTIME,			 true),
 		ConditionalOption(option::MONITOR_STYLE,			 true),
@@ -1006,6 +1012,11 @@ void OptionsMenu::update(float timeElapsed)
 									EngineMain::instance().setVSyncMode((Configuration::FrameSyncType)selectedEntry.selected().mValue);
 								}
 							}
+							if (mEnteredFromIngame && !mShowedAudioWarningMessage && selectedData >= option::TITLE_THEME && selectedData <= option::OUTRO_MUSIC)
+							{
+								mAudioWarningMessageTimeout = 4.0f;
+								mShowedAudioWarningMessage = true;
+							}
 							break;
 						}
 					}
@@ -1127,6 +1138,10 @@ void OptionsMenu::update(float timeElapsed)
 	if (mWarningMessageTimeout > 0.0f)
 	{
 		mWarningMessageTimeout = std::max(0.0f, mWarningMessageTimeout - timeElapsed);
+	}
+	if (mAudioWarningMessageTimeout > 0.0f)
+	{
+		mAudioWarningMessageTimeout = std::max(0.0f, mAudioWarningMessageTimeout - timeElapsed);
 	}
 
 	// Check for changes in connected gamepads
@@ -1280,16 +1295,30 @@ void OptionsMenu::render()
 			}
 		}
 
-		if (mEnteredFromIngame && mWarningMessageTimeout > 0.0f)
+		if (mEnteredFromIngame)
 		{
-			const float visibility = saturate(mWarningMessageTimeout / 0.5f);
-			const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
-			drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
-			drawer.printText(global::mFont5, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
-			drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
-			drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
-			drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
-			drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
+			if (mWarningMessageTimeout > 0.0f)
+			{
+				const float visibility = saturate(mWarningMessageTimeout / 0.3f);
+				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
+				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
+				drawer.printText(global::mFont5, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
+				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
+				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
+				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
+			}
+			if (mAudioWarningMessageTimeout > 0.0f)
+			{
+				const float visibility = saturate(mAudioWarningMessageTimeout / 0.3f);
+				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
+				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
+				drawer.printText(global::mFont5, rect, "Note: Music changes don't affect already playing tracks.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
+				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
+				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
+				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
+			}
 		}
 
 		drawer.performRendering();
@@ -1333,6 +1362,8 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 	}
 
 	mWarningMessageTimeout = enteredFromIngame ? 4.0f : 0.0f;		
+	mAudioWarningMessageTimeout = 0.0f;
+	mShowedAudioWarningMessage = false;
 }
 
 void OptionsMenu::removeControllerSetupMenu()

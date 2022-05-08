@@ -157,10 +157,17 @@ function void fn018466()
 {
 	A2 = u32[A0 + 0x40]
 	#if GAMEAPP
-		if (Game.getSetting(SETTING_UNDERWATER_AUDIO) && A2 == 0xffffb000 && u8[0xffffb005] <= 0x04)
+		if (A2 == 0xffffb000 && u8[0xffffb005] <= 0x04)
 		{
-			s16 diff = s16[0xffffb014] - s16(water.height.current)
-			Game.setUnderwaterAudioEffect(clamp(diff - 8, 0, 64) * 0xff / 64)
+			if (Game.getSetting(SETTING_UNDERWATER_AUDIO))
+			{
+				s16 diff = s16[0xffffb014] - s16(water.height.current)
+				Game.setUnderwaterAudioEffect(clamp(diff - 8, 0, 64) * 0xff / 64)
+			}
+			else
+			{
+				Game.setUnderwaterAudioEffect(0)
+			}
 		}
 	#endif
 

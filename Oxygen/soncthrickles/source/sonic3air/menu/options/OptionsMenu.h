@@ -99,6 +99,8 @@ private:
 
 	bool mEnteredFromIngame = false;
 	float mWarningMessageTimeout = 0.0f;
+	float mAudioWarningMessageTimeout = 0.0f;
+	bool mShowedAudioWarningMessage = false;
 
 	bool mHasAnyModOptions = false;
 };
