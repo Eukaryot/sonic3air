@@ -142,7 +142,7 @@ bool Server::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 				if (request.mQuery.mPlatform == "windows" && request.mQuery.mReleaseChannel == "test")
 				{
 					// Test builds for Windows
-					latestVersion = 0x22042300;
+					latestVersion = 0x22050800;
 					updateURL = "https://github.com/Eukaryot/sonic3air/releases";
 				}
 				else
