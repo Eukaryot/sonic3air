@@ -197,6 +197,15 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 	// Debug only
 	//RMX_LOG_INFO(*String(0, "Keyboard event: key=0x%08x, scancode=0x%04x", ev.key, ev.scancode));
 
+	if (mPausedByFocusLoss)
+	{
+		if (ev.state)
+		{
+			setPausedByFocusLoss(false);
+		}
+		return;
+	}
+
 	GuiBase::keyboard(ev);
 
 	if (ev.state)
@@ -424,6 +433,17 @@ void Application::update(float timeElapsed)
 	// Update input
 	InputManager::instance().updateInput(timeElapsed);
 
+	if (mPausedByFocusLoss)
+	{
+		if (InputManager::instance().anythingPressed())
+		{
+			setPausedByFocusLoss(false);
+		}
+
+		// Skip the rest
+		return;
+	}
+
 	// Update simulation
 	Profiling::pushRegion(ProfilingRegion::SIMULATION);
 	mSimulation->update(timeElapsed);
@@ -517,6 +537,16 @@ void Application::render()
 				rect.y += 20;
 			}
 		}
+	}
+
+	if (mPausedByFocusLoss)
+	{
+		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
+	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Tap to continue", 5, Color(0.2f, 1.0f, 1.0f));
+	#else
+		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Press any key to continue", 5, Color(0.2f, 1.0f, 1.0f));
+	#endif
 	}
 
 	drawer.performRendering();
@@ -692,6 +722,11 @@ void Application::toggleFullscreen()
 	}
 }
 
+void Application::enablePauseOnFocusLoss()
+{
+	setPausedByFocusLoss(true);
+}
+
 bool Application::hasKeyboard() const
 {
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
@@ -814,4 +849,13 @@ bool Application::updateLoading()
 			break;
 	}
 	return true;
+}
+
+void Application::setPausedByFocusLoss(bool enable)
+{
+	if (mPausedByFocusLoss != enable)
+	{
+		mPausedByFocusLoss = enable;
+		mSimulation->setRunning(!enable);
+	}
 }

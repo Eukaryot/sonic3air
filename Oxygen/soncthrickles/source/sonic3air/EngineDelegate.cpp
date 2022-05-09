@@ -17,6 +17,7 @@
 	#include "sonic3air/generator/ResourceScriptGenerator.h"
 #endif
 
+#include "oxygen/application/Application.h"
 #include "oxygen/application/GameProfile.h"
 #include "oxygen/base/CrashHandler.h"
 #include "oxygen/simulation/CodeExec.h"
@@ -178,7 +179,10 @@ void EngineDelegate::onPreSaveStateLoad()
 
 void EngineDelegate::onApplicationLostFocus()
 {
-	mGame.enableGamePauseByApplication();
+	if (mGame.shouldPauseOnFocusLoss())
+	{
+		Application::instance().enablePauseOnFocusLoss();
+	}
 }
 
 bool EngineDelegate::mayLoadScriptMods()

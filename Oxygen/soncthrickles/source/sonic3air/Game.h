@@ -67,14 +67,13 @@ public:
 
 	void updateSpecialInput(float timeElapsed);
 
-	void enableGamePauseByApplication();
-
 	inline Mode getCurrentMode() const			{ return mMode; }
 	inline void setCurrentMode(Mode mode)		{ mMode = mode; }
 
 	inline bool isTimeAttackMode() const		{ return mMode == Mode::TIME_ATTACK; }
 	inline PlayerRecorder& getPlayerRecorder()	{ return mPlayerRecorder; }
 
+	bool shouldPauseOnFocusLoss() const;
 	bool isDebugModeActive() const;
 
 	void fillDebugVisualization(Bitmap& bitmap, int& mode);

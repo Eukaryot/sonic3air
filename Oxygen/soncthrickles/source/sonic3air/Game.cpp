@@ -602,12 +602,9 @@ void Game::updateSpecialInput(float timeElapsed)
 	Application::instance().getGameView().setWhiteOverlayAlpha(mTimeAttackRestartCharge);
 }
 
-void Game::enableGamePauseByApplication()
+bool Game::shouldPauseOnFocusLoss() const
 {
-	if (GameApp::hasInstance() && Application::instance().getSimulation().getSpeed() > 0.0f)
-	{
-		GameApp::instance().onGamePaused(mAllowRestartInGamePause);
-	}
+	return (GameApp::hasInstance() && Application::instance().getSimulation().isRunning() && Application::instance().getSimulation().getSpeed() > 0.0f && mMode != Mode::MAIN_MENU_BG);
 }
 
 bool Game::isDebugModeActive() const

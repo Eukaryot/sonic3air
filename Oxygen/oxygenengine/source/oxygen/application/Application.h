@@ -52,6 +52,8 @@ public:
 	void setWindowMode(WindowMode windowMode, bool force = false);
 	void toggleFullscreen();
 
+	void enablePauseOnFocusLoss();
+
 	bool hasKeyboard() const;
 	bool hasVirtualGamepad() const;
 
@@ -59,19 +61,21 @@ private:
 	int updateWindowDisplayIndex();
 	void setUnscaledWindow();
 	bool updateLoading();
+	void setPausedByFocusLoss(bool enable);
 
 private:
 	WindowMode mWindowMode = WindowMode::WINDOWED;
 	HighResolutionTimer mApplicationTimer;
 	double mNextRefreshTime = 0.0;		// In milliseconds since application start
 	bool mIsVeryFirstFrameForLogging = true;
+	bool mPausedByFocusLoss = false;
 
 	// Simulation
 	Simulation* mSimulation = nullptr;
 
 	// Game
 	GameLoader* mGameLoader = nullptr;
-	GuiBase*  mGameApp = nullptr;
+	GuiBase* mGameApp = nullptr;
 	GameView* mGameView = nullptr;
 
 	// GUI
@@ -86,7 +90,7 @@ private:
 	SaveStateMenu* mSaveStateMenu = nullptr;
 	DebugSidePanel* mDebugSidePanel = nullptr;
 	ProfilingView* mProfilingView = nullptr;
-
+	
 	// Input
 	float mMouseHideTimer = 0.0f;
 };
