@@ -36,15 +36,13 @@ void ConfigurationImpl::fillDefaultGameProfile(GameProfile& gameProfile)
 	gameProfile.mFullName = "Sonic 3 - Angel Island Revisited";
 
 	gameProfile.mRomCheck.mSize = 0x400000;
-	gameProfile.mRomCheck.mChecksum = 0x78a067afdf44fb24;
+	gameProfile.mRomCheck.mChecksum = 0x344983ffcfeff8cb;
 
 	gameProfile.mRomInfos.resize(1);
 	gameProfile.mRomInfos[0].mSteamGameName = "Sonic 3 & Knuckles";
 	gameProfile.mRomInfos[0].mSteamRomName = L"Sonic_Knuckles_wSonic3.bin";
 	gameProfile.mRomInfos[0].mOverwrites.clear();
 	gameProfile.mRomInfos[0].mOverwrites.emplace_back(0x2001f0, 0x4a);
-	gameProfile.mRomInfos[0].mBlankRegions.clear();
-	gameProfile.mRomInfos[0].mBlankRegions.emplace_back(0x000206, 0x000297);
 }
 
 ConfigurationImpl::ConfigurationImpl()
