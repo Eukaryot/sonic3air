@@ -329,6 +329,17 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 	{
 		Json::Value gameServerJson;
 		{
+			gameServerJson["ServerAddress"] = mGameServer.mServerHostName;
+			gameServerJson["ServerPortUDP"] = mGameServer.mServerPortUDP;
+			gameServerJson["ServerPortTCP"] = mGameServer.mServerPortTCP;
+			gameServerJson["ServerPortWSS"] = mGameServer.mServerPortWSS;
+
+			Json::Value ghostSyncJson;
+			ghostSyncJson["Enabled"] = mGameServer.mGhostSync.mEnabled ? 1 : 0;
+			ghostSyncJson["ChannelName"] = mGameServer.mGhostSync.mChannelName;
+			ghostSyncJson["ShowOffscreenGhosts"] = mGameServer.mGhostSync.mShowOffscreenGhosts ? 1 : 0;
+			gameServerJson["GhostSync"] = ghostSyncJson;
+
 			Json::Value updateCheckJson;
 			updateCheckJson["ReleaseChannel"] = mGameServer.mUpdateCheck.mReleaseChannel;
 			gameServerJson["UpdateCheck"] = updateCheckJson;

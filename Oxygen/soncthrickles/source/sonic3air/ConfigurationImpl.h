@@ -53,15 +53,15 @@ public:
 	struct GhostSync
 	{
 		bool mEnabled = false;
-		std::string mChannelName;
-		bool mShowOffscreenGhosts = false;
+		std::string mChannelName = "world";
+		bool mShowOffscreenGhosts = true;
 	};
 	struct GameServer
 	{
 		std::string mServerHostName;
-		int mServerPortUDP = 0;
-		int mServerPortTCP = 0;
-		int mServerPortWSS = 0;
+		int mServerPortUDP = 21094;		// Used by most platforms
+		int mServerPortTCP = 21095;		// Used only as a fallback for UDP
+		int mServerPortWSS = 21096;		// Used by the web version
 		UpdateCheck mUpdateCheck;
 		GhostSync mGhostSync;
 	};
