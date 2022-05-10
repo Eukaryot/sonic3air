@@ -115,7 +115,7 @@ declare function u32 SRAM.load(u32 address, u16 offset, u16 bytes)
 
 declare function void SRAM.save(u32 address, u16 offset, u16 bytes)
 
-declare function void System.callFunctionByName(string functionName)
+declare function s8 System.callFunctionByName(string functionName)
 
 declare function void System.setupCallFrame(string functionName)
 

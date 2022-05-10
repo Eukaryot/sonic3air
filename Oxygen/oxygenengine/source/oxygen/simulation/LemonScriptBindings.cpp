@@ -214,14 +214,14 @@ namespace
 	}
 
 
-	void System_callFunctionByName(lemon::StringRef functionName)
+	bool System_callFunctionByName(lemon::StringRef functionName)
 	{
 		if (!functionName.isValid())
-			return;
+			return false;
 
 		CodeExec* codeExec = CodeExec::getActiveInstance();
-		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
-		codeExec->getLemonScriptRuntime().callFunctionByName(functionName, false);
+		RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return false);
+		return codeExec->getLemonScriptRuntime().callFunctionByName(functionName, false);
 	}
 
 	void System_setupCallFrame2(lemon::StringRef functionName, lemon::StringRef labelName)
