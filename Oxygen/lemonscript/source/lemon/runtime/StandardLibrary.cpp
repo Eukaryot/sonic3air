@@ -53,9 +53,11 @@ namespace
 			}
 			else if (value == 0)
 			{
-				RMX_CHECK(mLength < 0x100, "Too long string", return);
-				mBuffer[mLength] = '0';
-				++mLength;
+				const int numDigits = std::max(1, minDigits);
+				RMX_CHECK(mLength + numDigits <= 0x100, "Too long string", return);
+				for (int k = 0; k < numDigits; ++k)
+					mBuffer[mLength+k] = '0';
+				mLength += numDigits;
 				return;
 			}
 
