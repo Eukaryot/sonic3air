@@ -9,7 +9,7 @@ else {
 
 android {
     compileSdkVersion 30
-    ndkVersion "22.1.7171670"
+    ndkVersion "24.0.8215888"
     defaultConfig {
         if (buildAsApplication) {
             applicationId "org.eukaryot.sonic3air"
@@ -17,7 +17,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "21.09.28.0"
+        versionName "22.05.15.0"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-18", "-DANDROID_STL=c++_static"
