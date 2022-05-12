@@ -1,4 +1,4 @@
-#define BUILD_NUMBER   0x22050800
-#define BUILD_VERSION  22,05,08,0
-#define BUILD_STRING  "22.05.08.0"
-#define BUILD_VARIANT "TEST"		// Used for update check as well, use one the following: "TEST", "BETA", "PREVIEW" or "" (for stable releases)
+#define BUILD_NUMBER   0x22051500
+#define BUILD_VERSION  22,05,15,0
+#define BUILD_STRING  "22.05.15.0"
+#define BUILD_VARIANT "PREVIEW"		// Used for update check as well, use one the following: "TEST", "BETA", "PREVIEW" or "" (for stable releases)
