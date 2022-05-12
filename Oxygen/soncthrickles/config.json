@@ -1,8 +1,4 @@
 {
-
-	// Enter the path to the game ROM here if it can't be found automatically
-	"RomPath": "___internal/Sonic_Knuckles_wSonic3.bin",
-
 	// Paths
 	"ScriptsDir":     "scripts",
 	"MainScriptName": "main.lemon",

@@ -1,8 +1,4 @@
 {
-
-	// Enter the path to the game ROM here if it can't be found automatically
-	"RomPath": "",
-
 	// Default window size
 	"WindowSize": "1200 x 672",
 
