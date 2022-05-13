@@ -327,7 +327,7 @@ void PlatformFunctions::setAppIcon(int iconResource)
 #endif
 }
 
-#ifdef PLATFORM_MAC
+#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
 	std::wstring PlatformFunctions::mExAppDataPath = L"";
 #endif
 
@@ -347,7 +347,7 @@ std::wstring PlatformFunctions::getAppDataPath()
 	{
 		return appDataDir.toStdWString();
 	}
-#elif defined(PLATFORM_MAC)
+#elif defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
 	return mExAppDataPath;
 #endif
 	return L"";

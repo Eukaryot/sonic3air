@@ -50,6 +50,11 @@
 	#define GL_GLEXT_PROTOTYPES
 	#include <GLES2/gl2.h>
 	#include <GLES2/gl2ext.h>
+#elif defined(PLATFORM_IOS)
+	#define RMX_USE_GLES2
+	#define GL_GLEXT_PROTOTYPES
+	#include <OpenGLES/ES2/gl.h>
+	#include <OpenGLES/ES2/glext.h>
 #elif defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 	#define ALLOW_LEGACY_OPENGL
 	#define RMX_USE_GLEW

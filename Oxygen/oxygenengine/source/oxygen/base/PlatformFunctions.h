@@ -8,7 +8,7 @@
 
 #pragma once
 
-#ifdef PLATFORM_MAC
+#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
 	// Objective C already has YES and NO defined which causes the compiler to try and expand NO below.
 	#pragma push_macro("NO")
 	#undef NO
@@ -32,7 +32,7 @@ public:
 	};
 
 public:
-#ifdef PLATFORM_MAC
+#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
 	#pragma pop_macro("NO")
 	static std::wstring mExAppDataPath;
 #endif

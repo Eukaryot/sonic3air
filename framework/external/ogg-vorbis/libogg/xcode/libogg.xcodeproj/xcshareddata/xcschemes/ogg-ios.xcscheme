@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9E0C5E7E247DD5AF000105D0"
-               BuildableName = "Sonic3AIR"
-               BlueprintName = "sonic3air_cmd"
-               ReferencedContainer = "container:sonic3air.xcodeproj">
+               BlueprintIdentifier = "9EA8F28227E2E1B7006D5226"
+               BuildableName = "ogg-ios.framework"
+               BlueprintName = "ogg-ios"
+               ReferencedContainer = "container:xcode/libogg.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -40,16 +40,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9E0C5E7E247DD5AF000105D0"
-            BuildableName = "Sonic3AIR"
-            BlueprintName = "sonic3air_cmd"
-            ReferencedContainer = "container:sonic3air.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -57,16 +47,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "9E0C5E7E247DD5AF000105D0"
-            BuildableName = "Sonic3AIR"
-            BlueprintName = "sonic3air_cmd"
-            ReferencedContainer = "container:sonic3air.xcodeproj">
+            BlueprintIdentifier = "9EA8F28227E2E1B7006D5226"
+            BuildableName = "ogg-ios.framework"
+            BlueprintName = "ogg-ios"
+            ReferencedContainer = "container:xcode/libogg.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -87,3 +87,10 @@ mac_dist
 !/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.lib
 !/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.dylib
 !/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.so
+framework/external/ogg-vorbis/libogg/build
+framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/project.xcworkspace/xcuserdata
+framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/xcuserdata
+framework/external/sdl/SDL2/Xcode/SDL/SDL.xcodeproj/xcuserdata
+framework/external/ogg-vorbis/libvorbis/xcode/build
+framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/project.xcworkspace/xcuserdata
+framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/xcuserdata

@@ -67,7 +67,7 @@ bool EngineDelegate::onEnginePreStartup()
 	// Sanity check if the game is even extracted
 	{
 		// One of these two files must exist
-	#if defined(PLATFORM_MAC)
+	#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
 		Configuration& config = Configuration::instance();
 		const bool check = FTX::FileSystem->exists(config.mGameDataPath + L"/gamedata.bin");
 	#else

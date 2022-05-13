@@ -21,7 +21,12 @@
 	#define USE_UTF8_PATHS		// Linux supports UTF-8 file names instead of wchar_t
 
 #elif __APPLE__
+	#include <TargetConditionals.h>
+	#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+	#define PLATFORM_IOS
+	#else
 	#define PLATFORM_MAC
+	#endif
 	#define USE_UTF8_PATHS
 
 #elif __ANDROID__

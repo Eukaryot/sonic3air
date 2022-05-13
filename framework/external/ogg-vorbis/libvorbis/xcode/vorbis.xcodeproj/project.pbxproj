@@ -1,0 +1,1751 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		10C24F0AEB0341218F6DCCAB /* install */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = FEB7C3BC71AA4C3F8CB19B6B /* Build configuration list for PBXAggregateTarget "install" */;
+			buildPhases = (
+				88E775210BA44889A2E05F8F /* CMake PostBuild Rules */,
+			);
+			dependencies = (
+				5CFF5FFD0A324F1BA6BD4674 /* PBXTargetDependency */,
+			);
+			name = install;
+			productName = install;
+		};
+		4D2D6DB1C2B64E1DA7F7B561 /* ZERO_CHECK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 81C8983388E74707A5559BAB /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+			buildPhases = (
+				AC8138B7A25D40138FB4392A /* CMake Rules */,
+			);
+			dependencies = (
+			);
+			name = ZERO_CHECK;
+			productName = ZERO_CHECK;
+		};
+		5115B3520ED14ADA80BCAB4B /* ALL_BUILD */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = A0AC8844E662479E916148E4 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+			buildPhases = (
+				272F1B9B26C8465C8AA1E6C7 /* CMake Rules */,
+			);
+			dependencies = (
+				658585C688994AFEAE46177C /* PBXTargetDependency */,
+				DE6B70DFF7A84D1485D9060A /* PBXTargetDependency */,
+			);
+			name = ALL_BUILD;
+			productName = ALL_BUILD;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		09E7FF8CE4094AB5BD5FFD20 /* res0.c in Sources */ = {isa = PBXBuildFile; fileRef = A0CD691FE3C9470C837007FE /* res0.c */; };
+		0DB9E462572441FA9EA2F1B3 /* lsp.c in Sources */ = {isa = PBXBuildFile; fileRef = EF9D3394239D406291F7A6F6 /* lsp.c */; };
+		10C4254278DB4A0BBEB0825C /* codec.h in Headers */ = {isa = PBXBuildFile; fileRef = 90E372C85A08409F839D5926 /* codec.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		126B69BA62A34B4AAE4C7C1D /* mdct.c in Sources */ = {isa = PBXBuildFile; fileRef = 3699942A604A4DD09C325E2C /* mdct.c */; };
+		1B0A1511B2BE48B9A82E6B80 /* sharedbook.c in Sources */ = {isa = PBXBuildFile; fileRef = CF6A16A4420C4891B7F5B0C6 /* sharedbook.c */; };
+		1C060226A0FA4BE19E25768F /* masking.h in Headers */ = {isa = PBXBuildFile; fileRef = 90DAD3A7242F4F78B79890D3 /* masking.h */; };
+		364EC493A39B4BC7AEE6B323 /* synthesis.c in Sources */ = {isa = PBXBuildFile; fileRef = C78ECAC262314A8D96288D34 /* synthesis.c */; };
+		3FEFF65B003F4435AC51F2BC /* window.h in Headers */ = {isa = PBXBuildFile; fileRef = A7DF9009CE33444B9A196BB9 /* window.h */; };
+		4126AC6904F74A53B48548FC /* vorbisenc.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1B582AA1C640BF83D48F27 /* vorbisenc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		41C8D14AED0545EA9F3AB24C /* scales.h in Headers */ = {isa = PBXBuildFile; fileRef = 7AAF3051B37745DEA89A4930 /* scales.h */; };
+		4221294B164C4691909A8151 /* smallft.c in Sources */ = {isa = PBXBuildFile; fileRef = 7DD7A63E53514EA6A554A6D5 /* smallft.c */; };
+		5553EA0BB2864073A343D96E /* bitrate.h in Headers */ = {isa = PBXBuildFile; fileRef = B6E7D88764104C2E81EF1E62 /* bitrate.h */; };
+		58589DF7FAE046F3BC48C357 /* highlevel.h in Headers */ = {isa = PBXBuildFile; fileRef = 76950002236646A584DA4D57 /* highlevel.h */; };
+		63EF24B39E8D49CF986FD6E3 /* lookup_data.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AF2CD97F8D84E5DA772E73D /* lookup_data.h */; };
+		70F6B51FD969495695339378 /* os.h in Headers */ = {isa = PBXBuildFile; fileRef = 8C7D5E965B5648E78C3174F8 /* os.h */; };
+		7E0E62F22774445B8545B5BD /* envelope.c in Sources */ = {isa = PBXBuildFile; fileRef = 854102DB3CD04DB0B2C143E3 /* envelope.c */; };
+		7EAE87D4798548CDBCDE6B8F /* mapping0.c in Sources */ = {isa = PBXBuildFile; fileRef = C0D4F501565046199373A7F6 /* mapping0.c */; };
+		7EC12CC673954C30A32A00BE /* smallft.h in Headers */ = {isa = PBXBuildFile; fileRef = 882D377E302845829F49227E /* smallft.h */; };
+		847F63C502F34C85B2858E12 /* floor0.c in Sources */ = {isa = PBXBuildFile; fileRef = 0CB78C70565B4C7B800A6264 /* floor0.c */; };
+		848B965756AF4B9E85C88271 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = 086BD2A3B6C045B5A1EAB75C /* info.c */; };
+		975286FACBAB4183975A6C6A /* registry.c in Sources */ = {isa = PBXBuildFile; fileRef = E9697839815644C48E4C086E /* registry.c */; };
+		9B57CFFF4DE34EC09ABED7FE /* bitrate.c in Sources */ = {isa = PBXBuildFile; fileRef = AA2A103AE7F347C1A5B7A1AC /* bitrate.c */; };
+		9E115BE427FA938C001A0FC5 /* ogg.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E1157EA27FA9387001A0FC5 /* ogg.h */; };
+		9E115BE627FA938C001A0FC5 /* config_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E1157EC27FA9387001A0FC5 /* config_types.h */; };
+		9E115BE827FA938C001A0FC5 /* os_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E1157EF27FA9387001A0FC5 /* os_types.h */; };
+		9E115C0527FA938D001A0FC5 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E1158EE27FA9388001A0FC5 /* framing.c */; };
+		9E115C0727FA938D001A0FC5 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E1158EE27FA9388001A0FC5 /* framing.c */; };
+		9E115C0827FA938D001A0FC5 /* crctable.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E1158EF27FA9388001A0FC5 /* crctable.h */; };
+		9E115C0A27FA938D001A0FC5 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E1158F227FA9388001A0FC5 /* bitwise.c */; };
+		9E115C0C27FA938D001A0FC5 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E1158F227FA9388001A0FC5 /* bitwise.c */; };
+		9E469B3627FBEA6200FE908D /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = 086BD2A3B6C045B5A1EAB75C /* info.c */; };
+		9E469B3727FBEA7200FE908D /* vorbisenc.c in Sources */ = {isa = PBXBuildFile; fileRef = 4854E6939F6340E8BF748851 /* vorbisenc.c */; };
+		9E469B3827FBEA7500FE908D /* vorbisfile.c in Sources */ = {isa = PBXBuildFile; fileRef = A0FD3AB5C25C446BBDA3A17F /* vorbisfile.c */; };
+		9E469B3927FBEA9300FE908D /* mapping0.c in Sources */ = {isa = PBXBuildFile; fileRef = C0D4F501565046199373A7F6 /* mapping0.c */; };
+		9E469B3A27FBEA9300FE908D /* block.c in Sources */ = {isa = PBXBuildFile; fileRef = 55ED18DF9CC740F992EC2B7B /* block.c */; };
+		9E469B3B27FBEA9300FE908D /* psy.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AAAADF4A74F479D699116 /* psy.c */; };
+		9E469B3C27FBEA9300FE908D /* codebook.c in Sources */ = {isa = PBXBuildFile; fileRef = E4221639FE124A52BA52DC3E /* codebook.c */; };
+		9E469B3D27FBEA9300FE908D /* envelope.c in Sources */ = {isa = PBXBuildFile; fileRef = 854102DB3CD04DB0B2C143E3 /* envelope.c */; };
+		9E469B3E27FBEA9300FE908D /* smallft.c in Sources */ = {isa = PBXBuildFile; fileRef = 7DD7A63E53514EA6A554A6D5 /* smallft.c */; };
+		9E469B3F27FBEA9300FE908D /* lpc.c in Sources */ = {isa = PBXBuildFile; fileRef = 88B560F82D684765ADEDA6D4 /* lpc.c */; };
+		9E469B4027FBEA9300FE908D /* floor0.c in Sources */ = {isa = PBXBuildFile; fileRef = 0CB78C70565B4C7B800A6264 /* floor0.c */; };
+		9E469B4127FBEA9300FE908D /* window.c in Sources */ = {isa = PBXBuildFile; fileRef = 8CC43347F87C4541B6B5F372 /* window.c */; };
+		9E469B4227FBEA9300FE908D /* bitrate.c in Sources */ = {isa = PBXBuildFile; fileRef = AA2A103AE7F347C1A5B7A1AC /* bitrate.c */; };
+		9E469B4327FBEA9300FE908D /* mdct.c in Sources */ = {isa = PBXBuildFile; fileRef = 3699942A604A4DD09C325E2C /* mdct.c */; };
+		9E469B4427FBEA9300FE908D /* lsp.c in Sources */ = {isa = PBXBuildFile; fileRef = EF9D3394239D406291F7A6F6 /* lsp.c */; };
+		9E469B4527FBEA9300FE908D /* registry.c in Sources */ = {isa = PBXBuildFile; fileRef = E9697839815644C48E4C086E /* registry.c */; };
+		9E469B4627FBEA9300FE908D /* res0.c in Sources */ = {isa = PBXBuildFile; fileRef = A0CD691FE3C9470C837007FE /* res0.c */; };
+		9E469B4727FBEA9300FE908D /* lookup.c in Sources */ = {isa = PBXBuildFile; fileRef = 810EB1D140EB47C0BC3A3297 /* lookup.c */; };
+		9E469B4827FBEA9300FE908D /* floor1.c in Sources */ = {isa = PBXBuildFile; fileRef = FD3ECE5E971F457FAEC9EAEE /* floor1.c */; };
+		9E469B4927FBEA9300FE908D /* sharedbook.c in Sources */ = {isa = PBXBuildFile; fileRef = CF6A16A4420C4891B7F5B0C6 /* sharedbook.c */; };
+		9E469B4A27FBEA9300FE908D /* analysis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AE4B9484AAD4C87B8EB584D /* analysis.c */; };
+		9E469B4B27FBEA9300FE908D /* synthesis.c in Sources */ = {isa = PBXBuildFile; fileRef = C78ECAC262314A8D96288D34 /* synthesis.c */; };
+		9EC1F741281784910073C39E /* block.c in Sources */ = {isa = PBXBuildFile; fileRef = 55ED18DF9CC740F992EC2B7B /* block.c */; };
+		9EC1F742281784910073C39E /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E1158F227FA9388001A0FC5 /* bitwise.c */; };
+		9EC1F743281784910073C39E /* psy.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AAAADF4A74F479D699116 /* psy.c */; };
+		9EC1F744281784910073C39E /* sharedbook.c in Sources */ = {isa = PBXBuildFile; fileRef = CF6A16A4420C4891B7F5B0C6 /* sharedbook.c */; };
+		9EC1F745281784910073C39E /* lookup.c in Sources */ = {isa = PBXBuildFile; fileRef = 810EB1D140EB47C0BC3A3297 /* lookup.c */; };
+		9EC1F746281784910073C39E /* window.c in Sources */ = {isa = PBXBuildFile; fileRef = 8CC43347F87C4541B6B5F372 /* window.c */; };
+		9EC1F747281784910073C39E /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = 9E1158EE27FA9388001A0FC5 /* framing.c */; };
+		9EC1F748281784910073C39E /* smallft.c in Sources */ = {isa = PBXBuildFile; fileRef = 7DD7A63E53514EA6A554A6D5 /* smallft.c */; };
+		9EC1F749281784910073C39E /* floor1.c in Sources */ = {isa = PBXBuildFile; fileRef = FD3ECE5E971F457FAEC9EAEE /* floor1.c */; };
+		9EC1F74A281784910073C39E /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = 086BD2A3B6C045B5A1EAB75C /* info.c */; };
+		9EC1F74B281784910073C39E /* envelope.c in Sources */ = {isa = PBXBuildFile; fileRef = 854102DB3CD04DB0B2C143E3 /* envelope.c */; };
+		9EC1F74C281784910073C39E /* vorbisenc.c in Sources */ = {isa = PBXBuildFile; fileRef = 4854E6939F6340E8BF748851 /* vorbisenc.c */; };
+		9EC1F74D281784910073C39E /* vorbisfile.c in Sources */ = {isa = PBXBuildFile; fileRef = A0FD3AB5C25C446BBDA3A17F /* vorbisfile.c */; };
+		9EC1F74E281784910073C39E /* lpc.c in Sources */ = {isa = PBXBuildFile; fileRef = 88B560F82D684765ADEDA6D4 /* lpc.c */; };
+		9EC1F74F281784910073C39E /* bitrate.c in Sources */ = {isa = PBXBuildFile; fileRef = AA2A103AE7F347C1A5B7A1AC /* bitrate.c */; };
+		9EC1F750281784910073C39E /* res0.c in Sources */ = {isa = PBXBuildFile; fileRef = A0CD691FE3C9470C837007FE /* res0.c */; };
+		9EC1F751281784910073C39E /* codebook.c in Sources */ = {isa = PBXBuildFile; fileRef = E4221639FE124A52BA52DC3E /* codebook.c */; };
+		9EC1F752281784910073C39E /* mapping0.c in Sources */ = {isa = PBXBuildFile; fileRef = C0D4F501565046199373A7F6 /* mapping0.c */; };
+		9EC1F753281784910073C39E /* registry.c in Sources */ = {isa = PBXBuildFile; fileRef = E9697839815644C48E4C086E /* registry.c */; };
+		9EC1F754281784910073C39E /* lsp.c in Sources */ = {isa = PBXBuildFile; fileRef = EF9D3394239D406291F7A6F6 /* lsp.c */; };
+		9EC1F755281784910073C39E /* floor0.c in Sources */ = {isa = PBXBuildFile; fileRef = 0CB78C70565B4C7B800A6264 /* floor0.c */; };
+		9EC1F756281784910073C39E /* mdct.c in Sources */ = {isa = PBXBuildFile; fileRef = 3699942A604A4DD09C325E2C /* mdct.c */; };
+		9EC1F757281784910073C39E /* synthesis.c in Sources */ = {isa = PBXBuildFile; fileRef = C78ECAC262314A8D96288D34 /* synthesis.c */; };
+		9EC1F758281784910073C39E /* analysis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AE4B9484AAD4C87B8EB584D /* analysis.c */; };
+		A0B16C08ADF7456E986C237A /* analysis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2AE4B9484AAD4C87B8EB584D /* analysis.c */; };
+		A69C4269E7FF4C59B593AB28 /* lpc.h in Headers */ = {isa = PBXBuildFile; fileRef = 90314A1A8106424788B35E55 /* lpc.h */; };
+		A80F2EAFA7EC41E8BEB9A609 /* lsp.h in Headers */ = {isa = PBXBuildFile; fileRef = B5FA6BA728AC4570B67DF8ED /* lsp.h */; };
+		A939D153EF2742DB835B9419 /* vorbisenc.c in Sources */ = {isa = PBXBuildFile; fileRef = 4854E6939F6340E8BF748851 /* vorbisenc.c */; };
+		A968BA13554B40FC985623B0 /* lookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 037D181648C04ECB990EA712 /* lookup.h */; };
+		AC09EB9C97EA41B8A929C965 /* envelope.h in Headers */ = {isa = PBXBuildFile; fileRef = 9EA4DC48C2EE458F9469A8C8 /* envelope.h */; };
+		B48D50E0732B446C821867EB /* floor1.c in Sources */ = {isa = PBXBuildFile; fileRef = FD3ECE5E971F457FAEC9EAEE /* floor1.c */; };
+		B6EE21E42784447C8E6B5C72 /* window.c in Sources */ = {isa = PBXBuildFile; fileRef = 8CC43347F87C4541B6B5F372 /* window.c */; };
+		B7B9377A0DD644EA8B096FAE /* registry.h in Headers */ = {isa = PBXBuildFile; fileRef = C9D2890F9C504954B71FA6A5 /* registry.h */; };
+		BF78C836B8B4418BB2D2219D /* lpc.c in Sources */ = {isa = PBXBuildFile; fileRef = 88B560F82D684765ADEDA6D4 /* lpc.c */; };
+		C74673C82C4E4875AB942C2C /* psy.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AAAADF4A74F479D699116 /* psy.c */; };
+		D095A24636D447C7947AF525 /* mdct.h in Headers */ = {isa = PBXBuildFile; fileRef = 324253E5D4864B488E063DC9 /* mdct.h */; };
+		D74849492865404E913E108A /* codebook.c in Sources */ = {isa = PBXBuildFile; fileRef = E4221639FE124A52BA52DC3E /* codebook.c */; };
+		DA7ABD5CA5A041ED94FAAE2E /* backends.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ECC15B71084786851EAE8B /* backends.h */; };
+		DB27F48DF4544DF3BA065C2D /* lookup.c in Sources */ = {isa = PBXBuildFile; fileRef = 810EB1D140EB47C0BC3A3297 /* lookup.c */; };
+		E6EEC3B639E14D41BFE7F835 /* codec_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A25504B2D3D4F5691771F40 /* codec_internal.h */; };
+		E829DD0844AB461595327D90 /* vorbisfile.c in Sources */ = {isa = PBXBuildFile; fileRef = A0FD3AB5C25C446BBDA3A17F /* vorbisfile.c */; };
+		E9692FA04EAB4CFBBD2528DA /* misc.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A32891221F94CB998A24461 /* misc.h */; };
+		EC5D68B591E9447AA40631E6 /* codebook.h in Headers */ = {isa = PBXBuildFile; fileRef = F83EF03564E4430188AD7FF8 /* codebook.h */; };
+		FC2EA995E71F4F95A47778E3 /* block.c in Sources */ = {isa = PBXBuildFile; fileRef = 55ED18DF9CC740F992EC2B7B /* block.c */; };
+		FDEDC4E8EDDB4F9585932E3B /* psy.h in Headers */ = {isa = PBXBuildFile; fileRef = B64F09461A7E4976B1519D1E /* psy.h */; };
+		FE1D953E1D7044F0B4113713 /* vorbisfile.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F154C5295A9406184827D73 /* vorbisfile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1D2EC576AF0F49BE88DC691D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A12D27682F14DA88F232777 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D2D6DB1C2B64E1DA7F7B561;
+			remoteInfo = ZERO_CHECK;
+		};
+		4F06D2F47C9A46368E09E0EA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A12D27682F14DA88F232777 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D2D6DB1C2B64E1DA7F7B561;
+			remoteInfo = ZERO_CHECK;
+		};
+		E2875723CDB6454ABB821F3E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A12D27682F14DA88F232777 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5115B3520ED14ADA80BCAB4B;
+			remoteInfo = ALL_BUILD;
+		};
+		EF244875C5324ADABB912544 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A12D27682F14DA88F232777 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE055EA304774DDABE3C390F;
+			remoteInfo = vorbis;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9E8B604C27F8017300ADE80F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EC1F75A281784910073C39E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		037D181648C04ECB990EA712 /* lookup.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = lookup.h; path = ../lib/lookup.h; sourceTree = SOURCE_ROOT; };
+		086BD2A3B6C045B5A1EAB75C /* info.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = info.c; path = ../lib/info.c; sourceTree = SOURCE_ROOT; };
+		0A25504B2D3D4F5691771F40 /* codec_internal.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = codec_internal.h; path = ../lib/codec_internal.h; sourceTree = SOURCE_ROOT; };
+		0CB78C70565B4C7B800A6264 /* floor0.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = floor0.c; path = ../lib/floor0.c; sourceTree = SOURCE_ROOT; };
+		2AE4B9484AAD4C87B8EB584D /* analysis.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = analysis.c; path = ../lib/analysis.c; sourceTree = SOURCE_ROOT; };
+		324253E5D4864B488E063DC9 /* mdct.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = mdct.h; path = ../lib/mdct.h; sourceTree = SOURCE_ROOT; };
+		3699942A604A4DD09C325E2C /* mdct.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = mdct.c; path = ../lib/mdct.c; sourceTree = SOURCE_ROOT; };
+		3A32891221F94CB998A24461 /* misc.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = misc.h; path = ../lib/misc.h; sourceTree = SOURCE_ROOT; };
+		4854E6939F6340E8BF748851 /* vorbisenc.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = vorbisenc.c; path = ../lib/vorbisenc.c; sourceTree = SOURCE_ROOT; };
+		4AF2CD97F8D84E5DA772E73D /* lookup_data.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = lookup_data.h; path = ../lib/lookup_data.h; sourceTree = SOURCE_ROOT; };
+		4D0AAAADF4A74F479D699116 /* psy.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = psy.c; path = ../lib/psy.c; sourceTree = SOURCE_ROOT; };
+		55ED18DF9CC740F992EC2B7B /* block.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = block.c; path = ../lib/block.c; sourceTree = SOURCE_ROOT; };
+		5F154C5295A9406184827D73 /* vorbisfile.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = vorbisfile.h; path = ../include/vorbis/vorbisfile.h; sourceTree = SOURCE_ROOT; };
+		64040476C5774F6B90E211DC /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = ../lib/CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		71ECC15B71084786851EAE8B /* backends.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = backends.h; path = ../lib/backends.h; sourceTree = SOURCE_ROOT; };
+		76950002236646A584DA4D57 /* highlevel.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = highlevel.h; path = ../lib/highlevel.h; sourceTree = SOURCE_ROOT; };
+		7AAF3051B37745DEA89A4930 /* scales.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = scales.h; path = ../lib/scales.h; sourceTree = SOURCE_ROOT; };
+		7DD7A63E53514EA6A554A6D5 /* smallft.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = smallft.c; path = ../lib/smallft.c; sourceTree = SOURCE_ROOT; };
+		810EB1D140EB47C0BC3A3297 /* lookup.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = lookup.c; path = ../lib/lookup.c; sourceTree = SOURCE_ROOT; };
+		854102DB3CD04DB0B2C143E3 /* envelope.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = envelope.c; path = ../lib/envelope.c; sourceTree = SOURCE_ROOT; };
+		882D377E302845829F49227E /* smallft.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = smallft.h; path = ../lib/smallft.h; sourceTree = SOURCE_ROOT; };
+		88B560F82D684765ADEDA6D4 /* lpc.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = lpc.c; path = ../lib/lpc.c; sourceTree = SOURCE_ROOT; };
+		8C7D5E965B5648E78C3174F8 /* os.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = os.h; path = ../lib/os.h; sourceTree = SOURCE_ROOT; };
+		8CC43347F87C4541B6B5F372 /* window.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = window.c; path = ../lib/window.c; sourceTree = SOURCE_ROOT; };
+		90314A1A8106424788B35E55 /* lpc.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = lpc.h; path = ../lib/lpc.h; sourceTree = SOURCE_ROOT; };
+		90DAD3A7242F4F78B79890D3 /* masking.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = masking.h; path = ../lib/masking.h; sourceTree = SOURCE_ROOT; };
+		90E372C85A08409F839D5926 /* codec.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = codec.h; path = ../include/vorbis/codec.h; sourceTree = SOURCE_ROOT; };
+		9E1157EA27FA9387001A0FC5 /* ogg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogg.h; sourceTree = "<group>"; };
+		9E1157EC27FA9387001A0FC5 /* config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config_types.h; sourceTree = "<group>"; };
+		9E1157EF27FA9387001A0FC5 /* os_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = os_types.h; sourceTree = "<group>"; };
+		9E1158EE27FA9388001A0FC5 /* framing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = framing.c; sourceTree = "<group>"; };
+		9E1158EF27FA9388001A0FC5 /* crctable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crctable.h; sourceTree = "<group>"; };
+		9E1158F227FA9388001A0FC5 /* bitwise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitwise.c; sourceTree = "<group>"; };
+		9E8B602527F7FB4E00ADE80F /* vorbis copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "vorbis copy-Info.plist"; path = "/Users/sappharad/Documents/Coding/sonic3air/framework/external/ogg-vorbis/libvorbis/xcode/vorbis copy-Info.plist"; sourceTree = "<absolute>"; };
+		9E8B604E27F8017300ADE80F /* liboggvorbis_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liboggvorbis_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EA4DC48C2EE458F9469A8C8 /* envelope.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = envelope.h; path = ../lib/envelope.h; sourceTree = SOURCE_ROOT; };
+		9EC1F760281784910073C39E /* liboggvorbis_mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liboggvorbis_mac.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0CD691FE3C9470C837007FE /* res0.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = res0.c; path = ../lib/res0.c; sourceTree = SOURCE_ROOT; };
+		A0FD3AB5C25C446BBDA3A17F /* vorbisfile.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = vorbisfile.c; path = ../lib/vorbisfile.c; sourceTree = SOURCE_ROOT; };
+		A7DF9009CE33444B9A196BB9 /* window.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = window.h; path = ../lib/window.h; sourceTree = SOURCE_ROOT; };
+		AA2A103AE7F347C1A5B7A1AC /* bitrate.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = bitrate.c; path = ../lib/bitrate.c; sourceTree = SOURCE_ROOT; };
+		B5B233028D0243BDA8F229BB /* Vorbis.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Vorbis.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5FA6BA728AC4570B67DF8ED /* lsp.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = lsp.h; path = ../lib/lsp.h; sourceTree = SOURCE_ROOT; };
+		B64F09461A7E4976B1519D1E /* psy.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = psy.h; path = ../lib/psy.h; sourceTree = SOURCE_ROOT; };
+		B6E7D88764104C2E81EF1E62 /* bitrate.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = bitrate.h; path = ../lib/bitrate.h; sourceTree = SOURCE_ROOT; };
+		BE1B582AA1C640BF83D48F27 /* vorbisenc.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = vorbisenc.h; path = ../include/vorbis/vorbisenc.h; sourceTree = SOURCE_ROOT; };
+		C0D4F501565046199373A7F6 /* mapping0.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = mapping0.c; path = ../lib/mapping0.c; sourceTree = SOURCE_ROOT; };
+		C78ECAC262314A8D96288D34 /* synthesis.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = synthesis.c; path = ../lib/synthesis.c; sourceTree = SOURCE_ROOT; };
+		C9D2890F9C504954B71FA6A5 /* registry.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = registry.h; path = ../lib/registry.h; sourceTree = SOURCE_ROOT; };
+		CF6A16A4420C4891B7F5B0C6 /* sharedbook.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = sharedbook.c; path = ../lib/sharedbook.c; sourceTree = SOURCE_ROOT; };
+		E4221639FE124A52BA52DC3E /* codebook.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = codebook.c; path = ../lib/codebook.c; sourceTree = SOURCE_ROOT; };
+		E9697839815644C48E4C086E /* registry.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = registry.c; path = ../lib/registry.c; sourceTree = SOURCE_ROOT; };
+		EE76C958B635451593E7F09B /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = ../CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		EF9D3394239D406291F7A6F6 /* lsp.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = lsp.c; path = ../lib/lsp.c; sourceTree = SOURCE_ROOT; };
+		F83EF03564E4430188AD7FF8 /* codebook.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = codebook.h; path = ../lib/codebook.h; sourceTree = SOURCE_ROOT; };
+		FD3ECE5E971F457FAEC9EAEE /* floor1.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = floor1.c; path = ../lib/floor1.c; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9E8B604B27F8017300ADE80F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EC1F759281784910073C39E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		261D26DBBE504DE08C18ED46 /* Header Files */ = {
+			isa = PBXGroup;
+			children = (
+				90E372C85A08409F839D5926 /* codec.h */,
+				BE1B582AA1C640BF83D48F27 /* vorbisenc.h */,
+				5F154C5295A9406184827D73 /* vorbisfile.h */,
+				71ECC15B71084786851EAE8B /* backends.h */,
+				B6E7D88764104C2E81EF1E62 /* bitrate.h */,
+				F83EF03564E4430188AD7FF8 /* codebook.h */,
+				0A25504B2D3D4F5691771F40 /* codec_internal.h */,
+				9EA4DC48C2EE458F9469A8C8 /* envelope.h */,
+				76950002236646A584DA4D57 /* highlevel.h */,
+				037D181648C04ECB990EA712 /* lookup.h */,
+				4AF2CD97F8D84E5DA772E73D /* lookup_data.h */,
+				90314A1A8106424788B35E55 /* lpc.h */,
+				B5FA6BA728AC4570B67DF8ED /* lsp.h */,
+				90DAD3A7242F4F78B79890D3 /* masking.h */,
+				324253E5D4864B488E063DC9 /* mdct.h */,
+				3A32891221F94CB998A24461 /* misc.h */,
+				8C7D5E965B5648E78C3174F8 /* os.h */,
+				B64F09461A7E4976B1519D1E /* psy.h */,
+				C9D2890F9C504954B71FA6A5 /* registry.h */,
+				7AAF3051B37745DEA89A4930 /* scales.h */,
+				882D377E302845829F49227E /* smallft.h */,
+				A7DF9009CE33444B9A196BB9 /* window.h */,
+			);
+			name = "Header Files";
+			sourceTree = "<group>";
+		};
+		40FC5FADC1C64C008FE4B4B9 /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				2AE4B9484AAD4C87B8EB584D /* analysis.c */,
+				AA2A103AE7F347C1A5B7A1AC /* bitrate.c */,
+				55ED18DF9CC740F992EC2B7B /* block.c */,
+				E4221639FE124A52BA52DC3E /* codebook.c */,
+				854102DB3CD04DB0B2C143E3 /* envelope.c */,
+				0CB78C70565B4C7B800A6264 /* floor0.c */,
+				FD3ECE5E971F457FAEC9EAEE /* floor1.c */,
+				086BD2A3B6C045B5A1EAB75C /* info.c */,
+				810EB1D140EB47C0BC3A3297 /* lookup.c */,
+				88B560F82D684765ADEDA6D4 /* lpc.c */,
+				EF9D3394239D406291F7A6F6 /* lsp.c */,
+				C0D4F501565046199373A7F6 /* mapping0.c */,
+				3699942A604A4DD09C325E2C /* mdct.c */,
+				4D0AAAADF4A74F479D699116 /* psy.c */,
+				E9697839815644C48E4C086E /* registry.c */,
+				A0CD691FE3C9470C837007FE /* res0.c */,
+				CF6A16A4420C4891B7F5B0C6 /* sharedbook.c */,
+				7DD7A63E53514EA6A554A6D5 /* smallft.c */,
+				C78ECAC262314A8D96288D34 /* synthesis.c */,
+				4854E6939F6340E8BF748851 /* vorbisenc.c */,
+				A0FD3AB5C25C446BBDA3A17F /* vorbisfile.c */,
+				8CC43347F87C4541B6B5F372 /* window.c */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+		7EE025ECC3D444E392246BF4 /* vorbis */ = {
+			isa = PBXGroup;
+			children = (
+				9E1157D727FA9386001A0FC5 /* libogg */,
+				261D26DBBE504DE08C18ED46 /* Header Files */,
+				40FC5FADC1C64C008FE4B4B9 /* Source Files */,
+				64040476C5774F6B90E211DC /* CMakeLists.txt */,
+			);
+			name = vorbis;
+			sourceTree = "<group>";
+		};
+		8ED09D57A0F94F9B9E78407C /* ALL_BUILD */ = {
+			isa = PBXGroup;
+			children = (
+				CD86DF6F57BC43A1BC2E2B0E /* CMake Rules */,
+				EE76C958B635451593E7F09B /* CMakeLists.txt */,
+			);
+			name = ALL_BUILD;
+			sourceTree = "<group>";
+		};
+		9E1157D727FA9386001A0FC5 /* libogg */ = {
+			isa = PBXGroup;
+			children = (
+				9E1157E827FA9387001A0FC5 /* include */,
+				9E1158ED27FA9388001A0FC5 /* src */,
+			);
+			name = libogg;
+			path = ../../libogg;
+			sourceTree = "<group>";
+		};
+		9E1157E827FA9387001A0FC5 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				9E1157E927FA9387001A0FC5 /* ogg */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		9E1157E927FA9387001A0FC5 /* ogg */ = {
+			isa = PBXGroup;
+			children = (
+				9E1157EA27FA9387001A0FC5 /* ogg.h */,
+				9E1157EC27FA9387001A0FC5 /* config_types.h */,
+				9E1157EF27FA9387001A0FC5 /* os_types.h */,
+			);
+			path = ogg;
+			sourceTree = "<group>";
+		};
+		9E1158ED27FA9388001A0FC5 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				9E1158EE27FA9388001A0FC5 /* framing.c */,
+				9E1158EF27FA9388001A0FC5 /* crctable.h */,
+				9E1158F227FA9388001A0FC5 /* bitwise.c */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		C23D7853D36844589EB3FA30 = {
+			isa = PBXGroup;
+			children = (
+				8ED09D57A0F94F9B9E78407C /* ALL_BUILD */,
+				7EE025ECC3D444E392246BF4 /* vorbis */,
+				D922F32129F24C88A7AA5561 /* Products */,
+				9E8B602527F7FB4E00ADE80F /* vorbis copy-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		CD86DF6F57BC43A1BC2E2B0E /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		D922F32129F24C88A7AA5561 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B5B233028D0243BDA8F229BB /* Vorbis.framework */,
+				9E8B604E27F8017300ADE80F /* liboggvorbis_ios.a */,
+				9EC1F760281784910073C39E /* liboggvorbis_mac.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		70D631C6B9724176A9914099 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C4254278DB4A0BBEB0825C /* codec.h in Headers */,
+				4126AC6904F74A53B48548FC /* vorbisenc.h in Headers */,
+				FE1D953E1D7044F0B4113713 /* vorbisfile.h in Headers */,
+				DA7ABD5CA5A041ED94FAAE2E /* backends.h in Headers */,
+				9E115BE427FA938C001A0FC5 /* ogg.h in Headers */,
+				5553EA0BB2864073A343D96E /* bitrate.h in Headers */,
+				EC5D68B591E9447AA40631E6 /* codebook.h in Headers */,
+				E6EEC3B639E14D41BFE7F835 /* codec_internal.h in Headers */,
+				AC09EB9C97EA41B8A929C965 /* envelope.h in Headers */,
+				58589DF7FAE046F3BC48C357 /* highlevel.h in Headers */,
+				A968BA13554B40FC985623B0 /* lookup.h in Headers */,
+				63EF24B39E8D49CF986FD6E3 /* lookup_data.h in Headers */,
+				A69C4269E7FF4C59B593AB28 /* lpc.h in Headers */,
+				9E115BE827FA938C001A0FC5 /* os_types.h in Headers */,
+				A80F2EAFA7EC41E8BEB9A609 /* lsp.h in Headers */,
+				9E115BE627FA938C001A0FC5 /* config_types.h in Headers */,
+				1C060226A0FA4BE19E25768F /* masking.h in Headers */,
+				D095A24636D447C7947AF525 /* mdct.h in Headers */,
+				E9692FA04EAB4CFBBD2528DA /* misc.h in Headers */,
+				70F6B51FD969495695339378 /* os.h in Headers */,
+				FDEDC4E8EDDB4F9585932E3B /* psy.h in Headers */,
+				B7B9377A0DD644EA8B096FAE /* registry.h in Headers */,
+				9E115C0827FA938D001A0FC5 /* crctable.h in Headers */,
+				41C8D14AED0545EA9F3AB24C /* scales.h in Headers */,
+				7EC12CC673954C30A32A00BE /* smallft.h in Headers */,
+				3FEFF65B003F4435AC51F2BC /* window.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		9E8B604D27F8017300ADE80F /* oggvorbis_ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9E8B605427F8017300ADE80F /* Build configuration list for PBXNativeTarget "oggvorbis_ios" */;
+			buildPhases = (
+				9E8B604A27F8017300ADE80F /* Sources */,
+				9E8B604B27F8017300ADE80F /* Frameworks */,
+				9E8B604C27F8017300ADE80F /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = oggvorbis_ios;
+			productName = vorbis4ios;
+			productReference = 9E8B604E27F8017300ADE80F /* liboggvorbis_ios.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		9EC1F73F281784910073C39E /* oggvorbis_mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9EC1F75B281784910073C39E /* Build configuration list for PBXNativeTarget "oggvorbis_mac" */;
+			buildPhases = (
+				9EC1F740281784910073C39E /* Sources */,
+				9EC1F759281784910073C39E /* Frameworks */,
+				9EC1F75A281784910073C39E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = oggvorbis_mac;
+			productName = vorbis4ios;
+			productReference = 9EC1F760281784910073C39E /* liboggvorbis_mac.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		CE055EA304774DDABE3C390F /* vorbis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4D6C2D655B045ADAE6E092E /* Build configuration list for PBXNativeTarget "vorbis" */;
+			buildPhases = (
+				70D631C6B9724176A9914099 /* Headers */,
+				BF8198E2C85345C09A3A1FE1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2996E87AE8234C399671D5E9 /* PBXTargetDependency */,
+			);
+			name = vorbis;
+			productName = vorbis;
+			productReference = B5B233028D0243BDA8F229BB /* Vorbis.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5A12D27682F14DA88F232777 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				DefaultBuildSystemTypeForWorkspace = Latest;
+				LastUpgradeCheck = 1220;
+				TargetAttributes = {
+					9E8B604D27F8017300ADE80F = {
+						CreatedOnToolsVersion = 13.3;
+						ProvisioningStyle = Automatic;
+					};
+					9EC1F73F281784910073C39E = {
+						ProvisioningStyle = Automatic;
+					};
+					CE055EA304774DDABE3C390F = {
+						DevelopmentTeam = 436AD92E6J;
+					};
+				};
+			};
+			buildConfigurationList = 47A70380EE924A0E967818E0 /* Build configuration list for PBXProject "vorbis" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C23D7853D36844589EB3FA30;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5115B3520ED14ADA80BCAB4B /* ALL_BUILD */,
+				4D2D6DB1C2B64E1DA7F7B561 /* ZERO_CHECK */,
+				10C24F0AEB0341218F6DCCAB /* install */,
+				CE055EA304774DDABE3C390F /* vorbis */,
+				9E8B604D27F8017300ADE80F /* oggvorbis_ios */,
+				9EC1F73F281784910073C39E /* oggvorbis_mac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		272F1B9B26C8465C8AA1E6C7 /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/sappharad/Documents/Coding/vorbis -f /Users/sappharad/Documents/Coding/vorbis/CMakeScripts/ALL_BUILD_cmakeRulesBuildPhase.make$CONFIGURATION OBJDIR=$(basename \"$OBJECT_FILE_DIR_normal\") all";
+			showEnvVarsInLog = 0;
+		};
+		88E775210BA44889A2E05F8F /* CMake PostBuild Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake PostBuild Rules";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/sappharad/Documents/Coding/vorbis -f /Users/sappharad/Documents/Coding/vorbis/CMakeScripts/install_postBuildPhase.make$CONFIGURATION OBJDIR=$(basename \"$OBJECT_FILE_DIR_normal\") all";
+			showEnvVarsInLog = 0;
+		};
+		AC8138B7A25D40138FB4392A /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/sappharad/Documents/Coding/vorbis -f /Users/sappharad/Documents/Coding/vorbis/CMakeScripts/ZERO_CHECK_cmakeRulesBuildPhase.make$CONFIGURATION OBJDIR=$(basename \"$OBJECT_FILE_DIR_normal\") all";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9E8B604A27F8017300ADE80F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9E469B3A27FBEA9300FE908D /* block.c in Sources */,
+				9E115C0C27FA938D001A0FC5 /* bitwise.c in Sources */,
+				9E469B3B27FBEA9300FE908D /* psy.c in Sources */,
+				9E469B4927FBEA9300FE908D /* sharedbook.c in Sources */,
+				9E469B4727FBEA9300FE908D /* lookup.c in Sources */,
+				9E469B4127FBEA9300FE908D /* window.c in Sources */,
+				9E115C0727FA938D001A0FC5 /* framing.c in Sources */,
+				9E469B3E27FBEA9300FE908D /* smallft.c in Sources */,
+				9E469B4827FBEA9300FE908D /* floor1.c in Sources */,
+				9E469B3627FBEA6200FE908D /* info.c in Sources */,
+				9E469B3D27FBEA9300FE908D /* envelope.c in Sources */,
+				9E469B3727FBEA7200FE908D /* vorbisenc.c in Sources */,
+				9E469B3827FBEA7500FE908D /* vorbisfile.c in Sources */,
+				9E469B3F27FBEA9300FE908D /* lpc.c in Sources */,
+				9E469B4227FBEA9300FE908D /* bitrate.c in Sources */,
+				9E469B4627FBEA9300FE908D /* res0.c in Sources */,
+				9E469B3C27FBEA9300FE908D /* codebook.c in Sources */,
+				9E469B3927FBEA9300FE908D /* mapping0.c in Sources */,
+				9E469B4527FBEA9300FE908D /* registry.c in Sources */,
+				9E469B4427FBEA9300FE908D /* lsp.c in Sources */,
+				9E469B4027FBEA9300FE908D /* floor0.c in Sources */,
+				9E469B4327FBEA9300FE908D /* mdct.c in Sources */,
+				9E469B4B27FBEA9300FE908D /* synthesis.c in Sources */,
+				9E469B4A27FBEA9300FE908D /* analysis.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EC1F740281784910073C39E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9EC1F741281784910073C39E /* block.c in Sources */,
+				9EC1F742281784910073C39E /* bitwise.c in Sources */,
+				9EC1F743281784910073C39E /* psy.c in Sources */,
+				9EC1F744281784910073C39E /* sharedbook.c in Sources */,
+				9EC1F745281784910073C39E /* lookup.c in Sources */,
+				9EC1F746281784910073C39E /* window.c in Sources */,
+				9EC1F747281784910073C39E /* framing.c in Sources */,
+				9EC1F748281784910073C39E /* smallft.c in Sources */,
+				9EC1F749281784910073C39E /* floor1.c in Sources */,
+				9EC1F74A281784910073C39E /* info.c in Sources */,
+				9EC1F74B281784910073C39E /* envelope.c in Sources */,
+				9EC1F74C281784910073C39E /* vorbisenc.c in Sources */,
+				9EC1F74D281784910073C39E /* vorbisfile.c in Sources */,
+				9EC1F74E281784910073C39E /* lpc.c in Sources */,
+				9EC1F74F281784910073C39E /* bitrate.c in Sources */,
+				9EC1F750281784910073C39E /* res0.c in Sources */,
+				9EC1F751281784910073C39E /* codebook.c in Sources */,
+				9EC1F752281784910073C39E /* mapping0.c in Sources */,
+				9EC1F753281784910073C39E /* registry.c in Sources */,
+				9EC1F754281784910073C39E /* lsp.c in Sources */,
+				9EC1F755281784910073C39E /* floor0.c in Sources */,
+				9EC1F756281784910073C39E /* mdct.c in Sources */,
+				9EC1F757281784910073C39E /* synthesis.c in Sources */,
+				9EC1F758281784910073C39E /* analysis.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF8198E2C85345C09A3A1FE1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0B16C08ADF7456E986C237A /* analysis.c in Sources */,
+				9B57CFFF4DE34EC09ABED7FE /* bitrate.c in Sources */,
+				9E115C0527FA938D001A0FC5 /* framing.c in Sources */,
+				FC2EA995E71F4F95A47778E3 /* block.c in Sources */,
+				D74849492865404E913E108A /* codebook.c in Sources */,
+				7E0E62F22774445B8545B5BD /* envelope.c in Sources */,
+				847F63C502F34C85B2858E12 /* floor0.c in Sources */,
+				9E115C0A27FA938D001A0FC5 /* bitwise.c in Sources */,
+				B48D50E0732B446C821867EB /* floor1.c in Sources */,
+				848B965756AF4B9E85C88271 /* info.c in Sources */,
+				DB27F48DF4544DF3BA065C2D /* lookup.c in Sources */,
+				BF78C836B8B4418BB2D2219D /* lpc.c in Sources */,
+				0DB9E462572441FA9EA2F1B3 /* lsp.c in Sources */,
+				7EAE87D4798548CDBCDE6B8F /* mapping0.c in Sources */,
+				126B69BA62A34B4AAE4C7C1D /* mdct.c in Sources */,
+				C74673C82C4E4875AB942C2C /* psy.c in Sources */,
+				975286FACBAB4183975A6C6A /* registry.c in Sources */,
+				09E7FF8CE4094AB5BD5FFD20 /* res0.c in Sources */,
+				1B0A1511B2BE48B9A82E6B80 /* sharedbook.c in Sources */,
+				4221294B164C4691909A8151 /* smallft.c in Sources */,
+				364EC493A39B4BC7AEE6B323 /* synthesis.c in Sources */,
+				A939D153EF2742DB835B9419 /* vorbisenc.c in Sources */,
+				E829DD0844AB461595327D90 /* vorbisfile.c in Sources */,
+				B6EE21E42784447C8E6B5C72 /* window.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2996E87AE8234C399671D5E9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D2D6DB1C2B64E1DA7F7B561 /* ZERO_CHECK */;
+			targetProxy = 4F06D2F47C9A46368E09E0EA /* PBXContainerItemProxy */;
+		};
+		5CFF5FFD0A324F1BA6BD4674 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5115B3520ED14ADA80BCAB4B /* ALL_BUILD */;
+			targetProxy = E2875723CDB6454ABB821F3E /* PBXContainerItemProxy */;
+		};
+		658585C688994AFEAE46177C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D2D6DB1C2B64E1DA7F7B561 /* ZERO_CHECK */;
+			targetProxy = 1D2EC576AF0F49BE88DC691D /* PBXContainerItemProxy */;
+		};
+		DE6B70DFF7A84D1485D9060A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE055EA304774DDABE3C390F /* vorbis */;
+			targetProxy = EF244875C5324ADABB912544 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		00EBC433B7B54DA98E5442CE /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		02DFC9E3D3D249DE9834D407 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 436AD92E6J;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_VERSION = A;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					vorbis_EXPORTS,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				INFOPLIST_FILE = /Users/sappharad/Documents/Coding/vorbis/lib/CMakeFiles/vorbis.dir/Info.plist;
+				INSTALL_PATH = "@rpath";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_STYLE = DYNAMIC;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-fPIC",
+				);
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = org.xiph.vorbis;
+				PRODUCT_NAME = Vorbis;
+				SDKROOT = macosx;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		04C81E64B93C411BABE92561 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+		08507B45C4624FF39EFF5630 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		36802AFC97014F8884616270 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		44946A7D9BEE4247A128AE58 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = RelWithDebInfo;
+		};
+		4C180233B6C4409C800E5128 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 436AD92E6J;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_VERSION = A;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					vorbis_EXPORTS,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				INFOPLIST_FILE = /Users/sappharad/Documents/Coding/vorbis/lib/CMakeFiles/vorbis.dir/Info.plist;
+				INSTALL_PATH = "@rpath";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_STYLE = DYNAMIC;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-fPIC",
+				);
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = org.xiph.vorbis;
+				PRODUCT_NAME = Vorbis;
+				SDKROOT = macosx;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+		56679427B2214A159F7B25D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 436AD92E6J;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_VERSION = A;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					vorbis_EXPORTS,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				INFOPLIST_FILE = /Users/sappharad/Documents/Coding/vorbis/lib/CMakeFiles/vorbis.dir/Info.plist;
+				INSTALL_PATH = "@rpath";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_STYLE = DYNAMIC;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "   -fPIC  ";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = org.xiph.vorbis;
+				PRODUCT_NAME = Vorbis;
+				SDKROOT = macosx;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		9E8B605527F8017300ADE80F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9E8B605627F8017300ADE80F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9E8B605727F8017300ADE80F /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = MinSizeRel;
+		};
+		9E8B605827F8017300ADE80F /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = RelWithDebInfo;
+		};
+		9EC1F75C281784910073C39E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9EC1F75D281784910073C39E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9EC1F75E281784910073C39E /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = MinSizeRel;
+		};
+		9EC1F75F281784910073C39E /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = RelWithDebInfo;
+		};
+		B5604607BA3943D298F9562B /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+		B6B616318480472FB93B0D08 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = MinSizeRel;
+		};
+		C7433A8029F74975AC6A7EF8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		C7C43331E41C464D84141F62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		CBC1C5D3288B455F89162189 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Release;
+		};
+		D5DC05B5F6A745359B91EAC9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		DE249FCC3D0445878C48D460 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = MinSizeRel;
+		};
+		E30BA18E33D34E18B1B05734 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 436AD92E6J;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_VERSION = A;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					vorbis_EXPORTS,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../libogg/include/",
+					"$(PROJECT_DIR)/../lib",
+					"$(PROJECT_DIR)/../include",
+				);
+				INFOPLIST_FILE = /Users/sappharad/Documents/Coding/vorbis/lib/CMakeFiles/vorbis.dir/Info.plist;
+				INSTALL_PATH = "@rpath";
+				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_STYLE = DYNAMIC;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-fPIC",
+				);
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = org.xiph.vorbis;
+				PRODUCT_NAME = Vorbis;
+				SDKROOT = macosx;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		E51D0AABA3184738B52166C8 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = RelWithDebInfo;
+		};
+		E561709463714C7F85D932F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		F6A9D50757E1436984D2E041 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = /Users/sappharad/Documents/Coding/vorbis;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+					"$(inherited)",
+				);
+			};
+			name = Debug;
+		};
+		F708B10D00E8453887E9425A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		47A70380EE924A0E967818E0 /* Build configuration list for PBXProject "vorbis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F708B10D00E8453887E9425A /* Debug */,
+				36802AFC97014F8884616270 /* Release */,
+				DE249FCC3D0445878C48D460 /* MinSizeRel */,
+				44946A7D9BEE4247A128AE58 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		81C8983388E74707A5559BAB /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D5DC05B5F6A745359B91EAC9 /* Debug */,
+				C7C43331E41C464D84141F62 /* Release */,
+				B6B616318480472FB93B0D08 /* MinSizeRel */,
+				08507B45C4624FF39EFF5630 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9E8B605427F8017300ADE80F /* Build configuration list for PBXNativeTarget "oggvorbis_ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E8B605527F8017300ADE80F /* Debug */,
+				9E8B605627F8017300ADE80F /* Release */,
+				9E8B605727F8017300ADE80F /* MinSizeRel */,
+				9E8B605827F8017300ADE80F /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9EC1F75B281784910073C39E /* Build configuration list for PBXNativeTarget "oggvorbis_mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EC1F75C281784910073C39E /* Debug */,
+				9EC1F75D281784910073C39E /* Release */,
+				9EC1F75E281784910073C39E /* MinSizeRel */,
+				9EC1F75F281784910073C39E /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A0AC8844E662479E916148E4 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F6A9D50757E1436984D2E041 /* Debug */,
+				CBC1C5D3288B455F89162189 /* Release */,
+				B5604607BA3943D298F9562B /* MinSizeRel */,
+				E51D0AABA3184738B52166C8 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A4D6C2D655B045ADAE6E092E /* Build configuration list for PBXNativeTarget "vorbis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				56679427B2214A159F7B25D7 /* Debug */,
+				02DFC9E3D3D249DE9834D407 /* Release */,
+				4C180233B6C4409C800E5128 /* MinSizeRel */,
+				E30BA18E33D34E18B1B05734 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FEB7C3BC71AA4C3F8CB19B6B /* Build configuration list for PBXAggregateTarget "install" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E561709463714C7F85D932F1 /* Debug */,
+				C7433A8029F74975AC6A7EF8 /* Release */,
+				04C81E64B93C411BABE92561 /* MinSizeRel */,
+				00EBC433B7B54DA98E5442CE /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5A12D27682F14DA88F232777 /* Project object */;
+}
