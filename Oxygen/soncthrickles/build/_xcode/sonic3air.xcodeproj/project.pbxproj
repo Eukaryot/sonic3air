@@ -1982,10 +1982,10 @@
 		9E7E28F525EF21A60021AE3A /* FileProviderSDL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileProviderSDL.h; sourceTree = "<group>"; };
 		9E7E28F625EF21A60021AE3A /* FileProviderSDL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileProviderSDL.cpp; sourceTree = "<group>"; };
 		9E7E290925EF25F40021AE3A /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		9E7E291025EF26AF0021AE3A /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unzip.c; path = ../../../../../framework/external/zlib/zlib/contrib/minizip/unzip.c; sourceTree = "<group>"; };
-		9E7E291625EF27630021AE3A /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unzip.h; path = ../../../../../framework/external/zlib/zlib/contrib/minizip/unzip.h; sourceTree = "<group>"; };
-		9E7E291725EF27630021AE3A /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioapi.h; path = ../../../../../framework/external/zlib/zlib/contrib/minizip/ioapi.h; sourceTree = "<group>"; };
-		9E7E291825EF27630021AE3A /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ioapi.c; path = ../../../../../framework/external/zlib/zlib/contrib/minizip/ioapi.c; sourceTree = "<group>"; };
+		9E7E291025EF26AF0021AE3A /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
+		9E7E291625EF27630021AE3A /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
+		9E7E291725EF27630021AE3A /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		9E7E291825EF27630021AE3A /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
 		9E8202D62531497400575E6C /* AudioSourceBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioSourceBase.cpp; sourceTree = "<group>"; };
 		9E8202DC25314A1800575E6C /* CustomAudioMixer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CustomAudioMixer.cpp; sourceTree = "<group>"; };
 		9E8202DD25314A1800575E6C /* CustomAudioMixer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomAudioMixer.h; sourceTree = "<group>"; };
@@ -3368,7 +3368,8 @@
 				9E7E291025EF26AF0021AE3A /* unzip.c */,
 				9E7E291625EF27630021AE3A /* unzip.h */,
 			);
-			path = minizip;
+			name = minizip;
+			path = ../../../../framework/external/zlib/zlib/contrib/minizip;
 			sourceTree = "<group>";
 		};
 		9E82C78726BDF3A600ADDBD3 /* oxygen_netcore */ = {
