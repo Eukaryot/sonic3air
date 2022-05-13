@@ -58,7 +58,7 @@ public:
 	};
 	struct GameServer
 	{
-		std::string mServerHostName;
+		std::string mServerHostName = "sonic3air.org";
 		int mServerPortUDP = 21094;		// Used by most platforms
 		int mServerPortTCP = 21095;		// Used only as a fallback for UDP
 		int mServerPortWSS = 21096;		// Used by the web version
