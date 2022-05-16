@@ -13,6 +13,7 @@
 
 #include "oxygenserver/server/ServerNetConnection.h"
 #include "oxygenserver/subsystems/Channels.h"
+#include "oxygenserver/subsystems/UpdateCheck.h"
 #include "oxygenserver/subsystems/VirtualDirectory.h"
 
 
@@ -41,6 +42,7 @@ private:
 
 	// Sub-systems
 	Channels mChannels;
+	UpdateCheck mUpdateCheck;
 	VirtualDirectory mVirtualDirectory;
 
 	// Cached data

@@ -124,61 +124,12 @@ bool Server::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 			// Nothing more to change, the response is already filled in
 			return evaluation.respond(request);
 		}
-
-		case network::AppUpdateCheckRequest::Query::PACKET_TYPE:
-		{
-			using Request = network::AppUpdateCheckRequest;
-			Request request;
-			if (!evaluation.readQuery(request))
-				return false;
-
-			// TODO: Properly implement this
-			//  -> Maybe pass it on to a sub-system handling this kind of requests
-			request.mResponse.mHasUpdate = false;
-			if (request.mQuery.mAppName == "sonic3air")
-			{
-				uint32 latestVersion = 0;
-				const char* updateURL = nullptr;
-				if (request.mQuery.mPlatform == "windows" && request.mQuery.mReleaseChannel == "test")
-				{
-					// Test builds for Windows
-					latestVersion = 0x22050800;
-					updateURL = "https://github.com/Eukaryot/sonic3air/releases";
-				}
-				else
-				{
-					// Stable builds
-					if (request.mQuery.mPlatform == "windows" || request.mQuery.mPlatform == "linux" || request.mQuery.mPlatform == "mac" ||
-						request.mQuery.mPlatform == "android" || request.mQuery.mPlatform == "web")
-					{
-						if (request.mQuery.mReleaseChannel == "stable" || request.mQuery.mReleaseChannel == "preview" || request.mQuery.mReleaseChannel == "test")
-						{
-							latestVersion = 0x21092800;
-						}
-					}
-					else if (request.mQuery.mPlatform == "switch")
-					{
-						if (request.mQuery.mReleaseChannel == "stable" || request.mQuery.mReleaseChannel == "preview" || request.mQuery.mReleaseChannel == "test")
-						{
-							latestVersion = 0x21091200;
-						}
-					}
-				}
-
-				if (latestVersion != 0 && request.mQuery.mInstalledAppVersion < latestVersion)
-				{
-					request.mResponse.mHasUpdate = true;
-					request.mResponse.mAvailableAppVersion = latestVersion;
-					request.mResponse.mAvailableContentVersion = latestVersion;
-					request.mResponse.mUpdateInfoURL = (nullptr == updateURL ) ? "https://sonic3air.org" : updateURL;
-				}
-			}
-			return evaluation.respond(request);
-		}
 	}
 
 	// Go through sub-systems
 	if (mChannels.onReceivedRequestQuery(evaluation))
+		return true;
+	if (mUpdateCheck.onReceivedRequestQuery(evaluation))
 		return true;
 
 	// Failed
