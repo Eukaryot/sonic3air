@@ -216,6 +216,11 @@ aaudio_PlayDevice(_THIS)
     int64_t timeoutNanoseconds = 1 * 1000 * 1000; /* 8 ms */
     res = ctx.AAudioStream_write(private->stream,  private->mixbuf, private->mixlen / private->frame_size, timeoutNanoseconds);
     if (res < 0) {
+        // [Euka] Temporary fix for Android taken from https://github.com/libsdl-org/SDL/issues/4985
+        if (res == AAUDIO_ERROR_DISCONNECTED) {
+            ctx.AAudioStreamBuilder_openStream(ctx.builder, &private->stream); // reopen stream (mem leak probably)
+            ctx.AAudioStream_requestStart(private->stream); // start new stream
+        }
         LOGI("%s : %s", __func__, ctx.AAudio_convertResultToText(res));
     } else {
         LOGI("SDL AAudio play: %d frames, wanted:%d frames", (int)res, private->mixlen / private->frame_size);
