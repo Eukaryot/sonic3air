@@ -376,6 +376,13 @@ namespace
 		}
 	}
 
+	void debugLogValueStack()
+	{
+		const size_t valueStackSize = Application::instance().getSimulation().getCodeExec().getLemonScriptRuntime().getInternalLemonRuntime().getActiveControlFlow()->getValueStackSize();
+		const std::string valueString = *String(0, "Value Stack Size = %d", valueStackSize);
+		debugLogInternal(valueString);
+	}
+
 
 	uint16 Input_getController(uint8 controllerIndex)
 	{
@@ -892,9 +899,9 @@ namespace
 	}
 
 
-	bool Audio_isPlayingAudio(uint64 id)
+	bool Audio_isPlayingAudio(uint64 sfxId)
 	{
-		return EngineMain::instance().getAudioOut().isPlayingSfxId(id);
+		return EngineMain::instance().getAudioOut().isPlayingSfxId(sfxId);
 	}
 
 	void Audio_playAudio1(uint64 sfxId, uint8 contextId)
@@ -1738,7 +1745,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		// Audio
 		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
-			.setParameterInfo(0, "id");
+			.setParameterInfo(0, "sfxId");
 
 		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags)
 			.setParameterInfo(0, "sfxId")
@@ -1802,6 +1809,11 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(0, "name")
 			.setParameterInfo(1, "startAddress")
 			.setParameterInfo(2, "numColors");
+
+	#if 0
+		// Only for debugging value stack issues in lemonscript itself
+		module.addUserDefinedFunction("debugLogValueStack", lemon::wrap(&debugLogValueStack), defaultFlags);
+	#endif
 
 
 		// Debug keys
