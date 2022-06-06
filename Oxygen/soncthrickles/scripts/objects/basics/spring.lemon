@@ -852,7 +852,7 @@ function void fn023624()
 	{
 		objA1.flags2a &= ~char.flag.FACING_LEFT
 		objA1.position.x.u16 -= 6
-		objA1.velocity.x = -s16[A0 + 0x30]		// Regression fix for diagonal springs: thanks to GFX32
+		objA1.velocity.x = -s16[A0 + 0x30]		// Regression fix for diagonal springs: fix #contributed by GFX32
 	}
 	else
 	{

@@ -115,7 +115,7 @@ function void fn079cf8()
 {
 	setupObjectAttributesFull(0x07a178)
 #if STANDALONE
-	objA0.sprite_attributes -= 0x2000	// Fix for wrong palette line usage, thanks to Legobouwer
+	objA0.sprite_attributes -= 0x2000	// Fix for wrong palette line usage, #contributed by Legobouwer
 #endif
 	objA0.update_address = 0x079d08
 	fn079d08()

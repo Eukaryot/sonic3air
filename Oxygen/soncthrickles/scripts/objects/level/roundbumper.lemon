@@ -36,7 +36,7 @@ function void fn032df2()
 	{
 		objA0.mapping_offset = 0x2322ee
 	#if STANDALONE
-		objA0.sprite_attributes = 0x0300	// Fix for wrong palette line usage, thanks to Legobouwer
+		objA0.sprite_attributes = 0x0300	// Fix for wrong palette line usage, #contributed by Legobouwer
 	#else
 		objA0.sprite_attributes = 0x2300
 	#endif

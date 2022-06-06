@@ -159,7 +159,7 @@ function void ROMManipulation.BonusSM.Probabilities()
 
 function void ROMManipulation.ALZ.MusicFix()
 {
-	// Azure Lake emulated music fix as suggested by Legobouwer
+	// Azure Lake emulated music fix, #contributed by Legobouwer
 	u8[0x2d9f81] = 0x04
 }
 

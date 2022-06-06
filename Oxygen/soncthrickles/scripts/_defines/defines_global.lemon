@@ -279,7 +279,7 @@ define control.pad2.state		=  u8[0xfffff606]
 define control.pad2.pressed		=  u8[0xfffff607]
 
 // Deprecated old names for the "control.pad2" defines (left in for compatibility with existing mods)
-//  -> They are somewhat misleading, as these are mostly used in the same way as first controller's "control.pad1", but not "control.player1" (thanks to Veenee)
+//  -> They are somewhat misleading, as these are mostly used in the same way as first controller's "control.pad1", but not "control.player1" (name change suggestion #contributed by Veenee)
 define control.player2			= u16[0xfffff606]
 define control.player2.state	=  u8[0xfffff606]
 define control.player2.pressed	=  u8[0xfffff607]

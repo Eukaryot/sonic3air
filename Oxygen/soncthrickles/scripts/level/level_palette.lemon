@@ -546,7 +546,7 @@ function void LevelPaletteUpdate.LRZ2()
 			u16[0xfffff654] = 0
 
 	#if STANDALONE
-		// Fixed palette cycle, thanks to Alieneer
+		// Fixed palette cycle, #contributed by Alieneer
 		copyMemory(0xfffffc76, 0x003344 + D0.u16, 8)
 	#else
 		A0 = 0x003344

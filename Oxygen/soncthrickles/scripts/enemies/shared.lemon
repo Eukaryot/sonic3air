@@ -418,7 +418,7 @@ function void fn0857c2()
 {
 #if STANDALONE
 	// Bug fix for the drop dash not counting as a rolling state in collision checks for certain enemies,
-	// i.e. Sonic gets hurt when dropdashing on them -- thanks to GFX32 for the fix!
+	// i.e. Sonic gets hurt when dropdashing on them -- fix #contributed by GFX32
 	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH || u8[A1 + 0x20] == char.state.SONIC_DROPDASH)
 #else
 	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH)

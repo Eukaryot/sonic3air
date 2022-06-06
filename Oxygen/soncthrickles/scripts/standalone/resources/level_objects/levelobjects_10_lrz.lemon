@@ -591,7 +591,7 @@ function void LevelObjectTableBuilder.buildObjects_LRZ1()
 	LevelObjectTableBuilder.addObject(0x277e, 0x04f1, OBJECTTABLE2_07, 0x12, LVLOBJ_FLIP_X)
 
 	// Moved this damage object down 3 pixels to prevent triggering when player falls down onto the platform above
-	//  -> Thanks to D.A. Garden for the fix
+	//  -> Fix #contributed by D.A. Garden
 	LevelObjectTableBuilder.addObject(0x2780, 0x03e0, OBJECTTABLE2_6e, 0x71, 0)
 
 	LevelObjectTableBuilder.addObject(0x2780, 0x03e0, OBJECTTABLE2_31, 0x02, 0)
