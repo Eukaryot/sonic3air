@@ -207,10 +207,10 @@ constant u8 OBJECTTABLE1_2e		= 0x2e		// Object address 0x02b758 = AIZ Spiked Log
 constant u8 OBJECTTABLE1_2f		= 0x2f		// Object address 0x02b928 = Decorative Sprite
 constant u8 OBJECTTABLE1_30		= 0x30		// Object address 0x02bf20 = Generic Object (like AIZ flames)
 constant u8 OBJECTTABLE1_31		= 0x31		// Object address 0x02c3ae = LBZ Large Horizontal Cylinder
-constant u8 OBJECTTABLE1_32		= 0x32		// Object address 0x02b12a = AIZ2 Boss
+constant u8 OBJECTTABLE1_32		= 0x32		// Object address 0x02b12a = Drawbridge from AIZ2 end cutscene
 constant u8 OBJECTTABLE1_33		= 0x33		// Object address 0x02c518 = Button
 constant u8 OBJECTTABLE1_34		= 0x34		// Object address 0x02cfa8 = Checkpoint / Starpost
-constant u8 OBJECTTABLE1_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Farns
+constant u8 OBJECTTABLE1_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Ferns
 constant u8 OBJECTTABLE1_36		= 0x36		// Object address 0x01ed26 = HCZ Breakable Bar
 constant u8 OBJECTTABLE1_37		= 0x37		// Object address 0x02fda4 = -- hcz1_firstpool.lemon
 constant u8 OBJECTTABLE1_38		= 0x38		// Object address 0x030580 = -- hcz_fan.lemon

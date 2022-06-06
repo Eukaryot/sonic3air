@@ -18,8 +18,8 @@ function void Standalone.checkTimeAttackFinish()
 	if (!Game.isTimeAttack())
 		return
 
-	s16 px = s16[0xffffb010]
-	s16 py = s16[0xffffb014]
+	s16 px = s16[0xffffb000 + 0x10]
+	s16 py = s16[0xffffb000 + 0x14]
 	s16 poleX = -1
 	s16 poleY = -1
 

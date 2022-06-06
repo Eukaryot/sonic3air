@@ -33,7 +33,7 @@ function void Standalone.onLevelStart()
 		Input.setControllerLEDs(0, getCharacterColorsForControllerLEDs(clamp(levelselect.characters, 1, 3) - 1))
 
 		// Player 2
-		if (levelselect.characters == CHARS_SONIC_AND_TAILS || levelselect.characters == 4)
+		if (levelselect.characters == CHARS_SONIC_AND_TAILS || levelselect.characters == CHARS_KNUCKLES_AND_TAILS)
 			Input.setControllerLEDs(1, getCharacterColorsForControllerLEDs(CHARACTER_TAILS))
 	}
 
