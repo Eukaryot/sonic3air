@@ -25,18 +25,23 @@
 
 
 // Update addresses for characters:
-//  0x00010a94 = Sonic
-//  0x0001365c = Tails
-//  0x00016444 = Knuckles
+//  0x010a94 = Sonic
+//  0x01365c = Tails
+//  0x016444 = Knuckles
 define char.update_address		= u32[A0]
 
 // Render flags
 define char.render_flags		=  u8[A0 + 0x04]
-constant u8 render_flag.FLIP_X	=  0x01		// Flipped horizontally
-constant u8 render_flag.FLIP_Y	=  0x02		// Flipped vertically
-constant u8 render_flag.WORLD	=  0x04		// Usually set, so the object is positioned in world, not on screen
-constant u8 render_flag.COMPOUND=  0x40		// Used for multiple child object rendering
-constant u8 render_flag.VISIBLE	=  0x80		// Object visible on screen if set
+
+	constant u8 render_flag.FLIP_X					=  0x01		// Flipped horizontally
+	constant u8 render_flag.FLIP_Y					=  0x02		// Flipped vertically
+	constant u8 render_flag.WORLD					=  0x04		// Usually set, so the object is positioned in world, not on screen
+	constant u8 render_flag.COMPETITION_P1_SCREEN	=  0x08		// Indicates sprites that belong on the top half / player 1's side of the screen in competition mode
+	constant u8 render_flag.COMPETITION_P2_SCREEN	=  0x10		// Indicates sprites that belong on the bottom half / player 2's side of the screen in competition mode
+	constant u8 render_flag.STATIC_MAPPING			=  0x20		// Implies that the object's sprite consists of only one 8x8 tile
+	constant u8 render_flag.COMPOUND				=  0x40		// Used for multiple child object rendering
+	constant u8 render_flag.VISIBLE					=  0x80		// Object visible on screen if set
+
 
 // Base state:
 //  0x00 = Shortly when getting visible after title card (?)
@@ -47,111 +52,151 @@ constant u8 render_flag.VISIBLE	=  0x80		// Object visible on screen if set
 define char.base_state			=  u8[A0 + 0x05]
 
 // Bounding box size used for clipping (in contrast to hitbox)
-define char.box_size.y			=  u8[A0 + 0x06]	// Height
-define char.box_size.x			=  u8[A0 + 0x07]	// Width
+define char.box_size.y			=  u8[A0 + 0x06]			// Height
+define char.box_size.x			=  u8[A0 + 0x07]			// Width
 
-define char.sprite_priority		= u16[A0 + 0x08]	// Sprite priority: 0x100 by default, always a multiple of 0x80
-define char.sprite_attributes	= u16[A0 + 0x0a]	// Sprite attributes: start pattern index (lower 11 bits), atex (highest 4 bits)
+define char.sprite_priority		= u16[A0 + 0x08]			// Sprite priority: 0x100 by default, always a multiple of 0x80
+
+define char.sprite_attributes	= u16[A0 + 0x0a]			// Sprite attributes: start pattern index (lower 11 bits), flipping (bits 11/12), atex (highest 3 bits)
+
+	constant u16 sprite_attribute.FLIP_X		= 0x0800
+	constant u16 sprite_attribute.FLIP_Y		= 0x1000
+	constant u16 sprite_attribute.PALETTE.LINE0	= 0x0000	// First palette line
+	constant u16 sprite_attribute.PALETTE.LINE1	= 0x2000	// Second palette line
+	constant u16 sprite_attribute.PALETTE.LINE2	= 0x4000	// Third palette line
+	constant u16 sprite_attribute.PALETTE.LINE3	= 0x6000	// Fourth palette line
+	constant u16 sprite_attribute.PRIORITY		= 0x8000
+	constant u16 sprite_attribute.VRAM			= 0x07ff	// Bit mask for starting tile RAM location
+	constant u16 sprite_attribute.PALETTE		= 0x6000	// Bit mask for palette
+
+
 define char.mapping_offset		= u32[A0 + 0x0c]
 
 // Position and velocity
-define char.position.x			= u32[A0 + 0x10]	// 16:16 fixed point, i.e. upper 16 bits are the actual pixel position
-define char.position.x.u16		= u16[A0 + 0x10]	// Only the upper 16 bits = integer part
-define char.position.x.frac		= u16[A0 + 0x12]	// Only the lower 16 bits = fractional part
-define char.position.y			= u32[A0 + 0x14]	// 16:16 fixed point, i.e. upper 16 bits are the actual pixel position
-define char.position.y.u16		= u16[A0 + 0x14]	// Only the upper 16 bits = integer part
-define char.position.y.frac		= u16[A0 + 0x16]	// Only the lower 16 bits = fractional part
-define char.velocity.x			= s16[A0 + 0x18]	// 8:8 fixed point, i.e. upper 8 bits are full pixel velocity
-define char.velocity.y			= s16[A0 + 0x1a]	// 8:8 fixed point, i.e. upper 8 bits are full pixel velocity
+define char.position.x			= u32[A0 + 0x10]			// 16:16 fixed point, i.e. upper 16 bits are the actual pixel position
+define char.position.x.u16		= u16[A0 + 0x10]			// Only the upper 16 bits = integer part
+define char.position.x.frac		= u16[A0 + 0x12]			// Only the lower 16 bits = fractional part
+define char.position.y			= u32[A0 + 0x14]			// 16:16 fixed point, i.e. upper 16 bits are the actual pixel position
+define char.position.y.u16		= u16[A0 + 0x14]			// Only the upper 16 bits = integer part
+define char.position.y.frac		= u16[A0 + 0x16]			// Only the lower 16 bits = fractional part
+define char.velocity.x			= s16[A0 + 0x18]			// 8:8 fixed point, i.e. upper 8 bits are full pixel velocity
+define char.velocity.y			= s16[A0 + 0x1a]			// 8:8 fixed point, i.e. upper 8 bits are full pixel velocity
 define char.groundspeed			= s16[A0 + 0x1c]
 
 // Hitbox for collision checks
-define char.hitbox_extends.y	=  u8[A0 + 0x1e]	// E.g. 19 for Sonic/Knux, 15 for Tails, 14 when rolling (but not when ducking)
-define char.hitbox_extends.x	=  u8[A0 + 0x1f]	// E.g. 9 when upright, 7 when rolling
+define char.hitbox_extends.y	=  u8[A0 + 0x1e]			// E.g. 19 for Sonic/Knux, 15 for Tails, 14 when rolling (but not when ducking)
+define char.hitbox_extends.x	=  u8[A0 + 0x1f]			// E.g. 9 when upright, 7 when rolling
+
 
 // State
-define char.state				=  u8[A0 + 0x20]	// Current state
-define char.state.former		=  u8[A0 + 0x21]	// Former state (mostly the same as char.state, except for state 0x14)
+define char.state				=  u8[A0 + 0x20]			// Current state
+define char.state.former		=  u8[A0 + 0x21]			// Former state (mostly the same as char.state, except for state 0x14)
 define char.state.both			= u16[A0 + 0x20]
 
-// State constants
-constant u8 char.state.RUNNING			=  0x00		// Also used for hanging on horizontal poles in MHZ
-constant u8 char.state.ROLLING			=  0x02		// For both rolling on ground and jumping
-constant u8 char.state.STANDING			=  0x05
-constant u8 char.state.BALANCING1		=  0x06
-constant u8 char.state.LOOKING_UP		=  0x07
-constant u8 char.state.COWERING			=  0x08
-constant u8 char.state.SPINDASH			=  0x09
-constant u8 char.state.BALANCING2		=  0x0c		// More panicky version of balancing
-constant u8 char.state.BRAKING			=  0x0d
-constant u8 char.state.LIFTED			=  0x0f		// Rotating while free falling, being lifted by propeller, etc.
-constant u8 char.state.STRAIGHTJUMP		=  0x10		// Straight jump e.g. from a vertical spring
-constant u8 char.state.HOLDING_ON		=  0x11		// Holding vertically, used on HCZ breakable bars and in MHZ 2 post-boss cutscene
-constant u8 char.state.WIN_POSE			=  0x13
-constant u8 char.state.HANGING			=  0x14
-constant u8 char.state.BREATHE			=  0x15
-constant u8 char.state.DIED				=  0x18
-constant u8 char.state.GOT_HURT_PANIC	=  0x19		// With animated arms, used only in certain places (e.g. after snowboarding)
-constant u8 char.state.GOT_HURT			=  0x1a		// With unanimated arms, this is the default
-constant u8 char.state.FALLING_PANIC	=  0x1b		// Similar to the two above, used in HCZ waterslides
-constant u8 char.state.DISAPPEARED		=  0x1c		// Used directly after entering a Giant Ring and inside a CNZ cannon; hides the shield as well
-constant u8 char.state.TRANSFORMING		=  0x1f		// Super or hyper transformation
+	// State constants
+	constant u8 char.state.RUNNING			=  0x00			// Also used for hanging on horizontal poles in MHZ
+	constant u8 char.state.RUNNING2			=  0x01
+	constant u8 char.state.ROLLING			=  0x02			// For both rolling on ground and jumping
+	constant u8 char.state.ROLLING2			=  0x03			// Identical to 0x02
+	constant u8 char.state.PUSHING			=  0x04
+	constant u8 char.state.STANDING			=  0x05
+	constant u8 char.state.BALANCING1		=  0x06
+	constant u8 char.state.LOOKING_UP		=  0x07
+	constant u8 char.state.COWERING			=  0x08
+	constant u8 char.state.SPINDASH			=  0x09
+	// 0x0a is unused
+	constant u8 char.state.PULLEY			=  0x0b
+	constant u8 char.state.BALANCING2		=  0x0c			// More panicky version of balancing
+	constant u8 char.state.BRAKING			=  0x0d
+	constant u8 char.state.GRABBED			=  0x0e			// Used when the spider badnik in flying battery picks up the player character
+	constant u8 char.state.LIFTED			=  0x0f			// Rotating while free falling, being lifted by propeller, etc.
+	constant u8 char.state.STRAIGHTJUMP		=  0x10			// Straight jump e.g. from a vertical spring
+	constant u8 char.state.HOLDING_ON		=  0x11			// Holding vertically, used on HCZ breakable bars and in MHZ 2 post-boss cutscene
+	// 0x12 is unused
+	constant u8 char.state.WIN_POSE			=  0x13
+	constant u8 char.state.HANGING			=  0x14
+	constant u8 char.state.BREATHE			=  0x15
+	constant u8 char.state.DIED_GREY		=  0x16			// Actually unused
+	constant u8 char.state.DROWNED			=  0x17
+	constant u8 char.state.DIED				=  0x18
+	constant u8 char.state.GOT_HURT_PANIC	=  0x19			// With animated arms, used only in certain places (e.g. after snowboarding)
+	constant u8 char.state.GOT_HURT			=  0x1a			// With unanimated arms, this is the default
+	constant u8 char.state.FALLING_PANIC	=  0x1b			// Similar to the two above, used in HCZ waterslides
+	constant u8 char.state.DISAPPEARED		=  0x1c			// Used directly after entering a Giant Ring and inside a CNZ cannon; hides the shield as well
+	// 0x1e is unused
+	constant u8 char.state.TRANSFORMING		=  0x1f			// Super or hyper transformation
 
-constant u8 char.state.SONIC_DROPDASH	=  0x20		// Sonic with charged drop dash (only in standalone!)
-constant u8 char.state.SONIC_HANGON		=  0x22		// Sonic hanging with Tails
-constant u8 char.state.TAILS_FLYDOWN	=  0x20		// Tails flying down
-constant u8 char.state.TAILS_FLYUP		=  0x21		// Tails flying up
-constant u8 char.state.TAILS_CARRYDOWN	=  0x22		// Tails flying down, carrying other player
-constant u8 char.state.TAILS_CARRYUP	=  0x23		// Tails flying up, carrying other player
-constant u8 char.state.TAILS_FLYTIRED	=  0x24		// Tails flying tired
-constant u8 char.state.TAILS_SWIMDOWN	=  0x25		// Tails swimming down
-constant u8 char.state.TAILS_SWIMUP		=  0x26		// Tails swimming up
-constant u8 char.state.TAILS_SWIMCARRY	=  0x27		// Tails swimming, carrying other player
-constant u8 char.state.TAILS_SWIMTIRED	=  0x28		// Tails swimming tired
-constant u8 char.state.TAILS_TRANSFORM	=  0x29		// Super transformation for Tails
-constant u8 char.state.KNUX_FLYCLIMB	=  0x20		// Knuckles flying or climbing
-constant u8 char.state.KNUX_FALLING		=  0x21		// Knuckles falling after flight
-constant u8 char.state.KNUX_STANDUP		=  0x22		// Knuckles standing up after flying (when sliding)
-constant u8 char.state.KNUX_STANDUP2	=  0x23		// Knuckles standing up after flying and falling
+	// Character specific state constants
+	constant u8 char.state.SONIC_WHISTLE	=  0x0a			// Actually unused
+	constant u8 char.state.SONIC_DROPDASH	=  0x20			// Sonic with charged drop dash (only in standalone!)
+	constant u8 char.state.SONIC_HANGON		=  0x22			// Sonic hanging with Tails
+
+	constant u8 char.state.TAILS_RUNNING3	=  0x1f
+	constant u8 char.state.TAILS_FLYDOWN	=  0x20			// Tails flying down
+	constant u8 char.state.TAILS_FLYUP		=  0x21			// Tails flying up
+	constant u8 char.state.TAILS_CARRYDOWN	=  0x22			// Tails flying down, carrying other player
+	constant u8 char.state.TAILS_CARRYUP	=  0x23			// Tails flying up, carrying other player
+	constant u8 char.state.TAILS_FLYTIRED	=  0x24			// Tails flying tired
+	constant u8 char.state.TAILS_SWIMDOWN	=  0x25			// Tails swimming down
+	constant u8 char.state.TAILS_SWIMUP		=  0x26			// Tails swimming up
+	constant u8 char.state.TAILS_SWIMCARRY	=  0x27			// Tails swimming, carrying other player
+	constant u8 char.state.TAILS_SWIMTIRED	=  0x28			// Tails swimming tired
+	constant u8 char.state.TAILS_TRANSFORM	=  0x29			// Super transformation for Tails
+
+	constant u8 char.state.KNUX_FLYCLIMB	=  0x20			// Knuckles flying or climbing
+	constant u8 char.state.KNUX_FALLING		=  0x21			// Knuckles falling after flight
+	constant u8 char.state.KNUX_STANDUP		=  0x22			// Knuckles standing up after flying (when sliding)
+	constant u8 char.state.KNUX_STANDUP2	=  0x23			// Knuckles standing up after flying and falling
+	constant u8 char.state.KNUX_WIN_POSE_BS	=  0x24			// Knuckles' win pose during the result screen for Blue Sphere mode
+
 
 // Animation
-define char.animation.sprite	=  u8[A0 + 0x22]	// Currently shown animation sprite
-define char.animation.frame		=  u8[A0 + 0x23]	// Frame index inside current animation
-define char.animation.timer		=  u8[A0 + 0x24]	// Timer between frames (counting down)
+define char.animation.sprite	=  u8[A0 + 0x22]			// Currently shown animation sprite
+define char.animation.frame		=  u8[A0 + 0x23]			// Frame index inside current animation
+define char.animation.timer		=  u8[A0 + 0x24]			// Timer between frames (counting down)
 
 // Character specific
-define sonic.dropdash_counter	=  u8[A0 + 0x25]	// Used for Drop Dash; 0x00 = off, 0x01..0x14 = charging, 0x15 = fully charged
-define tails.flight_countdown	=  u8[A0 + 0x25]	// Timeout until Tails gets tired
-define knuckles.glide_direction	=  u8[A0 + 0x25]	// See "UpdateKnucklesGlide()"
+define sonic.dropdash_counter	=  u8[A0 + 0x25]			// Used for Drop Dash; 0x00 = off, 0x01..0x14 = charging, 0x15 = fully charged
+define tails.flight_countdown	=  u8[A0 + 0x25]			// Timeout until Tails gets tired
+define knuckles.glide_direction	=  u8[A0 + 0x25]			// See "UpdateKnucklesGlide()"
 
 // Rotation
-define char.rotation			=  u8[A0 + 0x26]	// Clockwise angle: 0x00 = upright, 0x40 = left wall, 0x80 = upside down, 0xc0 = right wall
-define char.rotation.x			=  u8[A0 + 0x27]	// Rotation around screen x vector
+define char.rotation.both		= u16[A0 + 0x26]
+define char.rotation			=  u8[A0 + 0x26]			// Clockwise angle: 0x00 = upright, 0x40 = left wall, 0x80 = upside down, 0xc0 = right wall
+define char.rotation.x			=  u8[A0 + 0x27]			// Rotation around screen x vector
+
 
 // Flags
-define char.flags					=  u8[A0 + 0x2a]
-constant u8 char.flag.FACING_LEFT	=  0x01			// Facing left
-constant u8 char.flag.IN_AIR		=  0x02			// In the air (not touching ground)
-constant u8 char.flag.ROLLING		=  0x04			// Rolling (either on ground or in the air)
-constant u8 char.flag.ON_OBJECT		=  0x08			// On an object (platform, bridge, corkscrew, monitor, etc.); the object's address is stored in "char.object_standing_on"
-constant u8 char.flag.CONTROL_LOCK	=  0x10			// Control lock (after rolling then jumping)
-constant u8 char.flag.PUSHING		=  0x20			// Pushing against wall or an object
-constant u8 char.flag.UNDERWATER	=  0x40			// Under water
+define char.flags				=  u8[A0 + 0x2a]
+
+	constant u8 char.flag.FACING_LEFT	=  0x01				// Facing left
+	constant u8 char.flag.IN_AIR		=  0x02				// In the air (not touching ground)
+	constant u8 char.flag.ROLLING		=  0x04				// Rolling (either on ground or in the air)
+	constant u8 char.flag.ON_OBJECT		=  0x08				// On an object (platform, bridge, corkscrew, monitor, etc.); the object's address is stored in "char.object_standing_on"
+	constant u8 char.flag.CONTROL_LOCK	=  0x10				// Control lock (after rolling then jumping)
+	constant u8 char.flag.PUSHING		=  0x20				// Pushing against wall or an object
+	constant u8 char.flag.UNDERWATER	=  0x40				// Under water
+
 
 // Bonus effects
-define char.bonus_effect				=  u8[A0 + 0x2b]
-constant u8 char.bonus.ANY_SHIELD		=  0x01
-constant u8 char.bonus.INVINCIBLE		=  0x02
-constant u8 char.bonus.SPEED_UP			=  0x04
-constant u8 char.bonus.SHIELD_FIRE		=  0x10
-constant u8 char.bonus.SHIELD_LIGHTNING	=  0x20
-constant u8 char.bonus.SHIELD_BUBBLE	=  0x40
-constant u8 char.bonus.INFINITE_INERTIA	=  0x80
+define char.bonus_effect		=  u8[A0 + 0x2b]
+
+	constant u8 char.bonus.ANY_SHIELD		=  0x01			// Also sometimes used for classic shield in standalone
+	constant u8 char.bonus.INVINCIBLE		=  0x02
+	constant u8 char.bonus.SPEED_UP			=  0x04			// Also used for slow shoes in competition mode
+	constant u8 char.bonus.DEFLECTABLE		=  0x08			// Seems unused for player characters? Harmful objects use it to denote projectiles that can be deflected by shields
+	constant u8 char.bonus.SHIELD_FIRE		=  0x10
+	constant u8 char.bonus.SHIELD_LIGHTNING	=  0x20
+	constant u8 char.bonus.SHIELD_BUBBLE	=  0x40
+	constant u8 char.bonus.INFINITE_INERTIA	=  0x80
+	constant u8 char.bonus.ELEMENTAL_SHIELDS=  0x70			// Any of the three elemental shields
+	constant u8 char.bonus.ALL_SHIELDS		=  0x71			// Any of the four shields
+
 
 // Drowning countdown
-define char.drown_countdown		=  u8[A0 + 0x2c]	// In seconds; when not in water (or immune), this is 30; terror music starts below 12
+define char.drown_countdown		=  u8[A0 + 0x2c]			// In seconds; when not in water (or immune), this is 30; terror music starts below 12
 
-define char.flags2d				=  u8[A0 + 0x2d]	// Another set of flags; 0x80 is set on LBZ cylinders, 0x04 is set by the MHZ vine wraps
+define char.flags2d				=  u8[A0 + 0x2d]			// Another set of flags; 0x80 is set on LBZ cylinders, 0x04 is set by the MHZ vine wraps
 
 // Control flags:
 //  0x01 = Can't be controlled directly, but maybe by an object (used e.g. when hanging or when hit by mole mushroom)
@@ -160,38 +205,36 @@ define char.flags2d				=  u8[A0 + 0x2d]	// Another set of flags; 0x80 is set on 
 //  0x80 = No collision interaction (e.g. during Super transformation, in LBZ 2 mid-boss cutscene, for AI Tails flying in, etc.)
 define char.control_flags		=  u8[A0 + 0x2e]
 
-define char.double_jump_state	=  u8[A0 + 0x2f]	// Usually 0, except shield power was used
-define char.hlock_countdown		= u16[A0 + 0x32]	// Countdown to 0 e.g. after hitting a horizontal spring to shortly ignore left/right controls
+define char.double_jump_state	=  u8[A0 + 0x2f]			// Usually 0, except shield power was used
+define char.hlock_countdown		= u16[A0 + 0x32]			// Countdown to 0 e.g. after hitting a horizontal spring to shortly ignore left/right controls
 
 // Bonus countdowns
-define char.invuln.countdown	=  u8[A0 + 0x34]	// Short invulnerablity time after getting hit, in frames
-define char.invinc.countdown	=  u8[A0 + 0x35]	// Incibility time, gets decreased every 8 frames
+define char.invuln.countdown	=  u8[A0 + 0x34]			// Short invulnerability time after getting hit, in frames
+define char.invinc.countdown	=  u8[A0 + 0x35]			// Invincibility time, gets decreased every 8 frames
 define char.speedup.countdown	=  u8[A0 + 0x36]
-define char.protection_flag		=  u8[A0 + 0x37]	// 0x80 is set by objects preventing Sonic from damage (like MGZ spinning top)
+define char.protection_flag		=  u8[A0 + 0x37]			// 0x80 is set by objects preventing Sonic from damage (like MGZ spinning top)
 
 // Character
-define char.character			=  u8[A0 + 0x38]	// 0 = Sonic, 1 = Tails, 2 = Knuckles (see CHARACTER_* constants)
+define char.character			=  u8[A0 + 0x38]			// 0 = Sonic, 1 = Tails, 2 = Knuckles (see CHARACTER_* constants)
 
 // Camera
-define char.look_up_down_timer 	=  u8[A0 + 0x39]	// Timer for looking up/down, before camera actually moves
+define char.look_up_down_timer 	=  u8[A0 + 0x39]			// Timer for looking up/down, before camera actually moves
 
 // Ground sensors
 define char.angle_sensor_1		=  u8[A0 + 0x3a]
 define char.angle_sensor_2		=  u8[A0 + 0x3b]
 
-define char.on_convex_surface	=  u8[A0 + 0x3c]	// Flag set when sticking to a convex surface, e.g. the spinning wheels in CNZ
-define char.spindash			=  u8[A0 + 0x3d]	// Set to 0x01 while charging spindash
-define char.spindash_charge		= u16[A0 + 0x3e]	// Additional charge after second key press
-define char.jumping				=  u8[A0 + 0x40]	// Jumping flag: 0x01 in air when button press does something (shield power, flying, gliding)
+define char.on_convex_surface	=  u8[A0 + 0x3c]			// Flag set when sticking to a convex surface, e.g. the spinning wheels in CNZ
+define char.spindash			=  u8[A0 + 0x3d]			// Set to 0x01 while charging spindash
+define char.spindash_charge		= u16[A0 + 0x3e]			// Additional charge after second key press
+define char.jumping				=  u8[A0 + 0x40]			// Jumping flag: 0x01 in air when button press does something (shield power, flying, gliding)
 
-define char.object_standing_on	= u16[A0 + 0x42]	// RAM address of object Sonic is standing on
+define char.object_standing_on	= u16[A0 + 0x42]			// RAM address of object Sonic is standing on
 
 // Default hitbox extends
 define char.hitbox.default.y	=  u8[A0 + 0x44]
 define char.hitbox.default.x	=  u8[A0 + 0x45]
 
 define char.layer_flags			= u16[A0 + 0x46]
-define char.layer_flags1		=  u8[A0 + 0x46]	// Bit 0x02 = current layer (for loopings etc.)
-define char.layer_flags2		=  u8[A0 + 0x47]	// Bit 0x02 = current layer (once more)
-
-
+define char.layer_flags1		=  u8[A0 + 0x46]			// Bit 0x02 = current layer (for loopings etc.)
+define char.layer_flags2		=  u8[A0 + 0x47]			// Bit 0x02 = current layer (once more)

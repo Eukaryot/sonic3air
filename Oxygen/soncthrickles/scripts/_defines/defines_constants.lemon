@@ -11,19 +11,20 @@
 // Characters                                            //
 //-------------------------------------------------------//
 
-// Single characters
-constant u8 CHARACTER_SONIC			= 0
-constant u8 CHARACTER_TAILS			= 1
-constant u8 CHARACTER_KNUCKLES		= 2
+// Single characters (see char.character)
+constant u8 CHARACTER_SONIC				= 0
+constant u8 CHARACTER_TAILS				= 1
+constant u8 CHARACTER_KNUCKLES			= 2
 
-// Character combinations
-constant u16 CHARS_SONIC_AND_TAILS	= 0
-constant u16 CHARS_SONIC_ALONE		= 1
-constant u16 CHARS_TAILS_ALONE		= 2
-constant u16 CHARS_KNUCKLES_ALONE	= 3
+// Character combinations (see global.characters)
+constant u16 CHARS_SONIC_AND_TAILS		= 0
+constant u16 CHARS_SONIC_ALONE			= 1
+constant u16 CHARS_TAILS_ALONE			= 2
+constant u16 CHARS_KNUCKLES_ALONE		= 3
+constant u16 CHARS_KNUCKLES_AND_TAILS	= 4		// Only used in standalone
 
 // Character abilities
-constant u8 DROPDASH_FULLCHARGE		= 0x15
+constant u8 DROPDASH_FULLCHARGE			= 0x15
 
 
 
@@ -74,46 +75,101 @@ constant u8 CONTROL_ABC		= 0x70	// Any of the three buttons
 // Music and sound effects                               //
 //-------------------------------------------------------//
 
-constant u8 MUSIC_MINIBOSS		= 0x18
-constant u8 MUSIC_MAINBOSS		= 0x19
-constant u8 MUSIC_GAMEOVER		= 0x27
-constant u8 MUSIC_LEVELCLEAR	= 0x29
-constant u8 MUSIC_EXTRALIFE		= 0x2a
-constant u8 MUSIC_CHAOSEMERALD	= 0x2b
-constant u8 MUSIC_MINIBOSS_2	= 0x2e	// Identical to 0x18
-constant u8 MUSIC_DROWNING		= 0x31
-constant u8 MUSIC_GAMECLEAR		= 0x32
+constant u8 MUSIC_AIZ1				= 0x01
+constant u8 MUSIC_AIZ2				= 0x02
+constant u8 MUSIC_HCZ1				= 0x03
+constant u8 MUSIC_HCZ2				= 0x04
+constant u8 MUSIC_MGZ1				= 0x05
+constant u8 MUSIC_MGZ2				= 0x06
+constant u8 MUSIC_CNZ1				= 0x07
+constant u8 MUSIC_CNZ2				= 0x08
+constant u8 MUSIC_FBZ1				= 0x09
+constant u8 MUSIC_FBZ2				= 0x0a
+constant u8 MUSIC_ICZ1				= 0x0b
+constant u8 MUSIC_ICZ2				= 0x0c
+constant u8 MUSIC_LBZ1				= 0x0d
+constant u8 MUSIC_LBZ2				= 0x0e
+constant u8 MUSIC_MHZ1				= 0x0f
+constant u8 MUSIC_MHZ2				= 0x10
+constant u8 MUSIC_SOZ1				= 0x11
+constant u8 MUSIC_SOZ2				= 0x12
+constant u8 MUSIC_LRZ1				= 0x13
+constant u8 MUSIC_LRZ2				= 0x14
+constant u8 MUSIC_SSZ				= 0x15
+constant u8 MUSIC_DEZ1				= 0x16
+constant u8 MUSIC_DEZ2				= 0x17
+constant u8 MUSIC_MINIBOSS			= 0x18
+constant u8 MUSIC_MAINBOSS			= 0x19
+constant u8 MUSIC_DDZ				= 0x1a
+constant u8 MUSIC_GLOWINGSPHERES	= 0x1b
+constant u8 MUSIC_SPECIALSTAGE		= 0x1c
+constant u8 MUSIC_SLOTMACHINE		= 0x1d
+constant u8 MUSIC_GUMBALLMACHINE	= 0x1e
+constant u8 MUSIC_KNUCKLES			= 0x1f
+constant u8 MUSIC_ALZ				= 0x20
+constant u8 MUSIC_BPZ				= 0x21
+constant u8 MUSIC_DPZ				= 0x22
+constant u8 MUSIC_CGZ				= 0x23
+constant u8 MUSIC_EMZ				= 0x24
+constant u8 MUSIC_TITLESCREEN		= 0x25
+constant u8 MUSIC_ENDING			= 0x26
+constant u8 MUSIC_GAMEOVER			= 0x27
+constant u8 MUSIC_CONTINUE			= 0x28
+constant u8 MUSIC_LEVELCLEAR		= 0x29
+constant u8 MUSIC_EXTRALIFE			= 0x2a
+constant u8 MUSIC_CHAOSEMERALD		= 0x2b
+constant u8 MUSIC_INVINCIBLE		= 0x2c
+constant u8 MUSIC_COMPETITIONMENU	= 0x2d
+constant u8 MUSIC_MINIBOSS_2		= 0x2e		// Identical to 0x18
+constant u8 MUSIC_DATASELECT		= 0x2f
+constant u8 MUSIC_BIGARMS			= 0x30
+constant u8 MUSIC_DROWNING			= 0x31
+constant u8 MUSIC_GAMECLEAR			= 0x32
+constant u8 MUSIC_CREDITSMEDLEY		= 0xdc
 
-constant u8 SFX_RING			= 0x33	// Alternating between left and right channel
-constant u8 SFX_RING_ALT		= 0x34	// Alternative ring sfx, not alternating
-constant u8 SFX_BRAKE			= 0x36
-constant u8 SFX_HITSPIKES		= 0x37
-constant u8 SFX_WATERSPLASH		= 0x39
-constant u8 SFX_DROWN			= 0x3b
-constant u8 SFX_ROLL			= 0x3c
-constant u8 SFX_POP				= 0x3d
-constant u8 SFX_FIRESHIELD		= 0x3e
-constant u8 SFX_BUBBLESHIELD	= 0x3f
-constant u8 SFX_LIGHTNINGSHIELD	= 0x41
-constant u8 SFX_INSTASHIELD		= 0x42
-constant u8 SFX_FIRESHIELDDASH	= 0x43
-constant u8 SFX_BUBBLEBOUNCE	= 0x44
-constant u8 SFX_LIGHTNINGJUMP	= 0x45
-constant u8 SFX_GRAB			= 0x4a
-constant u8 SFX_BOMBFALL		= 0x51
-constant u8 SFX_SPIKESMOVE		= 0x52
-constant u8 SFX_COLLAPSE		= 0x59
-constant u8 SFX_CLICK			= 0x5b
-constant u8 SFX_JUMP			= 0x62
-constant u8 SFX_SUPERTRANSFORM	= 0x9f
-constant u8 SFX_UNDERWATER_BELL	= 0xa9
-constant u8 SFX_SPINDASH_CHARGE	= 0xab
-constant u8 SFX_SPRING			= 0xb1
-constant u8 SFX_SPINDASH_RELEASE= 0xb6
-constant u8 SFX_SPILLRINGS		= 0xb9
+#if STANDALONE
+	// The following only applies in standalone
+	constant u8 MUSIC_SUPER					= 0xf0		// Super transformation theme
+	constant u8 MUSIC_BOSS_S1				= 0xf2		// Boss theme from Sonic 1
+	constant u8 MUSIC_BOSS_S2				= 0xf3		// Boss theme from Sonic 2
+	constant u8 MUSIC_KNUCKLES_FORCED_S3	= 0xf4		// Forced to play the Sonic 3 version of Knuckles' theme, regardless of menu setting
+	constant u8 MUSIC_KNUCKLES_FORCED_SK	= 0xf5		// Forced to play the Sonic & Knuckles version of Knuckles' theme, regardless of menu setting
+	constant u8 MUSIC_MINIBOSS_FORCED_S3	= 0xf6		// Forced to play the Sonic 3 version of the miniboss theme, regardless of menu setting
+	constant u8 MUSIC_MINIBOSS_FORCED_SK	= 0xf7		// Forced to play the Sonic & Knuckles version of the miniboss theme, regardless of menu setting
+														// 0xf8 is used for special stage music in Blue Spheres game mode
+	constant u8 MUSIC_KNUCKLES_FORCED_PROTO	= 0xf9		// Forced to play the Sonic 3 prototype version of the miniboss theme, regardless of menu setting
+#endif
 
-constant u8 MUSIC_CTRL_FADEOUT	= 0xe1
-constant u8 MUSIC_CTRL_STOP		= 0xe2
+constant u8 SFX_RING				= 0x33		// Alternating between left and right channel
+constant u8 SFX_RING_ALT			= 0x34		// Alternative ring sfx, not alternating
+constant u8 SFX_BRAKE				= 0x36
+constant u8 SFX_HITSPIKES			= 0x37
+constant u8 SFX_WATERSPLASH			= 0x39
+constant u8 SFX_DROWN				= 0x3b
+constant u8 SFX_ROLL				= 0x3c
+constant u8 SFX_POP					= 0x3d
+constant u8 SFX_FIRESHIELD			= 0x3e
+constant u8 SFX_BUBBLESHIELD		= 0x3f
+constant u8 SFX_LIGHTNINGSHIELD		= 0x41
+constant u8 SFX_INSTASHIELD			= 0x42
+constant u8 SFX_FIRESHIELDDASH		= 0x43
+constant u8 SFX_BUBBLEBOUNCE		= 0x44
+constant u8 SFX_LIGHTNINGJUMP		= 0x45
+constant u8 SFX_GRAB				= 0x4a
+constant u8 SFX_BOMBFALL			= 0x51
+constant u8 SFX_SPIKESMOVE			= 0x52
+constant u8 SFX_COLLAPSE			= 0x59
+constant u8 SFX_CLICK				= 0x5b
+constant u8 SFX_JUMP				= 0x62
+constant u8 SFX_SUPERTRANSFORM		= 0x9f
+constant u8 SFX_UNDERWATER_BELL		= 0xa9
+constant u8 SFX_SPINDASH_CHARGE		= 0xab
+constant u8 SFX_SPRING				= 0xb1
+constant u8 SFX_SPINDASH_RELEASE	= 0xb6
+constant u8 SFX_SPILLRINGS			= 0xb9
+
+constant u8 MUSIC_CTRL_FADEOUT		= 0xe1
+constant u8 MUSIC_CTRL_STOP			= 0xe2
 
 
 
