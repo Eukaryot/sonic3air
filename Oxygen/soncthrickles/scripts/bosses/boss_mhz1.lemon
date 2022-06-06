@@ -85,7 +85,6 @@ function void fn075220()
 	}
 
 	Kosinski.addToDMAQueue(0x1680ca, 0x75a0)
-
 	Kosinski.addToDMAQueue(0x16908c, 0x93e0)
 
 	addPatternLoadingCue(0x075f48)
@@ -160,6 +159,28 @@ function void fn075356()
 	objA0.base_state = 0x08
 	objA0.animation.sprite = 5
 	objA0.countdown_value = 0x4f
+
+#if STANDALONE
+	// Fix for jump in boss movement, #contributed by HazelSpooder
+	if (objA0.value3b == 0)
+	{
+		// Ignore first movements, the original countdown time is correct in that case
+		objA0.value3b = 1
+	}
+	else
+	{
+		// For the later movements, we need to add some extra movement time to avoid a sudden jump when reaching the log
+		if (isMainCharacter(CHARACTER_KNUCKLES))
+		{
+			objA0.countdown_value += getScreenExtend() / 2
+		}
+		else
+		{
+			objA0.countdown_value += 4		// Fix for a jump for the other characters (this was in the original game already)
+		}
+	}
+#endif
+
 	objA0.countdown_callback = 0x0753a4
 	u16[0xffffee0e] = 0x6000
 	screenmover_target.right = 0x6000
@@ -394,8 +415,8 @@ function void fn0755ae()
 		objA0.flags38 &= ~0x40
 		objA0.position.y.u16 = u16[A0 + 0x3c]
 		u16[A0 + 0x16] = 0
-		objA0.velocity.y = 0
 		objA0.velocity.x = 0x0400
+		objA0.velocity.y = 0
 		objA0.countdown_value = 0x2a
 		objA0.countdown_callback = 0x075330
 		objA0.animation.frame = 0
