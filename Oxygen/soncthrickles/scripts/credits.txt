@@ -1,0 +1,18 @@
+
+MAIN SONIC 3 A.I.R. SCRIPT DEVELOPMENT
+
+ -> The Sonic 3 A.I.R. scripts are based on a conversion of the 68K machine code in the original Sonic 3 & Knuckles ROM.
+
+ -> This conversion and subsequent manual code touch-ups was done by Eukaryot, as well as the addition of code changes
+	to make the scripts run in the Oxygen Engine, together with bug fixes and new features for Sonic 3 A.I.R.
+
+
+
+COMMUNITY CONTRIBUTIONS
+
+ -> Additional code touch-ups and documentation improvements were added by Vinegar, from his fork at:
+	https://github.com/vinegar97/sonic3air
+
+ -> Several bug fixes were provided by members of the Sonic 3 A.I.R. community, these are marked in the scripts with
+	a commented including "#contributed" and can be found by searching for that tag
+
