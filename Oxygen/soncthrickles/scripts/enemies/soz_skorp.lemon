@@ -43,8 +43,7 @@ function void fn08e670()
 	objA0.countdown_value = objA0.subtype2c - 1
 	u16[A0 + 0x3a] = objA0.subtype2c * 2 - 1
 
-	A2 = 0x08ea5a
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x08ea5a)
 }
 
 
@@ -83,7 +82,7 @@ function void fn08e6b8()
 function void fn08e706()
 {
 	objA0.velocity.x = -objA0.velocity.x
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.countdown_value = u16[A0 + 0x3a]
 }
 
@@ -159,7 +158,7 @@ function void fn08e78c()
 	{
 		objA0.animation.sprite = 4
 		objA0.sprite_priority = 0x0100
-		u8[A0 + 0x28] = 0x87
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.6x6)
 	}
 
 	fn08e982()

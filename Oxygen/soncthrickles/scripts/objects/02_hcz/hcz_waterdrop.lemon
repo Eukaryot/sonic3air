@@ -12,7 +12,7 @@
 function void fn03827c()
 {
 	objA0.mapping_offset = 0x23794e
-	objA0.sprite_attributes = 0x235c
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x035c)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 8
@@ -46,7 +46,7 @@ function void fn0382ba()
 				}
 
 				objA1.update_address = 0x0382fc
-				u8[A1 + 0x28] = 0xc7
+				objA1.collision_attributes = (collision.flag.SPECIAL | collision.size.6x6)
 				D0 = 0
 			}
 		}
@@ -113,8 +113,8 @@ function void fn038336()
 //# address-hook(0x038382) end(0x0383a8)
 function void fn038382()
 {
-	if (u8[A2 + 0x20] == 0x05)
-		u8[A2 + 0x21] = 0
+	if (u8[A2 + 0x20] == char.state.STANDING)
+		u8[A2 + 0x21] = char.state.RUNNING
 
 	objA0.state = 0x01
 	objA0.update_address = 0x038336

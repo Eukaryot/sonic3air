@@ -34,12 +34,12 @@ function void CNZBarberPole.UpdateVariantLeftToRight()
 {
 	A2 = A0 + 0x30
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn033392()
 
 	A2 += 6
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn033392()
 
 	CheckForUnloadObject()
@@ -49,8 +49,10 @@ function void CNZBarberPole.UpdateVariantLeftToRight()
 //# address-hook(0x033392) end(0x0335a6)
 function void fn033392()
 {
+	u8 bit = (1 << D6.u8)
+
 	D0 = 0
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if ((u8[A1 + 0x2a] & 0x08) == 0)
 		{
@@ -109,7 +111,7 @@ function void fn033392()
 
 	if (u16[A2 + 0x04] == 0 && abs(s16[A1 + 0x1c]) < 0x0118)
 	{
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 	else if ((u8[A1 + 0x2a] & 0x02) == 0)
 	{
@@ -137,10 +139,10 @@ function void fn033392()
 					D0.u16 = 0x80
 				}
 
-				u16[A1 + 0x0a] &= 0x7fff
+				objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 				if (D0.u8 < 0x34)
 				{
-					u16[A1 + 0x0a] |= 0x8000
+					objA1.sprite_attributes |= sprite_attribute.PRIORITY
 				}
 				if (u16[A2 + 0x04] != 0)
 				{
@@ -173,11 +175,11 @@ function void fn033392()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
-	u16[A1 + 0x0a] &= 0x7fff
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 
 
@@ -186,12 +188,12 @@ function void CNZBarberPole.UpdateVariantRightToLeft()
 {
 	A2 = A0 + 0x30
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn0335c4()
 
 	A2 += 6
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn0335c4()
 
 	CheckForUnloadObject()
@@ -201,8 +203,10 @@ function void CNZBarberPole.UpdateVariantRightToLeft()
 //# address-hook(0x0335c4) end(0x0337d6)
 function void fn0335c4()
 {
+	u8 bit = (1 << D6.u8)
+
 	D0 = 0
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if ((u8[A1 + 0x2a] & 0x08) == 0)
 		{
@@ -261,7 +265,7 @@ function void fn0335c4()
 
 	if (u16[A2 + 0x04] == 0 && abs(s16[A1 + 0x1c]) < 0x0118)
 	{
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 	else if ((u8[A1 + 0x2a] & 0x02) == 0)
 	{
@@ -289,10 +293,10 @@ function void fn0335c4()
 					D0.u16 = 0x80
 				}
 
-				u16[A1 + 0x0a] &= 0x7fff
+				objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 				if (D0.u8 >= 0x4c)
 				{
-					u16[A1 + 0x0a] |= 0x8000
+					objA1.sprite_attributes |= sprite_attribute.PRIORITY
 				}
 				if (u16[A2 + 0x04] != 0)
 				{
@@ -326,21 +330,23 @@ function void fn0335c4()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
-	u16[A1 + 0x0a] &= 0x7fff
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 
 
 //# address-hook(0x0337d8) end(0x033834)
 function void fn0337d8()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A1 + 0x2a] & 0x08)
 	{
 		A3 = 0xffff0000 + u16[A1 + 0x42]
-		u8[A3 + 0x2a] &= ~(1 << D6.u8)
+		u8[A3 + 0x2a] &= ~bit
 	}
 
 	u16[A1 + 0x42] = A0.u16
@@ -356,7 +362,7 @@ function void fn0337d8()
 		A0 = backupA0
 	}
 
-	u8[A1 + 0x2a] |= 0x08
-	u8[A1 + 0x2a] &= ~0x02
-	objA0.flags2a |= (1 << D6.u8)
+	u8[A1 + 0x2a] |= char.flag.ON_OBJECT
+	u8[A1 + 0x2a] &= ~char.flag.IN_AIR
+	objA0.flags2a |= bit
 }

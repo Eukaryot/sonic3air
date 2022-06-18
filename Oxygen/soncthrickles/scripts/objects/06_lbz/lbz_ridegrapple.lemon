@@ -26,20 +26,20 @@ function void fn0264c0()
 	D0.u16 <<= 2
 	objA0.countdown_callback = u32[0x02648c + D0.s16]
 	objA0.mapping_offset = 0x026930
-	objA0.sprite_attributes = 0x2433
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0433)
 
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02668e
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u8[A1 + 0x04] = objA0.render_flags
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u8[A1 + 0x04] |= 0x40
-		u8[A1 + 0x07] = 0x10
-		u8[A1 + 0x06] = 0x20
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.render_flags = objA0.render_flags
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.render_flags |= render_flag.COMPOUND
+		objA1.box_size.x = 0x10
+		objA1.box_size.y = 0x20
 
 		D1 = 5
 		u16[A1 + 0x16] = 6
@@ -140,20 +140,21 @@ function void fn0266b0()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
 	{
+		// Check if jump button pressed
 		D0.u8 &= CONTROL_ABC
 		if (D0.u8 == 0)
 		{
-			if (D0 & 0x0400)
+			if (D0 & 0x0400)		// CONTROL_LEFT held
 			{
 				u8[A1 + 0x2a] |= 0x01
 			}
-			if (D0 & 0x0800)
+			if (D0 & 0x0800)		// CONTROL_RIGHT held
 			{
 				u8[A1 + 0x2a] &= ~0x01
 			}
 
 			objA0.flags2a = u8[A1 + 0x2a]
-			u8[A1 + 0x04] = (u8[A1 + 0x04] & ~char.flag.FACING_LEFT) | (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+			objA1.render_flags = (objA1.render_flags & ~char.flag.FACING_LEFT) | (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 			objA1.position.x.u16 = u16[A3 + 0x10]
 			objA1.position.y.u16 = u16[A3 + 0x14] + 0x24
 
@@ -163,15 +164,15 @@ function void fn0266b0()
 		{
 			u8[A1 + 0x2e] = 0
 			u8[A2] = 0
-			u8[A2 + 2] = (D0.u16 & 0x0f00) ? 0x3c : 0x12
+			u8[A2 + 2] = (D0.u16 & 0x0f00) ? 0x3c : 0x12		// Any direction held?
 
 			objA1.velocity.x = objA0.velocity.x
 			objA1.velocity.y = -0x380
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = 0x02
-			u8[A1 + 0x2a] |= 0x02
-			u8[A1 + 0x2a] |= 0x04
+			u8[A1 + 0x20] = char.state.ROLLING
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
+			u8[A1 + 0x2a] |= char.flag.ROLLING
 			u8[A1 + 0x40] = 0x01
 		}
 	}
@@ -401,7 +402,7 @@ function void fn02666a()
 	{
 		objA1.velocity.x = objA0.velocity.x
 		objA1.velocity.y = 0
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2e] = 0
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c

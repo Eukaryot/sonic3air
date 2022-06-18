@@ -39,14 +39,14 @@ function void fn0436a8()
 
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16
-				u32[A1 + 0x0c] = 0x043782
-				u16[A1 + 0x0a] = 0x40d3
-				u8[A1 + 0x04] |= 0x84
-				u16[A1 + 0x08] = 0x0300
-				u8[A1 + 0x07] = 0x20
-				u8[A1 + 0x06] = 0x20
-				u8[A1 + 0x28] = 0x99
-				u8[A1 + 0x2b] |= 0x10
+				objA1.mapping_offset = 0x043782
+				objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x00d3)
+				objA1.render_flags |= (render_flag.WORLD | render_flag.VISIBLE)
+				objA1.sprite_priority = 0x0300
+				objA1.box_size.x = 0x20
+				objA1.box_size.y = 0x20
+				objA1.collision_attributes = (collision.flag.THREAT | collision.size.32x8)
+				u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 				objA1.velocity.y = 0x0800
 				u16[A1 + 0x2e] = (objA0.flags2a & 0x01) ? 0x24 : 0x1c
 			}

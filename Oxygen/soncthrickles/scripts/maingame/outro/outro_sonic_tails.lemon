@@ -56,7 +56,7 @@ function void fn05d8bc()
 {
 	setupObjectAttributesFull(0x0600da)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.base_state = 0x02
 	fn05fe82()
 
@@ -64,7 +64,7 @@ function void fn05d8bc()
 	u8[0xfffffab8] = 0
 
 	A1 = 0xffffb000
-	u8[A1 + 0x04] &= ~0x04
+	objA1.render_flags &= ~render_flag.WORLD
 	u8[A1 + 0x0a] |= 0x80
 	u16[A1 + 0x1c] = 0x0800
 	objA1.state = char.state.LIFTED
@@ -104,7 +104,7 @@ function void fn05d8bc()
 		}
 		else
 		{
-			u8[0xffffb020] = 0
+			u8[0xffffb000 + 0x20] = 0
 			if (isMainCharacter(CHARACTER_TAILS))
 			{
 				fn05fcb4()
@@ -232,7 +232,7 @@ function void fn05da74()
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		D0.u8 -= 4
-		u8[0xffffcc0e] &= ~0x04
+		u8[0xffffcc0a + 0x04] &= ~0x04
 	}
 	u8[A1 + 0x43] = D0.u8
 	D1.u16 = objA1.position.y.u16 - D0.s16
@@ -247,10 +247,10 @@ function void fn05da74()
 		super.palettefx.state = 2
 		super.palettefx.frame = 30
 
-		u32[A1 + 0x0c] = (global.characters != CHARS_TAILS_ALONE) ? 0x146620 : 0x148eb8
+		objA1.mapping_offset = (global.characters != CHARS_TAILS_ALONE) ? 0x146620 : 0x148eb8
 	}
 
-	u8[A1 + 0x20] = 0x05
+	u8[A1 + 0x20] = char.state.STANDING
 	u8[A1 + 0x2e] = 0x83
 	fn05fd88()
 	fn05db2c()
@@ -379,7 +379,7 @@ function void fn05de80()
 	objA0.animation.sprite = 0x02
 	if (objA0.subtype2c == 0)
 	{
-		objA0.sprite_attributes = 0xc52e
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x052e)
 		objA0.sprite_priority = 0x0280
 		if (outro.ending_type < 0)
 		{
@@ -389,7 +389,7 @@ function void fn05de80()
 	}
 	else
 	{
-		objA0.sprite_attributes = 0x252e
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x052e)
 		objA0.sprite_priority = 0x0300
 	}
 }
@@ -492,7 +492,7 @@ function void fn05df58()
 function void fn05df80()
 {
 	setupObjectAttributesFull(0x060104)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05df98
 }
 
@@ -554,7 +554,7 @@ function void fn05dbf6()
 		objA0.base_state = 0x14
 		objA0.flags2a |= 0x80
 		u8[0xffffeec4] = 0xff
-		u8[0xffffb020] = 0
+		u8[0xffffb000 + 0x20] = 0
 
 		objA0.countdown_value = 0x8f
 	#if STANDALONE
@@ -629,8 +629,8 @@ function void fn05dca6()
 		return
 
 	objA0.base_state = 0x1a
-	objA0.sprite_attributes = 0x226e
-	objA0.render_flags |= 0x01
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x026e)
+	objA0.render_flags |= render_flag.FLIP_X
 	u8[A0 + 0x0a] &= ~0x80
 	objA0.flags38 |= 0x10
 	objA0.position.y.u16 -= 8
@@ -758,14 +758,14 @@ function void fn05dfee()
 	objA0.animation.sprite = 0x01
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x14
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.position.x.u16 = 0x0220 + getScreenExtend()
 	objA0.position.y.u16 = 0xb0
 	objA0.velocity.x = -0x100 - (getScreenExtend() * 0x40 / 40)		// Faster plane needed
 
 	fn06001e()
 
-	playMusic(0xdc)
+	playMusic(MUSIC_CREDITSMEDLEY)
 
 #if STANDALONE
 	// Reset frame counter so we can use it to get the current credits music playback position
@@ -847,7 +847,7 @@ function void fn05e0f8()
 {
 	objA0.base_state = 0x02
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = 0x84da
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04da)
 	objA0.sprite_priority = 0x0180
 	objA0.animation.sprite = 0x07
 	objA0.position.x.u16 = 0x01e0 + getScreenExtend() * 2
@@ -923,14 +923,14 @@ function void fn05e18a()
 function void fn05e1c2()
 {
 	objA0.base_state = 0x02
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.position.x.u16 = 0xc0 + getScreenExtend()
 	objA0.position.y.u16 = 0xe0
 	fn0685e2()
 
 	if (outro.ending_type != 2)
 	{
-		playMusic(0xdc)
+		playMusic(MUSIC_CREDITSMEDLEY)
 
 	#if STANDALONE
 		// Reset frame counter so we can use it to get the current credits music playback position
@@ -942,11 +942,11 @@ function void fn05e1c2()
 	}
 
 	A1 = 0xffffb000
-	u8[A1 + 0x04] |= render_flag.FLIP_X
-	u8[A1 + 0x2a] |= 0x01
+	objA1.render_flags |= render_flag.FLIP_X
+	u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	u8[A1 + 0x0a] &= ~0x80
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x20] = 0x05
+	u8[A1 + 0x20] = char.state.STANDING
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		A2 = 0xffffcc0a
@@ -978,7 +978,7 @@ function void fn05e1c2()
 //# address-hook(0x05e288) end(0x05e2bc)
 function void fn05e288()
 {
-	u8[0xffffcc0e] &= ~0x04
+	u8[0xffffcc0a + 0x04] &= ~0x04
 	fn0847e6()
 
 	UpdateMovementStraightSimple()
@@ -990,7 +990,7 @@ function void fn05e288()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = 0x58
-	u8[A1 + 0x20] = 0
+	u8[A1 + 0x20] = char.state.RUNNING
 	UpdatePlayer1SpritePatterns()
 }
 
@@ -1008,10 +1008,10 @@ function void fn05e2c2()
 	objA0.velocity.y = -0x600
 
 	A1 = 0xffffb000
-	u8[A1 + 0x04] &= ~render_flag.FLIP_X
-	u8[A1 + 0x2a] &= ~0x01
+	objA1.render_flags &= ~render_flag.FLIP_X
+	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	u8[A1 + 0x2e] = 0x81
-	u16[A1 + 0x20] = 0x0200
+	u16[A1 + 0x20] = 0x0200		// char.state.ROLLING, char.state.RUNNING
 	u32[0xffffcc0a] = 0
 
 	D0 = (global.characters == CHARS_TAILS_ALONE) ? 0 : (outro.ending_type < 0) ? 4 : 8
@@ -1030,7 +1030,7 @@ function void fn05e334()
 		return
 
 	objA0.mapping_offset = 0x0607e6
-	objA0.sprite_attributes = 0x4347
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0347)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x80
@@ -1069,7 +1069,7 @@ function void fn05e3c0()
 	objA0.countdown_value = 0x05
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 
 	A1 = 0xffffb000
@@ -1110,16 +1110,16 @@ function void fn05e412()
 		{
 			if (allocDynamicObjectStd())
 			{
-				u32[A1] = 0x05fcdc
+				objA1.update_address = 0x05fcdc
 			}
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 			fn05e3c0()
 		}
 		else
 		{
 			objA0.base_state = 0x0c
 			u8[A1 + 0x2e] = 0x81
-			u8[A1 + 0x20] = 0
+			u8[A1 + 0x20] = char.state.RUNNING
 			u16[A1 + 0x18] = 0x0800
 			u16[A1 + 0x1c] = 0x0800
 		}
@@ -1149,7 +1149,7 @@ function void fn05e474()
 
 	objA0.base_state = 0x10
 	objA0.animation.sprite = 0x02
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 
 	A1 = 0xffffb000
 	u8[A1 + 0x2e] = 0x83
@@ -1157,7 +1157,7 @@ function void fn05e474()
 
 	if (allocDynamicObjectStd())
 	{
-		u32[A1] = 0x05fcfc
+		objA1.update_address = 0x05fcfc
 		if (outro.ending_type != 0)
 		{
 			u8[A1 + 0x2c] = 0x02
@@ -1176,7 +1176,7 @@ function void fn05e4b6()
 		objA0.position.x.u16 = 0x0160 + getScreenExtend()
 		if (allocDynamicObjectStd())
 		{
-			u32[A1] = 0x05ef68
+			objA1.update_address = 0x05ef68
 		}
 	}
 	DrawObject()
@@ -1301,7 +1301,7 @@ function void fn05e612()
 {
 	objA0.update_address = 0x05e64a
 	objA0.mapping_offset = 0x060796
-	objA0.sprite_attributes = 0x62ff
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02ff)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x08
@@ -1361,7 +1361,7 @@ function void fn05eb72()
 {
 	// Sonic
 	objA0.mapping_offset = 0x06036e
-	objA0.sprite_attributes = 0x81e3
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x01e3)
 	objA0.animation.sprite = 0x0c
 }
 
@@ -1371,7 +1371,7 @@ function void fn05eb88()
 {
 	// Tails
 	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = 0x826e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
 	objA0.animation.sprite = 0x0b
 }
 
@@ -1431,7 +1431,7 @@ function void fn05ed4a()
 function void fn05edac()
 {
 	objA0.mapping_offset = 0x06068e
-	objA0.sprite_attributes = 0xe2ff
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x02ff)
 	objA0.sprite_priority = 0x0300
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
@@ -1456,7 +1456,7 @@ function void fn05edac()
 function void fn05edfe()
 {
 	objA0.update_address = 0x05eec4
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	u16[A0 + 0x3a] = camera.foreground.y.u16
 	u8[A0 + 0x0a] &= ~0x80
 }
@@ -1471,7 +1471,7 @@ function void fn05ee18()
 	objA0.animation.timer = D0.u8
 	if (global.characters == CHARS_KNUCKLES_ALONE)
 	{
-		objA0.render_flags |= 0x04
+		objA0.render_flags |= render_flag.WORLD
 	}
 }
 
@@ -1515,7 +1515,7 @@ function void fn05ee86()
 	D0.u16 <<= 2
 	u32[A0 + 0x30] = u32[0x05eeb8 + D0.s16]
 	objA0.update_address = 0x05ef5c
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	if (u8[A0 + 0x2d] != 0)
 	{
 		objA0.animation.timer = 0x0c
@@ -1530,7 +1530,7 @@ function void fn05eec4()
 	if (D0.s16 >= 0x10)
 	{
 		objA0.update_address = 0x05ef08
-		objA0.render_flags &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
 		objA0.velocity.y = 0x10
 		objA0.position.x.u16 = objA0.position.x.u16 - camera.foreground.x.u16 + 0x80
 		objA0.position.y.u16 = objA0.position.y.u16 - camera.foreground.y.u16 + 0x80
@@ -1643,7 +1643,7 @@ function void fn05f566()
 	setupObjectAttributesFull(0x06018e)
 
 	objA0.update_address = 0x05f5b4
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.position.x.u16 = 0x110 + getScreenExtend()
 	objA0.position.y.u16 = 0xf0
 	objA0.countdown_value = 0x04af
@@ -1686,7 +1686,7 @@ function void fn05f5de()
 {
 	setupObjectAttributesFull(0x06019a)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0108
 	objA0.countdown_value = 0xef
@@ -1699,7 +1699,7 @@ function void fn05f5de()
 	if (allocDynamicObjectStd())
 	{
 		u16[A1 + 0x46] = A1.u16
-		u32[A1] = 0x0862b4
+		objA1.update_address = 0x0862b4
 		u16[A1 + 0x10] = 0x0120
 		u16[A1 + 0x14] = 0x0124
 		u8[A1 + 0x2c] = 0x8a
@@ -1746,7 +1746,7 @@ function void fn05f690()
 {
 	setupObjectAttributesBasic(0x0601a6)
 	objA0.update_address = 0x01abc6
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 }
 
 
@@ -1754,7 +1754,7 @@ function void fn05f690()
 function void fn05f6a8()
 {
 	setupObjectAttributesBasic(0x0601ac)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f6c4
 	objA0.countdown_value = 119
 	fn05f6c4()
@@ -1812,7 +1812,7 @@ function void fn05f6fc()
 //# address-hook(0x05fc8e) end(0x05fc98)
 function void fn05fc8e()
 {
-	u8[0xffffb020] = 0
+	u8[0xffffb000 + 0x20] = 0
 	super.palettefx.frame = 36
 	super.active = 1
 	fn05fc9e()
@@ -1824,7 +1824,7 @@ function void fn05fc9e()
 {
 	super.palettefx.state = 0xff
 	super.palettefx.timer = 0
-	u32[0xffffb00c] = 0x146816
+	u32[0xffffb000 + 0x0c] = 0x146816
 }
 
 
@@ -1836,7 +1836,7 @@ function void fn05fcb4()
 {
 	super.palettefx.state = 0xff
 	super.palettefx.frame = 0
-	u8[0xfffff668] = 0
+	super.palettefx.frame.tails = 0
 	super.active.tails = 0x01
 }
 
@@ -1952,7 +1952,7 @@ function void fn05fde0()
 //# address-hook(0x05fe10) end(0x05fe18)
 function void fn05fe10()
 {
-	u32[0xffffb00c] = 0x146620
+	u32[0xffffb000 + 0x0c] = 0x146620
 	UnloadObject()
 }
 
@@ -2007,21 +2007,21 @@ function void fn08648c()
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
 	global.move.deceleration = 0xc0
-	u8[0xffffb020] = 0x1f
+	u8[0xffffb000 + 0x20] = char.state.TRANSFORMING
 
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
 		super.active = 0
 		super.active.tails = 0x01
-		u8[0xffffb020] = 0x29
-		u16[0xfffffec0] = 0x800
-		u16[0xfffffec2] = 0x18
-		u16[0xfffffec4] = 0xc0
+		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
+		global.move.speedcap.tails = 0x800
+		global.move.acceleration.tails = 0x18
+		global.move.deceleration.tails = 0xc0
 		u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
 	}
 	else if (global.characters < CHARS_TAILS_ALONE)
 	{
-		u32[0xffffb00c] = 0x146816
+		u32[0xffffb000 + 0x0c] = 0x146816
 		super.active = 0xff
 	#if STANDALONE
 		super.active = (global.super_emeralds == 7) ? 0xff : 0x01
@@ -2036,7 +2036,7 @@ function void fn08648c()
 		u32[0xffffcbc0] = 0x01a494		// After-images effect
 	}
 
-	u8[0xffffb02b] |= 0x02
-	u8[0xffffb02e] = 0x81
-	u8[0xffffb035] = 0
+	u8[0xffffb000 + 0x2b] |= char.bonus.INVINCIBLE
+	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x35] = 0
 }

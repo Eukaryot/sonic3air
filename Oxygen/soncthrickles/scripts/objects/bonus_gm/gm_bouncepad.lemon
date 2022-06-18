@@ -33,11 +33,11 @@ function void fn060f3e()
 		D4.u16 = objA0.position.x.u16
 		fn01dc56()
 
-		if ((D6 & 0x00010000) || (objA0.flags2a & 0x08))
+		if ((D6 & 0x00010000) || (objA0.flags2a & object.flag.P1_ON_OBJECT))
 		{
 			A1 = 0xffffb000
 		}
-		else if ((D6 & 0x00020000) || (objA0.flags2a & 0x10))
+		else if ((D6 & 0x00020000) || (objA0.flags2a & object.flag.P2_ON_OBJECT))
 		{
 			A1 = 0xffffb04a
 		}
@@ -67,8 +67,8 @@ function void fn060f94()
 	objA1.velocity.x = D0.u16
 	u16[A1 + 0x1c] = D0.u16
 	objA1.state = char.state.STRAIGHTJUMP
-	u8[A1 + 0x2a] |= 0x02
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x40] = 0
 
 	u8[0xffff2000 + objA0.subtype2c] = 0
@@ -76,5 +76,5 @@ function void fn060f94()
 	A1 = 0xffff0000 + u16[0xfffffaa4]
 	u8[A1 + 0x38] |= 0x01
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }

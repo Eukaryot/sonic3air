@@ -27,7 +27,7 @@ function void InitLevelTiles.HPZ()
 	}
 	else
 	{
-		if (u16[0xffffb014] < 0x0480)
+		if (u16[0xffffb000 + 0x14] < 0x0480)
 		{
 			move_area.left = 0x0aa0 - getScreenExtend()
 		}
@@ -78,7 +78,7 @@ function void UpdateLevelTiles.HPZ()
 		u8[A1 + 0x04] = 0x8f
 	}
 
-	if (u16[0xffffb010] < 0x0ec0)
+	if (u16[0xffffb000 + 0x10] < 0x0ec0)
 	{
 		fn05a32c()
 	}
@@ -140,7 +140,7 @@ function void fn05a220()
 //# address-hook(0x05a224) end(0x05a25e)
 function void fn05a224()
 {
-	if (u16[0xffffb010] >= 0x0ec0)
+	if (u16[0xffffb000 + 0x10] >= 0x0ec0)
 	{
 		fn05a334()
 		fn04f2f6()
@@ -206,7 +206,7 @@ function void fn05a28c()
 //# address-hook(0x05a2a6) end(0x05a2e0)
 function void fn05a2a6()
 {
-	if (u16[0xffffb010] < 0x0ec0)
+	if (u16[0xffffb000 + 0x10] < 0x0ec0)
 	{
 		fn05a32c()
 		fn04f2f6()

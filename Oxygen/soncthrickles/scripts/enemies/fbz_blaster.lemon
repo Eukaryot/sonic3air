@@ -43,7 +43,7 @@ function void fn0894b6()
 	setupObjectAttributesFull(0x0896fc)
 	if (objA0.render_flags & render_flag.FLIP_Y)
 	{
-		objA0.render_flags &= ~0x02
+		objA0.render_flags &= ~render_flag.FLIP_Y
 		u8[A0 + 0x3c] = 0xff
 	}
 
@@ -110,7 +110,7 @@ function void fn089552()
 function void fn08955a()
 {
 	objA0.velocity.x = -objA0.velocity.x
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.countdown_value = u16[A0 + 0x3a]
 	fn08956a()
 }
@@ -140,8 +140,7 @@ function void fn08957a()
 	// "spawnChildObjects(0x089726)" replaced by:
 	spawnChildObject(0x089626, 0x00, -27, -22)
 
-	A2 = 0x08972e
-	SpawnProjectileChildObjectsInDir()
+	spawnProjectileChildObjectsInDir(0x08972e)
 }
 
 
@@ -155,8 +154,7 @@ function void fn0895a4()
 	fn0845a0()
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
-		A2 = 0x089746
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x089746)
 	}
 }
 

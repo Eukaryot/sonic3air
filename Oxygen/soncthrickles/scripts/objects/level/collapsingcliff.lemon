@@ -15,7 +15,7 @@
 //# address-hook(0x0204fe) end(0x02058e)
 function void CollapsingCliff.Init()
 {
-	objA0.sprite_attributes = 0x4001
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	if (global.zone == 0x05)
 	{
 		// IceCap Zone
@@ -28,7 +28,7 @@ function void CollapsingCliff.Init()
 	else
 	{
 		// Angel Island Zone
-		u32[A0 + 0x0c] = (global.zone_act == 0x0001) ? 0x21e7ac : 0x21e6c8
+		objA0.mapping_offset = (global.zone_act == 0x0001) ? 0x21e7ac : 0x21e6c8
 		u32[A0 + 0x30] = 0x020cb6
 		u32[A0 + 0x3c] = 0x020e9e
 		objA0.box_size.x = 0x3c
@@ -58,7 +58,7 @@ function void CollapsingCliff.Update()
 		--objA0.flags38
 	}
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
 		objA0.value3a = 1
@@ -94,21 +94,22 @@ function void fn020c24()
 function void fn020c38()
 {
 	D0 = objA0.animation.sprite * 2
-	A3 = u32[A0 + 0x0c]
+	A3 = objA0.mapping_offset
 	A3.u16 += u16[A3 + D0.s16]
 	D1.u16 = u16[(A3+=2)-2]
-	objA0.render_flags |= 0x20
+	objA0.render_flags |= render_flag.STATIC_MAPPING
 	D5.u8 = objA0.render_flags
 	A1 = A0
 
 	while (true)
 	{
-		u8[A1 + 0x04] = D5.u8
-		u8[A1 + 0x06] = objA0.box_size.y
-		u8[A1 + 0x07] = objA0.box_size.x
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u16[A1 + 0x0a] = u16[A0 + 0x0a]
-		u32[A1 + 0x0c] = A3
+		// Spawn cliff debris
+		objA1.render_flags = D5.u8
+		objA1.box_size.y = objA0.box_size.y
+		objA1.box_size.x = objA0.box_size.x
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.mapping_offset = A3
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		u8[A1 + 0x38] = u8[(A4+=1)-1]
@@ -120,7 +121,7 @@ function void fn020c38()
 			break
 
 		A3 += 6
-		u32[A1] = D4
+		objA1.update_address = D4
 	}
 
 	DrawObject()
@@ -167,7 +168,7 @@ function void fn0205de()
 				objA1.flags2a &= ~char.flag.ON_OBJECT
 				objA1.flags2a &= ~char.flag.PUSHING
 				objA1.flags2a |= char.flag.IN_AIR
-				u8[A1 + 0x21] = 1
+				u8[A1 + 0x21] = char.state.RUNNING2
 			}
 		}
 	}

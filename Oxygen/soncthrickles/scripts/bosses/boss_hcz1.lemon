@@ -191,7 +191,7 @@ function void fn06a042()
 function void fn06a046()
 {
 	objA0.base_state = 0x0a
-	playSound(0x3c)
+	playSound(SFX_ROLL)
 
 	objA0.flags38 |= 0x40
 	objA0.flags38 &= ~0x80
@@ -406,7 +406,7 @@ function void fn06a24c()
 	control.tails = 0
 	player1.control_override = 0xff
 	player2.control_override = 0xff
-	u8[0xffffb02e] = 0x80
+	u8[0xffffb000 + 0x2e] = 0x80
 
 	fn06a270()
 }
@@ -542,7 +542,7 @@ function void fn06a37a()
 function void fn06a384()
 {
 	u8[A0 + 0x40] = 0x02
-	u8[A0 + 0x28] = 0x8b
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8)
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x06a3a0
 }
@@ -616,7 +616,7 @@ function void fn06a460()
 	setupObjectAttributesMost(0x06ad08)
 
 	objA0.update_address = 0x06a478
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 }
 
 
@@ -652,7 +652,7 @@ function void fn06a4a8()
 	setupObjectAttributesMost(0x06ad10)
 
 	objA0.update_address = 0x06a4c0
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 }
 
 
@@ -667,8 +667,7 @@ function void fn06a4c0()
 //# address-hook(0x06a4c8) end(0x06a4f2)
 function void fn06a4c8()
 {
-	A1 = 0x06ad30
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x06ad30))
 		return
 
 	objA0.position.y.u16 = water.height.current
@@ -969,7 +968,7 @@ function void fn06a7c4()
 	if (objA0.subtype2c != 0)
 	{
 		A1 = 0xffffb04a
-		A2 = 0xfffff7cb
+		A2 = 0xfffff7cb		// Address of "player2.control_override"
 		if ((u8[A1 + 0x2a] & char.flag.UNDERWATER) == 0)
 		{
 			UnloadObject()
@@ -979,7 +978,7 @@ function void fn06a7c4()
 	else
 	{
 		A1 = 0xffffb000
-		A2 = 0xfffff7ca
+		A2 = 0xfffff7ca		// Address of "player1.control_override"
 	}
 
 	u8[A2] = 0
@@ -1008,7 +1007,7 @@ function void fn06a7c4()
 	objA1.velocity.y = 0
 	u16[A1 + 0x1c] = 0
 	objA1.state = char.state.LIFTED
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0x01
 	u8[A1 + 0x3d] = 0
 }
@@ -1202,7 +1201,7 @@ function void fn06aa00()
 {
 	u8[A2 + 0x2a] |= 0x02
 	u8[A2 + 0x2e] = 0x01
-	u8[A2 + 0x20] = 0x0f
+	u8[A2 + 0x20] = char.state.LIFTED
 	u8[A2 + 0x3d] = 0
 	u16[A2 + 0x18] = 0
 	u16[A2 + 0x1a] = 0
@@ -1274,7 +1273,7 @@ function void fn06aaa0()
 function void fn06aab6()
 {
 	objA0.flags38 |= 0x80
-	playSound(0x39)
+	playSound(SFX_WATERSPLASH)
 	u16[0xfffffa9a] = 0
 
 	// "spawnChildObjects(0x06ad7e)" replaced by:

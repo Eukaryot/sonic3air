@@ -16,7 +16,7 @@
 function void fn032656()
 {
 	objA0.mapping_offset = 0x231aee
-	objA0.sprite_attributes = 0x4040
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0040)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x10
@@ -40,13 +40,13 @@ function void fn0326b6()
 
 	A2 = A0 + 0x32
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D5.u16 = control.player1
 	fn032784()
 
 	A2 += 4
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5.u16 = control.tails
 	fn032784()
 
@@ -131,10 +131,11 @@ function void fn032784()
 		return
 #endif
 
+	u8 bit = (1 << D6.u8)
 	D0.u8 = u8[A2]
 	if (D0.u8 == 0)
 	{
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 			u8[A2 + 0x01] = 0
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
@@ -163,7 +164,7 @@ function void fn032784()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
 	{
-		if ((objA0.flags2a & (1 << D6.u8)) == 0)
+		if ((objA0.flags2a & bit) == 0)
 		{
 			u8[A2] = 0
 			return
@@ -199,7 +200,8 @@ function void fn032784()
 			}
 		}
 
-		D5.u8 &= 0x70
+		// Check if jump button pressed
+		D5.u8 &= CONTROL_ABC
 		if (D5.u8 == 0)
 		{
 			fn03260a()
@@ -209,15 +211,15 @@ function void fn032784()
 		u8[A1 + 0x40] = 0x01
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
-		u8[A1 + 0x20] = 0x02
-		u8[A1 + 0x2a] |= 0x04
+		u8[A1 + 0x20] = char.state.ROLLING
+		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA1.velocity.y = objA0.velocity.y - 0x680
 		objA1.velocity.x = 0
 		u16[A1 + 0x1c] = 0
 	}
 
-	u8[A1 + 0x2a] |= 0x02
-	u16[A1 + 0x08] = 0x0100
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x2e] = 0
 	u8[A2] = 0
 }

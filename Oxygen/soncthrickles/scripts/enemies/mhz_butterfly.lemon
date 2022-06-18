@@ -35,8 +35,7 @@ function void Butterfly.Update()
 //# address-hook(0x08e0c6) end(0x08e0d8)
 function void fn08e0c6()
 {
-	A1 = 0x08e10a
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08e10a))
 		return
 
 	u32[A0 + 0x30] = 0x08e124

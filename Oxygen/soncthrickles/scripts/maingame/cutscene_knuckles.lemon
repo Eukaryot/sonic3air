@@ -30,7 +30,7 @@ function void fn061d4c()
 	//  - 0x063a6a	-> objA0.subtype2c = 0x24	-> Knuckles cutscene in LRZ 2
 	//  - 0x063cfc	-> objA0.subtype2c = 0x28	-> Knuckles cutscene in HPZ
 	//  - 0x0656da	-> objA0.subtype2c = 0x2c	-> Knuckles cutscene in SSZ (S/T version)
-	//  - 0x063446	-> objA0.subtype2c = 0x30	-> Knuckles's MHZ 1 intro cutscene (in Sonic & Knuckles alone)
+	//  - 0x063446	-> objA0.subtype2c = 0x30	-> Knuckles' MHZ 1 intro cutscene (in Sonic & Knuckles alone)
 
 	A1 = u32[0x061d5e + objA0.subtype2c]
 	objA0.update_address = A1
@@ -157,7 +157,7 @@ function void fn065c56()
 	move_area.bottom.target = D0.u16
 
 	// "spawnSimpleChildObjects(0x084b12)" replaced by:
-	spawnSimpleChildObjects(0x084ad2, 1)
+	spawnSimpleChildObjects(0x084ad2, 1)		// Screen mover for the lower border
 }
 
 

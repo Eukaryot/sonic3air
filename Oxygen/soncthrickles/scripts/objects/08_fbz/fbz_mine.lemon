@@ -65,7 +65,7 @@ function void fn03c9bc()
 	if (s16[A0 + 0x30] < 0)
 	{
 		objA0.update_address = 0x03c9e4
-		u8[A0 + 0x28] = 0x8b
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8)
 		AddAsDynamicObject()
 	}
 	DrawOrUnloadObject()

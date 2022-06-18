@@ -25,7 +25,7 @@ function void fn031704()
 #else
 	objA0.box_size.y = 0x20
 #endif
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	objA0.value32 = objA0.position.y.u16
 
 	// Colors in objA0.state:

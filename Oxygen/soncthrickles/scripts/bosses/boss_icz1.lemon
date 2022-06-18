@@ -40,7 +40,7 @@ function void fn071162()
 //# address-hook(0x07117e) end(0x0711aa)
 function void fn07117e()
 {
-	u8[A0 + 0x26] = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 	StartBossFight()
 
 	#if STANDALONE
@@ -342,7 +342,7 @@ function void fn0713e8()
 	fn085ba8()
 
 	A1 = 0xffff0000 + u16[0xfffffaae]
-	if (u32[A1] == 0x08b660)
+	if (objA1.update_address == 0x08b660)
 	{
 		u8[A1 + 0x38] |= 0x20
 	}
@@ -532,7 +532,7 @@ function void fn07155a()
 function void fn071566()
 {
 	objA0.base_state = 0x08
-	u8[A0 + 0x28] = 0x8b
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8)
 	playSound(0xbf)
 }
 

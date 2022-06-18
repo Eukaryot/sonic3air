@@ -34,13 +34,12 @@ function void GameMode.MainGame()
 			StartLoadingPatternsForZone()
 		}
 
-		palette_fade.range = 0x202f		// Only palette entries 0x10...0x3f
-		SetPaletteFadedOut()
+		SetPaletteFadedOut(0x202f)		// Only palette entries 0x10...0x3f
 
 		global.fade_timer = 0x16
-		u16[0xffffb27e] = 0x16
-		control.pad1 = 0x7f00
-		control.pad2 = 0x7f00
+		u16[0xffffb250 + 0x2e] = 0x16
+		control.pad1 = 0x7f00		// ~CONTROL_START, 0
+		control.pad2 = 0x7f00		// ~CONTROL_START, 0
 		checkpoint.number &= 0x7f
 		global.game_mode &= ~0x80
 
@@ -136,8 +135,7 @@ function void GameMode.MainGame()
 			u16[0xffffff7e] = levelselect.soundtest << 8
 		}
 
-		palette_fade.range = 0x003f
-		SetPaletteFadedOut()
+		SetPaletteFadedOut(0x003f)
 		global.fade_timer = 0x16
 		u16[0xffffff7c] = 0
 		global.game_mode &= ~0x80
@@ -234,7 +232,7 @@ function void GameMode.MainGame()
 
 	global.demo_countdown = 60
 	palette_fade.range = 0x003f
-	u16[0xfffff794] = 0
+	global.fadeout_countdown = 0
 
 	while (global.demo_countdown != 0)
 	{
@@ -249,10 +247,10 @@ function void GameMode.MainGame()
 		DynamicObjectsLoading()
 		Kosinski.ProcessModules()
 
-		--u16[0xfffff794]
-		if (s16[0xfffff794] < 0)
+		--global.fadeout_countdown
+		if (s16(global.fadeout_countdown) < 0)
 		{
-			u16[0xfffff794] = 2
+			global.fadeout_countdown = 2
 			FadeOutPalette()
 		}
 	}
@@ -295,7 +293,7 @@ function void UpdateGamePause()
 		}
 		else
 		{
-			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb005] <= 0x04) && !competition_mode.active
+			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
 			Game.onGamePause(canRestart)
 			Standalone.onResumeAfterPause()
 		}
@@ -341,7 +339,7 @@ function void UpdateGamePause()
 		// In competition mode, button B during pause quits the stage
 		if (global.zone >= 0x0e && global.zone <= 0x12)
 		{
-			if ((control.pad1.pressed & CONTROL_B) && s8[0xffffff8b] < 0)
+			if ((control.pad1.pressed & CONTROL_B) && (competition_mode.game_mode < 0))
 			{
 				global.game_mode = 0xc0
 				break
@@ -579,7 +577,7 @@ function void initializeMainGame()
 		u8 musicId
 		if (global.zone_act == 0x0001 && checkpoint.number == 3)
 		{
-			musicId = 0x01
+			musicId = MUSIC_AIZ1
 		}
 		else if (isKnucklesIntro)
 		{
@@ -588,7 +586,7 @@ function void initializeMainGame()
 			Audio.playAudio("1f", AudioContext.CONTEXT_MUSIC)
 			musicId = 0
 		#else
-			musicId = 0x1f
+			musicId = MUSIC_KNUCKLES
 		#endif
 		}
 		else
@@ -597,7 +595,7 @@ function void initializeMainGame()
 			// Check if this is the S/T outro
 			if (global.zone_act == 0x0d01)
 			{
-				playMusic(0x26)		// Play Sonic 3 credits (instead of Sky Sanctuary)
+				playMusic(MUSIC_ENDING)		// Play Sonic 3 credits (instead of Sky Sanctuary)
 			}
 			else
 			{
@@ -693,7 +691,7 @@ function void initializeMainGame()
 	{
 		u32[0xffffcf82] = 0x01f202
 		u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
-		u8[0xffffb19e] = 1
+		u8[0xffffb172 + 0x2c] = 1
 	}
 	else if (global.zone == 0x07)
 	{
@@ -705,8 +703,8 @@ function void initializeMainGame()
 		ring_counter = 0
 		timer.alldata = 0
 		extra_lives_granted = 0
-		u16[0xfffffed0] = 0
-		u32[0xfffffed2] = 0
+		ring_counter.player2 = 0
+		timer.alldata.player2 = 0
 	#if STANDALONE
 		if (!Game.getSetting(SETTING_MAINTAIN_SHIELDS))
 	#endif
@@ -732,10 +730,10 @@ function void initializeMainGame()
 	unused.teleport_timer = 0
 	unused.teleport_active = 0
 #endif
-	u16[0xfffffec8] = 0
-	u16[0xfffffeca] = 0
-	u16[0xfffffecc] = 0
-	u16[0xfffffece] = 0
+	player.total_rings = 0
+	unused.player2.total_rings = 0
+	player.item_count = 0
+	unused.player2.item_count = 0
 	u16[0xfffffede] = 0
 	u8[0xfffffe65] = 0
 	super.active = 0
@@ -815,7 +813,7 @@ function void SetGlobalCharacters()
 		global.characters = levelselect.characters
 	#if STANDALONE
 		// Handle Knuckles & Tails
-		useKnucklesAndTails = (global.characters == 4)
+		useKnucklesAndTails = (global.characters == CHARS_KNUCKLES_AND_TAILS)
 		global.characters = min(global.characters, 3)
 	#endif
 	}
@@ -879,56 +877,57 @@ function void fn003e0e()
 function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
 {
 	// This function copies palette data from a table in ROM to RAM, index references one of multiple palette descriptors in ROM.
-	// Some noticable values for index:
-	//  - index = 0x03		-> Main palette line 0 (includes characters, Sonic/Tails version)
-	//  - index = 0x04		-> Level Select
-	//  - index = 0x05		-> Main palette line 0 (includes characters, Knuckles version)
-	//  - index = 0x0a		-> AIZ 1 Sonic intro palette (palette lines 1..3)
-	//  - index = 0x0b		-> AIZ 2 level palette
-	//  - index = 0x0c		-> HCZ 1 level palette
-	//  - index = 0x0d		-> HCZ 2 level palette
-	//  - index = 0x0e		-> MGZ 1 level palette
-	//  - index = 0x0f		-> MGZ 2 level palette
-	//  - index = 0x10		-> CNZ 1 level palette
-	//  - index = 0x11		-> CNZ 2 level palette
-	//  - index = 0x12		-> FBZ 1 level palette
-	//  - index = 0x13		-> FBZ 2 level palette
-	//  - index = 0x14		-> ICZ 1 level palette
-	//  - index = 0x15		-> ICZ 2 level palette
-	//  - index = 0x16		-> LBZ 1 level palette
-	//  - index = 0x17		-> LBZ 2 level palette
-	//  - index = 0x18		-> MHZ 1 level palette
-	//  - index = 0x19		-> MHZ 2 level palette
-	//  - index = 0x1a		-> SOZ 1 level palette
-	//  - index = 0x1b		-> SOZ 2 level palette
-	//  - index = 0x1c		-> LRZ 1 level palette
-	//  - index = 0x1d		-> LRZ 2 level palette
-	//  - index = 0x1e		-> SSZ   level palette
-	//  - index = 0x1f		-> Unknown (maybe Knuckles' SSZ act level palette?)
-	//  - index = 0x20		-> DEZ 1 level palette
-	//  - index = 0x21		-> DEZ 2 level palette
-	//  - index = 0x22		-> DDZ   level palette
-	//  - index = 0x25		-> Unknown
-	//  - index = 0x26		-> Competition mode ALZ
-	//  - index = 0x28		-> Competition mode BPZ
-	//  - index = 0x2a		-> AIZ 1 level palette (palette lines 1..3)
-	//  - index = 0x2b		-> AIZ 1 underwater palette (all palette lines)
-	//  - index = 0x2c		-> AIZ 2 underwater palette
-	//  - index = 0x2d		-> LBZ 1 underwater palette -- not used in the game
-	//  - index = 0x2e		-> LBZ 2 underwater palette
-	//  - index = 0x30		-> Used in AIZ
-	//  - index = 0x31		-> HCZ 1 underwater palette
-	//  - index = 0x32		-> HCZ 2 underwater palette
-	//  - index = 0x33		-> GM bonus stage palette (palette lines 1..3)
-	//  - index = 0x34		-> Competition mode DPZ
-	//  - index = 0x35		-> Competition mode CGZ
-	//  - index = 0x36		-> Competition mode EMZ
-	//  - index = 0x37		-> GS bonus stage palette (palette lines 1..3)
-	//  - index = 0x38		-> SM bonus stage palette (palette lines 1..3)
-	//  - index = 0x39		-> ICZ 2 underwater palette (all palette lines)
-	//  - index = 0x3a		-> CNZ 2 underwater palette
-	//  - index = 0x3f		-> HPZ level palette (palette lines 1..3)
-	//  - index = 0x40		-> Unknown
+	// Some notable values for index:
+	//  - index = 0x03				-> Main palette line 0 (includes characters, Sonic/Tails version)
+	//  - index = 0x04				-> Level Select
+	//  - index = 0x05				-> Main palette line 0 (includes characters, Knuckles version)
+	//  - index = 0x0a				-> AIZ 1 Sonic intro palette (palette lines 1..3)
+	//  - index = 0x0b				-> AIZ 2 level palette
+	//  - index = 0x0c				-> HCZ 1 level palette
+	//  - index = 0x0d				-> HCZ 2 level palette
+	//  - index = 0x0e				-> MGZ 1 level palette
+	//  - index = 0x0f				-> MGZ 2 level palette
+	//  - index = 0x10				-> CNZ 1 level palette
+	//  - index = 0x11				-> CNZ 2 level palette
+	//  - index = 0x12				-> FBZ 1 level palette
+	//  - index = 0x13				-> FBZ 2 level palette
+	//  - index = 0x14				-> ICZ 1 level palette
+	//  - index = 0x15				-> ICZ 2 level palette
+	//  - index = 0x16				-> LBZ 1 level palette
+	//  - index = 0x17				-> LBZ 2 level palette
+	//  - index = 0x18				-> MHZ 1 level palette
+	//  - index = 0x19				-> MHZ 2 level palette
+	//  - index = 0x1a, 0x3c		-> SOZ 1 level palette (0x3c is a different address, but with the exact same colours)
+	//  - index = 0x1b				-> SOZ 2 level palette
+	//  - index = 0x1c				-> LRZ 1 level palette
+	//  - index = 0x1d				-> LRZ 2 level palette
+	//  - index = 0x1e				-> SSZ   level palette
+	//  - index = 0x1f				-> Knuckles' SSZ act level palette
+	//  - index = 0x20				-> DEZ 1 level palette
+	//  - index = 0x21				-> DEZ 2 level palette
+	//  - index = 0x22, 0x23		-> DDZ   level palette
+	//  - index = 0x25				-> Ending palette
+	//  - index = 0x26, 0x27		-> Competition mode ALZ
+	//  - index = 0x28, 0x29		-> Competition mode BPZ
+	//  - index = 0x2a, 0x3b		-> AIZ 1 level palette (palette lines 1..3)
+	//  - index = 0x2b				-> AIZ 1 underwater palette (all palette lines)
+	//  - index = 0x2c				-> AIZ 2 underwater palette
+	//  - index = 0x2d, 0x2e		-> LBZ 2 underwater palette
+	//  - index = 0x2f				-> LBZ 1 underwater palette -- not used in the game
+	//  - index = 0x30				-> AIZ 2 palette during the bombing scene
+	//  - index = 0x31				-> HCZ 1 underwater palette
+	//  - index = 0x32				-> HCZ 2 underwater palette
+	//  - index = 0x33				-> GM bonus stage palette (palette lines 1..3)
+	//  - index = 0x34				-> Competition mode DPZ
+	//  - index = 0x35				-> Competition mode CGZ
+	//  - index = 0x36				-> Competition mode EMZ
+	//  - index = 0x37				-> GS bonus stage palette (palette lines 1..3)
+	//  - index = 0x38				-> SM bonus stage palette (palette lines 1..3)
+	//  - index = 0x39				-> ICZ 2 underwater palette (all palette lines)
+	//  - index = 0x3a				-> CNZ 2 underwater palette
+	//  - index = 0x3e				-> LRZ boss act palette
+	//  - index = 0x3f				-> HPZ level palette (palette lines 1..3)
+	//  - index = 0x40, 0x41		-> DEZ boss act palette
 
 #if STANDALONE
 	if (EXTENDED_CHARACTER_PALETTES)
@@ -1229,21 +1228,21 @@ function void fn01bc60()
 
 	move_area.left = minX
 	move_area.right = maxX
-	u16[0xffffee0c] = minX
-	u16[0xffffee0e] = maxX
-	u16[0xffffee1c] = minX
-	u16[0xffffee1e] = maxX
+	move_area.left.target = minX
+	move_area.right.target = maxX
+	move_area.left.player2 = minX
+	move_area.right.player2 = maxX
 
 	level.vertical_wrap = minY
 	move_area.bottom.current = maxY
-	u16[0xffffee10] = minY
+	move_area.top.target = minY
 	move_area.bottom.target = maxY
-	u16[0xffffee20] = minY
-	u16[0xffffee22] = maxY
+	level.vertical_wrap.player2 = minY
+	move_area.bottom.current.player2 = maxY
 
 	camera.yoffset.player = 0x60
 	camera.yoffset.tails = 0x60
-	u16[0xffffeea8] = 0xffff
+	level.width.bitmask = 0xffff
 	level.height.bitmask = 0xffff
 	SetupCharacterAtStartPosition()
 }
@@ -1255,8 +1254,8 @@ function void SetupCharacterAtStartPosition()
 	if (checkpoint.number != 0)
 	{
 		SetupCharacterAtLastCheckpoint()
-		D1.u16 = u16[0xffffb010]
-		D0.u16 = u16[0xffffb014]
+		D1.u16 = u16[0xffffb000 + 0x10]
+		D0.u16 = u16[0xffffb000 + 0x14]
 	}
 	else
 	{
@@ -1264,8 +1263,8 @@ function void SetupCharacterAtStartPosition()
 		A1 += global.zone * 8 + global.act * 4
 		D1 = u16[A1]
 		D0 = u16[A1+2]
-		u16[0xffffb010] = D1.u16
-		u16[0xffffb014] = D0.u16
+		u16[0xffffb000 + 0x10] = D1.u16
+		u16[0xffffb000 + 0x14] = D0.u16
 
 		if (global.zone_act == 0x0000)
 		{
@@ -1273,11 +1272,11 @@ function void SetupCharacterAtStartPosition()
 			{
 				D1.u16 = 0
 				D0.u16 = 0x420
-				u16[0xffffb010] = 0x0040
-				u16[0xffffb014] = 0x0420
+				u16[0xffffb000 + 0x10] = 0x0040
+				u16[0xffffb000 + 0x14] = 0x0420
 				move_area.left = 0
-				u16[0xffffee0c] = 0
-				u16[0xffffee1c] = 0
+				move_area.left.target = 0
+				move_area.left.player2 = 0
 			}
 		#if STANDALONE
 			else if (isMainCharacter(CHARACTER_KNUCKLES) && (Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 || Game.isTimeAttack()))
@@ -1286,8 +1285,8 @@ function void SetupCharacterAtStartPosition()
 				//  -> Camera positions here should be the same as in "fn0634ca"
 				if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
 				{
-					u16[0xffffb010] = 0x1830
-					u16[0xffffb014] = 0x0119
+					u16[0xffffb000 + 0x10] = 0x1830
+					u16[0xffffb000 + 0x14] = 0x0119
 					D1.u16 = 0x1768
 					D0.u16 = 0x0090
 					move_area.bottom.current = D0.u16
@@ -1310,8 +1309,8 @@ function void SetupCharacterAtStartPosition()
 			#if STANDALONE
 				if (level.start_location == 1)
 				{
-					u16[0xffffb010] = 0x0018
-					u16[0xffffb014] = 0x0600
+					u16[0xffffb000 + 0x10] = 0x0018
+					u16[0xffffb000 + 0x14] = 0x0600
 					D1.u16 = 0x0018
 					D0.u16 = 0x0600
 				}
@@ -1326,18 +1325,18 @@ function void SetupCharacterAtStartPosition()
 		{
 			if (isMainCharacter(CHARACTER_TAILS))
 			{
-				u16[0xffffb010] = 0x3780
-				u16[0xffffb014] = 0x01e0
+				u16[0xffffb000 + 0x10] = 0x3780
+				u16[0xffffb000 + 0x14] = 0x01e0
 				camera.position.x.u16 = 0x36f0
 				camera.position.y.u16 = 0x0200
 				move_area.left  = 0x35a0
-				u16[0xffffee0c] = 0x35a0
-				u16[0xffffee1c] = 0x35a0
+				move_area.left.target = 0x35a0
+				move_area.left.player2 = 0x35a0
 				level.vertical_wrap = 0x0200
-				u16[0xffffee10] = 0x0200
-				u16[0xffffee20] = 0x0200
-				u16[0xffffee60] = 0x36f0
-				u16[0xffffee64] = 0x0200
+				move_area.top.target = 0x0200
+				level.vertical_wrap.player2 = 0x0200
+				camera.position.x.u16.player2 = 0x36f0
+				camera.position.y.u16.player2 = 0x0200
 				return
 			}
 		#if STANDALONE
@@ -1346,18 +1345,18 @@ function void SetupCharacterAtStartPosition()
 				if (level.start_location == 1)
 				{
 					// Use Tails' start
-					u16[0xffffb010] = 0x3780
-					u16[0xffffb014] = 0x01e0
+					u16[0xffffb000 + 0x10] = 0x3780
+					u16[0xffffb000 + 0x14] = 0x01e0
 					camera.position.x.u16 = 0x36f0
 					camera.position.y.u16 = 0x0200
 					move_area.left  = 0x35a0
-					u16[0xffffee0c] = 0x35a0
-					u16[0xffffee1c] = 0x35a0
+					move_area.left.target = 0x35a0
+					move_area.left.player2 = 0x35a0
 					level.vertical_wrap = 0x0200
-					u16[0xffffee10] = 0x0200
-					u16[0xffffee20] = 0x0200
-					u16[0xffffee60] = 0x36f0
-					u16[0xffffee64] = 0x0200
+					move_area.top.target = 0x0200
+					level.vertical_wrap.player2 = 0x0200
+					camera.position.x.u16.player2 = 0x36f0
+					camera.position.y.u16.player2 = 0x0200
 					return
 				}
 			}
@@ -1369,7 +1368,7 @@ function void SetupCharacterAtStartPosition()
 			if (isMainCharacter(CHARACTER_KNUCKLES) && getNumPlayers() == 2)
 			{
 				// Move Knuckles a bit to the right in LBZ 2 to make space for Tails
-				u16[0xffffb010] += 0x10
+				u16[0xffffb000 + 0x10] += 0x10
 				D1.u16 += 0x10
 			}
 		}
@@ -1379,8 +1378,8 @@ function void SetupCharacterAtStartPosition()
 			if (!isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0)
 			{
 				move_area.left  = 0x00c0
-				u16[0xffffee0c] = 0x00c0
-				u16[0xffffee1c] = 0x00c0
+				move_area.left.target = 0x00c0
+				move_area.left.player2 = 0x00c0
 				D1.u16 = 0x0160
 			}
 		}
@@ -1427,11 +1426,11 @@ function void SetupCharacterAtStartPosition()
 	}
 
 	camera.position.x.u16 = D1.u16
-	u16[0xffffee60] = D1.u16
+	camera.position.x.u16.player2 = D1.u16
 
 	D0.s16 = clamp(D0.s16 - 96, 0, s16(move_area.bottom.current))
 	camera.position.y.u16 = D0.u16
-	u16[0xffffee64] = D0.u16
+	camera.position.y.u16.player2 = D0.u16
 }
 
 
@@ -1443,13 +1442,13 @@ function void SetupCharacterAtLastCheckpoint()
 		checkpoint.number		 = checkpoint.number.backup
 		global.zone_act			 = checkpoint.zone_act
 		global.zone_act.apparent = checkpoint.zone_act.apparent
-		u16[0xffffb010]			 = checkpoint.x
-		u16[0xffffb014]			 = checkpoint.y
+		u16[0xffffb000 + 0x10]			 = checkpoint.x
+		u16[0xffffb000 + 0x14]			 = checkpoint.y
 	#if STANDALONE
 		if (checkpoint.y & 0x8000)
 		{
-			u16[0xffffb014] &= 0x7fff
-			u8[0xffffb02a] |= char.flag.FACING_LEFT
+			u16[0xffffb000 + 0x14] &= 0x7fff
+			u8[0xffffb000 + 0x2a] |= char.flag.FACING_LEFT
 		}
 	#endif
 
@@ -1467,8 +1466,8 @@ function void SetupCharacterAtLastCheckpoint()
 		timer.alldata = checkpoint.time
 		timer.frames = 59
 		--timer.seconds
-		u16[0xffffb00a] = checkpoint.sprite_attr
-		u16[0xffffb046] = checkpoint.layer_flags
+		u16[0xffffb000 + 0x0a] = checkpoint.sprite_attr
+		u16[0xffffb000 + 0x46] = checkpoint.layer_flags
 
 		camera.update_routine = checkpoint.camera_routine
 		move_area.bottom.current = checkpoint.move_area.bottom
@@ -1487,15 +1486,15 @@ function void SetupCharacterAtLastCheckpoint()
 		global.stage_type = 0
 		global.zone_act = level.backup.zone_act
 		global.zone_act.apparent = u16[0xffffff9c]
-		u16[0xffffb010] = u16[0xfffffe4c]
-		u16[0xffffb014] = u16[0xfffffe4e]
+		u16[0xffffb000 + 0x10] = u16[0xfffffe4c]
+		u16[0xffffb000 + 0x14] = u16[0xfffffe4e]
 		ring_counter = u16[0xfffffe50]
 		extra_lives_granted = u8[0xfffffe61]
 		timer.alldata = u32[0xfffffe52]
 		timer.frames = 59
 		--timer.seconds
-		u16[0xffffb00a] = u16[0xfffffe56]
-		u16[0xffffb046] = u16[0xfffffe58]
+		u16[0xffffb000 + 0x0a] = u16[0xfffffe56]
+		u16[0xffffb000 + 0x46] = u16[0xfffffe58]
 
 		camera.update_routine = u8[0xfffffe64]
 		move_area.bottom.current = u16[0xfffffe62]
@@ -1705,7 +1704,7 @@ function void ResetOscillatingNumbers()
 //# address-hook(0x00773c) end(0x007790)
 function void UpdateOscillatingNumbers()
 {
-	if (competition_mode.active == 0 && u8[0xffffb005] >= 0x06)
+	if (competition_mode.active == 0 && u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	A1 = 0xfffffe6e
@@ -1781,8 +1780,11 @@ function void fn0067ee()
 		objA1.state = char.state.FALLING_PANIC
 		if (global.characters == CHARS_KNUCKLES_ALONE)
 		{
-			u16[A1 + 0x20] = 0x2121
-			u8[A1 + 0x23] = 1
+			// objA1.state = char.state.KNUX_FALLING
+			// objA1.state.former = char.state.KNUX_FALLING
+			objA1.state.both = 0x2121
+
+			objA1.animation.frame = 1
 			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
 		}
 		objA1.flags2a |= char.flag.IN_AIR
@@ -1821,8 +1823,8 @@ function void fn0067ee()
 		if (spawnAITails)
 		{
 			u32[0xffffb04a] = 0x01365c
-			u16[0xffffb05a] = u16[0xffffb010]
-			u16[0xffffb05e] = u16[0xffffb014]
+			u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
+			u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 			tails.ai_routine = 0
 		}
 		else if (isMainCharacter(CHARACTER_TAILS))
@@ -1875,8 +1877,8 @@ function void fn0067ee()
 			if (global.characters == CHARS_SONIC_ALONE)
 			{
 				u32[0xffffb04a] = 0x01365c
-				u16[0xffffb05a] = u16[0xffffb010]
-				u16[0xffffb05e] = u16[0xffffb014]
+				u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
+				u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 				tails.ai_routine = 0
 			}
 			else if (isMainCharacter(CHARACTER_TAILS))
@@ -1953,10 +1955,10 @@ function void RestoreShield()
 	}
 
 	// Restore shield
-	u8 shieldMask = 0x70
+	u8 shieldMask = char.bonus.ELEMENTAL_SHIELDS
 #if STANDALONE
 	if (Game.getSetting(SETTING_SHIELD_TYPES) != 1)
-		shieldMask = 0x71	// Support classic shield
+		shieldMask = char.bonus.ALL_SHIELDS	// Support classic shield
 #endif
 	A1 = 0xffffb000
 	u8 shieldFlags = global.shields_backup_1 & shieldMask
@@ -1969,32 +1971,32 @@ function void RestoreShield()
 
 	if (shieldFlags & char.bonus.SHIELD_FIRE)
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_FIRE)
 		u32[0xffffcce8] = 0x0195a6
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_LIGHTNING)
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_LIGHTNING)
 		u32[0xffffcce8] = 0x0196c2
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_BUBBLE)
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_BUBBLE)
 		u32[0xffffcce8] = 0x0198be
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 #if STANDALONE
 	else if ((Game.getSetting(SETTING_SHIELD_TYPES) != 1) && (shieldFlags & char.bonus.ANY_SHIELD))
 	{
-		u8[A1 + 0x2b] &= ~0x71
+		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 		u32[0xffffcce8] = 0x0194ce
-		u16[0xffffcd2a] = A1.u16
+		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 #endif
 }
@@ -2011,8 +2013,8 @@ function void InitializeGameCharacters()
 		if (global.zone_act == 0x1400)
 		{
 			u32[0xffffb172] = 0x049eee
-			u16[0xffffb182] = 0x78
-			u16[0xffffb186] = 0xf30
+			u16[0xffffb172 + 0x10] = 0x78
+			u16[0xffffb172 + 0x14] = 0xf30
 			ring_counter = checkpoint.rings
 			extra_lives_granted = checkpoint.lives_granted
 			hud.dirty.rings = 1
@@ -2030,22 +2032,22 @@ function void InitializeGameCharacters()
 
 	if (competition_mode.active)
 	{
-		D0.u8 = u8[0xffffffea]
+		D0.u8 = competition_mode.character.player1
 		fn006bd8()
 
 		u32[0xffffb000] = D1
-		u8[0xffffb038] = u8[0xffffffea]
-		u16[0xffffb05a] = u16[0xffffb010]
-		u16[0xffffb05e] = u16[0xffffb014]
+		u8[0xffffb000 + 0x38] = competition_mode.character.player1
+		u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
+		u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 		u32[0xffffcc54] = 0x018f86
 
 		if (competition_mode.multiplay)
 		{
-			D0.u8 = u8[0xffffffeb]
+			D0.u8 = competition_mode.character.player2
 			fn006bd8()
 
 			u32[0xffffb04a] = D1
-			u8[0xffffb082] = u8[0xffffffeb]
+			u8[0xffffb04a + 0x38] = competition_mode.character.player2
 			u32[0xffffcc9e] = 0x018f86
 		}
 
@@ -2060,7 +2062,7 @@ function void InitializeGameCharacters()
 		u32[0xffffb000] = 0x010a94
 		u32[0xffffcc54] = 0x018b3e
 		u32[0xffffcce8] = 0x0194ce
-		u16[0xffffcd2a] = 0xb000
+		u16[0xffffcce8 + 0x42] = 0xb000
 
 		// Also spawn Tails if needed
 		spawnSecondPlayerTails = (global.characters == CHARS_SONIC_AND_TAILS)
@@ -2070,7 +2072,7 @@ function void InitializeGameCharacters()
 		// Spawn Tails
 		u32[0xffffb000] = 0x01365c
 		u32[0xffffcc9e] = 0x018b3e
-		u16[0xffffb014] += 4
+		u16[0xffffb000 + 0x14] += 4
 		tails.ai_routine = 0
 	}
 	else if (global.characters == CHARS_KNUCKLES_ALONE)
@@ -2090,8 +2092,8 @@ function void InitializeGameCharacters()
 	if (spawnSecondPlayerTails)
 	{
 		u32[0xffffb04a] = 0x01365c
-		u16[0xffffb05a] = u16[0xffffb010] - 0x20
-		u16[0xffffb05e] = u16[0xffffb014] + 4
+		u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10] - 0x20
+		u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14] + 4
 		u32[0xffffcc9e] = 0x018b3e
 		tails.ai_routine = 0
 	}
@@ -2102,7 +2104,7 @@ function void InitializeGameCharacters()
 function void fn006bd8()
 {
 	// Only used in competition mode
-	D1 = (D0.u8 == 1) ? 0x013102 : 0x0105c4
+	D1 = (D0.u8 == CHARACTER_TAILS) ? 0x013102 : 0x0105c4
 }
 
 
@@ -2128,8 +2130,8 @@ function void fn04b6aa()
 
 	A1 = 0xffff4020
 	A0 = 0x1e4080
-	u16[0xffffb010] = u16[(A0+=2)-2]
-	u16[0xffffb014] = u16[(A0+=2)-2]
+	u16[0xffffb000 + 0x10] = u16[(A0+=2)-2]
+	u16[0xffffb000 + 0x14] = u16[(A0+=2)-2]
 
 	D1 = 0x1f
 	while (D1.s16 >= 0)
@@ -2245,11 +2247,13 @@ function void fn0075d2()
 	A0 = u32[0x0075fa + D0.u16]
 	rolling_demo.input_timer = u8[A0]
 	++A0
-	u32[0xffffef52] = A0
+	rolling_demo.progress = A0
 	rolling_demo.last_input = 0
-	control.pad1 = 0x8000
-	control.pad2 = 0x8000
-	u8[0xffffef50] = 0xff
+
+	control.pad1 = 0x8000		// CONTROL_START, 0
+	control.pad2 = 0x8000		// CONTROL_START, 0
+
+	rolling_demo.pressed_start = 0xff
 }
 
 
@@ -2258,7 +2262,7 @@ function void fn0075d2()
 function void UpdateSpecialScrolling()
 {
 	// Update of auto-scrolling (and similar)
-	if (u8[0xffffb005] < 0x06)
+	if (u8[0xffffb000 + 0x05] < 0x06)
 	{
 		// Call targets:
 		//  - 0x04f366	-> level.special_scrolling == 0x00	-> Default, does nothing at all
@@ -2314,16 +2318,22 @@ function void AddScore()
 
 // Rings (used by giant ring granting 50 rings, and inside bonus stages)
 
+function void addRings(u32 value)
+{
+	D0 = value
+	AddRings()
+}
+
 //# address-hook(0x0860f2) end(0x086148)
 function void AddRings()
 {
 	ring_counter = min(ring_counter + D0.u16, 999)
-	u16[0xfffffec8] = min(u16[0xfffffec8] + D0.u16, 999)
+	player.total_rings = min(player.total_rings + D0.u16, 999)
 	hud.dirty.rings |= 0x01
 
 	if (checkForExtraLifeByRings())
 	{
-		++u16[0xfffffecc]
+		++player.item_count
 		gainExtraLife()
 	}
 	else

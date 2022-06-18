@@ -55,8 +55,7 @@ function void fn08eaaa()
 	objA0.countdown_callback = 0x08ead2
 	if (objA0.flags38 & 0x80)
 	{
-		A2 = 0x08ed6c
-		SpawnIdenticalChildObjects()
+		spawnIdenticalChildObjects(0x08ed6c)
 	}
 }
 
@@ -72,7 +71,7 @@ function void fn08eacc()
 function void fn08ead2()
 {
 	objA0.base_state = 0x04
-	u8[A0 + 0x28] = 0x8b - (objA0.flags38 & 0x80)	// All parts except head count as threat
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8) - (objA0.flags38 & 0x80)	// All parts except head count as threat
 	u16[A0 + 0x3a] = objA0.position.y.u16
 
 	D0 = -0x60
@@ -130,7 +129,7 @@ function void fn08eb2e()
 function void fn08eb7e()
 {
 	objA0.base_state = 0x02
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	fn08eaaa()
 }
 
@@ -173,7 +172,7 @@ function void fn08ebe2()
 
 	D0 = objA0.subtype2c * 4
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x04] & 0x01) == 0)
+	if ((objA1.render_flags & render_flag.FLIP_X) == 0)
 	{
 		D0.s16 = -D0.s16
 	}

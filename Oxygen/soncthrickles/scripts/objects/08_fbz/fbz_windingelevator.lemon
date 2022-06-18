@@ -42,12 +42,12 @@ function void FBZWindingElevator.spawnPlatform(s16 offset)
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x03ca92
-		u16[A1 + 0x0a] = 0x42d2
-		u8[A1 + 0x04] |= 0x04
-		u8[A1 + 0x06] = 0x20
-		u8[A1 + 0x07] = 0x30
-		u16[A1 + 0x08] = 0x80
-		u32[A1 + 0x0c] = 0x03cb0c
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02d2)
+		objA1.render_flags |= render_flag.WORLD
+		objA1.box_size.y = 0x20
+		objA1.box_size.x = 0x30
+		objA1.sprite_priority = 0x80
+		objA1.mapping_offset = 0x03cb0c
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16 + offset
 		objA1.velocity.y = (objA0.flags2a & 0x01) ? 1 : -1

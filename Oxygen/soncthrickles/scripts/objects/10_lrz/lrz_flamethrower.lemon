@@ -16,8 +16,8 @@
 function void fn043d68()
 {
 	objA0.mapping_offset = 0x04408a
-	objA0.sprite_attributes = 0x2090
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0090)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
@@ -30,7 +30,7 @@ function void fn043d68()
 		objA0.animation.sprite = 7
 		if (objA0.flags2a & 0x01)
 		{
-			objA0.render_flags |= 0x02
+			objA0.render_flags |= render_flag.FLIP_Y
 		}
 
 		objA0.update_address = 0x043f12
@@ -116,14 +116,14 @@ function void fn043ddc()
 					objA1.position.x.u16 = objA0.position.x.u16
 					objA1.position.y.u16 = objA0.position.y.u16
 					objA1.position.x.u16 += 0x10
-					u8[A1 + 0x04] = objA0.render_flags
-					u32[A1 + 0x0c] = objA0.mapping_offset
-					u16[A1 + 0x0a] = 0x240d
-					u16[A1 + 0x08] = 0x0300
-					u8[A1 + 0x07] = 0x0c
-					u8[A1 + 0x06] = 0x0c
-					u8[A1 + 0x28] = 0x98
-					u8[A1 + 0x2b] |= 0x10
+					objA1.render_flags = objA0.render_flags
+					objA1.mapping_offset = objA0.mapping_offset
+					objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040d)
+					objA1.sprite_priority = 0x0300
+					objA1.box_size.x = 0x0c
+					objA1.box_size.y = 0x0c
+					objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
+					u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 					D0.u8 = objA0.flags2e
 					LookupSinCos()
 					D1.s16 <<= 2
@@ -219,14 +219,14 @@ function void fn043f12()
 					objA1.position.x.u16 = objA0.position.x.u16
 					objA1.position.y.u16 = objA0.position.y.u16
 					objA1.position.y.u16 += 0x10
-					u8[A1 + 0x04] = objA0.render_flags
-					u32[A1 + 0x0c] = objA0.mapping_offset
-					u16[A1 + 0x0a] = 0x240d
-					u16[A1 + 0x08] = 0x0300
-					u8[A1 + 0x07] = 0x0c
-					u8[A1 + 0x06] = 0x0c
-					u8[A1 + 0x28] = 0x98
-					u8[A1 + 0x2b] |= 0x10
+					objA1.render_flags = objA0.render_flags
+					objA1.mapping_offset = objA0.mapping_offset
+					objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040d)
+					objA1.sprite_priority = 0x0300
+					objA1.box_size.x = 0x0c
+					objA1.box_size.y = 0x0c
+					objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
+					u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 					D0.u8 = objA0.flags2e
 					LookupSinCos()
 					D1.s16 <<= 2

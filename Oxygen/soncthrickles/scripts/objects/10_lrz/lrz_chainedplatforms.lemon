@@ -16,8 +16,8 @@ function void fn04a644()
 	if (D0.s8 >= 0)
 	{
 		objA0.mapping_offset = 0x04a980
-		objA0.sprite_attributes = 0x240d
-		objA0.render_flags |= 0x04
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040d)
+		objA0.render_flags |= render_flag.WORLD
 		objA0.box_size.x = 0x18
 		objA0.box_size.y = 0x18
 		objA0.sprite_priority = 0x0200

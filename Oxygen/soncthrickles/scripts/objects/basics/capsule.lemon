@@ -88,7 +88,7 @@ function void fn0865de()
 	{
 		player2.control_override = 0xff
 	#if STANDALONE
-		control.tails = 0x0000
+		control.tails = 0
 	#endif
 	}
 
@@ -175,6 +175,7 @@ function void fn086984()
 		objA0.velocity.x = -0x100
 		objA0.base_state = D0.u8
 
+		// Show level results
 		if (allocDynamicObjectStd())
 		{
 			objA1.update_address = 0x02dad0
@@ -437,7 +438,7 @@ function void fn086a7a()
 	objA0.value3e = D2.u16
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x02)
+	if (objA1.render_flags & render_flag.FLIP_Y)
 	{
 		objA0.update_address = 0x08689c
 		u8[A0 + 0x43] += 0x08
@@ -697,8 +698,7 @@ function void fn08b616()
 
 			if (objA0.subtype2c & 0x80)
 			{
-				D0.u16 = 0x0600
-				TriggerNextZone()
+				TriggerNextZone(0x0600)
 			}
 		}
 		Object.TriggerUnloading()

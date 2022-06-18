@@ -30,21 +30,18 @@ function void Character.BaseUpdate.Sonic()
 	if (debug_mode.state == 0)
 	{
 		// Targets:
-		//	- 0x010afa	-> char.base_state = 0x00	-> Character.Initialization.Sonic()	  	-> Initialization
+		//	- 0x010afa	-> char.base_state = 0x00	-> Character.Initialization.Sonic()		-> Initialization
 		//	- 0x010bba	-> char.base_state = 0x02	-> Character.UpdateNormalState.Sonic()	-> In normal state
 		//	- 0x0122be	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.Sonic()	-> Sonic just got hurt
-		//	- 0x012390	-> char.base_state = 0x06	-> Character.UpdateDiedState.Sonic()  	-> Sonic died
+		//	- 0x012390	-> char.base_state = 0x06	-> Character.UpdateDiedState.Sonic()	-> Sonic died
 		//	- 0x01257c	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()		-> Completely inactive after death
 		//	- 0x0125ac	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Sonic()	-> Sonic died by drowning
 		call tableLookupAddress(0x010aec, char.base_state)
 	}
-	else
+	else if (updateDebugModeRegular())
 	{
-		if (updateDebugModeRegular())
-		{
-			UpdateSonicSpritePatterns()
-			DrawObject()
-		}
+		UpdateSonicSpritePatterns()
+		DrawObject()
 	}
 }
 
@@ -56,24 +53,22 @@ function void Character.BaseUpdate.Tails()
 	A5 = 0xffffee2e		// Address of camera.yoffset.tails
 	A6 = 0xffffcc9e		// Base address of dust cloud object for Tails
 
+	// Check for debug mode
 	if (debug_mode.state == 0 || global.characters != CHARS_TAILS_ALONE)	// Maybe a check if it's second player Tails?
 	{
 		// Targets:
-		//  - 0x0136ca	-> char.base_state = 0x00
-		//  - 0x0137c4	-> char.base_state = 0x02
-		//  - 0x01569c	-> char.base_state = 0x04
-		//  - 0x01578e	-> char.base_state = 0x06
-		//  - 0x0157e0	-> char.base_state = 0x08
-		//  - 0x015810	-> char.base_state = 0x0c
+		//  - 0x0136ca	-> char.base_state = 0x00	-> Character.Initialization.Tails()		-> Initialization
+		//  - 0x0137c4	-> char.base_state = 0x02	-> Character.UpdateNormalState.Tails()	-> In normal state
+		//  - 0x01569c	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.Tails()	-> Tails just got hurt
+		//  - 0x01578e	-> char.base_state = 0x06	-> Character.UpdateDiedState.Tails()	-> Tails died
+		//  - 0x0157e0	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()		-> Completely inactive after death
+		//  - 0x015810	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Tails()	-> Tails died by drowning
 		call tableLookupAddress(0x0136bc, char.base_state)
 	}
-	else
+	else if (updateDebugModeRegular())
 	{
-		if (updateDebugModeRegular())
-		{
-			UpdateTailsSpritePatterns()
-			DrawObject()
-		}
+		UpdateTailsSpritePatterns()
+		DrawObject()
 	}
 }
 
@@ -85,24 +80,22 @@ function void Character.BaseUpdate.Knuckles()
 	A5 = 0xffffee2c		// Address of camera.yoffset.player
 	A6 = 0xffffcc54		// Base address of dust cloud object
 
+	// Check for debug mode
 	if (debug_mode.state == 0)
 	{
 		// Targets:
-		//  - 0x0164aa	-> char.base_state = 0x00
-		//  - 0x01656c	-> char.base_state = 0x02
-		//  - 0x017bb6	-> char.base_state = 0x04
-		//  - 0x017c88	-> char.base_state = 0x06
-		//  - 0x017cba	-> char.base_state = 0x08
-		//  - 0x017cea	-> char.base_state = 0x0c
+		//  - 0x0164aa	-> char.base_state = 0x00	-> Character.Initialization.Knuckles()		-> Initialization
+		//  - 0x01656c	-> char.base_state = 0x02	-> Character.UpdateNormalState.Knuckles()	-> In normal state
+		//  - 0x017bb6	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.Knuckles()	-> Knuckles just got hurt
+		//  - 0x017c88	-> char.base_state = 0x06	-> Character.UpdateDiedState.Knuckles()		-> Knuckles died
+		//  - 0x017cba	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()			-> Completely inactive after death
+		//  - 0x017cea	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Knuckles()	-> Knuckles died by drowning
 		call tableLookupAddress(0x01649c, char.base_state)
 	}
-	else
+	else if (updateDebugModeRegular())
 	{
-		if (updateDebugModeRegular())
-		{
-			UpdateKnucklesSpritePatterns()
-			DrawObject()
-		}
+		UpdateKnucklesSpritePatterns()
+		DrawObject()
 	}
 }
 
@@ -150,7 +143,7 @@ function void Character.Initialization.shared(u8 character)
 	{
 		char.mapping_offset = 0x148eb8
 	}
-	else  // character == CHARACTER_KNUCKLES
+	else  // if (character == CHARACTER_KNUCKLES)
 	{
 		char.mapping_offset = 0x14a8d6
 	}
@@ -189,8 +182,8 @@ function void Character.Initialization.shared(u8 character)
 		}
 		else
 		{
-			char.sprite_attributes = 0x06a0 | (u16[0xffffb00a] & 0x8000)
-			u16[A0 + 0x46] = u16[0xffffb046]
+			char.sprite_attributes = 0x06a0 | (u16[0xffffb000 + 0x0a] & sprite_attribute.PRIORITY)
+			char.layer_flags = u16[0xffffb000 + 0x46]
 		}
 
 		super.active.tails = 0
@@ -203,9 +196,9 @@ function void Character.Initialization.shared(u8 character)
 
 		// Init Tails' tails object
 		u32[0xffffcc0a] = 0x0160a6
-		u16[0xffffcc3a] = A0.u16
+		u16[0xffffcc0a + 0x30] = A0.u16
 
-		u8[0xfffff746] = checkpoint.number
+		checkpoint.number.backup.tails = checkpoint.number
 	}
 	else
 	{
@@ -220,7 +213,7 @@ function void Character.Initialization.shared(u8 character)
 				checkpoint.x = char.position.x.u16
 				checkpoint.y = char.position.y.u16
 				checkpoint.sprite_attr = char.sprite_attributes
-				checkpoint.layer_flags = u16[A0 + 0x46]
+				checkpoint.layer_flags = char.layer_flags
 			}
 		}
 
@@ -398,14 +391,7 @@ function void Character.UpdateNormalState.Tails()
 	{
 		// Character is not directly controllable (but may be indirectly via an object, like when hanging on a pole or similar)
 		char.double_jump_state = 0
-		if (tails.carrying)
-		{
-			A1 = 0xffffb000
-			objA1.flags2a |= char.flag.IN_AIR
-			u8[A1 + 0x2e] = 0
-			tails.carrying = 0
-			tails.catch_timeout = 0
-		}
+		Tails.CheckDropSonic()
 	}
 	else
 	{
@@ -443,7 +429,7 @@ function void Character.UpdateNormalState.Tails()
 
 	if (u8[0xfffff7c9] != 0)
 	{
-		if (char.state == 0)
+		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
 	}
 
@@ -563,14 +549,8 @@ function void Character.UpdateKnucklesUprightOnGround()
 
 function void Character.updateUprightOnGround()
 {
-	if (char.character == CHARACTER_TAILS && tails.carrying)
-	{
-		A1 = 0xffffb000
-		objA1.flags2a |= char.flag.IN_AIR
-		u8[A1 + 0x2e] = 0
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	if (char.character == CHARACTER_TAILS)
+		Tails.CheckDropSonic()
 
 	if (Character.UpdateSpindash())
 		return
@@ -614,14 +594,8 @@ function void Character.UpdateKnucklesRollingOnGround()
 
 function void updateCharacterRollingOnGround()
 {
-	if (char.character == CHARACTER_TAILS && tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	if (char.character == CHARACTER_TAILS)
+		Tails.CheckDropSonic()
 
 	if (char.spindash == 0)
 	{
@@ -710,7 +684,7 @@ function void partialUpdateCharacterOnGround()
 //# address-hook(0x011036) end(0x01105e)
 function void Character.UpdateSonicRollingInAir()
 {
-	Character.updateJumpMoves()
+	UpdateSonicJumpMoves()
 	Character.UpdateControlInAir()
 	Character.CheckAgainstMoveBorders()
 	Character.UpdateMovement()
@@ -737,14 +711,7 @@ function void Character.UpdateSonicUprightInAir()
 //# address-hook(0x0149a2) end(0x0149e2)
 function void Character.UpdateTailsRollingInAir()
 {
-	if (tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	Tails.CheckDropSonic()
 
 	updateTailsInAir_shared()
 }
@@ -834,15 +801,7 @@ function bool UpdateTailsFlight_innerA()
 	// Cancel flight ("Tails Drop"): Stop flying and roll into a ball again
 	else if (Game.getSetting(SETTING_CANCEL_FLIGHT) && (control.tails.state & CONTROL_DOWN) && (control.tails.state & CONTROL_ABC))
 	{
-		if (tails.carrying)
-		{
-			A1 = 0xffffb000
-			objA1.state = char.state.ROLLING		// Player 1 should also roll in this case
-			u8[A1 + 0x2e] = 0
-			objA1.flags2a |= char.flag.IN_AIR
-			tails.carrying = 0
-			tails.catch_timeout = 0
-		}
+		Tails.CheckDropSonic()
 
 		char.double_jump_state = 0
 		char.state = char.state.ROLLING
@@ -998,13 +957,13 @@ function void Tails.UpdateCarrySonic()
 				objA1.position.x.u16 = char.position.x.u16
 				objA1.position.y.u16 = char.position.y.u16 + (global.inv_gravity ? -0x1c : 0x1c)
 
-				objA1.render_flags &= 0xfc
+				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 				u8[A1 + 0x2a] &= 0xfe
-				D0.u8 = char.flags & 0x01
+				D0.u8 = char.flags & char.flag.FACING_LEFT
 				objA1.render_flags |= D0.u8
 				u8[A1 + 0x2a] |= D0.u8
 				if (global.inv_gravity)
-					objA1.render_flags ^= 0x02
+					objA1.render_flags ^= render_flag.FLIP_Y
 
 				--u8[A1 + 0x24]
 				if (s8[A1 + 0x24] < 0)
@@ -1029,8 +988,8 @@ function void Tails.UpdateCarrySonic()
 					A2 = backupA2
 				}
 
-				s16[0xffffb018] = char.velocity.x
-				s16[0xffffb01a] = char.velocity.y
+				s16[0xffffb000 + 0x18] = char.velocity.x
+				s16[0xffffb000 + 0x1a] = char.velocity.y
 				tails.carried_velocity_x = char.velocity.x
 				tails.carried_velocity_y = char.velocity.y
 
@@ -1045,13 +1004,13 @@ function void Tails.UpdateCarrySonic()
 				u8[A1 + 0x2e] = 0
 				u8[A2] = 0
 
-				if (D0.u16 & 0x0f00)	// Any direction pressed?
+				if (D0.u16 & 0x0f00)	// Any direction held?
 				{
 					u8[A2+1] = catchTimeout
 
-					if (D0 & 0x0400)
+					if (D0 & 0x0400)	// CONTROL_LEFT held
 						objA1.velocity.x = -0x200
-					if (D0 & 0x0800)
+					if (D0 & 0x0800)	// CONTROL_RIGHT held
 						objA1.velocity.x = 0x200
 				}
 				else
@@ -1062,7 +1021,7 @@ function void Tails.UpdateCarrySonic()
 				objA1.velocity.y = -0x380		// TODO: Should Knuckles have a different jump acceleration here?
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
-				u8[A1 + 0x20] = 0x02
+				u8[A1 + 0x20] = char.state.ROLLING
 				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK
 				u8[A1 + 0x40] = 0x01
@@ -1101,7 +1060,7 @@ function void Tails.CheckCatchSonic()
 		return
 
 	// Also no grabbing if player 1 is standing on the ground and Tails not manually controlled
-	if ((u8[0xffffb02a] & char.flag.IN_AIR) == 0 && tails.control_counter == 0)
+	if ((u8[0xffffb000 + 0x2a] & char.flag.IN_AIR) == 0 && tails.control_counter == 0)
 		return
 #endif
 
@@ -1112,9 +1071,26 @@ function void Tails.CheckCatchSonic()
 		if (u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && u8[A1 + 0x3d] == 0 && debug_mode.state == 0)
 		{
 			fn01459e()
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 			u8[A2] = 1
 		}
+	}
+}
+
+
+function void Tails.CheckDropSonic()
+{
+	if (tails.carrying)
+	{
+		A1 = 0xffffb000
+	#if STANDALONE
+		if (objA0.state == char.state.ROLLING)
+			objA1.state = char.state.ROLLING		// Player 1 should also roll in this case
+	#endif
+		u8[A1 + 0x2e] = 0
+		objA1.flags2a |= char.flag.IN_AIR
+		tails.carrying = 0
+		tails.catch_timeout = 0
 	}
 }
 
@@ -1137,8 +1113,8 @@ function void fn01459e()
 	objA1.flags2a &= ~(char.flag.FACING_LEFT | char.flag.CONTROL_LOCK)
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x3d] = 0
-	objA1.render_flags &= 0xfc
-	D0.u8 = char.flags & 0x01
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	D0.u8 = char.flags & char.flag.FACING_LEFT
 	objA1.render_flags |= D0.u8
 	u8[A1 + 0x2a] |= D0.u8
 
@@ -1149,7 +1125,7 @@ function void fn01459e()
 	if (global.inv_gravity)
 	{
 		objA1.position.y.u16 -= 0x38
-		objA1.render_flags ^= 0x02
+		objA1.render_flags ^= render_flag.FLIP_Y
 	}
 }
 
@@ -1246,7 +1222,8 @@ function void UpdateKnucklesGlide()
 		char.velocity.x = (dx * char.groundspeed) >> 8
 		char.velocity.y += (char.velocity.y >= 0x80) ? -0x20 : 0x20
 
-		if (level.vertical_wrap != 0xff00)
+		// Drastically reduce glide speed around the top boundary of level
+		if (level.vertical_wrap != 0xff00)	// ...but only if vertical wrap is disabled
 		{
 			D0.s16 = level.vertical_wrap + 0x10
 			if (D0.s16 > s16(char.position.y.u16))
@@ -1385,7 +1362,7 @@ function void UpdateKnucklesGlideCollision()
 						char.animation.timer = 0x7f
 						char.animation.frame = 0
 						knuckles.glide_direction = 3
-						u16[A0 + 0x12] = char.position.x.u16
+						char.position.x.frac = char.position.x.u16
 						return
 					}
 				}
@@ -1541,7 +1518,7 @@ function void UpdateKnucklesGlideCollision()
 	else if (char.double_jump_state == 4)
 	{
 		// Climbing state
-		if (knuckles.preventclimbing & 0x80 || char.position.x.u16 != u16[A0 + 0x12] || (char.flags & char.flag.ON_OBJECT))
+		if (knuckles.preventclimbing & 0x80 || char.position.x.u16 != char.position.x.frac || (char.flags & char.flag.ON_OBJECT))
 		{
 			fn016ed2()
 			return
@@ -1834,10 +1811,10 @@ function void fn016e10()
 
 	if (D1.s16 != 0)
 	{
-		--s8[A0 + 0x25]
-		if (s8[A0 + 0x25] < 0)
+		--knuckles.glide_direction
+		if (s8(knuckles.glide_direction) < 0)
 		{
-			s8[A0 + 0x25] = 3
+			s8(knuckles.glide_direction) = 3
 
 			D1.u8 += char.animation.sprite
 			if (D1.u8 < 0xb7)
@@ -1914,7 +1891,8 @@ function void fn016fa8()
 {
 	char.animation.timer = 0x20
 	char.animation.frame = 0
-	char.state.both = 0x2020
+	char.state.both = 0x2020		// char.state.KNUX_FLYCLIMB, char.state.KNUX_FLYCLIMB
+
 	char.flags &= ~(char.flag.FACING_LEFT | char.flag.PUSHING)
 
 	D0 = u8(knuckles.glide_direction + 0x10) >> 5
@@ -2266,7 +2244,7 @@ function void setSpeedCapProperties(u32 address, bool isSuperActive)
 	{
 		// In water
 	#if STANDALONE
-		if (u8[A0 + 0x2b] & char.bonus.SPEED_UP)
+		if (char.bonus_effect & char.bonus.SPEED_UP)
 		{
 			u16[address] = max(u16[address], 0x600)
 			u16[address + 2] = max(u16[address + 2], 0x0c)
@@ -2300,7 +2278,7 @@ function void setSpeedCapProperties(u32 address, bool isSuperActive)
 	{
 		// Out of water
 	#if STANDALONE
-		if (u8[A0 + 0x2b] & char.bonus.SPEED_UP)
+		if (char.bonus_effect & char.bonus.SPEED_UP)
 		{
 			u16[address] = max(u16[address], 0xc00)
 			u16[address + 2] = max(u16[address + 2], 0x18)
@@ -2421,7 +2399,7 @@ function void Character.updateRotationOnGround0x00()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -2463,7 +2441,7 @@ function void Character.updateRotationOnGround0xc0()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -2524,7 +2502,7 @@ function void Character.updateRotationOnGround0x40()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -2565,7 +2543,7 @@ function void Character.updateRotationOnGround0x80()
 				{
 					char.flags |= char.flag.IN_AIR
 					char.flags &= ~char.flag.PUSHING
-					char.state.former = 0x01
+					char.state.former = char.state.RUNNING2
 					return
 				}
 			}
@@ -2792,7 +2770,7 @@ function void Character.updateJumpMoves()
 				// Handle drop dash
 				//  -> Can only be charged if there is no shield active (only exception: drop dash charge started already, when shield gets active -- this reflects Sonic Mania's behavior)
 				//  -> But can be charged if invincible (incl. Super / Hyper Sonic)
-				bool chargeDropDash = (control.player1.state & CONTROL_ABC) && ((char.bonus_effect & 0x70) == 0 || (char.bonus_effect & char.bonus.INVINCIBLE) || sonic.dropdash_counter > 0) && char.double_jump_state
+				bool chargeDropDash = (control.player1.state & CONTROL_ABC) && ((char.bonus_effect & char.bonus.ELEMENTAL_SHIELDS) == 0 || (char.bonus_effect & char.bonus.INVINCIBLE) || sonic.dropdash_counter > 0) && char.double_jump_state
 				if (chargeDropDash)
 				{
 					if (sonic.dropdash_counter < DROPDASH_FULLCHARGE)
@@ -2837,7 +2815,7 @@ function bool onCharacterPressedJumpInMidAir(u8 input_state, u8 input_pressed)
 		if (Game.getSetting(SETTING_TAILS_ASSIST_MODE) != 0 && (input_state & CONTROL_UP))
 		{
 			// Tails must be AI controlled and not too far away
-			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(s16[0xffffb05a] - s16[0xffffb010]) < 0xc0 && abs(s16[0xffffb05e] - s16[0xffffb014] + 0x40) < 0x80)
+			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(s16[0xffffb04a + 0x10] - s16[0xffffb000 + 0x10]) < 0xc0 && abs(s16[0xffffb04a + 0x14] - s16[0xffffb000 + 0x14] + 0x40) < 0x80)
 			{
 				// Tails must not already be flying already, and ready for flying
 				if (u8[0xffffb04a + 0x20] == char.state.ROLLING && u8[0xffffb04a + 0x40] == 1)	// char.jumping must be set
@@ -2891,11 +2869,11 @@ function void SonicPressedJumpInMidAir()
 			ClearPositionBackup()
 
 			char.double_jump_state = 1
-			u8[0xffffcd9c] = 1
+			u8[0xffffcd7c + 0x20] = 1
 
 			playSound(SFX_SPINDASH_RELEASE)
 
-			u8 input = control.player1.state & 0x0f	// Only directions
+			u8 input = control.player1.state & CONTROL_DPAD	// Only directions
 			if (input != 0 && input < 0x0b)		// Not left and right at the same time
 			{
 				// Perform Hyper Dash
@@ -2923,7 +2901,7 @@ function void SonicPressedJumpInMidAir()
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_FIRE)
 	{
-		u8[0xffffcd08] = 1		// That's 0x20 inside the shield object at 0xffffcce8
+		u8[0xffffcce8 + 0x20] = 1		// That's 0x20 inside the shield object at 0xffffcce8
 		char.double_jump_state = 1
 
 		s16 vx = 0x800
@@ -2939,7 +2917,7 @@ function void SonicPressedJumpInMidAir()
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_LIGHTNING)
 	{
-		u8[0xffffcd08] = 1
+		u8[0xffffcce8 + 0x20] = 1
 		char.double_jump_state = 1
 
 		char.velocity.y = -0x580
@@ -2948,7 +2926,7 @@ function void SonicPressedJumpInMidAir()
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_BUBBLE)
 	{
-		u8[0xffffcd08] = 1
+		u8[0xffffcce8 + 0x20] = 1
 		char.double_jump_state = 1
 
 	#if STANDALONE
@@ -2978,7 +2956,7 @@ function void SonicPressedJumpInMidAir()
 		// Insta-Shield
 		if ((char.bonus_effect & char.bonus.ANY_SHIELD) == 0)
 		{
-			u8[0xffffcd08] = 1
+			u8[0xffffcce8 + 0x20] = 1
 			char.double_jump_state = 1
 			playSound(SFX_INSTASHIELD)
 		}
@@ -3061,14 +3039,14 @@ function void KnucklesPressedJumpInMidAir()
 	if (char.flags & char.flag.FACING_LEFT)
 	{
 		char.velocity.x = -char.groundspeed
-		s8[A0 + 0x25] = -0x80
+		knuckles.glide_direction = -0x80
 	}
 	else
 	{
 		char.velocity.x = char.groundspeed
-		s8[A0 + 0x25] = 0
+		knuckles.glide_direction = 0
 	}
-	u16[A0 + 0x26] = 0
+	char.rotation.both = 0
 	knuckles.glideclimbstate = 0x02
 
 	fn016fa8()
@@ -3198,7 +3176,7 @@ function bool Character.performSuperTransformation()
 #if STANDALONE
 	chooseFittingMusic()	// Usually switches to super theme
 #else
-	playMusic(0x2c)
+	playMusic(MUSIC_INVINCIBLE)
 #endif
 
 #if STANDALONE
@@ -3218,14 +3196,14 @@ function void Character.cancelSuperTransformation()
 	super.active.tails = 0
 	super.palettefx.state = 2
 	super.palettefx.frame = 30
-	u8[0xfffff766] = 0xff
+	char.animation.sprite.backup = 0xff
 
 	if (char.character == CHARACTER_SONIC)
 	{
 		objA0.mapping_offset = 0x146620
 	}
 
-	char.state.former = 0x01
+	char.state.former = char.state.RUNNING2
 	char.invinc.countdown = 1
 
 	// Reset physics
@@ -3481,9 +3459,7 @@ function void CollectLevelRing()
 //# address-hook(0x01a596) end(0x01a5e8)
 function void CollectRing()
 {
-	if (u16[0xfffffec8] < 999)	// This is a different ring counter I guess?
-		++u16[0xfffffec8]
-
+	player.total_rings = min(player.total_rings + 1, 999)
 	if (ring_counter < 999)
 	{
 		++ring_counter
@@ -3687,14 +3663,14 @@ function void Character.checkForWaterSurface()
 		if (char.character == CHARACTER_TAILS)
 		{
 			u32[0xffffcb76] = 0x018164
-			u8[0xffffcba2] = 0x81
-			u32[0xffffcbb6] = A0
+			u8[0xffffcb76 + 0x2c] = 0x81
+			u32[0xffffcb76 + 0x40] = A0
 		}
 		else
 		{
 			u32[0xffffcb2c] = 0x018164
-			u8[0xffffcb58] = 0x81
-			u32[0xffffcb6c] = A0
+			u8[0xffffcb2c + 0x2c] = 0x81
+			u32[0xffffcb2c + 0x40] = A0
 		}
 
 		if (controlFlag)
@@ -3786,7 +3762,7 @@ function void chooseFittingMusic()
 		else if (level.boss_encounter == 2)
 		{
 			// LBZ 2 Big Arms fight
-			playMusic(0x30)
+			playMusic(MUSIC_BIGARMS)
 		}
 		else if (level.boss_encounter == 3)
 		{
@@ -3796,11 +3772,11 @@ function void chooseFittingMusic()
 	}
 	else if (super.active || super.active.tails)
 	{
-		playMusic(0xf0)		// Super Theme
+		playMusic(MUSIC_SUPER)		// Super Theme
 	}
 	else if (u8[0xffffb000 + 0x2b] & char.bonus.INVINCIBLE)
 	{
-		playMusic(0x2c)		// Invincibility Theme
+		playMusic(MUSIC_INVINCIBLE)		// Invincibility Theme
 	}
 	else
 	{
@@ -3816,7 +3792,7 @@ function void chooseFittingMusic()
 	}
 	else if (super.active || (u8[A1 + 0x2b] & char.bonus.INVINCIBLE))
 	{
-		playMusic(0x2c)
+		playMusic(MUSIC_INVINCIBLE)
 	}
 	else
 	{
@@ -3878,7 +3854,7 @@ function bool Character.UpdateSpindash()
 			if (input_pressed & CONTROL_ABC)
 			{
 				// Charge up
-				char.state.both = 0x0900
+				char.state.both = 0x0900		// char.state.SPINDASH, char.state.RUNNING
 				char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 				playSound(SFX_SPINDASH_CHARGE)
 			}
@@ -3963,10 +3939,10 @@ function void releaseDropDash()
 	if (char.drown_countdown >= 12 && abs(s8(char.rotation)) < 0x1c)
 	{
 		u8[A6 + 0x20] = 0x02
-		u16[A6 + 0x10] = u16[A0 + 0x10]
-		u16[A6 + 0x14] = u16[A0 + 0x14]
+		u16[A6 + 0x10] = char.position.x.u16
+		u16[A6 + 0x14] = char.position.y.u16
 		u8[A6 + 0x23] = 0x01
-		u8[A6 + 0x2a] = u8[A0 + 0x2a] & char.flag.FACING_LEFT
+		u8[A6 + 0x2a] = char.flags & char.flag.FACING_LEFT
 	}
 
 	s16 dy = s8(14 - char.hitbox_extends.y)
@@ -4280,7 +4256,7 @@ function void PressedLeftWhileUprightOnGround()
 		{
 			char.flags |= char.flag.FACING_LEFT
 			char.flags &= ~char.flag.PUSHING
-			char.state.former = 0x01
+			char.state.former = char.state.RUNNING2
 		}
 
 		D0.u16 -= D5.u16
@@ -4332,7 +4308,7 @@ function void PressedRightWhileUprightOnGround()
 		{
 			char.flags &= ~char.flag.FACING_LEFT
 			char.flags &= ~char.flag.PUSHING
-			char.state.former = 0x01
+			char.state.former = char.state.RUNNING2
 		}
 
 		D0.u16 += D5.u16
@@ -4348,7 +4324,7 @@ function void PressedRightWhileUprightOnGround()
 
 
 //# address-hook(0x011060) end(0x01134c)
-function void Character.UpdateUprightOnGroundInner()
+function void UpdateSonicUprightOnGroundInner()
 {
 	Character.updateUprightOnGroundInner()
 }
@@ -4392,12 +4368,12 @@ function void Character.updateUprightOnGroundInner()
 			// Movement left or right
 			if (input_state & CONTROL_LEFT)
 			{
-				// Though the original code uses different functions for the three characters here, they actaully are identical
+				// Though the original code uses different functions for the three characters here, they actually are identical
 				PressedLeftWhileUprightOnGround()
 			}
 			if (input_state & CONTROL_RIGHT)
 			{
-				// Though the original code uses different functions for the three characters here, they actaully are identical
+				// Though the original code uses different functions for the three characters here, they actually are identical
 				PressedRightWhileUprightOnGround()
 			}
 
@@ -4413,7 +4389,7 @@ function void Character.updateUprightOnGroundInner()
 				// Can only look up/down when state was not changed to balancing
 				if (char.state == char.state.STANDING)
 				{
-					if (input_state & (CONTROL_DOWN | CONTROL_UP))
+					if (input_state & (CONTROL_UP | CONTROL_DOWN))
 					{
 						cameraMoveState = 1
 						char.state = (input_state & CONTROL_DOWN) ? char.state.COWERING : char.state.LOOKING_UP
@@ -4475,7 +4451,7 @@ function void Character.updateUprightOnGroundInner()
 			D5.u16 = 0x0c
 		}
 
-		if ((input_state & 0x0c) == 0)	// No left or right
+		if ((input_state & (CONTROL_LEFT | CONTROL_RIGHT)) == 0)	// No left or right pressed
 		{
 			if (char.groundspeed != 0)
 			{
@@ -4687,7 +4663,7 @@ function void Character.CheckForStartRolling()
 
 	if ((char.bonus_effect & char.bonus.INFINITE_INERTIA) == 0)
 	{
-		if ((input_state & 0x0c) == 0)	// No left or right pressed
+		if ((input_state & (CONTROL_LEFT | CONTROL_RIGHT)) == 0)	// No left or right pressed
 		{
 			if (input_state & CONTROL_DOWN)
 			{
@@ -4819,7 +4795,7 @@ function void Character.CheckCollisionsWithDynamicObjects()
 	if (Game.getSetting(SETTING_INSTA_SHIELD))
 #endif
 	{
-		if (char.character == CHARACTER_SONIC && (char.bonus_effect & 0x73) == 0)
+		if (char.character == CHARACTER_SONIC && (char.bonus_effect & (char.bonus.ALL_SHIELDS | char.bonus.INVINCIBLE)) == 0)
 		{
 			hasInstaShield = (char.double_jump_state == 1)
 		}
@@ -4874,10 +4850,68 @@ function void Character.CheckCollisionsWithDynamicObjects_partial()
 		A4 += 2
 
 		// Offset into a list of hitbox sizes (the list looks a bit random)
-		u16 offset = u8[A1 + 0x28]
+		u16 offset = objA1.collision_attributes
 		if (offset != 0)
 		{
-			A2 = 0x00ff62 + (offset & 0x3f) * 2
+			// Targets:
+			//  - 0x04 x 0x04  -> (offset & collision_attributes.size) = collision.size.4x4
+			//  - 0x14 x 0x14  -> (offset & collision_attributes.size) = collision.size.20x20
+			//  - 0x0c x 0x14  -> (offset & collision_attributes.size) = collision.size.12x20
+			//  - 0x14 x 0x0c  -> (offset & collision_attributes.size) = collision.size.20x12
+			//  - 0x04 x 0x10  -> (offset & collision_attributes.size) = collision.size.4x16
+			//  - 0x0c x 0x12  -> (offset & collision_attributes.size) = collision.size.12x18
+			//  - 0x10 x 0x10  -> (offset & collision_attributes.size) = collision.size.16x16
+			//  - 0x06 x 0x06  -> (offset & collision_attributes.size) = collision.size.6x6
+			//  - 0x18 x 0x0c  -> (offset & collision_attributes.size) = collision.size.24x12
+			//  - 0x0c x 0x10  -> (offset & collision_attributes.size) = collision.size.12x16
+			//  - 0x10 x 0x08  -> (offset & collision_attributes.size) = collision.size.16x8
+			//  - 0x08 x 0x08  -> (offset & collision_attributes.size) = collision.size.8x8
+			//  - 0x14 x 0x10  -> (offset & collision_attributes.size) = collision.size.20x16
+			//  - 0x14 x 0x08  -> (offset & collision_attributes.size) = collision.size.20x8
+			//  - 0x0e x 0x0e  -> (offset & collision_attributes.size) = collision.size.14x14
+			//  - 0x18 x 0x18  -> (offset & collision_attributes.size) = collision.size.24x24
+			//  - 0x28 x 0x10  -> (offset & collision_attributes.size) = collision.size.40x16
+			//  - 0x10 x 0x18  -> (offset & collision_attributes.size) = collision.size.16x24
+			//  - 0x08 x 0x10  -> (offset & collision_attributes.size) = collision.size.8x16
+			//  - 0x20 x 0x70  -> (offset & collision_attributes.size) = collision.size.32x112
+			//  - 0x40 x 0x20  -> (offset & collision_attributes.size) = collision.size.64x32
+			//  - 0x80 x 0x20  -> (offset & collision_attributes.size) = collision.size.128x32
+			//  - 0x20 x 0x20  -> (offset & collision_attributes.size) = collision.size.32x32
+			//  - 0x08 x 0x08  -> (offset & collision_attributes.size) = collision.size.8x8_2
+			//  - 0x04 x 0x04  -> (offset & collision_attributes.size) = collision.size.4x4_2
+			//  - 0x20 x 0x08  -> (offset & collision_attributes.size) = collision.size.32x8
+			//  - 0x0c x 0x0c  -> (offset & collision_attributes.size) = collision.size.12x12
+			//  - 0x08 x 0x04  -> (offset & collision_attributes.size) = collision.size.8x4
+			//  - 0x18 x 0x04  -> (offset & collision_attributes.size) = collision.size.24x4
+			//  - 0x28 x 0x04  -> (offset & collision_attributes.size) = collision.size.40x4
+			//  - 0x04 x 0x08  -> (offset & collision_attributes.size) = collision.size.4x8
+			//  - 0x04 x 0x18  -> (offset & collision_attributes.size) = collision.size.4x24
+			//  - 0x04 x 0x28  -> (offset & collision_attributes.size) = collision.size.4x40
+			//  - 0x18 x 0x18  -> (offset & collision_attributes.size) = collision.size.24x24_2
+			//  - 0x18 x 0x18  -> (offset & collision_attributes.size) = collision.size.24x24_3
+			//  - 0x0c x 0x18  -> (offset & collision_attributes.size) = collision.size.12x24
+			//  - 0x48 x 0x08  -> (offset & collision_attributes.size) = collision.size.72x8
+			//  - 0x18 x 0x28  -> (offset & collision_attributes.size) = collision.size.24x40
+			//  - 0x10 x 0x04  -> (offset & collision_attributes.size) = collision.size.16x4
+			//  - 0x20 x 0x02  -> (offset & collision_attributes.size) = collision.size.32x2
+			//  - 0x10 x 0x1c  -> (offset & collision_attributes.size) = collision.size.16x28
+			//  - 0x0c x 0x24  -> (offset & collision_attributes.size) = collision.size.12x36
+			//  - 0x10 x 0x02  -> (offset & collision_attributes.size) = collision.size.16x2
+			//  - 0x04 x 0x40  -> (offset & collision_attributes.size) = collision.size.4x64
+			//  - 0x18 x 0x40  -> (offset & collision_attributes.size) = collision.size.24x64
+			//  - 0x20 x 0x10  -> (offset & collision_attributes.size) = collision.size.32x16
+			//  - 0x1c x 0x14  -> (offset & collision_attributes.size) = collision.size.28x20
+			//  - 0x10 x 0x02  -> (offset & collision_attributes.size) = collision.size.16x2_2
+			//  - 0x10 x 0x01  -> (offset & collision_attributes.size) = collision.size.16x1
+			//  - 0x02 x 0x08  -> (offset & collision_attributes.size) = collision.size.2x8
+			//  - 0x10 x 0x40  -> (offset & collision_attributes.size) = collision.size.16x64
+			//  - 0x0c x 0x04  -> (offset & collision_attributes.size) = collision.size.12x4
+			//  - 0x08 x 0x0c  -> (offset & collision_attributes.size) = collision.size.8x12
+			//  - 0x28 x 0x20  -> (offset & collision_attributes.size) = collision.size.40x32
+			//  - 0x40 x 0x02  -> (offset & collision_attributes.size) = collision.size.64x2
+			//  - 0x60 x 0x02  -> (offset & collision_attributes.size) = collision.size.96x2
+			//  - 0x28 x 0x28  -> (offset & collision_attributes.size) = collision.size.40x40
+			A2 = 0x00ff62 + (offset & collision_attributes.size) * 2
 			s16 hitbox.x = u8[A2]
 			s16 hitbox.y = u8[A2+1]
 
@@ -4907,7 +4941,7 @@ function void Character.CheckCollisionsWithDynamicObjects_partial()
 //# address-hook(0x00ffd4) end(0x010214)
 function void Character.OnCollisionWithDynamicObject()
 {
-	// Example values for u8[A1 + 0x28]:
+	// Example values for objA1.collision_attributes:
 	//  - 0x06, 0x0b, 0x17, 0x1a = Different types of enemies
 	//  - 0x0f		 = Boss enemy
 	//  - 0x18		 = Extended arm of DEZ Chainspike
@@ -4920,7 +4954,7 @@ function void Character.OnCollisionWithDynamicObject()
 	//  - 0x98, 0x9b = Projectile
 	//  - 0xd8		 = Thrown mushroom, stars over starpost
 
-	D1.u8 = u8[A1 + 0x28] & 0xc0
+	D1.u8 = (objA1.collision_attributes & collision_attributes.flags)
 	if (D1.u8 == 0)
 	{
 		// Collision is an enemy, i.e. is harmful, but can be attacked
@@ -5026,14 +5060,14 @@ function void Character.OnCollisionWithDynamicObject()
 			}
 		}
 	}
-	else if (D1.u8 == 0x40)
+	else if (D1.u8 == collision.flag.ITEM)
 	{
-		D0.u8 = u8[A1 + 0x28] & 0x3f
-		if (D0.u8 != 0x06)
+		D0.u8 = (objA1.collision_attributes & collision_attributes.size)
+		if (D0.u8 != collision.size.16x16)
 		{
 			// Collect ring, but only after 30 invulnerability frames
 			//  -> Remember that the "char.invuln.countdown" timer starts at 120
-			u8 timer = competition_mode.active ? char.invuln.countdown : u8[0xffffb034]
+			u8 timer = competition_mode.active ? char.invuln.countdown : u8[0xffffb000 + 0x34]
 			if (timer < 90)
 			{
 				u8[A1 + 0x05] = 0x04
@@ -5114,6 +5148,7 @@ function void Character.OnCollisionWithDynamicObject()
 		#endif
 			else if (char.character == CHARACTER_KNUCKLES)
 			{
+				// Check if Knuckles glides into the monitor
 				canOpenMonitor = (char.double_jump_state == 1 || char.double_jump_state == 3)
 			}
 
@@ -5131,12 +5166,12 @@ function void Character.OnCollisionWithDynamicObject()
 			}
 		}
 	}
-	else if (D1.u8 == 0x80)
+	else if (D1.u8 == collision.flag.THREAT)
 	{
 		// Harmful object
 		Character.OnThreatCollision()
 	}
-	else  // D1.u8 == 0xc0
+	else  // D1.u8 == collision.flag.SPECIAL
 	{
 		// Other interactable object
 		fn0103ba()
@@ -5148,7 +5183,7 @@ function void Character.OnCollisionWithDynamicObject()
 function void Character.OnThreatCollision()
 {
 	// Check for shield or invincibility
-	D0.u8 = char.bonus_effect & 0x73
+	D0.u8 = (char.bonus_effect & (char.bonus.ALL_SHIELDS | char.bonus.INVINCIBLE))
 	if (D0.u8 != 0)
 	{
 		D0.u8 &= u8[A1 + 0x2b]
@@ -5186,7 +5221,7 @@ function void Character.OnThreatCollision()
 		}
 	}
 
-	if ((u8[A1 + 0x2b] & 0x08) == 0)
+	if ((u8[A1 + 0x2b] & char.bonus.DEFLECTABLE) == 0)
 	{
 		if ((char.bonus_effect & char.bonus.INVINCIBLE) == 0)
 		{
@@ -5228,7 +5263,7 @@ function void Character.GettingHurt()
 		// It's the second player
 		if (competition_mode.active)
 		{
-			rings = u16[0xfffffed0]
+			rings = ring_counter.player2
 		}
 		else
 		{
@@ -5259,7 +5294,7 @@ function void Character.GettingHurt()
 			spilledRings = true
 
 			// Should be unnecessary, but make sure all shield flags are cleared
-			char.bonus_effect &= 0x8e
+			char.bonus_effect &= ~char.bonus.ALL_SHIELDS
 		}
 	}
 	else
@@ -5270,7 +5305,7 @@ function void Character.GettingHurt()
 	#endif
 		{
 			// Lose shield
-			char.bonus_effect &= 0x8e
+			char.bonus_effect &= ~char.bonus.ALL_SHIELDS
 		}
 	}
 
@@ -5332,8 +5367,8 @@ function u8 getSoundIdByObstacleAddress(u32 obstacleAddress)
 //# address-hook(0x0103ba) end(0x01040a)
 function void fn0103ba()
 {
-	u8 var = u8[A1 + 0x28] & 0x3f
-	if (var == 0x06 || var == 0x07 || var == 0x0a || var == 0x0c || (var >= 0x15 && var <= 0x18) || var == 0x21)
+	u8 var = (objA1.collision_attributes & collision_attributes.size)
+	if (var == collision.size.16x16 || var == collision.size.6x6 || var == collision.size.16x8 || var == collision.size.4x4_2 || (var >= collision.size.128x32 && var <= collision.size.4x4_2) || var == collision.size.24x24_2)
 	{
 		D1.u16 = A0 - 0xffffb000
 		if (D1.u16 != 0)
@@ -5349,7 +5384,7 @@ function void fn0103ba()
 function void UpdateShieldDeflecting()
 {
 	// Any shield active?
-	if ((char.bonus_effect & 0x71) == 0)
+	if ((char.bonus_effect & char.bonus.ALL_SHIELDS) == 0)
 		return
 
 	// Bounding box of shield
@@ -5368,13 +5403,71 @@ function void UpdateShieldDeflecting()
 		A4 += 2
 
 		// Check for deflectable object
-		u8 collisionFlags = u8[A1 + 0x28] & 0xc0
-		if (collisionFlags == 0x80)
+		u8 collisionFlags = (objA1.collision_attributes & collision_attributes.flags)
+		if (collisionFlags == collision.flag.THREAT)
 		{
 			// Offset into a list of hitbox sizes?
-			u16 offset = u8[A1 + 0x28] & 0x3f
+			u16 offset = (objA1.collision_attributes & collision_attributes.size)
 			if (offset != 0)
 			{
+				// Targets:
+				//  - 0x04 x 0x04  -> offset = collision.size.4x4
+				//  - 0x14 x 0x14  -> offset = collision.size.20x20
+				//  - 0x0c x 0x14  -> offset = collision.size.12x20
+				//  - 0x14 x 0x0c  -> offset = collision.size.20x12
+				//  - 0x04 x 0x10  -> offset = collision.size.4x16
+				//  - 0x0c x 0x12  -> offset = collision.size.12x18
+				//  - 0x10 x 0x10  -> offset = collision.size.16x16
+				//  - 0x06 x 0x06  -> offset = collision.size.6x6
+				//  - 0x18 x 0x0c  -> offset = collision.size.24x12
+				//  - 0x0c x 0x10  -> offset = collision.size.12x16
+				//  - 0x10 x 0x08  -> offset = collision.size.16x8
+				//  - 0x08 x 0x08  -> offset = collision.size.8x8
+				//  - 0x14 x 0x10  -> offset = collision.size.20x16
+				//  - 0x14 x 0x08  -> offset = collision.size.20x8
+				//  - 0x0e x 0x0e  -> offset = collision.size.14x14
+				//  - 0x18 x 0x18  -> offset = collision.size.24x24
+				//  - 0x28 x 0x10  -> offset = collision.size.40x16
+				//  - 0x10 x 0x18  -> offset = collision.size.16x24
+				//  - 0x08 x 0x10  -> offset = collision.size.8x16
+				//  - 0x20 x 0x70  -> offset = collision.size.32x112
+				//  - 0x40 x 0x20  -> offset = collision.size.64x32
+				//  - 0x80 x 0x20  -> offset = collision.size.128x32
+				//  - 0x20 x 0x20  -> offset = collision.size.32x32
+				//  - 0x08 x 0x08  -> offset = collision.size.8x8_2
+				//  - 0x04 x 0x04  -> offset = collision.size.4x4_2
+				//  - 0x20 x 0x08  -> offset = collision.size.32x8
+				//  - 0x0c x 0x0c  -> offset = collision.size.12x12
+				//  - 0x08 x 0x04  -> offset = collision.size.8x4
+				//  - 0x18 x 0x04  -> offset = collision.size.24x4
+				//  - 0x28 x 0x04  -> offset = collision.size.40x4
+				//  - 0x04 x 0x08  -> offset = collision.size.4x8
+				//  - 0x04 x 0x18  -> offset = collision.size.4x24
+				//  - 0x04 x 0x28  -> offset = collision.size.4x40
+				//  - 0x18 x 0x18  -> offset = collision.size.24x24_2
+				//  - 0x18 x 0x18  -> offset = collision.size.24x24_3
+				//  - 0x0c x 0x18  -> offset = collision.size.12x24
+				//  - 0x48 x 0x08  -> offset = collision.size.72x8
+				//  - 0x18 x 0x28  -> offset = collision.size.24x40
+				//  - 0x10 x 0x04  -> offset = collision.size.16x4
+				//  - 0x20 x 0x02  -> offset = collision.size.32x2
+				//  - 0x10 x 0x1c  -> offset = collision.size.16x28
+				//  - 0x0c x 0x24  -> offset = collision.size.12x36
+				//  - 0x10 x 0x02  -> offset = collision.size.16x2
+				//  - 0x04 x 0x40  -> offset = collision.size.4x64
+				//  - 0x18 x 0x40  -> offset = collision.size.24x64
+				//  - 0x20 x 0x10  -> offset = collision.size.32x16
+				//  - 0x1c x 0x14  -> offset = collision.size.28x20
+				//  - 0x10 x 0x02  -> offset = collision.size.16x2_2
+				//  - 0x10 x 0x01  -> offset = collision.size.16x1
+				//  - 0x02 x 0x08  -> offset = collision.size.2x8
+				//  - 0x10 x 0x40  -> offset = collision.size.16x64
+				//  - 0x0c x 0x04  -> offset = collision.size.12x4
+				//  - 0x08 x 0x0c  -> offset = collision.size.8x12
+				//  - 0x28 x 0x20  -> offset = collision.size.40x32
+				//  - 0x40 x 0x02  -> offset = collision.size.64x2
+				//  - 0x60 x 0x02  -> offset = collision.size.96x2
+				//  - 0x28 x 0x28  -> offset = collision.size.40x40
 				A2 = 0x00ff62 + offset * 2
 				s16 hitbox.x = u8[A2]
 				s16 hitbox.y = u8[A2+1]
@@ -5386,7 +5479,7 @@ function void UpdateShieldDeflecting()
 
 				if (checkBoxOverlap(D2.u16, D3.u16, D4.u16, D5.u16, px, py, sx, sy))
 				{
-					if (u8[A1 + 0x2b] & 0x08)
+					if (u8[A1 + 0x2b] & char.bonus.DEFLECTABLE)
 					{
 						deflectProjectile()
 						return
@@ -5412,7 +5505,7 @@ function void deflectProjectile()
 	objA1.velocity.x = (-s32(lookupCos(angle)) * 0x0800) >> 8
 	objA1.velocity.y = (-s32(lookupSin(angle)) * 0x0800) >> 8
 
-	// Remove deflectable flag
+	// Remove collision box
 	u8[A1 + 0x28] = 0
 }
 
@@ -5490,7 +5583,7 @@ function void Character.Die_noSound()
 	char.groundspeed = 0
 	char.state = char.state.DIED
 
-	u16[0xffffffce] = char.sprite_attributes
+	debug_mode.backup.sprite_attributes = char.sprite_attributes
 	u8[A0 + 0x0a] |= 0x80
 }
 
@@ -5519,7 +5612,7 @@ function void Character.clearEnemiesOnScreen(u16 minY)
 	{
 		A1 = 0xffff0000 + u16[A4]
 		A4 += 2
-		D0 = u8[A1 + 0x28]
+		D0 = objA1.collision_attributes
 		if (D0.u8 != 0)
 		{
 		#if STANDALONE
@@ -5552,7 +5645,7 @@ function void fn01050c()
 	if ((objA1.render_flags & render_flag.VISIBLE) == 0)
 		return
 
-	D0.u8 &= 0xc0
+	D0.u8 &= collision_attributes.flags
 	if (D0.u8 == 0)
 	{
 		if (u8[A1 + 0x29] == 0)
@@ -5560,11 +5653,11 @@ function void fn01050c()
 			fn01052e()
 		}
 	}
-	else if (D0.u8 == 0xc0)
+	else if (D0.u8 == collision.flag.SPECIAL)
 	{
 		fn01059c()
 	}
-	else if (D0.u8 & 0x80 && u8[A1 + 0x2b] & 0x08)
+	else if ((D0.u8 & collision.flag.THREAT) && (u8[A1 + 0x2b] & char.bonus.DEFLECTABLE))
 	{
 		deflectProjectile()
 	}
@@ -5603,7 +5696,7 @@ function void fn01059c()
 	//  -> CNZ balloon
 	//  -> CNZ bumpers (2 variants with different addresses)
 	//  -> SOZ sandcork
-	if (u32[A1] == 0x025cf0 || u32[A1] == 0x02cfa8 || u32[A1] == 0x031754 || (u32[A1] == 0x032e7e || u32[A1] == 0x032eaa) || u32[A1] == 0x041d32)
+	if (objA1.update_address == 0x025cf0 || objA1.update_address == 0x02cfa8 || objA1.update_address == 0x031754 || (objA1.update_address == 0x032e7e || objA1.update_address == 0x032eaa) || objA1.update_address == 0x041d32)
 		return
 #endif
 
@@ -5615,13 +5708,13 @@ function void fn01059c()
 	{
 		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
-			u16[0xffffb05a] = objA1.position.x.u16
-			u16[0xffffb05e] = objA1.position.y.u16
+			u16[0xffffb04a + 0x10] = objA1.position.x.u16
+			u16[0xffffb04a + 0x14] = objA1.position.y.u16
 		}
 
 		// Why is this done with Tails in the original, or was it meant for Knuckles as main character only?
-		u8[0xffffb06a] = char.state.ROLLING
-		u8[0xffffb074] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x20] = char.state.ROLLING
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 	}
 }
 
@@ -5976,7 +6069,7 @@ function void SonicLandingBubbleBounce()
 	s8 dy = char.hitbox_extends.y - char.hitbox.default.y
 	char.position.y.u16 += (global.inv_gravity) ? dy : -dy
 
-	u8[0xffffcd08] = 2
+	u8[0xffffcce8 + 0x20] = 2
 	playSound(SFX_BUBBLEBOUNCE)
 }
 
@@ -6119,12 +6212,8 @@ function void Character.updateBonusEffects()
 //# address-hook(0x0122be) end(0x012312)
 function void Character.UpdateGotHurtState.Sonic()
 {
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
+	if (debugModeRescue())
 		return
-	}
 
 	UpdateMovementStraight()
 	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
@@ -6146,6 +6235,116 @@ function void Character.UpdateGotHurtState.Sonic()
 function void SonicHurtCheckForStateChange()
 {
 	Character.HurtCheckForStateChange()
+}
+
+
+//# address-hook(0x0125e0) end(0x0125fc)
+function void SonicUpdateAnimationHurt()
+{
+	if (competition_mode.active == 0)
+	{
+		UpdateSonicAnimation()
+		if (global.inv_gravity)
+			char.render_flags ^= render_flag.FLIP_Y
+		UpdateSonicSpritePatterns()
+	}
+	else
+	{
+		CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
+		CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
+	}
+}
+
+
+//# address-hook(0x01569c) end(0x015710)
+function void Character.UpdateGotHurtState.Tails()
+{
+	// Tails is first player?
+	if (global.characters == CHARS_TAILS_ALONE)
+	{
+		if (debugModeRescue())
+			return
+	}
+
+	Tails.CheckDropSonic()
+
+	UpdateMovementStraight()
+	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
+
+	if (level.vertical_wrap == 0xff00)
+	{
+		char.position.y.u16 &= level.height.bitmask
+	}
+
+	Character.HurtCheckForStateChange()
+	Character.CheckAgainstMoveBorders()
+	Character.WriteToPositionBackup()
+	TailsUpdateAnimationHurt()
+	DrawObject()
+}
+
+
+//# address-hook(0x015716) end(0x015788)
+function void TailsHurtCheckForStateChange()
+{
+	Character.HurtCheckForStateChange()
+}
+
+
+//# address-hook(0x015842) end(0x01585e)
+function void TailsUpdateAnimationHurt()
+{
+	if (competition_mode.active == 0)
+	{
+		UpdateTailsAnimation()
+		if (global.inv_gravity)
+			char.render_flags ^= render_flag.FLIP_Y
+		UpdateTailsSpritePatterns()
+	}
+	else
+	{
+		CompetitionMode.Character.UpdateAnimation.Tails()
+		CompetitionMode.Character.UpdateSpritePatterns.Tails()
+	}
+}
+
+
+//# address-hook(0x017bb6) end(0x017c0a)
+function void Character.UpdateGotHurtState.Knuckles()
+{
+	if (debugModeRescue())
+		return
+
+	UpdateMovementStraight()
+	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
+
+	if (level.vertical_wrap == 0xff00)
+	{
+		char.position.y.u16 &= level.height.bitmask
+	}
+
+	Character.HurtCheckForStateChange()
+	Character.CheckAgainstMoveBorders()
+	Character.WriteToPositionBackup()
+	KnucklesUpdateAnimationHurt()
+	DrawObject()
+}
+
+
+//# address-hook(0x017c10) end(0x017c82)
+function void KnucklesHurtCheckForStateChange()
+{
+	Character.HurtCheckForStateChange()
+}
+
+
+//# address-hook(0x017d1e) end(0x017d2c)
+function void KnucklesUpdateAnimationHurt()
+{
+	UpdateKnucklesAnimation()
+	if (global.inv_gravity)
+		char.render_flags ^= render_flag.FLIP_Y
+	UpdateKnucklesSpritePatterns()
 }
 
 
@@ -6190,131 +6389,6 @@ function void Character.HurtCheckForStateChange()
 }
 
 
-//# address-hook(0x0125e0) end(0x0125fc)
-function void SonicUpdateAnimationHurt()
-{
-	if (competition_mode.active == 0)
-	{
-		UpdateSonicAnimation()
-		if (global.inv_gravity)
-			char.render_flags ^= render_flag.FLIP_Y
-		UpdateSonicSpritePatterns()
-	}
-	else
-	{
-		fn012d36()
-		fn01309a()
-	}
-}
-
-
-//# address-hook(0x01569c) end(0x015710)
-function void Character.UpdateGotHurtState.Tails()
-{
-	// Tails is first player?
-	if (global.characters == CHARS_TAILS_ALONE)
-	{
-		if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-		{
-			debug_mode.state = 1
-			player1.control_override = 0
-			return
-		}
-	}
-
-	if (tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
-
-	UpdateMovementStraight()
-	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
-
-	if (level.vertical_wrap == 0xff00)
-	{
-		char.position.y.u16 &= level.height.bitmask
-	}
-
-	Character.HurtCheckForStateChange()
-	Character.CheckAgainstMoveBorders()
-	Character.WriteToPositionBackup()
-	TailsUpdateAnimationHurt()
-	DrawObject()
-}
-
-
-//# address-hook(0x015716) end(0x015788)
-function void TailsHurtCheckForStateChange()
-{
-	Character.HurtCheckForStateChange()
-}
-
-
-//# address-hook(0x015842) end(0x01585e)
-function void TailsUpdateAnimationHurt()
-{
-	if (competition_mode.active == 0)
-	{
-		UpdateTailsAnimation()
-		if (global.inv_gravity)
-			char.render_flags ^= render_flag.FLIP_Y
-		UpdateTailsSpritePatterns()
-	}
-	else
-	{
-		fn015cd0()
-		fn016050()
-	}
-}
-
-
-//# address-hook(0x017bb6) end(0x017c0a)
-function void Character.UpdateGotHurtState.Knuckles()
-{
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
-		return
-	}
-
-	UpdateMovementStraight()
-	char.velocity.y += (char.flags & char.flag.UNDERWATER) ? 0x10 : 0x30
-
-	if (level.vertical_wrap == 0xff00)
-	{
-		char.position.y.u16 &= level.height.bitmask
-	}
-
-	Character.HurtCheckForStateChange()
-	Character.CheckAgainstMoveBorders()
-	Character.WriteToPositionBackup()
-	KnucklesUpdateAnimationHurt()
-	DrawObject()
-}
-
-
-//# address-hook(0x017c10) end(0x017c82)
-function void KnucklesHurtCheckForStateChange()
-{
-	Character.HurtCheckForStateChange()
-}
-
-
-//# address-hook(0x017d1e) end(0x017d2c)
-function void KnucklesUpdateAnimationHurt()
-{
-	UpdateKnucklesAnimation()
-	if (global.inv_gravity)
-		char.render_flags ^= render_flag.FLIP_Y
-	UpdateKnucklesSpritePatterns()
-}
-
-
 
 //-------------------------------------------------------//
 // State update: Died                                    //
@@ -6323,15 +6397,8 @@ function void KnucklesUpdateAnimationHurt()
 //# address-hook(0x012390) end(0x0123bc)
 function void Character.UpdateDiedState.Sonic()
 {
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
-	#if STANDALONE
-		char.invuln.countdown = 120
-	#endif
+	if (debugModeRescue())
 		return
-	}
 
 	Character.CheckDiedStateEnd()
 	Character.UpdateMovement()
@@ -6344,27 +6411,14 @@ function void Character.UpdateDiedState.Sonic()
 //# address-hook(0x01578e) end(0x0157da)
 function void Character.UpdateDiedState.Tails()
 {
+	// Tails is first player?
 	if (global.characters == CHARS_TAILS_ALONE)
 	{
-		if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-		{
-			debug_mode.state = 1
-			player1.control_override = 0
-		#if STANDALONE
-			char.invuln.countdown = 120
-		#endif
+		if (debugModeRescue())
 			return
-		}
 	}
 
-	if (tails.carrying)
-	{
-		A1 = 0xffffb000
-		u8[A1 + 0x2e] = 0
-		objA1.flags2a |= char.flag.IN_AIR
-		tails.carrying = 0
-		tails.catch_timeout = 0
-	}
+	Tails.CheckDropSonic()
 
 	Character.CheckDiedStateEnd()
 	Character.UpdateMovement()
@@ -6377,15 +6431,8 @@ function void Character.UpdateDiedState.Tails()
 //# address-hook(0x017c88) end(0x017cb4)
 function void Character.UpdateDiedState.Knuckles()
 {
-	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-	{
-		debug_mode.state = 1
-		player1.control_override = 0
-	#if STANDALONE
-		char.invuln.countdown = 120
-	#endif
+	if (debugModeRescue())
 		return
-	}
 
 	Character.CheckDiedStateEnd()
 	Character.UpdateMovement()
@@ -6444,8 +6491,8 @@ function void Character.CheckDiedStateEnd()
 			char.position.x.u16 = u16[0xfffffe4c]
 			char.position.y.u16 = u16[0xfffffe4e]
 			char.sprite_attributes = u16[0xfffffe56]
-			u16[A0 + 0x46] = u16[0xfffffe58]
-			u16[0xfffffed0] = 0
+			char.layer_flags = u16[0xfffffe58]
+			ring_counter.player2 = 0
 			u8[0xfffff74b] = 1
 		}
 
@@ -6479,11 +6526,13 @@ function void Character.CheckDiedStateEnd()
 			char.spindash_charge = 0x3c
 			global.in_extra_stage = 0
 
+		#if STANDALONE
 			if (Game.getSetting(SETTING_INFINITE_LIVES))
 			{
 				lives_counter = 3
 			}
 			else
+		#endif
 			{
 				--lives_counter
 			}
@@ -6492,15 +6541,15 @@ function void Character.CheckDiedStateEnd()
 			bool lostGame = false
 			if (lives_counter == 0)
 			{
-				u8[0xffffb0b6] = 0
-				u8[0xffffb100] = 1
+				u8[0xffffb094 + 0x22] = 0
+				u8[0xffffb0de + 0x22] = 1
 				global.time_over = 0	// It's game over instead
 				lostGame = true
 			}
 			else if (global.time_over)
 			{
-				u8[0xffffb0b6] = 2
-				u8[0xffffb100] = 3
+				u8[0xffffb094 + 0x22] = 2
+				u8[0xffffb0de + 0x22] = 3
 				lostGame = true
 			}
 
@@ -6514,10 +6563,10 @@ function void Character.CheckDiedStateEnd()
 				u32[0xffffb094] = 0x02d5c6
 				u32[0xffffb0de] = 0x02d5c6
 
-				u16[0xffffb0d2] = A0.u16
+				u16[0xffffb094 + 0x3e] = A0.u16
 				char.spindash_charge = 0
 				hud.dirty.timer = 0
-				u8[0xfffffec7] = 0
+				hud.dirty.timer.player2 = 0
 				playMusic(MUSIC_GAMEOVER)
 
 				// Load patterns for time/game over
@@ -6568,23 +6617,12 @@ function void Character.UpdateDrownedState.shared()
 {
 	if (char.character == CHARACTER_TAILS)
 	{
-		if (tails.carrying)
-		{
-			A1 = 0xffffb000
-			objA1.flags2a |= char.flag.IN_AIR
-			u8[A1 + 0x2e] = 0
-			tails.carrying = 0
-			tails.catch_timeout = 0
-		}
+		Tails.CheckDropSonic()
 	}
 	else
 	{
-		if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
-		{
-			debug_mode.state = 1
-			player1.control_override = 0
+		if (debugModeRescue())
 			return
-		}
 	}
 
 	UpdateMovementStraight()

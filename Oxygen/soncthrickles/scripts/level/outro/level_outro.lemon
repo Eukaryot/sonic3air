@@ -18,7 +18,7 @@ function void InitLevelTiles.Outro()
 
 	global.pause_disabled.u8 = 0xff
 	player1.camera_lock = 0xff
-	u8[0xffffb02e] = 0x03
+	u8[0xffffb000 + 0x2e] = 0x03
 
 	D0 = 0x02000000
 	camera.position.x = D0
@@ -187,7 +187,7 @@ function void fn05ab6e()
 	}
 
 	u16[0xffffeec4] = 0
-	palette_fade.range = 0x3f
+	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u8[0xffffee50] = 0xff
 	u8[0xfffff650] = 0xff
@@ -332,7 +332,7 @@ function void fn05ad16()
 		return
 	}
 
-	palette_fade.range = 0x3f
+	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u16[0xffffeec0] += 4
 	fn05ad30()
@@ -378,7 +378,7 @@ function void fn05ad56()
 	}
 
 	u16[0xffffeec4] = 0
-	palette_fade.range = 0x3f
+	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u8[0xffffee50] = 0xff
 	u8[0xfffff650] = 0xff
@@ -505,7 +505,7 @@ function void fn05ae90()
 		return
 	}
 
-	palette_fade.range = 0x3f
+	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u16[0xffffeec0] += 4
 	fn05aea8()
@@ -783,7 +783,7 @@ function void fn05b076()
 		return
 	}
 	level.scrolling_routine = 0x04
-	if (s16[0xffffeec2] >= 0)
+	if (s16(level.scrolling_routine) >= 0)
 	{
 		fn05af88()
 	}

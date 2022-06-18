@@ -77,6 +77,7 @@ function void fn076ac8()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object that fades in the boss palette
 		objA1.update_address = 0x0855b2
 		u16[A1 + 0x3a] = 0x03
 		u16[A1 + 0x3c] = 0x0f
@@ -127,8 +128,7 @@ function bool BossSOZ1.slideAsRock()
 		if (abs(objA0.velocity.x) >= 0x80 && (abs(objA0.velocity.x) & 0xf0) == 0)
 		{
 			// Spawn dust effects
-			A2 = 0x07740a
-			SpawnIdenticalChildObjects()
+			spawnIdenticalChildObjects(0x07740a)
 		}
 	}
 
@@ -163,9 +163,9 @@ function void fn076b44()
 
 	objA0.base_state = 0x06
 	if (D0.u16 != 0)
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	else
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 
 	objA0.countdown_value = 0x3e
 	objA0.countdown_callback = 0x076b86
@@ -195,8 +195,7 @@ function void fn076b86()
 	objA0.countdown_value = 0x07
 	objA0.countdown_callback = 0x076bb6
 
-	A2 = 0x0773d6
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x0773d6)
 }
 
 
@@ -299,8 +298,7 @@ function void fn076c72()
 
 	playSound(0x61)
 
-	A2 = 0x077402
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x077402)
 }
 
 
@@ -328,8 +326,7 @@ function void fn076ca2()
 
 	playSound(0x5f)
 
-	A2 = 0x07740a
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x07740a)
 }
 
 
@@ -488,7 +485,7 @@ function void fn076e0a()
 	objA0.flags38 |= 0x20
 	objA0.flags2a |= 0x80
 	objA0.position.x.u16 = camera.position.x.u16 + getScreenWidth() / 2
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 
 	if (allocDynamicObjectStd())
 	{
@@ -523,8 +520,8 @@ function void fn076e5c()
 	objA0.update_address = 0x076e94
 
 	// "spawnChildObjects(0x0773f4)" replaced by:
-	spawnChildObject(0x084a76, 0x00, 0, 0)
-	spawnChildObject(0x084a48, 0x02, 0, 0)
+	spawnChildObject(0x084a76, 0x00, 0, 0)			// Screen mover for the left border
+	spawnChildObject(0x084a48, 0x02, 0, 0)			// Screen mover for the right border
 
 	player1.control_override = 0xff
 
@@ -532,7 +529,7 @@ function void fn076e5c()
 	{
 		objA1.update_address = 0x0863c0
 	}
-	if (u16[0xffffb010] >= 0x43a0)
+	if (u16[0xffffb000 + 0x10] >= 0x43a0)
 	{
 		objA0.flags38 |= 0x08
 	}
@@ -543,7 +540,7 @@ function void fn076e5c()
 //# address-hook(0x076e94) end(0x076f08)
 function void fn076e94()
 {
-	A1 = 0xfffff602
+	A1 = 0xfffff602		// Address of "control.player1"
 	A2 = 0xffffb000
 	D0.u16 = 0x43a0
 	if ((objA0.flags38 & 0x08) == 0)
@@ -553,9 +550,9 @@ function void fn076e94()
 			D1 = 0
 			if (u8[A2 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0808
+			D1.u16 |= 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 			u16[A1] = D1.u16
 			return
 		}
@@ -567,9 +564,9 @@ function void fn076e94()
 			D1 = 0
 			if (u8[A2 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0404
+			D1.u16 |= 0x0404		// CONTROL_LEFT, CONTROL_LEFT
 			u16[A1] = D1.u16
 			return
 		}
@@ -578,7 +575,7 @@ function void fn076e94()
 	u16[A2 + 0x10] = D0.u16
 	u16[A1] = 0
 	u8[A2 + 0x04] &= ~render_flag.FLIP_X
-	u8[A2 + 0x2a] &= ~0x01
+	u8[A2 + 0x2a] &= ~char.flag.FACING_LEFT
 	u16[A2 + 0x18] = 0
 	u16[A2 + 0x1a] = 0
 	u16[A2 + 0x1c] = 0
@@ -663,7 +660,7 @@ function void fn076f88()
 	if (u8[A1 + 0x38] & 0x02)
 	{
 		objA0.base_state = 0x06
-		u8[A0 + 0x28] = 0xd7
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 		boss.remaining_hits = 0
 	}
 }
@@ -727,10 +724,10 @@ function void fn077022()
 
 	u16[A0 + 0x3c] = objA0.sprite_priority
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x01)
-		objA0.render_flags |= 0x01
+	if (objA1.render_flags & render_flag.FLIP_X)
+		objA0.render_flags |= render_flag.FLIP_X
 	else
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 
 	objA0.update_address = 0x077062
 	objA0.velocity.y = -0x100
@@ -755,7 +752,7 @@ function void fn07706c()
 	objA0.update_address = 0x0770c4
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0.s16 = s8[A0 + 0x42]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 		D0.s16 = -D0.s16
 	D1.u16 = objA1.position.x.u16 + D0.s16
 
@@ -763,7 +760,7 @@ function void fn07706c()
 	D0 = u8[(A2+=1)-1]
 	if (D0.s8 >= 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	D1.u16 += D0.s8
 	objA0.position.x.u16 = D1.u16
@@ -818,15 +815,15 @@ function void fn07710c()
 	D2.s16 = s8[(A1+=1)-1]
 	D3.s16 = s8[(A1+=1)-1]
 	objA0.animation.sprite = u8[(A1+=1)-1]
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	if (u8[A2 + 0x04] & 0x01)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D2.s16 = -D2.s16
 	}
 	if (u8[A1] != 0)
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 
 	objA0.position.x.u16 = u16[A2 + 0x10] + D2.s16
@@ -867,7 +864,7 @@ function void fn0772f6()
 		objA0.value3a = 0
 		objA0.value39 = 0
 
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 
 		A1 = 0xffff0000 + u16[A0 + 0x44]
 	#if STANDALONE

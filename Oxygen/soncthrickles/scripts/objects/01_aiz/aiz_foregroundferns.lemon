@@ -1,0 +1,72 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2022 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+//-------------------------------------------------------//
+// AIZ Foreground Decoration Ferns                       //
+//-------------------------------------------------------//
+
+//# address-hook(0x02c1f0) end(0x02c240)
+function void AIZ_ForegroundDeco.Init()
+{
+	objA0.mapping_offset = 0x22b8ec
+	objA0.render_flags |= render_flag.WORLD
+	u16[A0 + 0x30] = objA0.position.x.u16
+	objA0.value32 = objA0.position.y.u16
+	D0.u16 = objA0.subtype2c & 0x0f
+	objA0.animation.sprite = D0.u8
+
+	A1 = 0x02c242 + D0.s16 * 6
+	objA0.sprite_attributes = u16[(A1+=2)-2]
+	objA0.sprite_priority = u16[(A1+=2)-2]
+	objA0.box_size.x = u8[(A1+=1)-1]
+	objA0.box_size.y = u8[(A1+=1)-1]
+	D0.u16 = (objA0.subtype2c >> 2) & 0x3c
+
+	// Can be e.g.:
+	//  - 0x02c2a6
+	//  - 0x02c2dc
+	//  - 0x02c312
+	objA0.update_address = u32[0x02c24e + D0.u16]
+}
+
+
+function void AIZ_ForegroundDeco_shared(u8 shift)
+{
+	u32 px = u16[A0 + 0x30]
+	u32 py = u16[A0 + 0x32]
+	objA0.position.x.u16 = px + (s16(px - camera.position.x.u16 - 160) >> shift)
+	objA0.position.y.u16 = py + (s16(py - camera.position.y.u16 - 112) >> shift)
+
+	DrawOrUnloadObjectAtPosition(px)
+}
+
+//# address-hook(0x02c2a6) end(0x02c2d6)
+function void AIZ_ForegroundDeco1_Update()
+{
+	AIZ_ForegroundDeco_shared(3)
+}
+
+//# address-hook(0x02c2dc) end(0x02c30c)
+function void AIZ_ForegroundDeco2_Update()
+{
+	AIZ_ForegroundDeco_shared(2)
+}
+
+//# address-hook(0x02c312) end(0x02c342)
+function void AIZ_ForegroundDeco3_Update()
+{
+	AIZ_ForegroundDeco_shared(1)
+}
+
+//# address-hook(0x02c348) end(0x02c374)
+function void fn02c348()
+{
+	AIZ_ForegroundDeco_shared(0)
+}

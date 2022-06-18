@@ -110,8 +110,8 @@ function void fn06ef5a()
 function void fn06ef60()
 {
 	objA0.base_state = 0x08
-	playMusic(0x2e)
-	level.default_music.u8 = 0x2e
+	playMusic(MUSIC_MINIBOSS_2)
+	level.default_music.u8 = MUSIC_MINIBOSS_2
 }
 
 
@@ -138,11 +138,12 @@ function void fn06ef88()
 		return
 	}
 
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	objA0.countdown_value = 119
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the boss theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 	fn085ba8()
@@ -198,7 +199,7 @@ function void fn06f010()
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
 		D0.u16 = objA0.value3e
-		if ((objA0.flags2a & 0x08) == 0 && (u8[A1 + 0x38] & 0x04) == 0)
+		if ((objA0.flags2a & object.flag.P1_ON_OBJECT) == 0 && (u8[A1 + 0x38] & 0x04) == 0)
 		{
 			u8[A1 + 0x38] &= ~0x01
 		}
@@ -406,7 +407,7 @@ function void fn06f1a6()
 	if (objA0.subtype2c != 0)
 	{
 		D0.s16 = -D0.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		objA0.countdown_value = 0x3f
 	}
 	objA0.velocity.x = D0.s16
@@ -440,8 +441,7 @@ function void fn06f1fa()
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x06f224
 
-	A2 = 0x06faa2
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x06faa2)
 }
 
 
@@ -652,7 +652,7 @@ function void fn06f416()
 	objA0.value3e = 0x03
 	SetupObjectAttributesBasic()
 
-	u8[A0 + 0x28] = 0x86
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.16x16)
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A1 = 0xffff0000 + u16[A1 + 0x46]
 	A1 = 0xffff0000 + u16[A1 + 0x46]
@@ -682,9 +682,9 @@ function void fn06f46a()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x30] = u16[A1 + 0x30]
 	objA0.value32 = u16[A1 + 0x32]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		objA0.velocity.x = -objA0.velocity.x
 	}
 }

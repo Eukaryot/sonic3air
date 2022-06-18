@@ -16,7 +16,7 @@
 function void fn026130()
 {
 	objA0.mapping_offset = 0x22534c
-	objA0.sprite_attributes = 0x43c3
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x80
@@ -85,7 +85,7 @@ function void fn0261f2()
 			objA1.update_address = 0x02629c
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
-			u8[A1 + 0x04] = objA0.render_flags
+			objA1.render_flags = objA0.render_flags
 			u16[A1 + 0x3c] = A2.u16
 		}
 		A1 = backupA1
@@ -127,12 +127,12 @@ function void fn0261f2()
 
 			u16[A1 + 0x32] = 0x0f
 			u16[A1 + 0x1c] = objA1.velocity.x
-			objA0.flags2a &= ~0x20
-			objA0.flags2a &= ~0x40
-			u8[A1 + 0x2a] &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
+			objA0.flags2a &= ~object.flag.P2_PUSHING
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		}
 
-		playSound(0xb1)
+		playSound(SFX_SPRING)
 	}
 }
 
@@ -141,7 +141,7 @@ function void fn0261f2()
 function void fn02629c()
 {
 	objA0.mapping_offset = 0x22534c
-	objA0.sprite_attributes = 0x43c3
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x08
 	objA0.sprite_priority = 0x80
@@ -150,7 +150,7 @@ function void fn02629c()
 	objA0.value32 = objA0.position.y.u16
 	objA0.animation.sprite = 0x01
 	u8[A0 + 0x40] = 0x80
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x04
 
 	objA0.update_address = 0x0262ec

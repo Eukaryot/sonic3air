@@ -16,7 +16,7 @@
 function void fn04a3dc()
 {
 	objA0.mapping_offset = 0x04a3d2
-	objA0.sprite_attributes = 0x6378
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0378)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
@@ -81,17 +81,18 @@ function void fn04a428()
 		return
 	}
 
-	if (D1 & 0x70)
+	// Check if jump button pressed
+	if (D1 & CONTROL_ABC)
 	{
 		fn04a4b4()
 		return
 	}
 
-	if (D1 & 0x0400)
+	if (D1 & 0x0400)		// CONTROL_LEFT held
 	{
 		--u8[A2 + 0x06]
 	}
-	if (D1 & 0x0800)
+	if (D1 & 0x0800)		// CONTROL_RIGHT held
 	{
 		++u8[A2 + 0x06]
 	}
@@ -158,10 +159,10 @@ function void fn04a4f6()
 	u8[A2] = 0
 	u8[A2 + 0x02] = 0x1e
 
-	u16[A1 + 0x08] = 0x0100
+	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x1e] = 0x0e
 	u8[A1 + 0x1f] = 0x07
-	u8[A1 + 0x20] = 0x02
+	u8[A1 + 0x20] = char.state.ROLLING
 	u8[A1 + 0x27] = 0
 	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -178,7 +179,7 @@ function void fn04a53a()
 		--u8[A2 + 0x02]
 		if (u8[A2 + 0x02] == 0)
 		{
-			u16[A1 + 0x08] = 0x0100
+			objA1.sprite_priority = 0x0100
 		}
 		return
 	}
@@ -203,11 +204,11 @@ function void fn04a53a()
 			u8[A2 + 0x04] = D1.u8
 			u8[A2 + 0x06] = D0.u8 - 0x40
 
-			u8[A1 + 0x04] &= 0xfd
+			objA1.render_flags &= ~render_flag.FLIP_Y
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			u16[A1 + 0x1c] = 0x0800
-			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x20] = char.state.ROLLING
 			u8[A1 + 0x2e] = 0x01
 			fn04a5e0()
 		}
@@ -240,13 +241,13 @@ function void fn04a5e0()
 	D0.u8 = u8[A2 + 0x04]
 	if (D0.s8 < 0)
 	{
-		u16[A1 + 0x08] = 0x0280
-		u16[A1 + 0x0a] &= 0x7fff
+		objA1.sprite_priority = 0x0280
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 	else
 	{
-		u16[A1 + 0x08] = 0x0100
-		u16[A1 + 0x0a] |= 0x8000
+		objA1.sprite_priority = 0x0100
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 	D0.u8 += 4
 	u8[A2 + 0x04] = D0.u8

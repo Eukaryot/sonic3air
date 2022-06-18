@@ -86,12 +86,11 @@ function void fn0634b8()
 //# address-hook(0x0634ca) end(0x063524)
 function void fn0634ca()
 {
-	A1 = 0x0663de
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663de))
 		return
 
 	objA0.countdown_value = 0xef
-	u8[0xffffb02e] = 0x83
+	u8[0xffffb000 + 0x2e] = 0x83
 
 #if STANDALONE
 	Game.startSkippableCutscene()
@@ -127,7 +126,8 @@ function void fn0634ca()
 
 	if (allocDynamicObjectStd())
 	{
-		u32[A1] = 0x063682
+		// Spawn check for cutscene skip
+		objA1.update_address = 0x063682
 	}
 
 	// "spawnSimpleChildObjects(0x066656)" replaced by:
@@ -150,7 +150,8 @@ function void fn063526()
 		{
 			if (allocDynamicObjectStd())
 			{
-				u32[A1] = 0x063790
+				// Spawn bomb
+				objA1.update_address = 0x063790
 			}
 		}
 
@@ -316,11 +317,11 @@ function void fn06364e()
 	{
 		u32 backupA0 = A0
 
-		u16[0xffffb010] = objA0.position.x.u16
-		u16[0xffffb014] = objA0.position.y.u16
-		s16[0xffffb018] = objA0.velocity.x
-		s16[0xffffb01c] = objA0.velocity.x
-		u8[0xffffb02e] = 0
+		u16[0xffffb000 + 0x10] = objA0.position.x.u16
+		u16[0xffffb000 + 0x14] = objA0.position.y.u16
+		s16[0xffffb000 + 0x18] = objA0.velocity.x
+		s16[0xffffb000 + 0x1c] = objA0.velocity.x
+		u8[0xffffb000 + 0x2e] = 0
 
 		// Give Knuckles another update, to make sure he's rendered this frame at all
 		A0 = 0xffffb000
@@ -407,7 +408,7 @@ function void fn063694()
 	objA0.update_address = u32[(A1+=4)-4]
 	objA0.mapping_offset = u32[(A1+=4)-4]
 	objA0.sprite_attributes = u16[(A1+=2)-2]
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
@@ -484,7 +485,7 @@ function void fn063790()
 	objA0.position.x.u16 = camera.position.x.u16 + getScreenWidth() / 2
 	objA0.position.y.u16 = camera.position.y.u16 - 0x40
 
-	playSound(0x51)
+	playSound(SFX_BOMBFALL)
 
 	// "spawnChildObjects(0x06665c)" replaced by:
 	spawnChildObject(0x0638dc, 0x00, 0, -20)
@@ -538,7 +539,7 @@ function void fn063846()
 		if (allocDynamicObjectStd())
 		{
 			u16[A0 + 0x44] = A1.u16
-			u32[A1] = 0x085e64
+			objA1.update_address = 0x085e64
 			u16[A1 + 0x3a] = 0x07
 			u8[A1 + 0x2c] = 0xff
 
@@ -561,7 +562,7 @@ function void fn0638a2()
 	u8[0xfffffab8] |= 0x04
 	if (allocDynamicObjectStd())
 	{
-		u32[A1] = 0x0639c8
+		objA1.update_address = 0x0639c8
 	}
 	copyMemory(0xfffffca0, 0x0a973c, 0x20)
 
@@ -657,7 +658,7 @@ function void fn0639c8()
 
 	objA0.position.x.u16 = camera.position.x.u16 + 0x0110
 	objA0.position.y.u16 = camera.position.y.u16 - 0x60
-	playMusic(0x19)
+	playMusic(MUSIC_MAINBOSS)
 
 	// "spawnChildObjects(0x0919d0)" replaced by:
 	spawnChildObject(0x0916a8, 0x00, -12, 28)
@@ -726,7 +727,7 @@ function void fn065e02()
 	bool skip = false
 	if ((u8[0xfffffab8] & 0x04) == 0)
 	{
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 		D2.u16 = objA0.position.x.u16
 		if (D2.u16 < u16[A0 + 0x3a])
 		{
@@ -741,7 +742,7 @@ function void fn065e02()
 	if (!skip)
 	{
 		D1.s16 = -D1.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	objA0.velocity.x = D1.u16
 }

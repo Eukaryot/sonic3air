@@ -55,13 +55,12 @@ function void fn0624f2()
 //# address-hook(0x062528) end(0x062548)
 function void fn062528()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	control.player1 = 0
 	player1.control_override = 0xff
-	u8[0xffffb02e] = 0x80
+	u8[0xffffb000 + 0x2e] = 0x80
 	fn065dd6()
 
 #if STANDALONE
@@ -87,8 +86,9 @@ function void fn06254e()
 //# address-hook(0x06256c) end(0x0625a4)
 function void fn06256c()
 {
-	control.player1 = 0x0808
-	if (u16[0xffffb010] < 0x4760)
+	control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
+
+	if (u16[0xffffb000 + 0x10] < 0x4760)
 		return
 
 	objA0.base_state = 0x06
@@ -127,7 +127,8 @@ function void fn0625ca()
 function void fn06261a()
 {
 	// Sonic walks left into the transporter
-	control.player1 = 0x0404
+	control.player1 = 0x0404		// CONTROL_LEFT, CONTROL_LEFT
+
 	D0.u16 = camera.position.y.u16 + 0x0160
 	if (D0.u16 >= objA0.position.y.u16)
 		return

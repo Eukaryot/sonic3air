@@ -54,8 +54,7 @@ function void fn0630fc()
 //# address-hook(0x063134) end(0x06316a)
 function void fn063134()
 {
-	A1 = 0x0663cc
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663cc))
 		return
 
 	objA0.countdown_callback = 0x063182
@@ -135,7 +134,7 @@ function void fn0631a4()
 		if (player != 0 && u32[A1] != 0)
 		{
 			u8[A1 + 0x2e] = 0x81
-			u8[A1 + 0x20] = 0x05
+			u8[A1 + 0x20] = char.state.STANDING
 			StopObjectA1()
 
 		#if STANDALONE
@@ -183,7 +182,7 @@ function void fn063220()
 		{
 			++objA0.value39
 			objA0.value3e -= 4
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 }
@@ -198,7 +197,7 @@ function void fn063280()
 		objA1.update_address = 0x06338e
 	}
 
-	if (u8[0xffffb04e] & 0x80)
+	if (u8[0xffffb04a + 0x04] & 0x80)
 	{
 		if (allocDynamicObjectStd())
 		{
@@ -234,7 +233,7 @@ function void fn0632ca()
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
-		objA0.sprite_attributes = 0x8528
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0528)
 		A1 = 0xffff0000 + u16[A0 + 0x46]
 		objA0.respawn_entry = u16[A1 + 0x48]
 	}
@@ -313,7 +312,7 @@ function void fn06338e()
 	objA0.position.y.u16 = objA1.position.y.u16
 	u8[A1 + 0x2e] = 0x81
 	objA1.state = char.state.LIFTED
-	u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+	objA1.render_flags &= ~render_flag.FLIP_Y
 	u8[A1 + 0x0a] |= 0x80
 	u8[0xffffee39] = 0xff
 }
@@ -378,11 +377,11 @@ function void fn065e62()
 //# address-hook(0x065e72)
 function void fn065e72()
 {
-	u8[A1 + 0x20] = 0x05
+	u8[A1 + 0x20] = char.state.STANDING
 	if (objA0.animation.frame >= 0x0c)
 	{
-		u8[A1 + 0x04] |= render_flag.FLIP_Y
-		u8[A1 + 0x20] = 0
+		objA1.render_flags |= render_flag.FLIP_Y
+		u8[A1 + 0x20] = char.state.RUNNING
 		u8[A1 + 0x2e] = 0x83
 
 		D0 = (global.framecounter & 0x02) ? 2 : 0
@@ -427,6 +426,7 @@ function void fn062422()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the Knuckles theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 

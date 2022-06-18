@@ -14,7 +14,7 @@
 function void fn042bb8()
 {
 	objA0.mapping_offset = 0x042cb2
-	objA0.sprite_attributes = 0x63a1
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03a1)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x04
@@ -46,14 +46,14 @@ function void fn042bf6()
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16
 				objA1.position.x.u16 += 0x08
-				u8[A1 + 0x04] = objA0.render_flags
-				u32[A1 + 0x0c] = objA0.mapping_offset
-				u16[A1 + 0x0a] = 0x03a1
-				u16[A1 + 0x08] = 0x0300
-				u8[A1 + 0x07] = 0x0c
-				u8[A1 + 0x06] = 0x08
-				u8[A1 + 0x28] = 0x9b
-				u8[A1 + 0x2b] |= 0x10
+				objA1.render_flags = objA0.render_flags
+				objA1.mapping_offset = objA0.mapping_offset
+				objA1.sprite_attributes = 0x03a1
+				objA1.sprite_priority = 0x0300
+				objA1.box_size.x = 0x0c
+				objA1.box_size.y = 0x08
+				objA1.collision_attributes = (collision.flag.THREAT | collision.size.8x4)
+				u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 				objA1.velocity.x = 0x0200
 				if (objA0.flags2a & 0x01)
 				{

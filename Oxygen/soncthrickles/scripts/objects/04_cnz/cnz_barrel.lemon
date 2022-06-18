@@ -27,7 +27,7 @@ function void CNZBarrel.Init()
 	D0.u16 = (D0.u16 * 2) & 0x1e
 	u16[A0 + 0x3a] = D0.u16
 	objA0.mapping_offset = 0x2317b0
-	objA0.sprite_attributes = 0x438e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x038e)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
@@ -52,13 +52,13 @@ function void CNZBarrel.Update()
 
 	A2 = A0 + 0x32
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D5.u16 = control.player1
 	fn0324c0()
 
 	A2 += 4
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5.u16 = control.tails
 	fn0324c0()
 
@@ -101,7 +101,7 @@ function void fn0321e2()
 function void fn032208()
 {
 	D1.u16 = u16[A0 + 0x3c]
-	D0.u16 = objA0.flags2a & 0x18
+	D0.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u16 != D1.u16)
 	{
 		u16[A0 + 0x3c] = D0.u16
@@ -127,11 +127,11 @@ function void fn032208()
 
 	UpdateMovementStraightSimple()
 	D5 = 0
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		D5.u8 = control.player1.state
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		D5.u8 |= control.tails.state
 	}
@@ -351,10 +351,12 @@ function void fn0324c0()
 		return
 #endif
 
+	u8 bit = (1 << D6.u8)
+
 	D0.u8 = u8[A2]
 	if (D0.u8 == 0)
 	{
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 			u8[A2 + 0x01] = 0
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
@@ -389,7 +391,7 @@ function void fn0324c0()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
 	{
-		if ((objA0.flags2a & (1 << D6.u8)) == 0)
+		if ((objA0.flags2a & bit) == 0)
 		{
 			u8[A2] = 0
 			return
@@ -407,7 +409,7 @@ function void fn0324c0()
 		objA1.position.x.u16 = D1.u16
 		u8[A2 + 1] += 2
 		D0.u8 = u8[A0 + 0x35]
-		u16[A1 + 0x08] = (D0.u8 > u8[A2 + 0x03]) ? 0x80 : 0x100
+		objA1.sprite_priority = (D0.u8 > u8[A2 + 0x03]) ? 0x80 : 0x100
 
 		u16[A1 + 0x1c] = 0
 		D0.s16 = abs(objA0.velocity.y)
@@ -416,6 +418,7 @@ function void fn0324c0()
 			u16[A1 + 0x1c] = 0x800
 		}
 
+		// Check if jump button pressed
 		if ((D5.u8 & CONTROL_ABC) == 0)
 		{
 			fn03260a()
@@ -428,7 +431,7 @@ function void fn0324c0()
 		u16[A1 + 0x1c] = 0
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
-		u8[A1 + 0x20] = 0x02
+		u8[A1 + 0x20] = char.state.ROLLING
 		objA1.flags2a |= char.flag.ROLLING
 		u8[A1 + 0x40] = 0x01
 
@@ -438,7 +441,7 @@ function void fn0324c0()
 	}
 
 	objA1.flags2a |= char.flag.IN_AIR
-	u16[A1 + 0x08] = 0x0100
+	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x2e] = 0
 	u8[A2] = 0
 }
@@ -458,9 +461,9 @@ function void fn032610()
 	D0.u8 += 0x0b
 	D0.u16 = D0 / 0x16
 	u8[A1 + 0x22] = u8[0x03263e + D0.s16]
-	u8[A1 + 0x04] &= 0xfc
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	D0.u8 = u8[0x03264a + D0.s16]
-	u8[A1 + 0x04] |= D0.u8
+	objA1.render_flags |= D0.u8
 	D0 = u8[A1 + 0x22]
 
 	u32 backupA2 = A2

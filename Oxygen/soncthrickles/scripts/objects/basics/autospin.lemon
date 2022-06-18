@@ -176,7 +176,7 @@ function void fn01e9b6()
 	u8[A1 + 0x1f] = 7
 	objA1.state = char.state.ROLLING
 	objA1.flags2a |= char.flag.ROLLING
-	playSound(0x3c)
+	playSound(SFX_ROLL)
 }
 
 

@@ -16,7 +16,7 @@
 //# address-hook(0x0862ae) end(0x0862ae)
 function void fn0862ae()
 {
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	fn0862b4()
 }
 

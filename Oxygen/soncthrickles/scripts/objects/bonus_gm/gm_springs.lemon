@@ -72,10 +72,10 @@ function void fn060dac()
 		push(D1)
 
 		A1 = 0xffffb000
-		D6 = 3
+		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn01dccc()
 
-		if (objA0.flags2a & 0x08)
+		if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 		{
 			objA0.flags38 |= 0x20
 			SpringVertical.ApplyToCharacter()
@@ -87,10 +87,10 @@ function void fn060dac()
 		D4 = pop()
 
 		A1 = 0xffffb04a
-		D6 = 4
+		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn01dccc()
 
-		if (objA0.flags2a & 0x10)
+		if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 		{
 			SpringVertical.ApplyToCharacter()
 		}

@@ -261,7 +261,7 @@ function void RenderSprites()
 	u8[0xfffff62c] = 0x4f - D6.u8
 	if (u16[0xffffef3a] != 0)
 	{
-		if (u8[0xffffb005] < 0x06)
+		if (u8[0xffffb000 + 0x05] < 0x06)
 		{
 			u16[0xffffef3a] = 0
 		}
@@ -364,11 +364,11 @@ function void renderNextObject()
 			}
 		}
 
-		D3.u16 = u16[A0 + 0x16] - 1
+		D3.u16 = u16[A0 + 0x16] - 1	// Number of child sprites
 		if (D3.s16 < 0)
-			return
+			return	// Skip if none
 
-		A0 += 0x18
+		A0 += 0x18	// Start of child sprite data (u8[A0 + 0x05] = map frame)
 
 	#if STANDALONE
 		while (D3.s16 >= 0)
@@ -376,15 +376,16 @@ function void renderNextObject()
 		while (D3.s16 >= 0 && D7.s16 >= 0)
 	#endif
 		{
-			D0.u16 = u16[A0]
-			D1.u16 = u16[A0 + 2]
+			D0.u16 = u16[A0]		// Child sprite X position
+			D1.u16 = u16[A0 + 2]	// Child sprite Y position
 			if (D6 & render_flag.WORLD)
 			{
 				D0.u16 = (D0.u16 + 0x80 - cameraX)
 				D1.u16 = (D1.u16 + 0x80 - cameraY) & level.height.bitmask
 			}
-			D4 = u16(u8[A0 + 5]) * 2
-			A0 += 6
+
+			D4 = u16(u8[A0 + 5]) * 2	// Child sprite map frame id
+			A0 += 6	// To next child sprite (?)
 
 			A1 = tableLookupAddress(A2, D4.u16)
 			D4.u16 = u16[A1] - 1
@@ -427,10 +428,6 @@ function void renderNextObject()
 		}
 
 		objA0.render_flags |= render_flag.VISIBLE
-	#if !STANDALONE
-		if (D7.s16 < 0)
-			return
-	#endif
 
 	#if STANDALONE
 		if (objA0.update_address != 0x04a0c6)	// Explicitly disable sprite interpolation for the Glowing Spheres energy beam, as it ruins the effect
@@ -439,11 +436,14 @@ function void renderNextObject()
 			Renderer.clearSpriteTag()
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
 			return
+	#else
+		if (D7.s16 < 0)
+			return
 	#endif
 
 		A1 = objA0.mapping_offset
 		D4 = 0
-		if ((objA0.render_flags & 0x20) == 0)
+		if ((objA0.render_flags & render_flag.STATIC_MAPPING) == 0)
 		{
 			A1 = tableLookupAddress(A1, s16(objA0.animation.sprite) * 2)
 			D4.u16 = u16[A1] - 1
@@ -516,9 +516,9 @@ function void writeToSpriteTable(u16 renderQueue)
 
 		u16 index = u16[A1+2] + D5.u16
 		if (flipX)
-			index ^= 0x0800
+			index ^= sprite_attribute.FLIP_X
 		if (flipY)
-			index ^= 0x1000
+			index ^= sprite_attribute.FLIP_Y
 
 	#if STANDALONE
 		if (!Standalone.onDrawVdpSprite(px - 0x80, py - 0x80, size, index, renderQueue))
@@ -594,9 +594,9 @@ function void writeToSpriteTableCompound(u16 renderQueue)
 
 			u16 index = u16[A1+2] + D5.u16
 			if (flipX)
-				index ^= 0x0800
+				index ^= sprite_attribute.FLIP_X
 			if (flipY)
-				index ^= 0x1000
+				index ^= sprite_attribute.FLIP_Y
 
 		#if STANDALONE
 			// Note that clipping in x-direction is ignored for standalone rendering
@@ -716,13 +716,13 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 	{
 		objA0.render_flags &= ~render_flag.VISIBLE		// Reset visibility flag
 		D6.u8 = objA0.render_flags
-		if (D6 & 0x10)
+		if (D6 & render_flag.COMPETITION_P2_SCREEN)
 			return
 	}
 	else
 	{
 		D6.u8 = objA0.render_flags
-		if (D6 & 0x08)
+		if (D6 & render_flag.COMPETITION_P1_SCREEN)
 			return
 	}
 	u16 offsetY = splitScreenIndex * 0x70
@@ -733,7 +733,7 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 	// Special handling for compound objects
 	if (objA0.render_flags & render_flag.COMPOUND)
 	{
-		D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & u16[0xffffeea8]
+		D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & level.width.bitmask
 		D3.u16 = objA0.box_size.x
 		D2.u16 = getScreenWidth() + objA0.box_size.x * 2
 		if (D0.u16 >= D2.u16)
@@ -769,17 +769,17 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 			}
 		}
 
-		D3.u16 = objA0.position.y.frac - 1
+		D3.u16 = objA0.position.y.frac - 1	// Number of child sprites
 		if (D3.s16 >= 0)
 		{
-			A0 += 0x18
+			A0 += 0x18	// Start of child sprite data (u8[A0 + 0x05] = map frame)
 			while (D3.s16 >= 0 && D7.s16 >= 0)
 			{
-				D0.u16 = (u16[A0]   - u16[A3]   + 0x80) & u16[0xffffeea8]
-				D1.u16 = (u16[A0+2] - u16[A3+4] + 0x80) & level.height.bitmask
+				D0.u16 = (u16[A0]   - u16[A3]   + 0x80) & level.width.bitmask	// Child sprite X position
+				D1.u16 = (u16[A0+2] - u16[A3+4] + 0x80) & level.height.bitmask	// Child sprite Y position
 				D1.u16 += offsetY
-				D4 = u8[A0+5]
-				A0 += 6
+				D4 = u8[A0+5]	// Child sprite map frame id
+				A0 += 6			// To next child sprite (?)
 
 				A1 = tableLookupAddress(A2, D4.u16 * 2)
 				D4.s16 = s16[A1] - 1
@@ -796,9 +796,10 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 	}
 	else
 	{
+		// Normal (non-compound) object
 		if (D6 & render_flag.WORLD)
 		{
-			D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & u16[0xffffeea8]
+			D0.u16 = (D0.u16 - u16[A3] + objA0.box_size.x) & level.width.bitmask
 			D3.u16 = objA0.box_size.x
 			D2.u16 = getScreenWidth() + objA0.box_size.x * 2
 			if (D0.u16 >= D2.u16)
@@ -815,12 +816,12 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 		}
 		D1.u16 += offsetY
 
-		objA0.render_flags |= 0x80
+		objA0.render_flags |= render_flag.VISIBLE
 		if (D7.s16 >= 0)
 		{
 			A1 = objA0.mapping_offset
 			D4 = 0
-			if ((D6 & 0x20) == 0)
+			if ((D6 & render_flag.STATIC_MAPPING) == 0)
 			{
 				D4.u16 = u16(objA0.animation.sprite) * 2
 				A1 += u16[A1 + D4.u16]

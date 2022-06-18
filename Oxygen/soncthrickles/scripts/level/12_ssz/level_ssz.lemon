@@ -406,7 +406,7 @@ function void fn0575ea()
 	if (u8[0xffffeed8] != 0)
 		return
 
-	if (camera.position.x.u16 >= 0x19a0 - getScreenExtend() && u16[0xffffb014] < 0x0680)
+	if (camera.position.x.u16 >= 0x19a0 - getScreenExtend() && u16[0xffffb000 + 0x14] < 0x0680)
 	{
 		move_area.left = 0x19a0 - getScreenExtend()
 		D0.u16 = 0x05c0
@@ -425,7 +425,7 @@ function void fn0575ea()
 			if (D0.u16 >= 0x0100 && D0.u16 < 0x0e00)
 			{
 				A1 = 0x05778a
-				D1.u16 = u16[0xffffb010]
+				D1.u16 = u16[0xffffb000 + 0x10]
 				while (D1.u16 >= u16[(A1+=2)-2])
 				{
 					A1 += 2
@@ -459,7 +459,7 @@ function void fn0575ea()
 			}
 		}
 
-		D0.u16 = u16[0xffffb014]
+		D0.u16 = u16[0xffffb000 + 0x14]
 		if (D0.u16 >= 0x0440)
 		{
 			if (D0.u16 >= 0x0880 || s8[0xffffeed2] < 0)
@@ -476,7 +476,7 @@ function void fn0575ea()
 			{
 				move_area.left = 0x0160 - getScreenExtend()
 				move_area.right = 0x19a0 + getScreenExtend()
-				if (D0.u16 < 0x07c0 || camera.position.x.u16 != move_area.left || u8[0xffffb02a] & 0x02)
+				if (D0.u16 < 0x07c0 || camera.position.x.u16 != move_area.left || u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 					return
 
 				move_area.right = 0x0160 + getScreenExtend()
@@ -514,7 +514,7 @@ function void fn0575ea()
 				D1 = (level.display_routine == 0) ? 0x0160 : 0
 
 				move_area.left = D1.u16
-				if (D0.u16 < 0x0420 || camera.position.x.u16 != 0x1660 - getScreenExtend() || u8[0xffffb02a] & 0x02)
+				if (D0.u16 < 0x0420 || camera.position.x.u16 != 0x1660 - getScreenExtend() || u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 					return
 
 				move_area.left = 0x1660 - getScreenExtend()
@@ -555,8 +555,8 @@ function void InitLevelScrolling.SSZ()
 
 			objA1.update_address = 0x057b8e
 			D2.u16 = u16[(A5+=2)-2]
-			u8[A1 + 0x04] = D2.u8
-			u8[A1 + 0x06] = 0x80
+			objA1.render_flags = D2.u8
+			objA1.box_size.y = 0x80
 			objA1.position.x.u16 = u16[(A5+=2)-2]
 			objA1.velocity.y = u16[(A5+=2)-2]
 			u16[A1 + 0x2e] = u16[(A5+=2)-2]

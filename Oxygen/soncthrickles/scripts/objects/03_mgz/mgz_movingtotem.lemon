@@ -12,8 +12,8 @@
 function void fn0346e2()
 {
 	objA0.mapping_offset = 0x233b98
-	objA0.sprite_attributes = 0x4001
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x30
@@ -69,7 +69,7 @@ function void fn034728()
 	D6 = (D6 << 16) + (D6 >> 16)
 	if (D6.u8 & 0x01)
 	{
-		objA0.flags2a &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
 		A1 = 0xffffb000
 		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x28
 		if (D0.s16 >= 0)
@@ -80,7 +80,7 @@ function void fn034728()
 
 	if (D6.u8 & 0x02)
 	{
-		objA0.flags2a &= ~0x40
+		objA0.flags2a &= ~object.flag.P2_PUSHING
 		A1 = 0xffffb04a
 		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x28
 		if (D0.s16 >= 0)

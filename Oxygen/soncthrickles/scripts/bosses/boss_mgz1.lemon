@@ -66,8 +66,9 @@ function void fn0885a4()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 
 	// "spawnChildObjects(0x088b2c)" replaced by:
@@ -134,7 +135,7 @@ function void fn08867a()
 function void fn08867e()
 {
 	objA0.base_state = 0x0c
-	objA0.render_flags |= 0x02
+	objA0.render_flags |= render_flag.FLIP_Y
 	camera.screenshake.state.hi = 0xff
 	objA0.countdown_value = 0x7f
 	objA0.countdown_callback = 0x088716
@@ -152,7 +153,7 @@ function void fn08867e()
 		spawnChildObjects(0x088b62)
 		if (D3.u16 < 0x08)
 		{
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 		}
 	}
 }
@@ -244,7 +245,7 @@ function void fn088790()
 //# address-hook(0x0887a4) end(0x0887b8)
 function void fn0887a4()
 {
-	objA0.render_flags &= ~0x02
+	objA0.render_flags &= ~render_flag.FLIP_Y
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x0887ba
 }
@@ -326,7 +327,7 @@ function void fn0888a6()
 		D6 = (D6 << 16) + (D6 >> 16)
 		if (D6.u8 & 0x01)
 		{
-			objA0.flags2a &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
 			A1 = 0xffffb000
 			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x28
 			if (D0.s16 >= 0)
@@ -337,7 +338,7 @@ function void fn0888a6()
 
 		if (D6.u8 & 0x02)
 		{
-			objA0.flags2a &= ~0x40
+			objA0.flags2a &= ~object.flag.P2_PUSHING
 			A1 = 0xffffb04a
 			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x28
 			if (D0.s16 >= 0)

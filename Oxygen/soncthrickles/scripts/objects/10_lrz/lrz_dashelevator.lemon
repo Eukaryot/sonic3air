@@ -49,12 +49,12 @@ function void fn042f78()
 	D5 = 0
 	A2 = A0 + 0x2e
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn04301c()
 
 	++A2
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn04301c()
 
 	D0 = u32[A0 + 0x30]
@@ -117,9 +117,11 @@ function void fn042f78()
 //# address-hook(0x04301c) end(0x043094)
 function void fn04301c()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A2] == 0)
 	{
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 		#if STANDALONE
 			// Allow Super Peel-Out as well

@@ -16,7 +16,7 @@
 function void fn049aae()
 {
 	objA0.mapping_offset = 0x049c0a
-	objA0.sprite_attributes = 0xe2eb
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x02eb)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x14
 	objA0.box_size.y = 0x3c
@@ -44,7 +44,7 @@ function void fn049ada()
 		if (D0.u16 != 0)
 		{
 			A1 = 0xffffb000
-			D5 = 5
+			D5 = 5		// object.flag.P1_PUSHING
 			fn049b76()
 		}
 
@@ -52,7 +52,7 @@ function void fn049ada()
 		if (D6.u16 != 0)
 		{
 			A1 = 0xffffb04a
-			D5 = 6
+			D5 = 6		// object.flag.P2_PUSHING
 			fn049b76()
 		}
 	}
@@ -85,6 +85,8 @@ function void fn049b22()
 //# address-hook(0x049b76) end(0x049bf4)
 function void fn049b76()
 {
+	u8 bit = (1 << D5.u8)
+
 	playSound(0xaa)
 
 	u8[A1 + 0x2a] &= ~0x01
@@ -96,7 +98,7 @@ function void fn049b76()
 		objA1.velocity.x = -objA1.velocity.x
 	}
 
-	objA0.flags2a &= ~(1 << D5.u8)
+	objA0.flags2a &= ~bit
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 	u8[A1 + 0x2f] = 0

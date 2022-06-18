@@ -96,11 +96,11 @@ function void fn089c86()
 	objA0.animation.sprite = 0x05
 	fn086a3e()
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
 		//objA0.animation.sprite = 0x06		// Will get overwritten in any case, so what's the point?
-		if (D0 & 0x08)
+		if (D0 & object.flag.P1_ON_OBJECT)
 		{
 			objA0.animation.sprite = 0x0c
 			A1 = 0xffffb000
@@ -110,9 +110,9 @@ function void fn089c86()
 
 	#if STANDALONE
 		// Bug fix
-		D0.u8 = objA0.flags2a & 0x18
+		D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	#endif
-		if (D0 & 0x10)
+		if (D0 & object.flag.P2_ON_OBJECT)
 		{
 			objA0.animation.sprite = 0x0c
 			A1 = 0xffffb04a
@@ -183,7 +183,7 @@ function void fn089d44()
 	spilled_rings.speed = 0xff
 	objA0.hitbox_extends.x = 0x08
 	objA0.hitbox_extends.y = 0x08
-	objA0.render_flags = 0x84
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 
 	D0 = 4
 	fn0852d0()
@@ -246,7 +246,7 @@ function void fn089dc4()
 function void fn089dcc()
 {
 	// Rings
-	playSound(0xb9)
+	playSound(SFX_SPILLRINGS)
 
 	// "spawnChildObjects(0x089ef0)" replaced by:
 	spawnChildObject(0x089d44, 0x00, -8, -4)
@@ -301,9 +301,9 @@ function void fn089dee()
 		D1.s16 = -D1.s16
 	}
 	objA0.velocity.x = D1.u16
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	if (objA0.velocity.x < 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 }

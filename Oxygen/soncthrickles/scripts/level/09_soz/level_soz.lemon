@@ -120,7 +120,7 @@ function void fn055a9a()
 	}
 	else
 	{
-		D0.u16 = (u16[0xffffb010] >= 0x4000) ? 0x0960 : 0x0b20
+		D0.u16 = (u16[0xffffb000 + 0x10] >= 0x4000) ? 0x0960 : 0x0b20
 		move_area.bottom.current = D0.u16
 		move_area.bottom.target = D0.u16
 		fn055e96()
@@ -200,11 +200,11 @@ function void fn055b70()
 	if (u16[0xffffeec6] == 0x55)
 	{
 		D0.u16 = 0x4378
-		if (u16[0xffffb010] >= D0.u16 && u16[0xffffb014] >= 0x09a8)
+		if (u16[0xffffb000 + 0x10] >= D0.u16 && u16[0xffffb000 + 0x14] >= 0x09a8)
 		{
-			if (global.characters != CHARS_SONIC_AND_TAILS || u16[0xffffb05a] > D0.u16 || u16[0xffffb05e] >= 0x09a8)
+			if (global.characters != CHARS_SONIC_AND_TAILS || u16[0xffffb04a + 0x10] > D0.u16 || u16[0xffffb04a + 0x14] >= 0x09a8)
 			{
-				palette_fade.range = 0x0f
+				palette_fade.range = 0x000f		// Only first 0x10 palette entries
 				u16[0xffffeed6] = 0x15
 				u16[0xffffeed8] = 0x10
 				global.fade_timer |= 0xff00
@@ -358,14 +358,14 @@ function void fn055c84()
 
 	zeroMemory(0xfffffc40, 0x40)
 
-	D2.u16 = u16[0xffffb010] - u16[0xffffb05a]
-	D3.u16 = u16[0xffffb014] - u16[0xffffb05e]
+	D2.u16 = u16[0xffffb000 + 0x10] - u16[0xffffb04a + 0x10]
+	D3.u16 = u16[0xffffb000 + 0x14] - u16[0xffffb04a + 0x14]
 	D0.u16 = 0x0140
 	D1.u16 = 0x03ac
-	u16[0xffffb010] = D0.u16
-	u16[0xffffb014] = D1.u16
-	u16[0xffffb05a] = D0.u16 - D2.u16
-	u16[0xffffb05e] = D1.u16 - D3.u16
+	u16[0xffffb000 + 0x10] = D0.u16
+	u16[0xffffb000 + 0x14] = D1.u16
+	u16[0xffffb04a + 0x10] = D0.u16 - D2.u16
+	u16[0xffffb04a + 0x14] = D1.u16 - D3.u16
 
 	D0.u16 = 0xa0 - getScreenExtend()
 	D1.u16 = 0x034c
@@ -734,7 +734,7 @@ function void InitLevelTiles.SOZ2()
 	level.height.tilemask = 0x07f0
 	level.chunksize.bitmask = 0x3c
 	u16[0xffffeec0] = 0x08
-	if (u16[0xffffb010] >= 0x4e80)
+	if (u16[0xffffb000 + 0x10] >= 0x4e80)
 	{
 		fn05622c()
 	}
@@ -848,7 +848,7 @@ function void InitLevelScrolling.SOZ2()
 {
 	fn05697e()
 
-	D0 = (u16[0xffffb010] >= 0x2980) ? 0x20 : 0x10
+	D0 = (u16[0xffffb000 + 0x10] >= 0x2980) ? 0x20 : 0x10
 	level.scrolling_routine = D0.u16
 
 	fn0566d2()
@@ -1016,9 +1016,9 @@ function void fn056324()
 		A0 = backupA0
 
 		--level.display_routine
-		if (s16[0xffffeed2] < 0)
+		if (s16(level.display_routine) < 0)
 		{
-			palette_fade.range = 0x401f	// Only entries 0x20...0x3f
+			palette_fade.range = 0x401f		// Only entries 0x20...0x3f
 			level.display_routine = 0x15
 			level.scrolling_routine += 4
 
@@ -1041,7 +1041,7 @@ function void fn056366()
 		A0 = backupA0
 
 		--level.display_routine
-		if (s16[0xffffeed2] < 0)
+		if (s16(level.display_routine) < 0)
 		{
 			move_area.left = 0
 			move_area.right = 0x6000
@@ -1081,9 +1081,9 @@ function void fn0563a6()
 		// The original check is not precise enough:
 		//  When you trigger the first sand rise while being too high above it (that was formerly possible with Hyper Sonic Dash or Super Flickies),
 		//  it will accidently trigger the second one instead
-		if (u16[0xffffb014] < 0x0400 || u16[0xffffb014] > 0x0700)
+		if (u16[0xffffb000 + 0x14] < 0x0400 || u16[0xffffb000 + 0x14] > 0x0700)
 	#else
-		if (u16[0xffffb014] < 0x0400)
+		if (u16[0xffffb000 + 0x14] < 0x0400)
 	#endif
 		{
 			// First rising sand section
@@ -1243,7 +1243,7 @@ function void fn0564bc()
 //# address-hook(0x0564d4) end(0x0565c4)
 function void fn0564d4()
 {
-	if (u16[0xffffb010] < 0x5000 || camera.position.y.u16 < 0x0500)
+	if (u16[0xffffb000 + 0x10] < 0x5000 || camera.position.y.u16 < 0x0500)
 	{
 		fn0566d2()
 		fn0564e8()
@@ -1500,7 +1500,7 @@ function void fn056706()
 {
 	camera.background.x.u16 = camera.foreground.x.u16 - 0x4010 + (0x5250 - u16[0xffffeede])
 	camera.background.y.u16 = camera.foreground.y.u16 - 0x0250 + (0x06d8 - u16[0xffffeee0])
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 	{
 		fn056936()
 		return
@@ -1635,7 +1635,7 @@ function void fn0567b0()
 	}
 
 	level.display_routine = 0
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 	u16[0xffffeeda] += 4
 	fn05680a()
 }
@@ -1867,9 +1867,9 @@ function void fn05697e()
 //# address-hook(0x05699a) end(0x0569b8)
 function void fn05699a()
 {
-	if (u16[0xffffb010] >= 0x2a00)
+	if (u16[0xffffb000 + 0x10] >= 0x2a00)
 	{
-		if (u16[0xffffb014] >= 0x0140 && u16[0xffffb014] <= 0x0180)
+		if (u16[0xffffb000 + 0x14] >= 0x0140 && u16[0xffffb000 + 0x14] <= 0x0180)
 		{
 			_setZeroFlagByValue(1)
 			return
@@ -1888,7 +1888,7 @@ function void fn056a12()
 		D2 = 7
 		while (D2.s16 >= 0)
 		{
-			u32[A1] = D1
+			objA1.update_address = D1
 			u16[A1 + 0x2c] = D2.u16
 
 			if (!allocDynamicObjectAfterA1())

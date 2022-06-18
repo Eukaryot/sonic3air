@@ -11,11 +11,11 @@
 //# address-hook(0x04763e) end(0x0476e4)
 function void fn04763e()
 {
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	D0.u16 = objA0.subtype2c & 0x07
 	if ((D0.u16 >= 4) == !(objA0.render_flags & render_flag.FLIP_Y))
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 
 	D3 = 0x34
@@ -31,12 +31,13 @@ function void fn04763e()
 	D1 = 3
 	while (true)
 	{
-		u32[A1 + 0x0c] = 0x046f7a
-		u16[A1 + 0x0a] = 0x2480
-		u8[A1 + 0x04] = objA0.render_flags
-		u16[A1 + 0x08] = 0x0180
-		u8[A1 + 0x07] = 0x10
-		u8[A1 + 0x06] = 0x10
+		// Spawn staircase segments
+		objA1.mapping_offset = 0x046f7a
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0480)
+		objA1.render_flags = objA0.render_flags
+		objA1.sprite_priority = 0x0180
+		objA1.box_size.x = 0x10
+		objA1.box_size.y = 0x10
 		u8[A1 + 0x2c] = objA0.subtype2c
 		objA1.position.x.u16 = D2.u16
 		objA1.position.y.u16 = objA0.position.y.u16

@@ -43,11 +43,8 @@ function void fn072400()
 	// "spawnChildObjects(0x07296e)" replaced by:
 	spawnChildObject(0x072596, 0x00, 0, 0)
 
-	A2 = 0x072976
-	SpawnChildObjectChain()
-
-	A2 = 0x07297c
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x072976)
+	spawnChildObjectChain(0x07297c)
 }
 
 
@@ -182,7 +179,7 @@ function void fn0724c8()
 	else
 	{
 		objA0.base_state = 0x08
-		u8[A0 + 0x28] = 0x06
+		objA0.collision_attributes = collision.size.16x16
 	}
 }
 
@@ -568,6 +565,7 @@ function void fn072562()
 	{
 		if (allocDynamicObjectStd())
 		{
+			// Create the object that fades out the boss theme and starts the level music afterwards
 			objA1.update_address = 0x085b0a
 		}
 		objA0.position.x.u16 = u16[A0 + 0x3c]
@@ -637,13 +635,14 @@ function void fn08cfc8()
 	// Do not create this object, it leads to the level music starting twice
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the boss theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 #endif
 	hud.dirty.timer = 0
 
 	// "spawnSimpleChildObjects(0x084b12)" replaced by:
-	spawnSimpleChildObjects(0x084ad2, 1)
+	spawnSimpleChildObjects(0x084ad2, 1)		// Screen mover for the lower border
 
 	// "spawnSimpleChildObjects(0x08d27a)" replaced by:
 	spawnSimpleChildObjects(0x08d0ae, 5)
@@ -682,8 +681,7 @@ function void fn08d02e()
 function void fn08d046()
 {
 	objA0.update_address = 0x08d056
-	A2 = 0x08d25c
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d25c)
 }
 
 

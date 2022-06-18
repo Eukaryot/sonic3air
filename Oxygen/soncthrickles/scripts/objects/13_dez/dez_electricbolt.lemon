@@ -13,15 +13,15 @@ function void fn047892()
 {
 	objA0.mapping_offset = 0x04792e
 	objA0.sprite_attributes = 0x0379
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x18
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0x9f
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x24)
 
 #if STANDALONE
 	// Lightning shield protects from the bolt damage
-	u8[A0 + 0x2b] = char.bonus.SHIELD_LIGHTNING
+	objA0.flags2b = char.bonus.SHIELD_LIGHTNING
 #endif
 
 	fn0478be()

@@ -17,7 +17,7 @@ function void fn0251e4()
 {
 	if (u8[A0 + 0x3c] == 0)
 	{
-		D0.u8 = objA0.flags2a & 0x18
+		D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 		if (D0.u8 != 0)
 		{
 			u8[A0 + 0x3c] = 0x01
@@ -44,12 +44,12 @@ function void fn0251e4()
 		return
 	}
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		fn0251e4_sub(0xffffb000)
 	}
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		fn0251e4_sub(0xffffb04a)
 	}

@@ -20,8 +20,8 @@
 function void fn044a0c()
 {
 	// This defines the position where to stop automatic moving right
-	u16[A0 + 0x30] = u16[0xffffb010] + getScreenWidth() / 2 + 0x10
-	objA0.value32 = u16[0xffffb014]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x10] + getScreenWidth() / 2 + 0x10
+	objA0.value32 = u16[0xffffb000 + 0x14]
 
 	objA0.update_address = 0x044a26
 	fn044a26()
@@ -32,12 +32,13 @@ function void fn044a0c()
 function void fn044a26()
 {
 	player1.control_override = 1
-	control.player1 = 0x0800
+	control.player1 = 0x0800		// CONTROL_RIGHT, 0
+
 	camera.use_forced_target = true			// Forces camera to a certain position
 	camera.forced_target.x = u16[A0 + 0x30]
 	camera.forced_target.y = objA0.value32
 
-	D0.u16 = u16[0xffffb010] + 0x10
+	D0.u16 = u16[0xffffb000 + 0x10] + 0x10
 	if (D0.u16 < u16[A0 + 0x30])
 		return
 

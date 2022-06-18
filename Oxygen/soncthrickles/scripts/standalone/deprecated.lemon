@@ -76,3 +76,208 @@ function void fn00f3a4()
 {
 	CheckStaticCollisionVerticalShort()
 }
+
+function void fn01cdb2()
+{
+	PathSwapperCompetitionMode_UpdateVertical()
+}
+
+function void Character.UpdateUprightOnGroundInner()
+{
+	UpdateSonicUprightOnGroundInner()
+}
+
+function void fn0105c4()
+{
+	CompetitionMode.Character.BaseUpdate.Sonic_Knuckles()
+}
+
+function void fn010628()
+{
+	CompetitionMode.Character.Initialization.Sonic_Knuckles()
+}
+
+function void fn010740()
+{
+	CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
+}
+
+function void fn0107f6()
+{
+	CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
+}
+
+function void fn010868()
+{
+	CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()
+}
+
+function void fn010896()
+{
+	CompetitionMode.Character.UpdateRollingOnGround.Sonic_Knuckles()
+}
+
+function void fn0108b8()
+{
+	CompetitionMode.Character.UpdateRollingInAir.Sonic_Knuckles()
+}
+
+function void fn0108e6()
+{
+	CompetitionMode.Character.CheckForStartRolling.Sonic_Knuckles()
+}
+
+function void fn01094c()
+{
+	CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
+}
+
+function void fn012d36()
+{
+	CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
+}
+
+function void fn01309a()
+{
+	CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
+}
+
+function void fn010a80()
+{
+	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
+}
+
+function void fn013102()
+{
+	CompetitionMode.Character.BaseUpdate.Tails()
+}
+
+function void fn013166()
+{
+	CompetitionMode.Character.Initialization.Tails()
+}
+
+function void fn013274()
+{
+	CompetitionMode.Character.UpdateNormalState.Tails()
+}
+
+function void fn013336()
+{
+	CompetitionMode.Character.UpdateUprightOnGround.Tails()
+}
+
+function void fn01335a()
+{
+	CompetitionMode.Character.UpdateUprightInAir.Tails()
+}
+
+function void fn01346a()
+{
+	CompetitionMode.Character.UpdateRollingOnGround.Tails()
+}
+
+function void fn01348c()
+{
+	CompetitionMode.Character.UpdateRollingInAir.Tails()
+}
+
+function void fn0134ba()
+{
+	CompetitionMode.Character.CheckForStartRolling.Tails()
+}
+
+function void fn013520()
+{
+	CompetitionMode.Character.UpdateSpindash.Tails()
+}
+
+function void fn015cd0()
+{
+	CompetitionMode.Character.UpdateAnimation.Tails()
+}
+
+function void fn015cd6()
+{
+	CompetitionMode.UpdateTailsAnimation_inner()
+}
+
+function void fn015d1e()
+{
+	CompetitionMode.updateTailsAnimation_shared()
+}
+
+function void fn016050()
+{
+	CompetitionMode.Character.UpdateSpritePatterns.Tails()
+}
+
+function void fn013648()
+{
+	CompetitionMode.centerCameraYOffset.Tails()
+}
+
+function void fn0161fa()
+{
+	CompetitionMode.TailsTails.Init()
+}
+
+function void fn016232()
+{
+	CompetitionMode.TailsTails.Update()
+}
+
+function void fn016022()
+{
+	CompetitionMode.TailsTails.UpdateSpritePatterns()
+}
+
+function void fn01d890()
+{
+	ItemEffect.ApplyRobotnik()
+}
+
+function void fn01d6c2()
+{
+	MonitorIntact.CheckBlocking.player2()
+}
+
+function void fn084464()
+{
+	Object.AnimationProgressByLocalA1.CheckFlipX()
+}
+
+function void fn084498()
+{
+	Object.AnimationProgressByLocalA1.CheckFlipY()
+}
+
+function void fn084700()
+{
+	Object.AnimationProgressByLocalA1.SpeedUp()
+}
+
+function void fn084780()
+{
+	Object.AnimationProgressByLocalA1.SlowDown()
+}
+
+function void fn02cfc0()
+{
+	Checkpoint.Init()
+}
+
+function bool fn084fa4()
+{
+	return SetupObjectAttributesSlotted()
+}
+
+function void fn0193ca()
+{
+	HyperSonicStars.CreateSparks()
+}
+
+function void fn085b8a()
+{
+	StopCharacterWinPose.player1()
+}

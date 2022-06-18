@@ -16,7 +16,7 @@
 function void fn031d90()
 {
 	objA0.mapping_offset = 0x231010
-	objA0.sprite_attributes = 0x43e8
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03e8)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x10
@@ -157,8 +157,8 @@ function void fn031e96()
 				// Fix for bug when Tails carries other player and gets caught by the fan
 				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
 				{
-					u8[0xffffb02a] |= char.flag.IN_AIR
-					u8[0xffffb02e] = 0
+					u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+					u8[0xffffb000 + 0x2e] = 0
 				}
 			#endif
 			}

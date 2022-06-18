@@ -89,7 +89,7 @@ function void fn04b9ce()
 		// Tails' tails object
 		objA0.sprite_attributes = 0x06a0
 		u32[0xffffcc0a] = 0x0160a6
-		u16[0xffffcc3a] = A0.u16
+		u16[0xffffcc0a + 0x30] = A0.u16
 	}
 
 	slotmachine.rotation.full = 0
@@ -248,6 +248,7 @@ function void fn04bb84()
 //# address-hook(0x04bbb2) end(0x04bbf2)
 function void fn04bbb2()
 {
+	// Check if jump button pressed
 	if (control.player1.pressed & CONTROL_ABC)
 	{
 		D0.u8 = -(0x40 + slotmachine.rotation.u8 & 0xfc)
@@ -259,7 +260,7 @@ function void fn04bbb2()
 		D0.s32 >>= 8
 		objA0.velocity.y = D0.u16
 		objA0.flags2a |= 0x02
-		playSound(0x62)
+		playSound(SFX_JUMP)
 	}
 }
 
@@ -294,8 +295,8 @@ function void fn04bc1e()
 	u16[0xffffe402] += 0x40
 	if (u16[0xffffe402] == 0x1800)
 	{
-		palette_fade.range = 0x3f
-		u16[0xfffff794] = 0
+		palette_fade.range = 0x003f
+		global.fadeout_countdown = 0
 		objA0.update_address = 0x04bc54
 		slotmachine.fadeout.countdown = 60
 		u8[0xfffff650] = 0xff
@@ -307,10 +308,10 @@ function void fn04bc1e()
 //# address-hook(0x04bc54) end(0x04bcac)
 function void fn04bc54()
 {
-	--u16[0xfffff794]
-	if (s16[0xfffff794] < 0)
+	--global.fadeout_countdown
+	if (s16(global.fadeout_countdown) < 0)
 	{
-		u16[0xfffff794] = 0x02
+		global.fadeout_countdown = 0x02
 		u32 backupA0 = A0
 		FadeOutPalette()
 		A0 = backupA0

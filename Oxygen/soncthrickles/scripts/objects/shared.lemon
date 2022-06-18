@@ -16,7 +16,7 @@
 function void DrawObject()
 {
 	// Add object RAM address to one of the lists of rendered objects
-	//  -> There are multiple lists of 0x80 bytes, to get a priorization
+	//  -> There are multiple lists of 0x80 bytes, to get a prioritization
 	u32 address = 0xffffac00 + objA0.sprite_priority
 	while (address <= 0xffffaf80)
 	{
@@ -215,11 +215,11 @@ function void SetupObjectAttributesMost()
 //# address-hook(0x084040) end(0x08405e)
 function void SetupObjectAttributesBasic()
 {
-	objA0.sprite_priority  = u16[A1]
-	objA0.box_size.x       = u8[A1+2]
-	objA0.box_size.y       = u8[A1+3]
-	objA0.animation.sprite = u8[A1+4]
-	u8[A0 + 0x28]          = u8[A1+5]
+	objA0.sprite_priority      = u16[A1]
+	objA0.box_size.x           = u8[A1+2]
+	objA0.box_size.y           = u8[A1+3]
+	objA0.animation.sprite     = u8[A1+4]
+	objA0.collision_attributes = u8[A1+5]
 	objA0.render_flags |= render_flag.WORLD
 	objA0.base_state += 2
 	A1 += 6
@@ -289,7 +289,7 @@ function void fn01dc56()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dc74()
 
 	D1 = backupD1
@@ -300,7 +300,7 @@ function void fn01dc56()
 	A1 = 0xffffb04a
 	if (objA1.render_flags & render_flag.VISIBLE)
 	{
-		++D6.u8		// Do not simply set to 4, as upper bits should be preserved
+		++D6.u8		// object.flag.P2_ON_OBJECT, Do not simply set to 4, as upper bits should be preserved
 		fn01dc74()
 	}
 }
@@ -309,7 +309,7 @@ function void fn01dc56()
 //# address-hook(0x01dc74)
 function void fn01dc74()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		fn01df88()
@@ -381,7 +381,7 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 {
 	A1 = characterAddress
 	D6.u8 = bitnum
-	u8 bit = 1 << bitnum
+	u8 bit = (1 << bitnum)
 
 	if ((objA0.flags2a & bit) == 0)
 	{
@@ -420,7 +420,7 @@ function void fn01dd0e()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dd24()
 
 	D1 = backupD1
@@ -429,7 +429,7 @@ function void fn01dd0e()
 	D4 = backupD4
 
 	A1 = 0xffffb04a
-	++D6
+	++D6		// object.flag.P2_ON_OBJECT
 	fn01dd24()
 }
 
@@ -437,7 +437,8 @@ function void fn01dd0e()
 //# address-hook(0x01dd24) end(0x01dd6c)
 function void fn01dd24()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
 	{
 		fn01dece()
 		return
@@ -460,7 +461,7 @@ function void fn01dd24()
 
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.ON_OBJECT
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	D4 = 0
 }
 
@@ -515,7 +516,7 @@ function void fn08598a()
 //# translated(0x0859ce) end(0x0859d6)
 function bool fn0859ce()
 {
-	D2.u8 = u8[A2 + 0x03]	// D2 assigment is needed
+	D2.u8 = u8[A2 + 0x03]	// D2 assignment is needed
 	if (D2.u8 == 0)
 	{
 		fn0859fc()
@@ -593,7 +594,7 @@ function void Object.LoadSpritePatterns()
 
 		u32 sourceBase = u32[A2]
 		u32 tableAddress = u32[A2+4]
-		u16 targetInVRAM = (objA0.sprite_attributes & 0x07ff) << 5
+		u16 targetInVRAM = (objA0.sprite_attributes & sprite_attribute.VRAM) << 5
 
 		A2 = tableLookupAddress(tableAddress, u16(objA0.animation.sprite) * 2)
 		u16 numSprites = u16[A2] + 1
@@ -678,20 +679,20 @@ function void fn0850d4()
 //# address-hook(0x08594e) end(0x085988)
 function void fn08594e()
 {
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x08
+		objA0.flags2a &= ~object.flag.P1_ON_OBJECT
 		A1 = 0xffffb000
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x10
+		objA0.flags2a &= ~object.flag.P2_ON_OBJECT
 		A1 = 0xffffb04a
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 }
 
@@ -833,11 +834,11 @@ function void fn085b44()
 		{
 			if (camera.position.x.u16 < 0x0400)
 			{
-				objA0.subtype2c = 0xf2		// Sonic 1 boss music
+				objA0.subtype2c = MUSIC_BOSS_S1		// Sonic 1 boss music
 			}
 			else if (camera.position.x.u16 < 0x1800)
 			{
-				objA0.subtype2c = 0xf3		// Sonic 2 boss music
+				objA0.subtype2c = MUSIC_BOSS_S2		// Sonic 2 boss music
 			}
 		}
 		else if (objA0.subtype2c == MUSIC_MINIBOSS_2)
@@ -853,9 +854,9 @@ function void fn085b44()
 			{
 				u8 option = Game.getSetting(SETTING_AUDIO_HPZ_MUSIC)
 				if (option == 0)
-					objA0.subtype2c = 0xf6		// Enforce mini-boss theme from S3
+					objA0.subtype2c = MUSIC_MINIBOSS_FORCED_S3		// Enforce mini-boss theme from S3
 				else
-					objA0.subtype2c = 0xf7		// Enforce mini-boss theme from S&K
+					objA0.subtype2c = MUSIC_MINIBOSS_FORCED_SK		// Enforce mini-boss theme from S&K
 			}
 		}
 	#endif
@@ -865,7 +866,7 @@ function void fn085b44()
 
 	#if STANDALONE
 		// Credits in Knuckles' outro?
-		if (objA0.subtype2c == 0xdc)
+		if (objA0.subtype2c == MUSIC_CREDITSMEDLEY)
 		{
 			// Reset frame counter so we can use it to get the current credits music playback position
 			level.framecounter = 0
@@ -889,7 +890,7 @@ function void PlayMusicAfterLevelResults()
 	// Special handling for LRZ 2 boss
 	if (global.zone_act == 0x1600)
 	{
-		D0.u8 = 0x14
+		D0.u8 = MUSIC_LRZ2
 	}
 	else
 #endif
@@ -906,18 +907,18 @@ function void PlayMusicAfterLevelResults()
 		if (global.zone_act == 0x0a01 || global.zone_act == 0x0d01)
 		{
 			// TODO: Is this part still used / needed?
-			playMusic(0x26)		// Play Sonic 3 credits (instead of Sky Sanctuary)
+			playMusic(MUSIC_ENDING)		// Play Sonic 3 credits (instead of Sky Sanctuary)
 		}
 		else
 		{
-			playMusic(0xf0)		// Super Theme
+			playMusic(MUSIC_SUPER)		// Super Theme
 		}
 	}
 	else
 #endif
-	if (u8[0xffffb02b] & char.bonus.INVINCIBLE)
+	if (u8[0xffffb000 + 0x2b] & char.bonus.INVINCIBLE)
 	{
-		playMusic(0x2c)
+		playMusic(MUSIC_INVINCIBLE)
 	}
 	else
 	{
@@ -927,11 +928,10 @@ function void PlayMusicAfterLevelResults()
 
 
 //# address-hook(0x085b8a) end(0x085b8a)
-function void fn085b8a()
+function void StopCharacterWinPose.player1()
 {
 	stopCharacterWinPose(0xffffb000)
 }
-
 
 function void stopCharacterWinPose(u32 address)
 {
@@ -942,9 +942,12 @@ function void stopCharacterWinPose(u32 address)
 //# address-hook(0x085b8e) end(0x085ba6)
 function void StopCharacterWinPose()
 {
-	u16[A1 + 0x20] = 0x0505
-	u8[A1 + 0x23] = 0
-	u8[A1 + 0x24] = 0
+	// objA1.state = char.state.STANDING
+	// objA1.state.former = char.state.STANDING
+	objA1.state.both = 0x0505
+
+	objA1.animation.frame = 0
+	objA1.animation.timer = 0
 	objA1.flags2a &= ~char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0
 
@@ -966,11 +969,8 @@ function void fn085c00()
 
 	objA0.update_address = 0x085c1a
 
-	A1 = 0xffffb000
-	StopCharacterWinPose()
-
-	A1 = 0xffffb04a
-	StopCharacterWinPose()
+	stopCharacterWinPose(0xffffb000)
+	stopCharacterWinPose(0xffffb04a)
 }
 
 
@@ -1036,11 +1036,17 @@ function void Object.AnimationUpdate()
 		}
 
 		objA0.animation.sprite = D0.u8
-		objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x03)
+		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA0.flags2a & 0x03)
 		++objA0.animation.frame
 	}
 }
 
+
+function void Object.AlternativeAnimationUpdate(u32 address)
+{
+	A1 = address
+	Object.AlternativeAnimationUpdate()
+}
 
 //# address-hook(0x01ac88) end(0x01ad1e)
 function void Object.AlternativeAnimationUpdate()
@@ -1092,7 +1098,7 @@ function void Object.AlternativeAnimationUpdate()
 
 		objA0.animation.timer = u8[A1 + D1.s16 + 1]
 		objA0.animation.sprite = D0.u8
-		objA0.render_flags = (objA0.render_flags & 0xfc) | objA0.flags2a & 0x03
+		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (objA0.flags2a & 0x03)
 		++objA0.animation.frame
 	}
 }
@@ -1320,8 +1326,8 @@ function void fn01e0a2()
 			if (u8[A1 + 0x20] != char.state.WIN_POSE)
 		#endif
 			{
-				u8[A1 + 0x20] = 0x00
-				u8[A1 + 0x21] = 0x01
+				u8[A1 + 0x20] = char.state.RUNNING
+				u8[A1 + 0x21] = char.state.RUNNING2
 			}
 		}
 
@@ -1443,7 +1449,7 @@ function void PlatformCheckClimbOn()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	PlatformCheckClimbOnForCharacterA1()
 
 	D1 = backupD1
@@ -1452,7 +1458,7 @@ function void PlatformCheckClimbOn()
 	D4 = backupD4
 
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	PlatformCheckClimbOnForCharacterA1()
 }
 
@@ -1498,7 +1504,7 @@ function void fn01e2fe()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01e314()
 
 	D1 = backupD1
@@ -1507,14 +1513,14 @@ function void fn01e2fe()
 	D4 = backupD4
 
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn01e314()
 }
 
 
 function void fn01e314()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		fn01e50e()
@@ -1551,7 +1557,7 @@ function void fn01e356()
 	push(D1)
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01e36c()
 
 	D1 = pop()
@@ -1560,7 +1566,7 @@ function void fn01e356()
 	D4 = pop()
 
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn01e36c()
 }
 
@@ -1587,8 +1593,8 @@ function void fn01e36c()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
-	u8[A1 + 0x2a] |= 0x02
+	objA1.flags2a &= ~char.flag.ON_OBJECT
+	objA1.flags2a |= char.flag.IN_AIR
 	objA0.flags2a &= ~bit
 	D4 = 0
 }
@@ -1660,7 +1666,7 @@ function void fn01e45a()
 //# address-hook(0x01e490)
 function void LetSonicClimbOnObject()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 
 	// Already on another object?
 	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
@@ -1773,14 +1779,14 @@ function void fn08592c()
 
 
 //# address-hook(0x084400) end(0x084432)
-function void Object.AnimationProgressByLocalA1()
+function void Object.AnimationProgressByLocalA1()		// "Animate_Raw" in skdisasm
 {
 	Object.animationProgress(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x084404)
-function void Object.AnimationProgress()
+function void Object.AnimationProgress()		// "Animate_RawNoSST" in skdisasm
 {
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
@@ -1794,6 +1800,7 @@ function void Object.AnimationProgress()
 		}
 		else
 		{
+			// Advance to next frame
 			objA0.animation.timer = u8[A1]
 			objA0.animation.sprite = D1.u8
 		}
@@ -1810,7 +1817,11 @@ function void Object.animationProgress(u32 address)
 //# address-hook(0x084428)
 function void fn084428()
 {
-	call 0x084430 - D1.s8		// Can be 0x084434, 0x084438, 0x08443c
+	// Calls one of the following:
+	//	- 0x084434
+	//	- 0x084438
+	//	- 0x08443c
+	call 0x084430 - D1.s8
 	objA0.animation.frame = 0
 }
 
@@ -1818,18 +1829,21 @@ function void fn084428()
 //# address-hook(0x084434) end(0x084434)
 function void fn084434()
 {
+	// Loop animation from the start
 	fn08444e()
 }
 
 //# address-hook(0x084438) end(0x084438)
 function void fn084438()
 {
+	// Loop animation from specific frame
 	fn084440()
 }
 
 //# address-hook(0x08443c) end(0x08443c)
 function void fn08443c()
 {
+	// Call another function
 	fn08445a()
 }
 
@@ -1837,16 +1851,17 @@ function void fn08443c()
 //# address-hook(0x084440) end(0x084458)
 function void fn084440()
 {
+	// Set animation loop point
 	A1 += s8[A1 + D0.s16 + 2]
 	u32[A0 + 0x30] = A1
-	objA0.animation.sprite = u8[A1 + 1]
-	objA0.animation.timer = u8[A1]
+	fn08444e()
 }
 
 
 //# address-hook(0x08444e)
 function void fn08444e()
 {
+	// Restart animation
 	objA0.animation.sprite = u8[A1 + 1]
 	objA0.animation.timer = u8[A1]
 }
@@ -1855,16 +1870,23 @@ function void fn08444e()
 //# address-hook(0x08445a) end(0x084462)
 function void fn08445a()
 {
+	// Call address stored in objA0.countdown_callback
 	objA0.animation.timer = 0
 	A1 = objA0.countdown_callback
 	call A1
 }
 
 
-//# address-hook(0x084464) end(0x084496)
-function void fn084464()
+//# address-hook(0x084464) end(0x084464)
+function void Object.AnimationProgressByLocalA1.CheckFlipX()		// "Animate_RawAdjustFlipX" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
+	Object.AnimationProgress.CheckFlipX(u32[A0 + 0x30])
+}
+
+
+//# address-hook(0x084468) end(0x084496)
+function void Object.AnimationProgress.CheckFlipX()		// "Animate_RawNoSSTAdjustFlipX" in skdisasm
+{
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
@@ -1884,12 +1906,18 @@ function void fn084464()
 				objA0.render_flags ^= render_flag.FLIP_X
 			}
 
+			// Advance to next frame
 			objA0.animation.timer = u8[A1]
 			objA0.animation.sprite = D1.u8
 		}
 	}
 }
 
+function void Object.AnimationProgress.CheckFlipX(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckFlipX()
+}
 
 
 //# address-hook(0x01b662) end(0x01b662)

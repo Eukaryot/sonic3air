@@ -20,8 +20,9 @@ function void fn0705ea()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x19
+		u8[A1 + 0x2c] = MUSIC_MAINBOSS
 	}
 
 	requestLoadingPatterns(0x6f)
@@ -158,10 +159,10 @@ function void fn07071a()
 		else
 		{
 			objA0.flags38 |= 0x08
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 			if (D0.u16 == 0)
 			{
-				objA0.render_flags |= 0x01
+				objA0.render_flags |= render_flag.FLIP_X
 			}
 		}
 	}
@@ -238,7 +239,7 @@ function void fn070836()
 function void fn070854()
 {
 	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	objA0.countdown_value = 0x7f + getScreenExtend() / 2	// Delay screen movement a little bit more in widescreen
 	objA0.countdown_callback = 0x070870
 }
@@ -253,6 +254,7 @@ function void fn070870()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x307c
 		objA1.position.y.u16 = 0x0660
@@ -261,7 +263,7 @@ function void fn070870()
 	screenmover_target.right = 0x2fdc + getScreenExtend()
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 #if STANDALONE
 	// Add chunks with an actual collision near the capsule
@@ -299,7 +301,7 @@ function void fn0708aa()
 	screenmover_target.right = 0x3738
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	Kosinski.addMultipleToDMAQueue(0x07091c)
 
@@ -318,8 +320,7 @@ function void fn07092a()
 		return
 	}
 
-	D0.u16 = 0x0800
-	TriggerNextZone()
+	TriggerNextZone(0x0800)
 	UnloadObject()
 
 #if STANDALONE
@@ -404,7 +405,7 @@ function void fn0709a8()
 
 		objA0.base_state = 0x06
 		D0 = objA0.subtype2c * 2
-		if (u8[A1 + 0x04] & 0x01)
+		if (objA1.render_flags & render_flag.FLIP_X)
 			D0.u16 += 8
 
 		A1 = 0x0709fc + D0.u16
@@ -482,12 +483,11 @@ function void fn070a46()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2c] != 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	u16[A0 + 0x44] = u16[A1 + 0x46]
 
-	A2 = 0x070efc
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x070efc)
 	fn070a76()
 }
 
@@ -533,9 +533,9 @@ function void fn070abc()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = -0x1c
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D0.s16 = -D0.s16
 	}
 
@@ -811,7 +811,7 @@ function void fn070d10()
 	A1 = u32[0x070d88 + D0.s16]
 	SetupObjectAttributesFull()
 
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	MoveWithParent()
 }
 
@@ -939,10 +939,10 @@ function void fn067bbc()
 //# address-hook(0x067be6) end(0x067c36)
 function void fn067be6()
 {
-	if (u16[0xffffb010] > objA0.position.x.u16)
-		objA0.render_flags |= 0x01
+	if (u16[0xffffb000 + 0x10] > objA0.position.x.u16)
+		objA0.render_flags |= render_flag.FLIP_X
 	else
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 
 	A1 = 0xffff0000 + u16[A0 + 0x44]
 	objA0.animation.sprite = (objA0.flags38 & 0x04) ? 1 : 0
@@ -1045,7 +1045,7 @@ function void fn06802a()
 function void fn068036()
 {
 	objA0.base_state = 0x08
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 }
 
 

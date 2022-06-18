@@ -140,7 +140,7 @@ function void fn08c802()
 //# address-hook(0x08c82c) end(0x08c88a)
 function void fn08c82c()
 {
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 	if (D2.s16 < 0)
 	{
 		if (objA0.value2f == 4)

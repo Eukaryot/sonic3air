@@ -192,7 +192,8 @@ function u32 CreditsDataGenerator.build(u8 creditsIndex)
 		CreditsDataGenerator.addLine(line+5, 0, "LINNCAKI")
 		CreditsDataGenerator.addLine(line+6, 0, "FLAMEWING")
 		CreditsDataGenerator.addLine(line+7, 0, "HYLLIAN")
-		line += 0x15
+		CreditsDataGenerator.addLine(line+8, 0, "VINEGAR")
+		line += 0x16
 
 		CreditsDataGenerator.addLine(line,   1, "SPECIAL THANKS TO")
 		CreditsDataGenerator.addLine(line+2, 0, "FRED BRONZE")

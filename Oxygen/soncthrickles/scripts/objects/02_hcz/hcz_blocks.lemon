@@ -19,7 +19,7 @@ function void fn01f392()
 	objA0.box_size.x = u8[(A1+=1)-1]
 	objA0.box_size.y = u8[(A1+=1)-1]
 	objA0.mapping_offset = 0x21d04a
-	objA0.sprite_attributes = 0x43d4
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03d4)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 

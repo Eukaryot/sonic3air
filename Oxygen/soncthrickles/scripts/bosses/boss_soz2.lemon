@@ -55,11 +55,9 @@ function void fn07767c()
 	spawnChildObject(0x077dd8, 0x08, 0, 36)
 	spawnChildObject(0x067cd2, 0x0a, 0, -28)
 
-	A2 = 0x078320
-	SpawnChildObjectHierarchy()
+	spawnChildObjectHierarchy(0x078320)
 
-	A2 = 0x078326
-	SpawnChildObjectHierarchy()
+	spawnChildObjectHierarchy(0x078326)
 }
 
 
@@ -197,7 +195,7 @@ function void fn077822()
 	{
 		objA0.update_address = 0x077848
 		objA0.flags2a &= ~0x80
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	DrawObject()
 }
@@ -216,6 +214,7 @@ function void fn077848()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn capsule
 			objA1.update_address = 0x086540
 			objA1.position.x.u16 = 0x5360
 			objA1.position.y.u16 = 0x0720
@@ -249,7 +248,7 @@ function void fn07789a()
 	objA0.update_address = 0x0778f2
 	level.wait_for_results = 0xff
 	objA0.flags38 |= 0x30
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 }
 
 
@@ -288,6 +287,7 @@ function void fn0778f2()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 }
@@ -313,7 +313,7 @@ function void fn077966()
 	objA0.velocity.x = objA1.velocity.x
 	objA0.velocity.y = 0
 
-	if (u8[A1 + 0x38] != 0x02)
+	if (u8[A1 + 0x38] != CHARACTER_KNUCKLES)
 	{
 		objA0.update_address = 0x0779c0
 		objA1.state = char.state.GOT_HURT
@@ -364,8 +364,7 @@ function void fn077a02()
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
 	{
-		D0.u16 = 0x0900
-		TriggerNextZone()
+		TriggerNextZone(0x0900)
 		UnloadObject()
 	}
 }
@@ -382,8 +381,7 @@ function void fn077a3e()
 
 	if (objA1.position.x.u16 >= 0x5560)
 	{
-		D0.u16 = 0x0900
-		TriggerNextZone()
+		TriggerNextZone(0x0900)
 		UnloadObject()
 	}
 }
@@ -431,7 +429,7 @@ function void fn077ab4()
 function void fn077ab8()
 {
 	objA0.mapping_offset = 0x07834e
-	objA0.sprite_attributes = 0xe3a4
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x03a4)
 
 	// Targets:
 	//  - 0x077ae0	-> objA0.subtype2c = 0x00
@@ -1139,7 +1137,7 @@ function void fn0780be()
 			return
 		}
 
-		if (u8[A1 + 0x20] != 0x02 && u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] != 0x01)
+		if (u8[A1 + 0x20] != char.state.ROLLING && u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] != 0x01)
 		{
 			return
 		}
@@ -1164,12 +1162,12 @@ function void fn078120()
 	D6 = (D6 << 16) + (D6 >> 16)
 
 	D0 = 0
-	D1 = 3
+	D1 = 3		// object.flag.P1_ON_OBJECT
 	A1 = 0xffffb000
 	fn078136()
 
 	D0 = 1
-	D1 = 4
+	D1 = 4		// object.flag.P2_ON_OBJECT
 	A1 = 0xffffb04a
 	fn078136()
 }
@@ -1186,10 +1184,10 @@ function void fn078136()
 		objA0.flags2a &= ~bit
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	if (u8[A1 + 0x34] == 0)
 	{
-		objA0.flags2a &= 0x9f
+		objA0.flags2a &= ~(object.flag.P1_PUSHING | object.flag.P2_PUSHING)
 		DamageCharacter()
 	}
 }
@@ -1223,7 +1221,7 @@ function void fn078178()
 			D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
 			if (D0.s16 >= 0)
 			{
-				objA0.flags2a &= 0x9f
+				objA0.flags2a &= ~(object.flag.P1_PUSHING | object.flag.P2_PUSHING)
 				DamageCharacter()
 			}
 		}

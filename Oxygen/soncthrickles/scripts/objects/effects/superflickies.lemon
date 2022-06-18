@@ -42,9 +42,9 @@ function void fn01a19c()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
-	objA0.sprite_attributes = 0x8680
-	objA0.position.x.u16 = u16[0xffffb010] - 0xc0
-	objA0.position.y.u16 = u16[0xffffb014] - 0xc0
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
+	objA0.position.x.u16 = u16[0xffffb000 + 0x10] - 0xc0
+	objA0.position.y.u16 = u16[0xffffb000 + 0x14] - 0xc0
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
@@ -59,9 +59,9 @@ function void fn01a1f4()
 	// Update routine for a single flicky
 	if (super.active.tails == 0)
 	{
-		u16[0xffffb05a] = 0
-		u16[0xffffb05e] = 0
-		u8[0xffffb06a] = 0
+		u16[0xffffb04a + 0x10] = 0
+		u16[0xffffb04a + 0x14] = 0
+		u8[0xffffb04a + 0x20] = 0
 		if (u8[A0 + 0x30] != 0)
 		{
 			A1 = 0xffff0000 + objA0.value42
@@ -86,15 +86,15 @@ function void fn01a228()
 	if (objA0.velocity.x != 0)
 	{
 		if (objA0.velocity.x < 0)
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		else
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 	}
 
-	objA0.render_flags &= 0xfd
+	objA0.render_flags &= ~render_flag.FLIP_Y
 	if (global.inv_gravity)
 	{
-		objA0.render_flags |= 0x02
+		objA0.render_flags |= render_flag.FLIP_Y
 	}
 
 	--objA0.animation.timer
@@ -113,8 +113,8 @@ function void fn01a228()
 function void fn01a276()
 {
 	// Flickies fly away again when Tails returns to normal form
-	D2.u16 = u16[0xffffb010] - 0xc0
-	D3.u16 = u16[0xffffb014] - 0xc0
+	D2.u16 = u16[0xffffb000 + 0x10] - 0xc0
+	D3.u16 = u16[0xffffb000 + 0x14] - 0xc0
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		fn01a228()
@@ -149,8 +149,8 @@ function void fn01a292()
 			LookupSinCos()
 			D0.s16 >>= 3
 			D1.s16 >>= 4
-			D2.u16 = u16[0xffffb010]
-			D3.u16 = u16[0xffffb014] - 0x20
+			D2.u16 = u16[0xffffb000 + 0x10]
+			D3.u16 = u16[0xffffb000 + 0x14] - 0x20
 			if (global.inv_gravity)
 				D3.u16 += 0x40
 			D2.u16 += D0.u16
@@ -181,11 +181,11 @@ function void fn01a292()
 //# address-hook(0x01a31e) end(0x01a378)
 function void fn01a31e()
 {
-	D0.u8 = u8[A1 + 0x28]
+	D0.u8 = objA1.collision_attributes
 	if (D0.u8 == 0)
 		return
 
-	D0.u8 &= 0xc0
+	D0.u8 &= collision_attributes.flags
 	if (D0.u8 == 0)
 	{
 		if (u8[A1 + 0x29] != 0)
@@ -210,15 +210,15 @@ function void fn01a31e()
 	}
 	else
 	{
-		if (D0.u8 != 0xc0)
+		if (D0.u8 != collision.flag.SPECIAL)
 			return
 
 		u8[A1 + 0x29] |= 0x02
 	}
 
-	u16[0xffffb05a] = objA0.position.x.u16
-	u16[0xffffb05e] = objA0.position.y.u16
-	u8[0xffffb06a] = 2
+	u16[0xffffb04a + 0x10] = objA0.position.x.u16
+	u16[0xffffb04a + 0x14] = objA0.position.y.u16
+	u8[0xffffb04a + 0x20] = char.state.ROLLING
 }
 
 
@@ -311,7 +311,7 @@ function void fn01a3fe()
 		{
 			A1 = 0xffff0000 + u16[A4]
 			A4 += 2
-			D0.u8 = u8[A1 + 0x28]
+			D0.u8 = objA1.collision_attributes
 			if (D0.u8 != 0)
 			{
 				fn01a434()
@@ -329,20 +329,20 @@ function void fn01a434()
 	{
 	#if STANDALONE
 		// Exclude SOZ 1 boss
-		if (u32[A1] == 0x076f46)
+		if (objA1.update_address == 0x076f46)
 			return
 
 		// Exclude DEZ 2 boss and its robots
-		if (u32[A1] == 0x07f344 || u32[A1] == 0x07f4fa)
+		if (objA1.update_address == 0x07f344 || objA1.update_address == 0x07f4fa)
 			return
 
-		// Excluse SOZ 2 sand cork
-		if (u32[A1] == 0x041d32)
+		// Exclude SOZ 2 sand cork
+		if (objA1.update_address == 0x041d32)
 			return
 	#endif
 
-		D0.u8 &= 0xc0
-		if (D0.u8 == 0 || D0.u8 == 0xc0)
+		D0.u8 &= collision_attributes.flags
+		if (D0.u8 == 0 || D0.u8 == collision.flag.SPECIAL)
 		{
 			u8[A1 + 0x2d] = 0xff		// Could this be a flag like "attacked by a flicky"?
 			objA0.value42 = A1.u16

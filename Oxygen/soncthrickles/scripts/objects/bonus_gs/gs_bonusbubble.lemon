@@ -16,12 +16,12 @@
 function void fn04a1e6()
 {
 	objA0.mapping_offset = 0x04a294
-	objA0.sprite_attributes = 0xe364
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0364)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0200
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
 	objA0.update_address = 0x04a218
 	fn04a218()
@@ -71,7 +71,7 @@ function void fn04a2cc()
 	if (objA0.subtype2c == 0)
 	{
 		objA0.mapping_offset = 0x04a3d2
-		objA0.sprite_attributes = 0x6378
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0378)
 	}
 	else
 	{
@@ -84,7 +84,7 @@ function void fn04a2cc()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0200
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	if (u8[A0 + 0x29] != 0)
 	{
 		fn04a362()
@@ -210,6 +210,7 @@ function void fn061130()
 	if (u8[0xffff2022] != 0)
 		return
 
+	// Spawn floor platform for springs
 	if (!allocDynamicObjectAfterA0())
 		return
 
@@ -229,8 +230,7 @@ function void fn06114c()
 function void fn06114e()
 {
 	checkpoint.rings += 20
-	D0 = 10
-	AddRings()
+	addRings(10)
 }
 
 
@@ -272,7 +272,7 @@ function void fn061176()
 	D0.s32 = s32(D0.s16) * -0x700
 	D0.s32 >>= 8
 	objA1.velocity.y = D0.u16
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 	u8[A1 + 0x40] = 0
 	objA0.state = 1
@@ -285,13 +285,13 @@ function void fn0611d6()
 {
 	A1 = 0xffffb000
 	u32[0xffffcce8] = 0x0195a6
-	u16[0xffffcd2a] = A1.u16
-	u8[A1 + 0x2b] &= 0x8e
-	u8[A1 + 0x2b] |= 0x01
+	u16[0xffffcce8 + 0x42] = A1.u16
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
+	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
-	D0 = 4
+	D0 = 4		// char.bonus.SHIELD_FIRE
 	fn061254()
-	playMusic(0x3e)
+	playMusic(SFX_FIRESHIELD)
 }
 
 
@@ -300,13 +300,13 @@ function void fn061200()
 {
 	A1 = 0xffffb000
 	u32[0xffffcce8] = 0x0198be
-	u16[0xffffcd2a] = A1.u16
-	u8[A1 + 0x2b] &= 0x8e
-	u8[A1 + 0x2b] |= 0x01
+	u16[0xffffcce8 + 0x42] = A1.u16
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
+	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
-	D0 = 6
+	D0 = 6		// char.bonus.SHIELD_BUBBLE
 	fn061254()
-	playMusic(0x3f)
+	playMusic(SFX_BUBBLESHIELD)
 }
 
 
@@ -315,21 +315,23 @@ function void fn06122a()
 {
 	A1 = 0xffffb000
 	u32[0xffffcce8] = 0x0196c2
-	u16[0xffffcd2a] = A1.u16
-	u8[A1 + 0x2b] &= 0x8e
-	u8[A1 + 0x2b] |= 0x01
+	u16[0xffffcce8 + 0x42] = A1.u16
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
+	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
 
-	D0 = 5
+	D0 = 5		// char.bonus.SHIELD_LIGHTNING
 	fn061254()
-	playMusic(0x41)
+	playMusic(SFX_LIGHTNINGSHIELD)
 }
 
 
 //# address-hook(0x061254) end(0x061262)
 function void fn061254()
 {
-	u8[A1 + 0x2b] |= (1 << D0.u8)
-	A2 = 0xfffffe47
-	u8[A2] &= 0x8f
-	u8[A2] |= (1 << D0.u8)
+	u8 shield = (1 << D0.u8)
+
+	u8[A1 + 0x2b] |= shield
+	A2 = 0xfffffe47		// Address of "global.shields_backup_1"
+	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
+	u8[A2] |= shield
 }

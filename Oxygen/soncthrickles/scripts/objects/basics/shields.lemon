@@ -7,6 +7,12 @@
 */
 
 
+define objA0.shield.animation.sprite.backup		= u8[A0 + 0x34]
+define objA0.shield.art_offset			= u32[A0 + 0x38]
+define objA0.shield.pattern_offset		= u32[A0 + 0x3c]
+define objA0.shield.targetInVRAM		= u16[A0 + 0x40]
+define objA0.shield.character_address		= u16[A0 + 0x42]
+define objA1.shield.character_address		= u16[A1 + 0x42]
 
 //-------------------------------------------------------//
 // No shield / Insta-Shield (also Classic Shield)        //
@@ -16,8 +22,8 @@
 function void InstaShield.Init()
 {
 	objA0.mapping_offset = 0x01a0d0
-	u32[A0 + 0x3c] = 0x01a154
-	u32[A0 + 0x38] = 0x18c084
+	objA0.shield.pattern_offset = 0x01a154
+	objA0.shield.art_offset = 0x18c084
 	Shield.sharedInit()
 
 	objA0.update_address = 0x01952a
@@ -32,18 +38,18 @@ function void Shield.sharedInit()
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
 	objA0.sprite_attributes = 0x079c
-	u16[A0 + 0x40] = 0xf380
-	if (u8[0xffffb00a] & 0x80)
+	objA0.shield.targetInVRAM = 0xf380
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 	objA0.state.both = 0x01
-	u8[A0 + 0x34] = 0xff
+	objA0.shield.animation.sprite.backup = 0xff
 }
 
 
 //# address-hook(0x01952a) end(0x0195a4)
 function void InstaShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
 		objA0.position.x.u16 = u16[A2 + 0x10]
@@ -51,7 +57,7 @@ function void InstaShield.Update()
 		objA0.flags2a = u8[A2 + 0x2a] & char.flag.FACING_LEFT
 		if (global.inv_gravity)
 			objA0.flags2a |= 0x02
-		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 		Object.animationUpdate(0x0199ea)
 
@@ -79,13 +85,13 @@ function void InstaShield.Update()
 //# address-hook(0x01999a) end(0x0199e8)
 function void Shield.SharedSpriteUpdate()
 {
-	if (u8[A0 + 0x34] != objA0.animation.sprite)
+	if (objA0.shield.animation.sprite.backup != objA0.animation.sprite)
 	{
-		u8[A0 + 0x34] = objA0.animation.sprite
+		objA0.shield.animation.sprite.backup = objA0.animation.sprite
 
-		u32 sourceBase   = u32[A0 + 0x38]
-		u32 tableAddress = u32[A0 + 0x3c]
-		u16 targetInVRAM = u16[A0 + 0x40]
+		u32 sourceBase   = objA0.shield.art_offset
+		u32 tableAddress = objA0.shield.pattern_offset
+		u16 targetInVRAM = objA0.shield.targetInVRAM
 		updateMultipleSpritePatterns(sourceBase, tableAddress, targetInVRAM, objA0.animation.sprite)
 	}
 }
@@ -100,8 +106,8 @@ function void Shield.SharedSpriteUpdate()
 function void FireShield.Init()
 {
 	objA0.mapping_offset = 0x019ac6
-	u32[A0 + 0x38] = 0x18c704
-	u32[A0 + 0x3c] = 0x019ce6
+	objA0.shield.art_offset = 0x18c704
+	objA0.shield.pattern_offset = 0x019ce6
 	Shield.sharedInit()
 
 	objA0.update_address = 0x019602
@@ -112,28 +118,29 @@ function void FireShield.Init()
 //# address-hook(0x019602) end(0x0196c0)
 function void FireShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) || (u8[A2 + 0x20] == char.state.DISAPPEARED))
 		return
 
 	// Lost shield?
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
-		u8[A2 + 0x2b] &= ~0x71
-		objA0.update_address = 0x0194ce
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		return
 	}
 
 	if (u8[A2 + 0x2a] & char.flag.UNDERWATER)
 	{
-		u8[A2 + 0x2b] &= ~0x71
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		if (allocDynamicObjectStd())
 		{
+			// Spawn small explosion
 			objA1.update_address = 0x01e68e
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 		}
-		objA0.update_address = 0x0194ce
+		objA0.update_address = 0x0194ce		// Insta-Shield
 
 	#if STANDALONE
 		if (Game.getSetting(SETTING_SHIELD_TYPES) == 3)
@@ -153,7 +160,7 @@ function void FireShield.Update()
 		if (global.inv_gravity)
 			objA0.flags2a |= 0x02
 
-		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 	}
 
 	Object.animationUpdate(0x019a02)
@@ -181,8 +188,8 @@ function void LightningShield.Init()
 	}
 
 	objA0.mapping_offset = 0x019dc8
-	u32[A0 + 0x38] = 0x18e8a4
-	u32[A0 + 0x3c] = 0x019efa
+	objA0.shield.art_offset = 0x18e8a4
+	objA0.shield.pattern_offset = 0x019efa
 	Shield.sharedInit()
 
 	objA0.update_address = 0x019732
@@ -193,24 +200,24 @@ function void LightningShield.Init()
 //# address-hook(0x019732) end(0x01980a)
 function void LightningShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) || (u8[A2 + 0x20] == char.state.DISAPPEARED))
 		return
 
 	// Lost shield?
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
-		u8[A2 + 0x2b] &= ~0x71
-		objA0.update_address = 0x0194ce
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		return
 	}
 
 	if (u8[A2 + 0x2a] & char.flag.UNDERWATER)
 	{
-		u8[A2 + 0x2b] &= ~0x71
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		if (global.fade_timer != 0)
 		{
-			objA0.update_address = 0x0194ce
+			objA0.update_address = 0x0194ce		// Insta-Shield
 		}
 		else
 		{
@@ -243,7 +250,7 @@ function void LightningShield.Update()
 	if (global.inv_gravity)
 		objA0.flags2a |= 0x02
 
-	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	if (objA0.state != 0)
 	{
@@ -274,21 +281,22 @@ function void Effects.CreateSparks()
 	u8 counter = 4
 	while (counter > 0)
 	{
+		// Spawn sparks
 		if (!allocDynamicObjectStd())
 			break
 
 		objA1.update_address = 0x019874
-		u8[A1 + 0x04] = render_flag.WORLD
-		u16[A1 + 0x0a] = u16[A0 + 0x0a]
-		u32[A1 + 0x0c] = u32[A0 + 0x0c]
-		u8[A1 + 0x06] = 0x08
-		u8[A1 + 0x07] = 0x08
-		u16[A1 + 0x08] = 0x80
+		objA1.render_flags = render_flag.WORLD
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.box_size.y = 0x08
+		objA1.box_size.x = 0x08
+		objA1.sprite_priority = 0x80
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.velocity.x = u16[A2]
 		objA1.velocity.y = u16[A2+2]
-		u8[A1 + 0x20] = D2.u8
+		objA1.state = D2.u8
 
 		A2 += 4
 		--counter
@@ -321,7 +329,7 @@ function void LightningShield.ResetWaterPalette()
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
-		objA0.update_address = 0x0194ce
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		copyMemory(0xfffff080, 0xfffff000, 0x80)
 	}
 }
@@ -335,11 +343,11 @@ function void LightningShield.ResetWaterPalette()
 function void BubbleShield.Init()
 {
 	objA0.mapping_offset = 0x019f82
-	u32[A0 + 0x38] = 0x18f984
-	u32[A0 + 0x3c] = 0x01a076
+	objA0.shield.art_offset = 0x18f984
+	objA0.shield.pattern_offset = 0x01a076
 	Shield.sharedInit()
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.shield.character_address
 	UpdateMusicOnWaterTransition()
 	objA0.update_address = 0x019922
 	BubbleShield.Update()
@@ -349,15 +357,15 @@ function void BubbleShield.Init()
 //# address-hook(0x019922) end(0x019998)
 function void BubbleShield.Update()
 {
-	A2 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) || (u8[A2 + 0x20] == char.state.DISAPPEARED))
 		return
 
 	// Lost shield?
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
-		u8[A2 + 0x2b] &= ~0x71
-		objA0.update_address = 0x0194ce
+		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
+		objA0.update_address = 0x0194ce		// Insta-Shield
 		return
 	}
 
@@ -367,7 +375,7 @@ function void BubbleShield.Update()
 	if (global.inv_gravity)
 		objA0.flags2a |= 0x02
 
-	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	Object.animationUpdate(0x019a7a)
 
@@ -392,13 +400,13 @@ function void fn0187f0()
 	for (u8 i = 0; i < 4; ++i)
 	{
 		objA1.update_address = 0x0188e8
-		u8[A1 + 0x04] = (render_flag.COMPOUND | render_flag.WORLD)
-		u8[A1 + 0x07] = 0x10
-		u16[A1 + 0x08] = 0x80
-		u16[A1 + 0x0a] = 0x079c
-		u32[A1 + 0x0c] = 0x018aea
+		objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
+		objA1.box_size.x = 0x10
+		objA1.sprite_priority = 0x80
+		objA1.sprite_attributes = 0x079c
+		objA1.mapping_offset = 0x018aea
 		u16[A1 + 0x16] = 2
-		u16[A1 + 0x42] = objA0.value42
+		objA1.shield.character_address = objA0.shield.character_address
 		u8[A1 + 0x36] = D2.u8
 		u32[A1 + 0x30] = u32[(A2+=4)-4]
 		u16[A1 + 0x34] = u16[(A2+=2)-2]
@@ -421,7 +429,7 @@ function void fn018868()
 		return
 	}
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
 		UnloadObject()
@@ -432,10 +440,10 @@ function void fn018868()
 	if (objA1.state == char.state.DISAPPEARED)
 		return
 
-	if (u16[A1 + 0x0a] & 0x8000)
-		objA0.sprite_attributes |= 0x8000
+	if (objA1.sprite_attributes & sprite_attribute.PRIORITY)
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 #endif
 
 	objA0.position.x.u16 = objA1.position.x.u16
@@ -483,7 +491,7 @@ function void fn0188e8()
 		return
 	}
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.shield.character_address
 	if ((u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 	{
 		UnloadObject()
@@ -494,10 +502,10 @@ function void fn0188e8()
 	if (objA1.state == char.state.DISAPPEARED)
 		return
 
-	if (u16[A1 + 0x0a] & 0x8000)
-		objA0.sprite_attributes |= 0x8000
+	if (objA1.sprite_attributes & sprite_attribute.PRIORITY)
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 #endif
 
 	D1.u16 = u16(u8[A0 + 0x36]) * 12

@@ -12,7 +12,7 @@
 function void fn046426()
 {
 	objA0.update_address = 0x046452
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x18
 	objA0.sprite_priority = 0x0180
@@ -146,8 +146,8 @@ function void fn046536()
 	{
 		D1.u16 = 0x0c00
 		D2.u16 = objA0.flags2a & 0x01
-		D2.u16 ^= 0x01
-		if (D2.u16 & 0x01)
+		D2.u16 ^= render_flag.FLIP_X
+		if (D2.u16 & render_flag.FLIP_X)
 		{
 			D1.s16 = -D1.s16
 		}
@@ -155,11 +155,11 @@ function void fn046536()
 		objA1.velocity.x = D1.u16
 		u8[A1 + 0x2a] &= 0xfe
 		u8[A1 + 0x2a] |= D2.u8
-		u8[A1 + 0x04] &= 0xfe
-		u8[A1 + 0x04] |= D2.u8
+		objA1.render_flags &= ~render_flag.FLIP_X
+		objA1.render_flags |= D2.u8
 		objA0.animation.sprite = 3
 		++u8[A2]
-		playSound(0xb1)
+		playSound(SFX_SPRING)
 	}
 	else if (D0.u8 == 2)
 	{

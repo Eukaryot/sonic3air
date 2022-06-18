@@ -17,7 +17,7 @@ function void fn03e23e()
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x80
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x3c] = objA0.position.y.u16
 
 	D1 = 3
@@ -52,12 +52,12 @@ function void fn03e2b0()
 		objA1.position.x.u16 = objA0.position.x.u16 - 0x32
 		objA1.position.y.u16 = objA0.position.y.u16 + 0x3a
 		u16[A1 + 0x2e] = objA0.position.x.u16
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u8[A1 + 0x04] |= 0x04
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u8[A1 + 0x07] = 0x0c
-		u8[A1 + 0x06] = 0x30
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.render_flags |= render_flag.WORLD
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.box_size.x = 0x0c
+		objA1.box_size.y = 0x30
 		u16[A1 + 0x46] = A0.u16
 		u8[A1 + 0x22] = 0x02
 		u16[A1 + 0x36] = 0x34
@@ -65,13 +65,13 @@ function void fn03e2b0()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x03e472
-			u8[A1 + 0x04] |= 0x04
-			u8[A1 + 0x04] |= render_flag.FLIP_X
-			u8[A1 + 0x06] = 0x30
-			u8[A1 + 0x07] = 0x0c
-			u16[A1 + 0x08] = objA0.sprite_priority
-			u16[A1 + 0x0a] = objA0.sprite_attributes
-			u32[A1 + 0x0c] = objA0.mapping_offset
+			objA1.render_flags |= render_flag.WORLD
+			objA1.render_flags |= render_flag.FLIP_X
+			objA1.box_size.y = 0x30
+			objA1.box_size.x = 0x0c
+			objA1.sprite_priority = objA0.sprite_priority
+			objA1.sprite_attributes = objA0.sprite_attributes
+			objA1.mapping_offset = objA0.mapping_offset
 			objA1.position.x.u16 = objA0.position.x.u16 + 0x32
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x3a
 			u8[A1 + 0x22] = 0x02
@@ -253,6 +253,7 @@ function void fn03e508()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
 	{
+		// Check if jump button pressed
 		D1.u16 = D0.u16 & CONTROL_ABC
 		if (D1.u8 == 0)
 		{
@@ -269,16 +270,16 @@ function void fn03e508()
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x12
 
-		D0.u16 &= 0x0f00
+		D0.u16 &= 0x0f00	// Any direction held?
 		if (D0.u16 != 0)
 		{
 			u8[A2 + 0x02] = 0x3c
 		}
-		if (D0 & 0x0400)	// CONTROL_LEFT
+		if (D0 & 0x0400)	// CONTROL_LEFT held
 		{
 			objA1.velocity.x = -0x200
 		}
-		if (D0 & 0x0800)	// CONTROL_RIGHT
+		if (D0 & 0x0800)	// CONTROL_RIGHT held
 		{
 			objA1.velocity.x = 0x200
 		}
@@ -348,18 +349,18 @@ function void fn03e5f2()
 	// Check for cheat first
 	fn03e598()
 
-	if (D0 & 0x0400)	// CONTROL_LEFT
+	if (D0 & 0x0400)	// CONTROL_LEFT held
 	{
 		objA1.flags2a |= char.flag.FACING_LEFT
 	}
-	if (D0 & 0x0800)	// CONTROL_RIGHT
+	if (D0 & 0x0800)	// CONTROL_RIGHT held
 	{
 		objA1.flags2a &= ~char.flag.FACING_LEFT
 	}
 
 	D1.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
-	u8[A1 + 0x04] &= 0xfc
-	u8[A1 + 0x04] |= D1.u8
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA1.render_flags |= D1.u8
 
 	if (D0 & 0x0200)	// CONTROL_DOWN held
 	{
@@ -435,12 +436,12 @@ function void fn03e682()
 				objA1.state = char.state.HANGING
 				u8[A1 + 0x2e] = 0x03
 				u8[A1 + 0x3d] = 0
-				u8[A1 + 0x04] &= 0xfd
+				objA1.render_flags &= ~render_flag.FLIP_Y
 
 				u8[A2] = 1
 				D1.u8 = 0x90
 
-				playSound(0x4a)
+				playSound(SFX_GRAB)
 				fn03e658()
 			}
 		}

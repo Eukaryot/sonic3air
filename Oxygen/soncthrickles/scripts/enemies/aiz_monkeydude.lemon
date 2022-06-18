@@ -153,6 +153,7 @@ function void fn08724e()
 	}
 	else
 	{
+		// Coconut
 		objA0.update_address = 0x08744c
 		objA0.animation.sprite = 6
 		A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -534,15 +535,14 @@ function void fn0875b4()
 		if (u8[A1 + 0x3c] < 0x7c)
 			return
 
-		objA0.sprite_attributes = 0x2548
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0548)
 	}
 
 	objA0.flags38 |= 0x01
 	objA0.animation.sprite = 4
 	playSound(SFX_BOMBFALL)
 
-	A2 = 0x08769c
-	SpawnProjectileChildObjects()
+	spawnProjectileChildObjects(0x08769c)
 	if (_equal())
 	{
 		if (objA0.flags38 & 0x08)
@@ -574,7 +574,7 @@ function void fn086d4a()
 	A1 = u32[A0 + 0x3e]
 	SetupObjectAttributesFull()
 	objA0.update_address = 0x086d5e
-	objA0.flags2b |= 0x08
+	objA0.flags2b |= char.bonus.DEFLECTABLE
 	fn086d5e()
 }
 

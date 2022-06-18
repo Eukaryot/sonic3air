@@ -23,8 +23,8 @@ function void fn060c56()
 	ring_counter = checkpoint.rings
 	extra_lives_granted = checkpoint.lives_granted
 	hud.dirty.rings = 0x01
-	u8[0xffffb00a] |= 0x80
-	u8[0xffffb054] |= 0x80
+	u8[0xffffb000 + 0x0a] |= 0x80
+	u8[0xffffb04a + 0x0a] |= 0x80
 
 	A1 = 0xffff2000
 	for (u8 i = 0; i < 9; ++i)
@@ -34,7 +34,7 @@ function void fn060c56()
 	}
 
 	// "spawnChildObjects(0x0613f8)" replaced by:
-	spawnChildObject(0x060d58, 0x00, 0, 0)
+	spawnChildObject(0x060d58, 0x00, 0, 0)		// Floor platform for springs
 	spawnChildObject(0x060e4c, 0x02, 0, 36)
 	spawnChildObject(0x061044, 0x04, 0, 0)
 	spawnChildObject(0x060ffe, 0x06, -56, -44)

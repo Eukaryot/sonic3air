@@ -123,7 +123,7 @@ function void fn055fda()
 	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x24
 	objA0.sprite_priority = 0x0380
-	objA0.sprite_attributes = 0xc029
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0029)
 	objA0.mapping_offset = 0x05611e
 	objA0.velocity.x = 0x439c
 	objA0.velocity.y = 0x09d4
@@ -135,7 +135,7 @@ function void fn055fda()
 //# address-hook(0x056012) end(0x05602e)
 function void fn056012()
 {
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	if (u16[0xffffeed4] == 0)
 		return
 
@@ -171,7 +171,7 @@ function void fn056056()
 		return
 	}
 
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	if (u16[0xffffeed4] == 0)
 		return
 

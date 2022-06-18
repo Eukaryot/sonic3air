@@ -17,8 +17,8 @@ function void fn03bbee()
 	objA0.box_size.x = u8[0x03bbe8 + D0.s16]
 	objA0.box_size.y = u8[0x03bbe9 + D0.s16]
 	objA0.mapping_offset = 0x03bd8e
-	objA0.sprite_attributes = 0x23d2
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03d2)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16

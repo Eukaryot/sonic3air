@@ -33,7 +33,7 @@ function void fn0836e0()
 	objA0.update_address = 0x083708
 	objA0.hitbox_extends.x = 0x0f
 	objA0.hitbox_extends.y = 0x0f
-	u8[A0 + 0x28] = 0x46
+	objA0.collision_attributes = (collision.flag.ITEM | collision.size.16x16)
 	objA0.state = objA0.subtype2c
 }
 
@@ -45,7 +45,7 @@ function void fn083708()
 	if (level.signpost.address != 0)
 	{
 		A1 = 0xffff0000 + level.signpost.address
-		if (u32[A1] == 0x0837b2)
+		if (objA1.update_address == 0x0837b2)
 		{
 			u16 px = objA1.position.x.u16
 			u16 py = objA1.position.y.u16
@@ -76,7 +76,7 @@ function void fn083708()
 					if (objA0.render_flags & render_flag.FLIP_X)
 					{
 						objA0.render_flags &= ~render_flag.FLIP_X
-						objA0.sprite_attributes |= 0x8000
+						objA0.sprite_attributes |= sprite_attribute.PRIORITY
 						objA0.flags2a = 0
 					}
 
@@ -152,11 +152,10 @@ function void SignPost.BaseUpdate()
 //# address-hook(0x0837d8) end(0x08382e)
 function void fn0837d8()
 {
-	A1 = 0x083b04
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x083b04))
 		return
 
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	level.signpost.address = A0.u16
@@ -265,6 +264,7 @@ function void fn083912()
 
 		if (allocDynamicObjectStd())
 		{
+			// Level results
 			objA1.update_address = 0x02dad0
 		}
 
@@ -318,7 +318,7 @@ function void fn083938()
 function void fn0839a2()
 {
 	setupObjectAttributesFull(0x083b22)
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	objA0.update_address = 0x0839ea
@@ -353,7 +353,7 @@ function void fn083a24()
 {
 	setupObjectAttributesFull(0x083b16)
 	objA0.update_address = 0x083a40
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	fn083a40()
@@ -461,7 +461,7 @@ function void fn085a5a()
 		u8[A0 + 0x0a] |= 0x80
 	else
 		u8[A0 + 0x0a] &= ~0x80
-	objA0.sprite_priority = u16[A1 + 0x08]
+	objA0.sprite_priority = objA1.sprite_priority
 }
 
 
@@ -478,7 +478,7 @@ function void fn08671c()
 function void fn08672a()
 {
 	fn086a3e()
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		objA0.update_address = 0x086754
 		A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -505,8 +505,7 @@ function void fn086932()
 
 	if (global.zone == 0x03)
 	{
-		A1 = 0xffffb000
-		StartCharacterWinPose()
+		StartCharacterWinPose(0xffffb000)
 	}
 
 	if (objA0.flags38 & 0x80)
@@ -526,7 +525,6 @@ function void fn086932()
 }
 
 
-
 //# address-hook(0x086a3e) end(0x086a4e)
 function void fn086a3e()
 {
@@ -538,6 +536,11 @@ function void fn086a3e()
 }
 
 
+function void StartCharacterWinPose(u32 address)
+{
+	A1 = address
+	StartCharacterWinPose()
+}
 
 //# address-hook(0x0869c6) end(0x0869f4)
 function void StartCharacterWinPose()
@@ -564,6 +567,6 @@ function void StartCharacterWinPose()
 	u8[A1 + 0x2e] = 0x81
 	u8[A1 + 0x3d] = 0
 
-	objA0.flags2a &= ~0x20
-	objA0.flags2a &= ~0x40
+	objA0.flags2a &= ~object.flag.P1_PUSHING
+	objA0.flags2a &= ~object.flag.P2_PUSHING
 }

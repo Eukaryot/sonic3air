@@ -12,11 +12,11 @@
 function void fn057bb2()
 {
 	objA0.update_address = 0x057bf6
-	objA0.render_flags = 0x40
+	objA0.render_flags = render_flag.COMPOUND
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x30
 	objA0.sprite_priority = 0
-	objA0.sprite_attributes = 0xe310
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0310)
 	objA0.mapping_offset = 0x058780
 	objA0.velocity.y = u16[A0 + 0x38]
 

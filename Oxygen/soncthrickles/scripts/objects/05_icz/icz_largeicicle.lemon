@@ -60,7 +60,7 @@ function void fn08b1d4()
 function void fn08b1ec()
 {
 	objA0.update_address = 0x08b1fa
-	u8[A0 + 0x28] = 0x82
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x20)
 }
 
 

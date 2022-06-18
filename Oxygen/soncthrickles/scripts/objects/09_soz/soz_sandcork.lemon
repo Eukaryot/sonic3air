@@ -12,12 +12,12 @@
 function void fn041cc2()
 {
 	objA0.mapping_offset = 0x041eae
-	objA0.sprite_attributes = 0x43bd
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03bd)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x08
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 
 	D0.u16 = objA0.respawn_entry
 	if (D0.u16 != 0)
@@ -93,7 +93,7 @@ function void fn041d5c()
 
 	++objA0.animation.sprite
 	objA0.sprite_priority = 0
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 
 	fn0216b8()
 	UpdateMovementStraightSimple()
@@ -142,12 +142,12 @@ function void fn041e1a()
 		objA1.update_address = 0x041e6a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = D3.u16
-		u8[A1 + 0x04] = objA0.render_flags
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u16[A1 + 0x08] = 0x80
-		u8[A1 + 0x07] = 0x0c
-		u8[A1 + 0x06] = 0x80
+		objA1.render_flags = objA0.render_flags
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.sprite_priority = 0x80
+		objA1.box_size.x = 0x0c
+		objA1.box_size.y = 0x80
 		u16[A1 + 0x30] = D4.u16
 		u8[A1 + 0x22] = 0x02
 		u8[A1 + 0x2c] = objA0.subtype2c

@@ -32,7 +32,7 @@ function void fn02f952()
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x02fcb2
 	objA0.sprite_attributes = 0x045c
-	objA0.render_flags = render_flag.WORLD | render_flag.VISIBLE
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	objA0.box_size.x = 0x10
 #if STANDALONE
 	objA0.box_size.y = 0x10
@@ -283,8 +283,8 @@ function void fn02fbb2()
 	if (D0.u16 <= D1.u16 || D0.u16 > D1.u16 + 0x10)
 		return
 
-	if (u8[A1 + 0x2b] & 0x40)
-		return
+	if (u8[A1 + 0x2b] & char.bonus.SHIELD_BUBBLE)
+		return	// Ignore if player has a bubble shield
 
 	// Collect bubble
 	UpdateMusicOnWaterTransition()
@@ -294,16 +294,16 @@ function void fn02fbb2()
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
 	u16[A1 + 0x1c] = 0
-	u8[A1 + 0x20] = 0x15
+	u8[A1 + 0x20] = char.state.BREATHE
 	u16[A1 + 0x32] = 0x23
 	u8[A1 + 0x40] = 0
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 
 	if (u8[A1 + 0x2a] & char.flag.ROLLING)
 	{
-		if (u32[A1] == 0x010a94)
+		if (objA1.update_address == 0x010a94)
 		{
-			u8[A1 + 0x2a] &= ~0x04
+			u8[A1 + 0x2a] &= ~char.flag.ROLLING
 			u8[A1 + 0x1e] = 0x13
 			u8[A1 + 0x1f] = 0x09
 			objA1.position.y.u16 -= 0x05

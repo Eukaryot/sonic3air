@@ -22,7 +22,7 @@ function void fn0481f2()
 	objA0.box_size.x = 0x48
 	objA0.box_size.y = 0x50
 	objA0.sprite_priority = 0x80
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 
 	u16[A0 + 0x16] = 1
 	A2 = A0 + 0x18
@@ -208,6 +208,7 @@ function void fn0484b0()
 
 	if (allocDynamicObjectAfterA0())
 	{
+		// Tunnel ring spawner
 		objA1.update_address = 0x0487e4
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -296,7 +297,7 @@ function void fn048534()
 
 		fn04872c()
 
-		if (u32[A1] != 0x0487e4 && u32[A1] != 0x0487f0)		// Is target a character?
+		if (objA1.update_address != 0x0487e4 && objA1.update_address != 0x0487f0)		// Is target a character?
 		{
 			u8[A1 + 0x22] = 0x96
 			D0 = u8[A1 + 0x22]
@@ -358,7 +359,7 @@ function void fn0485ae()
 	{
 		// Movement in other pattern
 		D4.u16 = u8[A2] & 0x7f
-		if (u32[A1] == 0x0487f0)	// Check if this is a tunnel element and not a character
+		if (objA1.update_address == 0x0487f0)	// Check if this is a tunnel element and not a character
 		{
 			u16[A1 + 0x30] = u8[0x048620 + D4.u16]
 		}
@@ -624,12 +625,12 @@ function void fn0487f0()
 		{
 			// Create next "ring" of the tunnel
 			objA1.update_address = 0x0488a4
-			u8[A1 + 0x04] |= 0x04
-			u8[A1 + 0x06] = 0x10
-			u8[A1 + 0x07] = 0x10
-			u16[A1 + 0x08] = 0x80
-			u16[A1 + 0x0a] = 0x2385
-			u32[A1 + 0x0c] = 0x0489cc
+			objA1.render_flags |= render_flag.WORLD
+			objA1.box_size.y = 0x10
+			objA1.box_size.x = 0x10
+			objA1.sprite_priority = 0x80
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0385)
+			objA1.mapping_offset = 0x0489cc
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 
@@ -637,12 +638,12 @@ function void fn0487f0()
 			{
 				// 3D spiral part: Rotated circle sprite
 				D1.u8 = u8[A0 + 0x27]
-				u16[A1 + 0x08] = 0
+				objA1.sprite_priority = 0
 				D0.u8 = D1.u8 * 2
 				if (D0.s8 < 0)
 				{
 					u8[A1 + 0x2a] |= 0x01
-					u16[A1 + 0x08] = 0x80
+					objA1.sprite_priority = 0x80
 				}
 				D1.u8 = (((D1.u8 + 8) >> 4) & 0x07) + 8
 				u8[A1 + 0x20] = D1.u8

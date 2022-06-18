@@ -16,8 +16,8 @@
 function void fn04945c()
 {
 	objA0.mapping_offset = 0x0495d8
-	objA0.sprite_attributes = 0x230d
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x030d)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
@@ -26,12 +26,12 @@ function void fn04945c()
 	{
 		// Spawn the black orb
 		objA1.update_address = 0x0494ea
-		u8[A1 + 0x04] = objA0.render_flags
-		u8[A1 + 0x06] = 0x10
-		u8[A1 + 0x07] = 0x10
-		u16[A1 + 0x08] = 0x0280
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u32[A1 + 0x0c] = objA0.mapping_offset
+		objA1.render_flags = objA0.render_flags
+		objA1.box_size.y = 0x10
+		objA1.box_size.x = 0x10
+		objA1.sprite_priority = 0x0280
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.mapping_offset = objA0.mapping_offset
 		objA1.position.x.u16 = objA0.position.x.u16 + 0x20
 		objA1.position.y.u16 = objA0.position.y.u16
 		u8[A1 + 0x22] = 0x02
@@ -124,8 +124,8 @@ function void fn04952a()
 				// Fix for bug when Tails carries other player and gets caught by the hover effect
 				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
 				{
-					u8[0xffffb02a] |= char.flag.IN_AIR
-					u8[0xffffb02e] = 0
+					u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+					u8[0xffffb000 + 0x2e] = 0
 				}
 			#endif
 			}

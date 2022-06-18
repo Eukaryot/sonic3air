@@ -114,7 +114,7 @@ function void fn080584()
 function void fn080590()
 {
 	objA0.update_address = 0x0805ae
-	u8[A0 + 0x28] = 0x08
+	objA0.collision_attributes = collision.size.24x12
 	boss.remaining_hits = 0xff
 	objA0.value42 = 0xa0
 	u16[A0 + 0x44] = 0xffcc
@@ -169,7 +169,7 @@ function void fn08060c()
 	setupObjectAttributesFull(0x0812aa)
 
 	objA0.update_address = 0x080634
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.value42 = 0x7c
 	u16[A0 + 0x44] = 0x28
 	u8[0xfffffaa9] = 0x01
@@ -304,7 +304,7 @@ function void fn080810()
 	fn084580()
 
 	objA0.countdown_callback = 0x080888
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 
 	playSound(0x4e)
 	fn08086c()
@@ -423,7 +423,7 @@ function void fn080940()
 function void fn080956()
 {
 	objA0.base_state = 0x02
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.value39 = 0
 	objA0.animation.frame = 0
 	objA0.value42 = 0xb0
@@ -501,11 +501,11 @@ function void fn080a60()
 {
 	setupObjectAttributesFull(0x08129e)
 
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	D0 = objA0.subtype2c
 	if (D0.u8 == 2)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	D0.u16 <<= 2
 	u32[A0 + 0x30] = u32[0x080a8c + D0.s16]
@@ -636,6 +636,7 @@ function void fn081046()
 			objA0.groundspeed = 0x0140
 			if (allocDynamicObjectStd())
 			{
+				// Spawn giant Eggrobo's fire breath 
 				objA1.update_address = 0x080940
 				u16[A1 + 0x46] = A0.u16
 			}

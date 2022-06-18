@@ -25,12 +25,12 @@ function void fn03a252()
 {
 	A1 = 0xffffb000
 	A2 = A0 + 0x30
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03a270()
 
 	A1 = 0xffffb04a
 	A2 = A0 + 0x38
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn03a270()
 
 	CheckForUnloadObject()
@@ -40,7 +40,9 @@ function void fn03a252()
 //# address-hook(0x03a270) end(0x03a312)
 function void fn03a270()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		fn03a314()
 		return
@@ -91,7 +93,7 @@ function void fn03a270()
 					u8[A2 + 0x04] = D2.u8
 					u16[A2 + 0x06] = D3.u16
 
-					u8[A1 + 0x2a] |= 0x02
+					u8[A1 + 0x2a] |= char.flag.IN_AIR
 					LetSonicClimbOnObject()
 
 					u8[A1 + 0x2e] = 0x42
@@ -107,6 +109,8 @@ function void fn03a270()
 //# address-hook(0x03a314) end(0x03a466)
 function void fn03a314()
 {
+	u8 bit = (1 << D6.u8)
+
 	D0.u16 = abs(s16[A1 + 0x1c])
 	if (D0.u16 >= 0x0400 && (u8[A1 + 0x2a] & 0x02) == 0)
 	{
@@ -130,7 +134,7 @@ function void fn03a314()
 					{
 						u16[A2] = D0.u16 - 0xc0
 						u16[A2 + 0x02] = 0
-						u8[A1 + 0x04] |= (render_flag.FLIP_X | render_flag.FLIP_Y)
+						objA1.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
 
 						fn03a480()
 						return
@@ -143,7 +147,7 @@ function void fn03a314()
 						u16[A2] = D0.u16 + objA0.value42 - 0xc0
 						u16[A2 + 0x02] = 0
 						u16[A2 + 0x06] = -s16[A0 + 0x40]
-						u8[A1 + 0x04] &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
 						fn03a480()
 						return
@@ -169,25 +173,25 @@ function void fn03a314()
 		}
 		else
 		{
-			u8[A1 + 0x2a] &= ~0x04
+			u8[A1 + 0x2a] &= ~char.flag.ROLLING
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
-			u16[A1 + 0x20] = 0x01
+			u16[A1 + 0x20] = char.state.RUNNING2
 			u8[A1 + 0x2e] = 0
-			u8[A1 + 0x2a] &= ~0x08
-			objA0.flags2a &= ~(1 << D6.u8)
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			objA0.flags2a &= ~bit
 		}
 	}
 	else
 	{
 		objA1.velocity.x >>= 1
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x2a] &= ~0x04
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~char.flag.ROLLING
 		u8[A1 + 0x1e] = u8[A1 + 0x44]
 		u8[A1 + 0x1f] = u8[A1 + 0x45]
-		u16[A1 + 0x20] = 0x01
+		u16[A1 + 0x20] = char.state.RUNNING2
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~(u8(1) << D6.u8)
 		u8[A1 + 0x27] = 0xc0
 		u8[A1 + 0x30] = 0
@@ -208,8 +212,8 @@ function void fn03a480()
 		u8[A2 + 0x04] = 0
 		u16[A2 + 0x06] = -s16[A0 + 0x40]
 
-		u8[A1 + 0x04] |= render_flag.FLIP_X
-		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+		objA1.render_flags |= render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_Y
 
 		fn03a314()
 		return
@@ -222,8 +226,8 @@ function void fn03a480()
 		u8[A2 + 0x04] = render_flag.FLIP_X
 		u16[A2 + 0x06] = u16[A0 + 0x40]
 
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
-		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+		objA1.render_flags &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_Y
 
 		fn03a314()
 		return

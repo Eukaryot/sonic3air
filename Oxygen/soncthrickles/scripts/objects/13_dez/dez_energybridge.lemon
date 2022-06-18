@@ -17,8 +17,8 @@
 //# address-hook(0x047dde) end(0x047e2c)
 function void fn047dde()
 {
-	objA0.sprite_attributes = 0x23ff
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03ff)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0300
 
 	D0.u16 = (objA0.subtype2c & 0x0c) >> 1
@@ -89,11 +89,11 @@ function void fn047e8c()
 	if (u16[A0 + 0x34] == 0)
 	{
 		A1 = 0xffffb000
-		D6 = 3
+		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn047ee8()
 
 		A1 = 0xffffb04a
-		D6 = 4
+		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn047ee8()
 
 		objA0.update_address = 0x047e62
@@ -122,12 +122,12 @@ function void fn047e8c()
 //# address-hook(0x047ee8) end(0x047efa)
 function void fn047ee8()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 }
 
@@ -188,11 +188,11 @@ function void fn047f56()
 	}
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn047f9c()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn047f9c()
 
 	objA0.animation.sprite = (level.framecounter.low & 0x03)
@@ -211,6 +211,7 @@ function void fn047f56()
 //# address-hook(0x047f9c) end(0x047ff6)
 function void fn047f9c()
 {
+	u8 bit = (1 << D6.u8)
 	if (u16[A0 + 0x34] != 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x50
@@ -219,7 +220,7 @@ function void fn047f9c()
 			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x30
 			if (D0.u16 < 0x60)
 			{
-				objA0.flags2a |= (1 << D6.u8)
+				objA0.flags2a |= bit
 				u8[A1 + 0x46] = 0x0e
 				u8[A1 + 0x47] = 0x0f
 				return
@@ -227,13 +228,13 @@ function void fn047f9c()
 		}
 	}
 
-	u8 bit = 1 << D6.u8
+	//u8 bit = (1 << D6.u8)
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
 		if (u16[A0 + 0x34] == 0)
 		{
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 		}
 		u8[A1 + 0x46] = 0x0c
 		u8[A1 + 0x47] = 0x0d

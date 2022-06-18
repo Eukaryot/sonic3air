@@ -25,7 +25,7 @@
 function void PathSwapperInit()
 {
 	objA0.mapping_offset = 0x01d05a
-	objA0.sprite_attributes = 0x26bc
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x06bc)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x40
@@ -48,16 +48,16 @@ function void PathSwapperInit()
 			u8[A0 + 0x35] = 1
 		}
 
-		if (competition_mode.active == 0)
+		if (competition_mode.active)
 		{
-			objA0.update_address = 0x01cef2
-			PathSwapperBaseUpdateHorizontal()
+			objA0.update_address = 0x01cf1a
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03d2)
+			PathSwapperCompetitionMode_UpdateHorizontal()
 		}
 		else
 		{
-			objA0.update_address = 0x01cf1a
-			objA0.sprite_attributes = 0x63d2
-			PathSwapperCompetitionMode_UpdateHorizontal()
+			objA0.update_address = 0x01cef2
+			PathSwapperBaseUpdateHorizontal()
 		}
 	}
 	else
@@ -79,8 +79,8 @@ function void PathSwapperInit()
 		if (competition_mode.active)
 		{
 			objA0.update_address = 0x01cdb2
-			objA0.sprite_attributes = 0x63d2
-			// PathSwapperBaseUpdateVertical() here?
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03d2)
+			PathSwapperCompetitionMode_UpdateVertical()
 		}
 		else
 		{
@@ -122,7 +122,7 @@ function void PathSwapperBaseUpdateVertical()
 
 
 //# address-hook(0x01cdb2) end(0x01cef0)
-function void fn01cdb2()
+function void PathSwapperCompetitionMode_UpdateVertical()
 {
 	// This function is only used in competition mode
 	D1.u16 = objA0.position.x.u16
@@ -195,9 +195,9 @@ function void PathSwapperUpdateVertical()
 
 	// Affect priority flag (rendering on foreground)
 	if (objA0.subtype2c & (0x40 >> onPositiveSide))
-		u16[A1 + 0x0a] |= 0x8000
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		u16[A1 + 0x0a] &= 0x7fff
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 
 
@@ -304,7 +304,7 @@ function void PathSwapperUpdateHorizontal()
 
 	// Affect priority flag (rendering on foreground)
 	if (objA0.subtype2c & (0x40 >> onPositiveSide))
-		u16[A1 + 0x0a] |= 0x8000
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		u16[A1 + 0x0a] &= 0x7fff
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }

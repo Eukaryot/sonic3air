@@ -34,7 +34,7 @@ function void fn03bf68()
 	{
 		camera.use_forced_target = true
 		camera.forced_target.x = objA0.position.x.u16
-		camera.forced_target.y = u16[0xffffb014]
+		camera.forced_target.y = u16[0xffffb000 + 0x14]
 	}
 
 #if STANDALONE
@@ -67,7 +67,7 @@ function void fn03bfa0()
 		return
 	}
 
-	if (D1 & 0x0100)	// Up
+	if (D1 & 0x0100)	// CONTROL_UP held
 	{
 		D0.u16 = objA0.position.y.u16 - u16[A0 + 0x36]
 		if (D0.s16 < s16[A1 + 0x14])
@@ -75,7 +75,7 @@ function void fn03bfa0()
 			--objA1.position.y.u16
 		}
 	}
-	if (D1 & 0x0200)	// Down
+	if (D1 & 0x0200)	// CONTROL_DOWN held
 	{
 		D0.u16 = objA0.position.y.u16
 		if (D0.s16 > s16[A1 + 0x14])
@@ -84,6 +84,7 @@ function void fn03bfa0()
 		}
 	}
 
+	// Check if jump button pressed
 	if (D1.u16 & CONTROL_ABC)
 	{
 		fn03c068()
@@ -112,15 +113,15 @@ function void fn03c010()
 {
 	D0 = u8[A2 + 0x04]
 	if (D0.s8 >= 0)
-		u16[A1 + 0x0a] |= 0x8000
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	else
-		u16[A1 + 0x0a] &= 0x7fff
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 
 	D0.u8 >>= 4
 	D1.u8 = u8[0x03c048 + D0.s16]
 	u8[A1 + 0x22] = D1.u8
 	D1.s16 = s8[0x03c058 + D0.s16]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		D1.s16 = -D1.s16
 	}
@@ -132,7 +133,7 @@ function void fn03c010()
 //# address-hook(0x03c068) end(0x03c090)
 function void fn03c068()
 {
-	objA1.velocity.x = (D1 & 0x0400) ? -0x1000 : 0x1000
+	objA1.velocity.x = (D1 & 0x0400) ? -0x1000 : 0x1000		// CONTROL_LEFT held
 	objA1.velocity.y = -0x100
 	u8[A1 + 0x1e] = 0x0e
 	u8[A1 + 0x1f] = 0x07
@@ -149,7 +150,7 @@ function void fn03c096()
 	u8[A2] = 0
 	u8[A2 + 0x02] = 0x1e
 
-	u16[A1 + 0x0a] &= 0x7fff
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	u8[A1 + 0x27] = 0
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -179,7 +180,7 @@ function void fn03c0d0()
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			u16[A1 + 0x1c] = 0
-			u8[A1 + 0x04] &= 0xfc
+			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D0.u8 = u8[A1 + 0x1e]
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
@@ -198,7 +199,7 @@ function void fn03c0d0()
 				objA1.position.y.u16 = D0.u16
 			}
 
-			u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+			objA1.render_flags &= ~render_flag.FLIP_Y
 			u8[A1 + 0x20] = 0
 			objA1.flags2a |= char.flag.IN_AIR
 			objA1.flags2a &= ~char.flag.FACING_LEFT
@@ -223,12 +224,12 @@ function void fn03c0d0()
 function void fn03c1a6()
 {
 	objA0.mapping_offset = 0x03c20c
-	objA0.sprite_attributes = 0x22e5
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02e5)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x68
 	objA0.box_size.y = 0x08
 	objA0.sprite_priority = 0x0280
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x01
 
 	A2 = A0 + 0x18
@@ -246,6 +247,6 @@ function void fn03c1ee()
 {
 	A2 = A0 + 0x1d
 	u8[A2] = (u8[A2] + 1) % 4
-	u8[A0 + 0x28] = u8[0x03c208 + u8[A2]]
+	objA0.collision_attributes = u8[0x03c208 + u8[A2]]
 	fn01b662()
 }

@@ -58,7 +58,7 @@ function void fn0882e6()
 	UpdateMovementStraightSimple()
 	fn08459c()
 	Object.CountdownAndTrigger()
-	u8[A0 + 0x28] = (objA0.animation.sprite == 2) ? 0x86 : 0x0a
+	objA0.collision_attributes = (objA0.animation.sprite == 2) ? (collision.flag.THREAT | collision.size.16x16) : collision.size.16x8
 }
 
 
@@ -66,6 +66,6 @@ function void fn0882e6()
 function void fn08830e()
 {
 	objA0.velocity.x = -objA0.velocity.x
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.countdown_value = u16[A0 + 0x3a]
 }

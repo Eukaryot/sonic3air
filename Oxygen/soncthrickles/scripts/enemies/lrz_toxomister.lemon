@@ -25,7 +25,7 @@ function void Toxomister.PostInit()
 	setupObjectAttributesFull(0x09002e)
 
 	objA0.update_address = 0x08fd76
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x01
 
 	A1 = A0 + 0x18
@@ -93,7 +93,7 @@ function void fn08fdd8()
 {
 	setupObjectAttributesBasic(0x09003a)
 
-	u8[A0 + 0x28] = 0xd8
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.4x4_2)
 	objA0.hitbox_extends.y = 0x18
 	objA0.countdown_value = 0x6f
 	objA0.countdown_callback = 0x08fe10
@@ -264,8 +264,7 @@ function void fn08ff72()
 {
 	playSound(0x97)
 
-	A2 = 0x090040
-	SpawnChildObjectsInDir()
+	spawnChildObjectsInDir(0x090040)
 	if (_equal())
 	{
 		u16[A0 + 0x44] = A1.u16
@@ -283,7 +282,7 @@ function void fn08ff8c()
 	u8[A0 + 0x29] = 0
 	A1 = 0x08ffd0 + (D0.u8 & 0x03) * 4
 	A2 = 0xffff0000 + u16[(A1+=2)-2]
-	if (u8[A2 + 0x20] == 0x02 || u8[A2 + 0x2b] & 0x40)
+	if (u8[A2 + 0x20] == char.state.ROLLING || u8[A2 + 0x2b] & char.bonus.SHIELD_BUBBLE)
 		return
 
 	u16[A0 + 0x44] = A2.u16

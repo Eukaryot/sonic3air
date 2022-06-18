@@ -57,8 +57,7 @@ function void fn07b2dc()
 	}
 #endif
 
-	A1 = 0x07d3ea
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x07d3ea))
 		return
 
 	boss.remaining_hits = 8
@@ -97,8 +96,9 @@ function void fn07b2dc()
 	{
 		if (allocDynamicObjectStd())
 		{
+			// Create the object that fades out level music and starts the boss theme afterwards
 			objA1.update_address = 0x085b30
-			u8[A1 + 0x2c] = 0x19
+			u8[A1 + 0x2c] = MUSIC_MAINBOSS
 		}
 	}
 
@@ -167,7 +167,7 @@ function void fn07b416()
 function void fn07b41c()
 {
 	objA0.base_state = 0x08
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.position.y.u16 = camera.position.y.u16 + 0x40
 	objA0.velocity.x = 0x400
 	objA0.animation.sprite = 3
@@ -258,7 +258,7 @@ function void fn07b4ec()
 	}
 	else
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		objA0.animation.sprite = 1
 		u32[A0 + 0x30] = 0x07d5a2
 		objA0.countdown_callback = 0x07b57a
@@ -307,9 +307,9 @@ function void fn07b57a()
 	objA0.countdown_callback = 0x07b5e8
 
 	if (objA0.position.x.u16 > camera.position.x.u16 + getScreenWidth() / 2)
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 	else
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 }
 
 
@@ -381,7 +381,7 @@ function void fn07b63a()
 	s16[A0 + 0x40] = D1.s16
 	objA0.velocity.y = 0
 
-	playSound(0xb6)
+	playSound(SFX_SPINDASH_RELEASE)
 }
 
 
@@ -510,7 +510,7 @@ function void fn07b790()
 	}
 	objA0.velocity.x = D0.u16
 	u16[A0 + 0x40] = D1.u16
-	playSound(0xb6)
+	playSound(SFX_SPINDASH_RELEASE)
 }
 
 
@@ -717,7 +717,7 @@ function void fn07c902()
 	objA0.update_address = 0x07c91c
 	fn07d236()
 
-	playSound(0x3c)
+	playSound(SFX_ROLL)
 	fn07c91c()
 }
 
@@ -750,7 +750,7 @@ function void fn07c948()
 	if (objA0.subtype2c & 0x80)
 	{
 		objA0.subtype2c &= ~0x80
-		objA0.render_flags &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
 	}
 	fn07c964()
 }

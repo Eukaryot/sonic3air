@@ -155,6 +155,7 @@ function void fn081856()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the left border
 			objA1.update_address = 0x084a76
 		}
 
@@ -504,7 +505,7 @@ function void fn081f94()
 	fn082c86()
 	if (s8[A0 + 0x39] < 0)
 	{
-		if (u16[0xffffb010] >= objA0.position.x.u16)
+		if (u16[0xffffb000 + 0x10] >= objA0.position.x.u16)
 		{
 			// Launch 3 new missiles
 			objA0.value39 = 2

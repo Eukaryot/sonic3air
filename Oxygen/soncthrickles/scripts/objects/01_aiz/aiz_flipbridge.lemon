@@ -16,7 +16,7 @@
 function void fn02a94c()
 {
 	objA0.mapping_offset = 0x22a310
-	objA0.sprite_attributes = 0x42e9
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x04
 	objA0.render_flags = render_flag.WORLD
@@ -39,21 +39,22 @@ function void fn02a94c()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02aa78
-		u32[A1 + 0x0c] = 0x22a310
-		u16[A1 + 0x0a] = 0x42e9
-		u8[A1 + 0x04] = render_flag.WORLD
-		u8[A1 + 0x07] = 0x80
-		u8[A1 + 0x06] = 0x40
-		u16[A1 + 0x08] = 0x0200
+		objA1.mapping_offset = 0x22a310
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
+		objA1.render_flags = render_flag.WORLD
+		objA1.box_size.x = 0x80
+		objA1.box_size.y = 0x40
+		objA1.sprite_priority = 0x0200
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x04] |= 0x40
-		u16[A1 + 0x16] = 0x08
+		objA1.render_flags |= render_flag.COMPOUND
+		u16[A1 + 0x16] = 8		// Number of bridge segments
 		D2.u16 = objA0.position.y.u16 + 0x20
 		D3.u16 = objA0.position.x.u16 - 0x70
 		D4.u16 = 8
-		if (s8[A0 + 0x2c] < 0)
+		if (s8(objA0.subtype2c) < 0)
 		{
+			// Shrink vertical distance between segments a bit
 			D2.u16 -= 0x10
 			D4.u16 = 4
 		}
@@ -66,9 +67,11 @@ function void fn02a94c()
 			u16[(A2+=2)-2] = D3.u16
 			u16[(A2+=2)-2] = D2.u16
 			u16[(A2+=2)-2] = D1.u16
-			D1.u16 = (D1.u16 + 0x02) & 0x0f
-			D3.u16 += 0x20
-			D2.u16 -= D4.u16
+
+			D1.u16 = (D1.u16 + 0x02) & 0x0f		// Flipping delay between segments
+			D3.u16 += 0x20			// Horizontal distance between segments
+			D2.u16 -= D4.u16		// Vertical distance between segments
+
 			--D6.s16
 		}
 		u16[A0 + 0x3c] = A1.u16
@@ -155,7 +158,7 @@ function void fn02abf2()
 	push(D1)
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn02ac08()
 
 	D1 = pop()
@@ -164,7 +167,7 @@ function void fn02abf2()
 	D4 = pop()
 
 	A1 = 0xffffb04a
-	D6.u8 = 4
+	D6.u8 = 4		// object.flag.P2_ON_OBJECT
 	fn02ac08()
 }
 
@@ -172,7 +175,8 @@ function void fn02abf2()
 //# address-hook(0x02ac08) end(0x02acda)
 function void fn02ac08()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		D2.u16 = D1.u16 * 2
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
@@ -194,7 +198,7 @@ function void fn02ac08()
 
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		D4 = 0
 		return
 	}

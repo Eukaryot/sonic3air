@@ -92,8 +92,8 @@ function void fn03b534()
 function void fn03b566()
 {
 	objA0.mapping_offset = 0x03b6ce
-	objA0.sprite_attributes = 0x246b
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x046b)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x0c
 	objA0.sprite_priority = 0x0280
@@ -212,8 +212,8 @@ function void fn03b63a()
 function void fn03b6de()
 {
 	objA0.mapping_offset = 0x03b73c
-	objA0.sprite_attributes = 0x246b
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x046b)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.animation.sprite = objA0.subtype2c
 	D0.u16 = (objA0.subtype2c & 0x03) * 2
@@ -253,18 +253,18 @@ function void fn03b766()
 	while (true)
 	{
 		objA1.update_address = 0x03b86a
-		u32[A1 + 0x0c] = 0x03b91a
-		u16[A1 + 0x0a] = 0x246b
-		u8[A1 + 0x04] |= 0x04
+		objA1.mapping_offset = 0x03b91a
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x046b)
+		objA1.render_flags |= render_flag.WORLD
 	#if STANDALONE
 		// Increased size of bounding box to avoid early clipping
-		u8[A1 + 0x07] = 0x12
-		u8[A1 + 0x06] = 0x12
+		objA1.box_size.x = 0x12
+		objA1.box_size.y = 0x12
 	#else
-		u8[A1 + 0x07] = 0x0c
-		u8[A1 + 0x06] = 0x0c
+		objA1.box_size.x = 0x0c
+		objA1.box_size.y = 0x0c
 	#endif
-		u16[A1 + 0x08] = 0x0280
+		objA1.sprite_priority = 0x0280
 		u8[A1 + 0x2a] = objA0.flags2a
 		u8[A1 + 0x2a] |= 0x80
 		u16[A1 + 0x44] = objA0.position.x.u16
@@ -274,9 +274,9 @@ function void fn03b766()
 		if (D2.u8 & 1)
 		{
 			objA1.update_address = 0x03b8c2
-			u16[A1 + 0x0a] = 0x2443
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0443)
 			u8[A1 + 0x22] = 0x01
-			u8[A1 + 0x28] = 0x86
+			objA1.collision_attributes = (collision.flag.THREAT | collision.size.16x16)
 		}
 		D2.u8 >>= 1
 

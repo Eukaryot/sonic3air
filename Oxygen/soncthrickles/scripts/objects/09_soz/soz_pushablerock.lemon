@@ -12,8 +12,8 @@
 function void fn040546()
 {
 	objA0.mapping_offset = 0x040776
-	objA0.sprite_attributes = 0x4455
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0455)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x0c
 	objA0.hitbox_extends.y = 0x0b
@@ -40,8 +40,8 @@ function void fn040546()
 //# address-hook(0x0405aa)
 function void fn0405aa()
 {
-	u8[A0 + 0x30] = u8[0xffffb02a]
-	u8[A0 + 0x31] = u8[0xffffb074]
+	u8[A0 + 0x30] = u8[0xffffb000 + 0x2a]
+	u8[A0 + 0x31] = u8[0xffffb04a + 0x2a]
 	D1.u16 = 0x1b
 	D2.u16 = 0x0c
 	D3.u16 = 0x0d
@@ -172,7 +172,7 @@ function void fn0406ae()
 function void fn0406b4()
 {
 	D5 = 0
-	D3.u8 = objA0.flags2a & 0x60
+	D3.u8 = objA0.flags2a & (object.flag.P1_PUSHING | object.flag.P2_PUSHING)
 
 	if (D3.u8 != 0)
 	{
@@ -180,14 +180,14 @@ function void fn0406b4()
 
 		A1 = 0xffffb000
 		D0.u8 = u8[A0 + 0x30]
-		D6 = 5
+		D6 = 5		// object.flag.P1_PUSHING
 		fn0406e4()
 
 		if (D5.u16 == 0)
 		{
 			A1 = 0xffffb04a
 			D0.u8 = u8[A0 + 0x31]
-			D6 = 6
+			D6 = 6		// object.flag.P2_PUSHING
 			fn0406e4()
 		}
 	}

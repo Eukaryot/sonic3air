@@ -13,7 +13,7 @@ function void fn0821de()
 {
 	objA0.update_address = 0x0821fc
 	objA0.mapping_offset = 0x0832e2
-	objA0.sprite_attributes = 0xa2db
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x02db)
 	objA0.sprite_priority = 0
 	fn083146()
 	fn0821fc()
@@ -52,7 +52,7 @@ function void fn0821fc()
 	}
 
 	// Sonic crashed into the asteroid
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 	D0.u16 = u16[0xfffffa8e]
 	if (D0.u16 != 0)
 	{
@@ -71,7 +71,7 @@ function void fn0821fc()
 	if (D0.u8 == 0x20)
 	{
 		D1 = 0
-		D2.u16 = objA0.position.y.u16 - u16[0xffffb014]
+		D2.u16 = objA0.position.y.u16 - u16[0xffffb000 + 0x14]
 		D3.u8 = (D2.s16 < 0) ? 0xff : 0x00
 		D2.u16 = abs(D2.s16)
 		if (D2.u16 >= 0x10)
@@ -83,6 +83,7 @@ function void fn0821fc()
 		D4 = 2
 		while (D4.s16 >= 0)
 		{
+			// Spawn smaller asteroids
 			if (!allocDynamicObjectStd())
 			{
 				if (objA0.respawn_entry)
@@ -123,9 +124,10 @@ function void fn0821fc()
 		if (!allocDynamicObjectStd())
 			break
 
-		u32[A1] = D1
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
+		// Spawn asteroid debris
+		objA1.update_address = D1
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.position.x.u16 = D2.u16 + s8[(A2+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A2+=1)-1]
 		u16[A1 + 0x2c] = u16[(A2+=2)-2]
@@ -177,9 +179,9 @@ function void fn083146()
 	objA0.box_size.x = u8[(A1+=1)-1]
 	objA0.box_size.y = u8[(A1+=1)-1]
 	objA0.animation.sprite = u8[(A1+=1)-1]
-	u8[A0 + 0x28] = u8[(A1+=1)-1]
+	objA0.collision_attributes = u8[(A1+=1)-1]
 	u32[A0 + 0x30] = u32[(A1+=4)-4]
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	D1.u16 = (D1.u16 & 0x0f) * 2
 	objA0.velocity.x = u16[0x08317e + D1.s16]
 }

@@ -320,7 +320,7 @@ function void fn06c598()
 {
 	objA0.base_state = 0x1a
 	u8[A0 + 0x46] = 0
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.position.x.u16 = 0x3e80
 	objA0.position.y.u16 = 0x0700
 	objA0.velocity.x = -0x80
@@ -335,7 +335,7 @@ function void fn06c5c4()
 	UpdateMovementStraightSimple()
 	if ((objA0.flags2a & 0x40) == 0)
 	{
-		D0.u16 = u16[0xffffb010]
+		D0.u16 = u16[0xffffb000 + 0x10]
 		if (D0.u16 < objA0.position.x.u16)
 		{
 			fn0847e6()
@@ -614,7 +614,7 @@ function void fn02468a()
 	D2.u16 = u16[0xfffff740] + D1.u16
 	if (D2.u16 > 0x80)
 	{
-		objA0.render_flags &= ~0x80
+		objA0.render_flags &= ~render_flag.VISIBLE
 		return
 	}
 

@@ -131,7 +131,7 @@ function void fn08b7a0()
 		if (u8[A2 + 0x04] & render_flag.FLIP_X)
 		{
 			objA0.render_flags |= render_flag.FLIP_X
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 			objA0.velocity.x = -objA0.velocity.x
 		}
 	}

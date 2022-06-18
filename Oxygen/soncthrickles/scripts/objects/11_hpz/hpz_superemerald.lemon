@@ -36,7 +36,7 @@ function void fn0907a2()
 function void fn0907a8()
 {
 	objA0.update_address = 0x0908de
-	objA0.sprite_attributes = 0x8477
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0477)
 	objA0.flags38 |= 0x01
 
 	fn09084e()
@@ -106,7 +106,7 @@ function void fn090880()
 	{
 		objA0.update_address = 0x0908de
 		objA0.animation.sprite = 0x1e
-		objA0.sprite_attributes = 0x8477
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0477)
 
 		fn0908de()
 	}
@@ -123,7 +123,7 @@ function void fn09089e()
 	if (u8[0xfffffac0] == (objA0.subtype2c | 0x80))
 	{
 		objA0.animation.sprite = 0x1e
-		objA0.sprite_attributes = 0x8477
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0477)
 	}
 	else
 	{
@@ -140,7 +140,7 @@ function void fn09089e()
 		{
 			// Draw only a gray something
 			objA0.animation.sprite = 0x07
-			objA0.sprite_attributes = 0x83b5
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x03b5)
 		}
 		else
 		{
@@ -162,7 +162,7 @@ function void fn0908de()
 	D4.u16 = objA0.position.x.u16
 	PlatformCheckClimbOn()
 
-	if ((objA0.flags2a & 0x08) && (objA0.flags38 & 0x01))
+	if ((objA0.flags2a & object.flag.P1_ON_OBJECT) && (objA0.flags38 & 0x01))
 	{
 	#if STANDALONE
 		// Not allowed in normal HPZ
@@ -175,7 +175,7 @@ function void fn0908de()
 
 			A1 = 0xffffb000
 			u8[A1 + 0x2e] = 0x81
-			u16[A1 + 0x20] = 0x0500
+			u16[A1 + 0x20] = 0x0500		// char.state.STANDING, char.state.RUNNING
 		}
 	}
 
@@ -203,7 +203,7 @@ function void fn090926()
 		global.in_extra_stage = 1
 		global.sk_bluespheres = 1
 		checkpoint.number = level.backup.checkpoint
-		global.shields_backup_2 = u8[0xffffb02b]
+		global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 	}
 
 	DrawObject()

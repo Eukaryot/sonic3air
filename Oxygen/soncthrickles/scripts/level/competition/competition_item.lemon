@@ -15,7 +15,7 @@ function void fn036364()
 {
 	objA0.mapping_offset = 0x036aa6
 	objA0.sprite_attributes = 0x03c6
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
@@ -28,9 +28,9 @@ function void fn036364()
 	u8[A0 + 0x27] = (objA0.flags2a & 0x01) ? -1 : 1
 	objA0.flags2a &= ~0x01
 	objA0.state = 0x07
-	u8[A0 + 0x28] = 0xc7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.6x6)
 
-	u32[A0] = 0x0363d0
+	objA0.update_address = 0x0363d0
 	fn0363d0()
 }
 
@@ -43,7 +43,7 @@ function void fn0363d0()
 	D0.u8 = objA0.value26
 	LookupSinCos()
 	D1.s16 = u16[A0 + 0x30] + ((D1.s16 * 7) >> 5)
-	D1.u16 &= u16[0xffffeea8]
+	D1.u16 &= level.width.bitmask
 	D1.u16 += 0x0400
 	objA0.position.x.u16 = D1.u16
 
@@ -108,7 +108,7 @@ function void fn036464()
 function void fn036486()
 {
 	// Speed shoes
-	u8[A2 + 0x2b] |= 0x04
+	u8[A2 + 0x2b] |= char.bonus.SPEED_UP
 	u8[A2 + 0x36] = 0x4b
 	if (A2 == 0xffffb000)
 	{
@@ -118,9 +118,9 @@ function void fn036486()
 	}
 	else
 	{
-		u16[0xfffffec0] = 0x0c00
-		u16[0xfffffec2] = 0x18
-		u16[0xfffffec4] = 0x80
+		global.move.speedcap.tails = 0x0c00
+		global.move.acceleration.tails = 0x18
+		global.move.deceleration.tails = 0x80
 	}
 	objA0.state = 0x07
 	u8[A0 + 0x28] = 0
@@ -135,7 +135,7 @@ function void fn036486()
 function void fn0364d8()
 {
 	// Slow shoes
-	u8[A2 + 0x2b] |= 0x04
+	u8[A2 + 0x2b] |= char.bonus.SPEED_UP
 	u8[A2 + 0x36] = 0x4b
 	if (A2 == 0xffffb000)
 	{
@@ -145,9 +145,9 @@ function void fn0364d8()
 	}
 	else
 	{
-		u16[0xfffffec0] = 0x0300
-		u16[0xfffffec2] = 0x08
-		u16[0xfffffec4] = 0x20
+		global.move.speedcap.tails = 0x0300
+		global.move.acceleration.tails = 0x08
+		global.move.deceleration.tails = 0x20
 	}
 	objA0.state = 0x07
 	u8[A0 + 0x28] = 0
@@ -174,9 +174,9 @@ function void fn03652a()
 	D0.u16 = global.move.speedcap
 	D1.u16 = global.move.acceleration
 	D2.u16 = global.move.deceleration
-	D3.u16 = u16[0xfffffec0]
-	D4.u16 = u16[0xfffffec2]
-	D5.u16 = u16[0xfffffec4]
+	D3.u16 = global.move.speedcap.tails
+	D4.u16 = global.move.acceleration.tails
+	D5.u16 = global.move.deceleration.tails
 	u16[A7-=2] = D0.u16
 
 	A1 = 0x1e3c00 + u8[A2 + 0x38] * 8
@@ -185,22 +185,22 @@ function void fn03652a()
 	global.move.deceleration = u16[(A1+=2)-2]
 
 	A1 = 0x1e3c00 + u8[A3 + 0x38] * 8
-	u16[0xfffffec0] = u16[(A1+=2)-2]
-	u16[0xfffffec2] = u16[(A1+=2)-2]
-	u16[0xfffffec4] = u16[(A1+=2)-2]
+	global.move.speedcap.tails = u16[(A1+=2)-2]
+	global.move.acceleration.tails = u16[(A1+=2)-2]
+	global.move.deceleration.tails = u16[(A1+=2)-2]
 
 	D0.u16 = u16[(A7+=2)-2]
-	if (u8[A2 + 0x2b] & 0x04)
+	if (u8[A2 + 0x2b] & char.bonus.SPEED_UP)
 	{
 		global.move.speedcap = D3.u16
 		global.move.acceleration = D4.u16
 		global.move.deceleration = D5.u16
 	}
-	if (u8[A3 + 0x2b] & 0x04)
+	if (u8[A3 + 0x2b] & char.bonus.SPEED_UP)
 	{
-		u16[0xfffffec0] = D0.u16
-		u16[0xfffffec2] = D1.u16
-		u16[0xfffffec4] = D2.u16
+		global.move.speedcap.tails = D0.u16
+		global.move.acceleration.tails = D1.u16
+		global.move.deceleration.tails = D2.u16
 	}
 	objA0.state = 0x07
 	u8[A0 + 0x28] = 0
@@ -242,12 +242,12 @@ function void fn036612()
 
 	copyMemory(0xffffcb2c, A0, 0x2e)
 
-	u32[A1] = 0x03669c
+	objA1.update_address = 0x03669c
 	u8[A1 + 0x20] = 0x04
 	u16[A1 + 0x46] = u16[A2 + 0x46]
-	if (u16[A2 + 0x0a] & 0x8000)
+	if (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 	{
-		u16[A1 + 0x0a] |= 0x8000
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 }
 
@@ -322,7 +322,7 @@ function void fn0366c4()
 	{
 		objA0.position.y.u16 += D1.u16
 		u32[A0] = D2
-		u8[A0 + 0x28] = 0xc7
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.6x6)
 	}
 	if (level.vertical_wrap == 0xff00)
 	{

@@ -115,9 +115,9 @@ function void UpdateListOfRingsAround_Default()
 	s16 borderRight = 8
 #if STANDALONE
 	// We can extend that borders a little further, to avoid rings not getting collected when the player outruns the camera
-	if (u16[0xffffb010] < camera.position.x.u16 + 0x20)
+	if (u16[0xffffb000 + 0x10] < camera.position.x.u16 + 0x20)
 		borderLeft += 0x20
-	if (u16[0xffffb010] >= camera.position.x.u16 + getScreenWidth() - 0x20)
+	if (u16[0xffffb000 + 0x10] >= camera.position.x.u16 + getScreenWidth() - 0x20)
 		borderRight += 0x20
 #endif
 

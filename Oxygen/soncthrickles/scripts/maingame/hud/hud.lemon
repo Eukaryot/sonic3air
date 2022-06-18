@@ -459,10 +459,10 @@ function void DebugModePositionDisplay()
 	// Initialize direct VRAM write
 	VDP.setupVRAMWrite(0xdc40)
 
-	D1 = (u32(camera.position.x.u16) << 16) + u16[0xffffb010]
+	D1 = (u32(camera.position.x.u16) << 16) + u16[0xffffb000 + 0x10]
 	fn00df1c()
 
-	D1 = (u32(camera.position.y.u16) << 16) + u16[0xffffb014]
+	D1 = (u32(camera.position.y.u16) << 16) + u16[0xffffb000 + 0x14]
 	fn00df1c()
 }
 

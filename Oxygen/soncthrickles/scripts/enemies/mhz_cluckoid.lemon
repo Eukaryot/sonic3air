@@ -37,12 +37,10 @@ function void fn08e184()
 //# address-hook(0x08e1aa) end(0x08e1b8)
 function void fn08e1aa()
 {
-	A1 = 0x08e3d8
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08e3d8))
 		return
 
-	A2 = 0x08e402
-	SpawnChildObjectsInDir()
+	spawnChildObjectsInDir(0x08e402)
 }
 
 
@@ -140,7 +138,7 @@ function void fn08e37c()
 
 function void fn08e388()
 {
-	if (u8[A1 + 0x20] != 0x08 && u8[A1 + 0x3d] == 0 && u8[A1 + 0x2e] == 0)
+	if (u8[A1 + 0x20] != char.state.COWERING && u8[A1 + 0x3d] == 0 && u8[A1 + 0x2e] == 0)
 	{
 		CheckDistanceToObjectA1()
 		if (D2.u16 < 0x0100 && D3.u16 < 0x40)
@@ -238,7 +236,7 @@ function bool fn08e2ea()
 	{
 		D0.u16 = u16[0x08e364 + (D0.s16 & 0x06)]
 		D4.u16 = -0x20
-		if ((u8[A1 + 0x04] & 0x01) == 0)
+		if ((objA1.render_flags & render_flag.FLIP_X) == 0)
 		{
 			objA0.render_flags |= render_flag.FLIP_X
 			D0.s16 = -D0.s16

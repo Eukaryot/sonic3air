@@ -11,16 +11,16 @@
 //# address-hook(0x23a03c) end(0x23a048)
 function void fn23a03c()
 {
-	u16[0xffffee68] = u16[0xffffee60]
-	u16[0xffffee6c] = u16[0xffffee64]
+	camera.foreground.x.u16.player2 = camera.position.x.u16.player2
+	camera.foreground.y.u16.player2 = camera.position.y.u16.player2
 }
 
 
 //# address-hook(0x23a04a) end(0x23a062)
 function void fn23a04a()
 {
-	u16[0xfffff61e] = u16[0xffffee6c] - 0x70
-	u16[0xfffff620] = u16[0xffffee74] - 0x70
+	u16[0xfffff61e] = camera.foreground.y.u16.player2 - 0x70
+	u16[0xfffff620] = camera.background.y.u16.player2 - 0x70
 }
 
 
@@ -70,12 +70,12 @@ function void fn23a63c()
 	D0.u16 = camera.foreground.x.u16
 	u16[0xffffeeb4] = D0.u16
 	u16[0xffffeeb6] = D0.u16
-	D0.u16 = u16[0xffffee68]
+	D0.u16 = camera.foreground.x.u16.player2
 	u16[0xffffeeb8] = D0.u16
 	u16[0xffffeeba] = D0.u16
 
 	A1 = 0x23a928 + global.zone * 0x10
-	u16[0xffffeea8] = u16[(A1+=2)-2]
+	level.width.bitmask = u16[(A1+=2)-2]
 	level.height.bitmask = u16[(A1+=2)-2]
 	level.height.tilemask = u16[(A1+=2)-2]
 	level.chunksize.bitmask = u16[(A1+=2)-2]
@@ -94,7 +94,7 @@ function void fn23a68a()
 {
 	fn23a03c()
 
-	D2.u16 = u16[0xffffeea8] + 1
+	D2.u16 = level.width.bitmask + 1
 	D3.u16 = D2.u16
 	D2.u16 >>= 1
 	A1 = 0xffffeeb4
@@ -102,7 +102,7 @@ function void fn23a68a()
 	D0.u16 = camera.foreground.x.u16
 	fn23a080()
 
-	D0.u16 = u16[0xffffee68]
+	D0.u16 = camera.foreground.x.u16.player2
 	fn23a080()
 }
 
@@ -123,7 +123,7 @@ function void fn23a6ac()
 	D0.u16 = camera.foreground.y.u16
 	fn23a080()
 
-	D0.u16 = u16[0xffffee6c]
+	D0.u16 = camera.foreground.y.u16.player2
 	fn23a080()
 }
 
@@ -159,11 +159,11 @@ function void fn23a6de()
 	D0.u16 = camera.foreground.y.u16
 	level.display_routine = D0.u16
 	u16[0xffffeed4] = D0.u16
-	D0.u16 = u16[0xffffee6c]
+	D0.u16 = camera.foreground.y.u16.player2
 	u16[0xffffeed6] = D0.u16
 	u16[0xffffeed8] = D0.u16
 
-	D0 = ((u8[0xfffffeda] + 1) << 8) - 0x70
+	D0 = ((competition_mode.laps + 1) << 8) - 0x70
 	u16[0xffffeeda] = u32(0x900000) / D0.u16
 
 	fn23a752()
@@ -239,8 +239,8 @@ function void fn23a764()
 
 	A4 = A6
 	A5 = 0xffffa900
-	D0.u16 = u16[0xffffee74] - 4
-	D3.u16 = u16[0xffffee68]
+	D0.u16 = camera.background.y.u16.player2 - 4
+	D3.u16 = camera.foreground.x.u16.player2
 	D1 = 0x73
 	fn239e9c()
 
@@ -261,8 +261,8 @@ function void fn23a796()
 	D2 = 0x1a
 	fn23a7ba()
 
-	D0.u16 = u16[0xffffee68]
-	D1.u16 = u16[0xffffee70]
+	D0.u16 = camera.foreground.x.u16.player2
+	D1.u16 = camera.background.x.u16.player2
 	D2 = 0x1c
 	fn23a7ba()
 
@@ -298,9 +298,9 @@ function void fn23a7d0()
 	fn23a808()
 	camera.background.y.u16 = D0.u16
 
-	D0.u16 = u16[0xffffee6c]
+	D0.u16 = camera.foreground.y.u16.player2
 	fn23a808()
-	u16[0xffffee74] = D0.u16
+	camera.background.y.u16.player2 = D0.u16
 
 	level.display_routine += 0x03
 	u32[0xffffeed4] += 0x1000
@@ -393,9 +393,9 @@ function void fn23a88e()
 	fn23a8b6()
 	camera.background.y.u16 = D0.u16
 
-	D0.u16 = u16[0xffffee6c]
+	D0.u16 = camera.foreground.y.u16.player2
 	fn23a8b6()
-	u16[0xffffee74] = D0.u16
+	camera.background.y.u16.player2 = D0.u16
 
 	A1 = 0xffffa80e
 	D0.u16 = u16[0xffffeeb6]
@@ -436,10 +436,10 @@ function void fn23a8dc()
 	fn23a912()
 	camera.background.y.u16 = D0.u16
 
-	D0.u16 = u16[0xffffee6c]
+	D0.u16 = camera.foreground.y.u16.player2
 	fn23a912()
 	D0.u16 += 0x80
-	u16[0xffffee74] = D0.u16
+	camera.background.y.u16.player2 = D0.u16
 
 	D0.u16 = u16[0xffffeeb6]
 	fn23a91c()
@@ -448,7 +448,7 @@ function void fn23a8dc()
 
 	D0.u16 = u16[0xffffeeba]
 	fn23a91c()
-	u16[0xffffee70] = D0.u16
+	camera.background.x.u16.player2 = D0.u16
 	u16[0xffffeee4] = D1.u16
 }
 
@@ -477,7 +477,7 @@ function void fn23a924()
 
 	D0.u16 = u16[0xffffeed8]
 	fn23a94c()
-	u16[0xffffee74] = D0.u16
+	camera.background.y.u16.player2 = D0.u16
 
 	A1 = 0xffffa80a
 	D0.u16 = u16[0xffffeeb6]
@@ -535,9 +535,9 @@ function void fn23a980()
 	fn23a9a8()
 	camera.background.y.u16 = D0.u16
 
-	D0.u16 = u16[0xffffee6c]
+	D0.u16 = camera.foreground.y.u16.player2
 	fn23a9a8()
-	u16[0xffffee74] = D0.u16
+	camera.background.y.u16.player2 = D0.u16
 
 	A1 = 0xffffa800
 	D0.u16 = u16[0xffffeeb6]

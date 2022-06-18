@@ -12,8 +12,8 @@
 function void fn03b0e2()
 {
 	objA0.mapping_offset = 0x03b25c
-	objA0.sprite_attributes = 0x2443
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0443)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 
 	if (objA0.subtype2c == 0)
@@ -21,7 +21,7 @@ function void fn03b0e2()
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x10
 		objA0.hitbox_extends.y = 0x0a
-		u8[A0 + 0x28] = 0x9a
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 
 		objA0.update_address = 0x03b18c
 		fn03b18c()
@@ -30,14 +30,14 @@ function void fn03b0e2()
 	{
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x10
-		u8[A0 + 0x28] = 0x9a
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 
 		objA0.update_address = 0x01b662
 		fn01b662()
 	}
 	else if ((objA0.subtype2c & 0x01) == 0)
 	{
-		objA0.sprite_attributes |= 0x8000
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 		objA0.box_size.x = 0x30
 		objA0.box_size.y = 0x08
 
@@ -46,7 +46,7 @@ function void fn03b0e2()
 	}
 	else
 	{
-		objA0.sprite_attributes = 0xa442
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0442)
 		objA0.box_size.x = 0x24
 		objA0.box_size.y = 0x04
 		objA0.animation.sprite = 0x04

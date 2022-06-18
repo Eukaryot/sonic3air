@@ -16,7 +16,7 @@
 function void fn01ec18()
 {
 	objA0.mapping_offset = 0x01ecc6
-	objA0.sprite_attributes = 0x86bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06bc)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x200
 	objA0.flags2a |= 0x80
@@ -62,7 +62,7 @@ function void fn01ecaa()
 //# address-hook(0x01f3ea) end(0x01f3f0)
 function void fn01f3ea()
 {
-	objA0.flags2b |= 0x20
+	objA0.flags2b |= char.bonus.SHIELD_LIGHTNING		// Shocking surfaces
 	fn01f3f8()
 }
 
@@ -70,7 +70,7 @@ function void fn01f3ea()
 //# address-hook(0x01f3f2) end(0x01f4f2)
 function void fn01f3f2()
 {
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE		// Burning surfaces, like lava
 	fn01f3f8()
 }
 
@@ -79,7 +79,7 @@ function void fn01f3f2()
 function void fn01f3f8()
 {
 	objA0.mapping_offset = 0x01ecc6
-	objA0.sprite_attributes = 0x86bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06bc)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.flags2a |= 0x80
@@ -88,14 +88,17 @@ function void fn01f3f8()
 
 	if (objA0.flags2a & 0x01)
 	{
+		// Damages character entering from the sides
 		objA0.update_address = 0x01f4c4
 	}
 	else if (objA0.flags2a & 0x02)
 	{
+		// Damages character entering from below
 		objA0.update_address = 0x01f528
 	}
 	else
 	{
+		// Damages character entering from the top
 		objA0.update_address = 0x01f45e
 		fn01f45e()
 	}
@@ -111,12 +114,12 @@ function void fn01f45e()
 	D4.u16 = objA0.position.x.u16
 	CheckCharacterOnClimbableObject()
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		BlockerElement.DoDamage()
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		BlockerElement.DoDamage()
@@ -125,6 +128,30 @@ function void fn01f45e()
 	BlockerElement.checkForUnloadAndDebugRender(0xff80ffff)
 }
 
+
+//# address-hook(0x01f4c4) end(0x01f526)
+function void fn01f4c4()
+{
+	D1 = objA0.box_size.x + 11
+	D2 = objA0.box_size.y
+	D3.u16 = D2.u16 + 1
+	D4.u16 = objA0.position.x.u16
+	CheckCharacterOnClimbableObject()
+
+	D6 = (D6 << 16) + (D6 >> 16)
+	if (D6.u8 & 0x01)
+	{
+		A1 = 0xffffb000
+		BlockerElement.DoDamage()
+	}
+	if (D6.u8 & 0x02)
+	{
+		A1 = 0xffffb04a
+		BlockerElement.DoDamage()
+	}
+
+	BlockerElement.checkForUnloadAndDebugRender(0xffa0ffff)
+}
 
 
 // Object that is (flipped) GTGT
@@ -158,7 +185,7 @@ function void fn01f528()
 function void BlockerElement.DoDamage()
 {
 	// Check if character is protected by shield against this damage type
-	D0.u8 = objA0.flags2b & 0x73
+	D0.u8 = objA0.flags2b & (char.bonus.ALL_SHIELDS | char.bonus.INVINCIBLE)
 	if ((D0.u8 & u8[A1 + 0x2b]) == 0)
 	{
 		DamageCharacter()
@@ -175,7 +202,7 @@ function void BlockerElement.DoDamage()
 function void fn01f5a0()
 {
 	objA0.mapping_offset = 0x01ecc6
-	objA0.sprite_attributes = 0x86bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06bc)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.flags2a |= 0x80
@@ -210,12 +237,12 @@ function void fn01f606()
 	D4.u16 = objA0.position.x.u16
 	CheckCharacterOnClimbableObject()
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
 		BlockerElement.KillCharacter()
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		BlockerElement.KillCharacter()
@@ -249,6 +276,7 @@ function void fn01f66c()
 	BlockerElement.checkForUnloadAndDebugRender(0xffffc080)
 }
 
+// Object that is (flipped) GTGT
 
 //# address-hook(0x01f6d0) end(0x01f732)
 function void fn01f6d0()

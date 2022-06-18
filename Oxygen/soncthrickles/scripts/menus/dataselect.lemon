@@ -50,17 +50,17 @@ function void fn00c110()
 {
 	lives_counter = 3
 	continues_counter = 0
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	checkpoint.number = 0
 	global.stage_type = 0
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	unused.player2.next_life_score = 5000
 }
 
 
@@ -103,17 +103,22 @@ function void fn00c890()
 		{
 			if (u8[A3 + 0x3a] == u8[A3 + 0x37] && u8[A3 + 0x3b] != 0)
 			{
+				// Render "CLEAR" label
 				A1 = 0x00db36
 				D0.u16 = D7.u16
 				fn00d9f4()
 			}
 			else
 			{
+				// Render "ZONE" label
 				A1 = 0x00db31
 				D0.u16 = D7.u16 - 2
 				fn00d9f4()
 
+				// Render zone number
 				D0.u16 = u16[A3 + 0x36] * 2
+
+				// Second digit (10, 20, etc)
 				D1 = u8[0x00c95e + D0.s16]
 				if (D1.s8 < 0)
 				{
@@ -125,12 +130,14 @@ function void fn00c890()
 				}
 				VDP.writeData16(D1.u16)
 
+				// First digit (1, 2, etc)
 				D1 = 0xa562 + u8[0x00c95f + D0.s16]
 				VDP.writeData16(D1.u16)
 			}
 		}
 		else
 		{
+			// Render empty tiles
 			A1 = 0x00db2b
 			D0.u16 = D7.u16
 			fn00d9f4()
@@ -158,11 +165,11 @@ function void fn00c97a()
 		u16 characters = u16[A3 + 0x34]
 		if (!saveGameSlotUsed)
 		{
-			characters = 0
+			characters = CHARS_SONIC_AND_TAILS
 		}
-		else if (characters == 0)	// Handle Sonic & Tails - show Sonic's icons
+		else if (characters == CHARS_SONIC_AND_TAILS)	// Handle Sonic & Tails - show Sonic's icons
 		{
-			characters = 1
+			characters = CHARS_SONIC_ALONE
 		}
 	#if STANDALONE
 		else
@@ -189,7 +196,8 @@ function void fn00c97a()
 		}
 		else
 		{
-			D0.u8 = u8[A3 + 0x3e]
+			// Render lives digits
+			D0.u8 = u8[A3 + 0x3e]	// Get lives data from save file
 			fn00ca14()
 
 			D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16 + 6)
@@ -197,7 +205,8 @@ function void fn00c97a()
 			D2 = 1
 			fn001506()
 
-			D0.u8 = u8[A3 + 0x3f]
+			// Render continues digits
+			D0.u8 = u8[A3 + 0x3f] 	// Get continues data from save file
 			fn00ca14()
 
 			D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16 + 0x306)
@@ -225,9 +234,13 @@ function void fn00ca14()
 	}
 
 	A1 = 0xffffeeea		// Start address of vertical scroll offsets, looks like we're abusing this for something else here
-	D1.u16 = (D1.u16 == 0) ? 0x28 : (D1.u16 << 2)
+
+	// Render second digit (10, 20, etc)
+	D1.u16 = (D1.u16 == 0) ? 0x28 : (D1.u16 << 2)	// Don't render zero for second digit
 	u16[A1] = u16[0x00ca4c + D1.s16]
 	u16[A1 + 0x04] = u16[0x00ca4e + D1.s16]
+	
+	// Render first digit (1, 2, etc)
 	D0.u16 = D0.u8 * 4
 	u16[A1 + 0x02] = u16[0x00ca4c + D0.s16]
 	u16[A1 + 0x06] = u16[0x00ca4e + D0.s16]
@@ -266,7 +279,7 @@ function void DataSelect.setup()
 	u16[0xffffeee2] = 0
 	u16[0xffffeee4] = 0
 
-	Enigma.decompress(0x39d2a2, 0xffff0000, 0x0001)
+	Enigma.decompress(0x39d2a2, 0xffff0000, 0x01)
 	copyRectToVRAM(0xffff0000, 0xe000, 0x28, 0x1c)
 
 	Enigma.decompress(0x3a2020, 0xffff0000, 0x829f)
@@ -276,19 +289,24 @@ function void DataSelect.setup()
 
 	Nemesis.loadDataToVRAM(0x0ca5e0, 0xac40)
 
+	// Render "NO" label
 	A1 = 0x00db1c
 	D0.u16 = 0xcc06
 	fn00d9f4()
 
+	// Render "SAVE" label
+	// A1 = 0x00db1f
 	D0.u16 = 0xcc0c
 	fn00d9f4()
 
+	// Render "DELETE" label
+	// A1 = 0x00db24
 	D0.u16 = 0xccec
 	fn00d9f4()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0x00c56e
@@ -297,7 +315,7 @@ function void DataSelect.setup()
 
 	A0 = 0x3a23aa
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -305,7 +323,7 @@ function void DataSelect.setup()
 
 	A0 = 0x15a774
 	A1 = 0xffff0000
-	A2 = 0xffff8a80
+	A2 = 0xffff0000 + 0x8a80
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -320,7 +338,7 @@ function void DataSelect.setup()
 	while (D0.s16 >= 0)
 	{
 		objA0.update_address = u32[(A1+=4)-4]
-		objA0.sprite_attributes = 0x829f
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f)
 		objA0.mapping_offset = 0x00ce0e
 		objA0.position.x.u16 = u16[A1] + getScreenExtend()		// Adding the screen extend only really has an effect on the "Data Select" text
 		u16[A0 + 0x12] = u16[(A1+=2)-2]
@@ -350,7 +368,7 @@ function void DataSelect.setup()
 	A0 = A1 - 0x08c0
 	copyMemory(A1, A0, 0x540)
 
-	playMusic(0x2f)
+	playMusic(MUSIC_DATASELECT)
 	u32[0xffffef44] = 0x00c890
 	global.frame_state = 0x1e
 	waitForNextFrame()
@@ -393,20 +411,20 @@ function void DataSelect.update()
 		RenderSprites()
 
 		A0 = 0xfffffc42
-		++u16[0xffffe666]
-		if (u16[0xffffe666] >= 3)
-			u16[0xffffe666] = 0
+		++emerald.animframe
+		if (emerald.animframe >= 3)
+			emerald.animframe = 0
 
 	#if STANDALONE
 		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) >= 1)
 		{
 			// This version is a bit less flickery
 			copyMemory(A0, 0x00ca9a, 0x1e)
-			if (u16[0xffffe666] != 0)
+			if (emerald.animframe != 0)
 			{
 				for (u8 i = 0; i < 0x1e; i += 2)
 				{
-					u16 weight = abs(s16[0xffffe666] - 2) + 1
+					u16 weight = abs(s16(emerald.animframe) - 2) + 1
 
 					// Mix color with white
 					u16 r = u16[A0+i] & 0x0e
@@ -421,7 +439,7 @@ function void DataSelect.update()
 		}
 		else
 	#endif
-		if (u16[0xffffe666] == 0)
+		if (emerald.animframe == 0)
 		{
 			fillMemory_u16(A0, 0x1e, 0x0eee)
 		}
@@ -733,13 +751,13 @@ function void DataSelect.sharedNewGameStartup()
 function void fn00d30c()
 {
 	u8[A0 + 0x1d] = 0x0f
-	objA0.animation.sprite = u16[0xffffef4c] + 4
+	objA0.animation.sprite = dataselect.nosave_characters + 4
 
-	if (dataselect.slot_selected == 0 && u16[0xffffb078] == 0 && u16[0xffffeee4] == 0)
+	if (dataselect.slot_selected == 0 && u16[0xffffb04a + 0x2e] == 0 && u16[0xffffeee4] == 0)
 	{
 		if (control.pad1.pressed & DataSelect.CONTROLS_ACCEPT)
 		{
-			levelselect.characters = u16[0xffffef4c]
+			levelselect.characters = dataselect.nosave_characters
 
 			DataSelect.sharedNewGameStartup()
 
@@ -750,9 +768,9 @@ function void fn00d30c()
 			return
 		}
 
-		D0.u16 = u16[0xffffef4c]
+		D0.u16 = dataselect.nosave_characters
 		fn00d6d0()
-		u16[0xffffef4c] = D0.u16
+		dataselect.nosave_characters = D0.u16
 
 		objA0.animation.sprite = D0.u8 + 4
 		u16[A0 + 0x16] = 1
@@ -779,6 +797,7 @@ function void fn00d39e()
 {
 	if (allocDynamicObjectAfterA0())
 	{
+		// Spawn Emeralds
 		objA1.update_address = 0x00d70c
 		u16[A1 + 0x48] = A0.u16
 	}
@@ -883,7 +902,7 @@ function bool fn00d458()
 		// Empty save slot
 		u8[A0 + 0x1d] = 0x0f
 		objA0.animation.frame = 0
-		if (u16[0xffffb078] != 0 || u16[0xffffeee4] != 0)
+		if (u16[0xffffb04a + 0x2e] != 0 || u16[0xffffeee4] != 0)
 		{
 			return 2
 		}
@@ -927,7 +946,7 @@ function bool fn00d458()
 
 		if (u16[A0 + 0x38] == 0 && objA0.value3b == 0)
 		{
-			if (u16[0xffffb078] != 0)
+			if (u16[0xffffb04a + 0x2e] != 0)
 			{
 				return 2
 			}
@@ -941,7 +960,7 @@ function bool fn00d458()
 				objA0.flags38 = 0xff
 			}
 
-			if (u16[0xffffb078] != 0)
+			if (u16[0xffffb04a + 0x2e] != 0)
 			{
 				return 2
 			}
@@ -969,7 +988,7 @@ function bool fn00d458()
 			D1.u16 = u16[A0 + 0x36]
 			if (control.pad1.pressed & CONTROL_DOWN)
 			{
-				playSound(0x5b)
+				playSound(SFX_CLICK)
 				--D1.u16
 				if (D1.s16 < 0)
 				{
@@ -978,7 +997,7 @@ function bool fn00d458()
 			}
 			else if (control.pad1.pressed & CONTROL_UP)
 			{
-				playSound(0x5b)
+				playSound(SFX_CLICK)
 				++D1.u16
 				if (D1.u16 > D6.u16)
 				{
@@ -1106,7 +1125,7 @@ function void fn00d6d0()
 {
 	// Character selection
 	u8 character = D0.u8
-	if (u16[0xffffb07a] == 0)
+	if (u16[0xffffb04a + 0x30] == 0)
 	{
 		u8 maxCharacterSelection = 3
 	#if STANDALONE
@@ -1119,13 +1138,13 @@ function void fn00d6d0()
 
 		if (control.pad1.pressed & CONTROL_UP)
 		{
-			character = (character < maxCharacterSelection) ? (character + 1) : 0
-			playSound(0x5b)
+			character = (character < maxCharacterSelection) ? (character + 1) : CHARS_SONIC_AND_TAILS
+			playSound(SFX_CLICK)
 		}
 		else if (control.pad1.pressed & CONTROL_DOWN)
 		{
-			character = (character > 0) ? (character - 1) : maxCharacterSelection
-			playSound(0x5b)
+			character = (character > CHARS_SONIC_AND_TAILS) ? (character - 1) : maxCharacterSelection
+			playSound(SFX_CLICK)
 		}
 	}
 	D0 = character
@@ -1141,7 +1160,7 @@ function void fn00d6d0()
 function void fn00d70c()
 {
 	objA0.render_flags = render_flag.COMPOUND
-	objA0.sprite_attributes = 0x829f
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f)
 	objA0.mapping_offset = 0x00ce0e
 	objA0.box_size.x = 0x40
 	u16[A0 + 0x16] = 0x07
@@ -1283,7 +1302,7 @@ function void fn00d7ea()
 	fn00d912()
 	fn00d94a()
 
-	if (u16[0xffffb078] == 0)
+	if (u16[0xffffb04a + 0x2e] == 0)
 	{
 		if (control.pad1.pressed & DataSelect.CONTROLS_CANCEL)
 		{
@@ -1322,7 +1341,7 @@ function void fn00d7ea()
 		}
 	}
 
-	D0.u16 = u16[0xffffb05a]
+	D0.u16 = u16[0xffffb04a + 0x10]
 	objA0.position.x.u16 = D0.u16
 	objA0.velocity.x = D0.u16
 	objA0.velocity.y = objA0.position.y.u16
@@ -1341,7 +1360,7 @@ function void fn00d854()
 	objA0.animation.sprite = 0x0d
 	u8[A0 + 0x1d] = 0x08
 
-	u16[A0 + 0x12] = u16[0xffffb05a] + camera.foreground.x.u16
+	u16[A0 + 0x12] = u16[0xffffb04a + 0x10] + camera.foreground.x.u16
 	objA0.base_state += 4
 
 	fn00d69e()

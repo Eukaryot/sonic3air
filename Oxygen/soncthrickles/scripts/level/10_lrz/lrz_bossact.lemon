@@ -40,8 +40,8 @@ function void fn059fda()
 	player2.control_override = 0xff
 	control.player1 = 0
 	control.pad2 = 0
-	u16[0xffffb018] = 0		// Velocity x
-	u16[0xffffb062] = 0
+	u16[0xffffb000 + 0x18] = 0		// Velocity x
+	u16[0xffffb04a + 0x18] = 0
 
 	objA0.update_address = 0x059fdc
 }
@@ -183,10 +183,10 @@ function void fn059fdc()
 	}
 
 	u32[0xffffeee6] = D0
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
-		if (!level.results_done && (u8[A1 + 0x2b] & 0x10) == 0 && !level.capsule_opened)
+		if (!level.results_done && (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE) == 0 && !level.capsule_opened)
 		{
 			DamageCharacter()
 		}
@@ -195,7 +195,7 @@ function void fn059fdc()
 		u32[A1 + 0x10] += D0
 	}
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		if (!level.results_done && !level.capsule_opened)

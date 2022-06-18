@@ -13,8 +13,7 @@ function void Menu.FadeInAfterInit()
 {
 	u8 lastGameMode = global.game_mode
 
-	palette_fade.range = 0x003f
-	SetPaletteFadedOut()
+	SetPaletteFadedOut(0x003f)
 	D4.u16 = 0x15
 	while (D4.s16 >= 0)
 	{
@@ -56,8 +55,7 @@ function void Menu.FadeInAfterInit()
 #if STANDALONE
 function void Menu.fadeInImmediatelyAfterInit()
 {
-	palette_fade.range = 0x003f
-	SetPaletteFadedOut()
+	SetPaletteFadedOut(0x003f)
 	D4.u16 = 0x15
 	while (D4.s16 >= 0)
 	{

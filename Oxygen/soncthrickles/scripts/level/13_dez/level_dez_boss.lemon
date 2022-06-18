@@ -95,19 +95,20 @@ function void fn05a496()
 //# address-hook(0x05a49a) end(0x05a4c0)
 function void fn05a49a()
 {
-	D0.u16 = u16[0xffffef5e]
+	// Reset ring counter and time to DEZ 2 values after entering DEZ boss act
+	D0.u16 = level.backup.rings
 	if (D0.u16 != 0)
 	{
-		u16[0xffffef5e] = 0
+		level.backup.rings = 0
 		ring_counter = D0.u16
 		hud.dirty.rings = 0x01
 	}
 
-	D0 = u32[0xffffef60]
+	D0 = level.backup.timer.alldata
 	if (D0 != 0)
 	{
-		u32[0xffffef60] = 0
-		u32[0xfffffe22] = D0
+		level.backup.timer.alldata = 0
+		timer.alldata = D0
 		hud.dirty.timer = 0xff
 	}
 
@@ -664,11 +665,11 @@ function void fn05a7ec()
 function void fn05a872()
 {
 	objA0.update_address = 0x05a8b2
-	objA0.render_flags = 0x84
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x0c
 	objA0.sprite_priority = 0x80
-	objA0.sprite_attributes = 0xc001
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0001)
 	objA0.mapping_offset = 0x05a9ac
 	objA0.position.y.u16 = 0xf0
 	objA0.animation.sprite = (objA0.position.x.u16 & 0x60) >> 5
@@ -680,7 +681,7 @@ function void fn05a872()
 //# address-hook(0x05a8b2) end(0x05a8e0)
 function void fn05a8b2()
 {
-	if ((u8[A0 + 0x04] & 0x80) == 0)
+	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
 	{
 		objA0.position.x.u16 = level.despawn_position.x + 0x0400
 	}
@@ -803,7 +804,7 @@ function void fn080de0()
 
 	objA0.position.x.u16 = 0x70
 	objA0.position.y.u16 = 0xc0
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	fn080e02()
 }
 

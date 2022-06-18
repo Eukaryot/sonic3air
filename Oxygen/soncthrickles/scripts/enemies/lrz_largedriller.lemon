@@ -265,7 +265,7 @@ function void fn0903cc()
 	if (D0.u8 >= 0x08)
 	{
 		objA0.animation.sprite = 2
-		u8[A0 + 0x28] = 0x12
+		objA0.collision_attributes = collision.size.8x16
 	}
 
 	D0.u8 &= 0x04
@@ -333,8 +333,7 @@ function void fn090436()
 			objA0.flags38 ^= 0x02
 			if (objA0.flags38 & 0x02)
 			{
-				A2 = 0x090658
-				SpawnIdenticalChildObjects()
+				spawnIdenticalChildObjects(0x090658)
 			}
 		}
 
@@ -364,7 +363,7 @@ function void fn0904ba()
 	setupObjectAttributesFull(0x09061a)
 
 	objA0.update_address = 0x043a6c
-	objA0.render_flags |= 0x80
+	objA0.render_flags |= render_flag.VISIBLE
 	GetRandomNumber()
 	D0.u16 &= 0x01ff
 	D1.u16 = 0x0200
@@ -406,6 +405,7 @@ function void fn090512()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn collapsing rock formation
 			objA1.update_address = 0x039c50
 			u8[A1 + 0x32] = 0x01
 			objA1.position.x.u16 = 0x0f00
@@ -414,6 +414,7 @@ function void fn090512()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn collapsing rock formation
 			objA1.update_address = 0x039c50
 			u8[A1 + 0x32] = 0x01
 			objA1.position.x.u16 = 0x0f80
@@ -426,6 +427,7 @@ function void fn090512()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn collapsing rock formation
 			objA1.update_address = 0x039c50
 			u8[A1 + 0x32] = 0x01
 			objA1.position.x.u16 = 0x0540

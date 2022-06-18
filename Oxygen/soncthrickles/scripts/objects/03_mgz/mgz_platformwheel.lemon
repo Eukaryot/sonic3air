@@ -12,7 +12,7 @@
 function void fn033f84()
 {
 	objA0.mapping_offset = 0x233318
-	objA0.sprite_attributes = 0x435f
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x035f)
 	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x0c
@@ -24,19 +24,19 @@ function void fn033f84()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x03406e
-		u32[A1 + 0x0c] = 0x233318
-		u16[A1 + 0x0a] = 0x435f
-		u8[A1 + 0x04] = render_flag.WORLD
-		u8[A1 + 0x07] = 0x50
-		u8[A1 + 0x06] = 0x50
-		u16[A1 + 0x08] = 0x0280
+		objA1.mapping_offset = 0x233318
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x035f)
+		objA1.render_flags = render_flag.WORLD
+		objA1.box_size.x = 0x50
+		objA1.box_size.y = 0x50
+		objA1.sprite_priority = 0x0280
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		if ((objA0.flags2a & 0x02) == 0)
 		{
 			u8[A1 + 0x22] = 0x01
 		}
-		u8[A1 + 0x04] |= 0x40
+		objA1.render_flags |= render_flag.COMPOUND
 		u16[A1 + 0x16] = 0x04
 		u16[A0 + 0x3c] = A1.u16
 	}

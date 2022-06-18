@@ -196,8 +196,8 @@ function void fn051caa()
 		{
 			// When taking Knuckles' path, move everything up to Sonic's path
 			D0.u16 = 0x0700
-			u16[0xffffb014] -= D0.u16
-			u16[0xffffb05e] -= D0.u16
+			u16[0xffffb000 + 0x14] -= D0.u16
+			u16[0xffffb04a + 0x14] -= D0.u16
 			camera.position.y.u16 -= D0.u16
 			camera.foreground.y.u16 -= D0.u16
 			Level.GetCameraPosition()
@@ -325,8 +325,8 @@ function void fn051d82()
 	level.dualplanecollision = 0
 	u16[0xffffeeda] = 0
 	D0.u16 = 0x01c0
-	u16[0xffffb014] += D0.u16
-	u16[0xffffb05e] += D0.u16
+	u16[0xffffb000 + 0x14] += D0.u16
+	u16[0xffffb04a + 0x14] += D0.u16
 	camera.position.y.u16 += D0.u16
 	camera.foreground.y.u16 += D0.u16
 	Level.GetCameraPosition()
@@ -419,10 +419,10 @@ function void fn051e60()
 		knuckles.preventclimbing &= ~0x80
 		D0.u16 = 0x3000
 		D1.u16 = -0x200
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb014] -= D1.u16
-		u16[0xffffb05a] -= D0.u16
-		u16[0xffffb05e] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb000 + 0x14] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x14] -= D1.u16
 		fn04f3b0()
 
 		camera.position.x.u16 -= D0.u16
@@ -567,10 +567,10 @@ function void UpdateLevelTiles.CNZ2()
 {
 	D0.u16 = camera.screenshake.offset
 	camera.foreground.y.u16 += D0.u16
-	if (u16[0xffffb010] < 0x4600)
+	if (u16[0xffffb000 + 0x10] < 0x4600)
 	{
 		D0 = 0
-		if (u16[0xffffb010] < 0x0940)
+		if (u16[0xffffb000 + 0x10] < 0x0940)
 		{
 			D0.u16 = 0x0580
 		}
@@ -677,6 +677,7 @@ function void fn0521d2()
 	{
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the right border
 			objA1.update_address = 0x084a48
 			screenmover_target.right = 0x49a0 + getScreenExtend()
 			A6 = A2
@@ -802,6 +803,13 @@ function void fn052280()
 //# address-hook(0x051fce) end(0x051fd4)
 function void fn051fce()
 {
+	// Targets:
+	// objA0.base_state = 0x00		-> 0x051fd8
+	// objA0.base_state = 0x04		-> 0x051fdc
+	// objA0.base_state = 0x08		-> 0x051fe0
+	// objA0.base_state = 0x0c		-> 0x051fe4
+	// objA0.base_state = 0x10		-> 0x051fe8
+	// objA0.base_state = 0x14		-> 0x051fec
 	call 0x051fd8 + objA0.base_state
 }
 
@@ -956,11 +964,11 @@ function void fn0520cc()
 {
 #if STANDALONE
 	// Make sure main character does not get past the right wall (e.g. spindash into the passage way)
-	if (u16[0xffffb010] > 0x3375)
+	if (u16[0xffffb000 + 0x10] > 0x3375)
 	{
-		u16[0xffffb010] = 0x3375
-		u16[0xffffb018] = 0
-		u16[0xffffb01c] = 0
+		u16[0xffffb000 + 0x10] = 0x3375
+		u16[0xffffb000 + 0x18] = 0
+		u16[0xffffb000 + 0x1c] = 0
 	}
 #endif
 

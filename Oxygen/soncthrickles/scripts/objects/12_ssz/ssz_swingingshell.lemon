@@ -14,10 +14,10 @@
 function void fn0460d8()
 {
 	objA0.update_address = 0x046142
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x08
 	objA0.sprite_priority = 0x0180
-	objA0.sprite_attributes = 0x4348
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0348)
 	objA0.mapping_offset = 0x046ada
 	if (s8[A0 + 0x2c] < 0)
 	{
@@ -95,10 +95,10 @@ function void fn046142()
 function void fn0461a8()
 {
 	objA0.update_address = 0x0461fe
-	objA0.render_flags = 0x44
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0x68
 	objA0.box_size.x = 0x68
-	objA0.sprite_attributes = 0x6348
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0348)
 	objA0.mapping_offset = 0x046ada
 	D0.u16 = (objA0.subtype2c & 0x03) + 6
 	u16[A0 + 0x16] = D0.u16
@@ -169,11 +169,11 @@ function void fn0461fe()
 function void fn046284()
 {
 	objA0.update_address = 0x0462b6
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x0c
 	objA0.box_size.x = 0x18
 	objA0.sprite_priority = 0x80
-	objA0.sprite_attributes = 0x6348
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0348)
 	objA0.mapping_offset = 0x046ada
 	objA0.animation.sprite = 3
 
@@ -205,16 +205,16 @@ function void fn0462b6()
 	D6 = (D6 << 16) + (D6 >> 16)
 	u16 backupD6 = D6.u16
 	A1 = 0xffffb000
-	A2 = 0xfffff602
+	A2 = 0xfffff602		// Address of "control.player1"
 	A3 = A0 + 0x30
-	D5 = 3
+	D5 = 3		// object.flag.P1_ON_OBJECT
 	fn046324()
 
 	D6.u16 = backupD6 >> 1
 	A1 = 0xffffb04a
-	A2 = 0xfffff66a
+	A2 = 0xfffff66a		// Address of "control.tails"
 	A3 = A0 + 0x32
-	D5 = 4
+	D5 = 4		// object.flag.P2_ON_OBJECT
 	fn046324()
 
 	DrawObject()
@@ -224,14 +224,16 @@ function void fn0462b6()
 //# address-hook(0x046324) end(0x046424)
 function void fn046324()
 {
+	u8 bit = (1 << D5.u8)
+
 	if (u8[A3] == 0)
 	{
 		if (u8[A1 + 0x2e] != 0 || u8[A1 + 0x05] >= 0x04)
 			return
 
-		if (objA0.flags2a & (1 << D5.u8))
+		if (objA0.flags2a & bit)
 		{
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 			u8[A3] = 0xff
 
 			objA1.velocity.y = 0
@@ -240,7 +242,7 @@ function void fn046324()
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
 			objA1.state = char.state.ROLLING
-			u8[A1 + 0x2a] |= 0x04
+			u8[A1 + 0x2a] |= char.flag.ROLLING
 			u8[A1 + 0x2e] = 0x01
 			u8[A1 + 0x3d] = 0
 
@@ -283,28 +285,28 @@ function void fn046324()
 			if (D1.s16 <= -0x10)
 			{
 				u8[A3] = 0
-				objA0.flags2a &= ~(u8(1) << D5.u8)
+				objA0.flags2a &= ~bit
 				u8[A1 + 0x2e] = 0
-				u8[A1 + 0x2a] &= ~0x08
+				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 				D0.s16 = (objA0.flags2a & 0x01) ? -0x800 : 0x800
 				objA1.velocity.x = D0.u16
 				u16[A1 + 0x1c] = D0.u16
 
-				playSound(0xb6)
+				playSound(SFX_SPINDASH_RELEASE)
 				return
 			}
 		}
 	}
 
-	D0.u16 = u16[A2] & 0x70
+	D0.u16 = u16[A2] & CONTROL_ABC
 	if (D0.u16 != 0)
 	{
 		u8[A3] = 0
 		objA1.velocity.y = -0x680
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x40] = 0x01
 
-		playSound(0x62)
+		playSound(SFX_JUMP)
 	}
 }

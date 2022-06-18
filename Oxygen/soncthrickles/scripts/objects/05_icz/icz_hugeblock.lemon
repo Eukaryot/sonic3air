@@ -68,7 +68,7 @@ function void fn08a488()
 //# address-hook(0x08a4c4) end(0x08a4d4)
 function void fn08a4c4()
 {
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		objA0.base_state = 0x0c
 	}

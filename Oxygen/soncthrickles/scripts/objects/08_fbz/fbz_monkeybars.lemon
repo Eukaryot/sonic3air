@@ -20,13 +20,13 @@ function void fn03a7cc()
 		return
 	}
 
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x80
 	objA0.sprite_priority = 0x80
 	u16[A0 + 0x46] = objA0.position.y.u16
 	objA0.mapping_offset = 0x03ad8a
-	objA0.sprite_attributes = 0x4379
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0379)
 
 	objA0.countdown_value = (objA0.subtype2c & 0x7f) << 3
 	u16[A0 + 0x3c] = 0x02
@@ -103,19 +103,20 @@ function void fn03a8b8()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 		{
+			// Check if jump button pressed
 			D0.u8 &= CONTROL_ABC
 			if (D0.u8 == 0)
 			{
-				if (D0 & 0x0400)
+				if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.flags2a |= char.flag.FACING_LEFT
 				}
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.flags2a &= ~char.flag.FACING_LEFT
 				}
-				u8[A1 + 0x04] &= ~char.flag.FACING_LEFT
-				u8[A1 + 0x04] |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+				objA1.render_flags &= ~char.flag.FACING_LEFT
+				objA1.render_flags |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 				objA1.position.y.u16 = objA0.position.y.u16 + 0x9c
 			}
 			else
@@ -123,16 +124,16 @@ function void fn03a8b8()
 				u8[A1 + 0x2e] = 0
 				u8[A2] = 0
 				u8[A2 + 0x02] = 0x12
-				D0.u16 &= 0x0f00
+				D0.u16 &= 0x0f00			// Any direction held?
 				if (D0.u16 != 0)
 				{
 					u8[A2 + 0x02] = 0x3c
 				}
-				if (D0 & 0x0400)
+				if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x0200
 				}
@@ -153,7 +154,7 @@ function void fn03a8b8()
 			u8[A2 + 0x02] = 0x3c
 
 			u8[A1 + 0x2e] = 0
-			u8[A1 + 0x2a] &= ~0x08
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			u16[A1 + 0x42] = 0
 		}
 		return
@@ -204,7 +205,7 @@ function void fn03a8b8()
 			u16[A1 + 0x42] = A0.u16
 
 			u8[A2] = 0x01
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 
 		#if STANDALONE
 			u8[A1 + 0x3d] = 0	// Clear char.spindash
@@ -248,6 +249,7 @@ function void fn03aa7e()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 	{
+		// Check if jump button pressed
 		D0.u8 &= CONTROL_ABC
 		if (D0.u8 == 0)
 		{
@@ -256,7 +258,7 @@ function void fn03aa7e()
 				if (u8[A2 + 0x04] == 0)
 				{
 					D2.u16 = objA0.value3e - 0x10
-					if (D0 & 0x0400)
+					if (D0 & 0x0400)		// CONTROL_LEFT held
 					{
 						objA1.flags2a |= char.flag.FACING_LEFT
 						D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
@@ -266,7 +268,7 @@ function void fn03aa7e()
 							u8[A2 + 0x02] = 1
 						}
 					}
-					if (D0 & 0x0800)
+					if (D0 & 0x0800)		// CONTROL_RIGHT held
 					{
 						objA1.flags2a &= ~char.flag.FACING_LEFT
 						D1.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
@@ -278,8 +280,8 @@ function void fn03aa7e()
 					}
 
 					D0.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
-					u8[A1 + 0x04] &= 0xfc
-					u8[A1 + 0x04] |= D0.u8
+					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+					objA1.render_flags |= D0.u8
 					objA1.position.y.u16 = objA0.position.y.u16 + 0x12
 					if (u8[A2 + 0x04] == 0)
 					{
@@ -295,7 +297,7 @@ function void fn03aa7e()
 				D1 = u8[A2 + 0x04]
 				if (D1.u8 == 2)
 				{
-					playSound(0x4a)
+					playSound(SFX_GRAB)
 				}
 				--D1.u16
 				u8[A1 + 0x20] = (D1.u16 == 0) ? char.state.HANGING : char.state.RUNNING
@@ -331,23 +333,23 @@ function void fn03aa7e()
 			u8[A2] = 0
 			u8[A2 + 0x02] = 0x12
 
-			D0.u16 &= 0x0f00
+			D0.u16 &= 0x0f00		// Any direction held?
 			if (D0.u16 != 0)
 			{
 				u8[A2 + 0x02] = 0x3c
 			}
-			if (D0 & 0x0400)
+			if (D0 & 0x0400)		// CONTROL_LEFT held
 			{
 				objA1.velocity.x = -0x200
 			}
-			if (D0 & 0x0800)
+			if (D0 & 0x0800)		// CONTROL_RIGHT held
 			{
 				objA1.velocity.x = 0x200
 			}
 			objA1.velocity.y = -0x380
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x20] = char.state.ROLLING
 			u8[A1 + 0x22] = 0x96
 			u8[A1 + 0x27] = 0
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
@@ -375,7 +377,7 @@ function void fn03ab24()
 	u8[A1 + 0x2e] = 0
 	u8[A2] = 0
 	u8[A2 + 0x02] = 0x3c
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u16[A1 + 0x42] = 0
 }
 
@@ -455,7 +457,7 @@ function void fn03ac86()
 			}
 
 			// Character grabs the monkey bar
-			u8[A1 + 0x04] &= 0xfd
+			objA1.render_flags &= ~render_flag.FLIP_Y
 			objA1.position.x.u16 = objA0.position.x.u16 + 0x10 + D0.u16 - objA0.value3e
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x12
 			objA1.velocity.x = 0
@@ -463,7 +465,7 @@ function void fn03ac86()
 			u16[A1 + 0x1c] = 0
 			objA1.state = char.state.HANGING
 			u8[A1 + 0x22] = 0x91
-			u8[A1 + 0x2a] |= 0x08
+			u8[A1 + 0x2a] |= char.flag.ON_OBJECT
 			u8[A1 + 0x2e] = 0x03
 			u16[A1 + 0x42] = A0.u16
 
@@ -477,7 +479,7 @@ function void fn03ac86()
 			SetCharacterSpritePatterns()
 			A2 = backupA2
 
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 
 		#if STANDALONE
 			u8[A1 + 0x3d] = 0	// Clear char.spindash

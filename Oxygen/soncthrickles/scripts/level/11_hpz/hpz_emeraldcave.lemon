@@ -278,13 +278,13 @@ function void fn090b84()
 {
 	if (u8[A2] != 0)
 	{
-		u8[A1 + 0x04] |= render_flag.FLIP_X
-		u8[A1 + 0x2a] |= 0x01
+		objA1.render_flags |= render_flag.FLIP_X
+		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	}
 	else
 	{
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
-		u8[A1 + 0x2a] &= ~0x01
+		objA1.render_flags &= ~render_flag.FLIP_X
+		u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	}
 
 	D0 = u8[A2 + 0x01] + u8[A1 + 0x38]
@@ -334,8 +334,8 @@ function void fn090c16()
 {
 	objA0.update_address = 0x090c34
 	player1.camera_lock = 0
-	u8[0xffffb02e] = 0
-	u8[0xffffb078] = 0
+	u8[0xffffb000 + 0x2e] = 0
+	u8[0xffffb04a + 0x2e] = 0
 }
 
 
@@ -375,7 +375,7 @@ function void fn090c34()
 			checkpoint.number = level.backup.checkpoint | 0x80
 			global.zone_act   = level.backup.zone_act
 			global.zone_act.apparent = u16[0xffffff9c]
-			global.shields_backup_2 = u8[0xffffb02b]
+			global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 		}
 	}
 }
@@ -472,7 +472,7 @@ function void fn090d5e()
 function void fn090d78()
 {
 	objA0.update_address = 0x090da2
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.velocity.y = -0x80
 	objA0.countdown_value = 0x7f
 
@@ -539,7 +539,7 @@ function void fn090dfc()
 	setupObjectAttributesFull(0x090fd8)
 
 	objA0.update_address = 0x090e1c
-	objA0.render_flags |= 0x80
+	objA0.render_flags |= render_flag.VISIBLE
 	objA0.countdown_value = 0x7f
 
 	if (fn090f0a())

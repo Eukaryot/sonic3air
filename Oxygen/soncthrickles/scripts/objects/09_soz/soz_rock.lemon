@@ -12,8 +12,8 @@
 function void fn041702()
 {
 	objA0.mapping_offset = 0x04182e
-	objA0.sprite_attributes = 0x43d9
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03d9)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
@@ -26,20 +26,20 @@ function void fn041702()
 //# address-hook(0x04172e) end(0x0417a4)
 function void fn04172e()
 {
-	u8[A0 + 0x30] = u8[0xffffb020]
-	u8[A0 + 0x31] = u8[0xffffb06a]
+	u8[A0 + 0x30] = u8[0xffffb000 + 0x20]
+	u8[A0 + 0x31] = u8[0xffffb04a + 0x20]
 	D1.u16 = 0x23
 	D2.u16 = 0x10
 	D3.u16 = 0x11
 	D4.u16 = objA0.position.x.u16
 	fn01dc56()
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		DrawOrUnloadObject()
 	}
-	else if (D0.u8 == 0x18)
+	else if (D0.u8 == (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		if (u8[A0 + 0x30] != 0x02 && u8[A0 + 0x31] != 0x02)
 		{
@@ -86,15 +86,15 @@ function void fn0417a6()
 {
 	if (D0.u8 == 2)
 	{
-		u8[A1 + 0x2a] |= 0x04
+		u8[A1 + 0x2a] |= char.flag.ROLLING
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
 		objA1.state = char.state.ROLLING
 		objA1.velocity.y = -0x300
 	}
 
-	u8[A1 + 0x2a] |= 0x02
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x05] = 0x02
 }
 
@@ -120,7 +120,7 @@ function void fn0417de()
 //# address-hook(0x0417f6) end(0x041804)
 function void fn0417f6()
 {
-	objA0.flags2a &= 0xe7
+	objA0.flags2a &= ~(object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	playSound(0x6e)
 
 	objA0.update_address = 0x04180a

@@ -90,7 +90,7 @@ function void fn08db94()
 	{
 		objA0.position.x.u16 += D1.u16
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 
 	if (objA0.velocity.y >= 0)
@@ -121,7 +121,7 @@ function void fn08dc6e()
 		if (objA0.state != 0)
 			return
 
-		u8[A0 + 0x28] = 0xd7
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	}
 
 	fn085870()

@@ -13,7 +13,7 @@ function void fn03cb3a()
 {
 	objA0.mapping_offset = 0x03cc5a
 	objA0.sprite_attributes = 0x030f
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x80
@@ -26,7 +26,7 @@ function void fn03cb3a()
 //# address-hook(0x03cb66) end(0x03cbc8)
 function void fn03cb66()
 {
-	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	D0.u16 = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 	if (D0.s16 >= 0)
 	{
 		if (D0.s16 >= 0x20)
@@ -43,16 +43,16 @@ function void fn03cb66()
 	}
 
 	A1 = 0xffffb000
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x08
+		objA0.flags2a &= ~object.flag.P1_ON_OBJECT
 		fn03cbce()
 	}
 
 	A1 = 0xffffb04a
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x10
+		objA0.flags2a &= ~object.flag.P2_ON_OBJECT
 		fn03cbce()
 	}
 
@@ -73,8 +73,8 @@ function void fn03cbce()
 	u8[A1 + 0x05] = 0x02
 	objA1.velocity.y = (objA0.subtype2c & 0x02) ? -0xa00 : -0x1000
 	objA1.state = char.state.STRAIGHTJUMP
-	u8[A1 + 0x2a] |= 0x02
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x40] = 0
 
@@ -96,7 +96,7 @@ function void fn03cbce()
 		}
 	}
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }
 
 
@@ -141,9 +141,9 @@ function void fn023ab8()
 	if (u16[A0 + 0x3a] != 0)
 	{
 		--u16[A0 + 0x3a]
-		if (u16[A0 + 0x3a] == 0 && u8[A0 + 0x04] & 0x80)
+		if (u16[A0 + 0x3a] == 0 && objA0.render_flags & render_flag.VISIBLE)
 		{
-			playSound(0x52)
+			playSound(SFX_SPIKESMOVE)
 		}
 		return
 	}

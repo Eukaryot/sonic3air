@@ -89,7 +89,7 @@ function void fn075fd4()
 //# address-hook(0x076004) end(0x076036)
 function void fn076004()
 {
-	u8[A0 + 0x28] = 0x0f
+	objA0.collision_attributes = collision.size.24x24
 	boss.remaining_hits = 9
 	u8[A0 + 0x25] = u8[A0 + 0x28]
 	u8[0xfffffa88] = 0
@@ -158,7 +158,7 @@ function void fn07609a()
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x0760c4
 
-	playSound(0xb6)
+	playSound(SFX_SPINDASH_RELEASE)
 }
 
 
@@ -180,7 +180,7 @@ function void fn0760c4()
 	screenmover_target.right = 0x45a0
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -323,9 +323,10 @@ function void fn076270()
 	PlayMusicAfterLevelResults()
 
 	player1.control_override = 0xff
-	control.player1 = 0x0101
+	control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
+
 	player2.control_override = 0xff
-	control.tails = 0x0101
+	control.tails = 0x0101		// CONTROL_UP, CONTROL_UP
 	fn08638a()
 
 	objA0.countdown_value = 0x01bf
@@ -339,7 +340,7 @@ function void fn076270()
 	addPatternLoadingCue(0x083d7c)
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -469,8 +470,9 @@ function void fn07654a()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x19
+		u8[A1 + 0x2c] = MUSIC_MAINBOSS
 	}
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
@@ -522,7 +524,7 @@ function void fn076652()
 function void fn07665e()
 {
 	setupObjectAttributesFull(0x07694c)
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 
 	objA0.update_address = 0x076674
 	fn076674()
@@ -536,7 +538,7 @@ function void fn076674()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
-		u8[A0 + 0x28] = (u8[A1 + 0x2a] & 0x40) ? 0 : 0x8b
+		objA0.collision_attributes = (u8[A1 + 0x2a] & 0x40) ? 0 : (collision.flag.THREAT | collision.size.8x8)
 
 		D0.u8 = (global.framecounter & 0x01) ? 0xff : 0x00
 		if (objA0.subtype2c != 0)
@@ -598,7 +600,7 @@ function void fn07675c()
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
 	objA0.render_flags &= ~render_flag.FLIP_X
-	objA0.render_flags |= (u8[A1 + 0x04] & 0x01)
+	objA0.render_flags |= (objA1.render_flags & render_flag.FLIP_X)
 }
 
 
@@ -724,7 +726,8 @@ function void fn0768d2()
 //# address-hook(0x0768fe) end(0x076922)
 function void fn0768fe()
 {
-	control.player1 = 0x0808
+	control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
+
 	A1 = 0xffffb000
 	if (objA1.position.x.u16 < 0x4600)
 		return
@@ -743,11 +746,11 @@ function void fn0768fe()
 function void fn055732()
 {
 	objA0.update_address = 0x05576a
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x80
 	objA0.sprite_priority = 0x0380
-	objA0.sprite_attributes = 0x6580
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0580)
 	objA0.mapping_offset = 0x055908
 	objA0.position.y.u16 = 0x0300
 	objA0.animation.sprite = 1
@@ -780,12 +783,12 @@ function void fn05576a()
 function void fn05577c()
 {
 	objA0.update_address = 0x0557c8
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
-	objA0.sprite_attributes = 0x23af
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03af)
 	objA0.mapping_offset = 0x055908
-	u8[A0 + 0x28] = 0x8b
+	u8[A0 + 0x28] = (collision.flag.THREAT | collision.size.8x8)
 
 	D0.u16 = 0x80
 	D1 = 4

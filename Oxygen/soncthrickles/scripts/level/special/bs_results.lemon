@@ -151,6 +151,7 @@ function void fn02e4d6()
 		u16[0xffffeee0] = 0
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn character continue icons
 			u16[0xffffeee0] = A1.u16
 			objA1.update_address = 0x02ebe8
 			objA0.countdown_value = 0x010e
@@ -185,7 +186,7 @@ function void fn02e512()
 		if (isMainCharacter(CHARACTER_TAILS) && !Game.getSetting(SETTING_HYPER_TAILS))
 		{
 			// Tails
-			if (u8[0xffffef6a] != 4 && u8[0xffffef6a] < 7)
+			if (bluespheres.backup.zone != 4 && bluespheres.backup.zone < 7)
 			{
 				global.game_mode = 0x0c
 				return
@@ -197,7 +198,7 @@ function void fn02e512()
 			// Sonic, Knuckles (or Tails if using Hyper Tails setting)
 			if (global.lock_on_state == 0)
 			{
-				if (u8[0xffffef6a] == 4 || u8[0xffffef6a] >= 7)
+				if (bluespheres.backup.zone == 4 || bluespheres.backup.zone >= 7)
 				{
 					objA0.base_state = 0x0a
 				}
@@ -462,10 +463,10 @@ function void fn02e802()
 	// Create objects for the result screen
 	while (D1.s16 >= 0)
 	{
-		u32[A1] = u32[A2]
-		u8[A1 + 0x04] = render_flag.COMPOUND
-		u8[A1 + 0x07] = u8[A2+11]
-		u32[A1 + 0x0c] = 0x02f26a
+		objA1.update_address = u32[A2]
+		objA1.render_flags = render_flag.COMPOUND
+		objA1.box_size.x = u8[A2+11]
+		objA1.mapping_offset = 0x02f26a
 		objA1.position.x.u16 = u16[A2+6] + getScreenExtend()
 		objA1.position.y.u16 = u16[A2+8]
 		u8[A1 + 0x22] = u8[A2+10]
@@ -531,7 +532,7 @@ function void fn02e9f6()
 {
 	if (global.characters == CHARS_KNUCKLES_ALONE && global.lock_on_state == 0 && global.sk_bluespheres != 0)
 	{
-		objA0.sprite_attributes = 0x2000
+		objA0.sprite_attributes = sprite_attribute.PALETTE.LINE1
 	}
 	fn02ea10()
 }
@@ -595,12 +596,22 @@ function void fn02ea50()
 	//  - 0x18, 0x32, 0x37 = "Ring Bonus"
 	//  - 0x19, 0x33, 0x38 = "Perfect"
 	//  - 0x1a, 0x34, 0x39 = "Continue"
+	//  - 0x12			   = "Super" / "Hyper"
 	//  - 0x13			   = "Sonic"
-	//  - 0x14			   = "Miles" (not verified)
+	//  - 0x14			   = "Miles"
 	//  - 0x15			   = "Tails"
-	//  - 0x16			   = "Knuckles" (not verified)
+	//  - 0x16			   = "Knuckles"
+	//  - 0x22			   = "Special Stage"
 	//  - 0x23			   = "got a"
 	//  - 0x24			   = "Chaos Emerald"
+	//  - 0x25			   = "ll" (with 0x23 = "got all")
+	//  - 0x26			   = "s" (with 0x24 = "Chaos Emeralds", with 0x30 = "Super Emeralds")
+	//  - 0x27, 0x2c	   = "Now"
+	//  - 0x28, 0x35	   = "Be"
+	//  - 0x29, 0x2a, 0x2b = character continue icons
+	//  - 0x2d, 0x3a	   = "Can"
+	//  - 0x2e			   = "Can Go To"
+	//  - 0x2f			   = "Hidden Palace"
 	//  - 0x30			   = "Super Emerald"
 
 	if (!fn02de04())
@@ -668,7 +679,7 @@ function void fn02eaa6()
 	{
 		UnloadObject()
 	}
-	else if (u16[0xffffe666] != 0)
+	else if (emerald.animframe != 0)
 	{
 		DrawObject()
 	}
@@ -717,11 +728,11 @@ function void fn02eaf6()
 	objA0.position.x.u16 += D0.u16
 	u16[A0 + 0x46] += D0.u16
 	objA0.animation.sprite += D1.u8
-	objA0.sprite_attributes = 0xff79
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | sprite_attribute.FLIP_Y | sprite_attribute.FLIP_X | 0x0779)
 
 	if (global.lock_on_state == 0 && global.sk_bluespheres && global.characters == CHARS_KNUCKLES_ALONE)
 	{
-		objA0.sprite_attributes -= 0xe000
+		objA0.sprite_attributes -= (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3)
 	}
 
 	fn02ea4a()
@@ -954,7 +965,7 @@ function void fn02ecbc()
 {
 	if (global.lock_on_state != 0 || !global.sk_bluespheres)
 	{
-		objA0.sprite_attributes = 0x6000
+		objA0.sprite_attributes = sprite_attribute.PALETTE.LINE3
 	}
 }
 
@@ -966,8 +977,8 @@ function void fn02ecbc()
 function void fn02ecd0()
 {
 	objA0.update_address = 0x02ed2a
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
-	objA0.sprite_attributes = 0x879c
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
 	objA0.mapping_offset = 0x018aea
 
 	u16[A0 + 0x16] = 2

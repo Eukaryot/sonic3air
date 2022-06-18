@@ -14,8 +14,8 @@
 function void fn03c462()
 {
 	objA0.mapping_offset = 0x03c78e
-	objA0.sprite_attributes = 0xa32b
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x032b)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x80
@@ -36,12 +36,12 @@ function void fn03c462()
 			objA1.position.x.u16 += 0x30
 			objA1.position.y.u16 -= 0x30
 			u16[A1 + 0x44] = objA0.position.x.u16
-			u8[A1 + 0x04] = objA0.render_flags
-			u32[A1 + 0x0c] = objA0.mapping_offset
-			u16[A1 + 0x0a] = 0xc32b
-			u16[A1 + 0x08] = 0x0100
-			u8[A1 + 0x07] = 0x20
-			u8[A1 + 0x06] = 0x08
+			objA1.render_flags = objA0.render_flags
+			objA1.mapping_offset = objA0.mapping_offset
+			objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x032b)
+			objA1.sprite_priority = 0x0100
+			objA1.box_size.x = 0x20
+			objA1.box_size.y = 0x08
 			u8[A1 + 0x22] = 0x06
 			u8[A1 + 0x2a] |= 0x80
 			u16[A1 + 0x3c] = A0.u16
@@ -102,12 +102,12 @@ function void fn03c552()
 			objA1.position.y.u16 -= 0x04
 			u16[A1 + 0x46] = objA0.position.y.u16
 			u16[A1 + 0x46] -= 0x44
-			u8[A1 + 0x04] = objA0.render_flags
-			u32[A1 + 0x0c] = objA0.mapping_offset
-			u16[A1 + 0x0a] = 0xa32b
-			u16[A1 + 0x08] = 0x80
-			u8[A1 + 0x07] = 0x08
-			u8[A1 + 0x06] = 0x24
+			objA1.render_flags = objA0.render_flags
+			objA1.mapping_offset = objA0.mapping_offset
+			objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x032b)
+			objA1.sprite_priority = 0x80
+			objA1.box_size.x = 0x08
+			objA1.box_size.y = 0x24
 			u8[A1 + 0x1e] = 0x0c
 			u8[A1 + 0x22] = 0x02
 			objA1.velocity.y = -0x600
@@ -171,7 +171,7 @@ function void fn03c636()
 			{
 				objA1.update_address = 0x01e5e0
 				u8[A1 + 0x05] = 0x06
-				u16[A1 + 0x0a] = 0x8000
+				objA1.sprite_attributes = sprite_attribute.PRIORITY
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16
 				D0.u16 = u16[(A2+=2)-2]
@@ -211,8 +211,8 @@ function void fn03c6cc()
 		if (objA0.velocity.y >= 0)
 		{
 			objA0.animation.sprite = 0x03
-			u8[A0 + 0x28] = 0x9e
-			objA0.sprite_attributes &= 0x7fff
+			objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x8)
+			objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 		}
 	}
 	else

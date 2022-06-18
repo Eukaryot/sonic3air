@@ -19,8 +19,8 @@ function void fn0502c6()
 	{
 		D1.u16 = 0x0200
 		u16[0xffffeebc] = D1.u16
-		u16[0xffffb010] -= D1.u16
-		u16[0xffffb05a] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D1.u16
 
 	#if STANDALONE
 		// Also update position backup data (e.g. for after-images)
@@ -51,8 +51,8 @@ function void fn0502c6()
 
 function void fn050318()
 {
-	if (u8[A1 + 0x20] == 5)
-		u8[A1 + 0x20] = 0
+	if (u8[A1 + 0x20] == char.state.STANDING)
+		u8[A1 + 0x20] = char.state.RUNNING
 
 	D0.u16 += 0x18
 	if (objA1.position.x.u16 < D0.u16)
@@ -88,6 +88,7 @@ function void fn05034a()
 	D2 = 1
 	while (D2.s16 >= 0)
 	{
+		// Spawn blimp propellers
 		if (!allocDynamicObjectAfterA0())
 			break
 
@@ -276,7 +277,7 @@ function void fn0504dc()
 	if (objA0.value32 == 0)
 	{
 		objA0.base_state += 4
-		playSound(0x51)
+		playSound(SFX_BOMBFALL)
 	}
 	fn0504ee()
 }
@@ -369,7 +370,7 @@ function void fn0505a4()
 	objA0.box_size.x = 0x20
 	objA0.sprite_attributes = 0x0500
 	objA0.mapping_offset = 0x23c1b2
-	u8[A0 + 0x28] = 0x8b
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8)
 
 	fn0505e4()
 }
@@ -386,8 +387,7 @@ function void fn0505dc()
 //# address-hook(0x0505e4) end(0x05060e)
 function void fn0505e4()
 {
-	A1 = 0x23c22a
-	Object.AlternativeAnimationUpdate()
+	Object.AlternativeAnimationUpdate(0x23c22a)
 
 	if (objA0.base_state != 0)
 	{

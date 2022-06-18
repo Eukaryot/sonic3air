@@ -15,7 +15,7 @@ function void fn07ddb4()
 	if (InitBoss(0x07ddbe))
 		return
 
-	objA0.value26 = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 	StartBossFight()
 
 #if STANDALONE
@@ -312,8 +312,7 @@ function void fn07e016()
 	u16[A0 + 0x3c] = 0x0200
 	u16[A0 + 0x26] = 0x0100
 
-	A2 = 0x07efb6
-	SpawnChildObjectHierarchy()
+	spawnChildObjectHierarchy(0x07efb6)
 }
 
 
@@ -554,7 +553,7 @@ function void fn07e26a()
 	{
 		objA1.update_address = 0x0863c0
 	}
-	if (u16[0xffffb010] >= 0x0140)		// Note that this is *not* referring to the screen width, but an actual fixed position
+	if (u16[0xffffb000 + 0x10] >= 0x0140)		// Note that this is *not* referring to the screen width, but an actual fixed position
 	{
 		objA0.flags38 |= 0x08
 	}
@@ -575,9 +574,9 @@ function void fn07e298()
 			D1 = 0
 			if (u8[A1 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0808
+			D1.u16 |= 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 			control.player1 = D1.u16
 			return
 		}
@@ -589,9 +588,9 @@ function void fn07e298()
 			D1 = 0
 			if (u8[A1 + 0x2a] & 0x20)
 			{
-				D1.u16 |= 0x4040
+				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
-			D1.u16 |= 0x0404
+			D1.u16 |= 0x0404		// CONTROL_LEFT, CONTROL_LEFT
 			control.player1 = D1.u16
 			return
 		}
@@ -633,12 +632,14 @@ function void fn07e342()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the upper border
 			objA1.update_address = 0x084aa4
 		}
 		screenmover_target.bottom = 0x2000
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the lower border
 			objA1.update_address = 0x084ad2
 		}
 		playSound(0xcc)
@@ -654,10 +655,10 @@ function void fn07e384()
 	{
 		objA0.update_address = 0x07e3ca
 		u8[A1 + 0x2e] = 0x83
-		u8[A1 + 0x20] = 0
+		u8[A1 + 0x20] = char.state.RUNNING
 		StopObjectA1()
 
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		objA1.flags2a |= char.flag.IN_AIR
 		objA1.flags2a &= ~(char.flag.FACING_LEFT | char.flag.PUSHING)
 	}
@@ -672,7 +673,7 @@ function void fn07e3ca()
 	{
 		objA0.update_address = 0x07e3ec
 		objA0.countdown_value = 0x24
-		u8[0xffffb00a] &= ~0x80
+		u8[0xffffb000 + 0x0a] &= ~0x80
 	}
 
 	fn07eeee()
@@ -692,10 +693,10 @@ function void fn07e3ec()
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
 
-		playSound(0x9f)
+		playSound(SFX_SUPERTRANSFORM)
 	}
 
-	u16[0xffffb014] -= 0x10
+	u16[0xffffb000 + 0x14] -= 0x10
 	fn07eeee()
 }
 
@@ -710,9 +711,9 @@ function void fn07e420()
 		fn05fd88()
 
 		A1 = 0xffffb000
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		objA1.state = char.state.STANDING
-		u8[A1 + 0x21] = 0x00
+		objA1.state.former = char.state.RUNNING
 		objA1.flags2a &= ~char.flag.FACING_LEFT
 	}
 	fn07e44c()
@@ -757,7 +758,7 @@ function void fn07e4a2()
 	// Slight palette change
 	copyMemory(0xfffffc20, 0x07f01c, 0x20)
 
-	u8[0xffffb02e] = 0
+	u8[0xffffb000 + 0x2e] = 0
 	player1.control_override = 0
 	player2.control_override = 0
 	UnloadObject()
@@ -1138,7 +1139,7 @@ function void fn07e79c()
 	fn07ed6c()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u32[A1] != 0x07de6e)
+	if (objA1.update_address != 0x07de6e)
 		return
 
 	objA0.base_state = 0x04
@@ -1180,7 +1181,7 @@ function void fn07e7d6()
 
 	objA0.base_state = 0x08
 	boss.remaining_hits = 0xff
-	u8[A0 + 0x28] = 0x17
+	objA0.collision_attributes = collision.size.8x8_2
 	objA0.state = 0
 }
 
@@ -1428,7 +1429,7 @@ function void fn07ea6c()
 	if (objA0.subtype2c != 0)
 	{
 		D0.s16 = -D0.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	u16[A0 + 0x3a] = D0.u16
 	fn07ea9a()
@@ -1476,7 +1477,7 @@ function void fn07eacc()
 	D0.s16 = -0x200
 	if (objA0.subtype2c != 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D0.s16 = -D0.s16
 	}
 	objA0.velocity.x = D0.s16
@@ -1535,7 +1536,7 @@ function void fn07eb34()
 //# address-hook(0x07eb76) end(0x07eb8c)
 function void fn07eb76()
 {
-	u8[A0 + 0x28] = 0x86
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.16x16)
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x40)
 	{
@@ -1547,7 +1548,7 @@ function void fn07eb76()
 //# address-hook(0x07eb8e) end(0x07ebc0)
 function void fn07eb8e()
 {
-	if (u8[0xffffb02a] & 0x08)
+	if (u8[0xffffb000 + 0x2a] & char.flag.ON_OBJECT)
 	{
 		u16[A0 + 0x3c] = u16[A0 + 0x26]
 	}
@@ -1691,8 +1692,8 @@ function void fn07ec64()
 function void fn07ec84()
 {
 	D0.u16 = objA0.position.x.u16
-	D1.s16 = (u16[0xffffb010] > objA0.position.x.u16) ? 0x80 : -0x80
-	D2.u16 = u16[0xffffb010] - objA0.position.x.u16
+	D1.s16 = (u16[0xffffb000 + 0x10] > objA0.position.x.u16) ? 0x80 : -0x80
+	D2.u16 = u16[0xffffb000 + 0x10] - objA0.position.x.u16
 
 	objA0.velocity.x = D1.u16
 	if (objA0.velocity.x != 0)
@@ -1726,7 +1727,7 @@ function void fn07ecf4()
 	{
 		D0.s16 = -D0.s16
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	objA0.position.x.u16 += D0.u16
 	D0 = (D0 << 16) + (D0 >> 16)
@@ -1754,7 +1755,7 @@ function void fn07ed6c()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	objA0.position.y.u16 = objA1.position.y.u16
-	D0.u16 = u16[0xffffb010] - objA1.position.x.u16
+	D0.u16 = u16[0xffffb000 + 0x10] - objA1.position.x.u16
 	D1.u16 = objA1.position.x.u16
 	D2.u8 = (D0.s16 < 0) ? 0xff : 0x00
 	D0.u16 = min(abs(D0.s16), 0xa0)
@@ -1762,10 +1763,10 @@ function void fn07ed6c()
 
 	A2 = 0x07edba + D0.s16
 	D0.u8 = u8[(A2+=1)-1]
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	if (D2.u8 != 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D0.s16 = -D0.s16
 	}
 	D1.u16 += D0.u16
@@ -1888,10 +1889,10 @@ function void fn07eeee()
 	D0 = u8[A0 + 0x3c]
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = u8[0x07ef2e + D0.s16]
-	u8[A1 + 0x04] &= 0xfc
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
 	D0.u8 = u8[0x07ef3a + D0.s16]
-	u8[A1 + 0x04] |= D0.u8
+	objA1.render_flags |= D0.u8
 
 	D0 = u8[A1 + 0x22]
 	UpdatePlayer1SpritePatterns()

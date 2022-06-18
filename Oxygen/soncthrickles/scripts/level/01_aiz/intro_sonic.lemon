@@ -65,7 +65,7 @@ function void fn0674ac()
 	//  -> Can be used to change the "distance" to the beach
 	//  -> In widescreen, we take a bit more time than usual
 	u16[0xffffeeb6] = 0xe918 - getScreenExtend() * 3
-	u8[0xfffff766] = 0xff
+	char.animation.sprite.backup = 0xff
 
 	A1 = 0xffffb000
 	u8[A1 + 0x22] = 0		// char.animation.sprite
@@ -273,7 +273,7 @@ function void fn0676ac()
 function void fn0676c6()
 {
 	fn0679b8()
-	if (u16[0xffffb010] < 0x0918)
+	if (u16[0xffffb000 + 0x10] < 0x0918)
 	{
 		Object.CountdownAndTrigger()
 	}
@@ -291,7 +291,7 @@ function void fn0676c6()
 function void fn0676e8()
 {
 	fn0679b8()
-	if (u16[0xffffb010] >= 0x1240)
+	if (u16[0xffffb000 + 0x10] >= 0x1240)
 	{
 		objA0.base_state = 0x1a
 		objA0.position.y.u16 -= 0x20
@@ -303,7 +303,7 @@ function void fn0676e8()
 function void fn067704()
 {
 	fn0679b8()
-	if (u16[0xffffb010] < 0x13d0)
+	if (u16[0xffffb000 + 0x10] < 0x13d0)
 		return
 
 	u8[0xfffff650] = 0xff
@@ -587,7 +587,7 @@ function void fn067a08()
 	else
 	{
 		// Sonic's position gets increased afterwards
-		u16[0xffffb010] += u16[A0 + 0x40]
+		u16[0xffffb000 + 0x10] += u16[A0 + 0x40]
 	}
 }
 
@@ -642,8 +642,7 @@ function void fn061d92()
 //# address-hook(0x061dbe) end(0x061dee)
 function void fn061dbe()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	u8[A0 + 0x0a] &= ~0x80
@@ -664,8 +663,9 @@ function void fn065dd6()
 {
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the Knuckles theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x1f
+		u8[A1 + 0x2c] = MUSIC_KNUCKLES
 	}
 }
 
@@ -722,7 +722,7 @@ function void fn061e64()
 function void fn061e6a()
 {
 	objA0.base_state = 0x08
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	u32[A0 + 0x30] = 0x0666a9
 	objA0.velocity.x = -0x600
 	objA0.velocity.y = 0
@@ -813,7 +813,7 @@ function void fn061f70()
 function void fn061ea8()
 {
 	objA0.velocity.x = -objA0.velocity.x
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.countdown_value = 0x29
 	objA0.countdown_callback = 0x061ec2
 }

@@ -26,7 +26,7 @@ function void fn06e488()
 	objA0.countdown_callback = 0x06e4be
 
 	A1 = 0x06e476
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 	requestLoadingPatterns(0x6e)
@@ -94,8 +94,7 @@ function void fn06e4f2()
 	// "spawnChildObjects(0x06edcc)" replaced by:
 	spawnChildObject(0x06e82c, 0x00, 0, 20)
 
-	A2 = 0x06edd4
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x06edd4)
 }
 
 
@@ -133,11 +132,11 @@ function void fn06e574()
 	if (D2.u16 >= 0x20)
 	{
 		D1.u16 = 0x0100
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		if (D0.u16 == 0)
 		{
 			D1.s16 = -D1.s16
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 		}
 		objA0.velocity.x = D1.u16
 	}
@@ -180,12 +179,12 @@ function void fn06e5d8()
 		if (D0.u16 <= objA1.position.x.u16)
 		{
 			++D0.u16
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 		}
 		else
 		{
 			--D0.u16
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 		}
 		objA0.position.x.u16 = D0.u16
 	}
@@ -295,13 +294,14 @@ function void fn06e6e4()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x4990
 		objA1.position.y.u16 = 0x02e0
 	}
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -326,10 +326,10 @@ function void fn06e724()
 #endif
 
 	// "spawnSimpleChildObjects(0x084b0c)" replaced by:
-	spawnSimpleChildObjects(0x084aa4, 1)
+	spawnSimpleChildObjects(0x084aa4, 1)		// Screen mover for the upper border
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 #if STANDALONE
 	// Exchange rightmost chunks
@@ -347,7 +347,7 @@ function void fn06e778()
 	// (which happens in widescreen when having Sonic at the right screen edge during level results)
 	if (camera.position.x.u16 >= 0x4900)
 #else
-	if (u16[0xffffb010] >= 0x4a30)
+	if (u16[0xffffb000 + 0x10] >= 0x4a30)
 #endif
 	{
 		objA0.update_address = 0x06e7b6
@@ -398,7 +398,9 @@ function void fn06e7e4()
 		return
 
 	objA0.update_address = 0x06e80c
-	control.player1 = 0x7070
+
+	control.player1 = 0x7070		// CONTROL_ABC, CONTROL_ABC
+
 	player1.control_override = 0xff
 }
 
@@ -408,15 +410,14 @@ function void fn06e80c()
 {
 #if STANDALONE
 	// Minor tweak: Fade out a little later
-	if (u16[0xffffb014] > camera.position.y.u16)
+	if (u16[0xffffb000 + 0x14] > camera.position.y.u16)
 		return
 #else
-	if (u16[0xffffb014] > camera.position.y.u16 + 0x20)
+	if (u16[0xffffb000 + 0x14] > camera.position.y.u16 + 0x20)
 		return
 #endif
 
-	D0.u16 = 0x0500
-	TriggerNextZone()
+	TriggerNextZone(0x0500)
 	fn0852ae()
 }
 
@@ -556,7 +557,7 @@ function void fn06e936()
 	objA0.update_address = 0x085102
 	if (objA0.subtype2c != 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 
 	D0 = 0x08
@@ -729,7 +730,7 @@ function void fn06eada()
 {
 	setupObjectAttributesFull(0x06edc0)
 
-	objA0.flags2b |= 0x20
+	objA0.flags2b |= char.bonus.SHIELD_LIGHTNING
 	u32[A0 + 0x30] = 0x06ee2c
 	objA0.countdown_callback = 0x06eb34
 	objA0.update_address = (objA0.subtype2c & 0x02) ? 0x06eb0c : 0x06eb16
@@ -762,8 +763,8 @@ function void fn06eb34()
 	objA0.animation.sprite = 9
 	D0.u8 = objA0.value39 + 1
 	objA0.value39 = D0.u8
-	D0.u8 &= 0x03
-	objA0.render_flags &= 0xfc
+	D0.u8 &= (render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA0.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA0.render_flags |= D0.u8
 }
 

@@ -35,13 +35,13 @@ function void fn08639c()
 	D0.u16 = objA0.position.x.u16
 	if (D0.u16 < objA1.position.x.u16)
 	{
-		u8[A1 + 0x04] |= render_flag.FLIP_X
-		u8[A1 + 0x2a] |= 0x01
+		objA1.render_flags |= render_flag.FLIP_X
+		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 	}
 	else
 	{
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
-		u8[A1 + 0x2a] &= ~0x01
+		objA1.render_flags &= ~render_flag.FLIP_X
+		u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	}
 }
 
@@ -195,7 +195,7 @@ function void fn055814()
 {
 	objA0.update_address = 0x05582e
 	objA0.sprite_priority = 0x0380
-	objA0.sprite_attributes = 0xa500
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0500)
 	objA0.mapping_offset = 0x055908
 	fn05582e()
 }
@@ -322,13 +322,14 @@ function void fn0763b2()
 //# address-hook(0x0763d8) end(0x076402)
 function void fn0763d8()
 {
-	control.player1 = 0x0101
-	control.pad2 = 0x0101
+	control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
+	control.pad2 = 0x0101		// CONTROL_UP, CONTROL_UP
+
 	if (u8[0xfffffaa9] == 0)
 		return
 
 	objA0.update_address = 0x076404
-	control.player1 = 0x2020
+	control.player1 = 0x2020		// CONTROL_C, CONTROL_C
 
 	A1 = 0xffffb000
 	objA1.velocity.x = 0x0200
@@ -338,7 +339,8 @@ function void fn0763d8()
 //# address-hook(0x076404) end(0x076450)
 function void fn076404()
 {
-	control.player1 = 0x2000
+	control.player1 = 0x2000		// CONTROL_C, 0
+
 	A1 = 0xffffb000
 	if (objA1.velocity.y < 0)
 		return
@@ -346,13 +348,13 @@ function void fn076404()
 	objA0.update_address = 0x076456
 	StopObjectA1()
 
-	u8[A1 + 0x04] |= render_flag.FLIP_X
+	objA1.render_flags |= render_flag.FLIP_X
 	objA1.state = char.state.HOLDING_ON
 	u8[A1 + 0x2a] |= 0x01
 	u8[A1 + 0x2e] = 0x81
 	objA0.countdown_value = 0x5f
 
-	playSound(0x4a)
+	playSound(SFX_GRAB)
 
 	if (allocDynamicObjectStd())
 	{
@@ -369,8 +371,7 @@ function void fn076456()
 	if (objA0.countdown_value >= 0)
 		return
 
-	D0.u16 = 0x0400
-	TriggerNextZone()
+	TriggerNextZone(0x0400)
 	UnloadObject()
 
 #if STANDALONE
@@ -385,9 +386,9 @@ function void fn07646e()
 	objA0.update_address = 0x076492
 	A1 = 0xffffb04a
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = 0x20
-	u8[A1 + 0x04] &= ~render_flag.FLIP_X
-	u8[A1 + 0x2a] &= ~0x01
+	u8[A1 + 0x20] = char.state.TAILS_FLYDOWN
+	objA1.render_flags &= ~render_flag.FLIP_X
+	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 }
 
 

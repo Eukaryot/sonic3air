@@ -40,7 +40,7 @@ function void fn079416()
 	objA0.update_address = 0x079486
 	u8[0xfffff650] = 0x80
 	objA0.countdown_value = 0x0f
-	playSound(0x9f)
+	playSound(SFX_SUPERTRANSFORM)
 
 	copyMemory(0xfffffc80, 0xfffffc00, 0x20)
 	copyMemory(0xfffffca0, 0x079726, 0x60)

@@ -18,7 +18,7 @@ function void fn0784f0()
 	objA0.update_address = 0x078522
 	objA0.countdown_callback = 0x078528
 	A1 = 0x0784e8
-	objA0.value26 = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 	StartBossFight()
 
 	// Manipulate target value for move_area.left
@@ -86,11 +86,8 @@ function void fn078562()
 	level.bossarea.top = 0x07a8
 	level.bossarea.bottom = objA0.position.y.u16
 
-	A2 = 0x078d84
-	SpawnChildObjectHierarchy()
-
-	A2 = 0x078d8a
-	SpawnChildObjectHierarchy()
+	spawnChildObjectHierarchy(0x078d84)
+	spawnChildObjectHierarchy(0x078d8a)
 }
 
 
@@ -213,7 +210,7 @@ function void fn0786a6()
 function void fn0786bc()
 {
 	objA0.base_state = 0x10
-	u8[A0 + 0x28] = 0xb5
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.40x32)
 	objA0.countdown_callback = 0x0786ea
 
 	A1 = 0x078df1
@@ -235,7 +232,7 @@ function void fn0786ea()
 {
 	objA0.base_state = 0x12
 	objA0.animation.sprite = 5
-	u8[A0 + 0x28] = 0x06
+	objA0.collision_attributes = collision.size.16x16
 	objA0.countdown_value = 0x5f
 	objA0.countdown_callback = 0x07873a
 	camera.screenshake.state = 0x14
@@ -354,7 +351,7 @@ function void fn0787e0()
 //# address-hook(0x0787fe) end(0x078804)
 function void fn0787fe()
 {
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.countdown_value = 0x10
 	fn07880a()
 }
@@ -568,8 +565,7 @@ function void fn0789ca()
 
 	playSound(0x98)
 
-	A2 = 0x078d90
-	SpawnChildObjectsInDir()
+	spawnChildObjectsInDir(0x078d90)
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = objA0.value39
@@ -583,7 +579,7 @@ function void fn078a02()
 	setupObjectAttributesBasic(0x078d72)
 
 	objA0.update_address = 0x078a1c
-	objA0.flags2b |= 0x08
+	objA0.flags2b |= char.bonus.DEFLECTABLE
 
 	fn078baa()
 	fn078a1c()
@@ -751,7 +747,7 @@ function void fn078baa()
 {
 	u32[A0 + 0x18] = u32[0x078bc6 + objA0.subtype2c * 4]
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}

@@ -64,7 +64,7 @@ function void fn042028()
 		}
 	}
 
-	if (u16[0xffffb014] >= 0x06c0)
+	if (u16[0xffffb000 + 0x14] >= 0x06c0)
 	{
 		objA0.update_address = 0x0420a6
 	}
@@ -89,6 +89,8 @@ function void fn0420a6()
 	player2.control_override = 1
 	control.player1 = 0
 	control.tails = 0
+
+	// Check if jump button pressed
 	if ((control.pad1.pressed & CONTROL_ABC) == 0)
 		return
 
@@ -108,7 +110,7 @@ function void fn0420de()
 	{
 		objA1.velocity.y = -0x800
 		objA1.state = char.state.STRAIGHTJUMP
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2e] = 1
 		u8[A1 + 0x40] = 0
 	}
@@ -182,13 +184,13 @@ function void fn042180()
 function void fn04219e()
 {
 	objA0.mapping_offset = 0x040d10
-	objA0.sprite_attributes = 0x4432
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0432)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x34
 	objA0.sprite_priority = 0x80
 	objA0.animation.sprite = 0x08
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 1
 
 	A2 = A0 + 0x18
@@ -213,7 +215,7 @@ function void fn0421fe()
 	if (s8(objA0.animation.timer) < 0)
 	{
 		objA0.animation.timer = 3
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		++objA0.position.y.u16
 		++objA0.velocity.y
 		++u8[A0 + 0x1d]

@@ -54,8 +54,8 @@ function void fn08abb0()
 		}
 	}
 
-	u16[A7-=2] = u16[0xffffb018]
-	u16[A7-=2] = u16[0xffffb062]
+	u16[A7-=2] = u16[0xffffb000 + 0x18]
+	u16[A7-=2] = u16[0xffffb04a + 0x18]
 	fn08ac70()
 
 	D0 = u32[(A7+=4)-4]
@@ -132,7 +132,9 @@ function void fn08ac70()
 //# translated(0x08ac80) end(0x08accc)
 function bool fn08ac80()
 {
-	if (objA0.flags2a & (1 << D1.u8))
+	u8 bit = (1 << D1.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		// To break through, the character needs to be rolling fast enough
 		D3.u16 = abs(D0.s16)
@@ -140,9 +142,9 @@ function bool fn08ac80()
 		{
 			objA1.velocity.x = D0.s16
 			s16[A1 + 0x1c] = D0.s16
-			u8[A1 + 0x2a] &= ~(1 << D1.u8)
+			u8[A1 + 0x2a] &= ~bit
 
-			objA0.flags2a &= ~(1 << D1.u8)
+			objA0.flags2a &= ~bit
 			objA0.flags38 |= 0x01
 
 			// "spawnChildObjects(0x08aaea)" replaced by:

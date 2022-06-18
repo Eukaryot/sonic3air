@@ -20,13 +20,13 @@ function void fn03ea56()
 		objA1.update_address = 0x03ed0a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u32[A1 + 0x0c] = 0x03ed10
-		u16[A1 + 0x0a] = 0x440a
-		u8[A1 + 0x04] |= 0x04
-		u16[A1 + 0x08] = 0x0200
+		objA1.mapping_offset = 0x03ed10
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040a)
+		objA1.render_flags |= render_flag.WORLD
+		objA1.sprite_priority = 0x0200
 		objA1.box_size.x = 0x80
 		objA1.box_size.y = 0x80
-		u8[A1 + 0x04] |= 0x40
+		objA1.render_flags |= render_flag.COMPOUND
 	#if STANDALONE
 		objA1.box_size.x += 0x40	// Avoid early clipping that can happen when being caught while going very fast
 	#endif
@@ -311,7 +311,7 @@ function void fn03ec66()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x20
+	u8[A1 + 0x2a] &= ~char.flag.PUSHING
 }
 
 

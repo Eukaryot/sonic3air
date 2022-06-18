@@ -37,11 +37,10 @@ function void fn063a6a()
 //# address-hook(0x063a96) end(0x063ac4)
 function void fn063a96()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x56
 	objA0.position.x.u16 = 0x3a38
@@ -138,6 +137,7 @@ function void fn063b40()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn Cutscene Knuckles
 		objA1.update_address = 0x061d4c
 		objA1.subtype2c = 0x24
 	}
@@ -188,7 +188,7 @@ function void fn063bbe()
 	player1.camera_lock = 0xff
 	player1.control_override = 0
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = 0x07
+	u8[A1 + 0x20] = char.state.LOOKING_UP
 }
 
 
@@ -207,15 +207,14 @@ function void fn063bf4()
 //# address-hook(0x063c14) end(0x063c38)
 function void fn063c14()
 {
-	if (u16[0xffffb014] < 0x04c0)
+	if (u16[0xffffb000 + 0x14] < 0x04c0)
 		return
 
 	level.skip_titlecard = 0xff
-	u16[0xffffef5e] = ring_counter
-	u32[0xffffef60] = timer.alldata
-	global.shields_backup_2 = u8[0xffffb02b]
-	D0.u16 = 0x1600
-	TriggerNextZone()
+	level.backup.rings = ring_counter
+	level.backup.timer.alldata = timer.alldata
+	global.shields_backup_2 = u8[0xffffb000 + 0x2b]
+	TriggerNextZone(0x1600)
 }
 
 
@@ -276,7 +275,7 @@ function void fn063cac()
 		{
 			objA0.velocity.y = -0x100
 			camera.screenshake.state = 0x14
-			playSound(0x59)
+			playSound(SFX_COLLAPSE)
 		}
 	}
 	DrawObject()
@@ -295,7 +294,7 @@ function void fn065ed4()
 		objA0.animation.timer = 4
 		D0.u8 = objA0.animation.frame + 1
 		objA0.animation.frame = D0.u8
-		objA0.render_flags = (objA0.render_flags & 0xfc) | (D0.u8 & 0x03)
+		objA0.render_flags = (objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (D0.u8 & (render_flag.FLIP_X | render_flag.FLIP_Y))
 	}
 }
 
@@ -331,9 +330,11 @@ function void fn065efe()
 }
 
 
+//# address-hook(0x065f2e) end(0x065f84)
 function void fn065f2e()
 {
-	if ((objA0.flags38 & (1 << D2.u8)) == 0)
+	u8 bit = (1 << D2.u8)
+	if ((objA0.flags38 & bit) == 0)
 		return
 
 	--u8[A1 + 0x24]
@@ -342,10 +343,10 @@ function void fn065f2e()
 		u8[A1 + 0x24] = 8
 		D0.u8 = u8[A1 + 0x23]
 		++u8[A1 + 0x23]
-		D0.u8 &= 0x03
-		D1.u8 = u8[A1 + 0x04] & 0xfc
+		D0.u8 &= (render_flag.FLIP_X | render_flag.FLIP_Y)
+		D1.u8 = objA1.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		D1.u8 |= D0.u8
-		u8[A1 + 0x04] = D1.u8
+		objA1.render_flags = D1.u8
 	}
 
 	D0.u8 = u8[A0 + D3.s16]
@@ -363,14 +364,15 @@ function void fn065f2e()
 //# address-hook(0x065f84) end(0x065fd4)
 function void fn065f84()
 {
-	if (objA0.flags38 & (1 << D2.u8))
+	u8 bit = (1 << D2.u8)
+	if (objA0.flags38 & bit)
 		return
 
 	A2 = 0x065fd6
 	fn0858c8()
 	if (!_equal())
 	{
-		objA0.flags38 |= (1 << D2.u8)
+		objA0.flags38 |= bit
 		u16 backupD3 = D3.u16
 		player1.camera_lock = 0
 		hud.dirty.timer = 0

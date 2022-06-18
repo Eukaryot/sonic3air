@@ -94,7 +94,7 @@ function void TitleCard.Wait()
 		}
 		else if (u8[A0 + 0x45] != 0)
 		{
-			// Yet unknown...
+			// Competition mode stage (unused)
 			A2 = 0x02daa6
 			D1 = 0
 		}
@@ -108,15 +108,15 @@ function void TitleCard.Wait()
 		while (D1.s16 >= 0)
 		{
 			++u16[A0 + 0x30]
-			u32[A1] = u32[A2]
-			u8[A1 + 0x04] = render_flag.COMPOUND
+			objA1.update_address = u32[A2]
+			objA1.render_flags = render_flag.COMPOUND
 			u16[A1 + 0x46] = u16[A2+4]
 			objA1.position.x.u16 = u16[A2+6]
 			objA1.position.y.u16 = u16[A2+8]
 			u8[A1 + 0x22] = u8[A2+10]
-			u8[A1 + 0x07] = u8[A2+11]
+			objA1.box_size.x = u8[A2+11]
 			u8[A1 + 0x28] = u16[A2+12]
-			u32[A1 + 0x0c] = 0x02ee10
+			objA1.mapping_offset = 0x02ee10
 			u16[A1 + 0x48] = A0.u16
 			A2 += 14
 
@@ -125,7 +125,7 @@ function void TitleCard.Wait()
 				// Move title card elements towards screen center
 				u16 offset = getScreenExtend()
 				objA1.position.x.u16 += offset
-				if (u32[A1] != 0x02d8e2)
+				if (objA1.update_address != 0x02d8e2)
 					u16[A1 + 0x46] += offset
 			}
 			#endif
@@ -158,15 +158,15 @@ function void TitleCard.Appear()
 	{
 		timer.alldata = 0
 		ring_counter = 0
-		u16[0xfffffec8] = 0
+		player.total_rings = 0
 		extra_lives_granted = 0
-		u32[0xfffffed2] = 0
-		u16[0xfffffed0] = 0
-		u16[0xfffffeca] = 0
+		timer.alldata.player2 = 0
+		ring_counter.player2 = 0
+		unused.player2.total_rings = 0
 		hud.dirty.timer = 0xff
 		hud.dirty.rings = 0xff
-		u8[0xffffb02c] = 30
-		u8[0xffffb076] = 30
+		u8[0xffffb000 + 0x2c] = 30
+		u8[0xffffb04a + 0x2c] = 30
 		PlayMusicAfterLevelResults()
 	}
 
@@ -196,6 +196,7 @@ function void TitleCard.Show()
 		{
 			if (allocDynamicObjectStd())
 			{
+				// Ghost spawner
 				objA1.update_address = 0x08f0b8
 			}
 		}

@@ -28,13 +28,13 @@ function void DebugMode.BaseUpdate()
 function void DebugMode.Enter()
 {
 	debug_mode.state += 0x200
-	u32[0xffffffca] = u32[A0 + 0x0c]
+	debug_mode.backup.mapping_offset = char.mapping_offset
 	if (char.base_state < 0x06)
 	{
-		u16[0xffffffce] = char.sprite_attributes
+		debug_mode.backup.sprite_attributes = char.sprite_attributes
 	}
 	D0.u16 = level.height.bitmask
-	u16[0xffffb014] &= D0.u16
+	u16[0xffffb000 + 0x14] &= D0.u16
 	camera.position.y.u16 &= D0.u16
 	player1.camera_lock = 0
 	u16[0xfffff7c8] = 0
@@ -186,14 +186,14 @@ function void DebugMode.EvaluateInput()
 		{
 			objA1.position.x.u16 = char.position.x.u16
 			objA1.position.y.u16 = char.position.y.u16
-			u8[A1 + 0x04] = char.render_flags
-			u8[A1 + 0x2a] = char.render_flags & 0x7f
+			objA1.render_flags = char.render_flags
+			u8[A1 + 0x2a] = char.render_flags & ~render_flag.VISIBLE
 
 			D0 = debug_mode.selection * 10
 			u8[A1 + 0x2c] = u8[A2 + D0.u16 + 4]
-			u32[A1] = u32[A2 + D0.u16]
+			objA1.update_address = u32[A2 + D0.u16]
 			u8[A1] = 0
-			if (u32[A1] == 0x01d566)	// S-Monitor
+			if (objA1.update_address == 0x01d566)	// S-Monitor
 			{
 				u8[A1 + 0x2c] = 0x09
 			}
@@ -216,8 +216,8 @@ function void DebugMode.EvaluateInput()
 	#endif
 
 		A1 = 0xffffb000
-		objA1.mapping_offset = u32[0xffffffca]
-		objA1.sprite_attributes = u16[0xffffffce]
+		objA1.mapping_offset = debug_mode.backup.mapping_offset
+		objA1.sprite_attributes = debug_mode.backup.sprite_attributes
 		DebugMode.ResetSonic()
 		u8[A1 + 0x1e] = 0x13
 		u8[A1 + 0x1f] = 0x09
@@ -234,9 +234,9 @@ function void DebugMode.ResetSonic()
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
 	u16[A1 + 0x1c] = 0
-	u8[A1 + 0x20] = 0
-	u8[A1 + 0x2a] &= 0x01
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x20] = char.state.RUNNING
+	u8[A1 + 0x2a] &= char.flag.FACING_LEFT
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0
 	u8[A1 + 0x3d] = 0
 }
@@ -324,7 +324,7 @@ function bool updateDebugModeInput(bool playingAsTails)
 
 		#if STANDALONE
 			// Stop vertical movement to make things better controllable
-			s16[0xffffb01a] = 0
+			s16[0xffffb000 + 0x1a] = 0
 		#endif
 	}
 
@@ -348,3 +348,21 @@ function bool updateDebugModeInput(bool playingAsTails)
 	}
 	return false
 }
+
+
+function bool debugModeRescue()
+{
+	// Get character out of damage state and into object placement mode
+	if (debug_mode.enabled && (control.pad1.pressed & CONTROL_B))
+	{
+		debug_mode.state = 1
+		player1.control_override = 0
+	#if STANDALONE
+		char.invuln.countdown = 120
+	#endif
+		return true
+	}
+
+	return false
+}
+

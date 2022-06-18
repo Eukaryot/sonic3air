@@ -38,7 +38,7 @@ function void fn018184()
 	objA0.base_state += 2
 	objA0.mapping_offset = (u8[A0 + 0x43] == 0) ? 0x02fcb2 : 0x02fce0
 	objA0.sprite_attributes = 0x045c
-	objA0.render_flags = (render_flag.VISIBLE | render_flag.WORLD)
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	objA0.box_size.x = 0x10
 	objA0.sprite_priority = 0x80
 
@@ -157,11 +157,11 @@ function void fn018466()
 {
 	A2 = u32[A0 + 0x40]
 	#if GAMEAPP
-		if (A2 == 0xffffb000 && u8[0xffffb005] <= 0x04)
+		if (A2 == 0xffffb000 && u8[0xffffb000 + 0x05] <= 0x04)
 		{
 			if (Game.getSetting(SETTING_UNDERWATER_AUDIO))
 			{
-				s16 diff = s16[0xffffb014] - s16(water.height.current)
+				s16 diff = s16[0xffffb000 + 0x14] - s16(water.height.current)
 				Game.setUnderwaterAudioEffect(clamp(diff - 8, 0, 64) * 0xff / 64)
 			}
 			else
@@ -252,7 +252,7 @@ function void fn018466()
 				A0 = A2
 				Character.LandingOnGroundNoSpindash()
 
-				objA0.state = 0x17
+				objA0.state = char.state.DROWNED
 				objA0.flags2a |= 0x02
 				u8[A0 + 0x0a] |= 0x80
 				objA0.velocity.y = 0
@@ -274,7 +274,7 @@ function void fn018466()
 	}
 	else
 	{
-		u8[A2 + 0x20] = 0x17
+		u8[A2 + 0x20] = char.state.DROWNED
 		--u16[A0 + 0x30]
 		if (u16[A0 + 0x30] == 0)
 		{
@@ -296,7 +296,7 @@ function void fn018466()
 	objA0.value3e = 8 + (getRandomNumber() & 0x0f)
 	if (allocDynamicObjectStd())
 	{
-		u32[A1] = objA0.update_address
+		objA1.update_address = objA0.update_address
 		objA1.position.x.u16 = u16[A2 + 0x10]
 		D0 = 6
 		if (u8[A2 + 0x2a] & char.flag.FACING_LEFT)

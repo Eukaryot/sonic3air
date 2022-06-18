@@ -28,7 +28,7 @@ function void fn02d5c6()
 	objA0.position.x.u16 = isLeft ? 0x50 : 0x1f0 + getScreenExtend() * 2
 	objA0.position.y.u16 = 0xf0
 	objA0.mapping_offset = 0x02edd0
-	objA0.sprite_attributes = 0x879c
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
 	objA0.sprite_priority = 0
 
 	objA0.update_address = 0x02d612
@@ -68,7 +68,7 @@ function void fn02d638()
 	u16[0xffffe380] = 0
 	if ((objA0.animation.sprite & 0x01) == 0)
 	{
-		D0.u8 = (control.pad1.pressed | control.pad2.pressed) & 0xf0
+		D0.u8 = (control.pad1.pressed | control.pad2.pressed) & (CONTROL_START | CONTROL_ABC)
 		if (D0.u8 == 0 && u16[A0 + 0x24] != 0)
 		{
 			--u16[A0 + 0x24]

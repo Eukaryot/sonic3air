@@ -30,7 +30,7 @@ function void fn025f6a()
 	D0.u16 &= 0x38
 	A1 = 0x025f2a + D0.s16
 	objA0.mapping_offset = 0x224de6
-	objA0.sprite_attributes = 0x43c3
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	u16[A0 + 0x30] = objA0.position.x.u16
@@ -174,7 +174,7 @@ function void fn0260d2()
 	else if (global.zone_act == 0x0600 && objA0.position.x.u16 == 0x1500 && objA0.position.y.u16 == 0x03c8)
 	{
 		// Unload if main character is below again, otherwise he's blocked
-		if (u16[0xffffb010] < 0x1540 && u16[0xffffb014] > 0x03d0)
+		if (u16[0xffffb000 + 0x10] < 0x1540 && u16[0xffffb000 + 0x14] > 0x03d0)
 		{
 			UnloadObject()
 		}
@@ -203,13 +203,14 @@ function void fn0625e2()
 //# address-hook(0x0625fa) end(0x062618)
 function void fn0625fa()
 {
-	u8[0xffffb02e] = 0
+	u8[0xffffb000 + 0x2e] = 0
 
 	// Reset palette after Knuckles is off screen
 	loadPaletteLine1(0x0a8fbc)
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the Knuckles theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 }

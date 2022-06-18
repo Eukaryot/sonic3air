@@ -16,10 +16,10 @@
 function void DynamicRing.Init()
 {
 	objA0.mapping_offset = 0x01a99a
-	objA0.sprite_attributes = 0xa6bc
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x100
-	u8[A0 + 0x28] = 0x47
+	objA0.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 	objA0.box_size.x = 8
 	objA0.box_size.y = 8
 	objA0.hitbox_extends.x = 8
@@ -39,7 +39,7 @@ function void DynamicRing.Update()
 		DynamicRing.UpdateAttraction()
 
 		// Lost lightning shield?
-		if ((u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING) == 0)
+		if ((u8[0xffffb000 + 0x2b] & char.bonus.SHIELD_LIGHTNING) == 0)
 		{
 		#if STANDALONE
 			objA0.update_address = global.inv_gravity ? 0x01a662 : 0x01a64a
@@ -112,7 +112,7 @@ function void DynamicRing.FadeOut()
 //# address-hook(0x01a938) end(0x01a98c)
 function void DynamicRing.UpdateAttraction()
 {
-	s16 dx = u16[0xffffb010] - objA0.position.x.u16
+	s16 dx = u16[0xffffb000 + 0x10] - objA0.position.x.u16
 	if (dx < 0)
 	{
 		D1.s16 = -0x30
@@ -131,7 +131,7 @@ function void DynamicRing.UpdateAttraction()
 	}
 	objA0.velocity.x += D1.s16
 
-	s16 dy = u16[0xffffb014] - objA0.position.y.u16
+	s16 dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 	#if STANDALONE
 		// Consider level wrap for ring collection
 		if (level.vertical_wrap == 0xff00)
@@ -144,7 +144,7 @@ function void DynamicRing.UpdateAttraction()
 			{
 				objA0.position.y.u16 -= level.height.bitmask
 			}
-			dy = u16[0xffffb014] - objA0.position.y.u16
+			dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 		}
 	#endif
 	if (dy < 0)
@@ -187,6 +187,7 @@ function void fn01a64a()
 function void fn01a662()
 {
 	// Targets:
+	//  - 0x01a67a	-> objA0.base_state = 0x00
 	//  - 0x01a7e8	-> objA0.base_state = 0x02
 	//  - 0x01a7c2	-> objA0.base_state = 0x04
 	//  - 0x01a7d6	-> objA0.base_state = 0x06
@@ -208,7 +209,7 @@ function void fn01a67a()
 #endif
 
 	A1 = A0
-	D5 = (u8[A0 + 0x3f] == 0) ? ring_counter : u16[0xfffffed0]
+	D5 = (u8[A0 + 0x3f] == 0) ? ring_counter : ring_counter.player2
 	D5.u16 = min(D5.u16, maxRings) - 1
 	D4.u16 = 0x288
 	SpillRings()
@@ -221,18 +222,18 @@ function void SpillRings()
 {
 	while (D5.s16 >= 0)
 	{
-		u32[A1] = D6
-		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
-		u8[A1 + 0x05] += 2
-		u8[A1 + 0x07] = 8
-		u16[A1 + 0x08] = 0x180
-		u16[A1 + 0x0a] = 0xa6bc
-		u32[A1 + 0x0c] = 0x01a99a
+		objA1.update_address = D6
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.base_state += 2
+		objA1.box_size.x = 8
+		objA1.sprite_priority = 0x180
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
+		objA1.mapping_offset = 0x01a99a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		u8[A1 + 0x1e] = 8
 		u8[A1 + 0x1f] = 8
-		u8[A1 + 0x28] = 0x47
+		objA1.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 
 		spilled_rings.speed = 0xff
 		if (D4.s16 >= 0)
@@ -307,15 +308,9 @@ function void fn01a75c()
 				}
 			}
 
-			if (spilled_rings.speed == 0)
+			if ((spilled_rings.speed == 0) || (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight()))
 			{
-				// Time over for this ring
-				UnloadObject()
-				return
-			}
-
-			if (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight())
-			{
+				// Time over for this ring, or it fell out of the lower level bounds
 				UnloadObject()
 				return
 			}
@@ -324,6 +319,25 @@ function void fn01a75c()
 
 	AddAsDynamicObject()
 	objA0.position.x.u16 -= u16[0xffffeebc]
+	DrawObject()
+}
+
+
+//# address-hook(0x01a7c2) end(0x01a7d2)
+function void fn01a7c2()
+{
+	objA0.base_state += 2
+	u8[A0 + 0x28] = 0
+	objA0.sprite_priority = 0x80
+	CollectRing()
+	fn01a7d6()
+}
+
+
+//# address-hook(0x01a7d6) end(0x01a7e0)
+function void fn01a7d6()
+{
+	Object.animationUpdate(0x01a992)
 	DrawObject()
 }
 
@@ -352,14 +366,13 @@ function void fn01a7e8()
 				if (D1.s16 < 0)
 				{
 					objA0.position.y.u16 -= D1.u16
-					D0.s16 = objA0.velocity.y >> 2
-					objA0.velocity.y -= D0.u16
-					objA0.velocity.y = -objA0.velocity.y
+					objA0.velocity.y = (objA0.velocity.y >> 2) - objA0.velocity.y
 				}
 			}
 
 			if ((spilled_rings.speed == 0) || (objA0.position.y.u16 > move_area.bottom.current + getScreenHeight()))
 			{
+				// Time over for this ring, or it fell out of the lower level bounds
 				UnloadObject()
 				return
 			}
@@ -367,26 +380,7 @@ function void fn01a7e8()
 	}
 
 	AddAsDynamicObject()
-	D0.u16 = u16[0xffffeebc]
-	objA0.position.x.u16 -= D0.u16
-	DrawObject()
-}
-
-
-//# address-hook(0x01a7c2) end(0x01a7e0)
-function void fn01a7c2()
-{
-	objA0.base_state += 2
-	u8[A0 + 0x28] = 0
-	objA0.sprite_priority = 0x80
-	CollectRing()
-	fn01a7d6()
-}
-
-//# address-hook(0x01a7d6)
-function void fn01a7d6()
-{
-	Object.animationUpdate(0x01a992)
+	objA0.position.x.u16 -= u16[0xffffeebc]
 	DrawObject()
 }
 
@@ -414,10 +408,10 @@ function void fn01a532()
 {
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x01a99a
-	objA0.sprite_attributes = (competition_mode.active) ? 0x63d2 :0xa6bc
+	objA0.sprite_attributes = (competition_mode.active) ? (sprite_attribute.PALETTE.LINE3 | 0x03d2) : (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06bc)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0100
-	u8[A0 + 0x28] = 0x47
+	objA0.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 	objA0.box_size.x = 0x08
 	fn01a568()
 }

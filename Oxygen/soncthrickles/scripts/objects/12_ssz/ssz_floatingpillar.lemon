@@ -12,12 +12,12 @@
 function void fn044ae0()
 {
 	objA0.update_address = 0x044b30
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.base_state = 0x01
 	objA0.box_size.y = 0x21
 	objA0.box_size.x = 0x10
 	objA0.sprite_priority = 0x0180
-	objA0.sprite_attributes = 0xe2e4
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x02e4)
 	objA0.mapping_offset = 0x046900
 	objA0.animation.sprite = 2
 	objA0.velocity.y = objA0.position.y.u16
@@ -33,7 +33,7 @@ function void fn044ae0()
 //# address-hook(0x044b30) end(0x044b8a)
 function void fn044b30()
 {
-	D0.u16 = objA0.flags2a & 0x18
+	D0.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u16 != 0)
 	{
 		objA0.base_state = 0
@@ -61,7 +61,7 @@ function void fn044b30()
 			}
 		}
 
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 		objA0.animation.sprite = 0
 		objA0.update_address = 0x044b90
 	}
@@ -96,11 +96,11 @@ function void fn044b90()
 function void fn044bcc()
 {
 	objA0.update_address = 0x044bf8
-	objA0.render_flags = 0x84
+	objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 	objA0.box_size.y = 0x08
 	objA0.box_size.x = 0x08
 	objA0.sprite_priority = 0x0200
-	objA0.sprite_attributes = 0xe2e4
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x02e4)
 	objA0.mapping_offset = 0x046900
 	fn044bf8()
 }

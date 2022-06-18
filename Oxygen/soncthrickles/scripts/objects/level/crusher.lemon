@@ -19,7 +19,7 @@ function void Crusher.Init()
 	{
 		// Marble Garden Zone: Large crusher
 		objA0.mapping_offset = 0x228246
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.box_size.x = 0x20
 		objA0.box_size.y = 0x28
 		objA0.sprite_priority = 0x0280
@@ -28,7 +28,7 @@ function void Crusher.Init()
 	{
 		// Launch Base Zone: Small crusher
 		objA0.mapping_offset = 0x228236
-		objA0.sprite_attributes = 0x4455
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0455)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x10
 		objA0.sprite_priority = 0x80

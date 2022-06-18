@@ -135,17 +135,17 @@ function void fn088062()
 		{
 			if (objA0.flags38 & 0x04)
 			{
-				control.player1 = control.pad1 & 0x8c8c
+				control.player1 = control.pad1 & 0x8c8c		// (CONTROL_START | CONTROL_LEFT | CONTROL_RIGHT), (CONTROL_START | CONTROL_LEFT | CONTROL_RIGHT)
 			}
 
 			D0.u16 = objA1.position.x.u16
 			D1.s16 = s8[A0 + 0x42]
 			D2.u8 = objA0.flags38 & 0x01
-			D3.u8 = u8[A1 + 0x04] & 0x01
+			D3.u8 = objA1.render_flags & render_flag.FLIP_X
 			D3.u8 ^= D2.u8
 			if (D3.u8 != 0)
 			{
-				objA0.render_flags ^= 0x01
+				objA0.render_flags ^= render_flag.FLIP_X
 				objA0.flags38 ^= 0x01
 				s8[A0 + 0x42] = -s8[A0 + 0x42]
 			}
@@ -229,7 +229,7 @@ function void fn08813a()
 	D0.u16 = objA0.position.y.u16 - objA1.position.y.u16
 	u8[A0 + 0x43] = D0.u8
 	objA0.flags38 &= ~0x01
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.flags38 |= 0x01
 	}

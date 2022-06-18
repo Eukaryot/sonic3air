@@ -19,17 +19,17 @@ function void MushroomHead.Init()
 
 	if (objA0.subtype2c & 0x01)
 	{
-		objA0.sprite_attributes = 0xc399
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0399)
 		u8[A0 + 0x36] = 0x14
 	}
 	else
 	{
-		objA0.sprite_attributes = 0xc369
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0369)
 	}
 
 	if (objA0.subtype2c & 0x40)
 	{
-		objA0.sprite_attributes &= 0x7fff
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 
 	objA0.mapping_offset = 0x03e1fe
@@ -69,12 +69,12 @@ function void MushroomHead.Update()
 
 	A1 = 0xffffb000
 	D5 = 0x30
-	D6 = 0x03
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03e172()
 
 	A1 = 0xffffb04a
 	D5 = 0x32
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn03e172()
 
 	DrawOrUnloadObject()
@@ -96,7 +96,9 @@ function void fn03e0de()
 //# address-hook(0x03e172) end(0x03e1d8)
 function void fn03e172()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		u16[A0 + D5.s16] = objA1.velocity.y
 		return

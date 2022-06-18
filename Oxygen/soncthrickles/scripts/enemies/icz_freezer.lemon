@@ -170,7 +170,7 @@ function bool fn08a916()
 		D0.u8 &= D2.u8
 		D0.u8 -= D3.u8
 		A1 = 0xffff0000 + u16[A0 + 0x46]
-		if (u8[A1 + 0x04] & 0x02)
+		if (objA1.render_flags & render_flag.FLIP_Y)
 		{
 			s8[A0 + 0x43] = -s8[A0 + 0x43]
 		}
@@ -252,7 +252,7 @@ function void fn08a7ae()
 	D0.u16 = objA1.position.x.u16
 	objA0.position.x.u16 = D0.u16
 	objA0.position.y.u16 = objA1.position.y.u16
-	objA0.render_flags |= (u8[A1 + 0x04] & 0x01)
+	objA0.render_flags |= (objA1.render_flags & render_flag.FLIP_X)
 
 	A2 = 0xffff0000 + u16[A0 + 0x46]
 	D1.u16 = 0x0200
@@ -302,7 +302,7 @@ function void fn08a9e0()
 			u16[A4 + 0x18] = 0
 			u16[A4 + 0x1a] = 0
 			u16[A4 + 0x1c] = 0
-			u8[A4 + 0x20] = 0x1a
+			u8[A4 + 0x20] = char.state.GOT_HURT
 			u8[A4 + 0x2a] |= 0x02
 			u8[A4 + 0x2e] = 0x81
 			u8[A4 + 0x3d] = 0
@@ -360,7 +360,7 @@ function void fn08a84c()
 	D1.u16 = objA0.position.y.u16
 	if (u8[A1 + 0x38] == CHARACTER_KNUCKLES)
 	{
-		D2 = (u8[A1 + 0x04] & 0x01) ? 4 : -4
+		D2 = (objA1.render_flags & render_flag.FLIP_X) ? 4 : -4
 		D0.u16 += D2.u16
 		D1.u16 += 2
 	}

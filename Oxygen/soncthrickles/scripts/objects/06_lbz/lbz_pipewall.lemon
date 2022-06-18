@@ -13,7 +13,7 @@ function void fn0273e4()
 {
 	objA0.hitbox_extends.y = 0x10
 	objA0.mapping_offset = 0x226854
-	objA0.sprite_attributes = 0x42e6
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e6)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x20
 	u32[A0 + 0x3c] = 0x0276d8
@@ -29,8 +29,8 @@ function void fn0273e4()
 //# address-hook(0x027424) end(0x027590)
 function void fn027424()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 
 	D1.u16 = 0x1b
 	D2.u16 = 0x20
@@ -38,7 +38,7 @@ function void fn027424()
 	D4.u16 = objA0.position.x.u16
 	fn01dc56()
 
-	D0.u8 = objA0.flags2a & 0x60
+	D0.u8 = objA0.flags2a & (object.flag.P1_PUSHING | object.flag.P2_PUSHING)
 	if (D0.u8 == 0)
 	{
 		DrawOrUnloadObject()
@@ -47,15 +47,15 @@ function void fn027424()
 
 	A1 = 0xffffb000
 	D1.u16 = u16[A0 + 0x30]
-	if (objA0.flags2a & 0x20 && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
+	if (objA0.flags2a & object.flag.P1_PUSHING && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
 	{
-		if (objA0.flags2a & 0x40)
+		if (objA0.flags2a & object.flag.P2_PUSHING)
 		{
-			objA0.flags2a &= ~0x40
+			objA0.flags2a &= ~object.flag.P2_PUSHING
 
 			A2 = 0xffffb04a
 			u8[A2 + 0x2a] &= ~char.flag.PUSHING
-			if (u8[A2 + 0x20] == 0x02)
+			if (u8[A2 + 0x20] == char.state.ROLLING)
 			{
 				u16[A2 + 0x18] = objA0.value32
 				u16[A2 + 0x1c] = u16[A2 + 0x18]
@@ -66,23 +66,23 @@ function void fn027424()
 	{
 		A1 = 0xffffb04a
 		D1.u16 = objA0.value32
-		if ((objA0.flags2a & 0x40) == 0 || u8[A1 + 0x20] != char.state.ROLLING || abs(D1.s16) < 0x0480)
+		if ((objA0.flags2a & object.flag.P2_PUSHING) == 0 || u8[A1 + 0x20] != char.state.ROLLING || abs(D1.s16) < 0x0480)
 		{
 			DrawOrUnloadObject()
 			return
 		}
 
-		if (objA0.flags2a & 0x40)	// Isn't this always true here?
+		if (objA0.flags2a & object.flag.P2_PUSHING)	// Isn't this always true here?
 		{
-			objA0.flags2a &= ~0x40
-			u8[0xffffb074] &= ~0x20
+			objA0.flags2a &= ~object.flag.P2_PUSHING
+			u8[0xffffb04a + 0x2a] &= ~char.flag.PUSHING
 		}
 	}
 
-	if (objA0.flags2a & 0x20)
+	if (objA0.flags2a & object.flag.P1_PUSHING)
 	{
-		objA0.flags2a &= ~0x20
-		u8[0xffffb02a] &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
+		u8[0xffffb000 + 0x2a] &= ~char.flag.PUSHING
 	}
 	objA1.velocity.x = D1.u16
 
@@ -205,16 +205,16 @@ function void fn0275f2()
 	{
 		if (!allocDynamicObjectAfterA0())
 		{
-			playSound(0x59)
+			playSound(SFX_COLLAPSE)
 			return
 		}
 
-		u32[A1] = D4
-		u32[A1 + 0x0c] = A3
-		u8[A1 + 0x04] = D5.u8
-		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.update_address = D4
+		objA1.mapping_offset = A3
+		objA1.render_flags = D5.u8
+		objA1.sprite_attributes = objA0.sprite_attributes
 		u8[A1 + 0x08] = u8[A0 + 0x08]
-		u8[A1 + 0x07] = objA0.box_size.x
+		objA1.box_size.x = objA0.box_size.x
 		objA1.velocity.x = u16[(A4+=2)-2]
 		objA1.velocity.y = u16[(A4+=2)-2]
 		u8[A1 + 0x22] = u8[(A5+=1)-1]
@@ -232,21 +232,21 @@ function void fn0275f2()
 	A3 = objA0.mapping_offset + u16[A3 + D0.s16]
 	D1.u16 = u16[(A3+=2)-2] - 1		// Only "A3 += 2" seems relevant here
 	D1 = 3
-	objA0.render_flags |= 0x20
+	objA0.render_flags |= render_flag.STATIC_MAPPING
 	D4 = objA0.update_address
 	D5.u8 = objA0.render_flags
 	A1 = A0
 
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = A3
-		u8[A1 + 0x04] = D5.u8
+		objA1.update_address = D4
+		objA1.mapping_offset = A3
+		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.sprite_attributes = objA0.sprite_attributes
 		u8[A1 + 0x08] = u8[A0 + 0x08]
-		u8[A1 + 0x07] = objA0.box_size.x
+		objA1.box_size.x = objA0.box_size.x
 		objA1.velocity.x = u16[(A4+=2)-2]
 		objA1.velocity.y = u16[(A4+=2)-2]
 
@@ -260,7 +260,7 @@ function void fn0275f2()
 		A3 += 6
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }
 
 
@@ -272,7 +272,7 @@ function void fn0299f4()
 {
 	if ((level.framecounter.low & 1) == 0)
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 
 	UpdateMovementSimple()
@@ -297,7 +297,7 @@ function void fn029abe()
 
 	if ((level.framecounter.low & 1) == 0)
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 
 	UpdateMovementSimple()

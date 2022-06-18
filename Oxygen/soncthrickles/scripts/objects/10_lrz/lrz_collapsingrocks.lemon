@@ -19,7 +19,7 @@ function void fn039c50()
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.mapping_offset = 0x039e7a
-	objA0.sprite_attributes = 0xc0d3
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x00d3)
 
 	D0.u16 = ((objA0.subtype2c & 0x0f) << 4) + 8
 	u8[A0 + 0x30] = D0.u8
@@ -48,7 +48,7 @@ function void fn039ca8()
 		--u8[A0 + 0x30]
 	}
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
 		u8[A0 + 0x32] = 0x01
@@ -75,11 +75,11 @@ function void fn039ce8()
 		return
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn039d1a()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn039d1a()
 
 	UnloadObject()
@@ -89,13 +89,15 @@ function void fn039ce8()
 //# address-hook(0x039d1a) end(0x039d3c)
 function void fn039d1a()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
-		objA0.flags2a &= ~(1 << D6.u8)
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] &= ~0x20
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x21] = 0x01
+		objA0.flags2a &= ~bit
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] &= ~char.flag.PUSHING
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x21] = char.state.RUNNING2
 	}
 }
 
@@ -149,15 +151,15 @@ function void fn039d84()
 		if (!allocDynamicObjectAfterA0())
 			break
 
-		u32[A1] = D4
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u8[A1 + 0x04] = D5.u8
+		objA1.update_address = D4
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
 		u8[A1 + 0x22] = u8[(A3+=1)-1]
-		u16[A1 + 0x0a] = objA0.sprite_attributes | 0x8000
-		u16[A1 + 0x08] = 0x80
-		u8[A1 + 0x07] = 0x20
+		objA1.sprite_attributes = objA0.sprite_attributes | sprite_attribute.PRIORITY
+		objA1.sprite_priority = 0x80
+		objA1.box_size.x = 0x20
 		u8[A1 + 0x30] = u8[(A3+=1)-1]
 		D0.u8 = u8[A1 + 0x22] & 0xfc
 		u8[A1 + 0x34] = D0.u8
@@ -173,5 +175,5 @@ function void fn039d84()
 		objA0.respawn_entry = 0
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }

@@ -39,12 +39,12 @@ function void fn048eec()
 
 	A1 = 0xffffb000
 	A2 = 0xfffff7b0
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn048f12()
 
 	A1 = 0xffffb04a
 	A2 = 0xfffff7b1
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn048f12()
 
 	CheckForUnloadObject()
@@ -54,7 +54,9 @@ function void fn048eec()
 //# address-hook(0x048f12) end(0x048f8e)
 function void fn048f12()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		fn048fa4()
 		return
@@ -93,6 +95,8 @@ function void fn048f12()
 //# address-hook(0x048fa4) end(0x049068)
 function void fn048fa4()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A1 + 0x2a] & 0x02)
 	{
 		objA1.velocity.y = 0
@@ -134,7 +138,7 @@ function void fn048fa4()
 
 			if (global.inv_gravity)
 			{
-				u8[A1 + 0x04] ^= 0x02
+				objA1.render_flags ^= render_flag.FLIP_Y
 			}
 
 			if ((level.framecounter.low & 0x0f) == 0)
@@ -153,16 +157,16 @@ function void fn048fa4()
 		}
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 
 	if (global.inv_gravity)
 	{
 		u8[A1 + 0x27] = 0x80 - u8[A1 + 0x27]
-		u8[A1 + 0x04] ^= 0x02
+		objA1.render_flags ^= render_flag.FLIP_Y
 	}
 }
 
@@ -178,12 +182,12 @@ function void fn04906a()
 
 	A1 = 0xffffb000
 	A2 = 0xfffff7b0
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn049090()
 
 	A1 = 0xffffb04a
 	A2 = 0xfffff7b1
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn049090()
 
 	CheckForUnloadObject()
@@ -193,7 +197,9 @@ function void fn04906a()
 //# address-hook(0x049090) end(0x0491d4)
 function void fn049090()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x20
 		D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + D4.u16
@@ -222,11 +228,11 @@ function void fn049090()
 			s16[A1 + 0x1c] = -objA1.velocity.y
 		}
 
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		u8[A1 + 0x2a] &= ~0x01
 		u8[A1 + 0x2e] |= 0x40
 		u8[A1 + 0x2e] |= 0x02
-		u16[A1 + 0x20] = 0x01
+		u16[A1 + 0x20] = char.state.RUNNING2
 		u8[A1 + 0x27] = 0
 		u8[A2 + 0x02] = 0
 	}
@@ -235,12 +241,12 @@ function void fn049090()
 	if (D1.u16 >= D5.u16)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] &= ~0x08
-		objA0.flags2a &= ~(1 << D6.u8)
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		objA0.flags2a &= ~bit
 		u8[A1 + 0x27] = 1
 		u8[A1 + 0x30] = 0
 		u8[A1 + 0x31] = 4
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		return
 	}
 
@@ -248,9 +254,9 @@ function void fn049090()
 		return
 
 	if (objA1.velocity.y >= 0)
-		u8[A1 + 0x04] |= render_flag.FLIP_Y
+		objA1.render_flags |= render_flag.FLIP_Y
 	else
-		u8[A1 + 0x04] &= ~render_flag.FLIP_Y
+		objA1.render_flags &= ~render_flag.FLIP_Y
 
 	D0.u8 = u8[A2]
 	LookupSinCos()
@@ -361,13 +367,13 @@ function void fn0492d4()
 		{
 			if ((u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
 			{
-				u8[A1 + 0x2a] |= 0x02
+				u8[A1 + 0x2a] |= char.flag.IN_AIR
 				objA1.velocity.x = 0
 				objA1.velocity.y = 0
 				u16[A1 + 0x1c] = 0
 				u16[A1 + 0x26] = 0
-				u8[A1 + 0x04] &= 0xfc
-				u16[A1 + 0x20] = 0x01
+				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+				u16[A1 + 0x20] = char.state.RUNNING2
 				u8[A1 + 0x2e] = 0x83
 
 				u8[A2] = 1

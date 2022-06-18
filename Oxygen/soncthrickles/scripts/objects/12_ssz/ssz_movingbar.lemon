@@ -12,11 +12,11 @@
 function void fn04536c()
 {
 	objA0.update_address = 0x04539e
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x04
 	objA0.box_size.x = 0x30
 	objA0.sprite_priority = 0x0180
-	objA0.sprite_attributes = 0x4348
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0348)
 	objA0.mapping_offset = 0x046ada
 	objA0.velocity.y = objA0.position.y.u16
 
@@ -96,7 +96,7 @@ function void fn0453e6()
 		if (u8[A1 + 0x2e] != 0 || u8[A1 + 0x05] >= 0x04 || debug_mode.state != 0)
 			return
 
-		playSound(0x4a)
+		playSound(SFX_GRAB)
 		u8[A2] = 0xff
 
 		objA1.position.y.u16 = objA0.position.y.u16 + D1.u16
@@ -104,7 +104,7 @@ function void fn0453e6()
 		u16[A1 + 0x1c] = 0
 		u8[A1 + 0x3d] = 0
 		u8[A1 + 0x2e] = 0x03
-		u8[A1 + 0x04] &= 0xfc
+		objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		u8[A1 + 0x20] = 0
 
 		D0.u16 = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? 0xe9 : 0xe5
@@ -132,14 +132,14 @@ function void fn0453e6()
 
 				D1.u16 = -0x200
 				D2.u16 = -0x400
-				if ((D0 & 0x0400) == 0)
+				if ((D0 & 0x0400) == 0)		// CONTROL_LEFT not held
 				{
 					objA0.sprite_priority = 0x0180
 					D1.s16 = -D1.s16
-					if ((D0 & 0x0800) == 0)
+					if ((D0 & 0x0800) == 0)		// CONTROL_RIGHT not held
 					{
 						D1 = 0
-						if (D0 & 0x0200)
+						if (D0 & 0x0200)	// CONTROL_DOWN held
 						{
 							D2 = 0
 						}
@@ -156,7 +156,7 @@ function void fn0453e6()
 				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 				u8[A1 + 0x40] = 0x01
 
-				playSound(0x62)
+				playSound(SFX_JUMP)
 			}
 		}
 	}

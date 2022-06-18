@@ -1042,7 +1042,7 @@ function void LevelTilesAnim.Competiton_DPZ()
 //# address-hook(0x028466) end(0x0284c4)
 function void fn028466()
 {
-	D1 = (u16[0xffffeee4] - u16[0xffffee70]) & 0x3f
+	D1 = (u16[0xffffeee4] - camera.background.x.u16.player2) & 0x3f
 	if (D1.u8 != u8[A3 + 0x01])
 	{
 		u8[A3 + 0x01] = D1.u8

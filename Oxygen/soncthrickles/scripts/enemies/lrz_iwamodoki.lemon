@@ -92,8 +92,7 @@ function void fn08fb76()
 	objA0.base_state = 0
 #endif
 
-	A2 = 0x08fbd6
-	SpawnProjectileChildObjects()
+	spawnProjectileChildObjects(0x08fbd6)
 }
 
 
@@ -105,7 +104,7 @@ function void fn08fb90()
 {
 	A1 = u32[A0 + 0x3e]
 	SetupObjectAttributesBasic()
-	objA0.flags2b |= 0x08
+	objA0.flags2b |= char.bonus.DEFLECTABLE
 	objA0.update_address = 0x086d5e
 	objA0.animation.sprite = 6 + (objA0.subtype2c >> 2)
 	fn085180()

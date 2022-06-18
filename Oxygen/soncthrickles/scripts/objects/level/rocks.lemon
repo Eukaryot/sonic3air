@@ -31,12 +31,12 @@ function void Rocks.Init()
 	if (global.zone_act == 0x0001)	// Angel Island Act 2
 	{
 		objA0.mapping_offset = 0x21dd64
-		objA0.sprite_attributes = 0x42e9
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	}
 	else if (global.zone_act == 0x1200)	// ?
 	{
 		objA0.mapping_offset = 0x21ddec
-		objA0.sprite_attributes = 0xe300
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0300)
 		objA0.animation.sprite = 0
 	}
 	else if (global.zone == 0x09)	// Lava Reef
@@ -44,19 +44,19 @@ function void Rocks.Init()
 		if (global.act == 0)
 		{
 			objA0.mapping_offset = 0x0203d8
-			objA0.sprite_attributes = 0x40d3
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x00d3)
 		}
 		else
 		{
 			objA0.mapping_offset = 0x02047a
-			objA0.sprite_attributes = 0x640d
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x040d)
 		}
 		objA0.animation.sprite += 4
 	}
 	else
 	{
 		objA0.mapping_offset = 0x21dcdc
-		objA0.sprite_attributes = 0x2333
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0333)
 	}
 
 	D2.u16 &= 0x0f
@@ -105,10 +105,10 @@ function void Rocks.Init()
 function void Rocks.Update()
 {
 	u16[A0 + 0x38] = score.bonus_counter
-	u8[A0 + 0x32] = u8[0xffffb020]
-	u8[A0 + 0x33] = u8[0xffffb06a]
-	objA0.value3a = u8[0xffffb02a]
-	objA0.value3b = u8[0xffffb074]
+	u8[A0 + 0x32] = u8[0xffffb000 + 0x20]
+	u8[A0 + 0x33] = u8[0xffffb04a + 0x20]
+	objA0.value3a = u8[0xffffb000 + 0x2a]
+	objA0.value3b = u8[0xffffb04a + 0x2a]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -123,10 +123,10 @@ function void Rocks.Update()
 
 	if (objA0.subtype2c & 0x01)
 	{
-		D0.u8 = objA0.flags2a & 0x18
+		D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 		if (D0.u8 != 0)
 		{
-			if (D0.u8 == 0x18)
+			if (D0.u8 == (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 			{
 				if (u8[A0 + 0x32] == 2 || u8[A0 + 0x33] == 2)
 				{
@@ -144,7 +144,7 @@ function void Rocks.Update()
 			}
 			else
 			{
-				D1.u8 = D0.u8 & 0x08
+				D1.u8 = D0.u8 & object.flag.P1_ON_OBJECT
 				if (D1.u8 == 0)
 				{
 					fn01fbe0()
@@ -191,8 +191,8 @@ function void fn01fba8()
 	else
 	{
 		u8[A1 + 0x05] = 2
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 }
 
@@ -205,14 +205,14 @@ function void fn01fbae()
 	u8[A1 + 0x1f] = 7
 	u8[A1 + 0x20] = 2
 	u8[A1 + 0x2a] |= 0x06
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 }
 
 
 //# address-hook(0x01fbe0) end(0x01fbf6)
 function void fn01fbe0()
 {
-	D0.u8 &= 0x10
+	D0.u8 &= object.flag.P2_ON_OBJECT
 	if (D0.u8 == 0 || u8[A0 + 0x33] != 2)
 	{
 		fn01fb4c()
@@ -230,7 +230,7 @@ function void fn01fbe0()
 function void fn01fbf8()
 {
 	score.bonus_counter = u16[A0 + 0x38]
-	objA0.flags2a &= 0xe7
+	objA0.flags2a &= ~(object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (competition_mode.active == 0)
 	{
 		objA0.update_address = 0x01fc16
@@ -347,8 +347,8 @@ function void fn01fcf2()
 //# address-hook(0x01fd08) end(0x01ff1a)
 function void fn01fd08()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	u16[A0 + 0x36] = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	u16[A0 + 0x36] = u16[0xffffb04a + 0x18]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -379,7 +379,7 @@ function void fn01fd08()
 						// Super form breaks walls even when going slow
 						canBreakWall = true
 					}
-					else if ((objA0.flags2a & 0x20) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
+					else if ((objA0.flags2a & object.flag.P1_PUSHING) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
 					{
 						// Normal Sonic and Tails need to quickly roll into a wall to break it (this includes the fire shield attack)
 						canBreakWall = (objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x480)
@@ -389,10 +389,10 @@ function void fn01fd08()
 
 			if (canBreakWall)
 			{
-				objA0.flags2a &= ~0x20
+				objA0.flags2a &= ~object.flag.P1_PUSHING
 				Rocks.BreakWall()
 
-				if (objA0.flags2a & 0x40)
+				if (objA0.flags2a & object.flag.P2_PUSHING)
 				{
 					// Check for second character
 					A1 = 0xffffb04a
@@ -400,7 +400,7 @@ function void fn01fd08()
 					{
 						objA1.velocity.x = u16[A0 + 0x36]
 						u16[A1 + 0x1c] = objA1.velocity.x
-						objA0.flags2a &= ~0x40
+						objA0.flags2a &= ~object.flag.P2_PUSHING
 						objA1.flags2a &= ~char.flag.PUSHING
 					}
 				}
@@ -413,7 +413,7 @@ function void fn01fd08()
 			A1 = 0xffffb04a
 			D1.u16 = u16[A0 + 0x36]
 
-			if (objA0.flags2a & 0x40)
+			if (objA0.flags2a & object.flag.P2_PUSHING)
 			{
 				if (u8[A1 + 0x38] == CHARACTER_KNUCKLES)
 				{
@@ -432,7 +432,7 @@ function void fn01fd08()
 
 			if (canBreakWall)
 			{
-				objA0.flags2a &= ~0x40
+				objA0.flags2a &= ~object.flag.P2_PUSHING
 				Rocks.BreakWall()
 				return
 			}
@@ -467,11 +467,11 @@ function void Rocks.BreakWall()
 		}
 
 		u16[A1 + 0x1c] = objA1.velocity.x
-		u8[A1 + 0x2a] &= ~0x20
+		u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 0x01)
 		{
 			u8[A1 + 0x2f] = 0x02
-			u8[A1 + 0x20] = 0x21
+			u8[A1 + 0x20] = char.state.KNUX_FALLING
 			if (objA1.velocity.x < 0)
 				u8[A1 + 0x2a] |= 0x01
 			else
@@ -516,7 +516,7 @@ function void Rocks.BreakWall()
 		}
 
 		u16[A1 + 0x1c] = objA1.velocity.x
-		u8[A1 + 0x2a] &= ~0x20
+		u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		fn01fcc8()
 		objA0.update_address = 0x01fcae
 		objA0.animation.sprite = 3
@@ -530,18 +530,18 @@ function void Rocks.BreakWall()
 //# address-hook(0x01ff1e) end(0x01ff46)
 function void fn01ff1e()
 {
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x08
-		u8[0xffffb02a] |= char.flag.IN_AIR
-		u8[0xffffb02a] &= ~char.flag.ON_OBJECT
+		objA0.flags2a &= ~object.flag.P1_ON_OBJECT
+		u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+		u8[0xffffb000 + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x10
-		u8[0xffffb074] |= char.flag.IN_AIR
-		u8[0xffffb074] &= ~char.flag.ON_OBJECT
+		objA0.flags2a &= ~object.flag.P2_ON_OBJECT
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 }
 
@@ -552,8 +552,8 @@ function void fn01ff1e()
 //# address-hook(0x01ff48) end(0x01fffe)
 function void fn01ff48()
 {
-	u16[A0 + 0x30] = u16[0xffffb01a]
-	u16[A0 + 0x36] = u16[0xffffb064]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x1a]
+	u16[A0 + 0x36] = u16[0xffffb04a + 0x1a]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -588,18 +588,18 @@ function void fn01ff48()
 		objA1.velocity.y = u16[A0 + 0x36]
 	}
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 
 	objA0.update_address = 0x01fc16
@@ -661,14 +661,14 @@ function void fn02015c_internal(bool doAllocation)
 		}
 
 		doAllocation = true
-		u32[A1] = D4
-		u32[A1 + 0x0c] = u32[A0 + 0x0c]
-		u8[A1 + 0x04] = D5.u8
+		objA1.update_address = D4
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-		u16[A1 + 0x0a] = u16[A0 + 0x0a] | 0x8000
-		u16[A1 + 0x08] = 0x80
-		u8[A1 + 0x07] = 0x18
+		objA1.sprite_attributes = objA0.sprite_attributes | sprite_attribute.PRIORITY
+		objA1.sprite_priority = 0x80
+		objA1.box_size.x = 0x18
 		objA1.velocity.x = u16[(A4+=2)-2]
 		objA1.velocity.y = u16[(A4+=2)-2]
 		u8[A1 + 0x22] = D6.u8
@@ -696,7 +696,7 @@ function void fn020002()
 	D4.u16 = objA0.position.x.u16
 	fn01dc56()
 
-	D0.u8 = objA0.flags2a & 0x08
+	D0.u8 = objA0.flags2a & object.flag.P1_ON_OBJECT
 	if (D0.u8 == 0)
 	{
 		DrawOrUnloadObject()
@@ -711,7 +711,7 @@ function void fn020002()
 	}
 	fn020056()
 
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
 		fn020056()
@@ -724,7 +724,7 @@ function void fn020002()
 //# address-hook(0x020056) end(0x020086)
 function void fn020056()
 {
-	u8[A1 + 0x2a] |= 0x04
+	u8[A1 + 0x2a] |= char.flag.ROLLING
 	u8[A1 + 0x1e] = 0x0e
 	u8[A1 + 0x1f] = 0x07
 	objA1.state = char.state.ROLLING
@@ -739,7 +739,7 @@ function void fn020056()
 function void fn020088()
 {
 	score.bonus_counter = u16[A0 + 0x38]
-	objA0.flags2a &= 0xe7
+	objA0.flags2a &= ~(object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	objA0.update_address = 0x01fc16
 	fn02011e()
 	fn01fc16()
@@ -749,19 +749,19 @@ function void fn020088()
 //# address-hook(0x0200a2) end(0x0200ca)
 function void fn0200a2()
 {
-	D3.u8 = objA0.flags2a & 0x60
+	D3.u8 = objA0.flags2a & (object.flag.P1_PUSHING | object.flag.P2_PUSHING)
 	if (D3.u8 != 0)
 	{
 		D2.u16 = objA0.position.x.u16
 
 		A1 = 0xffffb000
 		D0.u8 = objA0.value3a
-		D6 = 5
+		D6 = 5		// object.flag.P1_PUSHING
 		fn0200cc()
 
 		A1 = 0xffffb04a
 		D0.u8 = objA0.value3b
-		D6 = 6
+		D6 = 6		// object.flag.P2_PUSHING
 		fn0200cc()
 	}
 }
@@ -770,7 +770,7 @@ function void fn0200a2()
 //# address-hook(0x0200cc) end(0x02011c)
 function void fn0200cc()
 {
-	u32 bit = 1 << D6
+	u32 bit = (1 << D6)
 	if ((D3 & bit) && (D2.u16 < objA1.position.x.u16) && (D0 & 0x20))
 	{
 		--u16[A0 + 0x40]
@@ -829,15 +829,14 @@ function void fn0201de()
 
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u8[A1 + 0x04] = D5.u8
+		objA1.update_address = D4
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u16[A1 + 0x0a] |= 0x8000
-		u16[A1 + 0x08] = 0x80
-		u8[A1 + 0x07] = 0x20
+		objA1.sprite_attributes = objA0.sprite_attributes | sprite_attribute.PRIORITY
+		objA1.sprite_priority = 0x80
+		objA1.box_size.x = 0x20
 		objA1.velocity.x = u16[(A4+=2)-2]
 		objA1.velocity.y = u16[(A4+=2)-2]
 		u8[A1 + 0x22] = u8[(A3+=1)-1]
@@ -853,5 +852,5 @@ function void fn0201de()
 			break
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }

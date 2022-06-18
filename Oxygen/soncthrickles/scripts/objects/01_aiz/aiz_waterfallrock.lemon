@@ -27,7 +27,7 @@ function void AIZWaterfallRock.Init()
 	D1.u16 <<= D2
 	u16[A0 + 0x34] = D1.u16
 	objA0.mapping_offset = 0x2294b4
-	objA0.sprite_attributes = 0x4001
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x18
 	objA0.render_flags = render_flag.WORLD
@@ -61,23 +61,23 @@ function void AIZWaterfallRock.Update()
 		}
 	}
 
-	A1 = 0x02a3b0
-	Object.AlternativeAnimationUpdate()
+	Object.AlternativeAnimationUpdate(0x02a3b0)
 
 	if (objA0.animation.sprite == 5 && u8[A0 + 0x36] == 0)
 	{
 		u8[A0 + 0x36] = 1
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn water splashes effect
 			objA1.update_address = 0x02a36c
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
-			u32[A1 + 0x0c] = 0x2294c0
-			u16[A1 + 0x0a] = 0x62e9
-			u8[A1 + 0x07] = 0x28
-			u8[A1 + 0x06] = 0x20
-			u8[A1 + 0x04] = render_flag.WORLD
-			u16[A1 + 0x08] = 0x200
+			objA1.mapping_offset = 0x2294c0
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02e9)
+			objA1.box_size.x = 0x28
+			objA1.box_size.y = 0x20
+			objA1.render_flags = render_flag.WORLD
+			objA1.sprite_priority = 0x200
 			u16[A1 + 0x3c] = A0.u16
 		}
 	}

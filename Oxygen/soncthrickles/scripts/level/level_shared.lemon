@@ -183,7 +183,7 @@ function void fn04f3b6()
 {
 	while (D2.s16 >= 0)
 	{
-		if (u32[A1] != 0 && (u8[A1 + 0x04] & 0x04))
+		if (u32[A1] != 0 && (objA1.render_flags & render_flag.WORLD))
 		{
 			objA1.position.x.u16 -= D0.u16
 			objA1.position.y.u16 -= D1.u16
@@ -201,7 +201,7 @@ function void UpdateScreenShake()
 {
 	camera.screenshake.prev_offset = camera.screenshake.offset
 	D1 = 0
-	if (u8[0xffffb005] < 0x06 && camera.screenshake.state != 0)
+	if (u8[0xffffb000 + 0x05] < 0x06 && camera.screenshake.state != 0)
 	{
 		if ((camera.screenshake.state & 0x8000) == 0)
 		{
@@ -359,6 +359,12 @@ function void InitBossArea()
 }
 
 
+function void TriggerNextZone(u16 zoneAndAct)
+{
+	D0.u16 = zoneAndAct
+	TriggerNextZone()
+}
+
 //# address-hook(0x085e3a) end(0x085e50)
 function void TriggerNextZone()
 {
@@ -384,7 +390,7 @@ function void TriggerNextZone()
 
 	if (Game.getSetting(SETTING_MAINTAIN_SHIELDS))
 	{
-		global.shields_backup_1 = u8[0xffffb02b] & 0x71
+		global.shields_backup_1 = u8[0xffffb000 + 0x2b] & char.bonus.ALL_SHIELDS
 	}
 #endif
 

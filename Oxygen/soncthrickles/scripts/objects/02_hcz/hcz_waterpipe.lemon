@@ -17,7 +17,7 @@ function void fn02fef6()
 		return
 	}
 
-	if (u16[0xffffb014] < 0x0500)
+	if (u16[0xffffb000 + 0x14] < 0x0500)
 	{
 		UnloadObject()
 		return
@@ -39,10 +39,10 @@ function void fn02ff2a()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0300
 	objA0.mapping_offset = 0x22ee10
-	objA0.sprite_attributes = 0x4500
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0500)
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x20
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x01
 
 	A2 = A0 + 0x18
@@ -58,7 +58,7 @@ function void fn02ff2a()
 //# address-hook(0x02ff7c) end(0x030006)
 function void fn02ff7c()
 {
-	D0.u16 = u16[0xffffb010] - 0x60
+	D0.u16 = u16[0xffffb000 + 0x10] - 0x60
 	if (D0.u16 >= objA0.position.x.u16)
 	{
 		objA0.update_address = 0x03003c
@@ -73,18 +73,19 @@ function void fn02ff7c()
 			if (!allocDynamicObjectAfterA0())
 				break
 
+			// Wall bricks broken off by geyser
 			objA1.update_address = 0x03011a
-			u32[A1 + 0x0c] = 0x22ef0e
-			u16[A1 + 0x0a] = 0x4558
-			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.mapping_offset = 0x22ef0e
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0558)
+			objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 			objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 			objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-			u16[A1 + 0x08] = 0x0380
-			u8[A1 + 0x07] = 0x18
-			u8[A1 + 0x06] = 0x18
+			objA1.sprite_priority = 0x0380
+			objA1.box_size.x = 0x18
+			objA1.box_size.y = 0x18
 			objA1.velocity.x = u16[(A3+=2)-2]
 			objA1.velocity.y = u16[(A3+=2)-2]
-			u8[A1 + 0x22] = D1.u8
+			objA1.animation.sprite = D1.u8
 
 			--D1.s16
 		}
@@ -106,8 +107,8 @@ function void fn03003c()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x0301de
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		D0.u16 = level.framecounter
@@ -118,11 +119,11 @@ function void fn03003c()
 		objA1.position.x.u16 += D0.u16
 		objA1.position.y.u16 += 0x18
 		D1.u16 = (D1.u16 >> 4) & 0x03
-		u16[A1 + 0x0a] = (D1.u16 == 0) ? 0x045c : 0x4530
+		objA1.sprite_attributes = (D1.u16 == 0) ? 0x045c : (sprite_attribute.PALETTE.LINE2 | 0x0530)
 		u8[A1 + 0x20] = D1.u8
-		u16[A1 + 0x08] = 0x0380
-		u8[A1 + 0x07] = 0x18
-		u8[A1 + 0x06] = 0x18
+		objA1.sprite_priority = 0x0380
+		objA1.box_size.x = 0x18
+		objA1.box_size.y = 0x18
 		objA1.velocity.x = 0x0400
 		objA1.velocity.y = 0
 	}
@@ -181,12 +182,12 @@ function void fn03011a()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x03023e
-			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
-			u8[A1 + 0x06] = 0x18
-			u8[A1 + 0x07] = 0x18
-			u16[A1 + 0x08] = 0x0200
-			u16[A1 + 0x0a] = 0x2530
-			u32[A1 + 0x0c] = 0x22ee10
+			objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.box_size.y = 0x18
+			objA1.box_size.x = 0x18
+			objA1.sprite_priority = 0x0200
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0530)
+			objA1.mapping_offset = 0x22ee10
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = water.height.current
 			u8[A1 + 0x20] = 0x08
@@ -269,8 +270,7 @@ function void fn03023e()
 {
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
-		A1 = 0x030260
-		Object.AlternativeAnimationUpdate()
+		Object.AlternativeAnimationUpdate(0x030260)
 		if (objA0.base_state == 0)
 		{
 			DrawObject()
@@ -285,14 +285,14 @@ function void fn03023e()
 //# address-hook(0x030294) end(0x0302e0)
 function void fn030294()
 {
-	u16 dx = u16[0xffffb010] - objA0.position.x.u16 + 0x30
-	u16 dy = u16[0xffffb014] - objA0.position.y.u16 + 0x40
+	u16 dx = u16[0xffffb000 + 0x10] - objA0.position.x.u16 + 0x30
+	u16 dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16 + 0x40
 	if (dx < 0x60 && dy < 0x10)
 	{
 		Kosinski.addToDMAQueue(0x391394, 0xa000)
 		objA0.animation.sprite = 1
-		u8[0xffffb02e] = 0x81
-		u8[0xffffb078] = 0x81
+		u8[0xffffb000 + 0x2e] = 0x81
+		u8[0xffffb04a + 0x2e] = 0x81
 
 		objA0.update_address = 0x0302e6
 		fn0302e6()
@@ -308,15 +308,15 @@ function void fn0302e6()
 {
 	if (kosinski.waiting_modules != 0)
 	{
-		u16[0xffffb014] -= 8
-		u16[0xffffb05e] -= 8
+		u16[0xffffb000 + 0x14] -= 8
+		u16[0xffffb04a + 0x14] -= 8
 		return
 	}
 
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0300
 	objA0.mapping_offset = 0x22ee10
-	objA0.sprite_attributes = 0x4500
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0500)
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x60
 	u16[A0 + 0x30] = 0x60
@@ -325,8 +325,8 @@ function void fn0302e6()
 	// Thank to Fred Bronze for pointing out that this is not needed at all! (https://s3unlocked.blogspot.de/2017/12/sonic-eraser.html)
 	if (!Game.getSetting(SETTING_HCZ_WATERPIPE))
 	{
-		u8[0xffffb020] = 0x1c
-		u8[0xffffb06a] = 0x1c
+		u8[0xffffb000 + 0x20] = char.state.DISAPPEARED
+		u8[0xffffb04a + 0x20] = char.state.DISAPPEARED
 	}
 
 	objA0.update_address = 0x030338
@@ -340,7 +340,7 @@ function void fn030338()
 	if (Game.getSetting(SETTING_HCZ_WATERPIPE))
 	{
 		// Move characters to the center, to avoid otherwise possible clipping at the border
-		for (u32 i = 0xffffb010; i <= 0xffffb05a; i += 0x4a)
+		for (u32 i = 0xffffb000 + 0x10; i <= 0xffffb04a + 0x10; i += 0x4a)
 		{
 			s16 dx = s16(u16[i] - objA0.position.x.u16)
 			if (dx < -8)
@@ -356,12 +356,12 @@ function void fn030338()
 		objA0.position.y.u16 -= 8
 	}
 
-	u16[0xffffb014] -= 8
-	u16[0xffffb05e] -= 8
+	u16[0xffffb000 + 0x14] -= 8
+	u16[0xffffb04a + 0x14] -= 8
 	if (u16[A0 + 0x30] <= 0x28)
 	{
-		u8[0xffffb020] = 0x1a
-		u8[0xffffb06a] = 0x1a
+		u8[0xffffb000 + 0x20] = char.state.GOT_HURT
+		u8[0xffffb04a + 0x20] = char.state.GOT_HURT
 		objA0.update_address = 0x03041a
 
 		playSound(0x57)
@@ -377,14 +377,14 @@ function void fn030338()
 				break
 
 			objA1.update_address = 0x03011a
-			u32[A1 + 0x0c] = 0x22ef0e
-			u16[A1 + 0x0a] = 0x4558
-			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.mapping_offset = 0x22ef0e
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0558)
+			objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 			objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 			objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-			u16[A1 + 0x08] = 0x0280
-			u8[A1 + 0x07] = 0x18
-			u8[A1 + 0x06] = 0x18
+			objA1.sprite_priority = 0x0280
+			objA1.box_size.x = 0x18
+			objA1.box_size.y = 0x18
 			objA1.velocity.x = u16[(A3+=2)-2]
 			objA1.velocity.y = u16[(A3+=2)-2]
 			u8[A1 + 0x22] = D1.u8
@@ -422,8 +422,8 @@ function void fn03041a()
 		}
 	}
 
-	u16[0xffffb014] -= 0x0a
-	u16[0xffffb05e] -= 0x0a
+	u16[0xffffb000 + 0x14] -= 0x0a
+	u16[0xffffb04a + 0x14] -= 0x0a
 	UpdateMovementStraightSimple()
 	objA0.velocity.y += 0x48
 
@@ -458,16 +458,16 @@ function void fn03041a()
 function void fn0304da()
 {
 	objA1.update_address = 0x0301de
-	u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
-	u8[A1 + 0x06] = 0x18
-	u8[A1 + 0x07] = 0x18
-	u16[A1 + 0x08] = 0x0380
-	u32[A1 + 0x0c] = objA0.mapping_offset
+	objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
+	objA1.box_size.y = 0x18
+	objA1.box_size.x = 0x18
+	objA1.sprite_priority = 0x0380
+	objA1.mapping_offset = objA0.mapping_offset
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16 - 0x50
 
 	D2.u16 = (D2.u16 >> 4) & 0x03
-	u16[A1 + 0x0a] = (D2.u16 == 0) ? 0x045c : 0x4530
+	objA1.sprite_attributes = (D2.u16 == 0) ? 0x045c : (sprite_attribute.PALETTE.LINE2 | 0x0530)
 	u8[A1 + 0x20] = D2.u8
 }
 

@@ -16,7 +16,7 @@
 function void fn03f868()
 {
 	objA0.mapping_offset = 0x03fb70
-	objA0.sprite_attributes = 0x43cd
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03cd)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
@@ -36,12 +36,12 @@ function void fn03f868()
 			objA1.position.x.u16 -= 0x40
 
 		objA1.position.y.u16 -= 0x18
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u8[A1 + 0x04] |= 0x04
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u8[A1 + 0x07] = 0x20
-		u8[A1 + 0x06] = 0x0c
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.render_flags |= render_flag.WORLD
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.box_size.x = 0x20
+		objA1.box_size.y = 0x0c
 		u16[A1 + 0x46] = A0.u16
 		u16[A1 + 0x34] = 0x18
 		u16[A0 + 0x46] = A1.u16
@@ -54,12 +54,12 @@ function void fn03f868()
 			u16[A1 + 0x2e] = objA0.position.x.u16
 			u16[A1 + 0x30] = objA1.position.y.u16
 			objA1.position.y.u16 -= 0x14
-			u32[A1 + 0x0c] = objA0.mapping_offset
-			u16[A1 + 0x0a] = 0x2420
-			u8[A1 + 0x04] |= 0x04
-			u16[A1 + 0x08] = objA0.sprite_priority
-			u8[A1 + 0x07] = 0x10
-			u8[A1 + 0x06] = 0x08
+			objA1.mapping_offset = objA0.mapping_offset
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0420)
+			objA1.render_flags |= render_flag.WORLD
+			objA1.sprite_priority = objA0.sprite_priority
+			objA1.box_size.x = 0x10
+			objA1.box_size.y = 0x08
 			u8[A1 + 0x22] = 0x01
 			u16[A1 + 0x46] = A0.u16
 		}
@@ -92,10 +92,10 @@ function void fn03f996()
 	D2.u16 = u16[A0 + 0x36]
 	if (objA0.value32 == 0)
 	{
-		if (objA0.flags2a & 0x18)
+		if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 			D2 = 0
 
-		D0.u8 = objA0.flags2a & 0x18
+		D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 		if (D0.u8 != 0 && u16[A0 + 0x34] != 0)
 		{
 			u8[A0 + 0x32] = 1
@@ -136,11 +136,11 @@ function void fn03f996()
 		}
 
 		A2 = 0xffffb000
-		D6 = 3
+		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn03fa26()
 
 		A2 = 0xffffb04a
-		D6 = 4
+		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn03fa26()
 	}
 	else
@@ -157,11 +157,11 @@ function void fn03f996()
 		objA0.value32 = 0
 
 		A2 = 0xffffb000
-		D6 = 3
+		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn03fa5a()
 
 		A2 = 0xffffb04a
-		D6 = 4
+		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn03fa5a()
 	}
 }
@@ -169,7 +169,9 @@ function void fn03f996()
 
 function void fn03fa26()
 {
-	if (u8[A1 + 0x2a] & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (u8[A1 + 0x2a] & bit)
 	{
 		u8[A2 + 0x05] = 0x02
 		u16[A2 + 0x1a] = (u16[A0 + 0x3a] < 0x0900) ? 0xf300 : 0xf180
@@ -186,7 +188,9 @@ function void fn03fa26()
 
 function void fn03fa5a()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		u8[A2 + 0x05] = 0x02
 		u16[A2 + 0x1a] = 0xf300

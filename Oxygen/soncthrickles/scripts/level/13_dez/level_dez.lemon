@@ -135,10 +135,10 @@ function void fn0593ec()
 
 		D0.u16 = 0x3600
 		D1.u16 = -0x400
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb014] -= D1.u16
-		u16[0xffffb05a] -= D0.u16
-		u16[0xffffb05e] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb000 + 0x14] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x14] -= D1.u16
 
 		fn04f3b0()
 

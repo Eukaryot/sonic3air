@@ -114,7 +114,7 @@ function void fn087ae6()
 {
 	Object.AnimationProgressByLocalA1()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u32[A1] != 0x087a2a)
+	if (objA1.update_address != 0x087a2a)
 	{
 		fn087b56()
 		if (_equal())
@@ -123,7 +123,7 @@ function void fn087ae6()
 			D0.u16 = objA0.position.x.u16
 			D1.u16 = 0x0200
 			objA0.render_flags |= render_flag.FLIP_X
-			if (D0.u16 < u16[0xffffb010])
+			if (D0.u16 < u16[0xffffb000 + 0x10])
 			{
 				D1.s16 = -D1.s16
 				objA0.render_flags &= ~render_flag.FLIP_X
@@ -134,7 +134,7 @@ function void fn087ae6()
 	}
 
 	objA0.render_flags &= ~render_flag.FLIP_X
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.render_flags |= render_flag.FLIP_X
 	}

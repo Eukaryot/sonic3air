@@ -64,7 +64,7 @@ function void fn086dae()
 function void fn068962()
 {
 	objA0.mapping_offset = 0x083ffc
-	objA0.sprite_attributes = 0x84d2
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04d2)
 	u32[A0 + 0x30] = 0x069164
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 	if (objA0.subtype2c == 0x06)
@@ -86,8 +86,7 @@ function void fn086dc6()
 		return
 
 	playSound(0x4d)
-	A2 = 0x086e2a
-	SpawnProjectileChildObjects()
+	spawnProjectileChildObjects(0x086e2a)
 	if (_equal())
 	{
 		++objA0.value39

@@ -12,12 +12,12 @@
 function void fn025d54()
 {
 	objA0.mapping_offset = 0x224b88
-	objA0.sprite_attributes = 0x235f
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x035f)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 1
 #if STANDALONE
 	// This seems to prevent characters balancing on the edges
@@ -95,12 +95,12 @@ function void fn025d9c()
 		else
 		{
 			u8[A3] = 1
-			if (objA0.flags2a & 0x08)
+			if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 			{
 				A1 = 0xffffb000
 				fn025ea6()
 			}
-			if (objA0.flags2a & 0x10)
+			if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 			{
 				A1 = 0xffffb04a
 				fn025ea6()
@@ -137,9 +137,9 @@ function void fn025ea6()
 	objA1.velocity.x = D1.u16
 	D0.s32 = (s32(D0.s16) * -0x0700) >> 8
 	objA1.velocity.y = D0.u16
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
-	u8[A1 + 0x2a] &= ~0x20
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x40] = 0
 	u8[A1 + 0x3d] = 0
 	playSound(0x7b)

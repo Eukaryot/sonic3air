@@ -42,7 +42,7 @@ function void fn02c8b8()
 		objA0.base_state = D0.u8
 		D0.u16 -= 0x14
 		objA0.sprite_attributes = u16[0x02c8a2 + D0.s16]
-		u32[A0 + 0x0c] = u32[0x02c876 + D0.s16 * 2]
+		objA0.mapping_offset = u32[0x02c876 + D0.s16 * 2]
 
 		A1 = 0x02c84a
 		objA0.value32 = u16[A1 + D0.s16]
@@ -69,7 +69,7 @@ function void fn02c8b8()
 		A1 = 0x02c7ea + D0.u16
 		objA0.value32 = u16[(A1+=2)-2]
 		u16[A0 + 0x34] = u16[(A1+=2)-2]
-		u32[A0 + 0x0c] = u32[(A1+=4)-4]
+		objA0.mapping_offset = u32[(A1+=4)-4]
 		objA0.hitbox_extends.y = 0x0c
 		objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 		objA0.sprite_priority = 0x300
@@ -81,11 +81,12 @@ function void fn02c8b8()
 		{
 			if (allocDynamicObjectStd())
 			{
+				// Spawn floating points display
 				objA1.update_address = 0x02cce0
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16
 				D0.u16 = objA0.value3e >> 1
-				u8[A1 + 0x22] = D0.u8
+				objA1.animation.sprite = D0.u8
 			}
 		}
 		else
@@ -210,7 +211,7 @@ function void fn02ca7c()
 //# address-hook(0x02cae4)
 function void fn02cae4()
 {
-	D0.u16 = objA0.position.x.u16 - u16[0xffffb010]
+	D0.u16 = objA0.position.x.u16 - u16[0xffffb000 + 0x10]
 	if (D0.s16 >= 0)
 	{
 		D0.u16 -= 0x180

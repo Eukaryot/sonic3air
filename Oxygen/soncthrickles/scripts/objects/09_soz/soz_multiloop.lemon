@@ -15,8 +15,8 @@
 function void fn01d106()
 {
 	objA0.mapping_offset = 0x01d05a
-	objA0.sprite_attributes = 0x26bc
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x06bc)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x40
 	objA0.sprite_priority = 0x0280
@@ -168,9 +168,9 @@ function void fn01d1e2()
 		}
 
 		if (D0 & 0x20)
-			u16[A1 + 0x0a] |= 0x8000
+			objA1.sprite_attributes |= sprite_attribute.PRIORITY
 		else
-			u16[A1 + 0x0a] &= 0x7fff
+			objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 	else
 	{
@@ -239,9 +239,9 @@ function void fn01d1e2()
 		}
 
 		if (D0 & 0x40)
-			u16[A1 + 0x0a] |= 0x8000
+			objA1.sprite_attributes |= sprite_attribute.PRIORITY
 		else
-			u16[A1 + 0x0a] &= 0x7fff
+			objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 }
 
@@ -339,9 +339,9 @@ function void fn01d3b8()
 		}
 
 		if (D0 & 0x20)
-			u16[A1 + 0x0a] |= 0x8000
+			objA1.sprite_attributes |= sprite_attribute.PRIORITY
 		else
-			u16[A1 + 0x0a] &= 0x7fff
+			objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 	else
 	{
@@ -410,8 +410,8 @@ function void fn01d3b8()
 		}
 
 		if (D0 & 0x40)
-			u16[A1 + 0x0a] |= 0x8000
+			objA1.sprite_attributes |= sprite_attribute.PRIORITY
 		else
-			u16[A1 + 0x0a] &= 0x7fff
+			objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 }

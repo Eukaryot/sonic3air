@@ -23,7 +23,7 @@ function void fn06aeb6()
 	if (InitBoss(0x06aecc))
 		return
 
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 #if STANDALONE
@@ -194,7 +194,7 @@ function void fn06b064()
 	if (s16[A0 + 0x30] < 0)
 	{
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		u16[A0 + 0x30] = 0x013f
 	}
 }
@@ -245,7 +245,7 @@ function void fn06b0cc()
 function void fn06b0e8()
 {
 	objA0.update_address = 0x06b154
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	level.wait_for_results = 0xff
 	level.boss_encounter = 0
 	screenmover_target.right = level.bossarea.left + 0x0180 + getScreenExtend() * 2
@@ -267,10 +267,11 @@ function void fn06b0e8()
 #endif
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
@@ -297,7 +298,7 @@ function void fn06b154()
 	control.tails = 0
 	player1.control_override = 0xff
 	player2.control_override = 0xff
-	u8[0xffffb02e] = 0x80
+	u8[0xffffb000 + 0x2e] = 0x80
 
 	stopCharacterWinPose(0xffffb000)
 	stopCharacterWinPose(0xffffb04a)
@@ -351,7 +352,7 @@ function void fn06b1d8()
 		return
 
 	objA0.base_state = 0x04
-	u8[A0 + 0x28] = 0xa6
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.16x4)
 	u32[A0 + 0x30] = 0x06bdf4
 	objA0.countdown_callback = 0x06b212
 }
@@ -361,7 +362,7 @@ function void fn06b1d8()
 function void fn06b204()
 {
 	playSoundRepeatedly(0xc0)
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 
@@ -396,7 +397,7 @@ function void fn06b22a()
 //# address-hook(0x06b25c) end(0x06b25c)
 function void fn06b25c()
 {
-	fn084780()
+	Object.AnimationProgressByLocalA1.SlowDown()
 }
 
 
@@ -830,7 +831,7 @@ function void fn06b6ba()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u8[A1 + 0x38] &= ~0x02
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}
@@ -876,7 +877,7 @@ function void fn06b71c()
 //# address-hook(0x06b734) end(0x06b734)
 function void fn06b734()
 {
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 
@@ -1000,7 +1001,7 @@ function void fn06b882()
 	D0.u16 = objA0.position.y.u16 - 0x60
 	if (D0.u16 < objA1.position.y.u16)
 	{
-		u8[A1 + 0x20] = 0x1a
+		u8[A1 + 0x20] = char.state.GOT_HURT
 		u8[A1 + 0x2e] = 0x81
 		objA0.update_address = 0x06b8c8
 		objA0.countdown_value = 0x5f
@@ -1041,8 +1042,7 @@ function void fn06b8c8()
 		return
 	}
 
-	D0.u16 = 0x0200
-	TriggerNextZone()
+	TriggerNextZone(0x0200)
 	UnloadObject()
 }
 
@@ -1213,7 +1213,7 @@ function void fn06bada()
 	u8[A0 + D4.s16] = 0xff
 	u8[A2 + 0x2a] |= 0x02
 	u8[A2 + 0x2e] = 0x01
-	u8[A2 + 0x20] = 0x18
+	u8[A2 + 0x20] = char.state.DIED
 	u8[A2 + 0x3d] = 0
 	u16[A2 + 0x18] = 0
 	u16[A2 + 0x1a] = 0
@@ -1225,9 +1225,9 @@ function void fn06bada()
 function void fn06bb02()
 {
 	u8[A0 + D4.s16] = 0
-	u8[A2 + 0x2a] |= 0x02
+	u8[A2 + 0x2a] |= char.flag.IN_AIR
 	u8[A2 + 0x2e] = 0
-	u8[A2 + 0x20] = 0x02
+	u8[A2 + 0x20] = char.state.ROLLING
 	u16[A2 + 0x1a] = -0x200
 }
 
@@ -1394,14 +1394,14 @@ function void fn06bcb2()
 			break
 
 		objA1.update_address = 0x03011a
-		u32[A1 + 0x0c] = 0x22ef0e
-		u16[A1 + 0x0a] = 0x43c3
-		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.mapping_offset = 0x22ef0e
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA1.position.x.u16 = D2.u16 + s8[(A3+=1)-1]
 		objA1.position.y.u16 = D3.u16 + s8[(A3+=1)-1]
-		u16[A1 + 0x08] = 0x0280
-		u8[A1 + 0x07] = 0x18
-		u8[A1 + 0x06] = 0x18
+		objA1.sprite_priority = 0x0280
+		objA1.box_size.x = 0x18
+		objA1.box_size.y = 0x18
 		objA1.velocity.x = u16[(A3+=2)-2]
 		objA1.velocity.y = u16[(A3+=2)-2]
 		u8[A1 + 0x22] = D1.u8
@@ -1412,10 +1412,16 @@ function void fn06bcb2()
 
 
 
-//# address-hook(0x084780) end(0x0847e4)
-function void fn084780()
+//# address-hook(0x084780) end(0x084780)
+function void Object.AnimationProgressByLocalA1.SlowDown()		// "Animate_RawGetSlower" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
+	Object.AnimationProgress.SlowDown(u32[A0 + 0x30])
+}
+
+
+//# address-hook(0x084784) end(0x0847e4)
+function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower" in skdisasm
+{
 	if ((objA0.flags38 & 0x20) == 0)
 	{
 		objA0.countdown_value = 0
@@ -1455,6 +1461,12 @@ function void fn084780()
 
 	A2 = objA0.countdown_callback
 	call A2
+}
+
+function void Object.AnimationProgress.SlowDown(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.SlowDown()
 }
 
 

@@ -37,6 +37,7 @@ function void fn081a74()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the upper border
 			objA1.update_address = 0x084aa4
 		}
 
@@ -46,6 +47,7 @@ function void fn081a74()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the lower border
 			objA1.update_address = 0x084ad2
 		}
 
@@ -209,8 +211,7 @@ function void fn081ca4()
 	SaveGameOnLevelFinished()
 
 	// Start outro
-	D0.u16 = 0x0d01
-	TriggerNextZone()
+	TriggerNextZone(0x0d01)
 
 	UnloadObject()
 }
@@ -524,7 +525,7 @@ function void fn082dce()
 		}
 
 		objA0.state = 0x20
-		u8[0xffffb034] = 0x5a
+		u8[0xffffb000 + 0x34] = 0x5a
 		playSound(0x6e)
 		fn082c6a()
 
@@ -620,7 +621,7 @@ function void fn08307c()
 
 	objA0.countdown_value = 0x82
 	D0.u16 = objA0.position.y.u16 + 0x68
-	if (D0.u16 < u16[0xffffb014])
+	if (D0.u16 < u16[0xffffb000 + 0x14])
 	{
 		playSound(0x98)
 		spawnSimpleChildObjects(0x083288)

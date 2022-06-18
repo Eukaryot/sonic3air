@@ -80,8 +80,9 @@ function void fn075220()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 
 	Kosinski.addToDMAQueue(0x1680ca, 0x75a0)
@@ -182,7 +183,7 @@ function void fn075356()
 #endif
 
 	objA0.countdown_callback = 0x0753a4
-	u16[0xffffee0e] = 0x6000
+	move_area.right.target = 0x6000
 	screenmover_target.right = 0x6000
 
 	if (allocDynamicObjectStd())
@@ -579,7 +580,7 @@ function void fn0757a0()
 function void fn0757c0()
 {
 	objA0.update_address = 0x0757d6
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	setupObjectAttributesMost(0x075e5e)
 }
 
@@ -857,7 +858,7 @@ function void fn075a48()
 function void fn075a6c()
 {
 	UpdateMovementStraightSimple()
-	if (u8[A0 + 0x04] & 0x80)
+	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		DrawObject()
 	}
@@ -885,7 +886,7 @@ function void fn075a94()
 	if (u16[0xfffffaa4] != 0)
 	{
 		A1 = 0xffff0000 + u16[0xfffffaa4]
-		if (u32[A1] == 0x0751ca)
+		if (objA1.update_address == 0x0751ca)
 		{
 			if (!(objA0.render_flags & render_flag.VISIBLE))
 			{

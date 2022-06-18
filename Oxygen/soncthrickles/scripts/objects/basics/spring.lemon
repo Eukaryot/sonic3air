@@ -104,7 +104,7 @@ function void SpringVertical.initInternal(bool flipY)
 			objA0.mapping_offset = 0x023904
 			objA0.sprite_attributes = 0x0391
 			if (global.zone == 0x12)
-				objA0.sprite_attributes |= 0x8000
+				objA0.sprite_attributes |= sprite_attribute.PRIORITY
 		}
 		else
 		{
@@ -154,10 +154,10 @@ function void Spring.SharedInit()
 	{
 		// Yellow spring
 		u16[A0 + 0x30] = -0x0a00
-		u32[A0 + 0x0c] = (competition_mode.active) ? 0x023912 : 0x023772
+		objA0.mapping_offset = (competition_mode.active) ? 0x023912 : 0x023772
 
 	#if STANDALONE
-		// Make in springs in HPZ just a little bit stronger
+		// Make springs in HPZ just a little bit stronger
 		if (global.zone_act == 0x1601)
 		{
 			u16[A0 + 0x30] = -0x0ac0
@@ -282,9 +282,9 @@ function void fn022f46()
 	push(D1)
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dccc()
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		SpringVertical.ApplyToCharacter()
 	}
@@ -295,9 +295,9 @@ function void fn022f46()
 	D4 = pop()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn01dccc()
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		SpringVertical.ApplyToCharacter()
 	}
@@ -379,7 +379,7 @@ function void fn023374()
 	push(D2)
 	push(D1)
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dccc()
 
 	if (D4.u16 == -2)
@@ -393,7 +393,7 @@ function void fn023374()
 	D3 = pop()
 	D4 = pop()
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn01dccc()
 
 	if (D4.u16 == -2)
@@ -485,7 +485,7 @@ function void fn0230de()
 	push(D2)
 	push(D1)
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dccc()
 
 	D6 = (D6 << 16) + (D6 >> 16)
@@ -509,7 +509,7 @@ function void fn0230de()
 	D3 = pop()
 	D4 = pop()
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn01dccc()
 
 	D6 = (D6 << 16) + (D6 >> 16)
@@ -622,8 +622,8 @@ function void fn0231be()
 		u8[A1 + 0x47] = 0x0f
 	}
 
-	objA0.flags2a &= ~0x20
-	objA0.flags2a &= ~0x40
+	objA0.flags2a &= ~object.flag.P1_PUSHING
+	objA0.flags2a &= ~object.flag.P2_PUSHING
 	objA1.flags2a &= ~char.flag.PUSHING
 	u8[A1 + 0x2f] = 0
 
@@ -700,10 +700,10 @@ function void SpringDiagonal.Update()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 
 	fn01dd24()
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		fn0234e6()
 	}
@@ -714,10 +714,10 @@ function void SpringDiagonal.Update()
 	D4 = backupD4
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 
 	fn01dd24()
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
 		fn0234e6()
 	}
@@ -815,7 +815,7 @@ function void SpringDiagonalFlipped.Update()
 	u32 backupD4 = D4
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01dd24()
 	if (D4.u16 == 0xfffe)
 	{
@@ -828,7 +828,7 @@ function void SpringDiagonalFlipped.Update()
 	D4 = backupD4
 
 	A1 = 0xffffb04a
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn01dd24()
 	if (D4.u16 == 0xfffe)
 	{

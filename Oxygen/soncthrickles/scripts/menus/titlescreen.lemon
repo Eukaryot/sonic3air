@@ -87,7 +87,7 @@ function void fn00440c()
 			D3.u16 = A1.u16 >> 1
 		}
 
-		u16 targetInVRAM = (u8[0xffffffbc] == 0) ? 0 : 0x6000
+		u16 targetInVRAM = (titleintro.buffer == 0) ? 0 : 0x6000
 		updateSpritePattern(0xffff0000, targetInVRAM, D3.u16)
 	}
 
@@ -98,7 +98,7 @@ function void fn00440c()
 	A1 = 0xffff8000
 	A0 = u32[A2]
 	A2 += 4
-	D0.u16 = (u8[0xffffffbc] == 0 || D7.u16 < 7) ? 0 : 0x0300
+	D0.u16 = (titleintro.buffer == 0 || D7.u16 < 7) ? 0 : 0x0300
 	Enigma.Decompress()
 	if (D7.u16 < 7)
 	{
@@ -114,7 +114,7 @@ function void fn00440c()
 #if !STANDALONE
 	set_status_register(0x2700)
 #endif
-	copyRectToVRAM(0xffff8000, (u8[0xffffffbc] == 0) ? 0xc000 : 0xe000, 0x28, 0x1c)
+	copyRectToVRAM(0xffff8000, (titleintro.buffer == 0) ? 0xc000 : 0xe000, 0x28, 0x1c)
 #if !STANDALONE
 	set_status_register(0x2300)
 #endif
@@ -276,7 +276,7 @@ function void TitleScreen()
 
 	outro.wait_time = 0
 	u16[0xfffff662] = 0
-	u8[0xffffffbc] = 0xff
+	titleintro.buffer = 0xff
 	titleintro.frames = 0
 	titleintro.animstep = 1
 	D0 = 1
@@ -289,7 +289,7 @@ function void TitleScreen()
 #endif
 
 	Kosinski.addToDecompressionQueue(0x351c86, 0xffff0000)
-	playMusic(0x25)
+	playMusic(MUSIC_TITLESCREEN)
 
 	// While loop: Intro sequence with Sonic running towards the camera
 	while (true)
@@ -383,13 +383,13 @@ function void TitleScreen()
 		Nemesis.loadDataToVRAM(0x0d6498, 0x9800)
 	}
 
-	u32[0xffffb000] = 0x00482c
-	u32[0xffffb04a] = 0x004a5c
-	u32[0xffffb0de] = 0x004a1e
-	u32[0xffffb128] = 0x004ae4
-	u32[0xffffb172] = 0x004b54
-	u32[0xffffb1bc] = 0x004bb2
-	u32[0xffffb206] = 0x00496a
+	u32[0xffffb000] = 0x00482c		// Banner ("Sonic 3 - Sonic The Hedgehog")
+	u32[0xffffb04a] = 0x004a5c		// Menu items
+	u32[0xffffb0de] = 0x004a1e		// Copyright info
+	u32[0xffffb128] = 0x004ae4		// Sonic's hand wagging
+	u32[0xffffb172] = 0x004b54		// Sonic's eye blinking
+	u32[0xffffb1bc] = 0x004bb2		// Tails in the Tornado
+	u32[0xffffb206] = 0x00496a		// "& Knuckles" logo append
 	titleintro.frames = 0
 
 	#if STANDALONE
@@ -427,16 +427,16 @@ function void TitleScreen()
 		{
 			global.game_mode = 0x0c
 			lives_counter = 3
-			u8[0xfffffec6] = 3
+			unused.lives_counter.player2 = 3
 			ring_counter = 0
 			timer.alldata = 0
 			player.score = 0
-			u16[0xfffffed0] = 0
-			u32[0xfffffed2] = 0
-			u32[0xfffffed6] = 0
+			ring_counter.player2 = 0
+			timer.alldata.player2 = 0
+			player2.score = 0
 			continues_counter = 0
 			player.next_life_score = 5000
-			u32[0xffffffc4] = 5000
+			unused.player2.next_life_score = 5000
 
 			playSound(MUSIC_CTRL_FADEOUT)
 
@@ -445,7 +445,7 @@ function void TitleScreen()
 			global.game_mode = 0x4c
 
 		#else
-			D0 = u8[0xffffff86]
+			D0 = titlescreen.selection
 			if (D0.u8 == 0)
 			{
 				// Data Select
@@ -517,15 +517,15 @@ function void TitleScreen()
 
 	global.rolling_demo = 1
 	lives_counter = 3
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	unused.player2.next_life_score = 5000
 }
 
 
@@ -538,7 +538,7 @@ function void fn0007ba()
 	fn004352()
 	fn000c50()
 
-	u16[0xfffff748] = control.pad1
+	titlescreen.backup.control.pad1 = control.pad1
 	fn0017d8()
 
 	if (global.demo_countdown != 0)
@@ -632,8 +632,8 @@ function void fn004352()
 	{
 		copyMemory(0xfffffc00, 0xfffffc80, 0x40)
 
-		u8[0xffffffbc] ^= 0xff
-		if (u8[0xffffffbc] != 0)
+		titleintro.buffer ^= 0xff
+		if (titleintro.buffer != 0)
 		{
 			VDP.Config.setNameTableBasePlaneA(0xc000)
 			VDP.Config.setNameTableBasePlaneB(0xc000)
@@ -658,7 +658,7 @@ function void fn004352()
 function void fn00482c()
 {
 	objA0.mapping_offset = 0x3501e0
-	objA0.sprite_attributes = 0xe500
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0500)
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x40
@@ -684,7 +684,7 @@ function void fn00486c()
 	if (D0.u16 == 0 && objA0.velocity.y == 0xffa5)
 	{
 		objA0.update_address = 0x0048dc
-		u32[0xffffb094] = 0x004924
+		u32[0xffffb094] = 0x004924		// Trademark
 	}
 	else
 	{
@@ -781,9 +781,9 @@ function void fn004a5c()
 	objA0.position.x.u16 = 0xf0 + getScreenExtend()
 	objA0.position.y.u16 = 0x0140
 	objA0.mapping_offset = 0x004c9c
-	objA0.sprite_attributes = 0xc680
-	u8[0xffffff86] &= 0x01
-	objA0.animation.sprite = u8[0xffffff86]
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0680)
+	titlescreen.selection &= 0x01
+	objA0.animation.sprite = titlescreen.selection
 
 	objA0.update_address = 0x004a88
 	fn004a88()
@@ -793,9 +793,9 @@ function void fn004a5c()
 //# address-hook(0x004a88) end(0x004ade)
 function void fn004a88()
 {
-	D2 = u8[0xffffff86]
+	D2 = titlescreen.selection
 
-	D0.u8 = control.pad1.pressed | control.pad2.pressed
+	D0.u8 = (control.pad1.pressed | control.pad2.pressed)
 	if (D0 & CONTROL_UP)
 	{
 		--D2.u8
@@ -819,11 +819,11 @@ function void fn004a88()
 	}
 
 	objA0.animation.sprite = D2.u8
-	u8[0xffffff86] = D2.u8
+	titlescreen.selection = D2.u8
 
-	if ((D0.u8 & 0x03) != 0)
+	if ((D0.u8 & (CONTROL_UP | CONTROL_DOWN)) != 0)
 	{
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 	}
 	DrawObject()
 }
@@ -836,7 +836,7 @@ function void fn004a88()
 function void fn004924()
 {
 	objA0.mapping_offset = 0x3501e0
-	objA0.sprite_attributes = 0xe500
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0500)
 	objA0.position.x.u16 = 0x0188 + getScreenExtend()
 	objA0.position.y.u16 = 0xec
 	objA0.sprite_priority = 0x80
@@ -880,7 +880,7 @@ function void fn00496a()
 #endif
 
 	objA0.mapping_offset = 0x0049ae
-	objA0.sprite_attributes = 0xe4c0
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x04c0)
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0108
 	objA0.sprite_priority = 0x80
@@ -895,7 +895,7 @@ function void fn00496a()
 //# address-hook(0x00499c) end(0x0049a8)
 function void fn00499c()
 {
-	D0.u16 = u16[0xffffb014] + 0x5c
+	D0.u16 = u16[0xffffb000 + 0x14] + 0x5c
 	objA0.position.y.u16 = D0.u16
 	DrawObject()
 }
@@ -908,7 +908,7 @@ function void fn00499c()
 function void fn004a1e()
 {
 	objA0.mapping_offset = 0x004c9c
-	objA0.sprite_attributes = 0xe680
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0680)
 	objA0.position.x.u16 = 0x0158 + getScreenExtend() * 2
 	objA0.position.y.u16 = 0x014c
 	objA0.sprite_priority = 0x80
@@ -935,7 +935,7 @@ function void fn004a56()
 function void fn004ae4()
 {
 	objA0.mapping_offset = 0x004f8c
-	objA0.sprite_attributes = 0xa400
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0400)
 	objA0.position.x.u16 = 0x0148 + getScreenExtend()
 	objA0.position.y.u16 = 0xdc
 	objA0.sprite_priority = 0x0180
@@ -965,7 +965,7 @@ function void fn004b16()
 function void fn004b54()
 {
 	objA0.mapping_offset = 0x004f8c
-	objA0.sprite_attributes = 0xa400
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0400)
 	objA0.position.x.u16 = 0xf8 + getScreenExtend()
 	objA0.position.y.u16 = 0xc8
 	objA0.sprite_priority = 0x0180
@@ -983,8 +983,7 @@ function void fn004b86()
 	D0.u16 = 0xc8 - scrolloffset.y.planeA
 	objA0.position.y.u16 = D0.u16
 
-	A1 = 0x004ba4
-	Object.AlternativeAnimationUpdate()
+	Object.AlternativeAnimationUpdate(0x004ba4)
 	DrawObject()
 }
 
@@ -996,7 +995,7 @@ function void fn004b86()
 function void fn004bb2()
 {
 	objA0.mapping_offset = 0x004fe8
-	objA0.sprite_attributes = 0x6400
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0400)
 	objA0.position.x.u16 = 0
 	objA0.position.y.u16 = 0xc0
 	objA0.sprite_priority = 0x0380

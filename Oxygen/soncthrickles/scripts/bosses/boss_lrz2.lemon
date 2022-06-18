@@ -216,7 +216,7 @@ function void fn07995e()
 {
 	objA0.base_state = 0x02
 	objA0.velocity.y = -0x580
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.position.x.u16 = (objA0.render_flags & render_flag.FLIP_X) ? 0x0a30 : (0x0b10 + getScreenExtend() * 2)
 	playSound(0x7a)
 }
@@ -237,14 +237,15 @@ function void fn079988()
 
 	objA0.update_address = 0x0799e0
 	objA0.flags38 |= 0x30
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 	level.wait_for_results = 0xff
 	level.boss_encounter = 0
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
-		u8[A1 + 0x04] |= render_flag.FLIP_Y
+		objA1.render_flags |= render_flag.FLIP_Y
 	}
 
 	if (allocDynamicObjectStd())
@@ -278,8 +279,9 @@ function void fn0799e0()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out boss theme and starts the level music afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x14
+		u8[A1 + 0x2c] = MUSIC_LRZ2
 	}
 
 	stopCharacterWinPose(0xffffb000)
@@ -289,7 +291,7 @@ function void fn0799e0()
 
 	if (allocDynamicObjectStd())
 	{
-		// Spawn screen mover
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 
@@ -377,11 +379,11 @@ function void fn079ac4()
 		objA0.sprite_priority = 0x0100
 
 		A1 = 0xffff0000 + u16[A0 + 0x46]
-		D1.u16 = (u8[A1 + 0x04] & 0x01) ? (getScreenWidth() - 0x20) : 0x20
+		D1.u16 = (objA1.render_flags & render_flag.FLIP_X) ? (getScreenWidth() - 0x20) : 0x20
 
 	#if STANDALONE
 		// Experimental: Target bomb right at character (makes things a bit more interesting)
-		//D1.u16 = u16[0xffffb010] - camera.position.x.u16
+		//D1.u16 = u16[0xffffb000 + 0x10] - camera.position.x.u16
 	#endif
 
 		objA0.position.x.u16 = 0x0a00 + D1.u16		// Note: 0x0a00 is camera.position.x.u16 here

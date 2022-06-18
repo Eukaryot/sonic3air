@@ -49,7 +49,7 @@ function void fn073906()
 	boss.remaining_hits = 8
 	objA0.countdown_callback = 0x073960
 	A1 = 0x0738ce
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 #if STANDALONE
@@ -93,8 +93,7 @@ function void fn073960()
 {
 	objA0.base_state = 0x04
 
-	A2 = 0x07418a
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x07418a)
 
 	// "spawnChildObjects(0x07415a)" replaced by:
 	spawnChildObject(0x073d74, 0x00, 112, -24)
@@ -168,9 +167,8 @@ function void fn0739e6()
 //# address-hook(0x0739f2) end(0x0739fe)
 function void fn0739f2()
 {
-	objA0.flags38 |= 0x04
-	u8[A0 + 0x28] = 0x0f
-	objA0.flags38 |= 0x08
+	objA0.collision_attributes = collision.size.24x24
+	objA0.flags38 |= (0x04 | 0x08)
 	fn073a04()
 }
 
@@ -838,7 +836,7 @@ function void fn073fe2()
 			objA0.render_flags &= ~render_flag.VISIBLE
 			objA0.countdown_value = 0x7f
 			objA0.flags38 |= 0x10
-			objA0.sprite_attributes = 0xa425
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0425)
 			objA0.velocity.y = -0x200
 			objA0.countdown_callback = 0x073a6a
 
@@ -852,7 +850,7 @@ function void fn073fe2()
 			screenmover_target.right = 0x3ab8
 
 			// "spawnSimpleChildObjects(0x084b00)" replaced by:
-			spawnSimpleChildObjects(0x084a48, 1)
+			spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 		}
 		else
 		{
@@ -886,7 +884,7 @@ function void fn074098()
 	{
 		objA0.update_address = 0x0856d0
 		objA0.flags2a |= 0x80
-		objA0.sprite_attributes = 0xa425
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0425)
 		objA0.velocity.x = u16[0x0740e4 + objA0.subtype2c]
 		objA0.velocity.y = -0x200
 		fn08594e()

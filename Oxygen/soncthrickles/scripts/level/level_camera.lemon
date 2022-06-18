@@ -65,7 +65,7 @@ function void UpdateCameraBoundsInLevel()
 		if (D0.s16 > 0)
 		{
 			D0.u16 = camera.position.y.u16 + 8
-			if (D0.u16 >= move_area.bottom.current && (u8[0xffffb02a] & char.flag.IN_AIR))
+			if (D0.u16 >= move_area.bottom.current && (u8[0xffffb000 + 0x2a] & char.flag.IN_AIR))
 			{
 				D1.u16 *= 4
 			}

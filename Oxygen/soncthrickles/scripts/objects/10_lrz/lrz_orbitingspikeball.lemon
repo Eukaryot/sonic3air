@@ -14,7 +14,7 @@
 function void fn043b3a()
 {
 	objA0.mapping_offset = 0x043d24
-	objA0.sprite_attributes = 0x240d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040d)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	u16[A0 + 0x44] = objA0.position.x.u16
@@ -45,7 +45,7 @@ function void fn043b3a()
 function void fn043b96()
 {
 	u8[A0 + 0x28] = 0
-	objA0.sprite_attributes &= 0x7fff
+	objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	D0.u8 = level.framecounter.low * 2
 	if (objA0.flags2a & 0x01)
 	{
@@ -54,8 +54,8 @@ function void fn043b96()
 	D0.u8 += objA0.subtype2c
 	if (D0.s8 < 0)
 	{
-		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x9a
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 	}
 	LookupSinCos()
 	D1.s16 >>= 3
@@ -70,7 +70,7 @@ function void fn043b96()
 function void fn043bde()
 {
 	u8[A0 + 0x28] = 0
-	objA0.sprite_attributes &= 0x7fff
+	objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	D0.u8 = level.framecounter.low * 2
 	if (objA0.flags2a & 0x01)
 	{
@@ -79,8 +79,8 @@ function void fn043bde()
 	D0.u8 += objA0.subtype2c
 	if (D0.s8 < 0)
 	{
-		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 	}
 	LookupSinCos()
 	D0.u16 = D1.u16
@@ -101,7 +101,7 @@ function void fn043bde()
 function void fn043c2c()
 {
 	objA0.mapping_offset = 0x043d24
-	objA0.sprite_attributes = 0x240d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040d)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	u16[A0 + 0x44] = objA0.position.x.u16
@@ -132,7 +132,7 @@ function void fn043c2c()
 function void fn043c88()
 {
 	u8[A0 + 0x28] = 0
-	objA0.sprite_attributes &= 0x7fff
+	objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	D0.u8 = level.framecounter.low * 2
 	if (objA0.flags2a & 0x01)
 	{
@@ -141,8 +141,8 @@ function void fn043c88()
 	D0.u8 += objA0.subtype2c
 	if (D0.s8 < 0)
 	{
-		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x9a
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 	}
 	LookupSinCos()
 	D0.u16 = D1.u16
@@ -160,7 +160,7 @@ function void fn043c88()
 function void fn043cd6()
 {
 	u8[A0 + 0x28] = 0
-	objA0.sprite_attributes &= 0x7fff
+	objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	D0.u8 = level.framecounter.low * 2
 	if (objA0.flags2a & 0x01)
 	{
@@ -169,8 +169,8 @@ function void fn043cd6()
 	D0.u8 += objA0.subtype2c
 	if (D0.s8 < 0)
 	{
-		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 	}
 	LookupSinCos()
 	D1.s16 >>= 2

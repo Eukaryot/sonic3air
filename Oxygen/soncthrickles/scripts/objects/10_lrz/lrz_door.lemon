@@ -22,13 +22,13 @@ function void fn04292a()
 	u16[A0 + 0x46] = objA0.position.y.u16
 	if (global.act == 0)
 	{
-		objA0.sprite_attributes = 0x43a1
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03a1)
 		objA0.box_size.y = 0x28
 	}
 	else
 	{
 		objA0.animation.sprite = 1
-		objA0.sprite_attributes = 0x4090
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0090)
 		objA0.box_size.y = 0x20
 	}
 

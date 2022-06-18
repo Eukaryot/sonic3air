@@ -66,12 +66,12 @@ function void fn048c44()
 			u16[A1 + 0x1c] = 0
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
-			u8[A1 + 0x2a] &= ~0x20
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA1.position.x.u16 = objA0.position.x.u16
 			if (u8[A1 + 0x2a] & 0x04)
 			{
-				u8[A1 + 0x2a] &= ~0x04
+				u8[A1 + 0x2a] &= ~char.flag.ROLLING
 				D0.u8 = u8[A1 + 0x1e] - u8[A1 + 0x44]
 				u8[A1 + 0x1e] = u8[A1 + 0x44]
 				u8[A1 + 0x1f] = u8[A1 + 0x45]
@@ -113,7 +113,7 @@ function void fn048d2c()
 		u16[A4 + 0x08] = D0.u16 >> 1
 		objA1.velocity.y = (objA0.flags2a & 0x02) ? 0x1000 : -0x1000
 		u8[A4] += 2
-		playSound(0x9f)
+		playSound(SFX_SUPERTRANSFORM)
 	}
 
 	fn048d66()
@@ -129,11 +129,11 @@ function void fn048d66()
 
 	D0 = u8[A4 + 0x02]
 	u8[A1 + 0x22] = u8[0x048db2 + D0.s16]
-	u8[A1 + 0x04] &= 0xfc
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	D0.u8 = u8[0x048dbe + D0.s16]
 	if (global.inv_gravity)
-		D0.u8 |= 0x02
-	u8[A1 + 0x04] |= D0.u8
+		D0.u8 |= render_flag.FLIP_Y
+	objA1.render_flags |= D0.u8
 
 	D0 = u8[A1 + 0x22]
 	u32 backupA2 = A2

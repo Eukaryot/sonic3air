@@ -19,14 +19,14 @@ function void fn032df2()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x80
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	u16[A0 + 0x30] = objA0.position.x.u16
 	objA0.value32 = objA0.position.y.u16
 
 	if (global.zone == 0x14)
 	{
 		objA0.mapping_offset = 0x0330a2
-		objA0.sprite_attributes = 0x62cd
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02cd)
 		objA0.update_address = 0x032ef0
 		fn032ef0()
 		return
@@ -38,7 +38,7 @@ function void fn032df2()
 	#if STANDALONE
 		objA0.sprite_attributes = 0x0300	// Fix for wrong palette line usage, #contributed by Legobouwer
 	#else
-		objA0.sprite_attributes = 0x2300
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0300)
 	#endif
 		objA0.update_address = 0x032ff0
 		fn032ff0()
@@ -46,7 +46,7 @@ function void fn032df2()
 	}
 
 	objA0.mapping_offset = 0x2322ce
-	objA0.sprite_attributes = 0x4364
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0364)
 	if (objA0.subtype2c != 0)
 	{
 		objA0.value26 = objA0.subtype2c
@@ -192,10 +192,11 @@ function void fn032f56()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn floating points display
 		objA1.update_address = 0x02cce0
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x22] = 0x04
+		objA1.animation.sprite = 0x04
 	}
 }
 

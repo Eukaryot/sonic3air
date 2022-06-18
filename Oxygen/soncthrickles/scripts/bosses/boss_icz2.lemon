@@ -31,7 +31,7 @@ function void fn071bce()
 	objA0.countdown_callback = 0x071c0e
 
 	A1 = 0x071bc6
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 	#if STANDALONE
@@ -129,7 +129,7 @@ function void fn071caa()
 	if (s16[A0 + 0x44] < 0)
 	{
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		u16[A0 + 0x44] = 0x017f + getScreenExtend() * 2		// Adding 2x screen extend is not very precise, but does the trick
 	}
 
@@ -231,6 +231,7 @@ function void fn071d9e()
 	level.boss_encounter = 0
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x4560 - getScreenExtend()
 		objA1.position.y.u16 = 0x06a3
@@ -241,6 +242,7 @@ function void fn071d9e()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 }
@@ -267,7 +269,7 @@ function void fn071de2()
 #endif
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	fn0852ae()
 }
@@ -543,7 +545,7 @@ function void fn072092()
 function void fn0720c6()
 {
 	objA0.update_address = 0x0720d4
-	u8[A0 + 0x28] = 0x9b
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x4)
 }
 
 
@@ -646,7 +648,7 @@ function void fn07225c()
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x071d80
 		A1 = 0xffff0000 + u16[0xfffffaae]
-		if (u32[A1] == 0x08b660)
+		if (objA1.update_address == 0x08b660)
 		{
 			u8[A1 + 0x38] |= 0x20
 		}

@@ -377,14 +377,14 @@ function void ObjectSpawning.SpawnFixedObject()
 {
 	u16 px			 = u16[A0]
 	u16 py			 = u16[A0+2] & 0x0fff
-	u8 flipFlags	 = (u16[A0+2] >> 13) & 0x03
+	u8 flipFlags	 = (u16[A0+2] >> 13) & (render_flag.FLIP_X | render_flag.FLIP_Y)
 	u8 objectType	 = u8[A0+4]
 	u8 objectSubtype = u8[A0+5]
 
-	u32[A1] = u32[A4 + u16(objectType) * 4]
+	objA1.update_address = u32[A4 + u16(objectType) * 4]
 	objA1.position.x.u16 = px
 	objA1.position.y.u16 = py
-	u8[A1 + 0x04] = flipFlags
+	objA1.render_flags = flipFlags
 	u8[A1 + 0x2a] = flipFlags
 	u8[A1 + 0x2c] = objectSubtype
 	objA1.respawn_entry = A3.u16
@@ -418,7 +418,7 @@ function bool conditionalSpawnDynamicObject(bool considerLevelWrap, bool forceYP
 
 	u16 px			 = u16[A0]
 	u16 py			 = u16[A0+2] & D5.u16		// D5.u16 is usually 0x0fff here
-	u8 flipFlags	 = (u16[A0+2] >> 13) & 0x03
+	u8 flipFlags	 = (u16[A0+2] >> 13) & (render_flag.FLIP_X | render_flag.FLIP_Y)
 	bool checkYPos	 = (u16[A0+2] & 0x8000) == 0
 	u8 objectType	 = u8[A0+4]
 	u8 objectSubtype = u8[A0+5]
@@ -446,10 +446,10 @@ function bool conditionalSpawnDynamicObject(bool considerLevelWrap, bool forceYP
 	// Set flag in respawn table entry
 	u8[A3] |= 0x80
 
-	u32[A1] = updateAddress
+	objA1.update_address = updateAddress
 	objA1.position.x.u16 = px
 	objA1.position.y.u16 = py
-	u8[A1 + 0x04] = flipFlags
+	objA1.render_flags = flipFlags
 	u8[A1 + 0x2a] = flipFlags
 	u8[A1 + 0x2c] = objectSubtype
 	objA1.respawn_entry = A3.u16
@@ -497,6 +497,68 @@ function void spawnChildObjects(u32 address)
 #endif
 }
 
+function void spawnProjectileChildObjects(u32 address)
+{
+	A2 = address
+	SpawnProjectileChildObjects()
+}
+
+function void spawnIdenticalChildObjects(u32 address)
+{
+	A2 = address
+	SpawnIdenticalChildObjects()
+}
+
+function void spawnChildObjectChain(u32 address)
+{
+	A2 = address
+	SpawnChildObjectChain()
+}
+
+function void spawnProjectileChildObjectsInDir(u32 address)
+{
+	A2 = address
+	SpawnProjectileChildObjectsInDir()
+}
+
+function void spawnSimpleChildObjects(u32 address)
+{
+	A2 = address
+	SpawnSimpleChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnSimpleChildObjects")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", u16[address] + 1))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[address + 2]))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
+}
+
+function void spawnChildObjectHierarchy(u32 address)
+{
+	A2 = address
+	SpawnChildObjectHierarchy()
+}
+
+function void spawnUniqueChildObjectHierarchy(u32 address)
+{
+	A2 = address
+	SpawnUniqueChildObjectHierarchy()
+}
+
+function void spawnChildObjectsInDir(u32 address)
+{
+	A2 = address
+	SpawnChildObjectsInDir()
+}
+
 //# address-hook(0x084060) end(0x0840ae)
 function void SpawnChildObjects()
 {
@@ -528,7 +590,7 @@ function bool spawnChildObject(u32 updateAddress, u8 subtype, s8 offset_x, s8 of
 	if (!allocDynamicObjectAfterA0())
 		return false
 
-	u32[A1] = updateAddress
+	objA1.update_address = updateAddress
 	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 	objA1.sprite_attributes = objA0.sprite_attributes
 	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
@@ -564,7 +626,7 @@ function void SpawnProjectileChildObjects()
 			return
 
 		// Basic initialization as above
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8
@@ -610,7 +672,7 @@ function void SpawnIdenticalChildObjects()
 			return
 
 		// Basic initialization as above
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8
@@ -652,7 +714,7 @@ function void SpawnChildObjectChain()
 		u16[A3 + 0x44] = A1.u16
 		A3 = A1
 
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8
@@ -687,7 +749,7 @@ function void SpawnProjectileChildObjectsInDir()
 			return
 
 		// Basic initialization as above
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8
@@ -715,30 +777,10 @@ function void SpawnProjectileChildObjectsInDir()
 }
 
 
-function void spawnSimpleChildObjects(u32 address)
-{
-	A2 = address
-	SpawnSimpleChildObjects()
-
-#if STANDALONE
-	if (ROMDataAnalyser.isEnabled())
-	{
-		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
-		{
-			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
-			ROMDataAnalyser.addKeyValue("function", "SpawnSimpleChildObjects")
-			ROMDataAnalyser.addKeyValue("count", stringformat("%d", u16[address] + 1))
-			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[address + 2]))
-			ROMDataAnalyser.endEntry()
-		}
-	}
-#endif
-}
-
 //# address-hook(0x084220) end(0x084256)
 function void SpawnSimpleChildObjects()
 {
-	// Very commonly child spawning function, spawns multiple of the same but with different subtypes.
+	// Very commonly used child spawning function, spawns multiple of the same but with different subtypes.
 	// Stored data, shared for all children:
 	//  - Update routine
 
@@ -755,7 +797,7 @@ function void spawnSimpleChildObjects(u32 updateAddress, u16 count)
 		if (!allocDynamicObjectAfterA0())
 			return
 
-		u32[A1] = updateAddress
+		objA1.update_address = updateAddress
 		objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8								// A simple enumeration of children (in steps of 2)
@@ -795,7 +837,7 @@ function void SpawnChildObjectHierarchy()
 		u16[A1 + 0x44] = A0.u16
 		A3 = A1
 
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8
@@ -831,7 +873,7 @@ function void SpawnUniqueChildObjectHierarchy()
 		u16[A1 + 0x44] = A0.u16
 		A3 = A1
 
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8
@@ -865,7 +907,7 @@ function void SpawnChildObjectsInDir()
 			return
 
 		// Basic initialization as above
-		u32[A1] = u32[A2]
+		objA1.update_address = u32[A2]
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.subtype2c = D2.u8
@@ -875,7 +917,7 @@ function void SpawnChildObjectsInDir()
 		s8 offset_y = s8[A2+5]
 		if (objA0.render_flags & render_flag.FLIP_X)
 		{
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 			offset_x = -offset_x
 		}
 		s8[A1 + 0x42] = offset_x

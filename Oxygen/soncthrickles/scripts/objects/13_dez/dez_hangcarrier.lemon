@@ -12,8 +12,8 @@
 function void fn046f84()
 {
 	objA0.mapping_offset = 0x04717e
-	objA0.sprite_attributes = 0x235d
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x035d)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x14
 	objA0.hitbox_extends.y = 0x14
@@ -104,14 +104,14 @@ function void fn04703e()
 			u8[A2] = 0
 			u8[A2 + 0x02] = 0x12
 
-			if (D0.u16 & 0x0f00)
+			if (D0.u16 & 0x0f00)	// Any direction held?
 			{
 				u8[A2 + 0x02] = 0x3c
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x200
 				}
-				else if (D0 & 0x0400)
+				else if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}
@@ -120,7 +120,7 @@ function void fn04703e()
 			objA1.velocity.y = -0x380
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x20] = char.state.ROLLING
 			u8[A1 + 0x27] = 0
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -161,7 +161,7 @@ function void fn04703e()
 			u8[A1 + 0x2e] = 1
 
 			u8[A2] = 1
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 }

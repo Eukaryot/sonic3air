@@ -27,17 +27,18 @@ function void fn049f20()
 {
 	while (true)
 	{
-		u32[A1 + 0x0c] = 0x04a08a
-		u16[A1 + 0x0a] = 0xa352
-		u8[A1 + 0x04] |= 0x04
-		u8[A1 + 0x07] = 0x08
-		u8[A1 + 0x06] = 0x18
-		u16[A1 + 0x08] = 0
+		objA1.mapping_offset = 0x04a08a
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0352)
+		objA1.render_flags |= render_flag.WORLD
+		objA1.box_size.x = 0x08
+		objA1.box_size.y = 0x18
+		objA1.sprite_priority = 0
 
 		--D1.s16
 		if (D1.s16 < 0)
 			break
 
+		// Spawn exit beam wall mounts
 		if (!allocDynamicObjectAfterA0())
 			break
 
@@ -45,7 +46,7 @@ function void fn049f20()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.x.u16 += 0x0190
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x04] |= render_flag.FLIP_X
+		objA1.render_flags |= render_flag.FLIP_X
 		u16[A1 + 0x3e] = A0.u16
 	}
 
@@ -64,6 +65,7 @@ function void fn049f5c()
 	{
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn exit beam lasers
 			objA1.update_address = 0x04a09a
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.x.u16 += 0x80
@@ -135,7 +137,7 @@ function void fn049fe4()
 	}
 
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x2a] |= 0x02
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	if (A1 == 0xffffb000)
 	{
 		objA0.subtype2c = 1
@@ -149,7 +151,7 @@ function void fn049fe4()
 			level.restart.u8 = 1
 			checkpoint.rings = ring_counter
 			checkpoint.lives_granted = extra_lives_granted
-			global.shields_backup_1 = u8[0xffffb02b] & 0x71
+			global.shields_backup_1 = u8[0xffffb000 + 0x2b] & char.bonus.ALL_SHIELDS
 		}
 	}
 }
@@ -168,7 +170,7 @@ function void fn04a07a()
 function void fn04a09a()
 {
 	objA0.mapping_offset = 0x04a118
-	objA0.sprite_attributes = 0xe364
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0364)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x88
 	objA0.box_size.y = 0x08

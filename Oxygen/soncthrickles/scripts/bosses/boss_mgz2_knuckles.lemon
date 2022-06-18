@@ -17,9 +17,9 @@ function void fn06c698()
 
 #if STANDALONE
 	// Use main boss music
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 #else
-	objA0.value26 = 0x2e
+	objA0.value26 = MUSIC_MINIBOSS_2
 #endif
 	StartBossFight()
 
@@ -145,7 +145,7 @@ function void fn06c7d8()
 {
 	if (objA0.countdown_value == 0x28)
 	{
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 
 		// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 		spawnSimpleChildObjects(0x06d16a, 1)
@@ -190,7 +190,7 @@ function void fn06c83c()
 {
 	if (objA0.countdown_value == 0x48)
 	{
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 
 		// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 		spawnSimpleChildObjects(0x06d16a, 1)
@@ -244,6 +244,7 @@ function void fn06c8b4()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn capsule
 		objA1.update_address = 0x086540
 		objA1.position.x.u16 = 0x3f40
 		objA1.position.y.u16 = 0xb0
@@ -253,7 +254,7 @@ function void fn06c8b4()
 	screenmover_target.right = D0.u16
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -286,7 +287,7 @@ function void fn06c8f4()
 function void fn06c932()
 {
 	D0.u16 = camera.position.x.u16 + getScreenWidth() + 0x10
-	if (D0.u16 <= u16[0xffffb010])
+	if (D0.u16 <= u16[0xffffb000 + 0x10])
 	{
 		fn06d13c()
 	}
@@ -396,12 +397,12 @@ function void fn06d42e()
 	GetRandomNumber()
 	D0.u16 &= 0xff
 	D1.u16 = D0.u16 & 0x01
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	D0.u16 -= 0x80
 	if (D0.s16 < 0)
 	{
 		D1.u16 += 2
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	D3.u16 = camera.position.y.u16 + 8
 
@@ -456,12 +457,12 @@ function void fn06d4dc()
 	D0.u16 &= 0x7f
 	D1.u16 = (D0.u16 & 0x01) + 4
 	D2.u16 = u16[0xfffffa82] >> 1
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	D3.u8 = u8[0x06d516 + D2.s16]
 	if (D3.u8 != 0)
 	{
 		D0.s16 = -D0.s16
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 	}
 	D1.u8 += D3.u8
 	D3.u16 = 0xf8
@@ -494,7 +495,7 @@ function void fn06d51a()
 	objA0.value3a = u8[0x06d598 + (D0.u16 >> 1)]
 	D0.u16 >>= 2
 	D2.u8 = u8[0x06d5a0 + D0.s16]
-	objA0.render_flags &= 0xfc
+	objA0.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA0.render_flags |= D2.u8
 	D1.u16 *= 2
 
@@ -506,7 +507,7 @@ function void fn06d51a()
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 
 	// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 	spawnSimpleChildObjects(0x06d16a, 1)

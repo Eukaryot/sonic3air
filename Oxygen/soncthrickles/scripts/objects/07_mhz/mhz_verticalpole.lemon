@@ -50,7 +50,7 @@ function void VerticalPole.Update()
 	{
 		camera.use_forced_target = true
 		camera.forced_target.x = objA0.position.x.u16
-		camera.forced_target.y = u16[0xffffb014]
+		camera.forced_target.y = u16[0xffffb000 + 0x14]
 	}
 
 #if STANDALONE
@@ -83,7 +83,8 @@ function void fn03f0d8()
 		return
 	}
 
-	D1.u16 &= 0x70
+	// Check if jump button pressed
+	D1.u16 &= CONTROL_ABC
 	if (D1.u16 != 0)
 	{
 		fn03f166()
@@ -120,7 +121,7 @@ function void fn03f11c()
 	u8[A1 + 0x22] = D1.u8
 
 	D1.s16 = s8[0x03f156 + D0.s16]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 		D1.s16 = -D1.s16
 
 	D1.u16 += objA0.position.x.u16
@@ -165,7 +166,7 @@ function void fn03f1c8()
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.velocity.x = 0x1000
 	u8[A1 + 0x2a] &= ~0x01
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		u8[A1 + 0x2a] |= 0x01
 		objA1.velocity.x = -objA1.velocity.x
@@ -178,7 +179,7 @@ function void fn03f1c8()
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
 	u8[A1 + 0x2f] = 0
 	u8[A1 + 0x27] = 0
-	u8[A1 + 0x22] = (u8[A1 + 0x38] == 0x01) ? 0x0e : 0x24
+	u8[A1 + 0x22] = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0x0e : 0x24
 
 	fn03f10a()
 }
@@ -234,14 +235,14 @@ function void fn03f246()
 				objA1.velocity.x = 0
 				objA1.velocity.y = 0
 				u16[A1 + 0x1c] = 0
-				u8[A1 + 0x04] &= 0xfc
+				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 				D0.u8 = u8[A1 + 0x1e]
 				u8[A1 + 0x1e] = u8[A1 + 0x44]
 				u8[A1 + 0x1f] = u8[A1 + 0x45]
 
 				if (u8[A1 + 0x2a] & 0x04)
 				{
-					u8[A1 + 0x2a] &= ~0x04
+					u8[A1 + 0x2a] &= ~char.flag.ROLLING
 					D0.u8 -= u8[A1 + 0x44]
 					objA1.position.y.u16 += D0.s8
 				}
@@ -255,7 +256,7 @@ function void fn03f246()
 				u8[A2] = 0x01
 				if (D2.s16 < 0)
 				{
-					u8[A1 + 0x04] |= render_flag.FLIP_X
+					objA1.render_flags |= render_flag.FLIP_X
 				}
 
 				D0 = u8[A1 + 0x22]
@@ -263,7 +264,7 @@ function void fn03f246()
 				SetCharacterSpritePatterns()
 				A2 = backupA2
 
-				playSound(0x4a)
+				playSound(SFX_GRAB)
 			}
 		}
 	}

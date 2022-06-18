@@ -71,8 +71,7 @@ function bool GiantRing.isSuperEmeraldStage()
 //# address-hook(0x06169a) end(0x0616e4)
 function void fn06169a()
 {
-	A1 = 0x06198e
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x06198e))
 		return
 
 	u32[A0 + 0x30] = 0x0619c2
@@ -133,23 +132,24 @@ function void fn0616e6()
 			}
 
 			objA0.base_state = 0x04
-			u8[0xfffff766] = 0xff
+			char.animation.sprite.backup = 0xff
 
 			A1 = 0xffffb000
 			objA1.state = char.state.DISAPPEARED
-			u8[A1 + 0x22] = 0
+			objA1.animation.sprite = 0
 			u8[A1 + 0x2e] = 0x53
 
 			if (tails.carrying)
 			{
 				A1 = 0xffffb04a
 				objA1.state = char.state.DISAPPEARED
-				u8[A1 + 0x22] = 0
+				objA1.animation.sprite = 0
 				u8[A1 + 0x2e] = 0x53
 			}
 
 			if (allocDynamicObjectStd())
 			{
+				// Warp flash effect
 				objA1.update_address = 0x0617be
 				u16[A1 + 0x46] = A0.u16
 			}
@@ -166,8 +166,7 @@ function void GiantRing.Grant50Rings()
 	level.giantrings_clear |= (1 << objA0.subtype2c)
 	objA0.flags38 |= 0x20
 
-	D0 = 50
-	AddRings()
+	addRings(50)
 }
 
 
@@ -195,8 +194,7 @@ function void fn0617be()
 //# address-hook(0x0617e0) end(0x061820)
 function void fn0617e0()
 {
-	A1 = 0x0619a0
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0619a0))
 		return
 
 	u32[A0 + 0x30] = 0x0619d4
@@ -206,10 +204,10 @@ function void fn0617e0()
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
 	objA0.subtype2c = u8[A1 + 0x2c]
-	D0.u16 = u16[0xffffb010]
+	D0.u16 = u16[0xffffb000 + 0x10]
 	if (D0.u16 >= objA0.position.x.u16)
 	{
-		u8[A1 + 0x04] |= render_flag.FLIP_X
+		objA1.render_flags |= render_flag.FLIP_X
 	}
 }
 
@@ -218,7 +216,7 @@ function void fn0617e0()
 function void fn061822()
 {
 	D6.u8 = objA0.animation.sprite
-	fn084464()
+	Object.AnimationProgressByLocalA1.CheckFlipX()
 	if (D6.u8 != objA0.animation.sprite && objA0.animation.frame == 3)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x46]

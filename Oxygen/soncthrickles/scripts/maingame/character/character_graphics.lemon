@@ -76,8 +76,7 @@ function void updateCharacterSpritePatternsInner(u8 animationSprite, u32 sourceB
 
 #if STANDALONE
 	// Sanity check: Never use more than 16 sprites (this should never trigger)
-	if (numSprites > 0x10)
-		numSprites = 0x10
+	numSprites = min(numSprites, 0x10)
 #endif
 
 	for (; numSprites > 0; --numSprites)
@@ -141,7 +140,7 @@ function void UpdateSonicAnimation()
 	{
 		updateSonicAnimationRunning()
 	}
-	else
+	else // if (D0.u8 == 0xfe)
 	{
 		updateSonicAnimationRolling()
 	}
@@ -150,7 +149,7 @@ function void UpdateSonicAnimation()
 function void updateSonicAnimationStanding()
 {
 	D1.u8 = char.flags & char.flag.FACING_LEFT
-	char.render_flags = (char.render_flags & 0xfc) | D1.u8
+	char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | D1.u8
 
 	--char.animation.timer
 	if (s8(char.animation.timer) < 0)
@@ -163,7 +162,7 @@ function void updateSonicAnimationStanding()
 function void updateSonicAnimationRolling()
 {
 	D1.u8 = char.flags & char.flag.FACING_LEFT
-	char.render_flags = (char.render_flags & 0xfc) | D1.u8
+	char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | D1.u8
 
 	--char.animation.timer
 	if (s8(char.animation.timer) >= 0)
@@ -205,18 +204,21 @@ function void updateSonicAnimation_shared()
 	}
 #endif
 
-	D0.u8 = u8[A1 + char.animation.frame + 1]
+	D0.u8 = u8[A1 + char.animation.frame + 1]	// Load next animation frame byte
 	if (D0.u8 < 0xfc)
 	{
+		// Advance to next frame
 		char.animation.sprite = D0.u8
 		++char.animation.frame
 	}
 	else if (D0.u8 == 0xfd)
 	{
+		// Change to another animation
 		char.state = u8[A1 + char.animation.frame + 2]
 	}
 	else if (D0.u8 == 0xfe)
 	{
+		// Loop animation from specific frame
 		u8 diff = u8[A1 + char.animation.frame + 2]
 		char.animation.frame -= diff
 		char.animation.sprite = u8[A1 + char.animation.frame + 1]
@@ -224,6 +226,7 @@ function void updateSonicAnimation_shared()
 	}
 	else if (D0.u8 == 0xff)
 	{
+		// Loop animation from the start
 		char.animation.frame = 1
 		char.animation.sprite = u8[A1 + 1]
 	}
@@ -249,7 +252,7 @@ function void updateSonicAnimationRunning()
 		D1 = (D0.u8 & 0x80) ? (render_flag.FLIP_X | render_flag.FLIP_Y) : 0
 		D2.u8 ^= D1.u8
 
-		char.render_flags &= 0xfc
+		char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		char.render_flags |= D2.u8
 
 		if (char.flags & char.flag.PUSHING)
@@ -356,7 +359,7 @@ function void updateCharacterAnimationRunning_shared()
 
 	D0.u8 = char.rotation.x
 	D1 = 0
-	char.render_flags &= 0xfc
+	char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	if ((char.flags & char.flag.FACING_LEFT) == 0)
 	{
 		if (u8[A0 + 0x2d] & 0x80)
@@ -439,7 +442,7 @@ function void UpdateTailsAnimation_inner()
 		char.flags &= ~char.flag.PUSHING
 	}
 
-	A1.u16 += u16[A1 + char.state * 2]
+	A1 = tableLookupAddress(A1, char.state * 2)
 	D0.u8 = u8[A1]
 
 	if (D0.u8 < 0x80)
@@ -477,7 +480,7 @@ function void UpdateTailsAnimation_inner()
 			D0.u8 += 0x10
 			D1 = (D0.s8 < 0) ? 3 : 0
 
-			char.render_flags &= 0xfc
+			char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D2.u8 ^= D1.u8
 			char.render_flags |= D2.u8
 
@@ -516,7 +519,7 @@ function void UpdateKnucklesAnimation()
 	{
 		updateSonicAnimationRunning()
 	}
-	else
+	else // if (D0.u8 == 0xfe)
 	{
 		updateSonicAnimationRolling()
 	}
@@ -526,7 +529,7 @@ function void UpdateKnucklesAnimation()
 //# address-hook(0x012872) end(0x012a28)
 function void fn012872()
 {
-	char.render_flags &= 0xfc
+	char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	D0.u8 = char.rotation.x
 	D3.u8 = u8[0x01286e + D1.s16]
 
@@ -613,57 +616,57 @@ function void fn012872()
 // Sonic, Knuckles
 
 //# address-hook(0x012d36) end(0x012f80)
-function void fn012d36()
+function void CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 {
-	D0 = objA0.state
-	if (D0.u8 != objA0.state.former)
+	D0 = char.state
+	if (D0.u8 != char.state.former)
 	{
-		objA0.state.former = D0.u8
-		objA0.animation.frame = 0
-		objA0.animation.timer = 0
-		objA0.flags2a &= ~0x20
+		char.state.former = D0.u8
+		char.animation.frame = 0
+		char.animation.timer = 0
+		char.flags &= ~char.flag.PUSHING
 	}
 	A1 = tableLookupAddress((char.character == CHARACTER_SONIC) ? 0x012f84 : 0x012fcc, D0.u16 * 2)
 
 	D0.u8 = u8[A1]
 	if (D0.s8 >= 0)
 	{
-		objA0.render_flags = (objA0.render_flags & ~0x03) | (objA0.flags2a & 0x01)
+		char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (char.flags & char.flag.FACING_LEFT)
 
-		--objA0.animation.timer
-		if (s8(objA0.animation.timer) >= 0)
+		--char.animation.timer
+		if (s8(char.animation.timer) >= 0)
 			return
 
-		objA0.animation.timer = D0.u8
+		char.animation.timer = D0.u8
 	}
 	else if (D0.u8 == 0xff)
 	{
-		D0 = u8[A0 + 0x27]
+		D0 = char.rotation.x
 		if (D0.u8 == 0)
 		{
-			D0.u8 = objA0.value26
+			D0.u8 = char.rotation
 			if (D0.s8 > 0)
 			{
 				--D0.u8
 			}
-			D2.u8 = objA0.flags2a & 0x01
+			D2.u8 = char.flags & char.flag.FACING_LEFT
 			if (D2.u8 == 0)
 			{
 				D0.u8 ^= 0xff
 			}
 			D0.u8 += 0x10
 			D1 = (D0.s8 < 0) ? 3 : 0
-			objA0.render_flags &= ~0x03
+			char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D2.u8 ^= D1.u8
-			objA0.render_flags |= D2.u8
+			char.render_flags |= D2.u8
 
-			if (objA0.flags2a & 0x20)
+			if (char.flags & char.flag.PUSHING)
 			{
-				--objA0.animation.timer
-				if (s8(objA0.animation.timer) >= 0)
+				--char.animation.timer
+				if (s8(char.animation.timer) >= 0)
 					return
 
-				D2.u16 = 0x0800 - abs(objA0.groundspeed)
+				D2.u16 = 0x0800 - abs(char.groundspeed)
 				if (D2.s16 < 0)
 					D2 = 0
 				if (char.character == CHARACTER_SONIC)
@@ -676,16 +679,16 @@ function void fn012d36()
 				{
 					// Knuckles
 					A1 = 0x013032
-					D2.u16 >>= 8
+					D2.u16 >>= 8		// Faster animation for Knuckles
 				}
-				objA0.animation.timer = D2.u8
-				objA0.render_flags = (objA0.render_flags & ~0x03) | (objA0.flags2a & 0x01)
+				char.animation.timer = D2.u8
+				char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (char.flags & char.flag.FACING_LEFT)
 			}
 			else
 			{
 				D0.u8 = (D0.u8 >> 5) & 0x03
-				D2.u16 = abs(objA0.groundspeed)
-				if (s8[A0 + 0x2b] < 0)
+				D2.u16 = abs(char.groundspeed)
+				if (s8(char.bonus_effect) < 0)
 				{
 					D2.u16 *= 2
 				}
@@ -700,92 +703,95 @@ function void fn012d36()
 					A1 = 0x01301a
 				}
 				D3.u8 += D0.u8
-				D1 = objA0.animation.frame
+				D1 = char.animation.frame
 				D0.u8 = u8[A1 + D1.s16 + 0x01]
 				if (D0.u8 == 0xff)
 				{
-					objA0.animation.frame = 0
+					char.animation.frame = 0
 					D0.u8 = u8[A1 + 0x01]
 				}
-				objA0.animation.sprite = D0.u8 + D3.u8
-				--objA0.animation.timer
-				if (s8(objA0.animation.timer) < 0)
+				char.animation.sprite = D0.u8 + D3.u8
+				--char.animation.timer
+				if (s8(char.animation.timer) < 0)
 				{
 					D2.u16 = max(0x0800 - D2.s16, 0) >> 8
-					objA0.animation.timer = D2.u8
-					++objA0.animation.frame
+					char.animation.timer = D2.u8
+					++char.animation.frame
 				}
 				return
 			}
 		}
 		else
 		{
-			objA0.render_flags &= ~0x03
-			D0.u8 = u8[A0 + 0x27]
+			char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+			D0.u8 = char.rotation.x
 			D1 = 0
-			D2.u8 = objA0.flags2a & 0x01
+			D2.u8 = char.flags & char.flag.FACING_LEFT
 			if (D2.u8 == 0)
 			{
 				D0.u8 += 0x16
 				D0.u16 = D0 / 0x2c
 				D0.u8 += 0x15
-				objA0.animation.sprite = D0.u8
-				objA0.animation.timer = 0
+				char.animation.sprite = D0.u8
+				char.animation.timer = 0
 			}
 			else
 			{
 				if (s8[A0 + 0x2d] < 0)
 				{
-					objA0.render_flags |= 0x01
+					char.render_flags |= render_flag.FLIP_X
 					D0.u8 += 0x16
 				}
 				else
 				{
-					objA0.render_flags |= 0x03
+					char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
 					D0.u8 = 0x9a - D0.u8
 				}
 				D0.u16 = D0 / 0x2c
 				D0.u8 += 0x15
-				objA0.animation.sprite = D0.u8
-				objA0.animation.timer = 0
+				char.animation.sprite = D0.u8
+				char.animation.timer = 0
 			}
 			return
 		}
 	}
 	else
 	{
-		--objA0.animation.timer
-		if (s8(objA0.animation.timer) >= 0)
+		--char.animation.timer
+		if (s8(char.animation.timer) >= 0)
 			return
 
-		D2.u16 = abs(objA0.groundspeed)
+		D2.u16 = abs(char.groundspeed)
 		A1 = (D2.u16 < 0x0600) ? 0x013020 : 0x013026
 		D2.u16 = max(0x0400 - D2.s16, 0) >> 8
-		objA0.animation.timer = D2.u8
-		D1.u8 = objA0.flags2a & 0x01
-		objA0.render_flags = (objA0.render_flags & ~0x03) | D1.u8
+		char.animation.timer = D2.u8
+		D1.u8 = char.flags & char.flag.FACING_LEFT
+		char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | D1.u8
 	}
 
 // 0x012d90:
-	D1 = objA0.animation.frame
+	D1 = char.animation.frame
 	D0.u8 = u8[A1 + D1.s16 + 0x01]
 	if (D0.u8 >= 0xfc)
 	{
 		if (D0.u8 == 0xff)
 		{
-			objA0.animation.frame = 0
+			// Loop animation from the start
+			char.animation.frame = 0
 			D0.u8 = u8[A1 + 0x01]
 		}
 		else if (D0.u8 == 0xfe)
 		{
+			// Loop animation from specific frame
 			D0.u8 = u8[A1 + D1.s16 + 0x02]
-			objA0.animation.frame -= D0.u8
+			char.animation.frame -= D0.u8
 			D1.u8 -= D0.u8
 			D0.u8 = u8[A1 + D1.s16 + 0x01]
 		}
 		else if (D0.u8 == 0xfd)
 		{
-			objA0.state = u8[A1 + D1.s16 + 0x02]
+			// Change to another animation
+			char.state = u8[A1 + D1.s16 + 0x02]
 			return
 		}
 		else if (D0.u8 == 0xfc)
@@ -793,22 +799,24 @@ function void fn012d36()
 			return
 		}
 	}
-	objA0.animation.sprite = D0.u8
-	++objA0.animation.frame
+
+	// Advance to next frame
+	char.animation.sprite = D0.u8
+	++char.animation.frame
 }
 
 
 //# address-hook(0x01309a) end(0x013100)
-function void fn01309a()
+function void CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
 {
 	u16 targetInVRAM = (A0 == 0xffffb000) ? 0xd000 : 0xd400
 	if (char.character != CHARACTER_SONIC)
 	{
-		updateMultipleSpritePatterns(0x33db60, 0x2a0498, targetInVRAM, objA0.animation.sprite)
+		updateMultipleSpritePatterns(0x33db60, 0x2a0498, targetInVRAM, char.animation.sprite)
 	}
 	else
 	{
-		updateMultipleSpritePatterns(0x337780, 0x29fde4, targetInVRAM, objA0.animation.sprite)
+		updateMultipleSpritePatterns(0x337780, 0x29fde4, targetInVRAM, char.animation.sprite)
 	}
 }
 
@@ -817,51 +825,51 @@ function void fn01309a()
 // Tails
 
 //# address-hook(0x015cd0) end(0x015cd0)
-function void fn015cd0()
+function void CompetitionMode.Character.UpdateAnimation.Tails()
 {
 	A1 = 0x015f60
-	fn015cd6()
+	CompetitionMode.UpdateTailsAnimation_inner()
 }
 
 
 //# address-hook(0x015cd6) end(0x015f5e)
-function void fn015cd6()
+function void CompetitionMode.UpdateTailsAnimation_inner()
 {
-	D0 = objA0.state
-	if (D0.u8 != objA0.state.former)
+	D0 = char.state
+	if (D0.u8 != char.state.former)
 	{
-		objA0.state.former = D0.u8
-		objA0.animation.frame = 0
-		objA0.animation.timer = 0
-		objA0.flags2a &= ~0x20
+		char.state.former = D0.u8
+		char.animation.frame = 0
+		char.animation.timer = 0
+		char.flags &= ~char.flag.PUSHING
 	}
 	A1 = tableLookupAddress(A1, D0.u16 * 2)
 
 	D0.u8 = u8[A1]
 	if (D0.s8 >= 0)
 	{
-		objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x01)
+		char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (char.flags & char.flag.FACING_LEFT)
 
-		--objA0.animation.timer
-		if (s8(objA0.animation.timer) < 0)
+		--char.animation.timer
+		if (s8(char.animation.timer) < 0)
 		{
-			objA0.animation.timer = D0.u8
-			fn015d1e()
+			char.animation.timer = D0.u8
+			CompetitionMode.updateTailsAnimation_shared()
 		}
 		return
 	}
 	else if (D0.u8 == 0xff)
 	{
-		D0 = u8[A0 + 0x27]
+		D0 = char.rotation.x
 		if (D0.u8 == 0)
 		{
 			D1 = 0
-			D0.u8 = objA0.value26
+			D0.u8 = char.rotation
 			if (D0.s8 > 0)
 			{
 				--D0.u8
 			}
-			D2.u8 = objA0.flags2a & 0x01
+			D2.u8 = char.flags & char.flag.FACING_LEFT
 			if (D2.u8 == 0)
 			{
 				D0.u8 ^= 0xff
@@ -871,34 +879,34 @@ function void fn015cd6()
 			{
 				D1 = 0x03
 			}
-			objA0.render_flags &= 0xfc
+			char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D2.u8 ^= D1.u8
-			objA0.render_flags |= D2.u8
-			if (objA0.flags2a & 0x20)
+			char.render_flags |= D2.u8
+			if (char.flags & char.flag.PUSHING)
 			{
-				--objA0.animation.timer
-				if (s8(objA0.animation.timer) >= 0)
+				--char.animation.timer
+				if (s8(char.animation.timer) >= 0)
 					return
 
-				D2.u16 = 0x0800 - abs(objA0.groundspeed)
+				D2.u16 = 0x0800 - abs(char.groundspeed)
 				if (D2.s16 < 0)
 					D2 = 0
 				D2.u16 >>= 6
-				objA0.animation.timer = D2.u8
+				char.animation.timer = D2.u8
 				A1 = 0x015fb8
-				objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x01)
-				fn015d1e()
+				char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (char.flags & char.flag.FACING_LEFT)
+				CompetitionMode.updateTailsAnimation_shared()
 				return
 			}
 
 			D0.u8 >>= 5
 			D0.u8 &= 0x03
-			D2.u16 = u16(objA0.groundspeed)
+			D2.u16 = u16(char.groundspeed)
 			if (D2.s16 < 0)
 			{
 				D2.s16 = -D2.s16
 			}
-			if (s8[A0 + 0x2b] < 0)
+			if (s8(char.bonus_effect) < 0)
 			{
 				D2.u16 *= 2
 			}
@@ -910,74 +918,74 @@ function void fn015cd6()
 				D0.u8 *= 2
 			}
 			D3.u8 += D0.u8
-			D1 = objA0.animation.frame
+			D1 = char.animation.frame
 			D0.u8 = u8[A1 + D1.s16 + 0x01]
 			if (D0.u8 == 0xff)
 			{
-				objA0.animation.frame = 0
+				char.animation.frame = 0
 				D0.u8 = u8[A1 + 0x01]
 			}
-			objA0.animation.sprite = D0.u8 + D3.u8
-			--objA0.animation.timer
-			if (s8(objA0.animation.timer) < 0)
+			char.animation.sprite = D0.u8 + D3.u8
+			--char.animation.timer
+			if (s8(char.animation.timer) < 0)
 			{
 				D2.s16 = 0x0800 - D2.s16
 				if (D2.s16 < 0)
 					D2 = 0
 				D2.u16 >>= 8
-				objA0.animation.timer = D2.u8
-				++objA0.animation.frame
+				char.animation.timer = D2.u8
+				++char.animation.frame
 			}
 			return
 		}
 
-		D0.u8 = u8[A0 + 0x27]
+		D0.u8 = char.rotation.x
 		D1 = 0
-		D2.u8 = objA0.flags2a &  0x01
+		D2.u8 = char.flags & char.flag.FACING_LEFT
 		if (D2.u8 == 0)
 		{
-			objA0.render_flags &= 0xfc
+			char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D0.u8 += 0x16
 			D0.u16 = D0 / 0x2c   // Result should also contain modulo in upper byte/word
 			D0.u8 += 0x15
-			objA0.animation.sprite = D0.u8
-			objA0.animation.timer = 0
+			char.animation.sprite = D0.u8
+			char.animation.timer = 0
 			return
 		}
 
-		objA0.render_flags &= 0xfc
+		char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		if (s8[A0 + 0x2d] < 0)
 		{
-			objA0.render_flags |= 0x01
+			char.render_flags |= render_flag.FLIP_X
 			D0.u8 += 0x16
 		}
 		else
 		{
-			objA0.render_flags |= 0x03
+			char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
 			D0.u8 = 0x9a - D0.u8
 		}
 		D0.u16 = D0 / 0x2c   // Result should also contain modulo in upper byte/word
 		D0.u8 += 0x15
-		objA0.animation.sprite = D0.u8
-		objA0.animation.timer = 0
+		char.animation.sprite = D0.u8
+		char.animation.timer = 0
 		return
 	}
 
-	--objA0.animation.timer
-	if (s8(objA0.animation.timer) >= 0)
+	--char.animation.timer
+	if (s8(char.animation.timer) >= 0)
 		return
 
 	if (D0.u8 == 0xfe)
 	{
-		D2.u16 = abs(objA0.groundspeed)
+		D2.u16 = abs(char.groundspeed)
 		A1 = (D2.u16 < 0x0600) ? 0x015fae : 0x015fb3
 		D2.s16 = 0x0400 - D2.s16
 		if (D2.s16 < 0)
 			D2 = 0
 		D2.u16 >>= 8
-		objA0.animation.timer = D2.u8
-		objA0.render_flags = (objA0.render_flags & 0xfc) | (objA0.flags2a & 0x01)
-		fn015d1e()
+		char.animation.timer = D2.u8
+		char.render_flags = (char.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | (char.flags & char.flag.FACING_LEFT)
+		CompetitionMode.updateTailsAnimation_shared()
 	}
 	else
 	{
@@ -986,7 +994,7 @@ function void fn015cd6()
 		D2.u16 = u16[A2 + 0x1a]
 		LookupAngleByVector()
 		D1 = 0
-		D2.u8 = objA0.flags2a & 0x01
+		D2.u8 = char.flags & char.flag.FACING_LEFT
 		if (D2.u8 == 0)
 			D0.u8 ^= 0xff
 		else
@@ -996,42 +1004,45 @@ function void fn015cd6()
 		{
 			D1 = 0x03
 		}
-		objA0.render_flags &= 0xfc
+		char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		D2.u8 ^= D1.u8
-		objA0.render_flags |= D2.u8
+		char.render_flags |= D2.u8
 		D0.u8 >>= 5
 		D0.u8 &= 0x03
 		D3.u8 = D0.u8 * 3
 		A1 = 0x0162d2
-		objA0.animation.timer = 0x03
-		fn015d1e()
-		objA0.animation.sprite += D3.u8
+		char.animation.timer = 0x03
+		CompetitionMode.updateTailsAnimation_shared()
+		char.animation.sprite += D3.u8
 	}
 }
 
 
 //# address-hook(0x015d1e)
-function void fn015d1e()
+function void CompetitionMode.updateTailsAnimation_shared()
 {
-	D1 = objA0.animation.frame
+	D1 = char.animation.frame
 	D0.u8 = u8[A1 + D1.s16 + 0x01]
 	if (D0.u8 >= 0xf0)
 	{
 		if (D0.u8 == 0xff)
 		{
-			objA0.animation.frame = 0
+			// Loop animation from the start
+			char.animation.frame = 0
 			D0.u8 = u8[A1 + 0x01]
 		}
 		else if (D0.u8 == 0xfe)
 		{
+			// Loop animation from specific frame
 			D0.u8 = u8[A1 + D1.s16 + 0x02]
-			objA0.animation.frame -= D0.u8
+			char.animation.frame -= D0.u8
 			D1.u8 -= D0.u8
 			D0.u8 = u8[A1 + D1.s16 + 0x01]
 		}
 		else if (D0.u8 == 0xfd)
 		{
-			objA0.state = u8[A1 + D1.s16 + 0x02]
+			// Change to another animation
+			char.state = u8[A1 + D1.s16 + 0x02]
 			return
 		}
 		else
@@ -1040,16 +1051,17 @@ function void fn015d1e()
 		}
 	}
 
-	objA0.animation.sprite = D0.u8
-	++objA0.animation.frame
+	// Advance to next frame
+	char.animation.sprite = D0.u8
+	++char.animation.frame
 }
 
 
 //# address-hook(0x016050) end(0x0160a4)
-function void fn016050()
+function void CompetitionMode.Character.UpdateSpritePatterns.Tails()
 {
 	u16 targetInVRAM = (A0 == 0xffffb000) ? 0xd000 : 0xd400
-	updateMultipleSpritePatterns(0x33a840, 0x2a013e, targetInVRAM, objA0.animation.sprite)
+	updateMultipleSpritePatterns(0x33a840, 0x2a013e, targetInVRAM, char.animation.sprite)
 }
 
 

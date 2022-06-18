@@ -29,13 +29,13 @@ function void fn03385e()
 {
 	A1 = 0xffffb000
 	A2 = A0 + 0x30
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D5.u16 = control.player1
 	fn0338c4()
 
 	A1 = 0xffffb04a
 	A2 = A0 + 0x34
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	D5.u16 = control.tails
 	fn0338c4()
 
@@ -65,7 +65,9 @@ function void fn03385e()
 //# address-hook(0x0338c4) end(0x033abe)
 function void fn0338c4()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if (u8[A2 + 0x01] != 0)
 		{
@@ -122,7 +124,7 @@ function void fn0338c4()
 						u8[A2] = 0
 					}
 
-					u8[A1 + 0x04] &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 					u8[A1 + 0x20] = 0
 					u8[A1 + 0x2a] &= ~0x01
 					u8[A1 + 0x2e] |= 0x40
@@ -195,9 +197,9 @@ function void fn0338c4()
 
 				D0 = u8[A2]
 				if (D0.u8 >= 0x80)
-					u16[A1 + 0x0a] |= 0x8000
+					objA1.sprite_attributes |= sprite_attribute.PRIORITY
 				else
-					u16[A1 + 0x0a] &= 0x7fff
+					objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 				D0.u8 += 0x40
 				D0.s8 = -D0.s8
 				D0.u16 &= 0xff
@@ -211,15 +213,15 @@ function void fn0338c4()
 	}
 
 	u8[A1 + 0x26] = 0
-	u8[A1 + 0x2a] &= ~0x04
+	u8[A1 + 0x2a] &= ~char.flag.ROLLING
 	u8[A1 + 0x1e] = 0x13
 	u8[A1 + 0x1f] = 0x09
-	u16[A1 + 0x20] = 0x01
-	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	u16[A1 + 0x20] = char.state.RUNNING2
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02
-	u16[A1 + 0x0a] &= 0x7fff
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	u8[A2 + 0x01] = 0x10
 }
 
@@ -227,15 +229,18 @@ function void fn0338c4()
 //# address-hook(0x033ade) end(0x033c14)
 function void fn033ade()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (debug_mode.state == 0)
 	{
-		D5.u16 &= 0x70
+		// Check if jump button pressed
+		D5.u16 &= CONTROL_ABC
 		if (D5.u16 != 0)
 		{
 			objA1.velocity.x = -0x800
 			objA1.velocity.y = -0x200
 			u8[A1 + 0x2a] |= 0x01
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			u8[A1 + 0x40] = 0
 
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
@@ -272,7 +277,7 @@ function void fn033ade()
 						objA1.velocity.x = (s8[A2] >= 0) ? 0x100 : -0x100
 						objA1.velocity.y = 0
 						u16[A1 + 0x1c] = objA1.velocity.x
-						u8[A1 + 0x2a] |= 0x02
+						u8[A1 + 0x2a] |= char.flag.IN_AIR
 					}
 				}
 			}
@@ -280,16 +285,16 @@ function void fn033ade()
 	}
 
 	u8[A1 + 0x26] = 0
-	u8[A1 + 0x2a] &= ~0x04
+	u8[A1 + 0x2a] &= ~char.flag.ROLLING
 	u8[A1 + 0x1e] = 0x13
 	u8[A1 + 0x1f] = 0x09
-	u16[A1 + 0x20] = 0x01
-	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	u16[A1 + 0x20] = char.state.RUNNING2
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x2e] &= ~0x40
 	u8[A1 + 0x2e] &= ~0x02
 	u8[A1 + 0x2e] &= ~0x01
-	u16[A1 + 0x0a] &= 0x7fff
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	u8[A2 + 0x01] = 0x10
 }
 
@@ -309,10 +314,10 @@ function void fn033bba()
 	D1.u16 += D0.u16
 	objA1.position.x.u16 = D1.u16
 	D0 = u8[A2]
-	u16[A1 + 0x0a] &= 0x7fff
+	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	if (D0.u8 >= 0x80)
 	{
-		u16[A1 + 0x0a] |= 0x8000
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 	D0.u8 += 0x40
 	D0.s8 = -D0.s8
@@ -328,10 +333,12 @@ function void fn033bba()
 //# address-hook(0x033c34) end(0x033c72)
 function void fn033c34()
 {
+	u8 bit = (1 << D6.u8)
+
 	if (u8[A1 + 0x2a] & 0x08)
 	{
 		A3 = 0xffff0000 + u16[A1 + 0x42]
-		u8[A3 + 0x2a] &= ~(1 << D6.u8)
+		u8[A3 + 0x2a] &= ~bit
 	}
 
 	u16[A1 + 0x42] = A0.u16
@@ -344,7 +351,7 @@ function void fn033c34()
 		A0 = backupA0
 	}
 
-	u8[A1 + 0x2a] |= 0x08
-	u8[A1 + 0x2a] &= ~0x02
-	objA0.flags2a |= (1 << D6.u8)
+	u8[A1 + 0x2a] |= char.flag.ON_OBJECT
+	u8[A1 + 0x2a] &= ~char.flag.IN_AIR
+	objA0.flags2a |= bit
 }

@@ -16,7 +16,7 @@
 function void FloatingPoints.Init()
 {
 	objA0.mapping_offset = 0x02cf50
-	objA0.sprite_attributes = 0x85e4
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x05e4)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 8

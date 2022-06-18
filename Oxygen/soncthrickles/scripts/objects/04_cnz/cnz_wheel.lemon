@@ -90,7 +90,7 @@ function void fn0328e8()
 		{
 			u8[A1 + 0x20] = 0
 		}
-		u8[A1 + 0x21] = 0x01
+		u8[A1 + 0x21] = char.state.RUNNING2
 		objA1.flags2a &= ~char.flag.PUSHING
 		u8[A1 + 0x3c] = 1		// Set the "char.on_convex_surface" flag
 	}

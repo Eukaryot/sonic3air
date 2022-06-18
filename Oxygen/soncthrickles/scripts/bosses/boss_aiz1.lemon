@@ -228,7 +228,7 @@ function void fn068bdc()
 {
 	objA0.value39 = 0x04
 	objA0.countdown_callback = 0x068bf6
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	UpdateMovementStraightSimple()
 }
 
@@ -347,7 +347,7 @@ function void fn068cd0()
 {
 	fn06885a()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u32[A1] == 0x06872c)	// Rocket launcher of AIZ 1 mini-boss
+	if (objA1.update_address == 0x06872c)	// Rocket launcher of AIZ 1 mini-boss
 		u8[A0 + 0x28] = 0
 	objA0.countdown_callback = 0x068d06
 	objA0.hitbox_extends.y = 8
@@ -357,7 +357,7 @@ function void fn068cd0()
 	{
 		// For Knuckles' AIZ 1 boss fight on Sonic's route (Act is 1 here already!)
 		//  -> Draw in foreground because of the palmtrees
-		objA0.sprite_attributes |= 0x8000
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 #endif
 }
@@ -460,14 +460,14 @@ function void fn068d9c()
 
 	if (global.zone != 0x00)
 	{
-		objA0.sprite_attributes = 0x500
+		objA0.sprite_attributes = 0x0500
 	}
 #if STANDALONE
 	else if (global.act == 1)
 	{
 		// For Knuckles' AIZ 1 boss fight on Sonic's route (Act is 1 here already!)
 		//  -> Draw in foreground because of the palmtrees
-		objA0.sprite_attributes |= 0x8000
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 #endif
 
@@ -585,7 +585,7 @@ function void fn068ee4()
 	D1.u16 &= 0x0c
 	D0.u16 += D1.u16
 
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		A2 = 0x068f3e
 		A3 = 0x068f58
@@ -677,7 +677,7 @@ function void fn0686be()
 	MoveAndFlipWithParent()
 	setupObjectAttributesMost(0x06900a)
 
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	u32[A0 + 0x30] = 0x069126
 	objA0.update_address = 0x0686e8
 	fn0849a2()
@@ -914,7 +914,7 @@ function void fn06889a()
 function void fn0688b0()
 {
 	objA0.base_state = 0x06
-	playSound(0x51)
+	playSound(SFX_BOMBFALL)
 	objA0.sprite_priority = 0x80
 	objA0.render_flags |= render_flag.FLIP_Y
 	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
@@ -948,7 +948,7 @@ function void fn0688f4()
 function void fn06890e()
 {
 	setupObjectAttributesFull(0x06903e)
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	objA0.countdown_callback = 0x06893e
 	D1 = 6
 	fn068928()
@@ -1002,7 +1002,7 @@ function void fn0689ac()
 	u16[A0 + 0x46] = A1.u16
 	objA0.position.y.u16 = objA1.position.y.u16
 	D0.s16 = -0x60
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		D0.s16 = -D0.s16
 		objA0.render_flags |= render_flag.FLIP_X

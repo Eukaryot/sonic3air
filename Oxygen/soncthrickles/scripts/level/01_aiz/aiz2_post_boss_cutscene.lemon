@@ -63,8 +63,7 @@ function void fn061f98()
 //# address-hook(0x061fc2) end(0x062012)
 function void fn061fc2()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	objA0.position.x.u16 = 0x4b8e
@@ -177,7 +176,7 @@ function void fn06208c()
 function void fn01e6ec()
 {
 	objA0.mapping_offset = 0x01e758
-	objA0.sprite_attributes = 0x85a0
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x05a0)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x0c

@@ -32,7 +32,7 @@ function void fn02131c()
 
 	objA0.animation.sprite = objA0.subtype2c & 0x0f
 	objA0.mapping_offset = 0x21fd52
-	objA0.sprite_attributes = 0x4001
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x28
 	objA0.countdown_callback = 0x02193a
@@ -42,7 +42,7 @@ function void fn02131c()
 	{
 		// Hydrocity Zone
 		objA0.mapping_offset = 0x21ffd8
-		objA0.sprite_attributes = 0x6001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0001)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x02199a
@@ -50,7 +50,7 @@ function void fn02131c()
 
 		if (objA0.animation.sprite == 0x02)
 		{
-			objA0.sprite_attributes = 0x4350
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0350)
 			objA0.box_size.x = 0x18
 			objA0.box_size.y = 0x20
 			objA0.countdown_callback = 0x02199a
@@ -63,7 +63,7 @@ function void fn02131c()
 	{
 		// Marble Garden Zone
 		objA0.mapping_offset = 0x21ff18
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.box_size.x = 0x20
 		objA0.box_size.y = 0x28
 		objA0.countdown_callback = 0x021a2a
@@ -84,7 +84,7 @@ function void fn02131c()
 	{
 		// Carnival Night Zone
 		objA0.mapping_offset = 0x021aba
-		objA0.sprite_attributes = 0x4420
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0420)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -100,7 +100,7 @@ function void fn02131c()
 	{
 		// Launch Base Zone
 		objA0.mapping_offset = 0x22005e
-		objA0.sprite_attributes = 0x22ea
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02ea)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x02199a
@@ -113,7 +113,7 @@ function void fn02131c()
 	{
 		// Mushroom Hill Zone
 		objA0.mapping_offset = 0x021bce
-		objA0.sprite_attributes = 0x434b
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x034b)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -126,7 +126,7 @@ function void fn02131c()
 	{
 		// Sandopolis Zone
 		objA0.mapping_offset = 0x021aba
-		objA0.sprite_attributes = 0x448c
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x048c)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -145,7 +145,7 @@ function void fn02131c()
 	{
 		// Lava Reef Zone
 		objA0.mapping_offset = 0x021c1e
-		objA0.sprite_attributes = 0x640d
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x040d)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x20
 		objA0.countdown_callback = 0x021a7a
@@ -159,8 +159,8 @@ function void fn02131c()
 //# address-hook(0x021568) end(0x021690)
 function void fn021568()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -202,7 +202,7 @@ function void fn021568()
 		else
 		{
 			// Does this wall allow for rolling into the wall? Otherwise the fire shield will do
-			if ((objA0.flags2a & 0x20) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
+			if ((objA0.flags2a & object.flag.P1_PUSHING) || (u8[A1 + 0x2b] & char.bonus.SHIELD_FIRE))
 			{
 				canBreakWall = (objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
 			}
@@ -210,13 +210,13 @@ function void fn021568()
 
 		if (canBreakWall)
 		{
-			objA0.flags2a &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
 			fn02165a()
 
 			A1 = 0xffffb04a
-			if ((objA0.flags2a & 0x40) && objA1.state == char.state.ROLLING)
+			if ((objA0.flags2a & object.flag.P2_PUSHING) && objA1.state == char.state.ROLLING)
 			{
-				objA0.flags2a &= ~0x40
+				objA0.flags2a &= ~object.flag.P2_PUSHING
 				objA1.velocity.x = objA0.value32
 				u16[A1 + 0x1c] = objA1.velocity.x
 				objA1.flags2a &= ~char.flag.PUSHING
@@ -229,19 +229,19 @@ function void fn021568()
 
 	A1 = 0xffffb04a
 	D1.u16 = objA0.value32
-	if ((objA0.flags2a & 0x40) && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
+	if ((objA0.flags2a & object.flag.P2_PUSHING) && objA1.state == char.state.ROLLING && abs(D1.s16) >= 0x0480)
 	{
-		objA0.flags2a &= ~0x40
+		objA0.flags2a &= ~object.flag.P2_PUSHING
 		fn02165a()
 
 	#if STANDALONE
 		if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 		{
 			// Prevent slope glitch here for player 1
-			if ((u8[0xffffb02a] & char.flag.ON_OBJECT) && u16[0xffffb042] == A0.u16)
+			if ((u8[0xffffb000 + 0x2a] & char.flag.ON_OBJECT) && u16[0xffffb000 + 0x42] == A0.u16)
 			{
-				u8[0xffffb02a] &= ~char.flag.ON_OBJECT
-				u8[0xffffb02a] |= char.flag.IN_AIR
+				u8[0xffffb000 + 0x2a] &= ~char.flag.ON_OBJECT
+				u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 			}
 		}
 	#endif
@@ -298,7 +298,7 @@ function void fn02165a()
 	if (global.zone == 0x02)
 	{
 		// Needed in MGZ to prevent Knuckles from a complete stop, when he uses a spinning top to break the wall
-		u8[0xffffb037] &= ~0x40
+		u8[0xffffb000 + 0x37] &= ~0x40
 	}
 #endif
 }
@@ -334,26 +334,31 @@ function void Wall.Destroy()
 function void fn0216b8()
 {
 	D0 = objA0.animation.sprite * 2
-	A3 = u32[A0 + 0x0c]
+	A3 = objA0.mapping_offset
 	A3 += u16[A3 + D0.s16]
 	D1.u16 = u16[A3] - 1
 	A3 += 2
-	objA0.render_flags |= 0x20
+	objA0.render_flags |= render_flag.STATIC_MAPPING
 	D4 = objA0.update_address
 	D5.u8 = objA0.render_flags
 	A1 = A0
 
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = A3
-		u8[A1 + 0x04] = D5.u8
+		// Spawn wall debris
+		objA1.update_address = D4
+		objA1.mapping_offset = A3
+		objA1.render_flags = D5.u8
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u16[A1 + 0x0a] = u16[A0 + 0x0a] | 0x8000
-		u8[A1 + 0x08] = u8[A0 + 0x08]
-		u8[A1 + 0x07] = objA0.box_size.x
-		u8[A1 + 0x06] = objA0.box_size.y
+		objA1.sprite_attributes = objA0.sprite_attributes | sprite_attribute.PRIORITY
+	#if STANDALONE
+		objA1.sprite_priority = objA0.sprite_priority
+	#else
+		u8[A1 + 0x08] = u8[A0 + 0x08]	// Original code only copies the upper byte of the sprite priority for some reason
+	#endif
+		objA1.box_size.x = objA0.box_size.x
+		objA1.box_size.y = objA0.box_size.y
 		objA1.velocity.x = u16[A4]
 		objA1.velocity.y = u16[A4+2]
 
@@ -375,8 +380,8 @@ function void fn02172e()
 {
 	// Used for the MGZ wall variant that is only breakable by spinning top
 
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -402,7 +407,7 @@ function void fn021758()
 			objA1.velocity.x = u16[A0 + 0x30]
 			u16[A1 + 0x1c] = objA1.velocity.x
 			objA1.flags2a &= ~char.flag.PUSHING
-			objA0.flags2a &= ~0x20
+			objA0.flags2a &= ~object.flag.P1_PUSHING
 
 			fn0217ee()
 			hitByPlayer1 = true
@@ -418,7 +423,7 @@ function void fn021758()
 			objA1.velocity.x = objA0.value32
 			u16[A1 + 0x1c] = objA1.velocity.x
 			objA1.flags2a &= ~char.flag.PUSHING
-			objA0.flags2a &= ~0x40
+			objA0.flags2a &= ~object.flag.P2_PUSHING
 
 			if (!hitByPlayer1)
 			{
@@ -453,8 +458,8 @@ function void fn0217ee()
 //# address-hook(0x021818) end(0x021936)
 function void fn021818()
 {
-	u16[A0 + 0x30] = u16[0xffffb018]
-	objA0.value32 = u16[0xffffb062]
+	u16[A0 + 0x30] = u16[0xffffb000 + 0x18]
+	objA0.value32 = u16[0xffffb04a + 0x18]
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
 	D3.u16 = D2.u16 + 1
@@ -485,11 +490,11 @@ function void fn021818()
 	D1.u16 = u16[A0 + 0x30]
 	if ((D6.u16 & 0x01) && (u8[A1 + 0x38] == CHARACTER_KNUCKLES))
 	{
-		objA0.flags2a &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
 		fn0218ce()
 
 		A1 = 0xffffb04a
-		if ((objA0.flags2a & 0x40) == 0)
+		if ((objA0.flags2a & object.flag.P2_PUSHING) == 0)
 		{
 			DrawOrUnloadObject()
 			return
@@ -497,7 +502,7 @@ function void fn021818()
 
 		objA1.velocity.x = objA0.value32
 		u16[A1 + 0x1c] = objA1.velocity.x
-		objA0.flags2a &= ~0x40
+		objA0.flags2a &= ~object.flag.P2_PUSHING
 		objA1.flags2a &= ~char.flag.PUSHING
 		DrawOrUnloadObject()
 	}
@@ -505,13 +510,13 @@ function void fn021818()
 	{
 		A1 = 0xffffb04a
 		D1.u16 = objA0.value32
-		if ((objA0.flags2a & 0x40) == 0 || u8[A1 + 0x38] != CHARACTER_KNUCKLES)
+		if ((objA0.flags2a & object.flag.P2_PUSHING) == 0 || u8[A1 + 0x38] != CHARACTER_KNUCKLES)
 		{
 			DrawOrUnloadObject()
 			return
 		}
 
-		objA0.flags2a &= ~0x40
+		objA0.flags2a &= ~object.flag.P2_PUSHING
 		fn0218ce()
 	}
 }
@@ -536,7 +541,7 @@ function void fn0218ce()
 	if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 0x01)
 	{
 		u8[A1 + 0x2f] = 0x02
-		u8[A1 + 0x20] = 0x21
+		u8[A1 + 0x20] = char.state.KNUX_FALLING
 		if (objA1.velocity.x < 0)
 			objA1.flags2a |= char.flag.FACING_LEFT
 		else

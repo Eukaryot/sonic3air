@@ -54,7 +54,7 @@ function void SmallExplosion.Init2()
 function void fn01e626()
 {
 	objA0.mapping_offset = 0x01e758
-	D0.u16 = (objA0.sprite_attributes & 0x8000) | 0x05a0
+	D0.u16 = (objA0.sprite_attributes & sprite_attribute.PRIORITY) | 0x05a0
 	objA0.sprite_attributes = D0.u16
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80

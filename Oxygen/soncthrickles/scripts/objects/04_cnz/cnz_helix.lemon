@@ -53,8 +53,8 @@ function void fn033102()
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			objA1.state = char.state.ROLLING
-			u8[A1 + 0x2a] &= ~0x20
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			u8[A1 + 0x2e] = 0x81
 
 			u8[A4 + 0x01] = 0
@@ -68,7 +68,7 @@ function void fn033102()
 			objA1.position.x.u16 = D1.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 		}
 	}
 }
@@ -260,8 +260,8 @@ function void fn0332a2()
 function void fn031c9e()
 {
 	objA0.mapping_offset = 0x230dcc
-	objA0.sprite_attributes = 0x43f0
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03f0)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x08

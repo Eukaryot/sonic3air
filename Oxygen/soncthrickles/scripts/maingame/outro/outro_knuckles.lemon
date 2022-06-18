@@ -116,7 +116,7 @@ function void fn05e80a()
 
 	#if STANDALONE
 		// Play outro music (not the medley, but the music before that; it's SSZ in the original)
-		playMusic(0x26)
+		playMusic(MUSIC_ENDING)
 	#else
 		PlayMusicAfterLevelResults()
 	#endif
@@ -172,9 +172,9 @@ function void fn05e890()
 
 	objA0.base_state = 0x0a
 	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = 0x826e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
 	objA0.animation.sprite = 0x01
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.flags2a |= 0x80
 
 	objA0.position.y.u16 = camera.position.y.u16 + 0x50
@@ -212,9 +212,9 @@ function void fn05e916()
 		return
 
 	objA0.base_state = 0x0c
-	objA0.sprite_attributes = 0x226e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x026e)
 	objA0.animation.sprite = 0x06
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	objA0.flags38 |= 0x10
 
 	objA0.position.y.u16 = u16[0xffffee9c] + 0x0448
@@ -304,7 +304,7 @@ function void fn05eb9e()
 {
 	// Knuckles
 	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = 0x826e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
 	objA0.animation.sprite = 0x12
 }
 
@@ -317,7 +317,7 @@ function void fn05ebc6()
 {
 	objA0.update_address = 0x05ebe4
 	setupObjectAttributesFull(0x07d450)
-	objA0.sprite_attributes += 0x4000
+	objA0.sprite_attributes += sprite_attribute.PALETTE.LINE2
 	objA0.animation.sprite = 2
 	fn05ebe4()
 }
@@ -346,9 +346,9 @@ function void fn05ebf0()
 function void fn05ec00()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x04] & 0x04) == 0)
+	if ((objA1.render_flags & render_flag.WORLD) == 0)
 	{
-		objA0.render_flags &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
 	}
 }
 
@@ -421,9 +421,9 @@ function void fn05ecb4()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u8[A0 + 0x0a] = (u8[A0 + 0x0a] & ~0x80) | (u8[A1 + 0x0a] & 0x80)
-	if ((u8[A1 + 0x04] & 0x04) == 0)
+	if ((objA1.render_flags & render_flag.WORLD) == 0)
 	{
-		objA0.render_flags &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
 	}
 
 	objA0.update_address = 0x05ed18
@@ -432,10 +432,10 @@ function void fn05ecb4()
 	{
 		++offset	// Knuckles with Master Emerald
 	}
-	offset *= 2
+	offset *= 2	// From here, first byte is the plane pilot, second byte is character standing on the wings
 	if (objA0.subtype2c != 0)
 	{
-		++offset
+		++offset	// Get offset of sprite for character on wings
 	}
 	objA0.animation.sprite = u8[0x05ed0e + offset]
 
@@ -681,11 +681,10 @@ function void fn05f71e()
 function void fn05f74e()
 {
 	u16[0xfffffa9a] = 0
-	A1 = 0x07d3ea
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x07d3ea))
 		return
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	u8[A0 + 0x0a] |= 0x80
 	objA0.animation.sprite = 0x0f
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
@@ -819,7 +818,7 @@ function void fn05f8a8()
 function void fn05f8c6()
 {
 	setupObjectAttributesFull(0x060182)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f946
 
 	A1 = 0x05f93e + objA0.subtype2c
@@ -830,6 +829,7 @@ function void fn05f8c6()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object that fades in the logo palette
 		u16[A0 + 0x44] = A1.u16
 		objA1.update_address = 0x0855b2
 		D0 = 0x05
@@ -966,7 +966,7 @@ function void fn05ff1c()
 	A1 += objA0.subtype2c
 	objA0.position.x.u16 = u16[(A1+=2)-2] + getScreenExtend()
 	objA0.position.y.u16 = u16[(A1+=2)-2]
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 
 	zeroMemory(0xfffffc20, 0x20)
 
@@ -999,7 +999,7 @@ function void fn05ff6e()
 	objA0.countdown_value = 3
 	A1 = 0xffff0000 + u16[A0 + 0x30]
 	D0.u16 = u16[A0 + 0x3a]
-	fadeColorsToWhiteUniform(A1, D0.u16 + 1)
+	fadeColorsToWhiteUniform(A1, D0.u16 + 1)	// Fade logo palette to white
 
 	--objA0.value39
 	if (s8[A0 + 0x39] < 0)
@@ -1023,7 +1023,7 @@ function void fn05ffa6()
 	A1 = 0xffff0000 + u16[A0 + 0x30]
 	A2 = 0xffff0000 + objA0.value32
 	D0.u16 = u16[A0 + 0x3a]
-	fadeColorsTowardsTargetUniform(A1, A2, u16[A0 + 0x3a] + 1)
+	fadeColorsTowardsTargetUniform(A1, A2, D0.u16 + 1)	// Fade logo palette back to it's original colors
 
 	--objA0.value39
 	if (s8[A0 + 0x39] < 0)
@@ -1137,6 +1137,7 @@ function void fn05fda4()
 {
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object that fades in the logo palette
 		u16[A0 + 0x44] = A1.u16
 		objA1.update_address = 0x0855b2
 		D0 = 5

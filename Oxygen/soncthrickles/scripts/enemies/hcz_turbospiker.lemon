@@ -108,7 +108,7 @@ function void fn087c8e()
 	objA0.base_state = 0x06
 	objA0.countdown_value = 0x0f
 	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -0x200 : 0x200
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 }
 
 
@@ -121,7 +121,7 @@ function void fn087cae()
 
 	objA0.base_state = objA0.value3a
 	objA0.velocity.x = -objA0.velocity.x
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.countdown_value = u16[A0 + 0x3c]
 }
 
@@ -315,7 +315,7 @@ function void fn087e48()
 	setupObjectAttributesMost(0x087ed2)
 	objA0.update_address = 0x087e66
 	objA0.value2f = objA0.subtype2c
-	playSound(0x39)
+	playSound(SFX_WATERSPLASH)
 }
 
 

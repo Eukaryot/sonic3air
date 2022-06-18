@@ -20,13 +20,13 @@ function void fn03e836()
 		objA1.update_address = 0x03e9a6
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u32[A1 + 0x0c] = 0x03ea4c
-		u16[A1 + 0x0a] = 0x4353
-		u8[A1 + 0x04] |= 0x04
-		u16[A1 + 0x08] = 0x0280
-		u8[A1 + 0x07] = 0x40
-		u8[A1 + 0x06] = 0x30
-		u8[A1 + 0x04] |= 0x40
+		objA1.mapping_offset = 0x03ea4c
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0353)
+		objA1.render_flags |= render_flag.WORLD
+		objA1.sprite_priority = 0x0280
+		objA1.box_size.x = 0x40
+		objA1.box_size.y = 0x30
+		objA1.render_flags |= render_flag.COMPOUND
 		u16[A1 + 0x16] = 0x08
 
 		u32[A0 + 0x32] = 0xfff40000
@@ -48,7 +48,7 @@ function void fn03e8a2()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D1 = 0
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		D1.u8 = 1 + max(u8[A0 + 0x36], u8[A0 + 0x37])
 	}
@@ -107,7 +107,7 @@ function void fn03e9ac()
 	u32 backupD1 = D1
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5 = 0x37
 	fn03e9c6()
 
@@ -117,7 +117,7 @@ function void fn03e9ac()
 	D4 = backupD4
 
 	A1 = 0xffffb000
-	--D6.u8
+	--D6.u8		// object.flag.P1_ON_OBJECT
 	D5 = 0x36
 	fn03e9c6()
 }
@@ -133,7 +133,9 @@ function void fn03e9c6()
 		return
 #endif
 
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
@@ -153,7 +155,7 @@ function void fn03e9c6()
 		}
 
 		objA1.flags2a &= ~char.flag.ON_OBJECT
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		u8[A0 + D5.s16] = 0
 		D4 = 0
 	}

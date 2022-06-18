@@ -16,7 +16,7 @@
 function void fn029338()
 {
 	objA0.mapping_offset = 0x228394
-	objA0.sprite_attributes = 0x42ea
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 	objA0.box_size.x = 0x1c
 	objA0.box_size.y = 0x04
 	objA0.render_flags |= render_flag.WORLD
@@ -46,9 +46,9 @@ function void fn029386()
 			{
 				fn0293d0()
 
-				u16[A1 + 0x08] = 0x80
+				objA1.sprite_priority = 0x80
 				u8[A1 + 0x22] = 0x02
-				u8[A1 + 0x28] = 0x98
+				objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
 				objA1.update_address = 0x029416
 
 				playSound(0xa8)
@@ -67,13 +67,13 @@ function void fn0293d0()
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16
 	u16[A1 + 0x2e] = objA0.countdown_value
-	u32[A1 + 0x0c] = 0x228394
-	u16[A1 + 0x0a] = 0x42ea
-	u8[A1 + 0x07] = 0x1c
-	u8[A1 + 0x06] = 0x04
-	u8[A1 + 0x04] = objA0.render_flags
+	objA1.mapping_offset = 0x228394
+	objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
+	objA1.box_size.x = 0x1c
+	objA1.box_size.y = 0x04
+	objA1.render_flags = objA0.render_flags
 	u8[A1 + 0x22] = 0x01
-	u16[A1 + 0x08] = 0x0180
+	objA1.sprite_priority = 0x0180
 }
 
 
@@ -90,7 +90,7 @@ function void fn02941c()
 {
 	if ((level.framecounter.low & 1) == 0)
 	{
-		objA0.render_flags ^= 0x02
+		objA0.render_flags ^= render_flag.FLIP_Y
 	}
 
 	D0.u16 = objA0.position.y.u16

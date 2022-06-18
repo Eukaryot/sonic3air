@@ -64,7 +64,7 @@ function void fn03ed6e()
 	{
 		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 		{
-			if (D1 & 0x0400)
+			if (D1 & 0x0400)		// CONTROL_LEFT held
 			{
 				D0.u16 = objA0.position.x.u16 - 0x16
 				if (D0.s16 < s16[A1 + 0x10])
@@ -80,7 +80,7 @@ function void fn03ed6e()
 				}
 			}
 
-			if (D1 & 0x0800)
+			if (D1 & 0x0800)		// CONTROL_RIGHT held
 			{
 				D0.u16 = objA0.position.x.u16 + 0x15
 				if (D0.s16 > s16[A1 + 0x10])
@@ -96,7 +96,8 @@ function void fn03ed6e()
 				}
 			}
 
-			D1.u16 &= 0x70
+			// Check if jump button pressed
+			D1.u16 &= CONTROL_ABC
 			if (D1.u16 == 0)
 			{
 				bool goto03ee8c = false
@@ -157,7 +158,6 @@ function void fn03ed6e()
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
 		objA1.state = char.state.ROLLING
-		objA1.flags2a |= objA1.flags2a
 		objA1.flags2a |= char.flag.ROLLING
 		objA1.flags2a &= ~char.flag.CONTROL_LOCK
 		u8[A1 + 0x27] = 0
@@ -187,7 +187,7 @@ function void fn03ed6e()
 						objA1.velocity.x = 0
 						objA1.velocity.y = 0
 						u16[A1 + 0x1c] = 0
-						u8[A1 + 0x04] &= 0xfc
+						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 						objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 						u8[A1 + 0x20] = 0
 						u8[A1 + 0x2e] = 0x03
@@ -214,7 +214,7 @@ function void fn03ed6e()
 						u32 backupA2 = A2
 						SetCharacterSpritePatterns()
 						A2 = backupA2
-						playSound(0x4a)
+						playSound(SFX_GRAB)
 					}
 				}
 			}

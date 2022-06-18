@@ -30,12 +30,12 @@ function void fn042262()
 {
 	A1 = 0xffffb000
 	A2 = A0 + 0x30
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn042278()
 
 	A1 = 0xffffb04a
 	A2 = A0 + 0x34
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn042278()
 }
 
@@ -73,7 +73,7 @@ function void fn042278()
 					u8[A1 + 0x1e] = u8[A1 + 0x44]
 					u8[A1 + 0x1f] = u8[A1 + 0x45]
 					u8[A1 + 0x2a] &= 0x89
-					u8[A1 + 0x2a] |= 0x08
+					u8[A1 + 0x2a] |= char.flag.ON_OBJECT
 					u8[A1 + 0x40] = 0
 					u8[A1 + 0x26] = 0
 					u8[A1 + 0x27] = 0
@@ -82,7 +82,7 @@ function void fn042278()
 					u8[A1 + 0x39] = 0
 					u8[A1 + 0x2f] = 0
 					u8[A1 + 0x2a] &= ~0x01
-					u8[A1 + 0x04] &= 0xfc
+					objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 					u8[A1 + 0x2e] = 0x43
 					u8[A1 + 0x20] = 0
 				}
@@ -103,9 +103,11 @@ function void fn042278()
 //# address-hook(0x042368) end(0x042394)
 function void fn042368()
 {
+	u8 bit = (1 << D6.u8)
+
 	u8[A1 + 0x2a] &= 0x81
-	u8[A1 + 0x2a] |= 0x02
-	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	objA0.flags2a &= ~bit
 	u16[A1 + 0x20] = 1
 	u8[A1 + 0x2e] = 0
 	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
@@ -117,11 +119,13 @@ function void fn042368()
 //# address-hook(0x042396) end(0x0423ce)
 function void fn042396()
 {
+	u8 bit = (1 << D6.u8)
+
 	u8[A1 + 0x46] = 0x0e
 	u8[A1 + 0x47] = 0x0f
 	u8[A1 + 0x2a] &= 0x81
 	u8[A1 + 0x2a] |= 0x01
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 	u16[A1 + 0x20] = 1
 	u8[A1 + 0x2e] = 0
 	s16[A1 + 0x1c] = -s16[A1 + 0x1c]

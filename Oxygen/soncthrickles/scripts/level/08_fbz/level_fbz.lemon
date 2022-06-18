@@ -15,7 +15,7 @@
 //# address-hook(0x0523ec) end(0x052420)
 function void InitLevelTiles.FBZ1()
 {
-	if (u16[0xffffb010] >= 0x0180)
+	if (u16[0xffffb000 + 0x10] >= 0x0180)
 	{
 		A1 = 0xffff0000 + u16[A3 + 0x34]
 		A5 = 0xffff0000 + u16[A3 + 0x48]
@@ -42,12 +42,12 @@ function void InitLevelTiles.FBZ1()
 //# address-hook(0x052424) end(0x05243e)
 function void UpdateLevelTiles.FBZ1()
 {
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	A1 = 0x05282c
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	call 0x052442 + level.display_routine
 }
 
@@ -620,7 +620,7 @@ function void InitLevelScrolling.FBZ1()
 		objA1.update_address = 0x052d10
 	}
 
-	if (u16[0xffffb010] < 0x0180)
+	if (u16[0xffffb000 + 0x10] < 0x0180)
 	{
 		u8[0xffffeed6] = 0xff
 		A1 = 0x052dd0
@@ -858,8 +858,8 @@ function void fn052972()
 
 		D0.u16 = 0x2e00
 		D1 = 0
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb05a] -= D0.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
 		fn04f3b0()
 
 		camera.position.x.u16 -= D0.u16
@@ -873,7 +873,7 @@ function void fn052972()
 	}
 	else
 	{
-		if (u8[0xffffb005] >= 0x06)
+		if (u8[0xffffb000 + 0x05] >= 0x06)
 			return
 
 		fn052ab2()
@@ -971,8 +971,8 @@ function void fn052a2a()
 //# address-hook(0x052ab2) end(0x052abe)
 function void fn052ab2()
 {
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	D2.u16 = level.display_routine
 	call 0x052ac2 + D2.s16
 }
@@ -1500,12 +1500,12 @@ function void fn052e50()
 //# address-hook(0x052e54) end(0x052e6e)
 function void fn052e54()
 {
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	A1 = 0x052fa0
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	D2.u16 = level.display_routine
 	call 0x052e72 + D2.s16
 }
@@ -1862,7 +1862,7 @@ function void fn053096()
 		return
 	}
 
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	fn053234()
@@ -1925,10 +1925,10 @@ function void fn0530f0()
 
 		u16[0xffffb000 + 0x10] -= moveX
 		u16[0xffffb04a + 0x10] -= moveX
-		if (u8[0xffffb02a] & 0x02)
+		if (u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 		{
-			u16[0xffffb014] += moveY
-			u16[0xffffb05e] += moveY
+			u16[0xffffb000 + 0x14] += moveY
+			u16[0xffffb04a + 0x14] += moveY
 		}
 
 	#if STANDALONE
@@ -2025,8 +2025,8 @@ function void fn05318c()
 //# address-hook(0x053234) end(0x053240)
 function void fn053234()
 {
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	call 0x053244 + level.display_routine
 }
 

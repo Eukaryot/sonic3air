@@ -16,7 +16,7 @@
 function void fn03f4b0()
 {
 	objA0.mapping_offset = 0x03f852
-	objA0.sprite_attributes = 0xc3cd
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x03cd)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
@@ -64,13 +64,13 @@ function void fn03f51c()
 		objA0.position.x.u16 = 0x7f00
 		if (u8[A0 + 0x30] != 0)
 		{
-			u16[0xffffb042] = 0
-			u8[0xffffb02e] = 0
+			u16[0xffffb000 + 0x42] = 0
+			u8[0xffffb000 + 0x2e] = 0
 		}
 		if (u8[A0 + 0x31] != 0)
 		{
-			u16[0xffffb08c] = 0
-			u8[0xffffb078] = 0
+			u16[0xffffb04a + 0x42] = 0
+			u8[0xffffb04a + 0x2e] = 0
 		}
 	}
 
@@ -89,13 +89,13 @@ function void fn03f572()
 		objA0.position.x.u16 = 0x7f00
 		if (u8[A0 + 0x30] != 0)
 		{
-			u16[0xffffb042] = 0
-			u8[0xffffb02e] = 0
+			u16[0xffffb000 + 0x42] = 0
+			u8[0xffffb000 + 0x2e] = 0
 		}
 		if (u8[A0 + 0x31] != 0)
 		{
-			u16[0xffffb08c] = 0
-			u8[0xffffb078] = 0
+			u16[0xffffb04a + 0x42] = 0
+			u8[0xffffb04a + 0x2e] = 0
 		}
 	}
 
@@ -127,12 +127,13 @@ function void fn03f5c2()
 		return
 	}
 
-	if (u8[A1 + 0x04] & 0x80)
+	if (objA1.render_flags & render_flag.VISIBLE)
 	{
 		if (u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
 		{
 			if (u16[A0 + 0x34] == objA1.velocity.x && u16[A0 + 0x36] == objA1.velocity.y)
 			{
+				// Check if jump button pressed
 				if ((D0.u8 & CONTROL_ABC) == 0)
 				{
 					objA1.position.x.u16 = objA0.position.x.u16
@@ -154,15 +155,15 @@ function void fn03f5c2()
 					u8[A2] = 0
 					u8[A2 + 0x02] = 0x12
 
-					if (D0 & 0x0f00)
+					if (D0 & 0x0f00)	// Any direction held?
 					{
 						u8[A2 + 0x02] = 0x3c
 					}
-					if (D0 & 0x0400)
+					if (D0 & 0x0400)		// CONTROL_LEFT held
 					{
 						objA1.velocity.x = -0x200
 					}
-					if (D0 & 0x0800)
+					if (D0 & 0x0800)		// CONTROL_RIGHT held
 					{
 						objA1.velocity.x = 0x0200
 					}
@@ -170,7 +171,7 @@ function void fn03f5c2()
 					objA1.velocity.y = -0x380
 					u8[A1 + 0x1e] = 0x0e
 					u8[A1 + 0x1f] = 0x07
-					u8[A1 + 0x20] = 0x02
+					u8[A1 + 0x20] = char.state.ROLLING
 					objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 					u8[A1 + 0x40] = 0x01
 				}
@@ -201,8 +202,8 @@ function void fn03f6a6()
 	else
 		objA1.flags2a &= ~char.flag.FACING_LEFT
 
-	u8[A1 + 0x04] &= 0xfc
-	u8[A1 + 0x04] |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA1.render_flags |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 	D0 = objA0.value26 >> 4
 	u8[A1 + 0x22] = u8[0x03f6ee + D0.s16]
 	D0 = u8[A1 + 0x22]
@@ -250,12 +251,12 @@ function void fn03f6fe()
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x3d] = 0
 			u8[A1 + 0x2e] = 0x03
-			u8[A1 + 0x04] &= 0xfd
+			objA1.render_flags &= ~render_flag.FLIP_Y
 			u16[A1 + 0x42] = A0.u16
 			objA1.velocity.x = objA0.velocity.x
 			objA1.velocity.y = objA0.velocity.y
 
-			playSound(0x4a)
+			playSound(SFX_GRAB)
 			fn03f6a6()
 		}
 	}

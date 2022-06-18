@@ -145,7 +145,7 @@ function void fn0455cc_sub()
 		}
 	}
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		A2 = 0xffffb000
 		D0.u16 = u16[A2 + 0x10] - objA0.position.x.u16 + 0x0c
@@ -155,6 +155,7 @@ function void fn0455cc_sub()
 			{
 				if (allocDynamicObjectAfterA0())
 				{
+					// Spawn teleporter beam
 					u16[A0 + 0x3c] = A1.u16
 					objA1.update_address = 0x0458b4
 					u16[A1 + 0x48] = A0.u16
@@ -165,7 +166,7 @@ function void fn0455cc_sub()
 					u16[A2 + 0x1a] = 0xffff
 					u8[A2 + 0x3d] = 0
 					u8[A2 + 0x2e] = 0x01
-					u8[A2 + 0x20] = 0x05
+					u8[A2 + 0x20] = char.state.STANDING
 					objA0.update_address = 0x0456f4
 					u16[A0 + 0x38] = 0xff00
 
@@ -214,7 +215,7 @@ function void fn0456f4()
 					D0.u16 &= 0x3f
 				u8[A0 + 0x2d] = D0.u8
 				u8[A1 + 0x2e] = 3
-				u8[A1 + 0x20] = 0
+				u8[A1 + 0x20] = char.state.RUNNING
 				u8[A1 + 0x22] = 0
 
 				if (global.zone == 0x16)
@@ -259,8 +260,8 @@ function void fn0457be()
 	if (u8[A0 + 0x2d] == 0)
 	{
 		u8[A1 + 0x2e] = 0x01
-		u8[A1 + 0x20] = 0x02
-		u8[A1 + 0x2a] |= 0x04
+		u8[A1 + 0x20] = char.state.ROLLING
+		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA0.value3e = objA1.position.y.u16
 		u32[A0 + 0x2e] = 0
 		u32[A0 + 0x32] = 0
@@ -300,7 +301,7 @@ function void fn04581c()
 	if (s32[A0 + 0x2e] >= 0)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x20] = 0
+		u8[A1 + 0x20] = char.state.RUNNING
 		u8[0xffffeed6] = 0
 		objA0.update_address = 0x0455cc
 	}
@@ -361,16 +362,14 @@ function void fn045b94()
 	if (global.characters == CHARS_KNUCKLES_ALONE)
 	{
 		// Knuckles' HPZ teleporter
-		if (camera.position.y.u16 >= 0x0240 || u16[0xffffb010] < 0x0b00)
+		if (camera.position.y.u16 >= 0x0240 || u16[0xffffb000 + 0x10] < 0x0b00)
 			return
 
 		playMusic(MUSIC_CTRL_FADEOUT)
 
 		u8[0xffffef56] = 0xff
 		SaveGameOnLevelFinished()
-
-		D0.u16 = 0x0a01
-		TriggerNextZone()
+		TriggerNextZone(0x0a01)
 	}
 	else
 	{
@@ -517,7 +516,7 @@ function void fn045c8e()
 		if (u8[A4 + 0x02] == 0)
 		{
 			objA1.velocity.x = -0x100
-			u16[A2] = 0x2424
+			u16[A2] = 0x2424		// (CONTROL_C | CONTROL_LEFT), (CONTROL_C | CONTROL_LEFT)
 			++u8[A4]
 		}
 	}
@@ -531,7 +530,7 @@ function void fn045c8e()
 			objA1.velocity.x = 0
 			u16[A1 + 0x1c] = 0
 			u8[A1 + 0x2e] = 0x03
-			u8[A1 + 0x20] = 0
+			u8[A1 + 0x20] = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			u16[A2] = 0
@@ -549,7 +548,7 @@ function void fn045c8e()
 		}
 		else
 		{
-			u16[A2] = 0x2404
+			u16[A2] = 0x2404		// (CONTROL_C | CONTROL_LEFT), CONTROL_LEFT
 		}
 	}
 	else
@@ -561,9 +560,7 @@ function void fn045c8e()
 
 			u8[0xffffef56] = 0xff
 			SaveGameOnLevelFinished()
-
-			D0.u16 = 0x0a00
-			TriggerNextZone()
+			TriggerNextZone(0x0a00)
 		}
 	}
 }
@@ -613,6 +610,7 @@ function void fn052300()
 		{
 			if (allocDynamicObjectAfterA0())
 			{
+				// Spawn teleporter beam
 				u16[A0 + 0x3c] = A1.u16
 				objA1.update_address = 0x0458b4
 				u16[A1 + 0x48] = A0.u16
@@ -663,7 +661,7 @@ function void fn05234a()
 			objA0.update_address = 0x0523ca
 			u8[A1 + 0x2e] = 3
 			objA1.position.y.u16 = 0
-			u8[A1 + 0x20] = 0
+			u8[A1 + 0x20] = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			playSound(0x73)
@@ -672,8 +670,8 @@ function void fn05234a()
 		else
 		{
 			u8[A1 + 0x2e] = 1
-			u8[A1 + 0x2a] |= 0x04
-			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x2a] |= char.flag.ROLLING
+			u8[A1 + 0x20] = char.state.ROLLING
 		}
 	}
 }
@@ -686,9 +684,7 @@ function void fn0523ca()
 	if (camera.position.y.u16 < 0x0780)
 	{
 		playMusic(MUSIC_CTRL_FADEOUT)
-
-		D0.u16 = 0x0500
-		TriggerNextZone()
+		TriggerNextZone(0x0500)
 	}
 }
 
@@ -700,7 +696,7 @@ function void fn0523ca()
 function void fn0458b4()
 {
 	objA0.update_address = 0x045916
-	objA0.render_flags = render_flag.WORLD | render_flag.COMPOUND
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0x80
 	objA0.box_size.x = 0x18
 	objA0.sprite_priority = 0x80
@@ -711,15 +707,15 @@ function void fn0458b4()
 
 	if (global.zone == 0x03)
 	{
-		objA0.sprite_attributes = 0x24ee
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x04ee)
 	}
 	else if (global.zone == 0x16)
 	{
-		objA0.sprite_attributes = 0x652e
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x052e)
 	}
 	else
 	{
-		objA0.sprite_attributes = 0xe35c
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x035c)
 	}
 
 	fn045916()
@@ -803,7 +799,7 @@ function void fn045992()
 function void fn045a66()
 {
 	objA0.update_address = 0x045a72
-	objA0.sprite_attributes += 0x8000
+	objA0.sprite_attributes += sprite_attribute.PRIORITY
 	fn045a72()
 }
 
@@ -831,6 +827,7 @@ function void fn045a72()
 		{
 			if (allocDynamicObjectStd())
 			{
+				// Trigger Mecha Sonic boss
 				objA1.update_address = 0x07b288
 				u16[0xfffffaa4] = A1.u16
 				u16[A0 + 0x30] = A1.u16
@@ -862,6 +859,7 @@ function void fn045ad6()
 	{
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn teleporter beam
 			u16[A0 + 0x3c] = A1.u16
 			objA1.update_address = 0x0458b4
 			u16[A1 + 0x48] = A0.u16

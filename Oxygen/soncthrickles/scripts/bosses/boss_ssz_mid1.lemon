@@ -56,8 +56,9 @@ function void fn07a20e()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x19
+		u8[A1 + 0x2c] = MUSIC_MAINBOSS
 	}
 
 	objA0.position.x.u16 = camera.position.x.u16 + 0x0110 + getScreenExtend()
@@ -152,8 +153,7 @@ function void fn07a32c()
 	{
 		objA0.base_state = 0x06
 		objA0.flags38 |= 0x40
-		A2 = 0x07a684
-		SpawnUniqueChildObjectHierarchy()
+		spawnUniqueChildObjectHierarchy(0x07a684)
 	}
 }
 
@@ -194,7 +194,7 @@ function void fn07a39a()
 	objA0.flags38 |= 0x40
 
 #if STANDALONE
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 #endif
 }
 
@@ -217,7 +217,7 @@ function void fn07a3a8()
 		objA0.velocity.x = (objA0.velocity.x < 0) ? BossMidSSZ1.getMovementSpeed() : -BossMidSSZ1.getMovementSpeed()
 	#else
 		objA0.velocity.x = -objA0.velocity.x
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 	#endif
 		objA0.countdown_value = BossMidSSZ1.getMoveTime() * 2 - 1
 	}
@@ -228,7 +228,7 @@ function void fn07a3a8()
 function void fn07a3ce()
 {
 	objA0.update_address = 0x07a3e6
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0x0400
 	objA0.velocity.y = 0
 }
@@ -279,7 +279,7 @@ function void fn07a446()
 	u8[A0 + 0x43] = 0x1a
 	objA0.value3a = 0x01
 #if STANDALONE
-	objA0.sprite_attributes -= 0x2000	// Fix for wrong palette line usage, #contributed by Legobouwer
+	objA0.sprite_attributes -= sprite_attribute.PALETTE.LINE1	// Fix for wrong palette line usage, #contributed by Legobouwer
 #endif
 
 	fn07a634()
@@ -329,7 +329,7 @@ function void fn07a496()
 	#if STANDALONE
 		if (s16[A1 + 0x18] > 0)
 	#else
-		if (u8[A1 + 0x04] & 0x01)
+		if (objA1.render_flags & render_flag.FLIP_X)
 	#endif
 		{
 			directionChange = !directionChange
@@ -370,7 +370,7 @@ function void fn07a4ec()
 	objA0.value3a = 0x04
 	setupObjectAttributesFull(0x07a66c)
 #if STANDALONE
-	objA0.sprite_attributes -= 0x2000	// Fix for wrong palette line usage, #contributed by Legobouwer
+	objA0.sprite_attributes -= sprite_attribute.PALETTE.LINE1	// Fix for wrong palette line usage, #contributed by Legobouwer
 #endif
 }
 
@@ -379,7 +379,7 @@ function void fn07a500()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 #if STANDALONE
-	if (u32[A1] == 0x07a428)
+	if (objA1.update_address == 0x07a428)
 	{
 		// This is the first chain link element, directly connected to the capsule
 		// ...and a good place to translate the linear angular movement into something more like actual Sonic 1 GHZ boss

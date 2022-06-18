@@ -72,7 +72,7 @@ function void fn08ee1c()
 	if (objA0.flags38 & 0x04)
 	{
 		objA0.base_state = 0x04
-		u8[A0 + 0x28] = 0xd9
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.32x8)
 		objA0.countdown_callback = 0x08ef1c
 	}
 }
@@ -112,21 +112,21 @@ function void fn08ee3a()
 		if (D1.s16 >= 0)
 		{
 			D1.u16 = 0x80
-			objA0.render_flags |= 0x01
+			objA0.render_flags |= render_flag.FLIP_X
 			if (D0.u16 >= u16[A0 + 0x3c])
 			{
 				D1.s16 = -D1.s16
-				objA0.render_flags ^= 0x01
+				objA0.render_flags ^= render_flag.FLIP_X
 			}
 		}
 		else
 		{
 			D1 = 0xffffff80
-			objA0.render_flags &= ~0x01
+			objA0.render_flags &= ~render_flag.FLIP_X
 			if (D0.u16 < u16[A0 + 0x3a])
 			{
 				D1.s16 = -D1.s16
-				objA0.render_flags ^= 0x01
+				objA0.render_flags ^= render_flag.FLIP_X
 			}
 		}
 

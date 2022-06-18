@@ -23,17 +23,17 @@ function void fn038688()
 	{
 		// IceCap Zone
 		objA0.mapping_offset = 0x038fba
-		objA0.sprite_attributes = 0x43b6
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03b6)
 		objA0.update_address = (objA0.subtype2c & 0x80) ? 0x038946 : 0x038882
 		objA0.subtype2c &= 0x7f
 	}
 	else if (global.zone == 0x09)
 	{
-		objA0.sprite_attributes = 0xe113
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0113)
 	}
 	else
 	{
-		objA0.sprite_attributes = 0x4038
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0038)
 	}
 
 	if (s8[A0 + 0x2c] < 0)
@@ -84,16 +84,16 @@ function void fn038756()
 		objA1.update_address = 0x03887c
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = u16[A0 + 0x0a]
-		u8[A1 + 0x04] = objA0.render_flags
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u8[A1 + 0x04] |= render_flag.COMPOUND
-		u8[A1 + 0x07] = 0x40
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.render_flags = objA0.render_flags
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.render_flags |= render_flag.COMPOUND
+		objA1.box_size.x = 0x40
 	#if STANDALONE
-		u8[A1 + 0x06] = 0x30	// For ICZ skewed bridges
+		objA1.box_size.y = 0x30	// For ICZ skewed bridges
 	#else
-		u8[A1 + 0x06] = 0x08
+		objA1.box_size.y = 0x08
 	#endif
 
 		u16[A1 + 0x16] = D1.u16
@@ -126,15 +126,15 @@ function void fn0387b6()
 
 	#if STANDALONE
 		// Change characters to the falling animations (used in HCZ 2 Knuckles cutscene)
-		if (u8[0xffffb020] == char.state.RUNNING || u8[0xffffb020] == char.state.STANDING)
+		if (u8[0xffffb000 + 0x20] == char.state.RUNNING || u8[0xffffb000 + 0x20] == char.state.STANDING)
 		{
-			u8[0xffffb020] = char.state.FALLING_PANIC
-			u8[0xffffb02a] |= char.flag.IN_AIR
+			u8[0xffffb000 + 0x20] = char.state.FALLING_PANIC
+			u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 		}
-		if (u8[0xffffb06a] == char.state.RUNNING || u8[0xffffb06a] == char.state.STANDING)
+		if (u8[0xffffb04a + 0x20] == char.state.RUNNING || u8[0xffffb04a + 0x20] == char.state.STANDING)
 		{
-			u8[0xffffb06a] = char.state.FALLING_PANIC
-			u8[0xffffb074] |= char.flag.IN_AIR
+			u8[0xffffb04a + 0x20] = char.state.FALLING_PANIC
+			u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 		}
 	#endif
 	}
@@ -148,7 +148,7 @@ function void fn0387b6()
 //# address-hook(0x0387e0) end(0x038876)
 function void fn0387e0()
 {
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		if (u8[A0 + 0x3e] != 0)
@@ -159,7 +159,7 @@ function void fn0387e0()
 	}
 	else
 	{
-		if (D0.u8 & 0x10)
+		if (D0.u8 & object.flag.P2_ON_OBJECT)
 		{
 			D0.u8 = u8[A0 + 0x3f] - objA0.value3b
 			if (D0.u8 != 0)
@@ -240,17 +240,17 @@ function void fn03890c()
 		return
 	}
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x08
-		u8[0xffffb02a] &= ~0x08
-		u8[0xffffb02a] |= 0x02
+		objA0.flags2a &= ~object.flag.P1_ON_OBJECT
+		u8[0xffffb000 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 	}
-	if (objA0.flags2a & 0x10)
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 	{
-		objA0.flags2a &= ~0x10
-		u8[0xffffb074] &= ~0x08
-		u8[0xffffb074] |= 0x02
+		objA0.flags2a &= ~object.flag.P2_ON_OBJECT
+		u8[0xffffb04a + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 	}
 	UnloadObject()
 }
@@ -281,14 +281,14 @@ function void fn0389de()
 
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = u32[A3 + 0x0c]
-		u8[A1 + 0x04] = u8[A3 + 0x04]
-		u16[A1 + 0x0a] = u16[A3 + 0x0a]
-		u16[A1 + 0x08] = u16[A3 + 0x08]
-		u8[A1 + 0x07] = u8[A3 + 0x07]
-		u8[A1 + 0x06] = u8[A3 + 0x06]
-		u16[A1 + 0x08] = u16[A3 + 0x08]
+		objA1.update_address = D4
+		objA1.mapping_offset = u32[A3 + 0x0c]
+		objA1.render_flags = u8[A3 + 0x04]
+		objA1.sprite_attributes = u16[A3 + 0x0a]
+		objA1.sprite_priority = u16[A3 + 0x08]
+		objA1.box_size.x = u8[A3 + 0x07]
+		objA1.box_size.y = u8[A3 + 0x06]
+		objA1.sprite_priority = u16[A3 + 0x08]
 		objA1.position.x.u16 = u16[(A2+=2)-2]
 		objA1.position.y.u16 = u16[(A2+=2)-2]
 		D0.u16 = u16[(A2+=2)-2]
@@ -328,7 +328,7 @@ function void fn038a88()
 	push(D1)
 
 	A1 = 0xffffb04a
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5 = 0x3b
 	fn038aa2()
 
@@ -338,7 +338,7 @@ function void fn038a88()
 	D4 = pop()
 
 	A1 = 0xffffb000
-	--D6.u8
+	--D6.u8		// object.flag.P1_ON_OBJECT
 	D5 = 0x3f
 	fn038aa2()
 }
@@ -347,7 +347,8 @@ function void fn038a88()
 //# address-hook(0x038aa2)
 function void fn038aa2()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
@@ -372,7 +373,7 @@ function void fn038aa2()
 		}
 
 		objA1.flags2a &= ~char.flag.ON_OBJECT
-		objA0.flags2a &= ~(1 << D6.u8)
+		objA0.flags2a &= ~bit
 		D4 = 0
 	}
 	else
@@ -381,7 +382,7 @@ function void fn038aa2()
 		fn01e410()
 		D1.u16 = backupD1
 
-		if (objA0.flags2a & (1 << D6.u8))
+		if (objA0.flags2a & bit)
 		{
 			D0 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
 			D0.u16 >>= 4
@@ -468,7 +469,7 @@ function void fn038882()
 {
 	// This is very similar to "fn0387e0()"
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		if (u8[A0 + 0x3e] != 0)
@@ -479,7 +480,7 @@ function void fn038882()
 	}
 	else
 	{
-		D0.u8 &= 0x10
+		D0.u8 &= object.flag.P2_ON_OBJECT
 		if (D0.u8 != 0)
 		{
 			D0.u8 = u8[A0 + 0x3f] - objA0.value3b
@@ -513,15 +514,15 @@ function void fn038c12()
 	D3 = 0xfffffffe
 	D4 = 0xfffffffe
 
-	D0.u16 = objA0.flags2a & 0x08
-	if (D0.u16 != 0 && u16[0xffffb018] != 0)
+	D0.u16 = objA0.flags2a & object.flag.P1_ON_OBJECT
+	if (D0.u16 != 0 && u16[0xffffb000 + 0x18] != 0)
 	{
 		D0.u8 = u8[A0 + 0x3f]
 		fn038c8e()
 	}
 
-	D0.u16 = objA0.flags2a & 0x10
-	if (D0.u16 != 0 && u16[0xffffb062] != 0)
+	D0.u16 = objA0.flags2a & object.flag.P2_ON_OBJECT
+	if (D0.u16 != 0 && u16[0xffffb04a + 0x18] != 0)
 	{
 		D0.u8 = objA0.value3b
 		fn038c8e()
@@ -584,7 +585,7 @@ function void fn038946()
 //# address-hook(0x038950) end(0x0389c4)
 function void fn038950()
 {
-	if ((objA0.flags2a & 0x18) == 0)
+	if ((objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) == 0)
 	{
 		if (u8[A0 + 0x3e] != 0)
 		{
@@ -598,7 +599,7 @@ function void fn038950()
 		D2.u16 = objA0.subtype2c * 16
 		fn038bd8()
 
-		if (objA0.flags2a & 0x10)
+		if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 		{
 			D0.u8 = u8[A0 + 0x3f] - objA0.value3b
 			if (D0.u8 != 0)
@@ -632,7 +633,7 @@ function void fn038b2a()
 	push(D1)
 
 	A1 = 0xffffb04a
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5 = 0x3b
 	fn038b44()
 
@@ -642,7 +643,7 @@ function void fn038b2a()
 	D4 = pop()
 
 	A1 = 0xffffb000
-	--D6.u8
+	--D6.u8		// object.flag.P1_ON_OBJECT
 	D5 = 0x3f
 	fn038b44()
 }
@@ -651,7 +652,8 @@ function void fn038b2a()
 //# address-hook(0x038b44)
 function void fn038b44()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{
@@ -676,8 +678,8 @@ function void fn038b44()
 			}
 		}
 
-		u8[A1 + 0x2a] &= ~0x08
-		objA0.flags2a &= ~(1 << D6.u8)
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		objA0.flags2a &= ~bit
 		D4 = 0
 	}
 	else
@@ -708,12 +710,12 @@ function void fn038ba8()
 function void fn038bd8()
 {
 	A1 = 0xffffb04a
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5 = 0x3b
 	fn038bea()
 
 	A1 = 0xffffb000
-	--D6.u8
+	--D6.u8		// object.flag.P1_ON_OBJECT
 	D5 = 0x3f
 	fn038bea()
 }
@@ -722,7 +724,8 @@ function void fn038bd8()
 //# address-hook(0x038bea)
 function void fn038bea()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{

@@ -20,8 +20,8 @@ function void fn034574()
 	D1.u16 >>= 2
 	u16[A0 + 0x34] = D1.u16
 	objA0.mapping_offset = 0x2339b2
-	objA0.sprite_attributes = 0x4001
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	u16[A0 + 0x36] = objA0.position.x.u16
 

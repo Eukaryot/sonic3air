@@ -130,10 +130,10 @@ function void fn0511c8()
 
 		D0.u16 = 0x2e00
 		D1.u16 = 0x0600
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb014] -= D1.u16
-		u16[0xffffb05a] -= D0.u16
-		u16[0xffffb05e] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb000 + 0x14] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x14] -= D1.u16
 		fn04f3b0()
 
 		camera.position.x.u16 -= D0.u16
@@ -165,7 +165,7 @@ function void fn0511c8()
 //# address-hook(0x05127c) end(0x0512a4)
 function void fn05127c()
 {
-	if (u8[0xffffb005] < 0x06 && (u16[0xffffeee8] == 0) && (camera.screenshake.state & 0x8000))
+	if (u8[0xffffb000 + 0x05] < 0x06 && (u16[0xffffeee8] == 0) && (camera.screenshake.state & 0x8000))
 	{
 		if (((level.framecounter - 1) & 0x0f) == 0)
 		{
@@ -236,12 +236,12 @@ function void fn01c930()
 		{
 			D0.u16 = 0x06a0
 			level.vertical_wrap = D0.u16
-			u16[0xffffee10] = D0.u16
+			move_area.top.target = D0.u16
 			move_area.bottom.current = D0.u16
 			move_area.bottom.target = D0.u16
 			D0.u16 = 0x3c80 + ((getScreenExtend() + 0x0f) & 0xfff0)
 			move_area.right = D0.u16
-			u16[0xffffee0e] = D0.u16
+			move_area.right.target = D0.u16
 			camera.update_routine += 2
 		}
 	}
@@ -258,10 +258,11 @@ function void fn01c96e()
 			return
 
 		move_area.left = D0.u16
-		u16[0xffffee0c] = D0.u16
+		move_area.left.target = D0.u16
 
 		if (allocDynamicObjectStd())
 		{
+			// Trigger boss
 			objA1.update_address = 0x06c31a
 			objA1.position.x.u16 = 0x3d20
 			objA1.position.y.u16 = 0x0668
@@ -277,7 +278,7 @@ function void fn01c96e()
 
 		D0.u16 = 0x6000
 		move_area.right = D0.u16
-		u16[0xffffee0e] = D0.u16
+		move_area.right.target = D0.u16
 
 		camera.update_routine -= 2
 	}
@@ -397,7 +398,7 @@ function void fn05132c()
 //# address-hook(0x05134c) end(0x0514a8)
 function void fn05134c()
 {
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	if ((camera.screenshake.state & 0x8000) == 0)
@@ -565,8 +566,8 @@ function void fn0514aa()
 		}
 	}
 
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	D2.u16 = u16[0xffffeee2]
 	call 0x0514e8 + D2.s16
 }
@@ -676,6 +677,7 @@ function void fn051560()
 
 		if (allocDynamicObjectStd())
 		{
+			// Mid-level Robotnik encounter
 			objA1.update_address = 0x06bf2a
 			objA1.position.x.u16 = 0x08e0
 			objA1.position.y.u16 = 0x0690
@@ -712,8 +714,9 @@ function void fn0515a4()
 
 		if (allocDynamicObjectStd())
 		{
+			// Mid-level Robotnik encounter
 			objA1.update_address = 0x06bf2a
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 			objA1.position.x.u16 = 0x2fa0
 			objA1.position.y.u16 = 0x02d0
 			camera.screenshake.state.hi = 0xff
@@ -737,8 +740,9 @@ function void fn05160e()
 
 			if (allocDynamicObjectStd())
 			{
+				// Mid-level Robotnik encounter
 				objA1.update_address = 0x06bf2a
-				u8[A1 + 0x04] |= render_flag.FLIP_X
+				objA1.render_flags |= render_flag.FLIP_X
 				objA1.position.x.u16 = 0x3300
 				objA1.position.y.u16 = 0x0790
 				camera.screenshake.state.hi = 0xff
@@ -767,7 +771,7 @@ function void fn051656()
 //# address-hook(0x051672) end(0x05167a)
 function void fn051672()
 {
-	if (u16[0xffffb010] >= 0x0980)
+	if (u16[0xffffb000 + 0x10] >= 0x0980)
 	{
 		fn0516a2()
 	}
@@ -777,7 +781,7 @@ function void fn051672()
 //# address-hook(0x05167c) end(0x051696)
 function void fn05167c()
 {
-	if (u16[0xffffb014] < 0x0100 && u16[0xffffb010] >= 0x2f80)
+	if (u16[0xffffb000 + 0x14] < 0x0100 && u16[0xffffb000 + 0x10] >= 0x2f80)
 	{
 		move_area.right = 0x6000
 		fn0516a2()
@@ -788,7 +792,7 @@ function void fn05167c()
 //# address-hook(0x051698) end(0x0516b2)
 function void fn051698()
 {
-	if (u16[0xffffb010] < 0x3200)
+	if (u16[0xffffb000 + 0x10] < 0x3200)
 	{
 		fn0516a2()
 	}
@@ -850,8 +854,8 @@ function void fn0516d0()
 //# address-hook(0x0516d2) end(0x051724)
 function void fn0516d2()
 {
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 
 	A1 = 0x23cf7c
 	D2 = 4
@@ -959,7 +963,7 @@ function void fn051762()
 //# address-hook(0x0517c4) end(0x0517d4)
 function void fn0517c4()
 {
-	if (u16[0xffffb010] >= 0x2a00)
+	if (u16[0xffffb000 + 0x10] >= 0x2a00)
 	{
 		u16[0xffffeed6] = 0
 		D0 = 0x5c
@@ -1024,8 +1028,8 @@ function void InitLevelScrolling.MGZ2()
 	level.scrolling_routine = 0x04
 	u16[0xffffeea2] = 0
 
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	if (D1.u16 < 0x0500)
 	{
 		if (D0.u16 >= 0x3800)
@@ -1036,7 +1040,7 @@ function void InitLevelScrolling.MGZ2()
 			{
 				if (allocDynamicObjectStd())
 				{
-					u32[A1] = D1
+					objA1.update_address = D1
 				}
 			}
 			else
@@ -1055,7 +1059,7 @@ function void InitLevelScrolling.MGZ2()
 			{
 				if (allocDynamicObjectStd())
 				{
-					u32[A1] = D1
+					objA1.update_address = D1
 				}
 			}
 			else
@@ -1239,8 +1243,8 @@ function void fn0519c4()
 		return
 	}
 
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	D2.u16 = level.display_routine
 	call 0x0519dc + D2.s16
 }
@@ -1387,7 +1391,7 @@ function void fn051a6a()
 
 		if (allocDynamicObjectStd())
 		{
-			u32[A1] = D1
+			objA1.update_address = D1
 		}
 	}
 	_setZeroFlagByValue(newLevelDisplayRoutine)
@@ -1432,7 +1436,7 @@ function void fn051ae6()
 		return
 	}
 
-	if (D1.u16 >= u16[0xffffb014] || D2.u16 >= u16[0xffffb010])
+	if (D1.u16 >= u16[0xffffb000 + 0x14] || D2.u16 >= u16[0xffffb000 + 0x10])
 		return
 
 	objA0.countdown_value = D3.u16
@@ -1459,8 +1463,8 @@ function void fn051b1c()
 		return
 	}
 
-	D2.u16 = u16[0xffffb010]
-	D3.u16 = u16[0xffffb014]
+	D2.u16 = u16[0xffffb000 + 0x10]
+	D3.u16 = u16[0xffffb000 + 0x14]
 	if (objA0.value39 != 0)
 	{
 		D1.u16 = D0.u16
@@ -1490,8 +1494,8 @@ function void fn051b1c()
 
 	u16[0xffffeed4] = D1.u16
 	D1.u16 -= D0.u16
-	u16[0xffffb014] -= D1.u16
-	u16[0xffffb05e] -= D1.u16
+	u16[0xffffb000 + 0x14] -= D1.u16
+	u16[0xffffb04a + 0x14] -= D1.u16
 }
 
 
@@ -1651,14 +1655,14 @@ function void fn0569dc()
 	push(D7)
 
 	A1 = 0xffffb000
-	if (u8[A1 + 0x2a] & 0x08)
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
 		A0 = 0xffff0000 + u16[A1 + 0x42]
 		fn01e580()
 	}
 
 	A1 = 0xffffb04a
-	if (u8[A1 + 0x2a] & 0x08)
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
 		A0 = 0xffff0000 + u16[A1 + 0x42]
 		fn01e580()

@@ -75,8 +75,7 @@ function void fn08cb9e()
 	// "spawnChildObjects(0x06817c)" replaced by:
 	spawnChildObject(0x067c38, 0x00, 0, -28)
 
-	A2 = 0x08d254
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d254)
 }
 
 
@@ -162,7 +161,7 @@ function void fn08cc84()
 	screenmover_target.right = 0x3ea0
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 }
 
 
@@ -278,8 +277,7 @@ function void fn08cdb8()
 	move_area.right = 0x3ea0
 	move_area.left = 0x3c00
 
-	A2 = 0x08d25c
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d25c)
 
 	fn08d116()
 	fn08d0ea()
@@ -300,11 +298,11 @@ function void fn08d0ea()
 //# address-hook(0x08d116) end(0x08d12a)
 function void fn08d116()
 {
-	// Spawn Robotnik
+	// Create the object that fades out level music and starts the boss theme afterwards
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 }
 
@@ -447,15 +445,14 @@ function void fn062640()
 //# address-hook(0x062678) end(0x0626ac)
 function void fn062678()
 {
-	D0.u16 = u16[0xffffb010]
+	D0.u16 = u16[0xffffb000 + 0x10]
 	if (D0.u16 >= objA0.position.x.u16)
 	{
 		fn0851d8()
 		return
 	}
 
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	objA0.animation.sprite = 0x16
@@ -518,12 +515,12 @@ function void fn062778()
 
 	// Knuckles despawns
 	u8[0xfffffaa9] = 0
-	u8[0xffffb02e] = 0		// Reset control_flags
-	u8[0xffffb078] = 0
+	u8[0xffffb000 + 0x2e] = 0		// Reset control_flags
+	u8[0xffffb04a + 0x2e] = 0
 	screenmover_target.right = 0x3b60 + getScreenExtend() * 2
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
-	spawnSimpleChildObjects(0x084a48, 1)
+	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 	move_area.bottom.target = 0x0148
 	fn0851e4()
@@ -575,7 +572,7 @@ function void fn062800()
 	}
 
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x04] &= ~render_flag.FLIP_X
+	objA1.render_flags &= ~render_flag.FLIP_X
 	u8[A1 + 0x2a] &= ~0x01
 }
 
@@ -597,7 +594,7 @@ function void fn0626f4()
 	objA0.base_state = 0x08
 	objA0.countdown_value = 0x0f
 	objA0.countdown_callback = 0x062726
-	playSound(0x51)
+	playSound(SFX_BOMBFALL)
 
 	// "spawnChildObjects(0x066584)" replaced by:
 	spawnChildObject(0x06282a, 0x00, -8, -16)
@@ -625,7 +622,7 @@ function void fn06282a()
 	objA0.update_address = 0x06284e
 	objA0.velocity.x = -0x200
 	objA0.velocity.y = -0x400
-	playSound(0x51)
+	playSound(SFX_BOMBFALL)
 
 	fn06284e()
 }
@@ -726,8 +723,7 @@ function void fn08cd4c()
 function void fn08cd5c()
 {
 	objA0.update_address = 0x08cd6c
-	A2 = 0x08d25c
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x08d25c)
 }
 
 

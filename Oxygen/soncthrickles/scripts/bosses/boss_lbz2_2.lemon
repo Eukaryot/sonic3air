@@ -52,8 +52,9 @@ function void fn0729de()
 
 		if (allocDynamicObjectStd())
 		{
+			// Create the object that fades out level music and starts the boss theme afterwards
 			objA1.update_address = 0x085b30
-			u8[A1 + 0x2c] = 0x19
+			u8[A1 + 0x2c] = MUSIC_MAINBOSS
 		}
 	}
 
@@ -68,8 +69,7 @@ function void fn0729de()
 	spawnChildObject(0x0730f8, 0x02, 0, 48)
 	spawnChildObject(0x073100, 0x04, 0, 92)
 
-	A2 = 0x0737e8
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x0737e8)
 }
 
 
@@ -175,7 +175,7 @@ function void fn072ffa()
 	if (InitBoss(0x073004))
 		return
 
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
 	level.bossarea.left -= getScreenExtend()
@@ -256,7 +256,7 @@ function void fn073056()
 	{
 		objA0.position.y.u16 = D1.u16
 		objA0.flags38 |= 0x20				// Stop the explosions
-		objA0.sprite_attributes &= 0x7fff	// Draw him in background
+		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY	// Draw him in background
 		objA0.update_address = 0x073058
 	}
 }
@@ -294,7 +294,7 @@ function void fn07305a()
 	}
 	else if (u16[A0 + 0x48] == 120)
 	{
-		playMusic(0x30)
+		playMusic(MUSIC_BIGARMS)
 		level.boss_encounter = 2	// Usually only 0 or 1, but we're using a value of 2 here for "chooseFittingMusic"
 	}
 
@@ -343,8 +343,7 @@ function void fn07308e()
 	objA0.update_address = 0x0730b0
 	objA0.countdown_callback = 0x0730b0
 
-	A2 = 0x0737ba
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x0737ba)
 }
 
 
@@ -592,7 +591,7 @@ function void fn0732ba()
 	{
 		playSound(0x5e)
 	}
-	u8[A0 + 0x28] = 0x9c
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x4)
 	objA0.animation.sprite = 0x11
 
 	D0 = -0x2c
@@ -626,7 +625,7 @@ function void fn073364()
 {
 	setupObjectAttributesMost(0x0736f0)
 
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	objA0.update_address = 0x073384
 	u32[A0 + 0x30] = 0x073844
 }
@@ -673,8 +672,8 @@ function void fn0733e2()
 {
 	D0.u8 = objA0.value39 + 1
 	objA0.value39 = D0.u8
-	objA0.render_flags &= 0xfc
-	objA0.render_flags |= (D0.u8 & 0x03)
+	objA0.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA0.render_flags |= (D0.u8 & (render_flag.FLIP_X | render_flag.FLIP_Y))
 }
 
 
@@ -686,7 +685,7 @@ function void fn0733fc()
 	if (objA0.countdown_value < 0)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x44]
-		if (u8[A1 + 0x04] & 0x01)
+		if (objA1.render_flags & render_flag.FLIP_X)
 		{
 			D2.u8 = 0xff
 			--D0.u8
@@ -966,10 +965,10 @@ function void fn0844ce()
 		}
 
 		u8[A1 + 0x22] = D1.u8
-		u8[A1 + 0x04] &= ~render_flag.FLIP_X
+		objA1.render_flags &= ~render_flag.FLIP_X
 		if (u8[A2 + D0.s16 + 0x02] != 0)
 		{
-			u8[A1 + 0x04] |= render_flag.FLIP_X
+			objA1.render_flags |= render_flag.FLIP_X
 		}
 	}
 	fn085fc4()

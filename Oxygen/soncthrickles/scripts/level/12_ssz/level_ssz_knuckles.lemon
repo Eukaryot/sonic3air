@@ -428,7 +428,7 @@ function void fn058fbc()
 function void fn0591d6()
 {
 	objA0.update_address = 0x059208
-	objA0.render_flags = 0x40
+	objA0.render_flags = render_flag.COMPOUND
 	objA0.box_size.y = 0x40
 	objA0.sprite_priority = 0x0380
 	objA0.mapping_offset = 0x059270
@@ -811,8 +811,9 @@ function void fn07ca3a()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x19
+		u8[A1 + 0x2c] = MUSIC_MAINBOSS
 	}
 
 	// "spawnChildObjects(0x068184)" replaced by:
@@ -880,8 +881,8 @@ function void fn07caf8()
 		#else
 			objA0.velocity.x = 0x80
 		#endif
-		objA0.render_flags |= 0x01
-		u8[0xffffb004] &= ~0x01
+		objA0.render_flags |= render_flag.FLIP_X
+		u8[0xffffb000 + 0x04] &= ~render_flag.FLIP_X
 	}
 
 	fn0847e6()
@@ -904,8 +905,9 @@ function void fn07cb28()
 
 		if (allocDynamicObjectStd())
 		{
+			// Create the object that fades out level music and starts the boss theme afterwards
 			objA1.update_address = 0x085b30
-			u8[A1 + 0x2c] = 0x30
+			u8[A1 + 0x2c] = MUSIC_BIGARMS
 		}
 	}
 	DrawObject()
@@ -927,6 +929,7 @@ function void fn07cb64()
 		}
 		if (allocDynamicObjectStd())
 		{
+			// Trigger Mecha Sonic boss
 			objA1.update_address = 0x07b288
 		}
 		u16[0xfffffaa4] = A1.u16
@@ -1003,7 +1006,7 @@ function void fn07cc3a()
 	objA0.position.y.u16 = objA1.position.y.u16
 	objA0.velocity.x = 0x0400
 	objA0.velocity.y = 0x80
-	u8[A1 + 0x22] = 0xc0
+	objA1.animation.sprite = 0xc0
 #if STANDALONE
 	// In S3AIR, it can happen that Knuckles faces the wrong direction while gliding
 	u8[A1 + 0x2a] = 0
@@ -1030,7 +1033,7 @@ function void fn07cc68()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 	objA0.hitbox_extends.y = 0x13
-	u8[A1 + 0x22] = 0xca
+	objA1.animation.sprite = 0xca
 	UpdatePlayer1SpritePatterns()
 }
 
@@ -1042,7 +1045,7 @@ function void fn07ccb0()
 	if (objA0.countdown_value == 0)
 	{
 		A1 = 0xffffb000
-		u8[A1 + 0x22] = 0xcb
+		objA1.animation.sprite = 0xcb
 		UpdatePlayer1SpritePatterns()
 	}
 
@@ -1158,15 +1161,15 @@ function void fn07cd82()
 		u8[0xfffffab8] |= 0x04
 		objA0.animation.sprite = 2
 
-		u8[A1 + 0x04] |= render_flag.FLIP_X
-		u8[A1 + 0x22] = 0xcb
-		u8[A1 + 0x2a] &= ~0x08
+		objA1.render_flags |= render_flag.FLIP_X
+		objA1.animation.sprite = 0xcb
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		u8[A1 + 0x2e] = 0x83
 		u8[A1 + 0x3d] = 0
 		u8[A1 + 0x40] = 0
 
 		UpdatePlayer1SpritePatterns()
-		playSound(0x4a)
+		playSound(SFX_GRAB)
 	}
 
 	MoveAndFlipWithParent()

@@ -18,7 +18,7 @@ function void fn030ad0()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.mapping_offset = 0x22f998
-	objA0.sprite_attributes = 0x23e4
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03e4)
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x40
 	objA0.value32 = objA0.position.y.u16
@@ -29,12 +29,12 @@ function void fn030ad0()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x030dec
-		u32[A1 + 0x0c] = 0x22f998
-		u16[A1 + 0x0a] = 0x23e4
-		u8[A1 + 0x04] = objA0.render_flags
-		u8[A1 + 0x07] = 0x20
-		u8[A1 + 0x07] = 0x30
-		u16[A1 + 0x08] = 0x0280
+		objA1.mapping_offset = 0x22f998
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03e4)
+		objA1.render_flags = objA0.render_flags
+		objA1.box_size.x = 0x20
+		objA1.box_size.x = 0x30
+		objA1.sprite_priority = 0x0280
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		u16[A1 + 0x3c] = A0.u16
@@ -48,8 +48,8 @@ function void fn030ad0()
 //# address-hook(0x030b58) end(0x030c00)
 function void fn030b58()
 {
-	u16 dx1 = u16[0xffffb010] - objA0.position.x.u16 + 0x20
-	u16 dx2 = u16[0xffffb05a] - objA0.position.x.u16 + 0x20
+	u16 dx1 = u16[0xffffb000 + 0x10] - objA0.position.x.u16 + 0x20
+	u16 dx2 = u16[0xffffb04a + 0x10] - objA0.position.x.u16 + 0x20
 	if (dx1 >= 0x40 && dx2 >= 0x40)
 	{
 		if (u16[A0 + 0x30] != 0x50)
@@ -120,7 +120,7 @@ function void fn030c06()
 		{
 			u8[A0 + 0x34] = 0
 			objA0.update_address = 0x030b58
-			playSound(0xb6)
+			playSound(SFX_SPINDASH_RELEASE)
 		}
 		else
 		{
@@ -151,34 +151,34 @@ function void fn030c06()
 function void fn030c7c()
 {
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn030c8c()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn030c8c()
 }
 
 
 function void fn030c8c()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if (u8[A0 + 0x35] & bit)
 	{
 		u8[A0 + 0x35] &= ~bit
 		objA1.velocity.x = (objA0.flags2a & 0x01) ? -0x1000 : 0x1000
 		objA1.velocity.y = 0
 		s16[A1 + 0x1c] = objA1.velocity.x
-		u8[A1 + 0x20] = 0
+		u8[A1 + 0x20] = char.state.RUNNING
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
 	}
 	else if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 }
 
@@ -187,12 +187,12 @@ function void fn030c8c()
 function void fn030ce0()
 {
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D0.u8 = control.player1.pressed
 	fn030cf8()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D0.u8 = control.tails.pressed
 	fn030cf8()
 }
@@ -216,6 +216,7 @@ function void fn030cf8()
 
 	if (u8[A0 + 0x35] & bit)
 	{
+		// Check if jump button pressed
 		if (D0.u8 & CONTROL_ABC)
 		{
 			u8[A0 + 0x35] &= ~bit
@@ -224,8 +225,8 @@ function void fn030cf8()
 			objA1.velocity.y = -0x400
 			s16[A1 + 0x1c] = objA1.velocity.x
 			u8[A1 + 0x2e] = 0
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			if (u8[A0 + 0x35] == 0)
 			{
 				u8[A0 + 0x34] = 0
@@ -247,14 +248,14 @@ function void fn030cf8()
 		{
 			u8[A0 + 0x35] |= bit
 
-			playSound(0x3c)
+			playSound(SFX_ROLL)
 
 			u8[A1 + 0x20] = 0
-			u8[A1 + 0x1e] = (u32[A1] == 0x01365c) ? 0x0f : 0x13
+			u8[A1 + 0x1e] = (objA1.update_address == 0x01365c) ? 0x0f : 0x13
 			u8[A1 + 0x1f] = 0x09
 			u8[A1 + 0x2a] &= ~0x01
-			u8[A1 + 0x2a] &= ~0x04
-			u8[A1 + 0x2a] &= ~0x20
+			u8[A1 + 0x2a] &= ~char.flag.ROLLING
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 			u8[A1 + 0x2e] = 1
 			objA1.position.x.u16 = objA0.position.x.u16 - 2
 			u16[A1 + 0x1c] = 0x1000

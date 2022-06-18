@@ -22,12 +22,12 @@ function void fn057c1e()
 	u16[A0 + 0x3c] = A1.u16
 
 	objA1.update_address = 0x0459b4
-	u8[A1 + 0x04] = (render_flag.COMPOUND | render_flag.WORLD)
-	u8[A1 + 0x06] = 0x80
-	u8[A1 + 0x07] = 0x18
-	u16[A1 + 0x08] = 0x80
-	u16[A1 + 0x0a] = 0xe35c
-	u32[A1 + 0x0c] = 0x046b3c
+	objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
+	objA1.box_size.y = 0x80
+	objA1.box_size.x = 0x18
+	objA1.sprite_priority = 0x80
+	objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x035c)
+	objA1.mapping_offset = 0x046b3c
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16
 	u16[A1 + 0x16] = 0x02
@@ -173,7 +173,7 @@ function void fn057dcc()
 	if (s32[A0 + 0x2e] >= 0)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x20] = 0
+		u8[A1 + 0x20] = char.state.RUNNING
 		tails.respawn_counter = 0
 		tails.ai_routine = 0x06
 		UnloadObject()
@@ -196,6 +196,7 @@ function void fn057e34()
 		if (!allocDynamicObjectAfterA0())
 			return
 
+		// Spawn Cutscene Knuckles
 		objA1.update_address = 0x061d4c
 		objA1.subtype2c = 0x2c
 		objA1.position.x.u16 = 0x0100
@@ -257,8 +258,7 @@ function void fn0656da()
 //# address-hook(0x065730) end(0x065758)
 function void fn065730()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 #if STANDALONE
@@ -330,7 +330,7 @@ function void fn0657ce()
 		return
 
 	objA0.base_state = 0x08
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.flags38 |= 0x40
 	objA0.animation.sprite = 0
 
@@ -367,7 +367,7 @@ function void fn065826()
 	if (objA0.countdown_value < 0)
 	{
 		objA0.base_state = 0x0c
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 		objA0.flags38 &= ~0x40
 		objA0.animation.sprite = 0x56
 		objA0.countdown_value = 0x05
@@ -408,7 +408,7 @@ function void fn065876()
 	objA0.base_state = 0x10
 	objA0.velocity.x = 0x0300
 	objA0.velocity.y = 0
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 
 	A1 = 0x066824
 	fn084580()
@@ -448,13 +448,13 @@ function void fn0658f2()
 	objA0.position.y.u16 += D1.u16
 	objA0.base_state = 0x14
 	objA0.sprite_priority = 0x0200
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	objA0.flags38 |= 0x40
 	objA0.animation.sprite = 0x01
 
 	// Trigger the bridge already
 	u8[0xffffeeda] = 0xff
-	playSound(0x5b)
+	playSound(SFX_CLICK)
 
 	A1 = 0x06671f
 	fn084580()
@@ -615,8 +615,7 @@ function void fn065a8c()
 //# address-hook(0x065ab6) end(0x065ace)
 function void fn065ab6()
 {
-	A1 = 0x0664b6
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0664b6))
 		return
 
 	u32[A0 + 0x30] = 0x066739
@@ -768,7 +767,7 @@ function void fn065fde()
 	if (D2.u16 >= 0x20 || D0.u16 == 0)
 		return
 
-	if ((u8[A1 + 0x04] & 0x01) == 0 || u8[A1 + 0x20] != char.state.COWERING)
+	if ((objA1.render_flags & render_flag.FLIP_X) == 0 || u8[A1 + 0x20] != char.state.COWERING)
 		return
 
 #if STANDALONE

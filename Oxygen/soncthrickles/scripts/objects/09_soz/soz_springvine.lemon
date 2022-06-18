@@ -12,8 +12,8 @@
 function void fn040786()
 {
 	objA0.mapping_offset = 0x040b0c
-	objA0.sprite_attributes = 0x43c9
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c9)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x2c
 	objA0.box_size.y = 0x2c
 	objA0.sprite_priority = 0x0280
@@ -22,15 +22,15 @@ function void fn040786()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x040872
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u8[A1 + 0x04] = objA0.render_flags
-		u8[A1 + 0x07] = 0x40
-		u8[A1 + 0x06] = 0x40
-		u16[A1 + 0x08] = 0x0200
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.render_flags = objA0.render_flags
+		objA1.box_size.x = 0x40
+		objA1.box_size.y = 0x40
+		objA1.sprite_priority = 0x0200
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x04] |= 0x40
+		objA1.render_flags |= render_flag.COMPOUND
 		u16[A1 + 0x16] = 8
 
 		D1 = objA0.position.x - 0x280000
@@ -88,12 +88,12 @@ function void fn040878()
 
 	A2 = A0 + 0x35
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn04093e()
 
 	--A2
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn04093e()
 
 	u16[A0 + 0x30] = D5.u16
@@ -125,7 +125,9 @@ function void fn040878()
 //# address-hook(0x04093e) end(0x0409b8)
 function void fn04093e()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		u8[A2] = 0
 		return
@@ -197,7 +199,7 @@ function void fn0409ba()
 	u8[A1 + 0x2f] = 0
 	u8[A1 + 0x40] = 0
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }
 
 

@@ -55,11 +55,10 @@ function void fn087952()
 function void fn087976()
 {
 	fn08459c()
-	if (D2.s16 > 0 && objA0.animation.sprite == 1 && u8[A0 + 0x04] & 0x80)
+	if (D2.s16 > 0 && objA0.animation.sprite == 1 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		playSound(0x4d)
-		A2 = 0x0879f8
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x0879f8)
 	}
 }
 

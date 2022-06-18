@@ -12,7 +12,7 @@
 function void fn01ed26()
 {
 	objA0.mapping_offset = 0x21cdca
-	objA0.sprite_attributes = 0x43ca
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03ca)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	u16[A0 + 0x30] = u32(objA0.subtype2c & 0x0f) * 0x3c
@@ -20,7 +20,7 @@ function void fn01ed26()
 	D1.u16 = (objA0.subtype2c & 0x30) >> 2
 	A1 = 0x01ed1a + D1.s16
 	D0 = 0
-	if (s8[A0 + 0x2c] < 0)
+	if (s8(objA0.subtype2c) < 0)
 	{
 		u16[A0 + 0x36] = u8[(A1+=1)-1]
 		u16[A0 + 0x38] = u8[(A1+=1)-1]
@@ -87,7 +87,7 @@ function void fn01edec()
 	if (u8[A2] != 0)
 	{
 		D0.u16 = objA0.position.y.u16 - u16[A0 + 0x36]
-		if (D1 & 0x0100)
+		if (D1 & 0x0100)		// CONTROL_UP held
 		{
 			--objA1.position.y.u16
 			if (D0.u16 >= objA1.position.y.u16)
@@ -97,7 +97,7 @@ function void fn01edec()
 		}
 
 		D0.u16 += u16[A0 + 0x38]
-		if (D1 & 0x0200)
+		if (D1 & 0x0200)		// CONTROL_DOWN held
 		{
 			++objA1.position.y.u16
 			if (D0.u16 < objA1.position.y.u16)
@@ -106,7 +106,8 @@ function void fn01edec()
 			}
 		}
 
-		D1.u16 &= 0x70
+		// Check if jump button pressed
+		D1.u16 &= CONTROL_ABC
 		if (D1.u16 == 0)
 			return
 
@@ -172,11 +173,11 @@ function void fn01eeec()
 {
 	if (u8[A0 + 0x32] != 0)
 	{
-		u8[0xffffb02e] &= 0xfe
+		u8[0xffffb000 + 0x2e] &= 0xfe
 	}
 	if (u8[A0 + 0x33] != 0)
 	{
-		u8[0xffffb078] &= 0xfe
+		u8[0xffffb04a + 0x2e] &= 0xfe
 	}
 
 	u8[0xfffff7c7] = 0
@@ -261,7 +262,7 @@ function void fn01efa0()
 	if (u8[A2] != 0)
 	{
 		D0.u16 = objA0.position.x.u16 - u16[A0 + 0x36]
-		if (D1 & 0x0400)
+		if (D1 & 0x0400)		// CONTROL_LEFT held
 		{
 			--objA1.position.x.u16
 			if (D0.u16 >= objA1.position.x.u16)
@@ -271,7 +272,7 @@ function void fn01efa0()
 		}
 
 		D0.u16 += u16[A0 + 0x38]
-		if (D1 & 0x0800)
+		if (D1  & 0x0800)		// CONTROL_RIGHT held
 		{
 			++objA1.position.x.u16
 			if (D0.u16 < objA1.position.x.u16)
@@ -280,7 +281,8 @@ function void fn01efa0()
 			}
 		}
 
-		D1.u16 &= 0x70
+		// Check if jump button pressed
+		D1.u16 &= CONTROL_ABC
 		if (D1.u16 == 0)
 			return
 
@@ -349,11 +351,11 @@ function void fn01f09a()
 {
 	if (u8[A0 + 0x32] != 0)
 	{
-		u8[0xffffb02e] &= 0xfe
+		u8[0xffffb000 + 0x2e] &= 0xfe
 	}
 	if (u8[A0 + 0x33] != 0)
 	{
-		u8[0xffffb078] &= 0xfe
+		u8[0xffffb04a + 0x2e] &= 0xfe
 	}
 
 	u8[0xfffff7c7] = 0
@@ -383,20 +385,21 @@ function void fn01f188()
 
 	while (true)
 	{
+		// Spawn broken pole pieces
 		objA1.update_address = objA0.update_address
-		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		D0.u16 = u16[(A4+=2)-2] +D2.u16
 		objA1.position.x.u16 = D0.u16
 		D0.u16 = u16[(A4+=2)-2] +D3.u16
 		objA1.position.y.u16 = D0.u16
-		u16[A1 + 0x08] = D4.u16
-		u8[A1 + 0x07] = 0x04
-		u8[A1 + 0x06] = 0x04
-		u8[A1 + 0x22] = objA0.animation.sprite
+		objA1.sprite_priority = D4.u16
+		objA1.box_size.x = 0x04
+		objA1.box_size.y = 0x04
+		objA1.animation.sprite = objA0.animation.sprite
 		objA1.velocity.x = objA0.velocity.x
 		objA1.velocity.y = objA0.velocity.y
 		u8[A1 + 0x3f] = u8[(A2+=1)-1]
@@ -409,5 +412,5 @@ function void fn01f188()
 			break
 	}
 
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }

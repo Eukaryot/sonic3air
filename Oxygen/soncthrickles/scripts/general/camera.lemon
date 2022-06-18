@@ -154,7 +154,7 @@ function void UpdateCameraPositionX()
 			{
 				// Variant A
 				s16 diff = 0
-				if (u8[0xffffb02e] & 0xc0 || u8[0xffffb03c] != 0)		// Reset to normal it certain situations when the player has no direct control, or when on a convex surface
+				if (u8[0xffffb000 + 0x2e] & 0xc0 || u8[0xffffb000 + 0x3c] != 0)		// Reset to normal in certain situations when the player has no direct control, or when on a convex surface
 				{
 					diff = clamp(-currentCameraPanning, -2, 2)
 				}
@@ -449,7 +449,7 @@ function void UpdateCameraPositionX_CompMode()
 		D0.u16 = objA0.position.x.u16
 	}
 
-	D2.u16 = u16[0xffffeea8]
+	D2.u16 = level.width.bitmask
 	D0.u16 = ((D0.u16 - u16[A1]) & D2.u16) - (getScreenWidth() / 2 - 0x10)
 	if (D0.s16 < 0)
 	{

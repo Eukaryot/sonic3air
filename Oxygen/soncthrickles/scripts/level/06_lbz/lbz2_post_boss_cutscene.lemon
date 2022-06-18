@@ -113,16 +113,17 @@ function void fn072c0a()
 			u8[0xfffffa88] = 0
 			StopObjectA1()
 
-			u8[A1 + 0x04] &= ~render_flag.FLIP_X
-			u8[A1 + 0x2a] &= ~0x01
-			control.player1 = 0x0101
+			objA1.render_flags &= ~render_flag.FLIP_X
+			u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
+
+			control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
 
 			// "spawnSimpleChildObjects(0x073806)" replaced by:
 			spawnSimpleChildObjects(0x072d24, 2)
 		}
 		else
 		{
-			D1 = (D0.s16 < 0) ? 2 : 3
+			D1 = (D0.s16 < 0) ? 2 : 3		// CONTROL_LEFT : CONTROL_RIGHT
 			control.player1.state |= (1 << D1.u8)
 		}
 	}
@@ -159,7 +160,7 @@ function void fn072c9e()
 	fn0844ce()
 
 	A1 = 0xffffb04a
-	u8[A1 + 0x20] = 0
+	u8[A1 + 0x20] = char.state.RUNNING
 	A2 = 0x073874
 	fn0844ce()
 }
@@ -186,11 +187,10 @@ function void fn072cc6()
 //# address-hook(0x072cda) end(0x072cf4)
 function void fn072cda()
 {
-	if (u16[0xffffb014] >= camera.position.y.u16 + 0x0120)
+	if (u16[0xffffb000 + 0x14] >= camera.position.y.u16 + 0x0120)
 	{
 		// Go on with Mushroom Hill Zone
-		D0.u16 = 0x0700
-		TriggerNextZone()
+		TriggerNextZone(0x0700)
 		UnloadObject()
 	}
 }
@@ -466,7 +466,7 @@ function void fn072f7a()
 	{
 		++objA0.value39
 		D0.u8 = objA0.value39 & 0x03
-		D1.u8 = objA0.render_flags & 0xfc
+		D1.u8 = objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		D1.u8 |= D0.u8
 		objA0.render_flags = D1.u8
 	}

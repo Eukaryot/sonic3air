@@ -96,8 +96,7 @@ function void fn08f7a4()
 //# address-hook(0x08f7ea) end(0x08f80c)
 function void fn08f7ea()
 {
-	A1 = 0x08f9ea
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08f9ea))
 		return
 
 	objA0.base_state = 0x04
@@ -233,7 +232,7 @@ function void fn08f910()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	objA0.velocity.x = objA1.velocity.x
-	objA0.render_flags = u8[A1 + 0x04]
+	objA0.render_flags = objA1.render_flags
 }
 
 
@@ -276,7 +275,7 @@ function void fn08f97c()
 
 	u32[A0 + 0x30] = 0x08fa56
 	objA0.countdown_callback = 0x08f9a4
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 }
 
 

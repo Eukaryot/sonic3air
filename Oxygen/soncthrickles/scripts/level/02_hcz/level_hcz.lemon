@@ -176,7 +176,7 @@ function void fn050c4c()
 		fn04f8f8()
 
 		u32[0xffffb172] = 0x0383bc		// HCZ run-on-water handler
-		u8[0xffffb19e] = 0x01
+		u8[0xffffb172 + 0x2c] = 0x01
 
 		u32 backupD7 = D7
 		u32 backupA0 = A0
@@ -201,8 +201,8 @@ function void fn050c4c()
 
 		D0.u16 = 0x3600
 		D1 = 0
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb05a] -= D0.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
 		fn04f3b0()
 
 		camera.position.x.u16 -= D0.u16
@@ -541,10 +541,10 @@ function void fn050f20()
 		fn04f386()
 		level.dualplanecollision = 0
 
-		D0.u16 = u16[0xffffb010]
+		D0.u16 = u16[0xffffb000 + 0x10]
 		if (D0.u16 >= 0x03f0 && D0.u16 < 0x0c10)
 		{
-			D0.u16 = u16[0xffffb014]
+			D0.u16 = u16[0xffffb000 + 0x14]
 			if (D0.u16 >= 0x0600 && D0.u16 < 0x0840)
 			{
 				level.dualplanecollision = 0xff
@@ -672,9 +672,9 @@ function void fn050fce()
 //# address-hook(0x050ff0) end(0x05106e)
 function void fn050ff0()
 {
-	if (u8[0xffffb005] < 0x06)
+	if (u8[0xffffb000 + 0x05] < 0x06)
 	{
-		D0 = (u16[0xffffb010] < 0x0a88) ? 0x00e000 : 0x014000
+		D0 = (u16[0xffffb000 + 0x10] < 0x0a88) ? 0x00e000 : 0x014000
 		D1.u16 = level.display_routine
 
 		bool goto05103a = false
@@ -692,7 +692,7 @@ function void fn050ff0()
 		}
 		else
 		{
-			if (u16[0xffffb010] >= 0x0680)
+			if (u16[0xffffb000 + 0x10] >= 0x0680)
 			{
 				camera.screenshake.state.hi = 0xff
 				goto05103a = true

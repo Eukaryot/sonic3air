@@ -116,7 +116,7 @@ function void fn091cc2()
 //# address-hook(0x091d0c) end(0x091d0c)
 function void fn091d0c()
 {
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 
@@ -173,7 +173,7 @@ function void fn091d6c()
 	objA0.countdown_callback = 0x091e46
 	if (objA0.subtype2c != 0)
 	{
-		objA0.render_flags |= 0x02
+		objA0.render_flags |= render_flag.FLIP_Y
 	}
 }
 
@@ -185,16 +185,16 @@ function void fn091d8c()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x02)
 	{
-		D0.u8 = (u8[A1 + 0x04] & 0x02) ? 0xff : 0x00
+		D0.u8 = (objA1.render_flags & render_flag.FLIP_Y) ? 0xff : 0x00
 		if (objA0.subtype2c != 0)
 			D0.u8 ^= 0xff
 
 		if (D0.u8 == 0)
 		{
 			objA0.base_state = 0x04
-			u8[A0 + 0x28] = 0x18
+			objA0.collision_attributes = collision.size.4x4_2
 			u8[A0 + 0x29] = 0xff
-			objA0.velocity.y = (u8[A1 + 0x04] & 0x02) ? -8 : 8
+			objA0.velocity.y = (objA1.render_flags & render_flag.FLIP_Y) ? -8 : 8
 			u16[A0 + 0x3a] = objA0.position.y.u16
 			objA0.countdown_value = 0x17
 		}
@@ -222,9 +222,9 @@ function void fn091de2()
 			{
 				goto091e46 = true
 			}
-			else if (u8[A0 + 0x28] == 0)
+			else if (objA0.collision_attributes == 0)
 			{
-				u8[A0 + 0x28] = 0x18
+				objA0.collision_attributes = collision.size.4x4_2
 				goto091e46 = true
 			}
 
@@ -241,7 +241,7 @@ function void fn091de2()
 	else
 	{
 		objA0.base_state = 0x02
-		u8[A0 + 0x28] = 0x98
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
 		objA0.animation.sprite = 2
 		A1 = 0xffff0000 + u16[A0 + 0x46]
 		u8[A1 + 0x38] &= ~0x02
@@ -252,7 +252,7 @@ function void fn091de2()
 //# address-hook(0x091e5a) end(0x091e6c)
 function void fn091e5a()
 {
-	u8[A0 + 0x28] = 0x98
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
 	objA0.box_size.x = 8
 	objA0.box_size.y = 8
 	objA0.update_address = 0x091e72

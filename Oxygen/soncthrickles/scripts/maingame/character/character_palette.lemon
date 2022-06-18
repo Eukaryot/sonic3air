@@ -297,7 +297,7 @@ function void UpdatePaletteEffects.SuperForm.originalVersion(u8 characterVersion
 		}
 
 		super.palettefx.state = 0xff
-		u8[0xffffb02e] = 0		// Reset "char.control_flags"
+		u8[0xffffb000 + 0x2e] = 0		// Reset "char.control_flags"
 	}
 	else  // (super.palettefx.state == 2)
 	{
@@ -528,7 +528,7 @@ function void UpdatePaletteEffects.SuperForm.smoothedVersion(u8 characterVersion
 
 		// Fully faded in
 		super.palettefx.state = 0xff
-		u8[0xffffb02e] = 0		// Reset "char.control_flags"
+		u8[0xffffb000 + 0x2e] = 0		// Reset "char.control_flags"
 	}
 	else  // (super.palettefx.state == 2)
 	{
@@ -700,7 +700,7 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 		super.palettefx.frame = 0
 		super.palettefx.frame.tails = 0
 		super.palettefx.state = 0xff
-		u8[0xffffb02e] = 0		// Reset "char.control_flags"
+		u8[0xffffb000 + 0x2e] = 0		// Reset "char.control_flags"
 	}
 	else  // (super.palettefx.state == 2)
 	{

@@ -26,8 +26,8 @@ function void InitLevelTiles.ICZ1()
 			if (allocDynamicObjectStd())
 			{
 				objA1.update_address = 0x053ad4
-				u16[0xffffb010] = 0x3640
-				u16[0xffffb014] = 0x0660
+				u16[0xffffb000 + 0x10] = 0x3640
+				u16[0xffffb000 + 0x14] = 0x0660
 				camera.foreground.x.u16 = 0x35a0
 				camera.position.x.u16 = 0x35a0
 				camera.foreground.y.u16 = 0x05fb
@@ -353,7 +353,7 @@ function void fn053a4c()
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 
-			playSound(0x62)
+			playSound(SFX_JUMP)
 		}
 	}
 }
@@ -529,7 +529,7 @@ function void fn039bee()
 	{
 		s16[A2 + 0x18] = -0x200
 		s16[A2 + 0x1a] = -0x400
-		u8[A2 + 0x20] = 0x19
+		u8[A2 + 0x20] = char.state.GOT_HURT_PANIC
 		u8[A2 + 0x2a] |= char.flag.IN_AIR
 		u8[A2 + 0x2e] = 0
 
@@ -537,8 +537,8 @@ function void fn039bee()
 		camera.screenshake.state = 0x14
 		D0.u16 = -0x100
 		level.vertical_wrap = D0.u16
-		u16[0xffffee10] = D0.u16
-		u16[0xffffee20] = D0.u16
+		move_area.top.target = D0.u16
+		level.vertical_wrap.player2 = D0.u16
 
 		playSound(0x5f)
 		UnloadObject()
@@ -650,10 +650,10 @@ function void ICZ1.TransitionToOutdoorArea()
 
 		D0.u16 = 0x6880
 		D1.u16 = 0xff00
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb014] -= D1.u16
-		u16[0xffffb05a] -= D0.u16
-		u16[0xffffb05e] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb000 + 0x14] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x14] -= D1.u16
 		fn04f3b0()
 		fn04f3a0()
 

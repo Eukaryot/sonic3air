@@ -12,14 +12,14 @@
 function void fn04187e()
 {
 	objA0.mapping_offset = 0x041b56
-	objA0.sprite_attributes = 0x4455
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0455)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x30
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0300
 	objA0.animation.sprite = 0x01
 	u16[A0 + 0x44] = objA0.position.x.u16
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 
 	u16[A0 + 0x16] = 1
 	A2 = A0 + 0x18
@@ -38,8 +38,8 @@ function void fn0418e4()
 	A3 = 0xfffff7e0 + (objA0.subtype2c & 0x0f)
 	D1 = u8[A3]
 	u16[A0 + 0x36] = D1.u16
-	u8[A0 + 0x30] = u8[0xffffb02a]
-	u8[A0 + 0x31] = u8[0xffffb074]
+	u8[A0 + 0x30] = u8[0xffffb000 + 0x2a]
+	u8[A0 + 0x31] = u8[0xffffb04a + 0x2a]
 
 	D1.u16 = 0x17
 	D2.u16 = 0x10
@@ -131,7 +131,7 @@ function void fn0419c6()
 {
 	D5 = 0
 
-	D3.u8 = objA0.flags2a & 0x60
+	D3.u8 = objA0.flags2a & (object.flag.P1_PUSHING | object.flag.P2_PUSHING)
 	if (D3.u8 == 0)
 	{
 		fn041a6c()
@@ -141,14 +141,14 @@ function void fn0419c6()
 	D2.u16 = objA0.position.x.u16
 	A1 = 0xffffb000
 	D0.u8 = u8[A0 + 0x30]
-	D6 = 5
+	D6 = 5		// object.flag.P1_PUSHING
 	fn0419fa()
 
 	if (D5.u16 == 0)
 	{
 		A1 = 0xffffb04a
 		D0.u8 = u8[A0 + 0x31]
-		D6 = 6
+		D6 = 6		// object.flag.P2_PUSHING
 		fn0419fa()
 
 		if (D5.u16 == 0)

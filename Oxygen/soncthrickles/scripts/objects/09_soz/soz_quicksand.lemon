@@ -19,12 +19,12 @@ function void fn0400ca()
 	D3.u16 = objA0.value32
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D5.u16 = control.player1
 	fn0400f0()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D5.u16 = control.tails
 	fn0400f0()
 
@@ -38,7 +38,7 @@ function void fn0400f0()
 	u16 dx = objA1.position.x.u16 - objA0.position.x.u16 + D2.u16
 	u16 dy = objA1.position.y.u16 - objA0.position.y.u16 + 0x33
 
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
 		if (dx < D3.u16 && dy < 0x40)
@@ -51,7 +51,7 @@ function void fn0400f0()
 					return
 				}
 
-				u8[A1 + 0x2a] |= 0x08
+				u8[A1 + 0x2a] |= char.flag.ON_OBJECT
 				objA0.flags2a |= bit
 				u8[A1 + 0x1e] = u8[A1 + 0x44]
 				u8[A1 + 0x1f] = u8[A1 + 0x45]
@@ -78,8 +78,8 @@ function void fn0400f0()
 				// Fix for bug when Tails carries other player and gets caught by the quicksand
 				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
 				{
-					u8[0xffffb02a] |= char.flag.IN_AIR
-					u8[0xffffb02e] = 0
+					u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+					u8[0xffffb000 + 0x2e] = 0
 				}
 			#endif
 			}
@@ -91,10 +91,11 @@ function void fn0400f0()
 		{
 			if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x2a] & 0x02)
 			{
-				D5.u16 &= 0x70
+				// Check if jump button pressed
+				D5.u16 &= CONTROL_ABC
 				if (D5.u16 != 0)
 				{
-					u8[A1 + 0x2a] &= ~0x08
+					u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 					objA0.flags2a &= ~bit
 					objA1.velocity.y = (u8[A1 + 0x38] == CHARACTER_KNUCKLES) ? -0x600 : -0x680
 					u8[A1 + 0x1e] = 0x0e
@@ -105,7 +106,7 @@ function void fn0400f0()
 					u8[A1 + 0x2f] = 0
 					u8[A1 + 0x40] = 0x01
 
-					playSound(0x62)
+					playSound(SFX_JUMP)
 				}
 				else
 				{
@@ -124,7 +125,7 @@ function void fn0400f0()
 			}
 		}
 
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
 	}
 }

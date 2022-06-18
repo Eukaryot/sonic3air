@@ -12,7 +12,7 @@
 function void fn04379e()
 {
 	objA0.mapping_offset = 0x043a8e
-	objA0.sprite_attributes = 0x2442
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0442)
 	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
@@ -24,8 +24,8 @@ function void fn04379e()
 
 	if (objA0.subtype2c == 0)
 	{
-		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 		objA0.update_address = 0x04397e
 		fn04397e()
 	}
@@ -46,11 +46,11 @@ function void fn0437fe()
 	D1.u16 += u16[A0 + 0x44]
 	objA0.position.x.u16 = D1.u16
 	u8[A0 + 0x28] = 0
-	objA0.sprite_attributes &= 0x7fff
+	objA0.sprite_attributes &= ~sprite_attribute.PRIORITY
 	if (s8[A0 + 0x26] < 0)
 	{
-		objA0.sprite_attributes |= 0x8000
-		u8[A0 + 0x28] = 0x8f
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x24)
 	}
 
 	A1 = 0xffffb000
@@ -221,12 +221,12 @@ function void fn0439ec()
 			objA1.update_address = 0x043a6c
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x20
-			u32[A1 + 0x0c] = 0x043b12
-			u16[A1 + 0x0a] = 0xc0d3
-			u8[A1 + 0x04] |= 0x84
-			u16[A1 + 0x08] = 0
-			u8[A1 + 0x07] = 4
-			u8[A1 + 0x06] = 4
+			objA1.mapping_offset = 0x043b12
+			objA1.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x00d3)
+			objA1.render_flags |= (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.sprite_priority = 0
+			objA1.box_size.x = 4
+			objA1.box_size.y = 4
 
 			GetRandomNumber()
 			D0.u16 = (D0.u16 & 0x01ff) - 0x100

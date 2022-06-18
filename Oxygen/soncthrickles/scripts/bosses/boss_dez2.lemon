@@ -23,7 +23,7 @@ function void fn07f06c()
 	objA0.countdown_callback = 0x07f0d2
 
 	A1 = 0x07f0c6
-	objA0.value26 = 0x19
+	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 	u8[0xfffffab8] = 0
 
@@ -211,7 +211,7 @@ function void fn07f220()
 	}
 
 	objA0.update_address = 0x07f266
-	objA0.render_flags &= ~0x80
+	objA0.render_flags &= ~render_flag.VISIBLE
 
 	spawnSimpleChildObjects(0x07fcce)
 	spawnSimpleChildObjects(0x07fcc8)
@@ -255,11 +255,12 @@ function void fn07f29a()
 
 	objA0.update_address = 0x07f2dc
 	level.boss_encounter = 0
-	playMusic(0x17)
+	playMusic(MUSIC_DEZ2)
 
 	screenmover_target.right = 0x3620
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 }
@@ -281,16 +282,15 @@ function void fn07f2dc()
 //# address-hook(0x07f2fe) end(0x07f330)
 function void fn07f2fe()
 {
-	if (u16[0xffffb010] < camera.position.x.u16 + getScreenWidth() + 0x20)
+	if (u16[0xffffb000 + 0x10] < camera.position.x.u16 + getScreenWidth() + 0x20)
 		return
 
 	level.skip_titlecard = 0xff
-	u16[0xffffef5e] = ring_counter
-	u32[0xffffef60] = timer.alldata
-	global.shields_backup_2 = u8[0xffffb02b]
+	level.backup.rings = ring_counter
+	level.backup.timer.alldata = timer.alldata
+	global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 
-	D0.u16 = 0x1700
-	TriggerNextZone()
+	TriggerNextZone(0x1700)
 	UnloadObject()
 }
 
@@ -448,7 +448,7 @@ function void fn07f45a()
 {
 	objA0.position.y.u16 -= D1.u16
 	objA0.base_state = 0
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	objA0.value3a = 0xff
 	fn07f486()
 }
@@ -459,7 +459,7 @@ function void fn07f472()
 {
 	objA0.position.y.u16 += D1.u16
 	objA0.base_state = 0x02
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	objA0.value3a = 0
 	fn07f486()
 }
@@ -637,14 +637,14 @@ function void fn07f56e()
 	if (b)
 	{
 		objA0.base_state = 0x02
-		u8[A0 + 0x28] = 0xc6
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 		objA0.velocity.x = u16[A0 + 0x3c]
 		objA0.velocity.y = 0
 	}
 	else
 	{
 		objA0.base_state = 0
-		u8[A0 + 0x28] = 0xc6
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	}
 }
 
@@ -655,7 +655,7 @@ function void fn07f5d2()
 	--objA0.value42
 	if (objA0.value42 == 0)
 	{
-		objA0.render_flags ^= 0x02
+		objA0.render_flags ^= render_flag.FLIP_Y
 	}
 
 	fn07f8a0()
@@ -893,7 +893,7 @@ function void fn07009a()
 		objA0.update_address = objA0.countdown_callback
 		objA0.position.y.u16 -= 0x04
 		objA0.velocity.x = 0x0200
-		objA0.sprite_attributes = 0x84a9
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04a9)
 	#if STANDALONE
 		if (global.zone_act == 0x0b01)		// DEZ 2 boss is always Robotnik
 			objA0.mapping_offset = 0x06837e
@@ -904,7 +904,7 @@ function void fn07009a()
 		objA0.animation.sprite = 0
 		objA0.animation.timer = 0
 		objA0.animation.frame = 0
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 
 	DrawObject()
@@ -1067,7 +1067,7 @@ function void fn07f8ca()
 	if (D0.u8 != 0)
 	{
 		objA0.base_state = 0x04
-		u8[A0 + 0x28] = 0xc6
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 		objA0.value39 = 0
 		D0.u16 = objA0.velocity.x
 		if (D0.u16 != 0)
@@ -1112,7 +1112,7 @@ function void fn07f900()
 	}
 
 	objA0.base_state = 0x06
-	u8[A0 + 0x28] = 0xc6
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x16)
 	objA0.value42 = 0x07
 	objA0.value39 = 0x08
 
@@ -1289,10 +1289,10 @@ function void fn07facc()
 	}
 
 	objA0.animation.sprite = D3.u8
-	D0.u8 = objA0.render_flags & 0xfc
+	D0.u8 = objA0.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	if (D2.u8 != 0)
 	{
-		D0.u8 |= 0x03
+		D0.u8 |= (render_flag.FLIP_X | render_flag.FLIP_Y)
 	}
 	objA0.render_flags = D0.u8
 }
@@ -1358,6 +1358,7 @@ function void fn07fb92()
 
 			if (allocDynamicObjectStd())
 			{
+				// Restore gravity
 				objA1.update_address = 0x07fc3e
 			}
 			AddScoreForBossEnemy()

@@ -67,7 +67,7 @@ function void fn0643f2()
 	u16[A0 + 0x44] = 0
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x56
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	objA0.countdown_value = 0x07
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
@@ -142,10 +142,12 @@ function void fn064472()
 	}
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the upper border
 		objA1.update_address = 0x084aa4
 	}
 
@@ -153,6 +155,7 @@ function void fn064472()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the lower border
 		objA1.update_address = 0x084ad2
 	}
 
@@ -187,7 +190,7 @@ function void fn06453c()
 	objA0.animation.sprite = 0x9a
 	objA0.velocity.x = 0xc0
 	objA0.velocity.y = -0x600
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -233,7 +236,7 @@ function void fn0645b0()
 	objA0.base_state = 0x2a
 	objA0.velocity.x = -0xc0
 	objA0.velocity.y = -0x500
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -346,7 +349,7 @@ function void fn0646b8()
 	objA0.animation.sprite = 0x9a
 	objA0.velocity.x = 0x0300
 	objA0.velocity.y = -0x500
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -375,7 +378,7 @@ function void fn06471a()
 	objA0.animation.sprite = 0x9a
 	objA0.velocity.x = -0x200
 	objA0.velocity.y = -0x200
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -436,7 +439,7 @@ function void fn0647ec()
 {
 	objA0.base_state = 0x38
 	objA0.velocity.y = -0x600
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -593,6 +596,7 @@ function void fn0648fa()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the lower border
 		objA1.update_address = 0x084ad2
 	}
 
@@ -636,15 +640,15 @@ function void fn064964()
 
 #if STANDALONE
 	// Change characters to the falling animations
-	if (u8[0xffffb020] == char.state.RUNNING || u8[0xffffb020] == char.state.STANDING)
+	if (u8[0xffffb000 + 0x20] == char.state.RUNNING || u8[0xffffb000 + 0x20] == char.state.STANDING)
 	{
-		u8[0xffffb020] = char.state.FALLING_PANIC
-		u8[0xffffb02a] |= char.flag.IN_AIR
+		u8[0xffffb000 + 0x20] = char.state.FALLING_PANIC
+		u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 	}
-	if (u8[0xffffb06a] == char.state.RUNNING || u8[0xffffb06a] == char.state.STANDING)
+	if (u8[0xffffb04a + 0x20] == char.state.RUNNING || u8[0xffffb04a + 0x20] == char.state.STANDING)
 	{
-		u8[0xffffb06a] = char.state.FALLING_PANIC
-		u8[0xffffb074] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x20] = char.state.FALLING_PANIC
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 	}
 #endif
 }
@@ -731,7 +735,7 @@ function void fn064a00()
 function void fn064a1c()
 {
 	objA0.base_state = 0x4e
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
 	A1 = 0x06682f
@@ -755,7 +759,7 @@ function void fn064a36()
 function void fn064a3c()
 {
 	objA0.base_state = 0x50
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	u16[A0 + 0x44] = 0x02
 	objA0.mapping_offset = 0x066f36
 	objA0.animation.sprite = 0x0e
@@ -775,7 +779,7 @@ function void fn064a6e()
 		if (objA0.animation.frame == 6)
 		{
 			u8[0xfffffaa2] = 0xff
-			playSound(0x59)
+			playSound(SFX_COLLAPSE)
 		}
 	}
 }
@@ -785,7 +789,7 @@ function void fn064a6e()
 function void fn064a8e()
 {
 	objA0.base_state = 0x52
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.countdown_callback = 0x064ae2
 	u16[A0 + 0x44] = 0
 	objA0.mapping_offset = 0x14a8d6
@@ -814,7 +818,7 @@ function void fn064ac0()
 function void fn064ae2()
 {
 	objA0.base_state = 0x54
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	u16[A0 + 0x44] = 0
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x07
@@ -843,13 +847,14 @@ function void fn064b22()
 	u16[A0 + 0x44] = 0x04
 	objA0.mapping_offset = 0x066b6a
 	objA0.animation.sprite = 0
-	objA0.render_flags &= ~0x01
+	objA0.render_flags &= ~render_flag.FLIP_X
 	objA0.position.x.u16 = 0x161c
 	objA0.position.y.u16 = 0x062c
 	screenmover_target.left = 0x1520
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn screen mover for the left border
 		objA1.update_address = 0x084a76
 	}
 
@@ -888,7 +893,7 @@ function void fn064b80()
 	objA0.render_flags |= render_flag.FLIP_X
 #endif
 
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -963,10 +968,10 @@ function void fn064c24()
 
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
-	if (u8[A1 + 0x04] & 0x01)
-		objA0.render_flags |= 0x01
+	if (objA1.render_flags & render_flag.FLIP_X)
+		objA0.render_flags |= render_flag.FLIP_X
 	else
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 
 	Object.animationProgress(0x06683a)
 	fn066236()
@@ -1005,7 +1010,8 @@ function void fn064ca6()
 	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		return
 
-	control.player1 = 0x0808
+	control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
+
 	if (objA1.position.x.u16 < 0x15a8)
 		return
 
@@ -1014,15 +1020,16 @@ function void fn064ca6()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x2e
+		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
 	}
 
 	A1 = 0xffffb000
 	player1.control_override = 0
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = (u8[A1 + 0x38] == 1) ? 0xb0 : 0xc4
-	u8[A1 + 0x20] = 7
+	objA1.animation.sprite = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0xb0 : 0xc4
+	u8[A1 + 0x20] = char.state.LOOKING_UP
 	control.player1 = 0
 	StopObjectA1()
 	UpdatePlayer1SpritePatterns()
@@ -1050,7 +1057,8 @@ function void fn064d38()
 		A1 = 0xffffb000
 		u8[A1 + 0x2e] = 0
 		player1.control_override = 0xff
-		control.player1 = 0x0808
+
+		control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 	}
 }
 
@@ -1113,7 +1121,7 @@ function void fn064de0()
 {
 	A1 = 0xffffb000
 	D1.u16 = objA1.position.x.u16 - 0x1892
-	control.player1 = (D1.s16 >= 0) ? 0x0404 : 0x0808
+	control.player1 = (D1.s16 >= 0) ? 0x0404 : 0x0808		// CONTROL_LEFT, CONTROL_LEFT : CONTROL_RIGHT, CONTROL_RIGHT
 	if (abs(D1.s16) > 4)
 		return
 
@@ -1134,7 +1142,7 @@ function void fn064e28()
 	{
 		objA0.update_address = 0x064e46
 		A1 = 0xffffb000
-		u8[A1 + 0x04] |= render_flag.FLIP_X
+		objA1.render_flags |= render_flag.FLIP_X
 		u8[A1 + 0x2a] |= 0x01
 	}
 }
@@ -1178,7 +1186,7 @@ function void fn064e88()
 
 	u16[0xfffffaae] = A0.u16
 	objA0.update_address = 0x064ec4
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.position.x.u16 = 0x1640
 	objA0.position.y.u16 = 0x02d0
 
@@ -1244,11 +1252,10 @@ function void fn064f20()
 		objA0.update_address = 0x064f70
 		objA0.flags38 |= 0x10
 		objA0.velocity.x = 0
-		u8[A0 + 0x28] = 0x0f
+		objA0.collision_attributes = collision.size.24x24
 		u8[A0 + 0x29] = 0xff
 
-		A2 = 0x066624
-		SpawnIdenticalChildObjects()
+		spawnIdenticalChildObjects(0x066624)
 	}
 
 	fn066348()
@@ -1987,7 +1994,7 @@ function void fn065602()
 	setupObjectAttributesBasic(0x066548)
 
 	objA0.update_address = 0x06561c
-	objA0.render_flags |= 0x80
+	objA0.render_flags |= render_flag.VISIBLE
 	fn0662c0()
 }
 

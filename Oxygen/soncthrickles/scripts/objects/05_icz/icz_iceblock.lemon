@@ -31,8 +31,8 @@ function void fn08b370()
 //# address-hook(0x08b384) end(0x08b3a4)
 function void fn08b384()
 {
-	objA0.value3a = u8[0xffffb020]
-	objA0.value3b = u8[0xffffb06a]
+	objA0.value3a = u8[0xffffb000 + 0x20]
+	objA0.value3b = u8[0xffffb04a + 0x20]
 
 	D1 = 0x23
 	D2 = 0x10
@@ -53,19 +53,19 @@ function void fn08b3aa()
 
 	// Any character on top rolling?
 	A2 = 0
-	if ((objA0.flags2a & 0x08) && objA0.value3a == char.state.ROLLING)
+	if ((objA0.flags2a & object.flag.P1_ON_OBJECT) && objA0.value3a == char.state.ROLLING)
 	{
 		A1 = 0xffffb000
-		if (objA0.flags2a & 0x10)
+		if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 		{
 			A2 = 0xffffb04a
 		}
 	}
-	else if ((objA0.flags2a & 0x10) && objA0.value3b == char.state.ROLLING)
+	else if ((objA0.flags2a & object.flag.P2_ON_OBJECT) && objA0.value3b == char.state.ROLLING)
 	{
 		A1 = 0xffffb04a
 	#if STANDALONE
-		if (objA0.flags2a & 0x08)
+		if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 		{
 			A2 = 0xffffb000
 		}

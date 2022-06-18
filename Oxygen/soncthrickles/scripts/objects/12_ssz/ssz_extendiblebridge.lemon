@@ -15,11 +15,11 @@
 //# address-hook(0x044f52) end(0x044fa0)
 function void fn044f52()
 {
-	objA0.render_flags = 0x44
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0x10
 	objA0.box_size.x = 0x60
 	objA0.sprite_priority = 0x0180
-	objA0.sprite_attributes = 0xc2f4
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x02f4)
 	objA0.mapping_offset = 0x046958
 	u16[A0 + 0x12] = objA0.position.x.u16
 	u16[A0 + 0x16] = 0x03

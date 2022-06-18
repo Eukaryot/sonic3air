@@ -109,8 +109,8 @@ function void fn03fbc4()
 			// Fix for bug when Tails carries other player and gets caught by the upwind
 			if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
 			{
-				u8[0xffffb02a] |= char.flag.IN_AIR
-				u8[0xffffb02e] = 0
+				u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+				u8[0xffffb000 + 0x2e] = 0
 			}
 		#endif
 
@@ -125,7 +125,7 @@ function void fn03fbc4()
 				if (u8[A1 + 0x27] == 0)
 				{
 					u8[A1 + 0x27] = 1
-					u8[A1 + 0x20] = 0
+					u8[A1 + 0x20] = char.state.RUNNING
 					u8[A1 + 0x30] = 0x7f
 					u8[A1 + 0x31] = 8
 				}

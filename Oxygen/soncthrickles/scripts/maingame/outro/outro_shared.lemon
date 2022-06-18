@@ -91,7 +91,7 @@ function void fn05b1a2()
 		if (allocDynamicObjectStd())
 		{
 			objA1.update_address = 0x085b30
-			u8[A1 + 0x2c] = 0xdc
+			u8[A1 + 0x2c] = MUSIC_CREDITSMEDLEY
 		}
 	}
 
@@ -169,7 +169,7 @@ function void fn05b204()
 			if (D3.u16 == D0.u16)
 			{
 				// Next actual text line
-				D6.u16 = (D2.u16 & 0x0001) ? 0xa347 : 0x8347	// Includes base sprite VRAM address + the palette to use
+				D6.u16 = (D2.u16 & 0x0001) ? (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0347) : (sprite_attribute.PRIORITY | 0x0347)	// Includes base sprite VRAM address + the palette to use
 				D2.u16 &= 0x0ffe	// This is the start offset from the left side inside plane A
 
 				// Print next characters, read from address A1 (using ASCII encoding)
@@ -288,7 +288,7 @@ function void fn05b514()
 	outro.wait_time = u16[0x05b656 + D1.u16]
 
 #if STANDALONE
-	u32 lines = 0x26a			// Number of text lines in credits
+	u32 lines = 0x26b			// Number of text lines in credits
 	u32 syncPoint = 0x2cce		// Sync point in credits music (in frames from music start)
 
 	// Credits start and end measured in frames from credits music start
@@ -434,12 +434,12 @@ function void fn05eb32()
 	objA0.update_address = 0x05ebb4
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.sprite_priority = u16[A1 + 0x08]
+	objA0.sprite_priority = objA1.sprite_priority
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
-	if (u8[A1 + 0x04] & 0x04)
+	if (objA1.render_flags & render_flag.WORLD)
 	{
-		objA0.render_flags |= 0x04
+		objA0.render_flags |= render_flag.WORLD
 	}
 
 	// Targets:
@@ -550,12 +550,14 @@ function void fn05f20a()
 
 	copyMemory(0xfffffca0, 0x060ada, 0x20)
 
+	// Attach "& Knuckles"
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f526
 		u16[A1 + 0x46] = A0.u16
 	}
 
+	// Attach trademark
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f4fa
@@ -566,13 +568,14 @@ function void fn05f20a()
 
 
 
-// "Sonic the Hedgehog 3 & Knuckles" logo in the best ending final screen
+// Object to create the full "Sonic the Hedgehog 3 & Knuckles" logo in the best ending final screen
 
 //# address-hook(0x05f26c) end(0x05f2dc)
 function void fn05f26c()
 {
 	setupObjectAttributesFull(0x060154)
 
+	// "Sonic the Hedgehog 3"
 	objA0.update_address = 0x05f1f6
 	if (objA0.subtype2c != 0)
 	{
@@ -586,12 +589,15 @@ function void fn05f26c()
 
 	copyMemory(0xfffffca0, 0x060ada, 0x20)
 
+	// Attach trademark
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f4fa
 		u16[A1 + 0x46] = A0.u16
 		u8[A1 + 0x2c] = 0x04
 	}
+
+	// Attach "& Knuckles"
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f546
@@ -613,7 +619,7 @@ function void fn05f31c()
 {
 	setupObjectAttributesMost(0x060160)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f376
 
 	A1 = 0x05f36e
@@ -659,7 +665,7 @@ function void fn05f39e()
 function void fn05f3aa()
 {
 	setupObjectAttributesMost(0x060168)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f3da
 
 	A1 = 0x05f3d2
@@ -683,7 +689,7 @@ function void fn05f3ea()
 {
 	// And this is Tails' tails
 	setupObjectAttributesBasic(0x060170)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f400
 	fn05f400()
 }
@@ -703,7 +709,7 @@ function void fn05f400()
 function void fn05f410()
 {
 	setupObjectAttributesFull(0x060176)
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x05f46a
 #if STANDALONE
 	// Make sure Knuckles is rendered in front of Sonic
@@ -736,20 +742,21 @@ function void fn05f46a()
 
 
 
-// Logo "& Knuckles"
+// Trademark
 
 //# address-hook(0x05f4fa) end(0x05f51c)
 function void fn05f4fa()
 {
 	if ((global.region_code & 0x80) == 0)
 	{
+		// Hide the trademark symbol
 		fn05ec36()
 		return
 	}
 
 	setupObjectAttributesFull(0x060130)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x084920
 
 	A1 = 0x05f520
@@ -758,14 +765,14 @@ function void fn05f4fa()
 
 
 
-// Trademark?
+// "& Knuckles" logo
 
 //# address-hook(0x05f526) end(0x05f540)
 function void fn05f526()
 {
 	setupObjectAttributesFull(0x06013c)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x084920
 
 	A1 = 0x05f544
@@ -781,7 +788,7 @@ function void fn05f546()
 {
 	setupObjectAttributesFull(0x060148)
 
-	objA0.render_flags &= ~0x04
+	objA0.render_flags &= ~render_flag.WORLD
 	objA0.update_address = 0x084920
 
 	A1 = 0x05f564
@@ -800,7 +807,7 @@ function void fn05f94c()
 
 	A1 = 0x060b3a
 	A2 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0xfffffc00 : 0xfffffc20
-	copyMemory(A2, 0x060b3a, 0x10)
+	copyMemory(A2, A1, 0x10)
 
 	Kosinski.addToDMAQueue(0x165826, 0x76c0)
 }
@@ -868,7 +875,7 @@ function void fn05fa58()
 {
 	objA0.update_address = 0x05fa8c
 	objA0.mapping_offset = 0x053518
-	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x03b6 : 0x23b6
+	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x03b6 : (sprite_attribute.PALETTE.LINE1 | 0x03b6)
 	objA0.sprite_priority = 0x0300
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x10

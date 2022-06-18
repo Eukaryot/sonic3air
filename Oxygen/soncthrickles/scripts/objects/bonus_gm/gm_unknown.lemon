@@ -114,7 +114,7 @@ function void fn061050()
 	level.restart.u8 = 1
 	checkpoint.rings = ring_counter
 	checkpoint.lives_granted = extra_lives_granted
-	global.shields_backup_1 = u8[0xffffb02b] & 0x71
+	global.shields_backup_1 = u8[0xffffb000 + 0x2b] & char.bonus.ALL_SHIELDS
 }
 
 
@@ -232,7 +232,7 @@ function void fn0612a8()
 	objA0.subtype2c = D0.u8
 	if (D0.u8 == 0x04)
 	{
-		u8[A0 + 0x28] = 0xd7
+		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	}
 	D0.u16 <<= 2
 	u32[A0 + 0x30] = u32[0x0612f0 + D0.s16]

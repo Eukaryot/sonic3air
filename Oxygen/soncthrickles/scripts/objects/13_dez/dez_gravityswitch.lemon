@@ -12,8 +12,8 @@
 function void fn048aaa()
 {
 	objA0.mapping_offset = 0x048bea
-	objA0.sprite_attributes = 0x2490
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0490)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x08
 	objA0.sprite_priority = 0x0280
@@ -72,8 +72,8 @@ function void fn048b40()
 		objA1.velocity.x = 0
 		objA1.velocity.y = 0
 		u16[A1 + 0x1c] = 0
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 
 		D2.u16 &= D3.u16
 		if (D2.u16 != 0)
@@ -107,7 +107,7 @@ function void fn048b9c()
 	D4.u16 = objA0.position.x.u16
 	fn01dc56()
 
-	if (objA0.flags2a & 0x08)
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 	{
 		u16[A0 + 0x30] = 0
 	}

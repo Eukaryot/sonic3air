@@ -46,8 +46,7 @@ function void Rhinobot.BaseUpdate()
 //# translated(0x086e7e) end(0x086ec2)
 function bool fn086e7e()
 {
-	A1 = 0x0870fe
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0870fe))
 		return true
 
 	objA0.hitbox_extends.x = 0x08
@@ -339,8 +338,7 @@ function void Rhinobot.DustEffect()
 //# address-hook(0x086f2c) end(0x086f3c)
 function void fn086f2c()
 {
-	A1 = 0x087110
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x087110))
 		return
 
 	objA0.countdown_callback = 0x08522c

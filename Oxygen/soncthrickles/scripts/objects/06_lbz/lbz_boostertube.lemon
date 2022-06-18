@@ -82,7 +82,7 @@ function void fn029620()
 		u8[A4] += 2
 		u8[A4 + 0x01] = 0
 
-		objA0.flags2a &= ~0x20
+		objA0.flags2a &= ~object.flag.P1_PUSHING
 
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -97,13 +97,13 @@ function void fn029620()
 
 		fn0297a2()
 
-		playSound(0x3c)
+		playSound(SFX_ROLL)
 
 		if (objA0.subtype2c & 0x20 && global.act != 0)
 		{
 		#if STANDALONE
 			// Remove priority flag for character
-			objA1.sprite_attributes &= ~0x8000
+			objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 
 			// Update achievement
 			if (A1 == 0xffffb000)
@@ -324,7 +324,7 @@ function void fn029818()
 function void fn029896()
 {
 	objA0.mapping_offset = 0x029c8a
-	objA0.sprite_attributes = 0x42ea
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.render_flags |= render_flag.WORLD
@@ -372,20 +372,20 @@ function void fn02990a()
 		objA0.countdown_value = 0x03
 		if (allocDynamicObjectAfterA0())
 		{
-			u32[A1] = (u16[A0 + 0x26] == 6) ? 0x0299f4 : 0x0299c6
+			objA1.update_address = (u16[A0 + 0x26] == 6) ? 0x0299f4 : 0x0299c6
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
-			u32[A1 + 0x0c] = 0x029c8a
-			u16[A1 + 0x0a] = 0x42ea
-			u8[A1 + 0x07] = 0x10
-			u8[A1 + 0x06] = 0x10
-			u16[A1 + 0x08] = 0x0380
+			objA1.mapping_offset = 0x029c8a
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
+			objA1.box_size.x = 0x10
+			objA1.box_size.y = 0x10
+			objA1.sprite_priority = 0x0380
 
 			D0.u16 = u16[A0 + 0x26]
 			A2 = 0x029992 + D0.s16
 			objA1.velocity.x = u16[(A2+=2)-2]
 			objA1.velocity.y = u16[(A2+=2)-2]
-			u8[A1 + 0x04] = u8[(A2+=1)-1]
+			objA1.render_flags = u8[(A2+=1)-1]
 			u8[A1 + 0x22] = u8[(A2+=1)-1]
 			if (u8[A1 + 0x22] == 0)
 			{
@@ -426,12 +426,12 @@ function void fn029a54()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x029abe
-			u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
-			u8[A1 + 0x06] = 0x10
-			u8[A1 + 0x07] = 0x10
-			u16[A1 + 0x08] = 0x0380
-			u16[A1 + 0x0a] = 0x42ea
-			u32[A1 + 0x0c] = 0x029c8a
+			objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
+			objA1.box_size.y = 0x10
+			objA1.box_size.x = 0x10
+			objA1.sprite_priority = 0x0380
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02ea)
+			objA1.mapping_offset = 0x029c8a
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			objA1.velocity.x = 0
@@ -452,6 +452,7 @@ function void fn029af8()
 	{
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn small explosion
 			objA1.update_address = 0x01e68e
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16

@@ -24,7 +24,7 @@ function void fn0532b6()
 //# address-hook(0x0532e0) end(0x0532ea)
 function void fn0532e0()
 {
-	if (u16[0xffffb010] < 0x2e80)
+	if (u16[0xffffb000 + 0x10] < 0x2e80)
 	{
 		fn0533a4()
 	}
@@ -50,7 +50,7 @@ function void fn0532f0()
 #if STANDALONE
 	// Move faster if player reached the end already
 	//  -> We're misusing the "level.trigger0f" variable for the current extra speed-up value
-	if (u16[0xffffb010] >= 0x3280 && u16[0xffffb014] <= 0x0300 && (level.framecounter & 0x03) == 0 && level.trigger0f < 0x80)
+	if (u16[0xffffb000 + 0x10] >= 0x3280 && u16[0xffffb000 + 0x14] <= 0x0300 && (level.framecounter & 0x03) == 0 && level.trigger0f < 0x80)
 	{
 		++level.trigger0f
 	}
@@ -92,7 +92,7 @@ function void fn053322()
 //# address-hook(0x05333a) end(0x0533a2)
 function void fn05333a()
 {
-	if (u16[0xffffb014] < 0x0280)
+	if (u16[0xffffb000 + 0x14] < 0x0280)
 	{
 		move_area.left = camera.position.x.u16
 	}
@@ -172,11 +172,11 @@ function void fn0533b8()
 function void fn0533ce()
 {
 	objA0.update_address = 0x053400
-	objA0.render_flags = 0x44
+	objA0.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 	objA0.box_size.y = 0xff
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x0300
-	objA0.sprite_attributes = 0xc3d5
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x03d5)
 	objA0.mapping_offset = 0x053518
 	u16[A0 + 0x16] = 0x02
 	fn053400()
@@ -271,11 +271,11 @@ function void fn0534a2()
 function void fn0534c6()
 {
 	objA0.update_address = 0x01abc6
-	objA0.render_flags = 0x40
+	objA0.render_flags = render_flag.COMPOUND
 	objA0.box_size.y = 0x0c
 	objA0.box_size.x = 0x2c
 	objA0.sprite_priority = 0x0380
-	objA0.sprite_attributes = 0x63a3
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03a3)
 	objA0.mapping_offset = 0x053518
 
 	D0.u16 = objA0.countdown_value * 6

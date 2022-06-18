@@ -67,8 +67,7 @@ function void fn062124()
 //# address-hook(0x06215e) end(0x062192)
 function void fn06215e()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	screenmover_target.top = level.vertical_wrap
@@ -113,7 +112,7 @@ function void fn062194()
 function void fn0621d6()
 {
 	objA0.base_state = 0x06
-	objA0.render_flags |= 0x01
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x062216
 	level.vertical_wrap = 0x05c0
@@ -145,7 +144,7 @@ function void fn062216()
 function void fn062232()
 {
 	objA0.base_state = 0x0a
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	fn062080()
 }
 
@@ -165,6 +164,7 @@ function void fn062242()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the Knuckles theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 	fn0851e4()

@@ -12,8 +12,8 @@
 function void fn047966()
 {
 	objA0.mapping_offset = 0x047c08
-	objA0.sprite_attributes = 0x2408
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0408)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x10
 	objA0.hitbox_extends.x = 0x3f
@@ -35,7 +35,7 @@ function void fn047966()
 		}
 		objA0.mapping_offset = 0x047ca8
 		objA0.box_size.x = 0x80
-		objA0.render_flags |= 0x40
+		objA0.render_flags |= render_flag.COMPOUND
 		u16[A0 + 0x16] = 0
 	}
 
@@ -48,13 +48,13 @@ function void fn047966()
 function void fn0479f0()
 {
 #if STANDALONE
-	if (objA0.flags2a & 0x08)	// Only first player is allowed to start the platform
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)	// Only first player is allowed to start the platform
 #else
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 #endif
 	{
 		objA0.state = u8[A0 + 0x31]
-		u32[A0] = (objA0.subtype2c != 0) ? 0x047a14 : 0x047ab4
+		objA0.update_address = (objA0.subtype2c != 0) ? 0x047a14 : 0x047ab4
 	}
 
 	fn047a58()
@@ -83,9 +83,9 @@ function void fn047a14()
 	D1.u8 ^= D0.u8
 	D1.u8 &= D0.u8
 #if STANDALONE
-	D1.u8 &= 0x08	// Ignore second player, it's just annoying having to deal with AI Tails
+	D1.u8 &= object.flag.P1_ON_OBJECT	// Ignore second player, it's just annoying having to deal with AI Tails
 #else
-	D1.u8 &= 0x18
+	D1.u8 &= (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 #endif
 	if (D1.u8 != 0)
 	{
@@ -116,11 +116,11 @@ function void fn047a58()
 function void fn047a88()
 {
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn047a96()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn047a96()
 }
 
@@ -128,7 +128,8 @@ function void fn047a88()
 function void fn047a96()
 {
 	// Move characters standing on the conveyor belt
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		D0 = 2
 		if ((objA0.state != 0) != global.inv_gravity)
@@ -170,9 +171,9 @@ function void fn047ab4()
 	D1.u8 ^= D0.u8
 	D1.u8 &= D0.u8
 #if STANDALONE
-	D1.u8 &= 0x08	// Ignore second player, it's just annoying having to deal with AI Tails
+	D1.u8 &= object.flag.P1_ON_OBJECT	// Ignore second player, it's just annoying having to deal with AI Tails
 #else
-	D1.u8 &= 0x18
+	D1.u8 &= (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 #endif
 	if (D1.u8 != 0)
 	{

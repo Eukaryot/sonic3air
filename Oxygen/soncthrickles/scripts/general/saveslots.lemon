@@ -218,7 +218,7 @@ function void InitSaveSlots()
 	}
 #endif
 
-	u16[0xffffef4c] = 0
+	dataselect.nosave_characters = CHARS_SONIC_AND_TAILS
 	dataselect.slot_selected = 1
 }
 

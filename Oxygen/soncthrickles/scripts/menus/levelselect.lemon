@@ -132,7 +132,7 @@ function void LevelSelect.init()
 	copyMemory(0xfffffcc0, 0xfffffc40, 0x20)
 	zeroMemory(0xfffffc40, 0x20)
 
-	playMusic(0x2f)
+	playMusic(MUSIC_DATASELECT)
 
 	global.demo_countdown = 1799	// 30 seconds (minus one frame)
 	competition_mode.active = 0
@@ -223,7 +223,7 @@ function bool LevelSelect.innerUpdate()
 		global.characters = levelselect.characters
 	#if STANDALONE
 		// Handle Knuckles & Tails
-		useKnucklesAndTails = (global.characters == 4)
+		useKnucklesAndTails = (global.characters == CHARS_KNUCKLES_AND_TAILS)
 		global.characters = min(global.characters, 3)
 	#endif
 
@@ -241,7 +241,7 @@ function bool LevelSelect.innerUpdate()
 			global.sk_bluespheres = 0
 		#if STANDALONE
 			player.next_life_score = 5000
-			u32[0xffffffc4] = 5000
+			unused.player2.next_life_score = 5000
 		#endif
 
 			if (D0.u16 == 0x4000 || D0.u16 == 0x4001)
@@ -318,17 +318,17 @@ function void LevelSelect.startGame()
 	checkpoint.move_area.bottom = 0x1000
 	u16[0xfffffe62] = 0x1000
 	lives_counter = 3
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	continues_counter = 0
 	global.rolling_demo = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	unused.player2.next_life_score = 5000
 	u16[0xffffff8a] = 0
 	competition_mode.active = 0
 }
@@ -385,17 +385,17 @@ function bool fn007d6c()
 	global.game_mode = 0x0c
 
 	lives_counter = 3
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	continues_counter = 0
 	global.rolling_demo = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	unused.player2.next_life_score = 5000
 
 	playSound(MUSIC_CTRL_FADEOUT)
 

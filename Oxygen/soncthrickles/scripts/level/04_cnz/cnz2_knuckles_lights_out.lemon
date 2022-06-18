@@ -53,15 +53,14 @@ function void fn0622b2()
 //# address-hook(0x0622e4) end(0x06232c)
 function void fn0622e4()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	u32[A0 + 0x30] = 0x0666bf
 	objA0.countdown_callback = 0x06233e
 
 	A1 = 0x062296
-	objA0.value26 = 0x1f
+	objA0.value26 = MUSIC_KNUCKLES
 	fn085d70()
 
 	level.bossarea.left -= getScreenExtend() * 2
@@ -130,7 +129,7 @@ function void fn06237c()
 				u32[A0 + 0x18] = u32[0x0623da + D0.s16]
 				D0.u8 += 0x04
 				objA0.value39 = D0.u8
-				objA0.render_flags ^= 0x01
+				objA0.render_flags ^= render_flag.FLIP_X
 			}
 		}
 	}
@@ -206,7 +205,7 @@ function void fn062480()
 function void fn031d3a()
 {
 	objA0.mapping_offset = 0x230e52
-	objA0.sprite_attributes = 0x4404
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0404)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x10
@@ -259,6 +258,7 @@ function void fn065d1c()
 	objA0.update_address = 0x065d46
 	if (allocDynamicObjectAfterA0())
 	{
+		// Spawn corkfloor
 		objA1.update_address = 0x02a3d0
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -276,7 +276,7 @@ function void fn065d1c()
 function void fn065d46()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x44]
-	if (u32[A1] != 0x02a5f8)
+	if (objA1.update_address != 0x02a5f8)
 	{
 		CheckForUnloadObject()
 		return
@@ -313,7 +313,7 @@ function void fn065d8c()
 	fn065dec()
 	objA0.animation.sprite = 0
 
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		objA0.animation.sprite = 1
 

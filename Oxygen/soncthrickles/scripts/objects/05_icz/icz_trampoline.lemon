@@ -135,7 +135,7 @@ function void fn08b9fa()
 function void fn08ba1c()
 {
 	objA0.value3a = objA0.flags2a
-	u32 backup = u16[0xffffb01a] + (u32(u16[0xffffb064]) << 16)
+	u32 backup = u16[0xffffb000 + 0x1a] + (u32(u16[0xffffb04a + 0x1a]) << 16)
 
 	D1 = 0x23
 	D2 = 0x14
@@ -155,14 +155,14 @@ function void fn08ba1c()
 		objA0.flags38 |= 0x04
 		objA0.value39 = 0
 
-		D4 = 3
+		D4 = 3		// object.flag.P1_ON_OBJECT
 		if (D2 & (u32(1) << D4))
 		{
 			A1 = 0xffffb000
 			fn08ba7e()
 		}
 
-		D4 = 4
+		D4 = 4		// object.flag.P2_ON_OBJECT
 		if (D2 & (u32(1) << D4))
 		{
 			D0 = (D0 << 16) + (D0 >> 16)
@@ -227,7 +227,7 @@ function void fn08b8c2()
 	if (objA0.subtype2c != 0)
 		objA0.render_flags |= render_flag.FLIP_X
 
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x02
 	fn08b8fa()
 

@@ -58,18 +58,18 @@ function void AIZWaterfall.spawnPlatform()
 		objA1.position.y.u16 = objA0.position.y.u16
 		if (global.act == 0)
 		{
-			u32[A1 + 0x0c] = 0x22ae30
-			u16[A1 + 0x0a] = 0x43cf
+			objA1.mapping_offset = 0x22ae30
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03cf)
 		}
 		else
 		{
-			u32[A1 + 0x0c] = 0x22ae20
-			u16[A1 + 0x0a] = 0x42e9
+			objA1.mapping_offset = 0x22ae20
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 		}
-		u8[A1 + 0x07] = 0x18
-		u8[A1 + 0x06] = 8
-		u8[A1 + 0x04] = render_flag.WORLD
-		u16[A1 + 0x08] = 0x280
+		objA1.box_size.x = 0x18
+		objA1.box_size.y = 8
+		objA1.render_flags = render_flag.WORLD
+		objA1.sprite_priority = 0x280
 		A2 = A1
 
 		// Spawn water splashes effect
@@ -80,18 +80,18 @@ function void AIZWaterfall.spawnPlatform()
 			objA1.position.y.u16 = objA0.position.y.u16
 			if (global.act == 0)
 			{
-				u32[A1 + 0x0c] = 0x22aeb0
-				u16[A1 + 0x0a] = 0x43cf
+				objA1.mapping_offset = 0x22aeb0
+				objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03cf)
 			}
 			else
 			{
-				u32[A1 + 0x0c] = 0x22ae40
-				u16[A1 + 0x0a] = 0x62e9
+				objA1.mapping_offset = 0x22ae40
+				objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02e9)
 			}
-			u8[A1 + 0x07] = 0x20
-			u8[A1 + 0x06] = 0x10
-			u8[A1 + 0x04] = render_flag.WORLD
-			u16[A1 + 0x08] = 0x200
+			objA1.box_size.x = 0x20
+			objA1.box_size.y = 0x10
+			objA1.render_flags = render_flag.WORLD
+			objA1.sprite_priority = 0x200
 			u16[A1 + 0x3c] = A2.u16
 			u16[A2 + 0x3c] = A1.u16
 		}

@@ -96,7 +96,7 @@ function void fn031226()
 	{
 		if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 		{
-			if (D1 & 0x0400)
+			if (D1 & 0x0400)		// CONTROL_LEFT held
 			{
 				--objA1.position.x.u16
 				--u8[A2 + 0x06]
@@ -108,7 +108,7 @@ function void fn031226()
 				}
 			}
 
-			if (D1 & 0x0800)
+			if (D1 & 0x0800)		// CONTROL_RIGHT held
 			{
 				++objA1.position.x.u16
 				--u8[A2 + 0x06]
@@ -120,7 +120,8 @@ function void fn031226()
 				}
 			}
 
-			D1.u16 &= 0x70
+			// Check if jump button pressed
+			D1.u16 &= CONTROL_ABC
 			if (D1.u16 == 0)
 			{
 				D0 = 0x02
@@ -192,7 +193,7 @@ function void fn031226()
 					u8[A2 + 0x04] = 0
 				}
 
-				u8[A1 + 0x04] &= 0xfc
+				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 				objA1.position.y.u16 = py
 				objA1.velocity.x = 0
 				objA1.velocity.y = 0
@@ -279,12 +280,12 @@ function void fn031502()
 	u16[A0 + 0x3c] = u16[(A1+=2)-2]
 	objA0.value3e = u16[(A1+=2)-2]
 	objA0.mapping_offset = 0x23035e
-	objA0.sprite_attributes = 0x243e
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x043e)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x0c
-	u8[A0 + 0x28] = 0x8b
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8)
 	u16[A0 + 0x30] = objA0.position.x.u16
 	objA0.value32 = objA0.position.y.u16
 

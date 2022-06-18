@@ -12,8 +12,8 @@
 function void fn041176()
 {
 	objA0.mapping_offset = 0x0412e0
-	objA0.sprite_attributes = 0x4001
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16

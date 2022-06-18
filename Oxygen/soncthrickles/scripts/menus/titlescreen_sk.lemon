@@ -26,6 +26,7 @@ function void TitleScreen_SK()
 	Enigma.decompress(0x0cba68, 0xffff7400, 0x849c)
 	if ((global.region_code & 0x80) == 0)
 	{
+		// Hide the trademark symbol
 		D0.u16 = 0xa49c
 		u16[0xffff775c] = D0.u16
 		u16[0xffff775e] = D0.u16
@@ -95,13 +96,13 @@ function void TitleScreen_SK()
 
 	Kosinski.addToDMAQueue(0x0cd910, 0x1c40)
 
-	palette_fade.range = 0x3f
+	palette_fade.range = 0x003f
 	global.fade_timer = 0x16
-	u32[0xffffb000] = 0x5628
-	u32[0xffffb04a] = 0x5770
-	u32[0xffffb094] = 0x5856
+	u32[0xffffb000] = 0x005628		// Sonic jumping down
+	u32[0xffffb04a] = 0x005770		// The Death Egg
+	u32[0xffffb094] = 0x005856		// Mountain top
 
-	playMusic(0x25)
+	playMusic(MUSIC_TITLESCREEN)
 
 	lives_counter = 3
 	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080
@@ -136,8 +137,8 @@ function void TitleScreen_SK()
 				fn005972()
 
 				u32[0xffffb04a] = 0x005802
-				u16[0xffffb078] = 0x0140
-				u16[0xffffb07c] = 0x70
+				u16[0xffffb04a + 0x2e] = 0x0140
+				u16[0xffffb04a + 0x32] = 0x70
 				u16[0xffffeec0] = 0x03
 
 				camera.screenshake.state = 0
@@ -205,22 +206,22 @@ function void TitleScreen_SK()
 
 		global.game_mode = 0x0c
 		lives_counter = 3
-		u8[0xfffffec6] = 3
+		unused.lives_counter.player2 = 3
 		ring_counter = 0
 		timer.alldata = 0
 		player.score = 0
-		u16[0xfffffed0] = 0
-		u32[0xfffffed2] = 0
-		u32[0xfffffed6] = 0
+		ring_counter.player2 = 0
+		timer.alldata.player2 = 0
+		player2.score = 0
 		continues_counter = 0
 		player.next_life_score = 5000
-		u32[0xffffffc4] = 5000
+		unused.player2.next_life_score = 5000
 
 		playSound(MUSIC_CTRL_FADEOUT)
 
 	#if !STANDALONE
 		// Is this even possible...?
-		if (u8[0xffffff86] >= 0x02)
+		if (titlescreen.selection >= 0x02)
 		{
 			// Level Select
 			global.game_mode = 0x28
@@ -228,7 +229,7 @@ function void TitleScreen_SK()
 		}
 	#endif
 
-		levelselect.characters = u8[0xffffff86] * 2 + 1
+		levelselect.characters = titlescreen.selection * 2 + 1
 		D0.u16 = 0x0700
 		global.zone_act = D0.u16
 		global.zone_act.apparent = D0.u16
@@ -301,15 +302,15 @@ function void TitleScreen_SK()
 
 	global.rolling_demo = 1
 	lives_counter = 3
-	u8[0xfffffec6] = 3
+	unused.lives_counter.player2 = 3
 	ring_counter = 0
 	timer.alldata = 0
 	player.score = 0
-	u16[0xfffffed0] = 0
-	u32[0xfffffed2] = 0
-	u32[0xfffffed6] = 0
+	ring_counter.player2 = 0
+	timer.alldata.player2 = 0
+	player2.score = 0
 	player.next_life_score = 5000
-	u32[0xffffffc4] = 5000
+	unused.player2.next_life_score = 5000
 }
 
 
@@ -363,7 +364,7 @@ function void fn00565a()
 
 	if (u16[0xffffeec0] == 0x03)
 	{
-		objA0.sprite_attributes |= 0x8000
+		objA0.sprite_attributes |= sprite_attribute.PRIORITY
 		if (camera.position.y.u16 >= 0xe0)
 		{
 			if (camera.position.y.u16 == 0xe0)
@@ -458,8 +459,8 @@ function void fn00571e()
 	Kosinski.addToDMAQueue(0x0d3bb4, 0x9dc0)
 	Kosinski.addToDMAQueue(0x0d5cc6, 0x8c40)
 
-	u32[0xffffb0de] = 0x58a8
-	u8[0xffffb102] = 0x1e
+	u32[0xffffb0de] = 0x0058a8		// Sonic & Knuckles logo
+	u8[0xffffb0de + 0x24] = 0x1e
 	objA0.update_address = 0x00576e
 }
 
@@ -477,7 +478,7 @@ function void fn00576e()
 function void fn005770()
 {
 	objA0.mapping_offset = 0x0cb924
-	objA0.sprite_attributes = 0x4680
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0680)
 	objA0.position.x.u16 = 0x0140 + getScreenExtend()
 	objA0.position.y.u16 = 0xb0
 	objA0.sprite_priority = 0x0180
@@ -558,7 +559,7 @@ function void fn005802()
 function void fn005856()
 {
 	objA0.mapping_offset = 0x0cba4c
-	objA0.sprite_attributes = 0x67a0
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x07a0)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x30
 	objA0.box_size.y = 0x08
@@ -602,7 +603,7 @@ function void fn0058a8()
 		return
 
 	objA0.mapping_offset = 0x0cb994
-	objA0.sprite_attributes = 0x84ee
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04ee)
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x7c
 	objA0.box_size.y = 0x28
@@ -775,8 +776,8 @@ function void fn005ae4()
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
 	objA0.mapping_offset = 0x005ed8
-	objA0.sprite_attributes = 0x8462
-	objA0.render_flags |= 0x40
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
+	objA0.render_flags |= render_flag.COMPOUND
 
 	A2 = A0 + 0x18
 	objA0.position.y.frac = 0x02
@@ -784,8 +785,8 @@ function void fn005ae4()
 	u16[(A2+=2)-2] = objA0.position.y.u16
 	u16[(A2+=2)-2] = 0
 
-	u8[0xffffff86] &= 0x01
-	objA0.value26 = (u8[0xffffff86] >> 1) + (u8[0xffffff86] << 7)
+	titlescreen.selection &= 0x01
+	objA0.value26 = (titlescreen.selection >> 1) + (titlescreen.selection << 7)
 	u8[A0 + 0x27] = 0x08
 
 	objA0.update_address = 0x005b42
@@ -796,7 +797,7 @@ function void fn005ae4()
 //# address-hook(0x005b42) end(0x005c0a)
 function void fn005b42()
 {
-	D2 = u8[0xffffff86]
+	D2 = titlescreen.selection
 	D0.u8 = objA0.value26 & 0x7f
 	if (D0.u8 == 0)
 	{
@@ -822,11 +823,11 @@ function void fn005b42()
 				D2 = 0
 			}
 		}
-		u8[0xffffff86] = D2.u8
+		titlescreen.selection = D2.u8
 
-		if (D0.u8 & 0x03)
+		if (D0.u8 & (CONTROL_UP | CONTROL_DOWN))
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 
@@ -884,8 +885,8 @@ function void fn005c10()
 	objA0.position.x.u16 = 0xd0 + getScreenExtend()
 	objA0.position.y.u16 = 0x014c
 	objA0.mapping_offset = 0x005ed8
-	objA0.sprite_attributes = 0x8462
-	D0.u8 = u8[0xffffff86]
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
+	D0.u8 = titlescreen.selection
 	objA0.state = D0.u8
 	objA0.state.former = D0.u8
 	objA0.animation.frame = 1
@@ -898,7 +899,7 @@ function void fn005c10()
 //# address-hook(0x005c42) end(0x005c54)
 function void fn005c42()
 {
-	objA0.state = u8[0xffffff86]
+	objA0.state = titlescreen.selection
 
 	Object.animationUpdate(0x005c5a)
 	DrawObject()
@@ -906,13 +907,13 @@ function void fn005c42()
 
 
 
-// No idea what this is
+// Trademark
 
 //# address-hook(0x005c70) end(0x005c9c)
 function void fn005c70()
 {
 	objA0.mapping_offset = 0x005f62
-	objA0.sprite_attributes = 0x8462
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
 	objA0.position.x.u16 = 0x01a2 + getScreenExtend()
 	objA0.position.y.u16 = 0x011d
 	objA0.sprite_priority = 0x80
@@ -927,7 +928,7 @@ function void fn005c70()
 //# address-hook(0x005ca2) end(0x005cae)
 function void fn005ca2()
 {
-	if (s8[0xffffffd8] < 0)
+	if (global.region_code & 0x80)
 	{
 		DrawObject()
 	}
@@ -941,7 +942,7 @@ function void fn005ca2()
 function void fn005cb0()
 {
 	objA0.mapping_offset = 0x005f6c
-	objA0.sprite_attributes = 0x8462
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
 	objA0.position.x.u16 = 0x017f
 	objA0.position.y.u16 = 0x0152
 	objA0.sprite_priority = 0x80
@@ -1196,7 +1197,7 @@ function void fn000c00()
 {
 	// Fades the background to blue
 	fn000c50()
-	u16[0xfffff748] = control.pad1
+	titlescreen.backup.control.pad1 = control.pad1
 	fn0017d8()
 	if (global.demo_countdown != 0)
 	{

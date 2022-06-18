@@ -30,8 +30,7 @@ function void fn062b3a()
 //# address-hook(0x062b68) end(0x062bac)
 function void fn062b68()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	u8[A0 + 0x0a] &= ~0x80
@@ -227,8 +226,8 @@ function void fn062cf8()
 
 	objA1.position.x.u16 = D0.u16
 	u8[0xfffffab8] = 0x04
-	u8[A1 + 0x04] &= ~render_flag.FLIP_X
-	u8[A1 + 0x2a] &= ~0x01
+	objA1.render_flags &= ~render_flag.FLIP_X
+	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 	player1.control_override = 0xff
 	control.player1 = 0
 	StopObjectA1()
@@ -240,7 +239,7 @@ function void fn062cf8()
 //# address-hook(0x062d2c) end(0x062d3c)
 function void fn062d2c()
 {
-	if (u8[A1 + 0x2a] & 0x02)
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		return
 
 	u8[0xfffffab8] = 0x06
@@ -258,7 +257,9 @@ function void fn062d42()
 
 	u8[0xfffffab8] = 0x08
 	player1.camera_lock = 0xff
-	control.player1 = 0x0202
+
+	control.player1 = 0x0202		// CONTROL_DOWN, CONTROL_DOWN
+
 	fn062d5a()
 }
 
@@ -337,7 +338,7 @@ function void fn062ddc()
 			if (D0.u16 > objA1.position.x.u16)
 				return
 
-			u8[A1 + 0x20] = 0x08
+			u8[A1 + 0x20] = char.state.COWERING
 			StopObjectA1()
 		}
 		else if (s8[A1 + 0x04] >= 0)
@@ -389,7 +390,7 @@ function void fn062e5c()
 	spawnSimpleChildObjects(0x061d4c, 1)
 	if (_equal())
 	{
-		u8[A1 + 0x2c] = 0x1c
+		objA1.subtype2c = 0x1c
 	}
 
 	fn062e92()
@@ -412,7 +413,7 @@ function void fn062e92()
 			objA0.flags38 |= 0x02
 			u8[0xfffffaa9] = 0xff
 
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 
@@ -449,17 +450,17 @@ function void fn062f0a()
 {
 	fn065dec()
 
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 	{
 		objA0.update_address = 0x062f4c
 		objA0.animation.sprite = 1
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 
 		if ((objA0.flags38 & 0x04) == 0)
 		{
 			objA0.flags38 |= 0x02
 			u8[0xfffffaa9] ^= 0xff
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 	}
 
@@ -473,7 +474,7 @@ function void fn062f4c()
 	objA0.flags38 &= ~0x02
 	fn065dec()
 
-	if ((objA0.flags2a & 0x18) == 0)
+	if ((objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) == 0)
 	{
 		objA0.update_address = 0x062f0a
 		objA0.animation.sprite = 0

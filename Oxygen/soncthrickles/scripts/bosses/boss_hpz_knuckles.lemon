@@ -13,14 +13,14 @@ function u8 BossHPZKnuckles.chooseMusicTrack()
 {
 	u8 option = Game.getSetting(SETTING_AUDIO_HPZ_MUSIC)
 	if (option == 0)
-		return 0xf4		// Knuckles' theme from S3
+		return MUSIC_KNUCKLES_FORCED_S3		// Knuckles' theme from S3
 	else if (option == 1)
-		return 0xf5		// Knuckles' theme from S&K
+		return MUSIC_KNUCKLES_FORCED_SK		// Knuckles' theme from S&K
 	else if (option == 2)
-		return 0xf6		// Mini-boss theme from S3
+		return MUSIC_MINIBOSS_FORCED_S3		// Mini-boss theme from S3
 	else if (option == 3)
-		return 0xf9		// Knuckles' theme from S3 prototype
-	return 0x1f		// Fallback value, should not get reached
+		return MUSIC_KNUCKLES_FORCED_PROTO		// Knuckles' theme from S3 prototype
+	return MUSIC_KNUCKLES		// Fallback value, should not get reached
 }
 #endif
 
@@ -73,21 +73,21 @@ function void fn063d1a()
 		u16[A1 + 0x2e] = 0x78
 		u8[A1 + 0x27] = u8[A0 + 0x27]
 
-		u8[A1 + 0x26] = 0x1f
+		objA1.value26 = MUSIC_KNUCKLES
 	#if STANDALONE
-		u8[A1 + 0x26] = BossHPZKnuckles.chooseMusicTrack()
+		objA1.value26 = BossHPZKnuckles.chooseMusicTrack()
 	#endif
 	}
 
 	objA0.update_address = 0x063de0
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = 0x24da
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x04da)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
 	objA0.hitbox_extends.x = 0x09
 	objA0.hitbox_extends.y = 0x13
-	objA0.render_flags = render_flag.WORLD | render_flag.FLIP_X
+	objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 	objA0.animation.sprite = 0xd8
 	boss.remaining_hits = 8
 	u32[A0 + 0x30] = 0x066771
@@ -391,7 +391,7 @@ function void fn06401c()
 	if (getRandomNumber() % 3 == 0)
 		objA0.velocity.y = -0x540
 #endif
-	playSound(0x62)
+	playSound(SFX_JUMP)
 
 	A1 = 0x0667c1
 	fn084580()
@@ -532,7 +532,7 @@ function void fn064184()
 {
 	if ((global.framecounter.low & 0x0f) == 0)
 	{
-		playSound(0x3c)
+		playSound(SFX_ROLL)
 	}
 
 	fn08450e()
@@ -580,7 +580,7 @@ function void fn0641ec()
 
 	if (objA0.velocity.x == 0)
 	{
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		objA0.position.y.u16 -= 4
 		fn063ebe()
 	}
@@ -708,12 +708,13 @@ function void fn064310()
 	objA0.mapping_offset = 0x066f36
 	objA0.animation.sprite = 2
 	objA0.flags38 |= 0x10
-	level.default_music.u8 = 0x14
+	level.default_music.u8 = MUSIC_LRZ2
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the Knuckles theme and starts level music afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = 0x14
+		u8[A1 + 0x2c] = MUSIC_LRZ2
 	}
 }
 
@@ -745,7 +746,7 @@ function void fn06438a()
 {
 	if ((global.framecounter.low & 0x1f) == 0)
 	{
-		playSound(0x59)
+		playSound(SFX_COLLAPSE)
 	}
 
 	--objA0.countdown_value
@@ -763,9 +764,9 @@ function void fn06438a()
 function void fn066094()
 {
 	if (D0.u16 != 0)
-		objA0.render_flags &= ~0x01
+		objA0.render_flags &= ~render_flag.FLIP_X
 	else
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 }
 
 

@@ -12,7 +12,7 @@
 function void fn031b9e()
 {
 	objA0.mapping_offset = 0x230cdc
-	objA0.sprite_attributes = 0x43be
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03be)
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x30
@@ -48,11 +48,11 @@ function void fn031bd2()
 //# address-hook(0x031c0a) end(0x031c98)
 function void fn031c0a()
 {
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 #if STANDALONE
 	// Ignore AI Tails
 	if (tails.control_counter == 0)
-		D0.u8 &= 0x08
+		D0.u8 &= object.flag.P1_ON_OBJECT
 #endif
 	if (u8[A0 + 0x30] == 0)
 	{

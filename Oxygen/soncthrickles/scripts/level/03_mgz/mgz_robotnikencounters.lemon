@@ -88,7 +88,7 @@ function void fn06bfca()
 function void fn06c014()
 {
 	objA0.base_state = 0x04
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 }
 
 
@@ -186,6 +186,7 @@ function void fn06c200()
 		screenmover_target.right = 0x6000
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the right border
 			objA1.update_address = 0x084a48
 		}
 	}
@@ -194,6 +195,7 @@ function void fn06c200()
 		screenmover_target.left = 0
 		if (allocDynamicObjectStd())
 		{
+			// Spawn screen mover for the left border
 			objA1.update_address = 0x084a76
 		}
 	}
@@ -230,7 +232,7 @@ function void fn06c962()
 	setupObjectAttributesBasic(0x06d782)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u32[A1] == 0x06c31a)
+	if (objA1.update_address == 0x06c31a)
 	{
 		u8[A0 + 0x0a] &= ~0x80
 	}
@@ -387,7 +389,7 @@ function void fn06ca62()
 				// "spawnChildObjects(0x06d812)" replaced by:
 				spawnChildObject(0x06cce6, 0x00, 0, 0)		// Spawn the chain
 
-				playSound(0x59)
+				playSound(SFX_COLLAPSE)
 
 				// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 				spawnSimpleChildObjects(0x06d16a, 1)		// Debris spawner
@@ -481,7 +483,7 @@ function void fn06cbce()
 	{
 		u8[A1 + 0x2c] = 0x02
 	}
-	playSound(0x59)
+	playSound(SFX_COLLAPSE)
 
 	// "spawnSimpleChildObjects(0x06d83e)" replaced by:
 	spawnSimpleChildObjects(0x06d16a, 1)		// Debris spawner
@@ -586,8 +588,8 @@ function void fn06cce6()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x26] = u16[A1 + 0x26]
-	objA0.render_flags = u8[A1 + 0x04]
-	objA0.render_flags &= ~0x80
+	objA0.render_flags = objA1.render_flags
+	objA0.render_flags &= ~render_flag.VISIBLE
 	objA0.countdown_value = 0x04
 }
 
@@ -703,7 +705,7 @@ function void fn06ceb0()
 	{
 		objA0.sprite_priority = 0x0380
 		A1 = 0xffff0000 + u16[A0 + 0x46]
-		if (u32[A1] == 0x06c31a)
+		if (objA1.update_address == 0x06c31a)
 		{
 			u8[A0 + 0x0a] &= ~0x80
 		}
@@ -741,7 +743,7 @@ function void fn06cf20()
 	setupObjectAttributesMost(0x06d7a0)
 
 	objA0.update_address = 0x06cf62
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x44] = u16[A1 + 0x46]
@@ -869,7 +871,7 @@ function void fn06d334()
 {
 	D0.u16 = u16[A0 + 0x26] * 2
 	u32[A0 + 0x18] = u32[0x06d34e + D0.s16]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.velocity.x = -objA0.velocity.x
 	}

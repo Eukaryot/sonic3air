@@ -45,7 +45,7 @@ function void fn04964a()
 	{
 		if (dx < 0x0500 && dy < 0x0280 && debug_mode.state == 0)
 		{
-			u8[A1 + 0x20] = 0
+			u8[A1 + 0x20] = char.state.RUNNING
 			u8[A1 + 0x27] = 0x01
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
 			objA1.flags2a |= char.flag.IN_AIR
@@ -65,7 +65,7 @@ function void fn04964a()
 			D5.u16 = 0x18
 			D0.u16 = objA1.velocity.y
 
-			if (D4 & 0x0100)
+			if (D4 & 0x0100)		// CONTROL_UP held
 			{
 				D0.u16 -= D5.u16
 				D1.s16 = -D6.s16
@@ -79,7 +79,7 @@ function void fn04964a()
 				}
 			}
 
-			if (D4 & 0x0200)
+			if (D4 & 0x0200)		// CONTROL_DOWN held
 			{
 				D0.u16 += D5.u16
 				if (D0.s16 >= D6.s16)
@@ -142,8 +142,8 @@ function void fn04964a()
 function void fn049766()
 {
 	objA0.mapping_offset = 0x0498c2
-	objA0.sprite_attributes = 0x232d
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x032d)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x20
 	objA0.sprite_priority = 0x0280
@@ -195,14 +195,14 @@ function void fn0497c2()
 	if (D6.u16 & 0x01)
 	{
 		A1 = 0xffffb000
-		D5 = 5
+		D5 = 5		// object.flag.P1_PUSHING
 		fn049848()
 	}
 
 	if (D6.u16 & 0x02)
 	{
 		A1 = 0xffffb04a
-		D5 = 6
+		D5 = 6		// object.flag.P2_PUSHING
 		fn049848()
 	}
 
@@ -223,14 +223,14 @@ function void fn049804()
 	if (D6.u16 & 0x01)
 	{
 		A1 = 0xffffb000
-		D5 = 5
+		D5 = 5		// object.flag.P1_PUSHING
 		fn049848()
 	}
 
 	if (D6.u16 & 0x02)
 	{
 		A1 = 0xffffb04a
-		D5 = 6
+		D5 = 6		// object.flag.P2_PUSHING
 		fn049848()
 	}
 
@@ -249,6 +249,8 @@ function void fn049848()
 //# address-hook(0x049850) end(0x0498c0)
 function void fn049850()
 {
+	u8 bit = (1 << D5.u8)
+
 	objA1.flags2a &= ~char.flag.FACING_LEFT
 	objA1.velocity.x = 0x0c00
 
@@ -258,7 +260,7 @@ function void fn049850()
 		objA1.flags2a |= char.flag.FACING_LEFT
 		objA1.velocity.x = -objA1.velocity.x
 	}
-	objA0.flags2a &= ~(1 << D5.u8)
+	objA0.flags2a &= ~bit
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 	u8[A1 + 0x2f] = 0
@@ -266,7 +268,7 @@ function void fn049850()
 	u16[A1 + 0x1c] = 0x01
 	if (u8[A1 + 0x27] == 0)
 		u8[A1 + 0x27] = 1
-	u8[A1 + 0x20] = 0
+	u8[A1 + 0x20] = char.state.RUNNING
 	u8[A1 + 0x30] = 0xff
 	u8[A1 + 0x31] = 0x04
 	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
@@ -283,8 +285,8 @@ function void fn049850()
 function void fn0498d2()
 {
 	objA0.mapping_offset = 0x049a6c
-	objA0.sprite_attributes = 0x232d
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x032d)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x30
 	objA0.sprite_priority = 0x0280
@@ -298,12 +300,12 @@ function void fn0498d2()
 	#else
 		objA1.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
 	#endif
-		u8[A1 + 0x04] = objA0.render_flags | 0x40
-		u8[A1 + 0x06] = 0x30
-		u8[A1 + 0x07] = 0x20
-		u16[A1 + 0x08] = 0x0200
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u32[A1 + 0x0c] = objA0.mapping_offset
+		objA1.render_flags = objA0.render_flags | render_flag.COMPOUND
+		objA1.box_size.y = 0x30
+		objA1.box_size.x = 0x20
+		objA1.sprite_priority = 0x0200
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.mapping_offset = objA0.mapping_offset
 
 		D2.u16 = objA0.position.x.u16
 		D3.u16 = objA0.position.y.u16
@@ -367,7 +369,7 @@ function void fn049986()
 	{
 		A1 = 0xffffb000
 		fn049a0e()
-		D5 = 5
+		D5 = 5		// object.flag.P1_PUSHING
 		fn049a02()
 	}
 
@@ -375,7 +377,7 @@ function void fn049986()
 	{
 		A1 = 0xffffb04a
 		fn049a0e()
-		D5 = 6
+		D5 = 6		// object.flag.P2_PUSHING
 		fn049a02()
 	}
 

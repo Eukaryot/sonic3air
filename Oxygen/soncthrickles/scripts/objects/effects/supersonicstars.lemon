@@ -18,12 +18,12 @@ function void fn019156()
 	updateSpritePattern(0x18bd44, 0xf380, 0x01a0)
 
 	objA0.mapping_offset = 0x0192de
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
 	objA0.sprite_attributes = 0x079c
-	if (u8[0xffffb00a] & 0x80)
+	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
 	objA0.update_address = 0x0191a4
@@ -42,9 +42,9 @@ function void fn0191a4()
 
 #if STANDALONE
 	// Sonic charging a Super Peel-Out right now?
-	if (u8[0xffffb03d] == 0x80)
+	if (u8[0xffffb000 + 0x3d] == 0x80)
 	{
-		objA0.position.x.u16 += (s16[0xffffb01c] >> 10) * ((u8[0xffffb02a] & char.flag.FACING_LEFT) ? 1 : -1)
+		objA0.position.x.u16 += (s16[0xffffb000 + 0x1c] >> 10) * ((u8[0xffffb000 + 0x2a] & char.flag.FACING_LEFT) ? 1 : -1)
 	}
 #endif
 
@@ -71,20 +71,20 @@ function void fn0191a4()
 
 		if (u8[A0 + 0x35] == 0)
 		{
-			objA0.position.x.u16 = u16[0xffffb010]
-			objA0.position.y.u16 = u16[0xffffb014]
+			objA0.position.x.u16 = u16[0xffffb000 + 0x10]
+			objA0.position.y.u16 = u16[0xffffb000 + 0x14]
 		}
 		DrawObject()
 	}
 	else
 	{
-		if (u8[0xffffb02e] == 0 && abs(s16[0xffffb01c]) >= 0x0800)
+		if (u8[0xffffb000 + 0x2e] == 0 && abs(s16[0xffffb000 + 0x1c]) >= 0x0800)
 		{
 			objA0.animation.sprite = 0
 			u8[A0 + 0x34] = 0x01
 
-			objA0.position.x.u16 = u16[0xffffb010]
-			objA0.position.y.u16 = u16[0xffffb014]
+			objA0.position.x.u16 = u16[0xffffb000 + 0x10]
+			objA0.position.y.u16 = u16[0xffffb000 + 0x14]
 			DrawObject()
 		}
 		else
@@ -99,6 +99,7 @@ function void fn0191a4()
 //# address-hook(0x019236) end(0x0192be)
 function void fn019236()
 {
+	// This is all technically unused
 	objA0.state = 0
 	A2 = 0xffffb000
 	D5 = 0x0f
@@ -106,16 +107,17 @@ function void fn019236()
 
 	while (D5.s16 >= 0)
 	{
+		// Spawn super sparks
 		if (!allocDynamicObjectStd())
 			return
 
 		objA1.update_address = 0x0192c0
-		u8[A1 + 0x04] = 0x84
-		u8[A1 + 0x06] = 0x08
-		u8[A1 + 0x07] = 0x08
-		u16[A1 + 0x08] = 0x0380
-		u16[A1 + 0x0a] = 0x879c
-		u32[A1 + 0x0c] = 0x0192ea
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.box_size.y = 0x08
+		objA1.box_size.x = 0x08
+		objA1.sprite_priority = 0x0380
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
+		objA1.mapping_offset = 0x0192ea
 		objA1.position.x.u16 = u16[A2 + 0x10]
 		objA1.position.y.u16 = u16[A2 + 0x14]
 

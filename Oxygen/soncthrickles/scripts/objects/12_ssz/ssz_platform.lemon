@@ -12,11 +12,11 @@
 function void fn044a68()
 {
 	objA0.update_address = 0x044aa0
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.y = 0x11
 	objA0.box_size.x = 0x20
 	objA0.sprite_priority = 0x0180
-	objA0.sprite_attributes = 0x42d4
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02d4)
 	objA0.mapping_offset = 0x046900
 	objA0.animation.sprite = 1
 	objA0.velocity.y = objA0.position.y.u16
@@ -29,7 +29,7 @@ function void fn044a68()
 function void fn044aa0()
 {
 	D0.u16 = objA0.countdown_value
-	D1.u16 = objA0.flags2a & 0x18
+	D1.u16 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D1.u16 == 0)
 	{
 		if (D0.u16 > 0)

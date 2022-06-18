@@ -111,7 +111,7 @@ function void fn088c38()
 		u8[A1 + 0x05] = 0x02
 		objA1.velocity.y = -0x600
 		objA1.flags2a |= char.flag.IN_AIR
-		u8[A1 + 0x2a] &= ~0x08
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		u8[A1 + 0x40] = 0
 	}
 }
@@ -121,7 +121,7 @@ function void fn088c38()
 function void fn088c6e()
 {
 	objA0.base_state = objA0.value3a
-	u8[A0 + 0x28] = 0x0a
+	objA0.collision_attributes = collision.size.16x8
 }
 
 
@@ -148,7 +148,7 @@ function void fn088c9a()
 
 	if (objA0.subtype2c == 0)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 }
 
@@ -199,8 +199,7 @@ function void fn088d02()
 	if (D2.u16 != 0 && objA0.animation.sprite == 4)
 	{
 		playSound(0x4d)
-		A2 = 0x088e32
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x088e32)
 	}
 }
 
@@ -275,7 +274,7 @@ function void fn088d94()
 function void fn088d98()
 {
 	objA0.base_state = 0x02
-	u8[A0 + 0x28] = 0xca
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.16x8)
 }
 
 
@@ -289,7 +288,7 @@ function void fn088da6()
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
 	u8[A1 + 0x40] = 0
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }
 
 

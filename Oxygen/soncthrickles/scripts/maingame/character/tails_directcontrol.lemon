@@ -84,7 +84,7 @@ function void fn016340()
 		}
 	}
 
-	if (s8[0xffffb004] >= 0 && u8[0xffffb005] == 0x02)
+	if (s8[0xffffb000 + 0x04] >= 0 && u8[0xffffb000 + 0x05] == 0x02)
 	{
 		A1 = 0xffffb04a
 	#if STANDALONE
@@ -178,7 +178,7 @@ function void fn01414c()
 			if (tails.up_press_timer >= 0xc0)
 			{
 				tails.up_press_timer = 0
-				control.tails |= 0x7070
+				control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 			}
 		}
 		else if (control.pad1.state & CONTROL_UP)
@@ -186,13 +186,13 @@ function void fn01414c()
 			#if STANDALONE
 				// Just go constantly up
 				//  -> This is the same behavior as in rest of standalone, but an intentional change to the original
-				control.tails |= 0x7070
+				control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 			#else
 				++tails.up_press_timer
 				if (tails.up_press_timer >= 0x20)
 				{
 					tails.up_press_timer = 0
-					control.tails |= 0x7070
+					control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 				}
 			#endif
 		}
@@ -202,7 +202,7 @@ function void fn01414c()
 			if (tails.up_press_timer >= 0x58)
 			{
 				tails.up_press_timer = 0
-				control.tails |= 0x7070
+				control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 			}
 		}
 
@@ -241,7 +241,7 @@ function void fn01421c()
 	D0.u8 = level.framecounter.low & 0x07
 	if (D0.u8 == 0)
 	{
-		control.tails |= 0x7070
+		control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
 	}
 	D0.u16 = camera.position.y.u16 + 0x90
 	if (D0.u16 >= objA0.position.y.u16)
@@ -268,7 +268,7 @@ function void fn0142e2()
 	{
 		A1 = 0xffffb000
 		bool skipPart = false
-		if (u8[A1 + 0x04] & render_flag.VISIBLE)
+		if (objA1.render_flags & render_flag.VISIBLE)
 		{
 			if (tails.control_counter != 0)
 			{
@@ -284,7 +284,7 @@ function void fn0142e2()
 					if (tails.up_press_timer >= 0x58)
 					{
 						tails.up_press_timer = 0
-						control.tails = 0x7070
+						control.tails = 0x7070		// CONTROL_ABC, CONTROL_ABC
 					}
 					else
 					{
@@ -293,7 +293,7 @@ function void fn0142e2()
 				}
 				else
 				{
-					control.tails = 0x7070
+					control.tails = 0x7070		// CONTROL_ABC, CONTROL_ABC
 				}
 			}
 		}

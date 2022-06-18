@@ -41,8 +41,7 @@ function void fn08c96c()
 //# address-hook(0x08c994) end(0x08c9b0)
 function void fn08c994()
 {
-	A1 = 0x08cb10
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08cb10))
 	{
 		signalMultiReturn()
 		return
@@ -204,7 +203,7 @@ function void FlyBotAlert.Init()
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0xd7
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 
 	objA0.update_address = 0x02946a
 	FlyBotAlert.Update()

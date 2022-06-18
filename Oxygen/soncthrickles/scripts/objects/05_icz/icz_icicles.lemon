@@ -37,7 +37,7 @@ function void fn08b2a4()
 	else
 	{
 		objA0.update_address = 0x08b2ee
-		u8[A0 + 0x28] = 0x92
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x16)
 	}
 }
 
@@ -57,7 +57,7 @@ function void fn08b2da()
 //# address-hook(0x08b330) end(0x08b34a)
 function void fn08b330()
 {
-	u8[A0 + 0x28] = 0x98
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
 	AddAsDynamicObject()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)

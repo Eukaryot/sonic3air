@@ -18,10 +18,12 @@ function void fn02237e()
 	A1 = A0
 	objA1.update_address = 0x022442
 	fn02241a()
-	u8[A1 + 0x22] = 0x21
+
+	objA1.animation.sprite = 0x21
 	D2.u16 = objA0.position.x.u16
 	D3.u16 = objA0.position.y.u16
-	D1.u16 = objA0.subtype2c & 0x0f
+
+	D1.u16 = objA0.subtype2c & 0x0f		// Length of vine
 	if (!allocDynamicObjectAfterA0())
 	{
 		fn022442()
@@ -33,7 +35,7 @@ function void fn02237e()
 	objA0.value3e = A1.u16
 	objA1.update_address = 0x02248a
 	u16[A1 + 0x3c] = A0.u16
-	D0.u8 = objA0.subtype2c & 0xf0
+	D0.u8 = objA0.subtype2c & 0xf0		// Initial swinging position of vine when spawning
 	u8[A1 + 0x42] = D0.u8
 	fn0223ea()
 }
@@ -57,7 +59,7 @@ function void fn0223ea()
 		if (D1.s16 < 0)
 		{
 			objA1.update_address = 0x02257e
-			u8[A1 + 0x22] = 0x20
+			objA1.animation.sprite = 0x20
 			u16[A0 + 0x40] = A1.u16
 			break
 		}
@@ -77,12 +79,12 @@ function void fn0223ea()
 //# address-hook(0x02241a) end(0x022440)
 function void fn02241a()
 {
-	u8[A1 + 0x04] = render_flag.WORLD
-	u8[A1 + 0x06] = 8
-	u8[A1 + 0x07] = 8
-	u16[A1 + 0x08] = 0x200
-	u16[A1 + 0x0a] = 0x41b
-	u32[A1 + 0x0c] = 0x022b9e
+	objA1.render_flags = render_flag.WORLD
+	objA1.box_size.y = 8
+	objA1.box_size.x = 8
+	objA1.sprite_priority = 0x0200
+	objA1.sprite_attributes = 0x041b
+	objA1.mapping_offset = 0x022b9e
 }
 
 

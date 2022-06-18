@@ -19,7 +19,7 @@ function void fn03b1fc()
 		if (objA0.animation.sprite > 4)
 			objA0.animation.sprite = 1
 
-		if ((level.framecounter.low & 0x0f) == 0 && u8[A0 + 0x04] & 0x80)
+		if ((level.framecounter.low & 0x0f) == 0 && objA0.render_flags & render_flag.VISIBLE)
 		{
 			playSound(0xd9)
 		}

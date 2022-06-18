@@ -19,16 +19,16 @@ function void fn03b934()
 	if (global.zone == 0x0b)
 	{
 		// Death Egg Zone
-		objA0.sprite_attributes = 0x22fc
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x02fc)
 		objA0.animation.sprite = 0x01
 	}
 	else
 	{
 		// Flying Battery Zone
-		objA0.sprite_attributes = 0x23b5
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x03b5)
 	}
 
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
@@ -61,11 +61,11 @@ function void fn03b97a()
 	}
 
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03b9d8()
 
 	A1 = 0xffffb04a
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn03b9d8()
 
 	D1.u16 = 0x10
@@ -81,7 +81,8 @@ function void fn03b97a()
 //# address-hook(0x03b9d8) end(0x03ba48)
 function void fn03b9d8()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		D0 = 4
 		D1.u16 = 0x0100
@@ -98,7 +99,7 @@ function void fn03b9d8()
 		if (u8[A0 + 0x32] != 0)
 		{
 			u8[A1 + 0x20] = 0
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA1.velocity.y = 0
 			return
 		}

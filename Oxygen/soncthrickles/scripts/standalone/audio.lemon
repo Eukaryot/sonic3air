@@ -8,15 +8,15 @@
 
 
 
-constant u8 SoundRegType.TYPE_MUSIC  = 0		// Looping, uses music channel (0)
-constant u8 SoundRegType.TYPE_JINGLE = 1		// Not looping, uses jingle channel (1) and aborts or pauses music
-constant u8 SoundRegType.TYPE_SOUND  = 2		// Sound effect (can be one-shot playback or continuous)
+constant u8 SoundRegType.TYPE_MUSIC		= 0			// Looping, uses music channel (0)
+constant u8 SoundRegType.TYPE_JINGLE	= 1			// Not looping, uses jingle channel (1) and aborts or pauses music
+constant u8 SoundRegType.TYPE_SOUND		= 2			// Sound effect (can be one-shot playback or continuous)
 
-constant u8 AudioContext.CONTEXT_MUSIC = 0x00		// Use music volume setting
-constant u8 AudioContext.CONTEXT_SOUND = 0x01		// Use sound volume setting
+constant u8 AudioContext.CONTEXT_MUSIC	= 0x00		// Use music volume setting
+constant u8 AudioContext.CONTEXT_SOUND	= 0x01		// Use sound volume setting
 
-constant u8 FastMusicFlag.MUSIC_TEMPO = 0x01
-constant u8 FastMusicFlag.SUPER_THEME = 0x02
+constant u8 FastMusicFlag.MUSIC_TEMPO	= 0x01
+constant u8 FastMusicFlag.SUPER_THEME	= 0x02
 
 global u8 fastMusicFlags
 global u8 alternatingRingSoundState
@@ -67,7 +67,7 @@ function void Standalone.playAudio(u8 sfxId)
 	}
 	else if (sfxId <= 0x2b)
 	{
-		soundRegType = (sfxId == 0x26 || sfxId == 0x28) ? SoundRegType.TYPE_MUSIC : SoundRegType.TYPE_JINGLE
+		soundRegType = (sfxId == MUSIC_ENDING || sfxId == MUSIC_CONTINUE) ? SoundRegType.TYPE_MUSIC : SoundRegType.TYPE_JINGLE
 	}
 	else if (sfxId <= 0x30)
 	{
@@ -87,7 +87,7 @@ function void Standalone.playAudio(u8 sfxId)
 	}
 
 	// Clear music for level results, emerald jingle, drowning music and outro music
-	if (sfxId == 0x29 || sfxId == 0x2b || sfxId == 0x31 || sfxId == 0xdc)
+	if (sfxId == MUSIC_LEVELCLEAR || sfxId == MUSIC_CHAOSEMERALD || sfxId == MUSIC_DROWNING || sfxId == MUSIC_CREDITSMEDLEY)
 	{
 		Audio.stopChannel(0)
 	}
@@ -104,7 +104,7 @@ function void Standalone.playAudio(u8 sfxId)
 	else
 	{
 		// Hard-coded handling of special sfx IDs
-		if (sfxId == 0x1c)
+		if (sfxId == MUSIC_SPECIALSTAGE)
 		{
 			// Special Stage
 			if (true)	// TODO: Add option to disable the speedup, of course for both music and gameplay
@@ -112,7 +112,7 @@ function void Standalone.playAudio(u8 sfxId)
 				soundKey = "1c_speedup"
 			}
 		}
-		else if (sfxId == 0x1f)
+		else if (sfxId == MUSIC_KNUCKLES)
 		{
 			// Knuckles' Theme
 			if (Game.getSetting(SETTING_AUDIO_KNUCKLES_THEME) == 0)
@@ -129,7 +129,7 @@ function void Standalone.playAudio(u8 sfxId)
 					soundKey = "1f_sonic3"
 			}
 		}
-		else if (sfxId == 0x25)
+		else if (sfxId == MUSIC_TITLESCREEN)
 		{
 			// Title theme
 			if (Game.getSetting(SETTING_AUDIO_TITLE_THEME) == 0)
@@ -137,19 +137,19 @@ function void Standalone.playAudio(u8 sfxId)
 				soundKey = "25_sonic3"
 			}
 		}
-		else if (sfxId == 0x26)
+		else if (sfxId == MUSIC_ENDING)
 		{
 			// Outro music
 			if (Game.getSetting(SETTING_AUDIO_OUTRO) == 0)
 			{
-				soundKey = 0x15			// Sky Sanctuary
+				soundKey = MUSIC_SSZ			// Sky Sanctuary
 			}
 			else if (Game.getSetting(SETTING_AUDIO_OUTRO) == 2)
 			{
 				soundKey = "26_proto"
 			}
 		}
-		else if (sfxId == 0x28)
+		else if (sfxId == MUSIC_CONTINUE)
 		{
 			// Continue screen music
 			if (Game.getSetting(SETTING_AUDIO_CONTINUE_SCREEN) == 0)
@@ -157,7 +157,7 @@ function void Standalone.playAudio(u8 sfxId)
 				soundKey = "28_sonic3"
 			}
 		}
-		else if (sfxId == 0x2a)
+		else if (sfxId == MUSIC_EXTRALIFE)
 		{
 			// Extra life jingle
 			if (Game.getSetting(SETTING_AUDIO_EXTRALIFE_JINGLE) == 0)
@@ -174,7 +174,7 @@ function void Standalone.playAudio(u8 sfxId)
 			Audio.playOverride(soundKey, AudioContext.CONTEXT_MUSIC, 1, 0)
 			return
 		}
-		else if (sfxId == 0x2c)
+		else if (sfxId == MUSIC_INVINCIBLE)
 		{
 			// Invincibility Theme
 			if (global.game_mode != 0x2c)	// In Blue Sphere game's Perfect screen, always use the S&K version
@@ -190,7 +190,7 @@ function void Standalone.playAudio(u8 sfxId)
 				}
 			}
 		}
-		else if (sfxId == 0x2d)
+		else if (sfxId == MUSIC_COMPETITIONMENU)
 		{
 			// Competition Menu music
 			if (Game.getSetting(SETTING_AUDIO_COMPETITION_MENU) == 1)
@@ -198,10 +198,10 @@ function void Standalone.playAudio(u8 sfxId)
 				soundKey = "2d_proto"
 			}
 		}
-		else if (sfxId == 0x18 || sfxId == 0x2e)
+		else if (sfxId == MUSIC_MINIBOSS || sfxId == MUSIC_MINIBOSS_2)
 		{
 			// Mini-boss music
-			soundKey = 0x18
+			soundKey = MUSIC_MINIBOSS
 			if (Game.getSetting(SETTING_AUDIO_MINIBOSS_THEME) == 0)
 			{
 				soundKey = "2e_sonic3"
@@ -212,16 +212,16 @@ function void Standalone.playAudio(u8 sfxId)
 					soundKey = "2e_sonic3"
 			}
 		}
-		else if (sfxId == 0x33)
+		else if (sfxId == SFX_RING)
 		{
 			// Alternating ring sound
 			alternatingRingSoundState = !alternatingRingSoundState
 			if (!alternatingRingSoundState)
 			{
-				soundKey = 0x34
+				soundKey = SFX_RING_ALT
 			}
 		}
-		else if (sfxId == 0xf0)
+		else if (sfxId == MUSIC_SUPER)
 		{
 			// Super Theme
 			soundRegType = SoundRegType.TYPE_MUSIC
@@ -254,7 +254,7 @@ function void Standalone.playAudio(u8 sfxId)
 			else if (configOption == 4)
 			{
 				// S&K invincibility theme
-				soundKey = 0x2c
+				soundKey = MUSIC_INVINCIBLE
 			}
 			else
 			{
@@ -262,40 +262,40 @@ function void Standalone.playAudio(u8 sfxId)
 				soundKey = "2e_proto"
 			}
 		}
-		else if (sfxId == 0xf2)
+		else if (sfxId == MUSIC_BOSS_S1)
 		{
 			// Sonic 1 boss music
 			soundKey = "sonic1_boss"
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
-		else if (sfxId == 0xf3)
+		else if (sfxId == MUSIC_BOSS_S2)
 		{
 			// Sonic 2 boss music
 			soundKey = "sonic2_boss"
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
-		else if (sfxId == 0xf4)
+		else if (sfxId == MUSIC_KNUCKLES_FORCED_S3)
 		{
 			// Knuckles' Theme (S3 version enforced)
 			soundKey = "1f_sonic3"
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
-		else if (sfxId == 0xf5)
+		else if (sfxId == MUSIC_KNUCKLES_FORCED_SK)
 		{
 			// Knuckles' Theme (S&K version enforced)
-			soundKey = 0x1f
+			soundKey = MUSIC_KNUCKLES
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
-		else if (sfxId == 0xf6)
+		else if (sfxId == MUSIC_MINIBOSS_FORCED_S3)
 		{
 			// Mini-boss music (S3 version enforced)
 			soundKey = "2e_sonic3"
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
-		else if (sfxId == 0xf7)
+		else if (sfxId == MUSIC_MINIBOSS_FORCED_SK)
 		{
 			// Mini-boss music (S&K version enforced)
-			soundKey = 0x18
+			soundKey = MUSIC_MINIBOSS
 			soundRegType = SoundRegType.TYPE_MUSIC
 		}
 		else if (sfxId == 0xf8)
@@ -312,7 +312,7 @@ function void Standalone.playAudio(u8 sfxId)
 				soundRegType = SoundRegType.TYPE_MUSIC
 			}
 		}
-		else if (sfxId == 0xf9)
+		else if (sfxId == MUSIC_KNUCKLES_FORCED_PROTO)
 		{
 			// Knuckles' Theme (S3 prototype version enforced)
 			soundKey = "1f_proto"
@@ -320,27 +320,27 @@ function void Standalone.playAudio(u8 sfxId)
 		}
 
 		// Support for Sonic 3 prototype music
-		if (sfxId == 0x07 && (Game.getSetting(SETTING_CNZ_PROTOTYPE_MUSIC) & 0x01))
+		if (sfxId == MUSIC_CNZ1 && (Game.getSetting(SETTING_CNZ_PROTOTYPE_MUSIC) & 0x01))
 		{
 			soundKey = "07_proto"
 		}
-		else if (sfxId == 0x08 && (Game.getSetting(SETTING_CNZ_PROTOTYPE_MUSIC) & 0x02))
+		else if (sfxId == MUSIC_CNZ2 && (Game.getSetting(SETTING_CNZ_PROTOTYPE_MUSIC) & 0x02))
 		{
 			soundKey = "08_proto"
 		}
-		else if (sfxId == 0x0b && (Game.getSetting(SETTING_ICZ_PROTOTYPE_MUSIC) & 0x01))
+		else if (sfxId == MUSIC_ICZ1 && (Game.getSetting(SETTING_ICZ_PROTOTYPE_MUSIC) & 0x01))
 		{
 			soundKey = "0b_proto"
 		}
-		else if (sfxId == 0x0c && (Game.getSetting(SETTING_ICZ_PROTOTYPE_MUSIC) & 0x02))
+		else if (sfxId == MUSIC_ICZ2 && (Game.getSetting(SETTING_ICZ_PROTOTYPE_MUSIC) & 0x02))
 		{
 			soundKey = "0c_proto"
 		}
-		else if (sfxId == 0x0d && (Game.getSetting(SETTING_LBZ_PROTOTYPE_MUSIC) & 0x01))
+		else if (sfxId == MUSIC_LBZ1 && (Game.getSetting(SETTING_LBZ_PROTOTYPE_MUSIC) & 0x01))
 		{
 			soundKey = "0d_proto"
 		}
-		else if (sfxId == 0x0e && (Game.getSetting(SETTING_LBZ_PROTOTYPE_MUSIC) & 0x02))
+		else if (sfxId == MUSIC_LBZ2 && (Game.getSetting(SETTING_LBZ_PROTOTYPE_MUSIC) & 0x02))
 		{
 			soundKey = "0e_proto"
 		}

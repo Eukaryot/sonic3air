@@ -56,7 +56,7 @@ function void fn01937c()
 	if (A0 == 0xffffcd7c)
 	{
 		objA0.update_address = 0x0193ca
-		fn0193ca()
+		HyperSonicStars.CreateSparks()
 	}
 	else
 	{
@@ -67,13 +67,13 @@ function void fn01937c()
 
 
 //# address-hook(0x0193ca) end(0x0193e6)
-function void fn0193ca()
+function void HyperSonicStars.CreateSparks()
 {
 	if (objA0.state != 0)
 	{
 		objA0.state = 0
-		objA0.position.x.u16 = u16[0xffffb010]
-		objA0.position.y.u16 = u16[0xffffb014]
+		objA0.position.x.u16 = u16[0xffffb000 + 0x10]
+		objA0.position.y.u16 = u16[0xffffb000 + 0x14]
 
 		D2 = 2
 		Effects.CreateSparks()
@@ -114,15 +114,15 @@ function void fn0193ec()
 		u16[A0 + 0x34] += objA0.velocity.y
 
 		D2.s16 = s8[A0 + 0x30]
-		if (u8[0xffffb02a] & 0x01)
+		if (u8[0xffffb000 + 0x2a] & char.flag.FACING_LEFT)
 			D2.s16 = -D2.s16
-		objA0.position.x.u16 = u16[0xffffb010] + D2.s16
-		objA0.position.y.u16 = u16[0xffffb014] + s8[A0 + 0x34]
-		objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[0xffffb00a] & 0x8000)
+		objA0.position.x.u16 = u16[0xffffb000 + 0x10] + D2.s16
+		objA0.position.y.u16 = u16[0xffffb000 + 0x14] + s8[A0 + 0x34]
+		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[0xffffb000 + 0x0a] & sprite_attribute.PRIORITY)
 
 	#if STANDALONE
 		// Do not render stars if Sonic is outside the screen (e.g. MGZ 2 boss)
-		if (u8[0xffffb004] & render_flag.VISIBLE)
+		if (u8[0xffffb000 + 0x04] & render_flag.VISIBLE)
 	#endif
 		{
 			DrawObject()

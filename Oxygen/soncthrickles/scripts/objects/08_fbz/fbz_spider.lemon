@@ -12,14 +12,14 @@
 function void fn03d090()
 {
 	objA0.mapping_offset = 0x03d2fc
-	objA0.sprite_attributes = 0x2339
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0339)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x60
 	objA0.sprite_priority = 0x80
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x01
 
 	A2 = A0 + 0x18
@@ -77,7 +77,7 @@ function void fn03d11e()
 		{
 			if ((u8[A1 + 0x2a] & 0x02) == 0)
 			{
-				u8[A1 + 0x20] = 0x0e
+				u8[A1 + 0x20] = char.state.GRABBED
 				u8[A1 + 0x2e] = 0xc1
 				u8[A1 + 0x3d] = 0
 				u8[A1 + 0x2a] = 0
@@ -98,20 +98,20 @@ function void fn03d11e()
 //# address-hook(0x03d1b2) end(0x03d21a)
 function void fn03d1b2()
 {
-	u16[0xffffb010] = objA0.position.x.u16
-	u16[0xffffb014] = objA0.position.y.u16 + 0x10
+	u16[0xffffb000 + 0x10] = objA0.position.x.u16
+	u16[0xffffb000 + 0x14] = objA0.position.y.u16 + 0x10
 
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x03d2f6
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x04] = objA0.render_flags
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u16[A1 + 0x08] = 0x0280
-		u8[A1 + 0x07] = 0x18
-		u8[A1 + 0x06] = 0x18
+		objA1.render_flags = objA0.render_flags
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.sprite_priority = 0x0280
+		objA1.box_size.x = 0x18
+		objA1.box_size.y = 0x18
 		u8[A1 + 0x22] = 0x0b
 		u16[A0 + 0x3c] = A1.u16
 	}
@@ -147,8 +147,8 @@ function void fn03d220()
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16
-	u16[0xffffb010] = objA0.position.x.u16
-	u16[0xffffb014] = objA0.position.y.u16 + 0x10
+	u16[0xffffb000 + 0x10] = objA0.position.x.u16
+	u16[0xffffb000 + 0x14] = objA0.position.y.u16 + 0x10
 
 	DrawOrUnloadObject()
 }
@@ -188,7 +188,7 @@ function void fn03d278()
 			A1 = 0xffffb000
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x2e] = 0
-			u8[A1 + 0x2a] |= 0x02
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA0.update_address = 0x03d2f6
 			objA0.animation.sprite = 0x0a
 			A1 = 0xffff0000 + u16[A0 + 0x3c]
@@ -201,7 +201,7 @@ function void fn03d278()
 
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
 	objA1.position.x.u16 = objA0.position.x.u16
-	u16[0xffffb010] = objA0.position.x.u16
+	u16[0xffffb000 + 0x10] = objA0.position.x.u16
 
 	DrawOrUnloadObject()
 }

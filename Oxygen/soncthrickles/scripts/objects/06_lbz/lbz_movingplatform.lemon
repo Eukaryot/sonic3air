@@ -16,7 +16,7 @@
 function void fn024e3c()
 {
 	objA0.mapping_offset = 0x025338
-	objA0.sprite_attributes = 0x43c3
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0180
 
@@ -122,7 +122,7 @@ function void fn024f1c()
 //# address-hook(0x024f90) end(0x024fc6)
 function void fn024f90()
 {
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		if (objA0.value3a != 0)
@@ -165,7 +165,7 @@ function void fn02505c()
 {
 	D2.u16 = u16[A0 + 0x38]
 	D1.u16 = u16[A0 + 0x36]
-	if ((objA0.flags2a & 0x18) == 0)
+	if ((objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) == 0)
 	{
 		if (D1.u16 == 0)
 			return
@@ -233,7 +233,7 @@ function void fn025108()
 {
 	if (u16[A0 + 0x3a] == 0)
 	{
-		if (objA0.flags2a & 0x18)
+		if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 		{
 			u16[A0 + 0x3a] = 0x1e
 		}
@@ -258,16 +258,16 @@ function void fn025132()
 		--u16[A0 + 0x3a]
 		if (u16[A0 + 0x3a] == 0)
 		{
-			if (objA0.flags2a & 0x08)
+			if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 			{
-				objA0.flags2a &= ~0x08
+				objA0.flags2a &= ~object.flag.P1_ON_OBJECT
 				A1 = 0xffffb000
 				fn025194()
 			}
 
-			if (objA0.flags2a & 0x10)
+			if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 			{
-				objA0.flags2a &= ~0x10
+				objA0.flags2a &= ~object.flag.P2_ON_OBJECT
 				A1 = 0xffffb04a
 				fn025194()
 			}
@@ -295,8 +295,8 @@ function void fn025132()
 //# address-hook(0x025194) end(0x0251ac)
 function void fn025194()
 {
-	u8[A1 + 0x2a] |= 0x02
-	u8[A1 + 0x2a] &= ~0x08
+	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x05] = 0x02
 	objA1.velocity.y = objA0.velocity.y
 }

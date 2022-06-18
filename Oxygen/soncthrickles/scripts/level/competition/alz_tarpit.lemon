@@ -18,7 +18,7 @@ function void fn032b8c()
 		return
 
 	A1 = 0xffffb000
-	if ((objA0.flags2a & 0x08) == 0)
+	if ((objA0.flags2a & object.flag.P1_ON_OBJECT) == 0)
 	{
 		if (objA0.flags38 < 0x30)
 		{
@@ -52,12 +52,12 @@ function void fn032b8c()
 
 	D1 = objA0.box_size.x
 	D3 = objA0.flags38 >> 1
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D4.u16 = objA0.position.x.u16
 	PlatformCheckClimbOnForCharacterA1()
 
 	A1 = 0xffffb04a
-	if ((objA0.flags2a & 0x10) == 0)
+	if ((objA0.flags2a & object.flag.P2_ON_OBJECT) == 0)
 	{
 		if (objA0.value3a < 0x30)
 		{
@@ -91,7 +91,7 @@ function void fn032b8c()
 
 	D1 = objA0.box_size.x
 	D3 = objA0.value3a >> 1
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D4.u16 = objA0.position.x.u16
 	PlatformCheckClimbOnForCharacterA1()
 }

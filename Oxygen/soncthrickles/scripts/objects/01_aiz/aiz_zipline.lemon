@@ -19,12 +19,12 @@ function void AIZZipLine.Init()
 	objA1.update_address = 0x021d28
 	fn021d00()
 
-	u8[A1 + 0x22] = 0x21
+	objA1.animation.sprite = 0x21
 	D2.u16 = objA0.position.x.u16
 	D3.u16 = objA0.position.y.u16
 	u16[A0 + 0x46] = objA0.position.x.u16 + ((objA0.subtype2c & 0x7f) << 4)
 
-	D1 = 4
+	D1 = 4		// Length of vine
 	if (allocDynamicObjectAfterA0())
 	{
 		objA0.value3e = A1.u16
@@ -57,7 +57,7 @@ function void fn021cb8()
 		if (D1.s16 < 0)
 		{
 			objA1.update_address = 0x022074
-			u8[A1 + 0x22] = 0x20
+			objA1.animation.sprite = 0x20
 			u16[A0 + 0x40] = A1.u16
 			break
 		}
@@ -76,12 +76,12 @@ function void fn021cb8()
 //# address-hook(0x021d00) end(0x021d26)
 function void fn021d00()
 {
-	u8[A1 + 0x04] = render_flag.WORLD
-	u8[A1 + 0x06] = 8
-	u8[A1 + 0x07] = 8
-	u16[A1 + 0x08] = 0x0200
-	u16[A1 + 0x0a] = 0x041b
-	u32[A1 + 0x0c] = 0x022b9e
+	objA1.render_flags = render_flag.WORLD
+	objA1.box_size.y = 8
+	objA1.box_size.x = 8
+	objA1.sprite_priority = 0x0200
+	objA1.sprite_attributes = 0x041b
+	objA1.mapping_offset = 0x022b9e
 }
 
 
@@ -109,13 +109,13 @@ function void fn021d4c()
 	D0.u16 = objA0.position.x.u16
 	if (D0.u16 >= u16[A0 + 0x46])
 	{
-		if (s8[A0 + 0x2c] < 0)
+		if (s8(objA0.subtype2c) < 0)
 		{
 			objA0.update_address = 0x021df2
 			objA0.velocity.x = 0x800
 			objA0.velocity.y = 0x200
 			objA0.mapping_offset = 0x02bfda
-			objA0.sprite_attributes = 0x62e9
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x02e9)
 			objA0.box_size.x = 8
 			objA0.box_size.y = 12
 			objA0.animation.sprite = 0
@@ -466,7 +466,8 @@ function void fn0220c2()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 4)
 		{
-			D1.u8 = D0.u8 & 0x70
+			// Check if jump button pressed
+			D1.u8 = D0.u8 & CONTROL_ABC
 			if (D1.u8 == 0)
 			{
 				fn0221ec()
@@ -482,11 +483,11 @@ function void fn0220c2()
 				D1.s16 = s16(objA0.position.y.u16 - u16[A0 + 0x44]) << 7
 				objA1.velocity.y = D1.u16
 				u8[A2 + 0x02] = 0x3c
-				if (D0 & 0x0400)
+				if (D0 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}
-				if (D0 & 0x0800)
+				if (D0 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x200
 				}
@@ -511,7 +512,7 @@ function void fn0220c2()
 	}
 	else
 	{
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		objA1.velocity.x = 0x300
 		objA1.velocity.y = 0x200
 	}
@@ -550,8 +551,8 @@ function void fn0221ec()
 function void fn022224()
 {
 	D1.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
-	u8[A1 + 0x04] &= 0xfc
-	u8[A1 + 0x04] |= D1.u8
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA1.render_flags |= D1.u8
 
 	D0 = u8[A1 + 0x22]
 	u32 backupA2 = A2
@@ -665,7 +666,7 @@ function void fn0222f4()
 				return
 		#endif
 
-			u8[A1 + 0x04] &= 0xfd
+			objA1.render_flags &= ~render_flag.FLIP_Y
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 			objA1.velocity.x = 0
@@ -694,7 +695,7 @@ function void AIZZipLineEndPole.Init()
 	objA0.sprite_priority = 0x380
 	objA0.box_size.x = 0x20
 	objA0.render_flags = render_flag.WORLD
-	objA0.sprite_attributes = 0x4324
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0324)
 	objA0.update_address = 0x01e7dc
 	AIZZipLineEndPole.Update()
 }

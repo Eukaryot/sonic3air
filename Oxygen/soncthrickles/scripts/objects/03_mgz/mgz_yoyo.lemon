@@ -12,12 +12,12 @@
 function void fn034800()
 {
 	objA0.mapping_offset = 0x2340c0
-	objA0.sprite_attributes = 0x235f
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x035f)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
 	objA0.sprite_priority = 0x0280
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 1
 
 	A2 = A0 + 0x18
@@ -32,16 +32,16 @@ function void fn034800()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x034bee
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u8[A1 + 0x04] = objA0.render_flags
-		u8[A1 + 0x07] = 0x60
-		u8[A1 + 0x06] = 0xc0
-		u16[A1 + 0x08] = 0x0300
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.render_flags = objA0.render_flags
+		objA1.box_size.x = 0x60
+		objA1.box_size.y = 0xc0
+		objA1.sprite_priority = 0x0300
 		objA1.position.x.u16 = objA0.position.x.u16 + ((objA0.flags2a & 0x01) ? 0x78 : -0x78)
 		u16[A1 + 0x12] = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16 + 0xd0
-		u8[A1 + 0x04] |= 0x40
+		objA1.render_flags |= render_flag.COMPOUND
 		u16[A1 + 0x16] = 0x08
 		A2 = A1 + 0x18
 
@@ -181,6 +181,7 @@ function void fn0349ba()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
 		{
+			// Check if jump button pressed
 			if ((D0.u8 & CONTROL_ABC) == 0)
 			{
 				D2.u16 = objA0.position.x.u16 - 0x26
@@ -204,7 +205,7 @@ function void fn0349ba()
 			objA1.velocity.y = -0x600
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x20] = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 
 			#if STANDALONE
@@ -257,7 +258,7 @@ function void fn0349ba()
 					u16[A1 + 0x1c] = 0
 					objA1.position.x.u16 = D2.u16
 					objA1.position.y.u16 = D3.u16
-					u8[A1 + 0x20] = 0x0b
+					u8[A1 + 0x20] = char.state.PULLEY
 					u8[A1 + 0x2e] = 0x01
 					if (objA0.flags2a & 0x01)
 						u8[A1 + 0x2a] |= 0x01

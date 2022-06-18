@@ -12,8 +12,8 @@
 function void fn044826()
 {
 	objA0.mapping_offset = 0x0449bc
-	objA0.sprite_attributes = 0x240d
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040d)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
@@ -24,13 +24,13 @@ function void fn044826()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16 - 8
 		u16[A1 + 0x46] = objA1.position.y.u16
-		u8[A1 + 0x04] = objA0.render_flags
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u16[A1 + 0x08] = 0x0280
-		u8[A1 + 0x07] = 0x10
-		u8[A1 + 0x06] = 0x10
-		u8[A1 + 0x28] = 0x9a
+		objA1.render_flags = objA0.render_flags
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.sprite_priority = 0x0280
+		objA1.box_size.x = 0x10
+		objA1.box_size.y = 0x10
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.12x12)
 		u16[A0 + 0x3c] = A1.u16
 	}
 
@@ -42,8 +42,7 @@ function void fn044826()
 //# address-hook(0x0448a8) end(0x044910)
 function void fn0448a8()
 {
-	A1 = 0x04495a
-	Object.AlternativeAnimationUpdate()
+	Object.AlternativeAnimationUpdate(0x04495a)
 
 	if (objA0.base_state != 0)
 	{

@@ -21,7 +21,7 @@ function void fn040e5c()
 	objA0.countdown_value = (objA0.subtype2c & 0x7f) * 8
 	u16[A0 + 0x38] = 0x02
 	objA0.animation.sprite = 0x06
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 
 	u16[A0 + 0x16] = 1
 	A2 = A0 + 0x18
@@ -104,6 +104,7 @@ function void fn040f52()
 	{
 		if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04)
 		{
+			// Check if jump button pressed
 			D0.u8 &= CONTROL_ABC
 			if (D0.u8 == 0)
 			{
@@ -131,16 +132,16 @@ function void fn040f52()
 				u8[A2] = 0
 				u8[A2+2] = 0x12
 
-				if (D0.u16 & 0x0f00)
+				if (D0.u16 & 0x0f00)		// Any direction held?
 				{
 					u8[A2+2] = 0x3c
 				}
 
-				if (D0.u16 & 0x0800)
+				if (D0.u16 & 0x0800)		// CONTROL_RIGHT held
 				{
 					objA1.velocity.x = 0x200
 				}
-				else if (D0.u16 & 0x0400)
+				else if (D0.u16 & 0x0400)		// CONTROL_LEFT held
 				{
 					objA1.velocity.x = -0x200
 				}
@@ -192,7 +193,7 @@ function void fn040f52()
 
 				u8[A2] = 1
 
-				playSound(0x5b)
+				playSound(SFX_CLICK)
 			}
 		}
 	}

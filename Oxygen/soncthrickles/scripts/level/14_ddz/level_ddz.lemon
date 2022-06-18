@@ -298,11 +298,13 @@ function void fn081492()
 
 			if (allocDynamicObjectStd())
 			{
+				// Spawn screen mover for the left border
 				objA1.update_address = 0x084a76
 			}
 
 			if (allocDynamicObjectStd())
 			{
+				// Spawn screen mover for the right border
 				objA1.update_address = 0x084a48
 			}
 		}
@@ -383,26 +385,26 @@ function void fn08160a()
 		super.active = 1
 	}
 	super.ring_dec.frames = 60
-	u32[0xffffb00c] = 0x146816		// "char.mapping_offset"
+	u32[0xffffb000 + 0x0c] = 0x146816		// "char.mapping_offset"
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_TAILS))
 	{
-		u8[0xffffb020] = char.state.TAILS_TRANSFORM
+		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
 	}
 	else
 #endif
 	{
-		u8[0xffffb020] = char.state.TRANSFORMING
+		u8[0xffffb000 + 0x20] = char.state.TRANSFORMING
 	}
-	u8[0xffffb02e] = 0x81
+	u8[0xffffb000 + 0x2e] = 0x81
 	global.move.speedcap = 0xa00
 	global.move.acceleration = 0x30
 	global.move.deceleration = 0x100
-	u8[0xffffb035] = 0
-	u8[0xffffb02b] |= char.bonus.INVINCIBLE
+	u8[0xffffb000 + 0x35] = 0
+	u8[0xffffb000 + 0x2b] |= char.bonus.INVINCIBLE
 
 #if STANDALONE
-	playSound(0x9f)
+	playSound(SFX_SUPERTRANSFORM)
 #else
 	playSound(0x46)
 #endif
@@ -434,7 +436,7 @@ function void fn08167c()
 
 	if (global.super_emeralds != 7)
 	{
-		u32[0xffffcbc0] = 0x08242a
+		u32[0xffffcbc0] = 0x08242a		// Super Sonic stars in Doomsday Zone
 	}
 	else
 	{
@@ -550,7 +552,7 @@ function void fn08151c()
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
 		u8[A1 + 0x2e] = 1
-		u8[A1 + 0x20] = 0
+		u8[A1 + 0x20] = char.state.RUNNING
 		objA1.velocity.x = 0x0800
 		u16[A1 + 0x1c] = 0x0800
 	}
@@ -681,6 +683,8 @@ function void fn082772()
 		if (control.pad1 != 0 && player1.control_override == 0)
 		{
 			D0.u16 = (control.pad1.state & CONTROL_DPAD) * 4
+
+			// Check if jump button pressed
 			if (control.pad1.pressed & CONTROL_ABC)
 			{
 				if (u8[A1 + 0x34] == 0)

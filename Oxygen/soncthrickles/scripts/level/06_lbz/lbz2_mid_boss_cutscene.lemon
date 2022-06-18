@@ -43,7 +43,7 @@ function void fn08d2b6()
 				objA0.countdown_value = 0x3f
 				objA0.countdown_callback = 0x08d344
 
-				u8[A1 + 0x04] &= ~render_flag.FLIP_X
+				objA1.render_flags &= ~render_flag.FLIP_X
 				u8[A1 + 0x0a] |= 0x80
 				objA1.state = char.state.STANDING
 				objA1.flags2a &= ~char.flag.FACING_LEFT
@@ -55,7 +55,7 @@ function void fn08d2b6()
 				screenmover_target.right = 0x6000
 
 				// "spawnSimpleChildObjects(0x084b00)" replaced by:
-				spawnSimpleChildObjects(0x084a48, 1)
+				spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 				// "spawnChildObjects(0x0681b4)" replaced by:
 				spawnChildObject(0x068062, 0x00, 30, 0)
@@ -87,12 +87,12 @@ function void LBZ2MidBossCutscene.stopTailsFromSuicide()
 		RespawnTails()
 		A0 = backupA0
 	}
-	else if (u16[0xffffb05a] >= 0x3bb0)
+	else if (u16[0xffffb04a + 0x10] >= 0x3bb0)
 	{
-		u16[0xffffb05a] = 0x3bb0
-		u16[0xffffb05e] = min(u16[0xffffb05e], 0x0630)
-		u16[0xffffb062] = 0
-		u16[0xffffb066] = 0
+		u16[0xffffb04a + 0x10] = 0x3bb0
+		u16[0xffffb04a + 0x14] = min(u16[0xffffb04a + 0x14], 0x0630)
+		u16[0xffffb04a + 0x18] = 0
+		u16[0xffffb04a + 0x1c] = 0
 		tails.ai_routine = 0x0a
 	}
 }
@@ -278,7 +278,7 @@ function void fn08d47c()
 //# address-hook(0x08d4cc) end(0x08d500)
 function void fn08d4cc()
 {
-	if (u8[A0 + 0x04] & 0x80)
+	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		fn0847e6()
 		UpdateMovementStraightSimple()
@@ -288,6 +288,7 @@ function void fn08d4cc()
 
 	if (allocDynamicObjectStd())
 	{
+		// Trigger second LBZ2 boss
 		objA1.update_address = 0x0729ba
 		objA1.position.x.u16 = 0x44a0
 		objA1.position.y.u16 = 0x0780
@@ -359,8 +360,7 @@ function void fn0628aa()
 //# address-hook(0x0628e0) end(0x062908)
 function void fn0628e0()
 {
-	A1 = 0x0663ba
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
 	objA0.render_flags |= render_flag.FLIP_X
@@ -369,8 +369,7 @@ function void fn0628e0()
 
 	CutsceneKnuckles.loadPalette()
 
-	A2 = 0x066592
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x066592)
 }
 
 
@@ -434,6 +433,7 @@ function void fn062964()
 
 	if (allocDynamicObjectStd())
 	{
+		// Create the object that fades out the Knuckles theme and starts the level music afterwards
 		objA1.update_address = 0x085b0a
 	}
 }
@@ -444,7 +444,7 @@ function void fn0629a8()
 {
 	if (objA0.position.y.u16 >= water.height.current)
 	{
-		playSound(0x39)
+		playSound(SFX_WATERSPLASH)
 		objA0.base_state = 0x0c
 	}
 
@@ -714,12 +714,12 @@ function void fn05480c()
 //# address-hook(0x0549c6) end(0x054a92)
 function void fn0549c6()
 {
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	if (player1.camera_lock)
 	{
-		D0.u16 = u16[0xffffb010] - camera.position.x.u16 - getScreenWidth() / 2
+		D0.u16 = u16[0xffffb000 + 0x10] - camera.position.x.u16 - getScreenWidth() / 2
 		if (D0.s16 >= 0)
 		{
 			camera.position.x.u16 += D0.u16

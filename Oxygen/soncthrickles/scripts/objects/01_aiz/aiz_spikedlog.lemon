@@ -16,7 +16,7 @@
 function void AIZSpikedLog.Init()
 {
 	objA0.mapping_offset = 0x22b0f0
-	objA0.sprite_attributes = 0x42e9
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x08
 	objA0.render_flags = render_flag.WORLD
@@ -27,8 +27,8 @@ function void AIZSpikedLog.Init()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02b8ee
-		u8[A1 + 0x04] = render_flag.WORLD
-		u8[A1 + 0x28] = 0x9c
+		objA1.render_flags = render_flag.WORLD
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.24x4)
 		u16[A1 + 0x3c] = A0.u16
 		u16[A0 + 0x3c] = A1.u16
 	}
@@ -51,7 +51,7 @@ function void AIZSpikedLog.Update()
 		}
 		else
 		{
-			D0.u8 = objA0.flags2a & 0x18
+			D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 			if (D0.u8 == 0)
 			{
 				if (u8[A0 + 0x32] != 0)

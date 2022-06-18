@@ -47,9 +47,9 @@ function void CompetitionMode.MainMenu()
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
 	level.framecounter = 0
-	if (competition_mode.mode >= 0x03)
+	if (competition_mode.menu.game_mode >= 0x03)
 	{
-		competition_mode.mode = 0
+		competition_mode.menu.game_mode = 0
 	}
 
 	Enigma.decompress(0x39d2a2, 0xffff0000, 0x6001)
@@ -57,7 +57,7 @@ function void CompetitionMode.MainMenu()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0xa85c
@@ -66,11 +66,12 @@ function void CompetitionMode.MainMenu()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x39f46e
-	A2 = 0xffff6940
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0x6940
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -100,7 +101,7 @@ function void CompetitionMode.MainMenu()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x30)
 
-	playMusic(0x2d)
+	playMusic(MUSIC_COMPETITIONMENU)
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -139,17 +140,17 @@ function void CompetitionMode.MainMenu()
 			return
 		}
 
-		if (D0.u8 & 0xf0)
+		if (D0.u8 & (CONTROL_START | CONTROL_ABC))
 		{
-			D2 = competition_mode.mode * 2
+			D2 = competition_mode.menu.game_mode * 2
 			call 0x00aa28 + D2.s16
 			break
 		}
 
-		D1.u8 = competition_mode.mode
+		D1.u8 = competition_mode.menu.game_mode
 		if (D0.u16 & CONTROL_UP)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 			if (D1.s8 <= 0)
 				D1 = 3
 			else
@@ -157,12 +158,12 @@ function void CompetitionMode.MainMenu()
 		}
 		else if (D0.u16 & CONTROL_DOWN)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 			++D1.u8
 			if (D1.u8 > 3)
 				D1 = 0
 		}
-		competition_mode.mode = D1.u8
+		competition_mode.menu.game_mode = D1.u8
 	}
 }
 
@@ -206,9 +207,9 @@ function void fn00aa2e()
 //# address-hook(0x00aa36) end(0x00aa52)
 function void fn00aa36()
 {
-	u8[0xffffff8b] = 0
-	u8[0xffffff8a] = u8[0xffffef4e]
-	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
+	competition_mode.game_mode = 0
+	competition_mode.item_flag = competition_mode.menu.items_toggle
+	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
 	global.game_mode = 0x3c
 	fn00aa8e()
 }
@@ -217,9 +218,9 @@ function void fn00aa36()
 //# address-hook(0x00aa54) end(0x00aa72)
 function void fn00aa54()
 {
-	u8[0xffffff8b] = 0x03
-	u8[0xffffff8a] = u8[0xffffef4e]
-	competition_mode.multiplay = (control.pad2.pressed & 0xe0) ? 0xff : 0x00
+	competition_mode.game_mode = 3
+	competition_mode.item_flag = competition_mode.menu.items_toggle
+	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
 	global.game_mode = 0x40
 	fn00aa8e()
 }
@@ -228,9 +229,10 @@ function void fn00aa54()
 //# address-hook(0x00aa74) end(0x00aaa0)
 function void fn00aa74()
 {
-	if (control.pad1.pressed & 0xe0)
+	if (control.pad1.pressed & (CONTROL_START | CONTROL_A | CONTROL_C))
 	{
-		u16[0xffffff8a] = 0xffff
+		u16[0xffffff8a] = 0xffff	// Items off (competition_mode.item_flag = 0xff), set game mode to time attack (competition_mode.game_mode = -1)
+
 		competition_mode.multiplay = 0
 		global.game_mode = 0xc0
 		fn00aa8e()
@@ -253,10 +255,10 @@ function void fn00aa8e()
 //# address-hook(0x00aaa6) end(0x00aad8)
 function void fn00aaa6()
 {
-	D1.u8 = competition_mode.mode
+	D1.u8 = competition_mode.menu.game_mode
 	if (D0.u16 & 0x01)
 	{
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 		if (D1.s8 <= 0)
 			D1 = 3
 		else
@@ -264,12 +266,12 @@ function void fn00aaa6()
 	}
 	else if (D0.u16 & 0x02)
 	{
-		playSound(0x5b)
+		playSound(SFX_CLICK)
 		++D1.u8
 		if (D1.u8 > 3)
 			D1 = 0
 	}
-	competition_mode.mode = D1.u8
+	competition_mode.menu.game_mode = D1.u8
 
 	// TODO: Resolve this... it's actually a "continue" in the main menu loop
 	//  -> This whole function should be removed as soon as it's not referenced any more
@@ -286,8 +288,8 @@ function void fn00aadc()
 	D0.u8 = objA0.flags2e
 	if (D0.s8 >= 0)
 	{
-		objA0.sprite_attributes &= 0x9fff
-		D1.u16 = (D0.u8 == competition_mode.mode) ? 0x4000 : 0x2000
+		objA0.sprite_attributes &= ~sprite_attribute.PALETTE
+		D1.u16 = (D0.u8 == competition_mode.menu.game_mode) ? sprite_attribute.PALETTE.LINE2 : sprite_attribute.PALETTE.LINE1
 		objA0.sprite_attributes |= D1.u16
 	}
 	DrawObject()
@@ -297,16 +299,16 @@ function void fn00aadc()
 //# address-hook(0x00ab00) end(0x00ab46)
 function void fn00ab00()
 {
-	if (competition_mode.mode <= 0x01)
+	if (competition_mode.menu.game_mode <= 0x01)
 	{
-		D0.u16 = (control.pad1.pressed | control.pad2.pressed) & 0x0c
+		D0.u16 = (control.pad1.pressed | control.pad2.pressed) & (CONTROL_LEFT | CONTROL_RIGHT)
 		if (D0.u16 != 0)
 		{
-			u8[0xffffef4e] = (u8[0xffffef4e] == 0) ? 0xff : 0x00
-			playSound(0x5b)
+			competition_mode.menu.items_toggle = (competition_mode.menu.items_toggle == 0) ? 0xff : 0x00
+			playSound(SFX_CLICK)
 		}
 
-		objA0.position.x.u16 = ((u8[0xffffef4e] == 0) ? 0x015c : 0x017c) + getScreenExtend()
+		objA0.position.x.u16 = ((competition_mode.menu.items_toggle == 0) ? 0x015c : 0x017c) + getScreenExtend()
 		if (level.framecounter.low & 0x08)
 		{
 			DrawObject()
@@ -372,7 +374,7 @@ function void CompetitionMode.StageSelect()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0xa85c
@@ -381,11 +383,12 @@ function void CompetitionMode.StageSelect()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x3a1b30
-	A2 = 0xffffb920
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -405,21 +408,21 @@ function void CompetitionMode.StageSelect()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f) + u16[(A1+=2)-2]
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
 		--D0.s16
 	}
 
-	D0 = u32(u8[0xffffffea]) * 0x55
+	D0 = u32(competition_mode.character.player1) * 0x55
 	D0.u8 += 0x40
-	u8[0xffffb0c2] = D0.u8
-	if (s8[0xfffff600] >= 0)
+	u8[0xffffb094 + 0x2e] = D0.u8
+	if (s8(global.game_mode) >= 0)
 	{
-		D0 = u32(u8[0xffffffeb]) * 0x55
+		D0 = u32(competition_mode.character.player2) * 0x55
 		D0.u8 += 0x40
-		u8[0xffffb234] = D0.u8
+		u8[0xffffb206 + 0x2e] = D0.u8
 	}
 
 	fn01aa6e()
@@ -433,11 +436,11 @@ function void CompetitionMode.StageSelect()
 	CompetitionMode.drawBackground(0x00)
 
 	A0 = 0xffffb378
-	u32[A0] = 0x00af58
+	objA0.update_address = 0x00af58
 	objA0.mapping_offset = 0x20a6e4
-	objA0.sprite_attributes += 0xc29f
+	objA0.sprite_attributes += (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x029f)
 	objA0.position.x.u16 = 0xb0 + getScreenExtend()
-	playMusic(0x2d)
+	playMusic(MUSIC_COMPETITIONMENU)
 
 	global.frame_state = 0x1e
 	waitForNextFrame()
@@ -515,7 +518,7 @@ function void CompetitionMode.StageSelect()
 		if (D1 & CONTROL_B)
 	#endif
 		{
-			u8[0xffffb0c3] = 0
+			u8[0xffffb094 + 0x2f] = 0
 			u8[0xffffeee2] = 0xff
 		}
 	#if STANDALONE
@@ -524,20 +527,20 @@ function void CompetitionMode.StageSelect()
 		if (D2 & CONTROL_B)
 	#endif
 		{
-			u8[0xffffb235] = 0
+			u8[0xffffb206 + 0x2f] = 0
 			u8[0xffffeee3] = 0xff
 		}
 		D1.u8 |= D2.u8
-		D2.u16 = D1.u8 & 0x03
+		D2.u16 = D1.u8 & (CONTROL_UP | CONTROL_DOWN)
 		if (D2.u16 != 0)
 		{
 			if ((D2.u8 & CONTROL_UP) == 0)
 			{
-				if (competition_mode.stage != 0x04)
+				if (competition_mode.menu.stage != 0x04)
 				{
-					playSound(0x5b)
-					++competition_mode.stage
-					if (competition_mode.stage != 0x01 && competition_mode.stage != 0x04)
+					playSound(SFX_CLICK)
+					++competition_mode.menu.stage
+					if (competition_mode.menu.stage != 0x01 && competition_mode.menu.stage != 0x04)
 					{
 						s16[0xffffeee6] = 0x48
 						continue
@@ -546,11 +549,11 @@ function void CompetitionMode.StageSelect()
 			}
 			else
 			{
-				if (competition_mode.stage != 0)
+				if (competition_mode.menu.stage != 0)
 				{
-					playSound(0x5b)
-					--competition_mode.stage
-					if (competition_mode.stage != 0x00 && competition_mode.stage != 0x03)
+					playSound(SFX_CLICK)
+					--competition_mode.menu.stage
+					if (competition_mode.menu.stage != 0x00 && competition_mode.menu.stage != 0x03)
 					{
 						s16[0xffffeee6] = -0x48
 						continue
@@ -565,7 +568,7 @@ function void CompetitionMode.StageSelect()
 
 	// Start now
 	playSound(0x63)
-	global.zone = u8[0x00af1e + competition_mode.stage]
+	global.zone = u8[0x00af1e + competition_mode.menu.stage]
 	global.act = 0
 	fn00c104()
 	global.game_mode = 0x0c
@@ -580,7 +583,7 @@ function void fn00af24()
 {
 	if (u16[0xffffe000] == 0xffa8 + getScreenExtend() && u16[0xffffeee6] == 0)
 	{
-		objA0.position.y.u16 = u32(competition_mode.stage) * 0x48 + (0xac - scrolloffset.y.planeA)
+		objA0.position.y.u16 = u32(competition_mode.menu.stage) * 0x48 + (0xac - scrolloffset.y.planeA)
 		if (level.framecounter.low & 0x08)
 		{
 			DrawObject()
@@ -594,11 +597,11 @@ function void fn00af58()
 {
 	if (u16[0xffffe000] == 0xffa8 + getScreenExtend() && u16[0xffffeee6] == 0)
 	{
-		objA0.position.y.u16 = u32(competition_mode.stage) * 0x48 + (0xa8 - scrolloffset.y.planeA)
-		objA0.animation.sprite = competition_mode.stage + 0x06
+		objA0.position.y.u16 = u32(competition_mode.menu.stage) * 0x48 + (0xa8 - scrolloffset.y.planeA)
+		objA0.animation.sprite = competition_mode.menu.stage + 0x06
 		DrawObject()
 
-		A1 = 0x20a5be + competition_mode.stage * 0x20
+		A1 = 0x20a5be + competition_mode.menu.stage * 0x20
 		copyMemory(0xfffffc40, A1, 0x20)
 	}
 	else
@@ -611,7 +614,7 @@ function void fn00af58()
 //# address-hook(0x00afb2) end(0x00afc6)
 function void fn00afb2()
 {
-	D0 = clamp(s8(competition_mode.stage) - 1, 0, 2)
+	D0 = clamp(s8(competition_mode.menu.stage) - 1, 0, 2)
 }
 
 
@@ -644,7 +647,7 @@ function void fn00b006()
 
 	D0 = 0xc004 + ((u32(D0.u16) * 0x48 + 0x20) << 4)
 	D7.u16 = D0.u16
-	if (s8[0xfffff600] < 0)
+	if (s8(global.game_mode) < 0)
 	{
 		D0.u16 += 0x0300
 	}
@@ -796,7 +799,7 @@ function void fn00b2cc()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0xa85c
@@ -805,11 +808,12 @@ function void fn00b2cc()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x3a1b30
-	A2 = 0xffffb920
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -833,17 +837,17 @@ function void fn00b2cc()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f) + u16[(A1+=2)-2]
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
 		--D0.s16
 	}
 
-	D0 = u32(u8[0xffffffea]) * 0x55
-	u8[0xffffb0c2] = 0x40 + D0.u8
-	D0 = u32(u8[0xffffffeb]) * 0x55
-	u8[0xffffb234] = 0x40 + D0.u8
+	D0 = u32(competition_mode.character.player1) * 0x55
+	u8[0xffffb094 + 0x2e] = 0x40 + D0.u8
+	D0 = u32(competition_mode.character.player2) * 0x55
+	u8[0xffffb206 + 0x2e] = 0x40 + D0.u8
 
 	fn01aa6e()
 	UpdateGameObjects()
@@ -855,7 +859,7 @@ function void fn00b2cc()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x00)
 
-	playMusic(0x2d)
+	playMusic(MUSIC_COMPETITIONMENU)
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -1100,7 +1104,7 @@ function void fn00b64e()
 function void fn00b656()
 {
 	objA0.mapping_offset = 0x3a1aee
-	objA0.sprite_attributes = 0x25c9
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x05c9)
 	D0 = 0
 	D1.s32 = -0x55
 	D2 = objA0.flags2e
@@ -1198,7 +1202,7 @@ function void fn00c0b8()
 	fn00c0ea()
 
 	objA0.sprite_priority = 0x80
-	u16[A1 + 0x08] = 0x0100
+	objA1.sprite_priority = 0x0100
 	u16[A2 + 0x08] = 0x0180
 	u8[A0 + 0x0a] |= 0x80
 	u8[A1 + 0x0a] &= ~0x80
@@ -1272,15 +1276,8 @@ function void fn00b74e()
 	global.level_started = 0
 	u16[0xffffeee8] = 30
 
-	A0 = 0x39d2a2
-	A1 = 0xffff0000
-	D0.u16 = 0x01
-	Enigma.Decompress()
-
-	A0 = 0x20ae62
-	A1 = 0xffff1000
-	D0.u16 = 0xa34a
-	Enigma.Decompress()
+	Enigma.decompress(0x39d2a2, 0xffff0000, 0x01)
+	Enigma.decompress(0x20ae62, 0xffff1000, 0xa34a)
 
 	A0 = 0x00bbac
 	fn00c088()
@@ -1302,10 +1299,12 @@ function void fn00b74e()
 	fn00c006()
 
 	A0 = 0x3a16be
+	// A1 = 0xffff5300
 	A2 = 0xffff0000 + 0x6940
 	fn00c006()
 
 	A0 = 0x3a1b30
+	// A1 = 0xffff6800
 	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
@@ -1327,7 +1326,7 @@ function void fn00b74e()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = u16[(A1+=2)-2] + 0x829f
+		objA0.sprite_attributes = u16[(A1+=2)-2] + (sprite_attribute.PRIORITY | 0x029f)
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
@@ -1343,7 +1342,7 @@ function void fn00b74e()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x00)
 
-	playMusic(0x28)
+	playMusic(MUSIC_CONTINUE)
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -1426,8 +1425,8 @@ function void fn00b9a6()
 {
 	// Character icon
 	objA0.mapping_offset = 0x3a1aee
-	objA0.sprite_attributes = 0xa5c9
-	objA0.animation.sprite = (objA0.flags2e == 0) ? u8[0xffffffea] : u8[0xffffffeb]
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x05c9)
+	objA0.animation.sprite = (objA0.flags2e == 0) ? competition_mode.character.player1 : competition_mode.character.player2
 	fn00b4f6()
 }
 
@@ -1438,7 +1437,7 @@ function void fn00b9a6()
 //# address-hook(0x00b9ca) end(0x00ba02)
 function void fn00b9ca()
 {
-	objA0.sprite_attributes = 0xa34a
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x034a)
 	D0.u8 = u8[0xffffeea2]
 	D1.u8 = u8[0xffffeea3]
 	if (objA0.flags2e != 0)
@@ -1663,7 +1662,7 @@ function void fn00bc08()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0020
+	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
 	u32[0xffffef44] = 0x00a85c
@@ -1672,15 +1671,17 @@ function void fn00bc08()
 
 	A0 = 0x39f87e
 	A1 = 0xffff0000
-	A2 = 0xffff53e0
+	A2 = 0xffff0000 + 0x53e0
 	fn00c006()
 
 	A0 = 0x3a16be
-	A2 = 0xffff6940
+	// A1 = 0xffff5300
+	A2 = 0xffff0000 + 0x6940
 	fn00c006()
 
 	A0 = 0x3a1b30
-	A2 = 0xffffb920
+	// A1 = 0xffff6800
+	A2 = 0xffff0000 + 0xb920
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -1717,7 +1718,7 @@ function void fn00bc08()
 		objA0.position.x.frac = u16[(A1+=2)-2]
 		objA0.position.y.u16 = u16[A1]
 		objA0.position.y.frac = u16[(A1+=2)-2]
-		objA0.sprite_attributes = 0x829f + u16[(A1+=2)-2]
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f) + u16[(A1+=2)-2]
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		objA0.flags2e = u8[(A1+=1)-1]
 		A0 += 0x4a
@@ -1728,7 +1729,7 @@ function void fn00bc08()
 	UpdateGameObjects()
 	RenderSprites()
 	CompetitionMode.drawBackground(0x00)
-	playMusic(0x28)
+	playMusic(MUSIC_CONTINUE)
 
 	global.frame_state = 0x1e
 	waitForNextFrame()
@@ -1762,7 +1763,7 @@ function void fn00bc08()
 		}
 		else
 		{
-			if (control.pad1.pressed & 0xe0)
+			if (control.pad1.pressed & (CONTROL_START | CONTROL_A | CONTROL_C))
 			{
 				global.game_mode = 0xc0
 				return
@@ -1805,18 +1806,18 @@ function void fn00beb2()
 function void fn00bef8()
 {
 	objA0.mapping_offset = 0x02f26a
-	objA0.sprite_attributes = 0x9fd5
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.FLIP_Y | sprite_attribute.FLIP_X | 0x07d5)
 
 	A1 = 0xffffe60c + ((global.zone - 0x0e) << 4)
 	D0 = u8[A1 + objA0.flags2e]
 	if (D0.u16 == 0x02)
 	{
-		objA0.sprite_attributes += 0x2000
+		objA0.sprite_attributes += sprite_attribute.PALETTE.LINE1
 	}
 	D0.u16 += 0x29
 	objA0.animation.sprite = D0.u8
 
-	u32[A0] = 0x00bf3e
+	objA0.update_address = 0x00bf3e
 	fn00bf3e()
 }
 
@@ -1824,7 +1825,7 @@ function void fn00bef8()
 //# address-hook(0x00bf3e) end(0x00bf56)
 function void fn00bf3e()
 {
-	if (u8[0xffffee5a] != objA0.flags2e || (level.framecounter.low & 0x08))
+	if (competition_mode.timeattack.new_record != objA0.flags2e || (level.framecounter.low & 0x08))
 	{
 		DrawObject()
 	}

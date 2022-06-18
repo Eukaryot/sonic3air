@@ -92,7 +92,7 @@ function void UpdateGameObjects()
 #endif
 
 	A0 = 0xffffb000
-	if (competition_mode.active == 0 && u8[A0 + 0x05] >= 0x06 && u8[A0 + 0x05] != 0x0c)
+	if (competition_mode.active == 0 && char.base_state >= 0x06 && char.base_state != 0x0c)
 	{
 		// Special case: Main character just died
 
@@ -615,13 +615,13 @@ function void UpdateRollingDemo()
 		global.game_mode = 0x04
 	}
 
-	A0 = u32[0xffffef52]
+	A0 = rolling_demo.progress
 	if (global.zone != 0x04 && global.zone < 0x07)
 	{
-		D1.u8 = u8[0xffffef50] & CONTROL_START
+		D1.u8 = rolling_demo.pressed_start & CONTROL_START
 		D1.u8 |= u8[A0-1]
 		D0.u8 = control.pad1.state & CONTROL_START
-		u8[0xffffef50] = (D0.u8 != 0) ? 0xff : 0
+		rolling_demo.pressed_start = (D0.u8 != 0) ? 0xff : 0
 		D0.u8 |= u8[A0]
 		++A0
 	}
@@ -635,11 +635,11 @@ function void UpdateRollingDemo()
 			A0 += 2
 		}
 
-		D1.u8 = u8[0xffffef50] & CONTROL_START
+		D1.u8 = rolling_demo.pressed_start & CONTROL_START
 		D1.u8 |= rolling_demo.last_input
 		rolling_demo.last_input = D2.u8
 		D0.u8 = control.pad1.state & CONTROL_START
-		u8[0xffffef50] = (D0.u8 != 0) ? 0xff : 0
+		rolling_demo.pressed_start = (D0.u8 != 0) ? 0xff : 0
 		D0.u8 |= D2.u8
 	}
 
@@ -656,8 +656,8 @@ function void UpdateRollingDemo()
 	D1.u8 ^= D0.u8
 	D1.u8 &= D0.u8
 	control.pad1.pressed = D1.u8
-	control.pad2 &= 0x8080
-	u32[0xffffef52] = A0
+	control.pad2 &= 0x8080		// CONTROL_START, CONTROL_START
+	rolling_demo.progress = A0
 }
 
 

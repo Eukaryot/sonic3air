@@ -85,7 +85,7 @@ function void fn091a6a()
 function void fn091ab0()
 {
 	objA0.velocity.x = -objA0.velocity.x
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.countdown_value = u16[A0 + 0x3a]
 }
 

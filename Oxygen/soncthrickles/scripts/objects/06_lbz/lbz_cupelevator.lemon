@@ -16,7 +16,7 @@
 function void CupElevator.Init()
 {
 	objA0.mapping_offset = 0x22619a
-	objA0.sprite_attributes = 0x440d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x20
@@ -34,12 +34,12 @@ function void CupElevator.Init()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02703e
-		u8[A1 + 0x04] = render_flag.WORLD
-		u8[A1 + 0x07] = 0x20
-		u8[A1 + 0x06] = 0x10
-		u16[A1 + 0x08] = 0x80
-		u16[A1 + 0x0a] = 0x440d
-		u32[A1 + 0x0c] = 0x22619a
+		objA1.render_flags = render_flag.WORLD
+		objA1.box_size.x = 0x20
+		objA1.box_size.y = 0x10
+		objA1.sprite_priority = 0x80
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
+		objA1.mapping_offset = 0x22619a
 		objA1.position.x.u16 = objA0.position.x.u16
 		u16[A1 + 0x30] = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -54,12 +54,12 @@ function void CupElevator.Init()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x02702e
-			u8[A1 + 0x04] = render_flag.WORLD
-			u8[A1 + 0x07] = 0x20
-			u8[A1 + 0x06] = 0x10
-			u16[A1 + 0x08] = 0x0100
-			u16[A1 + 0x0a] = 0x440d
-			u32[A1 + 0x0c] = 0x22619a
+			objA1.render_flags = render_flag.WORLD
+			objA1.box_size.x = 0x20
+			objA1.box_size.y = 0x10
+			objA1.sprite_priority = 0x0100
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
+			objA1.mapping_offset = 0x22619a
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			u8[A1 + 0x22] = 0x02
@@ -123,7 +123,7 @@ function void CupElevator.Update()
 
 	A2 = A0 + 0x3c
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	D0.u16 = control.player1
 	fn026eda()
 
@@ -134,7 +134,7 @@ function void CupElevator.Update()
 
 	A2 = A0 + 0x3d
 	A1 = 0xffffb04a
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	D0.u16 = control.tails
 	fn026eda()
 
@@ -515,11 +515,11 @@ function void fn026e78()
 		}
 
 		A1 = 0xffffb000
-		D6 = 3
+		D6 = 3		// object.flag.P1_ON_OBJECT
 		fn026eb4()
 
 		A1 = 0xffffb04a
-		D6 = 4
+		D6 = 4		// object.flag.P2_ON_OBJECT
 		fn026eb4()
 
 		UnloadObject()
@@ -530,15 +530,15 @@ function void fn026e78()
 //# address-hook(0x026eb4) end(0x026ed8)
 function void fn026eb4()
 {
-	u8 bit = 1 << D6.u8
+	u8 bit = (1 << D6.u8)
 	if (objA0.flags2a & bit)
 	{
 		objA0.flags2a &= ~bit
-		u16[A1 + 0x08] = 0x0100
+		objA1.sprite_priority = 0x0100
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] &= ~0x20
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] &= ~char.flag.PUSHING
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 }
 
@@ -550,6 +550,8 @@ function void fn026eda()
 	if (debug_mode.state)
 		return
 #endif
+
+	u8 bit = (1 << D6.u8)
 
 	if (u8[A2] == 0)
 	{
@@ -568,7 +570,7 @@ function void fn026eda()
 			fn01df90()
 		}
 
-		if ((objA0.flags2a & (1 << D6.u8)) == 0)
+		if ((objA0.flags2a & bit) == 0)
 			return
 
 		if (u16[A0 + 0x34] == 0)
@@ -590,25 +592,26 @@ function void fn026eda()
 	{
 		if (s8[A1 + 0x04] >= 0 || u8[A1 + 0x05] >= 0x04)
 		{
-			objA0.flags2a &= ~(1 << D6.u8)
-			u8[A1 + 0x2a] &= ~0x08
-			u16[A1 + 0x08] = 0x0100
+			objA0.flags2a &= ~bit
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			objA1.sprite_priority = 0x0100
 			u8[A1 + 0x2e] = 0
 			u8[A2] = 0
 			u8[A2 + 0x02] = 0x3c
 			return
 		}
 
+		// Check if jump button pressed
 		D0.u8 &= CONTROL_ABC
 		if (D0.u8 != 0 && u8[0xfffffaa9] == 0)
 		{
 			// Jumping out of the cup
-			u16[A1 + 0x08] = 0x0100
+			objA1.sprite_priority = 0x0100
 			u8[A1 + 0x2e] = 0
-			objA0.flags2a &= ~(1 << D6.u8)
-			u8[A1 + 0x2a] &= ~0x08
-			u8[A1 + 0x2a] &= ~0x20
-			u8[A1 + 0x2a] |= 0x02
+			objA0.flags2a &= ~bit
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] &= ~char.flag.PUSHING
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			u8[A1 + 0x40] = 0
 			#if STANDALONE
 				// Why not allow jump moves here?
@@ -616,7 +619,7 @@ function void fn026eda()
 			#endif
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = 0x02
+			u8[A1 + 0x20] = char.state.ROLLING
 			objA1.flags2a |= char.flag.ROLLING
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
 			if (D0 & 0x00000400)
@@ -638,7 +641,7 @@ function void fn026eda()
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16 - 0x10
 	D0.u8 = objA0.value26 + 0x20
-	u16[A1 + 0x08] = (D0.u8 >= 0xc0) ? 0x0100 : 0x0280
+	objA1.sprite_priority = (D0.u8 >= 0xc0) ? 0x0100 : 0x0280
 
 	D0 = objA0.value26
 	fn032610()
@@ -694,7 +697,7 @@ function void fn02703e()
 function void fn027096()
 {
 	objA0.mapping_offset = 0x22619a
-	objA0.sprite_attributes = 0x440d
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0180
 	objA0.box_size.x = 0x08

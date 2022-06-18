@@ -464,33 +464,33 @@ function void fn04b4c4()
 
 	// This updates animations of the blocks
 	A1 = 0xffff7005
-	--u8[0xfffffeb0]
-	if (s8[0xfffffeb0] < 0)
+	--slotmachine.goalblock.animtimer
+	if (s8(slotmachine.goalblock.animtimer) < 0)
 	{
-		u8[0xfffffeb0] = 1
+		slotmachine.goalblock.animtimer = 1
 	#if STANDALONE
 		// Slow down animation of "Goal" blocks on highest anti-flicker setting
 		if (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2)
-			u8[0xfffffeb0] = 0x0f
+			slotmachine.goalblock.animtimer = 0x0f
 	#endif
 
 		++u8[A1 + 0x20]
 		if (u8[A1 + 0x20] >= 3)
 			u8[A1 + 0x20] = 0
-		++u8[0xfffffeb1]
-		if (u8[0xfffffeb1] >= 6)
-			u8[0xfffffeb1] = 0
+		++slotmachine.goalblock.animframe
+		if (slotmachine.goalblock.animframe >= 6)
+			slotmachine.goalblock.animframe = 0
 	}
 
-	u8[A1 + 0x48] = u8[0xfffffeb1]
+	u8[A1 + 0x48] = slotmachine.goalblock.animframe
 	u8[A1 + 0x40] = static_rings.animframe
-	--u8[0xfffffeb4]
-	if (s8[0xfffffeb4] < 0)
+	--slotmachine.peppermintblock.animtimer
+	if (s8(slotmachine.peppermintblock.animtimer) < 0)
 	{
-		u8[0xfffffeb4] = 3
-		u8[0xfffffeb5] = (u8[0xfffffeb5] + 1) & 0x03
+		slotmachine.peppermintblock.animtimer = 3
+		slotmachine.peppermintblock.animframe = (slotmachine.peppermintblock.animframe + 1) & 0x03
 	}
-	u8[A1 + 0x38] = u8[0xfffffeb5]
+	u8[A1 + 0x38] = slotmachine.peppermintblock.animframe
 }
 
 
@@ -637,7 +637,7 @@ function void fn04bf62()
 	objA0.position.y.u16 = 0x0430
 	objA0.mapping_offset = 0x04c2a0
 	objA0.sprite_attributes = 0x0481
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x80
@@ -753,11 +753,11 @@ function void fn04c0aa()
 
 			// Spawn a spike ball
 			objA1.update_address = 0x04c374
-			u32[A1 + 0x0c] = 0x04c3e6
-			u16[A1 + 0x0a] = 0x2490
-			u8[A1 + 0x04] = render_flag.WORLD
-			u8[A1 + 0x07] = 0x10
-			u16[A1 + 0x08] = 0x0200
+			objA1.mapping_offset = 0x04c3e6
+			objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0490)
+			objA1.render_flags = render_flag.WORLD
+			objA1.box_size.x = 0x10
+			objA1.sprite_priority = 0x0200
 			u16[A1 + 0x40] = 0x1e
 			u16[A1 + 0x32] = objA0.value32
 			objA0.value32 += 0x90
@@ -798,11 +798,11 @@ function void fn04c0aa()
 
 		// Spawn a ring
 		objA1.update_address = 0x01a9ee
-		u8[A1 + 0x04] = render_flag.WORLD
-		u8[A1 + 0x07] = 0x08
-		u16[A1 + 0x08] = 0x0180
-		u16[A1 + 0x0a] = 0x26bc
-		u32[A1 + 0x0c] = 0x01a99a
+		objA1.render_flags = render_flag.WORLD
+		objA1.box_size.x = 0x08
+		objA1.sprite_priority = 0x0180
+		objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x06bc)
+		objA1.mapping_offset = 0x01a99a
 		u16[A1 + 0x32] = objA0.value32
 		objA0.value32 += 0x89
 		u16[A1 + 0x3c] = objA0.position.x.u16
@@ -918,7 +918,7 @@ function void fn04c374()
 		if (u16[0xffffe404] >= 0x05)
 		{
 			u16[0xffffe404] = 0
-			playSound(0x37)
+			playSound(SFX_HITSPIKES)
 		}
 
 		if (ring_counter != 0)
@@ -1608,13 +1608,13 @@ function void fn01aa56()
 #if STANDALONE
 	// Reposition the ring to prevent a small graphics glitch that happens in the original
 	//  (when the player moves out of the center, the ring effect would start to move)
-	if (u16[0xffffb010] != 0x460 || u16[0xffffb014] != 0x430)
+	if (u16[0xffffb000 + 0x10] != 0x460 || u16[0xffffb000 + 0x14] != 0x430)
 	{
 		u8 angle = slotmachine.rotation.u8 & 0xfc
 		s32 sine   = lookupSin(angle)
 		s32 cosine = lookupCos(angle)
-		s16 bx = 0x460 - u16[0xffffb010]
-		s16 by = 0x430 - u16[0xffffb014]
+		s16 bx = 0x460 - u16[0xffffb000 + 0x10]
+		s16 by = 0x430 - u16[0xffffb000 + 0x14]
 		objA0.position.x.u16 = camera.foreground.x.u16 + getScreenWidth() / 2 + s16[A0 + 0x46] + ((bx * cosine - by * sine) >> 8)
 		objA0.position.y.u16 = camera.foreground.y.u16 + getScreenHeight() / 2 + s16[A0 + 0x48] + ((bx * sine + by * cosine) >> 8)
 	}

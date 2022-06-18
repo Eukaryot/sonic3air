@@ -68,8 +68,7 @@ function void fn08dd52()
 	// "spawnChildObjects(0x08dfae)" replaced by:
 	spawnChildObject(0x08df3c, 0x00, 0, 0)
 
-	A2 = 0x08dfb6
-	SpawnChildObjectChain()
+	spawnChildObjectChain(0x08dfb6)
 
 	D0.u16 = 0x0200
 	objA0.value3e = D0.u16
@@ -218,7 +217,7 @@ function void fn08def4()
 
 	objA0.base_state = 0x04
 	objA0.position.y.u16 = D0.u16
-	objA0.render_flags ^= 0x02
+	objA0.render_flags ^= render_flag.FLIP_Y
 	objA0.flags38 &= ~0x04
 }
 

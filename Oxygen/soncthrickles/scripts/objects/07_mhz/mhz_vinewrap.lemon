@@ -35,11 +35,11 @@ function void fn03dc9c()
 function void fn03dcba()
 {
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03dcd0()
 
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn03dcd0()
 
 	CheckForUnloadObject()
@@ -49,7 +49,9 @@ function void fn03dcba()
 //# address-hook(0x03dcd0) end(0x03de68)
 function void fn03dcd0()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{
@@ -131,8 +133,8 @@ function void fn03dcd0()
 				}
 				else
 				{
-					u8[A1 + 0x2a] &= ~0x08
-					objA0.flags2a &= ~(1 << D6.u8)
+					u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+					objA0.flags2a &= ~bit
 					u8[A1 + 0x26] = 0x80
 					u8[A1 + 0x27] = 0
 					u8[A1 + 0x2d] = 0
@@ -143,8 +145,8 @@ function void fn03dcd0()
 			}
 			else
 			{
-				u8[A1 + 0x2a] &= ~0x08
-				objA0.flags2a &= ~(1 << D6.u8)
+				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+				objA0.flags2a &= ~bit
 				u8[A1 + 0x26] = 0
 				u8[A1 + 0x27] = 0
 				u8[A1 + 0x2d] = 0
@@ -157,8 +159,8 @@ function void fn03dcd0()
 		u8[A1 + 0x27] = 0
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
 	u8[A1 + 0x2d] = 0
@@ -169,11 +171,11 @@ function void fn03dcd0()
 function void fn03de6a()
 {
 	A1 = 0xffffb000
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn03de80()
 
 	A1 = 0xffffb04a
-	++D6.u8
+	++D6.u8		// object.flag.P2_ON_OBJECT
 	fn03de80()
 
 	CheckForUnloadObject()
@@ -183,7 +185,9 @@ function void fn03de6a()
 //# address-hook(0x03de80) end(0x03e016)
 function void fn03de80()
 {
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{
@@ -274,8 +278,8 @@ function void fn03de80()
 				}
 				else
 				{
-					u8[A1 + 0x2a] &= ~0x08
-					objA0.flags2a &= ~(1 << D6.u8)
+					u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+					objA0.flags2a &= ~bit
 					u8[A1 + 0x26] = 0
 					u8[A1 + 0x27] = 0
 					u8[A1 + 0x2d] = 0
@@ -283,8 +287,8 @@ function void fn03de80()
 			}
 			else
 			{
-				u8[A1 + 0x2a] &= ~0x08
-				objA0.flags2a &= ~(1 << D6.u8)
+				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+				objA0.flags2a &= ~bit
 				u8[A1 + 0x26] = 0x80
 				u8[A1 + 0x27] = 0
 				u8[A1 + 0x2d] = 0
@@ -300,8 +304,8 @@ function void fn03de80()
 		u8[A1 + 0x27] = 0
 	}
 
-	u8[A1 + 0x2a] &= ~0x08
-	objA0.flags2a &= ~(1 << D6.u8)
+	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA0.flags2a &= ~bit
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 0x04
 	u8[A1 + 0x2d] = 0

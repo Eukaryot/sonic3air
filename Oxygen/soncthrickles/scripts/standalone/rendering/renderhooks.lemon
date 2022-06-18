@@ -12,14 +12,11 @@
 // Standalone-specific functions and callbacks           //
 //-------------------------------------------------------//
 
-constant u8 SPRITE_FLAG_FLIP_X		 = 0x01
-constant u8 SPRITE_FLAG_FLIP_Y		 = 0x02
-constant u8 SPRITE_FLAG_WORLDSPACE	 = 0x20
-constant u8 SPRITE_FLAG_PRIO			 = 0x40
-constant u8 SPRITE_FLAG_NO_GLOBAL_TINT = 0x80
-
-constant u16 CHAR_ANIMSPRITE_SONIC_DROPDASH = 0x100
-constant u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x102
+constant u8 SPRITE_FLAG_FLIP_X			= 0x01
+constant u8 SPRITE_FLAG_FLIP_Y			= 0x02
+constant u8 SPRITE_FLAG_WORLDSPACE		= 0x20
+constant u8 SPRITE_FLAG_PRIO			= 0x40
+constant u8 SPRITE_FLAG_NO_GLOBAL_TINT	= 0x80
 
 
 function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
@@ -29,7 +26,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	//  -> So if an object's sprites should be replaced with a new loaded graphics, this here is the place to go
 
 	u8 gameMode = global.game_mode & 0x7f
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 
 	// Check for characters first
 	{
@@ -44,7 +41,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			// Player 2
 			drawCharacterVariant = 1
 		}
-		else if (A0 == 0xffffcc0a && u16[0xffffcc3a] != 0)
+		else if (A0 == 0xffffcc0a && u16[0xffffcc0a + 0x30] != 0)
 		{
 			// Tails' tails
 			drawCharacterVariant = 2
@@ -89,7 +86,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		}
 
 		// Classic shield
-		if (objA0.update_address == 0x01952a && (u8[0xffffb02b] & char.bonus.ANY_SHIELD))
+		if (objA0.update_address == 0x01952a && (u8[0xffffb000 + 0x2b] & char.bonus.ANY_SHIELD))
 		{
 			u8 anim = (level.framecounter >> 2) % 6
 			if (level.framecounter & 0x01)
@@ -123,7 +120,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Monitor
 		if (objA0.update_address >= 0x01d566 && objA0.update_address <= 0x01d61e)
 		{
-			u8 flags = ((objA0.render_flags & 0x02) ? SPRITE_FLAG_FLIP_Y : 0) | ((objA0.sprite_attributes & 0x8000) ? SPRITE_FLAG_PRIO : 0)
+			u8 flags = ((objA0.render_flags & render_flag.FLIP_Y) ? SPRITE_FLAG_FLIP_Y : 0) | (prioFlag ? SPRITE_FLAG_PRIO : 0)
 			if (objA0.animation.sprite == 11)
 			{
 				if (Game.getSetting(SETTING_MONITOR_STYLE))
@@ -140,12 +137,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				if (Game.getSetting(SETTING_MONITOR_STYLE))
 				{
 					Renderer.drawCustomSprite("monitor_s2_intact", px, py, 0x00, flags, renderQueue)
-					py += (objA0.render_flags & 0x02) ? 2 : -2
+					py += (objA0.render_flags & render_flag.FLIP_Y) ? 2 : -2
 				}
 				else
 				{
 					Renderer.drawCustomSprite("monitor_s3_intact", px, py, 0x00, flags, renderQueue)
-					py += (objA0.render_flags & 0x02) ? 5 : -5
+					py += (objA0.render_flags & render_flag.FLIP_Y) ? 5 : -5
 				}
 
 				if (objA0.animation.sprite <= 1)
@@ -180,7 +177,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			u64 key = Monitor.getIconSpriteKey(objA0.state)
 			if (key != 0)
 			{
-				u8 flags = ((objA0.render_flags & 0x02) ? SPRITE_FLAG_FLIP_Y : 0) | ((objA0.sprite_attributes & 0x8000) ? SPRITE_FLAG_PRIO : 0)
+				u8 flags = ((objA0.render_flags & render_flag.FLIP_Y) ? SPRITE_FLAG_FLIP_Y : 0) | (prioFlag ? SPRITE_FLAG_PRIO : 0)
 				u8 alpha = 255
 				if (objA0.base_state == 0x04)
 				{
@@ -229,19 +226,19 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// FBZ 2 boss fight Egg Robo head
 		if (objA0.update_address == 0x067b96 && isMainCharacter(CHARACTER_KNUCKLES))
 		{
-			u64 key
+			string key
 			if (objA0.animation.sprite < 2)
 				key = (level.framecounter & 0x10) ? "eggrobo_fbz_00" : "eggrobo_fbz_01"
 			else if (objA0.animation.sprite == 2)
 				key = "eggrobo_fbz_02"
 			else
 				key = "eggrobo_fbz_03"
-			Renderer.drawCustomSprite(key, px, py, 0x00, (objA0.render_flags & 0x01) | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
+			Renderer.drawCustomSprite(key, px, py, 0x00, (objA0.render_flags & render_flag.FLIP_X) | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 			return true
 		}
 
 		// Tornado in outro, when flying left
-		if (objA0.update_address == 0x05ea52 && char.render_flags & 0x01)
+		if (objA0.update_address == 0x05ea52 && char.render_flags & render_flag.FLIP_X)
 		{
 			// Render additional sprite on top
 			Renderer.drawCustomSprite("tornado_text_sonic", px-16, py-6, 0, 0x00, renderQueue + 1)
@@ -265,7 +262,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Cutscene Sonic in intro
 		if (objA0.update_address == 0x067472)
 		{
-			Standalone.drawCharacterSprite(0, 0, px, py, false)
+			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
 		}
 
@@ -408,7 +405,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// (Super) Sonic in Blue Sphere mini-game Perfect screen
 		if (objA0.update_address == 0x04e222 || objA0.update_address == 0x04e23a)
 		{
-			Standalone.drawCharacterSprite(0, 0, px, py, false)
+			Standalone.drawCharacterSprite(CHARACTER_SONIC, 0, px, py, false)
 			return true
 		}
 	}
@@ -432,11 +429,11 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			else
 			{
 				if (character == CHARACTER_SONIC)
-					key = Renderer.setupCustomCharacterSprite(0x0aaa7c, 0x0abe14, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+					key = Renderer.setupCustomCharacterSprite(0x0aaa7c, 0x0abe14, objA0.mapping_offset, objA0.animation.sprite, atex)
 				else if (character == CHARACTER_TAILS)
-					key = Renderer.setupCustomCharacterSprite(0x28f95a, 0x2908d2, objA0.mapping_offset, objA0.animation.sprite, 0x10)
+					key = Renderer.setupCustomCharacterSprite(0x28f95a, 0x2908d2, objA0.mapping_offset, objA0.animation.sprite, atex)
 				else
-					key = Renderer.setupCustomCharacterSprite(0x0abf22, 0x0ad31a, objA0.mapping_offset, objA0.animation.sprite, 0x00)
+					key = Renderer.setupCustomCharacterSprite(0x0abf22, 0x0ad31a, objA0.mapping_offset, objA0.animation.sprite, atex)
 			}
 			Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 			return true
@@ -450,7 +447,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			if (Renderer.hasCustomSprite(key))
 			{
 				// Check if there's also a custom palette
-				u64 paletteKey = "bluesphere_palette_tails"
+				string paletteKey = "bluesphere_palette_tails"
 				if (System.hasExternalPaletteData(paletteKey, 0))
 				{
 					atex = 0x40 + CHARACTER_TAILS * 0x20
@@ -516,7 +513,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Continue icon
 		if (objA0.update_address == 0x02ebe8 && objA0.animation.sprite >= 0x29 && objA0.animation.sprite <= 0x2b)
 		{
-			u64 key = (objA0.animation.sprite == 0x29) ? "continue_icon_sonic" : (objA0.animation.sprite == 0x2a) ? "continue_icon_tails" : "continue_icon_knuckles"
+			string key = (objA0.animation.sprite == 0x29) ? "continue_icon_sonic" : (objA0.animation.sprite == 0x2a) ? "continue_icon_tails" : "continue_icon_knuckles"
 			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 			return true
 		}
@@ -530,6 +527,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	}
 
 /*
+	// Characters in Data Select screen character selection
 	// TODO: Seems like the arrows are part of this graphics as well...?
 	if (objA0.update_address == 0x00d30c || objA0.update_address == 0x00d42c)
 	{
@@ -574,14 +572,14 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 function bool Standalone.onDrawVdpSprite(s16 px, s16 py, u8 size, u16 index, u16 renderQueue)
 {
 	// Explosion of bosses
-	if (u32[A0 + 0x0c] == 0x083ffc)
+	if (objA0.mapping_offset == 0x083ffc)
 	{
-		if (u8[A0 + 0x23] == 0)		// Actually the last frame before removal
+		if (objA0.animation.frame == 0)		// Actually the last frame before removal
 		{
 			Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, 64)
 			Renderer.drawVdpSpriteWithAlpha(px+1, py, size, index, renderQueue, 64)
 		}
-		else if (u8[A0 + 0x23] == 0x0c)
+		else if (objA0.animation.frame == 0x0c)
 		{
 			Renderer.drawVdpSpriteWithAlpha(px, py, size, index, renderQueue, 112)
 			Renderer.drawVdpSpriteWithAlpha(px+1, py, size, index, renderQueue, 112)
@@ -800,7 +798,7 @@ function u64 Standalone.renderWithStandardPacking(s16 px, s16 py, u32 patternRom
 {
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupCustomObjectSprite(u32[patternRomAddress], u32[patternRomAddress + 4], objA0.mapping_offset, objA0.animation.sprite, 0x00)
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -810,7 +808,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 {
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00)
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -823,7 +821,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 	//  -> An example is the CNZ balloons
 	u8 atex = (customAtex != 0xff) ? customAtex : ((objA0.sprite_attributes >> 9) & 0x30)
 	u64 key = Renderer.setupKosinskiCompressedSprite(patternRomAddress, objA0.mapping_offset, objA0.animation.sprite, 0x00, originalVramAddress / 0x20 - objA0.sprite_attributes)
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	Renderer.drawCustomSprite(key, px, py, atex, objA0.render_flags | (prioFlag ? SPRITE_FLAG_PRIO : 0), renderQueue)
 	return key
 }
@@ -831,7 +829,7 @@ function u64 Standalone.renderWithKosinskiCompression(s16 px, s16 py, u32 patter
 
 function void Standalone.renderCutsceneKnuckles(u8 variant, s16 px, s16 py, u16 renderQueue)
 {
-	bool prioFlag = (objA0.sprite_attributes & 0x8000) != 0
+	bool prioFlag = (objA0.sprite_attributes & sprite_attribute.PRIORITY) != 0
 	u64 key = stringformat("cutscene_knuckles_%d_0x%02x", variant, objA0.animation.sprite)
 	if (Renderer.hasCustomSprite(key))
 	{

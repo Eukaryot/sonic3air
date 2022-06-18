@@ -88,8 +88,7 @@ function void fn06852c()
 	// Trigger AIZ 1 transition cutscene
 	objA0.countdown_callback = 0x06857a
 
-	A2 = 0x06906a
-	SpawnIdenticalChildObjects()
+	spawnIdenticalChildObjects(0x06906a)
 
 	loadPaletteLine1(0x06917c)
 
@@ -236,7 +235,7 @@ function void fn01e78a()
 	objA0.sprite_priority = 0x180
 	objA0.box_size.x = 8
 	objA0.render_flags = render_flag.WORLD
-	objA0.sprite_attributes = 0x4001
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	objA0.update_address = 0x01e7b0
 	fn01e7b0()
 }

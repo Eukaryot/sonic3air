@@ -49,7 +49,7 @@ function void fn082038()
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		objA0.update_address = 0x08204c
-		playSound(0xb6)
+		playSound(SFX_SPINDASH_RELEASE)
 	}
 	fn08204c()
 }

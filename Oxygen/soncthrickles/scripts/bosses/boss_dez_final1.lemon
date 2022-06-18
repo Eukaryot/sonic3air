@@ -39,7 +39,7 @@ function void fn07fd68()
 function void fn07fd9e()
 {
 	objA0.base_state = 0x02
-	objA0.render_flags |= 0x04
+	objA0.render_flags |= render_flag.WORLD
 	u16[0xfffffaa4] = A0.u16
 	u32[0xfffffa84] = 0
 
@@ -47,11 +47,13 @@ function void fn07fd9e()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn running Robotnik
 		objA1.update_address = 0x080de0
 	}
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn door to the large Egg Robo
 		objA1.update_address = 0x080d72
 		u16[A1 + 0x46] = A0.u16
 	}
@@ -77,10 +79,10 @@ function void fn07fd9e()
 function void fn07fe06()
 {
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = 0
+	u8[A1 + 0x20] = char.state.RUNNING
 	objA1.velocity.x = 0x0600
 	u16[A1 + 0x1c] = 0x0600
-	if (u8[A1 + 0x38] == 0x01)
+	if (u8[A1 + 0x38] == CHARACTER_TAILS)
 	{
 		objA1.position.y.u16 += 4
 	}
@@ -100,8 +102,9 @@ function void fn07fe2c()
 
 		if (allocDynamicObjectStd())
 		{
+			// Create the object that fades out level music and starts the boss theme afterwards
 			objA1.update_address = 0x085b30
-			u8[A1 + 0x2c] = 0x30
+			u8[A1 + 0x2c] = MUSIC_BIGARMS
 		}
 	}
 }
@@ -147,8 +150,8 @@ function void fn07fe96()
 		objA0.base_state = 0x08
 		objA0.countdown_value = 0xbf
 		objA0.velocity.y = -0x80
-		u8[0xffffb02e] = 0
-		u8[0xffffb078] = 0
+		u8[0xffffb000 + 0x2e] = 0
+		u8[0xffffb04a + 0x2e] = 0
 
 		if (allocDynamicObjectStd())
 		{
@@ -286,7 +289,7 @@ function void fn07ffd2()
 function void fn07ffd8()
 {
 	objA0.base_state = 0x0c
-	D0.u16 = u16[0xffffb010]
+	D0.u16 = u16[0xffffb000 + 0x10]
 	if (D0.u16 < 0x0610)
 	{
 		D1.u16 = objA0.position.x.u16 - 0x80
@@ -392,7 +395,7 @@ function void fn080522()
 	else
 	{
 		objA0.update_address = 0x080542
-		u8[A0 + 0x28] = 0x16
+		objA0.collision_attributes = collision.size.32x32
 		fn080542()
 	}
 }
@@ -428,7 +431,7 @@ function void fn080562()
 	else
 	{
 		objA0.update_address = 0x080512
-		objA0.render_flags &= ~0x80
+		objA0.render_flags &= ~render_flag.VISIBLE
 	}
 }
 
@@ -494,7 +497,7 @@ function void fn080730()
 		}
 		else
 		{
-			objA0.render_flags &= ~0x80
+			objA0.render_flags &= ~render_flag.VISIBLE
 		}
 	}
 }
@@ -590,7 +593,7 @@ function void fn080b90()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((u8[A1 + 0x38] & 0x02) == 0)
 	{
-		D0.u16 = u16[0xffffb010]
+		D0.u16 = u16[0xffffb000 + 0x10]
 		D1.u16 = objA0.position.x.u16
 		D2.u8 = objA0.value3a
 		if (D2.u8 & 0x01)

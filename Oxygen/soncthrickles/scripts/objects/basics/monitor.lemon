@@ -7,6 +7,9 @@
 */
 
 
+define objA0.monitor.character_address		= u16[A0 + 0x42]
+define objA1.monitor.character_address		= u16[A1 + 0x42]
+
 
 //-------------------------------------------------------//
 // Monitor (a.k.a. Item Box)                             //
@@ -197,7 +200,7 @@ function bool Monitor.enforceClassicShield()
 	}
 	else if (setting == 3)
 	{
-		return (u8[0xffffb02b] & char.bonus.ANY_SHIELD) == 0
+		return (u8[0xffffb000 + 0x2b] & char.bonus.ANY_SHIELD) == 0
 	}
 	return false
 }
@@ -242,7 +245,7 @@ function void MonitorIntact.BaseUpdate()
 	//  - 0x01d57e	-> state = 0x00		-> Initialization
 	//  - 0x01d5dc	-> state = 0x02		-> Regular update
 	//  - 0x01d716	-> state = 0x04		-> Gets opened
-	call tableLookupAddress(0x01d574, u8[A0 + 0x05])
+	call tableLookupAddress(0x01d574, objA0.base_state)
 }
 
 
@@ -284,7 +287,7 @@ function void MonitorIntact.Init()
 		}
 	}
 
-	u8[A0 + 0x28] = 0x46
+	objA0.collision_attributes = (collision.flag.ITEM | collision.size.16x16)
 	objA0.state = objA0.subtype2c
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield's state is not completely supported
@@ -314,7 +317,7 @@ function void MonitorIntact.UpdateDefault()
 	D2.u16 = height - 1
 	D3.u16 = height
 	D4.u16 = objA0.position.x.u16
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	MonitorIntact.CheckBlocking()
 
 	// Collision check against player 2
@@ -323,8 +326,8 @@ function void MonitorIntact.UpdateDefault()
 	D2.u16 = height - 1
 	D3.u16 = height
 	D4.u16 = objA0.position.x.u16
-	D6 = 4
-	fn01d6c2()
+	D6 = 4		// object.flag.P2_ON_OBJECT
+	MonitorIntact.CheckBlocking.player2()
 
 	AddAsDynamicObject()
 
@@ -395,7 +398,8 @@ function void fn01d63a()
 //# address-hook(0x01d696) end(0x01d6be)
 function void MonitorIntact.CheckBlocking()
 {
-	if ((objA0.flags2a >> D6.u8) & 1)
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		fn01d6dc()
 	}
@@ -409,7 +413,7 @@ function void MonitorIntact.CheckBlocking()
 			canOpenMonitor = true
 		}
 	#if STANDALONE
-		else if (u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state == char.state.SONIC_DROPDASH)
+		else if (Game.getSetting(SETTING_DROPDASH) && u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state == char.state.SONIC_DROPDASH)
 		{
 			canOpenMonitor = true
 		}
@@ -430,13 +434,19 @@ function void MonitorIntact.CheckBlocking()
 
 
 //# address-hook(0x01d6c2) end(0x01d6da)
-function void fn01d6c2()
+function void MonitorIntact.CheckBlocking.player2()
 {
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
-		if (competition_mode.active == 0 || u8[A1 + 0x20] != 2)
+		bool canOpenMonitor = false
+		if (competition_mode.active && objA1.state == char.state.ROLLING)
 		{
+			canOpenMonitor = true
+		}
+		if (!canOpenMonitor)
+		{
+			// Block character movement
 			fn01df90()
 		}
 	}
@@ -475,19 +485,19 @@ function void MonitorIntact.Opening()
 {
 	if ((objA0.flags2a & 0x28) != 0)
 	{
-		u8[0xffffb02a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
+		u8[0xffffb000 + 0x2a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
 	#if !STANDALONE
 		// No idea why this is added in the original code
 		//  -> It just leads to the bug that you often get stopped by the second monitor if spindashing into multiple monitors next to each other
-		u8[0xffffb02a] |= char.flag.IN_AIR
+		u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 	#endif
 	}
 
 	if ((objA0.flags2a & 0x50) != 0)
 	{
-		u8[0xffffb074] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
+		u8[0xffffb04a + 0x2a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
 	#if !STANDALONE
-		u8[0xffffb074] |= char.flag.IN_AIR
+		u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 	#endif
 	}
 
@@ -500,21 +510,21 @@ function void MonitorIntact.Opening()
 		objA1.update_address = 0x01d7ba
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x04] = objA0.render_flags
+		objA1.render_flags = objA0.render_flags
 	#if STANDALONE
-		u8[A1 + 0x20] = objA0.subtype2c
+		objA1.state = objA0.subtype2c
 	#else
-		u8[A1 + 0x20] = objA0.state
+		objA1.state = objA0.state
 	#endif
 		u8[A1 + 0x2a] = objA0.flags2a
-		u16[A1 + 0x42] = objA0.value42
+		objA1.monitor.character_address = objA0.monitor.character_address
 	}
 
 	if (allocDynamicObjectAfterA0())
 	{
 		// Explosion
 		objA1.update_address = 0x01e5e0
-		u8[A1 + 0x05] += 2
+		objA1.base_state += 2
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 	}
@@ -556,8 +566,8 @@ function void ItemEffect.BaseUpdate()
 function void ItemEffect.Init()
 {
 	objA0.base_state += 2
-	objA0.sprite_attributes = 0x84c4
-	objA0.render_flags |= (render_flag.WORLD | 0x20)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04c4)
+	objA0.render_flags |= (render_flag.WORLD | render_flag.STATIC_MAPPING)
 	objA0.sprite_priority = 0x180
 	objA0.box_size.x = 8
 	objA0.velocity.y = (objA0.render_flags & render_flag.FLIP_Y) ? 0x300 : -0x300
@@ -578,10 +588,9 @@ function void ItemEffect.Init()
 	//  - 0x01dc32	-> D0 = 0x09
 	//  - 0x01dc40	-> D0 = 0x0a
 	//  - 0x01dc4e	-> D0 = 0x0b
-	//  - 0x01dba3	-> D0 = 0x0c
 	A1 = tableLookupAddress(0x01dba2, D0 * 2)
 	A1 += 2
-	u32[A0 + 0x0c] = A1
+	objA0.mapping_offset = A1
 
 #if STANDALONE
 	u8[A0 + 0x49] = objA0.state		// Backup original
@@ -643,7 +652,7 @@ function void ItemEffect.UpdateDefaultInternal()
 	objA0.base_state += 2
 	u16[A0 + 0x24] = 0x1d
 
-	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A1 = 0xffff0000 + objA0.monitor.character_address
 	A2 = (A1 == 0xffffb000) ? 0xfffffecc : 0xfffffece
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield
@@ -654,6 +663,7 @@ function void ItemEffect.UpdateDefaultInternal()
 #endif
 	{
 		// Targets:
+		//  - 0x01d890	-> objA0.base_state = 0x00
 		//  - 0x01d898	-> objA0.base_state = 0x01
 		//  - 0x01d890	-> objA0.base_state = 0x02
 		//  - 0x01d8ac	-> objA0.base_state = 0x03
@@ -668,10 +678,18 @@ function void ItemEffect.UpdateDefaultInternal()
 }
 
 
+//# address-hook(0x01d890) end(0x01d892)
+function void ItemEffect.ApplyRobotnik()
+{
+	++u16[A2]
+	DamageCharacter()
+}
+
+
 //# address-hook(0x01d898) end(0x01d8a6)
 function void ItemEffect.ApplyExtraLifePlayer1()
 {
-	++u16[0xfffffecc]
+	++player.item_count
 	gainExtraLife()
 }
 
@@ -682,7 +700,7 @@ function void ItemEffect.ApplyExtraRings()
 	++u16[A2]
 
 	ring_counter = min(ring_counter + 10, 999)
-	u16[0xfffffec8] = min(u16[0xfffffec8] + 10, 999)
+	player.total_rings = min(player.total_rings + 10, 999)
 	hud.dirty.rings |= 0x01
 
 	if (checkForExtraLifeByRings())
@@ -693,21 +711,13 @@ function void ItemEffect.ApplyExtraRings()
 		}
 		else
 		{
-			fn01d890()
+			ItemEffect.ApplyRobotnik()
 		}
 	}
 	else
 	{
 		playMusic(SFX_RING)
 	}
-}
-
-
-//# address-hook(0x01d890) end(0x01d892)
-function void fn01d890()
-{
-	++u16[A2]
-	DamageCharacter()
 }
 
 
@@ -739,9 +749,9 @@ function void ItemEffect.ApplySpeedUp()
 	}
 	else
 	{
-		u16[0xfffffec0] = 0xc00
-		u16[0xfffffec2] = 0x18
-		u16[0xfffffec4] = 0x80
+		global.move.speedcap.tails = 0xc00
+		global.move.acceleration.tails = 0x18
+		global.move.deceleration.tails = 0x80
 	}
 #endif
 
@@ -752,7 +762,7 @@ function void ItemEffect.ApplySpeedUp()
 function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundId)
 {
 	++u16[A2]
-	u8[A1 + 0x2b] &= ~0x71
+	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | shieldType)
 	playMusic(soundId)
 
@@ -808,18 +818,18 @@ function void ItemEffect.ApplyInvincibility()
 		u8[A1 + 0x35] = 150			// "char.invinc.countdown", decreases every 8 frames
 		if (!level.boss_encounter && u8[A1 + 0x2c] > 12)	// Check "char.drown_countdown"
 		{
-			playMusic(0x2c)
+			playMusic(MUSIC_INVINCIBLE)
 		}
 
 		if (u8[A0 + 0x43] == 0)
 		{
-			u32[0xffffcd7c] = 0x0187f0
-			u16[0xffffcdbe] = A1.u16
+			u32[0xffffcd7c] = 0x0187f0	// Invincibility stars
+			u16[0xffffcd7c + 0x42] = A1.u16
 		}
 		else
 		{
-			u32[0xffffcea4] = 0x0187f0
-			u16[0xffffcee6] = A1.u16
+			u32[0xffffcea4] = 0x0187f0	// Invincibility stars
+			u16[0xffffcea4 + 0x42] = A1.u16
 		}
 	}
 }
@@ -837,12 +847,12 @@ function void ItemEffect.ApplySuperTransformation()
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
 	global.move.deceleration = 0xc0
-	u8[0xffffb020] = 0x1f
+	u8[0xffffb000 + 0x20] = char.state.TRANSFORMING
 
 	if (isMainCharacter(CHARACTER_SONIC))
 	{
 		// Sonic
-		u32[0xffffb00c] = 0x146816		// "char.mapping_offset"
+		u32[0xffffb000 + 0x0c] = 0x146816		// "char.mapping_offset"
 		super.active = 0xff
 		global.move.speedcap = 0xa00
 		global.move.acceleration = 0x30
@@ -859,10 +869,10 @@ function void ItemEffect.ApplySuperTransformation()
 	#else
 		super.active.tails = 1
 	#endif
-		u8[0xffffb020] = 0x29
-		u16[0xfffffec0] = 0x800
-		u16[0xfffffec2] = 0x18
-		u16[0xfffffec4] = 0xc0
+		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
+		global.move.speedcap.tails = 0x800
+		global.move.acceleration.tails = 0x18
+		global.move.deceleration.tails = 0xc0
 		u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
 	}
 	else
@@ -874,15 +884,15 @@ function void ItemEffect.ApplySuperTransformation()
 	#endif
 	}
 
-	u8[0xffffb02e] = 0x81
-	u8[0xffffb035] = 0
-	u8[A1 + 0x2b] |= 0x02
+	u8[0xffffb000 + 0x2e] = 0x81
+	u8[0xffffb000 + 0x35] = 0
+	u8[A1 + 0x2b] |= char.bonus.INVINCIBLE
 
-	playSound(0x9f)
+	playSound(SFX_SUPERTRANSFORM)
 #if STANDALONE
 	chooseFittingMusic()	// Usually switches to super theme
 #else
-	playMusic(0x2c)
+	playMusic(MUSIC_INVINCIBLE)
 #endif
 }
 

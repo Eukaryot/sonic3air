@@ -104,7 +104,7 @@ function void fn08c6b0()
 	fn08c6d4()
 	if (!_equal())
 	{
-		u8[A0 + 0x3c] += (u8[A1 + 0x04] & 0x01) ? -8 : 8
+		u8[A0 + 0x3c] += (objA1.render_flags & render_flag.FLIP_X) ? -8 : 8
 	}
 
 	D2 = 4

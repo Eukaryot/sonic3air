@@ -80,7 +80,7 @@ function void UpdateLevelTiles.MHZ1()
 	{
 		fn054b80()
 
-		D0.u16 = (u16[0xffffb010] >= 0x4100) ? 0x0710 : 0x0aa0
+		D0.u16 = (u16[0xffffb000 + 0x10] >= 0x4100) ? 0x0710 : 0x0aa0
 		if (D0.u16 != move_area.bottom.current)
 		{
 			move_area.bottom.current = D0.u16
@@ -121,13 +121,13 @@ function void fn054b80()
 	if (global.lock_on_state == 0)
 	{
 		// For Sonic's and Tails' start, move the camera border to the right
-		if (u16[0xffffb014] < 0x0580)
+		if (u16[0xffffb000 + 0x14] < 0x0580)
 		{
 			D0.u16 = 0x00c0
 		}
 	#if STANDALONE
 		// This is only needed for the extended camera
-		else if (u16[0xffffb010] > 0x0160 && u16[0xffffb014] < 0x0700)
+		else if (u16[0xffffb000 + 0x10] > 0x0160 && u16[0xffffb000 + 0x14] < 0x0700)
 		{
 			D0.u16 = 0x00c0
 		}
@@ -172,8 +172,8 @@ function void UpdateLevelScrolling.MHZ1()
 
 		D0.u16 = 0x4200
 		D1 = 0
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb05a] -= D0.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
 
 		fn054cf4()
 
@@ -226,7 +226,7 @@ function void fn054cf4()
 					u8[A5] = 0
 				}
 			}
-			if (u8[A1 + 0x04] & 0x04)
+			if (objA1.render_flags & render_flag.WORLD)
 			{
 				objA1.position.x.u16 -= D0.u16
 				objA1.position.y.u16 -= D1.u16
@@ -281,8 +281,8 @@ function void fn054cb0()
 	{
 		D1.u16 = 0x0200
 		u16[0xffffeebc] = D1.u16
-		u16[0xffffb010] -= D1.u16
-		u16[0xffffb05a] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D1.u16
 
 	#if STANDALONE
 		// Also update position backup data (e.g. for after-images)
@@ -314,13 +314,13 @@ function void InitLevelTiles.MHZ2()
 	u16[0xffffeee8] = 0
 	u8[0xfffff7c1] = 0xff
 
-	if (u16[0xffffb010] < 0x09c0 && u16[0xffffb014] >= 0x0600)
+	if (u16[0xffffb000 + 0x10] < 0x09c0 && u16[0xffffb000 + 0x14] >= 0x0600)
 	{
 		u8[0xffffeed6] = 0
 		u8[0xfffff7c1] = 0
 		A1 = 0x0a945c
 	}
-	else if (u16[0xffffb010] < 0x2940)
+	else if (u16[0xffffb000 + 0x10] < 0x2940)
 	{
 		u8[0xffffeed6] = 0xff
 		A1 = 0x0a94bc
@@ -449,14 +449,14 @@ function void fn054dbe()
 
 		if (camera.position.x.u16 < 0x3600 && u16[0xffffeee8] == 0)
 		{
-			move_area.left = (u16[0xffffb014] >= 0x05c0) ? max(s16(0x98 - getScreenExtend() * 2), 0) : 0x0380
+			move_area.left = (u16[0xffffb000 + 0x14] >= 0x05c0) ? max(s16(0x98 - getScreenExtend() * 2), 0) : 0x0380
 		}
 
-		if (u16[0xffffb010] < 0x3a97)
+		if (u16[0xffffb000 + 0x10] < 0x3a97)
 		{
 			D0.u16 = 0x09a0
 		}
-		else if (u16[0xffffb010] < 0x3ac0 && u16[0xffffb014] >= 0x0300)
+		else if (u16[0xffffb000 + 0x10] < 0x3ac0 && u16[0xffffb000 + 0x14] >= 0x0300)
 		{
 			D0.u16 = 0x09a0
 		}
@@ -499,8 +499,8 @@ function void fn054e86()
 //# address-hook(0x055008) end(0x055038)
 function void fn055008()
 {
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 #if STANDALONE
 	// Don't use player position, but camera center position
 	D0.u16 = camera.position.x.u16 + getScreenWidth() / 2
@@ -676,7 +676,7 @@ function void InitLevelScrolling.MHZ2()
 {
 	u16[0xffffeeb4] = camera.foreground.x.u16
 	u16[0xffffeeb6] = camera.foreground.x.u16
-	if (u16[0xffffb010] >= 0x3700 && u16[0xffffb014] < 0x0500)
+	if (u16[0xffffb000 + 0x10] >= 0x3700 && u16[0xffffb000 + 0x14] < 0x0500)
 	{
 		level.scrolling_routine = 0x08
 		fn0554b8()
@@ -771,7 +771,7 @@ function void fn0551ea()
 //# address-hook(0x0551ee) end(0x055232)
 function void fn0551ee()
 {
-	if (u16[0xffffb010] >= 0x3700 && u16[0xffffb014] < 0x0500)
+	if (u16[0xffffb000 + 0x10] >= 0x3700 && u16[0xffffb000 + 0x14] < 0x0500)
 	{
 		fn0554b8()
 		fn04f2f6()
@@ -821,7 +821,7 @@ function void fn05523a()
 //# address-hook(0x055250) end(0x0552f4)
 function void fn055250()
 {
-	if (u16[0xffffb014] >= 0x0500)
+	if (u16[0xffffb000 + 0x14] >= 0x0500)
 	{
 		fn054c68()
 		fn04f2f6()
@@ -834,7 +834,7 @@ function void fn055250()
 		return
 	}
 
-	if (u16[0xffffb014] > 0x0420 && u8[0xffffb02a] & 0x02)
+	if (u16[0xffffb000 + 0x14] > 0x0420 && u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 	{
 		fn0554b8()
 		fn0552e4()
@@ -1326,8 +1326,8 @@ function void fn05560c()
 			// Jump back to start the repeating part again
 			D1.u16 = 0x200
 			u16[0xffffeebc] = D1.u16
-			u16[0xffffb010] -= D1.u16
-			u16[0xffffb05a] -= D1.u16
+			u16[0xffffb000 + 0x10] -= D1.u16
+			u16[0xffffb04a + 0x10] -= D1.u16
 
 		#if STANDALONE
 			// Also update position backup data (e.g. for after-images)
@@ -1368,8 +1368,8 @@ function void fn05560c()
 
 function void fn0556b8()
 {
-	if (u8[A1 + 0x20] == 5)
-		u8[A1 + 0x20] = 0
+	if (u8[A1 + 0x20] == char.state.STANDING)
+		u8[A1 + 0x20] = char.state.RUNNING
 
 	// Check against left / right movement bounds
 	D0.u16 += 0x18
@@ -1397,7 +1397,7 @@ function void fn0556f8()
 	objA0.box_size.y = 0x18
 	objA0.box_size.x = 0x18
 	objA0.sprite_priority = 0x80
-	objA0.sprite_attributes = 0xe580
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0580)
 	objA0.mapping_offset = 0x055908
 	objA0.position.x.u16 = 0x4238
 	objA0.position.y.u16 = 0x02f0

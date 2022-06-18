@@ -374,7 +374,7 @@ function void fn069526()
 	if (D0.u16 > objA1.position.x.u16)
 	{
 		// Move right
-		control.player1 = 0x0808
+		control.player1 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 		return
 	}
 
@@ -385,6 +385,7 @@ function void fn069526()
 		objA0.update_address = 0x069588
 		if (allocDynamicObjectStd())
 		{
+			// Spawn Cutscene Knuckles
 			objA1.update_address = 0x061d4c
 			objA1.subtype2c = 0x04
 		}
@@ -394,7 +395,7 @@ function void fn069526()
 	else
 	{
 		objA0.update_address = 0x0695ce
-		control.player1 = 0x2020
+		control.player1 = 0x2020		// CONTROL_C, CONTROL_C
 	}
 }
 
@@ -409,15 +410,15 @@ function void fn069588()
 		if (getNumPlayers() >= 2)
 		{
 			// Make Tails stop next to Sonic
-			if (u16[0xffffb05a] > u16[0xffffb010] + 0x10)
+			if (u16[0xffffb04a + 0x10] > u16[0xffffb000 + 0x10] + 0x10)
 			{
-				u16[0xffffb062] = 0
-				u16[0xffffb066] = 0
+				u16[0xffffb04a + 0x18] = 0
+				u16[0xffffb04a + 0x1c] = 0
 			}
 		}
 	#endif
 
-		control.player1 = 0x0101
+		control.player1 = 0x0101		// CONTROL_UP, CONTROL_UP
 		control.tails = 0
 	}
 	else
@@ -440,10 +441,9 @@ function void fn0695ae()
 {
 	// Checks when to fade over to HCZ1
 	D0.u16 = u16[0xfffffa86] + 0x01e6
-	if (D0.u16 <= u16[0xffffb014])
+	if (D0.u16 <= u16[0xffffb000 + 0x14])
 	{
-		D0.u16 = 0x0100
-		TriggerNextZone()
+		TriggerNextZone(0x0100)
 		UnloadObject()
 	}
 }
@@ -452,7 +452,8 @@ function void fn0695ae()
 //# address-hook(0x0695ce) end(0x069610)
 function void fn0695ce()
 {
-	control.player1 = 0x2000
+	control.player1 = 0x2000		// CONTROL_C, 0
+
 	A1 = 0xffffb000
 	u8[A1 + 0x0a] |= 0x80
 	if (objA1.velocity.y < 0)
@@ -468,7 +469,7 @@ function void fn0695ce()
 	move_area.bottom.target = D0.u16
 
 	// "spawnSimpleChildObjects(0x084b12)" replaced by:
-	spawnSimpleChildObjects(0x084ad2, 1)
+	spawnSimpleChildObjects(0x084ad2, 1)		// Screen mover for the lower border
 }
 
 
@@ -735,7 +736,7 @@ function void fn069844()
 	setupObjectAttributesBasic(0x069cec)
 
 	objA0.update_address = 0x06989e
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	objA0.countdown_callback = 0x0698bc
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A2 = 0xffff0000 + u16[A1 + 0x46]
@@ -789,7 +790,7 @@ function void fn0698c6()
 function void fn0698d2()
 {
 	setupObjectAttributesBasic(0x069cf2)
-	objA0.flags2b |= 0x10
+	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	playSound(0x4d)
 	objA0.hitbox_extends.y = 0x0c
 	objA0.countdown_value = 0x9f
@@ -1179,13 +1180,13 @@ function void fn069720()
 
 
 
-// Used in the boss fight, but more general maybe?
+// Drawbridge, Used in the boss fight, but more general maybe?
 
 //# address-hook(0x02b12a) end(0x02b266)
 function void fn02b12a()
 {
 	objA0.mapping_offset = 0x02b558
-	objA0.sprite_attributes = 0xc2e9
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x08
@@ -1212,12 +1213,12 @@ function void fn02b12a()
 	if (allocDynamicObjectAfterA0())
 	{
 		objA1.update_address = 0x02b380
-		u8[A1 + 0x04] = render_flag.WORLD | render_flag.COMPOUND
-		u8[A1 + 0x06] = 0x40
-		u8[A1 + 0x07] = 0x40
-		u16[A1 + 0x08] = objA0.sprite_priority
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u32[A1 + 0x0c] = objA0.mapping_offset
+		objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
+		objA1.box_size.y = 0x40
+		objA1.box_size.x = 0x40
+		objA1.sprite_priority = objA0.sprite_priority
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.mapping_offset = objA0.mapping_offset
 
 		D2.u16 = u16[A0 + 0x30]
 		D3.u16 = objA0.value32
@@ -1243,12 +1244,12 @@ function void fn02b12a()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x02b380
-			u8[A1 + 0x04] = render_flag.WORLD | render_flag.COMPOUND
-			u8[A1 + 0x06] = 0x40
-			u8[A1 + 0x07] = 0x40
-			u16[A1 + 0x08] = objA0.sprite_priority
-			u16[A1 + 0x0a] = objA0.sprite_attributes
-			u32[A1 + 0x0c] = objA0.mapping_offset
+			objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
+			objA1.box_size.y = 0x40
+			objA1.box_size.x = 0x40
+			objA1.sprite_priority = objA0.sprite_priority
+			objA1.sprite_attributes = objA0.sprite_attributes
+			objA1.mapping_offset = objA0.mapping_offset
 
 			D1 = 4
 			u16[A1 + 0x16] = D1.u16
@@ -1518,14 +1519,14 @@ function void fn02b4d0()
 {
 	while (true)
 	{
-		u32[A1] = D4
-		u32[A1 + 0x0c] = u32[A3 + 0x0c]
-		u8[A1 + 0x04] = u8[A3 + 0x04]
-		u16[A1 + 0x0a] = u16[A3 + 0x0a]
-		u16[A1 + 0x08] = u16[A3 + 0x08]
-		u8[A1 + 0x07] = u8[A3 + 0x07]
-		u8[A1 + 0x06] = u8[A3 + 0x06]
-		u16[A1 + 0x08] = u16[A3 + 0x08]
+		objA1.update_address = D4
+		objA1.mapping_offset = u32[A3 + 0x0c]
+		objA1.render_flags = u8[A3 + 0x04]
+		objA1.sprite_attributes = u16[A3 + 0x0a]
+		objA1.sprite_priority = u16[A3 + 0x08]
+		objA1.box_size.x = u8[A3 + 0x07]
+		objA1.box_size.y = u8[A3 + 0x06]
+		objA1.sprite_priority = u16[A3 + 0x08]
 		objA1.position.x.u16 = u16[(A2+=2)-2]
 		objA1.position.y.u16 = u16[(A2+=2)-2]
 		D0.u16 = u16[(A2+=2)-2]

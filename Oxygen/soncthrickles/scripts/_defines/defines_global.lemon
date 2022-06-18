@@ -115,7 +115,7 @@ define player2.camera_lock		=  u8[0xffffee0b]	// Same as above for player 2 in c
 
 define move_area.left.target	= u16[0xffffee0c]	// Left border where character can move (minus 0x10 = 16)
 define move_area.right.target	= u16[0xffffee0e]	// Right border where character can move (plus 0x128 = 296)
-define move_area.top.target		= u16[0xffffee10]	// top border where camera (and character) can move
+define move_area.top.target		= u16[0xffffee10]	// Top border where camera (and character) can move
 define move_area.bottom.target	= u16[0xffffee12]	// Bottom border where camera (and character) can move (minus screen height, usually 224)
 define move_area.left			= u16[0xffffee14]	// Left border where character can move (minus 0x10 = 16)
 define move_area.right			= u16[0xffffee16]	// Right border where character can move (plus 0x128 = 296)
@@ -258,7 +258,7 @@ define level.display_routine	= u16[0xffffeed2]
 
 define competition_mode.menu.game_mode		=  u8[0xffffef48]	// 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
 define competition_mode.menu.stage			=  u8[0xffffef4a]	// 0 for ALZ, 1 for BPZ, etc.
-define competition_mode.menu.items_toggle	=  u8[0xffffef4e]	// toggles items spawn in competition mode, 0xff is off
+define competition_mode.menu.items_toggle	=  u8[0xffffef4e]	// Toggles items spawn in competition mode, 0xff is off
 
 define competition_mode.mode		=  u8[0xffffef48]	// (DEPRECATED) 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
 define competition_mode.multiplay	=  u8[0xffffef49]	// 0 for single player, 1 for 2P multiplay
@@ -269,7 +269,7 @@ define dataselect.nosave_characters	=  u16[0xffffef4c]	// Current character(s) o
 
 define level.object_type_table		= u32[0xffffef5a]	// Address of lookup table that maps object type ID to object logic address
 define level.backup.rings			= u16[0xffffef5e]	// Stores ring count between level loading
-define level.backup.timer.alldata	= u32[0xffffef60]	// stores current level time between level loading
+define level.backup.timer.alldata	= u32[0xffffef60]	// Stores current level time between level loading
 define level.backup.timer.minutes	=  u8[0xffffef61]
 define level.backup.timer.seconds	=  u8[0xffffef62]
 define level.backup.timer.frames	=  u8[0xffffef63]
@@ -571,7 +571,7 @@ define competition_mode.laps				=  u8[0xfffffeda]	// Total number of laps in com
 define competition_mode.current_lap.player1	=  u8[0xfffffedc]	// Number of lap that player 1 is currently on
 define competition_mode.current_lap.player2	=  u8[0xfffffedd]	// Number of lap that player 2 is currently on
 define competition_mode.item_flag			=  u8[0xffffff8a]	// Toggles items spawn in Competition mode
-define competition_mode.game_mode			=  u8[0xffffff8b]	// 0 = Grand Prix, 3 = Match Race, -1 = Time Attack
+define competition_mode.game_mode			=  s8[0xffffff8b]	// 0 = Grand Prix, 3 = Match Race, -1 = Time Attack
 
 define checkpoint.number.backup.tails	=  u8[0xfffff746]	// Starpost number of last checkpoint for Tails (gets reset after act)
 define checkpoint.number				=  u8[0xfffffe2a]	// Starpost number of last checkpoint (gets reset after act)

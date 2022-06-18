@@ -352,6 +352,7 @@ function void fn0397d2()
 		u8[A2 + 0x2e] = 0x02
 		if (allocDynamicObjectAfterA0())
 		{
+			// Spawn Sonic snowboarding
 			objA1.update_address = 0x0393ee
 			objA1.position.x.u16 = u16[A2 + 0x10]
 			objA1.position.y.u16 = u16[A2 + 0x14]
@@ -376,7 +377,7 @@ function void fn03984e()
 	objA0.position.x.u16 = u16[A2 + 0x10]
 	objA0.position.y.u16 = u16[A2 + 0x14]
 
-	D0.u16 = control.pad1 & 0xf0f0
+	D0.u16 = control.pad1 & 0xf0f0		// (CONTROL_START | CONTROL_ABC), (CONTROL_START | CONTROL_ABC)
 	control.player1 = D0.u16
 	if (u8[A2 + 0x2e] == 0)
 	{
@@ -385,7 +386,7 @@ function void fn03984e()
 		objA0.position.y.u16 += 0x14
 		objA0.velocity.x = -0x200
 		objA0.velocity.y = -0x400
-		objA0.render_flags = render_flag.WORLD | render_flag.VISIBLE
+		objA0.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		objA0.animation.sprite = 1
 		objA0.animation.timer = 1
 		fn0397c6()
@@ -460,13 +461,14 @@ function void fn039924()
 {
 	if (allocDynamicObjectAfterA0())
 	{
+		// Spawn snow particles
 		objA1.update_address = 0x0399a6
-		u16[A1 + 0x0a] = 0x06b8
-		u32[A1 + 0x0c] = 0x0399d8
-		u16[A1 + 0x08] = 0x0100
-		u8[A1 + 0x07] = 0x04
-		u8[A1 + 0x06] = 0x04
-		u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
+		objA1.sprite_attributes = 0x06b8
+		objA1.mapping_offset = 0x0399d8
+		objA1.sprite_priority = 0x0100
+		objA1.box_size.x = 0x04
+		objA1.box_size.y = 0x04
+		objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
 		u16[A1 + 0x20] = 0x01
 		objA1.position.x.u16 = u16[A2 + 0x10]
 		objA1.position.y.u16 = u16[A2 + 0x14]

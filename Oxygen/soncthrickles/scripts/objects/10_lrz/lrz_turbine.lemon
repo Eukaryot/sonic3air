@@ -18,8 +18,8 @@
 //# address-hook(0x04429c) end(0x0442ec)
 function void fn04429c()
 {
-	objA0.sprite_attributes = 0xa3ad
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x03ad)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 
 	if (objA0.subtype2c != 0)
@@ -27,7 +27,7 @@ function void fn04429c()
 		objA0.mapping_offset = 0x0445b0
 		objA0.box_size.x = 0x04
 		objA0.box_size.y = 0x30
-		u8[A0 + 0x28] = 0xa0
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x40)
 
 		objA0.update_address = 0x044592
 		fn044592()
@@ -81,7 +81,8 @@ function void fn044338()
 
 	if (debug_mode.state == 0 && u8[A1 + 0x05] < 0x04)
 	{
-		if (D1.u16 & 0x70)
+		// Check if jump button pressed
+		if (D1.u16 & CONTROL_ABC)
 		{
 			fn0443c4()
 			return
@@ -99,7 +100,7 @@ function void fn044338()
 	u8[A2] = 0
 	u8[A2 + 0x02] = 0x1e
 
-	u16[A1 + 0x08] = 0x0100
+	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x1e] = 0x0e
 	u8[A1 + 0x1f] = 0x07
 	objA1.state = char.state.ROLLING
@@ -126,8 +127,8 @@ function void fn0443c4()
 	u16[A1 + 0x20] = 0
 	if (D0.s16 < 0)
 	{
-		u16[A1 + 0x20] = 0x1000
-		u16[A1 + 0x0a] |= 0x8000
+		u16[A1 + 0x20] = 0x1000		// char.state.STRAIGHTJUMP, char.state.RUNNING
+		objA1.sprite_attributes |= sprite_attribute.PRIORITY
 	}
 
 	u8[A2] = 0
@@ -152,7 +153,7 @@ function void fn044434()
 		--u8[A2 + 0x02]
 		if (u8[A2 + 0x02] == 0)
 		{
-			u16[A1 + 0x08] = 0x0100
+			objA1.sprite_priority = 0x0100
 		}
 		return
 	}
@@ -184,7 +185,7 @@ function void fn044434()
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			u16[A1 + 0x1c] = 0
-			u8[A1 + 0x04] &= 0xfc
+			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			objA1.position.x.u16 = objA0.position.x.u16
 
 			D0.u8 = ((level.framecounter.low & 0x07) - 4) * 4
@@ -213,14 +214,14 @@ function void fn04450a()
 	u8[A1 + 0x22] = D1.u8
 	D0.u16 &= 0x1f
 	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x044572 + D0.s16]
-	u16[A1 + 0x08] = 0x0100
-	u16[A1 + 0x0a] |= 0x8000
+	objA1.sprite_priority = 0x0100
+	objA1.sprite_attributes |= sprite_attribute.PRIORITY
 
 	D0.u8 = u8[A2 + 0x04]
 	if (D0.s8 < 0)
 	{
-		u16[A1 + 0x08] = 0x0280
-		u16[A1 + 0x0a] &= 0x7fff
+		objA1.sprite_priority = 0x0280
+		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 	}
 	D0.u8 += 4
 	u8[A2 + 0x04] = D0.u8

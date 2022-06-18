@@ -125,7 +125,7 @@ function void fn04fa0c()
 		--objA0.countdown_value
 
 		// Note: 0x480 is the bottom of the screen at the lower end of the tree
-		u16 height = 0x480 - u16[0xffffb014]
+		u16 height = 0x480 - u16[0xffffb000 + 0x14]
 		D0.u16 = 3 + height / 8
 		if (D0.u16 >= u16[0xffffeec4] || (objA0.value2f & 0x01))
 		{
@@ -363,7 +363,7 @@ function void fn04fc46()
 {
 	if (u16[0xffffeed4] == 0)
 	{
-		if (u8[0xffffb005] < 0x06)
+		if (u8[0xffffb000 + 0x05] < 0x06)
 		{
 			D0 = s32((u32(level.display_routine) << 16) - camera.background.y) >> 5
 			camera.background.y += D0
@@ -503,10 +503,10 @@ function void fn04fd62()
 
 		D0.u16 = 0x2f00
 		D1.u16 = 0x80
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb014] -= D1.u16
-		u16[0xffffb05a] -= D0.u16
-		u16[0xffffb05e] -= D1.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb000 + 0x14] -= D1.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x14] -= D1.u16
 		fn04f3a0()
 
 		camera.position.x.u16 -= D0.u16
@@ -531,10 +531,10 @@ function void fn04fd62()
 		// There are a few frames between the change of chunk contents and the loading of the chunk layouts (the latter happens right above).
 		// If you're falling down fast enough, you can basically glitch through the temporarily messed up collision.
 		// As a workaround, just check if the main character glitched through, and reposition him.
-		if (u16[0xffffb014] > 0x02fc)
+		if (u16[0xffffb000 + 0x14] > 0x02fc)
 		{
-			u16[0xffffb014] = 0x02fc
-			u16[0xffffb01a] = 0
+			u16[0xffffb000 + 0x14] = 0x02fc
+			u16[0xffffb000 + 0x1a] = 0
 		}
 	#endif
 	}
@@ -709,6 +709,7 @@ function void fn04ff74()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn Blimp
 			objA1.update_address = 0x05034a
 		}
 
@@ -1457,7 +1458,7 @@ function void fn01c746()
 	{
 		D0.u16 = 0x015a
 		level.vertical_wrap = D0.u16
-		u16[0xffffee10] = D0.u16
+		move_area.top.target = D0.u16
 		camera.update_routine += 2
 	}
 }
@@ -1607,7 +1608,7 @@ function void fn01caae()
 		#if STANDALONE
 			// Additional check for the area at the first Giant Ring
 			//  -> Required for extended camera
-			if (A1 == 0x01c612 && u16[0xffffb010] >= 0x1b80)
+			if (A1 == 0x01c612 && u16[0xffffb000 + 0x10] >= 0x1b80)
 				continue
 		#endif
 			break
@@ -2067,7 +2068,7 @@ function void UpdateForegroundScrolling.AIZ1()
 //# address-hook(0x23b152) end(0x23b178)
 function void fn23b152()
 {
-	if (u8[0xffffb005] < 0x06)
+	if (u8[0xffffb000 + 0x05] < 0x06)
 	{
 		D0 = min(u16[0xffffeed4] + 0x280, 0xa000)
 		u16[0xffffeed4] = D0.u16
@@ -2080,7 +2081,7 @@ function void fn23b152()
 //# address-hook(0x23b17a) end(0x23b1c4)
 function void fn23b17a()
 {
-	if (u8[0xffffb005] >= 0x06)
+	if (u8[0xffffb000 + 0x05] >= 0x06)
 		return
 
 	camera.background.x.frac += 6

@@ -13,11 +13,11 @@ function void fn03cc8a()
 {
 	objA0.mapping_offset = 0x03cfd0
 	objA0.sprite_attributes = 0x041d
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0180
-	objA0.render_flags |= 0x40
+	objA0.render_flags |= render_flag.COMPOUND
 	u16[A0 + 0x16] = 0x03
 
 	A2 = A0 + 0x18
@@ -152,7 +152,7 @@ function void fn03ce1a()
 	if (s8[A0 + 0x2c] < 0)
 		return
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		u16[A0 + 0x30] = 0
@@ -167,16 +167,16 @@ function void fn03ce1a()
 			return
 
 		A1 = 0xffffb000
-		if (objA0.flags2a & 0x08)
+		if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x08
+			objA0.flags2a &= ~object.flag.P1_ON_OBJECT
 			fn03cbce()
 		}
 
 		A1 = 0xffffb04a
-		if (objA0.flags2a & 0x10)
+		if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 		{
-			objA0.flags2a &= ~0x10
+			objA0.flags2a &= ~object.flag.P2_ON_OBJECT
 			fn03cbce()
 		}
 	}
@@ -225,14 +225,14 @@ function void fn03cec0()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.position.y.u16 -= 0x04
-		u8[A1 + 0x04] = objA0.render_flags
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = 0x041d
-		u16[A1 + 0x08] = 0x0200
-		u8[A1 + 0x07] = 0x0c
-		u8[A1 + 0x06] = 0x0c
-		u8[A1 + 0x28] = 0x98
-		u8[A1 + 0x2b] |= 0x10
+		objA1.render_flags = objA0.render_flags
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = 0x041d
+		objA1.sprite_priority = 0x0200
+		objA1.box_size.x = 0x0c
+		objA1.box_size.y = 0x0c
+		objA1.collision_attributes = (collision.flag.THREAT | collision.size.4x4_2)
+		u8[A1 + 0x2b] |= char.bonus.SHIELD_FIRE
 
 		if (objA0.subtype2c & 0x40)
 		{
@@ -253,7 +253,7 @@ function void fn03cec0()
 			D0.u8 = objA0.flags2e
 			if (D0.s8 < 0)
 			{
-				u16[A1 + 0x08] = 0x80
+				objA1.sprite_priority = 0x80
 			}
 			LookupSinCos()
 			D0.s16 = D1.s16 >> 4

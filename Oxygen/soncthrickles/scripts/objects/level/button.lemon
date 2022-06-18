@@ -26,12 +26,12 @@ function void Button.Init()
 	if (global.zone == 0x01)
 	{
 		objA0.mapping_offset = 0x22bd1a
-		objA0.sprite_attributes = 0x2426
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0426)
 	}
 	else if (global.zone == 0x03)
 	{
 		objA0.mapping_offset = 0x22bd4a
-		objA0.sprite_attributes = 0x441a
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x041a)
 	}
 	else if (global.zone == 0x04)
 	{
@@ -143,7 +143,7 @@ function void Button.checkIfPressed()
 	// This points to one of "level.trigger00" ... "level.trigger0f"
 	A3 = 0xfffff7e0 + (objA0.subtype2c & 0x0f)
 
-	if ((objA0.flags2a & 0x18) == 0)
+	if ((objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) == 0)
 	{
 		// Button is released
 		if ((objA0.subtype2c & 0x10) == 0)
@@ -157,7 +157,7 @@ function void Button.checkIfPressed()
 		// Button is pressed
 		if (u8[A3] == 0)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 		u8[A3] |= (1 << D3.u8)
 		objA0.animation.sprite = 1

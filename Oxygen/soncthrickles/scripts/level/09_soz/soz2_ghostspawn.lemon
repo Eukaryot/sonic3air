@@ -153,15 +153,14 @@ function void fn08f16a()
 //# address-hook(0x08f1ac) end(0x08f1f2)
 function void fn08f1ac()
 {
-	A1 = 0x08f61c
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08f61c))
 	{
 		signalMultiReturn()
 		return
 	}
 
-	objA0.render_flags &= ~0x04
-	objA0.render_flags |= 0x80
+	objA0.render_flags &= ~render_flag.WORLD
+	objA0.render_flags |= render_flag.VISIBLE
 	u8[A0 + 0x42] = u8[0xfffff7c3]
 	u8[A0 + 0x43] = u8[0xfffffaad]
 
@@ -298,7 +297,7 @@ function void fn08f2e0()
 	if (attackNow)
 	{
 		objA0.base_state = 0x0e
-		objA0.render_flags ^= 0x01
+		objA0.render_flags ^= render_flag.FLIP_X
 		objA0.velocity.x = -objA0.velocity.x
 		objA0.countdown_value = 0x3b
 	}
@@ -314,8 +313,8 @@ function void fn08f322()
 		return
 
 	objA0.base_state = 0x10
-	u8[A0 + 0x28] = 0xd7
-	objA0.render_flags |= 0x04
+	objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
+	objA0.render_flags |= render_flag.WORLD
 
 	objA0.position.x.u16 = camera.position.x.u16 + objA0.position.x.u16 - 0x80
 	objA0.position.y.u16 = camera.position.y.u16 + objA0.position.y.u16 - 0x80
@@ -439,8 +438,7 @@ function void fn08f48e()
 	fn084b6e()
 	if (objA0.subtype2c == 0)
 	{
-		A1 = 0x08f61c
-		fn084fa4()
+		SetupObjectAttributesSlotted(0x08f61c)
 	}
 	else
 	{
@@ -467,7 +465,7 @@ function void fn08f4f0()
 	{
 		if (D0.u16 > 0x01a0 + (getScreenWidth() - 320))
 		{
-			objA0.render_flags ^= 0x01
+			objA0.render_flags ^= render_flag.FLIP_X
 			objA0.velocity.x = -objA0.velocity.x
 		}
 	}
@@ -475,7 +473,7 @@ function void fn08f4f0()
 	{
 		if (D0.u16 < 0xa0)
 		{
-			objA0.render_flags ^= 0x01
+			objA0.render_flags ^= render_flag.FLIP_X
 			objA0.velocity.x = -objA0.velocity.x
 		}
 	}
@@ -513,7 +511,7 @@ function void fn08f538()
 	D2.u16 = u16[0x08f582 + D1.s16]
 	if (D0.u16 < 0x0120)
 	{
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 		D2.s16 = -D2.s16
 	}
 	objA0.velocity.x = D2.u16

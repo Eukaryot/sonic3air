@@ -21,7 +21,7 @@ function void UpdateWater()
 		return
 	}
 
-	if (u8[0xffffee30] == 0 && u8[0xffffb005] < 0x06)
+	if (u8[0xffffee30] == 0 && u8[0xffffb000 + 0x05] < 0x06)
 	{
 		fn006f4a()
 		UpdateWaterSurfaceLevel()
@@ -126,7 +126,7 @@ function void fn00717c()
 	if (s8[A1 + 0x2b] < 0)
 	{
 		u16[A1 + 0x32] = 0x05
-		u8[A1 + 0x2b] &= 0x7f
+		u8[A1 + 0x2b] &= ~char.bonus.INFINITE_INERTIA
 	}
 }
 
@@ -162,7 +162,7 @@ function void fn0071e4()
 	if (s8[A1 + 0x2b] < 0)
 	{
 		u16[A1 + 0x32] = 0x05
-		u8[A1 + 0x2b] &= 0x7f
+		u8[A1 + 0x2b] &= ~char.bonus.INFINITE_INERTIA
 	}
 }
 
@@ -189,13 +189,13 @@ function void fn00723e()
 			u8[A1 + 0x2a] |= 0x01
 
 		u8[A1 + 0x20] = (global.zone == 0x05) ? 0x19 : 0x1b
-		u8[A1 + 0x2b] |= 0x80
+		u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 	}
 	else
 	{
 		D1.u16 = 4
 		D0.u16 = u16[A1 + 0x1c]
-		if (D2 & 0x04)
+		if (D2 & CONTROL_LEFT)
 		{
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x2a] |= 0x01
@@ -203,7 +203,7 @@ function void fn00723e()
 			if (D0.s16 < 0)
 				D0.u16 -= D1.u16
 		}
-		if (D2 & 0x08)
+		if (D2 & CONTROL_RIGHT)
 		{
 			u8[A1 + 0x20] = 0
 			u8[A1 + 0x2a] &= ~0x01
@@ -221,7 +221,7 @@ function void fn00723e()
 				if (D0.s16 <= 0)
 				{
 					D0.u16 = 0
-					u8[A1 + 0x20] = 0x05
+					u8[A1 + 0x20] = char.state.STANDING
 				}
 			}
 			else
@@ -230,12 +230,12 @@ function void fn00723e()
 				if (D0.s16 <= 0)
 				{
 					D0.u16 = 0
-					u8[A1 + 0x20] = 0x05
+					u8[A1 + 0x20] = char.state.STANDING
 				}
 			}
 		}
 		u16[A1 + 0x1c] = D0.u16
-		u8[A1 + 0x2b] |= 0x80
+		u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 	}
 }
 
@@ -255,7 +255,7 @@ function void fn0072fa()
 
 function void fn00730c()
 {
-	if ((u8[A1 + 0x2a] & 0x02) == 0 && (u8[A1 + 0x2a] & 0x08) == 0)
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && (u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 	{
 		A2 = 0xffff8000
 		D0 = 0x14
@@ -344,20 +344,20 @@ function void fn00730c()
 
 				if (D1.u8 != 0)
 				{
-					u8[A1 + 0x2a] &= ~0x01
+					u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 					if (D1.s8 < 0)
 					{
-						u8[A1 + 0x2a] |= 0x01
+						u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 					}
 				}
 
-				u8[A1 + 0x20] = 0x19
+				u8[A1 + 0x20] = char.state.GOT_HURT_PANIC
 				objA1.position.y.u16 += s8(u8[A1 + 0x1e] - 0x0e)
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
-				u8[A1 + 0x2a] &= ~0x04
+				objA1.flags2a &= ~char.flag.ROLLING
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK
-				u8[A1 + 0x2b] |= 0x80
+				u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 
 				D0.u8 = global.framecounter & 0x0f
 				if (D0.u8 == 0)
@@ -372,14 +372,14 @@ function void fn00730c()
 	if (s8[A1 + 0x2b] < 0)
 	{
 		u16[A1 + 0x32] = 0x05
-		u8[A1 + 0x2b] &= 0x7f
+		u8[A1 + 0x2b] &= ~char.bonus.INFINITE_INERTIA
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
 		{
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
-			u8[A1 + 0x2a] &= ~0x04
+			objA1.flags2a &= ~char.flag.ROLLING
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
-			u8[A1 + 0x20] = 0
+			u8[A1 + 0x20] = char.state.RUNNING
 		}
 	}
 }
@@ -418,6 +418,8 @@ function void fn006f4a()
 
 function void fn006f90()
 {
+	u8 bit = (1 << D5.u8)
+
 	A2 = (global.act == 0) ? 0x00705c : 0x007130
 	D2.u16 = u16[(A2+=2)-2]
 
@@ -433,7 +435,7 @@ function void fn006f90()
 				return
 			}
 
-			if ((u8[0xfffff7c7] & (1 << D5.u8)) == 0)
+			if ((u8[0xfffff7c7] & bit) == 0)
 			{
 				if (u8[A1 + 0x2e] != 0)
 				{
@@ -455,22 +457,22 @@ function void fn006f90()
 				u8[A1 + 0x2f] = 0
 				if (u8[A2 + 0x0c] != 0)
 				{
-					if (D6 & 0x04)
+					if (D6 & CONTROL_LEFT)
 					{
 						--objA1.position.x.u16
 					}
-					if (D6 & 0x08)
+					if (D6 & CONTROL_RIGHT)
 					{
 						++objA1.position.x.u16
 					}
 				}
 				else
 				{
-					if (D6 & 0x01)
+					if (D6 & CONTROL_UP)
 					{
 						--objA1.position.y.u16
 					}
-					if (D6 & 0x02)
+					if (D6 & CONTROL_DOWN)
 					{
 						++objA1.position.y.u16
 					}
@@ -489,7 +491,7 @@ function void fn006f90()
 
 	if (u8[A3] != 0)
 	{
-		u8[A1 + 0x20] = 0x1a
+		u8[A1 + 0x20] = char.state.GOT_HURT
 		u8[A3] = 0
 	}
 }

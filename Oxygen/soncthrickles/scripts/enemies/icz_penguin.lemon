@@ -61,7 +61,7 @@ function void fn08bc6c()
 	{
 		objA0.velocity.x = -objA0.velocity.x
     	s16[A0 + 0x40] = -s16[A0 + 0x40]
-    	objA0.render_flags ^= 0x01
+    	objA0.render_flags ^= render_flag.FLIP_X
 	}
 	else if (D1.s16 >= 12)
 	{
@@ -127,7 +127,7 @@ function void fn08bcba()
 	{
 		objA0.velocity.x = -objA0.velocity.x
     	s16[A0 + 0x40] = -s16[A0 + 0x40]
-    	objA0.render_flags ^= 0x01
+    	objA0.render_flags ^= render_flag.FLIP_X
 	}
 	else if (D1.s16 >= 12)
 	{
@@ -163,7 +163,7 @@ function void fn08bcf4()
 	D0 = objA0.subtype2c
 	objA0.countdown_value = D0.u16
 	objA0.countdown_callback = 0x08bb24
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 }
 
 
@@ -177,8 +177,7 @@ function void fn08bd3c()
 //# address-hook(0x08bb0e) end(0x08bb1e)
 function void fn08bb0e()
 {
-	A1 = 0x08bddc
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x08bddc))
 		return
 
 	if (objA0.render_flags & render_flag.FLIP_Y)
@@ -211,7 +210,7 @@ function void fn08bb24()
 //# address-hook(0x08bb6a) end(0x08bc02)
 function void fn08bb6a()
 {
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 	if (!_equal())
 	{
 		if (objA0.flags2e <= 0x02)
@@ -263,7 +262,7 @@ function void fn08bbf4()
 {
 	objA0.velocity.x = -objA0.velocity.x
 	s16[A0 + 0x40] = -s16[A0 + 0x40]
-	objA0.render_flags ^= 0x01
+	objA0.render_flags ^= render_flag.FLIP_X
 }
 
 
@@ -312,7 +311,7 @@ function void fn08bc26()
 		{
 			objA0.velocity.x = -objA0.velocity.x
 			s16[A0 + 0x40] = -s16[A0 + 0x40]
-			objA0.render_flags ^= 0x01
+			objA0.render_flags ^= render_flag.FLIP_X
 		}
 	}
 

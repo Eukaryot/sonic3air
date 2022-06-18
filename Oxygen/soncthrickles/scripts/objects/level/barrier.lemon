@@ -20,7 +20,7 @@ function void fn020630()
 	if (global.zone == 0x01)
 	{
 		objA0.mapping_offset = 0x21ea1a
-		objA0.sprite_attributes = 0xc001
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0001)
 
 		D0.u8 = objA0.subtype2c
 		if (objA0.subtype2c & 0x80)
@@ -51,7 +51,7 @@ function void fn020630()
 		if ((objA0.subtype2c & 0x40) == 0)
 		{
 			objA0.mapping_offset = 0x21e896
-			objA0.sprite_attributes = 0x4001
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 			objA0.box_size.x = 0x40
 			objA0.box_size.y = 0x10
 			u32[A0 + 0x30] = 0x020cf4
@@ -60,7 +60,7 @@ function void fn020630()
 		else
 		{
 			objA0.mapping_offset = 0x21e992
-			objA0.sprite_attributes = 0x4001
+			objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 			objA0.box_size.x = 0x20
 			objA0.box_size.y = 0x30
 			u32[A0 + 0x30] = 0x020d14
@@ -77,7 +77,7 @@ function void fn020752()
 	if (global.zone == 0x02)
 	{
 		objA0.mapping_offset = 0x21ee68
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.flags38 = ((objA0.subtype2c & 0x0f) << 4) + 8
 		D1.u8 = (objA0.subtype2c & 0xf0) >> 2
 
@@ -116,7 +116,7 @@ function void fn0207d4()
 
 		objA0.flags38 = ((D0.u8 & 0x0f) << 4) + 8
 		objA0.mapping_offset = 0x21f2f2
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.box_size.x = 0x50
 		objA0.box_size.y = 0x38
 		u32[A0 + 0x30] = 0x020e19
@@ -127,12 +127,12 @@ function void fn0207d4()
 	if (global.zone == 0x16)
 	{
 		objA0.mapping_offset = 0x020fce
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	}
 	else if (global.zone == 0x09)
 	{
 		objA0.mapping_offset = 0x020f0e
-		objA0.sprite_attributes = 0x4090
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0090)
 	}
 	else
 	{
@@ -162,7 +162,7 @@ function void fn0208a6()
 	if (global.zone == 0x04)
 	{
 		objA0.mapping_offset = 0x02108e
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.flags38 = ((objA0.subtype2c & 0x0f) << 4) + 8
 		D1.u16 = (objA0.subtype2c & 0x70) >> 2
 
@@ -195,7 +195,7 @@ function void fn020904()
 	if (global.zone == 0x08)
 	{
 		objA0.mapping_offset = 0x02127a
-		objA0.sprite_attributes = 0x4001
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.flags38 = ((objA0.subtype2c & 0x0f) << 4) + 8
 		D1.u16 = (objA0.subtype2c & 0x70) >> 2
 
@@ -233,9 +233,9 @@ function void fn02095e()
 		if (objA0.flags38 == 0)
 		{
 			A4 = u32[A0 + 0x30]
-			if ((objA0.subtype2c & 0x80) && (objA0.flags2a & 0x18))
+			if ((objA0.subtype2c & 0x80) && (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)))
 			{
-				D1.u16 = (objA0.flags2a & 0x08) ? u16[0xffffb010] : u16[0xffffb05a]
+				D1.u16 = (objA0.flags2a & object.flag.P1_ON_OBJECT) ? u16[0xffffb000 + 0x10] : u16[0xffffb04a + 0x10]
 				if (D1.u16 < objA0.position.x.u16)
 				{
 					A4 = objA0.countdown_callback
@@ -249,7 +249,7 @@ function void fn02095e()
 		--objA0.flags38
 	}
 
-	if (objA0.flags2a & 0x18)
+	if (objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT))
 		objA0.value3a = 0x01
 
 	fn0209b8()
@@ -269,32 +269,32 @@ function void fn0209b8()
 //# address-hook(0x0209d0) end(0x020a52)
 function void fn0209d0()
 {
-	// Horizonlat barrier towards the end of MGZ 1
+	// Horizontal barrier towards the end of MGZ 1
 
 	D1 = objA0.box_size.x
 	D3.u16 = 0x10
 	D4.u16 = objA0.position.x.u16
 	PlatformCheckClimbOn()
 
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 != 0)
 	{
 		// Query the protection flag set by spinning top
-		D1.u8 = (D0.u8 & 0x08) ? u8[0xffffb037] : u8[0xffffb081]
+		D1.u8 = (D0.u8 & object.flag.P1_ON_OBJECT) ? u8[0xffffb000 + 0x37] : u8[0xffffb04a + 0x37]
 		if (D1.u8 & 0x80)
 		{
-			if (objA0.flags2a & 0x08)
+			if (objA0.flags2a & object.flag.P1_ON_OBJECT)
 			{
-				objA0.flags2a &= ~0x08
+				objA0.flags2a &= ~object.flag.P1_ON_OBJECT
 				A1 = 0xffffb000
-				u8[A1 + 0x2a] &= ~0x08
+				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			}
 
-			if (objA0.flags2a & 0x10)
+			if (objA0.flags2a & object.flag.P2_ON_OBJECT)
 			{
-				objA0.flags2a &= ~0x10
+				objA0.flags2a &= ~object.flag.P2_ON_OBJECT
 				A1 = 0xffffb04a
-				u8[A1 + 0x2a] &= ~0x08
+				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			}
 
 			A4 = 0x020a76
@@ -345,13 +345,13 @@ function void fn020af6()
 			A4 = u32[A0 + 0x30]
 			if (s8[A0 + 0x2c] < 0)
 			{
-				D0.u8 = objA0.flags2a & 0x18
+				D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 				if (D0.u8 != 0)
 				{
-					if (D0.u8 & 0x08)
-						D1.u16 = u16[0xffffb010]
+					if (D0.u8 & object.flag.P1_ON_OBJECT)
+						D1.u16 = u16[0xffffb000 + 0x10]
 					else
-						D1.u16 = u16[0xffffb05a]
+						D1.u16 = u16[0xffffb04a + 0x10]
 
 					if (D1.u16 < objA0.position.x.u16)
 					{
@@ -427,11 +427,11 @@ function void fn020b8c()
 	D1 = objA0.box_size.x
 
 	A1 = 0xffffb000
-	D6 = 0x03
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn020bba()
 
 	A1 = 0xffffb04a
-	D6 = 0x04
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn020bba()
 
 	DrawOrUnloadObject()
@@ -441,7 +441,8 @@ function void fn020b8c()
 //# address-hook(0x020bba) end(0x020c10)
 function void fn020bba()
 {
-	if (objA0.flags2a & (1 << D6.u8))
+	u8 bit = (1 << D6.u8)
+	if (objA0.flags2a & bit)
 	{
 		D2.u16 = D1.u16 * 2
 		if ((u8[A1 + 0x2a] & 0x02) == 0)
@@ -464,10 +465,10 @@ function void fn020bba()
 			}
 		}
 
-		objA0.flags2a &= ~(1 << D6.u8)
-		u8[A1 + 0x2a] &= ~0x08
-		u8[A1 + 0x2a] &= ~0x20
-		u8[A1 + 0x2a] |= 0x02
-		u8[A1 + 0x21] = 0x01
+		objA0.flags2a &= ~bit
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		u8[A1 + 0x2a] &= ~char.flag.PUSHING
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
+		u8[A1 + 0x21] = char.state.RUNNING2
 	}
 }

@@ -14,8 +14,8 @@
 function void fn041f44()
 {
 	objA0.mapping_offset = 0x041fc8
-	objA0.sprite_attributes = 0x4001
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 
 	if (objA0.subtype2c != 0)

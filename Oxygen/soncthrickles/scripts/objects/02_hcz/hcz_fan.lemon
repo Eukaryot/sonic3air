@@ -30,7 +30,7 @@ function void fn030580()
 		u16[A0 + 0x40] = objA0.position.x.u16
 		objA0.position.y.u16 += 0x1c
 		objA0.mapping_offset = 0x22e76c
-		objA0.sprite_attributes = 0x43d4
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03d4)
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x10
 		objA0.render_flags = render_flag.WORLD
@@ -40,12 +40,12 @@ function void fn030580()
 		u8[A1 + 0x2c] = (objA0.subtype2c & ~0x20) | 0x10
 	}
 
-	u32[A1 + 0x0c] = 0x22f3aa
-	u16[A1 + 0x0a] = 0x240b
-	u8[A1 + 0x04] |= 0x04
-	u16[A1 + 0x08] = 0x0200
-	u8[A1 + 0x07] = 0x10
-	u8[A1 + 0x06] = 0x0c
+	objA1.mapping_offset = 0x22f3aa
+	objA1.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040b)
+	objA1.render_flags |= render_flag.WORLD
+	objA1.sprite_priority = 0x0200
+	objA1.box_size.x = 0x10
+	objA1.box_size.y = 0x0c
 	u16[A1 + 0x40] = objA1.position.x.u16
 	D0.u16 = ((u8[A1 + 0x2c] & 0x0f) + 8) << 4
 	u16[A1 + 0x36] = D0.u16
@@ -150,11 +150,11 @@ function void fn03064e()
 				if (allocDynamicObjectStd())
 				{
 					objA1.update_address = 0x030834
-					u8[A1 + 0x04] = (render_flag.WORLD | render_flag.VISIBLE)
-					u8[A1 + 0x07] = 0x04
-					u16[A1 + 0x08] = 0x0300
-					u16[A1 + 0x0a] = 0x045c
-					u32[A1 + 0x0c] = 0x02fcb2
+					objA1.render_flags = (render_flag.WORLD | render_flag.VISIBLE)
+					objA1.box_size.x = 0x04
+					objA1.sprite_priority = 0x0300
+					objA1.sprite_attributes = 0x045c
+					objA1.mapping_offset = 0x02fcb2
 					objA1.position.x.u16 = objA0.position.x.u16
 
 					GetRandomNumber()
@@ -223,8 +223,8 @@ function void fn03077e()
 				// Fix for bug when Tails carries other player and gets caught by the fan
 				if (u8[A1 + 0x38] == CHARACTER_TAILS && tails.carrying)
 				{
-					u8[0xffffb02a] |= char.flag.IN_AIR
-					u8[0xffffb02e] = 0
+					u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
+					u8[0xffffb000 + 0x2e] = 0
 				}
 			#endif
 			}
@@ -267,7 +267,7 @@ function void fn030834()
 function void fn030850()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
-	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	D0.u16 = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 
 	if (D0.s16 >= 0x20)
 	{
@@ -324,10 +324,10 @@ function void fn030850()
 //# address-hook(0x0308fa) end(0x030936)
 function void fn0308fa()
 {
-	D0.u16 = u16[0xffffb010] - 0x20
+	D0.u16 = u16[0xffffb000 + 0x10] - 0x20
 	if (D0.u16 >= objA0.position.x.u16)
 	{
-		D0.u16 = u16[0xffffb014] - objA0.position.y.u16 - 0x20
+		D0.u16 = u16[0xffffb000 + 0x14] - objA0.position.y.u16 - 0x20
 		if (D0.u16 < 0x40)
 		{
 			Kosinski.addToDMAQueue(0x390900, 0xa000)
@@ -352,7 +352,7 @@ function void fn03093c()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.mapping_offset = 0x22f418
-	objA0.sprite_attributes = 0x2500
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0500)
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x20
 	u16[A0 + 0x30] = 0x08
@@ -403,8 +403,8 @@ function void fn03097e()
 function void fn0309cc()
 {
 	objA0.mapping_offset = 0x22f620
-	objA0.sprite_attributes = 0x6300
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0300)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x04
@@ -414,7 +414,7 @@ function void fn0309cc()
 	D0.u16 += 0x30
 	u16[A0 + 0x38] = D0.u16
 
-	u32[A0] = 0x030a10
+	objA0.update_address = 0x030a10
 	fn030a10()
 }
 
@@ -456,7 +456,7 @@ function void fn030a38()
 		D1.u16 += u16[A0 + 0x36]
 		D1.s16 = -D1.s16 >> 6
 		u16[A1 + 0x14] += D1.u16
-		u8[A1 + 0x2a] |= 0x02
+		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		objA1.flags2a &= ~char.flag.CONTROL_LOCK
 		u16[A1 + 0x1a] = 0
 		u8[A1 + 0x2f] = 0

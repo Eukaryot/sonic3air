@@ -98,7 +98,7 @@ function void fn0884d2()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn084700()
+	Object.AnimationProgressByLocalA1.SpeedUp()
 }
 
 
@@ -171,7 +171,7 @@ function void fn08855a()
 function void fn0887f6()
 {
 	objA0.update_address = 0x088804
-	u8[A0 + 0x28] = 0x9e
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.4x8)
 }
 
 
@@ -196,7 +196,7 @@ function void fn088820()
 {
 	setupObjectAttributesFull(0x088b02)
 
-	objA0.flags2b |= 0x08
+	objA0.flags2b |= char.bonus.DEFLECTABLE
 	GetRandomNumber()
 	D0.u8 &= 0x03
 	objA0.animation.sprite = D0.u8

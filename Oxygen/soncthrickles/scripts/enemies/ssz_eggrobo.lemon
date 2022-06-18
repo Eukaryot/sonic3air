@@ -186,9 +186,9 @@ function void fn0916a8()
 	setupObjectAttributesBasic(0x0919be)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x04] & 0x04) == 0)
+	if ((objA1.render_flags & render_flag.WORLD) == 0)
 	{
-		objA0.render_flags &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
 	}
 	objA0.update_address = 0x0916cc
 }
@@ -210,9 +210,9 @@ function void fn0916ee()
 	setupObjectAttributesBasic(0x0919c4)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if ((u8[A1 + 0x04] & 0x04) == 0)
+	if ((objA1.render_flags & render_flag.WORLD) == 0)
 	{
-		objA0.render_flags &= ~0x04
+		objA0.render_flags &= ~render_flag.WORLD
 	}
 	objA0.update_address = 0x091712
 }
@@ -226,8 +226,7 @@ function void fn091712()
 	{
 		objA0.update_address = 0x09173a
 		objA0.countdown_value = 0x5f
-		A2 = 0x0919de
-		SpawnChildObjectsInDir()
+		spawnChildObjectsInDir(0x0919de)
 	}
 	fn084920()
 }
@@ -267,7 +266,7 @@ function void fn09176c()
 	{
 		objA0.update_address = 0x0917b4
 		objA0.animation.sprite = 0x07
-		u8[A0 + 0x28] = 0x9c
+		objA0.collision_attributes = (collision.flag.THREAT | collision.size.24x4)
 		objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x800 : -0x800
 		playSound(0x5e)
 	}
@@ -314,8 +313,8 @@ function void fn0917c0()
 	objA0.velocity.y = D0.u16
 
 	objA0.hitbox_extends.y = 0x0c
-	objA0.render_flags = 0x04
-	objA0.render_flags |= 0x01
+	objA0.render_flags = render_flag.WORLD
+	objA0.render_flags |= render_flag.FLIP_X
 	objA0.sprite_priority = 0x0300
 	objA0.box_size.x = 0x08
 	objA0.animation.timer = 7
@@ -413,11 +412,11 @@ function void fn091930()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0.u16 = objA1.position.x.u16
 	D1.s16 = s8[A0 + 0x42]
-	objA0.render_flags &= ~0x01
-	if (u8[A1 + 0x04] & 0x01)
+	objA0.render_flags &= ~render_flag.FLIP_X
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		D1.s16 = -D1.s16
-		objA0.render_flags |= 0x01
+		objA0.render_flags |= render_flag.FLIP_X
 	}
 	D0.u16 += D1.u16
 	objA0.position.x.u16 = D0.u16
@@ -427,11 +426,11 @@ function void fn091930()
 		D0.u16 = objA1.position.y.u16
 	}
 	D1.s16 = s8[A0 + 0x43]
-	objA0.render_flags &= ~0x02
-	if (u8[A1 + 0x04] & 0x02)
+	objA0.render_flags &= ~render_flag.FLIP_Y
+	if (objA1.render_flags & render_flag.FLIP_Y)
 	{
 		D1.s16 = -D1.s16
-		objA0.render_flags |= 0x02
+		objA0.render_flags |= render_flag.FLIP_Y
 	}
 	D0.u16 += D1.u16
 	objA0.position.y.u16 = D0.u16

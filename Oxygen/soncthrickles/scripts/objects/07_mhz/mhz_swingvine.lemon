@@ -63,12 +63,12 @@ function void fn0225d0()
 //# address-hook(0x022656) end(0x02267c)
 function void fn022656()
 {
-	u8[A1 + 0x04] = render_flag.WORLD
-	u8[A1 + 0x07] = 0x08
-	u8[A1 + 0x06] = 0x08
-	u16[A1 + 0x08] = 0x0200
-	u32[A1 + 0x0c] = 0x022b9e
-	u16[A1 + 0x0a] = 0x0455
+	objA1.render_flags = render_flag.WORLD
+	objA1.box_size.x = 0x08
+	objA1.box_size.y = 0x08
+	objA1.sprite_priority = 0x0200
+	objA1.mapping_offset = 0x022b9e
+	objA1.sprite_attributes = 0x0455
 }
 
 
@@ -332,6 +332,7 @@ function void fn02291a()
 
 	if ((objA1.render_flags & render_flag.VISIBLE) && u8[A1 + 0x05] < 0x04 && debug_mode.state == 0)
 	{
+		// Check if jump button pressed
 		if ((D0.u8 & CONTROL_ABC) == 0)
 		{
 			if (u16[A0 + 0x30] != 0)
@@ -365,11 +366,11 @@ function void fn02291a()
 			objA1.velocity.y = D1.s16 << 7
 
 			u8[A2 + 0x02] = 0x3c
-			if (D0 & 0x0400)
+			if (D0 & 0x0400)		// CONTROL_LEFT held
 			{
 				objA1.velocity.x = -0x200
 			}
-			if (D0 & 0x0800)
+			if (D0 & 0x0800)		// CONTROL_RIGHT held
 			{
 				objA1.velocity.x = 0x200
 			}
@@ -404,8 +405,8 @@ function void fn02291a()
 function void fn022a28()
 {
 	D1.u8 = u8[A1 + 0x2a] & char.flag.FACING_LEFT
-	u8[A1 + 0x04] &= 0xfc
-	u8[A1 + 0x04] |= D1.u8
+	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
+	objA1.render_flags |= D1.u8
 	D0 = u8[A1 + 0x22]
 
 	u32 backupA2 = A2
@@ -478,7 +479,7 @@ function void fn022af8()
 			if (objA1.velocity.x >= 0x0400)
 			{
 				u8[A2] = 0x81
-				playSound(0x4a)
+				playSound(SFX_GRAB)
 			}
 
 			objA1.velocity.x = 0
@@ -489,7 +490,7 @@ function void fn022af8()
 			objA1.state = char.state.HANGING
 			u8[A1 + 0x3d] = 0
 			u8[A1 + 0x2e] = 0x03
-			u8[A1 + 0x04] &= 0xfd
+			objA1.render_flags &= ~render_flag.FLIP_Y
 		}
 	}
 }

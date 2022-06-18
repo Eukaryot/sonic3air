@@ -37,14 +37,14 @@ function void TailsTails.Update()
 	u8[A0 + 0x26] = u8[A2 + 0x26]			// Rotation
 	objA0.flags2a = u8[A2 + 0x2a]			// Flags
 	objA0.sprite_priority = u16[A2 + 0x08]
-	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	D0 = u8[A2 + 0x20]
-	if ((u8[A2 + 0x2a] & 0x20) && u8[0xfffff7c9] == 0)
+	if ((u8[A2 + 0x2a] & char.flag.PUSHING) && u8[0xfffff7c9] == 0)
 	{
-		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)
+		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)		// Range of Tails' pushing animation frames
 		{
-			D0 = 4
+			D0 = 4	// Set appropriate tail animation manually, because char.state isn't actually set for character pushing animation
 		}
 	}
 	if (u8[A0 + 0x34] != D0.u8)
@@ -76,7 +76,7 @@ function void TailsTails.UpdateSpritePatterns()
 // Competition mode
 
 //# address-hook(0x016022) end(0x01604e)
-function void fn016022()
+function void CompetitionMode.TailsTails.UpdateSpritePatterns()
 {
 	u16 targetInVRAM = (A0 == 0xffffcc0a) ? 0xd600 : 0xd200
 	updateMultipleSpritePatterns(0x33d5e0, 0x2a024c, targetInVRAM, objA0.animation.sprite)
@@ -84,22 +84,22 @@ function void fn016022()
 
 
 //# address-hook(0x0161fa) end(0x01622c)
-function void fn0161fa()
+function void CompetitionMode.TailsTails.Init()
 {
 	objA0.mapping_offset = 0x2a00a4
 	objA0.sprite_attributes = (A0 == 0xffffcc0a) ? 0x06b0 : 0x0690
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.render_flags = 0x04
+	objA0.render_flags = render_flag.WORLD
 
-	u32[A0] = 0x016232
-	fn016232()
+	objA0.update_address = 0x016232
+	CompetitionMode.TailsTails.Update()
 }
 
 
 //# address-hook(0x016232) end(0x01629a)
-function void fn016232()
+function void CompetitionMode.TailsTails.Update()
 {
 	A2 = 0xffff0000 + u16[A0 + 0x30]
 	objA0.value26 = u8[A2 + 0x26]
@@ -107,7 +107,7 @@ function void fn016232()
 	objA0.position.x.u16 = u16[A2 + 0x10]
 	objA0.position.y.u16 = u16[A2 + 0x14]
 	objA0.sprite_priority = u16[A2 + 0x08]
-	objA0.sprite_attributes = (objA0.sprite_attributes & 0x7fff) | (u16[A2 + 0x0a] & 0x8000)
+	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	D0 = u8[A2 + 0x20]
 	if ((u8[A2 + 0x2a] & 0x20) && D0.u8 != 0x05)
@@ -121,7 +121,7 @@ function void fn016232()
 	}
 
 	A1 = 0x0162c2
-	fn015cd6()
-	fn016022()
+	CompetitionMode.UpdateTailsAnimation_inner()
+	CompetitionMode.TailsTails.UpdateSpritePatterns()
 	DrawObject()
 }

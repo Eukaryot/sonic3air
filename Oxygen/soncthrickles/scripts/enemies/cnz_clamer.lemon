@@ -37,8 +37,7 @@ function void fn088fba()
 //# address-hook(0x088fdc) end(0x088fe8)
 function void fn088fdc()
 {
-	A1 = 0x089124
-	if (fn084fa4())
+	if (SetupObjectAttributesSlotted(0x089124))
 		return
 
 	// "spawnChildObjects(0x089148)" replaced by:
@@ -94,7 +93,7 @@ function void fn08904e()
 function void fn089056()
 {
 	objA0.base_state = 0x02
-	u8[A0 + 0x28] = 0x0a
+	objA0.collision_attributes = collision.size.16x8
 }
 
 
@@ -104,10 +103,9 @@ function void fn089064()
 	A1 = 0x089185
 	fn0845a0()
 
-	if (D2.u16 != 0 && objA0.animation.sprite == 8 && u8[A0 + 0x04] & 0x80)
+	if (D2.u16 != 0 && objA0.animation.sprite == 8 && objA0.render_flags & render_flag.VISIBLE)
 	{
-		A2 = 0x089150
-		SpawnProjectileChildObjectsInDir()
+		spawnProjectileChildObjectsInDir(0x089150)
 	}
 }
 
@@ -117,7 +115,7 @@ function void fn08908c()
 {
 	setupObjectAttributesBasic(0x089136)
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.render_flags = u8[A1 + 0x04]
+	objA0.render_flags = objA1.render_flags
 	objA0.sprite_attributes = 0
 	objA0.update_address = 0x0890aa
 }
@@ -169,5 +167,5 @@ function void fn0890d8()
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x40] = 0
 
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }

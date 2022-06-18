@@ -245,6 +245,8 @@ function void fn085436()
 }
 
 
+// Movement towards target X position
+
 //# address-hook(0x08548e) end(0x0854b8)
 function void fn08548e()
 {
@@ -260,6 +262,8 @@ function void fn08548e()
 	}
 }
 
+
+// Movement towards target Y position
 
 //# address-hook(0x0854ba) end(0x0854e4)
 function void fn0854ba()
@@ -429,9 +433,9 @@ function void fn0857c2()
 	}
 
 	// Targets:
-	//  - 0x0857f0	-> u8[A1 + 0x38] = 0x00
-	//  - 0x0857f4	-> u8[A1 + 0x38] = 0x01
-	//  - 0x085826	-> u8[A1 + 0x38] = 0x02
+	//  - 0x0857f0	-> u8[A1 + 0x38] = CHARACTER_SONIC
+	//  - 0x0857f4	-> u8[A1 + 0x38] = CHARACTER_TAILS
+	//  - 0x085826	-> u8[A1 + 0x38] = CHARACTER_KNUCKLES
 	D0 = u8[A1 + 0x38] * 2
 	call tableLookupAddress(0x0857ea, D0.u16)
 }
@@ -440,6 +444,7 @@ function void fn0857c2()
 //# address-hook(0x0857f0) end(0x0857f2)
 function void fn0857f0()
 {
+	// No special conditions for Sonic, attacked
 	D0 = 0
 	_setZeroFlagByValue(0)
 }
@@ -448,19 +453,22 @@ function void fn0857f0()
 //# address-hook(0x0857f4) end(0x085824)
 function void fn0857f4()
 {
-	if (u8[A1 + 0x2f] != 0 && (u8[A1 + 0x2a] & 0x40) == 0)
+	// Check for if the enemy is above Tails while flying and not underwater
+	if (u8[A1 + 0x2f] != 0 && (u8[A1 + 0x2a] & char.flag.UNDERWATER) == 0)
 	{
 		s16 dx = objA1.position.x.u16 - objA0.position.x.u16
 		s16 dy = objA1.position.y.u16 - objA0.position.y.u16
 		u8 angle = lookupAngleByVector(dx, dy)
 		if (u8(angle - 0x20) < 0x40)
 		{
+			// Attack the enemy
 			D0 = 1
 			_setZeroFlagByValue(1)
 			return
 		}
 	}
 
+	// Attack Tails
 	D0 = 0
 	_setZeroFlagByValue(0)
 }
@@ -469,6 +477,7 @@ function void fn0857f4()
 //# address-hook(0x085822)
 function void fn085822()
 {
+	// Attack the enemy
 	D0 = 1
 	_setZeroFlagByValue(1)
 }
@@ -477,7 +486,7 @@ function void fn085822()
 //# address-hook(0x085826) end(0x085836)
 function void fn085826()
 {
-	D0 = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3) ? 1 : 0
+	D0 = (u8[A1 + 0x2f] == 1 || u8[A1 + 0x2f] == 3) ? 1 : 0		// Check for Knuckles' gliding and ground slide states
 	_setZeroFlagByValue(D0)
 }
 
@@ -647,9 +656,9 @@ function void fn085da8()
 function void fn085de0()
 {
 	// "spawnChildObjects(0x085de8)" replaced by:
-	spawnChildObject(0x084a48, 0x00, 0, 0)		// Screen mover
+	spawnChildObject(0x084a48, 0x00, 0, 0)		// Screen mover for the right border
 	spawnChildObject(0x084aa4, 0x02, 0, 0)		// Screen mover for the upper border
-	spawnChildObject(0x084ad2, 0x04, 0, 0)
+	spawnChildObject(0x084ad2, 0x04, 0, 0)		// Screen mover for the lower border
 }
 
 
@@ -680,9 +689,9 @@ function void fn084258()
 			return
 
 		u16[A1 + 0x46] = A0.u16
-		u32[A1 + 0x0c] = objA0.mapping_offset
-		u16[A1 + 0x0a] = objA0.sprite_attributes
-		u32[A1] = u32[(A2+=4)-4]
+		objA1.mapping_offset = objA0.mapping_offset
+		objA1.sprite_attributes = objA0.sprite_attributes
+		objA1.update_address = u32[(A2+=4)-4]
 		u8[A1 + 0x2c] = D2.u8
 		D1.s8 = s8[(A2+=1)-1]
 		u8[A1 + 0x42] = D1.s8
@@ -706,7 +715,7 @@ function void fn084258()
 
 
 //# address-hook(0x08450e) end(0x08450e)
-function void fn08450e()
+function void fn08450e()		// "Animate_RawCheckResult" in skdisasm
 {
 	A1 = u32[A0 + 0x30]
 	fn084512()
@@ -714,7 +723,7 @@ function void fn08450e()
 
 
 //# address-hook(0x084512) end(0x084550)
-function void fn084512()
+function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
 {
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) >= 0)
@@ -730,12 +739,17 @@ function void fn084512()
 	if (D1.u8 == 0xff)
 	{
 		D1.s8 = -s8[(A2+=1)-1]
+		// Calls one of the following:
+		//	- 0x084552
+		//	- 0x084556
+		//	- 0x08455a
 		call 0x08454e + D1.s16
 		objA0.animation.frame = 0
 		D2 = -1
 	}
 	else
 	{
+		// Advance to next frame
 		objA0.animation.timer = u8[A1]
 		objA0.animation.sprite = D1.u8
 		D2 = 1
@@ -746,18 +760,21 @@ function void fn084512()
 //# address-hook(0x084552) end(0x084552)
 function void fn084552()
 {
+	// Loop animation from the start
 	fn08456a()
 }
 
 //# address-hook(0x084556) end(0x084556)
 function void fn084556()
 {
+	// Loop animation from specific frame
 	fn08455e()
 }
 
 //# address-hook(0x08455a) end(0x08455a)
 function void fn08455a()
 {
+	// Call another function
 	fn084576()
 }
 
@@ -765,6 +782,7 @@ function void fn08455a()
 //# address-hook(0x08455e) end(0x084566)
 function void fn08455e()
 {
+	// Set animation loop point
 	A1 += s8[(A2+=1)-1]
 	u32[A0 + 0x30] = A1
 	fn08456a()
@@ -774,6 +792,7 @@ function void fn08455e()
 //# address-hook(0x08456a) end(0x084574)
 function void fn08456a()
 {
+	// Restart animation
 	objA0.animation.sprite = u8[A1 + 1]
 	objA0.animation.timer = u8[A1]
 }
@@ -782,6 +801,7 @@ function void fn08456a()
 //# address-hook(0x084576) end(0x08457e)
 function void fn084576()
 {
+	// Call address stored in objA0.countdown_callback
 	objA0.animation.timer = 0
 	A1 = objA0.countdown_callback
 	call A1
@@ -789,7 +809,7 @@ function void fn084576()
 
 
 //# address-hook(0x084580) end(0x08458c)
-function void fn084580()
+function void fn084580()		// "Set_Raw_Animation" in skdisasm
 {
 	u32[A0 + 0x30] = A1
 	objA0.animation.frame = 0
@@ -834,6 +854,7 @@ function void fn0845a0()		// "Animate_RawNoSSTMultiDelay" in skdisasm
 	}
 	else
 	{
+		// Advance to next frame
 		objA0.animation.sprite = D1.u8
 		objA0.animation.timer = u8[A1 + D0.s16 + 1]
 		D2 = 1
@@ -858,24 +879,28 @@ function void fn0845cc()
 //# address-hook(0x0845d8) end(0x0845d8)
 function void fn0845d8()
 {
+	// Loop animation from the start
 	fn0845f2()
 }
 
 //# address-hook(0x0845dc) end(0x0845dc)
 function void fn0845dc()
 {
+	// Loop animation from specific frame
 	fn0845e4()
 }
 
 //# address-hook(0x0845e0) end(0x0845e0)
 function void fn0845e0()
 {
+	// Call another function
 	fn084600()
 }
 
 //# address-hook(0x0845e4) end(0x0845f0)
 function void fn0845e4()
 {
+	// Set animation loop point
 	D1.s16 = s8[A1 + D0.s16 + 1]
 	A1 += D1.s16
 	u32[A0 + 0x30] = A1
@@ -885,6 +910,7 @@ function void fn0845e4()
 //# address-hook(0x0845f2) end(0x0845fe)
 function void fn0845f2()
 {
+	// Restart animation
 	objA0.animation.sprite = u8[A1]
 	objA0.animation.timer = u8[A1 + 1]
 	D2 = 1
@@ -893,6 +919,7 @@ function void fn0845f2()
 //# address-hook(0x084600) end(0x08460c)
 function void fn084600()
 {
+	// Call address stored in objA0.countdown_callback
 	objA0.animation.timer = 0
 	A1 = objA0.countdown_callback
 	call A1
@@ -901,7 +928,7 @@ function void fn084600()
 
 
 //# address-hook(0x08460e) end(0x08460e)
-function void fn08460e()
+function void fn08460e()		// "Animate_RawMultiDelayFlipX" in skdisasm
 {
 	A1 = u32[A0 + 0x30]
 	fn084612()
@@ -909,7 +936,7 @@ function void fn08460e()
 
 
 //# address-hook(0x084612) end(0x084648)
-function void fn084612()
+function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 {
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
@@ -926,9 +953,10 @@ function void fn084612()
 			if (D1 & 0x40)
 			{
 				D1 &= ~0x40
-				objA0.render_flags ^= 0x01
+				objA0.render_flags ^= render_flag.FLIP_X
 			}
 
+			// Advance to next frame
 			objA0.animation.sprite = D1.u8
 			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]
 			D2 = 1
@@ -941,11 +969,17 @@ function void fn084612()
 }
 
 
-//# address-hook(0x08464a) end(0x084686)
-function void fn08464a()
+//# address-hook(0x08464a) end(0x08464a)
+function void fn08464a()		// "Animate_RawMultiDelayFlipY" in skdisasm
 {
 	A1 = u32[A0 + 0x30]
+	fn08464e()
+}
 
+
+//# address-hook(0x08464e) end(0x084686)
+function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
+{
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
@@ -961,8 +995,10 @@ function void fn08464a()
 			if (D1 & 0x40)
 			{
 				D1 &= ~0x40
-				objA0.render_flags ^= 0x02
+				objA0.render_flags ^= render_flag.FLIP_Y
 			}
+
+			// Advance to next frame
 			objA0.animation.sprite = D1.u8
 			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]
 
@@ -976,7 +1012,7 @@ function void fn08464a()
 
 
 //# address-hook(0x084688) end(0x084688)
-function void fn084688()
+function void fn084688()		// "Animate_Raw2MultiDelay" in skdisasm
 {
 	A1 = u32[A0 + 0x30]
 	fn08468c()
@@ -984,7 +1020,7 @@ function void fn084688()
 
 
 //# address-hook(0x08468c) end(0x0846ca)
-function void fn08468c()
+function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 {
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) >= 0)
@@ -1001,12 +1037,17 @@ function void fn08468c()
 	if (D1.u8 == 0xff)
 	{
 		D1.s8 = -s8[(A2+=1)-1]
+		// Calls one of the following:
+		//	- 0x0846cc
+		//	- 0x0846d0
+		//	- 0x0846d4
 		call 0x0846c8 + D1.s16
 		objA0.animation.frame = 0
 		_setZeroFlagByValue(0)
 	}
 	else
 	{
+		// Advance to next frame
 		objA0.animation.sprite = D1.u8
 		objA0.animation.timer = u8[A1 + D0.s16 + 1]
 		D2 = 1
@@ -1018,12 +1059,21 @@ function void fn08468c()
 //# address-hook(0x0846cc) end(0x0846cc)
 function void fn0846cc()
 {
+	// Loop animation from the start
 	fn0846e4()
+}
+
+//# address-hook(0x0846d0) end(0x0846d0)
+function void fn0846d0()
+{
+	// Loop animation from specific frame
+	fn0846d8()
 }
 
 //# address-hook(0x0846d4) end(0x0846d4)
 function void fn0846d4()
 {
+	// Call another function
 	fn0846f2()
 }
 
@@ -1031,15 +1081,27 @@ function void fn0846d4()
 //# address-hook(0x0846e4) end(0x0846f0)
 function void fn0846e4()
 {
+	// Restart animation
 	objA0.animation.sprite = u8[A1]
 	objA0.animation.timer = u8[A1 + 1]
 	D2 = -1
 }
 
 
+//# address-hook(0x0846d8) end(0x0846e0)
+function void fn0846d8()
+{
+	// Set animation loop point
+	A1 += s8[(A2+=1)-1]
+	u32[A0 + 0x30] = A1
+	fn0846e4()
+}
+
+
 //# address-hook(0x0846f2) end(0x0846fe)
 function void fn0846f2()
 {
+	// Call address stored in objA0.countdown_callback
 	objA0.animation.timer = 0
 	A1 = objA0.countdown_callback
 	call A1
@@ -1048,10 +1110,16 @@ function void fn0846f2()
 
 
 
-//# address-hook(0x084700) end(0x08477e)
-function void fn084700()
+//# address-hook(0x084700) end(0x084700)
+function void Object.AnimationProgressByLocalA1.SpeedUp()		// "Animate_RawGetFaster" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
+	Object.AnimationProgress.SpeedUp(u32[A0 + 0x30])
+}
+
+
+//# address-hook(0x084704) end(0x08477e)
+function void Object.AnimationProgress.SpeedUp()		// "Animate_RawNoSSTGetFaster" in skdisasm
+{
 	if ((objA0.flags38 & 0x20) == 0)
 	{
 		objA0.flags38 |= 0x20
@@ -1101,6 +1169,12 @@ function void fn084700()
 		D2 = 0
 	}
 	_setZeroFlagByValue(D2)
+}
+
+function void Object.AnimationProgress.SpeedUp(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.SpeedUp()
 }
 
 
@@ -1422,7 +1496,7 @@ function void fn084b82()
 {
 	objA0.render_flags &= ~render_flag.FLIP_X
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		objA0.render_flags |= render_flag.FLIP_X
 	}
@@ -1519,7 +1593,7 @@ function void fn084c72()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2 = u32[A1 + 0x10]
 	D3 = u32[A1 + 0x14]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 	{
 		D0.s32 = -D0.s32
 	}
@@ -1643,8 +1717,14 @@ function void fn084f6e()
 }
 
 
+function bool SetupObjectAttributesSlotted(u32 sourceAddress)
+{
+	A1 = sourceAddress
+	return SetupObjectAttributesSlotted()
+}
+
 //# translated(0x084fa4) end(0x085020)
-function bool fn084fa4()
+function bool SetupObjectAttributesSlotted()
 {
 	D0 = 0
 	D1.u16 = u16[A1]
@@ -1682,7 +1762,7 @@ function bool fn084fa4()
 	objA0.box_size.x = u8[(A1+=1)-1]
 	objA0.box_size.y = u8[(A1+=1)-1]
 	objA0.animation.sprite = u8[(A1+=1)-1]
-	u8[A0 + 0x28] = u8[(A1+=1)-1]
+	objA0.collision_attributes = u8[(A1+=1)-1]
 	objA0.flags2a |= 0x04
 	objA0.value3a = 0xff
 	objA0.render_flags |= render_flag.WORLD
@@ -1695,16 +1775,16 @@ function bool fn084fa4()
 //# address-hook(0x086334) end(0x08635c)
 function void fn086334()
 {
-	D0.u16 = 0x0808
+	D0.u16 = 0x0808		// CONTROL_RIGHT, CONTROL_RIGHT
 	if (objA0.countdown_value != 0)
 	{
 		--objA0.countdown_value
-		D0.u16 = 0x4808
+		D0.u16 = 0x4808		// (CONTROL_A | CONTROL_RIGHT), CONTROL_RIGHT
 	}
-	if (u8[0xffffb02a] & 0x20)
+	if (u8[0xffffb000 + 0x2a] & char.flag.PUSHING)
 	{
 		objA0.countdown_value = 0x1f
-		D0.u16 = 0x4848
+		D0.u16 = 0x4848		// (CONTROL_A | CONTROL_RIGHT), (CONTROL_A | CONTROL_RIGHT)
 	}
 	control.player1 = D0.u16
 }
@@ -1720,7 +1800,7 @@ function void fn08635e()
 	objA1.flags2a &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x40] = 0
-	playSound(0xb1)
+	playSound(SFX_SPRING)
 }
 
 
@@ -1784,7 +1864,7 @@ function void fn084e8c()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2.u16 = objA1.position.x.u16 + s8[A0 + 0x42]
-	if (u8[A1 + 0x04] & 0x01)
+	if (objA1.render_flags & render_flag.FLIP_X)
 		D1.s16 = -D1.s16
 	objA0.position.x.u16 = D2.u16 + D1.s16
 	objA0.position.y.u16 = objA1.position.y.u16 + s8[A0 + 0x43]

@@ -43,8 +43,8 @@ function void fn080184()
 {
 	setupObjectAttributesFull(0x0812ec)
 
-	objA0.render_flags |= 0x01
-	u8[A0 + 0x28] = 0x0f
+	objA0.render_flags |= render_flag.FLIP_X
+	objA0.collision_attributes = collision.size.24x24
 	boss.remaining_hits = 8
 
 	objA0.position.x.u16 = camera.foreground.x.u16 + 0x60 + getScreenExtend()
@@ -208,7 +208,7 @@ function void fn080426()
 	D0.u16 &= 0x01ff
 	objA0.position.x.u16 = camera.position.x.u16 + D0.u16 + 0x20 + getScreenExtend()
 	objA0.position.y.u16 = camera.position.y.u16 - 0x20
-	objA0.render_flags |= D0.u8 & 0x03
+	objA0.render_flags |= D0.u8 & (render_flag.FLIP_X | render_flag.FLIP_Y)
 	D0 >>= 16
 
 	A1 = 0x080490 + (D0.u16 & 0x03)
@@ -294,16 +294,14 @@ function void fn0803d6()
 		if (DEZFinalBoss3.canPlayerEnterDoomsday())
 		{
 			// Yay, Doomsday Zone!
-			D0.u16 = 0x0c00
-			TriggerNextZone()
+			TriggerNextZone(0x0c00)
 		}
 		else
 		{
 			if (global.characters != CHARS_KNUCKLES_ALONE)
 			{
 				// Outro for Sonic / Tails
-				D0.u16 = 0x0d01
-				TriggerNextZone()
+				TriggerNextZone(0x0d01)
 			}
 			else
 			{

@@ -26,7 +26,7 @@ function void fn01f752()
 {
 	fn01f7b8()
 
-	if ((objA0.flags2a & 0x18) == 0 && u16[A0 + 0x38] != 0)
+	if ((objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) == 0 && u16[A0 + 0x38] != 0)
 	{
 		--u16[A0 + 0x38]
 		if (u16[A0 + 0x38] == 0)
@@ -38,7 +38,7 @@ function void fn01f752()
 		{
 			if (move_area.left != 0x1300)
 			{
-				if (u16[0xffffb010] >= 0x2d00)
+				if (u16[0xffffb000 + 0x10] >= 0x2d00)
 				{
 					move_area.left = 0x1300
 				}
@@ -49,7 +49,7 @@ function void fn01f752()
 			}
 			if (move_area.right != 0x4000)
 			{
-				if (u16[0xffffb010] < 0x2d00)
+				if (u16[0xffffb000 + 0x10] < 0x2d00)
 				{
 					move_area.right = 0x4000
 				}
@@ -86,12 +86,12 @@ function void fn01f7b8()
 {
 	A1 = 0xffffb000
 	A2 = A0 + 0x30
-	D6 = 3
+	D6 = 3		// object.flag.P1_ON_OBJECT
 	fn01f7ce()
 
 	A1 = 0xffffb04a
 	A2 = A0 + 0x34
-	D6 = 4
+	D6 = 4		// object.flag.P2_ON_OBJECT
 	fn01f7ce()
 }
 
@@ -103,9 +103,11 @@ function void fn01f7ce()
 		return
 #endif
 
-	if ((objA0.flags2a & (1 << D6.u8)) == 0)
+	u8 bit = (1 << D6.u8)
+
+	if ((objA0.flags2a & bit) == 0)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			s16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
 			s16 dy = objA1.position.y.u16 - objA0.position.y.u16
@@ -116,7 +118,7 @@ function void fn01f7ce()
 					LetSonicClimbOnObject()
 
 					u32[A2] = 0
-					u8[A1 + 0x20] = 0
+					u8[A1 + 0x20] = char.state.RUNNING
 					u8[A1 + 0x2e] |= 0x42
 					if (A1 == 0xffffb000)
 					{
@@ -143,7 +145,7 @@ function void fn01f7ce()
 		D0.u16 = abs(s16[A1 + 0x1c])
 		if (D0.u16 >= 0x600)
 		{
-			if ((u8[A1 + 0x2a] & 0x02) == 0)
+			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 			{
 				D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x90
 				if (D0.s16 >= 0 && D0.u16 <= 0x130)
@@ -185,6 +187,7 @@ function void fn01f7ce()
 //# address-hook(0x01f8b4)
 function void fn01f8b4()
 {
+	u8 bit = (1 << D6.u8)
 	objA1.velocity.x >>= 1
 	objA1.velocity.y >>= 1
 	u8[A1 + 0x1e] = 19
@@ -195,14 +198,14 @@ function void fn01f8b4()
 	u8[A1 + 0x2e] &= ~0x42
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x31] = 4
-	objA0.flags2a &= ~(1 << D6.u8)
+	objA0.flags2a &= ~bit
 }
 
 
 //# address-hook(0x01f914) end(0x01f994)
 function void fn01f914()
 {
-	if ((u8[A1 + 0x2a] & 0x08) == 0)
+	if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 		return
 
 	D0 = s32(s16[A1 + 0x1c]) << 8

@@ -55,7 +55,7 @@ function void fn08a280()
 	}
 
 	A1 = 0xffff0000 + u16[0xfffffaa4]
-	if (u32[A1] == 0x089f38)
+	if (objA1.update_address == 0x089f38)
 	{
 		D0.u16 = objA1.position.x.u16
 		D1.u16 = objA1.position.y.u16 & level.height.bitmask

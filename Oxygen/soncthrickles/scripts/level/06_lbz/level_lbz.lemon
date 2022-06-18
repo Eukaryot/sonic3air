@@ -57,8 +57,8 @@ function void InitLevelTiles.LBZ1()
 		}
 	}
 
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	D2 = 0
 	fn23e458()
 	Level.GetCameraPosition()
@@ -174,18 +174,18 @@ function void UpdateLevelTiles.LBZ1()
 
 		#if STANDALONE
 			// Change characters to the falling animations
-			if (u8[0xffffb020] == char.state.RUNNING || u8[0xffffb020] == char.state.STANDING)
+			if (u8[0xffffb000 + 0x20] == char.state.RUNNING || u8[0xffffb000 + 0x20] == char.state.STANDING)
 			{
-				u8[0xffffb020] = char.state.KNUX_FALLING
-				u8[0xffffb021] = char.state.KNUX_FALLING
-				u8[0xffffb022] = 0xcb
-				u8[0xffffb023] = 1
-				u8[0xffffb02a] |= char.flag.IN_AIR
+				u8[0xffffb000 + 0x20] = char.state.KNUX_FALLING
+				u8[0xffffb000 + 0x21] = char.state.KNUX_FALLING
+				u8[0xffffb000 + 0x22] = 0xcb
+				u8[0xffffb000 + 0x23] = 1
+				u8[0xffffb000 + 0x2a] |= char.flag.IN_AIR
 			}
-			if (u8[0xffffb06a] == char.state.RUNNING || u8[0xffffb06a] == char.state.STANDING)
+			if (u8[0xffffb04a + 0x20] == char.state.RUNNING || u8[0xffffb04a + 0x20] == char.state.STANDING)
 			{
-				u8[0xffffb06a] = char.state.FALLING_PANIC
-				u8[0xffffb074] |= char.flag.IN_AIR
+				u8[0xffffb04a + 0x20] = char.state.FALLING_PANIC
+				u8[0xffffb04a + 0x2a] |= char.flag.IN_AIR
 			}
 		#endif
 		}
@@ -194,8 +194,8 @@ function void UpdateLevelTiles.LBZ1()
 		return
 	}
 
-	D0.u16 = u16[0xffffb010]
-	D1.u16 = u16[0xffffb014]
+	D0.u16 = u16[0xffffb000 + 0x10]
+	D1.u16 = u16[0xffffb000 + 0x14]
 	D2.u16 = level.display_routine
 	if (D2.u16 == 0)
 	{
@@ -398,8 +398,8 @@ function void fn05410c()
 {
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
-		u16 px = u16[0xffffb010]
-		u16 py = u16[0xffffb014]
+		u16 px = u16[0xffffb000 + 0x10]
+		u16 py = u16[0xffffb000 + 0x14]
 		if (px >= 0x37c0 && px <= 0x3800 && py >= 0x0600 && py <= 0x0680)
 		{
 			// Limits the screen to this top position, to hide that there's something (namely Sonic's path) above
@@ -900,8 +900,8 @@ function void fn05427c()
 
 		D0.u16 = 0x3a00
 		D1 = 0
-		u16[0xffffb010] -= D0.u16
-		u16[0xffffb05a] -= D0.u16
+		u16[0xffffb000 + 0x10] -= D0.u16
+		u16[0xffffb04a + 0x10] -= D0.u16
 		fn04f3b0()
 
 		camera.position.x.u16 -= D0.u16
@@ -1106,7 +1106,7 @@ function void fn054384()
 	}
 	else
 	{
-		if (u16[0xffffb010] >= 0x060a)
+		if (u16[0xffffb000 + 0x10] >= 0x060a)
 		{
 			fn0543a2()
 			u16[0xffffeec0] += 4

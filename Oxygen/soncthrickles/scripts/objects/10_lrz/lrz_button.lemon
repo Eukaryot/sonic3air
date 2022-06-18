@@ -23,12 +23,12 @@ function void fn042cd6()
 	if (global.act == 0)
 	{
 		objA0.mapping_offset = 0x042d7c
-		objA0.sprite_attributes = 0x63a1
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x03a1)
 	}
 	else
 	{
 		objA0.mapping_offset = 0x042d9e
-		objA0.sprite_attributes = 0x240d
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x040d)
 	}
 
 	objA0.update_address = 0x042d16
@@ -62,7 +62,7 @@ function void fn042d16()
 	{
 		if (u8[A3] == 0)
 		{
-			playSound(0x5b)
+			playSound(SFX_CLICK)
 		}
 		u8[A3] |= (1 << D3.u8)
 		objA0.animation.sprite = 1

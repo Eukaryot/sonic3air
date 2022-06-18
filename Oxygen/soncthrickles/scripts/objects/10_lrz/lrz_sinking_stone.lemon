@@ -23,12 +23,12 @@ function void fn04279e()
 	u16[A0 + 0x46] = objA0.position.y.u16
 	if (global.act == 0)
 	{
-		objA0.sprite_attributes = 0x40d3
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x00d3)
 	}
 	else
 	{
 		objA0.animation.sprite = 1
-		objA0.sprite_attributes = 0x4090
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0090)
 	}
 
 	objA0.update_address = 0x0427e2
@@ -39,7 +39,7 @@ function void fn04279e()
 //# address-hook(0x0427e2) end(0x04282e)
 function void fn0427e2()
 {
-	D0.u8 = objA0.flags2a & 0x18
+	D0.u8 = objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 	if (D0.u8 == 0)
 	{
 		if (objA0.flags2e != 0)

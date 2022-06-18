@@ -15,6 +15,9 @@
 global u8 oldRotationPlayer1
 global u8 oldRotationPlayer2
 
+constant u16 CHAR_ANIMSPRITE_SONIC_DROPDASH = 0x100
+constant u16 CHAR_ANIMSPRITE_SONIC_PEELOUT  = 0x102
+
 
 // This function is here only for script mods that want to change or extend the character sprites
 function u16 Standalone.getModdedAnimationSpriteEx(u8 character, u8 animationSprite)
@@ -123,7 +126,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 	u8 animationSprite = char.animation.sprite
 	u16 animationSpriteEx = Standalone.getModdedAnimationSpriteEx(character, animationSprite)
-	u8 flags = (char.render_flags & 0x03)
+	u8 flags = (char.render_flags & (SPRITE_FLAG_FLIP_X | SPRITE_FLAG_FLIP_Y))
 	u8 angle = 0
 	u64 key = 0
 	u8 rotationMode = 0
@@ -159,21 +162,25 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			// Character
 			if (animationSprite >= 0x01 && animationSprite <= 0x20)
 			{
+				// Walking animation
 				animationSprite = 0x01 + (animationSprite - 0x01) % 8
 				rotationMode = 1
 			}
 			else if (animationSprite >= 0x21 && animationSprite <= 0x30)
 			{
+				// Running animation
 				animationSprite = 0x21 + (animationSprite - 0x21) % 4
 				rotationMode = 1
 			}
 			else if (animationSprite >= 0x78 && animationSprite <= 0x7f)
 			{
+				// Swinging animation
 				animationSprite = 0x78
 				rotationMode = 2
 			}
 			else if (character == CHARACTER_TAILS && animationSprite >= 0xc3 && animationSprite <= 0xca)
 			{
+				// Tails' fastest run animation
 				animationSprite = 0xc3 + (animationSprite - 0xc3) % 2
 				rotationMode = 1
 			}
@@ -261,7 +268,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				angle = lookupAngleByVector(s16[characterAddress + 0x18], s16[characterAddress + 0x1a])
 
 				flags = 0
-				if (objA0.flags2a & 0x01)
+				if (char.flags & char.flag.FACING_LEFT)
 				{
 					flags |= SPRITE_FLAG_FLIP_X
 					angle += 0x80
@@ -286,7 +293,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	if (EXTENDED_CHARACTER_PALETTES)
 		atex = 0x40 + character * 0x20
 
-	if (char.sprite_attributes & 0x8000)
+	if (char.sprite_attributes & sprite_attribute.PRIORITY)
 		flags |= SPRITE_FLAG_PRIO
 
 	if (rotationMode != 0 && global.inv_gravity)

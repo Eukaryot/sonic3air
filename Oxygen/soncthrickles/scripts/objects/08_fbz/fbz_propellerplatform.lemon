@@ -12,12 +12,12 @@
 function void fn03a580()
 {
 	objA0.mapping_offset = 0x03a742
-	objA0.sprite_attributes = 0x2383
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0383)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x18
 	objA0.sprite_priority = 0x0280
-	u8[A0 + 0x28] = 0x8c
+	objA0.collision_attributes = (collision.flag.THREAT | collision.size.20x16)
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
 
@@ -120,7 +120,7 @@ function void fn03a664()
 //# address-hook(0x03a692) end(0x03a69c)
 function void fn03a692()
 {
-	if ((objA0.flags2a & 0x18) == 0)
+	if ((objA0.flags2a & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)) == 0)
 	{
 		fn03a620()
 	}

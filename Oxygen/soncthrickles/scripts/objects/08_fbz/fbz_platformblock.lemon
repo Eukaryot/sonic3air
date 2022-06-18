@@ -16,8 +16,8 @@ function void fn03c34c()
 	objA0.box_size.x = u8[0x03c344 + D0.u16 * 2]
 	objA0.box_size.y = u8[0x03c345 + D0.u16 * 2]
 	objA0.mapping_offset = 0x03c416
-	objA0.sprite_attributes = 0x440d
-	objA0.render_flags |= 0x04
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x040d)
+	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0280
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x30] = (objA0.subtype2c & 0x0f) << 4
@@ -38,7 +38,7 @@ function void fn03c34c()
 //# address-hook(0x03c3a8) end(0x03c410)
 function void fn03c3a8()
 {
-	D0.u16 = u16[0xffffb014] - objA0.position.y.u16
+	D0.u16 = u16[0xffffb000 + 0x14] - objA0.position.y.u16
 	if (D0.s16 >= 0x20)
 	{
 		D1.u16 = u16[A0 + 0x30]
