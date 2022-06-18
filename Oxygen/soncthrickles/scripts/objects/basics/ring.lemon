@@ -41,7 +41,11 @@ function void DynamicRing.Update()
 		// Lost lightning shield?
 		if ((u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING) == 0)
 		{
+		#if STANDALONE
+			objA0.update_address = global.inv_gravity ? 0x01a662 : 0x01a64a
+		#else
 			objA0.update_address = 0x01a64a
+		#endif
 			objA0.base_state = 0x02
 			spilled_rings.speed = 0xff
 		}
