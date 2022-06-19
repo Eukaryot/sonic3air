@@ -46,7 +46,23 @@ namespace lemon
 			return "Operator is not allowed here";
 		}
 
-		bool tryReplaceConstants(const ConstantToken& constLeft, const ConstantToken& constRight, Operator op, int64& outValue)
+		bool tryReplaceConstantsUnary(const ConstantToken& constRight, Operator op, int64& outValue)
+		{
+			if (constRight.mDataType == &PredefinedDataTypes::STRING)
+				return false;
+
+			switch (op)
+			{
+				// TODO: Add this as well - it's just postponed for now, as it introduces too many changes in S3AIR that might possibly be harmful
+				//case Operator::BINARY_MINUS:  outValue = -constRight.mValue;				return true;
+				case Operator::UNARY_NOT:	  outValue = (constRight.mValue == 0) ? 1 : 0;	return true;
+				case Operator::UNARY_BITNOT:  outValue = ~constRight.mValue;				return true;
+				default: break;
+			}
+			return false;
+		}
+
+		bool tryReplaceConstantsBinary(const ConstantToken& constLeft, const ConstantToken& constRight, Operator op, int64& outValue)
 		{
 			if (constLeft.mDataType == &PredefinedDataTypes::STRING || constRight.mDataType == &PredefinedDataTypes::STRING)
 				return false;
@@ -60,7 +76,9 @@ namespace lemon
 				case Operator::BINARY_MODULO:		outValue = constLeft.mValue % constRight.mValue;	return true;
 				case Operator::BINARY_SHIFT_LEFT:	outValue = constLeft.mValue << constRight.mValue;	return true;
 				case Operator::BINARY_SHIFT_RIGHT:	outValue = constLeft.mValue >> constRight.mValue;	return true;
-				// TODO: More to add here...?
+				case Operator::BINARY_AND:			outValue = constLeft.mValue & constRight.mValue;	return true;
+				case Operator::BINARY_OR:			outValue = constLeft.mValue | constRight.mValue;	return true;
+				case Operator::BINARY_XOR:			outValue = constLeft.mValue ^ constRight.mValue;	return true;
 				default: break;
 			}
 			return false;
@@ -761,9 +779,26 @@ namespace lemon
 						Token& rightToken = tokens[i+1];
 						CHECK_ERROR(rightToken.isStatement(), "Right of operator is no statement", mLineNumber);
 
-						UnaryOperationToken& token = tokens.createReplaceAt<UnaryOperationToken>(i);
-						token.mOperator = op;
-						token.mArgument = &rightToken.as<StatementToken>();
+						// Check for compile-time constant expression
+						bool replacedWithConstant = false;
+						if (rightToken.getType() == ConstantToken::TYPE)
+						{
+							int64 resultValue;
+							if (tryReplaceConstantsUnary(rightToken.as<ConstantToken>(), op, resultValue))
+							{
+								ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
+								token.mValue = resultValue;
+								token.mDataType = rightToken.as<ConstantToken>().mDataType;
+								replacedWithConstant = true;
+							}
+						}
+
+						if (!replacedWithConstant)
+						{
+							UnaryOperationToken& token = tokens.createReplaceAt<UnaryOperationToken>(i);
+							token.mOperator = op;
+							token.mArgument = &rightToken.as<StatementToken>();
+						}
 
 						tokens.erase(i+1);
 						break;
@@ -829,12 +864,12 @@ namespace lemon
 			CHECK_ERROR(leftToken.isStatement(), "Left of operator is no statement", mLineNumber);
 			CHECK_ERROR(rightToken.isStatement(), "Right of operator is no statement", mLineNumber);
 
-			// Check for constants, we might calculate the result at compile time
+			// Check for compile-time constant expression
 			bool replacedWithConstant = false;
 			if (leftToken.getType() == ConstantToken::TYPE && rightToken.getType() == ConstantToken::TYPE)
 			{
 				int64 resultValue;
-				if (tryReplaceConstants(leftToken.as<ConstantToken>(), rightToken.as<ConstantToken>(), op, resultValue))
+				if (tryReplaceConstantsBinary(leftToken.as<ConstantToken>(), rightToken.as<ConstantToken>(), op, resultValue))
 				{
 					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(bestPosition);
 					token.mValue = resultValue;
