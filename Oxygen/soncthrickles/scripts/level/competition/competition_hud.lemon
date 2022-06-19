@@ -249,7 +249,7 @@ function void fn0371be()
 function void fn0373a4()
 {
 	D0.u8 = competition_mode.laps
-	if (D0.u8 < competition_mode.current_lap.player1 && s8(hud.dirty.timer) >= 0)
+	if (D0.u8 < competition_mode.current_lap.player1 && (hud.dirty.timer & 0x80) == 0)
 	{
 		objA0.state = 0x05
 		objA0.render_flags |= render_flag.COMPETITION_P1_SCREEN
@@ -259,7 +259,7 @@ function void fn0373a4()
 	}
 
 	D0.u8 = competition_mode.laps
-	if (D0.u8 < competition_mode.current_lap.player2 && s8(hud.dirty.timer.player2) >= 0)
+	if (D0.u8 < competition_mode.current_lap.player2 && (hud.dirty.timer.player2 & 0x80) == 0)
 	{
 		objA0.state = 0x05
 		objA0.render_flags |= render_flag.COMPETITION_P2_SCREEN
