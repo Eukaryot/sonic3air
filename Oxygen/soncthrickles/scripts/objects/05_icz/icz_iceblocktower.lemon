@@ -12,6 +12,10 @@
 // ICZ Tower of four Ice Blocks                          //
 //-------------------------------------------------------//
 
+// Subtypes:
+//  - 0x00 for the bottom-most block
+//  - 0x02, 0x04, 0x06 for the ones stacked on top
+
 //# address-hook(0x08ab4e) end(0x08ab6a)
 function void IceBlockTower.Init()
 {
@@ -27,12 +31,10 @@ function void fn08ab86()
 {
 	setupObjectAttributesBasic(0x08acee)
 	objA0.update_address = 0x08abb0
-	D0 = objA0.subtype2c
-	if (D0 == 0x06)
-		objA0.animation.sprite = 0x03
+	if (objA0.subtype2c == 0x06)
+		objA0.animation.sprite = 0x03	// Different sprite for the top-most block
 
-	D0.u16 <<= 4
-	objA0.position.y.u16 -= D0.u16
+	objA0.position.y.u16 -= objA0.subtype2c * 16
 	fn08acce()
 }
 
@@ -43,13 +45,18 @@ function void fn08abb0()
 	if (objA0.subtype2c != 0)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x46]
-		if (u8[A1 + 0x38] & 0x01)
+		if (objA1.flags38 & 0x01)
 		{
+			// Start countdown before falling
 			objA0.update_address = 0x08ac1e
 			objA0.flags38 |= 0x01
-			D0 = 0x0f + (u16(objA0.subtype2c) << 2)
-			objA0.countdown_value = D0.u16
+			objA0.countdown_value = 0x0f + objA0.subtype2c * 4
 			objA0.countdown_callback = 0x08ac2a
+
+		#if STANDALONE
+			// Render this object (otherwise it would be invisible for a single frame)
+			fn08acce()
+		#endif
 			return
 		}
 	}
@@ -60,20 +67,17 @@ function void fn08abb0()
 
 	D0 = u32[(A7+=4)-4]
 	D1 = 5
-	if (objA0.animation.sprite != 0x03)
+	if (objA0.animation.sprite != 0x03 && objA0.subtype2c == 0)	// Only bottom-most block can be broken
 	{
-		if (objA0.subtype2c == 0)
-		{
-			A1 = 0xffffb000
-			if (fn08ac80())
-				return
+		A1 = 0xffffb000
+		if (fn08ac80())
+			return
 
-			A1 = 0xffffb04a
-			D0 = (D0 << 16) + (D0 >> 16)
-			++D1.u8
-			if (fn08ac80())
-				return
-		}
+		A1 = 0xffffb04a
+		D0 = (D0 << 16) + (D0 >> 16)
+		++D1.u8
+		if (fn08ac80())
+			return
 	}
 	fn08acce()
 }
@@ -175,7 +179,7 @@ function bool fn08ac80()
 function void fn08acce()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x44]
-	if (u8[A1 + 0x38] & 0x10)
+	if (objA1.flags38 & 0x10)
 	{
 		fn0852ae()
 	}
