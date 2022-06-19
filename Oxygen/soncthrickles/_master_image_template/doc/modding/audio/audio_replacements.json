@@ -150,7 +150,7 @@
 	"28": { "File": "...", "Type": "Music" },
 
 	// Level results jingle
-	"29": { "File": "...", "Type": "Jingle", "ClearMusic": "1" },
+	"29": { "File": "...", "Type": "Jingle" },
 
 	// Extra life jingle
 	//  -> First ID is S&K version, second is S3 version
