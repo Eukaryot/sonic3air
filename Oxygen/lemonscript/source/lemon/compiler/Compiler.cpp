@@ -164,6 +164,29 @@ namespace lemon
 				RMX_LOG_INFO("Hash for module '" << mModule.getModuleName() << "' = " << rmx::hexString(hash, 16));
 			}
 		#endif
+		#if 0
+			// Also for debugging: Text output of opcodes
+			{
+				String output;
+				for (ScriptFunction* function : mModule.getScriptFunctions())
+				{
+					output << function->getName().getString() << ":\r\n";
+					for (const Opcode& opcode : function->mOpcodes)
+					{
+						const String typeString = Opcode::GetTypeString(opcode.mType);
+						output << typeString << " (" << rmx::hexString((uint8)opcode.mDataType, 2) << "):";
+						if (opcode.mParameter != 0)
+						{
+							output.add(' ', 19 - typeString.length());
+							output << rmx::hexString(opcode.mParameter, 16);
+						}
+						output << "\r\n";
+					}
+					output << "\r\n";
+				}
+				output.saveFile(L"function_opcodes.txt");
+			}
+		#endif
 
 			// Optional translation
 			if (!mCompileOptions.mOutputTranslatedSource.empty())

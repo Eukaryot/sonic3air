@@ -79,6 +79,9 @@ namespace lemon
 		uint8 mFlags = 0;
 		uint32 mLineNumber = 0;
 		int64 mParameter = 0;	// For constants, or ID in case of variables and calls
+
+	public:
+		static const char* GetTypeString(Type type);
 	};
 
 }
