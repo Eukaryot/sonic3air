@@ -69,10 +69,10 @@ void PauseMenu::onFadeIn()
 		mMenuEntries.clear();
 		mMenuEntries.reserve(3);
 		mMenuEntries.addEntry("Continue", 0);
-		if (Game::instance().getCurrentMode() != Game::Mode::TIME_ATTACK)
-			mMenuEntries.addEntry("Options", 1);
 		if (mRestartEnabled)
 			mMenuEntries.addEntry("Restart", 2);
+		if (Game::instance().getCurrentMode() != Game::Mode::TIME_ATTACK)
+			mMenuEntries.addEntry("Options", 1);
 		mMenuEntries.addEntry("Exit Game", 3);
 	}
 	mMenuEntries.mSelectedEntryIndex = 0;
