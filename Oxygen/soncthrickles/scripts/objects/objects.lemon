@@ -60,23 +60,6 @@ function void GenericObject.Update()
 
 
 
-//# address-hook(0x084898) end(0x0848b4)
-function void Object.TriggerOnGroundHit()
-{
-	if (objA0.velocity.y >= 0)
-	{
-		CheckGroundCollision()
-		if (D1.s16 <= 0)
-		{
-			objA0.position.y.u16 += D1.s16
-			A1 = objA0.countdown_callback
-			call A1
-		}
-	}
-}
-
-
-
 //# address-hook(0x069946) end(0x069958)
 function void fn069946()
 {

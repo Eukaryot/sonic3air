@@ -887,27 +887,3 @@ function void Boss.ICZ1.RegularUpdate()
 		u8[A0 + 0x28] = u8[A0 + 0x25]
 	}
 }
-
-
-
-//# address-hook(0x084a1c) end(0x084a42)
-function void fn084a1c()
-{
-	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x38] & 0x10)
-	{
-		fn0849d8()
-	}
-	else
-	{
-		if (u8[A1 + 0x2a] & 0x80)
-		{
-			objA0.flags2a |= 0x80
-		}
-		else
-		{
-			AddAsDynamicObject()
-		}
-		DrawObject()
-	}
-}

@@ -275,28 +275,6 @@ function void fn08bc08()
 }
 
 
-//# address-hook(0x0848b6) end(0x0848e6)
-function void fn0848b6()
-{
-	D3 = s16(objA0.velocity.x) << 8
-	D3 += objA0.position.x
-	D3 = (D3 << 16) + (D3 >> 16)
-	CheckGroundCollisionFixedX()
-
-	if (D1.s16 >= -1 && D1.s16 < 12)
-	{
-		objA0.position.y.u16 += D1.u16
-		_setZeroFlagByValue(0)
-	}
-	else
-	{
-		A1 = objA0.countdown_callback
-		call A1
-		_setZeroFlagByValue(1)
-	}
-}
-
-
 //# address-hook(0x08bc26) end(0x08bc6a)
 function void fn08bc26()
 {

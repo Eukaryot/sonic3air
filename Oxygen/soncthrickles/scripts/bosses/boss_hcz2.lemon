@@ -1411,66 +1411,6 @@ function void fn06bcb2()
 }
 
 
-
-//# address-hook(0x084780) end(0x084780)
-function void Object.AnimationProgressByLocalA1.SlowDown()		// "Animate_RawGetSlower" in skdisasm
-{
-	Object.AnimationProgress.SlowDown(u32[A0 + 0x30])
-}
-
-
-//# address-hook(0x084784) end(0x0847e4)
-function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower" in skdisasm
-{
-	if ((objA0.flags38 & 0x20) == 0)
-	{
-		objA0.countdown_value = 0
-	}
-	objA0.flags38 |= 0x20
-
-	--objA0.animation.timer
-	if (s8(objA0.animation.timer) >= 0)
-		return
-
-	D2.u8 = objA0.flags2e
-	D0 = objA0.animation.frame + 1
-	D1.u8 = u8[A1 + D0.s16 + 0x01]
-	if (D1.s8 < 0)
-	{
-		D0 = 0
-		D1.u8 = u8[A1 + 0x01]
-		++D2.u8
-	}
-
-	objA0.animation.frame = D0.u8
-	objA0.animation.sprite = D1.u8
-	objA0.animation.timer = D2.u8
-	if (D2.u8 < u8[A1])
-	{
-		objA0.flags2e = D2.u8
-		return
-	}
-
-	D0.u8 = objA0.value2f + 1
-	objA0.value2f = D0.u8
-	if (D0.u8 < u8[A1 + 0x01])
-		return
-
-	objA0.flags38 &= ~0x20
-	objA0.value2f = 0
-
-	A2 = objA0.countdown_callback
-	call A2
-}
-
-function void Object.AnimationProgress.SlowDown(u32 address)
-{
-	A1 = address
-	Object.AnimationProgress.SlowDown()
-}
-
-
-
 //# address-hook(0x067e46) end(0x067e60)
 function void fn067e46()
 {

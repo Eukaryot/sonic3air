@@ -944,32 +944,3 @@ function void fn084f80()
 		fn0852ae()
 	}
 }
-
-
-//# address-hook(0x0844ce) end(0x08450c)
-function void fn0844ce()
-{
-	--u8[A1 + 0x24]
-	if (s8[A1 + 0x24] < 0)
-	{
-		u8[A1 + 0x24] = u8[A2]
-		D0 = u8[A1 + 0x23] + 2
-		u8[A1 + 0x23] = D0.u8
-		D1.u8 = u8[A2 + D0.s16 + 0x01]
-		if (D1.u8 == 0)
-		{
-			fn085fc4()
-			A1 = objA0.countdown_callback
-			call A1
-			return
-		}
-
-		u8[A1 + 0x22] = D1.u8
-		objA1.render_flags &= ~render_flag.FLIP_X
-		if (u8[A2 + D0.s16 + 0x02] != 0)
-		{
-			objA1.render_flags |= render_flag.FLIP_X
-		}
-	}
-	fn085fc4()
-}

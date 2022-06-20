@@ -153,19 +153,6 @@ function void fn08bf4c()
 }
 
 
-//# address-hook(0x0848fe) end(0x084912)
-function void fn0848fe()
-{
-	fn00fe3c()
-	if (D1.s16 >= 0)
-		return
-
-	objA0.position.x.u16 += D1.u16
-	A1 = objA0.countdown_callback
-	call A1
-}
-
-
 
 // Dissolving of spiked spheres
 

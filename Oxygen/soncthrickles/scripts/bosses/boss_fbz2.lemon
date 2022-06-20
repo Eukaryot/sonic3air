@@ -1081,13 +1081,11 @@ function void fn084ddc()
 	objA0.position.y.u16 = D3.u16
 }
 
-
 //# address-hook(0x084e16) end(0x084e1c)
 function void fn084e16()
 {
 	D1 = u8[A3 + D4.s16]
 }
-
 
 //# address-hook(0x084e1e) end(0x084e26)
 function void fn084e1e()
@@ -1095,13 +1093,11 @@ function void fn084e1e()
 	D1 = -s8[A2 + D0.s16]
 }
 
-
 //# address-hook(0x084e28) end(0x084e30)
 function void fn084e28()
 {
 	D1 = -s8[A3 + D4.s16]
 }
-
 
 //# address-hook(0x084e32) end(0x084e38)
 function void fn084e32()

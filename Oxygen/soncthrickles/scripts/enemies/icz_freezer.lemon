@@ -470,16 +470,3 @@ function void fn08a8dc()
 	D0 = 0x0c
 	fn0852d0()
 }
-
-
-//# address-hook(0x0848e8) end(0x0848fc)
-function void fn0848e8()
-{
-	fn00fac4()
-	if (D1.s16 >= 0)
-		return
-
-	objA0.position.x.u16 += D1.u16
-	A1 = objA0.countdown_callback
-	jump A1
-}

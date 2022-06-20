@@ -279,6 +279,22 @@ function void Object.CountdownAndTrigger()
 }
 
 
+//# address-hook(0x084898) end(0x0848b4)
+function void Object.TriggerOnGroundHit()
+{
+	if (objA0.velocity.y >= 0)
+	{
+		CheckGroundCollision()
+		if (D1.s16 <= 0)
+		{
+			objA0.position.y.u16 += D1.s16
+			A1 = objA0.countdown_callback
+			call A1
+		}
+	}
+}
+
+
 
 //# address-hook(0x01dc56) end(0x01dcb4)
 function void fn01dc56()
@@ -1918,6 +1934,79 @@ function void Object.AnimationProgress.CheckFlipX(u32 address)
 	A1 = address
 	Object.AnimationProgress.CheckFlipX()
 }
+
+
+//# address-hook(0x084498) end(0x084498)
+function void Object.AnimationProgressByLocalA1.CheckFlipY()		// "Animate_RawAdjustFlipY" in skdisasm
+{
+	Object.AnimationProgress.CheckFlipY(u32[A0 + 0x30])
+}
+
+
+//# address-hook(0x08449c) end(0x0844cc)
+function void Object.AnimationProgress.CheckFlipY()		// "Animate_RawNoSStAdjustFlipY" in skdisasm
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		++objA0.animation.frame
+		D0 = objA0.animation.frame
+
+		D1 = u8[A1 + objA0.animation.frame + 1]
+		if (D1.s8 < 0)
+		{
+			fn084428()
+		}
+		else
+		{
+			if (D1 & 0x40)
+			{
+				D1 &= ~0x40
+				objA0.render_flags ^= render_flag.FLIP_Y
+			}
+
+			// Advance to next frame
+			objA0.animation.timer = u8[A1]
+			objA0.animation.sprite = D1.u8
+		}
+	}
+}
+
+function void Object.AnimationProgress.CheckFlipY(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckFlipY()
+}
+
+
+//# address-hook(0x0844ce) end(0x08450c)
+function void fn0844ce()
+{
+	--u8[A1 + 0x24]
+	if (s8[A1 + 0x24] < 0)
+	{
+		u8[A1 + 0x24] = u8[A2]
+		D0 = u8[A1 + 0x23] + 2
+		u8[A1 + 0x23] = D0.u8
+		D1.u8 = u8[A2 + D0.s16 + 0x01]
+		if (D1.u8 == 0)
+		{
+			fn085fc4()
+			A1 = objA0.countdown_callback
+			call A1
+			return
+		}
+
+		u8[A1 + 0x22] = D1.u8
+		objA1.render_flags &= ~render_flag.FLIP_X
+		if (u8[A2 + D0.s16 + 0x02] != 0)
+		{
+			objA1.render_flags |= render_flag.FLIP_X
+		}
+	}
+	fn085fc4()
+}
+
 
 
 //# address-hook(0x01b662) end(0x01b662)
