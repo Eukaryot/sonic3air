@@ -53,8 +53,7 @@ namespace lemon
 
 			switch (op)
 			{
-				// TODO: Add this as well - it's just postponed for now, as it introduces too many changes in S3AIR that might possibly be harmful
-				//case Operator::BINARY_MINUS:  outValue = -constRight.mValue;				return true;
+				case Operator::BINARY_MINUS:  outValue = -constRight.mValue;				return true;
 				case Operator::UNARY_NOT:	  outValue = (constRight.mValue == 0) ? 1 : 0;	return true;
 				case Operator::UNARY_BITNOT:  outValue = ~constRight.mValue;				return true;
 				default: break;
@@ -157,6 +156,8 @@ namespace lemon
 
 			processUnaryOperations(*tokenList);
 			processBinaryOperations(*tokenList);
+
+			evaluateCompileTimeConstants(*tokenList);
 		}
 
 		// TODO: Statement type assignment will require resolving all identifiers first -- check if this is done here
@@ -779,26 +780,9 @@ namespace lemon
 						Token& rightToken = tokens[i+1];
 						CHECK_ERROR(rightToken.isStatement(), "Right of operator is no statement", mLineNumber);
 
-						// Check for compile-time constant expression
-						bool replacedWithConstant = false;
-						if (rightToken.getType() == ConstantToken::TYPE)
-						{
-							int64 resultValue;
-							if (tryReplaceConstantsUnary(rightToken.as<ConstantToken>(), op, resultValue))
-							{
-								ConstantToken& token = tokens.createReplaceAt<ConstantToken>(i);
-								token.mValue = resultValue;
-								token.mDataType = rightToken.as<ConstantToken>().mDataType;
-								replacedWithConstant = true;
-							}
-						}
-
-						if (!replacedWithConstant)
-						{
-							UnaryOperationToken& token = tokens.createReplaceAt<UnaryOperationToken>(i);
-							token.mOperator = op;
-							token.mArgument = &rightToken.as<StatementToken>();
-						}
+						UnaryOperationToken& token = tokens.createReplaceAt<UnaryOperationToken>(i);
+						token.mOperator = op;
+						token.mArgument = &rightToken.as<StatementToken>();
 
 						tokens.erase(i+1);
 						break;
@@ -864,31 +848,89 @@ namespace lemon
 			CHECK_ERROR(leftToken.isStatement(), "Left of operator is no statement", mLineNumber);
 			CHECK_ERROR(rightToken.isStatement(), "Right of operator is no statement", mLineNumber);
 
-			// Check for compile-time constant expression
-			bool replacedWithConstant = false;
-			if (leftToken.getType() == ConstantToken::TYPE && rightToken.getType() == ConstantToken::TYPE)
-			{
-				int64 resultValue;
-				if (tryReplaceConstantsBinary(leftToken.as<ConstantToken>(), rightToken.as<ConstantToken>(), op, resultValue))
-				{
-					ConstantToken& token = tokens.createReplaceAt<ConstantToken>(bestPosition);
-					token.mValue = resultValue;
-					token.mDataType = leftToken.as<ConstantToken>().mDataType;
-					replacedWithConstant = true;
-				}
-			}
-
-			if (!replacedWithConstant)
-			{
-				BinaryOperationToken& token = tokens.createReplaceAt<BinaryOperationToken>(bestPosition);
-				token.mOperator = op;
-				token.mLeft = &leftToken.as<StatementToken>();
-				token.mRight = &rightToken.as<StatementToken>();
-			}
+			BinaryOperationToken& token = tokens.createReplaceAt<BinaryOperationToken>(bestPosition);
+			token.mOperator = op;
+			token.mLeft = &leftToken.as<StatementToken>();
+			token.mRight = &rightToken.as<StatementToken>();
 
 			tokens.erase(bestPosition + 1);
 			tokens.erase(bestPosition - 1);
 		}
+	}
+
+	void TokenProcessing::evaluateCompileTimeConstants(TokenList& tokens)
+	{
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			TokenPtr<StatementToken> resultTokenPtr;
+			if (evaluateCompileTimeConstantsRecursive(tokens[i], resultTokenPtr))
+			{
+				tokens.replace(*resultTokenPtr, i);
+			}
+		}
+	}
+
+	bool TokenProcessing::evaluateCompileTimeConstantsRecursive(Token& inputToken, TokenPtr<StatementToken>& outTokenPtr)
+	{
+		switch (inputToken.getType())
+		{
+			case Token::Type::PARENTHESIS:
+			{
+				ParenthesisToken& pt = inputToken.as<ParenthesisToken>();
+				if (pt.mParenthesisType == ParenthesisType::PARENTHESIS && pt.mContent.size() == 1 && pt.mContent[0].isStatement())
+				{
+					// Move parenthesis content to the output token pointer, so it will replace the parenthesis itself
+					TokenPtr<StatementToken> tempContentPtr;
+					tempContentPtr = pt.mContent[0].as<StatementToken>();	// This intermediate step is needed to avoid reference count reaching 0 in between
+					outTokenPtr = tempContentPtr;
+					pt.mContent.clear();
+					return true;
+				}
+				break;
+			}
+
+			case Token::Type::UNARY_OPERATION:
+			{
+				UnaryOperationToken& uot = inputToken.as<UnaryOperationToken>();
+				evaluateCompileTimeConstantsRecursive(*uot.mArgument, uot.mArgument);
+
+				if (uot.mArgument->getType() == ConstantToken::TYPE)
+				{
+					int64 resultValue;
+					if (tryReplaceConstantsUnary(uot.mArgument->as<ConstantToken>(), uot.mOperator, resultValue))
+					{
+						const DataTypeDefinition* dataType = uot.mArgument->as<ConstantToken>().mDataType;	// Backup in case outTokenPtr is pointing to inputToken
+						ConstantToken& token = outTokenPtr.create<ConstantToken>();
+						token.mValue = resultValue;
+						token.mDataType = dataType;
+						return true;
+					}
+				}
+				break;
+			}
+
+			case Token::Type::BINARY_OPERATION:
+			{
+				BinaryOperationToken& bot = inputToken.as<BinaryOperationToken>();
+				evaluateCompileTimeConstantsRecursive(*bot.mLeft, bot.mLeft);
+				evaluateCompileTimeConstantsRecursive(*bot.mRight, bot.mRight);
+
+				if (bot.mLeft->getType() == ConstantToken::TYPE && bot.mRight->getType() == ConstantToken::TYPE)
+				{
+					int64 resultValue;
+					if (tryReplaceConstantsBinary(bot.mLeft->as<ConstantToken>(), bot.mRight->as<ConstantToken>(), bot.mOperator, resultValue))
+					{
+						const DataTypeDefinition* dataType = bot.mLeft->as<ConstantToken>().mDataType;	// Backup in case outTokenPtr is pointing to inputToken
+						ConstantToken& token = outTokenPtr.create<ConstantToken>();
+						token.mValue = resultValue;
+						token.mDataType = dataType;
+						return true;
+					}
+				}
+				break;
+			}
+		}
+		return false;
 	}
 
 	void TokenProcessing::assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType)

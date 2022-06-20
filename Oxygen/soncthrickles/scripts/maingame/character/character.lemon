@@ -1814,7 +1814,7 @@ function void fn016e10()
 		--knuckles.glide_direction
 		if (s8(knuckles.glide_direction) < 0)
 		{
-			s8(knuckles.glide_direction) = 3
+			knuckles.glide_direction = 3
 
 			D1.u8 += char.animation.sprite
 			if (D1.u8 < 0xb7)

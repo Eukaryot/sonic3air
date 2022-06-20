@@ -44,27 +44,17 @@ namespace lemon
 			mFunctionCompiler(functionCompiler)
 		{}
 
-		Opcode& addOpcode(Opcode::Type type, BaseType dataType = BaseType::VOID, int64 parameter = 0)
-		{
-			Opcode& opcode = vectorAdd(mFunctionCompiler.mOpcodes);
-			opcode.mType = type;
-			opcode.mDataType = dataType;
-			opcode.mParameter = parameter;
-			opcode.mLineNumber = mFunctionCompiler.mLineNumber;
-			return opcode;
-		}
-
 		void beginIf()
 		{
 			mIfJumpOpcodeIndex = mFunctionCompiler.mOpcodes.size();
-			addOpcode(Opcode::Type::JUMP_CONDITIONAL, BaseType::UINT_32);	// Target position must be set afterwards when if block is complete
+			mFunctionCompiler.addOpcode(Opcode::Type::JUMP_CONDITIONAL, BaseType::UINT_32);	// Target position must be set afterwards when if block is complete
 		}
 
 		void beginElse()
 		{
 			// Conditional jump to the end of the else-part
 			mElseJumpOpcodeIndex = mFunctionCompiler.mOpcodes.size();
-			addOpcode(Opcode::Type::JUMP, BaseType::UINT_32);				// Target position must be set afterwards when else block is complete
+			mFunctionCompiler.addOpcode(Opcode::Type::JUMP, BaseType::UINT_32);				// Target position must be set afterwards when else block is complete
 
 			// Correct target position of if-jump
 			mFunctionCompiler.mOpcodes[mIfJumpOpcodeIndex].mParameter = mFunctionCompiler.mOpcodes.size();
@@ -162,6 +152,19 @@ namespace lemon
 
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, BaseType dataType, int64 parameter)
 	{
+		// Remove signed flag for certain opcodes where it makes no difference
+		if (type == Opcode::Type::GET_VARIABLE_VALUE || type == Opcode::Type::SET_VARIABLE_VALUE ||
+			type == Opcode::Type::READ_MEMORY || type == Opcode::Type::WRITE_MEMORY ||
+			type == Opcode::Type::ARITHM_ADD || type == Opcode::Type::ARITHM_SUB || type == Opcode::Type::ARITHM_AND || type == Opcode::Type::ARITHM_OR || type == Opcode::Type::ARITHM_XOR ||
+			type == Opcode::Type::ARITHM_SHL || type == Opcode::Type::ARITHM_NEG || type == Opcode::Type::ARITHM_NOT || type == Opcode::Type::ARITHM_BITNOT ||
+			type == Opcode::Type::COMPARE_EQ || type == Opcode::Type::COMPARE_NEQ)
+		{
+			if (((uint8)dataType & 0xf8) == 0x18)
+			{
+				dataType = (BaseType)((uint8)dataType & ~0x08);
+			}
+		}
+
 		Opcode& opcode = vectorAdd(mOpcodes);
 		opcode.mType = type;
 		opcode.mDataType = dataType;
@@ -430,6 +433,7 @@ namespace lemon
 		{
 			case Token::Type::UNARY_OPERATION:
 			{
+				CHECK_ERROR(!isLValue, "Cannot assign value to a unary operation", mLineNumber);
 				const UnaryOperationToken& uot = token.as<UnaryOperationToken>();
 				switch (uot.mOperator)
 				{
@@ -475,6 +479,7 @@ namespace lemon
 
 			case Token::Type::BINARY_OPERATION:
 			{
+				CHECK_ERROR(!isLValue, "Cannot assign value to a binary operation", mLineNumber);
 				const BinaryOperationToken& bot = token.as<BinaryOperationToken>();
 				if (nullptr != bot.mFunction)
 				{
@@ -501,7 +506,7 @@ namespace lemon
 					case Operator::ASSIGN_DIVIDE:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_DIV);	break;
 					case Operator::ASSIGN_MODULO:			 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_MOD);	break;
 					case Operator::ASSIGN_AND:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_AND);	break;
-					case Operator::ASSIGN_OR:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_OR);		break;
+					case Operator::ASSIGN_OR:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_OR);	break;
 					case Operator::ASSIGN_XOR:				 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_XOR);	break;
 					case Operator::ASSIGN_SHIFT_LEFT:		 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SHL);	break;
 					case Operator::ASSIGN_SHIFT_RIGHT:		 compileBinaryAssignmentToOpcodes(bot, Opcode::Type::ARITHM_SHR);	break;
@@ -612,6 +617,7 @@ namespace lemon
 
 			case Token::Type::PARENTHESIS:
 			{
+				CHECK_ERROR(!isLValue, "Cannot assign value to an expression in parentheses", mLineNumber);
 				const ParenthesisToken& pt = token.as<ParenthesisToken>();
 				if (!pt.mContent.empty())
 				{
@@ -625,6 +631,7 @@ namespace lemon
 
 			case Token::Type::CONSTANT:
 			{
+				CHECK_ERROR(!isLValue, "Cannot assign value to a constant", mLineNumber);
 				const ConstantToken& ct = token.as<ConstantToken>();
 				addOpcode(Opcode::Type::PUSH_CONSTANT, ct.mDataType, ct.mValue);
 				break;
@@ -640,6 +647,7 @@ namespace lemon
 
 			case Token::Type::FUNCTION:
 			{
+				CHECK_ERROR(!isLValue, "Cannot assign value to a function call", mLineNumber);
 				const FunctionToken& ft = token.as<FunctionToken>();
 
 				// TODO: Check parameters vs. function signature?
@@ -665,6 +673,7 @@ namespace lemon
 
 			case Token::Type::VALUE_CAST:
 			{
+				CHECK_ERROR(!isLValue, "Cannot assign value to a type cast", mLineNumber);
 				const ValueCastToken& vct = token.as<ValueCastToken>();
 				compileTokenTreeToOpcodes(*vct.mArgument);
 

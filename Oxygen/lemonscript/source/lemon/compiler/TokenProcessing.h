@@ -11,6 +11,7 @@
 #include "lemon/program/Constant.h"
 #include "lemon/program/Variable.h"
 #include "lemon/compiler/Operators.h"
+#include "lemon/compiler/Token.h"
 
 
 namespace lemon
@@ -21,7 +22,6 @@ namespace lemon
 	class LocalVariable;
 	class ScriptFunction;
 	class StatementToken;
-	class TokenList;
 	struct GlobalCompilerConfig;
 
 	class TokenProcessing
@@ -66,6 +66,9 @@ namespace lemon
 
 		void processUnaryOperations(TokenList& tokens);
 		void processBinaryOperations(TokenList& tokens);
+
+		void evaluateCompileTimeConstants(TokenList& tokens);
+		bool evaluateCompileTimeConstantsRecursive(Token& inputToken, TokenPtr<StatementToken>& outTokenPtr);
 
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
