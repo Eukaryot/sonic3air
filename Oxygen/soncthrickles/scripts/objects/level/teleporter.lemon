@@ -153,20 +153,23 @@ function void fn0455cc_sub()
 		{
 			if (u8[A2 + 0x2e] == 0 && u8[A2 + 0x05] < 0x04 && debug_mode.state == 0)
 			{
+				// Spawn teleporter beam
 				if (allocDynamicObjectAfterA0())
 				{
-					// Spawn teleporter beam
 					u16[A0 + 0x3c] = A1.u16
+
 					objA1.update_address = 0x0458b4
-					u16[A1 + 0x48] = A0.u16
 					objA1.position.x.u16 = objA0.position.x.u16
 					objA1.position.y.u16 = objA0.position.y.u16
+					u16[A1 + 0x48] = A0.u16
+
 					u16[A2 + 0x18] = 0
 					u16[A2 + 0x1c] = 0
 					u16[A2 + 0x1a] = 0xffff
 					u8[A2 + 0x3d] = 0
 					u8[A2 + 0x2e] = 0x01
 					u8[A2 + 0x20] = char.state.STANDING
+
 					objA0.update_address = 0x0456f4
 					u16[A0 + 0x38] = 0xff00
 
@@ -184,58 +187,21 @@ function void fn0456f4()
 	fn045856()
 
 	A1 = 0xffffb000
+	#if STANDALONE
+		// Check if character got hurt right while entering the beam
+		if (u8[A1 + 0x05] == 0x04)
+		{
+			u8[A1 + 0x05] = 0x02
+			u16[A1 + 0x18] = 0
+			u16[A1 + 0x1a] = 0
+			u16[A1 + 0x1c] = 0
+		}
+	#endif
+
 	A2 = 0xffff0000 + u16[A0 + 0x3c]
 	if (s8[A2 + 0x46] >= 0x08)
 	{
-		if (u8[A2 + 0x46] != 0x08)
-		{
-			if (u8[A2 + 0x46] < 0x18)
-			{
-				if (level.framecounter.low & 0x01)
-				{
-					--objA1.position.y.u16
-					if (level.framecounter.low & 0x02)
-					{
-						D1 = 1
-						D0.u16 = objA1.position.x.u16
-						if (D0.u16 != objA0.position.x.u16)
-						{
-							if (D0.u16 >= objA0.position.x.u16)
-								D1.s16 = -D1.s16
-							objA1.position.x.u16 += D1.u16
-						}
-					}
-				}
-			}
-			else
-			{
-				objA0.update_address = 0x0457be
-				D0.u8 = objA0.subtype2c
-				if (global.zone != 0x16)
-					D0.u16 &= 0x3f
-				u8[A0 + 0x2d] = D0.u8
-				u8[A1 + 0x2e] = 3
-				u8[A1 + 0x20] = char.state.RUNNING
-				u8[A1 + 0x22] = 0
-
-				if (global.zone == 0x16)
-				{
-					move_area.left = 0x0aa0 - getScreenExtend()
-				}
-				else
-				{
-					level.vertical_wrap = 0xff00
-					D0.u16 = 0x1000
-					move_area.bottom.current = D0.u16
-					move_area.bottom.target = D0.u16
-				}
-
-				u8[0xffffeed7] = 0
-				playSound(0x73)
-				player1.camera_lock = 0xff
-			}
-		}
-		else
+		if (u8[A2 + 0x46] == 0x08)
 		{
 			objA1.flags2a &= ~char.flag.ON_OBJECT
 			objA1.flags2a |= char.flag.ROLLING
@@ -244,6 +210,50 @@ function void fn0456f4()
 			objA1.groundspeed = 0	// Kill drop dash effect
 		#endif
 			u8[0xffffeed6] = 0xff
+		}
+		else if (u8[A2 + 0x46] < 0x18)
+		{
+			if (level.framecounter.low & 0x01)
+			{
+				--objA1.position.y.u16
+				if (level.framecounter.low & 0x02)
+				{
+					D0.u16 = objA1.position.x.u16
+					if (D0.u16 != objA0.position.x.u16)
+					{
+						s16 dx = (D0.u16 >= objA0.position.x.u16) ? -1 : 1
+						objA1.position.x.u16 += dx
+					}
+				}
+			}
+		}
+		else	// if (u8[A2 + 0x46] >= 0x18)
+		{
+			objA0.update_address = 0x0457be
+			D0.u8 = objA0.subtype2c
+			if (global.zone != 0x16)
+				D0.u16 &= 0x3f
+			u8[A0 + 0x2d] = D0.u8
+
+			u8[A1 + 0x2e] = 3
+			u8[A1 + 0x20] = char.state.RUNNING
+			u8[A1 + 0x22] = 0
+
+			if (global.zone == 0x16)
+			{
+				move_area.left = 0x0aa0 - getScreenExtend()
+			}
+			else
+			{
+				level.vertical_wrap = 0xff00
+				D0.u16 = 0x1000
+				move_area.bottom.current = D0.u16
+				move_area.bottom.target = D0.u16
+			}
+
+			u8[0xffffeed7] = 0
+			playSound(0x73)
+			player1.camera_lock = 0xff
 		}
 	}
 
@@ -606,12 +616,13 @@ function void fn052300()
 	if (kosinski.waiting_modules == 0)
 	{
 		A1 = 0xffffb000
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
+			// Spawn teleporter beam
 			if (allocDynamicObjectAfterA0())
 			{
-				// Spawn teleporter beam
 				u16[A0 + 0x3c] = A1.u16
+
 				objA1.update_address = 0x0458b4
 				u16[A1 + 0x48] = A0.u16
 
@@ -635,30 +646,32 @@ function void fn05234a()
 	A2 = 0xffff0000 + u16[A0 + 0x3c]
 	if (s8[A2 + 0x46] >= 0x08)
 	{
-		if (u8[A2 + 0x46] != 0x08)
+		if (u8[A2 + 0x46] == 0x08)
 		{
-			if (u8[A2 + 0x46] < 0x18)
+			u8[A1 + 0x2e] = 1
+			u8[A1 + 0x2a] |= char.flag.ROLLING
+			u8[A1 + 0x20] = char.state.ROLLING
+		}
+		else if (u8[A2 + 0x46] < 0x18)
+		{
+			if (level.framecounter.low & 0x01)
 			{
-				if ((level.framecounter.low & 0x01) == 0)
-					return
-
 				--objA1.position.y.u16
-				if ((level.framecounter.low & 0x02) == 0)
-					return
-
-				D1 = 1
-				D0.u16 = objA1.position.x.u16
-				if (D0.u16 == objA0.position.x.u16)
-					return
-
-				if (D0.u16 >= objA0.position.x.u16)
-					D1.s16 = -D1.s16
-
-				objA1.position.x.u16 += D1.u16
-				return
+				if (level.framecounter.low & 0x02)
+				{
+					D0.u16 = objA1.position.x.u16
+					if (D0.u16 != objA0.position.x.u16)
+					{
+						s16 dx = (D0.u16 >= objA0.position.x.u16) ? -1 : 1
+						objA1.position.x.u16 += dx
+					}
+				}
 			}
-
+		}
+		else
+		{
 			objA0.update_address = 0x0523ca
+
 			u8[A1 + 0x2e] = 3
 			objA1.position.y.u16 = 0
 			u8[A1 + 0x20] = char.state.RUNNING
@@ -666,12 +679,6 @@ function void fn05234a()
 
 			playSound(0x73)
 			player1.camera_lock = 0xff
-		}
-		else
-		{
-			u8[A1 + 0x2e] = 1
-			u8[A1 + 0x2a] |= char.flag.ROLLING
-			u8[A1 + 0x20] = char.state.ROLLING
 		}
 	}
 }
