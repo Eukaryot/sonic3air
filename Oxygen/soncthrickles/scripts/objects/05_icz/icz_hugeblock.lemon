@@ -15,26 +15,22 @@
 //# address-hook(0x08a44a) end(0x08a46a)
 function void ICZHugeBlock.Init()
 {
-	D0 = objA0.base_state
-	D1.u16 = u16[0x08a46e + D0.s16]
-
 	u16 positionBackup = objA0.position.x.u16
 
-	// Calls one of the following:
-	//  - 0x08a488
-	//  - 0x08a4c4
-	//  - 0x08a4d6
-	//  - 0x08a4de
-	//  - 0x08a504
-	//  - 0x08a50c
-	//  - 0x08a51c
-	//  - 0x08a586
-	//  - 0x08a596
-	//  - 0x08a5ac
-	//  - 0x08a5c8
-	//  - 0x08a5e4
-
-	call 0x08a46e + D1.s16
+	// Called addresses:
+	//  - 0x08a488	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x08a4c4	-> objA0.base_state = 0x02
+	//  - 0x08a4d6	-> objA0.base_state = 0x04
+	//  - 0x08a4de	-> objA0.base_state = 0x06
+	//  - 0x08a504	-> objA0.base_state = 0x08
+	//  - 0x08a50c	-> objA0.base_state = 0x0a
+	//  - 0x08a51c	-> objA0.base_state = 0x0c
+	//  - 0x08a586	-> objA0.base_state = 0x10
+	//  - 0x08a596	-> objA0.base_state = 0x12
+	//  - 0x08a5ac	-> objA0.base_state = 0x14
+	//  - 0x08a5c8	-> objA0.base_state = 0x16
+	//  - 0x08a5e4	-> objA0.base_state = 0x18
+	call tableLookupAddress(0x08a46e, objA0.base_state)
 
 	D1 = 0x2b
 	D2 = 0x70
@@ -127,7 +123,7 @@ function void fn08a50c()
 }
 
 
-//# address-hook(0x08a51c) end(0x08a54a)
+//# address-hook(0x08a51c) end(0x08a53c)
 function void fn08a51c()
 {
 	D0.u16 = objA0.velocity.y - 0x20
@@ -142,6 +138,17 @@ function void fn08a51c()
 	{
 		fn08a540()
 	}
+}
+
+
+//# address-hook(0x08a540) end(0x08a560)
+function void fn08a540()
+{
+	objA0.position.y.u16 += D1.u16
+	objA0.base_state = 0x12
+	objA0.countdown_value = 0x1f
+	objA0.countdown_callback = 0x08a59a
+	playSound(0x96)
 }
 
 
@@ -161,6 +168,13 @@ function void fn08a586()
 function void fn08a596()
 {
 	Object.CountdownAndTrigger()
+}
+
+
+//# address-hook(0x08a59a) end(0x08a5a6)
+function void fn08a59a()
+{
+	objA0.base_state = u8[0x08a5a7 + objA0.subtype2c]
 }
 
 

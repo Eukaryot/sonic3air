@@ -293,17 +293,6 @@ function void fn08adca()
 }
 
 
-//# address-hook(0x08a540) end(0x08a560)
-function void fn08a540()
-{
-	objA0.position.y.u16 += D1.u16
-	objA0.base_state = 0x12
-	objA0.countdown_value = 0x1f
-	objA0.countdown_callback = 0x08a59a
-	playSound(0x96)
-}
-
-
 
 // When is breaks (in ICZ1)
 
@@ -363,14 +352,6 @@ function void fn08ae62()
 		objA0.update_address = 0x08aea0
 		fn085160()
 	}
-}
-
-
-//# address-hook(0x08a59a) end(0x08a5a6)
-function void fn08a59a()
-{
-	D0 = objA0.subtype2c
-	objA0.base_state = u8[0x08a5a7 + D0.s16]
 }
 
 
