@@ -161,7 +161,7 @@ namespace lemon
 		{
 			if (((uint8)dataType & 0xf8) == 0x18)
 			{
-				dataType = (BaseType)((uint8)dataType & ~0x08);
+				dataType = (BaseType)((uint8)dataType & ~0x0c);		// Remove flag 0x08 (signed flag) - and also 0x04 to convert CONST_INT to UINT64
 			}
 		}
 

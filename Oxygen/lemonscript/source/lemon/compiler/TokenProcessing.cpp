@@ -78,6 +78,7 @@ namespace lemon
 				case Operator::BINARY_AND:			outValue = constLeft.mValue & constRight.mValue;	return true;
 				case Operator::BINARY_OR:			outValue = constLeft.mValue | constRight.mValue;	return true;
 				case Operator::BINARY_XOR:			outValue = constLeft.mValue ^ constRight.mValue;	return true;
+				// TODO: How about support for "Operator::COMPARE_EQUAL" etc?
 				default: break;
 			}
 			return false;

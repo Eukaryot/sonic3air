@@ -73,12 +73,12 @@ namespace lemon
 
 		inline static bool isDigit(char ch)
 		{
-			return mLookup.mIsDigit[(size_t)ch];
+			return mLookup.mIsDigit[(uint8)ch];
 		}
 
 		inline static bool isLetter(char ch)
 		{
-			return mLookup.mIsLetter[(size_t)ch];
+			return mLookup.mIsLetter[(uint8)ch];
 		}
 
 		inline static bool isOperatorCharacter(char ch)
@@ -91,7 +91,7 @@ namespace lemon
 			size_t pos = 0;
 			for (; pos < length; ++pos)
 			{
-				if (!mLookup.mIsDigitOrLetter[(size_t)input[pos]])
+				if (!mLookup.mIsDigitOrLetter[(uint8)input[pos]])
 					return pos;
 			}
 			return pos;
@@ -102,7 +102,7 @@ namespace lemon
 			size_t pos = 0;
 			for (; pos < length; ++pos)
 			{
-				if (!mLookup.mIsIdentifierCharacter[(size_t)input[pos]])
+				if (!mLookup.mIsIdentifierCharacter[(uint8)input[pos]])
 					return pos;
 			}
 			return pos;

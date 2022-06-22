@@ -157,6 +157,7 @@ namespace lemon
 				// It is a number
 				const char* start = &input[pos];
 				const size_t numberLength = ParserHelper::collectNumber(start, length - pos);
+				RMX_ASSERT(numberLength > 0, "Failed to collect a number, even though the first cahracter is a digit");
 				pos += numberLength;
 				const int64 number = ParserHelper::parseInteger(start, numberLength, lineNumber);
 				ConstantParserToken& token = outTokens.create<ConstantParserToken>();
