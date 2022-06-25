@@ -518,28 +518,37 @@ bool EngineMain::createWindow()
 	{
 		// Set SDL OpenGL attributes
 		RMX_LOG_INFO("Setup of OpenGL attributes...");
-	#ifndef RMX_USE_GLES2
+	#if !defined(RMX_USE_GLES2)
 		{
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-
-		#ifdef PLATFORM_MAC
+			// OpenGL 3.1 or 3.2
+			const int majorVersion = 3;
+		#if defined(PLATFORM_MAC)
 			// macOS needs OpenGL 3.2 for GLSL 140 shaders to work. https://stackoverflow.com/a/31805596
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+			const int minorVersion = 2;
 		#else
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+			const int minorVersion = 1;
 
 			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		#endif
+
+			RMX_LOG_INFO("Using OpenGL " << majorVersion << "." << minorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 		}
 	#else
 		{
+			// GL ES 2.0
+			const int majorVersion = 2;
+			const int minorVersion = 0;
+
+			RMX_LOG_INFO("Using OpenGL ES " << majorVersion << "." << minorVersion);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 		}
 	#endif
 	}
