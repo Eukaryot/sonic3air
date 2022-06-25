@@ -21,11 +21,7 @@ function void fn060f2e()
 //# address-hook(0x060f3e) end(0x060f8e)
 function void fn060f3e()
 {
-	if (s16[0xffff2020] >= 0)
-	{
-		DrawObject()
-	}
-	else
+	if (s16[0xffff2020] < 0)
 	{
 		D1 = 0x0d
 		D2 = 0x08
@@ -36,20 +32,26 @@ function void fn060f3e()
 		if ((D6 & 0x00010000) || (objA0.flags2a & object.flag.P1_ON_OBJECT))
 		{
 			A1 = 0xffffb000
-		}
-		else if ((D6 & 0x00020000) || (objA0.flags2a & object.flag.P2_ON_OBJECT))
-		{
-			A1 = 0xffffb04a
-		}
-		else
-		{
-			DrawObject()
+			fn060f94()
+			UnloadObject()
 			return
 		}
 
-		fn060f94()
-		UnloadObject()
+		if ((D6 & 0x00020000) || (objA0.flags2a & object.flag.P2_ON_OBJECT))
+		{
+			A1 = 0xffffb04a
+			fn060f94()
+		#if STANDALONE
+			// AI controlled Tails shouldn't remove the bouncepad
+			if (tails.control_counter == 0)
+		#endif
+			{
+				UnloadObject()
+				return
+			}
+		}
 	}
+	DrawObject()
 }
 
 
