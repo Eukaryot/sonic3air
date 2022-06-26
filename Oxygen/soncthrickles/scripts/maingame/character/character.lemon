@@ -2861,7 +2861,18 @@ function void SonicPressedJumpInMidAir()
 
 	if (super.active)
 	{
-		if (super.active & 0x80)	// Hyper
+		bool performHyperDash = (super.active & 0x80)		// Hyper Sonic active
+		u8 input = control.player1.state & CONTROL_DPAD		// Only directions
+	#if STANDALONE
+		if (performHyperDash && Game.getSetting(SETTING_HYPER_DASH_CONTROLS) == 1)
+		{
+			// Hyper Dash requires also pressing D-pad in any direction
+			//  -> To allow for Drop Dashing without activating the Hyper Dash before
+			performHyperDash = (input != 0)
+		}
+	#endif
+
+		if (performHyperDash)
 		{
 			Character.ClearEnemiesOnScreen()
 
@@ -2873,7 +2884,6 @@ function void SonicPressedJumpInMidAir()
 
 			playSound(SFX_SPINDASH_RELEASE)
 
-			u8 input = control.player1.state & CONTROL_DPAD	// Only directions
 			if (input != 0 && input < 0x0b)		// Not left and right at the same time
 			{
 				// Perform Hyper Dash

@@ -127,6 +127,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::TAILS_FLIGHT_CANCEL,		SharedDatabase::Setting::SETTING_CANCEL_FLIGHT);
 		setupOptionEntry(option::NO_CONTROL_LOCK,			SharedDatabase::Setting::SETTING_NO_CONTROL_LOCK);
 		setupOptionEntry(option::HYPER_TAILS,				SharedDatabase::Setting::SETTING_HYPER_TAILS);
+		setupOptionEntry(option::HYPER_DASH_CONTROLS,		SharedDatabase::Setting::SETTING_HYPER_DASH_CONTROLS);
 		setupOptionEntry(option::MAINTAIN_SHIELDS,			SharedDatabase::Setting::SETTING_MAINTAIN_SHIELDS);
 		setupOptionEntry(option::SHIELD_TYPES,				SharedDatabase::Setting::SETTING_SHIELD_TYPES);
 		setupOptionEntry(option::BUBBLE_SHIELD_BOUNCE,		SharedDatabase::Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
@@ -628,6 +629,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<OptionsMenuEntry>().initEntry("Super Cancel:", option::SUPER_CANCEL)
 			.addOption("Off", 0)
 			.addOption("On", 1);
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Sonic Hyper Dash:", option::HYPER_DASH_CONTROLS)
+			.addOption("As Original", 0)
+			.addOption("Only when D-pad held", 1);
 	}
 
 	// Tweaks tab
