@@ -536,10 +536,10 @@ function void fn013d4a()
 		u8 flagsBackup = u8[0xffffe400 + D0.u8 + 2]
 	#if STANDALONE
 		// Make Tails account for Sonic's speed just enough he won't fall behind in AIZ 2 bombing section
-		targetPosX += (s16[A1 + 0x18] >> 7)
+		targetPosX += (objA1.velocity.x >> 7)
 	#endif
 
-		if ((u8[A1 + 0x2a] & 0x08) == 0 && s16[A1 + 0x1c] < 0x400)
+		if ((objA1.flags2a & char.flag.ON_OBJECT) == 0 && objA1.groundspeed < 0x400)
 		{
 			// Prefer to stand left, not directly behind main character
 			targetPosX -= 0x20
