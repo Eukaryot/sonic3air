@@ -213,6 +213,7 @@
     <ClCompile Include="..\..\source\rmxmedia\FileProviderSDL.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\Font.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\FontOutput.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\FontProcessor.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\FontSource.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\Framebuffer.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\FTX_System.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="..\..\source\rmxmedia\FileProviderSDL.h" />
     <ClInclude Include="..\..\source\rmxmedia\Font.h" />
     <ClInclude Include="..\..\source\rmxmedia\FontOutput.h" />
+    <ClInclude Include="..\..\source\rmxmedia\FontProcessor.h" />
     <ClInclude Include="..\..\source\rmxmedia\FontSource.h" />
     <ClInclude Include="..\..\source\rmxmedia\Framebuffer.h" />
     <ClInclude Include="..\..\source\rmxmedia\FTX_System.h" />

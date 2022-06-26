@@ -19,76 +19,6 @@
 #include "oxygen/resources/ResourcesCache.h"
 
 
-namespace
-{
-	struct OutlineFontProcessor : public FontProcessor
-	{
-		inline explicit OutlineFontProcessor(uint32 outlineColor = 0xff000000) : mOutlineColor(outlineColor) {}
-
-		virtual void process(FontProcessingData& data) override
-		{
-			const int outlineWidth = 1;
-
-			const int oldBorderLeft   = data.mBorderLeft;
-			const int oldBorderRight  = data.mBorderRight;
-			const int oldBorderTop    = data.mBorderTop;
-			const int oldBorderBottom = data.mBorderBottom;
-
-			data.mBorderLeft   = oldBorderLeft   + outlineWidth;
-			data.mBorderRight  = oldBorderRight  + outlineWidth;
-			data.mBorderTop    = oldBorderTop    + outlineWidth;
-			data.mBorderBottom = oldBorderBottom + outlineWidth;
-
-			const int newWidth  = data.mBitmap.mWidth  + (data.mBorderLeft + data.mBorderRight) - (oldBorderLeft + oldBorderRight);
-			const int newHeight = data.mBitmap.mHeight + (data.mBorderTop + data.mBorderBottom) - (oldBorderTop + oldBorderBottom);
-			const int insetX = data.mBorderLeft - oldBorderLeft;
-			const int insetY = data.mBorderTop - oldBorderTop;
-
-			Bitmap bitmap;
-			bitmap.create(newWidth, newHeight, 0);
-
-			for (int y = 0; y < data.mBitmap.mHeight; ++y)
-			{
-				for (int x = 0; x < data.mBitmap.mWidth; ++x)
-				{
-					if (data.mBitmap.mData[x + y * data.mBitmap.mWidth] & 0xff000000)
-					{
-						bitmap.mData[(insetX + x - 1) + (insetY + y) * bitmap.mWidth] = mOutlineColor;
-						bitmap.mData[(insetX + x + 1) + (insetY + y) * bitmap.mWidth] = mOutlineColor;
-						bitmap.mData[(insetX + x) + (insetY + y - 1) * bitmap.mWidth] = mOutlineColor;
-						bitmap.mData[(insetX + x) + (insetY + y + 1) * bitmap.mWidth] = mOutlineColor;
-					}
-				}
-			}
-			bitmap.insertBlend(insetX, insetY, data.mBitmap);
-			for (int y = 0; y < bitmap.mHeight; ++y)
-			{
-				uint32* pixelPtr = bitmap.getPixelPointer(0, y);
-				const float shadingFactor = interpolate(0.65f, 1.0f, saturate((float)y / (float)bitmap.mHeight * 2.0f));
-				for (int x = 0; x < bitmap.mWidth; ++x)
-				{
-					float colorR = (float)((*pixelPtr) & 0xff);
-					float colorG = (float)((*pixelPtr >> 8) & 0xff);
-					float colorB = (float)((*pixelPtr >> 16) & 0xff);
-					colorR *= shadingFactor;
-					colorG *= shadingFactor;
-					colorB *= shadingFactor;
-					*pixelPtr = (uint32)(colorR + 0.5f) | ((uint32)(colorG + 0.5f) << 8) | ((uint32)(colorB + 0.5f) << 16) | (*pixelPtr & 0xff000000);
-					++pixelPtr;
-				}
-			}
-			data.mBitmap = bitmap;
-		}
-
-	private:
-		uint32 mOutlineColor = 0xff000000;
-	};
-
-	OutlineFontProcessor gOutlineFontProcessor;
-	OutlineFontProcessor gOutlineFontProcessorTransparent(0x80000000);
-}
-
-
 namespace global
 {
 	Font mFont3Pure;
@@ -132,30 +62,44 @@ namespace global
 		resourcesCache.registerFontSource("sonic3_fontB");
 		resourcesCache.registerFontSource("sonic3_fontC");
 
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor = std::make_shared<ShadowFontProcessor>(Vec2f(0.5f, 0.5f), 0.6f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor2 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 0.5f), 0.5f);
+
+		std::shared_ptr<OutlineFontProcessor> outlineFontProcessor = std::make_shared<OutlineFontProcessor>();
+		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorTransparent = std::make_shared<OutlineFontProcessor>(0x80000000);
+
+		std::shared_ptr<GradientFontProcessor> gradientFontProcessor = std::make_shared<GradientFontProcessor>();
+
 		mFont3Pure.loadFromFile("data/font/smallfont.json");
 
 		mFont3.loadFromFile("data/font/smallfont.json");
-		mFont3.addFontProcessor(gOutlineFontProcessorTransparent);
+		mFont3.addFontProcessor(outlineFontProcessorTransparent);
+		mFont3.addFontProcessor(shadowFontProcessor);
 
 		mFont4.loadFromFile("data/font/oxyfont_tiny.json");
-		mFont4.addFontProcessor(gOutlineFontProcessor);
-		mFont4.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
+		mFont4.addFontProcessor(outlineFontProcessor);
+		mFont4.addFontProcessor(gradientFontProcessor);
+		mFont4.addFontProcessor(shadowFontProcessor);
 
 		mFont5.loadFromFile("data/font/oxyfont_small.json");
-		mFont5.addFontProcessor(gOutlineFontProcessor);
-		mFont5.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
+		mFont5.addFontProcessor(outlineFontProcessor);
+		mFont5.addFontProcessor(gradientFontProcessor);
+		mFont5.addFontProcessor(shadowFontProcessor);
 
 		mFont7.loadFromFile("data/font/sonic3_fontB.json");
-		mFont7.addFontProcessor(gOutlineFontProcessor);
-		mFont7.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
+		mFont7.addFontProcessor(outlineFontProcessor);
+		mFont7.addFontProcessor(gradientFontProcessor);
+		mFont7.addFontProcessor(shadowFontProcessor);
 
 		mFont10.loadFromFile("data/font/oxyfont_regular.json");
-		mFont10.addFontProcessor(gOutlineFontProcessor);
-		mFont10.setShadow(true, Vec2f(0.5f, 0.5f), 0.6f);
+		mFont10.addFontProcessor(outlineFontProcessor);
+		mFont10.addFontProcessor(gradientFontProcessor);
+		mFont10.addFontProcessor(shadowFontProcessor);
 
 		mFont18.loadFromFile("data/font/sonic3_fontC.json");
-		mFont18.addFontProcessor(gOutlineFontProcessor);
-		mFont18.setShadow(true, Vec2f(1.0f, 0.5f), 0.5f);
+		mFont18.addFontProcessor(outlineFontProcessor);
+		mFont18.addFontProcessor(gradientFontProcessor);
+		mFont18.addFontProcessor(shadowFontProcessor2);
 
 		FileHelper::loadTexture(mMainMenuBackgroundSeparator, L"data/images/menu/mainmenu_bg_separator.png");
 		FileHelper::loadTexture(mDataSelectBackground, L"data/images/menu/dataselect_bg.png");

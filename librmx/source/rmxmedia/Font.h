@@ -11,6 +11,8 @@
 
 #pragma once
 
+class FontProcessor;
+
 
 struct StringReader
 {
@@ -31,21 +33,6 @@ struct StringReader
 };
 
 
-struct FontProcessingData
-{
-	Bitmap mBitmap;
-	int mBorderLeft = 0;
-	int mBorderRight = 0;
-	int mBorderTop = 0;
-	int mBorderBottom = 0;
-};
-
-struct FontProcessor
-{
-	virtual void process(FontProcessingData& data) = 0;
-};
-
-
 struct FontSourceKey
 {
 	String mName;
@@ -60,36 +47,18 @@ struct FontSourceKey
 		return 0;
 	}
 
-	bool operator==(const FontSourceKey& other) const { return (compare(other) == 0); }
-	bool operator<(const FontSourceKey& other) const  { return (compare(other) < 0); }
+	inline bool operator==(const FontSourceKey& other) const { return (compare(other) == 0); }
+	inline bool operator<(const FontSourceKey& other) const  { return (compare(other) < 0); }
 };
 
 
 struct FontKey : public FontSourceKey
 {
-	FontProcessor* mProcessor = nullptr;
-	bool mShadowEnabled = false;
-	Vec2f mShadowOffset = Vec2f(1.0f, 1.0f);
-	float mShadowBlur = 1.0f;
-	float mShadowAlpha = 1.0f;
+	std::vector<std::shared_ptr<FontProcessor>> mProcessors;
 
-	int compare(const FontKey& other) const
-	{
-		COMPARE_CASCADE(::compare(mProcessor, other.mProcessor));
-		COMPARE_CASCADE(FontSourceKey::compare(other));
-		COMPARE_CASCADE(::compare(mShadowEnabled, other.mShadowEnabled));
-		if (mShadowEnabled)
-		{
-			COMPARE_CASCADE(::compare(mShadowOffset.x, other.mShadowOffset.x));
-			COMPARE_CASCADE(::compare(mShadowOffset.y, other.mShadowOffset.y));
-			COMPARE_CASCADE(::compare(mShadowBlur, other.mShadowBlur));
-			COMPARE_CASCADE(::compare(mShadowAlpha, other.mShadowAlpha));
-		}
-		return 0;
-	}
-
-	bool operator==(const FontKey& other) const { return (compare(other) == 0); }
-	bool operator<(const FontKey& other) const  { return (compare(other) < 0); }
+	int compare(const FontKey& other) const;
+	inline bool operator==(const FontKey& other) const { return (compare(other) == 0); }
+	inline bool operator<(const FontKey& other) const  { return (compare(other) < 0); }
 };
 
 
@@ -111,8 +80,9 @@ public:
 
 	bool loadFromFile(const String& filename, float size = 0.0f);
 	void setSize(float size);
-	void setShadow(bool enable, const Vec2f offset = Vec2f(1,1), float blur = 1.0f, float alpha = 1.0f);
-	void addFontProcessor(FontProcessor& processor);
+
+	void clearFontProcessors();
+	void addFontProcessor(const std::shared_ptr<FontProcessor>& processor);
 
 	const FontKey& getKey() const	{ return mKey; }
 	const String& getName() const	{ return mKey.mName; }

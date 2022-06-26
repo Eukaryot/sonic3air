@@ -442,7 +442,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 					screenPosition -= worldSpaceOffset;
 				}
 
-				Font* font = ResourcesCache::instance().getFontByKey(text.mFontKeyString, text.mFontKeyHash);
+				Font* font = ResourcesCache::instance().getFontByKey(text.mFontKeyHash);
 				if (nullptr != font)
 				{
 					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, text.mSpacing);

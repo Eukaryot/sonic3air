@@ -13,9 +13,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 
 
-MemoryHexView::MemoryHexView() :
-	mStartAddress(0xffffb000),
-	mLines(0)
+MemoryHexView::MemoryHexView()
 {
 }
 
@@ -29,7 +27,7 @@ void MemoryHexView::initialize()
 
 	// Debug output font
 	mFont.setSize(15.0f);
-	mFont.setShadow(true);
+	mFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 1.0f));
 }
 
 void MemoryHexView::deinitialize()

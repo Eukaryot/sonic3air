@@ -12,6 +12,8 @@
 #pragma once
 
 class Font;
+struct FontProcessingData;
+
 
 class API_EXPORT FontOutput
 {

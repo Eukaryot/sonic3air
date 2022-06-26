@@ -34,6 +34,7 @@
 #include "rmxmedia/FontSource.h"
 #include "rmxmedia/Font.h"
 #include "rmxmedia/FontOutput.h"
+#include "rmxmedia/FontProcessor.h"
 #include "rmxmedia/GLTools.h"
 #include "rmxmedia/Painter.h"
 #include "rmxmedia/Thread.h"

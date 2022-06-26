@@ -23,8 +23,8 @@ namespace global
 		inline bool operator<(const ZoneActPreviewKey& other) const  { return (mZone != other.mZone) ? (mZone < other.mZone) : (mAct != other.mAct) ? (mAct < other.mAct) : (mImage < other.mImage); }
 	};
 
-	extern Font mFont3;
 	extern Font mFont3Pure;
+	extern Font mFont3;
 	extern Font mFont4;
 	extern Font mFont5;
 	extern Font mFont7;

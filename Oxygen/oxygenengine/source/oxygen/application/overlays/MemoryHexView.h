@@ -25,9 +25,9 @@ public:
 	virtual void render() override;
 
 private:
-	uint32	mStartAddress;
-	uint32	mLines;
+	uint32 mStartAddress = 0xffffb000;
+	uint32 mLines = 0;
 
 	// Misc
-	Font	mFont;
+	Font mFont;
 };

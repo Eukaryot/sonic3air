@@ -11,6 +11,18 @@
 
 Font::CodecList Font::mCodecs;
 
+
+int FontKey::compare(const FontKey& other) const
+{
+	if (mProcessors.size() != other.mProcessors.size())
+		return (mProcessors.size() < other.mProcessors.size() ? -1 : 1);
+	for (size_t k = 0; k < mProcessors.size(); ++k)
+		COMPARE_CASCADE(::compare(mProcessors[k].get(), other.mProcessors[k].get()));
+	COMPARE_CASCADE(FontSourceKey::compare(other));
+	return 0;
+}
+
+
 FontSource* FontSourceStdFactory::construct(const FontSourceKey& key)
 {
 	if (key.mName.empty())
@@ -58,18 +70,15 @@ void Font::setSize(float size)
 	rebuildFontSource();
 }
 
-void Font::setShadow(bool enable, const Vec2f offset, float blur, float alpha)
+void Font::clearFontProcessors()
 {
-	mKey.mShadowEnabled = enable;
-	mKey.mShadowOffset = offset;
-	mKey.mShadowBlur = blur;
-	mKey.mShadowAlpha = alpha;
+	mKey.mProcessors.clear();
 	rebuildFontSource();
 }
 
-void Font::addFontProcessor(FontProcessor& processor)
+void Font::addFontProcessor(const std::shared_ptr<FontProcessor>& processor)
 {
-	mKey.mProcessor = &processor;
+	mKey.mProcessors.emplace_back(processor);
 	rebuildFontSource();
 }
 

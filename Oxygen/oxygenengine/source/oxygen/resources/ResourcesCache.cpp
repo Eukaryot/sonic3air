@@ -166,7 +166,7 @@ const ResourcesCache::Palette* ResourcesCache::getPalette(uint64 key, uint8 line
 	return (it == mPalettes.end()) ? nullptr : &it->second;
 }
 
-Font* ResourcesCache::getFontByKey(const std::string& keyString, uint64 keyHash)
+Font* ResourcesCache::getFontByKey(uint64 keyHash)
 {
 	// Try to find in map
 	const auto it = mCachedFonts.find(keyHash);

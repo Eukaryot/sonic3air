@@ -9,54 +9,6 @@
 #include "../rmxmedia.h"
 
 
-namespace
-{
-	void addFontShadow(FontProcessingData& data, const FontKey& key)
-	{
-		// Add shadow effect
-		const int oldBorderLeft   = data.mBorderLeft;
-		const int oldBorderRight  = data.mBorderRight;
-		const int oldBorderTop    = data.mBorderTop;
-		const int oldBorderBottom = data.mBorderBottom;
-
-		const int border = clamp(roundToInt(key.mShadowBlur * 2.0f), 0, 16);
-		const int offsX = clamp(roundToInt(key.mShadowOffset.x), 0, 16);
-		const int offsY = clamp(roundToInt(key.mShadowOffset.y), 0, 16);
-
-		data.mBorderLeft   = oldBorderLeft   + std::max(0, border - offsX);
-		data.mBorderRight  = oldBorderRight  + border + offsX;
-		data.mBorderTop    = oldBorderTop    + std::max(0, border - offsY);
-		data.mBorderBottom = oldBorderBottom + border + offsY;
-
-		const int newWidth  = data.mBitmap.mWidth  + (data.mBorderLeft + data.mBorderRight) - (oldBorderLeft + oldBorderRight);
-		const int newHeight = data.mBitmap.mHeight + (data.mBorderTop + data.mBorderBottom) - (oldBorderTop + oldBorderBottom);
-		const int insetX = data.mBorderLeft - oldBorderLeft;
-		const int insetY = data.mBorderTop - oldBorderTop;
-
-		Bitmap bmp;
-		bmp.create(newWidth, newHeight, 0);
-		bmp.insertBlend(insetX + offsX, insetY + offsY, data.mBitmap);
-		if (key.mShadowBlur > 0.0f)
-		{
-			bmp.gaussianBlur(bmp, key.mShadowBlur);
-		}
-		if (key.mShadowAlpha < 1.0f)
-		{
-			for (int i = 0; i < bmp.getPixelCount(); ++i)
-			{
-				bmp.mData[i] = roundToInt((float)(bmp.mData[i] >> 24) * key.mShadowAlpha) << 24;
-			}
-		}
-		else
-		{
-			bmp.clearRGB(0);
-		}
-		bmp.insertBlend(insetX, insetY, data.mBitmap);
-		data.mBitmap = bmp;
-	}
-}
-
-
 FontOutput::FontOutput(const FontKey& key)
 {
 	mKey = key;
@@ -195,16 +147,10 @@ void FontOutput::applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, c
 
 void FontOutput::applyEffects(FontProcessingData& fontProcessingData, SpriteHandleInfo& info, bool cacheBitmap)
 {
-	// Run processor
-	if (nullptr != mKey.mProcessor)
+	// Run font processors
+	for (const std::shared_ptr<FontProcessor>& processor : mKey.mProcessors)
 	{
-		mKey.mProcessor->process(fontProcessingData);
-	}
-
-	// Optionally add shadow effect
-	if (mKey.mShadowEnabled && mKey.mShadowAlpha > 0.001f)
-	{
-		addFontShadow(fontProcessingData, mKey);
+		processor->process(fontProcessingData);
 	}
 
 	info.mBorderLeft = fontProcessingData.mBorderLeft;

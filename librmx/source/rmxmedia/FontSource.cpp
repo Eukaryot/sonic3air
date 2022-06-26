@@ -71,7 +71,7 @@ bool FontSourceStd::fillGlyphInfo(FontSource::GlyphInfo& info)
 	{
 		// Rescale if needed
 		info.bitmap.rescale(bmp1, roundToInt(stdfont_width * mSize / stdfont_size),
-								  roundToInt(stdfont_height * mSize / stdfont_size));
+									roundToInt(stdfont_height * mSize / stdfont_size));
 	}
 	else
 	{

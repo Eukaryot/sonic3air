@@ -51,15 +51,14 @@ private:
 	void onAccept(bool loadingAllowed, bool savingAllowed);
 
 private:
-	bool mIsActive;
+	bool mIsActive = false;
 	bool mHadFirstUpdate = false;
-	bool mForLoading;
+	bool mForLoading = true;
 	bool mEditing = false;
-
 	std::vector<Entry> mEntries;
 	std::wstring mSaveStateDirectory[2];
 
-	uint32 mHighlightedIndex;
+	uint32 mHighlightedIndex = 0;
 	std::wstring mHighlightedName;
 
 	bool mHasPreview = false;

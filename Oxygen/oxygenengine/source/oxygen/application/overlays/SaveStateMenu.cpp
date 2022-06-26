@@ -18,13 +18,10 @@
 #include "oxygen/simulation/Simulation.h"
 
 
-SaveStateMenu::SaveStateMenu() :
-	mIsActive(false),
-	mForLoading(true),
-	mHighlightedIndex(0)
+SaveStateMenu::SaveStateMenu()
 {
 	mFont.setSize(18.0f);
-	mFont.setShadow(true, Vec2f(2,2), 0.5f);
+	mFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2f(2.0f, 2.0f), 0.5f));
 }
 
 SaveStateMenu::~SaveStateMenu()

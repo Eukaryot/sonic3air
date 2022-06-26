@@ -45,7 +45,7 @@ public:
 	const std::vector<const RawData*>& getRawData(uint64 key) const;
 	const Palette* getPalette(uint64 key, uint8 line) const;
 
-	Font* getFontByKey(const std::string& keyString, uint64 keyHash);
+	Font* getFontByKey(uint64 keyHash);
 	Font* registerFontSource(const std::string& filename);
 
 	void applyRomInjections(uint8* rom, uint32 romSize) const;
