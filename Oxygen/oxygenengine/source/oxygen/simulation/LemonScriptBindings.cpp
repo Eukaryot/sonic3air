@@ -1021,6 +1021,19 @@ namespace
 		}
 	}
 
+	int32 Renderer_getTextWidth(lemon::StringRef fontKey, lemon::StringRef text)
+	{
+		if (fontKey.isValid() && text.isValid())
+		{
+			Font* font = ResourcesCache::instance().getFontByKey(fontKey.getHash());
+			if (nullptr != font)
+			{
+				return font->getWidth(text.getString());
+			}
+		}
+		return 0;
+	}
+
 
 	uint64 debugKeyGetter(int index)
 	{
@@ -1742,6 +1755,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(7, "renderQueue")
 			.setParameterInfo(8, "useWorldSpace");
 
+		module.addUserDefinedFunction("Renderer.getTextWidth", lemon::wrap(&Renderer_getTextWidth), defaultFlags)
+			.setParameterInfo(0, "fontKey")
+			.setParameterInfo(1, "text");
+		
 
 		// Audio
 		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)

@@ -299,7 +299,9 @@ declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 
 
 declare function void Renderer.drawText(string fontKey, s32 px, s32 py, string text, u32 tintColor, u8 alignment, s8 spacing, u16 renderQueue, s8 useWorldSpace)
 
-declare function s8 Audio.isPlayingAudio(u64 id)
+declare function s32 Renderer.getTextWidth(string fontKey, string text)
+
+declare function s8 Audio.isPlayingAudio(u64 sfxId)
 
 declare function void Audio.playAudio(u64 sfxId, u8 contextId)
 
