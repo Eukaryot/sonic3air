@@ -172,6 +172,7 @@ namespace softwaredrawer
 
 		void setCurrentRenderTarget(DrawerTexture* renderTarget)
 		{
+			RMX_ASSERT(mScissorStack.empty(), "Changed render targets with non-empty scissor stack");
 			if (nullptr == mCurrentRenderTarget)
 			{
 				unlockScreenSurface();
@@ -181,11 +182,13 @@ namespace softwaredrawer
 
 			if (nullptr == mCurrentRenderTarget)
 			{
-				// Next call to "getOutputWrapper" will update everything accordingly
+				// Next call to "getOutputWrapper" will update the output wrapper accordingly
+				mScissorRect.set(0, 0, mScreenSurface->w, mScreenSurface->h);
 			}
 			else
 			{
 				mOutputWrapper.Set(mCurrentRenderTarget->accessBitmap());
+				mScissorRect.set(0, 0, mCurrentRenderTarget->getWidth(), mCurrentRenderTarget->getHeight());
 			}
 		}
 
@@ -360,19 +363,20 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 				RectDrawCommand& dc = drawCommand->as<RectDrawCommand>();
 				BitmapWrapper& outputWrapper = mInternal.getOutputWrapper();
 
+				// Target rect to fill in the output
+				Recti targetRect = dc.mRect;
 				bool mirrorX = false;
-				Recti rect = dc.mRect;
-				if (rect.width < 0)
+				if (targetRect.width < 0)
 				{
 					// Mirror horizontally
 					mirrorX = true;
-					rect.x += rect.width;
-					rect.width = -rect.width;
+					targetRect.x += targetRect.width;
+					targetRect.width = -targetRect.width;
 				}
-				const Recti uncroppedRect = rect;
-				rect.intersect(rect, mInternal.getScissorRect());
+				const Recti uncroppedRect = targetRect;
+				targetRect.intersect(targetRect, mInternal.getScissorRect());
 
-				if (!rect.empty())
+				if (!targetRect.empty())
 				{
 					Blitter::Options options;
 					options.mSwapRedBlue = mInternal.needSwapRedBlueChannels();
@@ -391,36 +395,68 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 
 						BitmapWrapper inputWrapper(*inputBitmap);
 
-						// Scaling?
-						const bool useScaling = (rect.getSize() != inputBitmap->getSize());
-
-						// Consider cropping
-						Recti inputRect(rect.getPos() - uncroppedRect.getPos(), rect.getSize());
-						if (useScaling)
+						Recti inputRect;
 						{
-							const float scaleX = (float)inputBitmap->getWidth() / (float)uncroppedRect.width;
-							const float scaleY = (float)inputBitmap->getHeight() / (float)uncroppedRect.height;
-							inputRect.x = roundToInt((float)inputRect.x * scaleX);
-							inputRect.y = roundToInt((float)inputRect.y * scaleY);
-							inputRect.width = roundToInt((float)inputRect.width * scaleX);
-							inputRect.height = roundToInt((float)inputRect.height * scaleY);
+							// Calculate actual UVs that also take cropping into account
+							Vec2f uv0 = dc.mUV0;
+							Vec2f uv1 = dc.mUV1;
+							if (targetRect != uncroppedRect)
+							{
+								const Vec2f relativeStart = Vec2f(targetRect.getPos() - uncroppedRect.getPos()) / Vec2f(uncroppedRect.getSize());
+								const Vec2f relativeEnd   = Vec2f(targetRect.getPos() - uncroppedRect.getPos() + targetRect.getSize()) / Vec2f(uncroppedRect.getSize());
+								uv0 = dc.mUV0 + relativeStart * (dc.mUV1 - dc.mUV0);
+								uv1 = dc.mUV0 + relativeEnd   * (dc.mUV1 - dc.mUV0);
+							}
+
+							// TODO: Support UVs outside the range [0.0f, 1.0f]
+							//  -> The following is just fail-safe code so nothing crashes...
+							{
+								uv0.x = saturate(uv0.x);
+								uv0.y = saturate(uv0.y);
+								uv1.x = clamp(uv1.x, uv0.x, 1.0f);
+								uv1.y = clamp(uv1.y, uv0.y, 1.0f);
+								if (uv0.x == uv1.x)
+								{
+									uv0.x = 0.0f;
+									uv1.x = 1.0f;
+								}
+								if (uv0.y == uv1.y)
+								{
+									uv0.y = 0.0f;
+									uv1.y = 1.0f;
+								}
+							}
+
+							// Get the part from the input that will get drawn
+							const Vec2f inputStart = uv0 * Vec2f(inputBitmap->getSize());
+							const Vec2f inputEnd = uv1 * Vec2f(inputBitmap->getSize());
+							inputRect.x = roundToInt(inputStart.x);
+							inputRect.y = roundToInt(inputStart.y);
+							inputRect.width = roundToInt(inputEnd.x) - inputRect.x;
+							inputRect.height = roundToInt(inputEnd.y) - inputRect.y;
+
+							if (inputRect.empty())
+								inputRect.set(0, 0, 1, 1);
 						}
+
+						// Scaling?
+						const bool useScaling = (targetRect.getSize() != inputRect.getSize());
 
 						// TODO: Support tint color everywhere
 						options.mTintColor = dc.mColor;
 
 						if (useScaling)
 						{
-							Blitter::blitBitmapWithScaling(outputWrapper, rect, inputWrapper, inputRect, options);
+							Blitter::blitBitmapWithScaling(outputWrapper, targetRect, inputWrapper, inputRect, options);
 						}
 						else
 						{
-							Blitter::blitBitmap(outputWrapper, rect.getPos(), inputWrapper, inputRect, options);
+							Blitter::blitBitmap(outputWrapper, targetRect.getPos(), inputWrapper, inputRect, options);
 						}
 					}
 					else
 					{
-						Blitter::blitColor(outputWrapper, rect, dc.mColor, options);
+						Blitter::blitColor(outputWrapper, targetRect, dc.mColor, options);
 					}
 				}
 				break;
