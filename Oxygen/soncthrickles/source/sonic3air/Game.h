@@ -103,7 +103,6 @@ private:
 	uint16 onTriggerNextZone(uint16 zoneAndAct);
 	uint16 onFadedOutLoadingZone(uint16 zoneAndAct);
 	bool onCharacterDied(uint8 playerIndex);
-	void onScreenFadedOutBeforeDataSelect();
 	void returnToMainMenu();
 
 	inline bool isNormalGame()	{ return mMode == Mode::NORMAL_GAME; }

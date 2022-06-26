@@ -441,8 +441,11 @@ function void TitleScreen()
 			playSound(MUSIC_CTRL_FADEOUT)
 
 		#if STANDALONE
-			// In S3AIR, there is no choice, sorry...
-			global.game_mode = 0x4c
+			// In S3AIR, there is no choice, always go to the main menu
+			FadeOutScreenBlocking()
+			Game.returnToMainMenu()
+			Audio.fadeOutChannel(0, 0x40)	// Do the rest of music fade out relatively quickly
+			yieldExecution()
 
 		#else
 			D0 = titlescreen.selection

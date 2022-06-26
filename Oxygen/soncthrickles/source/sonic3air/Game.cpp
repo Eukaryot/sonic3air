@@ -175,7 +175,6 @@ void Game::registerScriptBindings(lemon::Module& module)
 		module.addUserDefinedFunction("Game.onCharacterDied", lemon::wrap(*this, &Game::onCharacterDied), noInlineExecution)		// No inline execution as this function manipulated the call stack
 			.setParameterInfo(0, "playerIndex");
 
-		module.addUserDefinedFunction("Game.onScreenFadedOutBeforeDataSelect", lemon::wrap(*this, &Game::onScreenFadedOutBeforeDataSelect), defaultFlags);
 		module.addUserDefinedFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
 		module.addUserDefinedFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
 		module.addUserDefinedFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
@@ -999,14 +998,6 @@ bool Game::onCharacterDied(uint8 playerIndex)
 		Application::instance().getSimulation().getCodeExec().getLemonScriptRuntime().callFunctionByName("restartTimeAttack");
 	}
 	return true;
-}
-
-void Game::onScreenFadedOutBeforeDataSelect()
-{
-	if (mMode == Mode::TITLE_SCREEN)
-	{
-		mReturnToMenuTriggered = true;
-	}
 }
 
 void Game::returnToMainMenu()

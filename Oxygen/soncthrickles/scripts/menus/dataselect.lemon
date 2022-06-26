@@ -463,7 +463,6 @@ function void DataSelectScreen()
 	FadeOutScreenBlocking()
 
 #if STANDALONE
-	Game.onScreenFadedOutBeforeDataSelect()
 	InitSaveSlots()
 #endif
 

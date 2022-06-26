@@ -46,6 +46,11 @@ function void debugDrawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
 	Debug.drawRect(px, py, width, height, color)
 }
 
+function void Game.onScreenFadedOutBeforeDataSelect()
+{
+	Game.returnToMainMenu()
+}
+
 
 
 //-------------------------------------------------------//

@@ -379,8 +379,6 @@ declare function u16 Game.onFadedOutLoadingZone(u16 zoneAndAct)
 
 declare function s8 Game.onCharacterDied(u8 playerIndex)
 
-declare function void Game.onScreenFadedOutBeforeDataSelect()
-
 declare function void Game.returnToMainMenu()
 
 declare function s8 Game.isNormalGame()

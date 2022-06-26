@@ -86,11 +86,6 @@ function bool Game.onCharacterDied(u8 playerIndex)
 	return true
 }
 
-function void Game.onScreenFadedOutBeforeDataSelect()
-{
-	// Ignore this function call
-}
-
 function void Game.returnToMainMenu()
 {
 	// Ignore this function call
