@@ -85,7 +85,10 @@ void BackdropView::initialize()
 
 void BackdropView::update(float timeElapsed)
 {
-	mAnimationTime += timeElapsed;
+	if (Configuration::instance().mRenderMethod != Configuration::RenderMethod::SOFTWARE)
+	{
+		mAnimationTime += timeElapsed;
+	}
 
 	float targetMultiplier = 1.0f;
 	Simulation& simulation = Application::instance().getSimulation();
@@ -168,7 +171,7 @@ void BackdropView::render()
 		const Vec2f textureSize(mBackdropTexture.getSize());
 		const float scaling = 2.0f;
 
-		// Add some subtle movement to avoid burn-in on sensitive screens
+		// Add some subtle movement to avoid burn-in on sensitive screens (except with pure software renderer, where this effect is quite annoying due to missing interpolation)
 		const Vec2f animationOffset(mAnimationTime * 1.0f, mAnimationTime * 0.1f);
 
 		Drawer& drawer = EngineMain::instance().getDrawer();

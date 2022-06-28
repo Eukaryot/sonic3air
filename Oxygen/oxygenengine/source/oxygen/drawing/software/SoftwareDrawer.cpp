@@ -396,6 +396,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 						BitmapWrapper inputWrapper(*inputBitmap);
 
 						Recti inputRect;
+						bool useUVs = false;
 						{
 							// Calculate actual UVs that also take cropping into account
 							Vec2f uv0 = dc.mUV0;
@@ -408,24 +409,8 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 								uv1 = dc.mUV0 + relativeEnd   * (dc.mUV1 - dc.mUV0);
 							}
 
-							// TODO: Support UVs outside the range [0.0f, 1.0f]
-							//  -> The following is just fail-safe code so nothing crashes...
-							{
-								uv0.x = saturate(uv0.x);
-								uv0.y = saturate(uv0.y);
-								uv1.x = clamp(uv1.x, uv0.x, 1.0f);
-								uv1.y = clamp(uv1.y, uv0.y, 1.0f);
-								if (uv0.x == uv1.x)
-								{
-									uv0.x = 0.0f;
-									uv1.x = 1.0f;
-								}
-								if (uv0.y == uv1.y)
-								{
-									uv0.y = 0.0f;
-									uv1.y = 1.0f;
-								}
-							}
+							useUVs = (uv0.x < 0.0f || uv0.x > uv1.x || uv1.x > 1.0f ||
+									  uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
 
 							// Get the part from the input that will get drawn
 							const Vec2f inputStart = uv0 * Vec2f(inputBitmap->getSize());
@@ -434,18 +419,16 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 							inputRect.y = roundToInt(inputStart.y);
 							inputRect.width = roundToInt(inputEnd.x) - inputRect.x;
 							inputRect.height = roundToInt(inputEnd.y) - inputRect.y;
-
-							if (inputRect.empty())
-								inputRect.set(0, 0, 1, 1);
 						}
-
-						// Scaling?
-						const bool useScaling = (targetRect.getSize() != inputRect.getSize());
 
 						// TODO: Support tint color everywhere
 						options.mTintColor = dc.mColor;
 
-						if (useScaling)
+						if (useUVs)
+						{
+							Blitter::blitBitmapWithUVs(outputWrapper, targetRect, inputWrapper, inputRect, options);
+						}
+						else if (targetRect.getSize() != inputRect.getSize())
 						{
 							Blitter::blitBitmapWithScaling(outputWrapper, targetRect, inputWrapper, inputRect, options);
 						}

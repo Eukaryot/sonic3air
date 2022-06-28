@@ -45,4 +45,5 @@ public:
 	static void blitColor(BitmapWrapper& destBitmap, Recti destRect, const Color& color, const Options& options);
 	static void blitBitmap(BitmapWrapper& destBitmap, Vec2i destPosition, const BitmapWrapper& sourceBitmap, Recti sourceRect, const Options& options);
 	static void blitBitmapWithScaling(BitmapWrapper& destBitmap, Recti destRect, const BitmapWrapper& sourceBitmap, Recti sourceRect, const Options& options);
+	static void blitBitmapWithUVs(BitmapWrapper& destBitmap, Recti destRect, const BitmapWrapper& sourceBitmap, Recti sourceRect, const Options& options);
 };

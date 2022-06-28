@@ -139,7 +139,7 @@ namespace blitterinternal
 				}
 				else
 				{
-					memcpy(dst, src, sourceRect.width * 4);
+					memcpy(dst, src, sourceRect.width * sizeof(uint32));
 				}
 			}
 		}
@@ -181,7 +181,7 @@ namespace blitterinternal
 	template<bool SWAP_RED_BLUE, bool ALPHA_BLENDING, bool USE_TINT_COLOR>
 	void blitBitmapWithScaling(BitmapWrapper& destBitmap, Recti destRect, const BitmapWrapper& sourceBitmap, Recti sourceRect, uint32 tintColor)
 	{
-		if (destBitmap.empty())
+		if (destBitmap.empty() || sourceRect.empty())
 			return;
 
 		int lastSourceY = -1;
@@ -200,7 +200,7 @@ namespace blitterinternal
 			if (sourceY == lastSourceY && nullptr != lastDestData)
 			{
 				// Just copy the content from the last line, as it's the same contents again
-				memcpy(destData, lastDestData, destRect.width * 4);
+				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
 			}
 			else
 			{
@@ -241,7 +241,7 @@ namespace blitterinternal
 						}
 						else
 						{
-							memcpy(buffer, sourceData, sourceRect.width * 4);
+							memcpy(buffer, sourceData, sourceRect.width * sizeof(uint32));
 						}
 					}
 
@@ -279,6 +279,68 @@ namespace blitterinternal
 							destData[destX] = sourceData[position];
 							positionExact += advance;
 						}
+					}
+				}
+
+				lastSourceY = sourceY;
+				lastDestData = destData;
+			}
+		}
+	}
+
+	template<bool SWAP_RED_BLUE, bool ALPHA_BLENDING, bool USE_TINT_COLOR>
+	void blitBitmapWithUVs(BitmapWrapper& destBitmap, Recti destRect, const BitmapWrapper& sourceBitmap, Recti sourceRect, uint32 tintColor)
+	{
+		if (destBitmap.empty() || sourceRect.empty())
+			return;
+
+		// We can't handle negative source rect coordinate values, so if needed, shift its start offset by full source bitmap sizes
+		if (sourceRect.x < 0)
+		{
+			sourceRect.x = (sourceBitmap.mSize.x - 1) - (sourceBitmap.mSize.x - 1 - sourceRect.x) % sourceBitmap.mSize.x;
+		}
+		if (sourceRect.y < 0)
+		{
+			sourceRect.y = (sourceBitmap.mSize.y - 1) - (sourceBitmap.mSize.y - 1 - sourceRect.y) % sourceBitmap.mSize.y;
+		}
+
+		int lastSourceY = -1;
+		uint32* lastDestData = nullptr;
+
+		for (int lineIndex = 0; lineIndex < destRect.height; ++lineIndex)
+		{
+			const int destY = destRect.y + lineIndex;
+			const int sourceY = (sourceRect.y + lineIndex * sourceRect.height / destRect.height) % sourceBitmap.mSize.y;
+			uint32* destData = destBitmap.getPixelPointer(destRect.x, destY);
+
+			if (sourceY == lastSourceY && nullptr != lastDestData)
+			{
+				// Just copy the content from the last line, as it's the same contents again
+				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
+			}
+			else
+			{
+				const uint32* sourceData = sourceBitmap.getPixelPointer(0, sourceY);
+				for (int destX = 0; destX < destRect.width; ++destX)
+				{
+					const int sourceX = (sourceRect.x + destX * sourceRect.width / destRect.width) % sourceBitmap.mSize.x;
+					uint32 pixel;
+					if (USE_TINT_COLOR)
+					{
+						pixel = convertPixel<SWAP_RED_BLUE>(multiplyColors(sourceData[sourceX], tintColor));
+					}
+					else
+					{
+						pixel = convertPixel<SWAP_RED_BLUE>(sourceData[sourceX]);
+					}
+
+					if (ALPHA_BLENDING)
+					{
+						blendColors<false>((uint8*)&destData[destX], (uint8*)&pixel);
+					}
+					else
+					{
+						destData[destX] = pixel;
 					}
 				}
 
@@ -356,7 +418,7 @@ void Blitter::blitColor(BitmapWrapper& destBitmap, Recti destRect, const Color& 
 		for (int line = 1; line < destRect.height; ++line)
 		{
 			uint32* dst = destBitmap.getPixelPointer(destRect.x, destRect.y + line);
-			memcpy(dst, firstLine, (size_t)destRect.width * 4);
+			memcpy(dst, firstLine, (size_t)destRect.width * sizeof(uint32));
 		}
 	}
 	else if (color.a > 0.0f)
@@ -452,7 +514,7 @@ void Blitter::blitBitmap(BitmapWrapper& destBitmap, Vec2i destPosition, const Bi
 
 void Blitter::blitBitmapWithScaling(BitmapWrapper& destBitmap, Recti destRect, const BitmapWrapper& sourceBitmap, Recti sourceRect, const Options& options)
 {
-	if (destBitmap.empty())
+	if (destBitmap.empty() || sourceRect.empty())
 		return;
 
 	if (options.mTintColor == Color::WHITE)
@@ -506,6 +568,67 @@ void Blitter::blitBitmapWithScaling(BitmapWrapper& destBitmap, Recti destRect, c
 			else
 			{
 				blitterinternal::blitBitmapWithScaling<false, true, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
+		}
+	}
+}
+
+void Blitter::blitBitmapWithUVs(BitmapWrapper& destBitmap, Recti destRect, const BitmapWrapper& sourceBitmap, Recti sourceRect, const Options& options)
+{
+	if (destBitmap.empty() || sourceRect.empty())
+		return;
+
+	if (options.mTintColor == Color::WHITE)
+	{
+		if (!options.mUseAlphaBlending)
+		{
+			// No blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmapWithUVs<true, false, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+			}
+			else
+			{
+				blitterinternal::blitBitmapWithUVs<false, false, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+			}
+		}
+		else
+		{
+			// Alpha blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmapWithUVs<true, true, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+			}
+			else
+			{
+				blitterinternal::blitBitmapWithUVs<false, true, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+			}
+		}
+	}
+	else
+	{
+		if (!options.mUseAlphaBlending)
+		{
+			// No blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmapWithUVs<true, false, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
+			else
+			{
+				blitterinternal::blitBitmapWithUVs<false, false, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
+		}
+		else
+		{
+			// Alpha blending
+			if (options.mSwapRedBlue)
+			{
+				blitterinternal::blitBitmapWithUVs<true, true, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
+			}
+			else
+			{
+				blitterinternal::blitBitmapWithUVs<false, true, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor.getABGR32());
 			}
 		}
 	}
