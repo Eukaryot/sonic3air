@@ -42,6 +42,7 @@ FontSource* FontSourceBitmapFactory::construct(const FontSourceKey& key)
 }
 
 
+
 Font::Font()
 {
 }
@@ -59,7 +60,6 @@ Font::Font(float size) :
 Font::~Font()
 {
 	delete mFontSource;
-	delete mFontOutput;
 }
 
 bool Font::loadFromFile(const String& name, float size)
@@ -282,6 +282,48 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 	}
 }
 
+void Font::applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<TypeInfo>& inTypeInfos)
+{
+	outTypeInfos.reserve(inTypeInfos.size());
+	for (size_t i = 0; i < inTypeInfos.size(); ++i)
+	{
+		const TypeInfo& typeInfo = inTypeInfos[i];
+		if (nullptr == typeInfo.bitmap)
+			continue;
+
+		CharacterInfo& characterInfo = applyEffects(typeInfo);
+
+		ExtendedTypeInfo& extendedTypeInfo = vectorAdd(outTypeInfos);
+		extendedTypeInfo.mCharacter = typeInfo.unicode;
+		extendedTypeInfo.mBitmap = &characterInfo.mCachedBitmap;
+		extendedTypeInfo.mDrawPosition = Vec2i(typeInfo.pos) - Vec2i(characterInfo.mBorderLeft, characterInfo.mBorderTop);
+	}
+}
+
+Font::CharacterInfo& Font::applyEffects(const TypeInfo& typeInfo)
+{
+	const uint32 character = typeInfo.unicode;
+	CharacterInfo& characterInfo = mCharacterMap[character];
+	if (characterInfo.mCachedBitmap.empty())
+	{
+		FontProcessingData fontProcessingData;
+		fontProcessingData.mBitmap = *typeInfo.bitmap;
+
+		// Run font processors
+		for (const std::shared_ptr<FontProcessor>& processor : mKey.mProcessors)
+		{
+			processor->process(fontProcessingData);
+		}
+
+		characterInfo.mBorderLeft = fontProcessingData.mBorderLeft;
+		characterInfo.mBorderRight = fontProcessingData.mBorderRight;
+		characterInfo.mBorderTop = fontProcessingData.mBorderTop;
+		characterInfo.mBorderBottom = fontProcessingData.mBorderBottom;
+		characterInfo.mCachedBitmap.swap(fontProcessingData.mBitmap);
+	}
+	return characterInfo;
+}
+
 void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment, int spacing)
 {
 	Recti innerRect;
@@ -299,12 +341,11 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 		return;
 	}
 
-	std::vector<Font::TypeInfo> typeInfos;
-	std::vector<FontOutput::ExtendedTypeInfo> extendedTypeInfos;
+	std::vector<TypeInfo> typeInfos;
+	std::vector<ExtendedTypeInfo> extendedTypeInfos;
 	getTypeInfos(typeInfos, Vec2f(0.0f, 0.0f), text, spacing);
 
-	FontOutput& fontOutput = getFontOutput();
-	fontOutput.applyToTypeInfos(extendedTypeInfos, typeInfos);
+	applyToTypeInfos(extendedTypeInfos, typeInfos);
 	if (extendedTypeInfos.empty())
 	{
 		outBitmap.clear();
@@ -314,7 +355,7 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	// Get bounds
 	Vec2i boundsMin(+10000, +10000);
 	Vec2i boundsMax(-10000, -10000);
-	for (const FontOutput::ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
+	for (const ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
 	{
 		const Vec2i minPos = extendedTypeInfo.mDrawPosition;
 		const Vec2i maxPos = minPos + extendedTypeInfo.mBitmap->getSize();
@@ -327,7 +368,7 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	// Setup and fill bitmap
 	outBitmap.create(boundsMax.x - boundsMin.x, boundsMax.y - boundsMin.y, 0);
 
-	for (const FontOutput::ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
+	for (const ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
 	{
 		outBitmap.insertBlend(extendedTypeInfo.mDrawPosition.x - boundsMin.x, extendedTypeInfo.mDrawPosition.y - boundsMin.y, *extendedTypeInfo.mBitmap);
 	}
@@ -345,15 +386,6 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 		}
 	}
 	outInnerRect.height = fontSource->getHeight();
-}
-
-FontOutput& Font::getFontOutput()
-{
-	if (nullptr == mFontOutput)
-	{
-		mFontOutput = new FontOutput(mKey);
-	}
-	return *mFontOutput;
 }
 
 Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment)
@@ -390,8 +422,8 @@ Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int al
 void Font::invalidateFontSource()
 {
 	SAFE_DELETE(mFontSource);
-	SAFE_DELETE(mFontOutput);
 	mFontSourceDirty = true;
+	mCharacterMap.clear();
 }
 
 FontSource* Font::getFontSource()

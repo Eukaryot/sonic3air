@@ -9,72 +9,8 @@
 #include "../rmxmedia.h"
 
 
-FontOutput::FontOutput(const FontKey& key)
-{
-	mKey = key;
-}
-
-FontOutput::~FontOutput()
-{
-	reset();
-}
-
-void FontOutput::reset()
-{
-	mCharacterMap.clear();
-}
-
-
-void FontOutput::applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos)
-{
-	outTypeInfos.reserve(inTypeInfos.size());
-	for (size_t i = 0; i < inTypeInfos.size(); ++i)
-	{
-		const Font::TypeInfo& typeInfo = inTypeInfos[i];
-		if (nullptr == typeInfo.bitmap)
-			continue;
-
-		CharacterInfo& characterInfo = applyEffects(typeInfo);
-
-		ExtendedTypeInfo& extendedTypeInfo = vectorAdd(outTypeInfos);
-		extendedTypeInfo.mCharacter = typeInfo.unicode;
-		extendedTypeInfo.mBitmap = &characterInfo.mCachedBitmap;
-		extendedTypeInfo.mDrawPosition = Vec2i(typeInfo.pos) - Vec2i(characterInfo.mBorderLeft, characterInfo.mBorderTop);
-	}
-}
-
-FontOutput::CharacterInfo& FontOutput::applyEffects(const Font::TypeInfo& typeInfo)
-{
-	const uint32 character = typeInfo.unicode;
-	CharacterInfo& characterInfo = mCharacterMap[character];
-	if (characterInfo.mCachedBitmap.empty())
-	{
-		FontProcessingData fontProcessingData;
-		fontProcessingData.mBitmap = *typeInfo.bitmap;
-		applyEffects(fontProcessingData, characterInfo);
-	}
-	return characterInfo;
-}
-
-void FontOutput::applyEffects(FontProcessingData& fontProcessingData, CharacterInfo& info)
-{
-	// Run font processors
-	for (const std::shared_ptr<FontProcessor>& processor : mKey.mProcessors)
-	{
-		processor->process(fontProcessingData);
-	}
-
-	info.mBorderLeft = fontProcessingData.mBorderLeft;
-	info.mBorderRight = fontProcessingData.mBorderRight;
-	info.mBorderTop = fontProcessingData.mBorderTop;
-	info.mBorderBottom = fontProcessingData.mBorderBottom;
-	info.mCachedBitmap.swap(fontProcessingData.mBitmap);
-}
-
-
-
-OpenGLFontOutput::OpenGLFontOutput(FontOutput& fontOutput) :
-	mFontOutput(fontOutput)
+OpenGLFontOutput::OpenGLFontOutput(Font& font) :
+	mFont(font)
 {
 }
 
@@ -180,7 +116,7 @@ bool OpenGLFontOutput::loadTexture(const Font::TypeInfo& typeInfo)
 	SpriteHandleInfo& spriteHandleInfo = mHandleMap[character];
 	if (spriteHandleInfo.mAtlasHandle == -1)
 	{
-		FontOutput::CharacterInfo& characterInfo = mFontOutput.applyEffects(typeInfo);
+		Font::CharacterInfo& characterInfo = mFont.applyEffects(typeInfo);
 		spriteHandleInfo.mAtlasHandle = mAtlas.add(characterInfo.mCachedBitmap);
 		spriteHandleInfo.mBorderLeft = characterInfo.mBorderLeft;
 		spriteHandleInfo.mBorderRight = characterInfo.mBorderRight;

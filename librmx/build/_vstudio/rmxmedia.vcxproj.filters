@@ -69,7 +69,7 @@
     <ClCompile Include="..\..\source\rmxmedia\Font.cpp">
       <Filter>Font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\rmxmedia\FontOutput.cpp">
+    <ClCompile Include="..\..\source\rmxmedia\OpenGLFontOutput.cpp">
       <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\FontSource.cpp">
@@ -147,7 +147,7 @@
     <ClInclude Include="..\..\source\rmxmedia\Font.h">
       <Filter>Font</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rmxmedia\FontOutput.h">
+    <ClInclude Include="..\..\source\rmxmedia\OpenGLFontOutput.h">
       <Filter>Font</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\FontSource.h">

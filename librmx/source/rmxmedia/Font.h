@@ -11,7 +11,6 @@
 
 #pragma once
 
-class FontOutput;
 class FontProcessor;
 class FontSource;
 
@@ -74,6 +73,22 @@ public:
 		Vec2f pos;
 	};
 
+	struct ExtendedTypeInfo
+	{
+		uint32 mCharacter = 0;
+		Bitmap* mBitmap = nullptr;
+		Vec2i mDrawPosition;
+	};
+
+	struct CharacterInfo
+	{
+		Bitmap mCachedBitmap;
+		int mBorderLeft = 0;
+		int mBorderRight = 0;
+		int mBorderTop = 0;
+		int mBorderBottom = 0;
+	};
+
 public:
 	Font();
 	Font(const String& filename, float size);
@@ -99,10 +114,11 @@ public:
 	void wordWrapText(std::vector<std::wstring>& output, int lineWidth, const StringReader& text, int spacing = 0);
 	void getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing = 0);
 
+	void applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos);
+	CharacterInfo& applyEffects(const Font::TypeInfo& typeInfo);
+
 	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment = 1, int spacing = 0);
 	void printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing = 0);
-
-	FontOutput& getFontOutput();
 
 public:
 	static Vec2i applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment);
@@ -114,9 +130,9 @@ private:
 private:
 	FontSource* mFontSource = nullptr;
 	bool mFontSourceDirty = true;
-	FontOutput* mFontOutput = nullptr;
 	FontKey mKey;
 	float mAdvance = 0.0f;
+	std::map<uint32, CharacterInfo> mCharacterMap;
 
 public:
 	struct API_EXPORT CodecList

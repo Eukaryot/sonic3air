@@ -228,7 +228,7 @@ namespace opengldrawer
 			auto it = mFontOutputMap.find(key);
 			if (it == mFontOutputMap.end())
 			{
-				it = mFontOutputMap.emplace(key, font.getFontOutput()).first;
+				it = mFontOutputMap.emplace(key, font).first;
 			}
 			return it->second;
 		}
