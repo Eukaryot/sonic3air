@@ -488,7 +488,7 @@ constant u8 OBJECTTABLE2_45		= 0x45		// Object address 0x04187e = -- soz_pushswi
 constant u8 OBJECTTABLE2_46		= 0x46		// Object address 0x041b70 = -- soz_closingwall.lemon
 constant u8 OBJECTTABLE2_47		= 0x47		// Object address 0x041cc2 = -- soz_sandcork.lemon
 constant u8 OBJECTTABLE2_48		= 0x48		// Object address 0x04a9a8 = -- soz_zipline.lemon
-constant u8 OBJECTTABLE2_49		= 0x49		// Object address 0x041f44 = -- soz_unknown.lemon
+constant u8 OBJECTTABLE2_49		= 0x49		// Object address 0x041f44 = -- soz_inverseplatform.lemon
 constant u8 OBJECTTABLE2_4a		= 0x4a		// Object address 0x025a30 = -- dez_platform.lemon
 constant u8 OBJECTTABLE2_4b		= 0x4b		// Object address 0x046d9e = -- dez_tiltingbridge.lemon
 constant u8 OBJECTTABLE2_4c		= 0x4c		// Object address 0x046f84 = -- dez_hangcarrier.lemon

@@ -18,7 +18,7 @@ namespace
 		{
 			// This list uses the same sorting as the SDLK_* definitions
 			{ "Enter",			SDLK_RETURN },
-			// Escape intentionally not available
+			{ "Esc",			SDLK_ESCAPE },
 			{ "Backspace",		SDLK_BACKSPACE },
 			{ "Tab",			SDLK_TAB },
 			{ "Space",			SDLK_SPACE },
