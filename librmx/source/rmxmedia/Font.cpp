@@ -42,44 +42,50 @@ FontSource* FontSourceBitmapFactory::construct(const FontSourceKey& key)
 }
 
 
+Font::Font()
+{
+}
+
 Font::Font(const String& filename, float size)
 {
 	loadFromFile(filename, size);
 }
 
-Font::Font(float size)
+Font::Font(float size) :
+	Font("", size)
 {
-	loadFromFile("", size);
 }
 
 Font::~Font()
 {
 	delete mFontSource;
+	delete mFontOutput;
 }
 
 bool Font::loadFromFile(const String& name, float size)
 {
 	mKey.mName = name;
 	mKey.mSize = size;
-	return rebuildFontSource();
+	invalidateFontSource();
+	return (nullptr != getFontSource());
 }
 
 void Font::setSize(float size)
 {
 	mKey.mSize = size;
-	rebuildFontSource();
+	invalidateFontSource();
 }
 
 void Font::clearFontProcessors()
 {
 	mKey.mProcessors.clear();
-	rebuildFontSource();
+	invalidateFontSource();
 }
 
 void Font::addFontProcessor(const std::shared_ptr<FontProcessor>& processor)
 {
 	mKey.mProcessors.emplace_back(processor);
-	rebuildFontSource();
+	invalidateFontSource();
 }
 
 int Font::getWidth(const StringReader& text)
@@ -89,7 +95,8 @@ int Font::getWidth(const StringReader& text)
 
 int Font::getWidth(const StringReader& text, int pos, int len)
 {
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return 0;
 
 	if (pos < 0 || pos >= (int)text.mLength)
@@ -101,7 +108,7 @@ int Font::getWidth(const StringReader& text, int pos, int len)
 	for (int i = 0; i < len; ++i)
 	{
 		const uint32 ch = text[pos+i];
-		const FontSource::GlyphInfo* info = mFontSource->getGlyph(ch);
+		const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
 		if (nullptr == info)
 			continue;
 
@@ -114,18 +121,21 @@ int Font::getWidth(const StringReader& text, int pos, int len)
 
 int Font::getHeight()
 {
-	return (nullptr == mFontSource) ? 0 : mFontSource->getHeight();
+	FontSource* fontSource = getFontSource();
+	return (nullptr == fontSource) ? 0 : fontSource->getHeight();
 }
 
 int Font::getLineHeight()
 {
-	return (nullptr == mFontSource) ? 0 : mFontSource->getLineHeight();
+	FontSource* fontSource = getFontSource();
+	return (nullptr == fontSource) ? 0 : fontSource->getLineHeight();
 }
 
 Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment)
 {
 	Vec2f result(rect.x, rect.y);
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return result;
 
 	if (alignment >= 2 && alignment <= 9)
@@ -138,7 +148,7 @@ Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment
 			result.x += ((int)rect.width - getWidth(text)) * align_x / 2;
 
 		if (align_y > 0)
-			result.y += ((int)rect.height - mFontSource->getHeight()) * align_y / 2;
+			result.y += ((int)rect.height - fontSource->getHeight()) * align_y / 2;
 	}
 
 	return result;
@@ -146,7 +156,8 @@ Vec2f Font::alignText(const Rectf& rect, const StringReader& text, int alignment
 
 void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, const StringReader& text, int spacing)
 {
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return;
 
 	struct TextAndWidth
@@ -191,7 +202,7 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 		}
 		else
 		{
-			const FontSource::GlyphInfo* info = mFontSource->getGlyph(ch);
+			const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
 			if (nullptr == info)
 				continue;
 
@@ -247,7 +258,8 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 
 void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing)
 {
-	if (nullptr == mFontSource)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
 		return;
 
 	output.resize(text.mLength);
@@ -258,7 +270,7 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 		output[k].unicode = ch;
 		output[k].bitmap = nullptr;
 
-		const FontSource::GlyphInfo* info = mFontSource->getGlyph(ch);
+		const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
 		if (nullptr == info)
 			continue;
 
@@ -268,21 +280,6 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 
 		pos.x += info->advance + spacing;
 	}
-}
-
-void Font::print(int x, int y, const StringReader& text, int alignment)
-{
-	FTX::Painter->print(*this, Rectf((float)x, (float)y, 0.0f, 0.0f), text, alignment);
-}
-
-void Font::print(int x, int y, int w, int h, const StringReader& text, int alignment)
-{
-	FTX::Painter->print(*this, Rectf((float)x, (float)y, (float)w, (float)h), text, alignment);
-}
-
-void Font::print(const Rectf& rect, const StringReader& text, int alignment)
-{
-	FTX::Painter->print(*this, rect, text, alignment);
 }
 
 void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment, int spacing)
@@ -295,7 +292,8 @@ void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& d
 void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing)
 {
 	// Render text into a bitmap
-	if (nullptr == mFontSource || text.mLength == 0)
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource || text.mLength == 0)
 	{
 		outBitmap.clear();
 		return;
@@ -305,8 +303,8 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	std::vector<FontOutput::ExtendedTypeInfo> extendedTypeInfos;
 	getTypeInfos(typeInfos, Vec2f(0.0f, 0.0f), text, spacing);
 
-	FontOutput* output = FTX::Painter->getFontOutput(*this);
-	output->applyToTypeInfos(extendedTypeInfos, typeInfos);
+	FontOutput& fontOutput = getFontOutput();
+	fontOutput.applyToTypeInfos(extendedTypeInfos, typeInfos);
 	if (extendedTypeInfos.empty())
 	{
 		outBitmap.clear();
@@ -340,13 +338,22 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	outInnerRect.width = (int)(text.mLength - 1) * spacing;
 	for (size_t i = 0; i < text.mLength; ++i)
 	{
-		const FontSource::GlyphInfo* info = mFontSource->getGlyph(text[i]);
+		const FontSource::GlyphInfo* info = fontSource->getGlyph(text[i]);
 		if (nullptr != info)
 		{
 			outInnerRect.width += info->advance;
 		}
 	}
-	outInnerRect.height = mFontSource->getHeight();
+	outInnerRect.height = fontSource->getHeight();
+}
+
+FontOutput& Font::getFontOutput()
+{
+	if (nullptr == mFontOutput)
+	{
+		mFontOutput = new FontOutput(mKey);
+	}
+	return *mFontOutput;
 }
 
 Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment)
@@ -380,16 +387,25 @@ Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int al
 	return outPosition;
 }
 
-bool Font::rebuildFontSource()
+void Font::invalidateFontSource()
 {
-	delete mFontSource;
-	mFontSource = nullptr;
+	SAFE_DELETE(mFontSource);
+	SAFE_DELETE(mFontOutput);
+	mFontSourceDirty = true;
+}
 
-	for (IFontSourceFactory* factory : Font::mCodecs.mList)
+FontSource* Font::getFontSource()
+{
+	if (mFontSourceDirty)
 	{
-		mFontSource = factory->construct(mKey);
-		if (nullptr != mFontSource)
-			return true;
+		mFontSourceDirty = false;
+		RMX_ASSERT(nullptr == mFontSource, "Font source is expected to be a null pointer");
+		for (IFontSourceFactory* factory : Font::mCodecs.mList)
+		{
+			mFontSource = factory->construct(mKey);
+			if (nullptr != mFontSource)
+				break;
+		}
 	}
-	return false;
+	return mFontSource;
 }

@@ -129,11 +129,6 @@ namespace opengldrawer
 		{
 			mUpscaler.shutdown();
 			OpenGLDrawerResources::shutdown();
-
-			for (auto& pair : mFontOutputMap)
-			{
-				delete pair.second;
-			}
 		}
 
 		OpenGLDrawerTexture* createTexture()
@@ -226,33 +221,28 @@ namespace opengldrawer
 			return textureHandle;
 		}
 
-		FontOutput& getFontOutput(Font& font)
+		OpenGLFontOutput& getFontOutput(Font& font)
 		{
-			// Get or create FontOutput instance
+			// Get or create OpenGLFontOutput instance
 			const FontKey& key = font.getKey();
-			const auto it = mFontOutputMap.find(key);
-			if (it != mFontOutputMap.end())
+			auto it = mFontOutputMap.find(key);
+			if (it == mFontOutputMap.end())
 			{
-				return *it->second;
+				it = mFontOutputMap.emplace(key, font.getFontOutput()).first;
 			}
-			else
-			{
-				FontOutput* fontOutput = new FontOutput(key);
-				mFontOutputMap.emplace(key, fontOutput);
-				return *fontOutput;
-			}
+			return it->second;
 		}
 
 		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
 		{
-			FontOutput& output = getFontOutput(font);
+			OpenGLFontOutput& output = getFontOutput(font);
 			const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
 
 			static std::vector<Font::TypeInfo> typeinfos;
 			typeinfos.clear();
 			font.getTypeInfos(typeinfos, pos, text, printOptions.mSpacing);
 
-			static std::vector<FontOutput::VertexGroup> vertexGroups;
+			static std::vector<OpenGLFontOutput::VertexGroup> vertexGroups;
 			vertexGroups.clear();
 			output.buildVertexGroups(vertexGroups, typeinfos);
 
@@ -260,7 +250,7 @@ namespace opengldrawer
 			shader.bind();
 			shader.setParam("Transform", getPixelToViewSpaceTransform());
 
-			for (const FontOutput::VertexGroup& vertexGroup : vertexGroups)
+			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups)
 			{
 				shader.setTexture("Texture", *vertexGroup.mTexture);
 				shader.setParam("TintColor", printOptions.mTintColor);
@@ -269,7 +259,7 @@ namespace opengldrawer
 				vertexData.resize(vertexGroup.mVertices.size() * 4);
 				for (size_t i = 0; i < vertexGroup.mVertices.size(); ++i)
 				{
-					const FontOutput::Vertex& src = vertexGroup.mVertices[i];
+					const OpenGLFontOutput::Vertex& src = vertexGroup.mVertices[i];
 					float* dst = &vertexData[i * 4];
 					dst[0] = src.mPosition.x;
 					dst[1] = src.mPosition.y;
@@ -300,7 +290,7 @@ namespace opengldrawer
 		opengl::VertexArrayObject mMeshVAO;			// Always using the same instances with different contents -- TODO: Some kind of caching could be useful
 
 	private:
-		std::map<FontKey, FontOutput*> mFontOutputMap;
+		std::map<FontKey, OpenGLFontOutput> mFontOutputMap;
 	};
 }
 

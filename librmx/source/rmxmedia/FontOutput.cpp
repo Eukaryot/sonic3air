@@ -21,11 +21,100 @@ FontOutput::~FontOutput()
 
 void FontOutput::reset()
 {
+	mCharacterMap.clear();
+}
+
+
+void FontOutput::applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos)
+{
+	outTypeInfos.reserve(inTypeInfos.size());
+	for (size_t i = 0; i < inTypeInfos.size(); ++i)
+	{
+		const Font::TypeInfo& typeInfo = inTypeInfos[i];
+		if (nullptr == typeInfo.bitmap)
+			continue;
+
+		CharacterInfo& characterInfo = applyEffects(typeInfo);
+
+		ExtendedTypeInfo& extendedTypeInfo = vectorAdd(outTypeInfos);
+		extendedTypeInfo.mCharacter = typeInfo.unicode;
+		extendedTypeInfo.mBitmap = &characterInfo.mCachedBitmap;
+		extendedTypeInfo.mDrawPosition = Vec2i(typeInfo.pos) - Vec2i(characterInfo.mBorderLeft, characterInfo.mBorderTop);
+	}
+}
+
+FontOutput::CharacterInfo& FontOutput::applyEffects(const Font::TypeInfo& typeInfo)
+{
+	const uint32 character = typeInfo.unicode;
+	CharacterInfo& characterInfo = mCharacterMap[character];
+	if (characterInfo.mCachedBitmap.empty())
+	{
+		FontProcessingData fontProcessingData;
+		fontProcessingData.mBitmap = *typeInfo.bitmap;
+		applyEffects(fontProcessingData, characterInfo);
+	}
+	return characterInfo;
+}
+
+void FontOutput::applyEffects(FontProcessingData& fontProcessingData, CharacterInfo& info)
+{
+	// Run font processors
+	for (const std::shared_ptr<FontProcessor>& processor : mKey.mProcessors)
+	{
+		processor->process(fontProcessingData);
+	}
+
+	info.mBorderLeft = fontProcessingData.mBorderLeft;
+	info.mBorderRight = fontProcessingData.mBorderRight;
+	info.mBorderTop = fontProcessingData.mBorderTop;
+	info.mBorderBottom = fontProcessingData.mBorderBottom;
+	info.mCachedBitmap.swap(fontProcessingData.mBitmap);
+}
+
+
+
+OpenGLFontOutput::OpenGLFontOutput(FontOutput& fontOutput) :
+	mFontOutput(fontOutput)
+{
+}
+
+void OpenGLFontOutput::reset()
+{
 	mAtlas.clear();
 	mHandleMap.clear();
 }
 
-void FontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, const std::vector<Font::TypeInfo>& infos)
+void OpenGLFontOutput::print(const std::vector<Font::TypeInfo>& infos)
+{
+	// Display with OpenGL
+	if (FTX::Video->getVideoConfig().renderer != rmx::VideoConfig::Renderer::OPENGL)
+		return;
+
+#ifdef ALLOW_LEGACY_OPENGL
+	// Fill vertex groups
+	static std::vector<VertexGroup> vertexGroups;
+	vertexGroups.clear();
+	buildVertexGroups(vertexGroups, infos);
+
+	// Render them (here still using OpenGL immediate mode rendering)
+	for (const VertexGroup& vertexGroup : vertexGroups)
+	{
+		vertexGroup.mTexture->bind();
+
+		glBegin(GL_TRIANGLES);
+		for (const Vertex& vertex : vertexGroup.mVertices)
+		{
+			glTexCoord2f(vertex.mTexcoords.x, vertex.mTexcoords.y);
+			glVertex2f(vertex.mPosition.x, vertex.mPosition.y);
+		}
+		glEnd();
+	}
+#else
+	RMX_ASSERT(false, "Unsupported without legacy OpenGL support");
+#endif
+}
+
+void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, const std::vector<Font::TypeInfo>& infos)
 {
 	Texture* currentTexture = nullptr;
 	SpriteAtlas::Sprite sprite;
@@ -36,14 +125,14 @@ void FontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, co
 			continue;
 
 		const uint32 character = info.unicode;
-		SpriteHandleMap::iterator it2 = mHandleMap.find(character);
-		if (it2 == mHandleMap.end())
+		auto it = mHandleMap.find(character);
+		if (it == mHandleMap.end())
 		{
 			if (!loadTexture(info))
 				continue;
-			it2 = mHandleMap.find(character);
+			it = mHandleMap.find(character);
 		}
-		const SpriteHandleInfo& spriteHandleInfo = it2->second;
+		const SpriteHandleInfo& spriteHandleInfo = it->second;
 
 		const bool result = mAtlas.getSprite(spriteHandleInfo.mAtlasHandle, sprite);
 		RMX_ASSERT(result, "Failed to get sprite from atlas");
@@ -81,110 +170,22 @@ void FontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, co
 	}
 }
 
-void FontOutput::print(const std::vector<Font::TypeInfo>& infos)
+bool OpenGLFontOutput::loadTexture(const Font::TypeInfo& typeInfo)
 {
-	// Display with OpenGL
-	if (FTX::Video->getVideoConfig().renderer != rmx::VideoConfig::Renderer::OPENGL)
-		return;
-
-#ifdef ALLOW_LEGACY_OPENGL
-	// Fill vertex groups
-	static std::vector<VertexGroup> vertexGroups;
-	vertexGroups.clear();
-	buildVertexGroups(vertexGroups, infos);
-
-	// Render them (here still using OpenGL immediate mode rendering)
-	for (const VertexGroup& vertexGroup : vertexGroups)
-	{
-		vertexGroup.mTexture->bind();
-
-		glBegin(GL_TRIANGLES);
-		for (const Vertex& vertex : vertexGroup.mVertices)
-		{
-			glTexCoord2f(vertex.mTexcoords.x, vertex.mTexcoords.y);
-			glVertex2f(vertex.mPosition.x, vertex.mPosition.y);
-		}
-		glEnd();
-	}
-#else
-	RMX_ASSERT(false, "Unsupported without legacy OpenGL support");
-#endif
-}
-
-void FontOutput::applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos)
-{
-	outTypeInfos.reserve(inTypeInfos.size());
-	for (size_t i = 0; i < inTypeInfos.size(); ++i)
-	{
-		const Font::TypeInfo& typeInfo = inTypeInfos[i];
-		if (nullptr == typeInfo.bitmap)
-			continue;
-
-		const uint32 character = typeInfo.unicode;
-		SpriteHandleInfo* spriteHandleInfo = nullptr;
-		{
-			const SpriteHandleMap::iterator it = mHandleMap.find(character);
-			if (it == mHandleMap.end())
-			{
-				spriteHandleInfo = &mHandleMap[character];
-
-				FontProcessingData fontProcessingData;
-				fontProcessingData.mBitmap = *typeInfo.bitmap;
-				applyEffects(fontProcessingData, *spriteHandleInfo, true);
-			}
-			else
-			{
-				spriteHandleInfo = &it->second;
-			}
-		}
-
-		ExtendedTypeInfo& extendedTypeInfo = vectorAdd(outTypeInfos);
-		extendedTypeInfo.mCharacter = character;
-		extendedTypeInfo.mBitmap = &spriteHandleInfo->mCachedBitmap;
-		extendedTypeInfo.mDrawPosition = Vec2i(typeInfo.pos) - Vec2i(spriteHandleInfo->mBorderLeft, spriteHandleInfo->mBorderTop);
-	}
-}
-
-void FontOutput::applyEffects(FontProcessingData& fontProcessingData, SpriteHandleInfo& info, bool cacheBitmap)
-{
-	// Run font processors
-	for (const std::shared_ptr<FontProcessor>& processor : mKey.mProcessors)
-	{
-		processor->process(fontProcessingData);
-	}
-
-	info.mBorderLeft = fontProcessingData.mBorderLeft;
-	info.mBorderRight = fontProcessingData.mBorderRight;
-	info.mBorderTop = fontProcessingData.mBorderTop;
-	info.mBorderBottom = fontProcessingData.mBorderBottom;
-
-	if (cacheBitmap)
-	{
-		info.mCachedBitmap.swap(fontProcessingData.mBitmap);
-	}
-}
-
-void FontOutput::createAtlasHandle(const Bitmap& bitmap, SpriteHandleInfo& info)
-{
-	FontProcessingData fontProcessingData;
-	fontProcessingData.mBitmap = bitmap;
-	applyEffects(fontProcessingData, info, false);
-
-	info.mAtlasHandle = mAtlas.add(fontProcessingData.mBitmap);
-}
-
-bool FontOutput::loadTexture(const Font::TypeInfo& typeInfo)
-{
-	// Zeichen als Textur laden
+	// Load characters as texture
 	if (nullptr == typeInfo.bitmap)
 		return false;
 
 	const uint32 character = typeInfo.unicode;
-	const SpriteHandleMap::iterator it = mHandleMap.find(character);
-	if (it == mHandleMap.end())
+	SpriteHandleInfo& spriteHandleInfo = mHandleMap[character];
+	if (spriteHandleInfo.mAtlasHandle == -1)
 	{
-		SpriteHandleInfo& spriteHandleInfo = mHandleMap[character];
-		createAtlasHandle(*typeInfo.bitmap, spriteHandleInfo);
+		FontOutput::CharacterInfo& characterInfo = mFontOutput.applyEffects(typeInfo);
+		spriteHandleInfo.mAtlasHandle = mAtlas.add(characterInfo.mCachedBitmap);
+		spriteHandleInfo.mBorderLeft = characterInfo.mBorderLeft;
+		spriteHandleInfo.mBorderRight = characterInfo.mBorderRight;
+		spriteHandleInfo.mBorderTop = characterInfo.mBorderTop;
+		spriteHandleInfo.mBorderBottom = characterInfo.mBorderBottom;
 	}
 	return true;
 }

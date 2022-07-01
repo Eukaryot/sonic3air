@@ -43,7 +43,7 @@ namespace rmx
 
 		void print(Font& font, const Rectf& rect, const StringReader& text, int alignment = 1, const Color& color = Color::WHITE);
 		void print(Font& font, const Rectf& rect, const StringReader& text, const PrintOptions& printOptions);
-		FontOutput* getFontOutput(Font& font);
+		OpenGLFontOutput& getOpenGLFontOutput(Font& font);
 
 		void resetScissor();
 		void setScissor(const Recti& rect);
@@ -59,12 +59,6 @@ namespace rmx
 		typedef std::vector<Recti> RectStack;
 		RectStack mScissorStack;
 
-		struct OutputInfo
-		{
-			FontOutput* output;
-		};
-
-		typedef std::map<FontKey,OutputInfo> OutputInfoMap;
-		OutputInfoMap mOutputInfoMap;
+		std::map<FontKey, OpenGLFontOutput> mFontOutputMap;
 	};
 }

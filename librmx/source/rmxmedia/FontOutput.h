@@ -25,6 +25,37 @@ public:
 		Vec2i mDrawPosition;
 	};
 
+	struct CharacterInfo
+	{
+		Bitmap mCachedBitmap;
+		int mBorderLeft = 0;
+		int mBorderRight = 0;
+		int mBorderTop = 0;
+		int mBorderBottom = 0;
+	};
+
+public:
+	explicit FontOutput(const FontKey& key);
+	~FontOutput();
+
+	void reset();
+	inline const FontKey& getFontKey() const  { return mKey; }
+
+	void applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos);
+	CharacterInfo& applyEffects(const Font::TypeInfo& typeInfo);
+
+private:
+	void applyEffects(FontProcessingData& fontProcessingData, CharacterInfo& info);
+
+private:
+	FontKey mKey;
+	std::map<uint32, CharacterInfo> mCharacterMap;
+};
+
+
+class API_EXPORT OpenGLFontOutput
+{
+public:
 	struct Vertex
 	{
 		Vec2f mPosition;
@@ -37,34 +68,29 @@ public:
 	};
 
 public:
-	FontOutput(const FontKey& key);
-	~FontOutput();
+	explicit OpenGLFontOutput(FontOutput& fontOutput);
 
 	void reset();
+	inline const FontKey& getFontKey() const  { return mFontOutput.getFontKey(); }
 
-	void buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, const std::vector<Font::TypeInfo>& infos);
 	void print(const std::vector<Font::TypeInfo>& infos);
-	void applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos);
+	void buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, const std::vector<Font::TypeInfo>& infos);
 
 private:
 	struct SpriteHandleInfo
 	{
-		Bitmap mCachedBitmap;		// Only used for printing to bitmap
-		int mAtlasHandle = -1;		// Only used for printing with OpenGL (i.e. using sprite atlas)
+		int mAtlasHandle = -1;
 		int mBorderLeft = 0;
 		int mBorderRight = 0;
 		int mBorderTop = 0;
 		int mBorderBottom = 0;
 	};
-	typedef std::map<uint32, SpriteHandleInfo> SpriteHandleMap;
 
 private:
-	void applyEffects(FontProcessingData& fontProcessingData, SpriteHandleInfo& info, bool cacheBitmap);
-	void createAtlasHandle(const Bitmap& bitmap, SpriteHandleInfo& info);
 	bool loadTexture(const Font::TypeInfo& info);
 
 private:
-	FontKey mKey;
+	FontOutput& mFontOutput;
 	SpriteAtlas mAtlas;
-	SpriteHandleMap mHandleMap;
+	std::map<uint32, SpriteHandleInfo> mHandleMap;
 };

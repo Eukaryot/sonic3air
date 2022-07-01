@@ -11,7 +11,9 @@
 
 #pragma once
 
+class FontOutput;
 class FontProcessor;
+class FontSource;
 
 
 struct StringReader
@@ -73,7 +75,7 @@ public:
 	};
 
 public:
-	inline Font() {}
+	Font();
 	Font(const String& filename, float size);
 	explicit Font(float size);
 	~Font();
@@ -97,20 +99,22 @@ public:
 	void wordWrapText(std::vector<std::wstring>& output, int lineWidth, const StringReader& text, int spacing = 0);
 	void getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringReader& text, int spacing = 0);
 
-	void print(int x, int y, const StringReader& text, int alignment = 1);
-	void print(int x, int y, int w, int h, const StringReader& text, int alignment = 1);
-	void print(const Rectf& rect, const StringReader& text, int alignment = 1);
-
 	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment = 1, int spacing = 0);
 	void printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing = 0);
 
+	FontOutput& getFontOutput();
+
+public:
 	static Vec2i applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment);
 
 private:
-	bool rebuildFontSource();
+	void invalidateFontSource();
+	FontSource* getFontSource();
 
 private:
 	FontSource* mFontSource = nullptr;
+	bool mFontSourceDirty = true;
+	FontOutput* mFontOutput = nullptr;
 	FontKey mKey;
 	float mAdvance = 0.0f;
 
