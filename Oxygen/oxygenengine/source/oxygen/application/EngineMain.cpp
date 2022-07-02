@@ -38,6 +38,23 @@
 #endif
 
 
+struct EngineMain::Internal
+{
+	GameProfile		mGameProfile;
+	InputManager	mInputManager;
+	LogDisplay		mLogDisplay;
+	ModManager		mModManager;
+	ResourcesCache	mResourcesCache;
+	PersistentData	mPersistentData;
+	VideoOut		mVideoOut;
+	ControlsIn		mControlsIn;
+
+#if defined(PLATFORM_ANDROID)
+	AndroidJavaInterface mAndroidJavaInterface;
+#endif
+};
+
+
 void EngineMain::earlySetup()
 {
 	// This function contains stuff you would usually do right at the start of the "main" function
@@ -59,33 +76,13 @@ void EngineMain::earlySetup()
 
 EngineMain::EngineMain(EngineDelegateInterface& delegate_) :
 	mDelegate(delegate_),
-	mGameProfile(*new GameProfile()),
-	mInputManager(*new InputManager()),
-	mLogDisplay(*new LogDisplay()),
-	mModManager(*new ModManager()),
-	mResourcesCache(*new ResourcesCache()),
-	mPersistentData(*new PersistentData()),
-	mVideoOut(*new VideoOut()),
-	mControlsIn(*new ControlsIn())
-#if defined (PLATFORM_ANDROID)
-	, mAndroidJavaInterface(*new AndroidJavaInterface())
-#endif
+	mInternal(*new Internal())
 {
 }
 
 EngineMain::~EngineMain()
 {
-	delete &mGameProfile;
-	delete &mInputManager;
-	delete &mLogDisplay;
-	delete &mModManager;
-	delete &mResourcesCache;
-	delete &mPersistentData;
-	delete &mVideoOut;
-	delete &mControlsIn;
-#if defined (PLATFORM_ANDROID)
-	delete &mAndroidJavaInterface;
-#endif
+	delete &mInternal;
 }
 
 void EngineMain::execute(int argc, char** argv)
@@ -117,7 +114,7 @@ void EngineMain::onActiveModsChanged()
 	ResourcesCache::instance().loadAllResources();
 
 	// Update video
-	mVideoOut.handleActiveModsChanged();
+	mInternal.mVideoOut.handleActiveModsChanged();
 
 	// Update audio
 	mAudioOut->handleActiveModsChanged();
@@ -310,14 +307,14 @@ bool EngineMain::startupEngine()
 	}
 
 	RMX_LOG_INFO("Startup of VideoOut");
-	mVideoOut.startup();
+	mInternal.mVideoOut.startup();
 
 	// Input manager startup after config is loaded
 	RMX_LOG_INFO("Input initialization...");
 	InputManager::instance().startup();
 
 	RMX_LOG_INFO("Startup of ControlsIn");
-	mControlsIn.startup();
+	mInternal.mControlsIn.startup();
 
 	// Audio
 	RMX_LOG_INFO("Audio initialization...");
@@ -348,13 +345,13 @@ void EngineMain::shutdown()
 	destroyWindow();
 
 	// Shutdown subsystems
-	mVideoOut.shutdown();
+	mInternal.mVideoOut.shutdown();
 	if (nullptr != mAudioOut)
 	{
 		mAudioOut->shutdown();
 		SAFE_DELETE(mAudioOut);
 	}
-	mControlsIn.shutdown();
+	mInternal.mControlsIn.shutdown();
 
 	// Shutdown drawer
 	mDrawer.shutdown();
@@ -364,7 +361,7 @@ void EngineMain::shutdown()
 	FTX::Audio->exit();
 	FTX::System->exit();
 
-	mModManager.copyModSettingsToConfig();
+	mInternal.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
 	oxygen::Logging::shutdown();
 }
@@ -394,7 +391,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		if (!config.mProjectPath.empty())
 		{
 			RMX_LOG_INFO("Loading game profile");
-			const bool loadedProject = mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
+			const bool loadedProject = mInternal.mGameProfile.loadOxygenProjectFromFile(config.mProjectPath + L"oxygenproject.json");
 			RMX_CHECK(loadedProject, "Failed to load game profile from '" << *WString(config.mProjectPath).toString() << "oxygenproject.json'", );
 		}
 	}
@@ -681,7 +678,7 @@ bool EngineMain::createWindow()
 
 void EngineMain::destroyWindow()
 {
-	mVideoOut.destroyRenderer();
+	mInternal.mVideoOut.destroyRenderer();
 	mDrawer.destroyDrawer();
 	SDL_DestroyWindow(mSDLWindow);
 	mSDLWindow = nullptr;

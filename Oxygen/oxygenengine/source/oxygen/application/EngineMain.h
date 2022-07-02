@@ -14,17 +14,7 @@
 class AudioOutBase;
 class CodeExec;
 class Configuration;
-class GameProfile;
-class ControlsIn;
-class InputManager;
-class ModManager;
-class VideoOut;
-class ResourcesCache;
 class LogDisplay;
-class PersistentData;
-#if defined (PLATFORM_ANDROID)
-	class AndroidJavaInterface;
-#endif
 
 namespace lemon
 {
@@ -96,7 +86,6 @@ public:
 	void onActiveModsChanged();
 
 	inline AudioOutBase& getAudioOut() { return *mAudioOut; }
-	inline ControlsIn& getControlsIn() { return mControlsIn; }
 
 	inline SDL_Window& getSDLWindow() const	{ return *mSDLWindow; }
 	inline Drawer& getDrawer()				{ return mDrawer; }
@@ -120,21 +109,10 @@ private:
 	EngineDelegateInterface& mDelegate;
 	std::vector<std::string> mArguments;
 
-	GameProfile&	mGameProfile;
-	InputManager&	mInputManager;
-	LogDisplay&		mLogDisplay;
-	ModManager&		mModManager;
-	ResourcesCache&	mResourcesCache;
-	PersistentData&	mPersistentData;
+	struct Internal;
+	Internal& mInternal;
 
-	VideoOut&		mVideoOut;
 	AudioOutBase*   mAudioOut = nullptr;
-	ControlsIn&		mControlsIn;
-
 	SDL_Window*		mSDLWindow = nullptr;
 	Drawer			mDrawer;
-
-#if defined(PLATFORM_ANDROID)
-	AndroidJavaInterface& mAndroidJavaInterface;
-#endif
 };

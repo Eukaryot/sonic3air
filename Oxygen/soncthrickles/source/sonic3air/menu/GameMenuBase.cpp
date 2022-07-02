@@ -366,7 +366,7 @@ bool GameMenuEntries::sanitizeSelectedIndex(bool allowNonInteractableEntries)
 		{
 			if (mEntries[index]->isFullyInteractable())
 			{
-				mSelectedEntryIndex = index;
+				mSelectedEntryIndex = (int)index;
 				return true;
 			}
 		}
