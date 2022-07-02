@@ -36,20 +36,22 @@ const FontSource::GlyphInfo* FontSource::getGlyph(uint32 unicode)
 
 #include "StdFontData.inc"
 
-const float stdfont_size = 16;
-const int stdfont_width = 12;
-const int stdfont_height = 20;
-const int stdfont_ascender = 15;
-const int stdfont_lineheight = 25;
-
+namespace rmx::stdfont
+{
+	static const constexpr float SIZE = 16;
+	static const constexpr int WIDTH = 12;
+	static const constexpr int HEIGHT = 20;
+	static const constexpr int ASCENDER = 15;
+	static const constexpr int LINEHEIGHT = 25;
+}
 
 FontSourceStd::FontSourceStd(float size)
 {
 	RMX_ASSERT(size >= 1.0f && size < 100.0f, "Invalid standard font size of " << size);
 	mSize = size;
-	mAscender = stdfont_ascender;
-	mDescender = stdfont_height - stdfont_ascender;
-	mLineHeight = stdfont_lineheight;
+	mAscender = rmx::stdfont::ASCENDER;
+	mDescender = rmx::stdfont::HEIGHT - rmx::stdfont::ASCENDER;
+	mLineHeight = rmx::stdfont::LINEHEIGHT;
 }
 
 bool FontSourceStd::fillGlyphInfo(FontSource::GlyphInfo& info)
@@ -59,18 +61,18 @@ bool FontSourceStd::fillGlyphInfo(FontSource::GlyphInfo& info)
 
 	// Create bitmap & copy data
 	Bitmap bmp1;
-	bmp1.create(stdfont_width, stdfont_height);
-	for (int i = 0; i < stdfont_width * stdfont_height; ++i)
+	bmp1.create(rmx::stdfont::WIDTH, rmx::stdfont::HEIGHT);
+	for (int i = 0; i < bmp1.getPixelCount(); ++i)
 	{
 		int bits = (stdfont_data[index][i/16] >> ((i%16)*2)) % 4;
 		bmp1.mData[i] = 0x00ffffff + ((bits * 85) << 24);
 	}
 
-	if (mSize != stdfont_size)
+	if (mSize != rmx::stdfont::SIZE)
 	{
 		// Rescale if needed
-		info.mBitmap.rescale(bmp1, roundToInt(stdfont_width * mSize / stdfont_size),
-								  roundToInt(stdfont_height * mSize / stdfont_size));
+		info.mBitmap.rescale(bmp1, roundToInt(rmx::stdfont::WIDTH * mSize / rmx::stdfont::SIZE),
+								   roundToInt(rmx::stdfont::HEIGHT * mSize / rmx::stdfont::SIZE));
 	}
 	else
 	{
@@ -79,7 +81,7 @@ bool FontSourceStd::fillGlyphInfo(FontSource::GlyphInfo& info)
 
 	info.mLeftIndent = 0;
 	info.mTopIndent = 0;
-	info.mAdvance = roundToInt(stdfont_width * mSize / stdfont_size);
+	info.mAdvance = roundToInt(rmx::stdfont::WIDTH * mSize / rmx::stdfont::SIZE);
 	return true;
 }
 

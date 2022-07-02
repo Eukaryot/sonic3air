@@ -23,6 +23,7 @@
 #include "oxygen/application/overlays/DebugSidePanel.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/parts/RenderParts.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/resources/SpriteCache.h"
 
@@ -1024,7 +1025,7 @@ namespace
 	{
 		if (fontKey.isValid() && text.isValid())
 		{
-			Font* font = ResourcesCache::instance().getFontByKey(fontKey.getHash());
+			Font* font = FontCollection::instance().getFontByKey(fontKey.getHash());
 			if (nullptr != font)
 			{
 				return font->getWidth(text.getString());

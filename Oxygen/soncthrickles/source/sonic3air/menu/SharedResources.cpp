@@ -16,7 +16,7 @@
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/PackageFileCrawler.h"
 #include "oxygen/rendering/utils/PaletteBitmap.h"
-#include "oxygen/resources/ResourcesCache.h"
+#include "oxygen/resources/FontCollection.h"
 
 
 namespace global
@@ -51,17 +51,6 @@ namespace global
 
 	void loadSharedResources()
 	{
-		ResourcesCache& resourcesCache = ResourcesCache::instance();
-		resourcesCache.registerFontSource("monofont");
-		resourcesCache.registerFontSource("oxyfont_light");
-		resourcesCache.registerFontSource("oxyfont_regular");
-		resourcesCache.registerFontSource("oxyfont_small");
-		resourcesCache.registerFontSource("oxyfont_tiny");
-		resourcesCache.registerFontSource("oxyfont_tiny_narrow");
-		resourcesCache.registerFontSource("smallfont");
-		resourcesCache.registerFontSource("sonic3_fontB");
-		resourcesCache.registerFontSource("sonic3_fontC");
-
 		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor = std::make_shared<ShadowFontProcessor>(Vec2f(0.5f, 0.5f), 0.6f);
 		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor2 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 0.5f), 0.5f);
 

@@ -397,6 +397,9 @@
     <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp">
       <Filter>resources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -741,6 +744,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\ChangeBitSet.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h">
+      <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

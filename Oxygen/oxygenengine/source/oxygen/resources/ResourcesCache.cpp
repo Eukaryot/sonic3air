@@ -166,35 +166,6 @@ const ResourcesCache::Palette* ResourcesCache::getPalette(uint64 key, uint8 line
 	return (it == mPalettes.end()) ? nullptr : &it->second;
 }
 
-Font* ResourcesCache::getFontByKey(uint64 keyHash)
-{
-	// Try to find in map
-	const auto it = mCachedFonts.find(keyHash);
-	if (it != mCachedFonts.end())
-	{
-		return &it->second.mFont;
-	}
-	return nullptr;
-}
-
-Font* ResourcesCache::registerFontSource(const std::string& filename)
-{
-	const uint64 keyHash = rmx::getMurmur2_64(filename);
-	CachedFont& cachedFont = mCachedFonts[keyHash];
-	cachedFont.mKeyString = filename;
-	cachedFont.mKeyHash = keyHash;
-
-	if (cachedFont.mFont.loadFromFile("data/font/" + filename + ".json"))
-	{
-		return &cachedFont.mFont;
-	}
-	else
-	{
-		mCachedFonts.erase(keyHash);
-		return nullptr;
-	}
-}
-
 void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const
 {
 	for (const RawData* rawData : mRomInjections)

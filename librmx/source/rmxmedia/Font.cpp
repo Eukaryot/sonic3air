@@ -25,7 +25,7 @@ int FontKey::compare(const FontKey& other) const
 
 FontSource* FontSourceStdFactory::construct(const FontSourceKey& key)
 {
-	if (key.mName.empty())
+	if (key.mName.empty() && key.mSize > 0.0f)
 	{
 		return new FontSourceStd(key.mSize);
 	}

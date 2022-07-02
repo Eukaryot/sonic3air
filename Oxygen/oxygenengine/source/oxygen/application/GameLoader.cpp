@@ -16,6 +16,7 @@
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/RenderResources.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/PersistentData.h"
 #if defined (PLATFORM_ANDROID)
@@ -139,6 +140,10 @@ GameLoader::UpdateResult GameLoader::updateLoading()
 			// Load resources
 			RMX_LOG_INFO("Resource cache loading...");
 			ResourcesCache::instance().loadAllResources();
+
+			// Load fonts
+			RMX_LOG_INFO("Font loading...");
+			FontCollection::instance().reloadAll();
 
 			// Load persistent data
 			RMX_LOG_INFO("Persistent data loading...");

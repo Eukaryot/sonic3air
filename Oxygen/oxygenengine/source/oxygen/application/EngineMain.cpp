@@ -20,6 +20,7 @@
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
@@ -45,6 +46,7 @@ struct EngineMain::Internal
 	LogDisplay		mLogDisplay;
 	ModManager		mModManager;
 	ResourcesCache	mResourcesCache;
+	FontCollection	mFontCollection;
 	PersistentData	mPersistentData;
 	VideoOut		mVideoOut;
 	ControlsIn		mControlsIn;
@@ -112,6 +114,9 @@ void EngineMain::onActiveModsChanged()
 
 	// Update the resource cache -> palettes, raw data
 	ResourcesCache::instance().loadAllResources();
+
+	// Update fonts
+	mInternal.mFontCollection.collectFromMods();
 
 	// Update video
 	mInternal.mVideoOut.handleActiveModsChanged();

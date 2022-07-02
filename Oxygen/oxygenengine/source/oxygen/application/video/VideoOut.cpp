@@ -17,7 +17,7 @@
 #include "oxygen/rendering/hardware/HardwareRenderer.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
-#include "oxygen/resources/ResourcesCache.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
@@ -442,7 +442,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 					screenPosition -= worldSpaceOffset;
 				}
 
-				Font* font = ResourcesCache::instance().getFontByKey(text.mFontKeyHash);
+				Font* font = FontCollection::instance().getFontByKey(text.mFontKeyHash);
 				if (nullptr != font)
 				{
 					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, text.mSpacing);

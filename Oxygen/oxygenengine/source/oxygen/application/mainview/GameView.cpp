@@ -18,6 +18,7 @@
 #include "oxygen/helper/Profiling.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/rendering/RenderResources.h"
+#include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
@@ -297,6 +298,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						{
 							RenderResources::instance().loadSpriteCache();
 							ResourcesCache::instance().loadAllResources();
+							FontCollection::instance().reloadAll();
 							setLogDisplay("Reloaded resources");
 							break;
 						}

@@ -27,13 +27,6 @@ public:
 		bool mIsModded = false;
 	};
 
-	struct CachedFont
-	{
-		std::string mKeyString;
-		uint64 mKeyHash = 0;
-		Font mFont;
-	};
-
 public:
 	bool loadRom();
 	bool loadRomFromFile(const std::wstring& filename);
@@ -44,9 +37,6 @@ public:
 	inline const std::vector<uint8>& getUnmodifiedRom() const  { return mRom; }
 	const std::vector<const RawData*>& getRawData(uint64 key) const;
 	const Palette* getPalette(uint64 key, uint8 line) const;
-
-	Font* getFontByKey(uint64 keyHash);
-	Font* registerFontSource(const std::string& filename);
 
 	void applyRomInjections(uint8* rom, uint32 romSize) const;
 
@@ -72,6 +62,4 @@ private:
 	ObjectPool<RawData> mRawDataPool;
 
 	std::map<uint64, Palette> mPalettes;
-
-	std::map<uint64, CachedFont> mCachedFonts;	// Using "mKeyHash" as map key
 };

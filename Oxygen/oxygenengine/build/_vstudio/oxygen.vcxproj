@@ -108,6 +108,7 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp" />
+    <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\PrintedTextCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteBase.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h" />
+    <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h" />
     <ClInclude Include="..\..\source\oxygen\resources\PrintedTextCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
