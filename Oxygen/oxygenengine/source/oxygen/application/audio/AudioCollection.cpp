@@ -263,18 +263,18 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 
 void AudioCollection::determineActiveSourceRegistrations(bool preferOriginalSoundtrack)
 {
-	for (auto& pair : mAudioDefinitions)
+	for (auto& [key, audioDefinition] : mAudioDefinitions)
 	{
 		// Search for the right one considering settings
 		SourceRegistration* bestSourceReg = nullptr;
-		for (SourceRegistration& soundReg : pair.second.mSources)
+		for (SourceRegistration& soundReg : audioDefinition.mSources)
 		{
 			if (shouldPreferSoundRegistration(soundReg, bestSourceReg, preferOriginalSoundtrack))
 			{
 				bestSourceReg = &soundReg;
 			}
 		}
-		pair.second.mActiveSource = bestSourceReg;
+		audioDefinition.mActiveSource = bestSourceReg;
 	}
 }
 

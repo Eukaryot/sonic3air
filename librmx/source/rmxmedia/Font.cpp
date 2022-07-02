@@ -112,7 +112,7 @@ int Font::getWidth(const StringReader& text, int pos, int len)
 		if (nullptr == info)
 			continue;
 
-		width += info->advance;
+		width += info->mAdvance;
 	}
 
 	width += roundToInt((len - 1) * mAdvance);
@@ -216,12 +216,12 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 				}
 
 				whitespaceBeforeWord.mText += ch;
-				whitespaceBeforeWord.mWidth += info->advance + spacing;
+				whitespaceBeforeWord.mWidth += info->mAdvance + spacing;
 			}
 			else
 			{
 				// Check if line break is needed now
-				const int newCombinedLineWidth = currentLine.mWidth + whitespaceBeforeWord.mWidth + currentWord.mWidth + info->advance;
+				const int newCombinedLineWidth = currentLine.mWidth + whitespaceBeforeWord.mWidth + currentWord.mWidth + info->mAdvance;
 				if (newCombinedLineWidth > maxLineWidth)
 				{
 					if (currentLine.empty())
@@ -239,7 +239,7 @@ void Font::wordWrapText(std::vector<std::wstring>& output, int maxLineWidth, con
 				}
 
 				currentWord.mText += ch;
-				currentWord.mWidth += info->advance + spacing;
+				currentWord.mWidth += info->mAdvance + spacing;
 			}
 		}
 	}
@@ -274,11 +274,11 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 		if (nullptr == info)
 			continue;
 
-		output[k].bitmap = &info->bitmap;
-		output[k].pos.x = pos.x + (float)info->leftIndent;
-		output[k].pos.y = pos.y + (float)info->topIndent;
+		output[k].bitmap = &info->mBitmap;
+		output[k].pos.x = pos.x + (float)info->mLeftIndent;
+		output[k].pos.y = pos.y + (float)info->mTopIndent;
 
-		pos.x += info->advance + spacing;
+		pos.x += info->mAdvance + spacing;
 	}
 }
 
@@ -382,7 +382,7 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 		const FontSource::GlyphInfo* info = fontSource->getGlyph(text[i]);
 		if (nullptr != info)
 		{
-			outInnerRect.width += info->advance;
+			outInnerRect.width += info->mAdvance;
 		}
 	}
 	outInnerRect.height = fontSource->getHeight();

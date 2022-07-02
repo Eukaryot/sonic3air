@@ -99,11 +99,10 @@ namespace rmx
 		}
 
 		// Stop all playing audio instances
-		for (const auto& pair : mAudioInstances)
+		for (const auto& [key, audioInstance] : mAudioInstances)
 		{
-			AudioManager::AudioInstance& audioInstance = *pair.second;
-			audioInstance.mPlaybackDone = true;
-			audioInstance.mAudioMixer = nullptr;
+			audioInstance->mPlaybackDone = true;
+			audioInstance->mAudioMixer = nullptr;
 		}
 	}
 
@@ -163,10 +162,9 @@ namespace rmx
 
 	void AudioMixer::mixInAllAudioInstances(const MixerParameters& parameters)
 	{
-		for (auto& pair : mAudioInstances)
+		for (const auto& [key, audioInstance] : mAudioInstances)
 		{
-			AudioManager::AudioInstance& audioInstance = *pair.second;
-			mixInAudioInstance(audioInstance, parameters.mOutputBuffers, parameters.mOutputSamples, *parameters.mOutputFormat);
+			mixInAudioInstance(*audioInstance, parameters.mOutputBuffers, parameters.mOutputSamples, *parameters.mOutputFormat);
 		}
 	}
 

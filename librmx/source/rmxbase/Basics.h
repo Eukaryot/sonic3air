@@ -167,7 +167,22 @@ FORCE_INLINE int compare(bool first, bool second)	{ return (first == second) ? 0
 
 
 
-// Add element to std::vector
+// Check if an std::vector, std::list, etc. contains a certain element
+template<typename T, typename E>
+bool containsElement(T& container, E element)
+{
+	return (std::find(container.begin(), container.end(), element) != container.end());
+}
+
+// Check if an std::vector, std::list, etc. contains an element matching the predicate
+template<typename T, class PRED>
+bool containsByPredicate(T& container, PRED predicate)
+{
+	return (std::find_if(container.begin(), container.end(), predicate) != container.end());
+}
+
+
+// Add a new empty element to std::vector and return a reference
 template<typename T>
 T& vectorAdd(std::vector<T>& vec)
 {

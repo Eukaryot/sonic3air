@@ -30,10 +30,12 @@ void rmxmedia::initialize()
 	callbacks.push_back(rmx::WavLoader::load);
 
 	AudioBuffer::LoadCallbackList& cblist = AudioBuffer::mStaticLoadCallbacks;
-	for (const AudioBuffer::LoadCallbackType& callback : callbacks)
+	for (const AudioBuffer::LoadCallbackType callback : callbacks)
 	{
-		if (std::find(cblist.begin(), cblist.end(), callback) == cblist.end())
+		if (!containsElement(cblist, callback))
+		{
 			cblist.push_back(callback);
+		}
 	}
 
 	// Initialize font factories

@@ -17,11 +17,11 @@ class API_EXPORT FontSource
 public:
 	struct GlyphInfo
 	{
-		uint32 unicode = 0;
-		Bitmap bitmap;
-		int leftIndent = 0;
-		int topIndent = 0;
-		int advance = 0;
+		uint32 mUnicode = 0;
+		Bitmap mBitmap;
+		int mLeftIndent = 0;
+		int mTopIndent = 0;
+		int mAdvance = 0;
 	};
 
 public:
@@ -47,7 +47,7 @@ protected:
 class API_EXPORT FontSourceStd : public FontSource
 {
 public:
-	FontSourceStd(float size);
+	explicit FontSourceStd(float size);
 
 protected:
 	virtual bool fillGlyphInfo(GlyphInfo& info);
@@ -60,7 +60,7 @@ private:
 class API_EXPORT FontSourceBitmap : public FontSource
 {
 public:
-	FontSourceBitmap(const String& jsonFilename);
+	explicit FontSourceBitmap(const String& jsonFilename);
 
 protected:
 	virtual bool fillGlyphInfo(GlyphInfo& info);

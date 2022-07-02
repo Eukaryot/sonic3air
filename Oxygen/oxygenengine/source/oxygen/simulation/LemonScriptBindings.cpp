@@ -919,8 +919,7 @@ namespace
 					const std::string_view textString = str->getString();
 
 					// Does the string contain any uppercase letters?
-					const auto it = std::find_if(textString.begin(), textString.end(), [](char ch) { return (ch >= 'A' && ch <= 'Z'); } );
-					if (it != textString.end())
+					if (containsByPredicate(textString, [](char ch) { return (ch >= 'A' && ch <= 'Z'); } ))
 					{
 						// Convert to lowercase and try again
 						String str = textString;
