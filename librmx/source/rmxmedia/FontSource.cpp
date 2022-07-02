@@ -79,8 +79,6 @@ bool FontSourceStd::fillGlyphInfo(FontSource::GlyphInfo& info)
 		info.mBitmap.copy(bmp1);
 	}
 
-	info.mLeftIndent = 0;
-	info.mTopIndent = 0;
 	info.mAdvance = roundToInt(rmx::stdfont::WIDTH * mSize / rmx::stdfont::SIZE);
 	return true;
 }
@@ -93,7 +91,7 @@ FontSourceBitmap::FontSourceBitmap(const String& jsonFilename)
 {
 	// Read JSON file
 	Json::Value root = rmx::JsonHelper::loadFile(*jsonFilename.toWString());
-	RMX_CHECK(!root.isNull(), "Failed to load bitmap font JSON file at '" << *jsonFilename << "'", );
+	RMX_CHECK(!root.isNull(), "Failed to load bitmap font JSON file at '" << *jsonFilename << "'", return);
 
 	rmx::JsonHelper rootHelper(root);
 	rootHelper.tryReadInt("ascender", mAscender);
@@ -150,6 +148,7 @@ FontSourceBitmap::FontSourceBitmap(const String& jsonFilename)
 			}
 		}
 	}
+	mLoadingSucceeded = true;
 }
 
 bool FontSourceBitmap::fillGlyphInfo(FontSource::GlyphInfo& info)
@@ -158,11 +157,11 @@ bool FontSourceBitmap::fillGlyphInfo(FontSource::GlyphInfo& info)
 	if (it == mCharacterBitmaps.end())
 	{
 		// Resolve redirect if possible
-		const auto it2 = mCharacterRedirects.find(info.mUnicode);
-		if (it2 == mCharacterRedirects.end())
+		wchar_t* redirect = mapFind(mCharacterRedirects, (wchar_t)info.mUnicode);
+		if (nullptr == redirect)
 			return false;
 
-		it = mCharacterBitmaps.find(it2->second);
+		it = mCharacterBitmaps.find(*redirect);
 		if (it == mCharacterBitmaps.end())
 			return false;
 	}
@@ -170,8 +169,5 @@ bool FontSourceBitmap::fillGlyphInfo(FontSource::GlyphInfo& info)
 	const Bitmap& bitmap = it->second;
 	info.mBitmap = bitmap;
 	info.mAdvance = bitmap.mWidth + mSpaceBetweenCharacters;
-	info.mLeftIndent = 0;
-	info.mTopIndent = 0;
-
 	return true;
 }

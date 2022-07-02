@@ -31,7 +31,6 @@ public:
 public:
 	explicit OpenGLFontOutput(Font& font);
 
-	void reset();
 	inline const FontKey& getFontKey() const  { return mFont.getKey(); }
 
 	void print(const std::vector<Font::TypeInfo>& infos);
@@ -49,9 +48,11 @@ private:
 
 private:
 	bool loadTexture(const Font::TypeInfo& info);
+	void checkCacheValidity();
 
 private:
 	Font& mFont;
+	uint32 mLastFontChangeCounter = 0;
 	SpriteAtlas mAtlas;
 	std::map<uint32, SpriteHandleInfo> mHandleMap;
 };

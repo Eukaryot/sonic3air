@@ -59,6 +59,6 @@ namespace rmx
 		typedef std::vector<Recti> RectStack;
 		RectStack mScissorStack;
 
-		std::map<FontKey, OpenGLFontOutput> mFontOutputMap;
+		std::map<Font*, OpenGLFontOutput> mFontOutputMap;
 	};
 }

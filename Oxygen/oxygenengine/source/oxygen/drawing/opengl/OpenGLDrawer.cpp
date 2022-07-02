@@ -221,21 +221,20 @@ namespace opengldrawer
 			return textureHandle;
 		}
 
-		OpenGLFontOutput& getFontOutput(Font& font)
+		OpenGLFontOutput& getOpenGLFontOutput(Font& font)
 		{
 			// Get or create OpenGLFontOutput instance
-			const FontKey& key = font.getKey();
-			auto it = mFontOutputMap.find(key);
-			if (it == mFontOutputMap.end())
-			{
-				it = mFontOutputMap.emplace(key, font).first;
-			}
-			return it->second;
+			OpenGLFontOutput* fontOutput = mapFind(mFontOutputMap, &font);
+			if (nullptr != fontOutput)
+				return *fontOutput;
+
+			const auto pair = mFontOutputMap.emplace(&font, font);
+			return pair.first->second;
 		}
 
 		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
 		{
-			OpenGLFontOutput& output = getFontOutput(font);
+			OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
 			const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
 
 			static std::vector<Font::TypeInfo> typeinfos;
@@ -244,7 +243,7 @@ namespace opengldrawer
 
 			static std::vector<OpenGLFontOutput::VertexGroup> vertexGroups;
 			vertexGroups.clear();
-			output.buildVertexGroups(vertexGroups, typeinfos);
+			fontOutput.buildVertexGroups(vertexGroups, typeinfos);
 
 			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
 			shader.bind();
@@ -290,7 +289,7 @@ namespace opengldrawer
 		opengl::VertexArrayObject mMeshVAO;			// Always using the same instances with different contents -- TODO: Some kind of caching could be useful
 
 	private:
-		std::map<FontKey, OpenGLFontOutput> mFontOutputMap;
+		std::map<Font*, OpenGLFontOutput> mFontOutputMap;
 	};
 }
 

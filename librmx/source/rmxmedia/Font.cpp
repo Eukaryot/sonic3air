@@ -59,7 +59,8 @@ Font::Font(float size) :
 
 Font::~Font()
 {
-	delete mFontSource;
+	if (mOwnsFontSource)
+		delete mFontSource;
 }
 
 bool Font::loadFromFile(const String& name, float size)
@@ -76,16 +77,30 @@ void Font::setSize(float size)
 	invalidateFontSource();
 }
 
+void Font::injectFontSource(FontSource* fontSource)
+{
+	invalidateFontSource();
+
+	if (nullptr != fontSource)
+	{
+		mFontSource = fontSource;
+		mFontSourceDirty = false;
+		mOwnsFontSource = false;
+	}
+}
+
 void Font::clearFontProcessors()
 {
 	mKey.mProcessors.clear();
-	invalidateFontSource();
+	mCharacterMap.clear();
+	++mChangeCounter;
 }
 
 void Font::addFontProcessor(const std::shared_ptr<FontProcessor>& processor)
 {
 	mKey.mProcessors.emplace_back(processor);
-	invalidateFontSource();
+	mCharacterMap.clear();
+	++mChangeCounter;
 }
 
 int Font::getWidth(const StringReader& text)
@@ -267,16 +282,15 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 	for (size_t k = 0; k < text.mLength; ++k)
 	{
 		const uint32 ch = text[k];
-		output[k].unicode = ch;
-		output[k].bitmap = nullptr;
+		output[k].mUnicode = ch;
+		output[k].mBitmap = nullptr;
 
 		const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
 		if (nullptr == info)
 			continue;
 
-		output[k].bitmap = &info->mBitmap;
-		output[k].pos.x = pos.x + (float)info->mLeftIndent;
-		output[k].pos.y = pos.y + (float)info->mTopIndent;
+		output[k].mBitmap = &info->mBitmap;
+		output[k].mPosition = pos;
 
 		pos.x += info->mAdvance + spacing;
 	}
@@ -288,26 +302,26 @@ void Font::applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const s
 	for (size_t i = 0; i < inTypeInfos.size(); ++i)
 	{
 		const TypeInfo& typeInfo = inTypeInfos[i];
-		if (nullptr == typeInfo.bitmap)
+		if (nullptr == typeInfo.mBitmap)
 			continue;
 
 		CharacterInfo& characterInfo = applyEffects(typeInfo);
 
 		ExtendedTypeInfo& extendedTypeInfo = vectorAdd(outTypeInfos);
-		extendedTypeInfo.mCharacter = typeInfo.unicode;
+		extendedTypeInfo.mCharacter = typeInfo.mUnicode;
 		extendedTypeInfo.mBitmap = &characterInfo.mCachedBitmap;
-		extendedTypeInfo.mDrawPosition = Vec2i(typeInfo.pos) - Vec2i(characterInfo.mBorderLeft, characterInfo.mBorderTop);
+		extendedTypeInfo.mDrawPosition = Vec2i(typeInfo.mPosition) - Vec2i(characterInfo.mBorderLeft, characterInfo.mBorderTop);
 	}
 }
 
 Font::CharacterInfo& Font::applyEffects(const TypeInfo& typeInfo)
 {
-	const uint32 character = typeInfo.unicode;
+	const uint32 character = typeInfo.mUnicode;
 	CharacterInfo& characterInfo = mCharacterMap[character];
 	if (characterInfo.mCachedBitmap.empty())
 	{
 		FontProcessingData fontProcessingData;
-		fontProcessingData.mBitmap = *typeInfo.bitmap;
+		fontProcessingData.mBitmap = *typeInfo.mBitmap;
 
 		// Run font processors
 		for (const std::shared_ptr<FontProcessor>& processor : mKey.mProcessors)
@@ -421,9 +435,12 @@ Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int al
 
 void Font::invalidateFontSource()
 {
-	SAFE_DELETE(mFontSource);
+	if (mOwnsFontSource)
+		SAFE_DELETE(mFontSource);
 	mFontSourceDirty = true;
+	mOwnsFontSource = false;
 	mCharacterMap.clear();
+	++mChangeCounter;
 }
 
 FontSource* Font::getFontSource()
@@ -436,7 +453,10 @@ FontSource* Font::getFontSource()
 		{
 			mFontSource = factory->construct(mKey);
 			if (nullptr != mFontSource)
+			{
+				mOwnsFontSource = true;
 				break;
+			}
 		}
 	}
 	return mFontSource;

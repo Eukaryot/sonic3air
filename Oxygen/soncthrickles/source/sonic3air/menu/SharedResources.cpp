@@ -59,33 +59,35 @@ namespace global
 
 		std::shared_ptr<GradientFontProcessor> gradientFontProcessor = std::make_shared<GradientFontProcessor>();
 
-		mFont3Pure.loadFromFile("data/font/smallfont.json");
+		FontCollection& fontCollection = FontCollection::instance();
 
-		mFont3.loadFromFile("data/font/smallfont.json");
+		fontCollection.registerManagedFont(mFont3Pure, "smallfont");
+
+		fontCollection.registerManagedFont(mFont3, "smallfont");
 		mFont3.addFontProcessor(outlineFontProcessorTransparent);
 		mFont3.addFontProcessor(shadowFontProcessor);
 
-		mFont4.loadFromFile("data/font/oxyfont_tiny.json");
+		fontCollection.registerManagedFont(mFont4, "oxyfont_tiny");
 		mFont4.addFontProcessor(outlineFontProcessor);
 		mFont4.addFontProcessor(gradientFontProcessor);
 		mFont4.addFontProcessor(shadowFontProcessor);
 
-		mFont5.loadFromFile("data/font/oxyfont_small.json");
+		fontCollection.registerManagedFont(mFont5, "oxyfont_small");
 		mFont5.addFontProcessor(outlineFontProcessor);
 		mFont5.addFontProcessor(gradientFontProcessor);
 		mFont5.addFontProcessor(shadowFontProcessor);
 
-		mFont7.loadFromFile("data/font/sonic3_fontB.json");
+		fontCollection.registerManagedFont(mFont7, "sonic3_fontB");
 		mFont7.addFontProcessor(outlineFontProcessor);
 		mFont7.addFontProcessor(gradientFontProcessor);
 		mFont7.addFontProcessor(shadowFontProcessor);
 
-		mFont10.loadFromFile("data/font/oxyfont_regular.json");
+		fontCollection.registerManagedFont(mFont10, "oxyfont_regular");
 		mFont10.addFontProcessor(outlineFontProcessor);
 		mFont10.addFontProcessor(gradientFontProcessor);
 		mFont10.addFontProcessor(shadowFontProcessor);
 
-		mFont18.loadFromFile("data/font/sonic3_fontC.json");
+		fontCollection.registerManagedFont(mFont18, "sonic3_fontC");
 		mFont18.addFontProcessor(outlineFontProcessor);
 		mFont18.addFontProcessor(gradientFontProcessor);
 		mFont18.addFontProcessor(shadowFontProcessor2);

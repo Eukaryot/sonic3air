@@ -16,7 +16,7 @@ Font* FontCollection::getFontByKey(uint64 keyHash)
 {
 	// Try to find in map
 	CollectedFont* collectedFont = mapFind(mCollectedFonts, keyHash);
-	return (nullptr != collectedFont) ? &collectedFont->mLoadedFont : nullptr;
+	return (nullptr != collectedFont) ? &collectedFont->mUnmodifiedFont : nullptr;
 }
 
 void FontCollection::reloadAll()
@@ -63,6 +63,22 @@ void FontCollection::collectFromMods()
 	updateLoadedFonts();
 }
 
+void FontCollection::registerManagedFont(Font& font, const std::string& key)
+{
+	const uint64 keyHash = rmx::getMurmur2_64(key);
+	CollectedFont* collectedFont = mapFind(mCollectedFonts, keyHash);
+	if (nullptr != collectedFont)
+	{
+		collectedFont->mManagedFonts.push_back(&font);
+
+		// Update the font source in all font instances (note that it might also be a null pointer)
+		for (Font* font : collectedFont->mManagedFonts)
+		{
+			font->injectFontSource(collectedFont->mFontSource);
+		}
+	}
+}
+
 void FontCollection::loadDefinitionsFromPath(std::wstring_view path, const Mod* mod)
 {
 	if (!FTX::FileSystem->exists(path))
@@ -80,8 +96,10 @@ void FontCollection::loadDefinitionsFromPath(std::wstring_view path, const Mod* 
 
 		// Get or create the collected font for this key
 		CollectedFont& collectedFont = mCollectedFonts[keyHash];
-		if (collectedFont.mKeyHash != keyHash)
+		if (collectedFont.mManagedFonts.empty())	// This is true of the map entry was just created
 		{
+			// The list of managed font must always include the unmodified font
+			collectedFont.mManagedFonts.push_back(&collectedFont.mUnmodifiedFont);
 			collectedFont.mKeyHash = keyHash;
 			collectedFont.mKeyString = keyString;
 		}
@@ -98,35 +116,44 @@ void FontCollection::updateLoadedFonts()
 	std::vector<uint64> keysToRemove;
 	for (auto& [key, collectedFont] : mCollectedFonts)
 	{
-		if (collectedFont.mDefinitions.empty())
+		if (collectedFont.mDefinitions.empty() && collectedFont.mManagedFonts.size() <= 1)
+		{
+			// Font is unused and can be removed
+			keysToRemove.push_back(key);
+			continue;
+		}
+
+		// Nothing to do if the last definition (= the highest priority one) is already loaded
+		if (collectedFont.mDefinitions.size() == collectedFont.mLoadedDefinitionIndex + 1)
+			continue;
+
+		// Font source needs to be reloaded
+		collectedFont.mLoadedDefinitionIndex = -1;
+		SAFE_DELETE(collectedFont.mFontSource);
+
+		// Start at the end of the definitions list, at those have the highest priority
+		for (int index = (int)collectedFont.mDefinitions.size() - 1; index >= 0; --index)
+		{
+			const Definition& definition = collectedFont.mDefinitions[index];
+			collectedFont.mFontSource = new FontSourceBitmap(WString(definition.mDefinitionFile).toString());
+			if (collectedFont.mFontSource->isValid())
+			{
+				collectedFont.mLoadedDefinitionIndex = index;
+				break;
+			}
+			// If loading failed, try the next definition
+		}
+
+		// Update the font source in all font instances (note that it might also be a null pointer)
+		for (Font* font : collectedFont.mManagedFonts)
+		{
+			font->injectFontSource(collectedFont.mFontSource);
+		}
+
+		// If loading failed for all definitions, remove the collected font instance
+		if (collectedFont.mLoadedDefinitionIndex == -1 && collectedFont.mManagedFonts.size() <= 1)
 		{
 			keysToRemove.push_back(key);
-		}
-		else
-		{
-			// Nothing to do if the last definition (= the highest priority one) is already loaded
-			if (collectedFont.mDefinitions.size() == collectedFont.mLoadedDefinitionIndex + 1)
-				continue;
-			collectedFont.mLoadedDefinitionIndex = -1;
-
-			// Start at the end of the definitions list, at those have the highest priority
-			for (int index = (int)collectedFont.mDefinitions.size() - 1; index >= 0; --index)
-			{
-				const Definition& definition = collectedFont.mDefinitions[index];
-				const bool success = collectedFont.mLoadedFont.loadFromFile(WString(definition.mDefinitionFile).toString());
-				if (success)
-				{
-					collectedFont.mLoadedDefinitionIndex = index;
-					break;
-				}
-				// Otherwise try the next definition
-			}
-
-			// If loading failed for all definitions, remove the collected font instance
-			if (collectedFont.mLoadedDefinitionIndex == -1)
-			{
-				keysToRemove.push_back(key);
-			}
 		}
 	}
 

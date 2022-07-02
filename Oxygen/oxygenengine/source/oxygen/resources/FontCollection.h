@@ -26,8 +26,11 @@ public:
 		std::string mKeyString;
 		uint64 mKeyHash = 0;
 		std::vector<Definition> mDefinitions;	// There can be multiple font definitions with the same key, thanks to overloading
-		Font mLoadedFont;
+
 		int mLoadedDefinitionIndex = -1;
+		FontSourceBitmap* mFontSource = nullptr;
+		Font mUnmodifiedFont;
+		std::vector<Font*> mManagedFonts;
 	};
 
 public:
@@ -35,6 +38,8 @@ public:
 
 	void reloadAll();
 	void collectFromMods();
+
+	void registerManagedFont(Font& font, const std::string& key);
 
 private:
 	void loadDefinitionsFromPath(std::wstring_view path, const Mod* mod);

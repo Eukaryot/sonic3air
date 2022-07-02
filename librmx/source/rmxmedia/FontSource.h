@@ -19,8 +19,6 @@ public:
 	{
 		uint32 mUnicode = 0;
 		Bitmap mBitmap;
-		int mLeftIndent = 0;
-		int mTopIndent = 0;
 		int mAdvance = 0;
 	};
 
@@ -62,11 +60,14 @@ class API_EXPORT FontSourceBitmap : public FontSource
 public:
 	explicit FontSourceBitmap(const String& jsonFilename);
 
+	bool isValid() const  { return mLoadingSucceeded; }
+
 protected:
 	virtual bool fillGlyphInfo(GlyphInfo& info);
 
 private:
-	std::map<wchar_t, Bitmap>  mCharacterBitmaps;
-	std::map<wchar_t, wchar_t> mCharacterRedirects;
+	std::unordered_map<wchar_t, Bitmap>  mCharacterBitmaps;
+	std::unordered_map<wchar_t, wchar_t> mCharacterRedirects;
 	int mSpaceBetweenCharacters = 0;
+	bool mLoadingSucceeded = false;
 };

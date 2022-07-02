@@ -36,13 +36,13 @@ struct StringReader
 
 struct FontSourceKey
 {
+	FontSource* mFontSource = nullptr;	// Only used in case a certain font source is ínjected into a font instance
 	String mName;
-	float mSize;
-
-	FontSourceKey() : mSize(-1.0f) {}
+	float mSize = -1.0f;
 
 	int compare(const FontSourceKey& other) const
 	{
+		COMPARE_CASCADE(::compare(mFontSource, other.mFontSource));
 		COMPARE_CASCADE(::compare(mSize, other.mSize));
 		COMPARE_CASCADE(mName.compare(other.mName));
 		return 0;
@@ -68,9 +68,9 @@ class Font
 public:
 	struct TypeInfo
 	{
-		uint32 unicode = 0;
-		const Bitmap* bitmap = nullptr;
-		Vec2f pos;
+		uint32 mUnicode = 0;
+		const Bitmap* mBitmap = nullptr;
+		Vec2f mPosition;
 	};
 
 	struct ExtendedTypeInfo
@@ -97,6 +97,7 @@ public:
 
 	bool loadFromFile(const String& filename, float size = 0.0f);
 	void setSize(float size);
+	void injectFontSource(FontSource* fontSource);
 
 	void clearFontProcessors();
 	void addFontProcessor(const std::shared_ptr<FontProcessor>& processor);
@@ -104,6 +105,7 @@ public:
 	const FontKey& getKey() const	{ return mKey; }
 	const String& getName() const	{ return mKey.mName; }
 	float getSize() const			{ return mKey.mSize; }
+	uint32 getChangeCounter() const { return mChangeCounter; }
 
 	int getWidth(const StringReader& text);
 	int getWidth(const StringReader& text, int pos, int len = -1);
@@ -130,9 +132,12 @@ private:
 private:
 	FontSource* mFontSource = nullptr;
 	bool mFontSourceDirty = true;
+	bool mOwnsFontSource = false;
+
 	FontKey mKey;
 	float mAdvance = 0.0f;
 	std::map<uint32, CharacterInfo> mCharacterMap;
+	uint32 mChangeCounter = 0;			// This is meant for classes like OpenGLFontOutput, so that it knows when to invalidate its caching
 
 public:
 	struct API_EXPORT CodecList

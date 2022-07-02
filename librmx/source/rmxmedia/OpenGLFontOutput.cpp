@@ -12,12 +12,7 @@
 OpenGLFontOutput::OpenGLFontOutput(Font& font) :
 	mFont(font)
 {
-}
-
-void OpenGLFontOutput::reset()
-{
-	mAtlas.clear();
-	mHandleMap.clear();
+	mLastFontChangeCounter = mFont.getChangeCounter();
 }
 
 void OpenGLFontOutput::print(const std::vector<Font::TypeInfo>& infos)
@@ -52,15 +47,17 @@ void OpenGLFontOutput::print(const std::vector<Font::TypeInfo>& infos)
 
 void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGroups, const std::vector<Font::TypeInfo>& infos)
 {
+	checkCacheValidity();
+
 	Texture* currentTexture = nullptr;
 	SpriteAtlas::Sprite sprite;
 
 	for (const Font::TypeInfo& info : infos)
 	{
-		if (nullptr == info.bitmap)
+		if (nullptr == info.mBitmap)
 			continue;
 
-		const uint32 character = info.unicode;
+		const uint32 character = info.mUnicode;
 		auto it = mHandleMap.find(character);
 		if (it == mHandleMap.end())
 		{
@@ -85,10 +82,10 @@ void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGrou
 		const size_t firstIndex = vertices.size();
 		vertices.resize(firstIndex + 6);
 
-		const float x0 = info.pos.x - (float)spriteHandleInfo.mBorderLeft;
-		const float x1 = info.pos.x + (float)(info.bitmap->mWidth + spriteHandleInfo.mBorderRight);
-		const float y0 = info.pos.y - (float)spriteHandleInfo.mBorderTop;
-		const float y1 = info.pos.y + (float)(info.bitmap->mHeight + spriteHandleInfo.mBorderBottom);
+		const float x0 = info.mPosition.x - (float)spriteHandleInfo.mBorderLeft;
+		const float x1 = info.mPosition.x + (float)(info.mBitmap->mWidth + spriteHandleInfo.mBorderRight);
+		const float y0 = info.mPosition.y - (float)spriteHandleInfo.mBorderTop;
+		const float y1 = info.mPosition.y + (float)(info.mBitmap->mHeight + spriteHandleInfo.mBorderBottom);
 
 		vertices[firstIndex + 0].mPosition.set(x0, y0);
 		vertices[firstIndex + 1].mPosition.set(x0, y1);
@@ -109,10 +106,10 @@ void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGrou
 bool OpenGLFontOutput::loadTexture(const Font::TypeInfo& typeInfo)
 {
 	// Load characters as texture
-	if (nullptr == typeInfo.bitmap)
+	if (nullptr == typeInfo.mBitmap)
 		return false;
 
-	const uint32 character = typeInfo.unicode;
+	const uint32 character = typeInfo.mUnicode;
 	SpriteHandleInfo& spriteHandleInfo = mHandleMap[character];
 	if (spriteHandleInfo.mAtlasHandle == -1)
 	{
@@ -124,4 +121,15 @@ bool OpenGLFontOutput::loadTexture(const Font::TypeInfo& typeInfo)
 		spriteHandleInfo.mBorderBottom = characterInfo.mBorderBottom;
 	}
 	return true;
+}
+
+void OpenGLFontOutput::checkCacheValidity()
+{
+	// Cached data is only valid if the underlying font did not change in the meantime
+	if (mLastFontChangeCounter != mFont.getChangeCounter())
+	{
+		mAtlas.clear();
+		mHandleMap.clear();
+		mLastFontChangeCounter = mFont.getChangeCounter();
+	}
 }
