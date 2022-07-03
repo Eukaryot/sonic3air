@@ -145,7 +145,7 @@ void ResourcesCache::loadAllResources()
 
 	// Load palettes
 	mPalettes.clear();
-	loadRawData(L"data/palettes", false);
+	loadPalettes(L"data/palettes", false);
 	for (const Mod* mod : ModManager::instance().getActiveMods())
 	{
 		loadPalettes(mod->mFullPath + L"palettes", true);
@@ -375,7 +375,7 @@ void ResourcesCache::loadPalettes(const std::wstring& path, bool isModded)
 	// Load palettes from the given path
 	std::vector<rmx::FileIO::FileEntry> fileEntries;
 	fileEntries.reserve(8);
-	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
+	FTX::FileSystem->listFilesByMask(path + L"/*.png", true, fileEntries);
 	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 	{
 		if (!FTX::FileSystem->exists(fileEntry.mPath + fileEntry.mFilename))
