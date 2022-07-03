@@ -57,9 +57,6 @@ mkdir "%destDir%\artifacts\bin"
 copy "bin\Release-Enduser_x86\*.exe" "%destDir%\artifacts\bin"
 copy "bin\Release-Enduser_x86\*.pdb" "%destDir%\artifacts\bin"
 
-mkdir "%destDir%\artifacts\bin"
-robocopy "scripts" "%destDir%\artifacts\scripts" /e
-
 pushd "%destDir%"
 	"C:\Program Files\7-Zip\7z.exe" a -t7z -mx1 -r artifacts.7z artifacts
 popd
