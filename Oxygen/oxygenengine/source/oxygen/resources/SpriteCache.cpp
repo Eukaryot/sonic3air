@@ -13,7 +13,6 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
-#include "oxygen/helper/PackageFileCrawler.h"
 #include "oxygen/rendering/utils/Kosinski.h"
 #include "oxygen/rendering/utils/SpriteDump.h"
 #include "oxygen/simulation/EmulatorInterface.h"
@@ -313,16 +312,16 @@ void SpriteCache::dumpSprite(uint64 key, std::string_view categoryKey, uint8 spr
 void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 {
 	SheetCache sheetCache;
-	PackageFileCrawler fc;
-	fc.addFiles(path + L"/*.json", true);
-	if (fc.size() == 0)
+	std::vector<rmx::FileIO::FileEntry> fileEntries;
+	fileEntries.reserve(8);
+	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
+	if (fileEntries.empty())
 		return;
 
 	++mGlobalChangeCounter;
-	for (size_t fileIndex = 0; fileIndex < fc.size(); ++fileIndex)
+	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 	{
-		const FileCrawler::FileEntry& entry = *fc[fileIndex];
-		const Json::Value spritesJson = JsonHelper::loadFile(entry.mPath + entry.mFilename);
+		const Json::Value spritesJson = JsonHelper::loadFile(fileEntry.mPath + fileEntry.mFilename);
 		for (auto iterator = spritesJson.begin(); iterator != spritesJson.end(); ++iterator)
 		{
 			const String identifier(iterator.key().asString());
@@ -400,7 +399,7 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 
 				CacheItem& item = mCachedSprites[key];
 				item.mChangeCounter = mGlobalChangeCounter;
-				const std::wstring fullpath = entry.mPath + filename;
+				const std::wstring fullpath = fileEntry.mPath + filename;
 
 				// Palette or RGBA?
 				item.mUsesComponentSprite = WString(filename).endsWith(L".png");

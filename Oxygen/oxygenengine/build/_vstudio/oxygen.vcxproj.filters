@@ -247,9 +247,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\helper\PackageFileCrawler.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
@@ -579,9 +576,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h">
       <Filter>rendering\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\helper\PackageFileCrawler.h">
-      <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h">
       <Filter>rendering\utils</Filter>

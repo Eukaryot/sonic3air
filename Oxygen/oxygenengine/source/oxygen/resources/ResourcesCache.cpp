@@ -14,7 +14,6 @@
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
-#include "oxygen/helper/PackageFileCrawler.h"
 
 
 bool ResourcesCache::loadRom()
@@ -330,12 +329,12 @@ void ResourcesCache::saveRomToAppData()
 void ResourcesCache::loadRawData(const std::wstring& path, bool isModded)
 {
 	// Load raw data from the given path
-	PackageFileCrawler fc;
-	fc.addFiles(path + L"/*.json", true);
-	for (size_t fileIndex = 0; fileIndex < fc.size(); ++fileIndex)
+	std::vector<rmx::FileIO::FileEntry> fileEntries;
+	fileEntries.reserve(8);
+	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
+	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 	{
-		const FileCrawler::FileEntry& entry = *fc[fileIndex];
-		const Json::Value root = JsonHelper::loadFile(entry.mPath + entry.mFilename);
+		const Json::Value root = JsonHelper::loadFile(fileEntry.mPath + fileEntry.mFilename);
 
 		for (auto it = root.begin(); it != root.end(); ++it)
 		{
@@ -350,7 +349,7 @@ void ResourcesCache::loadRawData(const std::wstring& path, bool isModded)
 				const uint64 key = rmx::getMurmur2_64(String(it.key().asCString()));
 				rawData = &mRawDataPool.createObject();
 				rawData->mIsModded = isModded;
-				if (!FTX::FileSystem->readFile(entry.mPath + String(filename).toStdWString(), rawData->mContent))
+				if (!FTX::FileSystem->readFile(fileEntry.mPath + String(filename).toStdWString(), rawData->mContent))
 				{
 					mRawDataPool.destroyObject(*rawData);
 					continue;
@@ -374,26 +373,26 @@ void ResourcesCache::loadRawData(const std::wstring& path, bool isModded)
 void ResourcesCache::loadPalettes(const std::wstring& path, bool isModded)
 {
 	// Load palettes from the given path
-	PackageFileCrawler fc;
-	fc.addFiles(path + L"/*.png", true);
-	for (size_t fileIndex = 0; fileIndex < fc.size(); ++fileIndex)
+	std::vector<rmx::FileIO::FileEntry> fileEntries;
+	fileEntries.reserve(8);
+	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
+	for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 	{
-		const FileCrawler::FileEntry& entry = *fc[fileIndex];
-		if (!FTX::FileSystem->exists(entry.mPath + entry.mFilename))
+		if (!FTX::FileSystem->exists(fileEntry.mPath + fileEntry.mFilename))
 			continue;
 
 		std::vector<uint8> content;
-		if (!FTX::FileSystem->readFile(entry.mPath + entry.mFilename, content))
+		if (!FTX::FileSystem->readFile(fileEntry.mPath + fileEntry.mFilename, content))
 			continue;
 
 		Bitmap bitmap;
-		if (!bitmap.load(entry.mPath + entry.mFilename))
+		if (!bitmap.load(fileEntry.mPath + fileEntry.mFilename))
 		{
-			RMX_ERROR("Failed to load PNG at '" << *WString(entry.mPath + entry.mFilename).toString() << "'", );
+			RMX_ERROR("Failed to load PNG at '" << *WString(fileEntry.mPath + fileEntry.mFilename).toString() << "'", );
 			continue;
 		}
 
-		String name = WString(entry.mFilename).toString();
+		String name = WString(fileEntry.mFilename).toString();
 		name.remove(name.length() - 4, 4);
 
 		uint64 key = rmx::getMurmur2_64(name);		// Hash is the key of the first palette, the others are enumerated from there
