@@ -86,7 +86,7 @@ function void fn049cfe()
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
 				u8[A1 + 0x20] = char.state.ROLLING
-				if ((u8[A1 + 0x2a] & 0x04) == 0)
+				if ((u8[A1 + 0x2a] & char.flag.ROLLING) == 0)
 				{
 					u8[A1 + 0x2a] |= char.flag.ROLLING
 					objA1.position.y.u16 += 5

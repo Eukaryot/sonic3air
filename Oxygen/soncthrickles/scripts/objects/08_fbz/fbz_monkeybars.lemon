@@ -180,7 +180,7 @@ function void fn03a8b8()
 				return
 		#endif
 
-			if (u8[A1 + 0x2a] & 0x08)
+			if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 			{
 				A3 = 0xffff0000 + u16[A1 + 0x42]
 				if (u32[A3] == 0x03aa5a)
@@ -433,7 +433,7 @@ function void fn03ac86()
 				return
 		#endif
 
-			if (u8[A1 + 0x2a] & 0x08)
+			if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 			{
 				A3 = 0xffff0000 + u16[A1 + 0x42]
 				if (u32[A3] == 0x03a84c)

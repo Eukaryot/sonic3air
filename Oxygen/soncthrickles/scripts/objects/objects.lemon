@@ -15,7 +15,7 @@
 //# address-hook(0x02bf20) end(0x02bf54)
 function void GenericObject.Init()
 {
-	u32[A0 + 0xc] = 0x02bfda
+	objA0.mapping_offset = 0x02bfda
 	objA0.render_flags |= render_flag.WORLD
 	objA0.state = objA0.subtype2c
 

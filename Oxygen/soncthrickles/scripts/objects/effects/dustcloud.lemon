@@ -226,7 +226,7 @@ function void fn018cb6()
 	if (s8[A0 + 0x36] < 0)
 	{
 		u8[A0 + 0x36] = 3
-		if ((u8[A2 + 0x2a] & 0x40) == 0)
+		if ((u8[A2 + 0x2a] & char.flag.UNDERWATER) == 0)
 		{
 			if (allocDynamicObjectStd())
 			{
@@ -347,7 +347,7 @@ function void fn018ff6()
 
 	objA0.position.x.u16 = u16[A2 + 0x10]
 	objA0.position.y.u16 = u16[A2 + 0x14]
-	objA0.flags2a = u8[A2 + 0x2a] & 0x01
+	objA0.flags2a = u8[A2 + 0x2a] & char.flag.FACING_LEFT
 	if (objA0.state.former == 0)
 	{
 		objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)

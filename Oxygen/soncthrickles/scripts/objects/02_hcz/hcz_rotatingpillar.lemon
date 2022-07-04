@@ -192,7 +192,7 @@ function void fn032784()
 		if (D0.s16 < 0)
 			D0.s16 = -D0.s16
 
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			if (D0.u16 >= 0x0480)
 			{

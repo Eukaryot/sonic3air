@@ -133,7 +133,7 @@ function void fn00717c()
 
 function void fn0071e4()
 {
-	if ((u8[A1 + 0x2a] & 0x0a) == 0)
+	if ((u8[A1 + 0x2a] & (char.flag.ON_OBJECT | char.flag.IN_AIR)) == 0)
 	{
 		A2 = 0xffff8000
 		D0.u16 = (objA1.position.y.u16 >> 5) & level.chunksize.bitmask
@@ -373,7 +373,7 @@ function void fn00730c()
 	{
 		u16[A1 + 0x32] = 0x05
 		u8[A1 + 0x2b] &= ~char.bonus.INFINITE_INERTIA
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]

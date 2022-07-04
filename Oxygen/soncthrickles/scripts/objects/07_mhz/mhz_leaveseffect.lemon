@@ -42,7 +42,7 @@ function void MHZLeavesEffect.UpdateForPlayer()
 	if (u8[A2 + 0x46] != 0x0c)
 		return
 
-	if (u8[A2 + 0x2a] & 0x02)
+	if (u8[A2 + 0x2a] & char.flag.IN_AIR)
 	{
 		u16[A3] = u16[A2 + 0x1a]
 		return
@@ -57,7 +57,7 @@ function void MHZLeavesEffect.UpdateForPlayer()
 	if (D2.u16 != 0)
 	{
 		u16[A3] = 0
-		if ((u8[A2 + 0x2a] & 0x08) == 0 && D2.u16 >= 0x0400)
+		if ((u8[A2 + 0x2a] & char.flag.ON_OBJECT) == 0 && D2.u16 >= 0x0400)
 		{
 			D2.u16 = 0x0100
 			A4 = 0x03db50

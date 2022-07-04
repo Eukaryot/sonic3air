@@ -529,7 +529,7 @@ function void fn03519a()
 //# address-hook(0x035202) end(0x035268)
 function void fn035202()
 {
-	if ((u8[A1 + 0x2a] & 0x08) == 0)
+	if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 	{
 		if (u8[A4] >= 4)
 		{

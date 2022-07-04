@@ -1625,7 +1625,7 @@ function void fn059f82()
 	D0.u16 += 0x10
 	if (objA1.position.x.u16 < D0.u16)
 	{
-		if (u8[A1 + 0x2a] & 0x20)
+		if (u8[A1 + 0x2a] & char.flag.PUSHING)
 		{
 			A0 = A1
 			Character.Die()

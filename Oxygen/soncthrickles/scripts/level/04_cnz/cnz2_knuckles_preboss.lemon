@@ -76,7 +76,7 @@ function void fn062528()
 function void fn06254e()
 {
 	A1 = 0xffffb000
-	if (objA1.position.x.u16 >= 0x4728 && u8[A1 + 0x2a] & 0x02)
+	if (objA1.position.x.u16 >= 0x4728 && u8[A1 + 0x2a] & char.flag.IN_AIR)
 	{
 		objA0.base_state = 0x04
 	}

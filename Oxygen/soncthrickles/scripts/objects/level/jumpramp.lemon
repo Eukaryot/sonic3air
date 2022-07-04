@@ -37,7 +37,7 @@ function void fn024d68()
 //# address-hook(0x024d9a) end(0x024e32)
 function void fn024d9a()
 {
-	if (u8[A1 + 0x2a] & 0x02)
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		return
 
 	s16 dx = objA1.position.x.u16 - objA0.position.x.u16 + 0x10

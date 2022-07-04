@@ -72,7 +72,7 @@ function void fn033cac()
 			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16
 			if (D0.u16 < 0x20)
 			{
-				if (u8[A1 + 0x2e] == 0 && debug_mode.state == 0 && (u8[A1 + 0x2a] & 0x02) == 0)
+				if (u8[A1 + 0x2e] == 0 && debug_mode.state == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 				{
 					D0.u8 = u8[A1 + 0x26]
 					D0.u8 &= 0x7f

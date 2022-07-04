@@ -152,16 +152,16 @@ function void fn0338c4()
 			return
 		}
 
-		if (u8[A1 + 0x2a] & 0x02)
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 		{
 			objA1.velocity.x = -0x800
 			objA1.velocity.y = -0x200
-			u8[A1 + 0x2a] |= 0x01
+			u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
 			if (D0.s16 >= 0)
 			{
 				objA1.velocity.x = -objA1.velocity.x
-				u8[A1 + 0x2a] &= ~0x01
+				u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 			}
 		}
 		else
@@ -239,7 +239,7 @@ function void fn033ade()
 		{
 			objA1.velocity.x = -0x800
 			objA1.velocity.y = -0x200
-			u8[A1 + 0x2a] |= 0x01
+			u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			u8[A1 + 0x40] = 0
 
@@ -247,12 +247,12 @@ function void fn033ade()
 			if (D0.s16 >= 0)
 			{
 				objA1.velocity.x = -objA1.velocity.x
-				u8[A1 + 0x2a] &= ~0x01
+				u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 			}
 		}
 		else
 		{
-			if ((u8[A1 + 0x2a] & 0x02) == 0)
+			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 			{
 				D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + u16[A0 + 0x38]
 				if (D0.u16 < u16[A0 + 0x3a])
@@ -335,14 +335,14 @@ function void fn033c34()
 {
 	u8 bit = (1 << D6.u8)
 
-	if (u8[A1 + 0x2a] & 0x08)
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
 		A3 = 0xffff0000 + u16[A1 + 0x42]
 		u8[A3 + 0x2a] &= ~bit
 	}
 
 	u16[A1 + 0x42] = A0.u16
-	if (u8[A1 + 0x2a] & 0x02)
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 	{
 		objA1.velocity.x = 0
 		u32 backupA0 = A0

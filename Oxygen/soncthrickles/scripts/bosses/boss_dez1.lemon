@@ -572,7 +572,7 @@ function void fn07e298()
 		if (D0.u16 > objA1.position.x.u16)
 		{
 			D1 = 0
-			if (u8[A1 + 0x2a] & 0x20)
+			if (u8[A1 + 0x2a] & char.flag.PUSHING)
 			{
 				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}
@@ -586,7 +586,7 @@ function void fn07e298()
 		if (D0.u16 < objA1.position.x.u16)
 		{
 			D1 = 0
-			if (u8[A1 + 0x2a] & 0x20)
+			if (u8[A1 + 0x2a] & char.flag.PUSHING)
 			{
 				D1.u16 |= 0x4040		// CONTROL_A, CONTROL_A
 			}

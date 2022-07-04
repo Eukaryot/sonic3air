@@ -48,7 +48,7 @@ function void fn03a270()
 		return
 	}
 
-	if ((u8[A1 + 0x2a] & 0x02) == 0)
+	if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
 		bool inRange = false
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
@@ -112,7 +112,7 @@ function void fn03a314()
 	u8 bit = (1 << D6.u8)
 
 	D0.u16 = abs(s16[A1 + 0x1c])
-	if (D0.u16 >= 0x0400 && (u8[A1 + 0x2a] & 0x02) == 0)
+	if (D0.u16 >= 0x0400 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
 		if (u32[A2] != 0)
 		{
@@ -123,7 +123,7 @@ function void fn03a314()
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0xc0
 		if (D0.s16 >= 0 && D0.s16 < 0x0180)
 		{
-			if ((u8[A1 + 0x2a] & 0x08) == 0)
+			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 				return
 
 			if (objA0.subtype2c != 0)

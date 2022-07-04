@@ -43,7 +43,7 @@ function void fn0400f0()
 	{
 		if (dx < D3.u16 && dy < 0x40)
 		{
-			if (u8[A1 + 0x2a] & 0x02 && (u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x06 && u8[A1 + 0x2e] == 0)
+			if (u8[A1 + 0x2a] & char.flag.IN_AIR && (u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < 0x06 && u8[A1 + 0x2e] == 0)
 			{
 				if (objA1.velocity.y < 0)
 				{
@@ -89,7 +89,7 @@ function void fn0400f0()
 	{
 		if (dx < D3.u16 && dy < 0x40)
 		{
-			if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x2a] & 0x02)
+			if (u8[A1 + 0x2e] == 0 && u8[A1 + 0x2a] & char.flag.IN_AIR)
 			{
 				// Check if jump button pressed
 				D5.u16 &= CONTROL_ABC

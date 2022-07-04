@@ -114,7 +114,7 @@ function void fn01d1e2()
 			return
 
 		D0.u8 = objA0.subtype2c
-		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & char.flag.IN_AIR))
 			return
 
 		D2.u16 = abs(s16(objA1.position.x.u16 - D1.u16))
@@ -185,7 +185,7 @@ function void fn01d1e2()
 			return
 
 		D0.u8 = objA0.subtype2c
-		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & char.flag.IN_AIR))
 			return
 
 		D2.u16 = abs(s16(objA1.position.x.u16 - D1.u16))
@@ -285,7 +285,7 @@ function void fn01d3b8()
 			return
 
 		D0.u8 = objA0.subtype2c
-		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & char.flag.IN_AIR))
 			return
 
 		D2.u16 = abs(s16(objA1.position.y.u16 - D1.u16))
@@ -356,7 +356,7 @@ function void fn01d3b8()
 			return
 
 		D0.u8 = objA0.subtype2c
-		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & 0x02))
+		if ((objA0.subtype2c & 0x80) && (u8[A1 + 0x2a] & char.flag.IN_AIR))
 			return
 
 		D2.u16 = abs(s16(objA1.position.y.u16 - D1.u16))

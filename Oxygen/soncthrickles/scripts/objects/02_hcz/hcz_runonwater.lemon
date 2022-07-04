@@ -182,7 +182,7 @@ function void fn03857e()
 			objA1.velocity.y = 0
 			u16[A2] = objA1.position.x.u16
 			u16[A2 + 0x02] = water.height.current
-			if ((u8[A1 + 0x2a] & 0x02) == 0)
+			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 				return
 
 			D5.u16 &= 0x0c00

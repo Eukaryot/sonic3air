@@ -50,7 +50,7 @@ function void fn048c44()
 
 	if (D0.u16 < 0x10 && D1.u16 < 0x40)
 	{
-		if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & 0x02) == 0 && (u8[0xfffffab8] & 0x01) == 0)
+		if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && (u8[0xfffffab8] & 0x01) == 0)
 		{
 			A3 = 0xffff0000 + u16[A1 + 0x42]
 			if (u32[A3] == 0x048c16)
@@ -69,7 +69,7 @@ function void fn048c44()
 			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA1.position.x.u16 = objA0.position.x.u16
-			if (u8[A1 + 0x2a] & 0x04)
+			if (u8[A1 + 0x2a] & char.flag.ROLLING)
 			{
 				u8[A1 + 0x2a] &= ~char.flag.ROLLING
 				D0.u8 = u8[A1 + 0x1e] - u8[A1 + 0x44]

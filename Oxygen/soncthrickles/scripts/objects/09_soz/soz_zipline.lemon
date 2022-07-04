@@ -808,7 +808,7 @@ function void fn04b0de()
 	D0.u8 = u8[0x04b120 + D0.s16]
 
 	objA1.render_flags = (objA1.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | D0.u8
-	u8[A1 + 0x2a] = (u8[A1 + 0x2a] & 0xfc) | D0.u8
+	u8[A1 + 0x2a] = (u8[A1 + 0x2a] & ~(char.flag.FACING_LEFT | char.flag.IN_AIR)) | D0.u8
 
 	fn04b08e()
 }

@@ -368,7 +368,7 @@ function void fn090c34()
 	{
 		objA0.flags38 &= ~0x08
 		A1 = 0xffff0000 + u16[A0 + 0x44]
-		if ((u8[A1 + 0x2a] & 0x08) && (objA0.flags38 & 0x20))
+		if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) && (objA0.flags38 & 0x20))
 		{
 			playSound(0xaf)
 			level.restart = 1

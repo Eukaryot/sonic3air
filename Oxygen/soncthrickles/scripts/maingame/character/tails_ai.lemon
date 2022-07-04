@@ -164,7 +164,7 @@ function bool updateTailsAssist()
 			}
 
 			control.tails = 0
-			control.tails.state = (input & (CONTROL_RIGHT | CONTROL_LEFT))
+			control.tails.state = (input & (CONTROL_LEFT | CONTROL_RIGHT))
 			if (input & CONTROL_DOWN)
 			{
 				// Nothing here, just fly down

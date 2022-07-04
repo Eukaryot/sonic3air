@@ -74,7 +74,7 @@ function void fn03fd4e()
 	{
 		if (dx < 0x20 && dy < D3.u16)
 		{
-			if (u8[A1 + 0x2a] & 0x02 && (u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
+			if (u8[A1 + 0x2a] & char.flag.IN_AIR && (u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0)
 			{
 				objA0.flags2a |= bit
 
@@ -94,7 +94,7 @@ function void fn03fd4e()
 	{
 		if (dx < 0x20 && dy < D3.u16)
 		{
-			if (u8[A1 + 0x2a] & 0x02)
+			if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 			{
 				// Check if jump button pressed
 				if (D5.u16 & CONTROL_ABC)
@@ -174,7 +174,7 @@ function void fn03fe70()
 	{
 		if (dx < D3.u16 && dy < 0x20)
 		{
-			if (u8[A1 + 0x2a] & 0x02 && (u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0)
+			if (u8[A1 + 0x2a] & char.flag.IN_AIR && (u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < 0x04 && u8[A1 + 0x2e] == 0 && objA1.velocity.y >= 0)
 			{
 				u8[A1 + 0x2a] |= char.flag.ON_OBJECT
 				objA0.flags2a |= bit
@@ -194,7 +194,7 @@ function void fn03fe70()
 	{
 		if (dx < D3.u16 && dy < 0x20)
 		{
-			if (u8[A1 + 0x2a] & 0x02)
+			if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 			{
 				// Check if jump button pressed
 				D5.u16 &= CONTROL_ABC

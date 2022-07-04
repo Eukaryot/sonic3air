@@ -206,20 +206,21 @@ function void RenderHUD()
 		{
 			if (ring_counter == 0)
 			{
-				D4 += 2
+				D4 += 2		// Set rings HUD text to flicker
 			}
 			if (timer.minutes == 9 && !isBonusStage)
 			{
-				D4 += 4
+				D4 += 4		// Set timer HUD text to flicker
 			}
 		}
 
 		// Targets:
-		//  - 0x00dbc2	-> D4.u16 = 0x00
-		//  - 0x00dc00	-> D4.u16 = 0x02
-		//  - 0x00dc32	-> D4.u16 = 0x04
-		//  - 0x00dc96	-> D4.u16 = 0x08
-		//  - 0x00dcb6	-> D4.u16 = 0x0a
+		//  - 0x00dbc2	-> D4.u16 = 0x00		// Complete HUD text
+		//  - 0x00dc00	-> D4.u16 = 0x02		// HUD with rings text flickering
+		//  - 0x00dc32	-> D4.u16 = 0x04		// HUD with time text flickering
+		//  - 0x00dc6a	-> D4.u16 = 0x06		// HUD with both rings and time flickering
+		//  - 0x00dc96	-> D4.u16 = 0x08		// Bonus stage HUD
+		//  - 0x00dcb6	-> D4.u16 = 0x0a		// Bonus stage HUD with rings text flickering
 		A1 = tableLookupAddress(0x00dbb6, D4.u16)
 
 		D4.s16 = u16[A1] - 1
@@ -246,7 +247,7 @@ function void UpdateTimeAndHud()
 			if (hud.dirty.score)
 			{
 				hud.dirty.score = 0
-				D0 = 0x5c800003
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdc80)
 				D1 = player.score
 				RefreshScoreHudDisplay()
 			}
@@ -259,7 +260,7 @@ function void UpdateTimeAndHud()
 					ResetRingsDisplay()
 				}
 				hud.dirty.rings = 0
-				D0 = 0x5f400003
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
 				D1 = ring_counter
 				RefreshRingsHudDisplay()
 			}
@@ -351,7 +352,7 @@ function void UpdateTimeAndHud()
 					ResetRingsDisplay()
 				}
 				hud.dirty.rings = 0
-				D0 = 0x5f400003
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
 				D1 = ring_counter
 				RefreshRingsHudDisplay()
 			}

@@ -55,7 +55,7 @@ function void fn042574()
 		D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
 		if (D0.u16 < 0x20)
 		{
-			if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & 0x02) == 0)
+			if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 			{
 				if (objA0.flags2a & 0x01)
 				{
@@ -99,7 +99,7 @@ function void fn042574()
 function void fn042636()
 {
 	u8 bit = (1 << D6.u8)
-	if (u8[A1 + 0x2a] & 0x08)
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
 		A3 = 0xffff0000 + u16[A1 + 0x42]
 		u8[A3 + 0x2a] &= ~bit

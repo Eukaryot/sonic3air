@@ -413,7 +413,7 @@ function void fn0324c0()
 
 		u16[A1 + 0x1c] = 0
 		D0.s16 = abs(objA0.velocity.y)
-		if ((u8[A1 + 0x2a] & 0x02) == 0 && D0.u16 >= 0x0480)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && D0.u16 >= 0x0480)
 		{
 			u16[A1 + 0x1c] = 0x800
 		}

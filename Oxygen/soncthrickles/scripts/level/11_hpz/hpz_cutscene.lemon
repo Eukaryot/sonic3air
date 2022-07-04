@@ -1152,7 +1152,7 @@ function void fn064e28()
 function void fn064e46()
 {
 	A1 = 0xffffb000
-	if (objA1.position.y.u16 >= 0x0580 && (u8[A1 + 0x2a] & 0x02) == 0)
+	if (objA1.position.y.u16 >= 0x0580 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
 		objA0.update_address = 0x064e6c
 		player1.control_override = 0

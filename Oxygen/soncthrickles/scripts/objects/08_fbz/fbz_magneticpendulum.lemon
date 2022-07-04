@@ -217,7 +217,7 @@ function void fn03d4c2()
 				D2 = D0
 				D2.s32 >>= 3
 				D0 += D2
-				if ((u8[A2 + 0x2a] & 0x04) == 0)
+				if ((u8[A2 + 0x2a] & char.flag.ROLLING) == 0)
 				{
 					D3.s32 >>= 2
 					D1 += D3
@@ -367,7 +367,7 @@ function void fn03d78c()
 						{
 							D0 = 0x1d
 							D1 = 0x21
-							if ((u8[A2 + 0x2a] & 0x04) == 0)
+							if ((u8[A2 + 0x2a] & char.flag.ROLLING) == 0)
 							{
 								D0 = 0x22
 								D1 = 0x26
@@ -416,7 +416,7 @@ function void fn03d78c()
 						{
 							D0 = 0x1d
 							D1 = 0x21
-							if ((u8[A2 + 0x2a] & 0x04) == 0)
+							if ((u8[A2 + 0x2a] & char.flag.ROLLING) == 0)
 							{
 								D0 = 0x22
 								D1 = 0x26

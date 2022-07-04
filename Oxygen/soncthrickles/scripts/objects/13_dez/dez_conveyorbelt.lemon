@@ -42,7 +42,7 @@ function void fn047854()
 
 	if (D0.u16 < u16[A0 + 0x34] && D1.u16 < 0x60)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			D0.u16 = u16[A0 + 0x30]
 			if (D1.u16 >= 0x30)

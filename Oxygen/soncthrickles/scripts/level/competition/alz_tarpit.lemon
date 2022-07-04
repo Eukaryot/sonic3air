@@ -24,7 +24,7 @@ function void fn032b8c()
 		{
 			objA0.flags38 += 2
 		}
-		if (u8[A1 + 0x2a] & 0x08)
+		if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 		{
 			A2 = 0xffff0000 + u16[A1 + 0x42]
 			if (u32[A2] == 0x032aae)
@@ -63,7 +63,7 @@ function void fn032b8c()
 		{
 			objA0.value3a += 2
 		}
-		if (u8[A1 + 0x2a] & 0x08)
+		if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 		{
 			A2 = 0xffff0000 + u16[A1 + 0x42]
 			if (u32[A2] == 0x032aae)

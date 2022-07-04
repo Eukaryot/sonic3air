@@ -152,7 +152,7 @@ function void fn044d98()
 	if (D0 & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
-		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR && u8[A1 + 0x40] == 0)
 		{
 			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}
@@ -160,7 +160,7 @@ function void fn044d98()
 	if (D0 & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
-		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR && u8[A1 + 0x40] == 0)
 		{
 			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}
@@ -283,7 +283,7 @@ function void fn044eba()
 	if (D0 & object.flag.P1_ON_OBJECT)
 	{
 		A1 = 0xffffb000
-		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR && u8[A1 + 0x40] == 0)
 		{
 			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}
@@ -291,7 +291,7 @@ function void fn044eba()
 	if (D0 & object.flag.P2_ON_OBJECT)
 	{
 		A1 = 0xffffb04a
-		if (u8[A1 + 0x2a] & 0x02 && u8[A1 + 0x40] == 0)
+		if (u8[A1 + 0x2a] & char.flag.IN_AIR && u8[A1 + 0x40] == 0)
 		{
 			u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		}

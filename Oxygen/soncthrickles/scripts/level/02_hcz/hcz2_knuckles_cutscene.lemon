@@ -89,7 +89,7 @@ function void fn06215e()
 function void fn062194()
 {
 	A1 = 0xffffb000
-	if (objA1.position.x.u16 >= 0x3990 && u8[A1 + 0x2e] == 0 && u8[A1 + 0x2a] & 0x08)
+	if (objA1.position.x.u16 >= 0x3990 && u8[A1 + 0x2e] == 0 && u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 	{
 		objA0.base_state = 0x04
 		fn065dd6()

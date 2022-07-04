@@ -128,7 +128,7 @@ function void fn03f996()
 			return
 
 		objA0.value32 = 0
-		D0.u8 = u8[A1 + 0x2a] & 0x18
+		D0.u8 = u8[A1 + 0x2a] & (object.flag.P1_ON_OBJECT | object.flag.P2_ON_OBJECT)
 		if (D0.u8 == 0)
 		{
 			u16[A0 + 0x3a] = 0

@@ -57,7 +57,7 @@ function void fn032aae()
 			}
 
 			A2 = 0xffff0000 + u16[A1 + 0x42]
-			if ((u8[A1 + 0x2a] & 0x08) && u32[A2] == 0x032aae)
+			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) && u32[A2] == 0x032aae)
 			{
 				objA0.flags38 = u8[A2 + 0x38]
 			}
@@ -90,7 +90,7 @@ function void fn032aae()
 			}
 			A2 = 0xffff0000 + u16[A1 + 0x42]
 
-			if ((u8[A1 + 0x2a] & 0x08) && u32[A2] == 0x032aae)
+			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) && u32[A2] == 0x032aae)
 			{
 				objA0.value3a = u8[A2 + 0x3a]
 			}

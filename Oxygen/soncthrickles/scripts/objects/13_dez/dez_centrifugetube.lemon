@@ -97,7 +97,7 @@ function void fn048fa4()
 {
 	u8 bit = (1 << D6.u8)
 
-	if (u8[A1 + 0x2a] & 0x02)
+	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 	{
 		objA1.velocity.y = 0
 	}
@@ -106,7 +106,7 @@ function void fn048fa4()
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D4.u16
 		if (D0.u16 < D5.u16)
 		{
-			if ((u8[A1 + 0x2a] & 0x08) == 0)
+			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 				return
 
 			D0.u8 = u8[A2]
@@ -250,7 +250,7 @@ function void fn049090()
 		return
 	}
 
-	if ((u8[A1 + 0x2a] & 0x08) == 0)
+	if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 		return
 
 	if (objA1.velocity.y >= 0)
@@ -365,7 +365,7 @@ function void fn0492d4()
 		D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x20
 		if (D0.u16 < 0x40 && D1.u16 < 0x40)
 		{
-			if ((u8[A1 + 0x2a] & 0x08) == 0 && u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
+			if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0 && u8[A1 + 0x05] < 0x06 && debug_mode.state == 0)
 			{
 				u8[A1 + 0x2a] |= char.flag.IN_AIR
 				objA1.velocity.x = 0

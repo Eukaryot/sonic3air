@@ -364,11 +364,11 @@ function void renderNextObject()
 			}
 		}
 
-		D3.u16 = u16[A0 + 0x16] - 1	// Number of child sprites
+		D3.u16 = u16[A0 + 0x16] - 1	// Number of compound sprites
 		if (D3.s16 < 0)
 			return	// Skip if none
 
-		A0 += 0x18	// Start of child sprite data (u8[A0 + 0x05] = map frame)
+		A0 += 0x18	// Start of compound sprite data (u8[A0 + 0x05] = map frame)
 
 	#if STANDALONE
 		while (D3.s16 >= 0)
@@ -376,16 +376,16 @@ function void renderNextObject()
 		while (D3.s16 >= 0 && D7.s16 >= 0)
 	#endif
 		{
-			D0.u16 = u16[A0]		// Child sprite X position
-			D1.u16 = u16[A0 + 2]	// Child sprite Y position
+			D0.u16 = u16[A0]		// Compound sprite X position
+			D1.u16 = u16[A0 + 2]	// Compound sprite Y position
 			if (D6 & render_flag.WORLD)
 			{
 				D0.u16 = (D0.u16 + 0x80 - cameraX)
 				D1.u16 = (D1.u16 + 0x80 - cameraY) & level.height.bitmask
 			}
 
-			D4 = u16(u8[A0 + 5]) * 2	// Child sprite map frame id
-			A0 += 6	// To next child sprite (?)
+			D4 = u16(u8[A0 + 5]) * 2	// Compound sprite map frame id
+			A0 += 6	// To next compound sprite (?)
 
 			A1 = tableLookupAddress(A2, D4.u16)
 			D4.u16 = u16[A1] - 1
@@ -769,17 +769,17 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 			}
 		}
 
-		D3.u16 = objA0.position.y.frac - 1	// Number of child sprites
+		D3.u16 = objA0.position.y.frac - 1	// Number of compound sprites
 		if (D3.s16 >= 0)
 		{
-			A0 += 0x18	// Start of child sprite data (u8[A0 + 0x05] = map frame)
+			A0 += 0x18	// Start of compound sprite data (u8[A0 + 0x05] = map frame)
 			while (D3.s16 >= 0 && D7.s16 >= 0)
 			{
-				D0.u16 = (u16[A0]   - u16[A3]   + 0x80) & level.width.bitmask	// Child sprite X position
-				D1.u16 = (u16[A0+2] - u16[A3+4] + 0x80) & level.height.bitmask	// Child sprite Y position
+				D0.u16 = (u16[A0]   - u16[A3]   + 0x80) & level.width.bitmask	// Compound sprite X position
+				D1.u16 = (u16[A0+2] - u16[A3+4] + 0x80) & level.height.bitmask	// Compound sprite Y position
 				D1.u16 += offsetY
-				D4 = u8[A0+5]	// Child sprite map frame id
-				A0 += 6			// To next child sprite (?)
+				D4 = u8[A0+5]	// Compound sprite map frame id
+				A0 += 6			// To next compound sprite (?)
 
 				A1 = tableLookupAddress(A2, D4.u16 * 2)
 				D4.s16 = s16[A1] - 1

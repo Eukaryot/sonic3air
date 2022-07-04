@@ -53,7 +53,7 @@ function void fn03dcd0()
 
 	if ((objA0.flags2a & bit) == 0)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
 			if (objA1.velocity.x > 0)
@@ -108,14 +108,14 @@ function void fn03dcd0()
 	D0.u16 = abs(s16[A1 + 0x1c])
 	if (D0.u16 >= 0x0500)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x40
 			if (D0.s16 >= 0)
 			{
 				if (D0.u16 < 0x80)
 				{
-					if ((u8[A1 + 0x2a] & 0x08) == 0)
+					if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 						return
 
 					D2.u16 = D0.u16
@@ -189,7 +189,7 @@ function void fn03de80()
 
 	if ((objA0.flags2a & bit) == 0)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
 			if (objA1.velocity.x != 0)
@@ -251,14 +251,14 @@ function void fn03de80()
 	D0.u16 = abs(s16[A1 + 0x1c])
 	if (D0.u16 >= 0x0500)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x40
 			if (D0.s16 >= 0)
 			{
 				if (D0.u16 < 0x80)
 				{
-					if ((u8[A1 + 0x2a] & 0x08) == 0)
+					if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 						return
 
 					D2.u16 = D0.u16
