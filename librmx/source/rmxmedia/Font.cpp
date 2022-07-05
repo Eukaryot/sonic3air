@@ -338,20 +338,23 @@ Font::CharacterInfo& Font::applyEffects(const TypeInfo& typeInfo)
 	return characterInfo;
 }
 
-void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment, int spacing)
+void Font::printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment, int spacing, int* reservedOutputSize)
 {
 	Recti innerRect;
-	printBitmap(outBitmap, innerRect, text, spacing);
+	printBitmap(outBitmap, innerRect, text, spacing, reservedOutputSize);
 	outDrawPosition = applyAlignment(drawRect, innerRect, alignment);
 }
 
-void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing)
+void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing, int* reservedOutputSize)
 {
 	// Render text into a bitmap
 	FontSource* fontSource = getFontSource();
 	if (nullptr == fontSource || text.mLength == 0)
 	{
-		outBitmap.clear();
+		if (nullptr == reservedOutputSize)
+			outBitmap.clear();
+		else
+			outBitmap.createReusingMemory(0, 0, *reservedOutputSize);
 		return;
 	}
 
@@ -362,7 +365,10 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	applyToTypeInfos(extendedTypeInfos, typeInfos);
 	if (extendedTypeInfos.empty())
 	{
-		outBitmap.clear();
+		if (nullptr == reservedOutputSize)
+			outBitmap.clear();
+		else
+			outBitmap.createReusingMemory(0, 0, *reservedOutputSize);
 		return;
 	}
 
@@ -379,9 +385,14 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 		boundsMax.y = std::max(boundsMax.y, maxPos.y);
 	}
 
-	// Setup and fill bitmap
-	outBitmap.create(boundsMax.x - boundsMin.x, boundsMax.y - boundsMin.y, 0);
+	// Setup bitmap
+	const Vec2i size(boundsMax.x - boundsMin.x, boundsMax.y - boundsMin.y);
+	if (nullptr == reservedOutputSize)
+		outBitmap.create(size.x, size.y, 0);
+	else
+		outBitmap.createReusingMemory(size.x, size.y, *reservedOutputSize, 0);
 
+	// Fill bitmap
 	for (const ExtendedTypeInfo& extendedTypeInfo : extendedTypeInfos)
 	{
 		outBitmap.insertBlend(extendedTypeInfo.mDrawPosition.x - boundsMin.x, extendedTypeInfo.mDrawPosition.y - boundsMin.y, *extendedTypeInfo.mBitmap);

@@ -119,8 +119,8 @@ public:
 	void applyToTypeInfos(std::vector<ExtendedTypeInfo>& outTypeInfos, const std::vector<Font::TypeInfo>& inTypeInfos);
 	CharacterInfo& applyEffects(const Font::TypeInfo& typeInfo);
 
-	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment = 1, int spacing = 0);
-	void printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing = 0);
+	void printBitmap(Bitmap& outBitmap, Vec2i& outDrawPosition, const Recti& drawRect, const StringReader& text, int alignment = 1, int spacing = 0, int* reservedOutputSize = nullptr);
+	void printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReader& text, int spacing = 0, int* reservedOutputSize = nullptr);
 
 public:
 	static Vec2i applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment);

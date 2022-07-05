@@ -53,6 +53,7 @@ public:
 	void create(int wid, int hgt);
 	void create(int wid, int hgt, uint32 color);
 	void createReusingMemory(int wid, int hgt, int& reservedSize);
+	void createReusingMemory(int wid, int hgt, int& reservedSize, uint32 color);
 
 	// Clear bitmap
 	void clear();

@@ -87,16 +87,15 @@ namespace softwaredrawer
 		}
 	}
 
-	void mirrorBitmapX(std::vector<uint32>& destBuffer, const BitmapWrapper& sourceBitmap)
+	void mirrorBitmapX(Bitmap& destBitmap, int& destReservedSize, const Bitmap& sourceBitmap)
 	{
-		const int wid = sourceBitmap.mSize.x;
-		const int hgt = sourceBitmap.mSize.y;
-		destBuffer.resize(wid * hgt);
-		for (int y = 0; y < hgt; ++y)
+		destBitmap.createReusingMemory(sourceBitmap.getWidth(), sourceBitmap.getHeight(), destReservedSize);
+		for (int y = 0; y < sourceBitmap.getHeight(); ++y)
 		{
-			const uint32* src = sourceBitmap.getPixelPointer(wid - 1, y);
-			uint32* dst = &destBuffer[y * wid];
-			for (int x = 0; x < wid; ++x)
+			const uint32* src = sourceBitmap.getPixelPointer(sourceBitmap.getWidth() - 1, y);
+			uint32* dst = destBitmap.getPixelPointer(0, y);
+
+			for (int x = 0; x < sourceBitmap.getWidth(); ++x)
 			{
 				*dst = *src;
 				--src;
@@ -247,10 +246,10 @@ namespace softwaredrawer
 		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
 		{
 			BitmapWrapper& outputWrapper = getOutputWrapper();
-			Bitmap& bufferBitmap = mTempBitmap;
+			Bitmap& bufferBitmap = mTempBuffer;
 
 			Vec2i drawPosition;
-			font.printBitmap(bufferBitmap, drawPosition, rect, text, printOptions.mAlignment, printOptions.mSpacing);
+			font.printBitmap(bufferBitmap, drawPosition, rect, text, printOptions.mAlignment, printOptions.mSpacing, &mTempReservedSize);
 			if (printOptions.mTintColor != Color::WHITE)
 			{
 				softwaredrawer::applyTintToBitmap(bufferBitmap, printOptions.mTintColor);
@@ -289,8 +288,8 @@ namespace softwaredrawer
 		Recti mScissorRect;
 		std::vector<Recti> mScissorStack;
 
-		Bitmap mTempBitmap;
-		std::vector<uint32> mTempBuffer;
+		Bitmap mTempBuffer;
+		int mTempReservedSize = 0;
 
 	private:
 		DrawerTexture* mCurrentRenderTarget = nullptr;
@@ -386,14 +385,16 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 
 					if (nullptr != dc.mTexture)
 					{
-						BitmapWrapper inputWrapper(dc.mTexture->accessBitmap());
+						Bitmap* inputBitmap = &dc.mTexture->accessBitmap();
 
 						// Consider mirroring
 						if (mirrorX)
 						{
-							softwaredrawer::mirrorBitmapX(mInternal.mTempBuffer, inputWrapper);
-							inputWrapper.Set(&mInternal.mTempBuffer[0], inputWrapper.mSize);
+							softwaredrawer::mirrorBitmapX(mInternal.mTempBuffer, mInternal.mTempReservedSize, *inputBitmap);
+							inputBitmap = &mInternal.mTempBuffer;
 						}
+
+						BitmapWrapper inputWrapper(*inputBitmap);
 
 						Recti inputRect;
 						bool useUVs = false;
@@ -409,12 +410,11 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 								uv1 = dc.mUV0 + relativeEnd   * (dc.mUV1 - dc.mUV0);
 							}
 
-							useUVs = (uv0.x < 0.0f || uv0.x > uv1.x || uv1.x > 1.0f ||
-									  uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
+							useUVs = (uv0.x < 0.0f || uv0.x > uv1.x || uv1.x > 1.0f || uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
 
 							// Get the part from the input that will get drawn
-							const Vec2f inputStart = uv0 * Vec2f(inputWrapper.mSize);
-							const Vec2f inputEnd = uv1 * Vec2f(inputWrapper.mSize);
+							const Vec2f inputStart = uv0 * Vec2f(inputBitmap->getSize());
+							const Vec2f inputEnd = uv1 * Vec2f(inputBitmap->getSize());
 							inputRect.x = roundToInt(inputStart.x);
 							inputRect.y = roundToInt(inputStart.y);
 							inputRect.width = roundToInt(inputEnd.x) - inputRect.x;

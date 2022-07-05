@@ -117,6 +117,12 @@ void Bitmap::createReusingMemory(int wid, int hgt, int& reservedSize)
 	}
 }
 
+void Bitmap::createReusingMemory(int wid, int hgt, int& reservedSize, uint32 color)
+{
+	createReusingMemory(wid, hgt, reservedSize);
+	clear(color);
+}
+
 void Bitmap::clear()
 {
 	if (nullptr != mData)
