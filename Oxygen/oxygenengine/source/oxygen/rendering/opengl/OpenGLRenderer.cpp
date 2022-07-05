@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/hardware/HardwareRenderer.h"
+#include "oxygen/rendering/opengl/OpenGLRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"

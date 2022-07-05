@@ -10,12 +10,12 @@
 
 #include "oxygen/rendering/Renderer.h"
 #include "oxygen/rendering/Geometry.h"
-#include "oxygen/rendering/hardware/HardwareRenderResources.h"
-#include "oxygen/rendering/hardware/shaders/DebugDrawPlaneShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderPlaneShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderVdpSpriteShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderPaletteSpriteShader.h"
-#include "oxygen/rendering/hardware/shaders/RenderComponentSpriteShader.h"
+#include "oxygen/rendering/opengl/OpenGLRenderResources.h"
+#include "oxygen/rendering/opengl/shaders/DebugDrawPlaneShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderPlaneShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderVdpSpriteShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderPaletteSpriteShader.h"
+#include "oxygen/rendering/opengl/shaders/RenderComponentSpriteShader.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 

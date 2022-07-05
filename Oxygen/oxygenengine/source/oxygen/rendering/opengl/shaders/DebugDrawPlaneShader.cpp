@@ -7,8 +7,8 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/hardware/shaders/DebugDrawPlaneShader.h"
-#include "oxygen/rendering/hardware/HardwareRenderResources.h"
+#include "oxygen/rendering/opengl/shaders/DebugDrawPlaneShader.h"
+#include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/helper/FileHelper.h"

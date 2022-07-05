@@ -14,7 +14,7 @@
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/RenderResources.h"
-#include "oxygen/rendering/hardware/HardwareRenderer.h"
+#include "oxygen/rendering/opengl/OpenGLRenderer.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/resources/FontCollection.h"
