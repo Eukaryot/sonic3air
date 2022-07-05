@@ -79,6 +79,9 @@
     <Filter Include="application\gameview">
       <UniqueIdentifier>{966bc23b-1c4a-4d58-830f-bf7ddf86fe96}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rendering\sprite">
+      <UniqueIdentifier>{90c5c534-16d1-435b-841a-5303039a83ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -123,13 +126,7 @@
     <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\ComponentSprite.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\PaletteSprite.cpp">
       <Filter>rendering\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\RenderUtils.cpp">
@@ -228,9 +225,6 @@
     <ClCompile Include="..\..\source\oxygen\simulation\sound\ym2612.cpp">
       <Filter>simulation\sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteBase.cpp">
-      <Filter>rendering\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\EngineMain.cpp">
       <Filter>application</Filter>
     </ClCompile>
@@ -243,9 +237,6 @@
     <ClCompile Include="..\..\source\oxygen\pch.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\Configuration.cpp">
       <Filter>application</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\utils\SpriteDump.cpp">
-      <Filter>rendering\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp">
       <Filter>rendering\utils</Filter>
@@ -397,6 +388,18 @@
     <ClCompile Include="..\..\source\oxygen\resources\FontCollection.cpp">
       <Filter>resources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.cpp">
+      <Filter>rendering\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.cpp">
+      <Filter>rendering\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteBase.cpp">
+      <Filter>rendering\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteDump.cpp">
+      <Filter>rendering\sprite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -444,13 +447,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\utils\BufferTexture.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\ComponentSprite.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteBitmap.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\PaletteSprite.h">
       <Filter>rendering\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\RenderUtils.h">
@@ -555,9 +552,6 @@
     <ClInclude Include="..\..\source\oxygen\simulation\sound\ym2612.h">
       <Filter>simulation\sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteBase.h">
-      <Filter>rendering\utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\EngineMain.h">
       <Filter>application</Filter>
     </ClInclude>
@@ -573,9 +567,6 @@
     <ClInclude Include="..\..\source\oxygen\pch.h" />
     <ClInclude Include="..\..\source\oxygen\application\Configuration.h">
       <Filter>application</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\rendering\utils\SpriteDump.h">
-      <Filter>rendering\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\utils\Kosinski.h">
       <Filter>rendering\utils</Filter>
@@ -741,6 +732,18 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\resources\FontCollection.h">
       <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.h">
+      <Filter>rendering\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.h">
+      <Filter>rendering\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\SpriteBase.h">
+      <Filter>rendering\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\sprite\SpriteDump.h">
+      <Filter>rendering\sprite</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

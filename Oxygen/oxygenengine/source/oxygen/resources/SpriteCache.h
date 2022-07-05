@@ -9,8 +9,8 @@
 #pragma once
 
 #include <rmxmedia.h>
-#include "oxygen/rendering/utils/ComponentSprite.h"
-#include "oxygen/rendering/utils/PaletteSprite.h"
+#include "oxygen/rendering/sprite/ComponentSprite.h"
+#include "oxygen/rendering/sprite/PaletteSprite.h"
 
 class SpriteDump;
 

@@ -13,8 +13,8 @@
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
+#include "oxygen/rendering/sprite/SpriteDump.h"
 #include "oxygen/rendering/utils/Kosinski.h"
-#include "oxygen/rendering/utils/SpriteDump.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LemonScriptRuntime.h"
 

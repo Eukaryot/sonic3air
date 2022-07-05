@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/utils/PaletteSprite.h"
+#include "oxygen/rendering/sprite/PaletteSprite.h"
 
 
 namespace

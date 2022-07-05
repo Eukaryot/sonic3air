@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/utils/SpriteBase.h"
+#include "oxygen/rendering/sprite/SpriteBase.h"
 
 
 namespace spritebaseinternal

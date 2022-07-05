@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/rendering/utils/ComponentSprite.h"
+#include "oxygen/rendering/sprite/ComponentSprite.h"
 
 
 void ComponentSprite::clear()

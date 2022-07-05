@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/rendering/utils/SpriteBase.h"
+#include "oxygen/rendering/sprite/SpriteBase.h"
 
 
 class ComponentSprite : public SpriteBase
