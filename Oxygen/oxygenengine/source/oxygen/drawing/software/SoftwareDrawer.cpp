@@ -87,15 +87,16 @@ namespace softwaredrawer
 		}
 	}
 
-	void mirrorBitmapX(Bitmap& destBitmap, const Bitmap& sourceBitmap)
+	void mirrorBitmapX(std::vector<uint32>& destBuffer, const BitmapWrapper& sourceBitmap)
 	{
-		destBitmap.create(sourceBitmap.getWidth(), sourceBitmap.getHeight());
-		for (int y = 0; y < sourceBitmap.getHeight(); ++y)
+		const int wid = sourceBitmap.mSize.x;
+		const int hgt = sourceBitmap.mSize.y;
+		destBuffer.resize(wid * hgt);
+		for (int y = 0; y < hgt; ++y)
 		{
-			const uint32* src = sourceBitmap.getPixelPointer(sourceBitmap.getWidth() - 1, y);
-			uint32* dst = destBitmap.getPixelPointer(0, y);
-
-			for (int x = 0; x < sourceBitmap.getWidth(); ++x)
+			const uint32* src = sourceBitmap.getPixelPointer(wid - 1, y);
+			uint32* dst = &destBuffer[y * wid];
+			for (int x = 0; x < wid; ++x)
 			{
 				*dst = *src;
 				--src;
@@ -246,7 +247,7 @@ namespace softwaredrawer
 		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
 		{
 			BitmapWrapper& outputWrapper = getOutputWrapper();
-			Bitmap& bufferBitmap = mTempBuffer;
+			Bitmap& bufferBitmap = mTempBitmap;
 
 			Vec2i drawPosition;
 			font.printBitmap(bufferBitmap, drawPosition, rect, text, printOptions.mAlignment, printOptions.mSpacing);
@@ -256,12 +257,12 @@ namespace softwaredrawer
 			}
 
 			// Consider cropping
-			const Recti uncroppedRect(drawPosition.x, drawPosition.y, bufferBitmap.mWidth, bufferBitmap.mHeight);
+			const Recti uncroppedRect(drawPosition.x, drawPosition.y, bufferBitmap.getWidth(), bufferBitmap.getHeight());
 			Recti croppedRect = uncroppedRect;
 			croppedRect.intersect(uncroppedRect, mScissorRect);
 			if (croppedRect.width > 0 && croppedRect.height > 0)
 			{
-				Recti inputRect(0, 0, bufferBitmap.mWidth, bufferBitmap.mHeight);
+				Recti inputRect(0, 0, bufferBitmap.getWidth(), bufferBitmap.getHeight());
 				inputRect.x += (croppedRect.x - uncroppedRect.x);
 				inputRect.y += (croppedRect.y - uncroppedRect.y);
 				inputRect.width  -= (uncroppedRect.width - croppedRect.width);
@@ -288,7 +289,8 @@ namespace softwaredrawer
 		Recti mScissorRect;
 		std::vector<Recti> mScissorStack;
 
-		Bitmap mTempBuffer;
+		Bitmap mTempBitmap;
+		std::vector<uint32> mTempBuffer;
 
 	private:
 		DrawerTexture* mCurrentRenderTarget = nullptr;
@@ -384,16 +386,14 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 
 					if (nullptr != dc.mTexture)
 					{
-						Bitmap* inputBitmap = &dc.mTexture->accessBitmap();
+						BitmapWrapper inputWrapper(dc.mTexture->accessBitmap());
 
 						// Consider mirroring
 						if (mirrorX)
 						{
-							softwaredrawer::mirrorBitmapX(mInternal.mTempBuffer, *inputBitmap);
-							inputBitmap = &mInternal.mTempBuffer;
+							softwaredrawer::mirrorBitmapX(mInternal.mTempBuffer, inputWrapper);
+							inputWrapper.Set(&mInternal.mTempBuffer[0], inputWrapper.mSize);
 						}
-
-						BitmapWrapper inputWrapper(*inputBitmap);
 
 						Recti inputRect;
 						bool useUVs = false;
@@ -413,8 +413,8 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 									  uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
 
 							// Get the part from the input that will get drawn
-							const Vec2f inputStart = uv0 * Vec2f(inputBitmap->getSize());
-							const Vec2f inputEnd = uv1 * Vec2f(inputBitmap->getSize());
+							const Vec2f inputStart = uv0 * Vec2f(inputWrapper.mSize);
+							const Vec2f inputEnd = uv1 * Vec2f(inputWrapper.mSize);
 							inputRect.x = roundToInt(inputStart.x);
 							inputRect.y = roundToInt(inputStart.y);
 							inputRect.width = roundToInt(inputEnd.x) - inputRect.x;

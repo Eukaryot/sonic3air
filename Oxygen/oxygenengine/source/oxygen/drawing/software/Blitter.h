@@ -17,11 +17,11 @@ struct BitmapWrapper
 	Vec2i mSize;
 
 	inline BitmapWrapper() = default;
-	inline explicit BitmapWrapper(Bitmap& bitmap) : mData(bitmap.mData), mSize(bitmap.getSize()) {}
+	inline explicit BitmapWrapper(Bitmap& bitmap) : mData(bitmap.getData()), mSize(bitmap.getSize()) {}
 	inline BitmapWrapper(uint32* data, Vec2i size) : mData(data), mSize(size) {}
 
 	inline void Reset()  { mData = nullptr; mSize.set(0, 0); }
-	inline void Set(Bitmap& bitmap)  { mData = bitmap.mData; mSize = bitmap.getSize(); }
+	inline void Set(Bitmap& bitmap)  { mData = bitmap.getData(); mSize = bitmap.getSize(); }
 	inline void Set(uint32* data, Vec2i size)  { mData = data; mSize = size; }
 
 	inline bool empty() const  { return (nullptr == mData || mSize.x <= 0 || mSize.y <= 0); }

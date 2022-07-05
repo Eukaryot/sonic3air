@@ -156,8 +156,8 @@ bool BitmapCodecBMP::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadRes
 
 bool BitmapCodecBMP::encode(const Bitmap& bitmap, OutputStream& stream)
 {
-	const int width = bitmap.mWidth;
-	const int height = bitmap.mHeight;
+	const int width = bitmap.getWidth();
+	const int height = bitmap.getHeight();
 	const int dataSize = width * height * 4;
 	const int headerSize = sizeof(BmpHeader);
 
@@ -181,7 +181,7 @@ bool BitmapCodecBMP::encode(const Bitmap& bitmap, OutputStream& stream)
 
 	for (int y = 0; y < height; ++y)
 	{
-		uint32* src = &bitmap.mData[(height-y-1)*width];
+		const uint32* src = bitmap.getPixelPointer(0, height-y-1);
 		for (int x = 0; x < width; ++x)
 			output[x] = RGBA_to_BGRA(src[x]);
 		stream.write(output, width*4);

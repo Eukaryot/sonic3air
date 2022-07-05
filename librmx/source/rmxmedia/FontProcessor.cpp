@@ -29,8 +29,8 @@ void ShadowFontProcessor::process(FontProcessingData& data)
 	data.mBorderTop    = oldBorderTop    + std::max(0, border - offsY);
 	data.mBorderBottom = oldBorderBottom + border + offsY;
 
-	const int newWidth  = data.mBitmap.mWidth  + (data.mBorderLeft + data.mBorderRight) - (oldBorderLeft + oldBorderRight);
-	const int newHeight = data.mBitmap.mHeight + (data.mBorderTop + data.mBorderBottom) - (oldBorderTop + oldBorderBottom);
+	const int newWidth  = data.mBitmap.getWidth()  + (data.mBorderLeft + data.mBorderRight) - (oldBorderLeft + oldBorderRight);
+	const int newHeight = data.mBitmap.getHeight() + (data.mBorderTop + data.mBorderBottom) - (oldBorderTop + oldBorderBottom);
 	const int insetX = data.mBorderLeft - oldBorderLeft;
 	const int insetY = data.mBorderTop - oldBorderTop;
 
@@ -43,9 +43,10 @@ void ShadowFontProcessor::process(FontProcessingData& data)
 	}
 	if (mShadowAlpha < 1.0f)
 	{
+		uint32* data = bmp.getData();
 		for (int i = 0; i < bmp.getPixelCount(); ++i)
 		{
-			bmp.mData[i] = roundToInt((float)(bmp.mData[i] >> 24) * mShadowAlpha) << 24;
+			data[i] = roundToInt((float)(data[i] >> 24) * mShadowAlpha) << 24;
 		}
 	}
 	else
@@ -71,31 +72,31 @@ void OutlineFontProcessor::process(FontProcessingData& data)
 	data.mBorderTop    = oldBorderTop    + outlineWidth;
 	data.mBorderBottom = oldBorderBottom + outlineWidth;
 
-	const int newWidth  = data.mBitmap.mWidth  + (data.mBorderLeft + data.mBorderRight) - (oldBorderLeft + oldBorderRight);
-	const int newHeight = data.mBitmap.mHeight + (data.mBorderTop + data.mBorderBottom) - (oldBorderTop + oldBorderBottom);
+	const int newWidth  = data.mBitmap.getWidth()  + (data.mBorderLeft + data.mBorderRight) - (oldBorderLeft + oldBorderRight);
+	const int newHeight = data.mBitmap.getHeight() + (data.mBorderTop + data.mBorderBottom) - (oldBorderTop + oldBorderBottom);
 	const int insetX = data.mBorderLeft - oldBorderLeft;
 	const int insetY = data.mBorderTop - oldBorderTop;
 
 	Bitmap bitmap;
 	bitmap.create(newWidth, newHeight, 0);
 
-	for (int y = 0; y < data.mBitmap.mHeight; ++y)
+	for (int y = 0; y < data.mBitmap.getHeight(); ++y)
 	{
-		for (int x = 0; x < data.mBitmap.mWidth; ++x)
+		for (int x = 0; x < data.mBitmap.getWidth(); ++x)
 		{
-			if (data.mBitmap.mData[x + y * data.mBitmap.mWidth] & 0xff000000)
+			if (*data.mBitmap.getPixelPointer(x, y) & 0xff000000)
 			{
-				bitmap.mData[(insetX + x - 1) + (insetY + y) * bitmap.mWidth] = mOutlineColor;
-				bitmap.mData[(insetX + x + 1) + (insetY + y) * bitmap.mWidth] = mOutlineColor;
-				bitmap.mData[(insetX + x) + (insetY + y - 1) * bitmap.mWidth] = mOutlineColor;
-				bitmap.mData[(insetX + x) + (insetY + y + 1) * bitmap.mWidth] = mOutlineColor;
+				bitmap.setPixel(insetX + x - 1, insetY + y, mOutlineColor);
+				bitmap.setPixel(insetX + x + 1, insetY + y, mOutlineColor);
+				bitmap.setPixel(insetX + x, insetY + y - 1, mOutlineColor);
+				bitmap.setPixel(insetX + x, insetY + y + 1, mOutlineColor);
 
 				if (mDiagonalNeighbors)
 				{
-					bitmap.mData[(insetX + x - 1) + (insetY + y - 1) * bitmap.mWidth] = mOutlineColor;
-					bitmap.mData[(insetX + x - 1) + (insetY + y + 1) * bitmap.mWidth] = mOutlineColor;
-					bitmap.mData[(insetX + x + 1) + (insetY + y - 1) * bitmap.mWidth] = mOutlineColor;
-					bitmap.mData[(insetX + x + 1) + (insetY + y + 1) * bitmap.mWidth] = mOutlineColor;
+					bitmap.setPixel(insetX + x - 1, insetY + y - 1, mOutlineColor);
+					bitmap.setPixel(insetX + x - 1, insetY + y + 1, mOutlineColor);
+					bitmap.setPixel(insetX + x + 1, insetY + y - 1, mOutlineColor);
+					bitmap.setPixel(insetX + x + 1, insetY + y + 1, mOutlineColor);
 				}
 			}
 		}
@@ -107,11 +108,11 @@ void OutlineFontProcessor::process(FontProcessingData& data)
 
 void GradientFontProcessor::process(FontProcessingData& data)
 {
-	for (int y = 0; y < data.mBitmap.mHeight; ++y)
+	for (int y = 0; y < data.mBitmap.getHeight(); ++y)
 	{
 		uint32* pixelPtr = data.mBitmap.getPixelPointer(0, y);
-		const float shadingFactor = interpolate(0.65f, 1.0f, saturate((float)y / (float)data.mBitmap.mHeight * 2.0f));
-		for (int x = 0; x < data.mBitmap.mWidth; ++x)
+		const float shadingFactor = interpolate(0.65f, 1.0f, saturate((float)y / (float)data.mBitmap.getHeight() * 2.0f));
+		for (int x = 0; x < data.mBitmap.getWidth(); ++x)
 		{
 			float colorR = (float)((*pixelPtr) & 0xff);
 			float colorG = (float)((*pixelPtr >> 8) & 0xff);

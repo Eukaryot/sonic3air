@@ -396,8 +396,8 @@ void ResourcesCache::loadPalettes(const std::wstring& path, bool isModded)
 		name.remove(name.length() - 4, 4);
 
 		uint64 key = rmx::getMurmur2_64(name);		// Hash is the key of the first palette, the others are enumerated from there
-		const int numLines = std::min(bitmap.mHeight, 64);
-		const int numColorsPerLine = std::min(bitmap.mWidth, 64);
+		const int numLines = std::min(bitmap.getHeight(), 64);
+		const int numColorsPerLine = std::min(bitmap.getWidth(), 64);
 
 		for (int y = 0; y < numLines; ++y)
 		{
@@ -407,7 +407,7 @@ void ResourcesCache::loadPalettes(const std::wstring& path, bool isModded)
 
 			for (int x = 0; x < numColorsPerLine; ++x)
 			{
-				palette.mColors[x] = Color::fromABGR32(bitmap[x + y * bitmap.mWidth]);
+				palette.mColors[x] = Color::fromABGR32(bitmap.getPixel(x, y));
 			}
 			++key;
 		}

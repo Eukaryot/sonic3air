@@ -65,7 +65,7 @@ bool FontSourceStd::fillGlyphInfo(FontSource::GlyphInfo& info)
 	for (int i = 0; i < bmp1.getPixelCount(); ++i)
 	{
 		int bits = (stdfont_data[index][i/16] >> ((i%16)*2)) % 4;
-		bmp1.mData[i] = 0x00ffffff + ((bits * 85) << 24);
+		bmp1.getData()[i] = 0x00ffffff + ((bits * 85) << 24);
 	}
 
 	if (mSize != rmx::stdfont::SIZE)
@@ -168,6 +168,6 @@ bool FontSourceBitmap::fillGlyphInfo(FontSource::GlyphInfo& info)
 
 	const Bitmap& bitmap = it->second;
 	info.mBitmap = bitmap;
-	info.mAdvance = bitmap.mWidth + mSpaceBetweenCharacters;
+	info.mAdvance = bitmap.getWidth() + mSpaceBetweenCharacters;
 	return true;
 }

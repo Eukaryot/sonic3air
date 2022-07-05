@@ -146,10 +146,11 @@ namespace global
 				}
 
 				// Convert to grayscale
+				uint32* data = bitmap.getData();
 				const int pixels = bitmap.getPixelCount();
 				for (int i = 0; i < pixels; ++i)
 				{
-					bitmap.mData[i] = roundToInt(Color::fromABGR32(bitmap.mData[i]).getGray() * 255.0f) * 0x10101 + 0xff000000;
+					data[i] = roundToInt(Color::fromABGR32(data[i]).getGray() * 255.0f) * 0x10101 + 0xff000000;
 				}
 
 				{

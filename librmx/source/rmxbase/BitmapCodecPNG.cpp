@@ -204,7 +204,7 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadRes
 
 	// Create output bitmap
 	bitmap.create(width, height);
-	uint32* data = bitmap.mData;
+	uint32* data = bitmap.getData();
 
 	// Remove the filter
 	int outpos = 0;
@@ -355,16 +355,16 @@ bool BitmapCodecPNG::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadRes
 bool BitmapCodecPNG::encode(const Bitmap& bitmap, OutputStream& stream)
 {
 	// Save image data to memory in PNG format
-	if (nullptr == bitmap.mData)
+	if (bitmap.empty())
 		return false;
 
-	int width = bitmap.mWidth;
-	int height = bitmap.mHeight;
+	int width = bitmap.getWidth();
+	int height = bitmap.getHeight();
 
 	// Setup PNG header
 	PNGHeader header;
-	header.width = swapBytes32(bitmap.mWidth);
-	header.height = swapBytes32(bitmap.mHeight);
+	header.width = swapBytes32(bitmap.getWidth());
+	header.height = swapBytes32(bitmap.getHeight());
 	header.bitdepth = 8;
 	header.colortype = 6;
 	header.compression = 0;
@@ -376,7 +376,7 @@ bool BitmapCodecPNG::encode(const Bitmap& bitmap, OutputStream& stream)
 	for (int line = 0; line < height; ++line)
 	{
 		tmpdata[line*(width*4+1)] = 0;
-		memcpy(&tmpdata[line*(width*4+1)+1], &bitmap.mData[line*width], width*4);
+		memcpy(&tmpdata[line*(width*4+1)+1], bitmap.getPixelPointer(0, line), width*4);
 	}
 	int outsize = 0;
 	uint8* output = Deflate::encode(outsize, tmpdata, (width*4+1)*height);			// TODO: Optionally use ZlibDeflate here as well

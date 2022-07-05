@@ -196,7 +196,7 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						// Point sampling
 						const int sampleX = roundToInt(u * scaleU);
 						const int sampleY = roundToInt(v * scaleV);
-						const uint32 texColor = texture.mData[sampleX + sampleY * texture.getWidth()];
+						const uint32 texColor = texture.getPixel(sampleX, sampleY);
 
 						// Alpha blending
 						const uint16 multiplierA = ((texColor >> 16) & 0xff00) / 255;
@@ -229,10 +229,10 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						const int sampleY0 = (int)(sampleFloatY);
 						const int sampleX1 = std::min(sampleX0 + 1, texture.getWidth() - 1);
 						const int sampleY1 = std::min(sampleY0 + 1, texture.getHeight() - 1);
-						const uint8* sample00 = (uint8*)&texture.mData[sampleX0 + sampleY0 * texture.getWidth()];
-						const uint8* sample01 = (uint8*)&texture.mData[sampleX0 + sampleY1 * texture.getWidth()];
-						const uint8* sample10 = (uint8*)&texture.mData[sampleX1 + sampleY0 * texture.getWidth()];
-						const uint8* sample11 = (uint8*)&texture.mData[sampleX1 + sampleY1 * texture.getWidth()];
+						const uint8* sample00 = (const uint8*)texture.getPixelPointer(sampleX0, sampleY0);
+						const uint8* sample01 = (const uint8*)texture.getPixelPointer(sampleX0, sampleY1);
+						const uint8* sample10 = (const uint8*)texture.getPixelPointer(sampleX1, sampleY0);
+						const uint8* sample11 = (const uint8*)texture.getPixelPointer(sampleX1, sampleY1);
 						const float r = ((float)sample00[0] * (1.0f - factorX) + (float)sample10[0] * factorX) * (1.0f - factorY) + ((float)sample01[0] * (1.0f - factorX) + (float)sample11[0] * factorX) * factorY;
 						const float g = ((float)sample00[1] * (1.0f - factorX) + (float)sample10[1] * factorX) * (1.0f - factorY) + ((float)sample01[1] * (1.0f - factorX) + (float)sample11[1] * factorX) * factorY;
 						const float b = ((float)sample00[2] * (1.0f - factorX) + (float)sample10[2] * factorX) * (1.0f - factorY) + ((float)sample01[2] * (1.0f - factorX) + (float)sample11[2] * factorX) * factorY;
@@ -261,7 +261,7 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 					// Point sampling
 					const int sampleX = roundToInt(u * scaleU);
 					const int sampleY = roundToInt(v * scaleV);
-					const uint32 texColor = texture.mData[sampleX + sampleY * texture.getWidth()];
+					const uint32 texColor = texture.getPixel(sampleX, sampleY);
 
 					// TODO: Support bilinear sampling here as well
 					// TODO: Support red-blue swap here

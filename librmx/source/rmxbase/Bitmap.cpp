@@ -102,6 +102,21 @@ void Bitmap::create(int wid, int hgt, uint32 color)
 	clear(color);
 }
 
+void Bitmap::createReusingMemory(int wid, int hgt, int& reservedSize)
+{
+	const int size = wid * hgt;
+	if (reservedSize < size)
+	{
+		create(wid, hgt);
+		reservedSize = size;
+	}
+	else
+	{
+		mWidth = wid;
+		mHeight = hgt;
+	}
+}
+
 void Bitmap::clear()
 {
 	if (nullptr != mData)
@@ -152,24 +167,24 @@ void Bitmap::clearAlpha(uint8 alpha)
 	}
 }
 
-uint32 Bitmap::getPixel(int x, int y) const
+uint32 Bitmap::getPixelSafe(int x, int y) const
 {
 	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
 		return 0;
-	return mData[x+y*mWidth];
+	return mData[x + y * mWidth];
 }
 
-uint32* Bitmap::getPixelPointer(int x, int y)
+uint32* Bitmap::getPixelPointerSafe(int x, int y)
 {
 	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
-		return 0;
-	return &mData[x+y*mWidth];
+		return nullptr;
+	return &mData[x + y * mWidth];
 }
 
-const uint32* Bitmap::getPixelPointer(int x, int y) const
+const uint32* Bitmap::getPixelPointerSafe(int x, int y) const
 {
 	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
-		return 0;
+		return nullptr;
 	return &mData[x + y * mWidth];
 }
 

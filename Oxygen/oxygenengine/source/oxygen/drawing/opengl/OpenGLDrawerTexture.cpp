@@ -39,7 +39,7 @@ void OpenGLDrawerTexture::writeContentToBitmap(Bitmap& outBitmap)
 #if !defined(RMX_USE_GLES2)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mTexture.getHandle());
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, outBitmap.mData);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, outBitmap.getData());
 	glBindTexture(GL_TEXTURE_2D, 0);
 #else
 	RMX_ASSERT(false, "Not supported");

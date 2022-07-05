@@ -170,7 +170,7 @@ namespace utils
 			Bitmap& bitmap = vectorAdd(sprites);
 			if (bitmap.load(fc[fileIndex]->mPath + fc[fileIndex]->mFilename))
 			{
-				spriteAtlas.add((uint32)sprites.size(), Vec2i(bitmap.mWidth, bitmap.mHeight));
+				spriteAtlas.add((uint32)sprites.size(), bitmap.getSize());
 			}
 			else
 			{

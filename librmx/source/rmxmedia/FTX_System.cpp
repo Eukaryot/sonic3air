@@ -363,7 +363,7 @@ namespace rmx
 		{
 			Bitmap tmp;
 			Bitmap* bitmap = &mVideoConfig.iconBitmap;
-			if (bitmap->mData == nullptr)
+			if (bitmap->empty())
 			{
 				bitmap = nullptr;
 				if (tmp.load(mVideoConfig.iconSource.toWString()))
@@ -375,7 +375,7 @@ namespace rmx
 			if (nullptr != bitmap)
 			{
 				bitmap->rescale(32, 32);
-				SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->mData, 32, 32, 32, bitmap->mWidth * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+				SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->getData(), 32, 32, 32, bitmap->getWidth() * sizeof(uint32), 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 				SDL_SetWindowIcon(mMainWindow, icon);
 				SDL_FreeSurface(icon);
 			}
@@ -473,7 +473,7 @@ namespace rmx
 		{
 			const Recti& screen = getScreenRect();
 			bitmap.create(screen.width, screen.height);
-			glReadPixels(screen.left, screen.top, screen.width, screen.height, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.mData);
+			glReadPixels(screen.left, screen.top, screen.width, screen.height, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
 			bitmap.mirrorVertical();
 		}
 	}

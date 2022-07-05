@@ -192,12 +192,13 @@ void ModsMenu::initialize()
 					{
 						Bitmap& bitmap = res.mSmallIconGray.accessBitmap();
 						bitmap = res.mSmallIcon.accessBitmap();
+						uint32* data = bitmap.getData();
 
 						// Convert to grayscale
 						const int pixels = bitmap.getPixelCount();
 						for (int i = 0; i < pixels; ++i)
 						{
-							bitmap.mData[i] = (bitmap.mData[i] & 0xff000000) + (roundToInt(Color::fromABGR32(bitmap.mData[i]).getGray() * 255.0f) * 0x10101);
+							data[i] = (data[i] & 0xff000000) + (roundToInt(Color::fromABGR32(data[i]).getGray() * 255.0f) * 0x10101);
 						}
 						res.mSmallIconGray.bitmapUpdated();
 					}

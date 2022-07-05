@@ -83,9 +83,9 @@ void OpenGLFontOutput::buildVertexGroups(std::vector<VertexGroup>& outVertexGrou
 		vertices.resize(firstIndex + 6);
 
 		const float x0 = info.mPosition.x - (float)spriteHandleInfo.mBorderLeft;
-		const float x1 = info.mPosition.x + (float)(info.mBitmap->mWidth + spriteHandleInfo.mBorderRight);
+		const float x1 = info.mPosition.x + (float)(info.mBitmap->getWidth() + spriteHandleInfo.mBorderRight);
 		const float y0 = info.mPosition.y - (float)spriteHandleInfo.mBorderTop;
-		const float y1 = info.mPosition.y + (float)(info.mBitmap->mHeight + spriteHandleInfo.mBorderBottom);
+		const float y1 = info.mPosition.y + (float)(info.mBitmap->getHeight() + spriteHandleInfo.mBorderBottom);
 
 		vertices[firstIndex + 0].mPosition.set(x0, y0);
 		vertices[firstIndex + 1].mPosition.set(x0, y1);

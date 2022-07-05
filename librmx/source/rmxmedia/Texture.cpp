@@ -169,7 +169,7 @@ void Texture::load(const void* data, int width, int height)
 
 void Texture::load(const Bitmap& bitmap)
 {
-	load(bitmap.mData, bitmap.mWidth, bitmap.mHeight);
+	load(bitmap.getData(), bitmap.getWidth(), bitmap.getHeight());
 }
 
 void Texture::load(const String& filename)
@@ -181,7 +181,7 @@ void Texture::load(const String& filename)
 	}
 	Bitmap bitmap;
 	if (bitmap.load(filename.toWString()))
-		load(bitmap.mData, bitmap.mWidth, bitmap.mHeight);
+		load(bitmap.getData(), bitmap.getWidth(), bitmap.getHeight());
 }
 
 void Texture::loadCubemap(const String& filename)
@@ -200,7 +200,7 @@ void Texture::loadCubemap(const String& filename)
 		fname[pos+1] = 'x' + (i/2);
 		if (!bitmap.load(fname.toWString()))
 			continue;
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mFormat, bitmap.mWidth, bitmap.mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.mData);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mFormat, bitmap.getWidth(), bitmap.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
 	}
 }
 
@@ -215,7 +215,7 @@ void Texture::updateRect(const void* data, const Recti& rect)
 
 void Texture::updateRect(const Bitmap& bitmap, int px, int py)
 {
-	updateRect(bitmap.mData, Recti(px, py, bitmap.mWidth, bitmap.mHeight));
+	updateRect(bitmap.getData(), Recti(px, py, bitmap.getWidth(), bitmap.getHeight()));
 }
 
 void Texture::copyFramebuffer(const Recti& rect)

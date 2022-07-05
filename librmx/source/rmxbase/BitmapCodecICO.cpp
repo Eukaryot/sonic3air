@@ -64,8 +64,8 @@ bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadRes
 	mstream.skip(imageCount * sizeof(IconDirEntry));
 
 	// Choose the best fitting one from the icons
-	int optimal_wid = (bitmap.mWidth > 0)  ? bitmap.mWidth  : 32;
-	int optimal_hgt = (bitmap.mHeight > 0) ? bitmap.mHeight : 32;
+	int optimal_wid = (bitmap.getWidth() > 0)  ? bitmap.getWidth()  : 32;
+	int optimal_hgt = (bitmap.getHeight() > 0) ? bitmap.getHeight() : 32;
 	int optimal_bpp = 32;
 	int best_image = -1;
 	uint32 best_diff = 0xffffffff;
@@ -124,10 +124,11 @@ bool BitmapCodecICO::decode(Bitmap& bitmap, InputStream& stream, Bitmap::LoadRes
 		uint8* bitmask = &mem[54 + pal_size + img_size];
 		for (int y = 0; y < hgt; ++y)
 		{
+			uint32* src = bitmap.getPixelPointer(0, y);
 			for (int x = 0; x < wid; ++x)
 			{
 				if ((bitmask[x/8 + (hgt-1-y)*mask_line] >> (7-x%8)) & 1)
-					bitmap.mData[x+y*wid] &= 0x00ffffff;
+					src[x] &= 0x00ffffff;
 			}
 		}
 	}

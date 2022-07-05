@@ -20,21 +20,10 @@ namespace
 
 	void applyPalette(Bitmap& output, int& outputReservedSize, const PaletteBitmap& input, const uint32* palette)
 	{
-		const int size = input.mWidth * input.mHeight;
-		if (outputReservedSize < size)
+		output.createReusingMemory(input.mWidth, input.mHeight, outputReservedSize);
+		for (int i = 0; i < output.getPixelCount(); ++i)
 		{
-			output.create(input.mWidth, input.mHeight);
-			outputReservedSize = size;
-		}
-		else
-		{
-			output.mWidth = input.mWidth;
-			output.mHeight = input.mHeight;
-		}
-
-		for (int i = 0; i < size; ++i)
-		{
-			output.mData[i] = palette[input.mData[i]];
+			output.getData()[i] = palette[input.mData[i]];
 		}
 	}
 

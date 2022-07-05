@@ -285,10 +285,10 @@ bool SpriteAtlas::getSprite(int handle, Sprite& sprite)
 
 	const Bitmap& bitmap = mPageData[info->mPageIndex].mBitmap;
 	sprite.texture = &mPageData[info->mPageIndex].mTexture;
-	sprite.uvStart.x = (float)info->mRect.x / (float)bitmap.mWidth;
-	sprite.uvStart.y = (float)info->mRect.y / (float)bitmap.mHeight;
-	sprite.uvEnd.x = (float)(info->mRect.x + info->mRect.width) / (float)bitmap.mWidth;
-	sprite.uvEnd.y = (float)(info->mRect.y + info->mRect.height) / (float)bitmap.mHeight;
+	sprite.uvStart.x = (float)info->mRect.x / (float)bitmap.getWidth();
+	sprite.uvStart.y = (float)info->mRect.y / (float)bitmap.getHeight();
+	sprite.uvEnd.x = (float)(info->mRect.x + info->mRect.width) / (float)bitmap.getWidth();
+	sprite.uvEnd.y = (float)(info->mRect.y + info->mRect.height) / (float)bitmap.getHeight();
 	return true;
 }
 
@@ -303,8 +303,8 @@ const Texture* SpriteAtlas::getPage(int num)
 int SpriteAtlas::internalAdd(const Bitmap& bmp, const Recti* rect, bool updateTexture)
 {
 	Vec2i insertionSize;
-	insertionSize.x = (nullptr != rect) ? rect->width : bmp.mWidth;
-	insertionSize.y = (nullptr != rect) ? rect->height : bmp.mHeight;
+	insertionSize.x = (nullptr != rect) ? rect->width : bmp.getWidth();
+	insertionSize.y = (nullptr != rect) ? rect->height : bmp.getHeight();
 
 	const int key = (int)mSprites.size();	// No special key, just enumeration
 	SpriteAtlasBase::internalAdd(key, insertionSize);

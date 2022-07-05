@@ -278,7 +278,7 @@ void BlueSpheresRendering::renderToBitmap(Bitmap& bitmapOpaque, Bitmap& bitmapAl
 		bitmapAlpha.create(maxX, numRowsUntilPureGround - mNumPureSkyRows);
 		for (int y = mNumPureSkyRows; y < numRowsUntilPureGround; ++y)
 		{
-			uint32* output = &bitmapAlpha.mData[(y - mNumPureSkyRows) * bitmapAlpha.mWidth + indentX];
+			uint32* output = bitmapAlpha.getPixelPointer(indentX, y - mNumPureSkyRows);
 			const uint32* outputEnd = output + maxX;
 			const uint8* lookupData = &lookupDataBase[y * LOOKUP_WIDTH + offsetX];
 			const uint8* visibilityData = &mVisibilityLookup[y * LOOKUP_WIDTH + offsetX];
@@ -293,7 +293,7 @@ void BlueSpheresRendering::renderToBitmap(Bitmap& bitmapOpaque, Bitmap& bitmapAl
 		bitmapOpaque.create(maxX, mNumPureGroundRows);
 		for (int y = numRowsUntilPureGround; y < maxY; ++y)
 		{
-			uint32* output = &bitmapOpaque.mData[(y - numRowsUntilPureGround) * bitmapOpaque.mWidth + indentX];
+			uint32* output = bitmapOpaque.getPixelPointer(indentX, y - numRowsUntilPureGround);
 			const uint32* outputEnd = output + maxX;
 			const uint8* lookupData = &lookupDataBase[y * LOOKUP_WIDTH + offsetX];
 

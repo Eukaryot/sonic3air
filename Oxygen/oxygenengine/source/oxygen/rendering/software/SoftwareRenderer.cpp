@@ -190,7 +190,7 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 
 	// Set alpha channel to 0xff to make sure nothing gets lost due to alpha test
 	{
-		uint64* RESTRICT ptr = (uint64*)gameScreenBitmap.mData;
+		uint64* RESTRICT ptr = (uint64*)gameScreenBitmap.getData();
 		uint64* RESTRICT end = ptr + gameScreenBitmap.getPixelCount() / 2;
 		for (; ptr < end; ++ptr)
 		{
@@ -236,7 +236,7 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 
 		for (int y = 0; y < bitmapSize.y; ++y)
 		{
-			uint32* destRGBA = &gameScreenBitmap.mData[y * gameScreenBitmap.mWidth];
+			uint32* destRGBA = gameScreenBitmap.getPixelPointer(0, y);
 			const uint32* palette = (y < paletteManager.mSplitPositionY) ? palettes[0] : palettes[1];
 
 			for (int x = 0; x < bitmapSize.x; )
@@ -330,10 +330,10 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 			// Blur x-direction
 			if (ebg.mBlurValue >= 1)
 			{
-				for (int y = 0; y < gameScreenBitmap.mHeight; ++y)
+				for (int y = 0; y < gameScreenBitmap.getHeight(); ++y)
 				{
 					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = gameScreenBitmap.mWidth - 1; x >= 1; --x)
+					for (int x = gameScreenBitmap.getWidth() - 1; x >= 1; --x)
 					{
 						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x-1] & 0xfefefe)) >> 1);
 					}
@@ -343,11 +343,11 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 			// Blur y-direction
 			if (ebg.mBlurValue >= 3)
 			{
-				const int stride = gameScreenBitmap.mWidth;
-				for (int y = 0; y < gameScreenBitmap.mHeight-1; ++y)
+				const int stride = gameScreenBitmap.getWidth();
+				for (int y = 0; y < gameScreenBitmap.getHeight()-1; ++y)
 				{
 					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = 0; x < gameScreenBitmap.mWidth; ++x)
+					for (int x = 0; x < gameScreenBitmap.getWidth(); ++x)
 					{
 						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x+stride] & 0xfefefe)) >> 1);
 					}
@@ -451,7 +451,7 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 
 		for (int y = minY; y < maxY; ++y)
 		{
-			const int position = y * gameScreenBitmap.mWidth;
+			const int position = y * gameScreenBitmap.getWidth();
 			pixelBlockWriter.newLine(y, position, (y < paletteManager.mSplitPositionY) ? 0 : 1);
 
 			int vx = minX;
@@ -569,7 +569,7 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 		for (const BufferedPlaneData::PixelBlock& block : blocks)
 		{
 			const uint8* RESTRICT src = &bufferedPlaneData.mContent[block.mLinearPosition];
-			uint32* RESTRICT dstRGBA = &gameScreenBitmap.mData[block.mLinearPosition];
+			uint32* RESTRICT dstRGBA = &gameScreenBitmap.getData()[block.mLinearPosition];
 			const uint32* RESTRICT paletteWithAtex = &palettes[block.mPaletteIndex][block.mAtex];
 
 			if (isBackground)
@@ -660,7 +660,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 					colorIndex += (patternIndex >> 9) & 0x30;
 					if (colorIndex & 0x0f)
 					{
-						uint32& dst = gameScreenBitmap.mData[x + y * gameScreenBitmap.mWidth];
+						uint32& dst = *gameScreenBitmap.getPixelPointer(x, y);
 						if (useTintColor)
 						{
 							Color color = Color::fromABGR32(palette[colorIndex]);
@@ -774,17 +774,17 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			const SpriteManager::SpriteMaskInfo& mask = static_cast<const SpriteManager::SpriteMaskInfo&>(geometry.mSpriteInfo);
 			if (mask.mSize.x > 0 && mask.mSize.y > 0)
 			{
-				const int minX = clamp(mask.mInterpolatedPosition.x, 0, gameScreenBitmap.mWidth);
-				const int maxX = clamp(mask.mInterpolatedPosition.x + mask.mSize.x, 0, gameScreenBitmap.mWidth);
+				const int minX = clamp(mask.mInterpolatedPosition.x, 0, gameScreenBitmap.getWidth());
+				const int maxX = clamp(mask.mInterpolatedPosition.x + mask.mSize.x, 0, gameScreenBitmap.getWidth());
 				const int bytes = (maxX - minX) * 4;
 				if (bytes > 0)
 				{
-					const int minY = clamp(mask.mInterpolatedPosition.y, 0, gameScreenBitmap.mHeight);
-					const int maxY = clamp(mask.mInterpolatedPosition.y + mask.mSize.y, 0, gameScreenBitmap.mHeight);
+					const int minY = clamp(mask.mInterpolatedPosition.y, 0, gameScreenBitmap.getHeight());
+					const int maxY = clamp(mask.mInterpolatedPosition.y + mask.mSize.y, 0, gameScreenBitmap.getHeight());
 
 					for (int line = minY; line < maxY; ++line)
 					{
-						const uint32 offset = minX + line * gameScreenBitmap.mWidth;
+						const uint32 offset = minX + line * gameScreenBitmap.getWidth();
 						memcpy(&gameScreenBitmap[offset], &mGameScreenCopy[offset], bytes);
 					}
 				}

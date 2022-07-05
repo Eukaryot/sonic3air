@@ -743,7 +743,7 @@ void BitmapJPG::convertColors()
 void BitmapJPG::buildBitmap(Bitmap& bitmap)
 {
 	bitmap.create(width, height);
-	image = bitmap.mData;
+	image = bitmap.getData();
 
 	short* coeff_ptr = coeff_buffer;
 	short vector[64];

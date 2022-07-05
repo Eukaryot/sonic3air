@@ -38,12 +38,6 @@ public:
 	};
 
 public:
-	// Image data and properties
-	uint32* mData = nullptr;
-	int mWidth = 0;
-	int mHeight = 0;
-
-public:
 	Bitmap();
 	Bitmap(const Bitmap& bitmap);
 	Bitmap(const String& filename);
@@ -58,6 +52,7 @@ public:
 	// Create a bitmap
 	void create(int wid, int hgt);
 	void create(int wid, int hgt, uint32 color);
+	void createReusingMemory(int wid, int hgt, int& reservedSize);
 
 	// Clear bitmap
 	void clear();
@@ -66,22 +61,27 @@ public:
 	void clearRGB(uint32 color);
 	void clearAlpha(uint8 alpha);
 
-	bool empty() const				{ return (nullptr == mData); }
-	int getWidth() const			{ return mWidth; }
-	int getHeight() const			{ return mHeight; }
-	Vec2i getSize() const			{ return Vec2i(mWidth, mHeight); }
-	int getPixelCount() const		{ return mWidth * mHeight; }
-	float getAspectRatio() const	{ return (mHeight <= 0) ? 0.0f : (float)mWidth / (float)mHeight; }
+	inline bool empty() const				{ return (nullptr == mData); }
+	inline int getWidth() const				{ return mWidth; }
+	inline int getHeight() const			{ return mHeight; }
+	inline Vec2i getSize() const			{ return Vec2i(mWidth, mHeight); }
+	inline int getPixelCount() const		{ return mWidth * mHeight; }
+	inline float getAspectRatio() const		{ return (mHeight <= 0) ? 0.0f : (float)mWidth / (float)mHeight; }
 
-	uint32* getData()				{ return mData; }
-	const uint32* getData() const	{ return mData; }
+	inline uint32* getData()				{ return mData; }
+	inline const uint32* getData() const	{ return mData; }
 
-	uint32 getPixel(int x, int y) const;
-	uint32* getPixelPointer(int x, int y);
-	const uint32* getPixelPointer(int x, int y) const;
+	inline uint32 getPixel(int x, int y) const				 { return mData[x + y * mWidth]; }
+	inline uint32* getPixelPointer(int x, int y)			 { return &mData[x + y * mWidth]; }
+	inline const uint32* getPixelPointer(int x, int y) const { return &mData[x + y * mWidth]; }
+
+	uint32 getPixelSafe(int x, int y) const;
+	uint32* getPixelPointerSafe(int x, int y);
+	const uint32* getPixelPointerSafe(int x, int y) const;
+
 	uint32 sampleLinear(float x, float y) const;
 
-	void setPixel(int x, int y, unsigned int color);
+	void setPixel(int x, int y, uint32 color);
 	void setPixel(int x, int y, float red, float green, float blue, float alpha = 1.0f);
 
 	bool decode(InputStream& stream, LoadResult& outResult, const char* format = nullptr);
@@ -113,14 +113,19 @@ public:
 	void swap(Bitmap& other);
 
 	// Operators
-	uint32& operator[](size_t index)			 { return mData[index]; }
-	const uint32& operator[](size_t index) const { return mData[index]; }
-	Bitmap& operator=(const Bitmap& bmp)		 { copy(bmp); return *this; }
+	inline uint32& operator[](size_t index)				{ return mData[index]; }
+	inline const uint32& operator[](size_t index) const	{ return mData[index]; }
+	inline Bitmap& operator=(const Bitmap& bmp)			{ copy(bmp); return *this; }
 
 private:
 	void memcpyRect(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
 	void memcpyBlend(uint32* dst, int dwid, uint32* src, int swid, int wid, int hgt);
 	void convert2palette(uint8* output, int colors, uint32* palette);
+
+private:
+	uint32* mData = nullptr;
+	int mWidth = 0;
+	int mHeight = 0;
 
 public:
 	struct API_EXPORT CodecList

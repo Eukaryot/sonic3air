@@ -659,7 +659,7 @@ bool EngineMain::createWindow()
 		RMX_LOG_INFO("Setting window icon from loaded bitmap...");
 		Bitmap tmp;
 		Bitmap* bitmap = &videoConfig.iconBitmap;
-		if (bitmap->mData == nullptr)
+		if (bitmap->empty())
 		{
 			bitmap = nullptr;
 			if (tmp.load(videoConfig.iconSource.toWString()))
@@ -671,7 +671,7 @@ bool EngineMain::createWindow()
 		if (nullptr != bitmap)
 		{
 			bitmap->rescale(32, 32);
-			SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->mData, 32, 32, 32, bitmap->mWidth * 4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+			SDL_Surface* icon = SDL_CreateRGBSurfaceFrom(bitmap->getData(), 32, 32, 32, bitmap->getWidth() * sizeof(uint32), 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 			SDL_SetWindowIcon(mSDLWindow, icon);
 			SDL_FreeSurface(icon);
 		}

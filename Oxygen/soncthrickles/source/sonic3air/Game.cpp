@@ -649,9 +649,9 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 	const int32 cameraTileY = cameraY / 16;
 
 	const int32 minX = cameraTileX;
-	const int32 maxX = cameraTileX + bitmap.mWidth / 16;
+	const int32 maxX = cameraTileX + bitmap.getWidth() / 16;
 	const int32 minY = cameraTileY;
-	const int32 maxY = cameraTileY + bitmap.mHeight / 16;
+	const int32 maxY = cameraTileY + bitmap.getHeight() / 16;
 
 	const uint16 filterByCharacterPath = (3 << EmulatorInterface::instance().readMemory8(0xffffb046));
 
@@ -693,13 +693,13 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 				for (int32 iy = 0; iy < 16; ++iy)
 				{
 					const int32 py = (screenY + iy);
-					if (py < 0 || py >= bitmap.mHeight)
+					if (py < 0 || py >= bitmap.getHeight())
 						continue;
 
 					for (int32 ix = 0; ix < 16; ++ix)
 					{
 						const int32 px = (screenX + ix);
-						if (px < 0 || px >= bitmap.mWidth)
+						if (px < 0 || px >= bitmap.getWidth())
 							continue;
 
 						bool pixelVisible = false;
@@ -742,7 +742,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 						}
 					#endif
 
-						uint32& dst = bitmap.mData[py * bitmap.mWidth + px];
+						uint32& dst = *bitmap.getPixelPointer(px, py);
 						switch (mode)
 						{
 							case 0:
@@ -1049,8 +1049,8 @@ void Game::renderBlueSpheresGround(uint16 px, uint16 py, uint8 rotation, uint16 
 
 	mBlueSpheresRendering.renderToBitmap(*bitmaps[0], *bitmaps[1], VideoOut::instance().getScreenWidth(), px, py, rotation, fieldColorA, fieldColorB);
 
-	items[0]->mSprite->mOffset.y = VideoOut::instance().getScreenHeight() - bitmaps[0]->mHeight;
-	items[1]->mSprite->mOffset.y = items[0]->mSprite->mOffset.y - bitmaps[1]->mHeight;
+	items[0]->mSprite->mOffset.y = VideoOut::instance().getScreenHeight() - bitmaps[0]->getHeight();
+	items[1]->mSprite->mOffset.y = items[0]->mSprite->mOffset.y - bitmaps[1]->getHeight();
 }
 
 uint64 Game::getBlueSpheresGroundSprite(uint8 part)

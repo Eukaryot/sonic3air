@@ -106,8 +106,8 @@ namespace spritebaseinternal
 		const int px = destPosition.x + offset.x;
 		const int py = destPosition.y + offset.y;
 
-		Recti bbox(px, py, sourceBitmap.mWidth, sourceBitmap.mHeight);
-		bbox.intersect(Recti(0, 0, destBitmap.mWidth, destBitmap.mHeight));
+		Recti bbox(px, py, sourceBitmap.getWidth(), sourceBitmap.getHeight());
+		bbox.intersect(Recti(0, 0, destBitmap.getWidth(), destBitmap.getHeight()));
 		if (nullptr != blitOptions.mTargetRect)
 		{
 			bbox.intersect(*blitOptions.mTargetRect);
@@ -121,8 +121,8 @@ namespace spritebaseinternal
 
 		for (int iy = minY; iy < maxY; ++iy)
 		{
-			uint32* dst = &destBitmap.mData[minX + iy * destBitmap.mWidth];
-			const uint32* src = &sourceBitmap.mData[(minX - px) + (iy - py) * sourceBitmap.mWidth];
+			uint32* dst = destBitmap.getPixelPointer(minX, iy);
+			const uint32* src = sourceBitmap.getPixelPointer(minX - px, iy - py);
 
 			if (!useTintAdd)
 			{
@@ -187,7 +187,7 @@ namespace spritebaseinternal
 		{
 			Vec2f min(1e10f, 1e10f);
 			Vec2f max(-1e10f, -1e10f);
-			const Vec2i corners[4] = { Vec2i(0, 0), Vec2i(sourceBitmap.mWidth - 1, 0), Vec2i(0, sourceBitmap.mHeight - 1), Vec2i(sourceBitmap.mWidth - 1, sourceBitmap.mHeight - 1) };
+			const Vec2i corners[4] = { Vec2i(0, 0), Vec2i(sourceBitmap.getWidth() - 1, 0), Vec2i(0, sourceBitmap.getHeight() - 1), Vec2i(sourceBitmap.getWidth() - 1, sourceBitmap.getHeight() - 1) };
 			for (int i = 0; i < 4; ++i)
 			{
 				const Vec2f localCorner((float)(corners[i].x + offset.x + 0.5f), (float)(corners[i].y + offset.y + 0.5f));
@@ -204,7 +204,7 @@ namespace spritebaseinternal
 			bbox.width = (int)max.x + 1 - bbox.x;
 			bbox.height = (int)max.y + 1 - bbox.y;
 		}
-		bbox.intersect(Recti(0, 0, destBitmap.mWidth, destBitmap.mHeight));
+		bbox.intersect(Recti(0, 0, destBitmap.getWidth(), destBitmap.getHeight()));
 		if (nullptr != blitOptions.mTargetRect)
 		{
 			bbox.intersect(*blitOptions.mTargetRect);
@@ -219,7 +219,7 @@ namespace spritebaseinternal
 
 		for (int iy = minY; iy < maxY; ++iy)
 		{
-			uint32* dst = &destBitmap.mData[minX + iy * destBitmap.mWidth];
+			uint32* dst = destBitmap.getPixelPointer(minX, iy);
 
 			for (int ix = minX; ix < maxX; ++ix)
 			{
@@ -231,10 +231,10 @@ namespace spritebaseinternal
 					const int localX = roundToInt(dx * blitOptions.mInvTransform[0] + dy * blitOptions.mInvTransform[1] - 0.5f) - offset.x;
 					const int localY = roundToInt(dx * blitOptions.mInvTransform[2] + dy * blitOptions.mInvTransform[3] - 0.5f) - offset.y;
 
-					if (localX >= 0 && localX < (int)sourceBitmap.mWidth &&
-						localY >= 0 && localY < (int)sourceBitmap.mHeight)
+					if (localX >= 0 && localX < (int)sourceBitmap.getWidth() &&
+						localY >= 0 && localY < (int)sourceBitmap.getHeight())
 					{
-						pixel = sourceBitmap.mData[localX + localY * sourceBitmap.mWidth];
+						pixel = sourceBitmap.getPixel(localX, localY);
 					}
 				}
 

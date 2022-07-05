@@ -92,15 +92,15 @@ void HardwareRenderResources::refresh()
 		const uint32* palette1 = mRenderParts.getPaletteManager().getPalette(1);
 
 		// First check if there were any changes since the last refresh at all
-		const bool anyChange = (memcmp(&bitmap.mData[0], palette0, 0x400) != 0 || memcmp(&bitmap.mData[0x100], palette1, 0x400) != 0);
+		const bool anyChange = (memcmp(bitmap.getData(), palette0, 0x400) != 0 || memcmp(bitmap.getData() + 0x100, palette1, 0x400) != 0);
 		if (anyChange)
 		{
 			// Copy over the data and upload it to the GPU
-			memcpy(&bitmap.mData[0], palette0, 0x400);
-			memcpy(&bitmap.mData[0x100], palette1, 0x400);
+			memcpy(bitmap.getData(), palette0, 0x400);
+			memcpy(bitmap.getData() + 0x100, palette1, 0x400);
 
 			glBindTexture(GL_TEXTURE_2D, mPaletteTexture.getHandle());
-			glTexImage2D(GL_TEXTURE_2D, 0, rmx::OpenGLHelper::FORMAT_RGBA, bitmap.mWidth, bitmap.mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.mData);
+			glTexImage2D(GL_TEXTURE_2D, 0, rmx::OpenGLHelper::FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
