@@ -11,21 +11,29 @@
 #include <rmxbase.h>
 
 
-struct BitmapWrapper
+class BitmapWrapper
 {
-	uint32* mData = nullptr;
-	Vec2i mSize;
-
+public:
 	inline BitmapWrapper() = default;
 	inline explicit BitmapWrapper(Bitmap& bitmap) : mData(bitmap.getData()), mSize(bitmap.getSize()) {}
 	inline BitmapWrapper(uint32* data, Vec2i size) : mData(data), mSize(size) {}
 
-	inline void Reset()  { mData = nullptr; mSize.set(0, 0); }
-	inline void Set(Bitmap& bitmap)  { mData = bitmap.getData(); mSize = bitmap.getSize(); }
-	inline void Set(uint32* data, Vec2i size)  { mData = data; mSize = size; }
+	inline void reset()  { mData = nullptr; mSize.set(0, 0); }
+	inline void set(Bitmap& bitmap)  { mData = bitmap.getData(); mSize = bitmap.getSize(); }
+	inline void set(uint32* data, Vec2i size)  { mData = data; mSize = size; }
 
 	inline bool empty() const  { return (nullptr == mData || mSize.x <= 0 || mSize.y <= 0); }
-	inline uint32* getPixelPointer(int x, int y) const  { return &mData[x + y * mSize.x]; }
+
+	inline uint32* getData()  { return mData; }
+	inline const uint32* getData() const  { return mData; }
+	inline uint32* getPixelPointer(int x, int y)  { return &mData[x + y * mSize.x]; }
+	inline const uint32* getPixelPointer(int x, int y) const  { return &mData[x + y * mSize.x]; }
+
+	inline Vec2i getSize() const  { return mSize; }
+
+private:
+	uint32* mData = nullptr;
+	Vec2i mSize;
 };
 
 
@@ -35,7 +43,6 @@ public:
 	struct Options
 	{
 		// Note: Not all options are supported everywhere; and in some cases, there's specific Blitter functions for certain options
-		bool mSwapRedBlue = false;
 		bool mUseAlphaBlending = false;
 		bool mUseBilinearSampling = false;
 		Color mTintColor = Color::WHITE;

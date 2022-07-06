@@ -160,7 +160,7 @@ namespace softwaredrawer
 				}
 
 				mScreenSurface = nullptr;
-				mOutputWrapper.Reset();
+				mOutputWrapper.reset();
 			}
 		}
 
@@ -187,7 +187,7 @@ namespace softwaredrawer
 			}
 			else
 			{
-				mOutputWrapper.Set(mCurrentRenderTarget->accessBitmap());
+				mOutputWrapper.set(mCurrentRenderTarget->accessBitmap());
 				mScissorRect.set(0, 0, mCurrentRenderTarget->getWidth(), mCurrentRenderTarget->getHeight());
 			}
 		}
@@ -207,13 +207,13 @@ namespace softwaredrawer
 					{
 						SDL_LockSurface(mScreenSurface);
 						mIsScreenSurfaceLocked = true;
-						mOutputWrapper.Set((uint32*)mScreenSurface->pixels, Vec2i(mScreenSurface->w, mScreenSurface->h));
+						mOutputWrapper.set((uint32*)mScreenSurface->pixels, Vec2i(mScreenSurface->w, mScreenSurface->h));
 					}
 				}
 				else
 				{
 					// Handle invalid screen surface
-					mOutputWrapper.Reset();
+					mOutputWrapper.reset();
 				}
 			}
 			return mOutputWrapper;
@@ -222,6 +222,37 @@ namespace softwaredrawer
 		bool needSwapRedBlueChannels()
 		{
 			return (nullptr == mCurrentRenderTarget && mSurfaceSwapRedBlue);
+		}
+
+		void setupRedBlueSwappedBitmapWrapper(BitmapWrapper& bitmapWrapper)
+		{
+			// Setup temp buffer with the right size
+			mTempBuffer.createReusingMemory(bitmapWrapper.getSize().x, bitmapWrapper.getSize().y, mTempReservedSize);
+
+			// Copy over data and swap red and blue channels
+			const uint32* src = bitmapWrapper.getData();
+			uint32* dst = mTempBuffer.getData();
+			const int numPixels = mTempBuffer.getPixelCount();
+			int k = 0;
+
+			if constexpr (sizeof(void*) == 8)
+			{
+				// On 64-bit architectures: Process 2 pixels at once
+				for (; k < numPixels; k += 2)
+				{
+					const uint64 colors = *(uint64*)&src[k];
+					*(uint64*)&dst[k] = ((colors & 0x00ff000000ff0000ull) >> 16) | (colors & 0xff00ff00ff00ff00ull) | ((colors & 0x000000ff000000ffull) << 16);
+				}
+			}
+			// Process single pixels
+			for (; k < numPixels; ++k)
+			{
+				const uint32 color = src[k];
+				dst[k] = ((color & 0x00ff0000) >> 16) | (color & 0xff00ff00) | ((color & 0x000000ff) << 16);
+			}
+
+			// Use the temp buffer as replacement for the bitmap wrapper
+			bitmapWrapper.set(mTempBuffer);
 		}
 
 		void unlockScreenSurface()
@@ -267,11 +298,15 @@ namespace softwaredrawer
 				inputRect.width  -= (uncroppedRect.width - croppedRect.width);
 				inputRect.height -= (uncroppedRect.height - croppedRect.height);
 
+				BitmapWrapper bufferWrapper(bufferBitmap);
+				if (needSwapRedBlueChannels())
+				{
+					setupRedBlueSwappedBitmapWrapper(bufferWrapper);
+				}
+
 				Blitter::Options options;
-				options.mSwapRedBlue = needSwapRedBlueChannels();
 				options.mUseAlphaBlending = true;
 
-				BitmapWrapper bufferWrapper(bufferBitmap);
 				Blitter::blitBitmap(outputWrapper, drawPosition + inputRect.getPos(), bufferWrapper, inputRect, options);
 			}
 		}
@@ -380,7 +415,6 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 				if (!targetRect.empty())
 				{
 					Blitter::Options options;
-					options.mSwapRedBlue = mInternal.needSwapRedBlueChannels();
 					options.mUseAlphaBlending = mInternal.useAlphaBlending();
 
 					if (nullptr != dc.mTexture)
@@ -395,6 +429,10 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 						}
 
 						BitmapWrapper inputWrapper(*inputBitmap);
+						if (mInternal.needSwapRedBlueChannels())
+						{
+							mInternal.setupRedBlueSwappedBitmapWrapper(inputWrapper);
+						}
 
 						Recti inputRect;
 						bool useUVs = false;
@@ -413,8 +451,8 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 							useUVs = (uv0.x < 0.0f || uv0.x > uv1.x || uv1.x > 1.0f || uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
 
 							// Get the part from the input that will get drawn
-							const Vec2f inputStart = uv0 * Vec2f(inputBitmap->getSize());
-							const Vec2f inputEnd = uv1 * Vec2f(inputBitmap->getSize());
+							const Vec2f inputStart = uv0 * Vec2f(inputWrapper.getSize());
+							const Vec2f inputEnd = uv1 * Vec2f(inputWrapper.getSize());
 							inputRect.x = roundToInt(inputStart.x);
 							inputRect.y = roundToInt(inputStart.y);
 							inputRect.width = roundToInt(inputEnd.x) - inputRect.x;
@@ -453,10 +491,13 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 					BitmapWrapper& outputWrapper = mInternal.getOutputWrapper();
 					BitmapWrapper inputWrapper(dc.mTexture->accessBitmap());
 
-					Blitter::Options options;
-					options.mSwapRedBlue = mInternal.needSwapRedBlueChannels();
+					if (mInternal.needSwapRedBlueChannels())
+					{
+						mInternal.setupRedBlueSwappedBitmapWrapper(inputWrapper);
+					}
 
-					Blitter::blitBitmapWithScaling(outputWrapper, dc.mRect, inputWrapper, Recti(0, 0, inputWrapper.mSize.x, inputWrapper.mSize.y), options);
+					Blitter::Options options;
+					Blitter::blitBitmapWithScaling(outputWrapper, dc.mRect, inputWrapper, Recti(0, 0, inputWrapper.getSize().x, inputWrapper.getSize().y), options);
 				}
 				break;
 			}
@@ -470,9 +511,9 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 					Bitmap& inputBitmap = dc.mTexture->accessBitmap();
 
 					Blitter::Options options;
-					options.mSwapRedBlue = mInternal.needSwapRedBlueChannels();
 					options.mUseAlphaBlending = mInternal.useAlphaBlending();
 					options.mUseBilinearSampling = (mInternal.mCurrentSamplingMode == DrawerSamplingMode::BILINEAR);
+					// Note that this does not support red-blue channel swap
 
 					SoftwareRasterizer rasterizer(outputWrapper, options);
 					SoftwareRasterizer::Vertex_P2_T2 triangle[3];
@@ -498,11 +539,11 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 				BitmapWrapper& outputWrapper = mInternal.getOutputWrapper();
 
 				Blitter::Options options;
-				options.mSwapRedBlue = mInternal.needSwapRedBlueChannels();
 				options.mUseAlphaBlending = mInternal.useAlphaBlending();
 
 				SoftwareRasterizer rasterizer(outputWrapper, options);
 				SoftwareRasterizer::Vertex_P2_C4 triangle[3];
+				const bool swapRedBlue = mInternal.needSwapRedBlueChannels();
 
 				const int numTriangles = (int)dc.mTriangles.size() / 3;
 				for (int i = 0; i < numTriangles; ++i)
@@ -512,6 +553,11 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 					{
 						triangle[k].mPosition = input[k].mPosition;
 						triangle[k].mColor = input[k].mColor;
+					}
+					if (swapRedBlue)
+					{
+						for (int k = 0; k < 3; ++k)
+							triangle[k].mColor.swapRedBlue();
 					}
 					rasterizer.drawTriangle(triangle);
 				}

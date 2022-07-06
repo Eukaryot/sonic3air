@@ -164,8 +164,8 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 
 	int minY = (int)(firstIntegerY);
 	int maxY = (int)(std::floor(endY));
-	minY = clamp(minY, 0, mOutput.mSize.y);
-	maxY = clamp(maxY, -1, mOutput.mSize.y-1);
+	minY = clamp(minY, 0, mOutput.getSize().y);
+	maxY = clamp(maxY, -1, mOutput.getSize().y-1);
 
 	const float scaleU = (float)(texture.getWidth() - 1);
 	const float scaleV = (float)(texture.getHeight() - 1);
@@ -174,8 +174,8 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 	{
 		int minX = (int)(std::ceil(vertexLeft.mPosition.x));
 		int maxX = (int)(std::floor(vertexRight.mPosition.x));
-		minX = clamp(minX, 0, mOutput.mSize.x);
-		maxX = clamp(maxX, -1, mOutput.mSize.x-1);
+		minX = clamp(minX, 0, mOutput.getSize().x);
+		maxX = clamp(maxX, -1, mOutput.getSize().x-1);
 
 		if (minX <= maxX)
 		{
@@ -205,8 +205,6 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						bytes[1] = (((texColor >> 8)  & 0xff) * multiplierA + bytes[1] * multiplierB) >> 8;
 						bytes[2] = (((texColor >> 16) & 0xff) * multiplierA + bytes[2] * multiplierB) >> 8;
 						bytes[3] = 0xff;
-
-						// TODO: Support red-blue swap here
 
 						bytes += 4;
 						currentUV += diffUV;
@@ -244,8 +242,6 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						bytes[2] = (int)((b * a + (float)bytes[2] * (255.0f - a)) / 255.0f);
 						bytes[3] = 0xff;
 
-						// TODO: Support red-blue swap here
-
 						bytes += 4;
 						currentUV += diffUV;
 					}
@@ -264,7 +260,6 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 					const uint32 texColor = texture.getPixel(sampleX, sampleY);
 
 					// TODO: Support bilinear sampling here as well
-					// TODO: Support red-blue swap here
 
 					// No blending
 					*data = texColor;
@@ -308,14 +303,6 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 		advanceRight.mColor[k]  = (vertex11.mColor[k] - vertex10.mColor[k]) / rangeY;
 	}
 
-	if (mOptions.mSwapRedBlue)
-	{
-		vertexLeft.mColor.swapRedBlue();
-		vertexRight.mColor.swapRedBlue();
-		advanceLeft.mColor.swapRedBlue();
-		advanceRight.mColor.swapRedBlue();
-	}
-
 	// Move to the first integer line
 	const float firstIntegerY = std::ceil(startY);
 	const float firstStepY = firstIntegerY - startY;
@@ -329,15 +316,15 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 
 	int minY = (int)(firstIntegerY);
 	int maxY = (int)(std::floor(endY));
-	minY = clamp(minY, 0, mOutput.mSize.y);
-	maxY = clamp(maxY, -1, mOutput.mSize.y-1);
+	minY = clamp(minY, 0, mOutput.getSize().y);
+	maxY = clamp(maxY, -1, mOutput.getSize().y-1);
 
 	for (int y = minY; y <= maxY; ++y)
 	{
 		int minX = (int)(std::ceil(vertexLeft.mPosition.x));
 		int maxX = (int)(std::floor(vertexRight.mPosition.x));
-		minX = clamp(minX, 0, mOutput.mSize.x);
-		maxX = clamp(maxX, -1, mOutput.mSize.x-1);
+		minX = clamp(minX, 0, mOutput.getSize().x);
+		maxX = clamp(maxX, -1, mOutput.getSize().x-1);
 
 		if (minX <= maxX)
 		{
