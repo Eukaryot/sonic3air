@@ -391,7 +391,7 @@ function void fn006f4a()
 	if (debug_mode.state != 0 || global.zone != 0x01)
 		return
 
-	if (global.characters != CHARS_TAILS_ALONE)
+	if (!isMainCharacter(CHARACTER_TAILS))
 	{
 		A3 = 0xfffff7c8
 		A1 = 0xffffb000

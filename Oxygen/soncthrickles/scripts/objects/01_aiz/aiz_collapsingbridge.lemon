@@ -40,12 +40,12 @@ function void fn02acdc()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			objA1.render_flags |= render_flag.COMPOUND
-			u16[A1 + 0x16] = 6		// Number of bridge segments
+			objA1.compound.count = 6		// Number of bridge segments
 			D2.u16 = objA0.position.y.u16
 			D3.u16 = objA0.position.x.u16 - 0x4b
 
 			A2 = A1 + 0x18
-			D6.u16 = u16[A1 + 0x16]
+			D6.u16 = objA1.compound.count
 			u16[A2+4] = 1
 
 			while (D6.s16 > 0)
@@ -86,12 +86,12 @@ function void fn02acdc()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 			objA1.render_flags |= render_flag.COMPOUND
-			u16[A1 + 0x16] = 6		// Number of bridge segments
+			objA1.compound.count = 6		// Number of bridge segments
 			D2.u16 = objA0.position.y.u16
 			D3.u16 = objA0.position.x.u16 - 0x50
 
 			A2 = A1 + 0x18
-			D6.u16 = u16[A1 + 0x16]
+			D6.u16 = objA1.compound.count
 			u16[A2+4] = 1
 
 			while (D6.s16 > 0)

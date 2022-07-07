@@ -454,11 +454,11 @@ function void SaveGameOnLevelFinished()
 		if (!gameCompleted)
 		{
 			u8[A1 + 0x03] = nextZone
-			if (global.characters == CHARS_KNUCKLES_ALONE)
+			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
 				gameCompleted = (nextZone >= 0x0c)
 			}
-			else if (global.characters == CHARS_TAILS_ALONE)
+			else if (isMainCharacter(CHARACTER_TAILS))
 			{
 				gameCompleted = (nextZone >= 0x0d)
 			}

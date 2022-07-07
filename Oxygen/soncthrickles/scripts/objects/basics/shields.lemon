@@ -405,7 +405,7 @@ function void fn0187f0()
 		objA1.sprite_priority = 0x80
 		objA1.sprite_attributes = 0x079c
 		objA1.mapping_offset = 0x018aea
-		u16[A1 + 0x16] = 2
+		objA1.compound.count = 2
 		objA1.shield.character_address = objA0.shield.character_address
 		u8[A1 + 0x36] = D2.u8
 		u32[A1 + 0x30] = u32[(A2+=4)-4]

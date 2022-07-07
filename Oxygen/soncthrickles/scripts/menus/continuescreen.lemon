@@ -188,7 +188,7 @@ function void fn05c2e0()
 	D6.u16 = (sprite_attribute.PRIORITY | 0x0347)
 	fn05b318()
 
-	if (global.characters != CHARS_KNUCKLES_ALONE)
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
 	{
 	#if STANDALONE
 		if (global.characters == CHARS_SONIC_ALONE)
@@ -645,7 +645,7 @@ function void fn05c82c()
 //# address-hook(0x05c838) end(0x05c886)
 function void fn05c838()
 {
-	if (global.characters != CHARS_KNUCKLES_ALONE)
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		A1 = 0x05c8c8
 		objA0.position.x.u16 = 0x40
@@ -756,7 +756,7 @@ function void fn05c932()
 	else
 	{
 		objA0.base_state = 0x06
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			u8[0xfffffaa9] = 1
 		}
@@ -838,7 +838,7 @@ function void fn05ca14()
 function void fn05ca1a()
 {
 	objA0.mapping_offset = 0x05cd00
-	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? (sprite_attribute.PALETTE.LINE3 | 0x00d9) : 0x00d9
+	objA0.sprite_attributes = isMainCharacter(CHARACTER_KNUCKLES) ? (sprite_attribute.PALETTE.LINE3 | 0x00d9) : 0x00d9
 	objA0.sprite_priority = 0x0380
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08

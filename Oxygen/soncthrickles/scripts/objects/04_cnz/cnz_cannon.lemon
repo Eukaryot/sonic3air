@@ -23,7 +23,7 @@ function void fn0318a4()
 	objA0.box_size.y = 0x30
 	objA0.animation.sprite = 0x09
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 0x01
+	objA0.compound.count = 0x01
 
 	A2 = A0 + 0x18
 	u16[A2]   = objA0.position.x.u16
@@ -79,7 +79,7 @@ function void fn03192c()
 		LookupSinCos()
 		D0.u16 += 0x0120
 		D0.u16 >>= 6
-		u8[A0 + 0x1d] = D0.u8
+		objA0.compound.sprite1.animation.sprite = D0.u8
 		D0.u8 = level.framecounter.low & 0x1f
 		if (D0.u8 == 0)
 		{
@@ -104,7 +104,7 @@ function void fn03192c()
 				objA1.position.x.u16 = objA0.position.x.u16
 				objA1.position.y.u16 = objA0.position.y.u16 - 0x18
 
-				D0.u8 = 0x80 + u8[A0 + 0x1d] * 0x10
+				D0.u8 = 0x80 + objA0.compound.sprite1.animation.sprite * 0x10
 				LookupSinCos()
 				objA1.velocity.x = D1.s16 * 8
 				objA1.velocity.y = D0.s16 * 8
@@ -119,7 +119,7 @@ function void fn03192c()
 		LookupSinCos()
 		D0.u16 += 0x0120
 		D0.u16 >>= 6
-		u8[A0 + 0x1d] = D0.u8
+		objA0.compound.sprite1.animation.sprite = D0.u8
 		if (D0.u8 == 0x04)
 		{
 			u16[A0 + 0x34] = 0
@@ -198,7 +198,7 @@ function void fn0319f4()
 				return
 		}
 
-		D0.u8 = 0x80 + u8[A0 + 0x1d] * 0x10
+		D0.u8 = 0x80 + objA0.compound.sprite1.animation.sprite * 0x10
 		LookupSinCos()
 		D1.s16 <<= 4
 		D0.s16 <<= 4
@@ -237,7 +237,7 @@ function void fn031b18()
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		// Update sprite patterns for current rotation
-		D0 = u8[A0 + 0x1d]
+		D0 = objA0.compound.sprite1.animation.sprite
 	#if !STANDALONE
 		// In S3AIR, we update the graphics in every frame
 		//  -> This way it's no problem if there are briefly two cannons accessing this at the same time

@@ -22,7 +22,7 @@ function void fn044f52()
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x02f4)
 	objA0.mapping_offset = 0x046958
 	u16[A0 + 0x12] = objA0.position.x.u16
-	u16[A0 + 0x16] = 0x03
+	objA0.compound.count = 0x03
 	objA0.flags2a |= 0x80
 	objA0.countdown_value = 0xc0
 

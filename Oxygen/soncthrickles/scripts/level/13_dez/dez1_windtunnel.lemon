@@ -316,7 +316,7 @@ function void fn0498d2()
 		A2 = A1 + 0x18
 		A3 = 0x049a5a
 		D1 = 6
-		u16[A1 + 0x16] = D1.u16
+		objA1.compound.count = D1.u16
 		while (D1.s16 > 0)
 		{
 			u16[A2]   = D2.u16 + s8[A3]

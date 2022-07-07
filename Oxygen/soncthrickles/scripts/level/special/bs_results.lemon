@@ -530,7 +530,7 @@ function void fn02e9d8()
 //# address-hook(0x02e9f6) end(0x02ea0a)
 function void fn02e9f6()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE && global.lock_on_state == 0 && global.sk_bluespheres != 0)
+	if (isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0 && global.sk_bluespheres != 0)
 	{
 		objA0.sprite_attributes = sprite_attribute.PALETTE.LINE1
 	}
@@ -556,14 +556,7 @@ function void fn02ea1e()
 {
 	if (global.lock_on_state == 0 && global.sk_bluespheres)
 	{
-		if (global.characters == CHARS_KNUCKLES_ALONE)
-		{
-			objA0.animation.sprite += 0x1f
-		}
-		else
-		{
-			objA0.animation.sprite += 0x1a
-		}
+		objA0.animation.sprite += isMainCharacter(CHARACTER_KNUCKLES) ? 0x1f : 0x1a
 	}
 
 	fn02ea4a()
@@ -730,7 +723,7 @@ function void fn02eaf6()
 	objA0.animation.sprite += D1.u8
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | sprite_attribute.FLIP_Y | sprite_attribute.FLIP_X | 0x0779)
 
-	if (global.lock_on_state == 0 && global.sk_bluespheres && global.characters == CHARS_KNUCKLES_ALONE)
+	if (global.lock_on_state == 0 && global.sk_bluespheres && isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.sprite_attributes -= (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3)
 	}
@@ -856,7 +849,7 @@ function void fn02ebe8()
 	objA0.mapping_offset = 0x02f26a
 	objA0.position.x.u16 = 0x017c + getScreenExtend()
 	objA0.position.y.u16 = 0x014c
-	objA0.animation.sprite = 0x28 + max(global.characters, 1)	// 0x29 for Sonic (with or without Tails), 0x2a for Tails, 0x2b for Knuckles
+	objA0.animation.sprite = 0x29 + min(getMainCharacter(), 2)	// 0x29 for Sonic (with or without Tails), 0x2a for Tails, 0x2b for Knuckles
 
 	if (level.framecounter.low & 0x08)
 	{
@@ -981,7 +974,7 @@ function void fn02ecd0()
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
 	objA0.mapping_offset = 0x018aea
 
-	u16[A0 + 0x16] = 2
+	objA0.compound.count = 2
 	if (u16[A0 + 0x36] != 0)
 	{
 		objA0.position.x.u16 = 0x1640

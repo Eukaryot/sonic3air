@@ -20,7 +20,7 @@ function void fn03d090()
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 0x01
+	objA0.compound.count = 0x01
 
 	A2 = A0 + 0x18
 	u16[(A2+=2)-2] = objA0.position.x.u16
@@ -65,8 +65,8 @@ function void fn03d11e()
 	}
 
 	objA0.position.y.u16 = u16[A0 + 0x34] + u16[A0 + 0x46]
-	objA0.velocity.y = objA0.position.y.u16
-	u8[A0 + 0x1d] = (u16[A0 + 0x34] + 7) >> 3
+	objA0.compound.sprite1.position.y = objA0.position.y.u16
+	objA0.compound.sprite1.animation.sprite = (u16[A0 + 0x34] + 7) >> 3
 
 	A1 = 0xffffb000
 	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x10
@@ -141,8 +141,8 @@ function void fn03d220()
 	}
 
 	objA0.position.y.u16 = u16[A0 + 0x34] + u16[A0 + 0x46]
-	objA0.velocity.y = objA0.position.y.u16
-	u8[A0 + 0x1d] = (u16[A0 + 0x34] + 7) >> 3
+	objA0.compound.sprite1.position.y = objA0.position.y.u16
+	objA0.compound.sprite1.animation.sprite = (u16[A0 + 0x34] + 7) >> 3
 
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
 	objA1.position.x.u16 = objA0.position.x.u16

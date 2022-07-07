@@ -780,7 +780,7 @@ function void fn005ae4()
 	objA0.render_flags |= render_flag.COMPOUND
 
 	A2 = A0 + 0x18
-	objA0.position.y.frac = 0x02
+	objA0.compound.count = 0x02
 	u16[(A2+=2)-2] = objA0.position.x.u16
 	u16[(A2+=2)-2] = objA0.position.y.u16
 	u16[(A2+=2)-2] = 0

@@ -23,7 +23,7 @@ function void InitLevelTiles.MHZ1()
 	{
 		if (checkpoint.number == 0)
 		{
-			if (global.characters != CHARS_KNUCKLES_ALONE)
+			if (!isMainCharacter(CHARACTER_KNUCKLES))
 			{
 				A1 = 0xffffb000
 				objA1.position.x.u16 = 0x0718
@@ -44,7 +44,7 @@ function void InitLevelTiles.MHZ1()
 		}
 		else if (checkpoint.number == 1)
 		{
-			if (global.characters == CHARS_KNUCKLES_ALONE)
+			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
 				D2.u16 = 0x0680
 				camera.position.x.u16 = D2.u16
@@ -916,7 +916,7 @@ function void fn055312()
 		u16[0xffffeeca] = 0x02
 		u8[0xffffeed2] = 0xff
 
-		A1 = (global.characters != CHARS_KNUCKLES_ALONE) ? 0x0558e8 : 0x0558f8
+		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0558f8 : 0x0558e8
 		u8[0xffffeed9] = u8[A1]
 
 		player1.camera_lock = 0xff
@@ -1287,7 +1287,7 @@ function void fn05560c()
 {
 	u16[0xffffeebc] = 0
 	u16 newCameraX = camera.position.x.u16
-	newCameraX += (global.characters == CHARS_KNUCKLES_ALONE) ? 5 : 4
+	newCameraX += isMainCharacter(CHARACTER_KNUCKLES) ? 5 : 4
 
 	bool reachedEnd = (newCameraX >= 0x4280)
 	#if STANDALONE
@@ -1340,7 +1340,7 @@ function void fn05560c()
 			++u16[0xffffeeda]
 
 			D1.u16 = u16[0xffffeeda] & 0x0f
-			A1 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x0558f8 : 0x0558e8
+			A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0558f8 : 0x0558e8
 			u8[0xffffeed9] = u8[A1 + D1.s16]
 			if (u8[0xfffffaa9] != 0)
 			{
@@ -1376,7 +1376,7 @@ function void fn0556b8()
 	if (objA1.position.x.u16 < D0.u16)
 	{
 		objA1.position.x.u16 = D0.u16
-		objA1.groundspeed = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x0500 : 0x0400
+		objA1.groundspeed = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0500 : 0x0400
 	}
 	else
 	{

@@ -183,9 +183,9 @@ function void RenderHUD()
 			u16 py = useMobilePosition ? baseY : 200
 
 			string characterName
-			if (getMainCharacter() == CHARACTER_SONIC)
+			if (isMainCharacter(CHARACTER_SONIC))
 				characterName = "sonic"
-			else if (getMainCharacter() == CHARACTER_TAILS)
+			else if (isMainCharacter(CHARACTER_TAILS))
 				characterName = (global.region_code & 0x80) ? "tails" : "miles"
 			else
 				characterName = "knuckles"

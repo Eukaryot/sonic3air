@@ -146,7 +146,7 @@ function void fn054f8c()
 	A1 = 0xffffb000
 	if (u8[A1 + 0x2e] == 0x81)
 	{
-		D3.u16 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x02dc : 0x02cd
+		D3.u16 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x02dc : 0x02cd
 		D4.u16 = u16[0xffffeede] - D1.u16
 		objA1.position.y.u16 += D4.u16
 		D2.u16 -= D0.u16

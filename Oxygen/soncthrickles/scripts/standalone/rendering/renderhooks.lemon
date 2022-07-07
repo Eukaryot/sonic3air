@@ -743,7 +743,7 @@ function bool Standalone.onDrawVdpSpriteCompound(s16 px, s16 py, u8 size, u16 in
 		{
 			bool isSecondRow = (u16[A0 + 0x30] != 0)
 			u16 leftPattern = u16[0xffffeed8]
-			u32 baseAddress = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x0558f8 : 0x0558e8
+			u32 baseAddress = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0558f8 : 0x0558e8
 			u16 rightPattern = u8[baseAddress + ((u16[0xffffeeda] + 1) & 0x0f)]
 
 			bool renderLeft  = (!isSecondRow || leftPattern == 4)

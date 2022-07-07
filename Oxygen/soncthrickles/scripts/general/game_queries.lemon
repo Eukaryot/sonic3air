@@ -66,7 +66,12 @@ function bool isSecondCharacter(u8 character)
 	return (getSecondCharacter() == character)
 }
 
+function bool isPlayerCharacter(u8 player, u8 character)
+{
+	return (player == 1) ? isSecondCharacter(character) : isMainCharacter(character)
+}
+
 function u8 getNumPlayers()
 {
-	return (getSecondCharacter() == 0xff) ? 1 : 2
+	return (isSecondCharacter(0xff)) ? 1 : 2
 }

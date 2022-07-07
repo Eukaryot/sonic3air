@@ -27,7 +27,7 @@ function void RunOnWaterHandler.Init()
 		objA0.flags2a = 0
 		objA0.render_flags |= render_flag.COMPOUND
 
-		u16[A0 + 0x16] = 0x02
+		objA0.compound.count = 0x02
 		A2 = A0 + 0x18
 		u16[A2]    = objA0.position.x.u16
 		u16[A2+2]  = objA0.position.y.u16

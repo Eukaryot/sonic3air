@@ -56,7 +56,7 @@ function void fn040b62()
 			if (debug_mode.state == 0)
 			{
 				objA0.render_flags |= render_flag.COMPOUND
-				u16[A0 + 0x16] = 2
+				objA0.compound.count = 2
 
 				A2 = A0 + 0x18
 				u16[(A2+=2)-2] = objA0.position.x.u16
@@ -83,10 +83,10 @@ function void fn040bca()
 	if (s8(objA0.animation.timer) < 0)
 	{
 		objA0.animation.timer = 3
-		++u8[A0 + 0x1d]
-		if (u8[A0 + 0x1d] >= 13)
+		++objA0.compound.sprite1.animation.sprite
+		if (objA0.compound.sprite1.animation.sprite >= 13)
 		{
-			u8[A0 + 0x1d] = 9
+			objA0.compound.sprite1.animation.sprite = 9
 		}
 	}
 
@@ -97,7 +97,7 @@ function void fn040bca()
 	if (s16[A0 + 0x30] < 0)
 	{
 		objA0.render_flags &= ~render_flag.COMPOUND
-		u16[A0 + 0x16] = 0
+		objA0.compound.count = 0
 		objA0.update_address = 0x040c2a
 	}
 

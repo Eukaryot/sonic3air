@@ -1035,7 +1035,7 @@ function void fn06a872()
 		A1 = 0xffffb04a
 		if (u32[A1] != 0)
 		{
-			stopCharacterWinPose(0xffffb04a)
+			StopCharacterWinPose()
 		}
 	}
 	else

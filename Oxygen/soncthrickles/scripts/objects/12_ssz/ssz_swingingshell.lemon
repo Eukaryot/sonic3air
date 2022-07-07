@@ -101,7 +101,7 @@ function void fn0461a8()
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0348)
 	objA0.mapping_offset = 0x046ada
 	D0.u16 = (objA0.subtype2c & 0x03) + 6
-	u16[A0 + 0x16] = D0.u16
+	objA0.compound.count = D0.u16
 
 	if (allocDynamicObjectAfterA0())
 	{
@@ -132,10 +132,10 @@ function void fn0461fe()
 	}
 
 	A1 = 0xffff0000 + objA0.respawn_entry
-	D0.u16 = (u16[A1 + 0x20] - 0x40) & 0xff
+	D0.u16 = (objA1.compound.sprite2.position.y - 0x40) & 0xff
 	objA0.sprite_priority = (D0.u16 >= 0x80) ? 0x100 : 0x180
 
-	D0.u16 = u16[A1 + 0x20]
+	D0.u16 = objA1.compound.sprite2.position.y
 	LookupSinCos()
 	D1 = (D1 << 16)
 	D1.s32 >>= 4
@@ -144,8 +144,8 @@ function void fn0461fe()
 	D3 = objA0.position.x
 	D2 = objA0.position.y
 	D2.u16 = 0
-	D4.u16 = u16[A0 + 0x16]
-	--D4.u16
+	D4.u16 = objA0.compound.count - 1
+
 	A1 = A0 + 0x18
 
 	while (D4.s16 >= 0)
@@ -191,7 +191,7 @@ function void fn0462b6()
 	}
 
 	A1 = 0xffff0000 + u16[A0 + 0x2e]
-	D0.u16 = (u16[A1 + 0x16] - 1) * 6
+	D0.u16 = (objA1.compound.count - 1) * 6
 	objA0.position.x.u16 = u16[A1 + D0.s16 + 0x18]
 	D0.u16 = u16[A1 + D0.s16 + 0x1a] + 0x0c
 	objA0.position.y.u16 = D0.u16

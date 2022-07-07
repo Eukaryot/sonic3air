@@ -370,7 +370,7 @@ function void fn08aeea()
 		objA0.render_flags |= render_flag.FLIP_X
 
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 0x07
+	objA0.compound.count = 0x07
 	A1 = A0 + 0x1c
 	D6 = 6
 

@@ -39,7 +39,7 @@ function void fn053ad4()
 	objA1.mapping_offset = 0x046b3c
 	objA1.position.x.u16 = objA0.position.x.u16
 	objA1.position.y.u16 = objA0.position.y.u16
-	u16[A1 + 0x16] = 0x02
+	objA1.compound.count = 0x02
 	u16[A1 + 0x44] = objA0.position.y.u16 - 0x80
 	u8[A1 + 0x46] = 0x18
 	u16[A1 + 0x48] = A0.u16

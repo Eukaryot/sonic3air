@@ -54,7 +54,7 @@ function void Character.BaseUpdate.Tails()
 	A6 = 0xffffcc9e		// Base address of dust cloud object for Tails
 
 	// Check for debug mode
-	if (debug_mode.state == 0 || global.characters != CHARS_TAILS_ALONE)	// Maybe a check if it's second player Tails?
+	if (debug_mode.state == 0 || !isMainCharacter(CHARACTER_TAILS))	// Maybe a check if it's second player Tails?
 	{
 		// Targets:
 		//  - 0x0136ca	-> char.base_state = 0x00	-> Character.Initialization.Tails()		-> Initialization
@@ -163,7 +163,7 @@ function void Character.Initialization.shared(u8 character)
 
 	if (character == CHARACTER_TAILS)
 	{
-		if (global.characters == CHARS_TAILS_ALONE)
+		if (isMainCharacter(CHARACTER_TAILS))
 		{
 			if (checkpoint.number == 0)
 			{
@@ -254,20 +254,12 @@ function void Character.UpdateNormalState.Sonic()
 	{
 		// Call update function depending on flags
 		pushA456()
-		if (char.flags & char.flag.IN_AIR)
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateSonicRollingInAir()
-			else
-				Character.UpdateSonicUprightInAir()
-		}
-		else
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateSonicRollingOnGround()
-			else
-				Character.UpdateSonicUprightOnGround()
-		}
+		// Targets:
+		//  - 0x010f2c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateSonicUprightOnGround()
+		//  - 0x010fb6	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateSonicUprightInAir()
+		//  - 0x010fe0	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateSonicRollingOnGround()
+		//  - 0x011036	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateSonicRollingInAir()
+		call tableLookupAddress(0x010c90, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
 
@@ -397,20 +389,12 @@ function void Character.UpdateNormalState.Tails()
 	{
 		// Call update function depending on flags
 		pushA456()
-		if (char.flags & char.flag.IN_AIR)
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateTailsRollingInAir()
-			else
-				Character.UpdateTailsUprightInAir()
-		}
-		else
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateTailsRollingOnGround()
-			else
-				Character.UpdateTailsUprightOnGround()
-		}
+		// Targets:
+		//  - 0x014748	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateTailsUprightOnGround()
+		//  - 0x0147b8	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateTailsUprightInAir()
+		//  - 0x014934	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateTailsRollingOnGround()
+		//  - 0x0149a2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateTailsRollingInAir()
+		call tableLookupAddress(0x0138f6, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
 
@@ -471,20 +455,12 @@ function void Character.UpdateNormalState.Knuckles()
 	{
 		// Call update function depending on flags
 		pushA456()
-		if (char.flags & char.flag.IN_AIR)
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateKnucklesRollingInAir()
-			else
-				Character.UpdateKnucklesUprightInAir()
-		}
-		else
-		{
-			if (char.flags & char.flag.ROLLING)
-				Character.UpdateKnucklesRollingOnGround()
-			else
-				Character.UpdateKnucklesUprightOnGround()
-		}
+		// Targets:
+		//  - 0x0167f4	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = 0x00												-> Character.UpdateKnucklesUprightOnGround()
+		//  - 0x01684c	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.IN_AIR									-> Character.UpdateKnucklesUprightInAir()
+		//  - 0x0170c2	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = char.flag.ROLLING								-> Character.UpdateKnucklesRollingOnGround()
+		//  - 0x017118	-> (char.flags & (char.flag.IN_AIR | char.flag.ROLLING)) = (char.flag.IN_AIR | char.flag.ROLLING)			-> Character.UpdateKnucklesRollingInAir()
+		call tableLookupAddress(0x016642, char.flags & (char.flag.IN_AIR | char.flag.ROLLING))
 		popA456()
 	}
 
@@ -2986,7 +2962,7 @@ function void TailsPressedJumpInMidAir()
 #endif
 
 	// Tails is manually controlled?
-	if (global.characters == CHARS_TAILS_ALONE || tails.control_counter != 0)
+	if (isMainCharacter(CHARACTER_TAILS) || tails.control_counter != 0)
 	{
 		TailsStartFlight()
 	}
@@ -6270,7 +6246,7 @@ function void SonicUpdateAnimationHurt()
 function void Character.UpdateGotHurtState.Tails()
 {
 	// Tails is first player?
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		if (debugModeRescue())
 			return
@@ -6422,7 +6398,7 @@ function void Character.UpdateDiedState.Sonic()
 function void Character.UpdateDiedState.Tails()
 {
 	// Tails is first player?
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		if (debugModeRescue())
 			return
@@ -6524,7 +6500,7 @@ function void Character.CheckDiedStateEnd()
 	else
 	{
 		// Normal game
-		if (char.character == CHARACTER_TAILS && global.characters != CHARS_TAILS_ALONE)
+		if (char.character == CHARACTER_TAILS && !isMainCharacter(CHARACTER_TAILS))
 		{
 			// Second player Tails
 			char.base_state = 0x02

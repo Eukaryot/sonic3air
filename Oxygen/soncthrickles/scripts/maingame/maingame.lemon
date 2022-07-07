@@ -557,7 +557,7 @@ function void initializeMainGame()
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
 
-	Level.loadPaletteData((global.characters == CHARS_KNUCKLES_ALONE) ? 5 : 3)
+	Level.loadPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 5 : 3)
 	Level.InitializeWater()
 
 	zeroMemory(0xfffff0a0, 0x60)
@@ -569,9 +569,9 @@ function void initializeMainGame()
 
 	if (s16(global.rolling_demo) >= 0)
 	{
-		bool isKnucklesIntro = (global.zone_act == 0x0700 && global.characters == CHARS_KNUCKLES_ALONE && global.lock_on_state != 0 && checkpoint.number == 0)
+		bool isKnucklesIntro = (global.zone_act == 0x0700 && isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state != 0 && checkpoint.number == 0)
 	#if STANDALONE
-		isKnucklesIntro = (Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 && global.zone_act == 0x0000 && global.characters == CHARS_KNUCKLES_ALONE && checkpoint.number == 0 && !Game.isTimeAttack())
+		isKnucklesIntro = (Game.getSetting(SETTING_AIZ_INTRO_KNUCKLES) != 0 && global.zone_act == 0x0000 && isMainCharacter(CHARACTER_KNUCKLES) && checkpoint.number == 0 && !Game.isTimeAttack())
 	#endif
 
 		u8 musicId
@@ -1163,7 +1163,7 @@ function void Level.InitializeWater.Part2()
 		if (!EXTENDED_CHARACTER_PALETTES)
 	#endif
 		{
-			if (global.characters == CHARS_KNUCKLES_ALONE)
+			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
 				// Copying in Knuckles' colors into underwater palette
 				A1 = 0x007a4a + global.zone * 6
@@ -1778,7 +1778,7 @@ function void fn0067ee()
 	{
 		// Hydrocity Zone
 		objA1.state = char.state.FALLING_PANIC
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			// objA1.state = char.state.KNUX_FALLING
 			// objA1.state.former = char.state.KNUX_FALLING
@@ -1788,7 +1788,7 @@ function void fn0067ee()
 			objA1.animation.timer = 0	// This is A0 instead of A1 in original, thanks to Clownacy (https://forums.sonicretro.org/index.php?showtopic=30778&view=findpost&p=893997)
 		}
 		objA1.flags2a |= char.flag.IN_AIR
-		if (global.characters == CHARS_TAILS_ALONE)
+		if (isMainCharacter(CHARACTER_TAILS))
 		{
 			u8[A1 + 0x40] = 0x01
 		}
@@ -1902,7 +1902,7 @@ function void fn0067ee()
 	else if (global.zone_act == 0x0900)
 	{
 		// Lava Reef Zone
-		if (global.characters != CHARS_KNUCKLES_ALONE)
+		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			objA1.state = char.state.FALLING_PANIC
 			objA1.flags2a |= char.flag.IN_AIR
@@ -2056,7 +2056,7 @@ function void InitializeGameCharacters()
 	}
 
 	bool spawnSecondPlayerTails = false
-	if (global.characters == CHARS_SONIC_AND_TAILS || global.characters == CHARS_SONIC_ALONE)
+	if (isMainCharacter(CHARACTER_SONIC))
 	{
 		// Spawn Sonic
 		u32[0xffffb000] = 0x010a94
@@ -2065,9 +2065,9 @@ function void InitializeGameCharacters()
 		u16[0xffffcce8 + 0x42] = 0xb000
 
 		// Also spawn Tails if needed
-		spawnSecondPlayerTails = (global.characters == CHARS_SONIC_AND_TAILS)
+		spawnSecondPlayerTails = isSecondCharacter(CHARACTER_TAILS)
 	}
-	else if (global.characters == CHARS_TAILS_ALONE)
+	else if (isMainCharacter(CHARACTER_TAILS))
 	{
 		// Spawn Tails
 		u32[0xffffb000] = 0x01365c
@@ -2075,7 +2075,7 @@ function void InitializeGameCharacters()
 		u16[0xffffb000 + 0x14] += 4
 		tails.ai_routine = 0
 	}
-	else if (global.characters == CHARS_KNUCKLES_ALONE)
+	else if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// Spawn Knuckles
 		u32[0xffffb000] = 0x016444
@@ -2087,7 +2087,7 @@ function void InitializeGameCharacters()
 	#endif
 	}
 	else
-		assert(false, "Unsupported character selection")	// "global.characters" value not supported
+		assert(false, "Unsupported character selection")
 
 	if (spawnSecondPlayerTails)
 	{

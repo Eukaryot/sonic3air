@@ -162,7 +162,7 @@ function void fn0837d8()
 
 	objA0.hitbox_extends.x = 0x18
 	objA0.hitbox_extends.y = 0x1e
-	u32[A0 + 0x30] = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x083b58 : 0x083b4a
+	u32[A0 + 0x30] = isMainCharacter(CHARACTER_KNUCKLES) ? 0x083b58 : 0x083b4a
 	objA0.position.y.u16 = camera.position.y.u16 - 0x20
 
 	playSound(0xb8)

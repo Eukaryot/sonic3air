@@ -96,7 +96,7 @@ function void fn038756()
 		objA1.box_size.y = 0x08
 	#endif
 
-		u16[A1 + 0x16] = D1.u16
+		objA1.compound.count = D1.u16
 		--D1.u8
 		assert(D1.s16 <= 0x19)
 

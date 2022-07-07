@@ -228,7 +228,7 @@ function void fn08b8c2()
 		objA0.render_flags |= render_flag.FLIP_X
 
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 0x02
+	objA0.compound.count = 0x02
 	fn08b8fa()
 
 	objA0.animation.sprite = 0x08

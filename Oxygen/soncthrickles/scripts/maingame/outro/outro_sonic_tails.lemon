@@ -32,7 +32,7 @@ function void fn05d86a()
 	//  - 0x05de1a	-> objA0.base_state = 0x1e  -> Tornado flying on to the left
 	call tableLookupAddress(0x05d89c, objA0.base_state)
 
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 	#if STANDALONE
 		// Set Sonic's colors to blue, otherwise Sonic in the Tornado would be super
@@ -229,7 +229,7 @@ function void fn05da74()
 	objA0.position.x.u16 = objA1.position.x.u16 - D0.s16
 
 	D0 = 0x2b
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		D0.u8 -= 4
 		u8[0xffffcc0a + 0x04] &= ~0x04
@@ -247,7 +247,7 @@ function void fn05da74()
 		super.palettefx.state = 2
 		super.palettefx.frame = 30
 
-		objA1.mapping_offset = (global.characters != CHARS_TAILS_ALONE) ? 0x146620 : 0x148eb8
+		objA1.mapping_offset = isMainCharacter(CHARACTER_TAILS) ? 0x148eb8 : 0x146620
 	}
 
 	u8[A1 + 0x20] = char.state.STANDING
@@ -640,7 +640,7 @@ function void fn05dca6()
 	objA0.velocity.x = -0x80
 #endif
 	objA0.velocity.y = 0
-	objA0.animation.sprite = (global.characters != CHARS_TAILS_ALONE) ? 0x05 : 0x06
+	objA0.animation.sprite = isMainCharacter(CHARACTER_TAILS) ? 0x06 : 0x05
 
 	loadPaletteLine1(0x060a9a)
 
@@ -683,7 +683,7 @@ function void fn05dd6a()
 	{
 		objA0.base_state = 0x1e
 		u8[0xffffeec4] = 0xff
-		if (global.characters != CHARS_KNUCKLES_ALONE && outro.ending_type >= 0)
+		if (!isMainCharacter(CHARACTER_KNUCKLES) && outro.ending_type >= 0)
 		{
 			A2 = 0x05ddd2
 			D1 = 0x41
@@ -947,7 +947,7 @@ function void fn05e1c2()
 	u8[A1 + 0x0a] &= ~0x80
 	u8[A1 + 0x2e] = 0x83
 	u8[A1 + 0x20] = char.state.STANDING
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		A2 = 0xffffcc0a
 		u32[A2] = 0x0160a6
@@ -1014,7 +1014,7 @@ function void fn05e2c2()
 	u16[A1 + 0x20] = 0x0200		// char.state.ROLLING, char.state.RUNNING
 	u32[0xffffcc0a] = 0
 
-	D0 = (global.characters == CHARS_TAILS_ALONE) ? 0 : (outro.ending_type < 0) ? 4 : 8
+	D0 = isMainCharacter(CHARACTER_TAILS) ? 0 : (outro.ending_type < 0) ? 4 : 8
 	screenmover_target.right = D0.u16		// This variable is just misused to temporarily save this value
 
 	A1 = u32[0x05e328 + D0.u16]
@@ -1034,7 +1034,7 @@ function void fn05e334()
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x80
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		objA0.animation.sprite = 0x03
 	}
@@ -1048,7 +1048,7 @@ function void fn05e334()
 		fn05e3c0()
 		return
 	}
-	if (outro.ending_type == 0 && global.characters >= CHARS_TAILS_ALONE)
+	if (outro.ending_type == 0 && !isMainCharacter(CHARACTER_SONIC))
 	{
 		fn05e3c0()
 		return
@@ -1067,7 +1067,7 @@ function void fn05e3c0()
 {
 	objA0.base_state = 0x08
 	objA0.countdown_value = 0x05
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		objA0.render_flags |= render_flag.FLIP_X
 	}
@@ -1106,7 +1106,7 @@ function void fn05e412()
 	A1 = 0xffffb000
 	if (u8[A1 + 0x2e] == 0)
 	{
-		if (global.characters == CHARS_TAILS_ALONE)
+		if (isMainCharacter(CHARACTER_TAILS))
 		{
 			if (allocDynamicObjectStd())
 			{
@@ -1186,7 +1186,7 @@ function void fn05e4b6()
 //# address-hook(0x05e4e2) end(0x05e4fe)
 function void fn05e4e2()
 {
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		super.palettefx.timer = 0x7f
 	}
@@ -1469,7 +1469,7 @@ function void fn05ee18()
 	objA0.animation.sprite = 0x04
 	D0.u8 = u8[A0 + 0x2d]
 	objA0.animation.timer = D0.u8
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.render_flags |= render_flag.WORLD
 	}
@@ -1566,7 +1566,7 @@ function void fn05ef28()
 {
 	Object.animationProgress(0x06027c)
 
-	if (global.characters != CHARS_KNUCKLES_ALONE)
+	if (!isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		fn05fe48()
 	}
@@ -2009,17 +2009,7 @@ function void fn08648c()
 	global.move.deceleration = 0xc0
 	u8[0xffffb000 + 0x20] = char.state.TRANSFORMING
 
-	if (global.characters == CHARS_TAILS_ALONE)
-	{
-		super.active = 0
-		super.active.tails = 0x01
-		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
-		global.move.speedcap.tails = 0x800
-		global.move.acceleration.tails = 0x18
-		global.move.deceleration.tails = 0xc0
-		u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
-	}
-	else if (global.characters < CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_SONIC))
 	{
 		u32[0xffffb000 + 0x0c] = 0x146816
 		super.active = 0xff
@@ -2030,6 +2020,16 @@ function void fn08648c()
 		global.move.acceleration = 0x30
 		global.move.deceleration = 0x100
 		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		super.active = 0
+		super.active.tails = 0x01
+		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
+		global.move.speedcap.tails = 0x800
+		global.move.acceleration.tails = 0x18
+		global.move.deceleration.tails = 0xc0
+		u32[0xffffcd7c] = 0x01a170		// Super Flickies (the first one spawns the others)
 	}
 	else
 	{

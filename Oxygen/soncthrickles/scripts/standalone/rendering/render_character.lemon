@@ -128,7 +128,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 	u16 animationSpriteEx = Standalone.getModdedAnimationSpriteEx(character, animationSprite)
 	u8 flags = (char.render_flags & (SPRITE_FLAG_FLIP_X | SPRITE_FLAG_FLIP_Y))
 	u8 angle = 0
-	u64 key = 0
+	u64 key = Standalone.getModdedAnimationSpriteKey(character, animationSpriteEx)		// First ask modded scripts
 	u8 rotationMode = 0
 
 	if (variant < 2)
@@ -217,7 +217,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				oldRotationPlayer2 = angle
 		}
 
-		if (animationSpriteEx >= 0x100)
+		if (key == 0 && animationSpriteEx >= 0x100)
 		{
 			// Special handling for Drop Dash & Super Peel-Out
 			if (animationSpriteEx >= CHAR_ANIMSPRITE_SONIC_PEELOUT)

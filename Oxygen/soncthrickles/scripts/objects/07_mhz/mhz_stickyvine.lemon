@@ -32,7 +32,7 @@ function void fn03ea56()
 	#endif
 
 		u8 numSegments = 8
-		u16[A1 + 0x16] = numSegments
+		objA1.compound.count = numSegments
 
 		A2 = A1 + 0x18
 		for (u8 i = 0; i < numSegments; ++i)

@@ -342,7 +342,7 @@ function bool fn007d6c()
 	if (u16[0xffffffe2] == 0)
 	{
 		bool fail = false
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			fail = (D0.u16 == 0x0a00 || D0.u16 == 0x0c00 || D0.u16 == 0x1600 || D0.u16 == 0x1700)
 		}
@@ -354,7 +354,7 @@ function bool fn007d6c()
 			}
 			else if (D0.u16 == 0x0c00)
 			{
-				fail = (global.characters == CHARS_TAILS_ALONE)
+				fail = isMainCharacter(CHARACTER_TAILS)
 			}
 		}
 

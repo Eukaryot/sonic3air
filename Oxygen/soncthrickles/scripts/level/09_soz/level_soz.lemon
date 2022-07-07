@@ -202,7 +202,7 @@ function void fn055b70()
 		D0.u16 = 0x4378
 		if (u16[0xffffb000 + 0x10] >= D0.u16 && u16[0xffffb000 + 0x14] >= 0x09a8)
 		{
-			if (global.characters != CHARS_SONIC_AND_TAILS || u16[0xffffb04a + 0x10] > D0.u16 || u16[0xffffb04a + 0x14] >= 0x09a8)
+			if (getNumPlayers() == 1 || u16[0xffffb04a + 0x10] > D0.u16 || u16[0xffffb04a + 0x14] >= 0x09a8)
 			{
 				palette_fade.range = 0x000f		// Only first 0x10 palette entries
 				u16[0xffffeed6] = 0x15
@@ -344,8 +344,7 @@ function void fn055c84()
 	fn01c362()
 	fn0076a6()
 
-	bool isKnuckles = (global.characters == CHARS_KNUCKLES_ALONE)
-	Level.loadNonfadingPaletteData(isKnuckles ? 0x05 : 0x03)
+	Level.loadNonfadingPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 0x05 : 0x03)
 	Level.loadNonfadingPaletteData(0x1b)
 	Level.loadPaletteData(0x1b)
 

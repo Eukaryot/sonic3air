@@ -27,7 +27,7 @@ function void fn03e836()
 		objA1.box_size.x = 0x40
 		objA1.box_size.y = 0x30
 		objA1.render_flags |= render_flag.COMPOUND
-		u16[A1 + 0x16] = 0x08
+		objA1.compound.count = 0x08
 
 		u32[A0 + 0x32] = 0xfff40000
 		objA0.flags2a |= 0x80

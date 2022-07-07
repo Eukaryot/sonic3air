@@ -18,7 +18,7 @@ function void fn025d54()
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0280
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 1
+	objA0.compound.count = 1
 #if STANDALONE
 	// This seems to prevent characters balancing on the edges
 	//  -> Unfortunately, I did not find any use-case for this, just the code in "checkForBalancing()"
@@ -110,7 +110,7 @@ function void fn025d9c()
 			if (s8(objA0.animation.timer) < 0)
 			{
 				objA0.animation.timer = 1
-				u8[A0 + 0x1d] = (u8[A0 + 0x1d] + u8[A0 + 0x32]) & 0x03
+				objA0.compound.sprite1.animation.sprite = (objA0.compound.sprite1.animation.sprite + u8[A0 + 0x32]) & 0x03
 			}
 			objA0.animation.sprite = (objA0.animation.sprite != 0) ? 0 : 4
 		}

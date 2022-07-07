@@ -37,7 +37,7 @@ function void fn033f84()
 			u8[A1 + 0x22] = 0x01
 		}
 		objA1.render_flags |= render_flag.COMPOUND
-		u16[A1 + 0x16] = 0x04
+		objA1.compound.count = 0x04
 		u16[A0 + 0x3c] = A1.u16
 	}
 
@@ -89,7 +89,7 @@ function void fn034074()
 	D4 = D0
 	D5 = D1
 	A2 = A1 + 0x18
-	D6.u16 = u16[A1 + 0x16]
+	D6.u16 = objA1.compound.count
 
 	while (D6.s16 > 0)
 	{

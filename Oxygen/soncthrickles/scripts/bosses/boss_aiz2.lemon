@@ -1224,7 +1224,7 @@ function void fn02b12a()
 		D3.u16 = objA0.value32
 
 		D1 = 8
-		u16[A1 + 0x16] = D1.u16
+		objA1.compound.count = D1.u16
 		--D1.u16
 		A2 = A1 + 0x18
 
@@ -1252,7 +1252,7 @@ function void fn02b12a()
 			objA1.mapping_offset = objA0.mapping_offset
 
 			D1 = 4
-			u16[A1 + 0x16] = D1.u16
+			objA1.compound.count = D1.u16
 			--D1.u16
 			A2 = A1 + 0x18
 
@@ -1265,8 +1265,8 @@ function void fn02b12a()
 				--D1.s16
 			}
 
-			objA1.position.x.u16 = objA1.velocity.x
-			objA1.position.y.u16 = objA1.velocity.y
+			objA1.position.x.u16 = objA1.compound.sprite1.position.x
+			objA1.position.y.u16 = objA1.compound.sprite1.position.y
 			objA0.value3e = A1.u16
 		}
 	}
@@ -1332,8 +1332,8 @@ function void fn02b386()
 	D3.u16 = u16[A0 + 0x30]
 	D6 = 0
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
-	D6.u16 = u16[A1 + 0x16]
-	--D6.u16
+	D6.u16 = objA1.compound.count - 1
+
 	if (D6.s16 >= 0)
 	{
 		D0 = (D0 << 16) + (D0 >> 16)
@@ -1370,8 +1370,8 @@ function void fn02b386()
 
 		D6 = 0
 		A1 = 0xffff0000 + objA0.value3e
-		D6.u16 = u16[A1 + 0x16]
-		--D6.u16
+		D6.u16 = objA1.compound.count - 1
+
 		if (D6.s16 >= 0)
 		{
 			A2 = A1 + 0x18
@@ -1397,8 +1397,8 @@ function void fn02b386()
 				--D6.s16
 			}
 
-			objA1.position.x.u16 = objA1.velocity.x
-			objA1.position.y.u16 = objA1.velocity.y
+			objA1.position.x.u16 = objA1.compound.sprite1.position.x
+			objA1.position.y.u16 = objA1.compound.sprite1.position.y
 		}
 	}
 }

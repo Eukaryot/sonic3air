@@ -749,7 +749,7 @@ function void DataSelect.sharedNewGameStartup()
 //# address-hook(0x00d30c) end(0x00d39a)
 function void fn00d30c()
 {
-	u8[A0 + 0x1d] = 0x0f
+	objA0.compound.sprite1.animation.sprite = 0x0f
 	objA0.animation.sprite = dataselect.nosave_characters + 4
 
 	if (dataselect.slot_selected == 0 && u16[0xffffb04a + 0x2e] == 0 && u16[0xffffeee4] == 0)
@@ -772,7 +772,7 @@ function void fn00d30c()
 		dataselect.nosave_characters = D0.u16
 
 		objA0.animation.sprite = D0.u8 + 4
-		u16[A0 + 0x16] = 1
+		objA0.compound.count = 1
 		if (level.framecounter.low & 0x10)
 		{
 			fn00d69e()
@@ -780,7 +780,7 @@ function void fn00d30c()
 		}
 	}
 
-	u16[A0 + 0x16] = 0
+	objA0.compound.count = 0
 	fn00d69e()
 }
 
@@ -835,7 +835,7 @@ function void fn00d39e()
 //# address-hook(0x00d42c) end(0x00d69a)
 function void fn00d42c()
 {
-	u16[A0 + 0x16] = 0
+	objA0.compound.count = 0
 	A1 = u32[A0 + 0x30]
 
 	D0.u8 = dataselect.slot_selected - 1
@@ -880,7 +880,7 @@ function void fn00d42c()
 			fn00d6d0()
 			u16[A0 + 0x34] = D0.u16
 
-			u16[A0 + 0x16] = (level.framecounter.low & 0x10) ? 1 : 0
+			objA0.compound.count = (level.framecounter.low & 0x10) ? 1 : 0
 		}
 	}
 
@@ -899,7 +899,7 @@ function bool fn00d458()
 	if (u8[A1] & 0x80)
 	{
 		// Empty save slot
-		u8[A0 + 0x1d] = 0x0f
+		objA0.compound.sprite1.animation.sprite = 0x0f
 		objA0.animation.frame = 0
 		if (u16[0xffffb04a + 0x2e] != 0 || u16[0xffffeee4] != 0)
 		{
@@ -950,7 +950,7 @@ function bool fn00d458()
 				return 2
 			}
 
-			u8[A0 + 0x1d] = 0
+			objA0.compound.sprite1.animation.sprite = 0
 		}
 		else
 		{
@@ -966,8 +966,8 @@ function bool fn00d458()
 
 			if (u16[0xffffeee4] != 0)
 			{
-				u8[A0 + 0x1d] = 0
-				u16[A0 + 0x16] = 2
+				objA0.compound.sprite1.animation.sprite = 0x1a
+				objA0.compound.count = 2
 				return 2
 			}
 
@@ -1005,10 +1005,10 @@ function bool fn00d458()
 			}
 
 			u16[A0 + 0x36] = D1.u16
-			u8[A0 + 0x1d] = (level.framecounter.low & 0x10) ? 0x1a : 0
+			objA0.compound.sprite1.animation.sprite = (level.framecounter.low & 0x10) ? 0x1a : 0
 		}
 
-		u16[A0 + 0x16] = 2
+		objA0.compound.count = 2
 		if (u16[0xffffeee4] != 0)
 		{
 			return 2
@@ -1098,13 +1098,13 @@ function void fn00d69e()
 {
 	// Used by all character icons, the zone preview image, and Robotnik
 	objA0.position.x.u16 = u16[A0 + 0x12] - camera.foreground.x.u16
-	objA0.velocity.x = objA0.position.x.u16
-	objA0.velocity.y = objA0.position.y.u16
-	u16[A0 + 0x1e] = objA0.position.x.u16
-	objA0.state.both = objA0.position.y.u16
-	if (u8[A0 + 0x1d] == 0x1a)
+	objA0.compound.sprite1.position.x = objA0.position.x.u16
+	objA0.compound.sprite1.position.y = objA0.position.y.u16
+	objA0.compound.sprite2.position.x = objA0.position.x.u16
+	objA0.compound.sprite2.position.y = objA0.position.y.u16
+	if (objA0.compound.sprite1.animation.sprite == 0x1a)
 	{
-		objA0.velocity.y -= 8
+		objA0.compound.sprite1.position.y -= 8
 	}
 
 #if STANDALONE
@@ -1162,7 +1162,7 @@ function void fn00d70c()
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f)
 	objA0.mapping_offset = 0x00ce0e
 	objA0.box_size.x = 0x40
-	u16[A0 + 0x16] = 0x07
+	objA0.compound.count = 0x07
 
 	A1 = 0xffff0000 + objA0.respawn_entry
 	A2 = u32[A1 + 0x30]
@@ -1254,8 +1254,8 @@ function void fn00d7a4()
 {
 	objA0.render_flags = render_flag.COMPOUND
 	objA0.box_size.x = 0x30
-	u16[A0 + 0x16] = 0x01
-	u8[A0 + 0x1d] = 0x08
+	objA0.compound.count = 0x01
+	objA0.compound.sprite1.animation.sprite = 0x08
 	objA0.base_state += 4
 	fn00d7c0()
 
@@ -1357,7 +1357,7 @@ function void fn00d854()
 	u8[A0 + 0x25] = 0
 	u8[A0 + 0x28] = 0
 	objA0.animation.sprite = 0x0d
-	u8[A0 + 0x1d] = 0x08
+	objA0.compound.sprite1.animation.sprite = 0x08
 
 	u16[A0 + 0x12] = u16[0xffffb04a + 0x10] + camera.foreground.x.u16
 	objA0.base_state += 4
@@ -1404,9 +1404,9 @@ function void fn00d8a4()
 	fn00d912()
 	fn00d94a()
 
-	if (u8[A0 + 0x1d] == 0x0b)
+	if (objA0.compound.sprite1.animation.sprite == 0x0b)
 	{
-		u8[A0 + 0x1d] = 0x0c
+		objA0.compound.sprite1.animation.sprite = 0x0c
 		objA0.base_state += 4
 	}
 	DrawObject()
@@ -1480,7 +1480,7 @@ function void fn00d94a()
 		u8[A0 + 0x25] = 0x03
 		++u8[A0 + 0x28]
 		D0.u8 = (u8[A0 + 0x28] & 0x03) + 8
-		u8[A0 + 0x1d] = D0.u8
+		objA0.compound.sprite1.animation.sprite = D0.u8
 	}
 }
 

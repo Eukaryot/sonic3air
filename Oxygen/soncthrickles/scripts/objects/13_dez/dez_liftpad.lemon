@@ -37,7 +37,7 @@ function void fn047378()
 		objA1.position.y.u16 = D3.u16
 		objA1.render_flags |= render_flag.COMPOUND
 		A2 = A1 + 0x18
-		u16[A1 + 0x16] = D1.u16
+		objA1.compound.count = D1.u16
 
 		while (D1.s16 > 0)
 		{
@@ -47,7 +47,7 @@ function void fn047378()
 			--D1.s16
 		}
 
-		u8[A1 + 0x1d] = 2
+		objA1.compound.sprite1.animation.sprite = 2
 		u8[A1 + 0x22] = 1
 		objA0.value3e = A1.u16
 	}
@@ -130,7 +130,7 @@ function void fn04748e()
 	D3.u16 = u16[A0 + 0x44]
 	D6 = 0
 	A1 = 0xffff0000 + objA0.value3e
-	D6.u16 = u16[A1 + 0x16] - 2
+	D6.u16 = objA1.compound.count - 2
 	if (D6.s16 < 0)
 		return
 

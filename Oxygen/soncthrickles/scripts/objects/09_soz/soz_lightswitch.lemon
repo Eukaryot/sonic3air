@@ -23,7 +23,7 @@ function void fn040e5c()
 	objA0.animation.sprite = 0x06
 	objA0.render_flags |= render_flag.COMPOUND
 
-	u16[A0 + 0x16] = 1
+	objA0.compound.count = 1
 	A2 = A0 + 0x18
 	u16[(A2+=2)-2] = objA0.position.x.u16
 	u16[(A2+=2)-2] = objA0.position.y.u16
@@ -80,7 +80,7 @@ function void fn040ec4()
 			D0.u16 >>= 3
 			++D0.u16
 		}
-		u8[A0 + 0x1d] = D0.u8
+		objA0.compound.sprite1.animation.sprite = D0.u8
 	}
 
 	A2 = A0 + 0x30

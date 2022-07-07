@@ -344,7 +344,7 @@ function void LevelResults.AdvanceToNextAct()
 //# address-hook(0x02dd3e) end(0x02dd92)
 function void LevelResults.UpdateCharacterNameDisplay()
 {
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		++objA0.animation.sprite
 		if (global.region_code & 0x80)
@@ -357,7 +357,7 @@ function void LevelResults.UpdateCharacterNameDisplay()
 			objA0.box_size.x -= D0.u8
 		}
 	}
-	else if (global.characters == CHARS_KNUCKLES_ALONE)
+	else if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.animation.sprite += 3
 		D0 = 0x30

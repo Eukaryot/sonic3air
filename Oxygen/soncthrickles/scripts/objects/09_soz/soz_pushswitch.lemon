@@ -21,7 +21,7 @@ function void fn04187e()
 	u16[A0 + 0x44] = objA0.position.x.u16
 	objA0.render_flags |= render_flag.COMPOUND
 
-	u16[A0 + 0x16] = 1
+	objA0.compound.count = 1
 	A2 = A0 + 0x18
 	u16[(A2+=2)-2] = objA0.position.x.u16 + ((objA0.flags2a & 0x01) ? -0x10 : 0x10)
 	u16[(A2+=2)-2] = objA0.position.y.u16

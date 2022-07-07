@@ -15,7 +15,7 @@
 //# address-hook(0x053608) end(0x05365e)
 function void InitLevelTiles.ICZ1()
 {
-	if (checkpoint.number == 0 && global.characters == CHARS_KNUCKLES_ALONE)
+	if (checkpoint.number == 0 && isMainCharacter(CHARACTER_KNUCKLES))
 	{
 	#if STANDALONE
 		// Only if Knuckles starts at the teleporter at all
@@ -148,9 +148,9 @@ function void fn053744()
 		u16[0xffffeec6] = 0
 
 	#if STANDALONE
-		if (global.characters == CHARS_KNUCKLES_ALONE && level.start_location != 1)
+		if (isMainCharacter(CHARACTER_KNUCKLES) && level.start_location != 1)
 	#else
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 	#endif
 		{
 			level.scrolling_routine += 4
@@ -230,9 +230,9 @@ function void fn0537a8()
 	if (u16[0xffffeec6] == 0)
 	{
 	#if STANDALONE
-		if (global.characters == CHARS_KNUCKLES_ALONE && level.start_location != 1)
+		if (isMainCharacter(CHARACTER_KNUCKLES) && level.start_location != 1)
 	#else
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 	#endif
 		{
 			fn053780()

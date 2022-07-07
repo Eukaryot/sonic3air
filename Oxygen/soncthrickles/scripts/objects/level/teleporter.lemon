@@ -58,7 +58,7 @@ function void fn045528()
 		}
 
 		objA0.sprite_attributes = 0x052e
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			objA0.subtype2c = 0x4a
 		}
@@ -369,7 +369,7 @@ function void fn045866()
 //# address-hook(0x045b94) end(0x045bf2)
 function void fn045b94()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// Knuckles' HPZ teleporter
 		if (camera.position.y.u16 >= 0x0240 || u16[0xffffb000 + 0x10] < 0x0b00)
@@ -708,7 +708,7 @@ function void fn0458b4()
 	objA0.box_size.x = 0x18
 	objA0.sprite_priority = 0x80
 	objA0.mapping_offset = 0x046b3c
-	u16[A0 + 0x16] = 0x01
+	objA0.compound.count = 0x01
 	u16[A0 + 0x44] = objA0.position.y.u16 - 0x88
 	u8[A0 + 0x47] = 0x10
 
@@ -743,7 +743,7 @@ function void fn045916()
 
 	A1 = A0 + 0x18
 	D0.u16 = objA0.position.y.u16
-	D1.u16 = u16[A0 + 0x16] - 1
+	D1.u16 = objA0.compound.count - 1
 
 	while (D1.s16 >= 0)
 	{
@@ -759,7 +759,7 @@ function void fn045916()
 			else
 			{
 				u8[A1 + 0x05] = 2
-				++u16[A0 + 0x16]
+				++objA0.compound.count
 			}
 		}
 		else
@@ -772,7 +772,7 @@ function void fn045916()
 		--D1.s16
 	}
 
-	if (u16[A0 + 0x16] >= 7 && u8[A0 + 0x46] == 0)
+	if (objA0.compound.count >= 7 && u8[A0 + 0x46] == 0)
 	{
 		objA0.update_address = 0x045992
 		u8[A0 + 0x47] = 0x10
@@ -796,7 +796,7 @@ function void fn045992()
 	else
 	{
 		objA0.update_address = 0x0459b4
-		u16[A0 + 0x16] = 2
+		objA0.compound.count = 2
 		fn0459b4()
 	}
 }

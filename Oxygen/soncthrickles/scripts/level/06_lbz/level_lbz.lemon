@@ -40,7 +40,7 @@ function void InitLevelTiles.LBZ1()
 		--D0.s16
 	}
 
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		fn0540d0()
 	}
@@ -121,7 +121,7 @@ function void fn054146()
 //# address-hook(0x05419c) end(0x0541ec)
 function void InitLevelScrolling.LBZ1()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		A1 = 0xffff0000 + u16[A3] + 2
 		u8[(A1+=1)-1] = 0xe4
@@ -157,7 +157,7 @@ function void UpdateLevelTiles.LBZ1()
 	if (u16[0xffffeec4] == 0x55)
 	{
 		u16[0xffffeec4] = 0
-		if (global.characters != CHARS_KNUCKLES_ALONE)
+		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			A1 = 0xffff007d + u16[A3 + 0x08]
 			u8[A1] = 0xda
@@ -1100,7 +1100,7 @@ function void fn05437c()
 //# address-hook(0x054384) end(0x05439e)
 function void fn054384()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		fn0543c2()
 	}

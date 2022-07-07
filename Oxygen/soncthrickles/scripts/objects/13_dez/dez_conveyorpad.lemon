@@ -36,7 +36,7 @@ function void fn047966()
 		objA0.mapping_offset = 0x047ca8
 		objA0.box_size.x = 0x80
 		objA0.render_flags |= render_flag.COMPOUND
-		u16[A0 + 0x16] = 0
+		objA0.compound.count = 0
 	}
 
 	objA0.update_address = 0x0479f0

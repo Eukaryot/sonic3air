@@ -364,7 +364,7 @@ function void renderNextObject()
 			}
 		}
 
-		D3.u16 = u16[A0 + 0x16] - 1	// Number of compound sprites
+		D3.u16 = objA0.compound.count - 1	// Number of compound sprites
 		if (D3.s16 < 0)
 			return	// Skip if none
 
@@ -769,7 +769,7 @@ function void renderNextCompModeObject(u8 splitScreenIndex)
 			}
 		}
 
-		D3.u16 = objA0.position.y.frac - 1	// Number of compound sprites
+		D3.u16 = objA0.compound.count - 1	// Number of compound sprites
 		if (D3.s16 >= 0)
 		{
 			A0 += 0x18	// Start of compound sprite data (u8[A0 + 0x05] = map frame)

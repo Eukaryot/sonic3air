@@ -87,7 +87,7 @@ function void fn090964()
 	Kosinski.addToDMAQueue(0x1759ac, 0x9580)
 	Kosinski.addToDMAQueue(0x17588a, 0x9100)
 
-	A1 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x0a8a3c : 0x066912
+	A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0a8a3c : 0x066912
 	copyMemory(0xfffffca0, A1, 0x20)
 	copyMemory(0xfffffcc0, 0x0669f2, 0x40)
 
@@ -687,7 +687,7 @@ function bool fn090f0a()
 		objA0.animation.sprite = D0.u8
 		D1.u16 *= 2
 		u32[A0 + 0x18] = u32[0x090f74 + D1.s16]
-		if (global.characters == CHARS_KNUCKLES_ALONE)
+		if (isMainCharacter(CHARACTER_KNUCKLES))
 			D1.u16 += 2
 		D2.u16 = u16[0x090f90 + D1.s16]
 		objA0.sprite_attributes = D2.u16

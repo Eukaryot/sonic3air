@@ -15,7 +15,7 @@
 //# address-hook(0x05a12e) end(0x05a152)
 function void InitLevelTiles.HPZ()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		move_area.right = 0x0aa0 + getScreenExtend()
 
@@ -71,7 +71,7 @@ function void InitLevelScrolling.HPZ()
 function void UpdateLevelTiles.HPZ()
 {
 	u16[A3 + 0x18] = u16[A3 + 0x14]
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		A1 = 0xffff0000 + u16[A3 + 0x04]
 		u8[A1 + 0x03] = 0x8e

@@ -21,7 +21,7 @@ function void fn034302()
 	objA0.collision_attributes = collision.size.8x8_2
 	u8[A0 + 0x29] = 3
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 1
+	objA0.compound.count = 1
 
 	A2 = A0 + 0x18
 	u16[(A2+=2)-2] = objA0.position.x.u16

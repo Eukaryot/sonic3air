@@ -54,7 +54,7 @@ function void UpdateCamera()
 
 			A1 = 0xffffee7c		// Address of camera.position.y
 			A4 = 0xffffee02		// Looks like last camera movement (delta y) gets stored here
-			D3.u16 = (global.characters != CHARS_TAILS_ALONE) ? camera.yoffset.player : camera.yoffset.tails
+			D3.u16 = isMainCharacter(CHARACTER_TAILS) ? camera.yoffset.tails : camera.yoffset.player
 			UpdateCameraPositionY()
 		}
 	}
@@ -74,7 +74,7 @@ function void UpdateCamera()
 			A1 = 0xffffee7c
 			A2 = 0xffffee14
 			A4 = 0xffffee02
-			D3.u16 = (global.characters != CHARS_TAILS_ALONE) ? camera.yoffset.player : camera.yoffset.tails
+			D3.u16 = isMainCharacter(CHARACTER_TAILS) ? camera.yoffset.tails : camera.yoffset.player
 			UpdateCameraPositionY()
 		}
 

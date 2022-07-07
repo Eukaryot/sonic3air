@@ -63,7 +63,7 @@ function void SpecialStage()
 	// Load special stage palette
 	//  -> Character colors is the 8 colors from 0xfffffc90 (for Sonic/Knuckles) and 0xfffffcb0 (for Tails)
 	copyMemory(0xfffffc80, 0x00896e, 0x100)
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		copyMemory(0xfffffc90, 0x0089ee, 0x10)
 	}
@@ -734,7 +734,7 @@ function void fn008faa()
 	objA0.mapping_offset = 0x0abdfc
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x07d4)
 
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		objA0.mapping_offset = 0x2908ba
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07eb)
@@ -748,7 +748,7 @@ function void fn008faa()
 		}
 	}
 
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.mapping_offset = 0x0ad302
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x07d4)
@@ -2647,7 +2647,7 @@ function void fn02df64()
 //# address-hook(0x02e2c0) end(0x02e30e)
 function void fn02e2c0()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// Load palette colors for Knuckles
 		//  -> Original uses pink colors, standalone uses corrected ones

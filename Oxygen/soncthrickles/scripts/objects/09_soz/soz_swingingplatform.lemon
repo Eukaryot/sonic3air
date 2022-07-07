@@ -46,7 +46,7 @@ function void fn04143c()
 
 		A2 = A1 + 0x18
 		D1.u16 = objA0.subtype2c & 0x0f
-		u16[A1 + 0x16] = D1.u16
+		objA1.compound.count = D1.u16
 		while (D1.s16 > 0)
 		{
 			u16[(A2+=2)-2] = D2.u16
@@ -55,7 +55,7 @@ function void fn04143c()
 			--D1.s16
 		}
 
-		u8[A1 + 0x1d] = 2
+		objA1.compound.sprite1.animation.sprite = 2
 		u8[A1 + 0x22] = 1
 		u16[A0 + 0x3c] = A1.u16
 	}
@@ -127,7 +127,7 @@ function void fn04154c()
 	D3.u16 = u16[A0 + 0x44]
 	D6 = 0
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
-	D6.u16 = u16[A1 + 0x16] - 2
+	D6.u16 = objA1.compound.count - 2
 	if (D6.s16 < 0)
 		return
 

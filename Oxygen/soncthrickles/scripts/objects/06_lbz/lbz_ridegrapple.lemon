@@ -42,7 +42,7 @@ function void fn0264c0()
 		objA1.box_size.y = 0x20
 
 		D1 = 5
-		u16[A1 + 0x16] = 6
+		objA1.compound.count = 6
 		A2 = A1 + 0x18
 
 		while (D1.s16 >= 0)

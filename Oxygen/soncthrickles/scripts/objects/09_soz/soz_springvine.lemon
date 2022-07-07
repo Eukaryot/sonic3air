@@ -31,12 +31,12 @@ function void fn040786()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.render_flags |= render_flag.COMPOUND
-		u16[A1 + 0x16] = 8
+		objA1.compound.count = 8
 
 		D1 = objA0.position.x - 0x280000
 		D2 = objA0.position.y + 0x280000
 		A2 = A1 + 0x18
-		D0 = u16[A1 + 0x16] - 1
+		D0 = objA1.compound.count - 1
 		while (D0.s16 >= 0)
 		{
 			u16[(A2+=2)-2] = D1 >> 16

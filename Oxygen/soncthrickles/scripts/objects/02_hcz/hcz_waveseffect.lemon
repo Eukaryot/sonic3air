@@ -24,11 +24,11 @@ function void fn01f202()
 
 	#if STANDALONE
 	{
-		u16[A0 + 0x16] = 0		// Number of compound child objects, for standalone we use only the main object
+		objA0.compound.count = 0		// Number of compound child objects, for standalone we use only the main object
 	}
 	#else
 	{
-		u16[A0 + 0x16] = 1		// Number of compound child objects is usually 1
+		objA0.compound.count = 1		// Number of compound child objects is usually 1
 		u16[A0 + 0x18] = objA0.position.x.u16 + 0xc0
 		u16[A0 + 0x1a] = objA0.position.y.u16
 	}

@@ -151,7 +151,7 @@ function void fn02629c()
 	objA0.animation.sprite = 0x01
 	u8[A0 + 0x40] = 0x80
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 0x04
+	objA0.compound.count = 0x04
 
 	objA0.update_address = 0x0262ec
 	fn0262ec()
@@ -206,8 +206,7 @@ function void fn026338()
 	LookupSinCos()
 	D2.u16 = objA0.value32
 	D3.u16 = u16[A0 + 0x30]
-	D6 = u16[A0 + 0x16]
-	--D6.u16
+	D6 = objA0.compound.count - 1
 	if (D6.s16 >= 0)
 	{
 		D0 = (D0 << 16) + (D0 >> 16)

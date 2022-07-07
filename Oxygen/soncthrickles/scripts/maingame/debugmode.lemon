@@ -43,9 +43,20 @@ function void DebugMode.Enter()
 		char.flags &= ~char.flag.UNDERWATER
 		A1 = A0
 		UpdateMusicOnWaterTransition()
+	#if STANDALONE
+		if (!isMainCharacter(CHARACTER_TAILS))
+		{
+			setSpeedCapProperties(0xfffff760)
+		}
+		else
+		{
+			setSpeedCapProperties(0xfffffec0)
+		}
+	#else
 		global.move.speedcap = 0x600
 		global.move.acceleration = 0x0c
 		global.move.deceleration = 0x80
+	#endif
 	}
 
 	char.animation.sprite = 0
@@ -313,7 +324,7 @@ function bool updateDebugModeInput(bool playingAsTails)
 	if (!debug_mode.enabled)
 		return false
 
-	if (playingAsTails && global.characters != CHARS_TAILS_ALONE)
+	if (playingAsTails && !isMainCharacter(CHARACTER_TAILS))
 		return false
 
 	// Gravity toggle

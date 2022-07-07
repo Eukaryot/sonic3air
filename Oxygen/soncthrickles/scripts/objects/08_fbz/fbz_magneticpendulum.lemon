@@ -371,7 +371,7 @@ function void fn03d78c()
 							{
 								D0 = 0x22
 								D1 = 0x26
-								if (global.characters == CHARS_TAILS_ALONE)
+								if (isMainCharacter(CHARACTER_TAILS))
 								{
 									D0 = 0x1e
 									D1 = 0x22
@@ -420,7 +420,7 @@ function void fn03d78c()
 							{
 								D0 = 0x22
 								D1 = 0x26
-								if (global.characters == CHARS_TAILS_ALONE)
+								if (isMainCharacter(CHARACTER_TAILS))
 								{
 									D0 = 0x1e
 									D1 = 0x22
@@ -484,7 +484,7 @@ function void fn03d908()
 	objA0.sprite_priority = 0x0180
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0323)
 	objA0.mapping_offset = 0x03d9ae
-	u16[A0 + 0x16] = 0x05
+	objA0.compound.count = 0x05
 	fn03d93a()
 }
 

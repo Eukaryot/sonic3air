@@ -594,7 +594,7 @@ function void fn035bf8()
 	objA0.box_size.y = 0x10
 	u16[A0 + 0x30] = objA0.position.x.u16
 	objA0.render_flags |= render_flag.COMPOUND
-	objA0.position.y.frac = 0x01
+	objA0.compound.count = 0x01
 
 	A2 = A0 + 0x18
 	u16[(A2+=2)-2] = objA0.position.x.u16

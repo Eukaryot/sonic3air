@@ -17,7 +17,7 @@ function bool DEZFinalBoss3.shouldEscapeWithMasterEmerald()
 
 function bool DEZFinalBoss3.canPlayerEnterDoomsday()
 {
-	return (global.characters <= CHARS_SONIC_ALONE && global.chaos_emeralds == 7)
+	return (isMainCharacter(CHARACTER_SONIC) && global.chaos_emeralds == 7)
 }
 
 
@@ -298,7 +298,7 @@ function void fn0803d6()
 		}
 		else
 		{
-			if (global.characters != CHARS_KNUCKLES_ALONE)
+			if (!isMainCharacter(CHARACTER_KNUCKLES))
 			{
 				// Outro for Sonic / Tails
 				TriggerNextZone(0x0d01)

@@ -15,7 +15,7 @@
 //# address-hook(0x0320f2) end(0x032182)
 function void CNZBarrel.Init()
 {
-	if (objA0.position.x.u16 == 0x17e0 && global.characters == CHARS_KNUCKLES_ALONE)
+	if (objA0.position.x.u16 == 0x17e0 && isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		UnloadObject()
 		return

@@ -23,7 +23,7 @@ function void CupElevator.Init()
 	objA0.box_size.y = 0x10
 
 	// This object type allows for filtering for Knuckles (used at the end of LBZ 1)
-	if ((objA0.subtype2c & 0x40) && global.characters == CHARS_KNUCKLES_ALONE)
+	if ((objA0.subtype2c & 0x40) && isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.position.x.u16 = 0x7f00
 	}
@@ -707,7 +707,7 @@ function void fn027096()
 	objA0.animation.sprite = 3
 
 	// This object type allows for filtering for Knuckles (used at the end of LBZ 1)
-	if ((objA0.subtype2c & 0x40) && global.characters == CHARS_KNUCKLES_ALONE)
+	if ((objA0.subtype2c & 0x40) && isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.position.x.u16 = 0x7f00
 	}

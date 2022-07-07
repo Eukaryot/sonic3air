@@ -726,7 +726,7 @@ function void fn07e44c()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0)
 	{
-		D0.u16 = (global.characters != CHARS_TAILS_ALONE) ? 0x03ac : 0x03b0
+		D0.u16 = isMainCharacter(CHARACTER_TAILS) ? 0x03b0 : 0x03ac
 		if (objA0.position.y.u16 >= D0.u16)
 		{
 			objA0.position.y.u16 = D0.u16

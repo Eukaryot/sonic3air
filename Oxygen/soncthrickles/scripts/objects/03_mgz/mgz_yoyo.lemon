@@ -18,7 +18,7 @@ function void fn034800()
 	objA0.box_size.y = 0x20
 	objA0.sprite_priority = 0x0280
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 1
+	objA0.compound.count = 1
 
 	A2 = A0 + 0x18
 	u16[(A2+=2)-2] = objA0.position.x.u16
@@ -42,7 +42,7 @@ function void fn034800()
 		u16[A1 + 0x12] = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16 + 0xd0
 		objA1.render_flags |= render_flag.COMPOUND
-		u16[A1 + 0x16] = 0x08
+		objA1.compound.count = 0x08
 		A2 = A1 + 0x18
 
 		D2.u16 = objA0.position.x.u16 - 0x24
@@ -133,8 +133,7 @@ function void fn034900()
 		if (s8(objA0.animation.timer) < 0)
 		{
 			objA0.animation.timer = 1
-			u8[A0 + 0x1d] += D4.u8
-			u8[A0 + 0x1d] &= 0x03
+			objA0.compound.sprite1.animation.sprite = (objA0.compound.sprite1.animation.sprite + D4.u8) & 0x03
 		}
 
 		if (objA0.animation.sprite == 0)
@@ -285,7 +284,7 @@ function void fn034b22()
 	u16 numSections = D0 / 0x30
 	u16 remainder = D0 % 0x30
 
-	u16[A1 + 0x16] = numSections
+	objA1.compound.count = numSections
 	D1.u16 = numSections
 
 	A2 = A1 + 0x18
@@ -298,7 +297,7 @@ function void fn034b22()
 	}
 	else
 	{
-		++u16[A1 + 0x16]
+		++objA1.compound.count
 	}
 
 	py += remainder

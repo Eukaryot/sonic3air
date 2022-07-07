@@ -221,7 +221,7 @@ function void fn058048()
 {
 	A1 = 0xffffb000
 	A2 = A0 + 0x30
-	D3 = (global.characters == CHARS_TAILS_ALONE) ? 0xffffffff : 0
+	D3 = isMainCharacter(CHARACTER_TAILS) ? 0xffffffff : 0
 	fn05806e()
 
 	if (getNumPlayers() == 2)

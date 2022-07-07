@@ -34,9 +34,9 @@ function void fn0340cc()
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.render_flags |= render_flag.COMPOUND
-		u16[A1 + 0x16] = 0x04
+		objA1.compound.count = 0x04
 		A2 = A1 + 0x18
-		D0.u16 = u16[A1 + 0x16]
+		D0.u16 = objA1.compound.count
 		while (D0.s16 >= 0)
 		{
 			u16[(A2+=2)-2] = objA0.position.x.u16
@@ -134,13 +134,13 @@ function void fn03424a()
 	{
 		objA0.sprite_priority = 0x0300
 		u8[A1 + 0x22] = 1
-		u16[A1 + 0x16] = 4
+		objA1.compound.count = 4
 	}
 	else
 	{
 		objA0.sprite_priority = 0x0200
 		u8[A1 + 0x22] = 0
-		u16[A1 + 0x16] = 5
+		objA1.compound.count = 5
 	}
 
 	LookupSinCos()
@@ -175,13 +175,13 @@ function void fn0342a6()
 	{
 		objA0.sprite_priority = 0x0300
 		u8[A1 + 0x22] = 2
-		u16[A1 + 0x16] = 4
+		objA1.compound.count = 4
 	}
 	else
 	{
 		objA0.sprite_priority = 0x0200
 		u8[A1 + 0x22] = 0
-		u16[A1 + 0x16] = 5
+		objA1.compound.count = 5
 	}
 
 	LookupSinCos()

@@ -404,7 +404,7 @@ function void fn051e60()
 		fn0076a6()
 
 		Level.InitializeWater()
-		if (global.characters != CHARS_KNUCKLES_ALONE)
+		if (!isMainCharacter(CHARACTER_KNUCKLES))
 		{
 			VDP.Config.enableHInt(true)
 		}
@@ -613,7 +613,7 @@ function void fn052156()
 //# address-hook(0x05215a) end(0x052200)
 function void fn05215a()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 	#if STANDALONE
 		if (!Game.isTimeAttack())

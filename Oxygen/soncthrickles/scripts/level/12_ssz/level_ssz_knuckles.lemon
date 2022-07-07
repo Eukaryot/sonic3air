@@ -434,7 +434,7 @@ function void fn0591d6()
 	objA0.mapping_offset = 0x059270
 	objA0.position.x.u16 = 0x0122 + getScreenExtend()
 	objA0.position.y.u16 = 0xf0
-	u16[A0 + 0x16] = 0x08
+	objA0.compound.count = 0x08
 	fn059208()
 }
 

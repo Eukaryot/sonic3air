@@ -21,7 +21,7 @@ function void fn03e23e()
 	u16[A0 + 0x3c] = objA0.position.y.u16
 
 	D1 = 3
-	u16[A0 + 0x16] = D1.u16
+	objA0.compound.count = D1.u16
 	--D1.u8
 	A2 = A0 + 0x18
 	A3 = 0x03e29e

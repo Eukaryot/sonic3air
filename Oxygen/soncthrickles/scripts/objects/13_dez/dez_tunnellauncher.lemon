@@ -24,7 +24,7 @@ function void fn0481f2()
 	objA0.sprite_priority = 0x80
 	objA0.render_flags |= render_flag.COMPOUND
 
-	u16[A0 + 0x16] = 1
+	objA0.compound.count = 1
 	A2 = A0 + 0x18
 	D2.u16 = objA0.position.x.u16 + ((objA0.flags2a & 0x01) ? -0x38 : 0x38)
 	u16[A2] = D2.u16
@@ -89,7 +89,7 @@ function void fn048270()
 		if (objA0.animation.sprite == 0)
 			objA0.animation.sprite = 2
 
-		u8[A0 + 0x1d] = (objA0.flags2e & 0x01) ? objA0.value2f : 0
+		objA0.compound.sprite1.animation.sprite = (objA0.flags2e & 0x01) ? objA0.value2f : 0
 	}
 
 	DrawOrUnloadObject()

@@ -36,7 +36,7 @@ function void fn04539e()
 	A1 = 0xffffb000
 	A2 = A0 + 0x38
 	D0.u16 = control.player1
-	D1 = (global.characters == CHARS_TAILS_ALONE) ? 0x11 : 0x14
+	D1 = isMainCharacter(CHARACTER_TAILS) ? 0x11 : 0x14
 	fn0453e6()
 
 	A1 = 0xffffb04a

@@ -69,7 +69,7 @@ function void InitLevelScrolling.LRZ1()
 		--D2.s16
 	}
 
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// This removes the Death Egg usually visible in the background
 		//  -> It is visible in two locations, remove both in standalone
@@ -655,7 +655,7 @@ function void RenderLevelSprites.LRZ()
 //# address-hook(0x05711e) end(0x05714e)
 function void fn05711e()
 {
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		u16[0xffffeed8] = 0
 		UnloadObject()
@@ -908,7 +908,7 @@ function void fn0863ec()
 	if (_equal())
 		return
 
-	if (global.characters == CHARS_KNUCKLES_ALONE && global.zone == 0x09)
+	if (isMainCharacter(CHARACTER_KNUCKLES) && global.zone == 0x09)
 	{
 		u8[0xffffef56] = 0xff
 		SaveGameOnLevelFinished()

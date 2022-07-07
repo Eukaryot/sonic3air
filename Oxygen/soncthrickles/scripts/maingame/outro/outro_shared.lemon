@@ -85,7 +85,7 @@ function void fn05b1a2()
 	scrolloffset.y.both = 0
 	u16[0xfffffaae] = 0
 
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// Create the object that fades out music and starts the credits medley afterwards
 		if (allocDynamicObjectStd())
@@ -197,7 +197,7 @@ function void fn05b29e()
 	u8[0xffffeec4] = 0xff
 	u8[0xfffffacc] = 0xff
 
-	if (global.characters == CHARS_KNUCKLES_ALONE)
+	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		if (outro.ending_type >= 0)
 		{
@@ -363,13 +363,13 @@ function void fn05ea74()
 		}
 	}
 
-	if (global.characters == CHARS_TAILS_ALONE)
+	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		u8[A0 + 0x43] -= 4
 	}
 
 	objA0.render_flags |= render_flag.COMPOUND
-	u16[A0 + 0x16] = 0x02
+	objA0.compound.count = 0x02
 
 	// "spawnChildObjects(0x0601c2)" replaced by:
 	spawnChildObject(0x05eb32, 0x00, 0, -16)
@@ -806,7 +806,7 @@ function void fn05f94c()
 	global.random.seed = global.framecounter
 
 	A1 = 0x060b3a
-	A2 = (global.characters == CHARS_KNUCKLES_ALONE) ? 0xfffffc00 : 0xfffffc20
+	A2 = isMainCharacter(CHARACTER_KNUCKLES) ? 0xfffffc00 : 0xfffffc20
 	copyMemory(A2, A1, 0x10)
 
 	Kosinski.addToDMAQueue(0x165826, 0x76c0)
@@ -875,7 +875,7 @@ function void fn05fa58()
 {
 	objA0.update_address = 0x05fa8c
 	objA0.mapping_offset = 0x053518
-	objA0.sprite_attributes = (global.characters == CHARS_KNUCKLES_ALONE) ? 0x03b6 : (sprite_attribute.PALETTE.LINE1 | 0x03b6)
+	objA0.sprite_attributes = isMainCharacter(CHARACTER_KNUCKLES) ? 0x03b6 : (sprite_attribute.PALETTE.LINE1 | 0x03b6)
 	objA0.sprite_priority = 0x0300
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x10
