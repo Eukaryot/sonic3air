@@ -301,6 +301,8 @@ declare function void Renderer.drawText(string fontKey, s32 px, s32 py, string t
 
 declare function s32 Renderer.getTextWidth(string fontKey, string text)
 
+declare function u8 Audio.getAudioKeyType(u64 sfxId)
+
 declare function s8 Audio.isPlayingAudio(u64 sfxId)
 
 declare function void Audio.playAudio(u64 sfxId, u8 contextId)
@@ -414,8 +416,6 @@ declare function void Game.setDiscordState(string text)
 declare function void Game.setDiscordLargeImage(string imageName)
 
 declare function void Game.setDiscordSmallImage(string imageName)
-
-declare function s8 Game.isModdedSound(u8 sfxId)
 
 declare function void Game.setUnderwaterAudioEffect(u8 value)
 

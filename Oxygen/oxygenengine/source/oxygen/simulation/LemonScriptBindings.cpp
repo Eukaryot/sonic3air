@@ -900,6 +900,11 @@ namespace
 	}
 
 
+	uint8 Audio_getAudioKeyType(uint64 sfxId)
+	{
+		return (uint8)EngineMain::instance().getAudioOut().getAudioKeyType(sfxId);
+	}
+
 	bool Audio_isPlayingAudio(uint64 sfxId)
 	{
 		return EngineMain::instance().getAudioOut().isPlayingSfxId(sfxId);
@@ -1761,6 +1766,9 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		
 
 		// Audio
+		module.addUserDefinedFunction("Audio.getAudioKeyType", lemon::wrap(&Audio_getAudioKeyType), defaultFlags)
+			.setParameterInfo(0, "sfxId");
+
 		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
 			.setParameterInfo(0, "sfxId");
 

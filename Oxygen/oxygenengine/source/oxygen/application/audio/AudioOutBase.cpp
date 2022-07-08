@@ -67,6 +67,15 @@ void AudioOutBase::setGlobalVolume(float volume)
 	FTX::Audio->setGlobalVolume(mGlobalVolume);
 }
 
+AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 sfxId) const
+{
+	AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(sfxId);
+	if (nullptr == sourceReg)
+		return AudioKeyType::INVALID;
+
+	return (sourceReg->mPackage == AudioCollection::Package::MODDED) ? AudioKeyType::MODDED : AudioKeyType::UNMODDED;
+}
+
 bool AudioOutBase::isPlayingSfxId(uint64 sfxId) const
 {
 	return mAudioPlayer.isPlayingSfxId(sfxId);

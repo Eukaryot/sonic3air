@@ -160,12 +160,6 @@ function void Game.setUnderwaterAudioEffect(u8 effect)
 	// Feature not supported in Oxygen project
 }
 
-function bool Game.isModdedSound(u64 key)
-{
-	// TODO: Implement this
-	return false
-}
-
 function void Game.setDiscordDetails(string text)
 {
 	// Feature not supported in Oxygen project

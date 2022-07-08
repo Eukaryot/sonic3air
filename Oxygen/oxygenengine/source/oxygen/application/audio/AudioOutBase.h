@@ -34,6 +34,13 @@ public:
 		CONTEXT_MENU	= 0x10
 	};
 
+	enum class AudioKeyType
+	{
+		INVALID  = 0,
+		UNMODDED = 1,
+		MODDED   = 2
+	};
+
 public:
 	AudioOutBase();
 	virtual ~AudioOutBase();
@@ -52,6 +59,7 @@ public:
 	inline float getGlobalVolume() const   { return mGlobalVolume; }
 	void setGlobalVolume(float volume);
 
+	AudioKeyType getAudioKeyType(uint64 sfxId) const;
 	bool isPlayingSfxId(uint64 sfxId) const;
 
 	bool playAudioBase(uint64 sfxId, uint8 contextId);

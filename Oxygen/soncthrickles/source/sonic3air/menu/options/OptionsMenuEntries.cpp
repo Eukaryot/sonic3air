@@ -169,7 +169,7 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 			if (mData == option::SOUND_TEST)
 			{
 				audioDefinition = renderContext.mOptionsMenu->getSoundTestAudioDefinition(selected().mValue);
-				if (nullptr != audioDefinition && AudioOut::instance().isSoundIdModded(audioDefinition->mKeyId))
+				if (nullptr != audioDefinition && AudioOut::instance().getAudioKeyType(audioDefinition->mKeyId) == AudioOutBase::AudioKeyType::MODDED)
 				{
 					static std::string combinedText;
 					combinedText = *text + " (modded)";

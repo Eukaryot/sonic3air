@@ -51,6 +51,11 @@ function void Game.onScreenFadedOutBeforeDataSelect()
 	Game.returnToMainMenu()
 }
 
+function bool Game.isModdedSound(u64 sfxId)
+{
+	return (Audio.getAudioKeyType(sfxId) == AudioKeyType.MODDED)
+}
+
 
 
 //-------------------------------------------------------//

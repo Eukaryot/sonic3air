@@ -39,9 +39,6 @@ public:
 
 	void playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase = CONTEXT_INGAME, AudioReference* outAudioReference = nullptr);
 
-	bool isModdedSound(uint64 sfxId);
-	bool isSoundIdModded(uint64 sfxId);
-
 	void setMenuMusic(uint64 sfxId);
 	void restartMenuMusic();
 	void moveMenuMusicToIngame();

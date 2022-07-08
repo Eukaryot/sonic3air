@@ -63,11 +63,6 @@ namespace
 			DiscordIntegration::setModdedSmallImage(imageName.getString());
 	}
 
-	bool isModdedSound(uint8 sfxId)
-	{
-		return AudioOut::instance().isModdedSound(sfxId);
-	}
-
 	void setUnderwaterAudioEffect(uint8 value)
 	{
 		return AudioOut::instance().enableUnderwaterEffect((float)value / 255.0f);
@@ -239,9 +234,6 @@ void Game::registerScriptBindings(lemon::Module& module)
 
 	// Audio
 	{
-		module.addUserDefinedFunction("Game.isModdedSound", lemon::wrap(&isModdedSound), defaultFlags)
-			.setParameterInfo(0, "sfxId");
-
 		module.addUserDefinedFunction("Game.setUnderwaterAudioEffect", lemon::wrap(&setUnderwaterAudioEffect), defaultFlags)
 			.setParameterInfo(0, "value");
 	}

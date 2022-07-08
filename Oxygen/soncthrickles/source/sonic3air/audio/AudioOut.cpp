@@ -101,22 +101,6 @@ void AudioOut::playAudioDirect(uint64 sfxId, SoundRegType type, int contextBase,
 	}
 }
 
-bool AudioOut::isModdedSound(uint64 sfxId)
-{
-	const AudioCollection::SourceRegistration* soundReg = mAudioCollection.getSourceRegistration(sfxId);
-	return (nullptr != soundReg && soundReg->mPackage == AudioCollection::Package::MODDED);
-}
-
-bool AudioOut::isSoundIdModded(uint64 sfxId)
-{
-	const AudioCollection::SourceRegistration* sourceReg = mAudioCollection.getSourceRegistration(sfxId);
-	if (nullptr != sourceReg)
-	{
-		return (sourceReg->mPackage == AudioCollection::Package::MODDED);
-	}
-	return false;
-}
-
 void AudioOut::setMenuMusic(uint64 sfxId)
 {
 	if (!isPlayingSfxId(sfxId))
