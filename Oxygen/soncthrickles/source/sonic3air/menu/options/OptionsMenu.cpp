@@ -1343,7 +1343,7 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 		mOptionEntries[option.mOptionId].mGameMenuEntry->setVisible(visible);
 	}
 
-#if defined(PLATFORM_ANDROID)
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
 	// These options don't work on Android, so hide them
 	mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setVisible(false);
 	mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->setVisible(false);

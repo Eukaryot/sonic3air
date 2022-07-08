@@ -139,7 +139,7 @@ uint32 EngineMain::getPlatformFlags() const
 		uint32 flags = 0;
 	#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
 		flags |= 0x0001;
-	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	#elif defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
 		flags |= 0x0002;
 	#endif
 		return flags;
@@ -427,7 +427,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		config.mGameRecording = config.mFailSafeMode ? 0 : 1;
 	}
 
-#ifdef PLATFORM_ANDROID
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
 	// Use fullscreen, with no borders please
 	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
 
@@ -493,7 +493,7 @@ bool EngineMain::createWindow()
 {
 	Configuration& config = Configuration::instance();
 	const EngineDelegateInterface::AppMetaData& appMetaData = mDelegate.getAppMetaData();
-
+	
 	const bool useOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL) || (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 
 	// Setup video config
