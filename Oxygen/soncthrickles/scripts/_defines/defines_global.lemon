@@ -32,8 +32,8 @@
 //  - 0xffffb128 = HUD element 2 (ditto)
 //  - 0xffffcb2c = Underwater handler object for S/K
 //  - 0xffffcb76 = Underwater handler object for Tails
-//  - 0xffffcbc0 = After-images effect
-//  - 0xffffcc0a = Tails' tails, also used for Super form stars
+//  - 0xffffcbc0 = After-images effect, also used for Super form stars
+//  - 0xffffcc0a = Tails' tails
 //  - 0xffffcc54 = Dust cloud / water splash effect for S/K
 //  - 0xffffcc9e = Dust cloud / water splash effect for Tails
 //  - 0xffffcce8 = Shield

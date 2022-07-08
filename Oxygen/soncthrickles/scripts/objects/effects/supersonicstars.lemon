@@ -50,7 +50,7 @@ function void fn0191a4()
 
 	if (objA0.state != 0)
 	{
-		fn019236()
+		SuperSonicStars.CreateSparks()
 	}
 
 	if (u8[A0 + 0x34] != 0)
@@ -97,8 +97,23 @@ function void fn0191a4()
 
 
 //# address-hook(0x019236) end(0x0192be)
-function void fn019236()
+function void SuperSonicStars.CreateSparks()
 {
+#if STANDALONE
+
+	// Scatter sparks when dashing, bypassing original broken behavior
+	objA0.state = 0
+	objA0.mapping_offset = 0x0192ea
+	objA0.position.x.u16 = u16[0xffffb000 + 0x10]
+	objA0.position.y.u16 = u16[0xffffb000 + 0x14]
+
+	D2 = 2
+	Effects.CreateSparks()
+
+	objA0.mapping_offset = 0x0192de
+
+#else
+
 	// This is all technically unused
 	objA0.state = 0
 	A2 = 0xffffb000
@@ -147,4 +162,5 @@ function void fn019236()
 		D4.s16 = -D4.s16
 		--D5.s16
 	}
+#endif
 }

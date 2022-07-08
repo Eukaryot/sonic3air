@@ -80,6 +80,7 @@ constant u32 SETTING_EXTENDED_CAMERA			= 0x00001900	// Extended camera, similar 
 constant u32 SETTING_MAINTAIN_SHIELDS			= 0x00002100	// Maintain shields between zones
 constant u32 SETTING_MONITOR_STYLE				= 0x00002200	// Sonic 3 (when 0) or Sonic 2 (when 1) monitors
 constant u32 SETTING_HYPER_DASH_CONTROLS		= 0x00002300	// Controls for Hyper Dash in mid-air: 0 = Jump (with or without D-pad), 1 = Jump + D-pad
+constant u32 SETTING_SUPER_SONIC_ABILITY		= 0x00002400	// Determines which abilities will Super Sonic have: 0 = none (as in original), 1 = Shield abilities, 2 = air dash (nerfed version of Hyper Sonic's dash)
 constant u32 SETTING_BS_REPEAT_ON_FAIL			= 0x00009100	// Repeat the same special stage again if failed
 constant u32 SETTING_DISABLE_GHOST_SPAWN		= 0x00090100	// No ghost spawning in SOZ 2
 

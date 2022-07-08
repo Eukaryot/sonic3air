@@ -400,9 +400,13 @@ function void fn01c892()
 	if (camera.position.x.u16 < 0x0360 && camera.position.y.u16 >= 0x03e0)
 	{
 		A1 = 0xfffffc70
+	#if STANDALONE
+		copyMemory(A1, 0x0a8eac, 0x06)	// Fix for slightly different water pool palette at the start of HCZ act 1
+	#else
 		u16[(A1+=2)-2] = 0x0b80
 		u16[(A1+=2)-2] = 0x0240
 		u16[(A1+=2)-2] = 0x0220
+	#endif
 		camera.update_routine += 2
 	}
 }

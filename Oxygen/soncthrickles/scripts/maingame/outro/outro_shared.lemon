@@ -169,7 +169,7 @@ function void fn05b204()
 			if (D3.u16 == D0.u16)
 			{
 				// Next actual text line
-				D6.u16 = (D2.u16 & 0x0001) ? (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0347) : (sprite_attribute.PRIORITY | 0x0347)	// Includes base sprite VRAM address + the palette to use
+				D6.u16 = (D2.u16 & 0x0001) ? (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (ContinueScreen.TextTiles.targetInVRAM >> 5)) : (sprite_attribute.PRIORITY | (ContinueScreen.TextTiles.targetInVRAM >> 5))	// Includes base sprite VRAM address + the palette to use
 				D2.u16 &= 0x0ffe	// This is the start offset from the left side inside plane A
 
 				// Print next characters, read from address A1 (using ASCII encoding)

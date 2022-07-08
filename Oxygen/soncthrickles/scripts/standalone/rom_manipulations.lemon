@@ -13,6 +13,7 @@
 function void ApplyROMManipulations()
 {
 	ROMManipulation.RepairSpriteMappings()
+	ROMManipulation.RepairAnimations()
 	ROMManipulation.CutsceneKnucklesPalette()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
@@ -35,13 +36,38 @@ function void ROMManipulation.RepairSpriteMappings()
 	s16[0x14805c] = -0x18	// Originally -0x16
 	s16[0x148076] = -0x18	// Originally -0x16
 
+	// Fix for slight offset in Super Sonic standing sprites (0xba to 0xc7)
+	s16[0x1480f4] = -0x17	// Originally -0x18
+	s16[0x1480fa] = -0x0f	// Originally -0x10
+	s16[0x14810e] = -0x17	// Originally -0x18
+	s16[0x148114] = -0x0f	// Originally -0x10
+	s16[0x148128] = -0x17	// Originally -0x18
+
 	// Fix for slight offset in Super Sonic transformation sprites (0xd5 and 0xd6)
 	s16[0x148160] = -0x0e
 	s16[0x148174] = -0x0e
 
+	// Fix for incorrect pattern pointers in Super Sonic's third standing sprite
+	u8[0x1484f1] = 0x16
+	u8[0x1484f7] = 0x16
+	u8[0x1484fd] = 0x16
+	u8[0x148507] = 0x16
+
 	// Fix for the HCZ blow fish ("Pointdexter")
 	s8[0x360e8e] = -0x08
 	s8[0x360e9a] = -0x08
+}
+
+
+function void ROMManipulation.RepairAnimations()
+{
+	// Apply changes to Super Sonic's idle animation to use the third frame
+	u8[0x012c45] = 0x5c			// Shift the pointer back a bit to an otherwise empty area
+	u32[0x012c96] = 0x07bcbbba	// Add additional frames
+
+	// Fix for Tails' rolling animation playing backwards
+	u32[0x015b18] = 0x01989796
+	u32[0x015b1d] = 0x00989796
 }
 
 

@@ -2835,11 +2835,22 @@ function void SonicPressedJumpInMidAir()
 	char.double_jump_state = 1	// Always set this flag; needed for Drop Dash
 #endif
 
+#if STANDALONE
+	if ((super.active && Game.getSetting(SETTING_SUPER_SONIC_ABILITY) != 1) || (super.active & 0x80))
+#else
 	if (super.active)
+#endif
 	{
-		bool performHyperDash = (super.active & 0x80)		// Hyper Sonic active
+		bool isHyperSonic = (super.active & 0x80)			// Hyper Sonic active
+		bool performHyperDash = isHyperSonic
 		u8 input = control.player1.state & CONTROL_DPAD		// Only directions
+
 	#if STANDALONE
+		if (Game.getSetting(SETTING_SUPER_SONIC_ABILITY) == 2)
+		{
+			performHyperDash = (super.active)				// This allows Super Sonic to use the dash as well
+		}
+
 		if (performHyperDash && Game.getSetting(SETTING_HYPER_DASH_CONTROLS) == 1)
 		{
 			// Hyper Dash requires also pressing D-pad in any direction
@@ -2850,13 +2861,23 @@ function void SonicPressedJumpInMidAir()
 
 		if (performHyperDash)
 		{
-			Character.ClearEnemiesOnScreen()
+		#if STANDALONE
+			if (isHyperSonic)	// Super Sonic's dash does not cause a screen flash
+		#endif
+			{
+				Character.ClearEnemiesOnScreen()
+			}
 
 			camera.locktime.player1 = 0x2000
 			ClearPositionBackup()
 
 			char.double_jump_state = 1
-			u8[0xffffcd7c + 0x20] = 1
+		#if STANDALONE
+			if (!isHyperSonic)
+				u8[0xffffcbc0 + 0x20] = 1
+			else
+		#endif
+				u8[0xffffcd7c + 0x20] = 1
 
 			playSound(SFX_SPINDASH_RELEASE)
 
@@ -2864,30 +2885,47 @@ function void SonicPressedJumpInMidAir()
 			{
 				// Perform Hyper Dash
 				A1 = 0x011afa + input * 4
-				char.velocity.x  = s16[A1]
-				char.velocity.y  = s16[A1+2]
-				char.groundspeed = s16[A1]
+				char.velocity.x = s16[A1]
+				char.velocity.y = s16[A1+2]
 			}
 			else
 			{
-				s16 vx = (char.flags & char.flag.FACING_LEFT) ? -0x800 : 0x800
-				char.velocity.x = vx
+				char.velocity.x = (char.flags & char.flag.FACING_LEFT) ? -0x800 : 0x800
 				char.velocity.y = 0
-				char.groundspeed = vx
 			}
+
+		#if STANDALONE
+			if (!isHyperSonic)
+			{
+				// Reduce dash speed for Super Sonic
+				char.velocity.x = (char.velocity.x > 0) ? (char.velocity.x - 0x200) : (char.velocity.x < 0) ? (char.velocity.x + 0x200) : 0
+				char.velocity.y = (char.velocity.y > 0) ? (char.velocity.y - 0x200) : (char.velocity.y < 0) ? (char.velocity.y + 0x200) : 0
+			}
+		#endif
+
+			char.groundspeed = char.velocity.x
 		}
 		else
 		{
 			char.double_jump_state = 1
 		}
 	}
+#if STANDALONE
+	else if ((char.bonus_effect & char.bonus.INVINCIBLE) && (Game.getSetting(SETTING_SUPER_SONIC_ABILITY) != 1 && !super.active))
+#else
 	else if (char.bonus_effect & char.bonus.INVINCIBLE)
+#endif
 	{
 		// No reaction
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_FIRE)
 	{
-		u8[0xffffcce8 + 0x20] = 1		// That's 0x20 inside the shield object at 0xffffcce8
+	#if STANDALONE
+		if (super.active)
+			u8[0xffffcbc0 + 0x20] = 1
+		else
+	#endif
+			u8[0xffffcce8 + 0x20] = 1		// That's 0x20 inside the shield object at 0xffffcce8
 		char.double_jump_state = 1
 
 		s16 vx = 0x800
@@ -2903,16 +2941,31 @@ function void SonicPressedJumpInMidAir()
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_LIGHTNING)
 	{
-		u8[0xffffcce8 + 0x20] = 1
+	#if STANDALONE
+		if (super.active)
+			u8[0xffffcbc0 + 0x20] = 1
+		else
+	#endif
+			u8[0xffffcce8 + 0x20] = 1
 		char.double_jump_state = 1
 
-		char.velocity.y = -0x580
+	#if STANDALONE
+		if (super.active)
+			char.velocity.y = -0x680	// Slightly increasing double jump height for Super Sonic
+		else
+	#endif
+			char.velocity.y = -0x580
 		char.jumping = 0
 		playSound(SFX_LIGHTNINGJUMP)
 	}
 	else if (char.bonus_effect & char.bonus.SHIELD_BUBBLE)
 	{
-		u8[0xffffcce8 + 0x20] = 1
+	#if STANDALONE
+		if (super.active)
+			u8[0xffffcbc0 + 0x20] = 1
+		else
+	#endif
+			u8[0xffffcce8 + 0x20] = 1
 		char.double_jump_state = 1
 
 	#if STANDALONE
@@ -6000,10 +6053,14 @@ function void Character.LandingOnGroundResetState()
 	// Check for double jump state
 	if (char.double_jump_state != 0)
 	{
+	#if STANDALONE
+		if (char.character == CHARACTER_SONIC && (!super.active || (Game.getSetting(SETTING_SUPER_SONIC_ABILITY) == 1 && !(super.active & 0x80))) && (char.bonus_effect & char.bonus.SHIELD_BUBBLE))
+	#else
 		if (char.character == CHARACTER_SONIC && !super.active && (char.bonus_effect & char.bonus.SHIELD_BUBBLE))
+	#endif
 		{
 		#if STANDALONE
-			if ((char.bonus_effect & char.bonus.INVINCIBLE) == 0 && sonic.dropdash_counter == 0)
+			if (((char.bonus_effect & char.bonus.INVINCIBLE) == 0 && sonic.dropdash_counter == 0) || Game.getSetting(SETTING_SUPER_SONIC_ABILITY) == 1)
 		#endif
 			{
 				SonicLandingBubbleBounce()

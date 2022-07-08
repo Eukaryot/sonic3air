@@ -149,7 +149,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				{
 					if (objA0.animation.sprite == 1)
 					{
-						Renderer.drawCustomSprite("monitor_icon_static", px, py, 0x00, flags, renderQueue + 1)
+						Renderer.drawCustomSprite(Monitor.getIconSpriteKey(0), px, py, 0x00, flags, renderQueue + 1)
 					}
 				}
 				else
@@ -159,7 +159,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 					{
 						if (Monitor.enforceClassicShield())
 						{
-							key = "monitor_icon_classicshield"
+							key = Monitor.getIconSpriteKey(0x0b)
 						}
 					}
 					if (key != 0)

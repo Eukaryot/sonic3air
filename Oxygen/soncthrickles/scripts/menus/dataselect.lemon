@@ -966,7 +966,7 @@ function bool fn00d458()
 
 			if (u16[0xffffeee4] != 0)
 			{
-				objA0.compound.sprite1.animation.sprite = 0x1a
+				objA0.compound.sprite1.animation.sprite = 0
 				objA0.compound.count = 2
 				return 2
 			}

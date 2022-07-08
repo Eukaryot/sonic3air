@@ -11,6 +11,8 @@
 // Background containing the text "Continue" and the countdown
 //  -> These functions are also used by the credits, and the Blue Spheres mode result screen
 
+constant u16 ContinueScreen.TextTiles.targetInVRAM = 0x68e0
+
 //# address-hook(0x05b318) end(0x05b36a)
 function void fn05b318()
 {
@@ -166,7 +168,7 @@ function void fn05c2e0()
 	fn0011ca()
 
 	Nemesis.loadDataToVRAM(0x05d788, 0x0020)
-	Nemesis.loadDataToVRAM(0x0dde34, 0x68e0)
+	Nemesis.loadDataToVRAM(0x0dde34, ContinueScreen.TextTiles.targetInVRAM)
 	Nemesis.loadDataToVRAM(0x05cd66, 0x1180)
 	Nemesis.loadDataToVRAM(0x05d3c6, 0x1b20)
 
@@ -185,7 +187,7 @@ function void fn05c2e0()
 
 	A1 = 0x05cb9e	// "CONTINUE"
 	D2.u16 = 0x0292
-	D6.u16 = (sprite_attribute.PRIORITY | 0x0347)
+	D6.u16 = (sprite_attribute.PRIORITY | (ContinueScreen.TextTiles.targetInVRAM >> 5))
 	fn05b318()
 
 	if (!isMainCharacter(CHARACTER_KNUCKLES))
