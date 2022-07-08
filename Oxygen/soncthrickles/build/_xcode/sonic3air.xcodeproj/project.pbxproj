@@ -48,21 +48,10 @@
 		9E0C5EA5247DD6BB000105D0 /* pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856B245F89C300114DEB /* pch.cpp */; };
 		9E0C5EA6247DD6C3000105D0 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856E245F89C300114DEB /* Geometry.cpp */; };
 		9E0C5EA7247DD6C6000105D0 /* RenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856F245F89C300114DEB /* RenderResources.cpp */; };
-		9E0C5EA8247DD6CD000105D0 /* HardwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8573245F89C300114DEB /* HardwareRenderer.cpp */; };
-		9E0C5EA9247DD6CF000105D0 /* HardwareRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8572245F89C300114DEB /* HardwareRenderResources.cpp */; };
-		9E0C5EAA247DD6D4000105D0 /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8577245F89C300114DEB /* RenderVdpSpriteShader.cpp */; };
-		9E0C5EAB247DD6D6000105D0 /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8578245F89C300114DEB /* RenderComponentSpriteShader.cpp */; };
-		9E0C5EAC247DD6D9000105D0 /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8579245F89C300114DEB /* RenderPlaneShader.cpp */; };
-		9E0C5EAD247DD6DD000105D0 /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857B245F89C300114DEB /* RenderPaletteSpriteShader.cpp */; };
-		9E0C5EAE247DD6E4000105D0 /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857C245F89C300114DEB /* DebugDrawPlaneShader.cpp */; };
-		9E0C5EAF247DD6EF000105D0 /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8582245F89C400114DEB /* ComponentSprite.cpp */; };
 		9E0C5EB0247DD6F8000105D0 /* PaletteBitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8584245F89C400114DEB /* PaletteBitmap.cpp */; };
 		9E0C5EB1247DD6FB000105D0 /* Kosinski.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8585245F89C400114DEB /* Kosinski.cpp */; };
-		9E0C5EB2247DD6FE000105D0 /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8587245F89C400114DEB /* SpriteDump.cpp */; };
 		9E0C5EB3247DD701000105D0 /* BufferTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8588245F89C400114DEB /* BufferTexture.cpp */; };
 		9E0C5EB4247DD705000105D0 /* RenderUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858C245F89C400114DEB /* RenderUtils.cpp */; };
-		9E0C5EB5247DD708000105D0 /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858D245F89C400114DEB /* PaletteSprite.cpp */; };
-		9E0C5EB6247DD70B000105D0 /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8590245F89C400114DEB /* SpriteBase.cpp */; };
 		9E0C5EB7247DD712000105D0 /* SoftwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8594245F89C400114DEB /* SoftwareRenderer.cpp */; };
 		9E0C5EB8247DD717000105D0 /* PatternManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8597245F89C400114DEB /* PatternManager.cpp */; };
 		9E0C5EB9247DD71A000105D0 /* RenderParts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8599245F89C400114DEB /* RenderParts.cpp */; };
@@ -91,7 +80,6 @@
 		9E0C5ED2247DD77E000105D0 /* GameView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D2245F89C400114DEB /* GameView.cpp */; };
 		9E0C5ED3247DD78C000105D0 /* HighResolutionTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1DDD862471E0E8009DA2D2 /* HighResolutionTimer.cpp */; };
 		9E0C5ED4247DD790000105D0 /* Profiling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1DDD842471E0E8009DA2D2 /* Profiling.cpp */; };
-		9E0C5ED6247DD797000105D0 /* PackageFileCrawler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D8245F89C400114DEB /* PackageFileCrawler.cpp */; };
 		9E0C5ED7247DD79A000105D0 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D9245F89C400114DEB /* Utils.cpp */; };
 		9E0C5ED8247DD79C000105D0 /* BitStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DA245F89C400114DEB /* BitStream.cpp */; };
 		9E0C5ED9247DD79E000105D0 /* FileHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DC245F89C400114DEB /* FileHelper.cpp */; };
@@ -172,7 +160,6 @@
 		9E0C5F2A247DDFE0000105D0 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AEC245F882600114DEB /* AudioBuffer.cpp */; };
 		9E0C5F2B247DDFE0000105D0 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD1245F882600114DEB /* Camera.cpp */; };
 		9E0C5F2C247DDFE0000105D0 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD4245F882600114DEB /* Font.cpp */; };
-		9E0C5F2D247DDFE0000105D0 /* FontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AFC245F882600114DEB /* FontOutput.cpp */; };
 		9E0C5F2E247DDFE0000105D0 /* FontSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AE4245F882600114DEB /* FontSource.cpp */; };
 		9E0C5F2F247DDFE0000105D0 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD3245F882600114DEB /* Framebuffer.cpp */; };
 		9E0C5F30247DDFE0000105D0 /* FTX_System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ADD245F882600114DEB /* FTX_System.cpp */; };
@@ -248,7 +235,6 @@
 		9E1D5F682475733F003B1774 /* pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B5F245F886B00114DEB /* pch.cpp */; };
 		9E1D5F692475733F003B1774 /* FileCrawler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ABE245F882600114DEB /* FileCrawler.cpp */; };
 		9E1D5F6A2475733F003B1774 /* AudioOutBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85C9245F89C400114DEB /* AudioOutBase.cpp */; };
-		9E1D5F6B2475733F003B1774 /* HardwareRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8572245F89C300114DEB /* HardwareRenderResources.cpp */; };
 		9E1D5F6C2475733F003B1774 /* PlayerProgress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BD7245F88D200114DEB /* PlayerProgress.cpp */; };
 		9E1D5F6D2475733F003B1774 /* ScriptImplementations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BCF245F88D200114DEB /* ScriptImplementations.cpp */; };
 		9E1D5F6E2475733F003B1774 /* Module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B64245F886B00114DEB /* Module.cpp */; };
@@ -290,10 +276,8 @@
 		9E1D5F962475733F003B1774 /* SoftwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8594245F89C400114DEB /* SoftwareRenderer.cpp */; };
 		9E1D5F972475733F003B1774 /* LogDisplay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856A245F89C300114DEB /* LogDisplay.cpp */; };
 		9E1D5F982475733F003B1774 /* ActSelectMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BC2245F88D200114DEB /* ActSelectMenu.cpp */; };
-		9E1D5F992475733F003B1774 /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8582245F89C400114DEB /* ComponentSprite.cpp */; };
 		9E1D5F9A2475733F003B1774 /* Basics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7A8A245F882600114DEB /* Basics.cpp */; };
 		9E1D5F9B2475733F003B1774 /* TokenProcessing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B7B245F886B00114DEB /* TokenProcessing.cpp */; };
-		9E1D5F9C2475733F003B1774 /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8579245F89C300114DEB /* RenderPlaneShader.cpp */; };
 		9E1D5F9D2475733F003B1774 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD7245F882600114DEB /* Texture.cpp */; };
 		9E1D5F9F2475733F003B1774 /* VideoOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85A7245F89C400114DEB /* VideoOut.cpp */; };
 		9E1D5FA02475733F003B1774 /* blip_buf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8564245F89C300114DEB /* blip_buf.cpp */; };
@@ -306,7 +290,6 @@
 		9E1D5FA82475733F003B1774 /* BitmapCodecICO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7A91245F882600114DEB /* BitmapCodecICO.cpp */; };
 		9E1D5FA92475733F003B1774 /* SoftwareRasterizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8532245F89C300114DEB /* SoftwareRasterizer.cpp */; };
 		9E1D5FAA2475733F003B1774 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B5B245F886B00114DEB /* Runtime.cpp */; };
-		9E1D5FAB2475733F003B1774 /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858D245F89C400114DEB /* PaletteSprite.cpp */; };
 		9E1D5FAC2475733F003B1774 /* VideoBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACC245F882600114DEB /* VideoBuffer.cpp */; };
 		9E1D5FAD2475733F003B1774 /* pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856B245F89C300114DEB /* pch.cpp */; };
 		9E1D5FAE2475733F003B1774 /* PaletteManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E859A245F89C400114DEB /* PaletteManager.cpp */; };
@@ -359,7 +342,6 @@
 		9E1D5FDF2475733F003B1774 /* Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B72245F886B00114DEB /* Compiler.cpp */; };
 		9E1D5FE02475733F003B1774 /* CodeExec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8549245F89C300114DEB /* CodeExec.cpp */; };
 		9E1D5FE12475733F003B1774 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7A53245F723000114DEB /* main.m */; };
-		9E1D5FE22475733F003B1774 /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8577245F89C300114DEB /* RenderVdpSpriteShader.cpp */; };
 		9E1D5FE32475733F003B1774 /* InputRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85AE245F89C400114DEB /* InputRecorder.cpp */; };
 		9E1D5FE42475733F003B1774 /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7A88245F882600114DEB /* json_value.cpp */; };
 		9E1D5FE52475733F003B1774 /* FileHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DC245F89C400114DEB /* FileHelper.cpp */; };
@@ -374,7 +356,6 @@
 		9E1D5FEF2475733F003B1774 /* ResourcesCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8546245F89C300114DEB /* ResourcesCache.cpp */; };
 		9E1D5FF02475733F003B1774 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855D245F89C300114DEB /* Simulation.cpp */; };
 		9E1D5FF12475733F003B1774 /* LemonScriptRuntime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E854C245F89C300114DEB /* LemonScriptRuntime.cpp */; };
-		9E1D5FF22475733F003B1774 /* PackageFileCrawler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D8245F89C400114DEB /* PackageFileCrawler.cpp */; };
 		9E1D5FF32475733F003B1774 /* JobManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AFF245F882600114DEB /* JobManager.cpp */; };
 		9E1D5FF52475733F003B1774 /* SpriteAtlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B02245F882600114DEB /* SpriteAtlas.cpp */; };
 		9E1D5FF62475733F003B1774 /* DrawCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8538245F89C300114DEB /* DrawCollection.cpp */; };
@@ -382,17 +363,12 @@
 		9E1D5FF82475733F003B1774 /* ym2612.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8562245F89C300114DEB /* ym2612.cpp */; };
 		9E1D5FFA2475733F003B1774 /* OpenGLDrawerResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E9EF33A24678BC900AAA00F /* OpenGLDrawerResources.cpp */; };
 		9E1D5FFB2475733F003B1774 /* Blitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8530245F89C300114DEB /* Blitter.cpp */; };
-		9E1D5FFC2475733F003B1774 /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8587245F89C400114DEB /* SpriteDump.cpp */; };
 		9E1D5FFD2475733F003B1774 /* Bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7A8B245F882600114DEB /* Bitmap.cpp */; };
 		9E1D5FFE2475733F003B1774 /* SoundDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8561245F89C300114DEB /* SoundDriver.cpp */; };
 		9E1D5FFF2475733F003B1774 /* OggAudioSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85C1245F89C400114DEB /* OggAudioSource.cpp */; };
-		9E1D60002475733F003B1774 /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8590245F89C400114DEB /* SpriteBase.cpp */; };
 		9E1D60012475733F003B1774 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7A4B245F722F00114DEB /* AppDelegate.mm */; };
 		9E1D60022475733F003B1774 /* Drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8537245F89C300114DEB /* Drawer.cpp */; };
-		9E1D60032475733F003B1774 /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8578245F89C300114DEB /* RenderComponentSpriteShader.cpp */; };
 		9E1D60042475733F003B1774 /* BitmapCodecPNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AAE245F882600114DEB /* BitmapCodecPNG.cpp */; };
-		9E1D60052475733F003B1774 /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857B245F89C300114DEB /* RenderPaletteSpriteShader.cpp */; };
-		9E1D60062475733F003B1774 /* HardwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8573245F89C300114DEB /* HardwareRenderer.cpp */; };
 		9E1D60072475733F003B1774 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AEC245F882600114DEB /* AudioBuffer.cpp */; };
 		9E1D60092475733F003B1774 /* GameView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D2245F89C400114DEB /* GameView.cpp */; };
 		9E1D600C2475733F003B1774 /* Kosinski.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8585245F89C400114DEB /* Kosinski.cpp */; };
@@ -404,11 +380,9 @@
 		9E1D60132475733F003B1774 /* BlueSpheresRendering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDB245F88D200114DEB /* BlueSpheresRendering.cpp */; };
 		9E1D60142475733F003B1774 /* ResourceScriptGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BA8245F88D200114DEB /* ResourceScriptGenerator.cpp */; };
 		9E1D60152475733F003B1774 /* DrawCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E852A245F89C300114DEB /* DrawCommand.cpp */; };
-		9E1D60162475733F003B1774 /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857C245F89C300114DEB /* DebugDrawPlaneShader.cpp */; };
 		9E1D60172475733F003B1774 /* SecretUnlockedWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BBB245F88D200114DEB /* SecretUnlockedWindow.cpp */; };
 		9E1D60182475733F003B1774 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B83245F886B00114DEB /* Parser.cpp */; };
 		9E1D60192475733F003B1774 /* StandardLibrary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B59245F886B00114DEB /* StandardLibrary.cpp */; };
-		9E1D601A2475733F003B1774 /* FontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AFC245F882600114DEB /* FontOutput.cpp */; };
 		9E1D601B2475733F003B1774 /* TimeAttackMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BC7245F88D200114DEB /* TimeAttackMenu.cpp */; };
 		9E1D601E2475733F003B1774 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E6E7A60245F785D00114DEB /* OpenGL.framework */; };
 		9E1D60222475733F003B1774 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E6E7A4D245F723000114DEB /* Assets.xcassets */; };
@@ -549,18 +523,10 @@
 		9E5FD87E27EC08D500CD430A /* Transform2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0CCAC42518FBCD0007288E /* Transform2D.cpp */; };
 		9E5FD87F27EC08D500CD430A /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D9245F89C400114DEB /* Utils.cpp */; };
 		9E5FD88027EC08D500CD430A /* HighResolutionTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1DDD862471E0E8009DA2D2 /* HighResolutionTimer.cpp */; };
-		9E5FD88127EC08D500CD430A /* PackageFileCrawler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D8245F89C400114DEB /* PackageFileCrawler.cpp */; };
 		9E5FD88227EC08D500CD430A /* JsonHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85E0245F89C400114DEB /* JsonHelper.cpp */; };
 		9E5FD88327EC08DB00CD430A /* pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856B245F89C300114DEB /* pch.cpp */; };
 		9E5FD88427EC08E100CD430A /* RenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856F245F89C300114DEB /* RenderResources.cpp */; };
 		9E5FD88527EC08E100CD430A /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856E245F89C300114DEB /* Geometry.cpp */; };
-		9E5FD88627EC08EB00CD430A /* HardwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8573245F89C300114DEB /* HardwareRenderer.cpp */; };
-		9E5FD88727EC08EB00CD430A /* HardwareRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8572245F89C300114DEB /* HardwareRenderResources.cpp */; };
-		9E5FD88827EC08F200CD430A /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857C245F89C300114DEB /* DebugDrawPlaneShader.cpp */; };
-		9E5FD88927EC08F200CD430A /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8579245F89C300114DEB /* RenderPlaneShader.cpp */; };
-		9E5FD88A27EC08F200CD430A /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8578245F89C300114DEB /* RenderComponentSpriteShader.cpp */; };
-		9E5FD88B27EC08F200CD430A /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857B245F89C300114DEB /* RenderPaletteSpriteShader.cpp */; };
-		9E5FD88C27EC08F200CD430A /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8577245F89C300114DEB /* RenderVdpSpriteShader.cpp */; };
 		9E5FD88D27EC08FD00CD430A /* ScrollOffsetsManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85A1245F89C400114DEB /* ScrollOffsetsManager.cpp */; };
 		9E5FD88E27EC08FD00CD430A /* SpriteManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E859F245F89C400114DEB /* SpriteManager.cpp */; };
 		9E5FD88F27EC08FD00CD430A /* OverlayManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E859C245F89C400114DEB /* OverlayManager.cpp */; };
@@ -569,14 +535,10 @@
 		9E5FD89227EC08FD00CD430A /* PatternManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8597245F89C400114DEB /* PatternManager.cpp */; };
 		9E5FD89327EC08FD00CD430A /* RenderParts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8599245F89C400114DEB /* RenderParts.cpp */; };
 		9E5FD89427EC090600CD430A /* SoftwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8594245F89C400114DEB /* SoftwareRenderer.cpp */; };
-		9E5FD89527EC091000CD430A /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8587245F89C400114DEB /* SpriteDump.cpp */; };
 		9E5FD89627EC091000CD430A /* RenderUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858C245F89C400114DEB /* RenderUtils.cpp */; };
 		9E5FD89727EC091000CD430A /* BufferTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8588245F89C400114DEB /* BufferTexture.cpp */; };
-		9E5FD89827EC091000CD430A /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8582245F89C400114DEB /* ComponentSprite.cpp */; };
 		9E5FD89927EC091000CD430A /* PaletteBitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8584245F89C400114DEB /* PaletteBitmap.cpp */; };
 		9E5FD89A27EC091000CD430A /* Kosinski.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8585245F89C400114DEB /* Kosinski.cpp */; };
-		9E5FD89B27EC091000CD430A /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8590245F89C400114DEB /* SpriteBase.cpp */; };
-		9E5FD89C27EC091000CD430A /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858D245F89C400114DEB /* PaletteSprite.cpp */; };
 		9E5FD89D27EC091900CD430A /* SpriteCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8544245F89C300114DEB /* SpriteCache.cpp */; };
 		9E5FD89E27EC091900CD430A /* ResourcesCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8546245F89C300114DEB /* ResourcesCache.cpp */; };
 		9E5FD89F27EC091900CD430A /* PrintedTextCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECAAA3727D1C32200A32EEF /* PrintedTextCache.cpp */; };
@@ -709,7 +671,6 @@
 		9E5FD91E27EC0CB300CD430A /* rmxext_oggvorbis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AC4245F882600114DEB /* rmxext_oggvorbis.cpp */; };
 		9E5FD91F27EC0CC900CD430A /* AppFramework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ADE245F882600114DEB /* AppFramework.cpp */; };
 		9E5FD92027EC0CC900CD430A /* FileInputStreamSDL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0CCAB02518F7090007288E /* FileInputStreamSDL.cpp */; };
-		9E5FD92127EC0CC900CD430A /* FontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AFC245F882600114DEB /* FontOutput.cpp */; };
 		9E5FD92227EC0CC900CD430A /* FontSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AE4245F882600114DEB /* FontSource.cpp */; };
 		9E5FD92327EC0CC900CD430A /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD3245F882600114DEB /* Framebuffer.cpp */; };
 		9E5FD92427EC0CC900CD430A /* FTX_System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ADD245F882600114DEB /* FTX_System.cpp */; };
@@ -780,7 +741,6 @@
 		9E6E7B40245F882600114DEB /* FontSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AE4245F882600114DEB /* FontSource.cpp */; };
 		9E6E7B43245F882600114DEB /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AEC245F882600114DEB /* AudioBuffer.cpp */; };
 		9E6E7B46245F882600114DEB /* GuiBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AF8245F882600114DEB /* GuiBase.cpp */; };
-		9E6E7B47245F882600114DEB /* FontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AFC245F882600114DEB /* FontOutput.cpp */; };
 		9E6E7B49245F882600114DEB /* JobManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AFF245F882600114DEB /* JobManager.cpp */; };
 		9E6E7B4A245F882600114DEB /* SpriteAtlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B02245F882600114DEB /* SpriteAtlas.cpp */; };
 		9E6E7B89245F886B00114DEB /* RuntimeFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B56245F886B00114DEB /* RuntimeFunction.cpp */; };
@@ -857,21 +817,10 @@
 		9E6E860B245F89C400114DEB /* pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856B245F89C300114DEB /* pch.cpp */; };
 		9E6E860C245F89C400114DEB /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856E245F89C300114DEB /* Geometry.cpp */; };
 		9E6E860D245F89C400114DEB /* RenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856F245F89C300114DEB /* RenderResources.cpp */; };
-		9E6E860E245F89C400114DEB /* HardwareRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8572245F89C300114DEB /* HardwareRenderResources.cpp */; };
-		9E6E860F245F89C400114DEB /* HardwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8573245F89C300114DEB /* HardwareRenderer.cpp */; };
-		9E6E8610245F89C400114DEB /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8577245F89C300114DEB /* RenderVdpSpriteShader.cpp */; };
-		9E6E8611245F89C400114DEB /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8578245F89C300114DEB /* RenderComponentSpriteShader.cpp */; };
-		9E6E8612245F89C400114DEB /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8579245F89C300114DEB /* RenderPlaneShader.cpp */; };
-		9E6E8613245F89C400114DEB /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857B245F89C300114DEB /* RenderPaletteSpriteShader.cpp */; };
-		9E6E8614245F89C400114DEB /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857C245F89C300114DEB /* DebugDrawPlaneShader.cpp */; };
-		9E6E8615245F89C400114DEB /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8582245F89C400114DEB /* ComponentSprite.cpp */; };
 		9E6E8616245F89C400114DEB /* PaletteBitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8584245F89C400114DEB /* PaletteBitmap.cpp */; };
 		9E6E8617245F89C400114DEB /* Kosinski.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8585245F89C400114DEB /* Kosinski.cpp */; };
-		9E6E8618245F89C400114DEB /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8587245F89C400114DEB /* SpriteDump.cpp */; };
 		9E6E8619245F89C400114DEB /* BufferTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8588245F89C400114DEB /* BufferTexture.cpp */; };
 		9E6E861A245F89C400114DEB /* RenderUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858C245F89C400114DEB /* RenderUtils.cpp */; };
-		9E6E861B245F89C400114DEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858D245F89C400114DEB /* PaletteSprite.cpp */; };
-		9E6E861C245F89C400114DEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8590245F89C400114DEB /* SpriteBase.cpp */; };
 		9E6E861D245F89C400114DEB /* SoftwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8594245F89C400114DEB /* SoftwareRenderer.cpp */; };
 		9E6E861E245F89C400114DEB /* PatternManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8597245F89C400114DEB /* PatternManager.cpp */; };
 		9E6E861F245F89C400114DEB /* RenderParts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8599245F89C400114DEB /* RenderParts.cpp */; };
@@ -898,7 +847,6 @@
 		9E6E8636245F89C400114DEB /* GameProfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85CE245F89C400114DEB /* GameProfile.cpp */; };
 		9E6E8637245F89C400114DEB /* Application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85CF245F89C400114DEB /* Application.cpp */; };
 		9E6E8638245F89C400114DEB /* GameView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D2245F89C400114DEB /* GameView.cpp */; };
-		9E6E863A245F89C400114DEB /* PackageFileCrawler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D8245F89C400114DEB /* PackageFileCrawler.cpp */; };
 		9E6E863B245F89C400114DEB /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D9245F89C400114DEB /* Utils.cpp */; };
 		9E6E863C245F89C400114DEB /* BitStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DA245F89C400114DEB /* BitStream.cpp */; };
 		9E6E863D245F89C400114DEB /* FileHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DC245F89C400114DEB /* FileHelper.cpp */; };
@@ -1048,7 +996,6 @@
 		9EB069DE248088B20080AC49 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AEC245F882600114DEB /* AudioBuffer.cpp */; };
 		9EB069DF248088B20080AC49 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD1245F882600114DEB /* Camera.cpp */; };
 		9EB069E0248088B20080AC49 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD4245F882600114DEB /* Font.cpp */; };
-		9EB069E1248088B20080AC49 /* FontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AFC245F882600114DEB /* FontOutput.cpp */; };
 		9EB069E2248088B20080AC49 /* FontSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AE4245F882600114DEB /* FontSource.cpp */; };
 		9EB069E3248088B20080AC49 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD3245F882600114DEB /* Framebuffer.cpp */; };
 		9EB069E4248088B20080AC49 /* FTX_System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ADD245F882600114DEB /* FTX_System.cpp */; };
@@ -1090,20 +1037,9 @@
 		9EB06A1524808A490080AC49 /* pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856B245F89C300114DEB /* pch.cpp */; };
 		9EB06A1624808A590080AC49 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856E245F89C300114DEB /* Geometry.cpp */; };
 		9EB06A1724808A590080AC49 /* RenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856F245F89C300114DEB /* RenderResources.cpp */; };
-		9EB06A1824808A590080AC49 /* HardwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8573245F89C300114DEB /* HardwareRenderer.cpp */; };
-		9EB06A1924808A590080AC49 /* HardwareRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8572245F89C300114DEB /* HardwareRenderResources.cpp */; };
-		9EB06A1A24808A590080AC49 /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8577245F89C300114DEB /* RenderVdpSpriteShader.cpp */; };
-		9EB06A1B24808A590080AC49 /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8578245F89C300114DEB /* RenderComponentSpriteShader.cpp */; };
-		9EB06A1C24808A590080AC49 /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8579245F89C300114DEB /* RenderPlaneShader.cpp */; };
-		9EB06A1D24808A590080AC49 /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857B245F89C300114DEB /* RenderPaletteSpriteShader.cpp */; };
-		9EB06A1E24808A590080AC49 /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E857C245F89C300114DEB /* DebugDrawPlaneShader.cpp */; };
-		9EB06A1F24808A670080AC49 /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8582245F89C400114DEB /* ComponentSprite.cpp */; };
 		9EB06A2024808A670080AC49 /* PaletteBitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8584245F89C400114DEB /* PaletteBitmap.cpp */; };
-		9EB06A2124808A670080AC49 /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8587245F89C400114DEB /* SpriteDump.cpp */; };
 		9EB06A2224808A670080AC49 /* BufferTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8588245F89C400114DEB /* BufferTexture.cpp */; };
 		9EB06A2324808A670080AC49 /* RenderUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858C245F89C400114DEB /* RenderUtils.cpp */; };
-		9EB06A2424808A670080AC49 /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E858D245F89C400114DEB /* PaletteSprite.cpp */; };
-		9EB06A2524808A670080AC49 /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8590245F89C400114DEB /* SpriteBase.cpp */; };
 		9EB06A2624808A6D0080AC49 /* SoftwareRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8594245F89C400114DEB /* SoftwareRenderer.cpp */; };
 		9EB06A2724808A780080AC49 /* PatternManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8597245F89C400114DEB /* PatternManager.cpp */; };
 		9EB06A2824808A780080AC49 /* RenderParts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8599245F89C400114DEB /* RenderParts.cpp */; };
@@ -1132,7 +1068,6 @@
 		9EB06A4124808AB00080AC49 /* GameView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D2245F89C400114DEB /* GameView.cpp */; };
 		9EB06A4224808ABE0080AC49 /* HighResolutionTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1DDD862471E0E8009DA2D2 /* HighResolutionTimer.cpp */; };
 		9EB06A4324808ABE0080AC49 /* Profiling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1DDD842471E0E8009DA2D2 /* Profiling.cpp */; };
-		9EB06A4524808ABE0080AC49 /* PackageFileCrawler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D8245F89C400114DEB /* PackageFileCrawler.cpp */; };
 		9EB06A4624808ABE0080AC49 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85D9245F89C400114DEB /* Utils.cpp */; };
 		9EB06A4724808ABE0080AC49 /* BitStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DA245F89C400114DEB /* BitStream.cpp */; };
 		9EB06A4824808ABE0080AC49 /* FileHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DC245F89C400114DEB /* FileHelper.cpp */; };
@@ -1301,6 +1236,76 @@
 		9ECCA1CE259CF24C0093A389 /* FilePackage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECCA1C8259CF24C0093A389 /* FilePackage.cpp */; };
 		9ECCA1CF259CF24C0093A389 /* FilePackage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECCA1C8259CF24C0093A389 /* FilePackage.cpp */; };
 		9ECCA1D0259CF24C0093A389 /* FilePackage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECCA1C8259CF24C0093A389 /* FilePackage.cpp */; };
+		9ED1830328789E3900506AEB /* FontProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830228789E3900506AEB /* FontProcessor.cpp */; };
+		9ED1830428789E3900506AEB /* FontProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830228789E3900506AEB /* FontProcessor.cpp */; };
+		9ED1830528789E3900506AEB /* FontProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830228789E3900506AEB /* FontProcessor.cpp */; };
+		9ED1830628789E3900506AEB /* FontProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830228789E3900506AEB /* FontProcessor.cpp */; };
+		9ED1830728789E3900506AEB /* FontProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830228789E3900506AEB /* FontProcessor.cpp */; };
+		9ED1830A28789E7500506AEB /* FontCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830828789E7500506AEB /* FontCollection.cpp */; };
+		9ED1830B28789E7500506AEB /* FontCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830828789E7500506AEB /* FontCollection.cpp */; };
+		9ED1830C28789E7500506AEB /* FontCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830828789E7500506AEB /* FontCollection.cpp */; };
+		9ED1830D28789E7500506AEB /* FontCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830828789E7500506AEB /* FontCollection.cpp */; };
+		9ED1830E28789E7500506AEB /* FontCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1830828789E7500506AEB /* FontCollection.cpp */; };
+		9ED1831928789ED000506AEB /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831128789ED000506AEB /* ComponentSprite.cpp */; };
+		9ED1831A28789ED000506AEB /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831128789ED000506AEB /* ComponentSprite.cpp */; };
+		9ED1831B28789ED000506AEB /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831128789ED000506AEB /* ComponentSprite.cpp */; };
+		9ED1831C28789ED000506AEB /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831128789ED000506AEB /* ComponentSprite.cpp */; };
+		9ED1831D28789ED000506AEB /* ComponentSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831128789ED000506AEB /* ComponentSprite.cpp */; };
+		9ED1831E28789ED000506AEB /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831228789ED000506AEB /* SpriteDump.cpp */; };
+		9ED1831F28789ED000506AEB /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831228789ED000506AEB /* SpriteDump.cpp */; };
+		9ED1832028789ED000506AEB /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831228789ED000506AEB /* SpriteDump.cpp */; };
+		9ED1832128789ED000506AEB /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831228789ED000506AEB /* SpriteDump.cpp */; };
+		9ED1832228789ED000506AEB /* SpriteDump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831228789ED000506AEB /* SpriteDump.cpp */; };
+		9ED1832328789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
+		9ED1832428789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
+		9ED1832528789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
+		9ED1832628789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
+		9ED1832728789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
+		9ED1832828789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
+		9ED1832928789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
+		9ED1832A28789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
+		9ED1832B28789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
+		9ED1832C28789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
+		9ED1833D28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
+		9ED1833E28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
+		9ED1833F28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
+		9ED1834028789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
+		9ED1834128789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
+		9ED1834228789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833328789EFF00506AEB /* RenderVdpSpriteShader.cpp */; };
+		9ED1834328789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833328789EFF00506AEB /* RenderVdpSpriteShader.cpp */; };
+		9ED1834428789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833328789EFF00506AEB /* RenderVdpSpriteShader.cpp */; };
+		9ED1834528789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833328789EFF00506AEB /* RenderVdpSpriteShader.cpp */; };
+		9ED1834628789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833328789EFF00506AEB /* RenderVdpSpriteShader.cpp */; };
+		9ED1834728789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833428789EFF00506AEB /* RenderComponentSpriteShader.cpp */; };
+		9ED1834828789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833428789EFF00506AEB /* RenderComponentSpriteShader.cpp */; };
+		9ED1834928789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833428789EFF00506AEB /* RenderComponentSpriteShader.cpp */; };
+		9ED1834A28789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833428789EFF00506AEB /* RenderComponentSpriteShader.cpp */; };
+		9ED1834B28789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833428789EFF00506AEB /* RenderComponentSpriteShader.cpp */; };
+		9ED1834C28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833528789EFF00506AEB /* RenderPlaneShader.cpp */; };
+		9ED1834D28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833528789EFF00506AEB /* RenderPlaneShader.cpp */; };
+		9ED1834E28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833528789EFF00506AEB /* RenderPlaneShader.cpp */; };
+		9ED1834F28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833528789EFF00506AEB /* RenderPlaneShader.cpp */; };
+		9ED1835028789EFF00506AEB /* RenderPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833528789EFF00506AEB /* RenderPlaneShader.cpp */; };
+		9ED1835128789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833728789EFF00506AEB /* RenderPaletteSpriteShader.cpp */; };
+		9ED1835228789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833728789EFF00506AEB /* RenderPaletteSpriteShader.cpp */; };
+		9ED1835328789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833728789EFF00506AEB /* RenderPaletteSpriteShader.cpp */; };
+		9ED1835428789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833728789EFF00506AEB /* RenderPaletteSpriteShader.cpp */; };
+		9ED1835528789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833728789EFF00506AEB /* RenderPaletteSpriteShader.cpp */; };
+		9ED1835628789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833828789EFF00506AEB /* DebugDrawPlaneShader.cpp */; };
+		9ED1835728789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833828789EFF00506AEB /* DebugDrawPlaneShader.cpp */; };
+		9ED1835828789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833828789EFF00506AEB /* DebugDrawPlaneShader.cpp */; };
+		9ED1835928789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833828789EFF00506AEB /* DebugDrawPlaneShader.cpp */; };
+		9ED1835A28789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833828789EFF00506AEB /* DebugDrawPlaneShader.cpp */; };
+		9ED1835B28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
+		9ED1835C28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
+		9ED1835D28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
+		9ED1835E28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
+		9ED1835F28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
+		9ED1836228789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */; };
+		9ED1836328789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */; };
+		9ED1836428789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */; };
+		9ED1836528789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */; };
+		9ED1836628789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */; };
 		9ED3088E246CB56C00013D8D /* ErrorHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED3088C246CB56C00013D8D /* ErrorHandler.cpp */; };
 		9ED426AC2718E3CF00AA3301 /* discord_game_sdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */; };
 		9ED426AD2718E3CF00AA3301 /* discord_game_sdk.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -1678,8 +1683,6 @@
 		9E6E7AF7245F882600114DEB /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
 		9E6E7AF8245F882600114DEB /* GuiBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GuiBase.cpp; sourceTree = "<group>"; };
 		9E6E7AFA245F882600114DEB /* Painter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Painter.h; sourceTree = "<group>"; };
-		9E6E7AFC245F882600114DEB /* FontOutput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontOutput.cpp; sourceTree = "<group>"; };
-		9E6E7AFE245F882600114DEB /* FontOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontOutput.h; sourceTree = "<group>"; };
 		9E6E7AFF245F882600114DEB /* JobManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JobManager.cpp; sourceTree = "<group>"; };
 		9E6E7B00245F882600114DEB /* JobManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JobManager.h; sourceTree = "<group>"; };
 		9E6E7B02245F882600114DEB /* SpriteAtlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteAtlas.cpp; sourceTree = "<group>"; };
@@ -1867,37 +1870,15 @@
 		9E6E856D245F89C300114DEB /* RenderResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderResources.h; sourceTree = "<group>"; };
 		9E6E856E245F89C300114DEB /* Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
 		9E6E856F245F89C300114DEB /* RenderResources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderResources.cpp; sourceTree = "<group>"; };
-		9E6E8571245F89C300114DEB /* HardwareRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HardwareRenderer.h; sourceTree = "<group>"; };
-		9E6E8572245F89C300114DEB /* HardwareRenderResources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HardwareRenderResources.cpp; sourceTree = "<group>"; };
-		9E6E8573245F89C300114DEB /* HardwareRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HardwareRenderer.cpp; sourceTree = "<group>"; };
-		9E6E8574245F89C300114DEB /* HardwareRenderResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HardwareRenderResources.h; sourceTree = "<group>"; };
-		9E6E8576245F89C300114DEB /* RenderPlaneShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderPlaneShader.h; sourceTree = "<group>"; };
-		9E6E8577245F89C300114DEB /* RenderVdpSpriteShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderVdpSpriteShader.cpp; sourceTree = "<group>"; };
-		9E6E8578245F89C300114DEB /* RenderComponentSpriteShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderComponentSpriteShader.cpp; sourceTree = "<group>"; };
-		9E6E8579245F89C300114DEB /* RenderPlaneShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderPlaneShader.cpp; sourceTree = "<group>"; };
-		9E6E857A245F89C300114DEB /* RenderPaletteSpriteShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderPaletteSpriteShader.h; sourceTree = "<group>"; };
-		9E6E857B245F89C300114DEB /* RenderPaletteSpriteShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderPaletteSpriteShader.cpp; sourceTree = "<group>"; };
-		9E6E857C245F89C300114DEB /* DebugDrawPlaneShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DebugDrawPlaneShader.cpp; sourceTree = "<group>"; };
-		9E6E857D245F89C300114DEB /* RenderComponentSpriteShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderComponentSpriteShader.h; sourceTree = "<group>"; };
-		9E6E857E245F89C300114DEB /* DebugDrawPlaneShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugDrawPlaneShader.h; sourceTree = "<group>"; };
-		9E6E857F245F89C400114DEB /* RenderVdpSpriteShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderVdpSpriteShader.h; sourceTree = "<group>"; };
 		9E6E8580245F89C400114DEB /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
-		9E6E8582245F89C400114DEB /* ComponentSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentSprite.cpp; sourceTree = "<group>"; };
 		9E6E8583245F89C400114DEB /* PaletteBitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaletteBitmap.h; sourceTree = "<group>"; };
 		9E6E8584245F89C400114DEB /* PaletteBitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PaletteBitmap.cpp; sourceTree = "<group>"; };
 		9E6E8585245F89C400114DEB /* Kosinski.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Kosinski.cpp; sourceTree = "<group>"; };
 		9E6E8586245F89C400114DEB /* BufferTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferTexture.h; sourceTree = "<group>"; };
-		9E6E8587245F89C400114DEB /* SpriteDump.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteDump.cpp; sourceTree = "<group>"; };
 		9E6E8588245F89C400114DEB /* BufferTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BufferTexture.cpp; sourceTree = "<group>"; };
-		9E6E8589245F89C400114DEB /* PaletteSprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaletteSprite.h; sourceTree = "<group>"; };
-		9E6E858A245F89C400114DEB /* SpriteDump.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteDump.h; sourceTree = "<group>"; };
 		9E6E858B245F89C400114DEB /* Kosinski.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Kosinski.h; sourceTree = "<group>"; };
 		9E6E858C245F89C400114DEB /* RenderUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderUtils.cpp; sourceTree = "<group>"; };
-		9E6E858D245F89C400114DEB /* PaletteSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PaletteSprite.cpp; sourceTree = "<group>"; };
 		9E6E858E245F89C400114DEB /* RenderUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderUtils.h; sourceTree = "<group>"; };
-		9E6E858F245F89C400114DEB /* SpriteBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteBase.h; sourceTree = "<group>"; };
-		9E6E8590245F89C400114DEB /* SpriteBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteBase.cpp; sourceTree = "<group>"; };
-		9E6E8591245F89C400114DEB /* ComponentSprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentSprite.h; sourceTree = "<group>"; };
 		9E6E8593245F89C400114DEB /* SoftwareRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftwareRenderer.h; sourceTree = "<group>"; };
 		9E6E8594245F89C400114DEB /* SoftwareRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoftwareRenderer.cpp; sourceTree = "<group>"; };
 		9E6E8596245F89C400114DEB /* PatternManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PatternManager.h; sourceTree = "<group>"; };
@@ -1953,8 +1934,6 @@
 		9E6E85D1245F89C400114DEB /* GameView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameView.h; sourceTree = "<group>"; };
 		9E6E85D2245F89C400114DEB /* GameView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameView.cpp; sourceTree = "<group>"; };
 		9E6E85D5245F89C400114DEB /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
-		9E6E85D6245F89C400114DEB /* PackageFileCrawler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PackageFileCrawler.h; sourceTree = "<group>"; };
-		9E6E85D8245F89C400114DEB /* PackageFileCrawler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PackageFileCrawler.cpp; sourceTree = "<group>"; };
 		9E6E85D9245F89C400114DEB /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
 		9E6E85DA245F89C400114DEB /* BitStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BitStream.cpp; sourceTree = "<group>"; };
 		9E6E85DB245F89C400114DEB /* JsonHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JsonHelper.h; sourceTree = "<group>"; };
@@ -2112,6 +2091,34 @@
 		9ECCA1C3259CF1F00093A389 /* OpenGLHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenGLHelper.h; sourceTree = "<group>"; };
 		9ECCA1C7259CF24C0093A389 /* FilePackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilePackage.h; sourceTree = "<group>"; };
 		9ECCA1C8259CF24C0093A389 /* FilePackage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FilePackage.cpp; sourceTree = "<group>"; };
+		9ED1830128789E3900506AEB /* FontProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontProcessor.h; sourceTree = "<group>"; };
+		9ED1830228789E3900506AEB /* FontProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontProcessor.cpp; sourceTree = "<group>"; };
+		9ED1830828789E7500506AEB /* FontCollection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontCollection.cpp; sourceTree = "<group>"; };
+		9ED1830928789E7500506AEB /* FontCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontCollection.h; sourceTree = "<group>"; };
+		9ED1831128789ED000506AEB /* ComponentSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentSprite.cpp; sourceTree = "<group>"; };
+		9ED1831228789ED000506AEB /* SpriteDump.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteDump.cpp; sourceTree = "<group>"; };
+		9ED1831328789ED000506AEB /* PaletteSprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaletteSprite.h; sourceTree = "<group>"; };
+		9ED1831428789ED000506AEB /* SpriteDump.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteDump.h; sourceTree = "<group>"; };
+		9ED1831528789ED000506AEB /* PaletteSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PaletteSprite.cpp; sourceTree = "<group>"; };
+		9ED1831628789ED000506AEB /* SpriteBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteBase.h; sourceTree = "<group>"; };
+		9ED1831728789ED000506AEB /* SpriteBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteBase.cpp; sourceTree = "<group>"; };
+		9ED1831828789ED000506AEB /* ComponentSprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentSprite.h; sourceTree = "<group>"; };
+		9ED1832E28789EFF00506AEB /* OpenGLRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLRenderer.h; sourceTree = "<group>"; };
+		9ED1832F28789EFF00506AEB /* OpenGLRenderResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLRenderResources.h; sourceTree = "<group>"; };
+		9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLRenderer.cpp; sourceTree = "<group>"; };
+		9ED1833228789EFF00506AEB /* RenderPlaneShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderPlaneShader.h; sourceTree = "<group>"; };
+		9ED1833328789EFF00506AEB /* RenderVdpSpriteShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderVdpSpriteShader.cpp; sourceTree = "<group>"; };
+		9ED1833428789EFF00506AEB /* RenderComponentSpriteShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderComponentSpriteShader.cpp; sourceTree = "<group>"; };
+		9ED1833528789EFF00506AEB /* RenderPlaneShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderPlaneShader.cpp; sourceTree = "<group>"; };
+		9ED1833628789EFF00506AEB /* RenderPaletteSpriteShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderPaletteSpriteShader.h; sourceTree = "<group>"; };
+		9ED1833728789EFF00506AEB /* RenderPaletteSpriteShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderPaletteSpriteShader.cpp; sourceTree = "<group>"; };
+		9ED1833828789EFF00506AEB /* DebugDrawPlaneShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DebugDrawPlaneShader.cpp; sourceTree = "<group>"; };
+		9ED1833928789EFF00506AEB /* RenderComponentSpriteShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderComponentSpriteShader.h; sourceTree = "<group>"; };
+		9ED1833A28789EFF00506AEB /* DebugDrawPlaneShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugDrawPlaneShader.h; sourceTree = "<group>"; };
+		9ED1833B28789EFF00506AEB /* RenderVdpSpriteShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderVdpSpriteShader.h; sourceTree = "<group>"; };
+		9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLRenderResources.cpp; sourceTree = "<group>"; };
+		9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLFontOutput.cpp; sourceTree = "<group>"; };
+		9ED1836128789FDD00506AEB /* OpenGLFontOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLFontOutput.h; sourceTree = "<group>"; };
 		9ED3088C246CB56C00013D8D /* ErrorHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ErrorHandler.cpp; sourceTree = "<group>"; };
 		9ED3088D246CB56C00013D8D /* ErrorHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorHandler.h; sourceTree = "<group>"; };
 		9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = discord_game_sdk.dylib; path = ../../source/external/discord_game_sdk/lib/x86_64/discord_game_sdk.dylib; sourceTree = "<group>"; };
@@ -2589,8 +2596,8 @@
 				9E7E28F525EF21A60021AE3A /* FileProviderSDL.h */,
 				9E6E7AD4245F882600114DEB /* Font.cpp */,
 				9E6E7AF6245F882600114DEB /* Font.h */,
-				9E6E7AFC245F882600114DEB /* FontOutput.cpp */,
-				9E6E7AFE245F882600114DEB /* FontOutput.h */,
+				9ED1830228789E3900506AEB /* FontProcessor.cpp */,
+				9ED1830128789E3900506AEB /* FontProcessor.h */,
 				9E6E7AE4245F882600114DEB /* FontSource.cpp */,
 				9E6E7AF5245F882600114DEB /* FontSource.h */,
 				9E6E7AD3245F882600114DEB /* Framebuffer.cpp */,
@@ -2604,6 +2611,8 @@
 				9E6E7AC9245F882600114DEB /* GuiBase.h */,
 				9E6E7AFF245F882600114DEB /* JobManager.cpp */,
 				9E6E7B00245F882600114DEB /* JobManager.h */,
+				9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */,
+				9ED1836128789FDD00506AEB /* OpenGLFontOutput.h */,
 				9ECCA1C3259CF1F00093A389 /* OpenGLHelper.h */,
 				9E6E7ADB245F882600114DEB /* Painter.cpp */,
 				9E6E7AFA245F882600114DEB /* Painter.h */,
@@ -3053,6 +3062,8 @@
 		9E6E8543245F89C300114DEB /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				9ED1830828789E7500506AEB /* FontCollection.cpp */,
+				9ED1830928789E7500506AEB /* FontCollection.h */,
 				9ECAAA3727D1C32200A32EEF /* PrintedTextCache.cpp */,
 				9ECAAA3627D1C32200A32EEF /* PrintedTextCache.h */,
 				9E6E8546245F89C300114DEB /* ResourcesCache.cpp */,
@@ -3125,65 +3136,29 @@
 			children = (
 				9E6E856E245F89C300114DEB /* Geometry.cpp */,
 				9E6E85A4245F89C400114DEB /* Geometry.h */,
-				9E6E8570245F89C300114DEB /* hardware */,
+				9ED1832D28789EFF00506AEB /* opengl */,
 				9E6E8595245F89C400114DEB /* parts */,
 				9E6E8580245F89C400114DEB /* Renderer.h */,
 				9E6E856F245F89C300114DEB /* RenderResources.cpp */,
 				9E6E856D245F89C300114DEB /* RenderResources.h */,
 				9E6E8592245F89C400114DEB /* software */,
+				9ED1831028789ED000506AEB /* sprite */,
 				9E6E8581245F89C400114DEB /* utils */,
 			);
 			path = rendering;
 			sourceTree = "<group>";
 		};
-		9E6E8570245F89C300114DEB /* hardware */ = {
-			isa = PBXGroup;
-			children = (
-				9E6E8571245F89C300114DEB /* HardwareRenderer.h */,
-				9E6E8573245F89C300114DEB /* HardwareRenderer.cpp */,
-				9E6E8574245F89C300114DEB /* HardwareRenderResources.h */,
-				9E6E8572245F89C300114DEB /* HardwareRenderResources.cpp */,
-				9E6E8575245F89C300114DEB /* shaders */,
-			);
-			path = hardware;
-			sourceTree = "<group>";
-		};
-		9E6E8575245F89C300114DEB /* shaders */ = {
-			isa = PBXGroup;
-			children = (
-				9E6E8576245F89C300114DEB /* RenderPlaneShader.h */,
-				9E6E8577245F89C300114DEB /* RenderVdpSpriteShader.cpp */,
-				9E6E8578245F89C300114DEB /* RenderComponentSpriteShader.cpp */,
-				9E6E8579245F89C300114DEB /* RenderPlaneShader.cpp */,
-				9E6E857A245F89C300114DEB /* RenderPaletteSpriteShader.h */,
-				9E6E857B245F89C300114DEB /* RenderPaletteSpriteShader.cpp */,
-				9E6E857C245F89C300114DEB /* DebugDrawPlaneShader.cpp */,
-				9E6E857D245F89C300114DEB /* RenderComponentSpriteShader.h */,
-				9E6E857E245F89C300114DEB /* DebugDrawPlaneShader.h */,
-				9E6E857F245F89C400114DEB /* RenderVdpSpriteShader.h */,
-			);
-			path = shaders;
-			sourceTree = "<group>";
-		};
 		9E6E8581245F89C400114DEB /* utils */ = {
 			isa = PBXGroup;
 			children = (
-				9E6E8582245F89C400114DEB /* ComponentSprite.cpp */,
-				9E6E8583245F89C400114DEB /* PaletteBitmap.h */,
-				9E6E8584245F89C400114DEB /* PaletteBitmap.cpp */,
-				9E6E8585245F89C400114DEB /* Kosinski.cpp */,
-				9E6E8586245F89C400114DEB /* BufferTexture.h */,
-				9E6E8587245F89C400114DEB /* SpriteDump.cpp */,
 				9E6E8588245F89C400114DEB /* BufferTexture.cpp */,
-				9E6E8589245F89C400114DEB /* PaletteSprite.h */,
-				9E6E858A245F89C400114DEB /* SpriteDump.h */,
+				9E6E8586245F89C400114DEB /* BufferTexture.h */,
+				9E6E8585245F89C400114DEB /* Kosinski.cpp */,
 				9E6E858B245F89C400114DEB /* Kosinski.h */,
+				9E6E8584245F89C400114DEB /* PaletteBitmap.cpp */,
+				9E6E8583245F89C400114DEB /* PaletteBitmap.h */,
 				9E6E858C245F89C400114DEB /* RenderUtils.cpp */,
-				9E6E858D245F89C400114DEB /* PaletteSprite.cpp */,
 				9E6E858E245F89C400114DEB /* RenderUtils.h */,
-				9E6E858F245F89C400114DEB /* SpriteBase.h */,
-				9E6E8590245F89C400114DEB /* SpriteBase.cpp */,
-				9E6E8591245F89C400114DEB /* ComponentSprite.h */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -3337,8 +3312,6 @@
 				9E6E85DB245F89C400114DEB /* JsonHelper.h */,
 				9ECAA9FD27D1BDAC00A32EEF /* Logging.cpp */,
 				9ECAA9FC27D1BDAC00A32EEF /* Logging.h */,
-				9E6E85D8245F89C400114DEB /* PackageFileCrawler.cpp */,
-				9E6E85D6245F89C400114DEB /* PackageFileCrawler.h */,
 				9E1DDD842471E0E8009DA2D2 /* Profiling.cpp */,
 				9E1DDD872471E0E8009DA2D2 /* Profiling.h */,
 				9E0CCAC42518FBCD0007288E /* Transform2D.cpp */,
@@ -3531,6 +3504,50 @@
 			path = file;
 			sourceTree = "<group>";
 		};
+		9ED1831028789ED000506AEB /* sprite */ = {
+			isa = PBXGroup;
+			children = (
+				9ED1831128789ED000506AEB /* ComponentSprite.cpp */,
+				9ED1831228789ED000506AEB /* SpriteDump.cpp */,
+				9ED1831328789ED000506AEB /* PaletteSprite.h */,
+				9ED1831428789ED000506AEB /* SpriteDump.h */,
+				9ED1831528789ED000506AEB /* PaletteSprite.cpp */,
+				9ED1831628789ED000506AEB /* SpriteBase.h */,
+				9ED1831728789ED000506AEB /* SpriteBase.cpp */,
+				9ED1831828789ED000506AEB /* ComponentSprite.h */,
+			);
+			path = sprite;
+			sourceTree = "<group>";
+		};
+		9ED1832D28789EFF00506AEB /* opengl */ = {
+			isa = PBXGroup;
+			children = (
+				9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */,
+				9ED1832E28789EFF00506AEB /* OpenGLRenderer.h */,
+				9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */,
+				9ED1832F28789EFF00506AEB /* OpenGLRenderResources.h */,
+				9ED1833128789EFF00506AEB /* shaders */,
+			);
+			path = opengl;
+			sourceTree = "<group>";
+		};
+		9ED1833128789EFF00506AEB /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				9ED1833228789EFF00506AEB /* RenderPlaneShader.h */,
+				9ED1833328789EFF00506AEB /* RenderVdpSpriteShader.cpp */,
+				9ED1833428789EFF00506AEB /* RenderComponentSpriteShader.cpp */,
+				9ED1833528789EFF00506AEB /* RenderPlaneShader.cpp */,
+				9ED1833628789EFF00506AEB /* RenderPaletteSpriteShader.h */,
+				9ED1833728789EFF00506AEB /* RenderPaletteSpriteShader.cpp */,
+				9ED1833828789EFF00506AEB /* DebugDrawPlaneShader.cpp */,
+				9ED1833928789EFF00506AEB /* RenderComponentSpriteShader.h */,
+				9ED1833A28789EFF00506AEB /* DebugDrawPlaneShader.h */,
+				9ED1833B28789EFF00506AEB /* RenderVdpSpriteShader.h */,
+			);
+			path = shaders;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3627,7 +3644,7 @@
 		9E6E7A3F245F722F00114DEB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1330;
+				LastUpgradeCheck = 1340;
 				ORGANIZATIONNAME = None;
 				TargetAttributes = {
 					9E0C5E7E247DD5AF000105D0 = {
@@ -3833,11 +3850,11 @@
 				9ECAAA2827D1C25E00A32EEF /* Operators.cpp in Sources */,
 				9E0C5EB1247DD6FB000105D0 /* Kosinski.cpp in Sources */,
 				9E0C5F20247DDFC9000105D0 /* RC4Encryption.cpp in Sources */,
-				9E0C5EA8247DD6CD000105D0 /* HardwareRenderer.cpp in Sources */,
 				9E0C5EE9247DD7E0000105D0 /* ActSelectMenu.cpp in Sources */,
 				9E0C5ED9247DD79E000105D0 /* FileHelper.cpp in Sources */,
 				9E0C5EC2247DD739000105D0 /* ControlsIn.cpp in Sources */,
 				9E0C5E95247DD681000105D0 /* ResourcesCache.cpp in Sources */,
+				9ED1830528789E3900506AEB /* FontProcessor.cpp in Sources */,
 				9E0C5E98247DD68B000105D0 /* LemonScriptRuntime.cpp in Sources */,
 				9E82C7C726BDFA3200ADDBD3 /* InputConfig.cpp in Sources */,
 				9E49B9C3260C31B300719EC5 /* MenuItems.cpp in Sources */,
@@ -3849,8 +3866,8 @@
 				9E0C5F2B247DDFE0000105D0 /* Camera.cpp in Sources */,
 				9E0C5EF0247DD7FA000105D0 /* SharedDatabase.cpp in Sources */,
 				9E0C5EF6247DD80C000105D0 /* DiscordIntegration.cpp in Sources */,
+				9ED1831B28789ED000506AEB /* ComponentSprite.cpp in Sources */,
 				9E0C5EBB247DD720000105D0 /* OverlayManager.cpp in Sources */,
-				9E0C5EB5247DD708000105D0 /* PaletteSprite.cpp in Sources */,
 				9E0C5EED247DD7EB000105D0 /* PauseMenu.cpp in Sources */,
 				9E453AE825B91F500012BADC /* OpenGLTexture.cpp in Sources */,
 				9ECCA1CF259CF24C0093A389 /* FilePackage.cpp in Sources */,
@@ -3858,6 +3875,7 @@
 				9ECAAA3327D1C27C00A32EEF /* FlyweightString.cpp in Sources */,
 				9E0C5F11247DDFB9000105D0 /* BitmapCodecICO.cpp in Sources */,
 				9E0C5E8D247DD65D000105D0 /* DrawerTexture.cpp in Sources */,
+				9ED1830C28789E7500506AEB /* FontCollection.cpp in Sources */,
 				9E0C5F14247DDFB9000105D0 /* Color.cpp in Sources */,
 				9ECAAA7727D1C7C600A32EEF /* WebSocketWrapper.cpp in Sources */,
 				9E0C5EC0247DD733000105D0 /* EngineMain.cpp in Sources */,
@@ -3872,15 +3890,16 @@
 				9E0C5EC9247DD755000105D0 /* DebugLogView.cpp in Sources */,
 				9E0C5EE2247DD7C7000105D0 /* MainMenu.cpp in Sources */,
 				9E0C5EE6247DD7D3000105D0 /* SecretUnlockedWindow.cpp in Sources */,
+				9ED1832028789ED000506AEB /* SpriteDump.cpp in Sources */,
 				9ECAAA0C27D1C20F00A32EEF /* OneTimeAllocPool.cpp in Sources */,
 				9ECAAA4827D1C63E00A32EEF /* GhostSync.cpp in Sources */,
 				9ECAAA2427D1C25E00A32EEF /* LineNumberTranslation.cpp in Sources */,
 				9E0C5E88247DD649000105D0 /* DrawCommand.cpp in Sources */,
-				9E0C5F2D247DDFE0000105D0 /* FontOutput.cpp in Sources */,
 				9E0C5ED8247DD79C000105D0 /* BitStream.cpp in Sources */,
 				9E0C5EE5247DD7D1000105D0 /* SkippableCutsceneWindow.cpp in Sources */,
 				9EB2F814249679FE007482F3 /* Mod.cpp in Sources */,
 				9E0C5EFA247DD82A000105D0 /* RuntimeFunction.cpp in Sources */,
+				9ED1833F28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */,
 				9E7E28DD25EF21370021AE3A /* FileStructureTree.cpp in Sources */,
 				9EB2F81624967A09007482F3 /* ModsMenu.cpp in Sources */,
 				9E0C5F03247DD848000105D0 /* FunctionWrapper.cpp in Sources */,
@@ -3892,7 +3911,6 @@
 				9E7E28ED25EF217E0021AE3A /* ZlibDeflate.cpp in Sources */,
 				9ECAAA6F27D1C7C600A32EEF /* ConnectionManager.cpp in Sources */,
 				9ECAAA1927D1C24E00A32EEF /* ConstantArray.cpp in Sources */,
-				9E0C5EAD247DD6DD000105D0 /* RenderPaletteSpriteShader.cpp in Sources */,
 				9E0C5F3D247DDFE0000105D0 /* Texture.cpp in Sources */,
 				9E0C5F22247DDFC9000105D0 /* RmxDeflate.cpp in Sources */,
 				9E0C5E9F247DD6A7000105D0 /* sn76489.cpp in Sources */,
@@ -3902,15 +3920,16 @@
 				9E0C5ECB247DD761000105D0 /* EmulationAudioSource.cpp in Sources */,
 				9E0C5E9D247DD6A0000105D0 /* LemonScriptBindings.cpp in Sources */,
 				9ECAAA1527D1C24E00A32EEF /* Define.cpp in Sources */,
+				9ED1835328789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
 				9E7E28F925EF21A60021AE3A /* FileProviderSDL.cpp in Sources */,
 				9E0C5F32247DDFE0000105D0 /* GuiBase.cpp in Sources */,
+				9ED1834428789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */,
 				9E0C5ECF247DD774000105D0 /* Configuration.cpp in Sources */,
 				9E7E291B25EF27630021AE3A /* ioapi.c in Sources */,
 				9E0C5F30247DDFE0000105D0 /* FTX_System.cpp in Sources */,
 				9E2D87E924AD8C6200E6EEBE /* AudioReference.cpp in Sources */,
 				9E0C5EB3247DD701000105D0 /* BufferTexture.cpp in Sources */,
 				9E1499D124CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */,
-				9E0C5EAF247DD6EF000105D0 /* ComponentSprite.cpp in Sources */,
 				9E0788562549EDCF0008A7FB /* TouchControlsOverlay.cpp in Sources */,
 				9E0C5ECC247DD764000105D0 /* AudioOutBase.cpp in Sources */,
 				9E0C5F10247DDFB9000105D0 /* BitmapCodecBMP.cpp in Sources */,
@@ -3921,6 +3940,7 @@
 				9E7E28D925EF21370021AE3A /* ZipFileProvider.cpp in Sources */,
 				9E0C5F0C247DDF96000105D0 /* Token.cpp in Sources */,
 				9E0C5F1F247DDFC9000105D0 /* OutputStream.cpp in Sources */,
+				9ED1834E28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */,
 				9E0C5EE7247DD7D7000105D0 /* TimeAttackResultsMenu.cpp in Sources */,
 				9E0C5EBC247DD723000105D0 /* SpriteManager.cpp in Sources */,
 				9E0C5EFB247DD82C000105D0 /* StandardLibrary.cpp in Sources */,
@@ -3936,17 +3956,16 @@
 				9E0C5ECA247DD75E000105D0 /* OggAudioSource.cpp in Sources */,
 				9E0C5EFF247DD83C000105D0 /* Program.cpp in Sources */,
 				9E0C5F0D247DDFB9000105D0 /* Basics.cpp in Sources */,
-				9E0C5EAE247DD6E4000105D0 /* DebugDrawPlaneShader.cpp in Sources */,
 				9E0C5F0E247DDFB9000105D0 /* BinarySerializer.cpp in Sources */,
 				9E0C5F3B247DDFE0000105D0 /* SpriteAtlas.cpp in Sources */,
 				9E0C5F28247DDFE0000105D0 /* AppFramework.cpp in Sources */,
 				9E0C5F08247DDF88000105D0 /* ParserHelper.cpp in Sources */,
 				9E0C5E86247DD624000105D0 /* main.cpp in Sources */,
-				9E0C5EB6247DD70B000105D0 /* SpriteBase.cpp in Sources */,
 				9E0C5EE1247DD7C4000105D0 /* GameApp.cpp in Sources */,
 				9E82C77F26BDF29A00ADDBD3 /* CheatSheetOverlay.cpp in Sources */,
 				9E0C5E8C247DD659000105D0 /* SoftwareDrawer.cpp in Sources */,
 				9E0C5ED7247DD79A000105D0 /* Utils.cpp in Sources */,
+				9ED1835D28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9E0C5EA6247DD6C3000105D0 /* Geometry.cpp in Sources */,
 				9E0C5EA2247DD6B0000105D0 /* blip_buf.cpp in Sources */,
 				9E0C5F09247DDF8B000105D0 /* FunctionCompiler.cpp in Sources */,
@@ -3955,6 +3974,7 @@
 				9E0C5EC6247DD74C000105D0 /* SaveStateMenu.cpp in Sources */,
 				9ECB71B124C131FB00A8B55E /* OptionsMenu.cpp in Sources */,
 				9E0C5EDD247DD7AD000105D0 /* CrashHandler.cpp in Sources */,
+				9ED1835828789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9EB2F81B24967A2A007482F3 /* AudioSourceManager.cpp in Sources */,
 				9E0C5E8A247DD653000105D0 /* Blitter.cpp in Sources */,
 				9E0C5E9C247DD69D000105D0 /* EmulatorInterface.cpp in Sources */,
@@ -3965,12 +3985,13 @@
 				9ECAAA8B27D1C7C600A32EEF /* Sockets.cpp in Sources */,
 				9E0C5EFC247DD82F000105D0 /* Runtime.cpp in Sources */,
 				9E0C5EC5247DD749000105D0 /* DebugSidePanelCategory.cpp in Sources */,
+				9ED1832A28789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9E0C5F37247DDFE0000105D0 /* JobManager.cpp in Sources */,
-				9E0C5EA9247DD6CF000105D0 /* HardwareRenderResources.cpp in Sources */,
 				9E0C5F06247DDF81000105D0 /* Node.cpp in Sources */,
 				9E0C5EB4247DD705000105D0 /* RenderUtils.cpp in Sources */,
 				9E7E28F125EF217E0021AE3A /* FileProvider.cpp in Sources */,
 				9E0C5F31247DDFE0000105D0 /* GLTools.cpp in Sources */,
+				9ED1832528789ED000506AEB /* PaletteSprite.cpp in Sources */,
 				9E0C5F1E247DDFC9000105D0 /* Math.cpp in Sources */,
 				9E0C5ED0247DD777000105D0 /* GameProfile.cpp in Sources */,
 				9E0C5F3A247DDFE0000105D0 /* Shader.cpp in Sources */,
@@ -3988,7 +4009,6 @@
 				9E0C5EFD247DD833000105D0 /* Translator.cpp in Sources */,
 				9E0C5E9B247DD69A000105D0 /* SaveStateSerializer.cpp in Sources */,
 				9E1499D524CE613F0015EC7C /* Nativizer.cpp in Sources */,
-				9E0C5ED6247DD797000105D0 /* PackageFileCrawler.cpp in Sources */,
 				9ECAAA8327D1C7C600A32EEF /* WebSocketClient.cpp in Sources */,
 				9E0C5EDE247DD7B6000105D0 /* ConfigurationImpl.cpp in Sources */,
 				9E7E28E925EF217E0021AE3A /* FileIO.cpp in Sources */,
@@ -4000,11 +4020,11 @@
 				9E0C5EEE247DD7EE000105D0 /* ExtrasMenu.cpp in Sources */,
 				9E0C5F16247DDFB9000105D0 /* FileCrawler.cpp in Sources */,
 				9E0C5E8B247DD657000105D0 /* SoftwareRasterizer.cpp in Sources */,
+				9ED1836428789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */,
 				9ECAAA7327D1C7C600A32EEF /* ReceivedPacketCache.cpp in Sources */,
 				9E0CCAD42518FE490007288E /* OpcodeProcessor.cpp in Sources */,
 				9E0C5F18247DDFB9000105D0 /* FileSystem.cpp in Sources */,
 				9E0CCAC72518FBCD0007288E /* Transform2D.cpp in Sources */,
-				9E0C5EB2247DD6FE000105D0 /* SpriteDump.cpp in Sources */,
 				9E0C5F2A247DDFE0000105D0 /* AudioBuffer.cpp in Sources */,
 				9E0C5EE0247DD7BD000105D0 /* AudioOut.cpp in Sources */,
 				9E0C5EC7247DD74F000105D0 /* DebugSidePanel.cpp in Sources */,
@@ -4033,7 +4053,6 @@
 				9E0CCADE2518FE770007288E /* DefaultOpcodeProvider.cpp in Sources */,
 				9E0C5EE3247DD7C9000105D0 /* GameMenuManager.cpp in Sources */,
 				9E0C5ED1247DD77A000105D0 /* Application.cpp in Sources */,
-				9E0C5EAC247DD6D9000105D0 /* RenderPlaneShader.cpp in Sources */,
 				9E0C5EBA247DD71D000105D0 /* PaletteManager.cpp in Sources */,
 				9E0C5EEA247DD7E2000105D0 /* MenuBackground.cpp in Sources */,
 				9E0C5F02247DD845000105D0 /* Function.cpp in Sources */,
@@ -4050,6 +4069,7 @@
 				9E0C5F3E247DDFE0000105D0 /* Thread.cpp in Sources */,
 				9E0C5F27247DDFD6000105D0 /* rmxext_oggvorbis.cpp in Sources */,
 				9E0CCAE72518FE7C0007288E /* NativizedOpcodeProvider.cpp in Sources */,
+				9ED1834928789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */,
 				9E0C5F24247DDFC9000105D0 /* Tools.cpp in Sources */,
 				9EB2F812249679F9007482F3 /* ModManager.cpp in Sources */,
 				9EB2F82224967A55007482F3 /* ApplicationContextMenu.cpp in Sources */,
@@ -4057,12 +4077,10 @@
 				9E0C5F2E247DDFE0000105D0 /* FontSource.cpp in Sources */,
 				9E0CCAD02518FD940007288E /* SoundEmulation.cpp in Sources */,
 				9E0C5EB8247DD717000105D0 /* PatternManager.cpp in Sources */,
-				9E0C5EAA247DD6D4000105D0 /* RenderVdpSpriteShader.cpp in Sources */,
 				9E0C5E91247DD66B000105D0 /* OpenGLDrawer.cpp in Sources */,
 				9E0C5EA7247DD6C6000105D0 /* RenderResources.cpp in Sources */,
 				9E0C5E99247DD693000105D0 /* ROMDataAnalyser.cpp in Sources */,
 				9E0C5E9A247DD697000105D0 /* GameRecorder.cpp in Sources */,
-				9E0C5EAB247DD6D6000105D0 /* RenderComponentSpriteShader.cpp in Sources */,
 				9ECB71AF24C131F700A8B55E /* OptionsEntry.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4087,10 +4105,11 @@
 				9E1D5F682475733F003B1774 /* pch.cpp in Sources */,
 				9E1D5F692475733F003B1774 /* FileCrawler.cpp in Sources */,
 				9E1D5F6A2475733F003B1774 /* AudioOutBase.cpp in Sources */,
-				9E1D5F6B2475733F003B1774 /* HardwareRenderResources.cpp in Sources */,
+				9ED1831A28789ED000506AEB /* ComponentSprite.cpp in Sources */,
 				9E1D5F6C2475733F003B1774 /* PlayerProgress.cpp in Sources */,
 				9E1D5F6D2475733F003B1774 /* ScriptImplementations.cpp in Sources */,
 				9E1D5F6E2475733F003B1774 /* Module.cpp in Sources */,
+				9ED1832428789ED000506AEB /* PaletteSprite.cpp in Sources */,
 				9E1D5F6F2475733F003B1774 /* Camera.cpp in Sources */,
 				9E1D5F702475733F003B1774 /* Configuration.cpp in Sources */,
 				9E1D5F712475733F003B1774 /* BitStream.cpp in Sources */,
@@ -4106,6 +4125,8 @@
 				9E1D5F772475733F003B1774 /* ExtrasMenu.cpp in Sources */,
 				9E1D5F782475733F003B1774 /* SoftwareDrawerTexture.cpp in Sources */,
 				9E1D5F792475733F003B1774 /* rmxbase.cpp in Sources */,
+				9ED1835228789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
+				9ED1834828789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */,
 				9E1D5F7A2475733F003B1774 /* CrashHandler.cpp in Sources */,
 				9E1D5F7B2475733F003B1774 /* BinarySerializer.cpp in Sources */,
 				9E1D5F7C2475733F003B1774 /* PatternManager.cpp in Sources */,
@@ -4131,6 +4152,7 @@
 				9E1D5F872475733F003B1774 /* BitmapCodecJPG.cpp in Sources */,
 				9E2D87E424AD8C5D00E6EEBE /* AudioManager.cpp in Sources */,
 				9E1D5F882475733F003B1774 /* Geometry.cpp in Sources */,
+				9ED1830B28789E7500506AEB /* FontCollection.cpp in Sources */,
 				9E49B9BE260C31B300719EC5 /* OxygenMenu.cpp in Sources */,
 				9E1D5F8A2475733F003B1774 /* ConfigurationImpl.cpp in Sources */,
 				9E1D5F8B2475733F003B1774 /* JsonHelper.cpp in Sources */,
@@ -4152,11 +4174,9 @@
 				9E1D5F972475733F003B1774 /* LogDisplay.cpp in Sources */,
 				9E1D5F982475733F003B1774 /* ActSelectMenu.cpp in Sources */,
 				9ECAAA9227D1C7C600A32EEF /* ServerClientBase.cpp in Sources */,
-				9E1D5F992475733F003B1774 /* ComponentSprite.cpp in Sources */,
 				9E1D5F9A2475733F003B1774 /* Basics.cpp in Sources */,
 				9E265013254B0A4D0000A100 /* application_manager.cpp in Sources */,
 				9E1D5F9B2475733F003B1774 /* TokenProcessing.cpp in Sources */,
-				9E1D5F9C2475733F003B1774 /* RenderPlaneShader.cpp in Sources */,
 				9E8202DF25314A1800575E6C /* CustomAudioMixer.cpp in Sources */,
 				9ECAAA0B27D1C20F00A32EEF /* OneTimeAllocPool.cpp in Sources */,
 				9E1D5F9D2475733F003B1774 /* Texture.cpp in Sources */,
@@ -4168,6 +4188,7 @@
 				9E1D5FA32475733F003B1774 /* PlaneManager.cpp in Sources */,
 				9E0CCB012518FFF20007288E /* NativizedCode.inc in Sources */,
 				9E0CCADD2518FE760007288E /* DefaultOpcodeProvider.cpp in Sources */,
+				9ED1830428789E3900506AEB /* FontProcessor.cpp in Sources */,
 				9E1D5FA42475733F003B1774 /* GameMenuManager.cpp in Sources */,
 				9E1D5FA52475733F003B1774 /* PauseMenu.cpp in Sources */,
 				9E82C78426BDF33D00ADDBD3 /* LemonScriptProgram.cpp in Sources */,
@@ -4177,18 +4198,19 @@
 				9E1D5FA82475733F003B1774 /* BitmapCodecICO.cpp in Sources */,
 				9E1D5FA92475733F003B1774 /* SoftwareRasterizer.cpp in Sources */,
 				9E1D5FAA2475733F003B1774 /* Runtime.cpp in Sources */,
-				9E1D5FAB2475733F003B1774 /* PaletteSprite.cpp in Sources */,
 				9E8202E525314A3F00575E6C /* AudioMixer.cpp in Sources */,
 				9E1D5FAC2475733F003B1774 /* VideoBuffer.cpp in Sources */,
 				9E1D5FAD2475733F003B1774 /* pch.cpp in Sources */,
 				9E0CCACF2518FD940007288E /* SoundEmulation.cpp in Sources */,
 				9E1D5FAE2475733F003B1774 /* PaletteManager.cpp in Sources */,
 				9E1D5FAF2475733F003B1774 /* RenderParts.cpp in Sources */,
+				9ED1832928789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9E0CCAE42518FE7C0007288E /* NativizedOpcodeProvider.cpp in Sources */,
 				9E1D5FB02475733F003B1774 /* ROMDataAnalyser.cpp in Sources */,
 				9E1D5FB12475733F003B1774 /* GameUtils.cpp in Sources */,
 				9E1D5FB22475733F003B1774 /* HighResolutionTimer.cpp in Sources */,
 				9E1D5FB32475733F003B1774 /* GameRecorder.cpp in Sources */,
+				9ED1835728789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9E1D5FB42475733F003B1774 /* FileHandle.cpp in Sources */,
 				9E1D5FB52475733F003B1774 /* RC4Encryption.cpp in Sources */,
 				9E1D5FB62475733F003B1774 /* FTX_System.cpp in Sources */,
@@ -4208,6 +4230,7 @@
 				9E1D5FC22475733F003B1774 /* PersistentData.cpp in Sources */,
 				9E1D5FC32475733F003B1774 /* GLTools.cpp in Sources */,
 				9E1D5FC42475733F003B1774 /* DiscordIntegration.cpp in Sources */,
+				9ED1831F28789ED000506AEB /* SpriteDump.cpp in Sources */,
 				9E1D5FC52475733F003B1774 /* ScrollOffsetsManager.cpp in Sources */,
 				9E1D5FC62475733F003B1774 /* OpenGLDrawer.cpp in Sources */,
 				9ECCA1CE259CF24C0093A389 /* FilePackage.cpp in Sources */,
@@ -4229,12 +4252,14 @@
 				9E1D5FD32475733F003B1774 /* GameMenuBase.cpp in Sources */,
 				9E1D5FD42475733F003B1774 /* ControlsIn.cpp in Sources */,
 				9E1D5FD52475733F003B1774 /* PlayerRecorder.cpp in Sources */,
+				9ED1834D28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */,
 				9E1D5FD62475733F003B1774 /* DebugLogView.cpp in Sources */,
 				9E26500D254B0A4D0000A100 /* image_manager.cpp in Sources */,
 				9ECAAA1427D1C24E00A32EEF /* Define.cpp in Sources */,
 				9E1D5FD72475733F003B1774 /* TimeAttackResultsMenu.cpp in Sources */,
 				9E1D5FD82475733F003B1774 /* Color.cpp in Sources */,
 				9E0CCB11251910B70007288E /* version.inc in Sources */,
+				9ED1836328789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */,
 				9E1D5FD92475733F003B1774 /* MainMenu.cpp in Sources */,
 				9E1D5FDA2475733F003B1774 /* Translator.cpp in Sources */,
 				9E1D5FDB2475733F003B1774 /* ErrorHandler.cpp in Sources */,
@@ -4249,7 +4274,6 @@
 				9E1499D424CE613F0015EC7C /* Nativizer.cpp in Sources */,
 				9EB2F82124967A55007482F3 /* ApplicationContextMenu.cpp in Sources */,
 				9E7E28E825EF217E0021AE3A /* FileIO.cpp in Sources */,
-				9E1D5FE22475733F003B1774 /* RenderVdpSpriteShader.cpp in Sources */,
 				9ECAA9FF27D1BDAC00A32EEF /* Logging.cpp in Sources */,
 				9E26500A254B0A4D0000A100 /* types.cpp in Sources */,
 				9E1D5FE32475733F003B1774 /* InputRecorder.cpp in Sources */,
@@ -4272,7 +4296,6 @@
 				9E1D5FF02475733F003B1774 /* Simulation.cpp in Sources */,
 				9E1D5FF12475733F003B1774 /* LemonScriptRuntime.cpp in Sources */,
 				9E1499D024CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */,
-				9E1D5FF22475733F003B1774 /* PackageFileCrawler.cpp in Sources */,
 				9E1D5FF32475733F003B1774 /* JobManager.cpp in Sources */,
 				9ECB71B024C131FB00A8B55E /* OptionsMenu.cpp in Sources */,
 				9EB2F80524967986007482F3 /* ModsMenu.cpp in Sources */,
@@ -4283,30 +4306,27 @@
 				9E1D5FF72475733F003B1774 /* json_writer.cpp in Sources */,
 				9E1D5FF82475733F003B1774 /* ym2612.cpp in Sources */,
 				9E7E28F025EF217E0021AE3A /* FileProvider.cpp in Sources */,
+				9ED1835C28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9E1D5FFA2475733F003B1774 /* OpenGLDrawerResources.cpp in Sources */,
 				9E7E28D825EF21370021AE3A /* ZipFileProvider.cpp in Sources */,
 				9E0CCAF52518FF380007288E /* ProfilingView.cpp in Sources */,
 				9ECAAA3927D1C32200A32EEF /* PrintedTextCache.cpp in Sources */,
 				9E1D5FFB2475733F003B1774 /* Blitter.cpp in Sources */,
-				9E1D5FFC2475733F003B1774 /* SpriteDump.cpp in Sources */,
 				9E1D5FFD2475733F003B1774 /* Bitmap.cpp in Sources */,
 				9E7E28D425EF21370021AE3A /* PackedFileProvider.cpp in Sources */,
 				9E49B9B2260C315500719EC5 /* ControlFlow.cpp in Sources */,
 				9E1D5FFE2475733F003B1774 /* SoundDriver.cpp in Sources */,
 				9E1D5FFF2475733F003B1774 /* OggAudioSource.cpp in Sources */,
-				9E1D60002475733F003B1774 /* SpriteBase.cpp in Sources */,
 				9E995D3B25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E1D60012475733F003B1774 /* AppDelegate.mm in Sources */,
 				9E1D60022475733F003B1774 /* Drawer.cpp in Sources */,
 				9ECAAA4A27D1C63E00A32EEF /* UpdateCheck.cpp in Sources */,
-				9E1D60032475733F003B1774 /* RenderComponentSpriteShader.cpp in Sources */,
+				9ED1833E28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */,
 				9ECAAA2727D1C25E00A32EEF /* Operators.cpp in Sources */,
 				9E82C7C626BDFA3200ADDBD3 /* InputConfig.cpp in Sources */,
 				9E1D60042475733F003B1774 /* BitmapCodecPNG.cpp in Sources */,
-				9E1D60052475733F003B1774 /* RenderPaletteSpriteShader.cpp in Sources */,
 				9ECAAA8E27D1C7C600A32EEF /* RequestBase.cpp in Sources */,
 				9E0CCAFD2518FFF20007288E /* NativizedCode.cpp in Sources */,
-				9E1D60062475733F003B1774 /* HardwareRenderer.cpp in Sources */,
 				9E265007254B0A4D0000A100 /* overlay_manager.cpp in Sources */,
 				9E1D60072475733F003B1774 /* AudioBuffer.cpp in Sources */,
 				9E1D60092475733F003B1774 /* GameView.cpp in Sources */,
@@ -4323,16 +4343,15 @@
 				9E1D60142475733F003B1774 /* ResourceScriptGenerator.cpp in Sources */,
 				9E1D60152475733F003B1774 /* DrawCommand.cpp in Sources */,
 				9E26502B254B0A4D0000A100 /* relationship_manager.cpp in Sources */,
-				9E1D60162475733F003B1774 /* DebugDrawPlaneShader.cpp in Sources */,
 				9E1D60172475733F003B1774 /* SecretUnlockedWindow.cpp in Sources */,
 				9EB8FCAB2554E9BA00061D5E /* DataType.cpp in Sources */,
 				9E1D60182475733F003B1774 /* Parser.cpp in Sources */,
 				9E1D60192475733F003B1774 /* StandardLibrary.cpp in Sources */,
-				9E1D601A2475733F003B1774 /* FontOutput.cpp in Sources */,
 				9E7E290225EF25B60021AE3A /* FileInputStreamSDL.cpp in Sources */,
 				9E0CCAD62518FE4A0007288E /* OpcodeProcessor.cpp in Sources */,
 				9E1D601B2475733F003B1774 /* TimeAttackMenu.cpp in Sources */,
 				9E26501C254B0A4D0000A100 /* achievement_manager.cpp in Sources */,
+				9ED1834328789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */,
 				9E82C79F26BDF3C500ADDBD3 /* pch.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4357,23 +4376,21 @@
 				9E5FD90027EC0C8600CD430A /* ErrorHandler.cpp in Sources */,
 				9E5FD8FF27EC0C8600CD430A /* Basics.cpp in Sources */,
 				9E5FD86027EC089200CD430A /* BackdropView.cpp in Sources */,
-				9E5FD88627EC08EB00CD430A /* HardwareRenderer.cpp in Sources */,
 				9E5FD93227EC0CE200CD430A /* Painter.cpp in Sources */,
 				9E5FD8EE27EC0C3600CD430A /* StringRef.cpp in Sources */,
 				9E5FD87727EC08CA00CD430A /* FileStructureTree.cpp in Sources */,
 				9E5FD89927EC091000CD430A /* PaletteBitmap.cpp in Sources */,
 				9E5FD8D727EC0BEE00CD430A /* SecretUnlockedWindow.cpp in Sources */,
-				9E5FD88C27EC08F200CD430A /* RenderVdpSpriteShader.cpp in Sources */,
 				9E5FD88327EC08DB00CD430A /* pch.cpp in Sources */,
 				9E5FD85E27EC089200CD430A /* CheatSheetOverlay.cpp in Sources */,
 				9E5FD8A027EC097900CD430A /* ROMDataAnalyser.cpp in Sources */,
-				9E5FD92127EC0CC900CD430A /* FontOutput.cpp in Sources */,
 				9E5FD86E27EC08B400CD430A /* DrawerTexture.cpp in Sources */,
 				9E5FD8F727EC0C4E00CD430A /* StandardLibrary.cpp in Sources */,
 				9E5FD8F127EC0C3600CD430A /* Module.cpp in Sources */,
-				9E5FD89C27EC091000CD430A /* PaletteSprite.cpp in Sources */,
 				9E5FD8E827EC0C1F00CD430A /* TokenProcessing.cpp in Sources */,
 				9E5FD8BB27EC0A3F00CD430A /* NativizedCode.cpp in Sources */,
+				9ED1832C28789ED000506AEB /* SpriteBase.cpp in Sources */,
+				9ED1831D28789ED000506AEB /* ComponentSprite.cpp in Sources */,
 				9E5FD8E527EC0C1900CD430A /* Operators.cpp in Sources */,
 				9E5FD91127EC0C9C00CD430A /* Math.cpp in Sources */,
 				9E5FD8B427EC09A000CD430A /* WebSocketClient.cpp in Sources */,
@@ -4397,18 +4414,17 @@
 				9E5FD8C227EC0A5B00CD430A /* SharedDatabase.cpp in Sources */,
 				9E5FD8A627EC098400CD430A /* LogDisplay.cpp in Sources */,
 				9E5FD8D327EC0BE200CD430A /* OptionsMenuEntries.cpp in Sources */,
-				9E5FD88827EC08F200CD430A /* DebugDrawPlaneShader.cpp in Sources */,
 				9E5FD88227EC08D500CD430A /* JsonHelper.cpp in Sources */,
 				9E5FD85D27EC089200CD430A /* SaveStateMenu.cpp in Sources */,
 				9E5FD89D27EC091900CD430A /* SpriteCache.cpp in Sources */,
 				9E5FD87E27EC08D500CD430A /* Transform2D.cpp in Sources */,
 				9E5FD91827EC0CA500CD430A /* Tools.cpp in Sources */,
+				9ED1830E28789E7500506AEB /* FontCollection.cpp in Sources */,
 				9E5FD8D227EC0BD900CD430A /* GameMenuBase.cpp in Sources */,
 				9E5FD85927EC087E00CD430A /* GameSetupScreen.cpp in Sources */,
 				9E5FD89A27EC091000CD430A /* Kosinski.cpp in Sources */,
 				9E5FD90727EC0C8600CD430A /* BinarySerializer.cpp in Sources */,
 				9E5FD8E227EC0C1900CD430A /* LineNumberTranslation.cpp in Sources */,
-				9E5FD88927EC08F200CD430A /* RenderPlaneShader.cpp in Sources */,
 				9E5FD91427EC0C9C00CD430A /* JsonHelper.cpp in Sources */,
 				9E5FD8F627EC0C4E00CD430A /* RuntimeFunction.cpp in Sources */,
 				9E5FD85427EC087300CD430A /* ControlsIn.cpp in Sources */,
@@ -4437,7 +4453,6 @@
 				9E5FD8F927EC0C5500CD430A /* OptimizedOpcodeProvider.cpp in Sources */,
 				9E5FD8BA27EC09B200CD430A /* pch.cpp in Sources */,
 				9E5FD84927EC084C00CD430A /* AudioOutBase.cpp in Sources */,
-				9E5FD89B27EC091000CD430A /* SpriteBase.cpp in Sources */,
 				9E5FD8ED27EC0C3600CD430A /* FunctionWrapper.cpp in Sources */,
 				9E5FD8C727EC0A6300CD430A /* Game.cpp in Sources */,
 				9E5FD8EB27EC0C3600CD430A /* Define.cpp in Sources */,
@@ -4450,8 +4465,8 @@
 				9E5FD93527EC0CE200CD430A /* GuiBase.cpp in Sources */,
 				9E5FD8F327EC0C4E00CD430A /* OpcodeProcessor.cpp in Sources */,
 				9E5FD84827EC084800CD430A /* AudioCollection.cpp in Sources */,
+				9ED1835028789EFF00506AEB /* RenderPlaneShader.cpp in Sources */,
 				9E5FD8C927EC0BB500CD430A /* BlueSpheresRendering.cpp in Sources */,
-				9E5FD89827EC091000CD430A /* ComponentSprite.cpp in Sources */,
 				9E5FD8F527EC0C4E00CD430A /* Runtime.cpp in Sources */,
 				9E5FD8A927EC098400CD430A /* SaveStateSerializer.cpp in Sources */,
 				9E5FD8BF27EC0A5000CD430A /* GameClient.cpp in Sources */,
@@ -4462,7 +4477,9 @@
 				9E5FD8C527EC0A5B00CD430A /* PlayerRecorder.cpp in Sources */,
 				9E5FD87327EC08C000CD430A /* OpenGLTexture.cpp in Sources */,
 				9E5FD88F27EC08FD00CD430A /* OverlayManager.cpp in Sources */,
+				9ED1835528789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
 				9E5FD91227EC0C9C00CD430A /* Logging.cpp in Sources */,
+				9ED1832228789ED000506AEB /* SpriteDump.cpp in Sources */,
 				9E5FD8F427EC0C4E00CD430A /* ControlFlow.cpp in Sources */,
 				9E5FD86B27EC08AE00CD430A /* SoftwareDrawerTexture.cpp in Sources */,
 				9E5FD93627EC0CE200CD430A /* Shader.cpp in Sources */,
@@ -4474,7 +4491,9 @@
 				9E5FD86227EC089200CD430A /* MemoryHexView.cpp in Sources */,
 				9E5FD8B127EC09A000CD430A /* WebSocketWrapper.cpp in Sources */,
 				9E5FD91D27EC0CB300CD430A /* OggLoader.cpp in Sources */,
+				9ED1834B28789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */,
 				9E5FD8D027EC0BD900CD430A /* GameMenuManager.cpp in Sources */,
+				9ED1834628789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */,
 				9E5FD8E327EC0C1900CD430A /* FunctionCompiler.cpp in Sources */,
 				9E5FD91927EC0CA500CD430A /* RmxDeflate.cpp in Sources */,
 				9E5FD92327EC0CC900CD430A /* Framebuffer.cpp in Sources */,
@@ -4507,15 +4526,14 @@
 				9E5FD87127EC08C000CD430A /* OpenGLDrawerResources.cpp in Sources */,
 				9E5FD90C27EC0C8600CD430A /* FileSystem.cpp in Sources */,
 				9E5FD86A27EC08AE00CD430A /* Blitter.cpp in Sources */,
+				9ED1832728789ED000506AEB /* PaletteSprite.cpp in Sources */,
 				9E5FD90827EC0C8600CD430A /* Bitmap.cpp in Sources */,
 				9E5FD8D527EC0BE200CD430A /* OptionsEntry.cpp in Sources */,
+				9ED1835A28789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9E5FD85127EC086500CD430A /* GameLoader.cpp in Sources */,
 				9E5FD86527EC089200CD430A /* DebugLogView.cpp in Sources */,
-				9E5FD88B27EC08F200CD430A /* RenderPaletteSpriteShader.cpp in Sources */,
 				9E5FD87C27EC08D500CD430A /* Logging.cpp in Sources */,
 				9E5FD8FB27EC0C5E00CD430A /* SourceCodeWriter.cpp in Sources */,
-				9E5FD88727EC08EB00CD430A /* HardwareRenderResources.cpp in Sources */,
-				9E5FD88127EC08D500CD430A /* PackageFileCrawler.cpp in Sources */,
 				9E5FD85527EC087300CD430A /* InputRecorder.cpp in Sources */,
 				9E5FD84B27EC085100CD430A /* AudioSourceBase.cpp in Sources */,
 				9E5FD85A27EC087E00CD430A /* MenuItems.cpp in Sources */,
@@ -4548,17 +4566,19 @@
 				9E5FD8B927EC09A800CD430A /* ServerClientBase.cpp in Sources */,
 				9E5FD91727EC0CA500CD430A /* VectorBinarySerializer.cpp in Sources */,
 				9E5FD8B227EC09A000CD430A /* ReceivedPacketCache.cpp in Sources */,
-				9E5FD89527EC091000CD430A /* SpriteDump.cpp in Sources */,
+				9ED1830728789E3900506AEB /* FontProcessor.cpp in Sources */,
 				9E5FD84527EC082700CD430A /* ioapi.c in Sources */,
 				9E5FD8D427EC0BE200CD430A /* ControllerSetupMenu.cpp in Sources */,
 				9E5FD8BC27EC0A4900CD430A /* CustomAudioMixer.cpp in Sources */,
 				9E5FD93127EC0CE200CD430A /* Thread.cpp in Sources */,
 				9E5FD90A27EC0C8600CD430A /* FileCrawler.cpp in Sources */,
 				9E5FD87F27EC08D500CD430A /* Utils.cpp in Sources */,
+				9ED1834128789EFF00506AEB /* OpenGLRenderer.cpp in Sources */,
 				9E5FD90127EC0C8600CD430A /* InputStream.cpp in Sources */,
 				9E5FD8E427EC0C1900CD430A /* Compiler.cpp in Sources */,
 				9E5FD92727EC0CC900CD430A /* AudioReference.cpp in Sources */,
 				9E5FD92027EC0CC900CD430A /* FileInputStreamSDL.cpp in Sources */,
+				9ED1835F28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9E5FD8D927EC0BF600CD430A /* TimeAttackResultsMenu.cpp in Sources */,
 				9E5FD8DE27EC0C0C00CD430A /* pch.cpp in Sources */,
 				9E5FD84727EC084200CD430A /* Application.cpp in Sources */,
@@ -4576,6 +4596,7 @@
 				9E5FD8B627EC09A800CD430A /* Sockets.cpp in Sources */,
 				9E5FD90327EC0C8600CD430A /* BitmapCodecICO.cpp in Sources */,
 				9E5FD91F27EC0CC900CD430A /* AppFramework.cpp in Sources */,
+				9ED1836628789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */,
 				9E5FD88027EC08D500CD430A /* HighResolutionTimer.cpp in Sources */,
 				9E5FD86F27EC08B400CD430A /* Drawer.cpp in Sources */,
 				9E5FD8AE27EC098E00CD430A /* SoundDriver.cpp in Sources */,
@@ -4583,7 +4604,6 @@
 				9E5FD8A527EC098400CD430A /* EmulatorInterface.cpp in Sources */,
 				9E5FD88527EC08E100CD430A /* Geometry.cpp in Sources */,
 				9E5FD86C27EC08AE00CD430A /* SoftwareDrawer.cpp in Sources */,
-				9E5FD88A27EC08F200CD430A /* RenderComponentSpriteShader.cpp in Sources */,
 				9E5FD8FC27EC0C5E00CD430A /* Nativizer.cpp in Sources */,
 				9E5FD8E027EC0C1900CD430A /* Node.cpp in Sources */,
 			);
@@ -4609,10 +4629,11 @@
 				9E6E7B8D245F886B00114DEB /* pch.cpp in Sources */,
 				9E6E7B2E245F882600114DEB /* FileCrawler.cpp in Sources */,
 				9E6E8632245F89C400114DEB /* AudioOutBase.cpp in Sources */,
-				9E6E860E245F89C400114DEB /* HardwareRenderResources.cpp in Sources */,
+				9ED1831928789ED000506AEB /* ComponentSprite.cpp in Sources */,
 				9E6E80BE245F88D400114DEB /* PlayerProgress.cpp in Sources */,
 				9E6E80BC245F88D400114DEB /* ScriptImplementations.cpp in Sources */,
 				9E6E7B90245F886B00114DEB /* Module.cpp in Sources */,
+				9ED1832328789ED000506AEB /* PaletteSprite.cpp in Sources */,
 				9E6E7B36245F882600114DEB /* Camera.cpp in Sources */,
 				9E6E8635245F89C400114DEB /* Configuration.cpp in Sources */,
 				9E6E863C245F89C400114DEB /* BitStream.cpp in Sources */,
@@ -4628,6 +4649,8 @@
 				9E6E80BB245F88D400114DEB /* ExtrasMenu.cpp in Sources */,
 				9E6E85F0245F89C400114DEB /* SoftwareDrawerTexture.cpp in Sources */,
 				9E6E7B1E245F882600114DEB /* rmxbase.cpp in Sources */,
+				9ED1835128789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
+				9ED1834728789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */,
 				9E6E8641245F89C400114DEB /* CrashHandler.cpp in Sources */,
 				9E6E7B22245F882600114DEB /* BinarySerializer.cpp in Sources */,
 				9E6E861E245F89C400114DEB /* PatternManager.cpp in Sources */,
@@ -4653,6 +4676,7 @@
 				9E6E7B24245F882600114DEB /* BitmapCodecJPG.cpp in Sources */,
 				9E2D87E324AD8C5D00E6EEBE /* AudioManager.cpp in Sources */,
 				9E6E860C245F89C400114DEB /* Geometry.cpp in Sources */,
+				9ED1830A28789E7500506AEB /* FontCollection.cpp in Sources */,
 				9E49B9BD260C31B300719EC5 /* OxygenMenu.cpp in Sources */,
 				9E6E80AA245F88D400114DEB /* ConfigurationImpl.cpp in Sources */,
 				9E6E863E245F89C400114DEB /* JsonHelper.cpp in Sources */,
@@ -4674,11 +4698,9 @@
 				9E6E860A245F89C400114DEB /* LogDisplay.cpp in Sources */,
 				9E6E80B6245F88D400114DEB /* ActSelectMenu.cpp in Sources */,
 				9ECAAA9127D1C7C600A32EEF /* ServerClientBase.cpp in Sources */,
-				9E6E8615245F89C400114DEB /* ComponentSprite.cpp in Sources */,
 				9E6E7B19245F882600114DEB /* Basics.cpp in Sources */,
 				9E265012254B0A4D0000A100 /* application_manager.cpp in Sources */,
 				9E6E7B96245F886B00114DEB /* TokenProcessing.cpp in Sources */,
-				9E6E8612245F89C400114DEB /* RenderPlaneShader.cpp in Sources */,
 				9E8202DE25314A1800575E6C /* CustomAudioMixer.cpp in Sources */,
 				9ECAAA0A27D1C20F00A32EEF /* OneTimeAllocPool.cpp in Sources */,
 				9E6E7B3A245F882600114DEB /* Texture.cpp in Sources */,
@@ -4690,6 +4712,7 @@
 				9E6E8623245F89C400114DEB /* PlaneManager.cpp in Sources */,
 				9E0CCB0D251910990007288E /* NativizedCode.inc in Sources */,
 				9E0CCADB2518FE760007288E /* DefaultOpcodeProvider.cpp in Sources */,
+				9ED1830328789E3900506AEB /* FontProcessor.cpp in Sources */,
 				9E6E80B0245F88D400114DEB /* GameMenuManager.cpp in Sources */,
 				9E6E80BA245F88D400114DEB /* PauseMenu.cpp in Sources */,
 				9E82C78326BDF33D00ADDBD3 /* LemonScriptProgram.cpp in Sources */,
@@ -4699,18 +4722,19 @@
 				9E6E7B1B245F882600114DEB /* BitmapCodecICO.cpp in Sources */,
 				9E6E85F2245F89C400114DEB /* SoftwareRasterizer.cpp in Sources */,
 				9E6E7B8B245F886B00114DEB /* Runtime.cpp in Sources */,
-				9E6E861B245F89C400114DEB /* PaletteSprite.cpp in Sources */,
 				9E8202E425314A3F00575E6C /* AudioMixer.cpp in Sources */,
 				9E6E7B34245F882600114DEB /* VideoBuffer.cpp in Sources */,
 				9E6E860B245F89C400114DEB /* pch.cpp in Sources */,
 				9E0CCACE2518FD940007288E /* SoundEmulation.cpp in Sources */,
 				9E6E8620245F89C400114DEB /* PaletteManager.cpp in Sources */,
 				9E6E861F245F89C400114DEB /* RenderParts.cpp in Sources */,
+				9ED1832828789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9E0CCAE32518FE7C0007288E /* NativizedOpcodeProvider.cpp in Sources */,
 				9E6E85FF245F89C400114DEB /* ROMDataAnalyser.cpp in Sources */,
 				9E6E80C2245F88D400114DEB /* GameUtils.cpp in Sources */,
 				9E1DDD892471E0E8009DA2D2 /* HighResolutionTimer.cpp in Sources */,
 				9E6E8600245F89C400114DEB /* GameRecorder.cpp in Sources */,
+				9ED1835628789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9E6E7B25245F882600114DEB /* FileHandle.cpp in Sources */,
 				9E6E7B28245F882600114DEB /* RC4Encryption.cpp in Sources */,
 				9E6E7B3C245F882600114DEB /* FTX_System.cpp in Sources */,
@@ -4730,6 +4754,7 @@
 				9E6E85FD245F89C400114DEB /* PersistentData.cpp in Sources */,
 				9E6E7B3F245F882600114DEB /* GLTools.cpp in Sources */,
 				9E6E80C3245F88D400114DEB /* DiscordIntegration.cpp in Sources */,
+				9ED1831E28789ED000506AEB /* SpriteDump.cpp in Sources */,
 				9E6E8624245F89C400114DEB /* ScrollOffsetsManager.cpp in Sources */,
 				9E6E85F9245F89C400114DEB /* OpenGLDrawer.cpp in Sources */,
 				9ECCA1CD259CF24C0093A389 /* FilePackage.cpp in Sources */,
@@ -4751,12 +4776,14 @@
 				9E6E80B1245F88D400114DEB /* GameMenuBase.cpp in Sources */,
 				9E6E8628245F89C400114DEB /* ControlsIn.cpp in Sources */,
 				9E6E80BF245F88D400114DEB /* PlayerRecorder.cpp in Sources */,
+				9ED1834C28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */,
 				9E6E862F245F89C400114DEB /* DebugLogView.cpp in Sources */,
 				9E26500C254B0A4D0000A100 /* image_manager.cpp in Sources */,
 				9ECAAA1327D1C24E00A32EEF /* Define.cpp in Sources */,
 				9E6E80B4245F88D400114DEB /* TimeAttackResultsMenu.cpp in Sources */,
 				9E6E7B21245F882600114DEB /* Color.cpp in Sources */,
 				9E0CCB0F251910B70007288E /* version.inc in Sources */,
+				9ED1836228789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */,
 				9E6E80AF245F88D400114DEB /* MainMenu.cpp in Sources */,
 				9E6E7B8C245F886B00114DEB /* Translator.cpp in Sources */,
 				9ED3088E246CB56C00013D8D /* ErrorHandler.cpp in Sources */,
@@ -4771,7 +4798,6 @@
 				9E1499D324CE613F0015EC7C /* Nativizer.cpp in Sources */,
 				9EB2F82024967A55007482F3 /* ApplicationContextMenu.cpp in Sources */,
 				9E7E28E725EF217E0021AE3A /* FileIO.cpp in Sources */,
-				9E6E8610245F89C400114DEB /* RenderVdpSpriteShader.cpp in Sources */,
 				9ECAA9FE27D1BDAC00A32EEF /* Logging.cpp in Sources */,
 				9E265009254B0A4D0000A100 /* types.cpp in Sources */,
 				9E6E862A245F89C400114DEB /* InputRecorder.cpp in Sources */,
@@ -4794,7 +4820,6 @@
 				9E6E8604245F89C400114DEB /* Simulation.cpp in Sources */,
 				9E6E85FE245F89C400114DEB /* LemonScriptRuntime.cpp in Sources */,
 				9E1499CF24CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */,
-				9E6E863A245F89C400114DEB /* PackageFileCrawler.cpp in Sources */,
 				9E6E7B49245F882600114DEB /* JobManager.cpp in Sources */,
 				9ECB71AD24C131E500A8B55E /* OptionsMenu.cpp in Sources */,
 				9EB2F80424967986007482F3 /* ModsMenu.cpp in Sources */,
@@ -4805,30 +4830,27 @@
 				9E6E7B15245F882600114DEB /* json_writer.cpp in Sources */,
 				9E6E8607245F89C400114DEB /* ym2612.cpp in Sources */,
 				9E7E28EF25EF217E0021AE3A /* FileProvider.cpp in Sources */,
+				9ED1835B28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9E9EF33B24678BC900AAA00F /* OpenGLDrawerResources.cpp in Sources */,
 				9E7E28D725EF21370021AE3A /* ZipFileProvider.cpp in Sources */,
 				9E0CCAF62518FF390007288E /* ProfilingView.cpp in Sources */,
 				9ECAAA3827D1C32200A32EEF /* PrintedTextCache.cpp in Sources */,
 				9E6E85F1245F89C400114DEB /* Blitter.cpp in Sources */,
-				9E6E8618245F89C400114DEB /* SpriteDump.cpp in Sources */,
 				9E6E7B1A245F882600114DEB /* Bitmap.cpp in Sources */,
 				9E7E28D325EF21370021AE3A /* PackedFileProvider.cpp in Sources */,
 				9E49B9B1260C315500719EC5 /* ControlFlow.cpp in Sources */,
 				9E6E8606245F89C400114DEB /* SoundDriver.cpp in Sources */,
 				9E6E8630245F89C400114DEB /* OggAudioSource.cpp in Sources */,
-				9E6E861C245F89C400114DEB /* SpriteBase.cpp in Sources */,
 				9E995D3A25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E6E7A4C245F722F00114DEB /* AppDelegate.mm in Sources */,
 				9E6E85F5245F89C400114DEB /* Drawer.cpp in Sources */,
 				9ECAAA4927D1C63E00A32EEF /* UpdateCheck.cpp in Sources */,
-				9E6E8611245F89C400114DEB /* RenderComponentSpriteShader.cpp in Sources */,
+				9ED1833D28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */,
 				9ECAAA2627D1C25E00A32EEF /* Operators.cpp in Sources */,
 				9E82C7C526BDFA3200ADDBD3 /* InputConfig.cpp in Sources */,
 				9E6E7B2A245F882600114DEB /* BitmapCodecPNG.cpp in Sources */,
-				9E6E8613245F89C400114DEB /* RenderPaletteSpriteShader.cpp in Sources */,
 				9ECAAA8D27D1C7C600A32EEF /* RequestBase.cpp in Sources */,
 				9E0CCAFC2518FFF20007288E /* NativizedCode.cpp in Sources */,
-				9E6E860F245F89C400114DEB /* HardwareRenderer.cpp in Sources */,
 				9E265006254B0A4D0000A100 /* overlay_manager.cpp in Sources */,
 				9E6E7B43245F882600114DEB /* AudioBuffer.cpp in Sources */,
 				9E6E8638245F89C400114DEB /* GameView.cpp in Sources */,
@@ -4845,16 +4867,15 @@
 				9E6E80AB245F88D400114DEB /* ResourceScriptGenerator.cpp in Sources */,
 				9E6E85EF245F89C400114DEB /* DrawCommand.cpp in Sources */,
 				9E26502A254B0A4D0000A100 /* relationship_manager.cpp in Sources */,
-				9E6E8614245F89C400114DEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9E6E80B3245F88D400114DEB /* SecretUnlockedWindow.cpp in Sources */,
 				9EB8FCAA2554E9BA00061D5E /* DataType.cpp in Sources */,
 				9E6E7B9A245F886B00114DEB /* Parser.cpp in Sources */,
 				9E6E7B8A245F886B00114DEB /* StandardLibrary.cpp in Sources */,
-				9E6E7B47245F882600114DEB /* FontOutput.cpp in Sources */,
 				9E7E290025EF25B50021AE3A /* FileInputStreamSDL.cpp in Sources */,
 				9E0CCAD72518FE4B0007288E /* OpcodeProcessor.cpp in Sources */,
 				9E6E80B9245F88D400114DEB /* TimeAttackMenu.cpp in Sources */,
 				9E26501B254B0A4D0000A100 /* achievement_manager.cpp in Sources */,
+				9ED1834228789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */,
 				9E82C79E26BDF3C500ADDBD3 /* pch.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4872,19 +4893,16 @@
 				9EB069D0248088B20080AC49 /* json_value.cpp in Sources */,
 				9EB06A4324808ABE0080AC49 /* Profiling.cpp in Sources */,
 				9E7E28FA25EF21A60021AE3A /* FileProviderSDL.cpp in Sources */,
-				9EB06A1F24808A670080AC49 /* ComponentSprite.cpp in Sources */,
-				9EB06A2424808A670080AC49 /* PaletteSprite.cpp in Sources */,
 				9EB069DE248088B20080AC49 /* AudioBuffer.cpp in Sources */,
 				9EB069C1248088B20080AC49 /* Basics.cpp in Sources */,
-				9EB06A1C24808A590080AC49 /* RenderPlaneShader.cpp in Sources */,
 				9EB069EF248088B20080AC49 /* SpriteAtlas.cpp in Sources */,
 				9EC668C825D779C000A42FC2 /* InputManager.cpp in Sources */,
+				9ED1832B28789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9EB069B4248088B20080AC49 /* GlobalsLookup.cpp in Sources */,
 				9EB069DA248088B20080AC49 /* OggLoader.cpp in Sources */,
 				9EB06A0424808A1C0080AC49 /* DrawCollection.cpp in Sources */,
 				9EB06A4D24808B2B0080AC49 /* sn76489.cpp in Sources */,
 				9EB06A2D24808A780080AC49 /* ScrollOffsetsManager.cpp in Sources */,
-				9EB069E1248088B20080AC49 /* FontOutput.cpp in Sources */,
 				9E0CCAC82518FBCD0007288E /* Transform2D.cpp in Sources */,
 				9EB069C6248088B20080AC49 /* BitmapCodecJPG.cpp in Sources */,
 				9EB06A2F24808A8B0080AC49 /* EngineMain.cpp in Sources */,
@@ -4895,6 +4913,7 @@
 				9EB06A1324808A3F0080AC49 /* Simulation.cpp in Sources */,
 				9EB069C3248088B20080AC49 /* Bitmap.cpp in Sources */,
 				9EB06A3824808A9D0080AC49 /* DebugLogView.cpp in Sources */,
+				9ED1832128789ED000506AEB /* SpriteDump.cpp in Sources */,
 				9EB06A3124808A930080AC49 /* ControlsIn.cpp in Sources */,
 				9EB069E3248088B20080AC49 /* Framebuffer.cpp in Sources */,
 				9EB069B6248088B20080AC49 /* Function.cpp in Sources */,
@@ -4905,24 +4924,22 @@
 				9E82C7A126BDF3C500ADDBD3 /* pch.cpp in Sources */,
 				9E82C78626BDF33D00ADDBD3 /* LemonScriptProgram.cpp in Sources */,
 				9EB069E2248088B20080AC49 /* FontSource.cpp in Sources */,
+				9ED1834F28789EFF00506AEB /* RenderPlaneShader.cpp in Sources */,
 				9EB2F813249679FA007482F3 /* ModManager.cpp in Sources */,
 				9EB06A0024808A1C0080AC49 /* Blitter.cpp in Sources */,
 				9EB06A3D24808AA50080AC49 /* AudioPlayer.cpp in Sources */,
 				9EB069C0248088B20080AC49 /* Token.cpp in Sources */,
+				9ED1834528789EFF00506AEB /* RenderVdpSpriteShader.cpp in Sources */,
 				9EB06A5224808B3F0080AC49 /* Kosinski.cpp in Sources */,
-				9EB06A2524808A670080AC49 /* SpriteBase.cpp in Sources */,
 				9E8202E725314A3F00575E6C /* AudioMixer.cpp in Sources */,
 				9ECAAA0927D1C20F00A32EEF /* Logging.cpp in Sources */,
-				9EB06A1924808A590080AC49 /* HardwareRenderResources.cpp in Sources */,
 				9EB069B3248088B20080AC49 /* Program.cpp in Sources */,
 				9EB06A4E24808B2B0080AC49 /* SoundDriver.cpp in Sources */,
 				9EB069EE248088B20080AC49 /* Shader.cpp in Sources */,
 				9EB069ED248088B20080AC49 /* rmxmedia.cpp in Sources */,
 				9E7E28D625EF21370021AE3A /* PackedFileProvider.cpp in Sources */,
 				9ECAAA0D27D1C20F00A32EEF /* OneTimeAllocPool.cpp in Sources */,
-				9EB06A2124808A670080AC49 /* SpriteDump.cpp in Sources */,
 				9EB06A0C24808A3F0080AC49 /* PersistentData.cpp in Sources */,
-				9EB06A4524808ABE0080AC49 /* PackageFileCrawler.cpp in Sources */,
 				9E8202DA2531497400575E6C /* AudioSourceBase.cpp in Sources */,
 				9EB06A3424808A9D0080AC49 /* DebugSidePanelCategory.cpp in Sources */,
 				9EB06A3524808A9D0080AC49 /* SaveStateMenu.cpp in Sources */,
@@ -4936,10 +4953,10 @@
 				9EB06A0224808A1C0080AC49 /* SoftwareDrawer.cpp in Sources */,
 				9E49B9B4260C315500719EC5 /* ControlFlow.cpp in Sources */,
 				9ECAAA9027D1C7C600A32EEF /* RequestBase.cpp in Sources */,
-				9EB06A1B24808A590080AC49 /* RenderComponentSpriteShader.cpp in Sources */,
 				9EB069C9248088B20080AC49 /* ErrorHandler.cpp in Sources */,
 				9E7E28DA25EF21370021AE3A /* ZipFileProvider.cpp in Sources */,
 				9EB06A3E24808AAD0080AC49 /* Configuration.cpp in Sources */,
+				9ED1835E28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9EB069D5248088B20080AC49 /* rmxbase.cpp in Sources */,
 				9EB06A3A24808AA50080AC49 /* EmulationAudioSource.cpp in Sources */,
 				9EB069FF24808A1C0080AC49 /* SoftwareDrawerTexture.cpp in Sources */,
@@ -4949,7 +4966,6 @@
 				9EB06A2024808A670080AC49 /* PaletteBitmap.cpp in Sources */,
 				9EB06A1024808A3F0080AC49 /* SaveStateSerializer.cpp in Sources */,
 				9E0CCAEB2518FE7F0007288E /* OptimizedOpcodeProvider.cpp in Sources */,
-				9EB06A1E24808A590080AC49 /* DebugDrawPlaneShader.cpp in Sources */,
 				9EB06A0324808A1C0080AC49 /* DrawerTexture.cpp in Sources */,
 				9E0CCAE12518FE780007288E /* DefaultOpcodeProvider.cpp in Sources */,
 				9E7E28EE25EF217E0021AE3A /* ZlibDeflate.cpp in Sources */,
@@ -4966,6 +4982,7 @@
 				9EB069CF248088B20080AC49 /* json_reader.cpp in Sources */,
 				9EB069E0248088B20080AC49 /* Font.cpp in Sources */,
 				9EB2F81C24967A2A007482F3 /* AudioSourceManager.cpp in Sources */,
+				9ED1834028789EFF00506AEB /* OpenGLRenderer.cpp in Sources */,
 				9E82C77C26BDF29A00ADDBD3 /* BackdropView.cpp in Sources */,
 				9EB06A0E24808A3F0080AC49 /* ROMDataAnalyser.cpp in Sources */,
 				9EB06A2924808A780080AC49 /* PaletteManager.cpp in Sources */,
@@ -4978,9 +4995,11 @@
 				9EB06A4C24808AC40080AC49 /* CrashHandler.cpp in Sources */,
 				9ECAAA8C27D1C7C600A32EEF /* Sockets.cpp in Sources */,
 				9EB06A1524808A490080AC49 /* pch.cpp in Sources */,
+				9ED1832628789ED000506AEB /* PaletteSprite.cpp in Sources */,
 				9EB06A0724808A1C0080AC49 /* OpenGLDrawerTexture.cpp in Sources */,
 				9EB06A0A24808A2C0080AC49 /* ResourcesCache.cpp in Sources */,
 				9EB06A3624808A9D0080AC49 /* DebugSidePanel.cpp in Sources */,
+				9ED1834A28789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */,
 				9EB06A0124808A1C0080AC49 /* SoftwareRasterizer.cpp in Sources */,
 				9EB06A1424808A3F0080AC49 /* LogDisplay.cpp in Sources */,
 				9ECAAA9427D1C7C600A32EEF /* ServerClientBase.cpp in Sources */,
@@ -4996,6 +5015,7 @@
 				9ECAAA7827D1C7C600A32EEF /* WebSocketWrapper.cpp in Sources */,
 				9EB069D1248088B20080AC49 /* JsonHelper.cpp in Sources */,
 				9EB069F1248088B20080AC49 /* Texture.cpp in Sources */,
+				9ED1835928789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9EB069B0248088B20080AC49 /* Runtime.cpp in Sources */,
 				9EB069AF248088B20080AC49 /* StandardLibrary.cpp in Sources */,
 				9EB069AA2480882E0080AC49 /* AudioOut.cpp in Sources */,
@@ -5016,7 +5036,6 @@
 				9EB069BC248088B20080AC49 /* ParserHelper.cpp in Sources */,
 				9EB069EC248088B20080AC49 /* Painter.cpp in Sources */,
 				9EB069B5248088B20080AC49 /* Module.cpp in Sources */,
-				9EB06A1824808A590080AC49 /* HardwareRenderer.cpp in Sources */,
 				9EB06A5024808B2B0080AC49 /* blip_buf.cpp in Sources */,
 				9EB0699A24807A9C0080AC49 /* AppDelegate.mm in Sources */,
 				9EB069BA248088B20080AC49 /* Node.cpp in Sources */,
@@ -5028,13 +5047,13 @@
 				9ECAAA8427D1C7C600A32EEF /* WebSocketClient.cpp in Sources */,
 				9ECAAA3427D1C27C00A32EEF /* FlyweightString.cpp in Sources */,
 				9EB069AE248088B20080AC49 /* RuntimeFunction.cpp in Sources */,
-				9EB06A1A24808A590080AC49 /* RenderVdpSpriteShader.cpp in Sources */,
 				9E7E291C25EF27630021AE3A /* ioapi.c in Sources */,
 				9ECAAA7427D1C7C600A32EEF /* ReceivedPacketCache.cpp in Sources */,
 				9EB06A1224808A3F0080AC49 /* LemonScriptBindings.cpp in Sources */,
 				9E7E290525EF25B70021AE3A /* FileInputStreamSDL.cpp in Sources */,
 				9ECAAA2927D1C25E00A32EEF /* Operators.cpp in Sources */,
 				9EB069B7248088B20080AC49 /* FunctionWrapper.cpp in Sources */,
+				9ED1830628789E3900506AEB /* FontProcessor.cpp in Sources */,
 				9E0CCAF12518FF360007288E /* ProfilingView.cpp in Sources */,
 				9EB06A1724808A590080AC49 /* RenderResources.cpp in Sources */,
 				9E7E28EA25EF217E0021AE3A /* FileIO.cpp in Sources */,
@@ -5051,15 +5070,19 @@
 				9E7E28F225EF217E0021AE3A /* FileProvider.cpp in Sources */,
 				9ECAAA2D27D1C25E00A32EEF /* TypeCasting.cpp in Sources */,
 				9EB06A2C24808A780080AC49 /* PlaneManager.cpp in Sources */,
+				9ED1830D28789E7500506AEB /* FontCollection.cpp in Sources */,
 				9EB069BF248088B20080AC49 /* Parser.cpp in Sources */,
 				9E995D3D25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E08784826326E3E0005AEAF /* Experiments.cpp in Sources */,
 				9EB069CE248088B20080AC49 /* json_writer.cpp in Sources */,
+				9ED1836528789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */,
+				9ED1831C28789ED000506AEB /* ComponentSprite.cpp in Sources */,
 				9E49B9C8260C31B300719EC5 /* GameSetupScreen.cpp in Sources */,
 				9EB069FE24808A1C0080AC49 /* DrawCommand.cpp in Sources */,
 				9EB06A2624808A6D0080AC49 /* SoftwareRenderer.cpp in Sources */,
 				9EB069C7248088B20080AC49 /* BitmapCodecPNG.cpp in Sources */,
 				9EB06A4724808ABE0080AC49 /* BitStream.cpp in Sources */,
+				9ED1835428789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
 				9EB06A0924808A2C0080AC49 /* SpriteCache.cpp in Sources */,
 				9E0788572549EDCF0008A7FB /* TouchControlsOverlay.cpp in Sources */,
 				9EB06A4624808ABE0080AC49 /* Utils.cpp in Sources */,
@@ -5069,7 +5092,6 @@
 				9EB069C4248088B20080AC49 /* BitmapCodecBMP.cpp in Sources */,
 				9EB06A2B24808A780080AC49 /* SpriteManager.cpp in Sources */,
 				9EB06A0D24808A3F0080AC49 /* LemonScriptRuntime.cpp in Sources */,
-				9EB06A1D24808A590080AC49 /* RenderPaletteSpriteShader.cpp in Sources */,
 				9EB06A4224808ABE0080AC49 /* HighResolutionTimer.cpp in Sources */,
 				9EB069B9248088B20080AC49 /* Compiler.cpp in Sources */,
 				9E0CCAD12518FD940007288E /* SoundEmulation.cpp in Sources */,
@@ -5280,6 +5302,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -5335,6 +5358,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";

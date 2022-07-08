@@ -34,10 +34,10 @@ int main(int argc, char * argv[]) {
 		}
 		PlatformFunctions::mExAppDataPath = *String(myDocuments.path.UTF8String).toWString();
 	}
-	config.mAppDataPath = *String(myDocuments.path.UTF8String).toWString();
+	config.mAppDataPath = *String([myDocuments.path stringByAppendingString:@"/"].UTF8String).toWString();
 	//Mount the end user build into its application support directory, because data/cache will be created
 	[NSFileManager.defaultManager changeCurrentDirectoryPath:myDocuments.path];
-
+	
 	bool loadedSettings = config.loadSettings(config.mAppDataPath + L"settings.json", Configuration::SettingsType::STANDARD);
 	config.loadSettings(config.mAppDataPath + L"settings_input.json", Configuration::SettingsType::INPUT);
 	config.loadSettings(config.mAppDataPath + L"settings_global.json", Configuration::SettingsType::GLOBAL);
@@ -66,12 +66,12 @@ int main(int argc, char * argv[]) {
 		
 		try
 		{
-			Configuration& config = Configuration::instance();
-			//TODO: Change this to match the current device:
-			//config.mWindowSize = Vec2i(1200, 740);
-			
 			std::wstring resourcePath = *String([NSBundle.mainBundle.resourcePath stringByAppendingString:@"/data"].UTF8String).toWString();
 			config.mGameDataPath = resourcePath;
+			//Force software mode until someone figures out why the SDL window isn't being created properly in GL mode.
+			config.mAutoDetectRenderMethod = NO;
+			config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
+			config.saveSettings();
 			
 			NSString* appPath = NSBundle.mainBundle.bundlePath;
 			int argc = 1;
@@ -86,52 +86,25 @@ int main(int argc, char * argv[]) {
 	}
 	else{
 		//No game data installed, show information explaining what to do
-		//This is literally just a square right now because I was trying to confirm that video works
-		if(SDL_Init(SDL_INIT_VIDEO) < 0)
-		{
-			printf("SDL could not be initialized!\n"
-				   "SDL_Error: %s\n", SDL_GetError());
-			return 0;
+		const SDL_MessageBoxButtonData buttons[] = {
+			{ 0, 0, "OK" },
+		};
+		const SDL_MessageBoxData messageboxdata = {
+			SDL_MESSAGEBOX_INFORMATION, NULL,
+			"ROM not installed",
+			"Please install Sonic_Knuckles_wSonic3.bin into the Sonic 3 AIR folder using the Files app, then relaunch the game. The game will now exit when you tap OK.",
+			SDL_arraysize(buttons), buttons, NULL
+		};
+		int buttonid;
+		if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+			SDL_Log("error displaying message box");
+			return NO;
 		}
-		SDL_Window *window = SDL_CreateWindow("Sonic 3 AIR", 0, 0, 640, 400, SDL_WINDOW_SHOWN);
-	   if(!window)
-	   {
-		   printf("Window could not be created!\n"
-				  "SDL_Error: %s\n", SDL_GetError());
-	   }
-	   else
-	   {
-		   SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-		   if(!renderer)
-		   {
-			   printf("Renderer could not be created!\nSDL_Error: %s\n", SDL_GetError());
-		   }
-		   else
-		   {
-			   SDL_Rect square;
-			   square.x = 220;
-			   square.y = 100;
-			   square.w = 200;
-			   square.h = 200;
-
-			   while(true)
-			   {
-				   SDL_Event e;
-				   SDL_WaitEvent(&e);
-				   if(e.type == SDL_QUIT)
-				   {
-					   break;
-				   }
-				   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-				   SDL_RenderClear(renderer);
-				   SDL_SetRenderDrawColor(renderer, 0x55, 0x55, 0xFF, 0xFF);
-				   SDL_RenderFillRect(renderer, &square);
-				   SDL_RenderPresent(renderer);
-			   }
-			   SDL_DestroyRenderer(renderer);
-		   }
-		   SDL_DestroyWindow(window);
-	   }
+		//Close the app, which is not something iOS apps are supposed to do on their own.
+		UIApplication *app = [UIApplication sharedApplication];
+		[app performSelector:@selector(suspend)];
+		[NSThread sleepForTimeInterval:2.0];
+		exit(0);
 	}
 	
 	return YES;

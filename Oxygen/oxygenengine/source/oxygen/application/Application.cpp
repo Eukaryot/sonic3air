@@ -542,7 +542,7 @@ void Application::render()
 	if (mPausedByFocusLoss)
 	{
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
-	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
+	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
 		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Tap to continue", 5, Color(0.2f, 1.0f, 1.0f));
 	#else
 		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Press any key to continue", 5, Color(0.2f, 1.0f, 1.0f));
