@@ -66,6 +66,7 @@ int main(int argc, char** argv)
 
 	randomize();
 	rmx::Logging::addLogger(*new rmx::StdCoutLogger(true));
+	rmx::Logging::addLogger(*new rmx::FileLogger(L"log/server.log", true, true));
 
 	Configuration config;
 	config.loadConfiguration(L"config.json");

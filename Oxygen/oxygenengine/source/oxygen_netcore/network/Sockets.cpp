@@ -124,6 +124,17 @@ bool SocketAddress::operator==(const SocketAddress& other) const
 	return (mIP == other.mIP && mPort == other.mPort);
 }
 
+std::string SocketAddress::toLoggedString() const
+{
+	assureIpPort();
+#ifdef DEBUG
+	return mIP + ':' + std::to_string(mPort);
+#else
+	// To protect users' privacy, do not log IPs at all on production servers
+	return "[IP]:" + std::to_string(mPort);
+#endif
+}
+
 uint64 SocketAddress::getHash() const
 {
 	assureSockAddr();

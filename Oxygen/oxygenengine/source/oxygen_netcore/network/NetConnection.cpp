@@ -252,7 +252,7 @@ void NetConnection::acceptIncomingConnectionUDP(ConnectionManager& connectionMan
 	mCurrentTimestamp = currentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Because we just received a packet
 
-	RMX_LOG_INFO("Accepting connection via UDP from " << mRemoteAddress.toString());
+	RMX_LOG_INFO("Accepting connection via UDP from " << mRemoteAddress.toLoggedString());
 	mConnectionManager->addConnection(*this);	// This will also set the local connection ID
 
 	// Send back a response
@@ -267,7 +267,7 @@ void NetConnection::acceptIncomingConnectionTCP(ConnectionManager& connectionMan
 	mCurrentTimestamp = currentTimestamp;
 	mLastMessageReceivedTimestamp = mCurrentTimestamp;	// Because we just received a packet
 
-	RMX_LOG_INFO("Accepting connection via TCP from " << mRemoteAddress.toString());
+	RMX_LOG_INFO("Accepting connection via TCP from " << mRemoteAddress.toLoggedString());
 
 	// Send back a response
 	sendAcceptConnectionPacket();
@@ -316,7 +316,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 			}
 			setProtocolVersions(packet.mLowLevelProtocolVersion, packet.mHighLevelProtocolVersion);
 
-			RMX_LOG_INFO("Connection established to " << mRemoteAddress.toString());
+			RMX_LOG_INFO("Connection established to " << mRemoteAddress.toLoggedString());
 
 			// Set remote connection ID, as it was not known before
 			//  -> Unfortunately, we have to get in a somewhat awkward way, as it was skipped in deserialization before
@@ -338,7 +338,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 
 			if (mState != State::CONNECTED)
 			{
-				RMX_LOG_INFO("Received high-level packet while not connected from " << mRemoteAddress.toString());
+				RMX_LOG_INFO("Received high-level packet while not connected from " << mRemoteAddress.toLoggedString());
 				return;
 			}
 
@@ -355,7 +355,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 
 			if (mState != State::CONNECTED)
 			{
-				RMX_LOG_INFO("Received high-level packet while not connected from " << mRemoteAddress.toString());
+				RMX_LOG_INFO("Received high-level packet while not connected from " << mRemoteAddress.toLoggedString());
 				return;
 			}
 
@@ -396,7 +396,7 @@ bool NetConnection::receivedWebSocketPacket(const std::vector<uint8>& content)
 bool NetConnection::finishStartConnect()
 {
 	// Send a low-level message to establish the connection
-	RMX_LOG_INFO("Starting connection to " << mRemoteAddress.toString());
+	RMX_LOG_INFO("Starting connection to " << mRemoteAddress.toLoggedString());
 
 	// Get a new packet instance to fill
 	SentPacket& sentPacket = mConnectionManager->rentSentPacket();
