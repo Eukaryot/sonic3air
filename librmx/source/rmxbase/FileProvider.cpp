@@ -26,9 +26,24 @@ namespace rmx
 		return FileIO::exists(filename);
 	}
 
+	bool RealFileProvider::getFileSize(const std::wstring& filename, uint64& outFileSize)
+	{
+		return FileIO::getFileSize(filename, outFileSize);
+	}
+
+	bool RealFileProvider::getFileTime(const std::wstring& filename, time_t& outFileTime)
+	{
+		return FileIO::getFileTime(filename, outFileTime);
+	}
+
 	bool RealFileProvider::readFile(const std::wstring& filename, std::vector<uint8>& outData)
 	{
 		return FileIO::readFile(filename, outData);
+	}
+
+	bool RealFileProvider::renameFile(const std::wstring& oldFilename, const std::wstring& newFilename)
+	{
+		return FileIO::renameFile(oldFilename, newFilename);
 	}
 
 	bool RealFileProvider::listFiles(const std::wstring& path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries)

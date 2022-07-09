@@ -68,6 +68,22 @@ namespace rmx
 		return 0;
 	}
 
+	time_t FileSystem::getFileTime(std::wstring_view filename)
+	{
+		time_t time = 0;
+		mTempPath2 = normalizePath(filename, mTempPath2, false);
+		for (MountPoint& mountPoint : mMountPoints)
+		{
+			const std::wstring* localPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
+			if (nullptr != localPath)
+			{
+				if (mountPoint.mFileProvider->getFileTime(*localPath, time))
+					return time;
+			}
+		}
+		return time;
+	}
+
 	bool FileSystem::readFile(std::wstring_view filename, std::vector<uint8>& outData)
 	{
 		mTempPath2 = normalizePath(filename, mTempPath2, false);
@@ -184,6 +200,28 @@ namespace rmx
 				}
 			}
 		}
+	}
+
+	bool FileSystem::renameFile(std::wstring_view oldFilename, std::wstring_view newFilename)
+	{
+		mTempPath2 = normalizePath(oldFilename, mTempPath2, false);
+		std::wstring newTempPath(newFilename);
+		normalizePath(newTempPath, false);
+		for (MountPoint& mountPoint : mMountPoints)
+		{
+			const std::wstring* oldLocalPath = applyMountPoint(mountPoint, mTempPath2, mTempPath);
+			if (nullptr != oldLocalPath)
+			{
+				std::wstring tempPathForMounting;
+				const std::wstring* newLocalPath = applyMountPoint(mountPoint, newTempPath, tempPathForMounting);
+				if (nullptr != newLocalPath)
+				{
+					if (mountPoint.mFileProvider->renameFile(*oldLocalPath, *newLocalPath))
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	bool FileSystem::exists(std::string_view path)

@@ -212,7 +212,7 @@ namespace rmx
 	bool FileIO::exists(std::wstring_view path)
 	{
 	#ifdef USE_STD_FILESYSTEM
-		std_filesystem::path fspath(path.data());
+		const std_filesystem::path fspath(path.data());
 		return std_filesystem::exists(fspath);
 	#else
 		RMX_ASSERT(false, "Not implemented: FileIO::exists");
@@ -220,10 +220,42 @@ namespace rmx
 	#endif
 	}
 
-	uint64 FileIO::getFileSize(std::wstring_view filename)
+	bool FileIO::getFileSize(std::wstring_view filename, uint64& outSize)
 	{
+	#ifdef USE_STD_FILESYSTEM
+		const std_filesystem::path fspath(filename.data());
+		std::error_code errorCode;
+		const std::uintmax_t size = std_filesystem::file_size(fspath, errorCode);
+		if (errorCode)
+			return false;
+		outSize = (uint64)size;
+		return true;
+	#else
 		FileHandle file(filename, FILE_ACCESS_READ);
-		return file.getSize();
+		if (!file.isOpen())
+			return false;
+		outSize = file.getSize();
+		return true;
+	#endif
+	}
+
+	bool FileIO::getFileTime(std::wstring_view filename, time_t& outTime)
+	{
+	#ifdef USE_STD_FILESYSTEM
+		const std_filesystem::path fspath(filename.data());
+		std::error_code errorCode;
+		const std::filesystem::file_time_type time = std_filesystem::last_write_time(fspath, errorCode);
+		if (errorCode)
+			return false;
+
+		// This is the C++17 solution for converting the time -- see https://stackoverflow.com/questions/61030383/how-to-convert-stdfilesystemfile-time-type-to-time-t
+		const std::chrono::system_clock::time_point timePoint = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+		outTime = std::chrono::system_clock::to_time_t(timePoint);
+		return true;
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::getFileTime");
+		return false;
+	#endif
 	}
 
 	bool FileIO::readFile(std::wstring_view filename, std::vector<uint8>& outData)
@@ -285,9 +317,22 @@ namespace rmx
 		return inputStream;
 	}
 
+	bool FileIO::renameFile(const std::wstring& oldFilename, const std::wstring& newFilename)
+	{
+	#ifdef USE_STD_FILESYSTEM
+		const std_filesystem::path fspathOld(oldFilename.data());
+		const std_filesystem::path fspathNew(newFilename.data());
+		std::error_code errorCode;
+		std_filesystem::rename(fspathOld, fspathNew, errorCode);
+		return !errorCode;
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::renameFile");
+		return false;
+	#endif
+	}
+
 	void FileIO::createDirectory(std::wstring_view path)
 	{
-		// TODO: Use file providers here as well
 		createDir(path, true);
 	}
 
@@ -460,7 +505,7 @@ namespace rmx
 	void FileIO::setCurrentDirectory(std::wstring_view path)
 	{
 	#ifdef USE_STD_FILESYSTEM
-		std_filesystem::path fspath(path.data());
+		const std_filesystem::path fspath(path.data());
 		std_filesystem::current_path(fspath);
 	#endif
 	}
@@ -505,7 +550,7 @@ namespace rmx
 		}
 
 		const std::size_t dot = path.find_last_of(L'.');
-		if (dot != std::wstring::npos && dot > slash)
+		if (dot != std::wstring::npos && (dot > slash || slash == std::wstring::npos))
 		{
 			if (nullptr != name)
 				*name = path.substr(slash + 1, dot - slash - 1);

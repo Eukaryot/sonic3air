@@ -27,11 +27,14 @@ namespace rmx
 
 	public:
 		static bool exists(std::wstring_view path);
-		static uint64 getFileSize(std::wstring_view filename);
+		static bool getFileSize(std::wstring_view filename, uint64& outSize);
+		static bool getFileTime(std::wstring_view filename, time_t& outTime);
 
 		static bool readFile(std::wstring_view filename, std::vector<uint8>& outData);
 		static bool saveFile(std::wstring_view filename, const void* data, size_t size);
 		static InputStream* createInputStream(std::wstring_view filename);
+
+		static bool renameFile(const std::wstring& oldFilename, const std::wstring& newFilename);
 
 		static void createDirectory(std::wstring_view path);
 		static void listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries);

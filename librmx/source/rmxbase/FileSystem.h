@@ -22,19 +22,22 @@ namespace rmx
 
 	public:
 		FileSystem();
-		virtual ~FileSystem();
+		~FileSystem();
 
-		virtual bool exists(std::wstring_view filename);
-		virtual uint64 getFileSize(std::wstring_view filename);
+		bool exists(std::wstring_view filename);
+		uint64 getFileSize(std::wstring_view filename);
+		time_t getFileTime(std::wstring_view filename);
 
-		virtual bool readFile(std::wstring_view filename, std::vector<uint8>& outData);
-		virtual bool saveFile(std::wstring_view filename, const void* data, size_t size);
-		virtual InputStream* createInputStream(std::wstring_view filename);
+		bool readFile(std::wstring_view filename, std::vector<uint8>& outData);
+		bool saveFile(std::wstring_view filename, const void* data, size_t size);
+		InputStream* createInputStream(std::wstring_view filename);
 
-		virtual void createDirectory(std::wstring_view path);
-		virtual void listFiles(std::wstring_view path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries);
-		virtual void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries);
-		virtual void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);
+		void createDirectory(std::wstring_view path);
+		void listFiles(std::wstring_view path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries);
+		void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries);
+		void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);
+
+		bool renameFile(std::wstring_view oldFilename, std::wstring_view newFilename);
 
 		// Wrapper functions
 		bool exists(std::string_view path);
@@ -64,7 +67,7 @@ namespace rmx
 	private:
 		struct MountPoint
 		{
-			FileProvider* mFileProvider;
+			FileProvider* mFileProvider = nullptr;
 			int mPriority = 0;
 			std::wstring mMountPoint;
 			std::wstring mPrefixReplacement;
