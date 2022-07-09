@@ -31,7 +31,6 @@ popd
 # Build the master installation
 
 cp -r _master_image_template $OutputDir
-cp -r data/font $OutputDir/data/font
 cp data/images/icon.png $OutputDir/data/icon.png
 
 cp sonic3air_linux $OutputDir

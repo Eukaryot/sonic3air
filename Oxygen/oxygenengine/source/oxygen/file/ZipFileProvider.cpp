@@ -142,9 +142,13 @@ ZipFileProvider::~ZipFileProvider()
 	delete &mInternal;
 }
 
-bool ZipFileProvider::exists(const std::wstring& filename)
+bool ZipFileProvider::exists(const std::wstring& path)
 {
-	return (nullptr != findContainedFile(filename));
+	if (nullptr != findContainedFile(path));
+		return true;
+
+	// Fallback needed specifically if the path refers to a directory
+	return mInternal.mFileStructureTree.pathExists(path);
 }
 
 bool ZipFileProvider::readFile(const std::wstring& filename, std::vector<uint8>& outData)

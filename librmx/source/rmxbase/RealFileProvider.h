@@ -17,7 +17,7 @@ namespace rmx
 	class API_EXPORT RealFileProvider : public FileProvider
 	{
 	public:
-		bool exists(const std::wstring& filename) override;
+		bool exists(const std::wstring& path) override;
 		bool getFileSize(const std::wstring& filename, uint64& outFileSize) override;
 		bool getFileTime(const std::wstring& filename, time_t& outFileTime) override;
 		bool readFile(const std::wstring& filename, std::vector<uint8>& outData) override;

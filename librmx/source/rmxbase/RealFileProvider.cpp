@@ -12,9 +12,9 @@
 namespace rmx
 {
 
-	bool RealFileProvider::exists(const std::wstring& filename)
+	bool RealFileProvider::exists(const std::wstring& path)
 	{
-		return FileIO::exists(filename);
+		return FileIO::exists(path);
 	}
 
 	bool RealFileProvider::getFileSize(const std::wstring& filename, uint64& outFileSize)

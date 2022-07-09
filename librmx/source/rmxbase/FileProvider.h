@@ -21,7 +21,7 @@ namespace rmx
 	public:
 		virtual ~FileProvider();
 
-		virtual bool exists(const std::wstring& filename)  { return false; }
+		virtual bool exists(const std::wstring& path)  { return false; }
 		virtual bool getFileSize(const std::wstring& filename, uint64& outFileSize)  { return false; }
 		virtual bool getFileTime(const std::wstring& filename, time_t& outFileTime)  { return false; }
 		virtual bool readFile(const std::wstring& filename, std::vector<uint8>& outData)  { return false; }

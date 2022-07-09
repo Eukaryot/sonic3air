@@ -25,7 +25,6 @@ mkdir "%outputDir%"
 :: Build the master installation
 
 robocopy "_master_image_template" "%outputDir%" /e
-robocopy "data\font" "%outputDir%\data\font" /e
 
 copy "bin\Release-Enduser_x86\*.exe" "%outputDir%"
 copy "source\external\discord_game_sdk\lib\x86\discord_game_sdk.dll" "%outputDir%"

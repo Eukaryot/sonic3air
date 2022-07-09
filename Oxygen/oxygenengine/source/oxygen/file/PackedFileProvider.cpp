@@ -107,9 +107,13 @@ void PackedFileProvider::unregisterPackedFileInputStream(PackedFileInputStream& 
 	mPackedFileInputStreams.erase(&packedFileInputStream);
 }
 
-bool PackedFileProvider::exists(const std::wstring& filename)
+bool PackedFileProvider::exists(const std::wstring& path)
 {
-	return (nullptr != findPackedFile(filename));
+	if (nullptr != findPackedFile(path))
+		return true;
+
+	// Fallback needed specifically if the path refers to a directory
+	return mInternal.mFileStructureTree.pathExists(path);
 }
 
 bool PackedFileProvider::readFile(const std::wstring& filename, std::vector<uint8>& outData)

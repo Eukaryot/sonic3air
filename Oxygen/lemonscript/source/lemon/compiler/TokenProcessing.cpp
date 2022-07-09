@@ -930,6 +930,9 @@ namespace lemon
 				}
 				break;
 			}
+
+			default:
+				break;
 		}
 		return false;
 	}
