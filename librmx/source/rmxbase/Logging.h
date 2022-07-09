@@ -43,7 +43,7 @@ namespace rmx
 	class FileLogger final : public LoggerBase
 	{
 	public:
-		FileLogger(const std::wstring& filename, bool addTimestamp = false);
+		FileLogger(const std::wstring& filename, bool addTimestamp = false, bool renameExisting = false);
 		void log(LogLevel logLevel, const std::string& string) override;
 
 	private:

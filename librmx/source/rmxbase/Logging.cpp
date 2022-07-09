@@ -35,7 +35,23 @@ namespace rmx
 		#else
 			tstruct = *localtime(&now);
 		#endif
-			strftime(buf, sizeof(buf), "[%Y-%m-%d %T] ", &tstruct);
+			// Format example: "[2022-06-29 11:42:48] "
+			std::strftime(buf, sizeof(buf), "[%Y-%m-%d %T] ", &tstruct);
+			return buf;
+		}
+
+		std::string getFilenameString()
+		{
+			time_t now = time(0);
+			struct tm tstruct;
+			char buf[80];
+		#if defined(PLATFORM_WINDOWS)
+			localtime_s(&tstruct, &now);
+		#else
+			tstruct = *localtime(&now);
+		#endif
+			// Format example: "2022-06-29_11-42-48"
+			std::strftime(buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", &tstruct);
 			return buf;
 		}
 	}
@@ -70,7 +86,7 @@ namespace rmx
 	}
 
 
-	FileLogger::FileLogger(const std::wstring& filename, bool addTimestamp) :
+	FileLogger::FileLogger(const std::wstring& filename, bool addTimestamp, bool renameExisting) :
 		mAddTimestamp(addTimestamp)
 	{
 		// Create directory if needed
@@ -78,6 +94,19 @@ namespace rmx
 		if (slashPosition != std::wstring::npos)
 		{
 			FTX::FileSystem->createDirectory(filename.substr(0, slashPosition));
+		}
+
+		if (renameExisting && FTX::FileSystem->exists(filename))
+		{
+			const time_t time = FTX::FileSystem->getFileTime(filename);
+			std::wstring directory;
+			std::wstring name;
+			std::wstring extension;
+			FTX::FileSystem->splitPath(filename, &directory, &name, &extension);
+			name += L"_" + String(detail::getFilenameString()).toStdWString();
+			if (!directory.empty())
+				directory += L'/';
+			FTX::FileSystem->renameFile(filename, directory + name + L'.' + extension);
 		}
 
 		mFileHandle.open(filename, FILE_ACCESS_WRITE);
