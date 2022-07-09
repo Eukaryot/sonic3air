@@ -55,6 +55,7 @@
 #include "rmxbase/FileHandle.h"
 #include "rmxbase/FileIO.h"
 #include "rmxbase/FileProvider.h"
+#include "rmxbase/RealFileProvider.h"
 #include "rmxbase/FileSystem.h"
 #include "rmxbase/FileCrawler.h"
 #include "rmxbase/JsonHelper.h"
