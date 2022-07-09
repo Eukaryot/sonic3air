@@ -30,6 +30,9 @@ private:
 struct SocketAddress
 {
 public:
+	static inline bool mPreventIPLogging = false;
+
+public:
 	inline SocketAddress() :
 		mHasSockAddr(false),
 		mHasIpPort(false),

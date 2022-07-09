@@ -127,12 +127,15 @@ bool SocketAddress::operator==(const SocketAddress& other) const
 std::string SocketAddress::toLoggedString() const
 {
 	assureIpPort();
-#ifdef DEBUG
-	return mIP + ':' + std::to_string(mPort);
-#else
-	// To protect users' privacy, do not log IPs at all on production servers
-	return "[IP]:" + std::to_string(mPort);
-#endif
+	if (mPreventIPLogging)
+	{
+		// Do not log the IP itself
+		return "[IP]:" + std::to_string(mPort);
+	}
+	else
+	{
+		return mIP + ':' + std::to_string(mPort);
+	}
 }
 
 uint64 SocketAddress::getHash() const
