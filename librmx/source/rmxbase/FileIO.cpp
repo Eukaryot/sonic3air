@@ -108,7 +108,7 @@ namespace rmx
 
 			// Find files
 			_wfinddata_t fileinfo;
-			intptr_t handle = _wfindfirst(filemask.empty() ? (basePath + L"*").c_str() : (basePath + std::wstring(filemask)).c_str(), &fileinfo);
+			intptr_t handle = _wfindfirst((basePath + L"*").c_str(), &fileinfo);
 			bool success = (handle != -1);
 			while (success)
 			{
@@ -122,7 +122,7 @@ namespace rmx
 						// Directory
 						if (recursive || nullptr != outSubDirectories)
 						{
-							subDirectories.push_back(fileinfo.name);
+							subDirectories.push_back(name);
 						}
 					}
 					else
@@ -130,11 +130,16 @@ namespace rmx
 						// File
 						if (nullptr != outFileEntries)
 						{
-							FileIO::FileEntry& entry = vectorAdd(*outFileEntries);
-							entry.mFilename = fileinfo.name;
-							entry.mPath = basePath;
-							entry.mTime = fileinfo.time_write;
-							entry.mSize = (size_t)fileinfo.size;
+							// Check for wildcard match
+							const WString filename = fileinfo.name;
+							if (filemask.empty() || matchesPattern(*filename, filemask.data()))
+							{
+								FileIO::FileEntry& entry = vectorAdd(*outFileEntries);
+								entry.mFilename = fileinfo.name;
+								entry.mPath = basePath;
+								entry.mTime = fileinfo.time_write;
+								entry.mSize = (size_t)fileinfo.size;
+							}
 						}
 					}
 				}
