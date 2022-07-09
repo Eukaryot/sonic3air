@@ -7,12 +7,15 @@
 */
 
 
-define objA0.shield.animation.sprite.backup		= u8[A0 + 0x34]
-define objA0.shield.art_offset			= u32[A0 + 0x38]
-define objA0.shield.pattern_offset		= u32[A0 + 0x3c]
-define objA0.shield.targetInVRAM		= u16[A0 + 0x40]
+
+define objA0.shield.animation.sprite.backup	=  u8[A0 + 0x34]
+define objA0.shield.art_offset				= u32[A0 + 0x38]
+define objA0.shield.pattern_offset			= u32[A0 + 0x3c]
+define objA0.shield.targetInVRAM			= u16[A0 + 0x40]
 define objA0.shield.character_address		= u16[A0 + 0x42]
 define objA1.shield.character_address		= u16[A1 + 0x42]
+
+
 
 //-------------------------------------------------------//
 // No shield / Insta-Shield (also Classic Shield)        //
