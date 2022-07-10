@@ -11,6 +11,9 @@
 #if STANDALONE
 	// Positive if Sonic's fast run animation is active
 	global u8 sonic.fastrunanim.timer
+
+	// Countdown to zero; while positive, AI Tails will keep holding the jump buttons to gain more jump height
+	global u8 tails_assist.trigger_countdown
 #endif
 
 
@@ -934,10 +937,10 @@ function void Tails.UpdateCarrySonic()
 				objA1.position.y.u16 = char.position.y.u16 + (global.inv_gravity ? -0x1c : 0x1c)
 
 				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-				u8[A1 + 0x2a] &= 0xfe
+				objA1.flags2a &= ~char.flag.FACING_LEFT
 				D0.u8 = char.flags & char.flag.FACING_LEFT
 				objA1.render_flags |= D0.u8
-				u8[A1 + 0x2a] |= D0.u8
+				objA1.flags2a |= D0.u8
 				if (global.inv_gravity)
 					objA1.render_flags ^= render_flag.FLIP_Y
 
@@ -1092,7 +1095,7 @@ function void fn01459e()
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	D0.u8 = char.flags & char.flag.FACING_LEFT
 	objA1.render_flags |= D0.u8
-	u8[A1 + 0x2a] |= D0.u8
+	objA1.flags2a |= D0.u8
 
 	tails.carried_velocity_x = char.velocity.x
 	tails.carried_velocity_y = char.velocity.y
@@ -2791,15 +2794,37 @@ function bool onCharacterPressedJumpInMidAir(u8 input_state, u8 input_pressed)
 		if (Game.getSetting(SETTING_TAILS_ASSIST_MODE) != 0 && (input_state & CONTROL_UP))
 		{
 			// Tails must be AI controlled and not too far away
-			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(s16[0xffffb04a + 0x10] - s16[0xffffb000 + 0x10]) < 0xc0 && abs(s16[0xffffb04a + 0x14] - s16[0xffffb000 + 0x14] + 0x40) < 0x80)
+			s16 dx = s16[0xffffb04a + 0x10] - s16[0xffffb000 + 0x10]
+			s16 dy = s16[0xffffb04a + 0x14] - s16[0xffffb000 + 0x14]
+			if (tails.control_counter == 0 && tails.ai_routine == 0x06 && abs(dx) < 0xc0 && abs(dy) < 0x80)
 			{
 				// Tails must not already be flying already, and ready for flying
+				bool startFlight = false
 				if (u8[0xffffb04a + 0x20] == char.state.ROLLING && u8[0xffffb04a + 0x40] == 1)	// char.jumping must be set
+				{
+					startFlight = true
+				}
+
+				// Alternatively, Tails can be standing or running and ready to jump
+				else if ((u8[0xffffb04a + 0x2a] & char.flag.IN_AIR) == 0)
+				{
+					A0 = 0xffffb04a
+					control.tails.pressed |= CONTROL_ABC
+					if (Character.CheckStartJump())
+					{
+						tails.ai_routine = 0x30		// No valid value in vanilla, but we're using it for the Tails Assist flight routine
+						tails_assist.trigger_countdown = 8	// Hold jump button for 8 frames before triggering flight
+					}
+					A0 = 0xffffb000
+				}
+
+				if (startFlight)
 				{
 					A0 = 0xffffb04a
 					TailsStartFlight()
 					char.velocity.y = max(char.velocity.y, -0x200)	// Limit Tails' velocity
 					tails.ai_routine = 0x30		// No valid value in vanilla, but we're using it for the Tails Assist flight routine
+					tails_assist.trigger_countdown = 0
 					tails.catch_timeout = 0
 					A0 = 0xffffb000
 
@@ -5119,7 +5144,7 @@ function void Character.OnCollisionWithDynamicObject()
 			bool movingUp = (objA1.render_flags & render_flag.FLIP_Y) ? (vy > 0) : (vy < 0)
 			if (movingUp)
 			{
-				if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+				if (objA1.flags2a & char.flag.IN_AIR)
 				{
 					if ((objA1.render_flags & render_flag.FLIP_Y) == 0)
 					{
@@ -5146,7 +5171,7 @@ function void Character.OnCollisionWithDynamicObject()
 					//  -> This is done to be more consistent with other Sonic games, incl. Sonic 1, 2, CD, Mania and even Sonic 3 alone
 					//  -> The first check above tells us if the character is on a side of the monitor
 					//  -> The second one makes sure that you can always ground-based roll into a monitor (see e.g. first invincibility in MHZ 1, when spindashing into it from the right)
-					if ((u8[A1 + 0x2a] & char.flag.PUSHING) && (char.flags & char.flag.IN_AIR))
+					if ((objA1.flags2a & char.flag.PUSHING) && (char.flags & char.flag.IN_AIR))
 					{
 						return
 					}

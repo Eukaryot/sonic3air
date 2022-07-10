@@ -410,6 +410,7 @@ define camera.forced_target.y		= u16[0xfffff67c]
 // 0xfffff680 ... 0xfffff6df  -> Pattern loading request table
 
 
+// u16[0xfffff702] = the RAM address of an object that AI Tails is standing on
 define tails.control_counter	= u16[0xfffff702]	// Time in frames until AI takes over control again
 define tails.respawn_counter	= u16[0xfffff704]	// Counts up when Tails is offscreen, until 300 frames
 define tails.ai_routine			= u16[0xfffff708]	// Routine used to control second player Tails; see comments in "Character.TailsAI.Update"
@@ -420,6 +421,8 @@ define tails.ai_jumping			=  u8[0xfffff70f]
 
 define rings.update_routine		=  u8[0xfffff710]
 define global.level_started		=  s8[0xfffff711]	// Can be negative, which causes the HUD to fly in at the start
+// 0xfffff712 ... ?  -> Some kind of respawn entries for e.g. Glowing Spheres
+
 define level.water_present		=  u8[0xfffff730]
 
 define tails.carrying			=  u8[0xfffff73e]	// If Tails carries another character, this is 1, otherwise 0

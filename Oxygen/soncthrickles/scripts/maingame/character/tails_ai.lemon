@@ -90,7 +90,7 @@ function bool updateTailsAssist()
 	// Check for manual second player control
 	if (tails.control_counter == 0)
 	{
-		// Still flying or swimming?
+		// Currently flying or swimming?
 		if (char.state >= char.state.TAILS_FLYDOWN && char.state <= char.state.TAILS_SWIMTIRED)
 		{
 			u8 input = 0
@@ -199,9 +199,26 @@ function bool updateTailsAssist()
 			}
 			return true
 		}
+
+		// Is Tails still in the jump state before triggering the actual flight
+		else if (tails_assist.trigger_countdown > 0)
+		{
+			control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
+			--tails_assist.trigger_countdown
+			if (tails_assist.trigger_countdown == 0)
+			{
+				TailsStartFlight()
+				char.velocity.y = max(char.velocity.y, -0x200)	// Limit Tails' velocity
+				tails.ai_routine = 0x30		// No valid value in vanilla, but we're using it for the Tails Assist flight routine
+				tails.catch_timeout = 0
+			}
+
+			return true
+		}
 	}
 
 	// Switch back to normal AI behavior
+	tails_assist.trigger_countdown = 0
 	return false
 }
 #endif

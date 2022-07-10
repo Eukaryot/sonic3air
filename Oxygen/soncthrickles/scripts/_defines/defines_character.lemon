@@ -205,7 +205,7 @@ define char.flags2d				=  u8[A0 + 0x2d]			// Another set of flags; 0x80 is set o
 //  0x80 = No collision interaction (e.g. during Super transformation, in LBZ 2 mid-boss cutscene, for AI Tails flying in, etc.)
 define char.control_flags		=  u8[A0 + 0x2e]
 
-define char.double_jump_state	=  u8[A0 + 0x2f]			// Usually 0, except shield power was used
+define char.double_jump_state	=  u8[A0 + 0x2f]			// Usually 0, except shield power was used (used in different ways for Tails and Knuckles)
 define char.hlock_countdown		= u16[A0 + 0x32]			// Countdown to 0 e.g. after hitting a horizontal spring to shortly ignore left/right controls
 
 // Bonus countdowns
