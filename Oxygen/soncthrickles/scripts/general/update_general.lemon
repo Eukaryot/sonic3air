@@ -49,7 +49,7 @@ function void GameModeControlLoop()
 		//  - 0x003e2a	-> global.game_mode = 0x00				-> Initialization
 		//  - 0x003e32	-> global.game_mode = 0x04				-> SEGA logo, Intro, Title Screen
 		//  - 0x005fb2	-> global.game_mode = 0x08				-> Rolling Demo (handled by Main Game)
-		//  - 0x005fb2	-> global.game_mode = 0x0c				-> Main Game
+		//  - 0x005fb2	-> global.game_mode = 0x0c				-> Main Game (normal game + Competition Mode)
 		//  - 0x00051a	-> global.game_mode = 0x10, 0x18		-> "JumpToSegaScreen" according to s3unlocked, does not seem to be used?
 		//  - 0x05c2e0	-> global.game_mode = 0x14				-> Continue Screen
 		//  - 0x007a74	-> global.game_mode = 0x1c, 0x24, 0x28	-> Level Select

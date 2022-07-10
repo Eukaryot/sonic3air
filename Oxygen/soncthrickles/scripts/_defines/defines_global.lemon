@@ -301,12 +301,24 @@ define rolling_demo.progress		=  u32[0xffffef52]	// How far into the demo sequen
 //  - Payload:     This is the data to be written to VRAM; it's 4 bytes for each tile to be copied (one tile is two u16 patterns)
 
 
-// Game mode:
+// Game mode (not listing unused values, see "GameModeControlLoop()" for more details):
 //  - 0x00 = Initialization
 //  - 0x04 = SEGA logo, Intro, Title Screen
 //  - 0x08 = Rolling Demo
-//  - 0x0c = Main Game
-//  - ...more see "GameModeControlLoop()"
+//  - 0x0c = Main Game (normal game + Competition Mode)
+//  - 0x14 = Continue Screen
+//  - 0x1c = Level Select
+//  - 0x20 = Credits screen in Sonic 3
+//  - 0x2c = Blue Sphere game: Menu
+//  - 0x30 = Blue Sphere game: Results Screen
+//  - 0x34 = Special Stage
+//  - 0x38 = Competition Mode: Main Menu
+//  - 0x3c = Competition Mode: Player Selection
+//  - 0x40 = Competition Mode: Level Selection
+//  - 0x44 = Competition Mode: Results Screen
+//  - 0x48 = Special Stage results
+//  - 0x4c = Data Select
+//  - 0x50 = Competition Mode: Records Screen
 //  + Flag 0x80 is set during loading for some modes (incl. Main Game)
 define global.game_mode			=  u8[0xfffff600]
 
