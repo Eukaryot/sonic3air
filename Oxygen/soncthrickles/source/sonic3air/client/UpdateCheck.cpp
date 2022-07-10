@@ -27,6 +27,8 @@ namespace
 		return "mac";
 	#elif defined(PLATFORM_ANDROID)
 		return "android";
+	#elif defined(PLATFORM_IOS)
+		return "ios";
 	#elif defined(PLATFROM_WEB)
 		return "web";
 	#elif defined(PLATFROM_SWITCH)

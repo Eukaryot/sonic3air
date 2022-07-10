@@ -9,6 +9,16 @@
 #pragma once
 
 
+// Platforms overview:
+//  - PLATFORM_WINDOWS	-> Windows
+//  - PLATFORM_LINUX	-> Linux
+//  - PLATFORM_MAC		-> macOS
+//  - PLATFORM_ANDROID	-> Android
+//  - PLATFORM_IOS		-> iOS
+//  - PLATFORM_WEB		-> Web version (via emscripten)
+//  - PLATFORM_SWITCH	-> Nintendo Switch (homebrew)
+
+
 // Platform specific
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 	#define PLATFORM_WINDOWS
@@ -23,10 +33,10 @@
 #elif __APPLE__
 	#include <TargetConditionals.h>
 	#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
-	#define PLATFORM_IOS
+		#define PLATFORM_IOS
 	#else
 	#define PLATFORM_MAC
-	#endif
+		#endif
 	#define USE_UTF8_PATHS
 
 #elif __ANDROID__

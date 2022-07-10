@@ -65,6 +65,7 @@ bool Channels::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 				return false;
 
 			ServerNetConnection& connection = static_cast<ServerNetConnection&>(evaluation.mConnection);
+			RMX_LOG_INFO("JoinChannelRequest: " << request.mQuery.mChannelHash << " = '" << request.mQuery.mChannelName << "' (from " << static_cast<ServerNetConnection&>(evaluation.mConnection).getPlayerID() << ")");
 
 			// Find or create the channel and add the player there
 			Channel* baseChannel = findChannel(request.mQuery.mChannelHash);
@@ -87,6 +88,7 @@ bool Channels::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 				return false;
 
 			ServerNetConnection& connection = static_cast<ServerNetConnection&>(evaluation.mConnection);
+			RMX_LOG_INFO("LeaveChannelRequest: " << request.mQuery.mChannelHash << " (from " << static_cast<ServerNetConnection&>(evaluation.mConnection).getPlayerID() << ")");
 
 			// Remove player from the channel
 			Channel* channel = findChannel(request.mQuery.mChannelHash);

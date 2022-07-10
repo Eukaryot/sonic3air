@@ -359,8 +359,9 @@ void GhostSync::updateGhostPlayers()
 const char* GhostSync::getDesiredSubChannelName() const
 {
 	const bool isMainGame = (EmulatorInterface::instance().readMemory8(0xfffff600) == 0x0c);
+	const bool isCompetitionMode = (EmulatorInterface::instance().readMemory16(0xffffffe8) != 0);
 	const bool hasStarted = ((int8)EmulatorInterface::instance().readMemory8(0xfffff711) > 0);
-	if (!isMainGame || !hasStarted)
+	if (!isMainGame || isCompetitionMode || !hasStarted)
 		return nullptr;
 
 	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
