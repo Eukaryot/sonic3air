@@ -208,7 +208,6 @@
     <ClCompile Include="..\..\source\rmxmedia\AudioBuffer.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\AudioMixer.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\AudioReference.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\Camera.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\FileInputStreamSDL.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\FileProviderSDL.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\Font.cpp" />
@@ -241,7 +240,6 @@
     <ClInclude Include="..\..\source\rmxmedia\AudioBuffer.h" />
     <ClInclude Include="..\..\source\rmxmedia\AudioMixer.h" />
     <ClInclude Include="..\..\source\rmxmedia\AudioReference.h" />
-    <ClInclude Include="..\..\source\rmxmedia\Camera.h" />
     <ClInclude Include="..\..\source\rmxmedia\FileInputStreamSDL.h" />
     <ClInclude Include="..\..\source\rmxmedia\FileProviderSDL.h" />
     <ClInclude Include="..\..\source\rmxmedia\Font.h" />

@@ -251,7 +251,6 @@
     <ClInclude Include="..\..\source\rmxbase\SinglePtr.h" />
     <ClInclude Include="..\..\source\rmxbase\Singleton.h" />
     <ClInclude Include="..\..\source\rmxbase\SmartPtr.h" />
-    <ClInclude Include="..\..\source\rmxbase\Sort.h" />
     <ClInclude Include="..\..\source\rmxbase\StringImpl.h" />
     <ClInclude Include="..\..\source\rmxbase\String.h" />
     <ClInclude Include="..\..\source\rmxbase\Tools.h" />

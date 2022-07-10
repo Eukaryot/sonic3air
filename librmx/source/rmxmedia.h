@@ -30,7 +30,6 @@
 #include "rmxmedia/Shader.h"
 #include "rmxmedia/Framebuffer.h"
 #include "rmxmedia/VertexArrayObject.h"
-#include "rmxmedia/Camera.h"
 #include "rmxmedia/FontSource.h"
 #include "rmxmedia/Font.h"
 #include "rmxmedia/FontProcessor.h"

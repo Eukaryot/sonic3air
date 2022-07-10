@@ -150,16 +150,6 @@ public:
 		return -1;
 	}
 
-	void sort(int(*compare)(TYPE,TYPE))
-	{
-		rmx::quicksort(list, count, compare);
-	}
-
-	void sort(int(*compare)(const TYPE&, const TYPE&))
-	{
-		rmx::quicksort(list, count, compare);
-	}
-
 	inline TYPE* operator*()			 { return list; }
 	inline const TYPE* operator*() const { return list; }
 

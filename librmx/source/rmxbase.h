@@ -40,7 +40,6 @@
 #include "rmxbase/Basics.h"
 #include "rmxbase/ErrorHandler.h"
 #include "rmxbase/Math.h"
-#include "rmxbase/Sort.h"
 #include "rmxbase/CArray.h"
 #include "rmxbase/ObjectPool.h"
 #include "rmxbase/OneTimeAllocPool.h"

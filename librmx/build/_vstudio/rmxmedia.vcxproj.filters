@@ -91,9 +91,6 @@
     <ClCompile Include="..\..\source\rmxmedia\AudioManager.cpp">
       <Filter>Audio &amp; Video</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\rmxmedia\Camera.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\FileInputStreamSDL.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
@@ -171,9 +168,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\AudioManager.h">
       <Filter>Audio &amp; Video</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxmedia\Camera.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia_externals.h" />
     <ClInclude Include="..\..\source\rmxmedia\FileInputStreamSDL.h">

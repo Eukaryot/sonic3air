@@ -87,9 +87,6 @@
     <ClInclude Include="..\..\source\rmxbase\Basics.h">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Sort.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\rmxbase\Tools.h">
       <Filter>Tools</Filter>
     </ClInclude>
