@@ -144,7 +144,7 @@ ZipFileProvider::~ZipFileProvider()
 
 bool ZipFileProvider::exists(const std::wstring& path)
 {
-	if (nullptr != findContainedFile(path));
+	if (nullptr != findContainedFile(path))
 		return true;
 
 	// Fallback needed specifically if the path refers to a directory
