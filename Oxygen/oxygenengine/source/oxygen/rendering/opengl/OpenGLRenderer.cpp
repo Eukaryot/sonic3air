@@ -16,13 +16,13 @@
 #include "oxygen/simulation/LogDisplay.h"
 
 
-HardwareRenderer::HardwareRenderer(RenderParts& renderParts, DrawerTexture& outputTexture) :
+OpenGLRenderer::OpenGLRenderer(RenderParts& renderParts, DrawerTexture& outputTexture) :
 	Renderer(RENDERER_TYPE_ID, renderParts, outputTexture),
 	mResources(renderParts)
 {
 }
 
-void HardwareRenderer::initialize()
+void OpenGLRenderer::initialize()
 {
 	mGameResolution = Configuration::instance().mGameScreen;
 
@@ -64,13 +64,13 @@ void HardwareRenderer::initialize()
 	glDepthRange(0.0f, 1.0f);
 }
 
-void HardwareRenderer::reset()
+void OpenGLRenderer::reset()
 {
 	clearFullscreenBuffers(mGameScreenBuffer, mProcessingBuffer);
 	mResources.setAllPatternsDirty();
 }
 
-void HardwareRenderer::setGameResolution(const Vec2i& gameResolution)
+void OpenGLRenderer::setGameResolution(const Vec2i& gameResolution)
 {
 	if (mGameResolution != gameResolution)
 	{
@@ -84,12 +84,12 @@ void HardwareRenderer::setGameResolution(const Vec2i& gameResolution)
 	}
 }
 
-void HardwareRenderer::clearGameScreen()
+void OpenGLRenderer::clearGameScreen()
 {
 	clearFullscreenBuffer(mGameScreenBuffer);
 }
 
-void HardwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
+void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 {
 	internalRefresh();
 
@@ -172,7 +172,7 @@ void HardwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 	glDisable(GL_SCISSOR_TEST);
 }
 
-void HardwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
+void OpenGLRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 {
 	// Debug rendering
 	if (debugDrawMode <= PlaneManager::PLANE_A)
@@ -189,7 +189,7 @@ void HardwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 	glViewport_Recti(FTX::screenRect());
 }
 
-void HardwareRenderer::blurGameScreen()
+void OpenGLRenderer::blurGameScreen()
 {
 	copyGameScreenToProcessingBuffer();
 
@@ -207,7 +207,7 @@ void HardwareRenderer::blurGameScreen()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void HardwareRenderer::clearFullscreenBuffer(Framebuffer& buffer)
+void OpenGLRenderer::clearFullscreenBuffer(Framebuffer& buffer)
 {
 	// Save current frame buffer and viewport
 	GLint previousFramebuffer = 0;
@@ -227,7 +227,7 @@ void HardwareRenderer::clearFullscreenBuffer(Framebuffer& buffer)
 	glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
 }
 
-void HardwareRenderer::clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer& buffer2)
+void OpenGLRenderer::clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer& buffer2)
 {
 	// Save current frame buffer and viewport
 	GLint previousFramebuffer = 0;
@@ -252,12 +252,12 @@ void HardwareRenderer::clearFullscreenBuffers(Framebuffer& buffer1, Framebuffer&
 	glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
 }
 
-void HardwareRenderer::internalRefresh()
+void OpenGLRenderer::internalRefresh()
 {
 	mResources.refresh();
 }
 
-void HardwareRenderer::renderGeometry(const Geometry& geometry)
+void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 {
 	switch (geometry.getType())
 	{
@@ -482,7 +482,7 @@ void HardwareRenderer::renderGeometry(const Geometry& geometry)
 	}
 }
 
-void HardwareRenderer::copyGameScreenToProcessingBuffer()
+void OpenGLRenderer::copyGameScreenToProcessingBuffer()
 {
 	GLint oldFramebufferHandle = 0;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFramebufferHandle);

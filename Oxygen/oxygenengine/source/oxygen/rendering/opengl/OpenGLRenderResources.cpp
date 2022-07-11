@@ -42,13 +42,13 @@ namespace
 }
 
 
-HardwareRenderResources::HardwareRenderResources(RenderParts& renderParts) :
+OpenGLRenderResources::OpenGLRenderResources(RenderParts& renderParts) :
 	mRenderParts(renderParts)
 {
 	setAllPatternsDirty();
 }
 
-void HardwareRenderResources::initialize()
+void OpenGLRenderResources::initialize()
 {
 	// Palettes
 	{
@@ -81,7 +81,7 @@ void HardwareRenderResources::initialize()
 	}
 }
 
-void HardwareRenderResources::refresh()
+void OpenGLRenderResources::refresh()
 {
 	const PlaneManager& planeManager = mRenderParts.getPlaneManager();
 
@@ -224,12 +224,12 @@ void HardwareRenderResources::refresh()
 	}
 }
 
-void HardwareRenderResources::setAllPatternsDirty()
+void OpenGLRenderResources::setAllPatternsDirty()
 {
 	mAllPatternsDirty = true;
 }
 
-const BufferTexture& HardwareRenderResources::getHScrollOffsetsTexture(int scrollOffsetsIndex) const
+const BufferTexture& OpenGLRenderResources::getHScrollOffsetsTexture(int scrollOffsetsIndex) const
 {
 	if (scrollOffsetsIndex == 0xff)
 		return mEmptyScrollOffsetsTexture;
@@ -238,7 +238,7 @@ const BufferTexture& HardwareRenderResources::getHScrollOffsetsTexture(int scrol
 	return mHScrollOffsetsTexture[scrollOffsetsIndex];
 }
 
-const BufferTexture& HardwareRenderResources::getVScrollOffsetsTexture(int scrollOffsetsIndex) const
+const BufferTexture& OpenGLRenderResources::getVScrollOffsetsTexture(int scrollOffsetsIndex) const
 {
 	if (scrollOffsetsIndex == 0xff)
 		return mEmptyScrollOffsetsTexture;
@@ -247,7 +247,7 @@ const BufferTexture& HardwareRenderResources::getVScrollOffsetsTexture(int scrol
 	return mVScrollOffsetsTexture[scrollOffsetsIndex];
 }
 
-BufferTexture* HardwareRenderResources::getPaletteSpriteTexture(const SpriteManager::PaletteSpriteInfo& spriteInfo)
+BufferTexture* OpenGLRenderResources::getPaletteSpriteTexture(const SpriteManager::PaletteSpriteInfo& spriteInfo)
 {
 	const SpriteCache::CacheItem& cacheItem = *spriteInfo.mCacheItem;
 	RMX_CHECK(!cacheItem.mUsesComponentSprite, "Sprite is not a palette sprite", RMX_REACT_THROW);
@@ -266,7 +266,7 @@ BufferTexture* HardwareRenderResources::getPaletteSpriteTexture(const SpriteMana
 	return &texture.mTexture;
 }
 
-OpenGLTexture* HardwareRenderResources::getComponentSpriteTexture(const SpriteManager::ComponentSpriteInfo& spriteInfo)
+OpenGLTexture* OpenGLRenderResources::getComponentSpriteTexture(const SpriteManager::ComponentSpriteInfo& spriteInfo)
 {
 	const SpriteCache::CacheItem& cacheItem = *spriteInfo.mCacheItem;
 	RMX_CHECK(cacheItem.mUsesComponentSprite, "Sprite is not a component sprite", RMX_REACT_THROW);

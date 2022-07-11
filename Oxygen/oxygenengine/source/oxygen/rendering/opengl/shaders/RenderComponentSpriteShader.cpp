@@ -20,7 +20,7 @@ void RenderComponentSpriteShader::initialize()
 	FileHelper::loadShader(mShader, L"data/shader/render_sprite_component.shader", "Standard");
 }
 
-void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution, const HardwareRenderResources& resources)
+void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution, const OpenGLRenderResources& resources)
 {
 	mShader.bind();
 
@@ -47,7 +47,7 @@ void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution, const Har
 	mInitialized = true;
 }
 
-void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, HardwareRenderResources& resources)
+void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
 	glActiveTexture(GL_TEXTURE0);
 	OpenGLTexture* texture = resources.getComponentSpriteTexture(spriteInfo);

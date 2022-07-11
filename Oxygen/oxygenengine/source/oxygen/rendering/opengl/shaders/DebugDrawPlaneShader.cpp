@@ -26,7 +26,7 @@ void DebugDrawPlaneShader::initialize()
 	mLocHighlightPrio	= mShader.getUniformLocation("HighlightPrio");
 }
 
-void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const HardwareRenderResources& resources)
+void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const OpenGLRenderResources& resources)
 {
 	mShader.bind();
 

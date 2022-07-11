@@ -57,8 +57,8 @@ private:
 	Drawer* mRegisteredOwner = nullptr;
 	size_t mRegisteredIndex = 0;
 
-	Bitmap mBitmap;		// Holding the texture content, except if this is a hardware render target
-	Vec2i mSize;		// Resolution of the texture -- either the size of the bitmap or of a hardware render target
+	Bitmap mBitmap;		// Holding the texture content, except if this is an OpenGL render target
+	Vec2i mSize;		// Resolution of the texture -- either the size of the bitmap or of an OpenGL render target
 	bool mSetupAsRenderTarget = false;
 
 	DrawerTextureImplementation* mImplementation = nullptr;

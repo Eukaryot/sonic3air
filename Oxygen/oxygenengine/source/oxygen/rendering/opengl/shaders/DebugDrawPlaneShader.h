@@ -11,14 +11,14 @@
 #include <rmxmedia.h>
 
 class RenderParts;
-class HardwareRenderResources;
+class OpenGLRenderResources;
 
 
 class DebugDrawPlaneShader
 {
 public:
 	void initialize();
-	void draw(int planeIndex, RenderParts& renderParts, const HardwareRenderResources& resources);
+	void draw(int planeIndex, RenderParts& renderParts, const OpenGLRenderResources& resources);
 
 private:
 	bool mInitialized = false;

@@ -16,10 +16,10 @@
 class RenderParts;
 
 
-class HardwareRenderResources
+class OpenGLRenderResources
 {
 public:
-	HardwareRenderResources(RenderParts& renderParts);
+	OpenGLRenderResources(RenderParts& renderParts);
 
 	void initialize();
 	void refresh();

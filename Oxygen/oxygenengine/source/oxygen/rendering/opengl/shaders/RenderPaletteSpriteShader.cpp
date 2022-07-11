@@ -21,7 +21,7 @@ void RenderPaletteSpriteShader::initialize()
 	FileHelper::loadShader(mShader, L"data/shader/render_sprite_palette.shader", "Standard", additionalDefines);
 }
 
-void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const HardwareRenderResources& resources)
+void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources)
 {
 	mShader.bind();
 
@@ -61,7 +61,7 @@ void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSu
 	mInitialized = true;
 }
 
-void RenderPaletteSpriteShader::draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, HardwareRenderResources& resources)
+void RenderPaletteSpriteShader::draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
 	glActiveTexture(GL_TEXTURE0);
 	BufferTexture* texture = resources.getPaletteSpriteTexture(spriteInfo);

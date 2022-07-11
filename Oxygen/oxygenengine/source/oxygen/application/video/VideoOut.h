@@ -12,7 +12,7 @@
 #include "oxygen/rendering/Geometry.h"
 
 class Renderer;
-class HardwareRenderer;
+class OpenGLRenderer;
 class SoftwareRenderer;
 class RenderParts;
 class RenderResources;
@@ -89,7 +89,7 @@ private:
 
 private:
 	Renderer* mActiveRenderer = nullptr;
-	HardwareRenderer* mHardwareRenderer = nullptr;
+	OpenGLRenderer* mOpenGLRenderer = nullptr;
 	SoftwareRenderer* mSoftwareRenderer = nullptr;
 
 	RenderParts* mRenderParts = nullptr;

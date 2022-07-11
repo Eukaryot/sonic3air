@@ -10,15 +10,15 @@
 
 #include "oxygen/rendering/parts/SpriteManager.h"
 
-class HardwareRenderResources;
+class OpenGLRenderResources;
 
 
 class RenderPaletteSpriteShader
 {
 public:
 	void initialize();
-	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const HardwareRenderResources& resources);
-	void draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, HardwareRenderResources& resources);
+	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources);
+	void draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 
 private:
 	bool  mInitialized = false;

@@ -12,7 +12,7 @@
 
 class RenderParts;
 class PlaneGeometry;
-class HardwareRenderResources;
+class OpenGLRenderResources;
 
 
 class RenderPlaneShader
@@ -30,8 +30,8 @@ public:
 public:
 	void initialize(Variation variation, bool alphaTest);
 	void initialize(bool horizontalScrolling, bool verticalScrolling, bool noRepeat, bool alphaTest);
-	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const HardwareRenderResources& resources);
-	void draw(const PlaneGeometry& geometry, RenderParts& renderParts, const HardwareRenderResources& resources);
+	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources);
+	void draw(const PlaneGeometry& geometry, RenderParts& renderParts, const OpenGLRenderResources& resources);
 
 private:
 	bool  mInitialized = false;

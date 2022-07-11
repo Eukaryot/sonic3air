@@ -40,7 +40,7 @@ void RenderPlaneShader::initialize(bool horizontalScrolling, bool verticalScroll
 	FileHelper::loadShader(mShader, L"data/shader/render_plane.shader", techname, additionalDefines);
 }
 
-void RenderPlaneShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const HardwareRenderResources& resources)
+void RenderPlaneShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources)
 {
 	// No alpha blending needed for planes
 	glBlendFunc(GL_ONE, GL_ZERO);
@@ -105,7 +105,7 @@ void RenderPlaneShader::refresh(const Vec2i& gameResolution, int waterSurfaceHei
 	mInitialized = true;
 }
 
-void RenderPlaneShader::draw(const PlaneGeometry& geometry, RenderParts& renderParts, const HardwareRenderResources& resources)
+void RenderPlaneShader::draw(const PlaneGeometry& geometry, RenderParts& renderParts, const OpenGLRenderResources& resources)
 {
 	if (mLastActiveRect != geometry.mActiveRect)
 	{

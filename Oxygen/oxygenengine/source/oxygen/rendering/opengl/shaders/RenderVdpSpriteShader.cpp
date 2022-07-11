@@ -21,7 +21,7 @@ void RenderVdpSpriteShader::initialize()
 	FileHelper::loadShader(mShader, L"data/shader/render_sprite_vdp.shader", "Standard", additionalDefines);
 }
 
-void RenderVdpSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const HardwareRenderResources& resources)
+void RenderVdpSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources)
 {
 	mShader.bind();
 
@@ -62,7 +62,7 @@ void RenderVdpSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfac
 	mInitialized = true;
 }
 
-void RenderVdpSpriteShader::draw(const SpriteManager::VdpSpriteInfo& spriteInfo, const HardwareRenderResources& resources)
+void RenderVdpSpriteShader::draw(const SpriteManager::VdpSpriteInfo& spriteInfo, const OpenGLRenderResources& resources)
 {
 	const PaletteManager& paletteManager = resources.mRenderParts.getPaletteManager();
 	Vec4f tintColor = spriteInfo.mTintColor;

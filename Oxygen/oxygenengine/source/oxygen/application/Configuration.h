@@ -19,10 +19,10 @@ class Configuration
 public:
 	enum class RenderMethod
 	{
-		UNDEFINED		= 0x00,
-		SOFTWARE		= 0x10,
-		OPENGL_SOFT		= 0x20,		// Formerly "Software Renderer"
-		OPENGL_FULL		= 0x21		// Formerly "Hardware Renderer"
+		UNDEFINED	= 0x00,
+		SOFTWARE	= 0x10,
+		OPENGL_SOFT	= 0x20,
+		OPENGL_FULL	= 0x21
 	};
 
 	enum class WindowMode

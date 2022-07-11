@@ -31,7 +31,7 @@ VideoOut::VideoOut() :
 
 VideoOut::~VideoOut()
 {
-	delete mHardwareRenderer;
+	delete mOpenGLRenderer;
 	delete mSoftwareRenderer;
 	delete mRenderParts;
 	delete &mRenderResources;
@@ -84,7 +84,7 @@ void VideoOut::createRenderer(bool reset)
 
 void VideoOut::destroyRenderer()
 {
-	SAFE_DELETE(mHardwareRenderer);
+	SAFE_DELETE(mOpenGLRenderer);
 	SAFE_DELETE(mSoftwareRenderer);
 }
 
@@ -104,15 +104,15 @@ void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
 	}
 	else
 	{
-		if (nullptr == mHardwareRenderer)
+		if (nullptr == mOpenGLRenderer)
 		{
-			RMX_LOG_INFO("VideoOut: Creating hardware renderer");
-			mHardwareRenderer = new HardwareRenderer(*mRenderParts, mGameScreenTexture);
+			RMX_LOG_INFO("VideoOut: Creating OpenGL renderer");
+			mOpenGLRenderer = new OpenGLRenderer(*mRenderParts, mGameScreenTexture);
 
 			RMX_LOG_INFO("VideoOut: Renderer initialization");
-			mHardwareRenderer->initialize();
+			mOpenGLRenderer->initialize();
 		}
-		mActiveRenderer = mHardwareRenderer;
+		mActiveRenderer = mOpenGLRenderer;
 	}
 
 	if (reset)
@@ -208,9 +208,9 @@ bool VideoOut::updateGameScreen()
 
 void VideoOut::blurGameScreen()
 {
-	if (mActiveRenderer == mHardwareRenderer)
+	if (mActiveRenderer == mOpenGLRenderer)
 	{
-		mHardwareRenderer->blurGameScreen();
+		mOpenGLRenderer->blurGameScreen();
 	}
 }
 
