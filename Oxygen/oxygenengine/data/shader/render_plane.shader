@@ -10,7 +10,7 @@ precision highp int;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
+in vec2 position;
 out vec3 LocalOffset;
 
 uniform ivec4 ActiveRect;

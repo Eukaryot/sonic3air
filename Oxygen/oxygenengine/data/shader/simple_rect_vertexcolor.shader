@@ -10,7 +10,7 @@ precision mediump int;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
+in vec2 position;
 in vec4 color;
 out vec4 interpolatedColor;
 

@@ -10,7 +10,7 @@ precision mediump int;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
+in vec2 position;
 out vec2 uv0;
 
 void main()

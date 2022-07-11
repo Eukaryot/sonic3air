@@ -12,7 +12,7 @@ uniform ivec2 Size;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
+in vec2 position;
 out vec2 uv0;
 
 uniform ivec3 Position;		// With z = priority flag (0 or 1)

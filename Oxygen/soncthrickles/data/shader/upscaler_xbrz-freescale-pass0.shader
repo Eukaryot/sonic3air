@@ -75,8 +75,8 @@ precision mediump int;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
-out vec4 TEX0;
+in vec2 position;
+out vec2 TEX0;
 
 void main()
 {
@@ -91,7 +91,7 @@ void main()
 
 ## ----- Fragment -----------------------------------------------------------------
 
-in vec4 TEX0;
+in vec2 TEX0;
 out vec4 FragColor;
 
 uniform vec2 GameResolution;

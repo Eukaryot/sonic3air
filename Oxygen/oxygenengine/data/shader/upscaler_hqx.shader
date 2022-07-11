@@ -67,7 +67,7 @@ precision mediump int;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
+in vec2 position;
 out vec4 vTexCoord[4];
 
 uniform vec2 GameResolution;

@@ -13,7 +13,7 @@ uniform int FirstPattern;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
+in vec2 position;
 out vec3 LocalOffset;
 
 uniform ivec3 Position;		// With z = priority flag (0 or 1)

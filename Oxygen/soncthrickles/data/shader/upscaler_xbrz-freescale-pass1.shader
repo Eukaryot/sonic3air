@@ -75,8 +75,8 @@ precision mediump int;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
-out vec4 TEX0;
+in vec2 position;
+out vec2 TEX0;
 
 void main()
 {
@@ -91,13 +91,13 @@ void main()
 
 ## ----- Fragment -----------------------------------------------------------------
 
+in vec2 TEX0;
 out vec4 FragColor;
 
 uniform vec2 GameResolution;
 uniform vec2 OutputSize;
 uniform sampler2D Texture;
 uniform sampler2D OrigTexture;
-in vec4 TEX0;
 
 #define SourceSize vec4(GameResolution, 1.0 / GameResolution)
 #define OriginalSize vec4(GameResolution, 1.0 / GameResolution)

@@ -10,7 +10,8 @@ precision mediump int;
 
 ## ----- Vertex -------------------------------------------------------------------
 
-in vec4 position;
+in vec2 position;
+
 uniform ivec4 Rect;
 uniform ivec2 GameResolution;
 uniform float DepthValue;
