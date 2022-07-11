@@ -90,14 +90,15 @@ namespace opengldrawer
 	public:
 		Internal()
 		{
-			// Register oxygen-specific callback for shader source code post-processing
-			//  -> Must be done before loading first shaders in "OpenGLDrawerResources::startup" and "Upscaler::startup"
-			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
-
 		#if defined(RMX_USE_GLEW)
 			// GLEW initialization
 			RMX_LOG_INFO("GLEW initialization...");
-			glewInit();
+			const GLenum result = glewInit();
+			if (result != GLEW_OK)
+			{
+				RMX_ERROR("Error in OpenGL initialization (glewInit):\n" << glewGetErrorString(result), );
+				return;
+			}
 		#endif
 
 		#if defined(RMX_USE_GLAD)
@@ -105,6 +106,10 @@ namespace opengldrawer
 			RMX_LOG_INFO("GLAD initialization...");
 			gladLoadGL();
 		#endif
+
+			// Register oxygen-specific callback for shader source code post-processing
+			//  -> Must be done before loading first shaders in "OpenGLDrawerResources::startup" and "Upscaler::startup"
+			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
 
 		#ifdef USE_OPENGL_MESSAGE_CALLBACK
 			// Register OpenGL message callback for debugging
@@ -123,12 +128,17 @@ namespace opengldrawer
 			// Startup upscaler
 			RMX_LOG_INFO("Upscaler startup");
 			mUpscaler.startup();
+
+			mSetupSuccessful = true;
 		}
 
 		~Internal()
 		{
-			mUpscaler.shutdown();
-			OpenGLDrawerResources::shutdown();
+			if (mSetupSuccessful)
+			{
+				mUpscaler.shutdown();
+				OpenGLDrawerResources::shutdown();
+			}
 		}
 
 		OpenGLDrawerTexture* createTexture()
@@ -273,6 +283,7 @@ namespace opengldrawer
 		}
 
 	public:
+		bool mSetupSuccessful = false;
 		SDL_Window* mOutputWindow = nullptr;
 		Upscaler mUpscaler;
 
@@ -303,6 +314,11 @@ OpenGLDrawer::OpenGLDrawer() :
 OpenGLDrawer::~OpenGLDrawer()
 {
 	delete &mInternal;
+}
+
+bool OpenGLDrawer::wasSetupSuccessful()
+{
+	return mInternal.mSetupSuccessful;
 }
 
 void OpenGLDrawer::createTexture(DrawerTexture& outTexture)

@@ -152,17 +152,20 @@ void EngineMain::switchToRenderMethod(Configuration::RenderMethod newRenderMetho
 	const bool wasUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 	config.mRenderMethod = newRenderMethod;
 
-	const bool nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
-	if (nowUsingOpenGL)
-	{
-		config.mAutoDetectRenderMethod = false;
-	}
-
+	bool nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
 	if (nowUsingOpenGL != wasUsingOpenGL)
 	{
 		// Need to recreate the window
 		destroyWindow();
 		createWindow();
+
+		// Check OpenGL in the config again, it could have changed - namely if OpenGL initialization failed
+		nowUsingOpenGL = (config.mRenderMethod == Configuration::RenderMethod::OPENGL_FULL || config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT);
+	}
+
+	if (nowUsingOpenGL)
+	{
+		config.mAutoDetectRenderMethod = false;
 	}
 
 	// Switch the renderer
@@ -637,7 +640,13 @@ bool EngineMain::createWindow()
 	}
 	else
 	{
-		mDrawer.createDrawer<OpenGLDrawer>();
+		if (!mDrawer.createDrawer<OpenGLDrawer>())
+		{
+			// Fallback to software drawer
+			RMX_LOG_INFO("OpenGL drawer setup failed, using software rendering");
+			config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
+			mDrawer.createDrawer<SoftwareDrawer>();
+		}
 	}
 
 	// Tell FTX video manager that everything is okay

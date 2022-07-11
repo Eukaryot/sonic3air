@@ -36,11 +36,11 @@ public:
 	Type getType() const;
 
 	template<typename T>
-	void createDrawer()
+	bool createDrawer()
 	{
 		destroyDrawer();
 		mActiveDrawer = new T();
-		onDrawerCreated();
+		return onDrawerCreated();
 	}
 
 	void destroyDrawer();
@@ -79,7 +79,7 @@ public:
 	void presentScreen();
 
 private:
-	void onDrawerCreated();
+	bool onDrawerCreated();
 	void unregisterTexture(DrawerTexture& texture);
 
 private:

@@ -341,10 +341,15 @@ namespace rmx
 		if (videoconfig.renderer == VideoConfig::Renderer::OPENGL)
 		{
 		#ifdef RMX_USE_GLEW
-			glewInit();
+			const GLenum result = glewInit();
+			if (result != GLEW_OK)
+			{
+				RMX_ERROR("Error in OpenGL initialization (glewInit):\n" << glewGetErrorString(result), );
+				return false;
+			}
 		#endif
 		#ifdef RMX_USE_GLAD
-		    gladLoadGL();
+			gladLoadGL();
 		#endif
 		}
 		mInitialized = true;

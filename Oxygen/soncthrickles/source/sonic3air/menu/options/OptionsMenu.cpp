@@ -922,6 +922,7 @@ void OptionsMenu::update(float timeElapsed)
 		mOptionEntries[option::FILTERING].loadValue();
 		mOptionEntries[option::BG_BLUR].loadValue();
 		mOptionEntries[option::AUDIO_VOLUME].loadValue();
+		mOptionEntries[option::RENDERER].mGameMenuEntry->setSelectedIndexByValue((int)config.mRenderMethod);
 
 		if (mActiveMenu == &mTabMenuEntries && (keys.Down.justPressedOrRepeat() || keys.Up.justPressedOrRepeat()))
 		{

@@ -186,14 +186,21 @@ void Drawer::presentScreen()
 	mActiveDrawer->presentScreen();
 }
 
-void Drawer::onDrawerCreated()
+bool Drawer::onDrawerCreated()
 {
+	if (!mActiveDrawer->wasSetupSuccessful())
+	{
+		destroyDrawer();
+		return false;
+	}
+
 	// Recreate implementations of registered drawer textures
 	for (DrawerTexture* texture : mDrawerTextures)
 	{
 		RMX_ASSERT(!texture->isValid(), "Drawer texture already created");
 		mActiveDrawer->refreshTexture(*texture);
 	}
+	return true;
 }
 
 void Drawer::unregisterTexture(DrawerTexture& texture)

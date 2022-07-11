@@ -20,6 +20,7 @@ public:
 	virtual ~DrawerInterface() {}
 
 	virtual Drawer::Type getType() = 0;
+	virtual bool wasSetupSuccessful()  { return true; }
 
 	virtual void createTexture(DrawerTexture& outTexture) = 0;
 	virtual void refreshTexture(DrawerTexture& texture) = 0;
