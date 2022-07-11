@@ -9,12 +9,7 @@
 #include "../rmxmedia.h"
 
 
-AudioReference::AudioReference()
-{
-	initialize(0);
-}
-
-void AudioReference::initialize(int ID)
+void AudioReference::setInstanceID(int ID)
 {
 	mInstanceID = ID;
 	mInstance = nullptr;

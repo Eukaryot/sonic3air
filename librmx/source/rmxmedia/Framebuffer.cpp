@@ -13,10 +13,6 @@
 
 Renderbuffer::Renderbuffer()
 {
-	mHandle = 0;
-	mFormat = 0;
-	mWidth = 0;
-	mHeight = 0;
 }
 
 Renderbuffer::~Renderbuffer()
@@ -49,7 +45,7 @@ void Renderbuffer::create(GLenum format, int width, int height)
 
 void Renderbuffer::setSize(int width, int height)
 {
-	if (mHandle == 0 || !mFormat)
+	if (mHandle == 0 || mFormat == 0)
 		return;
 	if (width == mWidth && height == mHeight)
 		return;
@@ -63,11 +59,11 @@ void Renderbuffer::setSize(int width, int height)
 
 void Renderbuffer::destroy()
 {
-	if (mHandle == 0)
-		return;
-
-	glDeleteRenderbuffers(1, &mHandle);
-	mHandle = 0;
+	if (mHandle != 0)
+	{
+		glDeleteRenderbuffers(1, &mHandle);
+		mHandle = 0;
+	}
 }
 
 
@@ -76,9 +72,6 @@ void Renderbuffer::destroy()
 
 Framebuffer::Framebuffer()
 {
-	mHandle = 0;
-	mWidth = 0;
-	mHeight = 0;
 }
 
 Framebuffer::~Framebuffer()
@@ -160,20 +153,20 @@ void Framebuffer::attachRenderbuffer(GLenum attachment, GLuint handle)
 
 void Framebuffer::createRenderbuffer(GLenum attachment, GLenum internalformat)
 {
-	RenderbufferMap::iterator it = mRenderbuffers.find(attachment);
-	Renderbuffer* rb = nullptr;
-	if (it != mRenderbuffers.end())
+	Renderbuffer* renderbuffer = nullptr;
+	Renderbuffer** found = mapFind(mRenderbuffers, attachment);
+	if (nullptr != found)
 	{
-		rb = it->second;
+		renderbuffer = *found;
 	}
 	else
 	{
-		rb = new Renderbuffer();
-		mRenderbuffers.insert(RenderbufferMap::value_type(attachment, rb));
+		renderbuffer = new Renderbuffer();
+		mRenderbuffers.emplace(attachment, renderbuffer);
 	}
-	rb->create(internalformat, mWidth, mHeight);
+	renderbuffer->create(internalformat, mWidth, mHeight);
 	bind();
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rb->getHandle());
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, renderbuffer->getHandle());
 }
 
 void Framebuffer::bind()
@@ -210,7 +203,7 @@ void Framebuffer::deactivate()
 
 void Framebuffer::deleteAttachedBuffer(GLenum attachment)
 {
-	RenderbufferMap::iterator it = mRenderbuffers.find(attachment);
+	const auto it = mRenderbuffers.find(attachment);
 	if (it != mRenderbuffers.end())
 	{
 		delete it->second;

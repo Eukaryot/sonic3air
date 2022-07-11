@@ -248,7 +248,7 @@ namespace rmx
 		++mChangeCounter;
 		++mNextFreeID;
 
-		ref.initialize(instance.mID);
+		ref.setInstanceID(instance.mID);
 		return (instance.mID != 0);
 	}
 

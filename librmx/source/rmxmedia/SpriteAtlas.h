@@ -90,9 +90,9 @@ class API_EXPORT SpriteAtlas : protected SpriteAtlasBase
 public:
 	struct Sprite
 	{
-		Texture* texture = nullptr;
-		Vec2f uvStart;
-		Vec2f uvEnd;
+		Texture* mTexture = nullptr;
+		Vec2f mUVStart;
+		Vec2f mUVEnd;
 	};
 
 public:

@@ -16,11 +16,6 @@ std::function<void(String&, Shader::ShaderType)> Shader::mShaderSourcePostProces
 
 Shader::Shader()
 {
-	mVertexShader = 0;
-	mFragmentShader = 0;
-	mProgram = 0;
-	mBlendMode = BlendMode::UNDEFINED;
-	mTextureCount = 0;
 }
 
 Shader::~Shader()
@@ -125,14 +120,6 @@ void Shader::setTexture(const char* name, const Texture& texture)
 	setTexture(name, texture.getHandle(), texture.getType());
 }
 
-void Shader::setTexture(const char* name, const Texture* texture)
-{
-	if (nullptr != texture)
-	{
-		setTexture(name, texture->getHandle(), texture->getType());
-	}
-}
-
 void Shader::bind()
 {
 	if (mBlendMode != BlendMode::UNDEFINED)
@@ -215,9 +202,9 @@ bool Shader::linkProgram(const std::map<int, String>* vertexAttribMap)
 	// Bind vertex atrributes (must be done just before linking)
 	if (nullptr != vertexAttribMap)
 	{
-		for (const auto& pair : *vertexAttribMap)
+		for (const auto& [index, attributeName] : *vertexAttribMap)
 		{
-			glBindAttribLocation(mProgram, pair.first, *pair.second);
+			glBindAttribLocation(mProgram, index, *attributeName);
 		}
 	}
 
@@ -285,10 +272,10 @@ bool ShaderEffect::loadFromString(const String& content)
 {
 	mIncludeDir.clear();
 	readParts(content);
-	for (unsigned int i = 0; i < mParts.size(); ++i)
+	for (PartStruct& part : mParts)
 	{
-		if (mParts[i].title == "TECH")
-			parseTechniques(mParts[i].content);
+		if (part.mTitle == "TECH")
+			parseTechniques(part.mContent);
 	}
 	return true;
 }
@@ -317,10 +304,8 @@ ShaderEffect::TechniqueStruct* ShaderEffect::findTechniqueByName(const String& n
 {
 	for (TechniqueStruct& tech : mTechniques)
 	{
-		if (tech.name == name)
-		{
+		if (tech.mName == name)
 			return &tech;
-		}
 	}
 	return nullptr;
 }
@@ -328,9 +313,9 @@ ShaderEffect::TechniqueStruct* ShaderEffect::findTechniqueByName(const String& n
 bool ShaderEffect::getShaderInternal(Shader& shader, TechniqueStruct& tech, const String& additionalDefines)
 {
 	String definitions;
-	for (unsigned int j = 0; j < tech.defines.size(); ++j)
+	for (unsigned int j = 0; j < tech.mDefines.size(); ++j)
 	{
-		definitions << "#define " << tech.defines[j] << "\n";
+		definitions << "#define " << tech.mDefines[j] << "\n";
 	}
 	if (!additionalDefines.empty())
 	{
@@ -347,17 +332,17 @@ bool ShaderEffect::getShaderInternal(Shader& shader, TechniqueStruct& tech, cons
 	}
 
 	String vsSource;
-	buildSourceFromParts(vsSource, tech.vs_parts, definitions);
+	buildSourceFromParts(vsSource, tech.mVertexShaderParts, definitions);
 	preprocessSource(vsSource, Shader::ShaderType::VERTEX);
 
 	String fsSource;
-	buildSourceFromParts(fsSource, tech.fs_parts, definitions);
+	buildSourceFromParts(fsSource, tech.mFragmentShaderParts, definitions);
 	preprocessSource(fsSource, Shader::ShaderType::FRAGMENT);
 
-	if (!shader.compile(vsSource, fsSource, &tech.vertexAttribMap))
+	if (!shader.compile(vsSource, fsSource, &tech.mVertexAttribMap))
 		return false;
 
-	shader.setBlendMode(tech.blendmode);
+	shader.setBlendMode(tech.mBlendMode);
 	return true;
 }
 
@@ -377,12 +362,12 @@ void ShaderEffect::readParts(const String& source)
 			int b = line.findChars("# -", a, +1);
 			mParts.push_back(PartStruct());
 			currPart = &mParts.back();
-			currPart->title.makeSubString(line, a, b-a);
-			currPart->content.clear();
+			currPart->mTitle.makeSubString(line, a, b-a);
+			currPart->mContent.clear();
 		}
 		else if (currPart)
 		{
-			currPart->content << line << (char)13 << char(10);
+			currPart->mContent << line << (char)13 << char(10);
 		}
 	}
 }
@@ -399,7 +384,7 @@ void ShaderEffect::parseTechniques(String& source)
 
 		a = source.skipChars(" \t\n\r", a+9, +1);
 		b = source.findChars(" \t\n\r:{", a, +1);
-		tech.name.makeSubString(source, a, b-a);
+		tech.mName.makeSubString(source, a, b-a);
 
 		// Check for inheritance
 		b = source.skipChars(" \t\n\r", b, +1);
@@ -413,11 +398,11 @@ void ShaderEffect::parseTechniques(String& source)
 			if (nullptr != parentTech)
 			{
 				// Copy everything from parent
-				tech.vs_parts = parentTech->vs_parts;
-				tech.fs_parts = parentTech->fs_parts;
-				tech.defines = parentTech->defines;
-				tech.vertexAttribMap = parentTech->vertexAttribMap;
-				tech.blendmode = parentTech->blendmode;
+				tech.mVertexShaderParts = parentTech->mVertexShaderParts;
+				tech.mFragmentShaderParts = parentTech->mFragmentShaderParts;
+				tech.mDefines = parentTech->mDefines;
+				tech.mVertexAttribMap = parentTech->mVertexAttribMap;
+				tech.mBlendMode = parentTech->mBlendMode;
 			}
 		}
 
@@ -427,57 +412,58 @@ void ShaderEffect::parseTechniques(String& source)
 		techcontents.makeSubString(source, a, b-a);
 		source.remove(0, b+1);
 
-		StringArray techlines;
+		std::vector<String> techlines;
 		techcontents.split(techlines, ';');
-		for (StringArray::iterator it = techlines.begin(); it != techlines.end(); ++it)
+		std::vector<String> includes;
+		for (const String& line : techlines)
 		{
-			c = it->findChar('=', 0, +1);
-			if (c >= it->length())
+			c = line.findChar('=', 0, +1);
+			if (c >= line.length())
 				continue;
 
-			a = it->skipChars(" \t\n\r", 0, +1);
-			b = it->skipChars(" \t\n\r", c-1, -1) + 1;
+			a = line.skipChars(" \t\n\r", 0, +1);
+			b = line.skipChars(" \t\n\r", c-1, -1) + 1;
 			String identifier;
-			identifier.makeSubString(*it, a, b-a);
+			identifier.makeSubString(line, a, b-a);
 			identifier.lowerCase();
-			a = it->skipChars(" \t\n\r", c+1, +1);
-			b = it->skipChars(" \t\n\r", it->length()-1, -1) + 1;
+			a = line.skipChars(" \t\n\r", c+1, +1);
+			b = line.skipChars(" \t\n\r", line.length()-1, -1) + 1;
 			String value;
-			value.makeSubString(*it, a, b-a);
+			value.makeSubString(line, a, b-a);
 
 			if (identifier == "vs" || identifier == "fs")
 			{
-				StringArray& parts = (identifier[0] == 'v') ? tech.vs_parts : tech.fs_parts;
+				std::vector<String>& parts = (identifier[0] == 'v') ? tech.mVertexShaderParts : tech.mFragmentShaderParts;
 				parts.clear();		// In case it was inherited, forget about that now
 
-				StringArray includes;
+				includes.clear();
 				value.split(includes, '+');
-				for (StringArray::iterator k = includes.begin(); k != includes.end(); ++k)
+				for (const String& include : includes)
 				{
-					a = k->skipChars(" \t\n\r", 0, +1);
-					b = k->skipChars(" \t\n\r", k->length()-1, -1) + 1;
-					parts.push_back(k->getSubString(a, b-a));
+					a = include.skipChars(" \t\n\r", 0, +1);
+					b = include.skipChars(" \t\n\r", include.length()-1, -1) + 1;
+					parts.push_back(include.getSubString(a, b-a));
 				}
 			}
 			else if (identifier == "blendfunc")
 			{
 				value.lowerCase();
 				if (value == "alpha")
-					tech.blendmode = Shader::BlendMode::ALPHA;
+					tech.mBlendMode = Shader::BlendMode::ALPHA;
 				else if (value == "add")
-					tech.blendmode = Shader::BlendMode::ADD;
+					tech.mBlendMode = Shader::BlendMode::ADD;
 				else
-					tech.blendmode = Shader::BlendMode::OPAQUE;
+					tech.mBlendMode = Shader::BlendMode::OPAQUE;
 			}
 			else if (identifier == "define" || identifier == "defines")
 			{
-				tech.defines.push_back(value);
+				tech.mDefines.push_back(value);
 			}
 			else if (identifier.startsWith("vertexattrib[") && identifier.endsWith("]"))
 			{
 				const String numberString = identifier.getSubString(13, identifier.length()-14);
 				const int index = numberString.parseInt();
-				tech.vertexAttribMap[index] = value;
+				tech.mVertexAttribMap[index] = value;
 			}
 		}
 	}
@@ -485,10 +471,10 @@ void ShaderEffect::parseTechniques(String& source)
 
 ShaderEffect::PartStruct* ShaderEffect::findPartByName(const String& name)
 {
-	for (unsigned int i = 0; i < mParts.size(); ++i)
+	for (PartStruct& part : mParts)
 	{
-		if (mParts[i].title == name)
-			return &mParts[i];
+		if (part.mTitle == name)
+			return &part;
 	}
 	return nullptr;
 }
@@ -496,12 +482,12 @@ ShaderEffect::PartStruct* ShaderEffect::findPartByName(const String& name)
 void ShaderEffect::buildSourceFromParts(String& source, const std::vector<String>& parts, const String& definitions)
 {
 	String content;
-	for (unsigned int j = 0; j < parts.size(); ++j)
+	for (const String& partName : parts)
 	{
-		PartStruct* part = findPartByName(parts[j]);
+		PartStruct* part = findPartByName(partName);
 		if (nullptr != part)
 		{
-			content << *part->content;
+			content << *part->mContent;
 		}
 	}
 

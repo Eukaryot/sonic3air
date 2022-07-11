@@ -26,9 +26,10 @@ public:
 	inline GLuint getHandle() const  { return mHandle; }
 
 private:
-	GLuint mHandle;
-	GLenum mFormat;
-	int mWidth, mHeight;
+	GLuint mHandle = 0;
+	GLenum mFormat = 0;
+	int mWidth = 0;
+	int mHeight = 0;
 };
 
 
@@ -37,8 +38,6 @@ class API_EXPORT Framebuffer
 public:
 	Framebuffer();
 	~Framebuffer();
-
-	inline GLuint getHandle() const  { return mHandle; }
 
 	void create();
 	void create(int width, int height);
@@ -59,15 +58,15 @@ public:
 	void activate(GLbitfield clearmask);
 	void deactivate();
 
+	inline GLuint getHandle() const   { return mHandle; }
 	inline Recti getViewport() const  { return Recti(0, 0, mWidth, mHeight); }
 
 private:
 	void deleteAttachedBuffer(GLenum attachment);
 
 private:
-	GLuint mHandle;
-	int mWidth, mHeight;
-
-	typedef std::map<GLenum, Renderbuffer*> RenderbufferMap;
-	RenderbufferMap mRenderbuffers;
+	GLuint mHandle = 0;
+	int mWidth = 0;
+	int mHeight = 0;
+	std::map<GLenum, Renderbuffer*> mRenderbuffers;
 };

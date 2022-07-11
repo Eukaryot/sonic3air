@@ -66,7 +66,6 @@ public:
 
 	void setTexture(const char* name, GLuint handle, GLenum target);
 	void setTexture(const char* name, const Texture& texture);
-	void setTexture(const char* name, const Texture* texture);		// Deprecated
 
 	void bind();
 	void unbind();
@@ -79,11 +78,11 @@ private:
 	bool linkProgram(const std::map<int, String>* vertexAttribMap = nullptr);
 
 private:
-	GLuint mVertexShader;
-	GLuint mFragmentShader;
-	GLuint mProgram;
+	GLuint mVertexShader = 0;
+	GLuint mFragmentShader = 0;
+	GLuint mProgram = 0;
 	BlendMode mBlendMode = BlendMode::UNDEFINED;
-	int mTextureCount;
+	int mTextureCount = 0;
 
 	String mVertexSource;
 	String mFragmentSource;
@@ -105,22 +104,20 @@ public:
 	bool getShader(Shader& shader, const String& name, const String& additionalDefines = String());
 
 private:
-	typedef std::vector<String> StringArray;
-
 	struct PartStruct
 	{
-		String title;
-		String content;
+		String mTitle;
+		String mContent;
 	};
 
 	struct TechniqueStruct
 	{
-		String name;
-		StringArray vs_parts;
-		StringArray fs_parts;
-		StringArray defines;
-		std::map<int, String> vertexAttribMap;
-		Shader::BlendMode blendmode = Shader::BlendMode::UNDEFINED;
+		String mName;
+		std::vector<String> mVertexShaderParts;
+		std::vector<String> mFragmentShaderParts;
+		std::vector<String> mDefines;
+		std::map<int, String> mVertexAttribMap;
+		Shader::BlendMode mBlendMode = Shader::BlendMode::UNDEFINED;
 	};
 
 private:

@@ -41,24 +41,23 @@ std::string getGLErrorDescription(GLenum err);
 	class API_EXPORT DisplayList
 	{
 	public:
-		DisplayList()	{ displaylist = 0; }
 		~DisplayList()	{ clear(); }
 
-		bool valid()	{ return (displaylist > 0); }
+		bool valid() const  { return (mHandle > 0); }
 
 		void clear()
 		{
-			if (displaylist <= 0)
+			if (mHandle <= 0)
 				return;
-			glDeleteLists(displaylist, 1);
-			displaylist = 0;
+			glDeleteLists(mHandle, 1);
+			mHandle = 0;
 		}
 
 		void begin()
 		{
-			if (displaylist <= 0)
-				displaylist = glGenLists(1);
-			glNewList(displaylist, GL_COMPILE);
+			if (mHandle <= 0)
+				mHandle = glGenLists(1);
+			glNewList(mHandle, GL_COMPILE);
 		}
 
 		void end()
@@ -68,11 +67,11 @@ std::string getGLErrorDescription(GLenum err);
 
 		void render()
 		{
-			glCallList(displaylist);
+			glCallList(mHandle);
 		}
 
 	private:
-		int displaylist;
+		int mHandle = 0;
 	};
 #endif
 

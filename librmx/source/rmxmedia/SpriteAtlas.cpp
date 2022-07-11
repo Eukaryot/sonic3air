@@ -284,11 +284,11 @@ bool SpriteAtlas::getSprite(int handle, Sprite& sprite)
 		return false;
 
 	const Bitmap& bitmap = mPageData[info->mPageIndex].mBitmap;
-	sprite.texture = &mPageData[info->mPageIndex].mTexture;
-	sprite.uvStart.x = (float)info->mRect.x / (float)bitmap.getWidth();
-	sprite.uvStart.y = (float)info->mRect.y / (float)bitmap.getHeight();
-	sprite.uvEnd.x = (float)(info->mRect.x + info->mRect.width) / (float)bitmap.getWidth();
-	sprite.uvEnd.y = (float)(info->mRect.y + info->mRect.height) / (float)bitmap.getHeight();
+	sprite.mTexture = &mPageData[info->mPageIndex].mTexture;
+	sprite.mUVStart.x = (float)info->mRect.x / (float)bitmap.getWidth();
+	sprite.mUVStart.y = (float)info->mRect.y / (float)bitmap.getHeight();
+	sprite.mUVEnd.x = (float)(info->mRect.x + info->mRect.width) / (float)bitmap.getWidth();
+	sprite.mUVEnd.y = (float)(info->mRect.y + info->mRect.height) / (float)bitmap.getHeight();
 	return true;
 }
 
