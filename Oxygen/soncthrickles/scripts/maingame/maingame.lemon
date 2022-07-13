@@ -987,19 +987,19 @@ function void copyPaletteDataFromTable(u8 index, u16 ramAddress)
 		}
 		else if (index == 0x2b || index == 0x2c)
 		{
-			paletteVariant = 1
+			paletteVariant = 1		// AIZ underwater
 		}
 		else if (index == 0x39)
 		{
-			paletteVariant = 2
+			paletteVariant = 2		// ICZ underwater
 		}
 		else if (index == 0x31 || index == 0x32)
 		{
-			paletteVariant = 3
+			paletteVariant = 3		// HCZ underwater
 		}
 		else if (index == 0x2d  || index == 0x2e || index == 0x3a)
 		{
-			paletteVariant = 4
+			paletteVariant = 4		// CNZ/LBZ underwater
 		}
 
 		if (paletteVariant != 0xff)
