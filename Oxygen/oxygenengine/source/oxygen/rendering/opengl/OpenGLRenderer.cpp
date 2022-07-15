@@ -362,7 +362,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader;
 					if (needsRefresh)
 					{
-						shader.refresh(mGameResolution, mResources);
+						shader.refresh(mGameResolution);
 					}
 					shader.draw(spriteInfo, mResources);
 					break;

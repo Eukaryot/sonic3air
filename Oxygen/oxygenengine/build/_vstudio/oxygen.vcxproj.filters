@@ -400,6 +400,9 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.cpp">
       <Filter>rendering\opengl\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.cpp">
+      <Filter>drawing\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -744,6 +747,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderVdpSpriteShader.h">
       <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h">
+      <Filter>drawing\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

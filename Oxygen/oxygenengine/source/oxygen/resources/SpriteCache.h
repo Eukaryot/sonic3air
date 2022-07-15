@@ -20,9 +20,11 @@ class SpriteCache : public SingleInstance<SpriteCache>
 public:
 	struct CacheItem
 	{
+		uint64 mKey = 0;
 		bool mUsesComponentSprite = false;
 		SpriteBase* mSprite = nullptr;
 		uint32 mChangeCounter = 0;
+		CacheItem* mRedirect = nullptr;
 		bool mGotDumped = false;
 	};
 
@@ -48,17 +50,14 @@ public:
 
 	uint64 setupSpriteFromROM(uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, ROMSpriteEncoding encoding, int16 indexOffset = 0);
 
+	void clearRedirect(uint64 sourceKey);
+	void setupRedirect(uint64 sourceKey, uint64 targetKey);
+
 	SpriteDump& getSpriteDump();
 	void dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex);
 
 private:
-	struct SheetCache
-	{
-		std::map<std::wstring, PaletteBitmap> mPaletteSpriteSheets;
-		std::map<std::wstring, Bitmap> mComponentSpriteSheets;
-	};
-
-private:
+	CacheItem& createCacheItem(uint64 key);
 	void loadSpriteDefinitions(const std::wstring& path);
 
 private:

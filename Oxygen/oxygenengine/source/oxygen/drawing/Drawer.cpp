@@ -110,6 +110,11 @@ void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mUpscaledRectDrawCommands.createObject(rect, texture));
 }
 
+void Drawer::drawSprite(Vec2i position, uint64 spriteKey)
+{
+	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSpriteDrawCommands.createObject(position, spriteKey));
+}
+
 void Drawer::drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mMeshDrawCommands.createObject(triangles, texture));

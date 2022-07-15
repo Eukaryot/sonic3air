@@ -15,6 +15,7 @@
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/resources/SpriteCache.h"
 
 
 namespace softwaredrawer
@@ -498,6 +499,39 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 
 					Blitter::Options options;
 					Blitter::blitBitmapWithScaling(outputWrapper, dc.mRect, inputWrapper, Recti(0, 0, inputWrapper.getSize().x, inputWrapper.getSize().y), options);
+				}
+				break;
+			}
+
+			case DrawCommand::Type::SPRITE:
+			{
+				SpriteDrawCommand& sc = drawCommand->as<SpriteDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				BitmapWrapper& outputWrapper = mInternal.getOutputWrapper();
+				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
+
+				// Target rect to fill in the output
+				Recti targetRect(sc.mPosition + sprite.mOffset, sprite.getBitmap().getSize());
+				const Recti uncroppedRect = targetRect;
+				targetRect.intersect(targetRect, mInternal.getScissorRect());
+
+				if (!targetRect.empty())
+				{
+					Blitter::Options options;
+					options.mUseAlphaBlending = mInternal.useAlphaBlending();
+
+					BitmapWrapper inputWrapper(sprite.accessBitmap());
+					if (mInternal.needSwapRedBlueChannels())
+					{
+						mInternal.setupRedBlueSwappedBitmapWrapper(inputWrapper);
+					}
+
+					Blitter::blitBitmap(outputWrapper, targetRect.getPos(), inputWrapper, Recti(Vec2i(0, 0), sprite.getBitmap().getSize()), options);
 				}
 				break;
 			}

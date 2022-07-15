@@ -10,11 +10,13 @@
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
+#include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
 #include "oxygen/drawing/opengl/Upscaler.h"
 #include "oxygen/drawing/DrawCollection.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/resources/SpriteCache.h"
 
 
 #if defined(DEBUG) && defined(PLATFORM_WINDOWS)
@@ -286,6 +288,7 @@ namespace opengldrawer
 		bool mSetupSuccessful = false;
 		SDL_Window* mOutputWindow = nullptr;
 		Upscaler mUpscaler;
+		OpenGLSpriteTextureManager mSpriteTextureManager;
 
 		Recti mCurrentViewport;
 		Vec4f mPixelToViewSpaceTransform;	// Transformation from pixel-based coordinates view space, in the form: (x, y) = offset; (z, w) = scale
@@ -300,7 +303,7 @@ namespace opengldrawer
 		opengl::VertexArrayObject mMeshVAO;			// Always using the same instances with different contents -- TODO: Some kind of caching could be useful
 
 	private:
-		std::map<Font*, OpenGLFontOutput> mFontOutputMap;
+		std::unordered_map<Font*, OpenGLFontOutput> mFontOutputMap;
 	};
 }
 
@@ -453,6 +456,31 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 
 				UpscaledRectDrawCommand& dc = drawCommand->as<UpscaledRectDrawCommand>();
 				mInternal.mUpscaler.renderImage(dc.mRect, dc.mTexture->getImplementation<OpenGLDrawerTexture>()->getTextureHandle(), dc.mTexture->getSize());
+				break;
+			}
+
+			case DrawCommand::Type::SPRITE:
+			{
+				SpriteDrawCommand& sc = drawCommand->as<SpriteDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
+				if (nullptr == texture)
+					break;
+
+				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
+				const Vec4f rectParam = mInternal.getTransformOfRectInViewport(Recti(sc.mPosition + sprite.mOffset, sprite.getBitmap().getSize()));
+
+				Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(false, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
+				shader.bind();
+				shader.setParam("Transform", rectParam);
+				shader.setTexture("Texture", texture->getHandle(), GL_TEXTURE_2D);
+
+				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 				break;
 			}
 

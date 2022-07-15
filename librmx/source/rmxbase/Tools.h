@@ -34,7 +34,7 @@ namespace rmx
 	}
 	static constexpr inline uint64 compileTimeFNV_64(const char* string, const uint64 value = FNV1a_64_START_VALUE) noexcept
 	{
-		return (string[0] == 0) ? value : compileTimeFNV_64(&string[1], (value ^ static_cast<uint32>(string[0])) * 0x00000100000001b3);
+		return (string[0] == 0) ? value : compileTimeFNV_64(&string[1], (value ^ static_cast<uint32>(string[0])) * FNV1a_64_MAGIC_PRIME);
 	}
 
 	// Calculate Murmur2 64-bit hash for data

@@ -10,6 +10,7 @@
 
 #include "oxygen/rendering/parts/SpriteManager.h"
 
+class OpenGLDrawer;
 class OpenGLRenderResources;
 
 

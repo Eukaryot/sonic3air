@@ -10,6 +10,7 @@
 
 #include "oxygen/rendering/parts/SpriteManager.h"
 
+class OpenGLDrawer;
 class OpenGLRenderResources;
 
 
@@ -17,7 +18,7 @@ class RenderComponentSpriteShader
 {
 public:
 	void initialize();
-	void refresh(const Vec2i& gameResolution, const OpenGLRenderResources& resources);
+	void refresh(const Vec2i& gameResolution);
 	void draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 
 private:

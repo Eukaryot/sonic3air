@@ -55,6 +55,7 @@ public:
 		SET_RENDER_TARGET,
 		RECT,
 		UPSCALED_RECT,
+		SPRITE,
 		MESH,
 		MESH_VERTEX_COLOR,
 		SET_BLEND_MODE,
@@ -142,6 +143,19 @@ public:
 };
 
 
+class SpriteDrawCommand final : public DrawCommand
+{
+friend class ObjectPoolBase<SpriteDrawCommand>;
+
+protected:
+	SpriteDrawCommand(Vec2i position, uint64 spriteKey) : DrawCommand(Type::SPRITE), mPosition(position), mSpriteKey(spriteKey) {}
+
+public:
+	Vec2i mPosition;
+	uint64 mSpriteKey;
+};
+
+
 class MeshDrawCommand final : public DrawCommand
 {
 friend class ObjectPoolBase<MeshDrawCommand>;
@@ -158,7 +172,7 @@ public:
 
 class MeshVertexColorDrawCommand final : public DrawCommand
 {
-	friend class ObjectPoolBase<MeshVertexColorDrawCommand>;
+friend class ObjectPoolBase<MeshVertexColorDrawCommand>;
 
 protected:
 	MeshVertexColorDrawCommand(const std::vector<DrawerMeshVertex_P2_C4>& triangles) : DrawCommand(Type::MESH_VERTEX_COLOR), mTriangles(triangles) {}
@@ -281,6 +295,7 @@ public:
 	ObjectPool<SetRenderTargetDrawCommand>		 mSetRenderTargetDrawCommands;
 	ObjectPool<RectDrawCommand>					 mRectDrawCommands;
 	ObjectPool<UpscaledRectDrawCommand>			 mUpscaledRectDrawCommands;
+	ObjectPool<SpriteDrawCommand>				 mSpriteDrawCommands;
 	ObjectPool<MeshDrawCommand>					 mMeshDrawCommands;
 	ObjectPool<MeshVertexColorDrawCommand>		 mMeshVertexColorDrawCommands;
 	ObjectPool<SetBlendModeDrawCommand>			 mSetBlendModeDrawCommands;
@@ -301,6 +316,7 @@ public:
 			case DrawCommand::Type::SET_RENDER_TARGET:			mSetRenderTargetDrawCommands.destroyObject(drawCommand.as<SetRenderTargetDrawCommand>());  break;
 			case DrawCommand::Type::RECT:						mRectDrawCommands.destroyObject(drawCommand.as<RectDrawCommand>());  break;
 			case DrawCommand::Type::UPSCALED_RECT:				mUpscaledRectDrawCommands.destroyObject(drawCommand.as<UpscaledRectDrawCommand>());  break;
+			case DrawCommand::Type::SPRITE:						mSpriteDrawCommands.destroyObject(drawCommand.as<SpriteDrawCommand>());  break;
 			case DrawCommand::Type::MESH:						mMeshDrawCommands.destroyObject(drawCommand.as<MeshDrawCommand>());  break;
 			case DrawCommand::Type::MESH_VERTEX_COLOR:			mMeshVertexColorDrawCommands.destroyObject(drawCommand.as<MeshVertexColorDrawCommand>());  break;
 			case DrawCommand::Type::SET_BLEND_MODE:				mSetBlendModeDrawCommands.destroyObject(drawCommand.as<SetBlendModeDrawCommand>());  break;

@@ -197,9 +197,19 @@ bool SpriteCache::hasSprite(uint64 key) const
 
 const SpriteCache::CacheItem* SpriteCache::getSprite(uint64 key)
 {
-	const auto it = mCachedSprites.find(key);
-	if (it == mCachedSprites.end())
+	CacheItem* item = mapFind(mCachedSprites, key);
+	if (nullptr != item)
 	{
+		// Resolve redirect
+		while (nullptr != item->mRedirect)
+		{
+			item = item->mRedirect;
+		}
+		return item;
+	}
+	else
+	{
+		// Output an error
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
 			const std::string_view* str = LemonScriptRuntime::tryResolveStringHash(key);
@@ -214,54 +224,49 @@ const SpriteCache::CacheItem* SpriteCache::getSprite(uint64 key)
 		}
 		return nullptr;
 	}
-	return &it->second;
 }
 
 SpriteCache::CacheItem& SpriteCache::getOrCreatePaletteSprite(uint64 key)
 {
-	const auto it = mCachedSprites.find(key);
-	if (it != mCachedSprites.end())
+	CacheItem* item = mapFind(mCachedSprites, key);
+	if (nullptr != item)
 	{
-		RMX_CHECK(!it->second.mUsesComponentSprite, "Sprite is not a palette sprite", );
-		return it->second;
+		RMX_CHECK(!item->mUsesComponentSprite, "Sprite is not a palette sprite", );
 	}
 	else
 	{
-		CacheItem& item = mCachedSprites[key];
-		item.mSprite = new PaletteSprite();
-		item.mUsesComponentSprite = false;
-		item.mChangeCounter = mGlobalChangeCounter;
-		return item;
+		item = &createCacheItem(key);
+		item->mSprite = new PaletteSprite();
+		item->mUsesComponentSprite = false;
 	}
+	return *item;
 }
 
 SpriteCache::CacheItem& SpriteCache::getOrCreateComponentSprite(uint64 key)
 {
-	const auto it = mCachedSprites.find(key);
-	if (it != mCachedSprites.end())
+	CacheItem* item = mapFind(mCachedSprites, key);
+	if (nullptr != item)
 	{
-		RMX_CHECK(it->second.mUsesComponentSprite, "Sprite is not a component sprite", );
-		return it->second;
+		RMX_CHECK(item->mUsesComponentSprite, "Sprite is not a component sprite", );
 	}
 	else
 	{
-		CacheItem& item = mCachedSprites[key];
-		item.mSprite = new ComponentSprite();
-		item.mUsesComponentSprite = true;
-		item.mChangeCounter = mGlobalChangeCounter;
-		return item;
+		item = &createCacheItem(key);
+		item->mSprite = new ComponentSprite();
+		item->mUsesComponentSprite = true;
 	}
+	return *item;
 }
 
 uint64 SpriteCache::setupSpriteFromROM(uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, ROMSpriteEncoding encoding, int16 indexOffset)
 {
 	const uint64 key = (((uint64)patternsBaseAddress) << 42) ^ (((uint64)tableAddress) << 25) ^ (((uint64)mappingOffset) << 8) ^ (uint64)animationSprite;
 
-	const auto it = mCachedSprites.find(key);
-	if (it == mCachedSprites.end())
+	CacheItem* item = mapFind(mCachedSprites, key);
+	if (nullptr == item)
 	{
-		CacheItem& item = getOrCreatePaletteSprite(key);
-		PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(item.mSprite);
+		item = &getOrCreatePaletteSprite(key);
+		PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(item->mSprite);
 		createPaletteSpriteFromROM(paletteSprite, patternsBaseAddress, tableAddress, mappingOffset, animationSprite, atex, encoding, indexOffset);
 
 	#ifdef CREATE_SPRITEDUMP
@@ -277,6 +282,27 @@ uint64 SpriteCache::setupSpriteFromROM(uint32 patternsBaseAddress, uint32 tableA
 	return key;
 }
 
+void SpriteCache::clearRedirect(uint64 sourceKey)
+{
+	CacheItem* source = mapFind(mCachedSprites, sourceKey);
+	if (nullptr != source)
+	{
+		source->mRedirect = nullptr;
+	}
+}
+
+void SpriteCache::setupRedirect(uint64 sourceKey, uint64 targetKey)
+{
+	CacheItem* source = mapFind(mCachedSprites, sourceKey);
+	if (nullptr == source)
+	{
+		source = &createCacheItem(sourceKey);
+	}
+
+	CacheItem* target = mapFind(mCachedSprites, targetKey);
+	source->mRedirect = target;
+}
+
 SpriteDump& SpriteCache::getSpriteDump()
 {
 	if (nullptr == mSpriteDump)
@@ -289,29 +315,41 @@ SpriteDump& SpriteCache::getSpriteDump()
 
 void SpriteCache::dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex)
 {
-	const auto it = mCachedSprites.find(key);
-	if (it != mCachedSprites.end())
+	CacheItem* item = mapFind(mCachedSprites, key);
+	if (nullptr != item && !item->mGotDumped)
 	{
-		CacheItem& item = it->second;
-		if (!item.mGotDumped)
+		if (!item->mUsesComponentSprite)
 		{
-			if (!item.mUsesComponentSprite)
-			{
-				const PaletteSprite& paletteSprite = *static_cast<const PaletteSprite*>(item.mSprite);
-				getSpriteDump().addSprite(paletteSprite, categoryKey, spriteNumber, atex);
-			}
-			else
-			{
-				RMX_ERROR("Can't dump component sprites (attempted to dump '" << categoryKey << "' sprite " << rmx::hexString(spriteNumber, 2) << ")", );
-			}
-			item.mGotDumped = true;
+			const PaletteSprite& paletteSprite = *static_cast<const PaletteSprite*>(item->mSprite);
+			getSpriteDump().addSprite(paletteSprite, categoryKey, spriteNumber, atex);
 		}
+		else
+		{
+			RMX_ERROR("Can't dump component sprites (attempted to dump '" << categoryKey << "' sprite " << rmx::hexString(spriteNumber, 2) << ")", );
+		}
+		item->mGotDumped = true;
 	}
+}
+
+SpriteCache::CacheItem& SpriteCache::createCacheItem(uint64 key)
+{
+	CacheItem& item = mCachedSprites[key];
+	item.mKey = key;
+	item.mSprite = nullptr;
+	item.mUsesComponentSprite = false;
+	item.mChangeCounter = mGlobalChangeCounter;
+	return item;
 }
 
 void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 {
+	struct SheetCache
+	{
+		std::map<std::wstring, PaletteBitmap> mPaletteSpriteSheets;
+		std::map<std::wstring, Bitmap> mComponentSpriteSheets;
+	};
 	SheetCache sheetCache;
+
 	std::vector<rmx::FileIO::FileEntry> fileEntries;
 	fileEntries.reserve(8);
 	FTX::FileSystem->listFilesByMask(path + L"/*.json", true, fileEntries);
@@ -397,8 +435,7 @@ void SpriteCache::loadSpriteDefinitions(const std::wstring& path)
 					}
 				}
 
-				CacheItem& item = mCachedSprites[key];
-				item.mChangeCounter = mGlobalChangeCounter;
+				CacheItem& item = createCacheItem(key);
 				const std::wstring fullpath = fileEntry.mPath + filename;
 
 				// Palette or RGBA?

@@ -23,7 +23,8 @@ public:
 	void refreshImplementation(DrawerTexture& owner, bool setupRenderTarget, const Vec2i& size) override;
 
 public:
-	inline GLuint getTextureHandle()  { return mTexture.getHandle(); }
+	inline OpenGLTexture& getTexture()  { return mTexture; }
+	inline GLuint getTextureHandle()    { return mTexture.getHandle(); }
 	GLuint getFrameBufferHandle();
 
 public:

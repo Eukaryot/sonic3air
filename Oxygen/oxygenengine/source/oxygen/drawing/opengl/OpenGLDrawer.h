@@ -10,7 +10,6 @@
 
 #include "oxygen/drawing/DrawerInterface.h"
 
-
 namespace opengldrawer
 {
 	struct Internal;

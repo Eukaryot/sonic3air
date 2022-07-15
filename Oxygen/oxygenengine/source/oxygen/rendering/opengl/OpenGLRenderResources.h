@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "oxygen/rendering/parts/SpriteManager.h"
 #include "oxygen/rendering/utils/PaletteBitmap.h"
 #include "oxygen/rendering/utils/BufferTexture.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
@@ -27,9 +26,6 @@ public:
 
 	const BufferTexture& getHScrollOffsetsTexture(int scrollOffsetsIndex) const;
 	const BufferTexture& getVScrollOffsetsTexture(int scrollOffsetsIndex) const;
-
-	BufferTexture* getPaletteSpriteTexture(const SpriteManager::PaletteSpriteInfo& spriteInfo);
-	OpenGLTexture* getComponentSpriteTexture(const SpriteManager::ComponentSpriteInfo& spriteInfo);
 
 public:
 	RenderParts& mRenderParts;
@@ -51,13 +47,4 @@ public:
 	BufferTexture mHScrollOffsetsTexture[4];	// First two are for the planes, the others are used for certain effects that require an additional set of scroll offsets
 	BufferTexture mVScrollOffsetsTexture[4];
 	BufferTexture mEmptyScrollOffsetsTexture;
-
-	// Sprites
-	template<typename T> struct ChangeCounted
-	{
-		T mTexture;
-		uint32 mChangeCounter = -1;
-	};
-	std::map<uint64, ChangeCounted<BufferTexture>> mPaletteSpriteTextures;
-	std::map<uint64, ChangeCounted<OpenGLTexture>> mComponentSpriteTextures;
 };

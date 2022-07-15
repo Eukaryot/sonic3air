@@ -12,6 +12,7 @@
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
+#include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
 #include "oxygen/helper/FileHelper.h"
 
 
@@ -64,7 +65,7 @@ void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSu
 void RenderPaletteSpriteShader::draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources)
 {
 	glActiveTexture(GL_TEXTURE0);
-	BufferTexture* texture = resources.getPaletteSpriteTexture(spriteInfo);
+	const BufferTexture* texture = OpenGLSpriteTextureManager::instance().getPaletteSpriteTexture(*spriteInfo.mCacheItem, spriteInfo.mUseUpscaledSprite);
 	if (nullptr == texture)
 		return;
 
