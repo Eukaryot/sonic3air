@@ -100,7 +100,7 @@ TEMPLATE STRING::StringTemplate(const CHAR* str, size_t length)
 	mData[mLength] = 0;
 }
 
-TEMPLATE STRING::StringTemplate(const std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>>& str)
+TEMPLATE STRING::StringTemplate(const StdString& str)
 {
 	init();
 	if (str.empty())
@@ -112,7 +112,7 @@ TEMPLATE STRING::StringTemplate(const std::basic_string<CHAR, std::char_traits<C
 	mData[mLength] = 0;
 }
 
-TEMPLATE STRING::StringTemplate(const std::basic_string_view<CHAR>& str)
+TEMPLATE STRING::StringTemplate(const StdStringView& str)
 {
 	init();
 	if (str.empty())
@@ -206,7 +206,7 @@ TEMPLATE void STRING::makeDynamic()
 
 TEMPLATE STRING& STRING::clear()
 {
-	if (!mDynamic && !mSize)
+	if (!mDynamic && mSize == 0)
 		mData = const_cast<CHAR*>(_empty<CHAR>());
 	else
 		mData[0] = 0;
@@ -307,7 +307,7 @@ TEMPLATE void STRING::copy(const CHAR* str)
 	mData[mLength] = 0;
 }
 
-TEMPLATE void STRING::copy(const std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>>& str)
+TEMPLATE void STRING::copy(const StdString& str)
 {
 	// Copy string
 	expand((int)str.length());
@@ -316,7 +316,7 @@ TEMPLATE void STRING::copy(const std::basic_string<CHAR, std::char_traits<CHAR>,
 	mData[mLength] = 0;
 }
 
-TEMPLATE void STRING::copy(const std::basic_string_view<CHAR>& str)
+TEMPLATE void STRING::copy(const StdStringView& str)
 {
 	// Copy string
 	expand((int)str.length());
@@ -775,27 +775,24 @@ TEMPLATE CLASS STRING::getSubString(int pos) const
 	return getSubString(pos, (int)mLength - pos);
 }
 
-TEMPLATE int STRING::split(CLASS** str_ptr, CHAR separator) const
+TEMPLATE void STRING::split(std::vector<StdStringView>& output, CHAR separator) const
 {
-	// Split string
+	// Split string by separating character
 	int count = countChar(separator) + 1;
-	STRING* str = new STRING[count];
-	int num = 0;
+	output.resize(count);
+	int k = 0;
 	int start = 0;
 	for (int i = 0; mData[i]; ++i)
 	{
 		if (mData[i] == separator)
 		{
-			str[num].makeSubString(*this, start, i - start);
-			++num;
+			output[k] = StdStringView(&mData[start], (size_t)(i - start));
+			++k;
 			start = i+1;
 		}
 	}
-	str[num].makeSubString(*this, start, mLength - start);
-	*str_ptr = str;
-	return count;
+	output[k] = StdStringView(&mData[start], mLength - (size_t)start);
 }
-
 
 TEMPLATE void STRING::split(std::vector<CLASS>& output, CHAR separator) const
 {

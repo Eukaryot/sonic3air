@@ -28,7 +28,8 @@ enum class UnicodeEncoding
 
 
 // Template for concrete classes
-template<typename CHAR, typename CLASS> class StringTemplate
+template<typename CHAR, typename CLASS>
+class StringTemplate
 {
 friend class String;
 friend class WString;
@@ -36,13 +37,16 @@ friend class WString;
 public:
 	static const StringTemplate EMPTY;
 
+	typedef typename std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>> StdString;
+	typedef typename std::basic_string_view<CHAR> StdStringView;
+
 public:
 	StringTemplate();
 	StringTemplate(const StringTemplate& str);
 	StringTemplate(const CHAR* str);
 	StringTemplate(const CHAR* str, size_t length);
-	StringTemplate(const std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>>& str);
-	StringTemplate(const std::basic_string_view<CHAR>& str);
+	StringTemplate(const StdString& str);
+	StringTemplate(const StdStringView& str);
 	StringTemplate(int ignoreMe, const CHAR* format, ...);
 	~StringTemplate();
 
@@ -73,8 +77,8 @@ public:
 
 	void copy(const StringTemplate& str);
 	void copy(const CHAR* str);
-	void copy(const std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>>& str);
-	void copy(const std::basic_string_view<CHAR>& str);
+	void copy(const StdString& str);
+	void copy(const StdStringView& str);
 
 	void swap(StringTemplate& other);
 
@@ -124,8 +128,8 @@ public:
 	CLASS getSubString(int pos, int len) const;
 	CLASS getSubString(int pos) const;
 
-	int split(CLASS** str_ptr, CHAR separator) const;
 	void split(std::vector<CLASS>& output, CHAR separator) const;
+	void split(std::vector<StdStringView>& output, CHAR separator) const;
 	void compose(const std::vector<StringTemplate>& parts, const StringTemplate& separator);
 
 	void overwrite(const StringTemplate& str, int pos);
@@ -155,10 +159,10 @@ public:
 	bool saveFile(const std::string& filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO) const;
 	bool saveFile(const std::wstring& filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO) const;
 
-	CLASS& operator=(const CLASS& str)		{ copy(str); return (CLASS&)*this; }
-	CLASS& operator=(const CHAR* str)		{ copy(str); return (CLASS&)*this; }
-	CLASS& operator=(const std::basic_string<CHAR, std::char_traits<CHAR>, std::allocator<CHAR>>& str)	{ copy(str); return *this; }
-	CLASS& operator=(const std::basic_string_view<CHAR>& str)											{ copy(str); return *this; }
+	CLASS& operator=(const CLASS& str)			{ copy(str); return (CLASS&)*this; }
+	CLASS& operator=(const CHAR* str)			{ copy(str); return (CLASS&)*this; }
+	CLASS& operator=(const StdString& str)		{ copy(str); return *this; }
+	CLASS& operator=(const StdStringView& str)	{ copy(str); return *this; }
 
 	CLASS& operator<<(const CLASS& str)		{ add(str);			return (CLASS&)*this; }
 	CLASS& operator<<(CHAR ch)				{ add(ch);			return (CLASS&)*this; }
@@ -211,8 +215,8 @@ public:
 	String(const StringTemplate& str) : BASE(str) {}
 	String(const char* str) : BASE(str) {}
 	String(const char* str, size_t length) : BASE(str, length) {}
-	String(const std::basic_string<char, std::char_traits<char>, std::allocator<char>>& str) : BASE(str) {}
-	String(const std::basic_string_view<char>& str) : BASE(str) {}
+	String(const StdString& str) : BASE(str) {}
+	String(const StdStringView& str) : BASE(str) {}
 	String(int ignoreMe, const char* format, ...);
 
 	String& operator=(const String& str) { copy(str); return *this; }
@@ -234,8 +238,8 @@ public:
 	WString(const StringTemplate& str) : BASE(str) {}
 	WString(const wchar_t* str) : BASE(str) {}
 	WString(const wchar_t* str, size_t length) : BASE(str, length) {}
-	WString(const std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t>>& str) : BASE(str) {}
-	WString(const std::basic_string_view<wchar_t>& str) : BASE(str) {}
+	WString(const StdString& str) : BASE(str) {}
+	WString(const StdStringView& str) : BASE(str) {}
 	explicit WString(const String& str) : BASE(str.toWString()) {}
 	explicit WString(const char* str) : WString(String(str)) {}
 	explicit WString(const std::basic_string<char, std::char_traits<char>, std::allocator<char>>& str) : WString(String(str)) {}

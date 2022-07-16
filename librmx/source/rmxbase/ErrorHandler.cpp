@@ -8,7 +8,6 @@
 
 #include "../rmxbase.h"
 #include <locale>
-#include <codecvt>
 
 #ifdef PLATFORM_WINDOWS
 	#define WIN32_LEAN_AND_MEAN
@@ -140,8 +139,13 @@ namespace
 	#ifdef USE_VISTA_STYLE
 		if (canShowVistaStyleMessageBox())
 		{
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-			return showVistaStyleMessageBox(converter.from_bytes(message));
+			const auto size_needed = MultiByteToWideChar(CP_UTF8, 0, &message.at(0), (int)message.size(), nullptr, 0);
+			if (size_needed <= 0)
+				return 0;
+
+			std::wstring result(size_needed, 0);
+			MultiByteToWideChar(CP_UTF8, 0, &message.at(0), (int)message.size(), &result.at(0), size_needed);
+			return showVistaStyleMessageBox(result);
 		}
 		else
 	#endif
