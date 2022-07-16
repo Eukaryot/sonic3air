@@ -37,6 +37,9 @@
     <Filter Include="client">
       <UniqueIdentifier>{5e5e5db6-45b6-422c-ba5a-723d5e2c95a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{7b694f91-75d9-41b0-914c-45b43aa8031b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp">
@@ -146,6 +149,9 @@
     <ClCompile Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.cpp">
       <Filter>menu\options</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\resources\DynamicSprites.cpp">
+      <Filter>resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -253,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\options\OptionsMenuEntries.h">
       <Filter>menu\options</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\resources\DynamicSprites.h">
+      <Filter>resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

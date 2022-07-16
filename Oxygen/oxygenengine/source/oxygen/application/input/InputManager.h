@@ -143,6 +143,7 @@ public:
 	InputConfig::DeviceDefinition* getDeviceDefinition(const RealDevice& device) const;
 	const std::vector<InputConfig::Assignment>* getControlMapping(const RealDevice& device, InputConfig::DeviceDefinition::Button button) const;
 	void redefineControlMapping(const RealDevice& device, InputConfig::DeviceDefinition::Button button, const std::vector<InputConfig::Assignment>& newAssignments);
+	uint32 getMappingsChangeCounter() const  { return mMappingsChangeCounter; }
 
 	void registerInputFeeder(InputFeeder& inputFeeder);
 	void unregisterInputFeeder(InputFeeder& inputFeeder);
@@ -187,6 +188,7 @@ private:
 	PreferredGamepad mPreferredGamepadByPlayer[2];
 	int mLastCheckJoysticks = 0;
 	uint32 mGamepadsChangeCounter = 0;		// Gets increased whenever a gamepad is connected or unplugged
+	uint32 mMappingsChangeCounter = 0;		// Gets increased whenever the buttons mappings get changed
 
 	std::set<InputFeeder*> mInputFeeders;
 

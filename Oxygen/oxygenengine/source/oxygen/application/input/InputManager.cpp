@@ -807,6 +807,7 @@ void InputManager::redefineControlMapping(const RealDevice& device, InputConfig:
 		// Now also reload mappings from config and apply them
 		::setupRealDeviceInputMapping(const_cast<RealDevice&>(device), *inputDeviceDefinition);
 		updatePlayerGamepadAssignments();
+		++mMappingsChangeCounter;
 	}
 }
 

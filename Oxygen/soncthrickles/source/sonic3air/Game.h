@@ -12,6 +12,7 @@
 #include "sonic3air/data/PlayerProgress.h"
 #include "sonic3air/data/PlayerRecorder.h"
 #include "sonic3air/helper/BlueSpheresRendering.h"
+#include "sonic3air/resources/DynamicSprites.h"
 
 #include "oxygen/resources/ResourcesCache.h"
 
@@ -82,6 +83,7 @@ public:
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer);
 
 private:
+	void refreshInputIcons(InputManager::InputType inputType);
 	void startIntoGameInternal();
 
 	// Script bindings
@@ -126,6 +128,7 @@ private:
 	PlayerProgress mPlayerProgress;
 	PlayerRecorder mPlayerRecorder;
 	GameClient mGameClient;
+	DynamicSprites mDynamicSprites;
 
 	uint16 mLastZoneAndAct = 0;
 	uint8  mLastCharacters = 0;

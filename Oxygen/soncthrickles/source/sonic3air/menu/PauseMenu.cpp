@@ -357,7 +357,12 @@ void PauseMenu::render()
 		if (mTimeShown > 5.0f)
 		{
 			const float visibility = saturate((mTimeShown - 5.0f) * 3.0f) * mVisibility;
-			drawer.printText(global::mFont4, Recti(8, screenHeight + roundToInt(interpolate(20, -2, visibility)), 0, 0), "[W] / (Y): Hide menu for clean screenshots", 7, Color(0.6f, 0.8f, 1.0f, 0.8f));
+			const int py = screenHeight - 5 + roundToInt(interpolate(20, -2, visibility));
+
+			static const uint64 key = rmx::getMurmur2_64(std::string_view("@input_icon_button_Y"));
+			drawer.drawRect(Recti(0, py - 9, 175, 20), Color(0.0f, 0.0f, 0.0f, 0.8f));
+			drawer.drawSprite(Vec2i(12, py - 1), key);
+			drawer.printText(global::mFont4, Recti(24, py, 0, 0), "Hide menu for clean screenshots", 4, Color(0.6f, 0.8f, 1.0f, 1.0f));
 		}
 
 		drawer.performRendering();
