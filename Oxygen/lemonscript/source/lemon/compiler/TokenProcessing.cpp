@@ -462,7 +462,7 @@ namespace lemon
 					else if (rmx::startsWith(functionName, "base."))
 					{
 						// It's a base call
-						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call goes to a different function", mLineNumber);
+						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call \"" << functionName << "\" goes to a different function, expected \"base." << mContext.mFunction->getName().getString() << "\" instead", mLineNumber);
 						isValidFunctionCall = true;
 						isBaseCall = true;
 					}
