@@ -199,8 +199,7 @@ void MainMenu::update(float timeElapsed)
 						break;
 				}
 			}
-
-			if (keys.B.justPressed() || keys.Back.justPressed())
+			else if (keys.B.justPressed() || keys.Back.justPressed())
 			{
 				mState = State::FADE_TO_TITLESCREEN;
 				GameApp::instance().getGameView().startFadingOut();
