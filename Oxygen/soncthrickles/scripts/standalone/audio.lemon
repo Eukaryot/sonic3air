@@ -304,10 +304,10 @@ function void Standalone.playAudio(u8 sfxId)
 			if (true)	// TODO: Add option to disable the speedup, of course for both music and gameplay
 			{
 				soundKey = "1c_speedup45"
-				if (Audio.getAudioKeyType("1c_speedup45") != AudioKeyType.MODDED && Audio.getAudioKeyType("1c_speedup30") != AudioKeyType.MODDED)
+				if (Audio.getAudioKeyType("1c_speedup45") != AudioKeyType.MODDED && Audio.getAudioKeyType("1c_speedup") == AudioKeyType.MODDED)
 				{
 					// Prefer modded 30 seconds version variant over the non-modded 45 seconds version
-					soundKey = "1c_speedup30"
+					soundKey = "1c_speedup"
 				}
 				soundRegType = SoundRegType.TYPE_MUSIC
 			}
