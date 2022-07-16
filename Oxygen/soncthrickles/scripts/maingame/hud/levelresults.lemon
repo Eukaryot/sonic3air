@@ -243,7 +243,7 @@ function void LevelResults.UpdateBonusCounting()
 		// Special handling for Sky Sanctuary Zone (S/T) and probably also Lava Reef Boss
 		if (global.zone_act == 0x0a00 || u16[A0 + 0x2c] != 0)
 		{
-			u8[0xffffef56] = 0xff
+			sram.block_interrupts.u8 = 0xff
 			SaveGameOnLevelFinished()
 		}
 

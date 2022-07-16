@@ -207,7 +207,7 @@ function void fn081ca4()
 	if (objA0.countdown_value >= 0)
 		return
 
-	u8[0xffffef56] = 0xff
+	sram.block_interrupts.u8 = 0xff
 	SaveGameOnLevelFinished()
 
 	// Start outro

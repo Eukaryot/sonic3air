@@ -365,8 +365,8 @@ function void fn07bcb0()
 	u8[A1 + 0x2e] = 0x83
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x40] = 0
-	u8[0xffffef56] = 0xff
 
+	sram.block_interrupts.u8 = 0xff
 	SaveGameOnLevelFinished()
 }
 

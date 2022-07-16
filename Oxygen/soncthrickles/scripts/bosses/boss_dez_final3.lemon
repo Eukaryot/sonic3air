@@ -287,8 +287,9 @@ function void fn0803d6()
 	A1 = 0xffff0000 + u16[A0 + 0x44]
 	if (u8[A1 + 0x2a] & 0x80)
 	{
-		u8[0xffffef56] = 0xff
+		sram.block_interrupts.u8 = 0xff
 		SaveGameOnLevelFinished()
+
 		Object.TriggerUnloading()
 
 		if (DEZFinalBoss3.canPlayerEnterDoomsday())

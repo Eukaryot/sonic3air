@@ -148,7 +148,7 @@ function void VInt.InnerUpdate()
 	//  - 0x000b5c	-> global.frame_state = 0x16	-> Used in Level Select
 	//  - 0x000c00	-> global.frame_state = 0x1a	-> Used in S&K title screen, Blue Spheres mode results screen
 	//  - 0x000c20	-> global.frame_state = 0x1c	-> Used in Blue Spheres special stage
-	//  - 0x000c3e	-> global.frame_state = 0x1e	-> Used in Data Select
+	//  - 0x000c3e	-> global.frame_state = 0x1e	-> Used in Data Select, Blue Spheres special stage results and Competition Mode menus
 	call tableLookupAddress(0x0005e6, oldFrameState & 0x3e)
 
 	++global.framecounter

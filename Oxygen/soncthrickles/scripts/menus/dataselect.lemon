@@ -309,7 +309,7 @@ function void DataSelect.setup()
 	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
-	u32[0xffffef44] = 0x00c56e
+	vint.update_subroutine = 0x00c56e
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -369,7 +369,7 @@ function void DataSelect.setup()
 	copyMemory(A1, A0, 0x540)
 
 	playMusic(MUSIC_DATASELECT)
-	u32[0xffffef44] = 0x00c890
+	vint.update_subroutine = 0x00c890
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -530,10 +530,11 @@ function void fn000c3e()
 
 	// Known targets:
 	//  - 0x00a85c		-> Empty function, used in competition mode menu
+	//  - 0x00afc8		-> Used in competition mode menu
 	//  - 0x00c56e		-> Empty function, used in Data Select screen
 	//  - 0x00c890		-> Used in Data Select screen
 	//  - 0x02df62		-> Empty function, used in Blue Spheres special stage
-	A0 = u32[0xffffef44]
+	A0 = vint.update_subroutine
 	call A0
 
 	fn0017f4()
@@ -819,7 +820,7 @@ function void fn00d39e()
 	{
 		u8[A1 + 0x08] = 3
 		u32 backupA1 = A1
-		u8[0xffffef56] = 0xff
+		sram.block_interrupts.u8 = 0xff
 		SaveGameSlot()
 		A1 = backupA1
 	}
@@ -870,8 +871,9 @@ function void fn00d42c()
 				u8[A1 + 0x01] = global.game_random_base
 			#endif
 
-				u8[0xffffef56] = 0xff
+				sram.block_interrupts.u8 = 0xff
 				SaveGameSlot()
+
 				DrawObject()
 				return
 			}
@@ -1084,8 +1086,9 @@ function bool fn00d458()
 		}
 	#endif
 
-		u8[0xffffef56] = 0xff
+		sram.block_interrupts.u8 = 0xff
 		SaveGameSlot()
+
 		global.game_mode = 0x0c
 		DrawObject()
 		return 0
@@ -1437,8 +1440,8 @@ function void fn00d8c4()
 	#if STANDALONE
 		zeroMemory(0x801100 + 0x20 * u32(dataselect.slot_selected - 1), 0x20)
 	#endif
-		u8[0xffffef56] = 0xff
 
+		sram.block_interrupts.u8 = 0xff
 		SaveGameSlot()
 	}
 

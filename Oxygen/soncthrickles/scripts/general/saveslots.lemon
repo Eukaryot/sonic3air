@@ -25,7 +25,7 @@ function void InitSaveSlots()
 	if (global.lock_on_state != 0)
 		return
 
-	u16[0xffffef56] = 0
+	sram.block_interrupts.u16 = 0
 
 #if STANDALONE
 
@@ -243,7 +243,7 @@ function void fn00c30e()
 function void fn00c320()
 {
 #if !STANDALONE
-	if (u16[0xffffef56] != 0)
+	if (sram.block_interrupts.u16 != 0)
 	{
 		set_status_register(0x2700)
 	}
@@ -264,7 +264,7 @@ function void fn00c320()
 
 #if !STANDALONE
 	u8[0xa130f1] = 0	// Disable SRAM
-	if (u16[0xffffef56] != 0)
+	if (sram.block_interrupts.u16 != 0)
 	{
 		set_status_register(0x2300)
 	}
@@ -313,7 +313,7 @@ function void fn00c376()
 	u16[A6] = D7.u16
 
 #if !STANDALONE
-	if (u16[0xffffef56] != 0)
+	if (sram.block_interrupts.u16 != 0)
 	{
 		set_status_register(0x2700)
 	}
@@ -342,7 +342,7 @@ function void fn00c376()
 
 #if !STANDALONE
 	u8[0xa130f1] = 0	// Disable SRAM
-	if (u16[0xffffef56] != 0)
+	if (sram.block_interrupts.u16 != 0)
 	{
 		set_status_register(0x2300)
 	}
@@ -353,7 +353,7 @@ function void fn00c376()
 //# address-hook(0x00c3c2) end(0x00c3c2)
 function void fn00c3c2()
 {
-	u8[0xffffef56] = 0xff
+	sram.block_interrupts.u8 = 0xff
 	fn00c3c6()
 }
 
@@ -493,7 +493,7 @@ function void SaveGameOnLevelFinished()
 
 
 //# address-hook(0x00c532) end(0x00c56c)
-function void fn00c532()
+function void UpdateLivesContinuesInSaveGame()
 {
 	if (global.lock_on_state == 0 && global.active_saveslot != 0)
 	{

@@ -60,7 +60,7 @@ function void CompetitionMode.MainMenu()
 	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
-	u32[0xffffef44] = 0xa85c
+	vint.update_subroutine = 0x00a85c
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -377,7 +377,7 @@ function void CompetitionMode.StageSelect()
 	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
-	u32[0xffffef44] = 0xa85c
+	vint.update_subroutine = 0x00a85c
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -484,7 +484,7 @@ function void CompetitionMode.StageSelect()
 			{
 				if (u16[0xffffe000] == 0xffa8 + getScreenExtend())
 				{
-					u32[0xffffef44] = 0xafc8
+					vint.update_subroutine = 0x00afc8
 				}
 				u16[0xffffe000] += 8
 			}
@@ -621,7 +621,7 @@ function void fn00afb2()
 //# address-hook(0x00afc8) end(0x00b000)
 function void fn00afc8()
 {
-	u32[0xffffef44] = 0xa85c
+	vint.update_subroutine = 0x00a85c
 
 	u16 vramAddress = 0xc204
 	VDP.setWriteIncrement(0x80)
@@ -802,7 +802,7 @@ function void fn00b2cc()
 	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
-	u32[0xffffef44] = 0xa85c
+	vint.update_subroutine = 0x00a85c
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -1289,7 +1289,7 @@ function void fn00b74e()
 	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
-	u32[0xffffef44] = 0x00a85c
+	vint.update_subroutine = 0x00a85c
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
@@ -1665,7 +1665,7 @@ function void fn00bc08()
 	A2 = 0xffff0000 + 0x20
 	fn00c006()
 
-	u32[0xffffef44] = 0x00a85c
+	vint.update_subroutine = 0x00a85c
 	global.frame_state = 0x1e
 	waitForNextFrame()
 

@@ -1934,6 +1934,111 @@ function void fn08635e()
 
 
 
+// Used only in level transition after MHZ 2
+
+//# address-hook(0x08638a) end(0x0863be)
+function void fn08638a()
+{
+	A1 = 0xffffb000
+	fn08639c()
+
+	A1 = 0xffffb04a
+	if (objA1.render_flags & render_flag.VISIBLE)
+	{
+		fn08639c()
+	}
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
+}
+
+function void fn08639c()
+{
+	D0.u16 = objA0.position.x.u16
+	if (D0.u16 < objA1.position.x.u16)
+	{
+		objA1.render_flags |= render_flag.FLIP_X
+		u8[A1 + 0x2a] |= char.flag.FACING_LEFT
+	}
+	else
+	{
+		objA1.render_flags &= ~render_flag.FLIP_X
+		u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
+	}
+}
+
+
+//# address-hook(0x0863c0) end(0x0863e6)
+function void fn0863c0()
+{
+	// Tails there?
+	if (u32[0xffffb04a] == 0)
+	{
+		UnloadObject()
+		return
+	}
+
+	player2.control_override = 1
+	tails.control_counter = 0
+
+	objA0.update_address = 0x0863d6
+	fn0863d6()
+}
+
+
+//# address-hook(0x0863d6)
+function void fn0863d6()
+{
+	if (player2.control_override != 0)
+	{
+		control.tails = 0
+	}
+	else
+	{
+		control.pad2 = 0
+		UnloadObject()
+	}
+}
+
+
+// Object that allows characters to just exit the level to the right
+//  -> Used at the end of LRZ 2 for Knuckles and after the LRZ Boss act for Sonic / Tails - in both cases leading to HPZ
+
+//# address-hook(0x0863ec) end(0x086422)
+function void fn0863ec()
+{
+#if STANDALONE
+	// Freeze camera just before reaching the actual trigger, so that the character actually leaves the screen
+	if (camera.position.x.u16 > objA0.position.x.u16 - getScreenWidth() - 0x30)
+	{
+		// Could have use "camera.use_forced_target" as well instead, but I guess this solution works well enough
+		player1.camera_lock = 1
+		move_area.left = camera.position.x.u16
+	}
+#endif
+
+	A1 = 0xffffb000
+	A2 = 0x086426
+	fn0858c8()
+	if (_equal())
+		return
+
+	if (isMainCharacter(CHARACTER_KNUCKLES) && global.zone == 0x09)
+	{
+		sram.block_interrupts.u8 = 0xff
+		SaveGameOnLevelFinished()
+	}
+
+	// Decode compact zone & act
+	//  -> objA0.subtype2c is using the binary form ZZZZZZZA - i.e. only the lowest bit is the act, the rest is the zone
+	u16 zone = objA0.subtype2c >> 1
+	u16 act = objA0.subtype2c & 0x01
+	TriggerNextZone((zone << 8) + act)
+}
+
+
+
 // Used at least by CNZ 2 boss and DEZ spikebonker
 
 //# address-hook(0x084e3a) end(0x084e4c)

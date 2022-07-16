@@ -260,8 +260,9 @@ function void fn05c2e0()
 	player.next_life_score = 5000
 	unused.player2.next_life_score = 5000
 	--continues_counter
-	u8[0xffffef56] = 0xff
-	fn00c532()
+
+	sram.block_interrupts.u8 = 0xff
+	UpdateLivesContinuesInSaveGame()
 }
 
 

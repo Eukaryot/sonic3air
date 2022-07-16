@@ -886,41 +886,6 @@ function void UpdateBackground.LRZ2()
 
 
 
-// Object that allows Knuckles to just exit the level to the right
-//  -> Also used in LRZ Boss act for Sonic / Tails, and possibly elsewhere
-
-//# address-hook(0x0863ec) end(0x086422)
-function void fn0863ec()
-{
-#if STANDALONE
-	// Freeze camera just before reaching the actual trigger, so that the character actually leaves the screen
-	if (camera.position.x.u16 > objA0.position.x.u16 - getScreenWidth() - 0x30)
-	{
-		// Could have use "camera.use_forced_target" as well instead, but I guess this solution works well enough
-		player1.camera_lock = 1
-		move_area.left = camera.position.x.u16
-	}
-#endif
-
-	A1 = 0xffffb000
-	A2 = 0x086426
-	fn0858c8()
-	if (_equal())
-		return
-
-	if (isMainCharacter(CHARACTER_KNUCKLES) && global.zone == 0x09)
-	{
-		u8[0xffffef56] = 0xff
-		SaveGameOnLevelFinished()
-	}
-
-	D0 = u16[A0 + 0x2c] >> 1
-	D0.u8 = (D0.u8 << 1) + (D0.u8 >> 7)
-	TriggerNextZone()
-}
-
-
-
 //-------------------------------------------------------//
 // Lava Reef Zone Boss                                   //
 //-------------------------------------------------------//

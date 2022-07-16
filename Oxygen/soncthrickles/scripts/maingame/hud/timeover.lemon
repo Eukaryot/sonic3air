@@ -20,8 +20,8 @@ function void fn02d5c6()
 
 	if (objA0.animation.sprite == 0)
 	{
-		u8[0xffffef56] = 0xff
-		fn00c532()
+		sram.block_interrupts.u8 = 0xff
+		UpdateLivesContinuesInSaveGame()
 	}
 
 	bool isLeft = ((objA0.animation.sprite & 0x01) == 0)

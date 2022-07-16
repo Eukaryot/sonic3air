@@ -377,8 +377,9 @@ function void fn045b94()
 
 		playMusic(MUSIC_CTRL_FADEOUT)
 
-		u8[0xffffef56] = 0xff
+		sram.block_interrupts.u8 = 0xff
 		SaveGameOnLevelFinished()
+
 		TriggerNextZone(0x0a01)
 	}
 	else
@@ -568,8 +569,9 @@ function void fn045c8e()
 		{
 			playMusic(MUSIC_CTRL_FADEOUT)
 
-			u8[0xffffef56] = 0xff
+			sram.block_interrupts.u8 = 0xff
 			SaveGameOnLevelFinished()
+
 			TriggerNextZone(0x0a00)
 		}
 	}

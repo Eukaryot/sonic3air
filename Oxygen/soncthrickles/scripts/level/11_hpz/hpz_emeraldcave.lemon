@@ -649,7 +649,7 @@ function void fn090e9a()
 		u16[A0 + 0x44] = A1.u16
 	}
 
-	u8[0xffffef56] = 0xff
+	sram.block_interrupts.u8 = 0xff
 	CheckSaveGameSlotAfterBlueSpheres()
 }
 

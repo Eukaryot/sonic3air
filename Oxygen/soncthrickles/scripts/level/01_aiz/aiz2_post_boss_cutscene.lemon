@@ -218,37 +218,3 @@ function void fn01e732()
 	}
 	DrawObject()
 }
-
-
-
-//# address-hook(0x0863c0) end(0x0863e6)
-function void fn0863c0()
-{
-	// Tails there?
-	if (u32[0xffffb04a] == 0)
-	{
-		UnloadObject()
-		return
-	}
-
-	player2.control_override = 1
-	tails.control_counter = 0
-
-	objA0.update_address = 0x0863d6
-	fn0863d6()
-}
-
-
-//# address-hook(0x0863d6)
-function void fn0863d6()
-{
-	if (player2.control_override != 0)
-	{
-		control.tails = 0
-	}
-	else
-	{
-		control.pad2 = 0
-		UnloadObject()
-	}
-}

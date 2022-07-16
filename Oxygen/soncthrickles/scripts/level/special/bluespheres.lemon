@@ -2455,7 +2455,8 @@ function void fn02df64()
 
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
-	u16[0xffffef56] = 0
+
+	sram.block_interrupts.u16 = 0
 	CheckSaveGameSlotAfterBlueSpheres()
 
 	competition_mode.active = 0
@@ -2509,7 +2510,7 @@ function void fn02df64()
 
 	Kosinski.addToDMAQueue(0x15babe, 0xa460)
 
-	u32[0xffffef44] = 0x02df62
+	vint.update_subroutine = 0x02df62
 
 	while (true)
 	{

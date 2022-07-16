@@ -256,6 +256,9 @@ define level.display_routine	= u16[0xffffeed2]
 // 0xffffeeea .. 0xffffef39
 // Vertical scroll offsets (2x 20 interleaved words for foreground and background, covering the 320 pixels of original screen width)
 
+
+define vint.update_subroutine				= u32[0xffffef44]	// Update sub-routine used inside the vertical interrupt function "fn000c3e"
+
 define competition_mode.menu.game_mode		=  u8[0xffffef48]	// 0 for Grand Prix, 1 for Match Race, 2 for Time Attack
 define competition_mode.menu.stage			=  u8[0xffffef4a]	// 0 for ALZ, 1 for BPZ, etc.
 define competition_mode.menu.items_toggle	=  u8[0xffffef4e]	// Toggles items spawn in competition mode, 0xff is off
@@ -266,6 +269,9 @@ define competition_mode.stage		=  u8[0xffffef4a]	// (DEPRECATED) 0 for ALZ, 1 fo
 
 define dataselect.slot_selected		=   u8[0xffffef4b]
 define dataselect.nosave_characters	=  u16[0xffffef4c]	// Current character(s) on display in No Save slot
+
+define sram.block_interrupts.u8		=  u8[0xffffef56]
+define sram.block_interrupts.u16	= u16[0xffffef56]
 
 define level.object_type_table		= u32[0xffffef5a]	// Address of lookup table that maps object type ID to object logic address
 define level.backup.rings			= u16[0xffffef5e]	// Stores ring count between level loading
@@ -281,7 +287,7 @@ define global.pause_disabled.u8		=  u8[0xffffef72]
 define rolling_demo.input_timer		=  u8[0xffffef78]	// Frames until next input change from pre-recorded rolling demo data is applied
 define rolling_demo.last_input		=  u8[0xffffef79]	// Last input during rolling demo
 define rolling_demo.pressed_start	=  u8[0xffffef50]	// Set to 0xff if manual Start button input was made during a rolling demo
-define rolling_demo.progress		=  u32[0xffffef52]	// How far into the demo sequence 
+define rolling_demo.progress		= u32[0xffffef52]	// How far into the demo sequence 
 
 
 // 0xfffff000 ... 0xfffff0ff
