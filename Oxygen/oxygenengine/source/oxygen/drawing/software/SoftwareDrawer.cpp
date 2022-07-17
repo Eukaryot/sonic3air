@@ -524,6 +524,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 				{
 					Blitter::Options options;
 					options.mUseAlphaBlending = mInternal.useAlphaBlending();
+					options.mTintColor = sc.mTintColor;
 
 					BitmapWrapper inputWrapper(sprite.accessBitmap());
 					if (mInternal.needSwapRedBlueChannels())

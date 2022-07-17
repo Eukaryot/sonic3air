@@ -39,6 +39,8 @@ namespace rmx
 
 	// Calculate Murmur2 64-bit hash for data
 	uint64 getMurmur2_64(const uint8* data, size_t bytes);
+	uint64 getMurmur2_64(const char* str);
+	uint64 getMurmur2_64(const wchar_t* str);
 	uint64 getMurmur2_64(const String& str);
 	uint64 getMurmur2_64(const WString& str);
 	uint64 getMurmur2_64(const std::string& str);

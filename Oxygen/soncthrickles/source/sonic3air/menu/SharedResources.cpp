@@ -34,7 +34,6 @@ namespace global
 	DrawerTexture mLevelSelectBackground;
 	DrawerTexture mPreviewBorder;
 	DrawerTexture mOptionsTopBar;
-	DrawerTexture mCharactersIcon[3];
 	DrawerTexture mCharSelectionBox;
 	DrawerTexture mAchievementsFrame;
 	DrawerTexture mPauseScreenUpperBG;
@@ -97,9 +96,6 @@ namespace global
 		FileHelper::loadTexture(mLevelSelectBackground, L"data/images/menu/levelselect_bg.png");
 		FileHelper::loadTexture(mPreviewBorder, L"data/images/menu/preview_border.png");
 		FileHelper::loadTexture(mOptionsTopBar, L"data/images/menu/options_topbar_bg.png");
-		FileHelper::loadTexture(mCharactersIcon[0], L"data/images/menu/charselect_sonic.png");
-		FileHelper::loadTexture(mCharactersIcon[1], L"data/images/menu/charselect_tails.png");
-		FileHelper::loadTexture(mCharactersIcon[2], L"data/images/menu/charselect_knuckles.png");
 		FileHelper::loadTexture(mCharSelectionBox, L"data/images/menu/charselectionbox.png");
 		FileHelper::loadTexture(mAchievementsFrame, L"data/images/menu/achievements_frame.png");
 		FileHelper::loadTexture(mPauseScreenUpperBG, L"data/images/menu/pause_screen_upper.png");

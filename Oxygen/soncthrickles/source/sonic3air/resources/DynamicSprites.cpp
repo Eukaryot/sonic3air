@@ -18,7 +18,7 @@ namespace
 	{
 		#define RETURN(key) \
 			{ \
-				static uint64 SPRITE_KEY = rmx::getMurmur2_64(std::string_view(key)); \
+				static uint64 SPRITE_KEY = rmx::getMurmur2_64(key); \
 				return SPRITE_KEY; \
 			}
 
@@ -98,16 +98,16 @@ void DynamicSprites::updateSpriteRedirects()
 
 	const InputManager::ControllerScheme& keys = inputManager.getController(0);
 
-	static const uint64 INPUT_ICON_BUTTON_A     = rmx::getMurmur2_64(std::string_view("@input_icon_button_A"));
-	static const uint64 INPUT_ICON_BUTTON_B     = rmx::getMurmur2_64(std::string_view("@input_icon_button_B"));
-	static const uint64 INPUT_ICON_BUTTON_X     = rmx::getMurmur2_64(std::string_view("@input_icon_button_X"));
-	static const uint64 INPUT_ICON_BUTTON_Y     = rmx::getMurmur2_64(std::string_view("@input_icon_button_Y"));
-	static const uint64 INPUT_ICON_BUTTON_LEFT  = rmx::getMurmur2_64(std::string_view("@input_icon_button_left"));
-	static const uint64 INPUT_ICON_BUTTON_RIGHT = rmx::getMurmur2_64(std::string_view("@input_icon_button_right"));
-	static const uint64 INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64(std::string_view("@input_icon_button_up"));
-	static const uint64 INPUT_ICON_BUTTON_DOWN  = rmx::getMurmur2_64(std::string_view("@input_icon_button_down"));
-	static const uint64 INPUT_ICON_BUTTON_START = rmx::getMurmur2_64(std::string_view("@input_icon_button_start"));
-	static const uint64 INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64(std::string_view("@input_icon_button_back"));
+	static const uint64 INPUT_ICON_BUTTON_A     = rmx::getMurmur2_64("@input_icon_button_A");
+	static const uint64 INPUT_ICON_BUTTON_B     = rmx::getMurmur2_64("@input_icon_button_B");
+	static const uint64 INPUT_ICON_BUTTON_X     = rmx::getMurmur2_64("@input_icon_button_X");
+	static const uint64 INPUT_ICON_BUTTON_Y     = rmx::getMurmur2_64("@input_icon_button_Y");
+	static const uint64 INPUT_ICON_BUTTON_LEFT  = rmx::getMurmur2_64("@input_icon_button_left");
+	static const uint64 INPUT_ICON_BUTTON_RIGHT = rmx::getMurmur2_64("@input_icon_button_right");
+	static const uint64 INPUT_ICON_BUTTON_UP    = rmx::getMurmur2_64("@input_icon_button_up");
+	static const uint64 INPUT_ICON_BUTTON_DOWN  = rmx::getMurmur2_64("@input_icon_button_down");
+	static const uint64 INPUT_ICON_BUTTON_START = rmx::getMurmur2_64("@input_icon_button_start");
+	static const uint64 INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64("@input_icon_button_back");
 
 	SpriteCache& spriteCache = SpriteCache::instance();
 	switch (mLastInputType)
@@ -129,16 +129,16 @@ void DynamicSprites::updateSpriteRedirects()
 
 		case InputManager::InputType::GAMEPAD:
 		{
-			static const uint64 INPUT_ICON_XBOX_A     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_A"));
-			static const uint64 INPUT_ICON_XBOX_B     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_B"));
-			static const uint64 INPUT_ICON_XBOX_X     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_X"));
-			static const uint64 INPUT_ICON_XBOX_Y     = rmx::getMurmur2_64(std::string_view("input_icon_xbox_Y"));
-			static const uint64 INPUT_ICON_XBOX_LEFT  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_left"));
-			static const uint64 INPUT_ICON_XBOX_RIGHT = rmx::getMurmur2_64(std::string_view("input_icon_xbox_right"));
-			static const uint64 INPUT_ICON_XBOX_UP    = rmx::getMurmur2_64(std::string_view("input_icon_xbox_up"));
-			static const uint64 INPUT_ICON_XBOX_DOWN  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_down"));
-			static const uint64 INPUT_ICON_XBOX_START = rmx::getMurmur2_64(std::string_view("input_icon_xbox_start"));
-			static const uint64 INPUT_ICON_XBOX_BACK  = rmx::getMurmur2_64(std::string_view("input_icon_xbox_back"));
+			static const uint64 INPUT_ICON_XBOX_A     = rmx::getMurmur2_64("input_icon_xbox_A");
+			static const uint64 INPUT_ICON_XBOX_B     = rmx::getMurmur2_64("input_icon_xbox_B");
+			static const uint64 INPUT_ICON_XBOX_X     = rmx::getMurmur2_64("input_icon_xbox_X");
+			static const uint64 INPUT_ICON_XBOX_Y     = rmx::getMurmur2_64("input_icon_xbox_Y");
+			static const uint64 INPUT_ICON_XBOX_LEFT  = rmx::getMurmur2_64("input_icon_xbox_left");
+			static const uint64 INPUT_ICON_XBOX_RIGHT = rmx::getMurmur2_64("input_icon_xbox_right");
+			static const uint64 INPUT_ICON_XBOX_UP    = rmx::getMurmur2_64("input_icon_xbox_up");
+			static const uint64 INPUT_ICON_XBOX_DOWN  = rmx::getMurmur2_64("input_icon_xbox_down");
+			static const uint64 INPUT_ICON_XBOX_START = rmx::getMurmur2_64("input_icon_xbox_start");
+			static const uint64 INPUT_ICON_XBOX_BACK  = rmx::getMurmur2_64("input_icon_xbox_back");
 
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_XBOX_A);
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_XBOX_B);

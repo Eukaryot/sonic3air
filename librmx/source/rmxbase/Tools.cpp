@@ -136,6 +136,17 @@ namespace rmx
 		return getMurmur2_64((const uint8*)*str, str.length() * sizeof(wchar_t));
 	}
 
+	uint64 getMurmur2_64(const char* str)
+	{
+		return getMurmur2_64((const uint8*)str, strlen(str) * sizeof(char));
+	}
+
+	uint64 getMurmur2_64(const wchar_t* str)
+	{
+		// Note that this is *not* platform-independent
+		return getMurmur2_64((const uint8*)str, wcslen(str) * sizeof(wchar_t));
+	}
+
 	uint64 getMurmur2_64(const std::string& str)
 	{
 		return getMurmur2_64((const uint8*)&str[0], str.length() * sizeof(char));

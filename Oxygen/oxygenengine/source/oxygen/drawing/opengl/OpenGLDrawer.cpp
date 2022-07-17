@@ -474,11 +474,14 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 
 				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
 				const Vec4f rectParam = mInternal.getTransformOfRectInViewport(Recti(sc.mPosition + sprite.mOffset, sprite.getBitmap().getSize()));
+				const bool needsTintColor = (sc.mTintColor != Color::WHITE);
 
-				Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(false, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
+				Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
 				shader.bind();
 				shader.setParam("Transform", rectParam);
 				shader.setTexture("Texture", texture->getHandle(), GL_TEXTURE_2D);
+				if (needsTintColor)
+					shader.setParam("TintColor", sc.mTintColor);
 
 				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
 				break;

@@ -37,7 +37,6 @@ namespace global
 	extern DrawerTexture mLevelSelectBackground;
 	extern DrawerTexture mPreviewBorder;
 	extern DrawerTexture mOptionsTopBar;
-	extern DrawerTexture mCharactersIcon[3];
 	extern DrawerTexture mCharSelectionBox;
 	extern DrawerTexture mAchievementsFrame;
 	extern DrawerTexture mPauseScreenUpperBG;
