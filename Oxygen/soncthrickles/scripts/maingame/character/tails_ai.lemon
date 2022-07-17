@@ -438,39 +438,38 @@ function void fn013bf8()
 	D3.u8 = posbackup.offset.player1 - 0x44
 	tails.flight_target.x = u16[0xffffe500 + D3.u8]
 	tails.flight_target.y = u16[0xffffe500 + D3.u8 + 2]
-	D0.u16 = char.position.x.u16 - tails.flight_target.x
-	if (D0.u16 != 0)
+
+	s16 dx = char.position.x.u16 - tails.flight_target.x
+	if (dx != 0)
 	{
-		D2.u16 = min(abs(D0.s16) >> 4, 12)
-		D1.u8 = abs(s8[A1 + 0x18])
-		D2.u8 += D1.u8 + 1
-		if (D0.s16 >= 0)
+		s16 moveX = min(abs(dx) >> 4, 12)
+		moveX += abs(objA1.velocity.x) + 1
+		if (dx >= 0)
 		{
 			char.flags |= char.flag.FACING_LEFT
-			if (D2.u16 >= D0.u16)
+			if (moveX >= dx)
 			{
-				D2.u16 = D0.u16
-				D0 = 0
+				moveX = dx
+				dx = 0
 			}
-			D2.s16 = -D2.s16
+			char.position.x.u16 -= moveX
 		}
 		else
 		{
 			char.flags &= ~char.flag.FACING_LEFT
-			D0.s16 = -D0.s16
-			if (D2.u16 >= D0.u16)
+			dx = -dx
+			if (moveX >= dx)
 			{
-				D2.u8 = D0.u8
-				D0 = 0
+				moveX = dx
+				dx = 0
 			}
+			char.position.x.u16 += moveX
 		}
-		char.position.x.u16 += D2.u16
 	}
 
-	D1.s16 = char.position.y.u16 - tails.flight_target.y
-	if (D1.s16 != 0)
+	s16 dy = char.position.y.u16 - tails.flight_target.y
+	if (dy != 0)
 	{
-		s16 dy = D1.s16
 	#if STANDALONE
 		// Consider vertical level wrap
 		if (level.vertical_wrap == 0xff00)
@@ -484,39 +483,40 @@ function void fn013bf8()
 	}
 
 	D2.u8 = u8[0xffffe400 + D3.u8 + 2] & 0x80
-	if (D2.u8 == 0)
+	if (D2.u8 == 0 && u8[0xffffb000 + 0x05] < 0x06)
 	{
-		D1.u16 |= D0.u16
-		if (u8[0xffffb000 + 0x05] < 0x06)
+	#if STANDALONE
+		// Let Tails drop down when close enough to either the target point or the main character's current position
+		bool gainControlNow = (abs(dx) <= 4 && abs(dy) <= 4)
+		gainControlNow = gainControlNow || (abs(objA1.position.x.u16 - char.position.x.u16) <= 4 && abs(objA1.position.y.u16 - char.position.y.u16) <= 4)
+
+		// Allow for pressing a jump button to gain control over Tails at once
+		gainControlNow = gainControlNow || (control.tails.pressed & CONTROL_ABC)
+	#else
+		bool gainControlNow = (dx == 0 && dy == 0)
+	#endif
+
+		if (gainControlNow)
 		{
-			bool gainControlNow = false
-		#if STANDALONE
-			// Allow for pressing a jump button to gain control over Tails at once
-			gainControlNow = (control.tails.pressed & CONTROL_ABC)
-		#endif
+			tails.ai_routine = 0x06
+			char.control_flags = 0
+			char.state = char.state.RUNNING
+			char.velocity.x = 0
+			char.velocity.y = 0
+			char.groundspeed = 0
+			char.flags &= char.flag.UNDERWATER
+			char.flags |= char.flag.IN_AIR
+			char.hlock_countdown = 0
+			char.sprite_attributes = (char.sprite_attributes & ~sprite_attribute.PRIORITY) | (objA1.sprite_attributes & sprite_attribute.PRIORITY)
+			char.layer_flags1 = u8[A1 + 0x46]
+			char.layer_flags2 = u8[A1 + 0x47]
 
-			if (D1.u16 == 0 || gainControlNow)
+			if (gainControlNow)
 			{
-				tails.ai_routine = 0x06
-				char.control_flags = 0
-				char.state = char.state.RUNNING
-				char.velocity.x = 0
-				char.velocity.y = 0
-				char.groundspeed = 0
-				char.flags &= char.flag.UNDERWATER
-				char.flags |= char.flag.IN_AIR
-				char.hlock_countdown = 0
-				char.sprite_attributes = (char.sprite_attributes & ~sprite_attribute.PRIORITY) | (objA1.sprite_attributes & sprite_attribute.PRIORITY)
-				char.layer_flags1 = u8[A1 + 0x46]
-				char.layer_flags2 = u8[A1 + 0x47]
-
-				if (gainControlNow)
-				{
-					// Roll instead
-					char.state = char.state.ROLLING
-				}
-				return
+				// Roll instead
+				char.state = char.state.ROLLING
 			}
+			return
 		}
 	}
 	char.control_flags = 0x81
