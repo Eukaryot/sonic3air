@@ -63,7 +63,6 @@ namespace global
 
 		fontCollection.registerManagedFont(mFont3, "smallfont");
 		mFont3.addFontProcessor(outlineFontProcessorTransparent);
-		mFont3.addFontProcessor(shadowFontProcessor);
 
 		fontCollection.registerManagedFont(mFont4, "oxyfont_tiny");
 		mFont4.addFontProcessor(outlineFontProcessor);
