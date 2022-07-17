@@ -19,6 +19,7 @@ public:
 
 	void setIdentity();
 	void setRotationByAngle(float angle);
+	void setRotationAndScale(float angle, Vec2f scale);
 	void setByMatrix(float a, float b, float c, float d);
 
 	void applyScale(float scale);

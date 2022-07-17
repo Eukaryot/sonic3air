@@ -39,6 +39,20 @@ void Transform2D::setRotationByAngle(float angle)
 	mInverse[3] =  cos_;
 }
 
+void Transform2D::setRotationAndScale(float angle, Vec2f scale)
+{
+	const float sin_ = std::sin(angle);
+	const float cos_ = std::cos(angle);
+	mMatrix[0] =  cos_ * scale.x;
+	mMatrix[1] = -sin_ * scale.y;
+	mMatrix[2] =  sin_ * scale.x;
+	mMatrix[3] =  cos_ * scale.y;
+	mInverse[0] =  cos_ / scale.x;
+	mInverse[1] =  sin_ / scale.x;
+	mInverse[2] = -sin_ / scale.y;
+	mInverse[3] =  cos_ / scale.y;
+}
+
 void Transform2D::setByMatrix(float a, float b, float c, float d)
 {
 	mMatrix[0] = a;

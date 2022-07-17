@@ -838,6 +838,11 @@ namespace
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, (float)scale / 65536.0f);
 	}
 
+	void Renderer_drawCustomSpriteTinted2(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scaleX, int32 scaleY)
+	{
+		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, Vec2f((float)scaleX, (float)scaleY) / 65536.0f);
+	}
+
 	void Renderer_drawCustomSpriteTransformed(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
 	{
 		Transform2D transformation;
@@ -1667,6 +1672,18 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(6, "angle")
 			.setParameterInfo(7, "tintColor")
 			.setParameterInfo(8, "scale");
+
+		module.addNativeFunction("Renderer.drawCustomSpriteTinted", lemon::wrap(&Renderer_drawCustomSpriteTinted2), defaultFlags)
+			.setParameterInfo(0, "key")
+			.setParameterInfo(1, "px")
+			.setParameterInfo(2, "py")
+			.setParameterInfo(3, "atex")
+			.setParameterInfo(4, "flags")
+			.setParameterInfo(5, "renderQueue")
+			.setParameterInfo(6, "angle")
+			.setParameterInfo(7, "tintColor")
+			.setParameterInfo(8, "scaleX")
+			.setParameterInfo(9, "scaleY");
 
 		module.addNativeFunction("Renderer.drawCustomSpriteTransformed", lemon::wrap(&Renderer_drawCustomSpriteTransformed), defaultFlags)
 			.setParameterInfo(0, "key")

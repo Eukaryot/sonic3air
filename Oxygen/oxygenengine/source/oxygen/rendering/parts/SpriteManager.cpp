@@ -191,11 +191,19 @@ void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint8 at
 	drawCustomSpriteWithTransform(key, position, atex, flags, renderQueue, tintColor, transformation);
 }
 
+void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, Vec2f scale)
+{
+	Transform2D transformation;
+	transformation.setRotationAndScale(angle, scale);
+	drawCustomSpriteWithTransform(key, position, atex, flags, renderQueue, tintColor, transformation);
+}
+
 void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation)
 {
 	// Flags:
 	//  - 0x01 = Flip X
 	//  - 0x02 = Flip Y
+	//  - 0x08 = Pixel upscaling
 	//  - 0x10 = Fully opaque	-- TODO: This is only supported by software renderer
 	//  - 0x20 = World space
 	//  - 0x40 = Priority flag
@@ -236,7 +244,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	sprite.mPriorityFlag = (flags & 0x40) != 0;
 	sprite.mPosition = position;
 	sprite.mPivotOffset = item->mSprite->mOffset;
-	sprite.mFullyOpaque = ((flags & 0x10) != 0);
+	sprite.mFullyOpaque = (flags & 0x10) != 0;
 	sprite.mCoordinatesSpace = ((flags & 0x20) != 0) ? Space::WORLD : Space::SCREEN;
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
 	sprite.mTransformation = transformation;
@@ -265,7 +273,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	// For smoother rotation, use upscaled version of this sprite when actually rotating
 	//  -> This is basically the Fast SpriteRot algorithm (also see "applyScale3x" in PaletteSprite.cpp)
 	//  -> Currently only implemented for palette sprites, but could be added for component sprites as well if needed
-	if (!item->mUsesComponentSprite && sprite.mTransformation.hasRotationOrScale())
+	if (!item->mUsesComponentSprite && sprite.mTransformation.hasRotationOrScale() && (flags & 0x08) == 0)
 	{
 		sprite.mUseUpscaledSprite = true;
 
