@@ -37,7 +37,7 @@ namespace lemon
 		};
 
 	public:
-		ControlFlow(Runtime& runtime);
+		explicit ControlFlow(Runtime& runtime);
 
 		inline Runtime& getRuntime()  { return mRuntime; }
 		inline const Program& getProgram()  { return *mProgram; }

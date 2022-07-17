@@ -65,7 +65,7 @@ namespace lemon
 					{
 						const uint64 nameAndSignatureHash = (uint32)opcodes[k].mParameter;
 						const Function* function = program.getFunctionBySignature(nameAndSignatureHash);
-						if (nullptr != function && function->getType() == Function::Type::USER)
+						if (nullptr != function && function->getType() == Function::Type::NATIVE)
 						{
 							const int programCounter = (int)(k + 1);
 							if (newPC == -1 || std::abs(programCounter - oldPC) < std::abs(newPC - oldPC))
@@ -291,13 +291,13 @@ namespace lemon
 				break;
 			}
 
-			case Function::Type::USER:
+			case Function::Type::NATIVE:
 			{
-				const UserDefinedFunction& func = static_cast<const UserDefinedFunction&>(function);
+				const NativeFunction& func = static_cast<const NativeFunction&>(function);
 
 				// Directly execute it
 				mActiveControlFlow = mSelectedControlFlow;
-				func.execute(UserDefinedFunction::Context(*mSelectedControlFlow));
+				func.execute(NativeFunction::Context(*mSelectedControlFlow));
 				mActiveControlFlow = nullptr;
 				break;
 			}
@@ -459,12 +459,12 @@ namespace lemon
 
 					case Opcode::Type::CALL:
 					{
-						// Inline execution of user-defined function, if possible here
+						// Inline execution of native function, if possible here
 						//  -> Note that this optimization is actually hardly ever used, thanks to the CALL runtime opcode replacement in OptimizedOpcodeProvider
 						if (context.mOpcode->mFlags & RuntimeOpcode::FLAG_CALL_INLINE_RESOLVED)
 						{
-							const UserDefinedFunction& func = *context.mOpcode->getParameter<const UserDefinedFunction*>();
-							func.execute(UserDefinedFunction::Context(*mSelectedControlFlow));
+							const NativeFunction& func = *context.mOpcode->getParameter<const NativeFunction*>();
+							func.execute(NativeFunction::Context(*mSelectedControlFlow));
 							break;
 						}
 						else
@@ -565,9 +565,9 @@ namespace lemon
 				runtimeOpcode.setParameter(function);
 				runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED;
 
-				if (function->getType() == Function::Type::USER)
+				if (function->getType() == Function::Type::NATIVE)
 				{
-					if (static_cast<const UserDefinedFunction*>(function)->mFlags & UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION)
+					if (static_cast<const NativeFunction*>(function)->mFlags & NativeFunction::FLAG_ALLOW_INLINE_EXECUTION)
 					{
 						runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_INLINE_RESOLVED;
 					}

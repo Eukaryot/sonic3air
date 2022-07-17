@@ -16,7 +16,7 @@ namespace lemon
 {
 	class Function;
 	class Program;
-	class UserDefinedFunction;
+	class NativeFunction;
 	class Variable;
 	struct RuntimeOpcode;
 
@@ -68,8 +68,8 @@ namespace lemon
 	class API_EXPORT RuntimeDetailHandler
 	{
 	public:
-		virtual void preExecuteExternalFunction(const UserDefinedFunction& function, const ControlFlow& controlFlow)  {}
-		virtual void postExecuteExternalFunction(const UserDefinedFunction& function, const ControlFlow& controlFlow) {}
+		virtual void preExecuteExternalFunction(const NativeFunction& function, const ControlFlow& controlFlow)  {}
+		virtual void postExecuteExternalFunction(const NativeFunction& function, const ControlFlow& controlFlow) {}
 	};
 
 

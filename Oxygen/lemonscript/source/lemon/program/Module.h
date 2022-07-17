@@ -52,7 +52,7 @@ namespace lemon
 		const Function* getFunctionByUniqueId(uint64 uniqueId) const;
 
 		ScriptFunction& addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters = nullptr);
-		UserDefinedFunction& addUserDefinedFunction(FlyweightString name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags = 0);
+		NativeFunction& addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, uint8 flags = 0);
 
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
@@ -98,7 +98,7 @@ namespace lemon
 		std::vector<Function*> mFunctions;
 		std::vector<ScriptFunction*> mScriptFunctions;
 		ObjectPool<ScriptFunction, 64> mScriptFunctionPool;
-		ObjectPool<UserDefinedFunction, 16> mUserDefinedFunctionPool;
+		ObjectPool<NativeFunction, 32> mNativeFunctionPool;
 
 		// Variables
 		uint32 mFirstVariableID = 0;

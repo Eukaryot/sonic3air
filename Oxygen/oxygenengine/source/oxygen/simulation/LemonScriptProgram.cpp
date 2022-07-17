@@ -117,7 +117,7 @@ void LemonScriptProgram::startup()
 {
 	Configuration& config = Configuration::instance();
 
-	// Register script bindings (user-defined variables and functions)
+	// Register script bindings (user-defined variables and native functions)
 	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
 	//           and this in turn is the reason why there's a need for this separate startup function at all...
 	mInternal.mLemonScriptBindings.registerBindings(mInternal.mCoreModule);
@@ -538,6 +538,6 @@ void LemonScriptProgram::resolveLocation(const lemon::Function& function, uint32
 	}
 	else
 	{
-		scriptFilename = *String(0, "<user-defined function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
+		scriptFilename = *String(0, "<native function '%.*s'>", function.getName().getString().length(), function.getName().getString().data());
 	}
 }

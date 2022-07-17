@@ -80,14 +80,14 @@ namespace lemon
 		// Functions
 		for (Function* func : mFunctions)
 		{
-			if (func->getType() == Function::Type::USER)
-				mUserDefinedFunctionPool.destroyObject(*static_cast<UserDefinedFunction*>(func));
+			if (func->getType() == Function::Type::NATIVE)
+				mNativeFunctionPool.destroyObject(*static_cast<NativeFunction*>(func));
 			else
 				mScriptFunctionPool.destroyObject(*static_cast<ScriptFunction*>(func));
 		}
 		mFunctions.clear();
 		mScriptFunctions.clear();
-		mUserDefinedFunctionPool.clear();
+		mNativeFunctionPool.clear();
 		mScriptFunctionPool.clear();
 
 		// Variables
@@ -217,9 +217,9 @@ namespace lemon
 		return func;
 	}
 
-	UserDefinedFunction& Module::addUserDefinedFunction(FlyweightString name, const UserDefinedFunction::FunctionWrapper& functionWrapper, uint8 flags)
+	NativeFunction& Module::addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, uint8 flags)
 	{
-		UserDefinedFunction& func = mUserDefinedFunctionPool.createObject();
+		NativeFunction& func = mNativeFunctionPool.createObject();
 		func.mName = name;
 		func.setFunction(functionWrapper);
 		func.mFlags = flags;
@@ -444,7 +444,7 @@ namespace lemon
 						parameters[k].mType = DataTypeHelper::readDataType(serializer);
 					}
 
-					if (type == Function::Type::USER)
+					if (type == Function::Type::NATIVE)
 					{
 						// TODO: Check if it's there already and uses the same ID
 					}

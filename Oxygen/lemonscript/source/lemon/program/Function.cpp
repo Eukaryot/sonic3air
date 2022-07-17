@@ -209,14 +209,14 @@ namespace lemon
 	}
 
 
-	void UserDefinedFunction::setFunction(const FunctionWrapper& functionWrapper)
+	void NativeFunction::setFunction(const FunctionWrapper& functionWrapper)
 	{
 		mFunctionWrapper = &functionWrapper;
 		mReturnType = functionWrapper.getReturnType();
 		setParametersByTypes(functionWrapper.getParameterTypes());
 	}
 
-	UserDefinedFunction& UserDefinedFunction::setParameterInfo(size_t index, const std::string& identifier)
+	NativeFunction& NativeFunction::setParameterInfo(size_t index, const std::string& identifier)
 	{
 		RMX_ASSERT(index < mParameters.size(), "Invalid parameter index " << index);
 		RMX_ASSERT(!mParameters[index].mName.isValid(), "Parameter identifier is already set for index " << index);
@@ -224,7 +224,7 @@ namespace lemon
 		return *this;
 	}
 
-	void UserDefinedFunction::execute(const Context context) const
+	void NativeFunction::execute(const Context context) const
 	{
 		RuntimeDetailHandler* runtimeDetailHandler = context.mControlFlow.getRuntime().getRuntimeDetailHandler();
 		if (nullptr != runtimeDetailHandler)

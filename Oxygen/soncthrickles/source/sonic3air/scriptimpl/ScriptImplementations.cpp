@@ -109,18 +109,18 @@ namespace s3air
 
 void ScriptImplementations::registerScriptBindings(lemon::Module& module)
 {
-	const uint8 defaultFlags = lemon::UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
-	module.addUserDefinedFunction("Kosinski.Decompress", lemon::wrap(&s3air::kosinskiDecompress), defaultFlags);
-	module.addUserDefinedFunction("WriteScrollOffsets", lemon::wrap(&s3air::writeScrollOffsets), defaultFlags);
-	module.addUserDefinedFunction("WriteScrollOffsetsFlipped", lemon::wrap(&s3air::writeScrollOffsetsFlipped), defaultFlags);
+	const uint8 defaultFlags = lemon::NativeFunction::FLAG_ALLOW_INLINE_EXECUTION;
+	module.addNativeFunction("Kosinski.Decompress", lemon::wrap(&s3air::kosinskiDecompress), defaultFlags);
+	module.addNativeFunction("WriteScrollOffsets", lemon::wrap(&s3air::writeScrollOffsets), defaultFlags);
+	module.addNativeFunction("WriteScrollOffsetsFlipped", lemon::wrap(&s3air::writeScrollOffsetsFlipped), defaultFlags);
 
-	module.addUserDefinedFunction("putNybbles", lemon::wrap(&s3air::putNybbles), defaultFlags)
+	module.addNativeFunction("putNybbles", lemon::wrap(&s3air::putNybbles), defaultFlags)
 		.setParameterInfo(0, "input")
 		.setParameterInfo(1, "count")
 		.setParameterInfo(2, "value");
 
 	// TEST!
-	module.addUserDefinedFunction("uncompressKosinskiData", lemon::wrap(&s3air::decompressKosinskiData), defaultFlags)
+	module.addNativeFunction("uncompressKosinskiData", lemon::wrap(&s3air::decompressKosinskiData), defaultFlags)
 		.setParameterInfo(0, "sourceAddress")
 		.setParameterInfo(1, "targetInVRAM");
 }

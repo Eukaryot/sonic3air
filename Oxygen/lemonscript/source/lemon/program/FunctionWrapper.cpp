@@ -30,13 +30,13 @@ namespace lemon
 	namespace internal
 	{
 		template<>
-		void handleResult(StringRef result, const UserDefinedFunction::Context context)
+		void handleResult(StringRef result, const NativeFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.getHash());
 		};
 
 		template<>
-		StringRef popStackGeneric(const UserDefinedFunction::Context context)
+		StringRef popStackGeneric(const NativeFunction::Context context)
 		{
 			const uint64 stringHash = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
 			const FlyweightString* str = context.mControlFlow.getRuntime().resolveStringByKey(stringHash);

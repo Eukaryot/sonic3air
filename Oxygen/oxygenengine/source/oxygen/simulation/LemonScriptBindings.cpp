@@ -1227,9 +1227,9 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 	// Standard library
 	lemon::StandardLibrary::registerBindings(module);
 
-	const uint8 defaultFlags = lemon::UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
-	module.addUserDefinedFunction("assert", lemon::wrap(&scriptAssert1), defaultFlags);
-	module.addUserDefinedFunction("assert", lemon::wrap(&scriptAssert2), defaultFlags);
+	const uint8 defaultFlags = lemon::NativeFunction::FLAG_ALLOW_INLINE_EXECUTION;
+	module.addNativeFunction("assert", lemon::wrap(&scriptAssert1), defaultFlags);
+	module.addNativeFunction("assert", lemon::wrap(&scriptAssert2), defaultFlags);
 
 	// Emulator interface bindings
 	{
@@ -1262,109 +1262,109 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		}
 
 		// Query flags
-		module.addUserDefinedFunction("_equal", lemon::wrap(&checkFlags_equal), defaultFlags);
-		module.addUserDefinedFunction("_negative", lemon::wrap(&checkFlags_negative), defaultFlags);
+		module.addNativeFunction("_equal", lemon::wrap(&checkFlags_equal), defaultFlags);
+		module.addNativeFunction("_negative", lemon::wrap(&checkFlags_negative), defaultFlags);
 
 		// Explictly set flags
-		module.addUserDefinedFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags)
+		module.addNativeFunction("_setZeroFlagByValue", lemon::wrap(&setZeroFlagByValue), defaultFlags)
 			.setParameterInfo(0, "value");
 
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int8>), defaultFlags)
+		module.addNativeFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int8>), defaultFlags)
 			.setParameterInfo(0, "value");
 
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int16>), defaultFlags)
+		module.addNativeFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int16>), defaultFlags)
 			.setParameterInfo(0, "value");
 
-		module.addUserDefinedFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int32>), defaultFlags)
+		module.addNativeFunction("_setNegativeFlagByValue", lemon::wrap(&setNegativeFlagByValue<int32>), defaultFlags)
 			.setParameterInfo(0, "value");
 
 
 		// Memory access
-		module.addUserDefinedFunction("copyMemory", lemon::wrap(&copyMemory), defaultFlags)
+		module.addNativeFunction("copyMemory", lemon::wrap(&copyMemory), defaultFlags)
 			.setParameterInfo(0, "destAddress")
 			.setParameterInfo(1, "sourceAddress")
 			.setParameterInfo(2, "bytes");
 
-		module.addUserDefinedFunction("zeroMemory", lemon::wrap(&zeroMemory), defaultFlags)
+		module.addNativeFunction("zeroMemory", lemon::wrap(&zeroMemory), defaultFlags)
 			.setParameterInfo(0, "startAddress")
 			.setParameterInfo(1, "bytes");
 
-		module.addUserDefinedFunction("fillMemory_u8", lemon::wrap(&fillMemory_u8), defaultFlags)
+		module.addNativeFunction("fillMemory_u8", lemon::wrap(&fillMemory_u8), defaultFlags)
 			.setParameterInfo(0, "startAddress")
 			.setParameterInfo(1, "bytes")
 			.setParameterInfo(2, "value");
 
-		module.addUserDefinedFunction("fillMemory_u16", lemon::wrap(&fillMemory_u16), defaultFlags)
+		module.addNativeFunction("fillMemory_u16", lemon::wrap(&fillMemory_u16), defaultFlags)
 			.setParameterInfo(0, "startAddress")
 			.setParameterInfo(1, "bytes")
 			.setParameterInfo(2, "value");
 
-		module.addUserDefinedFunction("fillMemory_u32", lemon::wrap(&fillMemory_u32), defaultFlags)
+		module.addNativeFunction("fillMemory_u32", lemon::wrap(&fillMemory_u32), defaultFlags)
 			.setParameterInfo(0, "startAddress")
 			.setParameterInfo(1, "bytes")
 			.setParameterInfo(2, "value");
 
 
 		// Push and pop
-		module.addUserDefinedFunction("push", lemon::wrap(&push), defaultFlags);
-		module.addUserDefinedFunction("pop", lemon::wrap(&pop), defaultFlags);
+		module.addNativeFunction("push", lemon::wrap(&push), defaultFlags);
+		module.addNativeFunction("pop", lemon::wrap(&pop), defaultFlags);
 
 
 		// Persistent data
-		module.addUserDefinedFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData), defaultFlags)
+		module.addNativeFunction("System.loadPersistentData", lemon::wrap(&System_loadPersistentData), defaultFlags)
 			.setParameterInfo(0, "targetAddress")
 			.setParameterInfo(1, "key")
 			.setParameterInfo(2, "bytes");
 
-		module.addUserDefinedFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
+		module.addNativeFunction("System.savePersistentData", lemon::wrap(&System_savePersistentData), defaultFlags)
 			.setParameterInfo(0, "sourceAddress")
 			.setParameterInfo(1, "key")
 			.setParameterInfo(2, "bytes");
 
 
 		// SRAM
-		module.addUserDefinedFunction("SRAM.load", lemon::wrap(&SRAM_load), defaultFlags)
+		module.addNativeFunction("SRAM.load", lemon::wrap(&SRAM_load), defaultFlags)
 			.setParameterInfo(0, "address")
 			.setParameterInfo(1, "offset")
 			.setParameterInfo(2, "bytes");
 
-		module.addUserDefinedFunction("SRAM.save", lemon::wrap(&SRAM_save), defaultFlags)
+		module.addNativeFunction("SRAM.save", lemon::wrap(&SRAM_save), defaultFlags)
 			.setParameterInfo(0, "address")
 			.setParameterInfo(1, "offset")
 			.setParameterInfo(2, "bytes");
 
 
 		// System
-		module.addUserDefinedFunction("System.callFunctionByName", lemon::wrap(&System_callFunctionByName))	// Should not get inline executed
+		module.addNativeFunction("System.callFunctionByName", lemon::wrap(&System_callFunctionByName))	// Should not get inline executed
 			.setParameterInfo(0, "functionName");
 
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1))		// Should not get inline executed
+		module.addNativeFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame1))		// Should not get inline executed
 			.setParameterInfo(0, "functionName");
 
-		module.addUserDefinedFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))		// Should not get inline executed
+		module.addNativeFunction("System.setupCallFrame", lemon::wrap(&System_setupCallFrame2))		// Should not get inline executed
 			.setParameterInfo(0, "functionName")
 			.setParameterInfo(1, "labelName");
 
-		module.addUserDefinedFunction("System.getGlobalVariableValueByName", lemon::wrap(&System_getGlobalVariableValueByName), defaultFlags)
+		module.addNativeFunction("System.getGlobalVariableValueByName", lemon::wrap(&System_getGlobalVariableValueByName), defaultFlags)
 			.setParameterInfo(0, "variableName");
 
-		module.addUserDefinedFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByName), defaultFlags)
+		module.addNativeFunction("System.setGlobalVariableValueByName", lemon::wrap(&System_setGlobalVariableValueByName), defaultFlags)
 			.setParameterInfo(0, "variableName")
 			.setParameterInfo(1, "value");
 
-		module.addUserDefinedFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);
+		module.addNativeFunction("System.rand", lemon::wrap(&System_rand), defaultFlags);
 
-		module.addUserDefinedFunction("System.getPlatformFlags", lemon::wrap(&System_getPlatformFlags), defaultFlags);
+		module.addNativeFunction("System.getPlatformFlags", lemon::wrap(&System_getPlatformFlags), defaultFlags);
 
-		module.addUserDefinedFunction("System.hasPlatformFlag", lemon::wrap(&System_hasPlatformFlag), defaultFlags)
+		module.addNativeFunction("System.hasPlatformFlag", lemon::wrap(&System_hasPlatformFlag), defaultFlags)
 			.setParameterInfo(0, "flag");
 
 
 		// Access external data
-		module.addUserDefinedFunction("System.hasExternalRawData", lemon::wrap(&System_hasExternalRawData), defaultFlags)
+		module.addNativeFunction("System.hasExternalRawData", lemon::wrap(&System_hasExternalRawData), defaultFlags)
 			.setParameterInfo(0, "key");
 
-		module.addUserDefinedFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData1), defaultFlags)
+		module.addNativeFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData1), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "targetAddress")
 			.setParameterInfo(2, "offset")
@@ -1372,15 +1372,15 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "loadOriginalData")
 			.setParameterInfo(5, "loadModdedData");
 
-		module.addUserDefinedFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData2), defaultFlags)
+		module.addNativeFunction("System.loadExternalRawData", lemon::wrap(&System_loadExternalRawData2), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "targetAddress");
 
-		module.addUserDefinedFunction("System.hasExternalPaletteData", lemon::wrap(&System_hasExternalPaletteData), defaultFlags)
+		module.addNativeFunction("System.hasExternalPaletteData", lemon::wrap(&System_hasExternalPaletteData), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "line");
 
-		module.addUserDefinedFunction("System.loadExternalPaletteData", lemon::wrap(&System_loadExternalPaletteData), defaultFlags)
+		module.addNativeFunction("System.loadExternalPaletteData", lemon::wrap(&System_loadExternalPaletteData), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "line")
 			.setParameterInfo(2, "targetAddress")
@@ -1390,182 +1390,182 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 	// High-level functionality
 	{
 		// Input
-		module.addUserDefinedFunction("Input.getController", lemon::wrap(&Input_getController), defaultFlags)
+		module.addNativeFunction("Input.getController", lemon::wrap(&Input_getController), defaultFlags)
 			.setParameterInfo(0, "controllerIndex");
 
-		module.addUserDefinedFunction("Input.getControllerPrevious", lemon::wrap(&Input_getControllerPrevious), defaultFlags)
+		module.addNativeFunction("Input.getControllerPrevious", lemon::wrap(&Input_getControllerPrevious), defaultFlags)
 			.setParameterInfo(0, "controllerIndex");
 
-		module.addUserDefinedFunction("buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)			// Deprecated
+		module.addNativeFunction("buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)			// Deprecated
 			.setParameterInfo(0, "index");
 
-		module.addUserDefinedFunction("buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)		// Deprecated
+		module.addNativeFunction("buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)		// Deprecated
 			.setParameterInfo(0, "index");
 
-		module.addUserDefinedFunction("Input.buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)
+		module.addNativeFunction("Input.buttonDown", lemon::wrap(&Input_buttonDown), defaultFlags)
 			.setParameterInfo(0, "index");
 
-		module.addUserDefinedFunction("Input.buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)
+		module.addNativeFunction("Input.buttonPressed", lemon::wrap(&Input_buttonPressed), defaultFlags)
 			.setParameterInfo(0, "index");
 
-		module.addUserDefinedFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
+		module.addNativeFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
 			.setParameterInfo(0, "index");
 
-		module.addUserDefinedFunction("Input.setControllerLEDs", lemon::wrap(&Input_setControllerLEDs), defaultFlags)
+		module.addNativeFunction("Input.setControllerLEDs", lemon::wrap(&Input_setControllerLEDs), defaultFlags)
 			.setParameterInfo(0, "playerIndex")
 			.setParameterInfo(1, "color");
 
 		// Yield
-		module.addUserDefinedFunction("yieldExecution", lemon::wrap(&yieldExecution));	// Should not get inline executed
+		module.addNativeFunction("yieldExecution", lemon::wrap(&yieldExecution));	// Should not get inline executed
 
 		// Screen size query
-		module.addUserDefinedFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
-		module.addUserDefinedFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
-		module.addUserDefinedFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
+		module.addNativeFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
+		module.addNativeFunction("getScreenHeight", lemon::wrap(&getScreenHeight), defaultFlags);
+		module.addNativeFunction("getScreenExtend", lemon::wrap(&getScreenExtend), defaultFlags);
 
 
 		// VDP emulation
-		module.addUserDefinedFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags)
+		module.addNativeFunction("VDP.setupVRAMWrite", lemon::wrap(&VDP_setupVRAMWrite), defaultFlags)
 			.setParameterInfo(0, "vramAddress");
 
-		module.addUserDefinedFunction("VDP.setupVSRAMWrite", lemon::wrap(&VDP_setupVSRAMWrite), defaultFlags)
+		module.addNativeFunction("VDP.setupVSRAMWrite", lemon::wrap(&VDP_setupVSRAMWrite), defaultFlags)
 			.setParameterInfo(0, "vsramAddress");
 
-		module.addUserDefinedFunction("VDP.setupCRAMWrite", lemon::wrap(&VDP_setupCRAMWrite), defaultFlags)
+		module.addNativeFunction("VDP.setupCRAMWrite", lemon::wrap(&VDP_setupCRAMWrite), defaultFlags)
 			.setParameterInfo(0, "cramAddress");
 
-		module.addUserDefinedFunction("VDP.setWriteIncrement", lemon::wrap(&VDP_setWriteIncrement), defaultFlags)
+		module.addNativeFunction("VDP.setWriteIncrement", lemon::wrap(&VDP_setWriteIncrement), defaultFlags)
 			.setParameterInfo(0, "increment");
 
-		module.addUserDefinedFunction("VDP.readData16", lemon::wrap(&VDP_readData16), defaultFlags);
+		module.addNativeFunction("VDP.readData16", lemon::wrap(&VDP_readData16), defaultFlags);
 
-		module.addUserDefinedFunction("VDP.readData32", lemon::wrap(&VDP_readData32), defaultFlags);
+		module.addNativeFunction("VDP.readData32", lemon::wrap(&VDP_readData32), defaultFlags);
 
-		module.addUserDefinedFunction("VDP.writeData16", lemon::wrap(&VDP_writeData16), defaultFlags)
+		module.addNativeFunction("VDP.writeData16", lemon::wrap(&VDP_writeData16), defaultFlags)
 			.setParameterInfo(0, "value");
 
-		module.addUserDefinedFunction("VDP.writeData32", lemon::wrap(&VDP_writeData32), defaultFlags)
+		module.addNativeFunction("VDP.writeData32", lemon::wrap(&VDP_writeData32), defaultFlags)
 			.setParameterInfo(0, "value");
 
-		module.addUserDefinedFunction("VDP.copyToVRAM", lemon::wrap(&VDP_copyToVRAM), defaultFlags)
+		module.addNativeFunction("VDP.copyToVRAM", lemon::wrap(&VDP_copyToVRAM), defaultFlags)
 			.setParameterInfo(0, "address")
 			.setParameterInfo(1, "bytes");
 
-		module.addUserDefinedFunction("VDP.fillVRAMbyDMA", lemon::wrap(&VDP_fillVRAMbyDMA), defaultFlags)
+		module.addNativeFunction("VDP.fillVRAMbyDMA", lemon::wrap(&VDP_fillVRAMbyDMA), defaultFlags)
 			.setParameterInfo(0, "fillValue")
 			.setParameterInfo(1, "vramAddress")
 			.setParameterInfo(2, "bytes");
 
-		module.addUserDefinedFunction("VDP.zeroVRAM", lemon::wrap(&VDP_zeroVRAM), defaultFlags)
+		module.addNativeFunction("VDP.zeroVRAM", lemon::wrap(&VDP_zeroVRAM), defaultFlags)
 			.setParameterInfo(0, "bytes");
 
-		module.addUserDefinedFunction("VDP.copyToVRAMbyDMA", lemon::wrap(&VDP_copyToVRAMbyDMA), defaultFlags)
+		module.addNativeFunction("VDP.copyToVRAMbyDMA", lemon::wrap(&VDP_copyToVRAMbyDMA), defaultFlags)
 			.setParameterInfo(0, "sourceAddress")
 			.setParameterInfo(1, "vramAddress")
 			.setParameterInfo(2, "bytes");
 
-		module.addUserDefinedFunction("VDP.copyToCRAMbyDMA", lemon::wrap(&VDP_copyToCRAMbyDMA), defaultFlags)
+		module.addNativeFunction("VDP.copyToCRAMbyDMA", lemon::wrap(&VDP_copyToCRAMbyDMA), defaultFlags)
 			.setParameterInfo(0, "sourceAddress")
 			.setParameterInfo(1, "vramAddress")
 			.setParameterInfo(2, "bytes");
 
 
 		// VDP config
-		module.addUserDefinedFunction("VDP.Config.setActiveDisplay", lemon::wrap(&VDP_Config_setActiveDisplay), defaultFlags)
+		module.addNativeFunction("VDP.Config.setActiveDisplay", lemon::wrap(&VDP_Config_setActiveDisplay), defaultFlags)
 			.setParameterInfo(0, "enable");
 
-		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneB", lemon::wrap(&VDP_Config_setNameTableBasePlaneB), defaultFlags)
+		module.addNativeFunction("VDP.Config.setNameTableBasePlaneB", lemon::wrap(&VDP_Config_setNameTableBasePlaneB), defaultFlags)
 			.setParameterInfo(0, "vramAddress");
 
-		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneA", lemon::wrap(&VDP_Config_setNameTableBasePlaneA), defaultFlags)
+		module.addNativeFunction("VDP.Config.setNameTableBasePlaneA", lemon::wrap(&VDP_Config_setNameTableBasePlaneA), defaultFlags)
 			.setParameterInfo(0, "vramAddress");
 
-		module.addUserDefinedFunction("VDP.Config.setNameTableBasePlaneW", lemon::wrap(&VDP_Config_setNameTableBasePlaneW), defaultFlags)
+		module.addNativeFunction("VDP.Config.setNameTableBasePlaneW", lemon::wrap(&VDP_Config_setNameTableBasePlaneW), defaultFlags)
 			.setParameterInfo(0, "vramAddress");
 
-		module.addUserDefinedFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColor), defaultFlags)
+		module.addNativeFunction("VDP.Config.setBackdropColor", lemon::wrap(&VDP_Config_setBackdropColor), defaultFlags)
 			.setParameterInfo(0, "paletteIndex");
 
-		module.addUserDefinedFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags)
+		module.addNativeFunction("VDP.Config.setVerticalScrolling", lemon::wrap(&VDP_Config_setVerticalScrolling), defaultFlags)
 			.setParameterInfo(0, "verticalScrolling")
 			.setParameterInfo(1, "horizontalScrollMask");
 
-		module.addUserDefinedFunction("VDP.Config.setRenderingModeConfiguration", lemon::wrap(&VDP_Config_setRenderingModeConfiguration), defaultFlags)
+		module.addNativeFunction("VDP.Config.setRenderingModeConfiguration", lemon::wrap(&VDP_Config_setRenderingModeConfiguration), defaultFlags)
 			.setParameterInfo(0, "shadowHighlightPalette");
 
-		module.addUserDefinedFunction("VDP.Config.setHorizontalScrollTableBase", lemon::wrap(&VDP_Config_setHorizontalScrollTableBase), defaultFlags)
+		module.addNativeFunction("VDP.Config.setHorizontalScrollTableBase", lemon::wrap(&VDP_Config_setHorizontalScrollTableBase), defaultFlags)
 			.setParameterInfo(0, "vramAddress");
 
-		module.addUserDefinedFunction("VDP.Config.setPlayfieldSizeInPatterns", lemon::wrap(&VDP_Config_setPlayfieldSizeInPatterns), defaultFlags)
+		module.addNativeFunction("VDP.Config.setPlayfieldSizeInPatterns", lemon::wrap(&VDP_Config_setPlayfieldSizeInPatterns), defaultFlags)
 			.setParameterInfo(0, "width")
 			.setParameterInfo(1, "height");
 
-		module.addUserDefinedFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags)
+		module.addNativeFunction("VDP.Config.setPlayfieldSizeInPixels", lemon::wrap(&VDP_Config_setPlayfieldSizeInPixels), defaultFlags)
 			.setParameterInfo(0, "width")
 			.setParameterInfo(1, "height");
 
-		module.addUserDefinedFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
+		module.addNativeFunction("VDP.Config.setupWindowPlane", lemon::wrap(&VDP_Config_setupWindowPlane), defaultFlags)
 			.setParameterInfo(0, "useWindowPlane")
 			.setParameterInfo(1, "splitY");
 
-		module.addUserDefinedFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
+		module.addNativeFunction("VDP.Config.setPlaneWScrollOffset", lemon::wrap(&VDP_Config_setPlaneWScrollOffset), defaultFlags)
 			.setParameterInfo(0, "x")
 			.setParameterInfo(1, "y");
 
-		module.addUserDefinedFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags)
+		module.addNativeFunction("VDP.Config.setSpriteAttributeTableBase", lemon::wrap(&VDP_Config_setSpriteAttributeTableBase), defaultFlags)
 			.setParameterInfo(0, "vramAddress");
 
 
 		// Direct VRAM access
-		module.addUserDefinedFunction("getVRAM", lemon::wrap(&getVRAM), defaultFlags)
+		module.addNativeFunction("getVRAM", lemon::wrap(&getVRAM), defaultFlags)
 			.setParameterInfo(0, "vramAddress");
 
-		module.addUserDefinedFunction("setVRAM", lemon::wrap(&setVRAM), defaultFlags)
+		module.addNativeFunction("setVRAM", lemon::wrap(&setVRAM), defaultFlags)
 			.setParameterInfo(0, "vramAddress")
 			.setParameterInfo(1, "value");
 
 
 		// Special renderer functionality
-		module.addUserDefinedFunction("Renderer.setPaletteEntry", lemon::wrap(&Renderer_setPaletteEntry), defaultFlags)
+		module.addNativeFunction("Renderer.setPaletteEntry", lemon::wrap(&Renderer_setPaletteEntry), defaultFlags)
 			.setParameterInfo(0, "index")
 			.setParameterInfo(1, "color");
 
-		module.addUserDefinedFunction("Renderer.setPaletteEntryPacked", lemon::wrap(&Renderer_setPaletteEntryPacked), defaultFlags)
+		module.addNativeFunction("Renderer.setPaletteEntryPacked", lemon::wrap(&Renderer_setPaletteEntryPacked), defaultFlags)
 			.setParameterInfo(0, "index")
 			.setParameterInfo(1, "color");
 
-		module.addUserDefinedFunction("Renderer.enableSecondaryPalette", lemon::wrap(&Renderer_enableSecondaryPalette), defaultFlags)
+		module.addNativeFunction("Renderer.enableSecondaryPalette", lemon::wrap(&Renderer_enableSecondaryPalette), defaultFlags)
 			.setParameterInfo(0, "line");
 
-		module.addUserDefinedFunction("Renderer.setSecondaryPaletteEntryPacked", lemon::wrap(&Renderer_setSecondaryPaletteEntryPacked), defaultFlags)
+		module.addNativeFunction("Renderer.setSecondaryPaletteEntryPacked", lemon::wrap(&Renderer_setSecondaryPaletteEntryPacked), defaultFlags)
 			.setParameterInfo(0, "index")
 			.setParameterInfo(1, "color");
 
-		module.addUserDefinedFunction("Renderer.setScrollOffsetH", lemon::wrap(&Renderer_setScrollOffsetH), defaultFlags)
+		module.addNativeFunction("Renderer.setScrollOffsetH", lemon::wrap(&Renderer_setScrollOffsetH), defaultFlags)
 			.setParameterInfo(0, "setIndex")
 			.setParameterInfo(1, "lineNumber")
 			.setParameterInfo(2, "value");
 
-		module.addUserDefinedFunction("Renderer.setScrollOffsetV", lemon::wrap(&Renderer_setScrollOffsetV), defaultFlags)
+		module.addNativeFunction("Renderer.setScrollOffsetV", lemon::wrap(&Renderer_setScrollOffsetV), defaultFlags)
 			.setParameterInfo(0, "setIndex")
 			.setParameterInfo(1, "rowNumber")
 			.setParameterInfo(2, "value");
 
-		module.addUserDefinedFunction("Renderer.setHorizontalScrollNoRepeat", lemon::wrap(&Renderer_setHorizontalScrollNoRepeat), defaultFlags)
+		module.addNativeFunction("Renderer.setHorizontalScrollNoRepeat", lemon::wrap(&Renderer_setHorizontalScrollNoRepeat), defaultFlags)
 			.setParameterInfo(0, "setIndex")
 			.setParameterInfo(1, "enable");
 
-		module.addUserDefinedFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags)
+		module.addNativeFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags)
 			.setParameterInfo(0, "bias");
 
-		module.addUserDefinedFunction("Renderer.enforceClearScreen", lemon::wrap(&Renderer_enforceClearScreen), defaultFlags)
+		module.addNativeFunction("Renderer.enforceClearScreen", lemon::wrap(&Renderer_enforceClearScreen), defaultFlags)
 			.setParameterInfo(0, "enabled");
 
-		module.addUserDefinedFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags)
+		module.addNativeFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags)
 			.setParameterInfo(0, "planeIndex")
 			.setParameterInfo(1, "enabled");
 
-		module.addUserDefinedFunction("Renderer.setupPlane", lemon::wrap(&Renderer_setupPlane), defaultFlags)
+		module.addNativeFunction("Renderer.setupPlane", lemon::wrap(&Renderer_setupPlane), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "width")
@@ -1574,18 +1574,18 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(5, "scrollOffsets")
 			.setParameterInfo(6, "renderQueue");
 
-		module.addUserDefinedFunction("Renderer.resetCustomPlaneConfigurations", lemon::wrap(&Renderer_resetCustomPlaneConfigurations), defaultFlags);
+		module.addNativeFunction("Renderer.resetCustomPlaneConfigurations", lemon::wrap(&Renderer_resetCustomPlaneConfigurations), defaultFlags);
 
-		module.addUserDefinedFunction("Renderer.resetSprites", lemon::wrap(&Renderer_resetSprites), defaultFlags);
+		module.addNativeFunction("Renderer.resetSprites", lemon::wrap(&Renderer_resetSprites), defaultFlags);
 
-		module.addUserDefinedFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
+		module.addNativeFunction("Renderer.drawVdpSprite", lemon::wrap(&Renderer_drawVdpSprite), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "encodedSize")
 			.setParameterInfo(3, "patternIndex")
 			.setParameterInfo(4, "renderQueue");
 
-		module.addUserDefinedFunction("Renderer.drawVdpSpriteWithAlpha", lemon::wrap(&Renderer_drawVdpSpriteWithAlpha), defaultFlags)
+		module.addNativeFunction("Renderer.drawVdpSpriteWithAlpha", lemon::wrap(&Renderer_drawVdpSpriteWithAlpha), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "encodedSize")
@@ -1593,7 +1593,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "renderQueue")
 			.setParameterInfo(5, "alpha");
 
-		module.addUserDefinedFunction("Renderer.drawVdpSpriteTinted", lemon::wrap(&Renderer_drawVdpSpriteTinted), defaultFlags)
+		module.addNativeFunction("Renderer.drawVdpSpriteTinted", lemon::wrap(&Renderer_drawVdpSpriteTinted), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "encodedSize")
@@ -1602,44 +1602,44 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(5, "tintColor")
 			.setParameterInfo(6, "addedColor");
 
-		module.addUserDefinedFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
+		module.addNativeFunction("Renderer.hasCustomSprite", lemon::wrap(&Renderer_hasCustomSprite), defaultFlags)
 			.setParameterInfo(0, "key");
 
-		module.addUserDefinedFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)
+		module.addNativeFunction("Renderer.setupCustomUncompressedSprite", lemon::wrap(&Renderer_setupCustomUncompressedSprite), defaultFlags)
 			.setParameterInfo(0, "sourceBase")
 			.setParameterInfo(1, "word")
 			.setParameterInfo(2, "mappingOffset")
 			.setParameterInfo(3, "animationSprite")
 			.setParameterInfo(4, "atex");
 
-		module.addUserDefinedFunction("Renderer.setupCustomCharacterSprite", lemon::wrap(&Renderer_setupCustomCharacterSprite), defaultFlags)
+		module.addNativeFunction("Renderer.setupCustomCharacterSprite", lemon::wrap(&Renderer_setupCustomCharacterSprite), defaultFlags)
 			.setParameterInfo(0, "sourceBase")
 			.setParameterInfo(1, "tableAddress")
 			.setParameterInfo(2, "mappingOffset")
 			.setParameterInfo(3, "animationSprite")
 			.setParameterInfo(4, "atex");
 
-		module.addUserDefinedFunction("Renderer.setupCustomObjectSprite", lemon::wrap(&Renderer_setupCustomObjectSprite), defaultFlags)
+		module.addNativeFunction("Renderer.setupCustomObjectSprite", lemon::wrap(&Renderer_setupCustomObjectSprite), defaultFlags)
 			.setParameterInfo(0, "sourceBase")
 			.setParameterInfo(1, "tableAddress")
 			.setParameterInfo(2, "mappingOffset")
 			.setParameterInfo(3, "animationSprite")
 			.setParameterInfo(4, "atex");
 
-		module.addUserDefinedFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite1), defaultFlags)
+		module.addNativeFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite1), defaultFlags)
 			.setParameterInfo(0, "sourceBase")
 			.setParameterInfo(1, "mappingOffset")
 			.setParameterInfo(2, "animationSprite")
 			.setParameterInfo(3, "atex");
 
-		module.addUserDefinedFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite2), defaultFlags)
+		module.addNativeFunction("Renderer.setupKosinskiCompressedSprite", lemon::wrap(&Renderer_setupKosinskiCompressedSprite2), defaultFlags)
 			.setParameterInfo(0, "sourceBase")
 			.setParameterInfo(1, "mappingOffset")
 			.setParameterInfo(2, "animationSprite")
 			.setParameterInfo(3, "atex")
 			.setParameterInfo(4, "indexOffset");
 
-		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite1), defaultFlags)
+		module.addNativeFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite1), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
@@ -1647,7 +1647,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "flags")
 			.setParameterInfo(5, "renderQueue");
 
-		module.addUserDefinedFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite2), defaultFlags)
+		module.addNativeFunction("Renderer.drawCustomSprite", lemon::wrap(&Renderer_drawCustomSprite2), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
@@ -1657,7 +1657,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(6, "angle")
 			.setParameterInfo(7, "alpha");
 
-		module.addUserDefinedFunction("Renderer.drawCustomSpriteTinted", lemon::wrap(&Renderer_drawCustomSpriteTinted), defaultFlags)
+		module.addNativeFunction("Renderer.drawCustomSpriteTinted", lemon::wrap(&Renderer_drawCustomSpriteTinted), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
@@ -1668,7 +1668,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(7, "tintColor")
 			.setParameterInfo(8, "scale");
 
-		module.addUserDefinedFunction("Renderer.drawCustomSpriteTransformed", lemon::wrap(&Renderer_drawCustomSpriteTransformed), defaultFlags)
+		module.addNativeFunction("Renderer.drawCustomSpriteTransformed", lemon::wrap(&Renderer_drawCustomSpriteTransformed), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
@@ -1681,13 +1681,13 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(9, "transform21")
 			.setParameterInfo(10, "transform22");
 
-		module.addUserDefinedFunction("Renderer.extractCustomSprite", lemon::wrap(&Renderer_extractCustomSprite), defaultFlags)
+		module.addNativeFunction("Renderer.extractCustomSprite", lemon::wrap(&Renderer_extractCustomSprite), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "categoryName")
 			.setParameterInfo(2, "spriteNumber")
 			.setParameterInfo(3, "atex");
 
-		module.addUserDefinedFunction("Renderer.addSpriteMask", lemon::wrap(&Renderer_addSpriteMask), defaultFlags)
+		module.addNativeFunction("Renderer.addSpriteMask", lemon::wrap(&Renderer_addSpriteMask), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "width")
@@ -1695,7 +1695,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "renderQueue")
 			.setParameterInfo(5, "priorityFlag");
 
-		module.addUserDefinedFunction("Renderer.addSpriteMaskWorld", lemon::wrap(&Renderer_addSpriteMaskWorld), defaultFlags)
+		module.addNativeFunction("Renderer.addSpriteMaskWorld", lemon::wrap(&Renderer_addSpriteMaskWorld), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "width")
@@ -1703,27 +1703,27 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(4, "renderQueue")
 			.setParameterInfo(5, "priorityFlag");
 
-		module.addUserDefinedFunction("Renderer.setLogicalSpriteSpace", lemon::wrap(&Renderer_setLogicalSpriteSpace), defaultFlags)
+		module.addNativeFunction("Renderer.setLogicalSpriteSpace", lemon::wrap(&Renderer_setLogicalSpriteSpace), defaultFlags)
 			.setParameterInfo(0, "space");
 
-		module.addUserDefinedFunction("Renderer.clearSpriteTag", lemon::wrap(&Renderer_clearSpriteTag), defaultFlags);
+		module.addNativeFunction("Renderer.clearSpriteTag", lemon::wrap(&Renderer_clearSpriteTag), defaultFlags);
 
-		module.addUserDefinedFunction("Renderer.setSpriteTagWithPosition", lemon::wrap(&Renderer_setSpriteTagWithPosition), defaultFlags)
+		module.addNativeFunction("Renderer.setSpriteTagWithPosition", lemon::wrap(&Renderer_setSpriteTagWithPosition), defaultFlags)
 			.setParameterInfo(0, "spriteTag")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py");
 
-		module.addUserDefinedFunction("Renderer.resetViewport", lemon::wrap(&Renderer_resetViewport), defaultFlags)
+		module.addNativeFunction("Renderer.resetViewport", lemon::wrap(&Renderer_resetViewport), defaultFlags)
 			.setParameterInfo(0, "renderQueue");
 
-		module.addUserDefinedFunction("Renderer.setViewport", lemon::wrap(&Renderer_setViewport), defaultFlags)
+		module.addNativeFunction("Renderer.setViewport", lemon::wrap(&Renderer_setViewport), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "width")
 			.setParameterInfo(3, "height")
 			.setParameterInfo(4, "renderQueue");
 
-		module.addUserDefinedFunction("Renderer.setGlobalComponentTint", lemon::wrap(&Renderer_setGlobalComponentTint), defaultFlags)
+		module.addNativeFunction("Renderer.setGlobalComponentTint", lemon::wrap(&Renderer_setGlobalComponentTint), defaultFlags)
 			.setParameterInfo(0, "tintR")
 			.setParameterInfo(1, "tintG")
 			.setParameterInfo(2, "tintB")
@@ -1732,24 +1732,24 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(5, "addedB");
 
 		// Debug draw rects & texts
-		module.addUserDefinedFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
+		module.addNativeFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py");
 
-		module.addUserDefinedFunction("Debug.drawRect", lemon::wrap(&debugDrawRect), defaultFlags)
+		module.addNativeFunction("Debug.drawRect", lemon::wrap(&debugDrawRect), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "width")
 			.setParameterInfo(3, "height");
 
-		module.addUserDefinedFunction("Debug.drawRect", lemon::wrap(&debugDrawRect2), defaultFlags)
+		module.addNativeFunction("Debug.drawRect", lemon::wrap(&debugDrawRect2), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "width")
 			.setParameterInfo(3, "height")
 			.setParameterInfo(4, "color");
 
-		module.addUserDefinedFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
+		module.addNativeFunction("Renderer.drawText", lemon::wrap(&Renderer_drawText), defaultFlags)
 			.setParameterInfo(0, "fontKey")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py")
@@ -1760,58 +1760,58 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(7, "renderQueue")
 			.setParameterInfo(8, "useWorldSpace");
 
-		module.addUserDefinedFunction("Renderer.getTextWidth", lemon::wrap(&Renderer_getTextWidth), defaultFlags)
+		module.addNativeFunction("Renderer.getTextWidth", lemon::wrap(&Renderer_getTextWidth), defaultFlags)
 			.setParameterInfo(0, "fontKey")
 			.setParameterInfo(1, "text");
 		
 
 		// Audio
-		module.addUserDefinedFunction("Audio.getAudioKeyType", lemon::wrap(&Audio_getAudioKeyType), defaultFlags)
+		module.addNativeFunction("Audio.getAudioKeyType", lemon::wrap(&Audio_getAudioKeyType), defaultFlags)
 			.setParameterInfo(0, "sfxId");
 
-		module.addUserDefinedFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
+		module.addNativeFunction("Audio.isPlayingAudio", lemon::wrap(&Audio_isPlayingAudio), defaultFlags)
 			.setParameterInfo(0, "sfxId");
 
-		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags)
+		module.addNativeFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio1), defaultFlags)
 			.setParameterInfo(0, "sfxId")
 			.setParameterInfo(1, "contextId");
 
-		module.addUserDefinedFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio2), defaultFlags)
+		module.addNativeFunction("Audio.playAudio", lemon::wrap(&Audio_playAudio2), defaultFlags)
 			.setParameterInfo(0, "sfxId");
 
-		module.addUserDefinedFunction("Audio.stopChannel", lemon::wrap(&Audio_stopChannel), defaultFlags)
+		module.addNativeFunction("Audio.stopChannel", lemon::wrap(&Audio_stopChannel), defaultFlags)
 			.setParameterInfo(0, "channel");
 
-		module.addUserDefinedFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags)
+		module.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel), defaultFlags)
 			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "length");
 
-		module.addUserDefinedFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel), defaultFlags)
+		module.addNativeFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel), defaultFlags)
 			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "length");
 
-		module.addUserDefinedFunction("Audio.playOverride", lemon::wrap(&Audio_playOverride), defaultFlags)
+		module.addNativeFunction("Audio.playOverride", lemon::wrap(&Audio_playOverride), defaultFlags)
 			.setParameterInfo(0, "sfxId")
 			.setParameterInfo(1, "contextId")
 			.setParameterInfo(2, "channelId")
 			.setParameterInfo(3, "overriddenChannelId");
 
-		module.addUserDefinedFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
+		module.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
 			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "context")
 			.setParameterInfo(2, "postfix")
 			.setParameterInfo(3, "relativeSpeed");
 
-		module.addUserDefinedFunction("Audio.disableAudioModifier", lemon::wrap(&Audio_disableAudioModifier), defaultFlags)
+		module.addNativeFunction("Audio.disableAudioModifier", lemon::wrap(&Audio_disableAudioModifier), defaultFlags)
 			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "context");
 
 
 		// Misc
-		module.addUserDefinedFunction("Mods.isModActive", lemon::wrap(&Mods_isModActive), defaultFlags)
+		module.addNativeFunction("Mods.isModActive", lemon::wrap(&Mods_isModActive), defaultFlags)
 			.setParameterInfo(0, "modName");
 
-		module.addUserDefinedFunction("Mods.getModPriority", lemon::wrap(&Mods_getModPriority), defaultFlags)
+		module.addNativeFunction("Mods.getModPriority", lemon::wrap(&Mods_getModPriority), defaultFlags)
 			.setParameterInfo(0, "modName");
 	}
 
@@ -1827,17 +1827,17 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			var.mSetter = std::bind(logSetter, std::placeholders::_1, true);
 		}
 
-		module.addUserDefinedFunction("debugLog", lemon::wrap(&debugLog), defaultFlags)
+		module.addNativeFunction("debugLog", lemon::wrap(&debugLog), defaultFlags)
 			.setParameterInfo(0, "text");
 
-		module.addUserDefinedFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags)
+		module.addNativeFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags)
 			.setParameterInfo(0, "name")
 			.setParameterInfo(1, "startAddress")
 			.setParameterInfo(2, "numColors");
 
 	#if 0
 		// Only for debugging value stack issues in lemonscript itself
-		module.addUserDefinedFunction("debugLogValueStack", lemon::wrap(&debugLogValueStack), defaultFlags);
+		module.addNativeFunction("debugLogValueStack", lemon::wrap(&debugLogValueStack), defaultFlags);
 	#endif
 
 
@@ -1850,68 +1850,68 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 
 		// Watches
-		module.addUserDefinedFunction("debugWatch", lemon::wrap(&debugWatch), defaultFlags)
+		module.addNativeFunction("debugWatch", lemon::wrap(&debugWatch), defaultFlags)
 			.setParameterInfo(0, "address")
 			.setParameterInfo(1, "bytes");
 
 
 		// Dump to file
-		module.addUserDefinedFunction("debugDumpToFile", lemon::wrap(&debugDumpToFile), defaultFlags)
+		module.addNativeFunction("debugDumpToFile", lemon::wrap(&debugDumpToFile), defaultFlags)
 			.setParameterInfo(0, "filename")
 			.setParameterInfo(1, "startAddress")
 			.setParameterInfo(2, "bytes");
 
 
 		// ROM data analyser
-		module.addUserDefinedFunction("ROMDataAnalyser.isEnabled", lemon::wrap(&ROMDataAnalyser_isEnabled), defaultFlags);
+		module.addNativeFunction("ROMDataAnalyser.isEnabled", lemon::wrap(&ROMDataAnalyser_isEnabled), defaultFlags);
 
-		module.addUserDefinedFunction("ROMDataAnalyser.hasEntry", lemon::wrap(&ROMDataAnalyser_hasEntry), defaultFlags)
+		module.addNativeFunction("ROMDataAnalyser.hasEntry", lemon::wrap(&ROMDataAnalyser_hasEntry), defaultFlags)
 			.setParameterInfo(0, "category")
 			.setParameterInfo(1, "address");
 
-		module.addUserDefinedFunction("ROMDataAnalyser.beginEntry", lemon::wrap(&ROMDataAnalyser_beginEntry), defaultFlags)
+		module.addNativeFunction("ROMDataAnalyser.beginEntry", lemon::wrap(&ROMDataAnalyser_beginEntry), defaultFlags)
 			.setParameterInfo(0, "category")
 			.setParameterInfo(1, "address");
 
-		module.addUserDefinedFunction("ROMDataAnalyser.endEntry", lemon::wrap(&ROMDataAnalyser_endEntry), defaultFlags);
+		module.addNativeFunction("ROMDataAnalyser.endEntry", lemon::wrap(&ROMDataAnalyser_endEntry), defaultFlags);
 
-		module.addUserDefinedFunction("ROMDataAnalyser.addKeyValue", lemon::wrap(&ROMDataAnalyser_addKeyValue), defaultFlags)
+		module.addNativeFunction("ROMDataAnalyser.addKeyValue", lemon::wrap(&ROMDataAnalyser_addKeyValue), defaultFlags)
 			.setParameterInfo(0, "key")
 			.setParameterInfo(1, "value");
 
-		module.addUserDefinedFunction("ROMDataAnalyser.beginObject", lemon::wrap(&ROMDataAnalyser_beginObject), defaultFlags)
+		module.addNativeFunction("ROMDataAnalyser.beginObject", lemon::wrap(&ROMDataAnalyser_beginObject), defaultFlags)
 			.setParameterInfo(0, "key");
 
-		module.addUserDefinedFunction("ROMDataAnalyser.endObject", lemon::wrap(&ROMDataAnalyser_endObject), defaultFlags);
+		module.addNativeFunction("ROMDataAnalyser.endObject", lemon::wrap(&ROMDataAnalyser_endObject), defaultFlags);
 
 
 		// Debug side panel
-		module.addUserDefinedFunction("System.SidePanel.setupCustomCategory", lemon::wrap(&System_SidePanel_setupCustomCategory), defaultFlags)
+		module.addNativeFunction("System.SidePanel.setupCustomCategory", lemon::wrap(&System_SidePanel_setupCustomCategory), defaultFlags)
 			.setParameterInfo(0, "shortName")
 			.setParameterInfo(1, "fullName");
 
-		module.addUserDefinedFunction("System.SidePanel.addOption", lemon::wrap(&System_SidePanel_addOption), defaultFlags)
+		module.addNativeFunction("System.SidePanel.addOption", lemon::wrap(&System_SidePanel_addOption), defaultFlags)
 			.setParameterInfo(0, "text")
 			.setParameterInfo(1, "defaultValue");
 
-		module.addUserDefinedFunction("System.SidePanel.addEntry", lemon::wrap(&System_SidePanel_addEntry), defaultFlags)
+		module.addNativeFunction("System.SidePanel.addEntry", lemon::wrap(&System_SidePanel_addEntry), defaultFlags)
 			.setParameterInfo(0, "key");
 
-		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine1), defaultFlags)
+		module.addNativeFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine1), defaultFlags)
 			.setParameterInfo(0, "text")
 			.setParameterInfo(1, "indent")
 			.setParameterInfo(2, "color");
 
-		module.addUserDefinedFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine2), defaultFlags)
+		module.addNativeFunction("System.SidePanel.addLine", lemon::wrap(&System_SidePanel_addLine2), defaultFlags)
 			.setParameterInfo(0, "text")
 			.setParameterInfo(1, "indent");
 
-		module.addUserDefinedFunction("System.SidePanel.isEntryHovered", lemon::wrap(&System_SidePanel_isEntryHovered), defaultFlags)
+		module.addNativeFunction("System.SidePanel.isEntryHovered", lemon::wrap(&System_SidePanel_isEntryHovered), defaultFlags)
 			.setParameterInfo(0, "key");
 
 
 		// This is not really debugging-related, as it's meant to be written in non-developer environment as well
-		module.addUserDefinedFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags)
+		module.addNativeFunction("System.writeDisplayLine", lemon::wrap(&System_writeDisplayLine), defaultFlags)
 			.setParameterInfo(0, "text");
 	}
 

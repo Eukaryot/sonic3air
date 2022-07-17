@@ -31,12 +31,12 @@ namespace
 
 	class RuntimeDetailHandler final : public lemon::RuntimeDetailHandler
 	{
-		void preExecuteExternalFunction(const lemon::UserDefinedFunction& function, const lemon::ControlFlow& controlFlow) override
+		void preExecuteExternalFunction(const lemon::NativeFunction& function, const lemon::ControlFlow& controlFlow) override
 		{
 			Profiling::pushRegion(ProfilingRegion::SIMULATION_USER_CALL);
 		}
 
-		void postExecuteExternalFunction(const lemon::UserDefinedFunction& function, const lemon::ControlFlow& controlFlow) override
+		void postExecuteExternalFunction(const lemon::NativeFunction& function, const lemon::ControlFlow& controlFlow) override
 		{
 			Profiling::popRegion(ProfilingRegion::SIMULATION_USER_CALL);
 		}

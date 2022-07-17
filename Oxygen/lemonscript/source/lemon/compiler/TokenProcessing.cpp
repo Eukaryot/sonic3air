@@ -12,6 +12,7 @@
 #include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/runtime/Runtime.h"
 #include "lemon/runtime/StandardLibrary.h"
 
 

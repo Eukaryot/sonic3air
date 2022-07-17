@@ -27,7 +27,7 @@ namespace lemon
 		enum class Type : uint8
 		{
 			SCRIPT,
-			USER
+			NATIVE
 		};
 		struct Parameter
 		{
@@ -124,7 +124,7 @@ namespace lemon
 	};
 
 
-	class UserDefinedFunction : public Function
+	class NativeFunction : public Function
 	{
 	public:
 		struct Context
@@ -144,15 +144,15 @@ namespace lemon
 
 		enum Flags
 		{
-			FLAG_ALLOW_INLINE_EXECUTION = 0x01
+			FLAG_ALLOW_INLINE_EXECUTION = 0x01,		// Function can be called directly inside the opcode run loop and does not interfere with control flow
 		};
 
 	public:
-		inline UserDefinedFunction() : Function(Type::USER) {}
-		inline virtual ~UserDefinedFunction()  { delete mFunctionWrapper; }
+		inline NativeFunction() : Function(Type::NATIVE) {}
+		inline virtual ~NativeFunction()  { delete mFunctionWrapper; }
 
 		void setFunction(const FunctionWrapper& functionWrapper);
-		UserDefinedFunction& setParameterInfo(size_t index, const std::string& identifier);
+		NativeFunction& setParameterInfo(size_t index, const std::string& identifier);
 
 		void execute(const Context context) const;
 

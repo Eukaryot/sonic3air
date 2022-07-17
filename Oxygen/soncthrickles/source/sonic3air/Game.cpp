@@ -140,45 +140,45 @@ void Game::update(float timeElapsed)
 
 void Game::registerScriptBindings(lemon::Module& module)
 {
-	const uint8 defaultFlags = lemon::UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
+	const uint8 defaultFlags = lemon::NativeFunction::FLAG_ALLOW_INLINE_EXECUTION;
 	const uint8 noInlineExecution = 0;
 
 	// Game
 	{
-		module.addUserDefinedFunction("Game.getSetting", lemon::wrap(*this, &Game::useSetting), defaultFlags)
+		module.addNativeFunction("Game.getSetting", lemon::wrap(*this, &Game::useSetting), defaultFlags)
 			.setParameterInfo(0, "settingId");
 
-		module.addUserDefinedFunction("Game.isSecretUnlocked", lemon::wrap(*this, &Game::isSecretUnlocked), defaultFlags)
+		module.addNativeFunction("Game.isSecretUnlocked", lemon::wrap(*this, &Game::isSecretUnlocked), defaultFlags)
 			.setParameterInfo(0, "secretId");
 
-		module.addUserDefinedFunction("Game.triggerRestart", lemon::wrap(*this, &Game::triggerRestart), defaultFlags);
+		module.addNativeFunction("Game.triggerRestart", lemon::wrap(*this, &Game::triggerRestart), defaultFlags);
 
-		module.addUserDefinedFunction("Game.onGamePause", lemon::wrap(*this, &Game::onGamePause), defaultFlags)
+		module.addNativeFunction("Game.onGamePause", lemon::wrap(*this, &Game::onGamePause), defaultFlags)
 			.setParameterInfo(0, "canRestart");
 
-		module.addUserDefinedFunction("Game.allowRestartInGamePause", lemon::wrap(*this, &Game::allowRestartInGamePause), defaultFlags)
+		module.addNativeFunction("Game.allowRestartInGamePause", lemon::wrap(*this, &Game::allowRestartInGamePause), defaultFlags)
 			.setParameterInfo(0, "canRestart");
 
-		module.addUserDefinedFunction("Game.onLevelStart", lemon::wrap(*this, &Game::onLevelStart), defaultFlags);
+		module.addNativeFunction("Game.onLevelStart", lemon::wrap(*this, &Game::onLevelStart), defaultFlags);
 
-		module.addUserDefinedFunction("Game.onZoneActCompleted", lemon::wrap(*this, &Game::onZoneActCompleted), defaultFlags)
+		module.addNativeFunction("Game.onZoneActCompleted", lemon::wrap(*this, &Game::onZoneActCompleted), defaultFlags)
 			.setParameterInfo(0, "zoneAndAct");
 
-		module.addUserDefinedFunction("Game.onTriggerNextZone", lemon::wrap(*this, &Game::onTriggerNextZone), defaultFlags)
+		module.addNativeFunction("Game.onTriggerNextZone", lemon::wrap(*this, &Game::onTriggerNextZone), defaultFlags)
 			.setParameterInfo(0, "zoneAndAct");
 
-		module.addUserDefinedFunction("Game.onFadedOutLoadingZone", lemon::wrap(*this, &Game::onFadedOutLoadingZone), defaultFlags)
+		module.addNativeFunction("Game.onFadedOutLoadingZone", lemon::wrap(*this, &Game::onFadedOutLoadingZone), defaultFlags)
 			.setParameterInfo(0, "zoneAndAct");
 
-		module.addUserDefinedFunction("Game.onCharacterDied", lemon::wrap(*this, &Game::onCharacterDied), noInlineExecution)		// No inline execution as this function manipulated the call stack
+		module.addNativeFunction("Game.onCharacterDied", lemon::wrap(*this, &Game::onCharacterDied), noInlineExecution)		// No inline execution as this function manipulated the call stack
 			.setParameterInfo(0, "playerIndex");
 
-		module.addUserDefinedFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
-		module.addUserDefinedFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
-		module.addUserDefinedFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
-		module.addUserDefinedFunction("Game.onTimeAttackFinish", lemon::wrap(*this, &Game::onTimeAttackFinish), defaultFlags);
+		module.addNativeFunction("Game.returnToMainMenu", lemon::wrap(*this, &Game::returnToMainMenu), defaultFlags);
+		module.addNativeFunction("Game.isNormalGame", lemon::wrap(*this, &Game::isNormalGame), defaultFlags);
+		module.addNativeFunction("Game.isTimeAttack", lemon::wrap(*this, &Game::isTimeAttack), defaultFlags);
+		module.addNativeFunction("Game.onTimeAttackFinish", lemon::wrap(*this, &Game::onTimeAttackFinish), defaultFlags);
 
-		module.addUserDefinedFunction("Game.changePlanePatternRectAtex", lemon::wrap(*this, &Game::changePlanePatternRectAtex), defaultFlags)
+		module.addNativeFunction("Game.changePlanePatternRectAtex", lemon::wrap(*this, &Game::changePlanePatternRectAtex), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "width")
@@ -186,58 +186,58 @@ void Game::registerScriptBindings(lemon::Module& module)
 			.setParameterInfo(4, "planeIndex")
 			.setParameterInfo(5, "atex");
 
-		module.addUserDefinedFunction("Game.renderBlueSpheresGround", lemon::wrap(*this, &Game::renderBlueSpheresGround), defaultFlags)
+		module.addNativeFunction("Game.renderBlueSpheresGround", lemon::wrap(*this, &Game::renderBlueSpheresGround), defaultFlags)
 			.setParameterInfo(0, "px")
 			.setParameterInfo(1, "py")
 			.setParameterInfo(2, "rotation")
 			.setParameterInfo(3, "fieldColorA")
 			.setParameterInfo(4, "fieldColorB");
 
-		module.addUserDefinedFunction("Game.getBlueSpheresGroundSprite", lemon::wrap(*this, &Game::getBlueSpheresGroundSprite), defaultFlags)
+		module.addNativeFunction("Game.getBlueSpheresGroundSprite", lemon::wrap(*this, &Game::getBlueSpheresGroundSprite), defaultFlags)
 			.setParameterInfo(0, "part");
 
-		module.addUserDefinedFunction("Game.writeBlueSpheresData", lemon::wrap(*this, &Game::writeBlueSpheresData), defaultFlags)
+		module.addNativeFunction("Game.writeBlueSpheresData", lemon::wrap(*this, &Game::writeBlueSpheresData), defaultFlags)
 			.setParameterInfo(0, "targetAddress")
 			.setParameterInfo(1, "sourceAddress")
 			.setParameterInfo(2, "px")
 			.setParameterInfo(3, "py")
 			.setParameterInfo(4, "rotation");
 
-		module.addUserDefinedFunction("Game.getAchievementValue", lemon::wrap(*this, &Game::getAchievementValue), defaultFlags)
+		module.addNativeFunction("Game.getAchievementValue", lemon::wrap(*this, &Game::getAchievementValue), defaultFlags)
 			.setParameterInfo(0, "achievementId");
 
-		module.addUserDefinedFunction("Game.setAchievementValue", lemon::wrap(*this, &Game::setAchievementValue), defaultFlags)
+		module.addNativeFunction("Game.setAchievementValue", lemon::wrap(*this, &Game::setAchievementValue), defaultFlags)
 			.setParameterInfo(0, "achievementId")
 			.setParameterInfo(1, "value");
 
-		module.addUserDefinedFunction("Game.isAchievementComplete", lemon::wrap(*this, &Game::isAchievementComplete), defaultFlags)
+		module.addNativeFunction("Game.isAchievementComplete", lemon::wrap(*this, &Game::isAchievementComplete), defaultFlags)
 			.setParameterInfo(0, "achievementId");
 
-		module.addUserDefinedFunction("Game.setAchievementComplete", lemon::wrap(*this, &Game::setAchievementComplete), defaultFlags)
+		module.addNativeFunction("Game.setAchievementComplete", lemon::wrap(*this, &Game::setAchievementComplete), defaultFlags)
 			.setParameterInfo(0, "achievementId");
 
-		module.addUserDefinedFunction("Game.startSkippableCutscene", lemon::wrap(*this, &Game::startSkippableCutscene), defaultFlags);
-		module.addUserDefinedFunction("Game.endSkippableCutscene", lemon::wrap(*this, &Game::endSkippableCutscene), defaultFlags);
+		module.addNativeFunction("Game.startSkippableCutscene", lemon::wrap(*this, &Game::startSkippableCutscene), defaultFlags);
+		module.addNativeFunction("Game.endSkippableCutscene", lemon::wrap(*this, &Game::endSkippableCutscene), defaultFlags);
 	}
 
 	// Discord
 	{
-		module.addUserDefinedFunction("Game.setDiscordDetails", lemon::wrap(&setDiscordDetails), defaultFlags)
+		module.addNativeFunction("Game.setDiscordDetails", lemon::wrap(&setDiscordDetails), defaultFlags)
 			.setParameterInfo(0, "text");
 
-		module.addUserDefinedFunction("Game.setDiscordState", lemon::wrap(&setDiscordState), defaultFlags)
+		module.addNativeFunction("Game.setDiscordState", lemon::wrap(&setDiscordState), defaultFlags)
 			.setParameterInfo(0, "text");
 
-		module.addUserDefinedFunction("Game.setDiscordLargeImage", lemon::wrap(&setDiscordLargeImage), defaultFlags)
+		module.addNativeFunction("Game.setDiscordLargeImage", lemon::wrap(&setDiscordLargeImage), defaultFlags)
 			.setParameterInfo(0, "imageName");
 
-		module.addUserDefinedFunction("Game.setDiscordSmallImage", lemon::wrap(&setDiscordSmallImage), defaultFlags)
+		module.addNativeFunction("Game.setDiscordSmallImage", lemon::wrap(&setDiscordSmallImage), defaultFlags)
 			.setParameterInfo(0, "imageName");
 	}
 
 	// Audio
 	{
-		module.addUserDefinedFunction("Game.setUnderwaterAudioEffect", lemon::wrap(&setUnderwaterAudioEffect), defaultFlags)
+		module.addNativeFunction("Game.setUnderwaterAudioEffect", lemon::wrap(&setUnderwaterAudioEffect), defaultFlags)
 			.setParameterInfo(0, "value");
 	}
 

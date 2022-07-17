@@ -448,83 +448,83 @@ namespace lemon
 
 	void StandardLibrary::registerBindings(lemon::Module& module)
 	{
-		const uint8 flags = UserDefinedFunction::FLAG_ALLOW_INLINE_EXECUTION;
+		const uint8 flags = NativeFunction::FLAG_ALLOW_INLINE_EXECUTION;
 
 		// Register built-in functions, which are directly referenced by the compiler
 		{
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int8>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint8>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int16>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint16>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int32>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint32>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int64>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint64>), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<StringRef>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int8>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint8>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int16>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint16>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int32>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint32>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int64>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint64>), flags);
+			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<StringRef>), flags);
 
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less_or_equal), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater_or_equal), flags);
-			module.addUserDefinedFunction(BUILTIN_NAME_STRING_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::string_length), flags);
+			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), flags);
+			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less), flags);
+			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less_or_equal), flags);
+			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), flags);
+			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater_or_equal), flags);
+			module.addNativeFunction(BUILTIN_NAME_STRING_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::string_length), flags);
 		}
 
-		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<int8>), flags);
-		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<uint8>), flags);
-		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<int16>), flags);
-		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<uint16>), flags);
-		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<int32>), flags);
-		module.addUserDefinedFunction("min", lemon::wrap(&functions::minimum<uint32>), flags);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int8>), flags);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint8>), flags);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int16>), flags);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint16>), flags);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int32>), flags);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint32>), flags);
 
-		module.addUserDefinedFunction("max", lemon::wrap(&functions::maximum<int8>), flags);
-		module.addUserDefinedFunction("max", lemon::wrap(&functions::maximum<uint8>), flags);
-		module.addUserDefinedFunction("max", lemon::wrap(&functions::maximum<int16>), flags);
-		module.addUserDefinedFunction("max", lemon::wrap(&functions::maximum<uint16>), flags);
-		module.addUserDefinedFunction("max", lemon::wrap(&functions::maximum<int32>), flags);
-		module.addUserDefinedFunction("max", lemon::wrap(&functions::maximum<uint32>), flags);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int8>), flags);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint8>), flags);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int16>), flags);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint16>), flags);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int32>), flags);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint32>), flags);
 
-		module.addUserDefinedFunction("clamp", lemon::wrap(&functions::clamp<int8>), flags);
-		module.addUserDefinedFunction("clamp", lemon::wrap(&functions::clamp<uint8>), flags);
-		module.addUserDefinedFunction("clamp", lemon::wrap(&functions::clamp<int16>), flags);
-		module.addUserDefinedFunction("clamp", lemon::wrap(&functions::clamp<uint16>), flags);
-		module.addUserDefinedFunction("clamp", lemon::wrap(&functions::clamp<int32>), flags);
-		module.addUserDefinedFunction("clamp", lemon::wrap(&functions::clamp<uint32>), flags);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int8>), flags);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint8>), flags);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int16>), flags);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint16>), flags);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int32>), flags);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint32>), flags);
 
-		module.addUserDefinedFunction("abs", lemon::wrap(&functions::absolute<uint8, int8>), flags);
-		module.addUserDefinedFunction("abs", lemon::wrap(&functions::absolute<uint16, int16>), flags);
-		module.addUserDefinedFunction("abs", lemon::wrap(&functions::absolute<uint32, int32>), flags);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint8, int8>), flags);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint16, int16>), flags);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint32, int32>), flags);
 
-		module.addUserDefinedFunction("sqrt", lemon::wrap(&functions::sqrt_u32), flags);
+		module.addNativeFunction("sqrt", lemon::wrap(&functions::sqrt_u32), flags);
 
-		module.addUserDefinedFunction("sin_s16", lemon::wrap(&functions::sin_s16), flags);
-		module.addUserDefinedFunction("sin_s32", lemon::wrap(&functions::sin_s32), flags);
-		module.addUserDefinedFunction("cos_s16", lemon::wrap(&functions::cos_s16), flags);
-		module.addUserDefinedFunction("cos_s32", lemon::wrap(&functions::cos_s32), flags);
+		module.addNativeFunction("sin_s16", lemon::wrap(&functions::sin_s16), flags);
+		module.addNativeFunction("sin_s32", lemon::wrap(&functions::sin_s32), flags);
+		module.addNativeFunction("cos_s16", lemon::wrap(&functions::cos_s16), flags);
+		module.addNativeFunction("cos_s32", lemon::wrap(&functions::cos_s32), flags);
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat1), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat1), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1");
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat2), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat2), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1")
 			.setParameterInfo(2, "arg2");
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat3), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat3), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1")
 			.setParameterInfo(2, "arg2")
 			.setParameterInfo(3, "arg3");
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat4), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat4), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1")
 			.setParameterInfo(2, "arg2")
 			.setParameterInfo(3, "arg3")
 			.setParameterInfo(4, "arg4");
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat5), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat5), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1")
 			.setParameterInfo(2, "arg2")
@@ -532,7 +532,7 @@ namespace lemon
 			.setParameterInfo(4, "arg4")
 			.setParameterInfo(5, "arg5");
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat6), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat6), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1")
 			.setParameterInfo(2, "arg2")
@@ -541,7 +541,7 @@ namespace lemon
 			.setParameterInfo(5, "arg5")
 			.setParameterInfo(6, "arg6");
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat7), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat7), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1")
 			.setParameterInfo(2, "arg2")
@@ -551,7 +551,7 @@ namespace lemon
 			.setParameterInfo(6, "arg6")
 			.setParameterInfo(7, "arg7");
 
-		module.addUserDefinedFunction("stringformat", lemon::wrap(&functions::stringformat8), flags)
+		module.addNativeFunction("stringformat", lemon::wrap(&functions::stringformat8), flags)
 			.setParameterInfo(0, "format")
 			.setParameterInfo(1, "arg1")
 			.setParameterInfo(2, "arg2")
@@ -562,19 +562,19 @@ namespace lemon
 			.setParameterInfo(7, "arg7")
 			.setParameterInfo(8, "arg8");
 
-		module.addUserDefinedFunction("strlen", lemon::wrap(&functions::strlen), flags)
+		module.addNativeFunction("strlen", lemon::wrap(&functions::strlen), flags)
 			.setParameterInfo(0, "str");
 
-		module.addUserDefinedFunction("getchar", lemon::wrap(&functions::getchar), flags)
+		module.addNativeFunction("getchar", lemon::wrap(&functions::getchar), flags)
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index");
 
-		module.addUserDefinedFunction("substring", lemon::wrap(&functions::substring), flags)
+		module.addNativeFunction("substring", lemon::wrap(&functions::substring), flags)
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index")
 			.setParameterInfo(2, "length");
 
-		module.addUserDefinedFunction("getStringFromHash", lemon::wrap(&functions::getStringFromHash), flags)
+		module.addNativeFunction("getStringFromHash", lemon::wrap(&functions::getStringFromHash), flags)
 			.setParameterInfo(0, "hash");
 	}
 }
