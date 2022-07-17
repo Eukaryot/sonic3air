@@ -244,8 +244,11 @@ function void TitleScreen_SK()
 
 	#if STANDALONE
 		// In S3AIR, always go to the main menu
-		//  -> It's Data Select here, but that's just for the fade-out to work as in the Sonic 3 title screen
-		global.game_mode = 0x4c
+		FadeOutScreenBlocking()
+		Game.returnToMainMenu()
+		Audio.fadeOutChannel(0, 0x40)	// Do the rest of music fade out relatively quickly
+		yieldExecution()
+
 	#else
 		if (levelselect.unlocked && (control.pad1.state & CONTROL_A))
 		{
