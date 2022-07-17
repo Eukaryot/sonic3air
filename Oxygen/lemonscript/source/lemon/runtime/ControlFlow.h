@@ -21,6 +21,11 @@ namespace lemon
 
 	class API_EXPORT ControlFlow
 	{
+	friend class Runtime;
+	friend class OpcodeExec;
+	friend class OptimizedOpcodeExec;
+	friend struct RuntimeOpcodeContext;
+
 	public:
 		struct State
 		{
@@ -41,6 +46,7 @@ namespace lemon
 
 		inline Runtime& getRuntime()  { return mRuntime; }
 		inline const Program& getProgram()  { return *mProgram; }
+		inline MemoryAccessHandler& getMemoryAccessHandler() { return *mMemoryAccessHandler; }
 
 		void reset();
 
@@ -84,9 +90,6 @@ namespace lemon
 
 	private:
 		Runtime& mRuntime;
-
-	// TODO: Move more functionality from runtime to this class, and change the following part to private
-	public:
 		const Program* mProgram = nullptr;
 
 		CArray<State> mCallStack;	// Not using std::vector for performance reasons in debug builds
