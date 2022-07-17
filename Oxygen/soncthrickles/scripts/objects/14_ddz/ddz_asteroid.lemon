@@ -84,15 +84,21 @@ function void fn0821fc()
 		while (D4.s16 >= 0)
 		{
 			// Spawn smaller asteroids
-			if (!allocDynamicObjectStd())
+		#if STANDALONE
+			// First try to spawn children after this object, otherwise they won't be rendered in this frame
+			if (!allocDynamicObjectAfterA0())
+		#endif
 			{
-				if (objA0.respawn_entry)
+				if (!allocDynamicObjectStd())
 				{
-					A2 = 0xffff0000 + objA0.respawn_entry
-					u8[A2] &= ~0x80
+					if (objA0.respawn_entry)
+					{
+						A2 = 0xffff0000 + objA0.respawn_entry
+						u8[A2] &= ~0x80
+					}
+					UnloadObject()
+					return
 				}
-				UnloadObject()
-				return
 			}
 
 			objA1.update_address = 0x0821de
@@ -121,8 +127,14 @@ function void fn0821fc()
 
 	while (true)
 	{
-		if (!allocDynamicObjectStd())
-			break
+	#if STANDALONE
+		// First try to spawn children after this object, otherwise they won't be rendered in this frame
+		if (!allocDynamicObjectAfterA0())
+	#endif
+		{
+			if (!allocDynamicObjectStd())
+				break
+		}
 
 		// Spawn asteroid debris
 		objA1.update_address = D1

@@ -50,6 +50,7 @@ function void fn034c54()
 	{
 		if (objA0.flags2a & 0x02)
 		{
+			// Still in the air
 			if (objA0.velocity.y < 0x0200)
 			{
 				objA0.velocity.y += 8
@@ -64,8 +65,8 @@ function void fn034c54()
 			objA0.position.y.u16 += 0x13
 			if (u8[A0 + 0x2d] != 0)
 			{
-				objA0.velocity.y = 0
 				objA0.velocity.x = 0
+				objA0.velocity.y = 0
 				objA0.flags2a &= ~0x02
 			}
 			else
@@ -75,7 +76,7 @@ function void fn034c54()
 					D0.u16 = abs(objA0.velocity.x)
 					if (D0.u16 >= 0x40)
 					{
-						D1.u16 = (D0.u16 < 0x0100) ? 0x0800 : 0x0c00
+						D1.s16 = (D0.u16 < 0x0100) ? 0x0800 : 0x0c00
 						if (objA0.velocity.x < 0)
 						{
 							D1.s16 = -D1.s16
@@ -89,6 +90,7 @@ function void fn034c54()
 		}
 		else
 		{
+			// Moving on the ground
 			if (u8[A0 + 0x35] != 0)
 			{
 				fn035868()
@@ -98,12 +100,8 @@ function void fn034c54()
 			{
 				D0.u8 = objA0.value26
 				LookupSinCos()
-				D1.s32 = s32(D1.s16) * objA0.groundspeed
-				D1.s32 >>= 8
-				objA0.velocity.x = D1.u16
-				D0.s32 = s32(D0.s16) * objA0.groundspeed
-				D0.s32 >>= 8
-				objA0.velocity.y = D0.u16
+				objA0.velocity.x = (s32(D1.s16) * objA0.groundspeed) >> 8
+				objA0.velocity.y = (s32(D0.s16) * objA0.groundspeed) >> 8
 
 				fn034dbc()
 
@@ -158,15 +156,11 @@ function void fn034d92()
 //# address-hook(0x034dbc) end(0x034e6c)
 function void fn034dbc()
 {
-	D1.u8 = 0x40
 	if (objA0.groundspeed == 0)
 		return
 
-	if (objA0.groundspeed >= 0)
-	{
-		D1.s16 = -D1.s16
-	}
-	D0.u8 = objA0.value26 + D1.u8
+	D1.s16 = (objA0.groundspeed > 0) ? -0x40 : 0x40
+	D0.u8 = objA0.value26 + D1.s8
 
 	u16 backupD0 = D0.u16
 	objA0.hitbox_extends.x = 0x18
@@ -1021,12 +1015,12 @@ function void fn035706()
 //# address-hook(0x035868) end(0x035962)
 function void fn035868()
 {
-	if (u8[A0 + 0x35] != 0x02)
+	if (u8[A0 + 0x35] != 2)
 	{
 		--objA0.value3a
 		if (s8[A0 + 0x3a] < 0)
 		{
-			if (u8[A0 + 0x35] == 0x03)
+			if (u8[A0 + 0x35] == 3)
 			{
 				if (s8[A0 + 0x3e] < 0)
 				{

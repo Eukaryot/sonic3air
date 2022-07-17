@@ -28,6 +28,7 @@
 // Game objects (up to 110 of them), including some reserved slots:
 //  - 0xffffb000 = main character
 //  - 0xffffb04a = second character
+//  - 0xffffb094 = used by an object that just calls the "ResetDynamicObjectList" function (at least in main game)
 //  - 0xffffb0de = HUD element 1 (things like Time Over text)
 //  - 0xffffb128 = HUD element 2 (ditto)
 //  - 0xffffcb2c = Underwater handler object for S/K
