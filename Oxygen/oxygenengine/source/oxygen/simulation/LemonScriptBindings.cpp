@@ -1227,7 +1227,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 	// Standard library
 	lemon::StandardLibrary::registerBindings(module);
 
-	const uint8 defaultFlags = lemon::NativeFunction::FLAG_ALLOW_INLINE_EXECUTION;
+	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 	module.addNativeFunction("assert", lemon::wrap(&scriptAssert1), defaultFlags);
 	module.addNativeFunction("assert", lemon::wrap(&scriptAssert2), defaultFlags);
 

@@ -201,8 +201,8 @@ int main(int argc, char** argv)
 	var2.mSetter = logValueStr;
 
 	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
-	module.addNativeFunction("maximum", wrap(&testFunctionA));
-	module.addNativeFunction("maximum", wrap(&testFunctionB));
+	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
+	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);
 
 	SomeClass instance;
 	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
@@ -214,6 +214,7 @@ int main(int argc, char** argv)
 	globalsLookup.addDefinitionsFromModule(module);
 
 	{
+		std::cout << "=== Compilation ===\r\n";
 		lemon::Compiler::CompileOptions options;
 		Compiler compiler(module, globalsLookup, options);
 		const bool compileSuccess = compiler.loadScript(L"script01.lemon");
@@ -225,6 +226,7 @@ int main(int argc, char** argv)
 			}
 			return 0;
 		}
+		std::cout << "\r\n";
 	}
 
 #if 0
@@ -271,6 +273,7 @@ int main(int argc, char** argv)
 		const Function* func = program.getFunctionBySignature(rmx::getMurmur2_64(String("main")) + Function::getVoidSignatureHash());
 		RMX_CHECK(nullptr != func, "Function not found", RMX_REACT_THROW);
 
+		std::cout << "=== Execution ===\r\n";
 		Runtime runtime;
 		runtime.setProgram(program);
 		runtime.setMemoryAccessHandler(&memoryAccess);

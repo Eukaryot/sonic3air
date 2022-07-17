@@ -140,8 +140,8 @@ void Game::update(float timeElapsed)
 
 void Game::registerScriptBindings(lemon::Module& module)
 {
-	const uint8 defaultFlags = lemon::NativeFunction::FLAG_ALLOW_INLINE_EXECUTION;
-	const uint8 noInlineExecution = 0;
+	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+	const BitFlagSet<lemon::Function::Flag> noInlineExecution;
 
 	// Game
 	{

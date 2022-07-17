@@ -217,7 +217,7 @@ namespace lemon
 		return func;
 	}
 
-	NativeFunction& Module::addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, uint8 flags)
+	NativeFunction& Module::addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags)
 	{
 		NativeFunction& func = mNativeFunctionPool.createObject();
 		func.mName = name;

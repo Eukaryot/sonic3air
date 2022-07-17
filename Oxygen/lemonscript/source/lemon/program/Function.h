@@ -29,6 +29,7 @@ namespace lemon
 			SCRIPT,
 			NATIVE
 		};
+
 		struct Parameter
 		{
 			const DataTypeDefinition* mType = nullptr;
@@ -36,12 +37,21 @@ namespace lemon
 		};
 		typedef std::vector<Parameter> ParameterList;
 
+		enum class Flag
+		{
+			ALLOW_INLINE_EXECUTION = 0x01,	// Native only: Function can be called directly inside the opcode run loop and does not interfere with control flow
+			COMPILE_TIME_CONSTANT  = 0x02	// Native only: Function only does calculation on the parameters, does not read from run-time sources and has no side-effects 
+		};
+
 	public:
 		static uint32 getVoidSignatureHash();
 
 	public:
 		inline Type getType() const  { return mType; }
 		inline uint32 getID() const  { return mID; }
+
+		inline BitFlagSet<Flag> getFlags() const  { return mFlags; }
+		inline bool hasFlag(Flag flag) const	  { return mFlags.isSet(flag); }
 
 		inline FlyweightString getName() const { return mName; }
 		inline uint64 getNameAndSignatureHash() const { return mNameAndSignatureHash; }
@@ -60,6 +70,7 @@ namespace lemon
 	protected:
 		Type mType;
 		uint32 mID = 0;
+		BitFlagSet<Flag> mFlags;
 
 		// Metadata
 		FlyweightString mName;
@@ -142,11 +153,6 @@ namespace lemon
 			virtual std::vector<const DataTypeDefinition*> getParameterTypes() const = 0;
 		};
 
-		enum Flags
-		{
-			FLAG_ALLOW_INLINE_EXECUTION = 0x01,		// Function can be called directly inside the opcode run loop and does not interfere with control flow
-		};
-
 	public:
 		inline NativeFunction() : Function(Type::NATIVE) {}
 		inline virtual ~NativeFunction()  { delete mFunctionWrapper; }
@@ -158,7 +164,6 @@ namespace lemon
 
 	public:
 		const FunctionWrapper* mFunctionWrapper = nullptr;
-		uint8 mFlags = 0;
 	};
 
 

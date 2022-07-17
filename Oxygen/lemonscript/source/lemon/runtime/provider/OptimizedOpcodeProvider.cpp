@@ -450,16 +450,13 @@ namespace lemon
 				if (!isBaseCall)
 				{
 					const Function* function = runtime.getProgram().getFunctionBySignature((uint64)opcodes[0].mParameter);
-					if (nullptr != function && function->getType() == Function::Type::NATIVE)
+					if (nullptr != function && function->getType() == Function::Type::NATIVE && function->hasFlag(Function::Flag::ALLOW_INLINE_EXECUTION))
 					{
-						if (static_cast<const NativeFunction*>(function)->mFlags & NativeFunction::FLAG_ALLOW_INLINE_EXECUTION)
-						{
-							RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
-							runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_INLINE_CALL;
-							runtimeOpcode.setParameter((uint64)function);
-							outNumOpcodesConsumed = 1;
-							return true;
-						}
+						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
+						runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_INLINE_CALL;
+						runtimeOpcode.setParameter((uint64)function);
+						outNumOpcodesConsumed = 1;
+						return true;
 					}
 				}
 			}

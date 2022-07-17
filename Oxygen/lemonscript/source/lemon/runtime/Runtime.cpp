@@ -565,12 +565,9 @@ namespace lemon
 				runtimeOpcode.setParameter(function);
 				runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED;
 
-				if (function->getType() == Function::Type::NATIVE)
+				if (function->getType() == Function::Type::NATIVE && function->hasFlag(Function::Flag::ALLOW_INLINE_EXECUTION))
 				{
-					if (static_cast<const NativeFunction*>(function)->mFlags & NativeFunction::FLAG_ALLOW_INLINE_EXECUTION)
-					{
-						runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_INLINE_RESOLVED;
-					}
+					runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_INLINE_RESOLVED;
 				}
 
 				// Call the function now

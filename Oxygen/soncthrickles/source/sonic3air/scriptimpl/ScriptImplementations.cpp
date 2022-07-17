@@ -109,7 +109,8 @@ namespace s3air
 
 void ScriptImplementations::registerScriptBindings(lemon::Module& module)
 {
-	const uint8 defaultFlags = lemon::NativeFunction::FLAG_ALLOW_INLINE_EXECUTION;
+	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+
 	module.addNativeFunction("Kosinski.Decompress", lemon::wrap(&s3air::kosinskiDecompress), defaultFlags);
 	module.addNativeFunction("WriteScrollOffsets", lemon::wrap(&s3air::writeScrollOffsets), defaultFlags);
 	module.addNativeFunction("WriteScrollOffsetsFlipped", lemon::wrap(&s3air::writeScrollOffsetsFlipped), defaultFlags);

@@ -52,7 +52,7 @@ namespace lemon
 		const Function* getFunctionByUniqueId(uint64 uniqueId) const;
 
 		ScriptFunction& addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters = nullptr);
-		NativeFunction& addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, uint8 flags = 0);
+		NativeFunction& addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
 
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }

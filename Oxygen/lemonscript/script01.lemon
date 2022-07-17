@@ -14,6 +14,9 @@ constant array<u8> fibonacci =
 
 function void main()
 {
+	Log = 0x99
+	Log = maximum(0x11, 0x22)
+
 	// Test for constant arrays & strings
 	{
 		for (u8 i = 0; i < 11; ++i)
