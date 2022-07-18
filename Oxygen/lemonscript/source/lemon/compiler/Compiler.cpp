@@ -121,7 +121,8 @@ namespace lemon
 		mScriptFiles.reserve(0x200);
 
 		// Recursively load script files
-		if (!loadScriptInternal(*basepath, *filename, outLines, 0))
+		std::unordered_set<uint64> includedPathHashes;
+		if (!loadScriptInternal(*basepath, *filename, outLines, includedPathHashes))
 			return false;
 
 		if (!mCompileOptions.mOutputCombinedSource.empty())
@@ -213,16 +214,16 @@ namespace lemon
 		return false;
 	}
 
-	bool Compiler::loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, int inclusionDepth)
+	bool Compiler::loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes)
 	{
-		// Check for cycle in includes
-		++inclusionDepth;
-		if (inclusionDepth >= 50)
+		const std::wstring filepath = basepath + filename;
+		const uint64 pathHash = rmx::getMurmur2_64(filepath);
+		if (includedPathHashes.count(pathHash) > 0)
 		{
-			ErrorMessage& error = vectorAdd(mErrors);
-			error.mMessage = "Unusually high recursion depth in lemon script includes while loading script file '" + WString(filename).toStdString() + "' at '" + WString(basepath).toStdString() + "' (possibly some kind of cycle in the includes)";
-			return false;
+			// File was already included before, silently ignore the double inclusion
+			return true;
 		}
+		includedPathHashes.insert(pathHash);
 
 		ScriptFile& scriptFile = mScriptFilesPool.createObject();
 		mScriptFiles.push_back(&scriptFile);
@@ -230,7 +231,7 @@ namespace lemon
 		scriptFile.mFilename = filename;
 		scriptFile.mFirstLine = outLines.size() + 1;
 
-		if (!scriptFile.mContent.loadFile(basepath + filename))
+		if (!scriptFile.mContent.loadFile(filepath))
 		{
 			ErrorMessage& error = vectorAdd(mErrors);
 			error.mMessage = "Failed to load script file '" + WString(filename).toStdString() + "' at '" + WString(basepath).toStdString() + "'";
@@ -305,13 +306,13 @@ namespace lemon
 					FTX::FileSystem->listFilesByMask(basepath + *includeBasepath.toWString() + L"*.lemon", false, fileEntries);
 					for (const rmx::FileIO::FileEntry& fileEntry : fileEntries)
 					{
-						if (!loadScriptInternal(basepath + *includeBasepath.toWString(), fileEntry.mFilename, outLines, inclusionDepth))
+						if (!loadScriptInternal(basepath + *includeBasepath.toWString(), fileEntry.mFilename, outLines, includedPathHashes))
 							return false;
 					}
 				}
 				else
 				{
-					if (!loadScriptInternal(basepath + *includeBasepath.toWString(), *(includeFilename + ".lemon").toWString(), outLines, inclusionDepth))
+					if (!loadScriptInternal(basepath + *includeBasepath.toWString(), *(includeFilename + ".lemon").toWString(), outLines, includedPathHashes))
 						return false;
 				}
 

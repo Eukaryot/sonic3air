@@ -99,7 +99,7 @@ namespace lemon
 		struct NodesIterator;
 
 	private:
-		bool loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, int inclusionDepth);
+		bool loadScriptInternal(const std::wstring& basepath, const std::wstring& filename, std::vector<std::string_view>& outLines, std::unordered_set<uint64>& includedPathHashes);
 
 		// Node building
 		void buildNodesFromCodeLines(BlockNode& blockNode, const std::vector<std::string_view>& lines);
