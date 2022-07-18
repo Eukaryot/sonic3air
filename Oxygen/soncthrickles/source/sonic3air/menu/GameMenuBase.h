@@ -83,6 +83,9 @@ public:
 	bool setSelectedIndexByValue(uint32 value);
 	bool sanitizeSelectedIndex(bool allowInvisibleEntries = false);
 
+	size_t getPreviousVisibleIndex() const;
+	size_t getNextVisibleIndex() const;
+
 protected:
 	virtual void renderEntry(RenderContext& renderContext) {}
 

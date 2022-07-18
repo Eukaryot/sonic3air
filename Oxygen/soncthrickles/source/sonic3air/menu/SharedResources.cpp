@@ -162,11 +162,14 @@ namespace global
 
 		for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 		{
-			const String filename(0, "data/images/secrets/%s.png", secret.mImage.c_str());
-			FileHelper::loadTexture(mSecretImage[secret.mType], *filename.toWString());
+			if (!secret.mImage.empty())
+			{
+				const String filename(0, "data/images/secrets/%s.png", secret.mImage.c_str());
+				FileHelper::loadTexture(mSecretImage[secret.mType], *filename.toWString());
 
-			const String filename2(0, "data/images/secrets/%s_locked.png", secret.mImage.c_str());
-			FileHelper::loadTexture(mSecretImage[secret.mType | 0x80000000], *filename2.toWString(), false);	// This is okay to fail for some secrets
+				const String filename2(0, "data/images/secrets/%s_locked.png", secret.mImage.c_str());
+				FileHelper::loadTexture(mSecretImage[secret.mType | 0x80000000], *filename2.toWString(), false);	// This is okay to fail for some secrets
+			}
 		}
 	}
 }

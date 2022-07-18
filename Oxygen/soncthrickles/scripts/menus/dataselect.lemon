@@ -380,6 +380,20 @@ function void DataSelect.setup()
 	// Quick scroll-in effect
 	//u8[0xffffffff] = 12		// No worries, this RAM address is safe to use
 	//camera.foreground.x.u16 -= 360
+
+	// Check save slots to unlock DDZ in Act Select when DDZ was reached once
+	for (u32 slotIndex = 0; slotIndex < 8; ++slotIndex)
+	{
+		u32 slotAddress = 0xffffe6ac + slotIndex * 0x0a
+		u8 characters = (u8[slotAddress + 0x02] >> 4)
+		if (characters == CHARS_SONIC_AND_TAILS || characters == CHARS_SONIC_ALONE)
+		{
+			if ((u8[slotAddress] & 0x7f) != 0 || u8[slotAddress + 0x03] >= 0x0e)
+			{
+				Game.setSecretUnlocked(SECRET_DOOMSDAY_ZONE)
+			}
+		}
+	}
 #endif
 
 	VDP.Config.setActiveDisplay(true)

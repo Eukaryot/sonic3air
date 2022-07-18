@@ -151,6 +151,9 @@ void Game::registerScriptBindings(lemon::Module& module)
 		module.addNativeFunction("Game.isSecretUnlocked", lemon::wrap(*this, &Game::isSecretUnlocked), defaultFlags)
 			.setParameterInfo(0, "secretId");
 
+		module.addNativeFunction("Game.setSecretUnlocked", lemon::wrap(*this, &Game::setSecretUnlocked), defaultFlags)
+			.setParameterInfo(0, "secretId");
+
 		module.addNativeFunction("Game.triggerRestart", lemon::wrap(*this, &Game::triggerRestart), defaultFlags);
 
 		module.addNativeFunction("Game.onGamePause", lemon::wrap(*this, &Game::onGamePause), defaultFlags)
@@ -301,7 +304,7 @@ void Game::checkForUnlockedSecrets()
 
 	for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 	{
-		if (!mPlayerProgress.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
+		if (secret.mUnlockedByAchievements && !mPlayerProgress.isSecretUnlocked(secret.mType) && achievementsCompleted >= secret.mRequiredAchievements)
 		{
 			// Unlock secret now
 			mPlayerProgress.setSecretUnlocked(secret.mType);
@@ -1003,7 +1006,8 @@ void Game::setSecretUnlocked(uint32 secretId)
 	if (!mPlayerProgress.isSecretUnlocked(secretId))
 	{
 		mPlayerProgress.setSecretUnlocked(secretId);
-		GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, "Found hidden secret!", secret->mName);
+		const char* text = (secret->mType == SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE) ? "Unlocked in Act Select" : "Found hidden secret!";
+		GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, text, secret->mName);
 		mPlayerProgress.save();
 	}
 }

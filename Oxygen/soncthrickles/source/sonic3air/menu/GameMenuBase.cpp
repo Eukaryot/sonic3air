@@ -135,6 +135,76 @@ bool GameMenuEntry::sanitizeSelectedIndex(bool allowInvisibleEntries)
 	return true;
 }
 
+size_t GameMenuEntry::getPreviousVisibleIndex() const
+{
+	if (mOptions.empty())
+		return 0;
+
+	size_t index = mSelectedIndex;
+	if (index == 0)
+	{
+		// Can't go further back, check if the current index is visible
+		if (mOptions[index].mVisible)
+			return index;
+
+		// Advance to a visible index
+		const size_t lastIndex = mOptions.size() - 1;
+		while (index < lastIndex)
+		{
+			++index;
+			if (mOptions[index].mVisible)
+				return index;
+		}
+		return 0;
+	}
+	else
+	{
+		// Go back to the previous visible index
+		while (index > 0)
+		{
+			--index;
+			if (mOptions[index].mVisible)
+				return index;
+		}
+		return mSelectedIndex;
+	}
+}
+
+size_t GameMenuEntry::getNextVisibleIndex() const
+{
+	if (mOptions.empty())
+		return 0;
+
+	size_t index = mSelectedIndex;
+	const size_t lastIndex = mOptions.size() - 1;
+	if (index >= lastIndex)
+	{
+		// Can't advance further, check if the current index is visible
+		if (mOptions[index].mVisible)
+			return index;
+
+		// Go back to a visible index
+		while (index > 0)
+		{
+			--index;
+			if (mOptions[index].mVisible)
+				return index;
+		}
+		return lastIndex;
+	}
+	else
+	{
+		// Advance to the next visible index
+		while (index < lastIndex)
+		{
+			++index;
+			if (mOptions[index].mVisible)
+				return index;
+		}
+		return mSelectedIndex;
+	}
+}
+
 
 
 GameMenuEntries::~GameMenuEntries()
@@ -277,41 +347,21 @@ GameMenuEntries::UpdateResult GameMenuEntries::update()
 			if (optionChange < 0)
 			{
 				GameMenuEntry& entry = *mEntries[mSelectedEntryIndex];
-				if (!entry.mOptions.empty())
+				const size_t newIndex = entry.getPreviousVisibleIndex();
+				if (newIndex != entry.mSelectedIndex)
 				{
-					int index = (int)entry.mSelectedIndex;
-					for (int tries = 0; tries < 100; ++tries)
-					{
-						if (index <= 0)
-							break;
-
-						--index;
-						if (entry.mOptions[index].mVisible)		// Continue for invisible options, so they get skipped
-						{
-							entry.mSelectedIndex = index;
-							return UpdateResult::OPTION_CHANGED;
-						}
-					}
+					entry.mSelectedIndex = newIndex;
+					return UpdateResult::OPTION_CHANGED;
 				}
 			}
 			else
 			{
 				GameMenuEntry& entry = *mEntries[mSelectedEntryIndex];
-				if (!entry.mOptions.empty())
+				const size_t newIndex = entry.getNextVisibleIndex();
+				if (newIndex != entry.mSelectedIndex)
 				{
-					int index = (int)entry.mSelectedIndex;
-					for (int tries = 0; tries < 100; ++tries)
-					{
-						if (index >= (int)entry.mOptions.size() - 1)
-							break;
-
-						++index;
-						if (entry.mOptions[index].mVisible)		// Continue for invisible options, so they get skipped
-						{
-							entry.mSelectedIndex = index;
-							return UpdateResult::OPTION_CHANGED;
-						}
-					}
+					entry.mSelectedIndex = newIndex;
+					return UpdateResult::OPTION_CHANGED;
 				}
 			}
 		}

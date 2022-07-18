@@ -1356,27 +1356,6 @@ function void fn05e686()
 
 
 
-//# address-hook(0x05eb72) end(0x05eb86)
-function void fn05eb72()
-{
-	// Sonic
-	objA0.mapping_offset = 0x06036e
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x01e3)
-	objA0.animation.sprite = 0x0c
-}
-
-
-//# address-hook(0x05eb88) end(0x05eb9c)
-function void fn05eb88()
-{
-	// Tails
-	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
-	objA0.animation.sprite = 0x0b
-}
-
-
-
 // Master Emerald carried by the Tornado
 
 //# address-hook(0x05ec94) end(0x05eca4)

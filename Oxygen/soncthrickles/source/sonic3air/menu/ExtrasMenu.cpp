@@ -108,6 +108,9 @@ void ExtrasMenu::onFadeIn()
 
 		for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 		{
+			if (!secret.mShownInMenu)
+				continue;
+
 			// Only certain secrets produce an extra
 			if (secret.mType == SharedDatabase::Secret::SECRET_COMPETITION_MODE ||
 				secret.mType == SharedDatabase::Secret::SECRET_BLUE_SPHERE ||
@@ -130,14 +133,12 @@ void ExtrasMenu::onFadeIn()
 
 		for (const SharedDatabase::Secret& secret : SharedDatabase::getSecrets())
 		{
+			if (!secret.mShownInMenu)
+				continue;
 			if (!secret.mSerialized)	// Excludes the Competition Mode secret, which is not a secret at all actually
 				continue;
-
-			if (secret.mHidden)
-			{
-				if (!PlayerProgress::instance().isSecretUnlocked(secret.mType))
-					continue;
-			}
+			if (secret.mHiddenUntilUnlocked && !PlayerProgress::instance().isSecretUnlocked(secret.mType))
+				continue;
 
 			entries.addEntry(secret.mName, secret.mType);
 		}

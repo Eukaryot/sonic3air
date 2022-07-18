@@ -65,6 +65,7 @@ void ControllerSetupMenu::fadeIn()
 
 void ControllerSetupMenu::initialize()
 {
+	mMenuEntries.clear();
 	mMenuEntries.reserve(16);
 	{
 		GameMenuEntry& entry = mMenuEntries.addEntry("", ::CONTROLLER_SELECT);

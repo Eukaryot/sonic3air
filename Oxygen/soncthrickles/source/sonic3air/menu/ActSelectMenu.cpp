@@ -99,6 +99,10 @@ void ActSelectMenu::setBaseState(BaseState baseState)
 
 void ActSelectMenu::onFadeIn()
 {
+	// Update DDZ
+	mZoneEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
+	mActEntry->getOptionByValue(0x0c00)->mVisible = PlayerProgress::instance().isSecretUnlocked(SharedDatabase::Secret::SECRET_DOOMSDAY_ZONE);
+
 	mState = State::APPEAR;
 
 	mMenuBackground->showPreview(true);
@@ -235,8 +239,8 @@ void ActSelectMenu::render()
 	{
 		const auto& entry = mMenuEntries[line];
 		const std::string& text = entry.mOptions.empty() ? entry.mText : entry.mOptions[entry.mSelectedIndex].mText;
-		const bool canGoLeft  = entry.mOptions.empty() ? false : (entry.mSelectedIndex > 0);
-		const bool canGoRight = entry.mOptions.empty() ? false : (entry.mSelectedIndex < entry.mOptions.size() - 1);
+		const bool canGoLeft  = entry.mOptions.empty() ? false : (entry.getPreviousVisibleIndex() != entry.mSelectedIndex);
+		const bool canGoRight = entry.mOptions.empty() ? false : (entry.getNextVisibleIndex() != entry.mSelectedIndex);
 
 		const int py = positionY[line];
 		const bool isSelected = ((int)line == mMenuEntries.mSelectedEntryIndex);

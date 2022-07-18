@@ -299,17 +299,6 @@ function void fn05ea1a()
 
 
 
-//# address-hook(0x05eb9e) end(0x05ebb2)
-function void fn05eb9e()
-{
-	// Knuckles
-	objA0.mapping_offset = 0x060486
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
-	objA0.animation.sprite = 0x12
-}
-
-
-
 // The Master Emerald
 
 //# address-hook(0x05ebc6) end(0x05ebde)

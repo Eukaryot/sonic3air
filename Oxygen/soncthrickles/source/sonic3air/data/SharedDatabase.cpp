@@ -22,22 +22,6 @@ std::map<uint32, SharedDatabase::Achievement*> SharedDatabase::mAchievementMap;
 std::vector<SharedDatabase::Secret> SharedDatabase::mSecrets;
 
 
-namespace detail
-{
-	void addSetting(std::unordered_map<uint32, SharedDatabase::Setting>& settings, SharedDatabase::Setting::Type id, const char* identifier, SharedDatabase::Setting::SerializationType serializationType, bool enforceAllowInTimeAttack = false)
-	{
-		SharedDatabase::Setting& setting = settings[(uint32)id];
-		setting.mSettingId = id;
-		setting.mIdentifier = std::string(identifier).substr(9);
-		setting.mValue = ((uint32)id & 0xff);
-		setting.mDefaultValue = ((uint32)id & 0xff);
-		setting.mSerializationType = serializationType;
-		setting.mPurelyVisual = ((uint32)id & 0x80000000) != 0;
-		setting.mAllowInTimeAttack = enforceAllowInTimeAttack || setting.mPurelyVisual;
-	}
-}
-
-
 void SharedDatabase::initialize()
 {
 	if (mIsInitialized)
@@ -58,15 +42,27 @@ void SharedDatabase::initialize()
 		mAllZones.emplace_back("hpz", "zone11_hpz", "Hidden Palace Zone",	0x16, 1, 0);	// Not for Time Attack
 		mAllZones.emplace_back("ssz", "zone12_ssz", "Sky Sanctuary Zone",	0x0a, 1, 1);	// Only Act 1
 		mAllZones.emplace_back("dez", "zone13_dez", "Death Egg Zone",		0x0b, 2, 2);
-		mAllZones.emplace_back("ddz", "zone14_ddz", "The Doomsday Zone",	0x0c, 0, 0);
+		mAllZones.emplace_back("ddz", "zone14_ddz", "Doomsday Zone",		0x0c, 1, 0);
 	}
 
 	// Setup gameplay settings
 	{
-		#define ADD_SETTING(id) 			detail::addSetting(mSettings, id, #id, Setting::SerializationType::NONE);
-		#define ADD_SETTING_HIDDEN(id) 		detail::addSetting(mSettings, id, #id, Setting::SerializationType::HIDDEN);
-		#define ADD_SETTING_SERIALIZED(id) 	detail::addSetting(mSettings, id, #id, Setting::SerializationType::ALWAYS);
-		#define ADD_SETTING_ALLOW_TA(id) 	detail::addSetting(mSettings, id, #id, Setting::SerializationType::ALWAYS, true);
+		auto addSetting = [&](SharedDatabase::Setting::Type id, const char* identifier, SharedDatabase::Setting::SerializationType serializationType, bool enforceAllowInTimeAttack = false)
+		{
+			SharedDatabase::Setting& setting = mSettings[(uint32)id];
+			setting.mSettingId = id;
+			setting.mIdentifier = std::string(identifier).substr(9);
+			setting.mValue = ((uint32)id & 0xff);
+			setting.mDefaultValue = ((uint32)id & 0xff);
+			setting.mSerializationType = serializationType;
+			setting.mPurelyVisual = ((uint32)id & 0x80000000) != 0;
+			setting.mAllowInTimeAttack = enforceAllowInTimeAttack || setting.mPurelyVisual;
+		};
+
+		#define ADD_SETTING(id) 			addSetting(id, #id, Setting::SerializationType::NONE);
+		#define ADD_SETTING_HIDDEN(id) 		addSetting(id, #id, Setting::SerializationType::HIDDEN);
+		#define ADD_SETTING_SERIALIZED(id) 	addSetting(id, #id, Setting::SerializationType::ALWAYS);
+		#define ADD_SETTING_ALLOW_TA(id) 	addSetting(id, #id, Setting::SerializationType::ALWAYS, true);
 
 		// These settings get saved in "settings.json" under their setting ID
 		ADD_SETTING_SERIALIZED(Setting::SETTING_FIX_GLITCHES);
@@ -141,34 +137,34 @@ void SharedDatabase::initialize()
 	{
 		mAchievements.reserve(10);
 
-		#define ADD_ACHIEVEMENT(id, name, description, hint, image) \
-		{ \
-			Achievement& achievement = vectorAdd(mAchievements); \
-			achievement.mType = id; \
-			achievement.mName = name; \
-			achievement.mDescription = description; \
-			achievement.mHint = hint; \
-			achievement.mImage = image; \
-		}
+		auto addAchievement = [&](Achievement::Type type, const char* name, const char* description, const char* hint, const char* image)
+		{
+			Achievement& achievement = vectorAdd(mAchievements);
+			achievement.mType = type;
+			achievement.mName = name;
+			achievement.mDescription = description;
+			achievement.mHint = hint;
+			achievement.mImage = image;
+		};
 
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_300_RINGS,				"Attracted to shiny things", "Collect 300 rings without losing them.", "", "rings");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_DOUBLE_INVINCIBILITY,	"Double dose of stars", "Open another invincibility monitor while still being invincible from the last one.", "", "invincibility");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_CONTINUES,				"Old-fashioned life insurance", "Have 5 continues in one game.", "", "continues");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_GOING_HYPER,			"Going Hyper", "Collect all 14 emeralds and transform to a Hyper form.", "", "hyperform");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_SCORE,					"Score millionaire", "Reach a score of 1,000,000 points.", "", "score");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_ELECTROCUTE,			"Electrofishing", "Defeat an underwater enemy by electrocution.", "", "electrocution");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_LONGPLAY,				"Longplay", "Beat the game with any character.", "", "gamebeaten");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_BS_PERFECT,			"Tidied up the place", "Complete a Blue Spheres stage with Perfect.", "", "perfect");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_GS_EXIT_TOP,			"Is there an exit up there", "Reach the top of the Glowing Spheres bonus stage.", "", "glowingspheres");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_SM_JACKPOT,			"Jackpot", "Win the Jackpot in the Slot Machines bonus stage.", "", "jackpot");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_AIZ_TIMEATTACK,		"Bursting through the jungle", "Finish Angel Island Zone Act 1 in Time Attack in under 45 seconds.", "", "timeattack_aiz1");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_MGZ_GIANTRINGS,		"Attracted to giant shiny things", "Enter or collect 6 giant rings in Marble Garden Zone Act 1 in a single run without dying in between.", "", "giantrings_mgz1");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_ICZ_SNOWBOARDING,		"Greedy snowboarder", "Collect all 50 rings in the snow boarding section of IceCap Zone Act 1.", "", "snowboarding");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_ICZ_KNUX_SUNRISE,		"Once see the sunrise", "Defeat the upper boss in IceCap Zone Act 1 with Knuckles (you may need a buddy for this).", "", "icecap1boss");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_LBZ_STAY_DRY,			"Fluffy fur must not get wet", "Get through Launch Base Zone Act 2 without touching any water (requires A.I.R. level layouts).", "", "staydry");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_MHZ_OPEN_MONITORS,		"Display smasher", "Open 18 monitors in Mushroom Hill Zone Act 1 with Knuckles.", "", "monitors");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_FBZ_FREE_ANIMALS,		"Squirrels on a plane", "Free 35 animals in Flying Battery Zone Act 1 before the boss.", "", "animals");
-		ADD_ACHIEVEMENT(Achievement::ACHIEVEMENT_SSZ_DECOYS,			"No touchy", "Fight the second boss in Sonic's Sky Sanctuary but pop at most one of the inflatable Mechas.", "", "decoys");
+		addAchievement(Achievement::ACHIEVEMENT_300_RINGS,				"Attracted to shiny things", "Collect 300 rings without losing them.", "", "rings");
+		addAchievement(Achievement::ACHIEVEMENT_DOUBLE_INVINCIBILITY,	"Double dose of stars", "Open another invincibility monitor while still being invincible from the last one.", "", "invincibility");
+		addAchievement(Achievement::ACHIEVEMENT_CONTINUES,				"Old-fashioned life insurance", "Have 5 continues in one game.", "", "continues");
+		addAchievement(Achievement::ACHIEVEMENT_GOING_HYPER,			"Going Hyper", "Collect all 14 emeralds and transform to a Hyper form.", "", "hyperform");
+		addAchievement(Achievement::ACHIEVEMENT_SCORE,					"Score millionaire", "Reach a score of 1,000,000 points.", "", "score");
+		addAchievement(Achievement::ACHIEVEMENT_ELECTROCUTE,			"Electrofishing", "Defeat an underwater enemy by electrocution.", "", "electrocution");
+		addAchievement(Achievement::ACHIEVEMENT_LONGPLAY,				"Longplay", "Beat the game with any character.", "", "gamebeaten");
+		addAchievement(Achievement::ACHIEVEMENT_BS_PERFECT,				"Tidied up the place", "Complete a Blue Spheres stage with Perfect.", "", "perfect");
+		addAchievement(Achievement::ACHIEVEMENT_GS_EXIT_TOP,			"Is there an exit up there", "Reach the top of the Glowing Spheres bonus stage.", "", "glowingspheres");
+		addAchievement(Achievement::ACHIEVEMENT_SM_JACKPOT,				"Jackpot", "Win the Jackpot in the Slot Machines bonus stage.", "", "jackpot");
+		addAchievement(Achievement::ACHIEVEMENT_AIZ_TIMEATTACK,			"Bursting through the jungle", "Finish Angel Island Zone Act 1 in Time Attack in under 45 seconds.", "", "timeattack_aiz1");
+		addAchievement(Achievement::ACHIEVEMENT_MGZ_GIANTRINGS,			"Attracted to giant shiny things", "Enter or collect 6 giant rings in Marble Garden Zone Act 1 in a single run without dying in between.", "", "giantrings_mgz1");
+		addAchievement(Achievement::ACHIEVEMENT_ICZ_SNOWBOARDING,		"Greedy snowboarder", "Collect all 50 rings in the snow boarding section of IceCap Zone Act 1.", "", "snowboarding");
+		addAchievement(Achievement::ACHIEVEMENT_ICZ_KNUX_SUNRISE,		"Once see the sunrise", "Defeat the upper boss in IceCap Zone Act 1 with Knuckles (you may need a buddy for this).", "", "icecap1boss");
+		addAchievement(Achievement::ACHIEVEMENT_LBZ_STAY_DRY,			"Fluffy fur must not get wet", "Get through Launch Base Zone Act 2 without touching any water (requires A.I.R. level layouts).", "", "staydry");
+		addAchievement(Achievement::ACHIEVEMENT_MHZ_OPEN_MONITORS,		"Display smasher", "Open 18 monitors in Mushroom Hill Zone Act 1 with Knuckles.", "", "monitors");
+		addAchievement(Achievement::ACHIEVEMENT_FBZ_FREE_ANIMALS,		"Squirrels on a plane", "Free 35 animals in Flying Battery Zone Act 1 before the boss.", "", "animals");
+		addAchievement(Achievement::ACHIEVEMENT_SSZ_DECOYS,				"No touchy", "Fight the second boss in Sonic's Sky Sanctuary but pop at most one of the inflatable Mechas.", "", "decoys");
 
 		for (Achievement& achievement : mAchievements)
 		{
@@ -180,29 +176,30 @@ void SharedDatabase::initialize()
 	{
 		mSecrets.reserve(4);
 
-		#define ADD_SECRET(id, requiredAchievements, name, description, image) \
-		{ \
-			Secret& secret = vectorAdd(mSecrets); \
-			secret.mType = id; \
-			secret.mName = name; \
-			secret.mDescription = description; \
-			secret.mImage = image; \
-			secret.mRequiredAchievements = requiredAchievements; \
-			secret.mHidden = (requiredAchievements == -1); \
-			secret.mSerialized = (requiredAchievements != 0); \
-		}
+		auto addSecret = [&](Secret::Type type, bool hiddenUntilUnlocked, bool shownInMenu, bool serialized, uint32 requiredAchievements, const char* name, const char* description, const char* image)
+		{
+			Secret& secret = vectorAdd(mSecrets);
+			secret.mType = type;
+			secret.mName = name;
+			secret.mDescription = description;
+			secret.mImage = image;
+			secret.mRequiredAchievements = requiredAchievements;
+			secret.mUnlockedByAchievements = (requiredAchievements > 0);
+			secret.mHiddenUntilUnlocked = hiddenUntilUnlocked;
+			secret.mShownInMenu = shownInMenu;
+			secret.mSerialized = serialized;
+		};
 
-		ADD_SECRET(Secret::SECRET_COMPETITION_MODE,	0,  "Competition Mode", "As known from original Sonic 3 (& Knuckles).", "competitionmode");
-
-		ADD_SECRET(Secret::SECRET_DROPDASH,			3,  "Sonic Drop Dash", "In the Options menu (in Controls), you can now activate Sonic's Drop Dash move for Normal Game and Act Select.", "dropdash");
-		ADD_SECRET(Secret::SECRET_KNUX_AND_TAILS,	5,  "Knuckles & Tails Mode", "Play as Knuckles & Tails character combination in Normal Game and Act Select.", "knuckles_tails");
-		ADD_SECRET(Secret::SECRET_SUPER_PEELOUT,	7,  "Sonic Super Peel-Out", "The Super Peel-Out move is available in the Options menu. This also unlocks \"Max Control\" Time Attack.", "superpeelout");
-		ADD_SECRET(Secret::SECRET_DEBUGMODE,		10, "Debug Mode", "Debug Mode can be activated in the Options menu (in Tweaks), and is available in Normal Game and Act Select.", "debugmode");
-		ADD_SECRET(Secret::SECRET_BLUE_SPHERE,		12, "Blue Sphere", "Adds the Blue Sphere game to Extras that is known from Sonic 1 locked on to Sonic & Knuckles.", "bluesphere");
-
-		ADD_SECRET(Secret::SECRET_LEVELSELECT,		-1, "Level Select", "Adds the original Sonic 3 & Knuckles Level Select menu to Extras.", "levelselect");
-		ADD_SECRET(Secret::SECRET_TITLE_SK,			-1, "Sonic & Knuckles Title", "You can now select the Sonic & Knuckles title screen in the Options menu.", "title_sk");
-		ADD_SECRET(Secret::SECRET_GAME_SPEED,		-1, "Game Speed Setting", "Ready for a new challenge? Make the game faster (or slower) in the Options menu.", "gamespeed");
+		addSecret(Secret::SECRET_COMPETITION_MODE,	false, true,  false,  0, "Competition Mode", "As known from original Sonic 3 (& Knuckles).", "competitionmode");
+		addSecret(Secret::SECRET_DROPDASH,			false, true,  true,   3, "Sonic Drop Dash", "In the Options menu (in Controls), you can now activate Sonic's Drop Dash move for Normal Game and Act Select.", "dropdash");
+		addSecret(Secret::SECRET_KNUX_AND_TAILS,	false, true,  true,   5, "Knuckles & Tails Mode", "Play as Knuckles & Tails character combination in Normal Game and Act Select.", "knuckles_tails");
+		addSecret(Secret::SECRET_SUPER_PEELOUT,		false, true,  true,   7, "Sonic Super Peel-Out", "The Super Peel-Out move is available in the Options menu. This also unlocks \"Max Control\" Time Attack.", "superpeelout");
+		addSecret(Secret::SECRET_DEBUGMODE,			false, true,  true,  10, "Debug Mode", "Debug Mode can be activated in the Options menu (in Tweaks), and is available in Normal Game and Act Select.", "debugmode");
+		addSecret(Secret::SECRET_BLUE_SPHERE,		false, true,  true,  12, "Blue Sphere", "Adds the Blue Sphere game to Extras that is known from Sonic 1 locked on to Sonic & Knuckles.", "bluesphere");
+		addSecret(Secret::SECRET_LEVELSELECT,		true,  true,  true,   0, "Level Select", "Adds the original Sonic 3 & Knuckles Level Select menu to Extras.", "levelselect");
+		addSecret(Secret::SECRET_TITLE_SK,			true,  true,  true,   0, "Sonic & Knuckles Title", "You can now select the Sonic & Knuckles title screen in the Options menu.", "title_sk");
+		addSecret(Secret::SECRET_GAME_SPEED,		true,  true,  true,   0, "Game Speed Setting", "Ready for a new challenge? Make the game faster (or slower) in the Options menu.", "gamespeed");
+		addSecret(Secret::SECRET_DOOMSDAY_ZONE,		true,  false, true,   0, "Doomsday Zone", "", "");
 	}
 
 	mIsInitialized = true;

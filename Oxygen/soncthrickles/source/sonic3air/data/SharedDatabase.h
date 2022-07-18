@@ -160,7 +160,7 @@ public:
 
 	struct Secret
 	{
-		enum Type		// Hold in sync with script; must not use values >= 32
+		enum Type		// Hold in sync with script; serialized secrets must not use values >= 0x20
 		{
 			SECRET_COMPETITION_MODE = 0x80,		// Not serialized, only for display in the Extras menu
 
@@ -172,7 +172,9 @@ public:
 
 			SECRET_LEVELSELECT		= 0x10,
 			SECRET_TITLE_SK			= 0x11,
-			SECRET_GAME_SPEED		= 0x12
+			SECRET_GAME_SPEED		= 0x12,
+
+			SECRET_DOOMSDAY_ZONE	= 0x18
 		};
 
 		Type mType;
@@ -180,8 +182,10 @@ public:
 		std::string mDescription;
 		std::string mImage;
 		uint32 mRequiredAchievements;
+		bool mUnlockedByAchievements;
+		bool mShownInMenu;
+		bool mHiddenUntilUnlocked;
 		bool mSerialized;
-		bool mHidden;
 	};
 
 public:

@@ -427,7 +427,6 @@ function void fn05eb2e()
 }
 
 
-
 //# address-hook(0x05eb32) end(0x05eb66)
 function void fn05eb32()
 {
@@ -442,12 +441,53 @@ function void fn05eb32()
 		objA0.render_flags |= render_flag.WORLD
 	}
 
-	// Targets:
-	//  - 0x05eb72	-> global.characters = CHARS_SONIC_AND_TAILS
-	//  - 0x05eb72	-> global.characters = CHARS_SONIC_ALONE
-	//  - 0x05eb88	-> global.characters = CHARS_TAILS_ALONE
-	//  - 0x05eb9e	-> global.characters = CHARS_KNUCKLES_ALONE
-	call tableLookupAddress(0x05eb6a, global.characters * 2)
+	// Select character in Tornado by character selection
+	if (isMainCharacter(CHARACTER_SONIC))
+	{
+		// For Sonic as main character: Put Tails into the Tornado
+		fn05eb72()
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		// For Tails as main character: Put Sonic into the Tornado
+		fn05eb88()
+	}
+#if STANDALONE
+	else if (global.zone_act == 0x0d01)
+	{
+		// Special handling for Knuckles in S/T outro: Put Sonic into the Tornado
+		fn05eb88()
+	}
+#endif
+	else
+	{
+		// For Knuckles as main character: Put Sonic into the Tornado, but with a different animation sprite (that uses another palette)
+		fn05eb9e()
+	}
+}
+
+//# address-hook(0x05eb72) end(0x05eb86)
+function void fn05eb72()
+{
+	objA0.mapping_offset = 0x06036e
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x01e3)
+	objA0.animation.sprite = 0x0c
+}
+
+//# address-hook(0x05eb88) end(0x05eb9c)
+function void fn05eb88()
+{
+	objA0.mapping_offset = 0x060486
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
+	objA0.animation.sprite = 0x0b
+}
+
+//# address-hook(0x05eb9e) end(0x05ebb2)
+function void fn05eb9e()
+{
+	objA0.mapping_offset = 0x060486
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x026e)
+	objA0.animation.sprite = 0x12
 }
 
 
@@ -806,7 +846,12 @@ function void fn05f94c()
 	global.random.seed = global.framecounter
 
 	A1 = 0x060b3a
+#if STANDALONE
+	// Differentiate between the outros for Sonic/Tails and Knuckles, to allow for Knuckles in the S/T outro
+	A2 = (global.zone_act != 0x0d01) ? 0xfffffc00 : 0xfffffc20
+#else
 	A2 = isMainCharacter(CHARACTER_KNUCKLES) ? 0xfffffc00 : 0xfffffc20
+#endif
 	copyMemory(A2, A1, 0x10)
 
 	Kosinski.addToDMAQueue(0x165826, 0x76c0)
@@ -875,7 +920,12 @@ function void fn05fa58()
 {
 	objA0.update_address = 0x05fa8c
 	objA0.mapping_offset = 0x053518
+#if STANDALONE
+	// Differentiate the outros for Sonic/Tails and Knuckles, to allow for Knuckles in the S/T outro
+	objA0.sprite_attributes = (global.zone_act != 0x0d01) ? 0x03b6 : (sprite_attribute.PALETTE.LINE1 | 0x03b6)
+#else
 	objA0.sprite_attributes = isMainCharacter(CHARACTER_KNUCKLES) ? 0x03b6 : (sprite_attribute.PALETTE.LINE1 | 0x03b6)
+#endif
 	objA0.sprite_priority = 0x0300
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x10
