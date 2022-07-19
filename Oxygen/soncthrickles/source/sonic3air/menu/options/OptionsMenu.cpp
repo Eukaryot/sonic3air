@@ -870,12 +870,16 @@ void OptionsMenu::initialize()
 	// Fill sound test
 	{
 		mSoundTestAudioDefinitions.clear();
+		const bool hideFastTracks = !Configuration::instance().mDevMode.mEnabled;	// Hide fast tracks, except if in dev mode
 		const auto& audioDefinitions = AudioOut::instance().getAudioCollection().getAudioDefinitions();
-		for (const auto& pair : audioDefinitions)
+		for (const auto& [key, audioDefinition] : audioDefinitions)
 		{
-			if (pair.second.mType == AudioCollection::AudioDefinition::Type::MUSIC || pair.second.mType == AudioCollection::AudioDefinition::Type::JINGLE)
+			if (audioDefinition.mType == AudioCollection::AudioDefinition::Type::MUSIC || audioDefinition.mType == AudioCollection::AudioDefinition::Type::JINGLE)
 			{
-				mSoundTestAudioDefinitions.emplace_back(&pair.second);
+				if (hideFastTracks && rmx::endsWith(audioDefinition.mKeyString, "_fast"))
+					continue;
+
+				mSoundTestAudioDefinitions.emplace_back(&audioDefinition);
 			}
 		}
 
