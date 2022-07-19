@@ -33,7 +33,7 @@ namespace
 		if (tabIndex == 2)
 		{
 			// Achievements are hidden if dev mode or debug mode is active
-			return (!Game::instance().isDebugModeActive() && !EngineMain::getDelegate().useDeveloperFeatures());
+			return (Game::instance().getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) == 0 && !EngineMain::getDelegate().useDeveloperFeatures());
 		}
 	#endif
 		return true;

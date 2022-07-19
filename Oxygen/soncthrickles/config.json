@@ -26,6 +26,7 @@
 	{
 		// For infos on dev mode (developer mode) see Oxygen Handbook in "bonus/oxygenengine" folder
 		"Enabled": "1",					// Set to "1" to enable dev mode
+		"EnforceDebugMode": "0",		// Set to "1" to enable in-game debug mode whenever dev mode is active, independently from what's set in the Options menu
 
 		"LoadSaveState": "state_01",	// Load save state (requires "StartPhase": "3")
 		//"LoadLevel": "0x0601",		// Load level (requires "StartPhase": "3")

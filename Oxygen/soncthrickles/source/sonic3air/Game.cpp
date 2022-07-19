@@ -274,6 +274,15 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 
 	if (nullptr != setting)
 	{
+		// Special handling for Debug Mode setting in dev mode
+		if (settingId == SharedDatabase::Setting::SETTING_DEBUG_MODE)
+		{
+			if (!setting->mValue)
+			{
+				if (EngineMain::getDelegate().useDeveloperFeatures() && ConfigurationImpl::instance().mDevModeImpl.mEnforceDebugMode)
+					return true;
+			}
+		}
 		return setting->mValue;
 	}
 	else
@@ -602,37 +611,6 @@ void Game::updateSpecialInput(float timeElapsed)
 bool Game::shouldPauseOnFocusLoss() const
 {
 	return (GameApp::hasInstance() && Application::instance().getSimulation().isRunning() && Application::instance().getSimulation().getSpeed() > 0.0f && mMode != Mode::MAIN_MENU_BG);
-}
-
-bool Game::isDebugModeActive() const
-{
-	const bool settingActive = (getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) != 0);
-
-#ifdef ENDUSER
-	if (settingActive)
-	{
-		// If Debug Mode got unlocked (and enabled in the options menu), it can be used everywhere -- except for Time Attack and Competition Mode
-		return (mMode != Game::Mode::TIME_ATTACK && mMode != Game::Mode::COMPETITION);
-	}
-	else if (EngineMain::getDelegate().useDeveloperFeatures())
-	{
-		// If Dev Mode is active without having Debug Mode unlocked, it's limited to Act Select and directly started games
-		return (mMode == Game::Mode::UNDEFINED || mMode == Game::Mode::ACT_SELECT);
-	}
-	else
-	{
-		return false;
-	}
-#else
-	if (EngineMain::getDelegate().useDeveloperFeatures() && Configuration::instance().mGameRecording != 2)
-	{
-		return true;
-	}
-	else
-	{
-		return settingActive;
-	}
-#endif
 }
 
 void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
@@ -971,7 +949,7 @@ void Game::setAchievementComplete(uint32 achievementId)
 {
 #ifdef ENDUSER
 	// Can't affect achievements in debug mode
-	if (isDebugModeActive() || EngineMain::getDelegate().useDeveloperFeatures())
+	if (getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) != 0 || EngineMain::getDelegate().useDeveloperFeatures())
 		return;
 #endif
 

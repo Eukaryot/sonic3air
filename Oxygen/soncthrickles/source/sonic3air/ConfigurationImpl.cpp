@@ -87,6 +87,14 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 
 void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 {
+	// Dev mode
+	Json::Value devModeJson = rootHelper.mJson["DevMode"];
+	if (devModeJson.isObject())
+	{
+		JsonHelper devModeHelper(devModeJson);
+		devModeHelper.tryReadBool("EnforceDebugMode", mDevModeImpl.mEnforceDebugMode);
+	}
+
 	// Game server
 	{
 		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];

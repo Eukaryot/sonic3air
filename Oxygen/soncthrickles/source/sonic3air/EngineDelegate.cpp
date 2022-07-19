@@ -142,12 +142,6 @@ void EngineDelegate::registerNativizedCode(lemon::Program& program)
 
 void EngineDelegate::onRuntimeInit(CodeExec& codeExec)
 {
-	// Enable debug mode
-	if (mGame.isDebugModeActive())
-	{
-		codeExec.getEmulatorInterface().writeMemory16(0xffffffda, 1);
-	}
-
 #ifndef ENDUSER
 	// Generation of scripts from data in ROM or another source
 	//ResourceScriptGenerator::generateLevelObjectTableScript(codeExec);

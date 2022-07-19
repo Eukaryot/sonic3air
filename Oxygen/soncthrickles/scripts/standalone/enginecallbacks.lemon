@@ -24,6 +24,9 @@ function void Init()
 #if GAMEAPP
 	// Setup region code according to settings
 	global.region_code = Game.getSetting(SETTING_REGION_CODE)
+
+	if (Game.getSetting(SETTING_DEBUG_MODE))
+		debug_mode.enabled.u8 = 1
 #endif
 
 	// Initialization of global variables

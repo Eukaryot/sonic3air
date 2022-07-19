@@ -16,6 +16,12 @@ class GameProfile;
 class ConfigurationImpl : public ::Configuration
 {
 public:
+	struct DevModeImplSettings
+	{
+		bool mEnforceDebugMode = false;
+	};
+
+public:
 	inline static ConfigurationImpl& instance() { return static_cast<ConfigurationImpl&>(::Configuration::instance()); }
 
 	static void fillDefaultGameProfile(GameProfile& gameProfile);
@@ -44,6 +50,9 @@ public:
 
 	// Settings game version
 	std::string mGameVersionInSettings;
+
+	// Dev mode (in addition to "mDevMode" from base class)
+	DevModeImplSettings mDevModeImpl;
 
 	// Game server
 	struct UpdateCheck

@@ -502,8 +502,6 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	// Read dev mode setting first, as other settings rely on it
 	if (!mDevMode.mEnabled)	// If either config or settings set this to true, then it stays true
 	{
-		rootHelper.tryReadBool("DebugMode", mDevMode.mEnabled);		// Not a mistake -- this is intentional
-
 		Json::Value devModeJson = rootHelper.mJson["DevMode"];
 		if (devModeJson.isObject())
 		{

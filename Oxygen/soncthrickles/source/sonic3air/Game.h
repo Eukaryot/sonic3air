@@ -75,7 +75,6 @@ public:
 	inline PlayerRecorder& getPlayerRecorder()	{ return mPlayerRecorder; }
 
 	bool shouldPauseOnFocusLoss() const;
-	bool isDebugModeActive() const;
 
 	void fillDebugVisualization(Bitmap& bitmap, int& mode);
 

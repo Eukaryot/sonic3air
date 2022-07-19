@@ -17,6 +17,7 @@
 	// Dev mode
 	"DevMode":
 	{
-		"Enabled": "0"		// Set to "1" to enable developer mode (see Oxygen Handbook in "bonus/oxygenengine" folder for details)
+		"Enabled": "0",				// Set to "1" to enable developer mode (see Oxygen Handbook in "bonus/oxygenengine" folder for details)
+		"EnforceDebugMode": "0"		// Set to "1" to enable in-game debug mode whenever dev mode is active, independently from what's set in the Options menu
 	}
 }
