@@ -314,6 +314,10 @@ function void fn034f4c()
 //# address-hook(0x034f6a) end(0x034fba)
 function void fn034f6a()
 {
+	// Fix for possible soft-lock when using a bubble bounce to get on the spinning top, #contributed by GFX32
+	if (objA1.flags2a & char.flag.IN_AIR)
+		return
+
 	u8 bit = (1 << D6.u8)
 	if ((objA0.flags2a & bit) == 0)
 	{
