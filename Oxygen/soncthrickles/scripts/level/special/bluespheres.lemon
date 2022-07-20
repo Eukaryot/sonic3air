@@ -142,12 +142,12 @@ function void SpecialStage()
 	BlueSpheres.RenderSpheres()
 	fn009d5e()
 
-	u8[0xffffe433] = 0x01
+	bluespheres.stage_exit_animation = 1
 	global.frame_state = 0x1c
 
 	waitForNextFrame()
 
-	u8[0xffffe433] = 0
+	bluespheres.stage_exit_animation = 0
 	VDP.Config.setRenderingModeConfiguration(true)		// Enable shadow/highlight palette mode
 
 	global.demo_countdown = 1800
@@ -461,7 +461,7 @@ function void fn0085b0()
 //# address-hook(0x0087da) end(0x008818)
 function void fn0087da()
 {
-	if (u8[0xffffe433] == 0)
+	if (bluespheres.stage_exit_animation == 0)
 	{
 		D0.u16 = u16[0xffffe420]
 		if (D0.u16 >= 0x10)
@@ -824,7 +824,7 @@ function void fn00903e()
 	}
 
 	objA0.animation.sprite = u8[A1 + D0.s16]
-	if ((bluespheres.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0 && (control.pad1.pressed & CONTROL_ABC))
+	if ((bluespheres.jumping_flags.player1 & 0x80) == 0 && bluespheres.stage_exit_state == 0 && (control.pad1.pressed & CONTROL_ABC))
 	{
 		bluespheres.jumping_flags.player1 = 1
 	}
@@ -965,7 +965,7 @@ function void fn00927a()
 
 	fn009402()
 
-	if (u8[A0 + 0x44] == 0x05 && u8[0xffffe44c] == 0 && s8(bluespheres.jumping_flags.player2) >= 0)
+	if (u8[A0 + 0x44] == 0x05 && bluespheres.stage_exit_state == 0 && s8(bluespheres.jumping_flags.player2) >= 0)
 	{
 		if ((bluespheres.direction & 0x3f) == 0)
 		{
@@ -1193,20 +1193,22 @@ function void fn00953e()
 //# address-hook(0x009580) end(0x00972c)
 function void fn009580()
 {
-	if (u8[0xffffe433] != 0)
+	if (bluespheres.stage_exit_animation != 0)
 	{
-		if (u8[0xffffe433] < 0x61)
+		if (bluespheres.stage_exit_animation <= 0x60)
 		{
+			// Fast rotation of the stage after collecting the emerald
 			D1 = 8
 			bluespheres.direction += 8
-			++u8[0xffffe433]
+			++bluespheres.stage_exit_animation
 			return
 		}
 
+		// This seems to be dead code, at least in S3AIR, as "bluespheres.stage_exit_animation" doesn't reach a value above 0x3d
 		D0.u16 = (bluespheres.position.x | bluespheres.position.y) & 0xe0
 		if (D0.u16 != 0)
 		{
-			u8[0xffffe433] = 0
+			bluespheres.stage_exit_animation = 0
 		}
 	}
 
@@ -1238,7 +1240,7 @@ function void fn009580()
 
 	D1.u8 = control.pad1.state
 	D2.s16 = bluespheres.movement_speed
-	if (u8[0xffffe44c] == 0)
+	if (bluespheres.stage_exit_state == 0)
 	{
 		if (bluespheres.hitting_bumper == 0)
 		{
@@ -1320,7 +1322,7 @@ function void fn009580()
 	bluespheres.position.x -= D0 >> 16
 	bluespheres.position.y -= D1 >> 16
 
-	if ((bluespheres.jumping_flags.player1 & 0x80) == 0 && u8[0xffffe44c] == 0)
+	if ((bluespheres.jumping_flags.player1 & 0x80) == 0 && bluespheres.stage_exit_state == 0)
 	{
 		fn00972e()
 	}
@@ -1342,10 +1344,10 @@ function void fn00972e()
 	{
 		// Ran into red sphere
 		D0.u16 = (bluespheres.position.x | bluespheres.position.y) & 0xe0
-		if (D0.u16 == 0 && u8[0xffffe433] == 0)
+		if (D0.u16 == 0 && bluespheres.stage_exit_animation == 0)
 		{
 			// Game over
-			u8[0xffffe433] = 1
+			bluespheres.stage_exit_animation = 1
 			global.game_mode = (bluespheres.minigame_mode == 0) ? 0x48 : 0x2c
 			if (global.stage_type != 0)
 			{
@@ -1457,7 +1459,7 @@ function void fn00972e()
 	else if (D2.u8 == 5)
 	{
 		// Yellow spring sphere
-		if (u8[0xffffe44c] == 0 && (bluespheres.jumping_flags.player1 & 0x80) == 0)
+		if (bluespheres.stage_exit_state == 0 && (bluespheres.jumping_flags.player1 & 0x80) == 0)
 		{
 			D0.u8 = bluespheres.direction & 0x3f
 			if (D0.u8 == 0)
@@ -1668,7 +1670,7 @@ function void BlueSpheres.RenderSingleSphereB()
 //# address-hook(0x009b62) end(0x009d1c)
 function void fn009b62()
 {
-	if (u8[0xffffe44c] == 1)
+	if (bluespheres.stage_exit_state == 1)
 	{
 	#if STANDALONE
 		if (bluespheres.rings_remaining == 0)
@@ -1689,17 +1691,13 @@ function void fn009b62()
 		}
 
 		// Spawn the emerald
-		++u8[0xffffe44c]
+		++bluespheres.stage_exit_state
 		zeroMemory(0xfffff100, 0x400)
 
 		D0.u8 = bluespheres.direction
 		LookupSinCos()
-		D2.u16 = bluespheres.position.x
-		D3.u16 = bluespheres.position.y
-		D0.s16 <<= 3
-		D1.s16 <<= 3
-		D2.u16 -= D0.u16
-		D3.u16 -= D1.u16
+		D2.u16 = bluespheres.position.x - D0.s16 * 8
+		D3.u16 = bluespheres.position.y - D1.s16 * 8
 
 		A1 = 0xfffff100
 		D0.u16 = ((D2.u16 + 0x80) >> 8) & 0x1f
@@ -1717,7 +1715,7 @@ function void fn009b62()
 		A1 = (global.sk_bluespheres) ? 0x0ae99e : 0x0ae3ec
 		Kosinski.addToDMAQueue(A1, 0xb4e0)
 	}
-	else if (u8[0xffffe44c] == 2)
+	else if (bluespheres.stage_exit_state == 2)
 	{
 		if (kosinski.waiting_modules == 0)
 		{
@@ -1725,12 +1723,12 @@ function void fn009b62()
 			--bluespheres.emerald_jingle_countdown
 			if (bluespheres.emerald_jingle_countdown == 0)
 			{
-				++u8[0xffffe44c]
+				++bluespheres.stage_exit_state
 				playMusic(MUSIC_CHAOSEMERALD)
 			}
 		}
 	}
-	else if (u8[0xffffe44c] == 3)
+	else if (bluespheres.stage_exit_state == 3)
 	{
 		D0.u16 = ((bluespheres.position.x + 0x80) >> 8) & 0x1f
 		D1.u16 = ((bluespheres.position.y + 0x80) >> 8) & 0x1f
@@ -1753,8 +1751,8 @@ function void fn009b62()
 					}
 				}
 
-				++u8[0xffffe44c]
-				u8[0xffffe433] = 1
+				++bluespheres.stage_exit_state
+				bluespheres.stage_exit_animation = 1
 				global.game_mode = (bluespheres.minigame_mode != 0) ? 0x30 : 0x48
 
 				if (global.stage_type != 0)
@@ -1919,7 +1917,7 @@ function void BlueSpheres.OnBlueSphereCollected()
 	--bluespheres.blue_remaining
 	if (bluespheres.blue_remaining == 0)
 	{
-		u8[0xffffe44c] = 1
+		bluespheres.stage_exit_state = 1
 	}
 }
 
@@ -2415,7 +2413,7 @@ function void fn02df64()
 	if (Game.getSetting(SETTING_BS_REPEAT_ON_FAIL))
 	{
 		// Do not go to next stage if failed this stage
-		goToNextStage = (u8[0xffffe44c] != 0)
+		goToNextStage = (bluespheres.stage_exit_state != 0)
 	}
 #endif
 	if (goToNextStage)
