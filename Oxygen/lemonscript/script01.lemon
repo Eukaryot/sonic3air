@@ -14,9 +14,7 @@ constant array<u8> fibonacci =
 
 function void main()
 {
-	Log = 0x99
-	Log = maximum(0x11, 0x22)
-
+#if 0
 	// Test for constant arrays & strings
 	{
 		for (u8 i = 0; i < 11; ++i)
@@ -24,10 +22,7 @@ function void main()
 			debugLog(stringformat("[%d] = %d", i, fibonacci[i]))
 		}
 
-		constant array<string> strings =
-		{
-			"ABC", "DEF", "GHIJKL", "MNOP", "QRSTUV"
-		}
+		constant array<string> strings = { "ABC", "DEF", "GHIJKL", "MNOP", "QRSTUV" }
 
 		for (u8 i = 0; i < strings.length(); ++i)
 		{
@@ -37,8 +32,9 @@ function void main()
 		string hello = "Hello " + "World!"
 		Log = hello.length()
 	}
+#endif
 
-
+#if 0
 	u8 a = 0
 	if (a == ONE)
 	{
@@ -61,7 +57,7 @@ function void main()
 		}
 	else
 		Log = 0
-
+#endif
 
 	runTests()
 }
@@ -82,6 +78,8 @@ function void runTests()
 		debugLog("Test D failed")
 	if (!testE())
 		debugLog("Test E failed")
+	if (!testF())
+		debugLog("Test F failed")
 
 	debugLog("Done with all tests")
 }
@@ -122,3 +120,10 @@ function bool testE()
 	return (result == 0xb8)
 }
 
+function bool testF()
+{
+	s8 range = 2
+	s16 value = -20
+	s16 result = clamp(value, -range, range)
+	return (result == -2)
+}
