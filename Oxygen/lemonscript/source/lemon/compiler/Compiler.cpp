@@ -37,6 +37,11 @@ namespace lemon
 		{
 			return (token.getType() == Token::Type::OPERATOR && token.as<OperatorToken>().mOperator == op);
 		}
+
+		bool isKeyword(const Token& token, Keyword keyword)
+		{
+			return (token.getType() == Token::Type::KEYWORD && token.as<KeywordToken>().mKeyword == keyword);
+		}
 	}
 
 
@@ -1110,23 +1115,50 @@ namespace lemon
 		// Check for "constant array"
 		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mName.getHash() == ARRAY_NAME_HASH)
 		{
-			CHECK_ERROR(tokens.size() == 7, "Syntax error in constant array definition", lineNumber);
+			CHECK_ERROR(tokens.size() >= 7, "Syntax error in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", lineNumber);
 			CHECK_ERROR(tokens[3].getType() == Token::Type::VARTYPE, "Expected a type in <> in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[4], Operator::COMPARE_GREATER), "Expected a type in <> in constant array definition", lineNumber);
 			CHECK_ERROR(tokens[5].getType() == Token::Type::IDENTIFIER, "Expected identifier in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[6], Operator::ASSIGN), "Expected assignment at the end of constant array definition", lineNumber);
 
-			Node* nextNode = nodesIterator.peek();
-			CHECK_ERROR(nullptr != nextNode, "Constant array definition as last node is not allowed", lineNumber);
-			CHECK_ERROR(nextNode->getType() == Node::Type::BLOCK, "Expected block node after constant array header", lineNumber);
-
-			// Go through the block node and collect the values
 			static std::vector<uint64> values;
+			values.clear();
+			values.reserve(0x20);
+
+			bool removeNextNode = false;
+			if (tokens.size() >= 8)
 			{
+				CHECK_ERROR(tokens.size() >= 9, "Syntax error in constant array definition", lineNumber);
+				CHECK_ERROR(isKeyword(tokens[7], Keyword::BLOCK_BEGIN), "Expected { or a line break after = in constant array definition", lineNumber);
+				CHECK_ERROR(isKeyword(tokens.back(), Keyword::BLOCK_END), "Expected } at the end of constant array definition", lineNumber);
+
+				// Handle one-liner definition of constant array
+				bool expectingComma = false;
+				for (size_t i = 8; i < tokens.size() - 1; ++i)
+				{
+					Token& token = tokens[i];
+					if (expectingComma)
+					{
+						CHECK_ERROR(isOperator(token, Operator::COMMA_SEPARATOR), "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+						expectingComma = false;
+					}
+					else
+					{
+						CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
+						values.push_back(token.as<ConstantToken>().mValue);
+						expectingComma = true;
+					}
+				}
+			}
+			else
+			{
+				Node* nextNode = nodesIterator.peek();
+				CHECK_ERROR(nullptr != nextNode, "Constant array definition as last node is not allowed", lineNumber);
+				CHECK_ERROR(nextNode->getType() == Node::Type::BLOCK, "Expected block node after constant array header", lineNumber);
+
+				// Go through the block node and collect the values
 				BlockNode& content = nextNode->as<BlockNode>();
-				values.clear();
-				values.reserve(0x20);
 				bool expectingComma = false;
 				for (size_t n = 0; n < content.mNodes.size(); ++n)
 				{
@@ -1148,6 +1180,8 @@ namespace lemon
 						}
 					}
 				}
+
+				removeNextNode = true;
 			}
 
 			ConstantArray& constantArray = mModule.addConstantArray(tokens[5].as<IdentifierToken>().mName.getString(), tokens[3].as<VarTypeToken>().mDataType, &values[0], values.size(), isGlobalDefinition);
@@ -1160,9 +1194,12 @@ namespace lemon
 				scopeContext->mLocalConstantArrays.push_back(&constantArray);
 			}
 
-			// Erase block node pointer
-			++nodesIterator;
-			nodesIterator.eraseCurrent();
+			if (removeNextNode)
+			{
+				// Erase block node pointer
+				++nodesIterator;
+				nodesIterator.eraseCurrent();
+			}
 		}
 		else
 		{
