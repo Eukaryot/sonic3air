@@ -39,10 +39,10 @@ namespace
 	{
 		PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
 		std::vector<uint8> fileContent;
-		Color palette[256] = { Color::TRANSPARENT };
+		Color palette[0x100] = { Color::TRANSPARENT };
 		PaletteBitmap bmp;
 		bmp.create(16, 16);
-		for (int colorIndex = 0; colorIndex < 256; ++colorIndex)
+		for (int colorIndex = 0; colorIndex < 0x100; ++colorIndex)
 		{
 			palette[colorIndex] = paletteManager.getPaletteEntry(paletteIndex, colorIndex);
 			bmp.getData()[colorIndex] = colorIndex;
@@ -651,7 +651,7 @@ void GameView::render()
 			int py = baseY + 1;
 			for (int k = 0; k < 0x100; ++k)
 			{
-				const int px = baseX + 1 + (k % 0x10) * 5;
+				const int px = baseX + 1 + (k & 0x0f) * 5;
 				const int height = (k < 0x40) ? 4 : 2;
 				Color color = paletteManager.getPaletteEntry(paletteIndex, k);
 				color.a = 1.0f;

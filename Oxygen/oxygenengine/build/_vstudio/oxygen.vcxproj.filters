@@ -513,9 +513,6 @@
     <ClInclude Include="..\..\source\oxygen\simulation\LogDisplay.h">
       <Filter>simulation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\simulation\Runtime.h">
-      <Filter>simulation</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h">
       <Filter>simulation</Filter>
     </ClInclude>
