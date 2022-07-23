@@ -174,11 +174,27 @@ namespace lemon
 					output << function->getName().getString() << ":\r\n";
 					for (const Opcode& opcode : function->mOpcodes)
 					{
-						const String typeString = Opcode::GetTypeString(opcode.mType);
-						output << typeString << " (" << rmx::hexString((uint8)opcode.mDataType, 2) << "):";
+						String typeString = Opcode::GetTypeString(opcode.mType);
+						switch (opcode.mDataType)
+						{
+							case BaseType::VOID:	 break;
+							case BaseType::UINT_8:	 typeString << ".u8";   break;
+							case BaseType::UINT_16:	 typeString << ".u16";  break;
+							case BaseType::UINT_32:	 typeString << ".u32";  break;
+							case BaseType::UINT_64:	 typeString << ".u64";  break;
+							case BaseType::INT_8:	 typeString << ".s8";   break;
+							case BaseType::INT_16:	 typeString << ".s16";  break;
+							case BaseType::INT_32:	 typeString << ".s32";  break;
+							case BaseType::INT_64:	 typeString << ".s64";  break;
+							default:
+								typeString << "(" << rmx::hexString((uint8)opcode.mDataType, 2) << ")";
+								break;
+						}
+						output << "\t" << typeString << " ";
+
 						if (opcode.mParameter != 0)
 						{
-							output.add(' ', 19 - typeString.length());
+							output.add(' ', 22 - typeString.length());
 							output << rmx::hexString(opcode.mParameter, 16);
 						}
 						output << "\r\n";
@@ -662,7 +678,7 @@ namespace lemon
 				parameters.emplace_back();
 
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::VARTYPE, "Expected type in function parameter definition", lineNumber);
-				parameters.back().mType = tokens[offset].as<VarTypeToken>().mDataType;
+				parameters.back().mDataType = tokens[offset].as<VarTypeToken>().mDataType;
 
 				++offset;
 				CHECK_ERROR(tokens[offset].getType() == Token::Type::IDENTIFIER, "Expected identifier in function parameter definition", lineNumber);
@@ -690,7 +706,7 @@ namespace lemon
 		for (const Function::Parameter& parameter : function.getParameters())
 		{
 			CHECK_ERROR(nullptr == function.getLocalVariableByIdentifier(parameter.mName.getHash()), "Parameter name already used", lineNumber);
-			function.addLocalVariable(parameter.mName, parameter.mType, lineNumber);
+			function.addLocalVariable(parameter.mName, parameter.mDataType, lineNumber);
 		}
 
 		// Set source metadata

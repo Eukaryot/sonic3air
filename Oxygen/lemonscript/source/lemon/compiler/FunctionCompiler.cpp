@@ -105,7 +105,7 @@ namespace lemon
 			const Function::Parameter& parameter = mFunction.getParameters()[index];
 			const Variable* variable = mFunction.getLocalVariableByIdentifier(parameter.mName.getHash());
 			RMX_ASSERT(nullptr != variable, "Variable not found");
-			RMX_ASSERT(variable->getDataType() == parameter.mType, "Variable has wrong type");
+			RMX_ASSERT(variable->getDataType() == parameter.mDataType, "Variable has wrong data type");
 
 			// Assume the variable value is on the stack
 			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getID());

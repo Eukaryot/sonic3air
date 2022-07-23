@@ -75,7 +75,8 @@ namespace lemon
 		void addStringLiteral(FlyweightString str);
 
 		// Serialization
-		bool serialize(VectorBinarySerializer& serializer);
+		uint32 buildDependencyHash() const;
+		bool serialize(VectorBinarySerializer& serializer, uint32 dependencyHash);
 
 		inline uint64 getCompiledCodeHash() const     { return mCompiledCodeHash; }
 		inline void setCompiledCodeHash(uint64 hash)  { mCompiledCodeHash = hash; }

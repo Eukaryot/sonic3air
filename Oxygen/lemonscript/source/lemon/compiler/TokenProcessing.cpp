@@ -549,7 +549,7 @@ namespace lemon
 							CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
 							for (size_t i = 0; i < parameterTypes.size(); ++i)
 							{
-								CHECK_ERROR(parameterTypes[i] == mContext.mFunction->getParameters()[i].mType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
+								CHECK_ERROR(parameterTypes[i] == mContext.mFunction->getParameters()[i].mDataType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
 							}
 
 							// Use the very same function again, as a base call
@@ -654,7 +654,7 @@ namespace lemon
 
 				#ifdef DEBUG
 					const Function::ParameterList& parameterList = matchingFunction->getParameters();
-					RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mType == &PredefinedDataTypes::UINT_32 && parameterList[1].mType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
+					RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mDataType == &PredefinedDataTypes::UINT_32 && parameterList[1].mDataType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
 				#endif
 
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
@@ -954,7 +954,7 @@ namespace lemon
 						for (size_t k = 0; k < ft.mParameters.size(); ++k)
 						{
 							const Function::Parameter& parameter = ft.mFunction->getParameters()[k];
-							controlFlow.pushValueStack(parameter.mType, ft.mParameters[k].as<ConstantToken>()->mValue);
+							controlFlow.pushValueStack(parameter.mDataType, ft.mParameters[k].as<ConstantToken>()->mValue);
 						}
 						static_cast<const NativeFunction*>(ft.mFunction)->mFunctionWrapper->execute(NativeFunction::Context(controlFlow));
 

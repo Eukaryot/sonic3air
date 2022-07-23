@@ -146,7 +146,7 @@ namespace lemon
 
 		for (size_t i = 0; i < size; ++i)
 		{
-			priorities[i] = getImplicitCastPriority(original[i], target[i].mType);
+			priorities[i] = getImplicitCastPriority(original[i], target[i].mDataType);
 		}
 
 		// Highest priority should be first

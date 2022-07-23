@@ -155,7 +155,7 @@ namespace lemon
 				if (i != 0)
 					content << ", ";
 				const Function::Parameter& parameter = function->getParameters()[i];
-				content << parameter.mType->toString();
+				content << parameter.mDataType->toString();
 				if (parameter.mName.isValid())
 					content << " " << parameter.mName.getString();
 			}
@@ -324,7 +324,13 @@ namespace lemon
 		mStringLiterals.push_back(str);
 	}
 
-	bool Module::serialize(VectorBinarySerializer& outerSerializer)
+	uint32 Module::buildDependencyHash() const
+	{
+		// Just a very simple "hash" that changes when a new definition gets added
+		return (uint32)(mFunctions.size() + mGlobalVariables.size() + mConstants.size() + mConstantArrays.size() + mDefines.size() + mStringLiterals.size());
+	}
+
+	bool Module::serialize(VectorBinarySerializer& outerSerializer, uint32 dependencyHash)
 	{
 		// Format version history:
 		//  - 0x00 = First version, no signature yet
@@ -337,10 +343,11 @@ namespace lemon
 		//  - 0x07 = Several compatibility breaking changes and extensions (e.g. constant arrays)
 		//  - 0x08 = Added preprocessor definitions
 		//  - 0x09 = Added source file infos + more compact way of line number serialization
+		//  - 0x0a = Added dependency hash
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x09;
+		uint16 version = 0x0a;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -349,13 +356,18 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x09)
+			if (version < 0x0a)
 				return false;	// Loading older versions is not supported
+
+			const uint32 readDependencyHash = outerSerializer.read<uint32>();
+			if (readDependencyHash != dependencyHash)
+				return false;
 		}
 		else
 		{
 			outerSerializer.write(SIGNATURE);
 			outerSerializer.write(version);
+			outerSerializer.write(dependencyHash);
 		}
 
 		// Setup buffer and serializer for the uncompressed data
@@ -441,7 +453,7 @@ namespace lemon
 					for (uint8 k = 0; k < parameterCount; ++k)
 					{
 						parameters[k].mName.serialize(serializer);
-						parameters[k].mType = DataTypeHelper::readDataType(serializer);
+						parameters[k].mDataType = DataTypeHelper::readDataType(serializer);
 					}
 
 					if (type == Function::Type::NATIVE)
@@ -548,7 +560,7 @@ namespace lemon
 					for (uint8 k = 0; k < parameterCount; ++k)
 					{
 						function.mParameters[k].mName.write(serializer);
-						DataTypeHelper::writeDataType(serializer, function.mParameters[k].mType);
+						DataTypeHelper::writeDataType(serializer, function.mParameters[k].mDataType);
 					}
 
 					if (function.getType() == Function::Type::SCRIPT)

@@ -32,7 +32,7 @@ namespace lemon
 
 		struct Parameter
 		{
-			const DataTypeDefinition* mType = nullptr;
+			const DataTypeDefinition* mDataType = nullptr;
 			FlyweightString mName;
 		};
 		typedef std::vector<Parameter> ParameterList;

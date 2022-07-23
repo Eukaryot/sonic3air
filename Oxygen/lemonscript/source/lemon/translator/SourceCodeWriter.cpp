@@ -51,7 +51,7 @@ namespace lemon
 		{
 			if (i > 0)
 				line << ", ";
-			addDataType(line, function.getParameters()[i].mType);
+			addDataType(line, function.getParameters()[i].mDataType);
 			line << " ";
 			addIdentifier(line, function.getParameters()[i].mName.getString());
 		}

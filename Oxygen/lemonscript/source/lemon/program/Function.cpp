@@ -88,7 +88,7 @@ namespace lemon
 		mParameters.resize(parameterTypes.size());
 		for (size_t i = 0; i < parameterTypes.size(); ++i)
 		{
-			mParameters[i].mType = parameterTypes[i];
+			mParameters[i].mDataType = parameterTypes[i];
 		}
 		mSignatureHash = 0;
 	}
@@ -108,7 +108,7 @@ namespace lemon
 			data.push_back(mReturnType->getDataTypeHash());
 			for (const Parameter& parameter : mParameters)
 			{
-				data.push_back(parameter.mType->getDataTypeHash());
+				data.push_back(parameter.mDataType->getDataTypeHash());
 			}
 
 			mSignatureHash = rmx::getFNV1a_32((const uint8*)&data[0], data.size() * sizeof(uint32));
