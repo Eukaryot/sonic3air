@@ -61,8 +61,10 @@ void main()
 {
 	vec4 color = texture(SpriteTexture, uv0.xy);
 	color = color * TintColor + AddedColor;
+#ifdef ALPHA_TEST
 	if (color.a < 0.01)
 		discard;
+#endif
 
 	FragColor = color;
 }
@@ -73,8 +75,14 @@ void main()
 
 technique Standard
 {
-	blendfunc = alpha;
+	blendfunc = opaque;
 	vs = Shared + Vertex;
 	fs = Shared + Fragment;
 	vertexattrib[0] = position;
+}
+
+technique Standard_AlphaTest : Standard
+{
+	blendfunc = alpha;
+	define = ALPHA_TEST;
 }

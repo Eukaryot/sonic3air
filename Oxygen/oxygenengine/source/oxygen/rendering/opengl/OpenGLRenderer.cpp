@@ -55,8 +55,11 @@ void OpenGLRenderer::initialize()
 		}
 	}
 	mRenderVdpSpriteShader.initialize();
-	mRenderPaletteSpriteShader.initialize();
-	mRenderComponentSpriteShader.initialize();
+	for (int k = 0; k < 2; ++k)
+	{
+		mRenderPaletteSpriteShader[k].initialize(k == 1);
+		mRenderComponentSpriteShader[k].initialize(k == 1);
+	}
 	mDebugDrawPlaneShader.initialize();
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -341,7 +344,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::PALETTE:
 				{
 					const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(sg.mSpriteInfo);
-					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader;
+					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
 					if (needsRefresh)
 					{
 						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
@@ -359,7 +362,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::COMPONENT:
 				{
 					const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(sg.mSpriteInfo);
-					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader;
+					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
 					if (needsRefresh)
 					{
 						shader.refresh(mGameResolution);

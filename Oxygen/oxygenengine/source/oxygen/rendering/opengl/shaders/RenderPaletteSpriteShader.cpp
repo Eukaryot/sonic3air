@@ -16,10 +16,10 @@
 #include "oxygen/helper/FileHelper.h"
 
 
-void RenderPaletteSpriteShader::initialize()
+void RenderPaletteSpriteShader::initialize(bool alphaTest)
 {
 	const std::string additionalDefines = BufferTexture::supportsBufferTextures() ? "USE_BUFFER_TEXTURES" : "";
-	FileHelper::loadShader(mShader, L"data/shader/render_sprite_palette.shader", "Standard", additionalDefines);
+	FileHelper::loadShader(mShader, L"data/shader/render_sprite_palette.shader", alphaTest ? "Standard_AlphaTest" : "Standard", additionalDefines);
 }
 
 void RenderPaletteSpriteShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources)

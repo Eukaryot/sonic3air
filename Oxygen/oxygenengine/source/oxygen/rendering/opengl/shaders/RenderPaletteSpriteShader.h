@@ -17,7 +17,7 @@ class OpenGLRenderResources;
 class RenderPaletteSpriteShader
 {
 public:
-	void initialize();
+	void initialize(bool alphaTest);
 	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources);
 	void draw(const SpriteManager::PaletteSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 

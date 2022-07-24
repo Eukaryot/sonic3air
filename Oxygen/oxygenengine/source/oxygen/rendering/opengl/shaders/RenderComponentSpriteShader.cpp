@@ -16,9 +16,9 @@
 #include "oxygen/helper/FileHelper.h"
 
 
-void RenderComponentSpriteShader::initialize()
+void RenderComponentSpriteShader::initialize(bool alphaTest)
 {
-	FileHelper::loadShader(mShader, L"data/shader/render_sprite_component.shader", "Standard");
+	FileHelper::loadShader(mShader, L"data/shader/render_sprite_component.shader", alphaTest ? "Standard_AlphaTest" : "Standard");
 }
 
 void RenderComponentSpriteShader::refresh(const Vec2i& gameResolution)

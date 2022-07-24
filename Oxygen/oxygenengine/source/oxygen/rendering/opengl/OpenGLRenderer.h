@@ -61,8 +61,8 @@ private:
 	Shader						mPostFxBlurShader;
 	RenderPlaneShader			mRenderPlaneShader[RenderPlaneShader::_NUM_VARIATIONS][2];	// Using RenderPlaneShader::Variation enumeration, and alpha test off/on for second index
 	RenderVdpSpriteShader		mRenderVdpSpriteShader;
-	RenderPaletteSpriteShader	mRenderPaletteSpriteShader;
-	RenderComponentSpriteShader mRenderComponentSpriteShader;
+	RenderPaletteSpriteShader	mRenderPaletteSpriteShader[2];		// Two variations: With or without alpha test
+	RenderComponentSpriteShader mRenderComponentSpriteShader[2];
 	DebugDrawPlaneShader		mDebugDrawPlaneShader;
 
 	// Rendering runtime state

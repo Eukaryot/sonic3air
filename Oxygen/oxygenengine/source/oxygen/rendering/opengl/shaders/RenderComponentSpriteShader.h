@@ -17,7 +17,7 @@ class OpenGLRenderResources;
 class RenderComponentSpriteShader
 {
 public:
-	void initialize();
+	void initialize(bool alphaTest);
 	void refresh(const Vec2i& gameResolution);
 	void draw(const SpriteManager::ComponentSpriteInfo& spriteInfo, OpenGLRenderResources& resources);
 

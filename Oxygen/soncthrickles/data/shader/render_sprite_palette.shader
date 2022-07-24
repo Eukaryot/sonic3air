@@ -76,8 +76,10 @@ void main()
 
 	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex) / 512.0, LocalOffset.z + 0.5));
 	color = vec4(AddedColor.rgb, 0.0) + color * TintColor;
+#ifdef ALPHA_TEST
 	if (color.a < 0.01)
 		discard;
+#endif
 
 	FragColor = color;
 }
@@ -88,8 +90,14 @@ void main()
 
 technique Standard
 {
-	blendfunc = alpha;
+	blendfunc = opaque;
 	vs = Shared + Vertex;
 	fs = Shared + Fragment;
 	vertexattrib[0] = position;
+}
+
+technique Standard_AlphaTest : Standard
+{
+	blendfunc = alpha;
+	define = ALPHA_TEST;
 }

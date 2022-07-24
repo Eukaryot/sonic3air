@@ -256,10 +256,10 @@ function void UpdateLevelScrolling.DEZ2()
 		// Draw our own widescreen version of the background
 		Renderer.enforceClearScreen(true)
 		Renderer.enableDefaultPlane(0, false)
-		Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+		Renderer.drawCustomSprite("bg_dez2", getScreenExtend() - 40, 0, 0, 0x10, 0x1100)	// Draw fully opaque
 
 		// Change color entry 0x34 from black to dark blue, as that additional color is used by the "bg_dez2" bitmap
-		u16[0xfffffc00 + 0x68] = 0x0400
+		u16[0xfffffc00 + 0x68] = applyGlobalComponentTint_BGR32(0xff400000)
 	#endif
 
 	call 0x059526 + level.scrolling_routine
