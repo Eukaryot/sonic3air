@@ -11,7 +11,12 @@
 // Background containing the text "Continue" and the countdown
 //  -> These functions are also used by the credits, and the Blue Spheres mode result screen
 
-constant u16 ContinueScreen.TextTiles.targetInVRAM = 0x68e0
+constant u16 ContinueScreen.Numbers.targetInVRAM		= 0x0020
+constant u16 ContinueScreen.Characters.targetInVRAM		= 0x1180
+constant u16 ContinueScreen.ContinueIcons.targetInVRAM	= 0x1b20
+constant u16 ContinueScreen.TextTiles.targetInVRAM		= 0x68e0
+constant u16 ContinueScreen.Knuckles.targetInVRAM		= 0x9b40
+
 
 //# address-hook(0x05b318) end(0x05b36a)
 function void fn05b318()
@@ -167,10 +172,10 @@ function void fn05c2e0()
 	ClearPatternLoadingQueue()
 	fn0011ca()
 
-	Nemesis.loadDataToVRAM(0x05d788, 0x0020)
+	Nemesis.loadDataToVRAM(0x05d788, ContinueScreen.Numbers.targetInVRAM)			// Countdown digits
 	Nemesis.loadDataToVRAM(0x0dde34, ContinueScreen.TextTiles.targetInVRAM)
-	Nemesis.loadDataToVRAM(0x05cd66, 0x1180)
-	Nemesis.loadDataToVRAM(0x05d3c6, 0x1b20)
+	Nemesis.loadDataToVRAM(0x05cd66, ContinueScreen.Characters.targetInVRAM)		// Unique character continue sprites + countdown stars
+	Nemesis.loadDataToVRAM(0x05d3c6, ContinueScreen.ContinueIcons.targetInVRAM)		// Continue icons
 
 	global.level_started = 0
 	u8[0xfffffaa9] = 0
@@ -323,7 +328,7 @@ function void fn05c528()
 function void fn05c52a()
 {
 	objA0.mapping_offset = 0x05cc4a
-	objA0.sprite_attributes = 0x008c
+	objA0.sprite_attributes = (ContinueScreen.Characters.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x14
@@ -355,6 +360,12 @@ function void fn05c55c()
 //# address-hook(0x05c588) end(0x05c59c)
 function void fn05c588()
 {
+	// Targets:
+	//	- 0x05c5ac	-> objA0.base_state = 0x00
+	//	- 0x05c5d0	-> objA0.base_state = 0x02
+	//	- 0x05c62c	-> objA0.base_state = 0x04
+	//	- 0x05c642	-> objA0.base_state = 0x06
+	//	- 0x05c65e	-> objA0.base_state = 0x08
 	call tableLookupAddress(0x05c5a2, objA0.base_state)
 
 	UpdateSonicSpritePatterns()
@@ -366,11 +377,11 @@ function void fn05c588()
 //# address-hook(0x05c5ac) end(0x05c5ce)
 function void fn05c5ac()
 {
-	// Tails running after Knuckles when continuing
+	// Sonic running after Knuckles when continuing
 
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x146620
-	objA0.sprite_attributes = 0x0680
+	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	char.animation.sprite.backup = 0
 	objA0.animation.sprite = 0x5a
 	objA0.animation.timer = 0x06
@@ -463,9 +474,11 @@ function void fn05c660()
 //# address-hook(0x05c684) end(0x05c6b0)
 function void fn05c684()
 {
+	// Sonic running after Knuckles when continuing
+
 	objA0.base_state = 0x02
 	objA0.mapping_offset = 0x146620
-	objA0.sprite_attributes = 0x0680
+	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x0c
 	objA0.box_size.y = 0x14
@@ -528,7 +541,7 @@ function void fn05c6f4()
 function void fn05c718()
 {
 	objA0.mapping_offset = 0x05cc4a
-	objA0.sprite_attributes = 0x008c
+	objA0.sprite_attributes = (ContinueScreen.Characters.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10
 	objA0.box_size.y = 0x14
@@ -584,9 +597,11 @@ function void fn05c790()
 //# address-hook(0x05c7b2) end(0x05c7e0)
 function void fn05c7b2()
 {
+	// Tails running after Knuckles when continuing
+
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x148eb8
-	objA0.sprite_attributes = 0x06a0
+	objA0.sprite_attributes = (Char.Tails.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0280
 	char.animation.sprite.backup.tails = 0
 	objA0.state.both = 0x0500	// char.state.STANDING, char.state.RUNNING
@@ -661,7 +676,7 @@ function void fn05c838()
 	{
 		A1 = 0x05c85a
 		objA0.mapping_offset = 0x05cc4a
-		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x008c)
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | (ContinueScreen.Characters.targetInVRAM >> 5))
 		objA0.sprite_priority = 0x0200
 		objA0.box_size.x = 0x10
 		objA0.box_size.y = 0x18
@@ -705,6 +720,11 @@ function void fn05c8ac()
 //# address-hook(0x05c8c8) end(0x05c8dc)
 function void fn05c8c8()
 {
+	// Targets:
+	//	- 0x05c8ea	-> objA0.base_state = 0x00
+	//	- 0x05c91e	-> objA0.base_state = 0x02
+	//	- 0x05c932	-> objA0.base_state = 0x04
+	//	- 0x05c970	-> objA0.base_state = 0x06
 	call tableLookupAddress(0x05c8e2, objA0.base_state)
 
 	fn0661e0()
@@ -715,9 +735,11 @@ function void fn05c8c8()
 //# address-hook(0x05c8ea) end(0x05c91c)
 function void fn05c8ea()
 {
+	// Knuckles running
+
 	objA0.base_state += 2
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x04da)
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | (ContinueScreen.Knuckles.targetInVRAM >> 5))
 	objA0.sprite_priority = 0x80
 	objA0.animation.sprite = 7
 	objA0.box_size.x = 0x20
@@ -814,7 +836,7 @@ function void fn05c9c4()
 function void fn05c9dc()
 {
 	objA0.mapping_offset = 0x05cc4a
-	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x008c)
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | (ContinueScreen.Characters.targetInVRAM >> 5))
 	objA0.sprite_priority = 0x0380
 	objA0.animation.sprite = 7
 	objA0.box_size.x = 0x08
@@ -841,7 +863,7 @@ function void fn05ca14()
 function void fn05ca1a()
 {
 	objA0.mapping_offset = 0x05cd00
-	objA0.sprite_attributes = isMainCharacter(CHARACTER_KNUCKLES) ? (sprite_attribute.PALETTE.LINE3 | 0x00d9) : 0x00d9
+	objA0.sprite_attributes = isMainCharacter(CHARACTER_KNUCKLES) ? (sprite_attribute.PALETTE.LINE3 | (ContinueScreen.ContinueIcons.targetInVRAM >> 5)) : (ContinueScreen.ContinueIcons.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0380
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08

@@ -139,7 +139,7 @@ function void fn01841e()
 	{
 		u8[A0 + 0x32] = objA0.animation.sprite
 		u32 sourceBase = 0x0a9dfc + (objA0.animation.sprite - 9) * 0xc0
-		u16 targetInVRAM = (u8[A0 + 0x43] == 0) ? 0xfc00 : 0xfe00
+		u16 targetInVRAM = (u8[A0 + 0x43] == 0) ? DustCloud.targetInVRAM : DustCloud.Tails.targetInVRAM
 		updateSpritePattern(sourceBase, targetInVRAM, 0x60)
 	}
 }

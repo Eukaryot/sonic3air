@@ -50,7 +50,7 @@ function void fn0674ac()
 {
 	objA0.base_state = 0x02
 	objA0.mapping_offset = 0x146620
-	objA0.sprite_attributes = 0x0680
+	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0280
 	objA0.animation.sprite = 0xba
 	objA0.box_size.x = 0x40

@@ -26,7 +26,7 @@ constant bool CHEAT_ONE_BLUE_SPHERE			= 0		// If set, only a single blue sphere 
 
 // Debugging stuff
 constant bool DEBUG_DISABLE_HUD				= 0
-constant bool DEBUG_DYNAMIC_COLLISIONS		= 0
+constant u8 DEBUG_DYNAMIC_COLLISIONS		= 0		// 1 enables character and normal object hitboxes, 2 adds shield projectile deflection hitboxes, 3 adds rings and ring attraction boxes
 
 
 

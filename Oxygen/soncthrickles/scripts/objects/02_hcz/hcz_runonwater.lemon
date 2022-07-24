@@ -8,6 +8,11 @@
 
 
 
+constant u16 RunOnWater.Act1.targetInVRAM				= 0x6dc0
+constant u16 RunOnWater.Act2.targetInVRAM				= 0x6880
+constant u16 RunOnWater.WaterSlideSplash.targetInVRAM	= 0x7640
+
+
 //-------------------------------------------------------//
 // Special object to allow for running on water          //
 //-------------------------------------------------------//
@@ -18,7 +23,7 @@ function void RunOnWaterHandler.Init()
 	if (objA0.subtype2c != 0)
 	{
 		objA0.mapping_offset = 0x237c7a
-		objA0.sprite_attributes = (global.act == 0) ? 0x036e : 0x0344
+		objA0.sprite_attributes = (global.act == 0) ? (RunOnWater.Act1.targetInVRAM >> 5) : (RunOnWater.Act2.targetInVRAM >> 5)
 		objA0.render_flags |= render_flag.WORLD
 		objA0.sprite_priority = 0x0300
 		objA0.box_size.x = 0xa0
@@ -42,7 +47,7 @@ function void RunOnWaterHandler.Init()
 	else
 	{
 		objA0.mapping_offset = 0x237c60
-		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03b2)
+		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | (RunOnWater.WaterSlideSplash.targetInVRAM >> 5))
 		objA0.render_flags |= render_flag.WORLD
 		objA0.sprite_priority = 0x0300
 		objA0.box_size.x = 0x28
@@ -72,7 +77,7 @@ function void fn038464()
 		{
 			u8[A0 + 0x30] = objA0.animation.sprite
 			D1 = 0x392b14 + objA0.animation.sprite * 0x300
-			updateSpritePattern(D1, 0x7640, 0x0180)
+			updateSpritePattern(D1, RunOnWater.WaterSlideSplash.targetInVRAM, 0x0180)
 		}
 	}
 
@@ -110,7 +115,7 @@ function void RunOnWaterHandler.Update()
 	{
 		u8[A0 + 0x31] = D1.u8
 		u32 sourceInROM = 0x392394 + (D1.u16 * 0x180)
-		u16 targetInVRAM = (global.act == 0) ? 0x6dc0 : 0x6880
+		u16 targetInVRAM = (global.act == 0) ? RunOnWater.Act1.targetInVRAM : RunOnWater.Act2.targetInVRAM
 		updateSpritePattern(sourceInROM, targetInVRAM, 0xc0)
 	}
 

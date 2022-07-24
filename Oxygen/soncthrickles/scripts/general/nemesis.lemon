@@ -302,6 +302,12 @@ function void LoadRequiredSpritePatterns()
 }
 
 
+function void Nemesis.LoadMultipleToVRAM(u32 address)
+{
+	A1 = address
+	Nemesis.LoadMultipleToVRAM()
+}
+
 //# address-hook(0x001892) end(0x0018b2)
 function void Nemesis.LoadMultipleToVRAM()
 {

@@ -8,22 +8,32 @@
 
 
 
+constant u16 TitleScreenSK.Background.targetInVRAM	= 0x0000
+constant u16 TitleScreenSK.characters.targetInVRAM	= 0x1c40
+constant u16 TitleScreenSK.Menu.targetInVRAM		= 0x8c40
+constant u16 TitleScreenSK.SEGALogo.targetInVRAM	= 0x9380
+constant u16 TitleScreenSK.SonicFall.targetInVRAM	= 0x9de0
+constant u16 TitleScreenSK.SKTitleLogo.targetInVRAM	= 0x9dc0
+constant u16 TitleScreenSK.DeathEgg.targetInVRAM	= 0xd000
+constant u16 TitleScreenSK.Mountain.targetInVRAM	= 0xf400
+
+
 //# address-hook(0x005048) end(0x00552c)
 function void TitleScreen_SK()
 {
 	Kosinski.decompress(0x0cca20, 0xffff0000)
 	Kosinski.decompress(0x0cc6a0, A1)
 	Kosinski.decompress(0x0d2504, A1)
-	updateSpritePattern(0xffff0000, 0x0000, 0x0e20)
-	updateSpritePattern(0xffff1c40, 0x9380, 0x1640)
+	updateSpritePattern(0xffff0000, TitleScreenSK.Background.targetInVRAM, 0x0e20)
+	updateSpritePattern(0xffff1c40, TitleScreenSK.SEGALogo.targetInVRAM, 0x1640)		// Also updates sprite patterns for Sonic jumping down
 
 	Kosinski.decompress(0x0d33e4, 0xffff4e00)
-	updateSpritePattern(0xffff4e00, 0xd000, 0x0720)
+	updateSpritePattern(0xffff4e00, TitleScreenSK.DeathEgg.targetInVRAM, 0x0720)
 
 	Kosinski.decompress(0x0d3a64, 0xffff5d00)
-	updateSpritePattern(0xffff5d00, 0xf400, 0x0150)
+	updateSpritePattern(0xffff5d00, TitleScreenSK.Mountain.targetInVRAM, 0x0150)
 
-	Enigma.decompress(0x0cba68, 0xffff7400, 0x849c)
+	Enigma.decompress(0x0cba68, 0xffff7400, (sprite_attribute.PRIORITY | (TitleScreenSK.SEGALogo.targetInVRAM >> 5)))
 	if ((global.region_code & 0x80) == 0)
 	{
 		// Hide the trademark symbol
@@ -37,16 +47,17 @@ function void TitleScreen_SK()
 	}
 	copyRectToVRAM(0xffff7400, 0xc000, 0x28, 0x1c)
 
-	Enigma.decompress(0x0cc3aa, 0xffff7cc0, 0x0000)
+	Enigma.decompress(0x0cc3aa, 0xffff7cc0, (TitleScreenSK.Background.targetInVRAM >> 5))
 
 	A1 = 0xffff7cc0
 	D0 = 0x60000003
 	fn005d24()
 
-	Enigma.decompress(0x0cbb32, 0xffff8580, 0x80e2)
-	Enigma.decompress(0x0cbce0, 0xffff8e40, 0x80e2)
-	Enigma.decompress(0x0cbf3e, 0xffff9700, 0x80e2)
-	Enigma.decompress(0x0cc1c4, 0xffff9fc0, 0x80e2)
+	// Mappings for Sonic's landing animation
+	Enigma.decompress(0x0cbb32, 0xffff8580, (sprite_attribute.PRIORITY | (TitleScreenSK.characters.targetInVRAM >> 5)))
+	Enigma.decompress(0x0cbce0, 0xffff8e40, (sprite_attribute.PRIORITY | (TitleScreenSK.characters.targetInVRAM >> 5)))
+	Enigma.decompress(0x0cbf3e, 0xffff9700, (sprite_attribute.PRIORITY | (TitleScreenSK.characters.targetInVRAM >> 5)))
+	Enigma.decompress(0x0cc1c4, 0xffff9fc0, (sprite_attribute.PRIORITY | (TitleScreenSK.characters.targetInVRAM >> 5)))
 
 	Kosinski.addToDecompressionQueue(0x0d4ba6, 0xffff4800)
 
@@ -94,7 +105,7 @@ function void TitleScreen_SK()
 
 	copyMemory(0xfffffc80, 0x005588, 0x80)
 
-	Kosinski.addToDMAQueue(0x0cd910, 0x1c40)
+	Kosinski.addToDMAQueue(0x0cd910, TitleScreenSK.characters.targetInVRAM)
 
 	palette_fade.range = 0x003f
 	global.fade_timer = 0x16
@@ -326,7 +337,7 @@ function void fn00552e()
 	checkpoint.number.backup = 1
 	checkpoint.zone_act = D0.u16
 	checkpoint.zone_act.apparent = D0.u16
-	checkpoint.sprite_attr = 0x0680
+	checkpoint.sprite_attr = (Char.Player1.targetInVRAM >> 5)
 	checkpoint.layer_flags = 0x0c0d
 	checkpoint.rings = 0
 	checkpoint.lives_granted = 0
@@ -347,7 +358,7 @@ function void fn00552e()
 function void fn005628()
 {
 	objA0.mapping_offset = 0x0cb860
-	objA0.sprite_attributes = 0x04ef
+	objA0.sprite_attributes = (TitleScreenSK.SonicFall.targetInVRAM >> 5)
 	objA0.position.x.u16 = 0xe8
 	objA0.position.y.u16 = 0x16
 	objA0.sprite_priority = 0x80
@@ -403,7 +414,7 @@ function void fn00565a()
 		if (camera.position.y.u16 == 0xc8)
 	#endif
 		{
-			Kosinski.addToDMAQueue(0x0d0e12, 0x8c40)
+			Kosinski.addToDMAQueue(0x0d0e12, TitleScreenSK.Menu.targetInVRAM)		// This is actually the tiles for Sonic's landing animation, its just using the same VRAM location as the menu
 		}
 
 		A1 = 0xffff8580
@@ -459,8 +470,8 @@ function void fn00571e()
 	set_status_register(0x2300)
 #endif
 
-	Kosinski.addToDMAQueue(0x0d3bb4, 0x9dc0)
-	Kosinski.addToDMAQueue(0x0d5cc6, 0x8c40)
+	Kosinski.addToDMAQueue(0x0d3bb4, TitleScreenSK.SKTitleLogo.targetInVRAM)
+	Kosinski.addToDMAQueue(0x0d5cc6, TitleScreenSK.Menu.targetInVRAM)
 
 	u32[0xffffb0de] = 0x0058a8		// Sonic & Knuckles logo
 	u8[0xffffb0de + 0x24] = 0x1e
@@ -481,7 +492,7 @@ function void fn00576e()
 function void fn005770()
 {
 	objA0.mapping_offset = 0x0cb924
-	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0680)
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | (TitleScreenSK.DeathEgg.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0140 + getScreenExtend()
 	objA0.position.y.u16 = 0xb0
 	objA0.sprite_priority = 0x0180
@@ -562,7 +573,7 @@ function void fn005802()
 function void fn005856()
 {
 	objA0.mapping_offset = 0x0cba4c
-	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x07a0)
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | (TitleScreenSK.Mountain.targetInVRAM >> 5))
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x30
 	objA0.box_size.y = 0x08
@@ -606,7 +617,7 @@ function void fn0058a8()
 		return
 
 	objA0.mapping_offset = 0x0cb994
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04ee)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (TitleScreenSK.SKTitleLogo.targetInVRAM >> 5))
 	objA0.sprite_priority = 0
 	objA0.box_size.x = 0x7c
 	objA0.box_size.y = 0x28
@@ -779,7 +790,7 @@ function void fn005ae4()
 	u16[A0 + 0x44] = objA0.position.x.u16
 	u16[A0 + 0x46] = objA0.position.y.u16
 	objA0.mapping_offset = 0x005ed8
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (TitleScreenSK.Menu.targetInVRAM >> 5))
 	objA0.render_flags |= render_flag.COMPOUND
 
 	A2 = A0 + 0x18
@@ -888,7 +899,7 @@ function void fn005c10()
 	objA0.position.x.u16 = 0xd0 + getScreenExtend()
 	objA0.position.y.u16 = 0x014c
 	objA0.mapping_offset = 0x005ed8
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (TitleScreenSK.Menu.targetInVRAM >> 5))
 	D0.u8 = titlescreen.selection
 	objA0.state = D0.u8
 	objA0.state.former = D0.u8
@@ -916,7 +927,7 @@ function void fn005c42()
 function void fn005c70()
 {
 	objA0.mapping_offset = 0x005f62
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (TitleScreenSK.Menu.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x01a2 + getScreenExtend()
 	objA0.position.y.u16 = 0x011d
 	objA0.sprite_priority = 0x80
@@ -945,7 +956,7 @@ function void fn005ca2()
 function void fn005cb0()
 {
 	objA0.mapping_offset = 0x005f6c
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0462)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (TitleScreenSK.Menu.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x017f
 	objA0.position.y.u16 = 0x0152
 	objA0.sprite_priority = 0x80

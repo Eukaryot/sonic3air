@@ -431,11 +431,21 @@ function void fn05ecb4()
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
-		// Set correct colors for Knuckles
-		// TODO: This is not using custom palettes, so there's no palette effect for Hyper Knuckles
-		u16[0xfffffc04] = 0x064e
-		u16[0xfffffc06] = 0x020c
-		u16[0xfffffc08] = 0x0206
+		if (global.zone_act == 0x0d01)
+		{
+			// Set correct colors for Knuckles, and for Sonic in the Tornado
+			// TODO: This is not using custom palettes, so there's no palette effect for Hyper Knuckles
+			u16[0xfffffc04] = 0x064e
+			u16[0xfffffc06] = 0x020c
+			u16[0xfffffc08] = 0x0206
+			copyMemory(0xfffffc20, 0x0a8a3c, 0x20)
+		}
+
+		if (objA0.subtype2c == 0 && isSecondCharacter(CHARACTER_TAILS))
+		{
+			// Special handling for Knuckles & Tails game: Put Tails into the Tornado
+			objA0.animation.sprite = 0x0c
+		}
 	}
 #endif
 }

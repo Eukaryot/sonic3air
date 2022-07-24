@@ -7,6 +7,11 @@
 */
 
 
+constant u16 DataSelect.Background.targetInVRAM = 0x0020
+constant u16 DataSelect.MenuPart1.targetInVRAM = 0x53e0		// Includes most Data Select menu graphics from Sonic 3
+constant u16 DataSelect.MenuPart2.targetInVRAM = 0x8a80		// Includes additional graphics needed for the Sonic 3 & Knuckles expansion
+constant u16 DataSelect.TextTiles.targetInVRAM = 0xac40
+
 
 //-------------------------------------------------------//
 // Data Select Screen                                    //
@@ -97,7 +102,7 @@ function void fn00c890()
 	{
 		D0.u16 = D7.u16 - 2
 		VDP.setupVRAMWrite(D0)
-		VDP.writeData16(0x82b1)
+		VDP.writeData16(sprite_attribute.PRIORITY | 0x02b1)		// Render a small black bar to complete the save slot graphic
 
 		if (s8[A0] >= 0)
 		{
@@ -122,16 +127,16 @@ function void fn00c890()
 				D1 = u8[0x00c95e + D0.s16]
 				if (D1.s8 < 0)
 				{
-					D1.u16 = 0x8000
+					D1.u16 = (sprite_attribute.PRIORITY | 0)
 				}
 				else
 				{
-					D1.u16 += 0xa562
+					D1.u16 += (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (DataSelect.TextTiles.targetInVRAM >> 5))
 				}
 				VDP.writeData16(D1.u16)
 
 				// First digit (1, 2, etc)
-				D1 = 0xa562 + u8[0x00c95f + D0.s16]
+				D1 = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (DataSelect.TextTiles.targetInVRAM >> 5)) + u8[0x00c95f + D0.s16]
 				VDP.writeData16(D1.u16)
 			}
 		}
@@ -279,15 +284,15 @@ function void DataSelect.setup()
 	u16[0xffffeee2] = 0
 	u16[0xffffeee4] = 0
 
-	Enigma.decompress(0x39d2a2, 0xffff0000, 0x01)
+	Enigma.decompress(0x39d2a2, 0xffff0000, (DataSelect.Background.targetInVRAM >> 5))
 	copyRectToVRAM(0xffff0000, 0xe000, 0x28, 0x1c)
 
-	Enigma.decompress(0x3a2020, 0xffff0000, 0x829f)
+	Enigma.decompress(0x3a2020, 0xffff0000, (sprite_attribute.PRIORITY | (DataSelect.MenuPart1.targetInVRAM >> 5)))
 
 	A0 = 0x00cd58
 	fn00c866()
 
-	Nemesis.loadDataToVRAM(0x0ca5e0, 0xac40)
+	Nemesis.loadDataToVRAM(0x0ca5e0, DataSelect.TextTiles.targetInVRAM)		// Font used for the red labels
 
 	// Render "NO" label
 	A1 = 0x00db1c
@@ -306,7 +311,7 @@ function void DataSelect.setup()
 
 	A0 = 0x39d4a4
 	A1 = 0xffff0000
-	A2 = 0xffff0000 + 0x20
+	A2 = 0xffff0000 + DataSelect.Background.targetInVRAM
 	fn00c006()
 
 	vint.update_subroutine = 0x00c56e
@@ -315,7 +320,7 @@ function void DataSelect.setup()
 
 	A0 = 0x3a23aa
 	A1 = 0xffff0000
-	A2 = 0xffff0000 + 0x53e0
+	A2 = 0xffff0000 + DataSelect.MenuPart1.targetInVRAM
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -323,7 +328,7 @@ function void DataSelect.setup()
 
 	A0 = 0x15a774
 	A1 = 0xffff0000
-	A2 = 0xffff0000 + 0x8a80
+	A2 = 0xffff0000 + DataSelect.MenuPart2.targetInVRAM
 	fn00c006()
 
 	global.frame_state = 0x1e
@@ -338,7 +343,7 @@ function void DataSelect.setup()
 	while (D0.s16 >= 0)
 	{
 		objA0.update_address = u32[(A1+=4)-4]
-		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f)
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | (DataSelect.MenuPart1.targetInVRAM >> 5))
 		objA0.mapping_offset = 0x00ce0e
 		objA0.position.x.u16 = u16[A1] + getScreenExtend()		// Adding the screen extend only really has an effect on the "Data Select" text
 		u16[A0 + 0x12] = u16[(A1+=2)-2]
@@ -1176,7 +1181,7 @@ function void fn00d6d0()
 function void fn00d70c()
 {
 	objA0.render_flags = render_flag.COMPOUND
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x029f)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (DataSelect.MenuPart1.targetInVRAM >> 5))
 	objA0.mapping_offset = 0x00ce0e
 	objA0.box_size.x = 0x40
 	objA0.compound.count = 0x07
@@ -1557,7 +1562,7 @@ function void fn00d9f4()
 	u16 vramAddress = D0.u16
 	VDP.setupVRAMWrite(vramAddress)
 
-	D5.u16 = 0xa552
+	D5.u16 = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0552)
 	D6 = 0
 	while (true)
 	{
@@ -1568,7 +1573,7 @@ function void fn00d9f4()
 
 		if (D6.u8 == 0)
 		{
-			VDP.writeData16(0x8000)
+			VDP.writeData16((sprite_attribute.PRIORITY | 0x0000))
 		}
 		else
 		{

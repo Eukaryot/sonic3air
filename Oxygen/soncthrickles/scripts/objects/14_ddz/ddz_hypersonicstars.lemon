@@ -16,7 +16,7 @@ function void fn08242a()
 	objA0.update_address = 0x082452
 	objA0.animation.sprite = 6
 
-	updateSpritePattern(0x18bd44, 0xf380, 0x1a0)
+	updateSpritePattern(0x18bd44, Shield.targetInVRAM, 0x1a0)
 }
 
 

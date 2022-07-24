@@ -707,7 +707,7 @@ function void fn06618a()
 	if (objA0.animation.sprite != objA0.value3a)
 	{
 		objA0.value3a = objA0.animation.sprite
-		updateMultipleSpritePatterns(0x1200e0, 0x14bd0a, 0xd400, objA0.animation.sprite)
+		updateMultipleSpritePatterns(0x1200e0, 0x14bd0a, Char.Tails.targetInVRAM, objA0.animation.sprite)
 	}
 }
 

@@ -7,6 +7,11 @@
 */
 
 
+constant u16 Char.Player1.targetInVRAM				= 0xd000
+constant u16 Char.Tails.targetInVRAM				= 0xd400
+constant u16 Char.Player1_Tails.targetInVRAM		= 0xd200		// Used in Competition Mode when Player 1 is Tails
+constant u16 Char.Tails_Tails.targetInVRAM			= 0xd600
+
 
 //-------------------------------------------------------//
 // Character Sprites                                     //
@@ -34,7 +39,7 @@ function void updateCharacterSpritePatterns(u8 character, u8 animationSprite)
 {
 	u32 sourceBase
 	u32 tableAddress
-	u16 targetInVRAM = 0xd000
+	u16 targetInVRAM = Char.Player1.targetInVRAM
 	u32 animationSpriteBackup = 0xfffff766
 
 	if (character == CHARACTER_SONIC)
@@ -48,7 +53,7 @@ function void updateCharacterSpritePatterns(u8 character, u8 animationSprite)
 		// Tails
 		sourceBase = (animationSprite >= 0xd1) ? 0x143d00 : 0x3200e0
 		tableAddress = 0x14a08a
-		targetInVRAM = 0xd400
+		targetInVRAM = Char.Tails.targetInVRAM
 		animationSpriteBackup = 0xfffff7de
 	}
 	else
@@ -809,7 +814,7 @@ function void CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 //# address-hook(0x01309a) end(0x013100)
 function void CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
 {
-	u16 targetInVRAM = (A0 == 0xffffb000) ? 0xd000 : 0xd400
+	u16 targetInVRAM = (A0 == 0xffffb000) ? Char.Player1.targetInVRAM : Char.Tails.targetInVRAM
 	if (char.character != CHARACTER_SONIC)
 	{
 		updateMultipleSpritePatterns(0x33db60, 0x2a0498, targetInVRAM, char.animation.sprite)
@@ -1060,7 +1065,7 @@ function void CompetitionMode.updateTailsAnimation_shared()
 //# address-hook(0x016050) end(0x0160a4)
 function void CompetitionMode.Character.UpdateSpritePatterns.Tails()
 {
-	u16 targetInVRAM = (A0 == 0xffffb000) ? 0xd000 : 0xd400
+	u16 targetInVRAM = (A0 == 0xffffb000) ? Char.Player1.targetInVRAM : Char.Tails.targetInVRAM
 	updateMultipleSpritePatterns(0x33a840, 0x2a013e, targetInVRAM, char.animation.sprite)
 }
 

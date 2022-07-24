@@ -87,12 +87,12 @@ function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 			if (char.character == CHARACTER_SONIC)
 			{
 				char.mapping_offset = 0x29fc3a
-				char.sprite_attributes = 0x0680
+				char.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 			}
 			else
 			{
 				char.mapping_offset = 0x2a02aa
-				char.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0680)
+				char.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | (Char.Player1.targetInVRAM >> 5))
 			}
 			if (global.zone == 0x12)
 			{
@@ -108,12 +108,12 @@ function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 			if (char.character == CHARACTER_SONIC)
 			{
 				char.mapping_offset = 0x29fc3a
-				char.sprite_attributes = 0x06a0
+				char.sprite_attributes = (Char.Tails.targetInVRAM >> 5)
 			}
 			else
 			{
 				char.mapping_offset = 0x2a02aa
-				char.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x06a0)
+				char.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | (Char.Tails.targetInVRAM >> 5))
 			}
 			if (global.zone == 0x12)
 			{
@@ -425,7 +425,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 		char.layer_flags2 = 0x0d
 		if (A0 == 0xffffb000)
 		{
-			char.sprite_attributes = 0x0680
+			char.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 			if (global.zone == 0x12)
 			{
 				char.sprite_attributes |= sprite_attribute.PRIORITY
@@ -439,7 +439,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 		}
 		else
 		{
-			char.sprite_attributes = 0x06a0
+			char.sprite_attributes = (Char.Tails.targetInVRAM >> 5)
 			if (global.zone == 0x12)
 			{
 				char.sprite_attributes |= sprite_attribute.PRIORITY

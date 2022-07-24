@@ -7,10 +7,14 @@
 */
 
 
-define objA0.dustcloud.animation.sprite.backup		= u8[A0 + 0x34]
-define objA0.dustcloud.targetInVRAM		= u16[A0 + 0x40]
+define objA0.dustcloud.animation.sprite.backup	=  u8[A0 + 0x34]
+define objA0.dustcloud.targetInVRAM				= u16[A0 + 0x40]
 define objA0.dustcloud.character_address		= u16[A0 + 0x42]
 define objA1.dustcloud.character_address		= u16[A1 + 0x42]
+
+constant u16 DustCloud.targetInVRAM				= 0xfc00
+constant u16 DustCloud.Tails.targetInVRAM		= 0xfe00
+
 
 //-------------------------------------------------------//
 // Water splash effect & Spindash dust cloud             //
@@ -36,9 +40,9 @@ function void fn018b54()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x10
-	objA0.sprite_attributes = 0x07e0
+	objA0.sprite_attributes = (DustCloud.targetInVRAM >> 5)
 	objA0.dustcloud.character_address = 0xb000
-	objA0.dustcloud.targetInVRAM = 0xfc00
+	objA0.dustcloud.targetInVRAM = DustCloud.targetInVRAM
 
 	if (A0 != 0xffffcc54)
 	{
@@ -46,9 +50,9 @@ function void fn018b54()
 		objA0.flags38 = 1
 		if (!isMainCharacter(CHARACTER_TAILS))
 		{
-			objA0.sprite_attributes = 0x07f0
+			objA0.sprite_attributes = (DustCloud.Tails.targetInVRAM >> 5)
 			objA0.dustcloud.character_address = 0xb04a
-			objA0.dustcloud.targetInVRAM = 0xfe00
+			objA0.dustcloud.targetInVRAM = DustCloud.Tails.targetInVRAM
 		}
 	}
 
@@ -305,7 +309,7 @@ function void fn018f9c()
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x10
-	objA0.sprite_attributes = 0x07e0
+	objA0.sprite_attributes = (DustCloud.targetInVRAM >> 5)
 	objA0.dustcloud.character_address = 0xb000
 	if (A0.u16 != 0xcc54)
 	{

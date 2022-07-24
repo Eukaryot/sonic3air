@@ -1199,7 +1199,7 @@ function void fn01c550()
 	}
 	if (camera.position.x.u16 >= 0x2d80)
 	{
-		u16[0xfffffc5e] = (isMainCharacter(CHARACTER_KNUCKLES)) ? u16[0x04faea] : 0x0c02
+		u16[0xfffffc5e] = isMainCharacter(CHARACTER_KNUCKLES) ? u16[0x04faea] : 0x0c02
 		move_area.left = 0x2d80
 		requestLoadingPatterns(0x5a)
 		camera.update_routine += 2

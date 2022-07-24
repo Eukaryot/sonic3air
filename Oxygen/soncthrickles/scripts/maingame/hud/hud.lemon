@@ -20,7 +20,7 @@ function void HUD.drawSprite(u64 key, u16 px, u16 py, u16 renderQueue)
 
 function void HUD.drawDigit(u8 digit, u16 px, u16 py, u16 renderQueue)
 {
-	Renderer.drawCustomSprite(stringformat("hud_digit_%d", digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+	HUD.drawSprite(stringformat("hud_digit_%d", digit), px, py, renderQueue)
 }
 
 function void HUD.drawNumber(string stringMask, u32 number, u16 px, u16 py, u16 renderQueue)
@@ -28,7 +28,7 @@ function void HUD.drawNumber(string stringMask, u32 number, u16 px, u16 py, u16 
 	while (true)
 	{
 		u8 digit = number % 10
-		Renderer.drawCustomSprite(stringformat(stringMask, digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+		HUD.drawSprite(stringformat(stringMask, digit), px, py, renderQueue)
 		px -= 8
 		number /= 10
 		if (number == 0)
@@ -38,7 +38,7 @@ function void HUD.drawNumber(string stringMask, u32 number, u16 px, u16 py, u16 
 
 function void HUD.drawSmallDigit(u8 digit, u16 px, u16 py, u16 renderQueue)
 {
-	Renderer.drawCustomSprite(stringformat("hud_smalldigit_%d", digit), px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+	HUD.drawSprite(stringformat("hud_smalldigit_%d", digit), px, py, renderQueue)
 }
 #endif
 
@@ -182,14 +182,7 @@ function void RenderHUD()
 			u16 px = useMobilePosition ? (getScreenWidth() - baseX - 0x30) : baseX
 			u16 py = useMobilePosition ? baseY : 200
 
-			string characterName
-			if (isMainCharacter(CHARACTER_SONIC))
-				characterName = "sonic"
-			else if (isMainCharacter(CHARACTER_TAILS))
-				characterName = (global.region_code & 0x80) ? "tails" : "miles"
-			else
-				characterName = "knuckles"
-			HUD.drawSprite(stringformat("hud_lives_icon_%s", characterName), px, py, renderQueue)
+			HUD.drawSprite(getCharacterLivesIcon(getMainCharacter()), px, py, renderQueue)
 			++renderQueue
 
 			if (lives_counter >= 10)

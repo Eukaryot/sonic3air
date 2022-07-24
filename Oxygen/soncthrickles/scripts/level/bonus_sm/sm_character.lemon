@@ -78,7 +78,7 @@ function void fn04b9ce()
 	D0.u16 = min(getMainCharacter(), 2)
 	objA0.flags38 = D0.u8
 	objA0.mapping_offset = u32[0x04b9c2 + D0.s16 * 4]
-	objA0.sprite_attributes = 0x0680
+	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0100
 	objA0.state = 0x02
@@ -88,7 +88,7 @@ function void fn04b9ce()
 	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		// Tails' tails object
-		objA0.sprite_attributes = 0x06a0
+		objA0.sprite_attributes = (Char.Tails.targetInVRAM >> 5)
 		u32[0xffffcc0a] = 0x0160a6
 		u16[0xffffcc0a + 0x30] = A0.u16
 	}

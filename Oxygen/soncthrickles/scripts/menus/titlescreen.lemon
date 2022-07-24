@@ -8,6 +8,14 @@
 
 
 
+constant u16 TitleScreen.Intro_Background.targetInVRAM	= 0x0000
+constant u16 TitleScreen.IntroBuffer.targetInVRAM		= 0x6000
+constant u16 TitleScreen.Characters.targetInVRAM		= 0x8000
+constant u16 TitleScreen.AndKnucklesTitle.targetInVRAM	= 0x9800
+constant u16 TitleScreen.Banner.targetInVRAM			= 0xa000
+constant u16 TitleScreen.Menu.targetInVRAM				= 0xd000
+
+
 //-------------------------------------------------------//
 // SEGA Logo Screen                                      //
 //-------------------------------------------------------//
@@ -87,7 +95,7 @@ function void fn00440c()
 			D3.u16 = A1.u16 >> 1
 		}
 
-		u16 targetInVRAM = (titleintro.buffer == 0) ? 0 : 0x6000
+		u16 targetInVRAM = (titleintro.buffer == 0) ? TitleScreen.Intro_Background.targetInVRAM : TitleScreen.IntroBuffer.targetInVRAM
 		updateSpritePattern(0xffff0000, targetInVRAM, D3.u16)
 	}
 
@@ -98,7 +106,7 @@ function void fn00440c()
 	A1 = 0xffff8000
 	A0 = u32[A2]
 	A2 += 4
-	D0.u16 = (titleintro.buffer == 0 || D7.u16 < 7) ? 0 : 0x0300
+	D0.u16 = (titleintro.buffer == 0 || D7.u16 < 7) ? (TitleScreen.Intro_Background.targetInVRAM >> 5) : (TitleScreen.IntroBuffer.targetInVRAM >> 5)
 	Enigma.Decompress()
 	if (D7.u16 < 7)
 	{
@@ -208,9 +216,9 @@ function void TitleScreen()
 	}
 
 	Kosinski.decompress(0x350d26, 0xffff0000)	// After this, A1 points to where uncompressed data ends
-	updateSpritePattern(0xffff0000, 0x0000, A1.u16 >> 1)
+	updateSpritePattern(0xffff0000, TitleScreen.Intro_Background.targetInVRAM, A1.u16 >> 1)
 
-	Enigma.decompress(0x34f6a0, 0xffff8000, 0x0000)
+	Enigma.decompress(0x34f6a0, 0xffff8000, (TitleScreen.Intro_Background.targetInVRAM >> 5))
 
 #if !STANDALONE
 	if ((global.region_code & 0x80) == 0)
@@ -351,12 +359,12 @@ function void TitleScreen()
 
 	// Fill the planes with decompressed screen content
 	Kosinski.decompress(0x359fc6, 0xffff0000)	// After this, A1 points to where uncompressed data ends
-	updateSpritePattern(0xffff0000, 0x0000, A1.u16 >> 1)
+	updateSpritePattern(0xffff0000, TitleScreen.Intro_Background.targetInVRAM, A1.u16 >> 1)
 
-	Enigma.decompress(0x350018, 0xffff8000, 0x8000)
+	Enigma.decompress(0x350018, 0xffff8000, (sprite_attribute.PRIORITY | (TitleScreen.Intro_Background.targetInVRAM >> 5)))
 	copyRectToVRAM(0xffff8000, 0xc000, 0x28, 0x1c)
 
-	Enigma.decompress(0x350112, 0xffff8000, 0x4000)
+	Enigma.decompress(0x350112, 0xffff8000, (sprite_attribute.PALETTE.LINE2 | (TitleScreen.Intro_Background.targetInVRAM >> 5)))
 	copyRectToVRAM(0xffff8000, 0xe000, 0x28, 0x1c)
 
 	global.frame_state = 0x04
@@ -371,16 +379,16 @@ function void TitleScreen()
 	// Load patterns used in title screen
 	{
 		// Large banner
-		Nemesis.loadDataToVRAM(0x35026c, 0xa000)
+		Nemesis.loadDataToVRAM(0x35026c, TitleScreen.Banner.targetInVRAM)
 
-		// Menu options
-		Nemesis.loadDataToVRAM(0x004d2a, 0xd000)
+		// Menu options, copyright info
+		Nemesis.loadDataToVRAM(0x004d2a, TitleScreen.Menu.targetInVRAM)
 
-		// Wiggling finger, twinkle, Tails & Tornado in BG
-		Nemesis.loadDataToVRAM(0x2c49cc, 0x8000)
+		// Wiggling finger, winking eye, twinkle, Tails & Tornado in BG
+		Nemesis.loadDataToVRAM(0x2c49cc, TitleScreen.Characters.targetInVRAM)
 
 		// "& Knuckles"
-		Nemesis.loadDataToVRAM(0x0d6498, 0x9800)
+		Nemesis.loadDataToVRAM(0x0d6498, TitleScreen.AndKnucklesTitle.targetInVRAM)
 	}
 
 	u32[0xffffb000] = 0x00482c		// Banner ("Sonic 3 - Sonic The Hedgehog")
@@ -661,7 +669,7 @@ function void fn004352()
 function void fn00482c()
 {
 	objA0.mapping_offset = 0x3501e0
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0500)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | (TitleScreen.Banner.targetInVRAM >> 5))
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x80
 	objA0.box_size.y = 0x40
@@ -784,7 +792,7 @@ function void fn004a5c()
 	objA0.position.x.u16 = 0xf0 + getScreenExtend()
 	objA0.position.y.u16 = 0x0140
 	objA0.mapping_offset = 0x004c9c
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0680)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | (TitleScreen.Menu.targetInVRAM >> 5))
 	titlescreen.selection &= 0x01
 	objA0.animation.sprite = titlescreen.selection
 
@@ -839,7 +847,7 @@ function void fn004a88()
 function void fn004924()
 {
 	objA0.mapping_offset = 0x3501e0
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0500)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | (TitleScreen.Banner.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0188 + getScreenExtend()
 	objA0.position.y.u16 = 0xec
 	objA0.sprite_priority = 0x80
@@ -883,7 +891,7 @@ function void fn00496a()
 #endif
 
 	objA0.mapping_offset = 0x0049ae
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x04c0)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | (TitleScreen.AndKnucklesTitle.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0108
 	objA0.sprite_priority = 0x80
@@ -911,7 +919,7 @@ function void fn00499c()
 function void fn004a1e()
 {
 	objA0.mapping_offset = 0x004c9c
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0680)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | (TitleScreen.Menu.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0158 + getScreenExtend() * 2
 	objA0.position.y.u16 = 0x014c
 	objA0.sprite_priority = 0x80
@@ -938,7 +946,7 @@ function void fn004a56()
 function void fn004ae4()
 {
 	objA0.mapping_offset = 0x004f8c
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0400)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (TitleScreen.Characters.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0148 + getScreenExtend()
 	objA0.position.y.u16 = 0xdc
 	objA0.sprite_priority = 0x0180
@@ -968,7 +976,7 @@ function void fn004b16()
 function void fn004b54()
 {
 	objA0.mapping_offset = 0x004f8c
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x0400)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (TitleScreen.Characters.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0xf8 + getScreenExtend()
 	objA0.position.y.u16 = 0xc8
 	objA0.sprite_priority = 0x0180
@@ -998,7 +1006,7 @@ function void fn004b86()
 function void fn004bb2()
 {
 	objA0.mapping_offset = 0x004fe8
-	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0400)
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | (TitleScreen.Characters.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0
 	objA0.position.y.u16 = 0xc0
 	objA0.sprite_priority = 0x0380

@@ -76,7 +76,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Sonic on the snowboard in ICZ 1
 		if (objA0.update_address == 0x03943a || objA0.update_address == 0x0394a0 || objA0.update_address == 0x0395fe)
 		{
-			u64 key = stringformat("character_sonic_snowboarding_0x%02x", objA0.animation.sprite)
+			u64 key = stringformat("%s_snowboarding_0x%02x", getCharacterSpriteKey(CHARACTER_SONIC), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x345010, 0x347f8a, objA0.mapping_offset, objA0.animation.sprite, 0x00)
@@ -193,24 +193,24 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			if (objA0.animation.sprite == 0x0b)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+36, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite("hud_text_total", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+36, py-5, renderQueue-1)
+				HUD.drawSprite("hud_text_total", px, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x0c)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+37, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite("hud_text_bonus", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+37, py-5, renderQueue-1)
+				HUD.drawSprite("hud_text_bonus", px, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x0d)
 			{
-				Renderer.drawCustomSprite("hud_text_ring", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite("hud_text_ring", px, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x0e)
 			{
-				Renderer.drawCustomSprite("hud_text_time", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite("hud_text_time", px, py, renderQueue)
 				return true
 			}
 		}
@@ -277,7 +277,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		//  -> Sub-mode that uses "real" Knuckles sprites
 		if ((objA0.update_address == 0x063a6a) || (objA0.update_address == 0x063de0 && u16[A0 + 0x44] == 0) || (objA0.update_address == 0x0656da && (objA0.flags38 & 0x40) == 0) || (objA0.update_address == 0x063466 && objA0.value42 == 0x02))
 		{
-			u64 key = stringformat("character_knuckles_0x%02x", objA0.animation.sprite)
+			u64 key = stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)
@@ -416,11 +416,11 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u8 character = (objA0.update_address == 0x00927a) ? getSecondCharacter() : getMainCharacter()
 			u8 atex = (character == CHARACTER_TAILS) ? 0x10 : 0x00
-			u64 key = stringformat((character == CHARACTER_SONIC) ? "bluesphere_sonic_0x%02x" : (character == CHARACTER_TAILS) ? "bluesphere_tails_0x%02x" : "bluesphere_knuckles_0x%02x", objA0.animation.sprite)
+			u64 key = stringformat("%s_0x%02x", getCharacterBluesphereSpriteKey(character), objA0.animation.sprite)
 			if (Renderer.hasCustomSprite(key))
 			{
 				// Check if there's also a custom palette
-				string paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+				string paletteKey = getCharacterBluespherePaletteKey(character)
 				if (System.hasExternalPaletteData(paletteKey, 0))
 				{
 					atex = 0x40 + character * 0x20
@@ -477,30 +477,30 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			bool isSKStage = (global.lock_on_state == 0 && global.sk_bluespheres)
 			if (objA0.animation.sprite == 0x17 || objA0.animation.sprite == 0x31 || objA0.animation.sprite == 0x36)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px-60, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_score_superstage" : "hud_text_score_chaosstage", px - 96, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px-60, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_score_superstage" : "hud_text_score_chaosstage", px - 96, py, renderQueue)
 				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", player.score * 10, px + 88, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x18 || objA0.animation.sprite == 0x32 || objA0.animation.sprite == 0x37)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+77, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_ring_superstage" : "hud_text_ring_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_bonus_superstage" : "hud_text_bonus_chaosstage", px + 40, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+77, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_ring_superstage" : "hud_text_ring_chaosstage", px, py, renderQueue)
+				HUD.drawSprite(isSKStage ? "hud_text_bonus_superstage" : "hud_text_bonus_chaosstage", px + 40, py, renderQueue)
 				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", results.ring_bonus * 10, px + 184, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x19 || objA0.animation.sprite == 0x33 || objA0.animation.sprite == 0x38)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+52, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_perfect_superstage" : "hud_text_perfect_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+52, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_perfect_superstage" : "hud_text_perfect_chaosstage", px, py, renderQueue)
 				HUD.drawNumber(isSKStage ? "hud_digit_%d" : "hud_digit_%d_chaosstage", results.time_bonus * 10, px + 184, py, renderQueue)
 				return true
 			}
 			else if (objA0.animation.sprite == 0x1a || objA0.animation.sprite == 0x34 || objA0.animation.sprite == 0x39)
 			{
-				Renderer.drawCustomSprite(getCharacterBonusTextIcon(getMainCharacter()), px+60, py-5, 0, SPRITE_FLAG_PRIO, renderQueue-1)
-				Renderer.drawCustomSprite(isSKStage ? "hud_text_continue_superstage" : "hud_text_continue_chaosstage", px, py, 0, SPRITE_FLAG_PRIO, renderQueue)
+				HUD.drawSprite(getCharacterBonusTextIcon(getMainCharacter()), px+60, py-5, renderQueue-1)
+				HUD.drawSprite(isSKStage ? "hud_text_continue_superstage" : "hud_text_continue_chaosstage", px, py, renderQueue)
 				return true
 			}
 		}
@@ -513,7 +513,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Continue icon
 		if (objA0.update_address == 0x02ebe8 && objA0.animation.sprite >= 0x29 && objA0.animation.sprite <= 0x2b)
 		{
-			string key = (objA0.animation.sprite == 0x29) ? "continue_icon_sonic" : (objA0.animation.sprite == 0x2a) ? "continue_icon_tails" : "continue_icon_knuckles"
+			string key = getCharacterContinueIcon(getMainCharacter())
 			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 			return true
 		}

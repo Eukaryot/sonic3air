@@ -16,7 +16,7 @@
 function void TailsTails.Init()
 {
 	objA0.mapping_offset = 0x344bb8
-	objA0.sprite_attributes = 0x06b0
+	objA0.sprite_attributes = (Char.Tails_Tails.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
@@ -68,7 +68,7 @@ function void TailsTails.Update()
 //# address-hook(0x015c3e) end(0x015c6c)
 function void TailsTails.UpdateSpritePatterns()
 {
-	updateCharacterSpritePatternsInternal(objA0.animation.sprite, 0x336620, 0x344d74, 0xd600, 0xfffff7df)
+	updateCharacterSpritePatternsInternal(objA0.animation.sprite, 0x336620, 0x344d74, Char.Tails_Tails.targetInVRAM, 0xfffff7df)
 }
 
 
@@ -78,7 +78,7 @@ function void TailsTails.UpdateSpritePatterns()
 //# address-hook(0x016022) end(0x01604e)
 function void CompetitionMode.TailsTails.UpdateSpritePatterns()
 {
-	u16 targetInVRAM = (A0 == 0xffffcc0a) ? 0xd600 : 0xd200
+	u16 targetInVRAM = (A0 == 0xffffcc0a) ? Char.Tails_Tails.targetInVRAM : Char.Player1_Tails.targetInVRAM
 	updateMultipleSpritePatterns(0x33d5e0, 0x2a024c, targetInVRAM, objA0.animation.sprite)
 }
 
@@ -87,7 +87,7 @@ function void CompetitionMode.TailsTails.UpdateSpritePatterns()
 function void CompetitionMode.TailsTails.Init()
 {
 	objA0.mapping_offset = 0x2a00a4
-	objA0.sprite_attributes = (A0 == 0xffffcc0a) ? 0x06b0 : 0x0690
+	objA0.sprite_attributes = (A0 == 0xffffcc0a) ? (Char.Tails_Tails.targetInVRAM >> 5) : (Char.Player1_Tails.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18

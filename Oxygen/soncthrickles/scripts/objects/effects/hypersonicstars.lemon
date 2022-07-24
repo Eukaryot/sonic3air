@@ -20,7 +20,7 @@ function void fn019348()
 	}
 #endif
 
-	Kosinski.addToDMAQueue(0x14c652, 0xf380)
+	Kosinski.addToDMAQueue(0x14c652, Shield.targetInVRAM)
 
 	A1 = A0
 	for (u8 i = 0; i < 4; ++i)
@@ -50,7 +50,7 @@ function void fn01937c()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.sprite_attributes = 0x079c
+	objA0.sprite_attributes = (Shield.targetInVRAM >> 5)
 	objA0.animation.sprite = 0x06
 
 	if (A0 == 0xffffcd7c)

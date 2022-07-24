@@ -7,6 +7,9 @@
 */
 
 
+constant u16 LevelSelect.Background.targetInVRAM = 0x0000
+constant u16 LevelSelect.TextTiles.targetInVRAM	 = 0x0200
+
 
 //-------------------------------------------------------//
 // Level Select Main Function                            //
@@ -69,9 +72,9 @@ function void LevelSelect.init()
 
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
-	Nemesis.loadDataToVRAM(0x0ca5e0, 0x0200)
+	Nemesis.loadDataToVRAM(0x0ca5e0, LevelSelect.TextTiles.targetInVRAM)		// Main Level Select Font
 
-	Enigma.decompress(0x0cab54, 0xffff0000, 0x6000)
+	Enigma.decompress(0x0cab54, 0xffff0000, (sprite_attribute.PALETTE.LINE3 | (LevelSelect.Background.targetInVRAM >> 5)))
 	copyRectToVRAM(0xffff0000, 0xe000, 0x28, 0x1c)
 
 	zeroMemory(0xffff0000, 0x460 * 2)

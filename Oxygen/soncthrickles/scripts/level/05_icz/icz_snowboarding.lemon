@@ -15,7 +15,7 @@
 //# address-hook(0x0393ee) end(0x039434)
 function void fn0393ee()
 {
-	objA0.sprite_attributes = 0x0680
+	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	objA0.mapping_offset = 0x347e30
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x20
@@ -224,7 +224,7 @@ function void fn039676()
 //# address-hook(0x03968e) end(0x039698)
 function void fn03968e()
 {
-	D4.u16 = 0xd000
+	D4.u16 = Char.Player1.targetInVRAM
 	D6 = 0x345010
 	A2 = 0x347f8a
 	fn03969e()

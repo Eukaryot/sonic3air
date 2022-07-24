@@ -22,7 +22,7 @@ function void AfterImages.Init()
 #endif
 
 	objA0.mapping_offset = isMainCharacter(CHARACTER_KNUCKLES) ? 0x14a8d6 : 0x146816
-	objA0.sprite_attributes = 0x0680
+	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18

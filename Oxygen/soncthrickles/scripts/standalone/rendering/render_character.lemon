@@ -56,18 +56,7 @@ function void Standalone.drawCharacterSpriteDirect(u8 character, s16 px, s16 py,
 	if (key == 0)
 	{
 		u8 animationSprite = animationSpriteEx
-		if (character == CHARACTER_SONIC)
-		{
-			key = stringformat(super.active ? "character_supersonic_0x%02x" : "character_sonic_0x%02x", animationSprite)
-		}
-		else if (character == CHARACTER_TAILS)
-		{
-			key = stringformat("character_tails_0x%02x", animationSprite)
-		}
-		else if (character == CHARACTER_KNUCKLES)
-		{
-			key = stringformat("character_knuckles_0x%02x", animationSprite)
-		}
+		key = stringformat("%s_0x%02x", getCharacterSpriteKey(character), animationSprite)
 
 		if (!Renderer.hasCustomSprite(key))
 		{
@@ -234,18 +223,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 		if (key == 0)
 		{
-			if (character == CHARACTER_SONIC)
-			{
-				key = stringformat(super.active ? "character_supersonic_0x%02x" : "character_sonic_0x%02x", animationSprite)
-			}
-			else if (character == CHARACTER_TAILS)
-			{
-				key = stringformat("character_tails_0x%02x", animationSprite)
-			}
-			else if (character == CHARACTER_KNUCKLES)
-			{
-				key = stringformat("character_knuckles_0x%02x", animationSprite)
-			}
+			key = stringformat("%s_0x%02x", getCharacterSpriteKey(character), animationSprite)
 
 			if (!Renderer.hasCustomSprite(key))
 			{
@@ -281,7 +259,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			}
 		}
 
-		key = stringformat("character_tails_tails_0x%02x", animationSprite)
+		key = stringformat("%s_tails_0x%02x", getCharacterSpriteKey(CHARACTER_TAILS), animationSprite)
 		if (!Renderer.hasCustomSprite(key))
 		{
 			key = Renderer.setupCustomCharacterSprite(0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00)
@@ -361,5 +339,31 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 function string getCharacterBonusTextIcon(u8 character)
 {
-	return (character == CHARACTER_KNUCKLES) ? "hud_bonus_icon_red" : (character == CHARACTER_TAILS) ? "hud_bonus_icon_orange" : "hud_bonus_icon_blue"
+	return (character == CHARACTER_SONIC) ? "hud_bonus_icon_blue" : (character == CHARACTER_TAILS) ? "hud_bonus_icon_orange" : "hud_bonus_icon_red"
+}
+
+function string getCharacterContinueIcon(u8 character)
+{
+	return (character == CHARACTER_SONIC) ? "continue_icon_sonic" : (character == CHARACTER_TAILS) ? "continue_icon_tails" : "continue_icon_knuckles"
+}
+
+function string getCharacterLivesIcon(u8 character)
+{
+	return (character == CHARACTER_SONIC) ? "hud_lives_icon_sonic" : (character == CHARACTER_TAILS) ? ((global.region_code & 0x80) ? "hud_lives_icon_tails" : "hud_lives_icon_miles") : "hud_lives_icon_knuckles"
+}
+
+function string getCharacterSpriteKey(u8 character)
+{
+	bool isSuperActive = (character == CHARACTER_TAILS) ? super.active.tails : super.active
+	return getCharacterSpriteKey(character, isSuperActive)
+}
+
+function string getCharacterSpriteKey(u8 character, bool isSuperActive)
+{
+	return (character == CHARACTER_SONIC) ? (isSuperActive ? "character_supersonic" : "character_sonic") : (character == CHARACTER_TAILS) ? "character_tails" : "character_knuckles"
+}
+
+function string getCharacterBluesphereSpriteKey(u8 character)
+{
+	return (character == CHARACTER_SONIC) ? "bluesphere_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_tails" : "bluesphere_knuckles"
 }

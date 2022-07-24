@@ -25,7 +25,14 @@ define bluespheregame.enable_progress	=  u8[0xffffffab]	// Set to 0xff when not 
 define bluespheregame.shown_difficulty	=  u8[0xffffffac]	// Shown difficulty in results after perfect (counts up in the screen)
 define bluespheregame.difficulty_level	=  u8[0xffffffad]	// Actual difficulty
 
-constant u16 BlueSphereGame.TextTiles.targetInVRAM = 0xb7e0
+constant u16 BlueSphereGame.Background.targetInVRAM		= 0x0000
+constant u16 BlueSphereGame.SKTitleLogo.targetInVRAM	= 0x3000
+constant u16 BlueSphereGame.BGLogo.targetInVRAM			= 0x32e0
+constant u16 BlueSphereGame.Emeralds.targetInVRAM		= 0x3b80
+constant u16 BlueSphereGame.Menu.targetInVRAM			= 0xa9c0
+constant u16 BlueSphereGame.Bumpers.targetInVRAM		= 0xb300		// (BlueSphereGame.Menu.targetInVRAM + 0x0940)
+constant u16 BlueSphereGame.TextTiles.targetInVRAM		= 0xb7e0
+constant u16 BlueSphereGame.Tails.targetInVRAM			= 0xf400
 
 
 #if STANDALONE
@@ -141,16 +148,19 @@ function void fn04c97e()
 	fn04cb1a()
 
 	Nemesis.loadDataToVRAM(0x0dde34, BlueSphereGame.TextTiles.targetInVRAM)
-	Nemesis.loadDataToVRAM(0x189c7c, 0x32e0)
+	Nemesis.loadDataToVRAM(0x189c7c, BlueSphereGame.BGLogo.targetInVRAM)		// Sonic & Knuckles head logo
 
+	// Character background art
 	Kosinski.decompress(0x187d1c, 0xffff0000)
 	Kosinski.decompress(0x188f1e, A1)
-	updateSpritePattern(0xffff0000, 0, A1.u16 >> 1)
+	updateSpritePattern(0xffff0000, BlueSphereGame.Background.targetInVRAM, A1.u16 >> 1)
 
+	// Menu items. Includes text graphics, level code digits, copyright information, cursor bumpers and star icons
 	Kosinski.decompress(0x1897de, 0xffff4000)
-	updateSpritePattern(0xffff4000, 0xa9c0, 0x06d0)
+	updateSpritePattern(0xffff4000, BlueSphereGame.Menu.targetInVRAM, 0x06d0)
 
-	Enigma.decompress(0x187cb0, 0xffff8000, 0x2000)
+	// Plane mapping for big character art in the background
+	Enigma.decompress(0x187cb0, 0xffff8000, (sprite_attribute.PALETTE.LINE1 | (BlueSphereGame.Background.targetInVRAM >> 5)))
 
 	//copyRectToVRAM(0xffff8000, 0xc380, 0x28, 0x10)	// Should be the same as below, needs to be tested
 	A1 = 0xffff8000
@@ -159,7 +169,8 @@ function void fn04c97e()
 	D2 = 0x0f
 	CopyRectToVRAM()
 
-	Enigma.decompress(0x189c4e, 0xffff8000, 0x4197)
+	// Mapping for Sonic & Knuckles head logo in the background
+	Enigma.decompress(0x189c4e, 0xffff8000, (sprite_attribute.PALETTE.LINE2 | (BlueSphereGame.BGLogo.targetInVRAM >> 5)))
 
 	//copyRectToVRAM(0xffff8000, 0xe09c, 0x0c, 0x08)	// Should be the same as below, but something is wrong
 	A1 = 0xffff8000
@@ -539,7 +550,7 @@ function void fn04cf82()
 function void fn04d03e()
 {
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (BlueSphereGame.Menu.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x14
@@ -855,7 +866,7 @@ function void fn04d302()
 function void fn04d30e()
 {
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (BlueSphereGame.Menu.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0xd4 + getScreenExtend()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x14
@@ -939,7 +950,7 @@ function void fn04d3ce()
 	D0.u16 = u16[A0 + 0x30] + 1
 	D0 = u32(D0.u16) * 0x4a
 	A1 += D0.u16
-	objA1.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
+	objA1.sprite_attributes = (sprite_attribute.PRIORITY | (BlueSphereGame.Menu.targetInVRAM >> 5))
 
 	D1.u8 = control.pad1.pressed
 #if STANDALONE
@@ -1098,7 +1109,7 @@ function void fn04d5bc()
 function void fn04d5c2()
 {
 	objA0.mapping_offset = 0x04d8ae
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (BlueSphereGame.Menu.targetInVRAM >> 5))
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x08
 	objA0.box_size.y = 0x08
@@ -1155,7 +1166,7 @@ function void fn04d602()
 function void fn04d610()
 {
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (BlueSphereGame.Menu.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0128
 	objA0.sprite_priority = 0x80
@@ -1182,10 +1193,10 @@ function void fn04d648()
 function void fn04d64e()
 {
 	objA0.mapping_offset = 0x04d926
-	objA0.sprite_attributes = (levelselect.characters == CHARS_KNUCKLES_ALONE) ? (sprite_attribute.PRIORITY | 0x0598) : (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0598)
+	objA0.sprite_attributes = (levelselect.characters == CHARS_KNUCKLES_ALONE) ? (sprite_attribute.PRIORITY | (BlueSphereGame.Bumpers.targetInVRAM >> 5)) : (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | (BlueSphereGame.Bumpers.targetInVRAM >> 5))
 #if STANDALONE
 	if (levelselect.characters == CHARS_TAILS_ALONE)
-		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0598)
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | (BlueSphereGame.Bumpers.targetInVRAM >> 5))
 #endif
 
 	objA0.position.x.u16 = ((objA0.render_flags & render_flag.FLIP_X) ? 0x140 : 0x100) + getScreenExtend()
@@ -1331,27 +1342,26 @@ function void fn04d6b8()
 	}
 #endif
 
-	// Check if jump button pressed
 	if (control.pad1.pressed & CONTROL_ABC)
 	{
 		D0.u16 = objA0.sprite_attributes
-		if (D0.u16 == (sprite_attribute.PRIORITY | 0x0598))
+		if (D0.u16 == (sprite_attribute.PRIORITY | (BlueSphereGame.Bumpers.targetInVRAM >> 5)))
 		{
 			levelselect.characters = CHARS_SONIC_ALONE
-			objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0598)
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | (BlueSphereGame.Bumpers.targetInVRAM >> 5))
 		}
 		else
 	#if STANDALONE
-		if (D0.u16 == (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0598))
+		if (D0.u16 == (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | (BlueSphereGame.Bumpers.targetInVRAM >> 5)))
 		{
 			levelselect.characters = CHARS_TAILS_ALONE
-			objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0598)
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | (BlueSphereGame.Bumpers.targetInVRAM >> 5))
 		}
 		else
 	#endif
 		{
 			levelselect.characters = CHARS_KNUCKLES_ALONE
-			objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0598)
+			objA0.sprite_attributes = (sprite_attribute.PRIORITY | (BlueSphereGame.Bumpers.targetInVRAM >> 5))
 		}
 	}
 
@@ -1459,22 +1469,25 @@ function void fn04da7e()
 
 	copyMemory(0xfffffc80, 0x04de08, 0x80)
 
-	Kosinski.decompress(0x15bac0, 0xffff0000)
-	Kosinski.decompress(0x15c130, A1)
-	updateSpritePattern(0xffff0000, 0x3b80, A1.u16 >> 1)
+	// Special Stage results-related graphics. Loaded here for the Emerald sprites
+	Kosinski.decompress(0x15bac0, 0xffff0000)	// Special stage results text + Chaos emeralds and Sonic's continue icon
+	Kosinski.decompress(0x15c130, A1)			// Knuckles and Tails' continue icons
+	updateSpritePattern(0xffff0000, BlueSphereGame.Emeralds.targetInVRAM, A1.u16 >> 1)
 
+	// Smaller text sprites and code digits
 	Kosinski.decompress(0x1897de, 0xffff4000)
-	updateSpritePattern(0xffff4000, 0xa9c0, 0x06d0)
+	updateSpritePattern(0xffff4000, BlueSphereGame.Menu.targetInVRAM, 0x06d0)
 
 	Nemesis.loadDataToVRAM(0x0dde34, BlueSphereGame.TextTiles.targetInVRAM)
-	Nemesis.loadDataToVRAM(0x189c7c, 0x32e0)
+	Nemesis.loadDataToVRAM(0x189c7c, BlueSphereGame.BGLogo.targetInVRAM)		// Sonic & Knuckles head logo
 
 	A1 = 0x04de88	// "CONGRATULATIONS!"
 	D2.u16 = 0x030a
 	D6.u16 = (sprite_attribute.PRIORITY | (BlueSphereGame.TextTiles.targetInVRAM >> 5))
 	fn05b318()
 
-	Enigma.decompress(0x189c4e, 0xffff8000, 0x6197)
+	// Mapping for Sonic & Knuckles head logo in the background
+	Enigma.decompress(0x189c4e, 0xffff8000, (sprite_attribute.PALETTE.LINE3 | (BlueSphereGame.BGLogo.targetInVRAM >> 5)))
 
 	fn04dea2()
 
@@ -1526,21 +1539,20 @@ function void fn04da7e()
 	copyMemory(0xfffffcc0, 0x04de68, 0x20)
 	copyMemory(0xfffffce0, 0x060aba, 0x20)
 
-	Nemesis.loadDataToVRAM(0x189c7c, 0x0000)
+	Nemesis.loadDataToVRAM(0x189c7c, BlueSphereGame.Background.targetInVRAM)		// Sonic & Knuckles head logo
 
-	A1 = 0x04dde8
-	Nemesis.LoadMultipleToVRAM()
+	Nemesis.LoadMultipleToVRAM(0x04dde8)		// Robotnik + Egg Mobile and critter art for perfect results screen
 
-	Kosinski.decompress(0x16416e, 0xffff0000)
-	Kosinski.decompress(0x0de364, A1)
-	Kosinski.decompress(0x17fcbc, A1)
-	Kosinski.decompress(0x163248, A1)
-	Kosinski.decompress(0x15fdde, A1)
+	Kosinski.decompress(0x16416e, 0xffff0000)	// Small Sonic & Knuckles title logo
+	Kosinski.decompress(0x0de364, A1)			// "& Knuckles" subtitle (might be loaded for the trademark sign?)
+	Kosinski.decompress(0x17fcbc, A1)			// Master Emerald sprite
+	Kosinski.decompress(0x163248, A1)			// Robotnik posing sprites
+	Kosinski.decompress(0x15fdde, A1)			// Egg Robo's Egg Mobile sprites
 
-	updateSpritePattern(0xffff0000, 0x3000, A1.u16 >> 1)
+	updateSpritePattern(0xffff0000, BlueSphereGame.SKTitleLogo.targetInVRAM, A1.u16 >> 1)
 
-	Enigma.decompress(0x189c4e, 0xffff8000, 0x4000)
-
+	// Repeating Sonic & Knuckles head logo background
+	Enigma.decompress(0x189c4e, 0xffff8000, (sprite_attribute.PALETTE.LINE2 | (BlueSphereGame.Background.targetInVRAM >> 5)))
 	fn04dea2()
 
 	u32[0xffffb04a] = 0x04d03e	// Level text and number
@@ -1711,7 +1723,7 @@ function void fn04df52()
 //# address-hook(0x04df86) end(0x04dfe8)
 function void fn04df86()
 {
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (Char.Player1.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0100
 	objA0.sprite_priority = 0x80
@@ -1732,7 +1744,7 @@ function void fn04df86()
 	{
 		objA0.mapping_offset = 0x148eb8
 		objA0.state = char.state.WIN_POSE
-		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x06a0)
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | (Char.Tails.targetInVRAM >> 5))
 
 		objA0.update_address = 0x04dffe
 		fn04dffe()
@@ -1793,7 +1805,7 @@ function void fn04e012()
 	{
 		objA1.update_address = 0x04e074
 		objA1.mapping_offset = 0x04e316
-		objA1.sprite_attributes = 0x01dc
+		objA1.sprite_attributes = (BlueSphereGame.Emeralds.targetInVRAM >> 5)
 		objA1.sprite_priority = 0x80
 		objA1.box_size.x = 0x18
 		objA1.box_size.y = 0x18
@@ -1847,7 +1859,7 @@ function void fn04e0a4()
 {
 	// "Difficulty" text
 	objA0.mapping_offset = 0x04d7be
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x054e)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (BlueSphereGame.Menu.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0140
 	objA0.sprite_priority = 0x80
@@ -1914,17 +1926,17 @@ function void fn04e160()
 		D1 = (bluespheregame.shown_difficulty - 1) * 4
 		// Targets:
 		//  - 0x04e1c4	-> D1.u16 = 0	-> Sonic in perfect screen
-		//  - 0x04e264	-> D1.u16 = 1	-> Tails in perfect screen
-		//  - 0x04e2b8	-> D1.u16 = 2	-> Knuckles in perfect screen
-		//  - 0x05fb56	-> D1.u16 = 3	-> Robotnik in perfect screen
-		//  - 0x07cfa4	-> D1.u16 = 4	-> Mecha Sonic in perfect screen
-		//  - 0x0680a4	-> D1.u16 = 5	-> Egg Robo and the Egg Mobile in Perfect screen
-		//  - 0x02cd26	-> D1.u16 = 6	-> Chickens in perfect screen
-		//  - 0x02cd9a	-> D1.u16 = 7	-> Squirrels in perfect screen
-		//  - 0x02ce2c	-> D1.u16 = 8	-> Rabbits in perfect screen
-		//  - 0x07cff0	-> D1.u16 = 9	-> Master Emerald in perfect screen
-		//  - 0x05face	-> D1.u16 = 10	-> Sonic & Knuckles Logo in perfect screen
-		//  - 0x04e24c	-> D1.u16 = 11	-> Sonic going Super at MAX difficulty
+		//  - 0x04e264	-> D1.u16 = 4	-> Tails in perfect screen
+		//  - 0x04e2b8	-> D1.u16 = 8	-> Knuckles in perfect screen
+		//  - 0x05fb56	-> D1.u16 = 12	-> Robotnik in perfect screen
+		//  - 0x07cfa4	-> D1.u16 = 16	-> Mecha Sonic in perfect screen
+		//  - 0x0680a4	-> D1.u16 = 20	-> Egg Robo and the Egg Mobile in Perfect screen
+		//  - 0x02cd26	-> D1.u16 = 24	-> Chickens in perfect screen
+		//  - 0x02cd9a	-> D1.u16 = 28	-> Squirrels in perfect screen
+		//  - 0x02ce2c	-> D1.u16 = 32	-> Rabbits in perfect screen
+		//  - 0x07cff0	-> D1.u16 = 36	-> Master Emerald in perfect screen
+		//  - 0x05face	-> D1.u16 = 40	-> Sonic & Knuckles title Logo in perfect screen
+		//  - 0x04e24c	-> D1.u16 = 44	-> Sonic going Super at MAX difficulty
 		objA1.update_address = u32[0x04e17a + D1.u16]
 	}
 }
@@ -1958,7 +1970,7 @@ function void fn04e1b4()
 function void fn04e1c4()
 {
 	objA0.mapping_offset = 0x146620
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x0680)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (Char.Player1.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0120 + getScreenExtend()
 	objA0.position.y.u16 = 0x0120
 	objA0.render_flags |= render_flag.FLIP_X
@@ -2029,7 +2041,7 @@ function void fn04e24c()
 function void fn04e264()
 {
 	objA0.mapping_offset = 0x04e2a2
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07a0)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (BlueSphereGame.Tails.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0xfc + getScreenExtend()
 	objA0.position.y.u16 = 0x011b
 	objA0.render_flags |= render_flag.FLIP_X
@@ -2056,7 +2068,7 @@ function void fn04e29c()
 function void fn04e2b8()
 {
 	objA0.mapping_offset = 0x14a8d6
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x06a0)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (Char.Tails.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x0138 + getScreenExtend()
 	objA0.position.y.u16 = 0x0118
 	objA0.sprite_priority = 0x80
@@ -2077,7 +2089,7 @@ function void fn04e2f0()
 	if (D0.u8 != u8[A0 + 0x30])
 	{
 		u8[A0 + 0x30] = D0.u8
-		D4.u16 = 0xd400
+		D4.u16 = Char.Tails.targetInVRAM
 		fn018122()
 	}
 	DrawObject()
@@ -2373,7 +2385,7 @@ function void fn07d050()
 function void fn05face()
 {
 	objA0.mapping_offset = 0x060644
-	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0180)
+	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | (BlueSphereGame.SKTitleLogo.targetInVRAM >> 5))
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x14

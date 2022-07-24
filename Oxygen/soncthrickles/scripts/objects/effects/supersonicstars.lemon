@@ -15,14 +15,14 @@
 //# address-hook(0x019156) end(0x01919e)
 function void fn019156()
 {
-	updateSpritePattern(0x18bd44, 0xf380, 0x01a0)
+	updateSpritePattern(0x18bd44, Shield.targetInVRAM, 0x01a0)
 
 	objA0.mapping_offset = 0x0192de
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.sprite_attributes = 0x079c
+	objA0.sprite_attributes = (Shield.targetInVRAM >> 5)
 	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 
@@ -131,7 +131,7 @@ function void SuperSonicStars.CreateSparks()
 		objA1.box_size.y = 0x08
 		objA1.box_size.x = 0x08
 		objA1.sprite_priority = 0x0380
-		objA1.sprite_attributes = (sprite_attribute.PRIORITY | 0x079c)
+		objA1.sprite_attributes = (sprite_attribute.PRIORITY | (Shield.targetInVRAM >> 5))
 		objA1.mapping_offset = 0x0192ea
 		objA1.position.x.u16 = u16[A2 + 0x10]
 		objA1.position.y.u16 = u16[A2 + 0x14]

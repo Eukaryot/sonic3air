@@ -15,6 +15,7 @@ define objA0.shield.targetInVRAM			= u16[A0 + 0x40]
 define objA0.shield.character_address		= u16[A0 + 0x42]
 define objA1.shield.character_address		= u16[A1 + 0x42]
 
+constant u16 Shield.targetInVRAM			= 0xf380
 
 
 //-------------------------------------------------------//
@@ -40,8 +41,8 @@ function void Shield.sharedInit()
 	objA0.sprite_priority = 0x80
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.sprite_attributes = 0x079c
-	objA0.shield.targetInVRAM = 0xf380
+	objA0.sprite_attributes = (Shield.targetInVRAM >> 5)
+	objA0.shield.targetInVRAM = Shield.targetInVRAM
 	if (u8[0xffffb000 + 0x0a] & 0x80)
 		u8[A0 + 0x0a] |= 0x80
 	objA0.state.both = 0x01
@@ -395,7 +396,7 @@ function void BubbleShield.Update()
 //# address-hook(0x0187f0) end(0x018862)
 function void fn0187f0()
 {
-	updateSpritePattern(0x18a204, 0xf380, 0x200)
+	updateSpritePattern(0x18a204, Shield.targetInVRAM, 0x200)
 
 	D2 = 0
 	A2 = 0x0187d8
@@ -406,7 +407,7 @@ function void fn0187f0()
 		objA1.render_flags = (render_flag.COMPOUND | render_flag.WORLD)
 		objA1.box_size.x = 0x10
 		objA1.sprite_priority = 0x80
-		objA1.sprite_attributes = 0x079c
+		objA1.sprite_attributes = (Shield.targetInVRAM >> 5)
 		objA1.mapping_offset = 0x018aea
 		objA1.compound.count = 2
 		objA1.shield.character_address = objA0.shield.character_address

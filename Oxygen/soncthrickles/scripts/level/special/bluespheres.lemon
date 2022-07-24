@@ -7,6 +7,14 @@
 */
 
 
+constant u16 SpecialStage.CheckerFloor.targetInVRAM = 0x0000
+constant u16 SpecialStage.TextPromps.targetInVRAM	= 0xabe0
+constant u16 SpecialStage.HUDIcons.targetInVRAM		= 0xb120
+constant u16 SpecialStage.Background.targetInVRAM	= 0xb360
+constant u16 SpecialStage.Tails_Tails.targetInVRAM	= 0xf600
+constant u16 SpecialStage.Player.targetInVRAM		= 0xfa80
+constant u16 SpecialStage.Tails.targetInVRAM		= 0xfd60
+
 
 //-------------------------------------------------------//
 // Blue Spheres Special Stage                            //
@@ -72,7 +80,7 @@ function void SpecialStage()
 	for (u8 player = 0; player < getNumPlayers(); ++player)
 	{
 		u8 character = getPlayerCharacter(player)
-		string paletteKey = (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
+		string paletteKey = getCharacterBluespherePaletteKey(character)
 		u16 numColors = System.loadExternalPaletteData(paletteKey, 0, 0x800000, 0x20)
 		if (numColors > 0)
 		{
@@ -85,31 +93,32 @@ function void SpecialStage()
 	}
 #endif
 
-	Nemesis.loadDataToVRAM(0x0b07b8, 0x0000)
+	Nemesis.loadDataToVRAM(0x0b07b8, SpecialStage.CheckerFloor.targetInVRAM)		// Checkered Floor
 
 	fn0085b0()
 
-	Enigma.decompress(0x0aef54, 0xffff5500, 0x0000)
+	// Checkered Floor mapping
+	Enigma.decompress(0x0aef54, 0xffff5500, (SpecialStage.CheckerFloor.targetInVRAM >> 5))
 	copyRectToVRAM(0xffff5500, 0xc000, 0x28, 0x1c)
 
-	Nemesis.loadDataToVRAM(0x0ad904, 0xd000)
-	Nemesis.loadDataToVRAM(0x0adf60, 0xb4e0)
-	Nemesis.loadDataToVRAM(0x0aeed0, 0xb360)
-	Nemesis.loadDataToVRAM(0x0ad472, 0xabe0)
-	Nemesis.loadDataToVRAM(0x0ad5f4, 0xdf00)
-	Nemesis.loadDataToVRAM(0x0ad650, 0xf020)
+	Nemesis.loadDataToVRAM(0x0ad904, 0xd000)		// Sphere sprites
+	Nemesis.loadDataToVRAM(0x0adf60, 0xb4e0)		// Special stage ring sprites
+	Nemesis.loadDataToVRAM(0x0aeed0, SpecialStage.Background.targetInVRAM)
+	Nemesis.loadDataToVRAM(0x0ad472, SpecialStage.TextPromps.targetInVRAM)		// "get blue spheres" and "perfect" text
+	Nemesis.loadDataToVRAM(0x0ad5f4, 0xdf00)		// Arrow-like icon accompanying the above text
+	Nemesis.loadDataToVRAM(0x0ad650, 0xf020)		// Special Stage HUD digits
 
 	A0 = 0x0ad650
 	A4 = 0xffffe020
 	fn0015cc()
 
-	Nemesis.loadDataToVRAM(0x0ad7bc, 0xb120)
-	Nemesis.loadDataToVRAM(0x0ad430, 0xf400)
+	Nemesis.loadDataToVRAM(0x0ad7bc, SpecialStage.HUDIcons.targetInVRAM)		// Special Stage HUD icons
+	Nemesis.loadDataToVRAM(0x0ad430, 0xf400)		// Shadows
 
 	copyRectToVRAM(0x008d2c, 0xc084, 0x08, 0x03)
 	copyRectToVRAM(0x008d2c, 0xc0bc, 0x08, 0x03)
 
-	Enigma.decompress(0x0aedb0, 0xffff0000, 0x459b)
+	Enigma.decompress(0x0aedb0, 0xffff0000, (sprite_attribute.PALETTE.LINE2 | (SpecialStage.Background.targetInVRAM >> 5)))
 	copyRectToVRAM(0xffff0000, 0xe000, 0x40, 0x20)
 
 	Kosinski.decompress(0x0b2e36, 0xffff0000)
@@ -591,7 +600,7 @@ function void fn008df8()
 	objA0.box_size.y = 0x80
 	objA0.sprite_priority = 0
 	objA0.mapping_offset = 0x008e30
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0589)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | (SpecialStage.HUDIcons.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x120 + getScreenExtend()
 	objA0.position.y.u16 = 0x94
 	objA0.update_address = 0x008e2a
@@ -630,7 +639,7 @@ function void fn008e5c()
 	objA0.box_size.y = 0x80
 	objA0.sprite_priority = 0
 	objA0.mapping_offset = 0x008f5e
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x055f)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (SpecialStage.TextPromps.targetInVRAM >> 5))
 	objA0.position.x.u16 = 0x120 + getScreenExtend()
 	objA0.position.y.u16 = 0xe8
 	objA0.value32 = 0xb4
@@ -732,12 +741,12 @@ function void fn008faa()
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0200
 	objA0.mapping_offset = 0x0abdfc
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x07d4)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | (SpecialStage.Player.targetInVRAM >> 5))
 
 	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		objA0.mapping_offset = 0x2908ba
-		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07eb)
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (SpecialStage.Tails.targetInVRAM >> 5))
 
 		fn008d5c()
 		if (_equal())
@@ -751,7 +760,7 @@ function void fn008faa()
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		objA0.mapping_offset = 0x0ad302
-		objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x07d4)
+		objA0.sprite_attributes = (sprite_attribute.PRIORITY | (SpecialStage.Player.targetInVRAM >> 5))
 	}
 
 	u16[A0 + 0x30] = 0xa0
@@ -866,19 +875,19 @@ function void fn00903e()
 	{
 		A2 = 0x2908d2
 		D6 = 0x28f95a
-		D4.u16 = 0xfd60
+		D4.u16 = SpecialStage.Tails.targetInVRAM
 	}
 	else if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		A2 = 0x0ad31a
 		D6 = 0x0abf22
-		D4.u16 = 0xfa80
+		D4.u16 = SpecialStage.Player.targetInVRAM
 	}
 	else
 	{
 		A2 = 0x0abe14
 		D6 = 0x0aaa7c
-		D4.u16 = 0xfa80
+		D4.u16 = SpecialStage.Player.targetInVRAM
 	}
 
 	fn0091a2()
@@ -907,7 +916,7 @@ function void fn009212()
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0180
 	objA0.mapping_offset = 0x2908ba
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07eb)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (SpecialStage.Tails.targetInVRAM >> 5))
 	u16[A0 + 0x30] = 0xa0
 	objA0.value32 = 0x70
 	u16[A0 + 0x34] = 0
@@ -1006,7 +1015,7 @@ function void fn00927a()
 
 	A2 = 0x2908d2
 	D6 = 0x28f95a
-	D4.u16 = 0xfd60
+	D4.u16 = SpecialStage.Tails.targetInVRAM
 	fn0091a2()
 }
 
@@ -1079,7 +1088,7 @@ function void fn009444()
 	objA0.box_size.y = 0x10
 	objA0.sprite_priority = 0x0100
 	objA0.mapping_offset = 0x2910e8
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | 0x07b0)
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE1 | (SpecialStage.Tails_Tails.targetInVRAM >> 5))
 	u16[A0 + 0x30] = getScreenWidth() / 2
 	objA0.value32 = 0x70
 	objA0.value3a = 0xff
@@ -1119,7 +1128,7 @@ function void fn009488()
 
 	A2 = 0x291106
 	D6 = 0x2909e8
-	D4.u16 = 0xf600
+	D4.u16 = SpecialStage.Tails_Tails.targetInVRAM
 	fn0091a2()
 }
 
@@ -1713,7 +1722,7 @@ function void fn009b62()
 		copyMemory(0xfffffc64, A1, 0x08)
 
 		A1 = (global.sk_bluespheres) ? 0x0ae99e : 0x0ae3ec
-		Kosinski.addToDMAQueue(A1, 0xb4e0)
+		Kosinski.addToDMAQueue(A1, 0xb4e0)		// Emerald sprites
 	}
 	else if (bluespheres.stage_exit_state == 2)
 	{
@@ -2466,7 +2475,7 @@ function void fn02df64()
 
 	addPatternLoadingCue(0x02e310)
 
-	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)
+	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)		// Common results graphics shared
 
 	// Choose text: "Super" or "Hyper"
 	if (isMainCharacter(CHARACTER_SONIC))
@@ -2490,7 +2499,7 @@ function void fn02df64()
 	{
 		A1 = (global.super_emeralds < 7) ? 0x15b4f6 : 0x15b7ea
 	}
-	Kosinski.addToDMAQueue(A1, 0xa1e0)
+	Kosinski.addToDMAQueue(A1, 0xa1e0)		// "Super" or "Hyper" nameplate appropriate for the character and form
 
 	if (isMainCharacter(CHARACTER_SONIC))
 	{
@@ -2504,9 +2513,9 @@ function void fn02df64()
 	{
 		A1 = 0x0d67f0
 	}
-	Kosinski.addToDMAQueue(A1, 0x9e20)
+	Kosinski.addToDMAQueue(A1, 0x9e20)		// Character nameplate
 
-	Kosinski.addToDMAQueue(0x15babe, 0xa460)
+	Kosinski.addToDMAQueue(0x15babe, 0xa460)		// Special Stage results graphics
 
 	vint.update_subroutine = 0x02df62
 

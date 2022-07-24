@@ -19,7 +19,7 @@ function void fn06aeb6()
 	}
 #endif
 
-	A1 = (!isMainCharacter(CHARACTER_KNUCKLES)) ? 0x06ae96 : 0x06aea6
+	A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x06aea6 : 0x06ae96
 	if (InitBoss(0x06aecc))
 		return
 

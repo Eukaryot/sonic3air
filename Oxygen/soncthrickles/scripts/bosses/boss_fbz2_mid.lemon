@@ -50,7 +50,7 @@ function void fn06fd38()
 	move_area.right = 0x2b40
 #endif
 
-	u32 address = (isMainCharacter(CHARACTER_KNUCKLES)) ? 0x0705d0 : 0x0705b6
+	u32 address = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0705d0 : 0x0705b6
 	addPatternLoadingCue(address)
 
 	loadPaletteLine1(0x070420)

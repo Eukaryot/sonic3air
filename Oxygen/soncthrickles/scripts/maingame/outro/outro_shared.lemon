@@ -453,6 +453,11 @@ function void fn05eb32()
 		fn05eb88()
 	}
 #if STANDALONE
+	else if (isSecondCharacter(CHARACTER_TAILS))
+	{
+		// Special handling for Knuckles & Tails game: Put Tails into the Tornado
+		fn05eb72()
+	}
 	else if (global.zone_act == 0x0d01)
 	{
 		// Special handling for Knuckles in S/T outro: Put Sonic into the Tornado
