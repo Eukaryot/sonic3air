@@ -345,9 +345,10 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				{
 					const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(sg.mSpriteInfo);
 					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
-					if (needsRefresh)
+					if (needsRefresh || mLastUsedRenderPaletteSpriteShader != &shader)
 					{
 						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
+						mLastUsedRenderPaletteSpriteShader = &shader;
 					}
 					if (spriteInfo.mSize.x == 0 || spriteInfo.mSize.y == 0)
 					{
@@ -363,9 +364,10 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				{
 					const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(sg.mSpriteInfo);
 					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
-					if (needsRefresh)
+					if (needsRefresh || mLastUsedRenderComponentSpriteShader != &shader)
 					{
 						shader.refresh(mGameResolution);
+						mLastUsedRenderComponentSpriteShader = &shader;
 					}
 					shader.draw(spriteInfo, mResources);
 					break;

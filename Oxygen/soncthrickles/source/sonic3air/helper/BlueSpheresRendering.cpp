@@ -226,8 +226,8 @@ void BlueSpheresRendering::createSprites(Vec2i screenSize)
 			memcpy(output, lookupData, maxX);
 		}
 
-		items[0]->mSprite->mOffset.y = screenSize.y - bitmaps[0]->getHeight();
-		items[1]->mSprite->mOffset.y = items[0]->mSprite->mOffset.y - bitmaps[1]->getHeight();
+		items[0]->mSprite->mOffset.y = screenSize.y - bitmaps[0]->getHeight() - bitmaps[1]->getHeight();
+		items[1]->mSprite->mOffset.y = screenSize.y - bitmaps[1]->getHeight();
 	}
 }
 
@@ -300,10 +300,6 @@ void BlueSpheresRendering::writeVisibleSpheresData(uint32 targetAddress, uint32 
 
 bool BlueSpheresRendering::loadLookupData()
 {
-	// TEST
-	return false;
-
-
 	std::vector<uint8> data;
 	if (!FTX::FileSystem->readFile(L"data/binary/bluespheresrendering.bin", data))
 		return false;
@@ -492,7 +488,7 @@ void BlueSpheresRendering::performLookupCalculations()
 			int indent = 0;
 			for (; indent < LOOKUP_WIDTH / 2; ++indent)
 			{
-				if (ptr[indent] < 0.999f)
+				if (ptr[indent] > 0.999f)
 					break;
 			}
 			mNonOpaquePixelIndent[row] = indent;
