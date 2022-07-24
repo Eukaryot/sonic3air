@@ -11,18 +11,11 @@
 #include <rmxmedia.h>
 
 
-// General info on palette usage:
-//  - Entries 0x00...0x3f are used normally, as with VDP
-//     -> Arranged in 4 sub-palettes of 16 entries each
-//     -> Used by planes, VDP sprites and custom palette sprites
-//  - Bit 0x40 is reserved as priority bit
-//  - Bit 0x80 is used to switch to a different set of colors -> 0x80...0xbf
-//     -> These also support the priority bit 0x40
-//     -> Can be used by custom palette sprites only
-
-
 class PaletteManager
 {
+public:
+	static const constexpr uint16 NUM_COLORS = 0x200;
+
 public:
 	static Color unpackColor(uint16 packedColor);
 
@@ -31,13 +24,17 @@ public:
 
 	const uint32* getPalette(int paletteIndex) const;
 	void getPalette(Color* palette, int paletteIndex) const;
-	Color getPaletteEntry(int paletteIndex, uint8 colorIndex) const;
-	uint16 getPaletteEntryPacked(int paletteIndex, uint8 colorIndex, bool allowExtendedPacked = false) const;
-	void writePaletteEntry(int paletteIndex, uint8 colorIndex, uint32 color);
-	void writePaletteEntryPacked(int paletteIndex, uint8 colorIndex, uint16 packedColor);
+	Color getPaletteEntry(int paletteIndex, uint16 colorIndex) const;
+	uint16 getPaletteEntryPacked(int paletteIndex, uint16 colorIndex, bool allowExtendedPacked = false) const;
+	void writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color);
+	void writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor);
 
-	inline Color getBackdropColor() const  { return Color::fromABGR32(mPalette[0][mBackdropColorIndex]); }
-	inline void setBackdropColorIndex(uint8 paletteIndex)  { mBackdropColorIndex = paletteIndex; }
+	const uint64* getPaletteChangeFlags(int paletteIndex) const;
+	void resetAllPaletteChangeFlags();
+	void setAllPaletteChangeFlags();
+
+	inline Color getBackdropColor() const  { return Color::fromABGR32(mPalette[0].mColor[mBackdropColorIndex]); }
+	inline void setBackdropColorIndex(uint16 paletteIndex)  { mBackdropColorIndex = paletteIndex; }
 
 	void setPaletteSplitPositionY(uint8 py);
 
@@ -55,11 +52,20 @@ private:
 		uint16 mPackedColor = 0;
 		bool mIsValid = false;
 	};
+	struct Palette
+	{
+		uint32 mColor[NUM_COLORS] = { 0 };							// Colors in the palette
+		uint64 mChangeFlags[NUM_COLORS/64] = { true };				// One flag per color; only actually used and reset by hardware rendering
+		PackedPaletteColor mPackedColorCache[NUM_COLORS] = { 0 };	// Only used as an optimization
+	};
 
 private:
-	uint32 mPalette[2][0x100] = { 0 };	// [0] = Standard palette, [1] = Underwater palette (in S3AIR)
-	PackedPaletteColor mPackedPaletteCache[2][0x100] = { 0 };	// Only used as an optimization
-	uint8 mBackdropColorIndex = 0;
+	void setPaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color);
+	void setPaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint32 color, uint16 packedColor);
+
+private:
+	Palette mPalette[2];			// [0] = Standard palette, [1] = Underwater palette (in S3AIR)
+	uint16 mBackdropColorIndex = 0;
 
 	bool mUsesGlobalComponentTint = false;
 	Vec4f mGlobalComponentTintColor = Vec4f(1.0f, 1.0f, 1.0f, 1.0f);	// Not using the Color class to be able to have negative channel values as well (especially for added color)

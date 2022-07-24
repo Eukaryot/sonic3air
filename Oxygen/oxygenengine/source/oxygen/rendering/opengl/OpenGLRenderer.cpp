@@ -67,7 +67,7 @@ void OpenGLRenderer::initialize()
 void OpenGLRenderer::reset()
 {
 	clearFullscreenBuffers(mGameScreenBuffer, mProcessingBuffer);
-	mResources.setAllPatternsDirty();
+	mResources.clearAllCaches();
 }
 
 void OpenGLRenderer::setGameResolution(const Vec2i& gameResolution)

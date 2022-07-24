@@ -169,7 +169,7 @@ void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint
 	checkSpriteTag(sprite);
 }
 
-void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, float scale)
+void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, float scale)
 {
 	// Rotation
 	Transform2D transformation;
@@ -191,14 +191,14 @@ void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint8 at
 	drawCustomSpriteWithTransform(key, position, atex, flags, renderQueue, tintColor, transformation);
 }
 
-void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, Vec2f scale)
+void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, Vec2f scale)
 {
 	Transform2D transformation;
 	transformation.setRotationAndScale(angle, scale);
 	drawCustomSpriteWithTransform(key, position, atex, flags, renderQueue, tintColor, transformation);
 }
 
-void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation)
+void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation)
 {
 	// Flags:
 	//  - 0x01 = Flip X

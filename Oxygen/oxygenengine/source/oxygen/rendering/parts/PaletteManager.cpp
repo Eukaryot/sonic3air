@@ -50,7 +50,7 @@ void PaletteManager::preFrameUpdate()
 const uint32* PaletteManager::getPalette(int paletteIndex) const
 {
 	RMX_ASSERT(paletteIndex < 2, "Invalid palette index " << paletteIndex);
-	return mPalette[paletteIndex];
+	return mPalette[paletteIndex].mColor;
 }
 
 void PaletteManager::getPalette(Color* palette, int paletteIndex) const
@@ -61,14 +61,16 @@ void PaletteManager::getPalette(Color* palette, int paletteIndex) const
 	}
 }
 
-Color PaletteManager::getPaletteEntry(int paletteIndex, uint8 colorIndex) const
+Color PaletteManager::getPaletteEntry(int paletteIndex, uint16 colorIndex) const
 {
 	RMX_ASSERT(paletteIndex < 2, "Invalid palette index " << paletteIndex);
-	return Color::fromABGR32(mPalette[paletteIndex][colorIndex]);
+	RMX_CHECK(colorIndex < NUM_COLORS, "Invalid color index " << colorIndex, return Color::TRANSPARENT);
+	return Color::fromABGR32(mPalette[paletteIndex].mColor[colorIndex]);
 }
 
-uint16 PaletteManager::getPaletteEntryPacked(int paletteIndex, uint8 colorIndex, bool allowExtendedPacked) const
+uint16 PaletteManager::getPaletteEntryPacked(int paletteIndex, uint16 colorIndex, bool allowExtendedPacked) const
 {
+	RMX_CHECK(colorIndex < NUM_COLORS, "Invalid color index " << colorIndex, return 0);
 	const Color color = getPaletteEntry(paletteIndex, colorIndex);
 	if (allowExtendedPacked)	// For notes on extended packed color format, see "writePaletteEntryPacked"
 	{
@@ -86,23 +88,22 @@ uint16 PaletteManager::getPaletteEntryPacked(int paletteIndex, uint8 colorIndex,
 	}
 }
 
-void PaletteManager::writePaletteEntry(int paletteIndex, uint8 colorIndex, uint32 color)
+void PaletteManager::writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color)
 {
+	RMX_CHECK(colorIndex < NUM_COLORS, "Invalid color index " << colorIndex, return);
 	if (paletteIndex == 0)
 	{
-		mPalette[0][colorIndex] = color;
-		mPackedPaletteCache[0][colorIndex].mIsValid = false;
+		setPaletteEntry(0, colorIndex, color);
 	}
 
 	// Secondary palette gets written in both cases
-	{
-		mPalette[1][colorIndex] = color;
-		mPackedPaletteCache[1][colorIndex].mIsValid = false;
-	}
+	setPaletteEntry(1, colorIndex, color);
 }
 
-void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint8 colorIndex, uint16 packedColor)
+void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor)
 {
+	RMX_CHECK(colorIndex < NUM_COLORS, "Invalid color index " << colorIndex, return);
+
 	// Differentiate between:
 	//  - Original hardware's packed colors (9-bit): 0000 BBB0 GGG0 RRR0
 	//  - Extended packed colors (15-bit):           1BBB BBGG GGGR RRRR
@@ -110,15 +111,13 @@ void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint8 colorIndex,
 	// Note that extended packed colors can be matched to the original packed colors when not using the lowermost 2 bits of each channel
 	//  -> That also means when using these bits as well, they can even go higher than pure white at 0xff, but they will get clamped at that point
 
-	PackedPaletteColor& cache = mPackedPaletteCache[paletteIndex][colorIndex];
+	PackedPaletteColor& cache = mPalette[paletteIndex].mPackedColorCache[colorIndex];
 	if (cache.mPackedColor == packedColor && cache.mIsValid)
 	{
 		// Nothing to do... well except if this is the primary palette, then we should still make sure the secondary palette has the same color
-		if (paletteIndex == 0 && mPalette[1][colorIndex] != mPalette[0][colorIndex])
+		if (paletteIndex == 0)
 		{
-			mPalette[1][colorIndex] = mPalette[0][colorIndex];
-			mPackedPaletteCache[1][colorIndex].mPackedColor = mPackedPaletteCache[0][colorIndex].mPackedColor;
-			mPackedPaletteCache[1][colorIndex].mIsValid = true;
+			setPaletteEntryPacked(1, colorIndex, mPalette[0].mColor[colorIndex], cache.mPackedColor);
 		}
 		return;
 	}
@@ -142,17 +141,28 @@ void PaletteManager::writePaletteEntryPacked(int paletteIndex, uint8 colorIndex,
 
 	if (paletteIndex == 0)
 	{
-		mPalette[0][colorIndex] = color;
-		cache.mPackedColor = packedColor;
-		cache.mIsValid = true;
+		setPaletteEntryPacked(0, colorIndex, color, packedColor);
 	}
 
 	// Secondary palette gets written in both cases
-	{
-		mPalette[1][colorIndex] = color;
-		mPackedPaletteCache[1][colorIndex].mPackedColor = packedColor;
-		mPackedPaletteCache[1][colorIndex].mIsValid = true;
-	}
+	setPaletteEntryPacked(1, colorIndex, color, packedColor);
+}
+
+const uint64* PaletteManager::getPaletteChangeFlags(int paletteIndex) const
+{
+	return mPalette[paletteIndex].mChangeFlags;
+}
+
+void PaletteManager::resetAllPaletteChangeFlags()
+{
+	for (int i = 0; i < 2; ++i)
+		memset(mPalette[i].mChangeFlags, 0, sizeof(mPalette[i].mChangeFlags));
+}
+
+void PaletteManager::setAllPaletteChangeFlags()
+{
+	for (int i = 0; i < 2; ++i)
+		memset(mPalette[i].mChangeFlags, 0xff, sizeof(mPalette[i].mChangeFlags));
 }
 
 void PaletteManager::setPaletteSplitPositionY(uint8 py)
@@ -165,4 +175,27 @@ void PaletteManager::setGlobalComponentTint(const Vec4f& tintColor, const Vec4f&
 	mUsesGlobalComponentTint = true;
 	mGlobalComponentTintColor = tintColor;
 	mGlobalComponentAddedColor = addedColor;
+}
+
+void PaletteManager::setPaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color)
+{
+	Palette& palette = mPalette[paletteIndex];
+	if (palette.mColor[colorIndex] != color)
+	{
+		palette.mColor[colorIndex] = color;
+		palette.mChangeFlags[colorIndex / 64] |= (uint64)1 << (colorIndex % 64);
+		palette.mPackedColorCache[colorIndex].mIsValid = false;
+	}
+}
+
+void PaletteManager::setPaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint32 color, uint16 packedColor)
+{
+	Palette& palette = mPalette[paletteIndex];
+	if (palette.mColor[colorIndex] != color)
+	{
+		palette.mColor[colorIndex] = color;
+		palette.mChangeFlags[colorIndex / 64] |= (uint64)1 << (colorIndex % 64);
+		palette.mPackedColorCache[colorIndex].mPackedColor = packedColor;
+		palette.mPackedColorCache[colorIndex].mIsValid = true;
+	}
 }

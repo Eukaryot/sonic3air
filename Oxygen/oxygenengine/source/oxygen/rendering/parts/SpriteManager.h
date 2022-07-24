@@ -83,7 +83,7 @@ public:
 	{
 		inline PaletteSpriteInfo() : CustomSpriteInfoBase(Type::PALETTE) {}
 
-		uint8 mAtex = 0;
+		uint16 mAtex = 0;
 	};
 
 	struct ComponentSpriteInfo : public CustomSpriteInfoBase
@@ -109,9 +109,9 @@ public:
 	void refresh();
 
 	void drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint16 patternIndex, uint16 renderQueue, const Color& tintColor = Color::WHITE, const Color& addedColor = Color::TRANSPARENT);
-	void drawCustomSprite(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor = Color::WHITE, float angle = 0.0f, float scale = 1.0f);
-	void drawCustomSprite(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, Vec2f scale);
-	void drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint8 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation);
+	void drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor = Color::WHITE, float angle = 0.0f, float scale = 1.0f);
+	void drawCustomSprite(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, float angle, Vec2f scale);
+	void drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation);
 	void addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space);
 
 	void setLogicalSpriteSpace(Space space);

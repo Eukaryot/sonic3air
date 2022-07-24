@@ -519,6 +519,47 @@ function void fn000c50()
 			Renderer.setPaletteEntryPacked(i + 0x40, u16[paletteAddress + i * 2])
 		}
 	}
+
+	// Special handling for Blue Spheres
+	if (global.game_mode == 0x34 || global.game_mode == 0x2c || global.game_mode == 0x48)
+	{
+		u16 px = bluespheres.position.x
+		u16 py = bluespheres.position.y
+		u8 rotation = bluespheres.direction
+		bool isRotating = (rotation & 0x3f) != 0
+		if (isRotating || (rotation & 0x40) == 0)
+			px = (px + 0x80) & 0xff00
+		if (isRotating || (rotation & 0x40) != 0)
+			py = (py + 0x80) & 0xff00
+
+		bool parity = (((px + py) & 0x100) != 0) == ((rotation & 0x40) != 0)
+		if (!isRotating && (rotation & 0x80) == 0)
+		{
+			parity = !parity
+		}
+
+		u32 fieldColorBaseAddress = u32[0xffffe446]
+		u32 colorA = unpackColor(u16[fieldColorBaseAddress + (parity ? 8 : 0)])
+		u32 colorB = unpackColor(u16[fieldColorBaseAddress + (parity ? 0 : 8)])
+		
+		// Update palette (using the palette entries from 0x100 on)
+		bool reducedColors = (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x01) == 0
+		for (u16 i = 0; i < 60; ++i)
+		{
+			u8 blendFactor = reducedColors ? ((i / 30) * 0xff) : (i * 0xff / 59)
+			Renderer.setPaletteEntry(0x101 + i + (i / 15), 0xff000000 + applyGlobalComponentTint_BGR32(blendColors_BGR32(colorA, colorB, blendFactor)))
+		}
+		for (u16 i = 0; i < 15; ++i)
+		{
+			u8 blendFactor = reducedColors ? ((i / 8) * 0xff) : (i * 0xff / 14)
+			u32 baseColor = applyGlobalComponentTint_BGR32(blendColors_BGR32(colorA, colorB, blendFactor))
+			for (u16 k = 0; k < 12; ++k)
+			{
+				u32 alpha = reducedColors ? ((k / 6) * 0xff) : ((k + 1) * 0xff / 13)
+				Renderer.setPaletteEntry(0x141 + (11 - k) * 0x10 + i, (alpha << 24) + baseColor)
+			}
+		}
+	}
 #endif
 
 	VDP.copyToVRAMbyDMA(0xfffff800, 0xf800, 0x280)

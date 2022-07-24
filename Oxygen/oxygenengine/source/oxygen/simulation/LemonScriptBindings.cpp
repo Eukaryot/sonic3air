@@ -713,12 +713,12 @@ namespace
 	}
 
 
-	void Renderer_setPaletteEntry(uint8 index, uint32 color)
+	void Renderer_setPaletteEntry(uint16 index, uint32 color)
 	{
 		RenderParts::instance().getPaletteManager().writePaletteEntry(0, index, color);
 	}
 
-	void Renderer_setPaletteEntryPacked(uint8 index, uint16 color)
+	void Renderer_setPaletteEntryPacked(uint16 index, uint16 color)
 	{
 		RenderParts::instance().getPaletteManager().writePaletteEntryPacked(0, index, color);
 	}
@@ -728,7 +728,7 @@ namespace
 		RenderParts::instance().getPaletteManager().setPaletteSplitPositionY(line);
 	}
 
-	void Renderer_setSecondaryPaletteEntryPacked(uint8 index, uint16 color)
+	void Renderer_setSecondaryPaletteEntryPacked(uint16 index, uint16 color)
 	{
 		RenderParts::instance().getPaletteManager().writePaletteEntryPacked(1, index, color);
 	}
@@ -823,27 +823,27 @@ namespace
 		return SpriteCache::instance().setupSpriteFromROM(sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_KOSINSKI, indexOffset);
 	}
 
-	void Renderer_drawCustomSprite1(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue)
+	void Renderer_drawCustomSprite1(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue)
 	{
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue);
 	}
 
-	void Renderer_drawCustomSprite2(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint8 alpha)
+	void Renderer_drawCustomSprite2(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint8 alpha)
 	{
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color(1.0f, 1.0f, 1.0f, (float)alpha / 255.0f), (float)angle / 128.0f * PI_FLOAT);
 	}
 
-	void Renderer_drawCustomSpriteTinted(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scale)
+	void Renderer_drawCustomSpriteTinted(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scale)
 	{
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, (float)scale / 65536.0f);
 	}
 
-	void Renderer_drawCustomSpriteTinted2(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scaleX, int32 scaleY)
+	void Renderer_drawCustomSpriteTinted2(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint8 angle, uint32 tintColor, int32 scaleX, int32 scaleY)
 	{
 		RenderParts::instance().getSpriteManager().drawCustomSprite(key, Vec2i(px, py), atex, flags, renderQueue, Color::fromRGBA32(tintColor), (float)angle / 128.0f * PI_FLOAT, Vec2f((float)scaleX, (float)scaleY) / 65536.0f);
 	}
 
-	void Renderer_drawCustomSpriteTransformed(uint64 key, int16 px, int16 py, uint8 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
+	void Renderer_drawCustomSpriteTransformed(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue, uint32 tintColor, int32 transform11, int32 transform12, int32 transform21, int32 transform22)
 	{
 		Transform2D transformation;
 		transformation.setByMatrix((float)transform11 / 65536.0f, (float)transform12 / 65536.0f, (float)transform21 / 65536.0f, (float)transform22 / 65536.0f);

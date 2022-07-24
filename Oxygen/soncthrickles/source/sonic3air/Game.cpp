@@ -189,15 +189,7 @@ void Game::registerScriptBindings(lemon::Module& module)
 			.setParameterInfo(4, "planeIndex")
 			.setParameterInfo(5, "atex");
 
-		module.addNativeFunction("Game.renderBlueSpheresGround", lemon::wrap(*this, &Game::renderBlueSpheresGround), defaultFlags)
-			.setParameterInfo(0, "px")
-			.setParameterInfo(1, "py")
-			.setParameterInfo(2, "rotation")
-			.setParameterInfo(3, "fieldColorA")
-			.setParameterInfo(4, "fieldColorB");
-
-		module.addNativeFunction("Game.getBlueSpheresGroundSprite", lemon::wrap(*this, &Game::getBlueSpheresGroundSprite), defaultFlags)
-			.setParameterInfo(0, "part");
+		module.addNativeFunction("Game.setupBlueSpheresGroundSprites", lemon::wrap(*this, &Game::setupBlueSpheresGroundSprites), defaultFlags);
 
 		module.addNativeFunction("Game.writeBlueSpheresData", lemon::wrap(*this, &Game::writeBlueSpheresData), defaultFlags)
 			.setParameterInfo(0, "targetAddress")
@@ -1080,32 +1072,9 @@ void Game::changePlanePatternRectAtex(uint16 px, uint16 py, uint16 width, uint16
 	s3air::changePlanePatternRectAtex(EmulatorInterface::instance(), px, py, width, height, planeIndex, atex);
 }
 
-void Game::renderBlueSpheresGround(uint16 px, uint16 py, uint8 rotation, uint16 fieldColorA, uint16 fieldColorB)
+void Game::setupBlueSpheresGroundSprites()
 {
-	static const uint64 keys[2] = { rmx::getMurmur2_64(String("$generated_bluespheres_ground_opaque")),
-									rmx::getMurmur2_64(String("$generated_bluespheres_ground_alpha")) };
-	SpriteCache::CacheItem* items[2];
-
-	Bitmap* bitmaps[2];
-	for (int k = 0; k < 2; ++k)
-	{
-		SpriteCache::CacheItem& item = SpriteCache::instance().getOrCreateComponentSprite(keys[k]);
-		++item.mChangeCounter;
-		bitmaps[k] = &static_cast<ComponentSprite*>(item.mSprite)->accessBitmap();
-		items[k] = &item;
-	}
-
-	mBlueSpheresRendering.renderToBitmap(*bitmaps[0], *bitmaps[1], VideoOut::instance().getScreenWidth(), px, py, rotation, fieldColorA, fieldColorB);
-
-	items[0]->mSprite->mOffset.y = VideoOut::instance().getScreenHeight() - bitmaps[0]->getHeight();
-	items[1]->mSprite->mOffset.y = items[0]->mSprite->mOffset.y - bitmaps[1]->getHeight();
-}
-
-uint64 Game::getBlueSpheresGroundSprite(uint8 part)
-{
-	static const uint64 keys[2] = { rmx::getMurmur2_64(String("$generated_bluespheres_ground_opaque")),
-									rmx::getMurmur2_64(String("$generated_bluespheres_ground_alpha")) };
-	return keys[(part == 0) ? 0 : 1];
+	mBlueSpheresRendering.createSprites(VideoOut::instance().getScreenSize());
 }
 
 void Game::writeBlueSpheresData(uint32 targetAddress, uint32 sourceAddress, uint16 px, uint16 py, uint8 rotation)

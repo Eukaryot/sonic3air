@@ -112,8 +112,7 @@ private:
 
 	void changePlanePatternRectAtex(uint16 px, uint16 py, uint16 width, uint16 height, uint8 planeIndex, uint8 atex);
 
-	void renderBlueSpheresGround(uint16 px, uint16 py, uint8 rotation, uint16 fieldColorA, uint16 fieldColorB);
-	uint64 getBlueSpheresGroundSprite(uint8 part);
+	void setupBlueSpheresGroundSprites();
 	void writeBlueSpheresData(uint32 targetAddress, uint32 sourceAddress, uint16 px, uint16 py, uint8 rotation);
 
 	void startSkippableCutscene();

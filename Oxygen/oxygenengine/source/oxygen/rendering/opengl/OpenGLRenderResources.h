@@ -22,7 +22,7 @@ public:
 
 	void initialize();
 	void refresh();
-	void setAllPatternsDirty();
+	void clearAllCaches();
 
 	const BufferTexture& getHScrollOffsetsTexture(int scrollOffsetsIndex) const;
 	const BufferTexture& getVScrollOffsetsTexture(int scrollOffsetsIndex) const;

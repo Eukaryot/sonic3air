@@ -11,6 +11,8 @@
 #include "sonic3air/data/SharedDatabase.h"
 
 #include "oxygen/application/Configuration.h"
+#include "oxygen/rendering/utils/PaletteBitmap.h"
+#include "oxygen/resources/SpriteCache.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 
 //#define OUTPUT_FOG_BITMAPS
@@ -110,6 +112,24 @@ namespace
 		transform.z =  std::sin(angle);
 		transform.w =  std::cos(angle);
 	}
+
+	uint8 getPaletteIndex(float intensity, float opacity)
+	{
+		const int opacityStep = roundToInt(opacity * 13.0f);
+		if (opacityStep == 0)
+		{
+			return 0;
+		}
+		else if (opacityStep <= 12)
+		{
+			return 65 + (12 - opacityStep) * 16 + roundToInt(intensity * 14.0f);
+		}
+		else
+		{
+			const uint8 value = roundToInt(intensity * 59.0f);
+			return (value + 1) + (value / 15);
+		}
+	}
 }
 
 
@@ -131,35 +151,11 @@ void BlueSpheresRendering::startup()
 	}
 }
 
-void BlueSpheresRendering::renderToBitmap(Bitmap& bitmapOpaque, Bitmap& bitmapAlpha, int screenWidth, uint16 px, uint16 py, uint8 rotation, uint16 fieldColorA, uint16 fieldColorB)
+void BlueSpheresRendering::createSprites(Vec2i screenSize)
 {
-#if 0
-	// This is meant for fine-tuning the camera parameters
-	if (FTX::keyState(SDLK_DOWN))
-		CAMERA_POSITION_HEIGHT -= FTX::getTimeDifference() * 0.03f;
-	if (FTX::keyState(SDLK_UP))
-		CAMERA_POSITION_HEIGHT += FTX::getTimeDifference() * 0.03f;
-
-	if (FTX::keyState(SDLK_LEFT))
-		CAMERA_POSITION_BACKANGLE -= FTX::getTimeDifference() * 5.0f;
-	if (FTX::keyState(SDLK_RIGHT))
-		CAMERA_POSITION_BACKANGLE += FTX::getTimeDifference() * 5.0f;
-
-	if (FTX::keyState('w'))
-		CAMERA_TARGET_ANGLE -= FTX::getTimeDifference() * 2.0f;
-	if (FTX::keyState('s'))
-		CAMERA_TARGET_ANGLE += FTX::getTimeDifference() * 2.0f;
-
-	if (FTX::keyState('a'))
-		PLANE_DISTANCE -= FTX::getTimeDifference() * 30.0f;
-	if (FTX::keyState('d'))
-		PLANE_DISTANCE += FTX::getTimeDifference() * 30.0f;
-
-	if (FTX::keyState('q'))
-		GRID_SIZE -= FTX::getTimeDifference() * 0.8f;
-	if (FTX::keyState('e'))
-		GRID_SIZE += FTX::getTimeDifference() * 0.8f;
-#endif
+	// Update sprites only if needed
+	if (mLastScreenSize == screenSize)
+		return;
 
 	// Perform calculations that only need to be done once
 	if (!mInitializedLookups)
@@ -167,141 +163,71 @@ void BlueSpheresRendering::renderToBitmap(Bitmap& bitmapOpaque, Bitmap& bitmapAl
 		performLookupCalculations();
 	}
 
-	const int maxX = std::min(LOOKUP_WIDTH, screenWidth);
+	mLastScreenSize = screenSize;
+	const int maxX = std::min(LOOKUP_WIDTH, screenSize.x);
 	const int maxY = LOOKUP_HEIGHT;
-	const int indentX = (screenWidth - maxX) / 2;
+	const int indentX = (screenSize.x - maxX) / 2;
 	const int offsetX = (LOOKUP_WIDTH - maxX) / 2;
 
-	if (mPureRowsForWidth != screenWidth)
+	int numPureGroundRows = 0;
+	for (int row = LOOKUP_HEIGHT - 1; ; --row)
 	{
-		mNumPureSkyRows = 0;
-		for (int row = 0; ; ++row)
-		{
-			const uint8* lookup = &mVisibilityLookup[row * LOOKUP_WIDTH + offsetX];
-			const uint8* end = &mVisibilityLookup[(row + 1) * LOOKUP_WIDTH - offsetX - 1];
-			for (; lookup <= end; ++lookup)
-			{
-				if (*lookup != 0)
-					break;
-			}
-			if (lookup <= end)
-				break;
-			++mNumPureSkyRows;
-		}
-
-		mNumPureGroundRows = 0;
-		for (int row = LOOKUP_HEIGHT - 1; ; --row)
-		{
-			const uint8* lookup = &mVisibilityLookup[row * LOOKUP_WIDTH + offsetX];
-			const uint8* end = &mVisibilityLookup[(row + 1) * LOOKUP_WIDTH - offsetX - 1];
-			for (; lookup <= end; ++lookup)
-			{
-				if (*lookup != 0xff)
-					break;
-			}
-			if (lookup <= end)
-				break;
-			++mNumPureGroundRows;
-		}
-
-		mPureRowsForWidth = screenWidth;
+		if (mNonOpaquePixelIndent[row] > offsetX)
+			break;
+		++numPureGroundRows;
 	}
 
-	// Refresh mixed field color lookup
+	// Build or update all sprites
+	for (int index = 0; index < 0x2f; ++index)
 	{
-		const bool useFiltering = (SharedDatabase::getSettingValue(SharedDatabase::Setting::SETTING_BS_VISUAL_STYLE) & 0x01) != 0;
-		if (fieldColorA != mLastFieldColorA || fieldColorB != mLastFieldColorB || useFiltering != mLastFiltering)
-		{
-			const Color colorA = colorFromCompact(fieldColorA);
-			const Color colorB = colorFromCompact(fieldColorB);
-			for (int i = 0; i < 0x100; ++i)
-			{
-				const float intensity = useFiltering ? ((float)i / 255.0f) : (i >= 128 ? 1.0f : 0.0f);
-				const uint32 color = (Color::interpolateColor(colorA, colorB, intensity).getABGR32() & 0x00ffffff) | 0xff000000;
-				mMixedFieldColorLookup[i] = color;
-				mMixedFieldColorLookupInverse[0xff - i] = color;
-			}
-
-			mLastFieldColorA = fieldColorA;
-			mLastFieldColorB = fieldColorB;
-			mLastFiltering = useFiltering;
-		}
-	}
-
-	// Output the bitmaps
-	{
-		int movementStep = 0;
-		int rotationStep = 0;
-		bool parity = false;
-		{
-			const bool isRotating = (rotation & 0x3f) != 0;
-			if (isRotating || (rotation & 0x40) == 0)
-				px = (px + 0x80) & 0xff00;
-			if (isRotating || (rotation & 0x40) != 0)
-				py = (py + 0x80) & 0xff00;
-
-			parity = (((px + py) & 0x100) != 0) == ((rotation & 0x40) != 0);
-
-			if (isRotating)
-			{
-				rotationStep = (rotation & 0x3f) / 4;
-			}
-			else
-			{
-				if ((rotation & 0x80) == 0)
-				{
-					movementStep = (0xff - ((rotation & 0x40) ? px : py) & 0xff) / 8;
-					parity = !parity;
-				}
-				else
-				{
-					movementStep = (((rotation & 0x40) ? px : py) & 0xff) / 8;
-				}
-			}
-		}
-
-		const uint32* mixedFieldColorLookup = parity ? mMixedFieldColorLookupInverse : mMixedFieldColorLookup;
 		const uint8* lookupDataBase;
-		if (rotationStep != 0)
+		uint64 spriteKeys[2];
+		if (index < 0x20)
 		{
-			lookupDataBase = &mRotationIntensityLookup[rotationStep - 1][0];
+			lookupDataBase = &mStraightIntensityLookup[index][0];
+			spriteKeys[0] = rmx::getMurmur2_64(String(0, "bluespheres_ground_alpha_movement_0x%02x", index));
+			spriteKeys[1] = rmx::getMurmur2_64(String(0, "bluespheres_ground_opaque_movement_0x%02x", index));
 		}
 		else
 		{
-			lookupDataBase = &mStraightIntensityLookup[movementStep][0];
+			lookupDataBase = &mRotationIntensityLookup[index - 0x20][0];
+			spriteKeys[0] = rmx::getMurmur2_64(String(0, "bluespheres_ground_alpha_rotation_0x%02x", index - 0x1f));
+			spriteKeys[1] = rmx::getMurmur2_64(String(0, "bluespheres_ground_opaque_rotation_0x%02x", index - 0x1f));
 		}
 
-		// Ignore the first that are just sky, so completely transparent
+		SpriteCache::CacheItem* items[2];
+		PaletteBitmap* bitmaps[2];
+		for (int k = 0; k < 2; ++k)
+		{
+			SpriteCache::CacheItem& item = SpriteCache::instance().getOrCreatePaletteSprite(spriteKeys[k]);
+			++item.mChangeCounter;
+			bitmaps[k] = &static_cast<PaletteSprite*>(item.mSprite)->accessBitmap();
+			items[k] = &item;
+		}
+
+		// Ignore the first rows that are just sky, so completely transparent
 
 		// Then we have some rows of pixels that can be anything -- sky or ground or something in between
-		const int numRowsUntilPureGround = LOOKUP_HEIGHT - mNumPureGroundRows;
-		bitmapAlpha.create(maxX, numRowsUntilPureGround - mNumPureSkyRows);
+		const int numRowsUntilPureGround = LOOKUP_HEIGHT - numPureGroundRows;
+		bitmaps[0]->create(maxX, numRowsUntilPureGround - mNumPureSkyRows);
 		for (int y = mNumPureSkyRows; y < numRowsUntilPureGround; ++y)
 		{
-			uint32* output = bitmapAlpha.getPixelPointer(indentX, y - mNumPureSkyRows);
-			const uint32* outputEnd = output + maxX;
+			uint8* output = bitmaps[0]->getPixelPointer(indentX, y - mNumPureSkyRows);
 			const uint8* lookupData = &lookupDataBase[y * LOOKUP_WIDTH + offsetX];
-			const uint8* visibilityData = &mVisibilityLookup[y * LOOKUP_WIDTH + offsetX];
-
-			for (; output != outputEnd; ++output, ++lookupData, ++visibilityData)
-			{
-				*output = (mixedFieldColorLookup[*lookupData] & 0x00ffffff) | ((uint32)*visibilityData << 24);
-			}
+			memcpy(output, lookupData, maxX);
 		}
 
 		// And the rest is only ground
-		bitmapOpaque.create(maxX, mNumPureGroundRows);
+		bitmaps[1]->create(maxX, numPureGroundRows);
 		for (int y = numRowsUntilPureGround; y < maxY; ++y)
 		{
-			uint32* output = bitmapOpaque.getPixelPointer(indentX, y - numRowsUntilPureGround);
-			const uint32* outputEnd = output + maxX;
+			uint8* output = bitmaps[1]->getPixelPointer(indentX, y - numRowsUntilPureGround);
 			const uint8* lookupData = &lookupDataBase[y * LOOKUP_WIDTH + offsetX];
-
-			for (; output != outputEnd; ++output, ++lookupData)
-			{
-				*output = mixedFieldColorLookup[*lookupData];
-			}
+			memcpy(output, lookupData, maxX);
 		}
+
+		items[0]->mSprite->mOffset.y = screenSize.y - bitmaps[0]->getHeight();
+		items[1]->mSprite->mOffset.y = items[0]->mSprite->mOffset.y - bitmaps[1]->getHeight();
 	}
 }
 
@@ -374,6 +300,10 @@ void BlueSpheresRendering::writeVisibleSpheresData(uint32 targetAddress, uint32 
 
 bool BlueSpheresRendering::loadLookupData()
 {
+	// TEST
+	return false;
+
+
 	std::vector<uint8> data;
 	if (!FTX::FileSystem->readFile(L"data/binary/bluespheresrendering.bin", data))
 		return false;
@@ -416,46 +346,14 @@ bool BlueSpheresRendering::loadLookupData()
 		VectorBinarySerializer serializer(true, uncompressed);
 		const int pixels = width * height;
 
-		mVisibilityLookup.resize(pixels);
-		serializer.read(&mVisibilityLookup[0], mVisibilityLookup.size());
+		serializer.serialize(mNumPureSkyRows);
+		serializer.read(&mNonOpaquePixelIndent[0], sizeof(mNonOpaquePixelIndent));
 
-		// Read left halfs
 		for (int i = 0; i < 0x2f; ++i)
 		{
 			std::vector<uint8>& lookup = (i < 0x20) ? mStraightIntensityLookup[i] : mRotationIntensityLookup[i - 0x20];
 			lookup.resize(pixels);
-			for (int y = 0; y < height; ++y)
-			{
-				uint8* lookupData = &lookup[y * width];
-				serializer.read(lookupData, width / 2);
-			}
-		}
-
-		// Reconstruct the right halfs, which are just mirror images of the left half of either:
-		//  - the same lookup, but inverted (for straight), or
-		//  - another angle's lookups (for rotation)
-		for (int i = 0; i < 0x20; ++i)
-		{
-			for (int y = 0; y < height; ++y)
-			{
-				uint8* lookupData = &mStraightIntensityLookup[i][y * width];
-				for (int x = 0; x < width / 2; ++x)
-				{
-					lookupData[width - x - 1] = 255 - lookupData[x];
-				}
-			}
-		}
-		for (int i = 0; i < 0x0f; ++i)
-		{
-			for (int y = 0; y < height; ++y)
-			{
-				uint8* lookupDataDst = &mRotationIntensityLookup[0x0e - i][y * width];
-				uint8* lookupDataSrc = &mRotationIntensityLookup[i][y * width];
-				for (int x = 0; x < width / 2; ++x)
-				{
-					lookupDataDst[width - x - 1] = lookupDataSrc[x];
-				}
-			}
+			serializer.read(&lookup[0], width * height);
 		}
 	}
 
@@ -477,8 +375,9 @@ void BlueSpheresRendering::performLookupCalculations()
 		Vec3f mHitTangentY;
 	};
 	std::vector<CachedPixelData> cachedPixelData;
+	std::vector<float> visibilityLookup;
 	cachedPixelData.resize(pixels);
-	mVisibilityLookup.resize(pixels);
+	visibilityLookup.resize(pixels);
 
 	// First fill visibility lookup and cached pixel data, which we need for the further calculations
 	{
@@ -558,7 +457,45 @@ void BlueSpheresRendering::performLookupCalculations()
 			#endif
 			}
 
-			mVisibilityLookup[pixelIndex] = roundToInt(groundVisibility * 255.0f);
+			visibilityLookup[pixelIndex] = groundVisibility;
+		}
+
+		// How many rows are just pure sky, with empty pixels?
+		mNumPureSkyRows = 0;
+		int row = 0;
+		{
+			bool allSky = true;
+			for (; row < 224; ++row)
+			{
+				const float* ptr = &visibilityLookup[row * LOOKUP_WIDTH];
+				for (int x = 0; x < LOOKUP_WIDTH / 2; ++x)
+				{
+					if (ptr[x] > 0.001f)
+					{
+						allSky = false;
+						break;
+					}
+				}
+				if (!allSky)
+					break;
+
+				mNonOpaquePixelIndent[row] = LOOKUP_WIDTH / 2;
+				++mNumPureSkyRows;
+			}
+		}
+
+		// All remaining rows contain at least some parts of the ground
+		//  -> Now get the number of not fully opaque pixels from the left of each row
+		for (; row < 224; ++row)
+		{
+			const float* ptr = &visibilityLookup[row * LOOKUP_WIDTH];
+			int indent = 0;
+			for (; indent < LOOKUP_WIDTH / 2; ++indent)
+			{
+				if (ptr[indent] < 0.999f)
+					break;
+			}
+			mNonOpaquePixelIndent[row] = indent;
 		}
 
 	#ifdef OUTPUT_FOG_BITMAPS
@@ -598,7 +535,7 @@ void BlueSpheresRendering::performLookupCalculations()
 					const float cutFractionY = getIntegerCutFraction(gridPosition.y, gridExtendX.y * extendsFactor, gridExtendY.y * extendsFactor);
 					const float intensity = interpolate(cutFractionX, 1.0f - cutFractionX, cutFractionY);
 
-					lookupData[pixelIndex] = (int)(intensity * 255.5f);
+					lookupData[pixelIndex] = getPaletteIndex(intensity, visibilityLookup[pixelIndex]);
 				}
 			}
 		}
@@ -637,7 +574,7 @@ void BlueSpheresRendering::performLookupCalculations()
 					const float cutFractionY = getIntegerCutFraction(gridPosition.y, gridExtendX.y * extendsFactor, gridExtendY.y * extendsFactor);
 					const float intensity = interpolate(cutFractionX, 1.0f - cutFractionX, cutFractionY);
 
-					lookupData[pixelIndex] = (int)(intensity * 255.5f);
+					lookupData[pixelIndex] = getPaletteIndex(intensity, visibilityLookup[pixelIndex]);
 				}
 			}
 		}
@@ -649,22 +586,13 @@ void BlueSpheresRendering::performLookupCalculations()
 		{
 			VectorBinarySerializer serializer(false, data);
 
-			serializer.write(&mVisibilityLookup[0], mVisibilityLookup.size());
+			serializer.write(mNumPureSkyRows);
+			serializer.write(&mNonOpaquePixelIndent[0], sizeof(mNonOpaquePixelIndent));
 
-			// Save only the left half of each frame, the right half can be reconstructed in all cases
-			for (int i = 0; i < 0x20; ++i)
+			for (int i = 0; i < 0x2f; ++i)
 			{
-				for (int y = 0; y < height; ++y)
-				{
-					serializer.write(&mStraightIntensityLookup[i][y * width], width / 2);
-				}
-			}
-			for (int i = 0; i < 0x0f; ++i)
-			{
-				for (int y = 0; y < height; ++y)
-				{
-					serializer.write(&mRotationIntensityLookup[i][y * width], width / 2);
-				}
+				std::vector<uint8>& lookup = (i < 0x20) ? mStraightIntensityLookup[i] : mRotationIntensityLookup[i - 0x20];
+				serializer.write(&lookup[0], width * height);
 			}
 		}
 

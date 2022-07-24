@@ -11,6 +11,7 @@
 #include <rmxbase.h>
 
 class EmulatorInterface;
+class PaletteBitmap;
 
 
 class BlueSpheresRendering
@@ -18,7 +19,7 @@ class BlueSpheresRendering
 public:
 	void startup();
 
-	void renderToBitmap(Bitmap& bitmapOpaque, Bitmap& bitmapAlpha, int screenWidth, uint16 px, uint16 py, uint8 rotation, uint16 fieldColorA, uint16 fieldColorB);
+	void createSprites(Vec2i screenSize);
 	void writeVisibleSpheresData(uint32 targetAddress, uint32 sourceAddress, uint16 px, uint16 py, uint8 rotation, EmulatorInterface& emulatorInterface);
 
 private:
@@ -27,16 +28,9 @@ private:
 
 private:
 	bool mInitializedLookups = false;
-	std::vector<uint8> mVisibilityLookup;
 	std::vector<uint8> mStraightIntensityLookup[0x20];
 	std::vector<uint8> mRotationIntensityLookup[0x0f];
+	int mNonOpaquePixelIndent[224] = { 0 };				// Number of pixels from the left (or right) side until reaching the first fully opaque one, for each row
 	int mNumPureSkyRows = 0;
-	int mNumPureGroundRows = 0;
-	int mPureRowsForWidth = 0;
-
-	bool mLastFiltering = false;
-	uint16 mLastFieldColorA = 0;
-	uint16 mLastFieldColorB = 0;
-	uint32 mMixedFieldColorLookup[0x100];
-	uint32 mMixedFieldColorLookupInverse[0x100];
+	Vec2i mLastScreenSize;
 };

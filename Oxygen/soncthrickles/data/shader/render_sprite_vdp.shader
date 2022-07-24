@@ -100,7 +100,7 @@ void main()
 #endif
 	paletteIndex += atex;
 
-	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex) / 256.0, LocalOffset.z + 0.5));
+	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex) / 512.0, LocalOffset.z + 0.5));
 	color = vec4(AddedColor.rgb, 0.0) + color * TintColor;
 	if (color.a < 0.01)
 		discard;

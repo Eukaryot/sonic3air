@@ -2733,10 +2733,44 @@ function void BlueSpheres.renderCustomGround()
 	Renderer.setupPlane(getScreenWidth()-160, 0, 160, 32, 0x11, 3, 0x2f00)
 
 	// Render our own version of the ground
-	u32 fieldColorBaseAddress = u32[0xffffe446]
-	Game.renderBlueSpheresGround(bluespheres.position.x, bluespheres.position.y, bluespheres.direction, u16[fieldColorBaseAddress], u16[fieldColorBaseAddress+8])
-	Renderer.drawCustomSprite(Game.getBlueSpheresGroundSprite(1), 0, 0, 0x00,    0, 0x3000)
-	Renderer.drawCustomSprite(Game.getBlueSpheresGroundSprite(0), 0, 0, 0x00, 0x10, 0x3000)		// With flag to draw as fully opaque (rendering optimization)
+	//  -> This only works in combination with a palette set in V-Int, see "fn000c50"
+	string spriteKey1
+	string spriteKey2
+	{
+		Game.setupBlueSpheresGroundSprites()
+
+		u16 px = bluespheres.position.x
+		u16 py = bluespheres.position.y
+		u8 rotation = bluespheres.direction
+		bool isRotating = (rotation & 0x3f) != 0
+		if (isRotating || (rotation & 0x40) == 0)
+			px = (px + 0x80) & 0xff00
+		if (isRotating || (rotation & 0x40) != 0)
+			py = (py + 0x80) & 0xff00
+
+		if (isRotating)
+		{
+			u8 rotationStep = (rotation & 0x3f) / 4
+			spriteKey1 = stringformat("bluespheres_ground_alpha_rotation_0x%02x", rotationStep)
+			spriteKey2 = stringformat("bluespheres_ground_opaque_rotation_0x%02x", rotationStep)
+		}
+		else
+		{
+			u8 movementStep = 0
+			if ((rotation & 0x80) == 0)
+			{
+				movementStep = (0xff - ((rotation & 0x40) ? px : py) & 0xff) / 8
+			}
+			else
+			{
+				movementStep = (((rotation & 0x40) ? px : py) & 0xff) / 8
+			}
+			spriteKey1 = stringformat("bluespheres_ground_alpha_movement_0x%02x", movementStep)
+			spriteKey2 = stringformat("bluespheres_ground_opaque_movement_0x%02x", movementStep)
+		}
+	}
+	Renderer.drawCustomSprite(spriteKey1, 0, 0, 0x100,    0, 0x3000)
+	Renderer.drawCustomSprite(spriteKey2, 0, 0, 0x100, 0x10, 0x3000)		// With flag to draw as fully opaque (rendering optimization)
 
 	// Render glow effect on top
 	if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
