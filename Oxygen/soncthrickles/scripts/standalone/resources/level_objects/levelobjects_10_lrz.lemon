@@ -154,7 +154,7 @@ function void LevelObjectTableBuilder.buildObjects_LRZ1()
 	LevelObjectTableBuilder.addObject(0x0c99, 0x0793, OBJECTTABLE2_05, 0x40, 0)
 	LevelObjectTableBuilder.addObject(0x0cb0, 0x0394, OBJECTTABLE2_17, 0x00, 0)
 
-	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
+	if (Game.getSetting(SETTING_FIX_GLITCHES))
 	{
 		// Make this damage object a little wider to prevent a possible glitch here
 		LevelObjectTableBuilder.addObject(0x0cc0, 0x03a3, OBJECTTABLE2_6e, 0x41, 0)
