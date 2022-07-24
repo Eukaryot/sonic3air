@@ -27,6 +27,10 @@ function void InitLevelTiles.DDZ()
 	D1 = 0
 	D0 = 0
 	Level.InitialTilesFill()
+
+#if STANDALONE
+	Game.setSecretUnlocked(SECRET_DOOMSDAY_ZONE)
+#endif
 }
 
 
