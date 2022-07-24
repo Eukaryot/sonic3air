@@ -395,9 +395,7 @@ declare function s8 Game.onTimeAttackFinish()
 
 declare function void Game.changePlanePatternRectAtex(u16 px, u16 py, u16 width, u16 height, u8 planeIndex, u8 atex)
 
-declare function void Game.renderBlueSpheresGround(u16 px, u16 py, u8 rotation, u16 fieldColorA, u16 fieldColorB)
-
-declare function u64 Game.getBlueSpheresGroundSprite(u8 part)
+declare function void Game.setupBlueSpheresGroundSprites()
 
 declare function void Game.writeBlueSpheresData(u32 targetAddress, u32 sourceAddress, u16 px, u16 py, u8 rotation)
 
