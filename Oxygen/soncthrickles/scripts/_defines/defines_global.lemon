@@ -641,9 +641,9 @@ define spilled_rings.progress	= u16[0xfffffeb8]	// Grows faster at first, slower
 define global.move.speedcap.tails		= u16[0xfffffec0]	// Speed cap for normal running for Tails (common value is 0x0600)
 define global.move.acceleration.tails	= u16[0xfffffec2]	// Acceleration for Tails (common value is 0x000c)
 define global.move.deceleration.tails	= u16[0xfffffec4]	// Deceleration for Tails (common value is 0x0080)
-define player.total_rings				= u16[0xfffffec8]	// Total number of rings collected in a level, including lost rings. resets when warping out in any way
+define player.total_rings				= u16[0xfffffec8]	// Total number of rings collected in a level, including lost rings; resets when warping out in any way
 define unused.player2.total_rings		= u16[0xfffffeca]	// Unused leftover from Sonic 2
-define player.item_count				= u16[0xfffffecc]	// Total number of items (monitors broken or extra lives through giant rings) consumed in a level. resets when warping out in any way
+define player.item_count				= u16[0xfffffecc]	// Total number of items (monitors broken or extra lives through giant rings) consumed in a level; resets when warping out in any way
 define unused.player2.item_count		= u16[0xfffffece]	// Unused leftover from Sonic 2
 
 define level.total_rings		= u16[0xffffff04]	// All rings in stage (except in monitors or just lost by character)
