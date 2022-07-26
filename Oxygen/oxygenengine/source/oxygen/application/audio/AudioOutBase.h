@@ -36,9 +36,10 @@ public:
 
 	enum class AudioKeyType
 	{
-		INVALID  = 0,
-		UNMODDED = 1,
-		MODDED   = 2
+		INVALID		= 0,
+		EMULATED	= 1,
+		REMASTERED	= 2,
+		MODDED		= 3
 	};
 
 public:

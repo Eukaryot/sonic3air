@@ -65,7 +65,7 @@ namespace
 
 	void setUnderwaterAudioEffect(uint8 value)
 	{
-		return AudioOut::instance().enableUnderwaterEffect((float)value / 255.0f);
+		AudioOut::instance().enableUnderwaterEffect((float)value / 255.0f);
 	}
 }
 

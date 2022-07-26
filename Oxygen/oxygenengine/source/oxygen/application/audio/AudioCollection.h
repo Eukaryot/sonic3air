@@ -18,9 +18,10 @@ class AudioCollection
 public:
 	enum class Package
 	{
-		ORIGINAL,
-		REMASTERED,
-		MODDED
+		NONE		= 0,
+		ORIGINAL	= 1,
+		REMASTERED	= 2,
+		MODDED		= 3
 	};
 
 	struct AudioDefinition;

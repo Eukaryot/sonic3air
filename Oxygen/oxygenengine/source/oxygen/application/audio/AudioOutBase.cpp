@@ -73,7 +73,7 @@ AudioOutBase::AudioKeyType AudioOutBase::getAudioKeyType(uint64 sfxId) const
 	if (nullptr == sourceReg)
 		return AudioKeyType::INVALID;
 
-	return (sourceReg->mPackage == AudioCollection::Package::MODDED) ? AudioKeyType::MODDED : AudioKeyType::UNMODDED;
+	return (AudioKeyType)sourceReg->mPackage;
 }
 
 bool AudioOutBase::isPlayingSfxId(uint64 sfxId) const

@@ -344,7 +344,7 @@
 	"DA": { "Source": "EmulationContinuous", "Type": "Sound" },
 	"DB": { "Source": "EmulationContinuous", "Type": "Sound" },
 
-//	"DC_sk": { "Source": "Emulation", "Type": "Jingle" },		// Unused original version of this
+	"DC": { "Source": "Emulation", "Type": "Jingle" },		// Original version of the medley
 
 	"FF": { "Name": "SEGA", "File": "sfxFF_sega.ogg", "Type": "Jingle" },
 

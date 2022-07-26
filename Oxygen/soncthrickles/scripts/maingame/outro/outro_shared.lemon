@@ -288,8 +288,12 @@ function void fn05b514()
 	outro.wait_time = u16[0x05b656 + D1.u16]
 
 #if STANDALONE
-	u32 lines = 0x26b			// Number of text lines in credits
-	u32 syncPoint = 0x2cce		// Sync point in credits music (in frames from music start)
+	// Number of text lines in credits
+	u32 lines = 0x26b
+
+	// Sync point in credits music (in frames from music start)
+	//  -> This is different for emulated original S&K medley and the longer remastered one featuring also S3 music tracks
+	u32 syncPoint = (Audio.getAudioKeyType(MUSIC_CREDITSMEDLEY) == AudioKeyType.EMULATED) ? 10070 : 11470
 
 	// Credits start and end measured in frames from credits music start
 	//  -> In case of Knuckles' outro, the music will start in 0x5a frames, for the others it has started already

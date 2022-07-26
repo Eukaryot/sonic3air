@@ -177,9 +177,10 @@ constant u8 MUSIC_CTRL_STOP			= 0xe2
 // Return value for "Audio.getAudioKeyType"              //
 //-------------------------------------------------------//
 
-constant u8 AudioKeyType.INVALID  = 0	// Audio key is not valid / loaded at all
-constant u8 AudioKeyType.UNMODDED = 1	// Audio key is valid, but not modded
-constant u8 AudioKeyType.MODDED   = 2	// Audio key is modded
+constant u8 AudioKeyType.INVALID	= 0		// Audio key is not valid / loaded at all
+constant u8 AudioKeyType.EMULATED	= 1		// Audio key is emulated, but not modded
+constant u8 AudioKeyType.REMASTERED	= 2		// Audio key is remastered, but not modded
+constant u8 AudioKeyType.MODDED		= 3		// Audio key is modded
 
 
 
