@@ -290,6 +290,10 @@ function void fn0778f2()
 		// Spawn screen mover for the right border
 		objA1.update_address = 0x084a48
 	}
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
 }
 
 

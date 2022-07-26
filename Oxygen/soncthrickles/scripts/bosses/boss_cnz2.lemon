@@ -382,6 +382,7 @@ function void fn06e7b6()
 #if STANDALONE
 	// Reset controls, in case the player starts pressing a button right now (this would lead to the cannon firing immediately)
 	control.player1 = 0
+	Game.startSkippableCutscene()
 #endif
 }
 
@@ -389,6 +390,7 @@ function void fn06e7b6()
 //# address-hook(0x06e7e4) end(0x06e80a)
 function void fn06e7e4()
 {
+	// Fire the cannon when it's ready
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 		return

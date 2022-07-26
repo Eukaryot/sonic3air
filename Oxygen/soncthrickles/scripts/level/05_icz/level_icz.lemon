@@ -327,6 +327,7 @@ function void fn053a34()
 //# address-hook(0x053a4c) end(0x053ad2)
 function void fn053a4c()
 {
+	// Part of the avalanche controller after the snowboarding section
 	if (level.scrolling_routine >= 0x08)
 	{
 		UnloadObject()
@@ -343,17 +344,24 @@ function void fn053a4c()
 	if (objA0.position.y.u16 == 0x070e && player1.control_override != 0)
 	{
 		A1 = 0xffffb000
-		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && (control.pad1.pressed & CONTROL_ABC))
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
-			player1.control_override = 0
-			objA1.velocity.y = -0x600
-			u8[A1 + 0x40] = 0x01
-			u8[A1 + 0x1e] = 0x0e
-			u8[A1 + 0x1f] = 0x07
-			objA1.state = char.state.ROLLING
-			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+		#if STANDALONE
+			Game.endSkippableCutscene()
+		#endif
+			if (control.pad1.pressed & CONTROL_ABC)
+			{
+				// Player jumped out of the snow
+				player1.control_override = 0
+				objA1.velocity.y = -0x600
+				u8[A1 + 0x40] = 0x01
+				u8[A1 + 0x1e] = 0x0e
+				u8[A1 + 0x1f] = 0x07
+				objA1.state = char.state.ROLLING
+				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 
-			playSound(SFX_JUMP)
+				playSound(SFX_JUMP)
+			}
 		}
 	}
 }

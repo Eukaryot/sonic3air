@@ -308,6 +308,10 @@ function void fn039796()
 		u16[A2 + 0x18] = 0x0400
 		u16[A2 + 0x1a] = 0xf800
 		objA0.update_address = 0x0397d2
+
+	#if STANDALONE
+		Game.startSkippableCutscene()
+	#endif
 	}
 	fn0397c6()
 }

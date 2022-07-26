@@ -51,6 +51,10 @@ function void fn06c2ee()
 	{
 		objA1.update_address = 0x06d104
 	}
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
 }
 
 

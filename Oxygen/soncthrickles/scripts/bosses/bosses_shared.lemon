@@ -352,8 +352,13 @@ function void fn0694aa()
 //# address-hook(0x0694d4) end(0x069520)
 function void fn0694d4()
 {
+	// Used in AIZ 2 post-boss cutscene
 	if (level.wait_for_results)
 		return
+
+#if STANDALONE
+	Game.startSkippableCutscene()
+#endif
 
 	objA0.update_address = 0x069526
 	stopCharacterWinPose(0xffffb000)
