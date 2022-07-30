@@ -35,24 +35,40 @@ namespace lemon
 	namespace internal
 	{
 
-		// Return type handlers for functions
+		// Stack interactions templates for base types - these functions are used as a basis for return type and parameter type handling
 
 		template<typename R>
-		void handleResult(R result, const NativeFunction::Context context)
+		void pushStackGeneric(R result, const NativeFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack(traits::getDataType<R>(), result);
 		};
 
-		template<>
-		void handleResult<StringRef>(StringRef result, const NativeFunction::Context context);
+		template<typename T>
+		T popStackGeneric(const NativeFunction::Context context)
+		{
+			return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
+		}
 
+
+
+		// Template specializations for StringRef, representing the "string" type in script
+
+		template<>
+		void pushStackGeneric<StringRef>(StringRef result, const NativeFunction::Context context);
+
+		template<>
+		StringRef popStackGeneric(const NativeFunction::Context context);
+
+
+
+		// Return type handlers for functions
 
 		template<typename R>
 		struct ReturnTypeHandler0
 		{
 			void call(R(*pointer)(), const NativeFunction::Context context)
 			{
-				handleResult(pointer(), context);
+				pushStackGeneric(pointer(), context);
 			}
 		};
 
@@ -70,7 +86,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A), const NativeFunction::Context context, A a)
 			{
-				handleResult(pointer(a), context);
+				pushStackGeneric(pointer(a), context);
 			}
 		};
 
@@ -88,7 +104,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B), const NativeFunction::Context context, A a, B b)
 			{
-				handleResult(pointer(a, b), context);
+				pushStackGeneric(pointer(a, b), context);
 			}
 		};
 
@@ -106,7 +122,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C), const NativeFunction::Context context, A a, B b, C c)
 			{
-				handleResult(pointer(a, b, c), context);
+				pushStackGeneric(pointer(a, b, c), context);
 			}
 		};
 
@@ -124,7 +140,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D), const NativeFunction::Context context, A a, B b, C c, D d)
 			{
-				handleResult(pointer(a, b, c, d), context);
+				pushStackGeneric(pointer(a, b, c, d), context);
 			}
 		};
 
@@ -142,7 +158,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D, E), const NativeFunction::Context context, A a, B b, C c, D d, E e)
 			{
-				handleResult(pointer(a, b, c, d, e), context);
+				pushStackGeneric(pointer(a, b, c, d, e), context);
 			}
 		};
 
@@ -160,7 +176,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D, E, F), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f)
 			{
-				handleResult(pointer(a, b, c, d, e, f), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f), context);
 			}
 		};
 
@@ -178,7 +194,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D, E, F, G), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g), context);
 			}
 		};
 
@@ -196,7 +212,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D, E, F, G, H), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h), context);
 			}
 		};
 
@@ -214,7 +230,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D, E, F, G, H, I), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h, i), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h, i), context);
 			}
 		};
 
@@ -232,7 +248,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D, E, F, G, H, I, J), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h, i, j), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h, i, j), context);
 			}
 		};
 
@@ -250,7 +266,7 @@ namespace lemon
 		{
 			void call(R(*pointer)(A, B, C, D, E, F, G, H, I, J, K), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
 			{
-				handleResult(pointer(a, b, c, d, e, f, g, h, i, j, k), context);
+				pushStackGeneric(pointer(a, b, c, d, e, f, g, h, i, j, k), context);
 			}
 		};
 
@@ -272,7 +288,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(), const NativeFunction::Context context)
 			{
-				handleResult((object.*pointer)(), context);
+				pushStackGeneric((object.*pointer)(), context);
 			}
 		};
 
@@ -290,7 +306,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A), const NativeFunction::Context context, A a)
 			{
-				handleResult((object.*pointer)(a), context);
+				pushStackGeneric((object.*pointer)(a), context);
 			}
 		};
 
@@ -308,7 +324,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B), const NativeFunction::Context context, A a, B b)
 			{
-				handleResult((object.*pointer)(a, b), context);
+				pushStackGeneric((object.*pointer)(a, b), context);
 			}
 		};
 
@@ -326,7 +342,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C), const NativeFunction::Context context, A a, B b, C c)
 			{
-				handleResult((object.*pointer)(a, b, c), context);
+				pushStackGeneric((object.*pointer)(a, b, c), context);
 			}
 		};
 
@@ -344,7 +360,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D), const NativeFunction::Context context, A a, B b, C c, D d)
 			{
-				handleResult((object.*pointer)(a, b, c, d), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d), context);
 			}
 		};
 
@@ -362,7 +378,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E), const NativeFunction::Context context, A a, B b, C c, D d, E e)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e), context);
 			}
 		};
 
@@ -380,7 +396,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f), context);
 			}
 		};
 
@@ -398,7 +414,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g), context);
 			}
 		};
 
@@ -416,7 +432,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h), context);
 			}
 		};
 
@@ -434,7 +450,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h, i), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h, i), context);
 			}
 		};
 
@@ -452,7 +468,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h, i, j), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h, i, j), context);
 			}
 		};
 
@@ -470,7 +486,7 @@ namespace lemon
 		{
 			void call(CLASS& object, R(CLASS::*pointer)(A, B, C, D, E, F, G, H, I, J, K), const NativeFunction::Context context, A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k)
 			{
-				handleResult((object.*pointer)(a, b, c, d, e, f, g, h, i, j, k), context);
+				pushStackGeneric((object.*pointer)(a, b, c, d, e, f, g, h, i, j, k), context);
 			}
 		};
 
@@ -486,15 +502,6 @@ namespace lemon
 
 
 		// Function wrappers
-
-		template<typename T>
-		T popStackGeneric(const NativeFunction::Context context)
-		{
-			return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
-		}
-
-		template<>
-		StringRef popStackGeneric(const NativeFunction::Context context);
 
 		template<typename R>
 		class FunctionWrapperBase : public NativeFunction::FunctionWrapper

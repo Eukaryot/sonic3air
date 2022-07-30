@@ -456,12 +456,12 @@ void LemonScriptProgram::evaluateDefines()
 			{
 				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue;
 				const lemon::DataTypeDefinition& dataType = *tokens[0].as<lemon::VarTypeToken>().mDataType;
-				if (dataType.mClass == lemon::DataTypeDefinition::Class::INTEGER)
+				if (dataType.getClass() == lemon::DataTypeDefinition::Class::INTEGER)
 				{
 					GlobalDefine& var = vectorAdd(mGlobalDefines);
 					var.mName = define->getName();
 					var.mAddress = address;
-					var.mBytes = (uint8)dataType.mBytes;
+					var.mBytes = (uint8)dataType.getBytes();
 					var.mSigned = dataType.as<lemon::IntegerDataType>().mIsSigned;
 
 					const int pos = String(var.mName.getString()).findChar('.', 0, 1);	// Position of the dot

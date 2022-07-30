@@ -264,7 +264,7 @@ namespace lemon
 
 	int64* Runtime::accessGlobalVariableValue(const Variable& variable)
 	{
-		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName().getString() << " is not a global variable", return nullptr);
+		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName() << " is not a global variable", return nullptr);
 		const uint32 index = variable.getID() & 0x0fffffff;
 		RMX_CHECK(index < mGlobalVariables.size(), "Variable index " << index << " is not valid", return nullptr);
 		return &mGlobalVariables[index];

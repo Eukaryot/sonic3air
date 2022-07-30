@@ -30,7 +30,7 @@ namespace lemon
 	namespace internal
 	{
 		template<>
-		void handleResult(StringRef result, const NativeFunction::Context context)
+		void pushStackGeneric(StringRef result, const NativeFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.getHash());
 		};

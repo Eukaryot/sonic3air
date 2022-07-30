@@ -342,7 +342,7 @@ namespace lemon
 							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
 							runtimeOpcode.setParameter(variable.mPointer);
 
-							switch (variable.getDataType()->mBytes)
+							switch (variable.getDataType()->getBytes())
 							{
 								case 1:  runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_EXTERNAL_DISCARD<uint8>;   break;
 								case 2:  runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_SET_VARIABLE_VALUE_EXTERNAL_DISCARD<uint16>;  break;

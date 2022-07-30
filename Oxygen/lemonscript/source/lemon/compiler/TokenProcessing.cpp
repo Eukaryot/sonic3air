@@ -407,7 +407,7 @@ namespace lemon
 					Token& nextToken = tokens[i+1];
 					if (nextToken.getType() == Token::Type::IDENTIFIER)
 					{
-						CHECK_ERROR(varType->mClass != DataTypeDefinition::Class::VOID, "void variables not allowed", mLineNumber);
+						CHECK_ERROR(varType->getClass() != DataTypeDefinition::Class::VOID, "void variables not allowed", mLineNumber);
 
 						// Create new variable
 						const IdentifierToken& identifierToken = tokens[i+1].as<IdentifierToken>();
@@ -463,7 +463,7 @@ namespace lemon
 					else if (rmx::startsWith(functionName, "base."))
 					{
 						// It's a base call
-						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call \"" << functionName << "\" goes to a different function, expected \"base." << mContext.mFunction->getName().getString() << "\" instead", mLineNumber);
+						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call \"" << functionName << "\" goes to a different function, expected \"base." << mContext.mFunction->getName() << "\" instead", mLineNumber);
 						isValidFunctionCall = true;
 						isBaseCall = true;
 					}
@@ -600,7 +600,7 @@ namespace lemon
 					CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
 					const DataTypeDefinition* dataType = tokens[i].as<VarTypeToken>().mDataType;
-					CHECK_ERROR(dataType->mClass == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->toString() << "'", mLineNumber);
+					CHECK_ERROR(dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->getName() << "'", mLineNumber);
 
 					MemoryAccessToken& token = tokens.createReplaceAt<MemoryAccessToken>(i);
 					token.mDataType = dataType;
@@ -1075,23 +1075,23 @@ namespace lemon
 				// Choose best fitting signature
 				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
 				const bool result = TypeCasting(mConfig).getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
-				CHECK_ERROR(result, "Cannot implicitly cast between types '" << leftDataType->toString() << "' and '" << rightDataType->toString() << "'", mLineNumber);
+				CHECK_ERROR(result, "Cannot implicitly cast between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
 
 				token.mDataType = signature->mResult;
 
 				if (opType != OperatorHelper::OperatorType::TRINARY)
 				{
-					if (leftDataType->mClass == DataTypeDefinition::Class::INTEGER && rightDataType->mClass == DataTypeDefinition::Class::INTEGER)
+					if (leftDataType->getClass() == DataTypeDefinition::Class::INTEGER && rightDataType->getClass() == DataTypeDefinition::Class::INTEGER)
 					{
 						// Where necessary, add implicit casts
-						if (leftDataType->mBytes != signature->mLeft->mBytes)	// Ignore signed/unsigned differences
+						if (leftDataType->getBytes() != signature->mLeft->getBytes())	// Ignore signed/unsigned differences
 						{
 							TokenPtr<StatementToken> inner = bot.mLeft;
 							ValueCastToken& vct = bot.mLeft.create<ValueCastToken>();
 							vct.mDataType = signature->mLeft;
 							vct.mArgument = inner;
 						}
-						if (rightDataType->mBytes != signature->mRight->mBytes)	// Ignore signed/unsigned differences
+						if (rightDataType->getBytes() != signature->mRight->getBytes())	// Ignore signed/unsigned differences
 						{
 							TokenPtr<StatementToken> inner = bot.mRight;
 							ValueCastToken& vct = bot.mRight.create<ValueCastToken>();

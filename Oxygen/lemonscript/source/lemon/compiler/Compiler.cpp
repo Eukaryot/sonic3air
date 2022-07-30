@@ -176,7 +176,7 @@ namespace lemon
 				String output;
 				for (ScriptFunction* function : mModule.getScriptFunctions())
 				{
-					output << function->getName().getString() << ":\r\n";
+					output << function->getName() << ":\r\n";
 					for (const Opcode& opcode : function->mOpcodes)
 					{
 						String typeString = Opcode::GetTypeString(opcode.mType);
@@ -645,7 +645,7 @@ namespace lemon
 			{
 				if (!mTokenProcessing.resolveIdentifiers(define->mContent))
 					break;
-				CHECK_ERROR(iterationDepth < 10, "Too deep recursion in evaluating define '" << define->getName().getString() << "'", 0);
+				CHECK_ERROR(iterationDepth < 10, "Too deep recursion in evaluating define '" << define->getName() << "'", 0);
 			}
 		}
 	}

@@ -87,7 +87,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::VARTYPE:
 		{
 			VarTypeToken& token = token_.as<VarTypeToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			break;
 		}
 
@@ -108,7 +108,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::CONSTANT:
 		{
 			ConstantToken& token = token_.as<ConstantToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			serializer.serialize(token.mValue);
 			break;
 		}
@@ -116,7 +116,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::IDENTIFIER:
 		{
 			IdentifierToken& token = token_.as<IdentifierToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			token.mName.serialize(serializer);
 			break;
 		}
@@ -124,7 +124,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::PARENTHESIS:
 		{
 			ParenthesisToken& token = token_.as<ParenthesisToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			serializer.serializeAs<uint8>(token.mParenthesisType);
 			serializeTokenList(serializer, token.mContent);
 			break;
@@ -133,7 +133,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::COMMA_SEPARATED:
 		{
 			CommaSeparatedListToken& token = token_.as<CommaSeparatedListToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 
 			size_t numberOfEntries = token.mContent.size();
 			serializer.serializeAs<uint8>(numberOfEntries);
@@ -148,7 +148,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::UNARY_OPERATION:
 		{
 			UnaryOperationToken& token = token_.as<UnaryOperationToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			serializer.serializeAs<uint8>(token.mOperator);
 			serializeToken(serializer, token.mArgument);
 			break;
@@ -157,7 +157,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::BINARY_OPERATION:
 		{
 			BinaryOperationToken& token = token_.as<BinaryOperationToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			serializer.serializeAs<uint8>(token.mOperator);
 			serializeToken(serializer, token.mLeft);
 			serializeToken(serializer, token.mRight);
@@ -169,7 +169,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 			RMX_ERROR("Not supported", );
 		/*
 			VariableToken& token = token_.as<VariableToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			// TODO: Serialize the variable pointer
 		*/
 			break;
@@ -180,7 +180,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 			RMX_ERROR("Not supported", );
 		/*
 			FunctionToken& token = token_.as<FunctionToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			// TODO: Serialize the other members
 		*/
 			break;
@@ -189,7 +189,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::MEMORY_ACCESS:
 		{
 			MemoryAccessToken& token = token_.as<MemoryAccessToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			serializeToken(serializer, token.mAddress);
 			break;
 		}
@@ -197,7 +197,7 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		case Token::Type::VALUE_CAST:
 		{
 			ValueCastToken& token = token_.as<ValueCastToken>();
-			DataTypeHelper::serializeDataType(serializer, token.mDataType);
+			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
 			serializeToken(serializer, token.mArgument);
 			break;
 		}

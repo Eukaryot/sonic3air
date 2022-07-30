@@ -40,7 +40,7 @@ namespace lemon
 			return 1;
 		}
 
-		if (original->mClass == DataTypeDefinition::Class::INTEGER && target->mClass == DataTypeDefinition::Class::INTEGER)
+		if (original->getClass() == DataTypeDefinition::Class::INTEGER && target->getClass() == DataTypeDefinition::Class::INTEGER)
 		{
 			const IntegerDataType& originalInt = original->as<IntegerDataType>();
 			const IntegerDataType& targetInt = target->as<IntegerDataType>();
@@ -57,12 +57,12 @@ namespace lemon
 				return 1;
 			}
 
-			if (originalInt.mBytes == targetInt.mBytes)
+			if (originalInt.getBytes() == targetInt.getBytes())
 			{
 				return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
 			}
 
-			if (originalInt.mBytes < targetInt.mBytes)
+			if (originalInt.getBytes() < targetInt.getBytes())
 			{
 				// Up cast
 				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
@@ -95,16 +95,16 @@ namespace lemon
 				target = &PredefinedDataTypes::UINT_64;
 		}
 
-		if (original->mClass == DataTypeDefinition::Class::INTEGER && target->mClass == DataTypeDefinition::Class::INTEGER)
+		if (original->getClass() == DataTypeDefinition::Class::INTEGER && target->getClass() == DataTypeDefinition::Class::INTEGER)
 		{
 			const IntegerDataType& originalInt = original->as<IntegerDataType>();
 			const IntegerDataType& targetInt = target->as<IntegerDataType>();
 
 			// No need for an opcode if size does not change at all
-			if (originalInt.mBytes != targetInt.mBytes)
+			if (originalInt.getBytes() != targetInt.getBytes())
 			{
 				uint8 castTypeBits = (originalInt.mSizeBits << 2) + targetInt.mSizeBits;
-				if (originalInt.mIsSigned && targetInt.mBytes > originalInt.mBytes)		// Recognize signed up-cast
+				if (originalInt.mIsSigned && targetInt.getBytes() > originalInt.getBytes())		// Recognize signed up-cast
 				{
 					castTypeBits += 0x10;
 				}

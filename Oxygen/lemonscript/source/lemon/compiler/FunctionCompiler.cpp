@@ -124,7 +124,7 @@ namespace lemon
 		// Make sure it ends with a return in any case
 		if (mOpcodes.empty() || mOpcodes.back().mType != Opcode::Type::RETURN)
 		{
-			CHECK_ERROR(mFunction.getReturnType()->mClass == DataTypeDefinition::Class::VOID, "Function must return a value", blockNode.getLineNumber());
+			CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", blockNode.getLineNumber());
 			addOpcode(Opcode::Type::RETURN);
 		}
 		else
@@ -175,8 +175,8 @@ namespace lemon
 
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter)
 	{
-		BaseType baseType = dataType->mBaseType;
-		if (dataType->mClass == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
+		BaseType baseType = dataType->getBaseType();
+		if (dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
 		{
 			baseType = BaseType::BOOL;
 		}
@@ -194,7 +194,7 @@ namespace lemon
 			}
 			else
 			{
-				CHECK_ERROR(false, "Cannot cast from " << sourceType->toString() << " to " << targetType->toString(), mLineNumber);
+				CHECK_ERROR(false, "Cannot cast from " << sourceType->getName() << " to " << targetType->getName(), mLineNumber);
 			}
 		}
 	}
@@ -274,13 +274,13 @@ namespace lemon
 				const ReturnNode& returnNode = node.as<ReturnNode>();
 				if (returnNode.mStatementToken.valid())
 				{
-					CHECK_ERROR(mFunction.getReturnType()->mClass != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName().getString() << "' with 'void' return type cannot return a value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->getClass() != DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' with 'void' return type cannot return a value", node.getLineNumber());
 					compileTokenTreeToOpcodes(*returnNode.mStatementToken);
 					addCastOpcodeIfNecessary(returnNode.mStatementToken->mDataType, mFunction.getReturnType());
 				}
 				else
 				{
-					CHECK_ERROR(mFunction.getReturnType()->mClass == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName().getString() << "' must return a " << mFunction.getReturnType()->toString() << " value", node.getLineNumber());
+					CHECK_ERROR(mFunction.getReturnType()->getClass() == DataTypeDefinition::Class::VOID, "Function '" << mFunction.getName() << "' must return a " << mFunction.getReturnType()->getName() << " value", node.getLineNumber());
 				}
 				addOpcode(Opcode::Type::RETURN);
 				break;
@@ -686,7 +686,7 @@ namespace lemon
 				CHECK_ERROR(false, "Token type should be eliminated by now", mLineNumber);
 		}
 
-		if (consumeResult && token.mDataType->mClass != DataTypeDefinition::Class::VOID)
+		if (consumeResult && token.mDataType->getClass() != DataTypeDefinition::Class::VOID)
 		{
 			addOpcode(Opcode::Type::MOVE_STACK, BaseType::VOID, -1);	// Pop result of statement
 		}

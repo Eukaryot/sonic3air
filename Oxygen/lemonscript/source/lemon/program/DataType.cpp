@@ -13,11 +13,13 @@
 namespace lemon
 {
 
-	const std::string& VoidDataType::toString() const
+	FlyweightString DataTypeDefinition::getName() const
 	{
-		static const std::string TYPE_STRING_VOID = "void";
-		return TYPE_STRING_VOID;
+		if (!mName.isValid())
+			mName.set(mNameString);
+		return mName;
 	}
+
 
 	uint32 IntegerDataType::getDataTypeHash() const
 	{
@@ -26,46 +28,105 @@ namespace lemon
 		{
 			case IntegerDataType::Semantics::BOOLEAN:	return baseHash + (uint32)BaseType::BOOL;
 			case IntegerDataType::Semantics::CONSTANT:	return baseHash + (uint32)BaseType::INT_CONST;
-			default:									return baseHash + (uint32)mBytes + ((uint32)mIsSigned * 0x80);
+			default:									return baseHash + (uint32)getBytes() + ((uint32)mIsSigned * 0x80);
 		}
 	}
 
-	const std::string& IntegerDataType::toString() const
+
+	size_t DataTypeHelper::getSizeOfBaseType(BaseType baseType)
 	{
-		switch (mSemantics)
+		switch (baseType)
 		{
-			case Semantics::BOOLEAN:
-			{
-				static const std::string TYPE_STRING_BOOL = "bool";
-				return TYPE_STRING_BOOL;
-			}
-
-			case Semantics::CONSTANT:
-			{
-				static const std::string TYPE_STRING_CONST_INT = "const_int";
-				return TYPE_STRING_CONST_INT;
-			}
-
-			default:
-			{
-				static const std::string TYPE_STRINGS[] = { "s8", "s16", "s32", "s64", "u8", "u16", "u32", "u64" };
-				const std::string* typeStrings = mIsSigned ? &TYPE_STRINGS[0] : &TYPE_STRINGS[4];
-				if (mBytes <= 1)
-					return typeStrings[0];
-				else if (mBytes <= 2)
-					return typeStrings[1];
-				else if (mBytes <= 4)
-					return typeStrings[2];
-				else
-					return typeStrings[3];
-			}
+			case BaseType::UINT_8:		return 1;
+			case BaseType::UINT_16:		return 2;
+			case BaseType::UINT_32:		return 4;
+			case BaseType::UINT_64:		return 8;
+			case BaseType::INT_8:		return 1;
+			case BaseType::INT_16:		return 2;
+			case BaseType::INT_32:		return 4;
+			case BaseType::INT_64:		return 8;
+			case BaseType::INT_CONST:	return 8;
+			default:					return 0;
 		}
 	}
 
-	const std::string& StringDataType::toString() const
+	const DataTypeDefinition* DataTypeHelper::getDataTypeDefinitionForBaseType(BaseType baseType)
 	{
-		static const std::string TYPE_STRING = "string";
-		return TYPE_STRING;
+		switch (baseType)
+		{
+			case BaseType::UINT_8:		return &PredefinedDataTypes::UINT_8;
+			case BaseType::UINT_16:		return &PredefinedDataTypes::UINT_16;
+			case BaseType::UINT_32:		return &PredefinedDataTypes::UINT_32;
+			case BaseType::UINT_64:		return &PredefinedDataTypes::UINT_64;
+			case BaseType::INT_8:		return &PredefinedDataTypes::INT_8;
+			case BaseType::INT_16:		return &PredefinedDataTypes::INT_16;
+			case BaseType::INT_32:		return &PredefinedDataTypes::INT_32;
+			case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
+			case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
+			default:					return nullptr;
+		}
+	}
+
+
+	const DataTypeDefinition* DataTypeSerializer::readDataType(VectorBinarySerializer& serializer)
+	{
+		// TODO: We definitely need a more sophisticated serialization to support more data types
+		const BaseType baseType = (BaseType)serializer.read<uint8>();
+		if ((uint8)baseType == 0x40)	// Some dumb placeholder magic number for string
+		{
+			return &PredefinedDataTypes::STRING;
+		}
+		else
+		{
+			switch (baseType)
+			{
+				case BaseType::VOID:		return &PredefinedDataTypes::VOID;
+				case BaseType::UINT_8:		return &PredefinedDataTypes::UINT_8;
+				case BaseType::UINT_16:		return &PredefinedDataTypes::UINT_16;
+				case BaseType::UINT_32:		return &PredefinedDataTypes::UINT_32;
+				case BaseType::UINT_64:		return &PredefinedDataTypes::UINT_64;
+				case BaseType::INT_8:		return &PredefinedDataTypes::INT_8;
+				case BaseType::INT_16:		return &PredefinedDataTypes::INT_16;
+				case BaseType::INT_32:		return &PredefinedDataTypes::INT_32;
+				case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
+					//case BaseType::BOOL:
+				case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
+			}
+			return &PredefinedDataTypes::VOID;
+		}
+	}
+
+	void DataTypeSerializer::writeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition* const dataTypeDefinition)
+	{
+		// TODO: We definitely need a more sophisticated serialization to support more data types
+		if (nullptr == dataTypeDefinition)
+		{
+			serializer.write<uint8>(0);
+		}
+		else if (dataTypeDefinition == &PredefinedDataTypes::STRING)
+		{
+			serializer.write<uint8>(0x40);	// The same dumb magic number as above
+		}
+		else if (dataTypeDefinition->getClass() == DataTypeDefinition::Class::INTEGER && dataTypeDefinition->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
+		{
+			serializer.writeAs<uint8>(BaseType::BOOL);
+		}
+		else
+		{
+			serializer.writeAs<uint8>(dataTypeDefinition->getBaseType());
+		}
+	}
+
+	void DataTypeSerializer::serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition)
+	{
+		if (serializer.isReading())
+		{
+			dataTypeDefinition = readDataType(serializer);
+		}
+		else
+		{
+			writeDataType(serializer, dataTypeDefinition);
+		}
 	}
 
 }

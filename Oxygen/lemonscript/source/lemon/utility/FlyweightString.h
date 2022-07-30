@@ -69,4 +69,10 @@ namespace lemon
 		inline static detail::FlyweightStringManager mManager;
 		inline static std::string_view EMPTY_STRING_VIEW;
 	};
+
+
+	inline std::ostream& operator<<(std::ostream& stream, const FlyweightString& flyweightString)
+	{ 
+		return stream << flyweightString.getString();
+	}
 }

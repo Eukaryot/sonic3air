@@ -43,7 +43,7 @@ namespace lemon
 		serializer.serializeArraySize(mData);
 		if (serializer.isReading())
 		{
-			switch (mElementDataType->mBytes)
+			switch (mElementDataType->getBytes())
 			{
 				case 1:
 				{
@@ -73,7 +73,7 @@ namespace lemon
 		}
 		else
 		{
-			switch (mElementDataType->mBytes)
+			switch (mElementDataType->getBytes())
 			{
 				case 1:
 				{
