@@ -32,5 +32,7 @@ private:
 	std::vector<uint8> mRotationIntensityLookup[0x0f];
 	int mNonOpaquePixelIndent[224] = { 0 };				// Number of pixels from the left (or right) side until reaching the first fully opaque one, for each row
 	int mNumPureSkyRows = 0;
+
 	Vec2i mLastScreenSize;
+	uint32 mLastSpriteCacheChangeCounter = 0;
 };

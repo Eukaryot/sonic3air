@@ -19,4 +19,5 @@ public:
 private:
 	InputManager::InputType mLastInputType = InputManager::InputType::NONE;
 	uint32 mLastMappingsChangeCounter = 0;
+	uint32 mLastSpriteCacheChangeCounter = 0;
 };

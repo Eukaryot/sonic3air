@@ -89,12 +89,13 @@ void DynamicSprites::updateSpriteRedirects()
 {
 	InputManager& inputManager = InputManager::instance();
 	const InputManager::InputType lastInputType = inputManager.getLastInputType();
-	const uint32 changeCounter = inputManager.getMappingsChangeCounter();
-	if (lastInputType == mLastInputType && changeCounter == mLastMappingsChangeCounter)
+	SpriteCache& spriteCache = SpriteCache::instance();
+	if (mLastInputType == lastInputType && mLastMappingsChangeCounter == inputManager.getMappingsChangeCounter() && mLastSpriteCacheChangeCounter == spriteCache.getGlobalChangeCounter())
 		return;
 
 	mLastInputType = lastInputType;
-	mLastMappingsChangeCounter = changeCounter;
+	mLastMappingsChangeCounter = inputManager.getMappingsChangeCounter();
+	mLastSpriteCacheChangeCounter = spriteCache.getGlobalChangeCounter();
 
 	const InputManager::ControllerScheme& keys = inputManager.getController(0);
 
@@ -109,7 +110,6 @@ void DynamicSprites::updateSpriteRedirects()
 	static const uint64 INPUT_ICON_BUTTON_START = rmx::getMurmur2_64("@input_icon_button_start");
 	static const uint64 INPUT_ICON_BUTTON_BACK  = rmx::getMurmur2_64("@input_icon_button_back");
 
-	SpriteCache& spriteCache = SpriteCache::instance();
 	switch (mLastInputType)
 	{
 		case InputManager::InputType::KEYBOARD:

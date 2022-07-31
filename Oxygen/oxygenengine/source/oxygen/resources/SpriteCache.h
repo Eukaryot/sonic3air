@@ -53,6 +53,8 @@ public:
 	void clearRedirect(uint64 sourceKey);
 	void setupRedirect(uint64 sourceKey, uint64 targetKey);
 
+	inline uint32 getGlobalChangeCounter() const  { return mGlobalChangeCounter; }
+
 	SpriteDump& getSpriteDump();
 	void dumpSprite(uint64 key, std::string_view categoryKey, uint8 spriteNumber, uint8 atex);
 

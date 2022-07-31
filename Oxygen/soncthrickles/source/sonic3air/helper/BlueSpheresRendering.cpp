@@ -153,8 +153,10 @@ void BlueSpheresRendering::startup()
 
 void BlueSpheresRendering::createSprites(Vec2i screenSize)
 {
+	SpriteCache& spriteCache = SpriteCache::instance();
+
 	// Update sprites only if needed
-	if (mLastScreenSize == screenSize)
+	if (mLastScreenSize == screenSize && mLastSpriteCacheChangeCounter == spriteCache.getGlobalChangeCounter())
 		return;
 
 	// Perform calculations that only need to be done once
@@ -229,6 +231,8 @@ void BlueSpheresRendering::createSprites(Vec2i screenSize)
 		items[0]->mSprite->mOffset.y = screenSize.y - bitmaps[0]->getHeight() - bitmaps[1]->getHeight();
 		items[1]->mSprite->mOffset.y = screenSize.y - bitmaps[1]->getHeight();
 	}
+
+	mLastSpriteCacheChangeCounter = spriteCache.getGlobalChangeCounter();
 }
 
 void BlueSpheresRendering::writeVisibleSpheresData(uint32 targetAddress, uint32 sourceAddress, uint16 px, uint16 py, uint8 rotation, EmulatorInterface& emulatorInterface)
