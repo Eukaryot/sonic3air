@@ -185,6 +185,8 @@ namespace lemon
 
 	void FunctionCompiler::addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType)
 	{
+		CHECK_ERROR(nullptr != sourceType, "Internal error: Got an invalid source type for cast", mLineNumber);
+		CHECK_ERROR(nullptr != targetType, "Internal error: Got an invalid target type for cast", mLineNumber);
 		const BaseCastType castType = TypeCasting(mConfig).getBaseCastType(sourceType, targetType);
 		if (castType != BaseCastType::NONE)
 		{
