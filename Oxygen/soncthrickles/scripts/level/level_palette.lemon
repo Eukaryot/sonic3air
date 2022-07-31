@@ -342,7 +342,7 @@ function void LevelPaletteUpdate.LBZ_shared()
 		u16[0xfffffc54] = u16[A0 + D0.s16 + 4]
 
 	#if STANDALONE
-		// New for underwater palettes [added by Thorn]
+		// New for underwater palettes, #contributed by Thorn
 		u32[0xfffff0d0] = u32[A0 + D0.s16]
 		u16[0xfffff0d4] = u16[A0 + D0.s16 + 4]
 	#endif

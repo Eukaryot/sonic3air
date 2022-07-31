@@ -1159,7 +1159,7 @@ function void fn23e1aa()
 		u32[(A1+=4)-4] = 0x0c820c60
 		u32[(A1+=4)-4] = 0x0c400e20
 	#if STANDALONE
-		u32[0xfffffc7c] = 0x0c600ea4	// New line, corrects original S3&K glitch with brightest two colors in background reflections on water [added by Thorn, just like others below]
+		u32[0xfffffc7c] = 0x0c600ea4	// New line, corrects original S3&K glitch with brightest two colors in background reflections on water, #contributed by Thorn, just like others below
 	#endif
 		objA1.update_address = 0x0a000e00
 	}
