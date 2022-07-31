@@ -320,8 +320,8 @@ function void fn08ae0c()
 			objA0.velocity.y = -(D0.s16 >> 2)
 
 			// "spawnChildObjects(0x08b17e)" replaced by:
-			spawnChildObject(0x08bd40, 0x00, 28, 16)
-			spawnChildObject(0x08bd40, 0x02, 20, 16)
+			spawnChildObject(0x08bd40, 0x00, 28, 16)		// Snow dust
+			spawnChildObject(0x08bd40, 0x02, 20, 16)		// Snow dust
 		}
 	}
 	fn085160()
@@ -343,7 +343,8 @@ function void fn08ae62()
 		D1.u16 ^= D0.u16
 		if (D1 & 0x08)
 		{
-			spawnChildObjects(0x08b18c)
+			// "spawnChildObjects(0x08b18c)" replaced by:
+			spawnChildObject(0x08bd40, 0x00, 28, 16)		// Snow dust
 		}
 		fn085160()
 	}

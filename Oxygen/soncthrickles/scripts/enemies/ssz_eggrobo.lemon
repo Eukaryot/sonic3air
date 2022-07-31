@@ -226,7 +226,9 @@ function void fn091712()
 	{
 		objA0.update_address = 0x09173a
 		objA0.countdown_value = 0x5f
-		spawnChildObjectsInDir(0x0919de)
+
+		// "spawnChildObjectsInDir(0x0919de)" replaced by:
+		spawnChildObjectInDir(0x091756, 0x00, 11, -4)		// Laser gun shot
 	}
 	fn084920()
 }

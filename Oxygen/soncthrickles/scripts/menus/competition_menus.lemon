@@ -926,7 +926,7 @@ function void fn00b508()
 {
 	A1 = 0xfffff607		// Address of control.pad2.pressed
 	A2 = 0xffffeee3
-	A3 = 0xffffffeb
+	A3 = 0xffffffeb		// Address of competition_mode.character.player2
 	if (competition_mode.multiplay)
 	{
 		fn00b538()
@@ -948,7 +948,7 @@ function void fn00b52c()
 {
 	A1 = 0xfffff605		// Address of control.pad1.pressed
 	A2 = 0xffffeee2
-	A3 = 0xffffffea
+	A3 = 0xffffffea		// Address of competition_mode.character.player1
 	fn00b538()
 }
 
@@ -1009,8 +1009,8 @@ function void fn00b538()
 					{
 						u8[A0 + 0x30] = 0x01
 						D0.u8 = u8[A3] + 1
-						if (D0.u8 > 0x02)
-							D0 = 0
+						if (D0.u8 > CHARACTER_KNUCKLES)
+							D0 = CHARACTER_SONIC
 						u8[A3] = D0.u8
 						D0 = u32(D0.u16) * 0x55
 						if (D0 == 0)
@@ -1022,8 +1022,8 @@ function void fn00b538()
 					{
 						u8[A0 + 0x30] = 0xff
 						D0.u8 = u8[A3] - 1
-						if (D0.s8 < 0)
-							D0 = 0x02
+						if (D0.s8 < CHARACTER_SONIC)
+							D0 = CHARACTER_KNUCKLES
 						u8[A3] = D0.u8
 						D0 = u32(D0.u16) * 0x55
 						if (D0.u16 >= 0x80)

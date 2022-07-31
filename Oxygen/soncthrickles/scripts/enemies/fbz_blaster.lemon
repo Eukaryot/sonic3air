@@ -140,7 +140,8 @@ function void fn08957a()
 	// "spawnChildObjects(0x089726)" replaced by:
 	spawnChildObject(0x089626, 0x00, -27, -22)
 
-	spawnProjectileChildObjectsInDir(0x08972e)
+	// "spawnProjectileChildObjectsInDir(0x08972e)" replaced by:
+	spawnProjectileChildObjectInDir(0x086d4a, 0x00, -32, -32, -512, -1024, 0x08970e, 0x089771, 0x08562c)
 }
 
 
@@ -154,7 +155,8 @@ function void fn0895a4()
 	fn0845a0()
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
-		spawnProjectileChildObjectsInDir(0x089746)
+		// "spawnProjectileChildObjectsInDir(0x089746)" replaced by:
+		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -12, -4, 256, -512, 0x08971a, 0x089775, 0x08562c)
 	}
 }
 

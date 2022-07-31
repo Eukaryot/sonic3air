@@ -199,7 +199,9 @@ function void fn088d02()
 	if (D2.u16 != 0 && objA0.animation.sprite == 4)
 	{
 		playSound(0x4d)
-		spawnProjectileChildObjectsInDir(0x088e32)
+
+		// "spawnProjectileChildObjectsInDir(0x088e32)" replaced by:
+		spawnProjectileChildObjectInDir(0x086d4a, 0x00, 4, 0, 512, -512, 0x088e12, 0x088e5c, 0x085640)
 	}
 }
 

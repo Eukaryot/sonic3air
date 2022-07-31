@@ -54,7 +54,10 @@ function void fn0876ec()
 {
 	setupObjectAttributesFull(0x087862)
 	objA0.velocity.x = -0x100
-	spawnIdenticalChildObjects(0x087898)
+
+	// "spawnIdenticalChildObjects(0x087898)" replaced by:
+	spawnChildObjects(0x08778c, 0, 0, 6)
+
 	fn087702()
 }
 

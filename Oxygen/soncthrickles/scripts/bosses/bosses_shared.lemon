@@ -36,9 +36,8 @@ function void fn085bda()
 	objA0.update_address = 0x085c00
 	level.boss_encounter = 0
 
-	// Spawn the sign post
-	//  -> One object with update address 0x0837b2
-	spawnSimpleChildObjects(0x085bfa)
+	// "spawnSimpleChildObjects(0x085bfa)" replaced by:
+	spawnSimpleChildObjects(0x0837b2, 1)		// Signpost
 
 	addPatternLoadingCue(0x085bc8)
 

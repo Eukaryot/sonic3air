@@ -598,7 +598,10 @@ function void fn05dc2c()
 	spawnChildObject(0x05ec3c, 0x00, -10, 12)
 
 	if (outro.ending_type >= 0)
-		spawnChildObjects(0x0601e0)
+	{
+		// "spawnChildObjects(0x0601e0)" replaced by:
+		spawnChildObject(0x05ec94, 0x00, -34, -2)		// Master Emerald carried by the Tornado
+	}
 }
 
 
@@ -965,8 +968,11 @@ function void fn05e1c2()
 
 	if (outro.ending_type >= 0)
 	{
-		spawnSimpleChildObjects(0x060214)
-		spawnSimpleChildObjects(0x06021a)
+		// "spawnSimpleChildObjects(0x060214)" replaced by:
+		spawnSimpleChildObjects(0x05e504, 5)	// The birds
+
+		// "spawnSimpleChildObjects(0x06021a)" replaced by:
+		spawnSimpleChildObjects(0x05e612, 2)	// The dolphins
 	}
 
 	Kosinski.addToDMAQueue(0x163418, 0x3c60)
@@ -1673,7 +1679,9 @@ function void fn05f5de()
 	copyMemory(0xfffffca0, 0x060baa, 0x20)
 	fn05fda4()
 
-	spawnChildObjects(0x060220)
+	// "spawnChildObjects(0x060220)" replaced by:
+	spawnChildObject(0x05f690, 0x00, 0, -16)		// Rubble
+	spawnChildObject(0x05f6a8, 0x02, 0, -20)		// Egg Robo's eyes
 
 	if (allocDynamicObjectStd())
 	{

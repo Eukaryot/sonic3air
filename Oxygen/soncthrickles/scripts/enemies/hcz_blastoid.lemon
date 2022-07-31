@@ -58,7 +58,8 @@ function void fn087976()
 	if (D2.s16 > 0 && objA0.animation.sprite == 1 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		playSound(0x4d)
-		spawnProjectileChildObjectsInDir(0x0879f8)
+		// "spawnProjectileChildObjectsInDir(0x0879f8)" replaced by:
+		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -20, -7, -512, -256, 0x0879ec, 0x087a1f, 0x085636)
 	}
 }
 

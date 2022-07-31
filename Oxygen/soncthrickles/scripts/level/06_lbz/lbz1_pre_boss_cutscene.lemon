@@ -75,7 +75,8 @@ function void fn08cb9e()
 	// "spawnChildObjects(0x06817c)" replaced by:
 	spawnChildObject(0x067c38, 0x00, 0, -28)
 
-	spawnIdenticalChildObjects(0x08d254)
+	// "spawnIdenticalChildObjects(0x08d254)" replaced by:
+	spawnChildObjects(0x08cd5c, 0, 52, 1)
 }
 
 
@@ -283,7 +284,8 @@ function void fn08cdb8()
 	move_area.right = 0x3ea0
 	move_area.left = 0x3c00
 
-	spawnIdenticalChildObjects(0x08d25c)
+	// "spawnIdenticalChildObjects(0x08d25c)" replaced by:
+	spawnChildObjects(0x08ce34, 0, 0, 10)
 
 	fn08d116()
 	fn08d0ea()
@@ -739,7 +741,9 @@ function void fn08cd4c()
 function void fn08cd5c()
 {
 	objA0.update_address = 0x08cd6c
-	spawnIdenticalChildObjects(0x08d25c)
+
+	// "spawnIdenticalChildObjects(0x08d25c)" replaced by:
+	spawnChildObjects(0x08ce34, 0, 0, 10)
 }
 
 

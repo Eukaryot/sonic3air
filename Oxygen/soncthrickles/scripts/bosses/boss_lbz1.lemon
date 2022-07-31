@@ -43,8 +43,11 @@ function void fn072400()
 	// "spawnChildObjects(0x07296e)" replaced by:
 	spawnChildObject(0x072596, 0x00, 0, 0)
 
-	spawnChildObjectChain(0x072976)
-	spawnChildObjectChain(0x07297c)
+	// "spawnChildObjectChain(0x072976)" replaced by:
+	spawnChildObjectsChain(0x0725f4, 6)		// Bottom arm
+
+	// "spawnChildObjectChain(0x07297c)" replaced by:
+	spawnChildObjectsChain(0x0725ee, 6)		// Top arm
 }
 
 
@@ -530,7 +533,7 @@ function void fn072910()
 	objA0.update_address = 0x07279e
 	u8[A0 + 0x28] = 0
 	objA0.countdown_value = 0x80
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 
 	D0 = objA0.subtype2c * 2
 	A1 = 0x07293e + D0.s16
@@ -681,7 +684,9 @@ function void fn08d02e()
 function void fn08d046()
 {
 	objA0.update_address = 0x08d056
-	spawnIdenticalChildObjects(0x08d25c)
+
+	// "spawnIdenticalChildObjects(0x08d25c)" replaced by:
+	spawnChildObjects(0x08ce34, 0, 0, 10)
 }
 
 

@@ -956,9 +956,31 @@ function void fn05cb6a()
 	D4.u16 = global.characters
 	if (D4.u8 == CHARS_TAILS_ALONE)
 	{
-		spawnSimpleChildObjects(0x05cb88)
+		// "spawnSimpleChildObjects(0x05cb88)" replaced by:
+		spawnSimpleChildObjects(0x05ca78, 1)		// Tails' Tails for continue icon
 	}
 
 	D4.u16 <<= 2
 	u32[A0 + 0x30] = u32[0x05cb8e + D4.s16]
+}
+
+
+//# address-hook(0x05ca78) end(0x05ca98)
+function void fn05ca78()
+{
+	objA0.mapping_offset = 0x05cd00
+	objA0.sprite_attributes = (ContinueScreen.ContinueIcons.targetInVRAM >> 5)
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x08
+	objA0.box_size.y = 0x08
+
+	objA0.update_address = 0x05ca9e
+}
+
+
+//# address-hook(0x05ca9e) end(0x05caa8)
+function void fn05ca9e()
+{
+	Object.animationProgress(0x05cbbb)
+	DrawObject()
 }

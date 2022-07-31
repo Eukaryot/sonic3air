@@ -21,8 +21,17 @@ function void IceBlockTower.Init()
 {
 	setupObjectAttributesFull(0x08ace2)
 	objA0.update_address = 0x0850a2
-	A2 = (objA0.subtype2c == 0) ? 0x08acf4 : 0x08acfc
-	SpawnChildObjectHierarchy()
+
+	if (objA0.subtype2c == 0)
+	{
+		// "spawnChildObjectHierarchy(0x08acf4)" replaced by:
+		spawnChildObjectsHierarchy(0x08ab86, 3)
+	}
+	else
+	{
+		// "spawnChildObjectHierarchy(0x08acfc)" replaced by:
+		spawnChildObjectsHierarchy(0x08ab86, 4)
+	}
 }
 
 

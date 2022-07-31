@@ -153,7 +153,14 @@ function void fn07a32c()
 	{
 		objA0.base_state = 0x06
 		objA0.flags38 |= 0x40
-		spawnUniqueChildObjectHierarchy(0x07a684)
+
+		// "spawnUniqueChildObjectHierarchy(0x07a684)" replaced by:
+		spawnChildObjectHierarchy(0x07a428, 0x00)		// Chain hook
+		spawnChildObjectHierarchy(0x07a4d0, 0x02)		// Chain link
+		spawnChildObjectHierarchy(0x07a4d0, 0x04)		// Chain link
+		spawnChildObjectHierarchy(0x07a4d0, 0x06)		// Chain link
+		spawnChildObjectHierarchy(0x07a4d0, 0x08)		// Chain link
+		spawnChildObjectHierarchy(0x07a514, 0x0a)		// The wrecking ball
 	}
 }
 

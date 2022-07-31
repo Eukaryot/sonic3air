@@ -150,7 +150,10 @@ function void fn08867e()
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		D3.u16 = D0.u16
-		spawnChildObjects(0x088b62)
+
+		// "spawnChildObjects(0x088b62)" replaced by:
+		spawnChildObject(0x088864, 0x00, 0, 0)		// Platform for Knuckles
+
 		if (D3.u16 < 0x08)
 		{
 			objA1.render_flags |= render_flag.FLIP_X

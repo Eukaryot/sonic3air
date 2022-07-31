@@ -213,8 +213,11 @@ function void fn07f220()
 	objA0.update_address = 0x07f266
 	objA0.render_flags &= ~render_flag.VISIBLE
 
-	spawnSimpleChildObjects(0x07fcce)
-	spawnSimpleChildObjects(0x07fcc8)
+	// "spawnSimpleChildObjects(0x07fcce)" replaced by:
+	spawnSimpleChildObjects(0x07f7f6, 2)
+
+	// "spawnSimpleChildObjects(0x07fcc8)" replaced by:
+	spawnSimpleChildObjects(0x07f7ce, 6)
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
 	spawnSimpleChildObjects(0x083d84, 1)

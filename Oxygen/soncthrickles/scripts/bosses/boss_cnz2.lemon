@@ -94,7 +94,8 @@ function void fn06e4f2()
 	// "spawnChildObjects(0x06edcc)" replaced by:
 	spawnChildObject(0x06e82c, 0x00, 0, 20)
 
-	spawnIdenticalChildObjects(0x06edd4)
+	// "spawnIdenticalChildObjects(0x06edd4)" replaced by:
+	spawnChildObjects(0x06e95a, 0, 8, 4)		// Rotating green orbs
 }
 
 

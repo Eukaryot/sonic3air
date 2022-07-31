@@ -333,7 +333,8 @@ function void fn090436()
 			objA0.flags38 ^= 0x02
 			if (objA0.flags38 & 0x02)
 			{
-				spawnIdenticalChildObjects(0x090658)
+				// "spawnIdenticalChildObjects(0x090658)" replaced by:
+				spawnChildObjects(0x0904ba, 0, 12, 2)
 			}
 		}
 

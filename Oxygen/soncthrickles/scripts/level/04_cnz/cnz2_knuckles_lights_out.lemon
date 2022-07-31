@@ -17,13 +17,13 @@ function void fn06229e()
 		return
 	}
 
-	#if STANDALONE
-		if (Game.isTimeAttack())
-		{
-			UnloadObject()
-			return
-		}
-	#endif
+#if STANDALONE
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
 
 	A1 = 0x06228e
 	if (InitBoss(0x0622b2))

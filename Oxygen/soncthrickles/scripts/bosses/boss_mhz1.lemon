@@ -447,7 +447,9 @@ function void fn07560c()
 			u32[A0 + 0x30] = 0x075f02
 			objA0.countdown_callback = 0x07566e
 			--u8[A0 + 0x42]
-			spawnChildObjects(0x075e9e)
+
+			// "spawnChildObjects(0x075e9e)" replaced by:
+			spawnChildObject(0x07583a, 0x00, 0, -8)		// Disembodied head
 		}
 	}
 }

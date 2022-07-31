@@ -45,9 +45,16 @@ function void fn087172()
 	objA0.countdown_value = 0x3b
 	objA0.countdown_callback = 0x0871c2
 
-	A2 = (objA0.render_flags & render_flag.FLIP_X) ? 0x087686 : 0x087680
-
-	SpawnChildObjectChain()
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		// "spawnChildObjectChain(0x087686)" replaced by:
+		spawnChildObjectsChain(0x087248, 5)		// Throwing arm facing right
+	}
+	else
+	{
+		// "spawnChildObjectChain(0x087680)" replaced by:
+		spawnChildObjectsChain(0x08724e, 5)		// Throwing arm facing left
+	}
 }
 
 
@@ -542,7 +549,8 @@ function void fn0875b4()
 	objA0.animation.sprite = 4
 	playSound(SFX_BOMBFALL)
 
-	spawnProjectileChildObjects(0x08769c)
+	// "spawnProjectileChildObjects(0x08769c)" replaced by:
+	spawnProjectileChildObject(0x086d4a, 0x00, 0, 0, -512, -1024, 0x087674, 0x000000, 0x084bc0)		// Thrown coconut
 	if (_equal())
 	{
 		if (objA0.flags38 & 0x08)
@@ -571,8 +579,7 @@ function void fn087638()
 //# address-hook(0x086d4a) end(0x086d58)
 function void fn086d4a()
 {
-	A1 = u32[A0 + 0x3e]
-	SetupObjectAttributesFull()
+	setupObjectAttributesFull(objA0.child_attributes_offset)
 	objA0.update_address = 0x086d5e
 	objA0.flags2b |= char.bonus.DEFLECTABLE
 	fn086d5e()

@@ -86,8 +86,11 @@ function void fn078562()
 	level.bossarea.top = 0x07a8
 	level.bossarea.bottom = objA0.position.y.u16
 
-	spawnChildObjectHierarchy(0x078d84)
-	spawnChildObjectHierarchy(0x078d8a)
+	// "spawnChildObjectHierarchy(0x078d84)" replaced by:
+	spawnChildObjectsHierarchy(0x07880a, 12)		// Wiggling shooting arm on the right
+
+	// "spawnChildObjectHierarchy(0x078d8a)" replaced by:
+	spawnChildObjectsHierarchy(0x0787fe, 12)		// Wiggling shooting arm on the left
 }
 
 
@@ -565,7 +568,8 @@ function void fn0789ca()
 
 	playSound(0x98)
 
-	spawnChildObjectsInDir(0x078d90)
+	// "spawnChildObjectsInDir(0x078d90)" replaced by:
+	spawnChildObjectInDir(0x078a02, 0x00, 8, 0)		// Tiny bullets shot by the wiggling arms
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = objA0.value39

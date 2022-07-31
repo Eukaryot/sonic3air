@@ -68,7 +68,8 @@ function void fn08dd52()
 	// "spawnChildObjects(0x08dfae)" replaced by:
 	spawnChildObject(0x08df3c, 0x00, 0, 0)
 
-	spawnChildObjectChain(0x08dfb6)
+	// "spawnChildObjectChain(0x08dfb6)" replaced by:
+	spawnChildObjectsChain(0x08de26, 7)
 
 	D0.u16 = 0x0200
 	objA0.value3e = D0.u16

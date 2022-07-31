@@ -312,7 +312,8 @@ function void fn07e016()
 	u16[A0 + 0x3c] = 0x0200
 	u16[A0 + 0x26] = 0x0100
 
-	spawnChildObjectHierarchy(0x07efb6)
+	// "spawnChildObjectHierarchy(0x07efb6)" replaced by:
+	spawnChildObjectsHierarchy(0x07e4ce, 2)		// Orbiting spiked platforms in second phase
 }
 
 

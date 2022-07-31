@@ -725,6 +725,10 @@ function void fn08450e()		// "Animate_RawCheckResult" in skdisasm
 //# address-hook(0x084512) end(0x084550)
 function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
 {
+	// D2 = 0	-> No change
+	// D2 = 1	-> Change to next frame
+	// D2 = -1	-> Reached end of animation, decide next step
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) >= 0)
 	{
@@ -837,6 +841,12 @@ function void fn08459c()		// "Animate_RawMultiDelay" in skdisasm
 //# address-hook(0x0845a0)
 function void fn0845a0()		// "Animate_RawNoSSTMultiDelay" in skdisasm
 {
+	// D2 = 0	-> Animation running, no frame change
+	// D2 = 1	-> Animation running, change to next frame
+	// D2 = -1	-> Animation stopped
+	// _setZeroFlagByValue(0)	-> No frame update, or reached end of animation
+	// _setZeroFlagByValue(1)	-> Frame updated
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) >= 0)
 	{
@@ -938,6 +948,10 @@ function void fn08460e()		// "Animate_RawMultiDelayFlipX" in skdisasm
 //# address-hook(0x084612) end(0x084648)
 function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 {
+	// D2 = 0	-> Animation running, no frame change
+	// D2 = 1	-> Animation running, change to next frame
+	// D2 = -1	-> Animation stopped
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
@@ -980,6 +994,10 @@ function void fn08464a()		// "Animate_RawMultiDelayFlipY" in skdisasm
 //# address-hook(0x08464e) end(0x084686)
 function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
 {
+	// D2 = 0	-> Animation running, no frame change
+	// D2 = 1	-> Animation running, change to next frame
+	// D2 = -1	-> Animation stopped
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
@@ -1022,6 +1040,12 @@ function void fn084688()		// "Animate_Raw2MultiDelay" in skdisasm
 //# address-hook(0x08468c) end(0x0846ca)
 function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 {
+	// D2 = 0	-> No change
+	// D2 = 1	-> Change to next frame
+	// D2 = -1	-> Reached end of animation, decide next step
+	// _setZeroFlagByValue(0)	-> No frame update, or reached end of animation
+	// _setZeroFlagByValue(1)	-> Frame updated, but not looping
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) >= 0)
 	{

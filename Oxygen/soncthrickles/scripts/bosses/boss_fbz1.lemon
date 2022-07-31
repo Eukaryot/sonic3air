@@ -441,7 +441,8 @@ function void fn06f1fa()
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x06f224
 
-	spawnChildObjectChain(0x06faa2)
+	// "spawnChildObjectChain(0x06faa2)" replaced by:
+	spawnChildObjectsChain(0x06f3de, 5)		// Arms
 }
 
 

@@ -128,7 +128,8 @@ function bool BossSOZ1.slideAsRock()
 		if (abs(objA0.velocity.x) >= 0x80 && (abs(objA0.velocity.x) & 0xf0) == 0)
 		{
 			// Spawn dust effects
-			spawnIdenticalChildObjects(0x07740a)
+			// "spawnIdenticalChildObjects(0x07740a)" replaced by:
+			spawnChildObjects(0x07706c, 0, 4, 6)
 		}
 	}
 
@@ -195,7 +196,8 @@ function void fn076b86()
 	objA0.countdown_value = 0x07
 	objA0.countdown_callback = 0x076bb6
 
-	spawnIdenticalChildObjects(0x0773d6)
+	// "spawnIdenticalChildObjects(0x0773d6)" replaced by:
+	spawnChildObjects(0x076f0e, 0, 0, 8)
 }
 
 
@@ -298,7 +300,8 @@ function void fn076c72()
 
 	playSound(0x61)
 
-	spawnIdenticalChildObjects(0x077402)
+	// "spawnIdenticalChildObjects(0x077402)" replaced by:
+	spawnChildObjects(0x07706c, -4, 56, 6)		// Dust effects
 }
 
 
@@ -326,7 +329,9 @@ function void fn076ca2()
 
 	playSound(0x5f)
 
-	spawnIdenticalChildObjects(0x07740a)
+	// Spawn dust effects
+	// "spawnIdenticalChildObjects(0x07740a)" replaced by:
+	spawnChildObjects(0x07706c, 0, 4, 6)
 }
 
 

@@ -43,7 +43,8 @@ function void fn08e670()
 	objA0.countdown_value = objA0.subtype2c - 1
 	u16[A0 + 0x3a] = objA0.subtype2c * 2 - 1
 
-	spawnChildObjectChain(0x08ea5a)
+	// "spawnChildObjectChain(0x08ea5a)" replaced by:
+	spawnChildObjectsChain(0x08e744, 6)		// Stinger
 }
 
 

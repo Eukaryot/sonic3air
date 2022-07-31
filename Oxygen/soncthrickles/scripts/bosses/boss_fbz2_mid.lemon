@@ -73,7 +73,8 @@ function void fn06fd38()
 		u8[A1 + 0x2c] = 0x49
 	}
 
-	spawnIdenticalChildObjects(0x0703c8)
+	// "spawnIdenticalChildObjects(0x0703c8)" replaced by:
+	spawnChildObjects(0x06ff5c, 0, 0, 4)		// Force field generators
 }
 
 
@@ -92,7 +93,9 @@ function void fn06fdc0()
 	if ((objA0.flags38 & 0x80) == 0)
 	{
 		objA0.flags38 |= 0x80
-		spawnIdenticalChildObjects(0x0703e4)
+
+		// "spawnIdenticalChildObjects(0x0703e4)" replaced by:
+		spawnChildObjects(0x070118, 0, 0, 2)		// Force field effect
 	}
 }
 

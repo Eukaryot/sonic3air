@@ -95,7 +95,8 @@ function void fn089212()
 
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
-		spawnIdenticalChildObjects(0x08935a)
+		// "spawnIdenticalChildObjects(0x08935a)" replaced by:
+		spawnChildObjects(0x0892a0, 0, 0, 2)
 	}
 }
 

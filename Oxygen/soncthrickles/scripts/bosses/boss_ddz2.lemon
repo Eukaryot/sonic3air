@@ -624,7 +624,9 @@ function void fn08307c()
 	if (D0.u16 < u16[0xffffb000 + 0x14])
 	{
 		playSound(0x98)
-		spawnSimpleChildObjects(0x083288)
+
+		// "spawnSimpleChildObjects(0x083288)" replaced by:
+		spawnSimpleChildObjects(0x0825ca, 4)		// Blue spike balls
 	}
 	else
 	{
@@ -707,7 +709,8 @@ function void fn082652()
 	{
 		if ((global.framecounter.low & 0x07) == 0)
 		{
-			spawnSimpleChildObjects(0x0832a2)
+			// "spawnSimpleChildObjects(0x0832a2)" replaced by:
+			spawnSimpleChildObjects(0x0826a0, 1)		// Puffs of smoke
 		}
 	}
 

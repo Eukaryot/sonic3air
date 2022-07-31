@@ -601,7 +601,7 @@ function void fn063916()
 {
 	setupObjectAttributesBasic(0x066498)
 	objA0.update_address = 0x063946
-	objA0.countdown_callback = 0x0852a0
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 
 	GetRandomNumber()
 	objA0.velocity.x = (D0.u16 & 0x7f) - 0x3f
@@ -624,7 +624,7 @@ function void fn063946()
 function void fn06395c()
 {
 	setupObjectAttributesFull(0x083fb4)
-	objA0.countdown_callback = 0x0852a0
+	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
 	playSound(0xb4)
 
 	D0 = objA0.subtype2c

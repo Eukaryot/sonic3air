@@ -92,7 +92,12 @@ function void fn08fb76()
 	objA0.base_state = 0
 #endif
 
-	spawnProjectileChildObjects(0x08fbd6)
+	// Spawn flying explosion debris
+	// "spawnProjectileChildObjects(0x08fbd6)" replaced by:
+	spawnProjectileChildObject(0x08fb90, 0x00, -4, 4, -1024, -512, 0x08fbd0, 0x08fc8b, 0x08fbb8)
+	spawnProjectileChildObject(0x08fb90, 0x02, 4, 4, 1024, -512, 0x08fbd0, 0x08fc8b, 0x08fbb8)
+	spawnProjectileChildObject(0x08fb90, 0x04, -8, -8, -512, -1024, 0x08fbd0, 0x08fc87, 0x08fbb8)
+	spawnProjectileChildObject(0x08fb90, 0x06, 8, -8, 512, -1024, 0x08fbd0, 0x08fc87, 0x08fbb8)
 }
 
 
@@ -102,8 +107,7 @@ function void fn08fb76()
 //# address-hook(0x08fb90) end(0x08fbb2)
 function void fn08fb90()
 {
-	A1 = u32[A0 + 0x3e]
-	SetupObjectAttributesBasic()
+	setupObjectAttributesBasic(objA0.child_attributes_offset)
 	objA0.flags2b |= char.bonus.DEFLECTABLE
 	objA0.update_address = 0x086d5e
 	objA0.animation.sprite = 6 + (objA0.subtype2c >> 2)

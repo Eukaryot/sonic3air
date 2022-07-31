@@ -69,7 +69,8 @@ function void fn0729de()
 	spawnChildObject(0x0730f8, 0x02, 0, 48)
 	spawnChildObject(0x073100, 0x04, 0, 92)
 
-	spawnIdenticalChildObjects(0x0737e8)
+	// "spawnIdenticalChildObjects(0x0737e8)" replaced by:
+	spawnChildObjects(0x073396, 0, 0, 1)
 }
 
 
@@ -343,7 +344,8 @@ function void fn07308e()
 	objA0.update_address = 0x0730b0
 	objA0.countdown_callback = 0x0730b0
 
-	spawnIdenticalChildObjects(0x0737ba)
+	// "spawnIdenticalChildObjects(0x0737ba)" replaced by:
+	spawnChildObjects(0x0731ce, 0, 0, 2)
 }
 
 

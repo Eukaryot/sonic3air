@@ -487,7 +487,9 @@ function void fn070a46()
 	}
 	u16[A0 + 0x44] = u16[A1 + 0x46]
 
-	spawnIdenticalChildObjects(0x070efc)
+	// "spawnIdenticalChildObjects(0x070efc)" replaced by:
+	spawnChildObjects(0x070aa2, 0, 0, 4)		// Part of the arms
+
 	fn070a76()
 }
 
@@ -808,8 +810,7 @@ function void fn070d10()
 	D0.u16 *= 2
 	u32[A0 + 0x30] = u32[0x070d64 + D0.s16]
 
-	A1 = u32[0x070d88 + D0.s16]
-	SetupObjectAttributesFull()
+	setupObjectAttributesFull(u32[0x070d88 + D0.s16])
 
 	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	MoveWithParent()

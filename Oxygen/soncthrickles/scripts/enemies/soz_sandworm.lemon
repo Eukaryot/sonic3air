@@ -55,7 +55,8 @@ function void fn08eaaa()
 	objA0.countdown_callback = 0x08ead2
 	if (objA0.flags38 & 0x80)
 	{
-		spawnIdenticalChildObjects(0x08ed6c)
+		// "spawnIdenticalChildObjects(0x08ed6c)" replaced by:
+		spawnChildObjects(0x08ebe2, 0, -8, 8)
 	}
 }
 

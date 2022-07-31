@@ -264,7 +264,8 @@ function void fn08ff72()
 {
 	playSound(0x97)
 
-	spawnChildObjectsInDir(0x090040)
+	// "spawnChildObjectsInDir(0x090040)" replaced by:
+	spawnChildObjectInDir(0x08fdba, 0x00, -12, 8)		// Toxic smoke
 	if (_equal())
 	{
 		u16[A0 + 0x44] = A1.u16

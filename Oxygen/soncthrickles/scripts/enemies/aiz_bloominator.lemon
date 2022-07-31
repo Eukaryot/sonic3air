@@ -86,7 +86,9 @@ function void fn086dc6()
 		return
 
 	playSound(0x4d)
-	spawnProjectileChildObjects(0x086e2a)
+
+	// "spawnProjectileChildObjects(0x086e2a)" replaced by:
+	spawnProjectileChildObject(0x086d4a, 0x00, 0, -16, 256, -1280, 0x086e1e, 0x000000, 0x01ab32)	// Spike ball
 	if (_equal())
 	{
 		++objA0.value39

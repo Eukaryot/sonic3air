@@ -40,7 +40,8 @@ function void fn08e1aa()
 	if (SetupObjectAttributesSlotted(0x08e3d8))
 		return
 
-	spawnChildObjectsInDir(0x08e402)
+	// "spawnChildObjectsInDir(0x08e402)" replaced by:
+	spawnChildObjectInDir(0x08e2be, 0x00, 0, 28)		// Weather vane perch
 }
 
 

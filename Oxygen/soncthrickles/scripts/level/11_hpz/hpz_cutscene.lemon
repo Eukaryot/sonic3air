@@ -1255,7 +1255,8 @@ function void fn064f20()
 		objA0.collision_attributes = collision.size.24x24
 		u8[A0 + 0x29] = 0xff
 
-		spawnIdenticalChildObjects(0x066624)
+		// "spawnIdenticalChildObjects(0x066624)" replaced by:
+		spawnChildObjects(0x06531e, 8, -4, 2)
 	}
 
 	fn066348()
@@ -1697,8 +1698,16 @@ function void fn06531e()
 	objA0.update_address = 0x065348
 	objA0.countdown_value = 0xf0
 
-	A2 = (objA0.subtype2c == 0) ? 0x06662c : 0x066632
-	SpawnChildObjectHierarchy()
+	if (objA0.subtype2c == 0)
+	{
+		// "spawnChildObjectHierarchy(0x06662c)" replaced by:
+		spawnChildObjectsHierarchy(0x065376, 10)		// Electrifying tentacle on the left
+	}
+	else
+	{
+		// "spawnChildObjectHierarchy(0x066632)" replaced by:
+		spawnChildObjectsHierarchy(0x065360, 10)		// Electrifying tentacle on the right
+	}
 }
 
 

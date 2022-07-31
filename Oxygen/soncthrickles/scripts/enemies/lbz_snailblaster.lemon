@@ -278,7 +278,8 @@ function void fn08c1d8()
 		{
 			playSound(0x4d)
 
-			spawnProjectileChildObjects(0x08c29e)
+			// "spawnProjectileChildObjects(0x08c29e)" replaced by:
+			spawnProjectileChildObject(0x086d4a, 0x00, 0, 0, -512, -256, 0x08c27e, 0x000000, 0x01ab52)
 
 			A2 = 0xffff0000 + u16[A0 + 0x46]
 			if (u8[A2 + 0x04] & 0x01)

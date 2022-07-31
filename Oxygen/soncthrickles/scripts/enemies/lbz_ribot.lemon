@@ -113,13 +113,30 @@ function void fn08c594()
 	D0.u8 = u8[A1 + 0x2c] - 2
 	if (D0.u8 == 0)
 	{
-		A2 = (objA0.subtype2c == 0) ? 0x08c60e : 0x08c616
+		if (objA0.subtype2c == 0)
+		{
+			// "spawnIdenticalChildObjects(0x08c60e)" replaced by:
+			spawnChildObjects(0x08c502, 12, 0, 3)
+		}
+		else
+		{
+			// "spawnIdenticalChildObjects(0x08c616)" replaced by:
+			spawnChildObjects(0x08c502, -12, 0, 3)
+		}
 	}
 	else
 	{
-		A2 = (D0.s8 > 0) ? 0x08c61e : 0x08c606
+		if (D0.s8 > 0)
+		{
+			// "spawnIdenticalChildObjects(0x08c61e)" replaced by:
+			spawnChildObjects(0x08c502, 0, 0, 3)
+		}
+		else
+		{
+			// "spawnIdenticalChildObjects(0x08c606)" replaced by:
+			spawnChildObjects(0x08c502, 0, -12, 3)
+		}
 	}
-	SpawnIdenticalChildObjects()
 }
 
 

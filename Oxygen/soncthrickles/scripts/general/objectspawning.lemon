@@ -482,11 +482,16 @@ function void spawnChildObjects(u32 address)
 
 			for (u16 i = 0; i < count; ++i)
 			{
+				u32 updateAddress = u32[A2]
+				s8 offset_x = s8[A2 + 4]
+				s8 offset_y = s8[A2 + 5]
+				u8 subtype = (i * 2)
+
 				ROMDataAnalyser.beginObject(stringformat("%d", i))
-				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[A2]))
-				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", i * 2))
-				ROMDataAnalyser.addKeyValue("offset_x", stringformat("0x%02x", u8[A2+4]))
-				ROMDataAnalyser.addKeyValue("offset_y", stringformat("0x%02x", u8[A2+5]))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
 				ROMDataAnalyser.endObject()
 				A2 += 6
 			}
@@ -501,24 +506,148 @@ function void spawnProjectileChildObjects(u32 address)
 {
 	A2 = address
 	SpawnProjectileChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnProjectileChildObjects")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				u32 attributesOffset = u32[A2 + 4]
+				u32 animationOffset = u32[A2 + 8]
+				u32 callbackAddress = u32[A2 + 12]
+				s8 offset_x = s8[A2 + 16]
+				s8 offset_y = s8[A2 + 17]
+				s16 velocity_x = s16[A2 + 18]
+				s16 velocity_y = s16[A2 + 20]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("attributesOffset", stringformat("0x%06x", attributesOffset))
+				ROMDataAnalyser.addKeyValue("animationOffset", stringformat("0x%06x", animationOffset))
+				ROMDataAnalyser.addKeyValue("callbackAddress", stringformat("0x%06x", callbackAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+				ROMDataAnalyser.addKeyValue("velocity_x", stringformat((velocity_x < 0) ? "-%d" : "%d", abs(velocity_x)))
+				ROMDataAnalyser.addKeyValue("velocity_y", stringformat((velocity_y < 0) ? "-%d" : "%d", abs(velocity_y)))
+				ROMDataAnalyser.endObject()
+				A2 += 22
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnIdenticalChildObjects(u32 address)
 {
 	A2 = address
 	SpawnIdenticalChildObjects()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+			s8 offset_x = s8[address + 6]
+			s8 offset_y = s8[address + 7]
+
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnIdenticalChildObjects")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+			ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+			ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnChildObjectChain(u32 address)
 {
 	A2 = address
 	SpawnChildObjectChain()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnChildObjectChain")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnProjectileChildObjectsInDir(u32 address)
 {
 	A2 = address
 	SpawnProjectileChildObjectsInDir()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnProjectileChildObjectsInDir")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				u32 attributesOffset = u32[A2 + 4]
+				u32 animationOffset = u32[A2 + 8]
+				u32 callbackAddress = u32[A2 + 12]
+				s8 offset_x = s8[A2 + 16]
+				s8 offset_y = s8[A2 + 17]
+				s16 velocity_x = s16[A2 + 18]
+				s16 velocity_y = s16[A2 + 20]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("attributesOffset", stringformat("0x%06x", attributesOffset))
+				ROMDataAnalyser.addKeyValue("animationOffset", stringformat("0x%06x", animationOffset))
+				ROMDataAnalyser.addKeyValue("callbackAddress", stringformat("0x%06x", callbackAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+				ROMDataAnalyser.addKeyValue("velocity_x", stringformat((velocity_x < 0) ? "-%d" : "%d", abs(velocity_x)))
+				ROMDataAnalyser.addKeyValue("velocity_y", stringformat((velocity_y < 0) ? "-%d" : "%d", abs(velocity_y)))
+				ROMDataAnalyser.endObject()
+				A2 += 22
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnSimpleChildObjects(u32 address)
@@ -531,10 +660,13 @@ function void spawnSimpleChildObjects(u32 address)
 	{
 		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
 		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+
 			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
 			ROMDataAnalyser.addKeyValue("function", "SpawnSimpleChildObjects")
-			ROMDataAnalyser.addKeyValue("count", stringformat("%d", u16[address] + 1))
-			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", u32[address + 2]))
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
 			ROMDataAnalyser.endEntry()
 		}
 	}
@@ -545,18 +677,97 @@ function void spawnChildObjectHierarchy(u32 address)
 {
 	A2 = address
 	SpawnChildObjectHierarchy()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			u16 count = u16[address] + 1
+			u32 updateAddress = u32[address + 2]
+
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnChildObjectHierarchy")
+			ROMDataAnalyser.addKeyValue("count", stringformat("%d", count))
+			ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnUniqueChildObjectHierarchy(u32 address)
 {
 	A2 = address
 	SpawnUniqueChildObjectHierarchy()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnUniqueChildObjectHierarchy")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.endObject()
+				A2 += 4
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 function void spawnChildObjectsInDir(u32 address)
 {
 	A2 = address
 	SpawnChildObjectsInDir()
+
+#if STANDALONE
+	if (ROMDataAnalyser.isEnabled())
+	{
+		if (!ROMDataAnalyser.hasEntry("ChildSpawnList", address))
+		{
+			ROMDataAnalyser.beginEntry("ChildSpawnList", address)
+			ROMDataAnalyser.addKeyValue("function", "SpawnChildObjectsInDir")
+
+			A2 = address
+			u16 count = u16[A2] + 1
+			A2 += 2
+
+			for (u16 i = 0; i < count; ++i)
+			{
+				u32 updateAddress = u32[A2]
+				s8 offset_x = s8[A2 + 4]
+				s8 offset_y = s8[A2 + 5]
+				u8 subtype = (i * 2)
+
+				ROMDataAnalyser.beginObject(stringformat("%d", i))
+				ROMDataAnalyser.addKeyValue("update_routine", stringformat("0x%06x", updateAddress))
+				ROMDataAnalyser.addKeyValue("subtype", stringformat("0x%02x", subtype))
+				ROMDataAnalyser.addKeyValue("offset_x", stringformat((offset_x < 0) ? "-%d" : "%d", abs(offset_x)))
+				ROMDataAnalyser.addKeyValue("offset_y", stringformat((offset_y < 0) ? "-%d" : "%d", abs(offset_y)))
+				ROMDataAnalyser.endObject()
+				A2 += 6
+			}
+
+			ROMDataAnalyser.endEntry()
+		}
+	}
+#endif
 }
 
 //# address-hook(0x084060) end(0x0840ae)
@@ -596,8 +807,8 @@ function bool spawnChildObject(u32 updateAddress, u8 subtype, s8 offset_x, s8 of
 	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
 	u16[A1 + 0x46] = A0.u16								// Reference to parent
 
-	u8[A1 + 0x42] = offset_x
-	u8[A1 + 0x43] = offset_y
+	s8[A1 + 0x42] = offset_x
+	s8[A1 + 0x43] = offset_y
 	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
 	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
 
@@ -622,35 +833,49 @@ function void SpawnProjectileChildObjects()
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+		u32 attributesOffset = u32[A2 + 4]
+		u32 animationOffset = u32[A2 + 8]
+		u32 callbackAddress = u32[A2 + 12]
+		s8 offset_x = s8[A2 + 16]
+		s8 offset_y = s8[A2 + 17]
+		s16 velocity_x = s16[A2 + 18]
+		s16 velocity_y = s16[A2 + 20]
+
+		if (!spawnProjectileChildObject(updateAddress, D2.u8, offset_x, offset_y, velocity_x, velocity_y, attributesOffset, animationOffset, callbackAddress))
 			return
-
-		// Basic initialization as above
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
-
-		u32[A1 + 0x3e] = u32[A2+4]
-		u32[A1 + 0x30] = u32[A2+8]
-		u32[A1 + 0x34] = u32[A2+12]
-
-		s8 offset_x = s8[A2+16]
-		s8 offset_y = s8[A2+17]
-		s8[A1 + 0x42] = offset_x
-		s8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
-
-		objA1.velocity.x = s16[A2+18]
-		objA1.velocity.y = s16[A2+20]
 
 		A2 += 22
 		D2.u16 += 2
 	}
+}
+
+function bool spawnProjectileChildObject(u32 updateAddress, u8 subtype, s8 offset_x, s8 offset_y, s16 velocity_x, s16 velocity_y, u32 attributesOffset, u32 animationOffset, u32 callbackAddress)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	// Basic initialization as above
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+	u16[A1 + 0x46] = A0.u16								// Reference to parent
+
+	objA1.child_attributes_offset = attributesOffset
+	u32[A1 + 0x30] = animationOffset
+	objA1.countdown_callback = callbackAddress
+
+	s8[A1 + 0x42] = offset_x
+	s8[A1 + 0x43] = offset_y
+	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+	objA1.velocity.x = velocity_x
+	objA1.velocity.y = velocity_y
 
 	_setZeroFlagByValue(false)
+	return true
 }
 
 
@@ -662,33 +887,24 @@ function void SpawnIdenticalChildObjects()
 	//  - Update routine
 	//  - Offset relative to parent
 
-	D2 = 0
 	u16 count = u16[A2] + 1
-	A2 += 2
+	u32 updateAddress = u32[A2 + 2]
+	s8 offset_x = s8[A2 + 6]
+	s8 offset_y = s8[A2 + 7]
+	spawnChildObjects(updateAddress, offset_x, offset_y, count)
+}
 
+function void spawnChildObjects(u32 updateAddress, s8 offset_x, s8 offset_y, u16 count)
+{
+	D2 = 0
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
-			return
-
 		// Basic initialization as above
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
-
-		s8 offset_x = s8[A2+4]
-		s8 offset_y = s8[A2+5]
-		s8[A1 + 0x42] = offset_x
-		s8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+		if (!spawnChildObject(updateAddress, D2.u8, offset_x, offset_y))
+			return
 
 		D2.u16 += 2
 	}
-
-	_setZeroFlagByValue(false)
 }
 
 
@@ -699,11 +915,15 @@ function void SpawnChildObjectChain()
 	// Stored data, shared for all children:
 	//  - Update routine
 
+	u16 count = u16[A2] + 1
+	u32 updateAddress = u32[A2 + 2]
+	spawnChildObjectsChain(updateAddress, count)
+}
+
+function void spawnChildObjectsChain(u32 updateAddress, u16 count)
+{
 	A3 = A0
 	D2 = 0
-	u16 count = u16[A2] + 1
-	A2 += 2
-
 	for (u16 i = 0; i < count; ++i)
 	{
 		if (!allocDynamicObjectAfterA0())
@@ -714,10 +934,10 @@ function void SpawnChildObjectChain()
 		u16[A3 + 0x44] = A1.u16
 		A3 = A1
 
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
+		objA1.update_address = updateAddress
+		objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
 		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
+		objA1.subtype2c = D2.u8								// A simple enumeration of children (in steps of 2)
 
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -745,35 +965,49 @@ function void SpawnProjectileChildObjectsInDir()
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+		u32 attributesOffset = u32[A2 + 4]
+		u32 animationOffset = u32[A2 + 8]
+		u32 callbackAddress = u32[A2 + 12]
+		s8 offset_x = s8[A2 + 16]
+		s8 offset_y = s8[A2 + 17]
+		s16 velocity_x = s16[A2 + 18]
+		s16 velocity_y = s16[A2 + 20]
+
+		if (!spawnProjectileChildObjectInDir(updateAddress, D2.u8, offset_x, offset_y, velocity_x, velocity_y, attributesOffset, animationOffset, callbackAddress))
 			return
-
-		// Basic initialization as above
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
-
-		u32[A1 + 0x3e] = u32[A2+4]
-		u32[A1 + 0x30] = u32[A2+8]
-		u32[A1 + 0x34] = u32[A2+12]
-
-		s8 offset_x = s8[A2+16]
-		s8 offset_y = s8[A2+17]
-		s8[A1 + 0x42] = offset_x
-		s8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + ((objA0.render_flags & render_flag.FLIP_X) ? -offset_x : offset_x)
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
-
-		objA1.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -s16[A2+18] : s16[A2+18]
-		objA1.velocity.y = s16[A2+20]
 
 		A2 += 22
 		D2.u16 += 2
 	}
+}
+
+function bool spawnProjectileChildObjectInDir(u32 updateAddress, u8 subtype, s8 offset_x, s8 offset_y, s16 velocity_x, s16 velocity_y, u32 attributesOffset, u32 animationOffset, u32 callbackAddress)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	// Basic initialization as above
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+	u16[A1 + 0x46] = A0.u16								// Reference to parent
+
+	objA1.child_attributes_offset = attributesOffset
+	u32[A1 + 0x30] = animationOffset
+	objA1.countdown_callback = callbackAddress
+
+	s8[A1 + 0x42] = offset_x
+	s8[A1 + 0x43] = offset_y
+	objA1.position.x.u16 = objA0.position.x.u16 + ((objA0.render_flags & render_flag.FLIP_X) ? -offset_x : offset_x)
+	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
+
+	objA1.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? -velocity_x : velocity_x
+	objA1.velocity.y = velocity_y
 
 	_setZeroFlagByValue(false)
+	return true
 }
 
 
@@ -785,7 +1019,7 @@ function void SpawnSimpleChildObjects()
 	//  - Update routine
 
 	u16 count = u16[A2] + 1
-	u32 updateAddress = u32[A2+2]
+	u32 updateAddress = u32[A2 + 2]
 	spawnSimpleChildObjects(updateAddress, count)
 }
 
@@ -822,33 +1056,21 @@ function void SpawnChildObjectHierarchy()
 	// Stored data, shared for all children:
 	//  - Update routine
 
-	A3 = A0
-	D2 = 0
 	u16 count = u16[A2] + 1
-	A2 += 2
+	u32 updateAddress = u32[A2 + 2]
+	spawnChildObjectsHierarchy(updateAddress, count)
+}
 
+function void spawnChildObjectsHierarchy(u32 updateAddress, u16 count)
+{
+	D2 = 0
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		if (!spawnChildObjectHierarchy(updateAddress, D2.u8))
 			return
-
-		// Add references to the direct parent and to the root
-		u16[A1 + 0x46] = A3.u16
-		u16[A1 + 0x44] = A0.u16
-		A3 = A1
-
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-
-		objA1.position.x.u16 = objA0.position.x.u16
-		objA1.position.y.u16 = objA0.position.y.u16
 
 		D2.u16 += 2
 	}
-
-	_setZeroFlagByValue(false)
 }
 
 
@@ -859,33 +1081,45 @@ function void SpawnUniqueChildObjectHierarchy()
 	// Stored data per child:
 	//  - Update routine
 
-	A3 = A0
 	D2 = 0
 	u16 count = u16[A2] + 1
 	A2 += 2
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+
+		if (!spawnChildObjectHierarchy(updateAddress, D2.u8))
 			return
-
-		u16[A1 + 0x46] = A3.u16
-		u16[A1 + 0x44] = A0.u16
-		A3 = A1
-
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-
-		objA1.position.x.u16 = objA0.position.x.u16
-		objA1.position.y.u16 = objA0.position.y.u16
 
 		A2 += 4
 		D2.u16 += 2
 	}
+}
+
+function bool spawnChildObjectHierarchy(u32 updateAddress, u8 subtype)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	if (subtype == 0)
+		A3 = A0
+
+	// Add references to the direct parent and to the root
+	u16[A1 + 0x46] = A3.u16
+	u16[A1 + 0x44] = A0.u16
+	A3 = A1
+
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from root
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+
+	objA1.position.x.u16 = objA0.position.x.u16
+	objA1.position.y.u16 = objA0.position.y.u16
 
 	_setZeroFlagByValue(false)
+	return true
 }
 
 
@@ -903,31 +1137,41 @@ function void SpawnChildObjectsInDir()
 
 	for (u16 i = 0; i < count; ++i)
 	{
-		if (!allocDynamicObjectAfterA0())
+		u32 updateAddress = u32[A2]
+		s8 offset_x = s8[A2 + 4]
+		s8 offset_y = s8[A2 + 5]
+
+		if (!spawnChildObjectInDir(updateAddress, D2.u8, offset_x, offset_y))
 			return
-
-		// Basic initialization as above
-		objA1.update_address = u32[A2]
-		objA1.mapping_offset = objA0.mapping_offset
-		objA1.sprite_attributes = objA0.sprite_attributes
-		objA1.subtype2c = D2.u8
-		u16[A1 + 0x46] = A0.u16
-
-		s8 offset_x = s8[A2+4]
-		s8 offset_y = s8[A2+5]
-		if (objA0.render_flags & render_flag.FLIP_X)
-		{
-			objA1.render_flags |= render_flag.FLIP_X
-			offset_x = -offset_x
-		}
-		s8[A1 + 0x42] = offset_x
-		u8[A1 + 0x43] = offset_y
-		objA1.position.x.u16 = objA0.position.x.u16 + offset_x
-		objA1.position.y.u16 = objA0.position.y.u16 + offset_y
 
 		A2 += 6
 		D2.u16 += 2
 	}
+}
+
+function bool spawnChildObjectInDir(u32 updateAddress, u8 subtype, s8 offset_x, s8 offset_y)
+{
+	if (!allocDynamicObjectAfterA0())
+		return false
+
+	// Basic initialization as above
+	objA1.update_address = updateAddress
+	objA1.mapping_offset = objA0.mapping_offset			// Mapping offset and attributes are copied from parent
+	objA1.sprite_attributes = objA0.sprite_attributes
+	objA1.subtype2c = subtype							// Usually a simple enumeration of children (in steps of 2)
+	u16[A1 + 0x46] = A0.u16
+
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		objA1.render_flags |= render_flag.FLIP_X
+		offset_x = -offset_x
+	}
+
+	s8[A1 + 0x42] = offset_x
+	s8[A1 + 0x43] = offset_y
+	objA1.position.x.u16 = objA0.position.x.u16 + offset_x
+	objA1.position.y.u16 = objA0.position.y.u16 + offset_y
 
 	_setZeroFlagByValue(false)
+	return true
 }

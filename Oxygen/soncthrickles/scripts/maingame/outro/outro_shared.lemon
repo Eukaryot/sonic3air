@@ -363,7 +363,8 @@ function void fn05ea74()
 		u16[A0 + 0x3a] = 0x010b
 		if (outro.ending_type >= 0)
 		{
-			spawnChildObjects(0x0601e8)
+			// "spawnChildObjects(0x0601e8)" replaced by:
+			spawnChildObject(0x05df80, 0x00, -64, -4)		// Chain connecting the master emerald and the Tornado
 		}
 	}
 

@@ -93,7 +93,8 @@ function void fn073960()
 {
 	objA0.base_state = 0x04
 
-	spawnChildObjectChain(0x07418a)
+	// "spawnChildObjectChain(0x07418a)" replaced by:
+	spawnChildObjectsChain(0x073cb0, 4)		// Ball launcher lid/rack
 
 	// "spawnChildObjects(0x07415a)" replaced by:
 	spawnChildObject(0x073d74, 0x00, 112, -24)
