@@ -76,7 +76,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Sonic on the snowboard in ICZ 1
 		if (objA0.update_address == 0x03943a || objA0.update_address == 0x0394a0 || objA0.update_address == 0x0395fe)
 		{
-			u64 key = stringformat("%s_snowboarding_0x%02x", getCharacterSpriteKey(CHARACTER_SONIC), objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_snowboarding_0x%02x", getCharacterSpriteKey(CHARACTER_SONIC)), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x345010, 0x347f8a, objA0.mapping_offset, objA0.animation.sprite, 0x00)
@@ -277,7 +277,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		//  -> Sub-mode that uses "real" Knuckles sprites
 		if ((objA0.update_address == 0x063a6a) || (objA0.update_address == 0x063de0 && u16[A0 + 0x44] == 0) || (objA0.update_address == 0x0656da && (objA0.flags38 & 0x40) == 0) || (objA0.update_address == 0x063466 && objA0.value42 == 0x02))
 		{
-			u64 key = stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES), objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES)), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)
@@ -416,7 +416,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u8 character = (objA0.update_address == 0x00927a) ? getSecondCharacter() : getMainCharacter()
 			u8 atex = (character == CHARACTER_TAILS) ? 0x10 : 0x00
-			u64 key = stringformat("%s_0x%02x", getCharacterBluesphereSpriteKey(character), objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterBluesphereSpriteKey(character)), objA0.animation.sprite)
 			if (Renderer.hasCustomSprite(key))
 			{
 				// Check if there's also a custom palette

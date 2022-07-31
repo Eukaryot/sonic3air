@@ -56,7 +56,7 @@ function void Standalone.drawCharacterSpriteDirect(u8 character, s16 px, s16 py,
 	if (key == 0)
 	{
 		u8 animationSprite = animationSpriteEx
-		key = stringformat("%s_0x%02x", getCharacterSpriteKey(character), animationSprite)
+		key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(character)), animationSprite)
 
 		if (!Renderer.hasCustomSprite(key))
 		{
@@ -223,7 +223,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 		if (key == 0)
 		{
-			key = stringformat("%s_0x%02x", getCharacterSpriteKey(character), animationSprite)
+			key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(character)), animationSprite)
 
 			if (!Renderer.hasCustomSprite(key))
 			{
@@ -259,7 +259,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			}
 		}
 
-		key = stringformat("%s_tails_0x%02x", getCharacterSpriteKey(CHARACTER_TAILS), animationSprite)
+		key = stringformat(stringformat("%s_tails_0x%02x", getCharacterSpriteKey(CHARACTER_TAILS)), animationSprite)
 		if (!Renderer.hasCustomSprite(key))
 		{
 			key = Renderer.setupCustomCharacterSprite(0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00)

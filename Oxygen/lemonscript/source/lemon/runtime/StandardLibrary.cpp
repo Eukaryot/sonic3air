@@ -257,6 +257,8 @@ namespace lemon
 			{
 				if (argv <= 0)
 				{
+					// Warning: This means that additional '%' characters won't be processed at all, which also means that escaped ones won't be reduces to a single one
+					//  -> There's scripts that rely on this exact behavior, so don't ever change that!
 					result.addString(fmtPtr, (int)(fmtEnd - fmtPtr));
 					break;
 				}
