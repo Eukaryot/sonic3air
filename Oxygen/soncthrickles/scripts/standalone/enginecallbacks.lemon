@@ -27,6 +27,9 @@ function void Init()
 
 	if (Game.getSetting(SETTING_DEBUG_MODE))
 		debug_mode.enabled.u8 = 1
+
+	// Just in case a skippable cutscene was still active (this is relevant particularly after loading a save state)
+	Game.endSkippableCutscene()
 #endif
 
 	// Initialization of global variables
