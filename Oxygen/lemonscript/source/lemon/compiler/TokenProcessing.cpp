@@ -666,7 +666,8 @@ namespace lemon
 					token.mParameters[1] = content[0].as<StatementToken>();		// Array index
 					token.mDataType = matchingFunction->getReturnType();
 
-					assignStatementDataType(*token.mParameters[0], &PredefinedDataTypes::UINT_32);
+					assignStatementDataType(*token.mParameters[0], matchingFunction->getParameters()[0].mDataType);
+					assignStatementDataType(*token.mParameters[1], matchingFunction->getParameters()[1].mDataType);
 
 					tokens.erase(i+1);
 				}
