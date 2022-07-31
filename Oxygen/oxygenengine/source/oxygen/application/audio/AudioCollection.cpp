@@ -20,8 +20,9 @@ namespace
 
 	int compareSourceRegistrationPackages(AudioCollection::Package a, AudioCollection::Package b, bool preferOriginalSoundtrack)
 	{
-		const int prioritiesA[3] = { 0, 1, 2 };		// Preferring remastered over original, but modded will always be first
-		const int prioritiesB[3] = { 1, 0, 2 };		// Preferring original over remastered, but modded will always be first
+		static_assert((int)AudioCollection::Package::_NUM == 4);
+		const int prioritiesA[4] = { 0, 1, 2, 3 };		// Preferring remastered over original, but modded will always be first
+		const int prioritiesB[4] = { 0, 2, 1, 3 };		// Preferring original over remastered, but modded will always be first
 		const int* priorities = preferOriginalSoundtrack ? prioritiesB : prioritiesA;
 
 		const int prioA = priorities[(int)a];

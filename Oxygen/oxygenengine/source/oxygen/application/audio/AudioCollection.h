@@ -21,7 +21,8 @@ public:
 		NONE		= 0,
 		ORIGINAL	= 1,
 		REMASTERED	= 2,
-		MODDED		= 3
+		MODDED		= 3,
+		_NUM
 	};
 
 	struct AudioDefinition;
