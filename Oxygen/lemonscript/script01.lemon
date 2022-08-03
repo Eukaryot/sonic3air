@@ -29,7 +29,9 @@ function void main()
 			debugLog(stringformat("[%d] = \"%s\"", i, strings[i]))
 		}
 
-		string hello = "Hello " + "World!"
+		string hello = "Hello " + "World"
+		hello += "!"
+		debugLog(hello)
 		Log = hello.length()
 	}
 #endif

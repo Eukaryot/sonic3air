@@ -30,11 +30,7 @@
 	</Type>
 
 	<Type Name="lemon::DataTypeDefinition">
-		<DisplayString>{mClass}: {mBytes} bytes</DisplayString>
-	</Type>
-
-	<Type Name="lemon::IntegerDataType">
-		<DisplayString>{mSemantics,en}, {mBytes,d} bytes, signed={mIsSigned}</DisplayString>
+		<DisplayString>DataType={mNameString,s}</DisplayString>
 	</Type>
 
 	<Type Name="lemon::Function">

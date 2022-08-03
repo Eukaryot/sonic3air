@@ -1070,6 +1070,24 @@ namespace lemon
 							token.mDataType = &PredefinedDataTypes::STRING;
 							break;
 						}
+						else
+						{
+							if (bot.mOperator == Operator::ASSIGN_PLUS)
+							{
+								// Convert "A += B" to "A = A + B" for strings
+								TokenPtr<StatementToken> newRightSide;
+								BinaryOperationToken& newRightBot = newRightSide.create<BinaryOperationToken>();
+								newRightBot.mOperator = Operator::BINARY_PLUS;
+								newRightBot.mLeft = bot.mLeft;
+								newRightBot.mRight = bot.mRight;
+								newRightBot.mFunction = mBuiltinStringOperatorPlus.mFunctions[0];
+								newRightBot.mDataType = &PredefinedDataTypes::STRING;
+								bot.mOperator = Operator::ASSIGN;
+								bot.mRight = newRightSide;
+								bot.mDataType = &PredefinedDataTypes::STRING;
+								break;
+							}
+						}
 					}
 				}
 
