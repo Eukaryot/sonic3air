@@ -22,6 +22,7 @@
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/video/VideoOut.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
 
@@ -424,6 +425,9 @@ void MenuBackground::setGameStartedMenu()
 
 void MenuBackground::openMenu(GameMenuBase& menu)
 {
+	// The menus only really work in a fixed resolution, so make sure that one is set
+	VideoOut::instance().setScreenSize(400, 224);
+
 	GameApp::instance().getGameMenuManager().addMenu(menu);
 
 	if (&menu == mOptionsMenu || &menu == mExtrasMenu || &menu == mModsMenu)
