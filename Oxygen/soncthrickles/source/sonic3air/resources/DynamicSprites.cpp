@@ -152,5 +152,8 @@ void DynamicSprites::updateSpriteRedirects()
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_XBOX_BACK);
 			break;
 		}
+
+		default:
+			break;
 	}
 }

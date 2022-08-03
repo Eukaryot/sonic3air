@@ -82,7 +82,6 @@ public:
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer);
 
 private:
-	void refreshInputIcons(InputManager::InputType inputType);
 	void startIntoGameInternal();
 
 	// Script bindings
