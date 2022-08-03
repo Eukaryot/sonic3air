@@ -887,6 +887,13 @@ namespace
 		RenderParts::instance().getSpriteManager().setSpriteTagWithPosition(spriteTag, Vec2i(px, py));
 	}
 
+	void Renderer_setScreenSize(uint16 width, uint16 height)
+	{
+		width = clamp(width, 128, 1024);
+		height = clamp(height, 128, 1024);
+		VideoOut::instance().setScreenSize(width, height);
+	}
+
 	void Renderer_resetViewport(uint16 renderQueue)
 	{
 		RenderParts::instance().addViewport(Recti(0, 0, VideoOut::instance().getScreenWidth(), VideoOut::instance().getScreenHeight()), renderQueue);
@@ -1729,6 +1736,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(0, "spriteTag")
 			.setParameterInfo(1, "px")
 			.setParameterInfo(2, "py");
+
+		module.addNativeFunction("Renderer.setScreenSize", lemon::wrap(&Renderer_setScreenSize), defaultFlags)
+			.setParameterInfo(0, "width")
+			.setParameterInfo(1, "height");
 
 		module.addNativeFunction("Renderer.resetViewport", lemon::wrap(&Renderer_resetViewport), defaultFlags)
 			.setParameterInfo(0, "renderQueue");
