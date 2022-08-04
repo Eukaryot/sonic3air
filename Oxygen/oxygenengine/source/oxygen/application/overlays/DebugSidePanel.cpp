@@ -750,6 +750,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								spriteType = "Palette sprite";
 								color.setABGR32(0xffffc0ff);
 								SpriteManager::PaletteSpriteInfo& psi = (SpriteManager::PaletteSpriteInfo&)info;
+								objectRect.setPos(objectRect.getPos() + psi.mPivotOffset);
 								objectRect.width = psi.mSize.x;
 								objectRect.height = psi.mSize.y;
 								break;
@@ -759,6 +760,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								spriteType = "Component sprite";
 								color.setABGR32(0xffffc0e0);
 								SpriteManager::ComponentSpriteInfo& csi = (SpriteManager::ComponentSpriteInfo&)info;
+								objectRect.setPos(objectRect.getPos() + csi.mPivotOffset);
 								objectRect.width = csi.mSize.x;
 								objectRect.height = csi.mSize.y;
 								break;
