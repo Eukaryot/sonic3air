@@ -743,14 +743,16 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 		u8 character = getMainCharacter()
 		bool isHyperEffect = (super.active == 0xff || super.active.tails == 0xff)
 
+		// Fix here for Tails and Knuckles #contributed by 3Pills
+		--super.palettefx.timer
+		if (super.palettefx.timer >= 0)
+			return
+
 		// Fade in
 		if (characterVersion <= 1)
 		{
 			// Sonic
 			//  -> Fading #contributed by iCloudius
-			--super.palettefx.timer
-			if (super.palettefx.timer >= 0)
-				return
 
 			// Fade in effect
 			super.palettefx.frame += 6
