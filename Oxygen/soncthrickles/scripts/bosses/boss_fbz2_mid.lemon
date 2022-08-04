@@ -59,7 +59,7 @@ function void fn06fd38()
 	{
 		// Create the object that fades out level music and starts the boss theme afterwards
 		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = MUSIC_MINIBOSS_2
+		u8[A1 + 0x2c] = Game.getSetting(SETTING_FBZ2_MIDBOSS_TRACK) ? MUSIC_MINIBOSS_2 : MUSIC_MAINBOSS
 	}
 
 	// "spawnChildObjects(0x0703d0)" replaced by:

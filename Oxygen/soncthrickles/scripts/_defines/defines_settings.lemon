@@ -95,6 +95,7 @@ constant u32 SETTING_ICZ_NIGHTTIME				= 0x80050200	// Use night time palette for
 constant u32 SETTING_CNZ_PROTOTYPE_MUSIC		= 0x80041100	// Use Sonic 3 prototype music for CNZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
 constant u32 SETTING_ICZ_PROTOTYPE_MUSIC		= 0x80051100	// Use Sonic 3 prototype music for ICZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
 constant u32 SETTING_LBZ_PROTOTYPE_MUSIC		= 0x80061100	// Use Sonic 3 prototype music for LBZ Act 1 (Flag 0x01) and Act 2 (Flag 0x02)
+constant u32 SETTING_FBZ2_MIDBOSS_TRACK			= 0x80080300	// Use main boss (0) or mini-boss (1) music in FBZ 2 mid-boss
 constant u32 SETTING_SSZ_BOSS_TRACKS			= 0x800c0100	// Use Sonic 1 & 2 boss music in SSZ
 
 

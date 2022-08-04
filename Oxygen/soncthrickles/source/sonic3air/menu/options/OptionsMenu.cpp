@@ -156,6 +156,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::MINIBOSS_THEME,			SharedDatabase::Setting::SETTING_AUDIO_MINIBOSS_THEME);
 		setupOptionEntry(option::KNUCKLES_THEME,			SharedDatabase::Setting::SETTING_AUDIO_KNUCKLES_THEME);
 		setupOptionEntry(option::HPZ_MUSIC,					SharedDatabase::Setting::SETTING_AUDIO_HPZ_MUSIC);
+		setupOptionEntry(option::FBZ2_MIDBOSS_TRACK,		SharedDatabase::Setting::SETTING_FBZ2_MIDBOSS_TRACK);
 		setupOptionEntry(option::SSZ_BOSSTRACKS,			SharedDatabase::Setting::SETTING_SSZ_BOSS_TRACKS);
 		setupOptionEntry(option::OUTRO_MUSIC,				SharedDatabase::Setting::SETTING_AUDIO_OUTRO);
 		setupOptionEntry(option::COMPETITION_MENU_MUSIC,	SharedDatabase::Setting::SETTING_AUDIO_COMPETITION_MENU);
@@ -383,6 +384,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Music Selection");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("FBZ Laser Trap Boss:", option::FBZ2_MIDBOSS_TRACK)
+			.addOption("Mini-Boss Music", 1)
+			.addOption("Main Boss Music", 0);
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("In Hidden Palace:", option::HPZ_MUSIC)
 			.addOption("Sonic 3", 0)

@@ -859,12 +859,6 @@ function void fn085b44()
 		}
 		else if (objA0.subtype2c == MUSIC_MINIBOSS_2)
 		{
-			// In FBZ pre-boss encounter, enforce main boss music
-			if (global.zone_act == 0x0401)
-			{
-				objA0.subtype2c = MUSIC_MAINBOSS
-			}
-
 			// In HPZ emerald theft cutscene, consider config option
 			if (global.zone_act == 0x1601)
 			{
