@@ -133,7 +133,7 @@ function void fn063de0()
 	//  - 0x063e7c	-> objA0.base_state = 0x00  -> Standing there, shadow boxing
 	//  - 0x063eda	-> objA0.base_state = 0x02  -> Reacting to player...?
 	//  - 0x063f3c	-> objA0.base_state = 0x04  -> Kneeling and blocking a spindash attack
-	//  - ?			-> objA0.base_state = 0x06  -> Unused?
+	//  - 0x063fd8	-> objA0.base_state = 0x06  -> Punching when character is close
 	//  - 0x064016	-> objA0.base_state = 0x08  -> Cowering before jump
 	//  - 0x06403a	-> objA0.base_state = 0x0a  -> Jumping for a glide attack
 	//  - 0x064090	-> objA0.base_state = 0x0c  -> Gliding
