@@ -14,6 +14,9 @@
 
 function void scriptMainEntryPoint()
 {
+	if (SHCSplash.shouldShowUpAfterStartup())
+		SHCSplash.showSplashScreen()
+
 	System.setupCallFrame("GameModeControlLoop")
 }
 

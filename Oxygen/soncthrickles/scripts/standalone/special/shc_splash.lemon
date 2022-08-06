@@ -1,0 +1,186 @@
+/*
+	This script file is part of the Sonic 3 A.I.R. script software distribution.
+	Copyright (C) 2017-2022 by Eukaryot
+
+	Published under the GNU GPLv3 open source software license, see license.txt
+	or https://www.gnu.org/licenses/gpl-3.0.en.html
+*/
+
+
+
+// Override this method in your mod if it's a SHC submission and you'd like to show the SHC splash right on startup, between disclaimer and the SEGA logo
+function bool SHCSplash.shouldShowUpAfterStartup()
+{
+	return false
+}
+
+
+function void SHCSplash.setPalette(u16 opacity)
+{
+	constant array<u32> PALETTE =
+	{
+		0xff000000,
+		0xff100000,
+		0xff200000,
+		0xff300000,
+		0xff400000,
+		0xff600000,
+		0xff800000,
+		0xffa00000,
+		0xffc00000,
+		0xffe00000,
+		0xffe08000,
+		0xffe0c080,
+		0xffe0e0e0
+	}
+
+	// Some variation on the non-uniform fade-out
+	s32 reductionR = clamp(s32(0x100 - opacity) * 2, 0, 0xff)
+	s32 reductionG = clamp(s32(0xc0 - opacity) * 2, 0, 0xff)
+	s32 reductionB = clamp(s32(0x80 - opacity) * 2, 0, 0xff)
+
+	for (u8 i = 0; i < PALETTE.length(); ++i)
+	{
+		u32 color = PALETTE[i]
+		u32 r = color & 0xff
+		u32 g = (color >> 8) & 0xff
+		u32 b = (color >> 16) & 0xff
+		r = max(r - reductionR, 0)
+		g = max(g - reductionG, 0)
+		b = max(b - reductionB, 0)
+		color = 0xff000000 + r + (g << 8) + (b << 16)
+
+		Renderer.setPaletteEntry(i, color)
+	}
+}
+
+
+function void SHCSplash.showSplashScreen()
+{
+	s16 opacity = 0
+	u16 controllerPressed = 0
+
+	// More or less a hack to show the splash screen images in a less stretched way without having to rescale the actual image data:
+	// Just increase the game screen size to something larger
+	Renderer.setScreenSize(512, 288)
+
+	// Wait briefly in a black screen
+	SHCSplash.setPalette(0)
+	for (u8 frame = 0; frame < 30; ++frame)
+	{
+		Renderer.resetSprites()
+		yieldExecution()
+	}
+
+	// Fade in
+	for (; opacity <= 0x100; opacity += 8)
+	{
+		SHCSplash.setPalette(opacity)
+		Renderer.resetSprites()
+		Renderer.drawCustomSprite("shc_splash_frame_02", getScreenWidth() / 2, getScreenHeight() / 2, 0, 0, 0xa000)
+		
+		yieldExecution()
+	}
+
+	constant array<u8> ANIMATION_DATA =		// Animation data from Mania version of the splash screen
+	{
+		// Sprite number, duration
+		2, 8,		// Original duration: 64 - but shortened here to accommodate for the fade-in
+		1, 1,
+		0, 1,
+		1, 1,
+		2, 1,
+		1, 1,
+		0, 2,
+		2, 1,
+		0, 2,
+		1, 1,
+		2, 3,
+		0, 1,
+		2, 4,
+		1, 1,
+		0, 3,
+		1, 2,
+		0, 3,
+		1, 2,
+		2, 4,
+		1, 2,
+		0, 3,
+		2, 4,
+		0, 64,
+		2, 4,
+		1, 2,
+		0, 3,
+		2, 2,
+		0, 3,
+		1, 2,
+		2, 2,
+		0, 3,
+		2, 2,
+		0, 3,
+		2, 2,
+		1, 2,
+		0, 3,
+		1, 2,
+		0, 64,
+		2, 2,
+		0, 3,
+		1, 2,
+		2, 2,
+		0, 3,
+		2, 2,
+		1, 2,
+		0, 3,
+		1, 2,
+		2, 2,
+		1, 2,
+		2, 2,
+		1, 2,
+		0, 3,
+		2, 2,
+		0, 3,
+		1, 2,
+		2, 8		// Original duration: 360 - but shortened here, as that was certainly only meant to effectively stop the animation here
+	}
+
+	Audio.playAudio("shc_splash")
+
+	// Show the animation
+	u8 animationStep = 0
+	u8 animationCounter = 0
+	while (animationStep * 2 < ANIMATION_DATA.length())
+	{
+		controllerPressed |= Input.getController(0)
+		if (controllerPressed != 0)
+			break
+
+		u8 currentStepSprite = ANIMATION_DATA[animationStep * 2]
+		u8 currentStepDuration = ANIMATION_DATA[animationStep * 2 + 1]
+		Renderer.resetSprites()
+		Renderer.drawCustomSprite(stringformat("shc_splash_frame_%02d", currentStepSprite), getScreenWidth() / 2, getScreenHeight() / 2, 0, 0, 0xa000)
+
+		++animationCounter
+		if (animationCounter >= currentStepDuration)
+		{
+			++animationStep
+			animationCounter = 0
+		}
+
+		yieldExecution()
+	}
+
+	// Fade out
+	for (; opacity >= 0; opacity -= (controllerPressed != 0) ? 0x10 : 8)
+	{
+		controllerPressed |= Input.getController(0)
+
+		SHCSplash.setPalette(opacity)
+		Renderer.resetSprites()
+		Renderer.drawCustomSprite("shc_splash_frame_02", getScreenWidth() / 2, getScreenHeight() / 2, 0, 0, 0xa000)
+		
+		yieldExecution()
+	}
+
+	// Back to normal
+	Renderer.setScreenSize(400, 224)
+}

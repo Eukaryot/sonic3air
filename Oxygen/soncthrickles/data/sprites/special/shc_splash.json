@@ -1,0 +1,5 @@
+{
+	"shc_splash_frame_00": { "File": "shc_splash_frame_00.bmp", "Rect": "0,0,320,240", "Center": "160,120" },
+	"shc_splash_frame_01": { "File": "shc_splash_frame_01.bmp", "Rect": "0,0,320,240", "Center": "160,120" },
+	"shc_splash_frame_02": { "File": "shc_splash_frame_02.bmp", "Rect": "0,0,320,240", "Center": "160,120" }
+}

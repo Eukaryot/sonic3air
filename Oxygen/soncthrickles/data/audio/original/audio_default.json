@@ -351,6 +351,8 @@
 	"dropdash_charge": { "File": "s3air_dropdash_charge.ogg", "Type": "Sound", "Channel": "AB" },	// Use spindash channel
 	"dropdash_release":{ "File": "s3air_dropdash_release.ogg", "Type": "Sound", "Channel": "AB" },	// Use spindash channel
 	"peelout_charge":  { "File": "scd_peelout_charge.ogg", "Type": "Sound", "Channel": "AB" },		// Use spindash channel
-	"peelout_release": { "File": "scd_peelout_release.ogg", "Type": "Sound", "Channel": "AB" }		// Use spindash channel
+	"peelout_release": { "File": "scd_peelout_release.ogg", "Type": "Sound", "Channel": "AB" },		// Use spindash channel
+
+	"shc_splash": { "File": "shc_splash.ogg", "Type": "Sound" }
 
 }
