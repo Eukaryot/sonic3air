@@ -3554,25 +3554,29 @@ function bool checkForExtraLifeByRings()
 {
 #if STANDALONE
 	// No extra lives in Time Attack or when infinite lives option is enables
-	//  -> These check ensure that the ring sound gets played when collecting the 100th / 200th / etc. ring
+	//  -> These checks ensure that the ring sound gets played when collecting the 100th / 200th / etc. ring
 	//  -> Fix #contributed by Thorn
-	if (Game.isTimeAttack() || Game.getSetting(SETTING_INFINITE_LIVES))
+	if (Game.isTimeAttack())
 		return false
 
-	// Standalone uses upper 7 bits of "extra_lives_granted" differently, to allow for extra lives at 300+ rings as well
-	u16 currentExtraLives = (extra_lives_granted >> 1)
-	u16 ringsNeeded = (currentExtraLives + 1) * 100
-	if (ring_counter >= ringsNeeded)
+	// Here's a good place to check for the 300 rings achievement
+	if (ring_counter >= 300)
 	{
-		extra_lives_granted += 2	// Increase the value in upper 7 bits by 1
-
-		// Here's also a good place to check for the 300 rings achievement
-		if (ringsNeeded == 300)
-		{
-			Game.setAchievementComplete(ACHIEVEMENT_300_RINGS)
-		}
-		return true
+		Game.setAchievementComplete(ACHIEVEMENT_300_RINGS)
 	}
+
+	if (!Game.getSetting(SETTING_INFINITE_LIVES))
+	{
+		// Standalone uses upper 7 bits of "extra_lives_granted" differently, to allow for extra lives at 300+ rings as well
+		u16 currentExtraLives = (extra_lives_granted >> 1)
+		u16 ringsNeeded = (currentExtraLives + 1) * 100
+		if (ring_counter >= ringsNeeded)
+		{
+			extra_lives_granted += 2	// Increase the value in upper 7 bits by 1
+			return true
+		}
+	}
+	return false
 
 #else
 	if (ring_counter >= 100)
@@ -3589,9 +3593,8 @@ function bool checkForExtraLifeByRings()
 			return true
 		}
 	}
-#endif
-
 	return false
+#endif
 }
 
 
