@@ -1,0 +1,17 @@
+
+
+// Add the code below somewhere into your mod's scripts.
+// This will mark it as an Sonic Hacking Contest submission by adding the SHC splash right on startup, between disclaimer and the SEGA logo.
+// The contents of this file are public domain and free to use, in case it wasn't obvious :)
+
+
+#if GAMEAPP >= 0x22080600	// Check for game build from August 2022 or later
+
+	// Override the "SHCSplash.shouldShowUpAfterStartup" function in the base game scripts:
+	// The default one just returns false, but this override changes that to true to signal that the SHC splash screen should be shown.
+	function bool SHCSplash.shouldShowUpAfterStartup()
+	{
+		return true
+	}
+
+#endif

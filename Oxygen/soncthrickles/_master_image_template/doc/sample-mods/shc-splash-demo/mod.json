@@ -1,0 +1,11 @@
+{
+	"Metadata":
+	{
+		"Name": "SHC Splash Screen Demo Mod",
+		"Author": "Eukaryot",
+		"Description": "Contains the script changes needed to enable the Sonic Hacking Contest splash screen.\nSee the mod's \"scripts/main.lemon\" file for more information.",
+		"URL": "https://sonic3air.org",
+		"ModVersion": "1.0.0.0",
+		"GameVersion": "22.08.06.0"
+	}
+}
