@@ -1,0 +1,71 @@
+{
+
+	// Rings
+	"ring_00": { "File": "rings.bmp", "Rect":  "0,0,16,16", "Center": "8,8" },
+	"ring_01": { "File": "rings.bmp", "Rect": "16,0,16,16", "Center": "8,8" },
+	"ring_02": { "File": "rings.bmp", "Rect": "32,0,16,16", "Center": "8,8" },
+	"ring_03": { "File": "rings.bmp", "Rect": "48,0,16,16", "Center": "8,8" },
+	"ring_04": { "File": "rings.bmp", "Rect": "64,0,16,16", "Center": "8,8" },
+	"ring_05": { "File": "rings.bmp", "Rect": "80,0,16,16", "Center": "8,8" },
+	"ring_06": { "File": "rings.bmp", "Rect": "96,0,16,16", "Center": "8,8" },
+	"ring_07": { "File": "rings.bmp", "Rect":"112,0,16,16", "Center": "8,8" },
+	
+	// Monitors
+	"monitor_s3_intact": { "File": "monitors.bmp", "Rect":"0,0,32,32",   "Center": "16,16" },
+	"monitor_s3_broken": { "File": "monitors.bmp", "Rect":"32,0,32,32",  "Center": "16,16" },
+	"monitor_s2_intact": { "File": "monitors.bmp", "Rect":"0,32,32,32",  "Center": "16,16" },
+	"monitor_s2_broken": { "File": "monitors.bmp", "Rect":"32,32,32,32", "Center": "16,16" },
+	"monitor_icon_ring":            { "File": "monitors.bmp", "Rect":"64,0,16,16",  "Center": "8,8" },
+	"monitor_icon_speedshoes":      { "File": "monitors.bmp", "Rect":"80,0,16,16",  "Center": "8,8" },
+	"monitor_icon_invincibility":   { "File": "monitors.bmp", "Rect":"96,0,16,16",  "Center": "8,8" },
+	"monitor_icon_super":           { "File": "monitors.bmp", "Rect":"112,0,16,16", "Center": "8,8" },
+	"monitor_icon_lightningshield": { "File": "monitors.bmp", "Rect":"64,16,16,16", "Center": "8,8" },
+	"monitor_icon_fireshield":      { "File": "monitors.bmp", "Rect":"80,16,16,16", "Center": "8,8" },
+	"monitor_icon_bubbleshield":    { "File": "monitors.bmp", "Rect":"96,16,16,16", "Center": "8,8" },
+	"monitor_icon_classicshield":   { "File": "monitors.bmp", "Rect":"112,16,16,16","Center": "8,8" },
+	"monitor_icon_sonic":           { "File": "monitors.bmp", "Rect":"64,32,16,16", "Center": "8,8" },
+	"monitor_icon_tails":           { "File": "monitors.bmp", "Rect":"80,32,16,16", "Center": "8,8" },
+	"monitor_icon_knuckles":        { "File": "monitors.bmp", "Rect":"96,32,16,16", "Center": "8,8" },
+	"monitor_icon_static":          { "File": "monitors.bmp", "Rect":"64,48,16,16", "Center": "8,8" },
+	"monitor_icon_robotnik":        { "File": "monitors.bmp", "Rect":"80,48,16,16", "Center": "8,8" },
+
+	// Classic Shield
+	"shield_classic_01": { "File": "shield_classic.png", "Rect": "0,0,48,48",  "Center": "24,24" },
+	"shield_classic_02": { "File": "shield_classic.png", "Rect": "48,0,48,48", "Center": "24,24" },
+	"shield_classic_03": { "File": "shield_classic.png", "Rect": "96,0,48,48", "Center": "24,24" },
+	"shield_classic_04": { "File": "shield_classic.png", "Rect": "144,0,48,48","Center": "24,24" },
+	"shield_classic_05": { "File": "shield_classic.png", "Rect": "192,0,48,48","Center": "24,24" },
+	"shield_classic_06": { "File": "shield_classic.png", "Rect": "240,0,48,48","Center": "24,24" },
+	
+	// Bonus Bubble for Classic Shield
+	"bonusbubble_classicshield": { "File": "bonusbubble_classicshield.png", "Rect": "0,0,32,32", "Center": "16,16" },
+
+	// Time Attack Pole
+	"timeattack_pole_01": { "File": "timeattack_pole.png", "Rect":  "0,0,12,60", "Center": "6,30" },
+	"timeattack_pole_02": { "File": "timeattack_pole.png", "Rect": "13,0,12,60", "Center": "6,30" },
+	"timeattack_pole_03": { "File": "timeattack_pole.png", "Rect": "26,0,12,60", "Center": "6,30" },
+	"timeattack_pole_04": { "File": "timeattack_pole.png", "Rect": "39,0,12,60", "Center": "6,30" },
+	
+	// HCZ 1 water front
+	"hcz_waterfront": { "File": "hcz_waterfront.bmp", "Rect": "0,0,48,32" },
+	
+	// FBZ 2 egg robo head
+	"eggrobo_fbz_00": { "File": "eggrobo_fbz.png", "Rect":  "0,0,32,16", "Center": "16,8" },
+	"eggrobo_fbz_01": { "File": "eggrobo_fbz.png", "Rect":  "0,0,32,15", "Center": "16,7" },
+	"eggrobo_fbz_02": { "File": "eggrobo_fbz.png", "Rect": "32,0,32,16", "Center": "16,8" },
+	"eggrobo_fbz_03": { "File": "eggrobo_fbz.png", "Rect": "64,0,32,16", "Center": "16,8" },
+
+	// SOZ dark sand pit overlay
+	"obj_dark_sand_pit_overlay": { "File": "soz_darksandpit.png" },
+
+	// DEZ retracting spring base
+	"dez_retracting_spring_base": { "File": "dez_retracting_spring_base.bmp", "Rect": "0,0,32,16", "Center": "16,8" },
+
+	// DDZ missile
+	"ddz_missile_00": { "File": "ddz_missile.png", "Rect": "0,0,64,16",  "Center": "24,8" },
+	"ddz_missile_01": { "File": "ddz_missile.png", "Rect": "0,16,64,16", "Center": "24,8" },
+	
+	// "Sonic" text on Tornado when facing left
+	"tornado_text_sonic": { "File": "tornado_text_sonic.bmp", "Rect": "0,0,27,5" }
+
+}
