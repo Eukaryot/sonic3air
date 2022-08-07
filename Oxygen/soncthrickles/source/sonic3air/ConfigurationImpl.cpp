@@ -181,7 +181,7 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 					int value = 0;
 					if (gameSettingsHelper.tryReadInt(pair.second.mIdentifier, value))
 					{
-						pair.second.mValue = (uint32)value;
+						pair.second.mCurrentValue = (uint32)value;
 					}
 				}
 			}
@@ -219,11 +219,11 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 				{
 					if (rootHelper.tryReadInt(pair.first, valueA))
 					{
-						settingsMap.at(pair.second).mValue = (uint32)valueA;
+						settingsMap.at(pair.second).mCurrentValue = (uint32)valueA;
 					}
 					else if (rootHelper.tryReadBool(pair.first, valueB))
 					{
-						settingsMap.at(pair.second).mValue = valueB ? 1 : 0;
+						settingsMap.at(pair.second).mCurrentValue = valueB ? 1 : 0;
 					}
 				}
 			}
@@ -242,7 +242,7 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 						int value = 0;
 						if (settingsHelper.tryReadInt(identifier, value))
 						{
-							pair.second.mValue = (uint32)value;
+							pair.second.mCurrentValue = (uint32)value;
 						}
 					}
 				}
@@ -259,7 +259,7 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 						const std::string identifier = "GAMEPLAY_TWEAK_" + pair.second.mIdentifier.substr(8);
 						if (rootHelper.tryReadBool("GameplayTweak::" + identifier, value))
 						{
-							pair.second.mValue = value ? 1 : 0;
+							pair.second.mCurrentValue = value ? 1 : 0;
 						}
 					}
 				}
@@ -270,17 +270,17 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 				if (rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_TAILS_ASSIST", value1) &&
 					(rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_MANIA_TAILS_ASSIST", value2) || rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_MOD_MANIA_TAILS_ASSIST", value2)))
 				{
-					settingsMap.at(SharedDatabase::Setting::SETTING_TAILS_ASSIST_MODE).mValue = value1 ? (value2 ? 2 : 1) : 0;
+					settingsMap.at(SharedDatabase::Setting::SETTING_TAILS_ASSIST_MODE).mCurrentValue = value1 ? (value2 ? 2 : 1) : 0;
 				}
 				if (rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_LEVELLAYOUTS_AIR", value1) &&
 					rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_LEVELLAYOUTS_SONIC3", value2))
 				{
-					settingsMap.at(SharedDatabase::Setting::SETTING_LEVELLAYOUTS).mValue = value2 ? 0 : (value1 ? 2 : 1);
+					settingsMap.at(SharedDatabase::Setting::SETTING_LEVELLAYOUTS).mCurrentValue = value2 ? 0 : (value1 ? 2 : 1);
 				}
 				if (rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_RANDOM_MONITORS", value1) &&
 					rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_RANDOM_SHIELDS", value2))
 				{
-					settingsMap.at(SharedDatabase::Setting::SETTING_RANDOM_MONITORS).mValue = value1 ? 2 : (value2 ? 1 : 0);
+					settingsMap.at(SharedDatabase::Setting::SETTING_RANDOM_MONITORS).mCurrentValue = value1 ? 2 : (value2 ? 1 : 0);
 				}
 			}
 		}
@@ -289,7 +289,7 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 		if (!settingsMap.empty())	// This is going to be empty when the macOS UI calls loadConfiguration externally, causing crash
 		{
 			const SharedDatabase::Setting& ghosts = settingsMap.at(SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
-			ghosts.mValue = (ghosts.mValue >= 5) ? 5 : (ghosts.mValue >= 3) ? 3 : (ghosts.mValue >= 1) ? 1 : 0;
+			ghosts.mCurrentValue = (ghosts.mCurrentValue >= 5) ? 5 : (ghosts.mCurrentValue >= 3) ? 3 : (ghosts.mCurrentValue >= 1) ? 1 : 0;
 		}
 	}
 }
@@ -326,9 +326,9 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 			const SharedDatabase::Setting& setting = pair.second;
 			if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::NONE)
 				continue;
-			if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && setting.mValue == setting.mDefaultValue)
+			if (setting.mSerializationType == SharedDatabase::Setting::SerializationType::HIDDEN && setting.mCurrentValue == setting.mDefaultValue)
 				continue;
-			gameSettingsJson[setting.mIdentifier] = setting.mValue;
+			gameSettingsJson[setting.mIdentifier] = setting.mCurrentValue;
 		}
 		root["GameSettings"] = gameSettingsJson;
 	}

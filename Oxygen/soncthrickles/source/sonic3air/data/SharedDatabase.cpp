@@ -46,93 +46,7 @@ void SharedDatabase::initialize()
 	}
 
 	// Setup gameplay settings
-	{
-		auto addSetting = [&](SharedDatabase::Setting::Type id, const char* identifier, SharedDatabase::Setting::SerializationType serializationType, bool enforceAllowInTimeAttack = false)
-		{
-			SharedDatabase::Setting& setting = mSettings[(uint32)id];
-			setting.mSettingId = id;
-			setting.mIdentifier = std::string(identifier).substr(9);
-			setting.mValue = ((uint32)id & 0xff);
-			setting.mDefaultValue = ((uint32)id & 0xff);
-			setting.mSerializationType = serializationType;
-			setting.mPurelyVisual = ((uint32)id & 0x80000000) != 0;
-			setting.mAllowInTimeAttack = enforceAllowInTimeAttack || setting.mPurelyVisual;
-		};
-
-		#define ADD_SETTING(id) 			addSetting(id, #id, Setting::SerializationType::NONE);
-		#define ADD_SETTING_HIDDEN(id) 		addSetting(id, #id, Setting::SerializationType::HIDDEN);
-		#define ADD_SETTING_SERIALIZED(id) 	addSetting(id, #id, Setting::SerializationType::ALWAYS);
-		#define ADD_SETTING_ALLOW_TA(id) 	addSetting(id, #id, Setting::SerializationType::ALWAYS, true);
-
-		// These settings get saved in "settings.json" under their setting ID
-		ADD_SETTING_SERIALIZED(Setting::SETTING_FIX_GLITCHES);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_NO_CONTROL_LOCK);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_TAILS_ASSIST_MODE);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_CANCEL_FLIGHT);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_SUPER_CANCEL);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_INSTA_SHIELD);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_HYPER_TAILS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_SHIELD_TYPES);
-
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AIZ_BLIMPSEQUENCE);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_LBZ_BIGARMS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_LRZ2_BOSS);
-
-		ADD_SETTING_SERIALIZED(Setting::SETTING_EXTENDED_HUD);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_SMOOTH_ROTATION);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_SPEEDUP_AFTERIMGS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_BS_VISUAL_STYLE);
-
-		ADD_SETTING_SERIALIZED(Setting::SETTING_INFINITE_LIVES);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_INFINITE_TIME);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_RANDOM_MONITORS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_RANDOM_SPECIALSTAGES);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
-		ADD_SETTING_ALLOW_TA(Setting::SETTING_CAMERA_OUTRUN);			// Allowed in Time Attack, even though it's not purely visual (it has a minimal impact on gameplay simulation)
-		ADD_SETTING_ALLOW_TA(Setting::SETTING_EXTENDED_CAMERA);			// Same here
-		ADD_SETTING_SERIALIZED(Setting::SETTING_MAINTAIN_SHIELDS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_BS_REPEAT_ON_FAIL);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_DISABLE_GHOST_SPAWN);
-
-		ADD_SETTING_SERIALIZED(Setting::SETTING_SUPERFAST_RUNANIM);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_MONITOR_STYLE);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_HYPER_DASH_CONTROLS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_SUPER_SONIC_ABILITY);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_LIVES_DISPLAY);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_BS_COUNTDOWN_RINGS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_CONTINUE_MUSIC);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_UNDERWATER_AUDIO);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_ICZ_NIGHTTIME);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_CNZ_PROTOTYPE_MUSIC);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_ICZ_PROTOTYPE_MUSIC);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_LBZ_PROTOTYPE_MUSIC);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_FBZ2_MIDBOSS_TRACK);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_SSZ_BOSS_TRACKS);
-
-		ADD_SETTING_ALLOW_TA(Setting::SETTING_GFX_ANTIFLICKER);			// Allowed in Time Attack
-		ADD_SETTING_SERIALIZED(Setting::SETTING_LEVELLAYOUTS);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_REGION_CODE);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_TIME_ATTACK_GHOSTS);
-
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_TITLE_THEME);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_EXTRALIFE_JINGLE);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_INVINCIBILITY_THEME);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_SUPER_THEME);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_MINIBOSS_THEME);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_KNUCKLES_THEME);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_HPZ_MUSIC);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_OUTRO);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_COMPETITION_MENU);
-		ADD_SETTING_SERIALIZED(Setting::SETTING_AUDIO_CONTINUE_SCREEN);
-
-		ADD_SETTING_HIDDEN(Setting::SETTING_DROPDASH);
-		ADD_SETTING_HIDDEN(Setting::SETTING_SUPER_PEELOUT);
-		ADD_SETTING_HIDDEN(Setting::SETTING_DEBUG_MODE);
-		ADD_SETTING_HIDDEN(Setting::SETTING_TITLE_SCREEN);
-
-		// These settings get saved either indirectly or not at all
-		ADD_SETTING(Setting::SETTING_KNUCKLES_AND_TAILS);
-	}
+	setupSettings();
 
 	// Setup achievements
 	{
@@ -307,7 +221,7 @@ uint32 SharedDatabase::getSettingValue(uint32 settingId)
 	const SharedDatabase::Setting* setting = getSetting(settingId);
 	if (nullptr != setting)
 	{
-		return setting->mValue;
+		return setting->mCurrentValue;
 	}
 
 	// Use default value
@@ -341,4 +255,94 @@ SharedDatabase::Secret* SharedDatabase::getSecret(uint32 secretId)
 			return &secret;
 	}
 	return nullptr;
+}
+
+SharedDatabase::Setting& SharedDatabase::addSetting(SharedDatabase::Setting::Type id, const char* identifier, SharedDatabase::Setting::SerializationType serializationType, bool enforceAllowInTimeAttack)
+{
+	SharedDatabase::Setting& setting = mSettings[(uint32)id];
+	setting.mSettingId = id;
+	setting.mIdentifier = std::string(identifier).substr(9);
+	setting.mCurrentValue = ((uint32)id & 0xff);
+	setting.mDefaultValue = ((uint32)id & 0xff);
+	setting.mSerializationType = serializationType;
+	setting.mPurelyVisual = ((uint32)id & 0x80000000) != 0;
+	setting.mAllowInTimeAttack = enforceAllowInTimeAttack || setting.mPurelyVisual;
+	return setting;
+};
+
+void SharedDatabase::setupSettings()
+{
+	#define IDPARAMS(_id_) _id_, #_id_
+
+	// These settings get saved in "settings.json" under their setting ID
+	addSetting(IDPARAMS(Setting::SETTING_FIX_GLITCHES), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_NO_CONTROL_LOCK), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_TAILS_ASSIST_MODE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_CANCEL_FLIGHT), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SUPER_CANCEL), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_INSTA_SHIELD), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_HYPER_TAILS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SHIELD_TYPES), Setting::SerializationType::ALWAYS);
+
+	addSetting(IDPARAMS(Setting::SETTING_AIZ_BLIMPSEQUENCE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LBZ_BIGARMS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LRZ2_BOSS), Setting::SerializationType::ALWAYS);
+
+	addSetting(IDPARAMS(Setting::SETTING_EXTENDED_HUD), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SMOOTH_ROTATION), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SPEEDUP_AFTERIMGS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_BS_VISUAL_STYLE), Setting::SerializationType::ALWAYS);
+
+	addSetting(IDPARAMS(Setting::SETTING_INFINITE_LIVES), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_INFINITE_TIME), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_RANDOM_MONITORS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_RANDOM_SPECIALSTAGES), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_BUBBLE_SHIELD_BOUNCE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_CAMERA_OUTRUN), Setting::SerializationType::ALWAYS, true);			// Allowed in Time Attack, even though it's not purely visual (it has a minimal impact on gameplay simulation)
+	addSetting(IDPARAMS(Setting::SETTING_EXTENDED_CAMERA), Setting::SerializationType::ALWAYS, true);		// Same here
+	addSetting(IDPARAMS(Setting::SETTING_MAINTAIN_SHIELDS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_BS_REPEAT_ON_FAIL), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_DISABLE_GHOST_SPAWN), Setting::SerializationType::ALWAYS);
+
+	addSetting(IDPARAMS(Setting::SETTING_SUPERFAST_RUNANIM), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_MONITOR_STYLE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_HYPER_DASH_CONTROLS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SUPER_SONIC_ABILITY), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LIVES_DISPLAY), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_BS_COUNTDOWN_RINGS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_CONTINUE_MUSIC), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_UNDERWATER_AUDIO), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_ICZ_NIGHTTIME), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_CNZ_PROTOTYPE_MUSIC), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_ICZ_PROTOTYPE_MUSIC), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_LBZ_PROTOTYPE_MUSIC), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_FBZ2_MIDBOSS_TRACK), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_SSZ_BOSS_TRACKS), Setting::SerializationType::ALWAYS);
+
+	addSetting(IDPARAMS(Setting::SETTING_GFX_ANTIFLICKER), Setting::SerializationType::ALWAYS, true);		// Allowed in Time Attack
+	addSetting(IDPARAMS(Setting::SETTING_LEVELLAYOUTS), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_REGION_CODE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_TIME_ATTACK_GHOSTS), Setting::SerializationType::ALWAYS);
+
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_TITLE_THEME), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_EXTRALIFE_JINGLE), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_INVINCIBILITY_THEME), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_SUPER_THEME), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_MINIBOSS_THEME), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_KNUCKLES_THEME), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_HPZ_MUSIC), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_OUTRO), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_COMPETITION_MENU), Setting::SerializationType::ALWAYS);
+	addSetting(IDPARAMS(Setting::SETTING_AUDIO_CONTINUE_SCREEN), Setting::SerializationType::ALWAYS);
+
+	// Hidden settings
+	addSetting(IDPARAMS(Setting::SETTING_DROPDASH), Setting::SerializationType::HIDDEN);
+	addSetting(IDPARAMS(Setting::SETTING_SUPER_PEELOUT), Setting::SerializationType::HIDDEN);
+	addSetting(IDPARAMS(Setting::SETTING_DEBUG_MODE), Setting::SerializationType::HIDDEN);
+	addSetting(IDPARAMS(Setting::SETTING_TITLE_SCREEN), Setting::SerializationType::HIDDEN);
+
+	// Not saved at all
+	addSetting(IDPARAMS(Setting::SETTING_KNUCKLES_AND_TAILS), Setting::SerializationType::NONE);
+
+	#undef IDPARAMS
 }

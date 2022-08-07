@@ -269,13 +269,13 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 		// Special handling for Debug Mode setting in dev mode
 		if (settingId == SharedDatabase::Setting::SETTING_DEBUG_MODE)
 		{
-			if (!setting->mValue)
+			if (!setting->mCurrentValue)
 			{
 				if (EngineMain::getDelegate().useDeveloperFeatures() && ConfigurationImpl::instance().mDevModeImpl.mEnforceDebugMode)
 					return true;
 			}
 		}
-		return setting->mValue;
+		return setting->mCurrentValue;
 	}
 	else
 	{
@@ -288,7 +288,7 @@ void Game::setSetting(uint32 settingId, uint32 value)
 {
 	const SharedDatabase::Setting* setting = SharedDatabase::getSetting(settingId);
 	RMX_CHECK(nullptr != setting, "Setting not found", return);
-	setting->mValue = value;
+	setting->mCurrentValue = value;
 }
 
 void Game::checkForUnlockedSecrets()
@@ -778,7 +778,7 @@ void Game::onGameRecordingHeaderLoaded(const std::string& buildString, const std
 		const auto it = settings.find(settingId);
 		if (it != settings.end())
 		{
-			it->second.mValue = value;
+			it->second.mCurrentValue = value;
 		}
 	}
 }
@@ -802,7 +802,7 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 	for (const SharedDatabase::Setting* setting : relevantSettings)
 	{
 		serializer.writeAs<uint32>(setting->mSettingId);
-		serializer.write(setting->mValue);
+		serializer.write(setting->mCurrentValue);
 	}
 }
 

@@ -150,9 +150,9 @@ void PlayerRecorder::initRecording(const std::wstring& filename, uint16 zoneAndA
 	for (const auto& pair : settingsMap)
 	{
 		const SharedDatabase::Setting& setting = pair.second;
-		if (setting.mSerializationType != SharedDatabase::Setting::SerializationType::NONE && setting.mValue != setting.mDefaultValue)
+		if (setting.mSerializationType != SharedDatabase::Setting::SerializationType::NONE && setting.mCurrentValue != setting.mDefaultValue)
 		{
-			mCurrentRecording.mSettings.emplace_back(pair.first, setting.mValue);
+			mCurrentRecording.mSettings.emplace_back(pair.first, setting.mCurrentValue);
 		}
 	}
 }
