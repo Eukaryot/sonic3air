@@ -102,8 +102,8 @@ function void DebugMode.GetObjectTable()
 function void DebugMode.OnSelectionChanged()
 {
 	D0 = debug_mode.selection * 10
-	objA0.mapping_offset = u32[A2 + D0.u16 + 4]
-	objA0.sprite_attributes = u16[A2 + D0.u16 + 8]
+	char.mapping_offset = u32[A2 + D0.u16 + 4]
+	char.sprite_attributes = u16[A2 + D0.u16 + 8]
 	char.animation.sprite = u8[A2 + D0.u16]
 }
 
@@ -201,12 +201,12 @@ function void DebugMode.EvaluateInput()
 			u8[A1 + 0x2a] = char.render_flags & ~render_flag.VISIBLE
 
 			D0 = debug_mode.selection * 10
-			u8[A1 + 0x2c] = u8[A2 + D0.u16 + 4]
+			objA1.subtype2c = u8[A2 + D0.u16 + 4]
 			objA1.update_address = u32[A2 + D0.u16]
 			u8[A1] = 0
 			if (objA1.update_address == 0x01d566)	// S-Monitor
 			{
-				u8[A1 + 0x2c] = 0x09
+				objA1.subtype2c = 0x09
 			}
 			return
 		}
