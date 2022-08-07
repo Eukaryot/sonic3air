@@ -419,11 +419,7 @@ function void fn06a270()
 		return
 
 	objA0.update_address = 0x06a2a0
-#if STANDALONE
 	A2 = (getNumPlayers() == 1) ? 0x06ad9e : 0x06ada4
-#else
-	A2 = (global.characters != CHARS_SONIC_AND_TAILS) ? 0x06ad9e : 0x06ada4
-#endif
 	SpawnSimpleChildObjects()
 
 	objA0.countdown_value = 0x2f

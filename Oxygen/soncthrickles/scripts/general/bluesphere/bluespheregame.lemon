@@ -535,7 +535,7 @@ function void fn04cf82()
 		global.stage_type = 0
 		bluespheres.minigame_mode = 1
 		global.characters = levelselect.characters
-		lives_counter = 0x03
+		lives_counter = 3
 		global.sk_bluespheres = 0
 		global.next_bluespheres = 0
 		global.game_mode = 0x34

@@ -993,8 +993,9 @@ function void fn05fea8()
 function void fn05fefe()
 {
 	A1 += (global.characters & 0x03) * 2
-	objA0.position.x.u16 += s8[(A1+=1)-1]
-	objA0.position.y.u16 += s8[(A1+=1)-1]
+	objA0.position.x.u16 += s8[A1]
+	objA0.position.y.u16 += s8[A1+1]
+	A1 += 2
 }
 
 
@@ -1003,8 +1004,9 @@ function void fn05ffd4()
 {
 	A1 += objA0.subtype2c
 	A2 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.position.x.u16 = u16[A2 + 0x10] + s8[(A1+=1)-1]
-	objA0.position.y.u16 = u16[A2 + 0x14] + s8[(A1+=1)-1]
+	objA0.position.x.u16 = u16[A2 + 0x10] + s8[A1]
+	objA0.position.y.u16 = u16[A2 + 0x14] + s8[A1+1]
+	A1 += 2
 }
 
 
