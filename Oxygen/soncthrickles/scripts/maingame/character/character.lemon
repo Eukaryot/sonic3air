@@ -3605,11 +3605,7 @@ function void gainExtraLife()
 	if (Game.isTimeAttack())
 		return
 
-	if (Game.getSetting(SETTING_INFINITE_LIVES))
-	{
-		lives_counter = 3
-	}
-	else
+	if (!Game.getSetting(SETTING_INFINITE_LIVES))
 	{
 		lives_counter = min(lives_counter + 1, 99)
 		++hud.dirty.lives
@@ -6635,11 +6631,7 @@ function void Character.CheckDiedStateEnd()
 			global.in_extra_stage = 0
 
 		#if STANDALONE
-			if (Game.getSetting(SETTING_INFINITE_LIVES))
-			{
-				lives_counter = 3
-			}
-			else
+			if (!Game.getSetting(SETTING_INFINITE_LIVES))
 		#endif
 			{
 				--lives_counter

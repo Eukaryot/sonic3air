@@ -1446,11 +1446,7 @@ function void fn00972e()
 				if (grantExtraLife)
 				{
 				#if STANDALONE
-					if (Game.getSetting(SETTING_INFINITE_LIVES))
-					{
-						lives_counter = 3
-					}
-					else
+					if (!Game.getSetting(SETTING_INFINITE_LIVES))
 					{
 						lives_counter = min(lives_counter + 1, 99)
 						soundId = 0xb9

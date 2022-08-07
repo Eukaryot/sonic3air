@@ -175,7 +175,7 @@ function void RenderHUD()
 			++renderQueue
 		}
 
-		// Lives (not visible in Time Attack)
+		// Lives (not visible in Time Attack or with infinite lives setting)
 		if (!Game.isTimeAttack() && !Game.getSetting(SETTING_INFINITE_LIVES))
 		{
 			bool useMobilePosition = HUD.useMobileLivesDisplay()
