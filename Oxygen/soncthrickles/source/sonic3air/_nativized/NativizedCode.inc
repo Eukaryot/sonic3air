@@ -838,7 +838,7 @@ static void exec_7b7b2d639cf64dfb(const RuntimeOpcodeContext context)
 	context.writeLocalVariable<uint16>(context.getParameter<uint32>(8), (uint16)var2);
 }
 
-// First occurrence: checkForMultiReturn, line 708
+// First occurrence: checkForMultiReturn, line 725
 static void exec_2bb6072d6b7886f1(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -847,7 +847,7 @@ static void exec_2bb6072d6b7886f1(const RuntimeOpcodeContext context)
 	context.moveValueStack(1);
 }
 
-// First occurrence: checkForMultiReturn, line 710
+// First occurrence: checkForMultiReturn, line 727
 static void exec_65d7022203f98b98(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -855,7 +855,7 @@ static void exec_65d7022203f98b98(const RuntimeOpcodeContext context)
 	*context.getParameter<uint8*>(16) = (uint8)var2;
 }
 
-// First occurrence: signalMultiReturn, line 721
+// First occurrence: signalMultiReturn, line 738
 static void exec_59314229697c1db3(const RuntimeOpcodeContext context)
 {
 	const uint8 var0 = (uint8)*context.getParameter<uint8*>();
@@ -864,7 +864,7 @@ static void exec_59314229697c1db3(const RuntimeOpcodeContext context)
 	*context.getParameter<uint8*>(8) = (uint8)var2;
 }
 
-// First occurrence: debugDrawOutlineRect, line 730
+// First occurrence: debugDrawOutlineRect, line 747
 static void exec_56c7aa664c8c4397(const RuntimeOpcodeContext context)
 {
 	context.writeLocalVariable<uint32>(context.getParameter<uint32>(), (uint32)context.readValueStack<uint32>(-1));
@@ -875,7 +875,7 @@ static void exec_56c7aa664c8c4397(const RuntimeOpcodeContext context)
 	context.moveValueStack(-5);
 }
 
-// First occurrence: debugDrawOutlineRect, line 733
+// First occurrence: debugDrawOutlineRect, line 750
 static void exec_b474954f2b72c674(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint32>(0, (uint32)(uint32)context.readLocalVariable<uint32>(context.getParameter<uint32>()));
@@ -886,7 +886,7 @@ static void exec_b474954f2b72c674(const RuntimeOpcodeContext context)
 	context.moveValueStack(5);
 }
 
-// First occurrence: debugDrawOutlineRect, line 734
+// First occurrence: debugDrawOutlineRect, line 751
 static void exec_631a1f1093d4603e(const RuntimeOpcodeContext context)
 {
 	const uint32 var0 = (uint32)context.readLocalVariable<uint32>(context.getParameter<uint32>());
@@ -901,7 +901,7 @@ static void exec_631a1f1093d4603e(const RuntimeOpcodeContext context)
 	context.moveValueStack(5);
 }
 
-// First occurrence: debugDrawOutlineRect, line 735
+// First occurrence: debugDrawOutlineRect, line 752
 static void exec_48e90ac51e81a43a(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint32>(0, (uint32)(uint32)context.readLocalVariable<uint32>(context.getParameter<uint32>()));
@@ -912,7 +912,7 @@ static void exec_48e90ac51e81a43a(const RuntimeOpcodeContext context)
 	context.moveValueStack(5);
 }
 
-// First occurrence: debugDrawOutlineRect, line 736
+// First occurrence: debugDrawOutlineRect, line 753
 static void exec_98f50d2765e379e0(const RuntimeOpcodeContext context)
 {
 	context.writeValueStack<uint32>(0, (uint32)(uint32)context.readLocalVariable<uint32>(context.getParameter<uint32>()));
