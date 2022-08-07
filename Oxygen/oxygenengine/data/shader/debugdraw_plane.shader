@@ -80,7 +80,7 @@ void main()
 #endif
 	paletteIndex += atex;
 
-	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex) / 512.0, 0.0));
+	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex + 0.5) / 512, 0.0));
 	if ((patternIndex >> 15) < HighlightPrio)
 		color.rgb *= 0.3;
 
