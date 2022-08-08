@@ -705,9 +705,19 @@ TEMPLATE bool STRING::includesAt(const CHAR* str, int pos) const
 	return true;
 }
 
+TEMPLATE bool STRING::includesAt(StdStringView str, int pos) const
+{
+	return includesAt(str.data(), pos);
+}
+
 TEMPLATE bool STRING::startsWith(const CHAR* str) const
 {
 	return includesAt(str, 0);
+}
+
+TEMPLATE bool STRING::startsWith(StdStringView str) const
+{
+	return includesAt(str.data(), 0);
 }
 
 TEMPLATE bool STRING::endsWith(const CHAR* str) const
@@ -715,7 +725,17 @@ TEMPLATE bool STRING::endsWith(const CHAR* str) const
 	int len = 0;
 	while (str[len])
 		++len;
-	return includesAt(str, (int)mLength - len);
+	return endsWith(str, len);
+}
+
+TEMPLATE bool STRING::endsWith(const CHAR* str, int length) const
+{
+	return includesAt(str, (int)mLength - length);
+}
+
+TEMPLATE bool STRING::endsWith(StdStringView str) const
+{
+	return includesAt(str.data, (int)mLength - str.length());
 }
 
 TEMPLATE void STRING::makeSubString(int pos, int len)

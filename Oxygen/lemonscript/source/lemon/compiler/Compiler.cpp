@@ -1234,7 +1234,7 @@ namespace lemon
 		static const std::string PREFIX_FEATURE_LEVEL = "script-feature-level(";
 		String str(content);
 		str.trimWhitespace();
-		if (str.startsWith(PREFIX_FEATURE_LEVEL.c_str()) && str.endsWith(")"))
+		if (str.startsWith(PREFIX_FEATURE_LEVEL) && str.endsWith(")"))
 		{
 			str.remove(0, (int)PREFIX_FEATURE_LEVEL.size());
 			str.remove(str.length() - 1, 1);

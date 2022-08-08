@@ -598,7 +598,7 @@ namespace rmx
 			return false;
 
 		const WString postfix = mask.getSubString(wildcardPosition + 1, -1);
-		if (postfix.length() > 0 && !name.endsWith(*postfix))
+		if (postfix.length() > 0 && !name.endsWith(*postfix, postfix.length()))
 			return false;
 
 		return true;

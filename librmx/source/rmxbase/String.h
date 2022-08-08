@@ -119,8 +119,12 @@ public:
 	bool includes(const CHAR* str) const;
 	bool includes(const CHAR* str, int& pos) const;
 	bool includesAt(const CHAR* str, int pos) const;
+	bool includesAt(StdStringView str, int pos) const;
 	bool startsWith(const CHAR* str) const;
+	bool startsWith(StdStringView str) const;
 	bool endsWith(const CHAR* str) const;
+	bool endsWith(const CHAR* str, int length) const;
+	bool endsWith(StdStringView str) const;
 
 	void makeSubString(int pos, int len);
 	void makeSubString(const StringTemplate& str, int pos, int len);
