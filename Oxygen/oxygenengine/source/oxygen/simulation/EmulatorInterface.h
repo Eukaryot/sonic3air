@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "oxygen/helper/ChangeBitSet.h"
 #include "oxygen/simulation/DebuggingInterfaces.h"
 
 #include <lemon/runtime/Runtime.h>	// Definition of "lemon::MemoryAccessHandler"
@@ -90,7 +89,7 @@ public:
 	void writeVRam16(uint16 vramAddress, uint16 value);
 	void fillVRam(uint16 vramAddress, uint16 fillValue, uint16 bytes);
 	void copyFromMemoryToVRam(uint16 vramAddress, uint32 sourceAddress, uint16 bytes);
-	ChangeBitSet<0x800>& getVRamChangeBits();
+	BitArray<0x800>& getVRamChangeBits();
 
 	// VSRAM = Vertical scroll RAM
 	uint16* getVSRam();

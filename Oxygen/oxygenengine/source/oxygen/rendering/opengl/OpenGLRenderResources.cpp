@@ -143,7 +143,7 @@ void OpenGLRenderResources::refresh()
 	{
 		PaletteBitmap& bitmap = mPatternCacheBitmap;
 		const PatternManager::CacheItem* patternCache = mRenderParts.getPatternManager().getPatternCache();
-		const ChangeBitSet<0x800>& patternChangeBits = mRenderParts.getPatternManager().getChangeBits();
+		const BitArray<0x800>& patternChangeBits = mRenderParts.getPatternManager().getChangeBits();
 
 		mPatternCacheTexture.bindBuffer();
 		struct Range

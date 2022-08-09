@@ -183,7 +183,6 @@
     <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
     <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />
     <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h" />
-    <ClInclude Include="..\..\source\oxygen\helper\ChangeBitSet.h" />
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />

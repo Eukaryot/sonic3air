@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/helper/ChangeBitSet.h"
+#include <rmxbase.h>
 
 class PaletteBitmap;
 
@@ -34,11 +34,11 @@ public:
 	void setLastUsedAtex(uint16 patternIndex, uint8 atex);
 
 	inline const CacheItem* getPatternCache() const  { return mPatternCache; }
-	const ChangeBitSet<0x800>& getChangeBits() const { return mChangeBits; }
+	const BitArray<0x800>& getChangeBits() const  { return mChangeBits; }
 
 	void dumpAsPaletteBitmap(PaletteBitmap& output) const;
 
 private:
 	CacheItem mPatternCache[0x800];
-	ChangeBitSet<0x800> mChangeBits;	// One bit for each pattern, so we know which ones were changed in the last "refresh" call
+	BitArray<0x800> mChangeBits;	// One bit for each pattern, so we know which ones were changed in the last "refresh" call
 };

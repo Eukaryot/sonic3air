@@ -76,6 +76,7 @@ namespace rmx
 	};
 
 
+
 	class InputContext
 	{
 	public:
@@ -87,15 +88,16 @@ namespace rmx
 		void applyEvent(const KeyboardEvent& ev);
 		void applyEvent(const MouseEvent& ev);
 
-		inline bool getKeyState(int key) const	{ return (((mKeyState[(key & 0x01ff)/32] >> (key%32)) & 1) != 0); }
-		inline bool getKeyChange(int key) const	{ return (((mKeyChange[(key & 0x01ff)/32] >> (key%32)) & 1) != 0); }
+		inline size_t getBitIndex(int key) const { return (key & 0x01ff) + ((key & SDLK_SCANCODE_MASK) >> 21); }
+		inline bool getKeyState(int key) const	 { return mKeyState.isBitSet(getBitIndex(key)); }
+		inline bool getKeyChange(int key) const	 { return mKeyChange.isBitSet(getBitIndex(key)); }
 
 		bool getMouseState(int button) const;
 		bool getMouseChange(int button) const;
 
 	public:
-		uint32 mKeyState[16];
-		uint32 mKeyChange[16];
+		BitArray<0x400> mKeyState;
+		BitArray<0x400> mKeyChange;
 		Vec2i mMousePos;
 		Vec2i mMouseRel;
 		int   mMouseWheel;

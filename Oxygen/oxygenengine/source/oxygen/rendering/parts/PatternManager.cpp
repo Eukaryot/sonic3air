@@ -17,7 +17,7 @@ void PatternManager::refresh()
 	mChangeBits.clearAllBits();
 
 	// Update pattern cache content
-	const ChangeBitSet<0x800>& changeBits = EmulatorInterface::instance().getVRamChangeBits();
+	const BitArray<0x800>& changeBits = EmulatorInterface::instance().getVRamChangeBits();
 	for (int bitSetChunkIndex = 0; bitSetChunkIndex < 32; ++bitSetChunkIndex)	// Each chunk is 64 bits, each representing one pattern (= 32 bytes of VRAM)
 	{
 		if (changeBits.anyBitSetInChunk(bitSetChunkIndex))

@@ -207,6 +207,7 @@
     <ClInclude Include="..\..\source\rmxbase.h" />
     <ClInclude Include="..\..\source\rmxbase\Basics.h" />
     <ClInclude Include="..\..\source\rmxbase\BinarySerializer.h" />
+    <ClInclude Include="..\..\source\rmxbase\BitArray.h" />
     <ClInclude Include="..\..\source\rmxbase\BitFlagSet.h" />
     <ClInclude Include="..\..\source\rmxbase\Bitmap.h" />
     <ClInclude Include="..\..\source\rmxbase\BitmapCodecs.h" />

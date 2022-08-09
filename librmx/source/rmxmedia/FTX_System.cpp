@@ -255,7 +255,7 @@ namespace rmx
 
 	FTX_VideoManager::~FTX_VideoManager()
 	{
-		// TODO(fw): Do this right here?
+		// TODO: Do this right here?
 		SDL_DestroyWindow(mMainWindow);
 	}
 

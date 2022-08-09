@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <rmxbase.h>
+#include "rmxbase/ErrorHandler.h"
 
 
 template<size_t NUM_BITS>
-class ChangeBitSet
+class BitArray
 {
 public:
 	static const constexpr size_t NUM_CHUNKS = (NUM_BITS + 63) / 64;
@@ -30,21 +30,35 @@ public:
 
 	bool isBitSet(size_t index) const
 	{
+		RMX_ASSERT(index < NUM_BITS, "Invalid index " << index << " for bitfield of size " << NUM_BITS);
 		return (bool)((mChunks[index >> 6] >> (index & 0x3f)) & 1);
 	}
 
 	void clearBit(size_t index)
 	{
+		RMX_ASSERT(index < NUM_BITS, "Invalid index " << index << " for bitfield of size " << NUM_BITS);
 		mChunks[index >> 6] &= ~(1ULL << (index & 0x3f));
 	}
 
 	void setBit(size_t index)
 	{
+		RMX_ASSERT(index < NUM_BITS, "Invalid index " << index << " for bitfield of size " << NUM_BITS);
 		mChunks[index >> 6] |= (1ULL << (index & 0x3f));
+	}
+
+	void setBit(size_t index, bool value)
+	{
+		RMX_ASSERT(index < NUM_BITS, "Invalid index " << index << " for bitfield of size " << NUM_BITS);
+		if (value)
+			mChunks[index >> 6] |= (1ULL << (index & 0x3f));
+		else
+			mChunks[index >> 6] &= ~(1ULL << (index & 0x3f));
 	}
 
 	void setBitsInRange(size_t firstIndex, size_t lastIndex)
 	{
+		RMX_ASSERT(firstIndex < NUM_BITS, "Invalid first index " << firstIndex << " for bitfield of size " << NUM_BITS);
+		RMX_ASSERT(lastIndex < NUM_BITS, "Invalid last index " << lastIndex << " for bitfield of size " << NUM_BITS);
 		const size_t firstChunkIndex = (firstIndex >> 6);
 		const size_t lastChunkIndex = (lastIndex >> 6);
 		for (size_t chunkIndex = firstChunkIndex; chunkIndex <= lastChunkIndex; ++chunkIndex)
@@ -65,11 +79,13 @@ public:
 
 	bool anyBitSetInChunk(size_t chunkIndex) const
 	{
+		RMX_ASSERT(chunkIndex < NUM_CHUNKS, "Invalid chunk index " << chunkIndex << ", must be below " << NUM_CHUNKS);
 		return mChunks[chunkIndex];
 	}
 
 	int getNextSetBit(size_t startIndex) const
 	{
+		RMX_ASSERT(startIndex < NUM_BITS, "Invalid index " << startIndex << " for bitfield of size " << NUM_BITS);
 		size_t chunkIndex = (startIndex >> 6);
 		size_t bitIndex = (startIndex & 0x3f);
 		while (chunkIndex < NUM_CHUNKS)
@@ -105,6 +121,7 @@ public:
 
 	int getNextClearedBit(size_t startIndex) const
 	{
+		RMX_ASSERT(startIndex < NUM_BITS, "Invalid index " << startIndex << " for bitfield of size " << NUM_BITS);
 		size_t chunkIndex = (startIndex >> 6);
 		size_t bitIndex = (startIndex & 0x3f);
 		while (chunkIndex < NUM_CHUNKS)

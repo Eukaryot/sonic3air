@@ -199,6 +199,9 @@
     <ClInclude Include="..\..\source\rmxbase\BitFlagSet.h">
       <Filter>Tools</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\BitArray.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\Math.cpp">

@@ -53,23 +53,19 @@ namespace rmx
 
 	void InputContext::applyEvent(const KeyboardEvent& ev)
 	{
-		static_assert(SDL_NUM_SCANCODES == 0x0200);
-		const int entryIndex = (ev.key & 0x01ff) / 32;
-		const int keyBitmask = 1 << (ev.key % 32);
+		static_assert(SDL_NUM_SCANCODES == 0x0200);		// That's actually only partially relevant, as we're using keycodes, not scancodes
+		const size_t bitIndex = getBitIndex(ev.key);
 
-		const bool oldState = (mKeyState[entryIndex] & keyBitmask) != 0;
+		const bool oldState = mKeyState.isBitSet(bitIndex);
 		const bool change = (oldState != ev.state);
 		if (change)
 		{
-			mKeyChange[entryIndex] |= keyBitmask;
-			if (ev.state)
-				mKeyState[entryIndex] |= keyBitmask;
-			else
-				mKeyState[entryIndex] &= ~keyBitmask;
+			mKeyState.setBit(bitIndex, ev.state);
+			mKeyChange.setBit(bitIndex);
 		}
 		else
 		{
-			mKeyChange[entryIndex] &= ~keyBitmask;
+			mKeyChange.clearBit(bitIndex);
 		}
 	}
 
