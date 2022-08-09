@@ -84,15 +84,15 @@ private:
 	{
 		Vec2f mCenter;			// Center position on screen (see remarks on the coordinate system above)
 		Vec2f mHalfExtend;		// Relative half size on screen
-		DrawerTexture* mTexture = nullptr;
+		uint64 mSpriteKey = 0;
 		InputManager::Control* mControl = nullptr;
 		ConfigMode::State mReactToState;
 	};
 
 private:
 	void buildPointButton(const Vec2f& center, float radius, float priority, InputManager::Control& control, InputManager::Control* control2);
-	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, DrawerTexture& texture, InputManager::Control& control, ConfigMode::State reactToState);
-	void buildRoundButton(const Vec2f& center, float radius, DrawerTexture& texture, InputManager::Control& control, ConfigMode::State reactToState);
+	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState);
+	void buildRoundButton(const Vec2f& center, float radius, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState);
 
 	const TouchArea* getTouchAreaAtNormalizedPosition(const Vec2f& position) const;
 	Vec2f getNormalizedTouchFromScreenPosition(Vec2f vec) const;
@@ -107,15 +107,6 @@ private:
 	Vec2f mScreenScale;		// Used for coordinate system conversion: Screen scale in screen space
 
 	std::vector<VisualElement> mVisualElements;
-	DrawerTexture mDirectionalPadTextureLeft;
-	DrawerTexture mDirectionalPadTextureRight;
-	DrawerTexture mDirectionalPadTextureUp;
-	DrawerTexture mDirectionalPadTextureDown;
-	DrawerTexture mButtonTextureStart;
-	DrawerTexture mButtonTextureA;
-	DrawerTexture mButtonTextureB;
-	DrawerTexture mButtonTextureX;
-	DrawerTexture mButtonTextureY;
 	DrawerTexture mDoneText;
 
 	float mAutoHideTimer = 0.0f;

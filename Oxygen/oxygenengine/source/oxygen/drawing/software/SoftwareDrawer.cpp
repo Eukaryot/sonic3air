@@ -275,6 +275,89 @@ namespace softwaredrawer
 			return (mCurrentBlendMode == DrawerBlendMode::ALPHA);
 		}
 
+		void drawRect(Recti targetRect, Bitmap* inputBitmap, const Color& color, Vec2f uv0 = Vec2f(0.0f, 0.0f), Vec2f uv1 = Vec2f(1.0f, 1.0f))
+		{
+			BitmapWrapper& outputWrapper = getOutputWrapper();
+
+			// Target rect to fill in the output
+			bool mirrorX = false;
+			if (targetRect.width < 0)
+			{
+				// Mirror horizontally
+				mirrorX = true;
+				targetRect.x += targetRect.width;
+				targetRect.width = -targetRect.width;
+			}
+			const Recti uncroppedRect = targetRect;
+			targetRect.intersect(targetRect, getScissorRect());
+
+			if (targetRect.empty())
+				return;
+
+			Blitter::Options options;
+			options.mUseAlphaBlending = useAlphaBlending();
+
+			if (nullptr != inputBitmap)
+			{
+				// Consider mirroring
+				if (mirrorX)
+				{
+					softwaredrawer::mirrorBitmapX(mTempBuffer, mTempReservedSize, *inputBitmap);
+					inputBitmap = &mTempBuffer;
+				}
+
+				BitmapWrapper inputWrapper(*inputBitmap);
+				if (needSwapRedBlueChannels())
+				{
+					setupRedBlueSwappedBitmapWrapper(inputWrapper);
+				}
+
+				Recti inputRect;
+				bool useUVs = false;
+				{
+					// Calculate actual UVs that also take cropping into account
+					if (targetRect != uncroppedRect)
+					{
+						const Vec2f relativeStart = Vec2f(targetRect.getPos() - uncroppedRect.getPos()) / Vec2f(uncroppedRect.getSize());
+						const Vec2f relativeEnd   = Vec2f(targetRect.getPos() - uncroppedRect.getPos() + targetRect.getSize()) / Vec2f(uncroppedRect.getSize());
+						const Vec2f orginalUVStart = uv0;
+						const Vec2f orginalUVRange = uv1 - uv0;
+						uv0 = orginalUVStart + relativeStart * orginalUVRange;
+						uv1 = orginalUVStart + relativeEnd * orginalUVRange;
+					}
+
+					useUVs = (uv0.x < 0.0f || uv0.x > uv1.x || uv1.x > 1.0f || uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
+
+					// Get the part from the input that will get drawn
+					const Vec2f inputStart = uv0 * Vec2f(inputWrapper.getSize());
+					const Vec2f inputEnd = uv1 * Vec2f(inputWrapper.getSize());
+					inputRect.x = roundToInt(inputStart.x);
+					inputRect.y = roundToInt(inputStart.y);
+					inputRect.width = roundToInt(inputEnd.x) - inputRect.x;
+					inputRect.height = roundToInt(inputEnd.y) - inputRect.y;
+				}
+
+				options.mTintColor = color;
+
+				if (useUVs)
+				{
+					Blitter::blitBitmapWithUVs(outputWrapper, targetRect, inputWrapper, inputRect, options);
+				}
+				else if (targetRect.getSize() != inputRect.getSize())
+				{
+					Blitter::blitBitmapWithScaling(outputWrapper, targetRect, inputWrapper, inputRect, options);
+				}
+				else
+				{
+					Blitter::blitBitmap(outputWrapper, targetRect.getPos(), inputWrapper, inputRect, options);
+				}
+			}
+			else
+			{
+				Blitter::blitColor(outputWrapper, targetRect, color, options);
+			}
+		}
+
 		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
 		{
 			BitmapWrapper& outputWrapper = getOutputWrapper();
@@ -398,89 +481,9 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 			case DrawCommand::Type::RECT:
 			{
 				RectDrawCommand& dc = drawCommand->as<RectDrawCommand>();
-				BitmapWrapper& outputWrapper = mInternal.getOutputWrapper();
+				Bitmap* inputBitmap = (nullptr == dc.mTexture) ? nullptr : &dc.mTexture->accessBitmap();
 
-				// Target rect to fill in the output
-				Recti targetRect = dc.mRect;
-				bool mirrorX = false;
-				if (targetRect.width < 0)
-				{
-					// Mirror horizontally
-					mirrorX = true;
-					targetRect.x += targetRect.width;
-					targetRect.width = -targetRect.width;
-				}
-				const Recti uncroppedRect = targetRect;
-				targetRect.intersect(targetRect, mInternal.getScissorRect());
-
-				if (!targetRect.empty())
-				{
-					Blitter::Options options;
-					options.mUseAlphaBlending = mInternal.useAlphaBlending();
-
-					if (nullptr != dc.mTexture)
-					{
-						Bitmap* inputBitmap = &dc.mTexture->accessBitmap();
-
-						// Consider mirroring
-						if (mirrorX)
-						{
-							softwaredrawer::mirrorBitmapX(mInternal.mTempBuffer, mInternal.mTempReservedSize, *inputBitmap);
-							inputBitmap = &mInternal.mTempBuffer;
-						}
-
-						BitmapWrapper inputWrapper(*inputBitmap);
-						if (mInternal.needSwapRedBlueChannels())
-						{
-							mInternal.setupRedBlueSwappedBitmapWrapper(inputWrapper);
-						}
-
-						Recti inputRect;
-						bool useUVs = false;
-						{
-							// Calculate actual UVs that also take cropping into account
-							Vec2f uv0 = dc.mUV0;
-							Vec2f uv1 = dc.mUV1;
-							if (targetRect != uncroppedRect)
-							{
-								const Vec2f relativeStart = Vec2f(targetRect.getPos() - uncroppedRect.getPos()) / Vec2f(uncroppedRect.getSize());
-								const Vec2f relativeEnd   = Vec2f(targetRect.getPos() - uncroppedRect.getPos() + targetRect.getSize()) / Vec2f(uncroppedRect.getSize());
-								uv0 = dc.mUV0 + relativeStart * (dc.mUV1 - dc.mUV0);
-								uv1 = dc.mUV0 + relativeEnd   * (dc.mUV1 - dc.mUV0);
-							}
-
-							useUVs = (uv0.x < 0.0f || uv0.x > uv1.x || uv1.x > 1.0f || uv0.y < 0.0f || uv0.y > uv1.y || uv1.y > 1.0f);
-
-							// Get the part from the input that will get drawn
-							const Vec2f inputStart = uv0 * Vec2f(inputWrapper.getSize());
-							const Vec2f inputEnd = uv1 * Vec2f(inputWrapper.getSize());
-							inputRect.x = roundToInt(inputStart.x);
-							inputRect.y = roundToInt(inputStart.y);
-							inputRect.width = roundToInt(inputEnd.x) - inputRect.x;
-							inputRect.height = roundToInt(inputEnd.y) - inputRect.y;
-						}
-
-						// TODO: Support tint color everywhere
-						options.mTintColor = dc.mColor;
-
-						if (useUVs)
-						{
-							Blitter::blitBitmapWithUVs(outputWrapper, targetRect, inputWrapper, inputRect, options);
-						}
-						else if (targetRect.getSize() != inputRect.getSize())
-						{
-							Blitter::blitBitmapWithScaling(outputWrapper, targetRect, inputWrapper, inputRect, options);
-						}
-						else
-						{
-							Blitter::blitBitmap(outputWrapper, targetRect.getPos(), inputWrapper, inputRect, options);
-						}
-					}
-					else
-					{
-						Blitter::blitColor(outputWrapper, targetRect, dc.mColor, options);
-					}
-				}
+				mInternal.drawRect(dc.mRect, inputBitmap, dc.mColor, dc.mUV0, dc.mUV1);
 				break;
 			}
 
@@ -512,28 +515,21 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 				if (!item->mUsesComponentSprite)
 					break;
 
-				BitmapWrapper& outputWrapper = mInternal.getOutputWrapper();
 				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
-
-				// Target rect to fill in the output
-				Recti targetRect(sc.mPosition + sprite.mOffset, sprite.getBitmap().getSize());
-				const Recti uncroppedRect = targetRect;
-				targetRect.intersect(targetRect, mInternal.getScissorRect());
-
-				if (!targetRect.empty())
+				Vec2i offset = sprite.mOffset;
+				Vec2i size = sprite.getBitmap().getSize();
+				if (sc.mScale.x != 1.0f || sc.mScale.y != 1.0f)
 				{
-					Blitter::Options options;
-					options.mUseAlphaBlending = mInternal.useAlphaBlending();
-					options.mTintColor = sc.mTintColor;
-
-					BitmapWrapper inputWrapper(sprite.accessBitmap());
-					if (mInternal.needSwapRedBlueChannels())
-					{
-						mInternal.setupRedBlueSwappedBitmapWrapper(inputWrapper);
-					}
-
-					Blitter::blitBitmap(outputWrapper, targetRect.getPos(), inputWrapper, Recti(Vec2i(0, 0), sprite.getBitmap().getSize()), options);
+					offset.x = roundToInt((float)offset.x * sc.mScale.x);
+					offset.y = roundToInt((float)offset.y * sc.mScale.y);
+					size.x = roundToInt((float)size.x * sc.mScale.x);
+					size.y = roundToInt((float)size.y * sc.mScale.y);
 				}
+				const Recti targetRect(sc.mPosition + offset, size);
+
+				// TODO: No support for bilinear sampling here...
+
+				mInternal.drawRect(targetRect, &sprite.accessBitmap(), sc.mTintColor);
 				break;
 			}
 

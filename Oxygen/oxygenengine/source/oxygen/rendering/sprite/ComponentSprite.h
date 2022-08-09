@@ -21,6 +21,8 @@ public:
 	inline const Bitmap& getBitmap() const  { return mBitmap; }
 	inline Bitmap& accessBitmap()  { return mBitmap; }
 
+	inline Vec2i getSize() const override  { return mBitmap.getSize(); }
+
 private:
 	Bitmap mBitmap;
 };

@@ -188,6 +188,44 @@ namespace opengldrawer
 			}
 		}
 
+		void applySamplingMode()
+		{
+			switch (mCurrentSamplingMode)
+			{
+				case DrawerSamplingMode::POINT:
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+					break;
+				}
+				case DrawerSamplingMode::BILINEAR:
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					break;
+				}
+			}
+		}
+
+		void applyWrapMode()
+		{
+			switch (mCurrentWrapMode)
+			{
+				case DrawerWrapMode::CLAMP:
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+					break;
+				}
+				case DrawerWrapMode::REPEAT:
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+					break;
+				}
+			}
+		}
+
 		GLuint setupTexture(DrawerTexture& drawerTexture)
 		{
 			OpenGLDrawerTexture* openGLDrawerTexture = drawerTexture.getImplementation<OpenGLDrawerTexture>();
@@ -197,36 +235,8 @@ namespace opengldrawer
 			if (openGLDrawerTexture->mSamplingMode != mCurrentSamplingMode || openGLDrawerTexture->mWrapMode != mCurrentWrapMode)
 			{
 				glBindTexture(GL_TEXTURE_2D, textureHandle);
-				switch (mCurrentSamplingMode)
-				{
-					case DrawerSamplingMode::POINT:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-						break;
-					}
-					case DrawerSamplingMode::BILINEAR:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-						break;
-					}
-				}
-				switch (mCurrentWrapMode)
-				{
-					case DrawerWrapMode::CLAMP:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-						break;
-					}
-					case DrawerWrapMode::REPEAT:
-					{
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-						break;
-					}
-				}
+				applySamplingMode();
+				applyWrapMode();
 				openGLDrawerTexture->mSamplingMode = mCurrentSamplingMode;
 				openGLDrawerTexture->mWrapMode = mCurrentWrapMode;
 			}
@@ -242,6 +252,60 @@ namespace opengldrawer
 
 			const auto pair = mFontOutputMap.emplace(&font, font);
 			return pair.first->second;
+		}
+
+		void drawRect(Recti targetRect, GLuint textureHandle, const Color& color, Vec2f uv0 = Vec2f(0.0f, 0.0f), Vec2f uv1 = Vec2f(1.0f, 1.0f))
+		{
+			const Vec4f rectParam = getTransformOfRectInViewport(targetRect);
+
+			if (textureHandle != 0)
+			{
+				const bool needsTintColor = (color != Color::WHITE);
+
+				if (uv0.x == 0.0f && uv0.y == 0.0f && uv1.x == 1.0f && uv1.y == 1.0f)
+				{
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mCurrentBlendMode == DrawerBlendMode::ALPHA);
+					shader.bind();
+					shader.setParam("Transform", rectParam);
+					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
+					if (needsTintColor)
+						shader.setParam("TintColor", color);
+
+					OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+				}
+				else
+				{
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mCurrentBlendMode == DrawerBlendMode::ALPHA);
+					shader.bind();
+					shader.setParam("Transform", rectParam);
+					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
+					if (needsTintColor)
+						shader.setParam("TintColor", color);
+
+					const float vertexData[] =
+					{
+						0.0f, 0.0f, uv0.x, uv0.y,		// Upper left
+						0.0f, 1.0f, uv0.x, uv1.y,		// Lower left
+						1.0f, 1.0f, uv1.x, uv1.y,		// Lower right
+						1.0f, 1.0f, uv1.x, uv1.y,		// Lower right
+						1.0f, 0.0f, uv1.x, uv0.y,		// Upper right
+						0.0f, 0.0f, uv0.x, uv0.y		// Upper left
+					};
+
+					mMeshVAO.setup(opengl::VertexArrayObject::Format::P2_T2);
+					mMeshVAO.updateVertexData(&vertexData[0], 6);
+					mMeshVAO.draw(GL_TRIANGLES);
+				}
+			}
+			else
+			{
+				Shader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
+				shader.bind();
+				shader.setParam("Transform", rectParam);
+				shader.setParam("Color", Vec4f(color.data));
+
+				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+			}
 		}
 
 		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
@@ -395,57 +459,13 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					break;
 
 				RectDrawCommand& dc = drawCommand->as<RectDrawCommand>();
-				const Vec4f rectParam = mInternal.getTransformOfRectInViewport(dc.mRect);
-
+				GLuint textureHandle = 0;
 				if (nullptr != dc.mTexture)
 				{
-					const GLuint textureHandle = mInternal.setupTexture(*dc.mTexture);
-					const bool needsTintColor = (dc.mColor != Color::WHITE);
-
-					if (dc.mUV0.x == 0.0f && dc.mUV0.y == 0.0f && dc.mUV1.x == 1.0f && dc.mUV1.y == 1.0f)
-					{
-						Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
-						shader.bind();
-						shader.setParam("Transform", rectParam);
-						shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-						if (needsTintColor)
-							shader.setParam("TintColor", dc.mColor);
-
-						OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
-					}
-					else
-					{
-						Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
-						shader.bind();
-						shader.setParam("Transform", rectParam);
-						shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
-						if (needsTintColor)
-							shader.setParam("TintColor", dc.mColor);
-
-						const float vertexData[] =
-						{
-							0.0f, 0.0f, dc.mUV0.x, dc.mUV0.y,		// Upper left
-							0.0f, 1.0f, dc.mUV0.x, dc.mUV1.y,		// Lower left
-							1.0f, 1.0f, dc.mUV1.x, dc.mUV1.y,		// Lower right
-							1.0f, 1.0f, dc.mUV1.x, dc.mUV1.y,		// Lower right
-							1.0f, 0.0f, dc.mUV1.x, dc.mUV0.y,		// Upper right
-							0.0f, 0.0f, dc.mUV0.x, dc.mUV0.y		// Upper left
-						};
-
-						mInternal.mMeshVAO.setup(opengl::VertexArrayObject::Format::P2_T2);
-						mInternal.mMeshVAO.updateVertexData(&vertexData[0], 6);
-						mInternal.mMeshVAO.draw(GL_TRIANGLES);
-					}
+					textureHandle = mInternal.setupTexture(*dc.mTexture);
 				}
-				else
-				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectColoredShader();
-					shader.bind();
-					shader.setParam("Transform", rectParam);
-					shader.setParam("Color", Vec4f(dc.mColor.data));
 
-					OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
-				}
+				mInternal.drawRect(dc.mRect, textureHandle, dc.mColor, dc.mUV0, dc.mUV1);
 				break;
 			}
 
@@ -473,17 +493,23 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 					break;
 
 				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
-				const Vec4f rectParam = mInternal.getTransformOfRectInViewport(Recti(sc.mPosition + sprite.mOffset, sprite.getBitmap().getSize()));
-				const bool needsTintColor = (sc.mTintColor != Color::WHITE);
+				Vec2i offset = sprite.mOffset;
+				Vec2i size = sprite.getBitmap().getSize();
+				if (sc.mScale.x != 1.0f || sc.mScale.y != 1.0f)
+				{
+					offset.x = roundToInt((float)offset.x * sc.mScale.x);
+					offset.y = roundToInt((float)offset.y * sc.mScale.y);
+					size.x = roundToInt((float)size.x * sc.mScale.x);
+					size.y = roundToInt((float)size.y * sc.mScale.y);
+				}
+				const Recti targetRect(sc.mPosition + offset, size);
 
-				Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mInternal.mCurrentBlendMode == DrawerBlendMode::ALPHA);
-				shader.bind();
-				shader.setParam("Transform", rectParam);
-				shader.setTexture("Texture", texture->getHandle(), GL_TEXTURE_2D);
-				if (needsTintColor)
-					shader.setParam("TintColor", sc.mTintColor);
+				// TODO: Cache sampling mode for the texture?
+				//  -> That requires the sprite texture manager to store (more high level) OpenGLDrawerTexture instead of OpenGLTexture instances
+				glBindTexture(GL_TEXTURE_2D, texture->getHandle());
+				mInternal.applySamplingMode();
 
-				OpenGLDrawerResources::getSimpleQuadVAO().draw(GL_TRIANGLES);
+				mInternal.drawRect(targetRect, texture->getHandle(), sc.mTintColor);
 				break;
 			}
 

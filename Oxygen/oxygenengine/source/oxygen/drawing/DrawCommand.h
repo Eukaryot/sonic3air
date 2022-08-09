@@ -148,12 +148,13 @@ class SpriteDrawCommand final : public DrawCommand
 friend class ObjectPoolBase<SpriteDrawCommand>;
 
 protected:
-	SpriteDrawCommand(Vec2i position, uint64 spriteKey, const Color& tintColor) : DrawCommand(Type::SPRITE), mPosition(position), mSpriteKey(spriteKey), mTintColor(tintColor) {}
+	SpriteDrawCommand(Vec2i position, uint64 spriteKey, const Color& tintColor, Vec2f scale) : DrawCommand(Type::SPRITE), mPosition(position), mSpriteKey(spriteKey), mTintColor(tintColor), mScale(scale) {}
 
 public:
 	Vec2i mPosition;
 	uint64 mSpriteKey;
 	Color mTintColor;
+	Vec2f mScale;
 };
 
 

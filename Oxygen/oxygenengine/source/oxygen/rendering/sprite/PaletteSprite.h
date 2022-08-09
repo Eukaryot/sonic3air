@@ -30,6 +30,8 @@ public:
 	inline const PaletteBitmap& getBitmap() const  { return mBitmap; }
 	const PaletteBitmap& getUpscaledBitmap() const;
 
+	inline Vec2i getSize() const override  { return mBitmap.getSize(); }
+
 private:
 	PaletteBitmap mBitmap;
 	mutable PaletteBitmap mUpscaledBitmap;	// Used for smoother rotation

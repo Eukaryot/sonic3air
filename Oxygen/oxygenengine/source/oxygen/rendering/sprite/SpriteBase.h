@@ -28,6 +28,9 @@ public:
 	};
 
 public:
+	virtual Vec2i getSize() const = 0;
+
+protected:
 	void blitInto(Bitmap& output, const Bitmap& input, const Vec2i& position, const BlitOptions& blitOptions) const;
 
 public:

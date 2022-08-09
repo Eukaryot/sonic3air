@@ -11,6 +11,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
+#include "oxygen/resources/SpriteCache.h"
 
 
 namespace
@@ -71,10 +72,10 @@ void TouchControlsOverlay::buildTouchControls()
 	// Create touch areas and visual elements
 	{
 		const float size = mSetup.mDirectionalPadSize;
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(-0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, mDirectionalPadTextureLeft,  controller.Left,	ConfigMode::State::MOVING_DPAD);
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(+0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, mDirectionalPadTextureRight, controller.Right,	ConfigMode::State::MOVING_DPAD);
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, -0.3f) * size, Vec2f(0.125f, 0.2f) * size, mDirectionalPadTextureUp,    controller.Up,	ConfigMode::State::MOVING_DPAD);
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, +0.3f) * size, Vec2f(0.125f, 0.2f) * size, mDirectionalPadTextureDown,  controller.Down,	ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(-0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, "touch_overlay_left",  controller.Left,	ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(+0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, "touch_overlay_right", controller.Right,	ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, -0.3f) * size, Vec2f(0.125f, 0.2f) * size, "touch_overlay_up",    controller.Up,	ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, +0.3f) * size, Vec2f(0.125f, 0.2f) * size, "touch_overlay_down",  controller.Down,	ConfigMode::State::MOVING_DPAD);
 	}
 	{
 		const float size = mSetup.mDirectionalPadSize;
@@ -85,12 +86,12 @@ void TouchControlsOverlay::buildTouchControls()
 	}
 	{
 		const float size = mSetup.mFaceButtonsSize;
-		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(-0.28f, 0.0f) * size, 0.15f * size, mButtonTextureX, controller.X, ConfigMode::State::MOVING_BUTTONS);
-		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.28f, 0.0f) * size, 0.15f * size, mButtonTextureB, controller.B, ConfigMode::State::MOVING_BUTTONS);
-		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, -0.28f) * size, 0.15f * size, mButtonTextureY, controller.Y, ConfigMode::State::MOVING_BUTTONS);
-		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, +0.28f) * size, 0.15f * size, mButtonTextureA, controller.A, ConfigMode::State::MOVING_BUTTONS);
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(-0.28f, 0.0f) * size, 0.15f * size, "touch_overlay_X", controller.X, ConfigMode::State::MOVING_BUTTONS);
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(+0.28f, 0.0f) * size, 0.15f * size, "touch_overlay_B", controller.B, ConfigMode::State::MOVING_BUTTONS);
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, -0.28f) * size, 0.15f * size, "touch_overlay_Y", controller.Y, ConfigMode::State::MOVING_BUTTONS);
+		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, +0.28f) * size, 0.15f * size, "touch_overlay_A", controller.A, ConfigMode::State::MOVING_BUTTONS);
 	}
-	buildRectangularButton(mSetup.mStartButtonCenter, Vec2f(0.18f, 0.06f), mButtonTextureStart, controller.Start, ConfigMode::State::MOVING_START);
+	buildRectangularButton(mSetup.mStartButtonCenter, Vec2f(0.18f, 0.06f), "touch_overlay_start", controller.Start, ConfigMode::State::MOVING_START);
 
 	mLastScreenSize = FTX::screenSize();
 }
@@ -113,15 +114,6 @@ void TouchControlsOverlay::enableConfigMode(bool enable)
 
 void TouchControlsOverlay::initialize()
 {
-	FileHelper::loadTexture(mDirectionalPadTextureLeft,  L"data/images/overlay/dpad-left.png");
-	FileHelper::loadTexture(mDirectionalPadTextureRight, L"data/images/overlay/dpad-right.png");
-	FileHelper::loadTexture(mDirectionalPadTextureUp,    L"data/images/overlay/dpad-up.png");
-	FileHelper::loadTexture(mDirectionalPadTextureDown,  L"data/images/overlay/dpad-down.png");
-	FileHelper::loadTexture(mButtonTextureStart, L"data/images/overlay/button-start.png");
-	FileHelper::loadTexture(mButtonTextureA, L"data/images/overlay/button-A.png");
-	FileHelper::loadTexture(mButtonTextureB, L"data/images/overlay/button-B.png");
-	FileHelper::loadTexture(mButtonTextureX, L"data/images/overlay/button-X.png");
-	FileHelper::loadTexture(mButtonTextureY, L"data/images/overlay/button-Y.png");
 	FileHelper::loadTexture(mDoneText, L"data/images/overlay/done.png");
 }
 
@@ -208,8 +200,13 @@ void TouchControlsOverlay::render()
 	// Render visual elements
 	if (alpha > 0.0f)
 	{
+		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
 		for (VisualElement& visualElement : mVisualElements)
 		{
+			const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(visualElement.mSpriteKey);
+			if (nullptr == item)
+				continue;
+
 			const bool pressed = (nullptr == visualElement.mControl) ? false : visualElement.mControl->isPressed();
 
 			Rectf rect;
@@ -218,8 +215,12 @@ void TouchControlsOverlay::render()
 
 			Color color = (mConfigMode.mEnabled && visualElement.mReactToState == mConfigMode.mState) ? Color::CYAN : pressed ? Color::YELLOW : Color::WHITE;
 			color.a = alpha;
-			drawer.drawRect(getScreenFromNormalizedTouchRect(rect), *visualElement.mTexture, color);
+
+			rect = getScreenFromNormalizedTouchRect(rect);
+			const Vec2f scale = rect.getSize() / Vec2f(item->mSprite->getSize());
+			drawer.drawSprite(rect.getPos() + rect.getSize() / 2, visualElement.mSpriteKey, color, scale);
 		}
+		drawer.setSamplingMode(DrawerSamplingMode::POINT);
 	}
 }
 
@@ -236,12 +237,12 @@ void TouchControlsOverlay::buildPointButton(const Vec2f& center, float radius, f
 	}
 }
 
-void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, DrawerTexture& texture, InputManager::Control& control, ConfigMode::State reactToState)
+void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState)
 {
 	VisualElement& visualElement = vectorAdd(mVisualElements);
 	visualElement.mCenter.set(center);
 	visualElement.mHalfExtend = halfExtend;
-	visualElement.mTexture = &texture;
+	visualElement.mSpriteKey = rmx::getMurmur2_64(spriteKey);
 	visualElement.mControl = &control;
 	visualElement.mReactToState = reactToState;
 
@@ -252,12 +253,12 @@ void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec
 	touchArea.mControls.push_back(&control);
 }
 
-void TouchControlsOverlay::buildRoundButton(const Vec2f& center, float radius, DrawerTexture& texture, InputManager::Control& control, ConfigMode::State reactToState)
+void TouchControlsOverlay::buildRoundButton(const Vec2f& center, float radius, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState)
 {
 	VisualElement& visualElement = vectorAdd(mVisualElements);
 	visualElement.mCenter.set(center);
 	visualElement.mHalfExtend.set(radius, radius);
-	visualElement.mTexture = &texture;
+	visualElement.mSpriteKey = rmx::getMurmur2_64(spriteKey);
 	visualElement.mControl = &control;
 	visualElement.mReactToState = reactToState;
 
