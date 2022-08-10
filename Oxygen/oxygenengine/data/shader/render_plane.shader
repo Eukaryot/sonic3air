@@ -175,7 +175,7 @@ void main()
 #endif
 	paletteIndex += atex;
 
-	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex + 0.5) / 512, LocalOffset.z + 0.5));
+	vec4 color = texture(PaletteTexture, vec2((float(paletteIndex) + 0.5) / 512.0, LocalOffset.z + 0.5));
 #ifdef ALPHA_TEST
 	if (color.a < 0.01)
 		discard;
