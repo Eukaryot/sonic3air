@@ -251,7 +251,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 				if (FTX::FileSystem->readFile(config.mCompiledScriptSavePath, buffer))
 				{
 					VectorBinarySerializer serializer(true, buffer);
-					scriptsLoaded = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash);
+					scriptsLoaded = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash, loadOptions.mAppVersion);
 					RMX_CHECK(scriptsLoaded, "Failed to deserialize scripts, possibly because the compiled script file '" << WString(config.mCompiledScriptSavePath).toStdString() << "' is using an older format", );
 				}
 			}
@@ -274,7 +274,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 						// Save compiled scripts
 						buffer.clear();
 						VectorBinarySerializer serializer(false, buffer);
-						const bool success = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash);
+						const bool success = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash, loadOptions.mAppVersion);
 						RMX_CHECK(success, "Failed to serialize scripts", );
 						FTX::FileSystem->saveFile(config.mCompiledScriptSavePath, buffer);	// In order to use these scripts, they have to be manually moved to the "data" folder
 					}
@@ -288,7 +288,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 			if (FTX::FileSystem->readFile(L"data/scripts.bin", buffer))
 			{
 				VectorBinarySerializer serializer(true, buffer);
-				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash);
+				scriptsLoaded = mInternal.mScriptModule.serialize(serializer, coreModuleDependencyHash, loadOptions.mAppVersion);
 				RMX_CHECK(scriptsLoaded, "Failed to load 'scripts.bin'", );
 			}
 		}

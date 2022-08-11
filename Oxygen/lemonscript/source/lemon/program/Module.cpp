@@ -330,7 +330,7 @@ namespace lemon
 		return (uint32)(mFunctions.size() + mGlobalVariables.size() + mConstants.size() + mConstantArrays.size() + mDefines.size() + mStringLiterals.size());
 	}
 
-	bool Module::serialize(VectorBinarySerializer& outerSerializer, uint32 dependencyHash)
+	bool Module::serialize(VectorBinarySerializer& outerSerializer, uint32 dependencyHash, uint32 appVersion)
 	{
 		// Format version history:
 		//  - 0x00 = First version, no signature yet
@@ -344,10 +344,11 @@ namespace lemon
 		//  - 0x08 = Added preprocessor definitions
 		//  - 0x09 = Added source file infos + more compact way of line number serialization
 		//  - 0x0a = Added dependency hash
+		//  - 0x0b = Added app version
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x0a;
+		uint16 version = 0x0b;
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -356,11 +357,15 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x0a)
+			if (version < 0x0b)
 				return false;	// Loading older versions is not supported
 
 			const uint32 readDependencyHash = outerSerializer.read<uint32>();
 			if (readDependencyHash != dependencyHash)
+				return false;
+
+			const uint32 readAppVersion = outerSerializer.read<uint32>();
+			if (readAppVersion != appVersion)
 				return false;
 		}
 		else
@@ -368,6 +373,7 @@ namespace lemon
 			outerSerializer.write(SIGNATURE);
 			outerSerializer.write(version);
 			outerSerializer.write(dependencyHash);
+			outerSerializer.write(appVersion);
 		}
 
 		// Setup buffer and serializer for the uncompressed data

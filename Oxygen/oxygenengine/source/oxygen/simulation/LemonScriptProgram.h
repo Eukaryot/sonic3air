@@ -38,6 +38,7 @@ public:
 
 		bool mEnforceFullReload = false;
 		ModuleSelection mModuleSelection = ModuleSelection::ALL_MODS;
+		uint32 mAppVersion = 0;
 	};
 
 	struct GlobalDefine

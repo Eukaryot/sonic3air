@@ -272,6 +272,7 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	LemonScriptProgram::LoadOptions options;
 	options.mEnforceFullReload = enforceFullReload;
 	options.mModuleSelection = EngineMain::getDelegate().mayLoadScriptMods() ? LemonScriptProgram::LoadOptions::ModuleSelection::ALL_MODS : LemonScriptProgram::LoadOptions::ModuleSelection::BASE_GAME_ONLY;
+	options.mAppVersion = EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber;
 	const WString mainScriptPath = config.mScriptsDir + config.mMainScriptName;
 
 	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);

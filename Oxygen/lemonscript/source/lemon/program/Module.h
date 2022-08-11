@@ -76,7 +76,7 @@ namespace lemon
 
 		// Serialization
 		uint32 buildDependencyHash() const;
-		bool serialize(VectorBinarySerializer& serializer, uint32 dependencyHash);
+		bool serialize(VectorBinarySerializer& serializer, uint32 dependencyHash, uint32 appVersion);
 
 		inline uint64 getCompiledCodeHash() const     { return mCompiledCodeHash; }
 		inline void setCompiledCodeHash(uint64 hash)  { mCompiledCodeHash = hash; }
