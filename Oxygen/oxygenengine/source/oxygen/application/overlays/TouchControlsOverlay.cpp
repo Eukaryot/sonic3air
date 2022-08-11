@@ -203,22 +203,22 @@ void TouchControlsOverlay::render()
 		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
 		for (VisualElement& visualElement : mVisualElements)
 		{
-			const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(visualElement.mSpriteKey);
+			const bool pressed = (nullptr == visualElement.mControl) ? false : visualElement.mControl->isPressed();
+			const uint64 spriteKey = visualElement.mSpriteKeys[pressed ? 1 : 0];
+			const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(spriteKey);
 			if (nullptr == item)
 				continue;
-
-			const bool pressed = (nullptr == visualElement.mControl) ? false : visualElement.mControl->isPressed();
 
 			Rectf rect;
 			rect.setPos(visualElement.mCenter - visualElement.mHalfExtend);
 			rect.setSize(visualElement.mHalfExtend * 2.0f);
 
-			Color color = (mConfigMode.mEnabled && visualElement.mReactToState == mConfigMode.mState) ? Color::CYAN : pressed ? Color::YELLOW : Color::WHITE;
+			Color color = (mConfigMode.mEnabled && visualElement.mReactToState == mConfigMode.mState) ? Color::CYAN : Color::WHITE;
 			color.a = alpha;
 
 			rect = getScreenFromNormalizedTouchRect(rect);
 			const Vec2f scale = rect.getSize() / Vec2f(item->mSprite->getSize());
-			drawer.drawSprite(rect.getPos() + rect.getSize() / 2, visualElement.mSpriteKey, color, scale);
+			drawer.drawSprite(rect.getPos() + rect.getSize() / 2, spriteKey, color, scale);
 		}
 		drawer.setSamplingMode(DrawerSamplingMode::POINT);
 	}
@@ -242,7 +242,8 @@ void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec
 	VisualElement& visualElement = vectorAdd(mVisualElements);
 	visualElement.mCenter.set(center);
 	visualElement.mHalfExtend = halfExtend;
-	visualElement.mSpriteKey = rmx::getMurmur2_64(spriteKey);
+	visualElement.mSpriteKeys[0] = rmx::getMurmur2_64(spriteKey);
+	visualElement.mSpriteKeys[1] = rmx::getMurmur2_64(spriteKey + std::string("_hl"));
 	visualElement.mControl = &control;
 	visualElement.mReactToState = reactToState;
 
@@ -258,7 +259,8 @@ void TouchControlsOverlay::buildRoundButton(const Vec2f& center, float radius, c
 	VisualElement& visualElement = vectorAdd(mVisualElements);
 	visualElement.mCenter.set(center);
 	visualElement.mHalfExtend.set(radius, radius);
-	visualElement.mSpriteKey = rmx::getMurmur2_64(spriteKey);
+	visualElement.mSpriteKeys[0] = rmx::getMurmur2_64(spriteKey);
+	visualElement.mSpriteKeys[1] = rmx::getMurmur2_64(spriteKey + std::string("_hl"));
 	visualElement.mControl = &control;
 	visualElement.mReactToState = reactToState;
 

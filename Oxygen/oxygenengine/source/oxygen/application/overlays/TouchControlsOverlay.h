@@ -84,7 +84,7 @@ private:
 	{
 		Vec2f mCenter;			// Center position on screen (see remarks on the coordinate system above)
 		Vec2f mHalfExtend;		// Relative half size on screen
-		uint64 mSpriteKey = 0;
+		uint64 mSpriteKeys[2] = { 0, 0 };
 		InputManager::Control* mControl = nullptr;
 		ConfigMode::State mReactToState;
 	};
