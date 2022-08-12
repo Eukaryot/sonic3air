@@ -731,7 +731,11 @@ function void LevelObjectTableBuilder.buildObjects_AIZ2()
 	LevelObjectTableBuilder.addObject(0x2303, 0x07bf, OBJECTTABLE1_30, 0x01, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x2324, 0x0395, OBJECTTABLE1_30, 0x01, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x2336, 0x066e, OBJECTTABLE1_30, 0x01, LVLOBJ_FLIP_X)
-	LevelObjectTableBuilder.addObject(0x2340, 0x0748, OBJECTTABLE1_0e, 0x00, 0)
+
+	// An completely unnecessary jump ramp object in the original game, which occasionaly threw you out of the loop when going right to left
+	//  -> Found by Legobouwer, that counts as #contributed
+	//LevelObjectTableBuilder.addObject(0x2340, 0x0748, OBJECTTABLE1_0e, 0x00, 0)
+
 	LevelObjectTableBuilder.addObject(0x2343, 0x0422, OBJECTTABLE1_30, 0x01, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x2351, 0x02c7, OBJECTTABLE1_30, 0x01, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x2380, 0x0740, OBJECTTABLE1_02, 0x91, 0)
