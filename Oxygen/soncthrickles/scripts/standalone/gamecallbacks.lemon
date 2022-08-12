@@ -69,7 +69,12 @@ function void Standalone.onRestartAtCheckpoint()
 
 function void Standalone.onResumeAfterPause()
 {
-	// This is meant for mods, in case they want to check to changes made in the options menu
+	// Update debug mode setting
+	debug_mode.enabled.u8 = Game.getSetting(SETTING_DEBUG_MODE)
+	if (!debug_mode.enabled.u8)
+		debug_mode.state = 0
+
+	// This function can be overloaded by mods, in case they want to check for changes made in the Options menu
 }
 
 

@@ -22,11 +22,9 @@ function void Init()
 	pausecheats.unlocked = 1
 
 #if GAMEAPP
-	// Setup region code according to settings
+	// Setup certain values according to settings
 	global.region_code = Game.getSetting(SETTING_REGION_CODE)
-
-	if (Game.getSetting(SETTING_DEBUG_MODE))
-		debug_mode.enabled.u8 = 1
+	debug_mode.enabled.u8 = Game.getSetting(SETTING_DEBUG_MODE)
 
 	// Just in case a skippable cutscene was still active (this is relevant particularly after loading a save state)
 	Game.endSkippableCutscene()

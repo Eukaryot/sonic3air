@@ -73,7 +73,7 @@ namespace
 		ConditionalOption(option::DROP_DASH, 				 false, SharedDatabase::Secret::SECRET_DROPDASH),
 		ConditionalOption(option::SUPER_PEELOUT,			 false, SharedDatabase::Secret::SECRET_SUPER_PEELOUT),
 
-		ConditionalOption(option::DEBUG_MODE,				 true,  SharedDatabase::Secret::SECRET_DEBUGMODE),
+		ConditionalOption(option::DEBUG_MODE,				 false, SharedDatabase::Secret::SECRET_DEBUGMODE),
 		ConditionalOption(option::TITLE_SCREEN,				 true,  SharedDatabase::Secret::SECRET_TITLE_SK),
 		ConditionalOption(option::SHIELD_TYPES,				 true),
 		ConditionalOption(option::RANDOM_MONITORS,			 true),
