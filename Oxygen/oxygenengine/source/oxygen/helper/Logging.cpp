@@ -38,7 +38,7 @@ namespace
 			std::string name;
 			std::string ext;
 			rmx::FileIO::splitPath(filename, nullptr, &name, &ext);
-			std::string text = message + "\nin " + name + "." + ext + ", line " + std::to_string(line);
+			std::string text = message + "\n[" + name + "." + ext + ", line " + std::to_string(line) + "]";
 		#else
 			std::string text = message;
 		#endif

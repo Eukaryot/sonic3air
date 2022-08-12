@@ -17,6 +17,7 @@ class EmulatorInterface;
 class LemonScriptProgram;
 namespace lemon
 {
+	class ControlFlow;
 	class Function;
 	class GlobalsLookup;
 	class Runtime;
@@ -66,7 +67,7 @@ public:
 	std::string getOwnCurrentScriptLocationString() const;
 
 private:
-	static std::string buildScriptLocationString(lemon::Runtime& runtime);
+	static std::string buildScriptLocationString(const lemon::ControlFlow& controlFlow);
 	static uint32 getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter);
 
 private:

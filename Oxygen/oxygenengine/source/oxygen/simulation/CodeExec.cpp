@@ -703,17 +703,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 						gameRecordingSaved = (Application::instance().getSimulation().saveGameRecording() != 0);
 					}
 
-					std::string text = "Reached limit for runtime steps per update; if this happens, the program probably got stuck in a loop.";
-					{
-						std::string locationString = mLemonScriptRuntime.getOwnCurrentScriptLocationString();
-						if (!locationString.empty())
-						{
-							text += "\nIn " + locationString + ".";
-						}
-					}
-					if (gameRecordingSaved)
-						text += "\nA game recording file was written that could be helpful for debugging this issue.";
-					RMX_ERROR(text, );
+					showErrorWithScriptLocation("Reached limit for runtime steps per update; if this happens, the program probably got stuck in a loop.", gameRecordingSaved ? "A game recording file was written that could be helpful for debugging this issue." : "");
 					showMessageBox = false;
 				}
 				break;
@@ -746,7 +736,10 @@ bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted)
 		case lemon::Runtime::ExecuteResult::CALL:
 		{
 			const lemon::Function* func = runtime.handleResultCall(result);
-			RMX_CHECK(nullptr != func, "Call failed, probably due to invalid function (target = " << rmx::hexString(result.mCallTarget, 16) << ")", break);
+			if (nullptr == func)
+			{
+				showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(result.mCallTarget, 16) + ").");
+			}
 			break;
 		}
 
@@ -821,7 +814,11 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 		case lemon::Runtime::ExecuteResult::CALL:
 		{
 			const lemon::Function* func = runtime.handleResultCall(result);
-			RMX_CHECK(nullptr != func, "Call failed, probably due to invalid function (target = " << rmx::hexString(result.mCallTarget, 16) << ")", break);
+			if (nullptr == func)
+			{
+				showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(result.mCallTarget, 16) + ").");
+				break;
+			}
 
 			if (func->getType() == lemon::Function::Type::SCRIPT)
 			{
@@ -959,6 +956,19 @@ void CodeExec::deleteWatch(Watch& watch)
 		mWatchHitPool.returnObject(*hit);
 	watch.mHits.clear();
 	mWatchPool.returnObject(watch);
+}
+
+void CodeExec::showErrorWithScriptLocation(const std::string& errorText, const std::string& subText)
+{
+	std::string locationString = mLemonScriptRuntime.getOwnCurrentScriptLocationString();
+	if (locationString.empty())
+	{
+		RMX_ERROR(errorText << "\n" << subText, );
+	}
+	else
+	{
+		RMX_ERROR(errorText << "\nIn " << locationString << "." << (subText.empty() ? "" : "\n") << subText, );
+	}
 }
 
 void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)

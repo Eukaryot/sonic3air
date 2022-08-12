@@ -176,6 +176,8 @@ private:
 	uint32 getCurrentWatchValue(uint32 address, uint16 bytes) const;
 	void deleteWatch(Watch& watch);
 
+	void showErrorWithScriptLocation(const std::string& errorText, const std::string& subText = "");
+
 private:
 	// Interface implementations
 	void onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes) override;

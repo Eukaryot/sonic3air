@@ -111,12 +111,12 @@ struct LemonScriptRuntime::Internal
 
 bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionName, std::wstring* outFileName, uint32* outLineNumber, std::string* outModuleName)
 {
-	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-	if (nullptr == runtime)
+	lemon::ControlFlow* controlFlow = lemon::Runtime::getActiveControlFlow();
+	if (nullptr == controlFlow)
 		return false;
 
 	lemon::ControlFlow::Location location;
-	runtime->getLastStepLocation(location);
+	controlFlow->getLastStepLocation(location);
 	if (nullptr == location.mFunction)
 		return false;
 
@@ -133,11 +133,11 @@ bool LemonScriptRuntime::getCurrentScriptFunction(std::string_view* outFunctionN
 
 std::string LemonScriptRuntime::getCurrentScriptLocationString()
 {
-	lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
-	if (nullptr == runtime)
+	lemon::ControlFlow* controlFlow = lemon::Runtime::getActiveControlFlow();
+	if (nullptr == controlFlow)
 		return "";
 
-	return buildScriptLocationString(*runtime);
+	return buildScriptLocationString(*controlFlow);
 }
 
 const std::string_view* LemonScriptRuntime::tryResolveStringHash(uint64 hash)
@@ -336,13 +336,13 @@ void LemonScriptRuntime::getLastStepLocation(const lemon::ScriptFunction*& outFu
 
 std::string LemonScriptRuntime::getOwnCurrentScriptLocationString() const
 {
-	return buildScriptLocationString(mInternal.mRuntime);
+	return buildScriptLocationString(mInternal.mRuntime.getSelectedControlFlow());
 }
 
-std::string LemonScriptRuntime::buildScriptLocationString(lemon::Runtime& runtime)
+std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFlow& controlFlow)
 {
 	lemon::ControlFlow::Location location;
-	runtime.getLastStepLocation(location);
+	controlFlow.getLastStepLocation(location);
 	if (nullptr == location.mFunction)
 		return "";
 
