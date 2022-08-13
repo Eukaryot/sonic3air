@@ -174,6 +174,7 @@ function void updateSonicAnimationRolling()
 		return
 
 	D2.u16 = abs(char.groundspeed)
+	// This snippet sets the character's rolling animation based on ground speed, just like the running animations. but the two rolling animations are exactly the same, so it's a bit pointless
 	if (char.character == CHARACTER_SONIC)
 	{
 		A1 = (D2.u16 < 0x600) ? 0x012b02 : 0x012b0c
@@ -277,11 +278,13 @@ function void updateSonicAnimationRunning()
 			{
 				if (D2.u16 < 0x600)
 				{
+					// Sonic's walking animation
 					A1 = 0x012aee
 					D3.u8 = D0.u8 * 4
 				}
 				else
 				{
+					// Sonic's running animation
 					A1 = 0x012af8
 					D3.u8 = D0.u8 * 2
 				}
@@ -290,11 +293,13 @@ function void updateSonicAnimationRunning()
 			{
 				if (D2.u16 < 0x800)
 				{
+					// Super Sonic's walking animation
 					A1 = 0x012c7a
 					D3.u8 = D0.u8 * 4
 				}
 				else
 				{
+					// Super Sonic's walking animation
 					A1 = 0x012c84
 					D3.u8 = D0.u8 * 2
 				}
@@ -304,16 +309,19 @@ function void updateSonicAnimationRunning()
 		{
 			if (D2.u16 < 0x600)
 			{
+				// Tails' walking animation
 				A1 = 0x015b04
 				D3.u8 = D0.u8 * 4
 			}
 			else if (D2.u16 < 0x700)
 			{
+				// Tails' running animation
 				A1 = 0x015b0e
 				D3.u8 = D0.u8 * 2
 			}
 			else
 			{
+				// Tails' faster running animation
 				A1 = 0x015bfe
 				D3.u8 = D0.u8
 			}
@@ -322,11 +330,13 @@ function void updateSonicAnimationRunning()
 		{
 			if (D2.u16 < 0x600)
 			{
+				// Knuckles' walking animation
 				A1 = 0x017f3e
 				D3.u8 = D0.u8 * 4
 			}
 			else
 			{
+				// Knuckles' running animation
 				A1 = 0x017f48
 				D3.u8 = D0.u8 * 2
 			}

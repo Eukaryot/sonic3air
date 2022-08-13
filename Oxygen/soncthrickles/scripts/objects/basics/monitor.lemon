@@ -365,9 +365,17 @@ function void fn01d63a()
 	// Update falling monitor
 	if (u8[A0 + 0x3c] != 0)
 	{
+	#if STANDALONE
+		Character.UpdateMovement()		// This accounts for inverted gravity
+	#else
 		UpdateMovementSimple()
+	#endif
 
+	#if STANDALONE
+		if ((global.inv_gravity) == 0)		// Probably a good idea to check for ground collision based on gravity than orientation
+	#else
 		if ((objA0.render_flags & render_flag.FLIP_Y) == 0)
+	#endif
 		{
 			if (objA0.velocity.y >= 0)
 			{
@@ -382,7 +390,11 @@ function void fn01d63a()
 		}
 		else
 		{
+		#if STANDALONE
+			if (objA0.velocity.y >= 0)		// It seems inverted gravity also inverts velocity values, so this is actually the correct check here
+		#else
 			if (objA0.velocity.y < 0)
+		#endif
 			{
 				fn00fc12()
 				if (D1.s16 <= 0)
@@ -416,6 +428,14 @@ function void MonitorIntact.CheckBlocking()
 		}
 	#if STANDALONE
 		else if (Game.getSetting(SETTING_DROPDASH) && u8[A1 + 0x38] == CHARACTER_SONIC && objA1.state == char.state.SONIC_DROPDASH)
+		{
+			canOpenMonitor = true
+		}
+		else if (objA1.state == char.state.SPINDASH)
+		{
+			canOpenMonitor = true
+		}
+		else if (objA0.velocity.y != 0)
 		{
 			canOpenMonitor = true
 		}
