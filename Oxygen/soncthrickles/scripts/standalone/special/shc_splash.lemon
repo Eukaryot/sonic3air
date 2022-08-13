@@ -50,7 +50,7 @@ function void SHCSplash.setPalette(u16 opacity)
 		b = max(b - reductionB, 0)
 		color = 0xff000000 + r + (g << 8) + (b << 16)
 
-		Renderer.setPaletteEntry(i, color)
+		Renderer.setPaletteColor(i, color)
 	}
 }
 

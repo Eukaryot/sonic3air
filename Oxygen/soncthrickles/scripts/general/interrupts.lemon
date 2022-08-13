@@ -547,7 +547,7 @@ function void fn000c50()
 		for (u16 i = 0; i < 60; ++i)
 		{
 			u8 blendFactor = reducedColors ? ((i / 30) * 0xff) : (i * 0xff / 59)
-			Renderer.setPaletteEntry(0x101 + i + (i / 15), 0xff000000 + applyGlobalComponentTint_BGR32(blendColors_BGR32(colorA, colorB, blendFactor)))
+			Renderer.setPaletteColor(0x101 + i + (i / 15), 0xff000000 + applyGlobalComponentTint_BGR32(blendColors_BGR32(colorA, colorB, blendFactor)))
 		}
 		for (u16 i = 0; i < 15; ++i)
 		{
@@ -556,7 +556,7 @@ function void fn000c50()
 			for (u16 k = 0; k < 12; ++k)
 			{
 				u32 alpha = reducedColors ? ((k / 6) * 0xff) : ((k + 1) * 0xff / 13)
-				Renderer.setPaletteEntry(0x141 + (11 - k) * 0x10 + i, (alpha << 24) + baseColor)
+				Renderer.setPaletteColor(0x141 + (11 - k) * 0x10 + i, (alpha << 24) + baseColor)
 			}
 		}
 	}

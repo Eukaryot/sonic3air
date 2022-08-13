@@ -59,6 +59,49 @@ function bool Game.isModdedSound(u64 sfxId)
 
 
 //-------------------------------------------------------//
+// C++ bindings that got removed or renamed              //
+//-------------------------------------------------------//
+
+// These are still actively used in the scripts, for compatibility with mods that overwrite these variants of the functions
+
+function void Renderer.setPaletteEntry(u8 index, u32 color)
+{
+	Renderer.setPaletteColor(u16(index), color)
+}
+
+function void Renderer.setPaletteEntryPacked(u8 index, u16 color)
+{
+	Renderer.setPaletteColorPacked(u16(index), color)
+}
+
+function void Renderer.setSecondaryPaletteEntryPacked(u8 index, u16 color)
+{
+	Renderer.setSecondaryPaletteColorPacked(u16(index), color)
+}
+
+function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue)
+{
+	Renderer.drawSprite(key, px, py, u16(atex), flags, renderQueue)
+}
+
+function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u8 angle, u8 alpha)
+{
+	Renderer.drawSprite(key, px, py, u16(atex), flags, renderQueue, angle, alpha)
+}
+
+function void Renderer.drawCustomSpriteTinted(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
+{
+	Renderer.drawSpriteTinted(key, px, py, u16(atex), flags, renderQueue, angle, tintColor, scale)
+}
+
+function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u8 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
+{
+	Renderer.drawSpriteTransformed(key, px, py, u16(atex), flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
+}
+
+
+
+//-------------------------------------------------------//
 // Functions that got proper names                       //
 //-------------------------------------------------------//
 

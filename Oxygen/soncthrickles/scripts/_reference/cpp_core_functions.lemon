@@ -221,13 +221,13 @@ declare function u16 getVRAM(u16 vramAddress)
 
 declare function void setVRAM(u16 vramAddress, u16 value)
 
-declare function void Renderer.setPaletteEntry(u16 index, u32 color)
+declare function void Renderer.setPaletteColor(u16 index, u32 color)
 
-declare function void Renderer.setPaletteEntryPacked(u16 index, u16 color)
+declare function void Renderer.setPaletteColorPacked(u16 index, u16 color)
 
 declare function void Renderer.enableSecondaryPalette(u8 line)
 
-declare function void Renderer.setSecondaryPaletteEntryPacked(u16 index, u16 color)
+declare function void Renderer.setSecondaryPaletteColorPacked(u16 index, u16 color)
 
 declare function void Renderer.setScrollOffsetH(u8 setIndex, u16 lineNumber, u16 value)
 
@@ -265,15 +265,15 @@ declare function u64 Renderer.setupKosinskiCompressedSprite(u32 sourceBase, u32 
 
 declare function u64 Renderer.setupKosinskiCompressedSprite(u32 sourceBase, u32 mappingOffset, u8 animationSprite, u8 atex, s16 indexOffset)
 
-declare function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue)
+declare function void Renderer.drawSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue)
 
-declare function void Renderer.drawCustomSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u8 alpha)
+declare function void Renderer.drawSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u8 alpha)
 
-declare function void Renderer.drawCustomSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
+declare function void Renderer.drawSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
 
-declare function void Renderer.drawCustomSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scaleX, s32 scaleY)
+declare function void Renderer.drawSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scaleX, s32 scaleY)
 
-declare function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
+declare function void Renderer.drawSpriteTransformed(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
 
 declare function void Renderer.extractCustomSprite(u64 key, string categoryName, u8 spriteNumber, u8 atex)
 
