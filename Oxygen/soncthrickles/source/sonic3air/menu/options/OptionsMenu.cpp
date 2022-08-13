@@ -77,6 +77,7 @@ namespace
 		ConditionalOption(option::TITLE_SCREEN,				 true,  SharedDatabase::Secret::SECRET_TITLE_SK),
 		ConditionalOption(option::SHIELD_TYPES,				 true),
 		ConditionalOption(option::RANDOM_MONITORS,			 true),
+		ConditionalOption(option::MONITOR_BEHAVIOR,			 true),
 		ConditionalOption(option::RANDOM_SPECIALSTAGES,		 true),
 		ConditionalOption(option::SPECIAL_STAGE_REPEAT,		 true),
 		ConditionalOption(option::REGION,					 true),
@@ -129,6 +130,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::HYPER_TAILS,				SharedDatabase::Setting::SETTING_HYPER_TAILS);
 		setupOptionEntry(option::HYPER_DASH_CONTROLS,		SharedDatabase::Setting::SETTING_HYPER_DASH_CONTROLS);
 		setupOptionEntry(option::SUPER_SONIC_ABILITY,		SharedDatabase::Setting::SETTING_SUPER_SONIC_ABILITY);
+		setupOptionEntry(option::MONITOR_BEHAVIOR,			SharedDatabase::Setting::SETTING_MONITOR_BEHAVIOR);
 		setupOptionEntry(option::MAINTAIN_SHIELDS,			SharedDatabase::Setting::SETTING_MAINTAIN_SHIELDS);
 		setupOptionEntry(option::SHIELD_TYPES,				SharedDatabase::Setting::SETTING_SHIELD_TYPES);
 		setupOptionEntry(option::BUBBLE_SHIELD_BOUNCE,		SharedDatabase::Setting::SETTING_BUBBLE_SHIELD_BOUNCE);
@@ -699,6 +701,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Normal Monitors", 0)
 			.addOption("Random Shields", 1)
 			.addOption("Random Monitors", 2);
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Monitor Behavior:", option::MONITOR_BEHAVIOR)
+			.addOption("Default", 0)
+			.addOption("Fall down when hit", 1);
 
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Special Stages");
