@@ -121,6 +121,24 @@ namespace lemon
 		}
 	}
 
+	bool TypeCasting::canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex)
+	{
+		if (original.size() != target.size())
+			return false;
+
+		for (size_t i = 0; i < original.size(); ++i)
+		{
+			const uint8 priority = getImplicitCastPriority(original[i], target[i].mDataType);
+			if (priority == CANNOT_CAST)
+			{
+				if (nullptr != outFailedIndex)
+					*outFailedIndex = i;
+				return false;
+			}
+		}
+		return true;
+	}
+
 	uint16 TypeCasting::getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right)
 	{
 		const uint8 prioLeft = getImplicitCastPriority(left, signature.mLeft);

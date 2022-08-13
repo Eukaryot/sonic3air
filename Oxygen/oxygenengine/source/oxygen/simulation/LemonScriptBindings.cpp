@@ -329,7 +329,10 @@ namespace
 	{
 		uint32 lineNumber = 0;
 		const bool success = LemonScriptRuntime::getCurrentScriptFunction(nullptr, nullptr, &lineNumber, nullptr);
-		RMX_ASSERT(success, "No active lemon script runtime");
+	#if DEBUG
+		if (!success)
+			RMX_ERROR("Could not determine current script function during logging");
+	#endif
 
 		LogDisplay::ScriptLogSingleEntry& scriptLogSingleEntry = LogDisplay::instance().updateScriptLogValue(*String(0, "%04d", lineNumber), valueString);
 		if (gDebugNotificationInterface)

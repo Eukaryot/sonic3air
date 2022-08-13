@@ -450,27 +450,43 @@ namespace lemon
 					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 					const std::string_view functionName = identifierToken.mName.getString();
 					bool isBaseCall = false;
+					bool baseFunctionExists = false;
 					const Function* function = nullptr;
 					const Variable* thisPointerVariable = nullptr;
 
-					bool isValidFunctionCall = false;
 					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
 					if (!candidateFunctions.empty())
 					{
 						// Is it a global function
-						isValidFunctionCall = true;
 					}
 					else if (rmx::startsWith(functionName, "base."))
 					{
 						// It's a base call
+						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
 						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call \"" << functionName << "\" goes to a different function, expected \"base." << mContext.mFunction->getName() << "\" instead", mLineNumber);
-						isValidFunctionCall = true;
 						isBaseCall = true;
+
+						const std::string_view baseName = identifierToken.mName.getString().substr(5);
+						const std::vector<Function*>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
+						for (Function* candidate : candidates)
+						{
+							// Base function signature must be the same as current function's
+							if (candidate->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate != mContext.mFunction)
+							{
+								baseFunctionExists = true;
+								break;
+							}
+						}
+
+						// TODO: The following check would be no good idea, as some mods overwrite functions (and call their base) from other mods that may or may not be loaded before
+						//  -> The solution is to allow this, and make the base calls simply do nothing at all
+						//CHECK_ERROR(baseFunctionExists, "There's no base function for call \"" << functionName << "\" with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
 					}
 					else
 					{
 						// Special handling for "string.length()" and "array.length()"
 						//  -> TODO: Generalize this to pave the way for other kinds of "method calls"
+						bool isValidFunctionCall = false;
 						if (rmx::endsWith(functionName, ".length") && content.empty())
 						{
 							const std::string_view variableName = functionName.substr(0, functionName.length() - 7);
@@ -495,8 +511,8 @@ namespace lemon
 								}
 							}
 						}
+						CHECK_ERROR(isValidFunctionCall, "Unknown function name '" << functionName << "'", mLineNumber);
 					}
-					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" << functionName << "'", mLineNumber);
 
 					// Create function token
 					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
@@ -538,7 +554,7 @@ namespace lemon
 						parameterTypes[i] = assignStatementDataType(*token.mParameters[i], nullptr);
 					}
 
-					// If the function was not determined already, do that now
+					// If the function was not determined yet, do that now
 					if (nullptr == function)
 					{
 						// Find out which function signature actually fits
@@ -547,14 +563,38 @@ namespace lemon
 						{
 							// Base call must use the same function signature as the current one
 							CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
-							for (size_t i = 0; i < parameterTypes.size(); ++i)
-							{
-								CHECK_ERROR(parameterTypes[i] == mContext.mFunction->getParameters()[i].mDataType, "Base function call has different parameter at index " + std::to_string(i), mLineNumber);
-							}
+							size_t failedIndex = 0;
+							const bool canMatch = TypeCasting(mConfig).canMatchSignature(parameterTypes, mContext.mFunction->getParameters(), &failedIndex);
+							CHECK_ERROR(canMatch, "Can't cast parameters of function call to match base function, parameter '" << mContext.mFunction->getParameters()[failedIndex].mName << "' has the wrong type", mLineNumber);
 
-							// Use the very same function again, as a base call
-							function = mContext.mFunction;
-							token.mIsBaseCall = true;
+							if (baseFunctionExists)
+							{
+								// Use the very same function again, as a base call
+								function = mContext.mFunction;
+								token.mIsBaseCall = true;
+							}
+							else
+							{
+								// Base call would go nowhere - better replace the token again with one doing nothing at all, or returning a default value
+								const DataTypeDefinition* returnType = mContext.mFunction->getReturnType();
+								switch (returnType->getClass())
+								{
+									case DataTypeDefinition::Class::VOID:
+									{
+										tokens.erase(i);
+										break;
+									}
+									case DataTypeDefinition::Class::INTEGER:
+									case DataTypeDefinition::Class::STRING:
+									{
+										ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+										constantToken.mValue = 0;
+										constantToken.mDataType = returnType;
+										break;
+									}
+								}
+								return;
+							}
 						}
 						else
 						{
@@ -572,8 +612,6 @@ namespace lemon
 							}
 							CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" << functionName << "', the number or types of parameters passed are wrong", mLineNumber);
 						}
-
-						// TODO: Perform implicit casts for parameters here?
 					}
 
 					if (nullptr != function)
