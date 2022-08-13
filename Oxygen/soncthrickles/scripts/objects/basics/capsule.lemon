@@ -499,7 +499,13 @@ function void fn0867d6()
 	setupObjectAttributesFull(0x086b44)
 	if (global.zone_act == 0x0400)
 	{
+	#if STANDALONE
+		// Fix for debris object graphics #contributed by Legobouwer
+		objA0.sprite_attributes = 0x0000
+		objA0.mapping_offset = 0x1871e8
+	#else
 		objA0.sprite_attributes = 0x044e
+	#endif
 	}
 	objA0.update_address = 0x085102
 	fn086a64()
