@@ -780,11 +780,11 @@ function bool UpdateTailsFlight_innerA()
 	// Cancel flight ("Tails Drop"): Stop flying and roll into a ball again
 	else if (Game.getSetting(SETTING_CANCEL_FLIGHT) && (control.tails.state & CONTROL_DOWN) && (control.tails.state & CONTROL_ABC))
 	{
-		Tails.CheckDropSonic()
-
 		char.double_jump_state = 0
 		char.state = char.state.ROLLING
 		char.jumping = 0			// Clear this flag to prevent a new flight while falling
+
+		Tails.CheckDropSonic()
 		updateTailsInAir_shared()
 		return false
 	}
