@@ -103,41 +103,50 @@ void Font::addFontProcessor(const std::shared_ptr<FontProcessor>& processor)
 	++mChangeCounter;
 }
 
-int Font::getWidth(const StringReader& text)
+Vec2i Font::getTextBoxSize(const StringReader& text, int pos, int len)
 {
-	return getWidth(text, 0, (int)text.mLength);
+	FontSource* fontSource = getFontSource();
+	if (nullptr == fontSource)
+		return Vec2i();
+
+	if (pos < 0 || pos >= (int)text.mLength)
+		return Vec2i();
+	if (len < 0 || pos+len > (int)text.mLength)
+		len = (int)text.mLength - pos;
+
+	const int spacing = roundToInt(mAdvance);
+	Vec2i size(0, fontSource->getHeight());
+	{
+		int currentLineWidth = 0;
+		for (int i = 0; i < len; ++i)
+		{
+			const uint32 ch = text[pos+i];
+			const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
+			if (nullptr != info)
+			{
+				if (currentLineWidth > 0)
+					currentLineWidth += spacing;
+				currentLineWidth += info->mAdvance;
+			}
+			else
+			{
+				if (ch == '\n')
+				{
+					// Line break
+					size.x = std::max(size.x, currentLineWidth);
+					currentLineWidth = 0;
+					size.y += fontSource->getLineHeight();
+				}
+			}
+		}
+		size.x = std::max(size.x, currentLineWidth);
+	}
+	return size;
 }
 
 int Font::getWidth(const StringReader& text, int pos, int len)
 {
-	FontSource* fontSource = getFontSource();
-	if (nullptr == fontSource)
-		return 0;
-
-	if (pos < 0 || pos >= (int)text.mLength)
-		return 0;
-	if (len < 0 || pos+len > (int)text.mLength)
-		len = (int)text.mLength - pos;
-
-	int width = 0;
-	for (int i = 0; i < len; ++i)
-	{
-		const uint32 ch = text[pos+i];
-		const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
-		if (nullptr == info)
-			continue;
-
-		width += info->mAdvance;
-	}
-
-	width += roundToInt((len - 1) * mAdvance);
-	return width;
-}
-
-int Font::getHeight()
-{
-	FontSource* fontSource = getFontSource();
-	return (nullptr == fontSource) ? 0 : fontSource->getHeight();
+	return getTextBoxSize(text, pos, len).x;
 }
 
 int Font::getLineHeight()
@@ -277,6 +286,7 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 	if (nullptr == fontSource)
 		return;
 
+	const Vec2f originalPosition = pos;
 	output.resize(text.mLength);
 
 	for (size_t k = 0; k < text.mLength; ++k)
@@ -286,13 +296,22 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 		output[k].mBitmap = nullptr;
 
 		const FontSource::GlyphInfo* info = fontSource->getGlyph(ch);
-		if (nullptr == info)
-			continue;
+		if (nullptr != info)
+		{
+			output[k].mBitmap = &info->mBitmap;
+			output[k].mPosition = pos;
 
-		output[k].mBitmap = &info->mBitmap;
-		output[k].mPosition = pos;
-
-		pos.x += info->mAdvance + spacing;
+			pos.x += info->mAdvance + spacing;
+		}
+		else
+		{
+			if (ch == '\n')
+			{
+				// Line break
+				pos.x = originalPosition.x;
+				pos.y += fontSource->getLineHeight();
+			}
+		}
 	}
 }
 
@@ -399,18 +418,8 @@ void Font::printBitmap(Bitmap& outBitmap, Recti& outInnerRect, const StringReade
 	}
 
 	// Write inner rect
-	outInnerRect.x = -boundsMin.x;
-	outInnerRect.y = -boundsMin.y;
-	outInnerRect.width = (int)(text.mLength - 1) * spacing;
-	for (size_t i = 0; i < text.mLength; ++i)
-	{
-		const FontSource::GlyphInfo* info = fontSource->getGlyph(text[i]);
-		if (nullptr != info)
-		{
-			outInnerRect.width += info->mAdvance;
-		}
-	}
-	outInnerRect.height = fontSource->getHeight();
+	outInnerRect.setPos(-boundsMin);
+	outInnerRect.setSize(getTextBoxSize(text));
 }
 
 Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int alignment)

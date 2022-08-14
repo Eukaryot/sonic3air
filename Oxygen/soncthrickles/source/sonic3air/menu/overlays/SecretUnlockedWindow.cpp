@@ -111,7 +111,7 @@ void SecretUnlockedWindow::render()
 	Font& font = global::mFont10;
 
 	const int numTextLines = (int)mShownTextLines.size();
-	const int lineHeight = (font.getHeight() + 2);
+	const int lineHeight = (font.getLineHeight() + 1);
 
 	Recti rect;
 	rect.width = global::mPauseScreenLowerBG.getWidth();

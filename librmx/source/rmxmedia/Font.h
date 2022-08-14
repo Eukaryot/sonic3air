@@ -107,9 +107,8 @@ public:
 	float getSize() const			{ return mKey.mSize; }
 	uint32 getChangeCounter() const { return mChangeCounter; }
 
-	int getWidth(const StringReader& text);
-	int getWidth(const StringReader& text, int pos, int len = -1);
-	int getHeight();
+	Vec2i getTextBoxSize(const StringReader& text, int pos = 0, int len = -1);
+	int getWidth(const StringReader& text, int pos = 0, int len = -1);
 	int getLineHeight();
 
 	Vec2f alignText(const Rectf& rect, const StringReader& text, int alignment);
