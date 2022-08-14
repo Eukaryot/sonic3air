@@ -11,9 +11,6 @@
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",
 
-	// Script optimizations (use "3" as default = maximum optimization)
-	"ScriptOptimizationLevel": "3",
-
 	// Dev mode
 	"DevMode":
 	{

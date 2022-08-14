@@ -351,6 +351,9 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 			vgHelper.tryReadInt("StartPosY", mVirtualGamepad.mStartButtonCenter.y);
 		}
 
+		// Script
+		rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
+
 		// Mod settings
 		loadModSettings(root, mModSettings);
 	}
@@ -457,6 +460,9 @@ void Configuration::saveSettings()
 			vg["StartPosY"] = mVirtualGamepad.mStartButtonCenter.y;
 			root["VirtualGamepad"] = vg;
 		}
+
+		// Script
+		root["ScriptOptimizationLevel"] = mScriptOptimizationLevel;
 
 		// Mod settings
 		saveModSettings(root, mModSettings);
@@ -578,9 +584,8 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 		jsonHelper.tryReadString("Record", mInputRecorderOutput);
 	}
 
-	// Script
-	rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
 #if DEBUG
+	// Script
 	rootHelper.tryReadBool("CompileScripts", mForceCompileScripts);
 #endif
 }

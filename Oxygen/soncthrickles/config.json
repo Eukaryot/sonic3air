@@ -44,7 +44,6 @@
 	},
 
 	// Script / Debug
-	"ScriptOptimizationLevel": "3",
 	"CompileScripts": "0",
 	"WaitForDebugger": "0"
 }

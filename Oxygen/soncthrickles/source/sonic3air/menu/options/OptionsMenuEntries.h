@@ -48,15 +48,44 @@ public:
 };
 
 
+class LabelMenuEntry : public GameMenuEntry
+{
+public:
+	static const constexpr uint32 MENU_ENTRY_TYPE = rmx::compileTimeFNV_32("LabelMenuEntry");
+
+public:
+	LabelMenuEntry();
+	LabelMenuEntry& initEntry(const std::string& text);
+
+	void renderEntry(RenderContext& renderContext_) override;
+};
+
+
 class OptionsMenuEntry : public GameMenuEntry
 {
 public:
 	OptionsMenuEntry& setUseSmallFont(bool useSmallFont);
 
-	void renderEntry(RenderContext& renderContext_) override;
+	virtual void renderEntry(RenderContext& renderContext_) override;
+
+protected:
+	void renderInternal(RenderContext& renderContext_, const Color& normalColor, const Color& selectedColor);
 
 private:
 	bool mUseSmallFont = false;
+};
+
+
+class AdvancedOptionMenuEntry : public OptionsMenuEntry
+{
+public:
+	AdvancedOptionMenuEntry();
+	AdvancedOptionMenuEntry& setDefaultValue(uint32 defaultValue) { mDefaultValue = defaultValue; return *this; }
+
+	void renderEntry(RenderContext& renderContext_) override;
+
+private:
+	uint32 mDefaultValue = 0;
 };
 
 

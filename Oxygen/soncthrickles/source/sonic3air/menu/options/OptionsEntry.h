@@ -18,6 +18,9 @@ namespace option
 	{
 		_TAB_SELECTION,
 
+		// System
+		SCRIPT_OPTIMIZATION,
+
 		// Display
 		WINDOW_MODE,
 		WINDOW_MODE_STARTUP,

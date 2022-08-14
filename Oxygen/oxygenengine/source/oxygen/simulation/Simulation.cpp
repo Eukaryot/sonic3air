@@ -108,7 +108,7 @@ void Simulation::shutdown()
 
 void Simulation::reloadScriptsAfterModsChange()
 {
-	// Immediate reload the scripts (while the loading text box is shown)
+	// Immediate reload of the scripts (while the loading text box is shown)
 	if (mCodeExec.reloadScripts(false, false))
 	{
 		mCodeExec.reinitRuntime(nullptr, CodeExec::CallStackInitPolicy::RESET);

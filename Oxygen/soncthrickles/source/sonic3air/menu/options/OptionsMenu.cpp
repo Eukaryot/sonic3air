@@ -26,6 +26,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/Utils.h"
+#include "oxygen/simulation/Simulation.h"
 
 
 namespace
@@ -99,6 +100,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
+		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
 		setupOptionEntryInt(option::FILTERING,					&config.mFiltering);
@@ -217,6 +219,15 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Manual", option::_OPEN_MANUAL);
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Debugging");
+		entries.addEntry<LabelMenuEntry>().initEntry("These settings are meant only for debugging very specific issues.\nIt's recommended to leave them at their default values.");
+		entries.addEntry<AdvancedOptionMenuEntry>()
+			.setDefaultValue(3)
+			.initEntry("Script Optimization", option::SCRIPT_OPTIMIZATION)
+			.addOption("Disabled", 0)
+			.addOption("Basic", 1)
+			.addOption("Full (Default)", 3);
 	}
 
 	// Display tab
@@ -910,6 +921,7 @@ void OptionsMenu::initialize()
 	refreshGamepadLists(true);
 
 	mEnteredFromIngame = false;
+	mOriginalScriptOptimizationLevel = Configuration::instance().mScriptOptimizationLevel;
 }
 
 void OptionsMenu::deinitialize()
@@ -1515,6 +1527,12 @@ void OptionsMenu::goBack()
 	// Save changes
 	ModManager::instance().copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
+
+	// Apply script optimization level if it got changed
+	if (mOriginalScriptOptimizationLevel != Configuration::instance().mScriptOptimizationLevel)
+	{
+		Application::instance().getSimulation().triggerFullScriptsReload();
+	}
 
 	GameApp::instance().onExitOptions();
 	mState = mEnteredFromIngame ? State::FADE_TO_GAME : State::FADE_TO_MENU;

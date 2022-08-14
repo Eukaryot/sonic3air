@@ -91,6 +91,31 @@ void SectionMenuEntry::renderEntry(RenderContext& renderContext_)
 }
 
 
+LabelMenuEntry::LabelMenuEntry()
+{
+	setInteractable(false);
+}
+
+LabelMenuEntry& LabelMenuEntry::initEntry(const std::string& text)
+{
+	mText = text;
+	return *this;
+}
+
+void LabelMenuEntry::renderEntry(RenderContext& renderContext_)
+{
+	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
+	Drawer& drawer = *renderContext.mDrawer;
+	const int baseX = renderContext.mCurrentPosition.x;
+	int& py = renderContext.mCurrentPosition.y;
+
+	py -= 1;
+	const Vec2i boxSize = global::mFont4.getTextBoxSize(mText);
+	drawer.printText(global::mFont4, Recti(baseX, py, 0, 10), mText, 5, Color(1.0f, 0.8f, 0.6f, renderContext.mTabAlpha));
+	py += boxSize.y - 4;
+}
+
+
 OptionsMenuEntry& OptionsMenuEntry::setUseSmallFont(bool useSmallFont)
 {
 	mUseSmallFont = useSmallFont;
@@ -98,6 +123,11 @@ OptionsMenuEntry& OptionsMenuEntry::setUseSmallFont(bool useSmallFont)
 }
 
 void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
+{
+	renderInternal(renderContext_, Color::WHITE, Color::YELLOW);
+}
+
+void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color& normalColor, const Color& selectedColor)
 {
 	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
 	Drawer& drawer = *renderContext.mDrawer;
@@ -108,7 +138,7 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 	const bool isSelected = renderContext.mIsSelected;
 	const bool isDisabled = !isInteractable();
 
-	Color color = isSelected ? Color::YELLOW : isDisabled ? Color(0.4f, 0.4f, 0.4f) : Color(1.0f, 1.0f, 1.0f);
+	Color color = isSelected ? selectedColor : isDisabled ? Color(0.4f, 0.4f, 0.4f) : normalColor;
 	color.a *= renderContext.mTabAlpha;
 
 	if (mOptions.empty())
@@ -192,6 +222,21 @@ void OptionsMenuEntry::renderEntry(RenderContext& renderContext_)
 		}
 	}
 }
+
+
+AdvancedOptionMenuEntry::AdvancedOptionMenuEntry()
+{
+	setUseSmallFont(true);
+}
+
+void AdvancedOptionMenuEntry::renderEntry(RenderContext& renderContext_)
+{
+	OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
+	const Color normalColor = (mOptions[mSelectedIndex].mValue == mDefaultValue) ? Color::WHITE : Color(1.0f, 0.5f, 0.5f);
+	const Color selectedColor = (mOptions[mSelectedIndex].mValue == mDefaultValue) ? Color::YELLOW : Color(1.0f, 0.75f, 0.0f);
+	renderInternal(renderContext_, normalColor, selectedColor);
+}
+
 
 void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 {

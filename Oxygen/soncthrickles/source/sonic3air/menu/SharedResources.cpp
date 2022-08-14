@@ -49,8 +49,9 @@ namespace global
 
 	void loadSharedResources()
 	{
-		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor = std::make_shared<ShadowFontProcessor>(Vec2f(0.5f, 0.5f), 0.6f);
-		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor2 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 0.5f), 0.5f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 0.5f, 0.8f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor2 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 0.5f), 0.5f, 1.0f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor3 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 0.5f, 0.6f);
 
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessor = std::make_shared<OutlineFontProcessor>();
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorTransparent = std::make_shared<OutlineFontProcessor>(0x80000000);
@@ -67,7 +68,7 @@ namespace global
 		fontCollection.registerManagedFont(mFont4, "oxyfont_tiny");
 		mFont4.addFontProcessor(outlineFontProcessor);
 		mFont4.addFontProcessor(gradientFontProcessor);
-		mFont4.addFontProcessor(shadowFontProcessor);
+		mFont4.addFontProcessor(shadowFontProcessor3);
 
 		fontCollection.registerManagedFont(mFont5, "oxyfont_small");
 		mFont5.addFontProcessor(outlineFontProcessor);

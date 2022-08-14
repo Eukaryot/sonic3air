@@ -101,6 +101,7 @@ private:
 	float mWarningMessageTimeout = 0.0f;
 	float mAudioWarningMessageTimeout = 0.0f;
 	bool mShowedAudioWarningMessage = false;
+	int mOriginalScriptOptimizationLevel = -1;
 
 	bool mHasAnyModOptions = false;
 };
