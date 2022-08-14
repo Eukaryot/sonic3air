@@ -349,7 +349,12 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 			vgHelper.tryReadInt("ButtonsSize", mVirtualGamepad.mFaceButtonsSize);
 			vgHelper.tryReadInt("StartPosX", mVirtualGamepad.mStartButtonCenter.x);
 			vgHelper.tryReadInt("StartPosY", mVirtualGamepad.mStartButtonCenter.y);
+			vgHelper.tryReadInt("GameRecPosX", mVirtualGamepad.mGameRecButtonCenter.x);
+			vgHelper.tryReadInt("GameRecPosY", mVirtualGamepad.mGameRecButtonCenter.y);
 		}
+
+		// Game recorder
+		rootHelper.tryReadInt("GameRecordingMode", mGameRecorder.mRecordingMode);
 
 		// Script
 		rootHelper.tryReadInt("ScriptOptimizationLevel", mScriptOptimizationLevel);
@@ -458,8 +463,13 @@ void Configuration::saveSettings()
 			vg["ButtonsSize"] = mVirtualGamepad.mFaceButtonsSize;
 			vg["StartPosX"] = mVirtualGamepad.mStartButtonCenter.x;
 			vg["StartPosY"] = mVirtualGamepad.mStartButtonCenter.y;
+			vg["GameRecPosX"] = mVirtualGamepad.mGameRecButtonCenter.x;
+			vg["GameRecPosY"] = mVirtualGamepad.mGameRecButtonCenter.y;
 			root["VirtualGamepad"] = vg;
 		}
+
+		// Game recorder
+		root["GameRecordingMode"] = mGameRecorder.mRecordingMode;
 
 		// Script
 		root["ScriptOptimizationLevel"] = mScriptOptimizationLevel;
@@ -500,6 +510,27 @@ void Configuration::saveSettings()
 	if (!mSettingsFilenames[settingsIndex].empty())
 	{
 		saveSettingsInput(mSettingsFilenames[settingsIndex]);
+	}
+}
+
+void Configuration::evaluateGameRecording()
+{
+	if (mGameRecorder.mRecordingMode == 0 || mGameRecorder.mIsPlayback)
+	{
+		mGameRecorder.mIsRecording = false;
+	}
+	else if (mGameRecorder.mRecordingMode == 1)
+	{
+		mGameRecorder.mIsRecording = true;
+	}
+	else
+	{
+		#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
+			// Disable game recording unless explicitly enabled, as it can be really slow on mobile devices
+			mGameRecorder.mIsRecording = false;
+		#else
+			mGameRecorder.mIsRecording = !mFailSafeMode;
+		#endif
 	}
 }
 
@@ -550,11 +581,21 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 
 	// Game
 	rootHelper.tryReadInt("StartPhase", mStartPhase);
-	rootHelper.tryReadInt("GameRecording", mGameRecording);
-	rootHelper.tryReadInt("GameRecPlayFrom", mGameRecPlayFrom);
-	rootHelper.tryReadBool("GameRecIgnoreKeys", mGameRecIgnoreKeys);
 
-	if (mLoadLevel != -1 || mGameRecording == 2)
+	// Game recorder
+	Json::Value gamerecJson = rootHelper.mJson["DevMode"];
+	if (gamerecJson.isObject())
+	{
+		JsonHelper gamerecHelper(gamerecJson);
+		gamerecHelper.tryReadBool("EnablePlayback", mGameRecorder.mIsPlayback);
+		if (mGameRecorder.mIsPlayback)
+		{
+			rootHelper.tryReadInt("PlaybackStartFrame", mGameRecorder.mPlaybackStartFrame);
+			rootHelper.tryReadBool("PlaybackIgnoreKeys", mGameRecorder.mPlaybackIgnoreKeys);
+		}
+	}
+
+	if (mLoadLevel != -1 || mGameRecorder.mIsPlayback)
 	{
 		// Enforce start phase 3 (in-game) when a level to load directly is defined, and in game recording playback mode
 		mStartPhase = 3;

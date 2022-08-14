@@ -53,6 +53,7 @@ public:
 	void toggleFullscreen();
 
 	void enablePauseOnFocusLoss();
+	void triggerGameRecordingSave();
 
 	bool hasKeyboard() const;
 	bool hasVirtualGamepad() const;

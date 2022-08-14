@@ -235,6 +235,7 @@ void AdvancedOptionMenuEntry::renderEntry(RenderContext& renderContext_)
 	const Color normalColor = (mOptions[mSelectedIndex].mValue == mDefaultValue) ? Color::WHITE : Color(1.0f, 0.5f, 0.5f);
 	const Color selectedColor = (mOptions[mSelectedIndex].mValue == mDefaultValue) ? Color::YELLOW : Color(1.0f, 0.75f, 0.0f);
 	renderInternal(renderContext_, normalColor, selectedColor);
+	renderContext.mCurrentPosition.y -= 1;
 }
 
 

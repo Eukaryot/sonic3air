@@ -27,6 +27,7 @@ public:
 		Vec2f mFaceButtonsCenter;
 		float mFaceButtonsSize = 1.0f;
 		Vec2f mStartButtonCenter;
+		Vec2f mGameRecButtonCenter;
 	};
 	Setup mSetup;
 
@@ -60,6 +61,7 @@ private:
 			MOVING_DPAD,
 			MOVING_BUTTONS,
 			MOVING_START,
+			MOVING_GAMEREC,
 			SCALING_DPAD,
 			SCALING_BUTTONS
 		};
@@ -72,6 +74,13 @@ private:
 
 	struct TouchArea
 	{
+		enum class SpecialType
+		{
+			NONE,
+			GAMEREC
+		};
+
+		SpecialType mSpecialType = SpecialType ::NONE;
 		Rectf mRect;				// Main rectangle, using the touch area coordinate system
 		float mRadius = 0.0f;		// Additional radius outside of the rectangle
 		float mPriority = 1.0f;
@@ -91,13 +100,15 @@ private:
 
 private:
 	void buildPointButton(const Vec2f& center, float radius, float priority, InputManager::Control& control, InputManager::Control* control2);
-	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState);
+	void buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control* control, ConfigMode::State reactToState, TouchArea::SpecialType specialType = TouchArea::SpecialType::NONE);
 	void buildRoundButton(const Vec2f& center, float radius, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState);
 
 	const TouchArea* getTouchAreaAtNormalizedPosition(const Vec2f& position) const;
 	Vec2f getNormalizedTouchFromScreenPosition(Vec2f vec) const;
 	Vec2f getScreenFromNormalizedTouchPosition(Vec2f vec) const;
 	Rectf getScreenFromNormalizedTouchRect(Rectf rect) const;
+
+	void updateConfigMode();
 
 private:
 	Vec2i mLastScreenSize;
@@ -112,6 +123,7 @@ private:
 	float mAutoHideTimer = 0.0f;
 	bool mForceHidden = false;
 	float mVisibility = 0.0f;
+	bool mGameRecPressed = false;
 
 	ConfigMode mConfigMode;
 };

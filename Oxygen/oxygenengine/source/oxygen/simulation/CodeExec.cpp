@@ -698,7 +698,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 				if (showMessageBox)
 				{
 					bool gameRecordingSaved = false;
-					if (Configuration::instance().mGameRecording == 1)
+					if (Configuration::instance().mGameRecorder.mIsRecording)
 					{
 						gameRecordingSaved = (Application::instance().getSimulation().saveGameRecording() != 0);
 					}

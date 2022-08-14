@@ -15,11 +15,6 @@
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",
 
-	// Game recorder
-	"GameRecording": "-1",
-	"GameRecPlayFrom": "0",
-	"GameRecIgnoreKeys": "0",
-
 	// Video
 	"WindowSize": "1200 x 740",
 	"GameScreen": "400 x 224",		// Can be changed with numpad multiply/divide
@@ -28,6 +23,16 @@
 
 	// Audio
 	"AudioSampleRate": "48000",
+
+	// Game recorder
+	"GameRecording":
+	{
+		// Whether game recording is active at all is saved in settings.json (it usually is for desktop platforms)
+		// Warning: Playback of game recordings can have undesired side effects like overwriting persistent data!
+		"EnablePlayback": "0",			// Set to "1" to enable playback of local "gamerecording.bin" file
+		"PlaybackStartFrame": "0",		// Optional start frame inside the playback, where the game fast-forwards to
+		"PlaybackIgnoreKeys": "0"		// Ignore keyframes in the recording (except the first), only play back the inputs
+	},
 
 	// Input recorder
 	"InputRecorder":

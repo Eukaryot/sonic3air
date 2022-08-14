@@ -425,21 +425,15 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		config.mRenderMethod = Configuration::RenderMethod::OPENGL_FULL;
 	}
 
-	if (config.mGameRecording == -1)
-	{
-		config.mGameRecording = config.mFailSafeMode ? 0 : 1;
-	}
-
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
 	// Use fullscreen, with no borders please
 	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
-
-	// Disable game recording, as it's really slow on Android
-	config.mGameRecording = 0;
 #endif
 
+	config.evaluateGameRecording();
+
 	RMX_LOG_INFO(((config.mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? "Using pure software renderer" :
-			 (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Using opengl-soft renderer" : "Using opengl-full renderer"));
+				  (config.mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Using opengl-soft renderer" : "Using opengl-full renderer"));
 	return true;
 }
 

@@ -9,9 +9,6 @@
 
 	// Game
 	"StartPhase": "2",				// 0: Disclaimer, 1: Title Screen, 2: Main Menu, 3: In-game (loading a save state)
-	"GameRecording": "-1",
-	"GameRecPlayFrom": "0",
-	"GameRecIgnoreKeys": "0",
 
 	// Video
 	"WindowSize": "1200 x 740",
@@ -20,6 +17,16 @@
 
 	// Audio
 	"AudioSampleRate": "48000",
+	
+	// Game recorder
+	"GameRecording":
+	{
+		// Whether game recording is active at all is saved in settings.json (it usually is for desktop platforms)
+		// Warning: Playback of game recordings can have undesired side effects like overwriting persistent data!
+		"EnablePlayback": "0",			// Set to "1" to enable playback of local "gamerecording.bin" file
+		"PlaybackStartFrame": "0",		// Optional start frame inside the playback, where the game fast-forwards to
+		"PlaybackIgnoreKeys": "0"		// Ignore keyframes in the recording (except the first), only play back the inputs
+	},
 
 	// Dev mode
 	"DevMode":

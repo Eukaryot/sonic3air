@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
+#include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/rendering/utils/RenderUtils.h"
@@ -68,14 +69,15 @@ void TouchControlsOverlay::buildTouchControls()
 	mSetup.mFaceButtonsCenter = Vec2f(1.15f, 0.45f) + Vec2f(config.mVirtualGamepad.mFaceButtonsCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
 	mSetup.mFaceButtonsSize = (float)config.mVirtualGamepad.mFaceButtonsSize * CONFIG_TO_SETUP_SCALE;
 	mSetup.mStartButtonCenter = Vec2f(0.95f, -0.92f) + Vec2f(config.mVirtualGamepad.mStartButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
+	mSetup.mGameRecButtonCenter = Vec2f(-0.95f, -0.92f) + Vec2f(config.mVirtualGamepad.mGameRecButtonCenter) * CONFIG_TO_SETUP_SCALE * 0.5f;
 
 	// Create touch areas and visual elements
 	{
 		const float size = mSetup.mDirectionalPadSize;
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(-0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, "touch_overlay_left",  controller.Left,	ConfigMode::State::MOVING_DPAD);
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(+0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, "touch_overlay_right", controller.Right,	ConfigMode::State::MOVING_DPAD);
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, -0.3f) * size, Vec2f(0.125f, 0.2f) * size, "touch_overlay_up",    controller.Up,	ConfigMode::State::MOVING_DPAD);
-		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, +0.3f) * size, Vec2f(0.125f, 0.2f) * size, "touch_overlay_down",  controller.Down,	ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(-0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, "touch_overlay_left",  &controller.Left,  ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(+0.3f, 0.0f) * size, Vec2f(0.2f, 0.125f) * size, "touch_overlay_right", &controller.Right, ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, -0.3f) * size, Vec2f(0.125f, 0.2f) * size, "touch_overlay_up",    &controller.Up,	   ConfigMode::State::MOVING_DPAD);
+		buildRectangularButton(mSetup.mDirectionalPadCenter + Vec2f(0.0f, +0.3f) * size, Vec2f(0.125f, 0.2f) * size, "touch_overlay_down",  &controller.Down,  ConfigMode::State::MOVING_DPAD);
 	}
 	{
 		const float size = mSetup.mDirectionalPadSize;
@@ -91,7 +93,8 @@ void TouchControlsOverlay::buildTouchControls()
 		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, -0.28f) * size, 0.15f * size, "touch_overlay_Y", controller.Y, ConfigMode::State::MOVING_BUTTONS);
 		buildRoundButton(mSetup.mFaceButtonsCenter + Vec2f(0.0f, +0.28f) * size, 0.15f * size, "touch_overlay_A", controller.A, ConfigMode::State::MOVING_BUTTONS);
 	}
-	buildRectangularButton(mSetup.mStartButtonCenter, Vec2f(0.18f, 0.06f), "touch_overlay_start", controller.Start, ConfigMode::State::MOVING_START);
+	buildRectangularButton(mSetup.mStartButtonCenter, Vec2f(0.18f, 0.06f), "touch_overlay_start", &controller.Start, ConfigMode::State::MOVING_START);
+	buildRectangularButton(mSetup.mGameRecButtonCenter, Vec2f(0.15f, 0.06f), "touch_overlay_rec", nullptr, ConfigMode::State::MOVING_GAMEREC, TouchArea::SpecialType::GAMEREC);
 
 	mLastScreenSize = FTX::screenSize();
 }
@@ -203,6 +206,10 @@ void TouchControlsOverlay::render()
 		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
 		for (VisualElement& visualElement : mVisualElements)
 		{
+			// Skip game rec button is game recording is disabled
+			if (visualElement.mReactToState == ConfigMode::State::MOVING_GAMEREC && !Configuration::instance().mGameRecorder.mIsRecording)
+				continue;
+
 			const bool pressed = (nullptr == visualElement.mControl) ? false : visualElement.mControl->isPressed();
 			const uint64 spriteKey = visualElement.mSpriteKeys[pressed ? 1 : 0];
 			const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(spriteKey);
@@ -232,26 +239,26 @@ void TouchControlsOverlay::buildPointButton(const Vec2f& center, float radius, f
 	touchArea.mPriority = priority;
 	touchArea.mControls.push_back(&control);
 	if (nullptr != control2)
-	{
 		touchArea.mControls.push_back(control2);
-	}
 }
 
-void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState)
+void TouchControlsOverlay::buildRectangularButton(const Vec2f& center, const Vec2f& halfExtend, const char* spriteKey, InputManager::Control* control, ConfigMode::State reactToState, TouchArea::SpecialType specialType)
 {
 	VisualElement& visualElement = vectorAdd(mVisualElements);
 	visualElement.mCenter.set(center);
 	visualElement.mHalfExtend = halfExtend;
 	visualElement.mSpriteKeys[0] = rmx::getMurmur2_64(spriteKey);
 	visualElement.mSpriteKeys[1] = rmx::getMurmur2_64(spriteKey + std::string("_hl"));
-	visualElement.mControl = &control;
+	visualElement.mControl = control;
 	visualElement.mReactToState = reactToState;
 
 	TouchArea& touchArea = vectorAdd(mTouchAreas);
+	touchArea.mSpecialType = specialType;
 	touchArea.mRect.set(center - halfExtend, halfExtend * 2.0f);
 	touchArea.mRadius = 0.35f;
 	touchArea.mPriority = 1.0f;
-	touchArea.mControls.push_back(&control);
+	if (nullptr != control)
+		touchArea.mControls.push_back(control);
 }
 
 void TouchControlsOverlay::buildRoundButton(const Vec2f& center, float radius, const char* spriteKey, InputManager::Control& control, ConfigMode::State reactToState)
@@ -307,154 +314,194 @@ void TouchControlsOverlay::updateControls()
 {
 	if (mConfigMode.mEnabled)
 	{
-		// Config mode
-		if (mInputManager->getActiveTouches().empty())
-		{
-			if (mConfigMode.mState == ConfigMode::State::DONE_BUTTON_DOWN)
-			{
-				mConfigMode.mEnabled = false;
-			}
-			mConfigMode.mState = ConfigMode::State::TOUCH_UP;
-		}
-		else
-		{
-			const InputManager::Touch& touch = mInputManager->getActiveTouches()[0];
-			const Vec2f touchPosition = getNormalizedTouchFromScreenPosition(touch.mPosition * Vec2f(FTX::screenSize()));
-			Configuration& config = Configuration::instance();
+		updateConfigMode();
+		return;
+	}
 
-			switch (mConfigMode.mState)
-			{
-				case ConfigMode::State::TOUCH_UP:
-				{
-					if (touchPosition.sqrDist(mSetup.mDirectionalPadCenter) < square(mSetup.mDirectionalPadSize * 0.5f))
-					{
-						mConfigMode.mState = ConfigMode::State::MOVING_DPAD;
-						mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mDirectionalPadCenter);
-					}
-					// TODO: This is work-in-progress
-					//else if (touchPosition.sqrDist(mSetup.mDirectionalPadCenter) < square(mSetup.mDirectionalPadSize * 0.7f))
-					//{
-					//	mConfigMode.mState = ConfigMode::State::SCALING_DPAD;
-					//	mConfigMode.mLastTargetPosition.x = (float)config.mVirtualGamepad.mDirectionalPadSize;
-					//}
-					else if (touchPosition.sqrDist(mSetup.mFaceButtonsCenter) < square(mSetup.mFaceButtonsSize * 0.5f))
-					{
-						mConfigMode.mState = ConfigMode::State::MOVING_BUTTONS;
-						mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mFaceButtonsCenter);
-					}
-					// TODO: This is work-in-progress
-					//else if (touchPosition.sqrDist(mSetup.mFaceButtonsCenter) < square(mSetup.mFaceButtonsSize * 0.7f))
-					//{
-					//	mConfigMode.mState = ConfigMode::State::SCALING_BUTTONS;
-					//	mConfigMode.mLastTargetPosition.x = (float)config.mVirtualGamepad.mFaceButtonsSize;
-					//}
-					else if (touchPosition.sqrDist(mSetup.mStartButtonCenter) < square(0.3f))
-					{
-						mConfigMode.mState = ConfigMode::State::MOVING_START;
-						mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mStartButtonCenter);
-					}
-					else if (touchPosition.sqrDist(::DONE_BUTTON_RECT.getClosestPoint(touchPosition)) < square(0.075f))
-					{
-						mConfigMode.mState = ConfigMode::State::DONE_BUTTON_DOWN;
-					}
-					else
-					{
-						mConfigMode.mState = ConfigMode::State::TOUCH_DOWN;
-					}
-					break;
-				}
-
-				case ConfigMode::State::DONE_BUTTON_UP:
-				case ConfigMode::State::DONE_BUTTON_DOWN:
-				{
-					mConfigMode.mState = (touchPosition.sqrDist(::DONE_BUTTON_RECT.getClosestPoint(touchPosition)) < square(0.075f)) ? ConfigMode::State::DONE_BUTTON_DOWN : ConfigMode::State::DONE_BUTTON_UP;
-					break;
-				}
-
-				case ConfigMode::State::MOVING_DPAD:
-				{
-					if (touchPosition != mConfigMode.mLastTouchPosition)
-					{
-						mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-						config.mVirtualGamepad.mDirectionalPadCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
-						buildTouchControls();
-					}
-					break;
-				}
-
-				case ConfigMode::State::MOVING_BUTTONS:
-				{
-					if (touchPosition != mConfigMode.mLastTouchPosition)
-					{
-						mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-						config.mVirtualGamepad.mFaceButtonsCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
-						buildTouchControls();
-					}
-					break;
-				}
-
-				case ConfigMode::State::MOVING_START:
-				{
-					if (touchPosition != mConfigMode.mLastTouchPosition)
-					{
-						mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-						config.mVirtualGamepad.mStartButtonCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
-						buildTouchControls();
-					}
-					break;
-				}
-
-				case ConfigMode::State::SCALING_DPAD:
-				{
-					if (touchPosition != mConfigMode.mLastTouchPosition)
-					{
-						mConfigMode.mLastTargetPosition.x += (touchPosition - mConfigMode.mLastTouchPosition).dot(touchPosition - mSetup.mDirectionalPadCenter) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-						config.mVirtualGamepad.mDirectionalPadSize = clamp(roundToInt(mConfigMode.mLastTargetPosition.x), 50, 150);
-						buildTouchControls();
-					}
-					break;
-				}
-
-				case ConfigMode::State::SCALING_BUTTONS:
-				{
-					if (touchPosition != mConfigMode.mLastTouchPosition)
-					{
-						mConfigMode.mLastTargetPosition.x += (touchPosition - mConfigMode.mLastTouchPosition).dot(touchPosition - mSetup.mFaceButtonsCenter) / (CONFIG_TO_SETUP_SCALE * 0.5f);
-						config.mVirtualGamepad.mFaceButtonsSize = clamp(roundToInt(mConfigMode.mLastTargetPosition.x), 50, 150);
-						buildTouchControls();
-					}
-					break;
-				}
-
-				default:
-					break;
-			}
-
-			mConfigMode.mLastTouchPosition = touchPosition;
-		}
-
-		// No auto-hide in config mode
+	// Update touch areas
+	bool gameRecPressed = false;
+	if (!mInputManager->getActiveTouches().empty())
+	{
+		// There is at least one active touch, reset auto-hide
 		mAutoHideTimer = 0.0f;
+
+		for (const InputManager::Touch& touch : mInputManager->getActiveTouches())
+		{
+			TouchArea* touchArea = const_cast<TouchArea*>(getTouchAreaAtNormalizedPosition(touch.mPosition));
+			if (nullptr != touchArea)
+			{
+				switch (touchArea->mSpecialType)
+				{
+					case TouchArea::SpecialType::GAMEREC:
+					{
+						gameRecPressed = true;
+						break;
+					}
+					default:
+					{
+						for (InputManager::Control* control : touchArea->mControls)
+							control->mState = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	if (gameRecPressed != mGameRecPressed)
+	{
+		mGameRecPressed = gameRecPressed;
+		if (gameRecPressed)
+		{
+			Application::instance().triggerGameRecordingSave();
+		}
+	}
+}
+
+void TouchControlsOverlay::updateConfigMode()
+{
+	// Config mode
+	if (mInputManager->getActiveTouches().empty())
+	{
+		if (mConfigMode.mState == ConfigMode::State::DONE_BUTTON_DOWN)
+		{
+			mConfigMode.mEnabled = false;
+		}
+		mConfigMode.mState = ConfigMode::State::TOUCH_UP;
 	}
 	else
 	{
-		// Update touch areas
-		if (!mInputManager->getActiveTouches().empty())
-		{
-			// There is at least one active touch, reset auto-hide
-			mAutoHideTimer = 0.0f;
+		const InputManager::Touch& touch = mInputManager->getActiveTouches()[0];
+		const Vec2f touchPosition = getNormalizedTouchFromScreenPosition(touch.mPosition * Vec2f(FTX::screenSize()));
+		Configuration& config = Configuration::instance();
 
-			for (const InputManager::Touch& touch : mInputManager->getActiveTouches())
+		switch (mConfigMode.mState)
+		{
+			case ConfigMode::State::TOUCH_UP:
 			{
-				TouchArea* touchArea = const_cast<TouchArea*>(getTouchAreaAtNormalizedPosition(touch.mPosition));
-				if (nullptr != touchArea)
+				if (touchPosition.sqrDist(mSetup.mDirectionalPadCenter) < square(mSetup.mDirectionalPadSize * 0.5f))
 				{
-					for (InputManager::Control* control : touchArea->mControls)
-					{
-						control->mState = true;
-					}
+					mConfigMode.mState = ConfigMode::State::MOVING_DPAD;
+					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mDirectionalPadCenter);
 				}
+				// TODO: This is work-in-progress
+				//else if (touchPosition.sqrDist(mSetup.mDirectionalPadCenter) < square(mSetup.mDirectionalPadSize * 0.7f))
+				//{
+				//	mConfigMode.mState = ConfigMode::State::SCALING_DPAD;
+				//	mConfigMode.mLastTargetPosition.x = (float)config.mVirtualGamepad.mDirectionalPadSize;
+				//}
+				else if (touchPosition.sqrDist(mSetup.mFaceButtonsCenter) < square(mSetup.mFaceButtonsSize * 0.5f))
+				{
+					mConfigMode.mState = ConfigMode::State::MOVING_BUTTONS;
+					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mFaceButtonsCenter);
+				}
+				// TODO: This is work-in-progress
+				//else if (touchPosition.sqrDist(mSetup.mFaceButtonsCenter) < square(mSetup.mFaceButtonsSize * 0.7f))
+				//{
+				//	mConfigMode.mState = ConfigMode::State::SCALING_BUTTONS;
+				//	mConfigMode.mLastTargetPosition.x = (float)config.mVirtualGamepad.mFaceButtonsSize;
+				//}
+				else if (touchPosition.sqrDist(mSetup.mStartButtonCenter) < square(0.3f))
+				{
+					mConfigMode.mState = ConfigMode::State::MOVING_START;
+					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mStartButtonCenter);
+				}
+				else if (touchPosition.sqrDist(mSetup.mGameRecButtonCenter) < square(0.3f))
+				{
+					mConfigMode.mState = ConfigMode::State::MOVING_GAMEREC;
+					mConfigMode.mLastTargetPosition = Vec2f(config.mVirtualGamepad.mGameRecButtonCenter);
+				}
+				else if (touchPosition.sqrDist(::DONE_BUTTON_RECT.getClosestPoint(touchPosition)) < square(0.075f))
+				{
+					mConfigMode.mState = ConfigMode::State::DONE_BUTTON_DOWN;
+				}
+				else
+				{
+					mConfigMode.mState = ConfigMode::State::TOUCH_DOWN;
+				}
+				break;
 			}
+
+			case ConfigMode::State::DONE_BUTTON_UP:
+			case ConfigMode::State::DONE_BUTTON_DOWN:
+			{
+				mConfigMode.mState = (touchPosition.sqrDist(::DONE_BUTTON_RECT.getClosestPoint(touchPosition)) < square(0.075f)) ? ConfigMode::State::DONE_BUTTON_DOWN : ConfigMode::State::DONE_BUTTON_UP;
+				break;
+			}
+
+			case ConfigMode::State::MOVING_DPAD:
+			{
+				if (touchPosition != mConfigMode.mLastTouchPosition)
+				{
+					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
+					config.mVirtualGamepad.mDirectionalPadCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
+					buildTouchControls();
+				}
+				break;
+			}
+
+			case ConfigMode::State::MOVING_BUTTONS:
+			{
+				if (touchPosition != mConfigMode.mLastTouchPosition)
+				{
+					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
+					config.mVirtualGamepad.mFaceButtonsCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
+					buildTouchControls();
+				}
+				break;
+			}
+
+			case ConfigMode::State::MOVING_START:
+			{
+				if (touchPosition != mConfigMode.mLastTouchPosition)
+				{
+					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
+					config.mVirtualGamepad.mStartButtonCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
+					buildTouchControls();
+				}
+				break;
+			}
+
+			case ConfigMode::State::MOVING_GAMEREC:
+			{
+				if (touchPosition != mConfigMode.mLastTouchPosition)
+				{
+					mConfigMode.mLastTargetPosition += (touchPosition - mConfigMode.mLastTouchPosition) / (CONFIG_TO_SETUP_SCALE * 0.5f);
+					config.mVirtualGamepad.mGameRecButtonCenter.set(roundToInt(mConfigMode.mLastTargetPosition.x), roundToInt(mConfigMode.mLastTargetPosition.y));
+					buildTouchControls();
+				}
+				break;
+			}
+
+			case ConfigMode::State::SCALING_DPAD:
+			{
+				if (touchPosition != mConfigMode.mLastTouchPosition)
+				{
+					mConfigMode.mLastTargetPosition.x += (touchPosition - mConfigMode.mLastTouchPosition).dot(touchPosition - mSetup.mDirectionalPadCenter) / (CONFIG_TO_SETUP_SCALE * 0.5f);
+					config.mVirtualGamepad.mDirectionalPadSize = clamp(roundToInt(mConfigMode.mLastTargetPosition.x), 50, 150);
+					buildTouchControls();
+				}
+				break;
+			}
+
+			case ConfigMode::State::SCALING_BUTTONS:
+			{
+				if (touchPosition != mConfigMode.mLastTouchPosition)
+				{
+					mConfigMode.mLastTargetPosition.x += (touchPosition - mConfigMode.mLastTouchPosition).dot(touchPosition - mSetup.mFaceButtonsCenter) / (CONFIG_TO_SETUP_SCALE * 0.5f);
+					config.mVirtualGamepad.mFaceButtonsSize = clamp(roundToInt(mConfigMode.mLastTargetPosition.x), 50, 150);
+					buildTouchControls();
+				}
+				break;
+			}
+
+			default:
+				break;
 		}
+
+		mConfigMode.mLastTouchPosition = touchPosition;
 	}
+
+	// No auto-hide in config mode
+	mAutoHideTimer = 0.0f;
 }

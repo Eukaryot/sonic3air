@@ -46,6 +46,15 @@ public:
 		bool mEnabled = false;
 	};
 
+	struct GameRecorder
+	{
+		int mRecordingMode = -1;		// -1 = Auto, 0 = Recording disabled, 1 = Recording enabled
+		bool mIsRecording = false;
+		bool mIsPlayback = false;
+		int mPlaybackStartFrame = 0;
+		bool mPlaybackIgnoreKeys = false;
+	};
+
 	struct VirtualGamepad
 	{
 		float mOpacity = 0.8f;
@@ -54,6 +63,7 @@ public:
 		Vec2i mFaceButtonsCenter;
 		int   mFaceButtonsSize = 100;
 		Vec2i mStartButtonCenter;
+		Vec2i mGameRecButtonCenter;
 	};
 
 	struct Mod
@@ -88,6 +98,8 @@ public:
 	void saveSettings();
 
 	inline void setSettingsReadOnly(bool enable)  { mSettingsReadOnly = enable; }
+
+	void evaluateGameRecording();
 
 protected:
 	virtual void preLoadInitialization() = 0;
@@ -128,9 +140,7 @@ public:
 	int	 mUseCharacters = 1;
 	int  mStartPhase = 0;
 	int  mSimulationFrequency = 60;
-	int  mGameRecording = -1;
-	int  mGameRecPlayFrom = 0;
-	bool mGameRecIgnoreKeys = false;
+	GameRecorder mGameRecorder;
 
 	// Dev mode
 	DevModeSettings mDevMode;

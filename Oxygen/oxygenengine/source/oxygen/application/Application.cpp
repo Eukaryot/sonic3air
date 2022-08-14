@@ -286,12 +286,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 
 					case SDLK_F2:
 					{
-						if (Configuration::instance().mGameRecording == 1)
-						{
-							WString filename;
-							const uint32 numFrames = mSimulation->saveGameRecording(&filename);
-							LogDisplay::instance().setLogDisplay(String(0, "Saved recording of last %d seconds in '%s'", numFrames / 60, *filename.toString()));
-						}
+						triggerGameRecordingSave();
 						break;
 					}
 
@@ -724,6 +719,16 @@ void Application::toggleFullscreen()
 void Application::enablePauseOnFocusLoss()
 {
 	setPausedByFocusLoss(true);
+}
+
+void Application::triggerGameRecordingSave()
+{
+	if (Configuration::instance().mGameRecorder.mIsRecording)
+	{
+		WString filename;
+		const uint32 numFrames = mSimulation->saveGameRecording(&filename);
+		LogDisplay::instance().setLogDisplay(String(0, "Saved recording of last %d seconds in '%s'", numFrames / 60, *filename.toString()));
+	}
 }
 
 bool Application::hasKeyboard() const

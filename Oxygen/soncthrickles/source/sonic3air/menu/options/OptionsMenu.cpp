@@ -101,6 +101,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
+		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
 		setupOptionEntryInt(option::BACKDROP,					&config.mBackdrop);
 		setupOptionEntryInt(option::FILTERING,					&config.mFiltering);
@@ -222,12 +223,20 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Debugging");
 		entries.addEntry<LabelMenuEntry>().initEntry("These settings are meant only for debugging very specific issues.\nIt's recommended to leave them at their default values.");
+
 		entries.addEntry<AdvancedOptionMenuEntry>()
 			.setDefaultValue(3)
 			.initEntry("Script Optimization", option::SCRIPT_OPTIMIZATION)
 			.addOption("Disabled", 0)
 			.addOption("Basic", 1)
 			.addOption("Full (Default)", 3);
+
+		entries.addEntry<AdvancedOptionMenuEntry>()
+			.setDefaultValue(-1)
+			.initEntry("Debug Game Recording", option::GAME_RECORDING_MODE)
+			.addOption("Auto", -1)
+			.addOption("Disabled", 0)
+			.addOption("Enabled", 1);
 	}
 
 	// Display tab
@@ -1030,6 +1039,13 @@ void OptionsMenu::update(float timeElapsed)
 						{
 							mOptionEntries[selectedData].applyValue();
 							InputManager::instance().updatePlayerGamepadAssignments();
+							break;
+						}
+
+						case option::GAME_RECORDING_MODE:
+						{
+							mOptionEntries[selectedData].applyValue();
+							Configuration::instance().evaluateGameRecording();
 							break;
 						}
 

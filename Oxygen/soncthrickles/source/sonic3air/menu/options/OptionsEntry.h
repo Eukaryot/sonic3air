@@ -20,6 +20,7 @@ namespace option
 
 		// System
 		SCRIPT_OPTIMIZATION,
+		GAME_RECORDING_MODE,
 
 		// Display
 		WINDOW_MODE,

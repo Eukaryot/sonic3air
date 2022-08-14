@@ -5,9 +5,6 @@
 	// Audio output sample rate, valid values: 11025, 22050, 44100, 48000
 	"AudioSampleRate": "48000",
 
-	// Allow for dumping of a game simulation recording by pressing F2 (set to "1" to enforce this feature even in fail-safe mode)
-	"GameRecording": "-1",
-
 	// Platform override ("1": desktop, "2": mobile, "-1": auto-selection)
 	"PlatformFlags": "-1",
 
