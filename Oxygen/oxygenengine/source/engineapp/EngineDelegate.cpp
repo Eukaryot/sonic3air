@@ -114,14 +114,14 @@ Font& EngineDelegate::getDebugFont(int size)
 	if (size >= 10)
 	{
 		static Font font10;
-		if (font10.getHeight() == 0)
+		if (font10.getLineHeight() == 0)
 			font10.loadFromFile("data/font/oxyfont_regular.json", 0.0f);
 		return font10;
 	}
 	else
 	{
 		static Font font3;
-		if (font3.getHeight() == 0)
+		if (font3.getLineHeight() == 0)
 			font3.loadFromFile("data/font/smallfont.json", 0.0f);
 		return font3;
 	}

@@ -14,6 +14,8 @@
 class SpriteBase
 {
 public:
+	virtual ~SpriteBase() {}
+
 	struct BlitOptions
 	{
 		const Recti* mTargetRect = nullptr;
