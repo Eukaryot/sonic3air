@@ -82,24 +82,30 @@ namespace rmx
 				case SDL_QUIT:
 					quit();
 					break;
+
 				case SDL_WINDOWEVENT:
-					if (evnt.window.event == SDL_WINDOWEVENT_RESIZED)
+					if (evnt.window.event == SDL_WINDOWEVENT_RESIZED || evnt.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 						reshape(evnt.window.data1, evnt.window.data2);
 					break;
+
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
 					keyboard(evnt.key);
 					break;
+
 				case SDL_TEXTINPUT:
 					textinput(evnt.text);
 					break;
+
 				case SDL_MOUSEBUTTONDOWN:
 				case SDL_MOUSEBUTTONUP:
 					mouse(evnt.button);
 					break;
+
 				case SDL_MOUSEWHEEL:
 					mousewheel(evnt.wheel);
 					break;
+
 				case SDL_MOUSEMOTION:
 					ctx.mMousePos.set(evnt.motion.x, evnt.motion.y);
 					break;
