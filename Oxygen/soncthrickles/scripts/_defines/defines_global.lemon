@@ -379,17 +379,20 @@ define palette_fade.range		= u16[0xfffff626]	// Both of the above combined; defa
 
 define global.lag_frames		= u16[0xfffff628]
 
-// Known states:
+// Vertical interrupt routine:
 //  0x00 = Blank screen / loading, used in various places
 //  0x02 = Used in some first title prelude frames
 //  0x04 = Title screen & also in some prelude frames
 //  0x08 = Main game incl. cutscenes
 //  0x0c = Loading a level
+//  0x10 = Game pause
 //  0x12 = Transition / screen fading
 //  0x14 = SEGA logo (after its initial fade)
 //  0x16 = Level select screen
+//  0x1a = S&K title screen, Blue Spheres mode results screen
+//  0x1c = Blue Spheres special stage
 //  0x1e = Data select screen & competition mode menus
-define global.frame_state		=  u8[0xfffff62a]	// Gets reset to 0 in V-INT
+define global.frame_state		=  u8[0xfffff62a]	// Controls what the vertical interrupt does; gets reset to 0 unless a routine is explicitly set in the frame update (it usually is)
 
 define water.palette.source		= u32[0xfffff62e]	// Address with description data how and where to load secondary palette
 

@@ -133,11 +133,11 @@ function void VInt.InnerUpdate()
 	VDP.writeData32(scrolloffset.y.both)
 
 	u8 oldFrameState = global.frame_state
-	global.frame_state = 0
+	global.frame_state = 0		// Reset to default (this usually gets overwritten, except for some game states)
 	u16[0xfffff644] = 1
 
 	// Targets:
-	//  - 0x000606	-> global.frame_state = 0x00	-> Startup
+	//  - 0x000606	-> global.frame_state = 0x00	-> Default state, does nothing
 	//  - 0x00076e	-> global.frame_state = 0x02	-> Used in SEGA logo
 	//  - 0x0007ba	-> global.frame_state = 0x04	-> Used in title screen
 	//  - 0x0007ea	-> global.frame_state = 0x08	-> Used in main game

@@ -295,7 +295,9 @@ function void UpdateGamePause()
 		{
 			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
 			Game.onGamePause(canRestart)
-			yieldExecution()
+
+			global.frame_state = 0x10
+			waitForNextFrame()
 
 			Standalone.onResumeAfterPause()
 		}
