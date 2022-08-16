@@ -425,8 +425,9 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 		config.mRenderMethod = Configuration::RenderMethod::OPENGL_FULL;
 	}
 
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
 	// Use fullscreen, with no borders please
+	//  -> Note that this doesn't work for the web version, if running in mobile browsers - we rely on a window with fixed size (see config.json) there
 	config.mWindowMode = Configuration::WindowMode::EXCLUSIVE_FULLSCREEN;
 #endif
 
