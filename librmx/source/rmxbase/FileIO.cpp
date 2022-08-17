@@ -235,7 +235,7 @@ namespace rmx
 
 	bool FileIO::getFileSize(std::wstring_view filename, uint64& outSize)
 	{
-	#ifdef USE_STD_FILESYSTEM
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(filename.data());
 		std::error_code errorCode;
 		const std::uintmax_t size = std_filesystem::file_size(fspath, errorCode);
@@ -254,7 +254,7 @@ namespace rmx
 
 	bool FileIO::getFileTime(std::wstring_view filename, time_t& outTime)
 	{
-	#ifdef USE_STD_FILESYSTEM
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspath(filename.data());
 		std::error_code errorCode;
 		const std::filesystem::file_time_type time = std_filesystem::last_write_time(fspath, errorCode);
@@ -332,7 +332,7 @@ namespace rmx
 
 	bool FileIO::renameFile(const std::wstring& oldFilename, const std::wstring& newFilename)
 	{
-	#ifdef USE_STD_FILESYSTEM
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
 		const std_filesystem::path fspathOld(oldFilename.data());
 		const std_filesystem::path fspathNew(newFilename.data());
 		std::error_code errorCode;

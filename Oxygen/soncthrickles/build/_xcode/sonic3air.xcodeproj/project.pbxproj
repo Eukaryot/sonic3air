@@ -158,7 +158,6 @@
 		9E0C5F27247DDFD6000105D0 /* rmxext_oggvorbis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AC4245F882600114DEB /* rmxext_oggvorbis.cpp */; };
 		9E0C5F28247DDFE0000105D0 /* AppFramework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ADE245F882600114DEB /* AppFramework.cpp */; };
 		9E0C5F2A247DDFE0000105D0 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AEC245F882600114DEB /* AudioBuffer.cpp */; };
-		9E0C5F2B247DDFE0000105D0 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD1245F882600114DEB /* Camera.cpp */; };
 		9E0C5F2C247DDFE0000105D0 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD4245F882600114DEB /* Font.cpp */; };
 		9E0C5F2E247DDFE0000105D0 /* FontSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AE4245F882600114DEB /* FontSource.cpp */; };
 		9E0C5F2F247DDFE0000105D0 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD3245F882600114DEB /* Framebuffer.cpp */; };
@@ -238,7 +237,6 @@
 		9E1D5F6C2475733F003B1774 /* PlayerProgress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BD7245F88D200114DEB /* PlayerProgress.cpp */; };
 		9E1D5F6D2475733F003B1774 /* ScriptImplementations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BCF245F88D200114DEB /* ScriptImplementations.cpp */; };
 		9E1D5F6E2475733F003B1774 /* Module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B64245F886B00114DEB /* Module.cpp */; };
-		9E1D5F6F2475733F003B1774 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD1245F882600114DEB /* Camera.cpp */; };
 		9E1D5F702475733F003B1774 /* Configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85CC245F89C400114DEB /* Configuration.cpp */; };
 		9E1D5F712475733F003B1774 /* BitStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DA245F89C400114DEB /* BitStream.cpp */; };
 		9E1D5F722475733F003B1774 /* SpriteManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E859F245F89C400114DEB /* SpriteManager.cpp */; };
@@ -678,7 +676,6 @@
 		9E5FD92627EC0CC900CD430A /* FileProviderSDL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E28F625EF21A60021AE3A /* FileProviderSDL.cpp */; };
 		9E5FD92727EC0CC900CD430A /* AudioReference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E2D87E124AD8C5700E6EEBE /* AudioReference.cpp */; };
 		9E5FD92827EC0CC900CD430A /* AudioMixer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E8202E325314A3F00575E6C /* AudioMixer.cpp */; };
-		9E5FD92927EC0CC900CD430A /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD1245F882600114DEB /* Camera.cpp */; };
 		9E5FD92A27EC0CC900CD430A /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD4245F882600114DEB /* Font.cpp */; };
 		9E5FD92B27EC0CC900CD430A /* AudioManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E2D87E224AD8C5700E6EEBE /* AudioManager.cpp */; };
 		9E5FD92C27EC0CE200CD430A /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD7245F882600114DEB /* Texture.cpp */; };
@@ -729,7 +726,6 @@
 		9E6E7B32245F882600114DEB /* rmxmedia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACA245F882600114DEB /* rmxmedia.cpp */; };
 		9E6E7B33245F882600114DEB /* Thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACB245F882600114DEB /* Thread.cpp */; };
 		9E6E7B34245F882600114DEB /* VideoBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACC245F882600114DEB /* VideoBuffer.cpp */; };
-		9E6E7B36245F882600114DEB /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD1245F882600114DEB /* Camera.cpp */; };
 		9E6E7B37245F882600114DEB /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD3245F882600114DEB /* Framebuffer.cpp */; };
 		9E6E7B38245F882600114DEB /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD4245F882600114DEB /* Font.cpp */; };
 		9E6E7B3A245F882600114DEB /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD7245F882600114DEB /* Texture.cpp */; };
@@ -853,6 +849,21 @@
 		9E6E863E245F89C400114DEB /* JsonHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85E0245F89C400114DEB /* JsonHelper.cpp */; };
 		9E6E863F245F89C400114DEB /* PlatformFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85E3245F89C400114DEB /* PlatformFunctions.cpp */; };
 		9E6E8641245F89C400114DEB /* CrashHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85E6245F89C400114DEB /* CrashHandler.cpp */; };
+		9E7A08D828A8411700FA25F6 /* RealFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08C628A8411700FA25F6 /* RealFileProvider.cpp */; };
+		9E7A08D928A8411700FA25F6 /* RealFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08C628A8411700FA25F6 /* RealFileProvider.cpp */; };
+		9E7A08DA28A8411700FA25F6 /* RealFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08C628A8411700FA25F6 /* RealFileProvider.cpp */; };
+		9E7A08DB28A8411700FA25F6 /* RealFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08C628A8411700FA25F6 /* RealFileProvider.cpp */; };
+		9E7A08DC28A8411700FA25F6 /* RealFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08C628A8411700FA25F6 /* RealFileProvider.cpp */; };
+		9E7A08DF28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
+		9E7A08E028A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
+		9E7A08E128A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
+		9E7A08E228A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
+		9E7A08E328A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
+		9E7A08E728A841D000FA25F6 /* DynamicSprites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08E628A841D000FA25F6 /* DynamicSprites.cpp */; };
+		9E7A08E828A841D000FA25F6 /* DynamicSprites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08E628A841D000FA25F6 /* DynamicSprites.cpp */; };
+		9E7A08E928A841D000FA25F6 /* DynamicSprites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08E628A841D000FA25F6 /* DynamicSprites.cpp */; };
+		9E7A08EA28A841D000FA25F6 /* DynamicSprites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08E628A841D000FA25F6 /* DynamicSprites.cpp */; };
+		9E7A08EB28A841D000FA25F6 /* DynamicSprites.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08E628A841D000FA25F6 /* DynamicSprites.cpp */; };
 		9E7E28D325EF21370021AE3A /* PackedFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E28CD25EF21370021AE3A /* PackedFileProvider.cpp */; };
 		9E7E28D425EF21370021AE3A /* PackedFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E28CD25EF21370021AE3A /* PackedFileProvider.cpp */; };
 		9E7E28D525EF21370021AE3A /* PackedFileProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7E28CD25EF21370021AE3A /* PackedFileProvider.cpp */; };
@@ -994,7 +1005,6 @@
 		9EB069DB248088B20080AC49 /* rmxext_oggvorbis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AC4245F882600114DEB /* rmxext_oggvorbis.cpp */; };
 		9EB069DC248088B20080AC49 /* AppFramework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ADE245F882600114DEB /* AppFramework.cpp */; };
 		9EB069DE248088B20080AC49 /* AudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AEC245F882600114DEB /* AudioBuffer.cpp */; };
-		9EB069DF248088B20080AC49 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD1245F882600114DEB /* Camera.cpp */; };
 		9EB069E0248088B20080AC49 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD4245F882600114DEB /* Font.cpp */; };
 		9EB069E2248088B20080AC49 /* FontSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AE4245F882600114DEB /* FontSource.cpp */; };
 		9EB069E3248088B20080AC49 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AD3245F882600114DEB /* Framebuffer.cpp */; };
@@ -1633,7 +1643,6 @@
 		9E6E7AB3245F882600114DEB /* Box3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box3.h; sourceTree = "<group>"; };
 		9E6E7AB4245F882600114DEB /* FileCrawler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCrawler.h; sourceTree = "<group>"; };
 		9E6E7AB5245F882600114DEB /* RmxDeflate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RmxDeflate.cpp; sourceTree = "<group>"; };
-		9E6E7AB6245F882600114DEB /* Sort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sort.h; sourceTree = "<group>"; };
 		9E6E7AB7245F882600114DEB /* Basics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Basics.h; sourceTree = "<group>"; };
 		9E6E7AB8245F882600114DEB /* BitmapCodecBMP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BitmapCodecBMP.cpp; sourceTree = "<group>"; };
 		9E6E7AB9245F882600114DEB /* Bitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bitmap.h; sourceTree = "<group>"; };
@@ -1653,8 +1662,6 @@
 		9E6E7ACB245F882600114DEB /* Thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Thread.cpp; sourceTree = "<group>"; };
 		9E6E7ACC245F882600114DEB /* VideoBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoBuffer.cpp; sourceTree = "<group>"; };
 		9E6E7ACE245F882600114DEB /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
-		9E6E7AD1245F882600114DEB /* Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
-		9E6E7AD2245F882600114DEB /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		9E6E7AD3245F882600114DEB /* Framebuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Framebuffer.cpp; sourceTree = "<group>"; };
 		9E6E7AD4245F882600114DEB /* Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Font.cpp; sourceTree = "<group>"; };
 		9E6E7AD7245F882600114DEB /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
@@ -1946,6 +1953,14 @@
 		9E6E85E6245F89C400114DEB /* CrashHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CrashHandler.cpp; sourceTree = "<group>"; };
 		9E6E85E7245F89C400114DEB /* PlatformFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlatformFunctions.h; sourceTree = "<group>"; };
 		9E6E8642245FA24500114DEB /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Ogg.framework; sourceTree = "<group>"; };
+		9E7A08C628A8411700FA25F6 /* RealFileProvider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RealFileProvider.cpp; sourceTree = "<group>"; };
+		9E7A08D728A8411700FA25F6 /* RealFileProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RealFileProvider.h; sourceTree = "<group>"; };
+		9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLSpriteTextureManager.cpp; sourceTree = "<group>"; };
+		9E7A08DE28A8418700FA25F6 /* OpenGLSpriteTextureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLSpriteTextureManager.h; sourceTree = "<group>"; };
+		9E7A08E528A841D000FA25F6 /* DynamicSprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicSprites.h; sourceTree = "<group>"; };
+		9E7A08E628A841D000FA25F6 /* DynamicSprites.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DynamicSprites.cpp; sourceTree = "<group>"; };
+		9E7A08EC28A8431700FA25F6 /* BitFlagSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitFlagSet.h; sourceTree = "<group>"; };
+		9E7A08ED28A843E200FA25F6 /* BitArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitArray.h; sourceTree = "<group>"; };
 		9E7E28CD25EF21370021AE3A /* PackedFileProvider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PackedFileProvider.cpp; sourceTree = "<group>"; };
 		9E7E28CE25EF21370021AE3A /* PackedFileProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PackedFileProvider.h; sourceTree = "<group>"; };
 		9E7E28CF25EF21370021AE3A /* ZipFileProvider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZipFileProvider.cpp; sourceTree = "<group>"; };
@@ -2462,6 +2477,8 @@
 				9E6E7AB7245F882600114DEB /* Basics.h */,
 				9E6E7A9E245F882600114DEB /* BinarySerializer.cpp */,
 				9E6E7AB2245F882600114DEB /* BinarySerializer.h */,
+				9E7A08ED28A843E200FA25F6 /* BitArray.h */,
+				9E7A08EC28A8431700FA25F6 /* BitFlagSet.h */,
 				9E6E7A8B245F882600114DEB /* Bitmap.cpp */,
 				9E6E7AB9245F882600114DEB /* Bitmap.h */,
 				9E6E7AB8245F882600114DEB /* BitmapCodecBMP.cpp */,
@@ -2508,6 +2525,8 @@
 				9E6E7AAB245F882600114DEB /* Ray.h */,
 				9E6E7AAC245F882600114DEB /* RC4Encryption.cpp */,
 				9E6E7A8D245F882600114DEB /* RC4Encryption.h */,
+				9E7A08C628A8411700FA25F6 /* RealFileProvider.cpp */,
+				9E7A08D728A8411700FA25F6 /* RealFileProvider.h */,
 				9E6E7AA3245F882600114DEB /* Rect.h */,
 				9E6E7A96245F882600114DEB /* rmxbase.cpp */,
 				9E6E7AB5245F882600114DEB /* RmxDeflate.cpp */,
@@ -2516,7 +2535,6 @@
 				9E6E7ABA245F882600114DEB /* SinglePtr.h */,
 				9E6E7A90245F882600114DEB /* Singleton.h */,
 				9E6E7A97245F882600114DEB /* SmartPtr.h */,
-				9E6E7AB6245F882600114DEB /* Sort.h */,
 				9E6E7A9A245F882600114DEB /* String.cpp */,
 				9E6E7ABF245F882600114DEB /* String.h */,
 				9E6E7A73245F882600114DEB /* StringImpl.h */,
@@ -2588,8 +2606,6 @@
 				9E2D87E124AD8C5700E6EEBE /* AudioReference.cpp */,
 				9E2D87DF24AD8C5700E6EEBE /* AudioReference.h */,
 				9E6E7AEB245F882600114DEB /* buildinfo.inc */,
-				9E6E7AD1245F882600114DEB /* Camera.cpp */,
-				9E6E7AD2245F882600114DEB /* Camera.h */,
 				9E0CCAB02518F7090007288E /* FileInputStreamSDL.cpp */,
 				9E0CCAAB2518F7090007288E /* FileInputStreamSDL.h */,
 				9E7E28F625EF21A60021AE3A /* FileProviderSDL.cpp */,
@@ -2829,6 +2845,7 @@
 				9E6E7BE1245F88D200114DEB /* main.cpp */,
 				9E6E7BB0245F88D200114DEB /* menu */,
 				9E6E7BA4245F88D200114DEB /* pch.h */,
+				9E7A08E428A841D000FA25F6 /* resources */,
 				9E6E7BCE245F88D200114DEB /* scriptimpl */,
 				9E6E7BE3245F88D200114DEB /* version.inc */,
 			);
@@ -3051,6 +3068,8 @@
 				9E9EF33924678BC900AAA00F /* OpenGLDrawerResources.h */,
 				9E6E853E245F89C300114DEB /* OpenGLDrawerTexture.cpp */,
 				9E6E8541245F89C300114DEB /* OpenGLDrawerTexture.h */,
+				9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */,
+				9E7A08DE28A8418700FA25F6 /* OpenGLSpriteTextureManager.h */,
 				9E453AE425B91F500012BADC /* OpenGLTexture.cpp */,
 				9E453AE525B91F500012BADC /* OpenGLTexture.h */,
 				9E6E853D245F89C300114DEB /* Upscaler.cpp */,
@@ -3331,6 +3350,15 @@
 				9E6E85E7245F89C400114DEB /* PlatformFunctions.h */,
 			);
 			path = base;
+			sourceTree = "<group>";
+		};
+		9E7A08E428A841D000FA25F6 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				9E7A08E628A841D000FA25F6 /* DynamicSprites.cpp */,
+				9E7A08E528A841D000FA25F6 /* DynamicSprites.h */,
+			);
+			path = resources;
 			sourceTree = "<group>";
 		};
 		9E7E290F25EF268E0021AE3A /* minizip */ = {
@@ -3863,7 +3891,6 @@
 				9E0C5F38247DDFE0000105D0 /* Painter.cpp in Sources */,
 				9E0C5EC8247DD752000105D0 /* MemoryHexView.cpp in Sources */,
 				9E82C77B26BDF29A00ADDBD3 /* BackdropView.cpp in Sources */,
-				9E0C5F2B247DDFE0000105D0 /* Camera.cpp in Sources */,
 				9E0C5EF0247DD7FA000105D0 /* SharedDatabase.cpp in Sources */,
 				9E0C5EF6247DD80C000105D0 /* DiscordIntegration.cpp in Sources */,
 				9ED1831B28789ED000506AEB /* ComponentSprite.cpp in Sources */,
@@ -3872,6 +3899,7 @@
 				9E453AE825B91F500012BADC /* OpenGLTexture.cpp in Sources */,
 				9ECCA1CF259CF24C0093A389 /* FilePackage.cpp in Sources */,
 				9E0C5EDA247DD7A3000105D0 /* JsonHelper.cpp in Sources */,
+				9E7A08DA28A8411700FA25F6 /* RealFileProvider.cpp in Sources */,
 				9ECAAA3327D1C27C00A32EEF /* FlyweightString.cpp in Sources */,
 				9E0C5F11247DDFB9000105D0 /* BitmapCodecICO.cpp in Sources */,
 				9E0C5E8D247DD65D000105D0 /* DrawerTexture.cpp in Sources */,
@@ -3888,6 +3916,7 @@
 				9E0C5EBE247DD728000105D0 /* ScrollOffsetsManager.cpp in Sources */,
 				9E8202E625314A3F00575E6C /* AudioMixer.cpp in Sources */,
 				9E0C5EC9247DD755000105D0 /* DebugLogView.cpp in Sources */,
+				9E7A08E928A841D000FA25F6 /* DynamicSprites.cpp in Sources */,
 				9E0C5EE2247DD7C7000105D0 /* MainMenu.cpp in Sources */,
 				9E0C5EE6247DD7D3000105D0 /* SecretUnlockedWindow.cpp in Sources */,
 				9ED1832028789ED000506AEB /* SpriteDump.cpp in Sources */,
@@ -4000,6 +4029,7 @@
 				9E0C5F1B247DDFC1000105D0 /* json_reader.cpp in Sources */,
 				9E0C5F2C247DDFE0000105D0 /* Font.cpp in Sources */,
 				9E995D3C25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
+				9E7A08E128A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */,
 				9E0C5EA1247DD6AD000105D0 /* ym2612.cpp in Sources */,
 				9E0C5EF5247DD809000105D0 /* GameUtils.cpp in Sources */,
 				9E0C5F17247DDFB9000105D0 /* FileHandle.cpp in Sources */,
@@ -4110,7 +4140,6 @@
 				9E1D5F6D2475733F003B1774 /* ScriptImplementations.cpp in Sources */,
 				9E1D5F6E2475733F003B1774 /* Module.cpp in Sources */,
 				9ED1832428789ED000506AEB /* PaletteSprite.cpp in Sources */,
-				9E1D5F6F2475733F003B1774 /* Camera.cpp in Sources */,
 				9E1D5F702475733F003B1774 /* Configuration.cpp in Sources */,
 				9E1D5F712475733F003B1774 /* BitStream.cpp in Sources */,
 				9E1D5F722475733F003B1774 /* SpriteManager.cpp in Sources */,
@@ -4118,6 +4147,7 @@
 				9ECB71AE24C131F700A8B55E /* OptionsEntry.cpp in Sources */,
 				9E453AF625B91FB60012BADC /* GameLoader.cpp in Sources */,
 				9E1D5F742475733F003B1774 /* Token.cpp in Sources */,
+				9E7A08E828A841D000FA25F6 /* DynamicSprites.cpp in Sources */,
 				9E1D5F752475733F003B1774 /* OggLoader.cpp in Sources */,
 				9E1D5F762475733F003B1774 /* SaveStateSerializer.cpp in Sources */,
 				9E7E291A25EF27630021AE3A /* ioapi.c in Sources */,
@@ -4128,6 +4158,7 @@
 				9ED1835228789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
 				9ED1834828789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */,
 				9E1D5F7A2475733F003B1774 /* CrashHandler.cpp in Sources */,
+				9E7A08D928A8411700FA25F6 /* RealFileProvider.cpp in Sources */,
 				9E1D5F7B2475733F003B1774 /* BinarySerializer.cpp in Sources */,
 				9E1D5F7C2475733F003B1774 /* PatternManager.cpp in Sources */,
 				9E1D5F7D2475733F003B1774 /* JsonHelper.cpp in Sources */,
@@ -4170,6 +4201,7 @@
 				9E1D5F952475733F003B1774 /* BufferTexture.cpp in Sources */,
 				9ECAAA8227D1C7C600A32EEF /* WebSocketClient.cpp in Sources */,
 				9ECAAA4427D1C63E00A32EEF /* GameClient.cpp in Sources */,
+				9E7A08E028A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */,
 				9E1D5F962475733F003B1774 /* SoftwareRenderer.cpp in Sources */,
 				9E1D5F972475733F003B1774 /* LogDisplay.cpp in Sources */,
 				9E1D5F982475733F003B1774 /* ActSelectMenu.cpp in Sources */,
@@ -4386,6 +4418,7 @@
 				9E5FD8A027EC097900CD430A /* ROMDataAnalyser.cpp in Sources */,
 				9E5FD86E27EC08B400CD430A /* DrawerTexture.cpp in Sources */,
 				9E5FD8F727EC0C4E00CD430A /* StandardLibrary.cpp in Sources */,
+				9E7A08EB28A841D000FA25F6 /* DynamicSprites.cpp in Sources */,
 				9E5FD8F127EC0C3600CD430A /* Module.cpp in Sources */,
 				9E5FD8E827EC0C1F00CD430A /* TokenProcessing.cpp in Sources */,
 				9E5FD8BB27EC0A3F00CD430A /* NativizedCode.cpp in Sources */,
@@ -4443,6 +4476,7 @@
 				9E5FD87D27EC08D500CD430A /* Profiling.cpp in Sources */,
 				9E5FD90E27EC0C9000CD430A /* json_writer.cpp in Sources */,
 				9E5FD89027EC08FD00CD430A /* PaletteManager.cpp in Sources */,
+				9E7A08E328A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */,
 				9E5FD8EF27EC0C3600CD430A /* ConstantArray.cpp in Sources */,
 				9E5FD8E927EC0C1F00CD430A /* TypeCasting.cpp in Sources */,
 				9E5FD8AC27EC098E00CD430A /* blip_buf.cpp in Sources */,
@@ -4565,6 +4599,7 @@
 				9E5FD85C27EC088500CD430A /* Mod.cpp in Sources */,
 				9E5FD8B927EC09A800CD430A /* ServerClientBase.cpp in Sources */,
 				9E5FD91727EC0CA500CD430A /* VectorBinarySerializer.cpp in Sources */,
+				9E7A08DC28A8411700FA25F6 /* RealFileProvider.cpp in Sources */,
 				9E5FD8B227EC09A000CD430A /* ReceivedPacketCache.cpp in Sources */,
 				9ED1830728789E3900506AEB /* FontProcessor.cpp in Sources */,
 				9E5FD84527EC082700CD430A /* ioapi.c in Sources */,
@@ -4589,7 +4624,6 @@
 				9E5FD8D627EC0BE200CD430A /* OptionsMenu.cpp in Sources */,
 				9E5FD8B827EC09A800CD430A /* RequestBase.cpp in Sources */,
 				9E5FD88D27EC08FD00CD430A /* ScrollOffsetsManager.cpp in Sources */,
-				9E5FD92927EC0CC900CD430A /* Camera.cpp in Sources */,
 				9E5FD90F27EC0C9000CD430A /* json_value.cpp in Sources */,
 				9E5FD84D27EC085600CD430A /* EmulationAudioSource.cpp in Sources */,
 				9E5FD8A227EC098400CD430A /* Simulation.cpp in Sources */,
@@ -4634,7 +4668,6 @@
 				9E6E80BC245F88D400114DEB /* ScriptImplementations.cpp in Sources */,
 				9E6E7B90245F886B00114DEB /* Module.cpp in Sources */,
 				9ED1832328789ED000506AEB /* PaletteSprite.cpp in Sources */,
-				9E6E7B36245F882600114DEB /* Camera.cpp in Sources */,
 				9E6E8635245F89C400114DEB /* Configuration.cpp in Sources */,
 				9E6E863C245F89C400114DEB /* BitStream.cpp in Sources */,
 				9E6E8622245F89C400114DEB /* SpriteManager.cpp in Sources */,
@@ -4642,6 +4675,7 @@
 				9ECB71AC24C131E500A8B55E /* OptionsEntry.cpp in Sources */,
 				9E453AF425B91FB50012BADC /* GameLoader.cpp in Sources */,
 				9E6E7B9B245F886B00114DEB /* Token.cpp in Sources */,
+				9E7A08E728A841D000FA25F6 /* DynamicSprites.cpp in Sources */,
 				9E6E7B2F245F882600114DEB /* OggLoader.cpp in Sources */,
 				9E6E8601245F89C400114DEB /* SaveStateSerializer.cpp in Sources */,
 				9E7E291925EF27630021AE3A /* ioapi.c in Sources */,
@@ -4652,6 +4686,7 @@
 				9ED1835128789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
 				9ED1834728789EFF00506AEB /* RenderComponentSpriteShader.cpp in Sources */,
 				9E6E8641245F89C400114DEB /* CrashHandler.cpp in Sources */,
+				9E7A08D828A8411700FA25F6 /* RealFileProvider.cpp in Sources */,
 				9E6E7B22245F882600114DEB /* BinarySerializer.cpp in Sources */,
 				9E6E861E245F89C400114DEB /* PatternManager.cpp in Sources */,
 				9E6E7B2D245F882600114DEB /* JsonHelper.cpp in Sources */,
@@ -4694,6 +4729,7 @@
 				9E6E8619245F89C400114DEB /* BufferTexture.cpp in Sources */,
 				9ECAAA8127D1C7C600A32EEF /* WebSocketClient.cpp in Sources */,
 				9ECAAA4327D1C63E00A32EEF /* GameClient.cpp in Sources */,
+				9E7A08DF28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */,
 				9E6E861D245F89C400114DEB /* SoftwareRenderer.cpp in Sources */,
 				9E6E860A245F89C400114DEB /* LogDisplay.cpp in Sources */,
 				9E6E80B6245F88D400114DEB /* ActSelectMenu.cpp in Sources */,
@@ -4989,7 +5025,6 @@
 				9EB06A4824808ABE0080AC49 /* FileHelper.cpp in Sources */,
 				9EB069D8248088B20080AC49 /* Tools.cpp in Sources */,
 				9EB06A3F24808AAD0080AC49 /* GameProfile.cpp in Sources */,
-				9EB069DF248088B20080AC49 /* Camera.cpp in Sources */,
 				9EB06A3724808A9D0080AC49 /* MemoryHexView.cpp in Sources */,
 				9EB06A3924808AA50080AC49 /* OggAudioSource.cpp in Sources */,
 				9EB06A4C24808AC40080AC49 /* CrashHandler.cpp in Sources */,
@@ -5004,6 +5039,7 @@
 				9EB06A1424808A3F0080AC49 /* LogDisplay.cpp in Sources */,
 				9ECAAA9427D1C7C600A32EEF /* ServerClientBase.cpp in Sources */,
 				9EB06A3C24808AA50080AC49 /* AudioCollection.cpp in Sources */,
+				9E7A08EA28A841D000FA25F6 /* DynamicSprites.cpp in Sources */,
 				9EB069B2248088B20080AC49 /* pch.cpp in Sources */,
 				9EB069EB248088B20080AC49 /* JobManager.cpp in Sources */,
 				9EB069A224807A9D0080AC49 /* main.m in Sources */,
@@ -5036,6 +5072,7 @@
 				9EB069BC248088B20080AC49 /* ParserHelper.cpp in Sources */,
 				9EB069EC248088B20080AC49 /* Painter.cpp in Sources */,
 				9EB069B5248088B20080AC49 /* Module.cpp in Sources */,
+				9E7A08E228A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */,
 				9EB06A5024808B2B0080AC49 /* blip_buf.cpp in Sources */,
 				9EB0699A24807A9C0080AC49 /* AppDelegate.mm in Sources */,
 				9EB069BA248088B20080AC49 /* Node.cpp in Sources */,
@@ -5072,6 +5109,7 @@
 				9EB06A2C24808A780080AC49 /* PlaneManager.cpp in Sources */,
 				9ED1830D28789E7500506AEB /* FontCollection.cpp in Sources */,
 				9EB069BF248088B20080AC49 /* Parser.cpp in Sources */,
+				9E7A08DB28A8411700FA25F6 /* RealFileProvider.cpp in Sources */,
 				9E995D3D25F9CFAF00F4B934 /* StringRef.cpp in Sources */,
 				9E08784826326E3E0005AEAF /* Experiments.cpp in Sources */,
 				9EB069CE248088B20080AC49 /* json_writer.cpp in Sources */,
