@@ -204,7 +204,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	//  - 0x01 = Flip X
 	//  - 0x02 = Flip Y
 	//  - 0x08 = Pixel upscaling
-	//  - 0x10 = Fully opaque	-- TODO: This is only supported by software renderer
+	//  - 0x10 = Fully opaque
 	//  - 0x20 = World space
 	//  - 0x40 = Priority flag
 	//  - 0x80 = Use global tint

@@ -15,7 +15,7 @@
 constant u8 SPRITE_FLAG_FLIP_X			= 0x01
 constant u8 SPRITE_FLAG_FLIP_Y			= 0x02
 constant u8 SPRITE_FLAG_PIXEL_UPSCALING	= 0x08
-constant u8 SPRITE_FLAG_FULLY_OPAQUE	= 0x10		// TODO: This is only supported by software renderer
+constant u8 SPRITE_FLAG_FULLY_OPAQUE	= 0x10
 constant u8 SPRITE_FLAG_WORLDSPACE		= 0x20
 constant u8 SPRITE_FLAG_PRIO			= 0x40
 constant u8 SPRITE_FLAG_NO_GLOBAL_TINT	= 0x80

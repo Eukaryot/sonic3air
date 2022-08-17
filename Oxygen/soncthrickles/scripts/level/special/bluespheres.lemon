@@ -2775,7 +2775,7 @@ function void BlueSpheres.renderCustomGround()
 		}
 	}
 	Renderer.drawSprite(spriteKey1, 0, 0, 0x100, 0, 0x3000)
-	Renderer.drawSprite(spriteKey2, 0, 0, 0x100, SPRITE_FLAG_FULLY_OPAQUE, 0x3000)		// With flag to draw as fully opaque (rendering optimization)
+	Renderer.drawSprite(spriteKey2, 0, 0, 0x100, SPRITE_FLAG_FULLY_OPAQUE, 0x3000)		// Draw fully opaque (here meant only as a rendering optimization, primarily for software renderer)
 
 	// Render glow effect on top
 	if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
