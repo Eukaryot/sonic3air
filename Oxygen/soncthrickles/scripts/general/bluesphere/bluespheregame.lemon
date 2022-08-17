@@ -1504,6 +1504,17 @@ function void fn04da7e()
 	playMusic(MUSIC_LEVELCLEAR)
 	VDP.Config.setActiveDisplay(true)
 
+#if STANDALONE
+	// Load characters extended palettes
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+	// Load fading versions
+	loadCharacterPalette(CHARACTER_SONIC,    0x802000, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x802040, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802080, 0)
+#endif
+
 	BlueSpheres.FadeIn()
 
 	while (true)

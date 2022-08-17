@@ -299,7 +299,7 @@ function void updateSonicAnimationRunning()
 				}
 				else
 				{
-					// Super Sonic's walking animation
+					// Super Sonic's running animation
 					A1 = 0x012c84
 					D3.u8 = D0.u8 * 2
 				}

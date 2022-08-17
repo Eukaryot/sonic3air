@@ -448,7 +448,7 @@ function void TitleScreen()
 
 			playSound(MUSIC_CTRL_FADEOUT)
 
-		#if STANDALONE
+		#if GAMEAPP
 			// In S3AIR, there is no choice, always go to the main menu
 			FadeOutScreenBlocking()
 			Game.returnToMainMenu()
@@ -764,7 +764,9 @@ function void fn0048dc()
 			Renderer.drawCustomSprite("title_screen_air_h", px, py, 0x00, SPRITE_FLAG_PRIO, 0xa001, 0, alpha)
 		}
 
+	#if GAMEAPP
 		Renderer.drawCustomSprite("title_screen_start", getScreenWidth() / 2, 208 + max((50 - time) * 2, 0), 0x00, 0, 0x9f7e)
+	#endif
 	}
 
 	Renderer.drawCustomSprite("title_screen_cr", getScreenWidth() - 88, 204, 0x00, 0, 0x9f7e)
@@ -783,7 +785,7 @@ function void fn0048dc()
 //# address-hook(0x004a5c) end(0x004a82)
 function void fn004a5c()
 {
-#if STANDALONE
+#if GAMEAPP
 	// Leave this out in S3AIR
 	UnloadObject()
 	return

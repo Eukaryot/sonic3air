@@ -89,6 +89,12 @@ function void fn05e70e()
 	copyMemory(0xfffffca0, 0x0a8a3c, 0x20)
 	u32[0xfffffcaa] = 0xee0088
 
+#if STANDALONE
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	Kosinski.addToDMAQueue(0x163b9a, 0x6200)
 	Kosinski.addToDMAQueue(0x163418, 0x3c60)
 	Kosinski.addToDMAQueue(0x162914, 0x4dc0)
@@ -431,15 +437,13 @@ function void fn05ecb4()
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
+		// Set correct colors for Knuckles, and for Sonic in the Tornado
+		// TODO: This is not using custom palettes, so there's no palette effect for Hyper Knuckles
+		u16[0xfffffc04] = 0x064e
+		u16[0xfffffc06] = 0x020c
+		u16[0xfffffc08] = 0x0206
 		if (global.zone_act == 0x0d01)
-		{
-			// Set correct colors for Knuckles, and for Sonic in the Tornado
-			// TODO: This is not using custom palettes, so there's no palette effect for Hyper Knuckles
-			u16[0xfffffc04] = 0x064e
-			u16[0xfffffc06] = 0x020c
-			u16[0xfffffc08] = 0x0206
 			copyMemory(0xfffffc20, 0x0a8a3c, 0x20)
-		}
 
 		if (objA0.subtype2c == 0 && isSecondCharacter(CHARACTER_TAILS))
 		{
@@ -999,6 +1003,10 @@ function void fn05ff6e()
 	A1 = 0xffff0000 + u16[A0 + 0x30]
 	D0.u16 = u16[A0 + 0x3a]
 	fadeColorsToWhiteUniform(A1, D0.u16 + 1)	// Fade logo palette to white
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES && u16[A0 + 0x30] == 0xfc02)
+		fadeColorsToWhiteUniform(0x802000, 0xc0)
+#endif
 
 	--objA0.value39
 	if (s8[A0 + 0x39] < 0)
@@ -1024,6 +1032,10 @@ function void fn05ffa6()
 	D0.u16 = u16[A0 + 0x3a]
 	fadeColorsTowardsTargetUniform(A1, A2, D0.u16 + 1)	// Fade logo palette back to it's original colors
 
+#if STANDALONE
+	if (EXTENDED_CHARACTER_PALETTES && u16[A0 + 0x30] == 0xfc02)
+		fadeColorsTowardsTargetUniform(0x802000, 0x802180, 0xc0)
+#endif
 	--objA0.value39
 	if (s8[A0 + 0x39] < 0)
 	{

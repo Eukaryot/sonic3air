@@ -14,8 +14,8 @@
 
 function void Init()
 {
-	//global.chaos_emeralds = 7
-	//global.super_emeralds = 7
+	global.chaos_emeralds = 0
+	global.super_emeralds = 0
 	//debug_mode.enabled = 1
 
 	// In standalone, pause cheats should always be unlocked
@@ -28,6 +28,10 @@ function void Init()
 
 	// Just in case a skippable cutscene was still active (this is relevant particularly after loading a save state)
 	Game.endSkippableCutscene()
+#else
+	// Only unlock these for Oxygen Engine builds
+	levelselect.unlocked = 1
+	debug_mode.unlocked = 1
 #endif
 
 	// Initialization of global variables

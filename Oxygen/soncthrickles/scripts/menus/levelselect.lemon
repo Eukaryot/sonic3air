@@ -22,7 +22,9 @@ function void LevelSelect()
 	global.zone_act = 0
 	FadeOutScreenBlocking()
 
-#if !STANDALONE
+#if STANDALONE
+	Renderer.resetSprites()
+#else
 	set_status_register(0x2700)
 #endif
 
@@ -302,6 +304,26 @@ function bool LevelSelect.innerUpdate()
 			}
 		}
 	}
+
+#if STANDALONE
+	else if (control.pad1.pressed & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
+	{
+	#if !GAMEAPP
+		global.game_mode = 0x04
+	#endif
+
+		playSound(0xad)
+
+		u32 backupA0 = A0
+		FadeOutScreenBlocking()
+		A0 = backupA0
+
+		// Do not fade out music in this case, Data Select music is meant to kept playing
+		Game.returnToMainMenu()
+		yieldExecution()
+		return false
+	}
+#endif
 	return true
 }
 
@@ -544,19 +566,4 @@ function void fn007e64()
 				levelselect.characters = 0
 		}
 	}
-
-#if STANDALONE
-	if (control.pad1.pressed & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
-	{
-		playSound(0xad)
-
-		u32 backupA0 = A0
-		FadeOutScreenBlocking()
-		A0 = backupA0
-
-		// Do not fade out music in this case, Data Select music is meant to kept playing
-		Game.returnToMainMenu()
-		yieldExecution()
-	}
-#endif
 }

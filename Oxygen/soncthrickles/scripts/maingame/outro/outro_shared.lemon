@@ -677,6 +677,12 @@ function void fn05f31c()
 
 	copyMemory(0xfffffc80, 0x0a8a3c, 0x20)
 
+#if STANDALONE
+	loadCharacterPalette(CHARACTER_SONIC,    0x802180, 0)
+	loadCharacterPalette(CHARACTER_TAILS,    0x8021c0, 0)
+	loadCharacterPalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05ff62

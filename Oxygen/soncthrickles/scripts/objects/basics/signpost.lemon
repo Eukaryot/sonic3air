@@ -118,7 +118,7 @@ function void fn083708()
 				// Draw a hint
 				px = objA0.position.x.u16 - camera.foreground.x.u16 - 0x10
 				py = objA0.position.y.u16 - camera.foreground.y.u16 - 0x10
-				Renderer.drawVdpSpriteWithAlpha(px, py, 0x0f, 0x84c4, 0xd000, u8[A0 + 0x49] - 0x20)
+				Renderer.drawVdpSpriteWithAlpha(px, py, 0x0f, sprite_attribute.PRIORITY | 0x04c4, 0xd000, u8[A0 + 0x49] - 0x20)
 			}
 		#endif
 		}
