@@ -1,0 +1,6 @@
+{
+	"character_sonic_ending_0x00": { "File": "character_sonic_ending.bmp", "Rect": "8,8,32,40", "Center": "12,20" },
+	"character_sonic_ending_0x01": { "File": "character_sonic_ending.bmp", "Rect": "48,8,32,40", "Center": "12,20" },
+	"character_sonic_ending_0x02": { "File": "character_sonic_ending.bmp", "Rect": "88,8,40,40", "Center": "20,20" },
+	"character_sonic_ending_0x03": { "File": "character_sonic_ending.bmp", "Rect": "136,8,40,40", "Center": "20,20" }
+}

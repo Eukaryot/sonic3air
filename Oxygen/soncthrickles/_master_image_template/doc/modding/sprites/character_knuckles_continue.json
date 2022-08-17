@@ -1,0 +1,5 @@
+{
+	"character_knuckles_continue_0x00": { "File": "character_knuckles_continue.bmp", "Rect": "8,8,40,24", "Center": "20,2" },
+	"character_knuckles_continue_0x01": { "File": "character_knuckles_continue.bmp", "Rect": "56,8,40,24", "Center": "20,2" },
+	"character_knuckles_continue_0x02": { "File": "character_knuckles_continue.bmp", "Rect": "104,8,40,24", "Center": "20,2" }
+}

@@ -1,0 +1,4 @@
+{
+	"character_sonic_continue_0x00": { "File": "character_sonic_continue.bmp", "Rect": "8,8,24,40", "Center": "12,20" },
+	"character_sonic_continue_0x01": { "File": "character_sonic_continue.bmp", "Rect": "40,8,24,40", "Center": "12,20" }
+}

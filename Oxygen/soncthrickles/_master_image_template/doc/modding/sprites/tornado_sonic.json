@@ -1,0 +1,5 @@
+{
+	"tornado_sonic_pilot": { "File": "tornado_sonic.bmp", "Rect": "8,8,32,16", "Center": "20,8" },
+	"tornado_sonic_pilot_small": { "File": "tornado_sonic.bmp", "Rect": "48,8,16,8", "Center": "8,4" },
+	"tornado_sonic_small": { "File": "tornado_sonic.bmp", "Rect": "72,8,16,24", "Center": "8,12" }
+}

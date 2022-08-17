@@ -1,0 +1,5 @@
+{
+	"tornado_tails_pilot": { "File": "tornado_tails.bmp", "Rect": "8,8,24,16", "Center": "12,8" },
+	"tornado_tails_pilot_small": { "File": "tornado_tails.bmp", "Rect": "40,8,16,8", "Center": "8,4" },
+	"tornado_tails_small": { "File": "tornado_tails.bmp", "Rect": "64,8,16,16", "Center": "12,8" }
+}

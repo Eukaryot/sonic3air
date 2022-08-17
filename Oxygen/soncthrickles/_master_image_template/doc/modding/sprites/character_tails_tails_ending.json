@@ -1,0 +1,7 @@
+{
+	"character_tails_tails_ending_0x00": { "File": "character_tails_tails_ending.bmp", "Rect": "8,8,16,24", "Center": "4,12" },
+	"character_tails_tails_ending_0x01": { "File": "character_tails_tails_ending.bmp", "Rect": "32,8,24,24", "Center": "12,12" },
+	"character_tails_tails_ending_0x02": { "File": "character_tails_tails_ending.bmp", "Rect": "64,8,24,24", "Center": "12,12" },
+	"character_tails_tails_ending_0x03": { "File": "character_tails_tails_ending.bmp", "Rect": "96,16,24,16", "Center": "12,4" },
+	"character_tails_tails_ending_0x04": { "File": "character_tails_tails_ending.bmp", "Rect": "128,8,24,24", "Center": "12,12" }
+}

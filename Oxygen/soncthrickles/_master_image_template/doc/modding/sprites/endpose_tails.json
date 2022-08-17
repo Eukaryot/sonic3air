@@ -1,0 +1,4 @@
+{
+	"endpose_tails_0x00": { "File": "endpose_tails.bmp", "Rect": "8,8,40,48", "Center": "20,24" },
+	"endpose_tails_0x01": { "File": "endpose_tails.bmp", "Rect": "56,8,96,96", "Center": "48,48" }
+}

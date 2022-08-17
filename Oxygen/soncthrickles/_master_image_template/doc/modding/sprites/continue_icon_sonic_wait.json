@@ -1,0 +1,4 @@
+{
+	"continue_icon_sonic_wait_0x00": { "File": "continue_icon_sonic_wait.bmp", "Rect": "8,8,24,24", "Center": "12,12" },
+	"continue_icon_sonic_wait_0x01": { "File": "continue_icon_sonic_wait.bmp", "Rect": "40,8,24,24", "Center": "12,12" }
+}

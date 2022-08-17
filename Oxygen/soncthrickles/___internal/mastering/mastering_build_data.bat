@@ -11,7 +11,7 @@ mkdir "%outputDir%\data"
 
 
 :: Make sure the Release build is up-to-date
-%msbuildPath% build/_vstudio/sonic3air.sln /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
+%msbuildPath% build\_vstudio\sonic3air.sln /property:Configuration=Release /property:Platform=Win32 -verbosity:minimal
 
 :: Update auto-generated C++ script binding reference and run script nativization
 "bin\Release_x86\Sonic3AIR.exe" -dumpcppdefinitions -nativize

@@ -1,0 +1,4 @@
+{
+	"continue_icon_knuckles_wait_0x00": { "File": "continue_icon_knuckles_wait.bmp", "Rect": "8,8,16,24", "Center": "8,12" },
+	"continue_icon_knuckles_wait_0x01": { "File": "continue_icon_knuckles_wait.bmp", "Rect": "32,8,16,24", "Center": "8,12" }
+}

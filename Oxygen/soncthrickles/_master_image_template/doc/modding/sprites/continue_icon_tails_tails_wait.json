@@ -1,0 +1,5 @@
+{
+	"continue_icon_tails_tails_wait_0x00": { "File": "continue_icon_tails_tails_wait.bmp", "Rect": "8,8,16,16", "Center": "14,4" },
+	"continue_icon_tails_tails_wait_0x01": { "File": "continue_icon_tails_tails_wait.bmp", "Rect": "32,8,16,16", "Center": "14,4" },
+	"continue_icon_tails_tails_wait_0x02": { "File": "continue_icon_tails_tails_wait.bmp", "Rect": "56,8,16,16", "Center": "14,4" }
+}

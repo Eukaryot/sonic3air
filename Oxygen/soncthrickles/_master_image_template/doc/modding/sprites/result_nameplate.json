@@ -1,0 +1,14 @@
+{
+	"result_nameplate_sonic": { "File": "result_sprites.png", "Rect": "8,8,72,16", "Center": "-1,0" },
+	"result_nameplate_sonic_super": { "File": "result_sprites.png", "Rect": "88,8,80,16" },
+	"result_nameplate_sonic_hyper": { "File": "result_sprites.png", "Rect": "176,8,80,16" },
+	"result_nameplate_tails": { "File": "result_sprites.png", "Rect": "8,40,64,16", "Center": "-1,0" },
+	"result_nameplate_tails_super": { "File": "result_sprites.png", "Rect": "88,8,80,16" },
+	"result_nameplate_tails_hyper": { "File": "result_sprites.png", "Rect": "176,8,80,16" },
+	"result_nameplate_miles": { "File": "result_sprites.png", "Rect": "80,40,72,16", "Center": "-6,0" },
+	"result_nameplate_miles_super": { "File": "result_sprites.png", "Rect": "88,8,80,16" },
+	"result_nameplate_miles_hyper": { "File": "result_sprites.png", "Rect": "176,8,80,16" },
+	"result_nameplate_knuckles": { "File": "result_sprites.png", "Rect": "8,72,120,16", "Center": "-4,0" },
+	"result_nameplate_knuckles_super": { "File": "result_sprites.png", "Rect": "136,72,80,16" },
+	"result_nameplate_knuckles_hyper": { "File": "result_sprites.png", "Rect": "224,72,80,16" }
+}

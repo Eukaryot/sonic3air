@@ -1,0 +1,5 @@
+{
+	"endpose_knuckles_0x00": { "File": "endpose_knuckles.bmp", "Rect": "8,8,16,16", "Center": "8,8" },
+	"endpose_knuckles_0x01": { "File": "endpose_knuckles.bmp", "Rect": "32,8,32,40", "Center": "16,16" },
+	"endpose_knuckles_0x02": { "File": "endpose_knuckles.bmp", "Rect": "72,8,64,104", "Center": "32,52" }
+}
