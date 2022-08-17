@@ -14,8 +14,8 @@
 
 function void Init()
 {
-	global.chaos_emeralds = 0
-	global.super_emeralds = 0
+	//global.chaos_emeralds = 7
+	//global.super_emeralds = 7
 	//debug_mode.enabled = 1
 
 	// In standalone, pause cheats should always be unlocked
