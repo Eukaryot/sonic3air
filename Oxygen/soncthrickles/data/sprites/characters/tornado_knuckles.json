@@ -1,5 +1,4 @@
 {
-	"tornado_knuckles_small":			{ "File": "tornado_knuckles.bmp", "Rect": "64,8,24,24", "Center": "16,16" },
 	"tornado_knuckles_small_standing":	{ "File": "tornado_knuckles.bmp", "Rect": "32,8,24,24", "Center": "16,16" },
 	"tornado_knuckles_small_exhausted":	{ "File": "tornado_knuckles.bmp", "Rect": "8,20,16,12", "Center": "9,4" }
 }

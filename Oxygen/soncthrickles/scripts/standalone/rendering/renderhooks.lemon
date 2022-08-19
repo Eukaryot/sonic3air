@@ -354,6 +354,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				if (objA0.subtype2c != 0)
 					character = getMainCharacter()
 				key = stringformat((objA0.subtype2c == 0) ? "%s_pilot_small" : "%s_small", getCharacterTornadoSpriteKey(character))
+
+				if (objA0.subtype2c != 0 && isMainCharacter(CHARACTER_KNUCKLES) && outro.ending_type < 0)
+				{
+					// Replace Knuckles' smaller tornado sprite with a more fitting sprite in bad ending
+					key = stringformat((global.zone_act == 0x0d01) ? "%s_small_standing" : "%s_small_exhausted", getCharacterTornadoSpriteKey(CHARACTER_KNUCKLES))
+				}
 			}
 
 			atex = 0x40 + character * 0x20
@@ -596,7 +602,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// "unique" Tails sprite in Blue Sphere mini-game Perfect screen
 		if (objA0.update_address == 0x04e29c)
 		{
-			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px-6, py+4, 0xa6, SPRITE_FLAG_FLIP_X | (prioFlag ? SPRITE_FLAG_PRIO : 0), 0x00, renderQueue)
+			Standalone.drawCharacterSpriteDirect(CHARACTER_TAILS, px-6, py+4, 0xa6, SPRITE_FLAG_FLIP_X | (prioFlag ? SPRITE_FLAG_PRIO : 0), 0x60, renderQueue)
 			return true
 		}
 
