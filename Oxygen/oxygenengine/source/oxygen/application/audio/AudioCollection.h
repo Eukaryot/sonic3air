@@ -75,6 +75,7 @@ public:
 	~AudioCollection();
 
 	inline const std::map<uint64, AudioDefinition>& getAudioDefinitions() const  { return mAudioDefinitions; }
+	inline int getNumSourcesByPackageType(Package package) const  { return (package < Package::_NUM) ? mNumSourcesByPackageType[(size_t)package] : 0; };
 
 	void clear();
 	void clearPackage(Package package);
@@ -88,4 +89,5 @@ public:
 
 private:
 	std::map<uint64, AudioDefinition> mAudioDefinitions;
+	int mNumSourcesByPackageType[(size_t)Package::_NUM] = { 0 };
 };

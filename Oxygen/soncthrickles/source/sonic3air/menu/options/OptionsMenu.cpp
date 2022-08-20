@@ -1014,15 +1014,18 @@ void OptionsMenu::update(float timeElapsed)
 						{
 							// Change soundtrack and restart music
 							config.mActiveSoundtrack = selectedEntry.selected().mValue;
-							AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
-							AudioOut::instance().onSoundtrackPreferencesChanged();
-							if (nullptr == mPlayingSoundTest)
+							if (AudioOut::instance().getAudioCollection().getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) != 0)
 							{
-								AudioOut::instance().restartMenuMusic();
-							}
-							else
-							{
-								playSoundtest(*mPlayingSoundTest);
+								AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
+								AudioOut::instance().onSoundtrackPreferencesChanged();
+								if (nullptr == mPlayingSoundTest)
+								{
+									AudioOut::instance().restartMenuMusic();
+								}
+								else
+								{
+									playSoundtest(*mPlayingSoundTest);
+								}
 							}
 							break;
 						}

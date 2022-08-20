@@ -214,6 +214,14 @@ void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color
 		if (canGoRight)
 			drawer.printText(font, Recti(center + arrowDistance, py, 0, 10), ">", 5, color);
 
+		// Additional text for soundtrack
+		if (mData == option::SOUNDTRACK && AudioOut::instance().getAudioCollection().getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) == 0 && selected().mIndex == 1)
+		{
+			py += 13;
+			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "Not available, please exit and download", 5, Color(1.0f, 0.6f, 0.6f, color.a));
+			++py;
+		}
+
 		// Additional text for sound test
 		if (mData == option::SOUND_TEST && nullptr != audioDefinition)
 		{

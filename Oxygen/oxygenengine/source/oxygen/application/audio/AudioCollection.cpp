@@ -73,6 +73,8 @@ AudioCollection::~AudioCollection()
 void AudioCollection::clear()
 {
 	mAudioDefinitions.clear();
+	for (size_t i = 0; i < (size_t)Package::_NUM; ++i)
+		mNumSourcesByPackageType[i] = 0;
 }
 
 void AudioCollection::clearPackage(Package package)
@@ -98,6 +100,7 @@ void AudioCollection::clearPackage(Package package)
 			++it;
 		}
 	}
+	mNumSourcesByPackageType[(size_t)package] = 0;
 }
 
 bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstring& filename, Package package)
@@ -242,6 +245,7 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		sourceRegistration.mIsLooping = (type == AudioDefinition::Type::MUSIC);
 		sourceRegistration.mLoopStart = loopStart;
 		sourceRegistration.mVolume = volume;
+		++mNumSourcesByPackageType[(size_t)package];
 
 		if (sourceType == SourceRegistration::Type::FILE)
 		{
