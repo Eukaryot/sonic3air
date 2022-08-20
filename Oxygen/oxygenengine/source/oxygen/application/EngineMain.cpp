@@ -203,6 +203,8 @@ bool EngineMain::startupEngine()
 	}
 #endif
 
+	PlatformFunctions::onEngineStartup();
+
 	if (!mDelegate.onEnginePreStartup())
 		return false;
 

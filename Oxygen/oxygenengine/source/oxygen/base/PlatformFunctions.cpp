@@ -316,6 +316,14 @@ void PlatformFunctions::changeWorkingDirectory(const std::string& execCallPath)
 #endif
 }
 
+void PlatformFunctions::onEngineStartup()
+{
+#if defined(PLATFORM_WINDOWS)
+	// Handle DPI scaling by Windows
+	SetProcessDPIAware();
+#endif
+}
+
 void PlatformFunctions::setAppIcon(int iconResource)
 {
 #ifdef PLATFORM_WINDOWS

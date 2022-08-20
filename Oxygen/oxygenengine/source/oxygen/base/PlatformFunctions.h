@@ -43,6 +43,8 @@ public:
 
 	static void changeWorkingDirectory(const std::string& execCallPath);
 
+	static void onEngineStartup();
+
 	static void setAppIcon(int iconResource);
 	static std::wstring getAppDataPath();
 	static std::wstring tryGetSteamRomPath(const std::wstring& romName);
