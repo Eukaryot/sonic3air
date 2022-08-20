@@ -190,8 +190,8 @@ void AudioBuffer::lock()
 
 void AudioBuffer::unlock()
 {
-	mMutex.unlock();
 	--mMutexLockCounter;
+	mMutex.unlock();
 }
 
 void AudioBuffer::clearInternal()

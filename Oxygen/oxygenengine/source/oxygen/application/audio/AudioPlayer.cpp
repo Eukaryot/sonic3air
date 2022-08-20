@@ -519,30 +519,6 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 		stopAllSoundsByChannelAndContext(channelId, contextId);
 	}
 
-	SourceRegistration* baseSourceReg = sourceReg;
-	AudioModifier* modifier = findAudioModifier(channelId, contextId);
-	uint8 tempoSpeedup = 0;
-	if (nullptr != modifier)
-	{
-		if (sourceReg->mType == SourceRegistration::Type::EMULATION_DIRECT)		// Only direct emulation, so that some tracks we don't want to speed up (the buffered ones) are left out
-		{
-			// Emulated audio source: Only music tempo speedup is supported
-			if (modifier->mRelativeSpeed > 1.01f)
-			{
-				tempoSpeedup = 2 * roundToInt(1.0f / (modifier->mRelativeSpeed - 1.0f));
-			}
-		}
-		else
-		{
-			sourceReg = getModifiedSourceRegistration(*sourceReg, modifier->mPostfix);
-			if (nullptr == sourceReg)
-			{
-				// Ignore modifier if no modified sound exists
-				sourceReg = baseSourceReg;
-			}
-		}
-	}
-
 	// Check for channel overrides
 	const bool isOverridden = isChannelOverridden(channelId);
 	const float volume = isOverridden ? 0.0f : 1.0f;
@@ -573,15 +549,23 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 		playingSound->mBaseVolume = 1.0f;
 	}
 
-	// Apply tempo speedup for emulated audio source, if needed
-	if (tempoSpeedup > 0 && sourceReg->mAudioSource->isEmulationAudioSource())
+	// Apply audio modifier if needed
+	AudioModifier* modifier = findAudioModifier(channelId, contextId);
+	if (nullptr != modifier)
 	{
-		EmulationAudioSource& emulationAudioSource = static_cast<EmulationAudioSource&>(*sourceReg->mAudioSource);
-		emulationAudioSource.injectTempoSpeedup(tempoSpeedup);
+		SoundIterator iterator(mPlayingSounds);
+		while (PlayingSound* soundPtr = iterator.getNext())
+		{
+			if (soundPtr == playingSound)
+			{
+				applyAudioModifierSingle(iterator, modifier->mPostfix, modifier->mRelativeSpeed, modifier->mRelativeSpeed);
+				break;
+			}
+		}
 	}
 
 	// Success
-	playingSound->mBaseSourceReg = baseSourceReg;
+	playingSound->mBaseSourceReg = sourceReg;
 	return playingSound;
 }
 
@@ -796,90 +780,95 @@ AudioPlayer::SourceRegistration* AudioPlayer::getModifiedSourceRegistration(Sour
 void AudioPlayer::applyAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed, float speedChange)
 {
 	// Audio modifiers have an effect in three places:
-	//  a) New sounds starting use it (gets handled in "playAudio", not here)
+	//  a) New sounds starting use it (gets handled in "playAudioInternal", not here)
 	//  b) Currently playing sounds have to apply it
 	//  c) Paused sounds have to apply it
 
 	SoundIterator iterator(mPlayingSounds);
 	iterator.filterChannel(channelId);
 	iterator.filterContext(contextId);
-	while (PlayingSound* soundPtr = iterator.getNext())
+	while (nullptr != iterator.getNext())
 	{
-		PlayingSound& playingSound = *soundPtr;
-		if (!playingSound.mAudioRef.valid())
-			continue;
+		applyAudioModifierSingle(iterator, postfix, relativeSpeed, speedChange);
+	}
+}
 
-		if (playingSound.mAudioSource->isEmulationAudioSource())
+void AudioPlayer::applyAudioModifierSingle(SoundIterator& iterator, std::string_view postfix, float relativeSpeed, float speedChange)
+{
+	PlayingSound& playingSound = *iterator.getCurrent();
+	if (!playingSound.mAudioRef.valid())
+		return;
+
+	if (playingSound.mAudioSource->isEmulationAudioSource())
+	{
+		// Emulated audio source: Only music tempo speedup is supported
+		uint8 tempoSpeedup = 0;
+		if (relativeSpeed > 1.01f)
 		{
-			// Emulated audio source: Only music tempo speedup is supported
-			uint8 tempoSpeedup = 0;
-			if (relativeSpeed > 1.01f)
-			{
-				tempoSpeedup = 2 * roundToInt(1.0f / (relativeSpeed - 1.0f));
-			}
-
-			EmulationAudioSource& emulationAudioSource = static_cast<EmulationAudioSource&>(*playingSound.mAudioSource);
-			emulationAudioSource.injectTempoSpeedup(tempoSpeedup);
+			tempoSpeedup = 2 * roundToInt(1.0f / (relativeSpeed - 1.0f));
 		}
-		else
+
+		EmulationAudioSource& emulationAudioSource = static_cast<EmulationAudioSource&>(*playingSound.mAudioSource);
+		emulationAudioSource.injectTempoSpeedup(tempoSpeedup);
+	}
+	else
+	{
+		// Non-emulated audio source: Switch to a different audio file to play
+		PlayingSound& oldSound = playingSound;
+
+		// Get new source
+		SourceRegistration* newSourceReg = getModifiedSourceRegistration(*oldSound.mBaseSourceReg, postfix);
+		if (nullptr == newSourceReg)
+			return;
+
+		// Check if the postfix version is already playing
+		if (oldSound.mSourceReg == newSourceReg)
+			return;
+
+		// If original sound is modded, we require the modified sound to be modded as well
+		if (oldSound.mSourceReg->mPackage == AudioCollection::Package::MODDED && newSourceReg->mPackage != AudioCollection::Package::MODDED)
+			return;
+
+		if (oldSound.mState == PlayingSound::State::NONE)
+			return;
+
+		const bool isOverridden = (oldSound.mState == PlayingSound::State::OVERRIDDEN);
+		const float newPosition = oldSound.mAudioSource->mapAudioRefPositionToTrackPosition(oldSound.mAudioRef.getPosition()) / speedChange;
+		const float newVolume = isOverridden ? 0.0f : newSourceReg->mVolume;	// If pushed back, start muted until we can pause it just below
+
+		PlayingSound* newSound = startPlayback(*newSourceReg, newPosition, newVolume, oldSound.mContextId, oldSound.mChannelId);
+		if (nullptr != newSound)
 		{
-			// Non-emulated audio source: Switch to a different audio file to play
-			PlayingSound& oldSound = playingSound;
+			// Attention: Pointer to oldSound potentially got invalid after adding a new sound, so we better fetch it again
+			PlayingSound& oldSound = *iterator.getCurrent();
 
-			// Get new source
-			SourceRegistration* newSourceReg = getModifiedSourceRegistration(*oldSound.mBaseSourceReg, postfix);
-			if (nullptr == newSourceReg)
-				continue;
+			newSound->mBaseSourceReg = oldSound.mBaseSourceReg;
+			newSound->mState = oldSound.mState;
 
-			// Check if the postfix version is already playing
-			if (oldSound.mSourceReg == newSourceReg)
-				continue;
-
-			// If original sound is modded, we require the modified sound to be modded as well
-			if (oldSound.mSourceReg->mPackage == AudioCollection::Package::MODDED && newSourceReg->mPackage != AudioCollection::Package::MODDED)
-				continue;
-
-			if (oldSound.mState == PlayingSound::State::NONE)
-				continue;
-
-			const bool isOverridden = (oldSound.mState == PlayingSound::State::OVERRIDDEN);
-			const float newPosition = oldSound.mAudioSource->mapAudioRefPositionToTrackPosition(oldSound.mAudioRef.getPosition()) / speedChange;
-			const float newVolume = isOverridden ? 0.0f : newSourceReg->mVolume;	// If pushed back, start muted until we can pause it just below
-
-			PlayingSound* newSound = startPlayback(*newSourceReg, newPosition, newVolume, oldSound.mContextId, oldSound.mChannelId);
-			if (nullptr != newSound)
+			if (isOverridden)
 			{
-				// Attention: Pointer to oldSound potentially got invalid after adding a new sound, so we better fetch it again
-				PlayingSound& oldSound = *iterator.getCurrent();
-
-				newSound->mBaseSourceReg = oldSound.mBaseSourceReg;
-				newSound->mState = oldSound.mState;
-
-				if (isOverridden)
-				{
-					newSound->mAudioRef.setPause(true);
-					newSound->mBaseVolume = newSourceReg->mVolume;
-				}
-				else
-				{
-					// Quick cross fade
-					oldSound.mAudioRef.setVolumeChange(-50.0f);
-					newSound->mAudioRef.setVolumeChange(50.0f);
-				}
-
-				// Add or remove auto-streamer
-				if (oldSound.mSourceReg == oldSound.mBaseSourceReg)
-				{
-					startAutoStreamer(*oldSound.mAudioSource, oldSound.mAudioRef.getPosition(), speedChange);
-				}
-				if (newSound->mSourceReg == newSound->mBaseSourceReg)
-				{
-					stopAutoStreamer(*newSound->mAudioSource);
-				}
-
-				// Remove old playing sound
-				iterator.removeCurrent();
+				newSound->mAudioRef.setPause(true);
+				newSound->mBaseVolume = newSourceReg->mVolume;
 			}
+			else
+			{
+				// Quick cross fade
+				oldSound.mAudioRef.setVolumeChange(-50.0f);
+				newSound->mAudioRef.setVolumeChange(50.0f);
+			}
+
+			// Add or remove auto-streamer
+			if (oldSound.mSourceReg == oldSound.mBaseSourceReg)
+			{
+				startAutoStreamer(*oldSound.mAudioSource, oldSound.mAudioRef.getPosition(), speedChange);
+			}
+			if (newSound->mSourceReg == newSound->mBaseSourceReg)
+			{
+				stopAutoStreamer(*newSound->mAudioSource);
+			}
+
+			// Remove old playing sound
+			iterator.removeCurrent();
 		}
 	}
 }

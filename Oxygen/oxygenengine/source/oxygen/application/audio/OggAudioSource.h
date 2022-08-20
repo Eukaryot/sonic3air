@@ -41,8 +41,9 @@ private:
 
 	bool mIsLooping = false;
 	int mLoopStart = -1;		// In samples
-	float mSeekTime = -1.0f;	// In seconds
-	int mLastRewind = -1;		// In samples inside the audio buffer
+
+	int mTrackLength = -1;		// In samples - but it's only set if looped back at least once
+	int mInitialSeekPos = 0;	// In samples, start position of initial seek (zero if playback started at the beginning)
 
 	SDL_mutex* mMutex = nullptr;
 	float mPrecacheTime = 0.0f;

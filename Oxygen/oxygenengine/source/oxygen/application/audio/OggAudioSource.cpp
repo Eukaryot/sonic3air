@@ -86,12 +86,11 @@ void OggAudioSource::onPlaybackStart(AudioReference& audioRef, float time)
 		// Perform seeking if needed
 		if (time >= 0.0f)
 		{
-			mSeekTime = time;
 			mOggLoader->seek(time);
+			mInitialSeekPos = roundToInt(time * mAudioBuffer.getFrequency());
 		}
 	}
 
-	mLastRewind = -1;
 	SDL_UnlockMutex(mMutex);
 }
 
@@ -146,31 +145,28 @@ bool OggAudioSource::checkForUnload(float timestamp)
 
 float OggAudioSource::mapAudioRefPositionToTrackPosition(float audioRefPosition) const
 {
-	if (isDynamic() && mSeekTime > 0.0f)
+	if (!isDynamic())
 	{
-		// Did we rewind already (once or more) back to the loop start?
-		if (mLastRewind == -1)
-		{
-			return mSeekTime + audioRefPosition;
-		}
-		else
-		{
-			const float lastRewindSeconds = (float)mLastRewind / (float)mAudioBuffer.getFrequency();
-			const float loopStartSeconds = (float)mLoopStart / (float)mAudioBuffer.getFrequency();
-
-			if (audioRefPosition < lastRewindSeconds)
-			{
-				// TODO: Refine this, it's just a guess
-				return loopStartSeconds;
-			}
-			else
-			{
-				return loopStartSeconds + (audioRefPosition - lastRewindSeconds);
-			}
-		}
-
+		// For static caching, i.e. fully cached tracks, there's no difference between audio ref position and absolute position inside the track
+		return audioRefPosition;
 	}
-	return audioRefPosition;
+	
+	// Account for the difference in audio ref position (i.e. position inside the audio buffer) and absolute position inside the audio track
+	const float frequency = (float)mAudioBuffer.getFrequency();
+	int trackPosition = mInitialSeekPos + roundToInt(audioRefPosition * frequency);
+
+	// If track length is not known, we certainly did not loop yet, and it's very unlikely to get an input value after the track length
+	const bool afterFirstLoop = (mTrackLength > 0 && trackPosition >= mTrackLength);
+	if (afterFirstLoop)
+	{
+		// Otherwise normalize track position into the looping range
+		const int loopingPartLength = mTrackLength - mLoopStart;
+		if (loopingPartLength > 0)
+		{
+			trackPosition = mLoopStart + (trackPosition - mLoopStart) % loopingPartLength;
+		}
+	}
+	return (float)trackPosition / frequency;
 }
 
 AudioSourceBase::State OggAudioSource::startupInternal()
@@ -253,8 +249,13 @@ bool OggAudioSource::jobFunc()
 		}
 		else
 		{
+			// We now know where the end of the track actually is
+			if (mTrackLength < 0)
+			{
+				mTrackLength = mInitialSeekPos + mAudioBuffer.getLength();
+			}
+
 			// Seek back
-			mLastRewind = mAudioBuffer.getLength();
 			mAudioBuffer.setCompleted(false);
 			const float loopStartSeconds = (float)mLoopStart / (float)mAudioBuffer.getFrequency();
 			mOggLoader->seek(loopStartSeconds);

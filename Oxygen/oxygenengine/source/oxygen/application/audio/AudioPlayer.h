@@ -141,6 +141,7 @@ private:
 	AudioModifier* findAudioModifier(int channelId, int contextId, int* outIndex = nullptr);
 	SourceRegistration* getModifiedSourceRegistration(SourceRegistration& baseSourceReg, std::string_view postfix) const;
 	void applyAudioModifier(int channelId, int contextId, std::string_view postfix, float relativeSpeed, float speedChange);
+	void applyAudioModifierSingle(SoundIterator& iterator, std::string_view postfix, float relativeSpeed, float speedChange);
 
 	void startAutoStreamer(AudioSourceBase& audioSource, float currentTime, float speed = 1.0f);
 	void stopAutoStreamer(AudioSourceBase& audioSource);
