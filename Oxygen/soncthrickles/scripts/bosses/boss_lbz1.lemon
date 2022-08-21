@@ -556,8 +556,15 @@ function void fn07279e()
 function void fn084f92()
 {
 	// Boss damage palette effect
+#if STANDALONE
+	// Flash originally affects the wrong color, fix #contributed by Legobouwer
+	// TODO: Also add support for anti-flicker setting
+	A1 = 0xfffffc36
+	u16[A1] = (u16[A1] == 0x0222) ? 0x0eee : 0x0222
+#else
 	A1 = 0xfffffc22
 	u16[A1] = (u16[A1] == 0) ? 0x0eee : 0
+#endif
 }
 
 
