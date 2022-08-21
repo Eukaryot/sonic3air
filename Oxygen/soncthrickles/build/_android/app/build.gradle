@@ -15,9 +15,9 @@ android {
             applicationId "org.eukaryot.sonic3air"
         }
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 29     // Can't go higher, as requestLegacyExternalStorage in the manifest won't work otherwise
         versionCode 1
-        versionName "22.05.15.0"
+        versionName "22.08.21.0"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-18", "-DANDROID_STL=c++_static"
