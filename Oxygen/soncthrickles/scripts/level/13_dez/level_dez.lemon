@@ -55,7 +55,7 @@ function void UpdateLevelScrolling.DEZ1()
 		// Draw our own widescreen version of the background
 		Renderer.enforceClearScreen(true)
 		Renderer.enableDefaultPlane(0, false)
-		Renderer.drawCustomSprite("bg_dez1", getScreenExtend() - 40, 0, 0x00, 0, 0x1100)
+		Renderer.drawCustomSprite("bg_dez1", getScreenExtend() - 40, 0, 0x00, SPRITE_FLAG_FULLY_OPAQUE, 0x1100)
 	#endif
 
 	call 0x0593a0 + level.scrolling_routine
