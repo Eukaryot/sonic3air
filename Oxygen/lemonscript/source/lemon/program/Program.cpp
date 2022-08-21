@@ -102,6 +102,17 @@ namespace lemon
 	{
 		String output;
 		Nativizer().build(output, module, *this, memoryAccessHandler);
+
+		// Check if this is an actual change in the output file
+		{
+			String original;
+			if (original.loadFile(outputFilename))
+			{
+				if (output == original)
+					return;
+			}
+		}
+
 		output.saveFile(outputFilename);
 	}
 
