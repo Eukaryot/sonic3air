@@ -173,10 +173,13 @@ void EngineDelegate::onPreSaveStateLoad()
 
 void EngineDelegate::onApplicationLostFocus()
 {
+	// Automatic pause on focus change can be quite annoying in the desktop version (especially for development), so activate it only on mobile
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
 	if (mGame.shouldPauseOnFocusLoss())
 	{
 		Application::instance().enablePauseOnFocusLoss();
 	}
+#endif
 }
 
 bool EngineDelegate::mayLoadScriptMods()

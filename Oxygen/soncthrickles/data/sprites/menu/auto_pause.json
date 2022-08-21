@@ -1,0 +1,6 @@
+{
+
+	"auto_pause_text_key": { "File": "auto_pause.png", "Rect": "0,0,153,15", "Center": "76,7" },
+	"auto_pause_text_tap": { "File": "auto_pause.png", "Rect": "0,16,93,15", "Center": "46,7" }
+
+}

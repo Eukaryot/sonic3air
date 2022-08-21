@@ -24,9 +24,13 @@ public:
 		struct { TYPE x, y, z; };
 	};
 
+	enum class Initialization { NONE };
+	static const Initialization Uninitialized = Initialization::NONE;
+
 public:
 	Vec3() : x(0), y(0), z(0)		{}
-	explicit Vec3(bool undefined)	{}
+	explicit Vec3(Initialization)	{}
+	explicit Vec3(TYPE value)		{ FORi(data[i] = value); }
 	explicit Vec3(const TYPE* vec)	{ FORi(data[i] = vec[i]); }
 
 	Vec3(const Vec3& source) : x(source.x), y(source.y), z(source.z) {}
@@ -221,42 +225,42 @@ public:
 
 	Vec3 operator+(const Vec3& source) const
 	{
-		Vec3 result(false);
+		Vec3 result(Uninitialized);
 		FORi(result.data[i] = data[i] + source.data[i]);
 		return result;
 	}
 
 	Vec3 operator-(const Vec3& source) const
 	{
-		Vec3 result(false);
+		Vec3 result(Uninitialized);
 		FORi(result.data[i] = data[i] - source.data[i]);
 		return result;
 	}
 
 	Vec3 operator*(const Vec3& source) const
 	{
-		Vec3 result(false);
+		Vec3 result(Uninitialized);
 		FORi(result.data[i] = data[i] * source.data[i]);
 		return result;
 	}
 
 	Vec3 operator*(const TYPE factor) const
 	{
-		Vec3 result(false);
+		Vec3 result(Uninitialized);
 		FORi(result.data[i] = data[i] * factor);
 		return result;
 	}
 
 	Vec3 operator/(const Vec3& source) const
 	{
-		Vec3 result(false);
+		Vec3 result(Uninitialized);
 		FORi(result.data[i] = data[i] / source.data[i]);
 		return result;
 	}
 
 	Vec3 operator/(const TYPE divisor) const
 	{
-		Vec3 result(false);
+		Vec3 result(Uninitialized);
 		FORi(result.data[i] = data[i] / divisor);
 		return result;
 	}

@@ -144,9 +144,6 @@ void Application::sdlEvent(const SDL_Event& ev)
 	// Handle events that FTX doesn't
 	switch (ev.type)
 	{
-		// Removed shortly after adding that code in, as automatic pause on focus change is quite annoying at least during development
-		//  and can lead to some issues. Also, nobody asked for this anyways on the desktop versions.
-	#if 0
 		case SDL_WINDOWEVENT:
 		{
 			if (ev.window.windowID == SDL_GetWindowID(&EngineMain::instance().getSDLWindow()))
@@ -162,7 +159,6 @@ void Application::sdlEvent(const SDL_Event& ev)
 			}
 			break;
 		}
-	#endif
 
 		case SDL_APP_WILLENTERBACKGROUND:
 		{
@@ -535,12 +531,17 @@ void Application::render()
 
 	if (mPausedByFocusLoss)
 	{
+		Font& font = EngineMain::getDelegate().getDebugFont(10);
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
+
+		// TODO: The sprites are from S3AIR, but used in OxygenApp as well
 	#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB) || defined(PLATFORM_IOS)
-		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Tap to continue", 5, Color(0.2f, 1.0f, 1.0f));
+		static const uint64 key = rmx::getMurmur2_64(std::string_view("auto_pause_text_tap"));
 	#else
-		drawer.printText(mLogDisplayFont, FTX::screenRect(), "Press any key to continue", 5, Color(0.2f, 1.0f, 1.0f));
+		static const uint64 key = rmx::getMurmur2_64(std::string_view("auto_pause_text_key"));
 	#endif
+		const float scale = (float)(FTX::screenHeight() / 160);		// A bit larger than he usual upscaled pixel size
+		drawer.drawSprite(FTX::screenSize() / 2, key, Color(0.3f, 1.0f, 1.0f), Vec2f(scale));
 	}
 
 	drawer.performRendering();
