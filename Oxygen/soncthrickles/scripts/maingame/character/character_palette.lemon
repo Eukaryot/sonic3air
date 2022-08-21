@@ -466,27 +466,7 @@ function void UpdatePaletteEffects.SuperForm.smoothedVersion(u8 characterVersion
 		else if (characterVersion == 1)
 		{
 			// Super Sonic
-			u8 cycles = (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2) ? 0x18 : 0x0c
-			u16 nextFrame = (super.palettefx.frame < 48) ? (super.palettefx.frame + 6) : 36
-			u32 address1 = 0x00398e + super.palettefx.frame
-			u32 address2 = 0x00398e + nextFrame
-			u16 blendFactor = super.palettefx.timer * 0x100 / cycles
-			UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, false)
-
-			if (level.water_present)
-			{
-				u32 source = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette()
-				address1 = source + super.palettefx.frame
-				address2 = source + nextFrame
-				UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, true)
-			}
-
-			--super.palettefx.timer
-			if (super.palettefx.timer < 0)
-			{
-				super.palettefx.timer = cycles - 1
-				super.palettefx.frame = nextFrame
-			}
+			UpdatePaletteEffects.UpdateSuperSonic.Smoothed(characterVersion)
 		}
 		else if (characterVersion == 2)
 		{
@@ -508,7 +488,7 @@ function void UpdatePaletteEffects.SuperForm.smoothedVersion(u8 characterVersion
 			}
 
 			// Also update Sonic's colors, for the flickies
-			UpdatePaletteEffects.UpdateSuperSonic.Original(0xff)
+			UpdatePaletteEffects.UpdateSuperSonic.Smoothed(0xff)
 		}
 		else
 		{
@@ -618,18 +598,12 @@ function void UpdatePaletteEffects.SuperForm.smoothedVersion(u8 characterVersion
 			// Update of Sonic's colors used by the Flickies
 			{
 				superPaletteAddress = 0x00398e + 0x1e
-				for (u8 k = 0; k < 6; k += 2)
-				{
-					u16[0xfffffc04 + k] = blendColorsPacked(u16[0x802184 + k], u16[superPaletteAddress + k], blendFactor)
-				}
+				UpdatePaletteEffects.SuperForm.blendFlicky(0x802184, superPaletteAddress, blendFactor, false)
 
 				if (level.water_present)
 				{
 					superPaletteAddress = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette() + 0x1e
-					for (u8 k = 0; k < 6; k += 2)
-					{
-						u16[0xfffff084 + k] = blendColorsPacked(u16[0x802384 + k], u16[superPaletteAddress + k], blendFactor)
-					}
+					UpdatePaletteEffects.SuperForm.blendFlicky(0x802384, superPaletteAddress, blendFactor, true)
 				}
 			}
 		}
@@ -654,6 +628,38 @@ function void UpdatePaletteEffects.SuperForm.smoothedVersion(u8 characterVersion
 		{
 			--super.palettefx.timer
 		}
+	}
+}
+
+function void UpdatePaletteEffects.UpdateSuperSonic.Smoothed(u8 characterVersion)
+{
+	// Note that this is used for Tails as well, but only to update Sonic's palette (affects the Flickies!)
+	u8 cycles = (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2) ? 0x18 : 0x0c
+	u16 nextFrame = (super.palettefx.frame < 48) ? (super.palettefx.frame + 6) : 36
+	u32 address1 = 0x00398e + super.palettefx.frame
+	u32 address2 = 0x00398e + nextFrame
+	u16 blendFactor = super.palettefx.timer * 0x100 / cycles
+	if (characterVersion == 0xff)
+		UpdatePaletteEffects.SuperForm.blendFlicky(address2, address1, blendFactor, false)
+	else
+		UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, false)
+
+	if (level.water_present)
+	{
+		u32 source = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette()
+		address1 = source + super.palettefx.frame
+		address2 = source + nextFrame
+		if (characterVersion == 0xff)
+			UpdatePaletteEffects.SuperForm.blendFlicky(address2, address1, blendFactor, true)
+		else
+			UpdatePaletteEffects.SuperForm.blendSonicKnux(address2, address1, blendFactor, true)
+	}
+
+	--super.palettefx.timer
+	if (super.palettefx.timer < 0)
+	{
+		super.palettefx.timer = cycles - 1
+		super.palettefx.frame = nextFrame
 	}
 }
 
@@ -683,6 +689,15 @@ function void UpdatePaletteEffects.SuperForm.blendTails2(u32 source1, u32 source
 	u16[0x802016 + offset] = blendColorsPacked(u16[source1 + 6], u16[source2 + 4], blendFactor)
 }
 
+function void UpdatePaletteEffects.SuperForm.blendFlicky(u32 source1, u32 source2, u16 blendFactor, bool underwater)
+{
+	u32 dest = underwater ? 0xfffff084 : 0xfffffc04
+	for (u8 k = 0; k < 6; k += 2)
+	{
+		u16[dest + k] = blendColorsPacked(u16[source1 + k], u16[source2 + k], blendFactor)
+	}
+}
+
 
 function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 {
@@ -693,6 +708,12 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 		bool isHyperEffect = (super.active == 0xff || super.active.tails == 0xff)
 		u16 nextFrame = (super.palettefx.frame + 6) % (isHyperEffect ? 108 : 18)
 		u16 blendFactor = super.palettefx.timer * 0x100 / (isHyperEffect ? 0x07 : 0x0f)
+		if (characterVersion == 2)
+		{
+			// Tails
+			nextFrame = (super.palettefx.frame.tails + 6) % (isHyperEffect ? 108 : 18)
+			blendFactor = super.palettefx.timer.tails * 0x100 / (isHyperEffect ? 0x07 : 0x0f)
+		}
 		if (nextFrame % 18 == 0)
 			blendFactor = 0x100 - blendFactor
 		else if (nextFrame % 18 == 12)
@@ -730,6 +751,21 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 			}
 		}
 
+		if (characterVersion == 2)
+		{
+			// Super/Hyper Tails
+			--super.palettefx.timer.tails
+			if (super.palettefx.timer.tails < 0)
+			{
+				super.palettefx.timer.tails = isHyperEffect ? 0x07 : 0x0f
+				super.palettefx.frame.tails = nextFrame
+			}
+
+			// Also update Sonic's colors, for the flickies
+			UpdatePaletteEffects.UpdateSuperSonic.Smoothed(0xff)
+			return
+		}
+
 		--super.palettefx.timer
 		if (super.palettefx.timer < 0)
 		{
@@ -739,7 +775,7 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 	}
 	else if (super.palettefx.state == 1)
 	{
-		// Update ongoing palette effect
+		// Fade in
 		u8 character = getMainCharacter()
 		bool isHyperEffect = (super.active == 0xff || super.active.tails == 0xff)
 
@@ -748,7 +784,6 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 		if (super.palettefx.timer >= 0)
 			return
 
-		// Fade in
 		if (characterVersion <= 1)
 		{
 			// Sonic
@@ -844,18 +879,12 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 		{
 			// Tails: Update of Sonic's colors used by the Flickies
 			u32 superPaletteAddress = 0x00398e + 0x1e
-			for (u8 k = 0; k < 6; k += 2)
-			{
-				u16[0xfffffc04 + k] = blendColorsPacked(u16[0x802184 + k], u16[superPaletteAddress + k], blendFactor)
-			}
+			UpdatePaletteEffects.SuperForm.blendFlicky(0x802184, superPaletteAddress, blendFactor, false)
 
 			if (level.water_present)
 			{
 				superPaletteAddress = UpdatePaletteEffects.SuperForm.getSuperSonicUnderwaterPalette() + 0x1e
-				for (u8 k = 0; k < 6; k += 2)
-				{
-					u16[0xfffff084 + k] = blendColorsPacked(u16[0x802384 + k], u16[superPaletteAddress + k], blendFactor)
-				}
+				UpdatePaletteEffects.SuperForm.blendFlicky(0x802384, superPaletteAddress, blendFactor, true)
 			}
 		}
 
