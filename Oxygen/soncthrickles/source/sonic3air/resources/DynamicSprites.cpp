@@ -127,6 +127,33 @@ void DynamicSprites::updateSpriteRedirects()
 			break;
 		}
 
+		case InputManager::InputType::TOUCH:
+		{
+			static const uint64 INPUT_ICON_TOUCH_A     = rmx::getMurmur2_64("input_icon_touch_A");
+			static const uint64 INPUT_ICON_TOUCH_B     = rmx::getMurmur2_64("input_icon_touch_B");
+			static const uint64 INPUT_ICON_TOUCH_X     = rmx::getMurmur2_64("input_icon_touch_X");
+			static const uint64 INPUT_ICON_TOUCH_Y     = rmx::getMurmur2_64("input_icon_touch_Y");
+			static const uint64 INPUT_ICON_TOUCH_LEFT  = rmx::getMurmur2_64("input_icon_touch_left");
+			static const uint64 INPUT_ICON_TOUCH_RIGHT = rmx::getMurmur2_64("input_icon_touch_right");
+			static const uint64 INPUT_ICON_TOUCH_UP    = rmx::getMurmur2_64("input_icon_touch_up");
+			static const uint64 INPUT_ICON_TOUCH_DOWN  = rmx::getMurmur2_64("input_icon_touch_down");
+			static const uint64 INPUT_ICON_TOUCH_START = rmx::getMurmur2_64("input_icon_touch_start");
+			static const uint64 INPUT_ICON_TOUCH_BACK  = rmx::getMurmur2_64("input_icon_touch_back");
+
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_A,     INPUT_ICON_TOUCH_A);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_B,     INPUT_ICON_TOUCH_B);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_X,     INPUT_ICON_TOUCH_X);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_Y,     INPUT_ICON_TOUCH_Y);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_LEFT,  INPUT_ICON_TOUCH_LEFT);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_RIGHT, INPUT_ICON_TOUCH_RIGHT);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_UP,    INPUT_ICON_TOUCH_UP);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_DOWN,  INPUT_ICON_TOUCH_DOWN);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_START, INPUT_ICON_TOUCH_START);
+			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_TOUCH_BACK);
+			break;
+		}
+
+		default:
 		case InputManager::InputType::GAMEPAD:
 		{
 			static const uint64 INPUT_ICON_XBOX_A     = rmx::getMurmur2_64("input_icon_xbox_A");
@@ -152,8 +179,5 @@ void DynamicSprites::updateSpriteRedirects()
 			spriteCache.setupRedirect(INPUT_ICON_BUTTON_BACK,  INPUT_ICON_XBOX_BACK);
 			break;
 		}
-
-		default:
-			break;
 	}
 }
