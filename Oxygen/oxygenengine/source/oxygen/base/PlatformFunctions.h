@@ -49,7 +49,7 @@ public:
 	static std::wstring getAppDataPath();
 	static std::wstring tryGetSteamRomPath(const std::wstring& romName);
 
-	static std::string getSystemTimeString();
+	static std::string getCompactSystemTimeString();
 
 	static void showMessageBox(const std::string& caption, const std::string& text);
 	static DialogResult showDialogBox(rmx::ErrorSeverity severity, DialogButtons dialogButtons, const std::string& caption, const std::string& text);

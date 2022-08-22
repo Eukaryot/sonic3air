@@ -487,7 +487,7 @@ void Simulation::refreshDebugging()
 uint32 Simulation::saveGameRecording(WString* outFilename)
 {
 	WString filename = L"gamerecording.bin";
-	const std::string timeString = PlatformFunctions::getSystemTimeString();
+	const std::string timeString = PlatformFunctions::getCompactSystemTimeString();
 	if (!timeString.empty())
 	{
 		filename.format(L"gamerecording_%s.bin", *String(timeString).toWString());

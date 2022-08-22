@@ -392,18 +392,19 @@ std::wstring PlatformFunctions::tryGetSteamRomPath(const std::wstring& romName)
 #endif
 }
 
-std::string PlatformFunctions::getSystemTimeString()
+std::string PlatformFunctions::getCompactSystemTimeString()
 {
-#ifdef PLATFORM_WINDOWS
-
-	SYSTEMTIME st;
-	GetSystemTime(&st);
-	return *String(0, "%02d%02d%02d_%02d%02d%02d", st.wYear % 100, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
-
+	time_t now = time(0);
+	struct tm tstruct;
+	char buf[80];
+#if defined(PLATFORM_WINDOWS)
+	localtime_s(&tstruct, &now);
 #else
-	// Not implemented
-	return std::string();
+	tstruct = *localtime(&now);
 #endif
+	// Format example: "220629_114248"
+	std::strftime(buf, sizeof(buf), "%y%m%d_%H%M%S", &tstruct);
+	return buf;
 }
 
 void PlatformFunctions::showMessageBox(const std::string& caption, const std::string& text)
