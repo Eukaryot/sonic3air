@@ -308,7 +308,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				if (objA0.animation.sprite >= 0x03)
 					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
 				if (objA0.animation.sprite == 0x02)
-					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true))
+					key = getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true)
 				else // if (objA0.animation.sprite <= 0x01)
 					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, false), objA0.animation.sprite - 0x00)
 			}
@@ -331,7 +331,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u8 character = (objA0.update_address == 0x05f376) ? CHARACTER_SONIC : CHARACTER_TAILS
 			u8 atex = 0x40 + character * 0x20
-			u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character), objA0.animation.frame)
+			u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), objA0.animation.frame)
 			if (Renderer.hasCustomSprite(key))
 			{
 				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
@@ -541,7 +541,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u8 character = (objA0.update_address == 0x05c55c) ? CHARACTER_SONIC : (objA0.update_address == 0x05c74a) ? CHARACTER_TAILS : CHARACTER_KNUCKLES
 			u8 atex = 0x40 + character * 0x20
-			u64 key = stringformat("%s_continue_0x%02x", getCharacterSpriteKey(character), objA0.animation.sprite)
+			u64 key = stringformat("%s_continue_0x%02x", getCharacterSpriteKey(character, false), objA0.animation.sprite)
 			if (Renderer.hasCustomSprite(key))
 			{
 				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
@@ -579,7 +579,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Main Knuckles sprites
 		if (objA0.update_address == 0x05c8c8)
 		{
-			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES)), objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES, false)), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)
@@ -616,7 +616,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Knuckles in Blue Sphere mini-game Results and Perfect screen
 		if ((objA0.update_address == 0x04e000) || (objA0.update_address == 0x04e2f0))
 		{
-			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES)), objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES, false)), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)

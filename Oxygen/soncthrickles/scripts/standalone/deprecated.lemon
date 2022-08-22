@@ -58,10 +58,6 @@ function bool Game.isModdedSound(u64 sfxId)
 
 
 
-//-------------------------------------------------------//
-// C++ bindings that got removed or renamed              //
-//-------------------------------------------------------//
-
 // These are still actively used in the scripts, for compatibility with mods that overwrite these variants of the functions
 
 function void Renderer.setPaletteEntry(u8 index, u32 color)
@@ -105,6 +101,16 @@ function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u8 a
 // Functions that got proper names                       //
 //-------------------------------------------------------//
 
+function void fn00c532()
+{
+	UpdateLivesContinuesInSaveGame()
+}
+
+function void fn00f3a4()
+{
+	CheckStaticCollisionVerticalShort()
+}
+
 function void fn00f76e()
 {
 	CheckHitboxCollisionDownwards()
@@ -123,11 +129,6 @@ function void fn011fd6()
 function void fn011fee()
 {
 	Character.CheckCeilingCollision()
-}
-
-function void fn00f3a4()
-{
-	CheckStaticCollisionVerticalShort()
 }
 
 function void fn01cdb2()
@@ -185,6 +186,11 @@ function void fn01094c()
 	CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
 }
 
+function void fn010a80()
+{
+	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
+}
+
 function void fn012d36()
 {
 	CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
@@ -193,11 +199,6 @@ function void fn012d36()
 function void fn01309a()
 {
 	CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
-}
-
-function void fn010a80()
-{
-	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
 }
 
 function void fn013102()
@@ -245,6 +246,11 @@ function void fn013520()
 	CompetitionMode.Character.UpdateSpindash.Tails()
 }
 
+function void fn013648()
+{
+	CompetitionMode.centerCameraYOffset.Tails()
+}
+
 function void fn015cd0()
 {
 	CompetitionMode.Character.UpdateAnimation.Tails()
@@ -260,14 +266,14 @@ function void fn015d1e()
 	CompetitionMode.updateTailsAnimation_shared()
 }
 
+function void fn016022()
+{
+	CompetitionMode.TailsTails.UpdateSpritePatterns()
+}
+
 function void fn016050()
 {
 	CompetitionMode.Character.UpdateSpritePatterns.Tails()
-}
-
-function void fn013648()
-{
-	CompetitionMode.centerCameraYOffset.Tails()
 }
 
 function void fn0161fa()
@@ -280,9 +286,19 @@ function void fn016232()
 	CompetitionMode.TailsTails.Update()
 }
 
-function void fn016022()
+function void fn019236()
 {
-	CompetitionMode.TailsTails.UpdateSpritePatterns()
+	SuperSonicStars.CreateSparks()
+}
+
+function void fn0193ca()
+{
+	HyperSonicStars.CreateSparks()
+}
+
+function void fn01d6c2()
+{
+	MonitorIntact.CheckBlocking.player2()
 }
 
 function void fn01d890()
@@ -290,9 +306,9 @@ function void fn01d890()
 	ItemEffect.ApplyRobotnik()
 }
 
-function void fn01d6c2()
+function void fn02cfc0()
 {
-	MonitorIntact.CheckBlocking.player2()
+	Checkpoint.Init()
 }
 
 function void fn084464()
@@ -315,24 +331,9 @@ function void fn084780()
 	Object.AnimationProgressByLocalA1.SlowDown()
 }
 
-function void fn02cfc0()
-{
-	Checkpoint.Init()
-}
-
 function bool fn084fa4()
 {
 	return SetupObjectAttributesSlotted()
-}
-
-function void fn0193ca()
-{
-	HyperSonicStars.CreateSparks()
-}
-
-function void fn019236()
-{
-	SuperSonicStars.CreateSparks()
 }
 
 function void fn085b8a()
