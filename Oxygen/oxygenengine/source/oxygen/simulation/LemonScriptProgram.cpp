@@ -344,7 +344,22 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 		mInternal.mProgram.addModule(*module);
 	}
 
-	mInternal.mProgram.setOptimizationLevel(config.mScriptOptimizationLevel);
+	// Set script optimization level
+	{
+		int scriptOptimizationLevel = clamp(config.mScriptOptimizationLevel, 0, 3);
+		if (config.mScriptOptimizationLevel < 0)
+		{
+			// Auto-select script optimization level
+			//  -> Use a reduced level for web version, as nativization seems to introduce a bug in S3AIR, when finishing the Blue Spheres special stage
+			//  -> However, this only happens in the web version, and is not generally reproducible (it's consistent only for a few people, happens rarely or not at all for others)
+		#if defined(PLATFORM_WEB)
+			scriptOptimizationLevel = 1;
+		#else
+			scriptOptimizationLevel = 3;
+		#endif
+		}
+		mInternal.mProgram.setOptimizationLevel(scriptOptimizationLevel);
+	}
 
 	// Optional code nativization
 	if (config.mRunScriptNativization == 1 && !config.mScriptNativizationOutput.empty())

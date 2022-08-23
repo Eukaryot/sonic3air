@@ -225,18 +225,19 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<LabelMenuEntry>().initEntry("These settings are meant only for debugging very specific issues.\nIt's recommended to leave them at their default values.");
 
 		entries.addEntry<AdvancedOptionMenuEntry>()
-			.setDefaultValue(3)
+			.setDefaultValue(-1)
 			.initEntry("Script Optimization", option::SCRIPT_OPTIMIZATION)
+			.addOption("Auto (Default)", -1)
 			.addOption("Disabled", 0)
 			.addOption("Basic", 1)
-			.addOption("Full (Default)", 3);
+			.addOption("Full", 3);
 
 		entries.addEntry<AdvancedOptionMenuEntry>()
 			.setDefaultValue(-1)
 			.initEntry("Debug Game Recording", option::GAME_RECORDING_MODE)
+			.addOption("Auto (Default)", -1)
 			.addOption("Disabled", 0)
-			.addOption("Enabled", 1)
-			.addOption("Auto (Default)", -1);
+			.addOption("Enabled", 1);
 	}
 
 	// Display tab

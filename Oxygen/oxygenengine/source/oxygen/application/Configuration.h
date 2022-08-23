@@ -164,7 +164,7 @@ public:
 	// Audio
 	int   mAudioSampleRate = 48000;
 	float mAudioVolume = 1.0f;
-	bool  mUseAudioThreading = true;	// Disabled in constructor for platforms that don't support it
+	bool  mUseAudioThreading = true;		// Disabled in constructor for platforms that don't support it
 
 	// Input
 	std::vector<InputConfig::DeviceDefinition> mInputDeviceDefinitions;
@@ -181,7 +181,7 @@ public:
 
 	// Internal
 	bool mForceCompileScripts = false;
-	int mScriptOptimizationLevel = 3;
+	int mScriptOptimizationLevel = -1;		// -1: Auto, 0: No optimization at all, up to 3: Full optimization
 	std::wstring mCompiledScriptSavePath;
 	bool mEnableROMDataAnalyser = false;
 	bool mExitAfterScriptLoading = false;

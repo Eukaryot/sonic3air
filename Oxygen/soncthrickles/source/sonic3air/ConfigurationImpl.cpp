@@ -285,6 +285,12 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 			}
 		}
 
+		if (mGameVersionInSettings < "22.08.27.0")
+		{
+			// Reset script optimization - its default was 3 before introducing -1 for auto
+			mScriptOptimizationLevel = -1;
+		}
+
 		// Make corrections where needed
 		if (!settingsMap.empty())	// This is going to be empty when the macOS UI calls loadConfiguration externally, causing crash
 		{
