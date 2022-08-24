@@ -130,6 +130,9 @@ void VideoOut::setScreenSize(uint32 width, uint32 height)
 	mGameScreenTexture.setupAsRenderTarget(mGameResolution.x, mGameResolution.y);
 
 	mActiveRenderer->setGameResolution(mGameResolution);
+
+	// Render game screen again (this is particularly needed when switching from in-game Options back to the Pause Menu)
+	mRequireGameScreenUpdate = true;
 }
 
 Vec2i VideoOut::getInterpolatedWorldSpaceOffset() const
@@ -184,7 +187,7 @@ bool VideoOut::updateGameScreen()
 
 	// Only render something if a frame simulation was completed in the meantime
 	const bool hasNewSimulationFrame = (mFrameState == FrameState::FRAME_READY);
-	if (!hasNewSimulationFrame && !mFrameInterpolation.mCurrentlyInterpolating && !mDebugDrawRenderingRequested)
+	if (!hasNewSimulationFrame && !mFrameInterpolation.mCurrentlyInterpolating && !mDebugDrawRenderingRequested && !mRequireGameScreenUpdate)
 	{
 		// No update
 		return false;

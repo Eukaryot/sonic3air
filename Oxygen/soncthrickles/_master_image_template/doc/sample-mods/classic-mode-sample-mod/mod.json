@@ -1,0 +1,29 @@
+{
+	"Metadata":
+	{
+		"Name": "Classic Mode Sample Mod",
+		"Author": "Eukaryot",
+		"Description": "Makes the game (except the menus) run in the original resolution of 320x224.",
+		"URL": "https://sonic3air.org",
+		"ModVersion": "1.0.0.0",
+		"GameVersion": "22.08.21.0"
+	},
+	"Settings":
+	{
+		"List":
+		[
+			{
+				"InternalName": "Screen Width",
+				"DisplayName": "Screen Width",
+				"Variable": "ClassicModeSampleMode.screenWidth",	// This must be the name of a global variable in the scripts (not a define!)
+				"DefaultValue": "320",
+				"Options":
+				{
+					"320": "320 pixels (classic 4:3)",
+					"360": "360 pixels (16:10)",
+					"400": "400 pixels (16:9)"
+				}
+			}
+		]
+	}
+}

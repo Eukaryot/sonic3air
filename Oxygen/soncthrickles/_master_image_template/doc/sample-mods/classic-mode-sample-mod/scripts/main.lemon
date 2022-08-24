@@ -1,0 +1,54 @@
+
+global u16 ClassicModeSampleMode.screenWidth
+
+
+function void scriptMainEntryPoint()
+{
+	if (SHCSplash.shouldShowUpAfterStartup())
+		SHCSplash.showSplashScreen()
+
+	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
+	System.setupCallFrame("GameModeControlLoop")
+}
+
+
+function void EntryFunctions.dataSelect()
+{
+	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
+	base.EntryFunctions.dataSelect()
+}
+
+
+function void EntryFunctions.actSelect()
+{
+	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
+	base.EntryFunctions.actSelect()
+}
+
+
+function void EntryFunctions.competitionMode()
+{
+	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
+	base.EntryFunctions.competitionMode()
+}
+
+
+function void EntryFunctions.blueSphereGame()
+{
+	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
+	base.EntryFunctions.blueSphereGame()
+}
+
+
+function void EntryFunctions.levelSelect()
+{
+	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
+	base.EntryFunctions.levelSelect()
+}
+
+
+function void Standalone.onResumeAfterPause()
+{
+	Renderer.setScreenSize(ClassicModeSampleMode.screenWidth, 224)
+	base.Standalone.onResumeAfterPause()
+}

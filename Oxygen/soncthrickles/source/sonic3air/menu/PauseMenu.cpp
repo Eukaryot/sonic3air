@@ -17,6 +17,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
+#include "oxygen/application/video/VideoOut.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/simulation/Simulation.h"
 
@@ -101,6 +102,13 @@ void PauseMenu::update(float timeElapsed)
 	if (!isEnabled())
 		return;
 
+	if (mRestoreGameResolution != Vec2i())
+	{
+		// The menus only really work in a fixed resolution, so make sure that one is set
+		VideoOut::instance().setScreenSize(mRestoreGameResolution.x, mRestoreGameResolution.y);
+		mRestoreGameResolution = Vec2i();
+	}
+
 	GameMenuBase::update(timeElapsed);
 
 	if (mState == State::SHOW)
@@ -136,6 +144,7 @@ void PauseMenu::update(float timeElapsed)
 					case 1:
 					{
 						// Open options menu
+						mRestoreGameResolution = VideoOut::instance().getScreenRect().getSize();
 						GameApp::instance().openOptionsMenuInGame();
 						break;
 					}

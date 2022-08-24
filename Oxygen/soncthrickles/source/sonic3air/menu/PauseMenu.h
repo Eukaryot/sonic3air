@@ -58,4 +58,5 @@ private:
 	float mTimeShown = 0.0f;
 	bool mScreenshotMode = false;
 	bool mRestartEnabled = false;
+	Vec2i mRestoreGameResolution;
 };

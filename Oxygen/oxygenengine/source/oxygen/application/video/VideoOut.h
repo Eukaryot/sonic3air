@@ -108,4 +108,5 @@ private:
 
 	bool mDebugDrawRenderingRequested = false;
 	bool mPreviouslyHadOutsideFrameDebugDraws = false;
+	bool mRequireGameScreenUpdate = false;
 };
