@@ -53,7 +53,7 @@ MainMenu::MainMenu(MenuBackground& menuBackground) :
 		mMenuEntries.addEntry("EXTRAS",		 mainmenu::EXTRAS);
 		mMenuEntries.addEntry("MODS",		 mainmenu::MODS);
 
-	#if !defined(PLATFORM_ANDROID)
+	#if !defined(PLATFORM_ANDROID) && !defined(PLATFORM_IOS)
 		mMenuEntries.addEntry("EXIT",		 mainmenu::EXIT);
 	#endif
 	}

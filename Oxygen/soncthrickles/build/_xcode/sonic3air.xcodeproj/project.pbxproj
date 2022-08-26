@@ -5284,7 +5284,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5328,7 +5328,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5380,7 +5380,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5435,7 +5435,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5591,7 +5591,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
 			};
@@ -5630,7 +5630,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
 			};
@@ -5670,7 +5670,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5710,7 +5710,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MARKETING_VERSION = 22.05.15.0;
+				MARKETING_VERSION = 22.08.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
