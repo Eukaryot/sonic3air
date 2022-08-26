@@ -22,17 +22,18 @@ struct Application {
     DiscordUserId user_id;
 };
 
-void UpdateActivityCallback(void* data, enum EDiscordResult result)
+void DISCORD_CALLBACK UpdateActivityCallback(void* data, enum EDiscordResult result)
 {
     DISCORD_REQUIRE(result);
 }
 
-int RelationshipPassFilter(void* data, struct DiscordRelationship* relationship)
+bool DISCORD_CALLBACK RelationshipPassFilter(void* data, struct DiscordRelationship* relationship)
 {
     return (relationship->type == DiscordRelationshipType_Friend);
 }
 
-int RelationshipSnowflakeFilter(void* data, struct DiscordRelationship* relationship)
+bool DISCORD_CALLBACK RelationshipSnowflakeFilter(void* data,
+                                                 struct DiscordRelationship* relationship)
 {
     struct Application* app = (struct Application*)data;
 
@@ -40,7 +41,7 @@ int RelationshipSnowflakeFilter(void* data, struct DiscordRelationship* relation
             relationship->user.id < app->user_id);
 }
 
-void OnRelationshipsRefresh(void* data)
+void DISCORD_CALLBACK OnRelationshipsRefresh(void* data)
 {
     struct Application* app = (struct Application*)data;
     struct IDiscordRelationshipManager* module = app->relationships;
@@ -75,7 +76,7 @@ void OnRelationshipsRefresh(void* data)
     app->activities->update_activity(app->activities, &activity, app, UpdateActivityCallback);
 }
 
-void OnUserUpdated(void* data)
+void DISCORD_CALLBACK OnUserUpdated(void* data)
 {
     struct Application* app = (struct Application*)data;
     struct DiscordUser user;
@@ -83,7 +84,9 @@ void OnUserUpdated(void* data)
     app->user_id = user.id;
 }
 
-void OnOAuth2Token(void* data, enum EDiscordResult result, struct DiscordOAuth2Token* token)
+void DISCORD_CALLBACK OnOAuth2Token(void* data,
+                                    enum EDiscordResult result,
+                                    struct DiscordOAuth2Token* token)
 {
     if (result == DiscordResult_Ok) {
         printf("OAuth2 token: %s\n", token->access_token);
@@ -93,7 +96,9 @@ void OnOAuth2Token(void* data, enum EDiscordResult result, struct DiscordOAuth2T
     }
 }
 
-void OnLobbyConnect(void* data, enum EDiscordResult result, struct DiscordLobby* lobby)
+void DISCORD_CALLBACK OnLobbyConnect(void* data,
+                                     enum EDiscordResult result,
+                                     struct DiscordLobby* lobby)
 {
     printf("LobbyConnect returned %d\n", (int)result);
 }
