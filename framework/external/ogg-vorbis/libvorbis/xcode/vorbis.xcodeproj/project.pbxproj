@@ -232,7 +232,6 @@
 		9E1158EE27FA9388001A0FC5 /* framing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = framing.c; sourceTree = "<group>"; };
 		9E1158EF27FA9388001A0FC5 /* crctable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crctable.h; sourceTree = "<group>"; };
 		9E1158F227FA9388001A0FC5 /* bitwise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitwise.c; sourceTree = "<group>"; };
-		9E8B602527F7FB4E00ADE80F /* vorbis copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "vorbis copy-Info.plist"; path = "/Users/sappharad/Documents/Coding/sonic3air/framework/external/ogg-vorbis/libvorbis/xcode/vorbis copy-Info.plist"; sourceTree = "<absolute>"; };
 		9E8B604E27F8017300ADE80F /* liboggvorbis_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liboggvorbis_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EA4DC48C2EE458F9469A8C8 /* envelope.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = envelope.h; path = ../lib/envelope.h; sourceTree = SOURCE_ROOT; };
 		9EC1F760281784910073C39E /* liboggvorbis_mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liboggvorbis_mac.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -397,7 +396,6 @@
 				8ED09D57A0F94F9B9E78407C /* ALL_BUILD */,
 				7EE025ECC3D444E392246BF4 /* vorbis */,
 				D922F32129F24C88A7AA5561 /* Products */,
-				9E8B602527F7FB4E00ADE80F /* vorbis copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1196,7 +1194,6 @@
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1231,7 +1228,6 @@
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1267,7 +1263,6 @@
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1303,7 +1298,6 @@
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;

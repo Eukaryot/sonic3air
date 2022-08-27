@@ -34,8 +34,15 @@
 	#include <sys/stat.h>
 
 #elif defined(PLATFORM_MAC)
+#if TARGET_CPU_X86_64
+	//Older Intel macOS < 10.15 lacks std::filesystem, so we substitute with boost::filesystem
 	#include <boost/filesystem.hpp>
 	namespace std_filesystem = boost::filesystem;
+#else
+	//Newer Macs, specifically arm64, are running macOS 11 or newer which has std::filesystem
+	#include <filesystem>
+	namespace std_filesystem = std::filesystem;
+#endif
 	#define USE_STD_FILESYSTEM
 
 	#include <dirent.h>

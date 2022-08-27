@@ -11,9 +11,6 @@
 		9E0788552549EDCF0008A7FB /* TouchControlsOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0788522549EDCF0008A7FB /* TouchControlsOverlay.cpp */; };
 		9E0788562549EDCF0008A7FB /* TouchControlsOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0788522549EDCF0008A7FB /* TouchControlsOverlay.cpp */; };
 		9E0788572549EDCF0008A7FB /* TouchControlsOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0788522549EDCF0008A7FB /* TouchControlsOverlay.cpp */; };
-		9E086D392476DC8400FA255A /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E086D382476DC8400FA255A /* boost.framework */; };
-		9E086D3B2476DC9D00FA255A /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E086D382476DC8400FA255A /* boost.framework */; };
-		9E086D3C2476DC9D00FA255A /* boost.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E086D382476DC8400FA255A /* boost.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9E08784826326E3E0005AEAF /* Experiments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E851C245F89C300114DEB /* Experiments.cpp */; };
 		9E0C5E86247DD624000105D0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE1245F88D200114DEB /* main.cpp */; };
 		9E0C5E87247DD630000105D0 /* EngineDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BAE245F88D200114DEB /* EngineDelegate.cpp */; };
@@ -173,7 +170,6 @@
 		9E0C5F3E247DDFE0000105D0 /* Thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACB245F882600114DEB /* Thread.cpp */; };
 		9E0C5F3F247DDFE0000105D0 /* VertexArrayObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E9EF33D24678C0300AAA00F /* VertexArrayObject.cpp */; };
 		9E0C5F40247DDFE0000105D0 /* VideoBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACC245F882600114DEB /* VideoBuffer.cpp */; };
-		9E0C5F41247DEDE2000105D0 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E086D382476DC8400FA255A /* boost.framework */; };
 		9E0C5F4A247DEDFA000105D0 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E6E7A60245F785D00114DEB /* OpenGL.framework */; };
 		9E0C5F51247E017D000105D0 /* Sonic3AIR in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9E0C5E7F247DD5AF000105D0 /* Sonic3AIR */; };
 		9E0CCAC52518FBCD0007288E /* Transform2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E0CCAC42518FBCD0007288E /* Transform2D.cpp */; };
@@ -943,6 +939,11 @@
 		9E82C7C726BDFA3200ADDBD3 /* InputConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C7C326BDFA3100ADDBD3 /* InputConfig.cpp */; };
 		9E82C7C826BDFA3200ADDBD3 /* InputConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C7C326BDFA3100ADDBD3 /* InputConfig.cpp */; };
 		9E85ED5C246F7B9D001F1749 /* SetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E85ED5B246F7B9D001F1749 /* SetupViewController.m */; };
+		9E90E98228B99AC700526086 /* liboggvorbis_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC1F7742817853F0073C39E /* liboggvorbis_mac.a */; };
+		9E90E98528B99DA900526086 /* discord_game_sdk.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		9E91BAED28B98D7600949235 /* discord_game_sdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */; };
+		9E91BAEF28B98F6D00949235 /* discord_game_sdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */; };
+		9E91BAF028B98F6D00949235 /* discord_game_sdk.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9E995D3A25F9CFAF00F4B934 /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
 		9E995D3B25F9CFAF00F4B934 /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
 		9E995D3C25F9CFAF00F4B934 /* StringRef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E995D3925F9CFAF00F4B934 /* StringRef.cpp */; };
@@ -1020,7 +1021,6 @@
 		9EB069F2248088B20080AC49 /* Thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACB245F882600114DEB /* Thread.cpp */; };
 		9EB069F3248088B20080AC49 /* VertexArrayObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E9EF33D24678C0300AAA00F /* VertexArrayObject.cpp */; };
 		9EB069F4248088B20080AC49 /* VideoBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7ACC245F882600114DEB /* VideoBuffer.cpp */; };
-		9EB069F5248089A50080AC49 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E086D382476DC8400FA255A /* boost.framework */; };
 		9EB069FE24808A1C0080AC49 /* DrawCommand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E852A245F89C300114DEB /* DrawCommand.cpp */; };
 		9EB069FF24808A1C0080AC49 /* SoftwareDrawerTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E852E245F89C300114DEB /* SoftwareDrawerTexture.cpp */; };
 		9EB06A0024808A1C0080AC49 /* Blitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8530245F89C300114DEB /* Blitter.cpp */; };
@@ -1115,7 +1115,6 @@
 		9EC1F739281783EC0073C39E /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E5FD83727EC041600CD430A /* libSDL2.a */; };
 		9EC1F775281785510073C39E /* liboggvorbis_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC1F7742817853F0073C39E /* liboggvorbis_mac.a */; };
 		9EC1F776281785700073C39E /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E5FD83727EC041600CD430A /* libSDL2.a */; };
-		9EC1F777281785700073C39E /* liboggvorbis_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC1F7742817853F0073C39E /* liboggvorbis_mac.a */; };
 		9EC1F7782817858B0073C39E /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E5FD83727EC041600CD430A /* libSDL2.a */; };
 		9EC1F7792817858B0073C39E /* liboggvorbis_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC1F7742817853F0073C39E /* liboggvorbis_mac.a */; };
 		9EC1F77A281785A40073C39E /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E5FD83727EC041600CD430A /* libSDL2.a */; };
@@ -1317,10 +1316,6 @@
 		9ED1836528789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */; };
 		9ED1836628789FDD00506AEB /* OpenGLFontOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1836028789FDD00506AEB /* OpenGLFontOutput.cpp */; };
 		9ED3088E246CB56C00013D8D /* ErrorHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED3088C246CB56C00013D8D /* ErrorHandler.cpp */; };
-		9ED426AC2718E3CF00AA3301 /* discord_game_sdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */; };
-		9ED426AD2718E3CF00AA3301 /* discord_game_sdk.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		9ED426AE2718E3D700AA3301 /* discord_game_sdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */; };
-		9ED426AF2718E3D700AA3301 /* discord_game_sdk.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9EE730C324761BFD00A9DE41 /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AA1245F882600114DEB /* FileSystem.cpp */; };
 		9EE730C424761BFE00A9DE41 /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7AA1245F882600114DEB /* FileSystem.cpp */; };
 /* End PBXBuildFile section */
@@ -1410,6 +1405,13 @@
 			remoteGlobalIDString = BECDF6BE0761BA81005FE872;
 			remoteInfo = "Standard DMG";
 		};
+		9E90E98328B99C4600526086 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9E115C1927FA962E001A0FC5 /* vorbis.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 9EC1F73F281784910073C39E;
+			remoteInfo = oggvorbis_mac;
+		};
 		9EC1F7732817853F0073C39E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9E115C1927FA962E001A0FC5 /* vorbis.xcodeproj */;
@@ -1430,27 +1432,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9E1D60242475733F003B1774 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				9ED426AD2718E3CF00AA3301 /* discord_game_sdk.dylib in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		9E6E7A5F245F784400114DEB /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9E086D3C2476DC9D00FA255A /* boost.framework in Embed Frameworks */,
-				9ED426AF2718E3D700AA3301 /* discord_game_sdk.dylib in Embed Frameworks */,
+				9E91BAF028B98F6D00949235 /* discord_game_sdk.dylib in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9E90E98628B99DA900526086 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9E90E98528B99DA900526086 /* discord_game_sdk.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -2002,6 +2003,8 @@
 		9E82C7C926BDFA5B00ADDBD3 /* RenderPartsDefinitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderPartsDefinitions.h; sourceTree = "<group>"; };
 		9E85ED5A246F7B9D001F1749 /* SetupViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SetupViewController.h; sourceTree = "<group>"; };
 		9E85ED5B246F7B9D001F1749 /* SetupViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SetupViewController.m; sourceTree = "<group>"; };
+		9E91BADF28B97BE900949235 /* discord_game_sdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = discord_game_sdk.dylib; path = ../../source/external/discord_game_sdk/lib/aarch64/discord_game_sdk.dylib; sourceTree = "<group>"; };
+		9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = discord_game_sdk.dylib; path = ../../source/external/discord_game_sdk/lib/discord_game_sdk.dylib; sourceTree = "<group>"; };
 		9E995D3925F9CFAF00F4B934 /* StringRef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringRef.cpp; sourceTree = "<group>"; };
 		9E9EF33924678BC900AAA00F /* OpenGLDrawerResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLDrawerResources.h; sourceTree = "<group>"; };
 		9E9EF33A24678BC900AAA00F /* OpenGLDrawerResources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLDrawerResources.cpp; sourceTree = "<group>"; };
@@ -2148,7 +2151,6 @@
 				9E7E292125EF278B0021AE3A /* libz.tbd in Frameworks */,
 				9EC1F78D28178F020073C39E /* CoreAudio.framework in Frameworks */,
 				9EC1F795281793E90073C39E /* IOKit.framework in Frameworks */,
-				9E0C5F41247DEDE2000105D0 /* boost.framework in Frameworks */,
 				9EC1F79B2817972E0073C39E /* Metal.framework in Frameworks */,
 				9EC1F79228178FE90073C39E /* Carbon.framework in Frameworks */,
 				9EC1F7792817858B0073C39E /* liboggvorbis_mac.a in Frameworks */,
@@ -2164,14 +2166,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E90E98228B99AC700526086 /* liboggvorbis_mac.a in Frameworks */,
+				9E91BAED28B98D7600949235 /* discord_game_sdk.dylib in Frameworks */,
 				9EC1F78C28178EFB0073C39E /* CoreAudio.framework in Frameworks */,
-				9EC1F777281785700073C39E /* liboggvorbis_mac.a in Frameworks */,
 				9EC1F776281785700073C39E /* libSDL2.a in Frameworks */,
 				9EC1F79128178FDE0073C39E /* Carbon.framework in Frameworks */,
 				9E7E291F25EF27830021AE3A /* libz.tbd in Frameworks */,
-				9E086D392476DC8400FA255A /* boost.framework in Frameworks */,
 				9EC1F78328178BCF0073C39E /* AudioToolbox.framework in Frameworks */,
-				9ED426AC2718E3CF00AA3301 /* discord_game_sdk.dylib in Frameworks */,
 				9E1D601E2475733F003B1774 /* OpenGL.framework in Frameworks */,
 				9EC1F78828178C4C0073C39E /* ForceFeedback.framework in Frameworks */,
 			);
@@ -2205,11 +2206,10 @@
 				9EC1F775281785510073C39E /* liboggvorbis_mac.a in Frameworks */,
 				9E7E290D25EF26400021AE3A /* libz.tbd in Frameworks */,
 				9EC1F79028178FD60073C39E /* Carbon.framework in Frameworks */,
-				9E086D3B2476DC9D00FA255A /* boost.framework in Frameworks */,
-				9ED426AE2718E3D700AA3301 /* discord_game_sdk.dylib in Frameworks */,
 				9EC1F78228178BC40073C39E /* AudioToolbox.framework in Frameworks */,
 				9EC1F739281783EC0073C39E /* libSDL2.a in Frameworks */,
 				9E6E7A61245F785D00114DEB /* OpenGL.framework in Frameworks */,
+				9E91BAEF28B98F6D00949235 /* discord_game_sdk.dylib in Frameworks */,
 				9EC1F78728178C450073C39E /* ForceFeedback.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2220,7 +2220,6 @@
 			files = (
 				9EC1F78E28178F0B0073C39E /* CoreAudio.framework in Frameworks */,
 				9EC1F79328178FF10073C39E /* Carbon.framework in Frameworks */,
-				9EB069F5248089A50080AC49 /* boost.framework in Frameworks */,
 				9E7E292325EF27920021AE3A /* libz.tbd in Frameworks */,
 				9EC1F78528178BE50073C39E /* AudioToolbox.framework in Frameworks */,
 				9EC1F77B281785A40073C39E /* liboggvorbis_mac.a in Frameworks */,
@@ -2409,6 +2408,8 @@
 		9E6E7A5B245F784400114DEB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9E91BADF28B97BE900949235 /* discord_game_sdk.dylib */,
+				9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */,
 				9E47934C28221CF90065707F /* QuartzCore.framework */,
 				9E47934A28221CB20065707F /* CoreGraphics.framework */,
 				9E47934828221CA60065707F /* Metal.framework */,
@@ -3603,11 +3604,12 @@
 				9E1D5F5E2475733F003B1774 /* Sources */,
 				9E1D601C2475733F003B1774 /* Frameworks */,
 				9E1D60212475733F003B1774 /* Resources */,
-				9E1D60242475733F003B1774 /* Embed Frameworks */,
+				9E90E98628B99DA900526086 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9E90E98428B99C4600526086 /* PBXTargetDependency */,
 			);
 			name = sonic3air;
 			productName = sonic3air;
@@ -5142,6 +5144,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		9E90E98428B99C4600526086 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = oggvorbis_mac;
+			targetProxy = 9E90E98328B99C4600526086 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		9E64753527DB059800612BC4 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -5203,6 +5213,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				OBJROOT = "$(BUILD_DIR)";
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_NAME = Sonic3AIR;
 				SYMROOT = "$(BUILD_DIR)";
 			};
@@ -5241,6 +5252,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				OBJROOT = "$(BUILD_DIR)";
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_NAME = Sonic3AIR;
 				SYMROOT = "$(BUILD_DIR)";
 			};
@@ -5249,7 +5261,6 @@
 		9E1D60292475733F003B1774 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = x86_64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = sonic3air_MacApp/sonic3air.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -5284,7 +5295,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.08.27.0;
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5293,7 +5307,6 @@
 		9E1D602A2475733F003B1774 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = x86_64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = sonic3air_MacApp/sonic3air.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -5328,7 +5341,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.08.27.0;
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5558,7 +5574,7 @@
 		9E6E7A59245F723000114DEB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = x86_64;
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = sonic3air_MacApp/sonic3air.entitlements;
 				CODE_SIGN_IDENTITY = "-";
@@ -5591,7 +5607,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.08.27.0;
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
 			};
@@ -5600,7 +5619,7 @@
 		9E6E7A5A245F723000114DEB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = x86_64;
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = sonic3air_MacApp/sonic3air.entitlements;
 				CODE_SIGN_IDENTITY = "-";
@@ -5630,7 +5649,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.08.27.0;
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
 			};
@@ -5639,7 +5661,7 @@
 		9EB069A424807A9D0080AC49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = x86_64;
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_ENTITLEMENTS = oxygenApp_MacApp/oxygenApp.entitlements;
@@ -5670,7 +5692,10 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.08.27.0;
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -5679,7 +5704,7 @@
 		9EB069A524807A9D0080AC49 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = x86_64;
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_ENTITLEMENTS = oxygenApp_MacApp/oxygenApp.entitlements;
@@ -5710,7 +5735,10 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
+				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.08.27.0;
+				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
