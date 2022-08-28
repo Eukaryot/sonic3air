@@ -119,6 +119,8 @@ public:
 	InputManager();
 
 	void startup();
+	void enableTouchInput(bool enable);
+
 	void updateInput(float timeElapsed);
 	void injectSDLInputEvent(const SDL_Event& ev);
 
@@ -194,6 +196,7 @@ private:
 
 	std::set<SDL_Keycode> mOneFrameKeyboardInputs;
 
+	bool mTouchInputEnabled = false;
 	std::vector<Touch> mActiveTouches;
 
 	// Device type of last input -- for keyboard and gamepads, this is affected only by assigned controls, not by any pressed keys/buttons

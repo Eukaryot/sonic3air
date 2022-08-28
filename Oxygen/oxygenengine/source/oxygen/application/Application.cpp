@@ -46,6 +46,7 @@ Application::Application() :
 	if (hasVirtualGamepad())
 	{
 		mTouchControlsOverlay = new TouchControlsOverlay();
+		InputManager::instance().enableTouchInput(true);
 	}
 
 	// Register profiling region IDs

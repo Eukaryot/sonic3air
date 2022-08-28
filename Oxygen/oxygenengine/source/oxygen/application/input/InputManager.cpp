@@ -277,6 +277,11 @@ void InputManager::startup()
 	rescanRealDevices();
 }
 
+void InputManager::enableTouchInput(bool enable)
+{
+	mTouchInputEnabled = enable;
+}
+
 void InputManager::updateInput(float timeElapsed)
 {
 #if 0
@@ -299,8 +304,9 @@ void InputManager::updateInput(float timeElapsed)
 	mAnythingPressed = false;
 
 	// Update touches
+	mActiveTouches.clear();
+	if (mTouchInputEnabled)
 	{
-		mActiveTouches.clear();
 		const int touchDevices = SDL_GetNumTouchDevices();
 		for (int k = 0; k < touchDevices; ++k)
 		{
