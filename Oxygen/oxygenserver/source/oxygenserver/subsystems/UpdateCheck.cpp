@@ -40,7 +40,7 @@ UpdateCheck::UpdateCheck()
 	// Preview version
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x22051500;
+		definition.mVersionNumber = 0x22082700;
 		definition.mReleaseChannel = ReleaseChannel::PREVIEW;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.addPlatform(Platform::MAC);
