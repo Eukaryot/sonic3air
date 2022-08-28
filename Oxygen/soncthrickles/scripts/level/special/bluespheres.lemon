@@ -254,10 +254,8 @@ function void SpecialStage()
 	#if GAMEAPP
 		BlueSpheres.renderCustomGround()
 		BlueSpheres.renderCustomCharacterShadows()
-	#else
-	#if STANDALONE
+	#elif STANDALONE
 		Renderer.setViewport(getScreenExtend(), 0, 320, 224, 0x0000)
-	#endif
 	#endif
 
 		LoadRequiredSpritePatterns()
@@ -2722,20 +2720,25 @@ function void BlueSpheres.FadeIn()
 
 #if GAMEAPP
 
-function void BlueSpheres.renderCustomGround()
+function void BlueSpheres.replacePlaneRendering()
 {
 	// Disable rendering of plane B prio
 	Renderer.enableDefaultPlane(3, false)
+
+	// Manually render the HUD parts of this plane (blue spheres and rings counter)
+	Renderer.setupPlane(0, 0, 160, 32, 0x11, 3, 0x2f00)
+	Renderer.setupPlane(getScreenWidth()-160, 0, 160, 32, 0x11, 3, 0x2f00)
+}
+
+function void BlueSpheres.renderCustomGround()
+{
+	BlueSpheres.replacePlaneRendering()
 
 	// Render glow effect for background
 	if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
 	{
 		Renderer.drawSprite("bluespheres_glow_background", getScreenWidth() / 2, 20, 0x00, 0, 0x2000)
 	}
-
-	// Manually render the HUD parts of this plane (blue spheres and rings counter)
-	Renderer.setupPlane(0, 0, 160, 32, 0x11, 3, 0x2f00)
-	Renderer.setupPlane(getScreenWidth()-160, 0, 160, 32, 0x11, 3, 0x2f00)
 
 	// Render our own version of the ground
 	//  -> This only works in combination with a palette set in V-Int, see "fn000c50"

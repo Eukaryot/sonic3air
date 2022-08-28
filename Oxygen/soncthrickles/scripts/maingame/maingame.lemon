@@ -300,6 +300,10 @@ function void UpdateGamePause()
 			waitForNextFrame()
 
 			Standalone.onResumeAfterPause()
+
+			// Fix for brief glitch in Blue Spheres special stage
+			if (global.game_mode == 0x34)
+				BlueSpheres.replacePlaneRendering()
 		}
 	}
 
