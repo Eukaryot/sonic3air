@@ -373,10 +373,10 @@ function void LevelRingsTableBuilder.buildRings_SOZ1()
 	LevelRingsTableBuilder.addRing(0x3b48, 0x0aa4)
 	LevelRingsTableBuilder.addRing(0x3b60, 0x050e)
 	LevelRingsTableBuilder.addRing(0x3b68, 0x0a96)
-	LevelRingsTableBuilder.addRing(0x3b78, 0x0700)
-	LevelRingsTableBuilder.addRing(0x3b90, 0x0700)
+	//LevelRingsTableBuilder.addRing(0x3b78, 0x0700)	// Removed ring in wall
+	//LevelRingsTableBuilder.addRing(0x3b90, 0x0700)	// Removed ring in wall
 	LevelRingsTableBuilder.addRing(0x3ba0, 0x0896)
-	LevelRingsTableBuilder.addRing(0x3ba8, 0x0700)
+	//LevelRingsTableBuilder.addRing(0x3ba8, 0x0700)	// Removed ring in wall
 	LevelRingsTableBuilder.addRing(0x3bc0, 0x08a0)
 	LevelRingsTableBuilder.addRing(0x3be0, 0x08ae)
 	LevelRingsTableBuilder.addRing(0x3c20, 0x04ce)
