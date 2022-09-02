@@ -422,16 +422,3 @@ function void fn049a0e()
 	if (u8[A2 + D0.s16] >= 3)
 		u8[A2 + D0.s16] -= 2
 }
-
-
-
-#if STANDALONE
-//# address-hook(0x01b58a)
-function void DrawOrUnloadObjectAtPosition()
-{
-	if (!checkForUnloadObjectAtPosition(objA0.position.x.u16, 0x400))
-	{
-		DrawObject()
-	}
-}
-#endif

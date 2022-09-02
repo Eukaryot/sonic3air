@@ -48,6 +48,17 @@ function void DrawOrUnloadObject()
 	DrawOrUnloadObjectAtPosition(objA0.position.x.u16)
 }
 
+#if STANDALONE
+//# address-hook(0x01b58a)
+function void DrawOrUnloadObjectAtPosition()
+{
+	if (!checkForUnloadObjectAtPosition(objA0.position.x.u16, 0x400))
+	{
+		DrawObject()
+	}
+}
+#endif
+
 //# address-hook(0x01b5b0) end(0x01b5d0)
 function void DrawOrUnloadObjectByD0()
 {
