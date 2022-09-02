@@ -38,6 +38,12 @@ void AudioOut::startup()
 	// Call base implementation
 	AudioOutBase::startup();
 
+	// Switch soundtrack selection if remastered soundtrack is not available
+	if (mAudioCollection.getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) == 0)
+	{
+		ConfigurationImpl::instance().mActiveSoundtrack = 0;
+	}
+
 	// Replace the ingame master audio mixer
 	mIngameAudioMixer = &FTX::Audio->createAudioMixer<CustomAudioMixer>((int)AudioMixerId::INGAME_MASTER, (int)AudioMixerId::ROOT);
 }

@@ -218,7 +218,11 @@ void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color
 		if (mData == option::SOUNDTRACK && AudioOut::instance().getAudioCollection().getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) == 0 && selected().mIndex == 1)
 		{
 			py += 13;
-			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "Not available, please exit and download", 5, Color(1.0f, 0.6f, 0.6f, color.a));
+			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "Must be downloaded separately", 5, Color(1.0f, 0.9f, 0.8f, color.a));
+		#if defined(PLATFORM_WEB)
+			py += 10;
+			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "(Exit and select \"Extra Downloads\")", 5, Color(1.0f, 0.9f, 0.8f, color.a));
+		#endif
 			++py;
 		}
 
