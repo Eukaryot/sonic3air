@@ -29,8 +29,7 @@
 // -----------------------------------------------------------------------------------------------
 // [Euka] Added this change that seems needed for static Windows 64-bit builds with Visual Studio
 //  -> This prevents the linker error due to multiple "memcpy" definitions
-//  -> For some reason, it's not needed for 32-bit builds or any other platforms
-#if defined(_MSC_VER) && defined(_WIN64) && !defined(_WINDLL)
+#if defined(_MSC_VER) && !defined(_WINDLL)
     #define HAVE_LIBC
 #endif
 // -----------------------------------------------------------------------------------------------
