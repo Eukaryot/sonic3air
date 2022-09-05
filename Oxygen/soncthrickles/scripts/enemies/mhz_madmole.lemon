@@ -385,12 +385,12 @@ function void fn08d7a8()
 		if (objA0.velocity.x >= 0)
 		{
 			D3.s16 = 0x18
-			fn00fac4()
+			CheckRightWallCollision()
 		}
 		else
 		{
 			D3.s16 = -0x18
-			fn00fe3c()
+			CheckLeftWallCollision()
 		}
 
 		if (D1.s16 >= 0)

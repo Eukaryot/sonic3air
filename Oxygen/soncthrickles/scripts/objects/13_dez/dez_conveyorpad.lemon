@@ -149,7 +149,7 @@ function void fn047ab4()
 
 	objA0.position.x.u16 += (objA0.state != 0) ? -1 : 1
 	D3 = -0x40
-	fn00fe3c()
+	CheckLeftWallCollision()
 
 	if (D1.s16 < 0)
 	{
@@ -158,7 +158,7 @@ function void fn047ab4()
 	}
 
 	D3 = 0x40
-	fn00fac4()
+	CheckRightWallCollision()
 	if (D1.s16 < 0)
 	{
 		objA0.position.x.u16 += D1.u16

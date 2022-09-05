@@ -416,7 +416,7 @@ function void fn07f414()
 
 	if (objA0.velocity.y < 0)
 	{
-		fn00fc12()
+		CheckCeilingCollision()
 		if (D1.s16 < 0)
 		{
 			fn07f45a()
@@ -618,7 +618,7 @@ function void fn07f56e()
 	bool b = false
 	if (objA0.velocity.y < 0)
 	{
-		fn00fc12()
+		CheckCeilingCollision()
 		if (D1.s16 >= 0)
 			return
 

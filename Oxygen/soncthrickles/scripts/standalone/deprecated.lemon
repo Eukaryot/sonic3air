@@ -116,9 +116,84 @@ function void fn00f76e()
 	CheckHitboxCollisionDownwards()
 }
 
+function void fn00f898()
+{
+	Character.checkFloorEdgeCollision()
+}
+
+function void fn00f8a6()
+{
+	Character.checkFloorEdgeCollisionFixedY()
+}
+
+function void fn00f9ba()
+{
+	CheckHitboxCollisionRight()
+}
+
+function void fn00fa7a()
+{
+	Character.CheckRightWallCollision()
+}
+
+function void fn00fa7a_shared()
+{
+	Character.CheckRightWallCollision.shared()
+}
+
+function void fn00fac4()
+{
+	CheckRightWallCollision()
+}
+
 function void fn00faf2()
 {
 	CheckHitboxCollisionUpwards()
+}
+
+function void fn00fc12()
+{
+	CheckCeilingCollision()
+}
+
+function void fn00fc4a()
+{
+	Character.checkCeilingEdgeCollision()
+}
+
+function void fn00fc5c()
+{
+	Character.checkCeilingEdgeCollisionFixedY()
+}
+
+function void fn00fcca()
+{
+	CheckHitboxCollisionLeft()
+}
+
+function void fn00fd9a()
+{
+	Character.CheckLeftWallCollision()
+}
+
+function void fn00fd9a_shared()
+{
+	Character.CheckLeftWallCollision.shared()
+}
+
+function void fn00fe3c()
+{
+	CheckLeftWallCollision()
+}
+
+function void fn00fe44()
+{
+	CheckLeftWallCollisionAtX()
+}
+
+function void fn00fe6e()
+{
+	CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
 }
 
 function void fn011fd6()
@@ -189,6 +264,11 @@ function void fn01094c()
 function void fn010a80()
 {
 	CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
+}
+
+function void fn012006()
+{
+	Character.checkGroundEdgeCollision()
 }
 
 function void fn012d36()
@@ -334,6 +414,16 @@ function void fn084780()
 function bool fn084fa4()
 {
 	return SetupObjectAttributesSlotted()
+}
+
+function void fn085590()
+{
+	FadeOutColorUniform()
+}
+
+function void fn0855f8()
+{
+	FadeInColorUniform()
 }
 
 function void fn085b8a()

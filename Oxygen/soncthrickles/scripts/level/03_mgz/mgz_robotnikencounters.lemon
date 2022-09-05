@@ -153,7 +153,7 @@ function void fn06c07e()
 //# address-hook(0x06c1d4) end(0x06c1fa)
 function void fn06c1d4()
 {
-	fn00fc12()
+	CheckCeilingCollision()
 	if (D1.s16 >= 0)
 	{
 		fn0856e8()

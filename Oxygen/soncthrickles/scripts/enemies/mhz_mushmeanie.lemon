@@ -78,12 +78,12 @@ function void fn08db94()
 	if (objA0.velocity.x >= 0)
 	{
 		D3 = 8
-		fn00fac4()
+		CheckRightWallCollision()
 	}
 	else
 	{
 		D3 = -8
-		fn00fe3c()
+		CheckLeftWallCollision()
 	}
 
 	if (D1.s16 < 0)

@@ -627,7 +627,7 @@ function void fn00f72e()
 	D0.u8 = (D0.u8 + 0x20) & 0xc0
 	if (D0.u8 == 0x40)
 	{
-		fn00fcca()
+		CheckHitboxCollisionLeft()
 	}
 	else if (D0.u8 == 0x80)
 	{
@@ -635,7 +635,7 @@ function void fn00f72e()
 	}
 	else if (D0.u8 == 0xc0)
 	{
-		fn00f9ba()
+		CheckHitboxCollisionRight()
 	}
 	else
 	{
@@ -749,26 +749,20 @@ function void fn00f846()
 
 
 //# address-hook(0x00f898) end(0x00f8e8)
-function void fn00f898()
+function void Character.checkFloorEdgeCollision()
 {
-	D2.u16 = objA0.position.y.u16 + s8(objA0.hitbox_extends.y)
-	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
-
-	u8[0xfffff768] = 0
-	D5.u8 = char.layer_flags1
-
-	pushA456()
-	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
-	popA456()
-
-	D3.u8 = u8[0xfffff768]
-	if (D3 & 0x01)
-		D3.u8 = 0
+	Character.checkFloorEdgeCollisionAtY(objA0.position.y.u16 + s8(objA0.hitbox_extends.y))
 }
 
 
-//# address-hook(0x00f8a6) end(0x00f8e8)
-function void fn00f8a6()
+//# address-hook(0x00f8a6)
+function void Character.checkFloorEdgeCollisionFixedY()
+{
+	Character.checkFloorEdgeCollisionAtY(D2.u16)
+}
+
+
+function void Character.checkFloorEdgeCollisionAtY(u16 py)
 {
 	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
 
@@ -776,7 +770,7 @@ function void fn00f8a6()
 	D5.u8 = char.layer_flags1
 
 	pushA456()
-	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
+	checkStaticCollisionVertical(D3.u16, py, 0xfffff768, 0x10, 0)
 	popA456()
 
 	D3.u8 = u8[0xfffff768]
@@ -842,7 +836,7 @@ function void fn00f994()
 
 
 //# address-hook(0x00f9ba) end(0x00fa16)
-function void fn00f9ba()
+function void CheckHitboxCollisionRight()
 {
 	D3.u16 = objA0.position.x.u16 + s8(objA0.hitbox_extends.y)
 	D2.u16 = objA0.position.y.u16 - s8(objA0.hitbox_extends.x)
@@ -879,7 +873,7 @@ function void fn00fa1a()
 
 
 //# address-hook(0x00fa7a) end(0x00fac0)
-function void fn00fa7a()
+function void Character.CheckRightWallCollision()
 {
 	D2.u16 = objA0.position.y.u16
 	D3.u16 = objA0.position.x.u16
@@ -897,17 +891,17 @@ function void fn00fa7a()
 function void fn00fa88()
 {
 	D3.u16 += 10
-	fn00fa7a_shared()
+	Character.CheckRightWallCollision.shared()
 }
 
 //# address-hook(0x00faa4)
 function void fn00faa4()
 {
 	D3.u16 += objA0.hitbox_extends.x
-	fn00fa7a_shared()
+	Character.CheckRightWallCollision.shared()
 }
 
-function void fn00fa7a_shared()
+function void Character.CheckRightWallCollision.shared()
 {
 	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
 
@@ -919,7 +913,7 @@ function void fn00fa7a_shared()
 
 
 //# address-hook(0x00fac4) end(0x00faf0)
-function void fn00fac4()
+function void CheckRightWallCollision()
 {
 	D3.u16 += objA0.position.x.u16
 	D2.u16 = objA0.position.y.u16
@@ -1008,7 +1002,7 @@ function void fn00fbee()
 
 
 //# address-hook(0x00fc12) end(0x00fc48)
-function void fn00fc12()
+function void CheckCeilingCollision()
 {
 	D3.u16 = objA0.position.x.u16
 	D2.u16 = (objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
@@ -1022,15 +1016,20 @@ function void fn00fc12()
 
 
 //# address-hook(0x00fc4a) end(0x00fc9e)
-function void fn00fc4a()
+function void Character.checkCeilingEdgeCollision()
 {
-	D2.u16 = (objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
-	fn00fc5c()
+	Character.checkCeilingEdgeCollisionAtY((objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f)
 }
 
 
 //# address-hook(0x00fc5c)
-function void fn00fc5c()
+function void Character.checkCeilingEdgeCollisionFixedY()
+{
+	Character.checkCeilingEdgeCollisionAtY(D2.u16)
+}
+
+
+function void Character.checkCeilingEdgeCollisionAtY(u16 py)
 {
 	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
 
@@ -1038,7 +1037,7 @@ function void fn00fc5c()
 	D5.u8 = char.layer_flags1
 
 	pushA456()
-	checkStaticCollisionVertical(D3.u16, D2.u16, 0xfffff768, -0x10, 0x0800)
+	checkStaticCollisionVertical(D3.u16, py, 0xfffff768, -0x10, 0x0800)
 	popA456()
 
 	D3.u8 = u8[0xfffff768]
@@ -1059,7 +1058,7 @@ function void fn00fca0()
 
 
 //# address-hook(0x00fcca) end(0x00fd2e)
-function void fn00fcca()
+function void CheckHitboxCollisionLeft()
 {
 	D3.u16 = (objA0.position.x.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
 	D2.u16 = objA0.position.y.u16 - s8(objA0.hitbox_extends.x)
@@ -1095,7 +1094,7 @@ function void fn00fd32()
 
 
 //# address-hook(0x00fd9a) end(0x00fde8)
-function void fn00fd9a()
+function void Character.CheckLeftWallCollision()
 {
 	D3.u16 = objA0.position.x.u16
 	D2.u16 = objA0.position.y.u16
@@ -1113,17 +1112,17 @@ function void fn00fd9a()
 function void fn00fda8()
 {
 	D3.u16 -= 10
-	fn00fd9a_shared()
+	Character.CheckLeftWallCollision.shared()
 }
 
 //# address-hook(0x00fdc8)
 function void fn00fdc8()
 {
 	D3.u16 -= objA0.hitbox_extends.x
-	fn00fd9a_shared()
+	Character.CheckLeftWallCollision.shared()
 }
 
-function void fn00fd9a_shared()
+function void Character.CheckLeftWallCollision.shared()
 {
 	D3.u16 ^= 0x0f
 	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, -0x10, 0x400)
@@ -1136,15 +1135,15 @@ function void fn00fd9a_shared()
 
 
 //# address-hook(0x00fe3c) end(0x00fe40)
-function void fn00fe3c()
+function void CheckLeftWallCollision()
 {
 	D3.u16 = (D3.u16 + objA0.position.x.u16) ^ 0x0f
-	fn00fe44()
+	CheckLeftWallCollisionAtX()
 }
 
 
 //# address-hook(0x00fe6e) end(0x00fe8c)
-function void fn00fe6e()
+function void CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
 {
 	// Only used in competition mode
 	D5 = objA0.hitbox_extends.y - 3
@@ -1157,7 +1156,7 @@ function void fn00fe6e()
 
 
 //# address-hook(0x00fe44) end(0x00fe6c)
-function void fn00fe44()
+function void CheckLeftWallCollisionAtX()
 {
 	D2.u16 = objA0.position.y.u16
 

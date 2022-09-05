@@ -396,7 +396,7 @@ function void fn01d63a()
 			if (objA0.velocity.y < 0)
 		#endif
 			{
-				fn00fc12()
+				CheckCeilingCollision()
 				if (D1.s16 <= 0)
 				{
 					objA0.position.y.u16 -= D1.u16

@@ -133,7 +133,7 @@ function void fn08a51c()
 	}
 
 	UpdateMovementStraightSimple()
-	fn00fc12()
+	CheckCeilingCollision()
 	if (D1.s16 < 0)
 	{
 		fn08a540()

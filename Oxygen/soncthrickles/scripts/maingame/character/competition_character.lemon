@@ -190,7 +190,7 @@ function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 	D0.u8 = char.control_flags & 0xa0
 	if (D0.u8 == 0)
 	{
-		fn00fe6e()
+		CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
 	}
 }
 
@@ -520,7 +520,7 @@ function void CompetitionMode.Character.UpdateNormalState.Tails()
 	D0.u8 = char.control_flags & 0xa0
 	if (D0.u8 == 0)
 	{
-		fn00fe6e()
+		CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
 	}
 }
 

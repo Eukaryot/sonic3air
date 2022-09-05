@@ -68,7 +68,7 @@ function void fn08b1ec()
 function void fn08b1fa()
 {
 	UpdateMovementSimple()
-	fn00fc12()
+	CheckCeilingCollision()
 	if (D1.s16 < 0)
 	{
 		objA0.update_address = 0x08b228

@@ -355,7 +355,7 @@ function void fn05750c()
 	if (D1.u16 == 0)
 	{
 		u8[0xffffeec5] = 0xff
-		objA1.update_address = 0x01abb6
+		objA1.update_address = 0x01abb6		// Function address of "UnloadObject"
 	}
 
 	fn05758a()

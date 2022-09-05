@@ -56,10 +56,10 @@ function void fn07767c()
 	spawnChildObject(0x067cd2, 0x0a, 0, -28)
 
 	// "spawnChildObjectHierarchy(0x078320)" replaced by:
-	spawnChildObjectsHierarchy(0x077ab8, 3)		// Right/front arm parts
+	spawnChildObjectsHierarchy(0x077ab8, 3)		// Left/front arm parts
 
 	// "spawnChildObjectHierarchy(0x078326)" replaced by:
-	spawnChildObjectsHierarchy(0x077ab4, 3)		// Left/back arm parts
+	spawnChildObjectsHierarchy(0x077ab4, 3)		// Right/back arm parts
 }
 
 

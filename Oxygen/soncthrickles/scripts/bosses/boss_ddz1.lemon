@@ -247,7 +247,7 @@ function void fn081958()
 			D2 = 0xffffffe0
 			while (D0.s16 >= 0)
 			{
-				fn085590()
+				FadeOutColorUniform()
 				--D0.s16
 			}
 		}

@@ -323,7 +323,7 @@ function void fn06dc50()
 	if (objA0.velocity.x >= 0)
 	{
 		D3 = 0x10
-		fn00fac4()
+		CheckRightWallCollision()
 		if (D1.s16 >= 0)
 		{
 			D0.u16 = objA0.position.x.u16 + 0x10
@@ -347,7 +347,7 @@ function void fn06dc50()
 	else
 	{
 		D3 = -0x10
-		fn00fe3c()
+		CheckLeftWallCollision()
 		if (D1.s16 >= 0)
 		{
 			D0.u16 = objA0.position.x.u16 - 0x10
@@ -399,7 +399,7 @@ function void fn06dc50()
 		}
 		else
 		{
-			fn00fc12()
+			CheckCeilingCollision()
 			if (D1.s16 >= 0)
 			{
 				D0.u16 = objA0.position.x.u16

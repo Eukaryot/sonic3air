@@ -155,14 +155,14 @@ function void fn049de4()
 	objA0.velocity.x = D1.u16
 	UpdateMovementStraight()
 
-	fn00fd9a()
+	Character.CheckLeftWallCollision()
 	if (D1.s16 < 0)
 	{
 		objA0.position.x.u16 -= D1.u16
 		u16[A0 + 0x1c] = 0
 	}
 
-	fn00fa7a()
+	Character.CheckRightWallCollision()
 	if (D1.s16 < 0)
 	{
 		objA0.position.x.u16 += D1.u16

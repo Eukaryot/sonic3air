@@ -926,14 +926,13 @@ function void fn0855c2()
 		D0.u16 = u16[A0 + 0x3c]
 		D1 = 0x0e
 		D2 = -0x20
-		while (D0.s16 >= 0)
+		for (u8 i = 0; i <= D0.s16; ++i)
 		{
-			fn0855f8()
-			--D0.s16
+			FadeInColorUniform()
 		}
 
 		--objA0.value39
-		if (s8[A0 + 0x39] < 0)
+		if (s8(objA0.value39) < 0)
 		{
 			u8[0xfffffabf] = 0
 			Object.TriggerUnloading()
@@ -943,24 +942,30 @@ function void fn0855c2()
 
 
 //# address-hook(0x0855f8) end(0x08562a)
-function void fn0855f8()
+function void FadeInColorUniform()
 {
-	D3.u8 = u8[A1] & D1.u8
-	D4.u8 = u8[(A2+=1)-1] & D1.u8
-	if (D3.u8 < D4.u8)
-		D3.u8 += 2
-	u8[(A1+=1)-1] = D3.u8
-
-	D4.u8 = u8[A1]
-	D3.u8 = u8[A1] & D2.u8
-	D6.u8 = u8[(A2+=1)-1]
-	D5.u8 = D6.u8 & D2.u8
-	if (D3.u8 < D5.u8)
-		D3.u8 += 0x20
-	D4.u8 &= D1.u8
-	D6.u8 &= D1.u8
-	if (D4.u8 < D6.u8)
-		D4.u8 += 2
-	D4.u8 |= D3.u8
-	u8[(A1+=1)-1] = D4.u8
+	u16 color = u16[A1]
+	u16 target = u16[A2]
+	#if STANDALONE
+		color = makeNormalPackedColor(color)
+		target = makeNormalPackedColor(target)
+	#endif
+	if ((color & 0x0eee) < (target & 0x0eee))
+	{
+		if ((color & (D1 << 8)) < (target & (D1 << 8)))
+		{
+			color += (0x0002 << 8)
+		}
+		if ((color & D2.u8) < (target & D2.u8))
+		{
+			color += 0x0020
+		}
+		if ((color & D1.u8) < (target & D1.u8))
+		{
+			color += 0x0002
+		}
+	}
+	u16[A1] = color
+	A1 += 2
+	A2 += 2
 }

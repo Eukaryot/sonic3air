@@ -432,7 +432,7 @@ function void fn083ac6()
 		if (D0.u16 >= objA0.position.x.u16)
 		{
 			D3 = 0x20
-			fn00fac4()
+			CheckRightWallCollision()
 			if (D1.s16 >= 0)
 				return
 		}
@@ -443,7 +443,7 @@ function void fn083ac6()
 		if (D0.u16 <= objA0.position.x.u16)
 		{
 			D3 = -0x20
-			fn00fe3c()
+			CheckLeftWallCollision()
 			if (D1.s16 >= 0)
 				return
 		}

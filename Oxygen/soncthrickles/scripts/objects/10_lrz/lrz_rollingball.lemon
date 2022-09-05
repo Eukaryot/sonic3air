@@ -100,7 +100,7 @@ function void fn04389e()
 		UpdateMovementStraightSimple()
 
 		D3 = objA0.position.x.u16 - 0x20
-		fn00fe44()
+		CheckLeftWallCollisionAtX()
 
 		if (D1.s16 < 0)
 		{
@@ -130,7 +130,7 @@ function void fn04389e()
 	else
 	{
 		D3 = objA0.position.x.u16 - 0x20
-		fn00fe44()
+		CheckLeftWallCollisionAtX()
 
 		if (D1.s16 < 0)
 		{

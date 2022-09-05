@@ -58,7 +58,7 @@ function void fn046ff2()
 {
 	UpdateMovementStraightSimple()
 	objA0.velocity.y -= 8
-	fn00fc12()
+	CheckCeilingCollision()
 
 	if (D1.s16 < 0)
 	{

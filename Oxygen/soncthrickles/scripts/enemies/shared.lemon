@@ -1374,7 +1374,7 @@ function void fn0848b6()
 //# address-hook(0x0848e8) end(0x0848fc)
 function void fn0848e8()
 {
-	fn00fac4()
+	CheckRightWallCollision()
 	if (D1.s16 >= 0)
 		return
 
@@ -1387,7 +1387,7 @@ function void fn0848e8()
 //# address-hook(0x0848fe) end(0x084912)
 function void fn0848fe()
 {
-	fn00fe3c()
+	CheckLeftWallCollision()
 	if (D1.s16 >= 0)
 		return
 

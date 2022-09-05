@@ -20,6 +20,11 @@ function string getCharacterBluespherePaletteKey(u8 character)
 	return (character == CHARACTER_SONIC) ? "bluesphere_palette_sonic" : (character == CHARACTER_TAILS) ? "bluesphere_palette_tails" : "bluesphere_palette_knuckles"
 }
 
+function string getCharacterEndPosePaletteKey(u8 character)
+{
+	return (character == CHARACTER_SONIC) ? "endpose_palette_sonic" : (character == CHARACTER_TAILS) ? "endpose_palette_tails" : "endpose_palette_knuckles"
+}
+
 
 function u8 getUnderwaterPaletteVariantByCurrentZone()
 {
@@ -150,6 +155,53 @@ function void loadCharacterPalette(u8 character, u32 targetAddress, u8 paletteVa
 	}
 }
 
+
+function u8 getModdedEndPosePaletteLine(u8 character, bool isHyperEffect)
+{
+	string key = getCharacterEndPosePaletteKey(character)
+	u8 line = 2
+	if (isHyperEffect)
+	{
+		// Hyper color cycle (if mod supports it)
+		line = 3 + super.palettefx.frame / 18
+		if (!System.hasExternalPaletteData(key, line))
+		{
+			line = 1
+		}
+	}
+	return line
+}
+
+
+function void loadCharacterEndPosePalette(u8 character, u32 targetAddress, u8 paletteVariant)
+{
+	// Palette variants:
+	//  - 0 = Normal character palette
+	//  - 1 = Super character palette
+
+	// Load original character palette from ROM
+	u32 sourceAddress = (character == CHARACTER_SONIC) ? ((paletteVariant == 0) ? 0x060b6a : 0x060b8a) : (character == CHARACTER_TAILS) ? 0x060b4a : 0x060bea
+	copyMemory(targetAddress, sourceAddress, 0x20)
+
+	// Allow for loading modded palettes
+	if (EXTENDED_CHARACTER_PALETTES)
+	{
+		u16 numColors = System.loadExternalPaletteData(getCharacterEndPosePaletteKey(character), paletteVariant, 0x800000, 0x20)
+		for (u8 i = 0; i < numColors; ++i)
+		{
+			u32 rgba = u32[0x800000 + i * 4]
+			u16[targetAddress + i * 2] = packColorExt(rgba)
+		}
+
+		if (numColors < 0x20)
+		{
+			// First 16 colors got written in any case
+			numColors = max(numColors, 0x10)
+			zeroMemory(targetAddress + numColors * 2, 0x40 - numColors * 2)
+		}
+	}
+}
+
 #endif
 
 
@@ -234,6 +286,7 @@ function void UpdatePaletteEffects.SuperForm()
 	//  - 0x01 = Super Sonic
 	//  - 0x02 = Super/Hyper Tails
 	//  - 0x03 = Super/Hyper Knuckles
+	//  - 0xff = Super Flickies (uses Super Sonic's effects)
 	u8 characterVersion = isMainCharacter(CHARACTER_SONIC) ? ((super.active & 0x80) ? 0 : 1) : (getMainCharacter() + 1)
 
 	// There's three variants of this function:
@@ -301,7 +354,10 @@ function void UpdatePaletteEffects.SuperForm.originalVersion(u8 characterVersion
 			}
 
 			// Also update Sonic's colors, for the flickies
-			UpdatePaletteEffects.UpdateSuperSonic.Original(0xff)
+		#if STANDALONE
+			if (super.active.tails == 0xff)
+		#endif
+				UpdatePaletteEffects.UpdateSuperSonic.Original(0xff)
 		}
 		else
 		{
@@ -488,7 +544,8 @@ function void UpdatePaletteEffects.SuperForm.smoothedVersion(u8 characterVersion
 			}
 
 			// Also update Sonic's colors, for the flickies
-			UpdatePaletteEffects.UpdateSuperSonic.Smoothed(0xff)
+			if (super.active.tails == 0xff)
+				UpdatePaletteEffects.UpdateSuperSonic.Smoothed(0xff)
 		}
 		else
 		{
@@ -762,7 +819,8 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 			}
 
 			// Also update Sonic's colors, for the flickies
-			UpdatePaletteEffects.UpdateSuperSonic.Smoothed(0xff)
+			if (super.active.tails == 0xff)
+				UpdatePaletteEffects.UpdateSuperSonic.Smoothed(0xff)
 			return
 		}
 
@@ -900,4 +958,191 @@ function void UpdatePaletteEffects.SuperForm.moddingVersion(u8 characterVersion)
 	}
 }
 
+
+// Used for the big character pose sprites after the credits
+
+function bool UpdatePaletteEffects.SuperForm.endpose()
+{
+	// Palette effects depend on the character, and for Sonic on Hyper vs. Super form:
+	//  - 0x00 = Hyper Sonic
+	//  - 0x01 = Super Sonic
+	//  - 0x02 = Super/Hyper Tails
+	//  - 0x03 = Super/Hyper Knuckles
+	u8 characterVersion = isMainCharacter(CHARACTER_SONIC) ? ((objA0.subtype2c == 0x02) ? 0 : 1) : (getMainCharacter() + 1)
+
+	// There's three variants of this function:
+	//  - The original code -- handled outside this function
+	//  - Smoothed palette effects when an anti-flicker setting is active
+	//  - Variant for modded palettes
+
+	string characterPaletteKey = getCharacterEndPosePaletteKey(getMainCharacter())
+	string characterSpriteKey = 0
+
+	if (objA0.animation.sprite >= 0x03)
+		characterSpriteKey = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
+	else if (objA0.animation.sprite == 0x02)
+		characterSpriteKey = getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true)
+	else if (characterSpriteKey <= 0x01)
+		characterSpriteKey = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, false), objA0.animation.sprite - 0x00)
+	else
+		characterSpriteKey = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_KNUCKLES, false), objA0.animation.sprite)
+
+	bool isSuperPaletteModded = System.hasExternalPaletteData(characterPaletteKey, 2)		// Check line index 2, for Super/Hyper form palette
+	bool isSuperSpriteModded = Renderer.hasCustomSprite(characterSpriteKey)		// Check Super/Hyper form sprite
+
+	if (isSuperSpriteModded && isSuperPaletteModded)
+	{
+		// Modded super palettes (possible using different super colors) need a special handling
+		UpdatePaletteEffects.SuperForm.endpose.moddingVersion(characterVersion)
+		return true
+	}
+	else if (Game.getSetting(SETTING_GFX_ANTIFLICKER) != 0)
+	{
+		// Smoothed version of effects
+		UpdatePaletteEffects.SuperForm.endpose.smoothedVersion(characterVersion)
+		return true
+	}
+
+	// Original version of effects -- does not support modded palettes
+	return false
+}
+
+
+function void UpdatePaletteEffects.SuperForm.endpose.smoothedVersion(u8 characterVersion)
+{
+	// Update ongoing palette effect
+	if (characterVersion <= 1)
+	{
+		// Super/Hyper Sonic
+		u8 cycles = (Game.getSetting(SETTING_GFX_ANTIFLICKER) == 2) ? 0x18 : 0x0c
+		u16 nextFrame = (objA0.animation.frame + 6) % objA0.value3a
+		u32 address1 = u32[A0 + 0x30] + objA0.animation.frame
+		u32 address2 = u32[A0 + 0x30] + nextFrame
+		u16 blendFactor = objA0.animation.timer * 0x100 / cycles
+
+		for (u8 k = 0; k < 6; k += 2)
+		{
+			u16[0xfffffc44 + k] = blendColorsPacked(u16[address2 + k], u16[address1 + k], blendFactor)
+		}
+
+		--objA0.animation.timer
+		if (objA0.animation.timer < 0 || objA0.animation.timer > cycles)
+		{
+			objA0.animation.timer = cycles - 1
+			objA0.animation.frame = nextFrame
+		}
+	}
+	else if (characterVersion == 2)
+	{
+		// Super/Hyper Tails
+		u16 nextFrame = (objA0.animation.frame + 10) % 60
+		u32 address1 = 0x060c18 + objA0.animation.frame
+		u32 address2 = 0x060c18 + nextFrame
+		u8 cycles = 0x0c
+		u16 blendFactor = u16(objA0.animation.timer) * 0x100 / cycles
+
+		for (u8 k = 0; k < 8; k += 2)
+		{
+			u16[0xfffffc44 + k] = blendColorsPacked(u16[address2 + k], u16[address1 + k], blendFactor)
+		}
+
+		--objA0.animation.timer
+		if (objA0.animation.timer < 0 || objA0.animation.timer > cycles)
+		{
+			objA0.animation.timer = cycles - 1
+			objA0.animation.frame = nextFrame
+		}
+	}
+	else
+	{
+		// Super/Hyper Knuckles
+		u16 nextFrame = (u16[A0 + 0x3a] + 6) % 60
+		u8 cycles = (nextFrame == 0) ? 0x0f : 0x03
+		objA0.animation.timer = min(objA0.animation.timer, cycles - 1)
+		u32 address1 = 0x05fbe2 + u16[A0 + 0x3a]
+		u32 address2 = 0x05fbe2 + nextFrame
+		u16 blendFactor = objA0.animation.timer * 0x100 / cycles
+		u32 dest = 0xfffffc04
+
+		for (u8 k = 0; k < 4; k += 2)
+		{
+			u16[dest + k] = blendColorsPacked(u16[address2 + k], u16[address1 + k], blendFactor)
+		}
+		u16[dest + 6] = blendColorsPacked(u16[address2 + 4], u16[address1 + 4], blendFactor)
+		--objA0.animation.timer
+		if (objA0.animation.timer < 0 || objA0.animation.timer > cycles)
+		{
+			objA0.animation.timer = 0x10
+			u16[A0 + 0x3a] = nextFrame
+		}
+	}
+}
+
+
+function void UpdatePaletteEffects.SuperForm.endpose.moddingVersion(u8 characterVersion)
+{
+	// Update ongoing palette effect
+	u8 character = getMainCharacter()
+	bool isHyperEffect = (character == CHARACTER_SONIC && objA0.subtype2c == 0x02)
+	u16 nextFrame = (super.palettefx.frame + 6) % (isHyperEffect ? 108 : 18)
+	u16 blendFactor = super.palettefx.timer * 0x100 / (isHyperEffect ? 0x07 : 0x0f)
+	if (characterVersion == 2)
+	{
+		// Tails
+		nextFrame = (super.palettefx.frame.tails + 6) % (isHyperEffect ? 108 : 18)
+		blendFactor = super.palettefx.timer.tails * 0x100 / (isHyperEffect ? 0x07 : 0x0f)
+	}
+	if (nextFrame % 18 == 0)
+		blendFactor = 0x100 - blendFactor
+	else if (nextFrame % 18 == 12)
+		blendFactor = 0
+
+	u32 offset = character * 0x40
+	u32 source = 0x802180 + offset
+	u32 dest   = 0x802000 + offset
+
+	// Load modded Super palette
+	u8 line = getModdedEndPosePaletteLine(character, isHyperEffect)
+
+	zeroMemory(dest, 0x40)
+	u16 numColors = System.loadExternalPaletteData(getCharacterEndPosePaletteKey(character), line, 0x800000, 0x20)
+	for (u16 i = 0; i < numColors; ++i)
+	{
+		u32 rgba = u32[0x800000 + i * 4]
+		u16[dest + i * 2] = (rgba & 0xff000000) ? packColorExt(rgba) : 0
+	}
+
+	for (u8 k = 0; k < 0x40; k += 2)
+	{
+		if (u16[dest + k] == 0)
+		{
+			// Use original color as fallback
+			u16[dest + k] = u16[source + k]
+		}
+		else
+		{
+			// Apply flash effect
+			u16[dest + k] = blendColorsPacked(u16[dest + k], 0x0eee, blendFactor)
+		}
+	}
+
+	if (characterVersion == 2)
+	{
+		// Super/Hyper Tails
+		--super.palettefx.timer.tails
+		if (super.palettefx.timer.tails < 0)
+		{
+			super.palettefx.timer.tails = isHyperEffect ? 0x07 : 0x0f
+			super.palettefx.frame.tails = nextFrame
+		}
+		return
+	}
+
+	--super.palettefx.timer
+	if (super.palettefx.timer < 0)
+	{
+		super.palettefx.timer = isHyperEffect ? 0x07 : 0x0f
+		super.palettefx.frame = nextFrame
+	}
+}
 #endif

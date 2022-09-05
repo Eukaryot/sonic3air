@@ -512,7 +512,7 @@ function void fn00c866()
 	//  -  4:   0xffff0000,  0xc166,   0x000c,  0x0014
 	//  -  5:   0xffff0000,  0xc180,   0x000c,  0x0014
 	//  -  6:   0xffff0000,  0xc19a,   0x000c,  0x0014
-	//  -  7:   0xffff0104,  0xce98,   0x000c,  0x000a		-> Extensions for the first 6 save slots (S3K style)
+	//  -  7:   0xffff0104,  0xce18,   0x000c,  0x000a		-> Extensions for the first 6 save slots (S3K style)
 	//  -  8:   0xffff0104,  0xce32,   0x000c,  0x000a
 	//  -  9:   0xffff0104,  0xce4c,   0x000c,  0x000a
 	//  - 10:   0xffff0104,  0xce66,   0x000c,  0x000a
@@ -528,7 +528,7 @@ function void fn00c866()
 	for (u16 index = 0; index <= D7.u16; ++index)
 	{
 		A1 = u32[A0]										// Source in RAM
-		D0 = VDPHelper.getDirectVRAMWriteCode(u16[A0+4])	// Traget in VRAM
+		D0 = VDPHelper.getDirectVRAMWriteCode(u16[A0+4])	// Target in VRAM
 		D1.u16 = u16[A0+6]									// Width (minus one)
 		D2.u16 = u16[A0+8]									// Height (minus one)
 		fn001506()

@@ -633,6 +633,11 @@ function void fn05f480()
 
 	copyMemory(0xfffffc00, 0x060bea, 0x20)
 
+#if STANDALONE
+	loadCharacterEndPosePalette(CHARACTER_KNUCKLES, 0x802080, 0)
+	loadCharacterEndPosePalette(CHARACTER_KNUCKLES, 0x802200, 0)
+#endif
+
 	if (outro.ending_type > 0)
 	{
 		if (allocDynamicObjectStd())
@@ -865,6 +870,11 @@ function void fn05fba0()
 		fn05ec36()
 		return
 	}
+
+#if STANDALONE
+	if (UpdatePaletteEffects.SuperForm.endpose() != 0)
+		return
+#endif
 
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
@@ -1104,15 +1114,25 @@ function void fn08555e()
 	A1 = 0xffff0000 + u16[A0 + 0x30]
 	D0.u16 = u16[A0 + 0x3c]
 	D1 = 0x0e
-	D2 = 0xffffffe0
-	while (D0.s16 >= 0)
+	D2 = -0x20
+	for (u8 i = 0; i <= D0.s16; ++i)
 	{
-		fn085590()
-		--D0.s16
+		FadeOutColorUniform()
 	}
 
+#if STANDALONE
+	A1 = 0x802000
+	D0.u16 = 0xbf
+	D1 = 0x0e
+	D2 = -0x20
+	for (u8 i = 0; i <= D0.s16; ++i)
+	{
+		FadeOutColorUniform()
+	}
+#endif
+
 	--objA0.value39
-	if (s8[A0 + 0x39] < 0)
+	if (s8(objA0.value39) < 0)
 	{
 		u8[0xfffffabf] = 0
 		Object.TriggerUnloading()
@@ -1121,24 +1141,30 @@ function void fn08555e()
 
 
 //# address-hook(0x085590) end(0x0855b0)
-function void fn085590()
+function void FadeOutColorUniform()
 {
-	D3.u8 = u8[A1] & D1.u8
-	if (D3.u8 != 0)
-		D3.u8 -= 2
-	u8[(A1+=1)-1] = D3.u8
-
-	D4.u8 = u8[A1]
-	D3.u8 = u8[A1] & D2.u8
-	if (D3.u8 != 0)
-		D3.u8 -= 0x20
-
-	D4.u8 &= D1.u8
-	if (D4.u8 != 0)
-		D4.u8 -= 2
-	D4.u8 |= D3.u8
-
-	u8[(A1+=1)-1] = D4.u8
+	// Fade to black
+	u16 color = u16[A1]
+#if STANDALONE
+	color = makeNormalPackedColor(color)
+#endif
+	if (color != 0)
+	{
+		if (color & D1.u8)
+		{
+			color -= 0x0002
+		}
+		if (color & D2.u8)
+		{
+			color -= 0x0020
+		}
+		if (color & (D1 << 8))
+		{
+			color -= (0x0002 << 8)
+		}
+		u16[A1] = color
+	}
+	A1 += 2
 }
 
 

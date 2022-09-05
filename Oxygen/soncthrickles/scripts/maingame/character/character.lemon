@@ -646,11 +646,11 @@ function void partialUpdateCharacterOnGround()
 		{
 			pushA456()
 
-			fn00fd9a()
+			Character.CheckLeftWallCollision()
 			if (D1.s16 < 0)
 				char.position.x.u16 -= D1.s16
 
-			fn00fa7a()
+			Character.CheckRightWallCollision()
 			if (D1.s16 < 0)
 				char.position.x.u16 += D1.s16
 
@@ -1241,7 +1241,7 @@ function void UpdateKnucklesGlideCollision()
 					if (D0.s8 < 0)
 					{
 						char.flags |= char.flag.FACING_LEFT
-						fn00fcca()
+						CheckHitboxCollisionLeft()
 
 						D1.u16 |= D0.u16
 						if (D1.u16 != 0)
@@ -1251,7 +1251,7 @@ function void UpdateKnucklesGlideCollision()
 							if (global.inv_gravity == 0)
 							{
 								D2.u16 = char.position.y.u16 - 11
-								fn00f8a6()
+								Character.checkFloorEdgeCollisionFixedY()
 								if (D1.s16 < 0 || D1.u16 >= 12)
 								{
 									hit_wall = false
@@ -1264,7 +1264,7 @@ function void UpdateKnucklesGlideCollision()
 							else
 							{
 								D2.u16 = (char.position.y.u16 + 11) ^ 0x0f
-								fn00fc5c()
+								Character.checkCeilingEdgeCollisionFixedY()
 								if (D1.s16 < 0 || D1.u16 >= 12)
 								{
 									hit_wall = false
@@ -1283,7 +1283,7 @@ function void UpdateKnucklesGlideCollision()
 					else
 					{
 						char.flags &= ~char.flag.FACING_LEFT
-						fn00f9ba()
+						CheckHitboxCollisionRight()
 
 						D1.u16 |= D0.u16
 						if (D1.u16 != 0)
@@ -1293,7 +1293,7 @@ function void UpdateKnucklesGlideCollision()
 							if (global.inv_gravity == 0)
 							{
 								D2.u16 = char.position.y.u16 - 11
-								fn00f8a6()
+								Character.checkFloorEdgeCollisionFixedY()
 								if (D1.s16 < 0 || D1.u16 >= 12)
 								{
 									hit_wall = false
@@ -1306,7 +1306,7 @@ function void UpdateKnucklesGlideCollision()
 							else
 							{
 								D2.u16 = (char.position.y.u16 + 11) ^ 0x0f
-								fn00fc5c()
+								Character.checkCeilingEdgeCollisionFixedY()
 								if (D1.s16 < 0 || D1.u16 >= 12)
 								{
 									hit_wall = false
@@ -1896,7 +1896,7 @@ function void fn01793e()
 
 	if (angle == 0)
 	{
-		fn00fd9a()
+		Character.CheckLeftWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 -= D1.u16
@@ -1904,7 +1904,7 @@ function void fn01793e()
 			knuckles.glideclimbstate |= 0x20
 		}
 
-		fn00fa7a()
+		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 += D1.u16
@@ -1923,7 +1923,7 @@ function void fn01793e()
 	}
 	else if (angle == 0x40)
 	{
-		fn00fd9a()
+		Character.CheckLeftWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 -= D1.u16
@@ -1944,7 +1944,7 @@ function void fn01793e()
 					char.velocity.y = 0
 				return
 			}
-			fn00fa7a()
+			Character.CheckRightWallCollision()
 			if (D1.s16 < 0)
 			{
 				char.position.x.u16 += D1.u16
@@ -1968,7 +1968,7 @@ function void fn01793e()
 	}
 	else if (angle == 0x80)
 	{
-		fn00fd9a()
+		Character.CheckLeftWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 -= D1.u16
@@ -1976,7 +1976,7 @@ function void fn01793e()
 			knuckles.glideclimbstate |= 0x20
 		}
 
-		fn00fa7a()
+		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 += D1.u16
@@ -1995,7 +1995,7 @@ function void fn01793e()
 	}
 	else if (angle == 0xc0)
 	{
-		fn00fa7a()
+		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 += D1.u16
@@ -4615,7 +4615,7 @@ function void checkForBalancing()
 	{
 		// Not on an object
 		D3.u16 = char.position.x.u16
-		fn012006()
+		Character.checkGroundEdgeCollision()
 
 		if (D1.s16 >= 0x0c)
 		{
@@ -4625,7 +4625,7 @@ function void checkForBalancing()
 				if (char.character == CHARACTER_SONIC && !super.active)
 				{
 					D3.u16 = char.position.x.u16 - 6
-					fn012006()
+					Character.checkGroundEdgeCollision()
 					if (D1.s16 >= 0x0c)
 						balancing = 2
 				}
@@ -4636,7 +4636,7 @@ function void checkForBalancing()
 				if (char.character == CHARACTER_SONIC && !super.active)
 				{
 					D3.u16 = char.position.x.u16 + 6
-					fn012006()
+					Character.checkGroundEdgeCollision()
 					if (D1.s16 >= 0x0c)
 						balancing = -2
 				}
@@ -5672,15 +5672,15 @@ function void deflectProjectile()
 
 
 //# address-hook(0x012006) end(0x01200e)
-function void fn012006()
+function void Character.checkGroundEdgeCollision()
 {
 	if (global.inv_gravity == 0)
 	{
-		fn00f898()
+		Character.checkFloorEdgeCollision()
 	}
 	else
 	{
-		fn00fc4a()
+		Character.checkCeilingEdgeCollision()
 	}
 }
 
@@ -5910,14 +5910,14 @@ function void Character.CheckCollision()
 	D0.u8 = (D0.u8 - 0x20) & 0xc0
 	if (D0.u8 == 0)
 	{
-		fn00fd9a()
+		Character.CheckLeftWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 -= D1.u16
 			char.velocity.x = 0
 		}
 
-		fn00fa7a()
+		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 += D1.u16
@@ -5965,7 +5965,7 @@ function void Character.CheckCollision()
 	}
 	else if (D0.u8 == 0x40)
 	{
-		fn00fd9a()
+		Character.CheckLeftWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 -= D1.u16
@@ -5987,7 +5987,7 @@ function void Character.CheckCollision()
 			}
 			else
 			{
-				fn00fa7a()
+				Character.CheckRightWallCollision()
 				if (D1.s16 < 0)
 				{
 					char.position.x.u16 += D1.u16
@@ -6013,14 +6013,14 @@ function void Character.CheckCollision()
 	}
 	else if (D0.u8 == 0x80)
 	{
-		fn00fd9a()
+		Character.CheckLeftWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 -= D1.u16
 			char.velocity.x = 0
 		}
 
-		fn00fa7a()
+		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 += D1.u16
@@ -6051,7 +6051,7 @@ function void Character.CheckCollision()
 	}
 	else 	// (D0.u8 == 0xc0)
 	{
-		fn00fa7a()
+		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)
 		{
 			char.position.x.u16 += D1.s16

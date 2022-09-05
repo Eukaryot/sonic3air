@@ -300,17 +300,25 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u64 key = 0
 			u8 atex = 0
+			u8 flags = prioFlag ? SPRITE_FLAG_PRIO : 0
 
 			if (objA0.update_address == 0x05e18a)
 			{
 				atex = 0x20
 
 				if (objA0.animation.sprite >= 0x03)
+				{
 					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
-				if (objA0.animation.sprite == 0x02)
+					flags |= SPRITE_FLAG_FLIP_X
+				}
+				else if (objA0.animation.sprite == 0x02)
+				{
 					key = getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true)
+				}
 				else // if (objA0.animation.sprite <= 0x01)
+				{
 					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, false), objA0.animation.sprite - 0x00)
+				}
 			}
 
 			if (objA0.update_address == 0x05f4e4)
@@ -321,7 +329,13 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 
 			if (Renderer.hasCustomSprite(key))
 			{
-				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+				// Check if there's also a custom palette
+				string paletteKey = getCharacterEndPosePaletteKey(getMainCharacter())
+				if (System.hasExternalPaletteData(paletteKey, (objA0.subtype2c >= 0x00) ? 2 : 0))
+				{
+					atex = 0x40 + getMainCharacter() * 0x20
+				}
+				Renderer.drawCustomSprite(key, px, py, atex, flags, renderQueue)
 				return true
 			}
 		}
@@ -387,7 +401,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		//  -> Sub-mode that uses "real" Knuckles sprites
 		if ((objA0.update_address == 0x063a6a) || (objA0.update_address == 0x063de0 && u16[A0 + 0x44] == 0) || (objA0.update_address == 0x0656da && (objA0.flags38 & 0x40) == 0) || (objA0.update_address == 0x063466 && objA0.value42 == 0x02) || (objA0.update_address == 0x05e0d6) || (objA0.update_address == 0x05f46a))
 		{
-			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES)), objA0.animation.sprite)
+			u64 key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(CHARACTER_KNUCKLES, false)), objA0.animation.sprite)
 			if (!Renderer.hasCustomSprite(key))
 			{
 				key = Renderer.setupCustomCharacterSprite(0x1200e0, 0x14bd0a, 0x14a8d6, objA0.animation.sprite, 0x00)

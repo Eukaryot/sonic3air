@@ -1071,6 +1071,13 @@ function void fn05e334()
 //# address-hook(0x05e3c0) end(0x05e3e8)
 function void fn05e3c0()
 {
+#if STANDALONE
+	u32 targetAddress = 0x802000 + getMainCharacter() * 0x40
+	loadCharacterEndPosePalette(getMainCharacter(), targetAddress, 0)
+	targetAddress += 0x180
+	loadCharacterEndPosePalette(getMainCharacter(), targetAddress, 0)
+#endif
+
 	objA0.base_state = 0x08
 	objA0.countdown_value = 0x05
 	if (isMainCharacter(CHARACTER_TAILS))
@@ -1152,6 +1159,12 @@ function void fn05e474()
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 		return
+
+#if STANDALONE
+	super.palettefx.state = 0
+	loadCharacterEndPosePalette(CHARACTER_SONIC, 0x802000, 1)
+	loadCharacterEndPosePalette(CHARACTER_SONIC, 0x802180, 1)
+#endif
 
 	objA0.base_state = 0x10
 	objA0.animation.sprite = 0x02
@@ -1841,7 +1854,7 @@ function void fn05fcce()
 
 
 
-// Tails
+// Tails palette effect
 
 //# address-hook(0x05fcdc) end(0x05fce6)
 function void fn05fcdc()
@@ -1862,13 +1875,20 @@ function void fn05fcec()
 	}
 	else
 	{
+	#if STANDALONE
+		if (u8[0xfffff650] != 0)
+			return
+
+		if (UpdatePaletteEffects.SuperForm.endpose() != 0)
+			return
+	#endif
 		fn08598a()
 	}
 }
 
 
 
-// Sonic
+// Super / Hyper Sonic palette effect
 
 //# address-hook(0x05fcfc) end(0x05fd10)
 function void fn05fcfc()
@@ -1888,6 +1908,11 @@ function void fn05fd16()
 		fn05ec36()
 		return
 	}
+
+#if STANDALONE
+	if (UpdatePaletteEffects.SuperForm.endpose() != 0)
+		return
+#endif
 
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
