@@ -13,7 +13,18 @@ How to build the end user version:
 	- This build requires all of the same dependencies that you would have with the cmake version, so install SDL, libogg and libvorbis via homebrew with "brew install <name>" commands. The project is expecting them in /opt/local/lib/, which is where brew installs them by default.
 	- The binary will be copied into the same place that cmake would put it. 
 3. Run the command line version with -pack to get the packaged game data bin files.
-4. Copy the gamedata.bin and enginedata.bin files into the data/ subfolder in the _xcode folder. The contents of this folder will be copied into the compiled application bundle.
-5. Also copy scripts.bin in there too, it's in the /saves/ folder after you run the development version. And metadata.json from somewhere.
+4. Copy the gamedata.bin, enginedata.bin, audio data.bin and audioremaster.bin files into the data/ subfolder in the _xcode folder. The contents of this folder will be copied into the compiled application bundle.
+5. Also copy scripts.bin in there too, it's in the /saves/ folder after you run the development version.
 6. Switch the scheme at the top of Xcode to "sonic3air EndUser" and Build.
 	- If building for an actual release, you will want to use the "Archive" feature in Xcode so the build can be signed, notarized and exported from the archive.
+
+
+How to build the iOS version:
+=============================
+1. Perform the steps for the macOS End User build above, in order to get the .bin files into the data folder. (At least up to Step 5)
+2. Navigate to this folder via the command line.
+3. Run this command:
+xcodebuild -scheme sonic3air-ios -project sonic3air.xcodeproj -configuration Release clean archive -archivePath "s3airios.xcarchive" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+The archive contains the app, which can be zipped and the extension renamed to .ipa to install on a jailbroken device. The xcarchive can also be opened in Xcode, and it will allow you to export it signed to run on your own device without jailbreaking.
+
+You can also build and run the sonic3air-ios target directly inside Xcode, but you will be forced to sign the build if compiling for actual iOS devices.
