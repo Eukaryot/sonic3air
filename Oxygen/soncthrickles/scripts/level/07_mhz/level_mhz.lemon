@@ -834,7 +834,12 @@ function void fn055250()
 		return
 	}
 
-	if (u16[0xffffb000 + 0x14] > 0x0420 && u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
+#if STANDALONE
+	u16 minY = 0x0418	// Slightly higher, to avoid too early unloading of the parts of the level when jumping off the elevator at just the right position (which is possible only in S3AIR because of the faster elevator)
+#else
+	u16 minY = 0x0420
+#endif
+	if (u16[0xffffb000 + 0x14] > minY && u8[0xffffb000 + 0x2a] & char.flag.IN_AIR)
 	{
 		fn0554b8()
 		fn0552e4()
