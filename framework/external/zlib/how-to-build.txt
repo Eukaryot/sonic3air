@@ -1,7 +1,12 @@
 
-Build for Windows with Visual Studio 2019
+=== Build for Windows with Visual Studio 2019 ===
 
-zlib & minizip
+
+Using the build script
+	- Just execute "build_zlib.bat" and you're done
+
+
+Alternative: Manual build
 	- Uses a custom Visual Studio Solution "_vstudio/zlib.sln"
 	- Static Build
 	- Build as Debug + Release, for x86 + x64

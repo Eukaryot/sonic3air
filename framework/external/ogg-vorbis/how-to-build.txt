@@ -1,22 +1,27 @@
 
-Build for Windows with Visual Studio 2019
+=== Build for Windows with Visual Studio 2019 ===
 
-libogg
-	- Visual Studio Solution in "ogg-vorbis\libogg\win32\VS2015"
-	- If downloaded libogg separately or updating it:
-		- Changes in the Project Properties required for static build, for all configurations:
-			- C/C++ -> Code Generation -> "Runtime Library" = "Multi-threaded (/MT)"
-			- C/C++ -> Code Generation -> "Enable Function-Level Linking" = "Yes"
-	- Build as Debug + Release (for static build), for x86 + x64
-	- Afterwards execute "copy_libogg.bat" to copy headers and libs in place
 
-libvorbis
-	- Visual Studio Solution in "ogg-vorbis\libvorbis\win32\VS2010"
-	- Use the static build solution there
-	- If downloaded libvorbis separately or updating it:
-		- After download, remove the "psytune.c" and "tone.c" files under "ogg-vorbis\libvorbis\lib"
-		- Changes in the Project Properties required for static build, for all configurations:
-			- C/C++ -> Code Generation -> "Runtime Library" = "Multi-threaded (/MT)"
-			- C/C++ -> Code Generation -> "Enable Function-Level Linking" = "Yes"
-	- Build as Debug + Release, for x86 + x64
-	- Afterwards execute "copy_libvorbis.bat" to copy headers and libs in place
+Using the build script
+	- Just execute "build_ogg-vorbis.bat" and you're done
+
+
+Alternative: Manual build
+	- libogg
+		- Visual Studio Solution in "ogg-vorbis\libogg\win32\VS2015"
+		- If downloaded libogg separately or updating it:
+			- Changes in the Project Properties required for static build, for all configurations:
+				- C/C++ -> Code Generation -> "Runtime Library" = "Multi-threaded (/MT)"
+				- C/C++ -> Code Generation -> "Enable Function-Level Linking" = "Yes"
+		- Build as Debug + Release (for static build), for x86 + x64
+		- Afterwards execute "copy_libogg.bat" to copy headers and libs in place
+	- libvorbis
+		- Visual Studio Solution in "ogg-vorbis\libvorbis\win32\VS2010"
+		- Use the static build solution there
+		- If downloaded libvorbis separately or updating it:
+			- After download, remove the "psytune.c" and "tone.c" files under "ogg-vorbis\libvorbis\lib"
+			- Changes in the Project Properties required for static build, for all configurations:
+				- C/C++ -> Code Generation -> "Runtime Library" = "Multi-threaded (/MT)"
+				- C/C++ -> Code Generation -> "Enable Function-Level Linking" = "Yes"
+		- Build as Debug + Release, for x86 + x64
+		- Afterwards execute "copy_libvorbis.bat" to copy headers and libs in place
