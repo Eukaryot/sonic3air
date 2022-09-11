@@ -103,7 +103,7 @@ endif
 INCLUDES  += \
 				-I$(BASEDIR)/Oxygen/lemonscript/source \
 				-I$(BASEDIR)/Oxygen/oxygenengine/source \
-				-I$(BASEDIR)/Oxygen/soncthrickles/source \
+				-I$(BASEDIR)/Oxygen/sonic3air/source \
 				-I$(BASEDIR)/librmx/source
 
 INCLUDES += $(LIBS)
@@ -242,45 +242,45 @@ SOURCES	+=	\
 			Oxygen/oxygenengine/source/oxygen_netcore/network/internal/SentPacketCache \
 			Oxygen/oxygenengine/source/oxygen/pch \
 			Oxygen/oxygenengine/source/oxygen_netcore/pch \
-			Oxygen/soncthrickles/source/sonic3air/audio/AudioOut \
-			Oxygen/soncthrickles/source/sonic3air/audio/CustomAudioMixer \
-			Oxygen/soncthrickles/source/sonic3air/client/GameClient \
-			Oxygen/soncthrickles/source/sonic3air/client/GhostSync \
-			Oxygen/soncthrickles/source/sonic3air/client/UpdateCheck \
-			Oxygen/soncthrickles/source/sonic3air/ConfigurationImpl \
-			Oxygen/soncthrickles/source/sonic3air/data/PlayerProgress \
-			Oxygen/soncthrickles/source/sonic3air/data/PlayerRecorder \
-			Oxygen/soncthrickles/source/sonic3air/data/SharedDatabase \
-			Oxygen/soncthrickles/source/sonic3air/data/TimeAttackData \
-			Oxygen/soncthrickles/source/sonic3air/EngineDelegate \
-			Oxygen/soncthrickles/source/sonic3air/Game \
-			Oxygen/soncthrickles/source/sonic3air/generator/ResourceScriptGenerator \
-			Oxygen/soncthrickles/source/sonic3air/helper/BlueSpheresRendering \
-			Oxygen/soncthrickles/source/sonic3air/helper/DiscordIntegration \
-			Oxygen/soncthrickles/source/sonic3air/helper/GameUtils \
-			Oxygen/soncthrickles/source/sonic3air/main \
-			Oxygen/soncthrickles/source/sonic3air/menu/ActSelectMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/context/ApplicationContextMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/ExtrasMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/GameApp \
-			Oxygen/soncthrickles/source/sonic3air/menu/GameMenuBase \
-			Oxygen/soncthrickles/source/sonic3air/menu/GameMenuManager \
-			Oxygen/soncthrickles/source/sonic3air/menu/MainMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/MenuBackground \
-			Oxygen/soncthrickles/source/sonic3air/menu/ModsMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/options/ControllerSetupMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/options/OptionsEntry \
-			Oxygen/soncthrickles/source/sonic3air/menu/options/OptionsMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/options/OptionsMenuEntries \
-			Oxygen/soncthrickles/source/sonic3air/menu/overlays/SecretUnlockedWindow \
-			Oxygen/soncthrickles/source/sonic3air/menu/overlays/SkippableCutsceneWindow \
-			Oxygen/soncthrickles/source/sonic3air/menu/PauseMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/SharedResources \
-			Oxygen/soncthrickles/source/sonic3air/menu/TimeAttackMenu \
-			Oxygen/soncthrickles/source/sonic3air/menu/TimeAttackResultsMenu \
-			Oxygen/soncthrickles/source/sonic3air/scriptimpl/ScriptImplementations \
-			Oxygen/soncthrickles/source/sonic3air/_nativized/NativizedCode \
-			Oxygen/soncthrickles/source/sonic3air/pch \
+			Oxygen/sonic3air/source/sonic3air/audio/AudioOut \
+			Oxygen/sonic3air/source/sonic3air/audio/CustomAudioMixer \
+			Oxygen/sonic3air/source/sonic3air/client/GameClient \
+			Oxygen/sonic3air/source/sonic3air/client/GhostSync \
+			Oxygen/sonic3air/source/sonic3air/client/UpdateCheck \
+			Oxygen/sonic3air/source/sonic3air/ConfigurationImpl \
+			Oxygen/sonic3air/source/sonic3air/data/PlayerProgress \
+			Oxygen/sonic3air/source/sonic3air/data/PlayerRecorder \
+			Oxygen/sonic3air/source/sonic3air/data/SharedDatabase \
+			Oxygen/sonic3air/source/sonic3air/data/TimeAttackData \
+			Oxygen/sonic3air/source/sonic3air/EngineDelegate \
+			Oxygen/sonic3air/source/sonic3air/Game \
+			Oxygen/sonic3air/source/sonic3air/generator/ResourceScriptGenerator \
+			Oxygen/sonic3air/source/sonic3air/helper/BlueSpheresRendering \
+			Oxygen/sonic3air/source/sonic3air/helper/DiscordIntegration \
+			Oxygen/sonic3air/source/sonic3air/helper/GameUtils \
+			Oxygen/sonic3air/source/sonic3air/main \
+			Oxygen/sonic3air/source/sonic3air/menu/ActSelectMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/context/ApplicationContextMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/ExtrasMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/GameApp \
+			Oxygen/sonic3air/source/sonic3air/menu/GameMenuBase \
+			Oxygen/sonic3air/source/sonic3air/menu/GameMenuManager \
+			Oxygen/sonic3air/source/sonic3air/menu/MainMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/MenuBackground \
+			Oxygen/sonic3air/source/sonic3air/menu/ModsMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/options/ControllerSetupMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/options/OptionsEntry \
+			Oxygen/sonic3air/source/sonic3air/menu/options/OptionsMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/options/OptionsMenuEntries \
+			Oxygen/sonic3air/source/sonic3air/menu/overlays/SecretUnlockedWindow \
+			Oxygen/sonic3air/source/sonic3air/menu/overlays/SkippableCutsceneWindow \
+			Oxygen/sonic3air/source/sonic3air/menu/PauseMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/SharedResources \
+			Oxygen/sonic3air/source/sonic3air/menu/TimeAttackMenu \
+			Oxygen/sonic3air/source/sonic3air/menu/TimeAttackResultsMenu \
+			Oxygen/sonic3air/source/sonic3air/scriptimpl/ScriptImplementations \
+			Oxygen/sonic3air/source/sonic3air/_nativized/NativizedCode \
+			Oxygen/sonic3air/source/sonic3air/pch \
 			librmx/source/rmxbase/Basics \
 			librmx/source/rmxbase/BinarySerializer \
 			librmx/source/rmxbase/Bitmap \

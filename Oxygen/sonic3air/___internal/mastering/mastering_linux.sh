@@ -19,7 +19,7 @@ svn up ../../librmx
 svn up ../../framework/external
 svn up ../lemonscript
 svn up ../oxygenengine
-svn up ../soncthrickles
+svn up ../sonic3air
 
 pushd ./build/_cmake/build
 	cmake -DCMAKE_BUILD_TYPE=Release ..

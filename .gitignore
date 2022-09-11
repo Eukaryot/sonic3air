@@ -56,37 +56,38 @@ bin/
 
 # Oxygen
 /Oxygen/oxygenengine/OxygenApp
-/Oxygen/soncthrickles/Sonic3AIR
-/Oxygen/soncthrickles/source/_cmake/build/*
-/Oxygen/soncthrickles/___internal/analysis/*
-/Oxygen/soncthrickles/saves/scripts.bin
-/Oxygen/soncthrickles/saves/rec
-/Oxygen/soncthrickles/enginedata.bin
-/Oxygen/soncthrickles/gamedata.bin
+/Oxygen/sonic3air/Sonic3AIR
+/Oxygen/sonic3air/source/_cmake/build/*
+/Oxygen/sonic3air/___internal/analysis/*
+/Oxygen/sonic3air/saves/scripts.bin
+/Oxygen/sonic3air/saves/rec
+/Oxygen/sonic3air/enginedata.bin
+/Oxygen/sonic3air/gamedata.bin
 
 # Xcode
-/Oxygen/soncthrickles/build/_xcode/sonic3air.xcodeproj/project.xcworkspace/xcuserdata/*
-/Oxygen/soncthrickles/build/_xcode/sonic3air.xcodeproj/xcuserdata/*
-/Oxygen/soncthrickles/build/_xcode/data/font
-/Oxygen/soncthrickles/build/_xcode/data/*.bin
-/Oxygen/soncthrickles/build/_xcode/data/metadata.json
+/Oxygen/sonic3air/build/_xcode/sonic3air.xcodeproj/project.xcworkspace/xcuserdata/*
+/Oxygen/sonic3air/build/_xcode/sonic3air.xcodeproj/xcuserdata/*
+/Oxygen/sonic3air/build/_xcode/data/font
+/Oxygen/sonic3air/build/_xcode/data/*.bin
+/Oxygen/sonic3air/build/_xcode/data/metadata.json
 mac_dist
 
 # Web
-/Oxygen/soncthrickles/build/_emscripten/build
-/Oxygen/soncthrickles/build/_emscripten/dist/loader.js
-/Oxygen/soncthrickles/build/_emscripten/dist/sonic3air.data
-/Oxygen/soncthrickles/build/_emscripten/dist/sonic3air_web.js
-/Oxygen/soncthrickles/build/_emscripten/dist/sonic3air_web.wasm
+/Oxygen/sonic3air/build/_emscripten/build
+/Oxygen/sonic3air/build/_emscripten/dist/loader.js
+/Oxygen/sonic3air/build/_emscripten/dist/sonic3air.data
+/Oxygen/sonic3air/build/_emscripten/dist/sonic3air_web.js
+/Oxygen/sonic3air/build/_emscripten/dist/sonic3air_web.wasm
 
 # Android
-/Oxygen/soncthrickles/build/_android/local.properties
+/Oxygen/sonic3air/build/_android/local.properties
 
 # Discord Game SDL binaries
-!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.dll
-!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.lib
-!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.dylib
-!/Oxygen/soncthrickles/source/external/discord_game_sdk/lib/*/*.so
+!/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.dll
+!/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.lib
+!/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.dylib
+!/Oxygen/sonic3air/source/external/discord_game_sdk/lib/*/*.so
+
 framework/external/ogg-vorbis/libogg/build
 framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/project.xcworkspace/xcuserdata
 framework/external/ogg-vorbis/libogg/xcode/libogg.xcodeproj/xcuserdata

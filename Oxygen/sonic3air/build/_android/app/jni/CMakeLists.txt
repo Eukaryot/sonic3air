@@ -26,7 +26,7 @@ include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizi
 include_directories(${WORKSPACE_DIR}/librmx/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/oxygenengine/source)
-include_directories(${WORKSPACE_DIR}/Oxygen/soncthrickles/source)
+include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source)
 
 
 
@@ -123,7 +123,7 @@ target_link_libraries(oxygen oxygen_netcore)
 
 # Sonic3AIR
 
-file(GLOB_RECURSE SONIC3AIR_SOURCES ${WORKSPACE_DIR}/Oxygen/soncthrickles/source/sonic3air/*.cpp)
+file(GLOB_RECURSE SONIC3AIR_SOURCES ${WORKSPACE_DIR}/Oxygen/sonic3air/source/sonic3air/*.cpp)
 
 add_library(main SHARED ${SONIC3AIR_SOURCES})
 

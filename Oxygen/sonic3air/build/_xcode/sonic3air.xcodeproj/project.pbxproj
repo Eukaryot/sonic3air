@@ -1425,7 +1425,7 @@
 		9E0C5E7D247DD5AF000105D0 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = "$(PROJECT_DIR)/../../../soncthrickles";
+			dstPath = "$(PROJECT_DIR)/../../../sonic3air";
 			dstSubfolderSpec = 0;
 			files = (
 				9E0C5F51247E017D000105D0 /* Sonic3AIR in CopyFiles */,
@@ -2367,7 +2367,7 @@
 				9E64752627DB059600612BC4 /* sonic3air_iosApp */,
 				9EB0699724807A9C0080AC49 /* oxygenApp_MacApp */,
 				9E6E8515245F895C00114DEB /* oxygenengine */,
-				9E6E7B9E245F88D200114DEB /* soncthrickles */,
+				9E6E7B9E245F88D200114DEB /* sonic3air */,
 				9E6E7B51245F886B00114DEB /* lemonscript */,
 				9E6E7A6F245F882600114DEB /* librmx */,
 				9E6E7A48245F722F00114DEB /* Products */,
@@ -2808,15 +2808,15 @@
 			path = compiler;
 			sourceTree = "<group>";
 		};
-		9E6E7B9E245F88D200114DEB /* soncthrickles */ = {
+		9E6E7B9E245F88D200114DEB /* sonic3air */ = {
 			isa = PBXGroup;
 			children = (
 				9E6E7BA0245F88D200114DEB /* oxygenproject.json */,
 				9E6E7BA1245F88D200114DEB /* config.json */,
 				9E6E7BA2245F88D200114DEB /* source */,
 			);
-			name = soncthrickles;
-			path = ../../../soncthrickles;
+			name = sonic3air;
+			path = ../../../sonic3air;
 			sourceTree = "<group>";
 		};
 		9E6E7BA2245F88D200114DEB /* source */ = {
@@ -5196,7 +5196,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
@@ -5235,7 +5235,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
@@ -5281,7 +5281,7 @@
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
 					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
@@ -5327,7 +5327,7 @@
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
 					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
@@ -5371,7 +5371,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
 					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
 					"$(PROJECT_DIR)/../../source/external/",
@@ -5426,7 +5426,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
 					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
 					"$(PROJECT_DIR)/../../source/external/",
@@ -5593,7 +5593,7 @@
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
 					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
@@ -5635,7 +5635,7 @@
 					"$(PROJECT_DIR)/../../../../librmx/source/",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
-					"$(PROJECT_DIR)/../../../soncthrickles/source",
+					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
 					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",

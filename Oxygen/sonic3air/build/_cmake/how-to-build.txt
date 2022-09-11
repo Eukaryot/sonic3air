@@ -12,7 +12,7 @@ If needed, install them via "sudo apt-get install" (for Debian-based systems, th
 	=> Complete line to copy:   sudo apt-get install g++ cmake libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev
 
 Setup and build with CMake:
-	- cd ./Oxygen/soncthrickles/source/_cmake/build
+	- cd ./Oxygen/sonic3air/source/_cmake/build
 	- cmake -DCMAKE_BUILD_TYPE=Release ..
 	- cmake --build .
 
@@ -20,10 +20,10 @@ Setup and build with CMake:
 
 === Run Linux Builds ===
 
-For both, place a copy of the S3&K ROM "Sonic_Knuckles_wSonic3.bin" inside "Oxygen/soncthrickles/___internal".
+For both, place a copy of the S3&K ROM "Sonic_Knuckles_wSonic3.bin" inside "Oxygen/sonic3air/___internal".
 
 Run S3AIR:
-	- cd Oxygen/soncthrickles
+	- cd Oxygen/sonic3air
 	- ./sonic3air_linux
 
 Run Oxygen:

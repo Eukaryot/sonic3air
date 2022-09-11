@@ -1,6 +1,6 @@
 
 Preparation:
-- Go to "app/src/main/assets" and copy from the soncthrickles main directory:
+- Go to "app/src/main/assets" and copy from the sonic3air main directory:
 	- data (you can leave out the audio data to make builds faster during development)
 	- scripts
 	- config.json

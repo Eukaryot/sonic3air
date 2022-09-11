@@ -7,7 +7,7 @@
 sudo (dkp-)pacman -Syu
 sudo (dkp-)pacman -S switch-pkg-config devkitA64 switch-tools switch-sdl2 switch-glad switch-glm switch-libogg switch-libopus switch-libvorbis switch-libtheora
 ```
-3. In this directory (Oxygen/soncthrickles/build/_make):
+3. In this directory (Oxygen/sonic3air/build/_make):
 ```
 make PLATFORM=Switch
 ```

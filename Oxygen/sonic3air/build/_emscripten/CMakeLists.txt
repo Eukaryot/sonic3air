@@ -39,8 +39,8 @@ include_directories(${WORKSPACE_DIR}/framework/external/sdl/SDL2/include)
 include_directories(${WORKSPACE_DIR}/librmx/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/oxygenengine/source)
-include_directories(${WORKSPACE_DIR}/Oxygen/soncthrickles/source)
-include_directories(${WORKSPACE_DIR}/Oxygen/soncthrickles/source/external)
+include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source)
+include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source/external)
 include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
 
 
@@ -137,11 +137,11 @@ target_link_libraries(oxygen_enduser oxygen_netcore)
 
 # Sonic3AIR
 
-file(GLOB_RECURSE SONIC3AIR_SOURCES ${WORKSPACE_DIR}/Oxygen/soncthrickles/source/sonic3air/*.cpp)
+file(GLOB_RECURSE SONIC3AIR_SOURCES ${WORKSPACE_DIR}/Oxygen/sonic3air/source/sonic3air/*.cpp)
 
 # TODO: CMake seems to use a different working directory for this, so "Oxygen" is intentionally missing here
 SET(CMAKE_EXECUTABLE_SUFFIX ".js")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKSPACE_DIR}/soncthrickles/build/_emscripten/dist")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${WORKSPACE_DIR}/sonic3air/build/_emscripten/dist")
 
 add_executable(Sonic3AIR ${SONIC3AIR_SOURCES})
 
