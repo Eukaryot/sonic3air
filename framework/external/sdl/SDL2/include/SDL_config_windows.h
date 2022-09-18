@@ -25,6 +25,16 @@
 
 #include "SDL_platform.h"
 
+
+// -----------------------------------------------------------------------------------------------
+// [Euka] Added this change that seems needed for static Windows 64-bit builds with Visual Studio
+//  -> This prevents the linker error due to multiple "memcpy" definitions
+#if defined(_MSC_VER) && !defined(_WINDLL)
+    #define HAVE_LIBC
+#endif
+// -----------------------------------------------------------------------------------------------
+
+
 /* winsdkver.h defines _WIN32_MAXVER for SDK version detection. It is present since at least the Windows 7 SDK,
  * but out of caution we'll only use it if the compiler supports __has_include() to confirm its presence.
  * If your compiler doesn't support __has_include() but you have winsdkver.h, define HAVE_WINSDKVER_H.  */
