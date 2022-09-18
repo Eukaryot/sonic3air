@@ -396,29 +396,15 @@ function void LevelRingsTableBuilder.buildRings_AIZ2()
 	LevelRingsTableBuilder.addRing(0x2fd0, 0x0358)
 	LevelRingsTableBuilder.addRing(0x2fd0, 0x0570)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
-	{
-		// Fix for one misplaced ring, move it 0x100 to the left (changing order)
-		LevelRingsTableBuilder.addRing(0x30b0, 0x03d8)
-		LevelRingsTableBuilder.addRing(0x30c8, 0x03a4)
-		LevelRingsTableBuilder.addRing(0x3100, 0x0390)
-		LevelRingsTableBuilder.addRing(0x3120, 0x05fc)
-		LevelRingsTableBuilder.addRing(0x3138, 0x03a4)
-		LevelRingsTableBuilder.addRing(0x3140, 0x05f4)
-		LevelRingsTableBuilder.addRing(0x3150, 0x03d8)
-		LevelRingsTableBuilder.addRing(0x3160, 0x05ec)
-	}
-	else
-	{
-		LevelRingsTableBuilder.addRing(0x30c8, 0x03a4)
-		LevelRingsTableBuilder.addRing(0x3100, 0x0390)
-		LevelRingsTableBuilder.addRing(0x3120, 0x05fc)
-		LevelRingsTableBuilder.addRing(0x3138, 0x03a4)
-		LevelRingsTableBuilder.addRing(0x3140, 0x05f4)
-		LevelRingsTableBuilder.addRing(0x3150, 0x03d8)
-		LevelRingsTableBuilder.addRing(0x3160, 0x05ec)
-		LevelRingsTableBuilder.addRing(0x31b0, 0x03d8)
-	}
+	// Fix for one misplaced ring, move it 0x100 to the left (changing order of the next block of rings)
+	LevelRingsTableBuilder.addRing(0x30b0, 0x03d8)
+	LevelRingsTableBuilder.addRing(0x30c8, 0x03a4)
+	LevelRingsTableBuilder.addRing(0x3100, 0x0390)
+	LevelRingsTableBuilder.addRing(0x3120, 0x05fc)
+	LevelRingsTableBuilder.addRing(0x3138, 0x03a4)
+	LevelRingsTableBuilder.addRing(0x3140, 0x05f4)
+	LevelRingsTableBuilder.addRing(0x3150, 0x03d8)
+	LevelRingsTableBuilder.addRing(0x3160, 0x05ec)
 
 	LevelRingsTableBuilder.addRing(0x31e0, 0x0470)
 	LevelRingsTableBuilder.addRing(0x3200, 0x0480)

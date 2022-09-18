@@ -19,20 +19,12 @@ function void LevelRingsTableBuilder.buildRings_MGZ1()
 	LevelRingsTableBuilder.addRing(0x0410, 0x0c18)
 	LevelRingsTableBuilder.addRing(0x0428, 0x0c48)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
-	{
-		// Remove some rings not collectible or seemingly misplaced
-		LevelRingsTableBuilder.addRing(0x0440, 0x0c78)
-		LevelRingsTableBuilder.addRing(0x0458, 0x0ca8)
-	}
-	else
-	{
-		LevelRingsTableBuilder.addRing(0x0438, 0x0b08)
-		LevelRingsTableBuilder.addRing(0x0440, 0x0c78)
-		LevelRingsTableBuilder.addRing(0x0450, 0x0ad8)
-		LevelRingsTableBuilder.addRing(0x0458, 0x0ca8)
-		LevelRingsTableBuilder.addRing(0x0468, 0x0aa8)
-	}
+	// Remove some rings not collectible or seemingly misplaced
+	//LevelRingsTableBuilder.addRing(0x0438, 0x0b08)
+	LevelRingsTableBuilder.addRing(0x0440, 0x0c78)
+	//LevelRingsTableBuilder.addRing(0x0450, 0x0ad8)
+	LevelRingsTableBuilder.addRing(0x0458, 0x0ca8)
+	//LevelRingsTableBuilder.addRing(0x0468, 0x0aa8)
 
 	LevelRingsTableBuilder.addRing(0x0470, 0x0cd8)
 	LevelRingsTableBuilder.addRing(0x0480, 0x0a78)
@@ -851,6 +843,7 @@ function void LevelRingsTableBuilder.buildRings_MGZ2()
 
 	if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
 	{
+		// Add new rings over the checkpoint
 		LevelRingsTableBuilder.addRing(0x3528, 0x06bc)
 		LevelRingsTableBuilder.addRing(0x3540, 0x06bc)
 		LevelRingsTableBuilder.addRing(0x3558, 0x06bc)
