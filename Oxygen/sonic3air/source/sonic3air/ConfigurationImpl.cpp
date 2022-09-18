@@ -106,121 +106,25 @@ bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 	{
 		const auto& settingsMap = SharedDatabase::getSettings();
 
-		// Current format or legacy support...?
-		if (mGameVersionInSettings >= "19.10.30.0")
+		JsonHelper gameSettingsHelper(rootHelper.mJson["GameSettings"]);
+
+		// Load settings as uint32 values
+		for (auto& pair : settingsMap)
 		{
-			JsonHelper gameSettingsHelper(rootHelper.mJson["GameSettings"]);
-
-			// Load settings as uint32 values
-			for (auto& pair : settingsMap)
+			if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
 			{
-				if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
+				int value = 0;
+				if (gameSettingsHelper.tryReadInt(pair.second.mIdentifier, value))
 				{
-					int value = 0;
-					if (gameSettingsHelper.tryReadInt(pair.second.mIdentifier, value))
-					{
-						pair.second.mCurrentValue = (uint32)value;
-					}
+					pair.second.mCurrentValue = (uint32)value;
 				}
-			}
-
-			if (mGameVersionInSettings < "20.05.01.0")
-			{
-				// Enforce auto-detect once if user had an older version before
-				mAutoDetectRenderMethod = true;
 			}
 		}
-		else
+
+		if (mGameVersionInSettings < "20.05.01.0")
 		{
-			// Compatibility with former property names
-			{
-				const std::vector<std::pair<std::string, uint32>> DEPRECATED_NAMES_LOOKUP =
-				{
-					{ "GfxAntiFlicker",					SharedDatabase::Setting::SETTING_GFX_ANTIFLICKER },
-					{ "MusicSelect_TitleTheme",			SharedDatabase::Setting::SETTING_AUDIO_TITLE_THEME },
-					{ "MusicSelect_ExtraLifeJingle",	SharedDatabase::Setting::SETTING_AUDIO_EXTRALIFE_JINGLE },
-					{ "MusicSelect_InvincibilityTheme", SharedDatabase::Setting::SETTING_AUDIO_INVINCIBILITY_THEME },
-					{ "MusicSelect_SuperTheme",			SharedDatabase::Setting::SETTING_AUDIO_SUPER_THEME },
-					{ "MusicSelect_MiniBossTheme",		SharedDatabase::Setting::SETTING_AUDIO_MINIBOSS_THEME },
-					{ "MusicSelect_KnucklesTheme",		SharedDatabase::Setting::SETTING_AUDIO_KNUCKLES_THEME },
-					{ "MusicSelect_HiddenPalaceMusic",	SharedDatabase::Setting::SETTING_AUDIO_HPZ_MUSIC },
-					{ "SpecialStageVisuals",			SharedDatabase::Setting::SETTING_BS_VISUAL_STYLE },
-					{ "Region",							SharedDatabase::Setting::SETTING_REGION_CODE },
-					{ "TimeAttackGhosts",				SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS },
-					{ "DropDashActive",					SharedDatabase::Setting::SETTING_DROPDASH },
-					{ "SuperPeelOutActive",				SharedDatabase::Setting::SETTING_SUPER_PEELOUT },
-					{ "DebugMode",						SharedDatabase::Setting::SETTING_DEBUG_MODE }
-				};
-				int valueA = 0;
-				bool valueB = false;
-				for (const auto& pair : DEPRECATED_NAMES_LOOKUP)
-				{
-					if (rootHelper.tryReadInt(pair.first, valueA))
-					{
-						settingsMap.at(pair.second).mCurrentValue = (uint32)valueA;
-					}
-					else if (rootHelper.tryReadBool(pair.first, valueB))
-					{
-						settingsMap.at(pair.second).mCurrentValue = valueB ? 1 : 0;
-					}
-				}
-			}
-
-			if (mGameVersionInSettings >= "19.07.27.0")
-			{
-				JsonHelper settingsHelper(rootHelper.mJson["Settings"]);
-
-				// Load settings as uint32 values
-				for (auto& pair : settingsMap)
-				{
-					if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
-					{
-						// Replace "SETTING_" with "GAMEPLAY_TWEAK_"
-						const std::string identifier = "GAMEPLAY_TWEAK_" + pair.second.mIdentifier.substr(8);
-						int value = 0;
-						if (settingsHelper.tryReadInt(identifier, value))
-						{
-							pair.second.mCurrentValue = (uint32)value;
-						}
-					}
-				}
-			}
-			else
-			{
-				// Load settings as bool values
-				bool value = false;
-				for (auto& pair : settingsMap)
-				{
-					if (pair.second.mSerializationType != SharedDatabase::Setting::SerializationType::NONE)
-					{
-						// Replace "SETTING_" with "GAMEPLAY_TWEAK_"
-						const std::string identifier = "GAMEPLAY_TWEAK_" + pair.second.mIdentifier.substr(8);
-						if (rootHelper.tryReadBool("GameplayTweak::" + identifier, value))
-						{
-							pair.second.mCurrentValue = value ? 1 : 0;
-						}
-					}
-				}
-
-				// Handle settings that got merged
-				bool value1 = false;
-				bool value2 = false;
-				if (rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_TAILS_ASSIST", value1) &&
-					(rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_MANIA_TAILS_ASSIST", value2) || rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_MOD_MANIA_TAILS_ASSIST", value2)))
-				{
-					settingsMap.at(SharedDatabase::Setting::SETTING_TAILS_ASSIST_MODE).mCurrentValue = value1 ? (value2 ? 2 : 1) : 0;
-				}
-				if (rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_LEVELLAYOUTS_AIR", value1) &&
-					rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_LEVELLAYOUTS_SONIC3", value2))
-				{
-					settingsMap.at(SharedDatabase::Setting::SETTING_LEVELLAYOUTS).mCurrentValue = value2 ? 0 : (value1 ? 2 : 1);
-				}
-				if (rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_RANDOM_MONITORS", value1) &&
-					rootHelper.tryReadBool("GameplayTweak::GAMEPLAY_TWEAK_RANDOM_SHIELDS", value2))
-				{
-					settingsMap.at(SharedDatabase::Setting::SETTING_RANDOM_MONITORS).mCurrentValue = value1 ? 2 : (value2 ? 1 : 0);
-				}
-			}
+			// Enforce auto-detect once if user had an older version before
+			mAutoDetectRenderMethod = true;
 		}
 
 		if (mGameVersionInSettings < "22.08.27.0")
