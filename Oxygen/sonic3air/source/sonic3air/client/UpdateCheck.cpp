@@ -23,15 +23,15 @@ namespace
 		return "windows";
 	#elif defined(PLATFORM_LINUX)
 		return "linux";
-	#elif defined(PLATFROM_MAC)
+	#elif defined(PLATFORM_MAC)
 		return "mac";
 	#elif defined(PLATFORM_ANDROID)
 		return "android";
 	#elif defined(PLATFORM_IOS)
 		return "ios";
-	#elif defined(PLATFROM_WEB)
+	#elif defined(PLATFORM_WEB)
 		return "web";
-	#elif defined(PLATFROM_SWITCH)
+	#elif defined(PLATFORM_SWITCH)
 		return "switch";
 	#else
 		return "unknown";

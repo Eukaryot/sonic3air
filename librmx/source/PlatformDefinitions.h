@@ -35,8 +35,8 @@
 	#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 		#define PLATFORM_IOS
 	#else
-	#define PLATFORM_MAC
-		#endif
+		#define PLATFORM_MAC
+	#endif
 	#define USE_UTF8_PATHS
 
 #elif __ANDROID__
