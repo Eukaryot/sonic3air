@@ -14,11 +14,14 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	// (after all, there is the reason why they are not present in the original game)
 	bool addMissingWheelObjects = Game.getSetting(SETTING_FIX_GLITCHES)
 
+	// The Sonic 3 level layouts originally miss a lot of enemies in Knuckles' path, but this adds them in just in the other layouts
+	bool addEnemiesToSonic3Layout = true	// Instead of "Game.getSetting(SETTING_LEVELLAYOUTS) != 0"
+
 	LevelObjectTableBuilder.addObject(0x00d0, 0x0830, OBJECTTABLE1_01, 0x04, 0)
 	LevelObjectTableBuilder.addObject(0x0160, 0x0850, OBJECTTABLE1_08, 0x10, 0)
 	LevelObjectTableBuilder.addObject(0x0180, 0x0680, OBJECTTABLE1_41, 0x04, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x01a0, 0x0850, OBJECTTABLE1_a3, 0x00, LVLOBJ_FLIP_X)
 	}
@@ -42,7 +45,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x03e8, 0x0630, OBJECTTABLE1_4a, 0x2b, 0)
 	LevelObjectTableBuilder.addObject(0x03e8, 0x0630, OBJECTTABLE1_4a, 0xd5, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x0456, 0x0890, OBJECTTABLE1_a3, 0x00, LVLOBJ_FLIP_X)
 	}
@@ -60,7 +63,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x0630, 0x0a20, OBJECTTABLE1_0d, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x0640, 0x0ba0, OBJECTTABLE1_48, 0x00, LVLOBJ_FLIP_X)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x0680, 0x0a30, OBJECTTABLE1_a3, 0x00, LVLOBJ_FLIP_X)
 	}
@@ -95,7 +98,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x09f0, 0x09b0, OBJECTTABLE1_01, 0x03, 0)
 	LevelObjectTableBuilder.addObject(0x0a00, 0x0ab0, OBJECTTABLE1_01, 0x01, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x0a00, 0x0b58, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -150,7 +153,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x0d40, 0x0b20, OBJECTTABLE1_48, 0x00, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x0d48, 0x04b0, OBJECTTABLE1_07, 0x12, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x0d50, 0x0980, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -219,11 +222,13 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x125f, 0x02b1, OBJECTTABLE1_01, 0x08, 0)
 	LevelObjectTableBuilder.addObject(0x1280, 0x0478, OBJECTTABLE1_4b, 0x80, LVLOBJ_FLIP_X | LVLOBJ_FLIP_Y)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x1280, 0x0ac0, OBJECTTABLE1_a5, 0x00, 0)
-		LevelObjectTableBuilder.addObject(0x12c0, 0x05e0, OBJECTTABLE1_6b, 0x71, 0)
 	}
+
+	// This object is originally not in the Sonic 3 layouts, but is meant as a fix for collision, so we include it anyways
+	LevelObjectTableBuilder.addObject(0x12c0, 0x05e0, OBJECTTABLE1_6b, 0x71, 0)
 
 	LevelObjectTableBuilder.addObject(0x12d8, 0x0120, OBJECTTABLE1_0d, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x1300, 0x07c0, OBJECTTABLE1_4e, 0x28, LVLOBJ_FLIP_X | LVLOBJ_IGNORE_Y)
@@ -239,7 +244,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x13c0, 0x0150, OBJECTTABLE1_4c, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x13f0, 0x0850, OBJECTTABLE1_08, 0x10, LVLOBJ_FLIP_Y)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x1400, 0x0a80, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -253,7 +258,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x14d0, 0x08f0, OBJECTTABLE1_46, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x14f0, 0x0900, OBJECTTABLE1_46, 0x80, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x1500, 0x0a80, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -283,7 +288,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 		LevelObjectTableBuilder.addObject(0x1600, 0x03b8, OBJECTTABLE1_49, 0x00, 0)
 	}
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x1600, 0x0a80, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -309,7 +314,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x1700, 0x0510, OBJECTTABLE1_4a, 0x2b, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x1700, 0x0510, OBJECTTABLE1_4a, 0xd5, LVLOBJ_FLIP_X)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x1700, 0x0a80, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -430,7 +435,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x2070, 0x0700, OBJECTTABLE1_02, 0x01, 0)
 	LevelObjectTableBuilder.addObject(0x2080, 0x0480, OBJECTTABLE1_02, 0x01, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x2080, 0x0970, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -445,7 +450,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x2120, 0x0418, OBJECTTABLE1_02, 0x04, 0)
 	LevelObjectTableBuilder.addObject(0x2180, 0x0280, OBJECTTABLE1_4e, 0x30, LVLOBJ_IGNORE_Y)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x2180, 0x0970, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -460,7 +465,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x2280, 0x0280, OBJECTTABLE1_4e, 0x30, LVLOBJ_FLIP_X | LVLOBJ_IGNORE_Y)
 	LevelObjectTableBuilder.addObject(0x2280, 0x05b0, OBJECTTABLE1_08, 0x01, LVLOBJ_FLIP_Y)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x2280, 0x0970, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -476,7 +481,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x2370, 0x0610, OBJECTTABLE1_46, 0x20, 0)
 	LevelObjectTableBuilder.addObject(0x2380, 0x0460, OBJECTTABLE1_47, 0x41, LVLOBJ_FLIP_X)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x2388, 0x0b74, OBJECTTABLE1_a4, 0x00, 0)
 	}
@@ -485,7 +490,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x23b8, 0x0750, OBJECTTABLE1_07, 0x12, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x23c0, 0x0248, OBJECTTABLE1_85, 0x03, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x23c8, 0x0b0c, OBJECTTABLE1_a4, 0x00, LVLOBJ_FLIP_Y)
 	}
@@ -494,10 +499,8 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x23e0, 0x09e0, OBJECTTABLE1_2a, 0x01, 0)
 	LevelObjectTableBuilder.addObject(0x23e0, 0x0a68, OBJECTTABLE1_34, 0x8a, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
-	{
-		LevelObjectTableBuilder.addObject(0x23e8, 0x0bb0, OBJECTTABLE1_6b, 0x14, LVLOBJ_FLIP_X)
-	}
+	// This object is originally not in the Sonic 3 layouts, but is meant as a fix for collision, so we include it anyways
+	LevelObjectTableBuilder.addObject(0x23e8, 0x0bb0, OBJECTTABLE1_6b, 0x14, LVLOBJ_FLIP_X)
 
 	LevelObjectTableBuilder.addObject(0x23f0, 0x0640, OBJECTTABLE1_46, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x2410, 0x0650, OBJECTTABLE1_46, 0x00, 0)
@@ -522,10 +525,8 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x24dc, 0x0570, OBJECTTABLE1_01, 0x03, 0)
 	LevelObjectTableBuilder.addObject(0x24f0, 0x06c0, OBJECTTABLE1_46, 0x00, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
-	{
-		LevelObjectTableBuilder.addObject(0x2518, 0x0ba0, OBJECTTABLE1_6b, 0x15, LVLOBJ_FLIP_X)
-	}
+	// This object is originally not in the Sonic 3 layouts, but is meant as a fix for collision, so we include it anyways
+	LevelObjectTableBuilder.addObject(0x2518, 0x0ba0, OBJECTTABLE1_6b, 0x15, LVLOBJ_FLIP_X)
 
 	LevelObjectTableBuilder.addObject(0x2520, 0x06d0, OBJECTTABLE1_46, 0x10, 0)
 	LevelObjectTableBuilder.addObject(0x2540, 0x0450, OBJECTTABLE1_46, 0x30, 0)
@@ -584,7 +585,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x28a0, 0x04e0, OBJECTTABLE1_47, 0x20, 0)
 	LevelObjectTableBuilder.addObject(0x28c0, 0x0270, OBJECTTABLE1_a3, 0x00, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x28d8, 0x0a30, OBJECTTABLE1_a3, 0x00, 0)
 	}
@@ -630,7 +631,7 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x2c40, 0x02c8, OBJECTTABLE1_3c, 0x80, LVLOBJ_FLIP_Y)
 	LevelObjectTableBuilder.addObject(0x2c40, 0x04a0, OBJECTTABLE1_48, 0x20, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
+	if (addEnemiesToSonic3Layout)
 	{
 		LevelObjectTableBuilder.addObject(0x2c80, 0x0af0, OBJECTTABLE1_a5, 0x00, 0)
 	}
@@ -643,10 +644,8 @@ function void LevelObjectTableBuilder.buildObjects_CNZ1()
 	LevelObjectTableBuilder.addObject(0x2d00, 0x0b40, OBJECTTABLE1_47, 0x41, 0)
 	LevelObjectTableBuilder.addObject(0x2d20, 0x04d0, OBJECTTABLE1_a3, 0x00, 0)
 
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
-	{
-		LevelObjectTableBuilder.addObject(0x2d58, 0x0b40, OBJECTTABLE1_6b, 0x15, LVLOBJ_FLIP_X)
-	}
+	// This object is originally not in the Sonic 3 layouts, but is meant as a fix for collision, so we include it anyways
+	LevelObjectTableBuilder.addObject(0x2d58, 0x0b40, OBJECTTABLE1_6b, 0x15, LVLOBJ_FLIP_X)
 
 	LevelObjectTableBuilder.addObject(0x2d60, 0x0800, OBJECTTABLE1_47, 0x45, 0)
 
