@@ -14,12 +14,17 @@
 class ServerNetConnection : public NetConnection
 {
 public:
-	inline explicit ServerNetConnection(uint32 playerID) : mPlayerID(playerID) {}
+	inline explicit ServerNetConnection(uint32 playerID) :
+		mPlayerID(playerID),
+		mHexPlayerID(rmx::hexString(playerID, 8, "@"))
+	{}
 
 	inline uint32 getPlayerID() const  { return mPlayerID; }
+	inline const std::string& getHexPlayerID() const  { return mHexPlayerID; }
 
 	void unregisterPlayer();
 
 private:
 	uint32 mPlayerID = 0;
+	std::string mHexPlayerID;
 };

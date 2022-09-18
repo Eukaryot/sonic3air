@@ -92,7 +92,7 @@ bool UpdateCheck::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 				return false;
 
 			ServerNetConnection& connection = static_cast<ServerNetConnection&>(evaluation.mConnection);
-			RMX_LOG_INFO("AppUpdateCheckRequest: " << request.mQuery.mAppName << ", " << request.mQuery.mPlatform << ", " << request.mQuery.mReleaseChannel << ", " << rmx::hexString(request.mQuery.mInstalledAppVersion, 8) << " (from " << connection.getPlayerID() << ")");
+			RMX_LOG_INFO("AppUpdateCheckRequest: " << request.mQuery.mAppName << ", " << request.mQuery.mPlatform << ", " << request.mQuery.mReleaseChannel << ", " << rmx::hexString(request.mQuery.mInstalledAppVersion, 8) << " (from " << connection.getHexPlayerID() << ")");
 
 			request.mResponse.mHasUpdate = false;
 			if (request.mQuery.mAppName == "sonic3air")

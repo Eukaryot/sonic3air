@@ -83,7 +83,7 @@ NetConnection* Server::createNetConnection(ConnectionManager& connectionManager,
 		{
 			ServerNetConnection& connection = mNetConnectionPool.createObject(playerID);
 			mNetConnectionsByPlayerID[playerID] = &connection;
-			RMX_LOG_INFO("Created new connection with player ID " << playerID << " (now " << mNetConnectionsByPlayerID.size() << " total connections)");
+			RMX_LOG_INFO("Created new connection with player ID " << connection.getHexPlayerID() << " (now " << mNetConnectionsByPlayerID.size() << " total connections)");
 			return &connection;
 		}
 	}
@@ -93,7 +93,7 @@ NetConnection* Server::createNetConnection(ConnectionManager& connectionManager,
 void Server::destroyNetConnection(NetConnection& connection)
 {
 	ServerNetConnection& serverNetConnection = static_cast<ServerNetConnection&>(connection);
-	RMX_LOG_INFO("Removing connection with player ID " << serverNetConnection.getPlayerID() << " (now " << (mNetConnectionsByPlayerID.size() - 1) << " total connections)");
+	RMX_LOG_INFO("Removing connection with player ID " << serverNetConnection.getHexPlayerID() << " (now " << (mNetConnectionsByPlayerID.size() - 1) << " total connections)");
 
 	serverNetConnection.unregisterPlayer();
 	mNetConnectionsByPlayerID.erase(serverNetConnection.getPlayerID());
