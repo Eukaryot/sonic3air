@@ -81,71 +81,9 @@ bool ConfigurationImpl::loadConfigurationInternal(JsonHelper& jsonHelper)
 
 bool ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType)
 {
-	loadSettingsInternal(rootHelper, settingsType, false);
-	return true;
-}
-
-void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
-{
-	// Dev mode
-	Json::Value devModeJson = rootHelper.mJson["DevMode"];
-	if (devModeJson.isObject())
-	{
-		JsonHelper devModeHelper(devModeJson);
-		devModeHelper.tryReadBool("EnforceDebugMode", mDevModeImpl.mEnforceDebugMode);
-	}
-
-	// Game server
-	{
-		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
-		if (!gameServerJson.isNull())
-		{
-			// General game server settings
-			JsonHelper gameServerHelper(gameServerJson);
-			gameServerHelper.tryReadString("ServerAddress", mGameServer.mServerHostName);
-			gameServerHelper.tryReadInt("ServerPortUDP", mGameServer.mServerPortUDP);
-			gameServerHelper.tryReadInt("ServerPortTCP", mGameServer.mServerPortTCP);
-			gameServerHelper.tryReadInt("ServerPortWSS", mGameServer.mServerPortWSS);
-
-			// Update Check settings
-			const Json::Value& updateCheckJson = gameServerHelper.mJson["UpdateCheck"];
-			if (!updateCheckJson.isNull())
-			{
-				JsonHelper jsonHelper(updateCheckJson);
-				jsonHelper.tryReadInt("UpdateChannel", mGameServer.mUpdateCheck.mReleaseChannel);
-			}
-
-			// Ghost Sync settings
-			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
-			if (!ghostSyncJson.isNull())
-			{
-				JsonHelper jsonHelper(ghostSyncJson);
-				jsonHelper.tryReadBool("Enabled", mGameServer.mGhostSync.mEnabled);
-				jsonHelper.tryReadString("ChannelName", mGameServer.mGhostSync.mChannelName);
-				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServer.mGhostSync.mShowOffscreenGhosts);
-			}
-		}
-	}
-}
-
-void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType, bool isDeprecatedJson)
-{
-	if (!isDeprecatedJson && settingsType == SettingsType::STANDARD)
+	if (settingsType == SettingsType::STANDARD)
 	{
 		rootHelper.tryReadString("GameVersion", mGameVersionInSettings);
-
-		// Support "Deprecated" JSON object already which might get used by future game versions
-		//  -> This feature was added in 11/2019
-		if (mGameVersionInSettings > BUILD_STRING)
-		{
-			Json::Value deprecatedJson = rootHelper.mJson["Deprecated"];
-			if (deprecatedJson.isObject())
-			{
-				JsonHelper deprecatedJsonHelper(deprecatedJson);
-				loadSettingsInternal(deprecatedJsonHelper, settingsType, true);
-			}
-		}
-
 		loadSharedSettingsConfig(rootHelper);
 	}
 
@@ -169,7 +107,7 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 		const auto& settingsMap = SharedDatabase::getSettings();
 
 		// Current format or legacy support...?
-		if (isDeprecatedJson || mGameVersionInSettings >= "19.10.30.0")
+		if (mGameVersionInSettings >= "19.10.30.0")
 		{
 			JsonHelper gameSettingsHelper(rootHelper.mJson["GameSettings"]);
 
@@ -298,6 +236,7 @@ void ConfigurationImpl::loadSettingsInternal(JsonHelper& rootHelper, SettingsTyp
 			ghosts.mCurrentValue = (ghosts.mCurrentValue >= 5) ? 5 : (ghosts.mCurrentValue >= 3) ? 3 : (ghosts.mCurrentValue >= 1) ? 1 : 0;
 		}
 	}
+	return true;
 }
 
 void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType settingsType)
@@ -359,5 +298,48 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 			gameServerJson["UpdateCheck"] = updateCheckJson;
 		}
 		root["GameServer"] = gameServerJson;
+	}
+}
+
+void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
+{
+	// Dev mode
+	Json::Value devModeJson = rootHelper.mJson["DevMode"];
+	if (devModeJson.isObject())
+	{
+		JsonHelper devModeHelper(devModeJson);
+		devModeHelper.tryReadBool("EnforceDebugMode", mDevModeImpl.mEnforceDebugMode);
+	}
+
+	// Game server
+	{
+		const Json::Value& gameServerJson = rootHelper.mJson["GameServer"];
+		if (!gameServerJson.isNull())
+		{
+			// General game server settings
+			JsonHelper gameServerHelper(gameServerJson);
+			gameServerHelper.tryReadString("ServerAddress", mGameServer.mServerHostName);
+			gameServerHelper.tryReadInt("ServerPortUDP", mGameServer.mServerPortUDP);
+			gameServerHelper.tryReadInt("ServerPortTCP", mGameServer.mServerPortTCP);
+			gameServerHelper.tryReadInt("ServerPortWSS", mGameServer.mServerPortWSS);
+
+			// Update Check settings
+			const Json::Value& updateCheckJson = gameServerHelper.mJson["UpdateCheck"];
+			if (!updateCheckJson.isNull())
+			{
+				JsonHelper jsonHelper(updateCheckJson);
+				jsonHelper.tryReadInt("UpdateChannel", mGameServer.mUpdateCheck.mReleaseChannel);
+			}
+
+			// Ghost Sync settings
+			const Json::Value& ghostSyncJson = gameServerHelper.mJson["GhostSync"];
+			if (!ghostSyncJson.isNull())
+			{
+				JsonHelper jsonHelper(ghostSyncJson);
+				jsonHelper.tryReadBool("Enabled", mGameServer.mGhostSync.mEnabled);
+				jsonHelper.tryReadString("ChannelName", mGameServer.mGhostSync.mChannelName);
+				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServer.mGhostSync.mShowOffscreenGhosts);
+			}
+		}
 	}
 }

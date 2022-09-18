@@ -37,7 +37,6 @@ protected:
 
 private:
 	void loadSharedSettingsConfig(JsonHelper& rootHelper);
-	void loadSettingsInternal(JsonHelper& rootHelper, SettingsType settingsType, bool isDeprecatedJson);
 
 public:
 	// Audio
