@@ -396,7 +396,7 @@ int main(argc,argv)
                    ((argv[i][1]>='0') || (argv[i][1]<='9'))) &&
                   (strlen(argv[i]) == 2)))
             {
-                FILE * fin;
+                FILE * fin = NULL;
                 size_t size_read;
                 const char* filenameinzip = argv[i];
                 const char *savefilenameinzip;
@@ -473,7 +473,7 @@ int main(argc,argv)
                     do
                     {
                         err = ZIP_OK;
-                        size_read = fread(buf,1,size_buf,fin);
+                        size_read = (int)fread(buf,1,size_buf,fin);
                         if (size_read < size_buf)
                             if (feof(fin)==0)
                         {
@@ -483,7 +483,7 @@ int main(argc,argv)
 
                         if (size_read>0)
                         {
-                            err = zipWriteInFileInZip (zf,buf,(unsigned)size_read);
+                            err = zipWriteInFileInZip (zf,buf,size_read);
                             if (err<0)
                             {
                                 printf("error in writing %s in the zipfile\n",

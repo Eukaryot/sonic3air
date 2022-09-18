@@ -250,7 +250,7 @@ static int do_list(uf)
         char filename_inzip[256];
         unz_file_info64 file_info;
         uLong ratio=0;
-        const char *string_method;
+        const char *string_method = "";
         char charCrypt=' ';
         err = unzGetCurrentFileInfo64(uf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
         if (err!=UNZ_OK)
