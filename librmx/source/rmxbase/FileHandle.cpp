@@ -9,6 +9,34 @@
 #include "../rmxbase.h"
 
 
+namespace
+{
+	const char* getModeString(uint32 flags)
+	{
+		switch (flags & 0x0f)
+		{
+			case FILE_ACCESS_READ:      return (flags & FILE_ACCESS_TEXT) ? "rt" : "rb";
+			case FILE_ACCESS_WRITE:     return (flags & FILE_ACCESS_TEXT) ? "wt" : "wb";
+			case FILE_ACCESS_APPEND:    return (flags & FILE_ACCESS_TEXT) ? "at" : "ab";
+			case FILE_ACCESS_READWRITE: return (flags & FILE_ACCESS_TEXT) ? "rt+": "rb+";
+			default:					return "";
+		}
+	}
+
+	const wchar_t* getModeStringW(uint32 flags)
+	{
+		switch (flags & 0x0f)
+		{
+			case FILE_ACCESS_READ:      return (flags & FILE_ACCESS_TEXT) ? L"rt" : L"rb";
+			case FILE_ACCESS_WRITE:     return (flags & FILE_ACCESS_TEXT) ? L"wt" : L"wb";
+			case FILE_ACCESS_APPEND:    return (flags & FILE_ACCESS_TEXT) ? L"at" : L"ab";
+			case FILE_ACCESS_READWRITE: return (flags & FILE_ACCESS_TEXT) ? L"rt+": L"rb+";
+			default:					return L"";
+		}
+	}
+}
+
+
 FileHandle::FileHandle()
 {
 }
@@ -34,22 +62,12 @@ bool FileHandle::open(const String& filename, uint32 flags)
 	if (nullptr != mFile)
 		close();
 
-	const char* mode = "";
-	switch (flags & 0x0f)
-	{
-		case FILE_ACCESS_READ:      mode = (flags & FILE_ACCESS_TEXT) ? "rt" : "rb";  break;
-		case FILE_ACCESS_WRITE:     mode = (flags & FILE_ACCESS_TEXT) ? "wt" : "wb";  break;
-		case FILE_ACCESS_APPEND:    mode = (flags & FILE_ACCESS_TEXT) ? "at" : "ab";  break;
-		case FILE_ACCESS_READWRITE: mode = (flags & FILE_ACCESS_TEXT) ? "rt+": "rb+"; break;
-	}
-
-#ifdef PLATFORM_WINDOWS
-	if (fopen_s(&mFile, *filename, mode) != 0)
-		mFile = nullptr;
-#elif defined USE_UTF8_PATHS
-	mFile = fopen(*WString(filename).toUTF8(), mode);
+#if defined(PLATFORM_WINDOWS)
+	mFile = _fsopen(*filename, ::getModeString(flags), ((flags & 0x0f) == FILE_ACCESS_READ) ? _SH_DENYNO : _SH_DENYWR);		// Allow shared file reading
+#elif defined(USE_UTF8_PATHS)
+	mFile = fopen(*WString(filename).toUTF8(), ::getModeString(flags));
 #else
-	mFile = fopen(*filename, mode);
+	mFile = fopen(*filename, ::getModeString(flags));
 #endif
 
 	if (nullptr == mFile)
@@ -65,38 +83,14 @@ bool FileHandle::open(const WString& filename, uint32 flags)
 	if (nullptr != mFile)
 		close();
 
-#ifdef PLATFORM_WINDOWS
-	const wchar_t* mode = L"";
-	switch (flags & 0x0f)
-	{
-		case FILE_ACCESS_READ:      mode = (flags & FILE_ACCESS_TEXT) ? L"rt" : L"rb";  break;
-		case FILE_ACCESS_WRITE:     mode = (flags & FILE_ACCESS_TEXT) ? L"wt" : L"wb";  break;
-		case FILE_ACCESS_APPEND:    mode = (flags & FILE_ACCESS_TEXT) ? L"at" : L"ab";  break;
-		case FILE_ACCESS_READWRITE: mode = (flags & FILE_ACCESS_TEXT) ? L"at+": L"ab+"; break;
-	}
-
-	if (_wfopen_s(&mFile, *filename, mode) != 0)
+#if defined(PLATFORM_WINDOWS)
+	mFile = _wfsopen(*filename, ::getModeStringW(flags), ((flags & 0x0f) == FILE_ACCESS_READ) ? _SH_DENYNO : _SH_DENYWR);	// Allow shared file reading
+#elif defined(USE_UTF8_PATHS)
+	mFile = fopen(*filename.toUTF8(), ::getModeString(flags));
 #else
-	const char* mode = "";
-	switch (flags & 0x0f)
-	{
-		case FILE_ACCESS_READ:      mode = (flags & FILE_ACCESS_TEXT) ? "rt" : "rb";  break;
-		case FILE_ACCESS_WRITE:     mode = (flags & FILE_ACCESS_TEXT) ? "wt" : "wb";  break;
-		case FILE_ACCESS_APPEND:    mode = (flags & FILE_ACCESS_TEXT) ? "at" : "ab";  break;
-		case FILE_ACCESS_READWRITE: mode = (flags & FILE_ACCESS_TEXT) ? "at+": "ab+"; break;
-	}
+	mFile = fopen(*filename.toString(), ::getModeString(flags));
+#endif
 
-#ifdef USE_UTF8_PATHS
-	mFile = fopen(*filename.toUTF8(), mode);
-#else
-	mFile = fopen(*filename.toString(), mode);
-#endif
-	if (nullptr == mFile)
-#endif
-	{
-		mFile = nullptr;
-		return false;
-	}
 	if (nullptr == mFile)
 		return false;
 
