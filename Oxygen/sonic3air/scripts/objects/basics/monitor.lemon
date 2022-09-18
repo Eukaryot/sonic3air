@@ -435,7 +435,7 @@ function void MonitorIntact.CheckBlocking()
 		{
 			canOpenMonitor = true
 		}
-		else if (objA0.velocity.y != 0)
+		else if (objA0.velocity.y > 0)		// Fixed some unintentional interactions, #contributed by iCloudius
 		{
 			canOpenMonitor = true
 		}
