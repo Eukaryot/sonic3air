@@ -36,16 +36,27 @@ typedef struct {
     struct xdg_surface *surface;
     union {
         struct xdg_toplevel *toplevel;
-        struct xdg_popup *popup;
+        struct {
+            struct xdg_popup *popup;
+            struct xdg_positioner *positioner;
+            Uint32 parentID;
+            SDL_Window *child;
+        } popup;
     } roleobj;
     SDL_bool initial_configure_seen;
 } SDL_xdg_shell_surface;
+
+#define WINDOW_IS_XDG_POPUP(window) \
+    (window->flags & (SDL_WINDOW_TOOLTIP | SDL_WINDOW_POPUP_MENU))
 
 #ifdef HAVE_LIBDECOR_H
 typedef struct {
     struct libdecor_frame *frame;
     SDL_bool initial_configure_seen;
 } SDL_libdecor_surface;
+
+#define WINDOW_IS_LIBDECOR(viddata, window) \
+    (viddata->shell.libdecor && !WINDOW_IS_XDG_POPUP(window))
 #endif
 
 typedef struct {
@@ -63,13 +74,16 @@ typedef struct {
     } shell_surface;
     struct wl_egl_window *egl_window;
     struct SDL_WaylandInput *keyboard_device;
+#if SDL_VIDEO_OPENGL_EGL
     EGLSurface egl_surface;
+#endif
     struct zwp_locked_pointer_v1 *locked_pointer;
     struct zwp_confined_pointer_v1 *confined_pointer;
     struct zxdg_toplevel_decoration_v1 *server_decoration;
     struct zwp_keyboard_shortcuts_inhibitor_v1 *key_inhibitor;
     struct zwp_idle_inhibitor_v1 *idle_inhibitor;
     struct xdg_activation_token_v1 *activation_token;
+    struct wp_viewport *viewport;
 
     /* floating dimensions for restoring from maximized and fullscreen */
     int floating_width, floating_height;
@@ -84,6 +98,12 @@ typedef struct {
     int num_outputs;
 
     float scale_factor;
+    float pointer_scale_x;
+    float pointer_scale_y;
+    int drawable_width, drawable_height;
+    SDL_Rect damage_region;
+    SDL_bool needs_resize_event;
+    SDL_bool floating_resize_pending;
 } SDL_WindowData;
 
 extern void Wayland_ShowWindow(_THIS, SDL_Window *window);

@@ -18,6 +18,10 @@ Alternative: Manual build
 	- Afterwards execute "copy_sdl.bat" to copy headers and libs in place
 
 
+Fixes to apply after updating
+	- Include fix for Android audio when plugging in/out headphones
+
+
 Notes on SDL2 static builds
 	- Static builds don't work for x64, only for x86 builds
 	- The following libraries need to be linked separately under Windows if you link to SDL2 statically:

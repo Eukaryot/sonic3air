@@ -28,6 +28,7 @@
 #include "../SDL_pixels_c.h"
 #include "../../events/SDL_keyboard_c.h"
 #include "../../events/SDL_mouse_c.h"
+#include "../../SDL_hints_c.h"
 
 #include "SDL_windowsvideo.h"
 #include "SDL_windowswindow.h"
@@ -51,16 +52,17 @@ static const TCHAR *SDL_HelperWindowClassName = TEXT("SDLHelperWindowInputCatche
 static const TCHAR *SDL_HelperWindowName = TEXT("SDLHelperWindowInputMsgWindow");
 static ATOM SDL_HelperWindowClass = 0;
 
-/* For borderless Windows, still want the following flags:
+/* For borderless Windows, still want the following flag:
+   - WS_MINIMIZEBOX: window will respond to Windows minimize commands sent to all windows, such as windows key + m, shaking title bar, etc.
+   Additionally, non-fullscreen windows can add:
    - WS_CAPTION: this seems to enable the Windows minimize animation
    - WS_SYSMENU: enables system context menu on task bar
-   - WS_MINIMIZEBOX: window will respond to Windows minimize commands sent to all windows, such as windows key + m, shaking title bar, etc.
    This will also cause the task bar to overlap the window and other windowed behaviors, so only use this for windows that shouldn't appear to be fullscreen
  */
 
 #define STYLE_BASIC         (WS_CLIPSIBLINGS | WS_CLIPCHILDREN)
-#define STYLE_FULLSCREEN    (WS_POPUP)
-#define STYLE_BORDERLESS    (WS_POPUP)
+#define STYLE_FULLSCREEN    (WS_POPUP | WS_MINIMIZEBOX)
+#define STYLE_BORDERLESS    (WS_POPUP | WS_MINIMIZEBOX)
 #define STYLE_BORDERLESS_WINDOWED (WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX)
 #define STYLE_NORMAL        (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX)
 #define STYLE_RESIZABLE     (WS_THICKFRAME | WS_MAXIMIZEBOX)
@@ -156,7 +158,7 @@ WIN_SetWindowPositionInternal(_THIS, SDL_Window * window, UINT flags)
     int w, h;
 
     /* Figure out what the window area will be */
-    if (SDL_ShouldAllowTopmost() && ((window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_INPUT_FOCUS)) == (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_INPUT_FOCUS) || (window->flags & SDL_WINDOW_ALWAYS_ON_TOP))) {
+    if (SDL_ShouldAllowTopmost() && (window->flags & SDL_WINDOW_ALWAYS_ON_TOP)) {
         top = HWND_TOPMOST;
     } else {
         top = HWND_NOTOPMOST;
@@ -167,6 +169,13 @@ WIN_SetWindowPositionInternal(_THIS, SDL_Window * window, UINT flags)
     data->expected_resize = SDL_TRUE;
     SetWindowPos(hwnd, top, x, y, w, h, flags);
     data->expected_resize = SDL_FALSE;
+}
+
+static void SDLCALL
+WIN_MouseRelativeModeCenterChanged(void *userdata, const char *name, const char *oldValue, const char *hint)
+{
+    SDL_WindowData *data = (SDL_WindowData *)userdata;
+    data->mouse_relative_mode_center = SDL_GetStringBoolean(hint, SDL_TRUE);
 }
 
 static int
@@ -187,10 +196,12 @@ SetupWindowData(_THIS, SDL_Window * window, HWND hwnd, HWND parent, SDL_bool cre
     data->hinstance = (HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
     data->created = created;
     data->high_surrogate = 0;
-    data->mouse_button_flags = 0;
+    data->mouse_button_flags = (WPARAM)-1;
     data->last_pointer_update = (LPARAM)-1;
     data->videodata = videodata;
     data->initializing = SDL_TRUE;
+
+    SDL_AddHintCallback(SDL_HINT_MOUSE_RELATIVE_MODE_CENTER, WIN_MouseRelativeModeCenterChanged, data);
 
     window->driverdata = data;
 
@@ -296,7 +307,39 @@ SetupWindowData(_THIS, SDL_Window * window, HWND hwnd, HWND parent, SDL_bool cre
     return 0;
 }
 
+static void CleanupWindowData(_THIS, SDL_Window * window)
+{
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
 
+    if (data) {
+        SDL_DelHintCallback(SDL_HINT_MOUSE_RELATIVE_MODE_CENTER, WIN_MouseRelativeModeCenterChanged, data);
+
+        if (data->keyboard_hook) {
+            UnhookWindowsHookEx(data->keyboard_hook);
+        }
+        ReleaseDC(data->hwnd, data->hdc);
+        RemoveProp(data->hwnd, TEXT("SDL_WindowData"));
+        if (data->created) {
+            DestroyWindow(data->hwnd);
+            if (data->parent) {
+                DestroyWindow(data->parent);
+            }
+        } else {
+            /* Restore any original event handler... */
+            if (data->wndproc != NULL) {
+#ifdef GWLP_WNDPROC
+                SetWindowLongPtr(data->hwnd, GWLP_WNDPROC,
+                                 (LONG_PTR) data->wndproc);
+#else
+                SetWindowLong(data->hwnd, GWL_WNDPROC,
+                              (LONG_PTR) data->wndproc);
+#endif
+            }
+        }
+        SDL_free(data);
+    }
+    window->driverdata = NULL;
+}
 
 int
 WIN_CreateWindow(_THIS, SDL_Window * window)
@@ -421,6 +464,9 @@ WIN_CreateWindowFrom(_THIS, SDL_Window * window, const void *data)
                     }
                 }
             }
+        } else if (window->flags & SDL_WINDOW_OPENGL) {
+            /* Try to set up the pixel format, if it hasn't been set by the application */
+            WIN_GL_SetupWindow(_this, window);
         }
     }
 #endif
@@ -442,39 +488,40 @@ WIN_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon)
     HWND hwnd = ((SDL_WindowData *) window->driverdata)->hwnd;
     HICON hicon = NULL;
     BYTE *icon_bmp;
-    int icon_len, mask_len, y;
-    SDL_RWops *dst;
+    int icon_len, mask_len, row_len, y;
+    BITMAPINFOHEADER *bmi;
+    Uint8 *dst;
     SDL_bool isstack;
 
     /* Create temporary buffer for ICONIMAGE structure */
+    SDL_COMPILE_TIME_ASSERT(WIN_SetWindowIcon_uses_BITMAPINFOHEADER_to_prepare_an_ICONIMAGE, sizeof(BITMAPINFOHEADER) == 40);
     mask_len = (icon->h * (icon->w + 7)/8);
-    icon_len = 40 + icon->h * icon->w * sizeof(Uint32) + mask_len;
+    icon_len = sizeof(BITMAPINFOHEADER) + icon->h * icon->w * sizeof(Uint32) + mask_len;
     icon_bmp = SDL_small_alloc(BYTE, icon_len, &isstack);
-    dst = SDL_RWFromMem(icon_bmp, icon_len);
-    if (!dst) {
-        SDL_small_free(icon_bmp, isstack);
-        return;
-    }
 
     /* Write the BITMAPINFO header */
-    SDL_WriteLE32(dst, 40);
-    SDL_WriteLE32(dst, icon->w);
-    SDL_WriteLE32(dst, icon->h * 2);
-    SDL_WriteLE16(dst, 1);
-    SDL_WriteLE16(dst, 32);
-    SDL_WriteLE32(dst, BI_RGB);
-    SDL_WriteLE32(dst, icon->h * icon->w * sizeof(Uint32));
-    SDL_WriteLE32(dst, 0);
-    SDL_WriteLE32(dst, 0);
-    SDL_WriteLE32(dst, 0);
-    SDL_WriteLE32(dst, 0);
+    bmi = (BITMAPINFOHEADER *)icon_bmp;
+    bmi->biSize = SDL_SwapLE32(sizeof(BITMAPINFOHEADER));
+    bmi->biWidth = SDL_SwapLE32(icon->w);
+    bmi->biHeight = SDL_SwapLE32(icon->h * 2);
+    bmi->biPlanes = SDL_SwapLE16(1);
+    bmi->biBitCount = SDL_SwapLE16(32);
+    bmi->biCompression = SDL_SwapLE32(BI_RGB);
+    bmi->biSizeImage = SDL_SwapLE32(icon->h * icon->w * sizeof(Uint32));
+    bmi->biXPelsPerMeter = SDL_SwapLE32(0);
+    bmi->biYPelsPerMeter = SDL_SwapLE32(0);
+    bmi->biClrUsed = SDL_SwapLE32(0);
+    bmi->biClrImportant = SDL_SwapLE32(0);
 
     /* Write the pixels upside down into the bitmap buffer */
     SDL_assert(icon->format->format == SDL_PIXELFORMAT_ARGB8888);
+    dst = &icon_bmp[sizeof(BITMAPINFOHEADER)];
+    row_len = icon->w * sizeof(Uint32);
     y = icon->h;
     while (y--) {
         Uint8 *src = (Uint8 *) icon->pixels + y * icon->pitch;
-        SDL_RWwrite(dst, src, icon->w * sizeof(Uint32), 1);
+        SDL_memcpy(dst, src, row_len);
+        dst += row_len;
     }
 
     /* Write the mask */
@@ -482,7 +529,6 @@ WIN_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon)
 
     hicon = CreateIconFromResource(icon_bmp, icon_len, TRUE, 0x00030000);
 
-    SDL_RWclose(dst);
     SDL_small_free(icon_bmp, isstack);
 
     /* Set the icon for the window */
@@ -573,8 +619,38 @@ WIN_HideWindow(_THIS, SDL_Window * window)
 void
 WIN_RaiseWindow(_THIS, SDL_Window * window)
 {
+    /* If desired, raise the window more forcefully.
+     * Technique taken from http://stackoverflow.com/questions/916259/ .
+     * Specifically, http://stackoverflow.com/a/34414846 .
+     *
+     * The issue is that Microsoft has gone through a lot of trouble to make it
+     * nearly impossible to programmatically move a window to the foreground,
+     * for "security" reasons. Apparently, the following song-and-dance gets
+     * around their objections. */
+    SDL_bool bForce = SDL_GetHintBoolean(SDL_HINT_FORCE_RAISEWINDOW, SDL_FALSE);
+
+    HWND hCurWnd = NULL;
+    DWORD dwMyID = 0u;
+    DWORD dwCurID = 0u;
+
     HWND hwnd = ((SDL_WindowData *) window->driverdata)->hwnd;
+    if(bForce)
+    {
+        hCurWnd = GetForegroundWindow();
+        dwMyID = GetCurrentThreadId();
+        dwCurID = GetWindowThreadProcessId(hCurWnd, NULL);
+        ShowWindow(hwnd, SW_RESTORE);
+        AttachThreadInput(dwCurID, dwMyID, TRUE);
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    }
     SetForegroundWindow(hwnd);
+    if (bForce)
+    {
+        AttachThreadInput(dwCurID, dwMyID, FALSE);
+        SetFocus(hwnd);
+        SetActiveWindow(hwnd);
+    }
 }
 
 void
@@ -658,7 +734,14 @@ WIN_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display, 
     int x, y;
     int w, h;
 
-    if (SDL_ShouldAllowTopmost() && ((window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_INPUT_FOCUS)) == (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_INPUT_FOCUS) || window->flags & SDL_WINDOW_ALWAYS_ON_TOP)) {
+    if (!fullscreen && (window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_FULLSCREEN_DESKTOP)) != 0) {
+        /* Resizing the window on hide causes problems restoring it in Wine, and it's unnecessary.
+         * Also, Windows would preview the minimized window with the wrong size.
+         */
+        return;
+    }
+
+    if (SDL_ShouldAllowTopmost() && (window->flags & SDL_WINDOW_ALWAYS_ON_TOP)) {
         top = HWND_TOPMOST;
     } else {
         top = HWND_NOTOPMOST;
@@ -824,15 +907,6 @@ void
 WIN_SetWindowMouseGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 {
     WIN_UpdateClipCursor(window);
-
-    if (window->flags & SDL_WINDOW_FULLSCREEN) {
-        UINT flags = SWP_NOCOPYBITS | SWP_NOMOVE | SWP_NOSIZE;
-
-        if (!(window->flags & SDL_WINDOW_SHOWN)) {
-            flags |= SWP_NOACTIVATE;
-        }
-        WIN_SetWindowPositionInternal(_this, window, flags);
-    }
 }
 
 void
@@ -848,34 +922,7 @@ WIN_SetWindowKeyboardGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 void
 WIN_DestroyWindow(_THIS, SDL_Window * window)
 {
-    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
-
-    if (data) {
-        if (data->keyboard_hook) {
-            UnhookWindowsHookEx(data->keyboard_hook);
-        }
-        ReleaseDC(data->hwnd, data->hdc);
-        RemoveProp(data->hwnd, TEXT("SDL_WindowData"));
-        if (data->created) {
-            DestroyWindow(data->hwnd);
-            if (data->parent) {
-                DestroyWindow(data->parent);
-            }
-        } else {
-            /* Restore any original event handler... */
-            if (data->wndproc != NULL) {
-#ifdef GWLP_WNDPROC
-                SetWindowLongPtr(data->hwnd, GWLP_WNDPROC,
-                                 (LONG_PTR) data->wndproc);
-#else
-                SetWindowLong(data->hwnd, GWL_WNDPROC,
-                              (LONG_PTR) data->wndproc);
-#endif
-            }
-        }
-        SDL_free(data);
-    }
-    window->driverdata = NULL;
+    CleanupWindowData(_this, window);
 }
 
 SDL_bool
@@ -1007,7 +1054,7 @@ WIN_UpdateClipCursor(SDL_Window *window)
     if ((mouse->relative_mode || (window->flags & SDL_WINDOW_MOUSE_GRABBED) ||
          (window->mouse_rect.w > 0 && window->mouse_rect.h > 0)) &&
         (window->flags & SDL_WINDOW_INPUT_FOCUS)) {
-        if (mouse->relative_mode && !mouse->relative_mode_warp) {
+        if (mouse->relative_mode && !mouse->relative_mode_warp && data->mouse_relative_mode_center) {
             if (GetWindowRect(data->hwnd, &rect)) {
                 LONG cx, cy;
 

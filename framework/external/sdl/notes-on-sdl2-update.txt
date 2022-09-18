@@ -1,2 +1,0 @@
-
-TODO: Include fix for Android audio when plugging in/out headphones

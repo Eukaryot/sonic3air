@@ -69,6 +69,9 @@ static NSString *GCInputXboxShareButton = @"Button Share";
 #if !((__IPHONE_OS_VERSION_MAX_ALLOWED >= 130000) || (__APPLETV_OS_VERSION_MAX_ALLOWED >= 130000) || (__MAC_OS_VERSION_MAX_ALLOWED >= 1500000))
 @property(nonatomic, readonly) NSString *productCategory;
 #endif
+#if !((__IPHONE_OS_VERSION_MAX_ALLOWED >= 140500) || (__APPLETV_OS_VERSION_MAX_ALLOWED >= 140500) || (__MAC_OS_X_VERSION_MAX_ALLOWED >= 110300))
+@property(class, nonatomic, readwrite) BOOL shouldMonitorBackgroundEvents;
+#endif
 @end
 @interface GCExtendedGamepad (SDL)
 #if !((__IPHONE_OS_VERSION_MAX_ALLOWED >= 121000) || (__APPLETV_OS_VERSION_MAX_ALLOWED >= 121000) || (__MAC_OS_VERSION_MAX_ALLOWED >= 1401000))
@@ -327,6 +330,19 @@ IOS_AddMFIJoystickDevice(SDL_JoystickDeviceItem *device, GCController *controlle
             subtype = 1;
         }
 
+        if (SDL_strcmp(name, "Backbone One") == 0) {
+            /* The Backbone app uses the guide and share buttons */
+            if ((device->button_mask & (1 << SDL_CONTROLLER_BUTTON_GUIDE)) != 0) {
+                device->button_mask &= ~(1 << SDL_CONTROLLER_BUTTON_GUIDE);
+                --nbuttons;
+            }
+            if ((device->button_mask & (1 << SDL_CONTROLLER_BUTTON_MISC1)) != 0) {
+                device->button_mask &= ~(1 << SDL_CONTROLLER_BUTTON_MISC1);
+                --nbuttons;
+                device->has_xbox_share_button = SDL_FALSE;
+            }
+        }
+
         device->naxes = 6; /* 2 thumbsticks and 2 triggers */
         device->nhats = 1; /* d-pad */
         device->nbuttons = nbuttons;
@@ -570,6 +586,10 @@ IOS_JoystickInit(void)
         /* GameController.framework was added in iOS 7. */
         if (![GCController class]) {
             return 0;
+        }
+
+        if (@available(macOS 11.3, iOS 14.5, tvOS 14.5, *)) {
+            GCController.shouldMonitorBackgroundEvents = YES;
         }
 
         /* For whatever reason, this always returns an empty array on
@@ -1169,7 +1189,7 @@ IOS_MFIJoystickUpdate(SDL_Joystick *joystick)
             return nil;
         }
 
-        __weak typeof(self) weakSelf = self;
+        __weak __typeof(self) weakSelf = self;
         self.engine.stoppedHandler = ^(CHHapticEngineStoppedReason stoppedReason) {
             SDL_RumbleMotor *_this = weakSelf;
             if (_this == nil) {

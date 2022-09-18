@@ -253,6 +253,7 @@
 #cmakedefine HAVE_AUDIOCLIENT_H @HAVE_AUDIOCLIENT_H@
 #cmakedefine HAVE_TPCSHRD_H @HAVE_TPCSHRD_H@
 #cmakedefine HAVE_SENSORSAPI_H @HAVE_SENSORSAPI_H@
+#cmakedefine HAVE_ROAPI_H @HAVE_ROAPI_H@
 
 #cmakedefine HAVE_XINPUT_GAMEPAD_EX @HAVE_XINPUT_GAMEPAD_EX@
 #cmakedefine HAVE_XINPUT_STATE_EX @HAVE_XINPUT_STATE_EX@
@@ -277,6 +278,8 @@
 #cmakedefine SDL_VIDEO_DISABLED @SDL_VIDEO_DISABLED@
 #cmakedefine SDL_POWER_DISABLED @SDL_POWER_DISABLED@
 #cmakedefine SDL_FILESYSTEM_DISABLED @SDL_FILESYSTEM_DISABLED@
+#cmakedefine SDL_LOCALE_DISABLED @SDL_LOCALE_DISABLED@
+#cmakedefine SDL_MISC_DISABLED @SDL_MISC_DISABLED@
 
 /* Enable various audio drivers */
 #cmakedefine SDL_AUDIO_DRIVER_ALSA @SDL_AUDIO_DRIVER_ALSA@
@@ -491,6 +494,12 @@
 #cmakedefine SDL_FILESYSTEM_VITA @SDL_FILESYSTEM_VITA@
 #cmakedefine SDL_FILESYSTEM_PSP @SDL_FILESYSTEM_PSP@
 
+/* Enable misc subsystem */
+#cmakedefine SDL_MISC_DUMMY @SDL_MISC_DUMMY@
+
+/* Enable locale subsystem */
+#cmakedefine SDL_LOCALE_DUMMY @SDL_LOCALE_DUMMY@
+
 /* Enable assembly routines */
 #cmakedefine SDL_ASSEMBLY_ROUTINES @SDL_ASSEMBLY_ROUTINES@
 #cmakedefine SDL_ALTIVEC_BLITTERS @SDL_ALTIVEC_BLITTERS@
@@ -512,6 +521,7 @@
 
 #cmakedefine SDL_VIDEO_VITA_PIB @SDL_VIDEO_VITA_PIB@
 #cmakedefine SDL_VIDEO_VITA_PVR @SDL_VIDEO_VITA_PVR@
+#cmakedefine SDL_VIDEO_VITA_PVR_OGL @SDL_VIDEO_VITA_PVR_OGL@
 
 #if !defined(__WIN32__) && !defined(__WINRT__)
 #  if !defined(_STDINT_H_) && !defined(_STDINT_H) && !defined(HAVE_STDINT_H) && !defined(_HAVE_STDINT_H)

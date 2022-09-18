@@ -32,6 +32,8 @@
 /* Visual Studio 2013 tries to link with _vacopy in the C runtime. Newer versions do an inline assignment */
 #undef va_copy
 #define va_copy(dst, src)   dst = src
+#elif defined(__GNUC__) && (__GNUC__ < 3)
+#define va_copy(to, from)   __va_copy(to, from)
 #endif
 
 #if !defined(HAVE_VSSCANF) || !defined(HAVE_STRTOL) || !defined(HAVE_STRTOUL) || !defined(HAVE_STRTOD) || !defined(HAVE_STRTOLL) || !defined(HAVE_STRTOULL)
@@ -639,19 +641,16 @@ SDL_utf8strlcpy(SDL_OUT_Z_CAP(dst_bytes) char *dst, const char *src, size_t dst_
     size_t bytes = SDL_min(src_bytes, dst_bytes - 1);
     size_t i = 0;
     unsigned char trailing_bytes = 0;
-    if (bytes)
-    {
+
+    if (bytes) {
         unsigned char c = (unsigned char)src[bytes - 1];
-        if (UTF8_IsLeadByte(c))
+        if (UTF8_IsLeadByte(c)) {
             --bytes;
-        else if (UTF8_IsTrailingByte(c))
-        {
-            for (i = bytes - 1; i != 0; --i)
-            {
+        } else if (UTF8_IsTrailingByte(c)) {
+            for (i = bytes - 1; i != 0; --i) {
                 c = (unsigned char)src[i];
                 trailing_bytes = UTF8_TrailingBytes(c);
-                if (trailing_bytes)
-                {
+                if (trailing_bytes) {
                     if (bytes - i != trailing_bytes + 1)
                         bytes = i;
 
@@ -662,6 +661,7 @@ SDL_utf8strlcpy(SDL_OUT_Z_CAP(dst_bytes) char *dst, const char *src, size_t dst_
         SDL_memcpy(dst, src, bytes);
     }
     dst[bytes] = '\0';
+
     return bytes;
 }
 
@@ -1070,13 +1070,16 @@ SDL_strcmp(const char *str1, const char *str2)
 #if defined(HAVE_STRCMP)
     return strcmp(str1, str2);
 #else
-    while (*str1 && *str2) {
-        if (*str1 != *str2)
+    int result;
+
+    while(1) {
+        result = (int)((unsigned char) *str1 - (unsigned char) *str2);
+        if (result != 0 || (*str1 == '\0'/* && *str2 == '\0'*/))
             break;
         ++str1;
         ++str2;
     }
-    return (int)((unsigned char) *str1 - (unsigned char) *str2);
+    return result;
 #endif /* HAVE_STRCMP */
 }
 
@@ -1086,17 +1089,20 @@ SDL_strncmp(const char *str1, const char *str2, size_t maxlen)
 #if defined(HAVE_STRNCMP)
     return strncmp(str1, str2, maxlen);
 #else
-    while (*str1 && *str2 && maxlen) {
-        if (*str1 != *str2)
+    int result;
+
+    while (maxlen) {
+        result = (int) (unsigned char) *str1 - (unsigned char) *str2;
+        if (result != 0 || *str1 == '\0'/* && *str2 == '\0'*/)
             break;
         ++str1;
         ++str2;
         --maxlen;
     }
     if (!maxlen) {
-        return 0;
+        result = 0;
     }
-    return (int) ((unsigned char) *str1 - (unsigned char) *str2);
+    return result;
 #endif /* HAVE_STRNCMP */
 }
 
@@ -1108,19 +1114,18 @@ SDL_strcasecmp(const char *str1, const char *str2)
 #elif defined(HAVE__STRICMP)
     return _stricmp(str1, str2);
 #else
-    char a = 0;
-    char b = 0;
-    while (*str1 && *str2) {
+    int a, b, result;
+
+    while (1) {
         a = SDL_toupper((unsigned char) *str1);
         b = SDL_toupper((unsigned char) *str2);
-        if (a != b)
+        result = a - b;
+        if (result != 0 || a == 0 /*&& b == 0*/)
             break;
         ++str1;
         ++str2;
     }
-    a = SDL_toupper(*str1);
-    b = SDL_toupper(*str2);
-    return (int) ((unsigned char) a - (unsigned char) b);
+    return result;
 #endif /* HAVE_STRCASECMP */
 }
 
@@ -1132,24 +1137,21 @@ SDL_strncasecmp(const char *str1, const char *str2, size_t maxlen)
 #elif defined(HAVE__STRNICMP)
     return _strnicmp(str1, str2, maxlen);
 #else
-    char a = 0;
-    char b = 0;
-    while (*str1 && *str2 && maxlen) {
+    int a, b, result;
+
+    while (maxlen) {
         a = SDL_tolower((unsigned char) *str1);
         b = SDL_tolower((unsigned char) *str2);
-        if (a != b)
+        result = a - b;
+        if (result != 0 || a == 0 /*&& b == 0*/)
             break;
         ++str1;
         ++str2;
         --maxlen;
     }
-    if (maxlen == 0) {
-        return 0;
-    } else {
-        a = SDL_tolower((unsigned char) *str1);
-        b = SDL_tolower((unsigned char) *str2);
-        return (int) ((unsigned char) a - (unsigned char) b);
-    }
+    if (maxlen == 0)
+        result = 0;
+    return result;
 #endif /* HAVE_STRNCASECMP */
 }
 
