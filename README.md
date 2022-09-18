@@ -24,7 +24,7 @@ This repository is split into several different projects:
 * The librmx libraries that together with the external dependencies build a foundation for my own projects (S3AIR and my private stuff). This primarily consists of rmxbase, a collection of helper and utility classes, and rmxmedia, which is providing a basic game framework built on top of SDL2 & OpenGL.
 * Lemonscript language library, with compiler and runtime environment for script execution.
 * Oxygen Engine, the backbone game engine powering Sonic 3 A.I.R. This includes input, graphics, audio handling, and all the other game application stuff, as well as a simulation environment built around lemonscript that - as far as needed for the purposes of S3AIR - emulates aspects of Sega Genesis hardware. Note that Oxygen can be built as its own application (OxygenApp) that lacks the S3AIR C++ code.
-* S3AIR-specific C++ code, scripts and data in the "Oxygen/soncthrickles" directory. Yes, that's what it's named.
+* S3AIR-specific C++ code, scripts and data in the "Oxygen/sonic3air" directory. Yes, that's what it's named.
 
 
 ## External dependencies
@@ -36,14 +36,14 @@ External libraries and code used in this project:
 * jsoncpp - in "librmx/source/rmxbase/jsoncpp"
 * GLEW - in "librmx/source/rmxmedia/glew"
 * Sound chip emulation related code from Genesis Plus GX - in "Oxygen/oxygenengine/source/oxygen/simulation/sound"
-* Discord Game SDK - in "Oxygen/soncthrickles/source/external/discord_game_sdk"
-* xBRZ upscaler shader code - in "Oxygen/oxygenengine/data/shader" and once more in "Oxygen/soncthrickles/data/shader"
-* Hqx upscaler shader code & data files - in "Oxygen/oxygenengine/data/shader" and once more in "Oxygen/soncthrickles/data/shader"
+* Discord Game SDK - in "Oxygen/sonic3air/source/external/discord_game_sdk"
+* xBRZ upscaler shader code - in "Oxygen/oxygenengine/data/shader" and once more in "Oxygen/sonic3air/data/shader"
+* Hqx upscaler shader code & data files - in "Oxygen/oxygenengine/data/shader" and once more in "Oxygen/sonic3air/data/shader"
 
 
 ## How to build
 
-For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/soncthrickles/build":
+For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/sonic3air/build":
 * Windows: "_vstudio"
 * Mac:     "_xcode"
 * Linux:   "_cmake"

@@ -8,10 +8,6 @@ PLEASE NOTE:
 	into one exe. This applies to the external dependencies as well. (Only exception is the
 	Discord Game SDK.)
 
-- There is no working 64-bit build due to a linker error I did not resolve (as the public
-	releases for Windows are 32-bit anyways). This can probably be fixed with few changes
-	to SDL2, or by switching back to dynamic linking - at least for SDL2.
-
 
 
 >>> What you need
@@ -36,7 +32,7 @@ The easiest way to do so is as follows:
 - Then execute the batch script.
 
 - If everything went fine, the "framework/lib" directory should now be populated with
-	sub-directories "x64", "x64d", "x86", "x86d" with each containing "libbogg", "libvorbis",
+	sub-directories "x64", "x64d", "x86", "x86d" with each containing "libogg", "libvorbis",
 	"minizip", "sdl", "zlib" and the respective .lib files inside those.
 
 Alternatively or in case of errors:
