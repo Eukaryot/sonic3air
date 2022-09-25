@@ -124,6 +124,9 @@ function void fn02e410()
 			if ((level.framecounter & 0x03) == 0)
 			{
 				playSound(SFX_CLICK)
+			#if STANDALONE
+				Input.setControllerRumble(0, 0, 0x2000, 100)
+			#endif
 			}
 		}
 		else

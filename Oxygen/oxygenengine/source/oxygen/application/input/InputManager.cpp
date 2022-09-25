@@ -560,7 +560,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 		SDL_GameController* controller = SDL_GameControllerOpen(i);
 		const std::string joystickName = getJoystickName(joystick);
 		const std::string controllerName = getGameControllerName(controller);
-
+		
 		// Skip it if it's blacklisted
 		if (isBlacklistedName(joystickName) || isBlacklistedName(controllerName))
 			continue;
@@ -570,6 +570,9 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 		device.mSDLJoystick = joystick;
 		device.mSDLGameController = controller;
 		device.mSDLJoystickInstanceId = joystickInstanceId;
+	#if SDL_VERSION_ATLEAST(2, 0, 18)
+		device.mSupportsRumble = SDL_JoystickHasRumble(joystick);
+	#endif
 
 		// Try to find a matching device definition in configuration
 		const InputConfig::DeviceDefinition* matchingInputDeviceDefinition = nullptr;
@@ -848,7 +851,32 @@ void InputManager::setTouchInputMode(TouchInputMode mode)
 	}
 }
 
-void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& color)
+void InputManager::resetControllerRumbleForPlayer(int playerIndex) const
+{
+	setControllerRumbleForPlayer(playerIndex, 0.0f, 0.0f, 0);
+}
+
+void InputManager::setControllerRumbleForPlayer(int playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint32 milliseconds) const
+{
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	if (playerIndex >= 0 && playerIndex < 2)
+	{
+		const float intensity = Configuration::instance().mControllerRumbleIntensity[playerIndex];
+		const uint16 lowFrequencyRumbleUint16 = roundToInt(lowFrequencyRumble * intensity * 65535.0f);
+		const uint16 highFrequencyRumbleUint16 = roundToInt(highFrequencyRumble * intensity * 65535.0f);
+
+		for (size_t i = 0; i < mGamepads.size(); ++i)
+		{
+			if (mGamepads[i].mAssignedPlayer == playerIndex && nullptr != mGamepads[i].mSDLJoystick)
+			{
+				SDL_JoystickRumble(mGamepads[i].mSDLJoystick, lowFrequencyRumbleUint16, highFrequencyRumbleUint16, milliseconds);
+			}
+		}
+	}
+#endif
+}
+
+void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& color) const
 {
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 	// TODO: Remove some of these exclusions where possible

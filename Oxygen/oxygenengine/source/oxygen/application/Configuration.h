@@ -171,6 +171,7 @@ public:
 	VirtualGamepad mVirtualGamepad;
 	std::string mPreferredGamepad[2];
 	int mAutoAssignGamepadPlayerIndex = 0;	// Default is player 1 (who has index 0)
+	float mControllerRumbleIntensity[2] = { 0, 0 };
 
 	// Input recorder
 	std::wstring mInputRecorderInput;

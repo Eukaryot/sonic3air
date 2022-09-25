@@ -334,6 +334,8 @@ bool Configuration::loadSettings(const std::wstring& filename, SettingsType sett
 		// Input
 		rootHelper.tryReadString("PreferredGamepadPlayer1", mPreferredGamepad[0]);
 		rootHelper.tryReadString("PreferredGamepadPlayer2", mPreferredGamepad[1]);
+		rootHelper.tryReadFloat("ControllerRumblePlayer1", mControllerRumbleIntensity[0]);
+		rootHelper.tryReadFloat("ControllerRumblePlayer2", mControllerRumbleIntensity[1]);
 		rootHelper.tryReadInt("AutoAssignGamepadPlayerIndex", mAutoAssignGamepadPlayerIndex);
 
 		// Virtual gamepad
@@ -450,6 +452,8 @@ void Configuration::saveSettings()
 		root["PreferredGamepadPlayer1"] = mPreferredGamepad[0];
 		root["PreferredGamepadPlayer2"] = mPreferredGamepad[1];
 		root["AutoAssignGamepadPlayerIndex"] = mAutoAssignGamepadPlayerIndex;
+		root["ControllerRumblePlayer1"] = mControllerRumbleIntensity[0];
+		root["ControllerRumblePlayer2"] = mControllerRumbleIntensity[1];
 
 		// Virtual gamepad
 		{

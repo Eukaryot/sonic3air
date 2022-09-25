@@ -119,6 +119,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryPercent(option::MUSIC_VOLUME,			&config.mMusicVolume);
 		setupOptionEntryPercent(option::SOUND_VOLUME,			&config.mSoundVolume);
 		setupOptionEntryPercent(option::VGAMEPAD_OPACITY,		&config.mVirtualGamepad.mOpacity);
+		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P1,	&config.mControllerRumbleIntensity[0]);
+		setupOptionEntryPercent(option::CONTROLLER_RUMBLE_P2,	&config.mControllerRumbleIntensity[1]);
 
 		setupOptionEntry(option::ROTATION,					SharedDatabase::Setting::SETTING_SMOOTH_ROTATION);
 		setupOptionEntry(option::SPEEDUP_AFTER_IMAGES,		SharedDatabase::Setting::SETTING_SPEEDUP_AFTERIMGS);
@@ -613,14 +615,22 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Assign to Player 1", 0)
 			.addOption("Assign to Player 2", 1);
 
+		for (int k = 0; k < 2; ++k)
+		{
+			GameMenuEntry& entry = entries.addEntry<OptionsMenuEntry>().initEntry(*String(0, "Rumble Player %d", k+1), option::CONTROLLER_RUMBLE_P1 + k);
+			entry.addOption("Off", 0);
+			for (int i = 20; i <= 100; i += 20)
+				entry.addOption(*String(0, "%d %%", i), i);
+		}
+
 		if (Application::instance().hasVirtualGamepad())
 		{
 			entries.addEntry<TitleMenuEntry>().initEntry("Virtual Gamepad");
 
 			entries.addEntry<OptionsMenuEntry>().initEntry("Visibility:",   option::VGAMEPAD_OPACITY).addPercentageOptions(0, 100, 10);
-			entries.addEntry<OptionsMenuEntry>().initEntry("D-Pad Size:",	  option::VGAMEPAD_DPAD_SIZE).addNumberOptions(50, 150, 10);
+			entries.addEntry<OptionsMenuEntry>().initEntry("D-Pad Size:",	option::VGAMEPAD_DPAD_SIZE).addNumberOptions(50, 150, 10);
 			entries.addEntry<OptionsMenuEntry>().initEntry("Buttons Size:", option::VGAMEPAD_BUTTONS_SIZE).addNumberOptions(50, 150, 10);
-			entries.addEntry<OptionsMenuEntry>().initEntry("Set Touch Gamepad Layout...",	option::VGAMEPAD_SETUP);
+			entries.addEntry<OptionsMenuEntry>().initEntry("Set Touch Gamepad Layout...", option::VGAMEPAD_SETUP);
 		}
 
 
@@ -1062,11 +1072,15 @@ void OptionsMenu::update(float timeElapsed)
 							{
 								mOptionEntries[selectedData].applyValue();
 
-								if (selectedData >= option::VGAMEPAD_DPAD_SIZE && selectedData <= option::VGAMEPAD_BUTTONS_SIZE)
+								if (selectedData >= option::CONTROLLER_RUMBLE_P1 && selectedData <= option::CONTROLLER_RUMBLE_P2)
+								{
+									InputManager::instance().setControllerRumbleForPlayer(selectedData - option::CONTROLLER_RUMBLE_P1, 1.0f, 1.0f, 300);
+								}
+								else if (selectedData >= option::VGAMEPAD_DPAD_SIZE && selectedData <= option::VGAMEPAD_BUTTONS_SIZE)
 								{
 									TouchControlsOverlay::instance().buildTouchControls();
 								}
-								if (selectedData == option::FRAME_SYNC)
+								else if (selectedData == option::FRAME_SYNC)
 								{
 									EngineMain::instance().setVSyncMode((Configuration::FrameSyncType)selectedEntry.selected().mValue);
 								}

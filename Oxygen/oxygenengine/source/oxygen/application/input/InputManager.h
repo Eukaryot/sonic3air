@@ -102,6 +102,7 @@ public:
 		SDL_Joystick* mSDLJoystick = nullptr;
 		SDL_GameController* mSDLGameController = nullptr;
 		int32 mSDLJoystickInstanceId = 0;			// This changes every time the controller is reconnected, but stays fixed from there on
+		bool mSupportsRumble = false;
 		std::vector<InputConfig::ControlMapping> mControlMappings;
 		int mAssignedPlayer = 0;
 		bool mDirty = false;		// Only for temporary use
@@ -157,7 +158,11 @@ public:
 
 	void setControlState(Control& control, bool pressed);
 	void setTouchInputMode(TouchInputMode mode);
-	void setControllerLEDsForPlayer(int playerIndex, const Color& color);
+
+	void resetControllerRumbleForPlayer(int playerIndex) const;
+	void setControllerRumbleForPlayer(int playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint32 milliseconds) const;
+
+	void setControllerLEDsForPlayer(int playerIndex, const Color& color) const;
 
 private:
 	enum class WaitInputState
