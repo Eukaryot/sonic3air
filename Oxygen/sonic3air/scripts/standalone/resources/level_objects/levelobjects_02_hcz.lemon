@@ -375,15 +375,11 @@ function void LevelObjectTableBuilder.buildObjects_HCZ1()
 	LevelObjectTableBuilder.addObject(0x3060, 0x0638, OBJECTTABLE1_97, 0x00, LVLOBJ_FLIP_Y)
 	LevelObjectTableBuilder.addObject(0x30e0, 0x0270, OBJECTTABLE1_96, 0x20, LVLOBJ_FLIP_Y)
 
-	// The blocker object above the giant ring that does not exist in Sonic 3 Alone
-	if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
+	// The blocker object above the giant ring only exists in the S&K layout (yes, it's removed in S3AIR layout now as well
+	if (Game.getSetting(SETTING_LEVELLAYOUTS) == 1)
 	{
 		// Move this blocker object a bit right otherwise Knuckles can't climb up the wall on the left
 		LevelObjectTableBuilder.addObject(0x3108, 0x0410, OBJECTTABLE1_28, 0xf1, 0)
-	}
-	else if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
-	{
-		LevelObjectTableBuilder.addObject(0x3100, 0x0410, OBJECTTABLE1_28, 0xf1, 0)
 	}
 
 	LevelObjectTableBuilder.addObject(0x3108, 0x04f0, OBJECTTABLE1_07, 0x18, 0)
