@@ -200,7 +200,7 @@ namespace lemon
 		static void exec_ARITHM_BINARY_MOD(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) % (T)(*context.mControlFlow->mValueStackPtr));
+			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*context.mControlFlow->mValueStackPtr) == 0) ? 0 : ((T)(*(context.mControlFlow->mValueStackPtr-1)) % (T)(*context.mControlFlow->mValueStackPtr));
 		}
 
 		template<typename T>

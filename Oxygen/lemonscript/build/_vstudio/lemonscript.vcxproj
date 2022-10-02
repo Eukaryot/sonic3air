@@ -43,6 +43,7 @@
     <ClCompile Include="..\..\source\lemon\program\Opcode.cpp" />
     <ClCompile Include="..\..\source\lemon\program\Program.cpp" />
     <ClCompile Include="..\..\source\lemon\program\StringRef.cpp" />
+    <ClCompile Include="..\..\source\lemon\runtime\BuiltInFunctions.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\ControlFlow.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\OpcodeProcessor.cpp" />
     <ClCompile Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.cpp" />
@@ -90,7 +91,9 @@
     <ClInclude Include="..\..\source\lemon\program\SourceFileInfo.h" />
     <ClInclude Include="..\..\source\lemon\program\StringRef.h" />
     <ClInclude Include="..\..\source\lemon\program\Variable.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\BuiltInFunctions.h" />
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h" />
+    <ClInclude Include="..\..\source\lemon\runtime\FastStringStream.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeExecUtils.h" />
     <ClInclude Include="..\..\source\lemon\runtime\OpcodeProcessor.h" />
     <ClInclude Include="..\..\source\lemon\runtime\provider\DefaultOpcodeProvider.h" />

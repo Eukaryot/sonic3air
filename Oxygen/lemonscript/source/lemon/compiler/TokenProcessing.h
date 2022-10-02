@@ -12,6 +12,7 @@
 #include "lemon/program/Variable.h"
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
+#include "lemon/compiler/TypeCasting.h"
 
 
 namespace lemon
@@ -80,6 +81,7 @@ namespace lemon
 	private:
 		GlobalsLookup& mGlobalsLookup;
 		const GlobalCompilerConfig& mConfig;
+		TypeCasting mTypeCasting;
 		uint32 mLineNumber = 0;
 
 		CachedBuiltinFunction mBuiltinConstantArrayAccess;

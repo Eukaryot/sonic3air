@@ -8,186 +8,15 @@
 
 #include "lemon/pch.h"
 #include "lemon/runtime/StandardLibrary.h"
+#include "lemon/runtime/BuiltInFunctions.h"
+#include "lemon/runtime/FastStringStream.h"
 #include "lemon/program/FunctionWrapper.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/Program.h"
 
 
-namespace
-{
-	class FastStringStream
-	{
-	public:
-		void clear()
-		{
-			mLength = 0;
-		}
-
-		void addChar(char ch)
-		{
-			RMX_CHECK(mLength < 0x100, "Too long string", return);
-			mBuffer[mLength] = ch;
-			++mLength;
-		}
-
-		void addString(const char* str, int length)
-		{
-			RMX_CHECK(mLength + length <= 0x100, "Too long string", return);
-			memcpy(&mBuffer[mLength], str, length);
-			mLength += length;
-		}
-
-		void addString(std::string_view str)
-		{
-			addString(str.data(), (int)str.length());
-		}
-
-		void addDecimal(int64 value, int minDigits)
-		{
-			if (value < 0)
-			{
-				RMX_CHECK(mLength < 0x100, "Too long string", return);
-				mBuffer[mLength] = '-';
-				++mLength;
-				value = -value;
-			}
-			else if (value == 0)
-			{
-				const int numDigits = std::max(1, minDigits);
-				RMX_CHECK(mLength + numDigits <= 0x100, "Too long string", return);
-				for (int k = 0; k < numDigits; ++k)
-					mBuffer[mLength+k] = '0';
-				mLength += numDigits;
-				return;
-			}
-
-			int numDigits = 1;
-			int64 digitMax = 10;	// One more than the maximum number representable using numDigits
-			while (numDigits < 19 && (digitMax <= value || numDigits < minDigits))
-			{
-				++numDigits;
-				digitMax *= 10;
-			}
-			for (int64 digitBase = digitMax / 10; digitBase > 0; digitBase /= 10)
-			{
-				RMX_CHECK(mLength < 0x100, "Too long string", return);
-				mBuffer[mLength] = '0' + (char)((value / digitBase) % 10);
-				++mLength;
-			}
-		}
-
-		void addBinary(uint64 value, int minDigits)
-		{
-			int shift = 1;
-			while (shift < 64 && ((value >> shift) != 0 || shift < minDigits))
-			{
-				++shift;
-			}
-			RMX_CHECK(mLength + shift <= 0x100, "Too long string", return);
-			for (--shift; shift >= 0; --shift)
-			{
-				const int binValue = (value >> shift) & 0x01;
-				mBuffer[mLength] = (binValue == 0) ? '0' : '1';
-				++mLength;
-			}
-		}
-
-		void addHex(uint64 value, int minDigits)
-		{
-			int shift = 4;
-			while (shift < 64 && ((value >> shift) != 0 || shift < minDigits * 4))
-			{
-				shift += 4;
-			}
-			RMX_CHECK(mLength + shift / 4 <= 0x100, "Too long string", return);
-			for (shift -= 4; shift >= 0; shift -= 4)
-			{
-				const int hexValue = (value >> shift) & 0x0f;
-				mBuffer[mLength] = (hexValue <= 9) ? ('0' + (char)hexValue) : ('a' + (char)(hexValue - 10));
-				++mLength;
-			}
-		}
-
-	public:
-		char mBuffer[0x100] = { 0 };
-		int mLength = 0;
-	};
-}
-
-
 namespace lemon
 {
-	namespace builtins
-	{
-		template<typename T>
-		T constant_array_access(uint32 id, uint32 index)
-		{
-			Runtime* runtime = Runtime::getActiveRuntime();
-			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
-			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
-			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return 0);
-			return (T)constantArrays[id]->getElement(index);
-		}
-
-		template<>
-		StringRef constant_array_access(uint32 id, uint32 index)
-		{
-			Runtime* runtime = Runtime::getActiveRuntime();
-			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
-			const std::vector<ConstantArray*>& constantArrays = runtime->getProgram().getConstantArrays();
-			RMX_CHECK(id < constantArrays.size(), "Invalid constant array ID " << id << " (must be below " << constantArrays.size() << ")", return StringRef());
-			return StringRef(constantArrays[id]->getElement(index));
-		}
-
-		StringRef string_operator_plus(StringRef str1, StringRef str2)
-		{
-			Runtime* runtime = Runtime::getActiveRuntime();
-			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
-			RMX_CHECK(str1.isValid(), "Unable to resolve string", return StringRef());
-			RMX_CHECK(str2.isValid(), "Unable to resolve string", return StringRef());
-
-			static FastStringStream result;
-			result.clear();
-			result.addString(str1.getStringRef());
-			result.addString(str2.getStringRef());
-			return StringRef(runtime->addString(std::string_view(result.mBuffer, result.mLength)));
-		}
-
-		bool string_operator_less(StringRef str1, StringRef str2)
-		{
-			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
-			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (str1.getString() < str2.getString());
-		}
-
-		bool string_operator_less_or_equal(StringRef str1, StringRef str2)
-		{
-			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
-			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (str1.getString() <= str2.getString());
-		}
-
-		bool string_operator_greater(StringRef str1, StringRef str2)
-		{
-			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
-			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (str1.getString() > str2.getString());
-		}
-
-		bool string_operator_greater_or_equal(StringRef str1, StringRef str2)
-		{
-			RMX_CHECK(str1.isValid(), "Unable to resolve string", return false);
-			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
-			return (str1.getString() >= str2.getString());
-		}
-
-		uint32 string_length(StringRef str)
-		{
-			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
-			return (uint32)str.getString().length();
-		}
-	}
-
 	namespace functions
 	{
 		template<typename T>
@@ -250,7 +79,7 @@ namespace lemon
 			const char* fmtPtr = formatString.data();
 			const char* fmtEnd = fmtPtr + length;
 
-			static FastStringStream result;
+			static detail::FastStringStream result;
 			result.clear();
 
 			for (; fmtPtr < fmtEnd; ++fmtPtr)
@@ -438,40 +267,13 @@ namespace lemon
 	}
 
 
-
-	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_CONSTANT_ARRAY_ACCESS("#builtin_constant_array_access");
-	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS("#builtin_string_operator_plus");
-	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS("#builtin_string_operator_less");
-	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL("#builtin_string_operator_less_equal");
-	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER("#builtin_string_operator_greater");
-	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL("#builtin_string_operator_greater_equal");
-	StandardLibrary::FunctionName StandardLibrary::BUILTIN_NAME_STRING_LENGTH("#builtin_string_length");
-
-
 	void StandardLibrary::registerBindings(lemon::Module& module)
 	{
+		// Register built-in functions
+		BuiltInFunctions::registerBuiltInFunctions(module);
+
 		const BitFlagSet<Function::Flag> defaultFlags(Function::Flag::ALLOW_INLINE_EXECUTION);
 		const BitFlagSet<Function::Flag> compileTimeConstant(Function::Flag::ALLOW_INLINE_EXECUTION, Function::Flag::COMPILE_TIME_CONSTANT);
-
-		// Register built-in functions, which are directly referenced by the compiler
-		{
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int8>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint8>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int16>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint16>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int32>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint32>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<int64>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<uint64>), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_CONSTANT_ARRAY_ACCESS.makeFlyweightString(), lemon::wrap(&builtins::constant_array_access<StringRef>), defaultFlags);
-
-			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_PLUS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_plus), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_LESS.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less_or_equal), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater_or_equal), defaultFlags);
-			module.addNativeFunction(BUILTIN_NAME_STRING_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::string_length), defaultFlags);
-		}
 
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int8>), compileTimeConstant);
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint8>), compileTimeConstant);

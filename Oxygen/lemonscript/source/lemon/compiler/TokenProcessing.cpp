@@ -9,11 +9,10 @@
 #include "lemon/pch.h"
 #include "lemon/compiler/TokenProcessing.h"
 #include "lemon/compiler/TokenTypes.h"
-#include "lemon/compiler/TypeCasting.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/runtime/BuiltInFunctions.h"
 #include "lemon/runtime/Runtime.h"
-#include "lemon/runtime/StandardLibrary.h"
 
 
 namespace lemon
@@ -73,7 +72,7 @@ namespace lemon
 				case Operator::BINARY_MINUS:		outValue = constLeft.mValue - constRight.mValue;	return true;
 				case Operator::BINARY_MULTIPLY:		outValue = constLeft.mValue * constRight.mValue;	return true;
 				case Operator::BINARY_DIVIDE:		outValue = (constRight.mValue == 0) ? 0 : (constLeft.mValue / constRight.mValue);	return true;
-				case Operator::BINARY_MODULO:		outValue = constLeft.mValue % constRight.mValue;	return true;
+				case Operator::BINARY_MODULO:		outValue = (constRight.mValue == 0) ? 0 : (constLeft.mValue % constRight.mValue);	return true;
 				case Operator::BINARY_SHIFT_LEFT:	outValue = constLeft.mValue << constRight.mValue;	return true;
 				case Operator::BINARY_SHIFT_RIGHT:	outValue = constLeft.mValue >> constRight.mValue;	return true;
 				case Operator::BINARY_AND:			outValue = constLeft.mValue & constRight.mValue;	return true;
@@ -85,12 +84,18 @@ namespace lemon
 			return false;
 		}
 
-		void fillCachedBuiltinFunction(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const StandardLibrary::FunctionName& functionName, bool allowOnlyOne)
+		void fillCachedBuiltInFunctionSingle(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
 		{
 			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
 			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
-			if (allowOnlyOne)
-				RMX_ASSERT(functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
+			RMX_ASSERT(functions.size() == 1, "Multiple definitions for built-in function '" << functionName.mName << "'");
+			outCached.mFunctions = functions;
+		}
+
+		void fillCachedBuiltInFunctionMultiple(TokenProcessing::CachedBuiltinFunction& outCached, const GlobalsLookup& globalsLookup, const BuiltInFunctions::FunctionName& functionName)
+		{
+			const std::vector<Function*>& functions = globalsLookup.getFunctionsByName(functionName.mHash);
+			RMX_ASSERT(!functions.empty(), "Unable to find built-in function '" << functionName.mName << "'");
 			outCached.mFunctions = functions;
 		}
 
@@ -109,15 +114,16 @@ namespace lemon
 
 	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, const GlobalCompilerConfig& config) :
 		mGlobalsLookup(globalsLookup),
-		mConfig(config)
+		mConfig(config),
+		mTypeCasting(config)
 	{
-		fillCachedBuiltinFunction(mBuiltinConstantArrayAccess,			globalsLookup, StandardLibrary::BUILTIN_NAME_CONSTANT_ARRAY_ACCESS, false);
-		fillCachedBuiltinFunction(mBuiltinStringOperatorPlus,			globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_PLUS, true);
-		fillCachedBuiltinFunction(mBuiltinStringOperatorLess,			globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS, true);
-		fillCachedBuiltinFunction(mBuiltinStringOperatorLessOrEqual,	globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_LESS_OR_EQUAL, true);
-		fillCachedBuiltinFunction(mBuiltinStringOperatorGreater,		globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER, true);
-		fillCachedBuiltinFunction(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_OPERATOR_GREATER_OR_EQUAL, true);
-		fillCachedBuiltinFunction(mBuiltinStringLength,					globalsLookup, StandardLibrary::BUILTIN_NAME_STRING_LENGTH, true);
+		fillCachedBuiltInFunctionMultiple(mBuiltinConstantArrayAccess,			globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlus,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLess,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLessOrEqual,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreater,			globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringLength,					globalsLookup, BuiltInFunctions::STRING_LENGTH);
 	}
 
 	void TokenProcessing::processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType)
@@ -564,7 +570,7 @@ namespace lemon
 							// Base call must use the same function signature as the current one
 							CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
 							size_t failedIndex = 0;
-							const bool canMatch = TypeCasting(mConfig).canMatchSignature(parameterTypes, mContext.mFunction->getParameters(), &failedIndex);
+							const bool canMatch = mTypeCasting.canMatchSignature(parameterTypes, mContext.mFunction->getParameters(), &failedIndex);
 							CHECK_ERROR(canMatch, "Can't cast parameters of function call to match base function, parameter '" << mContext.mFunction->getParameters()[failedIndex].mName << "' has the wrong type", mLineNumber);
 
 							if (baseFunctionExists)
@@ -603,7 +609,7 @@ namespace lemon
 							uint32 bestPriority = 0xff000000;
 							for (const Function* candidateFunction : candidateFunctions)
 							{
-								const uint32 priority = TypeCasting(mConfig).getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+								const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
 								if (priority < bestPriority)
 								{
 									bestPriority = priority;
@@ -984,7 +990,7 @@ namespace lemon
 
 				if (allConstant)
 				{
-					// TEST: Compile-time evaluation of native functions that support it
+					// Compile-time evaluation of native functions that support it
 					if (ft.mFunction->getType() == Function::Type::NATIVE && ft.mFunction->hasFlag(Function::Flag::COMPILE_TIME_CONSTANT))
 					{
 						RMX_CHECK(ft.mParameters.size() == ft.mFunction->getParameters().size(), "Different number of parameters", );
@@ -1130,9 +1136,8 @@ namespace lemon
 				}
 
 				// Choose best fitting signature
-				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
-				const bool result = TypeCasting(mConfig).getBestSignature(bot.mOperator, leftDataType, rightDataType, &signature);
-				CHECK_ERROR(result, "Cannot implicitly cast between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
+				const TypeCasting::BinaryOperatorSignature* signature = mTypeCasting.getBestOperatorSignature(bot.mOperator, leftDataType, rightDataType);
+				CHECK_ERROR(nullptr != signature, "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(bot.mOperator) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
 
 				token.mDataType = signature->mResult;
 
@@ -1169,7 +1174,9 @@ namespace lemon
 				assignStatementDataType(*vct.mArgument, token.mDataType);
 
 				// Check if types fit together at all
-				CHECK_ERROR(TypeCasting(mConfig).getImplicitCastPriority(vct.mArgument->mDataType, vct.mDataType) != 0xff, "Explicit cast not possible", mLineNumber);
+				const DataTypeDefinition& original = *vct.mArgument->mDataType;
+				const DataTypeDefinition& target = *vct.mDataType;
+				CHECK_ERROR(mTypeCasting.canExplicitlyCastTypes(original, target), "Explicit cast not possible from " << original.getName().getString() << " to " << target.getName().getString(), mLineNumber);
 				break;
 			}
 

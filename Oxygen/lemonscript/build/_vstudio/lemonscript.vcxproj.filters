@@ -126,6 +126,9 @@
     <ClCompile Include="..\..\source\lemon\program\Define.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\runtime\BuiltInFunctions.cpp">
+      <Filter>lemon\runtime</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
@@ -271,6 +274,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\program\SourceFileInfo.h">
       <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\BuiltInFunctions.h">
+      <Filter>lemon\runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\runtime\FastStringStream.h">
+      <Filter>lemon\runtime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

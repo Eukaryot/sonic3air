@@ -16,71 +16,18 @@
 namespace lemon
 {
 
-	uint8 TypeCasting::getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target)
+	bool TypeCasting::canImplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const
 	{
-		if (original == target)
-		{
-			// No cast required at all
-			return 0;
-		}
-
-		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
-		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
-		if (original == &PredefinedDataTypes::STRING)
-			original = &PredefinedDataTypes::UINT_64;
-		if (mConfig.mScriptFeatureLevel < 2)
-		{
-			if (target == &PredefinedDataTypes::STRING)
-				target = &PredefinedDataTypes::UINT_64;
-		}
-
-		if (original == target)
-		{
-			// It's a conversion between string and u64
-			return 1;
-		}
-
-		if (original->getClass() == DataTypeDefinition::Class::INTEGER && target->getClass() == DataTypeDefinition::Class::INTEGER)
-		{
-			const IntegerDataType& originalInt = original->as<IntegerDataType>();
-			const IntegerDataType& targetInt = target->as<IntegerDataType>();
-
-			// Is one type undefined?
-			if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-			{
-				// Const may get cast to everything
-				return 1;
-			}
-			if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-			{
-				// Can this happen at all?
-				return 1;
-			}
-
-			if (originalInt.getBytes() == targetInt.getBytes())
-			{
-				return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
-			}
-
-			if (originalInt.getBytes() < targetInt.getBytes())
-			{
-				// Up cast
-				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
-			}
-			else
-			{
-				// Down cast
-				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
-			}
-		}
-		else
-		{
-			// No cast possible
-			return CANNOT_CAST;
-		}
+		return (getImplicitCastPriority(&original, &target) != 0xff);
 	}
 
-	BaseCastType TypeCasting::getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target)
+	bool TypeCasting::canExplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const
+	{
+		// TODO: This is a simplified implementation, as long as there's no need to differentiate between implicit and explicit casts
+		return canImplicitlyCastTypes(original, target);
+	}
+
+	BaseCastType TypeCasting::getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target) const
 	{
 		if (original == target)
 			return BaseCastType::NONE;
@@ -121,7 +68,7 @@ namespace lemon
 		}
 	}
 
-	bool TypeCasting::canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex)
+	bool TypeCasting::canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex) const
 	{
 		if (original.size() != target.size())
 			return false;
@@ -139,7 +86,7 @@ namespace lemon
 		return true;
 	}
 
-	uint16 TypeCasting::getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right)
+	uint16 TypeCasting::getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right) const
 	{
 		const uint8 prioLeft = getImplicitCastPriority(left, signature.mLeft);
 		const uint8 prioRight = getImplicitCastPriority(right, signature.mRight);
@@ -153,7 +100,7 @@ namespace lemon
 		}
 	}
 
-	uint32 TypeCasting::getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target)
+	uint32 TypeCasting::getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target) const
 	{
 		if (original.size() != target.size())
 			return 0xffffffff;
@@ -178,7 +125,7 @@ namespace lemon
 		return result;
 	}
 
-	bool TypeCasting::getBestSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right, const BinaryOperatorSignature** outSignature)
+	const TypeCasting::BinaryOperatorSignature* TypeCasting::getBestOperatorSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right) const
 	{
 		static const std::vector<BinaryOperatorSignature> signaturesSymmetric =
 		{
@@ -256,6 +203,7 @@ namespace lemon
 			}
 		}
 
+		const TypeCasting::BinaryOperatorSignature* bestSignature = nullptr;
 		uint16 bestPriority = 0xff00;
 		for (const BinaryOperatorSignature& signature : *signatures)
 		{
@@ -269,10 +217,74 @@ namespace lemon
 			if (priority < bestPriority)
 			{
 				bestPriority = priority;
-				*outSignature = &signature;
+				bestSignature = &signature;
 			}
 		}
-		return (bestPriority != 0xff00);
+		return bestSignature;
+	}
+
+	uint8 TypeCasting::getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target) const
+	{
+		if (original == target)
+		{
+			// No cast required at all
+			return 0;
+		}
+
+		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
+		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
+		if (original == &PredefinedDataTypes::STRING)
+			original = &PredefinedDataTypes::UINT_64;
+		if (mConfig.mScriptFeatureLevel < 2)
+		{
+			if (target == &PredefinedDataTypes::STRING)
+				target = &PredefinedDataTypes::UINT_64;
+		}
+
+		if (original == target)
+		{
+			// It's a conversion between string and u64
+			return 1;
+		}
+
+		if (original->getClass() == DataTypeDefinition::Class::INTEGER && target->getClass() == DataTypeDefinition::Class::INTEGER)
+		{
+			const IntegerDataType& originalInt = original->as<IntegerDataType>();
+			const IntegerDataType& targetInt = target->as<IntegerDataType>();
+
+			// Is one type undefined?
+			if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
+			{
+				// Const may get cast to everything
+				return 1;
+			}
+			if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
+			{
+				// Can this happen at all?
+				return 1;
+			}
+
+			if (originalInt.getBytes() == targetInt.getBytes())
+			{
+				return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
+			}
+
+			if (originalInt.getBytes() < targetInt.getBytes())
+			{
+				// Up cast
+				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
+			}
+			else
+			{
+				// Down cast
+				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
+			}
+		}
+		else
+		{
+			// No cast possible
+			return CANNOT_CAST;
+		}
 	}
 
 }
