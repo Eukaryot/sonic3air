@@ -134,7 +134,7 @@ public:
 
 	void split(std::vector<CLASS>& output, CHAR separator) const;
 	void split(std::vector<StdStringView>& output, CHAR separator) const;
-	void compose(const std::vector<StringTemplate>& parts, const StringTemplate& separator);
+	void compose(const std::vector<CLASS>& parts, const StringTemplate& separator);
 
 	void overwrite(const StringTemplate& str, int pos);
 	void insert(const StringTemplate& str, int pos);

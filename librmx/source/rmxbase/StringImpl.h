@@ -346,8 +346,8 @@ TEMPLATE void STRING::add(const STRING& str)
 TEMPLATE void STRING::add(const STRING& str, int pos, int len)
 {
 	// Add part of another string
-	if (len < 0 || pos+len > str.mLength)
-		len = str.mLength - pos;
+	if (len < 0 || pos+len > (int)str.mLength)
+		len = (int)str.mLength - pos;
 	expand(mLength + len);
 	memcpy(&mData[mLength], &str.mData[pos], len * sizeof(CHAR));
 	mLength += len;
@@ -487,7 +487,7 @@ TEMPLATE double STRING::parseDouble() const
 TEMPLATE int STRING::parseData(void* dst) const
 {
 	// Read data encoded as hex values in string
-	for (int i = 0; i < mLength/2; ++i)
+	for (int i = 0; i < (int)mLength/2; ++i)
 	{
 		int value = 0;
 		for (int j = 0; j < 2; ++j)
@@ -833,7 +833,7 @@ TEMPLATE void STRING::split(std::vector<CLASS>& output, CHAR separator) const
 	output[k].makeSubString(*this, start, (int)(mLength - start));
 }
 
-TEMPLATE void STRING::compose(const std::vector<STRING>& parts, const STRING& separator)
+TEMPLATE void STRING::compose(const std::vector<CLASS>& parts, const STRING& separator)
 {
 	// Compose string from parts
 	clear();
