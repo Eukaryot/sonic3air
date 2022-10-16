@@ -104,13 +104,13 @@ namespace rmx
 
 		// Video
 		const VideoConfig& getVideoConfig() const { return mVideoConfig; }
-		void setAutoClearScreen(bool enable)	{ mVideoConfig.autoclearscreen = enable; }
-		void setAutoSwapBuffers(bool enable)	{ mVideoConfig.autoswapbuffers = enable; }
+		void setAutoClearScreen(bool enable)	{ mVideoConfig.mAutoClearScreen = enable; }
+		void setAutoSwapBuffers(bool enable)	{ mVideoConfig.mAutoSwapBuffers = enable; }
 
-		int getScreenWidth() const				{ return mVideoConfig.rect.width; }
-		int getScreenHeight() const				{ return mVideoConfig.rect.height; }
-		Vec2i getScreenSize() const				{ return mVideoConfig.rect.getSize(); }
-		const Recti& getScreenRect() const		{ return mVideoConfig.rect; }
+		int getScreenWidth() const				{ return mVideoConfig.mWindowRect.width; }
+		int getScreenHeight() const				{ return mVideoConfig.mWindowRect.height; }
+		Vec2i getScreenSize() const				{ return mVideoConfig.mWindowRect.getSize(); }
+		const Recti& getScreenRect() const		{ return mVideoConfig.mWindowRect; }
 
 		bool reshaped() const					{ return mReshaped; }
 

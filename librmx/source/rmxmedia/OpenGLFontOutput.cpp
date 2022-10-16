@@ -18,7 +18,7 @@ OpenGLFontOutput::OpenGLFontOutput(Font& font) :
 void OpenGLFontOutput::print(const std::vector<Font::TypeInfo>& infos)
 {
 	// Display with OpenGL
-	if (FTX::Video->getVideoConfig().renderer != rmx::VideoConfig::Renderer::OPENGL)
+	if (FTX::Video->getVideoConfig().mRenderer != rmx::VideoConfig::Renderer::OPENGL)
 		return;
 
 #ifdef ALLOW_LEGACY_OPENGL

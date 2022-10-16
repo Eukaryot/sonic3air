@@ -714,7 +714,7 @@ void GameView::render()
 	drawer.setBlendMode(DrawerBlendMode::NONE);
 	drawer.drawUpscaledRect(mGameViewport, mFinalGameTexture);
 
-	if (!FTX::Video->getVideoConfig().autoclearscreen)
+	if (!FTX::Video->getVideoConfig().mAutoClearScreen)
 	{
 		// Draw black bars so no screen clearing is needed
 		const float x1 = mGameViewport.x;

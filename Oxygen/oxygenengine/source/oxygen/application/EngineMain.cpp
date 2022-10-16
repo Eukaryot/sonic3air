@@ -498,21 +498,21 @@ bool EngineMain::createWindow()
 
 	// Setup video config
 	rmx::VideoConfig videoConfig(config.mWindowMode != Configuration::WindowMode::WINDOWED, config.mWindowSize.x, config.mWindowSize.y, appMetaData.mTitle.c_str());
-	videoConfig.renderer = useOpenGL ? rmx::VideoConfig::Renderer::OPENGL : rmx::VideoConfig::Renderer::SOFTWARE;
-	videoConfig.resizeable = true;
-	videoConfig.autoclearscreen = useOpenGL;
-	videoConfig.autoswapbuffers = false;
-	videoConfig.vsync = (config.mFrameSync >= Configuration::FrameSyncType::VSYNC_ON);
-	videoConfig.iconResource = appMetaData.mWindowsIconResource;
+	videoConfig.mRenderer = useOpenGL ? rmx::VideoConfig::Renderer::OPENGL : rmx::VideoConfig::Renderer::SOFTWARE;
+	videoConfig.mResizeable = true;
+	videoConfig.mAutoClearScreen = useOpenGL;
+	videoConfig.mAutoSwapBuffers = false;
+	videoConfig.mVSync = (config.mFrameSync >= Configuration::FrameSyncType::VSYNC_ON);
+	videoConfig.mIconResource = appMetaData.mWindowsIconResource;
 
-	SDL_SetHint(SDL_HINT_RENDER_VSYNC, videoConfig.vsync ? "1" : "0");
+	SDL_SetHint(SDL_HINT_RENDER_VSYNC, videoConfig.mVSync ? "1" : "0");
 
 #if defined(LOAD_APP_ICON_PNG)
 	// Load app icon
 	if (!appMetaData.mIconFile.empty())
 	{
 		RMX_LOG_INFO("Loading application icon...");
-		FileHelper::loadBitmap(videoConfig.iconBitmap, appMetaData.mIconFile);
+		FileHelper::loadBitmap(videoConfig.mIconBitmap, appMetaData.mIconFile);
 	}
 #endif
 
@@ -565,7 +565,7 @@ bool EngineMain::createWindow()
 			case Configuration::WindowMode::WINDOWED:
 			{
 				// (Non-maximized) Window
-				if (videoConfig.resizeable)
+				if (videoConfig.mResizeable)
 					flags |= SDL_WINDOW_RESIZABLE;
 				break;
 			}
@@ -576,16 +576,16 @@ bool EngineMain::createWindow()
 				SDL_Rect rect;
 				if (SDL_GetDisplayBounds(displayIndex, &rect) == 0)
 				{
-					videoConfig.rect.width = rect.w;
-					videoConfig.rect.height = rect.h;
+					videoConfig.mWindowRect.width = rect.w;
+					videoConfig.mWindowRect.height = rect.h;
 				}
 				else
 				{
 					SDL_DisplayMode dm;
 					if (SDL_GetDesktopDisplayMode(displayIndex, &dm) == 0)
 					{
-						videoConfig.rect.width = dm.w;
-						videoConfig.rect.height = dm.h;
+						videoConfig.mWindowRect.width = dm.w;
+						videoConfig.mWindowRect.height = dm.h;
 					}
 				}
 				flags |= SDL_WINDOW_BORDERLESS;
@@ -602,15 +602,15 @@ bool EngineMain::createWindow()
 		}
 
 		RMX_LOG_INFO("Creating window...");
-		mSDLWindow = SDL_CreateWindow(*videoConfig.caption, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), videoConfig.rect.width, videoConfig.rect.height, flags);
+		mSDLWindow = SDL_CreateWindow(*videoConfig.mCaption, SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), SDL_WINDOWPOS_CENTERED_DISPLAY(displayIndex), videoConfig.mWindowRect.width, videoConfig.mWindowRect.height, flags);
 		if (nullptr == mSDLWindow)
 		{
 			return false;
 		}
 
 		RMX_LOG_INFO("Retrieving actual window size...");
-		SDL_GetWindowSize(mSDLWindow, &videoConfig.rect.width, &videoConfig.rect.height);
-		SDL_ShowCursor(!videoConfig.hidecursor);
+		SDL_GetWindowSize(mSDLWindow, &videoConfig.mWindowRect.width, &videoConfig.mWindowRect.height);
+		SDL_ShowCursor(!videoConfig.mHideCursor);
 
 		if (useOpenGL)
 		{
@@ -651,24 +651,24 @@ bool EngineMain::createWindow()
 
 #if defined(PLATFORM_WINDOWS)
 	// Set window icon (using a Windows-specific method)
-	if (videoConfig.iconResource != 0)
+	if (videoConfig.mIconResource != 0)
 	{
 		RMX_LOG_INFO("Setting window icon (Windows)...");
-		PlatformFunctions::setAppIcon(videoConfig.iconResource);
+		PlatformFunctions::setAppIcon(videoConfig.mIconResource);
 	}
 #endif
 
 #if defined(LOAD_APP_ICON_PNG)
 	// Set window icon (using SDL functionality)
-	if (nullptr != videoConfig.iconBitmap.getData() || videoConfig.iconSource.nonEmpty())
+	if (nullptr != videoConfig.mIconBitmap.getData() || videoConfig.mIconSource.nonEmpty())
 	{
 		RMX_LOG_INFO("Setting window icon from loaded bitmap...");
 		Bitmap tmp;
-		Bitmap* bitmap = &videoConfig.iconBitmap;
+		Bitmap* bitmap = &videoConfig.mIconBitmap;
 		if (bitmap->empty())
 		{
 			bitmap = nullptr;
-			if (tmp.load(videoConfig.iconSource.toWString()))
+			if (tmp.load(videoConfig.mIconSource.toWString()))
 			{
 				bitmap = &tmp;
 			}

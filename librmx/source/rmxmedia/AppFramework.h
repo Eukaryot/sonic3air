@@ -53,26 +53,26 @@ namespace rmx
 			OPENGL
 		};
 
-		Recti rect;						// Window rect on screen
-		Vec2i startPos;					// Upper left corner
-		int bpp = 32;					// Fullscreen only: Color depth bits per pixel
-		bool fullscreen = false;		// (Exclusive) fullscreen or window mode?
-		bool positioning = false;		// Window mode only: Use "startPos"
-		bool resizeable = true;			// Window mode only: Resizable window
-		bool noframe = false;			// Window mode only: Hide window frame / borderless window
-		bool vsync = true;				// Use vertical sync
-		bool hidecursor = false;		// Show or hide mouse cursor
-		int multisampling = 0;			// Multisampling setting, usually 0 to disable
-		bool autoclearscreen = true;	// Automatically clear screen before rendering
-		bool autoswapbuffers = true;	// Automatically swap buffers after rendering
-		int iconResource = 0;			// Resource number of icon
-		Bitmap iconBitmap;				// Bitmap of icon, as an alternative for "iconSource"
-		String iconSource;				// Source file for icon (in PNG format)
-		String caption;					// Caption text for window
-		Renderer renderer = Renderer::OPENGL;
+		Recti mWindowRect;				// Window rect on screen
+		Vec2i mStartPos;				// Upper left corner
+		int mColorDepth = 32;			// Fullscreen only: Color depth in bits per pixel
+		bool mFullscreen = false;		// (Exclusive) fullscreen or window mode?
+		bool mPositioning = false;		// Window mode only: Use "mStartPos"
+		bool mResizeable = true;		// Window mode only: Resizable window
+		bool mBorderless = false;		// Window mode only: Hide window frame / borderless window
+		bool mVSync = true;				// Use vertical sync
+		bool mHideCursor = false;		// Show or hide mouse cursor
+		int mMultisampling = 0;			// Multisampling setting, usually 0 to disable
+		bool mAutoClearScreen = true;	// Automatically clear screen before rendering
+		bool mAutoSwapBuffers = true;	// Automatically swap buffers after rendering
+		int mIconResource = 0;			// Resource number of icon
+		Bitmap mIconBitmap;				// Bitmap of icon, as an alternative for "iconSource"
+		String mIconSource;				// Source file for icon (in PNG format)
+		String mCaption;				// Caption text for window
+		Renderer mRenderer = Renderer::OPENGL;
 
 		VideoConfig();
-		VideoConfig(bool fullscr, int wid, int hgt, const String& caption_ = "");
+		VideoConfig(bool fullscreen, int width, int height, const String& caption = "");
 	};
 
 

@@ -268,46 +268,46 @@ namespace rmx
 	bool FTX_VideoManager::setVideoMode(const VideoConfig& videoconfig)
 	{
 		// Change video mode
-		uint32 flags = (videoconfig.renderer == VideoConfig::Renderer::OPENGL) ? SDL_WINDOW_OPENGL : 0;
-		if (videoconfig.fullscreen)
+		uint32 flags = (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL) ? SDL_WINDOW_OPENGL : 0;
+		if (videoconfig.mFullscreen)
 		{
 			flags |= SDL_WINDOW_FULLSCREEN;
 		}
 		else
 		{
-			if (videoconfig.noframe)
+			if (videoconfig.mBorderless)
 				flags |= SDL_WINDOW_BORDERLESS;
-			if (videoconfig.resizeable)
+			if (videoconfig.mResizeable)
 				flags |= SDL_WINDOW_RESIZABLE;
 		}
 
 		int startX = SDL_WINDOWPOS_UNDEFINED;
 		int startY = SDL_WINDOWPOS_UNDEFINED;
-		if (videoconfig.positioning)
+		if (videoconfig.mPositioning)
 		{
-			startX = videoconfig.startPos.x;
-			startY = videoconfig.startPos.y;
+			startX = videoconfig.mStartPos.x;
+			startY = videoconfig.mStartPos.y;
 		}
 
-		mMainWindow = SDL_CreateWindow(*videoconfig.caption, startX, startY, videoconfig.rect.width, videoconfig.rect.height, flags);
+		mMainWindow = SDL_CreateWindow(*videoconfig.mCaption, startX, startY, videoconfig.mWindowRect.width, videoconfig.mWindowRect.height, flags);
 
 		// Success so far?
 		if (nullptr == mMainWindow)
 			return false;
 
-		if (videoconfig.renderer == VideoConfig::Renderer::OPENGL)
+		if (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 			SDL_GL_CreateContext(mMainWindow);
-			SDL_GL_SetSwapInterval(videoconfig.vsync ? 1 : 0);
+			SDL_GL_SetSwapInterval(videoconfig.mVSync ? 1 : 0);
 		}
 
 		// Copy video config
 		mVideoConfig = videoconfig;
 
-		SDL_GetWindowSize(mMainWindow, &mVideoConfig.rect.width, &mVideoConfig.rect.height);
-		SDL_ShowCursor(!videoconfig.hidecursor);
+		SDL_GetWindowSize(mMainWindow, &mVideoConfig.mWindowRect.width, &mVideoConfig.mWindowRect.height);
+		SDL_ShowCursor(!videoconfig.mHideCursor);
 
-		if (videoconfig.renderer == VideoConfig::Renderer::OPENGL)
+		if (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 			// Defaults for OpenGL
 			glEnable(GL_BLEND);
@@ -330,7 +330,7 @@ namespace rmx
 		if (mInitialized)
 			return setVideoMode(videoconfig);
 
-		if (videoconfig.renderer == VideoConfig::Renderer::OPENGL)
+		if (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 			// Setup video mode for OpenGL
 			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -338,13 +338,13 @@ namespace rmx
 			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, videoconfig.multisampling);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, videoconfig.mMultisampling);
 		}
 
 		if (!setVideoMode(videoconfig))
 			return false;
 
-		if (videoconfig.renderer == VideoConfig::Renderer::OPENGL)
+		if (videoconfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 		#ifdef RMX_USE_GLEW
 			const GLenum result = glewInit();
@@ -362,22 +362,22 @@ namespace rmx
 
 	#ifdef PLATFORM_WINDOWS
 		// Symbol setzen (Windows)
-		if (mVideoConfig.iconResource != 0)
+		if (mVideoConfig.mIconResource != 0)
 		{
-			HICON hIcon = LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(mVideoConfig.iconResource));
+			HICON hIcon = LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(mVideoConfig.mIconResource));
 			SendMessage((HWND)FTX::Video->getNativeWindowHandle(), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 		}
 	#endif
 
 		// Set icon (general)
-		if (nullptr != mVideoConfig.iconBitmap.getData() || mVideoConfig.iconSource.nonEmpty())
+		if (nullptr != mVideoConfig.mIconBitmap.getData() || mVideoConfig.mIconSource.nonEmpty())
 		{
 			Bitmap tmp;
-			Bitmap* bitmap = &mVideoConfig.iconBitmap;
+			Bitmap* bitmap = &mVideoConfig.mIconBitmap;
 			if (bitmap->empty())
 			{
 				bitmap = nullptr;
-				if (tmp.load(mVideoConfig.iconSource.toWString()))
+				if (tmp.load(mVideoConfig.mIconSource.toWString()))
 				{
 					bitmap = &tmp;
 				}
@@ -405,11 +405,11 @@ namespace rmx
 	void FTX_VideoManager::reshape(int width, int height)
 	{
 		// Called e.g. when window size changed
-		if (mVideoConfig.rect.width == width && mVideoConfig.rect.height == height)
+		if (mVideoConfig.mWindowRect.width == width && mVideoConfig.mWindowRect.height == height)
 			return;
 
-		mVideoConfig.rect.width = width;
-		mVideoConfig.rect.height = height;
+		mVideoConfig.mWindowRect.width = width;
+		mVideoConfig.mWindowRect.height = height;
 		mReshaped = true;
 	/*
 		// Reset video mode
@@ -419,9 +419,9 @@ namespace rmx
 
 	void FTX_VideoManager::beginRendering()
 	{
-		if (mVideoConfig.autoclearscreen)
+		if (mVideoConfig.mAutoClearScreen)
 		{
-			if (mVideoConfig.renderer == VideoConfig::Renderer::OPENGL)
+			if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 			{
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			}
@@ -430,9 +430,9 @@ namespace rmx
 
 	void FTX_VideoManager::endRendering()
 	{
-		if (mVideoConfig.autoswapbuffers)
+		if (mVideoConfig.mAutoSwapBuffers)
 		{
-			if (mVideoConfig.renderer == VideoConfig::Renderer::OPENGL)
+			if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 			{
 				SDL_GL_SwapWindow(mMainWindow);
 			}
@@ -442,14 +442,14 @@ namespace rmx
 
 	void FTX_VideoManager::setPixelView()
 	{
-		if (mVideoConfig.renderer == VideoConfig::Renderer::OPENGL)
+		if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 		#ifdef ALLOW_LEGACY_OPENGL
 			// Set 2D view
-			glViewport(0, 0, mVideoConfig.rect.width, mVideoConfig.rect.height);
+			glViewport(0, 0, mVideoConfig.mWindowRect.width, mVideoConfig.mWindowRect.height);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			glOrtho(0.0, mVideoConfig.rect.width, mVideoConfig.rect.height, 0.0, +1.0, -1.0);
+			glOrtho(0.0, mVideoConfig.mWindowRect.width, mVideoConfig.mWindowRect.height, 0.0, +1.0, -1.0);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 		#else
@@ -460,18 +460,18 @@ namespace rmx
 
 	void FTX_VideoManager::setPerspective2D(double fov, double dnear, double dfar)
 	{
-		if (mVideoConfig.renderer == VideoConfig::Renderer::OPENGL)
+		if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 		#ifdef ALLOW_LEGACY_OPENGL
 			// Set perspective 2D view
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			double dx = mVideoConfig.rect.width * dnear * 0.5;
-			double dy = mVideoConfig.rect.height * dnear * 0.5;
+			double dx = mVideoConfig.mWindowRect.width * dnear * 0.5;
+			double dy = mVideoConfig.mWindowRect.height * dnear * 0.5;
 			glFrustum(-dx, dx, dy, -dy, dnear, dfar);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
-			glTranslatef(-mVideoConfig.rect.width * 0.5f, -mVideoConfig.rect.height * 0.5f, -1.0f);
+			glTranslatef(-mVideoConfig.mWindowRect.width * 0.5f, -mVideoConfig.mWindowRect.height * 0.5f, -1.0f);
 		#else
 			RMX_ASSERT(false, "Unsupported without legacy OpenGL support");
 		#endif
@@ -480,7 +480,7 @@ namespace rmx
 
 	void FTX_VideoManager::getScreenBitmap(Bitmap& bitmap)
 	{
-		if (mVideoConfig.renderer == VideoConfig::Renderer::OPENGL)
+		if (mVideoConfig.mRenderer == VideoConfig::Renderer::OPENGL)
 		{
 			const Recti& screen = getScreenRect();
 			bitmap.create(screen.width, screen.height);

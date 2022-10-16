@@ -15,24 +15,22 @@ namespace rmx
 
 	VideoConfig::VideoConfig()
 	{
-		memset(this, 0, sizeof(VideoConfig) - sizeof(String) * 2);
-		rect.set(0, 0, 800, 500);
-		caption = "FTX Window";
+		mWindowRect.set(0, 0, 800, 500);
+		mCaption = "FTX Window";
 	}
 
-	VideoConfig::VideoConfig(bool fullscr, int wid, int hgt, const String& caption_)
+	VideoConfig::VideoConfig(bool fullscreen, int width, int height, const String& caption)
 	{
-		memset(this, 0, sizeof(VideoConfig) - sizeof(String) * 2);
-		fullscreen = fullscr;
-		resizeable = !fullscr;
-		rect.setSize(wid, hgt);
-		bpp = 32;
-		caption = "FTX Window";
-		multisampling = 0;
-		autoclearscreen = true;
-		autoswapbuffers = true;
-		if (caption_.nonEmpty())
-			caption = caption_;
+		mFullscreen = fullscreen;
+		mResizeable = !fullscreen;
+		mWindowRect.set(0, 0, width, height);
+		mColorDepth = 32;
+		mCaption = "FTX Window";
+		mMultisampling = 0;
+		mAutoClearScreen = true;
+		mAutoSwapBuffers = true;
+		if (caption.nonEmpty())
+			mCaption = caption;
 	}
 
 
