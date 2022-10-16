@@ -1023,6 +1023,22 @@ function void fn05e2c2()
 	D0 = isMainCharacter(CHARACTER_TAILS) ? 0 : (outro.ending_type < 0) ? 4 : 8
 	screenmover_target.right = D0.u16		// This variable is just misused to temporarily save this value
 
+#if STANDALONE
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		// This is similar to `addPatternLoadingCue(0x05b504)`, but isn't called directly here because the target in VRAM we need is different
+		// Search for next free place in table
+		A2 = 0xfffff680
+		while (u32[A2] != 0)
+		{
+			A2 += 6
+		}
+
+		u32[A2] = 0x0dea00
+		u16[A2+4] = 0x68e0
+		return
+	}
+#endif
 	A1 = u32[0x05e328 + D0.u16]
 	Kosinski.addToDMAQueue(A1, 0x68e0)
 }
@@ -1044,11 +1060,30 @@ function void fn05e334()
 	{
 		objA0.animation.sprite = 0x03
 	}
+#if STANDALONE
+	else if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		objA0.mapping_offset = 0x060a4c
+		objA0.animation.sprite = 0x01
+	}
+#endif
 	D0.u16 = screenmover_target.right
 
 	A1 = u32[0x05e3b4 + D0.u16]
+#if STANDALONE
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+		A1 = 0x060bea
+#endif
 	copyMemory(0xfffffc40, A1, 0x20)
 
+#if STANDALONE
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		objA0.render_flags &= ~render_flag.FLIP_X
+		fn05e3c0()
+		return
+	}
+#endif
 	if (outro.ending_type < 0)
 	{
 		fn05e3c0()

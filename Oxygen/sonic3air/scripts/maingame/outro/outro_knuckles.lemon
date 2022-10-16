@@ -522,6 +522,14 @@ function void fn05f0c4()
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x05f20a
+	#if STANDALONE
+		if (global.zone_act == 0x0d01)
+		{
+			// Use the correct logo position in Sonic/Tails ending
+			u8[A1 + 0x2c] = 0x04
+			return
+		}
+	#endif
 		u8[A1 + 0x2c] = 0x08
 	}
 }

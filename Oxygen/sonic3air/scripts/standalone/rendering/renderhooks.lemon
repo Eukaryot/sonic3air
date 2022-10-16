@@ -299,32 +299,25 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		if (objA0.update_address == 0x05e18a || objA0.update_address == 0x05f4e4)
 		{
 			u64 key = 0
-			u8 atex = 0
+			u8 atex = (objA0.update_address == 0x05e18a) ? 0x20 : 0
 			u8 flags = prioFlag ? SPRITE_FLAG_PRIO : 0
 
-			if (objA0.update_address == 0x05e18a)
+			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
-				atex = 0x20
-
-				if (objA0.animation.sprite >= 0x03)
-				{
-					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
-					flags |= SPRITE_FLAG_FLIP_X
-				}
-				else if (objA0.animation.sprite == 0x02)
-				{
-					key = getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true)
-				}
-				else // if (objA0.animation.sprite <= 0x01)
-				{
-					key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, false), objA0.animation.sprite - 0x00)
-				}
-			}
-
-			if (objA0.update_address == 0x05f4e4)
-			{
-				// atex = 0x00 
 				key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_KNUCKLES, false), objA0.animation.sprite)
+			}
+			else if (objA0.animation.sprite >= 0x03)
+			{
+				key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
+				flags |= SPRITE_FLAG_FLIP_X
+			}
+			else if (objA0.animation.sprite == 0x02)
+			{
+				key = getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true)
+			}
+			else // if (objA0.animation.sprite <= 0x01)
+			{
+				key = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, false), objA0.animation.sprite - 0x00)
 			}
 
 			if (Renderer.hasCustomSprite(key))
@@ -341,11 +334,12 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		}
 
 		// Character sprites in best ending final scene
-		if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
+		if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
 		{
-			u8 character = (objA0.update_address == 0x05f376) ? CHARACTER_SONIC : CHARACTER_TAILS
+			u8 character = (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e) ? CHARACTER_SONIC : CHARACTER_TAILS
 			u8 atex = 0x40 + character * 0x20
-			u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), objA0.animation.frame)
+			u8 animationSprite = (objA0.animation.sprite <= 4) ? (objA0.animation.sprite-1) : (objA0.animation.sprite <= 9) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
+			u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), animationSprite)
 			if (Renderer.hasCustomSprite(key))
 			{
 				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)

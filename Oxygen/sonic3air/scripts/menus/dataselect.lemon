@@ -1592,31 +1592,35 @@ function void fn00d9f4()
 //# address-hook(0x00da1e) end(0x00da4c)
 function void fn00da1e()
 {
+	// Inputs:
+	// A1 = save slot address; (0xffffe6ac + (x * 0x0a), x is the slot number)
+	// A2 = 0xffffffb2, address to store emerald state in
+	// D0.u16 = compact representation of emerald collection states (u16[A1 + 0x06])
 	global.traded_emeralds = 0
-	D1 = 0
-	D2 = 0
-	D3 = 6
+	D1 = 0		// Collected Chaos Emerald counter
+	D2 = 0		// Collected Super Emerald counter
+	D3 = 6		// Number of emeralds
 	while (D3.s16 >= 0)
 	{
-		D0.u16 = (D0.u16 << 2) + (D0.u16 >> 14)
-		D4.u16 = D0.u16 & 0x03
-		u8[A2] = D4.u8
+		D0.u16 = (D0.u16 << 2) + (D0.u16 >> 14)		// Shift emerald collection state bits around to get the appropriate one on least significant digits (2 bits for each emerald)
+		D4.u16 = D0.u16 & 0x03		// Get emerald collection state
+		u8[A2] = D4.u8				// Store the result in the appropriate address
 
-		if (D4.u16 != 0)
+		if (D4.u16 != 0)		// Is Chaos Emerald collected?
 		{
-			++D1.u16
-			if (D4.u16 == 3)
+			++D1.u16			// Increase Chaos Emerald counter 
+			if (D4.u16 == 3)	// Is Super Emerald collected?
 			{
-				++D2.u16
+				++D2.u16		// Increase Super Emerald counter 
 			}
 		}
-		if (D4.u16 >= 2)
+		if (D4.u16 >= 2)		// Is emerald state traded or Super Emerald collected?
 		{
-			global.traded_emeralds = 0xff
+			global.traded_emeralds = 0xff	// Set all emeralds as traded
 		}
 
-		++A2
-		--D3.s16
+		++A2		// Increment to next Emerald state address
+		--D3.s16	// Move on to next emerald
 	}
 }
 
