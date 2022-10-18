@@ -299,7 +299,7 @@ void Font::getTypeInfos(std::vector<TypeInfo>& output, Vec2f pos, const StringRe
 		if (nullptr != info)
 		{
 			output[k].mBitmap = &info->mBitmap;
-			output[k].mPosition = pos;
+			output[k].mPosition = pos + info->mIndent;
 
 			pos.x += info->mAdvance + spacing;
 		}
@@ -456,7 +456,8 @@ Vec2i Font::applyAlignment(const Recti& drawRect, const Recti& innerRect, int al
 void Font::invalidateFontSource()
 {
 	if (mOwnsFontSource)
-		SAFE_DELETE(mFontSource);
+		delete mFontSource;
+	mFontSource = nullptr;
 	mFontSourceDirty = true;
 	mOwnsFontSource = false;
 	mCharacterMap.clear();
