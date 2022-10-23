@@ -1,0 +1,22 @@
+
+=== Build for Windows with Visual Studio 2019/2022 ===
+
+
+Using the build script
+	- Just execute "build_libcurl.bat" and you're done
+
+
+Alternative: Manual build
+	- Open the Visual Studio Solution at "curl\projects\Windows\VC14.30\curl-all.sln"
+	- Changed needed after download
+		1.) Link statically against the VC++ runtime, for all projects:
+			 C/C++ -> Code Generation -> Runtime Library = "Multi-threaded (/MT)" (yes, also for Debug)
+	- Build as "LIB Release - DLL Windows SSPI", both Win32 + x64
+	- Afterwards execute "copy_curl.bat" to copy headers and libs in place
+
+
+Notes on libcurl static builds
+	- The following libraries need to be linked separately under Windows if you link to libcurl statically,
+	  at least for the "DLL Windows SSPI" variant:
+		ws2_32.lib, wldap32.lib, crypt32.lib
+	- Also don't forget to manually add "#define CURL_STATICLIB" before any curl includes
