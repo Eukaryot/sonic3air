@@ -386,6 +386,81 @@ function void fn01d890()
 	ItemEffect.ApplyRobotnik()
 }
 
+function void SpringVertical.BaseUpdate()
+{
+	Spring.BaseUpdate()
+}
+
+function void SpringVertical.InitFlipped()
+{
+	SpringVerticalFlipped.Init()
+}
+
+function void SpringVertical.InitDiagonal()
+{
+	SpringDiagonal.Init()
+}
+
+function void SpringVertical.InitDiagonalFlipped()
+{
+	SpringDiagonalFlipped.Init()
+}
+
+function void fn022f46()
+{
+	SpringVertical.Update.CompetitionMode()
+}
+
+function void SpringHorizontal.Check()
+{
+	SpringHorizontal.Update()
+}
+
+function void fn0230de()
+{
+	SpringHorizontal.Check.CompetitionMode()
+}
+
+function void fn023160()
+{
+	SpringHorizontal.ApplyToCharacter.CompetitionMode()
+}
+
+function void fn023190()
+{
+	SpringHorizontal.ApplyToCharacter()
+}
+
+function void SpringVertical.UpdateFlipped()
+{
+	SpringVerticalFlipped.Update()
+}
+
+function void fn023374()
+{
+	SpringVerticalFlipped.Update.CompetitionMode()
+}
+
+function void fn0233da()
+{
+	SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
+}
+
+function void SpringDiagonal.UpdateFlipped()
+{
+	SpringDiagonalFlipped.Update()
+}
+
+function void fn0234e6()
+{
+	SpringDiagonal.ApplyToCharacter()
+}
+
+function void fn023624()
+{
+	SpringDiagonalFlipped.ApplyToCharacter()
+}
+
 function void fn02cfc0()
 {
 	Checkpoint.Init()

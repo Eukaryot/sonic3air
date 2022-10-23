@@ -90,7 +90,7 @@ function void CompetitionMode.MainMenu()
 	D0.u16 = u16[(A1+=2)-2]
 	while (D0.s16 >= 0)
 	{
-		u32[A0] = u32[(A1+=4)-4]
+		objA0.update_address = u32[(A1+=4)-4]
 		objA0.sprite_attributes = (CompetitionMenu.MenuPart2.targetInVRAM >> 5)
 		objA0.mapping_offset = 0x2098c0
 		objA0.position.x.u16 = u16[(A1+=2)-2] + getScreenExtend()
@@ -407,7 +407,7 @@ function void CompetitionMode.StageSelect()
 	D0.u16 = u16[(A1+=2)-2]
 	while (D0.s16 >= 0)
 	{
-		u32[A0] = u32[(A1+=4)-4]
+		objA0.update_address = u32[(A1+=4)-4]
 		objA0.mapping_offset = 0x20a6e4
 		objA0.position.x.u16 = u16[A1] + getScreenExtend()
 		objA0.position.x.frac = u16[(A1+=2)-2]
@@ -836,7 +836,7 @@ function void fn00b2cc()
 	D0.u16 = u16[(A1+=2)-2]
 	while (D0.s16 >= 0)
 	{
-		u32[A0] = u32[(A1+=4)-4]
+		objA0.update_address = u32[(A1+=4)-4]
 		objA0.mapping_offset = 0x20a6e4
 		objA0.position.x.u16 = u16[A1]
 		objA0.position.x.frac = u16[(A1+=2)-2]
@@ -1325,7 +1325,7 @@ function void fn00b74e()
 	D0.u16 = u16[(A1+=2)-2]
 	while (D0.s16 >= 0)
 	{
-		u32[A0] = u32[(A1+=4)-4]
+		objA0.update_address = u32[(A1+=4)-4]
 		objA0.mapping_offset = 0x20a6e4
 		objA0.position.x.u16 = u16[A1]
 		objA0.position.x.frac = u16[(A1+=2)-2]
@@ -1718,7 +1718,7 @@ function void fn00bc08()
 	D0.u16 = u16[(A1+=2)-2]
 	while (D0.s16 >= 0)
 	{
-		u32[A0] = u32[(A1+=4)-4]
+		objA0.update_address = u32[(A1+=4)-4]
 		objA0.mapping_offset = 0x20a6e4
 		objA0.position.x.u16 = u16[A1] + getScreenExtend()
 		objA0.position.x.frac = u16[(A1+=2)-2]

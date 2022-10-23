@@ -16,40 +16,45 @@
 function void LevelTilesAnimation()
 {
 	// Targets:
-	//  - 0x02783a	-> offset = 0x00	-> AIZ 1
-	//  - 0x02784a	-> offset = 0x04	-> AIZ 2
-	//  - 0x027880	-> offset = 0x08	-> HCZ 1
-	//  - 0x027a58	-> offset = 0x0c	-> HCZ 2
-	//  - 0x027c2c	-> offset = 0x10	-> MGZ 1
-	//  - 0x027c2c	-> offset = 0x14	-> MGZ 2
-	//  - 0x027c36	-> offset = 0x18	-> CNZ 1
-	//  - 0x027c36	-> offset = 0x1c	-> CNZ 2
-	//  - 0x0286e4	-> offset = 0x20	-> FBZ 1
-	//  - 0x0286e4	-> offset = 0x24	-> FBZ 2
-	//  - 0x027ccc	-> offset = 0x28	-> ICZ 1
-	//  - 0x027ccc	-> offset = 0x2c	-> ICZ 2
-	//  - 0x027e00	-> offset = 0x30	-> LBZ 1
-	//  - 0x027ef0	-> offset = 0x34	-> LBZ 2
-	//  - 0x0280ac	-> offset = 0x38	-> MHZ 1
-	//  - 0x0280ac	-> offset = 0x3c	-> MHZ 2
-	//  - 0x0281c8	-> offset = 0x40	-> SOZ 1
-	//  - 0x02825c	-> offset = 0x44	-> SOZ 2
-	//  - 0x0282be	-> offset = 0x48	-> LRZ 1
-	//  - 0x0282c8	-> offset = 0x4c	-> LRZ 2
-	//  - 0x0286e4	-> offset = 0x50	-> SSZ S/T
-	//  - 0x027838	-> offset = 0x54	-> SSZ Knuckles
-	//  - 0x0286e4	-> offset = 0x58	-> DEZ 1
-	//  - 0x0286e4	-> offset = 0x5c	-> DEZ 2
-	//  - 0x027838	-> offset = 0x60	-> DDZ
-	//  - 0x027838	-> offset = 0x6c	-> DEZ Boss
-	//    ...some unknowns here, including the competition mode stages
-	//  - 0x0284c8	-> offset = 0x98	-> Bonus GM
-	//  - 0x0284fe	-> offset = 0xa0	-> Bonus GS
-	//  - 0x027838	-> offset = 0xa8	-> Bonus SM
-	//  - 0x0282b4	-> offset = 0xb0	-> LRZ Boss
-	//  - 0x0286e4	-> offset = 0xb4	-> HPZ
-	//  - 0x027838	-> offset = 0xb8	-> ??
-	//  - 0x0286e4	-> offset = 0xbc	-> Emerald cave
+	//   offset			animated tiles		tile animation function
+	//  - 0x00:			0x028750			0x02783a				-> AIZ 1 (i.e. the technical act 1 = until everything gets set on fire)
+	//  - 0x04:			0x02879c			0x02784a				-> AIZ 2
+	//  - 0x08:			0x0287f4			0x027880				-> HCZ 1
+	//  - 0x0c:			0x02882c			0x027a58				-> HCZ 2
+	//  - 0x10:			0x028862			0x027c2c				-> MGZ 1
+	//  - 0x14:			0x028862			0x027c2c				-> MGZ 2
+	//  - 0x18:			0x028882			0x027c36				-> CNZ 1
+	//  - 0x1c:			0x028882			0x027c36				-> CNZ 2
+	//  - 0x20:			0x028906			0x0286e4				-> FBZ 1
+	//  - 0x24:			0x028948			0x0286e4				-> FBZ 2
+	//  - 0x28:			0x028990			0x027ccc				-> ICZ 1 (probably only the technical act 1)
+	//  - 0x2c:			0x028990			0x027ccc				-> ICZ 2
+	//  - 0x30:			0x0289a2			0x027e00				-> LBZ 1
+	//  - 0x34:			0x0289cc			0x027ef0				-> LBZ 2
+	//  - 0x38:			0x0289e8			0x0280ac				-> MHZ 1
+	//  - 0x3c:			0x0289e8			0x0280ac				-> MHZ 2
+	//  - 0x40:			0x028a6a			0x0281c8				-> SOZ 1
+	//  - 0x44:			0x028a6a			0x02825c				-> SOZ 2
+	//  - 0x48:			0x028a6a			0x0282be				-> LRZ 1
+	//  - 0x4c:			0x028a84			0x0282c8				-> LRZ 2
+	//  - 0x50:			0x028aa4			0x0286e4				-> SSZ S/T
+	//  - 0x54:			0x028aa4			0x027838				-> SSZ Knuckles		 (empty function)
+	//  - 0x58:			0x028aee			0x0286e4				-> DEZ 1
+	//  - 0x5c:			0x028aee			0x0286e4				-> DEZ 2
+	//  - 0x60, 0x64:	0x028bd8			0x027838				-> DDZ				 (empty function)
+	//  - 0x68, 0x6c:	0x028bd8			0x027838				-> Outro S/T		 (empty function)
+	//  - 0x70, 0x74:	0x028bd8			0x0286e4				-> ALZ
+	//  - 0x78, 0x7c:	0x028be6			0x0286e4				-> BPZ
+	//  - 0x80, 0x84:	0x028c1c			0x0283e2				-> DPZ
+	//  - 0x88, 0x8c:	0x028c3e			0x027838				-> CGZ				 (empty function)
+	//  - 0x90, 0x94:	0x028c3e			0x027838				-> EMZ				 (empty function)
+	//  - 0x98, 0x9c:	0x028c3e			0x0284c8				-> Bonus GM
+	//  - 0xa0, 0xa4:	0x028c2c			0x0284fe				-> Bonus GS
+	//  - 0xa8, 0xac:	0x028c3e			0x027838				-> Bonus SM			 (empty function)
+	//  - 0xb0:			0x028c3e			0x0282b4				-> LRZ Boss
+	//  - 0xb4:			0x028c40			0x0286e4				-> HPZ
+	//  - 0xb8:			0x028c7e			0x027838				-> DEZ Boss			 (empty function)
+	//  - 0xbc:			0x028c40			0x0286e4				-> Emerald cave
 
 	u8 offset = global.zone * 8 + global.act * 4
 	A2 = 0x027778 + s16[0x02777a + offset]

@@ -170,7 +170,7 @@ function void fn048370()
 				objA1.velocity.x = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? -0x200 : 0x200
 				objA1.velocity.y = -0x600
 				objA1.state = char.state.ROLLING
-				objA1.flags2a |= char.flag.IN_AIR | char.flag.ROLLING
+				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 				u8[A1 + 0x2e] = 0
 				u8[A1 + 0x40] = 1
 

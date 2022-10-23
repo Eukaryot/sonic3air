@@ -222,8 +222,8 @@ function void fn01414c()
 function void fn0141f2()
 {
 	objA0.value2f = 0x01
-	u8[A0 + 0x25] = 0xf0
-	objA0.flags2a = 0x02
+	tails.flight_countdown = 0xf0
+	objA0.flags2a = char.flag.IN_AIR
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 	objA0.groundspeed = 0
@@ -236,13 +236,9 @@ function void fn0141f2()
 function void fn01421c()
 {
 	tails.control_counter = 0
-	u8[A0 + 0x25] = 0xf0
-	control.tails = 0
-	D0.u8 = level.framecounter.low & 0x07
-	if (D0.u8 == 0)
-	{
-		control.tails |= 0x7070		// CONTROL_ABC, CONTROL_ABC
-	}
+	tails.flight_countdown = 0xf0
+	control.tails = (level.framecounter.low & 0x07) ? 0 : 0x7070		// CONTROL_ABC, CONTROL_ABC
+
 	D0.u16 = camera.position.y.u16 + 0x90
 	if (D0.u16 >= objA0.position.y.u16)
 	{
@@ -254,7 +250,7 @@ function void fn01421c()
 //# address-hook(0x014254) end(0x01425a)
 function void fn014254()
 {
-	u8[A0 + 0x25] = 0xf0
+	tails.flight_countdown = 0xf0
 }
 
 

@@ -619,11 +619,27 @@ define checkpoint.lives_granted			=  u8[0xfffffe43]
 define checkpoint.move_area.bottom		= u16[0xfffffe44]
 define checkpoint.camera_routine		=  u8[0xfffffe46]
 
-define global.shields_backup_1	=  u8[0xfffffe47]
-define global.stage_type		=  u8[0xfffffe48]	// 0 in normal gameplay, 1 in special stage, 2 in HPZ entered through giant ring as well as in bonus stages
-define level.backup.checkpoint	=  u8[0xfffffe49]
-define level.backup.zone_act	= u16[0xfffffe4a]
-// There's more backup stuff from here
+define global.shields_backup_1				=  u8[0xfffffe47]	// Backup of shields between stages, gets modified during bonus stages
+define global.stage_type					=  u8[0xfffffe48]	// 0 in normal gameplay, 1 in special stage, 2 in HPZ entered through giant ring as well as in bonus stages
+define level.backup.checkpoint				=  u8[0xfffffe49]
+define level.backup.zone_act				= u16[0xfffffe4a]
+define level.backup.x						= u16[0xfffffe4c]
+define level.backup.y						= u16[0xfffffe4e]
+define level.backup.rings_2					= u16[0xfffffe50]
+define level.backup.timer.alldata_2			= u32[0xfffffe52]
+define level.backup.minutes_2				=  u8[0xfffffe53]
+define level.backup.seconds_2				=  u8[0xfffffe54]
+define level.backup.frames_2				=  u8[0xfffffe55]
+define level.backup.sprite_attr				= u16[0xfffffe56]
+define level.backup.layer_flags				= u16[0xfffffe58]
+define level.backup.camera.x				= u16[0xfffffe5a]
+define level.backup.camera.y				= u16[0xfffffe5c]
+define level.backup.water.height			= u16[0xfffffe5e]
+define level.backup.water.fullscreen		=  u8[0xfffffe60]
+define level.backup.lives_granted			=  u8[0xfffffe61]
+define level.backup.move_area.bottom		= u16[0xfffffe62]
+define level.backup.camera_routine			=  u8[0xfffffe64]
+// There might be more backup stuff from here
 
 define oscillating_number_flags = u16[0xfffffe6e]
 // 0xfffffe70 ... 0xfffffeaf  -> 16 oscillating numbers, each consisting of two u16
@@ -683,9 +699,10 @@ define level.default_music.u8		=  u8[0xffffff91]
 define level.giantrings_clear		= u32[0xffffff92]	// One flag for each giant ring in the level, which gets set when the ring disappears
 define level.giantrings_clear.u16	= u16[0xffffff94]	// Only lower 16 bits, but more does not seem to get used anyway
 
-define global.shields_backup_2		=  u8[0xffffff96]
+define global.shields_backup_2		=  u8[0xffffff96]	// Backup of shields between stages, this one does not get modified during bonus stages
 define global.in_extra_stage		=  u8[0xffffff97]	// Set when entering Special Stage or Bonus Stage (note that this does not always get reset back to zero!)
 define checkpoint.zone_act.apparent	= u16[0xffffff9a]
+define level.backup.zone_act.apparent	= u16[0xffffff9c]
 
 // u16[0xfffffaa4] = RAM address pointer used for various things
 
@@ -693,8 +710,8 @@ define global.lock_on_state			= u16[0xffffffae]	// If 0, this is combined S3&K
 define global.chaos_emeralds		=  u8[0xffffffb0]	// Number of Chaos Emeralds (0..7)
 define global.super_emeralds		=  u8[0xffffffb1]	// Number of Super Emeralds (0..7)
 
-// 0xffffffb2 .. 0xffffffb8
-// Emerald collection states, one byte per emerald (for 7 emeralds, either a Chaos or Super Emerald each)
+// 0xffffffb2 .. 0xffffffb9
+// Emerald collection states, one byte per emerald (for 7 emeralds, either a Chaos or Super Emerald each. although there is enough space to hold an 8th emerald...)
 //  - 0 = Emerald not collected
 //  - 1 = Chaos Emerald collected
 //  - 2 = Chaos Emerald traded for an (inactive) Super Emerald

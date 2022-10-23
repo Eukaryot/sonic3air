@@ -29,7 +29,10 @@ function void fn0436a8()
 			objA0.animation.timer = 0x05
 			if (allocDynamicObjectAfterA0())
 			{
+				// Spawn lava fall object
 				objA1.update_address = 0x043764
+
+				// Spawn object and play sound effect every third call
 				++u8[A0 + 0x25]
 				if (u8[A0 + 0x25] >= 2)
 				{

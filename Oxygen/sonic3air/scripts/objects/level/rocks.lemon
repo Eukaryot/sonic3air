@@ -203,9 +203,9 @@ function void fn01fbae()
 	objA1.velocity.y = -0x300
 	u8[A1 + 0x1e] = 14
 	u8[A1 + 0x1f] = 7
-	u8[A1 + 0x20] = 2
-	u8[A1 + 0x2a] |= 0x06
-	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA1.state = char.state.ROLLING
+	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+	objA1.flags2a &= ~char.flag.ON_OBJECT
 }
 
 
@@ -704,7 +704,7 @@ function void fn020002()
 	}
 
 	A1 = 0xffffb000
-	if (u8[A1 + 0x38] != 0x02)
+	if (u8[A1 + 0x38] != CHARACTER_KNUCKLES)
 	{
 		DrawOrUnloadObject()
 		return

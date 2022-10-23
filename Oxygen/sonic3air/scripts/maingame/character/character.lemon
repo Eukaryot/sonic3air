@@ -6667,10 +6667,10 @@ function void Character.CheckDiedStateEnd()
 		else
 		{
 			player2.camera_lock = 0
-			char.position.x.u16 = u16[0xfffffe4c]
-			char.position.y.u16 = u16[0xfffffe4e]
-			char.sprite_attributes = u16[0xfffffe56]
-			char.layer_flags = u16[0xfffffe58]
+			char.position.x.u16 = level.backup.x
+			char.position.y.u16 = level.backup.y
+			char.sprite_attributes = level.backup.sprite_attr
+			char.layer_flags = level.backup.layer_flags
 			ring_counter.player2 = 0
 			u8[0xfffff74b] = 1
 		}

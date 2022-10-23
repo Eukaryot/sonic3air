@@ -66,19 +66,19 @@ function void Character.TailsAI.Update()
 	//  - 0x013b26	-> tails.ai_routine = 0x02	-> Respawn (can be a single frame)
 	//  - 0x013bf8	-> tails.ai_routine = 0x04	-> Flying in
 	//  - 0x013d4a	-> tails.ai_routine = 0x06	-> Normal state, controlled by player or AI
-	//  - 0x013f40	-> tails.ai_routine = 0x08	-> Unknown
+	//  - 0x013f40	-> tails.ai_routine = 0x08	-> Automatically spindashing up slopes
 	//  - 0x013fc0	-> tails.ai_routine = 0x0a	-> Inactive (e.g. in AIZ Intro with Sonic & Tails, but not with Sonic alone)
-	//  - 0x013fc2	-> tails.ai_routine = 0x0c	-> Unknown
+	//  - 0x013fc2	-> tails.ai_routine = 0x0c	-> Flying Sonic in automatically, Initialization 
 	//  - 0x013ffa	-> tails.ai_routine = 0x0e	-> Flying Sonic in automatically (e.g. CNZ 1 start with Sonic & Tails)
 	//  - 0x01408a	-> tails.ai_routine = 0x10	-> Flying away to disappear      (e.g. CNZ 1 start with Sonic alone)
 	//  - 0x0140c6	-> tails.ai_routine = 0x12	-> Direct control in MGZ 2 boss, waiting (direct control by first player, used in MGZ 2 boss with Sonic)
 	//  - 0x0140ce	-> tails.ai_routine = 0x14	-> Direct control in MGZ 2 boss, initialization
 	//  - 0x014106	-> tails.ai_routine = 0x16	-> Direct control in MGZ 2 boss, entering the screen from below
 	//  - 0x01414c	-> tails.ai_routine = 0x18	-> Direct control in MGZ 2 boss, now actually controllable
-	//  - 0x0141f2	-> tails.ai_routine = 0x1a	-> Unknown (no code ported)
-	//  - 0x01421c	-> tails.ai_routine = 0x1c	-> Unknown (no code ported)
-	//  - 0x014254	-> tails.ai_routine = 0x1e	-> Unknown (no code ported)
-	//  - 0x01425c	-> tails.ai_routine = 0x20	-> Unknown
+	//  - 0x0141f2	-> tails.ai_routine = 0x1a	-> In MGZ 2 boss, initialization
+	//  - 0x01421c	-> tails.ai_routine = 0x1c	-> In MGZ 2 boss, entering the screen from below
+	//  - 0x014254	-> tails.ai_routine = 0x1e	-> In MGZ 2 boss, sets flight countdown to regain control
+	//  - 0x01425c	-> tails.ai_routine = 0x20	-> Flying in automatically alone, Initialization
 	//  - 0x014286	-> tails.ai_routine = 0x22	-> Flying in automatically alone (e.g. CNZ 1 start with Tails alone)
 	call tableLookupAddress(0x0139ec, tails.ai_routine)
 }
@@ -763,7 +763,7 @@ function void fn013fc2()
 	objA0.flags2a = char.flag.IN_AIR
 	objA0.velocity.x = 0x0100
 	objA0.velocity.y = 0
-	u16[A0 + 0x1c] = 0
+	objA0.groundspeed = 0
 
 	A1 = 0xffffb000
 	fn01459e()
@@ -910,7 +910,7 @@ function void fn014286()
 		objA0.state = 0
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0
-		u16[A0 + 0x1c] = 0
+		objA0.groundspeed = 0
 		objA0.flags2a = char.flag.IN_AIR
 		objA0.value32 = 0
 		objA0.sprite_attributes &= ~sprite_attribute.PRIORITY

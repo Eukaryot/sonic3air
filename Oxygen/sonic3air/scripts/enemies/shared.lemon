@@ -578,6 +578,8 @@ function void fn085898()
 //# address-hook(0x0858c8) end(0x0858f6)
 function void fn0858c8()
 {
+	// Checks if an object (whose RAM address is stored in A1) is positioned inside a certain range of another object (from values in table at A2)
+
 	s16 px = objA1.position.x.u16
 	s16 py = objA1.position.y.u16
 	s16 minX = objA0.position.x.u16 + u16[(A2+=2)-2]

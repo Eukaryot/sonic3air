@@ -341,7 +341,7 @@ function void LevelSelect.startGame()
 	checkpoint.zone_act = zone_act
 	checkpoint.zone_act.apparent = zone_act
 	checkpoint.move_area.bottom = 0x1000
-	u16[0xfffffe62] = 0x1000
+	level.backup.move_area.bottom = 0x1000
 	lives_counter = 3
 	unused.lives_counter.player2 = 3
 	ring_counter = 0
@@ -406,7 +406,7 @@ function bool fn007d6c()
 	checkpoint.zone_act = D0.u16
 	checkpoint.zone_act.apparent = D0.u16
 	checkpoint.move_area.bottom = 0x1000
-	u16[0xfffffe62] = 0x1000
+	level.backup.move_area.bottom = 0x1000
 	global.game_mode = 0x0c
 
 	lives_counter = 3

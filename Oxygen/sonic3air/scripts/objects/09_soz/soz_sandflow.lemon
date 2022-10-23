@@ -264,10 +264,8 @@ function void fn03ff9e()
 					return
 
 				objA0.flags2a |= bit
-				objA1.flags2a |= char.flag.IN_AIR
-				objA1.flags2a |= char.flag.ON_OBJECT
-				objA1.flags2a &= ~char.flag.ROLLING
-				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ON_OBJECT)
+				objA1.flags2a &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
 				u8[A1 + 0x2f] = 0
 				u8[A1 + 0x40] = 0
 

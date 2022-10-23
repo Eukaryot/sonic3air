@@ -125,14 +125,14 @@ function void fn07a72c()
 function void fn07a7e2()
 {
 	// Targets:
-	//  - 0x07a800	-> objA0.base_state = 0x00		-> Moving down
-	//  - 0x07a874	-> objA0.base_state = 0x02		-> Moving right and left above the floor
-	//  - 0x07a8f4	-> objA0.base_state = 0x04		-> Moving towards the center
-	//  - 0x07a93c	-> objA0.base_state = 0x06		-> Extension of the ring of balloon capsules
-	//  - 0x07a95a	-> objA0.base_state = 0x08		-> Standing still briefly while pulling the ring closer again
-	//  - 0x07a98a	-> objA0.base_state = 0x0a		-> Moving up and staying there after a hit, until all balloons got popped
-	//  - 0x07a9d4	-> objA0.base_state = 0x0c		-> Starting next attack
-	//  - 0x07aa44	-> objA0.base_state = 0x0e		-> Laser attack pattern
+	//  - 0x07a800	-> objA0.value26 = 0x00		-> Moving down
+	//  - 0x07a874	-> objA0.value26 = 0x02		-> Moving right and left above the floor
+	//  - 0x07a8f4	-> objA0.value26 = 0x04		-> Moving towards the center
+	//  - 0x07a93c	-> objA0.value26 = 0x06		-> Extension of the ring of balloon capsules
+	//  - 0x07a95a	-> objA0.value26 = 0x08		-> Standing still briefly while pulling the ring closer again
+	//  - 0x07a98a	-> objA0.value26 = 0x0a		-> Moving up and staying there after a hit, until all balloons got popped
+	//  - 0x07a9d4	-> objA0.value26 = 0x0c		-> Starting next attack
+	//  - 0x07aa44	-> objA0.value26 = 0x0e		-> Laser attack pattern
 	call tableLookupAddress(0x07a7f0, objA0.value26)
 }
 

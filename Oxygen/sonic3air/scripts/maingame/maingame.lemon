@@ -472,7 +472,7 @@ function void initializeMainGame()
 			else
 			{
 				global.zone_act = level.backup.zone_act
-				global.zone_act.apparent = u16[0xffffff9c]
+				global.zone_act.apparent = level.backup.zone_act.apparent
 			}
 		}
 
@@ -1049,8 +1049,8 @@ function void Level.InitializeWater()
 		if (!levelHasWater && checkpoint.number != 0)	// Checkpoint 0 is Knuckles' start
 		{
 			// Knuckles presumably on Sonic's path?
-			u16 px = (global.stage_type == 0) ? checkpoint.x : u16[0xfffffe4c]
-			u16 py = (global.stage_type == 0) ? (checkpoint.y & 0x7fff) : u16[0xfffffe4e]
+			u16 px = (global.stage_type == 0) ? checkpoint.x : level.backup.x
+			u16 py = (global.stage_type == 0) ? (checkpoint.y & 0x7fff) : level.backup.y
 			if (px < 0x1400)
 			{
 				// Start area of AIZ 2
@@ -1493,27 +1493,27 @@ function void SetupCharacterAtLastCheckpoint()
 	{
 		global.stage_type = 0
 		global.zone_act = level.backup.zone_act
-		global.zone_act.apparent = u16[0xffffff9c]
-		u16[0xffffb000 + 0x10] = u16[0xfffffe4c]
-		u16[0xffffb000 + 0x14] = u16[0xfffffe4e]
-		ring_counter = u16[0xfffffe50]
-		extra_lives_granted = u8[0xfffffe61]
-		timer.alldata = u32[0xfffffe52]
+		global.zone_act.apparent = level.backup.zone_act.apparent
+		u16[0xffffb000 + 0x10] = level.backup.x
+		u16[0xffffb000 + 0x14] = level.backup.y
+		ring_counter = level.backup.rings_2
+		extra_lives_granted = level.backup.lives_granted
+		timer.alldata = level.backup.timer.alldata_2
 		timer.frames = 59
 		--timer.seconds
-		u16[0xffffb000 + 0x0a] = u16[0xfffffe56]
-		u16[0xffffb000 + 0x46] = u16[0xfffffe58]
+		u16[0xffffb000 + 0x0a] = level.backup.sprite_attr
+		u16[0xffffb000 + 0x46] = level.backup.layer_flags
 
-		camera.update_routine = u8[0xfffffe64]
-		move_area.bottom.current = u16[0xfffffe62]
-		move_area.bottom.target = u16[0xfffffe62]
-		camera.position.x.u16 = u16[0xfffffe5a]
-		camera.position.y.u16 = u16[0xfffffe5c]
+		camera.update_routine = level.backup.camera_routine
+		move_area.bottom.current = level.backup.move_area.bottom
+		move_area.bottom.target = level.backup.move_area.bottom
+		camera.position.x.u16 = level.backup.camera.x
+		camera.position.y.u16 = level.backup.camera.y
 
 		if (level.water_present)
 		{
-			water.height.next = u16[0xfffffe5e]
-			water.fullscreen = u8[0xfffffe60]
+			water.height.next = level.backup.water.height
+			water.fullscreen = level.backup.water.fullscreen
 		}
 	}
 }

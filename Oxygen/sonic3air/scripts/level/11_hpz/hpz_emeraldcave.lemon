@@ -374,7 +374,7 @@ function void fn090c34()
 			level.restart = 1
 			checkpoint.number = level.backup.checkpoint | 0x80
 			global.zone_act   = level.backup.zone_act
-			global.zone_act.apparent = u16[0xffffff9c]
+			global.zone_act.apparent = level.backup.zone_act.apparent
 			global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 		}
 	}

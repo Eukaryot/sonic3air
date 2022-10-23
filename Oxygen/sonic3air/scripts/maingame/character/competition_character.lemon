@@ -119,10 +119,10 @@ function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 			{
 				char.sprite_attributes |= sprite_attribute.PRIORITY
 			}
-			u16[0xfffffe4c] = char.position.x.u16
-			u16[0xfffffe4e] = char.position.y.u16
-			u16[0xfffffe56] = char.sprite_attributes
-			u16[0xfffffe58] = char.layer_flags
+			level.backup.x = char.position.x.u16
+			level.backup.y = char.position.y.u16
+			level.backup.sprite_attr = char.sprite_attributes
+			level.backup.layer_flags = char.layer_flags
 		}
 	}
 
@@ -444,10 +444,10 @@ function void CompetitionMode.Character.Initialization.Tails()
 			{
 				char.sprite_attributes |= sprite_attribute.PRIORITY
 			}
-			u16[0xfffffe4c] = char.position.x.u16
-			u16[0xfffffe4e] = char.position.y.u16
-			u16[0xfffffe56] = char.sprite_attributes
-			u16[0xfffffe58] = char.layer_flags
+			level.backup.x = char.position.x.u16
+			level.backup.y = char.position.y.u16
+			level.backup.sprite_attr = char.sprite_attributes
+			level.backup.layer_flags = char.layer_flags
 			u32[0xffffcc0a] = 0x0161fa
 			u16[0xffffcc0a + 0x30] = A0.u16
 		}

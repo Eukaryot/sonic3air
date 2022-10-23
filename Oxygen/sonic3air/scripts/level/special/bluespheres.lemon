@@ -2581,7 +2581,7 @@ function void fn02df64()
 
 		requestLoadingPatterns(0x48)
 
-		global.zone_act = 0x1701
+		global.zone_act = 0x1701		// Hidden Palace emerald cave
 		camera.position.x.u16 = 0x15a0 - getScreenExtend()
 		camera.position.y.u16 = 0x0240
 		dynobjects.routine = 0

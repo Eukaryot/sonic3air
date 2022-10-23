@@ -128,10 +128,10 @@ function void fn036d3e()
 		if (competition_mode.multiplay)
 		{
 			A1 = 0xffffb04a
-			u16[A1 + 0x10] = u16[0xfffffe4c]
-			u16[A1 + 0x14] = u16[0xfffffe4e]
-			objA1.sprite_attributes = u16[0xfffffe56]
-			u16[A1 + 0x46] = u16[0xfffffe58]
+			u16[A1 + 0x10] = level.backup.x
+			u16[A1 + 0x14] = level.backup.y
+			objA1.sprite_attributes = level.backup.sprite_attr
+			u16[A1 + 0x46] = level.backup.layer_flags
 			u16[A1 + 0x18] = 0
 			u16[A1 + 0x1a] = 0
 			u16[A1 + 0x1c] = 0

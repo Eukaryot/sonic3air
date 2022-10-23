@@ -236,6 +236,45 @@ function void fn00eb1a()
 		zeroMemory(0xffff8600, 0x400)
 	}
 
+	// Values for the ring table positions (stored into A1):
+	//  - 0x1e5a16		-> AIZ 1 (i.e. the technical act 1 = until everything gets set on fire)
+	//  - 0x1e5bbc		-> AIZ 2
+	//  - 0x1e758a		-> HCZ 1
+	//  - 0x1e7c70		-> HCZ 2
+	//  - 0x1e8b38		-> MGZ 1
+	//  - 0x1e9b36		-> MGZ 2
+	//  - 0x1ebcd6		-> CNZ 1
+	//  - 0x1ec1bc		-> CNZ 2
+	//  - 0x1eda10		-> FBZ 1
+	//  - 0x1edec2		-> FBZ 2
+	//  - 0x1ef204		-> ICZ 1 (probably only the technical act 1)
+	//  - 0x1ef4ba		-> ICZ 2
+	//  - 0x1f11d8		-> LBZ 1
+	//  - 0x1f1676		-> LBZ 2
+	//  - 0x1f3d6c		-> MHZ 1
+	//  - 0x1f4312		-> MHZ 2
+	//  - 0x1f61f8		-> SOZ 1
+	//  - 0x1f67fa		-> SOZ 2
+	//  - 0x1f874c		-> LRZ 1
+	//  - 0x1f8c7e		-> LRZ 2
+	//  - 0x1f9616		-> SSZ S/T
+	//  - 0x1f98e8		-> SSZ Knuckles
+	//  - 0x1fad22		-> DEZ 1
+	//  - 0x1fb180		-> DEZ 2
+	//  - 0x1fc234		-> DDZ 1
+	//  - 0x1fc542		-> DDZ 2 (dummy)
+	//  - 0x1fc554		-> Outro S/T
+	//  - 0x1fc596		-> ALZ
+	//  - 0x1fc602		-> BPZ
+	//  - 0x1fc67a		-> DPZ
+	//  - 0x1fc6e6		-> CGZ
+	//  - 0x1fc752		-> EMZ
+	//  - 0x1fc81e		-> Bonus GM
+	//  - 0x1fca86		-> Bonus GS
+	//  - 0x1fcb96		-> Bonus SM
+	//  - 0x1fcd82		-> LRZ Boss
+	//  - 0x1fce58		-> HPZ
+	//  - 0x1fcf24		-> DEZ Boss (also used for HPZ emerald cave)
 	u16 offset = global.zone * 8 + global.act * 4
 	A1 = u32[0x1e3e58 + offset]
 #if STANDALONE

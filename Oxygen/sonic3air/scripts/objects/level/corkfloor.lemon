@@ -296,11 +296,11 @@ function void fn02a588()
 //# address-hook(0x02a58e)
 function void fn02a58e()
 {
-	u8[A1 + 0x2a] |= 0x06
-	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
+	objA1.flags2a &= ~char.flag.ON_OBJECT
 	u8[A1 + 0x1e] = 14
 	u8[A1 + 0x1f] = 7
-	u8[A1 + 0x20] = 2
+	objA1.state = char.state.ROLLING
 	objA1.velocity.y = -0x300
 	u8[A1 + 0x05] = 2
 }

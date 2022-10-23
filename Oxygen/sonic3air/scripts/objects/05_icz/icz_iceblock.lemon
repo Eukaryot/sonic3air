@@ -81,8 +81,7 @@ function void fn08b3aa()
 	u8[A1 + 0x1e] = 0x0e
 	u8[A1 + 0x1f] = 0x07
 	objA1.state = char.state.ROLLING
-	objA1.flags2a |= char.flag.IN_AIR
-	objA1.flags2a |= char.flag.ROLLING
+	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 	objA1.flags2a &= ~char.flag.ON_OBJECT
 
 	if (A2 != 0)

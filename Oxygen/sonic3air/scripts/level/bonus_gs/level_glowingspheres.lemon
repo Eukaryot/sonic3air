@@ -257,9 +257,8 @@ function void LevelPaletteUpdate.BonusGS()
 		{
 			u16[0xfffff632] = 0
 		}
-		A0 = 0xffff7800
+		A0 = 0xffff7800 + D0.s16
 		A1 = 0xfffffc70
-		A0 = A0 + D0.s16
 		u32[(A1+=4)-4] = u32[(A0+=4)-4]
 		u32[(A1+=4)-4] = u32[(A0+=4)-4]
 		u32[(A1+=4)-4] = u32[(A0+=4)-4]

@@ -127,7 +127,7 @@ function void fn03e9ac()
 function void fn03e9c6()
 {
 #if STANDALONE
-	// Completely ignore characters with control flags 0x01 and 0x03 set
+	// Completely ignore characters with control flags 0x01 and 0x02 set
 	//  -> This is the case when hanging on a mushroom parachute
 	if ((u8[A1 + 0x2e] & 0x03) == 0x03)
 		return

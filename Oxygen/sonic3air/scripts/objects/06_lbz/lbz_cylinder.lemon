@@ -134,7 +134,7 @@ function void fn02c3e8()
 					u8[A1 + 0x0a] |= 0x80
 
 			#if STANDALONE
-				// Prevent non-rotated standing animation, whcih looks buggy
+				// Prevent non-rotated standing animation, which looks buggy
 				// (can be triggered in original by rolling and getting to a halt on the cylinder)
 				if (objA1.state == char.state.STANDING)
 					objA1.state = char.state.RUNNING

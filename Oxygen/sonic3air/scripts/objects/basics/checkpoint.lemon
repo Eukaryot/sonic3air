@@ -226,23 +226,23 @@ function u8 Checkpoint.selectBonusStage()
 //# address-hook(0x02d1cc) end(0x02d232)
 function void fn02d1cc()
 {
-	// This is used only for Special Stages
+	// This is used only when going into Special Stages from a giant ring, for a temporary one-time checkpoint
 	level.backup.checkpoint = checkpoint.number
 	level.backup.zone_act = global.zone_act
-	u16[0xffffff9c] = global.zone_act.apparent
-	u16[0xfffffe4c] = objA0.position.x.u16
-	u16[0xfffffe4e] = objA0.position.y.u16
-	u16[0xfffffe56] = u16[0xffffb000 + 0x0a]
-	u16[0xfffffe58] = u16[0xffffb000 + 0x46]
-	u16[0xfffffe50] = ring_counter
-	u8[0xfffffe61] = extra_lives_granted
-	u32[0xfffffe52] = timer.alldata
-	u8[0xfffffe64] = camera.update_routine
-	u16[0xfffffe62] = move_area.bottom.current
-	u16[0xfffffe5a] = camera.position.x.u16
-	u16[0xfffffe5c] = camera.position.y.u16
-	u16[0xfffffe5e] = water.height.next
-	u8[0xfffffe60] = water.fullscreen
+	level.backup.zone_act.apparent = global.zone_act.apparent
+	level.backup.x = objA0.position.x.u16
+	level.backup.y = objA0.position.y.u16
+	level.backup.sprite_attr = u16[0xffffb000 + 0x0a]
+	level.backup.layer_flags = u16[0xffffb000 + 0x46]
+	level.backup.rings_2 = ring_counter
+	level.backup.lives_granted = extra_lives_granted
+	level.backup.timer.alldata_2 = timer.alldata
+	level.backup.camera_routine = camera.update_routine
+	level.backup.move_area.bottom = move_area.bottom.current
+	level.backup.camera.x = camera.position.x.u16
+	level.backup.camera.y = camera.position.y.u16
+	level.backup.water.height = water.height.next
+	level.backup.water.fullscreen = water.fullscreen
 	global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 }
 
@@ -339,7 +339,7 @@ function void fn02d47e()
 			checkpoint.number = 0
 			level.restart.u8 = 1
 
-			// Backup of shields active before entering the Special Stage
+			// Backup of shields active before entering the Bonus Stage
 			D0.u8 = u8[0xffffb000 + 0x2b] & char.bonus.ALL_SHIELDS
 			global.shields_backup_1 = D0.u8
 			global.shields_backup_2 = D0.u8

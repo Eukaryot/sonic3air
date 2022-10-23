@@ -86,14 +86,7 @@ function void fn02d638()
 			}
 			else
 			{
-				if (continues_counter == 0)
-				{
-					global.game_mode = 0
-				}
-				else
-				{
-					global.game_mode = 0x14
-				}
+				global.game_mode = (continues_counter == 0) ? 0 : 0x14
 			}
 		}
 	}

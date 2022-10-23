@@ -101,18 +101,20 @@ function void fn03cbce()
 
 
 
-// Spring inside the floor
+// Retracting springs inside the floor
 
 //# address-hook(0x0239e4) end(0x0239f6)
 function void fn0239e4()
 {
-	SpringVertical.BaseUpdate()
-
-	D0.u16 = (objA0.subtype2c >> 3) & 0x0e
+	Spring.BaseUpdate()
 
 	// Targets:
-	//  - 0x023a04	-> D0.u16 = 0x00
-	//  - No other targets...?
+	//  - 0x023a04	-> objA0.subtype2c == 0x00 .. 0x0f	-> Vertical spring (the only one used, the rest seem broken)
+	//  - 0x023a20	-> objA0.subtype2c == 0x10 .. 0x1f	-> Horizontal spring
+	//  - 0x023a3c	-> objA0.subtype2c == 0x20 .. 0x2f	-> Vertical spring, pointing down
+	//  - 0x023a58	-> objA0.subtype2c == 0x30 .. 0x3f	-> Diagonal spring, pointing up
+	//  - 0x023a88	-> objA0.subtype2c == 0x40 .. 0x4f	-> Diagonal spring, pointing down
+	D0.u16 = (objA0.subtype2c >> 3) & 0x0e
 	call tableLookupAddress(0x0239fa, D0.u16)
 }
 

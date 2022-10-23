@@ -63,11 +63,37 @@ function void DynamicObjectsLoading.Init()
 	//  - 0x1e932c		-> MGZ 2
 	//  - 0x1ea0c2		-> CNZ 1
 	//  - 0x1eac38		-> CNZ 2
+	//  - 0x1ec5dc		-> FBZ 1
+	//  - 0x1ecfba		-> FBZ 2
 	//  - 0x1ee3ca		-> ICZ 1 (probably only the technical act 1)
 	//  - 0x1ee9a6		-> ICZ 2
 	//  - 0x1efc42		-> LBZ 1
 	//  - 0x1f065c		-> LBZ 2
-	//     ...
+	//  - 0x1f2296		-> MHZ 1
+	//  - 0x1f306a		-> MHZ 2
+	//  - 0x1f4866		-> SOZ 1
+	//  - 0x1f5676		-> SOZ 2
+	//  - 0x1f6e50		-> LRZ 1
+	//  - 0x1f7c9c		-> LRZ 2
+	//  - 0x1f90ee		-> SSZ S/T
+	//  - 0x1f95f2		-> SSZ Knuckles
+	//  - 0x1f98f4		-> DEZ 1
+	//  - 0x1fa188		-> DEZ 2
+	//  - 0x1fb6fa		-> DDZ 1
+	//  - 0x1fc22e		-> DDZ 2 (dummy)
+	//  - 0x1fc54e		-> Outro S/T
+	//  - 0x1fc560		-> ALZ
+	//  - 0x1fc5a2		-> BPZ
+	//  - 0x1fc60e		-> DPZ
+	//  - 0x1fc686		-> CGZ
+	//  - 0x1fc6f2		-> EMZ
+	//  - 0x1fc75e		-> Bonus GM
+	//  - 0x1fc82a		-> Bonus GS
+	//  - 0x1fcb90		-> Bonus SM
+	//  - 0x1fcba2		-> LRZ Boss
+	//  - 0x1fcc7a		-> HPZ
+	//  - 0x1fcee8		-> DEZ Boss
+	//  - 0x1fceee		-> Emerald cave
 	u8 offset = global.zone * 8 + global.act * 4
 	A0 = u32[0x1e3d98 + offset]
 #if STANDALONE

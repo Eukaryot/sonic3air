@@ -206,14 +206,10 @@ function void DamageCharacter()
 function void fn0242b6()
 {
 	// Targets:
-	//  - 0x0242cc	-> objA0.subtype2c = 0x00	(original subtype: 0x00)
-	//  - 0x0242ce	-> objA0.subtype2c = 0x02	(original subtype: 0x01)
-	//  - 0x0242e2	-> objA0.subtype2c = 0x04	(original subtype: 0x02)
-	//  - 0x024356	-> objA0.subtype2c = 0x06	(original subtype: 0x03)
-	//  - 0x029139	-> objA0.subtype2c = 0x08	(original subtype: 0x04)
-	//  - 0x0242ea	-> objA0.subtype2c = 0x0c	(original subtype: 0x06)
-	//  - 0x027404	-> objA0.subtype2c = 0x18	(original subtype: 0x0c)
-	//  - 0x029139	-> objA0.subtype2c = 0x1c	(original subtype: 0x0e)
+	//  - 0x0242cc	-> objA0.subtype2c = 0x00	(original subtype: 0x00)		// Stationary
+	//  - 0x0242ce	-> objA0.subtype2c = 0x02	(original subtype: 0x01)		// Moving up and down
+	//  - 0x0242e2	-> objA0.subtype2c = 0x04	(original subtype: 0x02)        // Moving left and right
+	//  - 0x024356	-> objA0.subtype2c = 0x06	(original subtype: 0x03)		// Pushable
 	call tableLookupAddress(0x0242c4, objA0.subtype2c)
 }
 

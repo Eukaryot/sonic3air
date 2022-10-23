@@ -73,6 +73,13 @@ function void ROMManipulation.RepairAnimations()
 
 function void ROMManipulation.CutsceneKnucklesPalette()
 {
+	// Fixed Super Sonic underwater palette effect repeat frame
+	for (u8 k = 0; k < 6; k += 2)
+	{
+		u16[0x003a00 + k] = u16[0x0039f4 + k]
+		u16[0x003a3c + k] = u16[0x003a30 + k]
+	}
+
 	// Changing Cutscene Knuckles' colors a bit to better fit the playable Knuckles
 	//  -> Note that this is not used (any more) in S3AIR, as Cutscene Knuckles uses a special palette there
 	//  -> See renderhooks.lemon

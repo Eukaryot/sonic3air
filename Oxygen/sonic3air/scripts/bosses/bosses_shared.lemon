@@ -392,13 +392,12 @@ function void fn083c06()
 	// Targets:
 	//  - 0x083c7c		-> AIZ 1
 	//  - 0x083c90		-> AIZ 2
-	//  - 0x083ca6		-> HCZ 1
-	//  - 0x083ca8		-> HCZ 2
-	//  - 0x083caa		-> MGZ 1+2
-	//  - 0x083cb2		-> CNZ 1+2, FBZ 1+2, ICZ 1
+	//  - 0x083ca6		-> HCZ 1+2							 (empty function)
+	//  - 0x083ca8		-> MGZ 1+2
+	//  - 0x083cb2		-> CNZ 1+2, FBZ 1+2, ICZ 1			 (empty function)
 	//  - 0x083cb4		-> ICZ 2
 	//  - 0x083cc0		-> LBZ 1+2, MHZ 1+2
-	//  - 0x083ccc		-> SOZ and everything afterwards
+	//  - 0x083ccc		-> SOZ and everything afterwards	 (empty function)
 	call tableLookupAddress(0x083c1c, D0.u8 * 2)
 }
 
