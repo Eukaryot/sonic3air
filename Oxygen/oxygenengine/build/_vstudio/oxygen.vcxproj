@@ -71,6 +71,7 @@
     <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
+    <ClCompile Include="..\..\source\oxygen\helper\Downloader.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
     <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />
     <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h" />
+    <ClInclude Include="..\..\source\oxygen\helper\Downloader.h" />
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />

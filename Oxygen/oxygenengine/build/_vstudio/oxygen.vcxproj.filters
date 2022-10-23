@@ -403,6 +403,9 @@
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.cpp">
       <Filter>drawing\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\Downloader.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -744,6 +747,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h">
       <Filter>drawing\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\Downloader.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
