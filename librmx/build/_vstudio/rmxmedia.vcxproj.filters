@@ -79,9 +79,6 @@
       <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\rmxmedia.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\glew\glew.c">
-      <Filter>_glew</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\VertexArrayObject.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -102,6 +99,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxmedia\FontProcessor.cpp">
       <Filter>Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxmedia\_glew\glew.c">
+      <Filter>_glew</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,12 +154,6 @@
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia.h" />
-    <ClInclude Include="..\..\source\rmxmedia\glew\GL\glew.h">
-      <Filter>_glew\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxmedia\glew\GL\wglew.h">
-      <Filter>_glew\GL</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\VertexArrayObject.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -184,6 +178,18 @@
     </ClInclude>
     <ClInclude Include="..\..\source\rmxmedia\FontProcessor.h">
       <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\_glew\GL\eglew.h">
+      <Filter>_glew\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\_glew\GL\glew.h">
+      <Filter>_glew\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\_glew\GL\glxew.h">
+      <Filter>_glew\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxmedia\_glew\GL\wglew.h">
+      <Filter>_glew\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

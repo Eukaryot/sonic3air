@@ -296,9 +296,9 @@ SOURCES	+=	\
 			librmx/source/rmxbase/FileProvider \
 			librmx/source/rmxbase/FileSystem \
 			librmx/source/rmxbase/InputStream \
-			librmx/source/rmxbase/jsoncpp/json_reader \
-			librmx/source/rmxbase/jsoncpp/json_value \
-			librmx/source/rmxbase/jsoncpp/json_writer \
+			librmx/source/rmxbase/_jsoncpp/json_reader \
+			librmx/source/rmxbase/_jsoncpp/json_value \
+			librmx/source/rmxbase/_jsoncpp/json_writer \
 			librmx/source/rmxbase/JsonHelper \
 			librmx/source/rmxbase/Logging \
 			librmx/source/rmxbase/Math \

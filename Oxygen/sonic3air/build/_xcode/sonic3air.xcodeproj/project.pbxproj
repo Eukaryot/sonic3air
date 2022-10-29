@@ -2563,7 +2563,7 @@
 				9E6E7A88245F882600114DEB /* json_value.cpp */,
 				9E6E7A89245F882600114DEB /* json_valueiterator.inl */,
 			);
-			path = jsoncpp;
+			path = _jsoncpp;
 			sourceTree = "<group>";
 		};
 		9E6E7A7D245F882600114DEB /* json */ = {
@@ -2657,7 +2657,7 @@
 				9E6E7AEF245F882600114DEB /* glew.c */,
 				9E6E7AF0245F882600114DEB /* GL */,
 			);
-			path = glew;
+			path = _glew;
 			sourceTree = "<group>";
 		};
 		9E6E7AF0245F882600114DEB /* GL */ = {
@@ -5283,7 +5283,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../../framework/external/ogg-vorbis/libogg/include",
 					"$(PROJECT_DIR)/../../source/external/",
@@ -5329,7 +5329,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../../framework/external/ogg-vorbis/libogg/include",
 					"$(PROJECT_DIR)/../../source/external/",
@@ -5373,7 +5373,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/../../source/external/",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../../framework/external/zlib/zlib/contrib/minizip",
@@ -5428,7 +5428,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/../../source/external/",
 					"$(PROJECT_DIR)/../../../../framework/external/sdl/SDL2/include",
 					"$(PROJECT_DIR)/../../../../framework/external/zlib/zlib/contrib/minizip",
@@ -5595,7 +5595,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../../framework/external/ogg-vorbis/libogg/include",
 					"$(PROJECT_DIR)/../../source/external/",
@@ -5637,7 +5637,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../../sonic3air/source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../../framework/external/ogg-vorbis/libogg/include",
 					"$(PROJECT_DIR)/../../source/external/",
@@ -5680,7 +5680,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../../framework/external/ogg-vorbis/libogg/include",
 					"$(PROJECT_DIR)/../../../../framework/external/zlib/zlib/contrib/minizip",
@@ -5723,7 +5723,7 @@
 					"$(PROJECT_DIR)/../../../oxygenengine/source",
 					"$(PROJECT_DIR)/../../source",
 					"$(PROJECT_DIR)/../../../lemonscript/source",
-					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/glew",
+					"$(PROJECT_DIR)/../../../../librmx/source/rmxmedia/_glew",
 					"$(PROJECT_DIR)/boost.framework/Headers",
 					"$(PROJECT_DIR)/../../../../framework/external/ogg-vorbis/libogg/include",
 					"$(PROJECT_DIR)/../../../../framework/external/zlib/zlib/contrib/minizip",

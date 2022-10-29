@@ -116,9 +116,6 @@
     <ClInclude Include="..\..\source\rmxbase\VectorBinarySerializer.h">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json_tool.h">
-      <Filter>_jsoncpp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\rmxbase\JsonHelper.h">
       <Filter>FileIO</Filter>
     </ClInclude>
@@ -136,36 +133,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\rmxbase\FileHandle.h">
       <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\allocator.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\assertions.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\config.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\forwards.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\json.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\json_features.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\reader.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\value.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\version.h">
-      <Filter>_jsoncpp\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\writer.h">
-      <Filter>_jsoncpp\json</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\rmxbase\ErrorHandler.h">
       <Filter>Tools</Filter>
@@ -201,6 +168,39 @@
     </ClInclude>
     <ClInclude Include="..\..\source\rmxbase\BitArray.h">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json_tool.h">
+      <Filter>_jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\allocator.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\assertions.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\config.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\forwards.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\json.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\json_features.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\reader.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\writer.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\value.h">
+      <Filter>_jsoncpp\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\version.h">
+      <Filter>_jsoncpp\json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -256,15 +256,6 @@
     <ClCompile Include="..\..\source\rmxbase\VectorBinarySerializer.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_reader.cpp">
-      <Filter>_jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_value.cpp">
-      <Filter>_jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_writer.cpp">
-      <Filter>_jsoncpp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\JsonHelper.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
@@ -295,9 +286,18 @@
     <ClCompile Include="..\..\source\rmxbase\RealFileProvider.cpp">
       <Filter>FileIO</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_reader.cpp">
+      <Filter>_jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_value.cpp">
+      <Filter>_jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_writer.cpp">
+      <Filter>_jsoncpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\source\rmxbase\jsoncpp\json_valueiterator.inl">
+    <None Include="..\..\source\rmxbase\_jsoncpp\json_valueiterator.inl">
       <Filter>_jsoncpp</Filter>
     </None>
   </ItemGroup>

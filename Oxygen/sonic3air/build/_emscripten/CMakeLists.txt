@@ -47,7 +47,7 @@ include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizi
 # rmxbase
 
 file(GLOB RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp
-						  ${WORKSPACE_DIR}/librmx/source/rmxbase/jsoncpp/*.cpp)
+						  ${WORKSPACE_DIR}/librmx/source/rmxbase/_jsoncpp/*.cpp)
 
 add_library(rmxbase ${RMXBASE_SOURCES})
 

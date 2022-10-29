@@ -31,7 +31,7 @@
 #include <algorithm>
 
 // Libraries
-#include "rmxbase/jsoncpp/json/json.h"	// Uses its own namespace "Json"
+#include "rmxbase/_jsoncpp/json/json.h"	// Uses its own namespace "Json"
 
 // RMX modules
 #include "PlatformDefinitions.h"

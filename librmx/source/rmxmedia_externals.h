@@ -104,5 +104,5 @@
 		#define GLEW_STATIC
 	#endif
 	#define GLEW_NO_GLU
-	#include "rmxmedia/glew/GL/glew.h"
+	#include "rmxmedia/_glew/GL/glew.h"
 #endif

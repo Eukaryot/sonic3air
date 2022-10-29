@@ -69,7 +69,7 @@ include_directories(${WORKSPACE_DIR}/framework/external/ogg-vorbis/libvorbis/lib
 include_directories(build/zlib)		# Needed for zconf.h
 include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizip)
 include_directories(${WORKSPACE_DIR}/librmx/source)
-include_directories(${WORKSPACE_DIR}/librmx/source/rmxmedia/glew)
+include_directories(${WORKSPACE_DIR}/librmx/source/rmxmedia/_glew)
 include_directories(${WORKSPACE_DIR}/Oxygen/lemonscript/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/oxygenengine/source)
 include_directories(${WORKSPACE_DIR}/Oxygen/sonic3air/source)
@@ -104,7 +104,7 @@ target_link_libraries(minizip zlibstatic)
 # rmxbase
 
 file(GLOB RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp
-						  ${WORKSPACE_DIR}/librmx/source/rmxbase/jsoncpp/*.cpp)
+						  ${WORKSPACE_DIR}/librmx/source/rmxbase/_jsoncpp/*.cpp)
 
 add_library(rmxbase ${RMXBASE_SOURCES})
 
@@ -120,7 +120,7 @@ target_link_libraries(rmxbase zlibstatic)
 # rmxmedia
 
 file(GLOB RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp
-						   ${WORKSPACE_DIR}/librmx/source/rmxmedia/glew/*.c)
+						   ${WORKSPACE_DIR}/librmx/source/rmxmedia/_glew/*.c)
 
 add_library(rmxmedia ${RMXMEDIA_SOURCES})
 

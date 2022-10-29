@@ -219,17 +219,6 @@
     <ClInclude Include="..\..\source\rmxbase\FileIO.h" />
     <ClInclude Include="..\..\source\rmxbase\FileSystem.h" />
     <ClInclude Include="..\..\source\rmxbase\GlobalObjectPtr.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\allocator.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\assertions.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\config.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\forwards.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\json.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\json_features.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\reader.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\value.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\version.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json\writer.h" />
-    <ClInclude Include="..\..\source\rmxbase\jsoncpp\json_tool.h" />
     <ClInclude Include="..\..\source\rmxbase\JsonHelper.h" />
     <ClInclude Include="..\..\source\rmxbase\FileProvider.h" />
     <ClInclude Include="..\..\source\rmxbase\Logging.h" />
@@ -262,6 +251,17 @@
     <ClInclude Include="..\..\source\rmxbase\Vec4.h" />
     <ClInclude Include="..\..\source\rmxbase\VectorBinarySerializer.h" />
     <ClInclude Include="..\..\source\rmxbase\ZlibDeflate.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\allocator.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\assertions.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\config.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\forwards.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\json.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\json_features.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\reader.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\value.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\version.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\writer.h" />
+    <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json_tool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\Basics.cpp" />
@@ -275,15 +275,6 @@
     <ClCompile Include="..\..\source\rmxbase\ErrorHandler.cpp" />
     <ClCompile Include="..\..\source\rmxbase\FileIO.cpp" />
     <ClCompile Include="..\..\source\rmxbase\FileSystem.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_reader.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_value.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\jsoncpp\json_writer.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\JsonHelper.cpp" />
     <ClCompile Include="..\..\source\rmxbase\FileProvider.cpp" />
     <ClCompile Include="..\..\source\rmxbase\Logging.cpp" />
@@ -303,9 +294,18 @@
     <ClCompile Include="..\..\source\rmxbase\Tools.cpp" />
     <ClCompile Include="..\..\source\rmxbase\VectorBinarySerializer.cpp" />
     <ClCompile Include="..\..\source\rmxbase\ZlibDeflate.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_reader.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_value.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_writer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\source\rmxbase\jsoncpp\json_valueiterator.inl" />
+    <None Include="..\..\source\rmxbase\_jsoncpp\json_valueiterator.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
