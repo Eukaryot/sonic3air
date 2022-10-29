@@ -54,7 +54,7 @@ namespace global
 		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor3 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 0.5f, 0.6f);
 
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessor = std::make_shared<OutlineFontProcessor>();
-		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorTransparent = std::make_shared<OutlineFontProcessor>(0x80000000);
+		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorTransparent = std::make_shared<OutlineFontProcessor>(Color(0.0f, 0.0f, 0.0f, 0.5f));
 
 		std::shared_ptr<GradientFontProcessor> gradientFontProcessor = std::make_shared<GradientFontProcessor>();
 

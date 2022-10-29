@@ -80,27 +80,56 @@ void OutlineFontProcessor::process(FontProcessingData& data)
 	Bitmap bitmap;
 	bitmap.create(newWidth, newHeight, 0);
 
+#if 0
+	// TODO: This does not work correctly yet
+	const uint32 outlineColorABGR = mOutlineColor.getABGR32();
+	for (int y = 0; y < data.mBitmap.getHeight(); ++y)
+	{
+		for (int x = 0; x < data.mBitmap.getWidth(); ++x)
+		{
+			const int alpha = data.mBitmap.getPixel(x, y) >> 24;
+			if (alpha > 0)
+			{
+				const uint32 color = (outlineColorABGR & 0x00ffffff) + (((outlineColorABGR >> 24) * alpha / 255) << 24);
+				bitmap.setPixel(insetX + x - 1, insetY + y, std::max(color, bitmap.getPixel(insetX + x - 1, insetY + y)));
+				bitmap.setPixel(insetX + x + 1, insetY + y, std::max(color, bitmap.getPixel(insetX + x + 1, insetY + y)));
+				bitmap.setPixel(insetX + x, insetY + y - 1, std::max(color, bitmap.getPixel(insetX + x, insetY + y - 1)));
+				bitmap.setPixel(insetX + x, insetY + y + 1, std::max(color, bitmap.getPixel(insetX + x, insetY + y + 1)));
+
+				if (mDiagonalNeighbors)
+				{
+					bitmap.setPixel(insetX + x - 1, insetY + y - 1, std::max(color, bitmap.getPixel(insetX + x - 1, insetY + y - 1)));
+					bitmap.setPixel(insetX + x - 1, insetY + y + 1, std::max(color, bitmap.getPixel(insetX + x - 1, insetY + y + 1)));
+					bitmap.setPixel(insetX + x + 1, insetY + y - 1, std::max(color, bitmap.getPixel(insetX + x + 1, insetY + y - 1)));
+					bitmap.setPixel(insetX + x + 1, insetY + y + 1, std::max(color, bitmap.getPixel(insetX + x + 1, insetY + y + 1)));
+				}
+			}
+		}
+	}
+#else
+	const uint32 outlineColorABGR = mOutlineColor.getABGR32();
 	for (int y = 0; y < data.mBitmap.getHeight(); ++y)
 	{
 		for (int x = 0; x < data.mBitmap.getWidth(); ++x)
 		{
 			if (*data.mBitmap.getPixelPointer(x, y) & 0xff000000)
 			{
-				bitmap.setPixel(insetX + x - 1, insetY + y, mOutlineColor);
-				bitmap.setPixel(insetX + x + 1, insetY + y, mOutlineColor);
-				bitmap.setPixel(insetX + x, insetY + y - 1, mOutlineColor);
-				bitmap.setPixel(insetX + x, insetY + y + 1, mOutlineColor);
+				bitmap.setPixel(insetX + x - 1, insetY + y, outlineColorABGR);
+				bitmap.setPixel(insetX + x + 1, insetY + y, outlineColorABGR);
+				bitmap.setPixel(insetX + x, insetY + y - 1, outlineColorABGR);
+				bitmap.setPixel(insetX + x, insetY + y + 1, outlineColorABGR);
 
 				if (mDiagonalNeighbors)
 				{
-					bitmap.setPixel(insetX + x - 1, insetY + y - 1, mOutlineColor);
-					bitmap.setPixel(insetX + x - 1, insetY + y + 1, mOutlineColor);
-					bitmap.setPixel(insetX + x + 1, insetY + y - 1, mOutlineColor);
-					bitmap.setPixel(insetX + x + 1, insetY + y + 1, mOutlineColor);
+					bitmap.setPixel(insetX + x - 1, insetY + y - 1, outlineColorABGR);
+					bitmap.setPixel(insetX + x - 1, insetY + y + 1, outlineColorABGR);
+					bitmap.setPixel(insetX + x + 1, insetY + y - 1, outlineColorABGR);
+					bitmap.setPixel(insetX + x + 1, insetY + y + 1, outlineColorABGR);
 				}
 			}
 		}
 	}
+#endif
 	bitmap.insertBlend(insetX, insetY, data.mBitmap);
 	data.mBitmap = bitmap;
 }
