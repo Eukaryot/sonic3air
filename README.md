@@ -33,6 +33,7 @@ External libraries and code used in this project:
 * SDL2 - in "framework/external/sdl"
 * libogg & libvorbis - in "framework/external/ogg-vorbis"
 * zlib incl. minizip - in "framework/external/zlib"
+* libcurl - in "framework/external/curl"
 * jsoncpp - in "librmx/source/rmxbase/jsoncpp"
 * GLEW - in "librmx/source/rmxmedia/glew"
 * Sound chip emulation related code from Genesis Plus GX - in "Oxygen/oxygenengine/source/oxygen/simulation/sound"
