@@ -60,17 +60,20 @@ void ShadowFontProcessor::process(FontProcessingData& data)
 
 void OutlineFontProcessor::process(FontProcessingData& data)
 {
-	const int outlineWidth = 1;
+	if (mRange <= 0)
+		return;
+	if (mRange > 10)
+		mRange = 10;
 
 	const int oldBorderLeft   = data.mBorderLeft;
 	const int oldBorderRight  = data.mBorderRight;
 	const int oldBorderTop    = data.mBorderTop;
 	const int oldBorderBottom = data.mBorderBottom;
 
-	data.mBorderLeft   = oldBorderLeft   + outlineWidth;
-	data.mBorderRight  = oldBorderRight  + outlineWidth;
-	data.mBorderTop    = oldBorderTop    + outlineWidth;
-	data.mBorderBottom = oldBorderBottom + outlineWidth;
+	data.mBorderLeft   = oldBorderLeft   + mRange;
+	data.mBorderRight  = oldBorderRight  + mRange;
+	data.mBorderTop    = oldBorderTop    + mRange;
+	data.mBorderBottom = oldBorderBottom + mRange;
 
 	const int newWidth  = data.mBitmap.getWidth()  + (data.mBorderLeft + data.mBorderRight) - (oldBorderLeft + oldBorderRight);
 	const int newHeight = data.mBitmap.getHeight() + (data.mBorderTop + data.mBorderBottom) - (oldBorderTop + oldBorderBottom);
@@ -80,46 +83,59 @@ void OutlineFontProcessor::process(FontProcessingData& data)
 	Bitmap bitmap;
 	bitmap.create(newWidth, newHeight, 0);
 
-#if 0
-	// TODO: This does not work correctly yet
-	const uint32 outlineColorABGR = mOutlineColor.getABGR32();
-	for (int y = 0; y < data.mBitmap.getHeight(); ++y)
-	{
-		for (int x = 0; x < data.mBitmap.getWidth(); ++x)
-		{
-			const int alpha = data.mBitmap.getPixel(x, y) >> 24;
-			if (alpha > 0)
-			{
-				const uint32 color = (outlineColorABGR & 0x00ffffff) + (((outlineColorABGR >> 24) * alpha / 255) << 24);
-				bitmap.setPixel(insetX + x - 1, insetY + y, std::max(color, bitmap.getPixel(insetX + x - 1, insetY + y)));
-				bitmap.setPixel(insetX + x + 1, insetY + y, std::max(color, bitmap.getPixel(insetX + x + 1, insetY + y)));
-				bitmap.setPixel(insetX + x, insetY + y - 1, std::max(color, bitmap.getPixel(insetX + x, insetY + y - 1)));
-				bitmap.setPixel(insetX + x, insetY + y + 1, std::max(color, bitmap.getPixel(insetX + x, insetY + y + 1)));
+#if 1
+	const uint32 outlineColorBGR = mOutlineColor.getABGR32() & 0x00ffffff;
+	const uint32 outlineColorAlpha = mOutlineColor.getABGR32() >> 24;
 
-				if (mDiagonalNeighbors)
+	for (int y = 0; y < bitmap.getHeight(); ++y)
+	{
+		for (int x = 0; x < bitmap.getWidth(); ++x)
+		{
+			uint8 highestAlpha = 0;
+			for (int dy = -mRange; dy <= mRange; ++dy)
+			{
+				int rangeX = mRange;
+				if (!mRectangularOutline)
 				{
-					bitmap.setPixel(insetX + x - 1, insetY + y - 1, std::max(color, bitmap.getPixel(insetX + x - 1, insetY + y - 1)));
-					bitmap.setPixel(insetX + x - 1, insetY + y + 1, std::max(color, bitmap.getPixel(insetX + x - 1, insetY + y + 1)));
-					bitmap.setPixel(insetX + x + 1, insetY + y - 1, std::max(color, bitmap.getPixel(insetX + x + 1, insetY + y - 1)));
-					bitmap.setPixel(insetX + x + 1, insetY + y + 1, std::max(color, bitmap.getPixel(insetX + x + 1, insetY + y + 1)));
+					rangeX -= abs(dy);
+				}
+
+				const int originalY = y + dy - insetY;
+				if (originalY >= 0 && originalY < data.mBitmap.getHeight())
+				{
+					for (int dx = -rangeX; dx <= rangeX; ++dx)
+					{
+						const int originalX = x + dx - insetX;
+						if (originalX >= 0 && originalX < data.mBitmap.getWidth())	// TODO: This can be optimized by calculating the correct range for dx
+						{
+							const uint32 color = data.mBitmap.getPixel(originalX, originalY);
+							const uint8 alpha = (color >> 24);
+							highestAlpha = std::max(alpha, highestAlpha);
+						}
+					}
 				}
 			}
+
+			highestAlpha = highestAlpha * outlineColorAlpha / 255;
+			const uint32 outColor = outlineColorBGR + (highestAlpha << 24);
+			bitmap.setPixel(x, y, outColor);
 		}
 	}
 #else
+	// Old simpler implementation, which mostly ignores alpha values
 	const uint32 outlineColorABGR = mOutlineColor.getABGR32();
 	for (int y = 0; y < data.mBitmap.getHeight(); ++y)
 	{
 		for (int x = 0; x < data.mBitmap.getWidth(); ++x)
 		{
-			if (*data.mBitmap.getPixelPointer(x, y) & 0xff000000)
+			if (data.mBitmap.getPixel(x, y) & 0xff000000)
 			{
 				bitmap.setPixel(insetX + x - 1, insetY + y, outlineColorABGR);
 				bitmap.setPixel(insetX + x + 1, insetY + y, outlineColorABGR);
 				bitmap.setPixel(insetX + x, insetY + y - 1, outlineColorABGR);
 				bitmap.setPixel(insetX + x, insetY + y + 1, outlineColorABGR);
 
-				if (mDiagonalNeighbors)
+				if (mRectangularOutline)
 				{
 					bitmap.setPixel(insetX + x - 1, insetY + y - 1, outlineColorABGR);
 					bitmap.setPixel(insetX + x - 1, insetY + y + 1, outlineColorABGR);
@@ -130,6 +146,7 @@ void OutlineFontProcessor::process(FontProcessingData& data)
 		}
 	}
 #endif
+
 	bitmap.insertBlend(insetX, insetY, data.mBitmap);
 	data.mBitmap = bitmap;
 }

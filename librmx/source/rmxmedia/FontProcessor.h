@@ -52,16 +52,18 @@ private:
 class OutlineFontProcessor : public FontProcessor
 {
 public:
-	inline explicit OutlineFontProcessor(Color outlineColor = Color::BLACK, bool diagonalNeighbors = false) :
+	inline explicit OutlineFontProcessor(Color outlineColor = Color::BLACK, int range = 1, bool rectangularOutline = false) :
 		mOutlineColor(outlineColor),
-		mDiagonalNeighbors(diagonalNeighbors)
+		mRange(range),
+		mRectangularOutline(rectangularOutline)
 	{}
 
 	virtual void process(FontProcessingData& data) override;
 
 private:
 	Color mOutlineColor = Color::BLACK;
-	bool mDiagonalNeighbors = false;
+	int mRange = 1;
+	bool mRectangularOutline = false;
 };
 
 
