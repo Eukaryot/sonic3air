@@ -13,6 +13,7 @@
 #include "lemon/compiler/Parser.h"
 #include "lemon/compiler/ParserTokens.h"
 #include "lemon/compiler/Preprocessor.h"
+#include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
@@ -31,16 +32,6 @@ namespace lemon
 			T& node = blockStack.back()->mNodes.createBack<T>();
 			node.setLineNumber(lineNumber);
 			return node;
-		}
-
-		bool isOperator(const Token& token, Operator op)
-		{
-			return (token.getType() == Token::Type::OPERATOR && token.as<OperatorToken>().mOperator == op);
-		}
-
-		bool isKeyword(const Token& token, Keyword keyword)
-		{
-			return (token.getType() == Token::Type::KEYWORD && token.as<KeywordToken>().mKeyword == keyword);
 		}
 	}
 
@@ -898,7 +889,7 @@ namespace lemon
 						if (nullptr != nextNode && nextNode->getType() == Node::Type::UNDEFINED)
 						{
 							UndefinedNode& nextNodeUndefined = nextNode->as<UndefinedNode>();
-							if (nextNodeUndefined.mTokenList.size() >= 1 && nextNodeUndefined.mTokenList[0].getType() == Token::Type::KEYWORD && nextNodeUndefined.mTokenList[0].as<KeywordToken>().mKeyword == Keyword::ELSE)
+							if (nextNodeUndefined.mTokenList.size() >= 1 && isKeyword(nextNodeUndefined.mTokenList[0], Keyword::ELSE))
 							{
 								// Special case: 'else if' (or anything where there's a statement directly after the 'else')
 								if (nextNodeUndefined.mTokenList.size() >= 2)
@@ -1121,7 +1112,7 @@ namespace lemon
 		static const uint64 ARRAY_NAME_HASH = rmx::getMurmur2_64(std::string_view("array"));
 
 		// Check for "constant array"
-		if (tokens[1].getType() == Token::Type::IDENTIFIER && tokens[1].as<IdentifierToken>().mName.getHash() == ARRAY_NAME_HASH)
+		if (isIdentifier(tokens[1], ARRAY_NAME_HASH))
 		{
 			CHECK_ERROR(tokens.size() >= 7, "Syntax error in constant array definition", lineNumber);
 			CHECK_ERROR(isOperator(tokens[2], Operator::COMPARE_LESS), "Expected a type in <> in constant array definition", lineNumber);

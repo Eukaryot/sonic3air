@@ -47,7 +47,8 @@ namespace lemon
 			{ rmx::getMurmur2_64(String("if")),			Keyword::IF },
 			{ rmx::getMurmur2_64(String("else")),		Keyword::ELSE },
 			{ rmx::getMurmur2_64(String("while")),		Keyword::WHILE },
-			{ rmx::getMurmur2_64(String("for")),		Keyword::FOR }
+			{ rmx::getMurmur2_64(String("for")),		Keyword::FOR },
+			{ rmx::getMurmur2_64(String("addressof")),	Keyword::ADDRESSOF }
 		};
 
 		static const std::vector<const char*> reservedKeywords =
@@ -66,10 +67,11 @@ namespace lemon
 			"static",
 			"virtual",
 			"override",
-			"function",
 			"enum",
 			"struct",
-			"class"
+			"class",
+			"foreach",
+			"typeof"
 		};
 		static std::map<uint64, std::string> reservedKeywordLookup;
 

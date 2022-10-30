@@ -28,6 +28,7 @@
     <ClCompile Include="..\..\source\lemon\compiler\ParserHelper.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Preprocessor.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Token.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\TokenHelper.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\TokenProcessing.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\TypeCasting.cpp" />
     <ClCompile Include="..\..\source\lemon\pch.cpp">
@@ -72,6 +73,7 @@
     <ClInclude Include="..\..\source\lemon\compiler\Preprocessor.h" />
     <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Token.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\TokenHelper.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TokenProcessing.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TokenTypes.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TypeCasting.h" />

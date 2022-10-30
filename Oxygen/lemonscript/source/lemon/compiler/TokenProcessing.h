@@ -71,6 +71,8 @@ namespace lemon
 		void evaluateCompileTimeConstants(TokenList& tokens);
 		bool evaluateCompileTimeConstantsRecursive(Token& inputToken, TokenPtr<StatementToken>& outTokenPtr);
 
+		void resolveAddressOf(TokenList& tokens);
+
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
 

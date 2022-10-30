@@ -37,7 +37,8 @@ namespace lemon
 		IF,
 		ELSE,
 		WHILE,
-		FOR
+		FOR,
+		ADDRESSOF
 	};
 
 }

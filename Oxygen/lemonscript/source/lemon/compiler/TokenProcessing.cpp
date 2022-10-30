@@ -8,6 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/TokenProcessing.h"
+#include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
@@ -161,6 +162,7 @@ namespace lemon
 			processArrayAccesses(*tokenList);
 			processExplicitCasts(*tokenList);
 			processVariables(*tokenList);
+			resolveAddressOf(*tokenList);
 
 			processUnaryOperations(*tokenList);
 			processBinaryOperations(*tokenList);
@@ -338,7 +340,7 @@ namespace lemon
 			for (size_t i = 0; i < tokens.size(); ++i)
 			{
 				Token& token = tokens[i];
-				if (token.getType() == Token::Type::OPERATOR && token.as<OperatorToken>().mOperator == Operator::COMMA_SEPARATOR)
+				if (isOperator(token, Operator::COMMA_SEPARATOR))
 				{
 					commaPositions.push_back(i);
 				}
@@ -365,7 +367,7 @@ namespace lemon
 					if (j > 0)
 					{
 						// Erase the comma token itself
-						CHECK_ERROR(tokens[commaPositions[j]].getType() == Token::Type::OPERATOR && tokens[commaPositions[j]].as<OperatorToken>().mOperator == Operator::COMMA_SEPARATOR, "Wrong token index", mLineNumber);
+						CHECK_ERROR(isOperator(tokens[commaPositions[j]], Operator::COMMA_SEPARATOR), "Wrong token index", mLineNumber);
 						tokens.erase(commaPositions[j]);
 					}
 				}
@@ -447,184 +449,180 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER && tokens[i+1].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].getType() == Token::Type::IDENTIFIER && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
 			{
-				// Must be a round parenthesis, not a bracket
-				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::PARENTHESIS)
+				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				const std::string_view functionName = identifierToken.mName.getString();
+				bool isBaseCall = false;
+				bool baseFunctionExists = false;
+				const Function* function = nullptr;
+				const Variable* thisPointerVariable = nullptr;
+
+				const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+				if (!candidateFunctions.empty())
 				{
-					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
-					const std::string_view functionName = identifierToken.mName.getString();
-					bool isBaseCall = false;
-					bool baseFunctionExists = false;
-					const Function* function = nullptr;
-					const Variable* thisPointerVariable = nullptr;
+					// Is it a global function
+				}
+				else if (rmx::startsWith(functionName, "base."))
+				{
+					// It's a base call
+					RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
+					CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call \"" << functionName << "\" goes to a different function, expected \"base." << mContext.mFunction->getName() << "\" instead", mLineNumber);
+					isBaseCall = true;
 
-					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
-					if (!candidateFunctions.empty())
+					const std::string_view baseName = identifierToken.mName.getString().substr(5);
+					const std::vector<Function*>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
+					for (Function* candidate : candidates)
 					{
-						// Is it a global function
-					}
-					else if (rmx::startsWith(functionName, "base."))
-					{
-						// It's a base call
-						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-						CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call \"" << functionName << "\" goes to a different function, expected \"base." << mContext.mFunction->getName() << "\" instead", mLineNumber);
-						isBaseCall = true;
-
-						const std::string_view baseName = identifierToken.mName.getString().substr(5);
-						const std::vector<Function*>& candidates = mGlobalsLookup.getFunctionsByName(rmx::getMurmur2_64(baseName));
-						for (Function* candidate : candidates)
+						// Base function signature must be the same as current function's
+						if (candidate->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate != mContext.mFunction)
 						{
-							// Base function signature must be the same as current function's
-							if (candidate->getSignatureHash() == mContext.mFunction->getSignatureHash() && candidate != mContext.mFunction)
+							baseFunctionExists = true;
+							break;
+						}
+					}
+
+					// TODO: The following check would be no good idea, as some mods overwrite functions (and call their base) from other mods that may or may not be loaded before
+					//  -> The solution is to allow this, and make the base calls simply do nothing at all
+					//CHECK_ERROR(baseFunctionExists, "There's no base function for call \"" << functionName << "\" with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
+				}
+				else
+				{
+					// Special handling for "string.length()" and "array.length()"
+					//  -> TODO: Generalize this to pave the way for other kinds of "method calls"
+					bool isValidFunctionCall = false;
+					if (rmx::endsWith(functionName, ".length") && content.empty())
+					{
+						const std::string_view variableName = functionName.substr(0, functionName.length() - 7);
+						const Variable* variable = findVariable(rmx::getMurmur2_64(variableName));
+						if (nullptr != variable && variable->getDataType() == &PredefinedDataTypes::STRING)
+						{
+							function = mBuiltinStringLength.mFunctions[0];
+							thisPointerVariable = variable;
+							isValidFunctionCall = true;
+						}
+						else
+						{
+							const ConstantArray* constantArray = findConstantArray(rmx::getMurmur2_64(variableName));
+							if (nullptr != constantArray)
 							{
-								baseFunctionExists = true;
-								break;
+								// This can simply be replaced with a compile-time constant
+								ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+								constantToken.mValue = (uint64)constantArray->getSize();
+								constantToken.mDataType = &PredefinedDataTypes::CONST_INT;
+								tokens.erase(i+1);
+								continue;
 							}
 						}
+					}
+					CHECK_ERROR(isValidFunctionCall, "Unknown function name '" << functionName << "'", mLineNumber);
+				}
 
-						// TODO: The following check would be no good idea, as some mods overwrite functions (and call their base) from other mods that may or may not be loaded before
-						//  -> The solution is to allow this, and make the base calls simply do nothing at all
-						//CHECK_ERROR(baseFunctionExists, "There's no base function for call \"" << functionName << "\" with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
+				// Create function token
+				FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+
+				// Build list of parameters
+				if (!content.empty())
+				{
+					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
+					{
+						const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
+						token.mParameters.reserve(tokenLists.size());
+						for (const TokenList& tokenList : tokenLists)
+						{
+							CHECK_ERROR(tokenList.size() == 1, "Function parameter content must be one token", mLineNumber);
+							CHECK_ERROR(tokenList[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
+							vectorAdd(token.mParameters) = tokenList[0].as<StatementToken>();
+						}
 					}
 					else
 					{
-						// Special handling for "string.length()" and "array.length()"
-						//  -> TODO: Generalize this to pave the way for other kinds of "method calls"
-						bool isValidFunctionCall = false;
-						if (rmx::endsWith(functionName, ".length") && content.empty())
+						CHECK_ERROR(content.size() == 1, "Function parameter content must be one token", mLineNumber);
+						CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
+						vectorAdd(token.mParameters) = content[0].as<StatementToken>();
+					}
+				}
+				if (nullptr != thisPointerVariable)
+				{
+					VariableToken& variableToken = vectorAdd(token.mParameters).create<VariableToken>();
+					variableToken.mVariable = thisPointerVariable;
+					variableToken.mDataType = thisPointerVariable->getDataType();
+				}
+				tokens.erase(i+1);
+
+				// Assign types
+				static std::vector<const DataTypeDefinition*> parameterTypes;	// Not multi-threading safe
+				parameterTypes.resize(token.mParameters.size());
+				for (size_t i = 0; i < token.mParameters.size(); ++i)
+				{
+					parameterTypes[i] = assignStatementDataType(*token.mParameters[i], nullptr);
+				}
+
+				// If the function was not determined yet, do that now
+				if (nullptr == function)
+				{
+					// Find out which function signature actually fits
+					RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
+					if (isBaseCall)
+					{
+						// Base call must use the same function signature as the current one
+						CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
+						size_t failedIndex = 0;
+						const bool canMatch = mTypeCasting.canMatchSignature(parameterTypes, mContext.mFunction->getParameters(), &failedIndex);
+						CHECK_ERROR(canMatch, "Can't cast parameters of function call to match base function, parameter '" << mContext.mFunction->getParameters()[failedIndex].mName << "' has the wrong type", mLineNumber);
+
+						if (baseFunctionExists)
 						{
-							const std::string_view variableName = functionName.substr(0, functionName.length() - 7);
-							const Variable* variable = findVariable(rmx::getMurmur2_64(variableName));
-							if (nullptr != variable && variable->getDataType() == &PredefinedDataTypes::STRING)
+							// Use the very same function again, as a base call
+							function = mContext.mFunction;
+							token.mIsBaseCall = true;
+						}
+						else
+						{
+							// Base call would go nowhere - better replace the token again with one doing nothing at all, or returning a default value
+							const DataTypeDefinition* returnType = mContext.mFunction->getReturnType();
+							switch (returnType->getClass())
 							{
-								function = mBuiltinStringLength.mFunctions[0];
-								thisPointerVariable = variable;
-								isValidFunctionCall = true;
-							}
-							else
-							{
-								const ConstantArray* constantArray = findConstantArray(rmx::getMurmur2_64(variableName));
-								if (nullptr != constantArray)
+								case DataTypeDefinition::Class::VOID:
 								{
-									// This can simply be replaced with a compile-time constant
+									tokens.erase(i);
+									break;
+								}
+								case DataTypeDefinition::Class::INTEGER:
+								case DataTypeDefinition::Class::STRING:
+								{
 									ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-									constantToken.mValue = (uint64)constantArray->getSize();
-									constantToken.mDataType = &PredefinedDataTypes::CONST_INT;
-									tokens.erase(i+1);
-									continue;
+									constantToken.mValue = 0;
+									constantToken.mDataType = returnType;
+									break;
 								}
 							}
+							return;
 						}
-						CHECK_ERROR(isValidFunctionCall, "Unknown function name '" << functionName << "'", mLineNumber);
 					}
-
-					// Create function token
-					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
-
-					// Build list of parameters
-					if (!content.empty())
+					else
 					{
-						if (content[0].getType() == Token::Type::COMMA_SEPARATED)
+						// Find best-fitting correct function overload
+						function = nullptr;
+						uint32 bestPriority = 0xff000000;
+						for (const Function* candidateFunction : candidateFunctions)
 						{
-							const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
-							token.mParameters.reserve(tokenLists.size());
-							for (const TokenList& tokenList : tokenLists)
+							const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
+							if (priority < bestPriority)
 							{
-								CHECK_ERROR(tokenList.size() == 1, "Function parameter content must be one token", mLineNumber);
-								CHECK_ERROR(tokenList[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-								vectorAdd(token.mParameters) = tokenList[0].as<StatementToken>();
+								bestPriority = priority;
+								function = candidateFunction;
 							}
 						}
-						else
-						{
-							CHECK_ERROR(content.size() == 1, "Function parameter content must be one token", mLineNumber);
-							CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-							vectorAdd(token.mParameters) = content[0].as<StatementToken>();
-						}
+						CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" << functionName << "', the number or types of parameters passed are wrong", mLineNumber);
 					}
-					if (nullptr != thisPointerVariable)
-					{
-						VariableToken& variableToken = vectorAdd(token.mParameters).create<VariableToken>();
-						variableToken.mVariable = thisPointerVariable;
-						variableToken.mDataType = thisPointerVariable->getDataType();
-					}
-					tokens.erase(i+1);
+				}
 
-					// Assign types
-					static std::vector<const DataTypeDefinition*> parameterTypes;	// Not multi-threading safe
-					parameterTypes.resize(token.mParameters.size());
-					for (size_t i = 0; i < token.mParameters.size(); ++i)
-					{
-						parameterTypes[i] = assignStatementDataType(*token.mParameters[i], nullptr);
-					}
-
-					// If the function was not determined yet, do that now
-					if (nullptr == function)
-					{
-						// Find out which function signature actually fits
-						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-						if (isBaseCall)
-						{
-							// Base call must use the same function signature as the current one
-							CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
-							size_t failedIndex = 0;
-							const bool canMatch = mTypeCasting.canMatchSignature(parameterTypes, mContext.mFunction->getParameters(), &failedIndex);
-							CHECK_ERROR(canMatch, "Can't cast parameters of function call to match base function, parameter '" << mContext.mFunction->getParameters()[failedIndex].mName << "' has the wrong type", mLineNumber);
-
-							if (baseFunctionExists)
-							{
-								// Use the very same function again, as a base call
-								function = mContext.mFunction;
-								token.mIsBaseCall = true;
-							}
-							else
-							{
-								// Base call would go nowhere - better replace the token again with one doing nothing at all, or returning a default value
-								const DataTypeDefinition* returnType = mContext.mFunction->getReturnType();
-								switch (returnType->getClass())
-								{
-									case DataTypeDefinition::Class::VOID:
-									{
-										tokens.erase(i);
-										break;
-									}
-									case DataTypeDefinition::Class::INTEGER:
-									case DataTypeDefinition::Class::STRING:
-									{
-										ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-										constantToken.mValue = 0;
-										constantToken.mDataType = returnType;
-										break;
-									}
-								}
-								return;
-							}
-						}
-						else
-						{
-							// Find best-fitting correct function overload
-							function = nullptr;
-							uint32 bestPriority = 0xff000000;
-							for (const Function* candidateFunction : candidateFunctions)
-							{
-								const uint32 priority = mTypeCasting.getPriorityOfSignature(parameterTypes, candidateFunction->getParameters());
-								if (priority < bestPriority)
-								{
-									bestPriority = priority;
-									function = candidateFunction;
-								}
-							}
-							CHECK_ERROR(bestPriority < 0xff000000, "No appropriate function overload found calling '" << functionName << "', the number or types of parameters passed are wrong", mLineNumber);
-						}
-					}
-
-					if (nullptr != function)
-					{
-						token.mFunction = function;
-						token.mDataType = function->getReturnType();
-					}
+				if (nullptr != function)
+				{
+					token.mFunction = function;
+					token.mDataType = function->getReturnType();
 				}
 			}
 		}
@@ -634,25 +632,21 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::VARTYPE && tokens[i+1].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].getType() == Token::Type::VARTYPE && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
 			{
-				// Must be a bracket
-				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::BRACKET)
-				{
-					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-					CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
-					CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
+				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+				CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
+				CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
 
-					const DataTypeDefinition* dataType = tokens[i].as<VarTypeToken>().mDataType;
-					CHECK_ERROR(dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->getName() << "'", mLineNumber);
+				const DataTypeDefinition* dataType = tokens[i].as<VarTypeToken>().mDataType;
+				CHECK_ERROR(dataType->getClass() == DataTypeDefinition::Class::INTEGER && dataType->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::DEFAULT, "Memory access is only possible using basic integer types, but not '" << dataType->getName() << "'", mLineNumber);
 
-					MemoryAccessToken& token = tokens.createReplaceAt<MemoryAccessToken>(i);
-					token.mDataType = dataType;
-					token.mAddress = content[0].as<StatementToken>();
-					tokens.erase(i+1);
+				MemoryAccessToken& token = tokens.createReplaceAt<MemoryAccessToken>(i);
+				token.mDataType = dataType;
+				token.mAddress = content[0].as<StatementToken>();
+				tokens.erase(i+1);
 
-					assignStatementDataType(*token.mAddress, &PredefinedDataTypes::UINT_32);
-				}
+				assignStatementDataType(*token.mAddress, &PredefinedDataTypes::UINT_32);
 			}
 		}
 	}
@@ -661,60 +655,56 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER && tokens[i+1].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].getType() == Token::Type::IDENTIFIER && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
 			{
-				// Must be a bracket
-				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::BRACKET)
+				// Check the identifier
+				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
+				const ConstantArray* constantArray = nullptr;
+				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
 				{
-					// Check the identifier
-					IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
-					const ConstantArray* constantArray = nullptr;
-					if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::CONSTANT_ARRAY)
-					{
-						constantArray = &identifierToken.mResolved->as<ConstantArray>();
-					}
-					else
-					{
-						// Check for local constant array
-						constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
-						CHECK_ERROR(nullptr != constantArray, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
-					}
-
-					TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-					CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
-					CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
-
-					const Function* matchingFunction = nullptr;
-					for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
-					{
-						if (function->getReturnType() == constantArray->getElementDataType())
-						{
-							matchingFunction = function;
-							break;
-						}
-					}
-					if (nullptr == matchingFunction)
-						continue;
-
-				#ifdef DEBUG
-					const Function::ParameterList& parameterList = matchingFunction->getParameters();
-					RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mDataType == &PredefinedDataTypes::UINT_32 && parameterList[1].mDataType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
-				#endif
-
-					FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
-					token.mFunction = matchingFunction;
-					token.mParameters.resize(2);
-					ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
-					idToken.mValue = constantArray->getID();
-					idToken.mDataType = &PredefinedDataTypes::UINT_32;
-					token.mParameters[1] = content[0].as<StatementToken>();		// Array index
-					token.mDataType = matchingFunction->getReturnType();
-
-					assignStatementDataType(*token.mParameters[0], matchingFunction->getParameters()[0].mDataType);
-					assignStatementDataType(*token.mParameters[1], matchingFunction->getParameters()[1].mDataType);
-
-					tokens.erase(i+1);
+					constantArray = &identifierToken.mResolved->as<ConstantArray>();
 				}
+				else
+				{
+					// Check for local constant array
+					constantArray = findInList(*mContext.mLocalConstantArrays, identifierToken.mName.getHash());
+					CHECK_ERROR(nullptr != constantArray, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
+				}
+
+				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+				CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
+				CHECK_ERROR(content[0].isStatement(), "Expected statement token inside brackets", mLineNumber);
+
+				const Function* matchingFunction = nullptr;
+				for (const Function* function : mBuiltinConstantArrayAccess.mFunctions)
+				{
+					if (function->getReturnType() == constantArray->getElementDataType())
+					{
+						matchingFunction = function;
+						break;
+					}
+				}
+				if (nullptr == matchingFunction)
+					continue;
+
+			#ifdef DEBUG
+				const Function::ParameterList& parameterList = matchingFunction->getParameters();
+				RMX_ASSERT(parameterList.size() == 2 && parameterList[0].mDataType == &PredefinedDataTypes::UINT_32 && parameterList[1].mDataType == &PredefinedDataTypes::UINT_32, "Function signature for constant array access does not fit");
+			#endif
+
+				FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+				token.mFunction = matchingFunction;
+				token.mParameters.resize(2);
+				ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
+				idToken.mValue = constantArray->getID();
+				idToken.mDataType = &PredefinedDataTypes::UINT_32;
+				token.mParameters[1] = content[0].as<StatementToken>();		// Array index
+				token.mDataType = matchingFunction->getReturnType();
+
+				assignStatementDataType(*token.mParameters[0], matchingFunction->getParameters()[0].mDataType);
+				assignStatementDataType(*token.mParameters[1], matchingFunction->getParameters()[1].mDataType);
+
+				tokens.erase(i+1);
 			}
 		}
 	}
@@ -723,18 +713,14 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::VARTYPE && tokens[i+1].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].getType() == Token::Type::VARTYPE && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
 			{
-				// Must be a round parenthesis, not a bracket
-				if (tokens[i+1].as<ParenthesisToken>().mParenthesisType == ParenthesisType::PARENTHESIS)
-				{
-					const DataTypeDefinition* targetType = tokens[i].as<VarTypeToken>().mDataType;
+				const DataTypeDefinition* targetType = tokens[i].as<VarTypeToken>().mDataType;
 
-					ValueCastToken& token = tokens.createReplaceAt<ValueCastToken>(i);
-					token.mArgument = tokens[i+1].as<ParenthesisToken>();
-					token.mDataType = targetType;
-					tokens.erase(i+1);
-				}
+				ValueCastToken& token = tokens.createReplaceAt<ValueCastToken>(i);
+				token.mArgument = tokens[i+1].as<ParenthesisToken>();
+				token.mDataType = targetType;
+				tokens.erase(i+1);
 			}
 		}
 	}
@@ -1020,6 +1006,35 @@ namespace lemon
 				break;
 		}
 		return false;
+	}
+
+	void TokenProcessing::resolveAddressOf(TokenList& tokens)
+	{
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
+		{
+			if (isKeyword(tokens[i], Keyword::ADDRESSOF))
+			{
+				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "addressof must be followed by parentheses", mLineNumber);
+				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+				CHECK_ERROR(content.size() == 1, "Expected a single token in parenthesis after 'addressof'", mLineNumber);
+
+				switch (content[0].getType())
+				{
+					case Token::Type::MEMORY_ACCESS:
+					{
+						// Replace addressof with the actual address
+						tokens.replace(*content[0].as<MemoryAccessToken>().mAddress, i);
+						tokens.erase(i+1);
+						break;
+					}
+
+					// TODO: Support "addressof(functionname)" as well, but that first requires moving address hook management from oxygen to lemonscript
+
+					default:
+						CHECK_ERROR(false, "Unsupported use of addressof", mLineNumber);
+				}
+			}
+		}
 	}
 
 	void TokenProcessing::assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType)
