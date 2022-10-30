@@ -98,6 +98,21 @@ function void Standalone.playRumbleEffectForAudio(u8 sfxId)
 		// Earthquake rumble
 		Input.setControllerRumble(0, 0x4000, 0x4000, 200)
 	}
+	else if (sfxId == 0x77)
+	{
+		// Balloon pop
+		Input.setControllerRumble(0, 0, 0x4000, 200)
+	}
+	else if (sfxId == 0x81)
+	{
+		// LBZ booster tube (and CNZ cannon)
+		Input.setControllerRumble(0, 0x4000, 0, 300)
+	}
+	else if (sfxId == 0xaa)
+	{
+		// Bumper
+		Input.setControllerRumble(0, 0x2000, 0x2000, 200)
+	}
 	else if (sfxId == 0xb4)
 	{
 		// Boss explosion

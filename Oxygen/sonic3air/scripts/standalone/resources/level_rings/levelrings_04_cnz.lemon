@@ -267,10 +267,10 @@ function void LevelRingsTableBuilder.buildRings_CNZ1()
 	LevelRingsTableBuilder.addRing(0x2498, 0x0788)
 
 	// Remove those misplaced rings in the (formerly hard-to-reach) secret room
-	LevelRingsTableBuilder.addRing(0x249c, 0x0528)
-	LevelRingsTableBuilder.addRing(0x249c, 0x0540)
-	LevelRingsTableBuilder.addRing(0x249c, 0x0558)
-	LevelRingsTableBuilder.addRing(0x249c, 0x0570)
+	//LevelRingsTableBuilder.addRing(0x249c, 0x0528)
+	//LevelRingsTableBuilder.addRing(0x249c, 0x0540)
+	//LevelRingsTableBuilder.addRing(0x249c, 0x0558)
+	//LevelRingsTableBuilder.addRing(0x249c, 0x0570)
 
 	LevelRingsTableBuilder.addRing(0x24b2, 0x079e)
 	LevelRingsTableBuilder.addRing(0x24d2, 0x07ad)
