@@ -345,10 +345,13 @@ namespace lemon
 		//  - 0x09 = Added source file infos + more compact way of line number serialization
 		//  - 0x0a = Added dependency hash
 		//  - 0x0b = Added app version
+		//  - 0x0c = Added address hook serialization
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		uint16 version = 0x0b;
+		const uint16 MINIMUM_VERSION = 0x0c;
+		uint16 version = 0x0c;
+
 		if (outerSerializer.isReading())
 		{
 			const uint32 signature = *(const uint32*)outerSerializer.peek();
@@ -357,7 +360,7 @@ namespace lemon
 
 			outerSerializer.skip(4);
 			version = outerSerializer.read<uint16>();
-			if (version < 0x0b)
+			if (version < MINIMUM_VERSION)
 				return false;	// Loading older versions is not supported
 
 			const uint32 readDependencyHash = outerSerializer.read<uint32>();
@@ -545,6 +548,13 @@ namespace lemon
 							scriptFunc.addLabel(name, (size_t)offset);
 						}
 
+						// Address hooks
+						count = (size_t)serializer.read<uint32>();
+						for (size_t k = 0; k < count; ++k)
+						{
+							scriptFunc.mAddressHooks.emplace_back(serializer.read<uint32>());
+						}
+
 						// Pragmas
 						count = (size_t)serializer.read<uint32>();
 						for (size_t k = 0; k < count; ++k)
@@ -629,9 +639,16 @@ namespace lemon
 							serializer.write(label.mOffset);
 						}
 
+						// Address hooks
+						serializer.writeAs<uint32>(scriptFunc.mAddressHooks.size());
+						for (uint32 addressHook : scriptFunc.mAddressHooks)
+						{
+							serializer.write(addressHook);
+						}
+
 						// Pragmas
 						serializer.writeAs<uint32>(scriptFunc.mPragmas.size());
-						for (const auto& pragma : scriptFunc.mPragmas)
+						for (const std::string& pragma : scriptFunc.mPragmas)
 						{
 							serializer.write(pragma);
 						}

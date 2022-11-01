@@ -55,8 +55,12 @@ namespace lemon
 	private:
 		void processDefines(TokenList& tokens);
 		void processConstants(TokenList& tokens);
-		void processParentheses(TokenList& tokens, std::vector<TokenList*>& outLinearTokenLists);
-		void processCommaSeparators(std::vector<TokenList*>& linearTokenLists);
+
+		void processParentheses(TokenList& tokens);
+		void processCommaSeparators(TokenList& tokens);
+
+		void processTokenListRecursive(TokenList& tokens);
+		void processTokenListRecursiveForPreprocessor(TokenList& tokens);
 
 		void processVariableDefinitions(TokenList& tokens);
 		void processFunctionCalls(TokenList& tokens);
@@ -71,7 +75,8 @@ namespace lemon
 		void evaluateCompileTimeConstants(TokenList& tokens);
 		bool evaluateCompileTimeConstantsRecursive(Token& inputToken, TokenPtr<StatementToken>& outTokenPtr);
 
-		void resolveAddressOf(TokenList& tokens);
+		void resolveAddressOfFunctions(TokenList& tokens);
+		void resolveAddressOfMemoryAccesses(TokenList& tokens);
 
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);

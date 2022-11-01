@@ -107,6 +107,9 @@ namespace lemon
 		void addLabel(FlyweightString labelName, size_t offset);
 		const Label* findLabelByOffset(size_t offset) const;
 
+		const std::vector<uint32>& getAddressHooks() const  { return mAddressHooks; }
+
+		void addOrProcessPragma(std::string_view pragmaString);
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
 
 		uint64 addToCompiledHash(uint64 hash) const;
@@ -121,6 +124,9 @@ namespace lemon
 
 		// Labels
 		std::vector<Label> mLabels;
+
+		// Address hooks
+		std::vector<uint32> mAddressHooks;
 
 		// Pragmas
 		std::vector<std::string> mPragmas;

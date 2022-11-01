@@ -534,7 +534,7 @@ namespace lemon
 							// Add all pragmas associated with this function, i.e. all pragma nodes in front
 							for (PragmaNode* pragmaNode : currentPragmas)
 							{
-								function.mPragmas.push_back(pragmaNode->mContent);
+								function.addOrProcessPragma(pragmaNode->mContent);
 							}
 							break;
 						}

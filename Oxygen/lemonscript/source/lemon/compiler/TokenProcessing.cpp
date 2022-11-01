@@ -140,35 +140,14 @@ namespace lemon
 		// Process constants
 		processConstants(tokensRoot);
 
-		// Build linear token lists that can mostly be processed individually
-		//  -> Each linear token list represents contents of one pair of parenthesis, or a comma-separated part in there -- plus there's always one linear token list for the whole root
-		//  -> They are sorted so that inner token lists have a lower index in "linearTokenLists" than their outer token list, so they're evaluated first
-		static std::vector<TokenList*> linearTokenLists;	// Not multi-threading safe
-		linearTokenLists.clear();
-		{
-			// Split by parentheses
-			processParentheses(tokensRoot, linearTokenLists);
+		// Build hierarchy by processing parentheses
+		processParentheses(tokensRoot);
 
-			// Split by commas
-			processCommaSeparators(linearTokenLists);
-		}
+		// Build hierarchy by processing commas (usually those separating paremeters in function calls)
+		processCommaSeparators(tokensRoot);
 
-		// We do the other processing steps on each linear token list individually
-		for (TokenList* tokenList : linearTokenLists)
-		{
-			processVariableDefinitions(*tokenList);
-			processFunctionCalls(*tokenList);
-			processMemoryAccesses(*tokenList);
-			processArrayAccesses(*tokenList);
-			processExplicitCasts(*tokenList);
-			processVariables(*tokenList);
-			resolveAddressOf(*tokenList);
-
-			processUnaryOperations(*tokenList);
-			processBinaryOperations(*tokenList);
-
-			evaluateCompileTimeConstants(*tokenList);
-		}
+		// Recursively go through the hierarchy of tokens for the main part of processing
+		processTokenListRecursive(tokensRoot);
 
 		// TODO: Statement type assignment will require resolving all identifiers first -- check if this is done here
 		assignStatementDataTypes(tokensRoot, resultType);
@@ -178,17 +157,11 @@ namespace lemon
 	{
 		mLineNumber = lineNumber;
 
-		// Build linear token lists that can mostly be processed individually
-		static std::vector<TokenList*> linearTokenLists;	// Not multi-threading safe
-		linearTokenLists.clear();
-		processParentheses(tokensRoot, linearTokenLists);
+		// Build hierarchy by processing parentheses
+		processParentheses(tokensRoot);
 
-		// We do the other processing steps on each linear token list individually
-		for (TokenList* tokenList : linearTokenLists)
-		{
-			processUnaryOperations(*tokenList);
-			processBinaryOperations(*tokenList);
-		}
+		// Recursively go through the hierarchy of tokens for the main part of processing
+		processTokenListRecursiveForPreprocessor(tokensRoot);
 	}
 
 	bool TokenProcessing::resolveIdentifiers(TokenList& tokens)
@@ -273,7 +246,7 @@ namespace lemon
 		}
 	}
 
-	void TokenProcessing::processParentheses(TokenList& tokens, std::vector<TokenList*>& outLinearTokenLists)
+	void TokenProcessing::processParentheses(TokenList& tokens)
 	{
 		static std::vector<std::pair<ParenthesisType, size_t>> parenthesisStack;	// Not multi-threading safe
 		parenthesisStack.clear();
@@ -312,9 +285,6 @@ namespace lemon
 					{
 						// Copy content as new token list into the parenthesis token
 						token.mContent.moveFrom(tokens, startPosition + 1, endPosition - startPosition - 1);
-
-						// Add to output
-						outLinearTokenLists.push_back(&token.mContent);
 					}
 
 					i -= (endPosition - startPosition);
@@ -323,64 +293,122 @@ namespace lemon
 		}
 
 		CHECK_ERROR(parenthesisStack.empty(), "Parenthesis not matching (too many open)", mLineNumber);
-
-		// Add to output
-		outLinearTokenLists.push_back(&tokens);
 	}
 
-	void TokenProcessing::processCommaSeparators(std::vector<TokenList*>& linearTokenLists)
+	void TokenProcessing::processCommaSeparators(TokenList& tokens)
 	{
-		static std::vector<size_t> commaPositions;	// Not multi-threading safe
-		for (size_t k = 0; k < linearTokenLists.size(); ++k)
+		// Recursively go through the whole parenthesis hierarchy
+		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			TokenList& tokens = *linearTokenLists[k];
-
-			// Find comma positions
-			commaPositions.clear();
-			for (size_t i = 0; i < tokens.size(); ++i)
+			if (tokens[i].getType() == Token::Type::PARENTHESIS)
 			{
-				Token& token = tokens[i];
-				if (isOperator(token, Operator::COMMA_SEPARATOR))
+				// Call recursively for this parenthesis
+				processCommaSeparators(tokens[i].as<ParenthesisToken>().mContent);
+			}
+		}
+
+		// Find comma positions
+		static std::vector<size_t> commaPositions;	// Not multi-threading safe
+		commaPositions.clear();
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			Token& token = tokens[i];
+			if (isOperator(token, Operator::COMMA_SEPARATOR))
+			{
+				commaPositions.push_back(i);
+			}
+		}
+
+		// Any commas?
+		if (!commaPositions.empty())
+		{
+			CommaSeparatedListToken& commaSeparatedListToken = tokens.createFront<CommaSeparatedListToken>();
+			commaSeparatedListToken.mContent.resize(commaPositions.size() + 1);
+
+			// All comma positions have changed by 1
+			for (size_t& pos : commaPositions)
+				++pos;
+
+			// Add "virtual" comma at the front for symmetry reasons
+			commaPositions.insert(commaPositions.begin(), 0);
+
+			for (int j = (int)commaPositions.size() - 1; j >= 0; --j)
+			{
+				const size_t first = commaPositions[j] + 1;
+				commaSeparatedListToken.mContent[j].moveFrom(tokens, first, tokens.size() - first);
+
+				if (j > 0)
 				{
-					commaPositions.push_back(i);
+					// Erase the comma token itself
+					CHECK_ERROR(isOperator(tokens[commaPositions[j]], Operator::COMMA_SEPARATOR), "Wrong token index", mLineNumber);
+					tokens.erase(commaPositions[j]);
 				}
 			}
+			CHECK_ERROR(tokens.size() == 1, "Token list must only contain the CommaSeparatedListToken afterwards", mLineNumber);
+		}
+	}
 
-			// Any commas?
-			if (!commaPositions.empty())
+	void TokenProcessing::processTokenListRecursive(TokenList& tokens)
+	{
+		// Resolve occurrences of "addressof" that refer to functions
+		//  -> These need to be resolved before processing the child tokens, because the function name as a sole identifier would cause a syntax error
+		resolveAddressOfFunctions(tokens);
+
+		// Go through the child token lists
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			switch (tokens[i].getType())
 			{
-				CommaSeparatedListToken& commaSeparatedListToken = tokens.createFront<CommaSeparatedListToken>();
-				commaSeparatedListToken.mContent.resize(commaPositions.size() + 1);
-
-				// All comma positions have changed by 1
-				for (size_t& pos : commaPositions)
-					++pos;
-
-				// Add "virtual" comma at the front for symmetry reasons
-				commaPositions.insert(commaPositions.begin(), 0);
-
-				for (int j = (int)commaPositions.size() - 1; j >= 0; --j)
+				case Token::Type::PARENTHESIS:
 				{
-					const size_t first = commaPositions[j] + 1;
-					commaSeparatedListToken.mContent[j].moveFrom(tokens, first, tokens.size() - first);
-
-					if (j > 0)
-					{
-						// Erase the comma token itself
-						CHECK_ERROR(isOperator(tokens[commaPositions[j]], Operator::COMMA_SEPARATOR), "Wrong token index", mLineNumber);
-						tokens.erase(commaPositions[j]);
-					}
+					// Call recursively for this parenthesis' contents
+					processTokenListRecursive(tokens[i].as<ParenthesisToken>().mContent);
+					break;
 				}
-				CHECK_ERROR(tokens.size() == 1, "Token list must only contain the CommaSeparatedListToken afterwards", mLineNumber);
 
-				// Add each part to linear token list (in order)
-				for (size_t j = 0; j < commaPositions.size(); ++j)
+				case Token::Type::COMMA_SEPARATED:
 				{
-					++k;
-					linearTokenLists.insert(linearTokenLists.begin() + k, &commaSeparatedListToken.mContent[j]);
+					// Call recursively for each comma-separated part
+					for (TokenList& content : tokens[i].as<CommaSeparatedListToken>().mContent)
+					{
+						processTokenListRecursive(content);
+					}
+					break;
 				}
 			}
 		}
+
+		// Now for the other processing steps, which are done after processing the child tokens
+		processVariableDefinitions(tokens);
+		processFunctionCalls(tokens);
+		processMemoryAccesses(tokens);
+		processArrayAccesses(tokens);
+		processExplicitCasts(tokens);
+		processVariables(tokens);
+
+		resolveAddressOfMemoryAccesses(tokens);
+
+		processUnaryOperations(tokens);
+		processBinaryOperations(tokens);
+
+		evaluateCompileTimeConstants(tokens);
+	}
+
+	void TokenProcessing::processTokenListRecursiveForPreprocessor(TokenList& tokens)
+	{
+		// Go through the child token lists
+		for (size_t i = 0; i < tokens.size(); ++i)
+		{
+			if (tokens[i].getType() == Token::Type::PARENTHESIS)
+			{
+				// Call recursively for this parenthesis' contents
+				processTokenListRecursiveForPreprocessor(tokens[i].as<ParenthesisToken>().mContent);
+			}
+		}
+
+		// Now for the other processing steps
+		processUnaryOperations(tokens);
+		processBinaryOperations(tokens);
 	}
 
 	void TokenProcessing::processVariableDefinitions(TokenList& tokens)
@@ -419,7 +447,7 @@ namespace lemon
 
 						// Create new variable
 						const IdentifierToken& identifierToken = tokens[i+1].as<IdentifierToken>();
-						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mName.getHash()), "Variable name already used", mLineNumber);
+						CHECK_ERROR(nullptr == findLocalVariable(identifierToken.mName.getHash()), "Variable name '" << identifierToken.mName.getString() << "' already used", mLineNumber);
 
 						// Variable may already exist in function (but not in scope, we just checked that)
 						RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
@@ -468,7 +496,7 @@ namespace lemon
 				{
 					// It's a base call
 					RMX_ASSERT(nullptr != mContext.mFunction, "Invalid function pointer");
-					CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call \"" << functionName << "\" goes to a different function, expected \"base." << mContext.mFunction->getName() << "\" instead", mLineNumber);
+					CHECK_ERROR(functionName.substr(5) == mContext.mFunction->getName().getString(), "Base call '" << functionName << "' goes to a different function, expected 'base." << mContext.mFunction->getName() << "' instead", mLineNumber);
 					isBaseCall = true;
 
 					const std::string_view baseName = identifierToken.mName.getString().substr(5);
@@ -485,7 +513,7 @@ namespace lemon
 
 					// TODO: The following check would be no good idea, as some mods overwrite functions (and call their base) from other mods that may or may not be loaded before
 					//  -> The solution is to allow this, and make the base calls simply do nothing at all
-					//CHECK_ERROR(baseFunctionExists, "There's no base function for call \"" << functionName << "\" with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
+					//CHECK_ERROR(baseFunctionExists, "There's no base function for call '" << functionName << "' with the same signature, i.e. exact same types for parameters and return value", mLineNumber);
 				}
 				else
 				{
@@ -520,7 +548,7 @@ namespace lemon
 				}
 
 				// Create function token
-				FunctionToken& token = tokens.createReplaceAt<FunctionToken>(i);
+				FunctionToken& functionToken = tokens.createReplaceAt<FunctionToken>(i);
 
 				// Build list of parameters
 				if (!content.empty())
@@ -528,24 +556,24 @@ namespace lemon
 					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
 					{
 						const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
-						token.mParameters.reserve(tokenLists.size());
+						functionToken.mParameters.reserve(tokenLists.size());
 						for (const TokenList& tokenList : tokenLists)
 						{
 							CHECK_ERROR(tokenList.size() == 1, "Function parameter content must be one token", mLineNumber);
 							CHECK_ERROR(tokenList[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-							vectorAdd(token.mParameters) = tokenList[0].as<StatementToken>();
+							vectorAdd(functionToken.mParameters) = tokenList[0].as<StatementToken>();
 						}
 					}
 					else
 					{
 						CHECK_ERROR(content.size() == 1, "Function parameter content must be one token", mLineNumber);
 						CHECK_ERROR(content[0].isStatement(), "Function parameter content must be a statement", mLineNumber);
-						vectorAdd(token.mParameters) = content[0].as<StatementToken>();
+						vectorAdd(functionToken.mParameters) = content[0].as<StatementToken>();
 					}
 				}
 				if (nullptr != thisPointerVariable)
 				{
-					VariableToken& variableToken = vectorAdd(token.mParameters).create<VariableToken>();
+					VariableToken& variableToken = vectorAdd(functionToken.mParameters).create<VariableToken>();
 					variableToken.mVariable = thisPointerVariable;
 					variableToken.mDataType = thisPointerVariable->getDataType();
 				}
@@ -553,10 +581,10 @@ namespace lemon
 
 				// Assign types
 				static std::vector<const DataTypeDefinition*> parameterTypes;	// Not multi-threading safe
-				parameterTypes.resize(token.mParameters.size());
-				for (size_t i = 0; i < token.mParameters.size(); ++i)
+				parameterTypes.resize(functionToken.mParameters.size());
+				for (size_t i = 0; i < functionToken.mParameters.size(); ++i)
 				{
-					parameterTypes[i] = assignStatementDataType(*token.mParameters[i], nullptr);
+					parameterTypes[i] = assignStatementDataType(*functionToken.mParameters[i], nullptr);
 				}
 
 				// If the function was not determined yet, do that now
@@ -567,16 +595,16 @@ namespace lemon
 					if (isBaseCall)
 					{
 						// Base call must use the same function signature as the current one
-						CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call has different parameter count", mLineNumber);
+						CHECK_ERROR(parameterTypes.size() == mContext.mFunction->getParameters().size(), "Base function call for '" << functionName << "' has different parameter count", mLineNumber);
 						size_t failedIndex = 0;
 						const bool canMatch = mTypeCasting.canMatchSignature(parameterTypes, mContext.mFunction->getParameters(), &failedIndex);
-						CHECK_ERROR(canMatch, "Can't cast parameters of function call to match base function, parameter '" << mContext.mFunction->getParameters()[failedIndex].mName << "' has the wrong type", mLineNumber);
+						CHECK_ERROR(canMatch, "Can't cast parameters of '" << functionName << "' function call to match base function, parameter '" << mContext.mFunction->getParameters()[failedIndex].mName << "' has the wrong type", mLineNumber);
 
 						if (baseFunctionExists)
 						{
 							// Use the very same function again, as a base call
 							function = mContext.mFunction;
-							token.mIsBaseCall = true;
+							functionToken.mIsBaseCall = true;
 						}
 						else
 						{
@@ -621,8 +649,8 @@ namespace lemon
 
 				if (nullptr != function)
 				{
-					token.mFunction = function;
-					token.mDataType = function->getReturnType();
+					functionToken.mFunction = function;
+					functionToken.mDataType = function->getReturnType();
 				}
 			}
 		}
@@ -878,8 +906,8 @@ namespace lemon
 			Token& leftToken = tokens[bestPosition - 1];
 			Token& rightToken = tokens[bestPosition + 1];
 
-			CHECK_ERROR(leftToken.isStatement(), "Left of operator is no statement", mLineNumber);
-			CHECK_ERROR(rightToken.isStatement(), "Right of operator is no statement", mLineNumber);
+			CHECK_ERROR(leftToken.isStatement(), "Left of operator " << OperatorHelper::getOperatorCharacters(op) << " is no statement", mLineNumber);
+			CHECK_ERROR(rightToken.isStatement(), "Right of operator " << OperatorHelper::getOperatorCharacters(op) << " is no statement", mLineNumber);
 
 			BinaryOperationToken& token = tokens.createReplaceAt<BinaryOperationToken>(bestPosition);
 			token.mOperator = op;
@@ -1008,7 +1036,7 @@ namespace lemon
 		return false;
 	}
 
-	void TokenProcessing::resolveAddressOf(TokenList& tokens)
+	void TokenProcessing::resolveAddressOfFunctions(TokenList& tokens)
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
@@ -1016,22 +1044,62 @@ namespace lemon
 			{
 				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "addressof must be followed by parentheses", mLineNumber);
 				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-				CHECK_ERROR(content.size() == 1, "Expected a single token in parenthesis after 'addressof'", mLineNumber);
-
-				switch (content[0].getType())
+				if (content.size() == 1 && content[0].getType() == Token::Type::IDENTIFIER)
 				{
-					case Token::Type::MEMORY_ACCESS:
+					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
+					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
+					if (!candidateFunctions.empty())
 					{
-						// Replace addressof with the actual address
-						tokens.replace(*content[0].as<MemoryAccessToken>().mAddress, i);
+						uint32 address = 0;
+						for (const Function* function : candidateFunctions)
+						{
+							if (function->getType() == Function::Type::SCRIPT)
+							{
+								const std::vector<uint32>& addressHooks = static_cast<const ScriptFunction*>(function)->getAddressHooks();
+								if (!addressHooks.empty())
+								{
+									address = addressHooks[0];
+									break;
+								}
+							}
+						}
+						CHECK_ERROR(address != 0, "No address hook found for function '" << identifierToken.mName.getString() << "'", mLineNumber);
+
+						// Replace addressof and the parenthesis with the actual address as a constant
+						ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
+						constantToken.mValue = address;
+						constantToken.mDataType = &PredefinedDataTypes::UINT_32;
 						tokens.erase(i+1);
 						break;
 					}
 
-					// TODO: Support "addressof(functionname)" as well, but that first requires moving address hook management from oxygen to lemonscript
+					CHECK_ERROR(false, "Address of identifier '" << identifierToken.mName.getString() << "' could not be determined", mLineNumber);
+				}
+			}
+		}
+	}
 
-					default:
-						CHECK_ERROR(false, "Unsupported use of addressof", mLineNumber);
+	void TokenProcessing::resolveAddressOfMemoryAccesses(TokenList& tokens)
+	{
+		for (size_t i = 0; i + 1 < tokens.size(); ++i)
+		{
+			if (isKeyword(tokens[i], Keyword::ADDRESSOF))
+			{
+				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "addressof must be followed by parentheses", mLineNumber);
+				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
+				CHECK_ERROR(content.size() == 1, "Expected a single token in parentheses after addressof", mLineNumber);
+
+				if (content[0].getType() == Token::Type::MEMORY_ACCESS)
+				{
+					// Replace addressof and the parenthesis with the actual address
+					TokenPtr<StatementToken> addressToken = content[0].as<MemoryAccessToken>().mAddress;
+					tokens.replace(*addressToken, i);
+					tokens.erase(i+1);
+				}
+				else
+				{
+					// Assuming that all other possible use-cases for addressof were already processed before
+					CHECK_ERROR(false, "Unsupported use of addressof", mLineNumber);
 				}
 			}
 		}

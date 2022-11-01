@@ -9,8 +9,9 @@
 #include "lemon/pch.h"
 #include "lemon/program/Function.h"
 #include "lemon/program/Module.h"
-#include "lemon/runtime/Runtime.h"
 #include "lemon/compiler/Utility.h"
+#include "lemon/runtime/Runtime.h"
+#include "lemon/utility/PragmaSplitter.h"
 
 
 namespace lemon
@@ -27,15 +28,8 @@ namespace lemon
 			uint8 mChunk[0x1000];
 			size_t mSize = 0;
 
-			QuickDataHasher()
-			{
-				mHash = rmx::startFNV1a_64();
-			}
-
-			explicit QuickDataHasher(uint64 initialHash) :
-				mHash(initialHash)
-			{
-			}
+			QuickDataHasher() : mHash(rmx::startFNV1a_64()) {}
+			explicit QuickDataHasher(uint64 initialHash) : mHash(initialHash) {}
 
 			uint64 getHash()
 			{
@@ -192,6 +186,38 @@ namespace lemon
 			}
 		}
 		return nullptr;
+	}
+
+	void ScriptFunction::addOrProcessPragma(std::string_view pragmaString)
+	{
+		PragmaSplitter pragmaSplitter(pragmaString);
+		if (!pragmaSplitter.mEntries.empty())
+		{
+			bool hadAddressHook = false;
+			for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
+			{
+				if (entry.mArgument == "address-hook")
+				{
+					// Create address hook
+					RMX_CHECK(!entry.mValue.empty(), "Address hook must have a value", continue);
+					const uint32 address = (uint32)rmx::parseInteger(entry.mValue);
+					mAddressHooks.push_back(address);
+					hadAddressHook = true;
+				}
+				else if (entry.mArgument == "translated")
+				{
+					// You can use "translated" to denote that some code was already put into script, but should not be an actual address hook
+					hadAddressHook = true;
+				}
+			}
+
+			// If there was an address hook, there's no need to store this pragma
+			if (hadAddressHook)
+				return;
+		}
+
+		// Store this pragma as string
+		mPragmas.emplace_back(pragmaString);
 	}
 
 	uint64 ScriptFunction::addToCompiledHash(uint64 hash) const

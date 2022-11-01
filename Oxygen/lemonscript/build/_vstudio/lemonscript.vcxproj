@@ -57,6 +57,7 @@
     <ClCompile Include="..\..\source\lemon\translator\SourceCodeWriter.cpp" />
     <ClCompile Include="..\..\source\lemon\translator\Translator.cpp" />
     <ClCompile Include="..\..\source\lemon\utility\FlyweightString.cpp" />
+    <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
@@ -110,6 +111,7 @@
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h" />
     <ClInclude Include="..\..\source\lemon\translator\Translator.h" />
     <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h" />
+    <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />
