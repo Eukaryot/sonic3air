@@ -196,8 +196,8 @@ function void UpdateLevelScrolling.MHZ1()
 	fn04f368()
 	fn054c68()
 
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -218,7 +218,7 @@ function void fn054cf4()
 		{
 			if (D3 == 0x02b962)
 			{
-				objA1.update_address = 0x01abb6		// Function address of "UnloadObject"
+				objA1.update_address = addressof(UnloadObject)
 				D3.u16 = u16[A1 + 0x48]
 				if (D3.u16 != 0)
 				{
@@ -871,8 +871,8 @@ function void fn055250()
 //# address-hook(0x0552e4) end(0x0552f4)
 function void fn0552e4()
 {
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1092,8 +1092,8 @@ function void fn055486()
 {
 	fn0554b8()
 
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1418,10 +1418,10 @@ function void fn04edd8()
 	push(A4)
 	push(D5)
 
-	A6 = 0xffffee84		// Address of camera.foreground.y
+	A6 = addressof(camera.foreground.y)
 	fn04ee84()
 
-	A5 = 0xffffee8a		// Address of camera.foreground.y.old
+	A5 = addressof(camera.foreground.y.old)
 	fn04eb22()
 
 	D5 = pop()

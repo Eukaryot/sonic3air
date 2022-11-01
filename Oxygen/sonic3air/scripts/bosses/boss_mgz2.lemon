@@ -17,7 +17,7 @@
 //# address-hook(0x06c2be) end(0x06c2dc)
 function void fn06c2be()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x06c2e2
 	objA0.sprite_priority = 0x0200

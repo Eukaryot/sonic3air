@@ -339,7 +339,7 @@ function void fn073b3c()
 //# address-hook(0x073b82) end(0x073b9a)
 function void fn073b82()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	objA0.flags2a |= 0x80
 	playSound(0x6e)
 
@@ -366,7 +366,7 @@ function void fn073ba0()
 
 	objA0.update_address = 0x073bdc
 	u32[A0 + 0x30] = 0x0741f8
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	D0 = objA0.subtype2c
 	if (D0.u8 == 0)
@@ -621,7 +621,7 @@ function void fn073dc8()
 //# address-hook(0x073df6) end(0x073e0c)
 function void fn073df6()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	objA0.animation.sprite = 0
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u8[A1 + 0x38] |= 0x80

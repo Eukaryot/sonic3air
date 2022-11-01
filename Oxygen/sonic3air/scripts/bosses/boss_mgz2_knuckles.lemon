@@ -223,7 +223,7 @@ function void fn06c88a()
 //# address-hook(0x06c890) end(0x06c8ae)
 function void fn06c890()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.sprite_priority = 0x0200
 	objA0.countdown_callback = 0x06c8b4
 	objA0.flags38 |= 0x10
@@ -317,7 +317,7 @@ function void fn06d16a()
 		D1.u16 += 0x18
 	}
 	objA0.position.y.u16 = D1.u16
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.value39 = 9		// Spawn 10 pieces of debris
 	objA0.countdown_callback = 0x06d1a6
 }

@@ -25,9 +25,9 @@
 //# address-hook(0x010a94) end(0x010ae8)
 function void Character.BaseUpdate.Sonic()
 {
-	A4 = 0xfffff760		// Address of speed caps
-	A5 = 0xffffee2c		// Address of camera.yoffset.player
-	A6 = 0xffffcc54		// Base address of dust cloud object
+	A4 = addressof(global.move.speedcap)	// Base address of speed caps & acceleration/deceleration
+	A5 = addressof(camera.yoffset.player)
+	A6 = 0xffffcc54							// Base address of dust cloud object
 
 	// Check for debug mode
 	if (debug_mode.state == 0)
@@ -52,9 +52,9 @@ function void Character.BaseUpdate.Sonic()
 //# address-hook(0x01365c) end(0x0136b8)
 function void Character.BaseUpdate.Tails()
 {
-	A4 = 0xfffffec0		// Address of Tails' speed caps
-	A5 = 0xffffee2e		// Address of camera.yoffset.tails
-	A6 = 0xffffcc9e		// Base address of dust cloud object for Tails
+	A4 = addressof(global.move.speedcap.tails)	// Base address of speed caps & acceleration/deceleration for Tails
+	A5 = addressof(camera.yoffset.tails)
+	A6 = 0xffffcc9e								// Base address of dust cloud object for Tails
 
 	// Check for debug mode
 	if (debug_mode.state == 0 || !isMainCharacter(CHARACTER_TAILS))	// Maybe a check if it's second player Tails?
@@ -79,9 +79,9 @@ function void Character.BaseUpdate.Tails()
 //# address-hook(0x016444) end(0x016498)
 function void Character.BaseUpdate.Knuckles()
 {
-	A4 = 0xfffff760		// Address of speed caps
-	A5 = 0xffffee2c		// Address of camera.yoffset.player
-	A6 = 0xffffcc54		// Base address of dust cloud object
+	A4 = addressof(global.move.speedcap)	// Base address of speed caps & acceleration/deceleration
+	A5 = addressof(camera.yoffset.player)
+	A6 = 0xffffcc54							// Base address of dust cloud object
 
 	// Check for debug mode
 	if (debug_mode.state == 0)

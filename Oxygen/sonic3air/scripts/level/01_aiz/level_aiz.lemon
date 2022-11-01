@@ -378,8 +378,8 @@ function void fn04fc46()
 		fn23b152()
 	}
 
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1.u16 = 0x1000
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -550,7 +550,7 @@ function void fn04fe38()
 	if (global.act != 0)
 	{
 		objA0.position.x.u16 = 0x7fff
-		objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+		objA0.update_address = addressof(UnloadObject)
 	}
 
 	objA0.box_size.y = 0x10
@@ -916,8 +916,8 @@ function void fn05011e()
 		u8[0xffffeed2] = 0xff
 	}
 
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1.u16 = 0x200
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1018,8 +1018,8 @@ function void fn050216()
 //# address-hook(0x050260)
 function void fn050260()
 {
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1062,8 +1062,8 @@ function void fn050292()
 //# address-hook(0x050298) end(0x0502c2)
 function void fn050298()
 {
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()

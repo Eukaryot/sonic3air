@@ -1606,7 +1606,7 @@ function void fn0651e2()
 function void fn0651f2()
 {
 	objA0.update_address = 0x06520a
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.animation.frame = 0
 	objA0.animation.timer = 0
 }
@@ -2062,5 +2062,5 @@ function void fn065692()
 {
 	objA0.animation.sprite = 0x05
 	objA0.countdown_value = 0x0b
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }

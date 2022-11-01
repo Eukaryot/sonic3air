@@ -11,7 +11,7 @@
 //# address-hook(0x0705ea) end(0x07062c)
 function void fn0705ea()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 119
 	objA0.countdown_callback = 0x070632
 
@@ -223,7 +223,7 @@ function void fn0707f6()
 //# address-hook(0x070836) end(0x07084e)
 function void fn070836()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x070854
 
@@ -238,7 +238,7 @@ function void fn070836()
 //# address-hook(0x070854) end(0x07086e)
 function void fn070854()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.render_flags &= ~render_flag.VISIBLE
 	objA0.countdown_value = 0x7f + getScreenExtend() / 2	// Delay screen movement a little bit more in widescreen
 	objA0.countdown_callback = 0x070870
@@ -624,7 +624,7 @@ function void fn070b80()
 function void fn070b8c()
 {
 	fn070d10()
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_callback = 0x070ba0
 }
 
@@ -633,7 +633,7 @@ function void fn070b8c()
 function void fn070ba0()
 {
 	objA0.update_address = 0x070bb0
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
@@ -1111,7 +1111,7 @@ function void fn084e32()
 //# address-hook(0x086cf6) end(0x086d0e)
 function void fn086cf6()
 {
-	objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+	objA0.update_address = addressof(DrawOrUnloadObject)
 	D0 = objA0.subtype2c
 	A1 = u32[0x086d12 + D0.s16]
 	objA0.mapping_offset = 0x086d2a

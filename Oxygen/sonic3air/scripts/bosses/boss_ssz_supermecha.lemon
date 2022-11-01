@@ -290,7 +290,7 @@ function void fn07bc32()
 	else
 #endif
 	{
-		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		objA0.update_address = addressof(Object.CountdownAndTrigger)
 		objA0.position.y.u16 += 0x20
 		objA0.countdown_callback = 0x07bc70
 
@@ -1466,7 +1466,7 @@ function void fn07c7d4()
 	setupObjectAttributesBasic(0x07d432)
 
 	objA0.update_address = 0x07c80a
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	GetRandomNumber()
 	objA0.position.x.u16 += (D0.u16 & 0x1f) - 0x0f

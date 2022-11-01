@@ -262,7 +262,7 @@ function void fn08cd6c()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x02)
 	{
-		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		objA0.update_address = addressof(Object.CountdownAndTrigger)
 		objA0.countdown_value = 0x1f
 		objA0.countdown_callback = 0x08cd98
 		objA0.position.y.u16 = 0x0160
@@ -775,7 +775,7 @@ function void fn08cdf2()
 	CheckDistanceToObjectA1()
 	if (D2.u16 < 0x70)
 	{
-		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		objA0.update_address = addressof(Object.CountdownAndTrigger)
 		move_area.left = 0x3da0
 		objA0.countdown_value = 0x1f
 		objA0.countdown_callback = 0x08cd9c

@@ -141,7 +141,7 @@ function void fn08fe36()
 	objA0.base_state = 0x06
 	objA0.velocity.y = 0
 	objA0.countdown_value = 0x7f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
@@ -233,7 +233,7 @@ function void fn08fedc()
 	objA0.velocity.y = 0
 	objA0.update_address = 0x08ff42
 	u32[A0 + 0x30] = 0x090085
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	fn0850d4()
 }
 

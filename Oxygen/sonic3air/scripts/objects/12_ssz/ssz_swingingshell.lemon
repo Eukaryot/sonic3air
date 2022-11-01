@@ -205,14 +205,14 @@ function void fn0462b6()
 	D6 = (D6 << 16) + (D6 >> 16)
 	u16 backupD6 = D6.u16
 	A1 = 0xffffb000
-	A2 = 0xfffff602		// Address of "control.player1"
+	A2 = addressof(control.player1)
 	A3 = A0 + 0x30
 	D5 = 3		// object.flag.P1_ON_OBJECT
 	fn046324()
 
 	D6.u16 = backupD6 >> 1
 	A1 = 0xffffb04a
-	A2 = 0xfffff66a		// Address of "control.tails"
+	A2 = addressof(control.tails)
 	A3 = A0 + 0x32
 	D5 = 4		// object.flag.P2_ON_OBJECT
 	fn046324()

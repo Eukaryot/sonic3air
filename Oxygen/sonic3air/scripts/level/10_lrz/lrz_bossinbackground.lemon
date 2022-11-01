@@ -448,7 +448,7 @@ function void fn0793a8()
 	setupObjectAttributesBasic(0x0795ea)
 
 	objA0.update_address = 0x0793c6
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.velocity.y = 0x0100
 
 	fn0793c6()

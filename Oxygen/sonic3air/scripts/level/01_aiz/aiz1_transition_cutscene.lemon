@@ -219,7 +219,7 @@ function void fn068646()
 	objA0.velocity.x = 0x400
 	objA0.velocity.y = 0
 	objA0.countdown_value = (global.zone_act == 0x0000) ? 0x120 : 0x40
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	// Trigger fire wall
 	u8[0xffffeec6] = 0xff

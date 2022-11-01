@@ -220,7 +220,7 @@ function void fn08218e()
 	setupObjectAttributesBasic(0x083202)
 
 	objA0.update_address = 0x0821c2
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A1 = 0xffff0000 + u16[A1 + 0x46]
 	D0.u8 = u8[A1 + 0x3c]

@@ -288,7 +288,7 @@ function void fn06ff70()
 	}
 	else
 	{
-		objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+		objA0.update_address = addressof(DrawOrUnloadObject)
 	}
 }
 
@@ -331,7 +331,7 @@ function void fn06fffa()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
 	{
-		objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+		objA0.update_address = addressof(DrawOrUnloadObject)
 		objA0.animation.sprite = 3
 
 		// "spawnChildObjects(0x083fee)" replaced by:
@@ -551,7 +551,7 @@ function void fn070294()
 //# address-hook(0x0702c0) end(0x0702d4)
 function void fn0702c0()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x0702d6
 }

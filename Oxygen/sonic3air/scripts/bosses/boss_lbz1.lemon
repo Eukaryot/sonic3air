@@ -533,7 +533,7 @@ function void fn072910()
 	objA0.update_address = 0x07279e
 	u8[A0 + 0x28] = 0
 	objA0.countdown_value = 0x80
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	D0 = objA0.subtype2c * 2
 	A1 = 0x07293e + D0.s16
@@ -703,7 +703,7 @@ function void fn08d056()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x02)
 	{
-		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		objA0.update_address = addressof(Object.CountdownAndTrigger)
 		objA0.countdown_value = 119
 		objA0.countdown_callback = 0x08d082
 		if (objA0.subtype2c == 0)
@@ -735,9 +735,9 @@ function void fn08d082()
 //# address-hook(0x08d0ae) end(0x08d0da)
 function void fn08d0ae()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 0xff
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.position.x.u16 = u16[0x08d0e0 + objA0.subtype2c]
 	objA0.position.y.u16 = 0x0a20
 

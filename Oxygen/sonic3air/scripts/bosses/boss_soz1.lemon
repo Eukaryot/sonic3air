@@ -11,7 +11,7 @@
 //# address-hook(0x076a12) end(0x076a84)
 function void fn076a12()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.position.x.u16 = 0x439d
 	objA0.position.y.u16 = 0x09f7
 
@@ -545,7 +545,7 @@ function void fn076e5c()
 //# address-hook(0x076e94) end(0x076f08)
 function void fn076e94()
 {
-	A1 = 0xfffff602		// Address of "control.player1"
+	A1 = addressof(control.player1)
 	A2 = 0xffffb000
 	D0.u16 = 0x43a0
 	if ((objA0.flags38 & 0x08) == 0)
@@ -780,7 +780,7 @@ function void fn0770c4()
 	if (s8[A0 + 0x2e] < 0)
 	{
 		objA0.update_address = 0x0770da
-		objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+		objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	}
 }
 

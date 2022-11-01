@@ -1016,7 +1016,7 @@ function void fn077fce()
 
 	objA0.update_address = 0x077fec
 	objA0.countdown_value = 0x08
-	objA0.countdown_callback = 0x0852a0   // Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	fn077fec()
 }
 

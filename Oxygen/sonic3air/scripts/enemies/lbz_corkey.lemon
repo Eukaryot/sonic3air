@@ -203,7 +203,7 @@ function void fn08c8c6()
 {
 	setupObjectAttributesMost(0x08c906)
 	objA0.update_address = 0x08c8e6
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	playSound(0x5e)
 	fn08c8e6()
 }

@@ -449,7 +449,7 @@ function void fn072f4c()
 	objA0.update_address = 0x072f7a
 	objA0.velocity.y = -0x40
 	objA0.countdown_value = 0x7f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	// "spawnSimpleChildObjects(0x07383e)" replaced by:
 	spawnSimpleChildObjects(0x072fb2, 1)
@@ -484,7 +484,7 @@ function void fn072fb2()
 
 	objA0.update_address = 0x072fd8
 	u32[A0 + 0x30] = 0x073864
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.velocity.y = 0x40
 
 	fn072fd8()

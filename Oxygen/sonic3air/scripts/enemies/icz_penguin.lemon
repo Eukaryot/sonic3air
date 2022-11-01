@@ -321,7 +321,7 @@ function void fn08bd40()
 	D0 = objA0.subtype2c
 	if (D0.u8 != 0)
 	{
-		objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+		objA0.update_address = addressof(Object.CountdownAndTrigger)
 		D0.u16 <<= 2
 		--D0.u16
 		objA0.countdown_value = D0.u16
@@ -337,7 +337,7 @@ function void fn08bd40()
 function void fn08bd6c()
 {
 	objA0.update_address = 0x08bd7a
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	fn08bd7a()
 }
 

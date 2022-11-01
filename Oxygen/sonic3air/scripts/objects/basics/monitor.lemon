@@ -283,7 +283,7 @@ function void MonitorIntact.Init()
 		#if STANDALONE
 			objA0.update_address = 0x01d61a		// Needed for render hook, simply calls "DrawOrUnloadObject"
 		#else
-			objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+			objA0.update_address = addressof(DrawOrUnloadObject)
 		#endif
 			return
 		}
@@ -755,11 +755,11 @@ function void ItemEffect.ApplySpeedUp()
 	A0 = A1
 	if (A0 == 0xffffb000 && !isMainCharacter(CHARACTER_TAILS))
 	{
-		setSpeedCapProperties(0xfffff760)
+		setSpeedCapProperties(addressof(global.move.speedcap))
 	}
 	else
 	{
-		setSpeedCapProperties(0xfffffec0)
+		setSpeedCapProperties(addressof(global.move.speedcap.tails))
 	}
 	A0 = backupA0
 #else
@@ -867,7 +867,7 @@ function void ItemEffect.ApplySuperTransformation()
 	super.active = 1
 	super.ring_dec.frames = 60
 #if STANDALONE
-	setSpeedCapProperties(0xfffff760, true)
+	setSpeedCapProperties(addressof(global.move.speedcap), true)
 #else
 	global.move.speedcap = 0x800
 	global.move.acceleration = 0x18
@@ -881,7 +881,7 @@ function void ItemEffect.ApplySuperTransformation()
 		u32[0xffffb000 + 0x0c] = 0x146816		// "char.mapping_offset"
 		super.active = 0xff
 	#if STANDALONE
-		setSpeedCapProperties(0xfffff760, true)
+		setSpeedCapProperties(addressof(global.move.speedcap), true)
 	#else
 		global.move.speedcap = 0xa00
 		global.move.acceleration = 0x30
@@ -901,7 +901,7 @@ function void ItemEffect.ApplySuperTransformation()
 	#endif
 		u8[0xffffb000 + 0x20] = char.state.TAILS_TRANSFORM
 	#if STANDALONE
-		setSpeedCapProperties(0xfffffec0, true)
+		setSpeedCapProperties(addressof(global.move.speedcap.tails), true)
 	#else
 		global.move.speedcap.tails = 0x800
 		global.move.acceleration.tails = 0x18

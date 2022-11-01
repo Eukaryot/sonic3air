@@ -94,7 +94,7 @@ function void Enemy.DrawOrUnload()
 //# address-hook(0x0852ae) end(0x0852ba)
 function void fn0852ae()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	objA0.flags38 |= 0x10
 }
 
@@ -102,7 +102,7 @@ function void fn0852ae()
 //# address-hook(0x0852bc) end(0x0852ce)
 function void fn0852bc()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	objA0.flags2a |= 0x80
 	objA0.flags38 |= 0x10
 }

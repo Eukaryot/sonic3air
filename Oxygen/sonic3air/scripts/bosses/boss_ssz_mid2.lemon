@@ -31,7 +31,7 @@ function void fn07a6a6()
 	Game.setAchievementValue(ACHIEVEMENT_SSZ_DECOYS, 0)
 #endif
 
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	level.boss_encounter = 1
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x07a712

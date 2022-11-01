@@ -296,7 +296,7 @@ function void fn087e1a()
 
 	objA0.update_address = 0x087e3e
 	u32[A0 + 0x30] = 0x087f30
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	DrawObject()
 }
 
@@ -328,7 +328,7 @@ function void fn087e66()
 
 	objA0.update_address = 0x087e86
 	u32[A0 + 0x30] = 0x087f37
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 

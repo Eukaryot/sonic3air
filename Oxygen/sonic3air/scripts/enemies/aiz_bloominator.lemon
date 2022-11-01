@@ -66,7 +66,7 @@ function void fn068962()
 	objA0.mapping_offset = 0x083ffc
 	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04d2)
 	u32[A0 + 0x30] = 0x069164
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	if (objA0.subtype2c == 0x06)
 	{
 		// "spawnChildObjects(0x0690d0)" replaced by:

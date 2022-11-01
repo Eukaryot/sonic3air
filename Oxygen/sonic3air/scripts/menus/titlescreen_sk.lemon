@@ -586,7 +586,7 @@ function void fn005856()
 //# address-hook(0x00587c) end(0x0058a2)
 function void fn00587c()
 {
-	D0.u16 = 0x0140 - u16[0xffffee60]
+	D0.u16 = 0x0140 - camera.position.x.u16.player2
 	D1.u16 = 0x01a8 - u16[0xffffee64]
 	if (camera.screenshake.state != 0)
 	{
@@ -1106,7 +1106,7 @@ function void fn005d94()
 	}
 	else if (D0.u16 == 1)
 	{
-		D2.u16 += u16[0xffffee60]
+		D2.u16 += camera.position.x.u16.player2
 		D2.s16 = -D2.s16
 		D3.u16 = 0x6f
 		while (D3.s16 >= 0)
@@ -1154,7 +1154,7 @@ function void fn005d94()
 		}
 		else
 		{
-			D2.u16 = -s16[0xffffee60]
+			D2.u16 = -s16(camera.position.x.u16.player2)
 			for (u8 i = 0; i < 224; i += 2)
 			{
 				GetRandomNumber()
@@ -1192,8 +1192,8 @@ function void fn005d94()
 
 	D0.u16 = camera.position.x.u16 + D2.u16
 	D0.s16 = -D0.s16
-	D0 = (D0 << 16) + (D0 >> 16)
-	D0.u16 = u16[0xffffee60] + D2.u16
+	D0 = (D0 << 16)
+	D0.u16 = camera.position.x.u16.player2 + D2.u16
 	D0.s16 = -D0.s16
 
 	for (u8 i = 0; i < 224; ++i)

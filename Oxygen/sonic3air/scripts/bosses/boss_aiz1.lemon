@@ -501,7 +501,7 @@ function void fn068dee()
 function void fn068dde()
 {
 	objA0.base_state = 0x04
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
@@ -657,7 +657,7 @@ function void fn069482()
 {
 	objA0.countdown_callback = 0x0694a4
 	u8[0xfffffaa3] = 0xff
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.flags38 |= 0x10
 
 	// "spawnChildObjects(0x069d66)" replaced by:
@@ -860,7 +860,7 @@ function void fn068828()
 {
 	setupObjectAttributesMost(0x069022)
 	u32[A0 + 0x30] = 0x06913f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
@@ -917,7 +917,7 @@ function void fn0688b0()
 	playSound(SFX_BOMBFALL)
 	objA0.sprite_priority = 0x80
 	objA0.render_flags |= render_flag.FLIP_Y
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.countdown_value = 0x60
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -996,7 +996,7 @@ function void fn0689ac()
 	fn06890e()
 	objA0.sprite_priority = 0x100
 	u32[A0 + 0x30] = 0x06916f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A1 = 0xffff0000 + u16[A1 + 0x46]
 	u16[A0 + 0x46] = A1.u16

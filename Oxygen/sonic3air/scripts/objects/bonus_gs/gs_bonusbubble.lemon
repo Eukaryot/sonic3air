@@ -150,7 +150,7 @@ function void fn04a362()
 //# address-hook(0x04a384) end(0x04a3cc)
 function void fn04a384()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	D1 = objA0.subtype2c
 	D2 = 1
 	if (D1.u8 != 3)
@@ -331,7 +331,7 @@ function void fn061254()
 	u8 shield = (1 << D0.u8)
 
 	u8[A1 + 0x2b] |= shield
-	A2 = 0xfffffe47		// Address of "global.shields_backup_1"
+	A2 = addressof(global.shields_backup_1)
 	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
 	u8[A2] |= shield
 }

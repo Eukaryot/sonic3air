@@ -809,8 +809,8 @@ function void fn057058()
 //# address-hook(0x05705c) end(0x05707c)
 function void fn05705c()
 {
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()

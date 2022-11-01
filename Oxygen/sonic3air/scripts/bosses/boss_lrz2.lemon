@@ -34,7 +34,7 @@ function void fn0797c6()
 		return
 
 	level.boss_encounter = 1
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 120
 	objA0.countdown_callback = 0x0797ec
 }
@@ -461,7 +461,7 @@ function void fn079b7e()
 	setupObjectAttributesBasic(0x07a152)
 
 	objA0.update_address = 0x079b96
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	fn079b96()
 }
 
@@ -482,7 +482,7 @@ function void fn079bac()
 	setupObjectAttributesBasic(0x07a158)
 
 	objA0.update_address = 0x079bca
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.velocity.y = 0x0100
 	fn079bca()
 }

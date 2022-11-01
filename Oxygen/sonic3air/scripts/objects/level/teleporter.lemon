@@ -416,8 +416,8 @@ function void fn045bf4()
 	}
 
 	A1 = 0xffffb000
-	A2 = 0xfffff602		// Address of "control.player1"
-	A3 = 0xfffff7ca		// Address of "player1.control_override"
+	A2 = addressof(control.player1)
+	A3 = addressof(player1.control_override)
 	A4 = A0 + 0x30
 	A5 = A0 + 0x31
 	D6 = 0
@@ -426,8 +426,8 @@ function void fn045bf4()
 	if (getNumPlayers() >= 2)
 	{
 		A1 = 0xffffb04a
-		A2 = 0xfffff66a		// Address of "control.tails"
-		A3 = 0xfffff7cb		// Address of "player2.control_override"
+		A2 = addressof(control.tails)
+		A3 = addressof(player2.control_override)
 		A4 = A0 + 0x31
 		A5 = A0 + 0x30
 		D6 = 1

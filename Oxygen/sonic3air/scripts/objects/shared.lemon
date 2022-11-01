@@ -152,7 +152,7 @@ function void Object.DespawnAndUnload()
 //# address-hook(0x0852a0) end(0x0852ac)
 function void Object.TriggerUnloading()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	objA0.flags2a |= 0x80
 }
 
@@ -683,7 +683,7 @@ function void fn0850ba()
 	}
 
 	objA0.flags38 |= 0x10
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 }
 
 
@@ -771,7 +771,7 @@ function void fn0851cc()
 //# address-hook(0x0851d8) end(0x0851ee)
 function void fn0851d8()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	objA0.flags2a |= 0x80
 	fn0851e4()
 }
@@ -811,7 +811,7 @@ function void fn085208()
 //# address-hook(0x08522c)
 function void fn08522c()
 {
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 	fn0851e4()
 }
 

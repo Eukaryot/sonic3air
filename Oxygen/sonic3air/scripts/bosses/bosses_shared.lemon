@@ -476,13 +476,13 @@ function void fn083d84()
 	u32 offset = u8[A1+3]
 
 	// Targets:
-	// offset = 0x00 -> 0x08488a	-> Address of "Object.CountdownAndTrigger"
+	// offset = 0x00 -> 0x08488a	-> "Object.CountdownAndTrigger"
 	// offset = 0x01 -> 0x083e70
 	// offset = 0x02 -> 0x083e4c
 	// offset = 0x03 -> 0x083e70
-	// offset = 0x04 -> 0x08488a	-> Address of "Object.CountdownAndTrigger"
+	// offset = 0x04 -> 0x08488a	-> "Object.CountdownAndTrigger"
 	// offset = 0x05 -> 0x083ec6
-	// offset = 0x06 -> 0x08488a	-> Address of "Object.CountdownAndTrigger"
+	// offset = 0x06 -> 0x08488a	-> "Object.CountdownAndTrigger"
 	// offset = 0x07 -> 0x083eec
 	// offset = 0x08 -> 0x083e4c
 	// offset = 0x09 -> 0x083eec
@@ -655,7 +655,7 @@ function void fn083f80()
 {
 	setupObjectAttributesFull(0x083fb4)
 	objA0.update_address = 0x083f9e
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	playSound(0xb4)
 	fn083f9e()

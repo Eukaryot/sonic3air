@@ -240,10 +240,10 @@ function void fn239d1e()
 	push(A4)
 	push(D5)
 
-	A6 = 0xffffee80		// Address of camera.foreground.x
+	A6 = addressof(camera.foreground.x)
 	fn239dbc()
 
-	A5 = 0xffffee88		// Address of camera.foreground.x.old
+	A5 = addressof(camera.foreground.x.old)
 	fn239822()
 
 	D5 = pop()

@@ -43,7 +43,7 @@ function void fn0691c8()
 
 	move_area.left = D0.u16
 	move_area.right = D0.u16 + getScreenExtend() * 2
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 120
 	objA0.countdown_callback = 0x069228
 	playMusic(MUSIC_CTRL_FADEOUT)
@@ -1078,7 +1078,7 @@ function void fn06995a()
 {
 	setupObjectAttributesBasic(0x069cf8)
 	objA0.update_address = 0x06998a
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	u32[A0 + 0x30] = (objA0.velocity.x == 0) ? 0x069e38 : 0x069e2f
 }
 
@@ -1096,7 +1096,7 @@ function void fn069996()
 {
 	setupObjectAttributesFull(0x069d06)
 	objA0.update_address = 0x0699b0
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
@@ -1114,7 +1114,7 @@ function void fn069a04()
 {
 	objA0.update_address = 0x069a1a
 	objA0.velocity.y = 0x0800
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 

@@ -228,7 +228,7 @@ function void fn061822()
 //# address-hook(0x061846) end(0x06185a)
 function void fn061846()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 0x20
 	objA0.countdown_callback = 0x06185c
 }

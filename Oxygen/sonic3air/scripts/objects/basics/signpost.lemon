@@ -108,7 +108,7 @@ function void fn083708()
 				{
 					// Signpost touched ground without hitting a monitor
 					playSound(0x7e)
-					objA0.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+					objA0.update_address = addressof(DrawOrUnloadObject)
 				}
 			}
 
@@ -327,7 +327,7 @@ function void fn0839a2()
 	u16[A0 + 0x3a] = objA0.position.x.u16
 	objA0.velocity.x = 0x1000
 	objA0.countdown_value = 0x20
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	fn0839ea()
 }
 

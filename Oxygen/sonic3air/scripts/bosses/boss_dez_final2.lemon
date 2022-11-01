@@ -363,7 +363,7 @@ function void fn0808ae()
 	setupObjectAttributesBasic(0x0812c2)
 
 	objA0.update_address = 0x0808fa
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2.u16 = objA1.position.x.u16

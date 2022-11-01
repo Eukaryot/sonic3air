@@ -129,7 +129,7 @@ function void fn08a20c()
 	setupObjectAttributesFull(0x08a41e)
 	objA0.update_address = 0x08a258
 	u32[A0 + 0x30] = 0x08a444
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.countdown_value = 0x5f
 
 	D0 = objA0.subtype2c

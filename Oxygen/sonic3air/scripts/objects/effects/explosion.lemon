@@ -96,7 +96,7 @@ function void SmallExplosion.Update()
 function void fn083f52()
 {
 	objA0.update_address = 0x083f68
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	playSound(0xb4)
 	fn083f68()
 }

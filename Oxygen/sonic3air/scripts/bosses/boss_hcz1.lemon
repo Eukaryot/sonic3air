@@ -72,7 +72,7 @@ function void fn069eda()
 
 	screenmover_target.right = move_area.right
 	u16[A0 + 0x44] = objA0.position.y.u16
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 120
 	objA0.countdown_callback = 0x069f64
 	playMusic(MUSIC_CTRL_FADEOUT)
@@ -423,7 +423,7 @@ function void fn06a270()
 	SpawnSimpleChildObjects()
 
 	objA0.countdown_value = 0x2f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	fn06a2a0()
 
 #if STANDALONE
@@ -667,7 +667,7 @@ function void fn06a4c8()
 		return
 
 	objA0.position.y.u16 = water.height.current
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	if (objA0.subtype2c != 0)
 	{
 		objA0.countdown_value = 7
@@ -884,7 +884,7 @@ function void fn06a6e4()
 
 	objA0.update_address = 0x06a6b8
 	objA0.countdown_value = 0x1f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
@@ -922,7 +922,7 @@ function void fn06a710()
 	u32[A0 + 0x30] = u32[A1 + D0.s16 * 4]
 	objA0.velocity.y = 0x0200
 	objA0.countdown_value = 0xbf
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	DrawObject()
 }
 
@@ -964,7 +964,7 @@ function void fn06a7c4()
 	if (objA0.subtype2c != 0)
 	{
 		A1 = 0xffffb04a
-		A2 = 0xfffff7cb		// Address of "player2.control_override"
+		A2 = addressof(player2.control_override)
 		if ((u8[A1 + 0x2a] & char.flag.UNDERWATER) == 0)
 		{
 			UnloadObject()
@@ -974,7 +974,7 @@ function void fn06a7c4()
 	else
 	{
 		A1 = 0xffffb000
-		A2 = 0xfffff7ca		// Address of "player1.control_override"
+		A2 = addressof(player1.control_override)
 	}
 
 	u8[A2] = 0

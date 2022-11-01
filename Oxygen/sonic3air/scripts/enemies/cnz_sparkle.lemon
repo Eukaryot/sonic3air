@@ -125,7 +125,7 @@ function void fn08926c()
 {
 	setupObjectAttributesBasic(0x089346)
 	objA0.flags2b |= char.bonus.SHIELD_LIGHTNING
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = 0x34

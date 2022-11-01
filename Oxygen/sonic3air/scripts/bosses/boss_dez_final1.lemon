@@ -876,7 +876,7 @@ function void fn081140()
 {
 	objA0.update_address = 0x080d64
 	objA0.countdown_value = 0x1f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
 	spawnSimpleChildObjects(0x083d84, 1)

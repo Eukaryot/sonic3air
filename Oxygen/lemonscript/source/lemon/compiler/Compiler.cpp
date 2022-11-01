@@ -167,7 +167,7 @@ namespace lemon
 				String output;
 				for (ScriptFunction* function : mModule.getScriptFunctions())
 				{
-					output << function->getName() << ":\r\n";
+					output << function->getName().getString() << ":\r\n";
 					for (const Opcode& opcode : function->mOpcodes)
 					{
 						String typeString = Opcode::GetTypeString(opcode.mType);

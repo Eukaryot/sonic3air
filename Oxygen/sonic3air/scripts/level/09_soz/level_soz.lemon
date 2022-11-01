@@ -126,8 +126,8 @@ function void fn055a9a()
 		fn055e96()
 		fn055d56()
 
-		A6 = 0xffffee90		// Address of camera.background.y
-		A5 = 0xffffee96		// Address of camera.background.y.old
+		A6 = addressof(camera.background.y)
+		A5 = addressof(camera.background.y.old)
 		D1 = 0
 		D6 = 0x20
 		LoadTileContentInDirY()
@@ -1120,8 +1120,8 @@ function void fn0563a6()
 
 function void fn0563c0()
 {
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1322,8 +1322,8 @@ function void fn0564d4()
 //# address-hook(0x0564e8)
 function void fn0564e8()
 {
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1 = 0
 	D6 = 0x20
 	LoadTileContentInDirY()
@@ -1456,8 +1456,8 @@ function void fn0566a4()
 //# address-hook(0x0566a8) end(0x0566b6)
 function void fn0566a8()
 {
-	A6 = 0xffffee90		// Address of camera.background.y
-	A5 = 0xffffee96		// Address of camera.background.y.old
+	A6 = addressof(camera.background.y)
+	A5 = addressof(camera.background.y.old)
 	D1.u16 = 0x0200
 	D6 = 0x20
 	LoadTileContentInDirY()

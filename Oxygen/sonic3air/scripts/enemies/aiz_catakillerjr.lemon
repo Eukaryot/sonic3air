@@ -179,7 +179,7 @@ function void fn08780a()
 {
 	setupObjectAttributesBasic(0x087892)
 	objA0.update_address = 0x08782c
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	fn084920()
 }

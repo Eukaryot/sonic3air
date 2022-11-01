@@ -1320,7 +1320,7 @@ function void fn074e30()
 	A1 = 0x074e7c + D0.s16
 	objA0.position.x.u16 = u16[(A1+=2)-2]
 	objA0.position.y.u16 = u16[(A1+=2)-2]
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 0x60
 	objA0.countdown_callback = 0x074e70
 

@@ -15,7 +15,7 @@
 //# address-hook(0x06bf2a) end(0x06bf7c)
 function void fn06bf2a()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	level.boss_encounter = 1
 	objA0.countdown_value = 120
 	objA0.countdown_callback = 0x06bf82
@@ -181,7 +181,7 @@ function void fn06c200()
 {
 	objA0.flags38 |= 0x20
 	level.boss_encounter = 0
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 
 	PlayMusicAfterLevelResults()
 
@@ -644,7 +644,7 @@ function void fn06cd42()
 
 	objA0.update_address = 0x06cd80
 	objA0.countdown_value = 0x2f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A2 = 0xffff0000 + u16[A1 + 0x46]
 	u16[A0 + 0x44] = A2.u16
@@ -750,7 +750,7 @@ function void fn06cef0()
 	else
 	{
 		objA0.flags38 |= 0x20
-		objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+		objA0.update_address = addressof(UnloadObject)
 	}
 }
 

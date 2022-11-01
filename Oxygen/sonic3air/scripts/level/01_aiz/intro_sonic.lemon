@@ -447,7 +447,7 @@ function void AIZIntro.WaveEffect.Init()
 	objA0.box_size.x = 0x10
 	objA0.render_flags |= render_flag.FLIP_X
 	u32[A0 + 0x30] = 0x067a9b
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	AIZIntro.WaveEffect.Update()
 }

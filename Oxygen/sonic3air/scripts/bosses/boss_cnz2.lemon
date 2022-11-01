@@ -275,7 +275,7 @@ function void fn06e6aa()
 //# address-hook(0x06e6c6) end(0x06e6de)
 function void fn06e6c6()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x06e6e4
 
@@ -902,7 +902,7 @@ function void fn06ed22()
 	if ((u8[A1 + 0x38] & 0x10) == 0)
 		return
 
-	objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+	objA0.update_address = addressof(UnloadObject)
 
 	// "spawnChildObjects(0x06edf2)" replaced by:
 	spawnChildObject(0x06e936, 0x00, -8, 0)

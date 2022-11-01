@@ -202,7 +202,7 @@ function void RenderSprites()
 	D7 = 0x4f			// Hard sprite limit: Not more than 0x50 -- but for standalone, we will happily ignore the limit
 	D6 = 0
 	A5 = 0xffffac00
-	A3 = 0xffffee80		// Address of camera.foreground.x
+	A3 = addressof(camera.foreground.x)
 	A6 = 0xfffff800
 	if (global.level_started != 0)
 	{

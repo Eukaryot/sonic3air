@@ -159,7 +159,7 @@ function void fn0459b4()
 
 			objA0.animation.sprite = 0x09
 			u16[A0 + 0x16] = 0
-			objA0.update_address = 0x01abb6		// Function address of "UnloadObject"
+			objA0.update_address = addressof(UnloadObject)
 			A1 = 0xffff0000 + objA0.respawn_entry
 			u8[A1 + 0x38] = 0
 		}

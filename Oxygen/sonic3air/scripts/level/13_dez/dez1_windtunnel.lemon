@@ -298,7 +298,7 @@ function void fn0498d2()
 	#if STANDALONE
 		objA1.update_address = 0x01b58a		// Not a "real" update address, but we need something different than 0x01b588
 	#else
-		objA1.update_address = 0x01b588		// Address of "DrawOrUnloadObject"
+		objA1.update_address = addressof(DrawOrUnloadObject)
 	#endif
 		objA1.render_flags = objA0.render_flags | render_flag.COMPOUND
 		objA1.box_size.y = 0x30

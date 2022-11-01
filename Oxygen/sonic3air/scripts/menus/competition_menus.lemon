@@ -924,9 +924,9 @@ function void fn00b4f6()
 //# address-hook(0x00b508) end(0x00b528)
 function void fn00b508()
 {
-	A1 = 0xfffff607		// Address of control.pad2.pressed
+	A1 = addressof(control.pad2.pressed)
 	A2 = 0xffffeee3
-	A3 = 0xffffffeb		// Address of competition_mode.character.player2
+	A3 = addressof(competition_mode.character.player2)
 	if (competition_mode.multiplay)
 	{
 		fn00b538()
@@ -946,9 +946,9 @@ function void fn00b508()
 //# address-hook(0x00b52c) end(0x00b534)
 function void fn00b52c()
 {
-	A1 = 0xfffff605		// Address of control.pad1.pressed
+	A1 = addressof(control.pad1.pressed)
 	A2 = 0xffffeee2
-	A3 = 0xffffffea		// Address of competition_mode.character.player1
+	A3 = addressof(competition_mode.character.player1)
 	fn00b538()
 }
 

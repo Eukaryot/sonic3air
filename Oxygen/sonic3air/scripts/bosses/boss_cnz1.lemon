@@ -26,7 +26,7 @@ function void fn06d99c()
 	move_area.right = D0.u16
 	move_area.bottom.current = 0x02b8
 	move_area.bottom.target = 0x02b8
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_value = 120
 	objA0.countdown_callback = 0x06da00
 
@@ -209,7 +209,7 @@ function void fn06db72()
 //# address-hook(0x06db86) end(0x06dba2)
 function void fn06db86()
 {
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	level.wait_for_results = 0xff
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x06dbae
@@ -554,7 +554,7 @@ function void fn06def8()
 	setupObjectAttributesBasic(0x06e2aa)
 
 	objA0.flags2b |= char.bonus.SHIELD_LIGHTNING
-	objA0.update_address = 0x08488a		// Address of "Object.CountdownAndTrigger"
+	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.countdown_callback = 0x06df34
 	u32[A0 + 0x30] = 0x06e339
 	if (objA0.subtype2c != 0)
@@ -570,7 +570,7 @@ function void fn06df34()
 {
 	objA0.update_address = 0x06df4a
 	objA0.countdown_value = 0x7f
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
@@ -625,7 +625,7 @@ function void fn06dfb4()
 		objA0.position.x.u16 = 0x3378
 	}
 	u32[A0 + 0x30] = 0x06e368
-	objA0.countdown_callback = 0x0852a0	// Address of "Object.TriggerUnloading()"
+	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 }
 
 
