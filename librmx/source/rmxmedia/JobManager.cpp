@@ -142,7 +142,7 @@ namespace rmx
 		// Wait until there's at leat one job available
 		SDL_LockMutex(mConditionLock);
 		JobBase* job = getNextJobInternal();
-		while (nullptr == job)
+		while (nullptr == job && mSearchforJobs)
 		{
 			// Using a time-out for two reasons:
 			//  - to have a chance to check if "mShouldBeRunning" changed outside
@@ -219,6 +219,7 @@ namespace rmx
 
 	void JobManager::stopAllThreads()
 	{
+		mSearchforJobs = false;
 		for (JobWorkerThread* thread : mThreads)
 		{
 			thread->signalStopThread(false);

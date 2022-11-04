@@ -370,6 +370,7 @@ void EngineMain::shutdown()
 	RMX_LOG_INFO("System shutdown");
 	FTX::Audio->exit();
 	FTX::System->exit();
+	FTX::JobManager->~JobManager();
 
 	mInternal.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
