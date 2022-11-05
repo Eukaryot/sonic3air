@@ -8,15 +8,24 @@
 
 #pragma once
 
+#include "lemon/program/DataType.h"
+
 
 namespace lemon
 {
 	struct DataTypeDefinition;
 
-	struct GlobalCompilerConfig
+	struct CompileOptions
 	{
+		// Options to be set before compilation
+		const DataTypeDefinition* mExternalAddressType = &PredefinedDataTypes::UINT_64;
+		std::wstring mOutputCombinedSource;
+		std::wstring mOutputNativizedSource;
+		std::wstring mOutputTranslatedSource;
+		bool mConsumeProcessedPragmas = true;
+
+		// Set during compilation
 		uint32 mScriptFeatureLevel = 1;
-		const DataTypeDefinition* mExternalAddressType = nullptr;
 	};
 
 	enum class Keyword : uint8

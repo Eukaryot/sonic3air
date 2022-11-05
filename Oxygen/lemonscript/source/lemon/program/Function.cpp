@@ -188,7 +188,7 @@ namespace lemon
 		return nullptr;
 	}
 
-	void ScriptFunction::addOrProcessPragma(std::string_view pragmaString)
+	void ScriptFunction::addOrProcessPragma(std::string_view pragmaString, bool consumeIfProcessed)
 	{
 		PragmaSplitter pragmaSplitter(pragmaString);
 		if (!pragmaSplitter.mEntries.empty())
@@ -212,7 +212,7 @@ namespace lemon
 			}
 
 			// If there was an address hook, there's no need to store this pragma
-			if (hadAddressHook)
+			if (consumeIfProcessed && hadAddressHook)
 				return;
 		}
 

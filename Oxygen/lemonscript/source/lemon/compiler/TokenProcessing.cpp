@@ -113,10 +113,10 @@ namespace lemon
 	}
 
 
-	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, const GlobalCompilerConfig& config) :
+	TokenProcessing::TokenProcessing(GlobalsLookup& globalsLookup, const CompileOptions& compileOptions) :
 		mGlobalsLookup(globalsLookup),
-		mConfig(config),
-		mTypeCasting(config)
+		mCompileOptions(compileOptions),
+		mTypeCasting(compileOptions)
 	{
 		fillCachedBuiltInFunctionMultiple(mBuiltinConstantArrayAccess,			globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlus,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
@@ -1175,7 +1175,7 @@ namespace lemon
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
 				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
 
-				if (mConfig.mScriptFeatureLevel >= 2)
+				if (mCompileOptions.mScriptFeatureLevel >= 2)
 				{
 					// Special handling for certain operations with two strings
 					if (leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)

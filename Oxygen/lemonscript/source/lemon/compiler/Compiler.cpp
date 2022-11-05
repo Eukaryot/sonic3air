@@ -71,8 +71,8 @@ namespace lemon
 		mModule(module),
 		mGlobalsLookup(globalsLookup),
 		mCompileOptions(compileOptions),
-		mTokenProcessing(globalsLookup, mGlobalCompilerConfig),
-		mPreprocessor(mGlobalCompilerConfig, mTokenProcessing)
+		mTokenProcessing(globalsLookup, compileOptions),
+		mPreprocessor(compileOptions, mTokenProcessing)
 	{
 	}
 
@@ -87,7 +87,6 @@ namespace lemon
 	{
 		mErrors.clear();
 		mModule.startCompiling(mGlobalsLookup);
-		mGlobalCompilerConfig.mExternalAddressType = mCompileOptions.mExternalAddressType;
 
 		// Read input file(s)
 		std::vector<std::string_view> inputLines;
@@ -534,7 +533,7 @@ namespace lemon
 							// Add all pragmas associated with this function, i.e. all pragma nodes in front
 							for (PragmaNode* pragmaNode : currentPragmas)
 							{
-								function.addOrProcessPragma(pragmaNode->mContent);
+								function.addOrProcessPragma(pragmaNode->mContent, mCompileOptions.mConsumeProcessedPragmas);
 							}
 							break;
 						}
@@ -731,7 +730,7 @@ namespace lemon
 		processUndefinedNodesInBlock(content, function, scopeContext);
 
 		// Build opcodes out of nodes inside the function's block
-		FunctionCompiler functionCompiler(function, mGlobalCompilerConfig);
+		FunctionCompiler functionCompiler(function, mCompileOptions);
 		functionCompiler.processParameters();
 		functionCompiler.buildOpcodesForFunction(content);
 	}
@@ -860,7 +859,7 @@ namespace lemon
 
 				case Keyword::IF:
 				{
-					if (mGlobalCompilerConfig.mScriptFeatureLevel >= 2)
+					if (mCompileOptions.mScriptFeatureLevel >= 2)
 						CHECK_ERROR(tokens.size() >= 2 && isOperator(tokens[1], Operator::PARENTHESIS_LEFT), "Expected parentheses after 'if' keyword", lineNumber);
 
 					// Process tokens
@@ -1246,7 +1245,7 @@ namespace lemon
 				{
 					REPORT_ERROR_CODE(CompilerError::Code::SCRIPT_FEATURE_LEVEL_TOO_HIGH, value, MAX_SCRIPT_FEATURE_LEVEL, "Script uses feature level " << value << ", but the highest supported level is " << MAX_SCRIPT_FEATURE_LEVEL);
 				}
-				mGlobalCompilerConfig.mScriptFeatureLevel = (uint32)value;
+				mCompileOptions.mScriptFeatureLevel = (uint32)value;
 			}
 			return true;
 		}

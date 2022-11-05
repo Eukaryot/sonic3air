@@ -81,9 +81,9 @@ namespace lemon
 	};
 
 
-	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const GlobalCompilerConfig& config) :
+	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const CompileOptions& compileOptions) :
 		mFunction(function),
-		mConfig(config),
+		mCompileOptions(compileOptions),
 		mOpcodes(function.mOpcodes)
 	{
 	}
@@ -187,7 +187,7 @@ namespace lemon
 	{
 		CHECK_ERROR(nullptr != sourceType, "Internal error: Got an invalid source type for cast", mLineNumber);
 		CHECK_ERROR(nullptr != targetType, "Internal error: Got an invalid target type for cast", mLineNumber);
-		const BaseCastType castType = TypeCasting(mConfig).getBaseCastType(sourceType, targetType);
+		const BaseCastType castType = TypeCasting(mCompileOptions).getBaseCastType(sourceType, targetType);
 		if (castType != BaseCastType::NONE)
 		{
 			if (castType != BaseCastType::INVALID)
@@ -294,7 +294,7 @@ namespace lemon
 				if (externalNode.mStatementToken.valid())
 				{
 					compileTokenTreeToOpcodes(*externalNode.mStatementToken);
-					addCastOpcodeIfNecessary(externalNode.mStatementToken->mDataType, mConfig.mExternalAddressType);
+					addCastOpcodeIfNecessary(externalNode.mStatementToken->mDataType, mCompileOptions.mExternalAddressType);
 				}
 				else
 				{
@@ -526,7 +526,7 @@ namespace lemon
 
 					case Operator::COMPARE_EQUAL:
 						compileBinaryOperationToOpcodes(bot, Opcode::Type::COMPARE_EQ);
-						if (consumeResult && mConfig.mScriptFeatureLevel >= 2)
+						if (consumeResult && mCompileOptions.mScriptFeatureLevel >= 2)
 							CHECK_ERROR(false, "Result of comparison is not used, this is certainly a mistake in the script", mLineNumber);
 						break;
 

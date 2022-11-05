@@ -36,7 +36,7 @@ namespace lemon
 		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
 		if (original == &PredefinedDataTypes::STRING)
 			original = &PredefinedDataTypes::UINT_64;
-		if (mConfig.mScriptFeatureLevel < 2)
+		if (mCompileOptions.mScriptFeatureLevel < 2)
 		{
 			if (target == &PredefinedDataTypes::STRING)
 				target = &PredefinedDataTypes::UINT_64;
@@ -235,7 +235,7 @@ namespace lemon
 		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
 		if (original == &PredefinedDataTypes::STRING)
 			original = &PredefinedDataTypes::UINT_64;
-		if (mConfig.mScriptFeatureLevel < 2)
+		if (mCompileOptions.mScriptFeatureLevel < 2)
 		{
 			if (target == &PredefinedDataTypes::STRING)
 				target = &PredefinedDataTypes::UINT_64;

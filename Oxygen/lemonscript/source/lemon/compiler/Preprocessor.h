@@ -17,12 +17,12 @@ namespace lemon
 	class ParserTokenList;
 	class StatementToken;
 	class TokenProcessing;
-	struct GlobalCompilerConfig;
+	struct CompileOptions;
 
 	class Preprocessor
 	{
 	public:
-		Preprocessor(const GlobalCompilerConfig& config, TokenProcessing& tokenProcessing);
+		Preprocessor(const CompileOptions& compileOptions, TokenProcessing& tokenProcessing);
 
 		void processLines(std::vector<std::string_view>& lines);
 
@@ -38,7 +38,7 @@ namespace lemon
 		int64 evaluateConstantToken(const StatementToken& token) const;
 
 	private:
-		const GlobalCompilerConfig& mConfig;
+		const CompileOptions& mCompileOptions;
 		TokenProcessing& mTokenProcessing;
 		std::string mBufferString;
 		uint32 mLineNumber;

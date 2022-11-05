@@ -20,8 +20,8 @@
 namespace lemon
 {
 
-	Preprocessor::Preprocessor(const GlobalCompilerConfig& config, TokenProcessing& tokenProcessing) :
-		mConfig(config),
+	Preprocessor::Preprocessor(const CompileOptions& compileOptions, TokenProcessing& tokenProcessing) :
+		mCompileOptions(compileOptions),
 		mTokenProcessing(tokenProcessing)
 	{
 	}

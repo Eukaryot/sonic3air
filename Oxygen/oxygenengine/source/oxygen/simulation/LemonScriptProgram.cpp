@@ -97,7 +97,7 @@ bool LemonScriptProgram::loadScriptModule(lemon::Module& module, lemon::GlobalsL
 	try
 	{
 		// Compile script source
-		lemon::Compiler::CompileOptions options;
+		lemon::CompileOptions options;
 		//options.mOutputCombinedSource = L"combined_source.lemon";	// Just for debugging preprocessor issues
 		//options.mOutputTranslatedSource = L"output.cpp";			// For testing translation
 		lemon::Compiler compiler(module, globalsLookup, options);

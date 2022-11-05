@@ -32,14 +32,6 @@ namespace lemon
 	class API_EXPORT Compiler
 	{
 	public:
-		struct CompileOptions
-		{
-			const DataTypeDefinition* mExternalAddressType = &PredefinedDataTypes::UINT_64;
-			std::wstring mOutputCombinedSource;
-			std::wstring mOutputNativizedSource;
-			std::wstring mOutputTranslatedSource;
-		};
-
 		struct ErrorMessage
 		{
 			std::string mMessage;
@@ -121,7 +113,6 @@ namespace lemon
 		Module& mModule;
 		GlobalsLookup& mGlobalsLookup;
 		CompileOptions mCompileOptions;
-		GlobalCompilerConfig mGlobalCompilerConfig;
 
 		TokenProcessing mTokenProcessing;
 		Preprocessor mPreprocessor;

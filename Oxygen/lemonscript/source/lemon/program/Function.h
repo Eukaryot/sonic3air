@@ -109,7 +109,7 @@ namespace lemon
 
 		const std::vector<uint32>& getAddressHooks() const  { return mAddressHooks; }
 
-		void addOrProcessPragma(std::string_view pragmaString);
+		void addOrProcessPragma(std::string_view pragmaString, bool consumeIfProcessed);
 		inline const std::vector<std::string>& getPragmas() const  { return mPragmas; }
 
 		uint64 addToCompiledHash(uint64 hash) const;

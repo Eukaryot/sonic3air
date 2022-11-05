@@ -23,7 +23,6 @@ namespace lemon
 	class LocalVariable;
 	class ScriptFunction;
 	class StatementToken;
-	struct GlobalCompilerConfig;
 
 	class TokenProcessing
 	{
@@ -45,7 +44,7 @@ namespace lemon
 		Context mContext;
 
 	public:
-		TokenProcessing(GlobalsLookup& globalsLookup, const GlobalCompilerConfig& config);
+		TokenProcessing(GlobalsLookup& globalsLookup, const CompileOptions& compileOptions);
 
 		void processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 		void processForPreprocessor(TokenList& tokensRoot, uint32 lineNumber);
@@ -87,7 +86,7 @@ namespace lemon
 
 	private:
 		GlobalsLookup& mGlobalsLookup;
-		const GlobalCompilerConfig& mConfig;
+		const CompileOptions& mCompileOptions;
 		TypeCasting mTypeCasting;
 		uint32 mLineNumber = 0;
 

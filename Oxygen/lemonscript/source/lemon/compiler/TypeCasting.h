@@ -14,8 +14,8 @@
 
 namespace lemon
 {
+	struct CompileOptions;
 	struct DataTypeDefinition;
-	struct GlobalCompilerConfig;
 
 	class TypeCasting
 	{
@@ -31,7 +31,7 @@ namespace lemon
 		};
 
 	public:
-		inline explicit TypeCasting(const GlobalCompilerConfig& config) : mConfig(config) {}
+		inline explicit TypeCasting(const CompileOptions& compileOptions) : mCompileOptions(compileOptions) {}
 
 		bool canImplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const;
 		bool canExplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const;
@@ -46,6 +46,6 @@ namespace lemon
 		uint8 getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target) const;
 
 	private:
-		const GlobalCompilerConfig& mConfig;
+		const CompileOptions& mCompileOptions;
 	};
 }
