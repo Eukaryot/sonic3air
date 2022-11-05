@@ -165,17 +165,17 @@ function void Object.TriggerUnloading()
 //# address-hook(0x006c2c) end(0x006c32)
 function void ResetDynamicObjectList()
 {
-	u16[0xffffe380] = 0
+	global.dynamic_objects.size = 0
 }
 
 
 //# address-hook(0x01040c) end(0x01041c)
 function void AddAsDynamicObject()
 {
-	if (u16[0xffffe380] < 0x7e)
+	if (global.dynamic_objects.size < 0x7e)
 	{
-		u16[0xffffe380] += 2
-		u16[0xffffe380 + u16[0xffffe380]] = A0.u16
+		global.dynamic_objects.size += 2
+		u16[0xffffe380 + global.dynamic_objects.size] = A0.u16
 	}
 }
 

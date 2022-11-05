@@ -54,8 +54,9 @@
 
 // 0xffffe380 .. 0xffffe3ff
 // Table of dynamic objects in range
-//  - First word is twice the number of objects in the table
-//  - One word per object, telling us its RAM address (lower u16 part only)
+//  - First word ("size") is twice the number of objects in the table
+//  - After that, each entry is word per object, telling us the RAM address of a dynamic object (lower u16 part only)
+define global.dynamic_objects.size	= u16[0xffffe380]
 
 
 // 0xffffe41c .. 0xffffe450

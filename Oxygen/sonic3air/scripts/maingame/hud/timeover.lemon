@@ -65,7 +65,7 @@ function void fn02d612()
 //# address-hook(0x02d638) end(0x02d68a)
 function void fn02d638()
 {
-	u16[0xffffe380] = 0
+	global.dynamic_objects.size = 0
 	if ((objA0.animation.sprite & 0x01) == 0)
 	{
 		D0.u8 = (control.pad1.pressed | control.pad2.pressed) & (CONTROL_START | CONTROL_ABC)

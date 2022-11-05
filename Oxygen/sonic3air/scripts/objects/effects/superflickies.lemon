@@ -293,9 +293,8 @@ function void fn01a37a()
 function void fn01a3fe()
 {
 	D1 = 0
-	A4 = 0xffffe380
-	D6.u16 = u16[A4]
-	A4 += 2
+	D6.u16 = global.dynamic_objects.size
+	A4 = addressof(global.dynamic_objects.size) + 2
 	if (D6.u16 != 0)
 	{
 		u8[0xfffff66c] += 2

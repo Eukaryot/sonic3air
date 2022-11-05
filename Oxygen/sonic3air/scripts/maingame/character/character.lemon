@@ -4935,9 +4935,8 @@ function void Character.CheckCollisionsWithDynamicObjects_partial()
 		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ff00)
 #endif
 
-	A4 = 0xffffe380
-	u16 numObjects = u16[A4]	// Actually it's twice the number of dynamic objects
-	A4 += 2
+	u16 numObjects = global.dynamic_objects.size	// Actually it's twice the number of dynamic objects
+	A4 = addressof(global.dynamic_objects.size) + 2
 	while (numObjects != 0)
 	{
 		// Get address of dynamic object
@@ -5563,9 +5562,8 @@ function void UpdateShieldDeflecting()
 		debugDrawRect(D2.u16, D3.u16, D4.u16, D5.u16, 0x8000ffff)
 #endif
 
-	A4 = 0xffffe380
-	u16 numObjects = u16[A4]	// Actually it's twice the number of dynamic objects
-	A4 += 2
+	u16 numObjects = global.dynamic_objects.size	// Actually it's twice the number of dynamic objects
+	A4 = addressof(global.dynamic_objects.size) + 2
 	while (numObjects != 0)
 	{
 		// Get address of dynamic object
@@ -5780,9 +5778,8 @@ function void Character.clearEnemiesOnScreen(u16 minY)
 	push(A2)
 
 	// Go through all the badniks to destroy
-	A4 = 0xffffe380
-	D6.u16 = u16[A4]
-	A4 += 2
+	D6.u16 = global.dynamic_objects.size
+	A4 = addressof(global.dynamic_objects.size) + 2
 	while (D6.u16 != 0)
 	{
 		A1 = 0xffff0000 + u16[A4]
