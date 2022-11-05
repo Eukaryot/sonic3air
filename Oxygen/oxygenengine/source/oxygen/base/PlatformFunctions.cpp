@@ -273,45 +273,48 @@ double PlatformFunctions::getTimerGranularityMilliseconds()
 	return timerGranularity;
 }
 
-void PlatformFunctions::changeWorkingDirectory(const std::string& execCallPath)
+void PlatformFunctions::changeWorkingDirectory(std::wstring_view executableCallPath)
 {
 #if defined(PLATFORM_WINDOWS)
-	// Move out of "bin", "build" or "_vstudio" directory
-	//  -> This is added only because with my Visual Studio setup, binaries get placed in such a target directory (don't ask why...)
-	const std::wstring path = rmx::FileSystem::getCurrentDirectory();
-	std::vector<std::wstring> parts;
-	for (size_t pos = 0; pos < path.length(); ++pos)
+	// Take the working directory from command line if possible
+	const size_t pos = executableCallPath.find_last_of(L"/\\");
+	if (pos != std::string::npos)
 	{
-		const size_t start = pos;
+		std::wstring path = std::wstring(executableCallPath.substr(0, pos));
 
-		// Find next separator
-		while (pos < path.length() && !(path[pos] == L'\\' || path[pos] == L'/'))
-			++pos;
-
-		// Get part as string
-		parts.emplace_back(path.substr(start, pos-start));
-	}
-
-	for (size_t index = 0; index < parts.size(); ++index)
-	{
-		if (parts[index] == L"bin" || parts[index] == L"build" || parts[index] == L"_vstudio")
+		// Move out of "bin", "build" or "_vstudio" directory
+		//  -> This is added only because with my Visual Studio setup, binaries get placed in such a target directory (don't ask why...)
+		std::vector<std::wstring> parts;
+		for (size_t pos = 0; pos < path.length(); ++pos)
 		{
-			std::wstring wd;
-			for (size_t i = 0; i < index; ++i)
-				wd += parts[i] + L'/';
-			rmx::FileSystem::setCurrentDirectory(wd);
-			break;
+			const size_t start = pos;
+
+			// Find next separator
+			while (pos < path.length() && !(path[pos] == L'\\' || path[pos] == L'/'))
+				++pos;
+
+			// Get part as string
+			parts.emplace_back(path.substr(start, pos-start));
 		}
+
+		for (size_t index = 0; index < parts.size(); ++index)
+		{
+			if (parts[index] == L"bin" || parts[index] == L"build" || parts[index] == L"_vstudio")
+			{
+				path.clear();
+				for (size_t i = 0; i < index; ++i)
+					path += parts[i] + L'/';
+				break;
+			}
+		}
+		rmx::FileSystem::setCurrentDirectory(path);
 	}
 #elif defined(PLATFORM_LINUX)
 	// Take the working directory from command line if possible
-	//  -> This seems to be needed in some cases, like when using a .desktop file as launcher
-	WString path;
-	path.fromUTF8(execCallPath);
-	const int pos = path.findChar(L'/', path.length()-1, -1);
-	if (pos >= 0)
+	const size_t pos = executableCallPath.find_last_of(L'/');
+	if (pos != std::string::npos)
 	{
-		rmx::FileSystem::setCurrentDirectory(*path.getSubString(0, pos));
+		rmx::FileSystem::setCurrentDirectory(executableCallPath.substr(0, pos));
 	}
 #endif
 }

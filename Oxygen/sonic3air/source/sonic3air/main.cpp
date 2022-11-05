@@ -8,10 +8,10 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/EngineDelegate.h"
-#include "sonic3air/version.inc"
+#include "sonic3air/helper/ArgumentsReader.h"
+#include "sonic3air/helper/PackageBuilder.h"
 
 #include "oxygen/base/PlatformFunctions.h"
-#include "oxygen/file/FilePackage.h"
 
 
 // HJW: I know it's sloppy to put this here... it'll get moved afterwards
@@ -33,94 +33,32 @@ extern "C"
 #endif
 
 
-struct Arguments
-{
-	bool mPack = false;
-	bool mNativize = false;
-	bool mDumpCppDefinitions = false;
-};
-
-void readArguments(Arguments& outArguments, int argc, char** argv)
-{
-#if !defined(ENDUSER) && !defined(PLATFORM_ANDROID)
-	for (int i = 0; i < argc; ++i)
-	{
-		const std::string parameter(argv[i]);
-		if (parameter == "-pack")
-		{
-			outArguments.mPack = true;
-		}
-		else if (parameter == "-nativize")
-		{
-			outArguments.mNativize = true;
-		}
-		else if (parameter == "-dumpcppdefinitions")
-		{
-			outArguments.mDumpCppDefinitions = true;
-		}
-	}
-#endif
-}
-
-void performPacking()
-{
-	// Update metadata.json
-	String metadata;
-	metadata << "{\r\n"
-			 << "\t\"Game\" : \"Sonic 3 - Angel Island Revisited\",\r\n"
-			 << "\t\"Author\" : \"Eukaryot (original game by SEGA)\",\r\n"
-			 << "\t\"Version\" : \"" << BUILD_STRING << "\",\r\n"
-			 << "\t\"GameAppBuild\" : \"" << rmx::hexString(BUILD_NUMBER, 8) << "\"\r\n"
-			 << "}\r\n";
-	metadata.saveFile("data/metadata.json");
-
-	// "gamedata.bin" = data directory except audio and shaders
-	{
-		std::vector<std::wstring> includedPaths = { L"data/" };
-		std::vector<std::wstring> excludedPaths = { L"data/audio/", L"data/shader/", L"data/metadata.json" };
-		FilePackage::createFilePackage(L"gamedata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-	}
-
-	// "audiodata.bin" = emulated / original audio directory
-	{
-		std::vector<std::wstring> includedPaths = { L"data/audio/original/" };
-		std::vector<std::wstring> excludedPaths = { };
-		FilePackage::createFilePackage(L"audiodata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-	}
-
-	// "audioremaster.bin" = remastered audio directory
-	{
-		std::vector<std::wstring> includedPaths = { L"data/audio/remastered/" };
-		std::vector<std::wstring> excludedPaths = { };
-		FilePackage::createFilePackage(L"audioremaster.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-	}
-
-	// "enginedata.bin" = shaders directory
-	{
-		std::vector<std::wstring> includedPaths = { L"data/shader/" };
-		std::vector<std::wstring> excludedPaths = { };
-		FilePackage::createFilePackage(L"enginedata.bin", includedPaths, excludedPaths, L"_master_image_template/data/", BUILD_NUMBER);
-	}
-}
-
-
 int main(int argc, char** argv)
 {
 	EngineMain::earlySetup();
 
-	// Make sure we're in the correct working directory
-	PlatformFunctions::changeWorkingDirectory(argc == 0 ? "" : argv[0]);
-
 	// Read command line arguments
-	Arguments arguments;
-	readArguments(arguments, argc, argv);
+	ArgumentsReader arguments;
+	arguments.read(argc, argv);
 
-	if (arguments.mPack)
+	// For certain arguments, just try to forward them to an already running instance of S3AIR
+	if (!arguments.mUrl.empty())
 	{
-		performPacking();
-		if (!arguments.mNativize && !arguments.mDumpCppDefinitions)		// In case multiple arguments got combined, the others would got ignored without this check
+		if (CommandForwarder::trySendCommand("ForwardedCommand:Url:" + arguments.mUrl))
 			return 0;
 	}
+
+	// Make sure we're in the correct working directory
+	PlatformFunctions::changeWorkingDirectory(arguments.mExecutableCallPath);
+
+#if !defined(ENDUSER) && !defined(PLATFORM_ANDROID)
+	if (arguments.mPack)
+	{
+		PackageBuilder::performPacking();
+		if (!arguments.mNativize && !arguments.mDumpCppDefinitions)		// In case multiple arguments got combined, the others would get ignored without this check
+			return 0;
+	}
+#endif
 
 	try
 	{
@@ -128,18 +66,21 @@ int main(int argc, char** argv)
 		EngineDelegate myDelegate;
 		EngineMain myMain(myDelegate);
 
+		// Evaluate some more arguments
+		Configuration& config = Configuration::instance();
 		if (arguments.mNativize)
 		{
-			Configuration::instance().mRunScriptNativization = 1;
-			Configuration::instance().mScriptNativizationOutput = L"source/sonic3air/_nativized/NativizedCode.inc";
-			Configuration::instance().mExitAfterScriptLoading = true;
+			config.mRunScriptNativization = 1;
+			config.mScriptNativizationOutput = L"source/sonic3air/_nativized/NativizedCode.inc";
+			config.mExitAfterScriptLoading = true;
 		}
 		if (arguments.mDumpCppDefinitions)
 		{
-			Configuration::instance().mDumpCppDefinitionsOutput = L"scripts/_reference/cpp_core_functions.lemon";
-			Configuration::instance().mExitAfterScriptLoading = true;
+			config.mDumpCppDefinitionsOutput = L"scripts/_reference/cpp_core_functions.lemon";
+			config.mExitAfterScriptLoading = true;
 		}
 
+		// Now run the game
 		myMain.execute(argc, argv);
 	}
 	catch (const std::exception& e)

@@ -41,7 +41,7 @@ public:
 	static void preciseDelay(double milliseconds);
 	static double getTimerGranularityMilliseconds();
 
-	static void changeWorkingDirectory(const std::string& execCallPath);
+	static void changeWorkingDirectory(std::wstring_view executableCallPath);
 
 	static void onEngineStartup();
 

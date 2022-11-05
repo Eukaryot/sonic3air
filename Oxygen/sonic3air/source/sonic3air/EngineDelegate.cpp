@@ -117,16 +117,19 @@ bool EngineDelegate::setupCustomGameProfile()
 void EngineDelegate::startupGame()
 {
 	mGame.startup();
+	mCommandForwarder.startup();
 }
 
 void EngineDelegate::shutdownGame()
 {
 	mGame.shutdown();
+	mCommandForwarder.shutdown();
 }
 
 void EngineDelegate::updateGame(float timeElapsed)
 {
 	mGame.update(timeElapsed);
+	mCommandForwarder.update(timeElapsed);
 }
 
 void EngineDelegate::registerScriptBindings(lemon::Module& module)

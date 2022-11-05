@@ -19,7 +19,12 @@ int main(int argc, char** argv)
 	EngineMain::earlySetup();
 
 	// Make sure we're in the correct working directory
-	PlatformFunctions::changeWorkingDirectory(argc == 0 ? "" : argv[0]);
+	if (argc > 0)
+	{
+		WString wstr;
+		wstr.fromUTF8(std::string(argv[0]));
+		PlatformFunctions::changeWorkingDirectory(wstr.toStdWString());
+	}
 
 	// Create engine delegate and angine main instance
 	{

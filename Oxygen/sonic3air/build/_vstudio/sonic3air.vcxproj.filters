@@ -152,6 +152,12 @@
     <ClCompile Include="..\..\source\sonic3air\resources\DynamicSprites.cpp">
       <Filter>resources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\CommandForwarder.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\PackageBuilder.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -262,6 +268,15 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\resources\DynamicSprites.h">
       <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\CommandForwarder.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\ArgumentsReader.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\PackageBuilder.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
