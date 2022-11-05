@@ -53,6 +53,7 @@ namespace lemon
 
 		ScriptFunction& addScriptFunction(FlyweightString name, const DataTypeDefinition* returnType, const Function::ParameterList* parameters = nullptr);
 		NativeFunction& addNativeFunction(FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
+		NativeFunction& addNativeMethod(FlyweightString context, FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags = BitFlagSet<Function::Flag>());
 
 		// Variables
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
@@ -96,7 +97,7 @@ namespace lemon
 
 		// Functions
 		uint32 mFirstFunctionID = 0;
-		std::vector<Function*> mFunctions;
+		std::vector<Function*> mFunctions;					// Contains both functions and methods
 		std::vector<ScriptFunction*> mScriptFunctions;
 		ObjectPool<ScriptFunction, 64> mScriptFunctionPool;
 		ObjectPool<NativeFunction, 32> mNativeFunctionPool;

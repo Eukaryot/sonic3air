@@ -79,12 +79,6 @@ namespace lemon
 			RMX_CHECK(str2.isValid(), "Unable to resolve string", return false);
 			return (str1.getString() >= str2.getString());
 		}
-
-		uint32 string_length(StringRef str)
-		{
-			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
-			return (uint32)str.getString().length();
-		}
 	}
 
 
@@ -95,7 +89,6 @@ namespace lemon
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL("#builtin_string_operator_less_equal");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_GREATER("#builtin_string_operator_greater");
 	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL("#builtin_string_operator_greater_equal");
-	BuiltInFunctions::FunctionName BuiltInFunctions::STRING_LENGTH("#builtin_string_length");
 
 
 	void BuiltInFunctions::registerBuiltInFunctions(lemon::Module& module)
@@ -118,6 +111,5 @@ namespace lemon
 		module.addNativeFunction(STRING_OPERATOR_LESS_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_less_or_equal), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_GREATER.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater), defaultFlags);
 		module.addNativeFunction(STRING_OPERATOR_GREATER_OR_EQUAL.makeFlyweightString(), lemon::wrap(&builtins::string_operator_greater_or_equal), defaultFlags);
-		module.addNativeFunction(STRING_LENGTH.makeFlyweightString(), lemon::wrap(&builtins::string_length), defaultFlags);
 	}
 }

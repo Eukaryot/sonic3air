@@ -72,10 +72,25 @@ namespace lemon
 		return (it == mFunctionsByName.end()) ? EMPTY_FUNCTIONS : it->second;
 	}
 
+	const std::vector<Function*>& GlobalsLookup::getMethodsByName(uint64 contextNameHash) const
+	{
+		static const std::vector<Function*> EMPTY_FUNCTIONS;
+		const auto it = mMethodsByName.find(contextNameHash);
+		return (it == mMethodsByName.end()) ? EMPTY_FUNCTIONS : it->second;
+	}
+
 	void GlobalsLookup::registerFunction(Function& function)
 	{
 		const uint64 nameHash = function.getName().getHash();
-		mFunctionsByName[nameHash].push_back(&function);
+		if (function.getContext().isEmpty())
+		{
+			mFunctionsByName[nameHash].push_back(&function);
+		}
+		else
+		{
+			const uint64 contextNameHash = function.getContext().getHash() + nameHash;
+			mMethodsByName[contextNameHash].push_back(&function);
+		}
 	}
 
 	void GlobalsLookup::registerGlobalVariable(Variable& variable)

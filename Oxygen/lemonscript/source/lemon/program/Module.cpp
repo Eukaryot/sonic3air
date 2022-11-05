@@ -141,25 +141,49 @@ namespace lemon
 	{
 		String content;
 		content << "// This file was auto-generated from the definitions in lemon script module '" << getModuleName() << "'.\r\n";
-		content << "\r\n";
 
-		for (const Function* function : mFunctions)
+		for (int pass = 0; pass < 2; ++pass)
 		{
-			if (function->getName().getString()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
-				continue;
+			// First pass: Regular functions -- Second pass: Methods
+			const bool outputMethods = (pass == 1);
 
-			content << "\r\n";
-			content << "declare function " << function->getReturnType()->getName().getString() << " " << function->getName().getString() << "(";
-			for (size_t i = 0; i < function->getParameters().size(); ++i)
+			content << "\r\n\r\n";
+			content << (outputMethods ? "// Methods (to be called on variables directly)" : "// Regular functions");
+			content << "\r\n\r\n";
+
+			for (const Function* function : mFunctions)
 			{
-				if (i != 0)
-					content << ", ";
-				const Function::Parameter& parameter = function->getParameters()[i];
-				content << parameter.mDataType->getName().getString();
-				if (parameter.mName.isValid())
-					content << " " << parameter.mName.getString();
+				const bool isMethod = !function->getContext().isEmpty();
+				if (isMethod != outputMethods)
+					continue;
+
+				if (function->getName().getString()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
+					continue;
+
+				content << "declare function " << function->getReturnType()->getName().getString() << " ";
+
+				size_t firstParam = 0;
+				if (outputMethods)
+				{
+					content << function->getContext().getString() << ":" << function->getName().getString() << "(";
+					firstParam = 1;
+				}
+				else
+				{
+					content << function->getName().getString() << "(";
+				}
+
+				for (size_t i = firstParam; i < function->getParameters().size(); ++i)
+				{
+					if (i > firstParam)
+						content << ", ";
+					const Function::Parameter& parameter = function->getParameters()[i];
+					content << parameter.mDataType->getName().getString();
+					if (parameter.mName.isValid())
+						content << " " << parameter.mName.getString();
+				}
+				content << ")\r\n\r\n";
 			}
-			content << ")\r\n";
 		}
 
 		content.saveFile(filename);
@@ -228,11 +252,26 @@ namespace lemon
 		return func;
 	}
 
+	NativeFunction& Module::addNativeMethod(FlyweightString context, FlyweightString name, const NativeFunction::FunctionWrapper& functionWrapper, BitFlagSet<Function::Flag> flags)
+	{
+		NativeFunction& func = mNativeFunctionPool.createObject();
+		func.mContext = context;
+		func.mName = name;
+		func.setFunction(functionWrapper);
+		func.mFlags = flags;
+
+		addFunctionInternal(func);
+		return func;
+	}
+
 	void Module::addFunctionInternal(Function& func)
 	{
 		RMX_ASSERT(mFunctions.size() < 0x10000, "Too many functions in module");
 		func.mID = mFirstFunctionID + (uint32)mFunctions.size();
-		func.mNameAndSignatureHash = func.mName.getHash() + func.getSignatureHash();
+		if (func.mContext.isEmpty())
+			func.mNameAndSignatureHash = func.mName.getHash() + func.getSignatureHash();
+		else
+			func.mNameAndSignatureHash = func.mContext.getHash() + func.mName.getHash() + func.getSignatureHash();
 		mFunctions.push_back(&func);
 	}
 

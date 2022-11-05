@@ -35,18 +35,19 @@ namespace lemon
 			enum class Type
 			{
 				UNDEFINED,
-				GLOBAL_VARIABLE,
+				VARIABLE,
 				CONSTANT,
 				CONSTANT_ARRAY,
 				DEFINE
 			};
 
 			inline Type getType() const  { return mType; }
+			inline bool isValid() const  { return mType != Type::UNDEFINED; }
 
-			inline void set(Variable* variable)			  { mType = Type::GLOBAL_VARIABLE; mPointer = variable; }
-			inline void set(Constant* constant)			  { mType = Type::CONSTANT;		   mPointer = constant; }
-			inline void set(ConstantArray* constantArray) { mType = Type::CONSTANT_ARRAY;  mPointer = constantArray; }
-			inline void set(Define* define)				  { mType = Type::DEFINE;		   mPointer = define; }
+			inline void set(Variable* variable)			  { mType = Type::VARIABLE;		  mPointer = variable; }
+			inline void set(Constant* constant)			  { mType = Type::CONSTANT;		  mPointer = constant; }
+			inline void set(ConstantArray* constantArray) { mType = Type::CONSTANT_ARRAY; mPointer = constantArray; }
+			inline void set(Define* define)				  { mType = Type::DEFINE;		  mPointer = define; }
 
 			template<typename T> const T& as() const  { return *static_cast<const T*>(mPointer); }
 
@@ -64,6 +65,7 @@ namespace lemon
 
 		// Functions
 		const std::vector<Function*>& getFunctionsByName(uint64 nameHash) const;
+		const std::vector<Function*>& getMethodsByName(uint64 contextNameHash) const;
 		void registerFunction(Function& function);
 
 		// Global variables
@@ -87,6 +89,7 @@ namespace lemon
 
 		// Functions
 		std::unordered_map<uint64, std::vector<Function*>> mFunctionsByName;	// Key is the hashed function name
+		std::unordered_map<uint64, std::vector<Function*>> mMethodsByName;		// Key is the sum of hashed context name + hashed function name
 		uint32 mNextFunctionID = 0;
 
 		// Global variables

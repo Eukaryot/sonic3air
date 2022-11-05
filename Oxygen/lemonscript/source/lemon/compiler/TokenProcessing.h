@@ -96,7 +96,6 @@ namespace lemon
 		CachedBuiltinFunction mBuiltinStringOperatorLessOrEqual;
 		CachedBuiltinFunction mBuiltinStringOperatorGreater;
 		CachedBuiltinFunction mBuiltinStringOperatorGreaterOrEqual;
-		CachedBuiltinFunction mBuiltinStringLength;
 	};
 
 }

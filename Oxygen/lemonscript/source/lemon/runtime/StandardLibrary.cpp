@@ -232,12 +232,13 @@ namespace lemon
 			return stringformat(format, 8, args);
 		}
 
-		uint32 strlen(StringRef string)
+		uint32 string_length(StringRef str)
 		{
-			return (string.isValid()) ? (uint32)string.getString().length() : 0;
+			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
+			return (uint32)str.getString().length();
 		}
 
-		uint8 getchar(StringRef string, uint32 index)
+		uint8 string_getCharacter(StringRef string, uint32 index)
 		{
 			if (!string.isValid())
 				return 0;
@@ -246,15 +247,15 @@ namespace lemon
 			return string.getString()[index];
 		}
 
-		uint64 substring(StringRef string, uint32 index, uint32 length)
+		StringRef string_getSubString(StringRef string, uint32 index, uint32 length)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
 			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
 			if (!string.isValid())
-				return 0;
+				return StringRef();
 
 			const std::string_view part = string.getString().substr(index, length);
-			return runtime->addString(part);
+			return StringRef(runtime->addString(part));
 		}
 
 		StringRef getStringFromHash(uint64 hash)
@@ -367,14 +368,25 @@ namespace lemon
 			.setParameterInfo(7, "arg7")
 			.setParameterInfo(8, "arg8");
 
-		module.addNativeFunction("strlen", lemon::wrap(&functions::strlen), defaultFlags)
+		module.addNativeFunction("strlen", lemon::wrap(&functions::string_length), defaultFlags)
 			.setParameterInfo(0, "str");
 
-		module.addNativeFunction("getchar", lemon::wrap(&functions::getchar), defaultFlags)
+		module.addNativeFunction("getchar", lemon::wrap(&functions::string_getCharacter), defaultFlags)
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index");
 
-		module.addNativeFunction("substring", lemon::wrap(&functions::substring), defaultFlags)
+		module.addNativeFunction("substring", lemon::wrap(&functions::string_getSubString), defaultFlags)
+			.setParameterInfo(0, "str")
+			.setParameterInfo(1, "index")
+			.setParameterInfo(2, "length");
+
+		module.addNativeMethod("string", "length", lemon::wrap(&functions::string_length), defaultFlags);
+
+		module.addNativeMethod("string", "getCharacter", lemon::wrap(&functions::string_getCharacter), defaultFlags)
+			.setParameterInfo(0, "str")
+			.setParameterInfo(1, "index");
+
+		module.addNativeMethod("string", "getSubString", lemon::wrap(&functions::string_getSubString), defaultFlags)
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index")
 			.setParameterInfo(2, "length");
