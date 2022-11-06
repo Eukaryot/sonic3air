@@ -193,6 +193,7 @@ function s16 checkStaticCollisionVerticalShort(u16 input.x, u16 input.y, u32 sen
 
 
 //# address-hook(0x00f3a4) end(0x00f3de)
+//# alias(fn00f3a4) deprecated
 function void CheckStaticCollisionVerticalShort()
 {
 	A5 = 0x00eff0
@@ -645,6 +646,7 @@ function void fn00f72e()
 
 
 //# address-hook(0x00f76e) end(0x00f7f8)
+//# alias(fn00f76e) deprecated
 function void CheckHitboxCollisionDownwards()
 {
 	// Check for ground collision at the borders of the character / object hitbox
@@ -749,6 +751,7 @@ function void fn00f846()
 
 
 //# address-hook(0x00f898) end(0x00f8e8)
+//# alias(fn00f898) deprecated
 function void Character.checkFloorEdgeCollision()
 {
 	Character.checkFloorEdgeCollisionAtY(objA0.position.y.u16 + s8(objA0.hitbox_extends.y))
@@ -756,6 +759,7 @@ function void Character.checkFloorEdgeCollision()
 
 
 //# address-hook(0x00f8a6)
+//# alias(fn00f8a6) deprecated
 function void Character.checkFloorEdgeCollisionFixedY()
 {
 	Character.checkFloorEdgeCollisionAtY(D2.u16)
@@ -836,6 +840,7 @@ function void fn00f994()
 
 
 //# address-hook(0x00f9ba) end(0x00fa16)
+//# alias(fn00f9ba) deprecated
 function void CheckHitboxCollisionRight()
 {
 	D3.u16 = objA0.position.x.u16 + s8(objA0.hitbox_extends.y)
@@ -873,6 +878,7 @@ function void fn00fa1a()
 
 
 //# address-hook(0x00fa7a) end(0x00fac0)
+//# alias(fn00fa7a) deprecated
 function void Character.CheckRightWallCollision()
 {
 	D2.u16 = objA0.position.y.u16
@@ -901,6 +907,7 @@ function void fn00faa4()
 	Character.CheckRightWallCollision.shared()
 }
 
+//# alias(fn00fa7a_shared) deprecated
 function void Character.CheckRightWallCollision.shared()
 {
 	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
@@ -913,6 +920,7 @@ function void Character.CheckRightWallCollision.shared()
 
 
 //# address-hook(0x00fac4) end(0x00faf0)
+//# alias(fn00fac4) deprecated
 function void CheckRightWallCollision()
 {
 	D3.u16 += objA0.position.x.u16
@@ -928,6 +936,7 @@ function void CheckRightWallCollision()
 
 
 //# address-hook(0x00faf2) end(0x00fb56)
+//# alias(fn00faf2) deprecated
 function void CheckHitboxCollisionUpwards()
 {
 	// Check for ceiling collision at the borders of the character / object hitbox
@@ -1002,6 +1011,7 @@ function void fn00fbee()
 
 
 //# address-hook(0x00fc12) end(0x00fc48)
+//# alias(fn00fc12) deprecated
 function void CheckCeilingCollision()
 {
 	D3.u16 = objA0.position.x.u16
@@ -1016,6 +1026,7 @@ function void CheckCeilingCollision()
 
 
 //# address-hook(0x00fc4a) end(0x00fc9e)
+//# alias(fn00fc4a) deprecated
 function void Character.checkCeilingEdgeCollision()
 {
 	Character.checkCeilingEdgeCollisionAtY((objA0.position.y.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f)
@@ -1023,6 +1034,7 @@ function void Character.checkCeilingEdgeCollision()
 
 
 //# address-hook(0x00fc5c)
+//# alias(fn00fc5c) deprecated
 function void Character.checkCeilingEdgeCollisionFixedY()
 {
 	Character.checkCeilingEdgeCollisionAtY(D2.u16)
@@ -1058,6 +1070,7 @@ function void fn00fca0()
 
 
 //# address-hook(0x00fcca) end(0x00fd2e)
+//# alias(fn00fcca) deprecated
 function void CheckHitboxCollisionLeft()
 {
 	D3.u16 = (objA0.position.x.u16 - s8(objA0.hitbox_extends.y)) ^ 0x0f
@@ -1094,6 +1107,7 @@ function void fn00fd32()
 
 
 //# address-hook(0x00fd9a) end(0x00fde8)
+//# alias(fn00fd9a) deprecated
 function void Character.CheckLeftWallCollision()
 {
 	D3.u16 = objA0.position.x.u16
@@ -1122,6 +1136,7 @@ function void fn00fdc8()
 	Character.CheckLeftWallCollision.shared()
 }
 
+//# alias(fn00fd9a_shared) deprecated
 function void Character.CheckLeftWallCollision.shared()
 {
 	D3.u16 ^= 0x0f
@@ -1135,6 +1150,7 @@ function void Character.CheckLeftWallCollision.shared()
 
 
 //# address-hook(0x00fe3c) end(0x00fe40)
+//# alias(fn00fe3c) deprecated
 function void CheckLeftWallCollision()
 {
 	D3.u16 = (D3.u16 + objA0.position.x.u16) ^ 0x0f
@@ -1156,6 +1172,7 @@ function void CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
 
 
 //# address-hook(0x00fe44) end(0x00fe6c)
+//# alias(fn00fe44) deprecated
 function void CheckLeftWallCollisionAtX()
 {
 	D2.u16 = objA0.position.y.u16

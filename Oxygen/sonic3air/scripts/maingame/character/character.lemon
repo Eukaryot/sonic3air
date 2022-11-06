@@ -4418,6 +4418,7 @@ function void PressedRightWhileUprightOnGround()
 
 
 //# address-hook(0x011060) end(0x01134c)
+//# alias(Character.UpdateUprightOnGroundInner) deprecated
 function void UpdateSonicUprightOnGroundInner()
 {
 	Character.updateUprightOnGroundInner()
@@ -6251,6 +6252,7 @@ function void SonicLandingBubbleBounce()
 
 
 //# address-hook(0x011fd6) end(0x011fec)
+//# alias(fn011fd6) deprecated
 function void Character.CheckFloorCollision()
 {
 	// Check for collision with floor, considering that gravity might be inversed
@@ -6267,6 +6269,7 @@ function void Character.CheckFloorCollision()
 
 
 //# address-hook(0x011fee) end(0x012004)
+//# alias(fn011fee) deprecated
 function void Character.CheckCeilingCollision()
 {
 	if (global.inv_gravity == 0)

@@ -493,6 +493,7 @@ function void SaveGameOnLevelFinished()
 
 
 //# address-hook(0x00c532) end(0x00c56c)
+//# alias(fn00c532) deprecated
 function void UpdateLivesContinuesInSaveGame()
 {
 	if (global.lock_on_state == 0 && global.active_saveslot != 0)

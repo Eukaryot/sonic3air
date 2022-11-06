@@ -101,119 +101,16 @@ function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u8 a
 // Functions that got proper names                       //
 //-------------------------------------------------------//
 
-function void fn00c532()
-{
-	UpdateLivesContinuesInSaveGame()
-}
-
-function void fn00f3a4()
-{
-	CheckStaticCollisionVerticalShort()
-}
-
-function void fn00f76e()
-{
-	CheckHitboxCollisionDownwards()
-}
-
-function void fn00f898()
-{
-	Character.checkFloorEdgeCollision()
-}
-
-function void fn00f8a6()
-{
-	Character.checkFloorEdgeCollisionFixedY()
-}
-
-function void fn00f9ba()
-{
-	CheckHitboxCollisionRight()
-}
-
-function void fn00fa7a()
-{
-	Character.CheckRightWallCollision()
-}
-
-function void fn00fa7a_shared()
-{
-	Character.CheckRightWallCollision.shared()
-}
-
-function void fn00fac4()
-{
-	CheckRightWallCollision()
-}
-
-function void fn00faf2()
-{
-	CheckHitboxCollisionUpwards()
-}
-
-function void fn00fc12()
-{
-	CheckCeilingCollision()
-}
-
-function void fn00fc4a()
-{
-	Character.checkCeilingEdgeCollision()
-}
-
-function void fn00fc5c()
-{
-	Character.checkCeilingEdgeCollisionFixedY()
-}
-
-function void fn00fcca()
-{
-	CheckHitboxCollisionLeft()
-}
-
-function void fn00fd9a()
-{
-	Character.CheckLeftWallCollision()
-}
-
-function void fn00fd9a_shared()
-{
-	Character.CheckLeftWallCollision.shared()
-}
-
-function void fn00fe3c()
-{
-	CheckLeftWallCollision()
-}
-
-function void fn00fe44()
-{
-	CheckLeftWallCollisionAtX()
-}
+// TODO: Replace all the rest here with alias pragmas for the functions
 
 function void fn00fe6e()
 {
 	CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
 }
 
-function void fn011fd6()
-{
-	Character.CheckFloorCollision()
-}
-
-function void fn011fee()
-{
-	Character.CheckCeilingCollision()
-}
-
 function void fn01cdb2()
 {
 	PathSwapperCompetitionMode_UpdateVertical()
-}
-
-function void Character.UpdateUprightOnGroundInner()
-{
-	UpdateSonicUprightOnGroundInner()
 }
 
 function void fn0105c4()
