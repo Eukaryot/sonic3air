@@ -1771,15 +1771,14 @@ function void fn239e9c()
 //# address-hook(0x239f18) end(0x239fb2)
 function void fn239f18()
 {
-	// This function probably sets line offsets in water (at least in AIZ)
-
+	// This function sets line offsets in water in AIZ 1
 	D7 = (D7 << 16) + (D7 >> 16)
 	D3 = (D3 << 16) + (D3 >> 16)
 
 	while (true)
 	{
 		D3.u16 = u16[(A4+=2)-2]
-		D7.u8 = (D3.s16 < 0) * 0xff
+		D7.u8 = (D3.s16 < 0) ? 0xff : 0x00
 		D3.u16 &= 0x7fff
 		D0.u16 -= D3.u16
 		if (D0.s16 < 0)
@@ -1829,7 +1828,6 @@ function void fn239f18()
 		else
 		{
 			D5.s16 = -s16[(A5+=2)-2]
-
 			while (D0.s16 >= 0)
 			{
 				D6.u16 = u16[(A2+=2)-2]
@@ -2189,8 +2187,7 @@ function void fn23b680()
 		D4.u16 = water.height.current - camera.foreground.y.u16
 		if (D4.u16 <= D1.u16)
 		{
-			D1.u16 = D4.u16
-			--D1.u16
+			D1.u16 = D4.u16 - 1
 			D2.u16 &= D3.u16
 			A6.u16 += D2.u16
 			fn239f18()

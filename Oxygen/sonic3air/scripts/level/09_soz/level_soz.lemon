@@ -632,6 +632,7 @@ function void fn04f1f0()
 {
 	D7 = (D7 << 16) + (D7 >> 16)
 	D3 = (D3 << 16) + (D3 >> 16)
+
 	while (true)
 	{
 		D3.u16 = u16[(A4+=2)-2]
@@ -641,13 +642,13 @@ function void fn04f1f0()
 		if (D0.s16 < 0)
 			break
 
-		if (D7.u8 != 0)
+		if (D7.u8 == 0)
 		{
-			A5 += D3.u16 * 2
+			A5 += 2
 		}
 		else
 		{
-			A5 += 2
+			A5 += D3.u16 * 2
 		}
 	}
 
@@ -662,40 +663,36 @@ function void fn04f1f0()
 	D4.u16 = D1.u16 - D0.u16
 	if (D4.s16 < 0)
 	{
-		D0.u16 = D1.u16 + 1
+		D0.u16 = D1.u16
+	}
+	else
+	{
+		--D0.u16
 	}
 
-	--D0.u16
 	while (true)
 	{
 		if (D7.u8 != 0)
 		{
-			while (true)
+			while (D0.s16 >= 0)
 			{
 				D6.u16 = u16[(A2+=2)-2]
 				D6 = (D6 << 16)
 				D6.u16 = u16[(A6+=2)-2] - s16[(A5+=2)-2]
 				u32[(A1+=4)-4] = D6
-
 				--D0.s16
-				if (D0.s16 < 0)
-					break
 			}
 		}
 		else
 		{
 			D5.s16 = -s16[(A5+=2)-2]
-
-			while (true)
+			while (D0.s16 >= 0)
 			{
 				D6.u16 = u16[(A2+=2)-2]
 				D6 = (D6 << 16)
 				D6.u16 = u16[(A6+=2)-2] + D5.u16
 				u32[(A1+=4)-4] = D6
-
 				--D0.s16
-				if (D0.s16 < 0)
-					break
 			}
 		}
 
@@ -705,15 +702,16 @@ function void fn04f1f0()
 		D0.u16 = u16[(A4+=2)-2]
 		D7.u8 = (D0.s16 < 0) ? 0xff : 0x00
 		D0.u16 &= 0x7fff
+
 		D5.u16 = D4.u16
 		D4.u16 -= D0.u16
-		if (D4.s16 >= 0)
+		if (D4.s16 < 0)
 		{
-			--D0.u16
+			D0.u16 = D5.u16
 		}
 		else
 		{
-			D0.u16 = D5.u16
+			--D0.u16
 		}
 	}
 
