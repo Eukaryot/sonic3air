@@ -62,20 +62,17 @@ namespace lemon
 	{
 		if (serializer.isReading())
 		{
-			const uint64 hash = serializer.read<uint64>();
 			const std::string_view stringView = serializer.readStringView(0xffff);
-			set(hash, stringView);
+			set(rmx::getMurmur2_64(stringView), stringView);
 		}
 		else
 		{
-			serializer.write(getHash());
 			serializer.write(getString(), 0xffff);
 		}
 	}
 
 	void FlyweightString::write(VectorBinarySerializer& serializer) const
 	{
-		serializer.write(getHash());
 		serializer.write(getString(), 0xffff);
 	}
 }
