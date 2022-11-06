@@ -85,11 +85,19 @@ namespace lemon
 		if (function.getContext().isEmpty())
 		{
 			mFunctionsByName[nameHash].push_back(&function);
+			for (const FlyweightString& str : function.getAliasNames())
+			{
+				mFunctionsByName[str.getHash()].push_back(&function);
+			}
 		}
 		else
 		{
-			const uint64 contextNameHash = function.getContext().getHash() + nameHash;
-			mMethodsByName[contextNameHash].push_back(&function);
+			const uint64 contextHash = function.getContext().getHash();
+			mMethodsByName[contextHash + nameHash].push_back(&function);
+			for (const FlyweightString& str : function.getAliasNames())
+			{
+				mMethodsByName[contextHash + str.getHash()].push_back(&function);
+			}
 		}
 	}
 

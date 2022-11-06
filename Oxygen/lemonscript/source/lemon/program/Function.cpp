@@ -196,7 +196,11 @@ namespace lemon
 			bool hadAddressHook = false;
 			for (const lemon::PragmaSplitter::Entry& entry : pragmaSplitter.mEntries)
 			{
-				if (entry.mArgument == "address-hook")
+				if (entry.mArgument == "alias")
+				{
+					mAliasNames.push_back(entry.mValue);
+				}
+				else if (entry.mArgument == "address-hook")
 				{
 					// Create address hook
 					RMX_CHECK(!entry.mValue.empty(), "Address hook must have a value", continue);

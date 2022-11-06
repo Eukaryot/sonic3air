@@ -535,6 +535,9 @@ namespace lemon
 							{
 								function.addOrProcessPragma(pragmaNode->mContent, mCompileOptions.mConsumeProcessedPragmas);
 							}
+
+							// Now register the function
+							mGlobalsLookup.registerFunction(function);
 							break;
 						}
 
@@ -693,9 +696,8 @@ namespace lemon
 			}
 		}
 
-		// Create function in program
-		ScriptFunction& function = mModule.addScriptFunction(functionName, returnType, &parameters);
-		mGlobalsLookup.registerFunction(function);
+		// Create function in module
+		ScriptFunction& function = mModule.addScriptFunction(functionName, returnType, parameters);
 
 		// Create new variables for parameters
 		for (const Function::Parameter& parameter : function.getParameters())
