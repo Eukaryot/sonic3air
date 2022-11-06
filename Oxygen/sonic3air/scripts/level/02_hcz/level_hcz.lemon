@@ -199,19 +199,28 @@ function void fn050c4c()
 		A2 = backupA2
 		A3 = backupA3
 
-		D0.u16 = 0x3600
+		u16 offsetX = 0x3600
+		D0.u16 = offsetX
 		D1 = 0
-		u16[0xffffb000 + 0x10] -= D0.u16
-		u16[0xffffb04a + 0x10] -= D0.u16
+		u16[0xffffb000 + 0x10] -= offsetX
+		u16[0xffffb04a + 0x10] -= offsetX
 		fn04f3b0()
 
-		camera.position.x.u16 -= D0.u16
-		camera.foreground.x.u16 -= D0.u16
-		move_area.left -= D0.u16
-		move_area.right -= D0.u16
+		camera.position.x.u16 -= offsetX
+		camera.foreground.x.u16 -= offsetX
+		move_area.left -= offsetX
+		move_area.right -= offsetX
 		Level.GetCameraPosition()
 
 		level.scrolling_routine = 0
+
+	#if STANDALONE
+		// Move the waves effect as well, to avoid a one-frame glitch here
+		if (u32[0xffffcf82] == 0x01f244)
+		{
+			u16[0xffffcf82 + 0x10] -= offsetX
+		}
+	#endif
 	}
 
 	UpdateBackground.HCZ1()
