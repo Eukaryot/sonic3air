@@ -18,24 +18,28 @@
 #include <lemon/program/GlobalsLookup.h>
 #include <lemon/program/Module.h>
 #include <lemon/program/Program.h>
+#include <lemon/runtime/StandardLibrary.h>
 #include <lemon/utility/PragmaSplitter.h>
 
 
 struct LemonScriptProgram::Internal
 {
-	lemon::Module mCoreModule;
+	lemon::Module mLemonCoreModule;
+	lemon::Module mOxygenCoreModule;
 	lemon::Module mScriptModule;
 	std::vector<lemon::Module*> mModModules;
 	std::vector<const Mod*> mLastModSelection;
 	lemon::Program mProgram;
 	LemonScriptBindings	mLemonScriptBindings;
+	lemon::GlobalsLookup mGlobalsLookupCoreOnly;
 
 	Hook mPreUpdateHook;
 	Hook mPostUpdateHook;
 	LinearLookupTable<Hook, 0x400000, 6, 1024> mAddressHooks;
 
 	inline Internal() :
-		mCoreModule("OxygenCore"),
+		mLemonCoreModule("LemonCore"),
+		mOxygenCoreModule("OxygenCore"),
 		mScriptModule("GameScript")
 	{}
 };
@@ -44,7 +48,8 @@ struct LemonScriptProgram::Internal
 LemonScriptProgram::LemonScriptProgram() :
 	mInternal(*new Internal())
 {
-	mInternal.mCoreModule.clear();
+	mInternal.mLemonCoreModule.clear();
+	mInternal.mOxygenCoreModule.clear();
 
 	// Register game-specific nativized code
 	EngineMain::getDelegate().registerNativizedCode(mInternal.mProgram);
@@ -58,22 +63,37 @@ LemonScriptProgram::~LemonScriptProgram()
 void LemonScriptProgram::startup()
 {
 	Configuration& config = Configuration::instance();
+	mInternal.mGlobalsLookupCoreOnly = lemon::GlobalsLookup();
 
-	// Register script bindings (user-defined variables and native functions)
+	// Setup lemon core module -- containing lemonscript standard library
+	{
+		lemon::Module& module = mInternal.mLemonCoreModule;
+		module.startCompiling(mInternal.mGlobalsLookupCoreOnly);
+		lemon::StandardLibrary::registerBindings(module);
+
+		// Set preprocessor definitions in core module
+		for (const auto& pair : config.mPreprocessorDefinitions.getDefinitions())
+		{
+			module.addPreprocessorDefinition(pair.second.mIdentifier, pair.second.mValue);
+		}
+		mInternal.mGlobalsLookupCoreOnly.addDefinitionsFromModule(module);
+	}
+
+	// Setup oxygen core module -- with Oxygen Engine specific bindings
 	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
 	//           and this in turn is the reason why there's a need for this separate startup function at all...
-	mInternal.mLemonScriptBindings.registerBindings(mInternal.mCoreModule);
-
-	// Set preprocessor definitions in core module
-	for (const auto& pair : config.mPreprocessorDefinitions.getDefinitions())
 	{
-		mInternal.mCoreModule.addPreprocessorDefinition(pair.second.mIdentifier, pair.second.mValue);
+		lemon::Module& module = mInternal.mOxygenCoreModule;
+		module.startCompiling(mInternal.mGlobalsLookupCoreOnly);
+		mInternal.mLemonScriptBindings.registerBindings(module);
+		mInternal.mGlobalsLookupCoreOnly.addDefinitionsFromModule(module);
 	}
 
 	// Optionally dump the core module script bindings into a generated script file for reference
 	if (!config.mDumpCppDefinitionsOutput.empty())
 	{
-		mInternal.mCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
+		mInternal.mLemonCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
+		mInternal.mOxygenCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput, true);
 	}
 }
 
@@ -168,8 +188,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 	}
 
 	Configuration& config = Configuration::instance();
-	lemon::GlobalsLookup globalsLookup;
-	globalsLookup.addDefinitionsFromModule(mInternal.mCoreModule);
+	lemon::GlobalsLookup globalsLookup = mInternal.mGlobalsLookupCoreOnly;	// Copy the definitions from the two core modules
 
 	// Clear program here already - in case compilation fails, it would be broken otherwise
 	mInternal.mProgram.clear();
@@ -178,7 +197,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 	if (mainScriptReloadNeeded)
 	{
 		mInternal.mScriptModule.clear();
-		const uint32 coreModuleDependencyHash = mInternal.mCoreModule.buildDependencyHash();
+		const uint32 coreModuleDependencyHash = mInternal.mLemonCoreModule.buildDependencyHash() + mInternal.mOxygenCoreModule.buildDependencyHash();
 
 		// Load scripts
 		std::vector<uint8> buffer;
@@ -279,7 +298,8 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 	}
 
 	// Build lemon script program from modules
-	mInternal.mProgram.addModule(mInternal.mCoreModule);
+	mInternal.mProgram.addModule(mInternal.mLemonCoreModule);
+	mInternal.mProgram.addModule(mInternal.mOxygenCoreModule);
 	mInternal.mProgram.addModule(mInternal.mScriptModule);
 	for (lemon::Module* module : mInternal.mModModules)
 	{

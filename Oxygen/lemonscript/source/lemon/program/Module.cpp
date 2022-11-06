@@ -137,29 +137,54 @@ namespace lemon
 		}
 	}
 
-	void Module::dumpDefinitionsToScriptFile(const std::wstring& filename)
+	void Module::dumpDefinitionsToScriptFile(const std::wstring& filename, bool append)
 	{
 		String content;
-		content << "// This file was auto-generated from the definitions in lemon script module '" << getModuleName() << "'.\r\n";
+		if (!append)
+		{
+			content << "// This file was auto-generated";
+		}
+		content << "\r\n\r\n\r\n";
+		content << "// === Module '" << getModuleName() << "' ===";
 
+		std::vector<const Function*> currentFunctions;
 		for (int pass = 0; pass < 2; ++pass)
 		{
 			// First pass: Regular functions -- Second pass: Methods
 			const bool outputMethods = (pass == 1);
 
-			content << "\r\n\r\n";
-			content << (outputMethods ? "// Methods (to be called on variables directly)" : "// Regular functions");
-			content << "\r\n\r\n";
-
+			currentFunctions.clear();
 			for (const Function* function : mFunctions)
 			{
 				const bool isMethod = !function->getContext().isEmpty();
-				if (isMethod != outputMethods)
-					continue;
+				if (isMethod == outputMethods)
+				{
+					if (function->getName().getString()[0] != '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
+					{
+						currentFunctions.push_back(function);
+					}
+				}
+			}
+			if (currentFunctions.empty())
+				continue;
 
-				if (function->getName().getString()[0] == '#')	// Exclude hidden built-ins (which can't be accessed by scripts directly anyways)
-					continue;
+			content << "\r\n\r\n";
+			content << (outputMethods ? "// Methods (to be called on variables directly)" : "// Regular functions");
+			content << "\r\n";
 
+			std::string lastPrefix = ".";		// Start with an invalid prefix so that first function will add a line break
+			for (const Function* function : currentFunctions)
+			{
+				// Separate functiosn with different prefixes
+				const size_t dot = function->getName().getString().find_first_of('.');
+				std::string_view prefix = (dot == std::string_view::npos) ? std::string_view() : function->getName().getString().substr(0, dot);
+				if (prefix != lastPrefix)
+				{
+					lastPrefix = prefix;
+					content << "\r\n";
+				}
+
+				// Output signature declaration
 				content << "declare function " << function->getReturnType()->getName().getString() << " ";
 
 				size_t firstParam = 0;
@@ -182,11 +207,13 @@ namespace lemon
 					if (parameter.mName.isValid())
 						content << " " << parameter.mName.getString();
 				}
-				content << ")\r\n\r\n";
+				content << ")\r\n";
 			}
 		}
 
-		content.saveFile(filename);
+		FileHandle fileHandle;
+		fileHandle.open(filename, append ? FILE_ACCESS_APPEND : FILE_ACCESS_WRITE);
+		fileHandle.write(&content[0], content.length());
 	}
 
 	const SourceFileInfo& Module::addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename)

@@ -39,7 +39,7 @@ namespace lemon
 
 		void startCompiling(const GlobalsLookup& globalsLookup);
 
-		void dumpDefinitionsToScriptFile(const std::wstring& filename);
+		void dumpDefinitionsToScriptFile(const std::wstring& filename, bool append = false);
 
 		const SourceFileInfo& addSourceFileInfo(const std::wstring& basepath, const std::wstring& filename);
 

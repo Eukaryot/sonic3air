@@ -1,449 +1,259 @@
-// This file was auto-generated from the definitions in lemon script module 'OxygenCore'.
+// This file was auto-generated
 
+
+// === Module 'LemonCore' ===
 
 // Regular functions
 
 declare function s8 min(s8, s8)
-
 declare function u8 min(u8, u8)
-
 declare function s16 min(s16, s16)
-
 declare function u16 min(u16, u16)
-
 declare function s32 min(s32, s32)
-
 declare function u32 min(u32, u32)
-
 declare function s8 max(s8, s8)
-
 declare function u8 max(u8, u8)
-
 declare function s16 max(s16, s16)
-
 declare function u16 max(u16, u16)
-
 declare function s32 max(s32, s32)
-
 declare function u32 max(u32, u32)
-
 declare function s8 clamp(s8, s8, s8)
-
 declare function u8 clamp(u8, u8, u8)
-
 declare function s16 clamp(s16, s16, s16)
-
 declare function u16 clamp(u16, u16, u16)
-
 declare function s32 clamp(s32, s32, s32)
-
 declare function u32 clamp(u32, u32, u32)
-
 declare function u8 abs(s8)
-
 declare function u16 abs(s16)
-
 declare function u32 abs(s32)
-
 declare function u32 sqrt(u32)
-
 declare function s16 sin_s16(s16)
-
 declare function s32 sin_s32(s32)
-
 declare function s16 cos_s16(s16)
-
 declare function s32 cos_s32(s32)
-
 declare function string stringformat(string format, u64 arg1)
-
 declare function string stringformat(string format, u64 arg1, u64 arg2)
-
 declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3)
-
 declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4)
-
 declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5)
-
 declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, u64 arg6)
-
 declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, u64 arg6, u64 arg7)
-
 declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3, u64 arg4, u64 arg5, u64 arg6, u64 arg7, u64 arg8)
-
 declare function u32 strlen(string str)
-
 declare function u8 getchar(string str, u32 index)
-
-declare function u64 substring(string str, u32 index, u32 length)
-
+declare function string substring(string str, u32 index, u32 length)
 declare function string getStringFromHash(u64 hash)
-
-declare function void assert(u8, string)
-
-declare function void assert(u8)
-
-declare function u8 _equal()
-
-declare function u8 _negative()
-
-declare function void _setZeroFlagByValue(u32 value)
-
-declare function void _setNegativeFlagByValue(s8 value)
-
-declare function void _setNegativeFlagByValue(s16 value)
-
-declare function void _setNegativeFlagByValue(s32 value)
-
-declare function void copyMemory(u32 destAddress, u32 sourceAddress, u32 bytes)
-
-declare function void zeroMemory(u32 startAddress, u32 bytes)
-
-declare function void fillMemory_u8(u32 startAddress, u32 bytes, u8 value)
-
-declare function void fillMemory_u16(u32 startAddress, u32 bytes, u16 value)
-
-declare function void fillMemory_u32(u32 startAddress, u32 bytes, u32 value)
-
-declare function void push(u32)
-
-declare function u32 pop()
-
-declare function u32 System.loadPersistentData(u32 targetAddress, string key, u32 bytes)
-
-declare function void System.savePersistentData(u32 sourceAddress, string key, u32 bytes)
-
-declare function u32 SRAM.load(u32 address, u16 offset, u16 bytes)
-
-declare function void SRAM.save(u32 address, u16 offset, u16 bytes)
-
-declare function s8 System.callFunctionByName(string functionName)
-
-declare function void System.setupCallFrame(string functionName)
-
-declare function void System.setupCallFrame(string functionName, string labelName)
-
-declare function s64 System.getGlobalVariableValueByName(string variableName)
-
-declare function void System.setGlobalVariableValueByName(string variableName, s64 value)
-
-declare function u32 System.rand()
-
-declare function u32 System.getPlatformFlags()
-
-declare function s8 System.hasPlatformFlag(u32 flag)
-
-declare function s8 System.hasExternalRawData(string key)
-
-declare function u32 System.loadExternalRawData(string key, u32 targetAddress, u32 offset, u32 maxBytes, s8 loadOriginalData, s8 loadModdedData)
-
-declare function u32 System.loadExternalRawData(string key, u32 targetAddress)
-
-declare function s8 System.hasExternalPaletteData(string key, u8 line)
-
-declare function u16 System.loadExternalPaletteData(string key, u8 line, u32 targetAddress, u8 maxColors)
-
-declare function u16 Input.getController(u8 controllerIndex)
-
-declare function u16 Input.getControllerPrevious(u8 controllerIndex)
-
-declare function u8 buttonDown(u8 index)
-
-declare function u8 buttonPressed(u8 index)
-
-declare function u8 Input.buttonDown(u8 index)
-
-declare function u8 Input.buttonPressed(u8 index)
-
-declare function void Input.setTouchInputMode(u8 index)
-
-declare function void Input.setControllerRumble(u8 playerIndex, u16 lowFrequencyRumble, u16 highFrequencyRumble, u32 milliseconds)
-
-declare function void Input.setControllerLEDs(u8 playerIndex, u32 color)
-
-declare function void yieldExecution()
-
-declare function u16 getScreenWidth()
-
-declare function u16 getScreenHeight()
-
-declare function u16 getScreenExtend()
-
-declare function void VDP.setupVRAMWrite(u16 vramAddress)
-
-declare function void VDP.setupVSRAMWrite(u16 vsramAddress)
-
-declare function void VDP.setupCRAMWrite(u16 cramAddress)
-
-declare function void VDP.setWriteIncrement(u16 increment)
-
-declare function u16 VDP.readData16()
-
-declare function u32 VDP.readData32()
-
-declare function void VDP.writeData16(u16 value)
-
-declare function void VDP.writeData32(u32 value)
-
-declare function void VDP.copyToVRAM(u32 address, u16 bytes)
-
-declare function void VDP.fillVRAMbyDMA(u16 fillValue, u16 vramAddress, u16 bytes)
-
-declare function void VDP.zeroVRAM(u16 bytes)
-
-declare function void VDP.copyToVRAMbyDMA(u32 sourceAddress, u16 vramAddress, u16 bytes)
-
-declare function void VDP.copyToCRAMbyDMA(u32 sourceAddress, u16 vramAddress, u16 bytes)
-
-declare function void VDP.Config.setActiveDisplay(u8 enable)
-
-declare function void VDP.Config.setNameTableBasePlaneB(u16 vramAddress)
-
-declare function void VDP.Config.setNameTableBasePlaneA(u16 vramAddress)
-
-declare function void VDP.Config.setNameTableBasePlaneW(u16 vramAddress)
-
-declare function void VDP.Config.setBackdropColor(u8 paletteIndex)
-
-declare function void VDP.Config.setVerticalScrolling(u8 verticalScrolling, u8 horizontalScrollMask)
-
-declare function void VDP.Config.setRenderingModeConfiguration(u8 shadowHighlightPalette)
-
-declare function void VDP.Config.setHorizontalScrollTableBase(u16 vramAddress)
-
-declare function void VDP.Config.setPlayfieldSizeInPatterns(u16 width, u16 height)
-
-declare function void VDP.Config.setPlayfieldSizeInPixels(u16 width, u16 height)
-
-declare function void VDP.Config.setupWindowPlane(u8 useWindowPlane, u16 splitY)
-
-declare function void VDP.Config.setPlaneWScrollOffset(u16 x, u8 y)
-
-declare function void VDP.Config.setSpriteAttributeTableBase(u16 vramAddress)
-
-declare function u16 getVRAM(u16 vramAddress)
-
-declare function void setVRAM(u16 vramAddress, u16 value)
-
-declare function void Renderer.setPaletteColor(u16 index, u32 color)
-
-declare function void Renderer.setPaletteColorPacked(u16 index, u16 color)
-
-declare function void Renderer.enableSecondaryPalette(u8 line)
-
-declare function void Renderer.setSecondaryPaletteColorPacked(u16 index, u16 color)
-
-declare function void Renderer.setScrollOffsetH(u8 setIndex, u16 lineNumber, u16 value)
-
-declare function void Renderer.setScrollOffsetV(u8 setIndex, u16 rowNumber, u16 value)
-
-declare function void Renderer.setHorizontalScrollNoRepeat(u8 setIndex, u8 enable)
-
-declare function void Renderer.setVerticalScrollOffsetBias(s16 bias)
-
-declare function void Renderer.enforceClearScreen(u8 enabled)
-
-declare function void Renderer.enableDefaultPlane(u8 planeIndex, u8 enabled)
-
-declare function void Renderer.setupPlane(s16 px, s16 py, s16 width, s16 height, u8 planeIndex, u8 scrollOffsets, u16 renderQueue)
-
-declare function void Renderer.resetCustomPlaneConfigurations()
-
-declare function void Renderer.resetSprites()
-
-declare function void Renderer.drawVdpSprite(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue)
-
-declare function void Renderer.drawVdpSpriteWithAlpha(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue, u8 alpha)
-
-declare function void Renderer.drawVdpSpriteTinted(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue, u32 tintColor, u32 addedColor)
-
-declare function s8 Renderer.hasCustomSprite(u64 key)
-
-declare function u64 Renderer.setupCustomUncompressedSprite(u32 sourceBase, u16 word, u32 mappingOffset, u8 animationSprite, u8 atex)
-
-declare function u64 Renderer.setupCustomCharacterSprite(u32 sourceBase, u32 tableAddress, u32 mappingOffset, u8 animationSprite, u8 atex)
-
-declare function u64 Renderer.setupCustomObjectSprite(u32 sourceBase, u32 tableAddress, u32 mappingOffset, u8 animationSprite, u8 atex)
-
-declare function u64 Renderer.setupKosinskiCompressedSprite(u32 sourceBase, u32 mappingOffset, u8 animationSprite, u8 atex)
-
-declare function u64 Renderer.setupKosinskiCompressedSprite(u32 sourceBase, u32 mappingOffset, u8 animationSprite, u8 atex, s16 indexOffset)
-
-declare function void Renderer.drawSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue)
-
-declare function void Renderer.drawSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u8 alpha)
-
-declare function void Renderer.drawSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
-
-declare function void Renderer.drawSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scaleX, s32 scaleY)
-
-declare function void Renderer.drawSpriteTransformed(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
-
-declare function void Renderer.extractCustomSprite(u64 key, string categoryName, u8 spriteNumber, u8 atex)
-
-declare function void Renderer.addSpriteMask(s16 px, s16 py, s16 width, s16 height, u16 renderQueue, u8 priorityFlag)
-
-declare function void Renderer.addSpriteMaskWorld(s16 px, s16 py, s16 width, s16 height, u16 renderQueue, u8 priorityFlag)
-
-declare function void Renderer.setLogicalSpriteSpace(u8 space)
-
-declare function void Renderer.clearSpriteTag()
-
-declare function void Renderer.setSpriteTagWithPosition(u64 spriteTag, u16 px, u16 py)
-
-declare function void Renderer.setScreenSize(u16 width, u16 height)
-
-declare function void Renderer.resetViewport(u16 renderQueue)
-
-declare function void Renderer.setViewport(s16 px, s16 py, s16 width, s16 height, u16 renderQueue)
-
-declare function void Renderer.setGlobalComponentTint(s16 tintR, s16 tintG, s16 tintB, s16 addedR, s16 addedG, s16 addedB)
-
-declare function void setWorldSpaceOffset(s32 px, s32 py)
-
-declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height)
-
-declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
-
-declare function void Renderer.drawText(string fontKey, s32 px, s32 py, string text, u32 tintColor, u8 alignment, s8 spacing, u16 renderQueue, s8 useWorldSpace)
-
-declare function s32 Renderer.getTextWidth(string fontKey, string text)
-
-declare function u8 Audio.getAudioKeyType(u64 sfxId)
-
-declare function s8 Audio.isPlayingAudio(u64 sfxId)
-
-declare function void Audio.playAudio(u64 sfxId, u8 contextId)
-
-declare function void Audio.playAudio(u64 sfxId)
-
-declare function void Audio.stopChannel(u8 channel)
-
-declare function void Audio.fadeInChannel(u8 channel, u16 length)
-
-declare function void Audio.fadeOutChannel(u8 channel, u16 length)
-
-declare function void Audio.playOverride(u64 sfxId, u8 contextId, u8 channelId, u8 overriddenChannelId)
-
-declare function void Audio.enableAudioModifier(u8 channel, u8 context, string postfix, u32 relativeSpeed)
-
-declare function void Audio.disableAudioModifier(u8 channel, u8 context)
-
-declare function u8 Mods.isModActive(string modName)
-
-declare function s32 Mods.getModPriority(string modName)
-
-declare function void debugLog(string text)
-
-declare function void debugLogColors(string name, u32 startAddress, u8 numColors)
-
-declare function void debugWatch(u32 address, u16 bytes)
-
-declare function void debugDumpToFile(string filename, u32 startAddress, u32 bytes)
-
-declare function s8 ROMDataAnalyser.isEnabled()
-
-declare function s8 ROMDataAnalyser.hasEntry(string category, u32 address)
-
-declare function void ROMDataAnalyser.beginEntry(string category, u32 address)
-
-declare function void ROMDataAnalyser.endEntry()
-
-declare function void ROMDataAnalyser.addKeyValue(string key, string value)
-
-declare function void ROMDataAnalyser.beginObject(string key)
-
-declare function void ROMDataAnalyser.endObject()
-
-declare function s8 System.SidePanel.setupCustomCategory(string shortName, string fullName)
-
-declare function s8 System.SidePanel.addOption(string text, s8 defaultValue)
-
-declare function void System.SidePanel.addEntry(u64 key)
-
-declare function void System.SidePanel.addLine(string text, s8 indent, u32 color)
-
-declare function void System.SidePanel.addLine(string text, s8 indent)
-
-declare function s8 System.SidePanel.isEntryHovered(u64 key)
-
-declare function void System.writeDisplayLine(string text)
-
-declare function u32 Game.getSetting(u32 settingId)
-
-declare function s8 Game.isSecretUnlocked(u32 secretId)
-
-declare function void Game.setSecretUnlocked(u32 secretId)
-
-declare function void Game.triggerRestart()
-
-declare function void Game.onGamePause(u8 canRestart)
-
-declare function void Game.allowRestartInGamePause(u8 canRestart)
-
-declare function void Game.onLevelStart()
-
-declare function void Game.onZoneActCompleted(u16 zoneAndAct)
-
-declare function u16 Game.onTriggerNextZone(u16 zoneAndAct)
-
-declare function u16 Game.onFadedOutLoadingZone(u16 zoneAndAct)
-
-declare function s8 Game.onCharacterDied(u8 playerIndex)
-
-declare function void Game.returnToMainMenu()
-
-declare function s8 Game.isNormalGame()
-
-declare function s8 Game.isTimeAttack()
-
-declare function s8 Game.onTimeAttackFinish()
-
-declare function void Game.changePlanePatternRectAtex(u16 px, u16 py, u16 width, u16 height, u8 planeIndex, u8 atex)
-
-declare function void Game.setupBlueSpheresGroundSprites()
-
-declare function void Game.writeBlueSpheresData(u32 targetAddress, u32 sourceAddress, u16 px, u16 py, u8 rotation)
-
-declare function s32 Game.getAchievementValue(u32 achievementId)
-
-declare function void Game.setAchievementValue(u32 achievementId, s32 value)
-
-declare function s8 Game.isAchievementComplete(u32 achievementId)
-
-declare function void Game.setAchievementComplete(u32 achievementId)
-
-declare function void Game.startSkippableCutscene()
-
-declare function void Game.endSkippableCutscene()
-
-declare function void Game.setDiscordDetails(string text)
-
-declare function void Game.setDiscordState(string text)
-
-declare function void Game.setDiscordLargeImage(string imageName)
-
-declare function void Game.setDiscordSmallImage(string imageName)
-
-declare function void Game.setUnderwaterAudioEffect(u8 value)
-
-declare function void Kosinski.Decompress()
-
-declare function void WriteScrollOffsets()
-
-declare function void WriteScrollOffsetsFlipped()
-
-declare function u32 putNybbles(u32 input, u16 count, u8 value)
-
-declare function void uncompressKosinskiData(u32 sourceAddress, u16 targetInVRAM)
-
 
 
 // Methods (to be called on variables directly)
 
 declare function u32 string:length()
-
 declare function u8 string:getCharacter(u32 index)
+declare function string string:getSubString(u32 index, u32 length)
 
-declare function u64 string:getSubString(u32 index, u32 length)
 
+
+// === Module 'OxygenCore' ===
+
+// Regular functions
+
+declare function void assert(u8, string)
+declare function void assert(u8)
+declare function u8 _equal()
+declare function u8 _negative()
+declare function void _setZeroFlagByValue(u32 value)
+declare function void _setNegativeFlagByValue(s8 value)
+declare function void _setNegativeFlagByValue(s16 value)
+declare function void _setNegativeFlagByValue(s32 value)
+declare function void copyMemory(u32 destAddress, u32 sourceAddress, u32 bytes)
+declare function void zeroMemory(u32 startAddress, u32 bytes)
+declare function void fillMemory_u8(u32 startAddress, u32 bytes, u8 value)
+declare function void fillMemory_u16(u32 startAddress, u32 bytes, u16 value)
+declare function void fillMemory_u32(u32 startAddress, u32 bytes, u32 value)
+declare function void push(u32)
+declare function u32 pop()
+
+declare function u32 System.loadPersistentData(u32 targetAddress, string key, u32 bytes)
+declare function void System.savePersistentData(u32 sourceAddress, string key, u32 bytes)
+
+declare function u32 SRAM.load(u32 address, u16 offset, u16 bytes)
+declare function void SRAM.save(u32 address, u16 offset, u16 bytes)
+
+declare function s8 System.callFunctionByName(string functionName)
+declare function void System.setupCallFrame(string functionName)
+declare function void System.setupCallFrame(string functionName, string labelName)
+declare function s64 System.getGlobalVariableValueByName(string variableName)
+declare function void System.setGlobalVariableValueByName(string variableName, s64 value)
+declare function u32 System.rand()
+declare function u32 System.getPlatformFlags()
+declare function s8 System.hasPlatformFlag(u32 flag)
+declare function s8 System.hasExternalRawData(string key)
+declare function u32 System.loadExternalRawData(string key, u32 targetAddress, u32 offset, u32 maxBytes, s8 loadOriginalData, s8 loadModdedData)
+declare function u32 System.loadExternalRawData(string key, u32 targetAddress)
+declare function s8 System.hasExternalPaletteData(string key, u8 line)
+declare function u16 System.loadExternalPaletteData(string key, u8 line, u32 targetAddress, u8 maxColors)
+
+declare function u16 Input.getController(u8 controllerIndex)
+declare function u16 Input.getControllerPrevious(u8 controllerIndex)
+
+declare function u8 buttonDown(u8 index)
+declare function u8 buttonPressed(u8 index)
+
+declare function u8 Input.buttonDown(u8 index)
+declare function u8 Input.buttonPressed(u8 index)
+declare function void Input.setTouchInputMode(u8 index)
+declare function void Input.setControllerRumble(u8 playerIndex, u16 lowFrequencyRumble, u16 highFrequencyRumble, u32 milliseconds)
+declare function void Input.setControllerLEDs(u8 playerIndex, u32 color)
+
+declare function void yieldExecution()
+declare function u16 getScreenWidth()
+declare function u16 getScreenHeight()
+declare function u16 getScreenExtend()
+
+declare function void VDP.setupVRAMWrite(u16 vramAddress)
+declare function void VDP.setupVSRAMWrite(u16 vsramAddress)
+declare function void VDP.setupCRAMWrite(u16 cramAddress)
+declare function void VDP.setWriteIncrement(u16 increment)
+declare function u16 VDP.readData16()
+declare function u32 VDP.readData32()
+declare function void VDP.writeData16(u16 value)
+declare function void VDP.writeData32(u32 value)
+declare function void VDP.copyToVRAM(u32 address, u16 bytes)
+declare function void VDP.fillVRAMbyDMA(u16 fillValue, u16 vramAddress, u16 bytes)
+declare function void VDP.zeroVRAM(u16 bytes)
+declare function void VDP.copyToVRAMbyDMA(u32 sourceAddress, u16 vramAddress, u16 bytes)
+declare function void VDP.copyToCRAMbyDMA(u32 sourceAddress, u16 vramAddress, u16 bytes)
+declare function void VDP.Config.setActiveDisplay(u8 enable)
+declare function void VDP.Config.setNameTableBasePlaneB(u16 vramAddress)
+declare function void VDP.Config.setNameTableBasePlaneA(u16 vramAddress)
+declare function void VDP.Config.setNameTableBasePlaneW(u16 vramAddress)
+declare function void VDP.Config.setBackdropColor(u8 paletteIndex)
+declare function void VDP.Config.setVerticalScrolling(u8 verticalScrolling, u8 horizontalScrollMask)
+declare function void VDP.Config.setRenderingModeConfiguration(u8 shadowHighlightPalette)
+declare function void VDP.Config.setHorizontalScrollTableBase(u16 vramAddress)
+declare function void VDP.Config.setPlayfieldSizeInPatterns(u16 width, u16 height)
+declare function void VDP.Config.setPlayfieldSizeInPixels(u16 width, u16 height)
+declare function void VDP.Config.setupWindowPlane(u8 useWindowPlane, u16 splitY)
+declare function void VDP.Config.setPlaneWScrollOffset(u16 x, u8 y)
+declare function void VDP.Config.setSpriteAttributeTableBase(u16 vramAddress)
+
+declare function u16 getVRAM(u16 vramAddress)
+declare function void setVRAM(u16 vramAddress, u16 value)
+
+declare function void Renderer.setPaletteColor(u16 index, u32 color)
+declare function void Renderer.setPaletteColorPacked(u16 index, u16 color)
+declare function void Renderer.enableSecondaryPalette(u8 line)
+declare function void Renderer.setSecondaryPaletteColorPacked(u16 index, u16 color)
+declare function void Renderer.setScrollOffsetH(u8 setIndex, u16 lineNumber, u16 value)
+declare function void Renderer.setScrollOffsetV(u8 setIndex, u16 rowNumber, u16 value)
+declare function void Renderer.setHorizontalScrollNoRepeat(u8 setIndex, u8 enable)
+declare function void Renderer.setVerticalScrollOffsetBias(s16 bias)
+declare function void Renderer.enforceClearScreen(u8 enabled)
+declare function void Renderer.enableDefaultPlane(u8 planeIndex, u8 enabled)
+declare function void Renderer.setupPlane(s16 px, s16 py, s16 width, s16 height, u8 planeIndex, u8 scrollOffsets, u16 renderQueue)
+declare function void Renderer.resetCustomPlaneConfigurations()
+declare function void Renderer.resetSprites()
+declare function void Renderer.drawVdpSprite(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue)
+declare function void Renderer.drawVdpSpriteWithAlpha(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue, u8 alpha)
+declare function void Renderer.drawVdpSpriteTinted(s16 px, s16 py, u8 encodedSize, u16 patternIndex, u16 renderQueue, u32 tintColor, u32 addedColor)
+declare function s8 Renderer.hasCustomSprite(u64 key)
+declare function u64 Renderer.setupCustomUncompressedSprite(u32 sourceBase, u16 word, u32 mappingOffset, u8 animationSprite, u8 atex)
+declare function u64 Renderer.setupCustomCharacterSprite(u32 sourceBase, u32 tableAddress, u32 mappingOffset, u8 animationSprite, u8 atex)
+declare function u64 Renderer.setupCustomObjectSprite(u32 sourceBase, u32 tableAddress, u32 mappingOffset, u8 animationSprite, u8 atex)
+declare function u64 Renderer.setupKosinskiCompressedSprite(u32 sourceBase, u32 mappingOffset, u8 animationSprite, u8 atex)
+declare function u64 Renderer.setupKosinskiCompressedSprite(u32 sourceBase, u32 mappingOffset, u8 animationSprite, u8 atex, s16 indexOffset)
+declare function void Renderer.drawSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue)
+declare function void Renderer.drawSprite(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u8 alpha)
+declare function void Renderer.drawSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scale)
+declare function void Renderer.drawSpriteTinted(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u8 angle, u32 tintColor, s32 scaleX, s32 scaleY)
+declare function void Renderer.drawSpriteTransformed(u64 key, s16 px, s16 py, u16 atex, u8 flags, u16 renderQueue, u32 tintColor, s32 transform11, s32 transform12, s32 transform21, s32 transform22)
+declare function void Renderer.extractCustomSprite(u64 key, string categoryName, u8 spriteNumber, u8 atex)
+declare function void Renderer.addSpriteMask(s16 px, s16 py, s16 width, s16 height, u16 renderQueue, u8 priorityFlag)
+declare function void Renderer.addSpriteMaskWorld(s16 px, s16 py, s16 width, s16 height, u16 renderQueue, u8 priorityFlag)
+declare function void Renderer.setLogicalSpriteSpace(u8 space)
+declare function void Renderer.clearSpriteTag()
+declare function void Renderer.setSpriteTagWithPosition(u64 spriteTag, u16 px, u16 py)
+declare function void Renderer.setScreenSize(u16 width, u16 height)
+declare function void Renderer.resetViewport(u16 renderQueue)
+declare function void Renderer.setViewport(s16 px, s16 py, s16 width, s16 height, u16 renderQueue)
+declare function void Renderer.setGlobalComponentTint(s16 tintR, s16 tintG, s16 tintB, s16 addedR, s16 addedG, s16 addedB)
+
+declare function void setWorldSpaceOffset(s32 px, s32 py)
+
+declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height)
+declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
+
+declare function void Renderer.drawText(string fontKey, s32 px, s32 py, string text, u32 tintColor, u8 alignment, s8 spacing, u16 renderQueue, s8 useWorldSpace)
+declare function s32 Renderer.getTextWidth(string fontKey, string text)
+
+declare function u8 Audio.getAudioKeyType(u64 sfxId)
+declare function s8 Audio.isPlayingAudio(u64 sfxId)
+declare function void Audio.playAudio(u64 sfxId, u8 contextId)
+declare function void Audio.playAudio(u64 sfxId)
+declare function void Audio.stopChannel(u8 channel)
+declare function void Audio.fadeInChannel(u8 channel, u16 length)
+declare function void Audio.fadeOutChannel(u8 channel, u16 length)
+declare function void Audio.playOverride(u64 sfxId, u8 contextId, u8 channelId, u8 overriddenChannelId)
+declare function void Audio.enableAudioModifier(u8 channel, u8 context, string postfix, u32 relativeSpeed)
+declare function void Audio.disableAudioModifier(u8 channel, u8 context)
+
+declare function u8 Mods.isModActive(string modName)
+declare function s32 Mods.getModPriority(string modName)
+
+declare function void debugLog(string text)
+declare function void debugLogColors(string name, u32 startAddress, u8 numColors)
+declare function void debugWatch(u32 address, u16 bytes)
+declare function void debugDumpToFile(string filename, u32 startAddress, u32 bytes)
+
+declare function s8 ROMDataAnalyser.isEnabled()
+declare function s8 ROMDataAnalyser.hasEntry(string category, u32 address)
+declare function void ROMDataAnalyser.beginEntry(string category, u32 address)
+declare function void ROMDataAnalyser.endEntry()
+declare function void ROMDataAnalyser.addKeyValue(string key, string value)
+declare function void ROMDataAnalyser.beginObject(string key)
+declare function void ROMDataAnalyser.endObject()
+
+declare function s8 System.SidePanel.setupCustomCategory(string shortName, string fullName)
+declare function s8 System.SidePanel.addOption(string text, s8 defaultValue)
+declare function void System.SidePanel.addEntry(u64 key)
+declare function void System.SidePanel.addLine(string text, s8 indent, u32 color)
+declare function void System.SidePanel.addLine(string text, s8 indent)
+declare function s8 System.SidePanel.isEntryHovered(u64 key)
+declare function void System.writeDisplayLine(string text)
+
+declare function u32 Game.getSetting(u32 settingId)
+declare function s8 Game.isSecretUnlocked(u32 secretId)
+declare function void Game.setSecretUnlocked(u32 secretId)
+declare function void Game.triggerRestart()
+declare function void Game.onGamePause(u8 canRestart)
+declare function void Game.allowRestartInGamePause(u8 canRestart)
+declare function void Game.onLevelStart()
+declare function void Game.onZoneActCompleted(u16 zoneAndAct)
+declare function u16 Game.onTriggerNextZone(u16 zoneAndAct)
+declare function u16 Game.onFadedOutLoadingZone(u16 zoneAndAct)
+declare function s8 Game.onCharacterDied(u8 playerIndex)
+declare function void Game.returnToMainMenu()
+declare function s8 Game.isNormalGame()
+declare function s8 Game.isTimeAttack()
+declare function s8 Game.onTimeAttackFinish()
+declare function void Game.changePlanePatternRectAtex(u16 px, u16 py, u16 width, u16 height, u8 planeIndex, u8 atex)
+declare function void Game.setupBlueSpheresGroundSprites()
+declare function void Game.writeBlueSpheresData(u32 targetAddress, u32 sourceAddress, u16 px, u16 py, u8 rotation)
+declare function s32 Game.getAchievementValue(u32 achievementId)
+declare function void Game.setAchievementValue(u32 achievementId, s32 value)
+declare function s8 Game.isAchievementComplete(u32 achievementId)
+declare function void Game.setAchievementComplete(u32 achievementId)
+declare function void Game.startSkippableCutscene()
+declare function void Game.endSkippableCutscene()
+declare function void Game.setDiscordDetails(string text)
+declare function void Game.setDiscordState(string text)
+declare function void Game.setDiscordLargeImage(string imageName)
+declare function void Game.setDiscordSmallImage(string imageName)
+declare function void Game.setUnderwaterAudioEffect(u8 value)
+
+declare function void Kosinski.Decompress()
+
+declare function void WriteScrollOffsets()
+declare function void WriteScrollOffsetsFlipped()
+declare function u32 putNybbles(u32 input, u16 count, u8 value)
+declare function void uncompressKosinskiData(u32 sourceAddress, u16 targetInVRAM)
