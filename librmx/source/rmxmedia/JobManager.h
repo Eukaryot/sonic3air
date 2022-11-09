@@ -58,6 +58,7 @@ namespace rmx
 		//     but that's probably overkill anyways if the number of active jobs is not more than a few dozens
 		std::vector<JobBase*> mJobs;
 		uint32 mNextDelayedJobTicks = 0;
+		bool mSearchforJobs = true;
 	};
 
 

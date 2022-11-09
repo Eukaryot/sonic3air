@@ -116,7 +116,7 @@ namespace
 	{
 		uint8* destPointer = EmulatorInterface::instance().getMemoryPointer(destAddress, true, bytes);
 		uint8* sourcePointer = EmulatorInterface::instance().getMemoryPointer(sourceAddress, false, bytes);
-		memcpy(destPointer, sourcePointer, bytes);
+		memmove(destPointer, sourcePointer, bytes);
 	}
 
 	void zeroMemory(uint32 startAddress, uint32 bytes)
