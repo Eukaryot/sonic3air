@@ -27,6 +27,17 @@ This repository is split into several different projects:
 * S3AIR-specific C++ code, scripts and data in the "Oxygen/sonic3air" directory. Yes, that's what it's named.
 
 
+## How to build
+
+For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/sonic3air/build":
+* Windows: "_vstudio"
+* Mac:     "_xcode"
+* Linux:   "_cmake"
+* Android: "_android"
+* Web:     "_emscripten"
+* Switch:  "_make"
+
+
 ## External dependencies
 
 External libraries and code used in this project:
@@ -42,15 +53,30 @@ External libraries and code used in this project:
 * Hqx upscaler shader code & data files - in "Oxygen/oxygenengine/data/shader" and once more in "Oxygen/sonic3air/data/shader"
 
 
-## How to build
+## Contributors
 
-For information on how to build for different platforms, find the readme files in the respective subdirectories of "Oxygen/sonic3air/build":
-* Windows: "_vstudio"
-* Mac:     "_xcode"
-* Linux:   "_cmake"
-* Android: "_android"
-* Web:     "_emscripten"
-* Switch:  "_make"
+Thanks to all contributors!
+
+Source code contributions by:
+* Sappharad
+* Heyjoeway
+* Carjem Generations
+* Ultracoolguy
+
+Remastered soundtrack by:
+* G Spindash
+
+Game scripts & other contributions by:
+* Vinegar
+* Thorn
+* Legobouwer
+* GFX32
+* Dynamic Lemons
+* HazelSpooder
+* iCloudius
+* D.A. Garden
+* Alieneer
+* 3Pills
 
 
 ## Want to contribute?
