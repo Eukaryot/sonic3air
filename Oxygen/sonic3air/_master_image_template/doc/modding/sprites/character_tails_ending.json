@@ -1,4 +1,4 @@
 {
-	"character_tails_ending_0x00": { "File": "character_tails_ending.bmp", "Rect": "8,8,24,40", "Center": "18,22" },
-	"character_tails_ending_0x01": { "File": "character_tails_ending.bmp", "Rect": "40,8,24,40", "Center": "18,22" }
+	"character_tails_ending_0x00": { "File": "character_tails_ending.bmp", "Rect": "8,8,24,40", "Center": "12,20" },
+	"character_tails_ending_0x01": { "File": "character_tails_ending.bmp", "Rect": "40,8,24,40", "Center": "12,20" }
 }
