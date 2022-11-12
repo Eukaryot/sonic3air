@@ -99,7 +99,8 @@ define objA0.collision_attributes	=  u8[A0 + 0x28]	// Determines the type of int
 	constant u8 collision.size.40x40		= 0x38
 
 	constant u8 collision_attributes.flags	= 0xc0		// Bit mask for type of collision box assigned to the object
-	constant u8 collision_flag.DESTRUCTIBLE	= 0x00		// Enemies or objects that can be destroyed or hit
+	constant u8 collision_flag.DESTRUCTIBLE	= 0x00		// Deprecated, use the below define instead
+	constant u8 collision.flag.DESTRUCTIBLE	= 0x00		// Enemies or objects that can be destroyed or hit
 	constant u8 collision.flag.ITEM			= 0x40		// Rings or monitors
 	constant u8 collision.flag.THREAT		= 0x80		// Harmful objects, usually spikes or objects with spikes
 	constant u8 collision.flag.SPECIAL		= 0xc0		// Special interactions handled on a per object basis. e.g. checkpoints and bumpers

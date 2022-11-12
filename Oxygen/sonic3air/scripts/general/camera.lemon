@@ -271,16 +271,16 @@ function void UpdateCameraPositionY()
 		D0.s16 -= 5
 	}
 
-	#if STANDALONE
-		// Prevent the infamous level wrap glitch
-		if (Game.getSetting(SETTING_FIX_GLITCHES) && level.vertical_wrap == 0xff00)
+#if STANDALONE
+	// Prevent the infamous level wrap glitch
+	if (Game.getSetting(SETTING_FIX_GLITCHES) && level.vertical_wrap == 0xff00)
+	{
+		if (D0.s16 > level.height.bitmask / 2)
 		{
-			if (D0.s16 > level.height.bitmask / 2)
-			{
-				D0.s16 -= level.height.bitmask
-			}
+			D0.s16 -= level.height.bitmask
 		}
-	#endif
+	}
+#endif
 
 	D1 = D3.u16
 	if (competition_mode.active)

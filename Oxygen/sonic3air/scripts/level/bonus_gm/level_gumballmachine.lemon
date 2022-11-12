@@ -21,7 +21,7 @@ function void InitLevelTiles.BonusGM()
 	gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
 #if STANDALONE
 	verticalScrollOffsetBias = getScreenExtend() & 0x0f
-	u8[0x818080] = 0	// Do not use the custom vetical scroll offsets buffer
+	u8[0x818080] = 0	// Do not use the custom vertical scroll offsets buffer
 #endif
 
 	D0.u16 = 0xc0
@@ -108,7 +108,7 @@ function void fn23efca()
 
 
 //# address-hook(0x23efec) end(0x23effa)
-function void fn23efec()
+function void InitLevelScrolling.BonusGM()
 {
 	fn23f012()
 	fn23a01e()

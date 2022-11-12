@@ -355,7 +355,7 @@ function void fn023c8e()
 {
 	fn023cdc()
 	objA0.position.y.u16 = u16[A0 + 0x34] + u8[A0 + 0x36]
-	fn0230de()
+	SpringHorizontal.Update.CompetitionMode()
 }
 
 
@@ -372,7 +372,7 @@ function void fn023caa()
 {
 	fn023cdc()
 	objA0.position.x.u16 = u8[A0 + 0x36] + objA0.value32
-	fn022f46()
+	SpringVertical.Update.CompetitionMode()
 }
 
 
@@ -389,7 +389,7 @@ function void fn023cc6()
 {
 	fn023cdc()
 	objA0.position.x.u16 = u8[A0 + 0x36] + objA0.value32
-	fn023374()
+	SpringVerticalFlipped.Update.CompetitionMode()
 }
 
 

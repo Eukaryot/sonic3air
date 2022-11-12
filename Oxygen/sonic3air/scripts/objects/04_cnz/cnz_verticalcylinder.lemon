@@ -239,8 +239,7 @@ function void fn033ade()
 		{
 			objA1.velocity.x = -0x800
 			objA1.velocity.y = -0x200
-			u8[A1 + 0x2a] |= char.flag.FACING_LEFT
-			u8[A1 + 0x2a] |= char.flag.IN_AIR
+			u8[A1 + 0x2a] |= (char.flag.FACING_LEFT | char.flag.IN_AIR)
 			u8[A1 + 0x40] = 0
 
 			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16

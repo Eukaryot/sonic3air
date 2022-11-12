@@ -165,8 +165,7 @@ function void fn028f40()
 	u16[A1 + 0x1c] = 0
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A1 + 0x40] = 0
-	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-	u8[A1 + 0x2a] &= ~char.flag.ROLLING
+	u8[A1 + 0x2a] &= ~(char.flag.ON_OBJECT | char.flag.ROLLING)
 	u8[A1 + 0x20] = 0
 	objA0.flags2a &= ~bit
 	u8[A4] = 0x20

@@ -375,7 +375,7 @@ function void TriggerNextZone()
 	// Decide on the next zone's start location -- either the default or an alternative one
 	//  - 0 is the default
 	//  - 1 is Sonic's and Tails' path
-	//  - 2 is Knuckles's path
+	//  - 2 is Knuckles' path
 	level.start_location = 0
 	if (D0.u16 == 0x0300)
 	{

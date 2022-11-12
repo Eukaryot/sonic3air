@@ -149,8 +149,7 @@ function void AIZ1.ChangeBackgroundForKnuckles()
 //# address-hook(0x04fa4c) end(0x04fad6)
 function void fn04fa4c()
 {
-	u32[0xfffffcf0] = u32[0x04fae4]
-	u32[0xfffffcf4] = u32[0x04fae8]
+	copyMemory(0xfffffcf0, 0x04fae4, 8)
 
 	fillMemory_u16(0xffff4c70, 0x10, 0x004b)
 	fillMemory_u16(0xffff4cf0, 0x10, 0x004b)
@@ -331,7 +330,7 @@ function void fn04fbea()
 		u32[A1+4] = 0x00ae00ce
 		u32[A1+8] = 0x02ee0aee
 
-		camera.background.y = 0x0200000
+		camera.background.y = 0x200000
 		camera.background.y.old = 0x0010
 		level.display_routine = 0x0068
 		gfx.plane_update_routine = 0x04		// Enter vertical scroll mode
@@ -1118,8 +1117,7 @@ function void fn01c46e()
 			{
 				A1 = 0xfffffc70
 				A2 = 0x04fae4
-				u32[(A1+=4)-4] = u32[(A2+=4)-4]
-				u32[A1] = u32[A2]
+				copyMemory((A1+=4)-4, (A2+=4)-4, 8)
 			}
 
 			// Make Tails fly in

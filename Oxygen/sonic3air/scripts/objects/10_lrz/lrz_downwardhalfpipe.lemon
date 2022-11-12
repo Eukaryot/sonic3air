@@ -114,8 +114,7 @@ function void fn042636()
 	u8[A1 + 0x1e] = u8[A1 + 0x44]
 	u8[A1 + 0x1f] = u8[A1 + 0x45]
 	u8[A1 + 0x2a] &= 0x89
-	u8[A1 + 0x2a] |= char.flag.ON_OBJECT
-	u8[A1 + 0x2a] |= char.flag.IN_AIR
+	u8[A1 + 0x2a] |= (char.flag.ON_OBJECT | char.flag.IN_AIR)
 	u8[A1 + 0x40] = 0
 	u8[A1 + 0x26] = 0
 	u8[A1 + 0x27] = 0

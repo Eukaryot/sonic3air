@@ -80,7 +80,7 @@ function void fn02e410()
 	}
 	else
 	{
-		// Counting bonusses towards score
+		// Counting bonuses towards score
 		u16 delta = 10
 	#if STANDALONE
 		if (Game.getSetting(SETTING_LEVELRESULT_SCORE))

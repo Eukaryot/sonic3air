@@ -388,7 +388,7 @@ function void fn045b94()
 	}
 	else
 	{
-		// Sonic's / Tails's HPZ teleporter (part of the HPZ cutscene)
+		// Sonic's / Tails' HPZ teleporter (part of the HPZ cutscene)
 		A1 = 0xffff0000 + u16[A0 + 0x2e]
 		if (objA1.position.x.u16 < 0x1000)
 		{

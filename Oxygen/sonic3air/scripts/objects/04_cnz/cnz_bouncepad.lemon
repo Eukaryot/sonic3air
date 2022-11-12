@@ -78,8 +78,7 @@ function void fn0329b8()
 
 		u8[A1 + 0x40] = 0
 		objA1.flags2a |= char.flag.IN_AIR
-		objA1.flags2a &= ~char.flag.CONTROL_LOCK
-		u8[A1 + 0x2a] &= ~char.flag.PUSHING
+		objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 
 		playSound(0x7b)
 	}

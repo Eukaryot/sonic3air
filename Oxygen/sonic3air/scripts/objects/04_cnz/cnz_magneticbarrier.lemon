@@ -141,7 +141,7 @@ function void fn032010()
 					}
 
 					D1.s16 >>= 2
-					if (u8[A1 + 0x38] != 0x01)
+					if (u8[A1 + 0x38] != CHARACTER_TAILS)
 					{
 						D1.s16 >>= 1
 					}

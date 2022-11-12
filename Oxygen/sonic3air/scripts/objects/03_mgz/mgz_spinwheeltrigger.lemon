@@ -138,8 +138,7 @@ function void fn025ea6()
 	D0.s32 = (s32(D0.s16) * -0x0700) >> 8
 	objA1.velocity.y = D0.u16
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
-	objA1.flags2a &= ~char.flag.CONTROL_LOCK
-	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.ON_OBJECT)
 	u8[A1 + 0x40] = 0
 	u8[A1 + 0x3d] = 0
 	playSound(0x7b)

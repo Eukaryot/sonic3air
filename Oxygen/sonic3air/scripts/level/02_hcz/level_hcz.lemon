@@ -393,7 +393,7 @@ function void UpdateBackground.HCZ1()
 
 
 //# address-hook(0x01c87e) end(0x01c888)
-function void fn01c87e()
+function void UpdateCameraBounds.HCZ1()
 {
 	// Targets:
 	//  - 0x01c892	-> camera.update_routine = 0x00
@@ -461,7 +461,7 @@ function void UpdateLevelTiles.HCZ2()
 
 
 //# address-hook(0x050e9c) end(0x050eee)
-function void UpdateLevelScrolling.HCZ2()
+function void InitLevelScrolling.HCZ2()
 {
 	if (camera.position.x.u16 < 0x0c00 && camera.position.y.u16 >= 0x0500)
 	{
@@ -493,7 +493,7 @@ function void UpdateLevelScrolling.HCZ2()
 
 
 //# address-hook(0x050ef2) end(0x050ef6)
-function void fn050ef2()
+function void UpdateScrolling.HCZ2()
 {
 	call 0x050efa + level.scrolling_routine
 }
@@ -796,7 +796,7 @@ function void fn0510da()
 
 
 //# address-hook(0x01c8f6) end(0x01c900)
-function void fn01c8f6()
+function void UpdateCameraBounds.HCZ2()
 {
 	// Targets:
 	//  - 0x01c908	-> camera.update_routine = 0x00

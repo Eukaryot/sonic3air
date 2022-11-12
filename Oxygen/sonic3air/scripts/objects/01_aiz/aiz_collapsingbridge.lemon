@@ -279,8 +279,7 @@ function void fn02af9c()
 			}
 		}
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-		u8[A1 + 0x2a] &= ~char.flag.PUSHING
+		u8[A1 + 0x2a] &= ~(char.flag.ON_OBJECT | char.flag.PUSHING)
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x21] = char.state.RUNNING2
 	}

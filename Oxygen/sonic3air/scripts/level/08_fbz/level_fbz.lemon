@@ -625,10 +625,7 @@ function void InitLevelScrolling.FBZ1()
 		u8[0xffffeed6] = 0xff
 		A1 = 0x052dd0
 		A5 = 0xfffffce4
-		u32[(A5+=4)-4] = u32[(A1+=4)-4]
-		u32[(A5+=4)-4] = u32[(A1+=4)-4]
-		u32[(A5+=4)-4] = u32[(A1+=4)-4]
-		u32[(A5+=4)-4] = u32[(A1+=4)-4]
+		copyMemory((A5+=16)-16, (A1+=16)-16, 16)
 
 		fn052a2a()
 		fn04f2f6()
@@ -1268,10 +1265,7 @@ function void fn052c3e()
 function void fn052c42()
 {
 	A5 = 0xfffffc64
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
+	copyMemory((A5+=16)-16, (A1+=16)-16, 16)
 	level.scrolling_routine = D0.u16
 
 	fn052a2a()
@@ -1392,10 +1386,7 @@ function void fn052cd4()
 function void fn052cd8()
 {
 	A5 = 0xfffffc64
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
+	copyMemory((A5+=16)-16, (A1+=16)-16, 16)
 	level.scrolling_routine = D0.u16
 	fn052a2a()
 	fn04f2f6()
@@ -1685,19 +1676,13 @@ function void fn052f32()
 	A6 = 0xfffffce2
 	u16[(A5+=2)-2] = 0x0eee
 	u16[(A6+=2)-2] = 0x0eee
-	u32[(A5+=4)-4] = u32[A1]
-	u32[(A6+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[A1]
-	u32[(A6+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[A1]
-	u32[(A6+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[A1]
-	u32[(A6+=4)-4] = u32[(A1+=4)-4]
+	copyMemory((A5+=16)-16, A1, 16)
+	copyMemory((A6+=16)-16, (A1+=16)-16, 16)
 }
 
 
 //# address-hook(0x052fa8) end(0x053018)
-function void fn052fa8()
+function void InitLevelScrolling.FBZ2()
 {
 	if (allocDynamicObjectStd())
 	{
@@ -1742,7 +1727,7 @@ function void fn052fa8()
 
 
 //# address-hook(0x05301c) end(0x053020)
-function void fn05301c()
+function void UpdateLevelScrolling.FBZ2()
 {
 	D0.u16 = level.scrolling_routine
 	call 0x053024 + D0.s16
@@ -2090,10 +2075,7 @@ function void fn05327a()
 function void fn05327e()
 {
 	A5 = 0xfffffc64
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
-	u32[(A5+=4)-4] = u32[(A1+=4)-4]
+	copyMemory((A5+=16)-16, (A1+=16)-16, 16)
 	level.scrolling_routine = D0.u16
 
 	fn052a2a()

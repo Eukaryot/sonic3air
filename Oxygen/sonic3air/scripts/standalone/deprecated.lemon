@@ -273,6 +273,16 @@ function void fn0193ca()
 	HyperSonicStars.CreateSparks()
 }
 
+function void fn01c87e()
+{
+	UpdateCameraBounds.HCZ1()
+}
+
+function void fn01c8f6()
+{
+	UpdateCameraBounds.HCZ2()
+}
+
 function void fn01d6c2()
 {
 	MonitorIntact.CheckBlocking.player2()
@@ -315,7 +325,7 @@ function void SpringHorizontal.Check()
 
 function void fn0230de()
 {
-	SpringHorizontal.Check.CompetitionMode()
+	SpringHorizontal.Update.CompetitionMode()
 }
 
 function void fn023160()
@@ -363,6 +373,41 @@ function void fn02cfc0()
 	Checkpoint.Init()
 }
 
+function void UpdateLevelScrolling.HCZ2()
+{
+	InitLevelScrolling.HCZ2()
+}
+
+function void fn050ef2()
+{
+	UpdateScrolling.HCZ2()
+}
+
+function void fn052fa8()
+{
+	InitLevelScrolling.FBZ2()
+}
+
+function void fn05301c()
+{
+	UpdateLevelScrolling.FBZ2()
+}
+
+function void fn0541f0()
+{
+	UpdateLevelScrolling.LBZ1()
+}
+
+function void fn0551aa()
+{
+	UpdateLevelScrolling.MHZ2()
+}
+
+function void fn05937e()
+{
+	InitLevelScrolling.DEZ1()
+}
+
 function void fn084464()
 {
 	Object.AnimationProgressByLocalA1.CheckFlipX()
@@ -401,4 +446,74 @@ function void fn0855f8()
 function void fn085b8a()
 {
 	StopCharacterWinPose.player1()
+}
+
+function void fn23a63c()
+{
+	InitLevelTiles.CompetitonModeLevel_shared()
+}
+
+function void fn23a68a()
+{
+	UpdateLevelTiles.CompetitonModeLevel_shared()
+}
+
+function void fn23a6ac()
+{
+	UpdateLevelTiles.CGZ()
+}
+
+function void fn23a6cc()
+{
+	InitLevelScrolling.ALZ()
+}
+
+function void fn23a6d2()
+{
+	InitLevelScrolling.BPZ()
+}
+
+function void fn23a6d8()
+{
+	InitLevelScrolling.DPZ()
+}
+
+function void fn23a6de()
+{
+	InitLevelScrolling.CGZ()
+}
+
+function void fn23a716()
+{
+	InitLevelScrolling.EMZ()
+}
+
+function void fn23a73e()
+{
+	UpdateLevelScrolling.ALZ()
+}
+
+function void fn23a748()
+{
+	UpdateLevelScrolling.BPZ()
+}
+
+function void fn23a796()
+{
+	UpdateLevelScrolling.DPZ()
+}
+
+function void fn23a752()
+{
+	UpdateLevelScrolling.CGZ()
+}
+
+function void fn23a75c()
+{
+	UpdateLevelScrolling.EMZ()
+}
+
+function void fn23efec()
+{
+	InitLevelScrolling.BonusGM()
 }

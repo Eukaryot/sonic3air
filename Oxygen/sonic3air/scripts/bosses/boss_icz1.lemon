@@ -171,8 +171,7 @@ function void Boss.ICZ1.GotoState06()
 function void fn071272()
 {
 	A2 = 0xfffffade
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
+	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
 	u16[A2] = 0
 }
 
@@ -378,8 +377,7 @@ function void fn071420()
 	objA0.update_address = 0x071440
 	A1 = 0x0719fa
 	A2 = 0xfffffade
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
+	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
 	u16[A2] = 0
 	u32[0xfffffada] = 0x0852a0
 }

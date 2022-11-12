@@ -226,8 +226,7 @@ function void fn03a480()
 		u8[A2 + 0x04] = render_flag.FLIP_X
 		u16[A2 + 0x06] = u16[A0 + 0x40]
 
-		objA1.render_flags &= ~render_flag.FLIP_X
-		objA1.render_flags &= ~render_flag.FLIP_Y
+		objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
 		fn03a314()
 		return

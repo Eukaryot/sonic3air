@@ -298,8 +298,7 @@ function void fn06f0ce()
 	u16[0xfffffc3e] = 0x0eee
 	A1 = 0x06fae0
 	A2 = 0xfffffade
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
-	u32[(A2+=4)-4] = u32[(A1+=4)-4]
+	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
 	u16[A2] = 0
 	u32[0xfffffada] = 0x0852a0
 	DrawObject()

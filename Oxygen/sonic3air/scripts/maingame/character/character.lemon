@@ -3094,8 +3094,7 @@ function void KnucklesPressedJumpInMidAir()
 #endif
 
 	// Start gliding
-	char.flags &= ~char.flag.ROLLING
-	char.flags &= ~char.flag.CONTROL_LOCK
+	char.flags &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
 	char.hitbox_extends.y = 10
 	char.hitbox_extends.x = 10
 	char.double_jump_state = 1
@@ -4400,8 +4399,7 @@ function void PressedRightWhileUprightOnGround()
 	{
 		if (char.flags & char.flag.FACING_LEFT)
 		{
-			char.flags &= ~char.flag.FACING_LEFT
-			char.flags &= ~char.flag.PUSHING
+			char.flags &= ~(char.flag.FACING_LEFT | char.flag.PUSHING)
 			char.state.former = char.state.RUNNING2
 		}
 
@@ -6174,11 +6172,9 @@ function void Character.LandingOnGroundStandUp()
 
 function void Character.LandingOnGroundResetState()
 {
-	char.flags &= ~char.flag.IN_AIR
-	char.flags &= ~char.flag.PUSHING
-	char.flags &= ~char.flag.CONTROL_LOCK
+	char.flags &= ~(char.flag.IN_AIR | char.flag.PUSHING | char.flag.CONTROL_LOCK)
 	char.jumping = 0
-	score.bonus_counter = 0		// No more increasing bonusses after hitting the ground
+	score.bonus_counter = 0		// No more increasing bonuses after hitting the ground
 	char.rotation.x = 0
 	u8[A0 + 0x2d] = 0
 	u8[A0 + 0x30] = 0

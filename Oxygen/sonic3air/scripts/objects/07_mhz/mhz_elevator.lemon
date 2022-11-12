@@ -65,8 +65,7 @@ function void fn03e2b0()
 		if (allocDynamicObjectAfterA0())
 		{
 			objA1.update_address = 0x03e472
-			objA1.render_flags |= render_flag.WORLD
-			objA1.render_flags |= render_flag.FLIP_X
+			objA1.render_flags |= (render_flag.WORLD | render_flag.FLIP_X)
 			objA1.box_size.y = 0x30
 			objA1.box_size.x = 0x0c
 			objA1.sprite_priority = objA0.sprite_priority

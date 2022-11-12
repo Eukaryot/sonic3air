@@ -165,8 +165,7 @@ function void fn0205de()
 			if (objA0.flags2a & bit)
 			{
 				objA0.flags2a &= ~bit
-				objA1.flags2a &= ~char.flag.ON_OBJECT
-				objA1.flags2a &= ~char.flag.PUSHING
+				objA1.flags2a &= ~(char.flag.ON_OBJECT | char.flag.PUSHING)
 				objA1.flags2a |= char.flag.IN_AIR
 				u8[A1 + 0x21] = char.state.RUNNING2
 			}

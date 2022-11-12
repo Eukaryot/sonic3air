@@ -355,8 +355,7 @@ function void fn00730c()
 				objA1.position.y.u16 += s8(u8[A1 + 0x1e] - 0x0e)
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
-				objA1.flags2a &= ~char.flag.ROLLING
-				objA1.flags2a &= ~char.flag.CONTROL_LOCK
+				objA1.flags2a &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
 				u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 
 				D0.u8 = global.framecounter & 0x0f
@@ -377,8 +376,7 @@ function void fn00730c()
 		{
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
-			objA1.flags2a &= ~char.flag.ROLLING
-			objA1.flags2a &= ~char.flag.CONTROL_LOCK
+			objA1.flags2a &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
 			u8[A1 + 0x20] = char.state.RUNNING
 		}
 	}

@@ -52,7 +52,7 @@ function void fn23a080()
 
 
 //# address-hook(0x23a73e) end(0x23a746)
-function void fn23a73e()
+function void UpdateLevelScrolling.ALZ()
 {
 	fn23a7d0()
 	A4 = 0x23aa58
@@ -64,7 +64,7 @@ function void fn23a73e()
 // Azure Lake
 
 //# address-hook(0x23a63c) end(0x23a686)
-function void fn23a63c()
+function void InitLevelTiles.CompetitonModeLevel_shared()
 {
 	fn23a03c()
 	D0.u16 = camera.foreground.x.u16
@@ -90,7 +90,7 @@ function void fn23a63c()
 
 
 //# address-hook(0x23a68a) end(0x23a6a8)
-function void fn23a68a()
+function void UpdateLevelTiles.CompetitonModeLevel_shared()
 {
 	fn23a03c()
 
@@ -111,10 +111,10 @@ function void fn23a68a()
 
 
 //# address-hook(0x23a6ac) end(0x23a6c8)
-function void fn23a6ac()
+function void UpdateLevelTiles.CGZ()
 {
 	// Used in CGZ
-	fn23a68a()
+	UpdateLevelTiles.CompetitonModeLevel_shared()
 	D2.u16 = level.height.bitmask + 1
 	D3.u16 = D2.u16
 	D2.u16 >>= 1
@@ -129,31 +129,31 @@ function void fn23a6ac()
 
 
 //# address-hook(0x23a6cc) end(0x23a6d0)
-function void fn23a6cc()
+function void InitLevelScrolling.ALZ()
 {
-	fn23a73e()
+	UpdateLevelScrolling.ALZ()
 	fn23a71a()
 }
 
 
 //# address-hook(0x23a6d2) end(0x23a6d6)
-function void fn23a6d2()
+function void InitLevelScrolling.BPZ()
 {
-	fn23a748()
+	UpdateLevelScrolling.BPZ()
 	fn23a71a()
 }
 
 
 //# address-hook(0x23a6d8) end(0x23a6dc)
-function void fn23a6d8()
+function void InitLevelScrolling.DPZ()
 {
-	fn23a796()
+	UpdateLevelScrolling.DPZ()
 	fn23a71a()
 }
 
 
 //# address-hook(0x23a6de) end(0x23a714)
-function void fn23a6de()
+function void InitLevelScrolling.CGZ()
 {
 	// Loads the CGZ background
 	D0.u16 = camera.foreground.y.u16
@@ -166,15 +166,15 @@ function void fn23a6de()
 	D0 = ((competition_mode.laps + 1) << 8) - 0x70
 	u16[0xffffeeda] = u32(0x900000) / D0.u16
 
-	fn23a752()
+	UpdateLevelScrolling.CGZ()
 	fn23a71a()
 }
 
 
 //# address-hook(0x23a716) end(0x23a716)
-function void fn23a716()
+function void InitLevelScrolling.EMZ()
 {
-	fn23a75c()
+	UpdateLevelScrolling.EMZ()
 	fn23a71a()
 }
 
@@ -197,7 +197,7 @@ function void fn23a71a()
 // Balloon Park
 
 //# address-hook(0x23a748) end(0x23a750)
-function void fn23a748()
+function void UpdateLevelScrolling.BPZ()
 {
 	fn23a88e()
 	A4 = 0x23aa6e
@@ -209,7 +209,7 @@ function void fn23a748()
 // Chrome Gadget
 
 //# address-hook(0x23a752) end(0x23a75a)
-function void fn23a752()
+function void UpdateLevelScrolling.CGZ()
 {
 	fn23a924()
 	A4 = 0x23aa7c
@@ -218,7 +218,7 @@ function void fn23a752()
 
 
 //# address-hook(0x23a75c) end(0x23a760)
-function void fn23a75c()
+function void UpdateLevelScrolling.EMZ()
 {
 	fn23a980()
 	A4 = 0x23aa86
@@ -251,7 +251,7 @@ function void fn23a764()
 // Desert Palace
 
 //# address-hook(0x23a796) end(0x23a7b6)
-function void fn23a796()
+function void UpdateLevelScrolling.DPZ()
 {
 	fn23a8dc()
 

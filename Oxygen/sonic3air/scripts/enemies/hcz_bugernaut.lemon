@@ -176,7 +176,7 @@ function void fn087b56()
 			}
 		}
 
-		A2 = A2 + 0x4a
+		A2 += 0x4a
 		--D0.s16
 	}
 

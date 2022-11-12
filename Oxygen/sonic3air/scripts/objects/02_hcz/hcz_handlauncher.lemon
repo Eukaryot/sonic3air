@@ -251,11 +251,9 @@ function void fn030cf8()
 			playSound(SFX_ROLL)
 
 			u8[A1 + 0x20] = 0
-			u8[A1 + 0x1e] = (objA1.update_address == 0x01365c) ? 0x0f : 0x13
+			u8[A1 + 0x1e] = (objA1.update_address == 0x01365c) ? 0x0f : 0x13		// Checking for Tails, might be clearer to check `u8[A1 + 0x38] == CHARACTER_TAILS` instead
 			u8[A1 + 0x1f] = 0x09
-			u8[A1 + 0x2a] &= ~0x01
-			u8[A1 + 0x2a] &= ~char.flag.ROLLING
-			u8[A1 + 0x2a] &= ~char.flag.PUSHING
+			u8[A1 + 0x2a] &= ~(0x01 | char.flag.ROLLING | char.flag.PUSHING)
 			u8[A1 + 0x2e] = 1
 			objA1.position.x.u16 = objA0.position.x.u16 - 2
 			u16[A1 + 0x1c] = 0x1000

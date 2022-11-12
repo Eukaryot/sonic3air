@@ -674,8 +674,7 @@ function void fn06e058()
 
 				A1 = 0x06e43a
 				A2 = 0xfffffade
-				u32[(A2+=4)-4] = u32[(A1+=4)-4]
-				u32[(A2+=4)-4] = u32[(A1+=4)-4]
+				copyMemory((A2+=8)-8, (A1+=8)-8, 8)
 			}
 		}
 

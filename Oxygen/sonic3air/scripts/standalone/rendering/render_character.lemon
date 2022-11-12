@@ -366,6 +366,11 @@ function string getCharacterResultsNameplate(u8 character)
 	return (character == CHARACTER_SONIC) ? "result_nameplate_sonic" : (character == CHARACTER_TAILS) ? ((global.region_code & 0x80) ? "result_nameplate_tails" : "result_nameplate_miles") : "result_nameplate_knuckles"
 }
 
+function string getCharacterSelectSpriteKey(u8 character)
+{
+	return (character == CHARACTER_SONIC) ? "charselect_sonic" : (character == CHARACTER_TAILS) ? "charselect_tails" : "charselect_knuckles"
+}
+
 function string getCharacterSpriteKey(u8 character)
 {
 	bool isSuperActive = (character == CHARACTER_TAILS) ? super.active.tails : super.active

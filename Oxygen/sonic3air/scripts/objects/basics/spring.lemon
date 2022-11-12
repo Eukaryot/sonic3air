@@ -452,7 +452,7 @@ function void SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
 // Horizontal spring in competition mode
 
 //# address-hook(0x0230de) end(0x02315a)
-function void SpringHorizontal.Check.CompetitionMode()
+function void SpringHorizontal.Update.CompetitionMode()
 {
 	for (u8 characterIndex = 0; characterIndex < 2; ++characterIndex)
 	{
@@ -462,8 +462,8 @@ function void SpringHorizontal.Check.CompetitionMode()
 		D4.u16 = objA0.position.x.u16
 
 		u32 characterAddress = 0xffffb000 + characterIndex * 0x4a
-		u8 bitnum = 3 + characterIndex
-		if (fn01dcb6_internal(characterAddress, bitnum))
+		D6 = 3 + characterIndex		// Seems like this value needs to be in D6, otherwise it causes a strange camera/player 2 bug in ALZ
+		if (fn01dcb6_internal(characterAddress, D6.u8))
 		{
 			fn01df90()
 		}

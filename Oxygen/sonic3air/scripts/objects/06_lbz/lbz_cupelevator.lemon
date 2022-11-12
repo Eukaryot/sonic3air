@@ -536,8 +536,7 @@ function void fn026eb4()
 		objA0.flags2a &= ~bit
 		objA1.sprite_priority = 0x0100
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-		u8[A1 + 0x2a] &= ~char.flag.PUSHING
+		u8[A1 + 0x2a] &= ~(char.flag.ON_OBJECT | char.flag.PUSHING)
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 	}
 }
@@ -609,8 +608,7 @@ function void fn026eda()
 			objA1.sprite_priority = 0x0100
 			u8[A1 + 0x2e] = 0
 			objA0.flags2a &= ~bit
-			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-			u8[A1 + 0x2a] &= ~char.flag.PUSHING
+			u8[A1 + 0x2a] &= ~(char.flag.ON_OBJECT | char.flag.PUSHING)
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			u8[A1 + 0x40] = 0
 			#if STANDALONE

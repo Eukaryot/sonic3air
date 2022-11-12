@@ -343,13 +343,13 @@ function void fn0628aa()
 	}
 
 	// Targets:
-	//  - 0x00628e0	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x006290e	-> objA0.base_state = 0x02  -> Waiting
-	//  - 0x0062928	-> objA0.base_state = 0x04  -> Boxing
-	//  - 0x0062942	-> objA0.base_state = 0x06  -> Knuckles chuckles
-	//  - 0x0062964	-> objA0.base_state = 0x08  -> Losing his balance when Death Egg starts
-	//  - 0x00629a8	-> objA0.base_state = 0x0a  -> Falling into the water
-	//  - 0x00629c0	-> objA0.base_state = 0x0c  -> ...aaand he's gone
+	//  - 0x0628e0	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x06290e	-> objA0.base_state = 0x02  -> Waiting
+	//  - 0x062928	-> objA0.base_state = 0x04  -> Boxing
+	//  - 0x062942	-> objA0.base_state = 0x06  -> Knuckles chuckles
+	//  - 0x062964	-> objA0.base_state = 0x08  -> Losing his balance when Death Egg starts
+	//  - 0x0629a8	-> objA0.base_state = 0x0a  -> Falling into the water
+	//  - 0x0629c0	-> objA0.base_state = 0x0c  -> ...aaand he's gone
 	call tableLookupAddress(0x0628d2, objA0.base_state)
 
 	Object.loadSpritePatterns(0x06666a)
