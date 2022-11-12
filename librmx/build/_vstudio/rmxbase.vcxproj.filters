@@ -205,6 +205,9 @@
     <ClInclude Include="..\..\source\rmxbase\file\RealFileProvider.h">
       <Filter>file</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\UnalignedMemory.h">
+      <Filter>memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp" />
@@ -297,6 +300,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\file\RealFileProvider.cpp">
       <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\UnalignedMemory.cpp">
+      <Filter>memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,17 @@
 #include <time.h>
 
 
+namespace rmx
+{
+	template<> int16  swapBytes(int16 value)  { return swapBytes16(value); }
+	template<> uint16 swapBytes(uint16 value) { return swapBytes16(value); }
+	template<> int32  swapBytes(int32 value)  { return swapBytes32(value); }
+	template<> uint32 swapBytes(uint32 value) { return swapBytes32(value); }
+	template<> int64  swapBytes(int64 value)  { return swapBytes64(value); }
+	template<> uint64 swapBytes(uint64 value) { return swapBytes64(value); }
+}
+
+
 float interpolate(float v0, float v1, float v2, float v3, float factor)
 {
 	// Cubic interpolation

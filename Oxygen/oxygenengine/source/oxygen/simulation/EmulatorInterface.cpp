@@ -231,23 +231,20 @@ uint8 EmulatorInterface::readMemory8(uint32 address)
 
 uint16 EmulatorInterface::readMemory16(uint32 address)
 {
-	return swapBytes16(*(uint16*)mInternal.accessMemory<MEMORY_MODE_READ>(address, 2));
+	const uint8* pointer = mInternal.accessMemory<MEMORY_MODE_READ>(address, 2);
+	return rmx::readMemoryUnalignedSwapped<uint16>(pointer);
 }
 
 uint32 EmulatorInterface::readMemory32(uint32 address)
 {
-	return swapBytes32(*(uint32*)mInternal.accessMemory<MEMORY_MODE_READ>(address, 4));
+	const uint8* pointer = mInternal.accessMemory<MEMORY_MODE_READ>(address, 4);
+	return rmx::readMemoryUnalignedSwapped<uint32>(pointer);
 }
 
 uint64 EmulatorInterface::readMemory64(uint32 address)
 {
-#if defined(__arm__)
-	// Do not access memory directly, but byte-wise to avoid "SIGBUS illegal alignment" issues (this happened on Android Release builds, but not in Debug for some reason)
 	const uint8* pointer = mInternal.accessMemory<MEMORY_MODE_READ>(address, 8);
-	return ((uint64)pointer[7]) + ((uint64)pointer[6] << 8) + ((uint64)pointer[5] << 16) + ((uint64)pointer[4] << 24) + ((uint64)pointer[3] << 32) + ((uint64)pointer[2] << 40) + ((uint64)pointer[1] << 48) + ((uint64)pointer[0] << 56);
-#else
-	return swapBytes64(*(uint64*)mInternal.accessMemory<MEMORY_MODE_READ>(address, 8));
-#endif
+	return rmx::readMemoryUnalignedSwapped<uint64>(pointer);
 }
 
 void EmulatorInterface::writeMemory8(uint32 address, uint8 value)

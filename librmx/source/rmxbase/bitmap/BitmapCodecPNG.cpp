@@ -17,12 +17,7 @@ namespace
 	uint32 readUint32LE(const uint8* pointer)
 	{
 		// Read as little endian
-	#if defined(__arm__)
-		// Do not access memory directly, but byte-wise to avoid "SIGBUS illegal alignment" issues (this happened on Android Release builds, but not in Debug for some reason)
-		return ((uint32)pointer[0]) + ((uint32)pointer[1] << 8) + ((uint32)pointer[2] << 16) + ((uint32)pointer[3] << 24);
-	#else
-		return *(uint32*)pointer;
-	#endif
+		return rmx::readMemoryUnaligned<uint32>(pointer);
 	}
 
 	uint32 readUint32BE(const uint8* pointer)

@@ -45,6 +45,7 @@
 #include "rmxbase/data/CArray.h"
 #include "rmxbase/memory/ObjectPool.h"
 #include "rmxbase/memory/OneTimeAllocPool.h"
+#include "rmxbase/memory/UnalignedMemory.h"
 #include "rmxbase/data/SingleInstance.h"
 #include "rmxbase/data/Singleton.h"
 #include "rmxbase/data/SinglePtr.h"

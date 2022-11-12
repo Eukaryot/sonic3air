@@ -55,6 +55,19 @@ FORCE_INLINE static uint64 swapBytes64(uint64 value)
 }
 
 
+namespace rmx
+{
+	template<typename T> T swapBytes(T value) { return value; }
+	template<> int16  swapBytes(int16 value);
+	template<> uint16 swapBytes(uint16 value);
+	template<> int32  swapBytes(int32 value);
+	template<> uint32 swapBytes(uint32 value);
+	template<> int64  swapBytes(int64 value);
+	template<> uint64 swapBytes(uint64 value);
+}
+
+
+
 // Invert bool
 FORCE_INLINE void toggle(bool& variable)	{ variable = !variable; }
 

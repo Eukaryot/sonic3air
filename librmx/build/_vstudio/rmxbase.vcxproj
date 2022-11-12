@@ -245,6 +245,7 @@
     <ClInclude Include="..\..\source\rmxbase\memory\RmxDeflate.h" />
     <ClInclude Include="..\..\source\rmxbase\memory\String.h" />
     <ClInclude Include="..\..\source\rmxbase\memory\StringImpl.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\UnalignedMemory.h" />
     <ClInclude Include="..\..\source\rmxbase\memory\VectorBinarySerializer.h" />
     <ClInclude Include="..\..\source\rmxbase\memory\ZlibDeflate.h" />
     <ClInclude Include="..\..\source\rmxbase\tools\BitArray.h" />
@@ -287,6 +288,7 @@
     <ClCompile Include="..\..\source\rmxbase\memory\RC4Encryption.cpp" />
     <ClCompile Include="..\..\source\rmxbase\memory\RmxDeflate.cpp" />
     <ClCompile Include="..\..\source\rmxbase\memory\String.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\UnalignedMemory.cpp" />
     <ClCompile Include="..\..\source\rmxbase\memory\VectorBinarySerializer.cpp" />
     <ClCompile Include="..\..\source\rmxbase\memory\ZlibDeflate.cpp" />
     <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp">

@@ -83,7 +83,7 @@ namespace rmx
 			{
 				// Do not access memory directly, but byte-wise to avoid "SIGBUS illegal alignment" issues (this happened on Android Release builds, but not in Debug for some reason)
 				//  -> This somewhat defeats the purpose of the whole optimization by using Murmur2...
-				memcpy(&k, data64, sizeof(uint64_t));
+				k = rmx::readMemoryUnaligned<uint64>(data64);
 				++data64;
 				k *= m;
 				k ^= k >> r;

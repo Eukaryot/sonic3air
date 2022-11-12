@@ -19,7 +19,7 @@ namespace
 			if (readPosition + sizeof(T) > buffer.size())
 				return false;
 
-			value = *(T*)&buffer[readPosition];
+			value = rmx::readMemoryUnaligned<T>(&buffer[readPosition]);
 			readPosition += sizeof(T);
 		}
 		else
