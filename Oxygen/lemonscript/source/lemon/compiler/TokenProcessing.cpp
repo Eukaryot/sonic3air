@@ -639,6 +639,11 @@ namespace lemon
 									constantToken.mDataType = returnType;
 									break;
 								}
+								case DataTypeDefinition::Class::ANY:
+								{
+									CHECK_ERROR(canMatch, "'any' type cannot be used as a return value", mLineNumber);
+									break;
+								}
 							}
 							return;
 						}

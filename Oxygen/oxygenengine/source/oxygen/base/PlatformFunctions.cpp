@@ -307,7 +307,17 @@ void PlatformFunctions::changeWorkingDirectory(std::wstring_view executableCallP
 				break;
 			}
 		}
-		rmx::FileSystem::setCurrentDirectory(path);
+
+		if (!path.empty())
+		{
+			try
+			{
+				rmx::FileSystem::setCurrentDirectory(path);
+			}
+			catch (...)
+			{
+			}
+		}
 	}
 #elif defined(PLATFORM_LINUX)
 	// Take the working directory from command line if possible
