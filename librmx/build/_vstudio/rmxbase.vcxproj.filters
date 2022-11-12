@@ -1,174 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Math">
-      <UniqueIdentifier>{26d6f35b-de15-430d-b199-7d85b917f2da}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory">
-      <UniqueIdentifier>{2562ba97-848f-42e3-9119-e75dbc0ee7bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="FileIO">
-      <UniqueIdentifier>{075a0025-0972-4662-9788-9e8b3be893af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Bitmap">
-      <UniqueIdentifier>{acedc732-9401-4805-8c68-1b4d49ab5af1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Tools">
-      <UniqueIdentifier>{91b33ad3-2142-48a8-8f7e-a072c6100f32}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Data">
-      <UniqueIdentifier>{a0697061-a00f-41cc-8daa-114c19bc184b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="_jsoncpp">
       <UniqueIdentifier>{93ef9899-bed3-458c-b044-21cd3d672ef9}</UniqueIdentifier>
     </Filter>
     <Filter Include="_jsoncpp\json">
       <UniqueIdentifier>{5cd9dac2-a434-4994-926c-b9fcf7c225f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="bitmap">
+      <UniqueIdentifier>{acedc732-9401-4805-8c68-1b4d49ab5af1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{a0697061-a00f-41cc-8daa-114c19bc184b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{26d6f35b-de15-430d-b199-7d85b917f2da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{2562ba97-848f-42e3-9119-e75dbc0ee7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{91b33ad3-2142-48a8-8f7e-a072c6100f32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{8b3c487a-329f-4c07-8797-c8a2184a9ced}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{075a0025-0972-4662-9788-9e8b3be893af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\rmxbase\Box2.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Box3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Line.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Mat3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Mat4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Math.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Plane.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Ray.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Rect.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Vec2.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Vec3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Vec4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\InputStream.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\OutputStream.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\RC4Encryption.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\String.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\FileCrawler.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Bitmap.h">
-      <Filter>Bitmap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Color.h">
-      <Filter>Bitmap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Basics.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Tools.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\SinglePtr.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Singleton.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\SmartPtr.h">
-      <Filter>Data</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\rmxbase.h" />
     <ClInclude Include="..\..\source\export.h" />
-    <ClInclude Include="..\..\source\rmxbase\SingleInstance.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\BinarySerializer.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\CArray.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\RmxDeflate.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\VectorBinarySerializer.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\JsonHelper.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\StringImpl.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\FileSystem.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Types.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\GlobalObjectPtr.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\FileHandle.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\ErrorHandler.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\CleanWindowsInclude.h" />
     <ClInclude Include="..\..\source\PlatformDefinitions.h" />
-    <ClInclude Include="..\..\source\rmxbase\FileIO.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\FileProvider.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\ZlibDeflate.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\ObjectPool.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\Logging.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\OneTimeAllocPool.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\BitmapCodecs.h">
-      <Filter>Bitmap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\RealFileProvider.h">
-      <Filter>FileIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\BitFlagSet.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\rmxbase\BitArray.h">
-      <Filter>Tools</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json_tool.h">
       <Filter>_jsoncpp</Filter>
     </ClInclude>
@@ -202,90 +67,147 @@
     <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\version.h">
       <Filter>_jsoncpp\json</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\bitmap\Bitmap.h">
+      <Filter>bitmap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapCodecs.h">
+      <Filter>bitmap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\bitmap\Color.h">
+      <Filter>bitmap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\data\CArray.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\data\GlobalObjectPtr.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\data\SingleInstance.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\data\SinglePtr.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\data\Singleton.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\data\SmartPtr.h">
+      <Filter>data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\tools\BitArray.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\tools\BitFlagSet.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\tools\Logging.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\tools\Tools.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\BinarySerializer.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\InputStream.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\ObjectPool.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\OneTimeAllocPool.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\OutputStream.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\RC4Encryption.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\String.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\StringImpl.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\VectorBinarySerializer.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\ZlibDeflate.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Box2.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Box3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Line.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Mat3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Mat4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Plane.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Ray.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Rect.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Vec2.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Vec3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\math\Vec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\base\Basics.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\base\ErrorHandler.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\base\Types.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\memory\RmxDeflate.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\file\FileCrawler.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\file\FileHandle.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\file\FileIO.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\file\FileProvider.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\file\FileSystem.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\file\JsonHelper.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\file\RealFileProvider.h">
+      <Filter>file</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\rmxbase\Math.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\InputStream.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\OutputStream.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\RC4Encryption.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\String.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\FileCrawler.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\Bitmap.cpp">
-      <Filter>Bitmap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecBMP.cpp">
-      <Filter>Bitmap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecICO.cpp">
-      <Filter>Bitmap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecJPG.cpp">
-      <Filter>Bitmap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecPNG.cpp">
-      <Filter>Bitmap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\Color.cpp">
-      <Filter>Bitmap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\Basics.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\Tools.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\BinarySerializer.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\RmxDeflate.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\VectorBinarySerializer.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\JsonHelper.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\FileSystem.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\FileHandle.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\ErrorHandler.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\FileIO.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\FileProvider.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\ZlibDeflate.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\Logging.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\OneTimeAllocPool.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\RealFileProvider.cpp">
-      <Filter>FileIO</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_reader.cpp">
       <Filter>_jsoncpp</Filter>
     </ClCompile>
@@ -294,6 +216,87 @@
     </ClCompile>
     <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_writer.cpp">
       <Filter>_jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\bitmap\Bitmap.cpp">
+      <Filter>bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecBMP.cpp">
+      <Filter>bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecICO.cpp">
+      <Filter>bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecJPG.cpp">
+      <Filter>bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecPNG.cpp">
+      <Filter>bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\bitmap\Color.cpp">
+      <Filter>bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\tools\Logging.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\tools\Tools.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\BinarySerializer.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\InputStream.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\OneTimeAllocPool.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\OutputStream.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\RC4Encryption.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\String.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\VectorBinarySerializer.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\ZlibDeflate.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\math\Math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\base\Basics.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\base\ErrorHandler.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\memory\RmxDeflate.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\file\FileCrawler.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\file\FileHandle.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\file\FileIO.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\file\FileProvider.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\file\FileSystem.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\file\JsonHelper.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\rmxbase\file\RealFileProvider.cpp">
+      <Filter>file</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

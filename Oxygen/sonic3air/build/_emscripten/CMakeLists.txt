@@ -46,8 +46,7 @@ include_directories(${WORKSPACE_DIR}/framework/external/zlib/zlib/contrib/minizi
 
 # rmxbase
 
-file(GLOB RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp
-						  ${WORKSPACE_DIR}/librmx/source/rmxbase/_jsoncpp/*.cpp)
+file(GLOB_RECURSE RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp)
 
 add_library(rmxbase ${RMXBASE_SOURCES})
 
@@ -59,7 +58,7 @@ add_library(rmxbase ${RMXBASE_SOURCES})
 
 # rmxmedia
 
-file(GLOB RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp)
+file(GLOB_RECURSE RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp)
 
 add_library(rmxmedia ${RMXMEDIA_SOURCES})
 

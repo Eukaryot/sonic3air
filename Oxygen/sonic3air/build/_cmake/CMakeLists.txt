@@ -103,8 +103,7 @@ target_link_libraries(minizip zlibstatic)
 
 # rmxbase
 
-file(GLOB RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp
-						  ${WORKSPACE_DIR}/librmx/source/rmxbase/_jsoncpp/*.cpp)
+file(GLOB_RECURSE RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp)
 
 add_library(rmxbase ${RMXBASE_SOURCES})
 
@@ -119,8 +118,8 @@ target_link_libraries(rmxbase zlibstatic)
 
 # rmxmedia
 
-file(GLOB RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp
-						   ${WORKSPACE_DIR}/librmx/source/rmxmedia/_glew/*.c)
+file(GLOB_RECURSE RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp
+								   ${WORKSPACE_DIR}/librmx/source/rmxmedia/_glew/*.c)
 
 add_library(rmxmedia ${RMXMEDIA_SOURCES})
 

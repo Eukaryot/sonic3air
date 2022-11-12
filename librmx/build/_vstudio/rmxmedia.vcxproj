@@ -88,11 +88,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia;$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxmedia.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxmedia.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessorDefinitions>DEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -117,11 +117,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia;$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxmedia.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxmedia.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessorDefinitions>DEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -147,10 +147,10 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia;$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxmedia.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxmedia.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat />
       <PreprocessorDefinitions>GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -176,10 +176,10 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../source/rmxmedia;$(ProjectDir)../../source/rmxmedia/_glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxmedia.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxmedia.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
@@ -203,62 +203,62 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\rmxmedia\AppFramework.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\AudioManager.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\AudioBuffer.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\AudioMixer.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\AudioReference.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\FileInputStreamSDL.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\FileProviderSDL.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\Font.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\OpenGLFontOutput.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\FontProcessor.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\FontSource.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\Framebuffer.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\FTX_System.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\GLTools.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\GuiBase.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\JobManager.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\Painter.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\audiovideo\AudioBuffer.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\audiovideo\AudioManager.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\audiovideo\AudioMixer.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\audiovideo\AudioReference.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\audiovideo\VideoBuffer.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\file\FileInputStreamSDL.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\file\FileProviderSDL.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\font\Font.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\font\FontProcessor.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\font\FontSource.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\framework\AppFramework.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\framework\FTX_System.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\framework\GuiBase.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\Framebuffer.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\GLTools.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\OpenGLFontOutput.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\Painter.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\Shader.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\SpriteAtlas.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\Texture.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\opengl\VertexArrayObject.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\rmxmedia.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\source\rmxmedia\Shader.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\SpriteAtlas.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\Texture.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\Thread.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\VertexArrayObject.cpp" />
-    <ClCompile Include="..\..\source\rmxmedia\VideoBuffer.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\threads\JobManager.cpp" />
+    <ClCompile Include="..\..\source\rmxmedia\threads\Thread.cpp" />
     <ClCompile Include="..\..\source\rmxmedia\_glew\glew.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\rmxmedia.h" />
-    <ClInclude Include="..\..\source\rmxmedia\AppFramework.h" />
-    <ClInclude Include="..\..\source\rmxmedia\AudioManager.h" />
-    <ClInclude Include="..\..\source\rmxmedia\AudioBuffer.h" />
-    <ClInclude Include="..\..\source\rmxmedia\AudioMixer.h" />
-    <ClInclude Include="..\..\source\rmxmedia\AudioReference.h" />
-    <ClInclude Include="..\..\source\rmxmedia\FileInputStreamSDL.h" />
-    <ClInclude Include="..\..\source\rmxmedia\FileProviderSDL.h" />
-    <ClInclude Include="..\..\source\rmxmedia\Font.h" />
-    <ClInclude Include="..\..\source\rmxmedia\OpenGLFontOutput.h" />
-    <ClInclude Include="..\..\source\rmxmedia\FontProcessor.h" />
-    <ClInclude Include="..\..\source\rmxmedia\FontSource.h" />
-    <ClInclude Include="..\..\source\rmxmedia\Framebuffer.h" />
-    <ClInclude Include="..\..\source\rmxmedia\FTX_System.h" />
-    <ClInclude Include="..\..\source\rmxmedia\GLTools.h" />
-    <ClInclude Include="..\..\source\rmxmedia\GuiBase.h" />
-    <ClInclude Include="..\..\source\rmxmedia\JobManager.h" />
-    <ClInclude Include="..\..\source\rmxmedia\OpenGLHelper.h" />
-    <ClInclude Include="..\..\source\rmxmedia\Painter.h" />
-    <ClInclude Include="..\..\source\rmxmedia\Shader.h" />
-    <ClInclude Include="..\..\source\rmxmedia\SpriteAtlas.h" />
-    <ClInclude Include="..\..\source\rmxmedia\Texture.h" />
-    <ClInclude Include="..\..\source\rmxmedia\Thread.h" />
-    <ClInclude Include="..\..\source\rmxmedia\VertexArrayObject.h" />
-    <ClInclude Include="..\..\source\rmxmedia\VideoBuffer.h" />
+    <ClInclude Include="..\..\source\rmxmedia\audiovideo\AudioBuffer.h" />
+    <ClInclude Include="..\..\source\rmxmedia\audiovideo\AudioManager.h" />
+    <ClInclude Include="..\..\source\rmxmedia\audiovideo\AudioMixer.h" />
+    <ClInclude Include="..\..\source\rmxmedia\audiovideo\AudioReference.h" />
+    <ClInclude Include="..\..\source\rmxmedia\audiovideo\VideoBuffer.h" />
+    <ClInclude Include="..\..\source\rmxmedia\file\FileInputStreamSDL.h" />
+    <ClInclude Include="..\..\source\rmxmedia\file\FileProviderSDL.h" />
+    <ClInclude Include="..\..\source\rmxmedia\font\Font.h" />
+    <ClInclude Include="..\..\source\rmxmedia\font\FontProcessor.h" />
+    <ClInclude Include="..\..\source\rmxmedia\font\FontSource.h" />
+    <ClInclude Include="..\..\source\rmxmedia\framework\AppFramework.h" />
+    <ClInclude Include="..\..\source\rmxmedia\framework\FTX_System.h" />
+    <ClInclude Include="..\..\source\rmxmedia\framework\GuiBase.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\Framebuffer.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\GLTools.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\OpenGLFontOutput.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\OpenGLHelper.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\Painter.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\Shader.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\SpriteAtlas.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\Texture.h" />
+    <ClInclude Include="..\..\source\rmxmedia\opengl\VertexArrayObject.h" />
+    <ClInclude Include="..\..\source\rmxmedia\threads\JobManager.h" />
+    <ClInclude Include="..\..\source\rmxmedia\threads\Thread.h" />
     <ClInclude Include="..\..\source\rmxmedia\_glew\GL\eglew.h" />
     <ClInclude Include="..\..\source\rmxmedia\_glew\GL\glew.h" />
     <ClInclude Include="..\..\source\rmxmedia\_glew\GL\glxew.h" />
@@ -266,13 +266,13 @@
     <ClInclude Include="..\..\source\rmxmedia_externals.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\source\rmxmedia\StdFontData.inc" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="rmxbase.vcxproj">
       <Project>{13afdec3-a272-4577-8df5-b6af731760a8}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\rmxmedia\font\StdFontData.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

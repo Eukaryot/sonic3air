@@ -6,7 +6,7 @@
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#include "../rmxbase.h"
+#include "rmxbase.h"
 #include "buildinfo.inc"
 
 

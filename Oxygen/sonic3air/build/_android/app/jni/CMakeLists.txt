@@ -53,8 +53,7 @@ target_link_libraries(minizip z)		# zlib
 
 # rmxbase
 
-file(GLOB RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp
-						  ${WORKSPACE_DIR}/librmx/source/rmxbase/_jsoncpp/*.cpp)
+file(GLOB_RECURSE RMXBASE_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxbase/*.cpp)
 
 add_library(rmxbase SHARED ${RMXBASE_SOURCES})
 
@@ -66,7 +65,7 @@ target_link_libraries(rmxbase log)
 
 # rmxmedia
 
-file(GLOB RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp)
+file(GLOB_RECURSE RMXMEDIA_SOURCES ${WORKSPACE_DIR}/librmx/source/rmxmedia/*.cpp)
 
 add_library(rmxmedia SHARED ${RMXMEDIA_SOURCES})
 

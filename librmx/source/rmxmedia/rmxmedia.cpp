@@ -6,7 +6,7 @@
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#include "../rmxmedia.h"
+#include "rmxmedia.h"
 #include "buildinfo.inc"
 
 

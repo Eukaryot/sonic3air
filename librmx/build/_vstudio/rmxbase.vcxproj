@@ -92,7 +92,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxbase.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -121,7 +121,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxbase.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -150,7 +150,7 @@
       <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxbase.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat />
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -178,7 +178,7 @@
       <AdditionalIncludeDirectories>../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>../rmxbase.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>rmxbase.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
@@ -205,52 +205,52 @@
     <ClInclude Include="..\..\source\export.h" />
     <ClInclude Include="..\..\source\PlatformDefinitions.h" />
     <ClInclude Include="..\..\source\rmxbase.h" />
-    <ClInclude Include="..\..\source\rmxbase\Basics.h" />
-    <ClInclude Include="..\..\source\rmxbase\BinarySerializer.h" />
-    <ClInclude Include="..\..\source\rmxbase\BitArray.h" />
-    <ClInclude Include="..\..\source\rmxbase\BitFlagSet.h" />
-    <ClInclude Include="..\..\source\rmxbase\Bitmap.h" />
-    <ClInclude Include="..\..\source\rmxbase\BitmapCodecs.h" />
-    <ClInclude Include="..\..\source\rmxbase\Box2.h" />
-    <ClInclude Include="..\..\source\rmxbase\Box3.h" />
-    <ClInclude Include="..\..\source\rmxbase\CArray.h" />
-    <ClInclude Include="..\..\source\rmxbase\Color.h" />
-    <ClInclude Include="..\..\source\rmxbase\ErrorHandler.h" />
-    <ClInclude Include="..\..\source\rmxbase\FileIO.h" />
-    <ClInclude Include="..\..\source\rmxbase\FileSystem.h" />
-    <ClInclude Include="..\..\source\rmxbase\GlobalObjectPtr.h" />
-    <ClInclude Include="..\..\source\rmxbase\JsonHelper.h" />
-    <ClInclude Include="..\..\source\rmxbase\FileProvider.h" />
-    <ClInclude Include="..\..\source\rmxbase\Logging.h" />
-    <ClInclude Include="..\..\source\rmxbase\ObjectPool.h" />
-    <ClInclude Include="..\..\source\rmxbase\OneTimeAllocPool.h" />
-    <ClInclude Include="..\..\source\rmxbase\RealFileProvider.h" />
-    <ClInclude Include="..\..\source\rmxbase\RmxDeflate.h" />
-    <ClInclude Include="..\..\source\rmxbase\FileCrawler.h" />
-    <ClInclude Include="..\..\source\rmxbase\FileHandle.h" />
-    <ClInclude Include="..\..\source\rmxbase\InputStream.h" />
-    <ClInclude Include="..\..\source\rmxbase\Line.h" />
-    <ClInclude Include="..\..\source\rmxbase\Mat3.h" />
-    <ClInclude Include="..\..\source\rmxbase\Mat4.h" />
-    <ClInclude Include="..\..\source\rmxbase\Math.h" />
-    <ClInclude Include="..\..\source\rmxbase\OutputStream.h" />
-    <ClInclude Include="..\..\source\rmxbase\Plane.h" />
-    <ClInclude Include="..\..\source\rmxbase\Ray.h" />
-    <ClInclude Include="..\..\source\rmxbase\RC4Encryption.h" />
-    <ClInclude Include="..\..\source\rmxbase\Rect.h" />
-    <ClInclude Include="..\..\source\rmxbase\SingleInstance.h" />
-    <ClInclude Include="..\..\source\rmxbase\SinglePtr.h" />
-    <ClInclude Include="..\..\source\rmxbase\Singleton.h" />
-    <ClInclude Include="..\..\source\rmxbase\SmartPtr.h" />
-    <ClInclude Include="..\..\source\rmxbase\StringImpl.h" />
-    <ClInclude Include="..\..\source\rmxbase\String.h" />
-    <ClInclude Include="..\..\source\rmxbase\Tools.h" />
-    <ClInclude Include="..\..\source\rmxbase\Types.h" />
-    <ClInclude Include="..\..\source\rmxbase\Vec2.h" />
-    <ClInclude Include="..\..\source\rmxbase\Vec3.h" />
-    <ClInclude Include="..\..\source\rmxbase\Vec4.h" />
-    <ClInclude Include="..\..\source\rmxbase\VectorBinarySerializer.h" />
-    <ClInclude Include="..\..\source\rmxbase\ZlibDeflate.h" />
+    <ClInclude Include="..\..\source\rmxbase\base\Basics.h" />
+    <ClInclude Include="..\..\source\rmxbase\base\ErrorHandler.h" />
+    <ClInclude Include="..\..\source\rmxbase\base\Types.h" />
+    <ClInclude Include="..\..\source\rmxbase\bitmap\Bitmap.h" />
+    <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapCodecs.h" />
+    <ClInclude Include="..\..\source\rmxbase\bitmap\Color.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\CArray.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\GlobalObjectPtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\SingleInstance.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\SinglePtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\Singleton.h" />
+    <ClInclude Include="..\..\source\rmxbase\data\SmartPtr.h" />
+    <ClInclude Include="..\..\source\rmxbase\file\FileCrawler.h" />
+    <ClInclude Include="..\..\source\rmxbase\file\FileHandle.h" />
+    <ClInclude Include="..\..\source\rmxbase\file\FileIO.h" />
+    <ClInclude Include="..\..\source\rmxbase\file\FileProvider.h" />
+    <ClInclude Include="..\..\source\rmxbase\file\FileSystem.h" />
+    <ClInclude Include="..\..\source\rmxbase\file\JsonHelper.h" />
+    <ClInclude Include="..\..\source\rmxbase\file\RealFileProvider.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Box2.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Box3.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Line.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Mat3.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Mat4.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Math.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Plane.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Ray.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Rect.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Vec2.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Vec3.h" />
+    <ClInclude Include="..\..\source\rmxbase\math\Vec4.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\BinarySerializer.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\InputStream.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\ObjectPool.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\OneTimeAllocPool.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\OutputStream.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\RC4Encryption.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\RmxDeflate.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\String.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\StringImpl.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\VectorBinarySerializer.h" />
+    <ClInclude Include="..\..\source\rmxbase\memory\ZlibDeflate.h" />
+    <ClInclude Include="..\..\source\rmxbase\tools\BitArray.h" />
+    <ClInclude Include="..\..\source\rmxbase\tools\BitFlagSet.h" />
+    <ClInclude Include="..\..\source\rmxbase\tools\Logging.h" />
+    <ClInclude Include="..\..\source\rmxbase\tools\Tools.h" />
     <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\allocator.h" />
     <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\assertions.h" />
     <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json\config.h" />
@@ -264,36 +264,36 @@
     <ClInclude Include="..\..\source\rmxbase\_jsoncpp\json_tool.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\rmxbase\Basics.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\BinarySerializer.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\Bitmap.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecBMP.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecICO.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecJPG.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\BitmapCodecPNG.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\Color.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\ErrorHandler.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\FileIO.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\FileSystem.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\JsonHelper.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\FileProvider.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\Logging.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\OneTimeAllocPool.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\RealFileProvider.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\RmxDeflate.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\FileCrawler.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\FileHandle.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\InputStream.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\Math.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\OutputStream.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\RC4Encryption.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\base\Basics.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\base\ErrorHandler.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\bitmap\Bitmap.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecBMP.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecICO.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecJPG.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\bitmap\BitmapCodecPNG.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\bitmap\Color.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\file\FileCrawler.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\file\FileHandle.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\file\FileIO.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\file\FileProvider.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\file\FileSystem.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\file\JsonHelper.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\file\RealFileProvider.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\math\Math.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\BinarySerializer.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\InputStream.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\OneTimeAllocPool.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\OutputStream.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\RC4Encryption.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\RmxDeflate.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\String.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\VectorBinarySerializer.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\memory\ZlibDeflate.cpp" />
     <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\source\rmxbase\String.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\Tools.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\VectorBinarySerializer.cpp" />
-    <ClCompile Include="..\..\source\rmxbase\ZlibDeflate.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\tools\Logging.cpp" />
+    <ClCompile Include="..\..\source\rmxbase\tools\Tools.cpp" />
     <ClCompile Include="..\..\source\rmxbase\_jsoncpp\json_reader.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
