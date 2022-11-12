@@ -280,6 +280,11 @@ namespace lemon
 				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
 			}
 		}
+		else if (target->getClass() == DataTypeDefinition::Class::ANY && original->getClass() != DataTypeDefinition::Class::VOID)
+		{
+			// Very low prio
+			return 0xf0;
+		}
 		else
 		{
 			// No cast possible

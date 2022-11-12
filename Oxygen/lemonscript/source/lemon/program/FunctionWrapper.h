@@ -15,6 +15,13 @@
 namespace lemon
 {
 
+	struct AnyTypeWrapper
+	{
+		const DataTypeDefinition* mType = nullptr;
+		uint64 mValue = 0;
+	};
+
+
 	namespace traits
 	{
 		template<typename T> const DataTypeDefinition* getDataType()  { return T::UNKNOWN_TYPE; }
@@ -29,6 +36,7 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<int64>();
 		template<> const DataTypeDefinition* getDataType<uint64>();
 		template<> const DataTypeDefinition* getDataType<StringRef>();
+		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>();
 	}
 
 
@@ -58,6 +66,16 @@ namespace lemon
 
 		template<>
 		StringRef popStackGeneric(const NativeFunction::Context context);
+
+
+
+		// Template specializations for AnyTypeWrapper, representing the "any" type in script
+
+		template<>
+		void pushStackGeneric<AnyTypeWrapper>(AnyTypeWrapper result, const NativeFunction::Context context);
+
+		template<>
+		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context);
 
 
 

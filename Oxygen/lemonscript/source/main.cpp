@@ -81,6 +81,26 @@ void debugLog(uint64 stringHash)
 	std::cout << storedString->getString() << std::endl;
 }
 
+void debugLog2(AnyTypeWrapper param)
+{
+	if (param.mType == &PredefinedDataTypes::UINT_8)
+	{
+		std::cout << rmx::hexString((uint8)param.mValue, 2) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::UINT_64)
+	{
+		std::cout << rmx::hexString(param.mValue, 8) << std::endl;
+	}
+	else if (param.mType == &PredefinedDataTypes::STRING)
+	{
+		debugLog(param.mValue);
+	}
+	else
+	{
+		std::cout << "Oops, type support not implemented yet" << std::endl;
+	}
+}
+
 uint32 valueD0 = 0;
 uint32 valueA0 = 0;
 
@@ -201,6 +221,7 @@ int main(int argc, char** argv)
 	var2.mSetter = logValueStr;
 
 	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
+	module.addNativeFunction("debugLog2", lemon::wrap(&debugLog2));
 	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
 	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);
 
@@ -215,7 +236,7 @@ int main(int argc, char** argv)
 
 	{
 		std::cout << "=== Compilation ===\r\n";
-		lemon::Compiler::CompileOptions options;
+		lemon::CompileOptions options;
 		Compiler compiler(module, globalsLookup, options);
 		const bool compileSuccess = compiler.loadScript(L"script01.lemon");
 		if (!compileSuccess)

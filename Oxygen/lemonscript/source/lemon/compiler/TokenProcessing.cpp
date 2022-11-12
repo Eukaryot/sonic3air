@@ -374,6 +374,9 @@ namespace lemon
 					}
 					break;
 				}
+
+                default:
+                    break;
 			}
 		}
 

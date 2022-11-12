@@ -67,6 +67,7 @@ namespace lemon
 		enum class Class : uint8
 		{
 			VOID,
+			ANY,
 			INTEGER,
 			STRING
 		};
@@ -107,6 +108,17 @@ namespace lemon
 		{}
 
 		uint32 getDataTypeHash() const override  { return 0; }
+	};
+
+
+	struct AnyDataType : public DataTypeDefinition
+	{
+	public:
+		inline AnyDataType() :
+			DataTypeDefinition("any", Class::ANY, 0, BaseType::UINT_64)
+		{}
+
+		uint32 getDataTypeHash() const override  { return 1; }
 	};
 
 
@@ -151,6 +163,7 @@ namespace lemon
 	struct PredefinedDataTypes
 	{
 		inline static const VoidDataType VOID		  = VoidDataType();
+		inline static const AnyDataType ANY			  = AnyDataType();
 
 		inline static const IntegerDataType UINT_8	  = IntegerDataType("u8",  1, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_8);
 		inline static const IntegerDataType UINT_16	  = IntegerDataType("u16", 2, IntegerDataType::Semantics::DEFAULT, false, BaseType::UINT_16);
@@ -177,6 +190,8 @@ namespace lemon
 
 	struct DataTypeSerializer
 	{
+		static const DataTypeDefinition* getDataTypeFromSerializedId(uint8 dataTypeId);
+		static uint8 getSerializedIdForDataType(const DataTypeDefinition* const dataTypeDefinition);
 		static const DataTypeDefinition* readDataType(VectorBinarySerializer& serializer);
 		static void writeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition* const dataTypeDefinition);
 		static void serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition);

@@ -187,18 +187,29 @@ namespace lemon
 	{
 		CHECK_ERROR(nullptr != sourceType, "Internal error: Got an invalid source type for cast", mLineNumber);
 		CHECK_ERROR(nullptr != targetType, "Internal error: Got an invalid target type for cast", mLineNumber);
+
 		const BaseCastType castType = TypeCasting(mCompileOptions).getBaseCastType(sourceType, targetType);
-		if (castType != BaseCastType::NONE)
+		if (castType == BaseCastType::NONE)
 		{
-			if (castType != BaseCastType::INVALID)
-			{
-				addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, (int64)castType);
-			}
-			else
-			{
-				CHECK_ERROR(false, "Cannot cast from " << sourceType->getName() << " to " << targetType->getName(), mLineNumber);
-			}
+			// No cast needed
+			return;
 		}
+
+		if (castType != BaseCastType::INVALID)
+		{
+			// It's a base cast type, we have an opcode for this
+			addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, (int64)castType);
+			return;
+		}
+
+		if (targetType == &PredefinedDataTypes::ANY)
+		{
+			// Cast to "any" by adding explicit information about the type
+			addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::UINT_64, DataTypeSerializer::getSerializedIdForDataType(sourceType));
+			return;
+		}
+
+		CHECK_ERROR(false, "Cannot cast from " << sourceType->getName() << " to " << targetType->getName(), mLineNumber);
 	}
 
 	void FunctionCompiler::buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context)
