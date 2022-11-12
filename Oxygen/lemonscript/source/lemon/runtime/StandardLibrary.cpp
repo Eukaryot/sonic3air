@@ -238,6 +238,12 @@ namespace lemon
 			return (uint32)str.getString().length();
 		}
 
+		bool string_isEmpty(StringRef str)
+		{
+			RMX_CHECK(str.isValid(), "Unable to resolve string", return 0);
+			return str.getString().empty();
+		}
+
 		uint8 string_getCharacter(StringRef string, uint32 index)
 		{
 			if (!string.isValid())
@@ -381,6 +387,8 @@ namespace lemon
 			.setParameterInfo(2, "length");
 
 		module.addNativeMethod("string", "length", lemon::wrap(&functions::string_length), defaultFlags);
+
+		module.addNativeMethod("string", "isEmpty", lemon::wrap(&functions::string_isEmpty), defaultFlags);
 
 		module.addNativeMethod("string", "getCharacter", lemon::wrap(&functions::string_getCharacter), defaultFlags)
 			.setParameterInfo(0, "str")

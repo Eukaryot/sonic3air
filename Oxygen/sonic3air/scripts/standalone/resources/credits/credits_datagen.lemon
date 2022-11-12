@@ -228,11 +228,11 @@ function u32 CreditsDataGenerator.build(u8 creditsIndex)
 function void CreditsDataGenerator.addLine(u8 line, u8 color, string text)
 {
 	// Calculate left start position depending on text length and characters included (some like space and 'I' are only half as wide)
-	u32 length = strlen(text)
+	u32 length = text.length()
 	u32 width = 0
 	for (u32 i = 0; i < length; ++i)
 	{
-		u8 ch = getchar(text, i)
+		u8 ch = text.getCharacter(i)
 		width += (ch == 0x20 || ch == 0x21 || ch == 0x28 || ch == 0x29 || ch == 0x2e || ch == 0x49) ? 1 : 2
 	}
 
@@ -250,10 +250,10 @@ function void CreditsDataGenerator.addLine(u8 line, u8 left, u8 color, string te
 	u8[A1+1] = (left * 2) + color
 	A1 += 2
 
-	u32 length = strlen(text)
+	u32 length = text.length()
 	for (u32 i = 0; i < length; ++i)
 	{
-		u8[A1 + i] = getchar(text, i)
+		u8[A1 + i] = text.getCharacter(i)
 	}
 	A1 += length
 

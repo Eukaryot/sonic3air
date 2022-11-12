@@ -48,6 +48,7 @@ declare function string getStringFromHash(u64 hash)
 // Methods (to be called on variables directly)
 
 declare function u32 string:length()
+declare function s8 string:isEmpty()
 declare function u8 string:getCharacter(u32 index)
 declare function string string:getSubString(u32 index, u32 length)
 

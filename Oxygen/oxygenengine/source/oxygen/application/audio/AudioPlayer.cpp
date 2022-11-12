@@ -10,6 +10,7 @@
 #include "oxygen/application/audio/AudioPlayer.h"
 #include "oxygen/application/audio/EmulationAudioSource.h"
 
+
 AudioPlayer::SoundIterator::SoundIterator(std::vector<PlayingSound>& sounds) :
 	mSounds(sounds)
 {
@@ -84,7 +85,7 @@ void AudioPlayer::startup()
 void AudioPlayer::shutdown()
 {
 	stopAllSounds(true);
-        mAudioSourceManager.clear();
+	mAudioSourceManager.clear();
 }
 
 void AudioPlayer::clearPlayback()
