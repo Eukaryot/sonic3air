@@ -35,6 +35,8 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint32>();
 		template<> const DataTypeDefinition* getDataType<int64>();
 		template<> const DataTypeDefinition* getDataType<uint64>();
+		template<> const DataTypeDefinition* getDataType<float>();
+		template<> const DataTypeDefinition* getDataType<double>();
 		template<> const DataTypeDefinition* getDataType<StringRef>();
 		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>();
 	}
@@ -46,9 +48,9 @@ namespace lemon
 		// Stack interactions templates for base types - these functions are used as a basis for return type and parameter type handling
 
 		template<typename R>
-		void pushStackGeneric(R result, const NativeFunction::Context context)
+		void pushStackGeneric(R value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<R>(), result);
+			context.mControlFlow.pushValueStack(traits::getDataType<R>(), value);
 		};
 
 		template<typename T>
@@ -59,10 +61,25 @@ namespace lemon
 
 
 
+		// Template specializations for float and double
+
+		template<>
+		void pushStackGeneric<float>(float value, const NativeFunction::Context context);
+
+		template<>
+		float popStackGeneric(const NativeFunction::Context context);
+
+		template<>
+		void pushStackGeneric<double>(double value, const NativeFunction::Context context);
+
+		template<>
+		double popStackGeneric(const NativeFunction::Context context);
+
+
 		// Template specializations for StringRef, representing the "string" type in script
 
 		template<>
-		void pushStackGeneric<StringRef>(StringRef result, const NativeFunction::Context context);
+		void pushStackGeneric<StringRef>(StringRef value, const NativeFunction::Context context);
 
 		template<>
 		StringRef popStackGeneric(const NativeFunction::Context context);
@@ -72,7 +89,7 @@ namespace lemon
 		// Template specializations for AnyTypeWrapper, representing the "any" type in script
 
 		template<>
-		void pushStackGeneric<AnyTypeWrapper>(AnyTypeWrapper result, const NativeFunction::Context context);
+		void pushStackGeneric<AnyTypeWrapper>(AnyTypeWrapper value, const NativeFunction::Context context);
 
 		template<>
 		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context);

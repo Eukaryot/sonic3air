@@ -26,7 +26,9 @@ namespace lemon
 		INT_32	  = 0x18 + 0x02,
 		INT_64	  = 0x18 + 0x03,
 		BOOL	  = UINT_8,
-		INT_CONST = 0x1f			// Constants have an undefined int type
+		INT_CONST = 0x1f,			// Constants have an undefined int type
+		FLOAT	  = 0x20,
+		DOUBLE	  = 0x21
 	};
 
 	enum class BaseCastType : uint8
@@ -69,6 +71,7 @@ namespace lemon
 			VOID,
 			ANY,
 			INTEGER,
+			FLOAT,
 			STRING
 		};
 
@@ -148,6 +151,17 @@ namespace lemon
 	};
 
 
+	struct FloatDataType : public DataTypeDefinition
+	{
+	public:
+		inline FloatDataType(const char* name, size_t bytes) :
+			DataTypeDefinition(name, Class::FLOAT, bytes, (bytes == 4) ? BaseType::FLOAT : BaseType::DOUBLE)
+		{}
+
+		uint32 getDataTypeHash() const override;
+	};
+
+
 	struct StringDataType : public DataTypeDefinition
 	{
 	public:
@@ -176,6 +190,9 @@ namespace lemon
 		inline static const IntegerDataType CONST_INT = IntegerDataType("const_int", 8, IntegerDataType::Semantics::CONSTANT, true, BaseType::INT_CONST);
 		//inline static const IntegerDataType BOOL	  = IntegerDataType("bool", 1, IntegerDataType::Semantics::BOOLEAN, false, BaseType::UINT_8);
 		inline static const IntegerDataType& BOOL	  = UINT_8;
+
+		inline static const FloatDataType& FLOAT	  = FloatDataType("float", 4);
+		inline static const FloatDataType& DOUBLE	  = FloatDataType("double", 8);
 
 		inline static const StringDataType STRING     = StringDataType();
 	};

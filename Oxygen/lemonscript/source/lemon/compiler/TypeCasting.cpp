@@ -138,6 +138,8 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
 			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
+			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
 			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)	// TODO: Strings need their own binary operations (and only few of them make actual sense...)
 		};
 		static const std::vector<BinaryOperatorSignature> signaturesComparison =
@@ -151,6 +153,8 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::BOOL),
 			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::BOOL)	// TODO: Strings need their own comparison operations
 		};
 		static const std::vector<BinaryOperatorSignature> signaturesTrinary =
@@ -163,6 +167,8 @@ namespace lemon
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
 			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)
 		};
 

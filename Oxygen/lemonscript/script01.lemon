@@ -22,6 +22,11 @@ function void main()
 	debugLog2(h)
 	debugLog2(yes)
 
+	// Test for floats
+	float two = createFloat(2)
+	logFloat(addFloats(two, createFloat(5)))
+	debugLog2(two)
+
 #if 0
 	// Test for constant arrays & strings
 	{

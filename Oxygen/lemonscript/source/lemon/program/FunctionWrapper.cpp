@@ -24,16 +24,49 @@ namespace lemon
 		template<> const DataTypeDefinition* getDataType<uint32>()			{ return &PredefinedDataTypes::UINT_32; }
 		template<> const DataTypeDefinition* getDataType<int64>()			{ return &PredefinedDataTypes::INT_64; }
 		template<> const DataTypeDefinition* getDataType<uint64>()			{ return &PredefinedDataTypes::UINT_64; }
+		template<> const DataTypeDefinition* getDataType<float>()			{ return &PredefinedDataTypes::FLOAT; }
+		template<> const DataTypeDefinition* getDataType<double>()			{ return &PredefinedDataTypes::DOUBLE; }
 		template<> const DataTypeDefinition* getDataType<StringRef>()		{ return &PredefinedDataTypes::STRING; }
 		template<> const DataTypeDefinition* getDataType<AnyTypeWrapper>()	{ return &PredefinedDataTypes::ANY; }
 	}
 
 	namespace internal
 	{
+
 		template<>
-		void pushStackGeneric(StringRef result, const NativeFunction::Context context)
+		void pushStackGeneric(float value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), result.getHash());
+			static_assert(sizeof(value) == 4);
+			const uint32 asInteger = *reinterpret_cast<uint32*>(&value);
+			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), asInteger);
+		}
+
+		template<>
+		float popStackGeneric(const NativeFunction::Context context)
+		{
+			const uint32 asInteger = (uint32)context.mControlFlow.popValueStack(traits::getDataType<uint32>());
+			return *reinterpret_cast<const float*>(&asInteger);
+		}
+
+		template<>
+		void pushStackGeneric(double value, const NativeFunction::Context context)
+		{
+			static_assert(sizeof(value) == 8);
+			const uint64 asInteger = *reinterpret_cast<uint64*>(&value);
+			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), asInteger);
+		}
+
+		template<>
+		double popStackGeneric(const NativeFunction::Context context)
+		{
+			const uint64 asInteger = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
+			return *reinterpret_cast<const double*>(&asInteger);
+		}
+
+		template<>
+		void pushStackGeneric(StringRef value, const NativeFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), value.getHash());
 		};
 
 		template<>
@@ -45,10 +78,10 @@ namespace lemon
 		}
 
 		template<>
-		void pushStackGeneric(AnyTypeWrapper result, const NativeFunction::Context context)
+		void pushStackGeneric(AnyTypeWrapper value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<uint64>(), result.mValue);
-			context.mControlFlow.pushValueStack(traits::getDataType<uint8>(), (uint64)result.mType);
+			context.mControlFlow.pushValueStack(traits::getDataType<uint64>(), value.mValue);
+			context.mControlFlow.pushValueStack(traits::getDataType<uint8>(), (uint64)value.mType);
 		};
 
 		template<>

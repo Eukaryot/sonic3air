@@ -32,6 +32,12 @@ namespace lemon
 		}
 	}
 
+	uint32 FloatDataType::getDataTypeHash() const
+	{
+		static const constexpr uint32 baseHash = ((uint32)Class::FLOAT) << 24;
+		return baseHash + (uint32)getBytes();
+	}
+
 
 	size_t DataTypeHelper::getSizeOfBaseType(BaseType baseType)
 	{
@@ -46,6 +52,8 @@ namespace lemon
 			case BaseType::INT_32:		return 4;
 			case BaseType::INT_64:		return 8;
 			case BaseType::INT_CONST:	return 8;
+			case BaseType::FLOAT:		return 4;
+			case BaseType::DOUBLE:		return 8;
 			default:					return 0;
 		}
 	}
@@ -63,6 +71,8 @@ namespace lemon
 			case BaseType::INT_32:		return &PredefinedDataTypes::INT_32;
 			case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
 			case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
+			case BaseType::FLOAT:		return &PredefinedDataTypes::FLOAT;
+			case BaseType::DOUBLE:		return &PredefinedDataTypes::DOUBLE;
 			default:					return nullptr;
 		}
 	}
@@ -95,6 +105,8 @@ namespace lemon
 				case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
 				//case BaseType::BOOL:
 				case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
+				case BaseType::FLOAT:		return &PredefinedDataTypes::FLOAT;
+				case BaseType::DOUBLE:		return &PredefinedDataTypes::DOUBLE;
 				default:					return &PredefinedDataTypes::VOID;
 			}
 		}

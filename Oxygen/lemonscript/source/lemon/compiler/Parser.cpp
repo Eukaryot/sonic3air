@@ -29,6 +29,8 @@ namespace lemon
 			{ rmx::getMurmur2_64(String("u16")),	&PredefinedDataTypes::UINT_16 },
 			{ rmx::getMurmur2_64(String("u32")),	&PredefinedDataTypes::UINT_32 },
 			{ rmx::getMurmur2_64(String("u64")),	&PredefinedDataTypes::UINT_64 },
+			{ rmx::getMurmur2_64(String("float")),	&PredefinedDataTypes::FLOAT },
+			{ rmx::getMurmur2_64(String("double")),	&PredefinedDataTypes::DOUBLE },
 			{ rmx::getMurmur2_64(String("string")),	&PredefinedDataTypes::STRING }
 		};
 
@@ -53,10 +55,9 @@ namespace lemon
 
 		static const std::vector<const char*> reservedKeywords =
 		{
+			// These keywords are meant to be reserved for potential future use, and must not be used as identifiers
 			"local",
 			"auto",
-			"float",
-			"double",
 			"switch",
 			"case",
 			"select",
@@ -71,7 +72,10 @@ namespace lemon
 			"struct",
 			"class",
 			"foreach",
-			"typeof"
+			"in",
+			"out",
+			"ref",
+			"typeof",
 		};
 		static std::map<uint64, std::string> reservedKeywordLookup;
 
@@ -118,8 +122,8 @@ namespace lemon
 			}
 
 			// Check for "true", "false"
-			static const uint64 trueHash  =  rmx::getMurmur2_64(std::string_view("true"));
-			static const uint64 falseHash =  rmx::getMurmur2_64(std::string_view("false"));
+			static const uint64 trueHash  = rmx::getMurmur2_64(std::string_view("true"));
+			static const uint64 falseHash = rmx::getMurmur2_64(std::string_view("false"));
 			if (identifierHash == trueHash || identifierHash == falseHash)
 			{
 				ConstantParserToken& token = outTokens.create<ConstantParserToken>();
