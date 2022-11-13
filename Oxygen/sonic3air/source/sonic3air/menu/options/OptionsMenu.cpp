@@ -1025,7 +1025,7 @@ void OptionsMenu::update(float timeElapsed)
 						{
 							// Change soundtrack and restart music
 							config.mActiveSoundtrack = selectedEntry.selected().mValue;
-							if (AudioOut::instance().getAudioCollection().getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) != 0)
+							if (AudioOut::instance().hasLoadedRemasteredSoundtrack())
 							{
 								AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
 								AudioOut::instance().onSoundtrackPreferencesChanged();

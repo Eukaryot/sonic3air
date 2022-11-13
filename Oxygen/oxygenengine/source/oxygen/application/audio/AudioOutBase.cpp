@@ -36,8 +36,7 @@ void AudioOutBase::startup()
 	// Load audio definitions
 	//  -> No mods yet here, that's coming later in "handleGameLoaded"
 	mAudioCollection.loadFromJson(L"data/audio/original", L"audio_default.json", AudioCollection::Package::ORIGINAL);
-	mAudioCollection.loadFromJson(L"data/audio/remastered", L"audio_replacements.json", AudioCollection::Package::REMASTERED);
-	determineActiveSourceRegistrations();
+	reloadRemasteredSoundtrack();
 
 	// Startup
 	mAudioPlayer.startup();
@@ -59,6 +58,14 @@ void AudioOutBase::realtimeUpdate(float secondsPassed)
 
 	// Update playback and streaming
 	mAudioPlayer.updatePlayback(secondsPassed);
+}
+
+void AudioOutBase::reloadRemasteredSoundtrack()
+{
+	mAudioCollection.clearPackage(AudioCollection::Package::REMASTERED);
+	mAudioCollection.loadFromJson(L"data/audio/remastered", L"audio_replacements.json", AudioCollection::Package::REMASTERED);
+	mLoadedRemasteredSoundtrack = (mAudioCollection.getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) != 0);
+	determineActiveSourceRegistrations();
 }
 
 void AudioOutBase::setGlobalVolume(float volume)

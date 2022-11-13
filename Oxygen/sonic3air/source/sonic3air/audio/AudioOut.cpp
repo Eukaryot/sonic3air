@@ -39,7 +39,7 @@ void AudioOut::startup()
 	AudioOutBase::startup();
 
 	// Switch soundtrack selection if remastered soundtrack is not available
-	if (mAudioCollection.getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) == 0)
+	if (!mLoadedRemasteredSoundtrack)
 	{
 		ConfigurationImpl::instance().mActiveSoundtrack = 0;
 	}

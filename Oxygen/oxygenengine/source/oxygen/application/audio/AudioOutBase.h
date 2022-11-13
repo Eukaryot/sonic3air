@@ -57,6 +57,9 @@ public:
 	AudioCollection& getAudioCollection()  { return mAudioCollection; }
 	AudioPlayer& getAudioPlayer()		   { return mAudioPlayer; }
 
+	void reloadRemasteredSoundtrack();
+	bool hasLoadedRemasteredSoundtrack() const  { return mLoadedRemasteredSoundtrack; }
+
 	inline float getGlobalVolume() const   { return mGlobalVolume; }
 	void setGlobalVolume(float volume);
 
@@ -81,5 +84,6 @@ protected:
 protected:
 	AudioCollection mAudioCollection;
 	AudioPlayer mAudioPlayer;
+	bool mLoadedRemasteredSoundtrack = false;
 	float mGlobalVolume = 1.0f;
 };

@@ -215,7 +215,7 @@ void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color
 			drawer.printText(font, Recti(center + arrowDistance, py, 0, 10), ">", 5, color);
 
 		// Additional text for soundtrack
-		if (mData == option::SOUNDTRACK && AudioOut::instance().getAudioCollection().getNumSourcesByPackageType(AudioCollection::Package::REMASTERED) == 0 && selected().mIndex == 1)
+		if (mData == option::SOUNDTRACK && !AudioOut::instance().hasLoadedRemasteredSoundtrack() && selected().mIndex == 1)
 		{
 			py += 13;
 			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "Must be downloaded separately", 5, Color(1.0f, 0.9f, 0.8f, color.a));
