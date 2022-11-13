@@ -18,19 +18,23 @@ namespace lemon
 
 	bool TypeCasting::canImplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const
 	{
-		return (getImplicitCastPriority(&original, &target) != 0xff);
+		const CastHandling handling = getCastHandling(&original, &target);
+		return (handling.mResult != CastHandling::Result::INVALID);
 	}
 
 	bool TypeCasting::canExplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const
 	{
-		// TODO: This is a simplified implementation, as long as there's no need to differentiate between implicit and explicit casts
-		return canImplicitlyCastTypes(original, target);
+		const CastHandling handling = getCastHandling(&original, &target);
+		return (handling.mResult != CastHandling::Result::INVALID);
 	}
 
-	BaseCastType TypeCasting::getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target) const
+	TypeCasting::CastHandling TypeCasting::getCastHandling(const DataTypeDefinition* original, const DataTypeDefinition* target) const
 	{
 		if (original == target)
-			return BaseCastType::NONE;
+		{
+			// No cast needed
+			return CastHandling(CastHandling::Result::NO_CAST, 0);
+		}
 
 		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
 		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
@@ -42,10 +46,42 @@ namespace lemon
 				target = &PredefinedDataTypes::UINT_64;
 		}
 
+		if (original == target)
+		{
+			// It's a conversion between string and u64
+			return CastHandling(CastHandling::Result::NO_CAST, 1);
+		}
+
 		if (original->getClass() == DataTypeDefinition::Class::INTEGER && target->getClass() == DataTypeDefinition::Class::INTEGER)
 		{
 			const IntegerDataType& originalInt = original->as<IntegerDataType>();
 			const IntegerDataType& targetInt = target->as<IntegerDataType>();
+
+			uint8 castPriority = 0;
+			if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
+			{
+				// Const may get cast to every integer type
+				castPriority = 1;
+			}
+			else if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
+			{
+				// Can this happen at all?
+				castPriority = 1;
+			}
+			else if (originalInt.getBytes() == targetInt.getBytes())
+			{
+				castPriority = (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
+			}
+			else if (originalInt.getBytes() < targetInt.getBytes())
+			{
+				// Up cast
+				castPriority = ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
+			}
+			else
+			{
+				// Down cast
+				castPriority = ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
+			}
 
 			// No need for an opcode if size does not change at all
 			if (originalInt.getBytes() != targetInt.getBytes())
@@ -55,16 +91,22 @@ namespace lemon
 				{
 					castTypeBits += 0x10;
 				}
-				return (BaseCastType)castTypeBits;
+				return CastHandling((BaseCastType)castTypeBits, castPriority);
 			}
 			else
 			{
-				return BaseCastType::NONE;	// No cast needed
+				// No cast needed
+				return CastHandling(CastHandling::Result::NO_CAST, castPriority);
 			}
+		}
+		else if (target->getClass() == DataTypeDefinition::Class::ANY)
+		{
+			// Any cast has a very low priority
+			return CastHandling(CastHandling::Result::ANY_CAST, 0xf0);
 		}
 		else
 		{
-			return BaseCastType::INVALID;
+			return CastHandling(CastHandling::Result::INVALID, 0xff);
 		}
 	}
 
@@ -75,8 +117,7 @@ namespace lemon
 
 		for (size_t i = 0; i < original.size(); ++i)
 		{
-			const uint8 priority = getImplicitCastPriority(original[i], target[i].mDataType);
-			if (priority == CANNOT_CAST)
+			if (!canImplicitlyCastTypes(*original[i], *target[i].mDataType))
 			{
 				if (nullptr != outFailedIndex)
 					*outFailedIndex = i;
@@ -231,71 +272,8 @@ namespace lemon
 
 	uint8 TypeCasting::getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target) const
 	{
-		if (original == target)
-		{
-			// No cast required at all
-			return 0;
-		}
-
-		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
-		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
-		if (original == &PredefinedDataTypes::STRING)
-			original = &PredefinedDataTypes::UINT_64;
-		if (mCompileOptions.mScriptFeatureLevel < 2)
-		{
-			if (target == &PredefinedDataTypes::STRING)
-				target = &PredefinedDataTypes::UINT_64;
-		}
-
-		if (original == target)
-		{
-			// It's a conversion between string and u64
-			return 1;
-		}
-
-		if (original->getClass() == DataTypeDefinition::Class::INTEGER && target->getClass() == DataTypeDefinition::Class::INTEGER)
-		{
-			const IntegerDataType& originalInt = original->as<IntegerDataType>();
-			const IntegerDataType& targetInt = target->as<IntegerDataType>();
-
-			// Is one type undefined?
-			if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-			{
-				// Const may get cast to everything
-				return 1;
-			}
-			if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-			{
-				// Can this happen at all?
-				return 1;
-			}
-
-			if (originalInt.getBytes() == targetInt.getBytes())
-			{
-				return (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
-			}
-
-			if (originalInt.getBytes() < targetInt.getBytes())
-			{
-				// Up cast
-				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
-			}
-			else
-			{
-				// Down cast
-				return ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
-			}
-		}
-		else if (target->getClass() == DataTypeDefinition::Class::ANY && original->getClass() != DataTypeDefinition::Class::VOID)
-		{
-			// Very low prio
-			return 0xf0;
-		}
-		else
-		{
-			// No cast possible
-			return CANNOT_CAST;
-		}
+		const CastHandling handling = getCastHandling(original, target);
+		return (handling.mResult != CastHandling::Result::INVALID) ? handling.mCastPriority : CANNOT_CAST;
 	}
 
 }

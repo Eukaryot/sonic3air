@@ -22,6 +22,25 @@ namespace lemon
 	public:
 		static const constexpr uint8 CANNOT_CAST = 0xff;
 
+		struct CastHandling
+		{
+			enum class Result
+			{
+				NO_CAST,	// No cast needed
+				INVALID,	// Cast not possible
+				BASE_CAST,	// Cast between base types
+				ANY_CAST,	// Cast from source type to "any"
+			};
+
+			Result mResult = Result::INVALID;
+			BaseCastType mBaseCastType = BaseCastType::INVALID;
+			uint8 mCastPriority = 0xff;
+
+			inline CastHandling() {}
+			inline CastHandling(Result result, uint8 castPriority) : mResult(result), mCastPriority(castPriority) {}
+			inline CastHandling(BaseCastType baseCastType, uint8 castPriority) : mResult(Result::BASE_CAST), mBaseCastType(baseCastType), mCastPriority(castPriority) {}
+		};
+
 		struct BinaryOperatorSignature
 		{
 			const DataTypeDefinition* mLeft;
@@ -35,7 +54,7 @@ namespace lemon
 
 		bool canImplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const;
 		bool canExplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const;
-		BaseCastType getBaseCastType(const DataTypeDefinition* original, const DataTypeDefinition* target) const;
+		CastHandling getCastHandling(const DataTypeDefinition* original, const DataTypeDefinition* target) const;
 
 		bool canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex = nullptr) const;
 		uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right) const;
