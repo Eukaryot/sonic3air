@@ -104,7 +104,6 @@ function void fn01f7ce()
 #endif
 
 	u8 bit = (1 << D6.u8)
-
 	if ((objA0.flags2a & bit) == 0)
 	{
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
@@ -148,7 +147,11 @@ function void fn01f7ce()
 			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 			{
 				D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x90
-				if (D0.s16 >= 0 && D0.u16 <= 0x130)
+				s16 minDiff = 0
+			#if STANDALONE
+				minDiff = 12		// For a slightly faster exit at the top
+			#endif
+				if (D0.s16 >= minDiff && D0.u16 <= 0x130)
 				{
 					fn01f914()
 					return
@@ -223,15 +226,14 @@ function void fn01f914()
 	}
 
 	D0.u16 = u16[A2] >> 1
-	D2.u16 = objA1.position.x.u16
 	s16 dx = (s32(lookupSin(D0.u8)) * 0x7000) >> 16
-	D0.u16 = objA0.position.x.u16 + dx
-	objA1.position.x.u16 = D0.u16
-	objA1.velocity.x = (D0.s16 - D2.s16) << 8
-	D2.u16 = objA1.position.y.u16
-	D0.s16 = objA0.position.y.u16 + 0x90 - (u16[A2] >> 2)
-	objA1.position.y.u16 = D0.u16
-	objA1.velocity.y = (D0.s16 - D2.s16) << 8
+	u16 newPosX = objA0.position.x.u16 + dx
+	objA1.velocity.x = s16(newPosX - objA1.position.x.u16) << 8
+	objA1.position.x.u16 = newPosX
+
+	u16 newPosY = objA0.position.y.u16 + 0x90 - (u16[A2] >> 2)
+	objA1.velocity.y = s16(newPosY - objA1.position.y.u16) << 8
+	objA1.position.y.u16 = newPosY
 
 	D0 = (u16[A2] >> 1) / 11
 	u8[A1 + 0x22] = u8[0x01f99a + D0.s16]
