@@ -159,10 +159,10 @@ public:
 	bool readUnicode(const uint8* data, size_t datasize, UnicodeEncoding encoding = UnicodeEncoding::AUTO);
 	void writeUnicode(std::vector<uint8>& buffer, UnicodeEncoding encoding = UnicodeEncoding::AUTO, bool addBOM = true) const;
 
-	bool loadFile(const std::string& filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO);
-	bool loadFile(const std::wstring& filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO);
-	bool saveFile(const std::string& filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO) const;
-	bool saveFile(const std::wstring& filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO) const;
+	bool loadFile(std::string_view filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO);
+	bool loadFile(std::wstring_view filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO);
+	bool saveFile(std::string_view filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO) const;
+	bool saveFile(std::wstring_view filename, UnicodeEncoding encoding = UnicodeEncoding::AUTO) const;
 
 	CLASS& operator=(const CLASS& str)			{ copy(str); return (CLASS&)*this; }
 	CLASS& operator=(const CHAR* str)			{ copy(str); return (CLASS&)*this; }

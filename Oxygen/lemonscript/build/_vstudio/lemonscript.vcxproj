@@ -19,17 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\lemon\compiler\backend\FunctionCompiler.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp" />
-    <ClCompile Include="..\..\source\lemon\compiler\FunctionCompiler.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\frontend\TokenProcessing.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\LineNumberTranslation.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Node.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Operators.cpp" />
-    <ClCompile Include="..\..\source\lemon\compiler\Parser.cpp" />
-    <ClCompile Include="..\..\source\lemon\compiler\ParserHelper.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\parser\Parser.cpp" />
+    <ClCompile Include="..\..\source\lemon\compiler\parser\ParserHelper.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Preprocessor.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\Token.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\TokenHelper.cpp" />
-    <ClCompile Include="..\..\source\lemon\compiler\TokenProcessing.cpp" />
     <ClCompile Include="..\..\source\lemon\compiler\TypeCasting.cpp" />
     <ClCompile Include="..\..\source\lemon\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -60,22 +61,23 @@
     <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Errors.h" />
-    <ClInclude Include="..\..\source\lemon\compiler\FunctionCompiler.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\TokenProcessing.h" />
     <ClInclude Include="..\..\source\lemon\compiler\GenericManager.h" />
     <ClInclude Include="..\..\source\lemon\compiler\LineNumberTranslation.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Node.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Definitions.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Operators.h" />
-    <ClInclude Include="..\..\source\lemon\compiler\Parser.h" />
-    <ClInclude Include="..\..\source\lemon\compiler\ParserHelper.h" />
-    <ClInclude Include="..\..\source\lemon\compiler\ParserTokens.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\parser\Parser.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\parser\ParserHelper.h" />
+    <ClInclude Include="..\..\source\lemon\compiler\parser\ParserTokens.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Preprocessor.h" />
     <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Token.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TokenHelper.h" />
-    <ClInclude Include="..\..\source\lemon\compiler\TokenProcessing.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TokenTypes.h" />
     <ClInclude Include="..\..\source\lemon\compiler\TypeCasting.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Utility.h" />

@@ -7,7 +7,7 @@
 */
 
 #include "lemon/pch.h"
-#include "lemon/compiler/ParserHelper.h"
+#include "lemon/compiler/parser/ParserHelper.h"
 
 
 namespace lemon

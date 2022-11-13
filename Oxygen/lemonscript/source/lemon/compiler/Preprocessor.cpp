@@ -8,12 +8,12 @@
 
 #include "lemon/pch.h"
 #include "lemon/compiler/Preprocessor.h"
-#include "lemon/compiler/Parser.h"
-#include "lemon/compiler/ParserHelper.h"
-#include "lemon/compiler/ParserTokens.h"
 #include "lemon/compiler/Token.h"
-#include "lemon/compiler/TokenProcessing.h"
 #include "lemon/compiler/TokenTypes.h"
+#include "lemon/compiler/parser/Parser.h"
+#include "lemon/compiler/parser/ParserHelper.h"
+#include "lemon/compiler/parser/ParserTokens.h"
+#include "lemon/compiler/frontend/TokenProcessing.h"
 #include "lemon/program/GlobalsLookup.h"
 
 

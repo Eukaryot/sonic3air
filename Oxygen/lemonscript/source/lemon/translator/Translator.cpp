@@ -399,4 +399,11 @@ namespace lemon
 		cppTranslator.translate(output, rootNode);
 	}
 
+	void Translator::translateToCppAndSave(std::wstring_view filename, const BlockNode& rootNode)
+	{
+		String output;
+		translateToCpp(output, rootNode);
+		output.saveFile(filename);
+	}
+
 }

@@ -72,7 +72,7 @@ namespace lemon
 			ANY,
 			INTEGER,
 			FLOAT,
-			STRING
+			STRING,
 		};
 
 	public:
@@ -170,7 +170,7 @@ namespace lemon
 		{}
 
 		// Rather unfortunately, the data type hash for string needs to be the same as for u64, for feature level 1 compatibility regarding function overloading
-		uint32 getDataTypeHash() const override  { return 0x01000008; }
+		uint32 getDataTypeHash() const override  { return (((uint32)Class::INTEGER) << 24) + 8; }
 	};
 
 

@@ -22,18 +22,18 @@
     <Filter Include="lemon\utility">
       <UniqueIdentifier>{24cc8bbf-111e-496d-a56b-0339bee81deb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lemon\compiler\frontend">
+      <UniqueIdentifier>{c675668b-c4eb-41c0-b274-eb652d7d8263}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\compiler\backend">
+      <UniqueIdentifier>{97f44403-b3e9-4f02-8f25-fabd8804d2df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lemon\compiler\parser">
+      <UniqueIdentifier>{bb405800-486c-4cfb-9b24-da9a021501c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\lemon\compiler\Compiler.cpp">
-      <Filter>lemon\compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\lemon\compiler\FunctionCompiler.cpp">
-      <Filter>lemon\compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\lemon\compiler\Parser.cpp">
-      <Filter>lemon\compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\lemon\compiler\TokenProcessing.cpp">
       <Filter>lemon\compiler</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\program\Function.cpp">
@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\source\lemon\compiler\Node.cpp">
       <Filter>lemon\compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\lemon\compiler\Preprocessor.cpp">
-      <Filter>lemon\compiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\lemon\program\Module.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
@@ -71,9 +68,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\runtime\RuntimeFunction.cpp">
       <Filter>lemon\runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\lemon\compiler\ParserHelper.cpp">
-      <Filter>lemon\compiler</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\lemon\translator\Translator.cpp">
       <Filter>lemon\translator</Filter>
@@ -135,21 +129,30 @@
     <ClCompile Include="..\..\source\lemon\utility\PragmaSplitter.cpp">
       <Filter>lemon\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\backend\FunctionCompiler.cpp">
+      <Filter>lemon\compiler\backend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\frontend\TokenProcessing.cpp">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\parser\Parser.cpp">
+      <Filter>lemon\compiler\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\parser\ParserHelper.cpp">
+      <Filter>lemon\compiler\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.cpp">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\lemon\compiler\Preprocessor.cpp">
+      <Filter>lemon\compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
       <Filter>lemon\compiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\FunctionCompiler.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\Parser.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\lemon\compiler\Token.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\TokenProcessing.h">
       <Filter>lemon\compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\compiler\TokenTypes.h">
@@ -194,16 +197,7 @@
     <ClInclude Include="..\..\source\lemon\compiler\Node.h">
       <Filter>lemon\compiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\ParserTokens.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\lemon\compiler\Definitions.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\Preprocessor.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\ParserHelper.h">
       <Filter>lemon\compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\program\Module.h">
@@ -251,9 +245,6 @@
     <ClInclude Include="..\..\source\lemon\runtime\RuntimeOpcodeContext.h">
       <Filter>lemon\runtime</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h">
-      <Filter>lemon\compiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\lemon\runtime\ControlFlow.h">
       <Filter>lemon\runtime</Filter>
     </ClInclude>
@@ -292,6 +283,30 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h">
       <Filter>lemon\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\backend\FunctionCompiler.h">
+      <Filter>lemon\compiler\backend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\TokenProcessing.h">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\parser\Parser.h">
+      <Filter>lemon\compiler\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\parser\ParserHelper.h">
+      <Filter>lemon\compiler\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\parser\ParserTokens.h">
+      <Filter>lemon\compiler\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\frontend\CompilerFrontend.h">
+      <Filter>lemon\compiler\frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\Preprocessor.h">
+      <Filter>lemon\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h">
+      <Filter>lemon\compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

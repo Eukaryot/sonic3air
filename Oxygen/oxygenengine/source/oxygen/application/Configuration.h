@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/application/input/InputConfig.h"
+
 #include <lemon/compiler/PreprocessorDefinition.h>
 
 class JsonHelper;

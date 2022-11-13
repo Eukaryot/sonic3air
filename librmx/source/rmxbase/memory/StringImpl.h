@@ -1368,7 +1368,7 @@ TEMPLATE void STRING::writeUnicode(std::vector<uint8>& buffer, UnicodeEncoding e
 	}
 }
 
-TEMPLATE bool STRING::loadFile(const std::string& filename, UnicodeEncoding encoding)
+TEMPLATE bool STRING::loadFile(std::string_view filename, UnicodeEncoding encoding)
 {
 	// Load contents of a text file into this string
 	clear();
@@ -1384,7 +1384,7 @@ TEMPLATE bool STRING::loadFile(const std::string& filename, UnicodeEncoding enco
 	return readUnicode(&buffer[0], buffer.size(), encoding);
 }
 
-TEMPLATE bool STRING::loadFile(const std::wstring& filename, UnicodeEncoding encoding)
+TEMPLATE bool STRING::loadFile(std::wstring_view filename, UnicodeEncoding encoding)
 {
 	// Load contents of a text file into this string
 	clear();
@@ -1400,7 +1400,7 @@ TEMPLATE bool STRING::loadFile(const std::wstring& filename, UnicodeEncoding enc
 	return readUnicode(&buffer[0], buffer.size(), encoding);
 }
 
-TEMPLATE bool STRING::saveFile(const std::string& filename, UnicodeEncoding encoding) const
+TEMPLATE bool STRING::saveFile(std::string_view filename, UnicodeEncoding encoding) const
 {
 	// Save contents of string into a text file
 	std::vector<uint8> buffer;
@@ -1408,7 +1408,7 @@ TEMPLATE bool STRING::saveFile(const std::string& filename, UnicodeEncoding enco
 	return FTX::FileSystem->saveFile(filename, buffer);
 }
 
-TEMPLATE bool STRING::saveFile(const std::wstring& filename, UnicodeEncoding encoding) const
+TEMPLATE bool STRING::saveFile(std::wstring_view filename, UnicodeEncoding encoding) const
 {
 	// Save contents of string into a text file
 	std::vector<uint8> buffer;

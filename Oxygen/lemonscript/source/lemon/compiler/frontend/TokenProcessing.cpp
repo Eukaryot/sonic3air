@@ -7,7 +7,7 @@
 */
 
 #include "lemon/pch.h"
-#include "lemon/compiler/TokenProcessing.h"
+#include "lemon/compiler/frontend/TokenProcessing.h"
 #include "lemon/compiler/TokenHelper.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/Utility.h"

@@ -7,7 +7,7 @@
 */
 
 #include "lemon/pch.h"
-#include "lemon/compiler/FunctionCompiler.h"
+#include "lemon/compiler/backend/FunctionCompiler.h"
 #include "lemon/compiler/Node.h"
 #include "lemon/compiler/TokenTypes.h"
 #include "lemon/compiler/TypeCasting.h"
