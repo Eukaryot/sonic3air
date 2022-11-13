@@ -24,7 +24,7 @@ function void main()
 
 	// Test for floats
 	float two = createFloat(2)
-	logFloat(addFloats(two, createFloat(5)))
+	logFloat(two + createFloat(5))
 	debugLog2(two)
 
 #if 0

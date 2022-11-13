@@ -18,7 +18,11 @@ namespace lemon
 	class OpcodeExecUtils
 	{
 	public:
-		template<typename T> FORCE_INLINE static T safeDivide(T a, T b) { return (b == 0) ? 0 : (a / b); }
+		template<typename T> FORCE_INLINE static T safeDivide(T a, T b)		 { return (b == 0) ? 0 : (a / b); }
+		template<typename T> FORCE_INLINE static T safeModulo(T a, T b)		 { return (b == 0) ? 0 : (a % b); }
+		template<> FORCE_INLINE static float safeModulo(float a, float b)	 { return (b == 0.0f) ? 0.0f : std::fmodf(a, b); }
+		template<> FORCE_INLINE static double safeModulo(double a, double b) { return (b == 0.0) ? 0.0 : std::fmod(a, b); }
+
 		template<typename T> FORCE_INLINE static T readMemory(ControlFlow& controlFlow, uint64 address) {}
 		template<typename T> FORCE_INLINE static void writeMemory(ControlFlow& controlFlow, uint64 address, T value) {}
 	};

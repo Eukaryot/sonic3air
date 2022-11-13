@@ -83,6 +83,36 @@ namespace lemon
 			mValueStackPtr[offset] = value;
 		}
 
+		template<>
+		FORCE_INLINE float readValueStack(int offset) const
+		{
+			const uint32 asInteger = (uint32)mValueStackPtr[offset];
+			return *reinterpret_cast<const float*>(&asInteger);
+		}
+
+		template<>
+		FORCE_INLINE void writeValueStack(int offset, float value) const
+		{
+			static_assert(sizeof(float) == 4);
+			const uint32 asInteger = *reinterpret_cast<uint32*>(&value);
+			mValueStackPtr[offset] = asInteger;
+		}
+
+		template<>
+		FORCE_INLINE double readValueStack(int offset) const
+		{
+			const uint64 asInteger = mValueStackPtr[offset];
+			return *reinterpret_cast<const double*>(&asInteger);
+		}
+
+		template<>
+		FORCE_INLINE void writeValueStack(int offset, double value) const
+		{
+			static_assert(sizeof(double) == 8);
+			const uint64 asInteger = *reinterpret_cast<uint64*>(&value);
+			mValueStackPtr[offset] = asInteger;
+		}
+
 		FORCE_INLINE void moveValueStack(int change)
 		{
 			mValueStackPtr += change;

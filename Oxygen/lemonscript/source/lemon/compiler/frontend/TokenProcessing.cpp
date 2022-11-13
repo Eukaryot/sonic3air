@@ -13,6 +13,7 @@
 #include "lemon/compiler/Utility.h"
 #include "lemon/program/GlobalsLookup.h"
 #include "lemon/runtime/BuiltInFunctions.h"
+#include "lemon/runtime/OpcodeExecUtils.h"
 #include "lemon/runtime/Runtime.h"
 
 
@@ -64,7 +65,8 @@ namespace lemon
 
 		bool tryReplaceConstantsBinary(const ConstantToken& constLeft, const ConstantToken& constRight, Operator op, int64& outValue)
 		{
-			if (constLeft.mDataType == &PredefinedDataTypes::STRING || constRight.mDataType == &PredefinedDataTypes::STRING)
+			// TODO: Support float/double as well here
+			if (constLeft.mDataType->getClass() != DataTypeDefinition::Class::INTEGER || constRight.mDataType->getClass() != DataTypeDefinition::Class::INTEGER)
 				return false;
 
 			switch (op)
@@ -72,8 +74,8 @@ namespace lemon
 				case Operator::BINARY_PLUS:			outValue = constLeft.mValue + constRight.mValue;	return true;
 				case Operator::BINARY_MINUS:		outValue = constLeft.mValue - constRight.mValue;	return true;
 				case Operator::BINARY_MULTIPLY:		outValue = constLeft.mValue * constRight.mValue;	return true;
-				case Operator::BINARY_DIVIDE:		outValue = (constRight.mValue == 0) ? 0 : (constLeft.mValue / constRight.mValue);	return true;
-				case Operator::BINARY_MODULO:		outValue = (constRight.mValue == 0) ? 0 : (constLeft.mValue % constRight.mValue);	return true;
+				case Operator::BINARY_DIVIDE:		outValue = OpcodeExecUtils::safeDivide(constLeft.mValue, constRight.mValue);  return true;
+				case Operator::BINARY_MODULO:		outValue = OpcodeExecUtils::safeModulo(constLeft.mValue, constRight.mValue);  return true;
 				case Operator::BINARY_SHIFT_LEFT:	outValue = constLeft.mValue << constRight.mValue;	return true;
 				case Operator::BINARY_SHIFT_RIGHT:	outValue = constLeft.mValue >> constRight.mValue;	return true;
 				case Operator::BINARY_AND:			outValue = constLeft.mValue & constRight.mValue;	return true;

@@ -17,6 +17,61 @@
 
 namespace lemon
 {
+	#define SELECT_EXEC_FUNC_BY_DATATYPE(_function_) \
+	{ \
+		switch (opcode.mDataType) \
+		{ \
+			case BaseType::INT_8:		runtimeOpcode.mExecFunc = &_function_<int8>;	break; \
+			case BaseType::INT_16:		runtimeOpcode.mExecFunc = &_function_<int16>;	break; \
+			case BaseType::INT_32:		runtimeOpcode.mExecFunc = &_function_<int32>;	break; \
+			case BaseType::INT_64:		runtimeOpcode.mExecFunc = &_function_<int64>;	break; \
+			case BaseType::UINT_8:		runtimeOpcode.mExecFunc = &_function_<uint8>;	break; \
+			case BaseType::UINT_16:		runtimeOpcode.mExecFunc = &_function_<uint16>;	break; \
+			case BaseType::UINT_32:		runtimeOpcode.mExecFunc = &_function_<uint32>;	break; \
+			case BaseType::UINT_64:		runtimeOpcode.mExecFunc = &_function_<uint64>;	break; \
+			case BaseType::INT_CONST:	runtimeOpcode.mExecFunc = &_function_<uint64>;	break; \
+			case BaseType::FLOAT:		runtimeOpcode.mExecFunc = &_function_<float>;	break; \
+			case BaseType::DOUBLE:		runtimeOpcode.mExecFunc = &_function_<double>;	break; \
+			default: \
+				throw std::runtime_error("Invalid opcode data type"); \
+		} \
+	}
+
+	#define SELECT_EXEC_FUNC_BY_DATATYPE_INT(_function_) \
+	{ \
+		switch (opcode.mDataType) \
+		{ \
+			case BaseType::INT_8:		runtimeOpcode.mExecFunc = &_function_<int8>;	break; \
+			case BaseType::INT_16:		runtimeOpcode.mExecFunc = &_function_<int16>;	break; \
+			case BaseType::INT_32:		runtimeOpcode.mExecFunc = &_function_<int32>;	break; \
+			case BaseType::INT_64:		runtimeOpcode.mExecFunc = &_function_<int64>;	break; \
+			case BaseType::UINT_8:		runtimeOpcode.mExecFunc = &_function_<uint8>;	break; \
+			case BaseType::UINT_16:		runtimeOpcode.mExecFunc = &_function_<uint16>;	break; \
+			case BaseType::UINT_32:		runtimeOpcode.mExecFunc = &_function_<uint32>;	break; \
+			case BaseType::UINT_64:		runtimeOpcode.mExecFunc = &_function_<uint64>;	break; \
+			case BaseType::INT_CONST:	runtimeOpcode.mExecFunc = &_function_<uint64>;	break; \
+			default: \
+				throw std::runtime_error("Invalid opcode data type"); \
+		} \
+	}
+
+	#define SELECT_EXEC_FUNC_BY_DATATYPE_SIGNED(_function_) \
+	{ \
+		const BaseType baseType = (BaseType)((int)opcode.mDataType | 0x08); \
+		switch (baseType) \
+		{ \
+			case BaseType::INT_8:		runtimeOpcode.mExecFunc = &_function_<int8>;	break; \
+			case BaseType::INT_16:		runtimeOpcode.mExecFunc = &_function_<int16>;	break; \
+			case BaseType::INT_32:		runtimeOpcode.mExecFunc = &_function_<int32>;	break; \
+			case BaseType::INT_64:		runtimeOpcode.mExecFunc = &_function_<int64>;	break; \
+			case BaseType::INT_CONST:	runtimeOpcode.mExecFunc = &_function_<int64>;	break; \
+			case BaseType::FLOAT:		runtimeOpcode.mExecFunc = &_function_<float>;	break; \
+			case BaseType::DOUBLE:		runtimeOpcode.mExecFunc = &_function_<double>;	break; \
+			default: \
+				throw std::runtime_error("Invalid opcode data type"); \
+		} \
+	}
+
 
 	class OpcodeExec
 	{
@@ -172,130 +227,130 @@ namespace lemon
 		static void exec_ARITHM_BINARY_ADD(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) + (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) + context.readValueStack<T>(0));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_SUB(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) - (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) - context.readValueStack<T>(0));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_MUL(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) * (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) * context.readValueStack<T>(0));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_DIV(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*context.mControlFlow->mValueStackPtr) == 0) ? 0 : ((T)(*(context.mControlFlow->mValueStackPtr-1)) / (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, OpcodeExecUtils::safeDivide(context.readValueStack<T>(-1), context.readValueStack<T>(0)));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_MOD(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*context.mControlFlow->mValueStackPtr) == 0) ? 0 : ((T)(*(context.mControlFlow->mValueStackPtr-1)) % (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, OpcodeExecUtils::safeModulo(context.readValueStack<T>(-1), context.readValueStack<T>(0)));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_AND(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) & (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) & context.readValueStack<T>(0));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_OR(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) | (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) | context.readValueStack<T>(0));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_XOR(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) ^ (T)(*context.mControlFlow->mValueStackPtr));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) ^ context.readValueStack<T>(0));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_SHL(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) << ((T)(*context.mControlFlow->mValueStackPtr) & (sizeof(T) * 8 - 1)));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) << (context.readValueStack<T>(0) & (sizeof(T) * 8 - 1)));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_SHR(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) >> ((T)(*context.mControlFlow->mValueStackPtr) & (sizeof(T) * 8 - 1)));
+			context.writeValueStack<T>(-1, context.readValueStack<T>(-1) >> (context.readValueStack<T>(0) & (sizeof(T) * 8 - 1)));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_CMP_EQ(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) == (T)(*context.mControlFlow->mValueStackPtr)) ? 1 : 0;
+			context.writeValueStack<uint64>(-1, (context.readValueStack<T>(-1) == context.readValueStack<T>(0)) ? 1 : 0);
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_CMP_NEQ(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) != (T)(*context.mControlFlow->mValueStackPtr)) ? 1 : 0;
+			context.writeValueStack<uint64>(-1, (context.readValueStack<T>(-1) != context.readValueStack<T>(0)) ? 1 : 0);
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_CMP_LT(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) < (T)(*context.mControlFlow->mValueStackPtr)) ? 1 : 0;
+			context.writeValueStack<uint64>(-1, (context.readValueStack<T>(-1) < context.readValueStack<T>(0)) ? 1 : 0);
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_CMP_LE(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) <= (T)(*context.mControlFlow->mValueStackPtr)) ? 1 : 0;
+			context.writeValueStack<uint64>(-1, (context.readValueStack<T>(-1) <= context.readValueStack<T>(0)) ? 1 : 0);
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_CMP_GT(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) > (T)(*context.mControlFlow->mValueStackPtr)) ? 1 : 0;
+			context.writeValueStack<uint64>(-1, (context.readValueStack<T>(-1) > context.readValueStack<T>(0)) ? 1 : 0);
 		}
 
 		template<typename T>
 		static void exec_ARITHM_BINARY_CMP_GE(const RuntimeOpcodeContext context)
 		{
 			--context.mControlFlow->mValueStackPtr;
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) >= (T)(*context.mControlFlow->mValueStackPtr)) ? 1 : 0;
+			context.writeValueStack<uint64>(-1, (context.readValueStack<T>(-1) >= context.readValueStack<T>(0)) ? 1 : 0);
 		}
 
 		template<typename T>
 		static void exec_ARITHM_UNARY_NEG(const RuntimeOpcodeContext context)
 		{
-			*(context.mControlFlow->mValueStackPtr-1) = -(T)(*(context.mControlFlow->mValueStackPtr-1));
+			context.writeValueStack<T>(-1, -context.readValueStack<T>(-1));
 		}
 
 		template<typename T>
 		static void exec_ARITHM_UNARY_NOT(const RuntimeOpcodeContext context)
 		{
-			*(context.mControlFlow->mValueStackPtr-1) = ((T)(*(context.mControlFlow->mValueStackPtr-1)) == 0) ? 1 : 0;
+			context.writeValueStack<uint64>(-1, (context.readValueStack<T>(-1) == 0) ? 1 : 0);
 		}
 
 		template<typename T>
 		static void exec_ARITHM_UNARY_BITNOT(const RuntimeOpcodeContext context)
 		{
-			*(context.mControlFlow->mValueStackPtr-1) = (T)~((T)(*(context.mControlFlow->mValueStackPtr-1)));
+			context.writeValueStack<T>(-1, ~context.readValueStack<T>(-1));
 		}
 
 		static void exec_NOT_HANDLED(const RuntimeOpcodeContext context)
@@ -315,39 +370,6 @@ namespace lemon
 		runtimeOpcode.setParameter(opcode.mParameter);		// Default usage, parameter might be used differently depending on the opcode type
 		runtimeOpcode.mExecFunc = &OpcodeExec::exec_NOT_HANDLED;
 		runtimeOpcode.mOpcodeType = opcode.mType;
-
-		#define SELECT_EXEC_FUNC_BY_DATATYPE(_function_) \
-		{ \
-			switch (opcode.mDataType) \
-			{ \
-				case BaseType::INT_8:		runtimeOpcode.mExecFunc = &_function_<int8>;    break; \
-				case BaseType::INT_16:		runtimeOpcode.mExecFunc = &_function_<int16>;   break; \
-				case BaseType::INT_32:		runtimeOpcode.mExecFunc = &_function_<int32>;   break; \
-				case BaseType::INT_64:		runtimeOpcode.mExecFunc = &_function_<int64>;   break; \
-				case BaseType::UINT_8:		runtimeOpcode.mExecFunc = &_function_<uint8>;   break; \
-				case BaseType::UINT_16:		runtimeOpcode.mExecFunc = &_function_<uint16>;  break; \
-				case BaseType::UINT_32:		runtimeOpcode.mExecFunc = &_function_<uint32>;  break; \
-				case BaseType::UINT_64:		runtimeOpcode.mExecFunc = &_function_<uint64>;  break; \
-				case BaseType::INT_CONST:	runtimeOpcode.mExecFunc = &_function_<uint64>;  break; \
-				default: \
-					throw std::runtime_error("Invalid opcode data type"); \
-			} \
-		}
-
-		#define SELECT_EXEC_FUNC_BY_DATATYPE_SIGNED(_function_) \
-		{ \
-			const BaseType baseType = (BaseType)((int)opcode.mDataType | 0x08); \
-			switch (baseType) \
-			{ \
-				case BaseType::INT_8:		runtimeOpcode.mExecFunc = &_function_<int8>;    break; \
-				case BaseType::INT_16:		runtimeOpcode.mExecFunc = &_function_<int16>;   break; \
-				case BaseType::INT_32:		runtimeOpcode.mExecFunc = &_function_<int32>;   break; \
-				case BaseType::INT_64:		runtimeOpcode.mExecFunc = &_function_<int64>;   break; \
-				case BaseType::INT_CONST:	runtimeOpcode.mExecFunc = &_function_<int64>;	break; \
-				default: \
-					throw std::runtime_error("Invalid opcode data type"); \
-			} \
-		}
 
 		switch (opcode.mType)
 		{
@@ -456,11 +478,11 @@ namespace lemon
 			{
 				if (opcode.mParameter == 0)
 				{
-					SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_READ_MEMORY);
+					SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_READ_MEMORY);
 				}
 				else
 				{
-					SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_READ_MEMORY_NOCONSUME);
+					SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_READ_MEMORY_NOCONSUME);
 				}
 				break;
 			}
@@ -469,11 +491,11 @@ namespace lemon
 			{
 				if (opcode.mParameter == 0)
 				{
-					SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_WRITE_MEMORY);
+					SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_WRITE_MEMORY);
 				}
 				else
 				{
-					SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_WRITE_MEMORY_EXCHANGED);
+					SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_WRITE_MEMORY_EXCHANGED);
 				}
 				break;
 			}
@@ -506,11 +528,12 @@ namespace lemon
 			case Opcode::Type::ARITHM_MUL:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_MUL);	break;
 			case Opcode::Type::ARITHM_DIV:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_DIV);	break;
 			case Opcode::Type::ARITHM_MOD:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_MOD);	break;
-			case Opcode::Type::ARITHM_AND:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_AND);	break;
-			case Opcode::Type::ARITHM_OR:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_OR);	break;
-			case Opcode::Type::ARITHM_XOR:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_XOR);	break;
-			case Opcode::Type::ARITHM_SHL:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_SHL);	break;
-			case Opcode::Type::ARITHM_SHR:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_SHR);	break;
+
+			case Opcode::Type::ARITHM_AND:		SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_BINARY_AND);	break;
+			case Opcode::Type::ARITHM_OR:		SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_BINARY_OR);	break;
+			case Opcode::Type::ARITHM_XOR:		SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_BINARY_XOR);	break;
+			case Opcode::Type::ARITHM_SHL:		SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_BINARY_SHL);	break;
+			case Opcode::Type::ARITHM_SHR:		SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_BINARY_SHR);	break;
 
 			case Opcode::Type::COMPARE_EQ:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_CMP_EQ);	break;
 			case Opcode::Type::COMPARE_NEQ:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_BINARY_CMP_NEQ);	break;
@@ -521,7 +544,7 @@ namespace lemon
 
 			case Opcode::Type::ARITHM_NEG:		SELECT_EXEC_FUNC_BY_DATATYPE_SIGNED(OpcodeExec::exec_ARITHM_UNARY_NEG);	break;
 			case Opcode::Type::ARITHM_NOT:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_UNARY_NOT);		break;
-			case Opcode::Type::ARITHM_BITNOT:	SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_UNARY_BITNOT);		break;
+			case Opcode::Type::ARITHM_BITNOT:	SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_UNARY_BITNOT);		break;
 
 			case Opcode::Type::JUMP:
 			case Opcode::Type::JUMP_CONDITIONAL:
@@ -550,4 +573,7 @@ namespace lemon
 		return true;
 	}
 
+	#undef SELECT_EXEC_FUNC_BY_DATATYPE
+	#undef SELECT_EXEC_FUNC_BY_DATATYPE_INT
+	#undef SELECT_EXEC_FUNC_BY_DATATYPE_SIGNED
 }
