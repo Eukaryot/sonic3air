@@ -188,7 +188,7 @@ namespace lemon
 		CHECK_ERROR(nullptr != sourceType, "Internal error: Got an invalid source type for cast", mLineNumber);
 		CHECK_ERROR(nullptr != targetType, "Internal error: Got an invalid target type for cast", mLineNumber);
 
-		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).getCastHandling(sourceType, targetType);
+		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).getCastHandling(sourceType, targetType, false);
 		switch (castHandling.mResult)
 		{
 			case TypeCasting::CastHandling::Result::NO_CAST:
@@ -504,6 +504,7 @@ namespace lemon
 					// Treat this just like a function call
 					compileTokenTreeToOpcodes(*bot.mLeft);
 					compileTokenTreeToOpcodes(*bot.mRight);
+					// TODO: Do we need implicit casts here?
 					addOpcode(Opcode::Type::CALL, (BaseType)0, bot.mFunction->getNameAndSignatureHash());
 					break;
 				}
@@ -514,6 +515,7 @@ namespace lemon
 					{
 						// Assignment to variable
 						compileTokenTreeToOpcodes(*bot.mRight);
+						addCastOpcodeIfNecessary(bot.mRight->mDataType, bot.mLeft->mDataType);
 						compileTokenTreeToOpcodes(*bot.mLeft, false, true);
 						break;
 					}
@@ -770,12 +772,14 @@ namespace lemon
 		{
 			addOpcode(Opcode::Type::MAKE_BOOL, leftToken->mDataType);
 		}
+		// TODO: Add cast opcode if necessary - but this requires knowing the binary operation signature (similar to function parameters)
 
 		compileTokenTreeToOpcodes(*rightToken);
 		if (usesBoolTypes && !isComparison(*rightToken))
 		{
 			addOpcode(Opcode::Type::MAKE_BOOL, rightToken->mDataType);
 		}
+		// TODO: Add cast opcode if necessary - but this requires knowing the binary operation signature (similar to function parameters)
 
 		// Not the token's own data type, that does not work for comparisons
 		//  -> TODO: This is potentially dangerous for u8 * s8 multiplications!
@@ -867,18 +871,23 @@ namespace lemon
 				{
 					if (opcode2.mType == Opcode::Type::CAST_VALUE)
 					{
-						switch (opcode2.mParameter & 0x83)
+						// TODO: Support conversions between integer, float, double constants
+						//  -> Unless this is done in the compiler frontend already, which actually makes more sense...
+						if (DataTypeHelper::isPureIntegerBaseCast((BaseCastType)opcode2.mParameter))
 						{
-							case 0x00:  opcode1.mParameter =  (uint8)opcode1.mParameter;  break;
-							case 0x01:  opcode1.mParameter = (uint16)opcode1.mParameter;  break;
-							case 0x02:  opcode1.mParameter = (uint32)opcode1.mParameter;  break;
-							case 0x80:  opcode1.mParameter =   (int8)opcode1.mParameter;  break;
-							case 0x81:  opcode1.mParameter =  (int16)opcode1.mParameter;  break;
-							case 0x82:  opcode1.mParameter =  (int32)opcode1.mParameter;  break;
+							switch (opcode2.mParameter & 0x13)
+							{
+								case 0x00:  opcode1.mParameter =  (uint8)opcode1.mParameter;  break;
+								case 0x01:  opcode1.mParameter = (uint16)opcode1.mParameter;  break;
+								case 0x02:  opcode1.mParameter = (uint32)opcode1.mParameter;  break;
+								case 0x10:  opcode1.mParameter =   (int8)opcode1.mParameter;  break;
+								case 0x11:  opcode1.mParameter =  (int16)opcode1.mParameter;  break;
+								case 0x12:  opcode1.mParameter =  (int32)opcode1.mParameter;  break;
+							}
+							opcode2.mType = Opcode::Type::NOP;
+							anotherRun = true;
+							continue;
 						}
-						opcode2.mType = Opcode::Type::NOP;
-						anotherRun = true;
-						continue;
 					}
 				}
 			}

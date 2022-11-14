@@ -18,17 +18,17 @@ namespace lemon
 
 	bool TypeCasting::canImplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const
 	{
-		const CastHandling handling = getCastHandling(&original, &target);
+		const CastHandling handling = getCastHandling(&original, &target, false);
 		return (handling.mResult != CastHandling::Result::INVALID);
 	}
 
 	bool TypeCasting::canExplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const
 	{
-		const CastHandling handling = getCastHandling(&original, &target);
+		const CastHandling handling = getCastHandling(&original, &target, true);
 		return (handling.mResult != CastHandling::Result::INVALID);
 	}
 
-	TypeCasting::CastHandling TypeCasting::getCastHandling(const DataTypeDefinition* original, const DataTypeDefinition* target) const
+	TypeCasting::CastHandling TypeCasting::getCastHandling(const DataTypeDefinition* original, const DataTypeDefinition* target, bool explicitCast) const
 	{
 		if (original == target)
 		{
@@ -52,62 +52,103 @@ namespace lemon
 			return CastHandling(CastHandling::Result::NO_CAST, 1);
 		}
 
-		if (original->getClass() == DataTypeDefinition::Class::INTEGER && target->getClass() == DataTypeDefinition::Class::INTEGER)
+		const bool originalIsBaseType = (original->getClass() == DataTypeDefinition::Class::INTEGER || original->getClass() == DataTypeDefinition::Class::FLOAT);
+		const bool targetIsBaseType = (target->getClass() == DataTypeDefinition::Class::INTEGER || target->getClass() == DataTypeDefinition::Class::FLOAT);
+		if (originalIsBaseType && targetIsBaseType)
 		{
-			const IntegerDataType& originalInt = original->as<IntegerDataType>();
-			const IntegerDataType& targetInt = target->as<IntegerDataType>();
-
-			uint8 castPriority = 0;
-			if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
+			if (original->getClass() == DataTypeDefinition::Class::INTEGER)
 			{
-				// Const may get cast to every integer type
-				castPriority = 1;
-			}
-			else if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
-			{
-				// Can this happen at all?
-				castPriority = 1;
-			}
-			else if (originalInt.getBytes() == targetInt.getBytes())
-			{
-				castPriority = (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
-			}
-			else if (originalInt.getBytes() < targetInt.getBytes())
-			{
-				// Up cast
-				castPriority = ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
-			}
-			else
-			{
-				// Down cast
-				castPriority = ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
-			}
-
-			// No need for an opcode if size does not change at all
-			if (originalInt.getBytes() != targetInt.getBytes())
-			{
-				uint8 castTypeBits = (originalInt.mSizeBits << 2) + targetInt.mSizeBits;
-				if (originalInt.mIsSigned && targetInt.getBytes() > originalInt.getBytes())		// Recognize signed up-cast
+				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
 				{
-					castTypeBits += 0x10;
+					// Cast between integers
+					const IntegerDataType& originalInt = original->as<IntegerDataType>();
+					const IntegerDataType& targetInt = target->as<IntegerDataType>();
+
+					uint8 castPriority = 0;
+					if (originalInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
+					{
+						// Const may get cast to every integer type
+						castPriority = 1;
+					}
+					else if (targetInt.mSemantics == IntegerDataType::Semantics::CONSTANT)
+					{
+						// Can this happen at all?
+						castPriority = 1;
+					}
+					else if (originalInt.getBytes() == targetInt.getBytes())
+					{
+						castPriority = (originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x02 : 0x01;
+					}
+					else if (originalInt.getBytes() < targetInt.getBytes())
+					{
+						// Up cast
+						castPriority = ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x20 : 0x10) + (targetInt.mSizeBits - originalInt.mSizeBits);
+					}
+					else
+					{
+						// Down cast
+						castPriority = ((originalInt.mIsSigned && !targetInt.mIsSigned) ? 0x40 : 0x30) + (originalInt.mSizeBits - targetInt.mSizeBits);
+					}
+
+					// No need for an opcode if size does not change at all
+					if (originalInt.getBytes() != targetInt.getBytes())
+					{
+						uint8 castTypeBits = (originalInt.mSizeBits * 4) + targetInt.mSizeBits;
+						if (originalInt.mIsSigned && targetInt.getBytes() > originalInt.getBytes())		// Recognize signed up-cast
+						{
+							castTypeBits += 0x10;
+						}
+						return CastHandling((BaseCastType)castTypeBits, castPriority);
+					}
+					else
+					{
+						// No cast needed
+						return CastHandling(CastHandling::Result::NO_CAST, castPriority);
+					}
 				}
-				return CastHandling((BaseCastType)castTypeBits, castPriority);
+				else
+				{
+					// TODO: Can we handle CONST_INT by doing a compile-time conversion of the constant value?
+
+					// Cast from integer to floating point type
+					const IntegerDataType& originalInt = original->as<IntegerDataType>();
+					uint8 castTypeBits = 0x20 + originalInt.mSizeBits;
+					castTypeBits += originalInt.mIsSigned ? 0x04 : 0;
+					castTypeBits += (target->getBytes() == 8) ? 0x08 : 0;
+					return CastHandling((BaseCastType)castTypeBits, 0x50 + originalInt.mSizeBits);
+				}
 			}
 			else
 			{
-				// No cast needed
-				return CastHandling(CastHandling::Result::NO_CAST, castPriority);
+				if (target->getClass() == DataTypeDefinition::Class::INTEGER)
+				{
+					// Cast from floating point type to integer
+					//  -> This needs to be done explicitly
+					if (explicitCast)
+					{
+						const IntegerDataType& targetInt = target->as<IntegerDataType>();
+						uint8 castTypeBits = 0x30 + targetInt.mSizeBits;
+						castTypeBits += targetInt.mIsSigned ? 0x04 : 0;
+						castTypeBits += (original->getBytes() == 8) ? 0x08 : 0;
+						return CastHandling((BaseCastType)castTypeBits, 0x54 - targetInt.mSizeBits);
+					}
+				}
+				else
+				{
+					// Cast from float to double or vice versa
+					const BaseCastType baseCastType = (original->getBytes() < target->getBytes()) ? BaseCastType::FLOAT_TO_DOUBLE : BaseCastType::DOUBLE_TO_FLOAT;
+					return CastHandling(baseCastType, 0x48);
+				}
 			}
 		}
-		else if (target->getClass() == DataTypeDefinition::Class::ANY)
+
+		if (target->getClass() == DataTypeDefinition::Class::ANY)
 		{
 			// Any cast has a very low priority
 			return CastHandling(CastHandling::Result::ANY_CAST, 0xf0);
 		}
-		else
-		{
-			return CastHandling(CastHandling::Result::INVALID, 0xff);
-		}
+
+		return CastHandling(CastHandling::Result::INVALID, 0xff);
 	}
 
 	bool TypeCasting::canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex) const
@@ -272,7 +313,7 @@ namespace lemon
 
 	uint8 TypeCasting::getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target) const
 	{
-		const CastHandling handling = getCastHandling(original, target);
+		const CastHandling handling = getCastHandling(original, target, false);
 		return (handling.mResult != CastHandling::Result::INVALID) ? handling.mCastPriority : CANNOT_CAST;
 	}
 

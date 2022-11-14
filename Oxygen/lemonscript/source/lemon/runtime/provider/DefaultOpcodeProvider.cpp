@@ -211,11 +211,11 @@ namespace lemon
 			*(context.mControlFlow->mValueStackPtr - 1) = value;	// Replace top-of-stack (still the address) with the value
 		}
 
-		template<typename T>
+		template<typename S, typename T>
 		static void exec_CAST_VALUE(const RuntimeOpcodeContext context)
 		{
-			const int64 value = *(context.mControlFlow->mValueStackPtr-1);
-			*(context.mControlFlow->mValueStackPtr-1) = (T)value;
+			const S value = context.readValueStack<S>(-1);
+			context.writeValueStack<T>(-1, static_cast<T>(value));
 		}
 
 		static void exec_MAKE_BOOL(const RuntimeOpcodeContext context)
@@ -502,15 +502,75 @@ namespace lemon
 
 			case Opcode::Type::CAST_VALUE:
 			{
-				const BaseType execType = OpcodeHelper::getCastExecType(opcode);
-				switch (execType)
+				const BaseCastType baseCastType = static_cast<BaseCastType>(opcode.mParameter);
+				switch (baseCastType)
 				{
-					case BaseType::INT_8:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int8>;	break;
-					case BaseType::INT_16:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int16>;	break;
-					case BaseType::INT_32:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int32>;	break;
-					case BaseType::UINT_8:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint8>;	break;
-					case BaseType::UINT_16:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint16>;	break;
-					case BaseType::UINT_32:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint32>;	break;
+					// Cast down (signed or unsigned makes no difference here)
+					case BaseCastType::INT_16_TO_8:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint16, uint8>;   break;
+					case BaseCastType::INT_32_TO_8:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint32, uint8>;   break;
+					case BaseCastType::INT_64_TO_8:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint64, uint8>;   break;
+					case BaseCastType::INT_32_TO_16: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint32, uint16>;  break;
+					case BaseCastType::INT_64_TO_16: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint64, uint16>;  break;
+					case BaseCastType::INT_64_TO_32: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint64, uint32>;  break;
+
+					// Cast up (value is unsigned -> adding zeroes)
+					case BaseCastType::UINT_8_TO_16:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint8, uint16>;  break;
+					case BaseCastType::UINT_8_TO_32:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint8, uint32>;  break;
+					case BaseCastType::UINT_8_TO_64:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint8, uint64>;  break;
+					case BaseCastType::UINT_16_TO_32: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint16, uint32>; break;
+					case BaseCastType::UINT_16_TO_64: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint16, uint64>; break;
+					case BaseCastType::UINT_32_TO_64: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint32, uint64>; break;
+
+					// Cast up (value is signed -> adding highest bit)
+					case BaseCastType::SINT_8_TO_16:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int8, int16>;    break;
+					case BaseCastType::SINT_8_TO_32:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int8, int32>;    break;
+					case BaseCastType::SINT_8_TO_64:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int8, int64>;    break;
+					case BaseCastType::SINT_16_TO_32: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int16, int32>;   break;
+					case BaseCastType::SINT_16_TO_64: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int16, int64>;   break;
+					case BaseCastType::SINT_32_TO_64: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int32, int64>;   break;
+
+					// Integer cast to float
+					case BaseCastType::UINT_8_TO_FLOAT:   runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint8,  float>;   break;
+					case BaseCastType::UINT_16_TO_FLOAT:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint16, float>;   break;
+					case BaseCastType::UINT_32_TO_FLOAT:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint32, float>;   break;
+					case BaseCastType::UINT_64_TO_FLOAT:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint64, float>;   break;
+					case BaseCastType::SINT_8_TO_FLOAT:   runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int8,   float>;   break;
+					case BaseCastType::SINT_16_TO_FLOAT:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int16,  float>;   break;
+					case BaseCastType::SINT_32_TO_FLOAT:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int32,  float>;   break;
+					case BaseCastType::SINT_64_TO_FLOAT:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int64,  float>;   break;
+
+					case BaseCastType::UINT_8_TO_DOUBLE:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint8,  double>;  break;
+					case BaseCastType::UINT_16_TO_DOUBLE: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint16, double>;  break;
+					case BaseCastType::UINT_32_TO_DOUBLE: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint32, double>;  break;
+					case BaseCastType::UINT_64_TO_DOUBLE: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<uint64, double>;  break;
+					case BaseCastType::SINT_8_TO_DOUBLE:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int8,   double>;  break;
+					case BaseCastType::SINT_16_TO_DOUBLE: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int16,  double>;  break;
+					case BaseCastType::SINT_32_TO_DOUBLE: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int32,  double>;  break;
+					case BaseCastType::SINT_64_TO_DOUBLE: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<int64,  double>;  break;
+
+					// Float cast to integer
+					case BaseCastType::FLOAT_TO_UINT_8:   runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, uint8>;    break;
+					case BaseCastType::FLOAT_TO_UINT_16:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, uint16>;   break;
+					case BaseCastType::FLOAT_TO_UINT_32:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, uint32>;   break;
+					case BaseCastType::FLOAT_TO_UINT_64:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, uint64>;   break;
+					case BaseCastType::FLOAT_TO_SINT_8:   runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, int8>;     break;
+					case BaseCastType::FLOAT_TO_SINT_16:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, int16>;    break;
+					case BaseCastType::FLOAT_TO_SINT_32:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, int32>;    break;
+					case BaseCastType::FLOAT_TO_SINT_64:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, int64>;    break;
+
+					case BaseCastType::DOUBLE_TO_UINT_8:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, uint8>;   break;
+					case BaseCastType::DOUBLE_TO_UINT_16: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, uint16>;  break;
+					case BaseCastType::DOUBLE_TO_UINT_32: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, uint32>;  break;
+					case BaseCastType::DOUBLE_TO_UINT_64: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, uint64>;  break;
+					case BaseCastType::DOUBLE_TO_SINT_8:  runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, int8>;    break;
+					case BaseCastType::DOUBLE_TO_SINT_16: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, int16>;   break;
+					case BaseCastType::DOUBLE_TO_SINT_32: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, int32>;   break;
+					case BaseCastType::DOUBLE_TO_SINT_64: runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, int64>;   break;
+
+					// Float cast
+					case BaseCastType::FLOAT_TO_DOUBLE:   runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<float, double>;   break;
+					case BaseCastType::DOUBLE_TO_FLOAT:   runtimeOpcode.mExecFunc = &OpcodeExec::exec_CAST_VALUE<double, float>;   break;
+
 					default:
 						throw std::runtime_error("Unrecognized cast type");
 				}

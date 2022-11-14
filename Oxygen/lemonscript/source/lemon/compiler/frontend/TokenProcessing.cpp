@@ -1143,9 +1143,17 @@ namespace lemon
 		{
 			case Token::Type::CONSTANT:
 			{
-				if (token.mDataType != &PredefinedDataTypes::STRING)
+				if (token.mDataType->getClass() == DataTypeDefinition::Class::INTEGER)
 				{
-					token.mDataType = (nullptr != resultType) ? resultType : &PredefinedDataTypes::CONST_INT;
+					if (nullptr != resultType && resultType->getClass() == DataTypeDefinition::Class::INTEGER)
+					{
+						// Let the constant use the result data type
+						token.mDataType = resultType;
+					}
+					else
+					{
+						token.mDataType = &PredefinedDataTypes::CONST_INT;
+					}
 				}
 				break;
 			}

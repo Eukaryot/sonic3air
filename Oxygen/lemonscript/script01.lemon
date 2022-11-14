@@ -14,6 +14,7 @@ constant array<u8> fibonacci =
 
 function void main()
 {
+#if 0
 	// Test for "any" type
 	u8 g = 0x56
 	u64 h = 0x123456789abcdef
@@ -21,10 +22,12 @@ function void main()
 	debugLog2(g)
 	debugLog2(h)
 	debugLog2(yes)
+#endif
 
 	// Test for floats
-	float two = createFloat(2)
+	float two = 2
 	logFloat(two + createFloat(5))
+	//logFloat(two + 5)		// TODO: Make this work
 	debugLog2(two)
 
 #if 0

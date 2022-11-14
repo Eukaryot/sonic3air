@@ -77,6 +77,12 @@ namespace lemon
 		}
 	}
 
+	bool DataTypeHelper::isPureIntegerBaseCast(BaseCastType baseCastType)
+	{
+		const uint8 value = (uint8)baseCastType;
+		return (value > 0 && value < 0x20);
+	}
+
 
 	const DataTypeDefinition* DataTypeSerializer::getDataTypeFromSerializedId(uint8 dataTypeId)
 	{

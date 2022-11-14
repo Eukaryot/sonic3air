@@ -14,6 +14,7 @@
 namespace lemon
 {
 
+	// This helper is only used by nativizer, after usage was replaced elsewhere
 	class OpcodeHelper
 	{
 	public:
@@ -44,6 +45,8 @@ namespace lemon
 				case BaseCastType::SINT_16_TO_32: return BaseType::INT_16;
 				case BaseCastType::SINT_16_TO_64: return BaseType::INT_16;
 				case BaseCastType::SINT_32_TO_64: return BaseType::INT_32;
+
+				// TODO: Add the rest here as well
 
 				default:
 					throw std::runtime_error("Unrecognized cast type");
