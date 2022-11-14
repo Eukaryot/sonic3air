@@ -106,6 +106,7 @@
 	"DC":				 { "Name": "Credits Medley", "File": "DC.ogg", "Type": "Jingle" },
 	"FF":				 { "File": "FF.ogg", "Type": "Jingle" },
 	"supertheme_sonic2": { "File": "supertheme_sonic2.ogg", "Type": "Music", "LoopStart": "29479" },
+	"supertheme_origins": { "File": "supertheme_origins.ogg", "Type": "Music", "LoopStart": "29479" },
 
 	"07_proto":			 { "Name": "Carnival Night 1 (Proto)",       "File": "07_proto.ogg", "Type": "Music", "LoopStart": "1248094" },
 	"07_proto_fast":	 { "Name": "Carnival Night 1 (Proto, fast)", "File": "07_proto_fast.ogg", "Type": "Music", "LoopStart": "998475" },
