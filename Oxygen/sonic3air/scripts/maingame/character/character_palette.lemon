@@ -983,7 +983,7 @@ function bool UpdatePaletteEffects.SuperForm.endpose()
 	//  - Variant for modded palettes
 
 	string characterPaletteKey = getCharacterEndPosePaletteKey(getMainCharacter())
-	string characterSpriteKey = 0
+	string characterSpriteKey = ""
 
 	if (objA0.animation.sprite >= 0x03)
 		characterSpriteKey = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
