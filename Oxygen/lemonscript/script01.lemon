@@ -26,9 +26,7 @@ function void main()
 
 	// Test for floats
 	float two = 2
-	logFloat(two + createFloat(5))
-	//logFloat(two + 5)		// TODO: Make this work
-	debugLog2(two)
+	debugLog2(two + (two / 5))	// Result: 2.4
 
 #if 0
 	// Test for constant arrays & strings

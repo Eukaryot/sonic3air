@@ -105,16 +105,6 @@ void debugLog2(AnyTypeWrapper param)
 	}
 }
 
-float createFloat(uint16 intValue)
-{
-	return (float)intValue;
-}
-
-float addFloats(float a, float b)
-{
-	return a + b;
-}
-
 void logFloat(float value)
 {
 	std::cout << value << std::endl;
@@ -241,8 +231,6 @@ int main(int argc, char** argv)
 
 	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
 	module.addNativeFunction("debugLog2", lemon::wrap(&debugLog2));
-	module.addNativeFunction("createFloat", lemon::wrap(&createFloat));
-	module.addNativeFunction("addFloats", lemon::wrap(&addFloats));
 	module.addNativeFunction("logFloat", lemon::wrap(&logFloat));
 	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
 	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);

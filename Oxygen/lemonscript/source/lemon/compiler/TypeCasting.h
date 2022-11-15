@@ -11,6 +11,8 @@
 #include "lemon/program/Function.h"
 #include "lemon/compiler/Operators.h"
 
+#include <optional>
+
 
 namespace lemon
 {
@@ -50,6 +52,9 @@ namespace lemon
 		};
 
 	public:
+		static const std::vector<BinaryOperatorSignature>& getBinarySignaturesForOperator(Operator op);
+
+	public:
 		inline explicit TypeCasting(const CompileOptions& compileOptions) : mCompileOptions(compileOptions) {}
 
 		bool canImplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const;
@@ -59,7 +64,8 @@ namespace lemon
 		bool canMatchSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target, size_t* outFailedIndex = nullptr) const;
 		uint16 getPriorityOfSignature(const BinaryOperatorSignature& signature, const DataTypeDefinition* left, const DataTypeDefinition* right) const;
 		uint32 getPriorityOfSignature(const std::vector<const DataTypeDefinition*>& original, const Function::ParameterList& target) const;
-		const BinaryOperatorSignature* getBestOperatorSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right) const;
+
+		std::optional<size_t> getBestOperatorSignature(const std::vector<BinaryOperatorSignature>& signatures, bool exactMatchLeftRequired, const DataTypeDefinition* left, const DataTypeDefinition* right) const;
 
 	private:
 		uint8 getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target) const;

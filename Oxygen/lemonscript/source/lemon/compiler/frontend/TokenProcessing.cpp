@@ -184,6 +184,18 @@ namespace lemon
 		return anyResolved;
 	}
 
+	void TokenProcessing::insertCastTokenIfNecessary(TokenPtr<StatementToken>& token, const DataTypeDefinition* targetDataType)
+	{
+		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).getCastHandling(token->mDataType, targetDataType, false);
+		if (castHandling.mResult == TypeCasting::CastHandling::Result::BASE_CAST)
+		{
+			TokenPtr<StatementToken> inner = token;		// Make a copy, as the original gets replaced in the next line
+			ValueCastToken& vct = token.create<ValueCastToken>();
+			vct.mDataType = targetDataType;
+			vct.mArgument = inner;
+		}
+	}
+
 	void TokenProcessing::processDefines(TokenList& tokens)
 	{
 		bool anyDefineResolved = false;
@@ -1248,31 +1260,23 @@ namespace lemon
 				}
 
 				// Choose best fitting signature
-				const TypeCasting::BinaryOperatorSignature* signature = mTypeCasting.getBestOperatorSignature(bot.mOperator, leftDataType, rightDataType);
-				CHECK_ERROR(nullptr != signature, "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(bot.mOperator) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
+				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
+				{
+					const std::vector<TypeCasting::BinaryOperatorSignature>& signatures = TypeCasting::getBinarySignaturesForOperator(bot.mOperator);
+					const bool exactMatchLeftRequired = (OperatorHelper::getOperatorType(bot.mOperator) == OperatorHelper::OperatorType::ASSIGNMENT);
+					const std::optional<size_t> bestIndex = mTypeCasting.getBestOperatorSignature(signatures, exactMatchLeftRequired, leftDataType, rightDataType);
+					CHECK_ERROR(bestIndex.has_value(), "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(bot.mOperator) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
+					signature = &signatures[*bestIndex];
+					// If needed later, store the index in the token - this indirectly gives access to the chosen signature again
+				}
 
 				token.mDataType = signature->mResult;
 
 				if (opType != OperatorHelper::OperatorType::TRINARY)
 				{
-					if (leftDataType->getClass() == DataTypeDefinition::Class::INTEGER && rightDataType->getClass() == DataTypeDefinition::Class::INTEGER)
-					{
-						// Where necessary, add implicit casts
-						if (leftDataType->getBytes() != signature->mLeft->getBytes())	// Ignore signed/unsigned differences
-						{
-							TokenPtr<StatementToken> inner = bot.mLeft;
-							ValueCastToken& vct = bot.mLeft.create<ValueCastToken>();
-							vct.mDataType = signature->mLeft;
-							vct.mArgument = inner;
-						}
-						if (rightDataType->getBytes() != signature->mRight->getBytes())	// Ignore signed/unsigned differences
-						{
-							TokenPtr<StatementToken> inner = bot.mRight;
-							ValueCastToken& vct = bot.mRight.create<ValueCastToken>();
-							vct.mDataType = signature->mRight;
-							vct.mArgument = inner;
-						}
-					}
+					// Add implicit casts where needed
+					insertCastTokenIfNecessary(bot.mLeft, signature->mLeft);
+					insertCastTokenIfNecessary(bot.mRight, signature->mRight);
 				}
 				break;
 			}

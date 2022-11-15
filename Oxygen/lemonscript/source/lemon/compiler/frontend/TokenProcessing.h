@@ -52,6 +52,8 @@ namespace lemon
 		bool resolveIdentifiers(TokenList& tokens);
 
 	private:
+		void insertCastTokenIfNecessary(TokenPtr<StatementToken>& token, const DataTypeDefinition* targetDataType);
+
 		void processDefines(TokenList& tokens);
 		void processConstants(TokenList& tokens);
 

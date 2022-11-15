@@ -16,6 +16,72 @@
 namespace lemon
 {
 
+	const std::vector<TypeCasting::BinaryOperatorSignature>& TypeCasting::getBinarySignaturesForOperator(Operator op)
+	{
+		static const std::vector<BinaryOperatorSignature> signaturesSymmetric =
+		{
+			// TODO: This is oversimplified, there are cases like multiply and left-shift (and probably also add / subtract) that require different handling
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
+			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)	// TODO: Strings need their own binary operations (and only few of them make actual sense...)
+		};
+		static const std::vector<BinaryOperatorSignature> signaturesComparison =
+		{
+			// Result types are always bool
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::BOOL),
+			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::BOOL)	// TODO: Strings need their own comparison operations
+		};
+		static const std::vector<BinaryOperatorSignature> signaturesTrinary =
+		{
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
+			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)
+		};
+
+		switch (OperatorHelper::getOperatorType(op))
+		{
+			case OperatorHelper::OperatorType::ASSIGNMENT:
+			case OperatorHelper::OperatorType::SYMMETRIC:
+				return signaturesSymmetric;
+
+			case OperatorHelper::OperatorType::COMPARISON:
+				return signaturesComparison;
+
+			case OperatorHelper::OperatorType::TRINARY:
+				return signaturesTrinary;
+
+			default:
+				// This should never happen
+				CHECK_ERROR_NOLINE(false, "Unknown operator type");
+				return signaturesTrinary;
+		}
+	}
+
 	bool TypeCasting::canImplicitlyCastTypes(const DataTypeDefinition& original, const DataTypeDefinition& target) const
 	{
 		const CastHandling handling = getCastHandling(&original, &target, false);
@@ -207,94 +273,13 @@ namespace lemon
 		return result;
 	}
 
-	const TypeCasting::BinaryOperatorSignature* TypeCasting::getBestOperatorSignature(Operator op, const DataTypeDefinition* left, const DataTypeDefinition* right) const
+	std::optional<size_t> TypeCasting::getBestOperatorSignature(const std::vector<BinaryOperatorSignature>& signatures, bool exactMatchLeftRequired, const DataTypeDefinition* left, const DataTypeDefinition* right) const
 	{
-		static const std::vector<BinaryOperatorSignature> signaturesSymmetric =
-		{
-			// TODO: This is oversimplified, there are cases like multiply and left-shift (and probably also add / subtract) that require different handling
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
-			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
-			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
-			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)	// TODO: Strings need their own binary operations (and only few of them make actual sense...)
-		};
-		static const std::vector<BinaryOperatorSignature> signaturesComparison =
-		{
-			// Result types are always bool
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::BOOL),
-			BinaryOperatorSignature(&PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING,  &PredefinedDataTypes::BOOL)	// TODO: Strings need their own comparison operations
-		};
-		static const std::vector<BinaryOperatorSignature> signaturesTrinary =
-		{
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_64,  &PredefinedDataTypes::INT_64),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_64, &PredefinedDataTypes::UINT_64),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_32,  &PredefinedDataTypes::INT_32),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_32, &PredefinedDataTypes::UINT_32),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_16,  &PredefinedDataTypes::INT_16),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_16, &PredefinedDataTypes::UINT_16),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::INT_8,   &PredefinedDataTypes::INT_8),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::UINT_8,  &PredefinedDataTypes::UINT_8),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::FLOAT,   &PredefinedDataTypes::FLOAT),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::DOUBLE,  &PredefinedDataTypes::DOUBLE),
-			BinaryOperatorSignature(&PredefinedDataTypes::BOOL, &PredefinedDataTypes::STRING,  &PredefinedDataTypes::STRING)
-		};
-
-		const std::vector<BinaryOperatorSignature>* signatures = nullptr;
-		bool exactMatchLeftRequired = false;
-
-		switch (OperatorHelper::getOperatorType(op))
-		{
-			case OperatorHelper::OperatorType::ASSIGNMENT:
-			{
-				signatures = &signaturesSymmetric;
-				exactMatchLeftRequired = true;
-				break;
-			}
-
-			case OperatorHelper::OperatorType::SYMMETRIC:
-			{
-				signatures = &signaturesSymmetric;
-				break;
-			}
-
-			case OperatorHelper::OperatorType::COMPARISON:
-			{
-				signatures = &signaturesComparison;
-				break;
-			}
-
-			case OperatorHelper::OperatorType::TRINARY:
-			{
-				signatures = &signaturesTrinary;
-				break;
-			}
-
-			default:
-			{
-				// This should never happen
-				CHECK_ERROR_NOLINE(false, "Unknown operator type");
-			}
-		}
-
-		const TypeCasting::BinaryOperatorSignature* bestSignature = nullptr;
+		std::optional<size_t> bestIndex;
 		uint16 bestPriority = 0xff00;
-		for (const BinaryOperatorSignature& signature : *signatures)
+		for (size_t index = 0; index < signatures.size(); ++index)
 		{
+			const BinaryOperatorSignature& signature = signatures[index];
 			if (exactMatchLeftRequired)
 			{
 				if (signature.mLeft != left)
@@ -304,11 +289,11 @@ namespace lemon
 			const uint16 priority = getPriorityOfSignature(signature, left, right);
 			if (priority < bestPriority)
 			{
+				bestIndex = index;
 				bestPriority = priority;
-				bestSignature = &signature;
 			}
 		}
-		return bestSignature;
+		return bestIndex;
 	}
 
 	uint8 TypeCasting::getImplicitCastPriority(const DataTypeDefinition* original, const DataTypeDefinition* target) const
