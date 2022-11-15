@@ -95,6 +95,10 @@ void debugLog2(AnyTypeWrapper param)
 	{
 		std::cout << *reinterpret_cast<float*>(&param.mValue) << std::endl;
 	}
+	else if (param.mType == &PredefinedDataTypes::DOUBLE)
+	{
+		std::cout << *reinterpret_cast<double*>(&param.mValue) << std::endl;
+	}
 	else if (param.mType == &PredefinedDataTypes::STRING)
 	{
 		debugLog(param.mValue);

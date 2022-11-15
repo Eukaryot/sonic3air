@@ -236,7 +236,7 @@ namespace lemon
 				case Token::Type::CONSTANT:
 				{
 					const ConstantToken& ct = token.as<ConstantToken>();
-					line << rmx::hexString(ct.mValue);
+					line << rmx::hexString(ct.mValue.get<uint64>());	// TODO: Support float and double here as well
 					break;
 				}
 

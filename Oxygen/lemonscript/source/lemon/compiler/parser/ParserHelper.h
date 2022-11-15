@@ -12,6 +12,8 @@
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Utility.h"
 
+#include <optional>
+
 
 namespace lemon
 {
@@ -19,27 +21,107 @@ namespace lemon
 	class ParserHelper
 	{
 	public:
+		struct ParseNumberResult
+		{
+			enum class Type
+			{
+				NONE,
+				INTEGER,
+				FLOAT,
+				DOUBLE
+			};
+
+			Type mType = Type::NONE;
+			AnyBaseValue mValue;
+		};
+
+	public:
+		inline static bool isLetter(char ch)
+		{
+			return mLookup.mIsLetter[(uint8)ch];
+		}
+
+		inline static bool isDigitOrDot(char ch)
+		{
+			return mLookup.mIsDigitOrDot[(uint8)ch];
+		}
+
+		inline static bool isOperatorCharacter(char ch)
+		{
+			return mOperatorLookup.isOperatorCharacter(ch);
+		}
+
+		inline static size_t collectNumber(std::string_view input)
+		{
+			size_t pos = 0;
+			for (; pos < input.length(); ++pos)
+			{
+				if (!mLookup.mPartOfNumber[(uint8)input[pos]])
+					return pos;
+			}
+			return pos;
+		}
+
+		inline static size_t collectIdentifier(std::string_view input)
+		{
+			size_t pos = 0;
+			for (; pos < input.length(); ++pos)
+			{
+				if (!mLookup.mIsIdentifierCharacter[(uint8)input[pos]])
+					return pos;
+			}
+			return pos;
+		}
+
+		inline static size_t collectOperators(std::string_view input)
+		{
+			size_t pos = 0;
+			for (; pos < input.length(); ++pos)
+			{
+				if (!mOperatorLookup.isOperatorCharacter(input[pos]))
+					return pos;
+			}
+			return pos;
+		}
+
+		static void collectStringLiteral(std::string_view input, std::string& output, size_t& outCharactersRead, uint32 lineNumber);
+		static void collectPreprocessorStatement(std::string_view input, std::string& output);
+		static bool findEndOfBlockComment(std::string_view input, size_t& pos);
+		static size_t skipStringLiteral(std::string_view input, uint32 lineNumber);
+		static ParseNumberResult parseNumber(std::string_view input);
+
+		inline static size_t findOperator(std::string_view input, Operator& outOperator)
+		{
+			return mOperatorLookup.lookup(input, outOperator);
+		}
+
+	private:
 		struct Lookup
 		{
 			constexpr Lookup() :
-				mIsDigit(),
 				mIsLetter(),
 				mIsDigitOrLetter(),
+				mIsDigitOrDot(),
+				mPartOfNumber(),
 				mIsIdentifierCharacter()
 			{
 				for (size_t i = 0; i < 0x100; ++i)
 				{
 					const char ch = (char)i;
-					mIsDigit[i] = (ch >= '0' && ch <= '9');
-					mIsLetter[i] = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
-					mIsDigitOrLetter[i] = mIsDigit[i] || mIsLetter[i];
-					mIsIdentifierCharacter[i] = mIsDigit[i] || mIsLetter[i] || (ch == '_') || (ch == '.');
+					const bool isLetter = (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+					const bool isDigit = (ch >= '0' && ch <= '9');
+					mIsLetter[i] = isLetter;
+					mIsDigitOrLetter[i] = isDigit || isLetter;
+					mIsDigitOrDot[i] = isDigit || ch == '.';
+					mPartOfNumber[i] = mIsDigitOrDot[i] || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F') || (ch == 'x');		// || (ch == '-'); // TODO: Support negative exponents in exponential notation of floats
+					mIsIdentifierCharacter[i] = isDigit || isLetter || (ch == '_') || (ch == '.');
 				}
 			}
 
-			bool mIsDigit[0x100];
 			bool mIsLetter[0x100];
 			bool mIsDigitOrLetter[0x100];
+			bool mIsDigitOrDot[0x100];
+			bool mPartOfNumber[0x100];
 			bool mIsIdentifierCharacter[0x100];
 		};
 
@@ -66,194 +148,11 @@ namespace lemon
 			uint8 mValues[55];		// Range from '0' (48) to 'f' (102)
 		};
 
-		inline static const Lookup mLookup;
-		inline static const DigitLookup mDigitLookupHex = DigitLookup(true);
-		inline static const DigitLookup mDigitLookupDec = DigitLookup(false);
-
-
-		inline static bool isDigit(char ch)
-		{
-			return mLookup.mIsDigit[(uint8)ch];
-		}
-
-		inline static bool isLetter(char ch)
-		{
-			return mLookup.mIsLetter[(uint8)ch];
-		}
-
-		inline static bool isOperatorCharacter(char ch)
-		{
-			return mOperatorLookup.isOperatorCharacter(ch);
-		}
-
-		inline static size_t collectNumber(const char* input, size_t length)
-		{
-			size_t pos = 0;
-			for (; pos < length; ++pos)
-			{
-				if (!mLookup.mIsDigitOrLetter[(uint8)input[pos]])
-					return pos;
-			}
-			return pos;
-		}
-
-		inline static size_t collectIdentifier(const char* input, size_t length)
-		{
-			size_t pos = 0;
-			for (; pos < length; ++pos)
-			{
-				if (!mLookup.mIsIdentifierCharacter[(uint8)input[pos]])
-					return pos;
-			}
-			return pos;
-		}
-
-		inline static size_t collectOperators(const char* input, size_t length)
-		{
-			size_t pos = 0;
-			for (; pos < length; ++pos)
-			{
-				if (!mOperatorLookup.isOperatorCharacter(input[pos]))
-					return pos;
-			}
-			return pos;
-		}
-
-		inline static void collectStringLiteral(const char* input, size_t length, std::string& output, size_t& outCharactersRead, uint32 lineNumber)
-		{
-			output.clear();
-			size_t pos;
-			for (pos = 0; pos < length; ++pos)
-			{
-				char ch = input[pos];
-
-				// Use backslash as escape character
-				if (ch == '\\' && pos+1 < length)
-				{
-					++pos;
-					ch = input[pos];
-					if (ch == 'n')
-						ch = '\n';
-					else if (ch == 'r')
-						ch = '\r';
-					else if (ch == 't')
-						ch = '\t';
-				}
-				else if (ch == '"')
-				{
-					break;
-				}
-
-				output += ch;
-			}
-			CHECK_ERROR(pos < length, "String literal exceeds line", lineNumber);
-			outCharactersRead = pos;
-		}
-
-		inline static void collectPreprocessorStatement(const char* input, size_t length, std::string& output)
-		{
-			output.clear();
-			for (size_t pos = 0; pos < length; ++pos)
-			{
-				const char ch = input[pos];
-				if (ch == '"')
-				{
-					for (++pos; pos < length; ++pos)
-					{
-						if (input[pos] == '"')
-							break;
-					}
-					break;
-				}
-				if (ch == '/' && pos < length-1)
-				{
-					if (input[pos+1] == '/')
-						break;
-					if (input[pos+1] == '*')
-					{
-						pos += 2;
-						if (findEndOfBlockComment(input, length, pos))
-						{
-							--pos;	// Go back one characters, as the for-loop will skip it again
-							continue;
-						}
-						break;
-					}
-				}
-				output += ch;
-			}
-		}
-
-		inline static bool findEndOfBlockComment(const char* input, size_t length, size_t& pos)
-		{
-			for (; pos + 1 < length; ++pos)
-			{
-				if (input[pos] == '*' && input[pos + 1] == '/')
-				{
-					pos += 2;
-					return true;
-				}
-			}
-			return false;
-		}
-
-		inline static size_t skipStringLiteral(const char* input, size_t length, uint32 lineNumber)
-		{
-			for (size_t pos = 0; pos < length; ++pos)
-			{
-				if (input[pos] == '\\' && pos+1 < length)
-				{
-					++pos;
-				}
-				else if (input[pos] == '"')
-				{
-					return pos + 1;
-				}
-			}
-			CHECK_ERROR(false, "String literal exceeds line", lineNumber);
-			return length;
-		}
-
-		inline static int64 parseInteger(const char* input, size_t length, uint32 lineNumber)
-		{
-			int64 result = 0;
-			uint8 errorCheck = 0;
-			if (length >= 3 && input[0] == '0' && input[1] == 'x')
-			{
-				for (size_t i = 2; i < length; ++i)
-				{
-					const char ch = input[i];
-					const uint8 value = mDigitLookupHex.getValueByCharacter(ch);
-					result = result * 16 + (int64)value;
-					errorCheck |= value;
-				}
-				CHECK_ERROR((errorCheck & 0x80) == 0, "Invalid hexadecimal number", lineNumber);
-			}
-			else
-			{
-				for (size_t i = 0; i < length; ++i)
-				{
-					const char ch = input[i];
-					const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
-					result = result * 10 + (int64)value;
-					errorCheck |= value;
-				}
-				CHECK_ERROR((errorCheck & 0x80) == 0, "Invalid decimal number", lineNumber);
-			}
-			return result;
-		}
-
-		inline static size_t findOperator(const char* str, size_t maxLength, Operator& outOperator)
-		{
-			return mOperatorLookup.lookup(str, maxLength, outOperator);
-		}
-
-	private:
 		struct OperatorLookup
 		{
 		public:
 			bool isOperatorCharacter(char ch);
-			size_t lookup(const char* str, size_t maxLength, Operator& outOperator);
+			size_t lookup(std::string_view input, Operator& outOperator);
 
 		private:
 			struct Entry
@@ -270,6 +169,10 @@ namespace lemon
 			void initialize();
 		};
 
+	private:
+		inline static const Lookup mLookup;
+		inline static const DigitLookup mDigitLookupHex = DigitLookup(true);
+		inline static const DigitLookup mDigitLookupDec = DigitLookup(false);
 		static OperatorLookup mOperatorLookup;
 	};
 

@@ -199,9 +199,11 @@ namespace lemon
 
 						case ParserToken::Type::CONSTANT:
 						{
+							const ConstantParserToken& input = parserToken.as<ConstantParserToken>();
 							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
-							constantToken.mValue = parserToken.as<ConstantParserToken>().mValue;
-							constantToken.mDataType = &PredefinedDataTypes::CONST_INT;
+							constantToken.mValue = input.mValue;
+							constantToken.mDataType = (input.mBaseType == BaseType::FLOAT)  ? static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::FLOAT) :
+													  (input.mBaseType == BaseType::DOUBLE) ? static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::DOUBLE) : static_cast<const DataTypeDefinition*>(&PredefinedDataTypes::CONST_INT);
 							break;
 						}
 
@@ -307,7 +309,7 @@ namespace lemon
 							if (offset+2 <= tokens.size() && isOperator(tokens[offset], Operator::ASSIGN))
 							{
 								CHECK_ERROR(offset+2 == tokens.size() && tokens[offset+1].getType() == Token::Type::CONSTANT, "Expected a constant value for initializing the global variable", node.getLineNumber());
-								variable.mInitialValue = tokens[offset+1].as<ConstantToken>().mValue;
+								variable.mInitialValue = tokens[offset+1].as<ConstantToken>().mValue.get<int64>();
 							}
 							break;
 						}
@@ -889,7 +891,7 @@ namespace lemon
 					else
 					{
 						CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", lineNumber);
-						values.push_back(token.as<ConstantToken>().mValue);
+						values.push_back(token.as<ConstantToken>().mValue.get<uint64>());
 						expectingComma = true;
 					}
 				}
@@ -918,7 +920,7 @@ namespace lemon
 						else
 						{
 							CHECK_ERROR(token.getType() == Token::Type::CONSTANT, "Expected a comma-separated list of constants inside constant array list of values", listNode.getLineNumber());
-							values.push_back(token.as<ConstantToken>().mValue);
+							values.push_back(token.as<ConstantToken>().mValue.get<uint64>());
 							expectingComma = true;
 						}
 					}
@@ -955,7 +957,7 @@ namespace lemon
 
 			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
 			const FlyweightString identifier = tokens[2].as<IdentifierToken>().mName;
-			const uint64 constantValue = tokens[4].as<ConstantToken>().mValue;
+			const uint64 constantValue = tokens[4].as<ConstantToken>().mValue.get<uint64>();
 
 			if (isGlobalDefinition)
 			{

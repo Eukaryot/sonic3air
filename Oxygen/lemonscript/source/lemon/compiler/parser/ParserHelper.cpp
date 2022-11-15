@@ -28,7 +28,7 @@ namespace lemon
 		return mIsOperatorCharacter[character - 32];
 	}
 
-	size_t ParserHelper::OperatorLookup::lookup(const char* str, size_t maxLength, Operator& outOperator)
+	size_t ParserHelper::OperatorLookup::lookup(std::string_view input, Operator& outOperator)
 	{
 		if (!mInitialized)
 		{
@@ -37,9 +37,9 @@ namespace lemon
 
 		size_t outLength = 0;
 		const Entry* parentEntry = nullptr;
-		for (size_t i = 0; i < maxLength; ++i)
+		for (size_t i = 0; i < input.length(); ++i)
 		{
-			const char character = str[i];
+			const char character = input[i];
 			if ((unsigned)character < 32 || (unsigned)character >= 128)
 				break;
 
@@ -182,6 +182,252 @@ namespace lemon
 		}
 
 		mInitialized = true;
+	}
+
+	void ParserHelper::collectStringLiteral(std::string_view input, std::string& output, size_t& outCharactersRead, uint32 lineNumber)
+	{
+		output.clear();
+		size_t pos = 0;
+		for (; pos < input.length(); ++pos)
+		{
+			char ch = input[pos];
+
+			// Use backslash as escape character
+			if (ch == '\\' && pos+1 < input.length())
+			{
+				++pos;
+				ch = input[pos];
+				if (ch == 'n')
+					ch = '\n';
+				else if (ch == 'r')
+					ch = '\r';
+				else if (ch == 't')
+					ch = '\t';
+			}
+			else if (ch == '"')
+			{
+				break;
+			}
+
+			output += ch;
+		}
+		CHECK_ERROR(pos < input.length(), "String literal exceeds line", lineNumber);
+		outCharactersRead = pos;
+	}
+
+	void ParserHelper::collectPreprocessorStatement(std::string_view input, std::string& output)
+	{
+		output.clear();
+		for (size_t pos = 0; pos < input.length(); ++pos)
+		{
+			const char ch = input[pos];
+			if (ch == '"')
+			{
+				for (++pos; pos < input.length(); ++pos)
+				{
+					if (input[pos] == '"')
+						break;
+				}
+				break;
+			}
+			if (ch == '/' && pos < input.length()-1)
+			{
+				if (input[pos+1] == '/')
+					break;
+				if (input[pos+1] == '*')
+				{
+					pos += 2;
+					if (findEndOfBlockComment(input, pos))
+					{
+						--pos;	// Go back one characters, as the for-loop will skip it again
+						continue;
+					}
+					break;
+				}
+			}
+			output += ch;
+		}
+	}
+
+	bool ParserHelper::findEndOfBlockComment(std::string_view input, size_t& pos)
+	{
+		for (; pos + 1 < input.length(); ++pos)
+		{
+			if (input[pos] == '*' && input[pos + 1] == '/')
+			{
+				pos += 2;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	size_t ParserHelper::skipStringLiteral(std::string_view input, uint32 lineNumber)
+	{
+		for (size_t pos = 0; pos < input.length(); ++pos)
+		{
+			if (input[pos] == '\\' && pos+1 < input.length())
+			{
+				++pos;
+			}
+			else if (input[pos] == '"')
+			{
+				return pos + 1;
+			}
+		}
+		CHECK_ERROR(false, "String literal exceeds line", lineNumber);
+		return input.length();
+	}
+
+	ParserHelper::ParseNumberResult ParserHelper::parseNumber(std::string_view input)
+	{
+		ParseNumberResult result;
+
+		// First check for integers
+		{
+			int64 number = 0;
+			uint8 errorCheck = 0;
+			if (input.length() >= 3 && input[0] == '0' && input[1] == 'x')
+			{
+				input = input.substr(2);
+				for (char ch : input)
+				{
+					const uint8 value = mDigitLookupHex.getValueByCharacter(ch);
+					number = number * 16 + (int64)value;
+					errorCheck |= value;
+				}
+			}
+			else
+			{
+				for (char ch : input)
+				{
+					const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
+					number = number * 10 + (int64)value;
+					errorCheck |= value;
+				}
+			}
+
+			if ((errorCheck & 0x80) == 0)
+			{
+				result.mType = ParseNumberResult::Type::INTEGER;
+				result.mValue = number;
+				return result;
+			}
+		}
+
+		// Check if it's a floating point type
+		{
+			if (input.length() < 2)		// Can't be a single digit, that would be an integer
+				return result;
+
+			bool isFloat = false;
+			if (input.back() == 'f')
+			{
+				input = input.substr(0, input.length()-1);
+				isFloat = true;
+			}
+
+			std::string_view integerString;
+			std::string_view fractionalString;
+			std::string_view exponentString;
+			{
+				const size_t dotPos = input.find_first_of('.');
+				const size_t expPos = input.find_first_of("eE");
+				if (dotPos == std::string_view::npos)
+				{
+					if (expPos == std::string_view::npos)
+					{
+						return result;
+					}
+
+					// It's something like "2e5"
+					integerString = input.substr(0, expPos);
+					exponentString = input.substr(expPos + 1);
+				}
+				else
+				{
+					integerString = input.substr(0, dotPos);
+
+					if (expPos == std::string_view::npos)
+					{
+						// It's something like "2.5"
+						fractionalString = input.substr(dotPos + 1);
+					}
+					else
+					{
+						if (dotPos > expPos)
+							return result;
+
+						// It's something like "2.1e5"
+						fractionalString = input.substr(dotPos + 1, expPos - dotPos - 1);
+						exponentString = input.substr(expPos + 1);
+					}
+				}
+			}
+
+			uint8 errorCheck = 0;
+			uint64 integerPart = 0;
+			for (char ch : integerString)
+			{
+				const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
+				integerPart = integerPart * 10 + (int64)value;
+				errorCheck |= value;
+			}
+			if (errorCheck & 0x80)
+				return result;
+
+			double doubleNumber = (double)integerPart;
+
+			if (!fractionalString.empty())
+			{
+				uint64 fractionalPart = 0;
+				for (char ch : fractionalString)
+				{
+					const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
+					fractionalPart = fractionalPart * 10 + (int64)value;
+					errorCheck |= value;
+				}
+				if (errorCheck & 0x80)
+					return result;
+
+				doubleNumber += (double)fractionalPart * std::pow(0.1, fractionalString.length());
+			}
+
+			if (!exponentString.empty())
+			{
+				// Handle negative exponent
+				bool negativeExponent = false;
+				if (exponentString[0] == '-')
+				{
+					negativeExponent = true;
+					exponentString = exponentString.substr(1);
+				}
+
+				int64 exponentPart = 0;
+				for (char ch : exponentString)
+				{
+					const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
+					exponentPart = exponentPart * 10 + (int64)value;
+					errorCheck |= value;
+				}
+				if (errorCheck & 0x80)
+					return result;
+
+				doubleNumber *= std::pow(10.0, negativeExponent ? -exponentPart : exponentPart);
+			}
+
+			if (isFloat)
+			{
+				result.mType = ParseNumberResult::Type::FLOAT;
+				result.mValue = (float)doubleNumber;
+			}
+			else
+			{
+				result.mType = ParseNumberResult::Type::DOUBLE;
+				result.mValue = doubleNumber;
+			}
+			return result;
+		}
 	}
 
 }

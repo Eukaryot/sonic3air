@@ -50,15 +50,16 @@ namespace lemon
 
 		bool tryReplaceConstantsUnary(const ConstantToken& constRight, Operator op, int64& outValue)
 		{
-			if (constRight.mDataType == &PredefinedDataTypes::STRING)
-				return false;
-
-			switch (op)
+			// TODO: Support float/double as well here
+			if (constRight.mDataType->getClass() == DataTypeDefinition::Class::INTEGER)
 			{
-				case Operator::BINARY_MINUS:  outValue = -constRight.mValue;				return true;
-				case Operator::UNARY_NOT:	  outValue = (constRight.mValue == 0) ? 1 : 0;	return true;
-				case Operator::UNARY_BITNOT:  outValue = ~constRight.mValue;				return true;
-				default: break;
+				switch (op)
+				{
+					case Operator::BINARY_MINUS:  outValue = -constRight.mValue.get<int64>();				return true;
+					case Operator::UNARY_NOT:	  outValue = (constRight.mValue.get<int64>() == 0) ? 1 : 0;	return true;
+					case Operator::UNARY_BITNOT:  outValue = ~constRight.mValue.get<int64>();				return true;
+					default: break;
+				}
 			}
 			return false;
 		}
@@ -66,23 +67,24 @@ namespace lemon
 		bool tryReplaceConstantsBinary(const ConstantToken& constLeft, const ConstantToken& constRight, Operator op, int64& outValue)
 		{
 			// TODO: Support float/double as well here
-			if (constLeft.mDataType->getClass() != DataTypeDefinition::Class::INTEGER || constRight.mDataType->getClass() != DataTypeDefinition::Class::INTEGER)
-				return false;
-
-			switch (op)
+			//  -> And possibly also combinations with integers?
+			if (constLeft.mDataType->getClass() == DataTypeDefinition::Class::INTEGER && constRight.mDataType->getClass() == DataTypeDefinition::Class::INTEGER)
 			{
-				case Operator::BINARY_PLUS:			outValue = constLeft.mValue + constRight.mValue;	return true;
-				case Operator::BINARY_MINUS:		outValue = constLeft.mValue - constRight.mValue;	return true;
-				case Operator::BINARY_MULTIPLY:		outValue = constLeft.mValue * constRight.mValue;	return true;
-				case Operator::BINARY_DIVIDE:		outValue = OpcodeExecUtils::safeDivide(constLeft.mValue, constRight.mValue);  return true;
-				case Operator::BINARY_MODULO:		outValue = OpcodeExecUtils::safeModulo(constLeft.mValue, constRight.mValue);  return true;
-				case Operator::BINARY_SHIFT_LEFT:	outValue = constLeft.mValue << constRight.mValue;	return true;
-				case Operator::BINARY_SHIFT_RIGHT:	outValue = constLeft.mValue >> constRight.mValue;	return true;
-				case Operator::BINARY_AND:			outValue = constLeft.mValue & constRight.mValue;	return true;
-				case Operator::BINARY_OR:			outValue = constLeft.mValue | constRight.mValue;	return true;
-				case Operator::BINARY_XOR:			outValue = constLeft.mValue ^ constRight.mValue;	return true;
-				// TODO: How about support for "Operator::COMPARE_EQUAL" etc?
-				default: break;
+				switch (op)
+				{
+					case Operator::BINARY_PLUS:			outValue = constLeft.mValue.get<int64>() + constRight.mValue.get<int64>();	return true;
+					case Operator::BINARY_MINUS:		outValue = constLeft.mValue.get<int64>() - constRight.mValue.get<int64>();	return true;
+					case Operator::BINARY_MULTIPLY:		outValue = constLeft.mValue.get<int64>() * constRight.mValue.get<int64>();	return true;
+					case Operator::BINARY_DIVIDE:		outValue = OpcodeExecUtils::safeDivide(constLeft.mValue.get<int64>(), constRight.mValue.get<int64>());  return true;
+					case Operator::BINARY_MODULO:		outValue = OpcodeExecUtils::safeModulo(constLeft.mValue.get<int64>(), constRight.mValue.get<int64>());  return true;
+					case Operator::BINARY_SHIFT_LEFT:	outValue = constLeft.mValue.get<int64>() << constRight.mValue.get<int64>();	return true;
+					case Operator::BINARY_SHIFT_RIGHT:	outValue = constLeft.mValue.get<int64>() >> constRight.mValue.get<int64>();	return true;
+					case Operator::BINARY_AND:			outValue = constLeft.mValue.get<int64>() & constRight.mValue.get<int64>();	return true;
+					case Operator::BINARY_OR:			outValue = constLeft.mValue.get<int64>() | constRight.mValue.get<int64>();	return true;
+					case Operator::BINARY_XOR:			outValue = constLeft.mValue.get<int64>() ^ constRight.mValue.get<int64>();	return true;
+					// TODO: How about support for "Operator::COMPARE_EQUAL" etc?
+					default: break;
+				}
 			}
 			return false;
 		}
@@ -649,7 +651,7 @@ namespace lemon
 								case DataTypeDefinition::Class::STRING:
 								{
 									ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-									constantToken.mValue = 0;
+									constantToken.mValue.reset();
 									constantToken.mDataType = returnType;
 									break;
 								}
@@ -757,7 +759,7 @@ namespace lemon
 				token.mFunction = matchingFunction;
 				token.mParameters.resize(2);
 				ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
-				idToken.mValue = constantArray->getID();
+				idToken.mValue = (uint64)constantArray->getID();
 				idToken.mDataType = &PredefinedDataTypes::UINT_32;
 				token.mParameters[1] = content[0].as<StatementToken>();		// Array index
 				token.mDataType = matchingFunction->getReturnType();
@@ -1046,7 +1048,7 @@ namespace lemon
 						for (size_t k = 0; k < ft.mParameters.size(); ++k)
 						{
 							const Function::Parameter& parameter = ft.mFunction->getParameters()[k];
-							controlFlow.pushValueStack(parameter.mDataType, ft.mParameters[k].as<ConstantToken>()->mValue);
+							controlFlow.pushValueStack(parameter.mDataType, ft.mParameters[k].as<ConstantToken>()->mValue.get<uint64>());
 						}
 						static_cast<const NativeFunction*>(ft.mFunction)->mFunctionWrapper->execute(NativeFunction::Context(controlFlow));
 
@@ -1100,7 +1102,7 @@ namespace lemon
 
 						// Replace addressof and the parenthesis with the actual address as a constant
 						ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-						constantToken.mValue = address;
+						constantToken.mValue = (uint64)address;
 						constantToken.mDataType = &PredefinedDataTypes::UINT_32;
 						tokens.erase(i+1);
 						break;

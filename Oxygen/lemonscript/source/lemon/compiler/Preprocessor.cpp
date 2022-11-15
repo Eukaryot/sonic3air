@@ -68,7 +68,7 @@ namespace lemon
 						const std::string_view rest = line.substr(pos + 1);
 						if (rmx::startsWith(rest, "if ") && rest.length() >= 4)
 						{
-							const bool isTrue = evaluateConditionString(&rest[3], rest.length() - 3, parser);
+							const bool isTrue = evaluateConditionString(rest.substr(3), parser);
 							const bool inheritedCondition = blockStack.shouldConsiderContent();
 							BlockStack::Block& block = vectorAdd(blockStack.mOpenBlocks);
 							block.mCondition = isTrue;
@@ -85,7 +85,7 @@ namespace lemon
 							CHECK_ERROR(!blockStack.mOpenBlocks.empty(), "Found no #if for #elif", mLineNumber);
 							BlockStack::Block& parentBlock = blockStack.mOpenBlocks.back();
 							parentBlock.mCondition = !parentBlock.mCondition;
-							const bool isTrue = evaluateConditionString(&rest[5], rest.length() - 5, parser);
+							const bool isTrue = evaluateConditionString(rest.substr(5), parser);
 							const bool inheritedCondition = blockStack.shouldConsiderContent();
 							BlockStack::Block& block = vectorAdd(blockStack.mOpenBlocks);
 							block.mCondition = isTrue;
@@ -108,7 +108,7 @@ namespace lemon
 							{
 								if (blockStack.shouldConsiderContent())
 								{
-									processDefinition(&rest[7], rest.length() - 7, parser);
+									processDefinition(rest.substr(7), parser);
 								}
 							}
 							else if (rmx::startsWith(rest, "error ") && rest.length() >= 7)
@@ -155,7 +155,7 @@ namespace lemon
 				{
 					if (isInBlockComment)
 					{
-						if (ParserHelper::findEndOfBlockComment(line.data(), line.length(), pos))
+						if (ParserHelper::findEndOfBlockComment(line, pos))
 						{
 							// Block comment ends here
 							eraseFromLine(line, modifiedLine, blockCommentStart, pos - blockCommentStart);
@@ -195,7 +195,7 @@ namespace lemon
 						else if (line[pos] == '"')
 						{
 							// It is a string
-							pos += ParserHelper::skipStringLiteral(&line[pos+1], length-pos-1, mLineNumber) + 1;
+							pos += ParserHelper::skipStringLiteral(line.substr(pos+1), mLineNumber) + 1;
 							continue;
 						}
 
@@ -239,10 +239,10 @@ namespace lemon
 		line = std::string_view(*modifiedLine);
 	}
 
-	bool Preprocessor::evaluateConditionString(const char* characters, size_t len, Parser& parser)
+	bool Preprocessor::evaluateConditionString(std::string_view input, Parser& parser)
 	{
 		// Parse input
-		ParserHelper::collectPreprocessorStatement(characters, len, mBufferString);
+		ParserHelper::collectPreprocessorStatement(input, mBufferString);
 		CHECK_ERROR(!mBufferString.empty(), "Empty identifier after preprocessor #if", mLineNumber);
 		ParserTokenList parserTokens;
 		parser.splitLineIntoTokens(mBufferString, mLineNumber, parserTokens);
@@ -250,10 +250,10 @@ namespace lemon
 		return (evaluateConstantExpression(parserTokens) != 0);
 	}
 
-	void Preprocessor::processDefinition(const char* characters, size_t len, Parser& parser)
+	void Preprocessor::processDefinition(std::string_view input, Parser& parser)
 	{
 		// Parse input
-		ParserHelper::collectPreprocessorStatement(characters, len, mBufferString);
+		ParserHelper::collectPreprocessorStatement(input, mBufferString);
 		CHECK_ERROR(!mBufferString.empty(), "Empty identifier after preprocessor #if", mLineNumber);
 		ParserTokenList parserTokens;
 		parser.splitLineIntoTokens(mBufferString, mLineNumber, parserTokens);
@@ -360,7 +360,7 @@ namespace lemon
 		{
 			case Token::Type::CONSTANT:
 			{
-				return token.as<ConstantToken>().mValue;
+				return token.as<ConstantToken>().mValue.get<int64>();
 			}
 
 			case Token::Type::PARENTHESIS:

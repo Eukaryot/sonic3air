@@ -91,7 +91,7 @@ namespace lemon
 		inline ConstantToken() : StatementToken(TYPE) {}
 
 	public:
-		int64 mValue = 0;
+		AnyBaseValue mValue = 0;
 	};
 
 

@@ -50,4 +50,30 @@ namespace lemon
 		ADDRESSOF
 	};
 
+	struct AnyBaseValue
+	{
+	public:
+		inline AnyBaseValue() {}
+		inline AnyBaseValue(uint64 value) : mValue(value) {}
+
+		template<typename T> T get() const  { return T::INVALID; }
+		
+		void reset()  { mValue = 0; }
+
+		void operator=(int64 value)   { mValue = value; }
+		void operator=(uint64 value)  { mValue = value; }
+		void operator=(bool value)    { mValue = (uint64)value; }
+		void operator=(float value)   { mValue = (uint64)*reinterpret_cast<uint32*>(&value); }	// This only works on little endian machines, but that's probably the case for a lot of lemonscript code...
+		void operator=(double value)  { mValue = *reinterpret_cast<uint64*>(&value); }
+
+	private:
+		uint64 mValue;
+	};
+
+	template<> inline int64  AnyBaseValue::get() const  { return mValue; }
+	template<> inline uint64 AnyBaseValue::get() const  { return mValue; }
+	template<> inline bool   AnyBaseValue::get() const  { return (bool)mValue; }
+	template<> inline float  AnyBaseValue::get() const  { return *reinterpret_cast<float*>(mValue); }
+	template<> inline double AnyBaseValue::get() const  { return *reinterpret_cast<double*>(mValue); }
+
 }

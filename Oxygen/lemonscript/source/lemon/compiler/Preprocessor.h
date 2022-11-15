@@ -32,8 +32,8 @@ namespace lemon
 
 	private:
 		void eraseFromLine(std::string_view& line, std::string*& modifiedLine, size_t offset, size_t count);
-		bool evaluateConditionString(const char* characters, size_t len, Parser& parser);
-		void processDefinition(const char* characters, size_t len, Parser& parser);
+		bool evaluateConditionString(std::string_view input, Parser& parser);
+		void processDefinition(std::string_view input, Parser& parser);
 		int64 evaluateConstantExpression(const ParserTokenList& parserTokens) const;
 		int64 evaluateConstantToken(const StatementToken& token) const;
 

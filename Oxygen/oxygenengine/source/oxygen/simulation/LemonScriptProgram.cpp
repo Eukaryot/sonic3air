@@ -424,7 +424,7 @@ void LemonScriptProgram::evaluateDefines()
 			if (tokens.size() == 4 &&
 				tokens[2].getType() == lemon::Token::Type::CONSTANT)
 			{
-				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue;
+				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue.get<uint64>();
 				const lemon::DataTypeDefinition& dataType = *tokens[0].as<lemon::VarTypeToken>().mDataType;
 				if (dataType.getClass() == lemon::DataTypeDefinition::Class::INTEGER)
 				{

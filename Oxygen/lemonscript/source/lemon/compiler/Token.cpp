@@ -109,7 +109,10 @@ void lemon::TokenSerializer::serializeTokenData(VectorBinarySerializer& serializ
 		{
 			ConstantToken& token = token_.as<ConstantToken>();
 			DataTypeSerializer::serializeDataType(serializer, token.mDataType);
-			serializer.serialize(token.mValue);
+			if (serializer.isReading())
+				token.mValue = serializer.read<uint64>();
+			else
+				serializer.write(token.mValue.get<uint64>());
 			break;
 		}
 

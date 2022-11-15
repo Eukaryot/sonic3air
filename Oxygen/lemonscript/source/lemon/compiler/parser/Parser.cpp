@@ -128,6 +128,7 @@ namespace lemon
 			{
 				ConstantParserToken& token = outTokens.create<ConstantParserToken>();
 				token.mValue = (identifierHash == trueHash);
+				token.mBaseType = BaseType::INT_CONST;
 				return;
 			}
 
@@ -158,45 +159,76 @@ namespace lemon
 				outTokens.create<KeywordParserToken>().mKeyword = Keyword::BLOCK_END;
 				++pos;
 			}
-			else if (ParserHelper::isDigit(firstCharacter))
+			else if (ParserHelper::isDigitOrDot(firstCharacter))
 			{
-				// It is a number
-				const char* start = &input[pos];
-				const size_t numberLength = ParserHelper::collectNumber(start, length - pos);
+				// It is a number (integer or floating point)
+				const std::string_view rest = input.substr(pos);
+				const size_t numberLength = ParserHelper::collectNumber(rest);
 				RMX_ASSERT(numberLength > 0, "Failed to collect a number, even though the first cahracter is a digit");
 				pos += numberLength;
-				const int64 number = ParserHelper::parseInteger(start, numberLength, lineNumber);
-				ConstantParserToken& token = outTokens.create<ConstantParserToken>();
-				token.mValue = number;
+				const std::string_view numberString = rest.substr(0, numberLength);
+
+				// Check if it's an integer
+				const ParserHelper::ParseNumberResult result = ParserHelper::parseNumber(numberString);
+				switch (result.mType)
+				{
+					case ParserHelper::ParseNumberResult::Type::INTEGER:
+					{
+						ConstantParserToken& token = outTokens.create<ConstantParserToken>();
+						token.mValue = result.mValue;
+						token.mBaseType = BaseType::INT_CONST;
+						break;
+					}
+
+					case ParserHelper::ParseNumberResult::Type::FLOAT:
+					{
+						ConstantParserToken& token = outTokens.create<ConstantParserToken>();
+						token.mValue = result.mValue;
+						token.mBaseType = BaseType::FLOAT;
+						break;
+					}
+
+					case ParserHelper::ParseNumberResult::Type::DOUBLE:
+					{
+						ConstantParserToken& token = outTokens.create<ConstantParserToken>();
+						token.mValue = result.mValue;
+						token.mBaseType = BaseType::DOUBLE;
+						break;
+					}
+
+					default:
+						CHECK_ERROR(false, "Invalid number '" << numberString << "'", lineNumber);
+				}
 			}
 			else if (ParserHelper::isLetter(firstCharacter) || (firstCharacter == '_'))
 			{
 				// It is an identifier or keyword
-				const char* start = &input[pos];
-				const size_t identifierLength = ParserHelper::collectIdentifier(start, length - pos);
+				const std::string_view rest = input.substr(pos);
+				const size_t identifierLength = ParserHelper::collectIdentifier(rest);
 				pos += identifierLength;
-				analyseIdentifier(std::string_view(start, identifierLength), outTokens, lineNumber);
+				analyseIdentifier(rest.substr(0, identifierLength), outTokens, lineNumber);
 			}
 			else if (firstCharacter == '@')
 			{
 				// It is a label
+				const std::string_view rest = input.substr(pos);
 				++pos;
-				const char* start = &input[pos];
-				const size_t identifierLength = ParserHelper::collectIdentifier(start, length - pos);
+				const size_t identifierLength = ParserHelper::collectIdentifier(rest.substr(1));
 				pos += identifierLength;
 				LabelParserToken& token = outTokens.create<LabelParserToken>();
-				token.mName = std::string(start-1, identifierLength+1);
+				token.mName = rest.substr(0, identifierLength + 1);
 			}
 			else if (ParserHelper::isOperatorCharacter(firstCharacter))
 			{
 				// It is a single operator or multiple of them
+				const std::string_view rest = input.substr(pos);
+				const size_t operatorsLength = ParserHelper::collectOperators(rest);
 				const char* start = &input[pos];
-				const size_t operatorsLength = ParserHelper::collectOperators(start, length - pos);
 
 				Operator op;
 				for (size_t i = 0; i < operatorsLength; )
 				{
-					const size_t operatorLength = ParserHelper::findOperator(&start[i], operatorsLength - i, op);
+					const size_t operatorLength = ParserHelper::findOperator(input.substr(pos + i, operatorsLength - i), op);
 					CHECK_ERROR(operatorLength > 0, "Operator not recognized", lineNumber);
 
 					if (op == Operator::BINARY_DIVIDE)
@@ -237,7 +269,7 @@ namespace lemon
 				// It is a string
 				++pos;
 				size_t charactersRead;
-				ParserHelper::collectStringLiteral(&input[pos], length - pos, mBufferString, charactersRead, lineNumber);
+				ParserHelper::collectStringLiteral(input.substr(pos), mBufferString, charactersRead, lineNumber);
 				StringLiteralParserToken& token = outTokens.create<StringLiteralParserToken>();
 				token.mString.set(mBufferString);
 				pos += charactersRead + 1;

@@ -104,18 +104,21 @@ namespace lemon
 
 		// Treat string type as u64, but only for the original type (to allow for converting a string to an integer, but not the other way round)
 		//  -> We make an exception for script feature level 1, for the sake of mod compatibility
-		if (original == &PredefinedDataTypes::STRING)
-			original = &PredefinedDataTypes::UINT_64;
-		if (mCompileOptions.mScriptFeatureLevel < 2)
 		{
-			if (target == &PredefinedDataTypes::STRING)
-				target = &PredefinedDataTypes::UINT_64;
-		}
+			if (original == &PredefinedDataTypes::STRING)
+				original = &PredefinedDataTypes::UINT_64;
 
-		if (original == target)
-		{
-			// It's a conversion between string and u64
-			return CastHandling(CastHandling::Result::NO_CAST, 1);
+			if (mCompileOptions.mScriptFeatureLevel < 2)
+			{
+				if (target == &PredefinedDataTypes::STRING)
+					target = &PredefinedDataTypes::UINT_64;
+			}
+
+			if (original == target)
+			{
+				// It's a conversion between string and u64
+				return CastHandling(CastHandling::Result::NO_CAST, 1);
+			}
 		}
 
 		const bool originalIsBaseType = (original->getClass() == DataTypeDefinition::Class::INTEGER || original->getClass() == DataTypeDefinition::Class::FLOAT);

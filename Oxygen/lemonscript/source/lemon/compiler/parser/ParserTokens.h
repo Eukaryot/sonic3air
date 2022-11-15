@@ -122,7 +122,8 @@ namespace lemon
 		inline ConstantParserToken() : ParserToken(TYPE) {}
 
 	public:
-		int64 mValue = 0;
+		AnyBaseValue mValue = 0;
+		BaseType mBaseType = BaseType::INT_CONST;	// Can also be FLOAT or DOUBLE
 	};
 
 

@@ -25,7 +25,14 @@ function void main()
 #endif
 
 	// Test for floats
-	float two = 2
+	debugLog2(3.)
+	debugLog2(.3)
+	debugLog2(12345.67890f)
+	//debugLog2(125e-4f)	// TODO: Support this as well (negative exponent)
+	debugLog2(2.56e2)
+
+	float two = 2.0
+	debugLog2(two)
 	debugLog2(two + (two / 5))	// Result: 2.4
 
 #if 0

@@ -653,7 +653,7 @@ namespace lemon
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a constant", mLineNumber);
 				const ConstantToken& ct = token.as<ConstantToken>();
-				addOpcode(Opcode::Type::PUSH_CONSTANT, ct.mDataType, ct.mValue);
+				addOpcode(Opcode::Type::PUSH_CONSTANT, ct.mDataType, ct.mValue.get<uint64>());
 				break;
 			}
 
