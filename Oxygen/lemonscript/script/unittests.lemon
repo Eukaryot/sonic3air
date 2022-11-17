@@ -1,0 +1,85 @@
+
+function void runTests()
+{
+	debugLog("Running tests...")
+
+	runIntegerArithmeticTests()
+	runFloatArithmeticTests()
+
+	debugLog("Done with all tests")
+}
+
+
+function void runIntegerArithmeticTests()
+{
+	if (!integerArithmeticTestA())
+		debugLog("Integer arithmetic test A failed")
+	if (!integerArithmeticTestB())
+		debugLog("Integer arithmetic test B failed")
+	if (!integerArithmeticTestC())
+		debugLog("Integer arithmetic test C failed")
+	if (!integerArithmeticTestD())
+		debugLog("Integer arithmetic test D failed")
+	if (!integerArithmeticTestE())
+		debugLog("Integer arithmetic test E failed")
+	if (!integerArithmeticTestF())
+		debugLog("Integer arithmetic test F failed")
+}
+
+function bool integerArithmeticTestA()
+{
+	s16 a = 9
+	a += (a < 0) ? 8 : -8
+	return (a == 1)
+}
+
+function bool integerArithmeticTestB()
+{
+	u16 a = 14
+	s16 b = -5
+	return (a + b == 9) && (b + a == 9)
+}
+
+function bool integerArithmeticTestC()
+{
+	u32 a = 0xfffff4e4
+	u16 result = (0xfffff580 - (a + 4)) / 8
+	return (result == 0x13)
+}
+
+function bool integerArithmeticTestD()
+{
+	s16 a = -30
+	s16 b = 9
+	s32 result = s32(a << 16) / b
+	return (result == -218453)
+}
+
+function bool integerArithmeticTestE()
+{
+	u8[0x04] = 0xbb
+	u8 result = (u8[0x04] &= 0xfc)
+	return (result == 0xb8)
+}
+
+function bool integerArithmeticTestF()
+{
+	s8 range = 2
+	s16 value = -20
+	s16 result = clamp(value, -range, range)
+	return (result == -2)
+}
+
+
+function void runFloatArithmeticTests()
+{
+	if (!floatArithmeticTestA())
+		debugLog("Float arithmetic test A failed")
+}
+
+function bool floatArithmeticTestA()
+{
+	s16 a = 9
+	float b = 2.5
+	return (b * a == a * b) && (b * a == 22.5)
+}

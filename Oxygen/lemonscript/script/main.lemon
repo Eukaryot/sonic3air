@@ -1,6 +1,8 @@
 
 //# script-feature-level(2)
 
+include unittests
+
 
 constant u8 ONE = 1
 
@@ -28,8 +30,9 @@ function void main()
 	debugLog2(3.)
 	debugLog2(.3)
 	debugLog2(12345.67890f)
-	//debugLog2(125e-4f)	// TODO: Support this as well (negative exponent)
-	debugLog2(2.56e2)
+	debugLog2(125e-4f)
+	debugLog2(2.56e-1)
+	debugLog2(6.5536e5)
 
 	float two = 2.0
 	debugLog2(two)
@@ -82,71 +85,6 @@ function void main()
 		Log = 0
 #endif
 
+	debugLog("")	// Empty line
 	runTests()
-}
-
-
-
-// --- Tests --- //
-
-function void runTests()
-{
-	if (!testA())
-		debugLog("Test A failed")
-	if (!testB())
-		debugLog("Test B failed")
-	if (!testC())
-		debugLog("Test C failed")
-	if (!testD())
-		debugLog("Test D failed")
-	if (!testE())
-		debugLog("Test E failed")
-	if (!testF())
-		debugLog("Test F failed")
-
-	debugLog("Done with all tests")
-}
-
-function bool testA()
-{
-	s16 a = 9
-	a += (a < 0) ? 8 : -8
-	return (a == 1)
-}
-
-function bool testB()
-{
-	u16 a = 14
-	s16 b = -5
-	return (a + b == 9) && (b + a == 9)
-}
-
-function bool testC()
-{
-	u32 a = 0xfffff4e4
-	u16 result = (0xfffff580 - (a + 4)) / 8
-	return (result == 0x13)
-}
-
-function bool testD()
-{
-	s16 a = -30
-	s16 b = 9
-	s32 result = s32(a << 16) / b
-	return (result == -218453)
-}
-
-function bool testE()
-{
-	u8[0x04] = 0xbb
-	u8 result = (u8[0x04] &= 0xfc)
-	return (result == 0xb8)
-}
-
-function bool testF()
-{
-	s8 range = 2
-	s16 value = -20
-	s16 result = clamp(value, -range, range)
-	return (result == -2)
 }
