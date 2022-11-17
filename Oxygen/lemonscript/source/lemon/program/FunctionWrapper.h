@@ -50,30 +50,15 @@ namespace lemon
 		template<typename R>
 		void pushStackGeneric(R value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<R>(), value);
+			context.mControlFlow.pushValueStack<R>(value);
 		};
 
 		template<typename T>
 		T popStackGeneric(const NativeFunction::Context context)
 		{
-			return static_cast<T>(context.mControlFlow.popValueStack(traits::getDataType<T>()));
+			return static_cast<T>(context.mControlFlow.popValueStack<T>());
 		}
 
-
-
-		// Template specializations for float and double
-
-		template<>
-		void pushStackGeneric<float>(float value, const NativeFunction::Context context);
-
-		template<>
-		float popStackGeneric(const NativeFunction::Context context);
-
-		template<>
-		void pushStackGeneric<double>(double value, const NativeFunction::Context context);
-
-		template<>
-		double popStackGeneric(const NativeFunction::Context context);
 
 
 		// Template specializations for StringRef, representing the "string" type in script

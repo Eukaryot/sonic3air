@@ -85,12 +85,12 @@ namespace lemon
 			const int count = (int)context.getParameter<int16>();
 			for (int i = 0; i < count; ++i)
 				context.writeValueStack(i, 0);
-			context.mControlFlow->mValueStackPtr += count;
+			context.moveValueStack(count);
 		}
 
 		static void exec_MOVE_STACK_negative(const RuntimeOpcodeContext context)
 		{
-			context.mControlFlow->mValueStackPtr += context.getParameter<int16>();
+			context.moveValueStack(context.getParameter<int16>());
 		}
 
 		static void exec_MOVE_STACK_m1(const RuntimeOpcodeContext context)

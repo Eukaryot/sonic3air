@@ -217,7 +217,7 @@ namespace lemon
 								mModule.addStringLiteral(str);
 							}
 							ConstantToken& constantToken = node.mTokenList.createBack<ConstantToken>();
-							constantToken.mValue = str.getHash();
+							constantToken.mValue.set(str.getHash());
 							constantToken.mDataType = &PredefinedDataTypes::STRING;
 							break;
 						}

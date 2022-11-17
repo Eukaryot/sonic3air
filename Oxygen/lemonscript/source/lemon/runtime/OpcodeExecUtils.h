@@ -25,8 +25,10 @@ namespace lemon
 		template<typename T> FORCE_INLINE static void writeMemory(ControlFlow& controlFlow, uint64 address, T value) {}
 	};
 
-	template<> FORCE_INLINE float  OpcodeExecUtils::safeModulo(float a, float b)   { return (b == 0.0f) ? 0.0f : std::fmod(a, b); }
-	template<> FORCE_INLINE double OpcodeExecUtils::safeModulo(double a, double b) { return (b == 0.0) ? 0.0 : std::fmod(a, b); }
+	template<> FORCE_INLINE float  OpcodeExecUtils::safeDivide(float a, float b)   { return a / b; }
+	template<> FORCE_INLINE double OpcodeExecUtils::safeDivide(double a, double b) { return a / b; }
+	template<> FORCE_INLINE float  OpcodeExecUtils::safeModulo(float a, float b)   { return std::fmod(a, b); }
+	template<> FORCE_INLINE double OpcodeExecUtils::safeModulo(double a, double b) { return std::fmod(a, b); }
 
 	template<> FORCE_INLINE int8   OpcodeExecUtils::readMemory<int8>  (ControlFlow& controlFlow, uint64 address) { return controlFlow.getMemoryAccessHandler().read8 (address); }
 	template<> FORCE_INLINE int16  OpcodeExecUtils::readMemory<int16> (ControlFlow& controlFlow, uint64 address) { return controlFlow.getMemoryAccessHandler().read16(address); }

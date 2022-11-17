@@ -256,7 +256,7 @@ namespace lemon
 
 				ConstantToken& newToken = tokens.createReplaceAt<ConstantToken>(i);
 				newToken.mDataType = constant->getDataType();
-				newToken.mValue = constant->getValue();
+				newToken.mValue.set(constant->getValue());
 			}
 		}
 	}
@@ -563,7 +563,7 @@ namespace lemon
 								{
 									// This can simply be replaced with a compile-time constant
 									ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-									constantToken.mValue = (uint64)constantArray->getSize();
+									constantToken.mValue.set<uint64>(constantArray->getSize());
 									constantToken.mDataType = &PredefinedDataTypes::CONST_INT;
 									tokens.erase(i+1);
 									continue;
@@ -759,7 +759,7 @@ namespace lemon
 				token.mFunction = matchingFunction;
 				token.mParameters.resize(2);
 				ConstantToken& idToken = token.mParameters[0].create<ConstantToken>();
-				idToken.mValue = (uint64)constantArray->getID();
+				idToken.mValue.set(constantArray->getID());
 				idToken.mDataType = &PredefinedDataTypes::UINT_32;
 				token.mParameters[1] = content[0].as<StatementToken>();		// Array index
 				token.mDataType = matchingFunction->getReturnType();
@@ -997,7 +997,7 @@ namespace lemon
 					{
 						const DataTypeDefinition* dataType = uot.mArgument->as<ConstantToken>().mDataType;	// Backup in case outTokenPtr is pointing to inputToken
 						ConstantToken& token = outTokenPtr.create<ConstantToken>();
-						token.mValue = resultValue;
+						token.mValue.set(resultValue);
 						token.mDataType = dataType;
 						return true;
 					}
@@ -1018,7 +1018,7 @@ namespace lemon
 					{
 						const DataTypeDefinition* dataType = bot.mLeft->as<ConstantToken>().mDataType;	// Backup in case outTokenPtr is pointing to inputToken
 						ConstantToken& token = outTokenPtr.create<ConstantToken>();
-						token.mValue = resultValue;
+						token.mValue.set(resultValue);
 						token.mDataType = dataType;
 						return true;
 					}
@@ -1048,16 +1048,16 @@ namespace lemon
 						for (size_t k = 0; k < ft.mParameters.size(); ++k)
 						{
 							const Function::Parameter& parameter = ft.mFunction->getParameters()[k];
-							controlFlow.pushValueStack(parameter.mDataType, ft.mParameters[k].as<ConstantToken>()->mValue.get<uint64>());
+							controlFlow.pushValueStack(ft.mParameters[k].as<ConstantToken>()->mValue);
 						}
 						static_cast<const NativeFunction*>(ft.mFunction)->mFunctionWrapper->execute(NativeFunction::Context(controlFlow));
 
 						// Get return value from the stack and write it as constant
 						const DataTypeDefinition* dataType = ft.mDataType;	// Backup in case outTokenPtr is pointing to inputToken
-						const int64 resultValue = controlFlow.popValueStack(ft.mFunction->getReturnType());
+						const int64 resultValue = controlFlow.popValueStack<int64>();
 
 						ConstantToken& token = outTokenPtr.create<ConstantToken>();
-						token.mValue = resultValue;
+						token.mValue.set(resultValue);
 						token.mDataType = dataType;
 						return true;
 					}
@@ -1102,7 +1102,7 @@ namespace lemon
 
 						// Replace addressof and the parenthesis with the actual address as a constant
 						ConstantToken& constantToken = tokens.createReplaceAt<ConstantToken>(i);
-						constantToken.mValue = (uint64)address;
+						constantToken.mValue.set(address);
 						constantToken.mDataType = &PredefinedDataTypes::UINT_32;
 						tokens.erase(i+1);
 						break;

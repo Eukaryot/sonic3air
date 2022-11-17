@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/compiler/Definitions.h"
 #include "lemon/program/DataType.h"
 
 
@@ -59,15 +60,17 @@ namespace lemon
 
 		inline size_t getValueStackSize() const  { return mValueStackPtr - mValueStackStart; }
 
-		FORCE_INLINE uint64 popValueStack(const DataTypeDefinition* dataType)
+		template<typename T>
+		FORCE_INLINE T popValueStack()
 		{
 			--mValueStackPtr;
-			return *mValueStackPtr;
+			return AnyBaseValue(*mValueStackPtr).get<T>();
 		}
 
-		FORCE_INLINE void pushValueStack(const DataTypeDefinition* dataType, uint64 value)
+		template<typename T>
+		FORCE_INLINE void pushValueStack(T value)
 		{
-			*mValueStackPtr = value;
+			*mValueStackPtr = AnyBaseValue(value).get<uint64>();
 			++mValueStackPtr;
 			RMX_ASSERT(mValueStackPtr < &mValueStackBuffer[0x78], "Value stack error: Too many elements");
 		}
@@ -75,13 +78,13 @@ namespace lemon
 		template<typename T>
 		FORCE_INLINE T readValueStack(int offset) const
 		{
-			return (T)mValueStackPtr[offset];
+			return AnyBaseValue(mValueStackPtr[offset]).get<T>();
 		}
 
 		template<typename T>
 		FORCE_INLINE void writeValueStack(int offset, T value) const
 		{
-			mValueStackPtr[offset] = value;
+			mValueStackPtr[offset] = AnyBaseValue(value).get<uint64>();
 		}
 
 		FORCE_INLINE void moveValueStack(int change)
@@ -107,34 +110,4 @@ namespace lemon
 		MemoryAccessHandler* mMemoryAccessHandler = nullptr;
 	};
 
-
-	template<>
-	FORCE_INLINE float ControlFlow::readValueStack(int offset) const
-	{
-		const uint32 asInteger = (uint32)mValueStackPtr[offset];
-		return *reinterpret_cast<const float*>(&asInteger);
-	}
-
-	template<>
-	FORCE_INLINE void ControlFlow::writeValueStack(int offset, float value) const
-	{
-		static_assert(sizeof(float) == 4);
-		const uint32 asInteger = *reinterpret_cast<uint32*>(&value);
-		mValueStackPtr[offset] = asInteger;
-	}
-
-	template<>
-	FORCE_INLINE double ControlFlow::readValueStack(int offset) const
-	{
-		const uint64 asInteger = mValueStackPtr[offset];
-		return *reinterpret_cast<const double*>(&asInteger);
-	}
-
-	template<>
-	FORCE_INLINE void ControlFlow::writeValueStack(int offset, double value) const
-	{
-		static_assert(sizeof(double) == 8);
-		const uint64 asInteger = *reinterpret_cast<uint64*>(&value);
-		mValueStackPtr[offset] = asInteger;
-	}
 }

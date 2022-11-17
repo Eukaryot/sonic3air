@@ -329,7 +329,7 @@ namespace lemon
 					const uint64 hash = parserToken.as<IdentifierParserToken>().mName.getHash();
 
 					// Unknown preprocessor definitions are okay, they automatically evaluate to 0
-					tokenList.createBack<ConstantToken>().mValue = (nullptr != mPreprocessorDefinitions) ? mPreprocessorDefinitions->getValue(hash) : 0;
+					tokenList.createBack<ConstantToken>().mValue.set<int64>((nullptr != mPreprocessorDefinitions) ? mPreprocessorDefinitions->getValue(hash) : 0);
 					break;
 				}
 			}

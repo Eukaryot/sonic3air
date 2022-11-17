@@ -127,7 +127,7 @@ namespace lemon
 			if (identifierHash == trueHash || identifierHash == falseHash)
 			{
 				ConstantParserToken& token = outTokens.create<ConstantParserToken>();
-				token.mValue = (identifierHash == trueHash);
+				token.mValue.set(identifierHash == trueHash);
 				token.mBaseType = BaseType::INT_CONST;
 				return;
 			}

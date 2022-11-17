@@ -78,6 +78,8 @@ namespace lemon
 
 	void ParserHelper::OperatorLookup::initialize()
 	{
+		static_assert(sizeof(AnyBaseValue) == 8);	// This just needs to be placed anywhere, why not here
+
 		if (mInitialized)
 			return;
 
@@ -310,7 +312,7 @@ namespace lemon
 			if ((errorCheck & 0x80) == 0)
 			{
 				result.mType = ParseNumberResult::Type::INTEGER;
-				result.mValue = number;
+				result.mValue.set(number);
 			}
 
 			// Return in any case, as we already know from the prefix that it can't be anything different than hexadecimal encoding
@@ -331,7 +333,7 @@ namespace lemon
 			if ((errorCheck & 0x80) == 0)
 			{
 				result.mType = ParseNumberResult::Type::INTEGER;
-				result.mValue = number;
+				result.mValue.set(number);
 				return result;
 			}
 		}
@@ -454,12 +456,12 @@ namespace lemon
 			if (isFloat)
 			{
 				result.mType = ParseNumberResult::Type::FLOAT;
-				result.mValue = (float)doubleNumber;
+				result.mValue.set((float)doubleNumber);
 			}
 			else
 			{
 				result.mType = ParseNumberResult::Type::DOUBLE;
-				result.mValue = doubleNumber;
+				result.mValue.set(doubleNumber);
 			}
 			return result;
 		}

@@ -34,45 +34,15 @@ namespace lemon
 	{
 
 		template<>
-		void pushStackGeneric(float value, const NativeFunction::Context context)
-		{
-			static_assert(sizeof(value) == 4);
-			const uint32 asInteger = *reinterpret_cast<uint32*>(&value);
-			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), asInteger);
-		}
-
-		template<>
-		float popStackGeneric(const NativeFunction::Context context)
-		{
-			const uint32 asInteger = (uint32)context.mControlFlow.popValueStack(traits::getDataType<uint32>());
-			return *reinterpret_cast<const float*>(&asInteger);
-		}
-
-		template<>
-		void pushStackGeneric(double value, const NativeFunction::Context context)
-		{
-			static_assert(sizeof(value) == 8);
-			const uint64 asInteger = *reinterpret_cast<uint64*>(&value);
-			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), asInteger);
-		}
-
-		template<>
-		double popStackGeneric(const NativeFunction::Context context)
-		{
-			const uint64 asInteger = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
-			return *reinterpret_cast<const double*>(&asInteger);
-		}
-
-		template<>
 		void pushStackGeneric(StringRef value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<StringRef>(), value.getHash());
+			context.mControlFlow.pushValueStack<uint64>(value.getHash());
 		};
 
 		template<>
 		StringRef popStackGeneric(const NativeFunction::Context context)
 		{
-			const uint64 stringHash = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
+			const uint64 stringHash = context.mControlFlow.popValueStack<uint64>();
 			const FlyweightString* str = context.mControlFlow.getRuntime().resolveStringByKey(stringHash);
 			return (nullptr != str) ? StringRef(*str) : StringRef();
 		}
@@ -80,17 +50,17 @@ namespace lemon
 		template<>
 		void pushStackGeneric(AnyTypeWrapper value, const NativeFunction::Context context)
 		{
-			context.mControlFlow.pushValueStack(traits::getDataType<uint64>(), value.mValue);
-			context.mControlFlow.pushValueStack(traits::getDataType<uint8>(), (uint64)value.mType);
+			context.mControlFlow.pushValueStack(value.mValue);
+			context.mControlFlow.pushValueStack(value.mType);
 		};
 
 		template<>
 		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context)
 		{
 			AnyTypeWrapper result;
-			const uint8 serializedTypeId = (uint8)context.mControlFlow.popValueStack(traits::getDataType<uint8>());
+			const uint8 serializedTypeId = context.mControlFlow.popValueStack<uint8>();
 			result.mType = DataTypeSerializer::getDataTypeFromSerializedId(serializedTypeId);
-			result.mValue = context.mControlFlow.popValueStack(traits::getDataType<uint64>());
+			result.mValue = context.mControlFlow.popValueStack<uint64>();
 			return result;
 		}
 	}
