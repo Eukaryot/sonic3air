@@ -279,32 +279,53 @@ namespace lemon
 		return input.length();
 	}
 
-	ParserHelper::ParseNumberResult ParserHelper::parseNumber(std::string_view input)
+	ParserHelper::ParseNumberResult ParserHelper::collectNumber(std::string_view input)
 	{
 		ParseNumberResult result;
 
-		// First check for integers
+		// Collect number characters, and also other characters that must not appear immediately after a number
+		size_t len = 0;
+		for (; len < input.length(); ++len)
+		{
+			if (!mLookup.mIsIdentifierCharacter[(uint8)input[len]])
+				break;
+		}
+
+		std::string_view collectedString = input.substr(0, len);
+		result.mBytesRead = len;
+
+		// First check for hexadecimal integer
+		if (len >= 3 && collectedString[0] == '0' && collectedString[1] == 'x')
+		{
+			collectedString = collectedString.substr(2);
+			int64 number = 0;
+			uint8 errorCheck = 0;
+			for (char ch : collectedString)
+			{
+				const uint8 value = mDigitLookupHex.getValueByCharacter(ch);
+				number = number * 16 + (int64)value;
+				errorCheck |= value;
+			}
+
+			if ((errorCheck & 0x80) == 0)
+			{
+				result.mType = ParseNumberResult::Type::INTEGER;
+				result.mValue = number;
+			}
+
+			// Return in any case, as we already know from the prefix that it can't be anything different than hexadecimal encoding
+			return result;
+		}
+
+		// Next check for decimal integer
 		{
 			int64 number = 0;
 			uint8 errorCheck = 0;
-			if (input.length() >= 3 && input[0] == '0' && input[1] == 'x')
+			for (char ch : collectedString)
 			{
-				input = input.substr(2);
-				for (char ch : input)
-				{
-					const uint8 value = mDigitLookupHex.getValueByCharacter(ch);
-					number = number * 16 + (int64)value;
-					errorCheck |= value;
-				}
-			}
-			else
-			{
-				for (char ch : input)
-				{
-					const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
-					number = number * 10 + (int64)value;
-					errorCheck |= value;
-				}
+				const uint8 value = mDigitLookupDec.getValueByCharacter(ch);
+				number = number * 10 + (int64)value;
+				errorCheck |= value;
 			}
 
 			if ((errorCheck & 0x80) == 0)
@@ -317,13 +338,27 @@ namespace lemon
 
 		// Check if it's a floating point type
 		{
-			if (input.length() < 2)		// Can't be a single digit, that would be an integer
+			if (collectedString.length() < 2)		// Can't be a single digit, that would be an integer
 				return result;
 
-			bool isFloat = false;
-			if (input.back() == 'f')
+			// Handle the special case that there's a minus after the string that is the the exponent's sign and thus part of the number
+			if ((collectedString.back() == 'e' || collectedString.back() == 'E') && (len < input.length() && input[len] == '-'))
 			{
-				input = input.substr(0, input.length()-1);
+				// Collect more characters
+				++len;
+				for (; len < input.length(); ++len)
+				{
+					if (!mLookup.mIsIdentifierCharacter[(uint8)input[len]])
+						break;
+				}
+				collectedString = input.substr(0, len);
+				result.mBytesRead = len;
+			}
+
+			bool isFloat = false;
+			if (collectedString.back() == 'f')
+			{
+				collectedString = collectedString.substr(0, collectedString.length()-1);
 				isFloat = true;
 			}
 
@@ -331,8 +366,8 @@ namespace lemon
 			std::string_view fractionalString;
 			std::string_view exponentString;
 			{
-				const size_t dotPos = input.find_first_of('.');
-				const size_t expPos = input.find_first_of("eE");
+				const size_t dotPos = collectedString.find_first_of('.');
+				const size_t expPos = collectedString.find_first_of("eE");
 				if (dotPos == std::string_view::npos)
 				{
 					if (expPos == std::string_view::npos)
@@ -341,17 +376,17 @@ namespace lemon
 					}
 
 					// It's something like "2e5"
-					integerString = input.substr(0, expPos);
-					exponentString = input.substr(expPos + 1);
+					integerString = collectedString.substr(0, expPos);
+					exponentString = collectedString.substr(expPos + 1);
 				}
 				else
 				{
-					integerString = input.substr(0, dotPos);
+					integerString = collectedString.substr(0, dotPos);
 
 					if (expPos == std::string_view::npos)
 					{
 						// It's something like "2.5"
-						fractionalString = input.substr(dotPos + 1);
+						fractionalString = collectedString.substr(dotPos + 1);
 					}
 					else
 					{
@@ -359,8 +394,8 @@ namespace lemon
 							return result;
 
 						// It's something like "2.1e5"
-						fractionalString = input.substr(dotPos + 1, expPos - dotPos - 1);
-						exponentString = input.substr(expPos + 1);
+						fractionalString = collectedString.substr(dotPos + 1, expPos - dotPos - 1);
+						exponentString = collectedString.substr(expPos + 1);
 					}
 				}
 			}

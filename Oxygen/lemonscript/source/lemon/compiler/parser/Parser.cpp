@@ -163,13 +163,7 @@ namespace lemon
 			{
 				// It is a number (integer or floating point)
 				const std::string_view rest = input.substr(pos);
-				const size_t numberLength = ParserHelper::collectNumber(rest);
-				RMX_ASSERT(numberLength > 0, "Failed to collect a number, even though the first cahracter is a digit");
-				pos += numberLength;
-				const std::string_view numberString = rest.substr(0, numberLength);
-
-				// Check if it's an integer
-				const ParserHelper::ParseNumberResult result = ParserHelper::parseNumber(numberString);
+				const ParserHelper::ParseNumberResult result = ParserHelper::collectNumber(rest);
 				switch (result.mType)
 				{
 					case ParserHelper::ParseNumberResult::Type::INTEGER:
@@ -197,8 +191,9 @@ namespace lemon
 					}
 
 					default:
-						CHECK_ERROR(false, "Invalid number '" << numberString << "'", lineNumber);
+						CHECK_ERROR(false, "Invalid number '" << rest.substr(0, result.mBytesRead) << "'", lineNumber);
 				}
+				pos += result.mBytesRead;
 			}
 			else if (ParserHelper::isLetter(firstCharacter) || (firstCharacter == '_'))
 			{

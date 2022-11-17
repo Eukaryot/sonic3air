@@ -33,6 +33,7 @@ namespace lemon
 
 			Type mType = Type::NONE;
 			AnyBaseValue mValue;
+			size_t mBytesRead = 0;
 		};
 
 	public:
@@ -49,17 +50,6 @@ namespace lemon
 		inline static bool isOperatorCharacter(char ch)
 		{
 			return mOperatorLookup.isOperatorCharacter(ch);
-		}
-
-		inline static size_t collectNumber(std::string_view input)
-		{
-			size_t pos = 0;
-			for (; pos < input.length(); ++pos)
-			{
-				if (!mLookup.mPartOfNumber[(uint8)input[pos]])
-					return pos;
-			}
-			return pos;
 		}
 
 		inline static size_t collectIdentifier(std::string_view input)
@@ -88,7 +78,7 @@ namespace lemon
 		static void collectPreprocessorStatement(std::string_view input, std::string& output);
 		static bool findEndOfBlockComment(std::string_view input, size_t& pos);
 		static size_t skipStringLiteral(std::string_view input, uint32 lineNumber);
-		static ParseNumberResult parseNumber(std::string_view input);
+		static ParseNumberResult collectNumber(std::string_view input);
 
 		inline static size_t findOperator(std::string_view input, Operator& outOperator)
 		{
@@ -102,7 +92,6 @@ namespace lemon
 				mIsLetter(),
 				mIsDigitOrLetter(),
 				mIsDigitOrDot(),
-				mPartOfNumber(),
 				mIsIdentifierCharacter()
 			{
 				for (size_t i = 0; i < 0x100; ++i)
@@ -113,7 +102,6 @@ namespace lemon
 					mIsLetter[i] = isLetter;
 					mIsDigitOrLetter[i] = isDigit || isLetter;
 					mIsDigitOrDot[i] = isDigit || ch == '.';
-					mPartOfNumber[i] = mIsDigitOrDot[i] || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F') || (ch == 'x');		// || (ch == '-'); // TODO: Support negative exponents in exponential notation of floats
 					mIsIdentifierCharacter[i] = isDigit || isLetter || (ch == '_') || (ch == '.');
 				}
 			}
@@ -121,7 +109,6 @@ namespace lemon
 			bool mIsLetter[0x100];
 			bool mIsDigitOrLetter[0x100];
 			bool mIsDigitOrDot[0x100];
-			bool mPartOfNumber[0x100];
 			bool mIsIdentifierCharacter[0x100];
 		};
 
