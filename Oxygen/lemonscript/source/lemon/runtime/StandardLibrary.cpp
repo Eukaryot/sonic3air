@@ -318,6 +318,10 @@ namespace lemon
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint16>), compileTimeConstant);
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int32>), compileTimeConstant);
 		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint32>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<int64>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<uint64>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<float>), compileTimeConstant);
+		module.addNativeFunction("min", lemon::wrap(&functions::minimum<double>), compileTimeConstant);
 
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int8>), compileTimeConstant);
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint8>), compileTimeConstant);
@@ -325,6 +329,10 @@ namespace lemon
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint16>), compileTimeConstant);
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int32>), compileTimeConstant);
 		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint32>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<int64>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<uint64>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<float>), compileTimeConstant);
+		module.addNativeFunction("max", lemon::wrap(&functions::maximum<double>), compileTimeConstant);
 
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int8>), compileTimeConstant);
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint8>), compileTimeConstant);
@@ -332,10 +340,17 @@ namespace lemon
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint16>), compileTimeConstant);
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int32>), compileTimeConstant);
 		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint32>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<int64>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<uint64>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<float>), compileTimeConstant);
+		module.addNativeFunction("clamp", lemon::wrap(&functions::clamp<double>), compileTimeConstant);
 
 		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint8, int8>), compileTimeConstant);
 		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint16, int16>), compileTimeConstant);
 		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint32, int32>), compileTimeConstant);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<uint64, int64>), compileTimeConstant);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<float, float>), compileTimeConstant);
+		module.addNativeFunction("abs", lemon::wrap(&functions::absolute<double, double>), compileTimeConstant);
 
 		module.addNativeFunction("sqrt", lemon::wrap(&functions::sqrt_u32), compileTimeConstant);
 

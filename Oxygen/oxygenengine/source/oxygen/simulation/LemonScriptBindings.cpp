@@ -346,11 +346,92 @@ namespace
 		debugLogInternal(valueString);
 	}
 
-	void debugLog(lemon::StringRef text)
+	template<typename T>
+	void debugLogIntSigned(T value)
 	{
-		if (text.isValid())
+		if (value < 0)
 		{
-			debugLogInternal(text.getString());
+			debugLogInternal('-' + rmx::hexString(-value, sizeof(T) * 2));
+		}
+		else
+		{
+			debugLogInternal(rmx::hexString(value, sizeof(T) * 2));
+		}
+	}
+
+	template<typename T>
+	void debugLogIntUnsigned(T value)
+	{
+		debugLogInternal(rmx::hexString(value, sizeof(T) * 2));
+	}
+
+	void debugLog(lemon::AnyTypeWrapper param)
+	{
+		switch (param.mType->getClass())
+		{
+			case lemon::DataTypeDefinition::Class::INTEGER:
+			{
+				if (param.mType == &lemon::PredefinedDataTypes::INT_8)
+				{
+					debugLogIntSigned(param.mValue.get<int8>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::UINT_8)
+				{
+					debugLogIntUnsigned(param.mValue.get<uint8>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::INT_16)
+				{
+					debugLogIntSigned(param.mValue.get<int16>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::UINT_16)
+				{
+					debugLogIntUnsigned(param.mValue.get<uint16>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::INT_32)
+				{
+					debugLogIntSigned(param.mValue.get<int32>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::UINT_32)
+				{
+					debugLogIntUnsigned(param.mValue.get<uint32>());
+				}
+				else if (param.mType == &lemon::PredefinedDataTypes::INT_64)
+				{
+					debugLogIntSigned(param.mValue.get<int64>());
+				}
+				else
+				{
+					debugLogIntUnsigned(param.mValue.get<uint64>());
+				}
+				break;
+			}
+
+			case lemon::DataTypeDefinition::Class::FLOAT:
+			{
+				if (param.mType->getBytes() == 4)
+				{
+					debugLogInternal(std::to_string(param.mValue.get<float>()));
+				}
+				else
+				{
+					debugLogInternal(std::to_string(param.mValue.get<double>()));
+				}
+				break;
+			}
+
+			case lemon::DataTypeDefinition::Class::STRING:
+			{
+				lemon::Runtime* runtime = lemon::Runtime::getActiveRuntime();
+				if (nullptr != runtime)
+				{
+					const lemon::FlyweightString* str = runtime->resolveStringByKey(param.mValue.get<uint64>());
+					if (nullptr != str)
+					{
+						debugLogInternal(str->getString());
+					}
+				}
+				break;
+			}
 		}
 	}
 
@@ -1869,7 +1950,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 		}
 
 		module.addNativeFunction("debugLog", lemon::wrap(&debugLog), defaultFlags)
-			.setParameterInfo(0, "text");
+			.setParameterInfo(0, "value");
 
 		module.addNativeFunction("debugLogColors", lemon::wrap(&debugLogColors), defaultFlags)
 			.setParameterInfo(0, "name")
