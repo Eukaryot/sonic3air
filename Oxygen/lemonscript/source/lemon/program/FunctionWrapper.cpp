@@ -60,7 +60,7 @@ namespace lemon
 			AnyTypeWrapper result;
 			const uint8 serializedTypeId = context.mControlFlow.popValueStack<uint8>();
 			result.mType = DataTypeSerializer::getDataTypeFromSerializedId(serializedTypeId);
-			result.mValue = context.mControlFlow.popValueStack<uint64>();
+			result.mValue = context.mControlFlow.popValueStack<AnyBaseValue>();
 			return result;
 		}
 	}

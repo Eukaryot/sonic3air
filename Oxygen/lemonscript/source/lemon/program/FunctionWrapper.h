@@ -18,7 +18,7 @@ namespace lemon
 	struct AnyTypeWrapper
 	{
 		const DataTypeDefinition* mType = nullptr;
-		uint64 mValue = 0;
+		AnyBaseValue mValue;
 	};
 
 

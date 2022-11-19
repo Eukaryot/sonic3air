@@ -1,7 +1,7 @@
 
 //# script-feature-level(2)
 
-include unittests
+//include unittests
 
 
 constant u8 ONE = 1
@@ -32,9 +32,9 @@ function void main()
 
 	debugLog(Math.degreesToRadians(90.0f))
 	debugLog(Math.degreesToRadians(90.0))
-	debugLog(Math.degreesToRadians(90))		// TODO: This does not work yet
-	//debugLog(Math.sin(Math.degreesToRadians(90.0)))
-
+	debugLog(Math.degreesToRadians(90))
+	debugLog(Math.degreesToRadians(s16(90)))
+	debugLog(Math.degreesToRadians(89 + 1.0f))
 
 #if 0
 	// Test for constant arrays & strings
@@ -83,6 +83,6 @@ function void main()
 		Log = 0
 #endif
 
-	debugLog("")	// Empty line
-	runTests()
+	//debugLog("")	// Empty line
+	//runTests()
 }

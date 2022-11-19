@@ -19,6 +19,7 @@ namespace lemon
 {
 	class Function;
 	class ConstantArray;
+	class ConstantToken;
 	class GlobalsLookup;
 	class LocalVariable;
 	class ScriptFunction;
@@ -53,6 +54,7 @@ namespace lemon
 
 	private:
 		void insertCastTokenIfNecessary(TokenPtr<StatementToken>& token, const DataTypeDefinition* targetDataType);
+		void castCompileTimeConstant(ConstantToken& constantToken, const DataTypeDefinition* targetDataType);
 
 		void processDefines(TokenList& tokens);
 		void processConstants(TokenList& tokens);

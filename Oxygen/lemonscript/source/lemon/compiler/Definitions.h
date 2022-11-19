@@ -71,6 +71,8 @@ namespace lemon
 	
 		inline void reset()  { mUint64 = 0; }
 
+		template<typename S, typename T> void cast() { set<T>(static_cast<T>(get<S>())); }
+
 	private:
 		union
 		{
@@ -91,6 +93,7 @@ namespace lemon
 	template<> FORCE_INLINE bool   AnyBaseValue::get() const  { return (bool)mUint64; }
 	template<> FORCE_INLINE float  AnyBaseValue::get() const  { return mFloat; }
 	template<> FORCE_INLINE double AnyBaseValue::get() const  { return mDouble; }
+	template<> FORCE_INLINE AnyBaseValue AnyBaseValue::get() const  { return *this; }
 
 	template<> FORCE_INLINE void AnyBaseValue::set(int8 value)    { mUint64 = (uint64)value; }
 	template<> FORCE_INLINE void AnyBaseValue::set(uint8 value)   { mUint64 = (int64)value; }
@@ -103,5 +106,6 @@ namespace lemon
 	template<> FORCE_INLINE void AnyBaseValue::set(bool value)    { mUint64 = (uint64)value; }
 	template<> FORCE_INLINE void AnyBaseValue::set(float value)   { mFloat  = value; }
 	template<> FORCE_INLINE void AnyBaseValue::set(double value)  { mDouble = value; }
+	template<> FORCE_INLINE void AnyBaseValue::set(AnyBaseValue value)  { *this = value; }
 
 }

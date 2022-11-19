@@ -74,25 +74,25 @@ void debugLog(AnyTypeWrapper param)
 {
 	if (param.mType == &PredefinedDataTypes::UINT_8)
 	{
-		std::cout << rmx::hexString((uint8)param.mValue, 2) << std::endl;
+		std::cout << rmx::hexString(param.mValue.get<uint8>(), 2) << std::endl;
 	}
 	else if (param.mType == &PredefinedDataTypes::UINT_64)
 	{
-		std::cout << rmx::hexString(param.mValue, 8) << std::endl;
+		std::cout << rmx::hexString(param.mValue.get<uint64>(), 8) << std::endl;
 	}
 	else if (param.mType == &PredefinedDataTypes::FLOAT)
 	{
-		std::cout << *reinterpret_cast<float*>(&param.mValue) << std::endl;
+		std::cout << param.mValue.get<float>() << std::endl;
 	}
 	else if (param.mType == &PredefinedDataTypes::DOUBLE)
 	{
-		std::cout << *reinterpret_cast<double*>(&param.mValue) << std::endl;
+		std::cout << param.mValue.get<double>() << std::endl;
 	}
 	else if (param.mType == &PredefinedDataTypes::STRING)
 	{
 		Runtime* runtime = Runtime::getActiveRuntime();
 		RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
-		const FlyweightString* storedString = runtime->resolveStringByKey(param.mValue);
+		const FlyweightString* storedString = runtime->resolveStringByKey(param.mValue.get<uint64>());
 		RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 		std::cout << storedString->getString() << std::endl;
 	}
