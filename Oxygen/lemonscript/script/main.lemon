@@ -17,26 +17,24 @@ constant array<u8> fibonacci =
 function void main()
 {
 #if 0
-	// Test for "any" type
-	u8 g = 0x56
-	u64 h = 0x123456789abcdef
-	string yes = "Yes!"
-	debugLog2(g)
-	debugLog2(h)
-	debugLog2(yes)
-#endif
-
 	// Test for floats
-	debugLog2(3.)
-	debugLog2(.3)
-	debugLog2(12345.67890f)
-	debugLog2(125e-4f)
-	debugLog2(2.56e-1)
-	debugLog2(6.5536e5)
+	debugLog(3.)
+	debugLog(.3)
+	debugLog(12345.67890f)
+	debugLog(125e-4f)
+	debugLog(2.56e-1)
+	debugLog(6.5536e5)
 
 	float two = 2.0
-	debugLog2(two)
-	debugLog2(two + (two / 5))	// Result: 2.4
+	debugLog(two)
+	debugLog(two + (two / 5))	// Result: 2.4
+#endif
+
+	debugLog(Math.degreesToRadians(90.0f))
+	debugLog(Math.degreesToRadians(90.0))
+	debugLog(Math.degreesToRadians(90))		// TODO: This does not work yet
+	//debugLog(Math.sin(Math.degreesToRadians(90.0)))
+
 
 #if 0
 	// Test for constant arrays & strings

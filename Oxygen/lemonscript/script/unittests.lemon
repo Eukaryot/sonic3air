@@ -75,6 +75,8 @@ function void runFloatArithmeticTests()
 {
 	if (!floatArithmeticTestA())
 		debugLog("Float arithmetic test A failed")
+	if (!floatArithmeticTestB())
+		debugLog("Float arithmetic test B failed")
 }
 
 function bool floatArithmeticTestA()
@@ -82,4 +84,9 @@ function bool floatArithmeticTestA()
 	s16 a = 9
 	float b = 2.5
 	return (b * a == a * b) && (b * a == 22.5)
+}
+
+function bool floatArithmeticTestB()
+{
+	return (Math.sin(Math.degreesToRadians(90.0)) == 1.0)
 }

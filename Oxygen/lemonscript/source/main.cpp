@@ -70,18 +70,7 @@ void logValueStr(int64 key)
 	std::cout << storedString->getString() << std::endl;
 }
 
-void debugLog(uint64 stringHash)
-{
-	Runtime* runtime = Runtime::getActiveRuntime();
-	RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
-
-	const FlyweightString* storedString = runtime->resolveStringByKey((uint64)stringHash);
-	RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
-
-	std::cout << storedString->getString() << std::endl;
-}
-
-void debugLog2(AnyTypeWrapper param)
+void debugLog(AnyTypeWrapper param)
 {
 	if (param.mType == &PredefinedDataTypes::UINT_8)
 	{
@@ -101,7 +90,11 @@ void debugLog2(AnyTypeWrapper param)
 	}
 	else if (param.mType == &PredefinedDataTypes::STRING)
 	{
-		debugLog(param.mValue);
+		Runtime* runtime = Runtime::getActiveRuntime();
+		RMX_CHECK(nullptr != runtime, "No lemon script runtime active", return);
+		const FlyweightString* storedString = runtime->resolveStringByKey(param.mValue);
+		RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
+		std::cout << storedString->getString() << std::endl;
 	}
 	else
 	{
@@ -234,7 +227,6 @@ int main(int argc, char** argv)
 	var2.mSetter = logValueStr;
 
 	module.addNativeFunction("debugLog", lemon::wrap(&debugLog));
-	module.addNativeFunction("debugLog2", lemon::wrap(&debugLog2));
 	module.addNativeFunction("logFloat", lemon::wrap(&logFloat));
 	module.addNativeFunction("maximum", wrap(&testFunctionA), Function::Flag::COMPILE_TIME_CONSTANT);
 	module.addNativeFunction("maximum", wrap(&testFunctionB), Function::Flag::COMPILE_TIME_CONSTANT);
