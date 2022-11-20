@@ -18,7 +18,7 @@ namespace lemon
 	class OpcodeHelper
 	{
 	public:
-		static BaseType getCastExecType(BaseCastType castType)
+		static BaseType getCastTargetType(BaseCastType castType)
 		{
 			switch (castType)
 			{
@@ -46,7 +46,47 @@ namespace lemon
 				case BaseCastType::SINT_16_TO_64: return BaseType::INT_16;
 				case BaseCastType::SINT_32_TO_64: return BaseType::INT_32;
 
-				// TODO: Add the rest here as well
+				// Integer cast to float
+				case BaseCastType::UINT_8_TO_FLOAT:  return BaseType::FLOAT;
+				case BaseCastType::UINT_16_TO_FLOAT: return BaseType::FLOAT;
+				case BaseCastType::UINT_32_TO_FLOAT: return BaseType::FLOAT;
+				case BaseCastType::UINT_64_TO_FLOAT: return BaseType::FLOAT;
+				case BaseCastType::SINT_8_TO_FLOAT:  return BaseType::FLOAT;
+				case BaseCastType::SINT_16_TO_FLOAT: return BaseType::FLOAT;
+				case BaseCastType::SINT_32_TO_FLOAT: return BaseType::FLOAT;
+				case BaseCastType::SINT_64_TO_FLOAT: return BaseType::FLOAT;
+
+				case BaseCastType::UINT_8_TO_DOUBLE:  return BaseType::DOUBLE;
+				case BaseCastType::UINT_16_TO_DOUBLE: return BaseType::DOUBLE;
+				case BaseCastType::UINT_32_TO_DOUBLE: return BaseType::DOUBLE;
+				case BaseCastType::UINT_64_TO_DOUBLE: return BaseType::DOUBLE;
+				case BaseCastType::SINT_8_TO_DOUBLE:  return BaseType::DOUBLE;
+				case BaseCastType::SINT_16_TO_DOUBLE: return BaseType::DOUBLE;
+				case BaseCastType::SINT_32_TO_DOUBLE: return BaseType::DOUBLE;
+				case BaseCastType::SINT_64_TO_DOUBLE: return BaseType::DOUBLE;
+
+				// Float cast to integer
+				case BaseCastType::FLOAT_TO_UINT_8:  return BaseType::UINT_8;
+				case BaseCastType::FLOAT_TO_UINT_16: return BaseType::UINT_16;
+				case BaseCastType::FLOAT_TO_UINT_32: return BaseType::UINT_32;
+				case BaseCastType::FLOAT_TO_UINT_64: return BaseType::UINT_64;
+				case BaseCastType::FLOAT_TO_SINT_8:  return BaseType::INT_8;
+				case BaseCastType::FLOAT_TO_SINT_16: return BaseType::INT_16;
+				case BaseCastType::FLOAT_TO_SINT_32: return BaseType::INT_32;
+				case BaseCastType::FLOAT_TO_SINT_64: return BaseType::INT_64;
+
+				case BaseCastType::DOUBLE_TO_UINT_8:  return BaseType::UINT_8;
+				case BaseCastType::DOUBLE_TO_UINT_16: return BaseType::UINT_16;
+				case BaseCastType::DOUBLE_TO_UINT_32: return BaseType::UINT_32;
+				case BaseCastType::DOUBLE_TO_UINT_64: return BaseType::UINT_64;
+				case BaseCastType::DOUBLE_TO_SINT_8:  return BaseType::INT_8;
+				case BaseCastType::DOUBLE_TO_SINT_16: return BaseType::INT_16;
+				case BaseCastType::DOUBLE_TO_SINT_32: return BaseType::INT_32;
+				case BaseCastType::DOUBLE_TO_SINT_64: return BaseType::INT_64;
+
+				// Float cast
+				case BaseCastType::FLOAT_TO_DOUBLE: return BaseType::DOUBLE;
+				case BaseCastType::DOUBLE_TO_FLOAT: return BaseType::FLOAT;
 
 				default:
 					throw std::runtime_error("Unrecognized cast type");
@@ -54,9 +94,9 @@ namespace lemon
 			return BaseType::UINT_64;
 		}
 
-		static BaseType getCastExecType(const Opcode& opcode)
+		static BaseType getCastTargetType(const Opcode& opcode)
 		{
-			return OpcodeHelper::getCastExecType(static_cast<BaseCastType>(opcode.mParameter));
+			return OpcodeHelper::getCastTargetType(static_cast<BaseCastType>(opcode.mParameter));
 		}
 	};
 

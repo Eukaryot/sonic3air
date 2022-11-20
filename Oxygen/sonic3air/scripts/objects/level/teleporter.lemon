@@ -254,7 +254,7 @@ function void fn0456f4()
 			u8[0xffffeed7] = 0
 			playSound(0x73)
 		#if STANDALONE
-			Input.setControllerRumble(0, 0, 0x8000, 500)
+			Input.setControllerRumble(-1, 0.0f, 0.5f, 500)
 		#endif
 
 			player1.camera_lock = 0xff
@@ -551,7 +551,7 @@ function void fn045c8e()
 			u16[A2] = 0
 			playSound(0x73)
 		#if STANDALONE
-			Input.setControllerRumble(0, 0, 0x8000, 500)
+			Input.setControllerRumble(-1, 0.0f, 0.5f, 500)
 		#endif
 
 			if (D6.u16 != 0)
@@ -688,7 +688,7 @@ function void fn05234a()
 
 			playSound(0x73)
 		#if STANDALONE
-			Input.setControllerRumble(0, 0, 0x8000, 500)
+			Input.setControllerRumble(-1, 0.0f, 0.5f, 500)
 		#endif
 
 			player1.camera_lock = 0xff
@@ -928,7 +928,7 @@ function void fn045b1c()
 				u32[A1] = 0
 				playSound(0x73)
 			#if STANDALONE
-				Input.setControllerRumble(0, 0, 0x8000, 500)
+				Input.setControllerRumble(-1, 0.0f, 0.5f, 500)
 			#endif
 
 				objA0.update_address = 0x045b8a

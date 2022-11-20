@@ -125,7 +125,7 @@ function void fn02e410()
 			{
 				playSound(SFX_CLICK)
 			#if STANDALONE
-				Input.setControllerRumble(0, 0, 0x2000, 100)
+				Input.setControllerRumble(-1, 0.0f, 0.1f, 100)
 			#endif
 			}
 		}

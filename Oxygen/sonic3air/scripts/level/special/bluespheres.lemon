@@ -1689,7 +1689,7 @@ function void fn009b62()
 			{
 				playMusic(0x66)
 			#if STANDALONE
-				Input.setControllerRumble(0, 0x6000, 0xffff, 400)
+				Input.setControllerRumble(-1, 0.4f, 1.0f, 400)
 			#endif
 			}
 			bluespheres.lifted_height += (bluespheres.lifted_height >= 0x7d) ? 4 : (bluespheres.lifted_height >= 0x3e) ? 3 : 2

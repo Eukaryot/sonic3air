@@ -517,7 +517,7 @@ namespace lemon
 				break;
 
 			case Opcode::Type::CAST_VALUE:
-				outInfo.mSubtypeData |= (uint32)OpcodeHelper::getCastExecType(firstOpcode);	// Type of cast
+				outInfo.mSubtypeData |= (uint32)OpcodeHelper::getCastTargetType(firstOpcode);	// Type of cast
 				break;
 
 			case Opcode::Type::ARITHM_ADD:
@@ -905,7 +905,7 @@ namespace lemon
 
 						case Opcode::Type::CAST_VALUE:
 						{
-							const BaseType dataType = OpcodeHelper::getCastExecType(opcode);
+							const BaseType dataType = OpcodeHelper::getCastTargetType(opcode);
 							Assignment& assignment = vectorAdd(assignments);
 							assignment.mDest	 = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, dataType, stackPosition - 1);
 							assignment.mSource	 = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, dataType, stackPosition - 1);

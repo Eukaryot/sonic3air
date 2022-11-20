@@ -753,3 +753,15 @@ function void debugDrawOutlineRect(s32 px, s32 py, s32 width, s32 height, u32 co
 	debugDrawRect(px, py + height - 1, width, 1, color)
 #endif
 }
+
+
+
+//-------------------------------------------------------//
+// Controller rumble                                     //
+//-------------------------------------------------------//
+
+function void Input.setControllerRumbleByAddress(u32 playerUpdateAddress, float lowFrequencyRumble, float highFrequencyRumble, u16 milliseconds)
+{
+	s8 playerIndex = (playerUpdateAddress == 0xffffb04a) ? 1 : 0
+	Input.setControllerRumble(playerIndex, lowFrequencyRumble, highFrequencyRumble, milliseconds)
+}

@@ -294,6 +294,28 @@ namespace lemon
 			return StringRef(runtime->addString(part));
 		}
 
+		bool string_startsWith(StringRef string, StringRef substring)
+		{
+			if (!string.isValid() || !substring.isValid())
+				return false;
+			return rmx::startsWith(string.getString(), substring.getString());
+		}
+
+		bool string_endsWith(StringRef string, StringRef substring)
+		{
+			if (!string.isValid() || !substring.isValid())
+				return false;
+			return rmx::endsWith(string.getString(), substring.getString());
+		}
+
+		int16 string_find(StringRef string, StringRef substring)
+		{
+			if (!string.isValid() || !substring.isValid())
+				return false;
+			const size_t position = string.getString().find(substring.getString());
+			return (position == std::string_view::npos) ? -1 : (int16)position;
+		}
+
 		StringRef getStringFromHash(uint64 hash)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
@@ -495,6 +517,15 @@ namespace lemon
 			.setParameterInfo(0, "str")
 			.setParameterInfo(1, "index")
 			.setParameterInfo(2, "length");
+
+		module.addNativeMethod("string", "startsWith", lemon::wrap(&functions::string_startsWith), defaultFlags)
+			.setParameterInfo(0, "substring");
+
+		module.addNativeMethod("string", "endsWith", lemon::wrap(&functions::string_endsWith), defaultFlags)
+			.setParameterInfo(0, "substring");
+
+		module.addNativeMethod("string", "find", lemon::wrap(&functions::string_find), defaultFlags)
+			.setParameterInfo(0, "substring");
 
 		module.addNativeFunction("getStringFromHash", lemon::wrap(&functions::getStringFromHash), defaultFlags)
 			.setParameterInfo(0, "hash");

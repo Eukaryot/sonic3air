@@ -134,7 +134,7 @@ function void fn045170()
 		{
 			playSound(0x8a)
 		#if STANDALONE
-			Input.setControllerRumble(0, 0x4000, 0, 200)
+			Input.setControllerRumbleByAddress(A1, 0.25f, 0.0f, 200)
 		#endif
 
 			objA1.velocity.x = u16[A2 + 0x02]

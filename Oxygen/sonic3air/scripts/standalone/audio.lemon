@@ -43,85 +43,85 @@ function void Standalone.playRumbleEffectForAudio(u8 sfxId)
 	// Rumble effects for certain sounds
 	if (sfxId == SFX_RING || sfxId == SFX_RING_ALT)
 	{
-		Input.setControllerRumble(0, 0, 0x3000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.2f, 200)
 	}
 	else if (sfxId == SFX_COLLAPSE)
 	{
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == SFX_POP)
 	{
 		// Badnik or monitor hit
-		Input.setControllerRumble(0, 0x4000, 0x8000, 200)
+		Input.setControllerRumble(-1, 0.25f, 0.5f, 200)
 	}
 	else if (sfxId == SFX_FIRESHIELDDASH)
 	{
-		Input.setControllerRumble(0, 0x4000, 0x6000, 200)
+		Input.setControllerRumble(-1, 0.25f, 0x6000, 200)
 	}
 	else if (sfxId == SFX_BUBBLEBOUNCE)
 	{
-		Input.setControllerRumble(0, 0, 0x4000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.25f, 200)
 	}
 	else if (sfxId == SFX_LIGHTNINGJUMP)
 	{
-		Input.setControllerRumble(0, 0, 0x8000, 250)
+		Input.setControllerRumble(-1, 0.0f, 0.5f, 250)
 	}
 	else if (sfxId == SFX_SPILLRINGS)
 	{
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == SFX_HITSPIKES)
 	{
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == SFX_SPRING)
 	{
-		Input.setControllerRumble(0, 0, 0x8000, 150)
+		Input.setControllerRumble(-1, 0.0f, 0.5f, 150)
 	}
 	else if (sfxId == 0x35)
 	{
 		// Lose shield
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == 0x65)
 	{
 		// Collect blue sphere or bonus stage bubble
-		Input.setControllerRumble(0, 0, 0x2000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0x2000, 200)
 	}
 	else if (sfxId == 0x6e)
 	{
 		// Boss hit
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == 0x6f)
 	{
 		// Earthquake rumble
-		Input.setControllerRumble(0, 0x4000, 0x4000, 200)
+		Input.setControllerRumble(-1, 0.25f, 0.25f, 200)
 	}
 	else if (sfxId == 0x77)
 	{
 		// Balloon pop
-		Input.setControllerRumble(0, 0, 0x4000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.25f, 200)
 	}
 	else if (sfxId == 0x81)
 	{
 		// LBZ booster tube (and CNZ cannon)
-		Input.setControllerRumble(0, 0x4000, 0, 300)
+		Input.setControllerRumble(-1, 0.25f, 0.0f, 300)
 	}
 	else if (sfxId == 0xaa)
 	{
 		// Bumper
-		Input.setControllerRumble(0, 0x2000, 0x2000, 200)
+		Input.setControllerRumble(-1, 0.1f, 0.1f, 200)
 	}
 	else if (sfxId == 0xb4)
 	{
 		// Boss explosion
-		Input.setControllerRumble(0, 0x8000, 0x8000, 300)
+		Input.setControllerRumble(-1, 0.5f, 0.5f, 300)
 	}
 	else if (sfxId == 0xcd)
 	{
 		// Death Egg rising
-		Input.setControllerRumble(0, 0x2000, 0x2000, 500)
+		Input.setControllerRumble(-1, 0.1f, 0.1f, 500)
 	}
 }
 
