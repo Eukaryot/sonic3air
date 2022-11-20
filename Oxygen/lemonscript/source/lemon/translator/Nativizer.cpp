@@ -169,7 +169,6 @@ namespace lemon
 			BaseType mDataType = BaseType::INT_CONST;
 			bool mExplicitCast = false;
 			size_t mOpcodeIndex = 0;
-			size_t mAssignmentIndex = 0;
 
 			void outputParameter(std::string& line, int64 value, BaseType dataType = BaseType::INT_CONST, bool isPointer = false) const
 			{
@@ -189,7 +188,79 @@ namespace lemon
 				line += ")";
 			}
 
-			void outputNode(std::string& line, const Node& node, bool isWrite, bool* closeParenthesis = nullptr) const
+			void outputDestNode(std::string& line, const Node& node, bool& closeParenthesis) const
+			{
+				switch (node.mType)
+				{
+					case Node::Type::VALUE_STACK:
+					{
+						const std::string& dataTypeString = getDataTypeString(node.mDataType);
+						line += "context.writeValueStack<" + dataTypeString + ">(";
+						line += std::to_string((int)node.mValue);
+						line += ", ";
+						closeParenthesis = true;
+						break;
+					}
+
+					case Node::Type::VARIABLE:
+					{
+						const uint32 variableId = (uint32)node.mValue;
+						const Variable::Type type = (Variable::Type)(variableId >> 28);
+						switch (type)
+						{
+							case Variable::Type::LOCAL:
+							{
+								const std::string& dataTypeString = getDataTypeString(node.mDataType);
+								line += "context.writeLocalVariable<" + dataTypeString + ">(";
+								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
+								line += ", ";
+								closeParenthesis = true;
+								break;
+							}
+
+							case Variable::Type::USER:
+							{
+								line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
+								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
+								line += ")).setValue(";
+								closeParenthesis = true;
+								break;
+							}
+
+							case Variable::Type::GLOBAL:
+							case Variable::Type::EXTERNAL:
+							{
+								outputParameter(line, node.mParameterOffset, node.mDataType, true);
+								break;
+							}
+						}
+						break;
+					}
+
+					case Node::Type::MEMORY:
+					{
+						const std::string& dataTypeString = getDataTypeString(node.mDataType, true);
+						line += "OpcodeExecUtils::writeMemory<" + dataTypeString + ">(*context.mControlFlow, ";
+						outputSourceNode(line, *node.mChild[0]);
+						line += ", ";
+						closeParenthesis = true;
+						break;
+					}
+
+					case Node::Type::TEMP_VAR:
+					{
+						const std::string& dataTypeString = getDataTypeString(node.mDataType);
+						line += *String(0, "const %s var%d", dataTypeString.c_str(), (int)node.mValue);
+						break;
+					}
+
+					default:
+						RMX_ERROR("Not handled", );
+						break;
+				}
+			}
+
+			void outputSourceNode(std::string& line, const Node& node) const
 			{
 				switch (node.mType)
 				{
@@ -215,27 +286,16 @@ namespace lemon
 
 					case Node::Type::PARAMETER:
 					{
-						// Always read as int64, as that's what default opcode execution does as well
-						outputParameter(line, node.mParameterOffset, BaseType::INT_64);
+						outputParameter(line, node.mParameterOffset, node.mDataType);
 						break;
 					}
 
 					case Node::Type::VALUE_STACK:
 					{
 						const std::string& dataTypeString = getDataTypeString(node.mDataType);
-						if (isWrite)
-						{
-							line += "context.writeValueStack<" + dataTypeString + ">(";
-							line += std::to_string((int)node.mValue);
-							line += ", (" + dataTypeString + ")";
-							*closeParenthesis = true;
-						}
-						else
-						{
-							line += "context.readValueStack<" + dataTypeString + ">(";
-							line += std::to_string((int)node.mValue);
-							line += ")";
-						}
+						line += "context.readValueStack<" + dataTypeString + ">(";
+						line += std::to_string((int)node.mValue);
+						line += ")";
 						break;
 					}
 
@@ -248,19 +308,9 @@ namespace lemon
 							case Variable::Type::LOCAL:
 							{
 								const std::string& dataTypeString = getDataTypeString(node.mDataType);
-								if (isWrite)
-								{
-									line += "context.writeLocalVariable<" + dataTypeString + ">(";
-									outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-									line += ", ";
-									*closeParenthesis = true;
-								}
-								else
-								{
-									line += "context.readLocalVariable<" + dataTypeString + ">(";
-									outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-									line += ")";
-								}
+								line += "context.readLocalVariable<" + dataTypeString + ">(";
+								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
+								line += ")";
 								break;
 							}
 
@@ -268,15 +318,7 @@ namespace lemon
 							{
 								line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
 								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-								if (isWrite)
-								{
-									line += ")).setValue(";
-									*closeParenthesis = true;
-								}
-								else
-								{
-									line += ")).getValue()";
-								}
+								line += ")).getValue()";
 								break;
 							}
 
@@ -287,26 +329,15 @@ namespace lemon
 								break;
 							}
 						}
-
 						break;
 					}
 
 					case Node::Type::MEMORY:
 					{
 						const std::string& dataTypeString = getDataTypeString(node.mDataType, true);
-						if (isWrite)
-						{
-							line += "OpcodeExecUtils::writeMemory<" + dataTypeString + ">(*context.mControlFlow, ";
-							outputNode(line, *node.mChild[0], false);
-							line += ", ";
-							*closeParenthesis = true;
-						}
-						else
-						{
-							line += "OpcodeExecUtils::readMemory<" + dataTypeString + ">(*context.mControlFlow, ";
-							outputNode(line, *node.mChild[0], false);
-							line += ")";
-						}
+						line += "OpcodeExecUtils::readMemory<" + dataTypeString + ">(*context.mControlFlow, ";
+						outputSourceNode(line, *node.mChild[0]);
+						line += ")";
 						break;
 					}
 
@@ -360,11 +391,11 @@ namespace lemon
 						if (nullptr == functionCall)
 						{
 							line += "((" + dataTypeString + ")(";
-							outputNode(line, *node.mChild[0], false);
+							outputSourceNode(line, *node.mChild[0]);
 							line += std::string(") ") + operatorString + " (" + dataTypeString + ")(";
 							if (isShift)
 								line += "(";
-							outputNode(line, *node.mChild[1], false);
+							outputSourceNode(line, *node.mChild[1]);
 							if (isShift)
 								line += ") & " + rmx::hexString(getIntegerDataTypeBits(node.mDataType) - 1, 2);		// Assuming the right side of a shift is always an integer
 							line += "))";
@@ -373,9 +404,9 @@ namespace lemon
 						{
 							line += functionCall;
 							line += "<" + dataTypeString + ">((" + dataTypeString + ")";
-							outputNode(line, *node.mChild[0], false);
+							outputSourceNode(line, *node.mChild[0]);
 							line += ", (" + dataTypeString + ")";
-							outputNode(line, *node.mChild[1], false);
+							outputSourceNode(line, *node.mChild[1]);
 							line += ")";
 						}
 						break;
@@ -394,21 +425,13 @@ namespace lemon
 
 						if (!ignoreSigned)
 							line += "(signed)";		// TODO: This is more of a hack....
-						outputNode(line, *node.mChild[0], false);
+						outputSourceNode(line, *node.mChild[0]);
 						break;
 					}
 
 					case Node::Type::TEMP_VAR:
 					{
-						if (isWrite)
-						{
-							const std::string& dataTypeString = getDataTypeString(node.mDataType);
-							line += *String(0, "const %s var%d", dataTypeString.c_str(), (int)node.mValue);
-						}
-						else
-						{
-							line += *String(0, "var%d", (int)node.mValue);
-						}
+						line += *String(0, "var%d", (int)node.mValue);
 						break;
 					}
 
@@ -420,15 +443,17 @@ namespace lemon
 
 			void outputLine(std::string& line) const
 			{
+				// Output this assignment into a text line
 				bool closeParenthesis = false;
-				outputNode(line, *mDest, true, &closeParenthesis);
+				outputDestNode(line, *mDest, closeParenthesis);
 
 				if (!closeParenthesis)
 					line += " = ";
 				if (mExplicitCast)
 					line += "(" + getDataTypeString(mDataType, true) + ")";
 
-				outputNode(line, *mSource, false);
+				outputSourceNode(line, *mSource);
+
 				if (closeParenthesis)
 					line += ")";
 				line += ";";
@@ -986,7 +1011,6 @@ namespace lemon
 			for (size_t i = oldNumAssignments; i < assignments.size(); ++i)
 			{
 				assignments[i].mOpcodeIndex = opcodeIndex;
-				assignments[i].mAssignmentIndex = i;
 			}
 		}
 
