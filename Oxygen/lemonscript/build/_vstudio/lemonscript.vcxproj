@@ -112,6 +112,7 @@
     <ClInclude Include="..\..\source\lemon\translator\Nativizer.h" />
     <ClInclude Include="..\..\source\lemon\translator\SourceCodeWriter.h" />
     <ClInclude Include="..\..\source\lemon\translator\Translator.h" />
+    <ClInclude Include="..\..\source\lemon\utility\AnyBaseValue.h" />
     <ClInclude Include="..\..\source\lemon\utility\FlyweightString.h" />
     <ClInclude Include="..\..\source\lemon\utility\PragmaSplitter.h" />
   </ItemGroup>

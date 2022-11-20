@@ -10,6 +10,7 @@
 
 #include "lemon/compiler/Definitions.h"
 #include "lemon/program/DataType.h"
+#include "lemon/utility/AnyBaseValue.h"
 
 
 namespace lemon
@@ -64,13 +65,13 @@ namespace lemon
 		FORCE_INLINE T popValueStack()
 		{
 			--mValueStackPtr;
-			return AnyBaseValue(*mValueStackPtr).get<T>();
+			return BaseTypeConversion::convert<uint64, T>(*mValueStackPtr);
 		}
 
 		template<typename T>
 		FORCE_INLINE void pushValueStack(T value)
 		{
-			*mValueStackPtr = AnyBaseValue(value).get<uint64>();
+			*mValueStackPtr = BaseTypeConversion::convert<T, uint64>(value);
 			++mValueStackPtr;
 			RMX_ASSERT(mValueStackPtr < &mValueStackBuffer[0x78], "Value stack error: Too many elements");
 		}
@@ -78,13 +79,13 @@ namespace lemon
 		template<typename T>
 		FORCE_INLINE T readValueStack(int offset) const
 		{
-			return AnyBaseValue(mValueStackPtr[offset]).get<T>();
+			return BaseTypeConversion::convert<uint64, T>(mValueStackPtr[offset]);
 		}
 
 		template<typename T>
 		FORCE_INLINE void writeValueStack(int offset, T value) const
 		{
-			mValueStackPtr[offset] = AnyBaseValue(value).get<uint64>();
+			mValueStackPtr[offset] = BaseTypeConversion::convert<T, uint64>(value);
 		}
 
 		FORCE_INLINE void moveValueStack(int change)

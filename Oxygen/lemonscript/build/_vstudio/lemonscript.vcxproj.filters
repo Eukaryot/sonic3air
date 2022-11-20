@@ -308,6 +308,9 @@
     <ClInclude Include="..\..\source\lemon\compiler\PreprocessorDefinition.h">
       <Filter>lemon\compiler</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\lemon\utility\AnyBaseValue.h">
+      <Filter>lemon\utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

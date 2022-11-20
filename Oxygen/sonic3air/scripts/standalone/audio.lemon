@@ -86,7 +86,7 @@ function void Standalone.playRumbleEffectForAudio(u8 sfxId)
 	else if (sfxId == 0x65)
 	{
 		// Collect blue sphere or bonus stage bubble
-		Input.setControllerRumble(-1, 0.0f, 0x2000, 200)
+		Input.setControllerRumble(-1, 0.0f, 0.1f, 200)
 	}
 	else if (sfxId == 0x6e)
 	{

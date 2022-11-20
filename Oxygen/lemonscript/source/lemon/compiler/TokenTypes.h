@@ -12,6 +12,7 @@
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Token.h"
 #include "lemon/program/GlobalsLookup.h"
+#include "lemon/utility/AnyBaseValue.h"
 #include "lemon/utility/FlyweightString.h"
 
 

@@ -11,6 +11,7 @@
 #include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/Operators.h"
 #include "lemon/compiler/Utility.h"
+#include "lemon/utility/AnyBaseValue.h"
 
 #include <optional>
 

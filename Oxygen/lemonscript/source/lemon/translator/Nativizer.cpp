@@ -15,6 +15,7 @@
 #include "lemon/program/Program.h"
 #include "lemon/runtime/OpcodeProcessor.h"
 #include "lemon/runtime/Runtime.h"
+#include "lemon/utility/AnyBaseValue.h"
 
 
 namespace lemon
@@ -32,36 +33,52 @@ namespace lemon
 			static const std::string TYPESTRING_int16  = "int16";
 			static const std::string TYPESTRING_int32  = "int32";
 			static const std::string TYPESTRING_int64  = "int64";
+			static const std::string TYPESTRING_float  = "float";
+			static const std::string TYPESTRING_double = "double";
 			static const std::string TYPESTRING_empty  = "";
 
-			if (ignoreSigned)
+			if ((uint8)dataType < 0x20)
 			{
-				switch ((uint8)dataType & 0x03)
+				// Integer
+				if (ignoreSigned)
 				{
-					case 0x00:  return TYPESTRING_uint8;
-					case 0x01:  return TYPESTRING_uint16;
-					case 0x02:  return TYPESTRING_uint32;
-					case 0x03:  return TYPESTRING_uint64;
+					switch ((uint8)dataType & 0x03)
+					{
+						case 0x00:  return TYPESTRING_uint8;
+						case 0x01:  return TYPESTRING_uint16;
+						case 0x02:  return TYPESTRING_uint32;
+						case 0x03:  return TYPESTRING_uint64;
+					}
+				}
+				else
+				{
+					switch ((uint8)dataType & 0x0b)
+					{
+						case 0x00:  return TYPESTRING_uint8;
+						case 0x01:  return TYPESTRING_uint16;
+						case 0x02:  return TYPESTRING_uint32;
+						case 0x03:  return TYPESTRING_uint64;
+						case 0x08:  return TYPESTRING_int8;
+						case 0x09:  return TYPESTRING_int16;
+						case 0x0a:  return TYPESTRING_int32;
+						case 0x0b:  return TYPESTRING_int64;
+					}
 				}
 			}
 			else
 			{
-				switch ((uint8)dataType & 0x0b)
+				switch (dataType)
 				{
-					case 0x00:  return TYPESTRING_uint8;
-					case 0x01:  return TYPESTRING_uint16;
-					case 0x02:  return TYPESTRING_uint32;
-					case 0x03:  return TYPESTRING_uint64;
-					case 0x08:  return TYPESTRING_int8;
-					case 0x09:  return TYPESTRING_int16;
-					case 0x0a:  return TYPESTRING_int32;
-					case 0x0b:  return TYPESTRING_int64;
+					case BaseType::FLOAT:  return TYPESTRING_float;
+					case BaseType::DOUBLE: return TYPESTRING_double;
+					default:
+						RMX_ERROR("Unsupported type", );
 				}
 			}
 			return TYPESTRING_empty;
 		}
 
-		size_t getDataTypeBits(BaseType dataType)
+		size_t getIntegerDataTypeBits(BaseType dataType)
 		{
 			switch ((uint8)dataType & 0x03)
 			{
@@ -178,17 +195,20 @@ namespace lemon
 				{
 					case Node::Type::CONSTANT:
 					{
+						const AnyBaseValue constant(node.mValue);
 						switch (node.mDataType)
 						{
-							case BaseType::INT_8:	line += std::to_string((int8)(node.mValue));			break;
-							case BaseType::INT_16:	line += std::to_string((int16)(node.mValue));			break;
-							case BaseType::INT_32:	line += std::to_string((int32)(node.mValue));			break;
-							case BaseType::INT_64:	line += std::to_string((int64)(node.mValue)) + "ll";	break;
-							case BaseType::UINT_8:	line += std::to_string((uint8)(node.mValue));			break;
-							case BaseType::UINT_16:	line += std::to_string((uint16)(node.mValue));			break;
-							case BaseType::UINT_32:	line += std::to_string((uint32)(node.mValue));			break;
-							case BaseType::UINT_64:	line += std::to_string((uint64)(node.mValue)) + "ull";	break;
-							default:				line += std::to_string((uint32)(node.mValue));			break;
+							case BaseType::INT_8:	line += std::to_string(constant.get<int8>());			break;
+							case BaseType::INT_16:	line += std::to_string(constant.get<int16>());			break;
+							case BaseType::INT_32:	line += std::to_string(constant.get<int32>());			break;
+							case BaseType::INT_64:	line += std::to_string(constant.get<int64>()) + "ll";	break;
+							case BaseType::UINT_8:	line += std::to_string(constant.get<uint8>());			break;
+							case BaseType::UINT_16:	line += std::to_string(constant.get<uint16>());			break;
+							case BaseType::UINT_32:	line += std::to_string(constant.get<uint32>());			break;
+							case BaseType::UINT_64:	line += std::to_string(constant.get<uint64>()) + "ull";	break;
+							case BaseType::FLOAT:	line += std::to_string(constant.get<float>()) + 'f';	break;
+							case BaseType::DOUBLE:	line += std::to_string(constant.get<double>());			break;
+							default:				line += std::to_string(constant.get<uint32>());			break;
 						}
 						break;
 					}
@@ -319,20 +339,21 @@ namespace lemon
 							case Opcode::Type::ARITHM_ADD:	operatorString = "+";   ignoreSigned = true;   booleanResult = false;	break;
 							case Opcode::Type::ARITHM_SUB:	operatorString = "-";   ignoreSigned = true;   booleanResult = false;	break;
 							case Opcode::Type::ARITHM_MUL:	operatorString = "*";   ignoreSigned = false;  booleanResult = false;	break;
-							case Opcode::Type::ARITHM_MOD:	operatorString = "%";   ignoreSigned = false;  booleanResult = false;	break;
+							case Opcode::Type::ARITHM_DIV:	functionCall = "OpcodeExecUtils::safeDivide";   ignoreSigned = false;  booleanResult = false;	break;
+							case Opcode::Type::ARITHM_MOD:	functionCall = "OpcodeExecUtils::safeModulo";   ignoreSigned = false;  booleanResult = false;	break;
 							case Opcode::Type::ARITHM_AND:	operatorString = "&";   ignoreSigned = true;   booleanResult = false;	break;
 							case Opcode::Type::ARITHM_OR:	operatorString = "|";   ignoreSigned = true;   booleanResult = false;	break;
 							case Opcode::Type::ARITHM_XOR:	operatorString = "^";   ignoreSigned = true;   booleanResult = false;	break;
-							case Opcode::Type::ARITHM_SHL:	operatorString = "<<";  ignoreSigned = true;   booleanResult = false;	isShift = true;  break;
-							case Opcode::Type::ARITHM_SHR:	operatorString = ">>";  ignoreSigned = false;  booleanResult = false;	isShift = true;  break;
+							case Opcode::Type::ARITHM_SHL:	operatorString = "<<";  ignoreSigned = true;   booleanResult = false;  isShift = true;  break;
+							case Opcode::Type::ARITHM_SHR:	operatorString = ">>";  ignoreSigned = false;  booleanResult = false;  isShift = true;  break;
 							case Opcode::Type::COMPARE_EQ:	operatorString = "==";  ignoreSigned = true;   booleanResult = true;	break;
 							case Opcode::Type::COMPARE_NEQ:	operatorString = "!=";  ignoreSigned = true;   booleanResult = true;	break;
 							case Opcode::Type::COMPARE_LT:	operatorString = "<";   ignoreSigned = false;  booleanResult = true;	break;
 							case Opcode::Type::COMPARE_LE:	operatorString = "<=";  ignoreSigned = false;  booleanResult = true;	break;
 							case Opcode::Type::COMPARE_GT:	operatorString = ">";   ignoreSigned = false;  booleanResult = true;	break;
 							case Opcode::Type::COMPARE_GE:	operatorString = ">=";  ignoreSigned = false;  booleanResult = true;	break;
-							case Opcode::Type::ARITHM_DIV:	functionCall = "OpcodeExecUtils::safeDivide";   ignoreSigned = false;  booleanResult = false;	break;
-							default:  break;
+							default:
+								break;
 						}
 
 						const std::string& dataTypeString = getDataTypeString(node.mDataType, ignoreSigned);
@@ -345,7 +366,7 @@ namespace lemon
 								line += "(";
 							outputNode(line, *node.mChild[1], false);
 							if (isShift)
-								line += ") & " + rmx::hexString(getDataTypeBits(node.mDataType) - 1, 2);
+								line += ") & " + rmx::hexString(getIntegerDataTypeBits(node.mDataType) - 1, 2);		// Assuming the right side of a shift is always an integer
 							line += "))";
 						}
 						else
