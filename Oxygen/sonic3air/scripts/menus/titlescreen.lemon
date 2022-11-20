@@ -452,7 +452,7 @@ function void TitleScreen()
 			// In S3AIR, there is no choice, always go to the main menu
 			FadeOutScreenBlocking()
 			Game.returnToMainMenu()
-			Audio.fadeOutChannel(0, 0x40)	// Do the rest of music fade out relatively quickly
+			Audio.fadeOutChannel(0, 0.25f)	// Do the rest of music fade out relatively quickly
 			yieldExecution()
 
 		#else

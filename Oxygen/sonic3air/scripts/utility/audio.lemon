@@ -70,11 +70,11 @@ function void ChangeMusicTempo()
 	#if STANDALONE
 	{
 		// Calculate actual speedup from input value (using a 16.16 fixed point number)
-		u32 relativeSpeed = 0x10000
+		float relativeSpeed = 1.0f
 		if (D0.u8 > 0)
 		{
 			u8 extraUpdateFrequency = D0.u8 / 2		// Each X frames, a second music update will be done in that frame
-			relativeSpeed += 0x10000 / extraUpdateFrequency
+			relativeSpeed += 1.0f / float(extraUpdateFrequency)
 		}
 		Standalone.setFastMusicFlagWithSpeedup(FastMusicFlag.MUSIC_TEMPO, relativeSpeed)
 	}

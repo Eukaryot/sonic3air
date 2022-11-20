@@ -265,7 +265,7 @@ declare function void Audio.fadeOutChannel(u8 channel, float seconds)
 declare function void Audio.fadeOutChannel(u8 channel, u16 seconds)
 declare function void Audio.playOverride(u64 sfxId, u8 contextId, u8 channelId, u8 overriddenChannelId)
 declare function void Audio.enableAudioModifier(u8 channel, u8 context, string postfix, float relativeSpeed)
-declare function void Audio.enableAudioModifier2(u8 channel, u8 context, string postfix, float relativeSpeed)
+declare function void Audio.enableAudioModifier(u8 channel, u8 context, string postfix, u32 relativeSpeed)
 declare function void Audio.disableAudioModifier(u8 channel, u8 context)
 
 declare function u8 Mods.isModActive(string modName)

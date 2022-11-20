@@ -95,6 +95,11 @@ function void Renderer.drawCustomSpriteTransformed(u64 key, s16 px, s16 py, u8 a
 	Renderer.drawSpriteTransformed(key, px, py, u16(atex), flags, renderQueue, tintColor, transform11, transform12, transform21, transform22)
 }
 
+function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, u32 relativeSpeed)
+{
+	Standalone.setFastMusicFlagWithSpeedup(flag, float(relativeSpeed) / 65536.0f)
+}
+
 
 
 //-------------------------------------------------------//

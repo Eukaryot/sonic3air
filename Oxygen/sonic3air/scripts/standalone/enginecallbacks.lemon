@@ -193,7 +193,7 @@ function void restartAtCheckpoint()
 function void restartTimeAttack()
 {
 	// Fade out music and screen
-	Audio.fadeOutChannel(0, 0x100)
+	Audio.fadeOutChannel(0, 1.0f)
 	FadeOutScreenBlocking()
 
 	// Signal restart

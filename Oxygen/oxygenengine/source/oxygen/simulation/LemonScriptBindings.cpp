@@ -2012,7 +2012,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(2, "postfix")
 			.setParameterInfo(3, "relativeSpeed");
 
-		module.addNativeFunction("Audio.enableAudioModifier2", lemon::wrap(&Audio_enableAudioModifier), defaultFlags)
+		module.addNativeFunction("Audio.enableAudioModifier", lemon::wrap(&Audio_enableAudioModifier2), defaultFlags)
 			.setParameterInfo(0, "channel")
 			.setParameterInfo(1, "context")
 			.setParameterInfo(2, "postfix")

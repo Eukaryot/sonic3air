@@ -131,7 +131,7 @@ function void Standalone.playAudio(u8 sfxId)
 	// Handle music control IDs
 	if (sfxId == MUSIC_CTRL_FADEOUT)
 	{
-		Audio.fadeOutChannel(0, 0x200)	// Fade out over 2 seconds
+		Audio.fadeOutChannel(0, 2.0f)	// Fade out over 2 seconds
 		return
 	}
 	else if (sfxId == MUSIC_CTRL_STOP)
@@ -440,7 +440,7 @@ function void Standalone.playAudio(u8 sfxId)
 		{
 			// Do not restart music if already playing
 			//  -> But make sure it gets played at full volume (in case it's fading out)
-			Audio.fadeInChannel(0, 0x40)
+			Audio.fadeInChannel(0, 0.25f)
 			return
 		}
 	}
@@ -469,7 +469,7 @@ function void Standalone.setFastMusicFlag(u8 flag, bool enable)
 		//  -> In the Oxygen engine, this is implemented as an audio modifier for channel 0
 		if (shouldBeFastMusicMode)
 		{
-			Audio.enableAudioModifier(0, 0, "_fast", 0x14000)
+			Audio.enableAudioModifier(0, 0, "_fast", 1.25f)
 		}
 		else
 		{
@@ -478,9 +478,9 @@ function void Standalone.setFastMusicFlag(u8 flag, bool enable)
 	}
 }
 
-function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, u32 relativeSpeed)
+function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, float relativeSpeed)
 {
-	if (relativeSpeed <= 0x10000)
+	if (relativeSpeed <= 1.0f)
 	{
 		Standalone.setFastMusicFlag(flag, false)
 	}
