@@ -331,6 +331,11 @@ namespace lemon
 		// Register built-in functions
 		BuiltInFunctions::registerBuiltInFunctions(module);
 
+		// Constants
+		module.addConstant("PI_FLOAT", &PredefinedDataTypes::FLOAT, AnyBaseValue(PI_FLOAT));
+		module.addConstant("PI_DOUBLE", &PredefinedDataTypes::DOUBLE, AnyBaseValue(PI_DOUBLE));
+
+		// Functions
 		const BitFlagSet<Function::Flag> defaultFlags(Function::Flag::ALLOW_INLINE_EXECUTION);
 		const BitFlagSet<Function::Flag> compileTimeConstant(Function::Flag::ALLOW_INLINE_EXECUTION, Function::Flag::COMPILE_TIME_CONSTANT);
 

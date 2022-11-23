@@ -957,7 +957,7 @@ namespace lemon
 
 			const DataTypeDefinition* dataType = tokens[1].as<VarTypeToken>().mDataType;
 			const FlyweightString identifier = tokens[2].as<IdentifierToken>().mName;
-			const uint64 constantValue = tokens[4].as<ConstantToken>().mValue.get<uint64>();
+			const AnyBaseValue constantValue = tokens[4].as<ConstantToken>().mValue;
 
 			if (isGlobalDefinition)
 			{

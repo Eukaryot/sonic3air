@@ -3,6 +3,12 @@
 
 // === Module 'LemonCore' ===
 
+Constants
+
+declare constant float PI_FLOAT = 3.14159f
+declare constant double PI_DOUBLE = 3.14159265358979
+
+
 // Regular functions
 
 declare function s8 min(s8, s8)

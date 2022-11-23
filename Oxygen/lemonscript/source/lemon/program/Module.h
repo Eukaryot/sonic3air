@@ -62,7 +62,7 @@ namespace lemon
 		ExternalVariable& addExternalVariable(FlyweightString name, const DataTypeDefinition* dataType);
 
 		// Constants
-		Constant& addConstant(FlyweightString name, const DataTypeDefinition* dataType, uint64 value);
+		Constant& addConstant(FlyweightString name, const DataTypeDefinition* dataType, AnyBaseValue value);
 
 		// Constant arrays
 		ConstantArray& addConstantArray(FlyweightString name, const DataTypeDefinition* elementDataType, const uint64* values, size_t size, bool isGlobalDefinition);

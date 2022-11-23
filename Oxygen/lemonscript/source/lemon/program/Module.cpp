@@ -10,6 +10,8 @@
 #include "lemon/program/Module.h"
 #include "lemon/program/GlobalsLookup.h"
 
+#include <iomanip>
+
 
 namespace lemon
 {
@@ -147,6 +149,44 @@ namespace lemon
 		content << "\r\n\r\n\r\n";
 		content << "// === Module '" << getModuleName() << "' ===";
 
+		// Constants
+		if (!mConstants.empty())
+		{
+			content << "\r\n\r\n";
+			content << "Constants";
+			content << "\r\n\r\n";
+
+			for (const Constant* constant : mConstants)
+			{
+				content << "declare constant " << constant->getDataType()->getName().getString() << " " << constant->getName().getString() << " = ";
+				switch (constant->getDataType()->getClass())
+				{
+					case DataTypeDefinition::Class::INTEGER:
+					{
+						content << rmx::hexString(constant->getValue().get<uint64>());
+						break;
+					}
+
+					case DataTypeDefinition::Class::FLOAT:
+					{
+						std::stringstream str;
+						if (constant->getDataType()->getBytes() == 4)
+						{
+							str << std::setprecision(std::numeric_limits<float>::digits10) << constant->getValue().get<float>() << "f";
+						}
+						else
+						{
+							str << std::setprecision(std::numeric_limits<double>::digits10) << constant->getValue().get<double>();
+						}
+						content << str.str();
+						break;
+					}
+				}
+				content << "\r\n";
+			}
+		}
+
+		// Functions
 		std::vector<const Function*> currentFunctions;
 		for (int pass = 0; pass < 2; ++pass)
 		{
@@ -243,7 +283,7 @@ namespace lemon
 		Constant& constant = mConstantPool.createObject();
 		constant.mName = name;
 		constant.mDataType = &PredefinedDataTypes::INT_64;
-		constant.mValue = value;
+		constant.mValue.set(value);
 		mPreprocessorDefinitions.emplace_back(&constant);
 		return constant;
 	}
@@ -345,7 +385,7 @@ namespace lemon
 		mLocalVariablesPool.destroyObject(variable);
 	}
 
-	Constant& Module::addConstant(FlyweightString name, const DataTypeDefinition* dataType, uint64 value)
+	Constant& Module::addConstant(FlyweightString name, const DataTypeDefinition* dataType, AnyBaseValue value)
 	{
 		Constant& constant = mConstantPool.createObject();
 		constant.mName = name;
@@ -504,7 +544,7 @@ namespace lemon
 				for (Constant* constant : mPreprocessorDefinitions)
 				{
 					constant->getName().write(serializer);
-					serializer.write(constant->mValue);
+					serializer.write(constant->mValue.get<uint64>());
 				}
 			}
 		}
@@ -853,7 +893,7 @@ namespace lemon
 					name.serialize(serializer);
 					const DataTypeDefinition* dataType = DataTypeSerializer::readDataType(serializer);
 					const uint64 value = serializer.read<uint64>();
-					addConstant(name, dataType, value);
+					addConstant(name, dataType, AnyBaseValue(value));
 				}
 			}
 			else
@@ -862,7 +902,7 @@ namespace lemon
 				{
 					constant->getName().write(serializer);
 					DataTypeSerializer::writeDataType(serializer, constant->getDataType());
-					serializer.write(constant->mValue);
+					serializer.write(constant->mValue.get<uint64>());
 				}
 			}
 		}

@@ -33,6 +33,8 @@
 
 #include <rmxmedia.h>
 
+#include <iomanip>
+
 
 namespace
 {
@@ -408,14 +410,16 @@ namespace
 
 			case lemon::DataTypeDefinition::Class::FLOAT:
 			{
+				std::stringstream str;
 				if (param.mType->getBytes() == 4)
 				{
-					debugLogInternal(std::to_string(param.mValue.get<float>()));
+					str << std::setprecision(std::numeric_limits<float>::digits10) << param.mValue.get<float>() << "f";
 				}
 				else
 				{
-					debugLogInternal(std::to_string(param.mValue.get<double>()));
+					str << std::setprecision(std::numeric_limits<double>::digits10) << param.mValue.get<double>();
 				}
+				debugLogInternal(str.str());
 				break;
 			}
 

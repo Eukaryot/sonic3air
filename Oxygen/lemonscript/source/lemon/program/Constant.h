@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "lemon/utility/AnyBaseValue.h"
 #include "lemon/utility/FlyweightString.h"
 
 
@@ -23,11 +24,11 @@ namespace lemon
 	public:
 		inline FlyweightString getName() const  { return mName; }
 		inline const DataTypeDefinition* getDataType() const  { return mDataType; }
-		inline uint64 getValue() const  { return mValue; }
+		inline AnyBaseValue getValue() const  { return mValue; }
 
 	private:
 		FlyweightString mName;
 		const DataTypeDefinition* mDataType = nullptr;
-		uint64 mValue = 0;
+		AnyBaseValue mValue { 0 };
 	};
 }
