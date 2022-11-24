@@ -30,6 +30,16 @@ function void fn06fd16()
 	//  - 0x06feb2	-> objA0.base_state = 0x08  -> Charging laser, and wall movement if needed
 	call tableLookupAddress(0x06fd2e, objA0.base_state)
 
+#if STANDALONE
+	// Destructible laser logic here and in other functions below was #contributed by HazelSpooder
+	if (objA0.base_state < 0x06)
+	{
+		// Prevent boss from being damaged too early
+		DrawObject()
+		return
+	}
+#endif
+
 	fn070330()
 	Enemy.DrawDynamicObject()
 }
@@ -40,7 +50,13 @@ function void fn06fd38()
 {
 	setupObjectAttributesFull(0x070396)
 
+#if STANDALONE
+	// Use 8 hits for the laser (Origins uses 12 hits, but the laser is faster in S3AIR)
+	boss.remaining_hits = 8
+#else
 	boss.remaining_hits = 0x7f
+#endif
+
 	objA0.value39 = 6			// Laser shots until the thing blows up by itself
 	level.boss_encounter = 1
 	screenmover_target.bottom = move_area.bottom.target
@@ -137,15 +153,20 @@ function void fn06fe28()
 	}
 	else
 	{
-		// Make things explode here
-		objA0.update_address = 0x08565e
-		objA0.flags2a |= 0x80
-		objA0.flags38 |= 0x20
-		objA0.countdown_value = 0x5f
-		objA0.countdown_callback = 0x06ff10
-
-		Kosinski.addMultipleToDMAQueue(0x06fea4)
+		FBZ2MidBoss.triggerExplosion()
 	}
+}
+
+function void FBZ2MidBoss.triggerExplosion()
+{
+	// Make things explode here
+	objA0.update_address = 0x08565e
+	objA0.flags2a |= 0x80
+	objA0.flags38 |= 0x20
+	objA0.countdown_value = 0x5f
+	objA0.countdown_callback = 0x06ff10
+
+	Kosinski.addMultipleToDMAQueue(0x06fea4)
 }
 
 
@@ -447,7 +468,16 @@ function void fn0701b4()
 #if STANDALONE
 	// Make the laser shoot faster
 	objA0.flags2e = min(objA0.flags2e, 0x08)
+
+	// Unload this object if laser is destroyed by player
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	if (objA1.value3a == 1)
+	{
+		UnloadObject()
+		return
+	}
 #endif
+
 	if (D2.u16 != 0)
 	{
 		if (D2.s16 > 0)
@@ -563,7 +593,13 @@ function void fn0702d6()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (s8[A1 + 0x39] >= 0)
 	{
-		camera.screenshake.state = 0
+	#if STANDALONE
+		// Prevent screen shake object from unloading if player destroys laser while it's firing
+		if (objA1.value3a == 0)
+	#endif
+		{
+			camera.screenshake.state = 0
+		}
 	}
 	Object.TriggerUnloading()
 }
@@ -587,18 +623,41 @@ function void fn0702ea()
 }
 
 
-
 //# address-hook(0x070330) end(0x070360)
 function void fn070330()
 {
 	if (u8[A0 + 0x28] != 0)
 		return
 
+#if STANDALONE	
+	if (boss.remaining_hits == 0)
+	{
+		// Laser was destroyed by player
+		FBZ2MidBoss.triggerExplosion()
+		objA0.value3a = 1	// Set here to make the laser disappear after being destroyed
+
+		// "spawnChildObjects(0x083fee)" replaced by:
+		spawnChildObject(0x083d84, 0x00, 0, 0)
+
+		AddScoreForBossEnemy_NoHudDirty()
+
+		// Spawn the screenshake object here
+		if (allocDynamicObjectStd())
+		{
+			objA1.update_address = 0x08642e
+		}
+		return
+	}
+#endif
+
 	if (objA0.state == 0)
 	{
 		// Character hit the laser
 		objA0.state = 0x20
 		playSound(0x6e)
+	#if STANDALONE	
+		objA0.flags2a |= 0x40
+	#endif
 	}
 	fn070362()
 
@@ -607,7 +666,12 @@ function void fn070330()
 	{
 		// Flashing ends
 		u8[A0 + 0x28] = u8[A0 + 0x25]
+
+	#if STANDALONE
+		objA0.flags2a &= ~0x40
+	#else
 		boss.remaining_hits = 0x7f
+	#endif
 	}
 }
 
