@@ -177,7 +177,7 @@ function void SHCSplash.showSplashScreen()
 		SHCSplash.setPalette(opacity)
 		Renderer.resetSprites()
 		Renderer.drawCustomSprite("shc_splash_frame_02", getScreenWidth() / 2, getScreenHeight() / 2, 0, 0, 0xa000)
-		
+
 		yieldExecution()
 	}
 

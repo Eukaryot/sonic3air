@@ -636,7 +636,7 @@ function void fn081046()
 			objA0.groundspeed = 0x0140
 			if (allocDynamicObjectStd())
 			{
-				// Spawn giant Eggrobo's fire breath 
+				// Spawn giant Eggrobo's fire breath
 				objA1.update_address = 0x080940
 				u16[A1 + 0x46] = A0.u16
 			}

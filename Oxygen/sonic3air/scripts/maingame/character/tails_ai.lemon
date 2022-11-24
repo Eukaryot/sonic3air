@@ -68,7 +68,7 @@ function void Character.TailsAI.Update()
 	//  - 0x013d4a	-> tails.ai_routine = 0x06	-> Normal state, controlled by player or AI
 	//  - 0x013f40	-> tails.ai_routine = 0x08	-> Automatically spindashing up slopes
 	//  - 0x013fc0	-> tails.ai_routine = 0x0a	-> Inactive (e.g. in AIZ Intro with Sonic & Tails, but not with Sonic alone)
-	//  - 0x013fc2	-> tails.ai_routine = 0x0c	-> Flying Sonic in automatically, Initialization 
+	//  - 0x013fc2	-> tails.ai_routine = 0x0c	-> Flying Sonic in automatically, Initialization
 	//  - 0x013ffa	-> tails.ai_routine = 0x0e	-> Flying Sonic in automatically (e.g. CNZ 1 start with Sonic & Tails)
 	//  - 0x01408a	-> tails.ai_routine = 0x10	-> Flying away to disappear      (e.g. CNZ 1 start with Sonic alone)
 	//  - 0x0140c6	-> tails.ai_routine = 0x12	-> Direct control in MGZ 2 boss, waiting (direct control by first player, used in MGZ 2 boss with Sonic)

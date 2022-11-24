@@ -289,7 +289,7 @@ define global.pause_disabled.u8		=  u8[0xffffef72]
 define rolling_demo.input_timer		=  u8[0xffffef78]	// Frames until next input change from pre-recorded rolling demo data is applied
 define rolling_demo.last_input		=  u8[0xffffef79]	// Last input during rolling demo
 define rolling_demo.pressed_start	=  u8[0xffffef50]	// Set to 0xff if manual Start button input was made during a rolling demo
-define rolling_demo.progress		= u32[0xffffef52]	// How far into the demo sequence 
+define rolling_demo.progress		= u32[0xffffef52]	// How far into the demo sequence
 
 
 // 0xfffff000 ... 0xfffff0ff

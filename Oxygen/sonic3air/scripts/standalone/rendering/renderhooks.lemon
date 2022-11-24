@@ -282,7 +282,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		// Signpost
 		if (objA0.update_address == 0x0837b2)
 		{
-			u64 key = 0			
+			u64 key = 0
 			u8 character = (objA0.animation.sprite == 0) ? CHARACTER_SONIC : (objA0.animation.sprite == 1) ? CHARACTER_TAILS : (objA0.animation.sprite == 2) ? CHARACTER_KNUCKLES : 0xff
 			u8 atex = 0x40 + character * 0x20
 

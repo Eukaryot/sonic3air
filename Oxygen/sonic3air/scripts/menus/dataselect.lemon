@@ -244,7 +244,7 @@ function void fn00ca14()
 	D1.u16 = (D1.u16 == 0) ? 0x28 : (D1.u16 << 2)	// Don't render zero for second digit
 	u16[A1] = u16[0x00ca4c + D1.s16]
 	u16[A1 + 0x04] = u16[0x00ca4e + D1.s16]
-	
+
 	// Render first digit (1, 2, etc)
 	D0.u16 = D0.u8 * 4
 	u16[A1 + 0x02] = u16[0x00ca4c + D0.s16]

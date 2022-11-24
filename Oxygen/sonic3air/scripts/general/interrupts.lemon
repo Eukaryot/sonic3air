@@ -541,7 +541,7 @@ function void fn000c50()
 		u32 fieldColorBaseAddress = u32[0xffffe446]
 		u32 colorA = unpackColor(u16[fieldColorBaseAddress + (parity ? 8 : 0)])
 		u32 colorB = unpackColor(u16[fieldColorBaseAddress + (parity ? 0 : 8)])
-		
+
 		// Update palette (using the palette entries from 0x100 on)
 		bool reducedColors = (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x01) == 0
 		for (u16 i = 0; i < 60; ++i)
