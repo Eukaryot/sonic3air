@@ -39,7 +39,8 @@ namespace lemon
 		};
 
 	private:
-		Opcode& addOpcode(Opcode::Type type, BaseType dataType = BaseType::VOID, int64 parameter = 0);
+		Opcode& addOpcode(Opcode::Type type, int64 parameter = 0);
+		Opcode& addOpcode(Opcode::Type type, BaseType dataType, int64 parameter = 0);
 		Opcode& addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter = 0);
 		void addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType);
 

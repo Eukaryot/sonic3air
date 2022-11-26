@@ -22,7 +22,7 @@ namespace lemon
 			BaseType::VOID,			// NOP
 			BaseType::VOID,			// MOVE_STACK
 			BaseType::VOID,			// MOVE_VAR_STACK
-			BaseType::INT_CONST,	// PUSH_CONSTANT
+			BaseType::VOID,			// PUSH_CONSTANT
 			BaseType::UINT_32,		// GET_VARIABLE_VALUE
 			BaseType::UINT_32,		// SET_VARIABLE_VALUE
 			BaseType::UINT_8,		// READ_MEMORY
@@ -48,8 +48,8 @@ namespace lemon
 			BaseType::UINT_8,		// COMPARE_LE
 			BaseType::UINT_8,		// COMPARE_GT
 			BaseType::UINT_8,		// COMPARE_GE
-			BaseType::UINT_32,		// JUMP
-			BaseType::UINT_32,		// JUMP_CONDITIONAL
+			BaseType::VOID,			// JUMP
+			BaseType::VOID,			// JUMP_CONDITIONAL
 			BaseType::VOID,			// CALL
 			BaseType::VOID,			// RETURN
 			BaseType::VOID,			// EXTERNAL_CALL

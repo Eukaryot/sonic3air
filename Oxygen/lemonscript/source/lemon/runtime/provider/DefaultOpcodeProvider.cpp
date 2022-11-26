@@ -370,7 +370,9 @@ namespace lemon
 				runtimeOpcode.mExecFunc = (opcode.mParameter >= 0) ? &OpcodeExec::exec_MOVE_VAR_STACK_positive : &OpcodeExec::exec_MOVE_VAR_STACK_negative;
 				break;
 
-			case Opcode::Type::PUSH_CONSTANT:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_PUSH_CONSTANT;	break;
+			case Opcode::Type::PUSH_CONSTANT:
+				runtimeOpcode.mExecFunc = &OpcodeExec::exec_PUSH_CONSTANT;
+				break;
 
 			case Opcode::Type::GET_VARIABLE_VALUE:
 			{
@@ -586,7 +588,7 @@ namespace lemon
 
 			case Opcode::Type::ARITHM_NEG:		SELECT_EXEC_FUNC_BY_DATATYPE_SIGNED(OpcodeExec::exec_ARITHM_UNARY_NEG);	break;
 			case Opcode::Type::ARITHM_NOT:		SELECT_EXEC_FUNC_BY_DATATYPE(OpcodeExec::exec_ARITHM_UNARY_NOT);		break;
-			case Opcode::Type::ARITHM_BITNOT:	SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_UNARY_BITNOT);		break;
+			case Opcode::Type::ARITHM_BITNOT:	SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_UNARY_BITNOT);	break;
 
 			case Opcode::Type::JUMP:
 			case Opcode::Type::JUMP_CONDITIONAL:

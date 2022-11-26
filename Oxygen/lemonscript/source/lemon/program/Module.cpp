@@ -19,46 +19,6 @@ namespace lemon
 	namespace
 	{
 		static const std::vector<Function*> EMPTY_FUNCTIONS;
-		static const SourceFileInfo EMPTY_SOURCE_FILE_INFO;
-
-		static const BaseType DEFAULT_OPCODE_BASETYPES[(size_t)Opcode::Type::_NUM_TYPES] =
-		{
-			BaseType::VOID,			// NOP
-			BaseType::VOID,			// MOVE_STACK
-			BaseType::VOID,			// MOVE_VAR_STACK
-			BaseType::INT_CONST,	// PUSH_CONSTANT
-			BaseType::UINT_32,		// GET_VARIABLE_VALUE
-			BaseType::UINT_32,		// SET_VARIABLE_VALUE
-			BaseType::UINT_8,		// READ_MEMORY
-			BaseType::UINT_8,		// WRITE_MEMORY
-			BaseType::VOID,			// CAST_VALUE
-			BaseType::VOID,			// MAKE_BOOL
-			BaseType::UINT_32,		// ARITHM_ADD
-			BaseType::UINT_32,		// ARITHM_SUB
-			BaseType::UINT_32,		// ARITHM_MUL
-			BaseType::UINT_32,		// ARITHM_DIV
-			BaseType::UINT_32,		// ARITHM_MOD
-			BaseType::UINT_8,		// ARITHM_AND
-			BaseType::UINT_8,		// ARITHM_OR
-			BaseType::UINT_8,		// ARITHM_XOR
-			BaseType::UINT_32,		// ARITHM_SHL
-			BaseType::UINT_32,		// ARITHM_SHR
-			BaseType::INT_CONST,	// ARITHM_NEG
-			BaseType::UINT_8,		// ARITHM_NOT
-			BaseType::UINT_8,		// ARITHM_BITNOT
-			BaseType::UINT_8,		// COMPARE_EQ
-			BaseType::UINT_8,		// COMPARE_NEQ
-			BaseType::UINT_8,		// COMPARE_LT
-			BaseType::UINT_8,		// COMPARE_LE
-			BaseType::UINT_8,		// COMPARE_GT
-			BaseType::UINT_8,		// COMPARE_GE
-			BaseType::UINT_32,		// JUMP
-			BaseType::UINT_32,		// JUMP_CONDITIONAL
-			BaseType::VOID,			// CALL
-			BaseType::VOID,			// RETURN
-			BaseType::VOID,			// EXTERNAL_CALL
-			BaseType::VOID,			// EXTERNAL_JUMP
-		};
 	}
 
 

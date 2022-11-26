@@ -47,14 +47,14 @@ namespace lemon
 		void beginIf()
 		{
 			mIfJumpOpcodeIndex = mFunctionCompiler.mOpcodes.size();
-			mFunctionCompiler.addOpcode(Opcode::Type::JUMP_CONDITIONAL, BaseType::UINT_32);	// Target position must be set afterwards when if block is complete
+			mFunctionCompiler.addOpcode(Opcode::Type::JUMP_CONDITIONAL);	// Target position must be set afterwards when if block is complete
 		}
 
 		void beginElse()
 		{
 			// Conditional jump to the end of the else-part
 			mElseJumpOpcodeIndex = mFunctionCompiler.mOpcodes.size();
-			mFunctionCompiler.addOpcode(Opcode::Type::JUMP, BaseType::UINT_32);				// Target position must be set afterwards when else block is complete
+			mFunctionCompiler.addOpcode(Opcode::Type::JUMP);				// Target position must be set afterwards when else block is complete
 
 			// Correct target position of if-jump
 			mFunctionCompiler.mOpcodes[mIfJumpOpcodeIndex].mParameter = mFunctionCompiler.mOpcodes.size();
@@ -97,7 +97,7 @@ namespace lemon
 		mLineNumber = mFunction.mStartLineNumber;
 
 		// Create scope
-		addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, mFunction.mLocalVariablesByID.size());
+		addOpcode(Opcode::Type::MOVE_VAR_STACK, mFunction.mLocalVariablesByID.size());
 
 		// Go through parameters in reverse order
 		for (int index = (int)mFunction.getParameters().size() - 1; index >= 0; --index)
@@ -111,7 +111,7 @@ namespace lemon
 			addOpcode(Opcode::Type::SET_VARIABLE_VALUE, variable->getDataType(), variable->getID());
 
 			// Pop value from stack (as SET_VARIABLE_VALUE opcode does not consume it)
-			addOpcode(Opcode::Type::MOVE_STACK, BaseType::VOID, -1);
+			addOpcode(Opcode::Type::MOVE_STACK, -1);
 		}
 	}
 
@@ -148,6 +148,11 @@ namespace lemon
 
 		// Determine opcode flags
 		assignOpcodeFlags();
+	}
+
+	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, int64 parameter)
+	{
+		return addOpcode(type, BaseType::VOID, parameter);
 	}
 
 	Opcode& FunctionCompiler::addOpcode(Opcode::Type type, BaseType dataType, int64 parameter)
@@ -200,14 +205,14 @@ namespace lemon
 			case TypeCasting::CastHandling::Result::BASE_CAST:
 			{
 				// It's a base cast type, we have an opcode for this
-				addOpcode(Opcode::Type::CAST_VALUE, BaseType::VOID, (int64)castHandling.mBaseCastType);
+				addOpcode(Opcode::Type::CAST_VALUE, (int64)castHandling.mBaseCastType);
 				break;
 			}
 
 			case TypeCasting::CastHandling::Result::ANY_CAST:
 			{
 				// Cast to "any" by adding explicit information about the type
-				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::UINT_64, DataTypeSerializer::getSerializedIdForDataType(sourceType));
+				addOpcode(Opcode::Type::PUSH_CONSTANT, DataTypeSerializer::getSerializedIdForDataType(sourceType));
 				break;
 			}
 
@@ -265,7 +270,7 @@ namespace lemon
 				if (!mFunction.getLabel(jumpNode.mLabelToken->mName, offset))
 					CHECK_ERROR(false, "Jump target label not found: " << jumpNode.mLabelToken->mName.getString(), node.getLineNumber());
 
-				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32, offset);
+				addOpcode(Opcode::Type::JUMP, offset);
 				break;
 			}
 
@@ -274,7 +279,7 @@ namespace lemon
 				CHECK_ERROR(context.mIsLoopBlock, "Keyword 'break' is only allowed inside a while or for loop", node.getLineNumber());
 
 				context.mBreakLocations.push_back((uint32)mOpcodes.size());
-				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32);	// Target position must be set afterwards when while block is complete
+				addOpcode(Opcode::Type::JUMP);	// Target position must be set afterwards when while block is complete
 				break;
 			}
 
@@ -283,7 +288,7 @@ namespace lemon
 				CHECK_ERROR(context.mIsLoopBlock, "Keyword 'continue' is only allowed inside a while or for loop", node.getLineNumber());
 
 				context.mContinueLocations.push_back((uint32)mOpcodes.size());
-				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32);	// Target position must be set afterwards when while block is complete
+				addOpcode(Opcode::Type::JUMP);	// Target position must be set afterwards when while block is complete
 				break;
 			}
 
@@ -355,7 +360,7 @@ namespace lemon
 				compileTokenTreeToOpcodes(*wsn.mConditionToken);
 
 				const size_t ifJumpOpcodeIndex = mOpcodes.size();
-				addOpcode(Opcode::Type::JUMP_CONDITIONAL, BaseType::UINT_32);	// Target position must be set afterwards when if block is complete
+				addOpcode(Opcode::Type::JUMP_CONDITIONAL);	// Target position must be set afterwards when if block is complete
 
 				NodeContext innerContext = context;
 				innerContext.mIsLoopBlock = true;
@@ -363,7 +368,7 @@ namespace lemon
 				buildOpcodesForNode(*wsn.mContent, innerContext);
 
 				// Jump back to condition evaluation
-				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32, startPosition);
+				addOpcode(Opcode::Type::JUMP, startPosition);
 
 				// This is where the conditional jump leads to
 				mOpcodes[ifJumpOpcodeIndex].mParameter = mOpcodes.size();
@@ -401,7 +406,7 @@ namespace lemon
 					compileTokenTreeToOpcodes(*fsn.mConditionToken);
 
 					ifJumpOpcodeIndex = mOpcodes.size();
-					addOpcode(Opcode::Type::JUMP_CONDITIONAL, BaseType::UINT_32);	// Target position must be set afterwards when if block is complete
+					addOpcode(Opcode::Type::JUMP_CONDITIONAL);	// Target position must be set afterwards when if block is complete
 				}
 
 				NodeContext innerContext = context;
@@ -418,7 +423,7 @@ namespace lemon
 				}
 
 				// Jump back to condition evaluation
-				addOpcode(Opcode::Type::JUMP, BaseType::UINT_32, startPosition);
+				addOpcode(Opcode::Type::JUMP, startPosition);
 
 				if (fsn.mConditionToken.valid())
 				{
@@ -482,7 +487,7 @@ namespace lemon
 						// TODO: Differentiate between pre- and post-fix!
 
 						compileTokenTreeToOpcodes(*uot.mArgument);
-						addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_8, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
+						addOpcode(Opcode::Type::PUSH_CONSTANT, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
 						addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
 						compileTokenTreeToOpcodes(*uot.mArgument, false, true);
 						break;
@@ -570,7 +575,7 @@ namespace lemon
 						builder.beginElse();
 						{
 							// Push "false"
-							addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::BOOL, 0);
+							addOpcode(Opcode::Type::PUSH_CONSTANT);		// With parameter value 0
 						}
 						builder.endIf();
 						break;
@@ -587,7 +592,7 @@ namespace lemon
 						builder.beginIf();
 						{
 							// Push "true"
-							addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::BOOL, 1);
+							addOpcode(Opcode::Type::PUSH_CONSTANT, 1);
 						}
 						builder.beginElse();
 						{
@@ -653,7 +658,7 @@ namespace lemon
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a constant", mLineNumber);
 				const ConstantToken& ct = token.as<ConstantToken>();
-				addOpcode(Opcode::Type::PUSH_CONSTANT, ct.mDataType, ct.mValue.get<uint64>());
+				addOpcode(Opcode::Type::PUSH_CONSTANT, ct.mValue.get<uint64>());
 				break;
 			}
 
@@ -708,7 +713,7 @@ namespace lemon
 
 		if (consumeResult && token.mDataType->getClass() != DataTypeDefinition::Class::VOID)
 		{
-			addOpcode(Opcode::Type::MOVE_STACK, BaseType::VOID, -1);	// Pop result of statement
+			addOpcode(Opcode::Type::MOVE_STACK, -1);	// Pop result of statement
 		}
 	}
 
@@ -790,7 +795,7 @@ namespace lemon
 	{
 		if (numVariables > 0)
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, numVariables);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, numVariables);
 		}
 	}
 
@@ -798,7 +803,7 @@ namespace lemon
 	{
 		if (numVariables > 0)
 		{
-			addOpcode(Opcode::Type::MOVE_VAR_STACK, BaseType::VOID, -numVariables);
+			addOpcode(Opcode::Type::MOVE_VAR_STACK, -numVariables);
 		}
 	}
 
@@ -969,7 +974,7 @@ namespace lemon
 
 					// Replace the first opcode with a jump directly to where the (now not really) conditional jump would lead to
 					firstOpcode.mType = Opcode::Type::JUMP;
-					firstOpcode.mDataType = BaseType::UINT_32;
+					firstOpcode.mDataType = BaseType::VOID;
 					firstOpcode.mFlags = Opcode::Flag::CTRLFLOW | Opcode::Flag::JUMP | Opcode::Flag::SEQ_BREAK;
 					firstOpcode.mParameter = jumpTarget;
 					firstOpcode.mLineNumber = condJumpOpcode.mLineNumber;
