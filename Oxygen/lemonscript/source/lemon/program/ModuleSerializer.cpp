@@ -22,7 +22,7 @@ namespace lemon
 			BaseType::VOID,			// NOP
 			BaseType::VOID,			// MOVE_STACK
 			BaseType::VOID,			// MOVE_VAR_STACK
-			BaseType::VOID,			// PUSH_CONSTANT
+			BaseType::INT_CONST,	// PUSH_CONSTANT
 			BaseType::UINT_32,		// GET_VARIABLE_VALUE
 			BaseType::UINT_32,		// SET_VARIABLE_VALUE
 			BaseType::UINT_8,		// READ_MEMORY

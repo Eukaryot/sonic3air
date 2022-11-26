@@ -212,7 +212,7 @@ namespace lemon
 			case TypeCasting::CastHandling::Result::ANY_CAST:
 			{
 				// Cast to "any" by adding explicit information about the type
-				addOpcode(Opcode::Type::PUSH_CONSTANT, DataTypeSerializer::getSerializedIdForDataType(sourceType));
+				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, DataTypeSerializer::getSerializedIdForDataType(sourceType));
 				break;
 			}
 
@@ -487,7 +487,7 @@ namespace lemon
 						// TODO: Differentiate between pre- and post-fix!
 
 						compileTokenTreeToOpcodes(*uot.mArgument);
-						addOpcode(Opcode::Type::PUSH_CONSTANT, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
+						addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, (uot.mOperator == Operator::UNARY_DECREMENT) ? -1 : 1);
 						addOpcode(Opcode::Type::ARITHM_ADD, uot.mDataType);
 						compileTokenTreeToOpcodes(*uot.mArgument, false, true);
 						break;
@@ -575,7 +575,7 @@ namespace lemon
 						builder.beginElse();
 						{
 							// Push "false"
-							addOpcode(Opcode::Type::PUSH_CONSTANT);		// With parameter value 0
+							addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, 0);
 						}
 						builder.endIf();
 						break;
@@ -592,7 +592,7 @@ namespace lemon
 						builder.beginIf();
 						{
 							// Push "true"
-							addOpcode(Opcode::Type::PUSH_CONSTANT, 1);
+							addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, 1);
 						}
 						builder.beginElse();
 						{
@@ -658,7 +658,7 @@ namespace lemon
 			{
 				CHECK_ERROR(!isLValue, "Cannot assign value to a constant", mLineNumber);
 				const ConstantToken& ct = token.as<ConstantToken>();
-				addOpcode(Opcode::Type::PUSH_CONSTANT, ct.mValue.get<uint64>());
+				addOpcode(Opcode::Type::PUSH_CONSTANT, ct.mDataType, ct.mValue.get<uint64>());
 				break;
 			}
 

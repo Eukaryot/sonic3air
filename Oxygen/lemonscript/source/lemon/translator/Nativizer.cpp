@@ -1205,8 +1205,9 @@ namespace lemon
 				}
 
 				// Replace read node
-				*tempVar.mReads[0].mNode = *tempVar.mWrite->mSource;
-				tempVar.mReads[0].mAssignment = tempVar.mWrite;
+				Read& read = tempVar.mReads[0];
+				*read.mNode = *tempVar.mWrite->mSource;
+				read.mAssignment = tempVar.mWrite;
 
 				// Invalidate old write assignment
 				tempVar.mWrite->mDest = nullptr;
