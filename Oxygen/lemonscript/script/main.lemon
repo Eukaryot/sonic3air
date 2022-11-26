@@ -1,7 +1,7 @@
 
 //# script-feature-level(2)
 
-//include unittests
+include unittests
 
 
 constant u8 ONE = 1
@@ -83,6 +83,6 @@ function void main()
 		Log = 0
 #endif
 
-	//debugLog("")	// Empty line
-	//runTests()
+	debugLog("")	// Empty line
+	runTests()
 }

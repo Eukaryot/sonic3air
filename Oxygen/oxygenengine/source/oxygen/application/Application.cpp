@@ -239,6 +239,7 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						// Not available for normal users, as this would crash the application if OpenGL is not supported
 						if (EngineMain::getDelegate().useDeveloperFeatures())
 						{
+							updateWindowDisplayIndex();
 							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::SOFTWARE) ? Configuration::RenderMethod::OPENGL_SOFT :
 																				(Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::SOFTWARE;
 							EngineMain::instance().switchToRenderMethod(newRenderMethod);
@@ -623,13 +624,6 @@ void Application::childClosed(GuiBase& child)
 	}
 	mRemoveChild = &child;
 }
-
-/*
-bool Application::isFullscreen() const
-{
-	return (SDL_GetWindowFlags(FTX::Video->getMainWindow()) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
-}
-*/
 
 void Application::setWindowMode(WindowMode windowMode, bool force)
 {

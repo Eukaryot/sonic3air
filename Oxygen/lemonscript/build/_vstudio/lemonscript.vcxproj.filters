@@ -150,6 +150,9 @@
     <ClCompile Include="..\..\source\lemon\program\ModuleSerializer.cpp">
       <Filter>lemon\program</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\lemon\translator\NativizerInternal.cpp">
+      <Filter>lemon\translator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lemon\compiler\Compiler.h">
@@ -316,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\lemon\program\ModuleSerializer.h">
       <Filter>lemon\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\lemon\translator\NativizerInternal.h">
+      <Filter>lemon\translator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

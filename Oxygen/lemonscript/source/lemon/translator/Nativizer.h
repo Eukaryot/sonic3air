@@ -75,38 +75,9 @@ namespace lemon
 
 		struct LookupDictionary
 		{
-			void addEmptyEntries(const uint64* hashes, size_t numHashes)
-			{
-				mEntries.reserve(mEntries.size() + numHashes);
-				for (size_t i = 0; i < numHashes; ++i)
-				{
-					mEntries.emplace(hashes[i], LookupEntry());
-				}
-			}
-
-			void loadFunctions(const CompactFunctionEntry* entries, size_t numEntries)
-			{
-				mEntries.reserve(mEntries.size() + numEntries);
-				for (size_t i = 0; i < numEntries; ++i)
-				{
-					mEntries.emplace(entries[i].mHash, LookupEntry(entries[i].mFunctionPointer, entries[i].mParameterStart));
-				}
-			}
-
-			void loadParameterInfo(const uint8* data, size_t count)
-			{
-				std::vector<uint8> decompressedData;
-				ZlibDeflate::decode(decompressedData, data, count);
-				mParameterData.resize(decompressedData.size() / 4);
-				data = &decompressedData[0];
-				for (LookupEntry::ParameterInfo& info : mParameterData)
-				{
-					info.mOffset = *(uint16*)&data[0];
-					info.mOpcodeIndex = data[2];
-					info.mSemantics = (LookupEntry::ParameterInfo::Semantics)data[3];
-					data += 4;
-				}
-			}
+			void addEmptyEntries(const uint64* hashes, size_t numHashes);
+			void loadFunctions(const CompactFunctionEntry* entries, size_t numEntries);
+			void loadParameterInfo(const uint8* data, size_t count);
 
 			std::unordered_map<uint64, LookupEntry> mEntries;
 			std::vector<LookupEntry::ParameterInfo> mParameterData;
@@ -123,6 +94,7 @@ namespace lemon
 	private:
 		void buildFunction(CppWriter& writer, const ScriptFunction& function);
 		size_t processOpcodes(CppWriter& writer, const Opcode* opcodes, size_t numOpcodes, const ScriptFunction& function);
+		size_t collectNativizableOpcodes(const Opcode* opcodes, size_t numOpcodes);
 
 	private:
 		const Module* mModule = nullptr;

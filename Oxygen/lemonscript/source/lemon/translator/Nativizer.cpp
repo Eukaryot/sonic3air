@@ -8,457 +8,17 @@
 
 #include "lemon/pch.h"
 #include "lemon/translator/Nativizer.h"
+#include "lemon/translator/NativizerInternal.h"
 #include "lemon/translator/SourceCodeWriter.h"
-#include "lemon/program/Function.h"
 #include "lemon/program/Module.h"
 #include "lemon/program/OpcodeHelper.h"
-#include "lemon/program/Program.h"
 #include "lemon/runtime/OpcodeProcessor.h"
-#include "lemon/runtime/Runtime.h"
-#include "lemon/utility/AnyBaseValue.h"
 
 
 namespace lemon
 {
 	namespace
 	{
-
-		const std::string& getDataTypeString(BaseType dataType, bool ignoreSigned = false)
-		{
-			static const std::string TYPESTRING_uint8  = "uint8";
-			static const std::string TYPESTRING_uint16 = "uint16";
-			static const std::string TYPESTRING_uint32 = "uint32";
-			static const std::string TYPESTRING_uint64 = "uint64";
-			static const std::string TYPESTRING_int8   = "int8";
-			static const std::string TYPESTRING_int16  = "int16";
-			static const std::string TYPESTRING_int32  = "int32";
-			static const std::string TYPESTRING_int64  = "int64";
-			static const std::string TYPESTRING_float  = "float";
-			static const std::string TYPESTRING_double = "double";
-			static const std::string TYPESTRING_empty  = "";
-
-			if ((uint8)dataType < 0x20)
-			{
-				// Integer
-				if (ignoreSigned)
-				{
-					switch ((uint8)dataType & 0x03)
-					{
-						case 0x00:  return TYPESTRING_uint8;
-						case 0x01:  return TYPESTRING_uint16;
-						case 0x02:  return TYPESTRING_uint32;
-						case 0x03:  return TYPESTRING_uint64;
-					}
-				}
-				else
-				{
-					switch ((uint8)dataType & 0x0b)
-					{
-						case 0x00:  return TYPESTRING_uint8;
-						case 0x01:  return TYPESTRING_uint16;
-						case 0x02:  return TYPESTRING_uint32;
-						case 0x03:  return TYPESTRING_uint64;
-						case 0x08:  return TYPESTRING_int8;
-						case 0x09:  return TYPESTRING_int16;
-						case 0x0a:  return TYPESTRING_int32;
-						case 0x0b:  return TYPESTRING_int64;
-					}
-				}
-			}
-			else
-			{
-				switch (dataType)
-				{
-					case BaseType::FLOAT:  return TYPESTRING_float;
-					case BaseType::DOUBLE: return TYPESTRING_double;
-					default:
-						RMX_ERROR("Unsupported type", );
-				}
-			}
-			return TYPESTRING_empty;
-		}
-
-		size_t getIntegerDataTypeBits(BaseType dataType)
-		{
-			switch ((uint8)dataType & 0x03)
-			{
-				case 0x00:  return 8;
-				case 0x01:  return 16;
-				case 0x02:  return 32;
-				case 0x03:  return 64;
-			}
-			return 0;
-		}
-
-
-		struct ParameterInfo
-		{
-			using Semantics = Nativizer::LookupEntry::ParameterInfo::Semantics;
-
-			size_t mOpcodeIndex = 0;
-			size_t mOffset = 0;
-			size_t mSize = 0;
-			Semantics mSemantics = Semantics::INTEGER;
-			BaseType mDataType = BaseType::INT_CONST;
-
-			inline ParameterInfo(size_t opcodeIndex, size_t size, Semantics semantics, BaseType dataType = BaseType::INT_CONST) :
-				mOpcodeIndex(opcodeIndex), mOffset(0), mSize(size), mSemantics(semantics), mDataType(dataType)
-			{}
-		};
-
-		struct Parameters
-		{
-			std::vector<ParameterInfo> mParameters;
-			size_t mTotalSize = 0;
-
-			void clear()
-			{
-				mParameters.clear();
-				mTotalSize = 0;
-			}
-
-			size_t add(size_t opcodeIndex, size_t size, ParameterInfo::Semantics semantics, BaseType dataType = BaseType::INT_CONST)
-			{
-				const size_t offset = mTotalSize;
-				mParameters.emplace_back(opcodeIndex, size, semantics, dataType);
-				mParameters.back().mOffset = offset;
-				mTotalSize += size;
-				return offset;
-			}
-		};
-
-		struct OpcodeInfo
-		{
-			Nativizer::OpcodeSubtypeInfo mSubtypeInfo;
-			ParameterInfo* mParameter = nullptr;
-			uint64 mHash = 0;
-		};
-
-		struct Assignment
-		{
-			struct Node
-			{
-				enum class Type
-				{
-					INVALID,
-					CONSTANT,			// Read a constant value (not really used at the moment; this could be used for specialized nativization that includes hard-coded constants)
-					PARAMETER,			// Read from a parameter
-					VALUE_STACK,		// Read from or write to the stack
-					VARIABLE,			// Read from or write to a variable
-					MEMORY,				// Read from or write to a memory location
-					MEMORY_FIXED,		// Read from a fixed memory location via a direct access pointer
-					OPERATION_UNARY,	// Execute a unary operation
-					OPERATION_BINARY,	// Execute a binary operation
-					TEMP_VAR			// Read from or write to a temporary local variable ("var0", "var1", etc. in nativized code)
-				};
-
-				Type mType = Type::INVALID;
-				BaseType mDataType = BaseType::INT_CONST;
-				uint64 mValue = 0;
-				uint64 mParameterOffset = 0;
-				Node* mChild[2] = { nullptr, nullptr };
-
-				inline Node() {}
-				inline Node(Type type, BaseType dataType) : mType(type), mDataType(dataType) {}
-				inline Node(Type type, BaseType dataType, uint64 value) : mType(type), mDataType(dataType), mValue(value) {}
-				inline Node(Type type, BaseType dataType, uint64 value, uint64 parameterOffset) : mType(type), mDataType(dataType), mValue(value), mParameterOffset(parameterOffset) {}
-			};
-
-			Node* mDest = nullptr;
-			Node* mSource = nullptr;
-			BaseType mDataType = BaseType::INT_CONST;
-			bool mExplicitCast = false;
-			size_t mOpcodeIndex = 0;
-
-			void outputParameter(std::string& line, int64 value, BaseType dataType = BaseType::INT_CONST, bool isPointer = false) const
-			{
-				const std::string& dataTypeString = getDataTypeString(dataType, false);
-				if (isPointer)
-				{
-					line += "*context.getParameter<" + dataTypeString + "*>(";
-				}
-				else
-				{
-					line += "context.getParameter<" + dataTypeString + ">(";
-				}
-				if (value != 0)
-				{
-					line += std::to_string(value);
-				}
-				line += ")";
-			}
-
-			void outputDestNode(std::string& line, const Node& node, bool& closeParenthesis) const
-			{
-				switch (node.mType)
-				{
-					case Node::Type::VALUE_STACK:
-					{
-						const std::string& dataTypeString = getDataTypeString(node.mDataType);
-						line += "context.writeValueStack<" + dataTypeString + ">(";
-						line += std::to_string((int)node.mValue);
-						line += ", ";
-						closeParenthesis = true;
-						break;
-					}
-
-					case Node::Type::VARIABLE:
-					{
-						const uint32 variableId = (uint32)node.mValue;
-						const Variable::Type type = (Variable::Type)(variableId >> 28);
-						switch (type)
-						{
-							case Variable::Type::LOCAL:
-							{
-								const std::string& dataTypeString = getDataTypeString(node.mDataType);
-								line += "context.writeLocalVariable<" + dataTypeString + ">(";
-								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-								line += ", ";
-								closeParenthesis = true;
-								break;
-							}
-
-							case Variable::Type::USER:
-							{
-								line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
-								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-								line += ")).setValue(";
-								closeParenthesis = true;
-								break;
-							}
-
-							case Variable::Type::GLOBAL:
-							case Variable::Type::EXTERNAL:
-							{
-								outputParameter(line, node.mParameterOffset, node.mDataType, true);
-								break;
-							}
-						}
-						break;
-					}
-
-					case Node::Type::MEMORY:
-					{
-						const std::string& dataTypeString = getDataTypeString(node.mDataType, true);
-						line += "OpcodeExecUtils::writeMemory<" + dataTypeString + ">(*context.mControlFlow, ";
-						outputSourceNode(line, *node.mChild[0]);
-						line += ", ";
-						closeParenthesis = true;
-						break;
-					}
-
-					case Node::Type::TEMP_VAR:
-					{
-						const std::string& dataTypeString = getDataTypeString(node.mDataType);
-						line += *String(0, "const %s var%d", dataTypeString.c_str(), (int)node.mValue);
-						break;
-					}
-
-					default:
-						RMX_ERROR("Not handled", );
-						break;
-				}
-			}
-
-			void outputSourceNode(std::string& line, const Node& node) const
-			{
-				switch (node.mType)
-				{
-					case Node::Type::CONSTANT:
-					{
-						const AnyBaseValue constant(node.mValue);
-						switch (node.mDataType)
-						{
-							case BaseType::INT_8:	line += std::to_string(constant.get<int8>());			break;
-							case BaseType::INT_16:	line += std::to_string(constant.get<int16>());			break;
-							case BaseType::INT_32:	line += std::to_string(constant.get<int32>());			break;
-							case BaseType::INT_64:	line += std::to_string(constant.get<int64>()) + "ll";	break;
-							case BaseType::UINT_8:	line += std::to_string(constant.get<uint8>());			break;
-							case BaseType::UINT_16:	line += std::to_string(constant.get<uint16>());			break;
-							case BaseType::UINT_32:	line += std::to_string(constant.get<uint32>());			break;
-							case BaseType::UINT_64:	line += std::to_string(constant.get<uint64>()) + "ull";	break;
-							case BaseType::FLOAT:	line += std::to_string(constant.get<float>()) + 'f';	break;
-							case BaseType::DOUBLE:	line += std::to_string(constant.get<double>());			break;
-							default:				line += std::to_string(constant.get<uint32>());			break;
-						}
-						break;
-					}
-
-					case Node::Type::PARAMETER:
-					{
-						outputParameter(line, node.mParameterOffset, node.mDataType);
-						break;
-					}
-
-					case Node::Type::VALUE_STACK:
-					{
-						const std::string& dataTypeString = getDataTypeString(node.mDataType);
-						line += "context.readValueStack<" + dataTypeString + ">(";
-						line += std::to_string((int)node.mValue);
-						line += ")";
-						break;
-					}
-
-					case Node::Type::VARIABLE:
-					{
-						const uint32 variableId = (uint32)node.mValue;
-						const Variable::Type type = (Variable::Type)(variableId >> 28);
-						switch (type)
-						{
-							case Variable::Type::LOCAL:
-							{
-								const std::string& dataTypeString = getDataTypeString(node.mDataType);
-								line += "context.readLocalVariable<" + dataTypeString + ">(";
-								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-								line += ")";
-								break;
-							}
-
-							case Variable::Type::USER:
-							{
-								line += "static_cast<GlobalVariable&>(context.mControlFlow->getProgram().getGlobalVariableByID(";
-								outputParameter(line, node.mParameterOffset, BaseType::UINT_32);
-								line += ")).getValue()";
-								break;
-							}
-
-							case Variable::Type::GLOBAL:
-							case Variable::Type::EXTERNAL:
-							{
-								outputParameter(line, node.mParameterOffset, node.mDataType, true);
-								break;
-							}
-						}
-						break;
-					}
-
-					case Node::Type::MEMORY:
-					{
-						const std::string& dataTypeString = getDataTypeString(node.mDataType, true);
-						line += "OpcodeExecUtils::readMemory<" + dataTypeString + ">(*context.mControlFlow, ";
-						outputSourceNode(line, *node.mChild[0]);
-						line += ")";
-						break;
-					}
-
-					case Node::Type::MEMORY_FIXED:
-					{
-						const bool swapBytes = (node.mValue & 0x01) != 0;
-						const size_t bytes = DataTypeHelper::getSizeOfBaseType(node.mDataType);
-						if (swapBytes && bytes >= 2)
-						{
-							line += *String(0, "swapBytes%d(", bytes * 8);
-							outputParameter(line, node.mParameterOffset, node.mDataType, true);
-							line += ")";
-						}
-						else
-						{
-							outputParameter(line, node.mParameterOffset, node.mDataType, true);
-						}
-						break;
-					}
-
-					case Node::Type::OPERATION_BINARY:
-					{
-						const char* operatorString = "";
-						const char* functionCall = nullptr;
-						bool ignoreSigned = false;
-						bool booleanResult = false;		// TODO: This is probably not really needed
-						bool isShift = false;
-						switch ((Opcode::Type)node.mValue)
-						{
-							case Opcode::Type::ARITHM_ADD:	operatorString = "+";   ignoreSigned = true;   booleanResult = false;	break;
-							case Opcode::Type::ARITHM_SUB:	operatorString = "-";   ignoreSigned = true;   booleanResult = false;	break;
-							case Opcode::Type::ARITHM_MUL:	operatorString = "*";   ignoreSigned = false;  booleanResult = false;	break;
-							case Opcode::Type::ARITHM_DIV:	functionCall = "OpcodeExecUtils::safeDivide";   ignoreSigned = false;  booleanResult = false;	break;
-							case Opcode::Type::ARITHM_MOD:	functionCall = "OpcodeExecUtils::safeModulo";   ignoreSigned = false;  booleanResult = false;	break;
-							case Opcode::Type::ARITHM_AND:	operatorString = "&";   ignoreSigned = true;   booleanResult = false;	break;
-							case Opcode::Type::ARITHM_OR:	operatorString = "|";   ignoreSigned = true;   booleanResult = false;	break;
-							case Opcode::Type::ARITHM_XOR:	operatorString = "^";   ignoreSigned = true;   booleanResult = false;	break;
-							case Opcode::Type::ARITHM_SHL:	operatorString = "<<";  ignoreSigned = true;   booleanResult = false;  isShift = true;  break;
-							case Opcode::Type::ARITHM_SHR:	operatorString = ">>";  ignoreSigned = false;  booleanResult = false;  isShift = true;  break;
-							case Opcode::Type::COMPARE_EQ:	operatorString = "==";  ignoreSigned = true;   booleanResult = true;	break;
-							case Opcode::Type::COMPARE_NEQ:	operatorString = "!=";  ignoreSigned = true;   booleanResult = true;	break;
-							case Opcode::Type::COMPARE_LT:	operatorString = "<";   ignoreSigned = false;  booleanResult = true;	break;
-							case Opcode::Type::COMPARE_LE:	operatorString = "<=";  ignoreSigned = false;  booleanResult = true;	break;
-							case Opcode::Type::COMPARE_GT:	operatorString = ">";   ignoreSigned = false;  booleanResult = true;	break;
-							case Opcode::Type::COMPARE_GE:	operatorString = ">=";  ignoreSigned = false;  booleanResult = true;	break;
-							default:
-								break;
-						}
-
-						const std::string& dataTypeString = getDataTypeString(node.mDataType, ignoreSigned);
-						if (nullptr == functionCall)
-						{
-							line += "((" + dataTypeString + ")(";
-							outputSourceNode(line, *node.mChild[0]);
-							line += std::string(") ") + operatorString + " (" + dataTypeString + ")(";
-							if (isShift)
-								line += "(";
-							outputSourceNode(line, *node.mChild[1]);
-							if (isShift)
-								line += ") & " + rmx::hexString(getIntegerDataTypeBits(node.mDataType) - 1, 2);		// Assuming the right side of a shift is always an integer
-							line += "))";
-						}
-						else
-						{
-							line += functionCall;
-							line += "<" + dataTypeString + ">((" + dataTypeString + ")";
-							outputSourceNode(line, *node.mChild[0]);
-							line += ", (" + dataTypeString + ")";
-							outputSourceNode(line, *node.mChild[1]);
-							line += ")";
-						}
-						break;
-					}
-
-					case Node::Type::OPERATION_UNARY:
-					{
-						bool ignoreSigned = false;
-						switch ((Opcode::Type)node.mValue)
-						{
-							case Opcode::Type::ARITHM_NEG:	  line += "-";  ignoreSigned = false;  break;
-							case Opcode::Type::ARITHM_NOT:	  line += "!";  ignoreSigned = true;   break;
-							case Opcode::Type::ARITHM_BITNOT: line += "~";  ignoreSigned = true;   break;
-							default:  break;
-						}
-
-						if (!ignoreSigned)
-							line += "(signed)";		// TODO: This is more of a hack....
-						outputSourceNode(line, *node.mChild[0]);
-						break;
-					}
-
-					case Node::Type::TEMP_VAR:
-					{
-						line += *String(0, "var%d", (int)node.mValue);
-						break;
-					}
-
-					default:
-						RMX_ERROR("Not handled", );
-						break;
-				}
-			}
-
-			void outputLine(std::string& line) const
-			{
-				// Output this assignment into a text line
-				bool closeParenthesis = false;
-				outputDestNode(line, *mDest, closeParenthesis);
-
-				if (!closeParenthesis)
-					line += " = ";
-				if (mExplicitCast)
-					line += "(" + getDataTypeString(mDataType, true) + ")";
-
-				outputSourceNode(line, *mSource);
-
-				if (closeParenthesis)
-					line += ")";
-				line += ";";
-			}
-		};
 
 		void writeBinaryBlob(CppWriter& writer, const std::string& identifier, const uint8* data, size_t length)
 		{
@@ -490,6 +50,40 @@ namespace lemon
 		}
 	}
 
+
+
+	void Nativizer::LookupDictionary::addEmptyEntries(const uint64* hashes, size_t numHashes)
+	{
+		mEntries.reserve(mEntries.size() + numHashes);
+		for (size_t i = 0; i < numHashes; ++i)
+		{
+			mEntries.emplace(hashes[i], LookupEntry());
+		}
+	}
+
+	void Nativizer::LookupDictionary::loadFunctions(const CompactFunctionEntry* entries, size_t numEntries)
+	{
+		mEntries.reserve(mEntries.size() + numEntries);
+		for (size_t i = 0; i < numEntries; ++i)
+		{
+			mEntries.emplace(entries[i].mHash, LookupEntry(entries[i].mFunctionPointer, entries[i].mParameterStart));
+		}
+	}
+
+	void Nativizer::LookupDictionary::loadParameterInfo(const uint8* data, size_t count)
+	{
+		std::vector<uint8> decompressedData;
+		ZlibDeflate::decode(decompressedData, data, count);
+		mParameterData.resize(decompressedData.size() / 4);
+		data = &decompressedData[0];
+		for (LookupEntry::ParameterInfo& info : mParameterData)
+		{
+			info.mOffset = *(uint16*)&data[0];
+			info.mOpcodeIndex = data[2];
+			info.mSemantics = (LookupEntry::ParameterInfo::Semantics)data[3];
+			data += 4;
+		}
+	}
 
 
 	void Nativizer::getOpcodeSubtypeInfo(OpcodeSubtypeInfo& outInfo, const Opcode* opcodes, size_t numOpcodesAvailable, MemoryAccessHandler& memoryAccessHandler)
@@ -738,539 +332,34 @@ namespace lemon
 
 	size_t Nativizer::processOpcodes(CppWriter& writer, const Opcode* opcodes, size_t numOpcodes, const ScriptFunction& function)
 	{
-		if (numOpcodes > MAX_OPCODES)
-			numOpcodes = MAX_OPCODES;
-
-		OpcodeInfo opcodeInfo[MAX_OPCODES];
-		size_t numOpcodeInfos = 0;
-
-		// Check how many opcodes are supported -- TODO: This will have to get removed when all are supported
+		// Check how many opcodes cam be nativized into a single function
+		numOpcodes = collectNativizableOpcodes(opcodes, numOpcodes);
+		if (numOpcodes < MIN_OPCODES)
 		{
-			for (size_t index = 0; index < numOpcodes; ++index)
-			{
-				const Opcode& opcode = opcodes[index];
-				RMX_ASSERT(opcode.mType != Opcode::Type::MAKE_BOOL, "MAKE_BOOL should not occur any more");
-
-				const bool isSupported = (opcode.mType == Opcode::Type::MOVE_STACK ||
-										  //opcode.mType == Opcode::Type::MOVE_VAR_STACK ||
-										  opcode.mType == Opcode::Type::PUSH_CONSTANT ||
-										  (opcode.mType >= Opcode::Type::GET_VARIABLE_VALUE && opcode.mType <= Opcode::Type::COMPARE_GE));
-				if (!isSupported)
-				{
-					numOpcodes = index;
-					break;
-				}
-			}
-
-			if (numOpcodes < MIN_OPCODES)
-				return numOpcodes + 1;
+			// Nativization is not worth it for so few opcodes, so just skip them
+			return numOpcodes + 1;
 		}
+
+		static NativizerInternal nativizerInternal;
+		nativizerInternal.reset();
 
 		// Get subtype infos from the opcodes, and build hashes
-		uint64 hash = getStartHash();
-		{
-			for (size_t opcodeIndex = 0; opcodeIndex < numOpcodes; )
-			{
-				OpcodeInfo& info = opcodeInfo[numOpcodeInfos];
-				info.mSubtypeInfo.mFirstOpcodeIndex = opcodeIndex;
-				getOpcodeSubtypeInfo(info.mSubtypeInfo, &opcodes[opcodeIndex], numOpcodes - opcodeIndex, *mMemoryAccessHandler);
-				opcodeIndex += info.mSubtypeInfo.mConsumedOpcodes;
-				hash = addOpcodeSubtypeInfoToHash(hash, info.mSubtypeInfo);
-				info.mHash = hash;
-				++numOpcodeInfos;
-			}
+		const uint64 hash = nativizerInternal.buildSubtypeInfos(opcodes, numOpcodes, *mMemoryAccessHandler);
+		if (mBuiltDictionary.mEntries.count(hash) != 0)
+			return numOpcodes;
 
-			if (mBuiltDictionary.mEntries.count(hash) != 0)
-				return numOpcodes;
-		}
-
-		static Parameters parameters;
-		parameters.clear();
-
-		static std::vector<Assignment> assignments;
-		assignments.clear();
-
-		static std::vector<Assignment::Node> nodes;
-		RMX_ASSERT(nodes.size() <= 0x100, "Oops, a reallocation happened");
-		nodes.clear();
-		nodes.reserve(0x100);
-
-		int stackPosition = 0;	// Relative to initial stack position
-
-		for (size_t infoIndex = 0; infoIndex < numOpcodeInfos; ++infoIndex)
-		{
-			const OpcodeInfo& info = opcodeInfo[infoIndex];
-			const size_t opcodeIndex = info.mSubtypeInfo.mFirstOpcodeIndex;
-			const Opcode& opcode = opcodes[opcodeIndex];
-			const size_t oldNumAssignments = assignments.size();
-
-			switch (info.mSubtypeInfo.mSpecialType)
-			{
-				case OpcodeSubtypeInfo::SpecialType::FIXED_MEMORY_READ:
-				{
-					const Opcode& readMemoryOpcode = opcodes[opcodeIndex+1];
-					const BaseType dataType = readMemoryOpcode.mDataType;
-					const uint64 swapBytesFlag = (info.mSubtypeInfo.mSubtypeData & 0x0001);
-					const bool consumeInput = (info.mSubtypeInfo.mSubtypeData & 0x0002) == 0;
-
-					if (!consumeInput)
-					{
-						// First add an assignment to push the address to the stack
-						const size_t parameterOffset = parameters.add(opcodeIndex, 8, ParameterInfo::Semantics::INTEGER);
-						Assignment& assignment = vectorAdd(assignments);
-						assignment.mDest   = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition);
-						assignment.mSource = &nodes.emplace_back(Assignment::Node::Type::PARAMETER, opcode.mDataType, 0, parameterOffset);
-						assignment.mDataType = opcode.mDataType;
-						++stackPosition;
-					}
-
-					const size_t parameterOffset = parameters.add(opcodeIndex, 8, ParameterInfo::Semantics::FIXED_MEMORY_ADDRESS);
-					Assignment& assignment = vectorAdd(assignments);
-					assignment.mDest   = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, dataType, stackPosition);
-					assignment.mSource = &nodes.emplace_back(Assignment::Node::Type::MEMORY_FIXED, dataType, swapBytesFlag, parameterOffset);
-					assignment.mDataType = dataType;
-					++stackPosition;
-					break;
-				}
-
-				default:
-				{
-					// Process a normal single opcode
-					switch (opcode.mType)
-					{
-						case Opcode::Type::MOVE_STACK:
-						{
-							stackPosition += (int16)opcode.mParameter;
-							break;
-						}
-
-						case Opcode::Type::PUSH_CONSTANT:
-						{
-							// Normal processing of the PUSH_CONSTANT opcode
-							Assignment& assignment = vectorAdd(assignments);
-							assignment.mDest = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition);
-							if (info.mSubtypeInfo.mSubtypeData & 0x8000)
-							{
-								// Specialized version hard-codes the constant value
-								assignment.mSource = &nodes.emplace_back(Assignment::Node::Type::CONSTANT, opcode.mDataType, opcode.mParameter);
-							}
-							else
-							{
-								// Generic version reads the constant value as a parameter
-								const size_t parameterOffset = parameters.add(opcodeIndex, 8, ParameterInfo::Semantics::INTEGER);
-								assignment.mSource = &nodes.emplace_back(Assignment::Node::Type::PARAMETER, opcode.mDataType, 0, parameterOffset);
-							}
-							assignment.mDataType = opcode.mDataType;
-							++stackPosition;
-							break;
-						}
-
-						case Opcode::Type::GET_VARIABLE_VALUE:
-						case Opcode::Type::SET_VARIABLE_VALUE:
-						{
-							const Variable::Type type = (Variable::Type)((uint32)(opcode.mParameter) >> 28);
-							size_t parameterOffset;
-							switch (type)
-							{
-								case Variable::Type::EXTERNAL:
-								{
-									parameterOffset = parameters.add(opcodeIndex, 8, ParameterInfo::Semantics::EXTERNAL_VARIABLE, opcode.mDataType);
-									break;
-								}
-								case Variable::Type::GLOBAL:
-								{
-									parameterOffset = parameters.add(opcodeIndex, 8, ParameterInfo::Semantics::GLOBAL_VARIABLE);
-									break;
-								}
-								default:
-								{
-									parameterOffset = parameters.add(opcodeIndex, 4, ParameterInfo::Semantics::INTEGER);
-									break;
-								}
-							}
-
-							if (opcode.mType == Opcode::Type::GET_VARIABLE_VALUE)
-							{
-								Assignment& assignment = vectorAdd(assignments);
-								assignment.mDest	 = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition);
-								assignment.mSource	 = &nodes.emplace_back(Assignment::Node::Type::VARIABLE, opcode.mDataType, (uint32)opcode.mParameter, parameterOffset);
-								assignment.mDataType = opcode.mDataType;
-								assignment.mExplicitCast = true;
-								++stackPosition;
-							}
-							else
-							{
-								Assignment& assignment = vectorAdd(assignments);
-								assignment.mDest	 = &nodes.emplace_back(Assignment::Node::Type::VARIABLE, opcode.mDataType, (uint32)opcode.mParameter, parameterOffset);
-								assignment.mSource	 = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 1);
-								assignment.mDataType = opcode.mDataType;
-								assignment.mExplicitCast = true;
-							}
-							break;
-						}
-
-						case Opcode::Type::READ_MEMORY:
-						{
-							const bool consumeInput = (opcode.mParameter == 0);
-							Assignment& assignment = vectorAdd(assignments);
-							assignment.mDest			  = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - (consumeInput ? 1 : 0));
-							assignment.mSource			  = &nodes.emplace_back(Assignment::Node::Type::MEMORY, opcode.mDataType);
-							assignment.mSource->mChild[0] = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, BaseType::UINT_32, stackPosition - 1);
-							assignment.mDataType = opcode.mDataType;
-							if (!consumeInput)
-								++stackPosition;
-							break;
-						}
-
-						case Opcode::Type::WRITE_MEMORY:
-						{
-							const bool exchangedInputs = (opcode.mParameter != 0);
-							{
-								// Main assignment
-								Assignment& assignment = vectorAdd(assignments);
-								assignment.mDest			= &nodes.emplace_back(Assignment::Node::Type::MEMORY, opcode.mDataType);
-								assignment.mDest->mChild[0]	= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, BaseType::UINT_32, stackPosition - (exchangedInputs ? 2 : 1));
-								assignment.mSource			= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - (exchangedInputs ? 1 : 2));
-								assignment.mDataType = opcode.mDataType;
-								assignment.mExplicitCast = true;
-							}
-							if (exchangedInputs)
-							{
-								// Add another assignment to copy the value to the top-of-stack, where it might be expected by the next assignments
-								Assignment& assignment = vectorAdd(assignments);
-								assignment.mDest	= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 2);
-								assignment.mSource	= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 1);
-								assignment.mDataType = opcode.mDataType;
-								assignment.mExplicitCast = true;
-							}
-							--stackPosition;
-							break;
-						}
-
-						case Opcode::Type::CAST_VALUE:
-						{
-							const BaseType dataType = OpcodeHelper::getCastTargetType(opcode);
-							Assignment& assignment = vectorAdd(assignments);
-							assignment.mDest	 = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, dataType, stackPosition - 1);
-							assignment.mSource	 = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, dataType, stackPosition - 1);
-							assignment.mDataType = dataType;
-							assignment.mExplicitCast = true;
-							break;
-						}
-
-						case Opcode::Type::ARITHM_ADD:
-						case Opcode::Type::ARITHM_SUB:
-						case Opcode::Type::ARITHM_MUL:
-						case Opcode::Type::ARITHM_DIV:
-						case Opcode::Type::ARITHM_MOD:
-						case Opcode::Type::ARITHM_AND:
-						case Opcode::Type::ARITHM_OR:
-						case Opcode::Type::ARITHM_XOR:
-						case Opcode::Type::ARITHM_SHL:
-						case Opcode::Type::ARITHM_SHR:
-						case Opcode::Type::COMPARE_EQ:
-						case Opcode::Type::COMPARE_NEQ:
-						case Opcode::Type::COMPARE_LT:
-						case Opcode::Type::COMPARE_LE:
-						case Opcode::Type::COMPARE_GT:
-						case Opcode::Type::COMPARE_GE:
-						{
-							Assignment& assignment = vectorAdd(assignments);
-							assignment.mDest				= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 2);
-							assignment.mSource				= &nodes.emplace_back(Assignment::Node::Type::OPERATION_BINARY, opcode.mDataType, (uint64)opcode.mType);
-							assignment.mSource->mChild[0]	= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 2);
-							assignment.mSource->mChild[1]	= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 1);
-							assignment.mDataType = opcode.mDataType;
-							--stackPosition;
-							break;
-						}
-
-						case Opcode::Type::ARITHM_NEG:
-						case Opcode::Type::ARITHM_NOT:
-						case Opcode::Type::ARITHM_BITNOT:
-						{
-							Assignment& assignment = vectorAdd(assignments);
-							assignment.mDest				= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 1);
-							assignment.mSource				= &nodes.emplace_back(Assignment::Node::Type::OPERATION_UNARY, opcode.mDataType, (uint64)opcode.mType);
-							assignment.mSource->mChild[0]	= &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, opcode.mDataType, stackPosition - 1);
-							assignment.mDataType			= opcode.mDataType;
-							assignment.mExplicitCast = true;
-							break;
-						}
-
-						default:
-							break;
-					}
-					break;
-				}
-
-			}
-
-			for (size_t i = oldNumAssignments; i < assignments.size(); ++i)
-			{
-				assignments[i].mOpcodeIndex = opcodeIndex;
-			}
-		}
-
-		// Assign parameter offsets
-		//  -> This is a separate step, now that the parameter list is filled; i.e. there won't be any more reallocations and the pointers stay valid
-		for (ParameterInfo& param : parameters.mParameters)
-		{
-			opcodeInfo[param.mOpcodeIndex].mParameter = &param;
-		}
+		nativizerInternal.buildAssignmentsFromOpcodes(opcodes);
 
 		// Postprocessing
-		//  -> Build temp vars where a value is both read (from any source) and written (to stack)
-		{
-			struct Read
-			{
-				Assignment* mAssignment = nullptr;
-				Assignment::Node* mNode = nullptr;
-			};
-			struct TempVar
-			{
-				Assignment* mWrite = nullptr;
-				std::vector<Read> mReads;
-				bool mPreserve = false;			// If set, this temp var must not be removed
-				bool mOutputToStack = false;	// If set, this temp var must also write to the stack, in addition to be used in the reads
-			};
-			static std::vector<TempVar> tempVars;
-			tempVars.clear();
-			tempVars.reserve(0x20);
-
-			// This lookup is meant to mirror the stack (with index MAX_OPCODES representing the initial stack position)
-			//  -> It's used to track which assignment nodes consume the value written by which other assignment
-			//  -> This way, we can build pairs of nodes that can be linked together:
-			//      where possible, the writing node gets integrated directly as input for the reading node, without the need of having a temp var in between
-			static TempVar* tempVarLookup[MAX_OPCODES * 2];
-			for (size_t k = 0; k < MAX_OPCODES * 2; ++k)
-			{
-				tempVarLookup[k] = nullptr;
-			}
-			int lowestWrittenStackPosition = stackPosition;
-
-			// First collect temp vars
-			for (size_t assignmentIndex = 0; assignmentIndex < assignments.size(); ++assignmentIndex)
-			{
-				Assignment& assignment = assignments[assignmentIndex];
-
-				// Iterate recursively through the node and its inner child nodes
-				static std::vector<Assignment::Node*> nodeStack;
-				nodeStack.clear();
-				nodeStack.push_back(assignment.mDest);		// Push first to the stack, so it gets handled last
-				nodeStack.push_back(assignment.mSource);
-				while (!nodeStack.empty())
-				{
-					Assignment::Node& node = *nodeStack.back();
-					nodeStack.pop_back();
-
-					switch (node.mType)
-					{
-						case Assignment::Node::Type::VALUE_STACK:
-						{
-							// Ignore the assignment's write access (that one needs separate handling afterwards, see below)
-							if (&node != assignment.mDest)
-							{
-								// Get the temp var at the respective stack position
-								const int readStackPosition = (int)node.mValue;
-								TempVar* tempVar = tempVarLookup[MAX_OPCODES + readStackPosition];
-								if (nullptr != tempVar)
-								{
-									Read& read = vectorAdd(tempVar->mReads);
-									read.mAssignment = &assignment;
-									read.mNode = &node;
-									tempVar->mPreserve = true;		// This temp var has a write and at leats one read, so it must not be removed by cleanup later on
-								}
-							}
-							break;
-						}
-
-						case Assignment::Node::Type::MEMORY:
-						case Assignment::Node::Type::OPERATION_UNARY:
-						{
-							// Go deeper into the child node
-							nodeStack.push_back(node.mChild[0]);
-							break;
-						}
-
-						case Assignment::Node::Type::OPERATION_BINARY:
-						{
-							// Go deeper into both child nodes
-							nodeStack.push_back(node.mChild[0]);
-							nodeStack.push_back(node.mChild[1]);
-							break;
-						}
-
-						default:
-							break;
-					}
-				}
-
-				// Add assignment's write as a temp var
-				//  -> If it turns out that this temp var is not consumed by a read, it will get removed again later (see below)
-				if (assignment.mDest->mType == Assignment::Node::Type::VALUE_STACK)
-				{
-					const int writeStackPosition = (int)assignment.mDest->mValue;
-					lowestWrittenStackPosition = std::min(lowestWrittenStackPosition, writeStackPosition);
-
-					TempVar& tempVar = vectorAdd(tempVars);
-					tempVarLookup[MAX_OPCODES + writeStackPosition] = &tempVar;
-					tempVar.mWrite = &assignment;
-					tempVar.mReads.clear();
-					tempVar.mPreserve = false;
-					tempVar.mOutputToStack = false;
-				}
-			}
-
-			// Now evaluate which of the temp vars (or assignments if you will) are required to be written to the stack
-			//  -> This is everything below the final stack position
-			for (int pos = lowestWrittenStackPosition; pos < stackPosition; ++pos)
-			{
-				TempVar* tempVar = tempVarLookup[MAX_OPCODES + pos];
-				if (nullptr != tempVar)
-				{
-					if (!tempVar->mReads.empty())
-					{
-						// Temp var has reads, which means it gets read by an assignment, but does not get consumed by it
-						//  -> We need to output an additional stack write for it
-						tempVar->mOutputToStack = true;		// Note that this implies "mPreserve", as it only gets set when there's also reads
-					}
-				}
-			}
-
-			// Remove all temp vars for stack writes that are not marked as preserved
-			//  -> That's all that did not get consumed
-			for (int i = (int)tempVars.size() - 1; i >= 0; --i)
-			{
-				TempVar& tempVar = tempVars[i];
-				if (!tempVar.mPreserve)
-				{
-					const int writeStackPosition = (int)tempVar.mWrite->mDest->mValue;
-					if (writeStackPosition >= stackPosition)
-					{
-						// Temp var refers to an assignment that can be dropped altogether
-						//  -> E.g. WRITE_MEMORY with exchanged inputs can create such assignments; but in many cases, their result goes unused
-						tempVar.mWrite->mDest = nullptr;
-					}
-					tempVars.erase(tempVars.begin() + i);
-				}
-			}
-
-			// Now go through the remaining temp vars and properly apply them
-			int nextTempVarNumber = 0;
-			for (TempVar& tempVar : tempVars)
-			{
-				Assignment& write = *tempVar.mWrite;
-				const int writeStackPosition = (int)write.mDest->mValue;
-
-				// Replace the nodes referenced in the remaining temp vars, so that they actually use the temp var
-				write.mDest->mType = Assignment::Node::Type::TEMP_VAR;
-				write.mDest->mValue = nextTempVarNumber;
-				for (const Read& read : tempVar.mReads)
-				{
-					RMX_ASSERT(writeStackPosition == read.mNode->mValue, "Difference in stack positions of read and write of a temp var");
-					read.mNode->mType = Assignment::Node::Type::TEMP_VAR;
-					read.mNode->mValue = nextTempVarNumber;
-				}
-
-				// And if the temp var needs to be written to the stack, add an additional assignment to do right that
-				if (tempVar.mOutputToStack)
-				{
-					Assignment& assignment = vectorAdd(assignments);
-					assignment.mDest	 = &nodes.emplace_back(Assignment::Node::Type::VALUE_STACK, write.mDataType, writeStackPosition);
-					assignment.mSource	 = &nodes.emplace_back(Assignment::Node::Type::TEMP_VAR, write.mDataType, nextTempVarNumber);
-					assignment.mDataType = write.mDataType;
-
-					// Register as a read, otherwise the optimization below could try to integrate this temp var
-					Read& read = vectorAdd(tempVar.mReads);
-					read.mAssignment = &assignment;
-					read.mNode = assignment.mSource;
-				}
-
-				++nextTempVarNumber;
-			}
-
-			// As an additional optimization, integrate some temp vars directly into where they are used
-			// TODO: This needs to preserve casts
-			for (size_t i = 0; i < tempVars.size(); ++i)
-			{
-				TempVar& tempVar = tempVars[i];
-				if (tempVars[i].mReads.size() != 1)
-					continue;
-
-				if (tempVar.mWrite->mSource->mType != Assignment::Node::Type::PARAMETER)
-				{
-					// TODO: Do not allow integration when there's variable or memory writes in between (except for parameters)
-					continue;
-				}
-
-				// Replace read node
-				Read& read = tempVar.mReads[0];
-				*read.mNode = *tempVar.mWrite->mSource;
-				read.mAssignment = tempVar.mWrite;
-
-				// Invalidate old write assignment
-				tempVar.mWrite->mDest = nullptr;
-			}
-
-			// Remove all assignments that just copy a value around (without an actual cast)
-			for (size_t i = 0; i < tempVars.size(); ++i)
-			{
-				TempVar& tempVar = tempVars[i];
-				if (nullptr != tempVar.mWrite->mDest && tempVar.mWrite->mSource->mType == Assignment::Node::Type::TEMP_VAR)
-				{
-					const int sourceTempVarNumber = (int)tempVar.mWrite->mSource->mValue;
-					const TempVar& sourceTempVar = tempVars[sourceTempVarNumber];
-					if (nullptr != sourceTempVar.mWrite->mDest && sourceTempVar.mWrite->mDest->mDataType == tempVar.mWrite->mDest->mDataType)
-					{
-						// Replace in all reads
-						for (Read& read : tempVar.mReads)
-						{
-							read.mNode->mValue = sourceTempVarNumber;
-						}
-
-						// Invalidate old write assignment
-						tempVar.mWrite->mDest = nullptr;
-					}
-				}
-			}
-		}
+		nativizerInternal.performPostProcessing();
 
 		// Generate code for the assignments
-		{
-			std::string line = "// First occurrence: ";
-			line.append(function.getName().getString());
-			if (opcodes[0].mLineNumber != 0)
-				line = line + ", line " + std::to_string(opcodes[0].mLineNumber - function.mSourceBaseLineOffset + 1);
-			writer.writeLine(line);
-
-			writer.writeLine("static void exec_" + rmx::hexString(hash, 16, "") + "(const RuntimeOpcodeContext context)");
-			writer.beginBlock();
-
-			// Write lines
-			for (const Assignment& assignment : assignments)
-			{
-				if (nullptr != assignment.mDest)	// Ignore the invalidated assignments
-				{
-					line.clear();
-					assignment.outputLine(line);
-					writer.writeLine(line);
-				}
-			}
-
-			if (stackPosition != 0)
-			{
-				writer.writeLine("context.moveValueStack(" + std::to_string(stackPosition) + ");");
-			}
-
-			writer.endBlock();
-			writer.writeEmptyLine();
-		}
+		nativizerInternal.generateCppCode(writer, function, hash);
 
 		// Register
-		for (size_t index = 1; index < numOpcodeInfos-1; ++index)
+		for (size_t index = 1; index < nativizerInternal.mOpcodeInfos.size() - 1; ++index)
 		{
-			const uint64 partialHash = opcodeInfo[index].mHash;
+			const uint64 partialHash = nativizerInternal.mOpcodeInfos[index].mHash;
 			mBuiltDictionary.mEntries[partialHash];		// Creates the entry with initial value, or leaves it like it is if it was already existing
 		}
 
@@ -1278,7 +367,7 @@ namespace lemon
 			LookupEntry& entry = mBuiltDictionary.mEntries[hash];
 			entry.mExecFunc = (ExecFunc)1;	// Treating this as a bool, we only care if it's a nullptr or not
 
-			std::vector<ParameterInfo>& params = parameters.mParameters;
+			std::vector<NativizerInternal::ParameterInfo>& params = nativizerInternal.mParameters.mParameters;
 			if (params.empty())
 			{
 				// Refer to the dummy entry for functions without parameters
@@ -1300,12 +389,33 @@ namespace lemon
 				}
 
 				// Add a terminating entry as well
-				parameterPtr->mOffset = (uint16)parameters.mTotalSize;
+				parameterPtr->mOffset = (uint16)nativizerInternal.mParameters.mTotalSize;
 				parameterPtr->mOpcodeIndex = 0xff;
 				parameterPtr->mSemantics = (LookupEntry::ParameterInfo::Semantics)0xff;
 			}
 		}
 
+		return numOpcodes;
+	}
+
+	size_t Nativizer::collectNativizableOpcodes(const Opcode* opcodes, size_t numOpcodes)
+	{
+		if (numOpcodes > MAX_OPCODES)
+			numOpcodes = MAX_OPCODES;
+
+		for (size_t index = 0; index < numOpcodes; ++index)
+		{
+			const Opcode::Type opcodeType = opcodes[index].mType;
+			RMX_ASSERT(opcodeType != Opcode::Type::MAKE_BOOL, "MAKE_BOOL should not occur any more");
+
+			const bool isSupported = (opcodeType == Opcode::Type::MOVE_STACK ||
+									  (opcodeType >= Opcode::Type::PUSH_CONSTANT && opcodeType <= Opcode::Type::COMPARE_GE));
+			if (!isSupported)
+			{
+				// Stop here
+				return index;
+			}
+		}
 		return numOpcodes;
 	}
 
