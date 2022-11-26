@@ -22,6 +22,7 @@ namespace lemon
 	class API_EXPORT Function
 	{
 	friend class Module;
+	friend class ModuleSerializer;
 
 	public:
 		enum class Type : uint8

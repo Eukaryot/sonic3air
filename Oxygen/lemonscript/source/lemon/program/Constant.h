@@ -20,6 +20,7 @@ namespace lemon
 	{
 	friend class CompilerFrontend;
 	friend class Module;
+	friend class ModuleSerializer;
 
 	public:
 		inline FlyweightString getName() const  { return mName; }

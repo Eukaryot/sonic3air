@@ -27,6 +27,7 @@ namespace lemon
 	friend class Program;
 	friend class GlobalsLookup;
 	friend class ScriptFunction;
+	friend class ModuleSerializer;
 
 	public:
 		explicit Module(const std::string& name);
