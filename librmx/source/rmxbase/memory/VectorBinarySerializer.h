@@ -8,6 +8,12 @@
 
 #pragma once
 
+#include "rmxbase/base/Types.h"
+
+#include <string>
+#include <vector>
+
+
 class VectorBinarySerializer
 {
 public:
@@ -42,7 +48,7 @@ public:
 	void serialize(float& value);
 	void serialize(double& value);
 	void serialize(std::string& value, size_t stringLengthLimit = 0xffffffff);
-	void serialize(std::wstring& value);
+	void serialize(std::wstring& value, size_t stringLengthLimit = 0xffffffff);
 	void serialize(String& value);
 	void serialize(WString& value);
 
@@ -105,6 +111,9 @@ public:
 		serialize(value);
 	}
 
+	size_t readSize(size_t limit);
+	void writeSize(size_t value, size_t limit);
+
 	template <typename T>
 	T read()
 	{
@@ -122,7 +131,7 @@ public:
 	}
 
 	void write(std::string_view value, size_t stringLengthLimit = 0xffffffff);
-	void write(std::wstring_view value);
+	void write(std::wstring_view value, size_t stringLengthLimit = 0xffffffff);
 
 	template <typename T, typename S>
 	void writeAs(const S& value)

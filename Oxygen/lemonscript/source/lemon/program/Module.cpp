@@ -454,11 +454,12 @@ namespace lemon
 		//  - 0x0b = Added app version
 		//  - 0x0c = Added address hook serialization
 		//  - 0x0d = Support for function alias names + added function flags as a small optimization
+		//  - 0x0e = Change in serialization of std::wstring in rmx
 
 		// Signature and version number
-		const uint32 SIGNATURE = *(uint32*)"LMD|";
-		const uint16 MINIMUM_VERSION = 0x0d;
-		uint16 version = 0x0d;
+		const uint32 SIGNATURE = *(uint32*)"LMD|";	// "Lemonscript Module"
+		const uint16 MINIMUM_VERSION = 0x0e;
+		uint16 version = 0x0e;
 
 		if (outerSerializer.isReading())
 		{
@@ -511,7 +512,7 @@ namespace lemon
 				std::wstring filename;
 				for (size_t i = 0; i < numberOfSourceFiles; ++i)
 				{
-					serializer.serialize(filename);
+					serializer.serialize(filename, 1024);
 					addSourceFileInfo(L"", filename);
 				}
 			}
@@ -519,7 +520,7 @@ namespace lemon
 			{
 				for (const SourceFileInfo* sourceFileInfo : mAllSourceFiles)
 				{
-					serializer.write(sourceFileInfo->mFilename);
+					serializer.write(sourceFileInfo->mFilename, 1024);
 				}
 			}
 		}

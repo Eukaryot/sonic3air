@@ -221,24 +221,36 @@ TEMPLATE void STRING::recount()
 		++mLength;
 }
 
+TEMPLATE void STRING::reserve(size_t newReservedLength)
+{
+	// Increase reserved size if needed
+	const size_t newSize = newReservedLength + 1;
+	if (mSize < newSize)
+	{
+		CHAR* newData = new CHAR[newSize];
+		if (mLength > 0)
+			memcpy(newData, mData, mLength * sizeof(CHAR));
+		newData[mLength] = 0;
+		if (mDynamic)
+			delete[] mData;
+		mData = newData;
+		mSize = newSize;
+		mDynamic = true;
+	}
+}
+
 TEMPLATE void STRING::expand(int newLength)
 {
 	// Increase reserved size if needed
-	if (newLength+1 <= (int)mSize)
-		return;
-
-	int newSize = 1;
-	while (newSize < newLength+1)
-		newSize *= 2;
-	CHAR* newData = new CHAR[newSize];
-	if (mLength > 0)
-		memcpy(newData, mData, mLength * sizeof(CHAR));
-	newData[mLength] = 0;
-	if (mDynamic)
-		delete[] mData;
-	mData = newData;
-	mSize = newSize;
-	mDynamic = true;
+	const size_t requiredSize = (size_t)newLength + 1;
+	if (mSize < requiredSize)
+	{
+		// Use the next power of two as size
+		int newSize = 1;
+		while (newSize < newLength+1)
+			newSize *= 2;
+		reserve(newSize - 1);
+	}
 }
 
 TEMPLATE void STRING::expand(int newLength, int insertspace)

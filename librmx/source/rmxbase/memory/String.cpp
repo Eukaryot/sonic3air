@@ -132,6 +132,7 @@ String WString::toString() const
 String WString::toUTF8() const
 {
 	String output;
+	output.reserve(mLength * 3/2);	// Just a first rough guess
 
 	size_t size = 0;
 	for (size_t i = 0; i < (size_t)mLength; ++i)
@@ -199,7 +200,7 @@ std::wstring WString::toStdWString() const
 void WString::fromUTF8(const char* str, size_t length)
 {
 	clear();
-	expand(length);		// Possibly too large, but that's better than reallocations
+	reserve(length);		// Possibly too large, but that's better than reallocations
 
 	while (length > 0)
 	{

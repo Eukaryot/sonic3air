@@ -58,6 +58,7 @@ public:
 
 	StringTemplate& clear();
 	void recount();
+	void reserve(size_t newReservedLength);
 	void expand(int newLength);
 	void expand(size_t newLength) { expand((int)newLength); }
 	void expand(int newLength, int insertspace);

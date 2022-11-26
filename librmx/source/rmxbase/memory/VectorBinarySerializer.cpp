@@ -150,36 +150,19 @@ void VectorBinarySerializer::serialize(std::string& value, size_t stringLengthLi
 {
 	if (mReading)
 	{
-		const size_t length = (stringLengthLimit <= 0xff) ? static_cast<size_t>(read<uint8>()) : (stringLengthLimit <= 0xffff) ? static_cast<size_t>(read<uint16>()) : read<uint32>();
-
-		// Limit length of strings
-		if (length > stringLengthLimit)
-		{
-			mHasError = true;
-		}
-
-		if (mHasError)
+		const size_t length = readSize(stringLengthLimit);
+		if (length == 0)
 		{
 			value.clear();
-			return;
-		}
-
-		value.resize(length);
-	}
-	else
-	{
-		if (stringLengthLimit <= 0xff)
-		{
-			writeAs<uint8>(value.size());
-		}
-		else if (stringLengthLimit <= 0xffff)
-		{
-			writeAs<uint16>(value.size());
 		}
 		else
 		{
-			writeAs<uint32>(value.size());
+			value.resize(length);
 		}
+	}
+	else
+	{
+		writeSize(value.size(), stringLengthLimit);
 	}
 
 	if (!value.empty())
@@ -188,39 +171,28 @@ void VectorBinarySerializer::serialize(std::string& value, size_t stringLengthLi
 	}
 }
 
-void VectorBinarySerializer::serialize(std::wstring& value)
+void VectorBinarySerializer::serialize(std::wstring& value, size_t stringLengthLimit)
 {
 	if (mReading)
 	{
-		value.resize((size_t)read<uint32>());
-		if (!value.empty())
+		const size_t length = readSize(stringLengthLimit);
+		if (length == 0)
 		{
-		#ifdef PLATFORM_WINDOWS
-			static_assert(sizeof(wchar_t) == 2);
-			read(&value[0], value.length() * sizeof(wchar_t));
-		#else
-			const uint16* pointer = (uint16*)readAccess(value.length() * 2);
-			for (size_t i = 0; i < value.length(); ++i)
-				value[i] = (wchar_t)pointer[i];
-		#endif
+			value.clear();
+		}
+		else
+		{
+			// Read UTF-8 encoded string
+			const char* pointer = (const char*)readAccess(length);
+			if (nullptr != pointer)
+			{
+				rmx::UTF8Conversion::convertFromUTF8(std::string_view(pointer, length), value);
+			}
 		}
 	}
 	else
 	{
-		writeAs<uint32>(value.length());
-		if (!value.empty())
-		{
-			// Write with 2 bytes per character -- TODO: expand to 4 bytes, or encode differently, like UTF-8 instead?
-		#ifdef PLATFORM_WINDOWS
-			static_assert(sizeof(wchar_t) == 2);
-			write(&value[0], value.length() * sizeof(wchar_t));
-		#else
-			const size_t size = value.length() * 2;
-			uint16* pointer = (uint16*)writeAccess(size);
-			for (size_t i = 0; i < value.length(); ++i)
-				pointer[i] = (uint16)value[i];
-		#endif
-		}
+		write(std::wstring_view(value), stringLengthLimit);
 	}
 }
 
@@ -244,13 +216,13 @@ void VectorBinarySerializer::serialize(WString& value)
 	if (mReading)
 	{
 		value.expand((int)read<uint32>());
-		read(value.accessData(), value.length() * sizeof(wchar_t));			// TODO: This is not compatible among different platforms!
+		read(value.accessData(), value.length() * sizeof(wchar_t));			// TODO: This is not compatible among different platforms! Use UTF-8 encoding here as well
 	}
 	else
 	{
 		writeAs<uint32>(value.length());
 		if (!value.empty())
-			write(value.accessData(), value.length() * sizeof(wchar_t));	// TODO: This is not compatible among different platforms!
+			write(value.accessData(), value.length() * sizeof(wchar_t));	// TODO: This is not compatible among different platforms! Use UTF-8 encoding here as well
 	}
 }
 
@@ -258,54 +230,58 @@ void VectorBinarySerializer::serializeData(std::vector<uint8>& data, size_t byte
 {
 	if (isReading())
 	{
-		const size_t numBytes = (bytesLimit <= 0xff) ? static_cast<size_t>(read<uint8>()) : (bytesLimit <= 0xffff) ? static_cast<size_t>(read<uint16>()) : read<uint32>();
-
-		// Limit number of bytes
-		if (numBytes > bytesLimit)
-		{
-			mHasError = true;
-		}
-
-		if (mHasError)
+		const size_t numBytes = readSize(bytesLimit);
+		if (numBytes == 0)
 		{
 			data.clear();
-			return;
-		}
-
-		data.resize(numBytes);
-	}
-	else
-	{
-		if (bytesLimit <= 0xff)
-		{
-			writeAs<uint8>(data.size());
-		}
-		else if (bytesLimit <= 0xffff)
-		{
-			writeAs<uint16>(data.size());
 		}
 		else
 		{
-			writeAs<uint32>(data.size());
+			data.resize(numBytes);
+			serialize(&data[0], data.size());
 		}
 	}
-
-	if (!data.empty())
+	else
 	{
-		serialize(&data[0], data.size());
+		writeSize(data.size(), bytesLimit);
+		if (!data.empty())
+		{
+			serialize(&data[0], data.size());
+		}
+	}
+}
+
+size_t VectorBinarySerializer::readSize(size_t limit)
+{
+	const size_t size = (limit <= 0xff) ? static_cast<size_t>(read<uint8>()) : (limit <= 0xffff) ? static_cast<size_t>(read<uint16>()) : read<uint32>();
+	if (size > limit)
+	{
+		mHasError = true;
+		return 0;
+	}
+	return size;
+}
+
+void VectorBinarySerializer::writeSize(size_t value, size_t limit)
+{
+	if (limit <= 0xff)
+	{
+		writeAs<uint8>(value);
+	}
+	else if (limit <= 0xffff)
+	{
+		writeAs<uint16>(value);
+	}
+	else
+	{
+		writeAs<uint32>(value);
 	}
 }
 
 std::string_view VectorBinarySerializer::readStringView(size_t stringLengthLimit)
 {
-	const size_t length = (stringLengthLimit <= 0xff) ? static_cast<size_t>(read<uint8>()) : (stringLengthLimit <= 0xffff) ? static_cast<size_t>(read<uint16>()) : read<uint32>();
-
-	// Limit length of strings
-	if (length > stringLengthLimit)
-	{
-		mHasError = true;
-	}
-	if (mHasError || length == 0)
+	const size_t length = readSize(stringLengthLimit);
+	if (length == 0)
 	{
 		return std::string_view();
 	}
@@ -316,40 +292,31 @@ std::string_view VectorBinarySerializer::readStringView(size_t stringLengthLimit
 
 void VectorBinarySerializer::write(std::string_view value, size_t stringLengthLimit)
 {
-	if (stringLengthLimit <= 0xff)
-	{
-		writeAs<uint8>(value.size());
-	}
-	else if (stringLengthLimit <= 0xffff)
-	{
-		writeAs<uint16>(value.size());
-	}
-	else
-	{
-		writeAs<uint32>(value.size());
-	}
-
+	writeSize(value.length(), stringLengthLimit);
 	if (!value.empty())
 	{
 		write(&value[0], value.length());
 	}
 }
 
-void VectorBinarySerializer::write(std::wstring_view value)
+void VectorBinarySerializer::write(std::wstring_view value, size_t stringLengthLimit)
 {
-	writeAs<uint32>(value.length());
-	if (!value.empty())
+	if (value.empty())
 	{
-		// Write with 2 bytes per character -- TODO: expand to 4 bytes, or encode differently, like UTF-8 instead?
-	#ifdef PLATFORM_WINDOWS
-		static_assert(sizeof(wchar_t) == 2);
-		write(&value[0], value.length() * sizeof(wchar_t));
-	#else
-		const size_t size = value.length() * 2;
-		uint16* pointer = (uint16*)writeAccess(size);
-		for (size_t i = 0; i < value.length(); ++i)
-			pointer[i] = (uint16)value[i];
-	#endif
+		writeSize(value.length(), stringLengthLimit);
+	}
+	else
+	{
+		// Write as UTF-8 string
+		const size_t encodedLength = rmx::UTF8Conversion::getLengthAsUTF8(value);
+		writeSize(encodedLength, stringLengthLimit);
+
+		char* pointer = (char*)writeAccess(encodedLength);
+		for (wchar_t ch : value)
+		{
+			const size_t encodedLength = rmx::UTF8Conversion::writeCharacterAsUTF8((uint32)ch, pointer);
+			pointer += encodedLength;
+		}
 	}
 }
 
