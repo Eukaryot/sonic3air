@@ -23,8 +23,6 @@ namespace lemon
 			MOVE_STACK,
 			MOVE_VAR_STACK,
 			PUSH_CONSTANT,
-			DUPLICATE,		// Not created any more, could be removed sooner or later
-			EXCHANGE,		// Not created any more, could be removed sooner or later
 			GET_VARIABLE_VALUE,
 			SET_VARIABLE_VALUE,
 			READ_MEMORY,

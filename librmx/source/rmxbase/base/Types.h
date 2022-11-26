@@ -44,6 +44,3 @@ typedef signed int		int32;
 typedef unsigned int	uint32;
 typedef int64_t			int64;
 typedef uint64_t		uint64;
-
-typedef uint8  BYTE;
-typedef uint32 UINT;

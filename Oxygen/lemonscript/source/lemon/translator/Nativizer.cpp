@@ -750,8 +750,6 @@ namespace lemon
 			{
 				const Opcode& opcode = opcodes[index];
 				RMX_ASSERT(opcode.mType != Opcode::Type::MAKE_BOOL, "MAKE_BOOL should not occur any more");
-				RMX_ASSERT(opcode.mType != Opcode::Type::DUPLICATE, "DUPLICATE should not occur any more");
-				RMX_ASSERT(opcode.mType != Opcode::Type::EXCHANGE, "EXCHANGE should not occur any more");
 
 				const bool isSupported = (opcode.mType == Opcode::Type::MOVE_STACK ||
 										  //opcode.mType == Opcode::Type::MOVE_VAR_STACK ||

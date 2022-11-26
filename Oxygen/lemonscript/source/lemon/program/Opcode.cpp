@@ -21,8 +21,6 @@ namespace lemon
 			case Type::MOVE_STACK:			return "MOVE_STACK";
 			case Type::MOVE_VAR_STACK:		return "MOVE_VAR_STACK";
 			case Type::PUSH_CONSTANT:		return "PUSH_CONSTANT";
-			case Type::DUPLICATE:			return "DUPLICATE";
-			case Type::EXCHANGE:			return "EXCHANGE";
 			case Type::GET_VARIABLE_VALUE:	return "GET_VARIABLE_VALUE";
 			case Type::SET_VARIABLE_VALUE:	return "SET_VARIABLE_VALUE";
 			case Type::READ_MEMORY:			return "READ_MEMORY";

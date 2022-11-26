@@ -20,14 +20,12 @@ namespace lemon
 		static const std::vector<Function*> EMPTY_FUNCTIONS;
 		static const SourceFileInfo EMPTY_SOURCE_FILE_INFO;
 
-		static BaseType DEFAULT_OPCODE_BASETYPES[(size_t)Opcode::Type::_NUM_TYPES] =
+		static const BaseType DEFAULT_OPCODE_BASETYPES[(size_t)Opcode::Type::_NUM_TYPES] =
 		{
 			BaseType::VOID,			// NOP
 			BaseType::VOID,			// MOVE_STACK
 			BaseType::VOID,			// MOVE_VAR_STACK
 			BaseType::INT_CONST,	// PUSH_CONSTANT
-			BaseType::VOID,			// DUPLICATE
-			BaseType::VOID,			// EXCHANGE
 			BaseType::UINT_32,		// GET_VARIABLE_VALUE
 			BaseType::UINT_32,		// SET_VARIABLE_VALUE
 			BaseType::UINT_8,		// READ_MEMORY
@@ -67,6 +65,7 @@ namespace lemon
 		mModuleName(name),
 		mModuleId(rmx::getMurmur2_64(name) & 0xffffffffffff0000ull)
 	{
+		static_assert((size_t)Opcode::Type::_NUM_TYPES == 35);	// Otherwise DEFAULT_OPCODE_BASETYPES needs to get updated
 	}
 
 	Module::~Module()

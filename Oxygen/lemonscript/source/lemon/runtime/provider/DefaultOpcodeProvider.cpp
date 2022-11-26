@@ -118,22 +118,6 @@ namespace lemon
 			++context.mControlFlow->mValueStackPtr;
 		}
 
-		static void exec_DUPLICATE(const RuntimeOpcodeContext context)
-		{
-			// TODO: Unused, should be removed
-			*context.mControlFlow->mValueStackPtr = *(context.mControlFlow->mValueStackPtr-1);
-			++context.mControlFlow->mValueStackPtr;
-		}
-
-		static void exec_EXCHANGE(const RuntimeOpcodeContext context)
-		{
-			// TODO: Unused, should be removed
-			const uint64 value1 = *(context.mControlFlow->mValueStackPtr-1);
-			const uint64 value2 = *(context.mControlFlow->mValueStackPtr-2);
-			*(context.mControlFlow->mValueStackPtr-1) = value2;
-			*(context.mControlFlow->mValueStackPtr-2) = value1;
-		}
-
 		static void exec_GET_VARIABLE_VALUE_LOCAL(const RuntimeOpcodeContext context)
 		{
 			const uint32 variableId = context.getParameter<uint32>();
@@ -387,8 +371,6 @@ namespace lemon
 				break;
 
 			case Opcode::Type::PUSH_CONSTANT:	runtimeOpcode.mExecFunc = &OpcodeExec::exec_PUSH_CONSTANT;	break;
-			case Opcode::Type::DUPLICATE:		runtimeOpcode.mExecFunc = &OpcodeExec::exec_DUPLICATE;		break;
-			case Opcode::Type::EXCHANGE:		runtimeOpcode.mExecFunc = &OpcodeExec::exec_EXCHANGE;		break;
 
 			case Opcode::Type::GET_VARIABLE_VALUE:
 			{
