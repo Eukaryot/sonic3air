@@ -454,11 +454,12 @@ namespace lemon
 		//  - 0x0c = Added address hook serialization
 		//  - 0x0d = Support for function alias names + added function flags as a small optimization
 		//  - 0x0e = Change in serialization of std::wstring in rmx
+		//  - 0x0f = Smaller optimizations in serialization
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";	// "Lemonscript Module"
-		const uint16 MINIMUM_VERSION = 0x0e;
-		uint16 version = 0x0e;
+		const uint16 MINIMUM_VERSION = 0x0f;
+		uint16 version = 0x0f;
 
 		if (outerSerializer.isReading())
 		{
@@ -638,7 +639,8 @@ namespace lemon
 								case 3:  opcode.mParameter = serializer.read<int8>();	break;
 								case 4:  opcode.mParameter = serializer.read<int16>();	break;
 								case 5:  opcode.mParameter = serializer.read<int32>();	break;
-								case 6:  opcode.mParameter = serializer.read<int64>();	break;
+								case 6:  opcode.mParameter = serializer.read<uint32>();	break;
+								case 7:  opcode.mParameter = serializer.read<int64>();	break;
 							}
 
 							opcode.mDataType = hasDataType ? (BaseType)serializer.read<uint8>() : DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType];
@@ -770,7 +772,8 @@ namespace lemon
 														(opcode.mParameter == -1) ? 2 :
 														(opcode.mParameter == (int64)(int8)opcode.mParameter)  ? 3 :
 														(opcode.mParameter == (int64)(int16)opcode.mParameter) ? 4 :
-														(opcode.mParameter == (int64)(int32)opcode.mParameter) ? 5 : 6;
+														(opcode.mParameter == (int64)(int32)opcode.mParameter) ? 5 :
+														(opcode.mParameter == (int64)(uint32)opcode.mParameter) ? 6 : 7;
 							const bool hasDataType     = (opcode.mDataType != DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType]);
 							const bool isSequenceBreak = (opcode.mFlags & Opcode::Flag::SEQ_BREAK) != 0;
 							const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber < lastLineNumber + 31) ? (opcode.mLineNumber - lastLineNumber) : 31;
@@ -783,7 +786,8 @@ namespace lemon
 								case 3:  serializer.writeAs<int8>(opcode.mParameter);	break;
 								case 4:  serializer.writeAs<int16>(opcode.mParameter);	break;
 								case 5:  serializer.writeAs<int32>(opcode.mParameter);	break;
-								case 6:  serializer.write(opcode.mParameter);			break;
+								case 6:  serializer.writeAs<uint32>(opcode.mParameter);	break;
+								case 7:  serializer.write(opcode.mParameter);			break;
 								default: break;
 							}
 

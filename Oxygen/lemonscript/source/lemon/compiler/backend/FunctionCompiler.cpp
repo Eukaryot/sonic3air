@@ -1073,6 +1073,7 @@ namespace lemon
 								{
 									// The conditional jump at the start is not needed any more, but we need to consume one item from the stack (namely the condition)
 									mOpcodes[i].mType = Opcode::Type::MOVE_STACK;
+									mOpcodes[i].mDataType = BaseType::VOID;			// Because that's what we generally use for MOVE_STACK
 									mOpcodes[i].mParameter = -1;
 									mOpcodes[i].mFlags &= Opcode::Flag::NEW_LINE;	// Clear all other flags
 								}
