@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/application/input/InputConfig.h"
+#include "oxygen/application/input/RumbleEffectQueue.h"
 
 
 class InputManager;
@@ -159,8 +160,8 @@ public:
 	void setControlState(Control& control, bool pressed);
 	void setTouchInputMode(TouchInputMode mode);
 
-	void resetControllerRumbleForPlayer(int playerIndex) const;
-	void setControllerRumbleForPlayer(int playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint32 milliseconds) const;
+	void resetControllerRumbleForPlayer(int playerIndex);
+	void setControllerRumbleForPlayer(int playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint32 milliseconds);
 
 	void setControllerLEDsForPlayer(int playerIndex, const Color& color) const;
 
@@ -185,6 +186,8 @@ private:
 	bool isPressed(const Control& control);
 	bool isPressed(const ControlInput& input);
 	bool isPressed(SDL_Joystick* joystick, const ControlInput& input);
+
+	void reapplyControllerRumble(int playerIndex);
 
 private:
 	ControllerScheme mController[2];
@@ -212,4 +215,6 @@ private:
 
 	TouchInputMode mTouchInputMode = TouchInputMode::HIDDEN_CONTROLS;
 	WaitInputState mWaitingForSingleInput = WaitInputState::NONE;
+
+	RumbleEffectQueue mRumbleEffectQueue[2];	// One for each player
 };

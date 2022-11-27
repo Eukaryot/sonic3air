@@ -406,6 +406,9 @@
     <ClCompile Include="..\..\source\oxygen\helper\Downloader.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp">
+      <Filter>application\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -750,6 +753,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\Downloader.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h">
+      <Filter>application\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

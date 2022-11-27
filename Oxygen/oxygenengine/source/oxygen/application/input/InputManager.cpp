@@ -413,6 +413,16 @@ void InputManager::updateInput(float timeElapsed)
 				break;
 		}
 	}
+
+	// Update controller rumble
+	const uint32 currentTicks = SDL_GetTicks();
+	for (int playerIndex = 0; playerIndex < 2; ++playerIndex)
+	{
+		if (mRumbleEffectQueue[playerIndex].removeExpiredEffects(currentTicks))
+		{
+			reapplyControllerRumble(playerIndex);
+		}
+	}
 }
 
 void InputManager::injectSDLInputEvent(const SDL_Event& ev)
@@ -850,29 +860,25 @@ void InputManager::setTouchInputMode(TouchInputMode mode)
 	}
 }
 
-void InputManager::resetControllerRumbleForPlayer(int playerIndex) const
+void InputManager::resetControllerRumbleForPlayer(int playerIndex)
 {
-	setControllerRumbleForPlayer(playerIndex, 0.0f, 0.0f, 0);
-}
-
-void InputManager::setControllerRumbleForPlayer(int playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint32 milliseconds) const
-{
-#if SDL_VERSION_ATLEAST(2, 0, 18)
 	if (playerIndex >= 0 && playerIndex < 2)
 	{
-		const float intensity = clamp(Configuration::instance().mControllerRumbleIntensity[playerIndex], 0.0f, 1.0f);
-		const uint16 lowFrequencyRumbleUint16 = (uint16)roundToInt(lowFrequencyRumble * intensity * 65535.0f);
-		const uint16 highFrequencyRumbleUint16 = (uint16)roundToInt(highFrequencyRumble * intensity * 65535.0f);
+		mRumbleEffectQueue[playerIndex].reset();
+		reapplyControllerRumble(playerIndex);
+	}
+}
 
-		for (size_t i = 0; i < mGamepads.size(); ++i)
+void InputManager::setControllerRumbleForPlayer(int playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint32 milliseconds)
+{
+	if (playerIndex >= 0 && playerIndex < 2)
+	{
+		const uint32 endTicks = SDL_GetTicks() + milliseconds;
+		if (mRumbleEffectQueue[playerIndex].addEffect(lowFrequencyRumble, highFrequencyRumble, endTicks))
 		{
-			if (mGamepads[i].mAssignedPlayer == playerIndex && nullptr != mGamepads[i].mSDLJoystick)
-			{
-				SDL_JoystickRumble(mGamepads[i].mSDLJoystick, lowFrequencyRumbleUint16, highFrequencyRumbleUint16, milliseconds);
-			}
+			reapplyControllerRumble(playerIndex);
 		}
 	}
-#endif
 }
 
 void InputManager::setControllerLEDsForPlayer(int playerIndex, const Color& color) const
@@ -989,4 +995,23 @@ bool InputManager::isPressed(SDL_Joystick* joystick, const ControlInput& input)
 		}
 	}
 	return false;
+}
+
+void InputManager::reapplyControllerRumble(int playerIndex)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	const float intensity = clamp(Configuration::instance().mControllerRumbleIntensity[playerIndex], 0.0f, 1.0f);
+	const float lowFreqIntensity = mRumbleEffectQueue[playerIndex].getCurrentLowFreqIntensity();
+	const float highFreqIntensity = mRumbleEffectQueue[playerIndex].getCurrentHighFreqIntensity();
+	const uint16 lowFrequencyRumbleUint16 = (uint16)roundToInt(lowFreqIntensity * intensity * 65535.0f);
+	const uint16 highFrequencyRumbleUint16 = (uint16)roundToInt(highFreqIntensity * intensity * 65535.0f);
+
+	for (size_t i = 0; i < mGamepads.size(); ++i)
+	{
+		if (mGamepads[i].mAssignedPlayer == playerIndex && nullptr != mGamepads[i].mSDLJoystick)
+		{
+			SDL_JoystickRumble(mGamepads[i].mSDLJoystick, lowFrequencyRumbleUint16, highFrequencyRumbleUint16, 0xffff);
+		}
+	}
+#endif
 }

@@ -35,6 +35,7 @@
     <ClCompile Include="..\..\source\oxygen\application\input\InputConfig.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\input\InputRecorder.cpp" />
+    <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\mainview\GameView.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\GameSetupScreen.cpp" />
     <ClCompile Include="..\..\source\oxygen\application\menu\MenuItems.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="..\..\source\oxygen\application\input\InputConfig.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputManager.h" />
     <ClInclude Include="..\..\source\oxygen\application\input\InputRecorder.h" />
+    <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h" />
     <ClInclude Include="..\..\source\oxygen\application\mainview\GameView.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\GameSetupScreen.h" />
     <ClInclude Include="..\..\source\oxygen\application\menu\MenuItems.h" />
