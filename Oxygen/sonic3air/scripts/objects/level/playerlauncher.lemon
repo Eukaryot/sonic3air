@@ -113,6 +113,9 @@ function void fn03b9d8()
 			u8[A0 + 0x30] = 0x0c
 			u8[A0 + 0x31] = 0x04
 			playSound(0xa2)
+		#if STANDALONE
+			Input.setControllerRumbleByAddress(A1, 0.0f, 0.75f, 150)
+		#endif
 		}
 	}
 }

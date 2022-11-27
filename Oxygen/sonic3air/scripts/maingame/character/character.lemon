@@ -878,6 +878,9 @@ function void UpdateTailsFlight_innerB()
 			if (((level.framecounter.low + 8) & 0x0f) == 0)
 			{
 				playSound((char.state == char.state.TAILS_FLYTIRED) ? 0xbb : 0xba)
+			#if STANDALONE
+				Input.setControllerRumbleByAddress(A0, 0.0f, 0.1f, 150)
+			#endif
 			}
 		}
 	}
@@ -1334,6 +1337,9 @@ function void UpdateKnucklesGlideCollision()
 						else
 						{
 							playSound(SFX_GRAB)
+						#if STANDALONE
+							Input.setControllerRumbleByAddress(A0, 0.5f, 0.0f, 200)
+						#endif
 						}
 
 						char.groundspeed = 0
@@ -1475,6 +1481,9 @@ function void UpdateKnucklesGlideCollision()
 				{
 					playSound(0x7e)
 				}
+			#if STANDALONE
+				Input.setControllerRumbleByAddress(A0, 0.2f, 0.2f, 100)
+			#endif
 			}
 			else
 			{
@@ -2766,7 +2775,7 @@ function void Character.updateJumpMoves()
 							Audio.playAudio("dropdash_charge", AudioContext.CONTEXT_SOUND)
 						}
 					}
-					Input.setControllerRumble((A0 == 0xffffb04a) ? 1 : 0, 0.0f, 0.25f, 100)
+					Input.setControllerRumbleByAddress(A0, 0.0f, 0.25f, 100)
 				}
 				else if (sonic.dropdash_counter > 0)
 				{
@@ -4011,7 +4020,9 @@ function void releaseSpindash()
 	u8[A6 + 0x20] = 0
 
 	playSound(SFX_SPINDASH_RELEASE)
-	Input.setControllerRumble((A0 == 0xffffb04a) ? 1 : 0, 0.0f, 1.0f, 150)
+#if STANDALONE
+	Input.setControllerRumbleByAddress(A0, 0.0f, 1.0f, 150)
+#endif
 }
 
 
@@ -4149,7 +4160,9 @@ function bool Character.updateSuperPeelout()
 			if (abs(char.groundspeed) >= 0x0a00)
 				sonic.fastrunanim.timer = 30
 
-			Input.setControllerRumble((A0 == 0xffffb04a) ? 1 : 0, 0.0f, 0.25f, 100)
+		#if STANDALONE
+			Input.setControllerRumbleByAddress(A0, 0.0f, 0.25f, 100)
+		#endif
 		}
 		else
 		{
