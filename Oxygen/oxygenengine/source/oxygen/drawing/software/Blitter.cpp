@@ -30,9 +30,9 @@ namespace blitterinternal
 	inline void blendColors(uint8* dst, const uint8* src)
 	{
 		const uint16 alpha = src[3];
-		dst[0] = (uint8)(src[0] * alpha + dst[0] * (255 - alpha)) / 255;
-		dst[1] = (uint8)(src[1] * alpha + dst[1] * (255 - alpha)) / 255;
-		dst[2] = (uint8)(src[2] * alpha + dst[2] * (255 - alpha)) / 255;
+		dst[0] = (uint8)((src[0] * alpha + dst[0] * (255 - alpha)) / 255);
+		dst[1] = (uint8)((src[1] * alpha + dst[1] * (255 - alpha)) / 255);
+		dst[2] = (uint8)((src[2] * alpha + dst[2] * (255 - alpha)) / 255);
 		dst[3] |= src[3];	// Assume at least one of both is 0xff, or both are 0
 	}
 
