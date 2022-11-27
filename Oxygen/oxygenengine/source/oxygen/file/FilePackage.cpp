@@ -11,7 +11,7 @@
 #include "oxygen/helper/Utils.h"
 
 
-bool FilePackage::loadPackage(const std::wstring& packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll)
+bool FilePackage::loadPackage(const std::wstring& packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll, bool showErrors)
 {
 	// Try to load the package
 	RMX_ASSERT(nullptr == inputStream, "Input stream was already opened");
@@ -28,8 +28,17 @@ bool FilePackage::loadPackage(const std::wstring& packageFilename, std::map<std:
 	PackageHeader header;
 	if (!readPackageHeader(header, serializer))
 	{
-		RMX_CHECK(header.mFormatVersion == PackageHeader::CURRENT_FORMAT_VERSION, "Unsupported format version " << header.mFormatVersion << " of file '" << WString(packageFilename).toStdString() << "'", return false);
-		RMX_ERROR("Invalid signature of file '" << WString(packageFilename).toStdString() << "'", );
+		if (showErrors)
+		{
+			if (header.mFormatVersion == PackageHeader::CURRENT_FORMAT_VERSION)
+			{
+				RMX_ERROR("Unsupported format version " << header.mFormatVersion << " of file '" << WString(packageFilename).toStdString() << "'", );
+			}
+			else
+			{
+				RMX_ERROR("Invalid signature of file '" << WString(packageFilename).toStdString() << "'", );
+			}
+		}
 		return false;
 	}
 
@@ -41,7 +50,8 @@ bool FilePackage::loadPackage(const std::wstring& packageFilename, std::map<std:
 	// Read entry headers
 	for (size_t i = 0; i < header.mNumEntries; ++i)
 	{
-		const std::wstring key = serializer.read<std::wstring>();
+		std::wstring key;
+		serializer.serialize(key, 1024);
 		PackedFile& packedFile = outPackedFiles[key];
 		packedFile.mPath = key;
 		packedFile.mPositionInFile = serializer.read<uint32>();
@@ -107,7 +117,7 @@ void FilePackage::createFilePackage(const std::wstring& packageFilename, const s
 	{
 		std::map<std::wstring, PackedFile> existingPackedFiles;
 		InputStream* inputStream = nullptr;
-		if (loadPackage(comparisonPath + packageFilename, existingPackedFiles, inputStream, true))
+		if (loadPackage(comparisonPath + packageFilename, existingPackedFiles, inputStream, true, false))
 		{
 			delete inputStream;
 
@@ -149,24 +159,24 @@ void FilePackage::createFilePackage(const std::wstring& packageFilename, const s
 		serializer.writeAs<uint32>(0);		// Will get overwritten
 
 		serializer.writeAs<uint32>(packedFiles.size());
-		for (auto& pair : packedFiles)
+		for (auto& [key, packedFile] : packedFiles)
 		{
-			serializer.write(pair.first);
-			pair.second.mPositionInFile = (uint32)output.size();	// Temporarily misusing this variable to store the position where to write the content's position in file when it got determined
+			serializer.write(key, 1024);
+			packedFile.mPositionInFile = (uint32)output.size();		// Temporarily misusing this variable to store the position where to write the content's position in file when it got determined
 			serializer.writeAs<uint32>(0);							// Will get overwritten
-			serializer.writeAs<uint32>(pair.second.mContent.size());
+			serializer.writeAs<uint32>(packedFile.mContent.size());
 		}
 
 		// Write entry header size
 		entryHeaderSize = output.size() - PackageHeader::HEADER_SIZE;
 		*(uint32*)&output[headerSizePosition] = (uint32)entryHeaderSize;
 
-		for (auto& pair : packedFiles)
+		for (auto& [key, packedFile] : packedFiles)
 		{
 			const uint32 position = (uint32)output.size();
-			serializer.write(&pair.second.mContent[0], pair.second.mContent.size());
-			*(uint32*)&output[pair.second.mPositionInFile] = position;
-			pair.second.mPositionInFile = position;
+			serializer.write(&packedFile.mContent[0], packedFile.mContent.size());
+			*(uint32*)&output[packedFile.mPositionInFile] = position;
+			packedFile.mPositionInFile = position;
 		}
 	}
 

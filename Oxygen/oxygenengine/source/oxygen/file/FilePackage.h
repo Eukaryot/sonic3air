@@ -26,7 +26,7 @@ public:
 	struct PackageHeader
 	{
 		static const constexpr char SIGNATURE[] = "OPCK";
-		static const constexpr uint32 CURRENT_FORMAT_VERSION = 2;
+		static const constexpr uint32 CURRENT_FORMAT_VERSION = 3;
 		static const constexpr size_t HEADER_SIZE = 20;
 
 		uint32 mFormatVersion = CURRENT_FORMAT_VERSION;
@@ -36,7 +36,7 @@ public:
 	};
 
 public:
-	static bool loadPackage(const std::wstring& packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll);
+	static bool loadPackage(const std::wstring& packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll, bool showErrors = true);
 	static void createFilePackage(const std::wstring& packageFilename, const std::vector<std::wstring>& includedPaths, const std::vector<std::wstring>& excludedPaths, const std::wstring& comparisonPath, uint32 contentVersion, bool forceReplace = false);
 
 private:
