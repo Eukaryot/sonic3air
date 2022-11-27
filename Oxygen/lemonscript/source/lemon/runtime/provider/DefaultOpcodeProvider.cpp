@@ -57,7 +57,7 @@ namespace lemon
 
 	#define SELECT_EXEC_FUNC_BY_DATATYPE_SIGNED(_function_) \
 	{ \
-		const BaseType baseType = ((uint8)opcode.mDataType < 0x20) ? (BaseType)((int)opcode.mDataType | 0x08) : opcode.mDataType; \
+		const BaseType baseType = BaseTypeHelper::isIntegerType(opcode.mDataType) ? BaseTypeHelper::makeIntegerSigned(opcode.mDataType) : opcode.mDataType; \
 		switch (baseType) \
 		{ \
 			case BaseType::INT_8:		runtimeOpcode.mExecFunc = &_function_<int8>;	break; \

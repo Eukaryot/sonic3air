@@ -1,9 +1,4 @@
 
-//# script-feature-level(2)
-
-include unittests
-
-
 constant u8 ONE = 1
 
 constant array<u8> fibonacci =
@@ -14,7 +9,7 @@ constant array<u8> fibonacci =
 }
 
 
-function void main()
+function void script01()
 {
 #if 0
 	// Test for floats
@@ -82,7 +77,4 @@ function void main()
 	else
 		Log = 0
 #endif
-
-	debugLog("")	// Empty line
-	runTests()
 }

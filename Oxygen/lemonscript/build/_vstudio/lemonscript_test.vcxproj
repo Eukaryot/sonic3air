@@ -23,7 +23,8 @@
     <ClCompile Include="..\..\source\NativizedCode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\script\main.lemon" />
+    <None Include="..\..\script\mainscript.lemon" />
+    <None Include="..\..\script\script01.lemon" />
     <None Include="..\..\script\unittests.lemon" />
     <None Include="..\..\source\NativizedCode.inc" />
   </ItemGroup>

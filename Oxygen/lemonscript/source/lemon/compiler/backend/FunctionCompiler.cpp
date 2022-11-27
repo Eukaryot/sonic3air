@@ -164,10 +164,8 @@ namespace lemon
 			type == Opcode::Type::ARITHM_SHL || type == Opcode::Type::ARITHM_NEG || type == Opcode::Type::ARITHM_NOT || type == Opcode::Type::ARITHM_BITNOT ||
 			type == Opcode::Type::COMPARE_EQ || type == Opcode::Type::COMPARE_NEQ)
 		{
-			if (((uint8)dataType & 0xf8) == 0x18)
-			{
-				dataType = (BaseType)((uint8)dataType & ~0x0c);		// Remove flag 0x08 (signed flag) - and also 0x04 to convert CONST_INT to UINT64
-			}
+			// This won't make any changes floating point types
+			dataType = BaseTypeHelper::makeIntegerUnsigned(dataType);
 		}
 
 		Opcode& opcode = vectorAdd(mOpcodes);

@@ -6,10 +6,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\source\NativizedCode.inc" />
-    <None Include="..\..\script\main.lemon">
+    <None Include="..\..\script\unittests.lemon">
       <Filter>script</Filter>
     </None>
-    <None Include="..\..\script\unittests.lemon">
+    <None Include="..\..\script\mainscript.lemon">
+      <Filter>script</Filter>
+    </None>
+    <None Include="..\..\script\script01.lemon">
       <Filter>script</Filter>
     </None>
   </ItemGroup>

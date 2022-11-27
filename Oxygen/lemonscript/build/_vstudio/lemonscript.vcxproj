@@ -84,6 +84,7 @@
     <ClInclude Include="..\..\source\lemon\compiler\TypeCasting.h" />
     <ClInclude Include="..\..\source\lemon\compiler\Utility.h" />
     <ClInclude Include="..\..\source\lemon\pch.h" />
+    <ClInclude Include="..\..\source\lemon\program\BaseType.h" />
     <ClInclude Include="..\..\source\lemon\program\Constant.h" />
     <ClInclude Include="..\..\source\lemon\program\ConstantArray.h" />
     <ClInclude Include="..\..\source\lemon\program\DataType.h" />

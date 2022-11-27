@@ -92,8 +92,6 @@ namespace lemon
 
 			Node* mDest = nullptr;
 			Node* mSource = nullptr;
-			BaseType mDataType = BaseType::INT_CONST;
-			bool mExplicitCast = false;
 			size_t mOpcodeIndex = 0;
 
 			void outputParameter(std::string& line, int64 value, BaseType dataType = BaseType::INT_CONST, bool isPointer = false) const;
@@ -107,7 +105,7 @@ namespace lemon
 		uint64 buildSubtypeInfos(const Opcode* opcodes, size_t numOpcodes, MemoryAccessHandler& memoryAccessHandler);
 		void buildAssignmentsFromOpcodes(const Opcode* opcodes);
 		void performPostProcessing();
-		void generateCppCode(CppWriter& writer, const ScriptFunction& function, uint64 hash);
+		void generateCppCode(CppWriter& writer, const ScriptFunction& function, const Opcode& firstOpcode, uint64 hash);
 
 	public:
 		std::vector<OpcodeInfo> mOpcodeInfos;

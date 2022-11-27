@@ -244,7 +244,7 @@ int main(int argc, char** argv)
 		std::cout << "=== Compilation ===\r\n";
 		lemon::CompileOptions options;
 		Compiler compiler(module, globalsLookup, options);
-		const bool compileSuccess = compiler.loadScript(L"script/main.lemon");
+		const bool compileSuccess = compiler.loadScript(L"script/mainscript.lemon");
 		if (!compileSuccess)
 		{
 			for (const Compiler::ErrorMessage& error : compiler.getErrors())

@@ -142,22 +142,23 @@ namespace lemon
 
 			case Opcode::Type::GET_VARIABLE_VALUE:
 			case Opcode::Type::SET_VARIABLE_VALUE:
-				outInfo.mSubtypeData |= ((uint32)firstOpcode.mDataType & 0xf7) << 16;		// Data type, ignoring signed/unsigned
-				outInfo.mSubtypeData |= (firstOpcode.mParameter >> 28);						// Variable type
+				outInfo.mSubtypeData |= ((uint32)BaseTypeHelper::makeIntegerUnsigned(firstOpcode.mDataType)) << 16;		// Data type, ignoring signed/unsigned
+				outInfo.mSubtypeData |= (firstOpcode.mParameter >> 28);													// Variable type
 				break;
 
 			case Opcode::Type::READ_MEMORY:
-				outInfo.mSubtypeData |= ((uint32)firstOpcode.mDataType & 0xf7) << 16;		// Data type, ignoring signed/unsigned
-				outInfo.mSubtypeData |= firstOpcode.mParameter;								// Flag for variant that does not consume its input
+				outInfo.mSubtypeData |= ((uint32)BaseTypeHelper::makeIntegerUnsigned(firstOpcode.mDataType)) << 16;		// Data type, ignoring signed/unsigned
+				outInfo.mSubtypeData |= firstOpcode.mParameter;															// Flag for variant that does not consume its input
 				break;
 
 			case Opcode::Type::WRITE_MEMORY:
-				outInfo.mSubtypeData |= ((uint32)firstOpcode.mDataType & 0xf7) << 16;		// Data type, ignoring signed/unsigned
-				outInfo.mSubtypeData |= firstOpcode.mParameter;								// Flag for exchanged inputs variant
+				outInfo.mSubtypeData |= ((uint32)BaseTypeHelper::makeIntegerUnsigned(firstOpcode.mDataType)) << 16;		// Data type, ignoring signed/unsigned
+				outInfo.mSubtypeData |= firstOpcode.mParameter;															// Flag for exchanged inputs variant
 				break;
 
 			case Opcode::Type::CAST_VALUE:
-				outInfo.mSubtypeData |= (uint32)OpcodeHelper::getCastTargetType(firstOpcode);	// Type of cast
+				outInfo.mSubtypeData |= (uint32)OpcodeHelper::getCastSourceType(firstOpcode) << 16;		// Type of cast
+				outInfo.mSubtypeData |= (uint32)OpcodeHelper::getCastTargetType(firstOpcode);			// Type of cast
 				break;
 
 			case Opcode::Type::ARITHM_ADD:
@@ -171,7 +172,7 @@ namespace lemon
 			case Opcode::Type::ARITHM_BITNOT:
 			case Opcode::Type::COMPARE_EQ:
 			case Opcode::Type::COMPARE_NEQ:
-				outInfo.mSubtypeData |= ((uint32)firstOpcode.mDataType & 0xf7) << 16;		// Data type, ignoring signed/unsigned
+				outInfo.mSubtypeData |= ((uint32)BaseTypeHelper::makeIntegerUnsigned(firstOpcode.mDataType)) << 16;		// Data type, ignoring signed/unsigned
 				break;
 
 			case Opcode::Type::ARITHM_MUL:
@@ -354,7 +355,7 @@ namespace lemon
 		nativizerInternal.performPostProcessing();
 
 		// Generate code for the assignments
-		nativizerInternal.generateCppCode(writer, function, hash);
+		nativizerInternal.generateCppCode(writer, function, opcodes[0], hash);
 
 		// Register
 		for (size_t index = 1; index < nativizerInternal.mOpcodeInfos.size() - 1; ++index)

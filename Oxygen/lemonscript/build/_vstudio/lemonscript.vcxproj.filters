@@ -323,6 +323,9 @@
     <ClInclude Include="..\..\source\lemon\translator\NativizerInternal.h">
       <Filter>lemon\translator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\lemon\program\BaseType.h">
+      <Filter>lemon\program</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

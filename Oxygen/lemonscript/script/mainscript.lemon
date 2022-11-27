@@ -1,0 +1,29 @@
+
+//# script-feature-level(2)
+
+#if 0
+
+
+function void main()
+{
+	u32 a = 0xfffff4e4
+	u16 result = (0xfffff580 - (a + 4)) / 8
+	Log = result
+}
+
+
+#else
+
+
+include script01
+include unittests
+
+function void main()
+{
+	script01()
+	debugLog("")	// Empty line
+	runTests()
+}
+
+
+#endif
