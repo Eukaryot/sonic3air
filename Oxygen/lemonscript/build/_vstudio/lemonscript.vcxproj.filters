@@ -326,6 +326,9 @@
     <ClInclude Include="..\..\source\lemon\program\BaseType.h">
       <Filter>lemon\program</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\lemon\utility\QuickDataHasher.h">
+      <Filter>lemon\utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="lemonscript.natvis" />

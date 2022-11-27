@@ -291,7 +291,7 @@ bool SaveStateSerializer::readGensxState(VectorBinarySerializer& serializer)
 			PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 			uint16 buffer[0x40];
 			serializer.serialize(buffer, 0x80);
-			for (int i = 0; i < 0x40; ++i)
+			for (uint16 i = 0; i < 0x40; ++i)
 			{
 				const uint16 packedColor = (((buffer[i])      & 0x07) << 1)
 										 + (((buffer[i] >> 3) & 0x07) << 5)

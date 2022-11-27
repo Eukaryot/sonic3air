@@ -159,8 +159,8 @@ void SpriteManager::drawVdpSprite(const Vec2i& position, uint8 encodedSize, uint
 	if (EngineMain::getDelegate().useDeveloperFeatures())
 	{
 		// Update "last used atex" of patterns in cache (actually that's only needed for debug output)
-		const int patterns = sprite.mSize.x * sprite.mSize.y;
-		for (int k = 0; k < patterns; ++k)
+		const uint16 patterns = (uint16)(sprite.mSize.x * sprite.mSize.y);
+		for (uint16 k = 0; k < patterns; ++k)
 		{
 			mPatternManager.setLastUsedAtex(sprite.mFirstPattern + k, (sprite.mFirstPattern >> 9) & 0x70);
 		}
@@ -367,8 +367,8 @@ void SpriteManager::collectLegacySprites()
 
 		// Update "last used atex" of patterns in cache (actually that's only needed for debug output)
 		{
-			const int patterns = sprite.mSize.x * sprite.mSize.y;
-			for (int k = 0; k < patterns; ++k)
+			const uint16 patterns = (uint16)(sprite.mSize.x * sprite.mSize.y);
+			for (uint16 k = 0; k < patterns; ++k)
 			{
 				mPatternManager.setLastUsedAtex(data[2] + k, (data[2] >> 9) & 0x70);
 			}

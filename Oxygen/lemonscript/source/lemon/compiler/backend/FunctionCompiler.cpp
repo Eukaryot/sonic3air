@@ -675,9 +675,9 @@ namespace lemon
 
 				for (size_t i = 0; i < ft.mParameters.size(); ++i)
 				{
-					const TokenPtr<StatementToken>& token = ft.mParameters[i];
-					compileTokenTreeToOpcodes(*token);
-					addCastOpcodeIfNecessary(token->mDataType, ft.mFunction->getParameters()[i].mDataType);
+					const TokenPtr<StatementToken>& statementToken = ft.mParameters[i];
+					compileTokenTreeToOpcodes(*statementToken);
+					addCastOpcodeIfNecessary(statementToken->mDataType, ft.mFunction->getParameters()[i].mDataType);
 				}
 
 				// Using the data type parameter here to encode whether or not this is a base function call

@@ -100,8 +100,8 @@ namespace genericmanager
 			template<typename T>
 			FactoryBase& getOrCreateElementFactory()
 			{
-				const uint32 type = (uint32)T::TYPE;
-				if (type < 0x80)
+				const constexpr uint32 type = (uint32)T::TYPE;
+				if constexpr (type < 0x80)
 				{
 					// Use std::vector
 					if (nullptr != mClassFactoriesList[type])

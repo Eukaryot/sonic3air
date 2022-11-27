@@ -30,16 +30,16 @@
 { \
 	if (!(condition)) \
 	{ \
-		std::ostringstream stream; \
-		stream << explanation; \
-		if (rmx::ErrorHandling::handleAssertBreak(severity, stream.str(), __FILE__, __LINE__)) \
+		std::ostringstream _stream_; \
+		_stream_ << explanation; \
+		if (rmx::ErrorHandling::handleAssertBreak(severity, _stream_.str(), __FILE__, __LINE__)) \
 			RMX_DEBUG_BREAK; \
 		reaction; \
 	} \
 }
 
 #ifdef PLATFORM_WINDOWS
-	#define RMX_REACT_THROW throw std::runtime_error(stream.str())
+	#define RMX_REACT_THROW throw std::runtime_error(_stream_.str())
 #else
 	#define RMX_REACT_THROW
 #endif

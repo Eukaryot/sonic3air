@@ -1235,7 +1235,7 @@ TEMPLATE void STRING::writeUnicode(std::vector<uint8>& buffer, UnicodeEncoding e
 
 	if (encoding == UnicodeEncoding::AUTO)
 	{
-		if (sizeof(CHAR) == 1)
+		if constexpr (sizeof(CHAR) == 1)
 			encoding = UnicodeEncoding::ASCII;
 		else
 			encoding = UnicodeEncoding::UTF8;
@@ -1284,23 +1284,23 @@ TEMPLATE void STRING::writeUnicode(std::vector<uint8>& buffer, UnicodeEncoding e
 			}
 			else if (code <= 0x7ff)
 			{
-				ptr[0] = 0xc0 + (code >> 6);
-				ptr[1] = 0x80 + (code & 0x3f);
+				ptr[0] = 0xc0 + (uint8)(code >> 6);
+				ptr[1] = 0x80 + (uint8)(code & 0x3f);
 				ptr += 2;
 			}
 			else if (code <= 0xffff)
 			{
-				ptr[0] = 0xe0 + (code >> 12);
-				ptr[1] = 0x80 + ((code >> 6) & 0x3f);
-				ptr[2] = 0x80 + (code & 0x3f);
+				ptr[0] = 0xe0 + (uint8)(code >> 12);
+				ptr[1] = 0x80 + (uint8)((code >> 6) & 0x3f);
+				ptr[2] = 0x80 + (uint8)(code & 0x3f);
 				ptr += 3;
 			}
 			else
 			{
-				ptr[0] = 0xf0 + (code >> 18);
-				ptr[1] = 0x80 + ((code >> 12) & 0x3f);
-				ptr[2] = 0x80 + ((code >> 6) & 0x3f);
-				ptr[3] = 0x80 + (code & 0x3f);
+				ptr[0] = 0xf0 + (uint8)(code >> 18);
+				ptr[1] = 0x80 + (uint8)((code >> 12) & 0x3f);
+				ptr[2] = 0x80 + (uint8)((code >> 6) & 0x3f);
+				ptr[3] = 0x80 + (uint8)(code & 0x3f);
 				ptr += 4;
 			}
 		}

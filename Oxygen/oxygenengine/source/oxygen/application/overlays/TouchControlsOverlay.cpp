@@ -162,7 +162,6 @@ void TouchControlsOverlay::render()
 	if (mVisibility <= 0.0f)
 		return;
 
-	InputManager& InputManager = InputManager::instance();
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	const float alpha = mVisibility * Configuration::instance().mVirtualGamepad.mOpacity;
 

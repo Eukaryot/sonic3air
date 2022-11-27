@@ -30,9 +30,9 @@ namespace blitterinternal
 	inline void blendColors(uint8* dst, const uint8* src)
 	{
 		const uint16 alpha = src[3];
-		dst[0] = (src[0] * alpha + dst[0] * (255 - alpha)) / 255;
-		dst[1] = (src[1] * alpha + dst[1] * (255 - alpha)) / 255;
-		dst[2] = (src[2] * alpha + dst[2] * (255 - alpha)) / 255;
+		dst[0] = (uint8)(src[0] * alpha + dst[0] * (255 - alpha)) / 255;
+		dst[1] = (uint8)(src[1] * alpha + dst[1] * (255 - alpha)) / 255;
+		dst[2] = (uint8)(src[2] * alpha + dst[2] * (255 - alpha)) / 255;
 		dst[3] |= src[3];	// Assume at least one of both is 0xff, or both are 0
 	}
 
@@ -56,9 +56,9 @@ namespace blitterinternal
 			uint8* dst = (uint8*)destBitmap.getPixelPointer(destRect.x, destRect.y + line);
 			for (int i = 0; i < destRect.width; ++i)
 			{
-				dst[0] = ((dst[0] * multiplicator) >> 8) + additions[0];
-				dst[1] = ((dst[1] * multiplicator) >> 8) + additions[1];
-				dst[2] = ((dst[2] * multiplicator) >> 8) + additions[2];
+				dst[0] = (uint8)(((dst[0] * multiplicator) >> 8) + additions[0]);
+				dst[1] = (uint8)(((dst[1] * multiplicator) >> 8) + additions[1]);
+				dst[2] = (uint8)(((dst[2] * multiplicator) >> 8) + additions[2]);
 				dst[3] = 0xff;
 				dst += 4;
 			}
@@ -80,7 +80,7 @@ namespace blitterinternal
 			{
 				for (int x = 0; x < sourceRect.width; ++x)
 				{
-					*dst = multiplyColors(*(uint32*)src, tintColor);
+					*dst = (uint8)multiplyColors(*(uint32*)src, tintColor);
 					src += 4;
 					dst += 4;
 				}
@@ -355,9 +355,9 @@ void Blitter::blitColor(BitmapWrapper& destBitmap, Recti destRect, const Color& 
 			uint8* dst = (uint8*)destBitmap.getPixelPointer(destRect.x, destRect.y + line);
 			for (int i = 0; i < destRect.width; ++i)
 			{
-				dst[0] = ((dst[0] * multiplicator) >> 8) + additions[0];
-				dst[1] = ((dst[1] * multiplicator) >> 8) + additions[1];
-				dst[2] = ((dst[2] * multiplicator) >> 8) + additions[2];
+				dst[0] = (uint8)(((dst[0] * multiplicator) >> 8) + additions[0]);
+				dst[1] = (uint8)(((dst[1] * multiplicator) >> 8) + additions[1]);
+				dst[2] = (uint8)(((dst[2] * multiplicator) >> 8) + additions[2]);
 				dst[3] = 0xff;
 				dst += 4;
 			}

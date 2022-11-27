@@ -568,9 +568,9 @@ namespace lemon
 						}
 						mContext.mLocalVariables->push_back(variable);
 
-						VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
-						token.mVariable = variable;
-						token.mDataType = variable->getDataType();
+						VariableToken& variableToken = tokens.createReplaceAt<VariableToken>(i);
+						variableToken.mVariable = variable;
+						variableToken.mDataType = variable->getDataType();
 
 						tokens.erase(i+1);
 					}
@@ -704,9 +704,9 @@ namespace lemon
 				// Assign types
 				static std::vector<const DataTypeDefinition*> parameterTypes;	// Not multi-threading safe
 				parameterTypes.resize(functionToken.mParameters.size());
-				for (size_t i = 0; i < functionToken.mParameters.size(); ++i)
+				for (size_t k = 0; k < functionToken.mParameters.size(); ++k)
 				{
-					parameterTypes[i] = assignStatementDataType(*functionToken.mParameters[i], nullptr);
+					parameterTypes[k] = assignStatementDataType(*functionToken.mParameters[k], nullptr);
 				}
 
 				// If the function was not determined yet, do that now
@@ -901,9 +901,9 @@ namespace lemon
 					CHECK_ERROR(nullptr != variable, "Unable to resolve identifier: " << identifierToken.mName.getString(), mLineNumber);
 				}
 
-				VariableToken& token = tokens.createReplaceAt<VariableToken>(i);
-				token.mVariable = variable;
-				token.mDataType = variable->getDataType();
+				VariableToken& variableToken = tokens.createReplaceAt<VariableToken>(i);
+				variableToken.mVariable = variable;
+				variableToken.mDataType = variable->getDataType();
 			}
 		}
 	}

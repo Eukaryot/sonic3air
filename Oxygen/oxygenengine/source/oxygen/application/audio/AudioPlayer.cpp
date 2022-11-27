@@ -806,7 +806,7 @@ void AudioPlayer::applyAudioModifierSingle(SoundIterator& iterator, std::string_
 		uint8 tempoSpeedup = 0;
 		if (relativeSpeed > 1.01f)
 		{
-			tempoSpeedup = 2 * roundToInt(1.0f / (relativeSpeed - 1.0f));
+			tempoSpeedup = (uint8)(2 * roundToInt(1.0f / (relativeSpeed - 1.0f)));
 		}
 
 		EmulationAudioSource& emulationAudioSource = static_cast<EmulationAudioSource&>(*playingSound.mAudioSource);

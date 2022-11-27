@@ -349,8 +349,8 @@ namespace lemon
 				const uint8 flags = serializer.read<uint8>();
 				const Function::Type type = (flags & FLAG_NATIVE_FUNCTION) ? Function::Type::NATIVE : Function::Type::SCRIPT;
 
-				FlyweightString name;
-				name.serialize(serializer);
+				FlyweightString functionName;
+				functionName.serialize(serializer);
 
 				aliasNames.clear();
 				if (flags & FLAG_HAS_ALIAS_NAMES)
@@ -381,7 +381,7 @@ namespace lemon
 				else
 				{
 					// Create new script function
-					ScriptFunction& scriptFunc = module.addScriptFunction(name, returnType, parameters, &aliasNames);
+					ScriptFunction& scriptFunc = module.addScriptFunction(functionName, returnType, parameters, &aliasNames);
 
 					// Source information
 					const size_t index = (size_t)serializer.read<uint16>();
@@ -549,7 +549,7 @@ namespace lemon
 							(opcode.mParameter == (int64)(uint32)opcode.mParameter) ? 6 : 7;
 						const bool hasDataType     = (opcode.mDataType != DEFAULT_OPCODE_BASETYPES[(size_t)opcode.mType]);
 						const bool isSequenceBreak = (opcode.mFlags & Opcode::Flag::SEQ_BREAK) != 0;
-						const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber < lastLineNumber + 31) ? (opcode.mLineNumber - lastLineNumber) : 31;
+						const uint8 lineNumberBits = (opcode.mLineNumber >= lastLineNumber && opcode.mLineNumber < lastLineNumber + 31) ? (uint8)(opcode.mLineNumber - lastLineNumber) : 31;
 
 						const uint16 typeAndFlags = (uint16)opcode.mType | ((uint16)parameterBits << 6) | ((uint16)hasDataType * 0x200) | ((uint16)isSequenceBreak * 0x400) | ((uint16)lineNumberBits << 11);
 						serializer.write(typeAndFlags);

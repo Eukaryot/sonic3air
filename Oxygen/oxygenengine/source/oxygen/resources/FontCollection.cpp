@@ -72,9 +72,9 @@ void FontCollection::registerManagedFont(Font& font, const std::string& key)
 		collectedFont->mManagedFonts.push_back(&font);
 
 		// Update the font source in all font instances (note that it might also be a null pointer)
-		for (Font* font : collectedFont->mManagedFonts)
+		for (Font* managedFont : collectedFont->mManagedFonts)
 		{
-			font->injectFontSource(collectedFont->mFontSource);
+			managedFont->injectFontSource(collectedFont->mFontSource);
 		}
 	}
 }
@@ -124,7 +124,7 @@ void FontCollection::updateLoadedFonts()
 		}
 
 		// Nothing to do if the last definition (= the highest priority one) is already loaded
-		if (collectedFont.mDefinitions.size() == collectedFont.mLoadedDefinitionIndex + 1)
+		if (collectedFont.mDefinitions.size() == (size_t)collectedFont.mLoadedDefinitionIndex + 1)
 			continue;
 
 		// Font source needs to be reloaded

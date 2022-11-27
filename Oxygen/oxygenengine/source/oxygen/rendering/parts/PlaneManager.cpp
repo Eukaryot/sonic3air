@@ -106,7 +106,7 @@ void PlaneManager::refresh()
 			{
 				if (isDeveloperMode)
 				{
-					for (int k = 0; k < 0x800; ++k)
+					for (uint16 k = 0; k < 0x800; ++k)
 					{
 						buffer[k] = k + ((uint16)mPatternManager.getLastUsedAtex(k) << 9);
 					}

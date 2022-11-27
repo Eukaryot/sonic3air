@@ -1687,13 +1687,13 @@ private:
 		{
 			zBankBaseAddress = 0;
 			zSongBank = 0;
-			hl = 0x8000 + mFixedContentOffset;
+			hl = 0x8000 + (uint16)mFixedContentOffset;
 		}
 		else if (mEnforcedSourceAddress != 0)
 		{
 			// Ignore the music pointer and use a custom source address (e.g. to play Sonic 3 track versions directly from the ROM, or tracks from other sources)
 			zBankBaseAddress = mEnforcedSourceAddress & 0xff8000;
-			zSongBank = zBankBaseAddress >> 15;
+			zSongBank = (uint8)(zBankBaseAddress >> 15);
 			hl = (mEnforcedSourceAddress & 0x7fff) | 0x8000;
 		}
 
@@ -1869,14 +1869,16 @@ private:
 		// zPlaySound:
 		GetPointerTable();
 		PointerTableOffset();
-		const uint16 backup_hl = hl;
-		ReadPointer();
-		zSFXVoiceTblPtr = hl;
-	#ifndef SOUNDDRIVER_FIX_BUGS
-		mRam[0x1c15] = 0;
-	#endif
-		hl = backup_hl;
-		iy = hl;
+		{
+			const uint16 backup_hl = hl;
+			ReadPointer();
+			zSFXVoiceTblPtr = hl;
+		#ifndef SOUNDDRIVER_FIX_BUGS
+			mRam[0x1c15] = 0;
+		#endif
+			hl = backup_hl;
+			iy = hl;
+		}
 
 		a = read8(iy + 2);
 		zSFXTempoDivider = a;
@@ -2379,8 +2381,8 @@ private:
 
 			af = backup_af;
 			ix = zSongFM6_DAC;
-			zTrack& track = *(zTrack*)&mRam[ix];
-			if ((track.PlaybackControl & 0x04) == 0)
+			zTrack& track2 = *(zTrack*)&mRam[ix];
+			if ((track2.PlaybackControl & 0x04) == 0)
 			{
 				mCycles += 1065;
 				zDACIndex = a;

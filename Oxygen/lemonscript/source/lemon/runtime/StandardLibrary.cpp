@@ -40,7 +40,7 @@ namespace lemon
 		template<typename R, typename T>
 		R absolute(T a)
 		{
-			return std::abs(a);
+			return (R)std::abs(a);
 		}
 
 		uint32 sqrt_u32(uint32 a)

@@ -277,10 +277,10 @@ void PlatformFunctions::changeWorkingDirectory(std::wstring_view executableCallP
 {
 #if defined(PLATFORM_WINDOWS)
 	// Take the working directory from command line if possible
-	const size_t pos = executableCallPath.find_last_of(L"/\\");
-	if (pos != std::string::npos)
+	const size_t slashPos = executableCallPath.find_last_of(L"/\\");
+	if (slashPos != std::string::npos)
 	{
-		std::wstring path = std::wstring(executableCallPath.substr(0, pos));
+		std::wstring path = std::wstring(executableCallPath.substr(0, slashPos));
 
 		// Move out of "bin", "build" or "_vstudio" directory
 		//  -> This is added only because with my Visual Studio setup, binaries get placed in such a target directory (don't ask why...)
@@ -321,10 +321,10 @@ void PlatformFunctions::changeWorkingDirectory(std::wstring_view executableCallP
 	}
 #elif defined(PLATFORM_LINUX)
 	// Take the working directory from command line if possible
-	const size_t pos = executableCallPath.find_last_of(L'/');
-	if (pos != std::string::npos)
+	const size_t slashPos = executableCallPath.find_last_of(L'/');
+	if (slashPos != std::string::npos)
 	{
-		rmx::FileSystem::setCurrentDirectory(executableCallPath.substr(0, pos));
+		rmx::FileSystem::setCurrentDirectory(executableCallPath.substr(0, slashPos));
 	}
 #endif
 }

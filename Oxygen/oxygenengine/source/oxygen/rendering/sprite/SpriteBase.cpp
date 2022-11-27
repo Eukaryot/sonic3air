@@ -19,9 +19,9 @@ namespace spritebaseinternal
 		const int alpha = srcPtr[3];
 		const int oneMinusAlpha = 0x100 - alpha;
 
-		dstPtr[0] = ((int)srcPtr[0] * alpha + (int)dstPtr[0] * oneMinusAlpha) >> 8;
-		dstPtr[1] = ((int)srcPtr[1] * alpha + (int)dstPtr[1] * oneMinusAlpha) >> 8;
-		dstPtr[2] = ((int)srcPtr[2] * alpha + (int)dstPtr[2] * oneMinusAlpha) >> 8;
+		dstPtr[0] = (uint8)(((int)srcPtr[0] * alpha + (int)dstPtr[0] * oneMinusAlpha) >> 8);
+		dstPtr[1] = (uint8)(((int)srcPtr[1] * alpha + (int)dstPtr[1] * oneMinusAlpha) >> 8);
+		dstPtr[2] = (uint8)(((int)srcPtr[2] * alpha + (int)dstPtr[2] * oneMinusAlpha) >> 8);
 		return dst | 0xff000000;
 	}
 

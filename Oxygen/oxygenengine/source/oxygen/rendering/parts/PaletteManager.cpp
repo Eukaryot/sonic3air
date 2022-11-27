@@ -26,9 +26,9 @@ Color PaletteManager::unpackColor(uint16 packedColor)
 	uint8& b = ((uint8*)&color)[2];
 	if (packedColor & 0x8000)
 	{
-		r = std::min(((packedColor) & 0x1f) * 0x09, 0xff);
-		g = std::min(((packedColor >> 5) & 0x1f) * 0x09, 0xff);
-		b = std::min(((packedColor >> 10) & 0x1f) * 0x09, 0xff);
+		r = (uint8)std::min(((packedColor) & 0x1f) * 0x09, 0xff);
+		g = (uint8)std::min(((packedColor >> 5) & 0x1f) * 0x09, 0xff);
+		b = (uint8)std::min(((packedColor >> 10) & 0x1f) * 0x09, 0xff);
 	}
 	else
 	{
@@ -57,7 +57,7 @@ void PaletteManager::getPalette(Color* palette, int paletteIndex) const
 {
 	for (int i = 0; i < 0x100; ++i)
 	{
-		palette[i] = getPaletteEntry(paletteIndex, i);
+		palette[i] = getPaletteEntry(paletteIndex, (uint16)i);
 	}
 }
 
@@ -77,14 +77,14 @@ uint16 PaletteManager::getPaletteEntryPacked(int paletteIndex, uint16 colorIndex
 		const uint32 r = ((roundToInt(saturate(color.r) * 255.0f) + 0x04) / 0x09);
 		const uint32 g = ((roundToInt(saturate(color.g) * 255.0f) + 0x04) / 0x09);
 		const uint32 b = ((roundToInt(saturate(color.b) * 255.0f) + 0x04) / 0x09);
-		return (r) + (g << 5) + (b << 10) + 0x8000;
+		return (uint16)((r) + (g << 5) + (b << 10) + 0x8000);
 	}
 	else
 	{
 		const uint32 r = ((roundToInt(saturate(color.r) * 255.0f) + 0x12) / 0x24);
 		const uint32 g = ((roundToInt(saturate(color.g) * 255.0f) + 0x12) / 0x24);
 		const uint32 b = ((roundToInt(saturate(color.b) * 255.0f) + 0x12) / 0x24);
-		return (r << 1) + (g << 5) + (b << 9);
+		return (uint16)((r << 1) + (g << 5) + (b << 9));
 	}
 }
 

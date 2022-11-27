@@ -350,7 +350,7 @@ std::string LemonScriptRuntime::buildScriptLocationString(const lemon::ControlFl
 	const std::wstring& fileName = location.mFunction->mSourceFileInfo->mFilename;
 	const uint32 lineNumber = getLineNumberInFile(*location.mFunction, location.mProgramCounter);
 	const std::string& moduleName = location.mFunction->getModule().getModuleName();
-	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";	return std::string();
+	return "function '" + functionName + "' at line " + std::to_string(lineNumber) + " of file '" + WString(fileName).toStdString() + "' in module '" + moduleName + "'";
 }
 
 uint32 LemonScriptRuntime::getLineNumberInFile(const lemon::ScriptFunction& function, size_t programCounter)

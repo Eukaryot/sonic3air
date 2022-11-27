@@ -515,7 +515,6 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 			device.mSDLGameController = nullptr;
 
 			using Button = InputConfig::DeviceDefinition::Button;
-			bool found = false;
 			const std::string key = (i == 0) ? "Keyboard1" : "Keyboard2";
 			InputConfig::DeviceDefinition* inputDeviceDefinition = getInputDeviceDefinitionByIdentifier(key);
 			if (nullptr == inputDeviceDefinition)
@@ -861,9 +860,9 @@ void InputManager::setControllerRumbleForPlayer(int playerIndex, float lowFreque
 #if SDL_VERSION_ATLEAST(2, 0, 18)
 	if (playerIndex >= 0 && playerIndex < 2)
 	{
-		const float intensity = Configuration::instance().mControllerRumbleIntensity[playerIndex];
-		const uint16 lowFrequencyRumbleUint16 = roundToInt(lowFrequencyRumble * intensity * 65535.0f);
-		const uint16 highFrequencyRumbleUint16 = roundToInt(highFrequencyRumble * intensity * 65535.0f);
+		const float intensity = clamp(Configuration::instance().mControllerRumbleIntensity[playerIndex], 0.0f, 1.0f);
+		const uint16 lowFrequencyRumbleUint16 = (uint16)roundToInt(lowFrequencyRumble * intensity * 65535.0f);
+		const uint16 highFrequencyRumbleUint16 = (uint16)roundToInt(highFrequencyRumble * intensity * 65535.0f);
 
 		for (size_t i = 0; i < mGamepads.size(); ++i)
 		{

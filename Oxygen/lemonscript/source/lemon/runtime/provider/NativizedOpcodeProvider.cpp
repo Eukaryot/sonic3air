@@ -92,8 +92,8 @@ namespace lemon
 						case Nativizer::LookupEntry::ParameterInfo::Semantics::GLOBAL_VARIABLE:
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
-							int64* value = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
-							runtimeOpcode.setParameter(value, parameter.mOffset);
+							int64* valuePointer = const_cast<Runtime&>(runtime).accessGlobalVariableValue(runtime.getProgram().getGlobalVariableByID(variableId));
+							runtimeOpcode.setParameter(valuePointer, parameter.mOffset);
 							break;
 						}
 

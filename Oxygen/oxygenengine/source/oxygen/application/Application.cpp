@@ -533,7 +533,6 @@ void Application::render()
 
 	if (mPausedByFocusLoss)
 	{
-		Font& font = EngineMain::getDelegate().getDebugFont(10);
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 0.8f));
 
 		// TODO: The sprites are from S3AIR, but used in OxygenApp as well

@@ -43,6 +43,6 @@ public:
 
 private:
 	GLuint mTextureHandle = 0;
-	GLuint mTexBuffer = ~0;
+	GLuint mTexBuffer = (GLuint)~0;
 	PixelFormat mPixelFormat = PixelFormat::UINT_8;
 };

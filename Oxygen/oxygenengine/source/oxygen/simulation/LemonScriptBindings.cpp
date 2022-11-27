@@ -1060,9 +1060,9 @@ namespace
 					if (containsByPredicate(textString, [](char ch) { return (ch >= 'A' && ch <= 'Z'); } ))
 					{
 						// Convert to lowercase and try again
-						String str = textString;
-						str.lowerCase();
-						sfxId = rmx::getMurmur2_64(str);
+						String tempStr = textString;
+						tempStr.lowerCase();
+						sfxId = rmx::getMurmur2_64(tempStr);
 						EngineMain::instance().getAudioOut().playAudioBase(sfxId, contextId);
 					}
 				}

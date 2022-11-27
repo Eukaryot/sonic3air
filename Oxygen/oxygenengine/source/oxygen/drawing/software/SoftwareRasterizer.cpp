@@ -237,9 +237,9 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 						const float a = ((float)sample00[3] * (1.0f - factorX) + (float)sample10[3] * factorX) * (1.0f - factorY) + ((float)sample01[3] * (1.0f - factorX) + (float)sample11[3] * factorX) * factorY;
 
 						// Alpha blending
-						bytes[0] = (int)((r * a + (float)bytes[0] * (255.0f - a)) / 255.0f);
-						bytes[1] = (int)((g * a + (float)bytes[1] * (255.0f - a)) / 255.0f);
-						bytes[2] = (int)((b * a + (float)bytes[2] * (255.0f - a)) / 255.0f);
+						bytes[0] = (uint8)((r * a + (float)bytes[0] * (255.0f - a)) / 255.0f);
+						bytes[1] = (uint8)((g * a + (float)bytes[1] * (255.0f - a)) / 255.0f);
+						bytes[2] = (uint8)((b * a + (float)bytes[2] * (255.0f - a)) / 255.0f);
 						bytes[3] = 0xff;
 
 						bytes += 4;

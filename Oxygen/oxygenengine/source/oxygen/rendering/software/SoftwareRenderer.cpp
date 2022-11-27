@@ -231,7 +231,7 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 		const PatternManager& patternManager = mRenderParts.getPatternManager();
 		const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
 		const PatternManager::CacheItem* patternCache = patternManager.getPatternCache();
-		const uint16 numPatternsPerLine = bitmapSize.x / 8;
+		const uint16 numPatternsPerLine = (uint16)(bitmapSize.x / 8);
 		const bool highlightPrioPatterns = (FTX::keyState(SDLK_LSHIFT) != 0);
 
 		for (int y = 0; y < bitmapSize.y; ++y)

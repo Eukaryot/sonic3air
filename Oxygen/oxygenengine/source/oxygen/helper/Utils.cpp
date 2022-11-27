@@ -134,7 +134,7 @@ namespace utils
 					return 0;
 				if (currentNumDigits >= 2)
 					return 0;
-				currentNumber = (currentNumber << 4) + digit;
+				currentNumber = (currentNumber << 4) + (uint8)digit;
 				++currentNumDigits;
 			}
 		}

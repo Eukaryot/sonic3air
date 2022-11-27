@@ -42,7 +42,7 @@ struct CommandForwarder::Internal
 		buffer[command.length()] = 0;
 
 		DWORD bytesSent = 0;
-		const bool result = WriteFile(pipeHandle, buffer, strlen(buffer)+1, &bytesSent, nullptr);
+		const bool result = WriteFile(pipeHandle, buffer, (DWORD)(strlen(buffer)+1), &bytesSent, nullptr);
 		RMX_CHECK(result && command.length() + 1 == bytesSent, "Error sending command: " << GetLastError(), );
 
 		CloseHandle(pipeHandle);

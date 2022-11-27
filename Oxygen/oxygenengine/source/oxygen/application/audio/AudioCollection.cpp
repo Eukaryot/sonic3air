@@ -115,15 +115,15 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		keyString.lowerCase();
 
 		// Numeric key is either a string hash, or the value in case of keys like "2C"
-		uint64 key = 0;
+		uint64 numericKey = 0;
 		{
 			if (keyString.length() == 2 && isHexDigit(keyString[0]) && isHexDigit(keyString[1]))
 			{
-				key = rmx::parseInteger(String("0x") + keyString);
+				numericKey = rmx::parseInteger(String("0x") + keyString);
 			}
 			else
 			{
-				key = rmx::getMurmur2_64(keyString);
+				numericKey = rmx::getMurmur2_64(keyString);
 			}
 		}
 
@@ -133,11 +133,11 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 		WString audioFilename;
 		uint32 sourceAddress = 0;
 		uint32 contentOffset = 0;
-		uint8 emulationSfxId = (key <= 0xff) ? (uint8)key : 0;
+		uint8 emulationSfxId = (numericKey <= 0xff) ? (uint8)numericKey : 0;
 		SourceRegistration::Type sourceType = SourceRegistration::Type::FILE;
 		int loopStart = 0;
 		float volume = 1.0f;
-		uint8 channel = (key < 0xff) ? (uint8)key : 0xff;
+		uint8 channel = (numericKey < 0xff) ? (uint8)numericKey : 0xff;
 
 		for (auto it = iterator->begin(); it != iterator->end(); ++it)
 		{
@@ -210,11 +210,11 @@ bool AudioCollection::loadFromJson(const std::wstring& basepath, const std::wstr
 			}
 		}
 
-		AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, key);
+		AudioDefinition* audioDefinition = mapFind(mAudioDefinitions, numericKey);
 		if (nullptr == audioDefinition)
 		{
-			audioDefinition = &mAudioDefinitions[key];
-			audioDefinition->mKeyId = key;
+			audioDefinition = &mAudioDefinitions[numericKey];
+			audioDefinition->mKeyId = numericKey;
 			audioDefinition->mKeyString = *keyString;
 			audioDefinition->mType = type;
 

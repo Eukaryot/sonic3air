@@ -63,8 +63,8 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 				{
 					if (!overwriteFlags[k])
 					{
-						const int index = k & mHorizontalScrollMask;
-						buffer[k] = (-src[index*2]) & SCROLL_OFFSET_VALUE_BITMASK;
+						const int srcIndex = k & mHorizontalScrollMask;
+						buffer[k] = (-src[srcIndex*2]) & SCROLL_OFFSET_VALUE_BITMASK;
 					}
 				}
 			}
@@ -126,10 +126,10 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 
 		if (refreshParameters.mUsingFrameInterpolation)
 		{
-			const uint16 positionMaskH = mPlaneManager.getPlayfieldSizeInPixels().x - 1;
-			const uint16 halfPositionH = mPlaneManager.getPlayfieldSizeInPixels().x / 2;
-			const uint16 positionMaskV = mPlaneManager.getPlayfieldSizeInPixels().y - 1;
-			const uint16 halfPositionV = mPlaneManager.getPlayfieldSizeInPixels().y / 2;
+			const uint16 positionMaskH = (uint16)(mPlaneManager.getPlayfieldSizeInPixels().x - 1);
+			const uint16 halfPositionH = (uint16)(mPlaneManager.getPlayfieldSizeInPixels().x / 2);
+			const uint16 positionMaskV = (uint16)(mPlaneManager.getPlayfieldSizeInPixels().y - 1);
+			const uint16 halfPositionV = (uint16)(mPlaneManager.getPlayfieldSizeInPixels().y / 2);
 
 			for (int index = 0; index < 4; ++index)
 			{
@@ -163,8 +163,8 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 	if (refreshParameters.mUsingFrameInterpolation)
 	{
 		const float interpolationFactor = (1.0f - refreshParameters.mInterFramePosition);
-		const uint16 positionMaskH = mPlaneManager.getPlayfieldSizeInPixels().x - 1;
-		const uint16 positionMaskV = mPlaneManager.getPlayfieldSizeInPixels().y - 1;
+		const uint16 positionMaskH = (uint16)(mPlaneManager.getPlayfieldSizeInPixels().x - 1);
+		const uint16 positionMaskV = (uint16)(mPlaneManager.getPlayfieldSizeInPixels().y - 1);
 
 		for (int index = 0; index < 4; ++index)
 		{

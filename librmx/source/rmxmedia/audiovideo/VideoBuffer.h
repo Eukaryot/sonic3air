@@ -68,7 +68,7 @@ private:
 	int mHeight = 0;
 	int mHeightUV = 0;
 	float mFramesPerSecond = 25.0f;
-	float mCropRect[4];
+	float mCropRect[4] = { 0.0f };
 
 	// Tables for YUV -> RGB conversion
 	static bool mConversionTablesInitialized;

@@ -448,7 +448,7 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 				Font* font = FontCollection::instance().getFontByKey(text.mFontKeyHash);
 				if (nullptr != font)
 				{
-					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, text.mSpacing);
+					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, (uint8)text.mSpacing);
 					PrintedTextCache& cache = RenderResources::instance().mPrintedTextCache;
 					PrintedTextCache::CacheItem* cacheItem = cache.getCacheItem(key);
 					if (nullptr == cacheItem)
