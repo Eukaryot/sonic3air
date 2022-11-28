@@ -79,15 +79,15 @@ namespace lemon
 		static FORCE_INLINE T convert(S value)  { return AnyBaseValue(value).get<T>(); }
 	};
 
-	template<> FORCE_INLINE int8   BaseTypeConversion::convert(int8 value)	{ return value; }
-	template<> FORCE_INLINE uint8  BaseTypeConversion::convert(uint8 value)	{ return value; }
-	template<> FORCE_INLINE int16  BaseTypeConversion::convert(int16 value)	{ return value; }
+	template<> FORCE_INLINE int8   BaseTypeConversion::convert(int8 value)		{ return value; }
+	template<> FORCE_INLINE uint8  BaseTypeConversion::convert(uint8 value)		{ return value; }
+	template<> FORCE_INLINE int16  BaseTypeConversion::convert(int16 value)		{ return value; }
 	template<> FORCE_INLINE uint16 BaseTypeConversion::convert(uint16 value)	{ return value; }
-	template<> FORCE_INLINE int32  BaseTypeConversion::convert(int32 value)	{ return value; }
+	template<> FORCE_INLINE int32  BaseTypeConversion::convert(int32 value)		{ return value; }
 	template<> FORCE_INLINE uint32 BaseTypeConversion::convert(uint32 value)	{ return value; }
-	template<> FORCE_INLINE int64  BaseTypeConversion::convert(int64 value)	{ return value; }
+	template<> FORCE_INLINE int64  BaseTypeConversion::convert(int64 value)		{ return value; }
 	template<> FORCE_INLINE uint64 BaseTypeConversion::convert(uint64 value)	{ return value; }
-	template<> FORCE_INLINE float  BaseTypeConversion::convert(float value)	{ return value; }
+	template<> FORCE_INLINE float  BaseTypeConversion::convert(float value)		{ return value; }
 	template<> FORCE_INLINE double BaseTypeConversion::convert(double value)	{ return value; }
 	template<> FORCE_INLINE AnyBaseValue BaseTypeConversion::convert(AnyBaseValue value)	{ return value; }
 

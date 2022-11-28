@@ -18,8 +18,8 @@ public:
 	bool addEffect(float lowFrequencyRumble, float highFrequencyRumble, uint32 endTicks);
 	bool removeExpiredEffects(uint32 currentTicks);
 
-	inline float RumbleEffectQueue::getCurrentLowFreqIntensity() const	{ return getCurrentIntensity(mLowFreqEffects); }
-	inline float RumbleEffectQueue::getCurrentHighFreqIntensity() const	{ return getCurrentIntensity(mHighFreqEffects); }
+	inline float getCurrentLowFreqIntensity() const	{ return getCurrentIntensity(mLowFreqEffects); }
+	inline float getCurrentHighFreqIntensity() const	{ return getCurrentIntensity(mHighFreqEffects); }
 
 private:
 	float getCurrentIntensity(const std::map<uint32, float>& effects) const;
