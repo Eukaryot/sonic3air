@@ -1039,12 +1039,12 @@ function void LevelObjectTableBuilder.buildObjects_MGZ2()
 		LevelObjectTableBuilder.addObject(0x3ce0, 0x0188, OBJECTTABLE1_08, 0x10, LVLOBJ_FLIP_Y)
 		LevelObjectTableBuilder.addObject(0x3da0, 0x0228, OBJECTTABLE1_0d, 0x00, 0)
 		LevelObjectTableBuilder.addObject(0x3de0, 0x0270, OBJECTTABLE1_51, 0x00, 0)
-		LevelObjectTableBuilder.addObject(0x3e00, 0x08f8, OBJECTTABLE1_34, 0x07, 0)
+		LevelObjectTableBuilder.addObject(0x3e00, 0x08f8, OBJECTTABLE1_34, 0x87, 0)
 	}
 	else
 	{
 		LevelObjectTableBuilder.addObject(0x3da0, 0x0218, OBJECTTABLE1_57, 0x2f, LVLOBJ_FLIP_X)
-		LevelObjectTableBuilder.addObject(0x3e00, 0x08f8, OBJECTTABLE1_34, 0x07, 0)
+		LevelObjectTableBuilder.addObject(0x3e00, 0x08f8, OBJECTTABLE1_34, 0x87, 0)
 		LevelObjectTableBuilder.addObject(0x3e22, 0x02a0, OBJECTTABLE1_51, 0x00, 0)
 		LevelObjectTableBuilder.addObject(0x3e3e, 0x0215, OBJECTTABLE1_55, 0x0f, 0)
 	}

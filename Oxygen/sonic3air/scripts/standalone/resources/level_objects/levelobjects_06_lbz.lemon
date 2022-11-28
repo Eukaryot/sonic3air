@@ -259,7 +259,7 @@ function void LevelObjectTableBuilder.buildObjects_LBZ1()
 	LevelObjectTableBuilder.addObject(0x1c70, 0x0738, OBJECTTABLE1_24, 0x73, 0)
 	LevelObjectTableBuilder.addObject(0x1c70, 0x0848, OBJECTTABLE1_07, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x1c78, 0x0178, OBJECTTABLE1_11, 0x00, 0)
-	LevelObjectTableBuilder.addObject(0x1c80, 0x0328, OBJECTTABLE1_34, 0x02, 0)
+	LevelObjectTableBuilder.addObject(0x1c80, 0x0328, OBJECTTABLE1_34, 0x82, 0)
 
 	if (Game.getSetting(SETTING_LEVELLAYOUTS) != 0)
 	{
