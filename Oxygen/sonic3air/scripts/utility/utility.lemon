@@ -384,6 +384,7 @@ function u32 convertColors32(u32 color)
 	return ((color & 0x000000ff) << 24) + ((color & 0x0000ff00) << 8) + ((color & 0x00ff0000) >> 8) + ((color & 0xff000000) >> 24)
 }
 
+#if STANDALONE
 function u32 applyGlobalComponentTint_BGR32(u32 color)
 {
 	u32 r = clamp((( color        & 0xff) * globalComponentTintColorR) / 0xff + globalComponentAddedColorR, 0, 0xff)
@@ -391,6 +392,7 @@ function u32 applyGlobalComponentTint_BGR32(u32 color)
 	u32 b = clamp((((color >> 16) & 0xff) * globalComponentTintColorB) / 0xff + globalComponentAddedColorB, 0, 0xff)
 	return r + (g << 8) + (b << 16)
 }
+#endif
 
 
 
@@ -762,6 +764,8 @@ function void debugDrawOutlineRect(s32 px, s32 py, s32 width, s32 height, u32 co
 
 function void Input.setControllerRumbleByAddress(u32 playerUpdateAddress, float lowFrequencyRumble, float highFrequencyRumble, u16 milliseconds)
 {
+#if STANDALONE
 	s8 playerIndex = (playerUpdateAddress == 0xffffb04a) ? 1 : 0
 	Input.setControllerRumble(playerIndex, lowFrequencyRumble, highFrequencyRumble, milliseconds)
+#endif
 }

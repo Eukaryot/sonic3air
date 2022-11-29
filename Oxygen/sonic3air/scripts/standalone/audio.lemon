@@ -22,6 +22,9 @@ global u8 fastMusicFlags
 global u8 alternatingRingSoundState
 
 
+
+#if STANDALONE
+
 // This function is here only for script mods that want to change the sound key, e.g. to play a custom music track / sound effect
 function u64 Standalone.getModdedSoundKey(u64 soundKey, u8 sfxId, u8 soundRegType)
 {
@@ -490,3 +493,5 @@ function void Standalone.setFastMusicFlagWithSpeedup(u8 flag, float relativeSpee
 		Audio.enableAudioModifier(0, 0, "_fast", relativeSpeed)
 	}
 }
+
+#endif

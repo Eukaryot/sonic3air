@@ -36,12 +36,14 @@ function void Init()
 
 	// Initialization of global variables
 	{
+	#if STANDALONE
 		globalComponentTintColorR = 0xff
 		globalComponentTintColorG = 0xff
 		globalComponentTintColorB = 0xff
 		globalComponentAddedColorR = 0
 		globalComponentAddedColorG = 0
 		globalComponentAddedColorB = 0
+	#endif
 
 		enableCustomPlaneReset = true
 	}

@@ -3950,7 +3950,9 @@ function bool Character.UpdateSpindash()
 				char.spindash_charge = min(char.spindash_charge + 0x200, 0x800)
 				playSound(SFX_SPINDASH_CHARGE)
 			}
+		#if STANDALONE
 			Input.setControllerRumbleByAddress(A0, 0.0f, 0.2f, 100)
+		#endif
 		}
 		else
 		{
@@ -4115,10 +4117,12 @@ function void releaseDropDash()
 	}
 
 	Audio.playAudio("dropdash_release", AudioContext.CONTEXT_SOUND)
+#if STANDALONE
 	if (super.active)
 		Input.setControllerRumbleByAddress(A0, 0.5f, 1.0f, 200)
 	else
 		Input.setControllerRumbleByAddress(A0, 0.0f, 1.0f, 150)
+#endif
 }
 
 

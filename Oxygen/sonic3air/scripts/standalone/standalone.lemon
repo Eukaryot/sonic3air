@@ -81,8 +81,10 @@ function void waitForNextFrame()
 		}
 	}
 
+#if STANDALONE
 	// Apply global tint color for screen fades
 	Renderer.setGlobalComponentTint(globalComponentTintColorR, globalComponentTintColorG, globalComponentTintColorB, globalComponentAddedColorR, globalComponentAddedColorG, globalComponentAddedColorB)
+#endif
 
 	// Tell the game whether an automatically triggered pause (e.g. by minimizing the app) should have the Restart button available
 	bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
