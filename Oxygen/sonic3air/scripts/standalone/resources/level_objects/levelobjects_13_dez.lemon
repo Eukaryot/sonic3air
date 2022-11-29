@@ -235,7 +235,13 @@ function void LevelObjectTableBuilder.buildObjects_DEZ1()
 	LevelObjectTableBuilder.addObject(0x15b8, 0x0810, OBJECTTABLE2_4d, 0x17, 0)
 	LevelObjectTableBuilder.addObject(0x15c8, 0x0ae0, OBJECTTABLE2_4d, 0x14, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x15cf, 0x0510, OBJECTTABLE2_08, 0x50, LVLOBJ_FLIP_X)
+
+	// We could replace the blocker with the out-commented alternative to open up the way to the hidden room here
+	//  -> But when going in there, the conveyor belt platform will despawn
+	//  -> So in the end, that hidden room doesn't actually work too well
+	//LevelObjectTableBuilder.addObject(0x15d0, 0x0820, OBJECTTABLE2_28, 0x1b, 0)	// If using this, also remove the spikes at 0x15b1, 0x0790
 	LevelObjectTableBuilder.addObject(0x15d0, 0x0800, OBJECTTABLE2_28, 0x1f, 0)
+
 	LevelObjectTableBuilder.addObject(0x15d0, 0x0900, OBJECTTABLE2_28, 0x1f, 0)
 	LevelObjectTableBuilder.addObject(0x15d0, 0x0b90, OBJECTTABLE2_4f, 0x04, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x1638, 0x0431, OBJECTTABLE2_4d, 0x12, 0)
