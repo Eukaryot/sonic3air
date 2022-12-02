@@ -242,9 +242,12 @@ namespace lemon
 
 	uint64 Runtime::addString(std::string_view str)
 	{
-		const FlyweightString flyweightString(str);
-		mStrings.addString(flyweightString);
-		return flyweightString.getHash();
+		const uint64 hash = rmx::getMurmur2_64(str);
+		if (nullptr == mStrings.getStringByHash(hash))
+		{
+			mStrings.addString(str, hash);
+		}
+		return hash;
 	}
 
 	int64 Runtime::getGlobalVariableValue_int64(const Variable& variable)
@@ -363,194 +366,211 @@ namespace lemon
 		return true;
 	}
 
-	void Runtime::executeSteps(Runtime::ExecuteResult& result, size_t stepsLimit)
+	void Runtime::executeSteps(ExecuteConnector& result, size_t stepsLimit)
 	{
 		stepsLimit *= (sizeof(RuntimeOpcode) + 8);		// Rough estimate for average runtime opcode size
-
 		result.mStepsExecuted = 0;
+
 		if (mSelectedControlFlow->mCallStack.count == 0)
 		{
 			result.mResult = ExecuteResult::HALT;
 			return;
 		}
 
-		ControlFlow::State& state = mSelectedControlFlow->mCallStack.back();
-		const uint8*& programCounter = state.mProgramCounter;
-		const RuntimeOpcodeBuffer& runtimeOpcodeBuffer = state.mRuntimeFunction->mRuntimeOpcodeBuffer;
-
-		// Reached the end already?
-		//  -> Should not happen actually, as all functions end with a return opcode
-		if (programCounter > runtimeOpcodeBuffer.getEnd())
-		{
-			returnFromFunction();
-			result.mResult = ExecuteResult::RETURN;
-			return;
-		}
-
-		mActiveControlFlow = mSelectedControlFlow;
-		RMX_CHECK(mSelectedControlFlow->mValueStackPtr >= mSelectedControlFlow->mValueStackStart, "Value stack error: Removed elements from empty stack", mSelectedControlFlow->mValueStackPtr = mSelectedControlFlow->mValueStackStart);
-		RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[0x78], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
-
-		result.mResult = ExecuteResult::CONTINUE;
-		mSelectedControlFlow->mLastStepState.mRuntimeFunction = state.mRuntimeFunction;
-		mSelectedControlFlow->mCurrentLocalVariables = &mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart];
-
 		RuntimeOpcodeContext context;
 		context.mControlFlow = mSelectedControlFlow;
-		context.mOpcode = (const RuntimeOpcode*)programCounter;
+		mActiveControlFlow = mSelectedControlFlow;
 
-		const uint8* programCounterInitial = programCounter;
+		result.mResult = ExecuteResult::CONTINUE;
+
+		// Outer loop
+		//  -> Gets restarted whenever the currently running function changes
+		//  -> Gets exited only by a return
 		while (true)
 		{
-			// Update location for the next step
-			mSelectedControlFlow->mLastStepState.mProgramCounter = (uint8*)context.mOpcode;
+			ControlFlow::State& state = mSelectedControlFlow->mCallStack.back();
+			const uint8*& programCounter = state.mProgramCounter;
 
-			// Optimization: Do multiple opcodes in a row without overheads if possible
-			if (context.mOpcode->mSuccessiveHandledOpcodes >= 4)
+			// Reached the end already?
+			//  -> Should not happen actually, as all functions end with a return opcode
+			if (programCounter > state.mRuntimeFunction->mRuntimeOpcodeBuffer.getEnd())
 			{
-				(*context.mOpcode->mExecFunc)(context);
-				context.mOpcode = context.mOpcode->mNext;
-
-				(*context.mOpcode->mExecFunc)(context);
-				context.mOpcode = context.mOpcode->mNext;
-
-				(*context.mOpcode->mExecFunc)(context);
-				context.mOpcode = context.mOpcode->mNext;
-
-				(*context.mOpcode->mExecFunc)(context);
-				context.mOpcode = context.mOpcode->mNext;
+				RMX_ASSERT(false, "Program counter exceeded the end of function");
+				returnFromFunction();
+				result.mResult = ExecuteResult::RETURN;
+				mActiveControlFlow = nullptr;
+				return;
 			}
-			else if (context.mOpcode->mSuccessiveHandledOpcodes > 0)
-			{
-				(*context.mOpcode->mExecFunc)(context);
-				context.mOpcode = context.mOpcode->mNext;
-			}
-			else
-			{
-				programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
 
-				switch (context.mOpcode->mOpcodeType)
+			RMX_CHECK(mSelectedControlFlow->mValueStackPtr >= mSelectedControlFlow->mValueStackStart, "Value stack error: Removed elements from empty stack", mSelectedControlFlow->mValueStackPtr = mSelectedControlFlow->mValueStackStart);
+			RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[0x78], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
+
+			mSelectedControlFlow->mLastStepState.mRuntimeFunction = state.mRuntimeFunction;
+			mSelectedControlFlow->mCurrentLocalVariables = &mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart];
+
+			context.mOpcode = (const RuntimeOpcode*)programCounter;
+			const uint8* programCounterInitial = programCounter;
+
+			// Inner loop
+			//  -> Main execution of opcodes inside a single function
+			//  -> Not exited on jumps
+			//  -> Gets exited by changing keepRunning when the running function was changed
+			//  -> Gets exited by a return when control needs to be returned to the caller
+			bool keepRunning = true;
+			while (keepRunning)
+			{
+				// Update location for the next step
+				mSelectedControlFlow->mLastStepState.mProgramCounter = (uint8*)context.mOpcode;
+
+				// Optimization: Do multiple opcodes in a row without overheads if possible
+				if (context.mOpcode->mSuccessiveHandledOpcodes >= 4)
 				{
-					case Opcode::Type::JUMP_CONDITIONAL:
+					(*context.mOpcode->mExecFunc)(context);
+					context.mOpcode = context.mOpcode->mNext;
+
+					(*context.mOpcode->mExecFunc)(context);
+					context.mOpcode = context.mOpcode->mNext;
+
+					(*context.mOpcode->mExecFunc)(context);
+					context.mOpcode = context.mOpcode->mNext;
+
+					(*context.mOpcode->mExecFunc)(context);
+					context.mOpcode = context.mOpcode->mNext;
+				}
+				else if (context.mOpcode->mSuccessiveHandledOpcodes > 0)
+				{
+					(*context.mOpcode->mExecFunc)(context);
+					context.mOpcode = context.mOpcode->mNext;
+				}
+				else
+				{
+					switch (context.mOpcode->mOpcodeType)
 					{
-						--mSelectedControlFlow->mValueStackPtr;
-						if (*mSelectedControlFlow->mValueStackPtr != 0)
-							break;
-
-						// Fallthrough to unconditional jump
-					}
-
-					case Opcode::Type::JUMP:
-					{
-						result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
-						programCounter = &runtimeOpcodeBuffer[(size_t)context.mOpcode->getParameter<uint32>()];
-
-						// Check if steps limit is reached (this usually means the limit was exceeded already, but that's okay)
-						//  -> This is needed to prevent endless loops
-						if (result.mStepsExecuted >= stepsLimit)
+						case Opcode::Type::JUMP_CONDITIONAL:
 						{
-							mActiveControlFlow = nullptr;
-							return;
+							--mSelectedControlFlow->mValueStackPtr;
+							if (*mSelectedControlFlow->mValueStackPtr != 0)
+							{
+								context.mOpcode = context.mOpcode->mNext;
+								break;
+							}
+
+							// Fallthrough to unconditional jump
 						}
 
-						programCounterInitial = programCounter;
-						break;
-					}
-
-					case Opcode::Type::CALL:
-					{
-						// Inline execution of native function, if possible here
-						//  -> Note that this optimization is actually hardly ever used, thanks to the CALL runtime opcode replacement in OptimizedOpcodeProvider
-						if (context.mOpcode->mFlags & RuntimeOpcode::FLAG_CALL_INLINE_RESOLVED)
+						case Opcode::Type::JUMP:
 						{
-							const NativeFunction& func = *context.mOpcode->getParameter<const NativeFunction*>();
-							func.execute(NativeFunction::Context(*mSelectedControlFlow));
+							result.mStepsExecuted += (size_t)((uint8*)context.mOpcode - programCounterInitial) + context.mOpcode->mSize;
+							programCounter = reinterpret_cast<const uint8*>(context.mOpcode->getParameter<uint64>());
+
+							// Check if steps limit is reached (this usually means the limit was exceeded already, but that's okay)
+							//  -> This is needed to prevent endless loops
+							if (result.mStepsExecuted >= stepsLimit)
+							{
+								mActiveControlFlow = nullptr;
+								return;
+							}
+
+							programCounterInitial = programCounter;
+							context.mOpcode = (const RuntimeOpcode*)programCounter;
 							break;
 						}
-						else
+
+						case Opcode::Type::CALL:
 						{
-							result.mResult = ExecuteResult::CALL;
+							programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
 							result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
 							result.mCallTarget = context.mOpcode->getParameter<uint64>();
-							result.mRuntimeOpcode = context.mOpcode;
+
+							const Function* func = handleResultCall(result, *context.mOpcode);
+							if (result.handleCall(func))
+							{
+								// Restart the outer loop now that the running function has changed
+								keepRunning = false;
+								break;
+							}
+							else
+							{
+								// Call handling failed, return control to the caller
+								result.mResult = ExecuteResult::CALL;
+								mActiveControlFlow = nullptr;
+								return;
+							}
+						}
+
+						case Opcode::Type::RETURN:
+						{
+							programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
+							returnFromFunction();
+							result.mResult = ExecuteResult::RETURN;
+							result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
 							mActiveControlFlow = nullptr;
 							return;
 						}
-					}
 
-					case Opcode::Type::RETURN:
-					{
-						returnFromFunction();
-						result.mResult = ExecuteResult::RETURN;
-						result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
-						mActiveControlFlow = nullptr;
-						return;
-					}
+						case Opcode::Type::EXTERNAL_CALL:
+						{
+							programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
+							--mSelectedControlFlow->mValueStackPtr;
+							result.mResult = ExecuteResult::EXTERNAL_CALL;
+							result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
+							result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
+							mActiveControlFlow = nullptr;
+							return;
+						}
 
-					case Opcode::Type::EXTERNAL_CALL:
-					{
-						--mSelectedControlFlow->mValueStackPtr;
-						result.mResult = ExecuteResult::EXTERNAL_CALL;
-						result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
-						result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
-						mActiveControlFlow = nullptr;
-						return;
-					}
+						case Opcode::Type::EXTERNAL_JUMP:
+						{
+							programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
+							--mSelectedControlFlow->mValueStackPtr;
+							returnFromFunction();
+							result.mResult = ExecuteResult::EXTERNAL_JUMP;
+							result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
+							result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
+							mActiveControlFlow = nullptr;
+							return;
+						}
 
-					case Opcode::Type::EXTERNAL_JUMP:
-					{
-						--mSelectedControlFlow->mValueStackPtr;
-						returnFromFunction();
-						result.mResult = ExecuteResult::EXTERNAL_JUMP;
-						result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
-						result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
-						mActiveControlFlow = nullptr;
-						return;
+						default:
+							throw std::runtime_error("Unhandled opcode");
 					}
-
-					default:
-						throw std::runtime_error("Unhandled opcode");
 				}
-
-				context.mOpcode = (const RuntimeOpcode*)programCounter;
 			}
 		}
 	}
 
-	const Function* Runtime::handleResultCall(const ExecuteResult& result)
+	const Function* Runtime::handleResultCall(const ExecuteResult& result, const RuntimeOpcode& runtimeOpcode)
 	{
-		RMX_ASSERT(result.mResult == ExecuteResult::CALL, "Do not use 'lemon::Runtime::handleResultCall' when execution result is not CALL");
-		RMX_ASSERT(nullptr != result.mRuntimeOpcode, "No runtime opcode given in 'lemon::Runtime::handleResultCall'");
-
 		// Consider base function call, if additional data says so
-		const size_t baseCallIndex = (result.mRuntimeOpcode->mFlags & RuntimeOpcode::FLAG_CALL_IS_BASE_CALL) ? (mSelectedControlFlow->getState().mBaseCallIndex + 1) : 0;
+		const size_t baseCallIndex = (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_IS_BASE_CALL) ? (mSelectedControlFlow->getState().mBaseCallIndex + 1) : 0;
 
 		const constexpr uint8 FLAG_RESOLVED_RUNTIME_FUNC = (RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED | RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC);
-		if ((result.mRuntimeOpcode->mFlags & FLAG_RESOLVED_RUNTIME_FUNC) == FLAG_RESOLVED_RUNTIME_FUNC)
+		if ((runtimeOpcode.mFlags & FLAG_RESOLVED_RUNTIME_FUNC) == FLAG_RESOLVED_RUNTIME_FUNC)
 		{
 			// Take the runtime function shortcut (this is the most common one)
-			const RuntimeFunction* runtimeFunction = result.mRuntimeOpcode->getParameter<const RuntimeFunction*>();
+			const RuntimeFunction* runtimeFunction = runtimeOpcode.getParameter<const RuntimeFunction*>();
 			callFunction(*runtimeFunction, baseCallIndex);
 			return runtimeFunction->mFunction;
 		}
-		else if (result.mRuntimeOpcode->mFlags & RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED)
+		else if (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED)
 		{
 			// Take the shortcut to a normal function
-			const Function* function = result.mRuntimeOpcode->getParameter<const Function*>();
+			const Function* function = runtimeOpcode.getParameter<const Function*>();
 			callFunction(*function, baseCallIndex);
 			return function;
 		}
 		else
 		{
-			RuntimeOpcode& runtimeOpcode = const_cast<RuntimeOpcode&>(*result.mRuntimeOpcode);
+			const uint64 callTarget = runtimeOpcode.getParameter<uint64>();
+			RuntimeOpcode& runtimeOpcodeMutable = const_cast<RuntimeOpcode&>(runtimeOpcode);
 
 			// If it's a script function call, there should be an associated runtime function that can be called directly
-			RuntimeFunction* runtimeFunction = getRuntimeFunctionBySignature(result.mCallTarget, baseCallIndex);
+			RuntimeFunction* runtimeFunction = getRuntimeFunctionBySignature(callTarget, baseCallIndex);
 			if (nullptr != runtimeFunction)
 			{
 				// Create a shortcut for next time
-				runtimeOpcode.setParameter(runtimeFunction);
-				runtimeOpcode.mFlags |= (RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED | RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC);
+				runtimeOpcodeMutable.setParameter(runtimeFunction);
+				runtimeOpcodeMutable.mFlags |= (RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED | RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC);
 
 				// Call the function now
 				callFunction(*runtimeFunction, baseCallIndex);
@@ -558,17 +578,12 @@ namespace lemon
 			}
 
 			// Another try, in case it's not a script function
-			const Function* function = mProgram->getFunctionBySignature(result.mCallTarget, baseCallIndex);
+			const Function* function = mProgram->getFunctionBySignature(callTarget, baseCallIndex);
 			if (nullptr != function)
 			{
 				// Create a shortcut for next time
-				runtimeOpcode.setParameter(function);
-				runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED;
-
-				if (function->getType() == Function::Type::NATIVE && function->hasFlag(Function::Flag::ALLOW_INLINE_EXECUTION))
-				{
-					runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_INLINE_RESOLVED;
-				}
+				runtimeOpcodeMutable.setParameter(function);
+				runtimeOpcodeMutable.mFlags |= RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED;
 
 				// Call the function now
 				callFunction(*function, baseCallIndex);

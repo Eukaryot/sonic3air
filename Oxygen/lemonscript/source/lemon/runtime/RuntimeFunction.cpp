@@ -184,6 +184,20 @@ namespace lemon
 
 		// Copy the results over, using memory from the shared memory pool
 		mRuntimeOpcodeBuffer.copyFrom(tempBuffer, runtime.mRuntimeOpcodesPool);
+
+		// Convert parameter of jumps from a uint32 offset to a direct pointer to their target runtime opcode
+		{
+			const std::vector<RuntimeOpcode*>& runtimeOpcodePointers = mRuntimeOpcodeBuffer.getOpcodePointers();
+			for (size_t i = 0; i < runtimeOpcodePointers.size(); ++i)
+			{
+				RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
+				if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP || runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+				{
+					const uint8* targetPointer = mRuntimeOpcodeBuffer.getStart() + (size_t)runtimeOpcode.getParameter<uint32>();
+					runtimeOpcode.setParameter<uint64>(reinterpret_cast<uint64>(targetPointer));
+				}
+			}
+		}
 	}
 
 	size_t RuntimeFunction::translateFromRuntimeProgramCounter(const uint8* runtimeProgramCounter) const

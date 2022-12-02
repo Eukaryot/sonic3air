@@ -248,12 +248,6 @@ namespace lemon
 			context.writeValueStack<T>(0, *context.mOpcode->getParameter<T*>() + context.mOpcode->getParameter<T>(8));
 			++context.mControlFlow->mValueStackPtr;
 		}
-
-		static void exec_OPT_INLINE_CALL(const RuntimeOpcodeContext context)
-		{
-			const NativeFunction& func = *context.mOpcode->getParameter<const NativeFunction*>();
-			func.execute(NativeFunction::Context(*context.mControlFlow));
-		}
 	};
 
 
@@ -449,27 +443,6 @@ namespace lemon
 					}
 					outNumOpcodesConsumed = 2;
 					return true;
-				}
-			}
-		}
-
-		// Here come some more optimizations, which don't require 2 or more opcodes
-		{
-			// Replace inline calls to native functions
-			if (opcodes[0].mType == Opcode::Type::CALL)
-			{
-				const bool isBaseCall = ((uint32)opcodes[0].mDataType != 0);
-				if (!isBaseCall)
-				{
-					const Function* function = runtime.getProgram().getFunctionBySignature((uint64)opcodes[0].mParameter);
-					if (nullptr != function && function->getType() == Function::Type::NATIVE && function->hasFlag(Function::Flag::ALLOW_INLINE_EXECUTION))
-					{
-						RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
-						runtimeOpcode.mExecFunc = &OptimizedOpcodeExec::exec_OPT_INLINE_CALL;
-						runtimeOpcode.setParameter((uint64)function);
-						outNumOpcodesConsumed = 1;
-						return true;
-					}
 				}
 			}
 		}

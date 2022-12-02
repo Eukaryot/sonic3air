@@ -21,6 +21,9 @@ namespace lemon
 
 class CodeExec final : public DebugNotificationInterface
 {
+friend struct RuntimeExecuteConnector;
+friend struct RuntimeExecuteConnectorDev;
+
 public:
 	enum class ExecutionState
 	{

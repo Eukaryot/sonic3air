@@ -34,7 +34,6 @@ namespace lemon
 	public:
 		enum Flags
 		{
-			FLAG_CALL_INLINE_RESOLVED		= 0x10,		// For CALL opcodes only: Call target is already resolved and is a user function meant to be inline executed
 			FLAG_CALL_IS_BASE_CALL			= 0x20,		// For CALL opcodes only: It is a base call
 			FLAG_CALL_TARGET_RESOLVED		= 0x40,		// For CALL opcodes only: Call target is already resolved and can be found in the parameter (as pointer)
 			FLAG_CALL_TARGET_RUNTIME_FUNC	= 0x80		// For CALL opcodes only: Resolved call target is a RuntimeFunction, not a Function

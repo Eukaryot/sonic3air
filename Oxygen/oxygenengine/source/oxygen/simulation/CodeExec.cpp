@@ -80,6 +80,45 @@ namespace
 }
 
 
+struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
+{
+	CodeExec& mCodeExec;
+
+	inline explicit RuntimeExecuteConnector(CodeExec& codeExec) : mCodeExec(codeExec) {}
+
+	bool handleCall(const lemon::Function* func)
+	{
+		if (nullptr == func)
+		{
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(mCallTarget, 16) + ").");
+			return false;
+		}
+		return true;
+	}
+};
+
+
+struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
+{
+	inline explicit RuntimeExecuteConnectorDev(CodeExec& codeExec) : RuntimeExecuteConnector(codeExec) {}
+
+	bool handleCall(const lemon::Function* func) override
+	{
+		if (nullptr == func)
+		{
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(mCallTarget, 16) + ").");
+			return false;
+		}
+		if (func->getType() == lemon::Function::Type::SCRIPT)
+		{
+			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
+			callFrame.mFunction = mCodeExec.mLemonScriptRuntime.getCurrentFunction();
+		}
+		return true;
+	}
+};
+
+
 
 const std::string& CodeExec::Location::toString() const
 {
@@ -728,21 +767,11 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted)
 {
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
-	lemon::Runtime::ExecuteResult result;
-	runtime.executeSteps(result, 5000);
+	RuntimeExecuteConnector connector(*this);
+	runtime.executeSteps(connector, 5000);
 
-	switch (result.mResult)
+	switch (connector.mResult)
 	{
-		case lemon::Runtime::ExecuteResult::CALL:
-		{
-			const lemon::Function* func = runtime.handleResultCall(result);
-			if (nullptr == func)
-			{
-				showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(result.mCallTarget, 16) + ").");
-			}
-			break;
-		}
-
 		case lemon::Runtime::ExecuteResult::RETURN:
 		{
 			if (mHasCallFramesToAdd)
@@ -767,7 +796,7 @@ bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted)
 		{
 			// Check for address hook at the target address
 			//  -> If it fails, we will just continue after the call
-			tryCallAddressHook((uint32)result.mCallTarget);
+			tryCallAddressHook((uint32)connector.mCallTarget);
 			break;
 		}
 
@@ -779,7 +808,7 @@ bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted)
 		default: break;
 	}
 
-	stepsExecuted = result.mStepsExecuted;
+	stepsExecuted = connector.mStepsExecuted;
 	return true;
 }
 
@@ -790,11 +819,11 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 		return false;
 
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
-	lemon::Runtime::ExecuteResult result;
-	runtime.executeSteps(result, 5000);
+	RuntimeExecuteConnectorDev connector(*this);
+	runtime.executeSteps(connector, 5000);
 
 	{
-		mActiveCallFrameTracking->mCallFrames.back().mSteps += result.mStepsExecuted;
+		mActiveCallFrameTracking->mCallFrames.back().mSteps += connector.mStepsExecuted;
 
 		// Correct written values for all watches that triggered in this update
 		if (!mWatchHitsThisUpdate.empty())
@@ -809,25 +838,8 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 		}
 	}
 
-	switch (result.mResult)
+	switch (connector.mResult)
 	{
-		case lemon::Runtime::ExecuteResult::CALL:
-		{
-			const lemon::Function* func = runtime.handleResultCall(result);
-			if (nullptr == func)
-			{
-				showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(result.mCallTarget, 16) + ").");
-				break;
-			}
-
-			if (func->getType() == lemon::Function::Type::SCRIPT)
-			{
-				CallFrame& callFrame = mActiveCallFrameTracking->pushCallFrame(CallFrame::Type::SCRIPT_DIRECT);
-				callFrame.mFunction = mLemonScriptRuntime.getCurrentFunction();
-			}
-			break;
-		}
-
 		case lemon::Runtime::ExecuteResult::RETURN:
 		{
 			popCallFrame();
@@ -846,7 +858,7 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 		{
 			// Check for address hook at the target address
 			//  -> If it fails, we will just continue after the call
-			tryCallAddressHookDev((uint32)result.mCallTarget);
+			tryCallAddressHookDev((uint32)connector.mCallTarget);
 			break;
 		}
 
@@ -858,7 +870,7 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 		default: break;
 	}
 
-	stepsExecuted = result.mStepsExecuted;
+	stepsExecuted = connector.mStepsExecuted;
 	return true;
 }
 

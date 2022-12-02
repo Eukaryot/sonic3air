@@ -337,6 +337,12 @@ namespace lemon
 			context.writeValueStack<T>(-1, ~context.readValueStack<T>(-1));
 		}
 
+		static void exec_INLINE_NATIVE_CALL(const RuntimeOpcodeContext context)
+		{
+			const NativeFunction& func = *context.mOpcode->getParameter<const NativeFunction*>();
+			func.execute(NativeFunction::Context(*context.mControlFlow));
+		}
+
 		static void exec_NOT_HANDLED(const RuntimeOpcodeContext context)
 		{
 			throw std::runtime_error("Unhandled opcode");
@@ -592,13 +598,33 @@ namespace lemon
 
 			case Opcode::Type::JUMP:
 			case Opcode::Type::JUMP_CONDITIONAL:
-			case Opcode::Type::CALL:
 			case Opcode::Type::RETURN:
 			case Opcode::Type::EXTERNAL_CALL:
 			case Opcode::Type::EXTERNAL_JUMP:
 			{
-				if ((uint32)opcode.mDataType != 0)
+				runtimeOpcode.mSuccessiveHandledOpcodes = 0;
+				return;
+			}
+
+			case Opcode::Type::CALL:
+			{
+				const bool isBaseCall = ((uint32)opcode.mDataType != 0);
+				if (isBaseCall)
+				{
 					runtimeOpcode.mFlags |= RuntimeOpcode::FLAG_CALL_IS_BASE_CALL;
+				}
+				else
+				{
+					// If this is a native function, replace with a runtime opcode that just executes the function without the usual overheads
+					const Function* function = runtime.getProgram().getFunctionBySignature((uint64)opcode.mParameter);
+					if (nullptr != function && function->getType() == Function::Type::NATIVE && function->hasFlag(Function::Flag::ALLOW_INLINE_EXECUTION))
+					{
+						runtimeOpcode.mExecFunc = &OpcodeExec::exec_INLINE_NATIVE_CALL;
+						runtimeOpcode.setParameter((uint64)function);
+						return;
+					}
+				}
+
 				runtimeOpcode.mSuccessiveHandledOpcodes = 0;
 				return;
 			}

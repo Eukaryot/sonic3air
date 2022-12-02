@@ -21,7 +21,8 @@ namespace lemon
 
 		inline void clear()  { mStrings.clear(); }
 		inline const FlyweightString* getStringByHash(uint64 hash) const  { return mapFind(mStrings, hash); }
-		inline void addString(FlyweightString str)  { mStrings[str.getHash()] = str; }
+		inline void addString(FlyweightString str)				  { mStrings[str.getHash()] = str; }
+		inline void addString(std::string_view str, uint64 hash)  { mStrings[hash] = str; }
 
 		void addFromList(const std::vector<FlyweightString>& list);
 

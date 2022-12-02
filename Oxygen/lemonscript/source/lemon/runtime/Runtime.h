@@ -97,9 +97,12 @@ namespace lemon
 
 			Result mResult = Result::HALT;
 			size_t mStepsExecuted = 0;
+			uint64 mCallTarget = 0;			// For result CALL, EXTERNAL_CALL and EXTERNAL_JUMP
+		};
 
-			uint64 mCallTarget = 0;							// For result CALL, EXTERNAL_CALL and EXTERNAL_JUMP
-			const RuntimeOpcode* mRuntimeOpcode = nullptr;	// For result CALL only
+		struct ExecuteConnector : public ExecuteResult
+		{
+			virtual bool handleCall(const Function* func) = 0;
 		};
 
 	public:
@@ -146,8 +149,8 @@ namespace lemon
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
 		bool returnFromFunction();
 
-		void executeSteps(Runtime::ExecuteResult& result, size_t stepsLimit = 1000);
-		const Function* handleResultCall(const ExecuteResult& result);
+		void executeSteps(ExecuteConnector& result, size_t stepsLimit = 1000);
+		const Function* handleResultCall(const ExecuteResult& result, const RuntimeOpcode& runtimeOpcode);
 
 		void getLastStepLocation(ControlFlow::Location& outLocation) const;
 

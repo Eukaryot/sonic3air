@@ -208,6 +208,19 @@ void doNothing()	// This function serves only as a point where to place breakpoi
 }
 
 
+struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
+{
+	bool handleCall(const lemon::Function* func)
+	{
+		if (nullptr == func)
+		{
+			throw std::runtime_error("Call failed, probably due to an invalid function");
+		}
+		return true;
+	}
+};
+
+
 int main(int argc, char** argv)
 {
 	INIT_RMX;
@@ -306,22 +319,13 @@ int main(int argc, char** argv)
 		runtime.setMemoryAccessHandler(&memoryAccess);
 		runtime.callFunction(*func);
 
-		Runtime::ExecuteResult result;
+		RuntimeExecuteConnector connector;
 		bool running = true;
 		while (running)
 		{
-			runtime.executeSteps(result, 10);
-			switch (result.mResult)
+			runtime.executeSteps(connector, 10);
+			switch (connector.mResult)
 			{
-				case Runtime::ExecuteResult::CALL:
-				{
-					if (nullptr == runtime.handleResultCall(result))
-					{
-						throw std::runtime_error("Call failed, probably due to an invalid function");
-					}
-					break;
-				}
-
 				case Runtime::ExecuteResult::RETURN:
 				{
 					if (runtime.getMainControlFlow().getCallStack().count == 0)
