@@ -175,12 +175,9 @@ void VectorBinarySerializer::serialize(std::wstring& value, size_t stringLengthL
 {
 	if (mReading)
 	{
+		value.clear();
 		const size_t length = readSize(stringLengthLimit);
-		if (length == 0)
-		{
-			value.clear();
-		}
-		else
+		if (length > 0)
 		{
 			// Read UTF-8 encoded string
 			const char* pointer = (const char*)readAccess(length);
