@@ -34,7 +34,6 @@ namespace lemon
 			mLocalVariablesBuffer[k] = 0;
 		}
 		mLocalVariablesSize = 0;
-		mLastStepState = State();
 	}
 
 	void ControlFlow::getCallStack(std::vector<Location>& outLocations) const
@@ -58,15 +57,16 @@ namespace lemon
 
 	void ControlFlow::getLastStepLocation(Location& outLocation) const
 	{
-		if (nullptr == mLastStepState.mRuntimeFunction)
+		if (!mCallStack.empty())
 		{
-			outLocation.mFunction = nullptr;
-			outLocation.mProgramCounter = 0;
+			const State& state = mCallStack.back();
+			outLocation.mFunction = state.mRuntimeFunction->mFunction;
+			outLocation.mProgramCounter = state.mRuntimeFunction->translateFromRuntimeProgramCounter(state.mProgramCounter);
 		}
 		else
 		{
-			outLocation.mFunction = mLastStepState.mRuntimeFunction->mFunction;
-			outLocation.mProgramCounter = mLastStepState.mRuntimeFunction->translateFromRuntimeProgramCounter(mLastStepState.mProgramCounter);
+			outLocation.mFunction = nullptr;
+			outLocation.mProgramCounter = 0;
 		}
 	}
 

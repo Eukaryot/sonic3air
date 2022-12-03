@@ -589,7 +589,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 				{
 					builder.addLine(String(0, "Watch 0x%08x (0x%02x bytes)", displayAddress, watch->mBytes), Color::fromABGR32(0xffa0a0a0));
 					if (watch->mBytes <= 4)
-						builder.addLine(String(0, "= %s at %s", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str(), watch->mLastHitLocation.toString().c_str()), Color::fromABGR32(0xffa0a0a0), 8);
+						builder.addLine(String(0, "= %s at %s", rmx::hexString(watch->mInitialValue, watch->mBytes * 2).c_str(), watch->mLastHitLocation.toString(codeExec).c_str()), Color::fromABGR32(0xffa0a0a0), 8);
 				}
 				else
 				{
@@ -603,9 +603,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						const uint64 key = ((uint64)watch->mAddress << 32) + hitIndex;
 						Builder::TextLine* textLine;
 						if (watch->mBytes <= 4)
-							textLine = &builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(String(0, "= %s at %s", rmx::hexString(hit.mWrittenValue, watch->mBytes * 2).c_str(), hit.mLocation.toString(codeExec).c_str()), Color::WHITE, 8, key);
 						else
-							textLine = &builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString().c_str()), Color::WHITE, 8, key);
+							textLine = &builder.addLine(String(0, "u%d[0xffff%04x] = %s at %s", hit.mBytes * 8, hit.mAddress, rmx::hexString(hit.mWrittenValue, std::min(hit.mBytes * 2, 8)).c_str(), hit.mLocation.toString(codeExec).c_str()), Color::WHITE, 8, key);
 
 						// Just a test
 					#if 0
@@ -855,7 +855,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			for (const CodeExec::VRAMWrite* write : writes)
 			{
 				const uint64 key = ((uint64)write->mAddress << 32) + write->mSize;
-				String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString().c_str());
+				String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString(codeExec).c_str());
 				Color color = Color::WHITE;
 				if (write->mAddress >= startAddressPlaneA && write->mAddress < endAddressPlaneA)
 				{

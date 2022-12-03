@@ -44,12 +44,11 @@ public:
 
 	struct Location
 	{
-		CodeExec* mCodeExec = nullptr;
 		const lemon::ScriptFunction* mFunction = nullptr;
 		size_t mProgramCounter = 0;
 		mutable std::string mResolvedString;
 
-		const std::string& toString() const;
+		const std::string& toString(CodeExec& codeExec) const;
 		bool operator==(const Location& other) const;
 	};
 
@@ -165,8 +164,6 @@ private:
 
 	bool executeRuntimeSteps(size_t& stepsExecuted, size_t minimumCallStackSize);
 	bool executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallStackSize);
-
-	void getLastStepLocation(Location& outLocation);
 
 	bool tryCallAddressHook(uint32 address);
 	bool tryCallAddressHookDev(uint32 address);

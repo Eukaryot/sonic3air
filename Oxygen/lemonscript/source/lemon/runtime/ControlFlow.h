@@ -103,7 +103,6 @@ namespace lemon
 		uint64* mValueStackPtr   = &mValueStackBuffer[4];
 		int64 mLocalVariablesBuffer[0x400] = { 0 };
 		size_t mLocalVariablesSize = 0;
-		State mLastStepState;
 
 		// Only as optimization for OpcodeExec
 		int64* mCurrentLocalVariables = nullptr;

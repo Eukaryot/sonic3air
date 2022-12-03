@@ -85,25 +85,19 @@ namespace lemon
 	public:
 		struct ExecuteResult
 		{
-			enum Result
+			enum class Result
 			{
-				CONTINUE,
-				CALL,
-				RETURN,
-				EXTERNAL_CALL,
-				EXTERNAL_JUMP,
-				STOPPED,
+				OKAY,
 				HALT
 			};
 
-			Result mResult = Result::HALT;
+			Result mResult = Result::OKAY;
 			size_t mStepsExecuted = 0;
-			uint64 mCallTarget = 0;			// For result CALL, EXTERNAL_CALL and EXTERNAL_JUMP
 		};
 
 		struct ExecuteConnector : public ExecuteResult
 		{
-			virtual bool handleCall(const Function* func) = 0;
+			virtual bool handleCall(const Function* func, uint64 callTarget) = 0;
 			virtual bool handleReturn() = 0;
 			virtual bool handleExternalCall(uint64 address) = 0;
 			virtual bool handleExternalJump(uint64 address) = 0;
@@ -154,9 +148,7 @@ namespace lemon
 		bool returnFromFunction();
 
 		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
-		const Function* handleResultCall(const ExecuteResult& result, const RuntimeOpcode& runtimeOpcode);
-
-		void getLastStepLocation(ControlFlow::Location& outLocation) const;
+		const Function* handleResultCall(const RuntimeOpcode& runtimeOpcode);
 
 		inline void triggerStopSignal()  { mReceivedStopSignal = true; }
 

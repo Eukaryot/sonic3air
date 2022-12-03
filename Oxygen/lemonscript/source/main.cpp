@@ -215,7 +215,7 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 
 	inline RuntimeExecuteConnector(Runtime& runtime) : mRuntime(runtime) {}
 
-	bool handleCall(const lemon::Function* func) override
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
 	{
 		if (nullptr == func)
 		{
@@ -349,7 +349,7 @@ int main(int argc, char** argv)
 		{
 			runtime.executeSteps(connector, 10, 0);
 
-			if (connector.mResult == Runtime::ExecuteResult::HALT)
+			if (connector.mResult == Runtime::ExecuteResult::Result::HALT)
 			{
 				connector.mStopped = true;
 			}

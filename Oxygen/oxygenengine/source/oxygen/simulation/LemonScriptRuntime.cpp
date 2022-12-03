@@ -329,7 +329,7 @@ void LemonScriptRuntime::setGlobalVariableValue_int64(lemon::FlyweightString var
 void LemonScriptRuntime::getLastStepLocation(const lemon::ScriptFunction*& outFunction, size_t& outProgramCounter) const
 {
 	lemon::ControlFlow::Location location;
-	mInternal.mRuntime.getLastStepLocation(location);
+	mInternal.mRuntime.getSelectedControlFlow().getLastStepLocation(location);
 	outFunction = location.mFunction;
 	outProgramCounter = location.mProgramCounter;
 }

@@ -86,11 +86,11 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 
 	inline explicit RuntimeExecuteConnector(CodeExec& codeExec) : mCodeExec(codeExec) {}
 
-	bool handleCall(const lemon::Function* func) override
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
 	{
 		if (nullptr == func)
 		{
-			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(mCallTarget, 16) + ").");
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
 			return false;
 		}
 		return true;
@@ -125,11 +125,11 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 {
 	inline explicit RuntimeExecuteConnectorDev(CodeExec& codeExec) : RuntimeExecuteConnector(codeExec) {}
 
-	bool handleCall(const lemon::Function* func) override
+	bool handleCall(const lemon::Function* func, uint64 callTarget) override
 	{
 		if (nullptr == func)
 		{
-			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(mCallTarget, 16) + ").");
+			mCodeExec.showErrorWithScriptLocation("Call failed, probably due to invalid function (target = " + rmx::hexString(callTarget, 16) + ").");
 			return false;
 		}
 		if (func->getType() == lemon::Function::Type::SCRIPT)
@@ -163,7 +163,7 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 
 
 
-const std::string& CodeExec::Location::toString() const
+const std::string& CodeExec::Location::toString(CodeExec& codeExec) const
 {
 	if (mResolvedString.empty())
 	{
@@ -175,7 +175,7 @@ const std::string& CodeExec::Location::toString() const
 		{
 			std::string scriptFilename;
 			uint32 lineNumber;
-			mCodeExec->getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
+			codeExec.getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
 			mResolvedString = std::string(mFunction->getName().getString()) + ", line " + std::to_string(lineNumber);
 		}
 	}
@@ -815,7 +815,7 @@ bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted, size_t minimumCallStac
 	runtime.executeSteps(connector, 5000, minimumCallStackSize);
 
 	stepsExecuted = connector.mStepsExecuted;
-	return (connector.mResult != lemon::Runtime::ExecuteResult::HALT);
+	return (connector.mResult != lemon::Runtime::ExecuteResult::Result::HALT);
 }
 
 bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallStackSize)
@@ -845,13 +845,7 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallS
 	}
 
 	stepsExecuted = connector.mStepsExecuted;
-	return (connector.mResult != lemon::Runtime::ExecuteResult::HALT);
-}
-
-void CodeExec::getLastStepLocation(Location& outLocation)
-{
-	outLocation.mCodeExec = this;
-	mLemonScriptRuntime.getLastStepLocation(outLocation.mFunction, outLocation.mProgramCounter);
+	return (connector.mResult != lemon::Runtime::ExecuteResult::Result::HALT);
 }
 
 bool CodeExec::tryCallAddressHook(uint32 address)
@@ -963,7 +957,7 @@ void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
 		return;
 
 	Location location;
-	getLastStepLocation(location);
+	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
 
 	Watch& watch = *mWatches[watchIndex];
 	{
@@ -991,7 +985,7 @@ void CodeExec::onVRAMWrite(uint16 address, uint16 bytes)
 		return;
 
 	Location location;
-	getLastStepLocation(location);
+	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
 
 	// Check if this can be merged with the VRAM write just before
 	if (!mVRAMWrites.empty())

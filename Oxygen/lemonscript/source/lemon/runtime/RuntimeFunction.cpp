@@ -181,8 +181,8 @@ namespace lemon
 						break;
 
 					// Take a shortcut by skipping the jump opcode and directly pointing to its target as next opcode
-					//  -> But only do that for jumps forward, otherwise it messes with the tracking of steps executed too much, leading to buggy behavior
-					//  -> In fact, the steps counting is quite imprecise for the forward jumps, as they're counted as if everything in between would have been executed (but that's going to be ignored for performance's sake...)
+					//  -> But only do that for jumps forward, otherwise it's possible that script execution can get stuck in an infinite loop
+					//  -> That's because counted steps are only checked in actually executed jumps, but not in those that we optimize away here
 					RuntimeOpcode* targetPointer = reinterpret_cast<RuntimeOpcode*>(runtimeOpcode.mNext->getParameter<uint64>());
 					RuntimeOpcode* ownPointer = &runtimeOpcode;
 					if (targetPointer <= ownPointer)
