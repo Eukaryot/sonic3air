@@ -81,11 +81,8 @@ namespace lemon
 		mOpcodePointers.resize(other.mOpcodePointers.size());
 		for (size_t k = 0; k < mOpcodePointers.size(); ++k)
 		{
-			size_t offset = (size_t)((uint8*)other.mOpcodePointers[k] - other.mBuffer);
+			const size_t offset = (size_t)((uint8*)other.mOpcodePointers[k] - other.mBuffer);
 			mOpcodePointers[k] = (RuntimeOpcode*)(mBuffer + offset);
-
-			offset = (size_t)((uint8*)other.mOpcodePointers[k]->mNext - other.mBuffer);
-			mOpcodePointers[k]->mNext = (RuntimeOpcode*)(mBuffer + offset);
 		}
 	}
 
@@ -96,105 +93,103 @@ namespace lemon
 		if (!mRuntimeOpcodeBuffer.empty() || mFunction->mOpcodes.empty())
 			return;
 
-		// Initialize runtime opcodes now that they are needed
-		const std::vector<Opcode>& opcodes = mFunction->mOpcodes;
-		const size_t numOpcodes = opcodes.size();
-
-		// Preparation: Build some useful information about opcodes
-		static std::vector<OpcodeProcessor::OpcodeData> opcodeData;
-		OpcodeProcessor::buildOpcodeData(opcodeData, *mFunction);
-
-		// Using a static buffer as temporary buffer before knowing the final size
-		static RuntimeOpcodeBuffer tempBuffer;
-		tempBuffer.clear();
-		tempBuffer.reserveForOpcodes(numOpcodes);
-
 		// Create the runtime opcodes
-		mProgramCounterByOpcodeIndex.resize(numOpcodes, 0xffffffff);
-
-		for (size_t i = 0; i < numOpcodes; )
 		{
-			const size_t start = tempBuffer.size();
+			// Initialize runtime opcodes now that they are needed
+			const std::vector<Opcode>& opcodes = mFunction->mOpcodes;
+			const size_t numOpcodes = opcodes.size();
 
-			int numOpcodesConsumed = 1;
-			createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, numOpcodesConsumed, runtime);
-			for (int k = 0; k < numOpcodesConsumed; ++k)
-			{
-				mProgramCounterByOpcodeIndex[k + i] = start;
-			}
-			i += numOpcodesConsumed;
-		}
+			// Preparation: Build some useful information about opcodes
+			static std::vector<OpcodeProcessor::OpcodeData> opcodeData;
+			OpcodeProcessor::buildOpcodeData(opcodeData, *mFunction);
 
-		// Translation of jumps
-		const std::vector<RuntimeOpcode*>& runtimeOpcodePointers = tempBuffer.getOpcodePointers();
-		for (size_t i = 0; i < runtimeOpcodePointers.size(); ++i)
-		{
-			RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
-			if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP || runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+			// Using a static buffer as temporary buffer before knowing the final size
+			static RuntimeOpcodeBuffer tempBuffer;
+			tempBuffer.clear();
+			tempBuffer.reserveForOpcodes(numOpcodes);
+
+			mProgramCounterByOpcodeIndex.resize(numOpcodes, 0xffffffff);
+
+			// Let the opcode providers create runtime opcodes
+			//  -> They may choose to merge more than one opcode into a runtime opcode, where that's feasible
+			for (size_t i = 0; i < numOpcodes; )
 			{
-				const size_t oldJumpTarget = (size_t)runtimeOpcode.getParameter<uint32>();
-				if (oldJumpTarget < opcodeData.size())
+				const size_t start = tempBuffer.size();
+
+				int numOpcodesConsumed = 1;
+				createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, numOpcodesConsumed, runtime);
+				for (int k = 0; k < numOpcodesConsumed; ++k)
 				{
-					const size_t newJumpTarget = mProgramCounterByOpcodeIndex[oldJumpTarget];
-					runtimeOpcode.setParameter((uint32)newJumpTarget);
+					mProgramCounterByOpcodeIndex[k + i] = start;
 				}
-				else
-				{
-					RMX_ASSERT(runtimeOpcodePointers.back()->mOpcodeType == Opcode::Type::RETURN, "Functions must end with a return in all cases");
-					const size_t newJumpTarget = (size_t)((uint8*)runtimeOpcodePointers.back() - (uint8*)runtimeOpcodePointers[0]);
-					runtimeOpcode.setParameter((uint32)newJumpTarget);
-				}
+				i += numOpcodesConsumed;
 			}
+
+			// Copy the runtime opcodes over into the actual opcode buffer for this function
+			mRuntimeOpcodeBuffer.copyFrom(tempBuffer, runtime.mRuntimeOpcodesPool);
 		}
 
-		// Update successive handled opcode counts
-		uint8 sequenceLength = 0;
-		for (int i = (int)runtimeOpcodePointers.size()-1; i >= 0; --i)
+		// Post-processing
 		{
-			if (runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes == 0)
-			{
-				sequenceLength = 0;
-			}
-			else
-			{
-				if (sequenceLength < 0xff)
-					++sequenceLength;
-			}
-			runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes = sequenceLength;
-		}
-
-		// Fill in the pointers to the next opcode
-		for (size_t i = 0; i < runtimeOpcodePointers.size() - 1; ++i)
-		{
-			RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
-			runtimeOpcode.mNext = (RuntimeOpcode*)((uint8*)&runtimeOpcode + (size_t)runtimeOpcode.mSize);
-			if (runtimeOpcode.mNext->mOpcodeType == Opcode::Type::JUMP)
-			{
-				// Take a shortcut by skipping the jump opcode and directly pointing to its target as next opcode
-				//  -> But only do that for jumps forward, otherwise it messes with the tracking of steps executed too much, leading to buggy behavior
-				//  -> In fact, the steps counting is quite imprecise for the forward jumps, as they're counted as if everything in between would have been executed (but that's going to be ignored for performance's sake...)
-				const size_t targetOffset = (size_t)runtimeOpcode.mNext->getParameter<uint32>();
-				const size_t ownOffset = (size_t)((uint8*)&runtimeOpcode - tempBuffer.getStart());
-				if (targetOffset > ownOffset)
-				{
-					runtimeOpcode.mNext = (RuntimeOpcode*)(tempBuffer.getStart() + targetOffset);
-				}
-			}
-		}
-
-		// Copy the results over, using memory from the shared memory pool
-		mRuntimeOpcodeBuffer.copyFrom(tempBuffer, runtime.mRuntimeOpcodesPool);
-
-		// Convert parameter of jumps from a uint32 offset to a direct pointer to their target runtime opcode
-		{
+			// Translation of jumps
 			const std::vector<RuntimeOpcode*>& runtimeOpcodePointers = mRuntimeOpcodeBuffer.getOpcodePointers();
 			for (size_t i = 0; i < runtimeOpcodePointers.size(); ++i)
 			{
 				RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
 				if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP || runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
 				{
-					const uint8* targetPointer = mRuntimeOpcodeBuffer.getStart() + (size_t)runtimeOpcode.getParameter<uint32>();
-					runtimeOpcode.setParameter<uint64>(reinterpret_cast<uint64>(targetPointer));
+					const size_t oldJumpTarget = (size_t)runtimeOpcode.getParameter<uint32>();
+					const uint8* newJumpTarget = nullptr;
+					if (oldJumpTarget < mProgramCounterByOpcodeIndex.size())
+					{
+						newJumpTarget = mRuntimeOpcodeBuffer.getStart() + mProgramCounterByOpcodeIndex[oldJumpTarget];
+					}
+					else
+					{
+						RMX_ASSERT(runtimeOpcodePointers.back()->mOpcodeType == Opcode::Type::RETURN, "Functions must end with a return in all cases");
+						newJumpTarget = (uint8*)runtimeOpcodePointers.back();
+					}
+					runtimeOpcode.setParameter<uint64>(reinterpret_cast<uint64>(newJumpTarget));
+				}
+			}
+
+			// Update successive handled opcode counts
+			uint8 sequenceLength = 0;
+			for (int i = (int)runtimeOpcodePointers.size()-1; i >= 0; --i)
+			{
+				if (runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes == 0)
+				{
+					sequenceLength = 0;
+				}
+				else
+				{
+					if (sequenceLength < 0xff)
+						++sequenceLength;
+				}
+				runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes = sequenceLength;
+			}
+
+			// Fill in the pointers to the next opcode
+			for (size_t i = 0; i < runtimeOpcodePointers.size() - 1; ++i)
+			{
+				RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
+				runtimeOpcode.mNext = (RuntimeOpcode*)((uint8*)&runtimeOpcode + (size_t)runtimeOpcode.mSize);
+
+				for (int runs = 0; runs < 5; ++runs)
+				{
+					if (runtimeOpcode.mNext->mOpcodeType != Opcode::Type::JUMP)
+						break;
+
+					// Take a shortcut by skipping the jump opcode and directly pointing to its target as next opcode
+					//  -> But only do that for jumps forward, otherwise it messes with the tracking of steps executed too much, leading to buggy behavior
+					//  -> In fact, the steps counting is quite imprecise for the forward jumps, as they're counted as if everything in between would have been executed (but that's going to be ignored for performance's sake...)
+					RuntimeOpcode* targetPointer = reinterpret_cast<RuntimeOpcode*>(runtimeOpcode.mNext->getParameter<uint64>());
+					RuntimeOpcode* ownPointer = &runtimeOpcode;
+					if (targetPointer <= ownPointer)
+						break;
+
+					runtimeOpcode.mNext = targetPointer;
+					// Continue the for-loop, in case mNext is yet another jump that can be resolved by a shortcut
 				}
 			}
 		}

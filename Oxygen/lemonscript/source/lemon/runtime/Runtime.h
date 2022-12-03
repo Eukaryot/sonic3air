@@ -147,7 +147,7 @@ namespace lemon
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
 		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }
 
-		void callFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
+		void callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
 		bool callFunctionAtLabel(const Function& function, FlyweightString labelName);
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());

@@ -217,7 +217,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 	const lemon::RuntimeFunction** runtimeFunctionPtr = mInternal.mAddressHookLookup.find(address);
 	if (nullptr != runtimeFunctionPtr)
 	{
-		mInternal.mRuntime.callFunction(**runtimeFunctionPtr);
+		mInternal.mRuntime.callRuntimeFunction(**runtimeFunctionPtr);
 	}
 	else
 	{
@@ -232,7 +232,7 @@ bool LemonScriptRuntime::callAddressHook(uint32 address)
 		if (nullptr != runtimeFunction)
 		{
 			mInternal.mAddressHookLookup.add(address, runtimeFunction);
-			mInternal.mRuntime.callFunction(*runtimeFunction);
+			mInternal.mRuntime.callRuntimeFunction(*runtimeFunction);
 		}
 		else
 		{

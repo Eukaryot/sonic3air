@@ -273,7 +273,7 @@ namespace lemon
 		return &mGlobalVariables[index];
 	}
 
-	void Runtime::callFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex)
+	void Runtime::callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex)
 	{
 		// Push new state to call stack
 		ControlFlow::State& state = *mSelectedControlFlow->mCallStack.add();
@@ -290,7 +290,7 @@ namespace lemon
 			case Function::Type::SCRIPT:
 			{
 				const ScriptFunction& func = static_cast<const ScriptFunction&>(function);
-				callFunction(*getRuntimeFunction(func));
+				callRuntimeFunction(*getRuntimeFunction(func));
 				break;
 			}
 
@@ -316,7 +316,7 @@ namespace lemon
 
 		RuntimeFunction* runtimeFunction = getRuntimeFunction(func);
 		RMX_ASSERT(nullptr != runtimeFunction, "Got invalid runtime function");
-		callFunction(*runtimeFunction);
+		callRuntimeFunction(*runtimeFunction);
 
 		// Build up scope accordingly (all local variables will have a value of zero, though)
 		int numLocalVars = (int)func.mLocalVariablesByID.size();
@@ -584,12 +584,11 @@ namespace lemon
 		// Consider base function call, if additional data says so
 		const size_t baseCallIndex = (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_IS_BASE_CALL) ? (mSelectedControlFlow->getState().mBaseCallIndex + 1) : 0;
 
-		const constexpr uint8 FLAG_RESOLVED_RUNTIME_FUNC = (RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED | RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC);
-		if ((runtimeOpcode.mFlags & FLAG_RESOLVED_RUNTIME_FUNC) == FLAG_RESOLVED_RUNTIME_FUNC)
+		if (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC)
 		{
 			// Take the runtime function shortcut (this is the most common one)
 			const RuntimeFunction* runtimeFunction = runtimeOpcode.getParameter<const RuntimeFunction*>();
-			callFunction(*runtimeFunction, baseCallIndex);
+			callRuntimeFunction(*runtimeFunction, baseCallIndex);
 			return runtimeFunction->mFunction;
 		}
 		else if (runtimeOpcode.mFlags & RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED)
@@ -610,10 +609,10 @@ namespace lemon
 			{
 				// Create a shortcut for next time
 				runtimeOpcodeMutable.setParameter(runtimeFunction);
-				runtimeOpcodeMutable.mFlags |= (RuntimeOpcode::FLAG_CALL_TARGET_RESOLVED | RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC);
+				runtimeOpcodeMutable.mFlags |= RuntimeOpcode::FLAG_CALL_TARGET_RUNTIME_FUNC;
 
 				// Call the function now
-				callFunction(*runtimeFunction, baseCallIndex);
+				callRuntimeFunction(*runtimeFunction, baseCallIndex);
 				return runtimeFunction->mFunction;
 			}
 
