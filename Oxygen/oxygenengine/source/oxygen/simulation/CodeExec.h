@@ -163,8 +163,8 @@ private:
 	bool hasValidState() const;
 	void runScript(bool executeSingleFunction, CallFrameTracking* callFrameTracking);
 
-	bool executeRuntimeSteps(size_t& stepsExecuted);
-	bool executeRuntimeStepsDev(size_t& stepsExecuted);
+	bool executeRuntimeSteps(size_t& stepsExecuted, size_t minimumCallStackSize);
+	bool executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallStackSize);
 
 	void getLastStepLocation(Location& outLocation);
 

@@ -103,7 +103,7 @@ public:
 
 public:
 	// MemoryAccessHandler interface implementation
-	uint8 read8(uint64 address) override	{ return readMemory8((uint32)address); }
+	uint8  read8(uint64 address) override	{ return readMemory8((uint32)address); }
 	uint16 read16(uint64 address) override	{ return readMemory16((uint32)address); }
 	uint32 read32(uint64 address) override	{ return readMemory32((uint32)address); }
 	uint64 read64(uint64 address) override	{ return readMemory64((uint32)address); }

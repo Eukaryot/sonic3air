@@ -296,12 +296,9 @@ namespace lemon
 
 			case Function::Type::NATIVE:
 			{
-				const NativeFunction& func = static_cast<const NativeFunction&>(function);
-
 				// Directly execute it
-				mActiveControlFlow = mSelectedControlFlow;
+				const NativeFunction& func = static_cast<const NativeFunction&>(function);
 				func.execute(NativeFunction::Context(*mSelectedControlFlow));
-				mActiveControlFlow = nullptr;
 				break;
 			}
 		}
@@ -366,33 +363,36 @@ namespace lemon
 		return true;
 	}
 
-	void Runtime::executeSteps(ExecuteConnector& result, size_t stepsLimit)
+	void Runtime::executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize)
 	{
 		stepsLimit *= (sizeof(RuntimeOpcode) + 8);		// Rough estimate for average runtime opcode size
 		result.mStepsExecuted = 0;
 
-		if (mSelectedControlFlow->mCallStack.count == 0)
+		if (mSelectedControlFlow->mCallStack.count <= minimumCallStackSize)
 		{
 			result.mResult = ExecuteResult::HALT;
 			return;
 		}
 
+		result.mResult = ExecuteResult::CONTINUE;
+
 		RuntimeOpcodeContext context;
 		context.mControlFlow = mSelectedControlFlow;
 		mActiveControlFlow = mSelectedControlFlow;
 
-		result.mResult = ExecuteResult::CONTINUE;
-
 		// Outer loop
 		//  -> Gets restarted whenever the currently running function changes
-		//  -> Gets exited only by a return
-		while (true)
+		//  -> Gets exited only by a stop signal or a return
+		mReceivedStopSignal = false;
+		while (!mReceivedStopSignal)
 		{
 			ControlFlow::State& state = mSelectedControlFlow->mCallStack.back();
 			const uint8*& programCounter = state.mProgramCounter;
 
+		#ifdef DEBUG
 			// Reached the end already?
 			//  -> Should not happen actually, as all functions end with a return opcode
+			//  -> That's why this check is only active in debug builds
 			if (programCounter > state.mRuntimeFunction->mRuntimeOpcodeBuffer.getEnd())
 			{
 				RMX_ASSERT(false, "Program counter exceeded the end of function");
@@ -401,6 +401,7 @@ namespace lemon
 				mActiveControlFlow = nullptr;
 				return;
 			}
+		#endif
 
 			RMX_CHECK(mSelectedControlFlow->mValueStackPtr >= mSelectedControlFlow->mValueStackStart, "Value stack error: Removed elements from empty stack", mSelectedControlFlow->mValueStackPtr = mSelectedControlFlow->mValueStackStart);
 			RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[0x78], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
@@ -414,10 +415,10 @@ namespace lemon
 			// Inner loop
 			//  -> Main execution of opcodes inside a single function
 			//  -> Not exited on jumps
-			//  -> Gets exited by changing keepRunning when the running function was changed
+			//  -> Gets exited by changing stayInsideInnerLoop when the running function was changed
 			//  -> Gets exited by a return when control needs to be returned to the caller
-			bool keepRunning = true;
-			while (keepRunning)
+			bool stayInsideInnerLoop = true;
+			while (stayInsideInnerLoop)
 			{
 				// Update location for the next step
 				mSelectedControlFlow->mLastStepState.mProgramCounter = (uint8*)context.mOpcode;
@@ -486,7 +487,7 @@ namespace lemon
 							if (result.handleCall(func))
 							{
 								// Restart the outer loop now that the running function has changed
-								keepRunning = false;
+								stayInsideInnerLoop = false;
 								break;
 							}
 							else
@@ -501,9 +502,24 @@ namespace lemon
 						case Opcode::Type::RETURN:
 						{
 							programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
-							returnFromFunction();
-							result.mResult = ExecuteResult::RETURN;
 							result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
+
+							mSelectedControlFlow->mLocalVariablesSize = mSelectedControlFlow->mCallStack.back().mLocalVariablesStart;
+							mSelectedControlFlow->mCallStack.pop_back();
+
+							if (result.handleReturn())
+							{
+								// Check stop conditions
+								if (mSelectedControlFlow->mCallStack.count > minimumCallStackSize && result.mStepsExecuted < stepsLimit)
+								{
+									// Restart the outer loop now that the running function has changed
+									stayInsideInnerLoop = false;
+									break;
+								}
+							}
+
+							// Handling failed or a stop condition triggered, return control to the caller
+							result.mResult = ExecuteResult::RETURN;
 							mActiveControlFlow = nullptr;
 							return;
 						}
@@ -512,11 +528,21 @@ namespace lemon
 						{
 							programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
 							--mSelectedControlFlow->mValueStackPtr;
-							result.mResult = ExecuteResult::EXTERNAL_CALL;
 							result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
 							result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
-							mActiveControlFlow = nullptr;
-							return;
+
+							if (result.handleExternalCall(result.mCallTarget))
+							{
+								// Restart the outer loop now that the running function has changed
+								stayInsideInnerLoop = false;
+								break;
+							}
+							else
+							{
+								result.mResult = ExecuteResult::EXTERNAL_CALL;
+								mActiveControlFlow = nullptr;
+								return;
+							}
 						}
 
 						case Opcode::Type::EXTERNAL_JUMP:
@@ -524,11 +550,21 @@ namespace lemon
 							programCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
 							--mSelectedControlFlow->mValueStackPtr;
 							returnFromFunction();
-							result.mResult = ExecuteResult::EXTERNAL_JUMP;
 							result.mStepsExecuted += (size_t)(programCounter - programCounterInitial);
 							result.mCallTarget = *mSelectedControlFlow->mValueStackPtr;
-							mActiveControlFlow = nullptr;
-							return;
+
+							if (result.handleExternalJump(result.mCallTarget))
+							{
+								// Restart the outer loop now that the running function has changed
+								stayInsideInnerLoop = false;
+								break;
+							}
+							else
+							{
+								result.mResult = ExecuteResult::EXTERNAL_JUMP;
+								mActiveControlFlow = nullptr;
+								return;
+							}
 						}
 
 						default:
@@ -537,6 +573,10 @@ namespace lemon
 				}
 			}
 		}
+
+		// Outer loop was exited by a stop signal
+		result.mResult = ExecuteResult::STOPPED;
+		mActiveControlFlow = nullptr;
 	}
 
 	const Function* Runtime::handleResultCall(const ExecuteResult& result, const RuntimeOpcode& runtimeOpcode)

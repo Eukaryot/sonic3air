@@ -92,6 +92,7 @@ namespace lemon
 				RETURN,
 				EXTERNAL_CALL,
 				EXTERNAL_JUMP,
+				STOPPED,
 				HALT
 			};
 
@@ -103,6 +104,9 @@ namespace lemon
 		struct ExecuteConnector : public ExecuteResult
 		{
 			virtual bool handleCall(const Function* func) = 0;
+			virtual bool handleReturn() = 0;
+			virtual bool handleExternalCall(uint64 address) = 0;
+			virtual bool handleExternalJump(uint64 address) = 0;
 		};
 
 	public:
@@ -149,10 +153,12 @@ namespace lemon
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
 		bool returnFromFunction();
 
-		void executeSteps(ExecuteConnector& result, size_t stepsLimit = 1000);
+		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);
 		const Function* handleResultCall(const ExecuteResult& result, const RuntimeOpcode& runtimeOpcode);
 
 		void getLastStepLocation(ControlFlow::Location& outLocation) const;
+
+		inline void triggerStopSignal()  { mReceivedStopSignal = true; }
 
 		bool serializeState(VectorBinarySerializer& serializer, std::string* outError = nullptr);
 
@@ -177,6 +183,8 @@ namespace lemon
 		// TODO: Add functions to create / destroy control flows, otherwise we're stuck with just the main control flow
 		std::vector<ControlFlow*> mControlFlows;		// Contains at least one control flow at all times = the main control flow at index 0
 		ControlFlow* mSelectedControlFlow = nullptr;	// The currently selected control flow used by methods like "executeSteps" and "callFunction"; this must always be a valid pointer
+
+		bool mReceivedStopSignal = false;
 	};
 
 }

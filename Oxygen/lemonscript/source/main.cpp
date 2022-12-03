@@ -210,12 +210,37 @@ void doNothing()	// This function serves only as a point where to place breakpoi
 
 struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 {
-	bool handleCall(const lemon::Function* func)
+	Runtime& mRuntime;
+	bool mStopped = false;
+
+	inline RuntimeExecuteConnector(Runtime& runtime) : mRuntime(runtime) {}
+
+	bool handleCall(const lemon::Function* func) override
 	{
 		if (nullptr == func)
 		{
 			throw std::runtime_error("Call failed, probably due to an invalid function");
 		}
+		return true;
+	}
+
+	bool handleReturn() override
+	{
+		if (mRuntime.getMainControlFlow().getCallStack().count == 0)
+		{
+			mStopped = true;
+			return false;
+		}
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
 		return true;
 	}
 };
@@ -319,32 +344,14 @@ int main(int argc, char** argv)
 		runtime.setMemoryAccessHandler(&memoryAccess);
 		runtime.callFunction(*func);
 
-		RuntimeExecuteConnector connector;
-		bool running = true;
-		while (running)
+		RuntimeExecuteConnector connector(runtime);
+		while (!connector.mStopped)
 		{
-			runtime.executeSteps(connector, 10);
-			switch (connector.mResult)
+			runtime.executeSteps(connector, 10, 0);
+
+			if (connector.mResult == Runtime::ExecuteResult::HALT)
 			{
-				case Runtime::ExecuteResult::RETURN:
-				{
-					if (runtime.getMainControlFlow().getCallStack().count == 0)
-						running = false;
-					break;
-				}
-
-				case Runtime::ExecuteResult::EXTERNAL_CALL:
-				case Runtime::ExecuteResult::EXTERNAL_JUMP:
-				{
-					doNothing();
-					break;
-				}
-
-				case Runtime::ExecuteResult::HALT:
-				{
-					running = false;
-					break;
-				}
+				connector.mStopped = true;
 			}
 		}
 

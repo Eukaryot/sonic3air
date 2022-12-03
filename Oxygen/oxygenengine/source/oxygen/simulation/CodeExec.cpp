@@ -86,7 +86,7 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 
 	inline explicit RuntimeExecuteConnector(CodeExec& codeExec) : mCodeExec(codeExec) {}
 
-	bool handleCall(const lemon::Function* func)
+	bool handleCall(const lemon::Function* func) override
 	{
 		if (nullptr == func)
 		{
@@ -94,6 +94,29 @@ struct RuntimeExecuteConnector : public lemon::Runtime::ExecuteConnector
 			return false;
 		}
 		return true;
+	}
+
+	bool handleReturn() override
+	{
+		if (mCodeExec.mHasCallFramesToAdd)
+		{
+			mCodeExec.applyCallFramesToAdd();
+		}
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		// Check for address hook at the target address
+		//  -> If it fails, we will just continue after the call
+		mCodeExec.tryCallAddressHook((uint32)address);
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		handleReturn();
+		return handleExternalCall(address);
 	}
 };
 
@@ -112,9 +135,29 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 		if (func->getType() == lemon::Function::Type::SCRIPT)
 		{
 			CodeExec::CallFrame& callFrame = mCodeExec.mActiveCallFrameTracking->pushCallFrame(CodeExec::CallFrame::Type::SCRIPT_DIRECT);
-			callFrame.mFunction = mCodeExec.mLemonScriptRuntime.getCurrentFunction();
+			callFrame.mFunction = func;
 		}
 		return true;
+	}
+
+	bool handleReturn() override
+	{
+		mCodeExec.popCallFrame();
+		return true;
+	}
+
+	bool handleExternalCall(uint64 address) override
+	{
+		// Check for address hook at the target address
+		//  -> If it fails, we will just continue after the call
+		mCodeExec.tryCallAddressHook((uint32)address);
+		return true;
+	}
+
+	bool handleExternalJump(uint64 address) override
+	{
+		handleReturn();
+		return handleExternalCall(address);
 	}
 };
 
@@ -494,6 +537,7 @@ bool CodeExec::performFrameUpdate()
 void CodeExec::yieldExecution()
 {
 	mCurrentlyRunningScript = false;
+	mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
 }
 
 bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail, const lemon::Environment* environment)
@@ -673,7 +717,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 
 	mActiveInstance = this;
 	mCurrentlyRunningScript = true;
-	const size_t abortOnCallStackSize = std::max<size_t>(mLemonScriptRuntime.getCallStackSize(), 1) - 1;	// Only used if executeSingleFunction == true
+	const size_t abortOnCallStackSize = executeSingleFunction ? (std::max<size_t>(mLemonScriptRuntime.getCallStackSize(), 1) - 1) : 0;
 	mActiveCallFrameTracking = mIsDeveloperMode ? callFrameTracking : nullptr;
 
 	size_t stepsCounter = 0;
@@ -686,7 +730,7 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 		size_t stepsExecutedThisCall;
 		try
 		{
-			const bool success = (nullptr != mActiveCallFrameTracking) ? executeRuntimeStepsDev(stepsExecutedThisCall) : executeRuntimeSteps(stepsExecutedThisCall);
+			const bool success = (nullptr != mActiveCallFrameTracking) ? executeRuntimeStepsDev(stepsExecutedThisCall, abortOnCallStackSize) : executeRuntimeSteps(stepsExecutedThisCall, abortOnCallStackSize);
 			if (!success)
 			{
 				if (executeSingleFunction)
@@ -764,55 +808,17 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 	mActiveInstance = nullptr;
 }
 
-bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted)
+bool CodeExec::executeRuntimeSteps(size_t& stepsExecuted, size_t minimumCallStackSize)
 {
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
 	RuntimeExecuteConnector connector(*this);
-	runtime.executeSteps(connector, 5000);
-
-	switch (connector.mResult)
-	{
-		case lemon::Runtime::ExecuteResult::RETURN:
-		{
-			if (mHasCallFramesToAdd)
-			{
-				applyCallFramesToAdd();
-			}
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_JUMP:
-		{
-			// Note that lemon script internal runtime already performed a return in this case
-			if (mHasCallFramesToAdd)
-			{
-				applyCallFramesToAdd();
-			}
-
-			// Fallthrough
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_CALL:
-		{
-			// Check for address hook at the target address
-			//  -> If it fails, we will just continue after the call
-			tryCallAddressHook((uint32)connector.mCallTarget);
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::HALT:
-		{
-			return false;
-		}
-
-		default: break;
-	}
+	runtime.executeSteps(connector, 5000, minimumCallStackSize);
 
 	stepsExecuted = connector.mStepsExecuted;
-	return true;
+	return (connector.mResult != lemon::Runtime::ExecuteResult::HALT);
 }
 
-bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
+bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallStackSize)
 {
 	// Same as "executeRuntimeSteps", but with additional developer mode stuff, incl. tracking of call frames
 	if (mActiveCallFrameTracking->mCallFrames.empty())
@@ -820,7 +826,7 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 
 	lemon::Runtime& runtime = mLemonScriptRuntime.getInternalLemonRuntime();
 	RuntimeExecuteConnectorDev connector(*this);
-	runtime.executeSteps(connector, 5000);
+	runtime.executeSteps(connector, 5000, minimumCallStackSize);
 
 	{
 		mActiveCallFrameTracking->mCallFrames.back().mSteps += connector.mStepsExecuted;
@@ -838,40 +844,8 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted)
 		}
 	}
 
-	switch (connector.mResult)
-	{
-		case lemon::Runtime::ExecuteResult::RETURN:
-		{
-			popCallFrame();
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_JUMP:
-		{
-			// Note that lemon script internal runtime already performed a return in this case
-			popCallFrame();
-
-			// Fallthrough
-		}
-
-		case lemon::Runtime::ExecuteResult::EXTERNAL_CALL:
-		{
-			// Check for address hook at the target address
-			//  -> If it fails, we will just continue after the call
-			tryCallAddressHookDev((uint32)connector.mCallTarget);
-			break;
-		}
-
-		case lemon::Runtime::ExecuteResult::HALT:
-		{
-			return false;
-		}
-
-		default: break;
-	}
-
 	stepsExecuted = connector.mStepsExecuted;
-	return true;
+	return (connector.mResult != lemon::Runtime::ExecuteResult::HALT);
 }
 
 void CodeExec::getLastStepLocation(Location& outLocation)
