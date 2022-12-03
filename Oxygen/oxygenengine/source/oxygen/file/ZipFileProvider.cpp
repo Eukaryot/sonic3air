@@ -22,57 +22,178 @@
 
 namespace detail
 {
+	class BufferedStream
+	{
+	public:
+		BufferedStream(const wchar_t* filename)
+		{
+			mInputStream = FTX::FileSystem->createInputStream(filename);
+			if (nullptr != mInputStream)
+			{
+				mSize = mInputStream->getSize();
+			}
+		}
+
+		~BufferedStream()
+		{
+			delete mInputStream;
+		}
+
+		inline bool isValid() const		   { return (nullptr != mInputStream); }
+		inline uint64 getPosition() const  { return mPosition; }
+
+		void setPosition(int64 offset, int origin)
+		{
+			if (origin == SEEK_END)
+			{
+				offset = std::max<int64>(0, (int64)mSize - (int64)offset);
+			}
+			else if (origin == SEEK_CUR)
+			{
+				offset = std::min<int64>(mPosition + offset, mSize);
+			}
+			mPosition = offset;
+		}
+
+		size_t read(void* buf, size_t size)
+		{
+			// Read buffered: First check if the start position is already buffered
+			RMX_ASSERT(size <= Page::SIZE, "Requested too much data at once");
+
+			size = std::min<size_t>(size, (size_t)((int64)mSize - (int64)mPosition));
+			if (size == 0)
+				return 0;
+
+			// Make sure all data is buffered in pages
+			++mLastUsageCounter;
+			const int startLocation = (int)(mPosition / Page::SIZE);
+			const int endLocation = (int)((mPosition + size - 1) / Page::SIZE);
+			const size_t startOffset = mPosition % Page::SIZE;
+			Page& startPage = findOrLoadPage(startLocation);
+
+			if (startLocation == endLocation)
+			{
+				memcpy(buf, &startPage.mData[startOffset], size);
+			}
+			else
+			{
+				Page& endPage = findOrLoadPage(endLocation);
+				const size_t startBytes = Page::SIZE - startOffset;
+
+				memcpy(buf, &startPage.mData[startOffset], startBytes);
+				memcpy(&((uint8*)buf)[startBytes], endPage.mData, size - startBytes);
+			}
+
+			mPosition += size;
+			return size;
+		}
+
+	private:
+		struct Page
+		{
+			static const constexpr size_t SIZE = 0x10000;
+			int mPageLocation = -1;
+			uint8 mData[SIZE];
+			size_t mLoadedSize = 0;
+			uint32 mLastUsage = 0;
+		};
+
+	private:
+		Page& findOrLoadPage(int location)
+		{
+			for (Page& page : mPages)
+			{
+				if (page.mPageLocation == location)
+				{
+					page.mLastUsage = mLastUsageCounter;
+					return page;
+				}
+			}
+
+			// Search page that is not used any more
+			Page* page = &mPages[0];
+			for (int i = 1; i < 4; ++i)
+			{
+				if (mPages[i].mLastUsage < page->mLastUsage)
+				{
+					page = &mPages[i];
+				}
+			}
+
+			// Load that page's content from the stream
+			page->mPageLocation = location;
+			page->mLastUsage = mLastUsageCounter;
+
+			const size_t startPosition = location * Page::SIZE;
+			if (mStreamPosition != startPosition)
+			{
+				mInputStream->setPosition(startPosition);
+			}
+			const size_t bytesRead = mInputStream->read(page->mData, std::min<size_t>(Page::SIZE, (size_t)mSize - startPosition));
+			page->mLoadedSize = bytesRead;
+			mStreamPosition = startPosition + bytesRead;
+			return *page;
+		}
+
+	private:
+		InputStream* mInputStream = nullptr;
+		size_t mStreamPosition = 0;
+		uint64 mPosition = 0;
+		uint64 mSize = 0;
+		uint32 mLastUsageCounter = 0;
+		Page mPages[4];
+	};
+
+
 	voidpf openFile(voidpf opaque, const void* filename, int mode)
 	{
-		return FTX::FileSystem->createInputStream((const wchar_t*)filename);
+		BufferedStream* bufferedStream = new BufferedStream((const wchar_t*)filename);
+		if (!bufferedStream->isValid())
+		{
+			delete bufferedStream;
+			return nullptr;
+		}
+		return bufferedStream;
 	}
 
 	int closeFile(voidpf opaque, voidpf stream)
 	{
-		delete (InputStream*)stream;
+		if (nullptr != stream)
+		{
+			BufferedStream* bufferedStream = (BufferedStream*)stream;
+			delete bufferedStream;
+		}
 		return 0;
 	}
 
 	uLong readFile(voidpf opaque, voidpf stream, void* buf, uLong size)
 	{
-		InputStream* inputStream = (InputStream*)stream;
-		if (nullptr == inputStream)
+		BufferedStream* bufferedStream = (BufferedStream*)stream;
+		if (nullptr == bufferedStream)
 			return 0;
-
-		return (uLong)inputStream->read(buf, (size_t)size);
+		return (uLong)bufferedStream->read(buf, (size_t)size);
 	}
 
 	ZPOS64_T tellFile(voidpf opaque, voidpf stream)
 	{
-		InputStream* inputStream = (InputStream*)stream;
-		if (nullptr == inputStream)
+		BufferedStream* bufferedStream = (BufferedStream*)stream;
+		if (nullptr == bufferedStream)
 			return 0;
-
-		return (ZPOS64_T)inputStream->getPosition();
+		return (ZPOS64_T)bufferedStream->getPosition();
 	}
 
 	long seekFile(voidpf opaque, voidpf stream, ZPOS64_T offset, int origin)
 	{
-		InputStream* inputStream = (InputStream*)stream;
-		if (nullptr == inputStream)
+		BufferedStream* bufferedStream = (BufferedStream*)stream;
+		if (nullptr == bufferedStream)
 			return 0;
-
-		if (origin == SEEK_END)
-		{
-			offset = (ZPOS64_T)std::max<int64>(0, (int64)inputStream->getSize() - (int64)offset);
-		}
-		else if (origin == SEEK_CUR)
-		{
-			offset = std::min<ZPOS64_T>((ZPOS64_T)inputStream->getPosition() + offset, (ZPOS64_T)inputStream->getSize());
-		}
-		inputStream->setPosition((size_t)offset);
+		bufferedStream->setPosition((int64)offset, origin);
 		return 0;
 	}
 
 	int testFileError(voidpf opaque, voidpf stream)
 	{
-		InputStream* inputStream = (InputStream*)stream;
-		return (nullptr == inputStream) ? 1 : 0;
+		return (nullptr == stream) ? 1 : 0;
 	}
 }
 
