@@ -158,8 +158,7 @@ bool Shader::load(const std::vector<uint8>& content, const String& techname, con
 	if (!effect.load(content))
 		return false;
 
-	effect.getShader(*this, techname, additionalDefines);
-	return true;
+	return effect.getShader(*this, techname, additionalDefines);
 }
 
 bool Shader::compileShader(GLenum shaderType, GLuint& shaderHandle, const String& source)
@@ -189,7 +188,6 @@ bool Shader::compileShader(GLenum shaderType, GLuint& shaderHandle, const String
 		infolog.recount();
 		mCompileLog << infolog;
 	}
-	mCompileLog << "\n";
 	return false;
 }
 

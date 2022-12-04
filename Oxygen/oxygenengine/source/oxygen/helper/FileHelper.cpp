@@ -161,8 +161,7 @@ bool FileHelper::loadShader(Shader& shader, const std::wstring& filename, const 
 	}
 	else
 	{
-		RMX_LOG_INFO("Error(s) loading shader '" << WString(filename).toStdString() << "':");
-		RMX_LOG_INFO(shader.getCompileLog().toStdString());
+		RMX_ERROR("Shader loading failed for '" << WString(filename).toStdString() << "':\n" << shader.getCompileLog().toStdString(), );
 	}
 	return true;
 }
