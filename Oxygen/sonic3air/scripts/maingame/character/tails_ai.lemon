@@ -273,8 +273,9 @@ function void Character.TailsAI.Init()
 		else if (global.zone_act == 0x0500 || global.zone_act == 0x0a00)	// ICZ 1 or SSZ (S/T)
 		{
 		#if STANDALONE
-			if (isMainCharacter(CHARACTER_KNUCKLES))
+			if (isMainCharacter(CHARACTER_KNUCKLES) && global.zone_act == 0x0500)
 			{
+				// For Knuckles & Tails in ICZ 1, make Tails fly in after a short time
 				tails.respawn_counter = 0
 				tails.ai_routine = 0x02
 				char.control_flags = 0x81
@@ -287,7 +288,6 @@ function void Character.TailsAI.Init()
 		#endif
 
 			// Disable Tails
-			// TODO: At least in SSZ, we should spawn Tails as well right from the start (he will reappear after a death anyway)
 			RespawnTails()
 			tails.ai_routine = 0x0a
 			char.control_flags = 0x83
