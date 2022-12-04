@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 	// Make sure we're in the correct working directory
 	PlatformFunctions::changeWorkingDirectory(arguments.mExecutableCallPath);
 
-#if !defined(ENDUSER) && !defined(PLATFORM_ANDROID)
+#if !defined(PLATFORM_ANDROID)
 	if (arguments.mPack)
 	{
 		PackageBuilder::performPacking();

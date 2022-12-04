@@ -29,13 +29,14 @@ namespace
 
 	bool showExtrasMenuTabContent(int tabIndex)
 	{
-	#if defined(ENDUSER)
 		if (tabIndex == 2)
 		{
-			// Achievements are hidden if dev mode or debug mode is active
-			return (Game::instance().getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) == 0 && !EngineMain::getDelegate().useDeveloperFeatures());
+			// Achievements are hidden if debug mode is active (but not for dev mode)
+			if (!EngineMain::getDelegate().useDeveloperFeatures())
+			{
+				return (Game::instance().getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) == 0);
+			}
 		}
-	#endif
 		return true;
 	}
 }

@@ -13,7 +13,7 @@
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/version.inc"
-#ifndef ENDUSER
+#if 0
 	#include "sonic3air/generator/ResourceScriptGenerator.h"
 #endif
 
@@ -63,7 +63,6 @@ bool EngineDelegate::onEnginePreStartup()
 	CrashHandler::setApplicationInfo(std::string("Sonic 3 A.I.R. v") + BUILD_STRING);
 	oxygen::Logging::setAssertBreakCaption(std::string("Sonic 3 A.I.R. - v") + BUILD_STRING);
 
-#ifdef ENDUSER
 	// Sanity check if the game is even extracted
 	{
 		// One of these two files must exist
@@ -83,7 +82,6 @@ bool EngineDelegate::onEnginePreStartup()
 			return false;
 		}
 	}
-#endif
 
 	return true;
 }
@@ -92,23 +90,25 @@ bool EngineDelegate::setupCustomGameProfile()
 {
 	GameProfile& gameProfile = GameProfile::instance();
 
-#ifdef ENDUSER
-	// Setup game profile data -- this is done so that no oxygenproject.json is needed for the end-user version of S3AIR
-	ConfigurationImpl::fillDefaultGameProfile(gameProfile);
+	if (FTX::FileSystem->exists(L"./oxygenproject.json"))
+	{
+		// Load from the oxygenproject.json file
+		gameProfile.loadOxygenProjectFromFile(L"./oxygenproject.json");
+	}
+	else
+	{
+		// Setup game profile data -- this is done so that no oxygenproject.json is needed for the end-user version of S3AIR
+		ConfigurationImpl::fillDefaultGameProfile(gameProfile);
 
-	gameProfile.mAsmStackRange.first = 0xfffffd00;
-	gameProfile.mAsmStackRange.second = 0xfffffe00;
+		gameProfile.mAsmStackRange.first = 0xfffffd00;
+		gameProfile.mAsmStackRange.second = 0xfffffe00;
 
-	gameProfile.mDataPackages.clear();
-	gameProfile.mDataPackages.emplace_back(L"enginedata.bin",    true);
-	gameProfile.mDataPackages.emplace_back(L"gamedata.bin",      true);
-	gameProfile.mDataPackages.emplace_back(L"audiodata.bin",     true);
-	gameProfile.mDataPackages.emplace_back(L"audioremaster.bin", false);	// Optional package
-#else
-
-	// Just load from the oxygenproject.json file
-	gameProfile.loadOxygenProjectFromFile(L"oxygenproject.json");
-#endif
+		gameProfile.mDataPackages.clear();
+		gameProfile.mDataPackages.emplace_back(L"enginedata.bin",    true);
+		gameProfile.mDataPackages.emplace_back(L"gamedata.bin",      true);
+		gameProfile.mDataPackages.emplace_back(L"audiodata.bin",     true);
+		gameProfile.mDataPackages.emplace_back(L"audioremaster.bin", false);	// Optional package
+	}
 
 	// Return true, so the engine won't load the oxygenprofile.json by itself
 	return true;
@@ -145,12 +145,12 @@ void EngineDelegate::registerNativizedCode(lemon::Program& program)
 
 void EngineDelegate::onRuntimeInit(CodeExec& codeExec)
 {
-#ifndef ENDUSER
+#if 0
 	// Generation of scripts from data in ROM or another source
-	//ResourceScriptGenerator::generateLevelObjectTableScript(codeExec);
-	//ResourceScriptGenerator::generateLevelRingsTableScript(codeExec);
-	//ResourceScriptGenerator::convertLevelObjectsBinToScript(L"E:/Projects/Workspace/Oxygen/_SonLVL/skdisasm-master/Levels/AIZ/Object Pos/1.bin", L"output_objects.lemon");
-	//ResourceScriptGenerator::convertLevelRingsBinToScript(L"E:/Projects/Workspace/Oxygen/_SonLVL/skdisasm-master/Levels/AIZ/Ring Pos/1.bin", L"output_rings.lemon");
+	ResourceScriptGenerator::generateLevelObjectTableScript(codeExec);
+	ResourceScriptGenerator::generateLevelRingsTableScript(codeExec);
+	ResourceScriptGenerator::convertLevelObjectsBinToScript(L"E:/Projects/Workspace/Oxygen/_SonLVL/skdisasm-master/Levels/AIZ/Object Pos/1.bin", L"output_objects.lemon");
+	ResourceScriptGenerator::convertLevelRingsBinToScript(L"E:/Projects/Workspace/Oxygen/_SonLVL/skdisasm-master/Levels/AIZ/Ring Pos/1.bin", L"output_rings.lemon");
 #endif
 }
 
@@ -198,11 +198,7 @@ bool EngineDelegate::allowModdedData()
 
 bool EngineDelegate::useDeveloperFeatures()
 {
-#if defined(ENDUSER)
 	return mConfiguration.mDevMode.mEnabled;
-#else
-	return true;
-#endif
 }
 
 void EngineDelegate::onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer)

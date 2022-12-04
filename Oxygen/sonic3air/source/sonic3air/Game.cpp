@@ -109,21 +109,22 @@ void Game::update(float timeElapsed)
 		DiscordIntegration::update();
 	}
 
-#ifndef ENDUSER
-	// Just for testing
-	static bool pressed = false;
-	if (FTX::keyState('x') != pressed)
+	if (EngineMain::getDelegate().useDeveloperFeatures() && (FTX::keyState(SDLK_LALT) || FTX::keyState(SDLK_RALT)))
 	{
-		pressed = !pressed;
-		if (pressed)
+		// Alt + X (and maybe Shift as well) for testing unlock windows
+		static bool pressed = false;
+		if (FTX::keyState('x') != pressed)
 		{
-			if (FTX::keyState(SDLK_LSHIFT))
-				GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, "Secret unlocked!", "Knuckles & Tails character combination can now be selected in Normal Game and Act Select.");
-			else
-				GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::ACHIEVEMENT, "Achievement unlocked!", "Cheated an achievement. Well done!");
+			pressed = !pressed;
+			if (pressed)
+			{
+				if (FTX::keyState(SDLK_LSHIFT))
+					GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::SECRET, "Secret unlocked!", "Knuckles & Tails character combination can now be selected in Normal Game and Act Select.");
+				else
+					GameApp::instance().showUnlockedWindow(SecretUnlockedWindow::EntryType::ACHIEVEMENT, "Achievement unlocked!", "Cheated an achievement. Well done!");
+			}
 		}
 	}
-#endif
 
 	if (mReturnToMenuTriggered)
 	{
@@ -868,11 +869,10 @@ bool Game::isAchievementComplete(uint32 achievementId)
 
 void Game::setAchievementComplete(uint32 achievementId)
 {
-#ifdef ENDUSER
-	// Can't affect achievements in debug mode
-	if (getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) != 0 || EngineMain::getDelegate().useDeveloperFeatures())
+	// Can't affect achievements in debug mode (except if dev mode is active)
+	const bool hasDebugModeActive = getSetting(SharedDatabase::Setting::SETTING_DEBUG_MODE, true) != 0;
+	if (hasDebugModeActive && !EngineMain::getDelegate().useDeveloperFeatures())
 		return;
-#endif
 
 	if (mPlayerProgress.getAchievementState(achievementId) == 0)
 	{

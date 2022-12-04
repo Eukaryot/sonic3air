@@ -300,13 +300,11 @@ void MainMenu::render()
 		std::wstring text = L"\x02c5" BUILD_STRING L" " BUILD_VARIANT;
 		drawer.printText(global::mFont3Pure, Recti(px, 1, 0, 0), text, 3, Color(0.2f, 0.2f, 0.2f, mVisibility * 0.3f));
 
-	#if defined(ENDUSER)
-		// Show when dev mode is active
+		// Show whether dev mode is active
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
 			drawer.printText(global::mFont3Pure, Recti(px - 6 - global::mFont3Pure.getWidth(text), 1, 0, 0), "DEV MODE", 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
 		}
-	#endif
 	}
 
 	// Mod errors

@@ -19,6 +19,7 @@ public:
 	struct DevModeImplSettings
 	{
 		bool mEnforceDebugMode = false;
+		bool SkipExitConfirmation = false;
 	};
 
 public:

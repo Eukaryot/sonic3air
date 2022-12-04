@@ -12,6 +12,7 @@
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/Game.h"
 #include "sonic3air/audio/AudioOut.h"
+#include "sonic3air/ConfigurationImpl.h"
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
@@ -173,18 +174,21 @@ void PauseMenu::update(float timeElapsed)
 
 					case 3:
 					{
-						// Exit game (without confirmation dialog during development, as I found that a bit annoying)
-					#ifdef ENDUSER
-						mState = State::DIALOG_EXIT;
-						mDialogVisibility = 0.0f;
+						// Exit game (possibly without confirmation dialog during development, as I found that a bit annoying)
+						if (ConfigurationImpl::instance().mDevModeImpl.SkipExitConfirmation)
+						{
+							exitGame();
+						}
+						else
+						{
+							mState = State::DIALOG_EXIT;
+							mDialogVisibility = 0.0f;
 
-						mDialogEntries.clear();
-						mDialogEntries.addEntry("Continue", 0);
-						mDialogEntries.addEntry("Exit to Menu", 0x20);
-						mDialogEntries.mSelectedEntryIndex = 0;
-					#else
-						exitGame();
-					#endif
+							mDialogEntries.clear();
+							mDialogEntries.addEntry("Continue", 0);
+							mDialogEntries.addEntry("Exit to Menu", 0x20);
+							mDialogEntries.mSelectedEntryIndex = 0;
+						}
 						break;
 					}
 				}

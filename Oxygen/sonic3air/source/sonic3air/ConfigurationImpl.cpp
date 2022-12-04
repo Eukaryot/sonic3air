@@ -213,6 +213,7 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 	{
 		JsonHelper devModeHelper(devModeJson);
 		devModeHelper.tryReadBool("EnforceDebugMode", mDevModeImpl.mEnforceDebugMode);
+		devModeHelper.tryReadBool("SkipExitConfirmation", mDevModeImpl.SkipExitConfirmation);
 	}
 
 	// Game server
