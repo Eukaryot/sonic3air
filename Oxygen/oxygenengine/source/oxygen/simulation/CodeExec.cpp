@@ -150,7 +150,7 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 	{
 		// Check for address hook at the target address
 		//  -> If it fails, we will just continue after the call
-		mCodeExec.tryCallAddressHook((uint32)address);
+		mCodeExec.tryCallAddressHookDev((uint32)address);
 		return true;
 	}
 
