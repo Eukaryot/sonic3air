@@ -60,6 +60,7 @@ public:
 		bool mChange = false;
 		bool mRepeat = false;
 		float mRepeatTimeout = 0.0f;
+		int mPlayerIndex = 0;
 
 		inline bool isPressed() const	{ return mState; }
 		inline bool hasChanged() const	{ return mChange; }
@@ -179,23 +180,34 @@ private:
 		// The joystick / game controller name is stored in Configuration instead
 	};
 
+	struct Player
+	{
+		ControllerScheme mController;
+		std::vector<Control*> mPlayerControls;
+		PreferredGamepad mPreferredGamepad;
+		RumbleEffectQueue mRumbleEffectQueue;
+		RealDevice* mLastInputDevice = nullptr;
+		RealDevice* mRumblingDevice = nullptr;
+	};
+
 private:
 	RealDevice* findGamepadBySDLJoystickInstanceId(int32 joystickInstanceId);
-	InputConfig::DeviceDefinition* getInputDeviceDefinitionByIdentifier(const std::string& identifier) const;
+	InputConfig::DeviceDefinition* getInputDeviceDefinitionByIdentifier(std::string_view identifier) const;
 
 	bool isPressed(const Control& control);
 	bool isPressed(const ControlInput& input);
 	bool isPressed(SDL_Joystick* joystick, const ControlInput& input);
 
 	void reapplyControllerRumble(int playerIndex);
+	void stopControllerRumbleForDevice(RealDevice& device);
 
 private:
-	ControllerScheme mController[2];
+	static const constexpr size_t NUM_PLAYERS = 2;
+	Player mPlayers[NUM_PLAYERS];
 
 	std::vector<Control*> mAllControls;
 	std::vector<RealDevice> mKeyboards;
 	std::vector<RealDevice> mGamepads;
-	PreferredGamepad mPreferredGamepadByPlayer[2];
 	int mLastCheckJoysticks = 0;
 	uint32 mGamepadsChangeCounter = 0;		// Gets increased whenever a gamepad is connected or unplugged
 	uint32 mMappingsChangeCounter = 0;		// Gets increased whenever the buttons mappings get changed
@@ -215,6 +227,4 @@ private:
 
 	TouchInputMode mTouchInputMode = TouchInputMode::HIDDEN_CONTROLS;
 	WaitInputState mWaitingForSingleInput = WaitInputState::NONE;
-
-	RumbleEffectQueue mRumbleEffectQueue[2];	// One for each player
 };
