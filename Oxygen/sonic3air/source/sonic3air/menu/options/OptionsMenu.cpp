@@ -338,9 +338,12 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Soundtrack");
 
-		entries.addEntry<OptionsMenuEntry>().initEntry("Soundtrack Type:", option::SOUNDTRACK)
+		entries.addEntry<SoundtrackMenuEntry>().initEntry("Soundtrack Type:", option::SOUNDTRACK)
 			.addOption("Emulated", 0)
 			.addOption("Remastered", 1);
+
+		mSoundtrackDownloadMenuEntry = &entries.addEntry<SoundtrackDownloadMenuEntry>();
+		mSoundtrackDownloadMenuEntry->initEntry("", option::SOUNDTRACK_DOWNLOAD);
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("Sound Test:", option::SOUND_TEST);	// Will be filled with content in "initialize()"
 
@@ -909,6 +912,8 @@ void OptionsMenu::initialize()
 		mTabMenuEntries[0].mSelectedIndex = mActiveTab;
 	}
 
+	mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
+
 	// Fill sound test
 	{
 		mSoundTestAudioDefinitions.clear();
@@ -1038,6 +1043,7 @@ void OptionsMenu::update(float timeElapsed)
 									playSoundtest(*mPlayingSoundTest);
 								}
 							}
+							mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
 							break;
 						}
 
@@ -1115,7 +1121,7 @@ void OptionsMenu::update(float timeElapsed)
 			else if (buttonEffect == ButtonEffect::ACCEPT && mActiveMenu != &mTabMenuEntries)
 			{
 				Tab& tab = mTabs[mActiveTab];
-				const GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
+				GameMenuEntry& selectedEntry = tab.mMenuEntries.selected();
 				switch (selectedEntry.mData)
 				{
 					case option::SOUND_TEST:
@@ -1151,6 +1157,12 @@ void OptionsMenu::update(float timeElapsed)
 						{
 							updateCheck.startUpdateCheck();
 						}
+						break;
+					}
+
+					case option::SOUNDTRACK_DOWNLOAD:
+					{
+						mSoundtrackDownloadMenuEntry->triggerButton();
 						break;
 					}
 

@@ -18,6 +18,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/base/CrashHandler.h"
 #include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/download/DownloadManager.h"
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/software/SoftwareDrawer.h"
 #include "oxygen/resources/FontCollection.h"
@@ -50,6 +51,7 @@ struct EngineMain::Internal
 	PersistentData	mPersistentData;
 	VideoOut		mVideoOut;
 	ControlsIn		mControlsIn;
+	DownloadManager mDownloadManager;
 
 #if defined(PLATFORM_ANDROID)
 	AndroidJavaInterface mAndroidJavaInterface;

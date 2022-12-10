@@ -158,6 +158,9 @@
     <ClCompile Include="..\..\source\sonic3air\helper\PackageBuilder.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -277,6 +280,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\helper\PackageBuilder.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.h">
+      <Filter>audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

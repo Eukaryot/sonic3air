@@ -13,6 +13,7 @@
 
 class ControllerSetupMenu;
 class MenuBackground;
+class SoundtrackDownloadMenuEntry;
 
 
 class OptionsMenu : public GameMenuBase
@@ -88,6 +89,7 @@ private:
 	std::vector<OptionEntry> mOptionEntries;
 	std::vector<GameMenuEntry*> mUnlockedSecretsEntries[2];
 	GameMenuEntry* mGamepadAssignmentEntries[2] = { nullptr };
+	SoundtrackDownloadMenuEntry* mSoundtrackDownloadMenuEntry = nullptr;
 
 	uint32 mLastGamepadsChangeCounter = 0;
 	std::vector<const AudioCollection::AudioDefinition*> mSoundTestAudioDefinitions;

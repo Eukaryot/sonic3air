@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "sonic3air/audio/RemasteredMusicDownload.h"
 #include "sonic3air/client/GameClient.h"
 #include "sonic3air/data/PlayerProgress.h"
 #include "sonic3air/data/PlayerRecorder.h"
@@ -74,6 +75,8 @@ public:
 	inline bool isTimeAttackMode() const		{ return mMode == Mode::TIME_ATTACK; }
 	inline PlayerRecorder& getPlayerRecorder()	{ return mPlayerRecorder; }
 
+	RemasteredMusicDownload& getRemasteredMusicDownload()  { return mRemasteredMusicDownload; }
+
 	bool shouldPauseOnFocusLoss() const;
 
 	void fillDebugVisualization(Bitmap& bitmap, int& mode);
@@ -126,6 +129,7 @@ private:
 	PlayerRecorder mPlayerRecorder;
 	GameClient mGameClient;
 	DynamicSprites mDynamicSprites;
+	RemasteredMusicDownload mRemasteredMusicDownload;
 
 	uint16 mLastZoneAndAct = 0;
 	uint8  mLastCharacters = 0;

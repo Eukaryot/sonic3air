@@ -82,6 +82,9 @@
     <Filter Include="rendering\opengl\shaders">
       <UniqueIdentifier>{5deef7ad-6389-4ab8-98f5-02398dd27146}</UniqueIdentifier>
     </Filter>
+    <Filter Include="download">
+      <UniqueIdentifier>{3f957152-f46c-4836-9d9d-b9655a560856}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -403,11 +406,14 @@
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.cpp">
       <Filter>drawing\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\helper\Downloader.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\input\RumbleEffectQueue.cpp">
       <Filter>application\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\download\Downloader.cpp">
+      <Filter>download</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\download\DownloadManager.cpp">
+      <Filter>download</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -751,11 +757,14 @@
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h">
       <Filter>drawing\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\helper\Downloader.h">
-      <Filter>helper</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\input\RumbleEffectQueue.h">
       <Filter>application\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\download\Downloader.h">
+      <Filter>download</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\download\DownloadManager.h">
+      <Filter>download</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

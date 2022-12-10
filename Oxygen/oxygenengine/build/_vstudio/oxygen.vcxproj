@@ -54,6 +54,8 @@
     <ClCompile Include="..\..\source\oxygen\application\video\VideoOut.cpp" />
     <ClCompile Include="..\..\source\oxygen\base\CrashHandler.cpp" />
     <ClCompile Include="..\..\source\oxygen\base\PlatformFunctions.cpp" />
+    <ClCompile Include="..\..\source\oxygen\download\Downloader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\download\DownloadManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\DrawCollection.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\DrawCommand.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\Drawer.cpp" />
@@ -72,7 +74,6 @@
     <ClCompile Include="..\..\source\oxygen\file\FileStructureTree.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\PackedFileProvider.cpp" />
     <ClCompile Include="..\..\source\oxygen\file\ZipFileProvider.cpp" />
-    <ClCompile Include="..\..\source\oxygen\helper\Downloader.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\HighResolutionTimer.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Profiling.cpp" />
     <ClCompile Include="..\..\source\oxygen\helper\Transform2D.cpp" />
@@ -167,6 +168,8 @@
     <ClInclude Include="..\..\source\oxygen\application\video\VideoOut.h" />
     <ClInclude Include="..\..\source\oxygen\base\CrashHandler.h" />
     <ClInclude Include="..\..\source\oxygen\base\PlatformFunctions.h" />
+    <ClInclude Include="..\..\source\oxygen\download\Downloader.h" />
+    <ClInclude Include="..\..\source\oxygen\download\DownloadManager.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\DrawCollection.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\DrawCommand.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\Drawer.h" />
@@ -186,7 +189,6 @@
     <ClInclude Include="..\..\source\oxygen\file\FileStructureTree.h" />
     <ClInclude Include="..\..\source\oxygen\file\PackedFileProvider.h" />
     <ClInclude Include="..\..\source\oxygen\file\ZipFileProvider.h" />
-    <ClInclude Include="..\..\source\oxygen\helper\Downloader.h" />
     <ClInclude Include="..\..\source\oxygen\helper\DrawerHelper.h" />
     <ClInclude Include="..\..\source\oxygen\helper\HighResolutionTimer.h" />
     <ClInclude Include="..\..\source\oxygen\helper\Profiling.h" />

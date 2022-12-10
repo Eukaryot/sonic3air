@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/helper/Downloader.h"
+#include "oxygen/download/Downloader.h"
 
 #ifdef PLATFORM_WINDOWS
 	#define CURL_STATICLIB
@@ -20,7 +20,7 @@
 #endif
 
 
-bool Downloader::isDownloaderSupporter()
+bool Downloader::isDownloaderSupported()
 {
 #ifdef PLATFORM_WINDOWS
 	return true;
@@ -31,19 +31,32 @@ bool Downloader::isDownloaderSupporter()
 
 Downloader::~Downloader()
 {
-	if (nullptr != mThread)
-	{
-		mThread->join();
-		delete mThread;
-	}
+	stopDownload();
 }
 
-void Downloader::startDownload(const std::string& url, const std::wstring& outputFilename)
+void Downloader::setupDownload(std::string_view url, std::wstring_view outputFilename)
 {
 	mURL = url;
-	mState = State::RUNNING;
 	mOutputFilename = outputFilename;
+}
+
+void Downloader::startDownload()
+{
+	mState = State::RUNNING;
 	mThread = new std::thread(&Downloader::performDownloadStatic, this);
+}
+
+void Downloader::stopDownload()
+{
+	// Stop the thread if it's running
+	if (nullptr != mThread)
+	{
+		mThreadRunning = false;
+		mThread->join();
+		delete mThread;
+		mThread = nullptr;
+	}
+	mState = State::NONE;
 }
 
 size_t Downloader::writeDataStatic(void* data, size_t size, size_t nmemb, Downloader* downloader)
@@ -58,8 +71,14 @@ void Downloader::performDownloadStatic(Downloader* downloader)
 
 size_t Downloader::writeData(void* data, size_t size, size_t nmemb)
 {
+	// Check for a signal to stop the download
+	if (!mThreadRunning)
+		return 0;
+
+	// Write data to the output file
 	const size_t bytes = size * nmemb;
 	const size_t written = mOutputFile.write(data, bytes);
+	mBytesDownloaded += written;
 	return written;
 }
 
@@ -74,12 +93,26 @@ void Downloader::performDownload()
 	}
 
 	mOutputFile.open(mOutputFilename, FILE_ACCESS_WRITE);
+	mThreadRunning = true;
+
 	curl_easy_setopt(curl, CURLOPT_URL, mURL.c_str());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &Downloader::writeDataStatic);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
 	const CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
+
 	mOutputFile.close();
-	mState = State::DONE;
+
+	// Check if aborted
+	if (mThreadRunning)
+	{
+		mThreadRunning = false;
+		mState = State::DONE;
+	}
+	else
+	{
+		// TODO: Delete the output file
+		mState = State::FAILED;
+	}
 #endif
 }

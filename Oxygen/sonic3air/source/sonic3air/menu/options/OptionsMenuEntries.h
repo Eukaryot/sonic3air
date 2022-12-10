@@ -68,10 +68,12 @@ public:
 
 	virtual void renderEntry(RenderContext& renderContext_) override;
 
+	virtual void triggerButton() {}
+
 protected:
 	void renderInternal(RenderContext& renderContext_, const Color& normalColor, const Color& selectedColor);
 
-private:
+protected:
 	bool mUseSmallFont = false;
 };
 
@@ -96,4 +98,20 @@ public:
 
 private:
 	bool mTextUpdateLink = false;
+};
+
+
+class SoundtrackMenuEntry : public OptionsMenuEntry
+{
+public:
+	void renderEntry(RenderContext& renderContext) override;
+};
+
+
+class SoundtrackDownloadMenuEntry : public OptionsMenuEntry
+{
+public:
+	void renderEntry(RenderContext& renderContext) override;
+	void triggerButton() override;
+	bool shouldBeShown();
 };

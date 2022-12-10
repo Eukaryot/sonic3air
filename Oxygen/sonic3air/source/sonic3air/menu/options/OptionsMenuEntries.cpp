@@ -14,9 +14,12 @@
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/client/GameClient.h"
 #include "sonic3air/client/UpdateCheck.h"
+#include "sonic3air/ConfigurationImpl.h"
+#include "sonic3air/Game.h"
 #include "sonic3air/version.inc"
 
 #include "oxygen/application/Application.h"
+#include "oxygen/download/Downloader.h"
 
 
 namespace
@@ -214,18 +217,6 @@ void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color
 		if (canGoRight)
 			drawer.printText(font, Recti(center + arrowDistance, py, 0, 10), ">", 5, color);
 
-		// Additional text for soundtrack
-		if (mData == option::SOUNDTRACK && !AudioOut::instance().hasLoadedRemasteredSoundtrack() && selected().mIndex == 1)
-		{
-			py += 13;
-			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "Must be downloaded separately", 5, Color(1.0f, 0.9f, 0.8f, color.a));
-		#if defined(PLATFORM_WEB)
-			py += 10;
-			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "(Exit and select \"Extra Downloads\")", 5, Color(1.0f, 0.9f, 0.8f, color.a));
-		#endif
-			++py;
-		}
-
 		// Additional text for sound test
 		if (mData == option::SOUND_TEST && nullptr != audioDefinition)
 		{
@@ -306,4 +297,117 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 	}
 
 	OptionsMenuEntry::renderEntry(renderContext);
+}
+
+void SoundtrackMenuEntry::renderEntry(RenderContext& renderContext_)
+{
+	renderInternal(renderContext_, Color::WHITE, Color::YELLOW);
+
+	#if defined(PLATFORM_WEB)
+		// Extra text for Web version if remastered soundtrack was not downloaded
+		//  -> This could be obsolete if Web can implement the internal downloader functionality
+		if (!Downloader::isDownloaderSupported() && !AudioOut::instance().hasLoadedRemasteredSoundtrack() && selected().mIndex == 1)
+		{
+			OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
+			Drawer& drawer = *renderContext.mDrawer;
+			const int baseX = renderContext.mCurrentPosition.x;
+			int& py = renderContext.mCurrentPosition.y;
+			const int center = mText.empty() ? baseX : (baseX + 88);
+
+			py += 13;
+			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "Must be downloaded separately", 5, Color(1.0f, 0.9f, 0.8f, renderContext.mTabAlpha));
+			py += 10;
+			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "(Exit and select \"Extra Downloads\")", 5, Color(1.0f, 0.9f, 0.8f, renderContext.mTabAlpha));
+			++py;
+		}
+	#endif
+}
+
+void SoundtrackDownloadMenuEntry::renderEntry(RenderContext& renderContext_)
+{
+	RemasteredMusicDownload& download = Game::instance().getRemasteredMusicDownload();
+	const RemasteredMusicDownload::State state = download.getState();
+	if (state != RemasteredMusicDownload::State::LOADED)
+	{
+		OptionsMenuRenderContext& renderContext = renderContext_.as<OptionsMenuRenderContext>();
+		Drawer& drawer = *renderContext.mDrawer;
+		const int center = renderContext.mCurrentPosition.x;
+		int& py = renderContext.mCurrentPosition.y;
+		Color color = renderContext.mIsSelected ? Color::YELLOW : Color::WHITE;
+		color.a *= renderContext.mTabAlpha;
+
+		std::string text;
+		switch (state)
+		{
+			case RemasteredMusicDownload::State::READY_FOR_DOWNLOAD:
+				text = "Download remastered soundtrack now? (126 MB)";
+				mText = "Start download";
+				break;
+
+			case RemasteredMusicDownload::State::DOWNLOAD_PENDING:
+				text = "Waiting for download...";
+				mText = "Stop download";
+				break;
+
+			case RemasteredMusicDownload::State::DOWNLOAD_RUNNING:
+				text = "Downloading... " + std::to_string(download.getBytesDownloaded() / (1024*1024)) + " MB";
+				mText = "Stop download";
+				break;
+
+			case RemasteredMusicDownload::State::DOWNLOAD_DONE:
+				text = "Download complete";
+				mText = "Load soundtrack";
+				break;
+
+			case RemasteredMusicDownload::State::DOWNLOAD_FAILED:
+				text = "Download failed";
+				mText = "Restart download";
+				break;
+
+			default:
+				break;
+		}
+
+		drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), text, 5, Color(0.8f, 1.0f, 0.9f, color.a));
+		py += 12;
+
+		mUseSmallFont = true;
+		renderInternal(renderContext_, Color::WHITE, Color::YELLOW);
+		py += 3;
+	}
+}
+
+void SoundtrackDownloadMenuEntry::triggerButton()
+{
+	RemasteredMusicDownload& download = Game::instance().getRemasteredMusicDownload();
+	const RemasteredMusicDownload::State state = download.getState();
+	switch (state)
+	{
+		case RemasteredMusicDownload::State::READY_FOR_DOWNLOAD:
+		case RemasteredMusicDownload::State::DOWNLOAD_FAILED:
+			download.startDownload();
+			break;
+
+		case RemasteredMusicDownload::State::DOWNLOAD_PENDING:
+		case RemasteredMusicDownload::State::DOWNLOAD_RUNNING:
+			download.removeDownload();
+			break;
+
+		case RemasteredMusicDownload::State::DOWNLOAD_DONE:
+			download.applyAfterDownload();
+			break;
+
+		default:
+			break;
+	}
+}
+
+bool SoundtrackDownloadMenuEntry::shouldBeShown()
+{
+#if 1
+	// Just for testing
+	return (ConfigurationImpl::instance().mActiveSoundtrack == 1 && Downloader::isDownloaderSupported());
+#else
+	return (ConfigurationImpl::instance().mActiveSoundtrack == 1 && Downloader::isDownloaderSupported() && !AudioOut::instance().hasLoadedRemasteredSoundtrack());
+#endif
 }

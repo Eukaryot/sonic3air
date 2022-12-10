@@ -25,15 +25,18 @@ public:
 	};
 
 public:
-	static bool isDownloaderSupporter();
+	static bool isDownloaderSupported();
 
 public:
 	~Downloader();
 
+	inline State getState() const  { return mState; }
 	inline bool isRunning() const  { return mState == State::RUNNING; }
 	inline uint64 getBytesDownloaded() const  { return mBytesDownloaded; }
 
-	void startDownload(const std::string& url, const std::wstring& outputFilename);
+	void setupDownload(std::string_view url, std::wstring_view outputFilename);
+	void startDownload();
+	void stopDownload();
 
 private:
 	static size_t writeDataStatic(void* data, size_t size, size_t nmemb, Downloader* downloader);
@@ -49,4 +52,5 @@ private:
 	std::wstring mOutputFilename;
 	FileHandle mOutputFile;
 	std::atomic<uint64> mBytesDownloaded = 0;
+	std::atomic<bool> mThreadRunning = false;
 };
