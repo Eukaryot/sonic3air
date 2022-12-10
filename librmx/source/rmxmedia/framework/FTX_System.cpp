@@ -45,7 +45,10 @@ namespace rmx
 
 		// Initialize SDL video
 		if (SDL_Init(SDL_INIT_VIDEO) < 0)
+		{
+			std::cout << "SDL_Init(SDL_INIT_VIDEO) failed with error: " << SDL_GetError() << "\n";
 			return false;
+		}
 
 		mInitialized = true;
 		return true;

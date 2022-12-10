@@ -83,8 +83,19 @@ bool FileHandle::open(const WString& filename, uint32 flags)
 	if (nullptr != mFile)
 		close();
 
+	const bool isWrite = (flags & 0x0f) != FILE_ACCESS_READ;
+	if (isWrite)
+	{
+		// Create directory if needed
+		const size_t slashPosition = std::wstring_view(*filename).find_last_of(L"/\\");
+		if (slashPosition != std::string::npos)
+		{
+			rmx::FileIO::createDirectory(std::wstring_view(*filename).substr(0, slashPosition));
+		}
+	}
+
 #if defined(PLATFORM_WINDOWS)
-	mFile = _wfsopen(*filename, ::getModeStringW(flags), ((flags & 0x0f) == FILE_ACCESS_READ) ? _SH_DENYNO : _SH_DENYWR);	// Allow shared file reading
+	mFile = _wfsopen(*filename, ::getModeStringW(flags), isWrite ? _SH_DENYWR : _SH_DENYNO);	// Allow shared file reading
 #elif defined(USE_UTF8_PATHS)
 	mFile = fopen(*filename.toUTF8(), ::getModeString(flags));
 #else

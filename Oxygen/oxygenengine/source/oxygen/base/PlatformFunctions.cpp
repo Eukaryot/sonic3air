@@ -32,7 +32,7 @@ namespace
 {
 #ifdef PLATFORM_WINDOWS
 
-	std::wstring GetStringRegKey(HKEY hKey, const wchar_t* valueName)
+	std::wstring getStringRegKey(HKEY hKey, const wchar_t* valueName)
 	{
 		WCHAR szBuffer[512];
 		DWORD dwBufferSize = sizeof(szBuffer);
@@ -47,7 +47,7 @@ namespace
 		LONG lRes = RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Valve\\Steam", 0, KEY_READ, &hKey);
 		if (lRes == ERROR_SUCCESS)
 		{
-			return GetStringRegKey(hKey, L"SteamPath");
+			return getStringRegKey(hKey, L"SteamPath");
 		}
 		return L"";
 	}
@@ -322,9 +322,10 @@ void PlatformFunctions::changeWorkingDirectory(std::wstring_view executableCallP
 #elif defined(PLATFORM_LINUX)
 	// Take the working directory from command line if possible
 	const size_t slashPos = executableCallPath.find_last_of(L'/');
-	if (slashPos != std::string::npos)
+	if (slashPos != std::wstring_view::npos)
 	{
-		rmx::FileSystem::setCurrentDirectory(executableCallPath.substr(0, slashPos));
+		const std::wstring path = std::wstring(executableCallPath.substr(0, slashPos + 1));
+		rmx::FileSystem::setCurrentDirectory(path);
 	}
 #endif
 }
