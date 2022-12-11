@@ -264,6 +264,12 @@ namespace rmx
 		mManagedFileProviders.insert(&fileProvider);
 	}
 
+	void FileSystem::destroyManagedFileProvider(FileProvider& fileProvider)
+	{
+		mManagedFileProviders.erase(&fileProvider);
+		delete &fileProvider;
+	}
+
 	void FileSystem::clearMountPoints()
 	{
 		// This also removes the default real file provider -- this way you can get rid of it
@@ -284,6 +290,19 @@ namespace rmx
 
 		fileProvider.mRegisteredMountPointFileSystems.insert(this);
 		std::sort(mMountPoints.begin(), mMountPoints.end(), [](const MountPoint& a, const MountPoint& b) { return a.mPriority > b.mPriority; } );
+	}
+
+	void FileSystem::removeMountPoints(FileProvider& fileProvider)
+	{
+		// Remove all mount points of this file provider
+		for (size_t k = 0; k < mMountPoints.size(); ++k)
+		{
+			if (&fileProvider == mMountPoints[k].mFileProvider)
+			{
+				mMountPoints.erase(mMountPoints.begin() + k);
+				--k;
+			}
+		}
 	}
 
 	void FileSystem::normalizePath(std::wstring& path, bool isDirectory)
@@ -318,15 +337,7 @@ namespace rmx
 
 	void FileSystem::onFileProviderDestroyed(FileProvider& fileProvider)
 	{
-		// Remove all mount points of this file provider
-		for (size_t k = 0; k < mMountPoints.size(); ++k)
-		{
-			if (&fileProvider == mMountPoints[k].mFileProvider)
-			{
-				mMountPoints.erase(mMountPoints.begin() + k);
-				--k;
-			}
-		}
+		removeMountPoints(fileProvider);
 	}
 
 	const std::wstring* FileSystem::applyMountPoint(const MountPoint& mountPoint, const std::wstring& inPath, std::wstring& tempPath) const

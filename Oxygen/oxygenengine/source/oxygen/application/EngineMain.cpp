@@ -130,6 +130,20 @@ void EngineMain::onActiveModsChanged()
 	Application::instance().getSimulation().reloadScriptsAfterModsChange();
 }
 
+bool EngineMain::reloadFilePackage(std::wstring_view packageName, bool forceReload)
+{
+	GameProfile& gameProfile = GameProfile::instance();
+	for (size_t index = 0; index < gameProfile.mDataPackages.size(); ++index)
+	{
+		const GameProfile::DataPackage& dataPackage = gameProfile.mDataPackages[index];
+		if (dataPackage.mFilename == packageName)
+		{
+			return loadFilePackageByIndex(index, forceReload);
+		}
+	}
+	return false;
+}
+
 uint32 EngineMain::getPlatformFlags() const
 {
 	if (Configuration::instance().mPlatformFlags != -1)
@@ -459,37 +473,76 @@ bool EngineMain::initFileSystem()
 	}
 
 	// Add package providers
-	GameProfile& gameProfile = GameProfile::instance();
-	int priority = 0x20;
-	for (const GameProfile::DataPackage& dataPackage : gameProfile.mDataPackages)
-	{
-		const std::wstring basePath = config.mGameDataPath + L"/";
-		PackedFileProvider* provider = new PackedFileProvider(basePath + dataPackage.mFilename);
-		if (provider->isLoaded())
-		{
-			// Mount to "data" in any case, otherwise OxygenApp won't work when the game data path is somewhere different
-			FTX::FileSystem->addManagedFileProvider(*provider);
-			FTX::FileSystem->addMountPoint(*provider, L"data/", L"data/", priority);
-		}
-		else
-		{
-			// Oops, could not load package file
-			delete provider;
+	return loadFilePackages(false);
+}
 
+bool EngineMain::loadFilePackages(bool forceReload)
+{
+	Configuration& config = Configuration::instance();
+	GameProfile& gameProfile = GameProfile::instance();
+	mPackedFileProviders.resize(gameProfile.mDataPackages.size(), nullptr);
+
+	for (size_t index = 0; index < gameProfile.mDataPackages.size(); ++index)
+	{
+		const bool success = loadFilePackageByIndex(index, forceReload);
+		if (!success)
+		{
 			// Is this a required package after all?
+			const GameProfile::DataPackage& dataPackage = gameProfile.mDataPackages[index];
 			if (dataPackage.mRequired)
 			{
-				// We still accept missing packages if data is present in unpacked form
+				// We still accept missing packages if any data is present in unpacked form
 				//  -> Just checking the "icon.png" to know whether that's the case
 				static const bool hasUnpackedData = FTX::FileSystem->exists(config.mGameDataPath + L"/images/icon.png");
-				RMX_CHECK(hasUnpackedData, "Could not find or open package '" << *WString(basePath + dataPackage.mFilename).toString() << "', application will close now again.", return false);
+				RMX_CHECK(hasUnpackedData, "Could not find or open package '" << *WString(dataPackage.mFilename).toString() << "', application will close now again.", return false);
 			}
 		}
-
-		++priority;
 	}
 
 	return true;
+}
+
+bool EngineMain::loadFilePackageByIndex(size_t index, bool forceReload)
+{
+	// Already loaded?
+	if (nullptr != mPackedFileProviders[index])
+	{
+		if (forceReload)
+		{
+			FTX::FileSystem->destroyManagedFileProvider(*mPackedFileProviders[index]);
+			mPackedFileProviders[index] = nullptr;
+		}
+		else
+		{
+			// Just ignore that one, it's already loaded
+			return true;
+		}
+	}
+
+	const GameProfile::DataPackage& dataPackage = GameProfile::instance().mDataPackages[index];
+	Configuration& config = Configuration::instance();
+
+	// First try loading from game installation
+	const std::wstring gameDataBasePath = config.mGameDataPath + L"/";
+	PackedFileProvider* provider = PackedFileProvider::createPackedFileProvider(gameDataBasePath + dataPackage.mFilename);
+	if (nullptr == provider)
+	{
+		// Then try loading from save data (e.g. downloaded packages)
+		const std::wstring saveDataBasePath = config.mAppDataPath + L"/data/";
+		provider = PackedFileProvider::createPackedFileProvider(saveDataBasePath + dataPackage.mFilename);
+	}
+
+	if (nullptr != provider)
+	{
+		// Mount to "data" in any case, otherwise OxygenApp won't work when the game data path is somewhere different
+		FTX::FileSystem->addManagedFileProvider(*provider);
+		FTX::FileSystem->addMountPoint(*provider, L"data/", L"data/", 0x20 + (int)index);
+		mPackedFileProviders[index] = provider;
+		return true;
+	}
+
+	// Failed
+	return false;
 }
 
 bool EngineMain::createWindow()

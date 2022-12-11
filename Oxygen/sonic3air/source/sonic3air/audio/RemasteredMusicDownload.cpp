@@ -8,6 +8,7 @@
 
 #include "sonic3air/pch.h"
 #include "sonic3air/audio/RemasteredMusicDownload.h"
+#include "sonic3air/audio/AudioOut.h"
 
 #include "oxygen/download/DownloadManager.h"
 
@@ -33,10 +34,7 @@ RemasteredMusicDownload::State RemasteredMusicDownload::getState()
 			case Downloader::State::FAILED:		return State::DOWNLOAD_FAILED;
 		}
 	}
-	else
-	{
-		return State::READY_FOR_DOWNLOAD;
-	}
+	return State::READY_FOR_DOWNLOAD;
 }
 
 uint64 RemasteredMusicDownload::getBytesDownloaded() const
@@ -56,6 +54,7 @@ void RemasteredMusicDownload::removeDownload()
 
 void RemasteredMusicDownload::applyAfterDownload()
 {
-	// TODO: Load remastered music download
-
+	// Load remastered music package
+	EngineMain::instance().reloadFilePackage(L"audioremaster.bin", false);
+	AudioOut::instance().reloadRemasteredSoundtrack();
 }

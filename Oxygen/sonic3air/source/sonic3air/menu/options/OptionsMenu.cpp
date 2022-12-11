@@ -51,9 +51,13 @@ namespace
 		}
 	};
 
+	// Hide certain options depending on:
+	//  - whether the options menu is opened from the pause menu (second parameter)
+	//  - and/or depending on secrets (third parameter)
 	static const std::vector<ConditionalOption> CONDITIONAL_OPTIONS =
 	{
 		ConditionalOption(option::SOUNDTRACK,				 true),
+		ConditionalOption(option::SOUNDTRACK_DOWNLOAD,		 true),
 		ConditionalOption(option::SOUND_TEST,				 true),
 		ConditionalOption(option::TITLE_THEME,				 true),
 		ConditionalOption(option::OUTRO_MUSIC,				 true),
@@ -1163,6 +1167,22 @@ void OptionsMenu::update(float timeElapsed)
 					case option::SOUNDTRACK_DOWNLOAD:
 					{
 						mSoundtrackDownloadMenuEntry->triggerButton();
+						mSoundtrackDownloadMenuEntry->setVisible(mSoundtrackDownloadMenuEntry->shouldBeShown());
+
+						// Restart music if remastered soundtrack was just loaded
+						if (AudioOut::instance().hasLoadedRemasteredSoundtrack())
+						{
+							AudioOut::instance().stopSoundContext(AudioOut::CONTEXT_MENU + AudioOut::CONTEXT_MUSIC);
+							AudioOut::instance().onSoundtrackPreferencesChanged();
+							if (nullptr == mPlayingSoundTest)
+							{
+								AudioOut::instance().restartMenuMusic();
+							}
+							else
+							{
+								playSoundtest(*mPlayingSoundTest);
+							}
+						}
 						break;
 					}
 
@@ -1419,8 +1439,9 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 
 	for (const ConditionalOption& option : CONDITIONAL_OPTIONS)
 	{
-		const bool visible = option.shouldBeVisible(enteredFromIngame);
-		mOptionEntries[option.mOptionId].mGameMenuEntry->setVisible(visible);
+		OptionsMenuEntry& optionsMenuEntry = *static_cast<OptionsMenuEntry*>(mOptionEntries[option.mOptionId].mGameMenuEntry);
+		const bool visible = option.shouldBeVisible(enteredFromIngame) && optionsMenuEntry.shouldBeShown();
+		optionsMenuEntry.setVisible(visible);
 	}
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WEB)

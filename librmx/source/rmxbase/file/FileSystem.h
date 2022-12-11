@@ -50,8 +50,10 @@ namespace rmx
 
 		// File provider & mount points management
 		void addManagedFileProvider(FileProvider& fileProvider);
+		void destroyManagedFileProvider(FileProvider& fileProvider);
 		void clearMountPoints();
 		void addMountPoint(FileProvider& fileProvider, std::wstring_view mountPoint, std::wstring_view prefixReplacement, int priority);
+		void removeMountPoints(FileProvider& fileProvider);
 
 	public:
 		// Misc functions

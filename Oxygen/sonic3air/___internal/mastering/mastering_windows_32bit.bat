@@ -26,6 +26,9 @@ mkdir "%outputDir%"
 
 robocopy "_master_image_template" "%outputDir%" /e
 
+:: Leave out the remastered music, as the Windows build can use an internal downloader
+del "%outputDir%\data\audioremaster.bin"
+
 copy "bin\Release-Enduser_x86\*.exe" "%outputDir%"
 copy "source\external\discord_game_sdk\lib\x86\discord_game_sdk.dll" "%outputDir%"
 

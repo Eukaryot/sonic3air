@@ -73,7 +73,25 @@ struct PackedFileProvider::Internal
 
 
 
-PackedFileProvider::PackedFileProvider(const std::wstring& packageFilename) :
+PackedFileProvider* PackedFileProvider::createPackedFileProvider(std::wstring_view packageFilename)
+{
+	if (!FTX::FileSystem->exists(packageFilename))
+		return nullptr;
+
+	PackedFileProvider* provider = new PackedFileProvider(packageFilename);
+	if (provider->isLoaded())
+	{
+		return provider;
+	}
+	else
+	{
+		// Oops, could not load package file
+		delete provider;
+		return nullptr;
+	}
+}
+
+PackedFileProvider::PackedFileProvider(std::wstring_view packageFilename) :
 	mInternal(*new Internal())
 {
 	// Load the package if there is one

@@ -2,7 +2,7 @@
 #include "engineapp/pch.h"
 #include "engineapp/EngineDelegate.h"
 
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 #if defined(PLATFORM_WINDOWS) && !defined(__GNUC__)

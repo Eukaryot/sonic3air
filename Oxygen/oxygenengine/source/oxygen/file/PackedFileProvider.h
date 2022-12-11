@@ -21,7 +21,10 @@ public:
 	using PackedFile = FilePackage::PackedFile;
 
 public:
-	PackedFileProvider(const std::wstring& packageFilename);
+	static PackedFileProvider* createPackedFileProvider(std::wstring_view packageFilename);
+
+public:
+	PackedFileProvider(std::wstring_view packageFilename);
 	~PackedFileProvider();
 
 	const bool isLoaded() const  { return mLoaded; }

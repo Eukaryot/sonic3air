@@ -15,6 +15,7 @@ class AudioOutBase;
 class CodeExec;
 class Configuration;
 class LogDisplay;
+class PackedFileProvider;
 
 namespace lemon
 {
@@ -84,6 +85,7 @@ public:
 	void execute(int argc, char** argv);
 
 	void onActiveModsChanged();
+	bool reloadFilePackage(std::wstring_view packageName, bool forceReload);
 
 	inline AudioOutBase& getAudioOut() { return *mAudioOut; }
 
@@ -101,6 +103,8 @@ private:
 
 	bool initConfigAndSettings(const std::wstring& argumentProjectPath);
 	bool initFileSystem();
+	bool loadFilePackages(bool forceReload);
+	bool loadFilePackageByIndex(size_t index, bool forceReload);
 
 	bool createWindow();
 	void destroyWindow();
@@ -112,7 +116,8 @@ private:
 	struct Internal;
 	Internal& mInternal;
 
-	AudioOutBase*   mAudioOut = nullptr;
+	AudioOutBase*	mAudioOut = nullptr;
 	SDL_Window*		mSDLWindow = nullptr;
 	Drawer			mDrawer;
+	std::vector<PackedFileProvider*> mPackedFileProviders;
 };

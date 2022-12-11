@@ -11,7 +11,7 @@
 #include "oxygen/helper/Utils.h"
 
 
-bool FilePackage::loadPackage(const std::wstring& packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll, bool showErrors)
+bool FilePackage::loadPackage(std::wstring_view packageFilename, std::map<std::wstring, PackedFile>& outPackedFiles, InputStream*& inputStream, bool forceLoadAll, bool showErrors)
 {
 	// Try to load the package
 	RMX_ASSERT(nullptr == inputStream, "Input stream was already opened");

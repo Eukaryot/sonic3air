@@ -404,10 +404,5 @@ void SoundtrackDownloadMenuEntry::triggerButton()
 
 bool SoundtrackDownloadMenuEntry::shouldBeShown()
 {
-#if 1
-	// Just for testing
-	return (ConfigurationImpl::instance().mActiveSoundtrack == 1 && Downloader::isDownloaderSupported());
-#else
 	return (ConfigurationImpl::instance().mActiveSoundtrack == 1 && Downloader::isDownloaderSupported() && !AudioOut::instance().hasLoadedRemasteredSoundtrack());
-#endif
 }
