@@ -502,9 +502,23 @@ namespace
 		return (getButtonState((int)index) && !getButtonState(index, true)) ? 1 : 0;
 	}
 
-	void Input_setTouchInputMode(uint8 index)
+	void Input_setTouchInputMode(uint8 mode)
 	{
-		return InputManager::instance().setTouchInputMode((InputManager::TouchInputMode)index);
+		return InputManager::instance().setTouchInputMode((InputManager::TouchInputMode)mode);
+	}
+
+	void Input_resetControllerRumble(int8 playerIndex)
+	{
+		if (playerIndex < 0)
+		{
+			// All players
+			InputManager::instance().resetControllerRumbleForPlayer(0);
+			InputManager::instance().resetControllerRumbleForPlayer(1);
+		}
+		else if (playerIndex < 2)
+		{
+			InputManager::instance().resetControllerRumbleForPlayer(playerIndex);
+		}
 	}
 
 	void Input_setControllerRumble(int8 playerIndex, float lowFrequencyRumble, float highFrequencyRumble, uint16 milliseconds)
@@ -1080,9 +1094,9 @@ namespace
 		EngineMain::instance().getAudioOut().stopChannel(channel);
 	}
 
-	void Audio_fadeInChannel(uint8 channel, float length)
+	void Audio_fadeInChannel(uint8 channel, float seconds)
 	{
-		EngineMain::instance().getAudioOut().fadeInChannel(channel, length);
+		EngineMain::instance().getAudioOut().fadeInChannel(channel, seconds);
 	}
 
 	void Audio_fadeInChannel2(uint8 channel, uint16 length)
@@ -1090,9 +1104,9 @@ namespace
 		EngineMain::instance().getAudioOut().fadeInChannel(channel, (float)length / 256.0f);
 	}
 
-	void Audio_fadeOutChannel(uint8 channel, float length)
+	void Audio_fadeOutChannel(uint8 channel, float seconds)
 	{
-		EngineMain::instance().getAudioOut().fadeOutChannel(channel, length);
+		EngineMain::instance().getAudioOut().fadeOutChannel(channel, seconds);
 	}
 
 	void Audio_fadeOutChannel2(uint8 channel, uint16 length)
@@ -1557,7 +1571,10 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 			.setParameterInfo(0, "index");
 
 		module.addNativeFunction("Input.setTouchInputMode", lemon::wrap(&Input_setTouchInputMode), defaultFlags)
-			.setParameterInfo(0, "index");
+			.setParameterInfo(0, "mode");
+
+		module.addNativeFunction("Input.resetControllerRumble", lemon::wrap(&Input_resetControllerRumble), defaultFlags)
+			.setParameterInfo(0, "playerIndex");
 
 		module.addNativeFunction("Input.setControllerRumble", lemon::wrap(&Input_setControllerRumble), defaultFlags)
 			.setParameterInfo(0, "playerIndex")
@@ -1994,7 +2011,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		module.addNativeFunction("Audio.fadeInChannel", lemon::wrap(&Audio_fadeInChannel2), defaultFlags)
 			.setParameterInfo(0, "channel")
-			.setParameterInfo(1, "seconds");
+			.setParameterInfo(1, "length");
 
 		module.addNativeFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel), defaultFlags)
 			.setParameterInfo(0, "channel")
@@ -2002,7 +2019,7 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		module.addNativeFunction("Audio.fadeOutChannel", lemon::wrap(&Audio_fadeOutChannel2), defaultFlags)
 			.setParameterInfo(0, "channel")
-			.setParameterInfo(1, "seconds");
+			.setParameterInfo(1, "length");
 
 		module.addNativeFunction("Audio.playOverride", lemon::wrap(&Audio_playOverride), defaultFlags)
 			.setParameterInfo(0, "sfxId")
