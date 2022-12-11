@@ -49,9 +49,9 @@ namespace global
 
 	void loadSharedResources()
 	{
-		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 0.5f, 0.8f);
-		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor2 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 0.5f), 0.5f, 1.0f);
-		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor3 = std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 0.5f, 0.6f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor  = std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 0.8f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor2 = std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 1.0f);
+		std::shared_ptr<ShadowFontProcessor> shadowFontProcessor3 = std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 0.5f, 0.6f);
 
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessor = std::make_shared<OutlineFontProcessor>();
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorTransparent = std::make_shared<OutlineFontProcessor>(Color(0.0f, 0.0f, 0.0f, 0.5f));

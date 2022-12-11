@@ -27,7 +27,7 @@ void MemoryHexView::initialize()
 
 	// Debug output font
 	mFont.setSize(15.0f);
-	mFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 1.0f));
+	mFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 1.0f));
 }
 
 void MemoryHexView::deinitialize()

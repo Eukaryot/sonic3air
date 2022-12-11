@@ -21,8 +21,8 @@ void ShadowFontProcessor::process(FontProcessingData& data)
 	const int oldBorderBottom = data.mBorderBottom;
 
 	const int border = clamp(roundToInt(mShadowBlur * 2.0f), 0, 16);
-	const int offsX = clamp(roundToInt(mShadowOffset.x), 0, 16);
-	const int offsY = clamp(roundToInt(mShadowOffset.y), 0, 16);
+	const int offsX = clamp(mShadowOffset.x, 0, 16);
+	const int offsY = clamp(mShadowOffset.y, 0, 16);
 
 	data.mBorderLeft   = oldBorderLeft   + std::max(0, border - offsX);
 	data.mBorderRight  = oldBorderRight  + border + offsX;

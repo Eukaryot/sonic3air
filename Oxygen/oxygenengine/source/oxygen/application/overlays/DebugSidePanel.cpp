@@ -94,7 +94,7 @@ DebugSidePanel::~DebugSidePanel()
 void DebugSidePanel::initialize()
 {
 	mSmallFont.loadFromFile("data/font/freefont_sampled.json");
-	mSmallFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 1.0f));
+	mSmallFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 1.0f));
 }
 
 void DebugSidePanel::deinitialize()

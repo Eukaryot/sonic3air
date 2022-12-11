@@ -104,7 +104,7 @@ void Application::initialize()
 
 	// Font
 	mLogDisplayFont.setSize(15.0f);
-	mLogDisplayFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2f(1.0f, 1.0f), 1.0f));
+	mLogDisplayFont.addFontProcessor(std::make_shared<ShadowFontProcessor>(Vec2i(1, 1), 1.0f));
 
 	RMX_LOG_INFO("Application initialization complete");
 }

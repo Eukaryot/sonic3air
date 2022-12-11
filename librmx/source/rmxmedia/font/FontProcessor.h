@@ -34,7 +34,7 @@ public:
 class ShadowFontProcessor : public FontProcessor
 {
 public:
-	inline explicit ShadowFontProcessor(Vec2f shadowOffset = Vec2f(1.0f, 1.0f), float shadowBlur = 1.0f, float shadowAlpha = 1.0f) :
+	inline explicit ShadowFontProcessor(Vec2i shadowOffset = Vec2i(1, 1), float shadowBlur = 1.0f, float shadowAlpha = 1.0f) :
 		mShadowOffset(shadowOffset),
 		mShadowBlur(shadowBlur),
 		mShadowAlpha(shadowAlpha)
@@ -43,7 +43,7 @@ public:
 	virtual void process(FontProcessingData& data) override;
 
 private:
-	Vec2f mShadowOffset;
+	Vec2i mShadowOffset;
 	float mShadowBlur = 1.0f;
 	float mShadowAlpha = 1.0f;
 };
