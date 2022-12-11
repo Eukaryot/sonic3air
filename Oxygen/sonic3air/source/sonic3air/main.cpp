@@ -11,7 +11,7 @@
 #include "sonic3air/helper/ArgumentsReader.h"
 #include "sonic3air/helper/PackageBuilder.h"
 
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 // HJW: I know it's sloppy to put this here... it'll get moved afterwards

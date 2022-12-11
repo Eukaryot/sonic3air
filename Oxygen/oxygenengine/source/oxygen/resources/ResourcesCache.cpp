@@ -10,10 +10,10 @@
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/modding/ModManager.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/FileHelper.h"
 #include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 bool ResourcesCache::loadRom()

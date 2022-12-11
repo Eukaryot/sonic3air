@@ -12,7 +12,7 @@
 
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 ApplicationContextMenu::ApplicationContextMenu()

@@ -8,8 +8,8 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/Configuration.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/JsonHelper.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/translator/SourceCodeWriter.h>
 

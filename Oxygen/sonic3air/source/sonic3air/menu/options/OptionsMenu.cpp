@@ -24,8 +24,8 @@
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/Utils.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/Simulation.h"
 
 

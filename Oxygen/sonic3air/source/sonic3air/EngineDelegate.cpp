@@ -19,7 +19,7 @@
 
 #include "oxygen/application/Application.h"
 #include "oxygen/application/GameProfile.h"
-#include "oxygen/base/CrashHandler.h"
+#include "oxygen/platform/CrashHandler.h"
 #include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 

@@ -17,9 +17,9 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/modding/ModManager.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/DrawerHelper.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 
 namespace

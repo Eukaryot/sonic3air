@@ -28,9 +28,9 @@
 #include "oxygen/application/overlays/SaveStateMenu.h"
 #include "oxygen/application/overlays/TouchControlsOverlay.h"
 #include "oxygen/application/video/VideoOut.h"
-#include "oxygen/base/PlatformFunctions.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/helper/Profiling.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/Simulation.h"
 

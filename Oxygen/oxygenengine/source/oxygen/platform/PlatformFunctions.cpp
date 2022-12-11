@@ -7,7 +7,7 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/helper/HighResolutionTimer.h"
 #include "oxygen/helper/Logging.h"
 

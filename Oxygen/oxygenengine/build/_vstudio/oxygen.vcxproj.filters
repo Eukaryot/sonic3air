@@ -46,9 +46,6 @@
     <Filter Include="resources">
       <UniqueIdentifier>{2f8f51cf-6e63-45aa-b331-70c7a2f83820}</UniqueIdentifier>
     </Filter>
-    <Filter Include="base">
-      <UniqueIdentifier>{1a6fb333-fe3a-4e1f-af20-540374f54e8e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="drawing">
       <UniqueIdentifier>{f7e88c35-532b-4eea-87c3-1252bbda7c22}</UniqueIdentifier>
     </Filter>
@@ -235,9 +232,6 @@
     <ClCompile Include="..\..\source\oxygen\simulation\PersistentData.cpp">
       <Filter>simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\base\PlatformFunctions.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\GameProfile.cpp">
       <Filter>application</Filter>
     </ClCompile>
@@ -282,9 +276,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\parts\OverlayManager.cpp">
       <Filter>rendering\parts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\base\CrashHandler.cpp">
-      <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.cpp">
       <Filter>drawing\opengl</Filter>
@@ -414,6 +405,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\download\DownloadManager.cpp">
       <Filter>download</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\CrashHandler.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\platform\PlatformFunctions.cpp">
+      <Filter>platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -574,9 +571,6 @@
     <ClInclude Include="..\..\source\oxygen\simulation\PersistentData.h">
       <Filter>simulation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\base\PlatformFunctions.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\GameProfile.h">
       <Filter>application</Filter>
     </ClInclude>
@@ -624,9 +618,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\parts\OverlayManager.h">
       <Filter>rendering\parts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\base\CrashHandler.h">
-      <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLDrawerResources.h">
       <Filter>drawing\opengl</Filter>
@@ -765,6 +756,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\download\DownloadManager.h">
       <Filter>download</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\CrashHandler.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\platform\PlatformFunctions.h">
+      <Filter>platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

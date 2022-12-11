@@ -7,8 +7,8 @@
 */
 
 #include "oxygen/pch.h"
-#include "oxygen/base/CrashHandler.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/CrashHandler.h"
+#include "oxygen/platform/PlatformFunctions.h"
 #include "oxygen/helper/Logging.h"
 
 #ifdef PLATFORM_WINDOWS

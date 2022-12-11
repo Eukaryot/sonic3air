@@ -16,7 +16,7 @@
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/GameProfile.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 #include <lemon/program/Function.h>
 #include <lemon/runtime/Runtime.h>
