@@ -37,12 +37,18 @@ function void LevelObjectTableBuilder.buildObjects_FBZ1()
 	LevelObjectTableBuilder.addObject(0x0460, 0x09e8, OBJECTTABLE1_e4, 0x03, 0)
 	LevelObjectTableBuilder.addObject(0x0460, 0x09f8, OBJECTTABLE1_e4, 0x80, 0)
 	LevelObjectTableBuilder.addObject(0x0488, 0x08a0, OBJECTTABLE1_72, 0xc7, LVLOBJ_FLIP_X)
-	LevelObjectTableBuilder.addObject(0x04a0, 0x06bc, OBJECTTABLE1_07, 0x02, 0)
+
+	// Removed unnecessary spring in the floor - #contributed by Lave slime
+	//LevelObjectTableBuilder.addObject(0x04a0, 0x06bc, OBJECTTABLE1_07, 0x02, 0)
+
 	LevelObjectTableBuilder.addObject(0x04a0, 0x0a78, OBJECTTABLE1_a9, 0x00, LVLOBJ_FLIP_X)
 	LevelObjectTableBuilder.addObject(0x04b0, 0x098c, OBJECTTABLE1_2f, 0x28, 0)
 	LevelObjectTableBuilder.addObject(0x04c0, 0x09a0, OBJECTTABLE1_72, 0xc3, 0)
 	LevelObjectTableBuilder.addObject(0x04c8, 0x08f8, OBJECTTABLE1_e4, 0x80, 0)
-	LevelObjectTableBuilder.addObject(0x04e0, 0x06bc, OBJECTTABLE1_07, 0x02, 0)
+
+	// And another spring
+	//LevelObjectTableBuilder.addObject(0x04e0, 0x06bc, OBJECTTABLE1_07, 0x02, 0)
+
 	LevelObjectTableBuilder.addObject(0x04e0, 0x0918, OBJECTTABLE1_72, 0x14, 0)
 	LevelObjectTableBuilder.addObject(0x0570, 0x08f0, OBJECTTABLE1_a8, 0x08, 0)
 	LevelObjectTableBuilder.addObject(0x0570, 0x0a10, OBJECTTABLE1_01, 0x01, 0)
