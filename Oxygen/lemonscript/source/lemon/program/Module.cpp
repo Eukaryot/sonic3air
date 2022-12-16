@@ -113,7 +113,7 @@ namespace lemon
 		if (!mConstants.empty())
 		{
 			content << "\r\n\r\n";
-			content << "Constants";
+			content << "// Constants";
 			content << "\r\n\r\n";
 
 			for (const Constant* constant : mConstants)
