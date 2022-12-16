@@ -73,7 +73,7 @@ namespace lemon
 		{
 			*mValueStackPtr = BaseTypeConversion::convert<T, uint64>(value);
 			++mValueStackPtr;
-			RMX_ASSERT(mValueStackPtr < &mValueStackBuffer[0x78], "Value stack error: Too many elements");
+			RMX_ASSERT(mValueStackPtr < &mValueStackBuffer[VALUE_STACK_LAST_INDEX], "Value stack error: Too many elements");
 		}
 
 		template<typename T>
@@ -94,15 +94,20 @@ namespace lemon
 		}
 
 	private:
+		inline static const size_t VALUE_STACK_MAX_SIZE    = 128;
+		inline static const size_t VALUE_STACK_FIRST_INDEX = 4;			// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately
+		inline static const size_t VALUE_STACK_LAST_INDEX  = VALUE_STACK_MAX_SIZE - 8;
+		inline static const size_t VAR_STACK_LIMIT         = 1024;
+
 		Runtime& mRuntime;
 		const Program* mProgram = nullptr;
 
 		CArray<State> mCallStack;	// Not using std::vector for performance reasons in debug builds
-		uint64 mValueStackBuffer[0x80] = { 0 };
-		uint64* mValueStackStart = &mValueStackBuffer[4];	// Leave 4 elements so that removing too many elements from the stack doesn't break everything immediately
-		uint64* mValueStackPtr   = &mValueStackBuffer[4];
-		int64 mLocalVariablesBuffer[0x400] = { 0 };
-		size_t mLocalVariablesSize = 0;
+		uint64 mValueStackBuffer[VALUE_STACK_MAX_SIZE] = { 0 };
+		uint64* mValueStackStart = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+		uint64* mValueStackPtr   = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+		int64 mLocalVariablesBuffer[VAR_STACK_LIMIT] = { 0 };
+		size_t mLocalVariablesSize = 0;							// Current used size of the local variables buffer
 
 		// Only as optimization for OpcodeExec
 		int64* mCurrentLocalVariables = nullptr;

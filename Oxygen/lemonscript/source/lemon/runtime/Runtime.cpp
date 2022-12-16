@@ -275,6 +275,11 @@ namespace lemon
 
 	void Runtime::callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex)
 	{
+		if (mSelectedControlFlow->mLocalVariablesSize + runtimeFunction.mFunction->mLocalVariablesByID.size() > ControlFlow::VAR_STACK_LIMIT)
+		{
+			throw std::runtime_error("Reached var stack limit, probably due to recursive function calls");
+		}
+
 		// Push new state to call stack
 		ControlFlow::State& state = *mSelectedControlFlow->mCallStack.add();
 		state.mRuntimeFunction = &runtimeFunction;
@@ -329,6 +334,7 @@ namespace lemon
 		//}
 		memset(&mSelectedControlFlow->mLocalVariablesBuffer[mSelectedControlFlow->mLocalVariablesSize], 0, numLocalVars * sizeof(int64));
 		mSelectedControlFlow->mLocalVariablesSize += numLocalVars;
+		RMX_CHECK(mSelectedControlFlow->mLocalVariablesSize <= ControlFlow::VAR_STACK_LIMIT, "Reached var stack limit, probably due to recursive function calls", RMX_REACT_THROW);
 		mSelectedControlFlow->mCallStack.back().mProgramCounter = runtimeFunction->translateToRuntimeProgramCounter(offset);
 		return true;
 	}
@@ -401,9 +407,11 @@ namespace lemon
 		#endif
 
 			RMX_CHECK(mSelectedControlFlow->mValueStackPtr >= mSelectedControlFlow->mValueStackStart, "Value stack error: Removed elements from empty stack", mSelectedControlFlow->mValueStackPtr = mSelectedControlFlow->mValueStackStart);
-			RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[0x78], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
+			RMX_CHECK(mSelectedControlFlow->mValueStackPtr < &mSelectedControlFlow->mValueStackBuffer[ControlFlow::VALUE_STACK_LAST_INDEX], "Value stack error: Too many elements", mSelectedControlFlow->mValueStackPtr = &mSelectedControlFlow->mValueStackBuffer[0x77]);
 
+			RMX_ASSERT(mSelectedControlFlow->mLocalVariablesSize <= ControlFlow::VAR_STACK_LIMIT, "Reached var stack limit");
 			mSelectedControlFlow->mCurrentLocalVariables = &mSelectedControlFlow->mLocalVariablesBuffer[state.mLocalVariablesStart];
+			RMX_ASSERT(nullptr != mSelectedControlFlow->mCurrentLocalVariables, "Reached var stack limit");
 
 			context.mOpcode = (const RuntimeOpcode*)state.mProgramCounter;
 
@@ -708,6 +716,7 @@ namespace lemon
 						controlFlow.mLocalVariablesBuffer[k] = serializer.read<int64>();
 					}
 					controlFlow.mLocalVariablesSize += numLocalVars;
+					RMX_CHECK(controlFlow.mLocalVariablesSize <= ControlFlow::VAR_STACK_LIMIT, "Reached var stack limit, probably due to recursive function calls", RMX_REACT_THROW);
 				}
 
 				// Make corrections to the program counters for the case that the call points changed

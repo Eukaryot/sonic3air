@@ -104,6 +104,7 @@ namespace lemon
 			int64* variables = &context.mControlFlow->mLocalVariablesBuffer[context.mControlFlow->mLocalVariablesSize];
 			memset(variables, 0, count * sizeof(int64));
 			context.mControlFlow->mLocalVariablesSize += count;
+			RMX_CHECK(context.mControlFlow->mLocalVariablesSize <= ControlFlow::VAR_STACK_LIMIT, "Reached var stack limit, probably due to recursive function calls", RMX_REACT_THROW);
 		}
 
 		static void exec_MOVE_VAR_STACK_negative(const RuntimeOpcodeContext context)

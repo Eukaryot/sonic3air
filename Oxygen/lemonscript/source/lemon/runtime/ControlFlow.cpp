@@ -23,13 +23,14 @@ namespace lemon
 	void ControlFlow::reset()
 	{
 		mCallStack.clear();
-		for (size_t k = 0; k < 0x80; ++k)
+		for (size_t k = 0; k < VALUE_STACK_MAX_SIZE; ++k)
 		{
 			mValueStackBuffer[k] = 0;
 		}
-		mValueStackStart = &mValueStackBuffer[4];
-		mValueStackPtr   = &mValueStackBuffer[4];
-		for (size_t k = 0; k < 0x400; ++k)
+		mValueStackStart = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+		mValueStackPtr   = &mValueStackBuffer[VALUE_STACK_FIRST_INDEX];
+
+		for (size_t k = 0; k < VAR_STACK_LIMIT; ++k)
 		{
 			mLocalVariablesBuffer[k] = 0;
 		}
