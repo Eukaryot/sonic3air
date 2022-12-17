@@ -11,6 +11,7 @@
 	"cnz2_layout": { "File": "zone04_cnz/layout_act2.bin" },
 	"lbz2_layout": { "File": "zone06_lbz/layout_act2.bin" },
 	"mhz2_layout": { "File": "zone07_mhz/layout_act2.bin" },
+	"hpz2_layout": { "File": "zone11_hpz/layout_hpz.bin"  },	// HPZ is zone/act 0x1601, hence it's "hpz2" here
 	"ssz1_layout": { "File": "zone12_ssz/layout_act1.bin" },
 	"dez1_layout": { "File": "zone13_dez/layout_act1.bin" }	
 }

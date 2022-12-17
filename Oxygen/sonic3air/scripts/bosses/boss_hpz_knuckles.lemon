@@ -36,15 +36,6 @@ function void fn063cfc()
 	copyMemory(A2, A1, 0x4a)
 
 	UnloadObject()
-
-#if STANDALONE
-	// Change the level chunks a little bit, so the prophecy picture is only there once
-	u8[0xffff81e5] = 0x48
-	u8[0xffff8218] = 0x42
-	u8[0xffff8219] = 0x49
-	u8[0xffff824d] = 0x4a
-	u8[0xffff824e] = 0x4c
-#endif
 }
 
 
