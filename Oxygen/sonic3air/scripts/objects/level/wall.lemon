@@ -235,7 +235,7 @@ function void fn021568()
 		fn02165a()
 
 	#if STANDALONE
-		if (Game.getSetting(SETTING_FIX_GLITCHES))
+		if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 		{
 			// Prevent slope glitch here for player 1
 			if ((u8[0xffffb000 + 0x2a] & char.flag.ON_OBJECT) && u16[0xffffb000 + 0x42] == A0.u16)

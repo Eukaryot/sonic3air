@@ -264,7 +264,7 @@ function void LevelResults.AdvanceToNextAct()
 	if (level.restart)
 	{
 		// Fix "frame-perfect reset" bug, but only for highest level of glitch fix setting
-		if (Game.getSetting(SETTING_FIX_GLITCHES))
+		if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 		{
 			UnloadObject()
 			return

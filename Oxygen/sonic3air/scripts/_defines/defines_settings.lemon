@@ -25,7 +25,7 @@
 //  if (Game.getSetting(SETTING_XYZ))
 
 // General settings affecting game mechanics
-constant u32 SETTING_FIX_GLITCHES				= 0x00000101	// Fix various gameplay glitches, especially exploitable glitches (but not visual glitches)
+constant u32 SETTING_FIX_GLITCHES				= 0x00000102	// Fix various gameplay glitches, especially exploitable glitches (but not visual glitches): 0 = allow original game glitches, 1 = allow only certain glitches for speedrunning, 2 = enable all glitch fixes
 constant u32 SETTING_NO_CONTROL_LOCK			= 0x00000201	// Control lock after roll + jump removed
 constant u32 SETTING_TAILS_ASSIST_MODE			= 0x00000401	// Allow for control of Tails' flight by first player: 0 = off, 1 = Sonic 3 style, 2 = Hybrid style, 3 = Mania style
 constant u32 SETTING_CANCEL_FLIGHT				= 0x00000501	// Cancel Tails' flight with down + jump

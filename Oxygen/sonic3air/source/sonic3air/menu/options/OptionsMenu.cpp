@@ -176,6 +176,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntry(option::UNDERWATER_AUDIO,			SharedDatabase::Setting::SETTING_UNDERWATER_AUDIO);
 		setupOptionEntry(option::REGION,					SharedDatabase::Setting::SETTING_REGION_CODE);
 		setupOptionEntry(option::TIMEATTACK_GHOSTS,			SharedDatabase::Setting::SETTING_TIME_ATTACK_GHOSTS);
+		setupOptionEntry(option::FIX_GLITCHES,				SharedDatabase::Setting::SETTING_FIX_GLITCHES);
 		setupOptionEntry(option::DROP_DASH,					SharedDatabase::Setting::SETTING_DROPDASH);
 		setupOptionEntry(option::SUPER_PEELOUT,				SharedDatabase::Setting::SETTING_SUPER_PEELOUT);
 		setupOptionEntry(option::DEBUG_MODE,				SharedDatabase::Setting::SETTING_DEBUG_MODE);
@@ -761,6 +762,14 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		entries.addEntry<OptionsMenuEntry>().initEntry("Region Code:", option::REGION)
 			.addOption("Western (\"Tails\")", 0x80)
 			.addOption("Japan (\"Miles\")", 0x00);
+
+
+		entries.addEntry<TitleMenuEntry>().initEntry("Speedrunning");
+
+		entries.addEntry<OptionsMenuEntry>().initEntry("Glitch Fixes:", option::FIX_GLITCHES)
+			.addOption("No glitch fixes", 0)
+			.addOption("Only basic fixes", 1)
+			.addOption("All (recommended)", 2);
 	}
 
 	for (int i = 1; i < Tab::Id::_NUM; ++i)		// Exclude "Mods" tab

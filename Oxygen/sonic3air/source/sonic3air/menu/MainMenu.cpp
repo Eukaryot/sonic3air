@@ -296,14 +296,24 @@ void MainMenu::render()
 	// Version info
 	{
 		// Make place for FPS display if it's shown
-		const int px = (int)(mRect.width - ((Configuration::instance().mPerformanceDisplay != 0) ? 32 : 2) + (1.0f - mVisibility) * 100.0f);
+		int px = (int)(mRect.width - ((Configuration::instance().mPerformanceDisplay != 0) ? 32 : 2) + (1.0f - mVisibility) * 100.0f);
 		std::wstring text = L"\x02c5" BUILD_STRING L" " BUILD_VARIANT;
 		drawer.printText(global::mFont3Pure, Recti(px, 1, 0, 0), text, 3, Color(0.2f, 0.2f, 0.2f, mVisibility * 0.3f));
 
-		// Show whether dev mode is active
+		// Show whether dev mode is active, or one of the non-default glitch fix settings
+		px -= 6 + global::mFont3Pure.getWidth(text);
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			drawer.printText(global::mFont3Pure, Recti(px - 6 - global::mFont3Pure.getWidth(text), 1, 0, 0), "DEV MODE", 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
+			drawer.printText(global::mFont3Pure, Recti(px, 1, 0, 0), "DEV MODE", 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
+		}
+		else
+		{
+			const SharedDatabase::Setting* setting = SharedDatabase::getSetting(SharedDatabase::Setting::SETTING_FIX_GLITCHES);
+			if (nullptr != setting && setting->mCurrentValue < 2)
+			{
+				const char* txt = (setting->mCurrentValue == 0) ? "NO GLITCH FIXES" : "ONLY BASIC FIXES";
+				drawer.printText(global::mFont3Pure, Recti(px, 1, 0, 0), txt, 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
+			}
 		}
 	}
 

@@ -386,7 +386,7 @@ function void fn056dca()
 	}
 
 #if STANDALONE
-	if (Game.getSetting(SETTING_FIX_GLITCHES))
+	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 	{
 		// Additional hard-coded check to make sure that level.display_routine is 0 when reaching the boss area
 		//  -> This prevents the glitch that act 2 won't properly load after the boss fight

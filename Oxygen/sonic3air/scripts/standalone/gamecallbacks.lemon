@@ -14,10 +14,13 @@
 
 function void Standalone.onLevelStart()
 {
-	// If in the parts of AIZ 1 and ICZ 1 that are internally Act 2 with no checkpoints, fully return to Act 1 -- fix #contributed by Thorn
-	if (checkpoint.number == 0 && ((global.zone_act == 0x0001 && global.zone_act.apparent == 0x0000) || (global.zone_act == 0x0501 && global.zone_act.apparent == 0x0500)))
+	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 	{
-		global.zone_act = global.zone_act.apparent
+		// If in the parts of AIZ 1 and ICZ 1 that are internally Act 2 with no checkpoints, fully return to Act 1 -- fix #contributed by Thorn
+		if (checkpoint.number == 0 && ((global.zone_act == 0x0001 && global.zone_act.apparent == 0x0000) || (global.zone_act == 0x0501 && global.zone_act.apparent == 0x0500)))
+		{
+			global.zone_act = global.zone_act.apparent
+		}
 	}
 
 	// Handle achievements

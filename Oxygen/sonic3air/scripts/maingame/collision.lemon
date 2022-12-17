@@ -913,7 +913,8 @@ function void Character.CheckRightWallCollision.shared()
 	checkStaticCollisionHorizontal(D3.u16, D2.u16, 0xfffff768, 0x10, 0)
 
 	D2.u8 = 0xc0
-	D3.u8 = u8[0xfffff768]
+	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
+		D3.u8 = u8[0xfffff768]		// Due to a mistake in code porting, this line was missing for quite a long time in S3AIR, causing a glitch that is now actively used in speedrunning
 	if (D3 & 0x01)
 		D3.u8 = 0xc0
 }
