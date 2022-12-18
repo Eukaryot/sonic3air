@@ -1,7 +1,8 @@
 
 ## ----- Shared -------------------------------------------------------------------
 
-#version 140		// Needed for isamplerBuffer
+// Needed for isamplerBuffer
+#version 140
 
 precision highp float;
 precision highp int;
