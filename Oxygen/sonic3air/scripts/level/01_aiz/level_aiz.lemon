@@ -1205,12 +1205,14 @@ function void fn01c550()
 
 #if STANDALONE
 	// Handling for Knuckles' new path
-	if (objA0.position.x.u16 < 0x1a00)
+	u16 playerPosX = u16[0xffffb000 + 0x10]
+	u16 playerPosY = u16[0xffffb000 + 0x14]
+	if (playerPosX >= 0x1680 && playerPosX < 0x1a00)	// Including a fix #contributed by Thorn
 	{
-		if (objA0.position.y.u16 < 0x0180)
+		if (playerPosY < 0x0180)
 		{
 			move_area.left = 0x1680
-			move_area.bottom.target = (objA0.position.x.u16 < 0x1960) ? 0x0090 : 0x0390
+			move_area.bottom.target = (playerPosX < 0x1960) ? 0x0090 : 0x0390
 			move_area.bottom.current = move_area.bottom.target
 		}
 		else

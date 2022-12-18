@@ -15,7 +15,11 @@ function void LevelObjectTableBuilder.buildObjects_AIZ1()
 
 	if (Game.getSetting(SETTING_LEVELLAYOUTS) == 2)
 	{
-		// Object added for Knuckles' new path
+		// Objects added for Knuckles' new path
+		LevelObjectTableBuilder.addObject(0x1300, 0x0160, OBJECTTABLE1_28, 0xf1, 0)
+		LevelObjectTableBuilder.addObject(0x1400, 0x0160, OBJECTTABLE1_28, 0xf1, 0)
+		LevelObjectTableBuilder.addObject(0x1500, 0x0160, OBJECTTABLE1_28, 0xf1, 0)
+		LevelObjectTableBuilder.addObject(0x1600, 0x0160, OBJECTTABLE1_28, 0xf1, 0)
 		LevelObjectTableBuilder.addObject(0x1690, 0x0140, OBJECTTABLE1_01, 0x08, 0)
 	}
 
