@@ -29,8 +29,8 @@
 	"0C": { "Name": "IceCap 2", "Source": "EmulationDirect", "Type": "Music" },
 
 	// LBZ
-	"0D": { "Name": "Lauch Base 1", "Source": "EmulationDirect", "Type": "Music" },
-	"0E": { "Name": "Lauch Base 2", "Source": "EmulationDirect", "Type": "Music" },
+	"0D": { "Name": "Launch Base 1", "Source": "EmulationDirect", "Type": "Music" },
+	"0E": { "Name": "Launch Base 2", "Source": "EmulationDirect", "Type": "Music" },
 
 	// MHZ
 	"0F": { "Name": "Mushroom Hill 1", "Source": "EmulationDirect", "Type": "Music" },
