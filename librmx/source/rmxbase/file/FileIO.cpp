@@ -284,7 +284,7 @@ namespace rmx
 	#ifdef USE_UTF8_PATHS
 		std::ifstream stream(*WString(filename).toUTF8(), std::ios::binary);
 	#else
-		std::ifstream stream(filename, std::ios::binary);
+		std::ifstream stream(filename.data(), std::ios::binary);
 	#endif
 		if (!stream.good())
 			return false;
@@ -313,7 +313,7 @@ namespace rmx
 	#ifdef USE_UTF8_PATHS
 		std::ofstream stream(*WString(filename).toUTF8(), std::ios::binary);
 	#else
-		std::ofstream stream(filename, std::ios::binary);
+		std::ofstream stream(filename.data(), std::ios::binary);
 	#endif
 		if (!stream.good())
 			return false;
