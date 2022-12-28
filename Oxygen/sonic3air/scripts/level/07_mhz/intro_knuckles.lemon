@@ -348,7 +348,7 @@ function void fn06364e()
 		if (allocDynamicObjectStd())
 		{
 			// Show title card
-			objA1.update_address = 0x02d690
+			objA1.update_address = addressof(TitleCard.Update)
 		}
 
 		global.level_started = -0x6f	// Let HUD fly in

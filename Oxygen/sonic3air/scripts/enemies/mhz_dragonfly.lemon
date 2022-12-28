@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08dd32) end(0x08dd32)
-function void fn08dd32()
+//# alias(fn08dd32) deprecated
+function void Dragonfly.Init()
 {
 	Object.InitWithUpdateAddress(0x08dd38)
 }

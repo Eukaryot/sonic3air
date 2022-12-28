@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08c2e2) end(0x08c2e2)
-function void fn08c2e2()
+//# alias(fn08c2e2) deprecated
+function void Ribot.Init()
 {
 	Object.InitWithUpdateAddress(0x08c2e8)
 }

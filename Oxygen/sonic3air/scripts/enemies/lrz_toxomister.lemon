@@ -15,7 +15,7 @@
 //# address-hook(0x08fd30) end(0x08fd30)
 function void Toxomister.Init()
 {
-	Object.InitWithUpdateAddress(0x08fd36)
+	Object.InitWithUpdateAddress(addressof(Toxomister.PostInit))
 }
 
 
@@ -298,8 +298,7 @@ function void fn08ff8c()
 //# address-hook(0x08ffe0) end(0x090000)
 function void fn08ffe0()
 {
-	D0.s16 = objA1.velocity.x >> 3
-	objA1.velocity.x -= D0.u16
+	objA1.velocity.x -= objA1.velocity.x >> 3
 
 	D0 = (u8[A1 + 0x2a] & char.flag.IN_AIR) ? 0x1a : 0x1c
 	D1.s16 = s16[A1 + D0.s16] >> 3

@@ -15,7 +15,7 @@
 //# address-hook(0x087156) end(0x087168)
 function void MonkeyDude.Init()
 {
-	Object.InitWithUpdateAddress(0x08715a)
+	Object.InitWithUpdateAddress(addressof(MonkeyDude.BaseUpdate))
 }
 
 
@@ -144,6 +144,7 @@ function void fn08724e()
 
 	if (objA0.subtype2c == 0)
 	{
+		// Shoulder joint
 		objA0.update_address = 0x0872cc
 		D0 = 0x0e
 		if ((objA0.flags38 & 0x08) == 0)
@@ -156,6 +157,7 @@ function void fn08724e()
 	}
 	else if (objA0.subtype2c != 0x08)
 	{
+		// Arm joints
 		objA0.update_address = 0x08741c
 	}
 	else

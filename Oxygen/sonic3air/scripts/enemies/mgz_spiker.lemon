@@ -15,7 +15,7 @@
 //# address-hook(0x088b96) end(0x088b96)
 function void Spiker.Init()
 {
-	Object.InitWithUpdateAddress(0x088b9c)
+	Object.InitWithUpdateAddress(addressof(Spiker.Update))
 }
 
 

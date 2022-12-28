@@ -93,7 +93,7 @@ function void fn02d028()
 			if (allocDynamicObjectStd())
 			{
 				// Spawn the checkpoint's spinning head
-				objA1.update_address = 0x02cfa8
+				objA1.update_address = addressof(Checkpoint.BaseUpdate)
 				objA1.render_flags = render_flag.WORLD
 				u8[A1 + 0x05] = 0x06
 				objA1.box_size.y = 8
@@ -148,7 +148,7 @@ function void fn02d10a()
 	if (s16[A0 + 0x36] < 0)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x3e]
-		if (objA1.update_address == 0x2cfa8)
+		if (objA1.update_address == addressof(Checkpoint.BaseUpdate))
 		{
 			u8[A1 + 0x20] = 2
 			u8[A1 + 0x22] = 0

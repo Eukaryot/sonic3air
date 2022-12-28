@@ -15,7 +15,8 @@
 // The worm hole
 
 //# address-hook(0x08f750) end(0x08f750)
-function void fn08f750()
+//# alias(fn08f750) deprecated
+function void Fireworm.Init()
 {
 	Object.InitWithUpdateAddress(0x08f756)
 }

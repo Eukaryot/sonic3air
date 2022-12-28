@@ -130,7 +130,7 @@ function void FireShield.Update()
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
-		objA0.update_address = 0x0194ce		// Insta-Shield
+		objA0.update_address = addressof(InstaShield.Init)		// Insta-Shield
 		return
 	}
 
@@ -144,7 +144,7 @@ function void FireShield.Update()
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16
 		}
-		objA0.update_address = 0x0194ce		// Insta-Shield
+		objA0.update_address = addressof(InstaShield.Init)		// Insta-Shield
 
 	#if STANDALONE
 		if (Game.getSetting(SETTING_SHIELD_TYPES) == 3)
@@ -212,7 +212,7 @@ function void LightningShield.Update()
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
-		objA0.update_address = 0x0194ce		// Insta-Shield
+		objA0.update_address = addressof(InstaShield.Init)		// Insta-Shield
 		return
 	}
 
@@ -221,11 +221,11 @@ function void LightningShield.Update()
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		if (global.fade_timer != 0)
 		{
-			objA0.update_address = 0x0194ce		// Insta-Shield
+			objA0.update_address = addressof(InstaShield.Init)		// Insta-Shield
 		}
 		else
 		{
-			objA0.update_address = 0x01989e
+			objA0.update_address = addressof(LightningShield.ResetWaterPalette)
 
 			copyMemory(0xfffff000, 0xfffff080, 0x80)
 			fillMemory_u32(0xfffff080, 0x80, 0x0eee0eee)	// Fill palette with white color
@@ -333,7 +333,7 @@ function void LightningShield.ResetWaterPalette()
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
-		objA0.update_address = 0x0194ce		// Insta-Shield
+		objA0.update_address = addressof(InstaShield.Init)		// Insta-Shield
 		copyMemory(0xfffff080, 0xfffff000, 0x80)
 	}
 }
@@ -369,7 +369,7 @@ function void BubbleShield.Update()
 	if ((u8[A2 + 0x2b] & char.bonus.ANY_SHIELD) == 0)
 	{
 		u8[A2 + 0x2b] &= ~char.bonus.ALL_SHIELDS
-		objA0.update_address = 0x0194ce		// Insta-Shield
+		objA0.update_address = addressof(InstaShield.Init)		// Insta-Shield
 		return
 	}
 

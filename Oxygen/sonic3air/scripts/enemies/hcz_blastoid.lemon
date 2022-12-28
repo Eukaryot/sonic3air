@@ -8,8 +8,13 @@
 
 
 
+//-------------------------------------------------------//
+// Blastoid  enemy from HCZ                              //
+//-------------------------------------------------------//
+
 //# address-hook(0x087928) end(0x087928)
-function void fn087928()
+//# alias(fn087928) deprecated
+function void Blastoid.Init()
 {
 	Object.InitWithUpdateAddress(0x08792e)
 }

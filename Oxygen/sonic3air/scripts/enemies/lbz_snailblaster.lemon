@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08bfae) end(0x08bfae)
-function void fn08bfae()
+//# alias(fn08bfae) deprecated
+function void SnailBlaster.Init()
 {
 	Object.InitWithUpdateAddress(0x08bfb4)
 }

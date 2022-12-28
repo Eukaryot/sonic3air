@@ -16,6 +16,7 @@ define objA1.monitor.character_address		= u16[A1 + 0x42]
 //-------------------------------------------------------//
 
 // Monitor types (stored in objA0.subtype2c and objA0.state):
+//  0x00 = Static, works like Robotnik
 //  0x01 = Extra Life
 //  0x02 = Robotnik
 //  0x03 = Rings
@@ -27,6 +28,7 @@ define objA1.monitor.character_address		= u16[A1 + 0x42]
 //  0x09 = "Super" monitor (debug only)
 //  0x0a = Already broken, too bad...
 //  0x0b = Classic Shield (Standalone only)
+//  0x10 = Flag that marks shield monitors that should be a Classic Shield when having all shield types active (Standalone only)
 
 
 #if STANDALONE
@@ -545,7 +547,7 @@ function void MonitorIntact.Opening()
 	if (allocDynamicObjectAfterA0())
 	{
 		// Explosion
-		objA1.update_address = 0x01e5e0
+		objA1.update_address = addressof(SmallExplosion.BaseUpdate)
 		objA1.base_state += 2
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
@@ -679,7 +681,7 @@ function void ItemEffect.UpdateDefaultInternal()
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield
 	{
-		ItemEffect.applyShield(0, 0x0194ce, 0x3a)
+		ItemEffect.applyShield(0, addressof(InstaShield.Init), 0x3a)
 	}
 	else
 #endif
@@ -791,7 +793,7 @@ function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundI
 	u32 shieldObjectAddress = (u8[A0 + 0x43] == 0) ? 0xffffcce8 : 0xffffcd32
 #if STANDALONE
 	// Attention if we're right during lightning shield flash effect in water
-	if (u32[shieldObjectAddress] == 0x01989e)
+	if (u32[shieldObjectAddress] == addressof(LightningShield.ResetWaterPalette))
 	{
 		copyMemory(0xfffff080, 0xfffff000, 0x80)
 	}
@@ -805,21 +807,21 @@ function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundI
 //# address-hook(0x01d954) end(0x01d990)
 function void ItemEffect.ApplyShieldFire()
 {
-	ItemEffect.applyShield(char.bonus.SHIELD_FIRE, 0x0195a6, SFX_FIRESHIELD)
+	ItemEffect.applyShield(char.bonus.SHIELD_FIRE, addressof(FireShield.Init), SFX_FIRESHIELD)
 }
 
 
 //# address-hook(0x01d992) end(0x01d9ce)
 function void ItemEffect.ApplyShieldLightning()
 {
-	ItemEffect.applyShield(char.bonus.SHIELD_LIGHTNING, 0x0196c2, SFX_LIGHTNINGSHIELD)
+	ItemEffect.applyShield(char.bonus.SHIELD_LIGHTNING, addressof(LightningShield.Init), SFX_LIGHTNINGSHIELD)
 }
 
 
 //# address-hook(0x01d9d0) end(0x01da0c)
 function void ItemEffect.ApplyShieldBubble()
 {
-	ItemEffect.applyShield(char.bonus.SHIELD_BUBBLE, 0x0198be, SFX_BUBBLESHIELD)
+	ItemEffect.applyShield(char.bonus.SHIELD_BUBBLE, addressof(BubbleShield.Init), SFX_BUBBLESHIELD)
 }
 
 
@@ -888,7 +890,7 @@ function void ItemEffect.ApplySuperTransformation()
 		global.move.deceleration = 0x100
 	#endif
 		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
-		u32[0xffffcbc0] = 0x01a494		// After-images effect
+		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 	}
 	else if (isMainCharacter(CHARACTER_TAILS))
 	{
@@ -912,7 +914,7 @@ function void ItemEffect.ApplySuperTransformation()
 	else
 	{
 		// Knuckles
-		u32[0xffffcbc0] = 0x01a494		// After-images effect
+		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 	#if STANDALONE
 		super.active = 0xff
 	#endif

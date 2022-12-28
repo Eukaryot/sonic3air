@@ -25,7 +25,7 @@ function void DynamicRing.Init()
 	objA0.hitbox_extends.x = 8
 	objA0.hitbox_extends.y = 8
 
-	objA0.update_address = 0x01a88c
+	objA0.update_address = addressof(DynamicRing.Update)
 	DynamicRing.Update()
 }
 
@@ -169,6 +169,10 @@ function void DynamicRing.UpdateAttraction()
 }
 
 
+
+//-------------------------------------------------------//
+// Spilled ring                                          //
+//-------------------------------------------------------//
 
 //# address-hook(0x01a64a) end(0x01a654)
 function void fn01a64a()

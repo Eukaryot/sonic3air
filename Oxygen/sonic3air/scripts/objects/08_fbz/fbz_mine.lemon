@@ -75,7 +75,7 @@ function void fn03c9bc()
 //# address-hook(0x03c9e4) end(0x03ca00)
 function void fn03c9e4()
 {
-	objA0.update_address = 0x01e5e0
+	objA0.update_address = addressof(SmallExplosion.BaseUpdate)
 	objA0.base_state = 0x06
 	u8[A0 + 0x28] = 0
 	u8[A0 + 0x29] = 0

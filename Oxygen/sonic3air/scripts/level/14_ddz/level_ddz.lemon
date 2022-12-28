@@ -446,7 +446,7 @@ function void fn08167c()
 	{
 		fn05fcce()
 		u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
-		u32[0xffffcbc0] = 0x01a494		// After-images effect
+		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 	}
 
 	addPatternLoadingCue(0x083d64)

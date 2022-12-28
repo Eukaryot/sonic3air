@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08ea66) end(0x08ea66)
-function void fn08ea66()
+//# alias(fn08ea66) deprecated
+function void Sandworm.Init()
 {
 	Object.InitWithUpdateAddress(0x08ea6c)
 }

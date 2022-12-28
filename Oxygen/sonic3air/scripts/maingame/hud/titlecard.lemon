@@ -125,7 +125,7 @@ function void TitleCard.Wait()
 				// Move title card elements towards screen center
 				u16 offset = getScreenExtend()
 				objA1.position.x.u16 += offset
-				if (objA1.update_address != 0x02d8e2)
+				if (objA1.update_address != addressof(TitleCard.RedBarElement.Update))
 					u16[A1 + 0x46] += offset
 			}
 			#endif
@@ -366,7 +366,7 @@ function void TitleCard.TextElement.Init()
 		objA0.animation.sprite += global.zone.apparent
 	}
 
-	objA0.update_address = 0x02d95c
+	objA0.update_address = addressof(TitleCard.TextElement.Update)
 	TitleCard.TextElement.Update()
 }
 
@@ -406,7 +406,7 @@ function void TitleCard.TextElement.Update()
 //# address-hook(0x02d9a0) end(0x02d9c6)
 function void fn02d9a0()
 {
-	objA0.update_address = 0x02d95c
+	objA0.update_address = addressof(TitleCard.TextElement.Update)
 	if (global.zone == 0x0a || global.zone == 0x0c || global.zone_act == 0x1601)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x48]

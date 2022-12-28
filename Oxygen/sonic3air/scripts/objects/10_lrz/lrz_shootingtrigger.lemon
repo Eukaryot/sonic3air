@@ -94,7 +94,7 @@ function void fn042ec0()
 		objA1.velocity.x = -objA1.velocity.x
 		objA1.velocity.y = -objA1.velocity.y
 		u8[A3] |= (1 << D3.u8)
-		objA0.update_address = 0x01e5e0
+		objA0.update_address = addressof(SmallExplosion.BaseUpdate)
 		objA0.base_state = 0x02
 		u8[A0 + 0x28] = 0
 		u8[A0 + 0x29] = 0

@@ -15,7 +15,7 @@
 //# address-hook(0x087bc4) end(0x087bc4)
 function void TurboSpiker.Init()
 {
-	Object.InitWithUpdateAddress(0x087bca)
+	Object.InitWithUpdateAddress(addressof(TurboSpiker.Update))
 }
 
 

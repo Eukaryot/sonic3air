@@ -15,7 +15,7 @@
 //# address-hook(0x08be2e) end(0x08be2e)
 function void StarPointer.Init()
 {
-	Object.InitWithUpdateAddress(0x08be34)
+	Object.InitWithUpdateAddress(addressof(StarPointer.Update))
 }
 
 

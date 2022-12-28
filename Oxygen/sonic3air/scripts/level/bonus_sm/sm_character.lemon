@@ -89,7 +89,7 @@ function void fn04b9ce()
 	{
 		// Tails' tails object
 		objA0.sprite_attributes = (Char.Tails.targetInVRAM >> 5)
-		u32[0xffffcc0a] = 0x0160a6
+		u32[0xffffcc0a] = addressof(TailsTails.Init)
 		u16[0xffffcc0a + 0x30] = A0.u16
 	}
 

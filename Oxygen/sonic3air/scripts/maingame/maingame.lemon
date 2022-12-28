@@ -640,7 +640,7 @@ function void initializeMainGame()
 		if (!isAnyIntro && global.zone_act != 0x1701 && !level.skip_titlecard)
 		{
 			// Spawn title card
-			u32[0xffffb250] = 0x02d690
+			u32[0xffffb250] = addressof(TitleCard.Update)
 
 			while (true)
 			{
@@ -1830,7 +1830,7 @@ function void fn0067ee()
 	#endif
 		if (spawnAITails)
 		{
-			u32[0xffffb04a] = 0x01365c
+			u32[0xffffb04a] = addressof(Character.BaseUpdate.Tails)
 			u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
 			u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 			tails.ai_routine = 0
@@ -1884,7 +1884,7 @@ function void fn0067ee()
 			// Add Tails
 			if (global.characters == CHARS_SONIC_ALONE)
 			{
-				u32[0xffffb04a] = 0x01365c
+				u32[0xffffb04a] = addressof(Character.BaseUpdate.Tails)
 				u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10]
 				u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14]
 				tails.ai_routine = 0
@@ -1981,21 +1981,21 @@ function void RestoreShield()
 	{
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_FIRE)
-		u32[0xffffcce8] = 0x0195a6
+		u32[0xffffcce8] = addressof(FireShield.Init)
 		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_LIGHTNING)
 	{
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_LIGHTNING)
-		u32[0xffffcce8] = 0x0196c2
+		u32[0xffffcce8] = addressof(LightningShield.Init)
 		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 	else if (shieldFlags & char.bonus.SHIELD_BUBBLE)
 	{
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= (char.bonus.ANY_SHIELD | char.bonus.SHIELD_BUBBLE)
-		u32[0xffffcce8] = 0x0198be
+		u32[0xffffcce8] = addressof(BubbleShield.Init)
 		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 #if STANDALONE
@@ -2003,7 +2003,7 @@ function void RestoreShield()
 	{
 		u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 		u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
-		u32[0xffffcce8] = 0x0194ce
+		u32[0xffffcce8] = addressof(InstaShield.Init)
 		u16[0xffffcce8 + 0x42] = A1.u16
 	}
 #endif
@@ -2067,9 +2067,9 @@ function void InitializeGameCharacters()
 	if (isMainCharacter(CHARACTER_SONIC))
 	{
 		// Spawn Sonic
-		u32[0xffffb000] = 0x010a94
+		u32[0xffffb000] = addressof(Character.BaseUpdate.Sonic)
 		u32[0xffffcc54] = 0x018b3e
-		u32[0xffffcce8] = 0x0194ce
+		u32[0xffffcce8] = addressof(InstaShield.Init)
 		u16[0xffffcce8 + 0x42] = 0xb000
 
 		// Also spawn Tails if needed
@@ -2078,7 +2078,7 @@ function void InitializeGameCharacters()
 	else if (isMainCharacter(CHARACTER_TAILS))
 	{
 		// Spawn Tails
-		u32[0xffffb000] = 0x01365c
+		u32[0xffffb000] = addressof(Character.BaseUpdate.Tails)
 		u32[0xffffcc9e] = 0x018b3e
 		u16[0xffffb000 + 0x14] += 4
 		tails.ai_routine = 0
@@ -2086,7 +2086,7 @@ function void InitializeGameCharacters()
 	else if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
 		// Spawn Knuckles
-		u32[0xffffb000] = 0x016444
+		u32[0xffffb000] = addressof(Character.BaseUpdate.Knuckles)
 		u32[0xffffcc54] = 0x018b3e
 
 	#if STANDALONE
@@ -2099,7 +2099,7 @@ function void InitializeGameCharacters()
 
 	if (spawnSecondPlayerTails)
 	{
-		u32[0xffffb04a] = 0x01365c
+		u32[0xffffb04a] = addressof(Character.BaseUpdate.Tails)
 		u16[0xffffb04a + 0x10] = u16[0xffffb000 + 0x10] - 0x20
 		u16[0xffffb04a + 0x14] = u16[0xffffb000 + 0x14] + 4
 		u32[0xffffcc9e] = 0x018b3e

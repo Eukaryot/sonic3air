@@ -15,7 +15,7 @@
 //# address-hook(0x08e09e) end(0x08e09e)
 function void Butterfly.Init()
 {
-	Object.InitWithUpdateAddress(0x08e0a4)
+	Object.InitWithUpdateAddress(addressof(Butterfly.Update))
 }
 
 

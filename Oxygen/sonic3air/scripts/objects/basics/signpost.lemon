@@ -45,7 +45,7 @@ function void fn083708()
 	if (level.signpost.address != 0)
 	{
 		A1 = 0xffff0000 + level.signpost.address
-		if (objA1.update_address == 0x0837b2)
+		if (objA1.update_address == addressof(SignPost.BaseUpdate))
 		{
 			u16 px = objA1.position.x.u16
 			u16 py = objA1.position.y.u16
@@ -62,7 +62,7 @@ function void fn083708()
 				{
 					objA1.flags38 &= ~0x01
 
-					objA0.update_address = 0x01d566		// Make this a real monitor
+					objA0.update_address = addressof(MonitorIntact.BaseUpdate)		// Make this a real monitor
 					objA0.base_state = 0x02
 					u8[A0 + 0x3c] = 0x04
 					objA0.velocity.y = -0x500
@@ -415,7 +415,7 @@ function void fn083a70()
 	playSound(0xb8)
 
 	// "spawnSimpleChildObjects(0x083b3c)" replaced by:
-	spawnSimpleChildObjects(0x02cce0, 1)
+	spawnSimpleChildObjects(addressof(FloatingPoints.Init), 1)
 
 	A3 = A1
 	addScore(10)

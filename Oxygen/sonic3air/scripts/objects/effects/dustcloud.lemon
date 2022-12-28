@@ -293,9 +293,9 @@ function void fn018d70()
 function void fn018f86()
 {
 	// Targets:
-	//  - 0x018f9c	-> objA0.base_state = 0x00
-	//  - 0x018fd2	-> objA0.base_state = 0x02
-	//  - 0x019060	-> objA0.base_state = 0x04
+	//  - 0x018f9c	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x018fd2	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x019060	-> objA0.base_state = 0x04	-> Unloading
 	//  - 0x019064	-> objA0.base_state = 0x06
 	call tableLookupAddress(0x018f94, objA0.base_state)
 }
@@ -313,6 +313,7 @@ function void fn018f9c()
 	objA0.dustcloud.character_address = 0xb000
 	if (A0.u16 != 0xcc54)
 	{
+		// Effect object for Tails
 		objA0.dustcloud.character_address = 0xb04a
 	}
 	fn018fd2()

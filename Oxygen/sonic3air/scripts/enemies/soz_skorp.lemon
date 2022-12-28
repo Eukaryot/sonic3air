@@ -15,7 +15,7 @@
 //# address-hook(0x08e650) end(0x08e650)
 function void Skorp.Init()
 {
-	Object.InitWithUpdateAddress(0x08e656)
+	Object.InitWithUpdateAddress(addressof(Skorp.Update))
 }
 
 

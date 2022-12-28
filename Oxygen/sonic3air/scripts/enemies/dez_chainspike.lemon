@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x091c3c) end(0x091c3c)
-function void fn091c3c()
+//# alias(fn091c3c) deprecated
+function void Chainspike.Init()
 {
 	Object.InitWithUpdateAddress(0x091c42)
 }

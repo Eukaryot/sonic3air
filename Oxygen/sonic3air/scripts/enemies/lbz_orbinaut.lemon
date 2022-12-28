@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08c632) end(0x08c632)
-function void fn08c632()
+//# alias(fn08c632) deprecated
+function void Orbinaut.Init()
 {
 	Object.InitWithUpdateAddress(0x08c638)
 }

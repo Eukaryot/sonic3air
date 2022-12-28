@@ -15,7 +15,7 @@
 //# address-hook(0x091518) end(0x091518)
 function void EggRobo.Init()
 {
-	Object.InitWithUpdateAddress(0x09151e)
+	Object.InitWithUpdateAddress(addressof(EggRobo.BaseUpdate))
 
 #if STANDALONE
 	objA0.box_size.x = 0x30

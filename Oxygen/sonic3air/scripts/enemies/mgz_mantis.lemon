@@ -15,7 +15,7 @@
 //# address-hook(0x088e60) end(0x088e60)
 function void Mantis.Init()
 {
-	Object.InitWithUpdateAddress(0x088e66)
+	Object.InitWithUpdateAddress(addressof(Mantis.Update))
 }
 
 

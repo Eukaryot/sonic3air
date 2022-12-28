@@ -15,7 +15,7 @@
 //# address-hook(0x089820) end(0x089820)
 function void Technosqueek.Init()
 {
-	Object.InitWithUpdateAddress(0x089826)
+	Object.InitWithUpdateAddress(addressof(Technosqueek.Update))
 }
 
 

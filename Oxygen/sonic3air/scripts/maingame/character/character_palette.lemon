@@ -989,7 +989,7 @@ function bool UpdatePaletteEffects.SuperForm.endpose()
 		characterSpriteKey = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_TAILS, false), objA0.animation.sprite - 0x03)
 	else if (objA0.animation.sprite == 0x02)
 		characterSpriteKey = getCharacterEndPoseSpriteKey(CHARACTER_SONIC, true)
-	else if (characterSpriteKey <= 0x01)
+	else if (objA0.animation.sprite <= 0x01)
 		characterSpriteKey = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_SONIC, false), objA0.animation.sprite - 0x00)
 	else
 		characterSpriteKey = stringformat("%s_0x%02x", getCharacterEndPoseSpriteKey(CHARACTER_KNUCKLES, false), objA0.animation.sprite)

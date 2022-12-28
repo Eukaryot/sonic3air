@@ -373,7 +373,7 @@ function void fn085760()
 
 	A3 = 0xffff0000 + A1.u16
 
-	objA0.update_address = 0x01e5e0		// Small explosion
+	objA0.update_address = addressof(SmallExplosion.BaseUpdate)
 	objA0.base_state = 0
 }
 
@@ -1792,8 +1792,13 @@ function void fn084cf4()
 	D2.u16 = objA1.position.x.u16
 	D3.u16 = objA1.position.y.u16
 	D4.u16 = D0.u16 ^ 0xffff
-	D1.u16 = u16[0x084d30 + D1.s16]
 
+	// Targets:
+	//  - 0x084d38	-> D1.s16 = 0x00
+	//  - 0x084d46	-> D1.s16 = 0x02
+	//  - 0x084d56	-> D1.s16 = 0x04
+	//  - 0x084d68	-> D1.s16 = 0x08
+	D1.u16 = u16[0x084d30 + D1.s16]
 	call 0x084d30 + D1.s16
 
 	D2.u16 += D5.u16

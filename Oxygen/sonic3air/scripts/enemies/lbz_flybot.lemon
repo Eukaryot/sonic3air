@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08c966) end(0x08c966)
-function void fn08c966()
+//# alias(fn08c966) deprecated
+function void FlyBot.Init()
 {
 	Object.InitWithUpdateAddress(0x08c96c)
 }
@@ -265,7 +266,7 @@ function void FlyBotAlert.CallFlyBot()
 
 	if (allocDynamicObjectAfterA0())
 	{
-		objA1.update_address = 0x08c966
+		objA1.update_address = addressof(FlyBot.Init)
 
 		// Note: offsetX is always -0xc0 or 0xc0, offsetY is always -0x60
 		D0.u16 = (objA0.subtype2c * 4) & 0x0c

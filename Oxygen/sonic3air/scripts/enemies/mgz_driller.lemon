@@ -15,7 +15,7 @@
 //# address-hook(0x08845a) end(0x08845a)
 function void Driller.Init()
 {
-	Object.InitWithUpdateAddress(0x088460)
+	Object.InitWithUpdateAddress(addressof(Driller.Update))
 
 #if STANDALONE
 	// Need to increase the bounding box just a little bit

@@ -75,9 +75,9 @@ function void Character.TailsAI.Update()
 	//  - 0x0140ce	-> tails.ai_routine = 0x14	-> Direct control in MGZ 2 boss, initialization
 	//  - 0x014106	-> tails.ai_routine = 0x16	-> Direct control in MGZ 2 boss, entering the screen from below
 	//  - 0x01414c	-> tails.ai_routine = 0x18	-> Direct control in MGZ 2 boss, now actually controllable
-	//  - 0x0141f2	-> tails.ai_routine = 0x1a	-> In MGZ 2 boss, initialization
-	//  - 0x01421c	-> tails.ai_routine = 0x1c	-> In MGZ 2 boss, entering the screen from below
-	//  - 0x014254	-> tails.ai_routine = 0x1e	-> In MGZ 2 boss, sets flight countdown to regain control
+	//  - 0x0141f2	-> tails.ai_routine = 0x1a	-> In MGZ 2 boss alone, initialization
+	//  - 0x01421c	-> tails.ai_routine = 0x1c	-> In MGZ 2 boss alone, entering the screen from below
+	//  - 0x014254	-> tails.ai_routine = 0x1e	-> In MGZ 2 boss alone, sets flight countdown to regain control
 	//  - 0x01425c	-> tails.ai_routine = 0x20	-> Flying in automatically alone, Initialization
 	//  - 0x014286	-> tails.ai_routine = 0x22	-> Flying in automatically alone (e.g. CNZ 1 start with Tails alone)
 	call tableLookupAddress(0x0139ec, tails.ai_routine)

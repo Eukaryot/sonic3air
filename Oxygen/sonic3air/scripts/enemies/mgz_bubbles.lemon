@@ -15,7 +15,7 @@
 //# address-hook(0x088336) end(0x088336)
 function void BubblesEnemy.Init()
 {
-	Object.InitWithUpdateAddress(0x08833c)
+	Object.InitWithUpdateAddress(addressof(BubblesEnemy.Update))
 }
 
 

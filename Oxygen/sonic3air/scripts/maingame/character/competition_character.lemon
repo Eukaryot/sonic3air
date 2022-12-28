@@ -434,7 +434,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 			checkpoint.y = char.position.y.u16
 			checkpoint.sprite_attr = char.sprite_attributes
 			checkpoint.layer_flags = char.layer_flags
-			u32[0xffffcbc0] = 0x0161fa
+			u32[0xffffcbc0] = addressof(CompetitionMode.TailsTails.Init)
 			u16[0xffffcbc0 + 0x30] = A0.u16
 		}
 		else
@@ -448,7 +448,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 			level.backup.y = char.position.y.u16
 			level.backup.sprite_attr = char.sprite_attributes
 			level.backup.layer_flags = char.layer_flags
-			u32[0xffffcc0a] = 0x0161fa
+			u32[0xffffcc0a] = addressof(CompetitionMode.TailsTails.Init)
 			u16[0xffffcc0a + 0x30] = A0.u16
 		}
 	}

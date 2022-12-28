@@ -15,7 +15,7 @@
 //# address-hook(0x0919ec) end(0x0919ec)
 function void Spikebonker.Init()
 {
-	Object.InitWithUpdateAddress(0x0919f2)
+	Object.InitWithUpdateAddress(addressof(Spikebonker.Update))
 }
 
 

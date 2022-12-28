@@ -733,8 +733,7 @@ function void SpringDiagonal.updateInternal(bool flipY)
 	for (u8 characterIndex = 0; characterIndex < 2; ++characterIndex)
 	{
 		D1.u16 = 27
-		D2.u16 = 8
-		D3.u16 = 16
+		D2.u16 = 16
 		D4.u16 = objA0.position.x.u16
 		A2 = flipY ? 0x023706 : 0x0236ea
 

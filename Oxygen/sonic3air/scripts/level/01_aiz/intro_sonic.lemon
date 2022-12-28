@@ -766,7 +766,7 @@ function void fn061f10()
 	if (allocDynamicObjectStd())
 	{
 		// Show title card
-		objA1.update_address = 0x02d690
+		objA1.update_address = addressof(TitleCard.Update)
 	}
 
 	global.level_started = -0x6f	// Let HUD fly in
@@ -804,7 +804,7 @@ function void fn061f70()
 
 	A4 = 0x02a8b0
 	++objA0.animation.sprite
-	objA0.update_address = 0x02a5f8
+	objA0.update_address = addressof(CorkFloor.Update)
 	Wall.Destroy()
 }
 

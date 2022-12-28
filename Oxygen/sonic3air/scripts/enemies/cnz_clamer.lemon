@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x088fb4) end(0x088fb4)
-function void fn088fb4()
+//# alias(fn088fb4) deprecated
+function void Clamer.Init()
 {
 	Object.InitWithUpdateAddress(0x088fba)
 }

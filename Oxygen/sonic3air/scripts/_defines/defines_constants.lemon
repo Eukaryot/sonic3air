@@ -137,7 +137,7 @@ constant u8 MUSIC_CREDITSMEDLEY		= 0xdc
 	constant u8 MUSIC_MINIBOSS_FORCED_S3	= 0xf6		// Forced to play the Sonic 3 version of the miniboss theme, regardless of menu setting
 	constant u8 MUSIC_MINIBOSS_FORCED_SK	= 0xf7		// Forced to play the Sonic & Knuckles version of the miniboss theme, regardless of menu setting
 														// 0xf8 is used for special stage music in Blue Spheres game mode
-	constant u8 MUSIC_KNUCKLES_FORCED_PROTO	= 0xf9		// Forced to play the Sonic 3 prototype version of the miniboss theme, regardless of menu setting
+	constant u8 MUSIC_KNUCKLES_FORCED_PROTO	= 0xf9		// Forced to play the Sonic 3 prototype version of Knuckles' theme, regardless of menu setting
 #endif
 
 constant u8 SFX_RING				= 0x33		// Alternating between left and right channel

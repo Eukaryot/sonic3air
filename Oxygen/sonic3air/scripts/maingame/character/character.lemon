@@ -198,7 +198,7 @@ function void Character.Initialization.shared(u8 character)
 		tails.respawn_counter = 0
 
 		// Init Tails' tails object
-		u32[0xffffcc0a] = 0x0160a6
+		u32[0xffffcc0a] = addressof(TailsTails.Init)
 		u16[0xffffcc0a + 0x30] = A0.u16
 
 		checkpoint.number.backup.tails = checkpoint.number
@@ -3185,7 +3185,7 @@ function bool Character.performSuperTransformation()
 		{
 			super.active = 0xff
 			u32[0xffffcd7c] = 0x019348		// Hyper Sonic stars
-			u32[0xffffcbc0] = 0x01a494		// After-images effect
+			u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 		}
 		else
 		{
@@ -3215,7 +3215,7 @@ function bool Character.performSuperTransformation()
 		if (possibleSuperForm == 2)
 		{
 			super.active = 0xff
-			u32[0xffffcbc0] = 0x01a494		// After-images effect
+			u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 		}
 		else
 		{
@@ -3520,7 +3520,7 @@ function bool makeDynamicRing()
 	A3 = A1
 	if (allocDynamicObjectStd())
 	{
-		objA1.update_address = 0x01a84e
+		objA1.update_address = addressof(DynamicRing.Init)
 		objA1.position.x.u16 = u16[A3]
 		objA1.position.y.u16 = u16[A3 + 2]
 		u16[A1 + 0x30] = A4.u16
@@ -3754,13 +3754,13 @@ function void Character.checkForWaterSurface()
 		// Spawn underwater update object
 		if (char.character == CHARACTER_TAILS)
 		{
-			u32[0xffffcb76] = 0x018164
+			u32[0xffffcb76] = addressof(UnderwaterUpdate.BaseUpdate)
 			u8[0xffffcb76 + 0x2c] = 0x81
 			u32[0xffffcb76 + 0x40] = A0
 		}
 		else
 		{
-			u32[0xffffcb2c] = 0x018164
+			u32[0xffffcb2c] = addressof(UnderwaterUpdate.BaseUpdate)
 			u8[0xffffcb2c + 0x2c] = 0x81
 			u32[0xffffcb2c + 0x40] = A0
 		}
@@ -5163,7 +5163,7 @@ function void Character.OnCollisionWithDynamicObject()
 			// Grant bonus points
 			Enemy.addScore(A1, 0x010216)
 
-			objA1.update_address = 0x01e5e0
+			objA1.update_address = addressof(SmallExplosion.BaseUpdate)
 			u8[A1 + 0x05] = 0
 			if (char.velocity.y < 0)
 			{
@@ -5868,7 +5868,7 @@ function void fn01052e()
 
 	A3 = 0xffff0000 + A0.u16
 
-	objA1.update_address = 0x01e5e0
+	objA1.update_address = addressof(SmallExplosion.BaseUpdate)
 	u8[A1 + 0x05] = 0
 }
 

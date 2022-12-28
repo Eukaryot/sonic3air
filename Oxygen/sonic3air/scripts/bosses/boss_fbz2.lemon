@@ -1075,6 +1075,12 @@ function void fn084ddc()
 	A3 = A2 + 0x40
 	D3.u16 = objA1.position.y.u16
 	D4.u16 = D0.u16 ^ 0xffff
+
+	// Targets:
+	//  - 0x084e16	-> D1.s16 = 0x00
+	//  - 0x084e1e	-> D1.s16 = 0x02
+	//  - 0x084e28	-> D1.s16 = 0x04
+	//  - 0x084e32	-> D1.s16 = 0x08
 	D1.u16 = u16[0x084e0e + D1.s16]
 	call 0x084e0e + D1.s16
 

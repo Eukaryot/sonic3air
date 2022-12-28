@@ -284,7 +284,7 @@ function void fn061176()
 function void fn0611d6()
 {
 	A1 = 0xffffb000
-	u32[0xffffcce8] = 0x0195a6
+	u32[0xffffcce8] = addressof(FireShield.Init)
 	u16[0xffffcce8 + 0x42] = A1.u16
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
@@ -299,7 +299,7 @@ function void fn0611d6()
 function void fn061200()
 {
 	A1 = 0xffffb000
-	u32[0xffffcce8] = 0x0198be
+	u32[0xffffcce8] = addressof(BubbleShield.Init)
 	u16[0xffffcce8 + 0x42] = A1.u16
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD
@@ -314,7 +314,7 @@ function void fn061200()
 function void fn06122a()
 {
 	A1 = 0xffffb000
-	u32[0xffffcce8] = 0x0196c2
+	u32[0xffffcce8] = addressof(LightningShield.Init)
 	u16[0xffffcce8 + 0x42] = A1.u16
 	u8[A1 + 0x2b] &= ~char.bonus.ALL_SHIELDS
 	u8[A1 + 0x2b] |= char.bonus.ANY_SHIELD

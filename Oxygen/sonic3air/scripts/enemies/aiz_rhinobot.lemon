@@ -15,7 +15,7 @@
 //# address-hook(0x086e56) end(0x086e56)
 function void Rhinobot.Init()
 {
-	Object.InitWithUpdateAddress(0x086e5c)
+	Object.InitWithUpdateAddress(addressof(Rhinobot.BaseUpdate))
 }
 
 

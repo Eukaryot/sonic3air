@@ -82,7 +82,7 @@ function void fn03438e()
 					objA1.update_address = 0x034536
 					if (u8[A0 + 0x29] == 0)
 					{
-						objA1.update_address = 0x01e5e0
+						objA1.update_address = addressof(SmallExplosion.BaseUpdate)
 						objA1.sprite_attributes = sprite_attribute.PRIORITY
 						u8[A1 + 0x05] = 2
 						u8[A0 + 0x34] = 1

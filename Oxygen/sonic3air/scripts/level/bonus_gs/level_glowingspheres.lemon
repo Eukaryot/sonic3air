@@ -274,15 +274,9 @@ function void LevelPaletteUpdate.BonusGS()
 		}
 		A0 = 0xffff78fc + D0.s16
 		A1 = 0xfffffc42
-		u32[(A1+=4)-4] = u32[A0 + 0x50]
-		u32[(A1+=4)-4] = u32[A0 + 0x54]
-		u16[(A1+=2)-2] = u16[A0 + 0x58]
-		u32[(A1+=4)-4] = u32[A0 + 0x28]
-		u32[(A1+=4)-4] = u32[A0 + 0x2c]
-		u16[(A1+=2)-2] = u16[A0 + 0x30]
-		u32[(A1+=4)-4] = u32[A0]
-		u32[(A1+=4)-4] = u32[A0 + 0x04]
-		u16[(A1+=2)-2] = objA0.sprite_priority
+		copyMemory((A1+=10)-10, A0 + 0x50, 10)
+		copyMemory((A1+=10)-10, A0 + 0x28, 10)
+		copyMemory((A1+=10)-10, A0, 10)
 	}
 }
 

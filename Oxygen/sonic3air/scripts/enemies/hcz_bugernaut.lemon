@@ -8,8 +8,13 @@
 
 
 
+//-------------------------------------------------------//
+// Bugernaut enemies from HCZ                            //
+//-------------------------------------------------------//
+
 //# address-hook(0x087a24) end(0x087a24)
-function void fn087a24()
+//# alias(fn087a24) deprecated
+function void Bugernaut.Init()
 {
 	Object.InitWithUpdateAddress(0x087a2a)
 }

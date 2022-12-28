@@ -713,7 +713,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 	}
 
 	// Title card red bar
-	if (objA0.update_address == 0x02d8e2)
+	if (objA0.update_address == addressof(TitleCard.RedBarElement.Update))
 	{
 		Renderer.drawCustomSprite("titlecard_redbar", px - 0x20, py - 0x40, 0x00, SPRITE_FLAG_PRIO | SPRITE_FLAG_NO_GLOBAL_TINT, renderQueue)
 		return true

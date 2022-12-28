@@ -96,9 +96,7 @@ function void fn05d8bc()
 				else
 			#endif
 				{
-					u16[0xfffffc04] = 0x0eee
-					u16[0xfffffc06] = 0x0eee
-					u16[0xfffffc08] = 0x0eee
+					fillMemory_u16(0xfffffc04, 6, 0x0eee)
 				}
 			}
 		}
@@ -122,9 +120,7 @@ function void fn05d8bc()
 				else
 			#endif
 				{
-					u16[0xfffffc04] = 0x0eee
-					u16[0xfffffc06] = 0x0eee
-					u16[0xfffffc08] = 0x0eee
+					fillMemory_u16(0xfffffc04, 6, 0x0eee)
 				}
 			}
 		}
@@ -953,7 +949,7 @@ function void fn05e1c2()
 	if (isMainCharacter(CHARACTER_TAILS))
 	{
 		A2 = 0xffffcc0a
-		u32[A2] = 0x0160a6
+		u32[A2] = addressof(TailsTails.Init)
 		u16[A2 + 0x30] = A1.u16
 	}
 
@@ -2079,7 +2075,7 @@ function void fn08648c()
 	}
 	else
 	{
-		u32[0xffffcbc0] = 0x01a494		// After-images effect
+		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 	}
 
 	u8[0xffffb000 + 0x2b] |= char.bonus.INVINCIBLE

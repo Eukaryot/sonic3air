@@ -15,7 +15,7 @@
 //# address-hook(0x086d6a) end(0x086d6a)
 function void Bloominator.Init()
 {
-	Object.InitWithUpdateAddress(0x086d70)
+	Object.InitWithUpdateAddress(addressof(Bloominator.BaseUpdate))
 }
 
 

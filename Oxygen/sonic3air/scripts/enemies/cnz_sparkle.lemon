@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x089198) end(0x089198)
-function void fn089198()
+//# alias(fn089198) deprecated
+function void Sparkle.Init()
 {
 	Object.InitWithUpdateAddress(0x08919e)
 }

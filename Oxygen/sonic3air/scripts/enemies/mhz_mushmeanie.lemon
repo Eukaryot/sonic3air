@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08daf6) end(0x08daf6)
-function void fn08daf6()
+//# alias(fn08daf6) deprecated
+function void Mushmeanie.Init()
 {
 	Object.InitWithUpdateAddress(0x08dafc)
 }

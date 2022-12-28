@@ -276,7 +276,7 @@ function void fn065d1c()
 function void fn065d46()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x44]
-	if (objA1.update_address != 0x02a5f8)
+	if (objA1.update_address != addressof(CorkFloor.Update))
 	{
 		CheckForUnloadObject()
 		return

@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x08e17e) end(0x08e17e)
-function void fn08e17e()
+//# alias(fn08e17e) deprecated
+function void Cluckoid.Init()
 {
 	Object.InitWithUpdateAddress(0x08e184)
 }

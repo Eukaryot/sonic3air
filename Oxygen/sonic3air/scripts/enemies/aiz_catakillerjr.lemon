@@ -15,7 +15,7 @@
 //# address-hook(0x0876ca) end(0x0876de)
 function void CatakillerJr.Init()
 {
-	Object.InitWithUpdateAddress(0x0876d0)
+	Object.InitWithUpdateAddress(addressof(CatakillerJr.BaseUpdate))
 }
 
 
@@ -95,6 +95,10 @@ function void fn08778c()
 //# address-hook(0x0877ac) end(0x0877c2)
 function void fn0877ac()
 {
+	// Targets:
+	//  - 0x08786e	-> objA0.subtype2c = 0x00, 0x02, 0x04	-> Big body joints
+	//  - 0x08787a	-> objA0.subtype2c = 0x06				-> Middle body joints
+	//  - 0x087886	-> objA0.subtype2c = 0x08, 0x0a			-> Small body joints (arm joints from Monkey Dude)
 	A1 = tableLookupAddress(0x0877c6, objA0.subtype2c)
 	D0 = objA0.subtype2c >> 1
 	objA0.value2f = u8[0x0877d2 + D0.u16]

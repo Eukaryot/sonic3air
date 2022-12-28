@@ -13,7 +13,8 @@
 //-------------------------------------------------------//
 
 //# address-hook(0x089376) end(0x089376)
-function void fn089376()
+//# alias(fn089376) deprecated
+function void Batbot.Init()
 {
 	Object.InitWithUpdateAddress(0x08937c)
 }

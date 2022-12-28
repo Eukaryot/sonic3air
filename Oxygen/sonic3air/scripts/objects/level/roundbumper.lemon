@@ -193,7 +193,7 @@ function void fn032f56()
 	if (allocDynamicObjectStd())
 	{
 		// Spawn floating points display
-		objA1.update_address = 0x02cce0
+		objA1.update_address = addressof(FloatingPoints.Init)
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
 		objA1.animation.sprite = 0x04

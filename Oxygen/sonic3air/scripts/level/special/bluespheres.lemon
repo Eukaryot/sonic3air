@@ -2559,9 +2559,7 @@ function void fn02df64()
 		copyMemory(0xfffffca0, 0x02e318, 0x20)
 	#if STANDALONE
 		// This is needed to avoid the red Super Emerald's colors from being corrupted
-		u16[0xfffffc24] = 0x0eee
-		u16[0xfffffc26] = 0x0eee
-		u16[0xfffffc28] = 0x0eee
+		fillMemory_u16(0xfffffc24, 6, 0x0eee)
 	#endif
 
 		fn02e2c0()

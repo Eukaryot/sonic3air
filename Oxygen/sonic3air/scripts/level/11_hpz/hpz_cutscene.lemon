@@ -1682,7 +1682,7 @@ function void fn0652fe()
 	if (objA0.countdown_value >= 0)
 		return
 
-	A1 = 0x01e5e0
+	A1 = addressof(SmallExplosion.BaseUpdate)
 	objA0.update_address = A1
 	objA0.base_state = 0x02
 	call A1

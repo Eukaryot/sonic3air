@@ -80,7 +80,7 @@ function void CorkFloor.Init()
 
 	A4 = u32[A0 + 0x3c]
 	++objA0.animation.sprite
-	objA0.update_address = 0x02a5f8
+	objA0.update_address = addressof(CorkFloor.Update)
 	Wall.Destroy()
 	CorkFloor.Update()
 }
@@ -111,7 +111,7 @@ function void fn02a5d8()
 
 	A4 = u32[A0 + 0x3c]
 	++objA0.animation.sprite
-	objA0.update_address = 0x02a5f8
+	objA0.update_address = addressof(CorkFloor.Update)
 	Wall.Destroy()
 	CorkFloor.Update()
 }
@@ -427,7 +427,7 @@ function void fn02a816()
 	++objA0.animation.sprite
 	D1 = D0
 	A4 = 0x02a84c + D0.s16 * 4
-	objA0.update_address = 0x02a5f8
+	objA0.update_address = addressof(CorkFloor.Update)
 	Wall.Destroy()
 	CorkFloor.Update()
 }

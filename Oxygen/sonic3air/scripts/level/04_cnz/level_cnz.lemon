@@ -368,7 +368,7 @@ function void fn051e12()
 	if (allocDynamicObjectStd())
 	{
 		// Spawn signpost
-		objA1.update_address = 0x0837b2
+		objA1.update_address = addressof(SignPost.BaseUpdate)
 		objA1.position.x.u16 = 0x32c0
 	}
 

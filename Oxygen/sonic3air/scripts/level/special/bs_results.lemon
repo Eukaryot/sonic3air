@@ -20,6 +20,12 @@ function void fn02e3b8()
 	//  - 0x02e410	-> objA0.base_state = 0x02  -> Texts flying in, waiting, then counting
 	//  - 0x02e4d6	-> objA0.base_state = 0x04  -> Check for continue
 	//  - 0x02e512	-> objA0.base_state = 0x06  -> Waiting for fade out
+	//  - 0x02e5c0	-> objA0.base_state = 0x08  -> "now ... can be Super ..." text, Initialization
+	//  - 0x02e5e0	-> objA0.base_state = 0x0a  -> Countdown to begin fade out
+	//  - 0x02e5f4	-> objA0.base_state = 0x0c  -> "... can go to Hidden Palace" text, Initialization
+	//  - 0x02e616	-> objA0.base_state = 0x0e  -> Hidden Palace scene for getting a Super Emerald
+	//  - 0x02e746	-> objA0.base_state = 0x10  -> End of Hidden Palace scene after getting all Super Emeralds
+	//  - 0x02e7da	-> objA0.base_state = 0x12  -> "now ... can be Hyper ..." text, Initialization
 	call tableLookupAddress(0x02e3c6, objA0.base_state)
 }
 
@@ -27,6 +33,7 @@ function void fn02e3b8()
 //# address-hook(0x02e3da) end(0x02e40e)
 function void fn02e3da()
 {
+	// Most Special Stage results graphics are loaded here
 	A1 = A0 + 0x4a
 	A2 = 0x02e834
 	D1 = 0x12
@@ -58,15 +65,12 @@ function void fn02e410()
 			global.fade_timer = 0x16
 
 			A1 = 0xfffffc00
-			u16[A1 + 0x42] = 0x0eee
-			u16[A1 + 0x44] = 0x0eee
-			u16[A1 + 0x4c] = 0x0eee
-			u16[A1 + 0x62] = 0x0eee
-			u16[A1 + 0x66] = 0x0eee
-			u16[A1 + 0x6e] = 0x0eee
-			u16[A1 + 0x70] = 0x0eee
-			u16[A1 + 0x7c] = 0x0eee
-			u16[A1 + 0x7e] = 0x0eee
+			fillMemory_u16(A1 + 0x42, 4, 0x0eee)
+			fillMemory_u16(A1 + 0x4c, 2, 0x0eee)
+			fillMemory_u16(A1 + 0x62, 2, 0x0eee)
+			fillMemory_u16(A1 + 0x66, 2, 0x0eee)
+			fillMemory_u16(A1 + 0x6e, 4, 0x0eee)
+			fillMemory_u16(A1 + 0x7c, 4, 0x0eee)
 		}
 
 	#if STANDALONE
@@ -172,6 +176,7 @@ function void fn02e512()
 {
 	if (global.lock_on_state == 0 && global.sk_bluespheres && bluespheres.blue_remaining == 0)
 	{
+		// Getting a Super Emerald
 		objA0.countdown_value = 0x3c
 		objA0.base_state = 0x0e
 		fn02e616()
@@ -186,24 +191,25 @@ function void fn02e512()
 
 	if (bluespheres.blue_remaining == 0 && global.chaos_emeralds >= 7)
 	{
+		// Got all Chaos Emeralds
 		if (isMainCharacter(CHARACTER_TAILS) && !Game.getSetting(SETTING_HYPER_TAILS))
 		{
 			// Tails
-			if (bluespheres.backup.zone != 4 && bluespheres.backup.zone < 7)
+			if (bluespheres.backup.zone != 4 && bluespheres.backup.zone < 7)		// Going to a Sonic 3 (disc 1) zone
 			{
 				global.game_mode = 0x0c
 				return
 			}
-			objA0.base_state = 0x0a
+			objA0.base_state = 0x0a		// Fade out
 		}
 		else
 		{
 			// Sonic, Knuckles (or Tails if using Hyper Tails setting)
 			if (global.lock_on_state == 0)
 			{
-				if (bluespheres.backup.zone == 4 || bluespheres.backup.zone >= 7)
+				if (bluespheres.backup.zone == 4 || bluespheres.backup.zone >= 7)		// Going to a Sonic & Knuckles (disc 2) zone
 				{
-					objA0.base_state = 0x0a
+					objA0.base_state = 0x0a		// Fade out
 				}
 			}
 		}
@@ -230,6 +236,7 @@ function void fn02e512()
 //# address-hook(0x02e5c0) end(0x02e5de)
 function void fn02e5c0()
 {
+	// "now ... can be Super ..."
 	if (u16[A0 + 0x30] == 0)
 	{
 		A1 = 0xffffbd96
@@ -237,7 +244,7 @@ function void fn02e5c0()
 		D1 = 0x05
 		fn02e802()
 
-		objA0.countdown_value = 0xf0
+		objA0.countdown_value = 240
 		objA0.base_state += 2
 	}
 }
@@ -268,7 +275,7 @@ function void fn02e5f4()
 		fn02e802()
 
 		objA0.countdown_value = 0xf0
-		objA0.base_state = 0x0a
+		objA0.base_state = 0x0a		// Fade out
 	}
 }
 
@@ -327,22 +334,22 @@ function void fn02e616()
 
 		A1 = 0xffffb98a
 		u16[A1 + 0x2e] = 0x08
-		u16[A1 + 0x78] = 0x0c
-		u16[A1 + 0xc2] = 0x0c
-		u16[A1 + 0x010c] = 0x10
-		u16[A1 + 0x0156] = 0x10
+		u16[A1 + 0x4a + 0x2e] = 0x0c
+		u16[A1 + 0x94 + 0x2e] = 0x0c
+		u16[A1 + 0xde + 0x2e] = 0x10
+		u16[A1 + 0x0128 + 0x2e] = 0x10
 		if (bluespheres.rings_collected >= 50)
 		{
-			u16[A1 + 0x01a0] = 0x14
+			u16[A1 + 0x0172 + 0x2e] = 0x14
 		}
-		u16[A1 + 0xaa] = 0
-		u16[A1 + 0x013e] = 0
+		u16[A1 + 0x94 + 0x16] = 0
+		u16[A1 + 0x0128 + 0x16] = 0
 
 		A1 = 0xffffbd96
-		u16[A1 + 0xc2] = 0x04
+		u16[A1 + 0x94 + 0x2e] = 0x04
 		if (global.super_emeralds >= 7)
 		{
-			u16[A1 + 0x0156] = 0x04
+			u16[A1 + 0x0128 + 0x2e] = 0x04
 		}
 	}
 	else
@@ -393,7 +400,7 @@ function void fn02e746()
 	if (global.super_emeralds < 7)
 	{
 		objA0.countdown_value = 0x3c
-		objA0.base_state = 0x0a
+		objA0.base_state = 0x0a		// Fade out
 	}
 	else
 	{
@@ -444,6 +451,7 @@ function void fn02e746()
 //# address-hook(0x02e7da) end(0x02e800)
 function void fn02e7da()
 {
+	// "now ... can be Hyper ..."
 	if (objA0.countdown_value != 0)
 	{
 		--objA0.countdown_value
@@ -456,7 +464,7 @@ function void fn02e7da()
 	fn02e802()
 
 	objA0.countdown_value = 0x0168
-	objA0.base_state = 0x0a
+	objA0.base_state = 0x0a		// Fade out
 }
 
 
@@ -472,7 +480,7 @@ function void fn02e802()
 		objA1.mapping_offset = 0x02f26a
 		objA1.position.x.u16 = u16[A2+6] + getScreenExtend()
 		objA1.position.y.u16 = u16[A2+8]
-		u8[A1 + 0x22] = u8[A2+10]
+		objA1.animation.sprite = u8[A2+10]
 		u16[A1 + 0x46] = u16[A2+4] + getScreenExtend()
 		u16[A1 + 0x48] = A0.u16
 
@@ -952,6 +960,7 @@ function void fn02ec80()
 //# address-hook(0x02eca8) end(0x02ecba)
 function void fn02eca8()
 {
+	// Assign either global.chaos_emeralds or global.super_emeralds
 	A1 = (global.lock_on_state == 0 && global.sk_bluespheres) ? 0xffffffb1 : 0xffffffb0
 }
 
@@ -959,6 +968,7 @@ function void fn02eca8()
 //# address-hook(0x02ecbc) end(0x02ecce)
 function void fn02ecbc()
 {
+	// Use green palette for results text if not locked on or in Sonic 3 (disc 1) special stages
 	if (global.lock_on_state != 0 || !global.sk_bluespheres)
 	{
 		objA0.sprite_attributes = sprite_attribute.PALETTE.LINE3
@@ -1071,6 +1081,8 @@ function void fn02ed2a()
 //# address-hook(0x085a1a) end(0x085a58)
 function void fn085a1a()
 {
+	// A1 -> Palette effect address
+	// A2 -> Target palette
 	if (u8[0xfffffabf] != 0)
 		return
 
@@ -1078,8 +1090,8 @@ function void fn085a1a()
 	if (s8(objA0.value3a) >= 0)
 		return
 
-	A3 = u32[(A1+=4)-4]
-	D0.u16 = u16[(A1+=2)-2]
+	A3 = u32[(A1+=4)-4]			// Address of colors to apply
+	D0.u16 = u16[(A1+=2)-2]		// Number of colors
 
 	D1 = objA0.value3b + 2
 	D2 = u8[A1 + D1.s16]

@@ -153,7 +153,7 @@ function void fn02dbca()
 				// Move elements towards screen center
 				u16 offset = getScreenExtend()
 				objA1.position.x.u16 += offset
-				if (objA1.update_address != 0x02d8e2)
+				if (objA1.update_address != addressof(TitleCard.RedBarElement.Update))
 					u16[A1 + 0x46] += offset
 			}
 			#endif
@@ -310,7 +310,7 @@ function void LevelResults.AdvanceToNextAct()
 	}
 
 	// Show title card for Act 2
-	objA0.update_address = 0x02d690
+	objA0.update_address = addressof(TitleCard.Update)
 	objA0.base_state = 0
 	u8[A0 + 0x3e] = 0xff
 

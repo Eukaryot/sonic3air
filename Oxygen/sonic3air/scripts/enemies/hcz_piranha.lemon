@@ -8,8 +8,13 @@
 
 
 
+//-------------------------------------------------------//
+// Piranhas from HCZ                                     //
+//-------------------------------------------------------//
+
 //# address-hook(0x087f56) end(0x087f56)
-function void fn087f56()
+//# alias(fn087f56) deprecated
+function void Piranha.Init()
 {
 	Object.InitWithUpdateAddress(0x087f5c)
 }

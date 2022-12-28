@@ -300,7 +300,7 @@ function void fn06f0ce()
 	A2 = 0xfffffade
 	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
 	u16[A2] = 0
-	u32[0xfffffada] = 0x0852a0
+	u32[0xfffffada] = addressof(Object.TriggerUnloading)
 	DrawObject()
 }
 

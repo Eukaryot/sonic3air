@@ -574,7 +574,7 @@ function void fn05c74a()
 
 		// Init Tails' tails object
 		A1 = 0xffffcc0a
-		objA1.update_address = 0x0160a6
+		objA1.update_address = addressof(TailsTails.Init)
 		u16[A1 + 0x30] = A0.u16
 
 		u32[0xffffcc54] = 0x05c82c

@@ -15,7 +15,7 @@
 //# address-hook(0x08bade) end(0x08bade)
 function void Penguin.Init()
 {
-	Object.InitWithUpdateAddress(0x08bae4)
+	Object.InitWithUpdateAddress(addressof(Penguin.Update))
 }
 
 

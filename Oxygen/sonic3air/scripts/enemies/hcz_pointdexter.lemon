@@ -15,7 +15,7 @@
 //# address-hook(0x08827c) end(0x08827c)
 function void Pointdexter.Init()
 {
-	Object.InitWithUpdateAddress(0x088282)
+	Object.InitWithUpdateAddress(addressof(Pointdexter.BaseUpdate))
 }
 
 

@@ -15,7 +15,7 @@
 //# address-hook(0x0878b2) end(0x0878b2)
 function void Jawz.Init()
 {
-	Object.InitWithUpdateAddress(0x0878b8)
+	Object.InitWithUpdateAddress(addressof(Jawz.PostInit))
 }
 
 

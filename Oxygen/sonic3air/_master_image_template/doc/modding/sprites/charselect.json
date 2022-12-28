@@ -1,0 +1,8 @@
+{
+
+	// Character selection icons
+	"charselect_sonic":    { "File": "charselect_sonic.bmp", "Center": "17,20" },
+	"charselect_tails":    { "File": "charselect_tails.bmp", "Center": "26,24" },
+	"charselect_knuckles": { "File": "charselect_knuckles.bmp", "Center": "13,20" }
+
+}

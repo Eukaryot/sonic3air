@@ -289,7 +289,7 @@ function void fn08b930()
 
 
 
-// Small now block usually to one side of the trampoline
+// Small snow block usually to one side of the trampoline
 
 //# address-hook(0x08a330) end(0x08a330)
 function void fn08a330()
