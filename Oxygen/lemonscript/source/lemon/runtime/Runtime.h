@@ -78,7 +78,6 @@ namespace lemon
 	friend class OpcodeExecUtils;
 	friend class OpcodeExec;
 	friend class OptimizedOpcodeExec;
-	friend class NativizedCode;
 	friend class RuntimeFunction;
 	friend struct RuntimeOpcodeContext;
 

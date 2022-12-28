@@ -56,6 +56,7 @@ namespace lemon
 				{
 					case BaseType::FLOAT:  return TYPESTRING_float;
 					case BaseType::DOUBLE: return TYPESTRING_double;
+					default:  break;
 				}
 			}
 			RMX_ERROR("Unsupported base type " << (int)dataType, );

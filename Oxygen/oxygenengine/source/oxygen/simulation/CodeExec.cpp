@@ -420,7 +420,7 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 			uint32 stackPointer = mEmulatorInterface.getRegister(EmulatorInterface::Register::A7);
 			RMX_CHECK((stackPointer & 0x00ff0000) == 0x00ff0000, "Stack pointer in register A7 is not pointing to a RAM address", );
 			stackPointer |= 0xffff0000;
-			RMX_CHECK(stackPointer >= GameProfile::instance().mAsmStackRange.first && stackPointer <= GameProfile::instance().mAsmStackRange.second, "Stack pointer in register A7 is not iside the ASM stack range", );
+			RMX_CHECK(stackPointer >= GameProfile::instance().mAsmStackRange.first && stackPointer <= GameProfile::instance().mAsmStackRange.second, "Stack pointer in register A7 is not inside the ASM stack range", );
 			while (stackPointer < GameProfile::instance().mAsmStackRange.second)
 			{
 				callstack.push_back(mEmulatorInterface.readMemory32(stackPointer));
@@ -926,8 +926,8 @@ uint32 CodeExec::getCurrentWatchValue(uint32 address, uint16 bytes) const
 		case 1:  return mEmulatorInterface.readMemory8 (address);
 		case 2:  return mEmulatorInterface.readMemory16(address);
 		case 4:  return mEmulatorInterface.readMemory32(address);
+		default: return 0;
 	}
-	return 0;
 }
 
 void CodeExec::deleteWatch(Watch& watch)

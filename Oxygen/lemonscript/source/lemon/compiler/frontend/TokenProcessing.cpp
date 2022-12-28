@@ -146,7 +146,7 @@ namespace lemon
 		// Build hierarchy by processing parentheses
 		processParentheses(tokensRoot);
 
-		// Build hierarchy by processing commas (usually those separating paremeters in function calls)
+		// Build hierarchy by processing commas (usually those separating parameters in function calls)
 		processCommaSeparators(tokensRoot);
 
 		// Recursively go through the hierarchy of tokens for the main part of processing
@@ -285,6 +285,7 @@ namespace lemon
 				break;
 			}
 
+			default:
 			case TypeCasting::CastHandling::Result::INVALID:
 				CHECK_ERROR(false, "Invalid cast of constants", mLineNumber);
 		}
@@ -752,6 +753,8 @@ namespace lemon
 									CHECK_ERROR(canMatch, "'any' type cannot be used as a return value", mLineNumber);
 									break;
 								}
+								default:
+									break;
 							}
 							return;
 						}
@@ -1139,10 +1142,10 @@ namespace lemon
 						ControlFlow controlFlow(emptyRuntime);
 						for (size_t k = 0; k < ft.mParameters.size(); ++k)
 						{
-							ConstantToken& contantToken = *ft.mParameters[k].as<ConstantToken>();
+							ConstantToken& constantToken = *ft.mParameters[k].as<ConstantToken>();
 							const Function::Parameter& parameter = ft.mFunction->getParameters()[k];
-							castCompileTimeConstant(contantToken, parameter.mDataType);
-							controlFlow.pushValueStack(contantToken.mValue);
+							castCompileTimeConstant(constantToken, parameter.mDataType);
+							controlFlow.pushValueStack(constantToken.mValue);
 						}
 						static_cast<const NativeFunction*>(ft.mFunction)->mFunctionWrapper->execute(NativeFunction::Context(controlFlow));
 

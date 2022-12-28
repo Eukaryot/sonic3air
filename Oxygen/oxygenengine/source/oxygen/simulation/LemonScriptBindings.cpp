@@ -436,6 +436,9 @@ namespace
 				}
 				break;
 			}
+
+			default:
+				break;
 		}
 	}
 
