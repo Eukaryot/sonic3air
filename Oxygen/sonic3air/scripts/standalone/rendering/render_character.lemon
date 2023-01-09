@@ -190,17 +190,37 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				angle = char.rotation
 				if (rotationMode == 1)
 				{
-					if (abs(s8(char.rotation)) <= 0x10 && abs(s8(oldRotation)) <= 0x10)
-					{
+					if (char.rotation <= 0x04 || char.rotation >= 0xfc)
 						angle = 0
-					}
-
-					if (angle != char.rotation)
+					else
 					{
-						s8 diff = angle - oldRotation
-						angle = oldRotation + clamp(diff, -3, 3)
+						u32 targetRotation = 0
+						if (char.rotation > 0x10 && char.rotation < 0xe8)
+							targetRotation = char.rotation
+							
+						u32 rotate = targetRotation - oldRotation
+						u32 shift = (abs(char.groundspeed) <= 0x6000) + 1
+						
+						if (abs(rotate) >= abs(rotate - 0x100))
+						{
+							if (abs(rotate - 0x200) < abs(rotate + 0x100))
+								oldRotation += (rotate - 0x100) >> shift
+							else
+								oldRotation += (rotate + 0x100) >> shift
+						}
+						else
+						{
+							if (abs(rotate) < abs(rotate + 0x100))
+								oldRotation += rotate >> shift
+							else
+								oldRotation += (rotate + 0x100) >> shift
+						}
+						angle = oldRotation
+						angle &= 0x1FF
 					}
+					
 				}
+
 			}
 
 			if (isPlayer1)
