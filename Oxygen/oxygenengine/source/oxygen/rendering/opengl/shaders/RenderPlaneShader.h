@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include <rmxmedia.h>
+#include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 
 class RenderParts;
 class PlaneGeometry;
 class OpenGLRenderResources;
 
 
-class RenderPlaneShader
+class RenderPlaneShader : public OpenGLShader
 {
 public:
 	enum Variation
@@ -30,8 +30,8 @@ public:
 public:
 	void initialize(Variation variation, bool alphaTest);
 	void initialize(bool horizontalScrolling, bool verticalScrolling, bool noRepeat, bool alphaTest);
-	void refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources);
-	void draw(const PlaneGeometry& geometry, RenderParts& renderParts, const OpenGLRenderResources& resources);
+	void refresh(const Vec2i& gameResolution, const OpenGLRenderResources& resources);
+	void draw(const PlaneGeometry& geometry, int waterSurfaceHeight, RenderParts& renderParts, const OpenGLRenderResources& resources);
 
 private:
 	bool  mInitialized = false;
@@ -40,14 +40,14 @@ private:
 	bool  mLastRenderedPlanePriority = false;
 	Recti mLastActiveRect;
 	Vec2i mLastGameResolution;
-	int   mLastWaterSurfaceHeight = 0;
+	int   mLastPaletteVariant = 0;
 	Vec4i mLastPlayfieldSize;
 
 	Shader mShader;
 	GLuint mLocActiveRect = 0;
 	GLuint mLocGameResolution = 0;
 	GLuint mLocPriorityFlag = 0;
-	GLuint mLocWaterLevel = 0;
+	GLuint mLocPaletteOffset = 0;
 	GLuint mLocPlayfieldSize = 0;
 	GLuint mLocPatternCacheTex = 0;
 	GLuint mLocIndexTex = 0;

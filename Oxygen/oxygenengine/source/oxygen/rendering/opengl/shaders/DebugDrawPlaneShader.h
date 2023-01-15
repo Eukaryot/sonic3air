@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include <rmxmedia.h>
+#include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 
 class RenderParts;
 class OpenGLRenderResources;
 
 
-class DebugDrawPlaneShader
+class DebugDrawPlaneShader : public OpenGLShader
 {
 public:
 	void initialize();

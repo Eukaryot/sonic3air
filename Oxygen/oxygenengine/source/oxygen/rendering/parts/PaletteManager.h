@@ -44,7 +44,7 @@ public:
 	void setGlobalComponentTint(const Vec4f& tintColor, const Vec4f& addedColor);
 
 public:
-	uint8 mSplitPositionY = 0xff;
+	int mSplitPositionY = 0xffff;	// Use some large value as default that is definitely larger than any responable screen height
 
 private:
 	struct PackedPaletteColor

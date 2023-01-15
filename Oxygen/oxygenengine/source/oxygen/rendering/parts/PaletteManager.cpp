@@ -41,7 +41,7 @@ Color PaletteManager::unpackColor(uint16 packedColor)
 
 void PaletteManager::preFrameUpdate()
 {
-	mSplitPositionY = 0xff;
+	mSplitPositionY = 0xffff;
 	mUsesGlobalComponentTint = false;
 	mGlobalComponentTintColor = Color::WHITE;
 	mGlobalComponentAddedColor = Color::TRANSPARENT;

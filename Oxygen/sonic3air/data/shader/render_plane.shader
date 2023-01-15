@@ -12,11 +12,10 @@ precision highp int;
 ## ----- Vertex -------------------------------------------------------------------
 
 in vec2 position;
-out vec3 LocalOffset;
+out vec2 LocalOffset;
 
 uniform ivec4 ActiveRect;
 uniform ivec2 GameResolution;
-uniform int WaterLevel;
 
 void main()
 {
@@ -26,7 +25,6 @@ void main()
 
 	LocalOffset.x = float(screenPosition.x);
 	LocalOffset.y = float(screenPosition.y);
-	LocalOffset.z = float(screenPosition.y - WaterLevel) / float(GameResolution.y);
 
 	gl_Position.x = float(screenPosition.x) / float(GameResolution.x) * 2.0 - 1.0;
 	gl_Position.y = float(screenPosition.y) / float(GameResolution.y) * 2.0 - 1.0;
@@ -38,7 +36,7 @@ void main()
 
 ## ----- Fragment -----------------------------------------------------------------
 
-in vec3 LocalOffset;
+in vec2 LocalOffset;
 out vec4 FragColor;
 
 #ifdef USE_BUFFER_TEXTURES
@@ -50,6 +48,7 @@ out vec4 FragColor;
 #endif
 
 uniform sampler2D PaletteTexture;
+uniform float PaletteOffset;
 uniform ivec4 PlayfieldSize;
 uniform int PriorityFlag;		// 0 or 1
 
@@ -176,7 +175,7 @@ void main()
 #endif
 	paletteIndex += atex;
 
-	vec4 color = texture(PaletteTexture, vec2((float(paletteIndex) + 0.5) / 512.0, LocalOffset.z + 0.5));
+	vec4 color = texture(PaletteTexture, vec2((float(paletteIndex) + 0.5) / 512.0, PaletteOffset));
 #ifdef ALPHA_TEST
 	if (color.a < 0.01)
 		discard;

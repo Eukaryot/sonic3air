@@ -8,12 +8,13 @@
 
 #pragma once
 
+#include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 
 class OpenGLRenderResources;
 
 
-class RenderVdpSpriteShader
+class RenderVdpSpriteShader : public OpenGLShader
 {
 public:
 	void initialize();

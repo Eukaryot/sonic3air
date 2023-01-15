@@ -412,6 +412,9 @@
     <ClCompile Include="..\..\source\oxygen\platform\PlatformFunctions.cpp">
       <Filter>platform</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.cpp">
+      <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -762,6 +765,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\platform\PlatformFunctions.h">
       <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.h">
+      <Filter>rendering\opengl\shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

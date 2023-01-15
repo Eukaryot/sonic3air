@@ -8,13 +8,14 @@
 
 #pragma once
 
+#include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 
 class OpenGLDrawer;
 class OpenGLRenderResources;
 
 
-class RenderComponentSpriteShader
+class RenderComponentSpriteShader : public OpenGLShader
 {
 public:
 	void initialize(bool alphaTest);

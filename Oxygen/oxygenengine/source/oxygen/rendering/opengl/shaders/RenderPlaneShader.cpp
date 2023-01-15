@@ -40,7 +40,7 @@ void RenderPlaneShader::initialize(bool horizontalScrolling, bool verticalScroll
 	FileHelper::loadShader(mShader, L"data/shader/render_plane.shader", techname, additionalDefines);
 }
 
-void RenderPlaneShader::refresh(const Vec2i& gameResolution, int waterSurfaceHeight, const OpenGLRenderResources& resources)
+void RenderPlaneShader::refresh(const Vec2i& gameResolution, const OpenGLRenderResources& resources)
 {
 	// No alpha blending needed for planes
 	glBlendFunc(GL_ONE, GL_ZERO);
@@ -49,14 +49,14 @@ void RenderPlaneShader::refresh(const Vec2i& gameResolution, int waterSurfaceHei
 
 	if (!mInitialized)
 	{
-		mLocActiveRect		  = mShader.getUniformLocation("ActiveRect");
-		mLocGameResolution	  = mShader.getUniformLocation("GameResolution");
-		mLocPriorityFlag	  = mShader.getUniformLocation("PriorityFlag");
-		mLocWaterLevel		  = mShader.getUniformLocation("WaterLevel");
-		mLocPlayfieldSize	  = mShader.getUniformLocation("PlayfieldSize");
-		mLocPatternCacheTex	  = mShader.getUniformLocation("PatternCacheTexture");
-		mLocIndexTex		  = mShader.getUniformLocation("IndexTexture");
-		mLocPaletteTex		  = mShader.getUniformLocation("PaletteTexture");
+		mLocActiveRect		= mShader.getUniformLocation("ActiveRect");
+		mLocGameResolution	= mShader.getUniformLocation("GameResolution");
+		mLocPriorityFlag	= mShader.getUniformLocation("PriorityFlag");
+		mLocPaletteOffset	= mShader.getUniformLocation("PaletteOffset");
+		mLocPlayfieldSize	= mShader.getUniformLocation("PlayfieldSize");
+		mLocPatternCacheTex	= mShader.getUniformLocation("PatternCacheTexture");
+		mLocIndexTex		= mShader.getUniformLocation("IndexTexture");
+		mLocPaletteTex		= mShader.getUniformLocation("PaletteTexture");
 
 		glUniform1i(mLocPatternCacheTex, 0);
 		glUniform1i(mLocPaletteTex, 1);
@@ -96,23 +96,11 @@ void RenderPlaneShader::refresh(const Vec2i& gameResolution, int waterSurfaceHei
 		mLastGameResolution = gameResolution;
 	}
 
-	if (mLastWaterSurfaceHeight != waterSurfaceHeight || !mInitialized)
-	{
-		glUniform1i(mLocWaterLevel, waterSurfaceHeight);
-		mLastWaterSurfaceHeight = waterSurfaceHeight;
-	}
-
 	mInitialized = true;
 }
 
-void RenderPlaneShader::draw(const PlaneGeometry& geometry, RenderParts& renderParts, const OpenGLRenderResources& resources)
+void RenderPlaneShader::draw(const PlaneGeometry& geometry, int waterSurfaceHeight, RenderParts& renderParts, const OpenGLRenderResources& resources)
 {
-	if (mLastActiveRect != geometry.mActiveRect)
-	{
-		glUniform4iv(mLocActiveRect, 1, geometry.mActiveRect.mData);
-		mLastActiveRect = geometry.mActiveRect;
-	}
-
 	const Vec4i playfieldSize = (geometry.mPlaneIndex <= PlaneManager::PLANE_A) ? renderParts.getPlaneManager().getPlayfieldSizeForShaders() : Vec4i(512, 256, 64, 32);
 	if (mLastPlayfieldSize != playfieldSize)
 	{
@@ -165,5 +153,25 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, RenderParts& renderP
 		}
 	}
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	// Handle palette split inside the active rect
+	Recti rects[2];
+	const int numRects = splitRectY(geometry.mActiveRect, waterSurfaceHeight, rects);
+	for (int i = 0; i < numRects; ++i)
+	{
+		if (mLastActiveRect != rects[i])
+		{
+			glUniform4iv(mLocActiveRect, 1, rects[i].mData);
+			mLastActiveRect = rects[i];
+		}
+
+		const int paletteVariant = i;
+		if (mLastPaletteVariant != paletteVariant || !mInitialized)
+		{
+			const float paletteOffset = (float)(paletteVariant + 0.5f) / 2.0f;
+			glUniform1f(mLocPaletteOffset, paletteOffset);
+			mLastPaletteVariant = paletteVariant;
+		}
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
 }

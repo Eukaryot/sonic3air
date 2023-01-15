@@ -90,6 +90,7 @@
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.cpp" />
+    <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderer.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\OpenGLRenderResources.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\DebugDrawPlaneShader.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderComponentSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPaletteSpriteShader.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\RenderPlaneShader.h" />

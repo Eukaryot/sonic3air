@@ -296,12 +296,12 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			if (mLastRenderedGeometryType != Geometry::Type::PLANE || mLastUsedPlaneShader != &shader)
 			{
-				shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
+				shader.refresh(mGameResolution, mResources);
 				mLastRenderedGeometryType = Geometry::Type::PLANE;
 				mLastUsedPlaneShader = &shader;
 			}
 
-			shader.draw(pg, mRenderParts, mResources);
+			shader.draw(pg, mRenderParts.getPaletteManager().mSplitPositionY, mRenderParts, mResources);
 			break;
 		}
 
