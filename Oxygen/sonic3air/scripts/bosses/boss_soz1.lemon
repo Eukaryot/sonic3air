@@ -129,7 +129,7 @@ function bool BossSOZ1.slideAsRock()
 		{
 			// Spawn dust effects
 			// "spawnIdenticalChildObjects(0x07740a)" replaced by:
-			spawnChildObjects(0x07706c, 0, 4, 6)
+			spawnChildObjects(0x07706c, 0, 5, 6)
 		}
 	}
 
