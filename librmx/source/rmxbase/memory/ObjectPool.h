@@ -280,6 +280,20 @@ protected:
 		return item.mObject;
 	}
 
+	template<typename A, typename B, typename C, typename D, typename E, typename F>
+	T& createObject(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f)
+	{
+		// Get an unused item
+		Item& item = allocItem();
+
+		// Call its constructor
+		new (static_cast<void*>(&item.mObject)) T(a, b, c, d, e, f);
+		item.mIsConstructed = true;
+
+		// Done
+		return item.mObject;
+	}
+
 	inline void destroyObject(T& object)
 	{
 		Item& item = reinterpret_cast<Item&>(object);
