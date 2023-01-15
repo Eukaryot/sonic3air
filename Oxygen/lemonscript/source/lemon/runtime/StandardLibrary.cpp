@@ -316,6 +316,14 @@ namespace lemon
 			return (position == std::string_view::npos) ? -1 : (int16)position;
 		}
 
+		StringRef getStringFromCharacter(uint8 character)
+		{
+			Runtime* runtime = Runtime::getActiveRuntime();
+			RMX_ASSERT(nullptr != runtime, "No lemon script runtime active");
+			const char str[2] = { (char)character, '\0' };
+			return StringRef(runtime->addString(str));
+		}
+
 		StringRef getStringFromHash(uint64 hash)
 		{
 			Runtime* runtime = Runtime::getActiveRuntime();
@@ -531,6 +539,9 @@ namespace lemon
 
 		module.addNativeMethod("string", "find", lemon::wrap(&functions::string_find), defaultFlags)
 			.setParameterInfo(0, "substring");
+
+		module.addNativeFunction("getStringFromCharacter", lemon::wrap(&functions::getStringFromCharacter), defaultFlags)
+			.setParameterInfo(0, "character");
 
 		module.addNativeFunction("getStringFromHash", lemon::wrap(&functions::getStringFromHash), defaultFlags)
 			.setParameterInfo(0, "hash");

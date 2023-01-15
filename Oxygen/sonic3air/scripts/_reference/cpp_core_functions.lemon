@@ -109,6 +109,7 @@ declare function string stringformat(string format, u64 arg1, u64 arg2, u64 arg3
 declare function u32 strlen(string str)
 declare function u8 getchar(string str, u32 index)
 declare function string substring(string str, u32 index, u32 length)
+declare function string getStringFromCharacter(u8 character)
 declare function string getStringFromHash(u64 hash)
 
 
