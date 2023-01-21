@@ -339,21 +339,19 @@ function void DataSelect.setup()
 
 	A0 = 0xffffb000
 	A1 = 0x00d13e
-	D0 = 0x0b
-	while (D0.s16 >= 0)
+	for (u8 i = 0; i < 12; ++i)
 	{
-		objA0.update_address = u32[(A1+=4)-4]
+		objA0.update_address = u32[A1]
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | (DataSelect.MenuPart1.targetInVRAM >> 5))
 		objA0.mapping_offset = 0x00ce0e
-		objA0.position.x.u16 = u16[A1] + getScreenExtend()		// Adding the screen extend only really has an effect on the "Data Select" text
-		u16[A0 + 0x12] = u16[(A1+=2)-2]
-		objA0.position.y.u16 = u16[(A1+=2)-2]
-		objA0.animation.sprite = u8[(A1+=1)-1]
-		objA0.flags2e = u8[(A1+=1)-1]
+		objA0.position.x.u16 = u16[A1+4] + getScreenExtend()		// Adding the screen extend only really has an effect on the "Data Select" text
+		u16[A0 + 0x12] = u16[A1+4]
+		objA0.position.y.u16 = u16[A1+6]
+		objA0.animation.sprite = u8[A1+8]
+		objA0.flags2e = u8[A1+9]
 		objA0.render_flags = render_flag.COMPOUND
-
 		A0 += 0x4a
-		--D0.s16
+		A1 += 10
 	}
 
 	fn01aa6e()
