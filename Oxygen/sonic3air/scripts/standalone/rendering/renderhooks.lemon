@@ -839,6 +839,17 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		}
 	}
 
+	// Text in Data Select screen that literally says "DATA SELECT", #contributed by iCloudius
+	if (objA0.mapping_offset == 0x00ce0e && A0 == 0xffffb000)
+	{
+		u64 key = "dataselect_text"
+		if (Renderer.hasCustomSprite(key))
+		{
+			Renderer.drawCustomSprite(key, px, py, 0x00, SPRITE_FLAG_PRIO, renderQueue)
+			return true
+		}
+	}
+
 	return false
 }
 
