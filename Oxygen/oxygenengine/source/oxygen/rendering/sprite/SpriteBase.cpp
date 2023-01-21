@@ -187,10 +187,10 @@ namespace spritebaseinternal
 		{
 			Vec2f min(1e10f, 1e10f);
 			Vec2f max(-1e10f, -1e10f);
-			const Vec2i corners[4] = { Vec2i(0, 0), Vec2i(sourceBitmap.getWidth() - 1, 0), Vec2i(0, sourceBitmap.getHeight() - 1), Vec2i(sourceBitmap.getWidth() - 1, sourceBitmap.getHeight() - 1) };
+			const Vec2i corners[4] = { Vec2i(0, 0), Vec2i(sourceBitmap.getWidth(), 0), Vec2i(0, sourceBitmap.getHeight()), Vec2i(sourceBitmap.getWidth(), sourceBitmap.getHeight()) };
 			for (int i = 0; i < 4; ++i)
 			{
-				const Vec2f localCorner((float)(corners[i].x + offset.x + 0.5f), (float)(corners[i].y + offset.y + 0.5f));
+				const Vec2f localCorner((float)(corners[i].x + offset.x), (float)(corners[i].y + offset.y));
 				const float screenCornerX = destPosition.x + localCorner.x * blitOptions.mTransform[0] + localCorner.y * blitOptions.mTransform[1];
 				const float screenCornerY = destPosition.y + localCorner.x * blitOptions.mTransform[2] + localCorner.y * blitOptions.mTransform[3];
 				min.x = std::min(screenCornerX, min.x);
