@@ -400,7 +400,7 @@ bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
 	config.initialization();
 
 	RMX_LOG_INFO("Loading configuration");
-#if defined(PLATFORM_MAC) || defined(PLATFORM_IOS)
+#if (defined(PLATFORM_MAC) || defined(PLATFORM_IOS)) && defined(ENDUSER)
 	config.loadConfiguration(config.mGameDataPath + L"/config.json");
 #else
 	config.loadConfiguration(L"config.json");

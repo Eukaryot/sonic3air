@@ -12,8 +12,8 @@
 #include "sonic3air/EngineDelegate.h"
 #include "sonic3air/version.inc"
 
-#include "oxygen/base/CrashHandler.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/CrashHandler.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 EngineDelegate _myDelegate;
 EngineMain* _myMain;

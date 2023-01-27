@@ -9,8 +9,8 @@
 #include "sonic3air/EngineDelegate.h"
 #include "sonic3air/version.inc"
 
-#include "oxygen/base/CrashHandler.h"
-#include "oxygen/base/PlatformFunctions.h"
+#include "oxygen/platform/CrashHandler.h"
+#include "oxygen/platform/PlatformFunctions.h"
 
 @interface AppDelegate ()
 
@@ -127,6 +127,10 @@ EngineMain* _myMain;
 		
 #ifdef ENDUSER
 		std::wstring resourcePath = *String([NSBundle.mainBundle.resourcePath stringByAppendingString:@"/data"].UTF8String).toWString();
+		config.mGameDataPath = resourcePath;
+#else
+		//Make development build look relative to the app instead
+		std::wstring resourcePath = *String([NSBundle.mainBundle.bundlePath stringByDeletingLastPathComponent].UTF8String).toWString();
 		config.mGameDataPath = resourcePath;
 #endif
 		
