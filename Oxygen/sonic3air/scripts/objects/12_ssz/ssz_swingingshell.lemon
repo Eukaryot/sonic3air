@@ -10,7 +10,7 @@
 
 // Central knob everything swings around
 
-//# address-hook(0x0460d8) end(0x046138)
+//# address-hook(0x0460d8) end(0x04613e)
 function void fn0460d8()
 {
 	objA0.update_address = 0x046142

@@ -447,7 +447,7 @@ function void fn0324c0()
 }
 
 
-//# address-hook(0x03260a) end(0x03260a)
+//# address-hook(0x03260a) end(0x03260c)
 function void fn03260a()
 {
 	D0 = u8[A2 + 1]

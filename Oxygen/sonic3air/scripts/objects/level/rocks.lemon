@@ -181,7 +181,7 @@ function void fn01fb4c()
 }
 
 
-//# address-hook(0x01fba8) end(0x01fba8)
+//# address-hook(0x01fba8) end(0x01fbac)
 function void fn01fba8()
 {
 	if (D0.u8 == 0x02)

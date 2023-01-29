@@ -1009,7 +1009,7 @@ function void fn035f8c()
 
 // Unknown in DPZ
 
-//# address-hook(0x0362a2) end(0x0362c2)
+//# address-hook(0x0362a2) end(0x0362c8)
 function void fn0362a2()
 {
 	objA0.mapping_offset = 0x036350

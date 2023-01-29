@@ -671,7 +671,7 @@ function void fn07a12a()
 }
 
 
-//# address-hook(0x07a130)
+//# address-hook(0x07a130) end(0x07a136)
 function void fn07a130()
 {
 	u16[0xfffff634] = 0x7fff

@@ -619,7 +619,7 @@ function void fn0578a6()
 }
 
 
-//# address-hook(0x0578aa) end(0x0578ea)
+//# address-hook(0x0578aa) end(0x0578ec)
 function void fn0578aa()
 {
 	D0.u16 = camera.position.y.u16 & level.height.bitmask

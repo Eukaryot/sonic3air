@@ -52,7 +52,7 @@ function void fn03bf68()
 }
 
 
-//# address-hook(0x03bfa0) end(0x03bff6)
+//# address-hook(0x03bfa0) end(0x03bffc)
 function void fn03bfa0()
 {
 	if (u8[A2] == 0)

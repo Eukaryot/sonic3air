@@ -843,7 +843,7 @@ function void fn0718ca()
 }
 
 
-//# address-hook(0x0718da) end(0x071940)
+//# address-hook(0x0718da) end(0x07194e)
 function void Boss.ICZ1.RegularUpdate()
 {
 	if (u8[A0 + 0x28] != 0)

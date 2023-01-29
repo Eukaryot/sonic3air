@@ -70,7 +70,7 @@ function void fn08657a()
 }
 
 
-//# address-hook(0x0865d0) end(0x0865d6)
+//# address-hook(0x0865d0) end(0x0865d8)
 function void fn0865d0()
 {
 	if (objA0.flags38 & 0x02)

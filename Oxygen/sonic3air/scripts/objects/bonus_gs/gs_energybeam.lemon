@@ -22,7 +22,7 @@ function void fn049eee()
 
 
 //# address-hook(0x049f20)
-//# translated(0x049ef4) end(0x049f50)
+//# translated(0x049ef4) end(0x049f56)
 function void fn049f20()
 {
 	while (true)

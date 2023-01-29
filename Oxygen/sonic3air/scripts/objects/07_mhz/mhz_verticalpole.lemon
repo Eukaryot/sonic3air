@@ -68,7 +68,7 @@ function void VerticalPole.Update()
 }
 
 
-//# address-hook(0x03f0d8) end(0x03f102)
+//# address-hook(0x03f0d8) end(0x03f108)
 function void fn03f0d8()
 {
 	if (u8[A2] == 0)

@@ -285,7 +285,7 @@ function void fn0761e8()
 function void fn07623c()
 {
 	D0.u16 = camera.position.x.u16 + 4
-	D1.u16 = max(0x45a0 - getScreenExtend(), 0x4580)	// Make sure capsule is centered as good as paossible, but large log must not be visible any more
+	D1.u16 = max(0x45a0 - getScreenExtend(), 0x4580)	// Make sure capsule is centered as good as possible, but large log must not be visible any more
 	if (D0.u16 >= D1.u16)
 	{
 		objA0.update_address = 0x076270

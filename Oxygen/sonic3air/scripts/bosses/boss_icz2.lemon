@@ -636,7 +636,7 @@ function void fn072168()
 }
 
 
-//# address-hook(0x07225c) end(0x0722e6)
+//# address-hook(0x07225c) end(0x0722f4)
 function void fn07225c()
 {
 	if (u8[A0 + 0x28] != 0)

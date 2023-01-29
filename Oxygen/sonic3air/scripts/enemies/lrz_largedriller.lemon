@@ -444,7 +444,7 @@ function void fn090512()
 }
 
 
-//# address-hook(0x0905a8) end(0x0905e6)
+//# address-hook(0x0905a8) end(0x0905f0)
 function void fn0905a8()
 {
 	if (u8[A0 + 0x28] == 0)

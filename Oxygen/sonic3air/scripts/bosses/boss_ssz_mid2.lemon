@@ -888,7 +888,7 @@ function void fn07af5a()
 
 // Decoy
 
-//# address-hook(0x07afa4) end(0x07aff0)
+//# address-hook(0x07afa4) end(0x07aff8)
 function void fn07afa4()
 {
 #if STANDALONE

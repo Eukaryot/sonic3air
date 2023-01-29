@@ -186,7 +186,7 @@ function void fn055b08()
 }
 
 
-//# address-hook(0x055b70) end(0x055b9c)
+//# address-hook(0x055b70) end(0x055b9e)
 function void fn055b70()
 {
 	// This is called during pyramid rise and boss fight

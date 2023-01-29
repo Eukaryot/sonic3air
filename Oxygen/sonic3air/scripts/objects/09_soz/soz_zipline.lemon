@@ -418,7 +418,7 @@ function void fn04ac98()
 }
 
 
-//# address-hook(0x04acc6) end(0x04ad2c)
+//# address-hook(0x04acc6) end(0x04ad30)
 function void fn04acc6()
 {
 	if (objA0.value26 != 0)
