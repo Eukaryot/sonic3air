@@ -92,14 +92,14 @@ function void fn036464()
 	// Called when a character collects this item
 
 	// Targets:
-	//  - 0x036486	-> objA0.state = 0x00
-	//  - 0x0364d8	-> objA0.state = 0x01
-	//  - 0x03652a	-> objA0.state = 0x02
-	//  - 0x0365e8	-> objA0.state = 0x03
-	//  - 0x036612	-> objA0.state = 0x04
-	//  - 0x036652	-> objA0.state = 0x05
-	//  - 0x036676	-> objA0.state = 0x06
-	//  - 0x03669a	-> objA0.state = 0x07
+	//  - 0x036486	-> objA0.state = 0x00	-> Speed shoes
+	//  - 0x0364d8	-> objA0.state = 0x01	-> Slow shoes
+	//  - 0x03652a	-> objA0.state = 0x02	-> Switch
+	//  - 0x0365e8	-> objA0.state = 0x03	-> Ring
+	//  - 0x036612	-> objA0.state = 0x04	-> Bomb
+	//  - 0x036652	-> objA0.state = 0x05	-> Banana
+	//  - 0x036676	-> objA0.state = 0x06	-> Spring
+	//  - 0x03669a	-> objA0.state = 0x07	-> That one's just empty...
 	call tableLookupAddress(0x036476, objA0.state * 2)
 }
 
@@ -177,7 +177,7 @@ function void fn03652a()
 	D3.u16 = global.move.speedcap.tails
 	D4.u16 = global.move.acceleration.tails
 	D5.u16 = global.move.deceleration.tails
-	u16[A7-=2] = D0.u16
+	u16 backupD0 = D0.u16
 
 	A1 = 0x1e3c00 + u8[A2 + 0x38] * 8
 	global.move.speedcap = u16[(A1+=2)-2]
@@ -189,7 +189,7 @@ function void fn03652a()
 	global.move.acceleration.tails = u16[(A1+=2)-2]
 	global.move.deceleration.tails = u16[(A1+=2)-2]
 
-	D0.u16 = u16[(A7+=2)-2]
+	D0.u16 = backupD0
 	if (u8[A2 + 0x2b] & char.bonus.SPEED_UP)
 	{
 		global.move.speedcap = D3.u16
@@ -228,7 +228,7 @@ function void fn0365e8()
 	}
 	else
 	{
-		call 0x01a5f0
+		CollectRing_P2()
 	}
 }
 
@@ -242,6 +242,7 @@ function void fn036612()
 
 	copyMemory(0xffffcb2c, A0, 0x2e)
 
+	A1 = 0xffffcb2c
 	objA1.update_address = 0x03669c
 	u8[A1 + 0x20] = 0x04
 	u16[A1 + 0x46] = u16[A2 + 0x46]
@@ -311,6 +312,14 @@ function void fn0366b6()
 }
 
 
+//# address-hook(0x0366be) end(0x0366be)
+function void fn0366be()
+{
+	D2 = 0x03670c
+	fn0366c4()
+}
+
+
 //# address-hook(0x0366c4) end(0x036708)
 function void fn0366c4()
 {
@@ -341,17 +350,319 @@ function void fn0366c4()
 }
 
 
+
+// Competition mode spring item
+
+//# address-hook(0x03670c) end(0x036758)
+function void fn03670c()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		A2 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			u8[A0 + 0x29] &= ~0x01
+			fn03675e()
+		}
+		A2 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			u8[A0 + 0x29] &= ~0x02
+			fn03675e()
+		}
+		u8[A0 + 0x29] = 0
+	}
+
+	Object.animationUpdate(0x036a58)
+	if (objA0.base_state == 0)
+	{
+		if (objA0.state != 0x09)
+		{
+			AddAsDynamicObject()
+		}
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x03675e) end(0x0367bc)
+function void fn03675e()
+{
+	D0.u16 = u16[A2 + 0x46]
+	if (D0.u16 != u16[A0 + 0x46])
+		return
+
+	objA0.state = 0x0a
+	u16[A2 + 0x1a] = 0xf600
+	u8[A2 + 0x2a] |= 0x02
+	u8[A2 + 0x2a] &= ~0x10
+	u8[A2 + 0x2a] &= ~0x20
+	u8[A2 + 0x40] = 0
+	u16[A2 + 0x1c] = 0x01
+	u8[A2 + 0x27] = 0x01
+	u8[A2 + 0x20] = 0
+	u8[A2 + 0x30] = 0
+	u8[A2 + 0x31] = 0x04
+	if (u8[A2 + 0x2a] & 0x01)
+	{
+		s8[A2 + 0x27] = -s8[A2 + 0x27]
+		s16[A2 + 0x1c] = -s16[A2 + 0x1c]
+	}
+	playSound(0x7b)
+}
+
+
+
+// Competition mode banana item
+
+//# address-hook(0x0367c2) end(0x036846)
+function void fn0367c2()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		A2 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			u8[A0 + 0x29] &= ~0x01
+			fn03684c()
+		}
+		A2 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			u8[A0 + 0x29] &= ~0x02
+			fn03684c()
+		}
+		u8[A0 + 0x29] = 0
+	}
+
+	Object.animationUpdate(0x036a58)
+	if (u8[A0 + 0x3c] != 0)
+	{
+		A1 = 0xffff0000 + objA0.value3e
+		--u8[A0 + 0x3c]
+		if (u8[A0 + 0x3c] != 0)
+		{
+			bool carry = false
+			D1.u16 = 0x20
+			D0.u16 = u16[A1 + 0x1c]
+			if (D0.s16 < 0)
+			{
+				carry = (u32(u16[A1 + 0x1c]) + D1.u16 >= 0x10000)
+				u16[A1 + 0x1c] += D1.u16
+			}
+			else
+			{
+				carry = (u16[A1 + 0x1c] < D1.u16)
+				u16[A1 + 0x1c] -= D1.u16
+			}
+			if (!carry)
+			{
+				AddAsDynamicObject()
+				DrawObject()
+				return
+			}
+			u16[A1 + 0x1c] = 0
+		}
+		u16[A1 + 0x32] = 0x05
+		u8[A1 + 0x2b] &= 0x7f
+	}
+
+	if (objA0.base_state == 0)
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x03684c) end(0x0368a8)
+function void fn03684c()
+{
+	if (u16[A2 + 0x46] == u16[A0 + 0x46] && s8[A2 + 0x2b] >= 0)
+	{
+		if ((u8[A2 + 0x2a] & 0x02) == 0 && u16[A2 + 0x1c] != 0)
+		{
+			objA0.state = 0x09
+			objA0.collision_attributes = 0
+
+			D1.s16 = (s16[A2 + 0x1c] < 0) ? -0x0200 : 0x0200
+			if (abs(s16[A2 + 0x1c]) < 0x0200)
+			{
+				s16[A2 + 0x1c] += D1.s16
+			}
+			s16[A2 + 0x1c] <<= 1
+			u8[A2 + 0x20] = 0x1b
+			u8[A2 + 0x2b] |= 0x80
+
+			objA0.value3e = A2.u16
+			u8[A0 + 0x3c] = 0x3c
+		}
+	}
+}
+
+
+
+// Competition mode bomb item
+
+//# address-hook(0x0368aa) end(0x036900)
+function void fn0368aa()
+{
+	if (u8[A0 + 0x29] != 0)
+	{
+		A2 = 0xffffb000
+		if (u8[A0 + 0x29] & 0x01)
+		{
+			u8[A0 + 0x29] &= ~0x01
+			call 0x036906
+		}
+		A2 = 0xffffb04a
+		if (u8[A0 + 0x29] & 0x02)
+		{
+			u8[A0 + 0x29] &= ~0x02
+			call 0x036906
+		}
+		u8[A0 + 0x29] = 0
+	}
+
+	fn036926()
+	objA0.animation.sprite = 0x11 + ((objA0.value26 + 0x10) >> 5)
+
+	if (move_area.bottom.current + 0x60 >= s16[A0 + 0x14])
+	{
+		AddAsDynamicObject()
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
+//# address-hook(0x036906) end(0x036920)
+function void fn036906()
+{
+	D0.u16 = u16[A2 + 0x46]
+	if (D0.u16 != u16[A0 + 0x46])
+		return
+
+	u32[A0] = 0x036a1a
+	objA0.state = 0x0b
+	A1 = A2
+	DamageCharacter()
+}
+
+
+//# address-hook(0x036926) end(0x036a18)
+function void fn036926()
+{
+	if ((objA0.flags2a & 0x02) == 0)
+	{
+		D0.u8 = objA0.value26
+		LookupSinCos()
+		D1.s32 = s32(D1.s16) * objA0.groundspeed
+		D1.s32 >>= 8
+		objA0.compound.sprite1.position.x = D1.u16
+		D0.s32 = s32(D0.s16) * objA0.groundspeed
+		D0.s32 >>= 8
+		objA0.compound.sprite1.position.y = D0.u16
+		UpdateMovementStraightSimple()
+
+		objA0.position.y.u16 &= level.height.bitmask
+		objA0.position.x.u16 &= level.width.bitmask
+		objA0.position.x.u16 += 0x0400
+		Character.UpdateRotationOnGround_partial()
+
+		D0.u8 = objA0.value26
+		if (D0.u8 == 0)
+		{
+			fn00fdec()
+			if (D1.s16 < 0)
+			{
+				objA0.position.x.u16 -= D1.u16
+				u32[A0] = 0x036a1a
+				objA0.state = 0x0b
+			}
+		}
+	}
+	else
+	{
+		objA0.compound.sprite1.position.x -= 0x10
+		if (objA0.velocity.x <= -0x0400)
+		{
+			objA0.compound.sprite1.position.x = 0xfc00
+		}
+		UpdateMovementSimple()
+		D0.u16 = level.height.bitmask
+		objA0.position.y.u16 &= D0.u16
+		D0.u16 = level.width.bitmask
+		objA0.position.x.u16 &= D0.u16
+		objA0.position.x.u16 += 0x0400
+
+		fn00f894()
+		if (D1.s16 < 0)
+		{
+			objA0.position.y.u16 += D1.u16
+			objA0.flags2a &= ~0x02
+			objA0.value26 = 0
+			return
+		}
+	
+		D0.s8 = objA0.value26
+		if (D0.s8 != 0)
+		{
+			if (D0.s8 < 0)
+				D0.s8 = min(D0.s8 + 2, 0)
+			else
+				D0.s8 = max(D0.s8 - 2, 0)
+			objA0.value26 = D0.s8
+		}
+		if (D0.s8 == 0)
+		{
+			fn00fdec()
+			if (D1.s16 < 0)
+			{
+				objA0.position.x.u16 -= D1.u16
+				u32[A0] = 0x036a1a
+				objA0.state = 0x0b
+			}
+		}
+	}
+}
+
+
+
+// Shared code
+
+//# address-hook(0x036a1a) end(0x036a32)
+function void fn036a1a()
+{
+	Object.animationUpdate(0x036a58)
+	if (objA0.base_state == 0)
+	{
+		DrawObject()
+	}
+	else
+	{
+		UnloadObject()
+	}
+}
+
+
 //# address-hook(0x036a38) end(0x036a56)
 function void fn036a38()
 {
 	if (allocDynamicObjectAfterA0())
 	{
-		D0 = 0x2c
-		while (D0.s16 >= 0)
-		{
-			u16[A1 + D0.u16] = u16[A0 + D0.u16]
-			D0.u16 -= 2
-		}
+		copyMemory(A1, A0, 0x2e)
 
 		u32[A1] = D1
 		u8[A1 + 0x20] = D2.u8

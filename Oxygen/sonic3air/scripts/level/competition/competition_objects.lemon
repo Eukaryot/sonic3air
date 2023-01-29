@@ -793,24 +793,6 @@ function void fn035e4c()
 
 
 
-// Unknown
-
-//# address-hook(0x036a1a) end(0x036a32)
-function void fn036a1a()
-{
-	Object.animationUpdate(0x036a58)
-	if (objA0.base_state == 0)
-	{
-		DrawObject()
-	}
-	else
-	{
-		UnloadObject()
-	}
-}
-
-
-
 // Object dropping water in EMZ
 
 //# address-hook(0x0380f8) end(0x03814a)

@@ -750,6 +750,14 @@ function void fn00f846()
 }
 
 
+//# address-hook(0x00f894) end(0x00f8e8)
+function void fn00f894()
+{
+	// This specific variant is only used for the bomb item in competition mode
+	D3.u16 = objA0.position.x.u16
+	Character.checkFloorEdgeCollision()
+}
+
 //# address-hook(0x00f898) end(0x00f8e8)
 //# alias(fn00f898) deprecated
 function void Character.checkFloorEdgeCollision()
@@ -1146,6 +1154,29 @@ function void Character.CheckLeftWallCollision.shared()
 	D2.u8 = 0x40
 	if (Game.getSetting(SETTING_FIX_GLITCHES) >= 2)
 		D3.u8 = u8[0xfffff768]		// Due to a mistake in code porting, this line was missing for quite a long time in S3AIR, causing a glitch that is now actively used in speedrunning
+	if (D3 & 0x01)
+		D3.u8 = 0x40
+}
+
+
+//# address-hook(0x00fdec) end(0x00fe3a)
+function void fn00fdec()
+{
+	// Only used in competition mode for the bomb item
+	u32[0xfffff796] = u32[0xfffff7b4]
+	if (u8[A0 + 0x46] != 0x0c)
+	{
+		u32[0xfffff796] = u32[0xfffff7b8]
+	}
+	D3.u16 = objA0.position.x.u16 ^ 0x0f
+	D2.u16 = objA0.position.y.u16 - objA0.hitbox_extends.y
+	A4 = 0xfffff768
+	u8[A4] = 0
+	A3 = 0xffff0000 + 0xfff0
+	D6.u16 = 0x0400
+	D5.u8 = u8[A0 + 0x47]
+	CheckStaticCollisionHorizontal()
+	D3.u8 = u8[0xfffff768]
 	if (D3 & 0x01)
 		D3.u8 = 0x40
 }

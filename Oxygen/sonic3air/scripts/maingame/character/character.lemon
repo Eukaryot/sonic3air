@@ -3562,6 +3562,51 @@ function void CollectRing()
 }
 
 
+//# address-hook(0x01a5f0) end(0x01a644)
+function void CollectRing_P2()
+{
+	// Only used for the ring item in competition mode
+	if (unused.player2.total_rings < 999)
+		++unused.player2.total_rings
+	if (ring_counter.player2 < 999)
+		++ring_counter.player2
+
+	// Left out this code, as it's not relevant in Sonic 3, just some leftover from Sonic 2
+#if !STANDALONE
+	if (!competition_mode.active)
+	{
+		// This is actually most of "CollectRing" again, except for the first line there
+		call 0x01a5a2
+		return
+	}
+
+	u8[0xfffffebe] |= 0x01	// Player 2 version of "hud.dirty.rings", I guess
+	if (ring_counter.player2 >= 100)
+	{
+		bool gainLife = false
+		if ((u8[0xfffffebf] & 0x02) == 0)
+		{
+			u8[0xfffffebf] |= 0x02
+			gainLife = true
+		}
+		else if (ring_counter.player2 >= 200 && (u8[0xfffffebf] & 0x04) == 0)
+		{
+			u8[0xfffffebf] |= 0x04
+			gainLife = true
+		}
+
+		if (gainLife)
+		{
+			++unused.lives_counter.player2
+			playMusic(MUSIC_EXTRALIFE)
+			return
+		}
+	}
+	playSound(SFX_RING)
+#endif
+}
+
+
 function bool checkForExtraLifeByRings()
 {
 #if STANDALONE
