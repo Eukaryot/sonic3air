@@ -211,6 +211,9 @@
     <ClInclude Include="..\..\source\rmxbase\memory\UTF8Conversion.h">
       <Filter>memory</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapView.h">
+      <Filter>bitmap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp" />

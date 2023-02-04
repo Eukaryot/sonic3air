@@ -9,15 +9,6 @@
 #pragma once
 
 
-// Formats
-#define BITMAP_FORMAT_MONOCHROME   1
-#define BITMAP_FORMAT_16COLORS	   4
-#define BITMAP_FORMAT_256COLORS	   8
-#define BITMAP_FORMAT_RGB16		  16
-#define BITMAP_FORMAT_RGB24		  24
-#define BITMAP_FORMAT_RGBA32	  32
-
-
 class API_EXPORT Bitmap
 {
 public:
@@ -35,6 +26,15 @@ public:
 			ERROR = 0xff	// Unknown or other error
 		};
 		Error mError = Error::OK;
+	};
+
+	enum class ColorFormat		// Only used in "convert" method
+	{
+		INDEXED_16_COLORS	= 4,
+		INDEXED_256_COLORS	= 8,
+		RGB16				= 16,
+		RGB24				= 24,
+		RGBA32				= 32
 	};
 
 public:
@@ -88,7 +88,7 @@ public:
 	bool decode(InputStream& stream, LoadResult& outResult, const char* format = nullptr);
 	bool encode(OutputStream& stream, const char* format) const;
 
-	uint8* convert(int format, int& size, uint32* palette = nullptr);
+	uint8* convert(ColorFormat format, int& size, uint32* palette = nullptr);
 
 	bool load(const WString& filename, LoadResult* outResult = nullptr);
 	bool save(const WString& filename);

@@ -205,6 +205,7 @@
     <ClInclude Include="..\..\source\rmxbase\base\Types.h" />
     <ClInclude Include="..\..\source\rmxbase\bitmap\Bitmap.h" />
     <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapCodecs.h" />
+    <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapView.h" />
     <ClInclude Include="..\..\source\rmxbase\bitmap\Color.h" />
     <ClInclude Include="..\..\source\rmxbase\data\CArray.h" />
     <ClInclude Include="..\..\source\rmxbase\data\GlobalObjectPtr.h" />

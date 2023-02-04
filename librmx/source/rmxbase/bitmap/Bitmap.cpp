@@ -230,7 +230,7 @@ uint32 Bitmap::sampleLinear(float x, float y) const
 	return color;
 }
 
-void Bitmap::setPixel(int x, int y, unsigned int color)
+void Bitmap::setPixel(int x, int y, uint32 color)
 {
 	if (x < 0 || x >= mWidth || y < 0 || y >= mHeight)
 		return;
@@ -280,7 +280,7 @@ bool Bitmap::encode(OutputStream& stream, const char* format) const
 	return false;
 }
 
-uint8* Bitmap::convert(int format, int& size, uint32* palette)
+uint8* Bitmap::convert(ColorFormat format, int& size, uint32* palette)
 {
 	// Convert into a different color format
 	uint8* output = nullptr;
@@ -289,7 +289,7 @@ uint8* Bitmap::convert(int format, int& size, uint32* palette)
 	switch (format)
 	{
 		// Convert RGBA -> RGB
-		case BITMAP_FORMAT_RGB24:
+		case ColorFormat::RGB24:
 		{
 			size *= 3;
 			output = new uint8[size];
@@ -299,23 +299,23 @@ uint8* Bitmap::convert(int format, int& size, uint32* palette)
 		}
 
 		// Reduce to 16-bit
-		case BITMAP_FORMAT_RGB16:
+		case ColorFormat::RGB16:
 		{
 			size *= 2;
 			output = new uint8[size];
 			for (int i = 0; i < pixels; ++i)
 			{
-				unsigned short color = 0;
+				uint16 color = 0;
 				color += (mData[i] >> 3) & 0x001f;
 				color += (mData[i] >> 5) & 0x07e0;
 				color += (mData[i] >> 8) & 0xf800;
-				*(unsigned short*)(&output[i*2]) = color;
+				*(uint16*)(&output[i*2]) = color;
 			}
 			return output;
 		}
 
 		// Create palette with 256 colors
-		case BITMAP_FORMAT_256COLORS:
+		case ColorFormat::INDEXED_256_COLORS:
 		{
 			if (!palette)
 				break;
@@ -325,7 +325,7 @@ uint8* Bitmap::convert(int format, int& size, uint32* palette)
 		}
 
 		// Create palette with 16 colors
-		case BITMAP_FORMAT_16COLORS:
+		case ColorFormat::INDEXED_16_COLORS:
 		{
 			if (!palette)
 				break;

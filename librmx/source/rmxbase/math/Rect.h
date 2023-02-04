@@ -27,6 +27,16 @@ public:
 	};
 
 public:
+	static TRect getIntersection(const TRect& other1, const TRect& other2)
+	{
+		const TYPE maxStartX = std::max(other1.x, other2.x);
+		const TYPE maxStartY = std::max(other1.y, other2.y);
+		const TYPE minEndX = std::min(other1.x + other1.width, other2.x + other2.width);
+		const TYPE minEndY = std::min(other1.y + other1.height, other2.y + other2.height);
+		return TRect(maxStartX, maxStartY, minEndX - maxStartX, minEndY - maxStartY);
+	}
+
+public:
 	TRect() : x(0), y(0), width(0), height(0)	{}
 	TRect(TYPE px, TYPE py, TYPE w, TYPE h)		{ set(px, py, w, h); }
 	TRect(Vec2<TYPE> pos, Vec2<TYPE> size)		{ set(pos, size); }
@@ -81,6 +91,7 @@ public:
 	float getAspectRatio() const  { return (float)width / (float)height; }
 
 	bool empty() const		{ return (width <= 0) || (height <= 0); }
+	bool isEmpty() const	{ return (width <= 0) || (height <= 0); }
 	bool nonEmpty() const	{ return (width > 0) && (height > 0); }
 
 	bool equal(const TRect& other) const
@@ -112,20 +123,12 @@ public:
 
 	void intersect(const TRect& other)
 	{
-		TRect rect(*this);
-		intersect(other, rect);
+		*this = getIntersection(*this, other);
 	}
 
 	void intersect(const TRect& other1, const TRect& other2)
 	{
-		const TYPE maxStartX = std::max(other1.x, other2.x);
-		const TYPE maxStartY = std::max(other1.y, other2.y);
-		const TYPE minEndX = std::min(other1.x + other1.width, other2.x + other2.width);
-		const TYPE minEndY = std::min(other1.y + other1.height, other2.y + other2.height);
-		x = maxStartX;
-		y = maxStartY;
-		width  = minEndX - x;
-		height = minEndY - y;
+		*this = getIntersection(other1, other2);
 	}
 
 	TYPE& operator[](size_t index)				{ return mData[index]; }
