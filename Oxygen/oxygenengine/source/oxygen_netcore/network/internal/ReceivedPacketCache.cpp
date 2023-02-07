@@ -21,7 +21,8 @@ void ReceivedPacketCache::clear()
 	// Remove references to all received packets still in the queue
 	for (CacheItem& item : mQueue)
 	{
-		item.mReceivedPacket->decReferenceCounter();
+		if (nullptr != item.mReceivedPacket)
+			item.mReceivedPacket->decReferenceCounter();
 	}
 	mQueue.clear();
 	mLastExtractedUniquePacketID = 0;

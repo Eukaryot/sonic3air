@@ -8,6 +8,7 @@
 
 #include "oxygenserver/pch.h"
 #include "oxygenserver/server/Server.h"
+#include "oxygenserver/server/CrashHandler.h"
 #include "oxygenserver/Configuration.h"
 
 
@@ -63,6 +64,9 @@ int main(int argc, char** argv)
 
 	// Make sure we're in the correct working directory
 	changeWorkingDirectory(argc == 0 ? "" : argv[0]);
+
+	// Setup crash handling
+	CrashHandler::initializeCrashHandler();
 
 	randomize();
 	rmx::Logging::addLogger(*new rmx::StdCoutLogger(true));
