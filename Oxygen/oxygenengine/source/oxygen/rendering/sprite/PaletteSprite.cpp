@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/sprite/PaletteSprite.h"
+#include "oxygen/drawing/software/Blitter.h"
 
 
 namespace
@@ -167,44 +168,6 @@ void PaletteSprite::createFromSpritePatterns(const std::vector<RenderUtils::Sing
 
 	// Fill
 	RenderUtils::blitSpritePatterns(mBitmap, -minX, -minY, patterns);
-}
-
-void PaletteSprite::blitInto(PaletteBitmap& output, const Vec2i& position) const
-{
-	int px = position.x + mOffset.x;
-	int py = position.y + mOffset.y;
-
-	const int minX = std::max<int>(0, -px);
-	const int maxX = std::min<int>(mBitmap.mWidth, output.mWidth - px);
-	const int minY = std::max<int>(0, -py);
-	const int maxY = std::min<int>(mBitmap.mHeight, output.mHeight - py);
-
-	for (int iy = minY; iy < maxY; ++iy)
-	{
-		const uint8* src = &mBitmap.mData[minX + iy * mBitmap.mWidth];
-		uint8* dst = &output.mData[(px + minX) + (py + iy) * output.mWidth];
-
-		for (int ix = minX; ix < maxX; ++ix)
-		{
-			// Check for transparency
-			if (*src & 0x0f)
-			{
-				*dst = *src;
-			}
-			++src;
-			++dst;
-		}
-	}
-}
-
-void PaletteSprite::blitInto(Bitmap& output, const Vec2i& position, const uint32* palette, const BlitOptions& blitOptions) const
-{
-	// We are converting the palette bitmap to RGBA, so we can use the same functionality as for component sprites
-	static Bitmap tempBitmap;
-	static int tempBitmapSize = 0;
-	applyPalette(tempBitmap, tempBitmapSize, blitOptions.mUseUpscaledSprite ? getUpscaledBitmap() : mBitmap, palette);
-
-	SpriteBase::blitInto(output, tempBitmap, position, blitOptions);
 }
 
 const PaletteBitmap& PaletteSprite::getUpscaledBitmap() const

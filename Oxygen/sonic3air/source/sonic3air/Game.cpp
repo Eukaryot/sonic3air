@@ -757,10 +757,10 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 					global::mFont3Pure.printBitmap(textBitmap, dummy, Recti(0, 0, 16, 16), rmx::hexString(angle, 2, ""));
 
 					Blitter::Options blitterOptions;
-					blitterOptions.mUseAlphaBlending = true;
-					BitmapWrapper destBitmap(bitmap);
-					BitmapWrapper sourceBitmap(textBitmap);
-					Blitter::blitBitmap(destBitmap, Vec2i(screenX+4, screenY+5), sourceBitmap, Recti(0, 0, textBitmap.getWidth(), textBitmap.getHeight()), blitterOptions);
+					blitterOptions.mBlendMode = BlendMode::ALPHA;
+
+					static Blitter blitter;
+					blitter.blitSprite(Blitter::OutputWrapper(bitmap), Blitter::SpriteWrapper(textBitmap, Vec2i()), Vec2i(screenX+4, screenY+5), blitterOptions);
 				}
 			}
 		}

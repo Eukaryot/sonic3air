@@ -24,6 +24,9 @@
     <ClInclude Include="..\..\source\oxygenserver\subsystems\UpdateCheck.h">
       <Filter>subsystems</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygenserver\server\CrashHandler.h">
+      <Filter>server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygenserver\main_server.cpp" />
@@ -43,6 +46,9 @@
     <ClCompile Include="..\..\source\oxygenserver\Configuration.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\subsystems\UpdateCheck.cpp">
       <Filter>subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygenserver\server\CrashHandler.cpp">
+      <Filter>server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

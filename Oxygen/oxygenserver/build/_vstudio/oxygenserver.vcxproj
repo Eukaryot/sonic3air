@@ -181,6 +181,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygenserver\Configuration.h" />
     <ClInclude Include="..\..\source\oxygenserver\pch.h" />
+    <ClInclude Include="..\..\source\oxygenserver\server\CrashHandler.h" />
     <ClInclude Include="..\..\source\oxygenserver\server\Server.h" />
     <ClInclude Include="..\..\source\oxygenserver\server\ServerNetConnection.h" />
     <ClInclude Include="..\..\source\oxygenserver\subsystems\Channels.h" />
@@ -198,6 +199,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygenserver\server\CrashHandler.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\server\Server.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\server\ServerNetConnection.cpp" />
     <ClCompile Include="..\..\source\oxygenserver\subsystems\Channels.cpp" />

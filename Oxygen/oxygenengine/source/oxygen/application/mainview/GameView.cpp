@@ -590,14 +590,14 @@ void GameView::render()
 	if (mDebugOutput >= 0)
 	{
 		// Draw a dark background over the full screen
-		drawer.setBlendMode(DrawerBlendMode::NONE);
+		drawer.setBlendMode(BlendMode::OPAQUE);
 		drawer.drawRect(FTX::screenRect(), Color(0.15f, 0.15f, 0.15f));
 		drawer.performRendering();
 
 		videoOut.renderDebugDraw(mDebugOutput, mRect);
 
 		// Enable alpha again for the UI
-		drawer.setBlendMode(DrawerBlendMode::ALPHA);
+		drawer.setBlendMode(BlendMode::ALPHA);
 		drawer.performRendering();
 
 		// No "GuiBase::render()" call here, as this would e.g. draw menus on top (and in wrong resolutions)
@@ -606,7 +606,7 @@ void GameView::render()
 
 	// Here goes the real rendering
 	drawer.setRenderTarget(mFinalGameTexture, gameScreenRect);
-	drawer.setBlendMode(DrawerBlendMode::NONE);
+	drawer.setBlendMode(BlendMode::OPAQUE);
 
 	// Simple mirror mode implementation: Just mirror the whole screen
 	if (Configuration::instance().mMirrorMode)
@@ -620,7 +620,7 @@ void GameView::render()
 	}
 
 	// Enable alpha for the UI
-	drawer.setBlendMode(DrawerBlendMode::ALPHA);
+	drawer.setBlendMode(BlendMode::ALPHA);
 
 	// Debug visualizations
 	if (mDebugVisualizationsEnabled)
@@ -711,7 +711,7 @@ void GameView::render()
 
 	// Draw the combined image
 	drawer.setWindowRenderTarget(FTX::screenRect());
-	drawer.setBlendMode(DrawerBlendMode::NONE);
+	drawer.setBlendMode(BlendMode::OPAQUE);
 	drawer.drawUpscaledRect(mGameViewport, mFinalGameTexture);
 
 	if (!FTX::Video->getVideoConfig().mAutoClearScreen)
@@ -732,7 +732,7 @@ void GameView::render()
 
 	// Enable alpha again
 	// TODO: Better do the fading inside the game viewport (instead of the full window) for performance reasons -- or apply to "drawUpscaledRect"
-	drawer.setBlendMode(DrawerBlendMode::ALPHA);
+	drawer.setBlendMode(BlendMode::ALPHA);
 	if (mFadeValue < 1.0f)
 	{
 		drawer.drawRect(FTX::screenRect(), Color(0.0f, 0.0f, 0.0f, 1.0f - mFadeValue));

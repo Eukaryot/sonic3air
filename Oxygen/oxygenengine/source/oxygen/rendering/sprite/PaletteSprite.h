@@ -23,9 +23,6 @@ public:
 	void createFromBitmap(const PaletteBitmap& bitmap, const Recti& sourceRect, const Vec2i& offset);
 	void createFromSpritePatterns(const std::vector<RenderUtils::SinglePattern>& patterns);
 
-	void blitInto(PaletteBitmap& output, const Vec2i& position) const;
-	void blitInto(Bitmap& output, const Vec2i& position, const uint32* palette, const BlitOptions& blitOptions = BlitOptions()) const;
-
 	inline PaletteBitmap& accessBitmap()  { return mBitmap; }
 	inline const PaletteBitmap& getBitmap() const  { return mBitmap; }
 	const PaletteBitmap& getUpscaledBitmap() const;

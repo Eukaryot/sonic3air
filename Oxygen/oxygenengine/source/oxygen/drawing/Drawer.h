@@ -53,9 +53,9 @@ public:
 
 	void setRenderTarget(DrawerTexture& texture, const Recti& rect);
 	void setWindowRenderTarget(const Recti& rect);
-	void setBlendMode(DrawerBlendMode blendMode);
-	void setSamplingMode(DrawerSamplingMode samplingMode);
-	void setWrapMode(DrawerWrapMode wrapMode);
+	void setBlendMode(BlendMode blendMode);
+	void setSamplingMode(SamplingMode samplingMode);
+	void setWrapMode(TextureWrapMode wrapMode);
 
 	void drawRect(const Rectf& rect, const Color& color);
 	void drawRect(const Rectf& rect, DrawerTexture& texture);

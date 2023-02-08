@@ -175,14 +175,14 @@ void BackdropView::render()
 		const Vec2f animationOffset(mAnimationTime * 1.0f, mAnimationTime * 0.1f);
 
 		Drawer& drawer = EngineMain::instance().getDrawer();
-		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
-		drawer.setWrapMode(DrawerWrapMode::REPEAT);
+		drawer.setSamplingMode(SamplingMode::BILINEAR);
+		drawer.setWrapMode(TextureWrapMode::REPEAT);
 		for (const Recti& rect : mRenderRects)
 		{
 			const Vec2f uv0 = (Vec2f(rect.getPos() - center) + animationOffset) / textureSize / scaling;
 			const Vec2f uv1 = (Vec2f(rect.getPos() + rect.getSize() - center) + animationOffset) / textureSize / scaling;
 			drawer.drawRect(rect, mBackdropTexture, uv0, uv1, Color(mColorMultiplier, mColorMultiplier, mColorMultiplier));
 		}
-		drawer.setWrapMode(DrawerWrapMode::CLAMP);
+		drawer.setWrapMode(TextureWrapMode::CLAMP);
 	}
 }

@@ -21,20 +21,17 @@ public:
 		const Recti* mTargetRect = nullptr;
 		const float* mTransform = nullptr;
 		const float* mInvTransform = nullptr;
-		const uint8* mDepthBuffer = nullptr;
+		uint8* mDepthBuffer = nullptr;
 		uint8 mDepthValue = 0;
 		bool mIgnoreAlpha = false;
-		const Vec4f* mTintColor = nullptr;
-		const Vec4f* mAddedColor = nullptr;
+		const Color* mTintColor = nullptr;
+		const Color* mAddedColor = nullptr;
 		bool mUseUpscaledSprite = false;
 	};
 
 public:
 	virtual Vec2i getSize() const = 0;
 
-protected:
-	void blitInto(Bitmap& output, const Bitmap& input, const Vec2i& position, const BlitOptions& blitOptions) const;
-
 public:
-	Vec2i mOffset;		// Offset of upper left corner relative to pivot
+	Vec2i mOffset;		// Offset of upper left corner relative to pivot (i.e. it's usually negative coordinates)
 };

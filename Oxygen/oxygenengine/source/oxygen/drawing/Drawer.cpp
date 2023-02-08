@@ -70,17 +70,17 @@ void Drawer::setWindowRenderTarget(const Recti& rect)
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWindowRenderTargetDrawCommands.createObject(rect));
 }
 
-void Drawer::setBlendMode(DrawerBlendMode blendMode)
+void Drawer::setBlendMode(BlendMode blendMode)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetBlendModeDrawCommands.createObject(blendMode));
 }
 
-void Drawer::setSamplingMode(DrawerSamplingMode samplingMode)
+void Drawer::setSamplingMode(SamplingMode samplingMode)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetSamplingModeDrawCommands.createObject(samplingMode));
 }
 
-void Drawer::setWrapMode(DrawerWrapMode wrapMode)
+void Drawer::setWrapMode(TextureWrapMode wrapMode)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSetWrapModeDrawCommands.createObject(wrapMode));
 }

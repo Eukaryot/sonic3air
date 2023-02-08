@@ -28,8 +28,8 @@ public:
 	GLuint getFrameBufferHandle();
 
 public:
-	DrawerSamplingMode mSamplingMode = DrawerSamplingMode::POINT;
-	DrawerWrapMode mWrapMode = DrawerWrapMode::CLAMP;
+	SamplingMode mSamplingMode = SamplingMode::POINT;
+	TextureWrapMode mWrapMode = TextureWrapMode::CLAMP;
 
 private:
 	OpenGLTexture mTexture;

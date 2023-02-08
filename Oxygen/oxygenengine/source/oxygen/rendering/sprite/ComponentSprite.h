@@ -16,8 +16,6 @@ class ComponentSprite : public SpriteBase
 public:
 	void clear();
 
-	void blitInto(Bitmap& output, const Vec2i& position, const BlitOptions& blitOptions = BlitOptions()) const;
-
 	inline const Bitmap& getBitmap() const  { return mBitmap; }
 	inline Bitmap& accessBitmap()  { return mBitmap; }
 

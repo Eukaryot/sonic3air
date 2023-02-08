@@ -9,28 +9,11 @@
 #pragma once
 
 #include <rmxbase.h>
+#include "oxygen/rendering/RenderingDefinitions.h"
 
 class DrawerTexture;
 class DrawCommandFactory;
 
-
-enum class DrawerBlendMode
-{
-	NONE,
-	ALPHA
-};
-
-enum class DrawerSamplingMode
-{
-	POINT,
-	BILINEAR
-};
-
-enum class DrawerWrapMode
-{
-	CLAMP,
-	REPEAT
-};
 
 struct DrawerMeshVertex		// TODO: Rename to "DrawerMeshVertex_P2_T2" to be more specific here
 {
@@ -190,10 +173,10 @@ class SetBlendModeDrawCommand final : public DrawCommand
 friend class ObjectPoolBase<SetBlendModeDrawCommand>;
 
 protected:
-	SetBlendModeDrawCommand(DrawerBlendMode blendMode) : DrawCommand(Type::SET_BLEND_MODE), mBlendMode(blendMode) {}
+	SetBlendModeDrawCommand(BlendMode blendMode) : DrawCommand(Type::SET_BLEND_MODE), mBlendMode(blendMode) {}
 
 public:
-	DrawerBlendMode mBlendMode;
+	BlendMode mBlendMode;
 };
 
 
@@ -202,10 +185,10 @@ class SetSamplingModeDrawCommand final : public DrawCommand
 	friend class ObjectPoolBase<SetSamplingModeDrawCommand>;
 
 protected:
-	SetSamplingModeDrawCommand(DrawerSamplingMode samplingMode) : DrawCommand(Type::SET_SAMPLING_MODE), mSamplingMode(samplingMode) {}
+	SetSamplingModeDrawCommand(SamplingMode samplingMode) : DrawCommand(Type::SET_SAMPLING_MODE), mSamplingMode(samplingMode) {}
 
 public:
-	DrawerSamplingMode mSamplingMode;
+	SamplingMode mSamplingMode;
 };
 
 
@@ -214,10 +197,10 @@ class SetWrapModeDrawCommand final : public DrawCommand
 	friend class ObjectPoolBase<SetWrapModeDrawCommand>;
 
 protected:
-	SetWrapModeDrawCommand(DrawerWrapMode wrapMode) : DrawCommand(Type::SET_WRAP_MODE), mWrapMode(wrapMode) {}
+	SetWrapModeDrawCommand(TextureWrapMode wrapMode) : DrawCommand(Type::SET_WRAP_MODE), mWrapMode(wrapMode) {}
 
 public:
-	DrawerWrapMode mWrapMode;
+	TextureWrapMode mWrapMode;
 };
 
 

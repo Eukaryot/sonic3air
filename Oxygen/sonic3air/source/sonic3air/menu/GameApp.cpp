@@ -173,10 +173,10 @@ void GameApp::render()
 		}
 
 		const Rectf rect = RenderUtils::getLetterBoxRect(FTX::screenRect(), (float)mDisclaimerTexture.getWidth() / (float)mDisclaimerTexture.getHeight());
-		drawer.setBlendMode(DrawerBlendMode::NONE);
-		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
+		drawer.setBlendMode(BlendMode::OPAQUE);
+		drawer.setSamplingMode(SamplingMode::BILINEAR);
 		drawer.drawRect(rect, mDisclaimerTexture, getVisibilityColor(mStateTimeout, 8.0f, 0.8f, 0.5f));
-		drawer.setSamplingMode(DrawerSamplingMode::POINT);
+		drawer.setSamplingMode(SamplingMode::POINT);
 		drawer.performRendering();
 	}
 

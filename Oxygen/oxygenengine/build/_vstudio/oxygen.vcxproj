@@ -64,6 +64,7 @@
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\Upscaler.cpp" />
+    <ClCompile Include="..\..\source\oxygen\drawing\software\BlitterOld.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.cpp" />
@@ -106,7 +107,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.cpp" />
-    <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteBase.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteDump.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\BufferTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\rendering\utils\Kosinski.cpp" />
@@ -180,6 +180,8 @@
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\Upscaler.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterOld.h" />
+    <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterHelper.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.h" />
@@ -220,6 +222,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\parts\SpacesManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\parts\SpriteManager.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\Renderer.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\RenderingDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\RenderResources.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.h" />

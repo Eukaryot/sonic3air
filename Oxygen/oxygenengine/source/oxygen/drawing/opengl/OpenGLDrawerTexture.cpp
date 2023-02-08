@@ -15,8 +15,8 @@ void OpenGLDrawerTexture::updateFromBitmap(const Bitmap& bitmap)
 	mTexture.loadBitmap(bitmap);
 
 	// Need to update these, as "loadBitmap" changed the OpenGL texture parameters
-	mSamplingMode = DrawerSamplingMode::POINT;
-	mWrapMode = DrawerWrapMode::CLAMP;
+	mSamplingMode = SamplingMode::POINT;
+	mWrapMode = TextureWrapMode::CLAMP;
 }
 
 void OpenGLDrawerTexture::setupAsRenderTarget(const Vec2i& size, DrawerTexture& owner)

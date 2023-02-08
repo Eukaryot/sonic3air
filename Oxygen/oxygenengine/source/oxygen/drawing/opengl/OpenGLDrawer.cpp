@@ -121,7 +121,7 @@ namespace opengldrawer
 
 			// Setup OpenGL defaults
 			RMX_LOG_INFO("Setting OpenGL defaults...");
-			setBlendMode(DrawerBlendMode::NONE);
+			setBlendMode(BlendMode::OPAQUE);
 
 			// Startup OpenGL drawer resources, including quad VAO and some basic shaders
 			RMX_LOG_INFO("OpenGL drawer resources startup");
@@ -168,18 +168,18 @@ namespace opengldrawer
 			return !mInvalidScissorRegion;
 		}
 
-		void setBlendMode(DrawerBlendMode blendMode)
+		void setBlendMode(BlendMode blendMode)
 		{
 			mCurrentBlendMode = blendMode;
 			switch (blendMode)
 			{
-				case DrawerBlendMode::NONE:
+				case BlendMode::OPAQUE:
 				{
 					glDisable(GL_BLEND);
 					glBlendFunc(GL_ONE, GL_ZERO);
 					break;
 				}
-				case DrawerBlendMode::ALPHA:
+				case BlendMode::ALPHA:
 				{
 					glEnable(GL_BLEND);
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -192,13 +192,13 @@ namespace opengldrawer
 		{
 			switch (mCurrentSamplingMode)
 			{
-				case DrawerSamplingMode::POINT:
+				case SamplingMode::POINT:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 					break;
 				}
-				case DrawerSamplingMode::BILINEAR:
+				case SamplingMode::BILINEAR:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -211,13 +211,13 @@ namespace opengldrawer
 		{
 			switch (mCurrentWrapMode)
 			{
-				case DrawerWrapMode::CLAMP:
+				case TextureWrapMode::CLAMP:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 					break;
 				}
-				case DrawerWrapMode::REPEAT:
+				case TextureWrapMode::REPEAT:
 				{
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -264,7 +264,7 @@ namespace opengldrawer
 
 				if (uv0.x == 0.0f && uv0.y == 0.0f && uv1.x == 1.0f && uv1.y == 1.0f)
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mCurrentBlendMode == DrawerBlendMode::ALPHA);
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mCurrentBlendMode == BlendMode::ALPHA);
 					shader.bind();
 					shader.setParam("Transform", rectParam);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
@@ -275,7 +275,7 @@ namespace opengldrawer
 				}
 				else
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mCurrentBlendMode == DrawerBlendMode::ALPHA);
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mCurrentBlendMode == BlendMode::ALPHA);
 					shader.bind();
 					shader.setParam("Transform", rectParam);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
@@ -357,9 +357,9 @@ namespace opengldrawer
 		Recti mCurrentViewport;
 		Vec4f mPixelToViewSpaceTransform;	// Transformation from pixel-based coordinates view space, in the form: (x, y) = offset; (z, w) = scale
 
-		DrawerBlendMode mCurrentBlendMode = DrawerBlendMode::NONE;
-		DrawerSamplingMode mCurrentSamplingMode = DrawerSamplingMode::POINT;
-		DrawerWrapMode mCurrentWrapMode = DrawerWrapMode::CLAMP;
+		BlendMode mCurrentBlendMode = BlendMode::OPAQUE;
+		SamplingMode mCurrentSamplingMode = SamplingMode::POINT;
+		TextureWrapMode mCurrentWrapMode = TextureWrapMode::CLAMP;
 
 		std::vector<Recti> mScissorStack;
 		bool mInvalidScissorRegion = false;

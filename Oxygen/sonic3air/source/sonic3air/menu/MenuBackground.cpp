@@ -211,8 +211,8 @@ void MenuBackground::render()
 	}
 
 	// Separators
-	drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
-	drawer.setWrapMode(DrawerWrapMode::REPEAT);
+	drawer.setSamplingMode(SamplingMode::BILINEAR);
+	drawer.setWrapMode(TextureWrapMode::REPEAT);
 	{
 		const float separatorAnimationOffset = -mAnimationTimer * 3.0f;
 
@@ -231,8 +231,8 @@ void MenuBackground::render()
 			detail::drawSeparator(drawer, splitAlter, separatorAnimationOffset, true);
 		}
 	}
-	drawer.setSamplingMode(DrawerSamplingMode::POINT);
-	drawer.setWrapMode(DrawerWrapMode::CLAMP);
+	drawer.setSamplingMode(SamplingMode::POINT);
+	drawer.setWrapMode(TextureWrapMode::CLAMP);
 
 	if (mPreviewVisibility > 0.0f)
 	{

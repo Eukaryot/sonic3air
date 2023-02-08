@@ -6,12 +6,26 @@
 *	or https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
-#include "oxygen/pch.h"
-#include "oxygen/rendering/sprite/ComponentSprite.h"
-#include "oxygen/drawing/software/Blitter.h"
+#pragma once
 
 
-void ComponentSprite::clear()
+enum class SamplingMode
 {
-	mBitmap.clear(0);
-}
+	POINT,
+	BILINEAR
+};
+
+enum class TextureWrapMode
+{
+	CLAMP,
+	REPEAT
+};
+
+enum class BlendMode
+{
+	OPAQUE,
+	ALPHA,
+	ONE_BIT,
+	ADDITIVE,
+	MULTIPLICATIVE
+};

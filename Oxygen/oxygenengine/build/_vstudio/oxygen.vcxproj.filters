@@ -265,9 +265,6 @@
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.cpp">
       <Filter>drawing\software</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp">
-      <Filter>drawing\software</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.cpp">
       <Filter>application\overlays</Filter>
     </ClCompile>
@@ -367,9 +364,6 @@
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.cpp">
       <Filter>rendering\sprite</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteBase.cpp">
-      <Filter>rendering\sprite</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\sprite\SpriteDump.cpp">
       <Filter>rendering\sprite</Filter>
     </ClCompile>
@@ -414,6 +408,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.cpp">
       <Filter>rendering\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\software\BlitterOld.cpp">
+      <Filter>drawing\software</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp">
+      <Filter>drawing\software</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -610,9 +610,6 @@
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h">
       <Filter>drawing\software</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h">
-      <Filter>drawing\software</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\oxygen\application\overlays\DebugSidePanelCategory.h">
       <Filter>application\overlays</Filter>
     </ClInclude>
@@ -768,6 +765,18 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\opengl\shaders\OpenGLShader.h">
       <Filter>rendering\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterOld.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterHelper.h">
+      <Filter>drawing\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\RenderingDefinitions.h">
+      <Filter>rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

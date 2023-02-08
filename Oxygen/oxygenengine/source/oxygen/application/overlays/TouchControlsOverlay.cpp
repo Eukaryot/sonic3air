@@ -202,7 +202,7 @@ void TouchControlsOverlay::render()
 	// Render visual elements
 	if (alpha > 0.0f)
 	{
-		drawer.setSamplingMode(DrawerSamplingMode::BILINEAR);
+		drawer.setSamplingMode(SamplingMode::BILINEAR);
 		for (VisualElement& visualElement : mVisualElements)
 		{
 			// Skip game rec button is game recording is disabled
@@ -226,7 +226,7 @@ void TouchControlsOverlay::render()
 			const Vec2f scale = rect.getSize() / Vec2f(item->mSprite->getSize());
 			drawer.drawSprite(rect.getPos() + rect.getSize() / 2, spriteKey, color, scale);
 		}
-		drawer.setSamplingMode(DrawerSamplingMode::POINT);
+		drawer.setSamplingMode(SamplingMode::POINT);
 	}
 }
 

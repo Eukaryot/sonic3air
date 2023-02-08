@@ -26,7 +26,7 @@ public:
 	};
 
 public:
-	SoftwareRasterizer(BitmapWrapper& output, const Blitter::Options& options) : mOutput(output), mOptions(options) {}
+	SoftwareRasterizer(BitmapViewMutable<uint32>& output, const Blitter::Options& options) : mOutput(output), mOptions(options) {}
 
 	void drawTriangle(const Vertex_P2_T2* vertices, const Bitmap& texture);
 	void drawTriangle(const Vertex_P2_C4* vertices);
@@ -36,6 +36,6 @@ private:
 	void drawTrapezoid(const Vertex_P2_C4& vertex00, const Vertex_P2_C4& vertex10, const Vertex_P2_C4& vertex01, const Vertex_P2_C4& vertex11);
 
 private:
-	BitmapWrapper& mOutput;
+	BitmapViewMutable<uint32>& mOutput;
 	Blitter::Options mOptions;
 };

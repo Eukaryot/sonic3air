@@ -24,6 +24,8 @@ public:
 
 	const uint32* getPalette(int paletteIndex) const;
 	void getPalette(Color* palette, int paletteIndex) const;
+	inline uint16 getPaletteSize(int paletteIndex) const  { return NUM_COLORS; }
+
 	Color getPaletteEntry(int paletteIndex, uint16 colorIndex) const;
 	uint16 getPaletteEntryPacked(int paletteIndex, uint16 colorIndex, bool allowExtendedPacked = false) const;
 	void writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color);

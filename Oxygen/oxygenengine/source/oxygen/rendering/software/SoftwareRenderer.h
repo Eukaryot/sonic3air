@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oxygen/rendering/Renderer.h"
+#include "oxygen/drawing/software/Blitter.h"
 
 class PlaneGeometry;
 class SpriteGeometry;
@@ -72,4 +73,6 @@ private:
 	};
 	static const constexpr int MAX_BUFFER_PLANE_DATA = 8;
 	BufferedPlaneData mBufferedPlaneData[MAX_BUFFER_PLANE_DATA];
+
+	Blitter mBlitter;
 };

@@ -133,8 +133,6 @@ void SoftwareRasterizer::drawTriangle(const Vertex_P2_C4* vertices)
 
 void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Vertex_P2_T2& vertex10, const Vertex_P2_T2& vertex01, const Vertex_P2_T2& vertex11, const Bitmap& texture)
 {
-	const bool useBilinearSampling = mOptions.mUseBilinearSampling;
-
 	const float startY = vertex00.mPosition.y;	// Can be assumed to be the same as vertex10.mPosition.y
 	const float endY = vertex01.mPosition.y;	// Can be assumed to be the same as vertex11.mPosition.y
 
@@ -183,10 +181,10 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 			const Vec2f diffUV = (vertexRight.mUV - vertexLeft.mUV) / std::max(vertexRight.mPosition.x - vertexLeft.mPosition.x, 1.0f);
 			Vec2f currentUV = vertexLeft.mUV + diffUV * ((float)(minX) - vertexLeft.mPosition.x);
 
-			if (mOptions.mUseAlphaBlending)
+			if (mOptions.mBlendMode == BlendMode::ALPHA)
 			{
 				uint8* bytes = (uint8*)data;
-				if (!useBilinearSampling)
+				if (mOptions.mSamplingMode == SamplingMode::POINT)
 				{
 					for (int x = minX; x <= maxX; ++x)
 					{
@@ -279,8 +277,6 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_T2& vertex00, const Verte
 
 void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Vertex_P2_C4& vertex10, const Vertex_P2_C4& vertex01, const Vertex_P2_C4& vertex11)
 {
-	const bool useBilinearSampling = mOptions.mUseBilinearSampling;
-
 	const float startY = vertex00.mPosition.y;	// Can be assumed to be the same as vertex10.mPosition.y
 	const float endY = vertex01.mPosition.y;	// Can be assumed to be the same as vertex11.mPosition.y
 
@@ -339,7 +335,7 @@ void SoftwareRasterizer::drawTrapezoid(const Vertex_P2_C4& vertex00, const Verte
 				currentColor[k] = vertexLeft.mColor[k] + diffColor[k] * factor2;
 			}
 
-			if (mOptions.mUseAlphaBlending)
+			if (mOptions.mBlendMode == BlendMode::ALPHA)
 			{
 				uint8* bytes = (uint8*)data;
 				for (int x = minX; x <= maxX; ++x)
