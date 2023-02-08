@@ -231,6 +231,8 @@ function void fn082c6a()
 
 
 
+// The Master Emerald in the giant Egg Robo's hands
+
 //# address-hook(0x081cc6) end(0x081d0c)
 function void fn081cc6()
 {
@@ -240,9 +242,9 @@ function void fn081cc6()
 	u8[A0 + 0x3c] = u8[A0 + 0x43]
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u16[A0 + 0x44] = u16[A1 + 0x46]
-	A1 = 0xffffffb2
-	D0 = 0x03
-	D1 = 0x06
+	A1 = 0xffffffb2		// Start of emerald collection states
+	D0 = 0x03			// Super Emerald collected state
+	D1 = 6				// Number of emeralds
 	while (D1.s16 >= 0)
 	{
 		if (D0.u8 != u8[(A1+=1)-1])
@@ -313,7 +315,7 @@ function void fn081d72()
 		return
 
 	// "spawnChildObjects(0x08327a)" replaced by:
-	spawnChildObject(0x081cc6, 0x00, 28, -4)
+	spawnChildObject(0x081cc6, 0x00, 28, -4)		// The Master Emerald
 }
 
 

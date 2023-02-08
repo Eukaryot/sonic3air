@@ -80,7 +80,7 @@ function void fn0181e8()
 	}
 	else
 	{
-		if (u16[0xfffff7c8] != 0)
+		if (level.HCZ_water_current_flags.both != 0)
 		{
 			u16[A0 + 0x34] += 4
 		}

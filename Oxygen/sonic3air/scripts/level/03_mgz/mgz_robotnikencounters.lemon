@@ -22,11 +22,11 @@ function void fn06bf2a()
 	objA0.subtype2c = 0
 	playMusic(MUSIC_CTRL_FADEOUT)
 
-	Kosinski.addToDMAQueue(0x36b340, 0x67e0)
+	Kosinski.addToDMAQueue(0x36b340, 0x67e0)		// Boss sprites
 
-	Kosinski.addToDMAQueue(0x36d572, 0x8bc0)
+	Kosinski.addToDMAQueue(0x36d572, 0x8bc0)		// Falling debris sprites
 
-	requestLoadingPatterns(0x6d)
+	requestLoadingPatterns(0x6d)		// Robotnik's ship, boss explosions, and capsule sprites
 	loadPaletteLine1(0x06d97c)
 }
 
@@ -188,12 +188,12 @@ function void fn06c200()
 	Kosinski.addToDMAQueue(0x3c3ebe, 0x0000)
 	Kosinski.addToDMAQueue(0x3ca132, 0x4a40)
 
-	requestLoadingPatterns(0x14)
+	requestLoadingPatterns(0x14)		// MGZ2 object sprites
 
-	Kosinski.addToDMAQueue(0x36e0c4, 0xa600)
-	Kosinski.addToDMAQueue(0x36e2d6, 0xa9e0)
+	Kosinski.addToDMAQueue(0x36e0c4, 0xa600)		// Spiker badnik sprites
+	Kosinski.addToDMAQueue(0x36e2d6, 0xa9e0)		// Mantis sprites
 
-	addPatternLoadingCue(0x083d3a)
+	addPatternLoadingCue(0x083d3a)		// Some common object sprites
 
 	loadPaletteLine1(0x0a8f5c)
 

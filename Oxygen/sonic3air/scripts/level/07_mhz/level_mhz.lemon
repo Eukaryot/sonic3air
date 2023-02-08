@@ -146,6 +146,7 @@ function void UpdateLevelScrolling.MHZ1()
 {
 	if (u16[0xffffeec6] != 0)
 	{
+		// Go to Mushroom Hill Act 2
 		u16[0xffffeec6] = 0
 
 		push(A3)
@@ -153,7 +154,7 @@ function void UpdateLevelScrolling.MHZ1()
 		push(A0)
 		push(D7)
 
-		requestLoadingPatterns(0x28)
+		requestLoadingPatterns(0x28)		// MHZ2 object sprites
 
 		global.zone_act = 0x0701
 		camera.update_routine = 0
@@ -1373,8 +1374,8 @@ function void fn05560c()
 
 function void fn0556b8()
 {
-	if (u8[A1 + 0x20] == char.state.STANDING)
-		u8[A1 + 0x20] = char.state.RUNNING
+	if (objA1.state == char.state.STANDING)
+		objA1.state = char.state.RUNNING
 
 	// Check against left / right movement bounds
 	D0.u16 += 0x18

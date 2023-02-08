@@ -29,7 +29,7 @@ function void fn06e488()
 	objA0.value26 = MUSIC_MAINBOSS
 	StartBossFight()
 
-	requestLoadingPatterns(0x6e)
+	requestLoadingPatterns(0x6e)		// Boss sprites
 	loadPaletteLine1(0x06ee48)
 }
 
@@ -352,7 +352,7 @@ function void fn06e778()
 #endif
 	{
 		objA0.update_address = 0x06e7b6
-		Kosinski.addToDMAQueue(0x0db406, 0xb400)
+		Kosinski.addToDMAQueue(0x0db406, 0xb400)		// Explosion smoke sprites
 
 		if (allocDynamicObjectStd())
 		{
@@ -420,7 +420,7 @@ function void fn06e80c()
 		return
 #endif
 
-	TriggerNextZone(0x0500)
+	TriggerNextZone(0x0500)		// IceCap Zone
 	fn0852ae()
 }
 

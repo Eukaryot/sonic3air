@@ -18,6 +18,9 @@ function void fn07b288()
 	// Targets:
 	//  - 0x07b2dc	-> objA0.base_state = 0x00  -> Initialization
 	//  - 0x07b3ac	-> objA0.base_state = 0x02  -> Waiting for the fight to start
+	//  - 0x07b3e6	-> objA0.base_state = 0x04  -> Dashing through the screen before the fight starts
+	//  - 0x07b416	-> objA0.base_state = 0x06  -> Countdown to float back in
+	//  - 0x07b44a	-> objA0.base_state = 0x08  -> Floating back in position again, rolled up
 	//  - 0x07b478	-> objA0.base_state = 0x0a  -> Rolling in mid-air
 	//  - 0x07b4da	-> objA0.base_state = 0x0c  -> Unfolding and turning around in mid-air while falling down
 	//  - 0x07b53e	-> objA0.base_state = 0x0e  -> Hitting the ground, potentially charging backslide
@@ -86,9 +89,9 @@ function void fn07b2dc()
 		objA0.position.y.u16 = camera.position.y.u16 + 0xa0
 	}
 
-	Kosinski.addToDMAQueue(0x17f738, 0x8380)
+	Kosinski.addToDMAQueue(0x17f738, 0x8380)		// Mecha Sonic effects sprites
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 
 	loadPaletteLine1(0x07d850)
 
@@ -565,7 +568,9 @@ function void fn07b81a()
 {
 	//  - 0x07b852	-> objA0.base_state = 0x00  -> Waiting inside the explosions after first defeat
 	//  - 0x07b87c	-> objA0.base_state = 0x02  -> Falling down
-	//  - 0x07b984	-> objA0.base_state = 0x08  -> Sitting there, seemingly defeated
+	//  - 0x07b93e	-> objA0.base_state = 0x04  -> Sitting there, defeated (Sonic/Tails fight)
+	//  - 0x07b972	-> objA0.base_state = 0x06
+	//  - 0x07b984	-> objA0.base_state = 0x08  -> Sitting there, seemingly defeated (Knuckles fight)
 	//  - 0x07b9d2	-> objA0.base_state = 0x0a  -> Rebooting for part two
 	//  - 0x07b9fa	-> objA0.base_state = 0x0c  -> Getting up again
 	//  - 0x07ba28	-> objA0.base_state = 0x0e  -> Charging his backslide to get to the Master Emerald
@@ -645,7 +650,7 @@ function void fn07b888()
 		{
 			objA0.flags38 |= 0x20
 			objA0.base_state = 0x08
-			objA0.countdown_value = 0xbf
+			objA0.countdown_value = 191
 			objA0.countdown_callback = 0x07b996
 			playMusic(MUSIC_CTRL_FADEOUT)
 			player2.control_override = 0xff

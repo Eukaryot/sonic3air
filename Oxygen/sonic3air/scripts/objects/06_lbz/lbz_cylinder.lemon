@@ -86,7 +86,7 @@ function void fn02c3e8()
 					//  -> This is only added to prevent bubble shield bounces, which mess up the character animation
 					s16[A1 + 0x1a] = 0
 				#endif
-					u8[A1 + 0x2d] = 0x80
+					u8[A1 + 0x2d] = 0x80		// Set cylinder walking animation
 					u16[A1 + 0x20] = char.state.RUNNING2
 					if (u16[A1 + 0x1c] == 0)
 					{
@@ -121,11 +121,11 @@ function void fn02c3e8()
 				if (u16[A1 + 0x1c] == 0)
 				{
 					u16[A1 + 0x1c] = 0x01
-					u8[A1 + 0x2d] = 0x81
+					u8[A1 + 0x2d] = 0x81		// Set cylinder standing animation
 				}
 				else
 				{
-					u8[A1 + 0x2d] = 0x80
+					u8[A1 + 0x2d] = 0x80		// Set cylinder walking animation
 				}
 
 				if (D0.s8 < 0)
@@ -154,7 +154,7 @@ function void fn02c3e8()
 		objA0.flags2a &= ~bit
 		objA1.flags2a |= char.flag.IN_AIR
 		objA1.flags2a &= ~char.flag.ON_OBJECT
-		u8[A1 + 0x30] = 0
-		u8[A1 + 0x31] = 0x04
+		u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+		u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	}
 }

@@ -190,7 +190,7 @@ function void fn05ab6e()
 	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u8[0xffffee50] = 0xff
-	u8[0xfffff650] = 0xff
+	level.palettefx.state = 0xff
 	u16[0xffffeec0] += 4
 
 	fn05abc0()
@@ -270,6 +270,7 @@ function void fn05ac70()
 	push(A0)
 	push(D7)
 
+	// Go to AIZ scene in best ending
 	global.zone_act = 0
 	checkpoint.number = 0x01
 	fn01c362()
@@ -277,6 +278,7 @@ function void fn05ac70()
 	global.zone_act = 0x0d01
 	checkpoint.number = 0
 
+	// Load character and level palettes
 	Level.loadNonfadingPaletteData(0x03)
 	Level.loadNonfadingPaletteData(0x2a)
 	copyMemory(0xfffffca0, 0x0a97bc, 0x20)
@@ -354,9 +356,9 @@ function void fn05ad30()
 	}
 
 	global.fade_timer = 0
-	u8[0xfffff650] = 0
-	u16[0xfffff634] = 0
-	u16[0xfffff632] = 0
+	level.palettefx.state = 0
+	level.palettefx.timer_1 = 0
+	level.palettefx.frame_1 = 0
 	u16[0xffffeec0] += 4
 	fn05ad56()
 }
@@ -381,7 +383,7 @@ function void fn05ad56()
 	palette_fade.range = 0x003f
 	u16[0xffffeeda] = 0x15
 	u8[0xffffee50] = 0xff
-	u8[0xfffff650] = 0xff
+	level.palettefx.state = 0xff
 	u16[0xffffeec0] += 4
 
 	fn05ad8e()
@@ -450,10 +452,11 @@ function void fn05ae0a()
 	push(A0)
 	push(D7)
 
+	// Got to the credits scene
 	fn01c362()
 	fn0076a6()
 
-	Level.loadNonfadingPaletteData(0x03)
+	Level.loadNonfadingPaletteData(0x03)		// Sonic's character palette
 
 	copyMemory(0xfffffca0, 0x0a97fc, 0x60)
 	fn05b11c()
@@ -527,9 +530,9 @@ function void fn05aea8()
 	}
 
 	global.fade_timer = 0
-	u8[0xfffff650] = 0
-	u16[0xfffff634] = 0
-	u16[0xfffff632] = 0
+	level.palettefx.state = 0
+	level.palettefx.timer_1 = 0
+	level.palettefx.frame_1 = 0
 	camera.position.y = 0
 	camera.foreground.y = 0
 	u16[0xffffeec0] += 4
@@ -1119,16 +1122,16 @@ function void fn058d3e()
 //# address-hook(0x0592ee) end(0x059318)
 function void fn0592ee()
 {
-	if (u8[0xfffff650] == 0)
+	if (level.palettefx.state == 0)
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 3
-			D0.u16 = u16[0xfffff632] + 4
+			level.palettefx.timer_1 = 3
+			D0.u16 = level.palettefx.frame_1 + 4
 			if (D0.u16 >= 0x38)
 				D0 = 0
-			u16[0xfffff632] = D0.u16
+			level.palettefx.frame_1 = D0.u16
 			u32[0xfffffc76] = u32[0x05931a + D0.s16]
 		}
 	}

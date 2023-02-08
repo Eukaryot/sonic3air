@@ -115,7 +115,7 @@ function void fn039102()
 		u8[A1 + 0x2e] = 0x01
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
-		u8[A1 + 0x20] = char.state.ROLLING
+		objA1.state = char.state.ROLLING
 		u8[A1 + 0x2a] |= char.flag.ROLLING
 		u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		u8[A1 + 0x26] = 0x28

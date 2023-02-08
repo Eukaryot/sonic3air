@@ -173,8 +173,8 @@ function void fn057344()
 	Kosinski.addToDecompressionQueue(0x1cefe4, 0xffff0180)
 	Kosinski.addToDecompressionQueue(0x1ce312, 0xffff90b8)
 
-	Kosinski.addToDMAQueue(0x1ce832, 0x0e60)
-	Kosinski.addToDMAQueue(0x1541b0, 0x6900)
+	Kosinski.addToDMAQueue(0x1ce832, 0x0e60)		// Death Egg, really up close in the outro
+	Kosinski.addToDMAQueue(0x1541b0, 0x6900)		// Spiralling tower
 
 	D7 = pop()
 	A0 = pop()

@@ -68,7 +68,7 @@ function void fn03dcd0()
 
 				u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 				LetSonicClimbOnObject()
-				u8[A1 + 0x2d] = 0x80
+				u8[A1 + 0x2d] = 0x80		// Set counter clockwise corkscrew walking animation going forwards
 
 				u16[A1 + 0x32] = 20
 				if (u16[A1 + 0x1c] < 0x600)
@@ -88,8 +88,8 @@ function void fn03dcd0()
 
 				u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 				LetSonicClimbOnObject()
-				u8[A1 + 0x2d] = 0x80
-				u8[A1 + 0x27] = 0x80	// Set rotation
+				u8[A1 + 0x2d] = 0x80	// Set counter clockwise corkscrew walking animation going backwards
+				u8[A1 + 0x27] = 0x80	// Set x-rotation of character
 
 			#if STANDALONE
 				// Enforce a brief blocking of left/right inputs in any case, so the character can't just stop in between in a somewhat broken hovering state
@@ -129,14 +129,14 @@ function void fn03dcd0()
 					D0.s16 >>= 8
 					D1.u16 += D0.u16
 					objA1.position.y.u16 = D1.u16
-					u8[A1 + 0x27] = D2.u8
+					u8[A1 + 0x27] = D2.u8		// Set x-rotation of character
 				}
 				else
 				{
 					u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 					objA0.flags2a &= ~bit
 					u8[A1 + 0x26] = 0x80
-					u8[A1 + 0x27] = 0
+					u8[A1 + 0x27] = 0		// Reset x-rotation of character
 					u8[A1 + 0x2d] = 0
 					s16[A1 + 0x1c] = -s16[A1 + 0x1c]
 					objA1.velocity.x = -objA1.velocity.x
@@ -148,7 +148,7 @@ function void fn03dcd0()
 				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 				objA0.flags2a &= ~bit
 				u8[A1 + 0x26] = 0
-				u8[A1 + 0x27] = 0
+				u8[A1 + 0x27] = 0		// Reset x-rotation of character
 				u8[A1 + 0x2d] = 0
 			}
 			return
@@ -156,13 +156,13 @@ function void fn03dcd0()
 	}
 	else
 	{
-		u8[A1 + 0x27] = 0
+		u8[A1 + 0x27] = 0		// Reset x-rotation of character
 	}
 
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x30] = 0
-	u8[A1 + 0x31] = 0x04
+	u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	u8[A1 + 0x2d] = 0
 }
 
@@ -208,8 +208,8 @@ function void fn03de80()
 
 					u8[A1 + 0x2a] &= ~0x01
 					LetSonicClimbOnObject()
-					u8[A1 + 0x27] = 0x80
-					u8[A1 + 0x2d] = 0x84
+					u8[A1 + 0x27] = 0x80		// Set x-rotation of character
+					u8[A1 + 0x2d] = 0x84		// Set clockwise corkscrew walking animation going forwards
 
 				#if STANDALONE
 					// Enforce a brief blocking of left/right inputs in any case, so the character can't just stop in between in a somewhat broken hovering state
@@ -235,7 +235,7 @@ function void fn03de80()
 
 					u8[A1 + 0x2a] |= 0x01
 					LetSonicClimbOnObject()
-					u8[A1 + 0x2d] = 0x84
+					u8[A1 + 0x2d] = 0x84		// Set clockwise corkscrew walking animation going backwards
 
 					u16[A1 + 0x32] = 20
 					if (s16[A1 + 0x1c] > -0x600)
@@ -274,14 +274,14 @@ function void fn03de80()
 					objA1.position.y.u16 = D1.u16
 					D2.u8 -= 0x80
 					D2.s8 = -D2.s8
-					u8[A1 + 0x27] = D2.u8
+					u8[A1 + 0x27] = D2.u8		// Set x-rotation of character
 				}
 				else
 				{
 					u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 					objA0.flags2a &= ~bit
 					u8[A1 + 0x26] = 0
-					u8[A1 + 0x27] = 0
+					u8[A1 + 0x27] = 0		// Reset x-rotation of character
 					u8[A1 + 0x2d] = 0
 				}
 			}
@@ -290,7 +290,7 @@ function void fn03de80()
 				u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 				objA0.flags2a &= ~bit
 				u8[A1 + 0x26] = 0x80
-				u8[A1 + 0x27] = 0
+				u8[A1 + 0x27] = 0		// Reset x-rotation of character
 				u8[A1 + 0x2d] = 0
 				s16[A1 + 0x1c] = -s16[A1 + 0x1c]
 				objA1.velocity.x = -objA1.velocity.x
@@ -301,12 +301,12 @@ function void fn03de80()
 	}
 	else
 	{
-		u8[A1 + 0x27] = 0
+		u8[A1 + 0x27] = 0		// Reset x-rotation of character
 	}
 
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x30] = 0
-	u8[A1 + 0x31] = 0x04
+	u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	u8[A1 + 0x2d] = 0
 }

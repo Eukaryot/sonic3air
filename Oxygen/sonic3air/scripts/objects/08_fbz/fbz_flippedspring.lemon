@@ -81,8 +81,8 @@ function void fn03cbce()
 	if (objA0.subtype2c & 0x01)
 	{
 		u8[A1 + 0x20] = 0
-		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1
-		u8[A1 + 0x31] = 0x04
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1		// "char.rotation.x.count"
+		u8[A1 + 0x31] = 0x04									// "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{

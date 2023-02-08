@@ -37,7 +37,7 @@ function void fn068a46()
 	boss.remaining_hits = 6
 	level.boss_encounter = 1
 
-	requestLoadingPatterns(0x5a)
+	requestLoadingPatterns(0x5a)		// Boss sprites
 	loadPaletteLine1(0x06917c)
 
 #if STANDALONE
@@ -1050,7 +1050,7 @@ function void fn068690()
 		level.boss_encounter = 0
 		PlayMusicAfterLevelResults()
 
-		addPatternLoadingCue(0x083d48)
+		addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
 		fn0852ae()
 	}
 }

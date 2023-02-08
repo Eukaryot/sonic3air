@@ -95,7 +95,7 @@ function void fn02d028()
 				// Spawn the checkpoint's spinning head
 				objA1.update_address = addressof(Checkpoint.BaseUpdate)
 				objA1.render_flags = render_flag.WORLD
-				u8[A1 + 0x05] = 0x06
+				objA1.base_state = 0x06
 				objA1.box_size.y = 8
 				objA1.box_size.x = 8
 				objA1.sprite_priority = 0x200
@@ -179,7 +179,7 @@ function void fn02d164()
 	// Use uppermost flag in checkpoint.y for checkpoints where character should face left instead of right
 	if (objA0.subtype2c & 0x80)
 	{
-		checkpoint.number &= 0x7f
+		checkpoint.number &= ~0x80
 		checkpoint.y |= 0x8000
 	}
 #endif
@@ -261,7 +261,7 @@ function void fn02d3c8()
 
 		objA1.update_address = objA0.update_address
 		objA1.render_flags = render_flag.WORLD
-		u8[A1 + 0x05] = 8
+		objA1.base_state = 8
 		objA1.box_size.x = 8
 		objA1.sprite_priority = objA0.sprite_priority
 		objA1.sprite_attributes = 0x05ec
@@ -296,7 +296,7 @@ function void fn02d3c8()
 		// Gumball machine
 		A1 = 0x187bec
 	}
-	Kosinski.addToDMAQueue(A1, 0xbd80)
+	Kosinski.addToDMAQueue(A1, 0xbd80)		// Checkpoint stars sprites
 }
 
 

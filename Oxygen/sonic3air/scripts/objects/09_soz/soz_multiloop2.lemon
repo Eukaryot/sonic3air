@@ -55,7 +55,7 @@ function void fn040474()
 					objA0.flags2a |= bit
 					u8[A1 + 0x1e] = 0x0e
 					u8[A1 + 0x1f] = 0x07
-					u8[A1 + 0x20] = char.state.ROLLING
+					objA1.state = char.state.ROLLING
 					objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING | char.flag.ON_OBJECT)
 					objA1.flags2a &= ~char.flag.CONTROL_LOCK
 					u8[A1 + 0x2f] = 0

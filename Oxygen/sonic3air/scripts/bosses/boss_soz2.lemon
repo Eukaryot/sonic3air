@@ -41,9 +41,9 @@ function void fn07767c()
 	u16[A0 + 0x3a] = objA0.position.y.u16
 	u16[0xfffffa82] = 0xc0
 
-	Kosinski.addToDMAQueue(0x16e1b0, 0x7480)
+	Kosinski.addToDMAQueue(0x16e1b0, 0x7480)		// Boss sprites
 
-	requestLoadingPatterns(0x6d)
+	requestLoadingPatterns(0x6d) // Robotnik's ship, boss explosions, and capsule sprites
 	loadPaletteLine1(0x0784a0)
 	copyMemory(0xfffffc60, 0x0784c0, 0x20)
 
@@ -370,7 +370,7 @@ function void fn077a02()
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
 	{
-		TriggerNextZone(0x0900)
+		TriggerNextZone(0x0900)		// Lava Reef Zone
 		UnloadObject()
 	}
 }
@@ -387,7 +387,7 @@ function void fn077a3e()
 
 	if (objA1.position.x.u16 >= 0x5560)
 	{
-		TriggerNextZone(0x0900)
+		TriggerNextZone(0x0900)		// Lava Reef Zone
 		UnloadObject()
 	}
 }

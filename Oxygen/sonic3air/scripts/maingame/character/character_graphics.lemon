@@ -247,7 +247,7 @@ function void updateSonicAnimation_shared()
 function void updateSonicAnimationRunning()
 {
 	D0 = 0
-	if ((u8[A0 + 0x2d] & 0x80) || char.rotation.x != 0)
+	if ((char.flags2d & 0x80) || char.rotation.x != 0)
 	{
 		updateCharacterAnimationRunning_shared()
 	}
@@ -369,25 +369,25 @@ function void updateSonicAnimationRunning()
 
 function void updateCharacterAnimationRunning_shared()
 {
-	D1.u16 = u8[A0 + 0x2d] & 0x7f
+	D1.u16 = char.flags2d & ~0x80
 	if (D1.u16 != 0)
 	{
 		fn012872()
 		return
 	}
 
+	// Corkscrew walking animation
+	// -> if flag 0x80 is set, it flips sprites vertically and plays animation backwards when facing right.
+	// -> If flag is clear, it does so when facing left
 	D0.u8 = char.rotation.x
 	D1 = 0
 	char.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	if ((char.flags & char.flag.FACING_LEFT) == 0)
 	{
-		if (u8[A0 + 0x2d] & 0x80)
+		if (char.flags2d & 0x80 && global.zone != 0x0b && global.zone != 0x04)
 		{
-			if (global.zone != 0x0b && global.zone != 0x04)
-			{
-				char.render_flags |= render_flag.FLIP_Y
-				D0.s8 = 0x8f - D0.s8
-			}
+			char.render_flags |= render_flag.FLIP_Y
+			D0.s8 = 0x8f - D0.s8
 		}
 		else
 		{
@@ -396,7 +396,7 @@ function void updateCharacterAnimationRunning_shared()
 	}
 	else
 	{
-		if (u8[A0 + 0x2d] & 0x80 && (global.zone == 0x04 || global.zone == 0x0b || global.zone == 0x07))
+		if (char.flags2d & 0x80 && (global.zone == 0x04 || global.zone == 0x0b || global.zone == 0x07))
 		{
 			char.render_flags |= render_flag.FLIP_X
 			D0.u8 += 11
@@ -487,6 +487,7 @@ function void UpdateTailsAnimation_inner()
 			LookupAngleByVector()
 			if (global.zone == 0x15)
 			{
+				// Slot Machine bonus stage
 				D0.u8 += u8[0xffffe400]
 			}
 
@@ -554,6 +555,7 @@ function void fn012872()
 
 	if (D1.u8 == 1)
 	{
+		// Corkscrew standing animation
 		if (char.flags & char.flag.FACING_LEFT)
 		{
 			char.render_flags |= render_flag.FLIP_X
@@ -565,6 +567,7 @@ function void fn012872()
 	}
 	else if (D1.u8 == 2)
 	{
+		// Diagonal corkscrew walking animation, flips vertically and runs backwards when facing left 
 		if (char.flags & char.flag.FACING_LEFT)
 		{
 			char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
@@ -580,6 +583,7 @@ function void fn012872()
 	}
 	else if (D1.u8 == 3)
 	{
+		// Diagonal corkscrew walking animation, flips vertically and runs backwards when facing right
 		if (char.flags & char.flag.FACING_LEFT)
 		{
 			char.render_flags |= render_flag.FLIP_X
@@ -596,6 +600,7 @@ function void fn012872()
 	}
 	else if (D1.u8 == 4)
 	{
+		// Corkscrew walking animation, flips vertically and runs backwards when facing left
 		if (char.flags & char.flag.FACING_LEFT)
 		{
 			char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)
@@ -609,8 +614,9 @@ function void fn012872()
 		D0.u16 = D0 / 22
 		D0.u8 += 0x31
 	}
-	else
+	else // if (D1.u8 == 5)
 	{
+		// Typical corkscrew animation
 		if (char.flags & char.flag.FACING_LEFT)
 		{
 			char.render_flags |= render_flag.FLIP_X

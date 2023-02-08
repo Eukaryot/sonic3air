@@ -134,7 +134,7 @@ function void fn0631a4()
 		if (player != 0 && u32[A1] != 0)
 		{
 			u8[A1 + 0x2e] = 0x81
-			u8[A1 + 0x20] = char.state.STANDING
+			objA1.state = char.state.STANDING
 			StopObjectA1()
 
 		#if STANDALONE
@@ -162,7 +162,7 @@ function void fn063220()
 		fn065eb4()
 	}
 
-	A1 = 0x0666f6
+	A1 = 0x0666f6		// Cutscene Knuckles lever pushing animation data
 	fn0845a0()
 	if (!_equal())
 	{
@@ -238,7 +238,7 @@ function void fn0632ca()
 		objA0.respawn_entry = u16[A1 + 0x48]
 	}
 
-	Kosinski.addToDMAQueue(0x16a072, 0xa500)
+	Kosinski.addToDMAQueue(0x16a072, 0xa500)		// Knuckles lever
 }
 
 
@@ -377,11 +377,11 @@ function void fn065e62()
 //# address-hook(0x065e72)
 function void fn065e72()
 {
-	u8[A1 + 0x20] = char.state.STANDING
+	objA1.state = char.state.STANDING
 	if (objA0.animation.frame >= 0x0c)
 	{
 		objA1.render_flags |= render_flag.FLIP_Y
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		u8[A1 + 0x2e] = 0x83
 
 		D0 = (global.framecounter & 0x02) ? 2 : 0
@@ -422,7 +422,7 @@ function void fn062422()
 	// Copies palette colors 0x10 .. 0x1f from secondary (underwater) to primary palette
 	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
 
-	addPatternLoadingCue(0x083d48)
+	addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
 
 	if (allocDynamicObjectStd())
 	{

@@ -1347,7 +1347,7 @@ function void fn01e0a2()
 			if (u8[A1 + 0x20] != char.state.WIN_POSE)
 		#endif
 			{
-				u8[A1 + 0x20] = char.state.RUNNING
+				objA1.state = char.state.RUNNING
 				u8[A1 + 0x21] = char.state.RUNNING2
 			}
 		}

@@ -870,6 +870,7 @@ function void fn05427c()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Launch Base Act 2
 		global.zone_act = 0x0601
 		camera.update_routine = 0
 		dynobjects.routine = 0
@@ -889,7 +890,7 @@ function void fn05427c()
 		Level.InitializeWater()
 		VDP.Config.enableHInt(true)
 
-		Level.loadPaletteData(0x17)
+		Level.loadPaletteData(0x17)		// LBZ 2 level palette
 
 		D7 = backupD7
 		A0 = backupA0

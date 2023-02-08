@@ -117,7 +117,7 @@ function void fn042636()
 	u8[A1 + 0x2a] |= (char.flag.ON_OBJECT | char.flag.IN_AIR)
 	u8[A1 + 0x40] = 0
 	u8[A1 + 0x26] = 0
-	u8[A1 + 0x27] = 0
+	u8[A1 + 0x27] = 0		// Reset x-rotation of character
 	u8[A1 + 0x2d] = 0
 	u8[A1 + 0x30] = 0
 	u8[A1 + 0x39] = 0

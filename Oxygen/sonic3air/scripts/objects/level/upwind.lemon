@@ -124,10 +124,10 @@ function void fn03fbc4()
 				u16[A1 + 0x1c] = 1
 				if (u8[A1 + 0x27] == 0)
 				{
-					u8[A1 + 0x27] = 1
-					u8[A1 + 0x20] = char.state.RUNNING
-					u8[A1 + 0x30] = 0x7f
-					u8[A1 + 0x31] = 8
+					u8[A1 + 0x27] = 1		// Set x-rotation of character
+					objA1.state = char.state.RUNNING
+					u8[A1 + 0x30] = 0x7f	// "char.rotation.x.count"
+					u8[A1 + 0x31] = 8		// "char.rotation.x.speed"
 				}
 			}
 		}

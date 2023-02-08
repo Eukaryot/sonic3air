@@ -117,7 +117,7 @@ function void fn01f7ce()
 					LetSonicClimbOnObject()
 
 					u32[A2] = 0
-					u8[A1 + 0x20] = char.state.RUNNING
+					objA1.state = char.state.RUNNING
 					u8[A1 + 0x2e] |= 0x42
 					if (A1 == 0xffffb000)
 					{
@@ -199,8 +199,8 @@ function void fn01f8b4()
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.ROLLING | char.flag.ON_OBJECT)
 	u8[A1 + 0x2e] &= ~0x42
-	u8[A1 + 0x30] = 0
-	u8[A1 + 0x31] = 4
+	u8[A1 + 0x30] = 0		// "char.rotation.x.count"
+	u8[A1 + 0x31] = 4		// "char.rotation.x.speed"
 	objA0.flags2a &= ~bit
 }
 

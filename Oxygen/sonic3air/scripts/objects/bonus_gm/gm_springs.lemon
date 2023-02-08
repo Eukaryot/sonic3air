@@ -19,10 +19,10 @@ function void fn060d58()
 	objA0.position.y.u16 = 0x0310
 
 	// "spawnChildObjects(0x061424)" replaced by:
-	spawnChildObject(0x060dac, 0x00, -48, -24)
-	spawnChildObject(0x060dac, 0x02, -16, -24)
-	spawnChildObject(0x060dac, 0x04, 16, -24)
-	spawnChildObject(0x060dac, 0x06, 48, -24)
+	spawnChildObject(0x060dac, 0x00, -48, -24)		// Single spring
+	spawnChildObject(0x060dac, 0x02, -16, -24)		// Single spring
+	spawnChildObject(0x060dac, 0x04, 16, -24)		// Single spring
+	spawnChildObject(0x060dac, 0x06, 48, -24)		// Single spring
 
 	objA0.update_address = 0x060d7e
 	fn060d7e()
@@ -43,7 +43,7 @@ function void fn060d7e()
 		u8[0xffff2022] = 0
 
 		// "spawnSimpleChildObjects(0x06143e)" replaced by:
-		spawnSimpleChildObjects(0x06101e, 16)
+		spawnSimpleChildObjects(0x06101e, 16)		// Collapsing spring platform debris
 
 		Object.TriggerUnloading()
 	}

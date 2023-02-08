@@ -276,7 +276,7 @@ function void fn081958()
 	copyMemory(0xfffffc40, 0x0a999c, 0x20)
 	copyMemory(0xfffffc80, 0xfffffc00, 0x80)
 
-	Kosinski.addToDMAQueue(0x182be6, 0x9a00)
+	Kosinski.addToDMAQueue(0x182be6, 0x9a00)			// Master Emerald sprite tiles
 }
 
 

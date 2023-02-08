@@ -22,10 +22,10 @@ function void fn076a12()
 	objA0.countdown_value = 120
 	playMusic(MUSIC_CTRL_FADEOUT)
 
-	Kosinski.addToDMAQueue(0x16cb5c, 0x76a0)
-	Kosinski.addToDMAQueue(0x16e0ee, 0x9e60)
+	Kosinski.addToDMAQueue(0x16cb5c, 0x76a0)		// Boss sprites
+	Kosinski.addToDMAQueue(0x16e0ee, 0x9e60)		// Sand dust particle sprites
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 

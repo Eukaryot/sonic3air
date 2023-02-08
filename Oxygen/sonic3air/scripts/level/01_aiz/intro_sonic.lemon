@@ -282,7 +282,7 @@ function void fn0676c6()
 		objA0.base_state = 0x18
 
 		// "spawnSimpleChildObjects(0x067a78)" replaced by:
-		spawnSimpleChildObjects(0x061d4c, 1)
+		spawnSimpleChildObjects(0x061d4c, 1)		// Cutscene Knuckles
 	}
 }
 
@@ -306,7 +306,7 @@ function void fn067704()
 	if (u16[0xffffb000 + 0x10] < 0x13d0)
 		return
 
-	u8[0xfffff650] = 0xff
+	level.palettefx.state = 0xff
 
 	A1 = 0xffffb000
 	u8[A1 + 0x05] = 0x04
@@ -689,7 +689,7 @@ function void fn061df4()
 //# address-hook(0x061e24) end(0x061e62)
 function void fn061e24()
 {
-	Object.animationProgress(0x0666af)
+	Object.animationProgress(0x0666af)		// Cutscene Knuckles jumping animation
 	UpdateMovementSimple()
 	if (D0.s32 >= 0)
 	{
@@ -723,7 +723,7 @@ function void fn061e6a()
 {
 	objA0.base_state = 0x08
 	objA0.render_flags ^= render_flag.FLIP_X
-	u32[A0 + 0x30] = 0x0666a9
+	u32[A0 + 0x30] = 0x0666a9		// Cutscene Knuckles running animation data
 	objA0.velocity.x = -0x600
 	objA0.velocity.y = 0
 	objA0.countdown_value = 0x29
@@ -758,7 +758,7 @@ function void fn061f10()
 		return
 	}
 
-	u8[0xfffff650] = 0
+	level.palettefx.state = 0
 	player1.control_override = 0
 	fn083c06()
 	fn0851e4()
@@ -834,7 +834,7 @@ function void fn061ec2()
 function void fn061eec()
 {
 	objA0.base_state = 0x0c
-	u32[A0 + 0x30] = 0x0666a9
+	u32[A0 + 0x30] = 0x0666a9		// Cutscene Knuckles running animation data
 	objA0.velocity.x = 0x0600
 
 	// Create the object that fades out the Knuckles theme and starts the level music afterwards
@@ -852,7 +852,7 @@ function void fn062022()
 	if (D0.u16 >= 0x4b3c)
 	{
 		objA0.position.x.u16 = D0.u16
-		Object.animationProgress(0x06669f)
+		Object.animationProgress(0x06669f)		// Cutscene Knuckles walking animation
 		return
 	}
 
@@ -867,7 +867,7 @@ function void fn062022()
 //# address-hook(0x062056) end(0x06206c)
 function void fn062056()
 {
-	u32[A0 + 0x30] = 0x0666b9
+	u32[A0 + 0x30] = 0x0666b9		// Cutscene Knuckles crossing arms to chuckling animation data
 	objA0.animation.timer = 0
 	objA0.animation.frame = 0
 	objA0.animation.sprite = 0x1c

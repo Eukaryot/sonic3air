@@ -65,9 +65,9 @@ function void fn07a20e()
 	objA0.position.y.u16 = camera.position.y.u16 - 0x40
 	u16[0xfffffa88] = 0
 
-	requestLoadingPatterns(0x7b)
+	requestLoadingPatterns(0x7b)		// Robotnik's ship and boss explosion sprites
 
-	Kosinski.addToDMAQueue(0x17edb4, 0x8d00)
+	Kosinski.addToDMAQueue(0x17edb4, 0x8d00)		// Green Hill Zone wrecking ball boss sprites
 
 	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
 
@@ -258,7 +258,7 @@ function void fn07a3e6()
 	u8[0xffffeed2] = 0xff
 
 	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
-	requestLoadingPatterns(0x32)
+	requestLoadingPatterns(0x32)		// SSZ object sprites
 
 	Object.TriggerUnloading()
 }

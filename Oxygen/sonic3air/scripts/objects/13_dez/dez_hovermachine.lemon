@@ -117,8 +117,8 @@ function void fn04952a()
 			{
 				objA1.state = char.state.RUNNING
 				u8[A1 + 0x27] = 0x01
-				u8[A1 + 0x30] = 0x7f
-				u8[A1 + 0x31] = 0x08
+				u8[A1 + 0x30] = 0x7f		// "char.rotation.x.count"
+				u8[A1 + 0x31] = 0x08		// "char.rotation.x.speed"
 
 			#if STANDALONE
 				// Fix for bug when Tails carries other player and gets caught by the hover effect

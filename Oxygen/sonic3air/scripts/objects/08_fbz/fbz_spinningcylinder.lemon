@@ -90,7 +90,7 @@ function void fn039f7e()
 						D2.u16 += 0x03
 						objA1.position.y.u16 = D2.u16
 						LetSonicClimbOnObject()
-						u8[A1 + 0x2d] = 0x80
+						u8[A1 + 0x2d] = 0x80		// Set cylinder walking animation
 						u16[A1 + 0x20] = char.state.RUNNING2
 						u8[A2] = 0
 						u8[A2 + 0x02] = 0
@@ -123,7 +123,7 @@ function void fn039f7e()
 				D2.u16 -= D1.u16
 				objA1.position.y.u16 = D2.u16
 				D0.u8 = u8[A2]
-				u8[A1 + 0x27] = D0.u8
+				u8[A1 + 0x27] = D0.u8		// Set x-rotation of character
 				u8[A2] += 0x04
 				if (u16[A1 + 0x1c] == 0)
 				{
@@ -147,8 +147,8 @@ function void fn039f7e()
 
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x30] = 0
-		u8[A1 + 0x31] = 0x04
+		u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+		u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2d] = 0
 	}
@@ -222,7 +222,7 @@ function void fn03a0d6()
 		u8[A1 + 0x2e] |= 0x40
 		u8[A1 + 0x2e] |= 0x02
 		u16[A1 + 0x20] = char.state.RUNNING2
-		u8[A1 + 0x27] = 0
+		u8[A1 + 0x27] = 0		// Reset x-rotation of character
 		u8[A2 + 0x02] = 0
 	}
 
@@ -232,9 +232,9 @@ function void fn03a0d6()
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x27] = 0x01
-		u8[A1 + 0x30] = 0
-		u8[A1 + 0x31] = 0x04
+		u8[A1 + 0x27] = 0x01		// Set x-rotation of character
+		u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+		u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		return
 	}

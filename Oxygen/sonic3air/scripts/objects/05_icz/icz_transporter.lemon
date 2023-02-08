@@ -57,7 +57,7 @@ function void fn053ba2()
 
 	A1 = 0xffffb000
 	u8[A1 + 0x2e] = 0x01
-	u8[A1 + 0x20] = char.state.ROLLING
+	objA1.state = char.state.ROLLING
 	u8[A1 + 0x2a] |= char.flag.ROLLING
 
 	A1 = 0xffffb000

@@ -728,7 +728,7 @@ function void fn064356()
 	A1 = 0x06680a
 	fn084580()
 
-	Kosinski.addToDMAQueue(0x174a86, 0xa000)
+	Kosinski.addToDMAQueue(0x174a86, 0xa000)	// Swirling stars around Knuckles' head while dizzy
 }
 
 

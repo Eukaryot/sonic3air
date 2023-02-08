@@ -18,9 +18,9 @@ function void fn078f56()
 	objA0.update_address = 0x078f82
 	objA0.countdown_value = 0x3b
 
-	Kosinski.addToDMAQueue(0x170f4e, 0x7560)
+	Kosinski.addToDMAQueue(0x170f4e, 0x7560)		// Death Egg eye flashing
 
-	Kosinski.addToDMAQueue(0x1714c0, 0x90e0)
+	Kosinski.addToDMAQueue(0x1714c0, 0x90e0)		// Debris sprites
 }
 
 

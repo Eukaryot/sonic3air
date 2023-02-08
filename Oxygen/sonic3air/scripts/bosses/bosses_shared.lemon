@@ -39,7 +39,7 @@ function void fn085bda()
 	// "spawnSimpleChildObjects(0x085bfa)" replaced by:
 	spawnSimpleChildObjects(addressof(SignPost.BaseUpdate), 1)		// Signpost
 
-	addPatternLoadingCue(0x085bc8)
+	addPatternLoadingCue(0x085bc8)		// Signpost pole sprite
 
 	fn083c06()
 }
@@ -337,7 +337,7 @@ function void fn0694aa()
 	level.wait_for_results = 0xff
 	level.boss_encounter = 0
 
-	addPatternLoadingCue(0x083d74)
+	addPatternLoadingCue(0x083d74)		// Capsule Sprites
 
 	// "spawnSimpleChildObjects(0x069d8c)" replaced by:
 	spawnSimpleChildObjects(0x086540, 1)		// Capsule
@@ -414,7 +414,7 @@ function void fn083c90()
 {
 	loadPaletteLine1(0x0a8bdc)
 
-	addPatternLoadingCue(0x083cce)
+	addPatternLoadingCue(0x083cce)		// AIZ2 object sprites
 }
 
 
@@ -427,7 +427,7 @@ function void fn083ca6()
 //# address-hook(0x083ca8) end(0x083cac)
 function void fn083ca8()
 {
-	addPatternLoadingCue(0x083d3a)
+	addPatternLoadingCue(0x083d3a)		// Some common object sprites
 }
 
 

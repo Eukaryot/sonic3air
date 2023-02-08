@@ -26,7 +26,7 @@ function void fn08b4ce()
 	{
 		// Semi-circle variant that is hanging on many walls
 		A1 = 0x08b532
-		objA0.update_address = 0x085140   // That's just "Enemy.DrawOrUnload"
+		objA0.update_address = addressof(Enemy.DrawOrUnload)
 	}
 	else
 	{

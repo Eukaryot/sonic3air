@@ -448,14 +448,15 @@ function void fn04b490()
 //# address-hook(0x04b4c4) end(0x04b54e)
 function void fn04b4c4()
 {
+	// This updates rotation sprites of colored solid blocks. six object sprites spread across two areas in RAM stored in A1
 	D0 = (slotmachine.rotation.u8 >> 2) & 0x0f
-	A1 = 0xffff700c
+	A1 = 0xffff7000 + 0x08 + 0x04		// RAM address of block data + offset of first three solid blocks + offset of mapping data
 	for (u8 i = 0; i < 3; ++i)
 	{
 		u16[A1] = D0.u16
 		A1 += 8
 	}
-	A1 = 0xffff706c
+	A1 = 0xffff7000 + (0x08 * 13) + 0x04		// RAM address of block data + offset of other three solid blocks + offset of mapping data
 	for (u8 i = 0; i < 3; ++i)
 	{
 		u16[A1] = D0.u16
@@ -463,7 +464,7 @@ function void fn04b4c4()
 	}
 
 	// This updates animations of the blocks
-	A1 = 0xffff7005
+	A1 = 0xffff7000 + 0x05		// RAM address of block data + offset of animation sprite data
 	--slotmachine.goalblock.animtimer
 	if (s8(slotmachine.goalblock.animtimer) < 0)
 	{
@@ -474,23 +475,28 @@ function void fn04b4c4()
 			slotmachine.goalblock.animtimer = 0x0f
 	#endif
 
-		++u8[A1 + 0x20]
-		if (u8[A1 + 0x20] >= 3)
-			u8[A1 + 0x20] = 0
+		// A1 + (0x08 * 4): RAM address of "Goal" blocks' animation sprite data.
+		++u8[A1 + (0x08 * 4)]
+		if (u8[A1 + (0x08 * 4)] >= 3)
+			u8[A1 + (0x08 * 4)] = 0
 		++slotmachine.goalblock.animframe
 		if (slotmachine.goalblock.animframe >= 6)
 			slotmachine.goalblock.animframe = 0
 	}
+	// A1 + (0x08 * 9): RAM address of slot catcher animation sprite data, seems unused?.
+	u8[A1 + (0x08 * 9)] = slotmachine.goalblock.animframe
 
-	u8[A1 + 0x48] = slotmachine.goalblock.animframe
-	u8[A1 + 0x40] = static_rings.animframe
+	// A1 + (0x08 * 8): RAM address of ring animation sprite data.
+	u8[A1 + (0x08 * 8)] = static_rings.animframe	// Note: animation sprite was already updated in "UpdateGlobalRingAnimation()", just need to copy the value over
+
 	--slotmachine.peppermintblock.animtimer
 	if (s8(slotmachine.peppermintblock.animtimer) < 0)
 	{
 		slotmachine.peppermintblock.animtimer = 3
 		slotmachine.peppermintblock.animframe = (slotmachine.peppermintblock.animframe + 1) & 0x03
 	}
-	u8[A1 + 0x38] = slotmachine.peppermintblock.animframe
+	// A1 + (0x08 * 7): RAM address of solid round white/red "peppermint" block animation sprite data.
+	u8[A1 + (0x08 * 7)] = slotmachine.peppermintblock.animframe
 }
 
 
@@ -630,6 +636,8 @@ function void fn04b65a()
 }
 
 
+// Slot machine catcher
+
 //# address-hook(0x04bf62) end(0x04bf94)
 function void fn04bf62()
 {
@@ -712,7 +720,7 @@ function void fn04c026()
 		u16[(A2+=2)-2] += 2
 		u16[A2] = 0x78
 		objA0.value42 = A1.u16
-		u8[0xfffff650] = 0x01
+		level.palettefx.state = 0x01
 		if (u8[0xffffe408] == 0x18)
 		{
 			u8[0xffffe408] = 0x08
@@ -857,7 +865,7 @@ function void fn04c23e()
 	u16[A0 + 0x30] = 0
 	u16[A2] += 2
 	u16[A2+2] = 0x08
-	u8[0xfffff650] = 0
+	level.palettefx.state = 0
 }
 
 

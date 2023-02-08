@@ -169,7 +169,7 @@ function void fn030c8c()
 		objA1.velocity.x = (objA0.flags2a & 0x01) ? -0x1000 : 0x1000
 		objA1.velocity.y = 0
 		s16[A1 + 0x1c] = objA1.velocity.x
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit

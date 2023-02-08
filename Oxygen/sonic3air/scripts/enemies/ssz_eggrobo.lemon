@@ -55,7 +55,7 @@ function void fn091526()
 		D1 |= (1 << D0)
 		u16[0xfffffa82] = D1.u16
 
-		Kosinski.addToDMAQueue(0x17b17e, 0xa000)
+		Kosinski.addToDMAQueue(0x17b17e, 0xa000)		// Egg Robo badnik sprites
 		UnloadObject()
 	}
 	else

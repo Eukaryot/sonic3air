@@ -194,8 +194,8 @@ function void fn03a314()
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~(u8(1) << D6.u8)
 		u8[A1 + 0x27] = 0xc0
-		u8[A1 + 0x30] = 0
-		u8[A1 + 0x31] = 0x04
+		u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+		u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	}
 }
 

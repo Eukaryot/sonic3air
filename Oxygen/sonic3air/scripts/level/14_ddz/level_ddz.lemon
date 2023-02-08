@@ -349,7 +349,7 @@ function void fn081554()
 		objA1.update_address = 0x082722
 	}
 
-	Kosinski.addToDMAQueue(0x18322a, 0x5b60)
+	Kosinski.addToDMAQueue(0x18322a, 0x5b60)		// Boss sprites, missiles and rocks, etc.
 
 #if STANDALONE
 	// Start with 50 rings now already, that looks better and prevents an unnecessary music tempo change
@@ -449,7 +449,7 @@ function void fn08167c()
 		u32[0xffffcbc0] = addressof(AfterImages.Init)		// After-images effect
 	}
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 
@@ -556,7 +556,7 @@ function void fn08151c()
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
 		u8[A1 + 0x2e] = 1
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		objA1.velocity.x = 0x0800
 		u16[A1 + 0x1c] = 0x0800
 	}

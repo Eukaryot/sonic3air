@@ -67,8 +67,7 @@ function void fn049f5c()
 		{
 			// Spawn exit beam lasers
 			objA1.update_address = 0x04a09a
-			objA1.position.x.u16 = objA0.position.x.u16
-			objA1.position.x.u16 += 0x80
+			objA1.position.x.u16 = objA0.position.x.u16 + 0x80
 			objA1.position.y.u16 = objA0.position.y.u16
 			u8[A1 + 0x26] = objA0.value26
 			u16[A1 + 0x3e] = A0.u16

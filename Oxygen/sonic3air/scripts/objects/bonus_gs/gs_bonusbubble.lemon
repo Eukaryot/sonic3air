@@ -42,6 +42,8 @@ function void fn04a218()
 }
 
 
+// Rising bonus bubble
+
 //# address-hook(0x04a238) end(0x04a284)
 function void fn04a238()
 {
@@ -70,11 +72,13 @@ function void fn04a2cc()
 {
 	if (objA0.subtype2c == 0)
 	{
+		// Unused "F" bonus bubble sprite
 		objA0.mapping_offset = 0x04a3d2
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x0378)
 	}
 	else
 	{
+		// bonus bubble sprites
 		objA0.mapping_offset = 0x06148a
 		objA0.sprite_attributes = 0x0388
 		objA0.animation.sprite = objA0.subtype2c + 7
@@ -153,27 +157,33 @@ function void fn04a384()
 	objA0.update_address = addressof(UnloadObject)
 	D1 = objA0.subtype2c
 	D2 = 1
-	if (D1.u8 != 3)
+	if (D1.u8 == 3)
 	{
-		if (D1.u8 != 2)
-		{
-			--D1.u16
-			if (D1.s16 >= 0)
-			{
-				D0 = A1.u16
-				fn061100()
-				return
-			}
-		}
+		// Rings bonus bubble
+		// In the Glowing Spheres bonus stage, the rings bonus bubble gives different amounts of rings based on elevation
+		D0.u16 = u8[A0 + 0x14] & 0x0f
+		A1 = 0x1e44c4
+		D0.u8 = u8[A1 + D0.s16]
+		checkpoint.rings += D0.u16
+		AddRings()
+		return
+	}
+
+	if (D1.u8 == 2)
+	{
+		// "REP" bonus bubble, useless in glowing spheres bonus
 		playSound(0x7b)
 		return
 	}
 
-	D0.u16 = u8[A0 + 0x14] & 0x0f
-	A1 = 0x1e44c4
-	D0.u8 = u8[A1 + D0.s16]
-	checkpoint.rings += D0.u16
-	AddRings()
+	// Moving the "F" bonus bubble out of range
+	--D1.u16
+	if (D1.s16 >= 0)
+	{
+		// Call one of the rest of the bonus bubble powerups
+		D0 = A1.u16
+		fn061100()
+	}
 }
 
 
@@ -248,6 +258,7 @@ function void fn06115c()
 	{
 		fn061176()
 	}
+
 	u8[A0 + 0x29] = 0
 	D2 = 0
 }
@@ -257,13 +268,11 @@ function void fn06115c()
 function void fn061176()
 {
 	A1 = 0xffff0000 + D0.u16
-	D1.u16 = objA0.position.x.u16
-	D2.u16 = objA0.position.y.u16
-	D1.u16 -= objA1.position.x.u16
-	D2.u16 -= objA1.position.y.u16
+	D1.u16 = objA0.position.x.u16 - objA1.position.x.u16
+	D2.u16 = objA0.position.y.u16 - objA1.position.y.u16
 	LookupAngleByVector()
-	D1.u8 = u8[0xfffffe04]
-	D1.u16 &= 0x03
+
+	D1.u16 = u8[0xfffffe04] & 0x03
 	D0.u16 += D1.u16
 	LookupSinCos()
 	D1.s32 = s32(D1.s16) * -0x700
@@ -272,9 +281,11 @@ function void fn061176()
 	D0.s32 = s32(D0.s16) * -0x700
 	D0.s32 >>= 8
 	objA1.velocity.y = D0.u16
-	u8[A1 + 0x2a] |= char.flag.IN_AIR
+
+	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.PUSHING)
 	u8[A1 + 0x40] = 0
+
 	objA0.state = 1
 	playSound(0x7b)
 }

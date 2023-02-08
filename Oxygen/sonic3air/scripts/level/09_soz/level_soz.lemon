@@ -301,7 +301,7 @@ function void fn055c26()
 
 				Kosinski.addToDMAQueue(0x1ad81e, 0x62a0)
 
-				requestLoadingPatterns(0x2c)
+				requestLoadingPatterns(0x2c)		// SOZ2 object sprites
 
 				D7 = pop()
 				A0 = pop()
@@ -324,6 +324,7 @@ function void fn055c84()
 	if (kosinski.waiting_modules != 0)
 		return
 
+	// Go to Sandopolis Act 2
 #if STANDALONE
 	Game.endSkippableCutscene()
 #endif
@@ -344,6 +345,7 @@ function void fn055c84()
 	fn01c362()
 	fn0076a6()
 
+	// Load character and level palettes
 	Level.loadNonfadingPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 0x05 : 0x03)
 	Level.loadNonfadingPaletteData(0x1b)
 	Level.loadPaletteData(0x1b)
@@ -574,10 +576,10 @@ function void fn055efc()
 	}
 
 	u8[0xfffff7c3] = 5		// Set light state to complete darkness
-	u16[0xfffff634] = 1799
-	u8[0xfffff650] = 0
-	u16[0xfffff656] = 0x04
-	u16[0xfffff652] = 0xd0
+	level.palettefx.timer_1 = 1799
+	level.palettefx.state = 0
+	level.palettefx.frame_4 = 0x04
+	level.palettefx.frame_2 = 0xd0
 }
 
 
@@ -1303,12 +1305,12 @@ function void fn0564d4()
 	A2 = pop()
 	A3 = pop()
 
-	u16[0xfffff634] = 0x7fff
+	level.palettefx.timer_1 = 0x7fff
 	u8[0xfffff7c3] = 0
-	D0.u16 = u16[0xfffff656]
+	D0.u16 = level.palettefx.frame_4
 	D0.s8 = -D0.s8
-	u8[0xfffff650] = D0.u8
-	u16[0xfffff658] = 0
+	level.palettefx.state = D0.u8
+	level.palettefx.timer_2 = 0
 	u8[0xfffff7f0] = 0x7f
 
 	fn056a12()
@@ -1376,7 +1378,7 @@ function void fn0565de()
 	Renderer.addSpriteMaskWorld(0x5250, 0x06a0, 0x70, 0xa0, 0x9f00, 1)
 #endif
 
-	u16[0xfffff634] = 0x7fff
+	level.palettefx.timer_1 = 0x7fff
 	u8[0xfffff7f0] = 0x7f
 	if (s16[0xffffeec6] >= 0)
 	{
@@ -1405,7 +1407,7 @@ function void fn0565de()
 
 	Kosinski.addToDMAQueue(0x1ad81e, 0x62a0)
 
-	Level.loadPaletteData(0x1b)
+	Level.loadPaletteData(0x1b)		// SOZ 2 level palette
 
 	D7 = pop()
 	A0 = pop()

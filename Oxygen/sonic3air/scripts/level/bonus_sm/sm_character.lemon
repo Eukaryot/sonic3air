@@ -300,7 +300,7 @@ function void fn04bc1e()
 		global.fadeout_countdown = 0
 		objA0.update_address = 0x04bc54
 		slotmachine.fadeout.countdown = 60
-		u8[0xfffff650] = 0xff
+		level.palettefx.state = 0xff
 	}
 	slotmachine.rotation.full += u16[0xffffe402]
 }

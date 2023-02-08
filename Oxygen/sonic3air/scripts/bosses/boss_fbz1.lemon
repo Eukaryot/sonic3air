@@ -52,9 +52,9 @@ function void fn06eea8()
 	u16[A0 + 0x3a] = 0x2e20		// Needed minimum camera-x position
 	objA0.countdown_callback = 0x06ef14
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 
-	Kosinski.addToDMAQueue(0x1652b4, 0xa5c0)
+	Kosinski.addToDMAQueue(0x1652b4, 0xa5c0)		// Boss sprites
 
 	loadPaletteLine1(0x06fac0)
 

@@ -142,7 +142,7 @@ function void fn0610c6()
 
 
 
-// Another thing
+// Falling bonus bubble
 
 //# address-hook(0x060eba) end(0x060eca)
 function void fn060eba()
@@ -157,11 +157,7 @@ function void fn060eba()
 //# address-hook(0x060ece) end(0x060f28)
 function void fn060ece()
 {
-	D0.u16 = objA0.velocity.y + 0x10
-	if (D0.u16 <= 0x0200)
-	{
-		objA0.velocity.y = D0.u16
-	}
+	objA0.velocity.y = min(objA0.velocity.y + 0x10, 0x0200)
 
 	UpdateMovementStraightSimple()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -228,10 +224,12 @@ function void fn0612a8()
 		}
 	}
 
+	// Set bonus bubble content and sprite based on random value in D0
 	D0.u8 = u8[0x0612e0 + D0.s16]
 	objA0.subtype2c = D0.u8
 	if (D0.u8 == 0x04)
 	{
+		// Bouncy black bubble hitbox
 		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	}
 	D0.u16 <<= 2

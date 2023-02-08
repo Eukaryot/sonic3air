@@ -29,7 +29,7 @@ function void Spikes.Init()
 		objA0.box_size.y = u8[(A1+=1)-1]
 		objA0.update_address = 0x024090
 		objA0.mapping_offset = 0x024456
-		objA0.sprite_attributes = (global.zone == 4) ? 0x0200 : 0x049c		// Flying Battery Zone spikes are a bit different
+		objA0.sprite_attributes = (global.zone == 0x04) ? 0x0200 : 0x049c		// Flying Battery Zone spikes are a bit different
 
 		D0.u16 >>= 1
 		objA0.animation.sprite = D0.u8

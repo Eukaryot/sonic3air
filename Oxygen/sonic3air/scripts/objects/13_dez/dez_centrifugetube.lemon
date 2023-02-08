@@ -128,7 +128,7 @@ function void fn048fa4()
 			D2.u16 = objA0.position.y.u16 + D1.u16
 			objA1.position.y.u16 = D2.u16
 			D0.u8 = u8[A2]
-			u8[A1 + 0x27] = D0.u8
+			u8[A1 + 0x27] = D0.u8		// Set x-rotation of character
 			u8[A2] += D3.u8
 			if (u16[A1 + 0x1c] == 0)
 			{
@@ -159,13 +159,13 @@ function void fn048fa4()
 
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x30] = 0
-	u8[A1 + 0x31] = 0x04
+	u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 
 	if (global.inv_gravity)
 	{
-		u8[A1 + 0x27] = 0x80 - u8[A1 + 0x27]
+		u8[A1 + 0x27] = 0x80 - u8[A1 + 0x27]		// Set x-rotation of character
 		objA1.render_flags ^= render_flag.FLIP_Y
 	}
 }
@@ -233,7 +233,7 @@ function void fn049090()
 		u8[A1 + 0x2e] |= 0x40
 		u8[A1 + 0x2e] |= 0x02
 		u16[A1 + 0x20] = char.state.RUNNING2
-		u8[A1 + 0x27] = 0
+		u8[A1 + 0x27] = 0		// Set x-rotation of character
 		u8[A2 + 0x02] = 0
 	}
 
@@ -243,9 +243,9 @@ function void fn049090()
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		objA0.flags2a &= ~bit
-		u8[A1 + 0x27] = 1
-		u8[A1 + 0x30] = 0
-		u8[A1 + 0x31] = 4
+		u8[A1 + 0x27] = 1		// Set x-rotation of character
+		u8[A1 + 0x30] = 0		// "char.rotation.x.count"
+		u8[A1 + 0x31] = 4		// "char.rotation.x.speed"
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		return
 	}

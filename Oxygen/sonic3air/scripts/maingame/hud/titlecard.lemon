@@ -31,45 +31,49 @@ function void TitleCard.Init()
 {
 	if (global.zone_act == 0x0d01)
 	{
+		// Outro for Sonic/Tails
 		UnloadObject()
 		return
 	}
 	else if (global.zone >= 0x0e && global.zone <= 0x12)
 	{
+		// Competition mode stages
 		u8[A0 + 0x45] = 0xff
 		UnloadObject()
 		return
 	}
 
-	Kosinski.addToDMAQueue(0x0d6f28, 0xa000)
-
-	A1 = (global.lock_on_state == 0) ? 0x15c3a2 : 0x15c2e0
-	Kosinski.addToDMAQueue(A1, 0xa200)
+	Kosinski.addToDMAQueue(0x0d6f28, 0xa000)		// Common title card sprites
+	Kosinski.addToDMAQueue((global.lock_on_state == 0) ? 0x15c3a2 : 0x15c2e0, 0xa200)		// "Sonic 3 & Knuckles"/"Sonic & Knuckles" red banner title
 
 	A1 = 0x0d6e46
-	if (global.zone_act != 0x1600 && global.zone_act != 0x1700 && global.act.apparent == 0)
+	if (global.zone_act != 0x1600 && global.zone_act != 0x1700 && global.act.apparent == 0)		// Excluding LRZ boss and DEZ boss acts
 	{
+		// Use act 1 title card number
 		A1 = 0x0d6d84
 	}
-	Kosinski.addToDMAQueue(A1, 0xa7a0)
+	Kosinski.addToDMAQueue(A1, 0xa7a0)		// Act number sprite
 
 	A1 = 0x02da16
 	D0 = global.zone.apparent
 	if (global.zone_act == 0x1600)
 	{
+		// Lava Reef Boss
 		D0 = 9
 	}
 	else if (global.zone_act == 0x1601)
 	{
+		// Hidden Palace Zone
 		D0 = 13
 	}
 	else if (global.zone_act == 0x1700)
 	{
+		// Death Egg Boss
 		D0 = 11
 	}
 
 	A1 = u32[A1 + D0.u16 * 4]
-	Kosinski.addToDMAQueue(A1, 0xa9a0)
+	Kosinski.addToDMAQueue(A1, 0xa9a0)		// Zone name
 
 	objA0.countdown_value = 0x5a
 	objA0.value32 = 0
@@ -137,7 +141,7 @@ function void TitleCard.Wait()
 
 		if (u8[A0 + 0x3e] != 0 && global.zone == 0x06)
 		{
-			requestLoadingPatterns(0x25)
+			requestLoadingPatterns(0x25)		// LBZ2 object sprites
 		}
 
 		objA0.base_state += 2
@@ -192,8 +196,9 @@ function void TitleCard.Show()
 
 	if (u8[A0 + 0x45] == 0)
 	{
-		if (global.zone_act == 0x801)
+		if (global.zone_act == 0x0801)
 		{
+			// Sandopolis Act 2
 			if (allocDynamicObjectStd())
 			{
 				// Ghost spawner
@@ -203,7 +208,7 @@ function void TitleCard.Show()
 
 		if (global.zone >= 0x13 && global.zone != 0x16 && global.zone_act != 0x1700)
 		{
-			// Do nothing
+			// Do nothing for bonus stages and Hidden Palace emerald cave
 		}
 		else
 		{
@@ -218,7 +223,7 @@ function void TitleCard.Show()
 			}
 			else if (global.zone != 0x0c && global.zone_act != 0x1700)
 			{
-				addPatternLoadingCue(0x08399a)
+				addPatternLoadingCue(0x08399a)		// Spike and Springs
 				fn02f77c()
 				StartLoadingPatternsForZone()
 			}
@@ -236,10 +241,12 @@ function void fn02f77c()
 	u16 offset = global.zone
 	if (global.zone == 0x16)
 	{
+		// Lava Reef Boss, Hidden Palace Zone
 		offset = 0x0d
 	}
 	else if (global.zone_act == 0x1700)
 	{
+		// Death Egg Boss
 		offset = 0x0e
 	}
 	offset = offset * 4 + global.act * 2
@@ -288,7 +295,7 @@ function void fn02f77c()
 //# address-hook(0x085fde) end(0x085ff8)
 function void StartLoadingPatternsForZone()
 {
-	addPatternLoadingCue(0x083d6c)
+	addPatternLoadingCue(0x083d6c)		// Small explosion sprites
 
 	// Targets:
 	//  - 0x08602e	-> global.zone = 0x00	-> AIZ
@@ -306,6 +313,7 @@ function void StartLoadingPatternsForZone()
 	//  - 0x0860d6	-> global.zone = 0x0c	-> DDZ
 	//  - 0x0860e4	-> global.zone = 0x0d	-> Outro S/T
 	//  - 0x0860e4	-> global.zone = 0x16	-> LRZ Boss
+	//  - All succeeding entries use 0x0860e4
 	u32 address = tableLookupAddress(0x085ffe, global.zone * 2)
 	addPatternLoadingCue(address)
 }
@@ -351,14 +359,17 @@ function void TitleCard.TextElement.Init()
 {
 	if (global.zone_act == 0x1600)
 	{
+		// Lava Reef Boss
 		objA0.animation.sprite = 0x0d
 	}
-	else if (global.zone_act == 0x1601)   // Hidden Palace (in normal playthrough)
+	else if (global.zone_act == 0x1601)
 	{
+		// Hidden Palace Zone (in normal playthrough)
 		objA0.animation.sprite = 0x11
 	}
 	else if (global.zone_act == 0x1700)
 	{
+		// Death Egg Boss
 		objA0.animation.sprite = 0x0f
 	}
 	else
@@ -409,6 +420,7 @@ function void fn02d9a0()
 	objA0.update_address = addressof(TitleCard.TextElement.Update)
 	if (global.zone == 0x0a || global.zone == 0x0c || global.zone_act == 0x1601)
 	{
+		// Single act zones (Sky Sanctuary, Doomsday, and Hidden Palace)
 		A1 = 0xffff0000 + u16[A0 + 0x48]
 		--u16[A1 + 0x30]
 		UnloadObject()

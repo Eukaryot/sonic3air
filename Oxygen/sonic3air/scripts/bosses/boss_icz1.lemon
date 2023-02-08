@@ -53,7 +53,7 @@ function void fn07117e()
 	objA0.update_address = 0x0711b0
 	objA0.countdown_callback = 0x0711b6
 
-	requestLoadingPatterns(0x5f)
+	requestLoadingPatterns(0x5f)		// Boss sprites
 	loadPaletteLine1(0x0719da)
 }
 

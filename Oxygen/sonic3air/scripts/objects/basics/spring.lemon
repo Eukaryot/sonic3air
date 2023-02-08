@@ -341,18 +341,18 @@ function void SpringVertical.ApplyToCharacter()
 	if (objA0.subtype2c & 0x01)
 	{
 		objA1.state = char.state.RUNNING
-		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1
-		u8[A1 + 0x31] = 4
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1		// "char.rotation.x.count"
+		u8[A1 + 0x31] = 4										// "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
 			objA1.groundspeed = -1
-			s8[A1 + 0x27] = -1
+			s8[A1 + 0x27] = -1		// Set x-rotation of character
 		}
 		else
 		{
 			objA1.groundspeed = 1
-			s8[A1 + 0x27] = 1
+			s8[A1 + 0x27] = 1		// Set x-rotation of character
 		}
 	}
 	else
@@ -412,18 +412,18 @@ function void SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
 	if (objA0.subtype2c & 0x01)
 	{
 		objA1.state = char.state.RUNNING
-		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1
-		u8[A1 + 0x31] = 4
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1		// "char.rotation.x.count"
+		u8[A1 + 0x31] = 4                                       // "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
 			objA1.groundspeed = -1
-			s8[A1 + 0x27] = -1
+			s8[A1 + 0x27] = -1		// Set x-rotation of character
 		}
 		else
 		{
 			objA1.groundspeed = 1
-			s8[A1 + 0x27] = 1
+			s8[A1 + 0x27] = 1		// Set x-rotation of character
 		}
 	}
 
@@ -548,18 +548,18 @@ function void fn0231be()
 	if (objA0.subtype2c & 0x01)
 	{
 		objA1.state = char.state.RUNNING
-		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3
-		u8[A1 + 0x31] = 8
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3		// "char.rotation.x.count"
+		u8[A1 + 0x31] = 8                                       // "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
 			objA1.groundspeed = -1
-			s8[A1 + 0x27] = -1
+			s8[A1 + 0x27] = -1		// Set x-rotation of character
 		}
 		else
 		{
 			objA1.groundspeed = 1
-			s8[A1 + 0x27] = 1
+			s8[A1 + 0x27] = 1		// Set x-rotation of character
 		}
 	}
 	else
@@ -690,17 +690,17 @@ function void SpringDiagonal.ApplyToCharacter()
 	if (objA0.subtype2c & 0x01)
 	{
 		u8[A1 + 0x20] = 0
-		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3
-		u8[A1 + 0x31] = 8
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3		// "char.rotation.x.count"
+		u8[A1 + 0x31] = 8                                       // "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
-			s8[A1 + 0x27] = -1
+			s8[A1 + 0x27] = -1		// Set x-rotation of character
 			objA1.groundspeed = -1
 		}
 		else
 		{
-			s8[A1 + 0x27] = 1
+			s8[A1 + 0x27] = 1		// Set x-rotation of character
 			objA1.groundspeed = 1
 		}
 	}
@@ -790,17 +790,17 @@ function void SpringDiagonalFlipped.ApplyToCharacter()
 	if (objA0.subtype2c & 0x01)
 	{
 		u8[A1 + 0x20] = 0
-		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3
-		u8[A1 + 0x31] = 8
+		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3		// "char.rotation.x.count"
+		u8[A1 + 0x31] = 8                                       // "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
-			s8[A1 + 0x27] = -1
+			s8[A1 + 0x27] = -1		// Set x-rotation of character
 			objA1.groundspeed = -1
 		}
 		else
 		{
-			s8[A1 + 0x27] = 1
+			s8[A1 + 0x27] = 1		// Set x-rotation of character
 			objA1.groundspeed = 1
 		}
 	}

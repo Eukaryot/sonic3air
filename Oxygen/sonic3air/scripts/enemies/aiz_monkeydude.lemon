@@ -552,7 +552,7 @@ function void fn0875b4()
 	playSound(SFX_BOMBFALL)
 
 	// "spawnProjectileChildObjects(0x08769c)" replaced by:
-	spawnProjectileChildObject(0x086d4a, 0x00, 0, 0, -512, -1024, 0x087674, 0x000000, 0x084bc0)		// Thrown coconut
+	spawnProjectileChildObject(0x086d4a, 0x00, 0, 0, -512, -1024, 0x087674, 0x000000, addressof(MoveWithGravity20))		// Thrown coconut
 	if (_equal())
 	{
 		if (objA0.flags38 & 0x08)

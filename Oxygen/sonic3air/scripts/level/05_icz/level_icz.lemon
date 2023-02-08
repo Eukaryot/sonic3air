@@ -465,7 +465,7 @@ function void fn05382c()
 
 		Kosinski.addToDMAQueue(0x3daf0a, 0x2440)
 
-		requestLoadingPatterns(0x20)
+		requestLoadingPatterns(0x20)		// ICZ2 object sprites
 
 		D7 = pop()
 		A0 = pop()
@@ -630,6 +630,7 @@ function void ICZ1.TransitionToOutdoorArea()
 {
 	if (kosinski.queue_size == 0)
 	{
+		// Go to IceCap Act 2
 		global.zone_act = 0x0501
 		camera.update_routine = 0
 		dynobjects.routine = 0
@@ -649,7 +650,7 @@ function void ICZ1.TransitionToOutdoorArea()
 		Level.InitializeWater()
 		VDP.Config.enableHInt(true)
 
-		Level.loadPaletteData(0x15)
+		Level.loadPaletteData(0x15)		// ICZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()

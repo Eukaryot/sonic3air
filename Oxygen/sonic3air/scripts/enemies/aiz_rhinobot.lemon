@@ -188,7 +188,7 @@ function void fn08701c()
 		playSound(0x48)
 
 		// "spawnChildObjects(0x087122)" replaced by:
-		spawnChildObject(0x086efc, 0x00, 12, 8)		// Dust effect
+		spawnChildObject(addressof(Rhinobot.DustEffect), 0x00, 12, 8)
 		if (_equal())
 		{
 			u32[A1 + 0x30] = 0x08713a
@@ -234,7 +234,7 @@ function void fn086f92()
 	playSound(0x48)
 
 	// "spawnChildObjects(0x08712a)" replaced by:
-	spawnChildObject(0x086efc, 0x00, 16, 8)
+	spawnChildObject(addressof(Rhinobot.DustEffect), 0x00, 16, 8)
 	if (_equal())
 	{
 		u32[A1 + 0x30] = 0x08714a

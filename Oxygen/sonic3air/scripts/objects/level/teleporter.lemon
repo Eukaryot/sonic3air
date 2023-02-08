@@ -87,11 +87,11 @@ function void fn0455cc()
 			if (objA0.render_flags & render_flag.VISIBLE)
 			{
 				u32[0xfffffc62] = 0x040c0408
-				u8[0xfffff650] = 0xff
+				level.palettefx.state = 0xff
 			}
 			else
 			{
-				u8[0xfffff650] = 0
+				level.palettefx.state = 0
 			}
 		}
 	}
@@ -236,7 +236,7 @@ function void fn0456f4()
 			u8[A0 + 0x2d] = D0.u8
 
 			u8[A1 + 0x2e] = 3
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			if (global.zone == 0x16)
@@ -274,7 +274,7 @@ function void fn0457be()
 	if (u8[A0 + 0x2d] == 0)
 	{
 		u8[A1 + 0x2e] = 0x01
-		u8[A1 + 0x20] = char.state.ROLLING
+		objA1.state = char.state.ROLLING
 		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA0.value3e = objA1.position.y.u16
 		u32[A0 + 0x2e] = 0
@@ -315,7 +315,7 @@ function void fn04581c()
 	if (s32[A0 + 0x2e] >= 0)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		u8[0xffffeed6] = 0
 		objA0.update_address = 0x0455cc
 	}
@@ -354,7 +354,7 @@ function void fn045866()
 		u16[A0 + 0x3a] = D0.u16
 
 		A1 = 0x04670c
-		if (global.zone == 0x0a)	// Sky Sanctuary
+		if (global.zone == 0x0a)	// Sky Sanctuary Zone
 		{
 			u32[0xfffffc58] = u32[A1 + D0.s16]
 		}
@@ -384,7 +384,7 @@ function void fn045b94()
 		sram.block_interrupts.u8 = 0xff
 		SaveGameOnLevelFinished()
 
-		TriggerNextZone(0x0a01)
+		TriggerNextZone(0x0a01)		// Knuckles' Sky Sanctuary act
 	}
 	else
 	{
@@ -397,7 +397,7 @@ function void fn045b94()
 		}
 
 		u32[0xfffffc62] = 0x040c0408
-		u8[0xfffff650] = 0xff
+		level.palettefx.state = 0xff
 		objA1.update_address = 0x045ad6
 		objA0.update_address = 0x045bf4
 	}
@@ -545,7 +545,7 @@ function void fn045c8e()
 			objA1.velocity.x = 0
 			u16[A1 + 0x1c] = 0
 			u8[A1 + 0x2e] = 0x03
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			u16[A2] = 0
@@ -579,7 +579,7 @@ function void fn045c8e()
 			sram.block_interrupts.u8 = 0xff
 			SaveGameOnLevelFinished()
 
-			TriggerNextZone(0x0a00)
+			TriggerNextZone(0x0a00)		// Sonic/Tails Sky Sanctuary act
 		}
 	}
 }
@@ -608,7 +608,7 @@ function void fn0522a0()
 		player1.control_override = 0xff
 		control.player1 = 0
 
-		Kosinski.addToDMAQueue(0x159cae, 0xa000)
+		Kosinski.addToDMAQueue(0x159cae, 0xa000)		// Zone warp teleporter sprites
 
 		A1 = 0xfffffc22
 		objA1.update_address = 0x0eee0ec0
@@ -659,7 +659,7 @@ function void fn05234a()
 		{
 			u8[A1 + 0x2e] = 1
 			u8[A1 + 0x2a] |= char.flag.ROLLING
-			u8[A1 + 0x20] = char.state.ROLLING
+			objA1.state = char.state.ROLLING
 		}
 		else if (u8[A2 + 0x46] < 0x18)
 		{
@@ -683,7 +683,7 @@ function void fn05234a()
 
 			u8[A1 + 0x2e] = 3
 			objA1.position.y.u16 = 0
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 
 			playSound(0x73)
@@ -704,7 +704,7 @@ function void fn0523ca()
 	if (camera.position.y.u16 < 0x0780)
 	{
 		playMusic(MUSIC_CTRL_FADEOUT)
-		TriggerNextZone(0x0500)
+		TriggerNextZone(0x0500)		// IceCap Act 1
 	}
 }
 

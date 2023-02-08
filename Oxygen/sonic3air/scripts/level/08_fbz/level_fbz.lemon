@@ -826,6 +826,7 @@ function void fn052972()
 {
 	if (u16[0xffffeec6] != 0)
 	{
+		// Go to Flying Battery Act 2
 		u16[0xffffeec6] = 0
 
 		push(A3)
@@ -833,7 +834,7 @@ function void fn052972()
 		push(A0)
 		push(D7)
 
-		requestLoadingPatterns(0x1c)
+		requestLoadingPatterns(0x1c)		// FBZ2 object sprites
 
 		global.zone_act = 0x0401
 		camera.update_routine = 0
@@ -846,7 +847,7 @@ function void fn052972()
 		fn01c362()
 		fn0076a6()
 
-		Level.loadPaletteData(0x13)
+		Level.loadPaletteData(0x13)		// FBZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()

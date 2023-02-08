@@ -103,9 +103,9 @@ function void fn078592()
 	objA0.base_state = 0x04
 	objA0.countdown_value = 0x2f
 
-	Kosinski.addToDMAQueue(0x16fcda, 0x7f60)
+	Kosinski.addToDMAQueue(0x16fcda, 0x7f60)		// Boss sprites
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 
@@ -654,7 +654,7 @@ function void fn078aa8()
 	copyMemory((A2+=8)-8, (A1+=8)-8, 8)
 	u16[A2] = 0
 	u32[0xfffffada] = 0x078b00
-	u16[0xfffff634] = 0x7fff
+	level.palettefx.timer_1 = 0x7fff
 
 	if (allocDynamicObjectStd())
 	{
@@ -680,7 +680,7 @@ function void fn078ae6()
 		return
 
 	move_area.left = 0x0940
-	u16[0xfffff634] = 0
+	level.palettefx.timer_1 = 0
 	UnloadObject()
 }
 

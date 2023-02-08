@@ -617,7 +617,7 @@ function void fn026eda()
 			#endif
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = char.state.ROLLING
+			objA1.state = char.state.ROLLING
 			objA1.flags2a |= char.flag.ROLLING
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
 			if (D0 & 0x00000400)

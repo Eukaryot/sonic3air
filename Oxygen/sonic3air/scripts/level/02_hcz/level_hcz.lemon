@@ -136,6 +136,7 @@ function void fn050bce()
 
 		Kosinski.addToDMAQueue(0x3bfa6c, 0x2360)
 
+		// Load HCZ2 object sprites
 		requestLoadingPatterns(0x10)
 		requestLoadingPatterns(0x11)
 
@@ -167,6 +168,7 @@ function void fn050c4c()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Hydrocity Act 2
 		global.zone_act = 0x0101
 		camera.update_routine = 0
 		dynobjects.routine = 0
@@ -192,7 +194,7 @@ function void fn050c4c()
 		water.height.next = D0.u16
 		water.height.target = D0.u16
 
-		Level.loadPaletteData(0x0d)
+		Level.loadPaletteData(0x0d)		// HCZ 2 level palette
 
 		D7 = backupD7
 		A0 = backupA0

@@ -704,7 +704,7 @@ function void fn08b616()
 
 			if (objA0.subtype2c & 0x80)
 			{
-				TriggerNextZone(0x0600)
+				TriggerNextZone(0x0600)		// Launch Base Act 1
 			}
 		}
 		Object.TriggerUnloading()

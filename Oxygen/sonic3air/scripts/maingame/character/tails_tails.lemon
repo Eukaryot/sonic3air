@@ -40,7 +40,7 @@ function void TailsTails.Update()
 	objA0.sprite_attributes = (objA0.sprite_attributes & ~sprite_attribute.PRIORITY) | (u16[A2 + 0x0a] & sprite_attribute.PRIORITY)
 
 	D0 = u8[A2 + 0x20]
-	if ((u8[A2 + 0x2a] & char.flag.PUSHING) && u8[0xfffff7c9] == 0)
+	if ((u8[A2 + 0x2a] & char.flag.PUSHING) && level.HCZ_water_current_flags.tails == 0)
 	{
 		if (u8[A2 + 0x22] >= 0xa9 && u8[A2 + 0x22] <= 0xac)		// Range of Tails' pushing animation frames
 		{

@@ -151,7 +151,7 @@ function void fn056bd2()
 
 		Kosinski.addToDMAQueue(0x1b97d6, 0x1200)
 
-		requestLoadingPatterns(0x30)
+		requestLoadingPatterns(0x30)		// LRZ2 object sprites
 
 		D7 = backupD7
 		A0 = backupA0
@@ -253,6 +253,7 @@ function void fn056caa()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Lava Reef Act 2
 		global.zone_act = 0x0901
 		camera.update_routine = 0
 		dynobjects.routine = 0
@@ -681,7 +682,7 @@ function void fn057156()
 
 	if (objA0.countdown_value == 0)
 	{
-		Kosinski.addToDMAQueue(0x15a112, 0x73e0)
+		Kosinski.addToDMAQueue(0x15a112, 0x73e0)		// Death Egg as part of the backgornd
 		objA0.flags2e = 0xff
 	}
 
@@ -1584,8 +1585,8 @@ function void fn059f3c()
 
 function void fn059f82()
 {
-	if (u8[A1 + 0x20] == char.state.STANDING)
-		u8[A1 + 0x20] = char.state.RUNNING
+	if (objA1.state == char.state.STANDING)
+		objA1.state = char.state.RUNNING
 
 	D0.u16 += 0x10
 	if (objA1.position.x.u16 < D0.u16)

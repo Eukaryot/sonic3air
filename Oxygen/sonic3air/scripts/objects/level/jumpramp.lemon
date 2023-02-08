@@ -65,11 +65,11 @@ function void fn024d9a()
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			u8[A1 + 0x05] = 2
 			u16[A1 + 0x1c] = 1
-			u8[A1 + 0x27] = 1
+			u8[A1 + 0x27] = 1		// Set x-rotation of character
 			u8[A1 + 0x20] = 0
-			u8[A1 + 0x30] = 0
-			u8[A1 + 0x31] = 4
-			u8[A1 + 0x2d] = 5
+			u8[A1 + 0x30] = 0		// "char.rotation.x.count"
+			u8[A1 + 0x31] = 4		// "char.rotation.x.speed"
+			u8[A1 + 0x2d] = 5		// Set corkscrew jump ramp animation
 		}
 	}
 }

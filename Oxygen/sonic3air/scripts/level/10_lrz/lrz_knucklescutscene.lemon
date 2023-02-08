@@ -149,7 +149,7 @@ function void fn063b40()
 		objA1.update_address = 0x063c3e
 	}
 
-	Kosinski.addToDMAQueue(0x172214, 0xa000)
+	Kosinski.addToDMAQueue(0x172214, 0xa000)	// Rolling boulder sprites
 }
 
 
@@ -188,7 +188,7 @@ function void fn063bbe()
 	player1.camera_lock = 0xff
 	player1.control_override = 0
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = char.state.LOOKING_UP
+	objA1.state = char.state.LOOKING_UP
 }
 
 
@@ -214,7 +214,7 @@ function void fn063c14()
 	level.backup.rings = ring_counter
 	level.backup.timer.alldata = timer.alldata
 	global.shields_backup_2 = u8[0xffffb000 + 0x2b]
-	TriggerNextZone(0x1600)
+	TriggerNextZone(0x1600)		// Lava Reef boss act
 }
 
 

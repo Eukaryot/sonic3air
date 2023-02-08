@@ -28,19 +28,22 @@ function void Rocks.Init()
 	objA0.countdown_value = objA0.position.x.u16
 	objA0.value42 = 0x40
 
-	if (global.zone_act == 0x0001)	// Angel Island Act 2
+	if (global.zone_act == 0x0001)
 	{
+		// Angel Island Act 2
 		objA0.mapping_offset = 0x21dd64
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x02e9)
 	}
-	else if (global.zone_act == 0x1200)	// ?
+	else if (global.zone_act == 0x1200)
 	{
+		// Endless Mine
 		objA0.mapping_offset = 0x21ddec
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE3 | 0x0300)
 		objA0.animation.sprite = 0
 	}
-	else if (global.zone == 0x09)	// Lava Reef
+	else if (global.zone == 0x09)
 	{
+		// Lava Reef Zone
 		if (global.act == 0)
 		{
 			objA0.mapping_offset = 0x0203d8
@@ -471,7 +474,7 @@ function void Rocks.BreakWall()
 		if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 0x01)
 		{
 			u8[A1 + 0x2f] = 0x02
-			u8[A1 + 0x20] = char.state.KNUX_FALLING
+			objA1.state = char.state.KNUX_FALLING
 			if (objA1.velocity.x < 0)
 				u8[A1 + 0x2a] |= 0x01
 			else

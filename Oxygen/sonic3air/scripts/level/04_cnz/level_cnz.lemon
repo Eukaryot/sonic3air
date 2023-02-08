@@ -382,6 +382,7 @@ function void fn051e60()
 {
 	if (u16[0xffffeec6] != 0)
 	{
+		// Go to Carnival Night Act 2
 		u16[0xffffeec6] = 0
 
 		push(A3)
@@ -389,6 +390,7 @@ function void fn051e60()
 		push(A0)
 		push(D7)
 
+		// Load CNZ2 object sprites
 		requestLoadingPatterns(0x18)
 		requestLoadingPatterns(0x19)
 
@@ -409,7 +411,7 @@ function void fn051e60()
 			VDP.Config.enableHInt(true)
 		}
 
-		Level.loadPaletteData(0x11)
+		Level.loadPaletteData(0x11)		// CNZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()
@@ -642,7 +644,7 @@ function void fn05215a()
 						u32 backupA2 = A2
 						u32 backupA3 = A3
 
-						addPatternLoadingCue(0x083d74)
+						addPatternLoadingCue(0x083d74)		// Capsule Sprites
 
 						D7 = backupD7
 						A0 = backupA0

@@ -59,6 +59,6 @@ function void fn06d104()
 //# address-hook(0x06d13c) end(0x06d146)
 function void fn06d13c()
 {
-	TriggerNextZone(0x0300)
+	TriggerNextZone(0x0300)		// Carnival Night Zone
 	UnloadObject()
 }

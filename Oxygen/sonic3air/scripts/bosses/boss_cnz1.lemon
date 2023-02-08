@@ -33,7 +33,7 @@ function void fn06d99c()
 	playMusic(MUSIC_CTRL_FADEOUT)
 	level.boss_encounter = 1
 
-	requestLoadingPatterns(0x5d)
+	requestLoadingPatterns(0x5d)		// Boss sprites
 	loadPaletteLine1(0x06e370)
 }
 
@@ -226,7 +226,7 @@ function void fn06dbae()
 	level.boss_encounter = 0
 	fn083c06()
 
-	addPatternLoadingCue(0x085bc8)
+	addPatternLoadingCue(0x085bc8)		// Signpost pole sprite
 }
 
 

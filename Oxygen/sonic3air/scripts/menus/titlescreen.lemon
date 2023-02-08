@@ -91,7 +91,7 @@ function void fn00440c()
 	{
 		if (D7.u16 > 7)
 		{
-			Kosinski.decompress(D0 & 0x00ffffff, 0xffff0000)
+			Kosinski.decompress(D0 & 0x00ffffff, 0xffff0000)		// Title screen + intro frames
 			D3.u16 = A1.u16 >> 1
 		}
 
@@ -192,7 +192,7 @@ function void TitleScreen()
 	global.stage_type = 0
 	debug_mode.state = 0
 	global.rolling_demo = 0
-	u16[0xfffff634] = 0
+	level.palettefx.timer_1 = 0
 	competition_mode.active = 0
 	global.level_started = 0
 	debug_mode.enabled.u8 = 0
@@ -215,6 +215,7 @@ function void TitleScreen()
 		return
 	}
 
+	// S3 title screen intro first frame
 	Kosinski.decompress(0x350d26, 0xffff0000)	// After this, A1 points to where uncompressed data ends
 	updateSpritePattern(0xffff0000, TitleScreen.Intro_Background.targetInVRAM, A1.u16 >> 1)
 
@@ -515,9 +516,7 @@ function void TitleScreen()
 		global.sk_bluespheres = 1
 		global.zone = 0x07
 		u16[0xffffffb0] = 0
-		u32[0xffffffb2] = 0
-		u16[0xffffffb6] = 0
-		u8[0xffffffb8] = 0
+		zeroMemory(0xffffffb2, 7)		// Clear emerald collection states
 		u8[0xffffffb3] = 0x02
 	}
 	else

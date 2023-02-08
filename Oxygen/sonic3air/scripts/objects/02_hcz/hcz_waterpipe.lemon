@@ -23,7 +23,7 @@ function void fn02fef6()
 		return
 	}
 
-	Kosinski.addToDMAQueue(0x390c02, 0xa000)
+	Kosinski.addToDMAQueue(0x390c02, 0xa000)		// Water geyser horizontal
 
 	objA0.update_address = 0x02ff2a
 	fn02ff2a()
@@ -133,7 +133,7 @@ function void fn03003c()
 	u16[(A2+=2)-2] = objA0.position.y.u16
 	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
 	{
-		u8[0xfffff650] = 0
+		level.palettefx.state = 0
 		playSound(0xe3)
 		playSound(0xe4)
 
@@ -289,7 +289,7 @@ function void fn030294()
 	u16 dy = u16[0xffffb000 + 0x14] - objA0.position.y.u16 + 0x40
 	if (dx < 0x60 && dy < 0x10)
 	{
-		Kosinski.addToDMAQueue(0x391394, 0xa000)
+		Kosinski.addToDMAQueue(0x391394, 0xa000)		// Water geyser vertical sprites
 		objA0.animation.sprite = 1
 		u8[0xffffb000 + 0x2e] = 0x81
 		u8[0xffffb04a + 0x2e] = 0x81
@@ -365,7 +365,7 @@ function void fn030338()
 		objA0.update_address = 0x03041a
 
 		playSound(0x57)
-		u8[0xfffff650] = 1
+		level.palettefx.state = 1
 
 		A3 = 0x0303ea
 		D2.u16 = objA0.position.x.u16
@@ -481,7 +481,7 @@ function void fn03052a()
 		playSound(0xe3)
 		playSound(0xe4)
 
-		u8[0xfffff650] = 0
+		level.palettefx.state = 0
 		if (objA0.respawn_entry)
 		{
 			A2 = 0xffff0000 + objA0.respawn_entry

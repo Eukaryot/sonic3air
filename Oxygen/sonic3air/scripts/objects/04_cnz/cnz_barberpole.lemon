@@ -74,7 +74,7 @@ function void fn033392()
 
 					fn0337d8()
 					s8[A1 + 0x26] = 0x20
-					u8[A1 + 0x2d] = 0x02
+					u8[A1 + 0x2d] = 0x02		// Diagonal corkscrew animation, walking right
 				}
 			}
 		}
@@ -101,7 +101,7 @@ function void fn033392()
 
 						fn0337d8()
 						s8[A1 + 0x26] = 0x20
-						u8[A1 + 0x2d] = 0x02
+						u8[A1 + 0x2d] = 0x02		// Diagonal corkscrew animation, walking right
 					}
 				}
 			}
@@ -150,7 +150,7 @@ function void fn033392()
 				}
 
 				D0.u16 *= 2
-				u8[A1 + 0x27] = D0.u8
+				u8[A1 + 0x27] = D0.u8		// Set x-rotation of character
 				LookupSinCos()
 				D4.u16 = D1.u16
 				D1.s16 >>= 4
@@ -177,8 +177,8 @@ function void fn033392()
 
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x30] = 0
-	u8[A1 + 0x31] = 0x04
+	u8[A1 + 0x30] = 0			// "char.rotation.x.count"
+	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 
@@ -228,7 +228,7 @@ function void fn0335c4()
 
 					fn0337d8()
 					s8[A1 + 0x26] = -0x20
-					u8[A1 + 0x2d] = 0x03
+					u8[A1 + 0x2d] = 0x03		// Diagonal corkscrew animation, walking left
 				}
 			}
 		}
@@ -255,7 +255,7 @@ function void fn0335c4()
 
 						fn0337d8()
 						s8[A1 + 0x26] = -0x20
-						u8[A1 + 0x2d] = 0x03
+						u8[A1 + 0x2d] = 0x03		// Diagonal corkscrew animation, walking left
 					}
 				}
 			}
@@ -305,7 +305,7 @@ function void fn0335c4()
 
 				D0.s8 = -D0.s8
 				D0.u16 *= 2
-				u8[A1 + 0x27] = D0.u8
+				u8[A1 + 0x27] = D0.u8		// Set x-rotation of character
 				LookupSinCos()
 				D4.u16 = D1.u16
 				D1.s16 >>= 4
@@ -332,8 +332,8 @@ function void fn0335c4()
 
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit
-	u8[A1 + 0x30] = 0
-	u8[A1 + 0x31] = 0x04
+	u8[A1 + 0x30] = 0           // "char.rotation.x.count"
+	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 }
 

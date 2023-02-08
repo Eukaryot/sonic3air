@@ -122,6 +122,16 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 			return true
 		}
 
+		// Dynamic ring
+		if (objA0.update_address == 0x01a88c && objA0.base_state == 0x00)
+		{
+			// Use smoother ring rotation
+			u16 animFrame = ((objA0.animation.sprite * 4 + 3 - objA0.animation.timer) / 2) % 8
+			u64 key = stringformat("ring_0%d", animFrame)
+			Renderer.drawCustomSprite(key, px, py, 0x00, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue, 0, 255)
+			return true
+		}
+
 		// Monitor
 		if (objA0.update_address >= 0x01d566 && objA0.update_address <= 0x01d61e)
 		{
@@ -154,7 +164,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				{
 					if (objA0.animation.sprite == 1)
 					{
-						Renderer.drawCustomSprite(Monitor.getIconSpriteKey(0), px, py, 0x00, flags, renderQueue + 1)
+						Renderer.drawCustomSprite(Monitor.getIconSpriteKey(0), px, py, 0x00, flags, renderQueue + 1)		// Draw static monitor icon
 					}
 				}
 				else
@@ -164,7 +174,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 					{
 						if (Monitor.enforceClassicShield())
 						{
-							key = Monitor.getIconSpriteKey(0x0b)
+							key = Monitor.getIconSpriteKey(0x0b)		// Get classic shield monitor icon key
 						}
 					}
 					if (key != 0)
@@ -329,20 +339,6 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 					atex = 0x40 + getMainCharacter() * 0x20
 				}
 				Renderer.drawCustomSprite(key, px, py, atex, flags, renderQueue)
-				return true
-			}
-		}
-
-		// Character sprites in best ending final scene
-		if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
-		{
-			u8 character = (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e) ? CHARACTER_SONIC : CHARACTER_TAILS
-			u8 atex = 0x40 + character * 0x20
-			u8 animationSprite = (objA0.animation.sprite <= 4) ? (objA0.animation.sprite-1) : (objA0.animation.sprite <= 9) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
-			u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), animationSprite)
-			if (Renderer.hasCustomSprite(key))
-			{
-				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 				return true
 			}
 		}
@@ -530,12 +526,22 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				return true
 			}
 
-			//// CNZ Balloon
-			//if (objA0.update_address == 0x031754)		// TODO: This still does not work (except for the red balloon, but not even its cord)
-			//{
-			//	Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)
-			//	return true
-			//}
+			// CNZ Balloon
+			if (objA0.update_address == 0x031754 && objA0.subtype2c == 0x04)
+			{
+				// This only works for the red balloon; its cord and other colors use a copy of the art that's Nemesis-compressed
+				Standalone.renderWithKosinskiCompression(px, py, 0x37060e, 0xff, renderQueue, 0xae80)		// Draw the balloon sprite
+
+				// Directly drawing the cord sprites
+				if (objA0.animation.sprite == 0x14)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, 0x035c, renderQueue)
+				if (objA0.animation.sprite == 0x15)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, 0x0360, renderQueue)
+				if (objA0.animation.sprite == 0x16)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, (sprite_attribute.FLIP_X | 0x035c), renderQueue)
+
+				return true        // skip hardware drawing the original balloon
+			}
 
 			// Elemental Shields + Insta-Shield
 			if (objA0.update_address == 0x01952a || objA0.update_address == 0x019602 || objA0.update_address == 0x019732 || objA0.update_address == 0x019922)
@@ -575,7 +581,9 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		{
 			u8 character = getMainCharacter()
 			u8 atex = 0x40 + character * 0x20
-			u64 key = stringformat((objA0.update_address == 0x05ca9e) ? "%s_tails_wait_0x%02x" : "%s_wait_0x%02x", getCharacterContinueIcon(character), objA0.animation.sprite)
+			u64 key = stringformat("%s_wait_0x%02x", getCharacterContinueIcon(character), (character == CHARACTER_SONIC) ? objA0.animation.sprite : (character == CHARACTER_TAILS) ? objA0.animation.sprite-2 : objA0.animation.sprite-7)
+			if (objA0.update_address == 0x05ca9e)
+				key = stringformat("%s_tails_wait_0x%02x", getCharacterContinueIcon(character), objA0.animation.sprite-4)
 			if (Renderer.hasCustomSprite(key))
 			{
 				Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
@@ -797,6 +805,20 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 		u8 atex = 0x40 + character * 0x20
 		Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
 		return true
+	}
+
+	// Character sprites in best ending final scene
+	if (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e || objA0.update_address == 0x05f3da || objA0.update_address == 0x05f400)
+	{
+		u8 character = (objA0.update_address == 0x05f376 || objA0.update_address == 0x05f39e) ? CHARACTER_SONIC : CHARACTER_TAILS
+		u8 atex = 0x40 + character * 0x20
+		u8 animationSprite = (character == CHARACTER_SONIC) ? (objA0.animation.sprite-1) : (character == CHARACTER_TAILS) ? (objA0.animation.sprite-5) : (objA0.animation.sprite-10)
+		u64 key = stringformat((objA0.update_address == 0x05f400) ? "%s_tails_ending_0x%02x" : "%s_ending_0x%02x", getCharacterSpriteKey(character, false), animationSprite)
+		if (Renderer.hasCustomSprite(key))
+		{
+			Renderer.drawCustomSprite(key, px, py, atex, prioFlag ? SPRITE_FLAG_PRIO : 0, renderQueue)
+			return true
+		}
 	}
 
 	// Characters in Data Select screen character selection
@@ -1136,30 +1158,37 @@ function void Standalone.renderCutsceneKnuckles(u8 variant, s16 px, s16 py, u16 
 	{
 		if (variant == 1)
 		{
+			// Sonic 3 (disc 1) zones use a shared resource for its Knuckles cutscene sprites
 			key = Standalone.renderWithStandardPacking(px, py, 0x06666a, 0x80, renderQueue)
 		}
 		else if (variant == 2)
 		{
+			// HPZ emerald theft scene
 			key = Standalone.renderWithStandardPacking(px, py, 0x066682, 0x80, renderQueue)
 		}
 		else if (variant == 3)
 		{
+			// Tired panting and shooing in HPZ/SSZ
 			key = Standalone.renderWithStandardPacking(px, py, 0x06668a, 0x80, renderQueue)
 		}
 		else if (variant == 4)
 		{
+			// Pushing the lever in MHZ 2
 			key = Standalone.renderWithStandardPacking(px, py, 0x066672, 0x80, renderQueue)
 		}
 		else if (variant == 5)
 		{
+			// Laying down in intro
 			key = Standalone.renderWithStandardPacking(px, py, 0x06667a, 0x80, renderQueue)
 		}
 		else if (variant == 6)
 		{
+			// Outro
 			key = Standalone.renderWithKosinskiCompression(px, py, 0x163b9a, 0x80, renderQueue)
 		}
 		else if (variant == 7)
 		{
+			// Looking left and right in MHZ 1
 			key = Standalone.renderWithKosinskiCompression(px, py, 0x1695c0, 0x80, renderQueue)
 		}
 

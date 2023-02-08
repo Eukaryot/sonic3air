@@ -180,7 +180,7 @@ function void fn03fe70()
 				objA0.flags2a |= bit
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
-				u8[A1 + 0x20] = char.state.ROLLING
+				objA1.state = char.state.ROLLING
 				u8[A1 + 0x2a] |= char.flag.ROLLING
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK
 				u8[A1 + 0x2f] = 0
@@ -275,8 +275,8 @@ function void fn03ff9e()
 				{
 					u8[A1 + 0x27] = 1
 					u8[A1 + 0x20] = 0
-					u8[A1 + 0x30] = 0x7f
-					u8[A1 + 0x31] = 0x08
+					u8[A1 + 0x30] = 0x7f		// "char.rotation.x.count"
+					u8[A1 + 0x31] = 0x08		// "char.rotation.x.speed"
 				}
 
 			#if STANDALONE

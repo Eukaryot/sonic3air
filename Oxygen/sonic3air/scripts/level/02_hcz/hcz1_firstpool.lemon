@@ -40,7 +40,7 @@ function void fn02fda4()
 		u16[A0 + 0x3c] = A1.u16
 	}
 
-	u8[0xfffff7c7] = 3
+	level.HCZ_breakable_bar_flags = 3
 	objA0.update_address = 0x02fe34
 	fn02fe34()
 }
@@ -54,8 +54,8 @@ function void fn02fe34()
 		objA0.animation.sprite = 3
 		objA0.animation.timer = 1
 		objA0.update_address = 0x02fe5e
-		u8[0xfffff7c7] = 0
-		u8[0xfffff650] = 1
+		level.HCZ_breakable_bar_flags = 0
+		level.palettefx.state = 1
 	}
 
 	DrawOrUnloadObject()

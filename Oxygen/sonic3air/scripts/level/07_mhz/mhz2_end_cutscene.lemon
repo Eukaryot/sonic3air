@@ -336,7 +336,7 @@ function void fn076456()
 	if (objA0.countdown_value >= 0)
 		return
 
-	TriggerNextZone(0x0400)
+	TriggerNextZone(0x0400)		// Flying Battery Zone
 	UnloadObject()
 
 #if STANDALONE
@@ -351,7 +351,7 @@ function void fn07646e()
 	objA0.update_address = 0x076492
 	A1 = 0xffffb04a
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = char.state.TAILS_FLYDOWN
+	objA1.state = char.state.TAILS_FLYDOWN
 	objA1.render_flags &= ~render_flag.FLIP_X
 	u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 }

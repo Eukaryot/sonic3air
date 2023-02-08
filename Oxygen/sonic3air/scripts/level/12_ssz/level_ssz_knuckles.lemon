@@ -15,7 +15,7 @@
 //# address-hook(0x058a46) end(0x058a9a)
 function void InitLevelTiles.SSZ_Knuckles()
 {
-	u8[0xfffff650] = 0xff
+	level.palettefx.state = 0xff
 	if (allocDynamicObjectStd())
 	{
 		objA1.update_address = 0x057c1e
@@ -175,7 +175,7 @@ function void fn058b20()
 
 	u16[0xffffeec8] = 0x01f0
 	u16[0xffffeeca] = 0x0f
-	u8[0xfffff650] = 0
+	level.palettefx.state = 0
 	u16[0xffffeec0] += 4
 }
 
@@ -721,7 +721,7 @@ function void fn059194()
 //# address-hook(0x05b42a) end(0x05b470)
 function void fn05b42a()
 {
-	Kosinski.addToDMAQueue(0x0de362, 0x7de0)
+	Kosinski.addToDMAQueue(0x0de362, 0x7de0) 		// "& Knuckles" subtitle
 
 	D0.u16 = (global.characters & 0x03) - 2
 	D1 = 0
@@ -746,7 +746,7 @@ function void fn05b42a()
 //# address-hook(0x05b4d4) end(0x05b4d8)
 function void fn05b4d4()
 {
-	addPatternLoadingCue(0x05b504)
+	addPatternLoadingCue(0x05b504)		// Characters and logo sprites in post-credits eyecatch
 
 	fn05b4de()
 }
@@ -755,7 +755,7 @@ function void fn05b4d4()
 //# address-hook(0x05b4de) end(0x05b4e2)
 function void fn05b4de()
 {
-	addPatternLoadingCue(0x05b50c)
+	addPatternLoadingCue(0x05b50c)		// Knuckles ending pose sprites
 
 	fn05b4e8()
 }
@@ -764,7 +764,7 @@ function void fn05b4de()
 //# address-hook(0x05b4e8) end(0x05b4f2)
 function void fn05b4e8()
 {
-	Kosinski.addToDMAQueue(0x16461e, 0x82a0)
+	Kosinski.addToDMAQueue(0x16461e, 0x82a0)		// "Sonic 3" Logo sprite
 }
 
 
@@ -773,7 +773,7 @@ function void fn05b4f8()
 {
 	fn05b4e8()
 
-	addPatternLoadingCue(0x05b504)
+	addPatternLoadingCue(0x05b504)		// Characters and logo sprites in post-credits eyecatch
 }
 
 
@@ -786,7 +786,7 @@ function void fn07ca1c()
 	objA0.update_address = 0x07ca3a
 	move_area.right = move_area.left + getScreenExtend() * 2
 
-	addPatternLoadingCue(0x07ca32)
+	addPatternLoadingCue(0x07ca32)		// Robotnik's ship
 }
 
 
@@ -825,7 +825,7 @@ function void fn07ca3a()
 	// "spawnChildObjects(0x0681b4)" replaced by:
 	spawnChildObject(0x068062, 0x00, 30, 0)
 
-	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)
+	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)	// Egg Mobile grabber claw sprites
 
 	DrawObject()
 }

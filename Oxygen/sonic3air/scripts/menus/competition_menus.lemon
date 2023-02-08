@@ -1693,8 +1693,8 @@ function void fn00bc08()
 	global.frame_state = 0x1e
 	waitForNextFrame()
 
-	Kosinski.decompress(0x15bac0, 0xffff0020)
-	Kosinski.decompress(0x15c130, A1)
+	Kosinski.decompress(0x15bac0, 0xffff0020)		// Results-related sprites, needed for Sonic's continue icon
+	Kosinski.decompress(0x15c130, A1)				// Knuckles and Tails' continue icons
 
 #if !STANDALONE
 	set_status_register(0x2700)

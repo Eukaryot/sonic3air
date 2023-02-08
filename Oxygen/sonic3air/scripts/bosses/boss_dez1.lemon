@@ -51,8 +51,8 @@ function void fn07ddb4()
 	// "spawnSimpleChildObjects(0x07ef96)" replaced by:
 	spawnSimpleChildObjects(0x07e80e, 8)
 
-	requestLoadingPatterns(0x7b)
-	Kosinski.addToDMAQueue(0x1805a0, 0x8000)
+	requestLoadingPatterns(0x7b)		// Robotnik's ship and boss explosion sprites
+	Kosinski.addToDMAQueue(0x1805a0, 0x8000)		// Boss sprites
 
 	loadPaletteLine1(0x07effc)
 }
@@ -656,7 +656,7 @@ function void fn07e384()
 	{
 		objA0.update_address = 0x07e3ca
 		u8[A1 + 0x2e] = 0x83
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		StopObjectA1()
 
 		objA1.render_flags &= ~render_flag.FLIP_X

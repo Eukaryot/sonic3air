@@ -37,7 +37,7 @@ function void DebugMode.Enter()
 	u16[0xffffb000 + 0x14] &= D0.u16
 	camera.position.y.u16 &= D0.u16
 	player1.camera_lock = 0
-	u16[0xfffff7c8] = 0
+	level.HCZ_water_current_flags.both = 0
 	if (char.flags & char.flag.UNDERWATER)
 	{
 		char.flags &= ~char.flag.UNDERWATER
@@ -127,7 +127,7 @@ function void DebugMode.EvaluateInput()
 			--debug_mode.move_delay
 			if (debug_mode.move_delay == 0)
 			{
-				debug_mode.move_delay = 1	// Tha's basically no delay at all
+				debug_mode.move_delay = 1	// That's basically no delay at all
 
 				// Increase movement speed, up to 0xff
 				if (debug_mode.move_speed < 0xff)
@@ -245,7 +245,7 @@ function void DebugMode.ResetSonic()
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
 	u16[A1 + 0x1c] = 0
-	u8[A1 + 0x20] = char.state.RUNNING
+	objA1.state = char.state.RUNNING
 	u8[A1 + 0x2a] &= char.flag.FACING_LEFT
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0

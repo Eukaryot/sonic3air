@@ -190,7 +190,7 @@ function void fn060e5c()
 		objA0.countdown_callback = 0x060ea2
 
 		// "spawnSimpleChildObjects(0x061444)" replaced by:
-		spawnSimpleChildObjects(0x060eba, 1)
+		spawnSimpleChildObjects(0x060eba, 1)		// Falling bonus bubble
 	}
 
 	MoveWithParent()

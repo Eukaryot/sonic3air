@@ -31,7 +31,7 @@ function void fn069ea0()
 	level.boss_encounter = 1
 	u8[0xffffeee8] = 0xff
 
-	requestLoadingPatterns(0x5b)
+	requestLoadingPatterns(0x5b)		// Boss sprites
 	level.vertical_wrap = 0x0300
 
 	// "spawnChildObjects(0x06ad6e)" replaced by:

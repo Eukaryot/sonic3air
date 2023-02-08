@@ -41,16 +41,16 @@ define outro.scroll_speed = u32[0xfffffac8]
 function void fn05928c()
 {
 	// Palette cycling for the ocean
-	if (u8[0xfffff650] == 0)
+	if (level.palettefx.state == 0)
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 0x07
-			D0.u16 = u16[0xfffff632] + 0x06
+			level.palettefx.timer_1 = 0x07
+			D0.u16 = level.palettefx.frame_1 + 0x06
 			if (D0.u16 >= 0x30)
 				D0 = 0
-			u16[0xfffff632] = D0.u16
+			level.palettefx.frame_1 = D0.u16
 			u32[0xfffffc7a] = u32[0x0592be + D0.s16]
 			u16[0xfffffc7e] = u16[0x0592c2 + D0.s16]
 		}
@@ -100,7 +100,7 @@ function void fn05b1a2()
 	u16[0xfffffc02] = 0x0eee
 	u16[0xfffffc22] = 0x00ee
 
-	addPatternLoadingCue(0x05b1ec)
+	addPatternLoadingCue(0x05b1ec)		// Credits text font
 }
 
 
@@ -655,9 +655,9 @@ function void fn05f26c()
 	}
 
 	// "spawnChildObjects(0x0601f0)" replaced by:
-	spawnChildObject(0x05f31c, 0x00, 0, 0)
-	spawnChildObject(0x05f3aa, 0x02, 0, 0)
-	spawnChildObject(0x05f410, 0x04, 0, 0)
+	spawnChildObject(0x05f31c, 0x00, 0, 0)		// Sonic in best ending final screen
+	spawnChildObject(0x05f3aa, 0x02, 0, 0)		// Tails in best ending final screen
+	spawnChildObject(0x05f410, 0x04, 0, 0)		// Knuckles in best ending final screen
 }
 
 
@@ -870,7 +870,7 @@ function void fn05f94c()
 #endif
 	copyMemory(A2, A1, 0x10)
 
-	Kosinski.addToDMAQueue(0x165826, 0x76c0)
+	Kosinski.addToDMAQueue(0x165826, 0x76c0)		// Clouds
 }
 
 

@@ -247,30 +247,30 @@ function void fn02863e()
 //# address-hook(0x002918) end(0x0029a6)
 function void LevelPaletteUpdate.BonusGS()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 0
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 0x0e
-		if (u16[0xfffff632] >= 0xfc)
+		level.palettefx.timer_1 = 0
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 0x0e
+		if (level.palettefx.frame_1 >= 0xfc)
 		{
-			u16[0xfffff632] = 0
+			level.palettefx.frame_1 = 0
 		}
 		A0 = 0xffff7800 + D0.s16
 		A1 = 0xfffffc70
 		copyMemory((A1+=14)-14, (A0+=14)-14, 14)
 	}
 
-	--u16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 0x03
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] += 0x0a
-		if (u16[0xfffff652] >= 0x03e8)
+		level.palettefx.timer_2 = 0x03
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 += 0x0a
+		if (level.palettefx.frame_2 >= 0x03e8)
 		{
-			u16[0xfffff652] = 0
+			level.palettefx.frame_2 = 0
 		}
 		A0 = 0xffff78fc + D0.s16
 		A1 = 0xfffffc42
@@ -290,41 +290,41 @@ function void LevelPaletteUpdate.BonusSM()
 		return
 #endif
 
-	if (s8[0xfffff650] > 0)
+	if (s8(level.palettefx.state) > 0)
 	{
-		--u16[0xfffff658]
-		if (s16[0xfffff658] < 0)
+		--level.palettefx.timer_2
+		if (s16(level.palettefx.timer_2) < 0)
 		{
-			u16[0xfffff658] = 0
+			level.palettefx.timer_2 = 0
 
-			D0.u16 = u16[0xfffff652]
-			u16[0xfffff652] += 8
-			if (u16[0xfffff652] >= 0x78)
-				u16[0xfffff652] = 0
+			D0.u16 = level.palettefx.frame_2
+			level.palettefx.frame_2 += 8
+			if (level.palettefx.frame_2 >= 0x78)
+				level.palettefx.frame_2 = 0
 
 			copyMemory(0xfffffc54, 0x003660 + D0.u16, 8)
 
-			D0.u16 = u16[0xfffff654]
-			u16[0xfffff654] += 2
-			if (u16[0xfffff654] >= 0x0c)
-				u16[0xfffff654] = 0
+			D0.u16 = level.palettefx.frame_3
+			level.palettefx.frame_3 += 2
+			if (level.palettefx.frame_3 >= 0x0c)
+				level.palettefx.frame_3 = 0
 
 			A0 = 0x0036e0
 			u16[0xfffffc5c] = u16[A0 + D0.u16]
 			u16[0xfffffc7c] = u16[A0 + D0.u16]
 		}
 	}
-	else if (s8[0xfffff650] == 0)
+	else if (s8(level.palettefx.state) == 0)
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 3
+			level.palettefx.timer_1 = 3
 
-			D0.u16 = u16[0xfffff632]
-			u16[0xfffff632] += 8
-			if (u16[0xfffff632] >= 0x40)
-				u16[0xfffff632] = 0
+			D0.u16 = level.palettefx.frame_1
+			level.palettefx.frame_1 += 8
+			if (level.palettefx.frame_1 >= 0x40)
+				level.palettefx.frame_1 = 0
 
 			A0 = 0x003620
 			copyMemory(0xfffffc54, A0 + D0.s16, 8)

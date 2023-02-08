@@ -48,7 +48,7 @@ function void fn0729de()
 	{
 		objA0.countdown_value = 0x7f
 		hud.dirty.timer = 0xff
-		requestLoadingPatterns(0x71)
+		requestLoadingPatterns(0x71)		// Boss sprites
 
 		if (allocDynamicObjectStd())
 		{
@@ -187,7 +187,7 @@ function void fn072ffa()
 	u8[0xfffffaa2] = 0
 	u8[0xfffffaa3] = 0
 
-	requestLoadingPatterns(0x71)
+	requestLoadingPatterns(0x71)		// Boss sprites
 	fn07302e()
 }
 
@@ -195,7 +195,7 @@ function void fn072ffa()
 //# address-hook(0x07302e) end(0x073032)
 function void fn07302e()
 {
-	addPatternLoadingCue(0x073038)
+	addPatternLoadingCue(0x073038)		// Robotnik's ship and boss explosion sprites
 }
 
 

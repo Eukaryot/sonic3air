@@ -91,7 +91,7 @@ function void fn0593a8()
 
 		Kosinski.addToDMAQueue(0x1d7fca, 0x5240)
 
-		requestLoadingPatterns(0x38)
+		requestLoadingPatterns(0x38)		// DEZ2 object sprites
 
 		D7 = pop()
 		A0 = pop()
@@ -110,6 +110,7 @@ function void fn0593ec()
 {
 	if (kosinski.waiting_modules == 0)
 	{
+		// Go to Death Egg Act 2
 		global.zone_act = 0x0b01
 		camera.update_routine = 0
 		dynobjects.routine = 0

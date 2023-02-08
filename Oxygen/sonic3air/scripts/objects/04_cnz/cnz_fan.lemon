@@ -150,8 +150,8 @@ function void fn031e96()
 			{
 				objA1.state = char.state.RUNNING
 				u8[A1 + 0x27] = 1
-				u8[A1 + 0x30] = 0x7f
-				u8[A1 + 0x31] = 8
+				u8[A1 + 0x30] = 0x7f		// "char.rotation.x.count"
+				u8[A1 + 0x31] = 8			// "char.rotation.x.speed"
 
 			#if STANDALONE
 				// Fix for bug when Tails carries other player and gets caught by the fan

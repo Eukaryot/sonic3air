@@ -211,7 +211,7 @@ function void fn032784()
 		u8[A1 + 0x40] = 0x01
 		u8[A1 + 0x1e] = 0x0e
 		u8[A1 + 0x1f] = 0x07
-		u8[A1 + 0x20] = char.state.ROLLING
+		objA1.state = char.state.ROLLING
 		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA1.velocity.y = objA0.velocity.y - 0x680
 		objA1.velocity.x = 0

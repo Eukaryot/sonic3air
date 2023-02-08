@@ -273,7 +273,7 @@ function void fn061892()
 function void fn0618ac()
 {
 	global.stage_type = 2
-	global.zone_act = 0x1701
+	global.zone_act = 0x1701		// Hidden Palace emerald cave
 	global.zone_act.apparent = 0x1701
 	checkpoint.number = 0
 	level.restart.u8 = 1
@@ -358,7 +358,8 @@ function void fn0618fc()
 	u32[0xfffffc2a] = 0x00ee0088
 	u16[0xfffffc3e] = 0x0044
 
-	Kosinski.addToDMAQueue(0x0db406, 0xb400)
+	// Restore the art that was overwritten by the giant ring
+	Kosinski.addToDMAQueue(0x0db406, 0xb400)		// Explosion smoke sprites
 
 	fn0851cc()
 }

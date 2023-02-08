@@ -111,11 +111,11 @@ function void fn06c354()
 	objA0.countdown_value = 120
 	objA0.countdown_callback = 0x06c3ec
 
-	Kosinski.addToDMAQueue(0x36b340, 0x67e0)
+	Kosinski.addToDMAQueue(0x36b340, 0x67e0)		// Boss sprites
 
-	Kosinski.addToDMAQueue(0x36d572, 0x8bc0)
+	Kosinski.addToDMAQueue(0x36d572, 0x8bc0)		// Falling debris sprites
 
-	requestLoadingPatterns(0x6d)
+	requestLoadingPatterns(0x6d)		// Robotnik's ship, boss explosions, and capsule sprites
 	loadPaletteLine1(0x06d97c)
 
 	// "spawnChildObjects(0x06819c)" replaced by:

@@ -34,7 +34,7 @@ function void fn06aeb6()
 	objA0.update_address = 0x06aefe
 	objA0.countdown_callback = 0x06af04
 
-	requestLoadingPatterns(0x6c)
+	requestLoadingPatterns(0x6c)		// Boss sprites
 
 	u16[0xfffffc1e] = 0
 
@@ -117,7 +117,7 @@ function void fn06af80()
 	objA0.countdown_value = 0x3f
 	objA0.countdown_callback = 0x06afc8
 
-	addPatternLoadingCue(0x083d6c)
+	addPatternLoadingCue(0x083d6c)		// Small explosion sprites
 	fn0685e2()
 }
 
@@ -919,7 +919,7 @@ function void fn06b76e()
 //# address-hook(0x06b7bc) end(0x06b7ea)
 function void fn06b7bc()
 {
-	Kosinski.addToDMAQueue(0x391394, 0x6d60)
+	Kosinski.addToDMAQueue(0x391394, 0x6d60)		// Rising water geyser sprites
 
 	objA0.update_address = 0x06b7d2
 	objA0.update_address = 0x06b7ec
@@ -976,7 +976,7 @@ function void fn06b832()
 	objA0.update_address = 0x06b882
 	if (objA0.subtype2c == 0)
 	{
-		u8[0xfffff650] = 0xff
+		level.palettefx.state = 0xff
 		camera.screenshake.state.hi = 0xff
 		playSound(0x57)
 		A1 = 0xffffb000
@@ -1001,7 +1001,7 @@ function void fn06b882()
 	D0.u16 = objA0.position.y.u16 - 0x60
 	if (D0.u16 < objA1.position.y.u16)
 	{
-		u8[A1 + 0x20] = char.state.GOT_HURT
+		objA1.state = char.state.GOT_HURT
 		u8[A1 + 0x2e] = 0x81
 		objA0.update_address = 0x06b8c8
 		objA0.countdown_value = 0x5f
@@ -1042,7 +1042,7 @@ function void fn06b8c8()
 		return
 	}
 
-	TriggerNextZone(0x0200)
+	TriggerNextZone(0x0200)		// Marble Garden Zone
 	UnloadObject()
 }
 

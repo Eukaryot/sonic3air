@@ -204,7 +204,7 @@ function void fn0349ba()
 			objA1.velocity.y = -0x600
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
-			u8[A1 + 0x20] = char.state.ROLLING
+			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 
 			#if STANDALONE
@@ -257,7 +257,7 @@ function void fn0349ba()
 					u16[A1 + 0x1c] = 0
 					objA1.position.x.u16 = D2.u16
 					objA1.position.y.u16 = D3.u16
-					u8[A1 + 0x20] = char.state.PULLEY
+					objA1.state = char.state.PULLEY
 					u8[A1 + 0x2e] = 0x01
 					if (objA0.flags2a & 0x01)
 						u8[A1 + 0x2a] |= 0x01

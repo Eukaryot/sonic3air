@@ -201,7 +201,7 @@ function void fn058002()
 			objA1.position.y.u16 = 0x7fff
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			u8[A1 + 0x2e] = 0x03
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 		}
 		else
 		{
@@ -328,7 +328,7 @@ function void fn05806e()
 
 		if (objA1.velocity.y >= 0)
 		{
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
 			u8[A1 + 0x2e] = 0x03
 			u16[A2 + 0x04] = 0xb4
@@ -342,7 +342,7 @@ function void fn05806e()
 			if (u16[A2 + 0x04] == 0)
 			{
 				playMusic(MUSIC_CTRL_FADEOUT)
-				TriggerNextZone(0x0b00)
+				TriggerNextZone(0x0b00)		// Death Egg Zone
 			}
 		}
 	}

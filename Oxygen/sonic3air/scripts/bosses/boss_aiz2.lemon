@@ -52,9 +52,9 @@ function void fn0691c8()
 	u8[0xfffffaa2] = 0
 	u8[0xfffffaa3] = 0
 
-	requestLoadingPatterns(0x6b)
+	requestLoadingPatterns(0x6b)		// Robotnik's ship and boss explosion sprites
 
-	Kosinski.addToDMAQueue(0x365260, 0x3000)
+	Kosinski.addToDMAQueue(0x365260, 0x3000)		// Boss sprites
 
 	loadPaletteLine1(0x069e80)
 }
@@ -390,7 +390,7 @@ function void fn069526()
 			objA1.subtype2c = 0x04
 		}
 
-		addPatternLoadingCue(0x083d6c)
+		addPatternLoadingCue(0x083d6c)		// Small explosion sprites
 	}
 	else
 	{

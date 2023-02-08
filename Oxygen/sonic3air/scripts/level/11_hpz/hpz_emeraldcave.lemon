@@ -84,8 +84,8 @@ function void UpdateLevelScrolling.EC()
 //# address-hook(0x090964) end(0x090a70)
 function void fn090964()
 {
-	Kosinski.addToDMAQueue(0x1759ac, 0x9580)
-	Kosinski.addToDMAQueue(0x17588a, 0x9100)
+	Kosinski.addToDMAQueue(0x1759ac, 0x9580)		// Chaos Emeralds
+	Kosinski.addToDMAQueue(0x17588a, 0x9100)		// Teleporter
 
 	A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0a8a3c : 0x066912
 	copyMemory(0xfffffca0, A1, 0x20)
@@ -125,10 +125,10 @@ function void fn090964()
 
 	objA0.update_address = 0x090a72
 	objA0.countdown_value = 0x1f
-	A2 = 0xffffffb2
-	D1 = 2
-	D2 = 0
-	D3 = 6
+	A2 = 0xffffffb2		// Start of emerald collection states
+	D1 = 2				// Chaos Emerald traded, Super Emerald inactive state
+	D2 = 0				// Emerald counter
+	D3 = 6				// Number of emeralds
 	while (D3.s16 >= 0)
 	{
 		if (D1.u8 <= u8[(A2+=1)-1])
@@ -183,7 +183,7 @@ function void fn090a94()
 		return
 	u8[0xfffffab8] &= ~0x01
 
-	A1 = 0xffffffb2
+	A1 = 0xffffffb2		// Start of emerald collection states
 	A2 = 0x090b1a
 	A3 = 0xfffffa82
 	A4 = 0x090b0c
@@ -191,7 +191,7 @@ function void fn090a94()
 	D0 = 0
 	D1 = 0
 	D2 = 0
-	D3 = 6
+	D3 = 6				// Number of emeralds
 	while (D3.s16 >= 0)
 	{
 		D0.u8 = u8[(A2+=1)-1]
@@ -637,7 +637,7 @@ function void fn090e9a()
 		return
 	}
 
-	A1 = 0xffffffb2
+	A1 = 0xffffffb2		// Start of emerald collection states
 	D0 = objA0.subtype2c
 	++u8[A1 + D0.s16]
 
@@ -680,7 +680,7 @@ function bool fn090f0a()
 	u8[A0 + 0x3c] = u8[0x090f64 + D0.s16]
 	u8[A0 + 0x3d] = u8[0x090f6c + D0.s16]
 
-	A1 = 0xffffffb2
+	A1 = 0xffffffb2		// Start of emerald collection states
 	D2.u8 = u8[A1 + D0.s16]
 	if (D2.u8 != 0 && D2.u8 < 2)
 	{

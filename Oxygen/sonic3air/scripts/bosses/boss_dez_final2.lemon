@@ -29,7 +29,7 @@ function void fn080082()
 		u16[A1 + 0x46] = A0.u16
 	}
 
-	Kosinski.addToDMAQueue(0x182be6, 0x9a00)
+	Kosinski.addToDMAQueue(0x182be6, 0x9a00)			// Master Emerald sprite tiles
 
 	fn0800d0()
 }
@@ -92,9 +92,9 @@ function void fn080102()
 		objA1.update_address = 0x080160
 	}
 
-	Kosinski.addToDMAQueue(0x1607d8, 0x93a0)
+	Kosinski.addToDMAQueue(0x1607d8, 0x93a0)	// Egg Mobile grabber claw sprites
 
-	Kosinski.addToDMAQueue(0x182ed8, 0x2000)
+	Kosinski.addToDMAQueue(0x182ed8, 0x2000)	// Falling debris sprites
 
 	fn0852ae()
 }
@@ -567,7 +567,7 @@ function bool fn080f3a()
 		u8[A1 + 0x2c] = 0x16
 	}
 
-	addPatternLoadingCue(0x080f9e)
+	addPatternLoadingCue(0x080f9e)		// Robotnik's ship
 	return true
 }
 

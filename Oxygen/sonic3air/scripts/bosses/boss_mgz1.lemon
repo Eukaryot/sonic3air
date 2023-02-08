@@ -62,7 +62,7 @@ function void fn0885a4()
 	fn0685e2()
 	objA0.flags38 |= 0x02
 
-	addPatternLoadingCue(0x088b88)
+	addPatternLoadingCue(0x088b88)		// Falling pointy rocks and boss explosion sprites
 
 	if (allocDynamicObjectStd())
 	{

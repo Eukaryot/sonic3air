@@ -173,7 +173,7 @@ function void fn057dcc()
 	if (s32[A0 + 0x2e] >= 0)
 	{
 		u8[A1 + 0x2e] = 0
-		u8[A1 + 0x20] = char.state.RUNNING
+		objA1.state = char.state.RUNNING
 		tails.respawn_counter = 0
 		tails.ai_routine = 0x06
 		UnloadObject()
@@ -291,7 +291,7 @@ function void fn06575e()
 	objA0.animation.sprite = 0x56
 	objA0.hitbox_extends.y = 0x33
 
-	Kosinski.addToDMAQueue(0x17dbc2, 0xa000)
+	Kosinski.addToDMAQueue(0x17dbc2, 0xa000)	// The Death Egg rising from the clouds in the intro
 }
 
 
@@ -456,7 +456,7 @@ function void fn0658f2()
 	u8[0xffffeeda] = 0xff
 	playSound(SFX_CLICK)
 
-	A1 = 0x06671f
+	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
 	fn084580()
 
 #if STANDALONE
@@ -494,7 +494,7 @@ function void fn06594a()
 
 	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
 
-	addPatternLoadingCue(0x083d48)
+	addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
 	fn0851e4()
 	Object.TriggerUnloading()
 }
@@ -778,7 +778,7 @@ function void fn065fde()
 	u8[0x065fde] = 0x93
 #endif
 
-	A1 = 0x06672a
+	A1 = 0x06672a		// Cutscene Knuckles tired shooing animation data
 	fn084580()
 }
 

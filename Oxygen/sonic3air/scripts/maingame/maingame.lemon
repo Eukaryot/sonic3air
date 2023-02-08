@@ -96,6 +96,7 @@ function void GameMode.MainGame()
 
 			if (global.zone == 0x09)
 			{
+				// Lava Reef Zone
 				fn01cacc()
 			}
 
@@ -108,8 +109,9 @@ function void GameMode.MainGame()
 			UpdateGlobalRingAnimation()
 			RenderSprites()
 
-			if (global.zone == 0x15)	// Slot Machine bonus stage
+			if (global.zone == 0x15)
 			{
+				// Slot Machine bonus stage
 				BonusSM.RenderRotatingMaze()
 				BonusSM.UpdateSlotMachine()
 			}
@@ -399,6 +401,7 @@ function void initializeMainGame()
 
 	if (global.zone_act == 0x0d01)
 	{
+		// Outro for Sonic/Tails
 		FadeScreenToWhiteBlocking()
 
 	#if STANDALONE
@@ -490,28 +493,30 @@ function void initializeMainGame()
 
 		if (isSonicIntro())
 		{
-			D0 = 1
-			FillPatternLoadingCues()
-
+			fillPatternLoadingCues(0x01)
 			requestLoadingPatterns(0x0a)
 		}
 		else if (competition_mode.active)
 		{
 			D0 = 6
-			// Isn't requestLoadingPatterns misisng here?
+			// It looks like RequestLoadingPatterns() is missing here, but each zone already loads the common sprites, so it would be redundant
 		}
 		else
 		{
-			if (isMainCharacter(CHARACTER_SONIC))		// Sonic
+			// Load both HUD and common object sprites for main game stages
+			if (isMainCharacter(CHARACTER_SONIC))
 			{
+				// Sonic
 				requestLoadingPatterns(0x01)
 			}
-			else if (isMainCharacter(CHARACTER_TAILS))	// Tails - or Miles
+			else if (isMainCharacter(CHARACTER_TAILS))
 			{
+				// Tails - or Miles
 				requestLoadingPatterns((global.region_code & 0x80) ? 0x07 : 0x52)
 			}
-			else 										// Must be Knuckles then
+			else
 			{
+				// Must be Knuckles then
 				requestLoadingPatterns(0x05)
 			}
 		}
@@ -565,7 +570,7 @@ function void initializeMainGame()
 	u16[0xfffffb00] = 0
 	u32[0xfffffbfc] = 0xfffffb00
 
-	Level.loadPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 5 : 3)
+	Level.loadPaletteData(isMainCharacter(CHARACTER_KNUCKLES) ? 0x05 : 0x03)	// Character palette
 	Level.InitializeWater()
 
 	zeroMemory(0xfffff0a0, 0x60)
@@ -622,8 +627,9 @@ function void initializeMainGame()
 		}
 
 		bool isAnyIntro = false
-		if (global.zone_act == 0)
+		if (global.zone_act == 0x0000)
 		{
+			// Angel Island Act 1
 			isAnyIntro = isSonicIntro()
 		}
 		if (isKnucklesIntro)
@@ -667,7 +673,7 @@ function void initializeMainGame()
 	#endif
 	}
 
-	Level.loadNonfadingPaletteData(0x03)
+	Level.loadNonfadingPaletteData(0x03)	// Sonic's character palette
 
 	fn01bc60()
 
@@ -841,10 +847,11 @@ function void SetGlobalCharacters()
 
 
 //# address-hook(0x003dbe) end(0x003dd8)
-function void fn003dbe()
+//# alias(fn003dbe) deprecated
+function void Level.loadNonfadingPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffffc80 = primary palette without fading applied
-	copyPaletteDataFromTable(D0.u16, 0xfc80)
+	Level.loadNonfadingPaletteData(D0.u16)
 }
 
 function void Level.loadNonfadingPaletteData(u8 index)
@@ -857,7 +864,7 @@ function void Level.loadNonfadingPaletteData(u8 index)
 function void Level.LoadPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffffc00 = primary palette with fading applied
-	copyPaletteDataFromTable(D0.u16, 0xfc00)
+	Level.loadPaletteData(D0.u16)
 }
 
 function void Level.loadPaletteData(u8 index)
@@ -867,18 +874,30 @@ function void Level.loadPaletteData(u8 index)
 
 
 //# address-hook(0x003df2) end(0x003e0c)
-function void fn003df2()
+//# alias(fn003df2) deprecated
+function void Level.loadSecondaryPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffff080 = secondary palette with fading applied
-	copyPaletteDataFromTable(D0.u16, 0xf080)
+	Level.loadSecondaryPaletteData(D0.u16)
+}
+
+function void Level.loadSecondaryPaletteData(u8 index)
+{
+	copyPaletteDataFromTable(index, 0xf080)
 }
 
 
 //# address-hook(0x003e0e) end(0x003e28)
-function void fn003e0e()
+//# alias(fn003e0e) deprecated
+function void Level.loadNonfadingSecondaryPaletteData()
 {
 	// Copies to somewhere inside the palette at 0xfffff000 = secondary palette without fading applied
-	copyPaletteDataFromTable(D0.u16, 0xf000)
+	Level.loadNonfadingSecondaryPaletteData(D0.u16)
+}
+
+function void Level.loadNonfadingSecondaryPaletteData(u8 index)
+{
+	copyPaletteDataFromTable(index, 0xf000)
 }
 
 
@@ -1040,11 +1059,12 @@ function void Level.InitializeWater()
 	bool levelHasWater = false
 	if (global.zone_act == 0x0000 || global.zone == 0x01 || global.zone_act == 0x0501 || global.zone_act == 0x0601)
 	{
+		// Angel Island Act 1, Hydrocity Zone, IceCap Act 2, and Launch Base Act 2 all have water
 		levelHasWater = true
 	}
-	else if (global.zone_act == 0x0001)		// Angel Island 2
+	else if (global.zone_act == 0x0001)		// Angel Island Act 2
 	{
-		levelHasWater = (global.zone_act.apparent != 0x01 || !isMainCharacter(CHARACTER_KNUCKLES))
+		levelHasWater = (global.zone_act.apparent != 0x0001 || !isMainCharacter(CHARACTER_KNUCKLES))	// No water for the second part of AIZ 1 for Sonic and Tails
 	#if STANDALONE
 		if (!levelHasWater && checkpoint.number != 0)	// Checkpoint 0 is Knuckles' start
 		{
@@ -1063,13 +1083,14 @@ function void Level.InitializeWater()
 		}
 	#endif
 	}
-	else if (global.zone_act == 0x0301)		// Carnival Night 2
+	else if (global.zone_act == 0x0301)		// Carnival Night Act 2
 	{
 		levelHasWater = !isMainCharacter(CHARACTER_KNUCKLES)
 	}
 
 	if (!levelHasWater)
 	{
+		// Remove water
 		level.water_present = 0
 		water.height.current = 0x1000
 		water.height.next = 0x1000
@@ -1157,10 +1178,10 @@ function void Level.InitializeWater.Part2()
 		}
 
 		D1.u16 = D0.u16
-		fn003df2()
+		Level.loadSecondaryPaletteData()
 
 		D0.u16 = D1.u16
-		fn003e0e()
+		Level.loadNonfadingSecondaryPaletteData()
 
 		if (checkpoint.number != 0)
 		{
@@ -1267,15 +1288,16 @@ function void SetupCharacterAtStartPosition()
 	}
 	else
 	{
-		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x1e3cd8 : 0x1e3c18
+		A1 = isMainCharacter(CHARACTER_KNUCKLES) ? 0x1e3cd8 : 0x1e3c18		// Get starting positions from respective tables
 		A1 += global.zone * 8 + global.act * 4
-		D1 = u16[A1]
-		D0 = u16[A1+2]
-		u16[0xffffb000 + 0x10] = D1.u16
-		u16[0xffffb000 + 0x14] = D0.u16
+		D1 = u16[A1]		// Get x-position
+		D0 = u16[A1+2]		// Get y-position
+		u16[0xffffb000 + 0x10] = D1.u16		// Set Player 1 x-position
+		u16[0xffffb000 + 0x14] = D0.u16		// Set Player 1 y-position
 
 		if (global.zone_act == 0x0000)
 		{
+			// Angel Island Act 1
 			if (isSonicIntro())
 			{
 				D1.u16 = 0
@@ -1312,6 +1334,7 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone_act == 0x0300)
 		{
+			// Carnival Night Act 1
 			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
 			#if STANDALONE
@@ -1331,6 +1354,7 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone_act == 0x0500)
 		{
+			// IceCap Act 1
 			if (isMainCharacter(CHARACTER_TAILS))
 			{
 				u16[0xffffb000 + 0x10] = 0x3780
@@ -1373,9 +1397,10 @@ function void SetupCharacterAtStartPosition()
 	#if STANDALONE
 		else if (global.zone_act == 0x0601)
 		{
+			// Launch Base Act 2
 			if (isMainCharacter(CHARACTER_KNUCKLES) && getNumPlayers() == 2)
 			{
-				// Move Knuckles a bit to the right in LBZ 2 to make space for Tails
+				// Move Knuckles (and camera) a bit to the right to make space for Tails
 				u16[0xffffb000 + 0x10] += 0x10
 				D1.u16 += 0x10
 			}
@@ -1383,8 +1408,10 @@ function void SetupCharacterAtStartPosition()
 	#endif
 		else if (global.zone_act == 0x0700)
 		{
+			// Mushroom Hill Act 1
 			if (!isMainCharacter(CHARACTER_KNUCKLES) && global.lock_on_state == 0)
 			{
+				// Move camera back to an earlier spawn point for Sonic/Tails with lock-on
 				move_area.left  = 0x00c0
 				move_area.left.target = 0x00c0
 				move_area.left.player2 = 0x00c0
@@ -1393,13 +1420,17 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone_act == 0x0900)
 		{
+			// Lava Reef Act 1
 			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
+				// Move camera ahead to accommodate for the Knuckles' walk-in intro
 				D1.u16 += 0xb0
 			}
 		}
 		else if (global.zone_act == 0x0b00 || global.zone_act == 0x1601)
 		{
+			// Death Egg Act 1, Hidden Palace
+			// Move camera ahead to accommodate for the walk-in intro
 			D1.u16 += 0xb0 + getScreenExtend()
 		}
 	#if STANDALONE
@@ -1414,7 +1445,7 @@ function void SetupCharacterAtStartPosition()
 		}
 		else if (global.zone == 0x15)
 		{
-			// Slot Machine
+			// Slot Machine bonus stage
 			D1.u16 -= getScreenExtend()
 		}
 	#endif
@@ -1523,14 +1554,15 @@ function void SetupCharacterAtLastCheckpoint()
 //# address-hook(0x007812) end(0x007890)
 function void fn007812()
 {
-	A4 = MainGame.getLevelDataPointer()
-	A1 = u32[A4] & 0x00ffffff
+	// Decompress 8x8 level tiles into VRAM
+	A4 = MainGame.getLevelDataPointer()		// Pointer to level art data
+	A1 = u32[A4] & 0x00ffffff		// Ignoring upper byte, which is the pattern request ID for object art
 	u32 firstSource = A1
 	D4.u16 = u16[A1]
 	Kosinski.addToDMAQueue(A1, 0x0000)
 
-	A1 = u32[A4+4] & 0x00ffffff
-	if (A1 != firstSource)
+	A1 = u32[A4+4] & 0x00ffffff		// Pointer to second set of tiles
+	if (A1 != firstSource)	// Checking if the two pointers aren't duplicates of eachother
 	{
 		Kosinski.addToDMAQueue(A1, D4.u16)
 	}
@@ -1552,18 +1584,20 @@ function void fn007812()
 //# address-hook(0x01c2b0) end(0x01c360)
 function void fn01c2b0()
 {
-	A2 = MainGame.getLevelDataPointer()
+	// Decompress 16x16 level blocks into its area in RAM
+	A2 = MainGame.getLevelDataPointer()		// Pointer to level art data
 
-	D0 = u32[A2+8] & 0x00ffffff
+	D0 = u32[A2+8] & 0x00ffffff		// Ignoring upper byte, which is the palette entry ID for level
 	D7 = D0
 	Kosinski.decompress(D0, 0xffff9000)
 
-	D0 = u32[A2+12] & 0x00ffffff
-	if (D7 != D0)
+	D0 = u32[A2+12] & 0x00ffffff		// Pointer to second set of blocks
+	if (D7 != D0)               	// Checking if the two pointers aren't duplicates of eachother
 	{
 		Kosinski.decompress(D0, A1)
 	}
 
+	// Decompress 128x128 level chunks into its area in RAM
 	D0 = u32[A2+16] & 0x00ffffff
 	D7 = D0
 	Kosinski.decompress(D0, 0xffff0000)
@@ -1629,15 +1663,18 @@ function void fn028c80()
 {
 	if (global.zone_act == 0x0100)
 	{
+		// Hydrocity act 1
 		fn0279d4()
 	}
 	else if (global.zone_act == 0x0101)
 	{
+		// Hydrocity act 2
 		u8[0xfffff7f1] = 0x20
 		u8[0xfffff7f3] = 0x40
 	}
 	else if (global.zone == 0x03)
 	{
+		// Carnival Night Zone
 		u8[0xfffff7f1] = 0x40
 		u8[0xfffff7f2] = 0
 		u8[0xfffff7f4] = 0
@@ -1649,36 +1686,43 @@ function void fn028c80()
 	}
 	else if (global.zone_act == 0x0600)
 	{
+		// Launch Base act 1
 		u8[0xfffff7f3] = 0x20
 	}
 	else if (global.zone_act == 0x0601)
 	{
+		// Launch Base act 2
 		fn02807a()
 		u8[0xfffff7f1] = 0x10
 	}
 	else if (global.zone == 0x07)
 	{
+		// Mushroom Hill
 		u8[0xfffff7f1] = 0x20
 		u8[0xfffff7f3] = 0x40
 	}
 	else if (global.zone == 0x08)
 	{
+		// Sandopolis Zone
 		u8[0xfffff7f1] = 0xff
 	}
 	else if (global.zone_act == 0x0900)
 	{
+		// Lava Reef act 1
 		u8[0xfffff7f1] = 0xff
 		u8[0xfffff7f3] = 0xff
 	}
 	else if (global.zone_act == 0x1000)
 	{
+		// Desert Palace
 		u8[0xfffff7f1] = 0x40
 		u8[0xfffff7f3] = 0x40
 	}
 	else if (global.zone == 0x14)
 	{
-		Kosinski.decompress(0x156c08, 0xffff1000)
-		Kosinski.decompress(0x1574e8, 0xffff7000)
+		// Glowing Spheres bonus stage 
+		Kosinski.decompress(0x156c08, 0xffff1000)		// Animated background art, loaded into a designated area in RAMm before going into VRAM
+		Kosinski.decompress(0x1574e8, 0xffff7000)		// See above
 
 		A1 = 0xffff6000
 		A2 = 0xffff7000
@@ -1692,10 +1736,11 @@ function void fn028c80()
 			--D0.s16
 		}
 
-		Kosinski.decompress(0x1578f8, 0xffff7800)
+		Kosinski.decompress(0x1578f8, 0xffff7800)		// Compressed palette for the background. yeah this stage is weird
 	}
 	else if (global.zone_act == 0x1600)
 	{
+		// Lava Reef Boss
 		u8[0xfffff7f1] = 0xff
 		u8[0xfffff7f3] = 0xff
 	}
@@ -2137,16 +2182,19 @@ function void fn04b6aa()
 	zeroMemory(0xffff3000, 0x4000)
 
 	A1 = 0xffff4020
-	A0 = 0x1e4080
+	A0 = 0x1e4080		// Layout data for the slot machine bonus
+
+	// Set player starting position
 	u16[0xffffb000 + 0x10] = u16[(A0+=2)-2]
 	u16[0xffffb000 + 0x14] = u16[(A0+=2)-2]
 
-	D1 = 0x1f
+	D1 = 0x1f		// Columns
 	while (D1.s16 >= 0)
 	{
-		D2 = 0x1f
+		D2 = 0x1f		// Rows
 		while (D2.s16 >= 0)
 		{
+			// Set block spawn position
 			u8[(A1+=1)-1] = u8[(A0+=1)-1]
 			--D2.s16
 		}
@@ -2155,15 +2203,15 @@ function void fn04b6aa()
 		--D1.s16
 	}
 
-	A1 = 0xffff7008
-	A0 = 0x04b722
-	D1 = 0x12
+	A1 = 0xffff7000 + 0x08		// Starting one block ahead to keep first type as empty space
+	A0 = 0x04b722				// Table of different block sprites for each type 
+	D1 = 0x12					// Loop once for each block type
 	while (D1.s16 >= 0)
 	{
-		u32[(A1+=4)-4] = u32[(A0+=4)-4]
+		u32[(A1+=4)-4] = u32[(A0+=4)-4]		// Mapping data
 		u16[(A1+=2)-2] = 0
-		u8[A1 - 1] = u8[A0 - 4]
-		u16[(A1+=2)-2] = u16[(A0+=2)-2]
+		u8[A1 - 1] = u8[A0 - 4]				// Initial animation frame
+		u16[(A1+=2)-2] = u16[(A0+=2)-2]		// Sprite attribute data
 		--D1.s16
 	}
 

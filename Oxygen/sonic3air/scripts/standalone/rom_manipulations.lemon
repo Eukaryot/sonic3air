@@ -56,6 +56,11 @@ function void ROMManipulation.RepairSpriteMappings()
 	// Fix for the HCZ blow fish ("Pointdexter")
 	s8[0x360e8e] = -0x08
 	s8[0x360e9a] = -0x08
+
+	// Remove the cord mapping from the CNZ red balloons; it's directly drawn in standalone to work around unloaded tiles in CNZ1 intro
+	u16[0x22306f4] = 0x02
+	u16[0x2230708] = 0x02
+	u16[0x223071c] = 0x02
 }
 
 

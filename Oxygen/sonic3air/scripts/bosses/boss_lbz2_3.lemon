@@ -59,7 +59,7 @@ function void fn0742a8()
 
 	loadPaletteLine1(0x0751aa)
 
-	Kosinski.addToDMAQueue(0x376874, 0x7b20)
+	Kosinski.addToDMAQueue(0x376874, 0x7b20)		// Big Arm sprites
 
 	// "spawnChildObjects(0x068184)" replaced by:
 	spawnChildObject(0x067cd2, 0x00, 0, -28)
@@ -591,9 +591,9 @@ function void fn074768()
 	objA1.flags2a |= char.flag.FACING_LEFT
 	StopObjectA1()
 
-	requestLoadingPatterns(0x71)
+	requestLoadingPatterns(0x71)		// Boss sprites
 
-	Kosinski.addToDMAQueue(0x15fddc, 0xa5c0)
+	Kosinski.addToDMAQueue(0x15fddc, 0xa5c0)		// Egg Robo head sprites
 
 	objA0.flags38 &= ~0x20
 
@@ -763,7 +763,7 @@ function void fn074952()
 	if (u16[0xffffb000 + 0x14] < level.bossarea.top + 0x0200)
 		return
 
-	TriggerNextZone(0x0700)
+	TriggerNextZone(0x0700)		// Mushroom Hill Zone
 	UnloadObject()
 }
 

@@ -121,7 +121,7 @@ function void SpecialStage()
 	Enigma.decompress(0x0aedb0, 0xffff0000, (sprite_attribute.PALETTE.LINE2 | (SpecialStage.Background.targetInVRAM >> 5)))
 	copyRectToVRAM(0xffff0000, 0xe000, 0x40, 0x20)
 
-	Kosinski.decompress(0x0b2e36, 0xffff0000)
+	Kosinski.decompress(0x0b2e36, 0xffff0000)		// skdisasm calls this "perspective maps"
 
 	fn009ea0()
 	fn00a0e6()
@@ -299,7 +299,7 @@ function u8 BlueSpheres.getNextOpenStageIndex()
 		if (emeraldCount < 7)
 		{
 			D1 = 5
-			D2 = hasSuperEmerald ? 2 : 0
+			D2 = hasSuperEmerald ? 2 : 0		// Use the correct emerald collection state based on the special stage set
 
 			while (u8[0xffffffb2 + D0.u16] != D2.u8)
 			{
@@ -333,7 +333,7 @@ function void fn0085b0()
 	if (!useGeneratedStage)
 	{
 		// Main game stages
-		Kosinski.decompress(u32[0x1e4078], 0xffff0000)
+		Kosinski.decompress(u32[0x1e4078], 0xffff0000)		// This is actually the special stage layout data getting decompressed
 
 		global.next_bluespheres = BlueSpheres.getNextOpenStageIndex()
 
@@ -1751,7 +1751,7 @@ function void fn009b62()
 					if (u8[A2] < 7)
 					{
 						++u8[A2]
-						A1 = 0xffffffb2
+						A1 = 0xffffffb2		// Start of emerald collection states
 						D0 = global.next_bluespheres
 						u8[A1 + D0.s16] |= 0x01
 					}
@@ -2470,9 +2470,9 @@ function void fn02df64()
 	global.fade_timer = 0
 	bluespheres.backup.zone_act = global.zone_act
 
-	addPatternLoadingCue(0x02e310)
+	addPatternLoadingCue(0x02e310)		// Ring sprites + HUD text for bonus tally
 
-	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)		// Common results graphics shared
+	Kosinski.addToDMAQueue(0x0d6a62, 0xb700)		// Common results graphics
 
 	// Choose text: "Super" or "Hyper"
 	if (isMainCharacter(CHARACTER_SONIC))
@@ -2568,16 +2568,18 @@ function void fn02df64()
 		copyMemory(0xfffffcc0, 0x0a9d5c, 0x40)
 		copyMemory(0xffff8000, 0x0a7924, 0x1000)
 
+		// Load Hidden Palace level blocks and chunks
 		Kosinski.decompress(0x1bfbea, 0xffff0000)	// After this, A1 points to where uncompressed data ends
 		Kosinski.decompress(0x1c71fe, A1)
 		Kosinski.decompress(0x1becf8, 0xffff9000)	// Same here
 		Kosinski.decompress(0x1c30fc, A1)
 
+		// Load Hidden Palace level tiles
 		D4.u16 = u16[0x1bee58]
 		Kosinski.addToDMAQueue(0x1bee58, 0x0000)
 		Kosinski.addToDMAQueue(0x1c3f2c, D4.u16)
 
-		requestLoadingPatterns(0x48)
+		requestLoadingPatterns(0x48)		// HPZ object sprites
 
 		global.zone_act = 0x1701		// Hidden Palace emerald cave
 		camera.position.x.u16 = 0x15a0 - getScreenExtend()

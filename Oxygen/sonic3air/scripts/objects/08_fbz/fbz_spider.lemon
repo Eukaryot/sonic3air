@@ -77,7 +77,7 @@ function void fn03d11e()
 		{
 			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 			{
-				u8[A1 + 0x20] = char.state.GRABBED
+				objA1.state = char.state.GRABBED
 				u8[A1 + 0x2e] = 0xc1
 				u8[A1 + 0x3d] = 0
 				u8[A1 + 0x2a] = 0

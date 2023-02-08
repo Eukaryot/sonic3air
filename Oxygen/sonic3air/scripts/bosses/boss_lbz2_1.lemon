@@ -65,9 +65,9 @@ function void fn073906()
 	spawnChildObject(0x073e0e, 0x00, 0, -8)
 	spawnChildObject(0x073ea2, 0x02, -24, -112)
 
-	requestLoadingPatterns(0x77)
+	requestLoadingPatterns(0x77)		// Robotnik running + ship and boss explosion sprites
 
-	Kosinski.addToDMAQueue(0x376542, 0x84a0)
+	Kosinski.addToDMAQueue(0x376542, 0x84a0)		// Boss sprites
 
 	loadPaletteLine1(0x0741fe)
 

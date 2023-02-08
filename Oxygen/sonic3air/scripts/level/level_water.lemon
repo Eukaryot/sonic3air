@@ -67,8 +67,9 @@ function void UpdateWater()
 //# address-hook(0x00714e) end(0x00748a)
 function void fn00714e()
 {
-	if (global.zone_act == 0x101)
+	if (global.zone_act == 0x0101)
 	{
+		// Hydrocity Act 2
 		A1 = 0xffffb000
 		D2.u8 = control.player1.state
 		fn00717c()
@@ -79,6 +80,7 @@ function void fn00714e()
 	}
 	else if (global.zone_act == 0x0500)
 	{
+		// IceCap Act 1
 		A1 = 0xffffb000
 		D2.u8 = control.player1.state
 		fn0071e4()
@@ -89,6 +91,7 @@ function void fn00714e()
 	}
 	else if (global.zone == 0x08)
 	{
+		// Sandopolis Zone (???)
 		fn0072fa()
 	}
 }
@@ -221,7 +224,7 @@ function void fn00723e()
 				if (D0.s16 <= 0)
 				{
 					D0.u16 = 0
-					u8[A1 + 0x20] = char.state.STANDING
+					objA1.state = char.state.STANDING
 				}
 			}
 			else
@@ -230,7 +233,7 @@ function void fn00723e()
 				if (D0.s16 <= 0)
 				{
 					D0.u16 = 0
-					u8[A1 + 0x20] = char.state.STANDING
+					objA1.state = char.state.STANDING
 				}
 			}
 		}
@@ -351,7 +354,7 @@ function void fn00730c()
 					}
 				}
 
-				u8[A1 + 0x20] = char.state.GOT_HURT_PANIC
+				objA1.state = char.state.GOT_HURT_PANIC
 				objA1.position.y.u16 += s8(u8[A1 + 0x1e] - 0x0e)
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
@@ -377,7 +380,7 @@ function void fn00730c()
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
 			objA1.flags2a &= ~(char.flag.ROLLING | char.flag.CONTROL_LOCK)
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 		}
 	}
 }
@@ -391,13 +394,13 @@ function void fn006f4a()
 
 	if (!isMainCharacter(CHARACTER_TAILS))
 	{
-		A3 = 0xfffff7c8
+		A3 = addressof(level.HCZ_water_current_flags.player1)
 		A1 = 0xffffb000
 		D6.u8 = control.player1.state
 		D5 = 0
 		fn006f90()
 
-		A3 = 0xfffff7c9
+		A3 = addressof(level.HCZ_water_current_flags.tails)
 		A1 = 0xffffb04a
 		D6.u8 = control.tails.state
 		D5 = 1
@@ -405,7 +408,7 @@ function void fn006f4a()
 	}
 	else
 	{
-		A3 = 0xfffff7c9
+		A3 = addressof(level.HCZ_water_current_flags.tails)
 		A1 = 0xffffb000
 		D6.u8 = control.player1.state
 		D5 = 0
@@ -433,7 +436,7 @@ function void fn006f90()
 				return
 			}
 
-			if ((u8[0xfffff7c7] & bit) == 0)
+			if ((level.HCZ_breakable_bar_flags & bit) == 0)
 			{
 				if (u8[A1 + 0x2e] != 0)
 				{
@@ -489,7 +492,7 @@ function void fn006f90()
 
 	if (u8[A3] != 0)
 	{
-		u8[A1 + 0x20] = char.state.GOT_HURT
+		objA1.state = char.state.GOT_HURT
 		u8[A3] = 0
 	}
 }

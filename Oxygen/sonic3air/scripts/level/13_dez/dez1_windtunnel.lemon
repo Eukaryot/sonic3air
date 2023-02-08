@@ -45,13 +45,14 @@ function void fn04964a()
 	{
 		if (dx < 0x0500 && dy < 0x0280 && debug_mode.state == 0)
 		{
-			u8[A1 + 0x20] = char.state.RUNNING
+			objA1.state = char.state.RUNNING
 			u8[A1 + 0x27] = 0x01
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK
 			objA1.flags2a |= char.flag.IN_AIR
 			u8[A1 + 0x2e] = 0x01
-			u8[A1 + 0x30] = 0xff
-			u8[A1 + 0x31] = 0x04
+			u8[A1 + 0x30] = 0xff		// "char.rotation.x.count"
+			u8[A1 + 0x31] = 0x04        // "char.rotation.x.speed"
+
 			u8[A1 + 0x40] = 0
 			u8[A2] = 1
 		}
@@ -268,9 +269,9 @@ function void fn049850()
 	u16[A1 + 0x1c] = 0x01
 	if (u8[A1 + 0x27] == 0)
 		u8[A1 + 0x27] = 1
-	u8[A1 + 0x20] = char.state.RUNNING
-	u8[A1 + 0x30] = 0xff
-	u8[A1 + 0x31] = 0x04
+	objA1.state = char.state.RUNNING
+	u8[A1 + 0x30] = 0xff		// "char.rotation.x.count"
+	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 	{
 		s16[A1 + 0x1c] = -s16[A1 + 0x1c]

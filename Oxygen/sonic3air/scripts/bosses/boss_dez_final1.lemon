@@ -43,7 +43,7 @@ function void fn07fd9e()
 	u16[0xfffffaa4] = A0.u16
 	u32[0xfffffa84] = 0
 
-	Kosinski.addToDMAQueue(0x181d44, 0x71e0)
+	Kosinski.addToDMAQueue(0x181d44, 0x71e0)		// Boss sprites
 
 	if (allocDynamicObjectStd())
 	{
@@ -79,7 +79,7 @@ function void fn07fd9e()
 function void fn07fe06()
 {
 	u8[A1 + 0x2e] = 0x81
-	u8[A1 + 0x20] = char.state.RUNNING
+	objA1.state = char.state.RUNNING
 	objA1.velocity.x = 0x0600
 	u16[A1 + 0x1c] = 0x0600
 	if (u8[A1 + 0x38] == CHARACTER_TAILS)
@@ -158,7 +158,7 @@ function void fn07fe96()
 			objA1.update_address = 0x08642e
 		}
 
-		addPatternLoadingCue(0x083d64)
+		addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 
 		if (allocDynamicObjectStd())
 		{
@@ -197,6 +197,7 @@ function void fn07fef6()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn the Master Emerald
 			objA1.update_address = 0x0806da
 			u16[A1 + 0x46] = A0.u16
 		}
@@ -437,16 +438,16 @@ function void fn080562()
 
 
 
-// A different object
+// The Master Emerald in the mouth of the giant Egg Robo
 
 //# address-hook(0x0806da) end(0x08072e)
 function void fn0806da()
 {
 	setupObjectAttributesFull(0x0812d4)
 
-	A1 = 0xffffffb2
-	D0 = 0x03
-	D1 = 0x06
+	A1 = 0xffffffb2		// Start of emerald collection states
+	D0 = 0x03			// Super Emerald collected state
+	D1 = 6				// Number of emeralds
 	while (D1.s16 >= 0)
 	{
 		if (D0.u8 != u8[(A1+=1)-1])

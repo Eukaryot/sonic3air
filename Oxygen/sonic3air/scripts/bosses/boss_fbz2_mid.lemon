@@ -66,6 +66,7 @@ function void fn06fd38()
 	move_area.right = 0x2b40
 #endif
 
+	// Load Egg Robo or Robotnik operator sprites alongside the midboss, depending on the player character 
 	u32 address = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0705d0 : 0x0705b6
 	addPatternLoadingCue(address)
 
@@ -255,7 +256,7 @@ function void fn06ff34()
 	level.boss_encounter = 0
 	objA0.update_address = 0x06ff50
 
-	addPatternLoadingCue(0x083d48)
+	addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
 }
 
 
@@ -394,7 +395,7 @@ function void fn0700ea()
 	}
 	else
 	{
-		addPatternLoadingCue(0x083d3a)
+		addPatternLoadingCue(0x083d3a)		// Some common object sprites
 		UnloadObject()
 	}
 }

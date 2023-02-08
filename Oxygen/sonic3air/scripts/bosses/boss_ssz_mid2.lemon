@@ -45,9 +45,9 @@ function void fn07a6a6()
 	}
 	u16[0xfffffa88] = 0
 
-	requestLoadingPatterns(0x7b)
+	requestLoadingPatterns(0x7b)		// Robotnik's ship and boss explosion sprites
 
-	Kosinski.addToDMAQueue(0x17efa6, 0x83e0)
+	Kosinski.addToDMAQueue(0x17efa6, 0x83e0)		// Metropolis Zone balloon boss sprites
 
 	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
 
@@ -635,7 +635,7 @@ function void fn07ac92()
 	u8[0xffffeed4] = 0xff
 
 	copyMemory(0xfffffc20, 0xfffffca0, 0x20)
-	requestLoadingPatterns(0x32)
+	requestLoadingPatterns(0x32)		// SSZ object sprites
 
 	Object.TriggerUnloading()
 }

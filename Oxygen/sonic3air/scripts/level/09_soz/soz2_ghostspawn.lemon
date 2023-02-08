@@ -359,7 +359,7 @@ function void fn08f390()
 //# address-hook(0x08f3de) end(0x08f3e2)
 function void fn08f3de()
 {
-	addPatternLoadingCue(0x08f3e8)
+	addPatternLoadingCue(0x08f3e8)		// Capsule sprites
 }
 
 

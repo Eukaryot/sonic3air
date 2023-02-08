@@ -13,74 +13,81 @@
 //# address-hook(0x0016fa) end(0x00172a)
 function void RequestLoadingPatterns()
 {
+	// Basically queueing to decompress some Nemesis-compressed art into its target in VRAM
 	u32 backupA1 = A1
 	u32 backupA2 = A2
 
 	// Targets:
-	//  - 0x09249e	-> D0.u16 = 0x01
-	//  - 0x0924cc	-> D0.u16 = 0x03
-	//  - 0x0924dc	-> D0.u16 = 0x05
-	//  - 0x09250a	-> D0.u16 = 0x07
-	//  - 0x092524	-> D0.u16 = 0x08
-	//  - 0x092534	-> D0.u16 = 0x0a
-	//  - 0x09253c	-> D0.u16 = 0x0b
-	//  - 0x092562	-> D0.u16 = 0x0c
-	//  - 0x092588	-> D0.u16 = 0x0e
-	//  - 0x0925ae	-> D0.u16 = 0x0f
-	//  - 0x0925b6	-> D0.u16 = 0x10
-	//  - 0x0925dc	-> D0.u16 = 0x11
-	//  - 0x0925f0	-> D0.u16 = 0x12
-	//  - 0x09260a	-> D0.u16 = 0x14
-	//  - 0x092624	-> D0.u16 = 0x16
-	//  - 0x092624	-> D0.u16 = 0x17
-	//  - 0x092624	-> D0.u16 = 0x18
-	//  - 0x092624	-> D0.u16 = 0x19
-	//  - 0x092638	-> D0.u16 = 0x1a
-	//  - 0x09264c	-> D0.u16 = 0x1c
-	//  - 0x092660	-> D0.u16 = 0x1e
-	//  - 0x092686	-> D0.u16 = 0x20
-	//  - 0x0926a6	-> D0.u16 = 0x22
-	//  - 0x0926b4	-> D0.u16 = 0x24
-	//  - 0x0926c2	-> D0.u16 = 0x25
-	//  - 0x0926ca	-> D0.u16 = 0x26
-	//  - 0x0926ca	-> D0.u16 = 0x28
-	//  - 0x0926de	-> D0.u16 = 0x2a
-	//  - 0x0926ec	-> D0.u16 = 0x2c
-	//  - 0x0926fa	-> D0.u16 = 0x2e
-	//  - 0x0926fa	-> D0.u16 = 0x2f
-	//  - 0x09270e	-> D0.u16 = 0x30
-	//  - 0x09271c	-> D0.u16 = 0x32
-	//  - 0x09271c	-> D0.u16 = 0x34
-	//  - 0x09272a	-> D0.u16 = 0x36
-	//  - 0x092738	-> D0.u16 = 0x38
-	//  - 0x092746	-> D0.u16 = 0x3a
-	//  - 0x09274e	-> D0.u16 = 0x40
-	//  - 0x092750	-> D0.u16 = 0x42
-	//  - 0x092782	-> D0.u16 = 0x43
-	//  - 0x0927ba	-> D0.u16 = 0x44
-	//  - 0x0927f2	-> D0.u16 = 0x45
-	//  - 0x09282a	-> D0.u16 = 0x46
-	//  - 0x092862	-> D0.u16 = 0x47
-	//  - 0x09286a	-> D0.u16 = 0x48
-	//  - 0x092878	-> D0.u16 = 0x4c
-	//  - 0x092888	-> D0.u16 = 0x50
-	//  - 0x092896	-> D0.u16 = 0x51
-	//  - 0x09289e	-> D0.u16 = 0x52
-	//  - 0x0928b8	-> D0.u16 = 0x5a
-	//  - 0x0928d2	-> D0.u16 = 0x5b
-	//  - 0x0928e0	-> D0.u16 = 0x5d
-	//  - 0x0928f6	-> D0.u16 = 0x5f
-	//  - 0x092904	-> D0.u16 = 0x60
-	//  - 0x092934	-> D0.u16 = 0x6b
-	//  - 0x092942	-> D0.u16 = 0x6c
-	//  - 0x09295c	-> D0.u16 = 0x6d
-	//  - 0x092970	-> D0.u16 = 0x6e
-	//  - 0x09298a	-> D0.u16 = 0x6f
-	//  - 0x0929b0	-> D0.u16 = 0x70
-	//  - 0x0929ca	-> D0.u16 = 0x71
-	//  - 0x0929d8	-> D0.u16 = 0x76
-	//  - 0x0929ec	-> D0.u16 = 0x77
-	//  - 0x092a00	-> D0.u16 = 0x7b
+	//	- 0x092484	-> D0.u16 = 0x00														-> Old duplicate of the next entry
+	//	- 0x09249e	-> D0.u16 = 0x01														-> Sonic HUD + common object sprites
+	//	- 0x0924b8	-> D0.u16 = 0x02														-> Explosions + Flickies and squirrels
+	//	- 0x0924cc	-> D0.u16 = 0x03														-> Game Over text sprites
+	//	- 0x0924d4	-> D0.u16 = 0x04														-> Sonic 2 Signpost sprites (?)
+	//	- 0x0924dc	-> D0.u16 = 0x05														-> Knuckles HUD + common object sprites
+	//	- 0x0924f6	-> D0.u16 = 0x06														-> Competition mode common sprites
+	//	- 0x09250a	-> D0.u16 = 0x07														-> Tails HUD + common object sprites
+	//	- 0x092524	-> D0.u16 = 0x08														-> Monitor sprites
+	//	- 0x09252c	-> D0.u16 = 0x09														-> Duplicate of the previous entry
+	//	- 0x092534	-> D0.u16 = 0x0a														-> AIZ Intro sprites
+	//	- 0x09253c	-> D0.u16 = 0x0b														-> AIZ 1 object sprites
+	//	- 0x092562	-> D0.u16 = 0x0c, 0x0d													-> AIZ 2 object sprites
+	//	- 0x092588	-> D0.u16 = 0x0e														-> HCZ 1 object sprites
+	//	- 0x0925ae	-> D0.u16 = 0x0f														-> HCZ 1 object sprites
+	//	- 0x0925b6	-> D0.u16 = 0x10														-> HCZ 2 object sprites
+	//	- 0x0925dc	-> D0.u16 = 0x11														-> HCZ 2 object sprites
+	//	- 0x0925f0	-> D0.u16 = 0x12, 0x13													-> MGZ 1 object sprites
+	//	- 0x09260a	-> D0.u16 = 0x14, 0x15													-> MGZ 2 object sprites
+	//	- 0x092624	-> D0.u16 = 0x16, 0x17													-> CNZ 1 object sprites
+	//	- 0x092624	-> D0.u16 = 0x18, 0x19													-> CNZ 2 object sprites
+	//	- 0x092638	-> D0.u16 = 0x1a, 0x1b													-> FBZ 1 object sprites
+	//	- 0x09264c	-> D0.u16 = 0x1c, 0x1d													-> FBZ 2 object sprites
+	//	- 0x092660	-> D0.u16 = 0x1e, 0x1f													-> ICZ 1 object sprites
+	//	- 0x092686	-> D0.u16 = 0x20, 0x21													-> ICZ 2 object sprites
+	//	- 0x0926a6	-> D0.u16 = 0x22, 0x23													-> LBZ 1 object sprites
+	//	- 0x0926b4	-> D0.u16 = 0x24														-> LBZ 2 object sprites
+	//	- 0x0926c2	-> D0.u16 = 0x25														-> LBZ 2 object sprites
+	//	- 0x0926ca	-> D0.u16 = 0x26, 0x27													-> MHZ 1 object sprites
+	//	- 0x0926ca	-> D0.u16 = 0x28, 0x29													-> MHZ 2 object sprites
+	//	- 0x0926de	-> D0.u16 = 0x2a, 0x2b													-> SOZ 1 object sprites
+	//	- 0x0926ec	-> D0.u16 = 0x2c, 0x2d													-> SOZ 2 object sprites
+	//	- 0x0926fa	-> D0.u16 = 0x2e, 0x2f													-> LRZ 1 object sprites
+	//	- 0x09270e	-> D0.u16 = 0x30, 0x31													-> LRZ 2 object sprites
+	//	- 0x09271c	-> D0.u16 = 0x32, 0x33													-> SSZ Sonic/Tails object sprites
+	//	- 0x09271c	-> D0.u16 = 0x34, 0x35													-> SSZ Knuckles object sprites
+	//	- 0x09272a	-> D0.u16 = 0x36, 0x37													-> DEZ 1 object sprites
+	//	- 0x092738	-> D0.u16 = 0x38, 0x39													-> DEZ 2 object sprites
+	//	- 0x092746	-> D0.u16 = 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f							-> DDZ object sprites (loads nothing but diagonal springs for some reason?)
+	//	- 0x09274e	-> D0.u16 = 0x40, 0x41													-> Outro for Sonic/Tails object sprites (empty?)
+	//	- 0x092750	-> D0.u16 = 0x42														-> 2P ALZ object sprites
+	//	- 0x092782	-> D0.u16 = 0x43														-> 2P BPZ object sprites
+	//	- 0x0927ba	-> D0.u16 = 0x44														-> 2P DPZ object sprites
+	//	- 0x0927f2	-> D0.u16 = 0x45														-> 2P CGZ object sprites
+	//	- 0x09282a	-> D0.u16 = 0x46														-> 2P EMZ object sprites
+	//	- 0x092862	-> D0.u16 = 0x47														-> Gumball machine bonus stage sprites
+	//	- 0x09286a	-> D0.u16 = 0x48, 0x49, 0x4a, 0x4b										-> HPZ object sprites
+	//	- 0x092878	-> D0.u16 = 0x4c, 0x4d													-> Robotnik running for DEZ boss act
+	//	- 0x092880	-> D0.u16 = 0x4e, 0x4f													-> Spikes and springs
+	//	- 0x092888	-> D0.u16 = 0x50														-> Glowing sphere bonus stage sprites
+	//	- 0x092896	-> D0.u16 = 0x51														-> Slot machine bonus stage blocks
+	//	- 0x09289e	-> D0.u16 = 0x52														-> Miles HUD + common object sprites
+	//	- 0x0928b8	-> D0.u16 = 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a				-> AIZ 1 boss
+	//	- 0x0928d2	-> D0.u16 = 0x5b														-> HCZ 1 boss
+	//	- 0x0928e0	-> D0.u16 = 0x5c, 0x5d													-> CNZ 1 boss
+	//	- 0x0928ee	-> D0.u16 = 0x5e														-> Boss explosions for MGZ1 boss
+	//	- 0x0928f6	-> D0.u16 = 0x5f														-> ICZ 1 boss
+	//	- 0x092904	-> D0.u16 = 0x60														-> LBZ 1 boss and pre-boss cutscene sprites
+	//	- 0x092912	-> D0.u16 = 0x61														-> Boss explosions for MHZ1 boss
+	//	- 0x09291a	-> D0.u16 = 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a		-> FBZ 2 mid boss
+	//	- 0x092934	-> D0.u16 = 0x6b														-> Egg Mobile and explosions for AIZ2 boss
+	//	- 0x092942	-> D0.u16 = 0x6c														-> HCZ 2 boss
+	//	- 0x09295c	-> D0.u16 = 0x6d														-> Egg Mobile, explosions, and capsule for MGZ2 boss and SOZ2 boss
+	//	- 0x092970	-> D0.u16 = 0x6e														-> CNZ 2 boss
+	//	- 0x09298a	-> D0.u16 = 0x6f														-> FBZ 2 main boss
+	//	- 0x0929b0	-> D0.u16 = 0x70														-> ICZ 2 boss
+	//	- 0x0929ca	-> D0.u16 = 0x71														-> LBZ 2 second boss
+	//	- 0x0929d8	-> D0.u16 = 0x72, 0x73, 0x74, 0x75, 0x76								-> Robotnik running and standing for DEZ2 boss
+	//	- 0x0929ec	-> D0.u16 = 0x77														-> Robotnik running + ship and explosions LBZ2 first boss
+	//	- 0x092a00	-> D0.u16 = 0x78, 0x79, 0x7a, 0x7b										-> Egg Mobile and explosions for MHZ2 boss, SSZ bosses, and DEZ1 boss
 	u32 address = tableLookupAddress(0x09238c, D0.u16 * 2)
 	addPatternLoadingCue(address)	// This is originally not called here, but it does the exact same thing as the original code
 
@@ -99,7 +106,7 @@ function void requestLoadingPatterns(u8 index)
 function void AddPatternLoadingCue()
 {
 	// Search for next free place in table
-	A2 = 0xfffff680
+	A2 = 0xfffff680		// Start of Nemesis decompression queue
 	while (u32[A2] != 0)
 	{
 		A2 += 6
@@ -124,70 +131,76 @@ function void FillPatternLoadingCues()
 	ClearPatternLoadingQueue()
 
 	// Targets:
-	//  - 0x09249e	-> D0.u16 = 0x01
-	//  - 0x0924cc	-> D0.u16 = 0x03
-	//  - 0x0924dc	-> D0.u16 = 0x05
-	//  - 0x09250a	-> D0.u16 = 0x07
-	//  - 0x092524	-> D0.u16 = 0x08
-	//  - 0x092534	-> D0.u16 = 0x0b
-	//  - 0x09253c	-> D0.u16 = 0x0c
-	//  - 0x092562	-> D0.u16 = 0x0d
-	//  - 0x092588	-> D0.u16 = 0x0e
-	//  - 0x0925ae	-> D0.u16 = 0x0f
-	//  - 0x0925b6	-> D0.u16 = 0x10
-	//  - 0x0925dc	-> D0.u16 = 0x11
-	//  - 0x0925f0	-> D0.u16 = 0x12
-	//  - 0x09260a	-> D0.u16 = 0x14
-	//  - 0x092624	-> D0.u16 = 0x16
-	//  - 0x092624	-> D0.u16 = 0x17
-	//  - 0x092624	-> D0.u16 = 0x18
-	//  - 0x092624	-> D0.u16 = 0x19
-	//  - 0x092638	-> D0.u16 = 0x1a
-	//  - 0x09264c	-> D0.u16 = 0x1c
-	//  - 0x092660	-> D0.u16 = 0x1e
-	//  - 0x092686	-> D0.u16 = 0x20
-	//  - 0x0926a6	-> D0.u16 = 0x22
-	//  - 0x0926b4	-> D0.u16 = 0x24
-	//  - 0x0926c2	-> D0.u16 = 0x25
-	//  - 0x0926ca	-> D0.u16 = 0x26
-	//  - 0x0926ca	-> D0.u16 = 0x28
-	//  - 0x0926de	-> D0.u16 = 0x2a
-	//  - 0x0926ec	-> D0.u16 = 0x2c
-	//  - 0x0926fa	-> D0.u16 = 0x2e
-	//  - 0x0926fa	-> D0.u16 = 0x2f
-	//  - 0x09270e	-> D0.u16 = 0x30
-	//  - 0x09271c	-> D0.u16 = 0x32
-	//  - 0x09271c	-> D0.u16 = 0x34
-	//  - 0x09272a	-> D0.u16 = 0x36
-	//  - 0x092738	-> D0.u16 = 0x38
-	//  - 0x092746	-> D0.u16 = 0x3a
-	//  - 0x09274e	-> D0.u16 = 0x40
-	//  - 0x092750	-> D0.u16 = 0x42
-	//  - 0x092782	-> D0.u16 = 0x43
-	//  - 0x0927ba	-> D0.u16 = 0x44
-	//  - 0x0927f2	-> D0.u16 = 0x45
-	//  - 0x09282a	-> D0.u16 = 0x46
-	//  - 0x092862	-> D0.u16 = 0x47
-	//  - 0x09286a	-> D0.u16 = 0x48
-	//  - 0x092878	-> D0.u16 = 0x4c
-	//  - 0x092888	-> D0.u16 = 0x50
-	//  - 0x092896	-> D0.u16 = 0x51
-	//  - 0x09289e	-> D0.u16 = 0x52
-	//  - 0x0928b8	-> D0.u16 = 0x5a
-	//  - 0x0928d2	-> D0.u16 = 0x5b
-	//  - 0x0928e0	-> D0.u16 = 0x5d
-	//  - 0x0928f6	-> D0.u16 = 0x5f
-	//  - 0x092904	-> D0.u16 = 0x60
-	//  - 0x092934	-> D0.u16 = 0x6b
-	//  - 0x092942	-> D0.u16 = 0x6c
-	//  - 0x09295c	-> D0.u16 = 0x6d
-	//  - 0x092970	-> D0.u16 = 0x6e
-	//  - 0x09298a	-> D0.u16 = 0x6f
-	//  - 0x0929b0	-> D0.u16 = 0x70
-	//  - 0x0929ca	-> D0.u16 = 0x71
-	//  - 0x0929d8	-> D0.u16 = 0x76
-	//  - 0x0929ec	-> D0.u16 = 0x77
-	//  - 0x092a00	-> D0.u16 = 0x7b
+	//	- 0x092484	-> D0.u16 = 0x00														-> Old duplicate of the next entry
+	//	- 0x09249e	-> D0.u16 = 0x01														-> Sonic HUD + common object sprites
+	//	- 0x0924b8	-> D0.u16 = 0x02														-> Explosions + Flickies and squirrels
+	//	- 0x0924cc	-> D0.u16 = 0x03														-> Game Over text sprites
+	//	- 0x0924d4	-> D0.u16 = 0x04														-> Sonic 2 Signpost sprites (?)
+	//	- 0x0924dc	-> D0.u16 = 0x05														-> Knuckles HUD + common object sprites
+	//	- 0x0924f6	-> D0.u16 = 0x06														-> Competition mode common sprites
+	//	- 0x09250a	-> D0.u16 = 0x07														-> Tails HUD + common object sprites
+	//	- 0x092524	-> D0.u16 = 0x08														-> Monitor sprites
+	//	- 0x09252c	-> D0.u16 = 0x09														-> Duplicate of the previous entry
+	//	- 0x092534	-> D0.u16 = 0x0a														-> AIZ Intro sprites
+	//	- 0x09253c	-> D0.u16 = 0x0b														-> AIZ 1 object sprites
+	//	- 0x092562	-> D0.u16 = 0x0c, 0x0d													-> AIZ 2 object sprites
+	//	- 0x092588	-> D0.u16 = 0x0e														-> HCZ 1 object sprites
+	//	- 0x0925ae	-> D0.u16 = 0x0f														-> HCZ 1 object sprites
+	//	- 0x0925b6	-> D0.u16 = 0x10														-> HCZ 2 object sprites
+	//	- 0x0925dc	-> D0.u16 = 0x11														-> HCZ 2 object sprites
+	//	- 0x0925f0	-> D0.u16 = 0x12, 0x13													-> MGZ 1 object sprites
+	//	- 0x09260a	-> D0.u16 = 0x14, 0x15													-> MGZ 2 object sprites
+	//	- 0x092624	-> D0.u16 = 0x16, 0x17													-> CNZ 1 object sprites
+	//	- 0x092624	-> D0.u16 = 0x18, 0x19													-> CNZ 2 object sprites
+	//	- 0x092638	-> D0.u16 = 0x1a, 0x1b													-> FBZ 1 object sprites
+	//	- 0x09264c	-> D0.u16 = 0x1c, 0x1d													-> FBZ 2 object sprites
+	//	- 0x092660	-> D0.u16 = 0x1e, 0x1f													-> ICZ 1 object sprites
+	//	- 0x092686	-> D0.u16 = 0x20, 0x21													-> ICZ 2 object sprites
+	//	- 0x0926a6	-> D0.u16 = 0x22, 0x23													-> LBZ 1 object sprites
+	//	- 0x0926b4	-> D0.u16 = 0x24														-> LBZ 2 object sprites
+	//	- 0x0926c2	-> D0.u16 = 0x25														-> LBZ 2 object sprites
+	//	- 0x0926ca	-> D0.u16 = 0x26, 0x27													-> MHZ 1 object sprites
+	//	- 0x0926ca	-> D0.u16 = 0x28, 0x29													-> MHZ 2 object sprites
+	//	- 0x0926de	-> D0.u16 = 0x2a, 0x2b													-> SOZ 1 object sprites
+	//	- 0x0926ec	-> D0.u16 = 0x2c, 0x2d													-> SOZ 2 object sprites
+	//	- 0x0926fa	-> D0.u16 = 0x2e, 0x2f													-> LRZ 1 object sprites
+	//	- 0x09270e	-> D0.u16 = 0x30, 0x31													-> LRZ 2 object sprites
+	//	- 0x09271c	-> D0.u16 = 0x32, 0x33													-> SSZ Sonic/Tails object sprites
+	//	- 0x09271c	-> D0.u16 = 0x34, 0x35													-> SSZ Knuckles object sprites
+	//	- 0x09272a	-> D0.u16 = 0x36, 0x37													-> DEZ 1 object sprites
+	//	- 0x092738	-> D0.u16 = 0x38, 0x39													-> DEZ 2 object sprites
+	//	- 0x092746	-> D0.u16 = 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f							-> DDZ object sprites (loads nothing but diagonal springs for some reason?)
+	//	- 0x09274e	-> D0.u16 = 0x40, 0x41													-> Outro for Sonic/Tails object sprites (empty?)
+	//	- 0x092750	-> D0.u16 = 0x42														-> 2P ALZ object sprites
+	//	- 0x092782	-> D0.u16 = 0x43														-> 2P BPZ object sprites
+	//	- 0x0927ba	-> D0.u16 = 0x44														-> 2P DPZ object sprites
+	//	- 0x0927f2	-> D0.u16 = 0x45														-> 2P CGZ object sprites
+	//	- 0x09282a	-> D0.u16 = 0x46														-> 2P EMZ object sprites
+	//	- 0x092862	-> D0.u16 = 0x47														-> Gumball machine bonus stage sprites
+	//	- 0x09286a	-> D0.u16 = 0x48, 0x49, 0x4a, 0x4b										-> HPZ object sprites
+	//	- 0x092878	-> D0.u16 = 0x4c, 0x4d													-> Robotnik running for DEZ boss act
+	//	- 0x092880	-> D0.u16 = 0x4e, 0x4f													-> Spikes and springs
+	//	- 0x092888	-> D0.u16 = 0x50														-> Glowing sphere bonus stage sprites
+	//	- 0x092896	-> D0.u16 = 0x51														-> Slot machine bonus stage blocks
+	//	- 0x09289e	-> D0.u16 = 0x52														-> Miles HUD + common object sprites
+	//	- 0x0928b8	-> D0.u16 = 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a				-> AIZ 1 boss
+	//	- 0x0928d2	-> D0.u16 = 0x5b														-> HCZ 1 boss
+	//	- 0x0928e0	-> D0.u16 = 0x5c, 0x5d													-> CNZ 1 boss
+	//	- 0x0928ee	-> D0.u16 = 0x5e														-> Boss explosions for MGZ1 boss
+	//	- 0x0928f6	-> D0.u16 = 0x5f														-> ICZ 1 boss
+	//	- 0x092904	-> D0.u16 = 0x60														-> LBZ 1 boss and pre-boss cutscene sprites
+	//	- 0x092912	-> D0.u16 = 0x61														-> Boss explosions for MHZ1 boss
+	//	- 0x09291a	-> D0.u16 = 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a		-> FBZ 2 mid boss
+	//	- 0x092934	-> D0.u16 = 0x6b														-> Egg Mobile and explosions for AIZ2 boss
+	//	- 0x092942	-> D0.u16 = 0x6c														-> HCZ 2 boss
+	//	- 0x09295c	-> D0.u16 = 0x6d														-> Egg Mobile, explosions, and capsule for MGZ2 boss and SOZ2 boss
+	//	- 0x092970	-> D0.u16 = 0x6e														-> CNZ 2 boss
+	//	- 0x09298a	-> D0.u16 = 0x6f														-> FBZ 2 main boss
+	//	- 0x0929b0	-> D0.u16 = 0x70														-> ICZ 2 boss
+	//	- 0x0929ca	-> D0.u16 = 0x71														-> LBZ 2 second boss
+	//	- 0x0929d8	-> D0.u16 = 0x72, 0x73, 0x74, 0x75, 0x76								-> Robotnik running and standing for DEZ2 boss
+	//	- 0x0929ec	-> D0.u16 = 0x77														-> Robotnik running + ship and explosions LBZ2 first boss
+	//	- 0x092a00	-> D0.u16 = 0x78, 0x79, 0x7a, 0x7b										-> Egg Mobile and explosions for MHZ2 boss, SSZ bosses, and DEZ1 boss
 	u32 address = tableLookupAddress(0x09238c, D0.u16 * 2)
 
 	s16 value = s16[address]
@@ -196,6 +209,13 @@ function void FillPatternLoadingCues()
 		u16 bytes = (value + 1) * 6
 		copyMemory(0xfffff680, address + 2, bytes)
 	}
+}
+
+
+function void fillPatternLoadingCues(u8 index)
+{
+	D0 = index
+	FillPatternLoadingCues()
 }
 
 

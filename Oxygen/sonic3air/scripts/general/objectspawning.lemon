@@ -16,6 +16,11 @@
 function void DynamicObjectsLoading()
 {
 	// This usually calls "fn01b69e()"
+	// Targets:
+	// 0x01b69a -> dynobjects.routine = 0
+	// 0x01b69e -> dynobjects.routine = 4
+	// 0x01b6a2 -> dynobjects.routine = 8
+	// 0x01b6a6 -> dynobjects.routine = 12
 	u32 address = 0x01b69a + dynobjects.routine
 	call address
 }

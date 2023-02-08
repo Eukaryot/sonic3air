@@ -410,27 +410,31 @@ function void Enemy.addScore(u32 enemyAddress, u32 scoreLookup)
 //# address-hook(0x0857b4) end(0x0857c0)
 function void Enemy.DamageCharacter()
 {
-	A2 = A0
-	A0 = A1
-	Character.GettingHurt()
-	A0 = A2
+	A2 = A0		// Backup enemy update address from A0 to A2
+	A0 = A1		// Copy player update address from A1 to A0
+	Character.GettingHurt()		// Deal damage to player character
+	// Player update address should still be preserved in A1
+	A0 = A2		// Copy enemy update address back from A2 to A0
 }
 
 
 //# address-hook(0x0857c2) end(0x0857e6)
 function void fn0857c2()
 {
-#if STANDALONE
-	// Bug fix for the drop dash not counting as a rolling state in collision checks for certain enemies,
-	// i.e. Sonic gets hurt when dropdashing on them -- fix #contributed by GFX32
-	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH || u8[A1 + 0x20] == char.state.SONIC_DROPDASH)
-#else
 	if (u8[A1 + 0x2b] & char.bonus.INVINCIBLE || u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x20] == char.state.SPINDASH)
-#endif
 	{
 		fn085822()
 		return
 	}
+#if STANDALONE
+	// Bug fix for the drop dash not counting as a rolling state in collision checks for certain enemies,
+	// i.e. Sonic gets hurt when dropdashing on them -- fix #contributed by GFX32
+	else if (Game.getSetting(SETTING_DROPDASH) && u8[A1 + 0x38] == CHARACTER_SONIC && u8[A1 + 0x20] == char.state.SONIC_DROPDASH)
+	{
+		fn085822()
+		return
+	}
+#endif
 
 	// Targets:
 	//  - 0x0857f0	-> u8[A1 + 0x38] = CHARACTER_SONIC
@@ -1265,7 +1269,7 @@ function void Object.AnimationProgress.SlowDown(u32 address)
 //# address-hook(0x0847e6) end(0x084828)
 function void fn0847e6()
 {
-	// Hovering of Robotnik's capsule
+	// Hovering motion, used for Robotnik's capsule, flying animal prison, the Tornado plane, some minibosses, etc.
 	s16 step = s16[A0 + 0x40]
 	s16 limit = objA0.value3e
 	D3 = 0

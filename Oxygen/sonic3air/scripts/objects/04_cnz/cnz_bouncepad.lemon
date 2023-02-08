@@ -72,8 +72,8 @@ function void fn0329b8()
 		{
 			u8[A1 + 0x20] = 0
 			s8[A1 + 0x27] = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? -1 : 1
-			u8[A1 + 0x30] = 0x03
-			u8[A1 + 0x31] = 0x08
+			u8[A1 + 0x30] = 0x03		// "char.rotation.x.count"
+			u8[A1 + 0x31] = 0x08		// "char.rotation.x.speed"
 		}
 
 		u8[A1 + 0x40] = 0

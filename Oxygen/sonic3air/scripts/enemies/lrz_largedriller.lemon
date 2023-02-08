@@ -56,8 +56,8 @@ function void fn0900f0()
 		}
 	}
 
-	Kosinski.addToDMAQueue(0x16f928, 0xa5c0)
-	addPatternLoadingCue(0x083d64)
+	Kosinski.addToDMAQueue(0x16f928, 0xa5c0)		// Large driller sprites
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 	loadPaletteLine1(0x090680)
 
 	// "spawnChildObjects(0x090626)" replaced by:

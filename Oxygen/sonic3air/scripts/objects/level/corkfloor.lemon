@@ -151,12 +151,14 @@ function void fn02a3d0()
 
 	if (global.zone_act == 0x0001)
 	{
+		// Angel Island Act 2
 		objA0.mapping_offset = 0x229bd4
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.box_size.y = 0x2c
 	}
 	else if (global.zone == 0x03)
 	{
+		// Carnival Night Zone
 		objA0.mapping_offset = 0x229c48
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0430)
 		objA0.box_size.x = 0x20
@@ -165,6 +167,7 @@ function void fn02a3d0()
 	}
 	else if (global.zone == 0x04)
 	{
+		// Flying Battery Zone
 		objA0.mapping_offset = 0x02a920
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x043a)
 		objA0.box_size.x = 0x10
@@ -173,6 +176,7 @@ function void fn02a3d0()
 	}
 	else if (global.zone == 0x05)
 	{
+		// IceCap Zone
 		objA0.mapping_offset = 0x229ce0
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.box_size.x = 0x10
@@ -191,6 +195,7 @@ function void fn02a3d0()
 	}
 	else if (global.zone == 0x06)
 	{
+		// Launch Base Zone
 		objA0.mapping_offset = 0x229ee8
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 		objA0.box_size.x = 0x20

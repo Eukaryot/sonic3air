@@ -24,11 +24,11 @@ function void fn0906a0()
 	u16[A2] = 0
 	objA0.position.x.u16 = 0x1640
 	objA0.position.y.u16 = 0x0340
-	u16[0xfffff634] = 7999
+	level.palettefx.timer_1 = 7999
 
-	A1 = 0xffffffb2
-	D0 = 3
-	D1 = 6
+	A1 = 0xffffffb2		// Start of emerald collection states
+	D0 = 0x03			// Super Emerald collected state
+	D1 = 6				// Number of emeralds
 	while (true)
 	{
 		if (D0.u8 != u8[(A1+=1)-1])

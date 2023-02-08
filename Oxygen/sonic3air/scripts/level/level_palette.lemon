@@ -100,39 +100,38 @@ function void LevelPaletteUpdate.Empty()
 //# address-hook(0x0021be) end(0x00227a)
 function void LevelPaletteUpdate.AIZ1()
 {
-	D0.u8 = u8[0xfffff72e]
+	D0.u8 = level.palettefx.aiz_intro
 	if (D0.u8 == 0)
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 7
-			D0.u16 = u16[0xfffff632]
-			u16[0xfffff632] += 8
-			D0.u16 &= 0x18
+			level.palettefx.timer_1 = 7
+			D0.u16 = level.palettefx.frame_1 & 0x18
+			level.palettefx.frame_1 += 8
 
 			copyMemory(0xfffffc56, 0x002af6 + D0.u16, 8)
 
-			if (u8[0xfffff650] == 0)
+			if (level.palettefx.state == 0)
 			{
-				D0.u16 = u16[0xfffff652]
-				u16[0xfffff652] = (u16[0xfffff652] >= 42) ? 0 : (u16[0xfffff652] + 6)	// No modulo here, does not verify
+				D0.u16 = level.palettefx.frame_2
+				level.palettefx.frame_2 = (level.palettefx.frame_2 >= 42) ? 0 : (level.palettefx.frame_2 + 6)	// No modulo here, does not verify
 				copyMemory(0xfffffc78, 0x002bf6 + D0.s16, 6)
 			}
 		}
 	}
 	else
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 9
-			D0.u16 = u16[0xfffff632]
-			u16[0xfffff632] = (u16[0xfffff632] + 8) % 80
+			level.palettefx.timer_1 = 9
+			D0.u16 = level.palettefx.frame_1
+			level.palettefx.frame_1 = (level.palettefx.frame_1 + 8) % 80
 			copyMemory(0xfffffc64, 0x002b16 + D0.s16, 8)
 
-			D0.u16 = u16[0xfffff652]
-			u16[0xfffff652] = (u16[0xfffff652] + 6) % 60
+			D0.u16 = level.palettefx.frame_2
+			level.palettefx.frame_2 = (level.palettefx.frame_2 + 6) % 60
 			copyMemory(0xfffffc7a, 0x002b96 + D0.s16, 6)
 		}
 	}
@@ -142,17 +141,16 @@ function void LevelPaletteUpdate.AIZ1()
 //# address-hook(0x00227c) end(0x002332)
 function void LevelPaletteUpdate.AIZ2()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 5
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 8
-		D0.u16 &= 0x18
+		level.palettefx.timer_1 = 5
+		D0.u16 = level.palettefx.frame_1 & 0x18
+		level.palettefx.frame_1 += 8
 
 		copyMemory(0xfffffc78, 0x002c26 + D0.s16, 8)
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] = (u16[0xfffff652] + 6) % 48
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 = (level.palettefx.frame_2 + 6) % 48
 
 		A0 = (camera.position.x.u16 >= 0x3800) ? 0x002c76 : 0x002c46
 
@@ -165,12 +163,12 @@ function void LevelPaletteUpdate.AIZ2()
 			u16[0xfffffc5c] = 0x0a0e
 	}
 
-	--u16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 1
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] = (u16[0xfffff654] + 2) % 52
+		level.palettefx.timer_2 = 1
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 = (level.palettefx.frame_3 + 2) % 52
 
 		A0 = (camera.position.x.u16 >= 0x3800) ? 0x002cda : 0x002ca6
 		u16[0xfffffc62] = u16[A0 + D0.s16]
@@ -181,16 +179,16 @@ function void LevelPaletteUpdate.AIZ2()
 //# address-hook(0x002334) end(0x002380)
 function void LevelPaletteUpdate.HCZ1()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = (u8[0xfffff650] != 0) ? 0 : 7
+		level.palettefx.timer_1 = (level.palettefx.state != 0) ? 0 : 7
 		A0 = 0x002d0e
-		D0.u16 = u16[0xfffff632]
+		D0.u16 = level.palettefx.frame_1
 
-		u16[0xfffff632] += 8
-		if (u16[0xfffff632] >= 0x20)
-			u16[0xfffff632] = 0
+		level.palettefx.frame_1 += 8
+		if (level.palettefx.frame_1 >= 0x20)
+			level.palettefx.frame_1 = 0
 
 		copyMemory(0xfffffc46, A0 + D0.s16, 8)
 		copyMemory(0xfffff0c6, A0 + D0.s16, 8)
@@ -207,15 +205,15 @@ function void LevelPaletteUpdate.HCZ2()
 //# address-hook(0x002384) end(0x00243e)
 function void LevelPaletteUpdate.CNZ()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 3
+		level.palettefx.timer_1 = 3
 		A0 = 0x002d2e
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 6
-		if (u16[0xfffff632] >= 0x60)
-			u16[0xfffff632] = 0
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 6
+		if (level.palettefx.frame_1 >= 0x60)
+			level.palettefx.frame_1 = 0
 
 		copyMemory(0xfffffc72, A0 + D0.s16, 6)
 
@@ -232,27 +230,28 @@ function void LevelPaletteUpdate.CNZ()
 #endif
 
 	A0 = 0x002d8e
-	D0.u16 = u16[0xfffff652]
-	u16[0xfffff652] += 0x06
-	if (u16[0xfffff652] >= 0xb4)
+	D0.u16 = level.palettefx.frame_2
+	level.palettefx.frame_2 += 0x06
+	if (level.palettefx.frame_2 >= 0xb4)
 	{
-		u16[0xfffff652] = 0
+		level.palettefx.frame_2 = 0
 	}
 	copyMemory(0xfffffc52, A0 + D0.s16, 6)
+
 
 	A0 = 0x002ee2
 	copyMemory(0xfffff0d2, A0 + D0.s16, 6)
 
-	--u16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 2
+		level.palettefx.timer_2 = 2
 
 		A0 = 0x002e42
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] += 4
-		if (u16[0xfffff654] >= 0x40)
-			u16[0xfffff654] = 0
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 += 4
+		if (level.palettefx.frame_3 >= 0x40)
+			level.palettefx.frame_3 = 0
 
 		u32[0xfffffc4e] = u32[A0 + D0.s16]
 		A0 = 0x002e42
@@ -264,40 +263,40 @@ function void LevelPaletteUpdate.CNZ()
 //# address-hook(0x00244e) end(0x002506)
 function void LevelPaletteUpdate.ICZ()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 5
+		level.palettefx.timer_1 = 5
 		A0 = 0x002fd6
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] = (u16[0xfffff632] + 4) % 64
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 = (level.palettefx.frame_1 + 4) % 64
 		u32[0xfffffc5c] = u32[A0 + D0.s16]
 	}
 
-	--u16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 9
+		level.palettefx.timer_2 = 9
 		A0 = 0x003016
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] = (u16[0xfffff652] + 4) % 72
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 = (level.palettefx.frame_2 + 4) % 72
 		if (u16[0xffffeee8] != 0)
 			u32[0xfffffc7c] = u32[A0 + D0.s16]
 	}
 
-	--u16[0xfffff65a]
-	if (s16[0xfffff65a] < 0)
+	--level.palettefx.timer_3
+	if (s16(level.palettefx.timer_3) < 0)
 	{
-		u16[0xfffff65a] = 7
+		level.palettefx.timer_3 = 7
 		A0 = 0x00305e
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] = (u16[0xfffff654] + 4) % 24
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 = (level.palettefx.frame_3 + 4) % 24
 		if (u16[0xffffeee8] != 0)
 			u32[0xfffffc78] = u32[A0 + D0.s16]
 
 		A0 = 0x003076
-		D0.u16 = u16[0xfffff656]
-		u16[0xfffff656] = (u16[0xfffff656] + 4) % 64
+		D0.u16 = level.palettefx.frame_4
+		level.palettefx.frame_4 = (level.palettefx.frame_4 + 4) % 64
 		u32[0xfffffc58] = u32[A0 + D0.s16]
 	}
 }
@@ -322,12 +321,12 @@ function void LevelPaletteUpdate.LBZ2()
 //# address-hook(0x002516) end(0x002544)
 function void LevelPaletteUpdate.LBZ_shared()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 3
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] = (u16[0xfffff632] + 6) % 18
+		level.palettefx.timer_1 = 3
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 = (level.palettefx.frame_1 + 6) % 18
 		copyMemory(0xfffffc50, A0 + D0.s16, 6)
 
 	#if STANDALONE
@@ -366,16 +365,16 @@ function void LevelPaletteUpdate.FBZ()
 //# address-hook(0x002546) end(0x00257a)
 function void LevelPaletteUpdate.SOZ1()
 {
-	--u16[0xfffff65a]
-	if (s16[0xfffff65a] < 0)
+	--level.palettefx.timer_3
+	if (s16(level.palettefx.timer_3) < 0)
 	{
-		u16[0xfffff65a] = 5
+		level.palettefx.timer_3 = 5
 
 		A0 = 0x0030da
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] += 8
-		if (u16[0xfffff654] >= 0x20)
-			u16[0xfffff654] = 0
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 += 8
+		if (level.palettefx.frame_3 >= 0x20)
+			level.palettefx.frame_3 = 0
 
 		copyMemory(0xfffffc58, A0 + D0.s16, 8)
 	}
@@ -385,69 +384,69 @@ function void LevelPaletteUpdate.SOZ1()
 //# address-hook(0x002598) end(0x00266a)
 function void LevelPaletteUpdate.SOZ2()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
 		// Change light state every 15 seconds
-		u16[0xfffff634] = 899
+		level.palettefx.timer_1 = 899
 		if (u8[0xfffff7c3] < 5)
 		{
 			// Go to next light state... it's getting darker
 			++u8[0xfffff7c3]
 			if ((u8[0xfffff7c3] & 0x01) == 0)
 			{
-				u8[0xfffff650] = 2
-				u16[0xfffff658] = 0
+				level.palettefx.state = 2
+				level.palettefx.timer_2 = 0
 			}
 		}
 	}
 
 	bool goto00264e = false
-	if (u8[0xfffff650] != 0)
+	if (level.palettefx.state != 0)
 	{
-		--u16[0xfffff658]
-		if (s16[0xfffff658] < 0)
+		--level.palettefx.timer_2
+		if (s16(level.palettefx.timer_2) < 0)
 		{
-			u16[0xfffff658] = 3
-			if (s8[0xfffff650] >= 0)
+			level.palettefx.timer_2 = 3
+			if (s8(level.palettefx.state) >= 0)
 			{
-				--u8[0xfffff650]
-				u16[0xfffff652] += 0x34
-				++u16[0xfffff656]
+				--level.palettefx.state
+				level.palettefx.frame_2 += 0x34
+				++level.palettefx.frame_4
 			}
 			else
 			{
-				++u8[0xfffff650]
-				u16[0xfffff652] -= 0x34
-				--u16[0xfffff656]
+				++level.palettefx.state
+				level.palettefx.frame_2 -= 0x34
+				--level.palettefx.frame_4
 			}
 
-			A0 = 0x00317a + s16[0xfffff652]
+			A0 = 0x00317a + s16(level.palettefx.frame_2)
 			copyMemory(0xfffffc42, A0, 0x16)
 			A0 += 0x16
 			copyMemory(0xfffffc62, A0, 0x1e)
 
-			D0.u16 = u16[0xfffff654]
+			D0.u16 = level.palettefx.frame_3
 			goto00264e = true
 		}
 	}
 
-	--u16[0xfffff65a]
-	if (s16[0xfffff65a] < 0)
+	--level.palettefx.timer_3
+	if (s16(level.palettefx.timer_3) < 0)
 	{
-		u16[0xfffff65a] = 5
+		level.palettefx.timer_3 = 5
 
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] += 8
-		if (u16[0xfffff654] >= 0x20)
-			u16[0xfffff654] = 0
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 += 8
+		if (level.palettefx.frame_3 >= 0x20)
+			level.palettefx.frame_3 = 0
 
 		goto00264e = true
 	}
 
 	if (goto00264e)
 	{
-		D1.u16 = u16[0xfffff656] * 32
+		D1.u16 = level.palettefx.frame_4 * 32
 		A0 = 0x0030da + D1.s16
 		copyMemory(0xfffffc58, A0 + D0.s16, 8)
 	}
@@ -457,36 +456,36 @@ function void LevelPaletteUpdate.SOZ2()
 //# address-hook(0x00266c) end(0x0026f0)
 function void LevelPaletteUpdate.LRZ1()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 0x0f
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 8
-		if (u16[0xfffff632] >= 0x80)
-			u16[0xfffff632] = 0
+		level.palettefx.timer_1 = 0x0f
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 8
+		if (level.palettefx.frame_1 >= 0x80)
+			level.palettefx.frame_1 = 0
 
 		A0 = 0x00327e
 		copyMemory(0xfffffc42, A0 + D0.s16, 8)
 
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] += 4
-		if (u16[0xfffff652] >= 0x1c)
-			u16[0xfffff652] = 0
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 += 4
+		if (level.palettefx.frame_2 >= 0x1c)
+			level.palettefx.frame_2 = 0
 
 		A0 = 0x0032fe
 		u32[0xfffffc62] = u32[A0 + D0.s16]
 	}
 
-	--u16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 7
+		level.palettefx.timer_2 = 7
 
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] += 2
-		if (u16[0xfffff654] >= 0x22)
-			u16[0xfffff654] = 0
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 += 2
+		if (level.palettefx.frame_3 >= 0x22)
+			level.palettefx.frame_3 = 0
 
 		A0 = 0x003322
 		u16[0xfffffc56] = u16[A0 + D0.s16]
@@ -497,37 +496,37 @@ function void LevelPaletteUpdate.LRZ1()
 //# address-hook(0x0026f2) end(0x00277c)
 function void LevelPaletteUpdate.LRZ2()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 0x0f
+		level.palettefx.timer_1 = 0x0f
 
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 8
-		if (u16[0xfffff632] >= 128)
-			u16[0xfffff632] = 0
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 8
+		if (level.palettefx.frame_1 >= 128)
+			level.palettefx.frame_1 = 0
 
 		A0 = 0x00327e
 		copyMemory(0xfffffc42, A0 + D0.s16, 8)
 
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] += 4
-		if (u16[0xfffff652] >= 28)
-			u16[0xfffff652] = 0
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 += 4
+		if (level.palettefx.frame_2 >= 28)
+			level.palettefx.frame_2 = 0
 
 		A0 = 0x0032fe
 		u32[0xfffffc62] = u32[A0 + D0.s16]
 	}
 
-	--u16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 0x0f
+		level.palettefx.timer_2 = 0x0f
 
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] += 8
-		if (u16[0xfffff654] >= 256)
-			u16[0xfffff654] = 0
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 += 8
+		if (level.palettefx.frame_3 >= 256)
+			level.palettefx.frame_3 = 0
 
 	#if STANDALONE
 		// Fixed palette cycle, #contributed by Alieneer
@@ -544,33 +543,33 @@ function void LevelPaletteUpdate.LRZ2()
 //# address-hook(0x002a50) end(0x002abe)
 function void LevelPaletteUpdate.LRZ_Boss()
 {
-	if (s8[0xfffff650] >= 0)
+	if (s8(level.palettefx.state) >= 0)
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 0x0f
+			level.palettefx.timer_1 = 0x0f
 
-			D0.u16 = u16[0xfffff632]
-			u16[0xfffff632] += 8
-			if (u16[0xfffff632] >= 0x80)
-				u16[0xfffff632] = 0
+			D0.u16 = level.palettefx.frame_1
+			level.palettefx.frame_1 += 8
+			if (level.palettefx.frame_1 >= 0x80)
+				level.palettefx.frame_1 = 0
 
 			A0 = 0x00327e
 			copyMemory(0xfffffc42, A0 + D0.s16, 8)
 		}
 
-		if (u8[0xfffff650] != 0)
+		if (level.palettefx.state != 0)
 		{
-			--u16[0xfffff658]
-			if (s16[0xfffff658] < 0)
+			--level.palettefx.timer_2
+			if (s16(level.palettefx.timer_2) < 0)
 			{
-				u16[0xfffff658] = 7
+				level.palettefx.timer_2 = 7
 
-				D0.u16 = u16[0xfffff654]
-				u16[0xfffff654] += 4
-				if (u16[0xfffff654] >= 0x3c)
-					u16[0xfffff654] = 0
+				D0.u16 = level.palettefx.frame_3
+				level.palettefx.frame_3 += 4
+				if (level.palettefx.frame_3 >= 0x3c)
+					level.palettefx.frame_3 = 0
 
 				A0 = 0x0036ec
 				u32[0xfffffc78] = u32[A0 + D0.s16]
@@ -583,17 +582,17 @@ function void LevelPaletteUpdate.LRZ_Boss()
 //# address-hook(0x002ac0) end(0x002af4)
 function void LevelPaletteUpdate.HPZ()
 {
-	if (u8[0xfffff650] == 0)
+	if (level.palettefx.state == 0)
 	{
-		--u16[0xfffff634]
-		if (s16[0xfffff634] < 0)
+		--level.palettefx.timer_1
+		if (s16(level.palettefx.timer_1) < 0)
 		{
-			u16[0xfffff634] = 7
+			level.palettefx.timer_1 = 7
 
-			D0.u16 = u16[0xfffff632]
-			u16[0xfffff632] += 4
-			if (u16[0xfffff632] >= 40)
-				u16[0xfffff632] = 0
+			D0.u16 = level.palettefx.frame_1
+			level.palettefx.frame_1 += 4
+			if (level.palettefx.frame_1 >= 40)
+				level.palettefx.frame_1 = 0
 
 			A0 = 0x003728
 			u32[0xfffffc62] = u32[A0 + D0.s16]
@@ -605,15 +604,15 @@ function void LevelPaletteUpdate.HPZ()
 //# address-hook(0x00277e) end(0x0027ac)
 function void LevelPaletteUpdate.DEZ1()
 {
-	--u16[0xfffff65a]
-	if (s16[0xfffff65a] < 0)
+	--level.palettefx.timer_3
+	if (s16(level.palettefx.timer_3) < 0)
 	{
-		u16[0xfffff65a] = 0x0f
+		level.palettefx.timer_3 = 0x0f
 
-		D0.u16 = u16[0xfffff654]
-		u16[0xfffff654] += 8
-		if (u16[0xfffff654] >= 0x30)
-			u16[0xfffff654] = 0
+		D0.u16 = level.palettefx.frame_3
+		level.palettefx.frame_3 += 8
+		if (level.palettefx.frame_3 >= 0x30)
+			level.palettefx.frame_3 = 0
 
 		A0 = 0x00349c
 		copyMemory(0xfffffc78, A0 + D0.s16, 8)
@@ -626,29 +625,29 @@ function void LevelPaletteUpdate.DEZ1()
 //# address-hook(0x0027b2) end(0x002818)
 function void LevelPaletteUpdate.DEZ2()
 {
-	--u16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 4
+		level.palettefx.timer_1 = 4
 
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 4
-		if (u16[0xfffff632] >= 48)
-			u16[0xfffff632] = 0
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 4
+		if (level.palettefx.frame_1 >= 48)
+			level.palettefx.frame_1 = 0
 
 		A0 = 0x003444
 		u32[0xfffffc5a] = u32[A0 + D0.s16]
 	}
 
-	--u16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 0x13
+		level.palettefx.timer_2 = 0x13
 
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] += 10
-		if (u16[0xfffff652] >= 40)
-			u16[0xfffff652] = 0
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 += 10
+		if (level.palettefx.frame_2 >= 40)
+			level.palettefx.frame_2 = 0
 
 		A0 = 0x003474 + D0.s16
 		A1 = 0xfffffc50
@@ -663,30 +662,30 @@ function void LevelPaletteUpdate.DEZ2()
 //# address-hook(0x00281a) end(0x002882)
 function void LevelPaletteUpdate.BPZ()
 {
-	--s16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 0x07
+		level.palettefx.timer_1 = 0x07
 		A0 = 0x0034cc
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 0x06
-		if (u16[0xfffff632] >= 0x12)
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 0x06
+		if (level.palettefx.frame_1 >= 0x12)
 		{
-			u16[0xfffff632] = 0
+			level.palettefx.frame_1 = 0
 		}
 		copyMemory(0xfffffc5a, A0 + D0.u16, 6)
 	}
 
-	--s16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 0x11
+		level.palettefx.timer_2 = 0x11
 		A0 = 0x0034de
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] += 0x06
-		if (u16[0xfffff652] >= 0x7e)
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 += 0x06
+		if (level.palettefx.frame_2 >= 0x7e)
 		{
-			u16[0xfffff652] = 0
+			level.palettefx.frame_2 = 0
 		}
 		copyMemory(0xfffffc64, A0 + D0.s16, 6)
 	}
@@ -696,16 +695,16 @@ function void LevelPaletteUpdate.BPZ()
 //# address-hook(0x002884) end(0x0028b8)
 function void LevelPaletteUpdate.CGZ()
 {
-	--s16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 0x09
+		level.palettefx.timer_1 = 0x09
 		A0 = 0x00355c
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 0x08
-		if (u16[0xfffff632] >= 0x50)
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 0x08
+		if (level.palettefx.frame_1 >= 0x50)
 		{
-			u16[0xfffff632] = 0
+			level.palettefx.frame_1 = 0
 		}
 		copyMemory(0xfffffc44, A0 + D0.u16, 8)
 	}
@@ -715,30 +714,30 @@ function void LevelPaletteUpdate.CGZ()
 //# address-hook(0x0028ba) end(0x002916)
 function void LevelPaletteUpdate.EMZ()
 {
-	--s16[0xfffff634]
-	if (s16[0xfffff634] < 0)
+	--level.palettefx.timer_1
+	if (s16(level.palettefx.timer_1) < 0)
 	{
-		u16[0xfffff634] = 0x07
+		level.palettefx.timer_1 = 0x07
 		A0 = 0x0035ac
-		D0.u16 = u16[0xfffff632]
-		u16[0xfffff632] += 0x02
-		if (u16[0xfffff632] >= 0x3c)
+		D0.u16 = level.palettefx.frame_1
+		level.palettefx.frame_1 += 0x02
+		if (level.palettefx.frame_1 >= 0x3c)
 		{
-			u16[0xfffff632] = 0
+			level.palettefx.frame_1 = 0
 		}
 		u16[0xfffffc5c] = u16[A0 + D0.u16 + 0x04]
 	}
 
-	--s16[0xfffff658]
-	if (s16[0xfffff658] < 0)
+	--level.palettefx.timer_2
+	if (s16(level.palettefx.timer_2) < 0)
 	{
-		u16[0xfffff658] = 0x1f
+		level.palettefx.timer_2 = 0x1f
 		A0 = 0x0035e8
-		D0.u16 = u16[0xfffff652]
-		u16[0xfffff652] += 0x04
-		if (u16[0xfffff652] >= 0x34)
+		D0.u16 = level.palettefx.frame_2
+		level.palettefx.frame_2 += 0x04
+		if (level.palettefx.frame_2 >= 0x34)
 		{
-			u16[0xfffff652] = 0
+			level.palettefx.frame_2 = 0
 		}
 		u32[0xfffffc72] = u32[A0 + D0.u16]
 	}

@@ -47,7 +47,7 @@ function void fn068508()
 	screenmover_target.right = move_area.right
 	level.boss_encounter = 1
 
-	requestLoadingPatterns(0x5a)
+	requestLoadingPatterns(0x5a)		// Boss sprites
 }
 
 
@@ -78,7 +78,7 @@ function void fn06852c()
 		// Trigger fire wall immediately
 		u16[0xffffeec6] = 0xff
 
-		addPatternLoadingCue(0x083d48)
+		addPatternLoadingCue(0x083d48)		// Monitor, small explosion, and critter sprites
 
 		UnloadObject()
 		return

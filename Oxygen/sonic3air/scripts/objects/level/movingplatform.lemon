@@ -17,21 +17,25 @@ function void MovingPlatform.Init()
 {
 	if (global.zone_act == 0x0000)
 	{
+		// Angel Island Act 1
 		objA0.mapping_offset = 0x0256a2
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03f7)
 	}
 	else if (global.zone_act == 0x0001)
 	{
+		// Angel Island Act 2
 		objA0.mapping_offset = 0x0256a2
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0440)
 	}
 	else if (global.zone == 0x01)
 	{
+		// Hydrocity Zone
 		objA0.mapping_offset = 0x025688
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x041d)
 	}
 	else if (global.zone == 0x02)
 	{
+		// Marble Garden Zone
 		objA0.mapping_offset = 0x025654
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x0001)
 	}

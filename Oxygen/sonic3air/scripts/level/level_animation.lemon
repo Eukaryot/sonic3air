@@ -874,7 +874,7 @@ function void LevelTilesAnim.SOZ2()
 		else
 			++u8[A3 + 0x01]
 
-		D1.u16 = u16[0xfffff656] & 0x06
+		D1.u16 = level.palettefx.frame_4 & 0x06
 		D2.u16 = D1.u16 >> 1
 		D1.u16 += D2.u16
 		if (D1.u16 != 0x06)

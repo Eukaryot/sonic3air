@@ -82,20 +82,21 @@ function void LevelSelect.init()
 	zeroMemory(0xffff0000, 0x460 * 2)
 
 	A3 = 0xffff0000
-	A1 = 0x0080e6
-	A5 = 0x0080c4
+	A1 = 0x0080e6		// Table of level select selection strings
+	A5 = 0x0080c4		// Table of option positions
 	D0 = 0
-	D1.u16 = 0x10
+	D1.u16 = 0x10		// Number of entries
 
 	while (D1.s16 >= 0)
 	{
 		D3.u16 = u16[(A5+=2)-2]
 		A2 = A3 + D3.s16
-		D2 = u8[(A1+=1)-1]
+		D2 = u8[(A1+=1)-1]		// Get string length
 		D3.u16 = D2.u16
 
 		while (D2.s16 >= 0)
 		{
+			// Reading and writing each character in string
 			u16[(A2+=2)-2] = u8[(A1+=1)-1]
 			--D2.s16
 		}
@@ -103,24 +104,28 @@ function void LevelSelect.init()
 		D2.u16 = 0x0d - D3.u16
 		while (D2.s16 >= 0)
 		{
+			// Add empty space after string
 			u16[(A2+=2)-2] = 0
 			--D2.s16
 		}
 
-		u16[A2] = 0x11
-		A2 += 0x50
-		u16[A2] = 0x12
+		u16[A2] = 0x11		// Level select act number "1"
+		A2 += 0x50			// Next line
+		u16[A2] = 0x12		// Level select act number "2"
 		--D1.s16
 	}
 
-	u16[A2] = 0
-	A2 -= 0x50
-	u16[A2] = 0x1a
-	u16[0xffff018a] = 0x13
-	u16[0xffff01da] = 0x14
+	u16[A2] = 0		// New line, reached end of list
+	A2 -= 0x50		// Going back a line to Sound Test option
+	u16[A2] = 0x1a		// Write second asterisk '*' for Sound Test option
+
+	// Act number for second entry for Lava Reef
+	u16[0xffff018a] = 0x13		// Level select act number "3"
+	u16[0xffff01da] = 0x14		// Level select act number "4"
 
 	copyRectToVRAM(0xffff0000, 0xc000, 0x28, 0x1c)
 
+	// Character select digits
 	D3 = 0
 	fn007f62()
 
@@ -132,7 +137,7 @@ function void LevelSelect.init()
 	A2 = 0x0081b0
 	LevelTilesAnim.Default()
 
-	Level.loadNonfadingPaletteData(0x04)
+	Level.loadNonfadingPaletteData(0x04)		// Level Select
 
 	copyMemory(0xfffffcc0, 0xfffffc40, 0x20)
 	zeroMemory(0xfffffc40, 0x20)
@@ -205,11 +210,18 @@ function bool LevelSelect.innerUpdate()
 #if !STANDALONE
 	set_status_register(0x2700)
 #endif
+
+	// White unhighlighted text
 	D3 = 0
 	fn007f62()
+
+	// Menu controls
 	fn007e64()
-	D3.u16 = 0x6000
+
+	// Yellow highlighted text
+	D3.u16 = sprite_attribute.PALETTE.LINE3
 	fn007f62()
+
 #if !STANDALONE
 	set_status_register(0x2300)
 #endif
@@ -235,6 +247,7 @@ function bool LevelSelect.innerUpdate()
 		D0.u16 = u16[0x007d22 + levelselect.selection * 2]
 		if (D0.u16 & 0x8000)
 		{
+			// Sound test
 			global.game_mode = 0
 			return true
 		}
@@ -285,7 +298,7 @@ function bool LevelSelect.innerUpdate()
 				{
 					if (global.zone_act != 0x0400 && global.zone_act < 0x0700)
 					{
-						global.zone_act = 0x0700
+						global.zone_act = 0x0700		// Mushroom Hill Act 1
 						global.zone_act.apparent = 0x0700
 						checkpoint.zone_act = 0x0700
 						checkpoint.zone_act.apparent = 0x0700
@@ -304,7 +317,6 @@ function bool LevelSelect.innerUpdate()
 			}
 		}
 	}
-
 #if STANDALONE
 	else if (control.pad1.pressed & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
 	{
@@ -318,12 +330,13 @@ function bool LevelSelect.innerUpdate()
 		FadeOutScreenBlocking()
 		A0 = backupA0
 
-		// Do not fade out music in this case, Data Select music is meant to kept playing
+		// Do not fade out music in this case, Data Select music is meant to keep playing
 		Game.returnToMainMenu()
 		yieldExecution()
 		return false
 	}
 #endif
+
 	return true
 }
 
@@ -354,7 +367,7 @@ function void LevelSelect.startGame()
 	global.rolling_demo = 0
 	player.next_life_score = 5000
 	unused.player2.next_life_score = 5000
-	u16[0xffffff8a] = 0
+	u16[0xffffff8a] = 0		// Items on (competition_mode.item_flag = 0), set game mode to Grand Prix (competition_mode.game_mode = 0)
 	competition_mode.active = 0
 }
 
@@ -369,32 +382,39 @@ function bool fn007d6c()
 		bool fail = false
 		if (isMainCharacter(CHARACTER_KNUCKLES))
 		{
+			// Knuckles can't go to Sonic's SSZ, DDZ, DEZ, or LRZ boss
 			fail = (D0.u16 == 0x0a00 || D0.u16 == 0x0c00 || D0.u16 == 0x1600 || D0.u16 == 0x1700)
 		}
 		else
 		{
 			if (D0.u16 == 0x0a01)
 			{
+				// Sonic and Tails can't go to Knuckles' SSZ
 				fail = true
 			}
 			else if (D0.u16 == 0x0c00)
 			{
+				// Tails can't go to DDZ
 				fail = isMainCharacter(CHARACTER_TAILS)
 			}
 		}
 
 		if (fail)
 		{
+			// Play error sound and prevent proceeding to zone
 			playSound(0xb2)
 			return false
 		}
 	}
 
+	// Tried to start a Sonic 3 stage in S&K ?
 	if (global.lock_on_state != 0)
 	{
+		// Can't go to Sonic 3 zones in Sonic & Knuckles without lock-on
 		D1.u16 = D0.u16 & 0xff00
 		if (D1.u16 != 0x0400 && D1.u16 < 0x0700)
 		{
+			// Redirect to Mushroom Hill Act 1
 			D0.u16 = 0x0700
 		}
 	}
@@ -424,7 +444,7 @@ function bool fn007d6c()
 
 	playSound(MUSIC_CTRL_FADEOUT)
 
-	u16[0xffffff8a] = 0
+	u16[0xffffff8a] = 0		// Items on (competition_mode.item_flag = 0), set game mode to Grand Prix (competition_mode.game_mode = 0)
 	competition_mode.active = (global.zone >= 0x0e && global.zone < 0x13)
 	return true
 }
@@ -468,12 +488,14 @@ function void fn007f62()
 
 	if (levelselect.selection != 0x20)
 	{
+		// Write character select counter digits
 		VDP.setupVRAMWrite(0xc19c)
 		LevelSelect.writeHexDigit(levelselect.characters >> 4,   D3.u16)
 		LevelSelect.writeHexDigit(levelselect.characters & 0x0f, D3.u16)
 	}
 	else
 	{
+		// Write Sound test counter digits
 		VDP.setupVRAMWrite(0xcb46)
 		LevelSelect.writeHexDigit(levelselect.soundtest >> 4,   D3.u16)
 		LevelSelect.writeHexDigit(levelselect.soundtest & 0x0f, D3.u16)

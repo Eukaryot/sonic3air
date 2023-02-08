@@ -45,9 +45,9 @@ function void fn075f50()
 	objA0.base_state = 0
 	u8[0xfffffaa9] = 0
 
-	Kosinski.addToDMAQueue(0x16a104, 0x7d80)
+	Kosinski.addToDMAQueue(0x16a104, 0x7d80)		// Boss sprites
 
-	requestLoadingPatterns(0x7b)
+	requestLoadingPatterns(0x7b)		// Robotnik's ship and boss explosion sprites
 	loadPaletteLine1(0x0769d4)
 
 	// "spawnChildObjects(0x07699c)" replaced by:
@@ -248,7 +248,7 @@ function void fn0761b2()
 	objA0.velocity.y = -0x200
 	objA0.flags38 |= 0x10
 
-	addPatternLoadingCue(0x076a04)
+	addPatternLoadingCue(0x076a04)		// Capsule and small explosion sprites
 
 	// "spawnSimpleChildObjects(0x0769b0)" replaced by:
 	spawnSimpleChildObjects(0x0766ca, 6)
@@ -337,7 +337,7 @@ function void fn076270()
 	// "spawnChildObjects(0x07699c)" replaced by:
 	spawnChildObject(0x067cd2, 0x00, 0, -28)
 
-	addPatternLoadingCue(0x083d7c)
+	addPatternLoadingCue(0x083d7c)		// Robotnik's ship
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
 	spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
@@ -683,7 +683,7 @@ function void fn076896()
 	if (camera.position.x.u16 < 0x4010)
 		return
 
-	Kosinski.addToDMAQueue(0x16942e, 0x75e0)
+	Kosinski.addToDMAQueue(0x16942e, 0x75e0)		// Spiked limbo pole segment sprites
 	UnloadObject()
 }
 

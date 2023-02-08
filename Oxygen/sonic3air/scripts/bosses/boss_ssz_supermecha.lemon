@@ -34,7 +34,7 @@ function void fn07b996()
 	// "spawnChildObjects(0x07d492)" replaced by:
 	spawnChildObject(0x07c886, 0x00, -4, 12)
 
-	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)
+	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)	// Master Emerald sprite
 }
 
 
@@ -103,6 +103,7 @@ function void fn07ba28()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn the Master Emerald
 		objA1.update_address = 0x07c818
 		u16[A0 + 0x44] = A1.u16
 	}
@@ -1487,6 +1488,8 @@ function void fn07c80a()
 
 
 
+// The Master Emerald in its pedestal
+
 //# address-hook(0x07c818) end(0x07c854)
 function void fn07c818()
 {
@@ -1496,9 +1499,9 @@ function void fn07c818()
 	objA0.position.y.u16 = camera.position.y.u16 + 0xa8
 
 	objA0.update_address = 0x07c864
-	A1 = 0xffffffb2
-	D0 = 3
-	D1 = 6
+	A1 = 0xffffffb2		// Start of emerald collection states
+	D0 = 0x03			// Super Emerald collected state
+	D1 = 6				// Number of emeralds
 	while (true)
 	{
 		if (D0.u8 != u8[(A1+=1)-1])

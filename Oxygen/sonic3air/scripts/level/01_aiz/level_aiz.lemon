@@ -398,7 +398,7 @@ function void fn04fc46()
 		Kosinski.addToDMAQueue(0x3b15d2, 0x0000)
 		Kosinski.addToDMAQueue(0x3b3784, 0x3f80)
 
-		addPatternLoadingCue(0x08399a)
+		addPatternLoadingCue(0x08399a)		// Spike and Springs
 
 		D7 = pop()
 		A0 = pop()
@@ -486,7 +486,7 @@ function void fn04fd62()
 		fn01c362()
 		fn0076a6()
 		Level.InitializeWater()
-		Level.loadPaletteData(0x0b)
+		Level.loadPaletteData(0x0b)		// AIZ 2 level palette
 
 		D7 = pop()
 		A0 = pop()
@@ -929,7 +929,7 @@ function void fn05011e()
 		push(A0)
 		push(D7)
 
-		requestLoadingPatterns(0x0c)
+		requestLoadingPatterns(0x0c)		// AIZ2 object sprites
 		fn02f77c()
 
 		D7 = pop()
@@ -1108,10 +1108,10 @@ function void fn01c46e()
 		{
 			if (checkpoint.number == 0 && isMainCharacter(CHARACTER_SONIC))
 			{
-				requestLoadingPatterns(0x0b)
+				requestLoadingPatterns(0x0b)		// AIZ1 object sprites
 			}
 
-			Level.loadPaletteData(0x2a)
+			Level.loadPaletteData(0x2a)		// AIZ 1 level palette
 
 			if (isMainCharacter(CHARACTER_KNUCKLES))
 			{
@@ -1168,7 +1168,7 @@ function void fn01c4d0()
 		Checkpoint.SaveCurrentState()
 
 		checkpoint.time = 0
-		requestLoadingPatterns(0x08)
+		requestLoadingPatterns(0x08)		// Monitor sprites
 		camera.update_routine += 2
 	}
 }
@@ -1199,7 +1199,7 @@ function void fn01c550()
 	{
 		u16[0xfffffc5e] = isMainCharacter(CHARACTER_KNUCKLES) ? u16[0x04faea] : 0x0c02
 		move_area.left = 0x2d80
-		requestLoadingPatterns(0x5a)
+		requestLoadingPatterns(0x5a)		// Boss sprites
 		camera.update_routine += 2
 	}
 
@@ -1233,7 +1233,7 @@ function void fn01c5c6()
 	if (camera.position.x.u16 >= 0x2e00 && kosinski.waiting_modules == 0)
 	{
 		Kosinski.addToDMAQueue(0x3af5d0, 0xa000)
-		requestLoadingPatterns(0x0c)
+		requestLoadingPatterns(0x0c)		// AIZ2 object sprites
 		camera.update_routine += 2
 	}
 }
@@ -1296,7 +1296,7 @@ function void fn01c664()
 		move_area.bottom.target = 0x0590
 		camera.update_routine += 2
 
-		if (global.zone_act.apparent == 1)
+		if (global.zone_act.apparent == 0x0001)
 		{
 		#if STANDALONE
 			move_area.left = 0x1040
@@ -1440,7 +1440,7 @@ function void fn01c6f6()
 			Kosinski.addToDMAQueue(0x3b48c6, 0x3f80)
 			Kosinski.addToDMAQueue(0x399cc4, 0xa000)
 
-			Level.loadPaletteData(0x30)
+			Level.loadPaletteData(0x30)		// AIZ 2 bombing scene palette
 
 			u8[0xffffeec6] = 0xff
 			camera.update_routine += 2
@@ -1506,7 +1506,7 @@ function void fn01c78c()
 		move_area.bottom.target = 0x0590
 		camera.update_routine += 2
 
-		if (global.zone_act.apparent == 1)
+		if (global.zone_act.apparent == 0x0001)
 		{
 			move_area.left = 0x1040
 			camera.update_routine += 2
@@ -1567,7 +1567,7 @@ function void fn01c81e()
 		Kosinski.addToDecompressionQueue(0x3b1372, 0xffff9ab8)
 		Kosinski.addToDMAQueue(0x3b48c6, 0x3f80)
 
-		Level.loadPaletteData(0x30)
+		Level.loadPaletteData(0x30)		// AIZ 2 bombing scene palette
 
 		move_area.left = 0x3b80
 		move_area.bottom.target = 0x05da

@@ -27,8 +27,8 @@ function void fn07f06c()
 	StartBossFight()
 	u8[0xfffffab8] = 0
 
-	requestLoadingPatterns(0x76)
-	Kosinski.addToDMAQueue(0x181002, 0x7140)
+	requestLoadingPatterns(0x76)		// Robotnik running and standing sprites
+	Kosinski.addToDMAQueue(0x181002, 0x7140)		// Boss sprites
 	loadPaletteLine1(0x07fd08)
 
 	// "spawnChildObjects(0x07fc8c)" replaced by:
@@ -293,7 +293,7 @@ function void fn07f2fe()
 	level.backup.timer.alldata = timer.alldata
 	global.shields_backup_2 = u8[0xffffb000 + 0x2b]
 
-	TriggerNextZone(0x1700)
+	TriggerNextZone(0x1700)		// Death Egg boss act
 	UnloadObject()
 }
 

@@ -162,7 +162,7 @@ function void fn04a4f6()
 	objA1.sprite_priority = 0x0100
 	u8[A1 + 0x1e] = 0x0e
 	u8[A1 + 0x1f] = 0x07
-	u8[A1 + 0x20] = char.state.ROLLING
+	objA1.state = char.state.ROLLING
 	u8[A1 + 0x27] = 0
 	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -208,7 +208,7 @@ function void fn04a53a()
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
 			u16[A1 + 0x1c] = 0x0800
-			u8[A1 + 0x20] = char.state.ROLLING
+			objA1.state = char.state.ROLLING
 			u8[A1 + 0x2e] = 0x01
 			fn04a5e0()
 		}

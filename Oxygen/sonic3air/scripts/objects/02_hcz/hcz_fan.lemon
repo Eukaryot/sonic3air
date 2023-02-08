@@ -215,8 +215,8 @@ function void fn03077e()
 				{
 					objA1.state = char.state.RUNNING
 					u8[A1 + 0x27] = 1
-					u8[A1 + 0x30] = 0x7f
-					u8[A1 + 0x31] = 0x08
+					u8[A1 + 0x30] = 0x7f		// "char.rotation.x.count"
+					u8[A1 + 0x31] = 0x08		// "char.rotation.x.speed"
 				}
 
 			#if STANDALONE
@@ -338,7 +338,7 @@ function void fn0308fa()
 		}
 	}
 
-	u8[0xfffff7c7] = 3
+	level.HCZ_breakable_bar_flags = 3
 	CheckForUnloadObject()
 }
 
@@ -373,7 +373,7 @@ function void fn03097e()
 		--u16[A0 + 0x30]
 		if (u16[A0 + 0x30] == 0)
 		{
-			u8[0xfffff7c7] = 0
+			level.HCZ_breakable_bar_flags = 0
 		}
 	}
 
@@ -467,8 +467,8 @@ function void fn030a38()
 		{
 			u8[A1 + 0x27] = 0x01
 			u8[A1 + 0x20] = 0
-			u8[A1 + 0x30] = 0x7f
-			u8[A1 + 0x31] = 0x08
+			u8[A1 + 0x30] = 0x7f		// "char.rotation.x.count"
+			u8[A1 + 0x31] = 0x08		// "char.rotation.x.speed"
 		}
 	}
 }

@@ -68,9 +68,9 @@ function void fn08cb9e()
 	move_area.left = 0x3820
 	move_area.right = 0x3ae8 + getScreenExtend()
 
-	requestLoadingPatterns(0x60)
+	requestLoadingPatterns(0x60)		// LBZ1 boss and pre-boss cutscene sprites
 
-	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)		// Miniboss containment box
 
 	// "spawnChildObjects(0x06817c)" replaced by:
 	spawnChildObject(0x067c38, 0x00, 0, -28)
@@ -160,7 +160,7 @@ function void fn08cc84()
 		return
 
 	objA0.base_state = 0x0a
-	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)		// Miniboss containment box
 	screenmover_target.right = 0x3ea0
 
 	// "spawnSimpleChildObjects(0x084b00)" replaced by:
@@ -215,7 +215,7 @@ function void fn08cce8()
 	objA0.velocity.x = 0x0200
 	objA0.velocity.y = 0x0200
 
-	Kosinski.addToDMAQueue(0x375358, 0x9ac0)
+	Kosinski.addToDMAQueue(0x375358, 0x9ac0)		// Boss sprites
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
 	spawnChildObject(0x068062, 0x00, 30, 0)
@@ -295,11 +295,11 @@ function void fn08cdb8()
 //# address-hook(0x08d0ea) end(0x08d110)
 function void fn08d0ea()
 {
-	Kosinski.addToDMAQueue(0x375358, 0x9ac0)
+	Kosinski.addToDMAQueue(0x375358, 0x9ac0)		// Boss sprites
 
-	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)
+	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)		// Miniboss containment box
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 
@@ -601,7 +601,7 @@ function void fn0626d6()
 	// Knuckles starts throwing the bomb
 
 	objA0.base_state = 0x06
-	u32[A0 + 0x30] = 0x0666c3
+	u32[A0 + 0x30] = 0x0666c3		// Cutscene Knuckles bomb throw animation data
 	objA0.countdown_callback = 0x0626f4
 }
 
@@ -618,7 +618,7 @@ function void fn0626f4()
 	spawnChildObject(0x06282a, 0x00, -8, -16)
 
 
-	addPatternLoadingCue(0x083d64)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
 }
 
 
@@ -672,7 +672,7 @@ function void fn06273e()
 function void fn062760()
 {
 	objA0.base_state = 0x0e
-	u32[A0 + 0x30] = 0x06669f
+	u32[A0 + 0x30] = 0x06669f		// Cutscene Knuckles walking animation data
 	objA0.animation.timer = 0
 	objA0.animation.frame = 0
 }
@@ -831,10 +831,10 @@ function void fn08cf1e()
 				return
 			}
 
-			addPatternLoadingCue(0x083d3a)
+			addPatternLoadingCue(0x083d3a)		// Some common object sprites
 		}
 
-		addPatternLoadingCue(0x08cf62)
+		addPatternLoadingCue(0x08cf62)		// LBZ2 object sprites
 		UnloadObject()
 	}
 }

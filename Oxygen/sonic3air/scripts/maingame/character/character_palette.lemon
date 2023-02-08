@@ -28,13 +28,13 @@ function string getCharacterEndPosePaletteKey(u8 character)
 
 function u8 getUnderwaterPaletteVariantByCurrentZone()
 {
-	if (global.zone == 0)		// AIZ
+	if (global.zone == 0x00)		// AIZ
 		return 1
-	else if (global.zone == 5)	// ICZ
+	else if (global.zone == 0x05)	// ICZ
 		return 2
-	else if (global.zone == 1)	// HCZ
+	else if (global.zone == 0x01)	// HCZ
 		return 3
-	else if (global.zone == 3 || global.zone == 6)	// CNZ/LBZ
+	else if (global.zone == 0x03 || global.zone == 0x06)	// CNZ/LBZ
 		return 4
 	else
 		return 2	// Use HCZ palette variant as fallback

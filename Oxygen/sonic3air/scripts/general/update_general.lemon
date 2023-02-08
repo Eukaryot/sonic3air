@@ -618,6 +618,7 @@ function void UpdateRollingDemo()
 	A0 = rolling_demo.progress
 	if (global.zone != 0x04 && global.zone < 0x07)
 	{
+		// Demos that take place in Sonic 3 (disc 1) zones
 		D1.u8 = rolling_demo.pressed_start & CONTROL_START
 		D1.u8 |= u8[A0-1]
 		D0.u8 = control.pad1.state & CONTROL_START
@@ -627,6 +628,7 @@ function void UpdateRollingDemo()
 	}
 	else
 	{
+		// Sonic & Knuckles zone demos
 		D2.u8 = u8[A0]
 		--rolling_demo.input_timer
 		if (rolling_demo.input_timer == 0xff)

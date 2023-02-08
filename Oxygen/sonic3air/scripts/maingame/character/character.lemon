@@ -160,8 +160,8 @@ function void Character.Initialization.shared(u8 character)
 
 	setSpeedCapProperties(A4, false)
 
-	u8[A0 + 0x30] = 0
-	u8[A0 + 0x31] = 4
+	char.rotation.x.count = 0
+	char.rotation.x.speed = 4
 	char.drown_countdown = 30
 
 	if (character == CHARACTER_TAILS)
@@ -322,7 +322,7 @@ function void Character.UpdateNormalState.Sonic()
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
 
-	if (u8[0xfffff7c8] != 0)
+	if (level.HCZ_water_current_flags.player1 != 0)
 	{
 		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
@@ -414,7 +414,7 @@ function void Character.UpdateNormalState.Tails()
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
 
-	if (u8[0xfffff7c9] != 0)
+	if (level.HCZ_water_current_flags.tails != 0)
 	{
 		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
@@ -480,7 +480,7 @@ function void Character.UpdateNormalState.Knuckles()
 	char.angle_sensor_1 = u8[0xfffff768]
 	char.angle_sensor_2 = u8[0xfffff76a]
 
-	if (u8[0xfffff7c8] != 0)
+	if (level.HCZ_water_current_flags.player1 != 0)
 	{
 		if (char.state == char.state.RUNNING)
 			char.state = char.state.former
@@ -855,6 +855,7 @@ function void UpdateTailsFlight_innerB()
 		// Flying
 		if (competition_mode.active)
 		{
+			// Not really clear why this is here, competition mode Tails doesn't seem to even use this function
 			char.state = char.state.TAILS_FLYDOWN
 		}
 		else
@@ -1003,7 +1004,7 @@ function void Tails.UpdateCarrySonic()
 				objA1.velocity.y = -0x380		// TODO: Should Knuckles have a different jump acceleration here?
 				u8[A1 + 0x1e] = 0x0e
 				u8[A1 + 0x1f] = 0x07
-				u8[A1 + 0x20] = char.state.ROLLING
+				objA1.state = char.state.ROLLING
 				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK
 				u8[A1 + 0x40] = 0x01
@@ -3333,26 +3334,26 @@ function void Character.UpdateRotationInAir()
 	{
 		u8 oldRotation = char.rotation.x
 		bool incRotation = 0
-		if (char.groundspeed >= 0 || u8[A0 + 0x2d] & 0x80)
+		if (char.groundspeed >= 0 || char.flags2d & 0x80)
 		{
-			char.rotation.x += u8[A0 + 0x31]
+			char.rotation.x += char.rotation.x.speed
 			incRotation = (char.rotation.x < oldRotation)
 		}
 		else
 		{
-			char.rotation.x -= u8[A0 + 0x31]
+			char.rotation.x -= char.rotation.x.speed
 			incRotation = (char.rotation.x > oldRotation)
 		}
 
 		if (incRotation)
 		{
-			if (u8[A0 + 0x30] > 0)
+			if (char.rotation.x.count > 0)
 			{
-				--u8[A0 + 0x30]
+				--char.rotation.x.count
 			}
 			else
 			{
-				u8[A0 + 0x30] = 0
+				char.rotation.x.count = 0
 				char.rotation.x = 0
 			}
 		}
@@ -4383,24 +4384,28 @@ function void PressedLeftWhileUprightOnGround()
 	D0.u16 = char.groundspeed
 	if (D0.s16 > 0)
 	{
+		// Pressed left while running right, thus braking
 		D0.u16 -= D4.u16
 		if (D0.s16 < 0)
 			D0.s16 = -0x80
 		char.groundspeed = D0.u16
 
-		// Check for braking (only when rotated upright)
+		// Check for braking state (only when rotated upright and going fast enough)
 		D0.u8 = (char.rotation + 0x20) & 0xc0
 		if (D0.u8 == 0 && D0.s16 >= 0x400)
 		{
-			if ((u8[A0 + 0x2d] & 0x80) == 0)
+			// 'char.flags2d & 0x80' prevents braking animation when set
+			if ((char.flags2d & 0x80) == 0)
 			{
 				playSound(SFX_BRAKE)
 				char.state = char.state.BRAKING
 				char.flags &= ~char.flag.FACING_LEFT
+
+				// Start braking dust animation if drown countdown is not active
 				if (char.drown_countdown >= 12)
 				{
-					u8[A6 + 0x05] = 0x06
-					u8[A6 + 0x22] = 0x15
+					u8[A6 + 0x05] = 0x06		// Base update for braking dust
+					u8[A6 + 0x22] = 0x15		// First frame of dust animation
 				}
 			}
 		}
@@ -4435,24 +4440,28 @@ function void PressedRightWhileUprightOnGround()
 	D0.u16 = char.groundspeed
 	if (D0.s16 < 0)
 	{
+		// Pressed right while running left, thus braking
 		D0.u16 += D4.u16
 		if (D0.s16 >= 0)
 			D0.s16 = 0x80
 		char.groundspeed = D0.u16
 
-		// Check for braking (only when rotated upright)
+		// Check for braking state (only when rotated upright and going fast enough)
 		D0.u8 = (char.rotation + 0x20) & 0xc0
 		if (D0.u8 == 0 && D0.s16 <= -0x400)
 		{
-			if ((u8[A0 + 0x2d] & 0x80) == 0)
+			// 'char.flags2d & 0x80' prevents braking animation when set
+			if ((char.flags2d & 0x80) == 0)
 			{
 				playSound(SFX_BRAKE)
 				char.state = char.state.BRAKING
 				char.flags |= char.flag.FACING_LEFT
+
+				// Start braking dust animation if drown countdown is not active
 				if (char.drown_countdown >= 12)
 				{
-					u8[A6 + 0x05] = 0x06
-					u8[A6 + 0x22] = 0x15
+					u8[A6 + 0x05] = 0x06		// Base update for braking dust
+					u8[A6 + 0x22] = 0x15		// First frame of dust animation
 				}
 			}
 		}
@@ -4781,10 +4790,12 @@ function void Character.UpdateControlOnGroundShared()
 			u8 angle = (D0.u8 + 0x20) & 0xc0
 			if (angle == 0)
 			{
+				// Upright
 				char.velocity.y += D1.s16
 			}
 			else if (angle == 0x40)
 			{
+				// Left wall
 				char.velocity.x -= D1.s16
 				char.groundspeed = 0
 				if (char.flags & char.flag.FACING_LEFT)
@@ -4794,10 +4805,12 @@ function void Character.UpdateControlOnGroundShared()
 			}
 			else if (angle == 0x80)
 			{
+				// Upside down
 				char.velocity.y -= D1.s16
 			}
 			else
 			{
+				// Right wall
 				char.velocity.x += D1.s16
 				char.groundspeed = 0
 				if ((char.flags & char.flag.FACING_LEFT) == 0)
@@ -5123,17 +5136,14 @@ function void Character.OnCollisionWithDynamicObject()
 	{
 		// Collision is an enemy, i.e. is harmful, but can be attacked
 		bool attacking = false
-		if (char.bonus_effect & char.bonus.INVINCIBLE)
-		{
-			attacking = true
-		}
-		else if (char.state == char.state.ROLLING || char.state == char.state.SPINDASH)
+		if (char.bonus_effect & char.bonus.INVINCIBLE || char.state == char.state.ROLLING || char.state == char.state.SPINDASH)
 		{
 			attacking = true
 		}
 	#if STANDALONE
 		else if (Game.getSetting(SETTING_DROPDASH) && char.character == CHARACTER_SONIC && char.state == char.state.SONIC_DROPDASH)
 		{
+			// Count Sonic's drop dash as a rolling state
 			attacking = true
 		}
 	#endif
@@ -5143,14 +5153,17 @@ function void Character.OnCollisionWithDynamicObject()
 			bool isThreat = false
 			if (char.character == CHARACTER_KNUCKLES)
 			{
+				// Check for Knuckles' gliding and ground slide states
 				isThreat = (char.double_jump_state != 1 && char.double_jump_state != 3)
 			}
 			else if (char.character == CHARACTER_SONIC || char.double_jump_state == 0 || (char.flags & char.flag.UNDERWATER))
 			{
+				// No real special conditions for Sonic besides the drop dash
 				isThreat = true
 			}
 			else
 			{
+				// Check for if the enemy is above Tails while flying
 				s16 dx = char.position.x.u16 - objA1.position.x.u16
 				s16 dy = char.position.y.u16 - objA1.position.y.u16
 				D0.u8 = lookupAngleByVector(dx, dy) - 0x20
@@ -5973,7 +5986,7 @@ function void Character.CheckCollision()
 	}
 #endif
 
-	bool someFlag = (char.character == CHARACTER_TAILS) ? u8[0xfffff7c9] : u8[0xfffff7c8]
+	bool someFlag = (char.character == CHARACTER_TAILS) ? level.HCZ_water_current_flags.tails : level.HCZ_water_current_flags.player1
 
 	u32[0xfffff796] = (char.layer_flags1 == 0x0c) ? u32[0xfffff7b4] : u32[0xfffff7b8]
 
@@ -6238,8 +6251,8 @@ function void Character.LandingOnGroundResetState()
 	char.jumping = 0
 	score.bonus_counter = 0		// No more increasing bonuses after hitting the ground
 	char.rotation.x = 0
-	u8[A0 + 0x2d] = 0
-	u8[A0 + 0x30] = 0
+	char.flags2d = 0
+	char.rotation.x.count = 0
 	char.look_up_down_timer = 0
 
 	// Check for double jump state
@@ -6803,8 +6816,7 @@ function void Character.CheckDiedStateEnd()
 				playMusic(MUSIC_GAMEOVER)
 
 				// Load patterns for time/game over
-				D0 = 3
-				FillPatternLoadingCues()
+				fillPatternLoadingCues(0x03)
 			}
 		}
 	}

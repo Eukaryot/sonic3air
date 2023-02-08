@@ -71,7 +71,7 @@ function void fn067b1c()
 {
 	u32[A0 + 0x30] = 0x0681d0
 
-	Kosinski.addToDMAQueue(0x15fddc, 0xa5c0)
+	Kosinski.addToDMAQueue(0x15fddc, 0xa5c0)		// Egg Robo head sprites
 }
 
 
@@ -229,7 +229,7 @@ function void fn067d0a()
 	setupObjectAttributesFull(0x068158)
 	objA0.update_address = 0x067d2a
 
-	Kosinski.addToDMAQueue(0x17c6e0, 0xa5c0)
+	Kosinski.addToDMAQueue(0x17c6e0, 0xa5c0)		// Mecha Sonic head sprites
 }
 
 

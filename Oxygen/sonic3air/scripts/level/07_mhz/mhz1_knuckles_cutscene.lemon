@@ -39,7 +39,7 @@ function void fn062b68()
 #else
 	objA0.countdown_value = 119
 #endif
-	u32[A0 + 0x30] = 0x06669f
+	u32[A0 + 0x30] = 0x06669f		// Cutscene Knuckles walking animation data
 	objA0.position.x.u16 = 0x02b0
 	objA0.position.y.u16 = 0x066c
 	objA0.velocity.x = 0x0200
@@ -110,7 +110,7 @@ function void fn062bf4()
 	objA0.velocity.y = -0x400
 	objA0.countdown_callback = 0x062c5a
 
-	A1 = 0x0666af
+	A1 = 0x0666af		// Cutscene Knuckles jumping animation data
 	fn084580()
 	fn062c42()
 }
@@ -143,7 +143,7 @@ function void fn062c76()
 	objA0.velocity.x = 0x200
 	objA0.velocity.y = 0
 
-	A1 = 0x06669f
+	A1 = 0x06669f		// Cutscene Knuckles walking animation data
 	fn084580()
 }
 
@@ -338,7 +338,7 @@ function void fn062ddc()
 			if (D0.u16 > objA1.position.x.u16)
 				return
 
-			u8[A1 + 0x20] = char.state.COWERING
+			objA1.state = char.state.COWERING
 			StopObjectA1()
 		}
 		else if (s8[A1 + 0x04] >= 0)
@@ -387,7 +387,7 @@ function void fn062e5c()
 	Kosinski.addToDMAQueue(0x1695c0, 0xa000)
 
 	// "spawnSimpleChildObjects(0x0665aa)" replaced by:
-	spawnSimpleChildObjects(0x061d4c, 1)
+	spawnSimpleChildObjects(0x061d4c, 1)		// Cutscene Knuckles
 	if (_equal())
 	{
 		objA1.subtype2c = 0x1c
@@ -508,7 +508,7 @@ function void fn062fa2()
 
 
 
-// Knuckles loooking left and riht
+// Knuckles looking left and right
 
 //# address-hook(0x062fb4) end(0x062fc8)
 function void fn062fb4()
@@ -522,7 +522,7 @@ function void fn062fb4()
 //# address-hook(0x062fca) end(0x062fd4)
 function void fn062fca()
 {
-	A1 = 0x0666e1
+	A1 = 0x0666e1		// Cutscene Knuckles peeking animation data
 	fn0845a0()
 	DrawObject()
 }

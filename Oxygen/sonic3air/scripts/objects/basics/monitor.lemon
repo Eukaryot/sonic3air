@@ -283,7 +283,7 @@ function void MonitorIntact.Init()
 		{
 			objA0.animation.sprite = 0x0b
 		#if STANDALONE
-			objA0.update_address = 0x01d61a		// Needed for render hook, simply calls "DrawOrUnloadObject"
+			objA0.update_address = addressof(MonitorIntact.Render)		// Needed for render hook, simply calls "DrawOrUnloadObject"
 		#else
 			objA0.update_address = addressof(DrawOrUnloadObject)
 		#endif
@@ -353,7 +353,7 @@ function void fn01d61e()
 	// Broken monitor
 	if (objA0.animation.sprite == 0x0b)
 	{
-		objA0.update_address = 0x01d61a
+		objA0.update_address = addressof(MonitorIntact.Render)
 	}
 
 	Object.animationUpdate(0x01db3a)
@@ -507,7 +507,7 @@ function void fn01d6dc()
 //# address-hook(0x01d716) end(0x01d7b6)
 function void MonitorIntact.Opening()
 {
-	if ((objA0.flags2a & 0x28) != 0)
+	if ((objA0.flags2a & (object.flag.P1_PUSHING | object.flag.P1_ON_OBJECT)) != 0)
 	{
 		u8[0xffffb000 + 0x2a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
 	#if !STANDALONE
@@ -517,7 +517,7 @@ function void MonitorIntact.Opening()
 	#endif
 	}
 
-	if ((objA0.flags2a & 0x50) != 0)
+	if ((objA0.flags2a & (object.flag.P2_PUSHING | object.flag.P2_ON_OBJECT)) != 0)
 	{
 		u8[0xffffb04a + 0x2a] &= ~(char.flag.PUSHING | char.flag.ON_OBJECT)
 	#if !STANDALONE
@@ -677,11 +677,11 @@ function void ItemEffect.UpdateDefaultInternal()
 	u16[A0 + 0x24] = 0x1d
 
 	A1 = 0xffff0000 + objA0.monitor.character_address
-	A2 = (A1 == 0xffffb000) ? 0xfffffecc : 0xfffffece
+	A2 = (A1 == 0xffffb000) ? 0xfffffecc : 0xfffffece		// Address to keep count of broken monitors in. having different ones for each player is a leftover from Sonic 2
 #if STANDALONE
 	if (objA0.state == 0x0b)	// Classic Shield
 	{
-		ItemEffect.applyShield(0, addressof(InstaShield.Init), 0x3a)
+		ItemEffect.applyShield(0, addressof(InstaShield.Init), SFX_CLASSICSHIELD)
 	}
 	else
 #endif
@@ -735,6 +735,7 @@ function void ItemEffect.ApplyExtraRings()
 		}
 		else
 		{
+			// Kinda harsh, but yeah, Player 2 gets hurt for initiating a 1-up
 			ItemEffect.ApplyRobotnik()
 		}
 	}
@@ -750,7 +751,7 @@ function void ItemEffect.ApplySpeedUp()
 {
 	++u16[A2]
 	u8[A1 + 0x2b] |= char.bonus.SPEED_UP
-	u8[A1 + 0x36] = 0x96
+	u8[A1 + 0x36] = 150			// "char.speedup.countdown", decreases every 8 frames
 
 #if STANDALONE
 	u32 backupA0 = A0

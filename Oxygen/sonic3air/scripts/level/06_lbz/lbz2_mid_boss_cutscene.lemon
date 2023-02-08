@@ -388,7 +388,7 @@ function void fn06290e()
 //# address-hook(0x062928) end(0x06292c)
 function void fn062928()
 {
-	A1 = 0x0666d2
+	A1 = 0x0666d2				// Cutscene Knuckles punching animation data
 	fn0845a0()
 }
 
@@ -408,7 +408,7 @@ function void fn062942()
 	if (camera.screenshake.state.hi != 0)
 	{
 		objA0.base_state = 0x08
-		u32[A0 + 0x30] = 0x06669a
+		u32[A0 + 0x30] = 0x06669a		// Cutscene Knuckles balancing animation data
 		objA0.animation.timer = 0
 		objA0.animation.frame = 0
 	}

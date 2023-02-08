@@ -87,7 +87,7 @@ function void DynamicRing.Update()
 		--level.total_rings
 		CollectRing()
 
-		objA0.update_address = 0x01a920
+		objA0.update_address = addressof(DynamicRing.FadeOut)
 		objA0.base_state = 0
 		DynamicRing.FadeOut()
 	}

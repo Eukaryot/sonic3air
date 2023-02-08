@@ -303,7 +303,7 @@ function void fn06364e()
 
 #if !STANDALONE
 	// This should already have been set to exactly this value...
-	D0.u16 = 0x0700
+	D0.u16 = 0x0700		// Mushroom Hill Act 1
 	global.zone_act = D0.u16
 	global.zone_act.apparent = D0.u16
 #endif
@@ -490,8 +490,8 @@ function void fn063790()
 	// "spawnChildObjects(0x06665c)" replaced by:
 	spawnChildObject(0x0638dc, 0x00, 0, -20)
 
-	addPatternLoadingCue(0x083d64)
-	Kosinski.addToDMAQueue(0x165000, 0xa5c0)
+	addPatternLoadingCue(0x083d64)		// Boss explosion sprites
+	Kosinski.addToDMAQueue(0x165000, 0xa5c0)		// Bomb sprites
 }
 
 
@@ -664,7 +664,7 @@ function void fn0639c8()
 	spawnChildObject(0x0916a8, 0x00, -12, 28)
 	spawnChildObject(0x0916ee, 0x02, -28, -4)
 
-	Kosinski.addToDMAQueue(0x17b17e, 0xa000)
+	Kosinski.addToDMAQueue(0x17b17e, 0xa000)		// Egg Robo badnik sprites
 }
 
 

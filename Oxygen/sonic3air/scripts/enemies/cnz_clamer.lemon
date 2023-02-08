@@ -107,7 +107,7 @@ function void fn089064()
 	if (D2.u16 != 0 && objA0.animation.sprite == 8 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		// "spawnProjectileChildObjectsInDir(0x089150)" replaced by:
-		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -16, 2, -512, 0, 0x08913c, 0x000000, 0x01ab52)
+		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -16, 2, -512, 0, 0x08913c, 0x000000, addressof(UpdateMovementStraightSimple))
 	}
 }
 

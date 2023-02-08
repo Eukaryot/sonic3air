@@ -159,9 +159,9 @@ function void fn064472()
 		objA1.update_address = 0x084ad2
 	}
 
-	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)
+	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)	// Egg Mobile grabber claw sprites
 
-	addPatternLoadingCue(0x064516)
+	addPatternLoadingCue(0x064516)		// Robotnik's ship
 }
 
 
@@ -858,7 +858,7 @@ function void fn064b22()
 		objA1.update_address = 0x084a76
 	}
 
-	A1 = 0x06671f
+	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
 	fn084580()
 
 #if STANDALONE
@@ -925,7 +925,7 @@ function void fn064bc6()
 	objA0.animation.sprite = 0
 	objA0.render_flags &= ~render_flag.FLIP_X
 
-	A1 = 0x06671f
+	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
 	fn084580()
 }
 
@@ -1029,7 +1029,7 @@ function void fn064ca6()
 	player1.control_override = 0
 	u8[A1 + 0x2e] = 0x83
 	objA1.animation.sprite = (u8[A1 + 0x38] == CHARACTER_TAILS) ? 0xb0 : 0xc4
-	u8[A1 + 0x20] = char.state.LOOKING_UP
+	objA1.state = char.state.LOOKING_UP
 	control.player1 = 0
 	StopObjectA1()
 	UpdatePlayer1SpritePatterns()
@@ -1322,9 +1322,9 @@ function void fn064fdc()
 	UnloadObjectA1()
 
 	u16[0xfffffaba] = 0
-	u16[0xfffff634] = 0
+	level.palettefx.timer_1 = 0
 
-	Kosinski.addToDMAQueue(0x17588a, 0xa5c0)
+	Kosinski.addToDMAQueue(0x17588a, 0xa5c0)		// Teleporter
 	Object.TriggerUnloading()
 }
 

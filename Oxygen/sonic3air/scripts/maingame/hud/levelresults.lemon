@@ -34,7 +34,7 @@ function void fn02dae6()
 {
 	playMusic(MUSIC_CTRL_FADEOUT)
 
-	Kosinski.addToDMAQueue(0x0d6a62, 0xa400)
+	Kosinski.addToDMAQueue(0x0d6a62, 0xa400)		// Common results graphics
 	if (global.zone_act != 0x1600 && global.act.apparent == 0)
 	{
 		// Any Act 1
@@ -49,7 +49,7 @@ function void fn02dae6()
 	}
 
 	u16[A0 + 0x2c] = D0.u16
-	Kosinski.addToDMAQueue(A1, 0xad00)
+	Kosinski.addToDMAQueue(A1, 0xad00)		// Act number sprite
 
 	if (isMainCharacter(CHARACTER_SONIC))
 	{
@@ -67,7 +67,7 @@ function void fn02dae6()
 		A1 = 0x0d67f0
 	}
 	D2.u16 = (u16[A0 + 0x2c] != 0) ? 0xb400 : 0xaf00
-	Kosinski.addToDMAQueue(A1, D2.u16)
+	Kosinski.addToDMAQueue(A1, D2.u16)		// Character nameplate
 
 	hud.dirty.timer = 0
 	u32 seconds = timer.seconds + u32(timer.minutes) * 60

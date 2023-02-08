@@ -51,12 +51,12 @@ function void fn040ec4()
 			D2.u16 += u16[A0 + 0x38]
 			if (D2.u16 == objA0.countdown_value)
 			{
-				u16[0xfffff634] = 899
+				level.palettefx.timer_1 = 899
 				u8[0xfffff7c3] = 0
-				D0.u16 = u16[0xfffff656]
+				D0.u16 = level.palettefx.frame_4
 				D0.s8 = -D0.s8
-				u8[0xfffff650] = D0.u8
-				u16[0xfffff658] = 0
+				level.palettefx.state = D0.u8
+				level.palettefx.timer_2 = 0
 			}
 			goto040f14 = true
 		}

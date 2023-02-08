@@ -119,7 +119,7 @@ function void fn0625ca()
 	objA0.base_state = 0x0c
 	objA0.animation.frame = 0
 	objA0.animation.timer = 0
-	u32[A0 + 0x30] = 0x06669f
+	u32[A0 + 0x30] = 0x06669f		// Cutscene Knuckles walking animation data
 }
 
 

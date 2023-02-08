@@ -361,12 +361,13 @@ function void DataSelect.setup()
 	copyMemory(0xfffffce0, 0xfffffc60, 0x20)
 	zeroMemory(0xfffffc60, 0x20)
 
-	Kosinski.decompress(0x20c7e0, 0xffff0000)
+	Kosinski.decompress(0x20c7e0, 0xffff0000)	// Save file S3 zone preview images
 
 	copyMemory(0xffff2300, 0xffff2bc0, 0x1180)
 
+	// Save file SK zone preview images
 	Kosinski.decompress(0x15cd62, 0xffff3480)	// After this, A1 points to where uncompressed data ends
-	Kosinski.decompress(0x15edb2, A1)
+	Kosinski.decompress(0x15edb2, A1)			// Save file Knuckles and Tails previews
 
 	A0 = A1 - 0x08c0
 	copyMemory(A1, A0, 0x540)
@@ -627,7 +628,7 @@ function void fn00d1fa()
 		FadeOutScreenBlocking()
 		A0 = backupA0
 
-		// Do not fade out music in this case, Data Select music is meant to kept playing
+		// Do not fade out music in this case, Data Select music is meant to keep playing
 		Game.returnToMainMenu()
 		yieldExecution()
 	#endif
@@ -750,9 +751,7 @@ function void DataSelect.sharedNewGameStartup()
 	global.next_bluespheres = 0
 	u16[0xfffffe17] = 0			// Possibly not needed at all
 	u16[0xffffffb0] = 0
-	u32[0xffffffb2] = 0
-	u16[0xffffffb6] = 0
-	u8[0xffffffb8] = 0
+	zeroMemory(0xffffffb2, 7)		// Clear emerald collection states
 	level.giantrings_clear = 0
 	global.traded_emeralds = 0
 
@@ -833,7 +832,7 @@ function void fn00d39e()
 	objA0.value3b = u8[A1] & 0x03
 
 	D0.u16 = u16[A1 + 0x06]
-	A2 = 0xffffffb2
+	A2 = 0xffffffb2		// Start of emerald collection states
 	fn00da1e()
 
 	u8[A0 + 0x3c] = D1.u8
@@ -1064,7 +1063,7 @@ function bool fn00d458()
 		global.next_bluespheres = (u8[A1 + 0x02] & 0x0f)
 
 		D0 = u16[A1 + 0x06]
-		A2 = 0xffffffb2
+		A2 = 0xffffffb2		// Start of emerald collection states
 		fn00da1e()
 		global.chaos_emeralds = D1.u8
 		global.super_emeralds = D2.u8

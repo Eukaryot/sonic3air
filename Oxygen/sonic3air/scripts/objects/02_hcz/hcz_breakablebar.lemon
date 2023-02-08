@@ -113,7 +113,7 @@ function void fn01edec()
 
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c
-		u8[0xfffff7c7] &= ~(1 << D2.u8)
+		level.HCZ_breakable_bar_flags &= ~(1 << D2.u8)
 		u8[A1 + 0x2e] &= 0xfe
 		if ((objA0.subtype2c & 0x40) == 0)
 		{
@@ -159,7 +159,7 @@ function void fn01edec()
 					objA1.state = char.state.HOLDING_ON
 					objA1.flags2a &= ~char.flag.FACING_LEFT
 					u8[A1 + 0x2e] = 0x01
-					u8[0xfffff7c7] |= (1 << (D2.u8 & 7))
+					level.HCZ_breakable_bar_flags |= (1 << (D2.u8 & 7))
 					u8[A2] = 0x01
 				}
 			}
@@ -180,7 +180,7 @@ function void fn01eeec()
 		u8[0xffffb04a + 0x2e] &= 0xfe
 	}
 
-	u8[0xfffff7c7] = 0
+	level.HCZ_breakable_bar_flags = 0
 	objA0.value32 = 0
 	objA0.update_address = 0x01ef3e
 	objA0.animation.sprite = 0x03
@@ -288,7 +288,7 @@ function void fn01efa0()
 
 		u8[A2] = 0
 		u8[A2 + 0x02] = 0x3c
-		u8[0xfffff7c7] &= ~(1 << D2.u8)
+		level.HCZ_breakable_bar_flags &= ~(1 << D2.u8)
 		u8[A1 + 0x2e] &= 0xfe
 		if ((objA0.subtype2c & 0x40) == 0)
 		{
@@ -336,7 +336,7 @@ function void fn01efa0()
 						objA1.position.y.u16 = D0.u16
 						objA1.state = char.state.HANGING
 						u8[A1 + 0x2e] = 0x01
-						u8[0xfffff7c7] |= (1 << D2.u8)
+						level.HCZ_breakable_bar_flags |= (1 << D2.u8)
 						u8[A2] = 0x01
 					}
 				}
@@ -358,7 +358,7 @@ function void fn01f09a()
 		u8[0xffffb04a + 0x2e] &= 0xfe
 	}
 
-	u8[0xfffff7c7] = 0
+	level.HCZ_breakable_bar_flags = 0
 	objA0.value32 = 0
 
 	objA0.update_address = 0x01ef3e

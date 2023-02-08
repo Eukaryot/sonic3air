@@ -396,7 +396,8 @@ define global.lag_frames		= u16[0xfffff628]
 define global.frame_state		=  u8[0xfffff62a]	// Controls what the vertical interrupt does; gets reset to 0 unless a routine is explicitly set in the frame update (it usually is)
 
 define water.palette.source		= u32[0xfffff62e]	// Address with description data how and where to load secondary palette
-
+define level.palettefx.frame_1	= u16[0xfffff632]
+define level.palettefx.timer_1	= u16[0xfffff634]
 define global.random.seed		= u32[0xfffff636]
 
 define global.game.paused		= u16[0xfffff63a]	// true when game is paused (in standalone, this is never the case)
@@ -408,6 +409,12 @@ define water.height.changerate	=  u8[0xfffff64c]	// Change per frame of height t
 define water.transition_counter	=  u8[0xfffff64d]	// Counts how often Sonic switched between above and under water
 define water.fullscreen			=  u8[0xfffff64e]	// This is set to 0x01 if the whole screen is underwater
 
+define level.palettefx.state	=  u8[0xfffff650]
+define level.palettefx.frame_2	= u16[0xfffff652]
+define level.palettefx.frame_3	= u16[0xfffff654]
+define level.palettefx.frame_4	= u16[0xfffff656]
+define level.palettefx.timer_2	= u16[0xfffff658]
+define level.palettefx.timer_3	= u16[0xfffff65a]
 define super.palettefx.frame	= u16[0xfffff65c]
 define super.palettefx.timer	=  s8[0xfffff65e]	// Only for Sonic / Knuckles, as Tails has his own version (though he sometimes uses this one as well...?)
 define super.palettefx.state	=  u8[0xfffff65f]
@@ -446,6 +453,8 @@ define rings.update_routine		=  u8[0xfffff710]
 define global.level_started		=  s8[0xfffff711]	// Can be negative, which causes the HUD to fly in at the start
 // 0xfffff712 ... ?  -> Some kind of respawn entries for e.g. Glowing Spheres
 
+define level.palettefx.aiz_intro		=  u8[0xfffff72e]
+
 define level.water_present		=  u8[0xfffff730]
 
 define tails.carrying			=  u8[0xfffff73e]	// If Tails carries another character, this is 1, otherwise 0
@@ -481,10 +490,14 @@ define level.boss_encounter		=  u8[0xfffff7aa]	// Set to 1 if in boss fight or s
 define global.level_flag02		=  u8[0xfffff7c2]	// Used only in LBZ 2
 
 define global.inv_gravity		=  u8[0xfffff7c6]	// Set to 1 if inverse gravity is used (Deathegg Act 2)
+define level.HCZ_breakable_bar_flags			=  u8[0xfffff7c7]		// 3 when next to a water current, nonzero value when grabbed on to a pole in HCZ, seems related to the player's position
+define level.HCZ_water_current_flags.both		= u16[0xfffff7c8]		// Flags that determine if either player is in a water current
+define level.HCZ_water_current_flags.player1	=  u8[0xfffff7c8]		// Set to 1 when in a water current
+define level.HCZ_water_current_flags.tails		=  u8[0xfffff7c9]		// See above
 define player1.control_override	=  s8[0xfffff7ca]	// If set to 1 or 0xff, first character cannot be controlled
 define player2.control_override	=  s8[0xfffff7cb]	// If set to 1 or 0xff, second character cannot be controlled
 
-define score.bonus_counter		= u16[0xfffff7d0]	// Needed for increases bonusses when destroying multiple enemies in a row
+define score.bonus_counter		= u16[0xfffff7d0]	// Needed for increases bonuses when destroying multiple enemies in a row
 define results.time_bonus		= u16[0xfffff7d2]	// Time bonus value in level results; also used for Perfect bonus in special stage results
 define results.ring_bonus		= u16[0xfffff7d4]	// Ring bonus value in level and special stage results
 

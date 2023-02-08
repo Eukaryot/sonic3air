@@ -40,7 +40,7 @@ function void fn071bce()
 		level.bossarea.right += getScreenExtend()
 	#endif
 
-	requestLoadingPatterns(0x70)
+	requestLoadingPatterns(0x70)		// Boss sprites
 	loadPaletteLine1(0x0723b0)
 }
 

@@ -431,23 +431,26 @@ function void UpdateControllers()
 	}
 	#else
 	{
-		A0 = 0xfffff604
-		A1 = 0xa10003
+		A0 = 0xfffff604		// Address of "control.pad1"
+		A1 = 0xa10003		// Hardware address for physical controller port 1
 
 		for (u8 i = 0; i < 2; ++i)
 		{
+			// Two loops, one for each controller port
 			u8[A1] = 0
-			D0.u8 = (u8[A1] << 2) & 0xc0
+			D0.u8 = (u8[A1] << 2) & (CONTROL_A | CONTROL_START)
+
 			u8[A1] = 0x40
-			D1.u8 = u8[A1] & 0x3f
-			D0.u8 = (D0.u8 | D1.u8) ^ 0xff
+			D1.u8 = u8[A1] & (CONTROL_DPAD | CONTROL_B | CONTROL_C)
 
-			D1.u8 = u8[A0] ^ D0.u8
-			u8[A0] = D0.u8
-			u8[A0+1] = D1.u8 & D0.u8
+			D0.u8 = (D0.u8 | D1.u8) ^ 0xff		// Currently pressed buttons
+			D1.u8 = u8[A0] ^ D0.u8				// Clearing buttons pressed in previous storage
 
-			A0 += 2
-			A1 += 2
+			u8[A0] = D0.u8					// Set button held states
+			u8[A0+1] = D1.u8 & D0.u8		// Set button pressed states
+
+			A0 += 2		// To next input storage address
+			A1 += 2		// To next controller port address
 		}
 	}
 	#endif

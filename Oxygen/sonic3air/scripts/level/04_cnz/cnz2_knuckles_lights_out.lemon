@@ -56,7 +56,7 @@ function void fn0622e4()
 	if (SetupObjectAttributesSlotted(0x0663ba))
 		return
 
-	u32[A0 + 0x30] = 0x0666bf
+	u32[A0 + 0x30] = 0x0666bf		// Cutscene Knuckles chuckling animation data
 	objA0.countdown_callback = 0x06233e
 
 	A1 = 0x062296
@@ -70,7 +70,7 @@ function void fn0622e4()
 	CutsceneKnuckles.loadPalette()
 
 	// "spawnChildObjects(0x066560)" replaced by:
-	spawnChildObject(0x062458, 0x00, -32, -108)
+	spawnChildObject(0x062458, 0x00, -32, -108)		// Invisible collision object
 }
 
 
@@ -303,7 +303,7 @@ function void fn065d6e()
 	objA0.update_address = 0x065d8c
 	objA0.position.y.u16 += 4
 
-	addPatternLoadingCue(0x065bfc)
+	addPatternLoadingCue(0x065bfc)		// Button sprites
 }
 
 

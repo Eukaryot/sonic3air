@@ -125,7 +125,7 @@ function void fn062200()
 {
 	// Knuckles runs in
 	objA0.position.x.u16 -= 4
-	Object.animationProgress(0x06669f)
+	Object.animationProgress(0x06669f)		// Cutscene Knuckles walking animation
 	Object.CountdownAndTrigger()
 }
 
