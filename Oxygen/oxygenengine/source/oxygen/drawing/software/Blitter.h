@@ -74,6 +74,8 @@ public:
 	void blitColor(const OutputWrapper& output, const Color& color, BlendMode blendMode);
 	void blitSprite(const OutputWrapper& output, const SpriteWrapper& sprite, Vec2i position, const Options& options);
 	void blitIndexed(const OutputWrapper& output, const IndexedSpriteWrapper& sprite, const PaletteWrapper& palette, Vec2i position, const Options& options);
+	void blitRectWithScaling(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, const Options& options);
+	void blitRectWithUVs(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, const Options& options);
 
 private:
 	BitmapViewMutable<uint32> makeTempBitmap(Vec2i size);

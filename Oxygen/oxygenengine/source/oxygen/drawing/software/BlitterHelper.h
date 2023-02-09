@@ -11,6 +11,19 @@
 
 struct BlitterHelper
 {
+	static inline uint32 multiplyColors(uint32 color1, uint32 color2)
+	{
+		uint32 result = 0;
+		const uint8* src1 = (uint8*)&color1;
+		const uint8* src2 = (uint8*)&color2;
+		uint8* dst = (uint8*)&result;
+		dst[0] = (uint8)((int)src1[0] * (int)src2[0] / 255);
+		dst[1] = (uint8)((int)src1[1] * (int)src2[1] / 255);
+		dst[2] = (uint8)((int)src1[2] * (int)src2[2] / 255);
+		dst[3] = (uint8)((int)src1[3] * (int)src2[3] / 255);
+		return result;
+	}
+
 	static inline void fillRect(const BitmapViewMutable<uint32>& view, Color color)
 	{
 		if (view.isEmpty())
@@ -75,20 +88,25 @@ struct BlitterHelper
 		}
 	}
 
+	static inline void blendPixelAlpha(uint8* dst, const uint8* src)
+	{
+		const int alpha = src[3];
+		if (alpha > 0)
+		{
+			const int oneMinusAlpha = 255 - alpha;
+			dst[0] = (uint8)((src[0] * alpha + dst[0] * oneMinusAlpha) / 255);
+			dst[1] = (uint8)((src[1] * alpha + dst[1] * oneMinusAlpha) / 255);
+			dst[2] = (uint8)((src[2] * alpha + dst[2] * oneMinusAlpha) / 255);
+		}
+	}
+
 	static inline void blendLineAlpha(uint32* dst_, const uint32* src_, size_t numPixels)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			const int alpha = src[3];
-			if (alpha > 0)
-			{
-				const int oneMinusAlpha = 0x100 - alpha;
-				dst[0] = (uint8)(((int)src[0] * alpha + (int)dst[0] * oneMinusAlpha) >> 8);
-				dst[1] = (uint8)(((int)src[1] * alpha + (int)dst[1] * oneMinusAlpha) >> 8);
-				dst[2] = (uint8)(((int)src[2] * alpha + (int)dst[2] * oneMinusAlpha) >> 8);
-			}
+			blendPixelAlpha(dst, src);
 			dst += 4;
 			src += 4;
 		}
@@ -100,17 +118,10 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (depthValue >= *depthBuffer)
+			if (depthValue >= *depthBuffer && src[3] > 0)
 			{
-				const int alpha = src[3];
-				if (alpha > 0)
-				{
-					const int oneMinusAlpha = 0x100 - alpha;
-					dst[0] = (uint8)(((int)src[0] * alpha + (int)dst[0] * oneMinusAlpha) >> 8);
-					dst[1] = (uint8)(((int)src[1] * alpha + (int)dst[1] * oneMinusAlpha) >> 8);
-					dst[2] = (uint8)(((int)src[2] * alpha + (int)dst[2] * oneMinusAlpha) >> 8);
-					*depthBuffer = depthValue;
-				}
+				blendPixelAlpha(dst, src);
+				*depthBuffer = depthValue;
 			}
 			dst += 4;
 			src += 4;
@@ -149,9 +160,12 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			dst[0] = std::min(src[0] + dst[0], 0xff);
-			dst[1] = std::min(src[1] + dst[1], 0xff);
-			dst[2] = std::min(src[2] + dst[2], 0xff);
+			if (src[3] > 0)
+			{
+				dst[0] = std::min(dst[0] + src[0], 0xff);
+				dst[1] = std::min(dst[1] + src[1], 0xff);
+				dst[2] = std::min(dst[2] + src[2], 0xff);
+			}
 			dst += 4;
 			src += 4;
 		}
@@ -163,11 +177,11 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (depthValue >= *depthBuffer)
+			if (src[3] > 0 && depthValue >= *depthBuffer)
 			{
-				dst[0] = std::min(src[0] + dst[0], 0xff);
-				dst[1] = std::min(src[1] + dst[1], 0xff);
-				dst[2] = std::min(src[2] + dst[2], 0xff);
+				dst[0] = std::min(dst[0] + src[0], 0xff);
+				dst[1] = std::min(dst[1] + src[1], 0xff);
+				dst[2] = std::min(dst[2] + src[2], 0xff);
 				*depthBuffer = depthValue;
 			}
 			dst += 4;
@@ -182,9 +196,12 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			dst[0] = (src[0] * dst[0]) / 255;
-			dst[1] = (src[1] * dst[1]) / 255;
-			dst[2] = (src[2] * dst[2]) / 255;
+			if (src[3] > 0)
+			{
+				dst[0] = (src[0] * dst[0]) / 255;
+				dst[1] = (src[1] * dst[1]) / 255;
+				dst[2] = (src[2] * dst[2]) / 255;
+			}
 			dst += 4;
 			src += 4;
 		}
@@ -196,7 +213,7 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (depthValue >= *depthBuffer)
+			if (src[3] > 0 && depthValue >= *depthBuffer)
 			{
 				dst[0] = (src[0] * dst[0]) / 255;
 				dst[1] = (src[1] * dst[1]) / 255;
@@ -369,6 +386,151 @@ struct BlitterHelper
 			//RMX_ASSERT(options.mDepthBuffer->getSize() == output.mBitmapView.getSize(), "Depth buffer size differs from output bitmap size");
 			BitmapViewMutable<uint8> depthBuffer(*options.mDepthBuffer, Recti(outputBoundingBox.getPos(), intermediate.getSize()));
 			mergeIntoOutputWithDepth(outputView, intermediate, depthBuffer, options);
+		}
+	}
+
+
+	template<bool ALPHA_BLENDING, bool USE_TINT_COLOR>
+	static inline void blitBitmapWithScaling(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, uint32 tintColor)
+	{
+		if (destBitmap.isEmpty() || sourceRect.isEmpty())
+			return;
+
+		int lastSourceY = -1;
+		uint32* lastDestData = nullptr;
+
+		uint32 position = 0;	// This is used as a 16.16 fixed point number
+		const uint32 advance = (sourceRect.width << 16) / destRect.width;
+
+		for (int lineIndex = 0; lineIndex < destRect.height; ++lineIndex)
+		{
+			const int destY = destRect.y + lineIndex;
+			const int sourceY = sourceRect.y + lineIndex * sourceRect.height / destRect.height;
+			uint32* destData = destBitmap.getPixelPointer(destRect.x, destY);
+
+			if (sourceY == lastSourceY && nullptr != lastDestData)
+			{
+				// Just copy the content from the last line, as it's the same contents again
+				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
+			}
+			else
+			{
+				const uint32* sourceData = sourceBitmap.getPixelPointer(sourceRect.x, sourceY);
+				position = 0;
+
+				if (USE_TINT_COLOR)
+				{
+					const constexpr int BUFFER_SIZE = 2048;
+					RMX_ASSERT(sourceRect.width <= BUFFER_SIZE, "Buffer supports only widths of " << BUFFER_SIZE << " pixels at maximum");
+					sourceRect.width = std::min(sourceRect.width, BUFFER_SIZE);
+					uint32 buffer[BUFFER_SIZE];
+					for (int x = 0; x < sourceRect.width; ++x)
+					{
+						buffer[x] = multiplyColors(sourceData[x], tintColor);
+					}
+
+					if (ALPHA_BLENDING)
+					{
+						for (int destX = 0; destX < destRect.width; ++destX)
+						{
+							blendPixelAlpha((uint8*)&destData[destX], (uint8*)&buffer[position >> 16]);
+							position += advance;
+						}
+					}
+					else
+					{
+						for (int destX = 0; destX < destRect.width; ++destX)
+						{
+							destData[destX] = buffer[position >> 16];
+							position += advance;
+						}
+					}
+				}
+				else
+				{
+					if (ALPHA_BLENDING)
+					{
+						for (int destX = 0; destX < destRect.width; ++destX)
+						{
+							blendPixelAlpha((uint8*)&destData[destX], (uint8*)&sourceData[position >> 16]);
+							position += advance;
+						}
+					}
+					else
+					{
+						for (int destX = 0; destX < destRect.width; ++destX)
+						{
+							destData[destX] = sourceData[position >> 16];
+							position += advance;
+						}
+					}
+				}
+
+				lastSourceY = sourceY;
+				lastDestData = destData;
+			}
+		}
+	}
+
+	template<bool ALPHA_BLENDING, bool USE_TINT_COLOR>
+	static inline void blitBitmapWithUVs(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, uint32 tintColor)
+	{
+		if (destBitmap.isEmpty() || sourceRect.isEmpty())
+			return;
+
+		// We can't handle negative source rect coordinate values, so if needed, shift its start offset by full source bitmap sizes
+		if (sourceRect.x < 0)
+		{
+			sourceRect.x = (sourceBitmap.getSize().x - 1) - (sourceBitmap.getSize().x - 1 - sourceRect.x) % sourceBitmap.getSize().x;
+		}
+		if (sourceRect.y < 0)
+		{
+			sourceRect.y = (sourceBitmap.getSize().y - 1) - (sourceBitmap.getSize().y - 1 - sourceRect.y) % sourceBitmap.getSize().y;
+		}
+
+		int lastSourceY = -1;
+		uint32* lastDestData = nullptr;
+
+		for (int lineIndex = 0; lineIndex < destRect.height; ++lineIndex)
+		{
+			const int destY = destRect.y + lineIndex;
+			const int sourceY = (sourceRect.y + lineIndex * sourceRect.height / destRect.height) % sourceBitmap.getSize().y;
+			uint32* destData = destBitmap.getPixelPointer(destRect.x, destY);
+
+			if (sourceY == lastSourceY && nullptr != lastDestData)
+			{
+				// Just copy the content from the last line, as it's the same contents again
+				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
+			}
+			else
+			{
+				const uint32* sourceData = sourceBitmap.getPixelPointer(0, sourceY);
+				for (int destX = 0; destX < destRect.width; ++destX)
+				{
+					const int sourceX = (sourceRect.x + destX * sourceRect.width / destRect.width) % sourceBitmap.getSize().x;
+					uint32 pixel;
+					if (USE_TINT_COLOR)
+					{
+						pixel = multiplyColors(sourceData[sourceX], tintColor);
+					}
+					else
+					{
+						pixel = sourceData[sourceX];
+					}
+
+					if (ALPHA_BLENDING)
+					{
+						blendPixelAlpha((uint8*)&destData[destX], (uint8*)&pixel);
+					}
+					else
+					{
+						destData[destX] = pixel;
+					}
+				}
+
+				lastSourceY = sourceY;
+				lastDestData = destData;
+			}
 		}
 	}
 };

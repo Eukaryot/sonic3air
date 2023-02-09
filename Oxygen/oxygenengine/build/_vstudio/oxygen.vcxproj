@@ -64,7 +64,6 @@
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\opengl\Upscaler.cpp" />
-    <ClCompile Include="..\..\source\oxygen\drawing\software\BlitterOld.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawer.cpp" />
     <ClCompile Include="..\..\source\oxygen\drawing\software\SoftwareDrawerTexture.cpp" />
@@ -180,7 +179,6 @@
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLSpriteTextureManager.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\OpenGLTexture.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\opengl\Upscaler.h" />
-    <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterOld.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\BlitterHelper.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\Blitter.h" />
     <ClInclude Include="..\..\source\oxygen\drawing\software\SoftwareRasterizer.h" />

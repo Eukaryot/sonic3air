@@ -106,6 +106,73 @@ void Blitter::blitIndexed(const OutputWrapper& output, const IndexedSpriteWrappe
 	}
 }
 
+void Blitter::blitRectWithScaling(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, const Options& options)
+{
+	if (destBitmap.isEmpty() || sourceRect.isEmpty())
+		return;
+
+	if (nullptr == options.mTintColor)
+	{
+		if (options.mBlendMode != BlendMode::ALPHA)
+		{
+			// No blending
+			BlitterHelper::blitBitmapWithScaling<false, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+		}
+		else
+		{
+			// Alpha blending
+			BlitterHelper::blitBitmapWithScaling<true, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+		}
+	}
+	else
+	{
+		if (options.mBlendMode != BlendMode::ALPHA)
+		{
+			// No blending
+			BlitterHelper::blitBitmapWithScaling<false, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+		}
+		else
+		{
+			// Alpha blending
+			BlitterHelper::blitBitmapWithScaling<true, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+		}
+	}
+}
+
+void Blitter::blitRectWithUVs(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, const Options& options)
+{
+	if (destBitmap.isEmpty() || sourceRect.isEmpty())
+		return;
+
+	if (nullptr == options.mTintColor)
+	{
+		if (options.mBlendMode != BlendMode::ALPHA)
+		{
+			// No blending
+			BlitterHelper::blitBitmapWithUVs<false, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+		}
+		else
+		{
+			// Alpha blending
+			BlitterHelper::blitBitmapWithUVs<true, false>(destBitmap, destRect, sourceBitmap, sourceRect, 0xffffffff);
+		}
+	}
+	else
+	{
+		if (options.mBlendMode != BlendMode::ALPHA)
+		{
+			// No blending
+			BlitterHelper::blitBitmapWithUVs<false, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+		}
+		else
+		{
+			// Alpha blending
+			BlitterHelper::blitBitmapWithUVs<true, true>(destBitmap, destRect, sourceBitmap, sourceRect, options.mTintColor->getABGR32());
+		}
+	}
+}
+
+
 BitmapViewMutable<uint32> Blitter::makeTempBitmap(Vec2i size)
 {
 	mTempBitmapData.resize(size.x * size.y);

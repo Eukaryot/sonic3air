@@ -11,7 +11,6 @@
 #include "oxygen/drawing/software/SoftwareDrawerTexture.h"
 #include "oxygen/drawing/software/SoftwareRasterizer.h"
 #include "oxygen/drawing/software/Blitter.h"
-#include "oxygen/drawing/software/BlitterOld.h"
 #include "oxygen/drawing/DrawCollection.h"
 #include "oxygen/drawing/DrawCommand.h"
 #include "oxygen/application/EngineMain.h"
@@ -339,18 +338,17 @@ namespace softwaredrawer
 						setupRedBlueSwappedBitmapWrapper(inputWrapper);
 					}
 
-					// TODO: Extend the new blitter with the functionality needed below
-					BlitterOld::Options options;
-					options.mUseAlphaBlending = useAlphaBlending();
-					options.mTintColor = color;
+					Blitter::Options options;
+					options.mBlendMode = useAlphaBlending() ? BlendMode::ALPHA : BlendMode::OPAQUE;
+					options.mTintColor = (color == Color::WHITE) ? nullptr : &color;
 
 					if (useUVs)
 					{
-						BlitterOld::blitBitmapWithUVs(getOutputWrapper(), targetRect, inputWrapper, inputRect, options);
+						mBlitter.blitRectWithUVs(getOutputWrapper(), targetRect, inputWrapper, inputRect, options);
 					}
 					else
 					{
-						BlitterOld::blitBitmapWithScaling(getOutputWrapper(), targetRect, inputWrapper, inputRect, options);
+						mBlitter.blitRectWithScaling(getOutputWrapper(), targetRect, inputWrapper, inputRect, options);
 					}
 				}
 				else
@@ -502,9 +500,7 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 						mInternal.setupRedBlueSwappedBitmapWrapper(inputWrapper);
 					}
 
-					// TODO: Switch to new blitter, but this requires some optimizations there for this specific use-case
-					BlitterOld::Options options;
-					BlitterOld::blitBitmapWithScaling(outputWrapper, dc.mRect, inputWrapper, Recti(0, 0, inputWrapper.getSize().x, inputWrapper.getSize().y), options);
+					mInternal.mBlitter.blitRectWithScaling(outputWrapper, dc.mRect, inputWrapper, Recti(0, 0, inputWrapper.getSize().x, inputWrapper.getSize().y), Blitter::Options());
 				}
 				break;
 			}
