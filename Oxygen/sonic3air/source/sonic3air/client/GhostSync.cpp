@@ -158,6 +158,29 @@ bool GhostSync::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 {
 	switch (evaluation.mPacketType)
 	{
+		case network::ChannelErrorPacket::PACKET_TYPE:
+		{
+			network::ChannelErrorPacket packet;
+			if (!evaluation.readPacket(packet))
+				return false;
+
+			switch (packet.mErrorCode)
+			{
+				case network::ChannelErrorPacket::ErrorCode::UNKNOWN_CHANNEL:
+				case network::ChannelErrorPacket::ErrorCode::CHANNEL_NOT_JOINED:
+				{
+					// Re-join the channel if needed
+					const uint32 channelHash = packet.mParameter;
+					if (mState == State::JOINED_CHANNEL && channelHash == mJoinedChannelHash)
+					{
+						mState = State::READY_TO_JOIN;
+					}
+					break;
+				}
+			}
+			return true;
+		}
+
 		case network::ChannelMessagePacket::PACKET_TYPE:
 		{
 			network::ChannelMessagePacket packet;

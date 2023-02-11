@@ -110,6 +110,29 @@ namespace network
 
 
 	// Sent from client to server
+	struct ChannelErrorPacket : public highlevel::PacketBase
+	{
+		HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("ChannelErrorPacket");
+
+		enum class ErrorCode : uint8
+		{
+			UNKNOWN,
+			UNKNOWN_CHANNEL,
+			CHANNEL_NOT_JOINED
+		};
+
+		ErrorCode mErrorCode = ErrorCode::UNKNOWN;
+		uint32 mParameter = 0;
+
+		virtual void serializeContent(VectorBinarySerializer& serializer, uint8 protocolVersion) override
+		{
+			serializer.serializeAs<uint8>(mErrorCode);
+			serializer.serialize(mParameter);
+		}
+	};
+
+
+	// Sent from client to server
 	struct BroadcastChannelMessagePacket : public highlevel::PacketBase
 	{
 		HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("BroadcastChannelMessagePacket");

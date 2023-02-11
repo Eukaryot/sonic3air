@@ -322,6 +322,8 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 			{
 				// Find the connection in our list of active connections
 				connection = mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup];
+				if (nullptr != connection && connection->getLocalConnectionID() != localConnectionID)
+					connection = nullptr;
 			}
 
 			if (nullptr == connection)
@@ -330,19 +332,40 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 				if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
 				{
 					// It's an error packet, don't send anything back
-					// TODO: Evaluate the error code
 				}
 				else
 				{
-					// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+					// Send back an error packet
+					lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::CONNECTION_INVALID);
+					sendConnectionlessLowLevelPacket(errorPacket, senderAddress, 0, remoteConnectionID);
 				}
 			}
 			else
 			{
 				if (connection->getRemoteConnectionID() != remoteConnectionID && lowLevelSignature != lowlevel::AcceptConnectionPacket::SIGNATURE)
 				{
-					// Unknown or invalid connection
-					// TODO: Send back an error packet - or better enqueue a notice to send one (if this method is executed by a thread)
+					// Unknown connection
+					if (lowLevelSignature == lowlevel::ErrorPacket::SIGNATURE)
+					{
+						// Evaluate the error packet
+						lowlevel::ErrorPacket errorPacket;
+						errorPacket.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.mMinimum);
+						switch (errorPacket.mErrorCode)
+						{
+							case lowlevel::ErrorPacket::ErrorCode::CONNECTION_INVALID:
+							{
+								// Invalidate connection
+								connection->disconnect(NetConnection::DisconnectReason::UNKNOWN);
+								return;
+							}
+						}
+					}
+					else
+					{
+						// Send back an error packet
+						lowlevel::ErrorPacket errorPacket(lowlevel::ErrorPacket::ErrorCode::CONNECTION_INVALID);
+						sendConnectionlessLowLevelPacket(errorPacket, senderAddress, 0, remoteConnectionID);
+					}
 				}
 				else
 				{

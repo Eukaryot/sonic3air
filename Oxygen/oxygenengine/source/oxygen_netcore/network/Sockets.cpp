@@ -332,9 +332,7 @@ bool TCPSocket::acceptConnection(TCPSocket& outSocket)
 	fd_set socketSet;
 	FD_ZERO(&socketSet);
 	FD_SET(mInternal->mSocket, &socketSet);
-	timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 1000;
+	timeval timeout { 0, 0 };
 	const int result = ::select(0, &socketSet, nullptr, nullptr, &timeout);
 	if (result < 0)
 	{

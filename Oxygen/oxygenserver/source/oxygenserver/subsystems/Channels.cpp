@@ -28,22 +28,51 @@ bool Channels::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 			// TODO: Handle "packet.mIsReplicatedData" by saving the data inside the player data
 
 			Channel* channel = findChannel(packet.mChannelHash);
-			if (nullptr != channel && channel->mPlayers.size() >= 2)	// TODO: Make sure the sending player is inside the channel, otherwise the second check can make problems
+			if (nullptr == channel)
 			{
-				// Prepare the packet to send
-				network::ChannelMessagePacket broadcastedPacket;
-				static_cast<network::BroadcastChannelMessagePacket&>(broadcastedPacket) = packet;	// Copy all the shared members
-				broadcastedPacket.mSendingPlayerID = connection.getPlayerID();
-
-				// Broadcast unreliably if that's how the message got sent to the server
-				const NetConnection::SendFlags::Flags sendFlags = (evaluation.mUniquePacketID == 0) ? NetConnection::SendFlags::UNRELIABLE : NetConnection::SendFlags::NONE;
-
-				for (const PlayerData& playerData : channel->mPlayers)
+				// Send back an error
+				network::ChannelErrorPacket errorPacket;
+				errorPacket.mErrorCode = network::ChannelErrorPacket::ErrorCode::UNKNOWN_CHANNEL;
+				errorPacket.mParameter = packet.mChannelHash;
+				connection.sendPacket(errorPacket, NetConnection::SendFlags::UNRELIABLE);
+			}
+			else
+			{
+				bool playerIsInChannel = false;
+				for (const Channels::PlayerData& player : channel->mPlayers)
 				{
-					// Ignore the sending player
-					if (playerData.mServerNetConnection != &connection)
+					if (player.mServerNetConnection == &connection)
 					{
-						playerData.mServerNetConnection->sendPacket(broadcastedPacket, sendFlags);
+						playerIsInChannel = true;
+						break;
+					}
+				}
+
+				if (!playerIsInChannel)
+				{
+					// Send back an error
+					network::ChannelErrorPacket errorPacket;
+					errorPacket.mErrorCode = network::ChannelErrorPacket::ErrorCode::CHANNEL_NOT_JOINED;
+					errorPacket.mParameter = packet.mChannelHash;
+					connection.sendPacket(errorPacket, NetConnection::SendFlags::UNRELIABLE);
+				}
+				else if (channel->mPlayers.size() >= 2)
+				{
+					// Prepare the packet to send
+					network::ChannelMessagePacket broadcastedPacket;
+					static_cast<network::BroadcastChannelMessagePacket&>(broadcastedPacket) = packet;	// Copy all the shared members
+					broadcastedPacket.mSendingPlayerID = connection.getPlayerID();
+
+					// Broadcast unreliably if that's how the message got sent to the server
+					const NetConnection::SendFlags::Flags sendFlags = (evaluation.mUniquePacketID == 0) ? NetConnection::SendFlags::UNRELIABLE : NetConnection::SendFlags::NONE;
+
+					for (const PlayerData& playerData : channel->mPlayers)
+					{
+						// Ignore the sending player
+						if (playerData.mServerNetConnection != &connection)
+						{
+							playerData.mServerNetConnection->sendPacket(broadcastedPacket, sendFlags);
+						}
 					}
 				}
 			}

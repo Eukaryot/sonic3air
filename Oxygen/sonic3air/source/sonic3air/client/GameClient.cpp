@@ -160,8 +160,8 @@ void GameClient::updateNotConnected(uint64 currentTimestamp)
 
 	if (mServerConnection.getState() == NetConnection::State::DISCONNECTED)
 	{
-		// Try connecting once again after a minute
-		if (currentTimestamp > mLastConnectionAttemptTimestamp + 60000)
+		// Try connecting once again after 30 seconds
+		if (currentTimestamp > mLastConnectionAttemptTimestamp + 30000)
 		{
 			startConnectingToServer(currentTimestamp);
 		}
