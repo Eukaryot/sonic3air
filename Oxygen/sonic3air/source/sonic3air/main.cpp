@@ -51,6 +51,13 @@ int main(int argc, char** argv)
 	// Make sure we're in the correct working directory
 	PlatformFunctions::changeWorkingDirectory(arguments.mExecutableCallPath);
 
+#if defined(PLATFORM_WINDOWS)
+	// Check if the user has an old version of "audioremaster.bin", and remove it if that the case
+	//  -> As the newer installations don't include that file, it is most likely an out-dated one, and could cause problems (at least an assert) down the line
+	if (FTX::FileSystem->exists(L"data/audioremaster.bin"))
+		FTX::FileSystem->removeFile(L"data/audioremaster.bin");
+#endif
+
 #if !defined(PLATFORM_ANDROID)
 	if (arguments.mPack)
 	{

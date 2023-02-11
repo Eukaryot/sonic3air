@@ -224,6 +224,12 @@ namespace rmx
 		return false;
 	}
 
+	bool FileSystem::removeFile(std::wstring_view path)
+	{
+		// TODO: Use file providers here as well
+		return FileIO::removeFile(path);
+	}
+
 	bool FileSystem::exists(std::string_view path)
 	{
 		return exists(String(path).toStdWString());

@@ -351,6 +351,19 @@ namespace rmx
 	#endif
 	}
 
+	bool FileIO::removeFile(std::wstring_view path)
+	{
+	#if defined(USE_STD_FILESYSTEM) && !defined(PLATFORM_MAC)
+		const std_filesystem::path fspath(path);
+		std::error_code errorCode;
+		std_filesystem::remove(fspath, errorCode);
+		return !errorCode;
+	#else
+		RMX_ASSERT(false, "Not implemented: FileIO::removeFile");
+		return false;
+	#endif
+	}
+
 	void FileIO::createDirectory(std::wstring_view path)
 	{
 		createDir(path, true);

@@ -35,8 +35,9 @@ namespace rmx
 		static InputStream* createInputStream(std::wstring_view filename);
 
 		static bool renameFile(const std::wstring& oldFilename, const std::wstring& newFilename);
-
+		static bool removeFile(std::wstring_view path);
 		static void createDirectory(std::wstring_view path);
+
 		static void listFiles(std::wstring_view path, bool recursive, std::vector<FileEntry>& outFileEntries);
 		static void listFilesByMask(std::wstring_view filemask, bool recursive, std::vector<FileEntry>& outFileEntries);
 		static void listDirectories(std::wstring_view path, std::vector<std::wstring>& outDirectories);
