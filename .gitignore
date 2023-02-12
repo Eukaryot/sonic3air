@@ -95,3 +95,6 @@ framework/external/sdl/SDL2/Xcode/SDL/SDL.xcodeproj/xcuserdata
 framework/external/ogg-vorbis/libvorbis/xcode/build
 framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/project.xcworkspace/xcuserdata
 framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj/xcuserdata
+Oxygen/sonic3air/build/_xcode/build/XCBuildData
+Oxygen/sonic3air/build/_xcode/build/sonic3air.build
+framework/external/sdl/SDL2/Xcode/SDL/build/SDL.build

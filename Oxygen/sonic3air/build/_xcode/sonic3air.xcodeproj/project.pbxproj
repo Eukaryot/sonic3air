@@ -1363,11 +1363,6 @@
 		9ED1832528789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
 		9ED1832628789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
 		9ED1832728789ED000506AEB /* PaletteSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831528789ED000506AEB /* PaletteSprite.cpp */; };
-		9ED1832828789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
-		9ED1832928789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
-		9ED1832A28789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
-		9ED1832B28789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
-		9ED1832C28789ED000506AEB /* SpriteBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1831728789ED000506AEB /* SpriteBase.cpp */; };
 		9ED1833D28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
 		9ED1833E28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
 		9ED1833F28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833028789EFF00506AEB /* OpenGLRenderer.cpp */; };
@@ -1643,6 +1638,9 @@
 		9E49B9BA260C31B300719EC5 /* OxygenMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OxygenMenu.h; sourceTree = "<group>"; };
 		9E49B9BB260C31B300719EC5 /* MenuItems.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuItems.h; sourceTree = "<group>"; };
 		9E49B9BC260C31B300719EC5 /* GameSetupScreen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameSetupScreen.cpp; sourceTree = "<group>"; };
+		9E5703D52999641400186F04 /* BitmapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitmapView.h; sourceTree = "<group>"; };
+		9E5703E52999645300186F04 /* BlitterHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlitterHelper.h; sourceTree = "<group>"; };
+		9E5703E62999647000186F04 /* RenderingDefinitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderingDefinitions.h; sourceTree = "<group>"; };
 		9E5FD82327EC041600CD430A /* SDL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDL.xcodeproj; path = ../../../../framework/external/sdl/SDL2/Xcode/SDL/SDL.xcodeproj; sourceTree = "<group>"; };
 		9E64752527DB059600612BC4 /* sonic3air-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "sonic3air-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E64753327DB059800612BC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -2246,7 +2244,6 @@
 		9ED1831428789ED000506AEB /* SpriteDump.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteDump.h; sourceTree = "<group>"; };
 		9ED1831528789ED000506AEB /* PaletteSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PaletteSprite.cpp; sourceTree = "<group>"; };
 		9ED1831628789ED000506AEB /* SpriteBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteBase.h; sourceTree = "<group>"; };
-		9ED1831728789ED000506AEB /* SpriteBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteBase.cpp; sourceTree = "<group>"; };
 		9ED1831828789ED000506AEB /* ComponentSprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComponentSprite.h; sourceTree = "<group>"; };
 		9ED1832E28789EFF00506AEB /* OpenGLRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLRenderer.h; sourceTree = "<group>"; };
 		9ED1832F28789EFF00506AEB /* OpenGLRenderResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLRenderResources.h; sourceTree = "<group>"; };
@@ -3076,14 +3073,15 @@
 		9E6E852D245F89C300114DEB /* software */ = {
 			isa = PBXGroup;
 			children = (
-				9E6E852E245F89C300114DEB /* SoftwareDrawerTexture.cpp */,
-				9E6E852F245F89C300114DEB /* Blitter.h */,
 				9E6E8530245F89C300114DEB /* Blitter.cpp */,
-				9E6E8531245F89C300114DEB /* SoftwareRasterizer.h */,
-				9E6E8532245F89C300114DEB /* SoftwareRasterizer.cpp */,
-				9E6E8533245F89C300114DEB /* SoftwareDrawer.h */,
+				9E6E852F245F89C300114DEB /* Blitter.h */,
+				9E5703E52999645300186F04 /* BlitterHelper.h */,
 				9E6E8534245F89C300114DEB /* SoftwareDrawer.cpp */,
+				9E6E8533245F89C300114DEB /* SoftwareDrawer.h */,
+				9E6E852E245F89C300114DEB /* SoftwareDrawerTexture.cpp */,
 				9E6E8535245F89C300114DEB /* SoftwareDrawerTexture.h */,
+				9E6E8532245F89C300114DEB /* SoftwareRasterizer.cpp */,
+				9E6E8531245F89C300114DEB /* SoftwareRasterizer.h */,
 			);
 			path = software;
 			sourceTree = "<group>";
@@ -3187,6 +3185,7 @@
 				9ED1832D28789EFF00506AEB /* opengl */,
 				9E6E8595245F89C400114DEB /* parts */,
 				9E6E8580245F89C400114DEB /* Renderer.h */,
+				9E5703E62999647000186F04 /* RenderingDefinitions.h */,
 				9E6E856F245F89C300114DEB /* RenderResources.cpp */,
 				9E6E856D245F89C300114DEB /* RenderResources.h */,
 				9E6E8592245F89C400114DEB /* software */,
@@ -3568,6 +3567,7 @@
 				9EBAFA7B2980D5E6004F13AA /* BitmapCodecJPG.cpp */,
 				9EBAFA7C2980D5E6004F13AA /* BitmapCodecPNG.cpp */,
 				9EBAFA7F2980D5E6004F13AA /* BitmapCodecs.h */,
+				9E5703D52999641400186F04 /* BitmapView.h */,
 				9EBAFA7A2980D5E6004F13AA /* Color.cpp */,
 				9EBAFA792980D5E6004F13AA /* Color.h */,
 			);
@@ -3837,7 +3837,6 @@
 				9ED1831428789ED000506AEB /* SpriteDump.h */,
 				9ED1831528789ED000506AEB /* PaletteSprite.cpp */,
 				9ED1831628789ED000506AEB /* SpriteBase.h */,
-				9ED1831728789ED000506AEB /* SpriteBase.cpp */,
 				9ED1831828789ED000506AEB /* ComponentSprite.h */,
 			);
 			path = sprite;
@@ -4324,7 +4323,6 @@
 				9E0C5EFC247DD82F000105D0 /* Runtime.cpp in Sources */,
 				9EBAFAC82980D5E6004F13AA /* FileIO.cpp in Sources */,
 				9E0C5EC5247DD749000105D0 /* DebugSidePanelCategory.cpp in Sources */,
-				9ED1832A28789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9E0C5F06247DDF81000105D0 /* Node.cpp in Sources */,
 				9E0C5EB4247DD705000105D0 /* RenderUtils.cpp in Sources */,
 				9ED1832528789ED000506AEB /* PaletteSprite.cpp in Sources */,
@@ -4558,7 +4556,6 @@
 				9E1D5FAE2475733F003B1774 /* PaletteManager.cpp in Sources */,
 				9E1D5FAF2475733F003B1774 /* RenderParts.cpp in Sources */,
 				9EBAFAD12980D5E6004F13AA /* FileSystem.cpp in Sources */,
-				9ED1832928789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9EBAFAD62980D5E6004F13AA /* FileHandle.cpp in Sources */,
 				9E0CCAE42518FE7C0007288E /* NativizedOpcodeProvider.cpp in Sources */,
 				9E1D5FB02475733F003B1774 /* ROMDataAnalyser.cpp in Sources */,
@@ -4757,7 +4754,6 @@
 				9EBAFAA72980D5E6004F13AA /* OneTimeAllocPool.cpp in Sources */,
 				9E5FD8BB27EC0A3F00CD430A /* NativizedCode.cpp in Sources */,
 				9EBAFABB2980D5E6004F13AA /* ZlibDeflate.cpp in Sources */,
-				9ED1832C28789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9ED1831D28789ED000506AEB /* ComponentSprite.cpp in Sources */,
 				9E5FD8E527EC0C1900CD430A /* Operators.cpp in Sources */,
 				9EBAFB6E2980D63E004F13AA /* Framebuffer.cpp in Sources */,
@@ -5120,7 +5116,6 @@
 				9E6E8620245F89C400114DEB /* PaletteManager.cpp in Sources */,
 				9E6E861F245F89C400114DEB /* RenderParts.cpp in Sources */,
 				9EBAFAD02980D5E6004F13AA /* FileSystem.cpp in Sources */,
-				9ED1832828789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9EBAFAD52980D5E6004F13AA /* FileHandle.cpp in Sources */,
 				9E0CCAE32518FE7C0007288E /* NativizedOpcodeProvider.cpp in Sources */,
 				9E6E85FF245F89C400114DEB /* ROMDataAnalyser.cpp in Sources */,
@@ -5299,7 +5294,6 @@
 				9EBAFB052980D5E6004F13AA /* BitmapCodecJPG.cpp in Sources */,
 				9EBAFB0A2980D5E6004F13AA /* BitmapCodecPNG.cpp in Sources */,
 				9EC668C825D779C000A42FC2 /* InputManager.cpp in Sources */,
-				9ED1832B28789ED000506AEB /* SpriteBase.cpp in Sources */,
 				9EB069B4248088B20080AC49 /* GlobalsLookup.cpp in Sources */,
 				9EBAFA2A2980D527004F13AA /* BuiltInFunctions.cpp in Sources */,
 				9EB069DA248088B20080AC49 /* OggLoader.cpp in Sources */,
@@ -5679,6 +5673,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.09.10.0;
@@ -5725,6 +5720,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
 				MARKETING_VERSION = 22.09.10.0;

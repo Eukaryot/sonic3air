@@ -679,13 +679,16 @@ bool UDPSocket::sendData(const uint8* data, size_t length, const SocketAddress& 
 {
 	if (!isValid())
 		return false;
-
-	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, (sockaddr*)destinationAddress.getSockAddr(), (int)sizeof(sockaddr_storage));
+	
+	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, (sockaddr*)destinationAddress.getSockAddr(), (int)sizeof(sockaddr));
 	if (result >= 0)
 		return true;
 
 #ifdef _WIN32
 	const int errorCode = WSAGetLastError();
+	RMX_LOG_INFO("sendto failed with error: " << errorCode);
+#else
+	const int errorCode = errno;
 	RMX_LOG_INFO("sendto failed with error: " << errorCode);
 #endif
 	return false;
@@ -760,7 +763,7 @@ bool UDPSocket::receiveInternal(ReceiveResult& outReceiveResult)
 		outReceiveResult.mBuffer.resize(bytesRead + CHUNK_SIZE);
 
 		sockaddr_storage& senderAddr = *reinterpret_cast<sockaddr_storage*>(outReceiveResult.mSenderAddress.accessSockAddr());
-		socklen_t senderAddrSize = sizeof(sockaddr_storage);
+		socklen_t senderAddrSize = sizeof(sockaddr);
 		const int result = ::recvfrom(mInternal->mSocket, (char*)&outReceiveResult.mBuffer[bytesRead], CHUNK_SIZE, 0, (sockaddr*)&senderAddr, &senderAddrSize);
 		if (result < 0)
 		{
