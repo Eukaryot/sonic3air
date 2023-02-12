@@ -366,8 +366,7 @@ function void UpdateTimeAndHud()
 
 			if (!global.game.paused)
 			{
-				A1 = 0xfffffe26
-				--A1
+				A1 = addressof(timer.alldata) + 3
 				++u8[A1]
 				if (u8[A1] >= 60)
 				{

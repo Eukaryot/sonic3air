@@ -275,7 +275,6 @@ function void UpdateGamePause()
 	}
 
 #if GAMEAPP
-	// In game app, global.game.paused will never be true -- instead, the whole script execution will get paused
 
 	// Start button pressed?
 	if (control.pad1.pressed & CONTROL_START)
@@ -295,6 +294,7 @@ function void UpdateGamePause()
 		}
 		else
 		{
+			global.game.paused = true
 			bool canRestart = !global.pause_disabled && (global.game_mode == 0x0c && global.stage_type == 0 && u8[0xffffb000 + 0x05] <= 0x04) && !competition_mode.active
 			Game.onGamePause(canRestart)
 
@@ -302,6 +302,7 @@ function void UpdateGamePause()
 			waitForNextFrame()
 
 			Standalone.onResumeAfterPause()
+			global.game.paused = false
 
 			// Fix for brief glitch in Blue Spheres special stage
 			if (global.game_mode == 0x34)
