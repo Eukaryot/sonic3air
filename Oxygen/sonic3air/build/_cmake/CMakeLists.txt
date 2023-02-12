@@ -34,6 +34,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")		# Full optimization
 	add_compile_options(-Wno-psabi)
 
+	# Needed under Linux to avoid link error from minizip: "relocation r_x86_64_pc32 against symbol `_length_code' can not be used when making a shared object; recompile with -fpic"
+	if (UNIX)
+		set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+	endif()
+
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 	# Clang only
