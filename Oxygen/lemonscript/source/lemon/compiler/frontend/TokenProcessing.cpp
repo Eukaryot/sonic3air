@@ -179,6 +179,11 @@ namespace lemon
 				{
 					const uint64 nameHash = identifierToken.mName.getHash();
 					identifierToken.mResolved = mGlobalsLookup.resolveIdentifierByHash(nameHash);
+					if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::DATA_TYPE)
+					{
+						VarTypeToken& varTypeToken = tokens.createReplaceAt<VarTypeToken>(i);
+						varTypeToken.mDataType = &identifierToken.mResolved->as<const DataTypeDefinition>();
+					}
 					anyResolved = true;
 				}
 			}
@@ -203,6 +208,12 @@ namespace lemon
 		const TypeCasting::CastHandling castHandling = TypeCasting(mCompileOptions).getCastHandling(constantToken.mDataType, targetDataType, false);
 		switch (castHandling.mResult)
 		{
+			case TypeCasting::CastHandling::Result::NO_CAST:
+			{
+				// No cast needed
+				break;
+			}
+
 			case TypeCasting::CastHandling::Result::BASE_CAST:
 			{
 				switch (castHandling.mBaseCastType)
@@ -1364,9 +1375,24 @@ namespace lemon
 					const std::vector<TypeCasting::BinaryOperatorSignature>& signatures = TypeCasting::getBinarySignaturesForOperator(bot.mOperator);
 					const bool exactMatchLeftRequired = (OperatorHelper::getOperatorType(bot.mOperator) == OperatorHelper::OperatorType::ASSIGNMENT);
 					const std::optional<size_t> bestIndex = mTypeCasting.getBestOperatorSignature(signatures, exactMatchLeftRequired, leftDataType, rightDataType);
-					CHECK_ERROR(bestIndex.has_value(), "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(bot.mOperator) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
-					signature = &signatures[*bestIndex];
-					// If needed later, store the index in the token - this indirectly gives access to the chosen signature again
+					if (bestIndex.has_value())
+					{
+						signature = &signatures[*bestIndex];
+						// If needed later, store the index in the token - this indirectly gives access to the chosen signature again
+					}
+					else
+					{
+						// Special handling for assignment of the same type
+						if (leftDataType == rightDataType && bot.mOperator == Operator::ASSIGN)
+						{
+							static TypeCasting::BinaryOperatorSignature directSignature(leftDataType, rightDataType, leftDataType);
+							signature = &directSignature;
+						}
+						else
+						{
+							CHECK_ERROR(false, "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(bot.mOperator) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
+						}
+					}
 				}
 
 				token.mDataType = signature->mResult;

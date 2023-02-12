@@ -14,8 +14,9 @@
 
 namespace lemon
 {
-
+	class GlobalsLookup;
 	class Variable;
+
 
 	class API_EXPORT Token : public genericmanager::Element<Token>
 	{
@@ -82,12 +83,12 @@ namespace lemon
 	class TokenSerializer
 	{
 	public:
-		static void serializeToken(VectorBinarySerializer& serializer, TokenPtr<Token>& token);
-		static void serializeToken(VectorBinarySerializer& serializer, TokenPtr<StatementToken>& token);
-		static void serializeTokenList(VectorBinarySerializer& serializer, TokenList& tokenList);
+		static void serializeToken(VectorBinarySerializer& serializer, TokenPtr<Token>& token, const GlobalsLookup& globalsLookup);
+		static void serializeToken(VectorBinarySerializer& serializer, TokenPtr<StatementToken>& token, const GlobalsLookup& globalsLookup);
+		static void serializeTokenList(VectorBinarySerializer& serializer, TokenList& tokenList, const GlobalsLookup& globalsLookup);
 
 	private:
-		static void serializeTokenData(VectorBinarySerializer& serializer, Token& token);
+		static void serializeTokenData(VectorBinarySerializer& serializer, Token& token, const GlobalsLookup& globalsLookup);
 	};
 
 }

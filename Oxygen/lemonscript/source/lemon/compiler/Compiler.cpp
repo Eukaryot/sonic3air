@@ -239,7 +239,7 @@ namespace lemon
 		// Backend part: Compile function contents into opcodes
 		for (FunctionNode* node : functionNodes)
 		{
-			FunctionCompiler functionCompiler(*node->mFunction, mCompileOptions);
+			FunctionCompiler functionCompiler(*node->mFunction, mCompileOptions, mGlobalsLookup);
 			functionCompiler.processParameters();
 			functionCompiler.buildOpcodesForFunction(*node->mContent);
 		}

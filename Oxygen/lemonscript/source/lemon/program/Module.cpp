@@ -72,6 +72,13 @@ namespace lemon
 		// String literals
 		mStringLiterals.clear();
 
+		// Data types
+		for (const CustomDataType* customDataType : mDataTypes)
+		{
+			delete customDataType;
+		}
+		mDataTypes.clear();
+
 		// Clear source file infos
 		mSourceFileInfoPool.clear();
 		mAllSourceFiles.clear();
@@ -96,6 +103,11 @@ namespace lemon
 		if (mConstantArrays.empty())
 		{
 			mFirstConstantArrayID = globalsLookup.mNextConstantArrayID;
+		}
+
+		if (mDataTypes.empty())
+		{
+			mFirstDataTypeID = (uint16)globalsLookup.mDataTypes.size();
 		}
 	}
 
@@ -394,15 +406,23 @@ namespace lemon
 		mStringLiterals.push_back(str);
 	}
 
+	const CustomDataType* Module::addDataType(const char* name, BaseType baseType)
+	{
+		const uint16 id = mFirstDataTypeID + (uint16)mDataTypes.size();
+		CustomDataType* customDataType = new CustomDataType(name, id, baseType);
+		mDataTypes.push_back(customDataType);
+		return customDataType;
+	}
+
 	uint32 Module::buildDependencyHash() const
 	{
 		// Just a very simple "hash" that changes when a new definition gets added
 		return (uint32)(mFunctions.size() + mGlobalVariables.size() + mConstants.size() + mConstantArrays.size() + mDefines.size() + mStringLiterals.size());
 	}
 
-	bool Module::serialize(VectorBinarySerializer& outerSerializer, uint32 dependencyHash, uint32 appVersion)
+	bool Module::serialize(VectorBinarySerializer& outerSerializer, const GlobalsLookup& globalsLookup, uint32 dependencyHash, uint32 appVersion)
 	{
-		return ModuleSerializer::serialize(*this, outerSerializer, dependencyHash, appVersion);
+		return ModuleSerializer::serialize(*this, outerSerializer, globalsLookup, dependencyHash, appVersion);
 	}
 
 }

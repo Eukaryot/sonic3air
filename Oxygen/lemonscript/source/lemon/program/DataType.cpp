@@ -21,22 +21,15 @@ namespace lemon
 	}
 
 
-	uint32 IntegerDataType::getDataTypeHash() const
+	uint16 StringDataType::getDataTypeHash() const
 	{
-		static const constexpr uint32 baseHash = ((uint32)Class::INTEGER) << 24;
-		switch (mSemantics)
-		{
-			case IntegerDataType::Semantics::BOOLEAN:	return baseHash + (uint32)BaseType::BOOL;
-			case IntegerDataType::Semantics::CONSTANT:	return baseHash + (uint32)BaseType::INT_CONST;
-			default:									return baseHash + (uint32)getBytes() + ((uint32)mIsSigned * 0x80);
-		}
+		return PredefinedDataTypes::UINT_64.getID();
 	}
 
-	uint32 FloatDataType::getDataTypeHash() const
-	{
-		static const constexpr uint32 baseHash = ((uint32)Class::FLOAT) << 24;
-		return baseHash + (uint32)getBytes();
-	}
+
+	CustomDataType::CustomDataType(const char* name, uint16 id, BaseType baseType) :
+		DataTypeDefinition(name, id, Class::CUSTOM, DataTypeHelper::getSizeOfBaseType(baseType), baseType)
+	{}
 
 
 	size_t DataTypeHelper::getSizeOfBaseType(BaseType baseType)
@@ -77,92 +70,35 @@ namespace lemon
 		}
 	}
 
+	void PredefinedDataTypes::collectPredefinedDataTypes(std::vector<const DataTypeDefinition*>& outDataTypes)
+	{
+		outDataTypes.clear();
+		outDataTypes.push_back(&PredefinedDataTypes::VOID);
+		outDataTypes.push_back(&PredefinedDataTypes::ANY);
+		outDataTypes.push_back(&PredefinedDataTypes::UINT_8);
+		outDataTypes.push_back(&PredefinedDataTypes::UINT_16);
+		outDataTypes.push_back(&PredefinedDataTypes::UINT_32);
+		outDataTypes.push_back(&PredefinedDataTypes::UINT_64);
+		outDataTypes.push_back(&PredefinedDataTypes::INT_8);
+		outDataTypes.push_back(&PredefinedDataTypes::INT_16);
+		outDataTypes.push_back(&PredefinedDataTypes::INT_32);
+		outDataTypes.push_back(&PredefinedDataTypes::INT_64);
+		outDataTypes.push_back(&PredefinedDataTypes::CONST_INT);
+		//outDataTypes.push_back(&PredefinedDataTypes::BOOL);
+		outDataTypes.push_back(&PredefinedDataTypes::FLOAT);
+		outDataTypes.push_back(&PredefinedDataTypes::DOUBLE);
+		outDataTypes.push_back(&PredefinedDataTypes::STRING);
+
+	#ifdef DEBUG
+		for (size_t i = 0; i < outDataTypes.size(); ++i)
+			RMX_ASSERT(outDataTypes[i]->getID() == (uint16)i, "Discrepancy in data type IDs for predefined data type");
+	#endif
+	}
+
 	bool DataTypeHelper::isPureIntegerBaseCast(BaseCastType baseCastType)
 	{
 		const uint8 value = (uint8)baseCastType;
 		return (value > 0 && value < 0x20);
-	}
-
-
-	const DataTypeDefinition* DataTypeSerializer::getDataTypeFromSerializedId(uint8 dataTypeId)
-	{
-		// TODO: We definitely need a more sophisticated serialization to support more data types
-		if (dataTypeId == 0x41)			// Some dumb placeholder magic number for any
-		{
-			return &PredefinedDataTypes::ANY;
-		}
-		else if (dataTypeId == 0x40)	// Some dumb placeholder magic number for string
-		{
-			return &PredefinedDataTypes::STRING;
-		}
-		else
-		{
-			const BaseType baseType = (BaseType)dataTypeId;
-			switch (baseType)
-			{
-				case BaseType::VOID:		return &PredefinedDataTypes::VOID;
-				case BaseType::UINT_8:		return &PredefinedDataTypes::UINT_8;
-				case BaseType::UINT_16:		return &PredefinedDataTypes::UINT_16;
-				case BaseType::UINT_32:		return &PredefinedDataTypes::UINT_32;
-				case BaseType::UINT_64:		return &PredefinedDataTypes::UINT_64;
-				case BaseType::INT_8:		return &PredefinedDataTypes::INT_8;
-				case BaseType::INT_16:		return &PredefinedDataTypes::INT_16;
-				case BaseType::INT_32:		return &PredefinedDataTypes::INT_32;
-				case BaseType::INT_64:		return &PredefinedDataTypes::INT_64;
-				//case BaseType::BOOL:
-				case BaseType::INT_CONST:	return &PredefinedDataTypes::CONST_INT;
-				case BaseType::FLOAT:		return &PredefinedDataTypes::FLOAT;
-				case BaseType::DOUBLE:		return &PredefinedDataTypes::DOUBLE;
-				default:					return &PredefinedDataTypes::VOID;
-			}
-		}
-	}
-
-	uint8 DataTypeSerializer::getSerializedIdForDataType(const DataTypeDefinition* const dataTypeDefinition)
-	{
-		// TODO: We definitely need a more sophisticated serialization to support more data types
-		if (nullptr == dataTypeDefinition)
-		{
-			return 0;
-		}
-		else if (dataTypeDefinition == &PredefinedDataTypes::ANY)
-		{
-			return 0x41;	// The same dumb magic number as above
-		}
-		else if (dataTypeDefinition == &PredefinedDataTypes::STRING)
-		{
-			return 0x40;	// The same dumb magic number as above
-		}
-		else if (dataTypeDefinition->getClass() == DataTypeDefinition::Class::INTEGER && dataTypeDefinition->as<IntegerDataType>().mSemantics == IntegerDataType::Semantics::BOOLEAN)
-		{
-			return (uint8)BaseType::BOOL;
-		}
-		else
-		{
-			return (uint8)dataTypeDefinition->getBaseType();
-		}
-	}
-
-	const DataTypeDefinition* DataTypeSerializer::readDataType(VectorBinarySerializer& serializer)
-	{
-		return getDataTypeFromSerializedId(serializer.read<uint8>());
-	}
-
-	void DataTypeSerializer::writeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition* const dataTypeDefinition)
-	{
-		serializer.write<uint8>(getSerializedIdForDataType(dataTypeDefinition));
-	}
-
-	void DataTypeSerializer::serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition)
-	{
-		if (serializer.isReading())
-		{
-			dataTypeDefinition = readDataType(serializer);
-		}
-		else
-		{
-			writeDataType(serializer, dataTypeDefinition);
-		}
 	}
 
 }

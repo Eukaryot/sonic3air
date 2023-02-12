@@ -38,16 +38,18 @@ namespace lemon
 				VARIABLE,
 				CONSTANT,
 				CONSTANT_ARRAY,
-				DEFINE
+				DEFINE,
+				DATA_TYPE
 			};
 
 			inline Type getType() const  { return mType; }
 			inline bool isValid() const  { return mType != Type::UNDEFINED; }
 
-			inline void set(Variable* variable)			  { mType = Type::VARIABLE;		  mPointer = variable; }
-			inline void set(Constant* constant)			  { mType = Type::CONSTANT;		  mPointer = constant; }
-			inline void set(ConstantArray* constantArray) { mType = Type::CONSTANT_ARRAY; mPointer = constantArray; }
-			inline void set(Define* define)				  { mType = Type::DEFINE;		  mPointer = define; }
+			inline void set(Variable* variable)					{ mType = Type::VARIABLE;		mPointer = variable; }
+			inline void set(Constant* constant)					{ mType = Type::CONSTANT;		mPointer = constant; }
+			inline void set(ConstantArray* constantArray)		{ mType = Type::CONSTANT_ARRAY;	mPointer = constantArray; }
+			inline void set(Define* define)						{ mType = Type::DEFINE;			mPointer = define; }
+			inline void set(const DataTypeDefinition* dataType)	{ mType = Type::DATA_TYPE;		mPointer = dataType; }
 
 			template<typename T> const T& as() const  { return *static_cast<const T*>(mPointer); }
 
@@ -57,6 +59,8 @@ namespace lemon
 		};
 
 	public:
+		GlobalsLookup();
+
 		void clear();
 		void addDefinitionsFromModule(const Module& module);
 
@@ -83,6 +87,12 @@ namespace lemon
 		// String literals
 		const FlyweightString* getStringLiteralByHash(uint64 hash) const;
 
+		// Data types
+		inline const std::vector<const DataTypeDefinition*>& getDataTypes() const  { return mDataTypes; }
+		void registerDataType(const CustomDataType* dataTypeDefinition);
+		const DataTypeDefinition* readDataType(VectorBinarySerializer& serializer) const;
+		void serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition) const;
+
 	private:
 		// All identifiers
 		std::unordered_map<uint64, Identifier> mAllIdentifiers;
@@ -100,6 +110,9 @@ namespace lemon
 
 		// String literals
 		StringLookup mStringLiterals;
+
+		// Data types
+		std::vector<const DataTypeDefinition*> mDataTypes;
 	};
 
 }

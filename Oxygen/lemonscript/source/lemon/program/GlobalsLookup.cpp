@@ -13,6 +13,18 @@
 
 namespace lemon
 {
+	namespace
+	{
+		const size_t NUM_PREDEFINED_DATA_TYPES = 14;
+	}
+
+
+	GlobalsLookup::GlobalsLookup()
+	{
+		// Add predefined data types
+		PredefinedDataTypes::collectPredefinedDataTypes(mDataTypes);
+		RMX_ASSERT(mDataTypes.size() == NUM_PREDEFINED_DATA_TYPES, "Wrong number of predefined data types");
+	}
 
 	void GlobalsLookup::clear()
 	{
@@ -22,6 +34,9 @@ namespace lemon
 		mNextFunctionID = 0;
 		mNextVariableID = 0;
 		mNextConstantArrayID = 0;
+
+		// Clear all data types except for the predefined ones
+		mDataTypes.resize(NUM_PREDEFINED_DATA_TYPES);
 	}
 
 	void GlobalsLookup::addDefinitionsFromModule(const Module& module)
@@ -50,6 +65,10 @@ namespace lemon
 		for (Define* define : module.mDefines)
 		{
 			registerDefine(*define);
+		}
+		for (const CustomDataType* dataType : module.mDataTypes)
+		{
+			registerDataType(dataType);
 		}
 
 		RMX_ASSERT(mNextFunctionID == module.mFirstFunctionID, "Mismatch in function ID when adding module '" << module.getModuleName() << "' (" << mNextFunctionID << " vs. " << module.mFirstFunctionID << ")");
@@ -131,6 +150,33 @@ namespace lemon
 	const FlyweightString* GlobalsLookup::getStringLiteralByHash(uint64 hash) const
 	{
 		return mStringLiterals.getStringByHash(hash);
+	}
+
+	void GlobalsLookup::registerDataType(const CustomDataType* dataTypeDefinition)
+	{
+		RMX_ASSERT(dataTypeDefinition->getID() == mDataTypes.size(), "Wrong data type ID");
+		mDataTypes.push_back(dataTypeDefinition);
+		mAllIdentifiers[dataTypeDefinition->getName().getHash()].set(dataTypeDefinition);
+	}
+
+	const DataTypeDefinition* GlobalsLookup::readDataType(VectorBinarySerializer& serializer) const
+	{
+		uint16 index = serializer.read<uint16>();
+		if (index >= mDataTypes.size())
+			index = 0;
+		return mDataTypes[index];
+	}
+
+	void GlobalsLookup::serializeDataType(VectorBinarySerializer& serializer, const DataTypeDefinition*& dataTypeDefinition) const
+	{
+		if (serializer.isReading())
+		{
+			dataTypeDefinition = readDataType(serializer);
+		}
+		else
+		{
+			serializer.write<uint16>((nullptr == dataTypeDefinition) ? 0 : dataTypeDefinition->getID());
+		}
 	}
 
 }

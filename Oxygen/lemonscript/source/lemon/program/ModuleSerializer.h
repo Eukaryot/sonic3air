@@ -13,14 +13,15 @@
 
 namespace lemon
 {
+	class GlobalsLookup;
 	class Module;
 
 	class ModuleSerializer
 	{
 	public:
-		static bool serialize(Module& module, VectorBinarySerializer& outerSerializer, uint32 dependencyHash, uint32 appVersion);
+		static bool serialize(Module& module, VectorBinarySerializer& outerSerializer, const GlobalsLookup& globalsLookup, uint32 dependencyHash, uint32 appVersion);
 
 	private:
-		static void serializeFunctions(Module& module, VectorBinarySerializer& serializer);
+		static void serializeFunctions(Module& module, VectorBinarySerializer& serializer, const GlobalsLookup& globalsLookup);
 	};
 }

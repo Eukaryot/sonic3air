@@ -9,6 +9,7 @@
 #include "lemon/pch.h"
 #include "lemon/program/ModuleSerializer.h"
 #include "lemon/program/Module.h"
+#include "lemon/program/GlobalsLookup.h"
 
 
 namespace lemon
@@ -58,7 +59,7 @@ namespace lemon
 	}
 
 
-	bool ModuleSerializer::serialize(Module& module, VectorBinarySerializer& outerSerializer, uint32 dependencyHash, uint32 appVersion)
+	bool ModuleSerializer::serialize(Module& module, VectorBinarySerializer& outerSerializer, const GlobalsLookup& globalsLookup, uint32 dependencyHash, uint32 appVersion)
 	{
 		// Format version history:
 		//  - 0x00 = First version, no signature yet
@@ -173,7 +174,7 @@ namespace lemon
 		}
 
 		// Serialize functions
-		serializeFunctions(module, serializer);
+		serializeFunctions(module, serializer, globalsLookup);
 
 		// Serialize global variables
 		if (serializer.isReading())
@@ -186,7 +187,7 @@ namespace lemon
 			{
 				FlyweightString name;
 				name.serialize(serializer);
-				const DataTypeDefinition* dataType = DataTypeSerializer::readDataType(serializer);
+				const DataTypeDefinition* dataType = globalsLookup.readDataType(serializer);
 				const int64 initialValue = serializer.read<int64>();
 				GlobalVariable& globalVariable = module.addGlobalVariable(name, dataType);
 				globalVariable.mInitialValue = initialValue;
@@ -213,7 +214,7 @@ namespace lemon
 				const GlobalVariable& globalVariable = static_cast<const GlobalVariable&>(variable);
 
 				variable.getName().serialize(serializer);
-				DataTypeSerializer::writeDataType(serializer, variable.getDataType());
+				serializer.write(variable.getDataType()->getID());
 				serializer.writeAs<int64>(globalVariable.mInitialValue);
 			}
 		}
@@ -229,7 +230,7 @@ namespace lemon
 				{
 					FlyweightString name;
 					name.serialize(serializer);
-					const DataTypeDefinition* dataType = DataTypeSerializer::readDataType(serializer);
+					const DataTypeDefinition* dataType = globalsLookup.readDataType(serializer);
 					const uint64 value = serializer.read<uint64>();
 					module.addConstant(name, dataType, AnyBaseValue(value));
 				}
@@ -239,7 +240,7 @@ namespace lemon
 				for (Constant* constant : module.mConstants)
 				{
 					constant->getName().write(serializer);
-					DataTypeSerializer::writeDataType(serializer, constant->getDataType());
+					serializer.write(constant->getDataType()->getID());
 					serializer.write(constant->mValue.get<uint64>());
 				}
 			}
@@ -257,7 +258,7 @@ namespace lemon
 				{
 					FlyweightString name;
 					name.serialize(serializer);
-					const DataTypeDefinition* dataType = DataTypeSerializer::readDataType(serializer);
+					const DataTypeDefinition* dataType = globalsLookup.readDataType(serializer);
 					ConstantArray& constantArray = module.addConstantArray(name, dataType, nullptr, 0, i < numGlobalConstantArrays);
 					constantArray.serializeData(serializer);
 				}
@@ -268,7 +269,7 @@ namespace lemon
 				for (ConstantArray* constantArray : module.mConstantArrays)
 				{
 					constantArray->getName().write(serializer);
-					DataTypeSerializer::writeDataType(serializer, constantArray->getElementDataType());
+					serializer.write(constantArray->getElementDataType()->getID());
 					constantArray->serializeData(serializer);
 				}
 			}
@@ -285,10 +286,10 @@ namespace lemon
 				{
 					FlyweightString name;
 					name.serialize(serializer);
-					const DataTypeDefinition* dataType = DataTypeSerializer::readDataType(serializer);
+					const DataTypeDefinition* dataType = globalsLookup.readDataType(serializer);
 
 					Define& define = module.addDefine(name, dataType);
-					TokenSerializer::serializeTokenList(serializer, define.mContent);
+					TokenSerializer::serializeTokenList(serializer, define.mContent, globalsLookup);
 				}
 			}
 			else
@@ -296,9 +297,8 @@ namespace lemon
 				for (Define* define : module.mDefines)
 				{
 					define->getName().serialize(serializer);
-					DataTypeSerializer::writeDataType(serializer, define->getDataType());
-
-					TokenSerializer::serializeTokenList(serializer, define->mContent);
+					serializer.write(define->getDataType()->getID());
+					TokenSerializer::serializeTokenList(serializer, define->mContent, globalsLookup);
 				}
 			}
 		}
@@ -309,6 +309,31 @@ namespace lemon
 			for (FlyweightString& str : module.mStringLiterals)
 			{
 				str.serialize(serializer);
+			}
+		}
+
+		// Serialize data types
+		{
+			size_t numberOfDataTypes = module.mDataTypes.size();
+			serializer.serializeAs<uint16>(numberOfDataTypes);
+
+			if (serializer.isReading())
+			{
+				for (size_t i = 0; i < numberOfDataTypes; ++i)
+				{
+					FlyweightString name;
+					name.serialize(serializer);
+					const BaseType baseType = (BaseType)serializer.read<uint8>();
+					module.addDataType(name.getString().data(), baseType);
+				}
+			}
+			else
+			{
+				for (const CustomDataType* dataType : module.mDataTypes)
+				{
+					dataType->getName().serialize(serializer);
+					serializer.writeAs<uint8>(dataType->getBaseType());
+				}
 			}
 		}
 
@@ -323,7 +348,7 @@ namespace lemon
 		return true;
 	}
 
-	void ModuleSerializer::serializeFunctions(Module& module, VectorBinarySerializer& serializer)
+	void ModuleSerializer::serializeFunctions(Module& module, VectorBinarySerializer& serializer, const GlobalsLookup& globalsLookup)
 	{
 		uint32 numberOfFunctions = (uint32)module.mFunctions.size();
 		serializer & numberOfFunctions;
@@ -360,7 +385,7 @@ namespace lemon
 						aliasName.serialize(serializer);
 				}
 
-				const DataTypeDefinition* returnType = (flags & FLAG_HAS_RETURN_TYPE) ? DataTypeSerializer::readDataType(serializer) : &PredefinedDataTypes::VOID;
+				const DataTypeDefinition* returnType = (flags & FLAG_HAS_RETURN_TYPE) ? globalsLookup.readDataType(serializer) : &PredefinedDataTypes::VOID;
 
 				parameters.clear();
 				if (flags & FLAG_HAS_PARAMETERS)
@@ -370,7 +395,7 @@ namespace lemon
 					for (uint8 k = 0; k < parameterCount; ++k)
 					{
 						parameters[k].mName.serialize(serializer);
-						parameters[k].mDataType = DataTypeSerializer::readDataType(serializer);
+						parameters[k].mDataType = globalsLookup.readDataType(serializer);
 					}
 				}
 
@@ -444,7 +469,7 @@ namespace lemon
 					{
 						FlyweightString name;
 						name.serialize(serializer);
-						const DataTypeDefinition* dataType = DataTypeSerializer::readDataType(serializer);
+						const DataTypeDefinition* dataType = globalsLookup.readDataType(serializer);
 						scriptFunc.addLocalVariable(name, dataType, 0);
 					}
 
@@ -511,7 +536,7 @@ namespace lemon
 
 				if (flags & FLAG_HAS_RETURN_TYPE)
 				{
-					DataTypeSerializer::writeDataType(serializer, function.mReturnType);
+					serializer.write(function.mReturnType->getID());
 				}
 
 				if (flags & FLAG_HAS_PARAMETERS)
@@ -521,7 +546,7 @@ namespace lemon
 					for (uint8 k = 0; k < parameterCount; ++k)
 					{
 						function.mParameters[k].mName.write(serializer);
-						DataTypeSerializer::writeDataType(serializer, function.mParameters[k].mDataType);
+						serializer.write(function.mParameters[k].mDataType->getID());
 					}
 				}
 
@@ -576,7 +601,7 @@ namespace lemon
 					for (const LocalVariable* var : scriptFunc.mLocalVariablesByID)
 					{
 						var->getName().serialize(serializer);
-						DataTypeSerializer::writeDataType(serializer, var->getDataType());
+						serializer.write(var->getDataType()->getID());
 					}
 
 					// Labels

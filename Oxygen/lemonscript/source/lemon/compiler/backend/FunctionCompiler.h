@@ -18,6 +18,7 @@ namespace lemon
 	class BlockNode;
 	class StatementToken;
 	class BinaryOperationToken;
+	class GlobalsLookup;
 	struct CompileOptions;
 
 	class FunctionCompiler
@@ -25,7 +26,7 @@ namespace lemon
 	friend struct OpcodeBuilder;
 
 	public:
-		FunctionCompiler(ScriptFunction& function, const CompileOptions& compileOptions);
+		FunctionCompiler(ScriptFunction& function, const CompileOptions& compileOptions, const GlobalsLookup& globalsLookup);
 
 		void processParameters();
 		void buildOpcodesForFunction(const BlockNode& blockNode);
@@ -61,6 +62,7 @@ namespace lemon
 	private:
 		ScriptFunction& mFunction;
 		const CompileOptions& mCompileOptions;
+		const GlobalsLookup& mGlobalsLookup;
 		std::vector<Opcode>& mOpcodes;
 		uint32 mLineNumber = 0;		// For error output
 	};

@@ -19,31 +19,20 @@ namespace lemon
 		static const std::vector<Function*> EMPTY_FUNCTIONS;
 	}
 
+	Program::Program()
+	{
+		PredefinedDataTypes::collectPredefinedDataTypes(mDataTypes);
+	}
+
 	Program::~Program()
 	{
-		clear();
+		clearInternal();
 	}
 
 	void Program::clear()
 	{
-		// This is only meant to clear the module list, while the modules themselves stay intact
-		mModules.clear();
-
-		// Functions
-		mFunctions.clear();
-		mScriptFunctions.clear();
-		mFunctionsBySignature.clear();
-		mFunctionsByName.clear();
-
-		// Variables
-		mGlobalVariables.clear();
-		mGlobalVariablesByName.clear();
-
-		// Constant arrays
-		mConstantArrays.clear();
-
-		// Defines
-		mDefines.clear();
+		clearInternal();
+		PredefinedDataTypes::collectPredefinedDataTypes(mDataTypes);
 	}
 
 	void Program::addModule(const Module& module)
@@ -95,6 +84,13 @@ namespace lemon
 		for (Define* define : module.mDefines)
 		{
 			mDefines.push_back(define);
+		}
+
+		// Data types
+		mDataTypes.reserve(mDataTypes.size() + module.mDataTypes.size());
+		for (const DataTypeDefinition* dataTypeDefinition : module.mDataTypes)
+		{
+			mDataTypes.push_back(dataTypeDefinition);
 		}
 	}
 
@@ -154,6 +150,36 @@ namespace lemon
 		{
 			outStrings.addFromList(module->getStringLiterals());
 		}
+	}
+
+	const DataTypeDefinition* Program::getDataTypeByID(uint16 dataTypeID) const
+	{
+		return (dataTypeID < mDataTypes.size()) ? mDataTypes[dataTypeID] : nullptr;
+	}
+
+	void Program::clearInternal()
+	{
+		// This is only meant to clear the module list, while the modules themselves stay intact
+		mModules.clear();
+
+		// Functions
+		mFunctions.clear();
+		mScriptFunctions.clear();
+		mFunctionsBySignature.clear();
+		mFunctionsByName.clear();
+
+		// Variables
+		mGlobalVariables.clear();
+		mGlobalVariablesByName.clear();
+
+		// Constant arrays
+		mConstantArrays.clear();
+
+		// Defines
+		mDefines.clear();
+
+		// Data types
+		mDataTypes.clear();
 	}
 
 }

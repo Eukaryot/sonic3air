@@ -8,6 +8,7 @@
 
 #include "lemon/pch.h"
 #include "lemon/program/FunctionWrapper.h"
+#include "lemon/program/Program.h"
 
 
 namespace lemon
@@ -51,15 +52,15 @@ namespace lemon
 		void pushStackGeneric(AnyTypeWrapper value, const NativeFunction::Context context)
 		{
 			context.mControlFlow.pushValueStack(value.mValue);
-			context.mControlFlow.pushValueStack(value.mType);
+			context.mControlFlow.pushValueStack(value.mType->getID());
 		};
 
 		template<>
 		AnyTypeWrapper popStackGeneric(const NativeFunction::Context context)
 		{
 			AnyTypeWrapper result;
-			const uint8 serializedTypeId = context.mControlFlow.popValueStack<uint8>();
-			result.mType = DataTypeSerializer::getDataTypeFromSerializedId(serializedTypeId);
+			const uint16 dataTypeId = context.mControlFlow.popValueStack<uint16>();
+			result.mType = context.mControlFlow.getProgram().getDataTypeByID(dataTypeId);
 			result.mValue = context.mControlFlow.popValueStack<AnyBaseValue>();
 			return result;
 		}

@@ -31,6 +31,12 @@ function void script01()
 	debugLog(Math.degreesToRadians(s16(90)))
 	debugLog(Math.degreesToRadians(89 + 1.0f))
 
+	ObjectHandle obj
+	obj = makeObjectHandle(99)
+	obj = increaseObjectHandle(obj)
+	obj = obj.increase()
+	debugLog(obj)
+
 #if 0
 	// Test for constant arrays & strings
 	{

@@ -62,6 +62,47 @@ void moveOutOfBinDir(const std::string& path)
 }
 
 
+struct ObjectHandleWrapper
+{
+	uint32 mContent;
+
+	static inline const CustomDataType* mObjectHandleDataType = nullptr;
+};
+
+ObjectHandleWrapper makeObjectHandle(uint32 value)
+{
+	return ObjectHandleWrapper { value };
+}
+
+ObjectHandleWrapper increaseObjectHandle(ObjectHandleWrapper value)
+{
+	return ObjectHandleWrapper { value.mContent + 1 };
+}
+
+namespace lemon
+{
+	namespace traits
+	{
+		template<> const DataTypeDefinition* getDataType<ObjectHandleWrapper>()  { return ObjectHandleWrapper::mObjectHandleDataType; }
+	}
+
+	namespace internal
+	{
+		template<>
+		void pushStackGeneric<ObjectHandleWrapper>(ObjectHandleWrapper value, const NativeFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack(value.mContent);
+		};
+
+		template<>
+		ObjectHandleWrapper popStackGeneric(const NativeFunction::Context context)
+		{
+			return ObjectHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
+		}
+	}
+}
+
+
 void logValue(int64 value)
 {
 	std::cout << rmx::hexString(value, 8) << std::endl;
@@ -103,6 +144,10 @@ void debugLog(AnyTypeWrapper param)
 		const FlyweightString* storedString = runtime->resolveStringByKey(param.mValue.get<uint64>());
 		RMX_CHECK(nullptr != storedString, "Unable to resolve format string", return);
 		std::cout << storedString->getString() << std::endl;
+	}
+	else if (param.mType == ObjectHandleWrapper::mObjectHandleDataType)
+	{
+		std::cout << "[ObjectHandle: " << param.mValue.get<uint32>() << "]" << std::endl;
 	}
 	else
 	{
@@ -262,6 +307,9 @@ int main(int argc, char** argv)
 	moveOutOfBinDir(argv[0]);
 
 	Module module("test_module");
+	GlobalsLookup globalsLookup;
+	module.startCompiling(globalsLookup);
+
 	UserDefinedVariable& varD0 = module.addUserDefinedVariable("D0", &PredefinedDataTypes::UINT_32);
 	varD0.mGetter = getterD0;
 	varD0.mSetter = setterD0;
@@ -281,9 +329,13 @@ int main(int argc, char** argv)
 	module.addNativeFunction("sayHello", wrap(instance, &SomeClass::sayHello));
 	module.addNativeFunction("incTen", wrap(instance, &SomeClass::incTen));
 
+	ObjectHandleWrapper::mObjectHandleDataType = module.addDataType("ObjectHandle", BaseType::UINT_32);
+	module.addNativeFunction("makeObjectHandle", wrap(&makeObjectHandle));
+	module.addNativeFunction("increaseObjectHandle", wrap(&increaseObjectHandle));
+	module.addNativeMethod("ObjectHandle", "increase", wrap(&increaseObjectHandle));
+
 	StandardLibrary::registerBindings(module);
 
-	GlobalsLookup globalsLookup;
 	globalsLookup.addDefinitionsFromModule(module);
 
 	{

@@ -81,9 +81,10 @@ namespace lemon
 	};
 
 
-	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const CompileOptions& compileOptions) :
+	FunctionCompiler::FunctionCompiler(ScriptFunction& function, const CompileOptions& compileOptions, const GlobalsLookup& globalsLookup) :
 		mFunction(function),
 		mCompileOptions(compileOptions),
+		mGlobalsLookup(globalsLookup),
 		mOpcodes(function.mOpcodes)
 	{
 	}
@@ -210,7 +211,7 @@ namespace lemon
 			case TypeCasting::CastHandling::Result::ANY_CAST:
 			{
 				// Cast to "any" by adding explicit information about the type
-				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, DataTypeSerializer::getSerializedIdForDataType(sourceType));
+				addOpcode(Opcode::Type::PUSH_CONSTANT, BaseType::INT_CONST, sourceType->getID());
 				break;
 			}
 

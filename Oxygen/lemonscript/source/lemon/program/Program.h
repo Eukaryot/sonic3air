@@ -27,6 +27,7 @@ namespace lemon
 		NativizedOpcodeProvider* mNativizedOpcodeProvider = nullptr;	// TODO: Is this even a good place for this?
 
 	public:
+		Program();
 		~Program();
 
 		inline const std::vector<const Module*>& getModules() const  { return mModules; }
@@ -56,8 +57,14 @@ namespace lemon
 		// String literals
 		void collectAllStringLiterals(StringLookup& outStrings) const;
 
+		// Data types
+		const DataTypeDefinition* getDataTypeByID(uint16 dataTypeID) const;
+
 		inline int getOptimizationLevel() const  { return mOptimizationLevel; }
 		void setOptimizationLevel(int level)	 { mOptimizationLevel = level; }
+
+	private:
+		void clearInternal();
 
 	private:
 		// Modules
@@ -78,6 +85,9 @@ namespace lemon
 
 		// Defines
 		std::vector<Define*> mDefines;
+
+		// Data types
+		std::vector<const DataTypeDefinition*> mDataTypes;
 
 		int mOptimizationLevel = 3;
 	};
