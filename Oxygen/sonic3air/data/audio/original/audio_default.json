@@ -52,8 +52,8 @@
 	"17": { "Name": "Death Egg 2", "Source": "EmulationDirect", "Type": "Music" },
 
 	// Boss music
-	"18":		   { "Name": "Mini-Boss (S&K)", "Source": "Emulation", "Type": "Music" },
-	"19":		   { "Name": "Main Boss", "Source": "Emulation", "Type": "Music" },
+	"18":		   { "Name": "Mini-Boss (S&K)", "Source": "EmulationDirect", "Type": "Music" },
+	"19":		   { "Name": "Main Boss", "Source": "EmulationDirect", "Type": "Music" },
 	"sonic1_boss": { "Name": "Sonic 1 Boss", "File": "sonic1_boss.ogg", "Type": "Music", "LoopStart": "600" },
 	"sonic2_boss": { "Name": "Sonic 2 Boss", "File": "sonic2_boss.ogg", "Type": "Music", "LoopStart": "11160" },
 
@@ -61,48 +61,48 @@
 	"1A": { "Name": "Doomsday", "Source": "EmulationDirect", "Type": "Music" },
 
 	// Bonus stages & blue spheres
-	"1B":			{ "Name": "Bonus Stage 1", "Source": "Emulation", "Type": "Music" },
+	"1B":			{ "Name": "Bonus Stage 1", "Source": "EmulationDirect", "Type": "Music" },
 	"1C":			{ "Name": "Special Stage", "Source": "EmulationDirect", "Type": "Music" },
 	"1C_speedup":	{ "Name": "Special Stage (Speed-up 30)", "Source": "EmulationDirect", "EmulatedID": "0x1c", "Type": "Music" },
 	"1C_speedup45":	{ "Name": "Special Stage (Speed-up 45)", "Source": "EmulationDirect", "EmulatedID": "0x1c", "Type": "Music" },
-	"1D":			{ "Name": "Bonus Stage 2", "Source": "Emulation", "Type": "Music" },
-	"1E":			{ "Name": "Bonus Stage 3", "Source": "Emulation", "Type": "Music" },
+	"1D":			{ "Name": "Bonus Stage 2", "Source": "EmulationDirect", "Type": "Music" },
+	"1E":			{ "Name": "Bonus Stage 3", "Source": "EmulationDirect", "Type": "Music" },
 
 	// Knuckles' Theme
-	"1F":		 { "Name": "Knuckles Theme (S&K)", "Source": "Emulation", "Type": "Music" },
-	"1F_sonic3": { "Name": "Knuckles Theme (S3)",  "Source": "Emulation", "EmulatedID": "0x1f", "Address": "0x2d97fd", "Type": "Music" },
+	"1F":		 { "Name": "Knuckles Theme (S&K)", "Source": "EmulationDirect", "Type": "Music" },
+	"1F_sonic3": { "Name": "Knuckles Theme (S3)",  "Source": "EmulationDirect", "EmulatedID": "0x1f", "Address": "0x2d97fd", "Type": "Music" },
 
 	// Competition mode
-	"20": { "Name": "Azure Lake",    "Source": "Emulation", "Type": "Music" },
-	"21": { "Name": "Balloon Park",  "Source": "Emulation", "Type": "Music" },
-	"22": { "Name": "Desert Palace", "Source": "Emulation", "Type": "Music" },
-	"23": { "Name": "Chrome Gadget", "Source": "Emulation", "Type": "Music" },
-	"24": { "Name": "Endless Mine",  "Source": "Emulation", "Type": "Music" },
+	"20": { "Name": "Azure Lake",    "Source": "EmulationDirect", "Type": "Music" },
+	"21": { "Name": "Balloon Park",  "Source": "EmulationDirect", "Type": "Music" },
+	"22": { "Name": "Desert Palace", "Source": "EmulationDirect", "Type": "Music" },
+	"23": { "Name": "Chrome Gadget", "Source": "EmulationDirect", "Type": "Music" },
+	"24": { "Name": "Endless Mine",  "Source": "EmulationDirect", "Type": "Music" },
 
 	// Title Theme (playing in title screen)
-	"25":		 { "Name": "Title Screen (S&K)", "Source": "Emulation", "Type": "Jingle" },
-	"25_sonic3": { "Name": "Title Screen (S3)",  "Source": "Emulation", "EmulatedID": "0x25", "Address": "0x2de18f", "Type": "Jingle" },
+	"25":		 { "Name": "Title Screen (S&K)", "Source": "EmulationDirect", "Type": "Jingle" },
+	"25_sonic3": { "Name": "Title Screen (S3)",  "Source": "EmulationDirect", "EmulatedID": "0x25", "Address": "0x2de18f", "Type": "Jingle" },
 
 
 	// Credits (Sonic 3)
-	"26": { "Name": "Sonic 3 Credits", "Source": "Emulation", "Type": "Music" },
+	"26": { "Name": "Sonic 3 Credits", "Source": "EmulationDirect", "Type": "Music" },
 
 	// Game Over
-	"27": { "Name": "Game Over", "Source": "Emulation", "Type": "Jingle" },
+	"27": { "Name": "Game Over", "Source": "EmulationDirect", "Type": "Jingle" },
 
 	// Continue Screen / Competition mode results
-	"28": 		 { "Name": "Continue Screen (S&K)", "Source": "Emulation", "Type": "Music" },
-	"28_sonic3": { "Name": "Continue Screen (S3)",  "Source": "Emulation", "EmulatedID": "0x28", "Address": "0x2dec7b", "Type": "Music" },
+	"28": 		 { "Name": "Continue Screen (S&K)", "Source": "EmulationDirect", "Type": "Music" },
+	"28_sonic3": { "Name": "Continue Screen (S3)",  "Source": "EmulationDirect", "EmulatedID": "0x28", "Address": "0x2dec7b", "Type": "Music" },
 
 	// Level results jingle (don't start the music again afterwards)
-	"29": { "Name": "Level Results", "Source": "Emulation", "Type": "Jingle" },
+	"29": { "Name": "Level Results", "Source": "EmulationDirect", "Type": "Jingle" },
 
 	// Extra life jingle
-	"2A":		 { "Name": "Extra Life (S&K)", "Source": "Emulation", "Type": "Jingle" },
-	"2A_sonic3": { "Name": "Extra Life (S3)",  "Source": "Emulation", "EmulatedID": "0x2a", "Address": "0x2df095", "Type": "Jingle" },
+	"2A":		 { "Name": "Extra Life (S&K)", "Source": "EmulationDirect", "Type": "Jingle" },
+	"2A_sonic3": { "Name": "Extra Life (S3)",  "Source": "EmulationDirect", "EmulatedID": "0x2a", "Address": "0x2df095", "Type": "Jingle" },
 
 	// Emerald jingle
-	"2B": { "Name": "Emerald Jingle", "Source": "Emulation", "Type": "Jingle" },
+	"2B": { "Name": "Emerald Jingle", "Source": "EmulationDirect", "Type": "Jingle" },
 
 	// Invincibility theme
 	"2C":		 { "Name": "Invincibility (S&K)", "Source": "EmulationDirect", "Type": "Music" },
@@ -112,23 +112,23 @@
 	"supertheme_sonic2": { "Name": "Sonic 2 Super Theme", "File": "supertheme_sonic2.ogg", "Type": "Music", "LoopStart": "167300" },
 
 	// Competition Mode menu
-	"2D": { "Name": "Competition", "Source": "Emulation", "Type": "Music" },
+	"2D": { "Name": "Competition", "Source": "EmulationDirect", "Type": "Music" },
 
 	// "2E" is a redirect to Mini-boss theme
-	"2E_sonic3": { "Name": "Mini-Boss (S3)", "Source": "Emulation", "EmulatedID": "0x2e", "Address": "0x2c71a0", "Type": "Music" },
+	"2E_sonic3": { "Name": "Mini-Boss (S3)", "Source": "EmulationDirect", "EmulatedID": "0x2e", "Address": "0x2c71a0", "Type": "Music" },
 
 	// Data Select menu
-	"2F": { "Name": "Data Select", "Source": "Emulation", "Type": "Music" },
+	"2F": { "Name": "Data Select", "Source": "EmulationDirect", "Type": "Music" },
 
 	// Final Boss
 	"30": { "Name": "Final Boss", "Source": "EmulationDirect", "Type": "Music" },
 
 	// Drowning jingle
-	"31": { "Name": "Drowning", "Source": "Emulation", "Type": "Jingle" },
+	"31": { "Name": "Drowning", "Source": "EmulationDirect", "Type": "Jingle" },
 
 	// Victory music (when game is finished)
-	"32":		 { "Name": "Victory (S&K)", "Source": "Emulation", "Type": "Jingle" },
-	"32_sonic3": { "Name": "Victory (S3)",  "Source": "Emulation", "EmulatedID": "0x32", "Address": "0x2dfbfe", "Type": "Jingle" },
+	"32":		 { "Name": "Victory (S&K)", "Source": "EmulationDirect", "Type": "Jingle" },
+	"32_sonic3": { "Name": "Victory (S3)",  "Source": "EmulationDirect", "EmulatedID": "0x32", "Address": "0x2dfbfe", "Type": "Jingle" },
 
 
 
@@ -145,16 +145,16 @@
 	"0E_proto":	{ "Name": "Launch Base 2 (Proto)", "File": "proto0E_lbz2.smps", "ContentOffset": "0x0000", "Source": "EmulationDirect", "EmulatedID": "0x0e", "Type": "Music" },	// Original location in prototype ROM = 0x0c0000
 
 	// Knuckles' Theme (Sonic 3 Prototype)
-	"1F_proto":	{ "Name": "Knuckles Theme (Proto)", "File": "proto1F_knuckles.smps", "ContentOffset": "0x3b19", "Source": "Emulation", "EmulatedID": "0x1f", "Type": "Music" },	// Original location in prototype ROM = 0x0cbb19
+	"1F_proto":	{ "Name": "Knuckles Theme (Proto)", "File": "proto1F_knuckles.smps", "ContentOffset": "0x3b19", "Source": "EmulationDirect", "EmulatedID": "0x1f", "Type": "Music" },	// Original location in prototype ROM = 0x0cbb19
 
 	// Credits (Sonic 3 Prototype)
-	"26_proto":	{ "Name": "Credits (Proto)", "File": "proto26_credits.smps", "ContentOffset": "0x2dcc", "Source": "Emulation", "EmulatedID": "0x26", "Type": "Music" },	// Original location in prototype ROM = 0x0d2dcc
+	"26_proto":	{ "Name": "Credits (Proto)", "File": "proto26_credits.smps", "ContentOffset": "0x2dcc", "Source": "EmulationDirect", "EmulatedID": "0x26", "Type": "Music" },	// Original location in prototype ROM = 0x0d2dcc
 
 	// Competition Mode menu (Sonic 3 Prototype)
-	"2D_proto":	{ "Name": "Competition (Proto)", "File": "proto2D_competition.smps", "ContentOffset": "0x4cb8", "Source": "Emulation", "EmulatedID": "0x2d", "Type": "Music" },	// Original location in prototype ROM = 0x0d4cb8
+	"2D_proto":	{ "Name": "Competition (Proto)", "File": "proto2D_competition.smps", "ContentOffset": "0x4cb8", "Source": "EmulationDirect", "EmulatedID": "0x2d", "Type": "Music" },	// Original location in prototype ROM = 0x0d4cb8
 
 	// Unused track (Sonic 3 Prototype) - we use it as a Super Theme option
-	"2E_proto":	{ "Name": "Super Theme (Proto)", "File": "proto2E_unused.smps", "ContentOffset": "0x5eaa", "Source": "Emulation", "EmulatedID": "0x2e", "Type": "Music" },	// Original location in prototype ROM = 0x0d5eaa
+	"2E_proto":	{ "Name": "Super Theme (Proto)", "File": "proto2E_unused.smps", "ContentOffset": "0x5eaa", "Source": "EmulationDirect", "EmulatedID": "0x2e", "Type": "Music" },	// Original location in prototype ROM = 0x0d5eaa
 
 
 
@@ -344,7 +344,7 @@
 	"DA": { "Source": "EmulationContinuous", "Type": "Sound" },
 	"DB": { "Source": "EmulationContinuous", "Type": "Sound" },
 
-	"DC": { "Source": "Emulation", "Type": "Jingle" },		// Original version of the medley
+	"DC": { "Source": "EmulationDirect", "Type": "Jingle" },		// Original version of the medley
 
 	"FF": { "Name": "SEGA", "File": "sfxFF_sega.ogg", "Type": "Jingle" },
 
