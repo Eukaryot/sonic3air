@@ -31,10 +31,12 @@ VideoOut::VideoOut() :
 
 VideoOut::~VideoOut()
 {
-	delete mOpenGLRenderer;
-	delete mSoftwareRenderer;
 	delete mRenderParts;
 	delete &mRenderResources;
+	delete mSoftwareRenderer;
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	delete mOpenGLRenderer;
+#endif
 }
 
 void VideoOut::startup()
@@ -79,30 +81,21 @@ void VideoOut::handleActiveModsChanged()
 
 void VideoOut::createRenderer(bool reset)
 {
-	setActiveRenderer(Configuration::instance().mRenderMethod != Configuration::RenderMethod::OPENGL_FULL, reset);
+	setActiveRenderer(Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_FULL, reset);
 }
 
 void VideoOut::destroyRenderer()
 {
-	SAFE_DELETE(mOpenGLRenderer);
 	SAFE_DELETE(mSoftwareRenderer);
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	SAFE_DELETE(mOpenGLRenderer);
+#endif
 }
 
-void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
+void VideoOut::setActiveRenderer(bool useOpenGLRenderer, bool reset)
 {
-	if (useSoftwareRenderer)
-	{
-		if (nullptr == mSoftwareRenderer)
-		{
-			RMX_LOG_INFO("VideoOut: Creating software renderer");
-			mSoftwareRenderer = new SoftwareRenderer(*mRenderParts, mGameScreenTexture);
-
-			RMX_LOG_INFO("VideoOut: Renderer initialization");
-			mSoftwareRenderer->initialize();
-		}
-		mActiveRenderer = mSoftwareRenderer;
-	}
-	else
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	if (useOpenGLRenderer)
 	{
 		if (nullptr == mOpenGLRenderer)
 		{
@@ -113,6 +106,19 @@ void VideoOut::setActiveRenderer(bool useSoftwareRenderer, bool reset)
 			mOpenGLRenderer->initialize();
 		}
 		mActiveRenderer = mOpenGLRenderer;
+	}
+	else
+#endif
+	{
+		if (nullptr == mSoftwareRenderer)
+		{
+			RMX_LOG_INFO("VideoOut: Creating software renderer");
+			mSoftwareRenderer = new SoftwareRenderer(*mRenderParts, mGameScreenTexture);
+
+			RMX_LOG_INFO("VideoOut: Renderer initialization");
+			mSoftwareRenderer->initialize();
+		}
+		mActiveRenderer = mSoftwareRenderer;
 	}
 
 	if (reset)
@@ -211,10 +217,12 @@ bool VideoOut::updateGameScreen()
 
 void VideoOut::blurGameScreen()
 {
+#ifdef RMX_WITH_OPENGL_SUPPORT
 	if (mActiveRenderer == mOpenGLRenderer)
 	{
 		mOpenGLRenderer->blurGameScreen();
 	}
+#endif
 }
 
 void VideoOut::toggleLayerRendering(int index)

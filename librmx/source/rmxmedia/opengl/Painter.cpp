@@ -8,6 +8,7 @@
 
 #include "rmxmedia.h"
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
 namespace rmx
 {
@@ -241,3 +242,5 @@ namespace rmx
 	}
 
 }
+
+#endif

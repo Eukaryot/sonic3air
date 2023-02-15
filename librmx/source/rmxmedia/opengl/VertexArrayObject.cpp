@@ -8,6 +8,7 @@
 
 #include "rmxmedia.h"
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
 namespace opengl
 {
@@ -127,3 +128,5 @@ namespace opengl
 		}
 	}
 }
+
+#endif

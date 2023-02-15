@@ -11,6 +11,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include <functional>
 
 
@@ -134,3 +136,5 @@ private:
 	std::vector<TechniqueStruct> mTechniques;
 	String mIncludeDir;
 };
+
+#endif

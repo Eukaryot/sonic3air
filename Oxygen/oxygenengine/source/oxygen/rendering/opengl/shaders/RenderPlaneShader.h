@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 
 class RenderParts;
@@ -58,3 +60,5 @@ private:
 	GLuint mLocScrollOffsetY = 0;
 	GLuint mLocPaletteTex = 0;
 };
+
+#endif

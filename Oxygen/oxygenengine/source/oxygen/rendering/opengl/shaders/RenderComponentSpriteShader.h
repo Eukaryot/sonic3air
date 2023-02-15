@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 #include "oxygen/rendering/parts/SpriteManager.h"
 
@@ -36,3 +38,5 @@ private:
 	GLuint mLocTintColor = 0;
 	GLuint mLocAddedColor = 0;
 };
+
+#endif

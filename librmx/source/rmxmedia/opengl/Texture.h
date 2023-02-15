@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include "OpenGLHelper.h"
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
+#include "OpenGLHelper.h"
 
 class Texture
 {
@@ -77,3 +78,5 @@ private:
 	bool   mFilterLinear = true;
 	bool   mHasMipmaps = false;
 };
+
+#endif

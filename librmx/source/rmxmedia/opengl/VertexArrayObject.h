@@ -11,6 +11,7 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
 namespace opengl
 {
@@ -50,3 +51,5 @@ namespace opengl
 		size_t mFloatsPerVertex = 0;
 	};
 }
+
+#endif

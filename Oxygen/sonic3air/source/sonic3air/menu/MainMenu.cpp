@@ -285,7 +285,7 @@ void MainMenu::render()
 		}
 		else
 		{
-			rmx::Painter::PrintOptions printOptions;
+			DrawerPrintOptions printOptions;
 			printOptions.mAlignment = 4;
 			printOptions.mTintColor = color;
 			printOptions.mSpacing = 1;

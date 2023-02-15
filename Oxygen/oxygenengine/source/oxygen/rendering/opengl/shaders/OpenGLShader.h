@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include <rmxmedia.h>
 
 
@@ -16,3 +18,5 @@ class OpenGLShader
 protected:
 	static int splitRectY(const Recti& inputRect, int splitY, Recti* outputRects);
 };
+
+#endif

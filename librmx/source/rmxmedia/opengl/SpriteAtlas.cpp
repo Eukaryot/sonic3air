@@ -206,6 +206,9 @@ bool SpriteAtlasBase::compareSpriteInfoBySize(const SpriteInfo& first, const Spr
 }
 
 
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 SpriteAtlas::SpriteAtlas()
 {
 }
@@ -354,3 +357,5 @@ int SpriteAtlas::internalAdd(const Bitmap& bmp, const Recti* rect, bool updateTe
 
 	return key;
 }
+
+#endif

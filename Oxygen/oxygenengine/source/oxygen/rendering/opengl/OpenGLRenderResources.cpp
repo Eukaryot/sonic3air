@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 
@@ -281,3 +284,5 @@ const BufferTexture& OpenGLRenderResources::getVScrollOffsetsTexture(int scrollO
 	RMX_ASSERT(scrollOffsetsIndex >= 0 && scrollOffsetsIndex < 4, "Invalid scroll offsets index " << scrollOffsetsIndex);
 	return mVScrollOffsetsTexture[scrollOffsetsIndex];
 }
+
+#endif

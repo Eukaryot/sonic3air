@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/helper/FileHelper.h"
 
@@ -96,3 +99,5 @@ opengl::VertexArrayObject& OpenGLDrawerResources::getSimpleQuadVAO()
 {
 	return openglresources::mInternal->mSimpleQuadVAO;
 }
+
+#endif

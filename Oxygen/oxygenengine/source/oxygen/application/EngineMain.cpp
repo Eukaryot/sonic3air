@@ -687,11 +687,8 @@ bool EngineMain::createWindow()
 	}
 
 	// Create drawer depending on render method
-	if (config.mRenderMethod == Configuration::RenderMethod::SOFTWARE)
-	{
-		mDrawer.createDrawer<SoftwareDrawer>();
-	}
-	else
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	if (config.mRenderMethod >= Configuration::RenderMethod::OPENGL_SOFT)
 	{
 		if (!mDrawer.createDrawer<OpenGLDrawer>())
 		{
@@ -700,6 +697,11 @@ bool EngineMain::createWindow()
 			config.mRenderMethod = Configuration::RenderMethod::SOFTWARE;
 			mDrawer.createDrawer<SoftwareDrawer>();
 		}
+	}
+	else
+#endif
+	{
+		mDrawer.createDrawer<SoftwareDrawer>();
 	}
 
 	// Tell FTX video manager that everything is okay

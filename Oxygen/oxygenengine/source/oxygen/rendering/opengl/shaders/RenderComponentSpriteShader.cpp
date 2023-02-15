@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/shaders/RenderComponentSpriteShader.h"
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/Geometry.h"
@@ -78,3 +81,5 @@ void RenderComponentSpriteShader::draw(const SpriteManager::ComponentSpriteInfo&
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+#endif

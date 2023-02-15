@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "rmxmedia_externals.h"
 
 
@@ -27,3 +29,5 @@ namespace rmx
 	#endif
 	};
 }
+
+#endif

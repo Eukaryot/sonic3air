@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
 
 
@@ -31,3 +33,5 @@ private:
 	OpenGLTexture mPass0Texture;
 	OpenGLTexture mLookupTexture[3];
 };
+
+#endif

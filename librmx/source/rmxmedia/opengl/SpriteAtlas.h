@@ -11,7 +11,6 @@
 
 #pragma once
 
-
 class API_EXPORT SpriteAtlasBase
 {
 public:
@@ -85,6 +84,8 @@ protected:
 
 
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 class API_EXPORT SpriteAtlas : protected SpriteAtlasBase
 {
 public:
@@ -121,3 +122,5 @@ private:
 	};
 	std::vector<PageData> mPageData;
 };
+
+#endif

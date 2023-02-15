@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include <rmxmedia.h>
 
 
@@ -26,3 +28,5 @@ private:
 	GLuint mTextureHandle = 0;
 	Vec2i mSize;
 };
+
+#endif

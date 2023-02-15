@@ -32,7 +32,7 @@ public:
 
 	void createRenderer(bool reset);
 	void destroyRenderer();
-	void setActiveRenderer(bool useSoftwareRenderer, bool reset);
+	void setActiveRenderer(bool useOpenGLRenderer, bool reset);
 
 	inline uint32 getScreenWidth() const   { return mGameResolution.x; }
 	inline uint32 getScreenHeight() const  { return mGameResolution.y; }
@@ -89,8 +89,10 @@ private:
 
 private:
 	Renderer* mActiveRenderer = nullptr;
-	OpenGLRenderer* mOpenGLRenderer = nullptr;
 	SoftwareRenderer* mSoftwareRenderer = nullptr;
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	OpenGLRenderer* mOpenGLRenderer = nullptr;
+#endif
 
 	RenderParts* mRenderParts = nullptr;
 	DrawerTexture mGameScreenTexture;

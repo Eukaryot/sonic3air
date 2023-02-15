@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/DrawerInterface.h"
 
 namespace opengldrawer
@@ -34,3 +36,5 @@ public:
 private:
 	opengldrawer::Internal& mInternal;
 };
+
+#endif

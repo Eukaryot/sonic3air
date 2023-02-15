@@ -8,6 +8,8 @@
 
 #include "rmxmedia.h"
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 
 /* ----- Renderbuffer ---------------------------------------------------------------------------------------------- */
 
@@ -210,3 +212,5 @@ void Framebuffer::deleteAttachedBuffer(GLenum attachment)
 		mRenderbuffers.erase(it);
 	}
 }
+
+#endif

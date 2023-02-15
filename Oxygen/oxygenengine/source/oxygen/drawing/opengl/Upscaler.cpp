@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/Upscaler.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/application/Configuration.h"
@@ -176,3 +179,5 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 
 	secondShader->unbind();
 }
+
+#endif

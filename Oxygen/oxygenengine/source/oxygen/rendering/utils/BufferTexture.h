@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include <rmxmedia.h>
 
 
@@ -46,3 +48,5 @@ private:
 	GLuint mTexBuffer = (GLuint)~0;
 	PixelFormat mPixelFormat = PixelFormat::UINT_8;
 };
+
+#endif

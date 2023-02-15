@@ -11,6 +11,7 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
 namespace rmx
 {
@@ -62,3 +63,5 @@ namespace rmx
 		std::map<Font*, OpenGLFontOutput> mFontOutputMap;
 	};
 }
+
+#endif

@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 
 
@@ -65,3 +68,5 @@ GLuint OpenGLDrawerTexture::getFrameBufferHandle()
 {
 	return mFrameBuffer.getHandle();
 }
+
+#endif

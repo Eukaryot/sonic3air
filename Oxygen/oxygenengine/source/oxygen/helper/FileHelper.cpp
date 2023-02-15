@@ -134,37 +134,41 @@ bool FileHelper::loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool s
 	return true;
 }
 
-bool FileHelper::loadTexture(DrawerTexture& texture, const std::wstring& filename, bool showError)
-{
-	if (!texture.isValid())
+	bool FileHelper::loadTexture(DrawerTexture& texture, const std::wstring& filename, bool showError)
 	{
-		EngineMain::instance().getDrawer().createTexture(texture);
+		if (!texture.isValid())
+		{
+			EngineMain::instance().getDrawer().createTexture(texture);
+		}
+
+		Bitmap& bitmap = texture.accessBitmap();
+		if (!loadBitmap(bitmap, filename, showError))
+			return false;
+
+		texture.bitmapUpdated();
+		return true;
 	}
 
-	Bitmap& bitmap = texture.accessBitmap();
-	if (!loadBitmap(bitmap, filename, showError))
-		return false;
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
-	texture.bitmapUpdated();
-	return true;
-}
-
-bool FileHelper::loadShader(Shader& shader, const std::wstring& filename, const std::string& techname, const std::string& additionalDefines)
-{
-	std::vector<uint8> content;
-	if (!FTX::FileSystem->readFile(filename, content))
-		return false;
-
-	if (shader.load(content, techname, additionalDefines))
+	bool FileHelper::loadShader(Shader& shader, const std::wstring& filename, const std::string& techname, const std::string& additionalDefines)
 	{
-		RMX_LOG_INFO("Loaded shader '" << WString(filename).toStdString() << "'");
+		std::vector<uint8> content;
+		if (!FTX::FileSystem->readFile(filename, content))
+			return false;
+
+		if (shader.load(content, techname, additionalDefines))
+		{
+			RMX_LOG_INFO("Loaded shader '" << WString(filename).toStdString() << "'");
+		}
+		else
+		{
+			RMX_ERROR("Shader loading failed for '" << WString(filename).toStdString() << "':\n" << shader.getCompileLog().toStdString(), );
+		}
+		return true;
 	}
-	else
-	{
-		RMX_ERROR("Shader loading failed for '" << WString(filename).toStdString() << "':\n" << shader.getCompileLog().toStdString(), );
-	}
-	return true;
-}
+
+#endif
 
 bool FileHelper::extractZipFile(const std::wstring& zipFilename, const std::wstring& outputBasePath)
 {

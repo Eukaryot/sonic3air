@@ -11,6 +11,10 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
+#include "rmxmedia/opengl/SpriteAtlas.h"
+
 class Font;
 
 
@@ -56,3 +60,5 @@ private:
 	SpriteAtlas mAtlas;
 	std::map<uint32, SpriteHandleInfo> mHandleMap;
 };
+
+#endif

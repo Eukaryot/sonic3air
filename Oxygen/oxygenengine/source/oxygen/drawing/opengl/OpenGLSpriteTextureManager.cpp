@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLSpriteTextureManager.h"
 
 
@@ -40,3 +43,5 @@ OpenGLTexture* OpenGLSpriteTextureManager::getComponentSpriteTexture(const Sprit
 	}
 	return &texture.mTexture;
 }
+
+#endif

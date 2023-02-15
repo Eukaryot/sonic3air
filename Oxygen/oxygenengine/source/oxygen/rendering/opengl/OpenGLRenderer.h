@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/Renderer.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
@@ -73,3 +75,5 @@ private:
 	SpriteManager::SpriteInfo::Type mLastRenderedSpriteType = SpriteManager::SpriteInfo::Type::INVALID;
 	bool mIsRenderingToProcessingBuffer = false;
 };
+
+#endif

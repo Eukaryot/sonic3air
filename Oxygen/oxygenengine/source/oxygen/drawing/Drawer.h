@@ -68,9 +68,9 @@ public:
 	void drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture);
 
 	void printText(Font& font, const Recti& rect, const String& text, int alignment = 1, Color color = Color::WHITE);
-	void printText(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions);
+	void printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions);
 	void printText(Font& font, const Recti& rect, const WString& text, int alignment = 1, Color color = Color::WHITE);
-	void printText(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions);
+	void printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions);
 
 	void pushScissor(const Recti& rect);
 	void popScissor();

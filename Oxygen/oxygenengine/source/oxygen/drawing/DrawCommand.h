@@ -27,6 +27,13 @@ struct DrawerMeshVertex_P2_C4
 	Color mColor;
 };
 
+struct DrawerPrintOptions
+{
+	int   mAlignment = 1;
+	int   mSpacing = 0;
+	Color mTintColor = Color::WHITE;
+};
+
 
 class DrawCommand
 {
@@ -216,7 +223,7 @@ protected:
 		mPrintOptions.mTintColor = color;
 	}
 
-	PrintTextDrawCommand(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions) :
+	PrintTextDrawCommand(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions) :
 		DrawCommand(Type::PRINT_TEXT), mFont(&font), mRect(rect), mText(text), mPrintOptions(printOptions)
 	{}
 
@@ -224,7 +231,7 @@ public:
 	Font* mFont = nullptr;
 	Recti mRect;
 	String mText;
-	rmx::Painter::PrintOptions mPrintOptions;
+	DrawerPrintOptions mPrintOptions;
 };
 
 
@@ -240,7 +247,7 @@ protected:
 		mPrintOptions.mTintColor = color;
 	}
 
-	PrintTextWDrawCommand(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions) :
+	PrintTextWDrawCommand(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions) :
 		DrawCommand(Type::PRINT_TEXT_W), mFont(&font), mRect(rect), mText(text), mPrintOptions(printOptions)
 	{}
 
@@ -248,7 +255,7 @@ public:
 	Font* mFont = nullptr;
 	Recti mRect;
 	WString mText;
-	rmx::Painter::PrintOptions mPrintOptions;
+	DrawerPrintOptions mPrintOptions;
 };
 
 

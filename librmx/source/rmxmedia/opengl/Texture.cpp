@@ -8,6 +8,7 @@
 
 #include "rmxmedia.h"
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
 Texture::Texture()
 {
@@ -294,3 +295,5 @@ void Texture::setWrapRepeatMirror()
 	glTexParameteri(mType, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);
 #endif
 }
+
+#endif

@@ -8,6 +8,8 @@
 
 #include "rmxmedia.h"
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 
 /* ----- Shader -------------------------------------------------------------------------------------------------- */
 
@@ -626,3 +628,5 @@ void ShaderEffect::preprocessSource(String& source, Shader::ShaderType shaderTyp
 		Shader::mShaderSourcePostProcessCallback(source, shaderType);
 	}
 }
+
+#endif

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
 #include "oxygen/rendering/utils/BufferTexture.h"
 #include "oxygen/resources/SpriteCache.h"
@@ -28,3 +30,5 @@ private:
 	std::unordered_map<uint64, ChangeCounted<BufferTexture>> mPaletteSpriteTextures;
 	std::unordered_map<uint64, ChangeCounted<OpenGLTexture>> mComponentSpriteTextures;
 };
+
+#endif

@@ -380,7 +380,7 @@ namespace softwaredrawer
 			}
 		}
 
-		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
+		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
 		{
 			Bitmap& bufferBitmap = mTempBuffer;
 

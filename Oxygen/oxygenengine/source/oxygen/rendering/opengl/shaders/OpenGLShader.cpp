@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/shaders/OpenGLShader.h"
 
 
@@ -30,3 +33,5 @@ int OpenGLShader::splitRectY(const Recti& inputRect, int splitY, Recti* outputRe
 		return 1;
 	}
 }
+
+#endif

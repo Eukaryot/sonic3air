@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include <rmxmedia.h>
 
 
@@ -24,3 +26,5 @@ public:
 
 	static opengl::VertexArrayObject& getSimpleQuadVAO();
 };
+
+#endif

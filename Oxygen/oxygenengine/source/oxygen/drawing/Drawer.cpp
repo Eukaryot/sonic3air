@@ -144,7 +144,7 @@ void Drawer::printText(Font& font, const Recti& rect, const String& text, int al
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, alignment, color));
 }
 
-void Drawer::printText(Font& font, const Recti& rect, const String& text, const rmx::Painter::PrintOptions& printOptions)
+void Drawer::printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextDrawCommands.createObject(font, rect, text, printOptions));
@@ -156,7 +156,7 @@ void Drawer::printText(Font& font, const Recti& rect, const WString& text, int a
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, alignment, color));
 }
 
-void Drawer::printText(Font& font, const Recti& rect, const WString& text, const rmx::Painter::PrintOptions& printOptions)
+void Drawer::printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions)
 {
 	if (!text.empty())
 		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mPrintTextWDrawCommands.createObject(font, rect, text, printOptions));

@@ -8,6 +8,7 @@
 
 #include "rmxmedia.h"
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
 
 OpenGLFontOutput::OpenGLFontOutput(Font& font) :
 	mFont(font)
@@ -133,3 +134,5 @@ void OpenGLFontOutput::checkCacheValidity()
 		mLastFontChangeCounter = mFont.getChangeCounter();
 	}
 }
+
+#endif

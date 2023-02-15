@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/OpenGLRenderer.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
@@ -503,3 +506,5 @@ void OpenGLRenderer::copyGameScreenToProcessingBuffer()
 	shader.unbind();
 	glBindFramebuffer(GL_FRAMEBUFFER, oldFramebufferHandle);
 }
+
+#endif

@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/drawing/opengl/OpenGLDrawer.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerResources.h"
 #include "oxygen/drawing/opengl/OpenGLDrawerTexture.h"
@@ -70,17 +73,17 @@ namespace opengldrawer
 
 		const char* titleString = (type == GL_DEBUG_TYPE_ERROR) ? "OpenGL Error" : "OpenGL Message";
 		const char* severityString = (severity == GL_DEBUG_SEVERITY_HIGH)		  ? "High" :
-									 (severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
-									 (severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
-									 (severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
+										(severity == GL_DEBUG_SEVERITY_MEDIUM)		  ? "Medium" :
+										(severity == GL_DEBUG_SEVERITY_LOW)		  ? "Low" :
+										(severity == GL_DEBUG_SEVERITY_NOTIFICATION) ? "Notification" : "<unknown>";
 		const char* typeString = (type == GL_DEBUG_TYPE_ERROR)				 ? "Error" :
-								 (type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
-								 (type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
-								 (type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
-								 (type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
-								 (type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
-								 (type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
-								 (type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
+									(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR) ? "Deprecated Behavior" :
+									(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)	 ? "Undefined Behavior" :
+									(type == GL_DEBUG_TYPE_PORTABILITY)		 ? "Portability" :
+									(type == GL_DEBUG_TYPE_PERFORMANCE)		 ? "Performance" :
+									(type == GL_DEBUG_TYPE_MARKER)				 ? "Marker" :
+									(type == GL_DEBUG_TYPE_PUSH_GROUP)			 ? "Push Group" :
+									(type == GL_DEBUG_TYPE_POP_GROUP)			 ? "Pop Group" : "<other>";
 
 		RMX_ERROR(titleString << " (severity = " << severityString << ", type = " << typeString << "):\n" << message, );
 	}
@@ -308,7 +311,7 @@ namespace opengldrawer
 			}
 		}
 
-		void printText(Font& font, const StringReader& text, const Recti& rect, const rmx::Painter::PrintOptions& printOptions)
+		void printText(Font& font, const StringReader& text, const Recti& rect, const DrawerPrintOptions& printOptions)
 		{
 			OpenGLFontOutput& fontOutput = getOpenGLFontOutput(font);
 			const Vec2f pos = font.alignText(rect, text, printOptions.mAlignment);
@@ -666,3 +669,5 @@ void OpenGLDrawer::presentScreen()
 {
 	SDL_GL_SwapWindow(mInternal.mOutputWindow);
 }
+
+#endif

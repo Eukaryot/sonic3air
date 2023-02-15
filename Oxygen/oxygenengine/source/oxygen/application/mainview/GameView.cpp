@@ -684,10 +684,12 @@ void GameView::render()
 			}
 		}
 
+	#ifdef RMX_WITH_OPENGL_SUPPORT
 		if (drawer.getType() == Drawer::Type::OPENGL)
 		{
 			FTX::Painter->setColor(Color::WHITE);	// Prevent possible broken display in UI (e.g. in S3AIR's menus)
 		}
+	#endif
 	}
 	drawer.performRendering();
 

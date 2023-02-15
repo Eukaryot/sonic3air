@@ -8,6 +8,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/utils/PaletteBitmap.h"
 #include "oxygen/rendering/utils/BufferTexture.h"
 #include "oxygen/drawing/opengl/OpenGLTexture.h"
@@ -48,3 +50,5 @@ public:
 	BufferTexture mVScrollOffsetsTexture[4];
 	BufferTexture mEmptyScrollOffsetsTexture;
 };
+
+#endif

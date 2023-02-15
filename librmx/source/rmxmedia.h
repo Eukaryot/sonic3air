@@ -17,6 +17,10 @@
 	#define DECLSPEC __attribute__ ((visibility("default")))
 #endif
 
+// OpenGL support master switch
+//  -> Can be disabled for platforms where OpenGL does not work
+#define RMX_WITH_OPENGL_SUPPORT
+
 
 // General includes
 #include "rmxbase.h"
@@ -28,14 +32,6 @@
 #include "rmxmedia/font/FontSource.h"
 #include "rmxmedia/font/Font.h"
 #include "rmxmedia/font/FontProcessor.h"
-#include "rmxmedia/opengl/Texture.h"
-#include "rmxmedia/opengl/SpriteAtlas.h"
-#include "rmxmedia/opengl/Shader.h"
-#include "rmxmedia/opengl/Framebuffer.h"
-#include "rmxmedia/opengl/VertexArrayObject.h"
-#include "rmxmedia/opengl/OpenGLFontOutput.h"
-#include "rmxmedia/opengl/GLTools.h"
-#include "rmxmedia/opengl/Painter.h"
 #include "rmxmedia/threads/Thread.h"
 #include "rmxmedia/audiovideo/VideoBuffer.h"
 #include "rmxmedia/audiovideo/AudioBuffer.h"
@@ -45,6 +41,17 @@
 #include "rmxmedia/framework/GuiBase.h"
 #include "rmxmedia/framework/AppFramework.h"
 #include "rmxmedia/framework/FTX_System.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+	#include "rmxmedia/opengl/Texture.h"
+	#include "rmxmedia/opengl/Shader.h"
+	#include "rmxmedia/opengl/Framebuffer.h"
+	#include "rmxmedia/opengl/VertexArrayObject.h"
+	#include "rmxmedia/opengl/OpenGLFontOutput.h"
+	#include "rmxmedia/opengl/GLTools.h"
+	#include "rmxmedia/opengl/Painter.h"
+#endif
+#include "rmxmedia/opengl/SpriteAtlas.h"
 
 
 // Library linking via pragma
@@ -61,7 +68,9 @@ namespace FTX
 	extern SingletonPtr<rmx::FTX_SystemManager>	System;
 	extern SingletonPtr<rmx::FTX_VideoManager>	Video;
 	extern SingletonPtr<rmx::AudioManager>		Audio;
+#ifdef RMX_WITH_OPENGL_SUPPORT
 	extern SingletonPtr<rmx::Painter>			Painter;
+#endif
 };
 
 // Initialization

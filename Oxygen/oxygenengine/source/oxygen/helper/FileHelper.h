@@ -21,7 +21,10 @@ public:
 	static bool loadPaletteBitmap(PaletteBitmap& bitmap, const std::wstring& filename, bool showError = true);
 	static bool loadBitmap(Bitmap& bitmap, const std::wstring& filename, bool showError = true);
 	static bool loadTexture(DrawerTexture& texture, const std::wstring& filename, bool showError = true);
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
 	static bool loadShader(Shader& shader, const std::wstring& filename, const std::string& techname = "", const std::string& additionalDefines = "");
+#endif
 
 	static bool extractZipFile(const std::wstring& zipFilename, const std::wstring& outputBasePath);
 };

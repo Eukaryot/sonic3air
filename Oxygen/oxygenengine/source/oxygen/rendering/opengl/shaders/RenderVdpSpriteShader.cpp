@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/shaders/RenderVdpSpriteShader.h"
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/Geometry.h"
@@ -86,3 +89,5 @@ void RenderVdpSpriteShader::draw(const SpriteManager::VdpSpriteInfo& spriteInfo,
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+#endif

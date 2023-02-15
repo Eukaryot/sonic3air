@@ -11,6 +11,8 @@
 
 #pragma once
 
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 
 class API_EXPORT Renderbuffer
 {
@@ -70,3 +72,5 @@ private:
 	int mHeight = 0;
 	std::map<GLenum, Renderbuffer*> mRenderbuffers;
 };
+
+#endif

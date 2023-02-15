@@ -7,6 +7,9 @@
 */
 
 #include "oxygen/pch.h"
+
+#ifdef RMX_WITH_OPENGL_SUPPORT
+
 #include "oxygen/rendering/opengl/shaders/DebugDrawPlaneShader.h"
 #include "oxygen/rendering/opengl/OpenGLRenderResources.h"
 #include "oxygen/rendering/parts/RenderParts.h"
@@ -55,3 +58,5 @@ void DebugDrawPlaneShader::draw(int planeIndex, RenderParts& renderParts, const 
 
 	mShader.unbind();
 }
+
+#endif
