@@ -37,16 +37,18 @@ namespace
 
 	bool dumpPaletteAsBMP(int paletteIndex)
 	{
-		PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
-		std::vector<uint8> fileContent;
+		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
 		Color palette[0x100] = { Color::TRANSPARENT };
+		paletteManager.getPalette(paletteIndex).dumpColors(palette, 0x100);
+
 		PaletteBitmap bmp;
 		bmp.create(16, 16);
 		for (int colorIndex = 0; colorIndex < 0x100; ++colorIndex)
 		{
-			palette[colorIndex] = paletteManager.getPaletteEntry(paletteIndex, (uint16)colorIndex);
 			bmp.getData()[colorIndex] = (uint8)colorIndex;
 		}
+
+		std::vector<uint8> fileContent;
 		if (!bmp.saveBMP(fileContent, palette))
 			return false;
 		return FTX::FileSystem->saveFile("palette_dump.bmp", fileContent);
@@ -56,14 +58,14 @@ namespace
 #if 0
 	bool dumpPaletteAsPAL(int paletteIndex)
 	{
-		PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
+		const PaletteManager& paletteManager = VideoOut::instance().getRenderParts().getPaletteManager();
 		String str;
 		str << "JASC-PAL\r\n";
 		str << "0100\r\n";
 		str << "256\r\n";
 		for (int colorIndex = 0; colorIndex < 64; ++colorIndex)
 		{
-			const Color color = paletteManager.getPaletteEntry(paletteIndex, colorIndex);
+			const Color color = paletteManager.getPalette(paletteIndex).getColor(colorIndex);
 			str << roundToInt(color.r * 255.0f) << ' ' << roundToInt(color.g * 255.0f) << ' ' << roundToInt(color.b * 255.0f) << "\r\n";
 		}
 		for (int colorIndex = 64; colorIndex < 256; ++colorIndex)
@@ -653,7 +655,7 @@ void GameView::render()
 			{
 				const int px = baseX + 1 + (k & 0x0f) * 5;
 				const int height = (k < 0x40) ? 4 : 2;
-				Color color = paletteManager.getPaletteEntry(paletteIndex, (uint16)k);
+				Color color = paletteManager.getPalette(paletteIndex).getColor(k);
 				color.a = 1.0f;
 				drawer.drawRect(Recti(px, py, 4, height), color);
 

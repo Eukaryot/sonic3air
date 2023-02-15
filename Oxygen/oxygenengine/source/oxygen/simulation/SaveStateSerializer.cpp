@@ -197,7 +197,7 @@ bool SaveStateSerializer::serializeState(VectorBinarySerializer& serializer, Sta
 			{
 				for (int i = 0; i < 0x40; ++i)
 				{
-					buffer[i] = paletteManager.getPaletteEntryPacked(0, i, true);
+					buffer[i] = paletteManager.getPalette(0).getEntryPacked(i, true);
 				}
 				serializer.serialize(buffer, 0x80);
 			}

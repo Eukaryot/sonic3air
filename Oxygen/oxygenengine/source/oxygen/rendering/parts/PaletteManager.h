@@ -11,31 +11,62 @@
 #include <rmxmedia.h>
 
 
+class Palette
+{
+friend class PaletteManager;
+
+public:
+	static const constexpr size_t NUM_COLORS = 0x200;
+
+public:
+	struct PackedPaletteColor
+	{
+		uint16 mPackedColor = 0;
+		bool mIsValid = false;
+	};
+
+public:
+	inline size_t getSize() const			{ return NUM_COLORS; }
+	inline const uint32* getData() const	{ return mColor; }
+
+	inline uint32 getEntry(int index) const	{ return (index >= 0 && index < (int)getSize()) ? mColor[index] : 0; }
+	inline Color getColor(int index) const	{ return Color::fromABGR32(getEntry(index)); }
+	uint16 getEntryPacked(uint16 colorIndex, bool allowExtendedPacked = false) const;
+
+	inline const uint64* getChangeFlags() const	{ return mChangeFlags; }
+	void resetAllPaletteChangeFlags();
+	void setAllPaletteChangeFlags();
+
+	void setPaletteEntry(uint16 colorIndex, uint32 color);
+	void setPaletteEntryPacked(uint16 colorIndex, uint32 color, uint16 packedColor);
+
+	void dumpColors(Color* outColors, int numColors) const;
+
+private:
+	uint32 mColor[NUM_COLORS] = { 0 };							// Colors in the palette
+	uint64 mChangeFlags[NUM_COLORS/64] = { true };				// One flag per color; only actually used and reset by hardware rendering
+	PackedPaletteColor mPackedColorCache[NUM_COLORS] = { 0 };	// Only used as an optimization
+};
+
+
 class PaletteManager
 {
-public:
-	static const constexpr uint16 NUM_COLORS = 0x200;
-
 public:
 	static Color unpackColor(uint16 packedColor);
 
 public:
 	void preFrameUpdate();
 
-	const uint32* getPalette(int paletteIndex) const;
-	void getPalette(Color* palette, int paletteIndex) const;
-	inline uint16 getPaletteSize(int paletteIndex) const  { return NUM_COLORS; }
+	Palette& getPalette(int paletteIndex);
+	const Palette& getPalette(int paletteIndex) const;
 
-	Color getPaletteEntry(int paletteIndex, uint16 colorIndex) const;
-	uint16 getPaletteEntryPacked(int paletteIndex, uint16 colorIndex, bool allowExtendedPacked = false) const;
 	void writePaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color);
 	void writePaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint16 packedColor);
 
-	const uint64* getPaletteChangeFlags(int paletteIndex) const;
 	void resetAllPaletteChangeFlags();
 	void setAllPaletteChangeFlags();
 
-	inline Color getBackdropColor() const  { return Color::fromABGR32(mPalette[0].mColor[mBackdropColorIndex]); }
+	inline Color getBackdropColor() const  { return getPalette(0).getColor(mBackdropColorIndex); }
 	inline void setBackdropColorIndex(uint16 paletteIndex)  { mBackdropColorIndex = paletteIndex; }
 
 	void setPaletteSplitPositionY(uint8 py);
@@ -47,23 +78,6 @@ public:
 
 public:
 	int mSplitPositionY = 0xffff;	// Use some large value as default that is definitely larger than any responable screen height
-
-private:
-	struct PackedPaletteColor
-	{
-		uint16 mPackedColor = 0;
-		bool mIsValid = false;
-	};
-	struct Palette
-	{
-		uint32 mColor[NUM_COLORS] = { 0 };							// Colors in the palette
-		uint64 mChangeFlags[NUM_COLORS/64] = { true };				// One flag per color; only actually used and reset by hardware rendering
-		PackedPaletteColor mPackedColorCache[NUM_COLORS] = { 0 };	// Only used as an optimization
-	};
-
-private:
-	void setPaletteEntry(int paletteIndex, uint16 colorIndex, uint32 color);
-	void setPaletteEntryPacked(int paletteIndex, uint16 colorIndex, uint32 color, uint16 packedColor);
 
 private:
 	Palette mPalette[2];			// [0] = Standard palette, [1] = Underwater palette (in S3AIR)

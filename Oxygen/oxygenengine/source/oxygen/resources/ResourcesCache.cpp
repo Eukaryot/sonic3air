@@ -161,8 +161,7 @@ const std::vector<const ResourcesCache::RawData*>& ResourcesCache::getRawData(ui
 
 const ResourcesCache::Palette* ResourcesCache::getPalette(uint64 key, uint8 line) const
 {
-	const auto it = mPalettes.find(key + line);
-	return (it == mPalettes.end()) ? nullptr : &it->second;
+	return mapFind(mPalettes, key + line);
 }
 
 void ResourcesCache::applyRomInjections(uint8* rom, uint32 romSize) const

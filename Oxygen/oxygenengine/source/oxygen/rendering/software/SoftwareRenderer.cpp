@@ -228,7 +228,7 @@ void SoftwareRenderer::renderDebugDraw(int debugDrawMode, const Recti& rect)
 		const PlaneManager& planeManager = mRenderParts.getPlaneManager();
 		const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
 		const PatternManager& patternManager = mRenderParts.getPatternManager();
-		const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
+		const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
 		const PatternManager::CacheItem* patternCache = patternManager.getPatternCache();
 		const uint16 numPatternsPerLine = (uint16)(bitmapSize.x / 8);
 		const bool highlightPrioPatterns = (FTX::keyState(SDLK_LSHIFT) != 0);
@@ -554,7 +554,7 @@ void SoftwareRenderer::renderPlane(const PlaneGeometry& geometry)
 	{
 		BufferedPlaneData& bufferedPlaneData = mBufferedPlaneData[foundFittingBufferedPlaneDataIndex];
 
-		const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
+		const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
 		const bool isBackground = (geometry.mPlaneIndex == PlaneManager::PLANE_B && !geometry.mPriorityFlag);
 
 		const std::vector<BufferedPlaneData::PixelBlock>& blocks = geometry.mPriorityFlag ? bufferedPlaneData.mPrioBlocks : bufferedPlaneData.mNonPrioBlocks;
@@ -611,7 +611,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 			const SpriteManager::VdpSpriteInfo& sprite = static_cast<const SpriteManager::VdpSpriteInfo&>(geometry.mSpriteInfo);
 
 			const PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-			const uint32* palettes[2] = { paletteManager.getPalette(0), paletteManager.getPalette(1) };
+			const uint32* palettes[2] = { paletteManager.getPalette(0).getData(), paletteManager.getPalette(1).getData() };
 			const PatternManager::CacheItem* patternCache = mRenderParts.getPatternManager().getPatternCache();
 
 			const uint8 depthValue = (sprite.mPriorityFlag) ? 0x80 : 0;
@@ -722,13 +722,13 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 				const PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(spriteInfo.mCacheItem->mSprite);
 				const PaletteBitmap& paletteBitmap = spriteInfo.mUseUpscaledSprite ? paletteSprite.getUpscaledBitmap() : paletteSprite.getBitmap();
 				const Blitter::IndexedSpriteWrapper spriteWrapper(paletteBitmap.getData(), paletteBitmap.getSize(), -paletteSprite.mOffset);
-				const Blitter::PaletteWrapper paletteWrapper(paletteManager.getPalette(0) + spriteInfo.mAtex, paletteManager.getPaletteSize(0) - spriteInfo.mAtex);
+				const Blitter::PaletteWrapper paletteWrapper(paletteManager.getPalette(0).getData() + spriteInfo.mAtex, paletteManager.getPalette(0).getSize() - spriteInfo.mAtex);
 
 				// Handle screen palette split
 				const int splitY = paletteManager.mSplitPositionY;
 				if (splitY < mGameResolution.y)
 				{
-					const Blitter::PaletteWrapper paletteWrapper2(paletteManager.getPalette(1) + spriteInfo.mAtex, paletteManager.getPaletteSize(1) - spriteInfo.mAtex);
+					const Blitter::PaletteWrapper paletteWrapper2(paletteManager.getPalette(1).getData() + spriteInfo.mAtex, paletteManager.getPalette(1).getSize() - spriteInfo.mAtex);
 
 					Recti targetRect = Recti::getIntersection(mCurrentViewport, Recti(0, 0, mGameResolution.x, splitY));
 					mBlitter.blitIndexed(Blitter::OutputWrapper(gameScreenBitmap, targetRect), spriteWrapper, paletteWrapper, spriteInfo.mInterpolatedPosition, blitterOptions);

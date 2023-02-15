@@ -82,7 +82,7 @@ void RenderParts::dumpPatternsContent()
 	mPatternManager.dumpAsPaletteBitmap(bmp);
 
 	Color palette[0x100];
-	mPaletteManager.getPalette(palette, 0);
+	mPaletteManager.getPalette(0).dumpColors(palette, 0x100);
 
 	std::vector<uint8> content;
 	bmp.saveBMP(content, palette);
@@ -95,7 +95,7 @@ void RenderParts::dumpPlaneContent(int planeIndex)
 	mPlaneManager.dumpAsPaletteBitmap(bmp, planeIndex);
 
 	Color palette[0x100];
-	mPaletteManager.getPalette(palette, 0);
+	mPaletteManager.getPalette(0).dumpColors(palette, 0x100);
 
 	std::vector<uint8> content;
 	bmp.saveBMP(content, palette);

@@ -84,7 +84,7 @@ void SpriteDump::addSprite(const PaletteSprite& paletteSprite, std::string_view 
 	if (!FTX::FileSystem->exists(*filename))
 	{
 		Color palette[0x100];
-		VideoOut::instance().getRenderParts().getPaletteManager().getPalette(palette, 0);
+		VideoOut::instance().getRenderParts().getPaletteManager().getPalette(0).dumpColors(palette, 0x100);
 		if (atex != 0)
 		{
 			for (int i = 0; i < 0x10; ++i)

@@ -52,8 +52,8 @@ void OpenGLRenderResources::initialize()
 {
 	// Palettes
 	{
-		mPaletteBitmap.create(PaletteManager::NUM_COLORS, 2);
-		mPaletteTexture.setup(Vec2i(PaletteManager::NUM_COLORS, 2), rmx::OpenGLHelper::FORMAT_RGBA);
+		mPaletteBitmap.create(Palette::NUM_COLORS, 2);
+		mPaletteTexture.setup(Vec2i(Palette::NUM_COLORS, 2), rmx::OpenGLHelper::FORMAT_RGBA);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -89,17 +89,17 @@ void OpenGLRenderResources::refresh()
 	{
 		Bitmap& bitmap = mPaletteBitmap;
 		PaletteManager& paletteManager = mRenderParts.getPaletteManager();
-		const uint32* palette0 = paletteManager.getPalette(0);
-		const uint32* palette1 = paletteManager.getPalette(1);
+		const uint32* palette0 = paletteManager.getPalette(0).getData();
+		const uint32* palette1 = paletteManager.getPalette(1).getData();
 
 		// First check if there were any changes since the last refresh at all
-		int firstChangedColor = PaletteManager::NUM_COLORS;
+		int firstChangedColor = Palette::NUM_COLORS;
 		int lastChangedColor = -1;
 		bool secondaryPaletteChanged = false;
 		{
-			const uint64* changeFlags0 = paletteManager.getPaletteChangeFlags(0);
-			const uint64* changeFlags1 = paletteManager.getPaletteChangeFlags(1);
-			for (int k = 0; k < PaletteManager::NUM_COLORS / 64; ++k)
+			const uint64* changeFlags0 = paletteManager.getPalette(0).getChangeFlags();
+			const uint64* changeFlags1 = paletteManager.getPalette(1).getChangeFlags();
+			for (int k = 0; k < Palette::NUM_COLORS / 64; ++k)
 			{
 				// For all changed, copy over the data
 				if (changeFlags0[k] != 0)
