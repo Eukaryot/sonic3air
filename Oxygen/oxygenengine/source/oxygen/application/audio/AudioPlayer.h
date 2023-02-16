@@ -93,6 +93,7 @@ private:
 	{
 		int mPlayingChannelId = -1;
 		int mOverriddenChannelId = -1;
+		uint8 mContextId = 0;
 		uint32 mPlayingSoundUniqueId = 0;
 		bool mActive = true;
 	};
@@ -134,9 +135,9 @@ private:
 	PlayingSound* getPlayingSound(AudioReference& audioRef);
 	const PlayingSound* getPlayingSound(AudioReference& audioRef) const;
 
-	void applyChannelOverride(int overriddenChannelId);
-	void removeChannelOverride(int overriddenChannelId);
-	bool isChannelOverridden(int channelId) const;
+	void applyChannelOverride(int overriddenChannelId, uint8 contextId);
+	void removeChannelOverride(int overriddenChannelId, uint8 contextId);
+	bool isChannelOverridden(int channelId, uint8 contextId) const;
 
 	AudioModifier* findAudioModifier(int channelId, int contextId, int* outIndex = nullptr);
 	SourceRegistration* getModifiedSourceRegistration(SourceRegistration& baseSourceReg, std::string_view postfix) const;

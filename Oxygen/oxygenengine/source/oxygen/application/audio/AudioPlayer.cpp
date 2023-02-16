@@ -109,7 +109,7 @@ void AudioPlayer::playOverride(uint64 sfxId, int contextId, int channelId, int o
 	// Deactivate duplicates first
 	for (ChannelOverride& channelOverride : mChannelOverrides)
 	{
-		if (channelOverride.mPlayingChannelId == channelId)
+		if (channelOverride.mPlayingChannelId == channelId && channelOverride.mContextId == contextId)
 		{
 			channelOverride.mActive = false;
 		}
@@ -131,10 +131,11 @@ void AudioPlayer::playOverride(uint64 sfxId, int contextId, int channelId, int o
 		ChannelOverride& channelOverride = vectorAdd(mChannelOverrides);
 		channelOverride.mPlayingChannelId = channelId;
 		channelOverride.mOverriddenChannelId = overriddenChannelId;
+		channelOverride.mContextId = contextId;
 		channelOverride.mPlayingSoundUniqueId = playingSound->mUniqueId;
 
 		// Apply its effects
-		applyChannelOverride(overriddenChannelId);
+		applyChannelOverride(overriddenChannelId, contextId);
 	}
 }
 
@@ -233,10 +234,10 @@ void AudioPlayer::updatePlayback(float timeElapsed)
 		if (!channelOverride.mActive)
 		{
 			// Check if overridden channel is still affected by another override
-			if (!isChannelOverridden(channelOverride.mOverriddenChannelId))
+			if (!isChannelOverridden(channelOverride.mOverriddenChannelId, channelOverride.mContextId))
 			{
 				// Undo its effects
-				removeChannelOverride(channelOverride.mOverriddenChannelId);
+				removeChannelOverride(channelOverride.mOverriddenChannelId, channelOverride.mContextId);
 			}
 
 			// Remove from list
@@ -521,7 +522,7 @@ AudioPlayer::PlayingSound* AudioPlayer::playAudioInternal(SourceRegistration* so
 	}
 
 	// Check for channel overrides
-	const bool isOverridden = isChannelOverridden(channelId);
+	const bool isOverridden = isChannelOverridden(channelId, contextId);
 	const float volume = isOverridden ? 0.0f : 1.0f;
 
 	// Start playing that sound
@@ -710,10 +711,11 @@ const AudioPlayer::PlayingSound* AudioPlayer::getPlayingSound(AudioReference& au
 	return const_cast<AudioPlayer*>(this)->getPlayingSound(audioRef);
 }
 
-void AudioPlayer::applyChannelOverride(int overriddenChannelId)
+void AudioPlayer::applyChannelOverride(int overriddenChannelId, uint8 contextId)
 {
 	SoundIterator iterator(mPlayingSounds);
 	iterator.filterChannel(overriddenChannelId);
+	iterator.filterContext(contextId);
 	iterator.filterState(PlayingSound::State::PLAYING);
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
@@ -726,10 +728,11 @@ void AudioPlayer::applyChannelOverride(int overriddenChannelId)
 	}
 }
 
-void AudioPlayer::removeChannelOverride(int overriddenChannelId)
+void AudioPlayer::removeChannelOverride(int overriddenChannelId, uint8 contextId)
 {
 	SoundIterator iterator(mPlayingSounds);
 	iterator.filterChannel(overriddenChannelId);
+	iterator.filterContext(contextId);
 	iterator.filterState(PlayingSound::State::OVERRIDDEN);
 	while (PlayingSound* soundPtr = iterator.getNext())
 	{
@@ -746,11 +749,11 @@ void AudioPlayer::removeChannelOverride(int overriddenChannelId)
 	}
 }
 
-bool AudioPlayer::isChannelOverridden(int channelId) const
+bool AudioPlayer::isChannelOverridden(int channelId, uint8 contextId) const
 {
 	for (const ChannelOverride& channelOverride : mChannelOverrides)
 	{
-		if (channelOverride.mOverriddenChannelId == channelId && channelOverride.mActive)
+		if (channelOverride.mOverriddenChannelId == channelId && channelOverride.mContextId == contextId && channelOverride.mActive)
 			return true;
 	}
 	return false;

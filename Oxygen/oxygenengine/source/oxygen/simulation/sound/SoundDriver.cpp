@@ -219,17 +219,7 @@ public:
 	{
 		// Some sanity checks
 		RMX_ASSERT(sizeof(zTrack) == 0x30, "");
-
-		memset(mRam, 0, 0x2000);
-		memcpy(mRam + 0x00d6, DACBanksData, 0x45);
-		memcpy(mRam + 0x049c, zFMInstrumentRegTableData, 0x1d);
-		memcpy(mRam + 0x0695, zFMDACInitBytesData, 0x14);
-		memcpy(mRam + 0x07df, zSFXChannelDataData, 0x20);
-		memcpy(mRam + 0x0aa5, zPSGFrequenciesData, 0xf3);
-		memcpy(mRam + 0x1116, DecTableData, 0x10);
-		memcpy(mRam + 0x1300, z80_SoundDriverPointersData, 0x843);
-
-		zRingSpeaker = 1;		// 0x33 should be the right (not left) ring sound, as 0x34 is the right one already
+		reset();
 	}
 
 	void setFixedContent(const uint8* data, uint32 size, uint32 offset)
@@ -241,7 +231,33 @@ public:
 
 	void reset()
 	{
+		memset(mRam, 0, 0x2000);
+		memcpy(mRam + 0x00d6, DACBanksData, 0x45);
+		memcpy(mRam + 0x049c, zFMInstrumentRegTableData, 0x1d);
+		memcpy(mRam + 0x0695, zFMDACInitBytesData, 0x14);
+		memcpy(mRam + 0x07df, zSFXChannelDataData, 0x20);
+		memcpy(mRam + 0x0aa5, zPSGFrequenciesData, 0xf3);
+		memcpy(mRam + 0x1116, DecTableData, 0x10);
+		memcpy(mRam + 0x1300, z80_SoundDriverPointersData, 0x843);
+
+		zRingSpeaker = 1;		// 0x33 should be the right (not left) ring sound, as 0x34 is the right one already
 		zSpindashRev = 0;
+
+		zBankBaseAddress = 0;
+		mCycles = 0;
+		mFrameNumber = 0;
+		mNumFramesCalculated = 0;
+		mStopped = false;
+		mSoundChipWritesThisFrame.clear();
+		mSoundChipWritesCalculated.clear();
+
+		mDACPlaybackState = DACPlaybackState::IDLE;
+		mDACSampleLength = 0;
+		mDACSampleDataPtr = 0;
+		sample1_rate = 0;
+		sample2_rate = 0;
+		sample1_index = 0;
+		sample2_index = 0;
 	}
 
 	SoundDriver::UpdateResult performSoundDriverUpdate()
