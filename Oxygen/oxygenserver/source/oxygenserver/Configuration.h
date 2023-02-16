@@ -26,8 +26,8 @@ public:
 
 public:
 	// Server setup
-	uint16 mUDPPort = 21094;
-	uint16 mTCPPort = 21095;
+	uint16 mUDPPort = 0;
+	uint16 mTCPPort = 0;
 
 private:
 	static inline Configuration* mSingleInstance = nullptr;

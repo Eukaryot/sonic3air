@@ -8,6 +8,7 @@
 
 #include "oxygenserver/pch.h"
 #include "oxygenserver/server/Server.h"
+#include "oxygenserver/Configuration.h"
 
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
@@ -19,17 +20,22 @@
 
 void Server::runServer()
 {
-	// Setup sockets & connection manager
+	Configuration& config = Configuration::instance();
+	const uint16 udpPort = (config.mUDPPort == 0) ? UDP_SERVER_PORT : config.mUDPPort;
+	const uint16 tcpPort = (config.mTCPPort == 0) ? TCP_SERVER_PORT : config.mTCPPort;
+
+	// Setup sockets
 	UDPSocket udpSocket;
-	if (!udpSocket.bindToPort(UDP_SERVER_PORT))
-		RMX_ERROR("UDP socket bind to port " << UDP_SERVER_PORT << " failed", return);
-	RMX_LOG_INFO("UDP socket bound to port " << UDP_SERVER_PORT);
+	if (!udpSocket.bindToPort(udpPort))
+		RMX_ERROR("UDP socket bind to port " << udpPort << " failed", return);
+	RMX_LOG_INFO("UDP socket bound to port " << udpPort);
 
 	TCPSocket tcpListenSocket;
-	if (!tcpListenSocket.setupServer(TCP_SERVER_PORT))
-		RMX_ERROR("TCP socket bind to port " << TCP_SERVER_PORT << " failed", return);
-	RMX_LOG_INFO("TCP socket bound to port " << TCP_SERVER_PORT);
+	if (!tcpListenSocket.setupServer(tcpPort))
+		RMX_ERROR("TCP socket bind to port " << tcpPort << " failed", return);
+	RMX_LOG_INFO("TCP socket bound to port " << tcpPort);
 
+	// Setup connection manager
 	ConnectionManager connectionManager(&udpSocket, &tcpListenSocket, *this, network::HIGHLEVEL_PROTOCOL_VERSION_RANGE);
 #ifdef DEBUG
 	setupDebugSettings(connectionManager.mDebugSettings);
