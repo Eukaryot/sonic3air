@@ -426,6 +426,8 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 	{
 		const OverlayManager& overlayManager = RenderParts::instance().getOverlayManager();
 		const Vec2i worldSpaceOffset = getInterpolatedWorldSpaceOffset();
+		FontCollection& fontCollection = FontCollection::instance();
+
 		for (int i = 0; i < OverlayManager::NUM_CONTEXTS; ++i)
 		{
 			const std::vector<OverlayManager::DebugDrawRect>& debugDrawRects = overlayManager.getDebugDrawRects((OverlayManager::Context)i);
@@ -453,7 +455,11 @@ void VideoOut::collectGeometries(std::vector<Geometry*>& geometries)
 					screenPosition -= worldSpaceOffset;
 				}
 
-				Font* font = FontCollection::instance().getFontByKey(text.mFontKeyHash);
+				Font* font = fontCollection.getFontByKey(text.mFontKeyHash);
+				if (nullptr == font)
+				{
+					font = fontCollection.createFontByKey(text.mFontKeyString);
+				}
 				if (nullptr != font)
 				{
 					const PrintedTextCache::Key key(text.mFontKeyHash, text.mTextHash, (uint8)text.mSpacing);

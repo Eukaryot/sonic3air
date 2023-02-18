@@ -298,10 +298,12 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 						case SDLK_F10:
 						{
+							HighResolutionTimer timer;
+							timer.start();
 							RenderResources::instance().loadSpriteCache();
 							ResourcesCache::instance().loadAllResources();
 							FontCollection::instance().reloadAll();
-							setLogDisplay("Reloaded resources");
+							setLogDisplay(String(0, "Reloaded resources in %0.2f sec", timer.getSecondsSinceStart()));
 							break;
 						}
 					}

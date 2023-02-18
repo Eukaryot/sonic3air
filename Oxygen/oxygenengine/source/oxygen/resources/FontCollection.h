@@ -21,6 +21,7 @@ public:
 		std::wstring mDefinitionFile;
 		const Mod* mMod = nullptr;
 	};
+
 	struct CollectedFont
 	{
 		std::string mKeyString;
@@ -35,16 +36,20 @@ public:
 
 public:
 	Font* getFontByKey(uint64 keyHash);
+	Font* createFontByKey(std::string_view key);
+
+	bool registerManagedFont(Font& font, std::string_view key);
 
 	void reloadAll();
 	void collectFromMods();
 
-	void registerManagedFont(Font& font, const std::string& key);
-
 private:
+	void registerManagedFontInternal(Font& font, CollectedFont& collectedFont);
 	void loadDefinitionsFromPath(std::wstring_view path, const Mod* mod);
 	void updateLoadedFonts();
 
 private:
-	std::unordered_map<uint64, CollectedFont> mCollectedFonts;	// Using "mKeyHash" as map key
+	std::unordered_map<uint64, CollectedFont> mCollectedFonts;	// Includes all the fonts that were loaded from files; using "mKeyHash" as map key
+	std::unordered_map<uint64, Font*> mFontsByKeyHash;			// Includes unmodified collected fonts and run-time created fonts (though not the managed fonts); using the font's key hash as map key
+	ObjectPool<Font> mFontPool;
 };

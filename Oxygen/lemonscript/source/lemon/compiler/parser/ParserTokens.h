@@ -10,7 +10,9 @@
 
 #include "lemon/compiler/Definitions.h"
 #include "lemon/compiler/GenericManager.h"
+#include "lemon/compiler/Operators.h"
 #include "lemon/program/DataType.h"
+#include "lemon/utility/AnyBaseValue.h"
 #include "lemon/utility/FlyweightString.h"
 
 
