@@ -587,15 +587,15 @@ void Configuration::loadConfigurationProperties(JsonHelper& rootHelper)
 	rootHelper.tryReadInt("StartPhase", mStartPhase);
 
 	// Game recorder
-	Json::Value gamerecJson = rootHelper.mJson["DevMode"];
+	Json::Value gamerecJson = rootHelper.mJson["GameRecording"];
 	if (gamerecJson.isObject())
 	{
 		JsonHelper gamerecHelper(gamerecJson);
 		gamerecHelper.tryReadBool("EnablePlayback", mGameRecorder.mIsPlayback);
 		if (mGameRecorder.mIsPlayback)
 		{
-			rootHelper.tryReadInt("PlaybackStartFrame", mGameRecorder.mPlaybackStartFrame);
-			rootHelper.tryReadBool("PlaybackIgnoreKeys", mGameRecorder.mPlaybackIgnoreKeys);
+			gamerecHelper.tryReadInt("PlaybackStartFrame", mGameRecorder.mPlaybackStartFrame);
+			gamerecHelper.tryReadBool("PlaybackIgnoreKeys", mGameRecorder.mPlaybackIgnoreKeys);
 		}
 	}
 

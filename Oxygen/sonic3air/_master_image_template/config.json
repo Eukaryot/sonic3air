@@ -14,5 +14,15 @@
 		"Enabled": "0",				// Set to "1" to enable developer mode (see Oxygen Handbook in "bonus/oxygenengine" folder for details)
 		"EnforceDebugMode": "0",	// Set to "1" to enable in-game debug mode whenever dev mode is active, independently from what's set in the Options menu
 		"SkipExitConfirmation": "0"	// Set to "1" to skip the confirmation when exiting the game from pause menu
+	},
+
+	// Game recorder
+	"GameRecording":
+	{
+		// Whether game recording is active at all is saved in settings.json (it usually is for desktop platforms)
+		// Warning: Playback of game recordings can have undesired side effects like overwriting persistent data!
+		"EnablePlayback": "0",			// Set to "1" to enable playback of local "gamerecording.bin" file
+		"PlaybackStartFrame": "0",		// Optional start frame inside the playback, where the game fast-forwards to
+		"PlaybackIgnoreKeys": "0"		// Ignore keyframes in the recording (except the first), only play back the inputs
 	}
 }
