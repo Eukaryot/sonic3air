@@ -90,7 +90,7 @@ bool Simulation::startup()
 		if (mGameRecorder.isPlaying())
 		{
 			mGameRecorder.setIgnoreKeys(config.mGameRecorder.mPlaybackIgnoreKeys);
-			mFastForwardTarget = config.mGameRecorder.mPlaybackStartFrame;
+			mCurrentTargetFrame = (double)config.mGameRecorder.mPlaybackStartFrame;
 			config.setSettingsReadOnly(true);	// Do not overwrite settings
 		}
 	}
@@ -152,10 +152,8 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 		}
 	}
 
-	const float tickLength = 1.0f / getSimulationFrequency();
-	const float tickAccumInitial = tickLength * 0.25f;		// You would usually except this to be zero, but that's a bit too far from the stable center
-
-	mAccumulatedTime = tickAccumInitial;
+	mFrameNumber = 0;
+	mCurrentTargetFrame = 0.0;
 	mNextSingleStep = false;
 	mSingleStepContinue = false;
 }
@@ -228,24 +226,6 @@ void Simulation::update(float timeElapsed)
 	if (!isRunning() || !mCodeExec.isCodeExecutionPossible())
 		return;
 
-	const float tickLength = 1.0f / getSimulationFrequency();
-	const float tickStableCenter = tickLength * 0.5f;		// Right in between the tick length, where it's most clearly inside the tick (towards the edges 0.0f and tick length, things get a bit ambiguous)
-	const float tickAccumInitial = tickLength * 0.25f;		// You would usually except this to be zero, but that's a bit too far from the stable center
-
-	// Handle fast forwarding (for game recording playback)
-	if (mFrameNumber < mFastForwardTarget)
-	{
-		for (int i = std::min<int>(mFastForwardTarget - mFrameNumber, 500); i > 0; --i)
-		{
-			// Update emulation
-			const bool result = generateFrame();
-			if (!result)
-				break;
-		}
-		mAccumulatedTime = tickAccumInitial;
-		return;
-	}
-
 	// Limit length of one frame to 100ms
 	timeElapsed = clamp(timeElapsed, 0.0f, 0.1f);
 
@@ -254,64 +234,68 @@ void Simulation::update(float timeElapsed)
 	{
 		if (mNextSingleStep)
 		{
-			mAccumulatedTime = tickLength;
+			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame + 1.0);
 			mNextSingleStep = mSingleStepContinue;
 		}
 		else
 		{
-			mAccumulatedTime = tickAccumInitial;
+			mCurrentTargetFrame = roundToDouble(mCurrentTargetFrame);
 		}
 	}
 	else
 	{
 		const float step = timeElapsed * mSimulationSpeed;
-		mAccumulatedTime += step;
+		mCurrentTargetFrame += (double)(step * getSimulationFrequency());
 	}
 
-	if (mAccumulatedTime >= tickLength)
+	const bool useFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
+	const uint32 requiredFrameNumber = useFrameInterpolation ? (uint32)std::ceil(mCurrentTargetFrame) : (uint32)roundToInt(mCurrentTargetFrame);
+
+	if (mFrameNumber < requiredFrameNumber)
 	{
 		const uint32 startTime = SDL_GetTicks();
 		const uint32 limitTime = startTime + 200;
 
-		while (true)
+		while (mFrameNumber < requiredFrameNumber)
 		{
 			// Update emulation
 			const bool result = generateFrame();
-			mAccumulatedTime -= tickLength;
-
-			if (!result || mAccumulatedTime < tickLength)
+			if (!result)
 				break;
 
 			// Time limit to prevent non-responding application
 			if (SDL_GetTicks() >= limitTime)
-			{
-				mAccumulatedTime = tickAccumInitial;
 				break;
-			}
 		}
 
 		// Each second, a small correction to the accumulated time gets applied
-		if (mFrameNumber - mLastCorrectionFrame >= 60)
+		if ((int)(mFrameNumber - mLastCorrectionFrame) >= (int)getSimulationFrequency())
 		{
 			// The idea here is to bring the accumulated time towards the midpoint, where it's most stable against unintentional double frames or frame skips (which might happen otherwise)
 			//  -> This is most useful for 60 Hz displays with V-sync on, but should have a similar effect on e.g. 75 Hz, 90 Hz, 120 Hz
 			//  -> It should not introduce any noticeable issues or game speed changes in other cases
-			const float diff = mAccumulatedTime - tickStableCenter;
-			const float maxChange = tickLength * 0.1f;
-			if (std::fabs(diff) < tickLength * 0.4f)	// Don't do this while close to the instable edges
-			{
-				mAccumulatedTime += clamp(-diff, -maxChange, maxChange);
-				mLastCorrectionFrame = mFrameNumber;
-			}
+			const double stableOffset = useFrameInterpolation ? 0.25 : 0.0;
+			const double diff = mCurrentTargetFrame - (roundToDouble(mCurrentTargetFrame - stableOffset) + stableOffset);
+			const constexpr double maxChange = 0.1;
+			mCurrentTargetFrame += clamp(-diff, -maxChange, maxChange);
+			mLastCorrectionFrame = mFrameNumber;
 		}
 	}
 
-	VideoOut::instance().setInterFramePosition(saturate(mAccumulatedTime / tickLength));
+	if (mFrameNumber == requiredFrameNumber)
+	{
+		const float position = saturate((float)(mCurrentTargetFrame - (double)(mFrameNumber - 1)));
+		VideoOut::instance().setInterFramePosition(position);
+	}
+	else
+	{
+		VideoOut::instance().setInterFramePosition(0.0f);
+	}
 
 #if 0
 	// Meant for debugging of accumulated time stability
 	if ((mFrameNumber % 6) == 0)
-		LogDisplay::instance().setModeDisplay(String(0, "accum = %02d%%", roundToInt(mAccumulatedTime / tickLength * 100)));
+		LogDisplay::instance().setModeDisplay(String(0, "diff = %+0.3f", (float)(mCurrentTargetFrame - roundToDouble(mCurrentTargetFrame))));
 #endif
 }
 

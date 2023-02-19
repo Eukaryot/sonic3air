@@ -44,9 +44,11 @@ public:
 
 	void preFrameUpdate();
 	void postFrameUpdate();
-	void setInterFramePosition(float position);
-	bool updateGameScreen();
 
+	inline bool useFrameInterpolation() const  { return mFrameInterpolation.mUseInterpolationThisUpdate; }
+	void setInterFramePosition(float position);
+
+	bool updateGameScreen();
 	void blurGameScreen();
 
 	void preRefreshDebugging();

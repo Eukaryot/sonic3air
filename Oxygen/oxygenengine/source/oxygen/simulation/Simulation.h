@@ -74,11 +74,11 @@ private:
 	float	mSimulationFrequencyOverride = 0.0f;
 	float	mSimulationSpeed = 1.0f;
 	float	mDefaultSimulationSpeed = 1.0f;
-	float	mAccumulatedTime = 0.0f;
 	bool	mNextSingleStep = false;
 	bool	mSingleStepContinue = false;
+
+	double	mCurrentTargetFrame = 0.0f;
 	uint32	mFrameNumber = 0;
-	uint32	mFastForwardTarget = 0;
 	uint32	mLastCorrectionFrame = 0;
 
 	std::wstring mStateLoaded;

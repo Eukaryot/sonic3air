@@ -95,7 +95,9 @@ FORCE_INLINE bool inside(double value, double vmin, double vmax)	{ return (value
 
 // Round to integer
 FORCE_INLINE int roundToInt(float value)		{ return (int)floor(value + 0.5f); }
+FORCE_INLINE int roundToInt(double value)		{ return (int)floor(value + 0.5); }
 FORCE_INLINE float roundToFloat(float value)	{ return floor(value + 0.5f); }
+FORCE_INLINE double roundToDouble(double value)	{ return floor(value + 0.5); }
 
 // Round for integer, identity for floats
 template<typename T> static T roundForInt(float value)  { return (T)value; }
