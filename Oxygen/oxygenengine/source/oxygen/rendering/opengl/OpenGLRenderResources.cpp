@@ -55,15 +55,15 @@ void OpenGLRenderResources::initialize()
 {
 	// Palettes
 	{
-		mPaletteBitmap.create(Palette::NUM_COLORS, 2);
-		mPaletteTexture.setup(Vec2i(Palette::NUM_COLORS, 2), rmx::OpenGLHelper::FORMAT_RGBA);
+		mPaletteBitmap.create(256, Palette::NUM_COLORS / 256 * 2);
+		mPaletteTexture.setup(mPaletteBitmap.getSize(), rmx::OpenGLHelper::FORMAT_RGBA);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	// Patterns
 	{
 		mPatternCacheBitmap.create(0x40, 0x800);
-		mPatternCacheTexture.create(BufferTexture::PixelFormat::UINT_8, 0x40, 0x800);
+		mPatternCacheTexture.create(BufferTexture::PixelFormat::UINT_8, mPatternCacheBitmap.getSize());
 	}
 
 	// Planes & scrolling
@@ -96,33 +96,28 @@ void OpenGLRenderResources::refresh()
 		const uint32* palette1 = paletteManager.getPalette(1).getData();
 
 		// First check if there were any changes since the last refresh at all
-		int firstChangedColor = Palette::NUM_COLORS;
-		int lastChangedColor = -1;
+		bool primaryPaletteChanged = false;
 		bool secondaryPaletteChanged = false;
 		{
 			const uint64* changeFlags0 = paletteManager.getPalette(0).getChangeFlags();
 			const uint64* changeFlags1 = paletteManager.getPalette(1).getChangeFlags();
 			for (int k = 0; k < Palette::NUM_COLORS / 64; ++k)
 			{
-				// For all changed, copy over the data
+				// For all changed flags, copy over the respective data
 				if (changeFlags0[k] != 0)
 				{
-					firstChangedColor = std::min(firstChangedColor, k * 64);
-					lastChangedColor = std::max(lastChangedColor, k * 64 + 63);
-					memcpy(bitmap.getPixelPointer(k * 64, 0), palette0 + k * 64, 64 * sizeof(uint32));
+					memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256), palette0 + k * 64, 64 * sizeof(uint32));
+					primaryPaletteChanged = true;
 				}
 				if (changeFlags1[k] != 0)
 				{
-					firstChangedColor = std::min(firstChangedColor, k * 64);
-					lastChangedColor = std::max(lastChangedColor, k * 64 + 63);
-					memcpy(bitmap.getPixelPointer(k * 64, 1), palette1 + k * 64, 64 * sizeof(uint32));
+					memcpy(bitmap.getPixelPointer((k * 64) % 256, (k * 64) / 256 + 2), palette1 + k * 64, 64 * sizeof(uint32));
 					secondaryPaletteChanged = true;
 				}
 			}
 		}
 
-		const bool anyChange = (firstChangedColor <= lastChangedColor);
-		if (anyChange)
+		if (primaryPaletteChanged || secondaryPaletteChanged)
 		{
 			// Upload changes to the GPU
 			glBindTexture(GL_TEXTURE_2D, mPaletteTexture.getHandle());
@@ -133,8 +128,8 @@ void OpenGLRenderResources::refresh()
 			}
 			else
 			{
-				// Update only what's changes in the primary palette
-				glTexSubImage2D(GL_TEXTURE_2D, 0, firstChangedColor, 0, lastChangedColor - firstChangedColor + 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getPixelPointer(firstChangedColor, 0));
+				// Update only the primary palette
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 2, GL_RGBA, GL_UNSIGNED_BYTE, bitmap.getData());
 			}
 			glBindTexture(GL_TEXTURE_2D, 0);
 

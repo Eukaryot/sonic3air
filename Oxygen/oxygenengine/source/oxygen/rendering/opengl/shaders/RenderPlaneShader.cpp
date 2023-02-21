@@ -170,7 +170,7 @@ void RenderPlaneShader::draw(const PlaneGeometry& geometry, int waterSurfaceHeig
 		const int paletteVariant = i;
 		if (mLastPaletteVariant != paletteVariant || !mInitialized)
 		{
-			const float paletteOffset = (float)(paletteVariant + 0.5f) / 2.0f;
+			const float paletteOffset = (float)paletteVariant / 2.0f;
 			glUniform1f(mLocPaletteOffset, paletteOffset);
 			mLastPaletteVariant = paletteVariant;
 		}

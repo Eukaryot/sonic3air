@@ -109,7 +109,7 @@ namespace network
 	};
 
 
-	// Sent from client to server
+	// Sent from server to client
 	struct ChannelErrorPacket : public highlevel::PacketBase
 	{
 		HIGHLEVEL_PACKET_DEFINE_PACKET_TYPE("ChannelErrorPacket");

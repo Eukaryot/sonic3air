@@ -31,6 +31,7 @@ public:
 	~BufferTexture();
 
 	void create(PixelFormat pixelFormat, int width = 0, int height = 1, const void* data = nullptr);
+	void create(PixelFormat pixelFormat, Vec2i size, const void* data = nullptr);
 
 	inline bool isValid() const				{ return mTexBuffer != (GLuint)~0; }
 	inline GLuint getTextureHandle() const	{ return mTextureHandle; }

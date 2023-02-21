@@ -177,6 +177,9 @@ bool GhostSync::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 					}
 					break;
 				}
+
+				default:
+					break;
 			}
 			return true;
 		}

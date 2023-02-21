@@ -73,6 +73,21 @@ uniform int PriorityFlag;		// 0 or 1
 	uniform int ScrollOffsetY;
 #endif
 
+
+vec4 getPaletteColor(int paletteIndex, float paletteOffsetY)
+{
+#ifdef GL_ES
+	int paletteY = paletteIndex / 256;
+	int paletteX = paletteIndex - paletteY * 256;
+#else
+	int paletteX = paletteIndex & 0xff;
+	int paletteY = paletteIndex >> 8;
+#endif
+	vec2 samplePosition = vec2((float(paletteX) + 0.5) / 256.0, (float(paletteY) + 0.5) / 4.0 + paletteOffsetY);
+	return texture(PaletteTexture, samplePosition);
+}
+
+
 void main()
 {
 	int ix = int(LocalOffset.x);
@@ -175,7 +190,7 @@ void main()
 #endif
 	paletteIndex += atex;
 
-	vec4 color = texture(PaletteTexture, vec2((float(paletteIndex) + 0.5) / 512.0, PaletteOffset));
+	vec4 color = getPaletteColor(paletteIndex, PaletteOffset);
 #ifdef ALPHA_TEST
 	if (color.a < 0.01)
 		discard;

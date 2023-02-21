@@ -36,6 +36,21 @@ uniform sampler2D PaletteTexture;
 uniform ivec4 PlayfieldSize;
 uniform int HighlightPrio;		// 0 or 1
 
+
+vec4 getPaletteColor(int paletteIndex, float paletteOffsetY)
+{
+#ifdef GL_ES
+	int paletteY = paletteIndex / 256;
+	int paletteX = paletteIndex - paletteY * 256;
+#else
+	int paletteX = paletteIndex & 0xff;
+	int paletteY = paletteIndex >> 8;
+#endif
+	vec2 samplePosition = vec2((float(paletteX) + 0.5) / 256.0, (float(paletteY) + 0.5) / 4.0 + paletteOffsetY);
+	return texture(PaletteTexture, samplePosition);
+}
+
+
 void main()
 {
 	int ix = int(uv0.x * float(PlayfieldSize.x));
@@ -81,7 +96,7 @@ void main()
 #endif
 	paletteIndex += atex;
 
-	vec4 color = texture(PaletteTexture, vec2(float(paletteIndex + 0.5) / 512, 0.0));
+	vec4 color = getPaletteColor(paletteIndex, 0.0);
 	if ((patternIndex >> 15) < HighlightPrio)
 		color.rgb *= 0.3;
 

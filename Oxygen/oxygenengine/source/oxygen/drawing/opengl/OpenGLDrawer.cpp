@@ -182,10 +182,26 @@ namespace opengldrawer
 					glBlendFunc(GL_ONE, GL_ZERO);
 					break;
 				}
+
 				case BlendMode::ALPHA:
+				case BlendMode::ONE_BIT:
 				{
 					glEnable(GL_BLEND);
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+				}
+
+				case BlendMode::ADDITIVE:
+				{
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_ONE, GL_ONE);
+					break;
+				}
+
+				case BlendMode::MULTIPLICATIVE:
+				{
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_DST_COLOR, GL_ZERO);
 					break;
 				}
 			}

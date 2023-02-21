@@ -358,6 +358,9 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 								connection->disconnect(NetConnection::DisconnectReason::UNKNOWN);
 								return;
 							}
+
+							default:
+								break;
 						}
 					}
 					else

@@ -80,6 +80,11 @@ void BufferTexture::create(PixelFormat pixelFormat, int width, int height, const
 #endif
 }
 
+void BufferTexture::create(PixelFormat pixelFormat, Vec2i size, const void* data)
+{
+	create(pixelFormat, size.x, size.y, data);
+}
+
 void BufferTexture::bindBuffer() const
 {
 #if defined(SUPPORTS_BUFFER_TEXTURES)
