@@ -230,6 +230,7 @@ void Simulation::update(float timeElapsed)
 	timeElapsed = clamp(timeElapsed, 0.0f, 0.1f);
 
 	// Do nothing as long as not enough time has passed
+	const double oldTargetFrame = mCurrentTargetFrame;
 	if (mSimulationSpeed <= 0.0f)
 	{
 		if (mNextSingleStep)
@@ -245,7 +246,7 @@ void Simulation::update(float timeElapsed)
 	else
 	{
 		const float step = timeElapsed * mSimulationSpeed;
-		mCurrentTargetFrame += (double)(step * getSimulationFrequency());
+		mCurrentTargetFrame += (double)step * (double)getSimulationFrequency();
 	}
 
 	const bool useFrameInterpolation = (Configuration::instance().mFrameSync == Configuration::FrameSyncType::FRAME_INTERPOLATION);
@@ -265,7 +266,11 @@ void Simulation::update(float timeElapsed)
 
 			// Time limit to prevent non-responding application
 			if (SDL_GetTicks() >= limitTime)
+			{
+				// Reset target frame to an earlier frame, but still make sure we had any progress at all
+				mCurrentTargetFrame = std::max((double)mFrameNumber, oldTargetFrame);
 				break;
+			}
 		}
 
 		// Each second, a small correction to the accumulated time gets applied
