@@ -440,7 +440,7 @@ void ModsMenu::update(float timeElapsed)
 	}
 
 	// Info overlay animation
-	moveFloatTowards(mInfoOverlay.mVisibility, mInfoOverlay.mShouldBeVisible ? 1.0f : 0.0f, timeElapsed * 6.0f);
+	moveFloatTowards(mInfoOverlay.mVisibility, mInfoOverlay.mShouldBeVisible ? 1.0f : 0.0f, timeElapsed * 8.0f);
 	if (mInfoOverlay.mVisibility > 0.0f)
 	{
 		GameMenuEntries& menuEntries = mTabs[mActiveTab].mMenuEntries;
@@ -460,7 +460,7 @@ void ModsMenu::update(float timeElapsed)
 			ModEntry& modEntry = mModEntries[menuEntries.selected().mData];
 			if (mInfoOverlay.mShownMod != modEntry.mMod)
 			{
-				global::mFont4.wordWrapText(mInfoOverlay.mDescriptionLines, 300, modEntry.mMod->mDescription);
+				global::mFont4Narrow.wordWrapText(mInfoOverlay.mDescriptionLines, 290, modEntry.mMod->mDescription);
 				mInfoOverlay.mShownMod = modEntry.mMod;
 			}
 		}
@@ -706,8 +706,8 @@ void ModsMenu::render()
 		drawer.popScissor();
 
 		Recti rect(globalOffsetX, infoOverlayPosition, 400, 224 - infoOverlayPosition);
-		drawer.drawRect(rect, Color(1.0f, 1.0f, 1.0f, mVisibility * 0.5f));
-		drawer.drawRect(Recti(rect.x, rect.y - 1, rect.width, 1), Color(0.0f, 0.0f, 0.0f, mVisibility * 0.5f));
+		drawer.drawRect(rect, Color(0.0f, 0.0f, 0.0f, mVisibility * 0.9f));
+		drawer.drawRect(Recti(rect.x, rect.y - 1, rect.width, 1), Color(1.0f, 1.0f, 1.0f, mVisibility));
 
 		if (mTabs[mActiveTab].mMenuEntries.hasSelected())
 		{
@@ -734,7 +734,7 @@ void ModsMenu::render()
 				{
 					WString path(L"mods/" + modEntry->mMod->mLocalDirectory);
 					path.upperCase();
-					drawer.printText(global::mFont3Pure, rect + Vec2i(3, -9), path, 3, colorDark);
+					drawer.printText(global::mFont3Pure, rect + Vec2i(3, -10), path, 3, colorDark);
 				}
 				{
 					drawer.printText(global::mFont10, rect, modEntry->mMod->mDisplayName, 1, colorY2);
@@ -742,12 +742,12 @@ void ModsMenu::render()
 				}
 				if (!modEntry->mMod->mAuthor.empty())
 				{
-					drawer.printText(global::mFont5, rect + Vec2i(8, 0), "by " + modEntry->mMod->mAuthor, 1, colorY);
+					drawer.printText(global::mFont5NoOutline, rect + Vec2i(8, 0), "by " + modEntry->mMod->mAuthor, 1, colorY);
 					rect.y += 15;
 				}
 				if (!modEntry->mMod->mModVersion.empty())
 				{
-					drawer.printText(global::mFont5, rect + Vec2i(8, 0), "Version " + modEntry->mMod->mModVersion, 1, colorY);
+					drawer.printText(global::mFont5NoOutline, rect + Vec2i(8, 0), "Version " + modEntry->mMod->mModVersion, 1, colorY);
 					rect.y += 15;
 				}
 				rect.y += 4;
@@ -755,14 +755,14 @@ void ModsMenu::render()
 				{
 					for (const std::wstring& line : mInfoOverlay.mDescriptionLines)
 					{
-						drawer.printText(global::mFont4, rect, line, 1, colorW);
-						rect.y += 12;
+						drawer.printText(global::mFont4Narrow, rect, line, 1, colorW);
+						rect.y += 11;
 					}
 					rect.y += 6;
 				}
 				if (!modEntry->mMod->mURL.empty())
 				{
-					drawer.printText(global::mFont4, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
+					drawer.printText(global::mFont4Narrow, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
 					rect.y += 16;
 				}
 			}
