@@ -104,6 +104,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
+		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServer.mGhostSync.mEnabled);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
@@ -224,12 +225,20 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.addOption("Stable & preview", 1)
 			.addOption("All incl. test builds", 2);
 
+		entries.addEntry<TitleMenuEntry>().initEntry("Ghost Sync");
+		entries.addEntry<LabelMenuEntry>().initEntry("If enabled, Ghost Sync shares your position in the game and\nshows all other players online in the same stage as ghosts.", Color(0.8f, 0.8f, 1.0f));
+		entries.addEntry<OptionsMenuEntry>()
+			.setUseSmallFont(true)
+			.initEntry("Enable Ghost Sync", option::GHOST_SYNC)
+			.addOption("Disabled", 0)
+			.addOption("Enabled", 1);
+
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Manual", option::_OPEN_MANUAL);
 
 		entries.addEntry<TitleMenuEntry>().initEntry("Debugging");
-		entries.addEntry<LabelMenuEntry>().initEntry("These settings are meant only for debugging very specific issues.\nIt's recommended to leave them at their default values.");
+		entries.addEntry<LabelMenuEntry>().initEntry("These settings are meant only for debugging very specific issues.\nIt's recommended to leave them at their default values.", Color(1.0f, 0.8f, 0.6f));
 
 		entries.addEntry<AdvancedOptionMenuEntry>()
 			.setDefaultValue(-1)
@@ -1511,6 +1520,14 @@ void OptionsMenu::setupOptionEntryInt(option::Option optionId, int* valuePointer
 	OptionEntry& optionEntry = mOptionEntries[optionId];
 	optionEntry.mOptionId = optionId;
 	optionEntry.mType = OptionEntry::Type::CONFIG_INT;
+	optionEntry.mValuePointer = valuePointer;
+}
+
+void OptionsMenu::setupOptionEntryBool(option::Option optionId, bool* valuePointer)
+{
+	OptionEntry& optionEntry = mOptionEntries[optionId];
+	optionEntry.mOptionId = optionId;
+	optionEntry.mType = OptionEntry::Type::CONFIG_BOOL;
 	optionEntry.mValuePointer = valuePointer;
 }
 

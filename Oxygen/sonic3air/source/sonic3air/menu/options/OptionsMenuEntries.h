@@ -55,9 +55,12 @@ public:
 
 public:
 	LabelMenuEntry();
-	LabelMenuEntry& initEntry(const std::string& text);
+	LabelMenuEntry& initEntry(const std::string& text, const Color& color);
 
 	void renderEntry(RenderContext& renderContext_) override;
+
+protected:
+	Color mColor = Color::WHITE;
 };
 
 

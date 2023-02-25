@@ -99,9 +99,10 @@ LabelMenuEntry::LabelMenuEntry()
 	setInteractable(false);
 }
 
-LabelMenuEntry& LabelMenuEntry::initEntry(const std::string& text)
+LabelMenuEntry& LabelMenuEntry::initEntry(const std::string& text, const Color& color)
 {
 	mText = text;
+	mColor = color;
 	return *this;
 }
 
@@ -114,7 +115,7 @@ void LabelMenuEntry::renderEntry(RenderContext& renderContext_)
 
 	py -= 1;
 	const Vec2i boxSize = global::mFont4.getTextBoxSize(mText);
-	drawer.printText(global::mFont4, Recti(baseX, py, 0, 10), mText, 5, Color(1.0f, 0.8f, 0.6f, renderContext.mTabAlpha));
+	drawer.printText(global::mFont4, Recti(baseX, py, 0, 10), mText, 5, Color(mColor.r, mColor.g, mColor.b, mColor.a * renderContext.mTabAlpha));
 	py += boxSize.y - 4;
 }
 

@@ -25,6 +25,7 @@ namespace global
 
 	extern Font mFont3Pure;
 	extern Font mFont3;
+	extern Font mFont4NarrowSimple;
 	extern Font mFont4Narrow;
 	extern Font mFont4;
 	extern Font mFont5NoOutline;

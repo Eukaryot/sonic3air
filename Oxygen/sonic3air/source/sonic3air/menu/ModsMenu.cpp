@@ -460,7 +460,7 @@ void ModsMenu::update(float timeElapsed)
 			ModEntry& modEntry = mModEntries[menuEntries.selected().mData];
 			if (mInfoOverlay.mShownMod != modEntry.mMod)
 			{
-				global::mFont4Narrow.wordWrapText(mInfoOverlay.mDescriptionLines, 290, modEntry.mMod->mDescription);
+				global::mFont4NarrowSimple.wordWrapText(mInfoOverlay.mDescriptionLines, 290, modEntry.mMod->mDescription);
 				mInfoOverlay.mShownMod = modEntry.mMod;
 			}
 		}
@@ -755,14 +755,14 @@ void ModsMenu::render()
 				{
 					for (const std::wstring& line : mInfoOverlay.mDescriptionLines)
 					{
-						drawer.printText(global::mFont4Narrow, rect, line, 1, colorW);
+						drawer.printText(global::mFont4NarrowSimple, rect, line, 1, colorW);
 						rect.y += 11;
 					}
 					rect.y += 6;
 				}
 				if (!modEntry->mMod->mURL.empty())
 				{
-					drawer.printText(global::mFont4Narrow, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
+					drawer.printText(global::mFont4NarrowSimple, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
 					rect.y += 16;
 				}
 			}

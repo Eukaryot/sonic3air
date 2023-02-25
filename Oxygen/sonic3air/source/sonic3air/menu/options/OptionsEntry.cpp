@@ -68,6 +68,14 @@ void OptionEntry::loadValue()
 			break;
 		}
 
+		case OptionEntry::Type::CONFIG_BOOL:
+		{
+			bool* ptr = reinterpret_cast<bool*>(mValuePointer);
+			const uint32 value = (uint32)*ptr;
+			mGameMenuEntry->setSelectedIndexByValue(value);
+			break;
+		}
+
 		case OptionEntry::Type::CONFIG_ENUM_8:
 		{
 			uint8* ptr = reinterpret_cast<uint8*>(mValuePointer);
@@ -134,6 +142,13 @@ void OptionEntry::applyValue()
 		{
 			int* ptr = reinterpret_cast<int*>(mValuePointer);
 			*ptr = (int)value;
+			break;
+		}
+
+		case OptionEntry::Type::CONFIG_BOOL:
+		{
+			bool* ptr = reinterpret_cast<bool*>(mValuePointer);
+			*ptr = (value != 0);
 			break;
 		}
 

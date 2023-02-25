@@ -22,6 +22,7 @@ namespace global
 {
 	Font mFont3Pure;
 	Font mFont3;
+	Font mFont4NarrowSimple;
 	Font mFont4Narrow;
 	Font mFont4;
 	Font mFont5NoOutline;
@@ -68,8 +69,13 @@ namespace global
 		fontCollection.registerManagedFont(mFont3, "smallfont");
 		mFont3.addFontProcessor(outlineFontProcessorTransparent);
 
+		fontCollection.registerManagedFont(mFont4NarrowSimple, "oxyfont_tiny_narrow");
+		mFont4NarrowSimple.addFontProcessor(shadowFontProcessor4);
+
 		fontCollection.registerManagedFont(mFont4Narrow, "oxyfont_tiny_narrow");
-		mFont4Narrow.addFontProcessor(shadowFontProcessor4);
+		mFont4Narrow.addFontProcessor(outlineFontProcessor);
+		mFont4Narrow.addFontProcessor(gradientFontProcessor);
+		mFont4Narrow.addFontProcessor(shadowFontProcessor3);
 
 		fontCollection.registerManagedFont(mFont4, "oxyfont_tiny");
 		mFont4.addFontProcessor(outlineFontProcessor);

@@ -52,6 +52,7 @@ private:
 	void setupOptionEntry(option::Option optionId, SharedDatabase::Setting::Type setting);
 	void setupOptionEntryBitmask(option::Option optionId, SharedDatabase::Setting::Type setting);
 	void setupOptionEntryInt(option::Option optionId, int* valuePointer);
+	void setupOptionEntryBool(option::Option optionId, bool* valuePointer);
 	void setupOptionEntryEnum8(option::Option optionId, void* valuePointer);
 	void setupOptionEntryPercent(option::Option optionId, float* valuePointer);
 
