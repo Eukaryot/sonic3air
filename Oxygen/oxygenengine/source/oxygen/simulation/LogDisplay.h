@@ -19,7 +19,7 @@ public:
 	struct ScriptLogSingleEntry
 	{
 		std::string mValue;
-		std::vector<uint64> mCallStack;
+		int mCallFrameIndex = -1;
 	};
 	struct ScriptLogEntry
 	{

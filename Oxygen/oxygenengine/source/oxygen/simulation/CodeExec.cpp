@@ -191,8 +191,10 @@ bool CodeExec::Location::operator==(const Location& other) const
 
 CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type type)
 {
+	const int parentIndex = mCallFrames.empty() ? -1 : mCallStack.back();
 	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
 	callFrame.mType = type;
+	callFrame.mParentIndex = parentIndex;
 	callFrame.mDepth = (int)mCallStack.size();
 	mCallStack.emplace_back(mCallFrames.size() - 1);
 	return callFrame;
@@ -200,8 +202,10 @@ CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type 
 
 CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrameFailed(CallFrame::Type type)
 {
+	const int parentIndex = mCallFrames.empty() ? -1 : mCallStack.back();
 	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
 	callFrame.mType = type;
+	callFrame.mParentIndex = parentIndex;
 	callFrame.mDepth = (int)mCallStack.size();
 	return callFrame;
 }
@@ -592,6 +596,21 @@ void CodeExec::processCallFrames()
 	mMainCallFrameTracking.processCallFrames();
 }
 
+void CodeExec::getCallStackFromCallFrameIndex(std::vector<uint64>& outCallStack, int callFrameIndex)
+{
+	while (callFrameIndex >= 0 && callFrameIndex < (int)mMainCallFrameTracking.mCallFrames.size())
+	{
+		CallFrame& callFrame = mMainCallFrameTracking.mCallFrames[callFrameIndex];
+		if (nullptr != callFrame.mFunction)
+		{
+			outCallStack.push_back(callFrame.mFunction->getName().getHash());
+		}
+
+		// Continue with parent
+		callFrameIndex = callFrame.mParentIndex;
+	}
+}
+
 void CodeExec::clearWatches(bool clearPersistent)
 {
 	std::vector<std::pair<uint32, uint16>> reAddWatches;
@@ -970,7 +989,7 @@ void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
 		watch.mHits.push_back(&hit);
 
 		if (nullptr != mActiveCallFrameTracking)
-			mActiveCallFrameTracking->writeCurrentCallStack(hit.mCallStack);
+			hit.mCallFrameIndex = (int)mActiveCallFrameTracking->mCallFrames.size() - 1;
 		mWatchHitsThisUpdate.emplace_back(&watch, &hit);
 	}
 	watch.mLastHitLocation = location;
@@ -1003,14 +1022,13 @@ void CodeExec::onVRAMWrite(uint16 address, uint16 bytes)
 	write.mAddress = address;
 	write.mSize = bytes;
 	write.mLocation = location;
-	write.mCallStack.clear();
 	if (nullptr != mActiveCallFrameTracking)
-		mActiveCallFrameTracking->writeCurrentCallStack(write.mCallStack);
+		write.mCallFrameIndex = (int)mActiveCallFrameTracking->mCallFrames.size() - 1;
 	mVRAMWrites.push_back(&write);
 }
 
 void CodeExec::onLog(LogDisplay::ScriptLogSingleEntry& scriptLogSingleEntry)
 {
 	if (nullptr != mActiveCallFrameTracking)
-		mActiveCallFrameTracking->writeCurrentCallStack(scriptLogSingleEntry.mCallStack);
+		scriptLogSingleEntry.mCallFrameIndex = (int)mActiveCallFrameTracking->mCallFrames.size() - 1;
 }

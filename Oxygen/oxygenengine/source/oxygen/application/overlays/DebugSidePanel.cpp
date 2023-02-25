@@ -627,7 +627,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 						if (category.mOpenKeys.count(key) != 0)
 						{
-							for (uint64 functionNameHash : hit.mCallStack)
+							std::vector<uint64> callStack;
+							codeExec.getCallStackFromCallFrameIndex(callStack, hit.mCallFrameIndex);
+							for (uint64 functionNameHash : callStack)
 							{
 								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
 								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
@@ -887,7 +889,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 				if (category.mOpenKeys.count(key) != 0)
 				{
-					for (uint64 functionNameHash : write->mCallStack)
+					std::vector<uint64> callStack;
+					codeExec.getCallStackFromCallFrameIndex(callStack, write->mCallFrameIndex);
+					for (uint64 functionNameHash : callStack)
 					{
 						const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
 						builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
@@ -925,7 +929,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 						if (category.mOpenKeys.count(key) != 0)
 						{
-							for (uint64 functionNameHash : singleEntry.mCallStack)
+							std::vector<uint64> callStack;
+							codeExec.getCallStackFromCallFrameIndex(callStack, singleEntry.mCallFrameIndex);
+							for (uint64 functionNameHash : callStack)
 							{
 								const std::string_view name = codeExec.getLemonScriptProgram().getFunctionNameByHash(functionNameHash);
 								builder.addLine(String(name), Color::fromABGR32(0xffc0c0c0), 32);
