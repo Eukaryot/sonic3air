@@ -122,11 +122,7 @@ namespace lemon
 
 	void Runtime::reset()
 	{
-		for (ControlFlow* controlFlow : mControlFlows)
-		{
-			controlFlow->reset();	// Existing control flows are only reset, not destroyed
-		}
-		mSelectedControlFlow = mControlFlows[0];	// Reset to main control flow
+		clearAllControlFlows();
 
 		mRuntimeFunctions.clear();
 		mRuntimeFunctionsMapped.clear();
@@ -154,6 +150,15 @@ namespace lemon
 			// Load all string literals
 			mProgram->collectAllStringLiterals(mStrings);
 		}
+	}
+
+	void Runtime::clearAllControlFlows()
+	{
+		for (ControlFlow* controlFlow : mControlFlows)
+		{
+			controlFlow->reset();	// Existing control flows are only reset, not destroyed
+		}
+		mSelectedControlFlow = mControlFlows[0];	// Reset to main control flow
 	}
 
 	void Runtime::setProgram(const Program& program)

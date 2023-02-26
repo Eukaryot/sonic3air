@@ -114,6 +114,7 @@ namespace lemon
 		~Runtime();
 
 		void reset();
+		void clearAllControlFlows();
 
 		inline const Program& getProgram() const  { return *mProgram; }
 		void setProgram(const Program& program);

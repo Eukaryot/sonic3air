@@ -166,6 +166,8 @@ void DebugSidePanel::update(float timeElapsed)
 void DebugSidePanel::render()
 {
 	mRect = FTX::screenRect();
+	const Vec2i screenSize = mRect.getSize();
+
 	GuiBase::render();
 
 	mBuilder.mTextLines.clear();
@@ -311,35 +313,46 @@ void DebugSidePanel::render()
 	for (const Builder::TextLine& line : mBuilder.mTextLines)
 	{
 		rect.y += line.mLineSpacing;
-		if (!line.mText.empty())
+		if (rect.y < -12 || rect.y >= screenSize.y)	// The 12 is just a guess for the maximum visible line height
+			continue;
+		if (line.mText.empty())
+			continue;
+
+		Recti selectionRect = rect;
+		selectionRect.x -= 8;
+		selectionRect.height = 12;
+
+		Recti textRect = rect;
+		textRect.x += line.mIntend;
+		textRect.height = 12;
+
+		if (line.mKey == mMouseOverKey && mMouseOverKey != INVALID_KEY)
 		{
-			Recti selectionRect = rect;
-			selectionRect.x -= 8;
-			selectionRect.height = 12;
-
-			Recti textRect = rect;
-			textRect.x += line.mIntend;
-			textRect.height = 12;
-
-			if (line.mKey == mMouseOverKey && mMouseOverKey != INVALID_KEY)
-			{
-				drawer.drawRect(selectionRect, Color(1.0f, 1.0f, 0.0f, 0.5f));
-			}
-
-			if (line.mOptionValue >= 0)
-			{
-				drawer.printText(mSmallFont, textRect, (line.mOptionValue != 0) ? "[x" : "[ ", 1, line.mColor);
-				textRect.x += 10;
-				drawer.printText(mSmallFont, textRect, "]", 1, line.mColor);
-				textRect.x += 10;
-				textRect.width -= 20;
-			}
-
-			drawer.printText(mSmallFont, textRect, line.mText, 1, line.mColor);
+			drawer.drawRect(selectionRect, Color(1.0f, 1.0f, 0.0f, 0.5f));
 		}
+
+		if (line.mOptionValue >= 0)
+		{
+			drawer.printText(mSmallFont, textRect, (line.mOptionValue != 0) ? "[x" : "[ ", 1, line.mColor);
+			textRect.x += 10;
+			drawer.printText(mSmallFont, textRect, "]", 1, line.mColor);
+			textRect.x += 10;
+			textRect.width -= 20;
+		}
+
+		drawer.printText(mSmallFont, textRect, line.mText, 1, line.mColor);
 	}
 
-	category.mScrollSize = std::max(category.mScrollPosition + rect.y - FTX::screenHeight() / 5, 0);
+	category.mScrollSize = std::max(category.mScrollPosition + rect.y - screenSize.y / 5, 0);
+
+	if (category.mScrollSize > 0)
+	{
+		const int totalHeight = screenSize.y - 48;
+		const float scrollBarSize = (float)totalHeight / (float)(category.mScrollSize + screenSize.y);
+		const float scrollBarPos = (float)category.mScrollPosition / (float)category.mScrollSize * (1.0f - scrollBarSize);
+
+		drawer.drawRect(Recti(FTX::screenWidth() - 6, 42 + roundToInt(scrollBarPos * totalHeight), 2, roundToInt(scrollBarSize * totalHeight)), Color(1.0f, 1.0f, 1.0f, 0.6f));
+	}
 
 	drawer.performRendering();
 }
@@ -525,7 +538,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					}
 
 					const uint64 key = (nullptr == callFrame.mFunction) ? INVALID_KEY : callFrame.mFunction->getID();
-					const bool isOpen = (callFrame.mAnyChildFailed || callFrame.mDepth < 2 || category.mOpenKeys.count(key) != 0);
+					const bool isOpen = (callFrame.mAnyChildFailed || callFrame.mDepth < 1 || category.mOpenKeys.count(key) != 0);
 
 					std::string postfix;
 					if (!isOpen)

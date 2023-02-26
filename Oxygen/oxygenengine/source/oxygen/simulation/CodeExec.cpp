@@ -191,7 +191,7 @@ bool CodeExec::Location::operator==(const Location& other) const
 
 CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type type)
 {
-	const int parentIndex = mCallFrames.empty() ? -1 : mCallStack.back();
+	const int parentIndex = mCallStack.empty() ? -1 : mCallStack.back();
 	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
 	callFrame.mType = type;
 	callFrame.mParentIndex = parentIndex;
@@ -407,6 +407,8 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 			VectorBinarySerializer serializer(true, *serializedRuntimeState);
 			success = getLemonScriptRuntime().serializeRuntime(serializer);
 		}
+
+		mLemonScriptRuntime.getInternalLemonRuntime().clearAllControlFlows();
 
 		if (enforcedCallStack != nullptr && !enforcedCallStack->empty())
 		{
