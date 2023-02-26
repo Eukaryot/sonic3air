@@ -336,24 +336,23 @@ namespace opengldrawer
 			typeinfos.clear();
 			font.getTypeInfos(typeinfos, pos, text, printOptions.mSpacing);
 
-			static std::vector<OpenGLFontOutput::VertexGroup> vertexGroups;
-			vertexGroups.clear();
+			static OpenGLFontOutput::VertexGroups vertexGroups;
 			fontOutput.buildVertexGroups(vertexGroups, typeinfos);
 
 			Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(true, true);
 			shader.bind();
 			shader.setParam("Transform", getPixelToViewSpaceTransform());
 
-			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups)
+			for (const OpenGLFontOutput::VertexGroup& vertexGroup : vertexGroups.mVertexGroups)
 			{
 				shader.setTexture("Texture", *vertexGroup.mTexture);
 				shader.setParam("TintColor", printOptions.mTintColor);
 
 				static std::vector<float> vertexData;
-				vertexData.resize(vertexGroup.mVertices.size() * 4);
-				for (size_t i = 0; i < vertexGroup.mVertices.size(); ++i)
+				vertexData.resize(vertexGroup.mNumVertices * 4);
+				for (size_t i = 0; i < vertexGroup.mNumVertices; ++i)
 				{
-					const OpenGLFontOutput::Vertex& src = vertexGroup.mVertices[i];
+					const OpenGLFontOutput::Vertex& src = vertexGroups.mVertices[vertexGroup.mStartIndex + i];
 					float* dst = &vertexData[i * 4];
 					dst[0] = src.mPosition.x;
 					dst[1] = src.mPosition.y;
@@ -362,7 +361,7 @@ namespace opengldrawer
 				}
 
 				mMeshVAO.setup(opengl::VertexArrayObject::Format::P2_T2);
-				mMeshVAO.updateVertexData(&vertexData[0], vertexGroup.mVertices.size());
+				mMeshVAO.updateVertexData(&vertexData[0], vertexGroup.mNumVertices);
 				mMeshVAO.draw(GL_TRIANGLES);
 			}
 		}
