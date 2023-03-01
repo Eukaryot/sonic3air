@@ -16,6 +16,8 @@
 
 namespace lemon
 {
+	class Environment;
+
 
 	class API_EXPORT Variable
 	{
@@ -100,7 +102,7 @@ namespace lemon
 		void setValue(int64 value) override  {}
 
 	public:
-		void* mPointer = nullptr;
+		std::function<int64*()> mAccessor;
 	};
 
 }

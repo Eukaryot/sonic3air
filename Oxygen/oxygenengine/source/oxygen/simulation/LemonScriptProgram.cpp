@@ -48,22 +48,12 @@ struct LemonScriptProgram::Internal
 LemonScriptProgram::LemonScriptProgram() :
 	mInternal(*new Internal())
 {
-	mInternal.mLemonCoreModule.clear();
-	mInternal.mOxygenCoreModule.clear();
-
 	// Register game-specific nativized code
 	EngineMain::getDelegate().registerNativizedCode(mInternal.mProgram);
-}
 
-LemonScriptProgram::~LemonScriptProgram()
-{
-	delete &mInternal;
-}
-
-void LemonScriptProgram::startup()
-{
 	Configuration& config = Configuration::instance();
-	mInternal.mGlobalsLookupCoreOnly = lemon::GlobalsLookup();
+	mInternal.mLemonCoreModule.clear();
+	mInternal.mOxygenCoreModule.clear();
 
 	// Setup lemon core module -- containing lemonscript standard library
 	{
@@ -80,8 +70,6 @@ void LemonScriptProgram::startup()
 	}
 
 	// Setup oxygen core module -- with Oxygen Engine specific bindings
-	//  -> TODO: This has some dependency of the runtime, as the register variables directly access the emulator interface instance;
-	//           and this in turn is the reason why there's a need for this separate startup function at all...
 	{
 		lemon::Module& module = mInternal.mOxygenCoreModule;
 		module.startCompiling(mInternal.mGlobalsLookupCoreOnly);
@@ -95,6 +83,11 @@ void LemonScriptProgram::startup()
 		mInternal.mLemonCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput);
 		mInternal.mOxygenCoreModule.dumpDefinitionsToScriptFile(config.mDumpCppDefinitionsOutput, true);
 	}
+}
+
+LemonScriptProgram::~LemonScriptProgram()
+{
+	delete &mInternal;
 }
 
 LemonScriptBindings& LemonScriptProgram::getLemonScriptBindings()

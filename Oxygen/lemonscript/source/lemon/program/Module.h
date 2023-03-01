@@ -60,7 +60,7 @@ namespace lemon
 		inline const std::vector<Variable*>& getGlobalVariables() const  { return mGlobalVariables; }
 		GlobalVariable& addGlobalVariable(FlyweightString name, const DataTypeDefinition* dataType);
 		UserDefinedVariable& addUserDefinedVariable(FlyweightString name, const DataTypeDefinition* dataType);
-		ExternalVariable& addExternalVariable(FlyweightString name, const DataTypeDefinition* dataType);
+		ExternalVariable& addExternalVariable(FlyweightString name, const DataTypeDefinition* dataType, std::function<int64*()>&& accessor);
 
 		// Constants
 		Constant& addConstant(FlyweightString name, const DataTypeDefinition* dataType, AnyBaseValue value);

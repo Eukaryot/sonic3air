@@ -267,7 +267,7 @@ namespace lemon
 
 						const uint32 variableId = (uint32)opcodes[0].mParameter;
 						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
-						runtimeOpcode.setParameter(variable.mPointer);
+						runtimeOpcode.setParameter(variable.mAccessor());
 						runtimeOpcode.setParameter(opcodes[1].mParameter, 8);
 						outNumOpcodesConsumed = 3;
 						return true;
@@ -346,7 +346,7 @@ namespace lemon
 						case Variable::Type::EXTERNAL:
 						{
 							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
-							runtimeOpcode.setParameter(variable.mPointer);
+							runtimeOpcode.setParameter(variable.mAccessor());
 
 							switch (variable.getDataType()->getBytes())
 							{

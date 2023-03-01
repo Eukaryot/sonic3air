@@ -283,7 +283,6 @@ CodeExec::CodeExec() :
 	mEmulatorInterface(EngineMain::getDelegate().useDeveloperFeatures() ? *new EmulatorInterfaceDev() : *new EmulatorInterface()),
 	mLemonScriptRuntime(*new LemonScriptRuntime(mLemonScriptProgram, mEmulatorInterface))
 {
-	mLemonScriptProgram.startup();
 	mRuntimeEnvironment.mEmulatorInterface = &mEmulatorInterface;
 
 	mIsDeveloperMode = EngineMain::getDelegate().useDeveloperFeatures();
@@ -365,6 +364,7 @@ bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
 	const LemonScriptProgram::LoadScriptsResult result = mLemonScriptProgram.loadScripts(mainScriptPath.toStdString(), options);
 	if (result == LemonScriptProgram::LoadScriptsResult::PROGRAM_CHANGED)
 	{
+		lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
 		mLemonScriptRuntime.onProgramUpdated();
 	}
 	cleanScriptDebug();

@@ -76,8 +76,6 @@ public:
 	LemonScriptProgram();
 	~LemonScriptProgram();
 
-	void startup();
-
 	LemonScriptBindings& getLemonScriptBindings();
 	lemon::Program& getInternalLemonProgram();
 

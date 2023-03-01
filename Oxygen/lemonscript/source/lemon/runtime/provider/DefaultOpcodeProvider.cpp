@@ -408,7 +408,7 @@ namespace lemon
 					case Variable::Type::EXTERNAL:
 					{
 						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
-						runtimeOpcode.setParameter(variable.mPointer);
+						runtimeOpcode.setParameter(variable.mAccessor());
 
 						switch (variable.getDataType()->getBytes())
 						{
@@ -450,7 +450,7 @@ namespace lemon
 					case Variable::Type::EXTERNAL:
 					{
 						const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
-						runtimeOpcode.setParameter(variable.mPointer);
+						runtimeOpcode.setParameter(variable.mAccessor());
 
 						switch (variable.getDataType()->getBytes())
 						{

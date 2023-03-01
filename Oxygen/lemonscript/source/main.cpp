@@ -173,6 +173,11 @@ void setterD0(int64 value)
 	valueD0 = (uint32)value;
 }
 
+int64* accessA0()
+{
+	return (int64*)&valueA0;
+}
+
 int8 testFunctionA(int8 a, int8 b)
 {
 	std::cout << "Test function A called" << std::endl;
@@ -313,8 +318,7 @@ int main(int argc, char** argv)
 	UserDefinedVariable& varD0 = module.addUserDefinedVariable("D0", &PredefinedDataTypes::UINT_32);
 	varD0.mGetter = getterD0;
 	varD0.mSetter = setterD0;
-	lemon::ExternalVariable& varA0 = module.addExternalVariable("A0", &lemon::PredefinedDataTypes::UINT_32);
-	varA0.mPointer = &valueA0;
+	lemon::ExternalVariable& varA0 = module.addExternalVariable("A0", &lemon::PredefinedDataTypes::UINT_32, std::bind(accessA0));
 	UserDefinedVariable& var = module.addUserDefinedVariable("Log", &PredefinedDataTypes::INT_64);
 	var.mSetter = logValue;
 	UserDefinedVariable& var2 = module.addUserDefinedVariable("LogStr", &PredefinedDataTypes::INT_64);

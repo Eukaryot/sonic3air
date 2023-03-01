@@ -101,7 +101,7 @@ namespace lemon
 						{
 							const uint32 variableId = (uint32)opcode.mParameter;
 							const ExternalVariable& variable = static_cast<ExternalVariable&>(runtime.getProgram().getGlobalVariableByID(variableId));
-							runtimeOpcode.setParameter(variable.mPointer, parameter.mOffset);
+							runtimeOpcode.setParameter(variable.mAccessor(), parameter.mOffset);
 							break;
 						}
 

@@ -71,6 +71,12 @@ namespace
 		return *lemon::Runtime::getActiveEnvironmentSafe<RuntimeEnvironment>().mEmulatorInterface;
 	}
 
+	int64* accessRegister(size_t index)
+	{
+		uint32& reg = getEmulatorInterface().getRegister(index);
+		return reinterpret_cast<int64*>(&reg);
+	}
+
 	void scriptAssert1(uint8 condition, lemon::StringRef text)
 	{
 		if (!condition)
@@ -1406,32 +1412,17 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 	// Emulator interface bindings
 	{
-		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
-
 		// Register access
 		const std::string registerNamesDAR[16] = { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7" };
 		for (size_t i = 0; i < 16; ++i)
 		{
-			lemon::ExternalVariable& var = module.addExternalVariable(registerNamesDAR[i], &lemon::PredefinedDataTypes::UINT_32);
-			var.mPointer = &emulatorInterface.getRegister(i);
-
-			lemon::ExternalVariable& var_u8 = module.addExternalVariable(registerNamesDAR[i] + ".u8", &lemon::PredefinedDataTypes::UINT_8);
-			var_u8.mPointer = &emulatorInterface.getRegister(i);
-
-			lemon::ExternalVariable& var_s8 = module.addExternalVariable(registerNamesDAR[i] + ".s8", &lemon::PredefinedDataTypes::INT_8);
-			var_s8.mPointer = &emulatorInterface.getRegister(i);
-
-			lemon::ExternalVariable& var_u16 = module.addExternalVariable(registerNamesDAR[i] + ".u16", &lemon::PredefinedDataTypes::UINT_16);
-			var_u16.mPointer = &emulatorInterface.getRegister(i);
-
-			lemon::ExternalVariable& var_s16 = module.addExternalVariable(registerNamesDAR[i] + ".s16", &lemon::PredefinedDataTypes::INT_16);
-			var_s16.mPointer = &emulatorInterface.getRegister(i);
-
-			lemon::ExternalVariable& var_u32 = module.addExternalVariable(registerNamesDAR[i] + ".u32", &lemon::PredefinedDataTypes::UINT_32);
-			var_u32.mPointer = &emulatorInterface.getRegister(i);
-
-			lemon::ExternalVariable& var_s32 = module.addExternalVariable(registerNamesDAR[i] + ".s32", &lemon::PredefinedDataTypes::INT_32);
-			var_s32.mPointer = &emulatorInterface.getRegister(i);
+			module.addExternalVariable(registerNamesDAR[i],			 &lemon::PredefinedDataTypes::UINT_32, std::bind(accessRegister, i));
+			module.addExternalVariable(registerNamesDAR[i] + ".u8",  &lemon::PredefinedDataTypes::UINT_8,  std::bind(accessRegister, i));
+			module.addExternalVariable(registerNamesDAR[i] + ".s8",  &lemon::PredefinedDataTypes::INT_8,   std::bind(accessRegister, i));
+			module.addExternalVariable(registerNamesDAR[i] + ".u16", &lemon::PredefinedDataTypes::UINT_16, std::bind(accessRegister, i));
+			module.addExternalVariable(registerNamesDAR[i] + ".s16", &lemon::PredefinedDataTypes::INT_16,  std::bind(accessRegister, i));
+			module.addExternalVariable(registerNamesDAR[i] + ".u32", &lemon::PredefinedDataTypes::UINT_32, std::bind(accessRegister, i));
+			module.addExternalVariable(registerNamesDAR[i] + ".s32", &lemon::PredefinedDataTypes::INT_32,  std::bind(accessRegister, i));
 		}
 
 		// Query flags
