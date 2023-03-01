@@ -16,6 +16,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oxygen_netcore", "..\..\..\oxygenengine\build\_vstudio\oxygen_netcore.vcxproj", "{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "restarter", "restarter.vcxproj", "{9CE1F342-4F28-4ECF-A9D3-F7D6E46222B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{488CD7A3-2B09-43AC-82B2-8D72DEBFBB78} = {488CD7A3-2B09-43AC-82B2-8D72DEBFBB78}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

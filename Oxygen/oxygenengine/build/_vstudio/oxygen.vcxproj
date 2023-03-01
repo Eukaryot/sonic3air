@@ -245,6 +245,7 @@
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptRuntime.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LogDisplay.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\PersistentData.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\RuntimeEnvironment.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\SaveStateSerializer.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\Simulation.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\sound\blip_buf.h" />

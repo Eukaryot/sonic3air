@@ -284,6 +284,7 @@ CodeExec::CodeExec() :
 	mLemonScriptRuntime(*new LemonScriptRuntime(mLemonScriptProgram, mEmulatorInterface))
 {
 	mLemonScriptProgram.startup();
+	mRuntimeEnvironment.mEmulatorInterface = &mEmulatorInterface;
 
 	mIsDeveloperMode = EngineMain::getDelegate().useDeveloperFeatures();
 	if (mIsDeveloperMode)
@@ -476,6 +477,8 @@ bool CodeExec::performFrameUpdate()
 	if (!canExecute())
 		return false;
 
+	lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
+
 	const bool beginningNewFrame = (mExecutionState != ExecutionState::INTERRUPTED);
 	if (beginningNewFrame)
 	{
@@ -546,12 +549,12 @@ void CodeExec::yieldExecution()
 	mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
 }
 
-bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail, const lemon::Environment* environment)
+bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail)
 {
 	if (canExecute())
 	{
 		// TODO: This would be a good use case for using a different control flow than the main one
-		lemon::Runtime::setActiveEnvironment(environment);
+		lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
 
 		if (mLemonScriptRuntime.callFunctionByName(functionName, showErrorOnFail))
 		{

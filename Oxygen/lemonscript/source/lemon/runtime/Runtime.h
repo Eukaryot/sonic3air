@@ -106,7 +106,10 @@ namespace lemon
 		inline static ControlFlow* getActiveControlFlow()	{ return mActiveControlFlow; }
 		inline static Runtime* getActiveRuntime()			{ return (nullptr == mActiveControlFlow) ? nullptr : &mActiveControlFlow->getRuntime(); }
 
+		template<typename T> inline static const T* getActiveEnvironment()		{ return static_cast<T*>(mActiveEnvironment); }		// Note that this is not type safe - you need to be sure the type is correct
+		template<typename T> inline static const T& getActiveEnvironmentSafe()	{ const Environment& env = getActiveEnvironmentSafe(); RMX_ASSERT(env.getType() == T::TYPE, "Wrong active environment type"); return static_cast<const T&>(env); }
 		inline static const Environment* getActiveEnvironment()					{ return mActiveEnvironment; }
+		inline static const Environment& getActiveEnvironmentSafe()				{ RMX_ASSERT(nullptr != mActiveEnvironment, "No active environment set"); return *mActiveEnvironment; }
 		inline static void setActiveEnvironment(const Environment* environment)	{ mActiveEnvironment = environment; }
 
 	public:

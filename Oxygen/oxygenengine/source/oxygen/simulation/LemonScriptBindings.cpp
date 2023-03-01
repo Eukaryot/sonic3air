@@ -40,7 +40,7 @@ namespace
 {
 	namespace detail
 	{
-		uint32 loadData(uint32 targetAddress, const std::vector<uint8>& data, uint32 offset, uint32 maxBytes)
+		uint32 loadData(EmulatorInterface& emulatorInterface, uint32 targetAddress, const std::vector<uint8>& data, uint32 offset, uint32 maxBytes)
 		{
 			if (data.empty())
 				return 0;
@@ -57,7 +57,7 @@ namespace
 				bytes = std::min(bytes, maxBytes);
 			}
 
-			uint8* dst = EmulatorInterface::instance().getMemoryPointer(targetAddress, true, bytes);
+			uint8* dst = emulatorInterface.getMemoryPointer(targetAddress, true, bytes);
 			memcpy(dst, &data[offset], bytes);
 			return bytes;
 		}
@@ -65,6 +65,11 @@ namespace
 
 
 	DebugNotificationInterface* gDebugNotificationInterface = nullptr;
+
+	inline EmulatorInterface& getEmulatorInterface()
+	{
+		return *lemon::Runtime::getActiveEnvironmentSafe<RuntimeEnvironment>().mEmulatorInterface;
+	}
 
 	void scriptAssert1(uint8 condition, lemon::StringRef text)
 	{
@@ -92,44 +97,44 @@ namespace
 
 	uint8 checkFlags_equal()
 	{
-		return EmulatorInterface::instance().getFlagZ();
+		return getEmulatorInterface().getFlagZ();
 	}
 
 	uint8 checkFlags_negative()
 	{
-		return EmulatorInterface::instance().getFlagN();
+		return getEmulatorInterface().getFlagN();
 	}
 
 	void setZeroFlagByValue(uint32 value)
 	{
 		// In contrast to the emulator, we use the zero flag in its original form: it gets set when value is zero
-		EmulatorInterface::instance().setFlagZ(value == 0);
+		getEmulatorInterface().setFlagZ(value == 0);
 	}
 
 	template<typename T>
 	void setNegativeFlagByValue(T value)
 	{
 		const int bits = sizeof(T) * 8;
-		EmulatorInterface::instance().setFlagN((value >> (bits - 1)) != 0);
+		getEmulatorInterface().setFlagN((value >> (bits - 1)) != 0);
 	}
 
 
 	void copyMemory(uint32 destAddress, uint32 sourceAddress, uint32 bytes)
 	{
-		uint8* destPointer = EmulatorInterface::instance().getMemoryPointer(destAddress, true, bytes);
-		uint8* sourcePointer = EmulatorInterface::instance().getMemoryPointer(sourceAddress, false, bytes);
+		uint8* destPointer = getEmulatorInterface().getMemoryPointer(destAddress, true, bytes);
+		uint8* sourcePointer = getEmulatorInterface().getMemoryPointer(sourceAddress, false, bytes);
 		memmove(destPointer, sourcePointer, bytes);
 	}
 
 	void zeroMemory(uint32 startAddress, uint32 bytes)
 	{
-		uint8* pointer = EmulatorInterface::instance().getMemoryPointer(startAddress, true, bytes);
+		uint8* pointer = getEmulatorInterface().getMemoryPointer(startAddress, true, bytes);
 		memset(pointer, 0, bytes);
 	}
 
 	void fillMemory_u8(uint32 startAddress, uint32 bytes, uint8 value)
 	{
-		uint8* pointer = EmulatorInterface::instance().getMemoryPointer(startAddress, true, bytes);
+		uint8* pointer = getEmulatorInterface().getMemoryPointer(startAddress, true, bytes);
 		for (uint32 i = 0; i < bytes; ++i)
 		{
 			pointer[i] = value;
@@ -141,7 +146,7 @@ namespace
 		RMX_CHECK((startAddress & 0x01) == 0, "Odd address not valid", return);
 		RMX_CHECK((bytes & 0x01) == 0, "Odd number of bytes not valid", return);
 
-		uint8* pointer = EmulatorInterface::instance().getMemoryPointer(startAddress, true, bytes);
+		uint8* pointer = getEmulatorInterface().getMemoryPointer(startAddress, true, bytes);
 
 		value = (value << 8) + (value >> 8);
 		for (uint32 i = 0; i < bytes; i += 2)
@@ -155,7 +160,7 @@ namespace
 		RMX_CHECK((startAddress & 0x01) == 0, "Odd address not valid", return);
 		RMX_CHECK((bytes & 0x03) == 0, "Number of bytes must be divisible by 4", return);
 
-		uint8* pointer = EmulatorInterface::instance().getMemoryPointer(startAddress, true, bytes);
+		uint8* pointer = getEmulatorInterface().getMemoryPointer(startAddress, true, bytes);
 
 		value = ((value & 0x000000ff) << 24)
 			  + ((value & 0x0000ff00) << 8)
@@ -171,15 +176,17 @@ namespace
 
 	void push(uint32 value)
 	{
-		uint32& A7 = EmulatorInterface::instance().getRegister(15);
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
+		uint32& A7 = emulatorInterface.getRegister(15);
 		A7 -= 4;
-		EmulatorInterface::instance().writeMemory32(A7, value);
+		emulatorInterface.writeMemory32(A7, value);
 	}
 
 	uint32 pop()
 	{
-		uint32& A7 = EmulatorInterface::instance().getRegister(15);
-		const uint32 result = EmulatorInterface::instance().readMemory32(A7);
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
+		uint32& A7 = emulatorInterface.getRegister(15);
+		const uint32 result = emulatorInterface.readMemory32(A7);
 		A7 += 4;
 		return result;
 	}
@@ -188,7 +195,7 @@ namespace
 	uint32 System_loadPersistentData(uint32 targetAddress, lemon::StringRef key, uint32 maxBytes)
 	{
 		const std::vector<uint8>& data = PersistentData::instance().getData(key.getHash());
-		return detail::loadData(targetAddress, data, 0, maxBytes);
+		return detail::loadData(getEmulatorInterface(), targetAddress, data, 0, maxBytes);
 	}
 
 	void System_savePersistentData(uint32 sourceAddress, lemon::StringRef key, uint32 bytes)
@@ -196,7 +203,7 @@ namespace
 		const size_t size = (size_t)bytes;
 		std::vector<uint8> data;
 		data.resize(size);
-		const uint8* src = EmulatorInterface::instance().getMemoryPointer(sourceAddress, false, bytes);
+		const uint8* src = getEmulatorInterface().getMemoryPointer(sourceAddress, false, bytes);
 		memcpy(&data[0], src, size);
 
 		if (key.isValid())
@@ -207,12 +214,12 @@ namespace
 
 	uint32 SRAM_load(uint32 address, uint16 offset, uint16 bytes)
 	{
-		return (uint32)EmulatorInterface::instance().loadSRAM(address, (size_t)offset, (size_t)bytes);
+		return (uint32)getEmulatorInterface().loadSRAM(address, (size_t)offset, (size_t)bytes);
 	}
 
 	void SRAM_save(uint32 address, uint16 offset, uint16 bytes)
 	{
-		EmulatorInterface::instance().saveSRAM(address, (size_t)offset, (size_t)bytes);
+		getEmulatorInterface().saveSRAM(address, (size_t)offset, (size_t)bytes);
 	}
 
 
@@ -295,7 +302,7 @@ namespace
 		if (nullptr == rawData)
 			return 0;
 
-		return detail::loadData(targetAddress, rawData->mContent, offset, maxBytes);
+		return detail::loadData(getEmulatorInterface(), targetAddress, rawData->mContent, offset, maxBytes);
 	}
 
 	uint32 System_loadExternalRawData2(lemon::StringRef key, uint32 targetAddress)
@@ -317,7 +324,7 @@ namespace
 
 		const std::vector<Color>& colors = palette->mColors;
 		const size_t numColors = std::min<size_t>(colors.size(), maxColors);
-		uint32* targetPointer = (uint32*)EmulatorInterface::instance().getMemoryPointer(targetAddress, true, (uint32)numColors * 4);
+		uint32* targetPointer = (uint32*)getEmulatorInterface().getMemoryPointer(targetAddress, true, (uint32)numColors * 4);
 		for (size_t i = 0; i < numColors; ++i)
 		{
 			targetPointer[i] = palette->mColors[i].getRGBA32();
@@ -609,14 +616,14 @@ namespace
 		{
 			case WriteTarget::VRAM:
 			{
-				result = EmulatorInterface::instance().readVRam16(mWriteAddress);
+				result = getEmulatorInterface().readVRam16(mWriteAddress);
 				break;
 			}
 
 			case WriteTarget::VSRAM:
 			{
 				const uint8 index = (mWriteAddress / 2) & 0x3f;
-				result = EmulatorInterface::instance().getVSRam()[index];
+				result = getEmulatorInterface().getVSRam()[index];
 				break;
 			}
 
@@ -646,14 +653,14 @@ namespace
 				if (nullptr != gDebugNotificationInterface)
 					gDebugNotificationInterface->onVRAMWrite(mWriteAddress, 2);
 
-				EmulatorInterface::instance().writeVRam16(mWriteAddress, value);
+				getEmulatorInterface().writeVRam16(mWriteAddress, value);
 				break;
 			}
 
 			case WriteTarget::VSRAM:
 			{
 				const uint8 index = (mWriteAddress / 2) & 0x3f;
-				EmulatorInterface::instance().getVSRam()[index] = value;
+				getEmulatorInterface().getVSRam()[index] = value;
 				break;
 			}
 
@@ -677,7 +684,7 @@ namespace
 		RMX_CHECK((bytes & 1) == 0, "Number of bytes in VDP_copyToVRAM must be divisible by two, but is " << bytes, bytes &= 0xfffe);
 		RMX_CHECK(uint32(mWriteAddress) + bytes <= 0x10000, "Invalid VRAM access from " << rmx::hexString(mWriteAddress, 8) << " to " << rmx::hexString(mWriteAddress+bytes-1, 8) << " in VDP_copyToVRAM", return);
 
-		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
 		if (mWriteIncrement == 2)
 		{
 			// Optimized version of the code below
@@ -700,7 +707,7 @@ namespace
 			for (uint16 i = 0; i < bytes; i += 2)
 			{
 				const uint16 value = emulatorInterface.readMemory16(address);
-				EmulatorInterface::instance().writeVRam16(mWriteAddress, value);
+				emulatorInterface.writeVRam16(mWriteAddress, value);
 				mWriteAddress += mWriteIncrement;
 				address += 2;
 			}
@@ -714,7 +721,7 @@ namespace
 		if (nullptr != gDebugNotificationInterface)
 			gDebugNotificationInterface->onVRAMWrite(vramAddress, bytes);
 
-		EmulatorInterface::instance().fillVRam(vramAddress, fillValue, bytes);
+		getEmulatorInterface().fillVRam(vramAddress, fillValue, bytes);
 		mWriteAddress = vramAddress + bytes;
 	}
 
@@ -732,10 +739,11 @@ namespace
 		RMX_ASSERT((mWriteAddress % 2) == 0, "Invalid CRAM write address " << mWriteAddress);
 		RMX_ASSERT((mWriteIncrement % 2) == 0, "Invalid CRAM write increment " << mWriteIncrement);
 
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
 		PaletteManager& paletteManager = RenderParts::instance().getPaletteManager();
 		for (uint16 i = 0; i < bytes; i += 2)
 		{
-			const uint16 colorValue = EmulatorInterface::instance().readMemory16(address + i);
+			const uint16 colorValue = emulatorInterface.readMemory16(address + i);
 			paletteManager.writePaletteEntryPacked(0, mWriteAddress / 2, colorValue);
 			mWriteAddress += mWriteIncrement;
 		}
@@ -824,12 +832,12 @@ namespace
 
 	uint16 getVRAM(uint16 vramAddress)
 	{
-		return EmulatorInterface::instance().readVRam16(vramAddress);
+		return getEmulatorInterface().readVRam16(vramAddress);
 	}
 
 	void setVRAM(uint16 vramAddress, uint16 value)
 	{
-		EmulatorInterface::instance().writeVRam16(vramAddress, value);
+		getEmulatorInterface().writeVRam16(vramAddress, value);
 	}
 
 

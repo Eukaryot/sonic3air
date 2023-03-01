@@ -772,6 +772,9 @@
     <ClInclude Include="..\..\source\oxygen\rendering\RenderingDefinitions.h">
       <Filter>rendering</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\RuntimeEnvironment.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />

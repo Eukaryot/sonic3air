@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include "oxygen/simulation/LemonScriptRuntime.h"
 #include "oxygen/simulation/DebuggingInterfaces.h"
+#include "oxygen/simulation/LemonScriptRuntime.h"
+#include "oxygen/simulation/RuntimeEnvironment.h"
 
 class EmulatorInterface;
 namespace lemon
@@ -138,7 +139,7 @@ public:
 	bool performFrameUpdate();
 	void yieldExecution();
 
-	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail, const lemon::Environment* environment = nullptr);
+	bool executeScriptFunction(const std::string& functionName, bool showErrorOnFail);
 
 	inline EmulatorInterface& getEmulatorInterface()	{ return mEmulatorInterface; }
 	inline LemonScriptRuntime& getLemonScriptRuntime()	{ return mLemonScriptRuntime; }
@@ -191,8 +192,9 @@ private:
 	LemonScriptProgram& mLemonScriptProgram;	// Move instance to Simulation?
 	EmulatorInterface&  mEmulatorInterface;
 	LemonScriptRuntime& mLemonScriptRuntime;
-	bool mIsDeveloperMode = false;
+	RuntimeEnvironment mRuntimeEnvironment;
 
+	bool mIsDeveloperMode = false;
 	ExecutionState mExecutionState = ExecutionState::INACTIVE;
 	bool mCurrentlyRunningScript = false;
 	size_t mAccumulatedStepsOfCurrentFrame = 0;
