@@ -121,7 +121,7 @@ namespace s3air
 
 			if (!SpriteCache::instance().hasSprite(key))
 			{
-				key = SharedDatabase::setupCharacterSprite(characterIndex, animationSprite, false);
+				key = SharedDatabase::setupCharacterSprite(emulatorInterface, characterIndex, animationSprite, false);
 				if (!SpriteCache::instance().hasSprite(key))
 					key = 0;
 			}
@@ -152,7 +152,7 @@ namespace s3air
 			uint64 key = rmx::getMurmur2_64(String(0, "character_tails_tails_0x%02x", tailsAnimSprite));
 			if (!SpriteCache::instance().hasSprite(key))
 			{
-				key = SharedDatabase::setupTailsTailsSprite(tailsAnimSprite);
+				key = SharedDatabase::setupTailsTailsSprite(emulatorInterface, tailsAnimSprite);
 				if (!SpriteCache::instance().hasSprite(key))
 					key = 0;
 			}

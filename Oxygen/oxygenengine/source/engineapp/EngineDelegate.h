@@ -17,7 +17,7 @@ public:
 	bool onEnginePreStartup() override;
 	bool setupCustomGameProfile() override;
 
-	void startupGame() override;
+	void startupGame(EmulatorInterface& emulatorInterface) override;
 	void shutdownGame() override;
 	void updateGame(float timeElapsed) override;
 

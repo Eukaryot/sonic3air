@@ -10,6 +10,8 @@
 
 #include <rmxbase.h>
 
+class EmulatorInterface;
+
 
 class SharedDatabase
 {
@@ -196,8 +198,8 @@ public:
 	static const std::vector<Zone>& getAllZones()  { return mAllZones; }
 	static const Zone* getZoneByInternalIndex(uint8 index);
 
-	static uint64 setupCharacterSprite(uint8 character, uint16 animationSprite, bool superActive = false);
-	static uint64 setupTailsTailsSprite(uint8 animationSprite);
+	static uint64 setupCharacterSprite(EmulatorInterface& emulatorInterface, uint8 character, uint16 animationSprite, bool superActive = false);
+	static uint64 setupTailsTailsSprite(EmulatorInterface& emulatorInterface, uint8 animationSprite);
 	static uint8 getTailsTailsAnimationSprite(uint8 characterAnimationSprite, uint32 globalTime);
 
 	static inline const std::unordered_map<uint32, Setting>& getSettings()  { return mSettings; }

@@ -12,6 +12,7 @@
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/rendering/utils/Kosinski.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/simulation/RuntimeEnvironment.h"
 
 #include <lemon/program/FunctionWrapper.h>
 #include <lemon/program/Module.h>
@@ -20,39 +21,47 @@
 namespace s3air
 {
 
+	inline EmulatorInterface& getEmulatorInterface()
+	{
+		return *lemon::Runtime::getActiveEnvironmentSafe<RuntimeEnvironment>().mEmulatorInterface;
+	}
+
 	void kosinskiDecompress()
 	{
-		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
 		uint32& A0 = emulatorInterface.getRegister(EmulatorInterface::Register::A0);
 		uint32& A1 = emulatorInterface.getRegister(EmulatorInterface::Register::A1);
 
 		uint8* initialPointer = emulatorInterface.getMemoryPointer(A1, false, 1);
 		uint8* pointer = initialPointer;
-		Kosinski::decompress(pointer, A0);
+		Kosinski::decompress(emulatorInterface, pointer, A0);
 
 		A1 += (uint32)(pointer - initialPointer);
 	}
 
 	void writeScrollOffsetsShared(uint32 value)
 	{
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
 		const int height = VideoOut::instance().getScreenHeight();
 		for (int line = 0; line < height; ++line)
 		{
-			EmulatorInterface::instance().writeMemory32(0xffffe000 + line * 4, value);
+			emulatorInterface.writeMemory32(0xffffe000 + line * 4, value);
 		}
 	}
 
 	void writeScrollOffsets()
 	{
-		const uint16 foregroundX = -(int16)EmulatorInterface::instance().readMemory16(0xffffee80);
-		const uint16 backgroundX = -(int16)EmulatorInterface::instance().readMemory16(0xffffee8c);
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
+		const uint16 foregroundX = -(int16)emulatorInterface.readMemory16(0xffffee80);
+		const uint16 backgroundX = -(int16)emulatorInterface.readMemory16(0xffffee8c);
 		writeScrollOffsetsShared(((uint32)foregroundX << 16) | backgroundX);
 	}
 
 	void writeScrollOffsetsFlipped()
 	{
-		const uint16 foregroundX = -(int16)EmulatorInterface::instance().readMemory16(0xffffee80);
-		const uint16 backgroundX = -(int16)EmulatorInterface::instance().readMemory16(0xffffee8c);
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
+		const uint16 foregroundX = -(int16)emulatorInterface.readMemory16(0xffffee80);
+		const uint16 backgroundX = -(int16)emulatorInterface.readMemory16(0xffffee8c);
 		writeScrollOffsetsShared(((uint32)backgroundX << 16) | foregroundX);
 	}
 
@@ -69,9 +78,8 @@ namespace s3air
 	// TEST!
 	void decompressKosinskiData(uint32 sourceAddress, uint16 targetInVRAM)
 	{
-		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
-
 		// Get the decompressed size
+		EmulatorInterface& emulatorInterface = getEmulatorInterface();
 		uint16 size = emulatorInterface.readMemory16(sourceAddress);
 		if (size == 0xa000)
 			size = 0x8000;
@@ -81,7 +89,7 @@ namespace s3air
 		{
 			uint8 buffer[0x1000];
 			uint8* pointer = buffer;
-			Kosinski::decompress(pointer, inputAddress);
+			Kosinski::decompress(emulatorInterface, pointer, inputAddress);
 
 			const uint16 bytes = std::min<uint16>(size, 0x1000);
 			uint8* dst = emulatorInterface.getVRam() + targetInVRAM;

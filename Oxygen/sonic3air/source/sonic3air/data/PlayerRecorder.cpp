@@ -60,18 +60,18 @@ namespace
 		return min * 6000 + sec * 100 + hsec;
 	}
 
-	uint8 getLevelSectionFlags(uint16 zoneAndAct)
+	uint8 getLevelSectionFlags(EmulatorInterface& emulatorInterface, uint16 zoneAndAct)
 	{
 		if (zoneAndAct == 0x0000)
 		{
 			// AIZ act 1 internal transition to act 2
-			if (EmulatorInterface::instance().readMemory16(0xfffffe10) == 0x0001)
+			if (emulatorInterface.readMemory16(0xfffffe10) == 0x0001)
 				return 0x10;
 		}
 		else if (zoneAndAct == 0x0500)
 		{
 			// ICZ act 1 internal transition to act 2
-			if (EmulatorInterface::instance().readMemory16(0xfffffe10) == 0x0501)
+			if (emulatorInterface.readMemory16(0xfffffe10) == 0x0501)
 				return 0x10;
 		}
 		return 0;
@@ -106,6 +106,11 @@ void PlayerRecorder::reset()
 
 	mCurrentRecording.mFrames.clear();
 	mCurrentPlaybacks.clear();
+}
+
+void PlayerRecorder::setEmulatorInterface(EmulatorInterface& emulatorInterface)
+{
+	mEmulatorInterface = &emulatorInterface;
 }
 
 void PlayerRecorder::setCurrentDirectory(const std::wstring& directory)
@@ -191,14 +196,15 @@ void PlayerRecorder::onPostUpdateFrame()
 		return;
 
 	// Nothing to do outside of main game
-	const bool isMainGame = (EmulatorInterface::instance().readMemory8(0xfffff600) == 0x0c);
-	const bool hasStarted = ((int8)EmulatorInterface::instance().readMemory8(0xfffff711) > 0);
+	EmulatorInterface& emulatorInterface = *mEmulatorInterface;
+	const bool isMainGame = (emulatorInterface.readMemory8(0xfffff600) == 0x0c);
+	const bool hasStarted = ((int8)emulatorInterface.readMemory8(0xfffff711) > 0);
 
 	if (isMainGame && hasStarted)
 	{
 		mState = State::ACTIVE;
 
-		const uint16 frameNumber = EmulatorInterface::instance().readMemory16(0xfffffe04);
+		const uint16 frameNumber = emulatorInterface.readMemory16(0xfffffe04);
 
 		// Recording
 		if (mRecordingActive)
@@ -298,21 +304,23 @@ void PlayerRecorder::updateRecording(Recording& recording, uint16 frameNumber)
 {
 	if (frameNumber == recording.mFrames.size())
 	{
+		EmulatorInterface& emulatorInterface = *mEmulatorInterface;
+
 		recording.mFrames.emplace_back();
 		Frame& frame = recording.mFrames.back();
 
 		// Collect data
 		frame.mInput = ControlsIn::instance().getInputPad(0);
-		frame.mPosition.x = EmulatorInterface::instance().readMemory16(0xffffb010);
-		frame.mPosition.y = EmulatorInterface::instance().readMemory16(0xffffb014);
-		frame.mSprite = EmulatorInterface::instance().readMemory16(0x801002);
-		frame.mRotation = EmulatorInterface::instance().readMemory8(0xffffb026);
+		frame.mPosition.x = emulatorInterface.readMemory16(0xffffb010);
+		frame.mPosition.y = emulatorInterface.readMemory16(0xffffb014);
+		frame.mSprite = emulatorInterface.readMemory16(0x801002);
+		frame.mRotation = emulatorInterface.readMemory8(0xffffb026);
 
 		// Set flags accordingly
-		frame.mFlags = (EmulatorInterface::instance().readMemory8(0xffffb004) & 0x03);
-		if (EmulatorInterface::instance().readMemory16(0xffffb00a) & 0x8000)	{ frame.mFlags |= Frame::FLAG_PRIORITY; }
-		if (EmulatorInterface::instance().readMemory8(0xffffb046) == 0x0e)		{ frame.mFlags |= Frame::FLAG_LAYER; }
-		frame.mFlags |= getLevelSectionFlags(recording.mZoneAndAct);
+		frame.mFlags = (emulatorInterface.readMemory8(0xffffb004) & 0x03);
+		if (emulatorInterface.readMemory16(0xffffb00a) & 0x8000)	{ frame.mFlags |= Frame::FLAG_PRIORITY; }
+		if (emulatorInterface.readMemory8(0xffffb046) == 0x0e)		{ frame.mFlags |= Frame::FLAG_LAYER; }
+		frame.mFlags |= getLevelSectionFlags(emulatorInterface, recording.mZoneAndAct);
 	}
 	else
 	{
@@ -325,14 +333,16 @@ void PlayerRecorder::updatePlayback(const Recording& recording, uint16 frameNumb
 	if (!recording.mVisible || frameNumber >= recording.mFrames.size())
 		return;
 
+	EmulatorInterface& emulatorInterface = *mEmulatorInterface;
+
 	const Frame& frame = recording.mFrames[frameNumber];
-	int px = frame.mPosition.x - EmulatorInterface::instance().readMemory16(0xffffee80);
-	int py = frame.mPosition.y - EmulatorInterface::instance().readMemory16(0xffffee84);
+	int px = frame.mPosition.x - emulatorInterface.readMemory16(0xffffee80);
+	int py = frame.mPosition.y - emulatorInterface.readMemory16(0xffffee84);
 
 	// Level section fixes for AIZ 1 and ICZ 1
 	if (recording.mZoneAndAct == 0x0000)
 	{
-		const uint8 currentSectionFlags = getLevelSectionFlags(recording.mZoneAndAct);
+		const uint8 currentSectionFlags = getLevelSectionFlags(emulatorInterface, recording.mZoneAndAct);
 		if (frame.mFlags & 0x10)
 		{
 			px += 0x2f00;
@@ -346,7 +356,7 @@ void PlayerRecorder::updatePlayback(const Recording& recording, uint16 frameNumb
 	}
 	else if (recording.mZoneAndAct == 0x0500)
 	{
-		const uint8 currentSectionFlags = getLevelSectionFlags(recording.mZoneAndAct);
+		const uint8 currentSectionFlags = getLevelSectionFlags(emulatorInterface, recording.mZoneAndAct);
 		if (frame.mFlags & 0x10)
 		{
 			px += 0x6880;
@@ -360,9 +370,9 @@ void PlayerRecorder::updatePlayback(const Recording& recording, uint16 frameNumb
 	}
 
 	// Consider vertical level wrap
-	if (EmulatorInterface::instance().readMemory16(0xffffee18) != 0)
+	if (emulatorInterface.readMemory16(0xffffee18) != 0)
 	{
-		const int levelHeightBitmask = EmulatorInterface::instance().readMemory16(0xffffeeaa);
+		const int levelHeightBitmask = emulatorInterface.readMemory16(0xffffeeaa);
 		py &= levelHeightBitmask;
 		if (py >= levelHeightBitmask / 2)
 			py -= (levelHeightBitmask + 1);
@@ -370,7 +380,7 @@ void PlayerRecorder::updatePlayback(const Recording& recording, uint16 frameNumb
 
 	const uint8 character = (recording.mCategory >> 4) - 1;
 	const Vec2i velocity = (frameNumber > 0) ? (frame.mPosition - recording.mFrames[frameNumber-1].mPosition) : Vec2i(0, 1);
-	s3air::drawPlayerSprite(EmulatorInterface::instance(), character, Vec2i(px, py), velocity, frame.mSprite, frame.mFlags & 0x43, frame.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &frameNumber, true, 0x99990000 + recording.mIndex * 0x10);
+	s3air::drawPlayerSprite(emulatorInterface, character, Vec2i(px, py), velocity, frame.mSprite, frame.mFlags & 0x43, frame.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &frameNumber, true, 0x99990000 + recording.mIndex * 0x10);
 }
 
 bool PlayerRecorder::serializeRecording(VectorBinarySerializer& serializer, Recording& recording)

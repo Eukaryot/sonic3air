@@ -115,6 +115,11 @@ void Simulation::reloadScriptsAfterModsChange()
 	}
 }
 
+EmulatorInterface& Simulation::getEmulatorInterface()
+{
+	return mCodeExec.getEmulatorInterface();
+}
+
 void Simulation::resetState()
 {
 	EngineMain::instance().getAudioOut().reset();

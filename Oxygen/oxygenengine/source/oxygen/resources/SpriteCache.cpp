@@ -26,9 +26,8 @@
 namespace
 {
 
-	void decodeROMSpriteData(std::vector<RenderUtils::PatternPixelContent>& patternBuffer, uint32 patternsBaseAddress, uint32 patternAddress, SpriteCache::ROMSpriteEncoding encoding)
+	void decodeROMSpriteData(EmulatorInterface& emulatorInterface, std::vector<RenderUtils::PatternPixelContent>& patternBuffer, uint32 patternsBaseAddress, uint32 patternAddress, SpriteCache::ROMSpriteEncoding encoding)
 	{
-		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 		switch (encoding)
 		{
 			case SpriteCache::ENCODING_NONE:
@@ -91,7 +90,7 @@ namespace
 				while (size > 0)
 				{
 					uint8* pointer = buffer;
-					Kosinski::decompress(pointer, inputAddress);
+					Kosinski::decompress(emulatorInterface, pointer, inputAddress);
 
 					const uint16 bytes = std::min<uint16>(size, 0x1000);
 					RMX_ASSERT((bytes & 0x1f) == 0, "Expected decompressed data size to be divisible by 0x20");
@@ -108,12 +107,12 @@ namespace
 		}
 	}
 
-	void createPaletteSpriteFromROM(PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 patternAddress, uint32 mappingAddress, uint8 atex, SpriteCache::ROMSpriteEncoding encoding, int16 indexOffset)
+	void createPaletteSpriteFromROM(EmulatorInterface& emulatorInterface, PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 patternAddress, uint32 mappingAddress, uint8 atex, SpriteCache::ROMSpriteEncoding encoding, int16 indexOffset)
 	{
 		// Fill sprite pattern buffer
 		static std::vector<RenderUtils::PatternPixelContent> patternBuffer;
 		patternBuffer.clear();
-		decodeROMSpriteData(patternBuffer, patternsBaseAddress, patternAddress, encoding);
+		decodeROMSpriteData(emulatorInterface, patternBuffer, patternsBaseAddress, patternAddress, encoding);
 
 		// Fill sprite patterns
 		static std::vector<RenderUtils::SinglePattern> patterns;
@@ -136,13 +135,12 @@ namespace
 		//paletteSprite.mBitmap.shiftAllIndices(atex);
 	}
 
-	void createPaletteSpriteFromROM(PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, SpriteCache::ROMSpriteEncoding encoding, int16 indexOffset)
+	void createPaletteSpriteFromROM(EmulatorInterface& emulatorInterface, PaletteSprite& paletteSprite, uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, SpriteCache::ROMSpriteEncoding encoding, int16 indexOffset)
 	{
-		EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 		const uint32 patternAddress = (encoding == SpriteCache::ENCODING_NONE || encoding == SpriteCache::ENCODING_KOSINSKI) ? tableAddress : (tableAddress + emulatorInterface.readMemory16(tableAddress + animationSprite * 2));
 		const uint32 mappingAddress = mappingOffset + emulatorInterface.readMemory16(mappingOffset + animationSprite * 2);
 
-		createPaletteSpriteFromROM(paletteSprite, patternsBaseAddress, patternAddress, mappingAddress, atex, encoding, indexOffset);
+		createPaletteSpriteFromROM(emulatorInterface, paletteSprite, patternsBaseAddress, patternAddress, mappingAddress, atex, encoding, indexOffset);
 	}
 
 	bool isHexDigit(char ch)
@@ -258,7 +256,7 @@ SpriteCache::CacheItem& SpriteCache::getOrCreateComponentSprite(uint64 key)
 	return *item;
 }
 
-uint64 SpriteCache::setupSpriteFromROM(uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, ROMSpriteEncoding encoding, int16 indexOffset)
+uint64 SpriteCache::setupSpriteFromROM(EmulatorInterface& emulatorInterface, uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, ROMSpriteEncoding encoding, int16 indexOffset)
 {
 	const uint64 key = (((uint64)patternsBaseAddress) << 42) ^ (((uint64)tableAddress) << 25) ^ (((uint64)mappingOffset) << 8) ^ (uint64)animationSprite;
 
@@ -267,7 +265,7 @@ uint64 SpriteCache::setupSpriteFromROM(uint32 patternsBaseAddress, uint32 tableA
 	{
 		item = &getOrCreatePaletteSprite(key);
 		PaletteSprite& paletteSprite = *static_cast<PaletteSprite*>(item->mSprite);
-		createPaletteSpriteFromROM(paletteSprite, patternsBaseAddress, tableAddress, mappingOffset, animationSprite, atex, encoding, indexOffset);
+		createPaletteSpriteFromROM(emulatorInterface, paletteSprite, patternsBaseAddress, tableAddress, mappingOffset, animationSprite, atex, encoding, indexOffset);
 
 	#ifdef CREATE_SPRITEDUMP
 		if (animationSprite != 0)	// TODO: Do this only for characters

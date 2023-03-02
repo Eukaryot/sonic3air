@@ -132,7 +132,7 @@ const SharedDatabase::Zone* SharedDatabase::getZoneByInternalIndex(uint8 index)
 	return nullptr;
 }
 
-uint64 SharedDatabase::setupCharacterSprite(uint8 character, uint16 animationSprite, bool superActive)
+uint64 SharedDatabase::setupCharacterSprite(EmulatorInterface& emulatorInterface, uint8 character, uint16 animationSprite, bool superActive)
 {
 	if (animationSprite >= 0x100)
 	{
@@ -173,13 +173,13 @@ uint64 SharedDatabase::setupCharacterSprite(uint8 character, uint16 animationSpr
 				break;
 		}
 
-		return SpriteCache::instance().setupSpriteFromROM(sourceBase, tableAddress, mappingOffset, (uint8)animationSprite, 0x00, SpriteCache::ENCODING_CHARACTER);
+		return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, sourceBase, tableAddress, mappingOffset, (uint8)animationSprite, 0x00, SpriteCache::ENCODING_CHARACTER);
 	}
 }
 
-uint64 SharedDatabase::setupTailsTailsSprite(uint8 animationSprite)
+uint64 SharedDatabase::setupTailsTailsSprite(EmulatorInterface& emulatorInterface, uint8 animationSprite)
 {
-	return SpriteCache::instance().setupSpriteFromROM(0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00, SpriteCache::ENCODING_CHARACTER);
+	return SpriteCache::instance().setupSpriteFromROM(emulatorInterface, 0x336620, 0x344d74, 0x344bb8, animationSprite, 0x00, SpriteCache::ENCODING_CHARACTER);
 }
 
 uint8 SharedDatabase::getTailsTailsAnimationSprite(uint8 characterAnimationSprite, uint32 globalTime)

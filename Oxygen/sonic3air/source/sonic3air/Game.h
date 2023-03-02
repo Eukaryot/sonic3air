@@ -41,7 +41,7 @@ public:
 public:
 	Game();
 
-	void startup();
+	void startup(EmulatorInterface& emulatorInterface);
 	void shutdown();
 	void update(float timeElapsed);
 
@@ -121,6 +121,8 @@ private:
 	void endSkippableCutscene();
 
 private:
+	EmulatorInterface* mEmulatorInterface = nullptr;
+
 	Mode mMode = Mode::UNDEFINED;
 	uint32 mSubMode = 0;
 

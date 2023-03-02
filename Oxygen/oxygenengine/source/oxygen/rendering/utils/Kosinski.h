@@ -10,9 +10,11 @@
 
 #include <rmxbase.h>
 
+class EmulatorInterface;
+
 
 class Kosinski
 {
 public:
-	static void decompress(uint8*& output, uint32& inputAddress);
+	static void decompress(EmulatorInterface& emulatorInterface, uint8*& output, uint32& inputAddress);
 };

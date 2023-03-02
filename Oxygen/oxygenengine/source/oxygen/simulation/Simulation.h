@@ -33,6 +33,7 @@ public:
 
 	CodeExec& getCodeExec()				  { return mCodeExec; }
 	ROMDataAnalyser* getROMDataAnalyser() { return mROMDataAnalyser; }
+	EmulatorInterface& getEmulatorInterface();
 
 	void resetState();
 	void resetIntoGame(const std::vector<std::pair<std::string, std::string>>* enforcedCallStack);

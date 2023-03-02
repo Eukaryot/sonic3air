@@ -934,27 +934,27 @@ namespace
 
 	uint64 Renderer_setupCustomUncompressedSprite(uint32 sourceBase, uint16 words, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(sourceBase, words / 0x10, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_NONE);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, words / 0x10, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_NONE);
 	}
 
 	uint64 Renderer_setupCustomCharacterSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_CHARACTER);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_CHARACTER);
 	}
 
 	uint64 Renderer_setupCustomObjectSprite(uint32 sourceBase, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_OBJECT);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceBase, tableAddress, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_OBJECT);
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite1(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_KOSINSKI);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_KOSINSKI);
 	}
 
 	uint64 Renderer_setupKosinskiCompressedSprite2(uint32 sourceAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, int16 indexOffset)
 	{
-		return SpriteCache::instance().setupSpriteFromROM(sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_KOSINSKI, indexOffset);
+		return SpriteCache::instance().setupSpriteFromROM(getEmulatorInterface(), sourceAddress, 0, mappingOffset, animationSprite, atex, SpriteCache::ENCODING_KOSINSKI, indexOffset);
 	}
 
 	void Renderer_drawSprite1(uint64 key, int16 px, int16 py, uint16 atex, uint8 flags, uint16 renderQueue)

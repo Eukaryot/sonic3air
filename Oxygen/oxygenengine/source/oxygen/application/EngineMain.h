@@ -14,6 +14,7 @@
 class AudioOutBase;
 class CodeExec;
 class Configuration;
+class EmulatorInterface;
 class LogDisplay;
 class PackedFileProvider;
 
@@ -45,7 +46,7 @@ public:
 	virtual bool onEnginePreStartup() = 0;
 	virtual bool setupCustomGameProfile() = 0;
 
-	virtual void startupGame() = 0;
+	virtual void startupGame(EmulatorInterface& emulatorInterface) = 0;
 	virtual void shutdownGame() = 0;
 	virtual void updateGame(float timeElapsed) = 0;
 

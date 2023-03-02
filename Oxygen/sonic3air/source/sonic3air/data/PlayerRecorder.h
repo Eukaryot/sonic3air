@@ -20,6 +20,7 @@ public:
 	PlayerRecorder();
 
 	void reset();
+	void setEmulatorInterface(EmulatorInterface& emulatorInterface);
 	void setCurrentDirectory(const std::wstring& directory);
 
 	inline bool isPlaying() const  { return (mState != State::INACTIVE && !mRecordingActive); }
@@ -51,6 +52,7 @@ private:
 		uint8  mFlags = 0;
 		// TODO: Adding velocity direction (as angle) would make sense here for Tails, to get smoother tails movement while rolling & jumping
 	};
+
 	struct Recording
 	{
 		std::wstring mFilename;
@@ -73,6 +75,7 @@ private:
 	bool serializeRecording(VectorBinarySerializer& serializer, Recording& recording);
 
 private:
+	EmulatorInterface* mEmulatorInterface = nullptr;
 	std::wstring mDirectory;
 	int mMaxGhosts = 5;
 

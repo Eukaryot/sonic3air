@@ -12,6 +12,7 @@
 #include "oxygen/rendering/sprite/ComponentSprite.h"
 #include "oxygen/rendering/sprite/PaletteSprite.h"
 
+class EmulatorInterface;
 class SpriteDump;
 
 
@@ -48,7 +49,7 @@ public:
 	CacheItem& getOrCreatePaletteSprite(uint64 key);
 	CacheItem& getOrCreateComponentSprite(uint64 key);
 
-	uint64 setupSpriteFromROM(uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, ROMSpriteEncoding encoding, int16 indexOffset = 0);
+	uint64 setupSpriteFromROM(EmulatorInterface& emulatorInterface, uint32 patternsBaseAddress, uint32 tableAddress, uint32 mappingOffset, uint8 animationSprite, uint8 atex, ROMSpriteEncoding encoding, int16 indexOffset = 0);
 
 	void clearRedirect(uint64 sourceKey);
 	void setupRedirect(uint64 sourceKey, uint64 targetKey);

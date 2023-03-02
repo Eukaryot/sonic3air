@@ -114,9 +114,9 @@ bool EngineDelegate::setupCustomGameProfile()
 	return true;
 }
 
-void EngineDelegate::startupGame()
+void EngineDelegate::startupGame(EmulatorInterface& emulatorInterface)
 {
-	mGame.startup();
+	mGame.startup(emulatorInterface);
 	mCommandForwarder.startup();
 }
 

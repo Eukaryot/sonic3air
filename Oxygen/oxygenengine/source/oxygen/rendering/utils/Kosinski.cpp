@@ -69,10 +69,10 @@ namespace
 
 
 
-void Kosinski::decompress(uint8*& output, uint32& inputAddress)
+void Kosinski::decompress(EmulatorInterface& emulatorInterface, uint8*& output, uint32& inputAddress)
 {
 	const uint8* initialOutput = output;
-	ByteReader byteReader(EmulatorInterface::instance(), inputAddress);
+	ByteReader byteReader(emulatorInterface, inputAddress);
 	BitReader bitReader(byteReader);
 	bitReader.init();
 

@@ -37,7 +37,7 @@ bool EngineDelegate::setupCustomGameProfile()
 	return false;
 }
 
-void EngineDelegate::startupGame()
+void EngineDelegate::startupGame(EmulatorInterface& emulatorInterface)
 {
 }
 

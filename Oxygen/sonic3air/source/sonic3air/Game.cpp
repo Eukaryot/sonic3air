@@ -74,8 +74,11 @@ Game::Game()
 {
 }
 
-void Game::startup()
+void Game::startup(EmulatorInterface& emulatorInterface)
 {
+	mEmulatorInterface = &emulatorInterface;
+	mPlayerRecorder.setEmulatorInterface(emulatorInterface);
+
 	mPlayerProgress.load();
 	mBlueSpheresRendering.startup();
 	mGameClient.setupClient();
@@ -103,7 +106,7 @@ void Game::update(float timeElapsed)
 		mTimeoutUntilDiscordRefresh -= timeElapsed;
 		if (mTimeoutUntilDiscordRefresh <= 0.0f)
 		{
-			DiscordIntegration::updateInfo(mMode, mSubMode, EmulatorInterface::instance());
+			DiscordIntegration::updateInfo(mMode, mSubMode, *mEmulatorInterface);
 			mTimeoutUntilDiscordRefresh = 3.0f;
 		}
 		DiscordIntegration::update();
@@ -347,8 +350,8 @@ void Game::startIntoLevel(Mode mode, uint32 submode, uint16 zoneAndAct, uint8 ch
 	mLastZoneAndAct = zoneAndAct;
 	mLastCharacters = characters;
 
-	EmulatorInterface::instance().writeMemory16(0xfffffe10, zoneAndAct);
-	EmulatorInterface::instance().writeMemory16(0xffffff0a, characters);
+	mEmulatorInterface->writeMemory16(0xfffffe10, zoneAndAct);
+	mEmulatorInterface->writeMemory16(0xffffff0a, characters);
 
 	if (mMode == Mode::TIME_ATTACK)
 	{
@@ -445,7 +448,7 @@ void Game::onPreUpdateFrame()
 
 void Game::onPostUpdateFrame()
 {
-	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
+	EmulatorInterface& emulatorInterface = *mEmulatorInterface;
 
 	// Check for invalid game mode inside simulation
 	{
@@ -622,7 +625,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 	const int32 minY = cameraTileY;
 	const int32 maxY = cameraTileY + bitmap.getHeight() / 16;
 
-	const uint16 filterByCharacterPath = (3 << EmulatorInterface::instance().readMemory8(0xffffb046));
+	const uint16 filterByCharacterPath = (3 << mEmulatorInterface->readMemory8(0xffffb046));
 
 	for (int32 y = minY; y <= maxY; ++y)
 	{
@@ -634,14 +637,14 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 			// Access the right chunk
 			const uint16 chunkX = (x / 8);
 			const uint16 chunkY = (y / 8) & 0x1f;
-			uint32 address = EmulatorInterface::instance().readMemory16(0xffff8008 + chunkY * 4) + chunkX;
-			const uint16 chunkType = EmulatorInterface::instance().readMemory8(0xffff0000 + address);
+			uint32 address = mEmulatorInterface->readMemory16(0xffff8008 + chunkY * 4) + chunkX;
+			const uint16 chunkType = mEmulatorInterface->readMemory8(0xffff0000 + address);
 
 			// Access tile info
-			address = EmulatorInterface::instance().readMemory16(0x00f02a + chunkType * 2);
+			address = mEmulatorInterface->readMemory16(0x00f02a + chunkType * 2);
 			address += ((x % 8) + (y % 8) * 8) * 2;
-			const uint16 tile = EmulatorInterface::instance().readMemory16(0xffff0000 + address);
-			const uint8 tileForm = EmulatorInterface::instance().readMemory8(EmulatorInterface::instance().readMemory32(0xfffff796) + (tile & 0x03ff) * 2);
+			const uint16 tile = mEmulatorInterface->readMemory16(0xffff0000 + address);
+			const uint8 tileForm = mEmulatorInterface->readMemory8(mEmulatorInterface->readMemory32(0xfffff796) + (tile & 0x03ff) * 2);
 
 			if ((tile & 0xf000) != 0 && tileForm != 0)
 			{
@@ -649,7 +652,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 				uint8 angle;
 				if (mode == 1)	// Angle is only relevant in mode 1
 				{
-					angle = EmulatorInterface::instance().readMemory8(0x096000 + tileForm);
+					angle = mEmulatorInterface->readMemory8(0x096000 + tileForm);
 					if (tile & 0x0400)	// Flip horizontally
 						angle = 0x100 - angle;
 					if (tile & 0x0800)	// Flip vertically
@@ -676,7 +679,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 					#if 1
 						// Vertical
 						const uint16 offset = (tile & 0x0400) ? (15 - ix) : ix;
-						int8 indent = (int8)EmulatorInterface::instance().readMemory8(0x096100 + (tileForm * 0x10) + offset);
+						int8 indent = (int8)mEmulatorInterface->readMemory8(0x096100 + (tileForm * 0x10) + offset);
 						if (indent != 0)
 						{
 							if (tile & 0x0800)
@@ -694,7 +697,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 					#else
 						// Horizontal
 						const uint16 offset = (tile & 0x0800) ? (15 - iy) : iy;
-						int8 indent = (int8)EmulatorInterface::instance().readMemory8(0x097100 + (tileForm * 0x10) + offset);
+						int8 indent = (int8)mEmulatorInterface->readMemory8(0x097100 + (tileForm * 0x10) + offset);
 						if (indent != 0)
 						{
 							if (tile & 0x0400)
@@ -998,7 +1001,7 @@ bool Game::onTimeAttackFinish()
 
 void Game::changePlanePatternRectAtex(uint16 px, uint16 py, uint16 width, uint16 height, uint8 planeIndex, uint8 atex)
 {
-	s3air::changePlanePatternRectAtex(EmulatorInterface::instance(), px, py, width, height, planeIndex, atex);
+	s3air::changePlanePatternRectAtex(*mEmulatorInterface, px, py, width, height, planeIndex, atex);
 }
 
 void Game::setupBlueSpheresGroundSprites()
@@ -1008,7 +1011,7 @@ void Game::setupBlueSpheresGroundSprites()
 
 void Game::writeBlueSpheresData(uint32 targetAddress, uint32 sourceAddress, uint16 px, uint16 py, uint8 rotation)
 {
-	mBlueSpheresRendering.writeVisibleSpheresData(targetAddress, sourceAddress, px, py, rotation, EmulatorInterface::instance());
+	mBlueSpheresRendering.writeVisibleSpheresData(targetAddress, sourceAddress, px, py, rotation, *mEmulatorInterface);
 }
 
 void Game::startSkippableCutscene()

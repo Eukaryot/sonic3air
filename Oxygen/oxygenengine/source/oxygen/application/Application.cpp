@@ -824,7 +824,7 @@ bool Application::updateLoading()
 				}
 
 				// Startup game
-				EngineMain::getDelegate().startupGame();
+				EngineMain::getDelegate().startupGame(mSimulation->getEmulatorInterface());
 
 				RMX_LOG_INFO("Adding game app instance");
 				mGameApp = &EngineMain::getDelegate().createGameApp();
