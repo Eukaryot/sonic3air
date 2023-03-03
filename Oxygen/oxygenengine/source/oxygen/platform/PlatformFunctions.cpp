@@ -590,3 +590,64 @@ bool PlatformFunctions::isDebuggerPresent()
 	return false;
 #endif
 }
+
+bool PlatformFunctions::hasClipboardSupport()
+{
+#ifdef PLATFORM_WINDOWS
+	return true;
+#else
+	return false;
+#endif
+}
+
+bool PlatformFunctions::copyToClipboard(std::wstring_view string)
+{
+#ifdef PLATFORM_WINDOWS
+	if (OpenClipboard(nullptr))
+	{
+		const std::string str = WString(string).toStdString();
+		HGLOBAL handle = GlobalAlloc(GMEM_MOVEABLE, str.length() + 1);
+		if (nullptr != handle)
+		{
+			LPTSTR lockedText = (LPTSTR)GlobalLock(handle);
+			if (nullptr != lockedText)
+			{
+				memcpy(lockedText, (LPCTSTR)str.c_str(), str.length() + 1);
+				GlobalUnlock(handle);
+
+				EmptyClipboard();
+				SetClipboardData(CF_TEXT, handle);
+				CloseClipboard();
+				return true;
+			}
+		}
+	}
+#endif
+	return false;
+}
+
+
+bool PlatformFunctions::pasteFromClipboard(WString& outString)
+{
+#ifdef PLATFORM_WINDOWS
+	bool result = false;
+	if (IsClipboardFormatAvailable(CF_TEXT) && OpenClipboard(nullptr))
+	{
+		HGLOBAL handle = GetClipboardData(CF_TEXT);
+		if (nullptr != handle)
+		{
+			char* text = static_cast<char*>(GlobalLock(handle));
+			if (nullptr != text)
+			{
+				outString = WString(text);
+				GlobalUnlock(handle);
+				result = true;
+			}
+		}
+		CloseClipboard();
+	}
+	return result;
+#else
+	return false;
+#endif
+}

@@ -40,6 +40,9 @@
     <Filter Include="resources">
       <UniqueIdentifier>{7b694f91-75d9-41b0-914c-45b43aa8031b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="menu\entries">
+      <UniqueIdentifier>{20f22ee4-b33d-4aea-ad8d-884f4e8a2d95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp">
@@ -160,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.cpp">
       <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.cpp">
+      <Filter>menu\entries</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -283,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\audio\RemasteredMusicDownload.h">
       <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.h">
+      <Filter>menu\entries</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

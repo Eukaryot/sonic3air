@@ -16,7 +16,6 @@ class OptionsMenu;
 struct OptionsMenuRenderContext : public GameMenuEntry::RenderContext
 {
 	OptionsMenu* mOptionsMenu = nullptr;
-	bool mIsSelected = false;
 	float mTabAlpha = 1.0f;
 	bool mIsModsTab = false;
 };

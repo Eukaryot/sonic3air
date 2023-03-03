@@ -412,6 +412,9 @@
     <ClCompile Include="..\..\source\oxygen\drawing\software\Blitter.cpp">
       <Filter>drawing\software</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -774,6 +777,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\RuntimeEnvironment.h">
       <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

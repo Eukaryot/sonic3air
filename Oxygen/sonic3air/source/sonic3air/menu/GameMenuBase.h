@@ -39,6 +39,7 @@ public:
 	{
 		Drawer* mDrawer = nullptr;
 		Vec2i mCurrentPosition;
+		bool mIsSelected = false;
 
 		template<typename T> T& as()  { return *static_cast<T*>(this); }
 	};
@@ -85,6 +86,10 @@ public:
 
 	size_t getPreviousVisibleIndex() const;
 	size_t getNextVisibleIndex() const;
+
+public:
+	virtual void keyboard(const rmx::KeyboardEvent& ev) {}
+	virtual void textinput(const rmx::TextInputEvent& ev) {}
 
 protected:
 	virtual void renderEntry(RenderContext& renderContext) {}

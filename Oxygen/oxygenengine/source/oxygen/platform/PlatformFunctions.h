@@ -59,5 +59,9 @@ public:
 	static void openDirectoryExternal(const std::wstring& path);
 	static void openURLExternal(const std::string& url);
 
+	static bool hasClipboardSupport();
+	static bool copyToClipboard(std::wstring_view string);
+	static bool pasteFromClipboard(WString& outString);
+
 	static bool isDebuggerPresent();
 };
