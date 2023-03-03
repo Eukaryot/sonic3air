@@ -58,6 +58,9 @@ namespace
 			}
 
 			uint8* dst = emulatorInterface.getMemoryPointer(targetAddress, true, bytes);
+			if (nullptr == dst)
+				return 0;
+
 			memcpy(dst, &data[offset], bytes);
 			return bytes;
 		}
@@ -206,12 +209,14 @@ namespace
 
 	void System_savePersistentData(uint32 sourceAddress, lemon::StringRef key, uint32 bytes)
 	{
+		const uint8* src = getEmulatorInterface().getMemoryPointer(sourceAddress, false, bytes);
+		if (nullptr == src)
+			return;
+
 		const size_t size = (size_t)bytes;
 		std::vector<uint8> data;
 		data.resize(size);
-		const uint8* src = getEmulatorInterface().getMemoryPointer(sourceAddress, false, bytes);
 		memcpy(&data[0], src, size);
-
 		if (key.isValid())
 		{
 			PersistentData::instance().setData(key.getString(), data);

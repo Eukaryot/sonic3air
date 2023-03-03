@@ -16,51 +16,14 @@
 namespace emulatorinterface
 {
 
-	struct Internal
+	struct Internal : public RuntimeMemory
 	{
 	public:
-		// State
-		uint8 mRom[0x400000] = { 0 };			// Up to 4 MB for the ROM
-		uint8 mRam[0x10000] = { 0 };			// 64 KB RAM
-		uint8 mVRam[0x10000] = { 0 };			// 64 KB Video RAM
-		BitArray<0x800> mVRamChangeBits;		// Each bit in there represents 32 bytes of VRAM; a bit is set if the respective part of VRAM got written
-		uint16 mVSRam[0x40] = { 0 };			// Buffer for vertical scroll offsets
-		uint8 mSharedMemory[0x100000] = { 0 };	// 1 MB of additional shared memory between script and C++ (usage similar to RAM, but not used by original code, obviously)
-		uint64 mSharedMemoryUsage = 0;			// Each bit represents 16 KB of shared memory and tells us if anything non-zero is written there at all
-		std::vector<uint8> mSRam;				// Persistent memory to be saved on disk
-		uint32 mRegisters[16] = { 0 };			// Registers
-		bool mFlagZ = false;					// Zero flag
-		bool mFlagN = false;					// Negative flag
-
 		// Debugging
 		std::vector<EmulatorInterface::Watch> mWatches;
 		DebugNotificationInterface* mDebugNotificationInterface = nullptr;
 
 	public:
-		void clear()
-		{
-			// Reset ROM to unmodified version
-			{
-				const std::vector<uint8>& unmodifiedROM = ResourcesCache::instance().getUnmodifiedRom();
-				memcpy(mRom, &unmodifiedROM[0], unmodifiedROM.size());
-				if (sizeof(mRom) > unmodifiedROM.size())
-					memset(&mRom[unmodifiedROM.size()], 0, sizeof(mRom) - unmodifiedROM.size());
-			}
-
-			memset(mRam, 0, sizeof(mRam));
-			memset(mVRam, 0, sizeof(mVRam));
-			mVRamChangeBits.setAllBits();		// Count all VRAM as changed
-			memset(mSharedMemory, 0, sizeof(mSharedMemory));
-			mSharedMemoryUsage = 0;
-			memset(mRegisters, 0, sizeof(mRegisters));
-			mRegisters[15] = GameProfile::instance().mAsmStackRange.second;   // Initialization of A7 (just leaving it 0 is no good idea)
-		}
-
-		void applyRomInjections()
-		{
-			ResourcesCache::instance().applyRomInjections(mRom, sizeof(mRom));
-		}
-
 		FORCE_INLINE bool isValidMemoryRegion(uint32 address, uint32 size)
 		{
 			address &= 0x00ffffff;
@@ -120,8 +83,9 @@ namespace emulatorinterface
 			{
 				//if ((address & 0xfffff0) == 0xc00000)
 				//	_asm nop;
-				mDummy_uint8 = 0;
-				return &mDummy_uint8;
+				static uint64 dummy;
+				dummy = 0;
+				return (uint8*)&dummy;
 			}
 			else
 			{
@@ -146,13 +110,34 @@ namespace emulatorinterface
 				}
 			}
 		}
-
-	private:
-		uint8 mDummy_uint8 = 0;
 	};
 
 }
 
+
+void RuntimeMemory::clear()
+{
+	// Reset ROM to unmodified version
+	{
+		const std::vector<uint8>& unmodifiedROM = ResourcesCache::instance().getUnmodifiedRom();
+		memcpy(mRom, &unmodifiedROM[0], unmodifiedROM.size());
+		if (sizeof(mRom) > unmodifiedROM.size())
+			memset(&mRom[unmodifiedROM.size()], 0, sizeof(mRom) - unmodifiedROM.size());
+	}
+
+	memset(mRam, 0, sizeof(mRam));
+	memset(mVRam, 0, sizeof(mVRam));
+	mVRamChangeBits.setAllBits();		// Count all VRAM as changed
+	memset(mSharedMemory, 0, sizeof(mSharedMemory));
+	mSharedMemoryUsage = 0;
+	memset(mRegisters, 0, sizeof(mRegisters));
+	mRegisters[15] = GameProfile::instance().mAsmStackRange.second;   // Initialization of A7 (just leaving it 0 is no good idea)
+}
+
+void RuntimeMemory::applyRomInjections()
+{
+	ResourcesCache::instance().applyRomInjections(mRom, sizeof(mRom));
+}
 
 
 EmulatorInterface::EmulatorInterface() :
@@ -178,6 +163,11 @@ void EmulatorInterface::applyRomInjections()
 void EmulatorInterface::setDebugNotificationInterface(DebugNotificationInterface* debugNotificationInterface)
 {
 	mInternal.mDebugNotificationInterface = debugNotificationInterface;
+}
+
+RuntimeMemory& EmulatorInterface::getRuntimeMemory()
+{
+	return mInternal;
 }
 
 uint32 EmulatorInterface::getRomSize()
