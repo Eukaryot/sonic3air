@@ -44,7 +44,7 @@ uint64 RemasteredMusicDownload::getBytesDownloaded() const
 
 void RemasteredMusicDownload::startDownload()
 {
-	DownloadManager::instance().startDownload(mDownloadID, "https://sonic3air.org/download/audioremaster.bin", Configuration::instance().mAppDataPath + L"data/audioremaster.bin");
+	DownloadManager::instance().startDownload(mDownloadID, "https://sonic3air.org/download/audioremaster.bin", L"data/audioremaster.bin");
 }
 
 void RemasteredMusicDownload::removeDownload()

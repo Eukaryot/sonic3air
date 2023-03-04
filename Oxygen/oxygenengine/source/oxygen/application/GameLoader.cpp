@@ -19,7 +19,7 @@
 #include "oxygen/resources/FontCollection.h"
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/simulation/PersistentData.h"
-#if defined (PLATFORM_ANDROID)
+#if defined(PLATFORM_ANDROID)
 	#include "oxygen/platform/AndroidJavaInterface.h"
 #endif
 

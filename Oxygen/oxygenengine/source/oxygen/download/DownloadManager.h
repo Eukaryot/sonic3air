@@ -16,6 +16,7 @@ class DownloadManager : public SingleInstance<DownloadManager>
 public:
 	const Downloader* getDownloadByKey(uint64 key) const;
 
+	// Note that the outputFilename path is always relative to the app data folder
 	void startDownload(uint64 key, std::string_view url, std::wstring_view outputFilename);
 	void removeDownload(uint64 key);
 

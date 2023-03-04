@@ -30,7 +30,7 @@
 #include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/simulation/PersistentData.h"
 #include "oxygen/simulation/Simulation.h"
-#if defined (PLATFORM_ANDROID)
+#if defined(PLATFORM_ANDROID)
 	#include "oxygen/platform/AndroidJavaInterface.h"
 #endif
 

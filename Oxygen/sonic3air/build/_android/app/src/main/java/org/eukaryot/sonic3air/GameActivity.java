@@ -1,7 +1,10 @@
 package org.eukaryot.sonic3air;
 
+import android.app.DownloadManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -170,5 +173,59 @@ public class GameActivity extends SDLActivity
                 receivedRomContent(false, null);
             }
         }
+    }
+
+    public long startFileDownload(String url, String filename)
+    {
+        Log.i("oxygen", "Starting download from '" + url + "' to file '" + filename + "'");
+
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        request.setAllowedOverMetered(false);
+        request.setDestinationUri(Uri.fromFile(new File(getExternalFilesDir(null).getAbsoluteFile(), filename)));
+        request.setVisibleInDownloadsUi(false);     // Only needed until API level 29
+
+        DownloadManager downloadManager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        long downloadId = downloadManager.enqueue(request);
+        return downloadId;
+    }
+
+    public boolean stopFileDownload(long downloadId)
+    {
+        DownloadManager downloadManager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        return (downloadManager.remove(downloadId) > 0);
+    }
+
+    public int getDownloadStatus(long downloadId)
+    {
+        // Return value:
+        //  0x00 = Invalid download request
+        //  0x01 = Pending download
+        //  0x02 = Running
+        //  0x04 = Paused
+        //  0x08 = Finished successfully
+        //  0x10 = Failed
+        Cursor cursor = getDownloadCursor(downloadId);
+        return (null != cursor) ? cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) : 0;
+    }
+
+    public long getDownloadCurrentBytes(long downloadId)
+    {
+        Cursor cursor = getDownloadCursor(downloadId);
+        return (null != cursor) ? cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)) : 0;
+    }
+
+    public long getDownloadTotalBytes(long downloadId)
+    {
+        Cursor cursor = getDownloadCursor(downloadId);
+        return (null != cursor) ? cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)) : 0;
+    }
+
+    private Cursor getDownloadCursor(long downloadId)
+    {
+        DownloadManager downloadManager = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadId));
+        return (cursor.moveToFirst()) ? cursor : null;
     }
 }

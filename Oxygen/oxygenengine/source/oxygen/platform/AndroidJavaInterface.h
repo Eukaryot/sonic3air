@@ -36,8 +36,11 @@
 		void onReceivedRomContent(const uint8* content, size_t bytes);
 		void onRomContentSelectionFailed();
 
+		uint64 startFileDownload(const char* url, const char* filenameUTF8);
+		bool stopFileDownload(uint64 downloadId);
+		void getDownloadStatus(uint64 downloadId, int& outStatus, uint64& outCurrentBytes, uint64& outTotalBytes);
+
 	private:
-		//rmx::Mutex mMutex;	// TODO: Add this is
 		RomFileInjection mRomFileInjection;
 	};
 

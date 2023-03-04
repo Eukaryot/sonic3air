@@ -9,7 +9,10 @@
 #include "oxygen/pch.h"
 #include "oxygen/download/Downloader.h"
 
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS)
+	#define PLATFORM_SUPPORTS_DOWNLOADER
+	#define USING_CURL
+
 	#define CURL_STATICLIB
 	#include <curl/curl.h>
 
@@ -17,12 +20,16 @@
 	#pragma comment(lib, "ws2_32.lib")
 	#pragma comment(lib, "wldap32.lib")
 	#pragma comment(lib, "crypt32.lib")
+
+#elif defined(PLATFORM_ANDROID)
+	#define PLATFORM_SUPPORTS_DOWNLOADER
+	#include "oxygen/platform/AndroidJavaInterface.h"
 #endif
 
 
 bool Downloader::isDownloaderSupported()
 {
-#ifdef PLATFORM_WINDOWS
+#ifdef PLATFORM_SUPPORTS_DOWNLOADER
 	return true;
 #else
 	return false;
@@ -84,7 +91,8 @@ size_t Downloader::writeData(void* data, size_t size, size_t nmemb)
 
 void Downloader::performDownload()
 {
-#ifdef PLATFORM_WINDOWS
+#if defined(USING_CURL)
+
 	CURL* curl = curl_easy_init();
 	if (nullptr == curl)
 	{
@@ -92,7 +100,7 @@ void Downloader::performDownload()
 		return;
 	}
 
-	mOutputFile.open(mOutputFilename, FILE_ACCESS_WRITE);
+	mOutputFile.open(Configuration::instance().mAppDataPath + mOutputFilename, FILE_ACCESS_WRITE);
 	mThreadRunning = true;
 
 	curl_easy_setopt(curl, CURLOPT_URL, mURL.c_str());
@@ -114,5 +122,51 @@ void Downloader::performDownload()
 		// TODO: Delete the output file
 		mState = State::FAILED;
 	}
+
+#elif defined(PLATFORM_ANDROID)
+
+	AndroidJavaInterface& javaInterface = AndroidJavaInterface::instance();
+	const uint64 downloadId = javaInterface.startFileDownload(mURL.c_str(), *WString(mOutputFilename).toUTF8());
+
+	// The download runs in its own thread, so we just have to wait here...
+	mThreadRunning = true;
+	while (true)
+	{
+		if (!mThreadRunning)
+		{
+			// Download was stopped by the user
+			javaInterface.stopFileDownload(downloadId);
+			mState = State::FAILED;
+			return;
+		}
+
+		// States:
+		//  0x00 = Invalid download request
+		//  0x01 = Pending download
+		//  0x02 = Running
+		//  0x04 = Paused
+		//  0x08 = Finished successfully
+		//  0x10 = Failed
+		int state;
+		uint64 bytesDownloaded;
+		uint64 bytesTotal;
+		javaInterface.getDownloadStatus(downloadId, state, bytesDownloaded, bytesTotal);
+		mBytesDownloaded = bytesDownloaded;
+
+		if (state == 0x00 || state == 0x10)
+		{
+			mState = State::FAILED;
+			return;
+		}
+		else if (state == 0x08)
+		{
+			mThreadRunning = false;
+			mState = State::DONE;
+			return;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	}
+
 #endif
 }
