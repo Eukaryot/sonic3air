@@ -23,16 +23,17 @@ namespace global
 		inline bool operator<(const ZoneActPreviewKey& other) const  { return (mZone != other.mZone) ? (mZone < other.mZone) : (mAct != other.mAct) ? (mAct < other.mAct) : (mImage < other.mImage); }
 	};
 
-	extern Font mFont3Pure;
-	extern Font mFont3;
-	extern Font mFont4NarrowSimple;
-	extern Font mFont4Narrow;
-	extern Font mFont4;
-	extern Font mFont5NoOutline;
-	extern Font mFont5;
-	extern Font mFont7;
-	extern Font mFont10;
-	extern Font mFont18;
+	extern Font mSmallfont;
+	extern Font mSmallfontOutlined;
+	extern Font mOxyfontNarrowSimple;
+	extern Font mOxyfontNarrow;
+	extern Font mOxyfontTinySimple;
+	extern Font mOxyfontTiny;
+	extern Font mOxyfontSmallNoOutline;
+	extern Font mOxyfontSmall;
+	extern Font mOxyfontRegular;
+	extern Font mSonicFontB;
+	extern Font mSonicFontC;
 
 	extern DrawerTexture mMainMenuBackgroundSeparator;
 	extern DrawerTexture mDataSelectBackground;

@@ -122,7 +122,7 @@ void MainMenu::onFadeIn()
 				text += mod->mFailedMessage;
 			}
 		}
-		utils::splitTextIntoLines(mErrorLines, text, global::mFont4, 160);
+		utils::splitTextIntoLines(mErrorLines, text, global::mOxyfontTiny, 160);
 		mCheckedModErrors = true;
 	}
 
@@ -281,7 +281,7 @@ void MainMenu::render()
 
 		if (isMainEntry)
 		{
-			drawer.printText(global::mFont18, Recti(px, py, 200, 18), text, 4, color);
+			drawer.printText(global::mSonicFontC, Recti(px, py, 200, 18), text, 4, color);
 		}
 		else
 		{
@@ -289,7 +289,7 @@ void MainMenu::render()
 			printOptions.mAlignment = 4;
 			printOptions.mTintColor = color;
 			printOptions.mSpacing = 1;
-			drawer.printText(global::mFont10, Recti(px, py, 200, 10), text, printOptions);
+			drawer.printText(global::mOxyfontRegular, Recti(px, py, 200, 10), text, printOptions);
 		}
 	}
 
@@ -298,13 +298,13 @@ void MainMenu::render()
 		// Make place for FPS display if it's shown
 		int px = (int)(mRect.width - ((Configuration::instance().mPerformanceDisplay != 0) ? 32 : 2) + (1.0f - mVisibility) * 100.0f);
 		std::wstring text = L"\x02c5" BUILD_STRING L" " BUILD_VARIANT;
-		drawer.printText(global::mFont3Pure, Recti(px, 1, 0, 0), text, 3, Color(0.2f, 0.2f, 0.2f, mVisibility * 0.3f));
+		drawer.printText(global::mSmallfont, Recti(px, 1, 0, 0), text, 3, Color(0.2f, 0.2f, 0.2f, mVisibility * 0.3f));
 
 		// Show whether dev mode is active, or one of the non-default glitch fix settings
-		px -= 6 + global::mFont3Pure.getWidth(text);
+		px -= 6 + global::mSmallfont.getWidth(text);
 		if (EngineMain::getDelegate().useDeveloperFeatures())
 		{
-			drawer.printText(global::mFont3Pure, Recti(px, 1, 0, 0), "DEV MODE", 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
+			drawer.printText(global::mSmallfont, Recti(px, 1, 0, 0), "DEV MODE", 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
 		}
 		else
 		{
@@ -312,7 +312,7 @@ void MainMenu::render()
 			if (nullptr != setting && setting->mCurrentValue < 2)
 			{
 				const char* txt = (setting->mCurrentValue == 0) ? "NO GLITCH FIXES" : "ONLY BASIC FIXES";
-				drawer.printText(global::mFont3Pure, Recti(px, 1, 0, 0), txt, 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
+				drawer.printText(global::mSmallfont, Recti(px, 1, 0, 0), txt, 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
 			}
 		}
 	}
@@ -322,10 +322,10 @@ void MainMenu::render()
 	{
 		if (i >= 10)
 		{
-			drawer.printText(global::mFont4, Recti(8, 30 + (int)i * 12, 0, 0), "...", 1, Color(1.0f, 0.6f, 0.4f, saturate(mVisibility * 5.0f - 4.0f)));
+			drawer.printText(global::mOxyfontTiny, Recti(8, 30 + (int)i * 12, 0, 0), "...", 1, Color(1.0f, 0.6f, 0.4f, saturate(mVisibility * 5.0f - 4.0f)));
 			break;
 		}
-		drawer.printText(global::mFont4, Recti(8, 30 + (int)i * 12, 0, 0), mErrorLines[i], 1, Color(1.0f, 0.6f, 0.4f, saturate(mVisibility * 5.0f - 4.0f)));
+		drawer.printText(global::mOxyfontTiny, Recti(8, 30 + (int)i * 12, 0, 0), mErrorLines[i], 1, Color(1.0f, 0.6f, 0.4f, saturate(mVisibility * 5.0f - 4.0f)));
 	}
 
 	drawer.performRendering();

@@ -40,7 +40,7 @@ void SkippableCutsceneWindow::render()
 
 	const Recti rect(roundToInt(mRect.width) - 140, 0, 140, 14);
 	const Color color(1.0f, 1.0f - std::fmod(mAnimationTimer * 2.0f, 1.0f) * 0.5f, 1.0f - std::fmod(mAnimationTimer * 2.0f, 1.0f), mVisibility);
-	drawer.printText(global::mFont4, rect, "Fast forwarding cutscene", 5, color);
+	drawer.printText(global::mOxyfontTiny, rect, "Fast forwarding cutscene", 5, color);
 }
 
 void SkippableCutsceneWindow::show(bool visible)

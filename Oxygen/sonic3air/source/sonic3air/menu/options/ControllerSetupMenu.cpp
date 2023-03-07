@@ -318,18 +318,18 @@ void ControllerSetupMenu::render()
 	{
 		mMenuEntries.setSelectedIndexByValue(::_BACK);
 		py += 80;
-		drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), "No game controller found", 2, Color(0.6f, 0.8f, 1.0f, alpha));
+		drawer.printText(global::mSonicFontB, Recti(baseX, py, 0, 10), "No game controller found", 2, Color(0.6f, 0.8f, 1.0f, alpha));
 		py += 15;
 	}
 	else
 	{
 		if (Application::instance().hasKeyboard())
 		{
-			drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), "Select keyboard or game controller", 2, Color(0.6f, 0.8f, 1.0f, alpha));
+			drawer.printText(global::mSonicFontB, Recti(baseX, py, 0, 10), "Select keyboard or game controller", 2, Color(0.6f, 0.8f, 1.0f, alpha));
 		}
 		else
 		{
-			drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), "Select game controller", 2, Color(0.6f, 0.8f, 1.0f, alpha));
+			drawer.printText(global::mSonicFontB, Recti(baseX, py, 0, 10), "Select game controller", 2, Color(0.6f, 0.8f, 1.0f, alpha));
 		}
 		py += 11;
 	}
@@ -350,7 +350,7 @@ void ControllerSetupMenu::render()
 		if ((entry.mData & 0xf0) == 0x10)
 		{
 			// Button entry
-			Font& font = global::mFont5;
+			Font& font = global::mOxyfontSmall;
 
 			drawer.printText(font, Recti(baseX - 16, py, 0, 10), entry.mText, 6, color);
 
@@ -442,16 +442,16 @@ void ControllerSetupMenu::render()
 		{
 			// Entry without options
 			py += (entry.mData == ::_BACK) ? 10 : 4;
-			drawer.printText(global::mFont10, Recti(rect.x, py, rect.width, 10), text, 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(rect.x, py, rect.width, 10), text, 5, color);
 
 			if (isSelected)
 			{
 				// Draw arrows
-				const int halfTextWidth = global::mFont10.getWidth(entry.mText) / 2;
+				const int halfTextWidth = global::mOxyfontRegular.getWidth(entry.mText) / 2;
 				const int offset = (int)std::fmod(FTX::getTime() * 6.0f, 6.0f);
 				const int arrowDistance = 16 + ((offset > 3) ? (6 - offset) : offset);
-				drawer.printText(global::mFont10, Recti(baseX - halfTextWidth - arrowDistance, py, 0, 10), ">>", 5, color);
-				drawer.printText(global::mFont10, Recti(baseX + halfTextWidth + arrowDistance, py, 0, 10), "<<", 5, color);
+				drawer.printText(global::mOxyfontRegular, Recti(baseX - halfTextWidth - arrowDistance, py, 0, 10), ">>", 5, color);
+				drawer.printText(global::mOxyfontRegular, Recti(baseX + halfTextWidth + arrowDistance, py, 0, 10), "<<", 5, color);
 			}
 
 			py += (entry.mData == ::ASSIGN_ALL) ? 20 : 16;
@@ -460,7 +460,7 @@ void ControllerSetupMenu::render()
 		{
 			// It's an actual options entry, with multiple options to choose from
 			py += 4;
-			Font& font = global::mFont10;
+			Font& font = global::mOxyfontRegular;
 
 			const bool canGoLeft  = (entry.mSelectedIndex > 0);
 			const bool canGoRight = (entry.mSelectedIndex < entry.mOptions.size() - 1);
@@ -601,7 +601,7 @@ void ControllerSetupMenu::refreshGamepadList(bool forceUpdate)
 		for (const InputManager::RealDevice& gamepad : InputManager::instance().getGamepads())
 		{
 			std::string text = gamepad.getName();
-			utils::shortenTextToFit(text, global::mFont10, 180);
+			utils::shortenTextToFit(text, global::mOxyfontRegular, 180);
 			entry.addOption(text, gamepad.mSDLJoystickInstanceId);
 		}
 		entry.setSelectedIndexByValue(oldValue);

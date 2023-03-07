@@ -108,7 +108,7 @@ void SecretUnlockedWindow::render()
 	}
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	Font& font = global::mFont10;
+	Font& font = global::mOxyfontRegular;
 
 	const int numTextLines = (int)mShownTextLines.size();
 	const int lineHeight = (font.getLineHeight() + 1);
@@ -122,7 +122,7 @@ void SecretUnlockedWindow::render()
 	drawer.drawRect(rect, global::mPauseScreenLowerBG);
 
 	const Color titleColor = (mShownEntry.mEntryType == EntryType::ACHIEVEMENT) ? Color(0.6f, 0.8f, 1.0f) : Color(1.0f, 0.7f, 0.6f);
-	drawer.printText(global::mFont7, Recti(rect.x + 55, rect.y, rect.width - 55, 20), mShownEntry.mTitle, 4, titleColor);
+	drawer.printText(global::mSonicFontB, Recti(rect.x + 55, rect.y, rect.width - 55, 20), mShownEntry.mTitle, 4, titleColor);
 
 	for (int lineIndex = 0; lineIndex < numTextLines; ++lineIndex)
 	{
@@ -155,5 +155,5 @@ void SecretUnlockedWindow::showInternal(Entry& entry)
 	mPhaseTimer = 0.0f;
 
 	std::swap(mShownEntry, entry);
-	utils::splitTextIntoLines(mShownTextLines, mShownEntry.mContent, global::mFont10, 170);
+	utils::splitTextIntoLines(mShownTextLines, mShownEntry.mContent, global::mOxyfontRegular, 170);
 }

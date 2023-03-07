@@ -268,7 +268,7 @@ void TimeAttackMenu::render()
 	}
 
 	// Title text
-	drawer.printText(global::mFont18, Recti(anchorX, 4, 0, 18), "TIME ATTACK", 5, Color(1.0f, 1.0f, 1.0f, alpha));
+	drawer.printText(global::mSonicFontC, Recti(anchorX, 4, 0, 18), "TIME ATTACK", 5, Color(1.0f, 1.0f, 1.0f, alpha));
 
 	// Menu entries
 	const int positionY[] = { 116, 138, 160, 198 };
@@ -298,20 +298,20 @@ void TimeAttackMenu::render()
 		}
 
 		if (canGoLeft)
-			drawer.printText(global::mFont10, Recti(px - 145 - arrowAnimOffset, py, 10, 10), "<", 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(px - 145 - arrowAnimOffset, py, 10, 10), "<", 5, color);
 		if (canGoRight)
-			drawer.printText(global::mFont10, Recti(px + 15 + arrowAnimOffset, py, 10, 10), ">", 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(px + 15 + arrowAnimOffset, py, 10, 10), ">", 5, color);
 
-		drawer.printText(global::mFont10, Recti(px - 160, py, 200, 10), text, 5, color);
+		drawer.printText(global::mOxyfontRegular, Recti(px - 160, py, 200, 10), text, 5, color);
 	}
 
 	for (int i = 0; i < 5; ++i)
 	{
 		Recti rect(anchorX + 90, 118 + i * 18, 80, 18);
 		if (i < (int)mBestTimes.size())
-			drawer.printText(global::mFont10, rect, mBestTimes[i], 5, Color(1.0f, 1.0f, 1.0f, alpha));
+			drawer.printText(global::mOxyfontRegular, rect, mBestTimes[i], 5, Color(1.0f, 1.0f, 1.0f, alpha));
 		else
-			drawer.printText(global::mFont10, rect, "-' --\" --", 5, Color(0.9f, 0.9f, 0.9f, alpha));
+			drawer.printText(global::mOxyfontRegular, rect, "-' --\" --", 5, Color(0.9f, 0.9f, 0.9f, alpha));
 	}
 
 	drawer.performRendering();

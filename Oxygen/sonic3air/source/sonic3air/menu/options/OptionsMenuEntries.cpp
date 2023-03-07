@@ -58,7 +58,7 @@ void TitleMenuEntry::renderEntry(RenderContext& renderContext_)
 	int& py = renderContext.mCurrentPosition.y;
 
 	py += 15;
-	drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), ("* " + mText + " *"), 5, Color(0.6f, 0.8f, 1.0f, renderContext.mTabAlpha));
+	drawer.printText(global::mSonicFontB, Recti(baseX, py, 0, 10), ("* " + mText + " *"), 5, Color(0.6f, 0.8f, 1.0f, renderContext.mTabAlpha));
 	py += 2;
 }
 
@@ -84,8 +84,8 @@ void SectionMenuEntry::renderEntry(RenderContext& renderContext_)
 	const float alpha = renderContext.mTabAlpha;
 
 	py += 14;
-	const int textWidth = global::mFont10.getWidth(mText);
-	drawer.printText(global::mFont10, Recti(baseX - 140, py, 0, 10), mText, 4, Color(0.7f, 1.0f, 0.9f, alpha));
+	const int textWidth = global::mOxyfontRegular.getWidth(mText);
+	drawer.printText(global::mOxyfontRegular, Recti(baseX - 140, py, 0, 10), mText, 4, Color(0.7f, 1.0f, 0.9f, alpha));
 	drawer.drawRect(Recti(baseX - 185, py + 4, 40, 1), Color(0.7f, 1.0f, 0.9f, alpha));
 	drawer.drawRect(Recti(baseX - 184, py + 5, 40, 1), Color(0.0f, 0.0f, 0.0f, alpha * 0.75f));
 	drawer.drawRect(Recti(baseX - 135 + textWidth, py + 4, 320 - textWidth, 1), Color(0.7f, 1.0f, 0.9f, alpha));
@@ -114,8 +114,8 @@ void LabelMenuEntry::renderEntry(RenderContext& renderContext_)
 	int& py = renderContext.mCurrentPosition.y;
 
 	py -= 1;
-	const Vec2i boxSize = global::mFont4.getTextBoxSize(mText);
-	drawer.printText(global::mFont4, Recti(baseX, py, 0, 10), mText, 5, Color(mColor.r, mColor.g, mColor.b, mColor.a * renderContext.mTabAlpha));
+	const Vec2i boxSize = global::mOxyfontTiny.getTextBoxSize(mText);
+	drawer.printText(global::mOxyfontTiny, Recti(baseX, py, 0, 10), mText, 5, Color(mColor.r, mColor.g, mColor.b, mColor.a * renderContext.mTabAlpha));
 	py += boxSize.y - 4;
 }
 
@@ -137,7 +137,7 @@ void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color
 	Drawer& drawer = *renderContext.mDrawer;
 	const int baseX = renderContext.mCurrentPosition.x;
 	int& py = renderContext.mCurrentPosition.y;
-	Font& font = (mUseSmallFont || renderContext.mIsModsTab) ? global::mFont5 : global::mFont10;
+	Font& font = (mUseSmallFont || renderContext.mIsModsTab) ? global::mOxyfontSmall : global::mOxyfontRegular;
 
 	const bool isSelected = renderContext.mIsSelected;
 	const bool isDisabled = !isInteractable();
@@ -222,7 +222,7 @@ void OptionsMenuEntry::renderInternal(RenderContext& renderContext_, const Color
 		if (mData == option::SOUND_TEST && nullptr != audioDefinition)
 		{
 			py += 13;
-			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), audioDefinition->mDisplayName, 5, color);
+			drawer.printText(global::mOxyfontTiny, Recti(center - 80, py, 160, 10), audioDefinition->mDisplayName, 5, color);
 		}
 	}
 }
@@ -251,8 +251,8 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 	int& py = renderContext.mCurrentPosition.y;
 	const float alpha = renderContext.mTabAlpha;
 
-	drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Your Game Version:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
-	drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), "v" BUILD_STRING, 6, Color(0.8f, 1.0f, 0.8f, alpha));
+	drawer.printText(global::mOxyfontSmall, Recti(baseX - 100, py, 0, 10), "Your Game Version:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
+	drawer.printText(global::mOxyfontSmall, Recti(baseX + 100, py, 0, 10), "v" BUILD_STRING, 6, Color(0.8f, 1.0f, 0.8f, alpha));
 	py += 12;
 
 	UpdateCheck& updateCheck = GameClient::instance().getUpdateCheck();
@@ -260,31 +260,31 @@ void UpdateCheckMenuEntry::renderEntry(RenderContext& renderContext_)
 	{
 		case UpdateCheck::State::FAILED:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color(1.0f, 0.0f, 0.0f, alpha));
+			drawer.printText(global::mOxyfontSmall, Recti(baseX, py, 0, 10), "Can't connect to server", 5, Color(1.0f, 0.0f, 0.0f, alpha));
 			break;
 		}
 		case UpdateCheck::State::SEND_QUERY:
 		case UpdateCheck::State::WAITING_FOR_RESPONSE:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Connecting to server...", 5, Color(1.0f, 1.0f, 1.0f, alpha));
+			drawer.printText(global::mOxyfontSmall, Recti(baseX, py, 0, 10), "Connecting to server...", 5, Color(1.0f, 1.0f, 1.0f, alpha));
 			break;
 		}
 		case UpdateCheck::State::HAS_RESPONSE:
 		{
 			if (updateCheck.hasUpdate())
 			{
-				drawer.printText(global::mFont5, Recti(baseX - 100, py, 0, 10), "Update available:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
-				drawer.printText(global::mFont5, Recti(baseX + 100, py, 0, 10), getVersionString(updateCheck.getResponse()->mAvailableAppVersion), 6, Color(1.0f, 1.0f, 0.6f, alpha));
+				drawer.printText(global::mOxyfontSmall, Recti(baseX - 100, py, 0, 10), "Update available:", 4, Color(1.0f, 1.0f, 1.0f, alpha));
+				drawer.printText(global::mOxyfontSmall, Recti(baseX + 100, py, 0, 10), getVersionString(updateCheck.getResponse()->mAvailableAppVersion), 6, Color(1.0f, 1.0f, 0.6f, alpha));
 			}
 			else
 			{
-				drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "You're using the latest version", 5, Color(0.8f, 1.0f, 0.8f, alpha));
+				drawer.printText(global::mOxyfontSmall, Recti(baseX, py, 0, 10), "You're using the latest version", 5, Color(0.8f, 1.0f, 0.8f, alpha));
 			}
 			break;
 		}
 		default:
 		{
-			drawer.printText(global::mFont5, Recti(baseX, py, 0, 10), "Ready to check for updates", 5, Color(0.8f, 0.8f, 0.8f, alpha));
+			drawer.printText(global::mOxyfontSmall, Recti(baseX, py, 0, 10), "Ready to check for updates", 5, Color(0.8f, 0.8f, 0.8f, alpha));
 			break;
 		}
 	}
@@ -316,9 +316,9 @@ void SoundtrackMenuEntry::renderEntry(RenderContext& renderContext_)
 			const int center = mText.empty() ? baseX : (baseX + 88);
 
 			py += 13;
-			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "Must be downloaded separately", 5, Color(1.0f, 0.9f, 0.8f, renderContext.mTabAlpha));
+			drawer.printText(global::mOxyfontTiny, Recti(center - 80, py, 160, 10), "Must be downloaded separately", 5, Color(1.0f, 0.9f, 0.8f, renderContext.mTabAlpha));
 			py += 10;
-			drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), "(Exit and select \"Extra Downloads\")", 5, Color(1.0f, 0.9f, 0.8f, renderContext.mTabAlpha));
+			drawer.printText(global::mOxyfontTiny, Recti(center - 80, py, 160, 10), "(Exit and select \"Extra Downloads\")", 5, Color(1.0f, 0.9f, 0.8f, renderContext.mTabAlpha));
 			++py;
 		}
 	#endif
@@ -352,6 +352,9 @@ void SoundtrackDownloadMenuEntry::renderEntry(RenderContext& renderContext_)
 
 			case RemasteredMusicDownload::State::DOWNLOAD_RUNNING:
 				text = "Downloading... " + std::to_string(download.getBytesDownloaded() / (1024*1024)) + " MB";
+			#if defined(PLATFORM_ANDROID)
+				text += "  (Wi-fi required)";
+			#endif
 				mText = "Stop download";
 				break;
 
@@ -369,7 +372,7 @@ void SoundtrackDownloadMenuEntry::renderEntry(RenderContext& renderContext_)
 				break;
 		}
 
-		drawer.printText(global::mFont4, Recti(center - 80, py, 160, 10), text, 5, Color(0.8f, 1.0f, 0.9f, color.a));
+		drawer.printText(global::mOxyfontTiny, Recti(center - 80, py, 160, 10), text, 5, Color(0.8f, 1.0f, 0.9f, color.a));
 		py += 12;
 
 		mUseSmallFont = true;

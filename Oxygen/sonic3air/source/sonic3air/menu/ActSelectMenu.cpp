@@ -231,7 +231,7 @@ void ActSelectMenu::render()
 	}
 
 	// Title text
-	drawer.printText(global::mFont18, Recti(anchorX, 4, 0, 18), "ACT SELECT", 5, Color(1.0f, 1.0f, 1.0f, alpha));
+	drawer.printText(global::mSonicFontC, Recti(anchorX, 4, 0, 18), "ACT SELECT", 5, Color(1.0f, 1.0f, 1.0f, alpha));
 
 	// Menu entries
 	const int positionY[] = { 116, 138, 160, 198 };
@@ -261,11 +261,11 @@ void ActSelectMenu::render()
 		}
 
 		if (canGoLeft)
-			drawer.printText(global::mFont10, Recti(px - 55 - arrowAnimOffset, py, 10, 10), "<", 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(px - 55 - arrowAnimOffset, py, 10, 10), "<", 5, color);
 		if (canGoRight)
-			drawer.printText(global::mFont10, Recti(px + 105 + arrowAnimOffset, py, 10, 10), ">", 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(px + 105 + arrowAnimOffset, py, 10, 10), ">", 5, color);
 
-		drawer.printText(global::mFont10, Recti(px - 70, py, 200, 10), text, 5, color);
+		drawer.printText(global::mOxyfontRegular, Recti(px - 70, py, 200, 10), text, 5, color);
 	}
 
 	// Show character selection

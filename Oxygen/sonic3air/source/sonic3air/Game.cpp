@@ -757,7 +757,7 @@ void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
 				if (mode == 1)
 				{
 					Vec2i dummy;
-					global::mFont3Pure.printBitmap(textBitmap, dummy, Recti(0, 0, 16, 16), rmx::hexString(angle, 2, ""));
+					global::mSmallfont.printBitmap(textBitmap, dummy, Recti(0, 0, 16, 16), rmx::hexString(angle, 2, ""));
 
 					Blitter::Options blitterOptions;
 					blitterOptions.mBlendMode = BlendMode::ALPHA;

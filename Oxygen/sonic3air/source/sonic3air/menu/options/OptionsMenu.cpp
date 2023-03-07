@@ -1403,14 +1403,14 @@ void OptionsMenu::render()
 					const Color color2 = (k == entry.mSelectedIndex) ? color : Color(0.9f, 0.9f, 0.9f, alpha * 0.8f);
 					const std::string& text = entry.mOptions[k].mText;
 					const int px = roundToInt(((float)k - mActiveTabAnimated) * 180.0f) + center - 80;
-					drawer.printText(global::mFont18, Recti(px, py, 160, 20), text, 5, color2);
+					drawer.printText(global::mSonicFontC, Recti(px, py, 160, 20), text, 5, color2);
 				}
 			}
 
 			if (canGoLeft)
-				drawer.printText(global::mFont10, Recti(center - arrowDistance, py + 6, 0, 10), "<", 5, color);
+				drawer.printText(global::mOxyfontRegular, Recti(center - arrowDistance, py + 6, 0, 10), "<", 5, color);
 			if (canGoRight)
-				drawer.printText(global::mFont10, Recti(center + arrowDistance, py + 6, 0, 10), ">", 5, color);
+				drawer.printText(global::mOxyfontRegular, Recti(center + arrowDistance, py + 6, 0, 10), ">", 5, color);
 
 			if (isSelected)
 			{
@@ -1425,7 +1425,7 @@ void OptionsMenu::render()
 				const float visibility = saturate(mWarningMessageTimeout / 0.3f);
 				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
 				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
-				drawer.printText(global::mFont5, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.printText(global::mOxyfontSmall, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
 				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
 				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
 				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
@@ -1436,7 +1436,7 @@ void OptionsMenu::render()
 				const float visibility = saturate(mAudioWarningMessageTimeout / 0.3f);
 				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
 				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
-				drawer.printText(global::mFont5, rect, "Note: Music changes don't affect already playing tracks.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.printText(global::mOxyfontSmall, rect, "Note: Music changes don't affect already playing tracks.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
 				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
 				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
 				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
@@ -1580,7 +1580,7 @@ void OptionsMenu::refreshGamepadLists(bool forceUpdate)
 			for (const InputManager::RealDevice& gamepad : InputManager::instance().getGamepads())
 			{
 				std::string text = gamepad.getName();
-				utils::shortenTextToFit(text, global::mFont10, 135);
+				utils::shortenTextToFit(text, global::mOxyfontRegular, 135);
 				entry.addOption(text, gamepad.mSDLJoystickInstanceId);
 			}
 			if (!entry.setSelectedIndexByValue(oldSelectedValue))

@@ -213,6 +213,12 @@ void ModsMenu::initialize()
 			entries.clear();
 			entries.reserve(activeMods.size());
 
+			// TEST!
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"ABC");
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"DEF");
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"GHIJKL");
+			//entries.addEntry<InputFieldMenuEntry>().initEntry(L"MNOP");
+
 			// Add active mods
 			//  -> In reverse order, as highest priority are the last (not first!) mods in the active list
 			for (auto it = activeMods.rbegin(); it != activeMods.rend(); ++it)
@@ -471,7 +477,7 @@ void ModsMenu::update(float timeElapsed)
 			ModEntry& modEntry = mModEntries[menuEntries.selected().mData];
 			if (mInfoOverlay.mShownMod != modEntry.mMod)
 			{
-				global::mFont4NarrowSimple.wordWrapText(mInfoOverlay.mDescriptionLines, 290, modEntry.mMod->mDescription);
+				global::mOxyfontTinySimple.wordWrapText(mInfoOverlay.mDescriptionLines, 290, modEntry.mMod->mDescription);
 				mInfoOverlay.mShownMod = modEntry.mMod;
 			}
 		}
@@ -542,17 +548,17 @@ void ModsMenu::render()
 	if (!mHasAnyMods)
 	{
 		Recti rect(globalOffsetX + 32, 16, 300, 18);
-		drawer.printText(global::mFont7, rect, "No mods installed!", 1, Color(0.6f, 0.8f, 1.0f, mVisibility));
+		drawer.printText(global::mSonicFontB, rect, "No mods installed!", 1, Color(0.6f, 0.8f, 1.0f, mVisibility));
 		rect.y += 22;
 
 		Color color(0.8f, 0.9f, 1.0f, mVisibility);
-		drawer.printText(global::mFont5, rect, "Have a look at the game manual PDF for instructions", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "Have a look at the game manual PDF for instructions", 1, color);
 		rect.y += 14;
-		drawer.printText(global::mFont5, rect, "on how to install mods.", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "on how to install mods.", 1, color);
 		rect.y += 18;
-		drawer.printText(global::mFont5, rect, "Note that you will have to restart Sonic 3 A.I.R.", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "Note that you will have to restart Sonic 3 A.I.R.", 1, color);
 		rect.y += 14;
-		drawer.printText(global::mFont5, rect, "to make it scan for new mods.", 1, color);
+		drawer.printText(global::mOxyfontSmall, rect, "to make it scan for new mods.", 1, color);
 		rect.y += 32;
 		rect.x += 16;
 
@@ -564,7 +570,7 @@ void ModsMenu::render()
 			color = isSelected ? Color::YELLOW : Color::WHITE;
 			color.a *= mVisibility;
 
-			drawer.printText(global::mFont10, rect, entry.mText, 1, color);
+			drawer.printText(global::mOxyfontRegular, rect, entry.mText, 1, color);
 			rect.y += 22;
 		}
 		return;
@@ -614,14 +620,14 @@ void ModsMenu::render()
 				text = "* " + text + " *";
 				visualRect.x -= 12;
 			}
-			drawer.printText(global::mFont7, visualRect, text, 1, Color(0.6f, 0.8f, 1.0f, alpha));
+			drawer.printText(global::mSonicFontB, visualRect, text, 1, Color(0.6f, 0.8f, 1.0f, alpha));
 			rect.y += rect.height + 7;
 		}
 
 		const bool showPriorityHints = (tabIndex == 0 && mActiveTab == 0 && inMovementMode && menuEntries.size() >= 2);
 		if (showPriorityHints)
 		{
-			drawer.printText(global::mFont3Pure, rect + Vec2i(-12, -12), "HIGH PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
+			drawer.printText(global::mSmallfont, rect + Vec2i(-12, -12), "HIGH PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
 		}
 
 		if (menuEntries.empty())
@@ -629,7 +635,7 @@ void ModsMenu::render()
 			Recti visualRect = rect;
 			visualRect.x -= roundToInt(saturate(1.0f - mVisibility) * 300.0f);
 			Color color = (tabIndex == mActiveTab) ? Color(1.0f, 1.0f, 1.0f, alpha) : Color(0.7f, 0.7f, 0.7f, alpha);
-			drawer.printText(global::mFont5, visualRect + Vec2i(24, 0), (tabIndex == 0) ? "- None -" : "- None -", 1, color);
+			drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), (tabIndex == 0) ? "- None -" : "- None -", 1, color);
 		}
 
 		for (size_t index = 0; index < menuEntries.size(); ++index)
@@ -669,7 +675,7 @@ void ModsMenu::render()
 						drawer.drawRect(iconRect, texture, Color(1.0f, 1.0f, 1.0f, alpha));
 					}
 
-					drawer.printText(global::mFont5, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, color);
+					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, color);
 
 					if (isSelected && inMovementMode)
 					{
@@ -677,18 +683,18 @@ void ModsMenu::render()
 						if (tabIndex == 0)
 						{
 							if (menuEntries.size() >= 2)
-								drawer.printText(global::mFont5, visualRect - Vec2i(12, 1), L"\u21f3", 1, color);
-							drawer.printText(global::mFont5, visualRect + Vec2i(225, 0), L"\u25ba", 1, color);
+								drawer.printText(global::mOxyfontSmall, visualRect - Vec2i(12, 1), L"\u21f3", 1, color);
+							drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(225, 0), L"\u25ba", 1, color);
 						}
 						else
 						{
-							drawer.printText(global::mFont5, visualRect - Vec2i(10, 0), L"\u25c4", 1, color);
+							drawer.printText(global::mOxyfontSmall, visualRect - Vec2i(10, 0), L"\u25c4", 1, color);
 						}
 					}
 				}
 				else
 				{
-					drawer.printText(global::mFont5, visualRect + Vec2i(24, 0), entry.mText, 1, color);
+					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), entry.mText, 1, color);
 				}
 
 				if (inMovementMode && tabIndex != mActiveTab && (int)index == menuEntries.mSelectedEntryIndex)
@@ -717,7 +723,7 @@ void ModsMenu::render()
 
 		if (showPriorityHints)
 		{
-			drawer.printText(global::mFont3Pure, rect + Vec2i(-12, -3), "LOW PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
+			drawer.printText(global::mSmallfont, rect + Vec2i(-12, -3), "LOW PRIORITY", 1, Color(0.4f, 0.5f, 0.6f, alpha * 0.25f));
 		}
 
 		drawer.popScissor();
@@ -759,20 +765,20 @@ void ModsMenu::render()
 				{
 					WString path(L"mods/" + modEntry->mMod->mLocalDirectory);
 					path.upperCase();
-					drawer.printText(global::mFont3Pure, rect + Vec2i(3, -10), path, 3, colorDark);
+					drawer.printText(global::mSmallfont, rect + Vec2i(3, -10), path, 3, colorDark);
 				}
 				{
-					drawer.printText(global::mFont10, rect, modEntry->mMod->mDisplayName, 1, colorY2);
+					drawer.printText(global::mOxyfontRegular, rect, modEntry->mMod->mDisplayName, 1, colorY2);
 					rect.y += 19;
 				}
 				if (!modEntry->mMod->mAuthor.empty())
 				{
-					drawer.printText(global::mFont5NoOutline, rect + Vec2i(8, 0), "by " + modEntry->mMod->mAuthor, 1, colorY);
+					drawer.printText(global::mOxyfontSmallNoOutline, rect + Vec2i(8, 0), "by " + modEntry->mMod->mAuthor, 1, colorY);
 					rect.y += 15;
 				}
 				if (!modEntry->mMod->mModVersion.empty())
 				{
-					drawer.printText(global::mFont5NoOutline, rect + Vec2i(8, 0), "Version " + modEntry->mMod->mModVersion, 1, colorY);
+					drawer.printText(global::mOxyfontSmallNoOutline, rect + Vec2i(8, 0), "Version " + modEntry->mMod->mModVersion, 1, colorY);
 					rect.y += 15;
 				}
 				rect.y += 4;
@@ -780,14 +786,14 @@ void ModsMenu::render()
 				{
 					for (const std::wstring& line : mInfoOverlay.mDescriptionLines)
 					{
-						drawer.printText(global::mFont4NarrowSimple, rect, line, 1, colorW);
+						drawer.printText(global::mOxyfontTinySimple, rect, line, 1, colorW);
 						rect.y += 11;
 					}
 					rect.y += 6;
 				}
 				if (!modEntry->mMod->mURL.empty())
 				{
-					drawer.printText(global::mFont4NarrowSimple, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
+					drawer.printText(global::mOxyfontTinySimple, rect, "More info:   " + modEntry->mMod->mURL, 1, colorW);
 					rect.y += 16;
 				}
 			}
@@ -799,7 +805,7 @@ void ModsMenu::render()
 	{
 		Recti rect(100, 94, 200, 35);
 		DrawerHelper::drawBorderedRect(drawer, rect, 1, Color(1.0f, 1.0f, 1.0f, 0.95f), Color(0.2f, 0.2f, 0.2f, 0.9f));
-		drawer.printText(global::mFont10, rect, "Applying changes...", 5);
+		drawer.printText(global::mOxyfontRegular, rect, "Applying changes...", 5);
 	}
 
 	drawer.performRendering();

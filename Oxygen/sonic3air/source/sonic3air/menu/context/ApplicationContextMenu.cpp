@@ -104,7 +104,7 @@ void ApplicationContextMenu::render()
 
 		{
 			const Recti textRect(rect.x + 5, rect.y - 21, 0, rect.height);
-			drawer.printText(global::mFont10, textRect, "Sonic 3 A.I.R.", 4);
+			drawer.printText(global::mOxyfontRegular, textRect, "Sonic 3 A.I.R.", 4);
 		}
 
 		Item* clickedItem = nullptr;
@@ -120,7 +120,7 @@ void ApplicationContextMenu::render()
 			drawer.drawRect(rect, selected ? Color(0.4f, 0.4f, 0.1f) : Color(0.1f, 0.1f, 0.1f));
 
 			const Recti textRect(rect.x + 10, rect.y + 1, 0, rect.height);
-			drawer.printText(global::mFont10, textRect, item.mText, 4);
+			drawer.printText(global::mOxyfontRegular, textRect, item.mText, 4);
 			rect.y += 22;
 		}
 

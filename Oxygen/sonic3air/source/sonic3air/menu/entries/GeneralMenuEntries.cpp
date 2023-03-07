@@ -35,7 +35,7 @@ void InputFieldMenuEntry::textinput(const rmx::TextInputEvent& ev)
 void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 {
 	const Recti textRect(renderContext.mCurrentPosition, Vec2i(200, 11));
-	Font& font = global::mFont5;
+	Font& font = global::mOxyfontSmall;
 	const int cursorOffset = font.getWidth(mTextInputHandler.getText(), 0, mTextInputHandler.getCursorPosition());
 
 	if (renderContext.mIsSelected)

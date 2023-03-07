@@ -361,8 +361,8 @@ void ExtrasMenu::render()
 		if (!showExtrasMenuTabContent(tabIndex))
 		{
 			const char* text2 = EngineMain::getDelegate().useDeveloperFeatures() ? "because Dev Mode is active" : "because Debug Mode is active";
-			drawer.printText(global::mFont7, Recti(baseX, py + 22, 0, 0), "Achievements are locked", 5, Color(1.0f, 0.75f, 0.5f, alpha));
-			drawer.printText(global::mFont7, Recti(baseX, py + 35, 0, 0), text2, 5, Color(1.0f, 0.75f, 0.5f, alpha));
+			drawer.printText(global::mSonicFontB, Recti(baseX, py + 22, 0, 0), "Achievements are locked", 5, Color(1.0f, 0.75f, 0.5f, alpha));
+			drawer.printText(global::mSonicFontB, Recti(baseX, py + 35, 0, 0), text2, 5, Color(1.0f, 0.75f, 0.5f, alpha));
 
 			if (mTailsYawning.getWidth() == 0)
 			{
@@ -387,7 +387,7 @@ void ExtrasMenu::render()
 			if (isBack)
 			{
 				py += (tabIndex < 2) ? 22 : 16;
-				drawer.printText(global::mFont10, Recti(baseX, py, 0, 10), entry.mText, 5, color);
+				drawer.printText(global::mOxyfontRegular, Recti(baseX, py, 0, 10), entry.mText, 5, color);
 				py += 16;
 			}
 			else if (tabIndex == Tab::Id::EXTRAS)
@@ -411,13 +411,13 @@ void ExtrasMenu::render()
 				// Title
 				String name(secret->mName);
 				name.upperCase();
-				drawer.printText(global::mFont18, Recti(px - 103, py + 12, 0, 10), name, 1, color);
+				drawer.printText(global::mSonicFontC, Recti(px - 103, py + 12, 0, 10), name, 1, color);
 
 				py = localStartY + 56;
 				if (isSelected)
 				{
 					const Color color3(1.0f, 1.0f - std::fabs(std::fmod(FTX::getTime(), 1.0f) - 0.5f) * 2.0f, 0.0f, entry.mAnimation.mHighlight);
-					drawer.printText(global::mFont5, Recti(px + roundToInt(interpolate(50.0f, 0.0f, entry.mAnimation.mHighlight)), py - 11, 0, 10), "Press Enter to start", 2, color3);
+					drawer.printText(global::mOxyfontSmall, Recti(px + roundToInt(interpolate(50.0f, 0.0f, entry.mAnimation.mHighlight)), py - 11, 0, 10), "Press Enter to start", 2, color3);
 				}
 				py -= 8;
 			}
@@ -427,7 +427,7 @@ void ExtrasMenu::render()
 				if (line == 1)
 				{
 					py += 15;
-					drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), String(0, "%d of %d achievements completed", mAchievementsCompleted, (int)SharedDatabase::getAchievements().size()), 5, Color(0.6f, 0.8f, 1.0f, alpha));
+					drawer.printText(global::mSonicFontB, Recti(baseX, py, 0, 10), String(0, "%d of %d achievements completed", mAchievementsCompleted, (int)SharedDatabase::getAchievements().size()), 5, Color(0.6f, 0.8f, 1.0f, alpha));
 					py += 16;
 				}
 
@@ -449,10 +449,10 @@ void ExtrasMenu::render()
 				// Title
 				String name(isUnlocked ? secret->mName : "???");
 				name.upperCase();
-				drawer.printText(global::mFont10, Recti(px - 110, py, 0, 10), name, 1, color);
+				drawer.printText(global::mOxyfontRegular, Recti(px - 110, py, 0, 10), name, 1, color);
 
 				// Description
-				const Color color2 = isSelected ? Color(1.0f, 1.0f, 0.6f, tabAlpha) : Color(0.8f, 0.8f, 0.8f, tabAlpha);
+				const Color color2 = isSelected ? Color(1.0f, 1.0f, 0.6f, tabAlpha) : Color(0.9f, 0.9f, 0.9f, tabAlpha);
 				if (isUnlocked)
 				{
 					std::vector<std::string>* textLines = nullptr;
@@ -461,7 +461,7 @@ void ExtrasMenu::render()
 						if (it == mDescriptionLinesCache.end())
 						{
 							textLines = &mDescriptionLinesCache[0x1000 + entry.mData];
-							utils::splitTextIntoLines(*textLines, secret->mDescription, global::mFont4, 260);
+							utils::splitTextIntoLines(*textLines, secret->mDescription, global::mOxyfontTiny, 260);
 						}
 						else
 						{
@@ -474,7 +474,7 @@ void ExtrasMenu::render()
 					for (const std::string& textLine : *textLines)
 					{
 						py += 10;
-						drawer.printText(global::mFont4, Recti(px - 105, py, 0, 10), textLine, 1, color2);
+						drawer.printText(global::mOxyfontTiny, Recti(px - 105, py, 0, 10), textLine, 1, color2);
 					}
 
 					py = localStartY + 56;
@@ -483,7 +483,7 @@ void ExtrasMenu::render()
 				{
 					String text(0, "Complete %d achievements to unlock", secret->mRequiredAchievements);
 					py += 19;
-					drawer.printText(global::mFont4, Recti(px - 105, py, 0, 10), text, 1, color2);
+					drawer.printText(global::mOxyfontTiny, Recti(px - 105, py, 0, 10), text, 1, color2);
 
 					py = localStartY + 56;
 				}
@@ -499,7 +499,7 @@ void ExtrasMenu::render()
 				if (section != newSection)
 				{
 					py += (line == 1) ? 15 : 30;
-					drawer.printText(global::mFont7, Recti(baseX, py, 0, 10), isComplete ? "* Completed achievements *" : "* Open achievements *", 5, Color(0.6f, 0.8f, 1.0f, tabAlpha));
+					drawer.printText(global::mSonicFontB, Recti(baseX, py, 0, 10), isComplete ? "* Completed achievements *" : "* Open achievements *", 5, Color(0.6f, 0.8f, 1.0f, tabAlpha));
 					py += 16;
 					section = newSection;
 
@@ -524,7 +524,7 @@ void ExtrasMenu::render()
 				// Title
 				String name(achievement->mName);
 				name.upperCase();
-				drawer.printText(global::mFont10, Recti(px - 110, py, 0, 10), name, 1, color);
+				drawer.printText(global::mOxyfontRegular, Recti(px - 110, py, 0, 10), name, 1, color);
 
 				// Description
 				{
@@ -534,7 +534,7 @@ void ExtrasMenu::render()
 						if (it == mDescriptionLinesCache.end())
 						{
 							textLines = &mDescriptionLinesCache[entry.mData];
-							utils::splitTextIntoLines(*textLines, achievement->mDescription, global::mFont4, 260);
+							utils::splitTextIntoLines(*textLines, achievement->mDescription, global::mOxyfontTiny, 260);
 							if (!achievement->mHint.empty())
 								textLines->emplace_back("Hint: " + achievement->mHint);
 						}
@@ -545,12 +545,12 @@ void ExtrasMenu::render()
 					}
 
 					py += (textLines->size() == 1) ? 9 : 5;
-					const Color color2 = isSelected ? Color(1.0f, 1.0f, 0.6f, tabAlpha) : Color(0.8f, 0.8f, 0.8f, tabAlpha);
+					const Color color2 = isSelected ? Color(1.0f, 1.0f, 0.6f, tabAlpha) : Color(0.9f, 0.9f, 0.9f, tabAlpha);
 
 					for (const std::string& textLine : *textLines)
 					{
 						py += 10;
-						drawer.printText(global::mFont4, Recti(px - 105, py, 0, 10), textLine, 1, color2);
+						drawer.printText(global::mOxyfontTiny, Recti(px - 105, py, 0, 10), textLine, 1, color2);
 					}
 				}
 
@@ -558,7 +558,7 @@ void ExtrasMenu::render()
 			}
 			else
 			{
-				drawer.printText(global::mFont10, Recti(baseX, py, 0, 10), entry.mText, 5, color);
+				drawer.printText(global::mOxyfontRegular, Recti(baseX, py, 0, 10), entry.mText, 5, color);
 				py += 16;
 			}
 
@@ -599,13 +599,13 @@ void ExtrasMenu::render()
 			const Color color2 = (k == entry.mSelectedIndex) ? color : Color(0.9f, 0.9f, 0.9f, alpha * 0.8f);
 			const std::string& text = entry.mOptions[k].mText;
 			const int px = roundToInt(((float)k - mActiveTabAnimated) * 220.0f) + center - 80;
-			drawer.printText(global::mFont18, Recti(px, py, 160, 20), text, 5, color2);
+			drawer.printText(global::mSonicFontC, Recti(px, py, 160, 20), text, 5, color2);
 		}
 
 		if (canGoLeft)
-			drawer.printText(global::mFont10, Recti(center - arrowDistance, py + 6, 0, 10), "<", 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(center - arrowDistance, py + 6, 0, 10), "<", 5, color);
 		if (canGoRight)
-			drawer.printText(global::mFont10, Recti(center + arrowDistance, py + 6, 0, 10), ">", 5, color);
+			drawer.printText(global::mOxyfontRegular, Recti(center + arrowDistance, py + 6, 0, 10), ">", 5, color);
 
 		py += 36;
 

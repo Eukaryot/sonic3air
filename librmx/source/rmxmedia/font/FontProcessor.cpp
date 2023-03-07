@@ -11,7 +11,7 @@
 
 void ShadowFontProcessor::process(FontProcessingData& data)
 {
-	if (mShadowAlpha < 0.001f)
+	if (mShadowColor.a < 0.001f)
 		return;
 
 	// Add shadow effect
@@ -41,17 +41,19 @@ void ShadowFontProcessor::process(FontProcessingData& data)
 	{
 		bmp.gaussianBlur(bmp, mShadowBlur);
 	}
-	if (mShadowAlpha < 1.0f)
+
+	const uint32 shadowRGB = mShadowColor.getABGR32() & 0xffffff;
+	if (mShadowColor.a < 1.0f)
 	{
 		uint32* data = bmp.getData();
 		for (int i = 0; i < bmp.getPixelCount(); ++i)
 		{
-			data[i] = roundToInt((float)(data[i] >> 24) * mShadowAlpha) << 24;
+			data[i] = shadowRGB + (roundToInt((float)(data[i] >> 24) * mShadowColor.a) << 24);
 		}
 	}
 	else
 	{
-		bmp.clearRGB(0);
+		bmp.clearRGB(shadowRGB);
 	}
 	bmp.insertBlend(insetX, insetY, data.mBitmap);
 	data.mBitmap = bmp;
