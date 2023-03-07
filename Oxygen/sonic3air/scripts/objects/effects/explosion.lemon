@@ -105,8 +105,7 @@ function void fn083f52()
 //# address-hook(0x083f68)
 function void fn083f68()
 {
-	A1 = 0x083fcc
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x083fcc)
 	DrawObject()
 }
 

@@ -15,13 +15,14 @@
 //# address-hook(0x071bce) end(0x071c02)
 function void fn071bce()
 {
-	#if STANDALONE
-		if (Game.isTimeAttack())
-		{
-			UnloadObject()
-			return
-		}
-	#endif
+#if STANDALONE
+	// Skip boss in Time Attack
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
 
 	A1 = 0x071bbe
 	if (InitBoss(0x071bd8))
@@ -86,16 +87,17 @@ function void fn071c36()
 	objA0.countdown_callback = 0x071c84
 
 	// "spawnChildObjects(0x072336)" replaced by:
-	spawnChildObject(0x067f5c, 0x00, 0, 0)
+	spawnChildObject(0x067f5c, 0x00, 0, 0)			// Egg Mobile
 	if (_equal())
 	{
+		// Top part of the cockpit
 		u8[A1 + 0x2c] = 0x09
 	}
 
 	// "spawnChildObjects(0x07233e)" replaced by:
-	spawnChildObject(0x071e28, 0x00, 24, 7)
-	spawnChildObject(0x071e98, 0x02, 0, 11)
-	spawnChildObject(0x071f30, 0x04, 0, 45)
+	spawnChildObject(0x071e28, 0x00, 24, 7)			// Liquid nitrogen tank
+	spawnChildObject(0x071e98, 0x02, 0, 11)			// Telescopic pole extension
+	spawnChildObject(0x071f30, 0x04, 0, 45)			// Telescopic platform
 }
 
 
@@ -216,6 +218,7 @@ function void fn071d80()
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x071d9e
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x07236c)" replaced by:
 	spawnChildObject(0x0720f2, 0x00, -20, 4)
 	spawnChildObject(0x0720f2, 0x02, 12, 4)
@@ -326,7 +329,7 @@ function void fn071e82()
 	u16[A0 + 0x26] = 0x06
 
 	// "spawnSimpleChildObjects(0x07235e)" replaced by:
-	spawnSimpleChildObjects(0x072020, 4)
+	spawnSimpleChildObjects(0x072020, 4)		// Freezer cloud from leaking nitrogen tank
 }
 
 
@@ -436,7 +439,7 @@ function void fn071f7a()
 	A1 = 0xffff0000 + u16[A0 + 0x46]		// Is this line good for anything?
 
 	// "spawnChildObjects(0x072364)" replaced by:
-	spawnChildObject(0x0720c6, 0x00, 0, 8)
+	spawnChildObject(0x0720c6, 0x00, 0, 8)		// Spiked platform hitbox
 }
 
 
@@ -516,7 +519,7 @@ function void fn07203c()
 function void fn07205e()
 {
 	MoveWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (objA0.animation.frame >= 4 && objA0.animation.frame <= 8)
 	{
 		A1 = 0x07208a
@@ -531,7 +534,7 @@ function void fn07205e()
 function void fn072092()
 {
 	MoveAndFlipWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (objA0.animation.frame >= 4 && objA0.animation.frame <= 8)
 	{
 		A1 = 0x0720be
@@ -645,6 +648,7 @@ function void fn07225c()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x071d80
 		A1 = 0xffff0000 + u16[0xfffffaae]

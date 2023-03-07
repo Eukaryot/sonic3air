@@ -34,6 +34,17 @@ function void fn08d586()
 }
 
 
+//# address-hook(0x08d876) end(0x08d880)
+function void fn08d876()
+{
+	D1 = 0x1f
+	D2 = 4
+	D3 = 5
+	D4.u16 = objA0.position.x.u16
+	fn01dc56()
+}
+
+
 //# address-hook(0x08d5a6) end(0x08d5aa)
 function void fn08d5a6()
 {
@@ -52,7 +63,7 @@ function void fn08d5b0()
 	objA0.flags38 |= 0x02
 
 	// "spawnChildObjects(0x08d9c0)" replaced by:
-	spawnChildObject(0x08d602, 0x00, 0, 16)
+	spawnChildObject(0x08d602, 0x00, 0, 16)			// Madmole
 }
 
 
@@ -294,6 +305,9 @@ function void fn08d8e6()
 	{
 		u8[A0 + 0x29] = 0
 		D0.u16 = (D0.u16 & 0x03) * 2
+
+		// A2 is assigned 0xffffb000 for D0.u16 == 2,
+		//            and 0xffffb04a for D0.u16 == 4 or D0.u16 == 6
 		A1 = 0x08d942 + D0.s16
 		A2 = 0xffff0000 + u16[(A1+=2)-2]
 		if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) == 0)
@@ -325,6 +339,9 @@ function void fn08d94a()
 	{
 		u8[A0 + 0x29] = 0
 		D0.u16 = (D0.u16 & 0x03) * 2
+
+		// A2 is assigned 0xffffb000 for D0.u16 == 2,
+		//            and 0xffffb04a for D0.u16 == 4 or D0.u16 == 6
 		A1 = 0x08d942 + D0.s16
 		A2 = 0xffff0000 + u16[(A1+=2)-2]
 		if ((u8[A2 + 0x2b] & char.bonus.INVINCIBLE) == 0)

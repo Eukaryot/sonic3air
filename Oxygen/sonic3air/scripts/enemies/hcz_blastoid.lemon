@@ -59,7 +59,7 @@ function void fn087952()
 //# address-hook(0x087976) end(0x08799c)
 function void fn087976()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.s16 > 0 && objA0.animation.sprite == 1 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		playSound(0x4d)

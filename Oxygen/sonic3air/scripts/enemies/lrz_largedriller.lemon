@@ -40,7 +40,7 @@ function void fn0900f0()
 	}
 
 	// "spawnSimpleChildObjects(0x09067a)" replaced by:
-	spawnSimpleChildObjects(0x0862ae, 1)
+	spawnSimpleChildObjects(0x0862ae, 1)		// Sprite mask
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x8b
@@ -190,7 +190,7 @@ function void fn0902fe()
 	objA0.countdown_callback = 0x090352
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 }
 
 

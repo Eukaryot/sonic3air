@@ -59,8 +59,8 @@ function void fn063d1a()
 
 	if (allocDynamicObjectStd())
 	{
-		objA1.update_address = 0x085ca4
-		u32[A1 + 0x34] = 0x063dd4
+		objA1.update_address = addressof(CheckForBossStart)
+		objA1.countdown_callback = 0x063dd4
 		u16[A1 + 0x2e] = 0x78
 		u8[A1 + 0x27] = u8[A0 + 0x27]
 
@@ -81,7 +81,7 @@ function void fn063d1a()
 	objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 	objA0.animation.sprite = 0xd8
 	boss.remaining_hits = 8
-	u32[A0 + 0x30] = 0x066771
+	u32[A0 + 0x30] = 0x066771		// Boss Knuckles fighting pose animation data
 	u16[A0 + 0x44] = 0
 
 	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
@@ -205,7 +205,7 @@ function void fn063e14()
 //# address-hook(0x063e7c) end(0x063eba)
 function void fn063e7c()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	if (D2.s16 < 0 && u8[0xfffffab8] & 0x01)
 	{
 		D0.u8 = objA0.value39 + 1
@@ -237,15 +237,14 @@ function void fn063ebe()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x066771
-	fn084580()
+	Object.ResetAnimationProgress(0x066771)		// Boss Knuckles fighting pose animation data
 }
 
 
 //# address-hook(0x063eda) end(0x063f0c)
 function void fn063eda()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	CheckDistanceToPlayers()
 	fn066094()
 
@@ -275,8 +274,7 @@ function void fn063f20()
 	objA0.animation.sprite = 0xda
 	objA0.countdown_value = 119
 
-	A1 = 0x0667ad
-	fn084580()
+	Object.ResetAnimationProgress(0x0667ad)		// Boss Knuckles punching animation data
 }
 
 
@@ -292,7 +290,7 @@ function void fn063f3c()
 		UpdateMovementStraightSimple()
 	}
 
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	if (!_negative())
 	{
 		A3 = 0x063f6a
@@ -331,8 +329,7 @@ function void fn063f7a()
 	objA1.velocity.y = -objA1.velocity.y
 	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
 
-	A1 = 0x0667b4
-	fn084580()
+	Object.ResetAnimationProgress(0x0667b4)		// Boss Knuckles "crouch guard" animation data
 }
 
 
@@ -368,7 +365,7 @@ function void fn063ff8()
 //# address-hook(0x064016) end(0x064016)
 function void fn064016()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 }
 
 
@@ -384,15 +381,14 @@ function void fn06401c()
 #endif
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Boss Knuckles jumping animation data
 }
 
 
 //# address-hook(0x06403a) end(0x064052)
 function void fn06403a()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0)
 	{
@@ -417,8 +413,7 @@ function void fn064066()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x06401c
 
-	A1 = 0x0667cc
-	fn084580()
+	Object.ResetAnimationProgress(0x0667cc)		// Boss Knuckles crouching animation data
 }
 
 
@@ -466,7 +461,7 @@ function void fn0640dc()
 //# address-hook(0x064102) end(0x06411e)
 function void fn064102()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	UpdateMovementSimple()
 	CheckGroundCollision()
 	if (D1.s16 < 0)
@@ -488,15 +483,14 @@ function void fn064132()
 	objA0.render_flags ^= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
-	A1 = 0x0667d4
-	fn084580()
+	Object.ResetAnimationProgress(0x0667d4)		// Boss Knuckles glide drop animation data
 }
 
 
 //# address-hook(0x06414c) end(0x064160)
 function void fn06414c()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	CheckDistanceToPlayers()
 	fn066094()
 
@@ -513,8 +507,7 @@ function void fn064164()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x063ebe
 
-	A1 = 0x0667e0
-	fn084580()
+	Object.ResetAnimationProgress(0x0667e0)		// Boss Knuckles land to get up animation data
 }
 
 
@@ -526,7 +519,7 @@ function void fn064184()
 		playSound(SFX_ROLL)
 	}
 
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	--objA0.countdown_value
 	if (objA0.countdown_value < 0)
 	{
@@ -539,7 +532,7 @@ function void fn064184()
 		objA0.flags38 &= ~0x01
 
 		// "spawnSimpleChildObjects(0x0665fc)" replaced by:
-		spawnSimpleChildObjects(0x064c24, 1)
+		spawnSimpleChildObjects(0x064c24, 1)		// Spin dash dust
 	}
 
 	A3 = 0x064056
@@ -558,15 +551,14 @@ function void fn0641c4()
 	objA0.velocity.y = 0
 	objA0.countdown_value = 0x3b
 
-	A1 = 0x0667f5
-	fn084580()
+	Object.ResetAnimationProgress(0x0667f5)		// Boss Knuckles crouching animation data
 }
 
 
 //# address-hook(0x0641ec) end(0x06421e)
 function void fn0641ec()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	fn06615a()
 
 	if (objA0.velocity.x == 0)
@@ -605,15 +597,14 @@ function void fn064222()
 	u16[A0 + 0x40] = D1.u16
 	objA0.position.y.u16 += 4
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Boss Knuckles rolling animation data
 }
 
 
 //# address-hook(0x064258) end(0x06429a)
 function void fn064258()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	fn06615a()
 	UpdateMovementSimple()
 
@@ -668,8 +659,7 @@ function void fn06429e()
 		objA0.mapping_offset = 0x14a8d6
 		objA0.animation.sprite = 0x8d
 
-		A1 = 0x0667bc
-		fn084580()
+		Object.ResetAnimationProgress(0x0667bc)		// Boss Knuckles hurt animation data
 	}
 }
 
@@ -713,7 +703,7 @@ function void fn064310()
 //# address-hook(0x064350) end(0x064350)
 function void fn064350()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -725,8 +715,7 @@ function void fn064356()
 	objA0.countdown_callback = 0x0643a4
 	playSound(0x90)
 
-	A1 = 0x06680a
-	fn084580()
+	Object.ResetAnimationProgress(0x06680a)		// Cutscene Knuckles unconscious animation data
 
 	Kosinski.addToDMAQueue(0x174a86, 0xa000)	// Swirling stars around Knuckles' head while dizzy
 }

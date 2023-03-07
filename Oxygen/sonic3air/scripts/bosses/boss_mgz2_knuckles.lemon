@@ -86,9 +86,10 @@ function void fn06c72a()
 	objA0.countdown_callback = 0x06c788
 
 	// "spawnChildObjects(0x06819c)" replaced by:
-	spawnChildObject(0x067e62, 0x00, -6, 4)
+	spawnChildObject(0x067e62, 0x00, -6, 4)			// Egg Mobile
 	if (_equal())
 	{
+		// Top part of the cockpit
 		u8[A1 + 0x2c] = 0x09
 	}
 
@@ -228,6 +229,7 @@ function void fn06c890()
 	objA0.countdown_callback = 0x06c8b4
 	objA0.flags38 |= 0x10
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x06d822)" replaced by:
 	spawnChildObject(0x06cfbe, 0x00, 12, -20)
 	spawnChildObject(0x06cfbe, 0x02, -16, 8)

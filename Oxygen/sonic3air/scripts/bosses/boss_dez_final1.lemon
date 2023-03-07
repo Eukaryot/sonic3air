@@ -464,12 +464,14 @@ function void fn0806da()
 
 	if (objA0.subtype2c == 0)
 	{
+		// The Master Emerald in giant Egg Robo's mouth
 		objA0.update_address = 0x080730
 		objA0.value42 = 0x58
 		u16[A0 + 0x44] = 0x08
 	}
 	else
 	{
+		// The Master Emerald in the chase sequence
 		objA0.update_address = 0x080760
 		objA0.animation.sprite = 0
 	}
@@ -678,8 +680,7 @@ function void fn080c48()
 //# address-hook(0x080c58) end(0x080c5c)
 function void fn080c58()
 {
-	A1 = 0x08133e
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x08133e)
 }
 
 
@@ -710,8 +711,7 @@ function void fn080c8a()
 //# address-hook(0x080ca6) end(0x080caa)
 function void fn080ca6()
 {
-	A1 = 0x081349
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x081349)
 }
 
 
@@ -880,7 +880,7 @@ function void fn081140()
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -914,6 +914,7 @@ function void fn08119a()
 
 	if (boss.remaining_hits == 0)
 	{
+		// Boss beaten
 		fn081206()
 		return
 	}
@@ -948,7 +949,7 @@ function void fn081206()
 	objA0.update_address = 0x080584
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04

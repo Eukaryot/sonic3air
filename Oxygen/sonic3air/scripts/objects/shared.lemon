@@ -1800,6 +1800,7 @@ function void fn08592c()
 
 
 //# address-hook(0x084400) end(0x084432)
+//# alias(fn084400) deprecated
 function void Object.AnimationProgressByLocalA1()		// "Animate_Raw" in skdisasm
 {
 	Object.animationProgress(u32[A0 + 0x30])
@@ -1807,6 +1808,7 @@ function void Object.AnimationProgressByLocalA1()		// "Animate_Raw" in skdisasm
 
 
 //# address-hook(0x084404)
+//# alias(fn084404) deprecated
 function void Object.AnimationProgress()		// "Animate_RawNoSST" in skdisasm
 {
 	--objA0.animation.timer
@@ -1899,6 +1901,7 @@ function void fn08445a()
 
 
 //# address-hook(0x084464) end(0x084464)
+//# alias(fn084464) deprecated
 function void Object.AnimationProgressByLocalA1.CheckFlipX()		// "Animate_RawAdjustFlipX" in skdisasm
 {
 	Object.AnimationProgress.CheckFlipX(u32[A0 + 0x30])
@@ -1906,8 +1909,11 @@ function void Object.AnimationProgressByLocalA1.CheckFlipX()		// "Animate_RawAdj
 
 
 //# address-hook(0x084468) end(0x084496)
+//# alias(fn084468) deprecated
 function void Object.AnimationProgress.CheckFlipX()		// "Animate_RawNoSSTAdjustFlipX" in skdisasm
 {
+	// Flips sprite horizontally if flag 0x40 is set
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{
@@ -1942,6 +1948,7 @@ function void Object.AnimationProgress.CheckFlipX(u32 address)
 
 
 //# address-hook(0x084498) end(0x084498)
+//# alias(fn084498) deprecated
 function void Object.AnimationProgressByLocalA1.CheckFlipY()		// "Animate_RawAdjustFlipY" in skdisasm
 {
 	Object.AnimationProgress.CheckFlipY(u32[A0 + 0x30])
@@ -1949,8 +1956,11 @@ function void Object.AnimationProgressByLocalA1.CheckFlipY()		// "Animate_RawAdj
 
 
 //# address-hook(0x08449c) end(0x0844cc)
+//# alias(fn08449c) deprecated
 function void Object.AnimationProgress.CheckFlipY()		// "Animate_RawNoSStAdjustFlipY" in skdisasm
 {
+	// Flips sprite vertically if flag 0x40 is set
+
 	--objA0.animation.timer
 	if (s8(objA0.animation.timer) < 0)
 	{

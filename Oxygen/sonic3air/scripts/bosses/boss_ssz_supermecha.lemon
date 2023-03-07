@@ -16,7 +16,7 @@
 function void fn07b984()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -32,7 +32,7 @@ function void fn07b996()
 	playMusic(MUSIC_DDZ)
 
 	// "spawnChildObjects(0x07d492)" replaced by:
-	spawnChildObject(0x07c886, 0x00, -4, 12)
+	spawnChildObject(0x07c886, 0x00, -4, 12)	// Mecha Sonic's eye
 
 	Kosinski.addToDMAQueue(0x17fcba, 0xa5c0)	// Master Emerald sprite
 }
@@ -44,8 +44,7 @@ function void fn07b9d2()
 	if ((objA0.flags38 & 0x40) == 0)
 	{
 		objA0.base_state = 0x0c
-		A1 = 0x07d5ef
-		fn084580()
+		Object.ResetAnimationProgress(0x07d5ef)
 		objA0.animation.sprite = 0x0e
 		objA0.countdown_callback = 0x07ba00
 	}
@@ -55,7 +54,7 @@ function void fn07b9d2()
 //# address-hook(0x07b9fa) end(0x07b9fa)
 function void fn07b9fa()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -66,6 +65,7 @@ function void fn07ba00()
 	objA0.countdown_value = 0x3b
 	objA0.flags38 |= 0x04
 
+	// Spawn dash dust
 	if (objA0.render_flags & render_flag.FLIP_X)
 	{
 		// "spawnSimpleChildObjects(0x07d47a)" replaced by:
@@ -125,8 +125,7 @@ function void fn07ba90()
 
 	objA0.base_state = 0x12
 	objA0.countdown_callback = 0x07bad0
-	A1 = 0x07d5f6
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5f6)
 }
 
 
@@ -135,7 +134,7 @@ function void fn07babe()
 {
 	objA0.velocity.x -= 0x30
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -148,15 +147,14 @@ function void fn07bad0()
 	objA0.hitbox_extends.y = 0x4b
 	objA0.countdown_callback = 0x07bb20
 
-	A1 = (objA0.render_flags & render_flag.FLIP_X) ? 0x07d60a : 0x07d61a
-	fn084580()
+	Object.ResetAnimationProgress((objA0.render_flags & render_flag.FLIP_X) ? 0x07d60a : 0x07d61a)
 }
 
 
 //# address-hook(0x07bb06) end(0x07bb1a)
 function void fn07bb06()
 {
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	MoveWithGravity20()
 	if (objA0.velocity.y >= 0)
 	{
@@ -191,8 +189,7 @@ function void fn07bb20()
 	objA0.base_state = 0x16
 	objA0.countdown_callback = 0x07bbc6
 
-	A1 = 0x07d5ab
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5ab)
 
 	fn07bb7c()
 }
@@ -208,7 +205,7 @@ function void fn07bb7c()
 	fn07c678()
 
 	// "spawnSimpleChildObjects(0x07d48c)" replaced by:
-	spawnSimpleChildObjects(0x07c948, 1)
+	spawnSimpleChildObjects(0x07c948, 1)		// Electric sparks
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x08
@@ -222,7 +219,7 @@ function void fn07bbac()
 	playSoundRepeatedly(0xa4)
 	fn08598a()
 	u8[0xfffffab8] ^= 0x40
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -296,7 +293,7 @@ function void fn07bc32()
 		objA0.countdown_callback = 0x07bc70
 
 		// "spawnSimpleChildObjects(0x07d4ca)" replaced by:
-		spawnSimpleChildObjects(0x07ce90, 16)
+		spawnSimpleChildObjects(0x07ce90, 16)		// Mecha Sonic giblets
 	}
 }
 
@@ -470,7 +467,7 @@ function void fn07bdbe()
 	playSoundRepeatedly(0xa4)
 	fn08598a()
 	u8[0xfffffab8] ^= 0x40
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 //# address-hook(0x07bdd8) end(0x07bdf0)
@@ -479,8 +476,7 @@ function void fn07bdd8()
 	objA0.base_state = 0x02
 	objA0.flags38 |= 0x40
 	objA0.countdown_callback = 0x07bdf6
-	A1 = 0x07d5ff
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5ff)
 }
 
 
@@ -506,8 +502,7 @@ function void fn07be0e()
 	objA0.position.y.u16 = D0.u16
 	objA0.base_state = 0x06
 	objA0.countdown_callback = 0x07be4e
-	A1 = 0x07d645
-	fn084580()
+	Object.ResetAnimationProgress(0x07d645)
 }
 
 
@@ -515,7 +510,7 @@ function void fn07be0e()
 function void fn07be42()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -596,12 +591,11 @@ function void fn07bed2()
 	objA0.velocity.y = 0
 	u16[A0 + 0x40] = (objA0.render_flags & render_flag.FLIP_X) ? 0x80 : -0x80
 
-	A1 = 0x07d652
-	fn084580()
+	Object.ResetAnimationProgress(0x07d652)
 	objA0.flags38 |= 0x40
 
 	// "spawnChildObjects(0x07d49a)" replaced by:
-	spawnChildObject(0x07c78e, 0x00, 20, -4)
+	spawnChildObject(0x07c78e, 0x00, 20, -4)		// Exhaust flame + spark effect of Super Mecha
 }
 
 
@@ -609,7 +603,7 @@ function void fn07bed2()
 function void fn07bf28()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	D0.u16 = objA0.velocity.x + u16[A0 + 0x40]
 	objA0.velocity.x = D0.u16
@@ -644,8 +638,7 @@ function void fn07bf5a()
 
 	objA0.base_state = 0x0e
 	s16[A0 + 0x40] = -s16[A0 + 0x40]
-	A1 = 0x07d626
-	fn084580()
+	Object.ResetAnimationProgress(0x07d626)
 }
 
 
@@ -653,7 +646,7 @@ function void fn07bf5a()
 function void fn07bfa0()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 
 	objA0.velocity.x += u16[A0 + 0x40]
 	UpdateMovementStraightSimple()
@@ -732,8 +725,7 @@ function void fn07c06e()
 		D5 = 3
 		fn0861d0()
 
-		A1 = 0x07d52a
-		fn084580()
+		Object.ResetAnimationProgress(0x07d52a)
 		return
 	}
 
@@ -750,12 +742,11 @@ function void fn07c06e()
 
 		playSound(0xa0)
 
-		A1 = 0x07d652
-		fn084580()
+		Object.ResetAnimationProgress(0x07d652)
 		objA0.flags38 |= 0x40
 
 		// "spawnChildObjects(0x07d49a)" replaced by:
-		spawnChildObject(0x07c78e, 0x00, 20, -4)
+		spawnChildObject(0x07c78e, 0x00, 20, -4)		// Exhaust flame + spark effect of Super Mecha
 	}
 	else
 	{
@@ -763,8 +754,7 @@ function void fn07c06e()
 		objA0.velocity.x = 0
 		objA0.velocity.y = 0
 
-		A1 = 0x07d57c
-		fn084580()
+		Object.ResetAnimationProgress(0x07d57c)
 	}
 }
 
@@ -773,7 +763,7 @@ function void fn07c06e()
 function void fn07c11c()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -791,7 +781,7 @@ function void fn07c12e()
 function void fn07c144()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 	Object.TriggerOnGroundHit()
 }
@@ -820,7 +810,7 @@ function void fn07c17a()
 function void fn07c18c()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 	D0.u16 = level.bossarea.top
 	if (D0.u16 < objA0.position.y.u16)
@@ -835,8 +825,7 @@ function void fn07c18c()
 	else
 		objA0.render_flags &= ~render_flag.FLIP_X
 
-	A1 = 0x07d538
-	fn084580()
+	Object.ResetAnimationProgress(0x07d538)
 }
 
 
@@ -844,7 +833,7 @@ function void fn07c18c()
 function void fn07c1d8()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -861,7 +850,7 @@ function void fn07c1e4()
 function void fn07c1f2()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	objA0.velocity.x += u16[A0 + 0x40]
 	objA0.velocity.y += 0x80
@@ -890,7 +879,7 @@ function void fn07c232()
 function void fn07c250()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	objA0.velocity.y = objA0.velocity.y - 0x80
 	UpdateMovementStraightSimple()
@@ -909,8 +898,7 @@ function void fn07c274()
 	objA0.countdown_callback = 0x07c2be
 	playSound(0x96)
 
-	A1 = 0x07d556
-	fn084580()
+	Object.ResetAnimationProgress(0x07d556)
 }
 
 
@@ -918,7 +906,7 @@ function void fn07c274()
 function void fn07c2a4()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	objA0.velocity.x += u16[A0 + 0x40]
 	UpdateMovementStraightSimple()
@@ -932,8 +920,7 @@ function void fn07c2be()
 	objA0.flags38 &= ~0x40
 	objA0.countdown_callback = 0x07c2e8
 
-	A1 = 0x07d561
-	fn084580()
+	Object.ResetAnimationProgress(0x07d561)
 }
 
 
@@ -941,7 +928,7 @@ function void fn07c2be()
 function void fn07c2dc()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -952,8 +939,7 @@ function void fn07c2e8()
 	objA0.velocity.x = 0
 	objA0.velocity.y = -0x600
 
-	A1 = 0x07d56c
-	fn084580()
+	Object.ResetAnimationProgress(0x07d56c)
 }
 
 
@@ -961,7 +947,7 @@ function void fn07c2e8()
 function void fn07c302()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	MoveWithGravity20()
 
 	D0.u16 = level.bossarea.top
@@ -977,7 +963,7 @@ function void fn07c302()
 function void fn07c328()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 
 	moveWithGravity(0x10)
 	if (u16[A0 + 0x1a] < 0x0100)
@@ -1020,7 +1006,7 @@ function void fn07c39e()
 	objA0.countdown_value = 0x2f
 
 	// "spawnChildObjects(0x07d4ae)" replaced by:
-	spawnChildObject(0x07c744, 0x00, -7, -8)
+	spawnChildObject(0x07c744, 0x00, -7, -8)		// Energy ball projectile
 
 	--objA0.value39
 	if (s8(objA0.value39) >= 0)
@@ -1044,8 +1030,7 @@ function void fn07c3ca()
 	A1 = 0x07db66
 	fn07c678()
 
-	A1 = 0x07d508
-	fn084580()
+	Object.ResetAnimationProgress(0x07d508)
 }
 
 
@@ -1053,7 +1038,7 @@ function void fn07c3ca()
 function void fn07c3f8()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 	Object.TriggerOnGroundHit()
 }
@@ -1066,15 +1051,14 @@ function void fn07c410()
 	objA0.countdown_callback = 0x07c436
 	playSound(0x96)
 
-	A1 = 0x07d510
-	fn084580()
+	Object.ResetAnimationProgress(0x07d510)
 }
 
 
 //# address-hook(0x07c430) end(0x07c430)
 function void fn07c430()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -1092,7 +1076,7 @@ function void fn07c436()
 //# address-hook(0x07c458) end(0x07c464)
 function void fn07c458()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	Object.TriggerOnGroundHit()
 }
@@ -1120,7 +1104,7 @@ function void fn07c46a()
 //# address-hook(0x07c49e) end(0x07c4de)
 function void fn07c49e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 
 	D0.u16 = level.bossarea.right
@@ -1146,7 +1130,7 @@ function void fn07c49e()
 //# address-hook(0x07c4e0) end(0x07c516)
 function void fn07c4e0()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	CheckGroundCollision()
 	if (D1.s16 < 0)
@@ -1158,15 +1142,14 @@ function void fn07c4e0()
 
 	playSound(0x96)
 
-	A1 = 0x07d5c1
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5c1)
 }
 
 
 //# address-hook(0x07c51c) end(0x07c51c)
 function void fn07c51c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -1194,7 +1177,7 @@ function void fn07c522()
 //# address-hook(0x07c55e) end(0x07c572)
 function void fn07c55e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	if (objA0.velocity.y >= 0)
 	{
@@ -1211,8 +1194,7 @@ function void fn07c578()
 
 	playSound(0x96)
 
-	A1 = 0x07d5b6
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5b6)
 	fn07bb7c()
 }
 
@@ -1229,8 +1211,7 @@ function void fn07c59a()
 	{
 		objA0.base_state = 0x46
 		objA0.countdown_callback = 0x07c718
-		A1 = 0x07d587
-		fn084580()
+		Object.ResetAnimationProgress(0x07d587)
 	}
 	else
 	{
@@ -1255,8 +1236,7 @@ function void fn07c59a()
 			objA0.base_state = 0x3e
 			objA0.countdown_callback = 0x07c646
 
-			A1 = 0x07d636
-			fn084580()
+			Object.ResetAnimationProgress(0x07d636)
 		}
 		else
 		{
@@ -1282,7 +1262,7 @@ function void fn07c59a()
 function void fn07c630()
 {
 	fn08598a()
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 }
@@ -1343,7 +1323,7 @@ function void fn07c684()
 function void fn07c6f0()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (_equal())
 		return
 	if (objA0.animation.frame != 8)
@@ -1352,7 +1332,7 @@ function void fn07c6f0()
 	playSound(0x98)
 
 	// "spawnSimpleChildObjects(0x07d4a8)" replaced by:
-	spawnSimpleChildObjects(0x07c726, 8)
+	spawnSimpleChildObjects(0x07c726, 8)		// Ring projectiles
 }
 
 
@@ -1364,7 +1344,7 @@ function void fn07c718()
 }
 
 
-// Orb projectile
+// Ring projectile
 
 //# address-hook(0x07c726) end(0x07c734)
 function void fn07c726()
@@ -1427,7 +1407,7 @@ function void fn07c77a()
 
 
 
-// Exhaust spark effect of Super Mecha
+// Exhaust flame + spark effect of Super Mecha
 
 //# address-hook(0x07c78e) end(0x07c796)
 function void fn07c78e()
@@ -1455,7 +1435,7 @@ function void fn07c79c()
 		return
 
 	// "spawnSimpleChildObjects(0x07d4a2)" replaced by:
-	spawnSimpleChildObjects(0x07c7d4, 1)
+	spawnSimpleChildObjects(0x07c7d4, 1)		// Exhaust sparks
 
 	DrawObject()
 }
@@ -1481,8 +1461,7 @@ function void fn07c7d4()
 //# address-hook(0x07c80a) end(0x07c812)
 function void fn07c80a()
 {
-	A1 = 0x07d683
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07d683)
 	DrawObject()
 }
 
@@ -1565,7 +1544,7 @@ function void fn07c886()
 //# address-hook(0x07c8ba) end(0x07c8be)
 function void fn07c8ba()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	DrawObject()
 }
 
@@ -1676,7 +1655,7 @@ function void fn07cf14()
 		objA0.position.y.u16 = camera.position.y.u16 + 0xd0
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x0c
@@ -1690,7 +1669,7 @@ function void fn07cf14()
 		objA0.velocity.x = (D0.u8 == 0) ? -2 : 2
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x1e

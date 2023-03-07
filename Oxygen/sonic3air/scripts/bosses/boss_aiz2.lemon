@@ -80,6 +80,7 @@ function void Boss.AIZ2.BaseUpdate()
 	//  - 0x0693f0	-> objA0.base_state = 0x08	-> Waiting briefly
 	//  - 0x0692e2	-> objA0.base_state = 0x0a	-> Disappearing in the waterfall
 	//  - 0x069456	-> objA0.base_state = 0x0c	-> Moving behind the waterfall
+	//  - 0x06946a	-> objA0.base_state = 0x0e
 	call tableLookupAddress(0x06925c, objA0.base_state)
 
 	if ((objA0.flags38 & 0x40) == 0)
@@ -97,15 +98,16 @@ function void fn06926c()
 	objA0.render_flags |= render_flag.FLIP_X
 
 	// "spawnChildObjects(0x06818c)" replaced by:
-	spawnChildObject(0x067d42, 0x00, 0, -20)
+	spawnChildObject(0x067d42, 0x00, 0, -20)		// Egg Mobile
 	if (_equal())
 	{
+		// Top part of the cockpit with the glass dome
 		u8[A1 + 0x2c] = 0x08
 	}
 
 	// "spawnChildObjects(0x069d18)" replaced by:
-	spawnChildObject(0x069622, 0x00, 20, -4)
-	spawnChildObject(0x069622, 0x02, -20, -4)
+	spawnChildObject(0x069622, 0x00, 20, -4)		// Front arm
+	spawnChildObject(0x069622, 0x02, -20, -4)		// Back arm
 
 	fn0692a0()
 }
@@ -129,7 +131,7 @@ function void fn0692a0()
 	}
 
 	// "spawnChildObjects(0x069d2e)" replaced by:
-	spawnChildObject(0x0699c0, 0x00, 0, 0)
+	spawnChildObject(0x0699c0, 0x00, 0, 0)		// Waterfall splash
 }
 
 
@@ -146,8 +148,7 @@ function void fn069c94()
 //# address-hook(0x0692e2) end(0x069300)
 function void fn0692e2()
 {
-	A1 = 0x069d98
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069d98)
 	objA0.flags38 &= ~0x40
 	if (objA0.animation.sprite == 0x2b)
 	{
@@ -159,8 +160,7 @@ function void fn0692e2()
 //# address-hook(0x06932c) end(0x069336)
 function void fn06932c()
 {
-	A1 = 0x069db3
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069db3)
 	fn069be2()
 }
 
@@ -191,6 +191,7 @@ function void fn069be2()
 
 	if (boss.remaining_hits == 0)
 	{
+		// Boss beaten
 		objA0.update_address = 0x085668
 		objA0.flags38 &= ~0x40
 		u8[A0 + 0x0a] |= 0x80
@@ -231,7 +232,7 @@ function void fn069302()
 	objA0.countdown_callback = 0x06933a
 
 	// "spawnChildObjects(0x069d36)" replaced by:
-	spawnChildObject(0x069996, 0x00, 0, -48)
+	spawnChildObject(0x069996, 0x00, 0, -48)		// Water trickling on glass
 }
 
 
@@ -461,7 +462,7 @@ function void fn0695ce()
 
 	objA0.update_address = 0x069616
 	u8[A1 + 0x2e] = 0x83
-	u8[A1 + 0x22] = 0xcb
+	u8[A1 + 0x22] = 0xcb		// Set Knuckles dropping sprite
 	UpdatePlayer1SpritePatterns()
 
 	D0.u16 = 0x1000
@@ -518,7 +519,7 @@ function void fn06965a()
 	}
 
 	// "spawnChildObjects(0x069d26)" replaced by:
-	spawnChildObject(0x069738, 0x00, -28, 0)
+	spawnChildObject(0x069738, 0x00, -28, 0)		// Fireball cannon
 }
 
 
@@ -553,8 +554,7 @@ function void fn0696b4()
 function void fn0696ca()
 {
 	objA0.flags38 &= ~0x40
-	A1 = 0x069dbe
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069dbe)
 }
 
 
@@ -772,7 +772,7 @@ function void fn06989e()
 function void fn0698bc()
 {
 	// "spawnChildObjects(0x069d56)" replaced by:
-	spawnChildObject(0x0698d2, 0x00, 0, 0)
+	spawnChildObject(0x0698d2, 0x00, 0, 0)		// Fireball
 
 	fn0698c6()
 }
@@ -805,20 +805,21 @@ function void fn069b5e()
 {
 	D0.u16 = u16[A0 + 0x26] >> 1
 
+	// Start charging fireball cannon
 	if (D0.u16 == 0x00)
 	{
 		// "spawnChildObjects(0x069d3e)" replaced by:
-		spawnChildObject(0x069844, 0x00, 3, 5)
+		spawnChildObject(0x069844, 0x00, 3, 5)		// Fireball cannon charge glow
 	}
 	else if (D0.u16 == 0x02 || D0.u16 == 0x04)
 	{
 		// "spawnChildObjects(0x069d46)" replaced by:
-		spawnChildObject(0x069844, 0x00, 0, 7)
+		spawnChildObject(0x069844, 0x00, 0, 7)		// Fireball cannon charge glow
 	}
 	else
 	{
 		// "spawnChildObjects(0x069d4e)" replaced by:
-		spawnChildObject(0x069844, 0x00, -3, 5)
+		spawnChildObject(0x069844, 0x00, -3, 5)		// Fireball cannon charge glow
 	}
 }
 
@@ -846,7 +847,7 @@ function void fn069b7a()
 
 
 
-// Part of the cockpit
+// Egg Mobile, top part of the cockpit with the glass dome
 
 //# address-hook(0x067d42) end(0x067d5a)
 function void fn067d42()
@@ -872,7 +873,7 @@ function void fn067d68()
 	objA0.animation.sprite = objA0.subtype2c
 
 	// "spawnChildObjects(0x06816c)" replaced by:
-	spawnChildObject(0x067b66, 0x00, 0, -28)
+	spawnChildObject(0x067b66, 0x00, 0, -28)		// Robotnik head
 }
 
 
@@ -889,7 +890,7 @@ function void fn067d84()
 	objA0.base_state = 0x04
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = (global.zone != 0x00) ? 0x04 : 0x12
@@ -909,7 +910,7 @@ function void fn067dd8()
 	}
 
 	objA0.base_state = 0x06
-	objA0.animation.sprite = 0x05
+	objA0.animation.sprite = 0x05		// Full Egg Mobile with glass dome
 	objA0.velocity.y = -0x200
 	objA0.countdown_value = 0x7f
 }
@@ -982,7 +983,7 @@ function void fn0693fa()
 	fn069c94()
 
 	// "spawnChildObjects(0x069d2e)" replaced by:
-	spawnChildObject(0x0699c0, 0x00, 0, 0)
+	spawnChildObject(0x0699c0, 0x00, 0, 0)		// Waterfall splash
 	u8[A1 + 0x2c] = 0x02
 }
 
@@ -999,8 +1000,7 @@ function void fn0699c0()
 //# address-hook(0x0699ea) end(0x0699fe)
 function void fn0699ea()
 {
-	A1 = 0x069e4a
-	fn084612()
+	Object.AnimationProgress.DistinctTimer_CheckFlipX(0x069e4a)
 	if (objA0.animation.sprite != 0x2b)
 	{
 		DrawObject()
@@ -1012,8 +1012,7 @@ function void fn0699ea()
 function void fn069a1a()
 {
 	UpdateMovementStraightSimple()
-	A1 = 0x069e65
-	fn084612()
+	Object.AnimationProgress.DistinctTimer_CheckFlipX(0x069e65)
 	if (objA0.animation.sprite != 0x2b)
 	{
 		DrawObject()
@@ -1059,7 +1058,7 @@ function void fn069914()
 		if ((global.framecounter & 0x03) == 0)
 		{
 			// "spawnChildObjects(0x069d5e)" replaced by:
-			spawnChildObject(0x06995a, 0x00, 0, 0)
+			spawnChildObject(0x06995a, 0x00, 0, 0)		// Fireball trail
 		}
 		Enemy.DrawDynamicObject()
 	}
@@ -1071,7 +1070,7 @@ function void fn069914()
 
 
 
-// Part of flame object
+// Fireball trail
 
 //# address-hook(0x06995a) end(0x069988)
 function void fn06995a()
@@ -1086,7 +1085,7 @@ function void fn06995a()
 //# address-hook(0x06998a) end(0x069990)
 function void fn06998a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	DrawObject()
 }
 
@@ -1103,8 +1102,7 @@ function void fn069996()
 //# address-hook(0x0699b0) end(0x0699ba)
 function void fn0699b0()
 {
-	A1 = 0x069e41
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x069e41)
 	DrawObject()
 }
 

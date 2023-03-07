@@ -16,6 +16,7 @@
 function void GiantRing.Init()
 {
 #if STANDALONE
+	// No Giant Rings in Time Attack, as they serve no purpose there
 	if (Game.isTimeAttack())
 	{
 		UnloadObject()
@@ -26,6 +27,7 @@ function void GiantRing.Init()
 	D0.u8 = objA0.subtype2c
 	if (level.giantrings_clear & (1 << D0))
 	{
+		// Giant ring already collected
 		UnloadObject()
 	}
 	else
@@ -163,7 +165,7 @@ function void GiantRing.Grant50Rings()
 {
 	playSound(0xb3)
 
-	level.giantrings_clear |= (1 << objA0.subtype2c)
+	level.giantrings_clear |= (1 << objA0.subtype2c)		// Set Giant ring as collected
 	objA0.flags38 |= 0x20
 
 	addRings(50)
@@ -285,7 +287,7 @@ function void fn0618ac()
 //# address-hook(0x0618d0) end(0x0618de)
 function void fn0618d0()
 {
-	level.giantrings_clear |= (1 << objA0.subtype2c)
+	level.giantrings_clear |= (1 << objA0.subtype2c)		// Set Giant ring as collected
 	fn0851d8()
 }
 

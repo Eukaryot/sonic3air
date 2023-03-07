@@ -366,21 +366,22 @@ function void UpdateTimeAndHud()
 
 			if (!global.game.paused)
 			{
-				A1 = addressof(timer.alldata) + 3
-				++u8[A1]
-				if (u8[A1] >= 60)
+				// Time progress (not being rendered, but still updated)
+				++timer.frames
+				if (timer.frames >= 60)
 				{
-					u8[A1] = 0
-					--A1
-					++u8[A1]
-					if (u8[A1] >= 60)
+					timer.frames = 0
+					++timer.seconds
+					if (timer.seconds >= 60)
 					{
-						u8[A1] = 0
-						--A1
-						++u8[A1]
-						if (u8[A1] >= 9)
+						timer.seconds = 0
+						++timer.minutes
+
+					#if STANDALONE
+						if (!Game.getSetting(SETTING_INFINITE_TIME))
+					#endif
 						{
-							u8[A1] = 9
+							timer.minutes = min(timer.minutes, 9)
 						}
 					}
 				}

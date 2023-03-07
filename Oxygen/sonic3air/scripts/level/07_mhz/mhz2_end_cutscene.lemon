@@ -229,7 +229,7 @@ function void fn076310()
 	objA0.velocity.y = 0
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
-	spawnChildObject(0x068062, 0x00, 30, 0)
+	spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{

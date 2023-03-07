@@ -5856,8 +5856,10 @@ function void Character.clearEnemiesOnScreen(u16 minY)
 	A4 = addressof(global.dynamic_objects.size) + 2
 	while (D6.u16 != 0)
 	{
+		// Get address of dynamic object
 		A1 = 0xffff0000 + u16[A4]
 		A4 += 2
+
 		D0 = objA1.collision_attributes
 		if (D0.u8 != 0)
 		{

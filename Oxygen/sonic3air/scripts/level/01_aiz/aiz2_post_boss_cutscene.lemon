@@ -77,7 +77,7 @@ function void fn061fc2()
 	CutsceneKnuckles.loadPalette()
 
 	// "spawnSimpleChildObjects(0x06655a)" replaced by:
-	spawnSimpleChildObjects(0x0620ea, 1)
+	spawnSimpleChildObjects(0x0620ea, 1)				// Invisible collision object
 	if (_equal())
 	{
 		objA1.position.x.u16 = 0x4b08

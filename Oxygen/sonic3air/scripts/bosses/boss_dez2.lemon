@@ -144,8 +144,7 @@ function void fn07f194()
 		objA0.flags38 |= 0x08
 		objA0.countdown_callback = 0x07f1de
 
-		A1 = 0x07fcd4
-		fn084580()
+		Object.ResetAnimationProgress(0x07fcd4)
 
 		// "spawnChildObjects(0x07fca0)" replaced by:
 		spawnChildObject(0x07f64a, 0x00, 0, 20)
@@ -183,8 +182,7 @@ function void fn07f1fa()
 {
 	objA0.base_state = 0x0a
 	objA0.countdown_callback = 0x07f166
-	A1 = 0x07fcd9
-	fn084580()
+	Object.ResetAnimationProgress(0x07fcd9)
 }
 
 
@@ -217,10 +215,10 @@ function void fn07f220()
 	spawnSimpleChildObjects(0x07f7f6, 2)
 
 	// "spawnSimpleChildObjects(0x07fcc8)" replaced by:
-	spawnSimpleChildObjects(0x07f7ce, 6)
+	spawnSimpleChildObjects(0x07f7ce, 6)		// Boss giblets
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 	playMusic(MUSIC_CTRL_FADEOUT)
 }
@@ -238,7 +236,7 @@ function void fn07f266()
 		objA0.position.y.u16 = 0x0328
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	}
 }
 
@@ -499,7 +497,7 @@ function void fn07f4b8()
 function void fn07f4c0()
 {
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -733,7 +731,7 @@ function void fn07f66c()
 	if ((u8[A1 + 0x38] & 0x04) == 0)
 	{
 		MoveWithParent()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		fn084934()
 		return
 	}
@@ -756,7 +754,7 @@ function void fn07f690()
 			++u8[A0 + 0x43]
 		}
 		MoveWithParent()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		fn084920()
 		return
 	}
@@ -774,7 +772,7 @@ function void fn07f6ba()
 	if (objA0.countdown_value >= 0)
 	{
 		MoveWithParent()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		fn084920()
 		return
 	}
@@ -794,7 +792,7 @@ function void fn07f6d2()
 	}
 
 	MoveWithParent()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x08)
@@ -871,7 +869,7 @@ function void fn07f74c()
 //# address-hook(0x070068) end(0x070094)
 function void fn070068()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x80)
 	{
@@ -940,7 +938,7 @@ function void fn07f79c()
 		objA0.animation.sprite = 0x15
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x06
@@ -1357,7 +1355,7 @@ function void fn07fb92()
 			objA0.countdown_callback = 0x07f210
 
 			// "spawnSimpleChildObjects(0x083fee)" replaced by:
-			spawnSimpleChildObjects(0x083d84, 1)
+			spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 			if (allocDynamicObjectStd())
 			{

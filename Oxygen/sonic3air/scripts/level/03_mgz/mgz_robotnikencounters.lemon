@@ -62,7 +62,7 @@ function void fn06bfca()
 {
 	setupObjectAttributesFull(0x06d770)
 
-	u8[A0 + 0x29] = 0xff
+	boss.remaining_hits = 0xff
 	objA0.hitbox_extends.x = 0x30
 	objA0.hitbox_extends.y = 0x24
 	u16[A0 + 0x26] = 0x0c
@@ -70,9 +70,10 @@ function void fn06bfca()
 	objA0.velocity.y = -0x800
 
 	// "spawnChildObjects(0x06819c)" replaced by:
-	spawnChildObject(0x067e62, 0x00, -6, 4)
+	spawnChildObject(0x067e62, 0x00, -6, 4)			// Egg Mobile
 	if (_equal())
 	{
+		// Top part of the cockpit
 		u8[A1 + 0x2c] = 0x09
 	}
 
@@ -417,7 +418,7 @@ function void fn06ca62()
 		}
 		else
 		{
-			fn08459c()
+			Object.AnimationProgressByLocalA1.DistinctTimer()
 			fn06ca4a()
 		}
 	}
@@ -443,7 +444,7 @@ function void fn06cb04()
 //# address-hook(0x06cb14) end(0x06cb1a)
 function void fn06cb14()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn06ca4a()
 }
 
@@ -462,7 +463,7 @@ function void fn06cb1e()
 function void fn06cb38()
 {
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -470,7 +471,7 @@ function void fn06cb38()
 //# address-hook(0x06cb6a) end(0x06cb70)
 function void fn06cb6a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -926,7 +927,7 @@ function void fn06d5a4()
 	if (u8[A0 + 0x28] != 0)
 		return
 
-	if (u8[A0 + 0x29] == 0)
+	if (boss.remaining_hits == 0)
 	{
 		if (u8[A0 + 0x46] == 0)
 		{
@@ -936,7 +937,7 @@ function void fn06d5a4()
 			return
 		}
 
-		u8[A0 + 0x29] = 0x01
+		boss.remaining_hits = 0x01
 		objA0.flags2a &= ~0x80
 	}
 
@@ -967,7 +968,7 @@ function void fn06d61e()
 {
 	if (u8[A0 + 0x28] == 0)
 	{
-		if (u8[A0 + 0x29] == 0)
+		if (boss.remaining_hits == 0)
 		{
 			objA0.update_address = 0x085668
 			objA0.countdown_callback = 0x06c890

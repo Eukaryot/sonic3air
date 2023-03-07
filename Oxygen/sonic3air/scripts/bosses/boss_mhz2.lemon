@@ -16,6 +16,7 @@
 function void fn075f50()
 {
 #if STANDALONE
+	// Skip boss in Time Attack
 	if (Game.isTimeAttack())
 	{
 		UnloadObject()
@@ -40,7 +41,7 @@ function void fn075f50()
 
 	objA0.position.x.u16 += 0xc0
 
-	setupObjectAttributesFull(0x076928)
+	setupObjectAttributesFull(0x076928)		// Egg Mobile body is initialized as the main object, other parts are spawned after this
 
 	objA0.base_state = 0
 	u8[0xfffffaa9] = 0
@@ -51,7 +52,7 @@ function void fn075f50()
 	loadPaletteLine1(0x0769d4)
 
 	// "spawnChildObjects(0x07699c)" replaced by:
-	spawnChildObject(0x067cd2, 0x00, 0, -28)
+	spawnChildObject(0x067cd2, 0x00, 0, -28)		// Robotnik head
 
 	// "spawnChildObjects(0x076982)" replaced by:
 	spawnChildObject(0x07665e, 0x00, -20, 24)
@@ -227,7 +228,7 @@ function void fn076164()
 		objA0.countdown_callback = 0x0761b2
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 		AddScoreForBossEnemy()
 	}
@@ -251,7 +252,7 @@ function void fn0761b2()
 	addPatternLoadingCue(0x076a04)		// Capsule and small explosion sprites
 
 	// "spawnSimpleChildObjects(0x0769b0)" replaced by:
-	spawnSimpleChildObjects(0x0766ca, 6)
+	spawnSimpleChildObjects(0x0766ca, 6)		// Boss giblets
 }
 
 
@@ -335,7 +336,7 @@ function void fn076270()
 	objA0.flags38 &= ~0x20
 
 	// "spawnChildObjects(0x07699c)" replaced by:
-	spawnChildObject(0x067cd2, 0x00, 0, -28)
+	spawnChildObject(0x067cd2, 0x00, 0, -28)		// Robotnik head
 
 	addPatternLoadingCue(0x083d7c)		// Robotnik's ship
 
@@ -476,7 +477,7 @@ function void fn07654a()
 	}
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 	u8[0xfffff7c1] = 0
 }
@@ -495,7 +496,7 @@ function void fn076604()
 //# address-hook(0x07662a) end(0x076630)
 function void fn07662a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn084920()
 }
 
@@ -661,7 +662,7 @@ function void fn076782()
 			}
 
 			// "spawnSimpleChildObjects(0x083fee)" replaced by:
-			spawnSimpleChildObjects(0x083d84, 1)
+			spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x20

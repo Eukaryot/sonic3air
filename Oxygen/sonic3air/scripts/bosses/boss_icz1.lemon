@@ -22,6 +22,7 @@ function void fn071162()
 	}
 
 #if STANDALONE
+	// Skip boss in Time Attack
 	if (Game.isTimeAttack())
 	{
 		UnloadObject()
@@ -360,6 +361,7 @@ function void fn0713e8()
 		}
 	}
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x0719b0)" replaced by:
 	spawnChildObject(0x07168a, 0x00, -12, -12)
 	spawnChildObject(0x07168a, 0x02, 12, -12)
@@ -856,7 +858,7 @@ function void Boss.ICZ1.RegularUpdate()
 		objA0.countdown_callback = 0x0713e8
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 		AddScoreForBossEnemy()
 

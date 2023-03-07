@@ -159,7 +159,7 @@ function void fn08f862()
 	if (_equal())
 	{
 		UpdateMovementStraightSimple()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 
@@ -176,8 +176,7 @@ function void fn08f862()
 //# address-hook(0x08f89a) end(0x08f8ec)
 function void fn08f89a()
 {
-	A1 = 0x08fa4d
-	fn084612()
+	Object.AnimationProgress.DistinctTimer_CheckFlipX(0x08fa4d)
 
 	++objA0.countdown_value
 	if (s16[A0 + 0x44] >= 0)

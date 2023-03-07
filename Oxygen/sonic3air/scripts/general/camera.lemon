@@ -268,7 +268,12 @@ function void UpdateCameraPositionY()
 	}
 	if (char.flags & char.flag.ROLLING)
 	{
+	#if STANDALONE
+		// Accounting for Tails` smaller rolling box. see: https://s3unlocked.blogspot.com/2017/12/roll-height-bugs-part-1.html
+		D0.s16 -= (char.character == CHARACTER_TAILS) ? 1 : 5
+	#else
 		D0.s16 -= 5
+	#endif
 	}
 
 #if STANDALONE

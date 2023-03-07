@@ -300,7 +300,7 @@ function void StartLoadingPatternsForZone()
 	// Targets:
 	//  - 0x08602e	-> global.zone = 0x00	-> AIZ
 	//  - 0x08603c	-> global.zone = 0x01	-> HCZ
-	//  - 0x08604a	-> global.zone = 0x02	-> MGC
+	//  - 0x08604a	-> global.zone = 0x02	-> MGZ
 	//  - 0x086058	-> global.zone = 0x03	-> CNZ
 	//  - 0x086066	-> global.zone = 0x04	-> FBZ
 	//  - 0x086074	-> global.zone = 0x05	-> ICZ

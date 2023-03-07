@@ -1312,7 +1312,7 @@ function void fn01c664()
 #if STANDALONE
 function void AIZ1a.checkPreBossArea()
 {
-	// Skip check for boss
+	// Skip check for boss in Time Attack
 	if (Game.isTimeAttack())
 		return
 

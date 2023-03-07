@@ -128,13 +128,13 @@ function void fn08180e()
 	fn0685e2()
 
 	// "spawnSimpleChildObjects(0x08325c)" replaced by:
-	spawnSimpleChildObjects(0x081e3c, 1)
+	spawnSimpleChildObjects(0x081e3c, 1)		// Giant Egg Robo in cockpit
 
 	// "spawnSimpleChildObjects(0x083262)" replaced by:
-	spawnSimpleChildObjects(0x081f36, 3)
+	spawnSimpleChildObjects(0x081f36, 3)		// Exhaust flames
 
 	// "spawnSimpleChildObjects(0x083268)" replaced by:
-	spawnSimpleChildObjects(0x081e82, 3)
+	spawnSimpleChildObjects(0x081e82, 3)		// Cannons
 }
 
 
@@ -313,10 +313,10 @@ function void fn081a00()
 	objA0.velocity.y = -0x200
 
 	// "spawnSimpleChildObjects(0x083274)" replaced by:
-	spawnSimpleChildObjects(0x081d72, 3)
+	spawnSimpleChildObjects(0x081d72, 3)		// Shoulder thrusters
 
 	// "spawnSimpleChildObjects(0x083282)" replaced by:
-	spawnSimpleChildObjects(0x081f7e, 2)
+	spawnSimpleChildObjects(0x081f7e, 2)		// Exhaust flames
 }
 
 
@@ -408,7 +408,7 @@ function void fn081eca()
 		objA0.countdown_value = 0x60
 
 		// "spawnSimpleChildObjects(0x08326e)" replaced by:
-		spawnSimpleChildObjects(0x081f14, 1)
+		spawnSimpleChildObjects(0x081f14, 1)		// Cannon bullets
 	}
 	fn081ede()
 }
@@ -551,8 +551,7 @@ function void fn0826e2()
 		objA0.position.x.u16 += u16[0xfffffa90]
 	}
 
-	A1 = 0x083fcc
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x083fcc)
 
 	objA0.velocity.x += u16[A0 + 0x3a]
 	objA0.velocity.y += u16[A0 + 0x3c]
@@ -755,7 +754,7 @@ function void fn083004()
 	u16[A0 + 0x44] = 0x60
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x1c

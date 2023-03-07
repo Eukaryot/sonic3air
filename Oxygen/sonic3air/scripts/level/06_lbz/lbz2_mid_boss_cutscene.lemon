@@ -58,7 +58,7 @@ function void fn08d2b6()
 				spawnSimpleChildObjects(0x084a48, 1)		// Screen mover for the right border
 
 				// "spawnChildObjects(0x0681b4)" replaced by:
-				spawnChildObject(0x068062, 0x00, 30, 0)
+				spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 
 				fn08d53e()
 
@@ -388,8 +388,7 @@ function void fn06290e()
 //# address-hook(0x062928) end(0x06292c)
 function void fn062928()
 {
-	A1 = 0x0666d2				// Cutscene Knuckles punching animation data
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0666d2)		// Cutscene Knuckles punching animation
 }
 
 

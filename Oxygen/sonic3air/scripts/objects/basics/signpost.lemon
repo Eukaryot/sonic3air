@@ -162,13 +162,13 @@ function void fn0837d8()
 
 	objA0.hitbox_extends.x = 0x18
 	objA0.hitbox_extends.y = 0x1e
-	u32[A0 + 0x30] = isMainCharacter(CHARACTER_KNUCKLES) ? 0x083b58 : 0x083b4a
-	objA0.position.y.u16 = camera.position.y.u16 - 0x20
+	u32[A0 + 0x30] = isMainCharacter(CHARACTER_KNUCKLES) ? 0x083b58 : 0x083b4a		// Signpost spinning animation data
+	objA0.position.y.u16 = camera.position.y.u16 - 0x20		// Place the signpost just above the screen
 
 	playSound(0xb8)
 
 	// "spawnChildObjects(0x083b2e)" replaced by:
-	spawnChildObject(0x083a24, 0x00, 0, 24)
+	spawnChildObject(0x083a24, 0x00, 0, 24)		// Base stick
 }
 
 
@@ -178,7 +178,7 @@ function void fn083832()
 	if ((global.framecounter & 0x03) == 0)
 	{
 		// "spawnSimpleChildObjects(0x083b36)" replaced by:
-		spawnSimpleChildObjects(0x0839a2, 1)
+		spawnSimpleChildObjects(0x0839a2, 1)		// Sparkles
 	}
 
 	fn083a50()
@@ -397,7 +397,7 @@ function void fn083a50()
 function void fn083a70()
 {
 	A1 = 0xffff0000 + D0.u16
-	if (u8[A1 + 0x20] != 2)
+	if (u8[A1 + 0x20] != char.state.ROLLING)
 		return
 	if (objA1.velocity.y >= 0)
 		return
@@ -465,6 +465,8 @@ function void fn085a5a()
 }
 
 
+
+// Animal capsule unlock button
 
 //# address-hook(0x08671c) end(0x086726)
 function void fn08671c()

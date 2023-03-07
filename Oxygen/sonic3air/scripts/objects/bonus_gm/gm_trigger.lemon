@@ -201,8 +201,7 @@ function void fn060e5c()
 //# address-hook(0x060e8c) end(0x060e9c)
 function void fn060e8c()
 {
-	A1 = 0x06145b
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x06145b)
 	MoveWithParent()
 	DrawObject()
 }

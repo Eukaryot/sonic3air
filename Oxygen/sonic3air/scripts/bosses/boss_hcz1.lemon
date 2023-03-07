@@ -15,13 +15,14 @@
 //# address-hook(0x069ea0) end(0x069ecc)
 function void fn069ea0()
 {
-	#if STANDALONE
-		if (Game.isTimeAttack())
-		{
-			UnloadObject()
-			return
-		}
-	#endif
+#if STANDALONE
+	// Skip boss in Time Attack
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
 
 	A1 = 0x069ed2
 	if (InitBoss(0x069eaa))
@@ -35,7 +36,7 @@ function void fn069ea0()
 	level.vertical_wrap = 0x0300
 
 	// "spawnChildObjects(0x06ad6e)" replaced by:
-	spawnChildObject(0x06a51e, 0x00, 0, 0)
+	spawnChildObject(0x06a51e, 0x00, 0, 0)		// Water agitator pole
 
 	#if STANDALONE
 		// There is this one chunk visible with broken palette
@@ -126,12 +127,13 @@ function void fn069faa()
 	objA0.countdown_value = 0xdf
 	objA0.countdown_callback = 0x069ff0
 
+	// Spawn rockets
 	// "spawnChildObjects(0x06ad4e)" replaced by:
 	spawnChildObject(0x06a2ba, 0x00, 24, 24)
 	spawnChildObject(0x06a2ba, 0x02, -24, -24)
 	spawnChildObject(0x06a2ba, 0x04, -24, 24)
 	spawnChildObject(0x06a2ba, 0x06, 24, -24)
-	spawnChildObject(0x06a4a8, 0x08, 0, 36)
+	spawnChildObject(0x06a4a8, 0x08, 0, 36)			// Exhaust flame
 }
 
 
@@ -387,6 +389,7 @@ function void fn06a22a()
 		objA1.update_address = 0x06a24c
 	}
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x06adaa)" replaced by:
 	spawnChildObject(0x06a8c6, 0x00, -12, -12)
 	spawnChildObject(0x06a8c6, 0x02, -12, 12)
@@ -419,7 +422,7 @@ function void fn06a270()
 		return
 
 	objA0.update_address = 0x06a2a0
-	A2 = (getNumPlayers() == 1) ? 0x06ad9e : 0x06ada4
+	A2 = (getNumPlayers() == 1) ? 0x06ad9e : 0x06ada4		// Objects that moves characters down to HCZ 2
 	SpawnSimpleChildObjects()
 
 	objA0.countdown_value = 0x2f
@@ -439,7 +442,7 @@ function void fn06a2a0()
 		return
 
 	// "spawnSimpleChildObjects(0x06ad98)" replaced by:
-	spawnSimpleChildObjects(0x06a710, 1)
+	spawnSimpleChildObjects(0x06a710, 1)		// Drainer bubbles after the boss
 
 	Object.CountdownAndTrigger()
 }
@@ -470,7 +473,7 @@ function void fn06a2de()
 	objA0.flags38 |= 0x40
 
 	// "spawnChildObjects(0x06ad76)" replaced by:
-	spawnChildObject(0x06a460, 0x00, 0, 0)
+	spawnChildObject(0x06a460, 0x00, 0, 0)		// Rocket exhaust flame
 }
 
 
@@ -746,15 +749,14 @@ function void fn06a57c()
 	playSound(0xc0)
 
 	// "spawnSimpleChildObjects(0x06ad92)" replaced by:
-	spawnSimpleChildObjects(0x06a65c, 30)
+	spawnSimpleChildObjects(0x06a65c, 30)		// Agitator whirlpool bubbles
 }
 
 
 //# address-hook(0x06a5b2) end(0x06a5b6)
 function void fn06a5b2()
 {
-	A1 = 0x06adec
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x06adec)
 }
 
 
@@ -787,7 +789,7 @@ function void fn06a5d8()
 		objA0.countdown_callback = 0x06a622
 
 		fn06a986()
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 }
 
@@ -795,8 +797,7 @@ function void fn06a5d8()
 //# address-hook(0x06a618) end(0x06a61c)
 function void fn06a618()
 {
-	A1 = 0x06ae16
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x06ae16)
 }
 
 
@@ -815,6 +816,7 @@ function void fn06a636()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x10)
 	{
+		// Spawn water agitator giblets
 		// "spawnChildObjects(0x06adc4)" replaced by:
 		spawnChildObject(0x06a8ee, 0x00, 0, -36)
 		spawnChildObject(0x06a8ee, 0x02, -8, 0)
@@ -984,7 +986,7 @@ function void fn06a7c4()
 		return
 	}
 
-	u16[A0 + 0x44] = A1.u16
+	u16[A0 + 0x44] = A1.u16		// Character address
 	u8[A0 + 0x0a] &= ~0x80
 	D0.u16 = objA1.position.x.u16
 	objA0.position.x.u16 = D0.u16
@@ -1050,8 +1052,7 @@ function void fn06a8c6()
 	setupObjectAttributesBasic(0x06ad42)
 
 	objA0.update_address = 0x085102
-	D0 = (objA0.subtype2c >> 1) + 0x1b
-	objA0.animation.sprite = D0.u8
+	objA0.animation.sprite = 0x1b + (objA0.subtype2c >> 1)
 
 	D0 = 0x20
 	fn0852d0()
@@ -1064,8 +1065,7 @@ function void fn06a8ee()
 	setupObjectAttributesBasic(0x06ad48)
 	objA0.update_address = 0x0856d0
 
-	D0 = (objA0.subtype2c >> 1) + 0x1f
-	objA0.animation.sprite = D0.u8
+	objA0.animation.sprite = 0x1f + (objA0.subtype2c >> 1)
 
 	D0 = 0x1c
 	fn0852d0()
@@ -1272,6 +1272,7 @@ function void fn06aab6()
 	playSound(SFX_WATERSPLASH)
 	u16[0xfffffa9a] = 0
 
+	// Spawn water splashes
 	// "spawnChildObjects(0x06ad7e)" replaced by:
 	spawnChildObject(0x06a4c8, 0x00, 0, 0)
 	spawnChildObject(0x06a4c8, 0x02, -16, 0)
@@ -1387,11 +1388,12 @@ function void fn06ac48()
 
 	if (boss.remaining_hits == 0)
 	{
+		// Boss beaten
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x06a22a
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 		AddScoreForBossEnemy()
 		return

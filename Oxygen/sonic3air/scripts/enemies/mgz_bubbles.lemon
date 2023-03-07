@@ -54,7 +54,7 @@ function void fn088370()
 //# address-hook(0x0883ac) end(0x0883e0)
 function void fn0883ac()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	D4.u16 = objA0.velocity.y
 	fn0847e6()
 	if (objA0.velocity.y == 0 && D4.s16 >= 0)
@@ -72,7 +72,7 @@ function void fn0883ac()
 //# address-hook(0x0883e6) end(0x08840e)
 function void fn0883e6()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (!_equal() && objA0.animation.frame == 4)
 	{
 		playSound(0x94)

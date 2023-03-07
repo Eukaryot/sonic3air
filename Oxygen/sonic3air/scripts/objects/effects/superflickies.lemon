@@ -293,6 +293,8 @@ function void fn01a37a()
 function void fn01a3fe()
 {
 	D1 = 0
+
+	// Go through all the badniks to destroy
 	D6.u16 = global.dynamic_objects.size
 	A4 = addressof(global.dynamic_objects.size) + 2
 	if (D6.u16 != 0)
@@ -308,8 +310,10 @@ function void fn01a3fe()
 		A4 += D0.s16
 		while (D6.u16 != 0)
 		{
+			// Get address of dynamic object
 			A1 = 0xffff0000 + u16[A4]
 			A4 += 2
+
 			D0.u8 = objA1.collision_attributes
 			if (D0.u8 != 0)
 			{
@@ -337,6 +341,18 @@ function void fn01a434()
 
 		// Exclude SOZ 2 sand cork
 		if (objA1.update_address == 0x041d32)
+			return
+
+		// Exclude CNZ balloons 
+		if (objA1.update_address == 0x031754)
+			return
+
+		// Exclude CNZ bumpers 
+		if (objA1.update_address == 0x032e7e || objA1.update_address == 0x032eaa)
+			return
+
+		// Exclude checkpoint and its stars 
+		if (objA1.update_address == 0x02cfa8)
 			return
 	#endif
 

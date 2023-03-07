@@ -65,8 +65,7 @@ function void fn088e98()
 //# address-hook(0x088ec4) end(0x088ee0)
 function void fn088ec4()
 {
-	A1 = 0x088fa4
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x088fa4)
 	if (D2.s16 > 0)
 	{
 		objA0.position.y.u16 += u16[0x088ee2 + objA0.animation.frame]
@@ -106,8 +105,7 @@ function void fn088f0e()
 //# address-hook(0x088f22) end(0x088f3e)
 function void fn088f22()
 {
-	A1 = 0x088fab
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x088fab)
 	if (D2.s16 > 0)
 	{
 		objA0.position.y.u16 += u16[0x088f40 + objA0.animation.frame]

@@ -21,6 +21,7 @@ function bool DEZFinalBoss3.canPlayerEnterDoomsday()
 }
 
 
+// Egg Mobile
 
 //# address-hook(0x080160) end(0x080174)
 function void fn080160()
@@ -41,6 +42,7 @@ function void fn080160()
 //# address-hook(0x080184) end(0x0801d4)
 function void fn080184()
 {
+	// The Egg Mobile is initialized here as the main object, other parts are spawned after this
 	setupObjectAttributesFull(0x0812ec)
 
 	objA0.render_flags |= render_flag.FLIP_X
@@ -56,11 +58,11 @@ function void fn080184()
 	}
 
 	// "spawnChildObjects(0x06817c)" replaced by:
-	spawnChildObject(0x067c38, 0x00, 0, -28)
+	spawnChildObject(0x067c38, 0x00, 0, -28)		// Robotnik head
 
 	// "spawnChildObjects(0x081330)" replaced by:
-	spawnChildObject(0x0804b0, 0x00, 0, 35)
-	spawnChildObject(0x0806da, 0x02, 0, 59)
+	spawnChildObject(0x0804b0, 0x00, 0, 35)			// Egg Mobile crane hook
+	spawnChildObject(0x0806da, 0x02, 0, 59)			// The Master emerald
 }
 
 
@@ -79,7 +81,7 @@ function void fn0801d8()
 	objA0.velocity.x = 0x500
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
-	spawnChildObject(0x068062, 0x00, 30, 0)
+	spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 
 	fn0685e2()
 }
@@ -244,7 +246,7 @@ function void fn08030e()
 	for (u8 i = 0; i < 4; ++i)
 	{
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = (i < 2) ? 0x16 : 0x18
@@ -412,7 +414,7 @@ function void fn080e2c()
 		objA0.countdown_callback = 0x08029c
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

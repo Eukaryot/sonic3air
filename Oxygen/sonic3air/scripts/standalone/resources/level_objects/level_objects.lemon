@@ -524,8 +524,8 @@ constant u8 OBJECTTABLE2_69		= 0x69		// Object address 0x01a51a = Unused (points
 constant u8 OBJECTTABLE2_6a		= 0x6a		// Object address 0x01f3f8 = Damaging Blocker Element
 constant u8 OBJECTTABLE2_6b		= 0x6b		// Object address 0x01f5a0 = Killing Blocker Element
 constant u8 OBJECTTABLE2_6c		= 0x6c		// Object address 0x038688 = Bridge
-constant u8 OBJECTTABLE2_6d		= 0x6d		// Object address 0x01f3ea = Blocker Element
-constant u8 OBJECTTABLE2_6e		= 0x6e		// Object address 0x01f3f2 = Blocker Element
+constant u8 OBJECTTABLE2_6d		= 0x6d		// Object address 0x01f3ea = Shocking Blocker Element
+constant u8 OBJECTTABLE2_6e		= 0x6e		// Object address 0x01f3f2 = Burning Blocker Element
 constant u8 OBJECTTABLE2_6f		= 0x6f		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE2_70		= 0x70		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE2_71		= 0x71		// Object address 0x01a51a = Unused (points to ring)

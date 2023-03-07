@@ -313,7 +313,7 @@ function void fn08a036()
 					return
 
 				// "spawnSimpleChildObjects(0x08a42a)" replaced by:
-				spawnSimpleChildObjects(0x08a1d4, 6)
+				spawnSimpleChildObjects(0x08a1d4, 6)		// Broken ice pieces
 
 				if (allocDynamicObjectAfterA0())
 				{

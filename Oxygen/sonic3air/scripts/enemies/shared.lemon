@@ -51,7 +51,7 @@ function void Enemy.UnloadDelayed()
 //# address-hook(0x085102) end(0x08513a)
 function void fn085102()
 {
-	// Called after destruction
+	// Scattered boss giblets, Called after destruction
 
 	UpdateMovementSimple()
 
@@ -721,16 +721,20 @@ function void fn084258()
 
 
 //# address-hook(0x08450e) end(0x08450e)
-function void fn08450e()		// "Animate_RawCheckResult" in skdisasm
+//# alias(fn08450e) deprecated
+function void Object.AnimationProgressByLocalA1.CheckEnd()		// "Animate_RawCheckResult" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn084512()
+	Object.AnimationProgress.CheckEnd(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x084512) end(0x084550)
-function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
+//# alias(fn084512) deprecated
+function void Object.AnimationProgress.CheckEnd()		// "Animate_RawNoSSTCheckResult" in skdisasm
 {
+	// Marks end of animation specifically with 0xff
+	// Seems mainly used for Cutscene/Boss Knuckles when using "real" Knuckles sprites
+
 	// D2 = 0	-> No change
 	// D2 = 1	-> Change to next frame
 	// D2 = -1	-> Reached end of animation, decide next step
@@ -748,6 +752,8 @@ function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
 	D1 = u8[(A2+=1)-1]
 	if (D1.u8 == 0xff)
 	{
+		// Reached end of animation
+
 		D1.s8 = -s8[(A2+=1)-1]
 		// Calls one of the following:
 		//	- 0x084552
@@ -764,6 +770,12 @@ function void fn084512()		// "Animate_RawNoSSTCheckResult" in skdisasm
 		objA0.animation.sprite = D1.u8
 		D2 = 1
 	}
+}
+
+function void Object.AnimationProgress.CheckEnd(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckEnd()
 }
 
 
@@ -819,11 +831,18 @@ function void fn084576()
 
 
 //# address-hook(0x084580) end(0x08458c)
-function void fn084580()		// "Set_Raw_Animation" in skdisasm
+//# alias(fn084580) deprecated
+function void Object.ResetAnimationProgress()		// "Set_Raw_Animation" in skdisasm
 {
 	u32[A0 + 0x30] = A1
 	objA0.animation.frame = 0
 	objA0.animation.timer = 0
+}
+
+function void Object.ResetAnimationProgress(u32 address)
+{
+	A1 = address
+	Object.ResetAnimationProgress()
 }
 
 
@@ -837,16 +856,19 @@ function void StopObjectA1()
 
 
 //# address-hook(0x08459c) end(0x0845d6)
-function void fn08459c()		// "Animate_RawMultiDelay" in skdisasm
+//# alias(fn08459c) deprecated
+function void Object.AnimationProgressByLocalA1.DistinctTimer()		// "Animate_RawMultiDelay" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x0845a0)
-function void fn0845a0()		// "Animate_RawNoSSTMultiDelay" in skdisasm
+//# alias(fn0845a0) deprecated
+function void Object.AnimationProgress.DistinctTimer()		// "Animate_RawNoSSTMultiDelay" in skdisasm
 {
+	// Gives each animation frame its own timer value
+
 	// D2 = 0	-> Animation running, no frame change
 	// D2 = 1	-> Animation running, change to next frame
 	// D2 = -1	-> Animation stopped
@@ -872,10 +894,16 @@ function void fn0845a0()		// "Animate_RawNoSSTMultiDelay" in skdisasm
 	{
 		// Advance to next frame
 		objA0.animation.sprite = D1.u8
-		objA0.animation.timer = u8[A1 + D0.s16 + 1]
+		objA0.animation.timer = u8[A1 + D0.s16 + 1]		// Set unique timer value for new frame
 		D2 = 1
 		_setZeroFlagByValue(1)
 	}
+}
+
+function void Object.AnimationProgress.DistinctTimer(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.DistinctTimer()
 }
 
 
@@ -944,16 +972,19 @@ function void fn084600()
 
 
 //# address-hook(0x08460e) end(0x08460e)
-function void fn08460e()		// "Animate_RawMultiDelayFlipX" in skdisasm
+//# alias(fn08460e) deprecated
+function void Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()		// "Animate_RawMultiDelayFlipX" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn084612()
+	Object.AnimationProgress.DistinctTimer_CheckFlipX(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x084612) end(0x084648)
-function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
+//# alias(fn084612) deprecated
+function void Object.AnimationProgress.DistinctTimer_CheckFlipX()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 {
+	// Gives each animation frame its own timer value, flips sprite horizontally if flag 0x40 is set
+
 	// D2 = 0	-> Animation running, no frame change
 	// D2 = 1	-> Animation running, change to next frame
 	// D2 = -1	-> Animation stopped
@@ -978,7 +1009,7 @@ function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 
 			// Advance to next frame
 			objA0.animation.sprite = D1.u8
-			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]
+			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]		// Set unique timer value for new frame
 			D2 = 1
 		}
 	}
@@ -988,18 +1019,27 @@ function void fn084612()		// "Animate_RawNoSSTMultiDelayFlipX" in skdisasm
 	}
 }
 
+function void Object.AnimationProgress.DistinctTimer_CheckFlipX(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.DistinctTimer_CheckFlipX()
+}
+
 
 //# address-hook(0x08464a) end(0x08464a)
-function void fn08464a()		// "Animate_RawMultiDelayFlipY" in skdisasm
+//# alias(fn08464a) deprecated
+function void Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipY()		// "Animate_RawMultiDelayFlipY" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn08464e()
+	Object.AnimationProgress.DistinctTimer_CheckFlipY(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x08464e) end(0x084686)
-function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
+//# alias(fn08464e) deprecated
+function void Object.AnimationProgress.DistinctTimer_CheckFlipY()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
 {
+	// Gives each animation frame its own timer value, flips sprite vertically if flag 0x40 is set
+
 	// D2 = 0	-> Animation running, no frame change
 	// D2 = 1	-> Animation running, change to next frame
 	// D2 = -1	-> Animation stopped
@@ -1024,7 +1064,7 @@ function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
 
 			// Advance to next frame
 			objA0.animation.sprite = D1.u8
-			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]
+			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]		// Set unique timer value for new frame
 
 			D2 = 1
 			return
@@ -1034,18 +1074,28 @@ function void fn08464e()		// "Animate_RawNoSSTMultiDelayFlipY" in skdisasm
 	D2 = 0
 }
 
+function void Object.AnimationProgress.DistinctTimer_CheckFlipY(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.DistinctTimer_CheckFlipY()
+}
+
 
 //# address-hook(0x084688) end(0x084688)
-function void fn084688()		// "Animate_Raw2MultiDelay" in skdisasm
+//# alias(fn084688) deprecated
+function void Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()		// "Animate_Raw2MultiDelay" in skdisasm
 {
-	A1 = u32[A0 + 0x30]
-	fn08468c()
+	Object.AnimationProgress.CheckEnd_DistinctTimer(u32[A0 + 0x30])
 }
 
 
 //# address-hook(0x08468c) end(0x0846ca)
-function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
+//# alias(fn08468c) deprecated
+function void Object.AnimationProgress.CheckEnd_DistinctTimer()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 {
+	// Gives each animation frame its own timer value, marks end of animation specifically with 0xff
+	// Seems mainly used for Cutscene/Boss Knuckles when using "real" Knuckles sprites
+
 	// D2 = 0	-> No change
 	// D2 = 1	-> Change to next frame
 	// D2 = -1	-> Reached end of animation, decide next step
@@ -1066,6 +1116,8 @@ function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 	D1 = u8[(A2+=1)-1]
 	if (D1.u8 == 0xff)
 	{
+		// Reached end of animation
+
 		D1.s8 = -s8[(A2+=1)-1]
 		// Calls one of the following:
 		//	- 0x0846cc
@@ -1079,10 +1131,16 @@ function void fn08468c()		// "Animate_Raw2NoSSTMultiDelay" in skdisasm
 	{
 		// Advance to next frame
 		objA0.animation.sprite = D1.u8
-		objA0.animation.timer = u8[A1 + D0.s16 + 1]
+		objA0.animation.timer = u8[A1 + D0.s16 + 1]		// Set unique timer value for new frame
 		D2 = 1
 		_setZeroFlagByValue(1)
 	}
+}
+
+function void Object.AnimationProgress.CheckEnd_DistinctTimer(u32 address)
+{
+	A1 = address
+	Object.AnimationProgress.CheckEnd_DistinctTimer()
 }
 
 
@@ -1141,6 +1199,7 @@ function void fn0846f2()
 
 
 //# address-hook(0x084700) end(0x084700)
+//# alias(fn084700) deprecated
 function void Object.AnimationProgressByLocalA1.SpeedUp()		// "Animate_RawGetFaster" in skdisasm
 {
 	Object.AnimationProgress.SpeedUp(u32[A0 + 0x30])
@@ -1148,12 +1207,20 @@ function void Object.AnimationProgressByLocalA1.SpeedUp()		// "Animate_RawGetFas
 
 
 //# address-hook(0x084704) end(0x08477e)
+//# alias(fn084704) deprecated
 function void Object.AnimationProgress.SpeedUp()		// "Animate_RawNoSSTGetFaster" in skdisasm
 {
+	// Plays animation with a starting timer set in u8[A1], and increases that timer value up to a limit defined in u8[A1 + 1]
+
+	// _setZeroFlagByValue(0)	-> No change
+	// _setZeroFlagByValue(1)	-> Change to next frame
+	// _setZeroFlagByValue(-1)	-> Reached end of animation, loop
+
 	if ((objA0.flags38 & 0x20) == 0)
 	{
+		// Animation just started
 		objA0.flags38 |= 0x20
-		objA0.flags2e = u8[A1]
+		objA0.flags2e = u8[A1]		// Initial timer value
 		objA0.value2f = 0
 	}
 
@@ -1162,29 +1229,34 @@ function void Object.AnimationProgress.SpeedUp()		// "Animate_RawNoSSTGetFaster"
 	{
 		D2.u8 = objA0.flags2e
 		D0 = objA0.animation.frame + 1
-		D1.u8 = u8[A1 + D0.s16 + 2]
+		D1.u8 = u8[A1 + D0.s16 + 2]		// Advance to next frame
 		if (D1.s8 < 0)
 		{
+			// Reached end of animation
 			D0 = 0
-			D1.u8 = u8[A1 + 2]
+			D1.u8 = u8[A1 + 2]		// Loop animation from the start
 			if (D2.u8 == 0)
 			{
 				objA0.animation.frame = D0.u8
 				objA0.animation.sprite = D1.u8
 				objA0.animation.timer = D2.u8
-				++objA0.value2f
+
+				++objA0.value2f		// Increment with each loop
 				if (objA0.value2f >= u8[A1 + 1])
 				{
+					// Reached fastest animation speed
 					objA0.flags38 &= ~0x20
 					objA0.value2f = 0
+
 					A2 = objA0.countdown_callback
 					call A2
 				}
-				D2 = 0xffffffff
+				D2 = -1
 				_setZeroFlagByValue(D2)
 				return
 			}
 
+			// Decrease timer restart value for faster animation
 			--D2.u8
 			objA0.flags2e = D2.u8
 		}
@@ -1209,6 +1281,7 @@ function void Object.AnimationProgress.SpeedUp(u32 address)
 
 
 //# address-hook(0x084780) end(0x084780)
+//# alias(fn084780) deprecated
 function void Object.AnimationProgressByLocalA1.SlowDown()		// "Animate_RawGetSlower" in skdisasm
 {
 	Object.AnimationProgress.SlowDown(u32[A0 + 0x30])
@@ -1216,10 +1289,14 @@ function void Object.AnimationProgressByLocalA1.SlowDown()		// "Animate_RawGetSl
 
 
 //# address-hook(0x084784) end(0x0847e4)
+//# alias(fn084784) deprecated
 function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower" in skdisasm
 {
+	// Plays animation with a starting timer of 0, and increases that timer value up to a limit defined in u8[A1]
+
 	if ((objA0.flags38 & 0x20) == 0)
 	{
+		// Animation just started
 		objA0.countdown_value = 0
 	}
 	objA0.flags38 |= 0x20
@@ -1230,12 +1307,13 @@ function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower
 
 	D2.u8 = objA0.flags2e
 	D0 = objA0.animation.frame + 1
-	D1.u8 = u8[A1 + D0.s16 + 0x01]
+	D1.u8 = u8[A1 + D0.s16 + 1]		// Advance to next frame
 	if (D1.s8 < 0)
 	{
+		// Reached end of animation
 		D0 = 0
-		D1.u8 = u8[A1 + 0x01]
-		++D2.u8
+		D1.u8 = u8[A1 + 1]		// Loop animation from the start
+		++D2.u8			// Increase timer restart value for slower animation
 	}
 
 	objA0.animation.frame = D0.u8
@@ -1243,13 +1321,14 @@ function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower
 	objA0.animation.timer = D2.u8
 	if (D2.u8 < u8[A1])
 	{
-		objA0.flags2e = D2.u8
+		// Reached slowest animation speed
+		objA0.flags2e = D2.u8		// Set new timer value
 		return
 	}
 
-	D0.u8 = objA0.value2f + 1
+	D0.u8 = objA0.value2f + 1		// Increment with each loop
 	objA0.value2f = D0.u8
-	if (D0.u8 < u8[A1 + 0x01])
+	if (D0.u8 < u8[A1 + 1])		// Seems like this is using the first animation frame as a loop count limit?
 		return
 
 	objA0.flags38 &= ~0x20

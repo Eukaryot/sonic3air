@@ -15,7 +15,7 @@ function void fn089bdc()
 	objA0.update_address = 0x089c14
 
 	// "spawnChildObjects(0x089ea8)" replaced by:
-	spawnChildObject(0x089c5c, 0x00, 0, -36)
+	spawnChildObject(0x089c5c, 0x00, 0, -36)			// Capsule unlock button
 
 	if (objA0.respawn_entry)
 	{
@@ -47,12 +47,13 @@ function void fn089c14()
 		fn089dac()
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x08
 		}
 
+		// Spawn opened capsule giblets
 		// "spawnChildObjects(0x089eb0)" replaced by:
 		spawnChildObject(0x089d78, 0x00, 0, -8)
 		spawnChildObject(0x089d78, 0x02, -16, -8)
@@ -262,12 +263,12 @@ function void fn089dcc()
 function void fn089dde()
 {
 	// "spawnChildObjects(0x089f16)" replaced by:
-	spawnChildObject(0x089650, 0x00, -24, -4)
-	spawnChildObject(0x089650, 0x02, 24, -4)
+	spawnChildObject(0x089650, 0x00, -24, -4)		// Blaster badnik
+	spawnChildObject(0x089650, 0x02, 24, -4)		// Blaster badnik
 
 	// "spawnChildObjects(0x089f24)" replaced by:
-	spawnChildObject(0x089a5a, 0x00, -8, -4)
-	spawnChildObject(0x089a5a, 0x02, 8, -4)
+	spawnChildObject(0x089a5a, 0x00, -8, -4)		// Technosqueak
+	spawnChildObject(0x089a5a, 0x02, 8, -4)			// Technosqueak
 }
 
 

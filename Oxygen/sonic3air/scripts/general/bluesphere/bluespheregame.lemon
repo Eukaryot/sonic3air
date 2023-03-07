@@ -1558,7 +1558,7 @@ function void fn04da7e()
 	Kosinski.decompress(0x0de364, A1)			// "& Knuckles" subtitle (might be loaded for the trademark sign?)
 	Kosinski.decompress(0x17fcbc, A1)			// Master Emerald sprite
 	Kosinski.decompress(0x163248, A1)			// Robotnik posing sprites
-	Kosinski.decompress(0x15fdde, A1)			// Egg Robo's Egg Mobile sprites
+	Kosinski.decompress(0x15fdde, A1)			// Egg Robo head sprites
 
 	updateSpritePattern(0xffff0000, BlueSphereGame.SKTitleLogo.targetInVRAM, A1.u16 >> 1)
 
@@ -2181,7 +2181,7 @@ function void fn0680a4()
 	objA0.sprite_priority = 0x0280
 	objA0.box_size.x = 0x20
 	objA0.box_size.y = 0x20
-	objA0.animation.sprite = 0x0a
+	objA0.animation.sprite = 0x0a		// Egg Mobile full body
 	objA0.position.x.u16 = 0x0188 + getScreenExtend()
 	objA0.position.y.u16 = 0xc0
 	fn0685e2()

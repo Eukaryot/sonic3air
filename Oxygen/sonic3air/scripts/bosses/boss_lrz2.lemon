@@ -87,7 +87,7 @@ function void fn07981e()
 
 	// "spawnChildObjects(0x07a18c)" replaced by:
 	spawnChildObject(0x079be6, 0x00, 0, -18)
-	spawnChildObject(0x079c0c, 0x02, -21, 1)
+	spawnChildObject(0x079c0c, 0x02, -21, 1)		// Robotnik head
 }
 
 
@@ -470,8 +470,7 @@ function void fn079b7e()
 function void fn079b96()
 {
 	MoveWithParent()
-	A1 = 0x07a1c7
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07a1c7)
 	DrawObject()
 }
 
@@ -491,8 +490,7 @@ function void fn079bac()
 //# address-hook(0x079bca) end(0x079be0)
 function void fn079bca()
 {
-	A1 = 0x07a1d8
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07a1d8)
 	objA0.velocity.y -= 0x10
 	UpdateMovementStraightSimple()
 	DrawObject()
@@ -538,14 +536,14 @@ function void fn079c1c()
 	MoveAndFlipWithParent()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.animation.sprite = 0x0f
+	objA0.animation.sprite = 0x0f		// Normal face
 	if (u8[A1 + 0x2a] & 0x40)
 	{
-		objA0.animation.sprite = 0x10
+		objA0.animation.sprite = 0x10		// Damage face
 	}
 	else if (u8[A1 + 0x2a] & 0x80)
 	{
-		objA0.animation.sprite = 0x11
+		objA0.animation.sprite = 0x11		// Defeat face
 	}
 
 	fn08498c()
@@ -584,7 +582,7 @@ function void fn079ec4()
 function void fn079ee6()
 {
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06
@@ -615,7 +613,7 @@ function void fn079f58()
 			u8[0xffffeec6] = 0xff
 
 			// "spawnSimpleChildObjects(0x083fee)" replaced by:
-			spawnSimpleChildObjects(0x083d84, 1)
+			spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x04

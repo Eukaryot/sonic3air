@@ -534,13 +534,13 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 
 				// Directly drawing the cord sprites
 				if (objA0.animation.sprite == 0x14)
-					Renderer.drawVdpSprite(px-4, py+16, 0x03, 0x035c, renderQueue)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, (sprite_attribute.PALETTE.LINE2 | 0x035c), renderQueue)
 				if (objA0.animation.sprite == 0x15)
-					Renderer.drawVdpSprite(px-4, py+16, 0x03, 0x0360, renderQueue)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, (sprite_attribute.PALETTE.LINE2 | 0x0360), renderQueue)
 				if (objA0.animation.sprite == 0x16)
-					Renderer.drawVdpSprite(px-4, py+16, 0x03, (sprite_attribute.FLIP_X | 0x035c), renderQueue)
+					Renderer.drawVdpSprite(px-4, py+16, 0x03, (sprite_attribute.FLIP_X | sprite_attribute.PALETTE.LINE2 | 0x035c), renderQueue)
 
-				return true        // skip hardware drawing the original balloon
+				return true        // Skip hardware drawing the original balloon
 			}
 
 			// Elemental Shields + Insta-Shield

@@ -20,7 +20,7 @@ function void Boss.AIZ1.BaseUpdate()
 	//  - 0x068a6e	-> objA0.base_state = 0x02	-> Waiting until character reaches the right position
 	//  - 0x068574	-> objA0.base_state = 0x04	-> Short wait time
 	//  - 0x068aba	-> objA0.base_state = 0x06	-> Flying down or up
-	//  - 0x0685fc	-> objA0.base_state = 0x08	-> Flame thrower (plus rockets in Knuckles' fight)
+	//  - 0x0685fc	-> objA0.base_state = 0x08	-> Flamethrower (plus rockets in Knuckles' fight)
 	//  - 0x068b1c	-> objA0.base_state = 0x0a	-> Short wait time before flying up
 	//  - 0x068b68	-> objA0.base_state = 0x0c	-> Short wait time before flying left/right or down again
 	//  - 0x068bbc	-> objA0.base_state = 0x0e	-> Flying left/right
@@ -75,13 +75,14 @@ function void fn068a94()
 	fn06859c()
 
 	// "spawnChildObjects(0x06905c)" replaced by:
-	spawnChildObject(0x0686be, 0x00, 0, 32)
-	spawnChildObject(0x06870a, 0x02, -36, 8)
+	spawnChildObject(0x0686be, 0x00, 0, 32)		// Exhaust flames
+	spawnChildObject(0x06870a, 0x02, -36, 8)	// Flamethrower nozzle
 
+	// Spawn rocket launchers
 	// "spawnChildObjects(0x069086)" replaced by:
-	spawnChildObject(0x068c12, 0x00, 0, -32)
-	spawnChildObject(0x068c12, 0x02, 9, -28)
-	spawnChildObject(0x068c12, 0x04, 18, -24)
+	spawnChildObject(0x068c12, 0x00, 0, -32)	// Left
+	spawnChildObject(0x068c12, 0x02, 9, -28)	// Middle
+	spawnChildObject(0x068c12, 0x04, 18, -24)	// Right
 }
 
 
@@ -111,6 +112,7 @@ function void fn068ade()
 	objA0.countdown_value = 0x1e
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
+		// Launch rockets in Knuckles' fight
 		objA0.flags38 |= 0x02
 	}
 }
@@ -123,6 +125,7 @@ function void fn068afe()
 	objA0.value39 = 8
 	playSound(0x4f)
 
+	// Spawn flamethrower flames
 	// "spawnChildObjects(0x0690b6)" replaced by:
 	spawnChildObject(0x0688f4, 0x00, -100, 4)
 	spawnChildObject(0x0688f4, 0x02, -84, 4)
@@ -137,11 +140,13 @@ function void fn068b1c()
 	fn08486e()
 	if (_equal() || D1.s16 >= 0)
 	{
+		// Wait
 		UpdateMovementStraightSimple()
 		Enemy.DrawDynamicObject()
 	}
 	else
 	{
+		// Fly up
 		fn068b34()
 	}
 }
@@ -152,7 +157,7 @@ function void fn068b34()
 {
 	objA0.base_state = 0x06
 	objA0.countdown_value = 0x5f
-	objA0.flags38 ^= 0x04
+	objA0.flags38 ^= 0x04		// Flip vertical movement direction
 	if ((objA0.flags38 & 0x04) == 0)
 	{
 		objA0.velocity.y = 0x100
@@ -200,7 +205,7 @@ function void fn068b92()
 	objA0.base_state = 0x0e
 	objA0.value39 = 0x04
 	objA0.countdown_callback = 0x068bdc
-	objA0.flags38 ^= 0x08
+	objA0.flags38 ^= 0x08		// Flip horizontal movement direction
 	objA0.velocity.x = (objA0.flags38 & 0x08) ? -0x100 : 0x100
 	fn0685e2()
 }
@@ -212,10 +217,12 @@ function void fn068bbc()
 	fn08486e()
 	if (_equal())
 	{
+		// Wait
 		UpdateMovementStraightSimple()
 	}
 	else
 	{
+		// Fly down
 		A1 = objA0.countdown_callback
 		call A1
 	}
@@ -246,6 +253,7 @@ function void fn068c02()
 {
 	fn085ba8()
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x06910c)" replaced by:
 	spawnChildObject(0x068e98, 0x00, -16, -8)
 	spawnChildObject(0x068e98, 0x02, 12, -16)
@@ -299,9 +307,10 @@ function void fn068c64()
 	objA0.countdown_callback = 0x068c84
 	u32[A0 + 0x30] = 0x069136
 
+	// Spawn rocket
 	// "spawnChildObjects(0x0690a8)" replaced by:
-	spawnChildObject(0x06880a, 0x00, 0, 4)
-	spawnChildObject(0x068c96, 0x02, 0, 4)
+	spawnChildObject(0x06880a, 0x00, 0, 4)		// Rocket exhaust flame
+	spawnChildObject(0x068c96, 0x02, 0, 4)		// Rocket
 }
 
 
@@ -492,7 +501,7 @@ function void fn068dd8()
 //# address-hook(0x068dee) end(0x068df4)
 function void fn068dee()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Enemy.DrawDynamicObject()
 }
 
@@ -624,7 +633,7 @@ function void Boss.AIZ1.RegularUpdate()
 		objA0.velocity.y = 0
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x10
@@ -660,6 +669,7 @@ function void fn069482()
 	objA0.update_address = addressof(Object.CountdownAndTrigger)
 	objA0.flags38 |= 0x10
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x069d66)" replaced by:
 	spawnChildObject(0x069a3a, 0x00, -16, -16)
 	spawnChildObject(0x069a3a, 0x02, 16, -16)
@@ -699,8 +709,7 @@ function void fn0686e8()
 
 
 
-// Update of the three rocket launchers
-// (not sure if the first two functions are part of them as well)
+// Flamethrower nozzle
 
 //# address-hook(0x06870a) end(0x06871a)
 function void fn06870a()
@@ -719,6 +728,8 @@ function void fn068720()
 }
 
 
+// Update of the three rocket launchers + lid 
+
 //# address-hook(0x06872c) end(0x068740)
 function void fn06872c()
 {
@@ -726,9 +737,9 @@ function void fn06872c()
 
 	// Targets:
 	//  - 0x068754	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x06875e	-> objA0.base_state = 0x02  -> Waiting while blimb flying in from above
+	//  - 0x06875e	-> objA0.base_state = 0x02  -> Waiting while blimp flies in from above
 	//  - 0x06877e	-> objA0.base_state = 0x04  -> Closed
-	//  - 0x06879c	-> objA0.base_state = 0x06  -> Opening / Opened
+	//  - 0x06879c	-> objA0.base_state = 0x06  -> Opening / Opened the lid
 	//  - 0x0687dc	-> objA0.base_state = 0x08  -> Shooting rockets
 	//  - 0x06879c	-> objA0.base_state = 0x0a  -> Closing again (same function as state 0x06!)
 	//  - 0x068572	-> objA0.base_state = 0x0c  -> Inactive (empty function)
@@ -784,7 +795,7 @@ function void fn06878c()
 //# address-hook(0x06879c) end(0x06879c)
 function void fn06879c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -808,14 +819,14 @@ function void fn0687b6()
 	if (objA0.value39 == 1)
 	{
 		// "spawnChildObjects(0x0690a8)" replaced by:
-		spawnChildObject(0x06880a, 0x00, 0, 4)
-		spawnChildObject(0x068c96, 0x02, 0, 4)
+		spawnChildObject(0x06880a, 0x00, 0, 4)		// Rocket exhaust flame
+		spawnChildObject(0x068c96, 0x02, 0, 4)		// Rocket
 	}
 	else
 	{
 		// "spawnChildObjects(0x06909a)" replaced by:
-		spawnChildObject(0x06880a, 0x00, 0, 4)
-		spawnChildObject(0x068844, 0x02, 0, 4)
+		spawnChildObject(0x06880a, 0x00, 0, 4)		// Rocket exhaust flame
+		spawnChildObject(0x068844, 0x02, 0, 4)		// Rocket
 	}
 }
 
@@ -840,6 +851,8 @@ function void fn068802()
 	objA0.base_state = 0x0c
 }
 
+
+// Rocket exhaust flame
 
 //# address-hook(0x06880a) end(0x06881e)
 function void fn06880a()
@@ -929,7 +942,7 @@ function void fn0688b0()
 
 
 
-// Flame thrower
+// Flamethrower flames
 
 //# address-hook(0x0688f4) end(0x068904)
 function void fn0688f4()
@@ -964,7 +977,7 @@ function void fn068928()
 //# address-hook(0x068956) end(0x06895c)
 function void fn068956()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Enemy.DrawDynamicObject()
 }
 
@@ -1015,7 +1028,7 @@ function void fn0689ac()
 //# address-hook(0x0689f8) end(0x068a16)
 function void fn0689f8()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.s16 > 0)
 	{
 		D0.u16 = u16[0x068a18 + D0.s16]

@@ -325,8 +325,7 @@ function void fn081dcc()
 	D0 = u32[A0 + 0x30]
 	if (D0 != 0)
 	{
-		A1 = D0
-		fn0845a0()
+		Object.AnimationProgress.DistinctTimer(D0)
 	}
 	fn082c86()
 
@@ -339,7 +338,7 @@ function void fn081dcc()
 		u32[A0 + 0x18] = u32[0x081e1c + D0.s16]
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04
@@ -394,8 +393,8 @@ function void fn0824f4()
 	playSound(0x81)
 
 	// "spawnChildObjects(0x083294)" replaced by:
-	spawnChildObject(0x082588, 0x00, 8, 0)
-	spawnChildObject(0x0825bc, 0x02, -24, 0)
+	spawnChildObject(0x082588, 0x00, 8, 0)		// Fat rocket faces
+	spawnChildObject(0x0825bc, 0x02, -24, 0)	// Rocket exhaust flames
 }
 
 
@@ -457,8 +456,7 @@ function void fn08259a()
 		objA0.sprite_priority = 0x0100
 	}
 
-	A1 = 0x0832c3
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0832c3)
 
 	MoveWithParent()
 	fn084920()
@@ -587,14 +585,14 @@ function void fn08303e()
 	u16[A0 + 0x44] = 0x40
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x0e
 	}
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x0e
@@ -633,7 +631,7 @@ function void fn08307c()
 	else
 	{
 		// "spawnSimpleChildObjects(0x08328e)" replaced by:
-		spawnSimpleChildObjects(0x08249a, 4)
+		spawnSimpleChildObjects(0x08249a, 4)		// Fat rockets
 	}
 }
 

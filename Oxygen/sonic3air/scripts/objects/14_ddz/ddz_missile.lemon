@@ -236,8 +236,7 @@ function void fn0821c2()
 {
 	objA0.position.x.u16 -= u16[0xfffffaae]
 
-	A1 = 0x0832b4
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0832b4)
 
 	UpdateMovementStraightSimple()
 	DrawOrUnloadObject()
@@ -423,7 +422,7 @@ function void fn082b84()
 	objA0.countdown_callback = 0x085088
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x06

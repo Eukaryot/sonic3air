@@ -77,7 +77,7 @@ function void fn08fb4c()
 //# address-hook(0x08fb70) end(0x08fb70)
 function void fn08fb70()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 

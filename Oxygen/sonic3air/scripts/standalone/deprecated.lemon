@@ -413,26 +413,6 @@ function void fn05937e()
 	InitLevelScrolling.DEZ1()
 }
 
-function void fn084464()
-{
-	Object.AnimationProgressByLocalA1.CheckFlipX()
-}
-
-function void fn084498()
-{
-	Object.AnimationProgressByLocalA1.CheckFlipY()
-}
-
-function void fn084700()
-{
-	Object.AnimationProgressByLocalA1.SpeedUp()
-}
-
-function void fn084780()
-{
-	Object.AnimationProgressByLocalA1.SlowDown()
-}
-
 function bool fn084fa4()
 {
 	return SetupObjectAttributesSlotted()

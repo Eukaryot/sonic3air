@@ -326,7 +326,7 @@ function void fn067704()
 	copyMemory(0xfffffc60, 0x067aaa, 0x20)
 
 	// "spawnSimpleChildObjects(0x067a7e)" replaced by:
-	spawnSimpleChildObjects(0x067900, 7)
+	spawnSimpleChildObjects(0x067900, 7)		// Dropped emeralds
 
 	Object.TriggerUnloading()
 }
@@ -350,8 +350,8 @@ function void fn06777a()
 	Kosinski.addToDMAQueue(0x387ca6, 0xb620)	// Chaos Emeralds (for later)
 
 	// "spawnChildObjects(0x067a62)" replaced by:
-	spawnChildObject(0x067824, 0x00, 56, 4)
-	spawnChildObject(0x067862, 0x02, 24, 24)
+	spawnChildObject(0x067824, 0x00, 56, 4)			// Plane propeller blades
+	spawnChildObject(0x067862, 0x02, 24, 24)		// Plane belly rocket
 }
 
 
@@ -461,7 +461,7 @@ function void AIZIntro.WaveEffect.Update()
 	{
 		D0.u16 = u16[A1 + 0x40]
 		objA0.position.x.u16 -= D0.u16
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		DrawObject()
 	}
 	else
@@ -654,7 +654,7 @@ function void fn061dbe()
 	fn065dd6()
 
 	// "spawnChildObjects(0x06659a)" replaced by:
-	spawnChildObject(0x061f60, 0x00, 0, 24)
+	spawnChildObject(0x061f60, 0x00, 0, 24)			// Cork floor
 }
 
 

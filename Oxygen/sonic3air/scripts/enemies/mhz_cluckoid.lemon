@@ -73,8 +73,7 @@ function void fn08e1e2()
 		fn08e2d4()
 	}
 
-	A1 = 0x08e418
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x08e418)
 }
 
 

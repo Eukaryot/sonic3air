@@ -155,14 +155,13 @@ function void fn063526()
 			}
 		}
 
-		Object.animationProgress(0x0668c3)
+		Object.animationProgress(0x0668c3)		// Cutscene Knuckles chilling animation
 	}
 	else
 	{
 		objA0.base_state = 0x04
 		objA0.animation.sprite = 0x04
-		A1 = 0x0668c7
-		fn084580()
+		Object.ResetAnimationProgress(0x0668c7)		// Cutscene Knuckles getting up animation data
 	}
 }
 
@@ -172,13 +171,13 @@ function void fn063562()
 {
 	if ((u8[0xfffffab8] & 0x02) == 0)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 
 	objA0.base_state = 0x06
 	objA0.value42 = 0x02
-	objA0.animation.sprite = 0x8d
+	objA0.animation.sprite = 0x8d		// Cutscene Knuckles hurt frame
 	objA0.velocity.x = -0x100
 	objA0.velocity.y = -0x100
 
@@ -220,15 +219,14 @@ function void fn0635c8()
 	objA0.base_state = 0x0a
 	objA0.countdown_callback = 0x0635fc
 
-	A1 = 0x0668d0
-	fn084580()
+	Object.ResetAnimationProgress(0x0668d0)		// Cutscene Knuckles unconscious, getting up, shaking head to shaking fist animation data
 }
 
 
 //# address-hook(0x0635f6) end(0x0635f6)
 function void fn0635f6()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -241,8 +239,7 @@ function void fn0635fc()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 
 #if STANDALONE
 	// Create the object that fades out the Knuckles theme and starts the level music afterwards
@@ -263,7 +260,7 @@ function void fn063620()
 		objA0.velocity.x += 0x0c
 	}
 	UpdateMovementStraightSimple()
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 
 	u16 pointToReach = camera.position.x.u16 + 0x0180
 #if STANDALONE

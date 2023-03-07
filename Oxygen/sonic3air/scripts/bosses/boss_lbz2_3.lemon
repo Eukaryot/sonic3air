@@ -62,7 +62,7 @@ function void fn0742a8()
 	Kosinski.addToDMAQueue(0x376874, 0x7b20)		// Big Arm sprites
 
 	// "spawnChildObjects(0x068184)" replaced by:
-	spawnChildObject(0x067cd2, 0x00, 0, -28)
+	spawnChildObject(0x067cd2, 0x00, 0, -28)		// Robotnik head
 }
 
 
@@ -497,6 +497,7 @@ function void fn0746d8()
 	objA0.animation.sprite = 5
 	objA0.flags38 |= 0x10
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x07515e)" replaced by:
 	spawnChildObject(0x074d14, 0x00, -12, -44)
 	spawnChildObject(0x074d14, 0x02, 20, -44)
@@ -598,7 +599,7 @@ function void fn074768()
 	objA0.flags38 &= ~0x20
 
 	// "spawnChildObjects(0x068184)" replaced by:
-	spawnChildObject(0x067cd2, 0x00, 0, -28)
+	spawnChildObject(0x067cd2, 0x00, 0, -28)		// Robotnik head
 }
 
 
@@ -621,7 +622,7 @@ function void fn0747d6()
 	fn0685e2()
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
-	spawnChildObject(0x068062, 0x00, 30, 0)
+	spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 
 	DrawObject()
 }
@@ -1325,7 +1326,7 @@ function void fn074e30()
 	objA0.countdown_callback = 0x074e70
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04
@@ -1424,7 +1425,7 @@ function void fn074fd2()
 		AddScoreForBossEnemy()
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

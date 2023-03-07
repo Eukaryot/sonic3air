@@ -293,7 +293,7 @@ function void fn024356()
 
 		A1 = 0xffffb04a
 		D0.u8 = u8[A0 + 0x3f]
-		D6 = 6		// object.flag.P1_PUSHING
+		D6 = 6		// object.flag.P2_PUSHING
 		fn02438a()
 	}
 
@@ -306,7 +306,7 @@ function void fn024356()
 function void fn02438a()
 {
 	// Pushable?
-	if ((D3 & (1 << D6)) && (D2.u16 >= objA1.position.x.u16) && (D0 & 0x20))
+	if ((D3 & (1 << D6)) && (D2.u16 >= objA1.position.x.u16) && (D0 & char.flag.PUSHING))
 	{
 		--u16[A0 + 0x3a]
 		if (s16[A0 + 0x3a] < 0)

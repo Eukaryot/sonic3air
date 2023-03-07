@@ -19,13 +19,13 @@ function void fn086540()
 
 	// Targets:
 	//  - 0x08657a	-> objA0.base_state = 0x00		-> Initialization
-	//  - 0x0865d0	-> objA0.base_state = 0x02
-	//  - 0x08661e	-> objA0.base_state = 0x04
-	//  - 0x086626	-> objA0.base_state = 0x06
+	//  - 0x0865d0	-> objA0.base_state = 0x02		-> Normal update, check for opening
+	//  - 0x08661e	-> objA0.base_state = 0x04		-> Opening, Countdown and trigger level results
+	//  - 0x086626	-> objA0.base_state = 0x06		-> Opened, Regain player control after results
 	//  - 0x08662a	-> objA0.base_state = 0x08		-> Flying down, then hovering
-	//  - 0x0866ba	-> objA0.base_state = 0x0a
-	//  - 0x0866cc	-> objA0.base_state = 0x0c
-	//  - 0x0866da	-> objA0.base_state = 0x0e
+	//  - 0x0866ba	-> objA0.base_state = 0x0a		-> Opening, hovering in place
+	//  - 0x0866cc	-> objA0.base_state = 0x0c		-> Opened, hovering in place
+	//  - 0x0866da	-> objA0.base_state = 0x0e		-> About to fly away
 	//  - 0x0866ec	-> objA0.base_state = 0x10		-> Opening, flying away
 	//  - 0x086716	-> objA0.base_state = 0x12		-> Opened, flying away
 	call tableLookupAddress(0x086566, objA0.base_state)
@@ -47,11 +47,13 @@ function void fn08657a()
 
 	if ((objA0.render_flags & render_flag.FLIP_Y) == 0)
 	{
+		// Right-side up, standing capsule
 		// "spawnChildObjects(0x086b5c)" replaced by:
-		spawnChildObject(0x08671c, 0x00, 0, -36)
+		spawnChildObject(0x08671c, 0x00, 0, -36)		// Capsule unlock button
 	}
 	else
 	{
+		// Upside down, flying capsule
 		objA0.base_state = 0x08
 		D0.u16 = camera.position.x.u16 + 160
 		objA0.position.x.u16 = D0.u16
@@ -61,11 +63,11 @@ function void fn08657a()
 		fn0685e2()
 
 		// "spawnChildObjects(0x086b64)" replaced by:
-		spawnChildObject(0x08675c, 0x00, 0, 36)
+		spawnChildObject(0x08675c, 0x00, 0, 36)			// Capsule unlock button, flipped
 
 		// "spawnChildObjects(0x086b6c)" replaced by:
-		spawnChildObject(0x086802, 0x00, -20, -36)
-		spawnChildObject(0x086802, 0x02, 20, -36)
+		spawnChildObject(0x086802, 0x00, -20, -36)		// Propeller blades on the left
+		spawnChildObject(0x086802, 0x02, 20, -36)		// Propeller blades on the right
 	}
 }
 
@@ -92,10 +94,11 @@ function void fn0865de()
 	#endif
 	}
 
-	objA0.animation.sprite = 1
+	objA0.animation.sprite = 1		// Opened capsule
 	objA0.countdown_value = 0x40
 	level.capsule_opened = 0xff
 
+	// Spawn opened capsule giblets
 	// "spawnChildObjects(0x086b7a)" replaced by:
 	spawnChildObject(0x0867d6, 0x00, 0, -8)
 	spawnChildObject(0x0867d6, 0x02, -16, -8)
@@ -103,6 +106,7 @@ function void fn0865de()
 	spawnChildObject(0x0867d6, 0x06, -24, -8)
 	spawnChildObject(0x0867d6, 0x08, 24, -8)
 
+	// Spawn escaped critters
 	// "spawnChildObjects(0x086b9a)" replaced by:
 	spawnChildObject(0x086820, 0x00, 0, -4)
 	spawnChildObject(0x086820, 0x02, -8, -4)
@@ -115,7 +119,7 @@ function void fn0865de()
 	spawnChildObject(0x086820, 0x10, 4, -4)
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 	u8[A1 + 0x2c] = 0x08
 }
@@ -221,7 +225,7 @@ function void fn08662a()
 	D0.u16 = camera.position.y.u16 + ((global.zone == 0x02) ? 0x20 : 0x40)
 	s16 difference = D0.u16 - objA0.position.y.u16
 #if STANDALONE
-	// Don't apply change if close to the target height already, and decend slightly faster
+	// Don't apply change if close to the target height already, and descend slightly faster
 	if (abs(difference > 4))
 		objA0.position.y += (difference <= 0) ? -0x5000 : 0x5000
 #else
@@ -305,6 +309,8 @@ function void fn086716()
 }
 
 
+// Unlock button for flying animal capsule 
+
 //# address-hook(0x08675c) end(0x08676c)
 function void fn08675c()
 {
@@ -334,9 +340,10 @@ function void fn086770()
 		if (D0.u16 != 0)
 		{
 			A1 = 0xffff0000 + D0.u16
+			debugLog(stringformat("A1 = 0x%06x", A1))
 			if (objA1.velocity.y < 0)
 			{
-				active = (u8[A1 + 0x20] == 0x02 || u8[A1 + 0x38] == 0x01)
+				active = (u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x38] == CHARACTER_TAILS)
 			}
 		}
 
@@ -440,6 +447,7 @@ function void fn086a7a()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (objA1.render_flags & render_flag.FLIP_Y)
 	{
+		// Flying critters spawned from a flying capsule
 		objA0.update_address = 0x08689c
 		u8[A0 + 0x43] += 0x08
 		objA0.velocity.y = 0
@@ -447,27 +455,44 @@ function void fn086a7a()
 
 	D0.u16 &= 0x02
 	D2.u16 = D0.u16
-	if (global.zone_act == 0x0400)
-		D2.u16 += 0x04
+	if (global.zone_act == 0x0400)		// In Flying Battery Act 1?
+		D2.u16 += 0x04		// Use a different VRAM index entry
 
 	objA0.sprite_attributes = u16[0x086b16 + D2.s16]
+
+	// Decides the two critter's movement pattern for each zone
+	// Targets:
+	// Flicky, chicken		-> global.zone = 0x00	-> AIZ
+	// Rabbit, seal			-> global.zone = 0x01	-> HCZ
+	// Flicky, chicken		-> global.zone = 0x02	-> MGZ
+	// Rabbit, flicky		-> global.zone = 0x03	-> CNZ
+	// Squirrel, flicky		-> global.zone = 0x04	-> FBZ
+	// Penguin, seal		-> global.zone = 0x05	-> ICZ
+	// Flicky, chicken		-> global.zone = 0x06	-> LBZ
+	// Squirrel, chicken	-> global.zone = 0x07	-> MHZ
+	// Rabbit, chicken		-> global.zone = 0x08	-> SOZ
+	// Flicky, chicken		-> global.zone = 0x09	-> LRZ
+	// Rabbit, chicken		-> global.zone = 0x0a	-> SSZ
+	// Squirrel, chicken	-> global.zone = 0x0b	-> DEZ
+	// Squirrel, chicken	-> global.zone = 0x0c	-> DDZ
+	// Flicky, chicken		-> global.zone = 0x0d	-> Outro S/T
 	D2 = global.zone * 2
 	A1 = 0x02c7ba + D2.u16
-
 	D0.u16 >>= 1
 	D0.u8 = u8[A1 + D0.s16]
 	D0.u16 <<= 3
+
 	A2 = 0x02c7ea
 	objA0.mapping_offset = u32[A2 + D0.s16 + 0x04]
 
+	// Timer is longer for higher subtypes
 	D1.u16 <<= 2
 	objA0.countdown_value = D1.u16
-	A1 = 0xffff0000 + u16[A0 + 0x46]
 
+	// Set movement direction based on critter's position relative to capsule
+	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0.u16 = objA0.position.x.u16
-	D1.u16 = 0x0200
-	if (D0.u16 < objA1.position.x.u16)
-		D1.s16 = -D1.s16
+	D1.s16 = (D0.u16 < objA1.position.x.u16) ? -0x0200 : 0x0200
 	objA0.velocity.x = D1.u16
 	fn086b1e()
 }
@@ -621,7 +646,7 @@ function void fn08683e()
 
 
 
-// The small flame
+// The small exhaust flame from the ship
 
 //# address-hook(0x068062) end(0x068072)
 function void fn068062()

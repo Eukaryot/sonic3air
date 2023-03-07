@@ -85,14 +85,15 @@ function void fn06e4f2()
 	fn0685e2()
 
 	// "spawnChildObjects(0x0681a4)" replaced by:
-	spawnChildObject(0x067f5c, 0x00, 0, -8)
+	spawnChildObject(0x067f5c, 0x00, 0, -8)			// Egg Mobile
 	if (_equal())
 	{
+		// Top part of the cockpit
 		u8[A1 + 0x2c] = 0x09
 	}
 
 	// "spawnChildObjects(0x06edcc)" replaced by:
-	spawnChildObject(0x06e82c, 0x00, 0, 20)
+	spawnChildObject(0x06e82c, 0x00, 0, 20)		// The center green ball
 
 	// "spawnIdenticalChildObjects(0x06edd4)" replaced by:
 	spawnChildObjects(0x06e95a, 0, 8, 4)		// Rotating green orbs
@@ -213,6 +214,7 @@ function void fn06e632()
 	objA0.countdown_value = 0xff
 	objA0.countdown_callback = 0x06e650
 
+	// Spawn electric bolts hitting the dropped green orb
 	// "spawnChildObjects(0x06ede4)" replaced by:
 	spawnChildObject(0x06eada, 0x00, -12, 84)
 	spawnChildObject(0x06eada, 0x02, 12, 84)
@@ -279,6 +281,7 @@ function void fn06e6c6()
 	objA0.flags38 |= 0x10
 	objA0.countdown_callback = 0x06e6e4
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x06ee00)" replaced by:
 	spawnChildObject(0x06ebac, 0x00, -20, 0)
 	spawnChildObject(0x06ebac, 0x02, 20, 0)
@@ -437,7 +440,7 @@ function void fn06e82c()
 	//  - 0x06e8a2	-> objA0.base_state = 0x04  -> Falling & bouncing
 	//  - 0x06e8e8	-> objA0.base_state = 0x06  -> Standing still
 	//  - 0x06e8fe	-> objA0.base_state = 0x08  -> Flickering while charging
-	//  - 0x06e920	-> objA0.base_state = 0x0a  -> Waiting while Robotnik decends
+	//  - 0x06e920	-> objA0.base_state = 0x0a  -> Waiting while Robotnik descends
 	call tableLookupAddress(0x06e844, objA0.base_state)
 
 	fn06ed22()
@@ -530,7 +533,7 @@ function void fn06e8fe()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x08)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 
@@ -623,7 +626,7 @@ function void fn06e9e2()
 	{
 		D0.u8 = u8[A0 + 0x40]
 		u8[A0 + 0x3c] += D0.u8
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		Object.CountdownAndTrigger()
 	}
 	else
@@ -631,7 +634,7 @@ function void fn06e9e2()
 		objA0.base_state = 0x06
 
 		// "spawnChildObjects(0x06eddc)" replaced by:
-		spawnChildObject(0x06eada, 0x00, 0, 76)
+		spawnChildObject(0x06eada, 0x00, 0, 76)		// Orbiting electric bolts
 
 		u8[A1 + 0x2c] = objA0.subtype2c
 	}
@@ -654,7 +657,7 @@ function void fn06ea26()
 	{
 		D0.u8 = u8[A0 + 0x40]
 		u8[A0 + 0x3c] += D0.u8
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 	else
 	{
@@ -671,7 +674,7 @@ function void fn06ea5c()
 {
 	D0.u8 = u8[A0 + 0x40]
 	u8[A0 + 0x3c] += D0.u8
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -695,7 +698,7 @@ function void fn06ea70()
 //# address-hook(0x06ea92) end(0x06eab0)
 function void fn06ea92()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	++u8[A0 + 0x3c]
 	if (u8[A0 + 0x3c] == objA0.value3a)
 	{
@@ -710,7 +713,7 @@ function void fn06eab2()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x38] & 0x08)
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 		return
 	}
 
@@ -904,6 +907,7 @@ function void fn06ed22()
 
 	objA0.update_address = addressof(UnloadObject)
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x06edf2)" replaced by:
 	spawnChildObject(0x06e936, 0x00, -8, 0)
 	spawnChildObject(0x06e936, 0x02, 8, 0)

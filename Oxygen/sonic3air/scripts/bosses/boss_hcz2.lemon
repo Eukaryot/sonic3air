@@ -12,6 +12,7 @@
 function void fn06aeb6()
 {
 #if STANDALONE
+	// Skip boss in Time Attack
 	if (Game.isTimeAttack())
 	{
 		UnloadObject()
@@ -84,9 +85,10 @@ function void fn06af32()
 	objA0.countdown_callback = 0x06af80
 
 	// "spawnChildObjects(0x06bdec)" replaced by:
-	spawnChildObject(0x067e28, 0x00, 0, 12)
+	spawnChildObject(0x067e28, 0x00, 0, 12)		// Egg Mobile
 	if (_equal())
 	{
+		// Full body with the glass dome
 		u8[A1 + 0x2c] = 0x05
 	}
 
@@ -1418,6 +1420,6 @@ function void fn067e46()
 	if (u8[A1 + 0x38] & 0x10)
 	{
 		objA0.base_state = 0x06
-		objA0.animation.sprite = 5
+		objA0.animation.sprite = 5		// Egg mobile full body with the glass dome
 	}
 }

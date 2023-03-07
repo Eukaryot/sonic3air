@@ -241,8 +241,7 @@ function void fn076bf4()
 {
 	UpdateMovementStraightSimple()
 
-	A1 = 0x07745d
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07745d)
 
 	if (D2.s16 > 0)
 	{
@@ -338,7 +337,7 @@ function void fn076ca2()
 //# address-hook(0x076cce) end(0x076cee)
 function void fn076cce()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.s16 > 0)
 	{
 		objA0.value39 = objA0.animation.sprite
@@ -424,7 +423,7 @@ function void fn076d28()
 function void fn076d7c()
 {
 	--objA0.countdown_value
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	if (D2.s16 > 0)
 	{
 		D0.u8 = objA0.animation.sprite
@@ -445,7 +444,7 @@ function void fn076da8()
 function void fn076db0()
 {
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.s16 > 0)
 	{
 		objA0.value39 = objA0.animation.sprite
@@ -788,8 +787,7 @@ function void fn0770c4()
 //# address-hook(0x0770da) end(0x0770e4)
 function void fn0770da()
 {
-	A1 = 0x07749b
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07749b)
 	DrawObject()
 }
 
@@ -892,7 +890,7 @@ function void fn0772f6()
 		move_area.right = camera.position.x.u16 + getScreenExtend() * 2
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

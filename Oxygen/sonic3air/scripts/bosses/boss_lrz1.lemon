@@ -148,15 +148,14 @@ function void fn078606()
 	objA0.velocity.y = -0x400
 	playSound(0x95)
 
-	A1 = 0x078de2
-	fn084580()
+	Object.ResetAnimationProgress(0x078de2)
 }
 
 
 //# address-hook(0x078628) end(0x078660)
 function void fn078628()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn07867c()
 	UpdateMovementStraightSimple()
 
@@ -216,8 +215,7 @@ function void fn0786bc()
 	objA0.collision_attributes = (collision.flag.THREAT | collision.size.40x32)
 	objA0.countdown_callback = 0x0786ea
 
-	A1 = 0x078df1
-	fn084580()
+	Object.ResetAnimationProgress(0x078df1)
 }
 
 
@@ -225,7 +223,7 @@ function void fn0786bc()
 function void fn0786da()
 {
 	objA0.position.y.u16 += 4
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	AddAsDynamicObject()
 }
 
@@ -272,8 +270,7 @@ function void fn07873a()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0x0400
 
-	A1 = 0x078df8
-	fn084580()
+	Object.ResetAnimationProgress(0x078df8)
 	fn08594e()
 }
 
@@ -281,7 +278,7 @@ function void fn07873a()
 //# address-hook(0x078768) end(0x0787ac)
 function void fn078768()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (objA0.animation.frame < 6)
 	{
 		fn078c14()
@@ -331,6 +328,7 @@ function void fn0787e0()
 		objA1.update_address = 0x078aa8
 	}
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x078d9e)" replaced by:
 	spawnChildObject(0x078a70, 0x00, 0, -12)
 	spawnChildObject(0x078a70, 0x02, -25, -12)
@@ -737,7 +735,7 @@ function void fn078b86()
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 6
@@ -794,6 +792,7 @@ function void fn078c14()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
 		fn078c60()
 		return
 	}
@@ -826,7 +825,7 @@ function void fn078c60()
 	objA0.countdown_callback = 0x0787e0
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 	fn08594e()
 	AddScoreForBossEnemy()
@@ -864,6 +863,7 @@ function void fn078cf4()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
 		A1 = 0xffff0000 + u16[A0 + 0x44]
 		D0.u16 = (objA0.render_flags & render_flag.FLIP_X) ? 7 : 6
 		u8[A1 + 0x38] |= (1 << D0.u8)
@@ -881,7 +881,7 @@ function void fn078cf4()
 		playSound(0x6e)
 
 		// "spawnSimpleChildObjects(0x078d98)" replaced by:
-		spawnSimpleChildObjects(0x078a28, 1)
+		spawnSimpleChildObjects(0x078a28, 1)		// Damage flashing sprite
 	}
 
 	--objA0.state

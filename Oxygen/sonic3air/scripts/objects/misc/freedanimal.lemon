@@ -16,15 +16,36 @@
 function void FreedAnimal.BaseUpdate()
 {
 	// Targets:
-	//  - 0x02c8b8	-> objA0.base_state = 0x00
-	//  - 0x02c9e0	-> objA0.base_state = 0x02
-	//  - 0x02ca3c	-> objA0.base_state = 0x04
-	//  - 0x02ca7c	-> objA0.base_state = 0x06
-	//  - 0x02ca3c	-> objA0.base_state = 0x08
-	//  - 0x02ca3c	-> objA0.base_state = 0x0a
-	//  - 0x02ca7c	-> objA0.base_state = 0x0e
-	//  - 0x02ca3c	-> objA0.base_state = 0x10
-	//  - 0x02cb02	-> objA0.base_state = 0x1c
+	//  - 0x02c8b8	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x02c9e0	-> objA0.base_state = 0x02	-> Regular update
+	//  - 0x02ca3c	-> objA0.base_state = 0x04	-> Rabbit
+	//  - 0x02ca7c	-> objA0.base_state = 0x06	-> Chicken
+	//  - 0x02ca3c	-> objA0.base_state = 0x08	-> Penguin
+	//  - 0x02ca3c	-> objA0.base_state = 0x0a	-> Seal
+	//  - 0x02ca3c	-> objA0.base_state = 0x0c	-> Pig
+	//  - 0x02ca7c	-> objA0.base_state = 0x0e	-> Flicky
+	//  - 0x02ca3c	-> objA0.base_state = 0x10	-> Squirrel
+
+	// These are leftover critter entries from Sonic 2:
+	//  - 0x02ca7c	-> objA0.base_state = 0x12	-> Eagle
+	//  - 0x02ca3c	-> objA0.base_state = 0x14	-> Mouse
+	//  - 0x02ca3c	-> objA0.base_state = 0x16	-> Monkey
+	//  - 0x02ca3c	-> objA0.base_state = 0x18	-> Turtle
+	//  - 0x02ca3c	-> objA0.base_state = 0x1a	-> Bear
+
+	// The rest of these seem like leftovers from Sonic 1:
+	//  - 0x02cb02	-> objA0.base_state = 0x1c	-> Escaped from capsule
+	//  - 0x02cb24	-> objA0.base_state = 0x1e	-> Chicken following Sonic
+	//  - 0x02cb24	-> objA0.base_state = 0x20	-> Flicky following Sonic
+	//  - 0x02cb44	-> objA0.base_state = 0x22	-> Flicky jumping in place
+	//  - 0x02cb80	-> objA0.base_state = 0x24	-> Rabbit following Sonic
+	//  - 0x02cbdc	-> objA0.base_state = 0x26	-> Rabbit jumping in place
+	//  - 0x02cbfc	-> objA0.base_state = 0x28	-> Penguin jumping back and forth
+	//  - 0x02cbdc	-> objA0.base_state = 0x2a	-> Penguin jumping in place
+	//  - 0x02cbfc	-> objA0.base_state = 0x2c	-> Seal jumping back and forth
+	//  - 0x02cbdc	-> objA0.base_state = 0x2e	-> Pig jumping in place
+	//  - 0x02cc3c	-> objA0.base_state = 0x30	-> Chicken jumping back and forth
+	//  - 0x02cb9c	-> objA0.base_state = 0x32	-> Squirrel jumping back and forth
 	call tableLookupAddress(0x02c786, objA0.base_state)
 }
 
@@ -38,17 +59,34 @@ function void fn02c8b8()
 
 	if (objA0.subtype2c != 0)
 	{
+		// Decide which critter to spawn based on subtype, seems like a leftover all the way from Sonic 1's ending
+		// Targets:
+		// Flicky		-> objA0.subtype2c = 0x0f
+		// Flicky		-> objA0.subtype2c = 0x10
+		// Flicky		-> objA0.subtype2c = 0x11
+		// Rabbit		-> objA0.subtype2c = 0x12
+		// Rabbit		-> objA0.subtype2c = 0x13
+		// Penguin		-> objA0.subtype2c = 0x14
+		// Penguin		-> objA0.subtype2c = 0x15
+		// Seal			-> objA0.subtype2c = 0x16
+		// Pig			-> objA0.subtype2c = 0x17
+		// Chicken		-> objA0.subtype2c = 0x18
+		// Squirrel		-> objA0.subtype2c = 0x19
 		D0 = objA0.subtype2c * 2
+
+		// These two lines are not adjusted to account for the extra critter entries from Sonic 2, which leads to broken behavior
 		objA0.base_state = D0.u8
 		D0.u16 -= 0x14
+
 		objA0.sprite_attributes = u16[0x02c8a2 + D0.s16]
 		objA0.mapping_offset = u32[0x02c876 + D0.s16 * 2]
 
 		A1 = 0x02c84a
-		objA0.value32 = u16[A1 + D0.s16]
+		u16[A0 + 0x32] = u16[A1 + D0.s16]			// Used in calculating horizontal velocity
 		objA0.velocity.x = u16[A1 + D0.s16]
-		u16[A0 + 0x34] = u16[A1 + D0.s16 + 2]
+		u16[A0 + 0x34] = u16[A1 + D0.s16 + 2]		// Used in calculating vertical velocity
 		objA0.velocity.y = u16[A1 + D0.s16 + 2]
+
 		objA0.hitbox_extends.y = 12
 		objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 		objA0.sprite_priority = 0x300
@@ -58,19 +96,38 @@ function void fn02c8b8()
 	else
 	{
 		objA0.base_state += 2
+
+		// Randomly decide which critter to spawn
 		D0.u16 = getRandomNumber() & 0x01
 		objA0.sprite_attributes = (D0.u16 == 0) ? 0x0580 : 0x0592
 
+		// Decides the two critter's movement pattern for each zone
+		// Targets:
+		// Flicky, chicken		-> global.zone = 0x00	-> AIZ
+		// Rabbit, seal			-> global.zone = 0x01	-> HCZ
+		// Flicky, chicken		-> global.zone = 0x02	-> MGZ
+		// Rabbit, flicky		-> global.zone = 0x03	-> CNZ
+		// Squirrel, flicky		-> global.zone = 0x04	-> FBZ
+		// Penguin, seal		-> global.zone = 0x05	-> ICZ
+		// Flicky, chicken		-> global.zone = 0x06	-> LBZ
+		// Squirrel, chicken	-> global.zone = 0x07	-> MHZ
+		// Rabbit, chicken		-> global.zone = 0x08	-> SOZ
+		// Flicky, chicken		-> global.zone = 0x09	-> LRZ
+		// Rabbit, chicken		-> global.zone = 0x0a	-> SSZ
+		// Squirrel, chicken	-> global.zone = 0x0b	-> DEZ
+		// Squirrel, chicken	-> global.zone = 0x0c	-> DDZ
+		// Flicky, chicken		-> global.zone = 0x0d	-> Outro S/T
 		D1 = global.zone * 2 + D0.u16
 		D0.u8 = u8[0x02c7ba + D1.s16]
 		u8[A0 + 0x30] = D0.u8
 		D0.u16 <<= 3
 
 		A1 = 0x02c7ea + D0.u16
-		objA0.value32 = u16[(A1+=2)-2]
-		u16[A0 + 0x34] = u16[(A1+=2)-2]
+		objA0.value32 = u16[(A1+=2)-2]		// Used in calculating horizontal velocity
+		u16[A0 + 0x34] = u16[(A1+=2)-2]		// Used in calculating vertical velocity
 		objA0.mapping_offset = u32[(A1+=4)-4]
-		objA0.hitbox_extends.y = 0x0c
+
+		objA0.hitbox_extends.y = 12
 		objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 		objA0.sprite_priority = 0x300
 		objA0.box_size.x = 8
@@ -79,6 +136,7 @@ function void fn02c8b8()
 		objA0.velocity.y = -0x400
 		if (objA0.flags38 == 0)
 		{
+			// Broken free from a badnik
 			if (allocDynamicObjectStd())
 			{
 				// Spawn floating points display
@@ -91,6 +149,7 @@ function void fn02c8b8()
 		}
 		else
 		{
+			// Escaping from a capsule, another Sonic 1 leftover?
 			objA0.base_state = 0x1c
 			objA0.velocity.x = 0
 		}
@@ -122,6 +181,7 @@ function void fn02c9e0()
 				objA0.base_state = u8[A0 + 0x30] * 2 + 4
 				if (objA0.flags38 != 0 && global.framecounter & 0x10)
 				{
+					// Change movement direction for some critters escaping from capsule
 					objA0.velocity.x = -objA0.velocity.x
 					objA0.render_flags ^= render_flag.FLIP_X
 				}
@@ -228,7 +288,7 @@ function void fn02cae4()
 //# address-hook(0x02cb02) end(0x02cb1e)
 function void fn02cb02()
 {
-	if (s8[A0 + 0x04] >= 0)
+	if (s8(objA0.render_flags) >= 0)
 	{
 		fn02c9da()
 		return

@@ -62,7 +62,7 @@ function void fn073906()
 #endif
 
 	// "spawnChildObjects(0x07414c)" replaced by:
-	spawnChildObject(0x073e0e, 0x00, 0, -8)
+	spawnChildObject(0x073e0e, 0x00, 0, -8)		// Robotnik head, Egg Mobile empty seat
 	spawnChildObject(0x073ea2, 0x02, -24, -112)
 
 	requestLoadingPatterns(0x77)		// Robotnik running + ship and boss explosion sprites
@@ -636,6 +636,8 @@ function void fn073dea()
 }
 
 
+// Robotnik head
+
 //# address-hook(0x073e0e) end(0x073e22)
 function void fn073e0e()
 {
@@ -666,7 +668,7 @@ function void fn073e3a()
 	if (u8[A1 + 0x38] & 0x80)
 	{
 		objA0.base_state = 0x04
-		objA0.animation.sprite = 0
+		objA0.animation.sprite = 0		// Normal face
 		u32[A0 + 0x30] = 0x0741f0
 	}
 }
@@ -678,12 +680,12 @@ function void fn073e5e()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A1 + 0x2a] & 0x40)
 	{
-		objA0.animation.sprite = 2
+		objA0.animation.sprite = 2		// Damage face
 	}
 	else if (u8[A1 + 0x2a] & 0x80)
 	{
 		objA0.base_state = 0x06
-		objA0.animation.sprite = 3
+		objA0.animation.sprite = 3		// Defeat face
 	}
 	else
 	{
@@ -842,7 +844,7 @@ function void fn073fe2()
 			objA0.countdown_callback = 0x073a6a
 
 			// "spawnChildObjects(0x083fee)" replaced by:
-			spawnChildObject(0x083d84, 0x00, 0, 0)
+			spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x04

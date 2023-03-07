@@ -39,8 +39,8 @@ function void fn089394()
 	setupObjectAttributesFull(0x089454)
 
 	// "spawnChildObjects(0x08946c)" replaced by:
-	spawnChildObject(0x0893e8, 0x00, 0, 16)
-	spawnChildObject(0x08942e, 0x02, 0, 3)
+	spawnChildObject(0x0893e8, 0x00, 0, 16)		// Lightbulb
+	spawnChildObject(0x08942e, 0x02, 0, 3)		// Eyes
 }
 
 
@@ -63,8 +63,9 @@ function void fn0893a4()
 //# address-hook(0x0893cc) end(0x0893e2)
 function void fn0893cc()
 {
-	Object.animationProgress(0x08947a)
+	Object.animationProgress(0x08947a)		// Wing flapping animation
 
+	// Movement towards player position
 	A1 = 0xffffb000
 	D0.u16 = 0x0200
 	D1 = 8
@@ -111,8 +112,7 @@ function void fn08940c()
 //# address-hook(0x089426) end(0x08942a)
 function void fn089426()
 {
-	A1 = 0x089480
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x089480)		// Lightbulb flashing animation
 }
 
 

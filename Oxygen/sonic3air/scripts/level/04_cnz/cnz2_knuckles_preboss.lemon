@@ -12,6 +12,7 @@
 function void fn0624de()
 {
 #if STANDALONE
+	// Skip Knuckles in Time Attack
 	if (Game.isTimeAttack())
 	{
 		UnloadObject()

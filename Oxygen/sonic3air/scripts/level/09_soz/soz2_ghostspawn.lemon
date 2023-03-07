@@ -127,8 +127,7 @@ function void fn08f11e()
 			objA0.update_address = 0x08f37a
 			objA0.countdown_callback = 0x08f16a
 
-			A1 = 0x08f6bf
-			fn084580()
+			Object.ResetAnimationProgress(0x08f6bf)
 
 			playSound(0x8a)
 		}
@@ -167,7 +166,7 @@ function void fn08f1ac()
 	fn08f538()
 	playSound(0x92)
 
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.u16 != 0)
 	{
 		if (u8[0xfffff7c3] == 5)	// That's the final light state
@@ -192,7 +191,7 @@ function void fn08f1f4()
 //# address-hook(0x08f1fe) end(0x08f224)
 function void fn08f1fe()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 	fn08f4f0()
@@ -208,7 +207,7 @@ function void fn08f1fe()
 //# address-hook(0x08f226) end(0x08f264)
 function void fn08f226()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn0847e6()
 	if (D3.u16 == 0)
 	{
@@ -241,7 +240,7 @@ function void fn08f26e()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 	fn08f4f0()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (!_equal())
 	{
 		if (objA0.animation.frame == 2)
@@ -254,7 +253,7 @@ function void fn08f26e()
 			A1 = u32[0x08f2b2 + D0.s16]
 			objA0.animation.sprite = u8[A1]
 
-			fn084580()
+			Object.ResetAnimationProgress()
 		}
 	}
 }
@@ -266,7 +265,7 @@ function void fn08f2be()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 	fn08f4f0()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.u16 != 0)
 	{
 		objA0.base_state = 0x04
@@ -280,7 +279,7 @@ function void fn08f2be()
 //# address-hook(0x08f2e0) end(0x08f320)
 function void fn08f2e0()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn0847e6()
 	UpdateMovementStraightSimple()
 
@@ -307,7 +306,7 @@ function void fn08f2e0()
 //# address-hook(0x08f322) end(0x08f36c)
 function void fn08f322()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	--objA0.countdown_value
 	if (objA0.countdown_value >= 0)
 		return
@@ -325,7 +324,7 @@ function void fn08f322()
 //# address-hook(0x08f36e) end(0x08f374)
 function void fn08f36e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 }
 
@@ -333,7 +332,7 @@ function void fn08f36e()
 //# address-hook(0x08f37a) end(0x08f38a)
 function void fn08f37a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.loadSpritePatterns(0x08f67a)
 	DrawObject()
 }
@@ -379,7 +378,7 @@ function void fn08f3f6()
 	objA0.subtype2c = 0x03
 
 	// "spawnChildObjects(0x08f646)" replaced by:
-	spawnChildObject(0x08f438, 0x00, 0, -36)
+	spawnChildObject(0x08f438, 0x00, 0, -36)			// Capsule unlock button
 
 	bool isCapsuleOpen = (checkpoint.number != 0 || isMainCharacter(CHARACTER_KNUCKLES) || !isGhostSpawnEnabled())
 	if (isCapsuleOpen)

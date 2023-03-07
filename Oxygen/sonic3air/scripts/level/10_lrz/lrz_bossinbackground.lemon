@@ -303,7 +303,7 @@ function void fn0791fe()
 	objA0.position.y.u16 += 0x18
 
 	// "spawnSimpleChildObjects(0x083fee)" replaced by:
-	spawnSimpleChildObjects(0x083d84, 1)
+	spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 
 	if (objA0.subtype2c != 0)
 	{
@@ -437,7 +437,7 @@ function void fn07939c()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	objA0.position.x.u16 = objA1.position.x.u16
 	objA0.position.y.u16 = objA1.position.y.u16
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn084920()
 }
 
@@ -458,8 +458,7 @@ function void fn0793a8()
 //# address-hook(0x0793c6)
 function void fn0793c6()
 {
-	A1 = 0x0796b9
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0796b9)
 
 	objA0.velocity.y -= 0x10
 	UpdateMovementStraightSimple()

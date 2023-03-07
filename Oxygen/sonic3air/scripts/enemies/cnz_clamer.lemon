@@ -42,7 +42,7 @@ function void fn088fdc()
 		return
 
 	// "spawnChildObjects(0x089148)" replaced by:
-	spawnChildObject(0x08908c, 0x00, 0, -8)
+	spawnChildObject(0x08908c, 0x00, 0, -8)		// Bouncy shell hitbox
 }
 
 
@@ -68,8 +68,7 @@ function void fn088fec()
 			}
 		}
 
-		A1 = 0x089170
-		fn0845a0()
+		Object.AnimationProgress.DistinctTimer(0x089170)		// Shell clacking animation
 	}
 	else
 	{
@@ -101,13 +100,12 @@ function void fn089056()
 //# address-hook(0x089064) end(0x089088)
 function void fn089064()
 {
-	A1 = 0x089185
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x089185)		// Shooting animation
 
 	if (D2.u16 != 0 && objA0.animation.sprite == 8 && objA0.render_flags & render_flag.VISIBLE)
 	{
 		// "spawnProjectileChildObjectsInDir(0x089150)" replaced by:
-		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -16, 2, -512, 0, 0x08913c, 0x000000, addressof(UpdateMovementStraightSimple))
+		spawnProjectileChildObjectInDir(0x086d4a, 0x00, -16, 2, -512, 0, 0x08913c, 0x000000, addressof(UpdateMovementStraightSimple))		// Spike ball
 	}
 }
 
@@ -154,11 +152,11 @@ function void fn0890c8()
 function void fn0890d8()
 {
 	D0.u16 = 0x0800
-	u8[A1 + 0x2a] &= ~0x01
+	u8[A1 + 0x2a] &= ~render_flag.FLIP_X
 	if (objA0.render_flags & render_flag.FLIP_X)
 	{
 		D0.s16 = -D0.s16
-		u8[A1 + 0x2a] |= 0x01
+		u8[A1 + 0x2a] |= render_flag.FLIP_X
 	}
 	u8[A1 + 0x05] = 0x02
 	objA1.position.y.u16 += 6

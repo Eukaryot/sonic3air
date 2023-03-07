@@ -75,8 +75,8 @@ function void fn075220()
 	objA0.hitbox_extends.y = 0x18
 
 	// "spawnChildObjects(0x075e84)" replaced by:
-	spawnChildObject(0x0757c0, 0x00, 0, 0)
-	spawnChildObject(0x0757c0, 0x02, 0, 0)
+	spawnChildObject(0x0757c0, 0x00, 0, 0)			// Exhaust flame
+	spawnChildObject(0x0757c0, 0x02, 0, 0)			// Exhaust flame
 
 	if (allocDynamicObjectStd())
 	{
@@ -97,7 +97,7 @@ function void fn075220()
 //# address-hook(0x0752d4) end(0x0752e0)
 function void fn0752d4()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 	Object.CountdownAndTrigger()
 }
@@ -129,7 +129,7 @@ function void fn075302()
 //# address-hook(0x07531c) end(0x07532a)
 function void fn07531c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn08486e()
 	if (_equal())
 	{
@@ -253,7 +253,7 @@ function void fn07541a()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (!_equal())
 	{
 		if (objA0.animation.frame == 0x0a)
@@ -334,7 +334,7 @@ function void fn0754d6()
 //# address-hook(0x0754e0) end(0x075506)
 function void fn0754e0()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (!_equal())
 	{
 		if (objA0.animation.sprite == 0x12)
@@ -365,7 +365,7 @@ function void fn075508()
 //# address-hook(0x075532) end(0x075562)
 function void fn075532()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 
 	if (objA0.velocity.y >= 0)
@@ -435,7 +435,7 @@ function void fn07560c()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (!_equal())
 	{
 		if (objA0.animation.frame == 0x0a)
@@ -460,7 +460,7 @@ function void fn07565c()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -509,7 +509,7 @@ function void fn075708()
 //# address-hook(0x0756c6) end(0x0756fa)
 function void fn0756c6()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 
 	D0.u16 = camera.position.y.u16 + 0x30
@@ -526,7 +526,7 @@ function void fn0756c6()
 //# address-hook(0x0756fc) end(0x075702)
 function void fn0756fc()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -534,7 +534,7 @@ function void fn0756fc()
 //# address-hook(0x07571c) end(0x07579e)
 function void fn07571c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	D0.u16 = objA0.velocity.y - 0x48
 	if (D0.s16 >= -0x700)
 	{
@@ -670,7 +670,7 @@ function void fn07589e()
 			fn0758be()
 		}
 	}
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -718,7 +718,7 @@ function void fn075924()
 //# address-hook(0x07592a) end(0x075930)
 function void fn07592a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -798,7 +798,7 @@ function void fn075986()
 			return
 		}
 	}
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -902,7 +902,7 @@ function void fn075a94()
 				if (D0.u8 < 5)
 				{
 					// "spawnSimpleChildObjects(0x075e98)" replaced by:
-					spawnSimpleChildObjects(0x075ad4, 1)
+					spawnSimpleChildObjects(0x075ad4, 1)		// Log
 				}
 			}
 		}
@@ -1025,11 +1025,12 @@ function void fn075d80()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
 		objA0.update_address = 0x085668
 		objA0.countdown_callback = 0x0757ba
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x10

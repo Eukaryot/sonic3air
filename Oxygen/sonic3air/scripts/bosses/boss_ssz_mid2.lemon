@@ -58,7 +58,7 @@ function void fn07a6a6()
 //# address-hook(0x07a712) end(0x07a718)
 function void fn07a712()
 {
-	objA0.update_address = 0x07a71a
+	objA0.update_address = 0x07a71a		// Egg Mobile
 }
 
 
@@ -81,7 +81,7 @@ function void fn07a72c()
 	objA0.sprite_priority = 0x0180
 	objA0.position.x.u16 = 0x1700
 	objA0.position.y.u16 = 0x0300
-	objA0.animation.sprite = 0x0a
+	objA0.animation.sprite = 0x0a		// Egg Mobile full body
 	objA0.base_state += 2
 	objA0.collision_attributes = collision.size.16x24
 	boss.remaining_hits = 8
@@ -103,7 +103,7 @@ function void fn07a72c()
 	objA0.value3a = 0x27
 
 	// "spawnChildObjects(0x0681bc)" replaced by:
-	spawnChildObject(0x067d0a, 0x00, 0, -32)
+	spawnChildObject(0x067d0a, 0x00, 0, -32)		// Mecha Sonic head
 
 	if (allocDynamicObjectStd())
 	{
@@ -516,15 +516,15 @@ function void fn07ab56()
 		u16[0xfffffafc] = 0x1e
 
 		// "spawnChildObjects(0x07ab80)" replaced by:
-		spawnChildObject(0x07ab8e, 0x00, -12, -4)
-		spawnChildObject(0x07ab8e, 0x02, -24, -4)
+		spawnChildObject(0x07ab8e, 0x00, -12, -4)		// Laser beam tail
+		spawnChildObject(0x07ab8e, 0x02, -24, -4)		// Laser beam head
 	}
 }
 
 
 
-// Laser beam
 
+// Laser beam
 
 //# address-hook(0x07ab8e) end(0x07abbc)
 function void fn07ab8e()
@@ -537,6 +537,7 @@ function void fn07ab8e()
 	D0 = 0
 	if (objA0.subtype2c != 0)
 	{
+		// Set as beam tail
 		D0 = 8
 		objA0.animation.sprite = 0x0c
 		objA0.sprite_priority = 0x0100
@@ -655,7 +656,7 @@ function void fn07acf2()
 		objA0.flags38 = 0
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x04

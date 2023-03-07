@@ -30,9 +30,13 @@ function void AIZ_ForegroundDeco.Init()
 	D0.u16 = (objA0.subtype2c >> 2) & 0x3c
 
 	// Can be e.g.:
+	//  - 0x02c26a
+	//  - 0x02c270
 	//  - 0x02c2a6
 	//  - 0x02c2dc
 	//  - 0x02c312
+	//  - 0x02c348
+	//  - 0x02c37a
 	objA0.update_address = u32[0x02c24e + D0.u16]
 }
 
@@ -45,6 +49,18 @@ function void AIZ_ForegroundDeco_shared(u8 shift)
 	objA0.position.y.u16 = py + (s16(py - camera.position.y.u16 - 112) >> shift)
 
 	DrawOrUnloadObjectAtPosition(px)
+}
+
+//# address-hook(0x02c26a) end(0x02c26a)
+function void fn2c26a()
+{
+	DrawOrUnloadObject()
+}
+
+//# address-hook(0x02c270) end(0x02c2a0)
+function void AIZ_ForegroundDeco0_Update()
+{
+	AIZ_ForegroundDeco_shared(4)
 }
 
 //# address-hook(0x02c2a6) end(0x02c2d6)
@@ -66,7 +82,19 @@ function void AIZ_ForegroundDeco3_Update()
 }
 
 //# address-hook(0x02c348) end(0x02c374)
-function void fn02c348()
+//# alias(fn02c348) deprecated
+function void AIZ_ForegroundDeco4_Update()
 {
 	AIZ_ForegroundDeco_shared(0)
+}
+
+//# address-hook(0x02c37a) end(0x02c3a8)
+function void fn02c37a()
+{
+	u32 px = u16[A0 + 0x30]
+	u32 py = u16[A0 + 0x32]
+	objA0.position.x.u16 = px + (s16(px - camera.position.x.u16 - 160) * 2)
+	objA0.position.y.u16 = py + (s16(py - camera.position.y.u16 - 112))
+
+	DrawOrUnloadObjectAtPosition(px)
 }

@@ -281,13 +281,16 @@ function void fn08ff8c()
 		return
 
 	u8[A0 + 0x29] = 0
+
+	// A1 is assigned 0xb000, 0xf604 for D0.u16 == 1 or D0.u16 == 3,
+	//            and 0xb04a, 0xf606 for D0.u16 == 2
 	A1 = 0x08ffd0 + (D0.u8 & 0x03) * 4
 	A2 = 0xffff0000 + u16[(A1+=2)-2]
 	if (u8[A2 + 0x20] == char.state.ROLLING || u8[A2 + 0x2b] & char.bonus.SHIELD_BUBBLE)
 		return
 
 	u16[A0 + 0x44] = A2.u16
-	A2 = 0xffff0000 + u16[(A1+=2)-2]
+	A2 = 0xffff0000 + u16[(A1+=2)-2]		// Address of "control.pad1" or "control.pad2"
 	objA0.value3e = A2.u16
 	u16[A0 + 0x3a] = u16[A2]
 	objA0.base_state = 0x08

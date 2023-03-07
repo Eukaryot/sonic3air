@@ -193,7 +193,6 @@ function void fn08780a()
 function void fn08782c()
 {
 	MoveAndFlipWithParent()
-	A1 = 0x0878a8
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0878a8)
 	fn084920()
 }

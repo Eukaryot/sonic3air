@@ -59,13 +59,13 @@ function void fn06eea8()
 	loadPaletteLine1(0x06fac0)
 
 	// "spawnChildObjects(0x06fa76)" replaced by:
-	spawnChildObject(0x06f10e, 0x00, -16, -8)
-	spawnChildObject(0x06f10e, 0x02, 16, -8)
-	spawnChildObject(0x06f10e, 0x04, 0, -8)
-	spawnChildObject(0x06efda, 0x06, 0, -36)
-	spawnChildObject(0x06f060, 0x08, 0, -8)
-	spawnChildObject(0x06f178, 0x0a, 0, 0)
-	spawnChildObject(0x06f178, 0x0c, 0, 0)
+	spawnChildObject(0x06f10e, 0x00, -16, -8)		// Window hiding the eyes
+	spawnChildObject(0x06f10e, 0x02, 16, -8)		// Window hiding the eyes
+	spawnChildObject(0x06f10e, 0x04, 0, -8)			// Window hiding the eyes
+	spawnChildObject(0x06efda, 0x06, 0, -36)		// Capsule button
+	spawnChildObject(0x06f060, 0x08, 0, -8)			// Eyes
+	spawnChildObject(0x06f178, 0x0a, 0, 0)			// Left arm
+	spawnChildObject(0x06f178, 0x0c, 0, 0)			// Right arm
 }
 
 
@@ -123,7 +123,7 @@ function void fn06ef76()
 	objA0.flags38 &= ~0x80
 
 	// "spawnChildObjects(0x06faa8)" replaced by:
-	spawnChildObject(0x06f0ce, 0x00, 0, -8)
+	spawnChildObject(0x06f0ce, 0x00, 0, -8)		// Eye flashing sprite
 }
 
 
@@ -149,8 +149,9 @@ function void fn06ef88()
 	fn085ba8()
 
 	// "spawnSimpleChildObjects(0x06fab0)" replaced by:
-	spawnSimpleChildObjects(0x06f74c, 1)
+	spawnSimpleChildObjects(0x06f74c, 1)			// Opened capsule
 
+	// Spawn escaped animals
 	// "spawnChildObjects(0x089ed0)" replaced by:
 	spawnChildObject(0x089ce2, 0x00, 0, -4)
 	spawnChildObject(0x089ce2, 0x02, 16, -4)
@@ -158,6 +159,7 @@ function void fn06ef88()
 	spawnChildObject(0x089ce2, 0x06, 28, -4)
 	spawnChildObject(0x089ce2, 0x08, -28, -4)
 
+	// Spawn boss giblets
 	// "spawnChildObjects(0x086b7a)" replaced by:
 	spawnChildObject(0x0867d6, 0x00, 0, -8)
 	spawnChildObject(0x0867d6, 0x02, -16, -8)
@@ -401,13 +403,14 @@ function void fn06f1a6()
 {
 	setupObjectAttributesBasic(0x06fa46)
 
-	D0.s16 = -0x0140
+	D0.s16 = -0x0140		// Offset the shoulders to the right place
 	objA0.subtype2c -= 0x0a
 	if (objA0.subtype2c != 0)
 	{
+		// Right arm goes the opposite way
 		D0.s16 = -D0.s16
 		objA0.render_flags |= render_flag.FLIP_X
-		objA0.countdown_value = 0x3f
+		objA0.countdown_value = 0x3f		// Delay the Right arm a bit
 	}
 	objA0.velocity.x = D0.s16
 	objA0.velocity.y = -0xd0
@@ -471,10 +474,8 @@ function void fn06f240()
 	objA0.flags38 &= ~0x08
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	u8[A1 + 0x38] &= ~0x02
-	objA0.flags38 &= ~0x02
-	u8[A1 + 0x38] &= ~0x40
-	objA0.flags38 &= ~0x40
+	u8[A1 + 0x38] &= ~0x42
+	objA0.flags38 &= ~0x42
 	objA0.countdown_value = 120
 	objA0.countdown_callback = 0x06f2a8
 	u8[A0 + 0x3c] = 0xa0
@@ -1268,7 +1269,7 @@ function void fn06f994()
 			objA0.flags2a |= 0x80
 
 			// "spawnChildObjects(0x083fee)" replaced by:
-			spawnChildObject(0x083d84, 0x00, 0, 0)
+			spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 			AddScoreForBossEnemy()
 			return

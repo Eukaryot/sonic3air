@@ -21,22 +21,22 @@ function void fn062112()
 		return
 	}
 
-	#if STANDALONE
-		// In time attack, skip this cutscene and trigger the bridge now
-		if (Game.isTimeAttack())
-		{
-			level.trigger08 = 0xff
-			UnloadObject()
-			return
-		}
+#if STANDALONE
+	// In time attack, skip this cutscene and trigger the bridge now
+	if (Game.isTimeAttack())
+	{
+		level.trigger08 = 0xff
+		UnloadObject()
+		return
+	}
 
-		// Slightly change the cutscene area via ROM manipulation
-		u16[0x062154] = 0x38b0
-		u16[0x062156] = 0x38f0
+	// Slightly change the cutscene area via ROM manipulation
+	u16[0x062154] = 0x38b0
+	u16[0x062156] = 0x38f0
 
-		// There is this one chunk visible with broken palette, replace it
-		u8[0xffff8849] = 0xb2
-	#endif
+	// There is this one chunk visible with broken palette, replace it
+	u8[0xffff8849] = 0xb2
+#endif
 
 	A1 = 0x062150
 	if (InitBoss(0x062124))

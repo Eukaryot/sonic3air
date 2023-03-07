@@ -600,18 +600,18 @@ function void ItemEffect.Init()
 	objA0.animation.sprite = D0.u8
 
 	// Targets:
-	//  - 0x01dbba	-> D0 = 0x00
-	//  - 0x01dbc2	-> D0 = 0x01
-	//  - 0x01dbd0	-> D0 = 0x02
-	//  - 0x01dbde	-> D0 = 0x03
-	//  - 0x01dbec	-> D0 = 0x04
-	//  - 0x01dbfa	-> D0 = 0x05
-	//  - 0x01dc08	-> D0 = 0x06
-	//  - 0x01dc16	-> D0 = 0x07
-	//  - 0x01dc24	-> D0 = 0x08
-	//  - 0x01dc32	-> D0 = 0x09
-	//  - 0x01dc40	-> D0 = 0x0a
-	//  - 0x01dc4e	-> D0 = 0x0b
+	//  - 0x01dbba	-> D0 = 0x00	-> Static 1
+	//  - 0x01dbc2	-> D0 = 0x01	-> Static 2
+	//  - 0x01dbd0	-> D0 = 0x02	-> Extra Life
+	//  - 0x01dbde	-> D0 = 0x03	-> Robotnik
+	//  - 0x01dbec	-> D0 = 0x04	-> Rings
+	//  - 0x01dbfa	-> D0 = 0x05	-> Speed Shoes
+	//  - 0x01dc08	-> D0 = 0x06	-> Fire Shield
+	//  - 0x01dc16	-> D0 = 0x07	-> Lightning Shield
+	//  - 0x01dc24	-> D0 = 0x08	-> Water Shield
+	//  - 0x01dc32	-> D0 = 0x09	-> Invincibility
+	//  - 0x01dc40	-> D0 = 0x0a	-> "S"
+	//  - 0x01dc4e	-> D0 = 0x0b	-> Broken
 	A1 = tableLookupAddress(0x01dba2, D0 * 2)
 	A1 += 2
 	objA0.mapping_offset = A1
@@ -687,16 +687,16 @@ function void ItemEffect.UpdateDefaultInternal()
 #endif
 	{
 		// Targets:
-		//  - 0x01d890	-> objA0.base_state = 0x00
-		//  - 0x01d898	-> objA0.base_state = 0x01
-		//  - 0x01d890	-> objA0.base_state = 0x02
-		//  - 0x01d8ac	-> objA0.base_state = 0x03
-		//  - 0x01d90a	-> objA0.base_state = 0x04
-		//  - 0x01d954	-> objA0.base_state = 0x05
-		//  - 0x01d992	-> objA0.base_state = 0x06
-		//  - 0x01d9d0	-> objA0.base_state = 0x07
-		//  - 0x01da0e	-> objA0.base_state = 0x08
-		//  - 0x01da60	-> objA0.base_state = 0x09
+		//  - 0x01d890	-> objA0.state = 0x00	-> Static, works like Robotnik
+		//  - 0x01d898	-> objA0.state = 0x01	-> Extra Life
+		//  - 0x01d890	-> objA0.state = 0x02	-> Robotnik
+		//  - 0x01d8ac	-> objA0.state = 0x03	-> Rings
+		//  - 0x01d90a	-> objA0.state = 0x04	-> Speed Shoes
+		//  - 0x01d954	-> objA0.state = 0x05	-> Fire Shield
+		//  - 0x01d992	-> objA0.state = 0x06	-> Lightning Shield
+		//  - 0x01d9d0	-> objA0.state = 0x07	-> Water Shield
+		//  - 0x01da0e	-> objA0.state = 0x08	-> Invincibility
+		//  - 0x01da60	-> objA0.state = 0x09	-> "Super" monitor (debug only)
 		call tableLookupAddress(0x01d87c, objA0.state * 2)
 	}
 }

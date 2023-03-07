@@ -89,7 +89,7 @@ function void fn06852c()
 	objA0.countdown_callback = 0x06857a
 
 	// "spawnIdenticalChildObjects(0x06906a)" replaced by:
-	spawnChildObjects(0x068dfa, 0, 0, 6)
+	spawnChildObjects(0x068dfa, 0, 0, 6)		// Passing miniboss drones in the background
 
 	loadPaletteLine1(0x06917c)
 
@@ -128,13 +128,13 @@ function void fn06857a()
 	objA0.base_state = 0x06
 
 	// "spawnChildObjects(0x06905c)" replaced by:
-	spawnChildObject(0x0686be, 0x00, 0, 32)
-	spawnChildObject(0x06870a, 0x02, -36, 8)
+	spawnChildObject(0x0686be, 0x00, 0, 32)		// Exhaust flames
+	spawnChildObject(0x06870a, 0x02, -36, 8)	// Flamethrower nozzle
 
 	// "spawnChildObjects(0x069072)" replaced by:
-	spawnChildObject(0x06872c, 0x00, 0, -32)
-	spawnChildObject(0x06872c, 0x02, 9, -28)
-	spawnChildObject(0x06872c, 0x04, 18, -24)
+	spawnChildObject(0x06872c, 0x00, 0, -32)	// Rocket launcher
+	spawnChildObject(0x06872c, 0x02, 9, -28)	// Rocket launcher
+	spawnChildObject(0x06872c, 0x04, 18, -24)	// Rocket launcher
 
 	fn06859c()
 }
@@ -203,7 +203,7 @@ function void fn06862e()
 	objA0.countdown_callback = 0x068646
 
 	// "spawnChildObjects(0x069104)" replaced by:
-	spawnChildObject(0x083f22, 0x00, 0, 0)
+	spawnChildObject(0x083f22, 0x00, 0, 0)		// Random explosions during the mid-stage fire transition
 }
 
 

@@ -91,7 +91,7 @@ function void fn08a280()
 function void fn08a2e2()
 {
 	// "spawnSimpleChildObjects(0x08a430)" replaced by:
-	spawnSimpleChildObjects(0x08a20c, 9)
+	spawnSimpleChildObjects(0x08a20c, 9)		// Wall fragments
 
 	Object.TriggerUnloading()
 	playSound(SFX_COLLAPSE)

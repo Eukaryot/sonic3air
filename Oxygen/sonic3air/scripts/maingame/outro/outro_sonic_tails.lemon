@@ -620,8 +620,7 @@ function void fn05dca6()
 
 	if (objA0.position.x.u16 >= 0x0140 + getScreenExtend())
 	{
-		A1 = 0x060253
-		fn0845a0()
+		Object.AnimationProgress.DistinctTimer(0x060253)
 	}
 
 	if (objA0.position.x.u16 <= 0x0220 + getScreenExtend() * 2)
@@ -861,8 +860,7 @@ function void fn05e0f8()
 //# address-hook(0x05e142) end(0x05e16e)
 function void fn05e142()
 {
-	A1 = 0x066824
-	fn084512()
+	Object.AnimationProgress.CheckEnd(0x066824)		// Cutscene Knuckles walking animation
 
 	UpdateMovementStraightSimple()
 	if (objA0.position.x.u16 < 0x0120 + getScreenExtend())
@@ -1646,6 +1644,7 @@ function void fn05f0e2()
 	}
 	if (allocDynamicObjectStd())
 	{
+		// Spawn the Master Emerald
 		objA1.update_address = 0x05f8c6
 		u8[A1 + 0x2c] = 0x04
 	}
@@ -1729,6 +1728,7 @@ function void fn05f5de()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn sprite mask
 		u16[A1 + 0x46] = A1.u16
 		objA1.update_address = 0x0862b4
 		u16[A1 + 0x10] = 0x0120
@@ -1807,8 +1807,7 @@ function void fn05f6c4()
 //# address-hook(0x05f6da) end(0x05f6e4)
 function void fn05f6da()
 {
-	A1 = 0x0602a7
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0602a7)
 	DrawObject()
 }
 

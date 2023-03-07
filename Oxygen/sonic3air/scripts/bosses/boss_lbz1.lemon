@@ -444,7 +444,7 @@ function void fn072840()
 			objA0.countdown_callback = 0x072562
 
 			// "spawnChildObjects(0x083fee)" replaced by:
-			spawnChildObject(0x083d84, 0x00, 0, 0)
+			spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 			if (!isMainCharacter(CHARACTER_KNUCKLES))
 			{
@@ -742,5 +742,5 @@ function void fn08d0ae()
 	objA0.position.y.u16 = 0x0a20
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 }

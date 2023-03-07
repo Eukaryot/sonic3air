@@ -194,6 +194,9 @@ function void fn08813a()
 
 	u8[A0 + 0x29] = 0
 	D2.u16 = D0.u16 & 0x03
+
+	// A2 is assigned 0xb000, 0xf604 for D2.u16 == 1 or D2.u16 == 3,
+	//            and 0xb04a, 0xf606 for D2.u16 == 2
 	A2 = 0x0881e6 + D2.u16 * 4
 	A1 = 0xffff0000 + u16[(A2+=2)-2]
 	u16[A0 + 0x44] = A1.u16
@@ -216,7 +219,7 @@ function void fn08813a()
 		objA0.flags38 |= 0x04
 	}
 
-	A3 = 0xffff0000 + u16[(A2+=2)-2]
+	A3 = 0xffff0000 + u16[(A2+=2)-2]		// Address of "control.pad1" or "control.pad2"
 	objA0.value3e = A3.u16
 	u16[A0 + 0x46] = u16[A3]
 	objA0.base_state = 0x06

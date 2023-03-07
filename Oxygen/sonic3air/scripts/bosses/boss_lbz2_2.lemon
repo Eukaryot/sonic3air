@@ -32,6 +32,7 @@ function void fn0729ba()
 //# address-hook(0x0729de) end(0x072a4e)
 function void fn0729de()
 {
+	// Egg Mobile initialized as glass dome, other parts spawned after
 	setupObjectAttributesFull(0x0736cc)
 
 	boss.remaining_hits = 9
@@ -59,7 +60,7 @@ function void fn0729de()
 	}
 
 	// "spawnChildObjects(0x06817c)" replaced by:
-	spawnChildObject(0x067c38, 0x00, 0, -28)
+	spawnChildObject(0x067c38, 0x00, 0, -28)		// Robotnik head
 
 	// "spawnChildObjects(0x0737f0)" replaced by:
 	spawnChildObject(0x073164, 0x00, 0, -20)
@@ -785,9 +786,10 @@ function void fn0734fa()
 	{
 		// Note: This code in S3A is at 0x050194
 
+		// Boss beaten
 		AddScoreForBossEnemy_NoHudDirty()
 
-		objA0.animation.sprite = 5
+		objA0.animation.sprite = 5		// Egg mobile full body with the glass dome
 		objA0.flags2a |= 0x40
 		objA0.flags2a |= 0x80
 		u8[A0 + 0x28] = 0
@@ -795,7 +797,7 @@ function void fn0734fa()
 		objA0.flags38 |= (1 << D0.u8)
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 		u8[A1 + 0x2c] = 0x04
 
@@ -907,7 +909,7 @@ function void fn07361e()
 		}
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	}
 	else
 	{

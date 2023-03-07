@@ -44,6 +44,8 @@ function void Jawz.Update()
 		return
 	}
 
+	// A1 is assigned 0xffffb000 for D0.u16 == 1,
+	//            and 0xffffb04a for D0.u16 == 2 or D0.u16 == 3
 	A1 = 0xffff0000 + u16[0x087910 + D0.s16 * 2]
 	fn0857c2()
 	if (_equal())

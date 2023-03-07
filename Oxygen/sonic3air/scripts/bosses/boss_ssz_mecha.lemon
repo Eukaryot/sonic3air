@@ -81,7 +81,7 @@ function void fn07b2dc()
 		objA0.flags38 |= 0x04
 
 		// "spawnSimpleChildObjects(0x07d47a)" replaced by:
-		spawnSimpleChildObjects(0x07c902, 2)
+		spawnSimpleChildObjects(0x07c902, 2)		// Dash dust
 
 		BossMecha1.setBossArea()
 
@@ -106,7 +106,7 @@ function void fn07b2dc()
 	}
 
 	// "spawnSimpleChildObjects(0x07d474)" replaced by:
-	spawnSimpleChildObjects(0x07c9ba, 1)
+	spawnSimpleChildObjects(0x07c9ba, 1)		// Damaging spike hitbox
 
 	AllocDynamicObjectStd()
 }
@@ -181,7 +181,7 @@ function void fn07b41c()
 //# address-hook(0x07b44a) end(0x07b460)
 function void fn07b44a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 
 	if (objA0.position.x.u16 >= level.bossarea.right)
@@ -203,7 +203,7 @@ function void fn07b462()
 //# address-hook(0x07b478) end(0x07b47e)
 function void fn07b478()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -239,7 +239,7 @@ function void fn07b484()
 //# address-hook(0x07b4da) end(0x07b4e6)
 function void fn07b4da()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	MoveWithGravity20()
 	Object.TriggerOnGroundHit()
 }
@@ -272,7 +272,7 @@ function void fn07b4ec()
 //# address-hook(0x07b53e) end(0x07b53e)
 function void fn07b53e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -298,7 +298,7 @@ function void fn07b544()
 	objA0.flags38 |= 0x04
 
 	// "spawnSimpleChildObjects(0x07d486)" replaced by:
-	spawnSimpleChildObjects(0x07c8fe, 2)
+	spawnSimpleChildObjects(0x07c8fe, 2)		// Dash dust
 }
 
 
@@ -343,8 +343,7 @@ function void fn07b5c2()
 function void fn07b5e8()
 {
 	objA0.hitbox_extends.y = 0x0f
-	A1 = 0x07d54a
-	fn084580()
+	Object.ResetAnimationProgress(0x07d54a)
 
 	objA0.velocity.x = (getScreenWidth() - 64) * 2
 	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
@@ -362,7 +361,7 @@ function void fn07b5e8()
 //# address-hook(0x07b63a) end(0x07b67a)
 function void fn07b63a()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 	if (objA0.velocity.y < 0)
 		return
@@ -391,7 +390,7 @@ function void fn07b63a()
 //# address-hook(0x07b67c) end(0x07b694)
 function void fn07b67c()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	objA0.velocity.x += s16[A0 + 0x40]
 	UpdateMovementStraightSimple()
 
@@ -411,7 +410,7 @@ function void fn07b698()
 //# address-hook(0x07b6a0) end(0x07b6d8)
 function void fn07b6a0()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 
 	if (objA0.velocity.y >= 0)
@@ -431,7 +430,7 @@ function void fn07b6a0()
 //# address-hook(0x07b6da) end(0x07b6ea)
 function void fn07b6da()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 
 	A1 = 0x07b462
@@ -442,7 +441,7 @@ function void fn07b6da()
 //# address-hook(0x07b6ee) end(0x07b746)
 function void fn07b6ee()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0)
 	{
@@ -457,7 +456,7 @@ function void fn07b6ee()
 			playSound(0x96)
 
 			// "spawnSimpleChildObjects(0x07d480)" replaced by:
-			spawnSimpleChildObjects(0x07c902, 1)
+			spawnSimpleChildObjects(0x07c902, 1)		// Dash dust
 			if (_equal())
 			{
 				u8[A1 + 0x2c] = 0x08
@@ -470,7 +469,7 @@ function void fn07b6ee()
 //# address-hook(0x07b748) end(0x07b74e)
 function void fn07b748()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 }
 
@@ -489,7 +488,7 @@ function void fn07b754()
 //# address-hook(0x07b77e) end(0x07b78a)
 function void fn07b77e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementStraightSimple()
 	Object.CountdownAndTrigger()
 }
@@ -520,7 +519,7 @@ function void fn07b790()
 //# address-hook(0x07b7ba) end(0x07b7d2)
 function void fn07b7ba()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	objA0.velocity.x += s16[A0 + 0x40]
 	UpdateMovementStraightSimple()
 
@@ -551,7 +550,7 @@ function void fn07b7ec()
 //# address-hook(0x07b804) end(0x07b818)
 function void fn07b804()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0)
 	{
@@ -618,14 +617,13 @@ function void fn07b888()
 {
 	objA0.hitbox_extends.y = 0x23
 
-	A1 = 0x07d5e4
-	fn084580()
+	Object.ResetAnimationProgress(0x07d5e4)
 
 	A1 = 0x07d842
 	fn07c678()
 
 	// "spawnSimpleChildObjects(0x07d48c)" replaced by:
-	spawnSimpleChildObjects(0x07c948, 1)
+	spawnSimpleChildObjects(0x07c948, 1)		// Electric sparks
 
 	playSound(0x96)
 
@@ -677,7 +675,7 @@ function void fn07b888()
 function void fn07b93e()
 {
 	fn08598a()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 
@@ -729,8 +727,7 @@ function void fn07c902()
 //# address-hook(0x07c91c) end(0x07c942)
 function void fn07c91c()
 {
-	A1 = 0x07d65f
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x07d65f)		// Mecha Sonic dash dust animation
 	MoveAndFlipWithParent()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
@@ -933,6 +930,8 @@ function void fn07d312()
 	D0.u8 = boss.remaining_hits
 	if (D0.u8 == 0)
 	{
+		// Boss beaten
+
 		// Targets:
 		//  - 0x07d35a
 		//  - 0x07d39e
@@ -969,7 +968,7 @@ function void fn07d35a()
 	objA0.countdown_value = 0x7f
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x04

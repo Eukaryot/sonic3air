@@ -78,7 +78,7 @@ function void fn0643f2()
 function void fn064422()
 {
 	// Knuckles running to the right after he lost the fight
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 
 	D0.u16 = objA0.velocity.x + 0x10
 	if (D0.u16 < 0x0400)
@@ -99,15 +99,14 @@ function void fn064422()
 function void fn064450()
 {
 	objA0.base_state = 0x22
-	A1 = 0x066824
-	fn084580()
+	Object.ResetAnimationProgress(0x066824)		// Cutscene Knuckles walking animation data
 }
 
 
 //# address-hook(0x064460) end(0x064470)
 function void fn064460()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	if (u8[0xfffffab8] & 0x01)
 	{
 		fn06453c()
@@ -123,8 +122,7 @@ function void fn064472()
 	objA0.mapping_offset = 0x066f36
 	objA0.animation.sprite = 0x0a
 
-	A1 = 0x06687b
-	fn084580()
+	Object.ResetAnimationProgress(0x06687b)		// Cutscene Knuckles shaking fist animation data
 
 	u8[A0 + 0x0a] |= 0x80
 	objA0.position.x.u16 = 0x1620
@@ -138,6 +136,7 @@ function void fn064472()
 	}
 	if (allocDynamicObjectStd())
 	{
+		// Spawn Egg Mobile
 		objA1.update_address = 0x064e88
 	}
 	if (allocDynamicObjectStd())
@@ -168,7 +167,7 @@ function void fn064472()
 //# address-hook(0x06451e) end(0x06453a)
 function void fn06451e()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0)
 	{
@@ -192,8 +191,7 @@ function void fn06453c()
 	objA0.velocity.y = -0x600
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -221,7 +219,7 @@ function void fn06457c()
 //# address-hook(0x064594) end(0x0645ae)
 function void fn064594()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0 && objA0.position.y.u16 >= 0x0339)
 	{
@@ -238,8 +236,7 @@ function void fn0645b0()
 	objA0.velocity.y = -0x500
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -253,7 +250,7 @@ function void fn0645d4()
 	}
 	else
 	{
-		fn08450e()
+		Object.AnimationProgressByLocalA1.CheckEnd()
 	}
 }
 
@@ -268,15 +265,14 @@ function void fn0645e0()
 	objA0.animation.sprite = 0x0a
 	objA0.countdown_value = 0x7f
 
-	A1 = 0x066880
-	fn084580()
+	Object.ResetAnimationProgress(0x066880)		// Cutscene Knuckles shouting animation data
 }
 
 
 //# address-hook(0x064610) end(0x06463a)
 function void fn064610()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x = min(objA0.velocity.x + 0x0c, 0x300)
 	UpdateMovementStraightSimple()
 	if (objA0.position.x.u16 >= 0x1660)
@@ -296,8 +292,7 @@ function void fn06463c()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -318,7 +313,7 @@ function void fn064670()
 	objA0.base_state = 0x30
 	u16[A0 + 0x44] = 0x02
 	objA0.mapping_offset = 0x066f36
-	objA0.animation.sprite = 0x0d
+	objA0.animation.sprite = 0x0d		// Cutscene Knuckles preparing jump frame
 	objA0.countdown_value = 0x1d
 }
 
@@ -326,7 +321,7 @@ function void fn064670()
 //# address-hook(0x064692) end(0x0646ae)
 function void fn064692()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 
 	A1 = 0xffff0000 + u16[0xfffffaae]
@@ -351,15 +346,14 @@ function void fn0646b8()
 	objA0.velocity.y = -0x500
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
 //# address-hook(0x0646f6) end(0x064710)
 function void fn0646f6()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.velocity.y >= 0 && objA0.position.y.u16 >= 0x03ab)
 	{
@@ -380,15 +374,14 @@ function void fn06471a()
 	objA0.velocity.y = -0x200
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
 //# address-hook(0x064758) end(0x06478c)
 function void fn064758()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x = min(objA0.velocity.x + 0x0c, 0x300)
 	UpdateMovementStraightSimple()
 
@@ -413,15 +406,14 @@ function void fn06478e()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 
-	A1 = 0x06682f
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
 //# address-hook(0x0647c6) end(0x0647e2)
 function void fn0647c6()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 
 	A1 = 0xffff0000 + u16[0xfffffaba]
@@ -441,8 +433,7 @@ function void fn0647ec()
 	objA0.velocity.y = -0x600
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -535,7 +526,7 @@ function void fn06489e()
 //# address-hook(0x0648b2) end(0x0648b2)
 function void fn0648b2()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -549,8 +540,7 @@ function void fn0648b8()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x0648ea
 
-	A1 = 0x0667e7
-	fn084580()
+	Object.ResetAnimationProgress(0x0667e7)		// Cutscene Knuckles falling off animation data
 }
 
 
@@ -603,7 +593,7 @@ function void fn0648fa()
 	for (u8 i = 0; i < 2; ++i)
 	{
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 		if (_equal())
 		{
 			u8[A1 + 0x2c] = 0x14
@@ -657,7 +647,7 @@ function void fn064964()
 //# address-hook(0x064984) end(0x064984)
 function void fn064984()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -670,15 +660,14 @@ function void fn06498a()
 	objA0.velocity.y = 0
 	objA0.countdown_callback = 0x0649b4
 
-	A1 = 0x06680a
-	fn084580()
+	Object.ResetAnimationProgress(0x06680a)		// Cutscene Knuckles unconscious animation data
 }
 
 
 //# address-hook(0x0649ae) end(0x0649ae)
 function void fn0649ae()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -688,8 +677,7 @@ function void fn0649b4()
 	objA0.base_state = 0x4a
 	objA0.countdown_callback = 0x0649de
 
-	A1 = 0x06684f
-	fn084580()
+	Object.ResetAnimationProgress(0x06684f)		// Cutscene Knuckles head shaking animation data
 
 	// "spawnSimpleChildObjects(0x066644)" replaced by:
 	spawnSimpleChildObjects(0x06563a, 1)
@@ -721,7 +709,7 @@ function void fn0649de()
 //# address-hook(0x064a00) end(0x064a1a)
 function void fn064a00()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x -= 0x0c
 	UpdateMovementStraightSimple()
 	if (objA0.position.x.u16 <= 0x1810)
@@ -738,8 +726,7 @@ function void fn064a1c()
 	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0
 
-	A1 = 0x06682f
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -751,7 +738,7 @@ function void fn064a36()
 		objA0.animation.timer = min(objA0.animation.timer, 60)
 	#endif
 
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 }
 
 
@@ -765,15 +752,14 @@ function void fn064a3c()
 	objA0.animation.sprite = 0x0e
 	objA0.countdown_callback = 0x064a8e
 
-	A1 = 0x0668af
-	fn084580()
+	Object.ResetAnimationProgress(0x0668af)		// Cutscene Knuckles pointing back animation data
 }
 
 
 //# address-hook(0x064a6e) end(0x064a8c)
 function void fn064a6e()
 {
-	fn084688()
+	Object.AnimationProgressByLocalA1.CheckEnd_DistinctTimer()
 	if (!_equal())
 	{
 		if (objA0.animation.frame == 6)
@@ -795,15 +781,14 @@ function void fn064a8e()
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x56
 
-	A1 = 0x066885
-	fn084580()
+	Object.ResetAnimationProgress(0x066885)		// Cutscene Knuckles door barging animation data
 }
 
 
 //# address-hook(0x064ac0) end(0x064ae0)
 function void fn064ac0()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	objA0.velocity.x -= 0x0c
 	UpdateMovementStraightSimple()
 	D0.u16 = camera.position.x.u16 - 0x40
@@ -824,15 +809,14 @@ function void fn064ae2()
 	objA0.animation.sprite = 0x07
 	objA0.velocity.x = 0
 
-	A1 = 0x06682f
-	fn084580()
+	Object.ResetAnimationProgress(0x06682f)		// Cutscene Knuckles walking animation data
 }
 
 
 //# address-hook(0x064b10) end(0x064b20)
 function void fn064b10()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (u8[0xfffffab8] & 0x40)
 	{
 		fn064b80()
@@ -858,8 +842,7 @@ function void fn064b22()
 		objA1.update_address = 0x084a76
 	}
 
-	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06671f)		// Cutscene Knuckles tired panting animation data
 
 #if STANDALONE
 	Game.endSkippableCutscene()
@@ -870,7 +853,7 @@ function void fn064b22()
 //# address-hook(0x064b6a) end(0x064b7e)
 function void fn064b6a()
 {
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 	UpdateMovementSimple()
 	if (objA0.position.x.u16 <= 0x15c0)
 	{
@@ -895,8 +878,7 @@ function void fn064b80()
 
 	playSound(SFX_JUMP)
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -909,7 +891,7 @@ function void fn064bb8()
 	}
 	else
 	{
-		fn08459c()
+		Object.AnimationProgressByLocalA1.DistinctTimer()
 	}
 }
 
@@ -925,8 +907,7 @@ function void fn064bc6()
 	objA0.animation.sprite = 0
 	objA0.render_flags &= ~render_flag.FLIP_X
 
-	A1 = 0x06671f				// Cutscene Knuckles tired panting animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06671f)		// Cutscene Knuckles tired panting animation data
 }
 
 
@@ -937,7 +918,7 @@ function void fn064bfa()
 	// Correct Knuckles facing right while rolling in teleporter
 	objA0.render_flags |= render_flag.FLIP_X
 #endif
-	fn08450e()
+	Object.AnimationProgressByLocalA1.CheckEnd()
 }
 
 
@@ -949,8 +930,7 @@ function void fn064c00()
 	objA0.mapping_offset = 0x14a8d6
 	objA0.animation.sprite = 0x9a
 
-	A1 = 0x0667c1
-	fn084580()
+	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
 
 
@@ -1179,6 +1159,8 @@ function void fn064e86()
 }
 
 
+// The Egg Mobile
+
 //# address-hook(0x064e88) end(0x064ebe)
 function void fn064e88()
 {
@@ -1191,10 +1173,10 @@ function void fn064e88()
 	objA0.position.y.u16 = 0x02d0
 
 	// "spawnChildObjects(0x068184)" replaced by:
-	spawnChildObject(0x067cd2, 0x00, 0, -28)
+	spawnChildObject(0x067cd2, 0x00, 0, -28)		// Robotnik head
 
 	// "spawnChildObjects(0x066608)" replaced by:
-	spawnChildObject(0x06502e, 0x00, 0, 35)
+	spawnChildObject(0x06502e, 0x00, 0, 35)			// Egg Mobile crane hook
 
 	fn064ec4()
 }
@@ -1233,7 +1215,7 @@ function void fn064f04()
 	fn0685e2()
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
-	spawnChildObject(0x068062, 0x00, 30, 0)
+	spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 }
 
 
@@ -1253,10 +1235,10 @@ function void fn064f20()
 		objA0.flags38 |= 0x10
 		objA0.velocity.x = 0
 		objA0.collision_attributes = collision.size.24x24
-		u8[A0 + 0x29] = 0xff
+		boss.remaining_hits = 0xff
 
 		// "spawnIdenticalChildObjects(0x066624)" replaced by:
-		spawnChildObjects(0x06531e, 8, -4, 2)
+		spawnChildObjects(0x06531e, 8, -4, 2)		// Egg Mobile electrifying tentacles
 	}
 
 	fn066348()
@@ -1295,7 +1277,7 @@ function void fn064fa0()
 		objA0.flags38 &= ~0x10
 
 		// "spawnChildObjects(0x0681b4)" replaced by:
-		spawnChildObject(0x068062, 0x00, 30, 0)
+		spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 	}
 
 	fn066372()
@@ -1420,7 +1402,7 @@ function void fn066372()
 
 
 
-// Robotnik (some function above seem to be part of his capsule)
+// Egg Mobile hook (some function above seem to be part of Robotnik's capsule)
 
 //# address-hook(0x06502e) end(0x065042)
 function void fn06502e()
@@ -1689,6 +1671,8 @@ function void fn0652fe()
 	u8[A0 + 0x0a] |= 0x80
 }
 
+
+// Egg Mobile electrifying tentacles
 
 //# address-hook(0x06531e) end(0x065342)
 function void fn06531e()

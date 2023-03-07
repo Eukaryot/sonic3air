@@ -255,7 +255,7 @@ function void fn072d78()
 function void fn072d92()
 {
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	if (_equal())
 	{
 		objA1.position.x.u16 = 0x4430

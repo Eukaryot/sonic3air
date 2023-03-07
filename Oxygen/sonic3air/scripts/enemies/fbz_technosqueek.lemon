@@ -49,7 +49,7 @@ function void fn089842()
 			objA0.render_flags |= render_flag.FLIP_Y
 
 		// "spawnChildObjects(0x089b24)" replaced by:
-		spawnChildObject(0x0899b4, 0x00, 20, 4)
+		spawnChildObject(0x0899b4, 0x00, 20, 4)		// Technosqueek tail
 
 		D0.u16 = 0x0400
 		u16[A0 + 0x3a] = D0.u16
@@ -66,7 +66,7 @@ function void fn089842()
 		objA0.render_flags |= render_flag.FLIP_Y
 
 		// "spawnChildObjects(0x089b24)" replaced by:
-		spawnChildObject(0x0899b4, 0x00, 20, 4)
+		spawnChildObject(0x0899b4, 0x00, 20, 4)		// Technosqueek tail
 
 		D0.u16 = 0x0400
 		objA0.value3e = D0.u16
@@ -80,7 +80,7 @@ function void fn089842()
 //# address-hook(0x0898dc) end(0x089924)
 function void fn0898dc()
 {
-	fn08460e()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipX()
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
 		objA0.flags38 |= 0x02
@@ -140,7 +140,7 @@ function void fn089940()
 //# address-hook(0x08995c) end(0x08999c)
 function void fn08995c()
 {
-	fn08464a()
+	Object.AnimationProgressByLocalA1.DistinctTimer_CheckFlipY()
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
 		objA0.flags38 |= 0x02
@@ -262,7 +262,7 @@ function void fn089a70()
 	objA0.subtype2c = 0
 
 	// "spawnChildObjects(0x089b24)" replaced by:
-	spawnChildObject(0x0899b4, 0x00, 20, 4)
+	spawnChildObject(0x0899b4, 0x00, 20, 4)		// Technosqueek tail
 }
 
 

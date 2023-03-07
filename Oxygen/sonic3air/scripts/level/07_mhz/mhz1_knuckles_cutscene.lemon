@@ -110,8 +110,7 @@ function void fn062bf4()
 	objA0.velocity.y = -0x400
 	objA0.countdown_callback = 0x062c5a
 
-	A1 = 0x0666af		// Cutscene Knuckles jumping animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x0666af)		// Cutscene Knuckles jumping animation data
 	fn062c42()
 }
 
@@ -143,8 +142,7 @@ function void fn062c76()
 	objA0.velocity.x = 0x200
 	objA0.velocity.y = 0
 
-	A1 = 0x06669f		// Cutscene Knuckles walking animation data
-	fn084580()
+	Object.ResetAnimationProgress(0x06669f)		// Cutscene Knuckles walking animation data
 }
 
 
@@ -169,6 +167,7 @@ function void fn062ca4()
 	bool useCutscene = (!isMainCharacter(CHARACTER_KNUCKLES) && checkpoint.number == 0 && global.lock_on_state == 0)
 
 #if STANDALONE
+	// Skip Knuckles in Time Attack
 	if (Game.isTimeAttack())
 	{
 		useCutscene = false
@@ -522,8 +521,7 @@ function void fn062fb4()
 //# address-hook(0x062fca) end(0x062fd4)
 function void fn062fca()
 {
-	A1 = 0x0666e1		// Cutscene Knuckles peeking animation data
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x0666e1)		// Cutscene Knuckles peeking animation
 	DrawObject()
 }
 

@@ -56,7 +56,7 @@ function void fn0882e6()
 {
 	fn0847e6()
 	UpdateMovementStraightSimple()
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	Object.CountdownAndTrigger()
 	objA0.collision_attributes = (objA0.animation.sprite == 2) ? (collision.flag.THREAT | collision.size.16x16) : collision.size.16x8
 }

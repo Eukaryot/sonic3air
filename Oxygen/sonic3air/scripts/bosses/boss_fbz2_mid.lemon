@@ -80,11 +80,11 @@ function void fn06fd38()
 	}
 
 	// "spawnChildObjects(0x0703d0)" replaced by:
-	spawnChildObject(0x06ffdc, 0x00, 0, 0)
-	spawnChildObject(0x07002a, 0x02, 0, 0)
+	spawnChildObject(0x06ffdc, 0x00, 0, 0)		// Robotnik's console
+	spawnChildObject(0x07002a, 0x02, 0, 0)		// Robotnik himself
 
 	// "spawnSimpleChildObjects(0x0703de)" replaced by:
-	spawnSimpleChildObjects(0x0862ae, 1)
+	spawnSimpleChildObjects(0x0862ae, 1)		// Sprite mask
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 0x49
@@ -179,7 +179,7 @@ function void fn06fe3a()
 	objA0.velocity.y = 0
 
 	// "spawnChildObjects(0x0703ec)" replaced by:
-	spawnChildObject(0x070192, 0x00, 0, 8)
+	spawnChildObject(0x070192, 0x00, 0, 8)		// Charging laser
 
 	fn06fe54()
 }
@@ -357,7 +357,7 @@ function void fn06fffa()
 		objA0.animation.sprite = 3
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	}
 	DrawObject()
 }
@@ -556,7 +556,7 @@ function void fn070262()
 	}
 
 	// "spawnChildObjects(0x083fee)" replaced by:
-	spawnChildObject(0x083d84, 0x00, 0, 0)
+	spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 	if (_equal())
 	{
 		objA1.position.y.u16 += 0x60
@@ -638,7 +638,7 @@ function void fn070330()
 		objA0.value3a = 1	// Set here to make the laser disappear after being destroyed
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 		AddScoreForBossEnemy_NoHudDirty()
 

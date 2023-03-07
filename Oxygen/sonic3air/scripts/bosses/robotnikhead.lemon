@@ -13,10 +13,13 @@
 //-------------------------------------------------------//
 
 // Main update function for heads:
-//  - 0x067aca	in HCZ, CNZ, ICZ
+//  - 0x067aca	in HCZ, MGZ, CNZ, ICZ
 //  - 0x067b66	in AIZ
-//  - 0x067c38	in LBZ (boss 2)
-//  - 0x067cd2	in LBZ (boss 3), MHZ, SOZ
+//  - 0x067b96	in FBZ
+//  - 0x067c38	in LBZ (boss 2), DEZ
+//  - 0x067cd2	in LBZ (boss 3), MHZ, SOZ, HPZ, and SSZ
+//  - 0x073e0e	in LBZ (boss 1)
+//  - 0x079c0c	in LRZ
 
 
 //# address-hook(0x067aca) end(0x067ade)
@@ -25,9 +28,9 @@ function void fn067aca()
 	MoveAndFlipWithParent()
 
 	// Targets:
-	//  - 0x067aea	-> objA0.base_state = 0x00
-	//  - 0x067b34	-> objA0.base_state = 0x02
-	//  - 0x067b64	-> objA0.base_state = 0x04
+	//  - 0x067aea	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x067b34	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x067b64	-> objA0.base_state = 0x04  -> Defeated
 	call tableLookupAddress(0x067ae4, objA0.base_state)
 
 	fn08498c()
@@ -83,12 +86,12 @@ function void fn067b34()
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
 		if (u8[A1 + 0x2a] & 0x40)
-			objA0.animation.sprite = 02
+			objA0.animation.sprite = 2		// Damage face
 	}
 	else
 	{
 		objA0.base_state = 0x04
-		objA0.animation.sprite = 3
+		objA0.animation.sprite = 3		// Defeat face
 	}
 }
 
@@ -106,9 +109,9 @@ function void fn067b66()
 	fn069b2e()
 
 	// Targets:
-	//  - 0x067aea	-> objA0.base_state = 0x00
-	//  - 0x067b34	-> objA0.base_state = 0x02
-	//  - 0x067b64	-> objA0.base_state = 0x04
+	//  - 0x067aea	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x067b34	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x067b64	-> objA0.base_state = 0x04  -> Defeated
 	call tableLookupAddress(0x067b90, objA0.base_state)
 
 	if ((objA0.flags38 & 0x40) == 0)
@@ -125,7 +128,7 @@ function void fn067c38()
 
 	// Targets:
 	//  - 0x067c58	-> objA0.base_state = 0x00  -> Initialization
-	//  - 0x067c8a	-> objA0.base_state = 0x02  -> Normal update
+	//  - 0x067c8a	-> objA0.base_state = 0x02  -> Regular update
 	//  - 0x067cba	-> objA0.base_state = 0x04  -> Defeated
 	call tableLookupAddress(0x067c52, objA0.base_state)
 	fn08498c()
@@ -159,14 +162,12 @@ function void fn067c8a()
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 	{
 		if (u8[A1 + 0x2a] & 0x40)
-		{
-			objA0.animation.sprite = 2
-		}
+			objA0.animation.sprite = 2		// Damage face
 	}
 	else
 	{
 		objA0.base_state = 0x04
-		objA0.animation.sprite = 3
+		objA0.animation.sprite = 3		// Defeat face
 	}
 }
 

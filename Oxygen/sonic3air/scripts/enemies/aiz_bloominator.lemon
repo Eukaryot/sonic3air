@@ -44,6 +44,7 @@ function void fn086d8a()
 //# address-hook(0x086da2) end(0x086daa)
 function void fn086da2()
 {
+	// Calls "fn086dae()" after wait time
 	if (objA0.render_flags & render_flag.VISIBLE)
 	{
 		Object.CountdownAndTrigger()
@@ -55,7 +56,7 @@ function void fn086da2()
 function void fn086dae()
 {
 	objA0.base_state = 0x04
-	u32[A0 + 0x30] = 0x086e42
+	u32[A0 + 0x30] = 0x086e42		// Spitting animation data
 	objA0.countdown_callback = 0x086dfc
 }
 
@@ -70,7 +71,7 @@ function void fn068962()
 	if (objA0.subtype2c == 0x06)
 	{
 		// "spawnChildObjects(0x0690d0)" replaced by:
-		spawnChildObject(0x068994, 0x00, 0, 0)
+		spawnChildObject(0x068994, 0x00, 0, 0)		// Angel Island miniboss flamethrower end flame
 	}
 }
 
@@ -78,11 +79,12 @@ function void fn068962()
 //# address-hook(0x086dc6) end(0x086dfa)
 function void fn086dc6()
 {
-	fn08459c()
-	if (_equal())
+	Object.AnimationProgressByLocalA1.DistinctTimer()			// Calls "fn086dfc()" after animation ends
+
+	if (_equal())		// Only proceed on new frames
 		return
 
-	if (D0.u8 != 0x06 && D0.u8 != 0x0e)
+	if (D0.u8 != 0x06 && D0.u8 != 0x0e)		// Only proceed on these specific frames
 		return
 
 	playSound(0x4d)
@@ -91,6 +93,7 @@ function void fn086dc6()
 	spawnProjectileChildObject(0x086d4a, 0x00, 0, -16, 256, -1280, 0x086e1e, 0x000000, addressof(UpdateMovementSimple))	// Spike ball
 	if (_equal())
 	{
+		// Reverse direction every other shot
 		++objA0.value39
 		if (objA0.value39 & 0x01)
 		{

@@ -311,5 +311,5 @@ function void fn08ed1e()
 //# address-hook(0x08ed3e) end(0x08ed3e)
 function void fn08ed3e()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }

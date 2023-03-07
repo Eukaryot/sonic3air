@@ -42,20 +42,6 @@ function void fn0891ba()
 }
 
 
-//# address-hook(0x0891ee) end(0x0891ee)
-function void fn0891ee()
-{
-	Object.AnimationProgressByLocalA1.SpeedUp()
-}
-
-
-//# address-hook(0x08920e) end(0x08920e)
-function void fn08920e()
-{
-	Object.CountdownAndTrigger()
-}
-
-
 //# address-hook(0x0891c2) end(0x0891ec)
 function void fn0891c2()
 {
@@ -106,6 +92,20 @@ function void fn089212()
 function void fn08924e()
 {
 	objA0.base_state = 0x02
+}
+
+
+//# address-hook(0x0891ee) end(0x0891ee)
+function void fn0891ee()
+{
+	Object.AnimationProgressByLocalA1.SpeedUp()
+}
+
+
+//# address-hook(0x08920e) end(0x08920e)
+function void fn08920e()
+{
+	Object.CountdownAndTrigger()
 }
 
 

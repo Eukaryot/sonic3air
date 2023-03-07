@@ -67,7 +67,7 @@ function void fn088480()
 {
 	setupObjectAttributesFull(0x088af6)
 
-	u8[A0 + 0x29] = 0xfe
+	boss.remaining_hits = 0xfe
 	objA0.hitbox_extends.y = 0x28
 	fn0685e2()
 
@@ -235,8 +235,9 @@ function void fn088a62()
 	if (u8[A0 + 0x28] != 0)
 		return
 
-	if (u8[A0 + 0x29] == 0)
+	if (boss.remaining_hits == 0)
 	{
+		// Boss beaten
 		objA0.update_address = 0x085668
 		camera.screenshake.state = 0
 		objA0.countdown_callback = 0x0887ca
@@ -247,7 +248,7 @@ function void fn088a62()
 		}
 
 		// "spawnChildObjects(0x083fee)" replaced by:
-		spawnChildObject(0x083d84, 0x00, 0, 0)
+		spawnChildObject(0x083d84, 0x00, 0, 0)		// Boss explosion generator
 
 		AddScoreForBossEnemy()
 		return

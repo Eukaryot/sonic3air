@@ -79,8 +79,7 @@ function void fn0894f2()
 		}
 	}
 
-	A1 = 0x08975e
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x08975e)
 	UpdateMovementStraightSimple()
 	fn0848b6()
 	Object.CountdownAndTrigger()
@@ -151,8 +150,7 @@ function void fn0895a4()
 	if (fn0896d6())
 		return
 
-	A1 = 0x089768
-	fn0845a0()
+	Object.AnimationProgress.DistinctTimer(0x089768)
 	if (D2.u16 != 0 && objA0.animation.frame == 6)
 	{
 		// "spawnProjectileChildObjectsInDir(0x089746)" replaced by:
@@ -219,6 +217,8 @@ function void fn08963e()
 	DrawObject()
 }
 
+
+// Used when jumping out of a capsule
 
 //# address-hook(0x089650) end(0x08965e)
 function void fn089650()

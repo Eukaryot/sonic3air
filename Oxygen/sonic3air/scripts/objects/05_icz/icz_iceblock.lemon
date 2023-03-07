@@ -90,6 +90,7 @@ function void fn08b3aa()
 		u8[A2 + 0x2a] &= ~char.flag.ON_OBJECT
 	}
 
+	// Spawn broken ice block chunks
 	// "spawnChildObjects(0x08b480)" replaced by:
 	spawnChildObject(0x08b432, 0x00, 0, -8)
 	spawnChildObject(0x08b432, 0x02, 0, 8)

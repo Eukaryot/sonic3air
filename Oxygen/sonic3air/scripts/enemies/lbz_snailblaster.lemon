@@ -86,7 +86,7 @@ function void fn08c052()
 	if (fn08c23c())
 		return
 
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 
 	if (D2.u16 != 0)
 	{
@@ -272,7 +272,7 @@ function void fn08c1a4()
 //# address-hook(0x08c1d8) end(0x08c21c)
 function void fn08c1d8()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.s16 > 0 && objA0.animation.frame == 4)
 	{
 		if (objA0.render_flags & render_flag.VISIBLE)

@@ -783,12 +783,14 @@ function void fn05b4f8()
 //# address-hook(0x07ca1c) end(0x07ca2c)
 function void fn07ca1c()
 {
-	objA0.update_address = 0x07ca3a
+	objA0.update_address = 0x07ca3a		// The Egg Mobile
 	move_area.right = move_area.left + getScreenExtend() * 2
 
 	addPatternLoadingCue(0x07ca32)		// Robotnik's ship
 }
 
+
+// The Egg Mobile
 
 //# address-hook(0x07ca3a) end(0x07caa4)
 function void fn07ca3a()
@@ -817,15 +819,15 @@ function void fn07ca3a()
 	}
 
 	// "spawnChildObjects(0x068184)" replaced by:
-	spawnChildObject(0x067cd2, 0x00, 0, -28)
+	spawnChildObject(0x067cd2, 0x00, 0, -28)		// Robotnik head
 
 	// "spawnChildObjects(0x07d4bc)" replaced by:
-	spawnChildObject(0x07ccfe, 0x00, 0, 35)
+	spawnChildObject(0x07ccfe, 0x00, 0, 35)			// Egg Mobile crane hook
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
-	spawnChildObject(0x068062, 0x00, 30, 0)
+	spawnChildObject(0x068062, 0x00, 30, 0)			// Egg Mobile exhaust flame
 
-	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)	// Egg Mobile grabber claw sprites
+	Kosinski.addToDMAQueue(0x1607d8, 0x94e0)		// Egg Mobile grabber claw sprites
 
 	DrawObject()
 }
@@ -978,7 +980,7 @@ function void fn07cbce()
 		objA0.countdown_callback = 0x07cc26
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
-		spawnSimpleChildObjects(0x083d84, 1)
+		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
 	}
 
 	DrawObject()
@@ -989,7 +991,7 @@ function void fn07cbce()
 function void fn07cc26()
 {
 	// "spawnSimpleChildObjects(0x07d4c4)" replaced by:
-	spawnSimpleChildObjects(0x07ce6c, 4)
+	spawnSimpleChildObjects(0x07ce6c, 4)		// Egg Robo giblets
 
 	objA0.flags38 |= 0x30
 	Object.TriggerUnloading()

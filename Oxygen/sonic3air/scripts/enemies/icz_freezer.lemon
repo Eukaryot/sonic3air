@@ -399,6 +399,7 @@ function void fn08a84c()
 	u8[A1 + 0x2e] = 0
 	u8[A1 + 0x34] = 0x78
 
+	// Spawn broken ice block chunks
 	// "spawnChildObjects(0x08aaea)" replaced by:
 	spawnChildObject(0x08a8dc, 0x00, -12, -8)
 	spawnChildObject(0x08a8dc, 0x02, -4, -8)

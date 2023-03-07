@@ -500,8 +500,7 @@ function void fn05c6b6()
 	A1 = 0xffff0000 + u16[0xfffffaa4]
 	if ((u8[A1 + 0x38] & 0x04) == 0)
 	{
-		A1 = 0x05cbc5
-		fn084512()
+		Object.AnimationProgress.CheckEnd(0x05cbc5)
 		return
 	}
 
@@ -529,8 +528,7 @@ function void fn05c6f4()
 	objA0.position.x.u16 += 6
 	if (objA0.position.x.u16 < getScreenWidth() + 80)
 	{
-		A1 = 0x05cbb4
-		fn084512()
+		Object.AnimationProgress.CheckEnd(0x05cbb4)
 		return
 	}
 
@@ -780,8 +778,7 @@ function void fn05c932()
 
 	if (px < getScreenWidth() + 160)
 	{
-		A1 = 0x05cbb4
-		fn084512()
+		Object.AnimationProgress.CheckEnd(0x05cbb4)
 	}
 	else
 	{

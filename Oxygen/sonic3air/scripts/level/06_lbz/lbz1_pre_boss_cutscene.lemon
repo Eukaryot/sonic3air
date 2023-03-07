@@ -60,6 +60,7 @@ function void fn08cb90()
 //# address-hook(0x08cb9e) end(0x08cbec)
 function void fn08cb9e()
 {
+	// The Egg Mobile is initialized here as the main object, other parts are spawned after this
 	setupObjectAttributesFull(0x08d230)
 
 	u8[A0 + 0x29] = 0xff
@@ -73,7 +74,7 @@ function void fn08cb9e()
 	Kosinski.addToDMAQueue(0x37567a, 0x8ac0)		// Miniboss containment box
 
 	// "spawnChildObjects(0x06817c)" replaced by:
-	spawnChildObject(0x067c38, 0x00, 0, -28)
+	spawnChildObject(0x067c38, 0x00, 0, -28)		// Robotnik head
 
 	// "spawnIdenticalChildObjects(0x08d254)" replaced by:
 	spawnChildObjects(0x08cd5c, 0, 52, 1)
@@ -218,7 +219,7 @@ function void fn08cce8()
 	Kosinski.addToDMAQueue(0x375358, 0x9ac0)		// Boss sprites
 
 	// "spawnChildObjects(0x0681b4)" replaced by:
-	spawnChildObject(0x068062, 0x00, 30, 0)
+	spawnChildObject(0x068062, 0x00, 30, 0)		// Egg Mobile exhaust flame
 }
 
 
@@ -493,7 +494,7 @@ function void fn0626b2()
 //# address-hook(0x0626ee) end(0x0626ee)
 function void fn0626ee()
 {
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 }
 
 

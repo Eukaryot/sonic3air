@@ -213,6 +213,6 @@ function void fn08c8c6()
 function void fn08c8e6()
 {
 	++u16[A0 + 0x3a]
-	fn08459c()
+	Object.AnimationProgressByLocalA1.DistinctTimer()
 	fn084934()
 }

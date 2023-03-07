@@ -33,6 +33,40 @@ function void fn08dd38()
 }
 
 
+//# address-hook(0x08dd52) end(0x08dd8a)
+function void fn08dd52()
+{
+	setupObjectAttributesFull(0x08df96)
+
+	u32[A0 + 0x30] = 0x08dfce
+
+	// "spawnChildObjects(0x08dfae)" replaced by:
+	spawnChildObject(0x08df3c, 0x00, 0, 0)		// Wings
+
+	// "spawnChildObjectChain(0x08dfb6)" replaced by:
+	spawnChildObjectsChain(0x08de26, 7)			// Tail
+
+	D0.u16 = 0x0200
+	objA0.value3e = D0.u16
+	objA0.velocity.y = D0.u16
+	u16[A0 + 0x40] = 0x08
+	objA0.flags38 &= ~0x01
+
+	fn08dd90()
+}
+
+
+//# address-hook(0x08dd90) end(0x08dda8)
+function void fn08dd90()
+{
+	D0.u16 = 0x0200
+	u16[A0 + 0x3a] = D0.u16
+	objA0.velocity.x = D0.u16
+	u16[A0 + 0x3c] = 0x20
+	objA0.flags38 &= ~0x08
+}
+
+
 //# address-hook(0x08ddaa) end(0x08dde4)
 function void fn08ddaa()
 {
@@ -56,40 +90,6 @@ function void fn08dde6()
 	fn08482a()
 	UpdateMovementStraightSimple()
 	Object.CountdownAndTrigger()
-}
-
-
-//# address-hook(0x08dd52) end(0x08dd8a)
-function void fn08dd52()
-{
-	setupObjectAttributesFull(0x08df96)
-
-	u32[A0 + 0x30] = 0x08dfce
-
-	// "spawnChildObjects(0x08dfae)" replaced by:
-	spawnChildObject(0x08df3c, 0x00, 0, 0)
-
-	// "spawnChildObjectChain(0x08dfb6)" replaced by:
-	spawnChildObjectsChain(0x08de26, 7)
-
-	D0.u16 = 0x0200
-	objA0.value3e = D0.u16
-	objA0.velocity.y = D0.u16
-	u16[A0 + 0x40] = 0x08
-	objA0.flags38 &= ~0x01
-
-	fn08dd90()
-}
-
-
-//# address-hook(0x08dd90) end(0x08dda8)
-function void fn08dd90()
-{
-	D0.u16 = 0x0200
-	u16[A0 + 0x3a] = D0.u16
-	objA0.velocity.x = D0.u16
-	u16[A0 + 0x3c] = 0x20
-	objA0.flags38 &= ~0x08
 }
 
 
@@ -161,6 +161,14 @@ function void fn08de74()
 }
 
 
+//# address-hook(0x08df80) end(0x08df94)
+function void fn08df80()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x46]
+	objA0.position.y.u16 = objA1.position.y.u16 + s8[A0 + 0x43]
+}
+
+
 //# address-hook(0x08de8a) end(0x08deb4)
 function void fn08de8a()
 {
@@ -221,14 +229,6 @@ function void fn08def4()
 	objA0.position.y.u16 = D0.u16
 	objA0.render_flags ^= render_flag.FLIP_Y
 	objA0.flags38 &= ~0x04
-}
-
-
-//# address-hook(0x08df80) end(0x08df94)
-function void fn08df80()
-{
-	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.position.y.u16 = objA1.position.y.u16 + s8[A0 + 0x43]
 }
 
 

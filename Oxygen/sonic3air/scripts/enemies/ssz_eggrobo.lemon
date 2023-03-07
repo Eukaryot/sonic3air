@@ -292,20 +292,24 @@ function void fn0917c0()
 {
 	objA0.update_address = 0x02c778
 	objA0.base_state += 2
-	GetRandomNumber()
-	D0.u16 &= 0x01
+
+	// Randomly decide which critter to spawn
+	D0.u16 = getRandomNumber() & 0x01
+
 	objA0.sprite_attributes = (D0.u16 == 0) ? 0x0580 : 0x0592
+
+	// Decides the critter's movement pattern
 	u8[A0 + 0x30] = D0.u8
 	D0.u16 <<= 3
 
 	A1 = 0x02c7ea + D0.u16
-	D1.u16 = u16[(A1+=2)-2]
+	D1.u16 = u16[(A1+=2)-2]		// Used in calculating horizontal velocity
 	A2 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A2 + 0x04] & 0x01)
+	if (u8[A2 + 0x04] & render_flag.FLIP_X)
 		D1.s16 = -D1.s16
 	objA0.velocity.x = D1.u16
 
-	u16[A0 + 0x34] = u16[(A1+=2)-2]
+	u16[A0 + 0x34] = u16[(A1+=2)-2]		// Used in calculating vertical velocity
 	objA0.mapping_offset = u32[(A1+=4)-4]
 	D0 = (D0 << 16) + (D0 >> 16)
 	D0.u16 &= 0x01ff
@@ -314,7 +318,7 @@ function void fn0917c0()
 	D0.s16 = -D0.s16
 	objA0.velocity.y = D0.u16
 
-	objA0.hitbox_extends.y = 0x0c
+	objA0.hitbox_extends.y = 12
 	objA0.render_flags = render_flag.WORLD
 	objA0.render_flags |= render_flag.FLIP_X
 	objA0.sprite_priority = 0x0300
