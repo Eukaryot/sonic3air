@@ -402,14 +402,14 @@ void CodeExec::reinitRuntime(const LemonScriptRuntime::CallStackWithLabels* enfo
 		if (!mLemonScriptRuntime.hasValidProgram())
 			return;
 
+		mLemonScriptRuntime.getInternalLemonRuntime().clearAllControlFlows();
+
 		bool success = false;
 		if (serializedRuntimeState != nullptr && !serializedRuntimeState->empty())
 		{
 			VectorBinarySerializer serializer(true, *serializedRuntimeState);
 			success = getLemonScriptRuntime().serializeRuntime(serializer);
 		}
-
-		mLemonScriptRuntime.getInternalLemonRuntime().clearAllControlFlows();
 
 		if (enforcedCallStack != nullptr && !enforcedCallStack->empty())
 		{
