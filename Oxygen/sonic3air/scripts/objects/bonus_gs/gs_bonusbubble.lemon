@@ -55,6 +55,12 @@ function void fn04a238()
 		D1.u16 = (u8[A0 + 0x14] & 0x0f) * 4
 		D0.u16 = D1.u16 + (level.framecounter & 0x03)
 		objA0.subtype2c = u8[0x1e4484 + D0.u16]
+	#if STANDALONE
+		// Don't spawn 1-ups with the infinite lives setting on, instead replace with a ring bubble
+		if (objA0.subtype2c == 1 && Game.getSetting(SETTING_INFINITE_LIVES))
+			objA0.subtype2c = 3
+	#endif
+
 		objA0.update_address = 0x04a34c
 		fn04a2cc()
 	}
@@ -78,7 +84,7 @@ function void fn04a2cc()
 	}
 	else
 	{
-		// bonus bubble sprites
+		// Bonus bubble sprites
 		objA0.mapping_offset = 0x06148a
 		objA0.sprite_attributes = 0x0388
 		objA0.animation.sprite = objA0.subtype2c + 7
@@ -162,8 +168,7 @@ function void fn04a384()
 		// Rings bonus bubble
 		// In the Glowing Spheres bonus stage, the rings bonus bubble gives different amounts of rings based on elevation
 		D0.u16 = u8[A0 + 0x14] & 0x0f
-		A1 = 0x1e44c4
-		D0.u8 = u8[A1 + D0.s16]
+		D0.u8 = u8[0x1e44c4 + D0.u16]
 		checkpoint.rings += D0.u16
 		AddRings()
 		return
@@ -200,9 +205,7 @@ function void fn0610f8()
 //# address-hook(0x061100) end(0x06110c)
 function void fn061100()
 {
-	D1.u16 = u16[0x06110e + D1.s16 * 2]
-	call 0x06110e + D1.s16
-
+	call tableLookupAddress(0x06110e, D1.u16 * 2)
 	_setZeroFlagByValue(D2.u16)
 }
 
@@ -345,4 +348,12 @@ function void fn061254()
 	A2 = addressof(global.shields_backup_1)
 	u8[A2] &= ~char.bonus.ELEMENTAL_SHIELDS
 	u8[A2] |= shield
+}
+
+
+//# address-hook(0x061264) end(0x06126a)
+function void fn061264()
+{
+	// Unused "Super bubble"
+	global.shields_backup_1 |= 0x80
 }

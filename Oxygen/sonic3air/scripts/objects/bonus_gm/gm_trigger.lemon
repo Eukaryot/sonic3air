@@ -117,7 +117,6 @@ function void fn060d40()
 }
 
 
-
 //# address-hook(0x06126c) end(0x0612a6)
 function void fn06126c()
 {
@@ -151,9 +150,9 @@ function void fn06126c()
 		objA0.position.y.u16 = D2.u16
 	}
 
-	#if STANDALONE
-		Renderer.addSpriteMaskWorld(objA0.position.x.u16 - 0x100, objA0.position.y.u16 - 0x10, 0x200, 0x30, 0x9e00, 1)
-	#endif
+#if STANDALONE
+	Renderer.addSpriteMaskWorld(objA0.position.x.u16 - 0x100, objA0.position.y.u16 - 0x10, 0x200, 0x30, 0x9e00, 1)
+#endif
 }
 
 

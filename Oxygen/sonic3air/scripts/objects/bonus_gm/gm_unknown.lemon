@@ -148,6 +148,11 @@ function void fn0610c6()
 function void fn060eba()
 {
 	setupObjectAttributesFull(0x0613e0)
+#if STANDALONE
+	objA0.box_size.x = 0x10		// Larger visual bounding box to prevent early clipping
+	objA0.box_size.y = 0x10
+#endif
+
 	objA0.update_address = 0x060ece
 	fn0612a8()
 	fn060ece()
@@ -209,29 +214,48 @@ function void fn0610e0()
 //# address-hook(0x0612a8) end(0x0612de)
 function void fn0612a8()
 {
-	GetRandomNumber()
-	D0.u16 &= 0x0f
-	if (D0.u16 == 0)
+	u8 rnd = getRandomNumber() & 0x0f
+
+	// This code makes sure you can't get more than one 1-up per run of the Gumball Machine stage
+	if (rnd == 0)
 	{
 		A1 = 0xffff0000 + u16[A0 + 0x46]
 		if (u8[A1 + 0x38] & 0x80)
 		{
-			D0 = 3
+			// We had one already, now switch to a black bubble instead
+			rnd = 3
 		}
 		else
 		{
+			// Allow 1-up
 			u8[A1 + 0x38] |= 0x80
 		}
 	}
 
-	// Set bonus bubble content and sprite based on random value in D0
-	D0.u8 = u8[0x0612e0 + D0.s16]
-	objA0.subtype2c = D0.u8
-	if (D0.u8 == 0x04)
+	// Set bonus bubble content and sprite based on the previous chosen random value
+	u8 bubbleType = u8[0x0612e0 + rnd]
+
+#if STANDALONE
+	// Don't spawn 1-ups with the infinite lives setting on, instead replace with a ring bubble
+	if (bubbleType == 0x00 && Game.getSetting(SETTING_INFINITE_LIVES))
+		bubbleType = 0x02
+#endif
+
+	// Bubble types:
+	//  0x00 = 1-up bubble
+	//  0x01 = Rep bubble
+	//  0x02 = Ring bubble
+	//  0x03 = Empty bubble
+	//  0x04 = Bouncy black bubble
+	//  0x05 = Fire shield
+	//  0x06 = Bubble shield
+	//  0x07 = Lightning shield
+	//  0x08 = Unused golden "Super bubble"
+	objA0.subtype2c = bubbleType
+	if (bubbleType == 0x04)
 	{
 		// Bouncy black bubble hitbox
 		objA0.collision_attributes = (collision.flag.SPECIAL | collision.size.8x8_2)
 	}
-	D0.u16 <<= 2
-	u32[A0 + 0x30] = u32[0x0612f0 + D0.s16]
+	u32[A0 + 0x30] = u32[0x0612f0 + bubbleType * 4]
 }

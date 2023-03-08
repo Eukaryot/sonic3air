@@ -1342,9 +1342,10 @@ function void fn01e0a2()
 		if (u8[A1 + 0x20] != char.state.ROLLING && u8[A1 + 0x20] != char.state.SPINDASH)
 		{
 		#if STANDALONE
-			// Make an exception for the win pose
-			//  -> This prevents characters from showing their walking animation when standing next to an object like the capsule during the level results
-			if (u8[A1 + 0x20] != char.state.WIN_POSE)
+			// Also add exceptions for...
+			//  -> The win pose: This prevents characters from showing their walking animation when standing next to an object like the capsule during the level results
+			//  -> Super/Hyper transformation: Without this, transformating next to a monitor switched to the run animation, and can even cause a softlock if imediately cancelling the transformation
+			if (u8[A1 + 0x20] != char.state.WIN_POSE && u8[A1 + 0x20] != char.state.TRANSFORMING)
 		#endif
 			{
 				objA1.state = char.state.RUNNING
