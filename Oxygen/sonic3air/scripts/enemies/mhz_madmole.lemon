@@ -34,17 +34,6 @@ function void fn08d586()
 }
 
 
-//# address-hook(0x08d876) end(0x08d880)
-function void fn08d876()
-{
-	D1 = 0x1f
-	D2 = 4
-	D3 = 5
-	D4.u16 = objA0.position.x.u16
-	fn01dc56()
-}
-
-
 //# address-hook(0x08d5a6) end(0x08d5aa)
 function void fn08d5a6()
 {
