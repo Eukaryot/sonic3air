@@ -117,10 +117,11 @@
     <ClCompile Include="..\..\source\oxygen\resources\ResourcesCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\resources\SpriteCache.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\CodeExec.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\EmulatorInterface.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\GameRecorder.cpp" />
-    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptProgram.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptRuntime.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\LogDisplay.cpp" />
@@ -238,11 +239,12 @@
     <ClInclude Include="..\..\source\oxygen\resources\ResourcesCache.h" />
     <ClInclude Include="..\..\source\oxygen\resources\SpriteCache.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\analyse\ROMDataAnalyser.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\CodeExec.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\DebuggingInterfaces.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\EmulatorInterface.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\GameRecorder.h" />
-    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptBindings.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptProgram.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptRuntime.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LogDisplay.h" />

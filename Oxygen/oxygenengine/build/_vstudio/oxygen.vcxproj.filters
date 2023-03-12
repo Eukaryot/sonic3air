@@ -82,6 +82,9 @@
     <Filter Include="download">
       <UniqueIdentifier>{3f957152-f46c-4836-9d9d-b9655a560856}</UniqueIdentifier>
     </Filter>
+    <Filter Include="simulation\bindings">
+      <UniqueIdentifier>{8bad1afb-2428-4f4e-8187-4dbd48347a39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -175,9 +178,6 @@
       <Filter>simulation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\simulation\CodeExec.cpp">
-      <Filter>simulation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptBindings.cpp">
       <Filter>simulation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptRuntime.cpp">
@@ -415,6 +415,12 @@
     <ClCompile Include="..\..\source\oxygen\helper\TextInputHandler.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.cpp">
+      <Filter>simulation\bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp">
+      <Filter>simulation\bindings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\oxygen\helper\BitStream.h">
@@ -514,9 +520,6 @@
       <Filter>simulation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\CodeExec.h">
-      <Filter>simulation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptBindings.h">
       <Filter>simulation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptRuntime.h">
@@ -780,6 +783,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\helper\TextInputHandler.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.h">
+      <Filter>simulation\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h">
+      <Filter>simulation\bindings</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "oxygen/simulation/LemonScriptBindings.h"
+#include "oxygen/simulation/bindings/LemonScriptBindings.h"
 
 #include <lemon/utility/FlyweightString.h>
 

@@ -21,5 +21,8 @@ class LemonScriptBindings
 {
 public:
 	void registerBindings(lemon::Module& module);
-	void setDebugNotificationInterface(DebugNotificationInterface* bebugNotificationInterface);
+	void setDebugNotificationInterface(DebugNotificationInterface* debugNotificationInterface);
+
+public:
+	static inline DebugNotificationInterface* mDebugNotificationInterface = nullptr;
 };

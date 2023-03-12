@@ -8,7 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/simulation/LemonScriptRuntime.h"
-#include "oxygen/simulation/LemonScriptBindings.h"
+#include "oxygen/simulation/bindings/LemonScriptBindings.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/LogDisplay.h"
