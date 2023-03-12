@@ -75,6 +75,8 @@ public:
 		const SpriteCache::CacheItem* mCacheItem = nullptr;
 		Vec2i mSize;
 		Vec2i mPivotOffset;
+		bool mFlipX = false;
+		bool mFlipY = false;
 		Transform2D mTransformation;
 		bool mUseUpscaledSprite = false;	// Currently only supported for palette sprites
 	};
@@ -116,6 +118,13 @@ public:
 
 	uint32 addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue);
 	void setSpriteHandleFlags(uint32 spriteHandle, uint8 flags);
+	void setSpriteHandleFlipX(uint32 spriteHandle, bool flipX);
+	void setSpriteHandleFlipY(uint32 spriteHandle, bool flipY);
+	void setSpriteHandleRotationScale(uint32 spriteHandle, float radians, Vec2f scale);
+	void setSpriteHandleTransform(uint32 spriteHandle, const Transform2D& transformation);
+	void setSpriteHandlePriorityFlag(uint32 spriteHandle, bool priorityFlag);
+	void setSpriteHandleCoordinateSpace(uint32 spriteHandle, Space space);
+	void setSpriteHandleUseGlobalComponentTint(uint32 spriteHandle, bool enable);
 	void setSpriteHandlePaletteOffset(uint32 spriteHandle, uint16 paletteOffset);
 	void setSpriteHandleTintColor(uint32 spriteHandle, Color tintColor);
 	void setSpriteHandleOpacity(uint32 spriteHandle, float opacity);

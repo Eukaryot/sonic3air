@@ -475,18 +475,18 @@ namespace
 
 	void Renderer_addSpriteMask(int16 px, int16 py, int16 width, int16 height, uint16 renderQueue, uint8 priorityFlag)
 	{
-		RenderParts::instance().getSpriteManager().addSpriteMask(Vec2i(px, py), Vec2i(width, height), renderQueue, priorityFlag != 0, SpriteManager::Space::SCREEN);
+		RenderParts::instance().getSpriteManager().addSpriteMask(Vec2i(px, py), Vec2i(width, height), renderQueue, priorityFlag != 0, SpacesManager::Space::SCREEN);
 	}
 
 	void Renderer_addSpriteMaskWorld(int16 px, int16 py, int16 width, int16 height, uint16 renderQueue, uint8 priorityFlag)
 	{
-		RenderParts::instance().getSpriteManager().addSpriteMask(Vec2i(px, py), Vec2i(width, height), renderQueue, priorityFlag != 0, SpriteManager::Space::WORLD);
+		RenderParts::instance().getSpriteManager().addSpriteMask(Vec2i(px, py), Vec2i(width, height), renderQueue, priorityFlag != 0, SpacesManager::Space::WORLD);
 	}
 
 	void Renderer_setLogicalSpriteSpace(uint8 space)
 	{
 		RMX_CHECK(space < 2, "Invalid space index " << space, return);
-		RenderParts::instance().getSpriteManager().setLogicalSpriteSpace((SpriteManager::Space)space);
+		RenderParts::instance().getSpriteManager().setLogicalSpriteSpace((SpacesManager::Space)space);
 	}
 
 	void Renderer_clearSpriteTag()
@@ -577,6 +577,63 @@ namespace
 	void SpriteHandle_setFlags(SpriteHandleWrapper spriteHandle, uint8 flags)
 	{
 		RenderParts::instance().getSpriteManager().setSpriteHandleFlags(spriteHandle.mHandle, flags);
+	}
+
+	void SpriteHandle_setFlipX(SpriteHandleWrapper spriteHandle, bool flipX)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleFlipX(spriteHandle.mHandle, flipX);
+	}
+
+	void SpriteHandle_setFlipY(SpriteHandleWrapper spriteHandle, bool flipY)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleFlipY(spriteHandle.mHandle, flipY);
+	}
+
+	void SpriteHandle_setRotation(SpriteHandleWrapper spriteHandle, float degrees)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, degrees * PI_FLOAT / 180.f, Vec2f(1.0f));
+	}
+
+	void SpriteHandle_setScale1(SpriteHandleWrapper spriteHandle, float scale)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, 0.0f, Vec2f(scale));
+	}
+
+	void SpriteHandle_setScale2(SpriteHandleWrapper spriteHandle, float scaleX, float scaleY)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, 0.0f, Vec2f(scaleX, scaleY));
+	}
+
+	void SpriteHandle_setRotationScale1(SpriteHandleWrapper spriteHandle, float degrees, float scale)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, degrees * PI_FLOAT / 180.f, Vec2f(scale));
+	}
+
+	void SpriteHandle_setRotationScale2(SpriteHandleWrapper spriteHandle, float degrees, float scaleX, float scaleY)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, degrees * PI_FLOAT / 180.f, Vec2f(scaleX, scaleY));
+	}
+
+	void SpriteHandle_setTransform(SpriteHandleWrapper spriteHandle, float transform11, float transform12, float transform21, float transform22)
+	{
+		Transform2D transformation;
+		transformation.setByMatrix(transform11, transform12, transform21, transform22);
+		RenderParts::instance().getSpriteManager().setSpriteHandleTransform(spriteHandle.mHandle, transformation);
+	}
+
+	void SpriteHandle_setPriorityFlag(SpriteHandleWrapper spriteHandle, bool priorityFlag)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandlePriorityFlag(spriteHandle.mHandle, priorityFlag);
+	}
+
+	void SpriteHandle_setCoordinateSpace(SpriteHandleWrapper spriteHandle, uint8 space)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleCoordinateSpace(spriteHandle.mHandle, (space == 0) ? SpacesManager::Space::SCREEN : SpacesManager::Space::WORLD);
+	}
+
+	void SpriteHandle_setUseGlobalComponentTint(SpriteHandleWrapper spriteHandle, bool enable)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleUseGlobalComponentTint(spriteHandle.mHandle, enable);
 	}
 
 	void SpriteHandle_setPaletteOffset(SpriteHandleWrapper spriteHandle, uint16 paletteOffset)
@@ -1043,6 +1100,50 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	module.addNativeMethod("SpriteHandle", "setFlags", lemon::wrap(&SpriteHandle_setFlags), defaultFlags)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "flags");
+
+	module.addNativeMethod("SpriteHandle", "setFlipX", lemon::wrap(&SpriteHandle_setFlipX), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "flipX");
+
+	module.addNativeMethod("SpriteHandle", "setFlipY", lemon::wrap(&SpriteHandle_setFlipY), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "flipY");
+
+	module.addNativeMethod("SpriteHandle", "setRotation", lemon::wrap(&SpriteHandle_setRotation), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "degrees");
+
+	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScale1), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "scale");
+
+	module.addNativeMethod("SpriteHandle", "setScale", lemon::wrap(&SpriteHandle_setScale2), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "scaleX")
+		.setParameterInfo(2, "scaleY");
+
+	module.addNativeMethod("SpriteHandle", "setRotationScale", lemon::wrap(&SpriteHandle_setRotationScale1), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "degrees")
+		.setParameterInfo(2, "scale");
+
+	module.addNativeMethod("SpriteHandle", "setRotationScale", lemon::wrap(&SpriteHandle_setRotationScale2), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "degrees")
+		.setParameterInfo(2, "scaleX")
+		.setParameterInfo(3, "scaleY");
+
+	module.addNativeMethod("SpriteHandle", "setPriorityFlag", lemon::wrap(&SpriteHandle_setPriorityFlag), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "priorityFlag");
+
+	module.addNativeMethod("SpriteHandle", "setCoordinateSpace", lemon::wrap(&SpriteHandle_setCoordinateSpace), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "space");
+
+	module.addNativeMethod("SpriteHandle", "setUseGlobalComponentTint", lemon::wrap(&SpriteHandle_setUseGlobalComponentTint), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "enable");
 
 	module.addNativeMethod("SpriteHandle", "setPaletteOffset", lemon::wrap(&SpriteHandle_setPaletteOffset), defaultFlags)
 		.setParameterInfo(0, "this")

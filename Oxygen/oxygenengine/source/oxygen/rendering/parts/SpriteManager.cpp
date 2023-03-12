@@ -307,6 +307,71 @@ void SpriteManager::setSpriteHandleFlags(uint32 spriteHandle, uint8 flags)
 	}
 }
 
+void SpriteManager::setSpriteHandleFlipX(uint32 spriteHandle, bool flipX)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr && spritePtr->mFlipX != flipX)
+	{
+		spritePtr->mFlipX = flipX;
+		spritePtr->mTransformation.flipX();
+	}
+}
+
+void SpriteManager::setSpriteHandleFlipY(uint32 spriteHandle, bool flipY)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr && spritePtr->mFlipY != flipY)
+	{
+		spritePtr->mFlipY = flipY;
+		spritePtr->mTransformation.flipY();
+	}
+}
+
+void SpriteManager::setSpriteHandleRotationScale(uint32 spriteHandle, float radians, Vec2f scale)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mTransformation.setRotationAndScale(radians, scale);
+	}
+}
+
+void SpriteManager::setSpriteHandleTransform(uint32 spriteHandle, const Transform2D& transformation)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mTransformation = transformation;
+	}
+}
+
+void SpriteManager::setSpriteHandlePriorityFlag(uint32 spriteHandle, bool priorityFlag)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mPriorityFlag = priorityFlag;
+	}
+}
+
+void SpriteManager::setSpriteHandleCoordinateSpace(uint32 spriteHandle, Space space)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mCoordinatesSpace = space;
+	}
+}
+
+void SpriteManager::setSpriteHandleUseGlobalComponentTint(uint32 spriteHandle, bool enable)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mUseGlobalComponentTint = enable;
+	}
+}
+
 void SpriteManager::setSpriteHandlePaletteOffset(uint32 spriteHandle, uint16 paletteOffset)
 {
 	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
@@ -404,12 +469,16 @@ void SpriteManager::applyFlags(CustomSpriteInfoBase& sprite, uint8 flags) const
 	sprite.mUseGlobalComponentTint = (flags & 0x80) == 0;
 
 	// Flip X / Y
-	if ((flags & 0x01) != 0)
+	const bool flipX = (flags & 0x01) != 0;
+	const bool flipY = (flags & 0x02) != 0;
+	if (sprite.mFlipX != flipX)
 	{
+		sprite.mFlipX = flipX;
 		sprite.mTransformation.flipX();
 	}
-	if ((flags & 0x02) != 0)
+	if (sprite.mFlipY != flipY)
 	{
+		sprite.mFlipY = flipY;
 		sprite.mTransformation.flipY();
 	}
 }
