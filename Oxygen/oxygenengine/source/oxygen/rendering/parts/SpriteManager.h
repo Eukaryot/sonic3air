@@ -56,7 +56,7 @@ public:
 		inline ~SpriteInfo() {}
 
 	private:
-		Type mType;
+		const Type mType = Type::INVALID;
 	};
 
 	struct VdpSpriteInfo : public SpriteInfo
@@ -76,7 +76,7 @@ public:
 		Vec2i mSize;
 		Vec2i mPivotOffset;
 		Transform2D mTransformation;
-		bool  mUseUpscaledSprite = false;	// Currently only supported for palette sprites
+		bool mUseUpscaledSprite = false;	// Currently only supported for palette sprites
 	};
 
 	struct PaletteSpriteInfo : public CustomSpriteInfoBase
@@ -114,6 +114,13 @@ public:
 	void drawCustomSpriteWithTransform(uint64 key, const Vec2i& position, uint16 atex, uint8 flags, uint16 renderQueue, const Color& tintColor, const Transform2D& transformation);
 	void addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space);
 
+	uint32 addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue);
+	void setSpriteHandleFlags(uint32 spriteHandle, uint8 flags);
+	void setSpriteHandlePaletteOffset(uint32 spriteHandle, uint16 paletteOffset);
+	void setSpriteHandleTintColor(uint32 spriteHandle, Color tintColor);
+	void setSpriteHandleOpacity(uint32 spriteHandle, float opacity);
+	void setSpriteHandleAddedColor(uint32 spriteHandle, Color addedColor);
+
 	void setLogicalSpriteSpace(Space space);
 	void clearSpriteTag();
 	void setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& position);
@@ -127,6 +134,23 @@ public:
 	bool mLegacyVdpSpriteMode = false;
 
 private:
+	struct SpriteSets
+	{
+		std::vector<VdpSpriteInfo>		 mVdpSprites;
+		std::vector<PaletteSpriteInfo>	 mPaletteSprites;
+		std::vector<ComponentSpriteInfo> mComponentSprites;
+		std::vector<SpriteMaskInfo>		 mSpriteMasks;
+		std::unordered_map<uint32, CustomSpriteInfoBase*> mSpritesByHandle;
+		std::pair<uint32, CustomSpriteInfoBase*> mLatestSpritesByHandle;
+
+		void clear();
+		void swap(SpriteSets& other);
+		CustomSpriteInfoBase* getSpriteByHandle(uint32 spriteHandle) const;
+	};
+
+private:
+	CustomSpriteInfoBase* addSpriteByKey(uint64 key);
+	void applyFlags(CustomSpriteInfoBase& sprite, uint8 flags) const;
 	void checkSpriteTag(SpriteInfo& sprite);
 	void collectLegacySprites();
 
@@ -137,18 +161,10 @@ private:
 	bool mResetSprites = false;
 	Space mLogicalSpriteSpace = Space::SCREEN;
 
-	struct SpriteSets
-	{
-		std::vector<VdpSpriteInfo>		 mVdpSprites;
-		std::vector<PaletteSpriteInfo>	 mPaletteSprites;
-		std::vector<ComponentSpriteInfo> mComponentSprites;
-		std::vector<SpriteMaskInfo>		 mSpriteMasks;
-		void clear();
-		void swap(SpriteSets& other);
-	};
 	SpriteSets mCurrSpriteSets;
 	SpriteSets mNextSpriteSets;
 	std::vector<SpriteInfo*> mSprites;
+	uint32 mNextSpriteHandle = 1;
 
 	uint16 mSpriteAttributeTableBase = 0xf800;	// Only used in legacy VPD sprite mode
 

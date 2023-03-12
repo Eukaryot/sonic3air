@@ -20,6 +20,8 @@ void SpriteManager::SpriteSets::clear()
 	mPaletteSprites.clear();
 	mComponentSprites.clear();
 	mSpriteMasks.clear();
+	mSpritesByHandle.clear();
+	mLatestSpritesByHandle = std::make_pair(0, nullptr);
 }
 
 void SpriteManager::SpriteSets::swap(SpriteSets& other)
@@ -28,6 +30,19 @@ void SpriteManager::SpriteSets::swap(SpriteSets& other)
 	other.mPaletteSprites.swap(mPaletteSprites);
 	other.mComponentSprites.swap(mComponentSprites);
 	other.mSpriteMasks.swap(mSpriteMasks);
+	other.mSpritesByHandle.swap(mSpritesByHandle);
+	mLatestSpritesByHandle = std::make_pair(0, nullptr);
+}
+
+SpriteManager::CustomSpriteInfoBase* SpriteManager::SpriteSets::getSpriteByHandle(uint32 spriteHandle) const
+{
+	// Use the quick lookup if possible
+	if (mLatestSpritesByHandle.first == spriteHandle)
+		return mLatestSpritesByHandle.second;
+
+	// Otherwise search the map
+	const auto it = mSpritesByHandle.find(spriteHandle);
+	return (it == mSpritesByHandle.end()) ? nullptr : it->second;
 }
 
 
@@ -209,85 +224,37 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	//  - 0x40 = Priority flag
 	//  - 0x80 = Use global tint
 
-	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(key);
-	if (nullptr == item)
+	CustomSpriteInfoBase* spritePtr = addSpriteByKey(key);
+	if (nullptr == spritePtr)
 		return;
 
-	CustomSpriteInfoBase* spritePtr;
-	if (item->mUsesComponentSprite)
-	{
-		if (mNextSpriteSets.mComponentSprites.size() >= 0x400)
-		{
-			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mComponentSprites.size() << " component sprites, further sprites will be ignored", );
-			return;
-		}
-
-		spritePtr = &vectorAdd(mNextSpriteSets.mComponentSprites);
-	}
-	else
-	{
-		if (mNextSpriteSets.mPaletteSprites.size() >= 0x400)
-		{
-			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mPaletteSprites.size() << " palette sprites, further sprites will be ignored", );
-			return;
-		}
-
-		PaletteSpriteInfo& info = vectorAdd(mNextSpriteSets.mPaletteSprites);
-		info.mAtex = atex;
-		spritePtr = &info;
-	}
 	CustomSpriteInfoBase& sprite = *spritePtr;
+	if (sprite.getType() == SpriteInfo::Type::PALETTE)
+	{
+		static_cast<PaletteSpriteInfo&>(sprite).mAtex = atex;
+	}
 
-	sprite.mKey = key;
-	sprite.mCacheItem = item;
-	sprite.mRenderQueue = renderQueue;
-	sprite.mPriorityFlag = (flags & 0x40) != 0;
 	sprite.mPosition = position;
-	sprite.mPivotOffset = item->mSprite->mOffset;
-	sprite.mFullyOpaque = (flags & 0x10) != 0;
-	sprite.mCoordinatesSpace = ((flags & 0x20) != 0) ? Space::WORLD : Space::SCREEN;
-	sprite.mLogicalSpace = mLogicalSpriteSpace;
+	sprite.mRenderQueue = renderQueue;
 	sprite.mTransformation = transformation;
+	sprite.mTintColor = tintColor;
 
-	if (item->mUsesComponentSprite)
-	{
-		ComponentSprite& sourceSprite = *static_cast<ComponentSprite*>(item->mSprite);
-		sprite.mSize = sourceSprite.getBitmap().getSize();
-	}
-	else
-	{
-		PaletteSprite& sourceSprite = *static_cast<PaletteSprite*>(item->mSprite);
-		sprite.mSize = sourceSprite.getBitmap().getSize();
-	}
-
-	// Flip X / Y
-	if ((flags & 0x01) != 0)
-	{
-		sprite.mTransformation.flipX();
-	}
-	if ((flags & 0x02) != 0)
-	{
-		sprite.mTransformation.flipY();
-	}
+	applyFlags(sprite, flags);
 
 	// For smoother rotation, use upscaled version of this sprite when actually rotating
 	//  -> This is basically the Fast SpriteRot algorithm (also see "applyScale3x" in PaletteSprite.cpp)
 	//  -> Currently only implemented for palette sprites, but could be added for component sprites as well if needed
-	if (!item->mUsesComponentSprite && sprite.mTransformation.hasRotationOrScale() && (flags & 0x08) == 0)
+	if (!sprite.mCacheItem->mUsesComponentSprite && sprite.mTransformation.hasRotationOrScale() && (flags & 0x08) == 0)
 	{
 		sprite.mUseUpscaledSprite = true;
 
 		const constexpr float SCALE = 1.0f / 3.0f;
-		const Vec2f transformedOffset = sprite.mTransformation.transformVector(item->mSprite->mOffset);
+		const Vec2f transformedOffset = sprite.mTransformation.transformVector(sprite.mCacheItem->mSprite->mOffset);
 		sprite.mPosition.x += roundToInt(transformedOffset.x * (1.0f - SCALE));
 		sprite.mPosition.y += roundToInt(transformedOffset.y * (1.0f - SCALE));
 		sprite.mSize *= 3;
 		sprite.mTransformation.applyScale(SCALE);
 	}
-
-	sprite.mTintColor = tintColor;
-	//sprite.mAddedColor = addedColor;
-	sprite.mUseGlobalComponentTint = (flags & 0x80) == 0;
 
 	checkSpriteTag(sprite);
 }
@@ -309,6 +276,73 @@ void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint
 	sprite.mLogicalSpace = mLogicalSpriteSpace;
 }
 
+uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue)
+{
+	CustomSpriteInfoBase* spritePtr = addSpriteByKey(key);
+	if (nullptr == spritePtr)
+		return 0;
+
+	CustomSpriteInfoBase& sprite = *spritePtr;
+	sprite.mPosition = position;
+	sprite.mRenderQueue = renderQueue;
+	sprite.mTransformation.setIdentity();
+
+	checkSpriteTag(sprite);
+
+	const uint32 handle = mNextSpriteHandle;
+	mNextSpriteSets.mSpritesByHandle[handle] = spritePtr;
+
+	++mNextSpriteHandle;
+	if (mNextSpriteHandle == 0)
+		++mNextSpriteHandle;
+	return handle;
+}
+
+void SpriteManager::setSpriteHandleFlags(uint32 spriteHandle, uint8 flags)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		applyFlags(*spritePtr, flags);
+	}
+}
+
+void SpriteManager::setSpriteHandlePaletteOffset(uint32 spriteHandle, uint16 paletteOffset)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr && spritePtr->getType() == SpriteInfo::Type::PALETTE)
+	{
+		static_cast<PaletteSpriteInfo*>(spritePtr)->mAtex = paletteOffset;
+	}
+}
+
+void SpriteManager::setSpriteHandleTintColor(uint32 spriteHandle, Color tintColor)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mTintColor = tintColor;
+	}
+}
+
+void SpriteManager::setSpriteHandleOpacity(uint32 spriteHandle, float opacity)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mTintColor.a = opacity;
+	}
+}
+
+void SpriteManager::setSpriteHandleAddedColor(uint32 spriteHandle, Color addedColor)
+{
+	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
+	if (nullptr != spritePtr)
+	{
+		spritePtr->mAddedColor = addedColor;
+	}
+}
+
 void SpriteManager::setLogicalSpriteSpace(Space space)
 {
 	mLogicalSpriteSpace = space;
@@ -323,6 +357,61 @@ void SpriteManager::setSpriteTagWithPosition(uint64 spriteTag, const Vec2i& posi
 {
 	mSpriteTag = spriteTag;
 	mTaggedSpritePosition = position;
+}
+
+SpriteManager::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
+{
+	const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(key);
+	if (nullptr != item)
+	{
+		if (item->mUsesComponentSprite)
+		{
+			if (mNextSpriteSets.mComponentSprites.size() < 0x400)
+			{
+				ComponentSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mComponentSprites);
+				sprite.mKey = key;
+				sprite.mCacheItem = item;
+				sprite.mPivotOffset = item->mSprite->mOffset;
+				sprite.mSize = static_cast<ComponentSprite*>(item->mSprite)->getBitmap().getSize();
+				sprite.mLogicalSpace = mLogicalSpriteSpace;
+				return &sprite;
+			}
+			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mComponentSprites.size() << " component sprites, further sprites will be ignored", );
+		}
+		else
+		{
+			if (mNextSpriteSets.mPaletteSprites.size() < 0x400)
+			{
+				PaletteSpriteInfo& sprite = vectorAdd(mNextSpriteSets.mPaletteSprites);
+				sprite.mKey = key;
+				sprite.mCacheItem = item;
+				sprite.mPivotOffset = item->mSprite->mOffset;
+				sprite.mSize = static_cast<PaletteSprite*>(sprite.mCacheItem->mSprite)->getBitmap().getSize();
+				sprite.mLogicalSpace = mLogicalSpriteSpace;
+				return &sprite;
+			}
+			RMX_ERROR("Reached the upper limit of " << mNextSpriteSets.mPaletteSprites.size() << " palette sprites, further sprites will be ignored", );
+		}
+	}
+	return nullptr;
+}
+
+void SpriteManager::applyFlags(CustomSpriteInfoBase& sprite, uint8 flags) const
+{
+	sprite.mPriorityFlag = (flags & 0x40) != 0;
+	sprite.mFullyOpaque = (flags & 0x10) != 0;
+	sprite.mCoordinatesSpace = ((flags & 0x20) != 0) ? Space::WORLD : Space::SCREEN;
+	sprite.mUseGlobalComponentTint = (flags & 0x80) == 0;
+
+	// Flip X / Y
+	if ((flags & 0x01) != 0)
+	{
+		sprite.mTransformation.flipX();
+	}
+	if ((flags & 0x02) != 0)
+	{
+		sprite.mTransformation.flipY();
+	}
 }
 
 void SpriteManager::checkSpriteTag(SpriteInfo& sprite)

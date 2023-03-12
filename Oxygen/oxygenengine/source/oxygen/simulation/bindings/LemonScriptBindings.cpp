@@ -873,9 +873,6 @@ namespace
 
 void LemonScriptBindings::registerBindings(lemon::Module& module)
 {
-	// Renderer bindings
-	RendererBindings::registerBindings(module);
-
 	// Basic functions
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 	module.addNativeFunction("assert", lemon::wrap(&scriptAssert1), defaultFlags);
@@ -1061,8 +1058,12 @@ void LemonScriptBindings::registerBindings(lemon::Module& module)
 
 		// Yield
 		module.addNativeFunction("yieldExecution", lemon::wrap(&yieldExecution));	// Should not get inline executed
+	}
 
+	// Renderer bindings
+	RendererBindings::registerBindings(module);
 
+	{
 		// Audio
 		module.addNativeFunction("Audio.getAudioKeyType", lemon::wrap(&Audio_getAudioKeyType), defaultFlags)
 			.setParameterInfo(0, "sfxId");

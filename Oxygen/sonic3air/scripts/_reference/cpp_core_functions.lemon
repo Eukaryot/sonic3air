@@ -253,14 +253,15 @@ declare function void Renderer.setScreenSize(u16 width, u16 height)
 declare function void Renderer.resetViewport(u16 renderQueue)
 declare function void Renderer.setViewport(s16 px, s16 py, s16 width, s16 height, u16 renderQueue)
 declare function void Renderer.setGlobalComponentTint(s16 tintR, s16 tintG, s16 tintB, s16 addedR, s16 addedG, s16 addedB)
+declare function void Renderer.drawText(string fontKey, s32 px, s32 py, string text, u32 tintColor, u8 alignment, s8 spacing, u16 renderQueue, s8 useWorldSpace)
+declare function s32 Renderer.getTextWidth(string fontKey, string text)
 
 declare function void setWorldSpaceOffset(s32 px, s32 py)
 
 declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height)
 declare function void Debug.drawRect(s32 px, s32 py, s32 width, s32 height, u32 color)
 
-declare function void Renderer.drawText(string fontKey, s32 px, s32 py, string text, u32 tintColor, u8 alignment, s8 spacing, u16 renderQueue, s8 useWorldSpace)
-declare function s32 Renderer.getTextWidth(string fontKey, string text)
+declare function SpriteHandle Renderer.addSpriteHandle(u64 spriteKey, s16 px, s16 py, u16 renderQueue)
 
 declare function u8 Audio.getAudioKeyType(u64 sfxId)
 declare function s8 Audio.isPlayingAudio(u64 sfxId)
@@ -336,3 +337,12 @@ declare function void WriteScrollOffsets()
 declare function void WriteScrollOffsetsFlipped()
 declare function u32 putNybbles(u32 input, u16 count, u8 value)
 declare function void uncompressKosinskiData(u32 sourceAddress, u16 targetInVRAM)
+
+
+// Methods (to be called on variables directly)
+
+declare function void SpriteHandle:setFlags(u8 flags)
+declare function void SpriteHandle:setPaletteOffset(u16 paletteOffset)
+declare function void SpriteHandle:setTintColor(float red, float green, float blue, float alpha)
+declare function void SpriteHandle:setOpacity(float opacity)
+declare function void SpriteHandle:setAddedColor(float red, float green, float blue)

@@ -15,6 +15,7 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 #include "oxygen/simulation/RuntimeEnvironment.h"
 
+#include <lemon/program/DataType.h>
 #include <lemon/program/FunctionWrapper.h>
 #include <lemon/program/Module.h>
 
@@ -559,13 +560,78 @@ namespace
 	{
 		RenderParts::instance().getOverlayManager().addDebugDrawRect(Recti(px, py, width, height), Color::fromRGBA32(color));
 	}
+
+
+	struct SpriteHandleWrapper
+	{
+		uint32 mHandle = 0;
+		static inline const lemon::CustomDataType* mDataType = nullptr;
+	};
+
+	SpriteHandleWrapper Renderer_addSpriteHandle(uint64 spriteKey, int16 px, int16 py, uint16 renderQueue)
+	{
+		const uint32 handle = RenderParts::instance().getSpriteManager().addSpriteHandle(spriteKey, Vec2i(px, py), renderQueue);
+		return SpriteHandleWrapper { handle };
+	}
+
+	void SpriteHandle_setFlags(SpriteHandleWrapper spriteHandle, uint8 flags)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleFlags(spriteHandle.mHandle, flags);
+	}
+
+	void SpriteHandle_setPaletteOffset(SpriteHandleWrapper spriteHandle, uint16 paletteOffset)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandlePaletteOffset(spriteHandle.mHandle, paletteOffset);
+	}
+
+	void SpriteHandle_setTintColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue, float alpha)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleTintColor(spriteHandle.mHandle, Color(red, green, blue, alpha));
+	}
+
+	void SpriteHandle_setOpacity(SpriteHandleWrapper spriteHandle, float opacity)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleOpacity(spriteHandle.mHandle, opacity);
+	}
+
+	void SpriteHandle_setAddedColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue)
+	{
+		RenderParts::instance().getSpriteManager().setSpriteHandleAddedColor(spriteHandle.mHandle, Color(red, green, blue));
+	}
+}
+
+
+namespace lemon
+{
+	namespace traits
+	{
+		template<> const DataTypeDefinition* getDataType<SpriteHandleWrapper>()  { return SpriteHandleWrapper::mDataType; }
+	}
+
+	namespace internal
+	{
+		template<>
+		void pushStackGeneric<SpriteHandleWrapper>(SpriteHandleWrapper value, const NativeFunction::Context context)
+		{
+			context.mControlFlow.pushValueStack(value.mHandle);
+		};
+
+		template<>
+		SpriteHandleWrapper popStackGeneric(const NativeFunction::Context context)
+		{
+			return SpriteHandleWrapper { context.mControlFlow.popValueStack<uint32>() };
+		}
+	}
 }
 
 
 void RendererBindings::registerBindings(lemon::Module& module)
 {
-	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
+	// Data type
+	SpriteHandleWrapper::mDataType = module.addDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
+	
+	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 
 	// Screen size query
 	module.addNativeFunction("getScreenWidth", lemon::wrap(&getScreenWidth), defaultFlags);
@@ -947,7 +1013,8 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(0, "fontKey")
 		.setParameterInfo(1, "text");
 
-	// Debug draw rects & texts
+
+	// Debug draw rects
 	module.addNativeFunction("setWorldSpaceOffset", lemon::wrap(&setWorldSpaceOffset), defaultFlags)
 		.setParameterInfo(0, "px")
 		.setParameterInfo(1, "py");
@@ -964,4 +1031,37 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(2, "width")
 		.setParameterInfo(3, "height")
 		.setParameterInfo(4, "color");
+
+
+	// Sprite handle
+	module.addNativeFunction("Renderer.addSpriteHandle", lemon::wrap(&Renderer_addSpriteHandle), defaultFlags)
+		.setParameterInfo(0, "spriteKey")
+		.setParameterInfo(1, "px")
+		.setParameterInfo(2, "py")
+		.setParameterInfo(3, "renderQueue");
+
+	module.addNativeMethod("SpriteHandle", "setFlags", lemon::wrap(&SpriteHandle_setFlags), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "flags");
+
+	module.addNativeMethod("SpriteHandle", "setPaletteOffset", lemon::wrap(&SpriteHandle_setPaletteOffset), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "paletteOffset");
+
+	module.addNativeMethod("SpriteHandle", "setTintColor", lemon::wrap(&SpriteHandle_setTintColor), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "red")
+		.setParameterInfo(2, "green")
+		.setParameterInfo(3, "blue")
+		.setParameterInfo(4, "alpha");
+
+	module.addNativeMethod("SpriteHandle", "setOpacity", lemon::wrap(&SpriteHandle_setOpacity), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "opacity");
+
+	module.addNativeMethod("SpriteHandle", "setAddedColor", lemon::wrap(&SpriteHandle_setAddedColor), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "red")
+		.setParameterInfo(2, "green")
+		.setParameterInfo(3, "blue");
 }
