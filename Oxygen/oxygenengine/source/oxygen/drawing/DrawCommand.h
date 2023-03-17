@@ -46,6 +46,7 @@ public:
 		RECT,
 		UPSCALED_RECT,
 		SPRITE,
+		SPRITE_RECT,
 		MESH,
 		MESH_VERTEX_COLOR,
 		SET_BLEND_MODE,
@@ -145,6 +146,20 @@ public:
 	uint64 mSpriteKey;
 	Color mTintColor;
 	Vec2f mScale;
+};
+
+
+class SpriteRectDrawCommand final : public DrawCommand
+{
+	friend class ObjectPoolBase<SpriteRectDrawCommand>;
+
+protected:
+	SpriteRectDrawCommand(const Recti& rect, uint64 spriteKey, const Color& tintColor) : DrawCommand(Type::SPRITE_RECT), mRect(rect), mSpriteKey(spriteKey), mTintColor(tintColor) {}
+
+public:
+	Recti mRect;
+	uint64 mSpriteKey;
+	Color mTintColor;
 };
 
 
@@ -288,6 +303,7 @@ public:
 	ObjectPool<RectDrawCommand>					 mRectDrawCommands;
 	ObjectPool<UpscaledRectDrawCommand>			 mUpscaledRectDrawCommands;
 	ObjectPool<SpriteDrawCommand>				 mSpriteDrawCommands;
+	ObjectPool<SpriteRectDrawCommand>			 mSpriteRectDrawCommands;
 	ObjectPool<MeshDrawCommand>					 mMeshDrawCommands;
 	ObjectPool<MeshVertexColorDrawCommand>		 mMeshVertexColorDrawCommands;
 	ObjectPool<SetBlendModeDrawCommand>			 mSetBlendModeDrawCommands;
@@ -309,6 +325,7 @@ public:
 			case DrawCommand::Type::RECT:						mRectDrawCommands.destroyObject(drawCommand.as<RectDrawCommand>());  break;
 			case DrawCommand::Type::UPSCALED_RECT:				mUpscaledRectDrawCommands.destroyObject(drawCommand.as<UpscaledRectDrawCommand>());  break;
 			case DrawCommand::Type::SPRITE:						mSpriteDrawCommands.destroyObject(drawCommand.as<SpriteDrawCommand>());  break;
+			case DrawCommand::Type::SPRITE_RECT:				mSpriteRectDrawCommands.destroyObject(drawCommand.as<SpriteRectDrawCommand>());  break;
 			case DrawCommand::Type::MESH:						mMeshDrawCommands.destroyObject(drawCommand.as<MeshDrawCommand>());  break;
 			case DrawCommand::Type::MESH_VERTEX_COLOR:			mMeshVertexColorDrawCommands.destroyObject(drawCommand.as<MeshVertexColorDrawCommand>());  break;
 			case DrawCommand::Type::SET_BLEND_MODE:				mSetBlendModeDrawCommands.destroyObject(drawCommand.as<SetBlendModeDrawCommand>());  break;

@@ -87,22 +87,34 @@ void Drawer::setWrapMode(TextureWrapMode wrapMode)
 
 void Drawer::drawRect(const Rectf& rect, const Color& color)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, color));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, color));
+	}
 }
 
 void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture));
+	}
 }
 
 void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Color& tintColor)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, tintColor));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, tintColor));
+	}
 }
 
 void Drawer::drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor)
 {
-	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, uv0, uv1, tintColor));
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mRectDrawCommands.createObject(rect, texture, uv0, uv1, tintColor));
+	}
 }
 
 void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
@@ -113,6 +125,14 @@ void Drawer::drawUpscaledRect(const Rectf& rect, DrawerTexture& texture)
 void Drawer::drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor, Vec2f scale)
 {
 	mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSpriteDrawCommands.createObject(position, spriteKey, tintColor, scale));
+}
+
+void Drawer::drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor)
+{
+	if (!rect.isEmpty())
+	{
+		mDrawCollection.addDrawCommand(DrawCommand::mFactory.mSpriteRectDrawCommands.createObject(rect, spriteKey, tintColor));
+	}
 }
 
 void Drawer::drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture)

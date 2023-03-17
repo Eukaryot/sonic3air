@@ -531,6 +531,28 @@ void OpenGLDrawer::performRendering(const DrawCollection& drawCollection)
 				break;
 			}
 
+			case DrawCommand::Type::SPRITE_RECT:
+			{
+				SpriteRectDrawCommand& sc = drawCommand->as<SpriteRectDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				OpenGLTexture* texture = mInternal.mSpriteTextureManager.getComponentSpriteTexture(*item);
+				if (nullptr == texture)
+					break;
+
+				// TODO: Cache sampling mode for the texture?
+				//  -> That requires the sprite texture manager to store (more high level) OpenGLDrawerTexture instead of OpenGLTexture instances
+				glBindTexture(GL_TEXTURE_2D, texture->getHandle());
+				mInternal.applySamplingMode();
+
+				mInternal.drawRect(sc.mRect, texture->getHandle(), sc.mTintColor);
+				break;
+			}
+
 			case DrawCommand::Type::MESH:
 			{
 				if (!mInternal.mayRenderAnything())

@@ -63,6 +63,7 @@ public:
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor);
 	void drawUpscaledRect(const Rectf& rect, DrawerTexture& texture);
 	void drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor = Color::WHITE, Vec2f scale = Vec2f(1.0f, 1.0f));
+	void drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor = Color::WHITE);
 	void drawMesh(const std::vector<DrawerMeshVertex>& triangles, DrawerTexture& texture);
 	void drawMesh(const std::vector<DrawerMeshVertex_P2_C4>& triangles);
 	void drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture);

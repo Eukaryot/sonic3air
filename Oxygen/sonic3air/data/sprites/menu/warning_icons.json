@@ -1,0 +1,6 @@
+{
+
+	"small_warning_icon_yellow": { "File": "warning_icons.png", "Rect":  "1,1,12,11", "Center": "7,6" },
+	"small_warning_icon_red":    { "File": "warning_icons.png", "Rect": "14,1,12,11", "Center": "7,6" }	
+
+}

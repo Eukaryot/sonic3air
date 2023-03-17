@@ -532,6 +532,23 @@ void SoftwareDrawer::performRendering(const DrawCollection& drawCollection)
 				break;
 			}
 
+			case DrawCommand::Type::SPRITE_RECT:
+			{
+				SpriteRectDrawCommand& sc = drawCommand->as<SpriteRectDrawCommand>();
+				const SpriteCache::CacheItem* item = SpriteCache::instance().getSprite(sc.mSpriteKey);
+				if (nullptr == item)
+					break;
+				if (!item->mUsesComponentSprite)
+					break;
+
+				ComponentSprite& sprite = *static_cast<ComponentSprite*>(item->mSprite);
+
+				// TODO: No support for bilinear sampling here...
+
+				mInternal.drawRect(sc.mRect, &sprite.accessBitmap(), sc.mTintColor);
+				break;
+			}
+
 			case DrawCommand::Type::MESH:
 			{
 				MeshDrawCommand& dc = drawCommand->as<MeshDrawCommand>();

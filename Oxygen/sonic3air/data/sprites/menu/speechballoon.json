@@ -1,0 +1,18 @@
+{
+
+	"speechballoon_00": { "File": "speechballoon.png", "Rect": "1,1,5,5", "Center": "5,5" },
+	"speechballoon_10": { "File": "speechballoon.png", "Rect": "7,1,1,5" },
+	"speechballoon_20": { "File": "speechballoon.png", "Rect": "9,1,5,5", "Center": "0,5" },
+
+	"speechballoon_01": { "File": "speechballoon.png", "Rect": "1,7,5,1" },
+	"speechballoon_11": { "File": "speechballoon.png", "Rect": "7,7,1,1" },
+	"speechballoon_21": { "File": "speechballoon.png", "Rect": "9,7,5,1" },
+
+	"speechballoon_02": { "File": "speechballoon.png", "Rect": "1,9,5,5", "Center": "5,0" },
+	"speechballoon_12": { "File": "speechballoon.png", "Rect": "7,9,1,5" },
+	"speechballoon_22": { "File": "speechballoon.png", "Rect": "9,9,5,5", "Center": "0,0" },
+
+	"speechballoon_arrow_up":   { "File": "speechballoon.png", "Rect": "1,15,12,9", "Center": "6,9" },
+	"speechballoon_arrow_down": { "File": "speechballoon.png", "Rect": "1,25,12,9", "Center": "6,0" }
+
+}

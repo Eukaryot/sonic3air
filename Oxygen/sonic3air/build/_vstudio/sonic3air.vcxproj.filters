@@ -167,6 +167,9 @@
     <ClCompile Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.cpp">
       <Filter>menu\entries</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\helper\DrawingUtils.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -292,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\entries\GeneralMenuEntries.h">
       <Filter>menu\entries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\helper\DrawingUtils.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

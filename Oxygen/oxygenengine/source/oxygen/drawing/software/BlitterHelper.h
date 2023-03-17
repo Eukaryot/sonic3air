@@ -408,7 +408,7 @@ struct BlitterHelper
 			const int sourceY = sourceRect.y + lineIndex * sourceRect.height / destRect.height;
 			uint32* destData = destBitmap.getPixelPointer(destRect.x, destY);
 
-			if (sourceY == lastSourceY && nullptr != lastDestData)
+			if (sourceY == lastSourceY && nullptr != lastDestData && !ALPHA_BLENDING)
 			{
 				// Just copy the content from the last line, as it's the same contents again
 				memcpy(destData, lastDestData, destRect.width * sizeof(uint32));
