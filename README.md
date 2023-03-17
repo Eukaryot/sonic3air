@@ -77,6 +77,7 @@ Game scripts & other contributions by:
 * D.A. Garden
 * Alieneer
 * 3Pills
+* Elsie The Pict
 
 
 ## Want to contribute?
