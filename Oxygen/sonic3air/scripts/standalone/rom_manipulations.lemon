@@ -15,6 +15,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.RepairSpriteMappings()
 	ROMManipulation.RepairAnimations()
 	ROMManipulation.CutsceneKnucklesPalette()
+	ROMManipulation.AIZ1.KnucklesIntroCritters()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
 	ROMManipulation.BonusSM.Probabilities()
@@ -92,6 +93,15 @@ function void ROMManipulation.CutsceneKnucklesPalette()
 	u16[0x066912 + 0x06] = 0x020c
 	u16[0x066912 + 0x08] = 0x0206
 	//u16[0x066912 + 0x0a] = 0x0080		// TODO: This entry is also used for the rings, should not be changed to green
+}
+
+
+function void ROMManipulation.AIZ1.KnucklesIntroCritters()
+{
+	// Use AIZ critters and not the MHZ critters in Knuckles' intro, #contributed by iCloudius
+	//  -> Also requires some additional initialization code, search for the comment above to find that one
+	s16[0x06370f] = 0x5000
+	s16[0x063713] = -0x45fb
 }
 
 
