@@ -184,21 +184,64 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 			if (rotationMode != 0)
 			{
-				s8 oldRotation = isPlayer1 ? oldRotationPlayer1 : oldRotationPlayer2
-				flags = char.flags & char.flag.FACING_LEFT		// This really has to be "char.flags", not "char.render_flags"
-
-				angle = char.rotation
-				if (rotationMode == 1)
+				if (char.flags & char.flag.IN_AIR || global.zone == 0x0c) //Use in-air rotation in DDZ
 				{
-					if (abs(s8(char.rotation)) <= 0x10 && abs(s8(oldRotation)) <= 0x10)
-					{
-						angle = 0
-					}
+					s8 oldRotation = isPlayer1 ? oldRotationPlayer1 : oldRotationPlayer2
+					flags = char.flags & char.flag.FACING_LEFT		// This really has to be "char.flags", not "char.render_flags"
 
-					if (angle != char.rotation)
+					angle = char.rotation
+					if (rotationMode == 1)
 					{
-						s8 diff = angle - oldRotation
-						angle = oldRotation + clamp(diff, -3, 3)
+						if (abs(s8(char.rotation)) <= 0x10 && abs(s8(oldRotation)) <= 0x10)
+						{
+							angle = 0
+						}
+
+						if (angle != char.rotation)
+						{
+							s8 diff = angle - oldRotation
+							angle = oldRotation + clamp(diff, -3, 3)
+						}
+					}	
+				}
+				else
+				{
+					u8 oldRotation = isPlayer1 ? oldRotationPlayer1 : oldRotationPlayer2
+					flags = char.flags & char.flag.FACING_LEFT		// This really has to be "char.flags", not "char.render_flags"
+
+					angle = char.rotation
+					if (rotationMode == 1)
+					{
+						
+						if (char.rotation <= 0x04 || char.rotation >= 0xfc)
+							oldRotation = 0
+						else
+						{
+							u32 targetRotation = 0
+							if (char.rotation > 0x10 && char.rotation < 0xe8)
+								targetRotation = char.rotation
+								
+							u32 rotate = targetRotation - oldRotation
+							u32 shift = (abs(char.groundspeed) <= 0x6000) + 1
+							
+							if (abs(rotate) >= abs(rotate - 0x100))
+							{
+								if (abs(rotate - 0x200) < abs(rotate + 0x100))
+									oldRotation += (rotate - 0x100) >> shift
+								else
+									oldRotation += (rotate + 0x100) >> shift
+							}
+							else
+							{
+								if (abs(rotate) < abs(rotate + 0x100))
+									oldRotation += rotate >> shift
+								else
+									oldRotation += (rotate + 0x100) >> shift
+							}
+						}
+						
+						angle = oldRotation
+						angle &= 0xFF
 					}
 				}
 			}
