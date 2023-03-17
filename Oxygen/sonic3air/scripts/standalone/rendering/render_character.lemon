@@ -184,7 +184,13 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 			if (rotationMode != 0)
 			{
-				if (char.flags & char.flag.IN_AIR || global.zone == 0x0c) //Use in-air rotation in DDZ
+				bool useVanillaS3AIRRotation = true
+				if (Game.getSetting(SETTING_SMOOTH_ROTATION) == 2)
+				{
+					useVanillaS3AIRRotation = (char.flags & char.flag.IN_AIR || global.zone == 0x0c)	// Use in-air rotation in DDZ
+				}
+
+				if (useVanillaS3AIRRotation)
 				{
 					s8 oldRotation = isPlayer1 ? oldRotationPlayer1 : oldRotationPlayer2
 					flags = char.flags & char.flag.FACING_LEFT		// This really has to be "char.flags", not "char.render_flags"
@@ -192,7 +198,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 					angle = char.rotation
 					if (rotationMode == 1)
 					{
-						if (abs(s8(char.rotation)) <= 0x10 && abs(s8(oldRotation)) <= 0x10)
+						if (abs(s8(char.rotation)) <= 0x10 && abs(oldRotation) <= 0x10)
 						{
 							angle = 0
 						}
@@ -206,6 +212,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 				}
 				else
 				{
+					// Mania-accurate rotation #contributed by Elsie The Pict
 					u8 oldRotation = isPlayer1 ? oldRotationPlayer1 : oldRotationPlayer2
 					flags = char.flags & char.flag.FACING_LEFT		// This really has to be "char.flags", not "char.render_flags"
 

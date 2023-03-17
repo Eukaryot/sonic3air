@@ -479,7 +479,8 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("Character Rotation:", option::ROTATION)
 			.addOption("Original", 0)
-			.addOption("Smooth", 1);
+			.addOption("Smooth", 1)
+			.addOption("Mania-Accurate", 2);
 
 		entries.addEntry<OptionsMenuEntry>().initEntry("Time Display:", option::TIME_DISPLAY)
 			.addOption("Original", 0)
