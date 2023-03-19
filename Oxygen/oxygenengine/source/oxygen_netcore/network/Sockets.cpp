@@ -324,6 +324,12 @@ bool TCPSocket::setupServer(uint16 serverPort)
 		return false;
 	}
 
+	#ifdef _WIN32
+		// Switch socket to non-blocking (especially for sending)
+		u_long mode = 1;
+		ioctlsocket(mInternal->mSocket, FIONBIO, &mode);
+	#endif
+
 	return true;
 }
 
