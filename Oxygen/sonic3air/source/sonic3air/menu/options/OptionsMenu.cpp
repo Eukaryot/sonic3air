@@ -10,6 +10,7 @@
 #include "sonic3air/menu/options/OptionsMenu.h"
 #include "sonic3air/menu/options/ControllerSetupMenu.h"
 #include "sonic3air/menu/options/OptionsMenuEntries.h"
+#include "sonic3air/menu/entries/GeneralMenuEntries.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/SharedResources.h"
@@ -232,6 +233,10 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.initEntry("Enable Ghost Sync", option::GHOST_SYNC)
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
+
+		// TEST
+		//  -> TODO: Needs support for a label text like "Channel" and possibly some explanation text as well
+		//entries.addEntry<InputFieldMenuEntry>().initEntry(L"world");
 
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
@@ -979,7 +984,18 @@ void OptionsMenu::deinitialize()
 
 void OptionsMenu::keyboard(const rmx::KeyboardEvent& ev)
 {
+	GameMenuEntry* entry = getSelectedGameMenuEntry();
+	if (nullptr != entry)
+		entry->keyboard(ev);
+
 	GameMenuBase::keyboard(ev);
+}
+
+void OptionsMenu::textinput(const rmx::TextInputEvent& ev)
+{
+	GameMenuEntry* entry = getSelectedGameMenuEntry();
+	if (nullptr != entry)
+		entry->textinput(ev);
 }
 
 void OptionsMenu::update(float timeElapsed)
@@ -1608,6 +1624,19 @@ bool OptionsMenu::isTitleShown(int tabIndex, int line) const
 			return true;
 	}
 	return false;
+}
+
+GameMenuEntry* OptionsMenu::getSelectedGameMenuEntry()
+{
+	if (mActiveTab < Tab::Id::_NUM)
+	{
+		GameMenuEntries& menuEntries = mTabs[mActiveTab].mMenuEntries;
+		if (menuEntries.mSelectedEntryIndex >= 0 && menuEntries.mSelectedEntryIndex < (int)menuEntries.size())
+		{
+			return &menuEntries[menuEntries.mSelectedEntryIndex];
+		}
+	}
+	return nullptr;
 }
 
 void OptionsMenu::goBack()

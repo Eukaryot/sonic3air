@@ -30,6 +30,7 @@ public:
 	virtual void initialize() override;
 	virtual void deinitialize() override;
 	virtual void keyboard(const rmx::KeyboardEvent& ev) override;
+	virtual void textinput(const rmx::TextInputEvent& ev) override;
 	virtual void update(float timeElapsed) override;
 	virtual void render() override;
 
@@ -59,6 +60,7 @@ private:
 	void playSoundtest(const AudioCollection::AudioDefinition& audioDefinition);
 	void refreshGamepadLists(bool forceUpdate = false);
 	bool isTitleShown(int tabIndex, int line) const;
+	GameMenuEntry* getSelectedGameMenuEntry();
 	void goBack();
 
 private:
