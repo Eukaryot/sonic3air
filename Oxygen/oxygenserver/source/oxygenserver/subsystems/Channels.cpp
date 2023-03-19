@@ -10,6 +10,7 @@
 #include "oxygenserver/subsystems/Channels.h"
 #include "oxygenserver/server/ServerNetConnection.h"
 
+#include "oxygen_netcore/network/LagStopwatch.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
 
@@ -19,6 +20,7 @@ bool Channels::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 	{
 		case network::BroadcastChannelMessagePacket::PACKET_TYPE:
 		{
+			LAG_STOPWATCH("BroadcastChannelMessagePacket", 500);
 			network::BroadcastChannelMessagePacket packet;
 			if (!evaluation.readPacket(packet))
 				return false;
@@ -84,6 +86,7 @@ bool Channels::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 
 bool Channels::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 {
+	LAG_STOPWATCH("Channels::onReceivedRequestQuery", 1000);
 	switch (evaluation.mPacketType)
 	{
 		case network::JoinChannelRequest::Query::PACKET_TYPE:

@@ -9,10 +9,9 @@
 #include "oxygen_netcore/pch.h"
 #include "oxygen_netcore/network/ServerClientBase.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
+#include "oxygen_netcore/network/LagStopwatch.h"
 #include "oxygen_netcore/network/LowLevelPackets.h"
 #include "oxygen_netcore/network/NetConnection.h"
-
-#include <chrono>
 
 
 namespace
@@ -57,50 +56,65 @@ uint64 ServerClientBase::getCurrentTimestamp()
 bool ServerClientBase::updateReceivePackets(ConnectionManager& connectionManager)
 {
 	// Check the socket for new packets
-	if (!connectionManager.updateReceivePackets())
-		return false;
+	{
+		LAG_STOPWATCH("connectionManager.updateReceivePackets", 2000);
+		if (!connectionManager.updateReceivePackets())
+			return false;
+	}
 
-	connectionManager.syncPacketQueues();
+	{
+		LAG_STOPWATCH("connectionManager.syncPacketQueues", 2000);
+		connectionManager.syncPacketQueues();
+	}
 
 	// Handle incoming TCP connections
-	std::list<TCPSocket>& incomingTCPConnections = connectionManager.getIncomingTCPConnections();
-	while (!incomingTCPConnections.empty())
 	{
-		// Create a new connection
-		NetConnection* connection = createNetConnection(connectionManager, SocketAddress());	// TODO: Fill in the actual sender address, in case some implementation wants to use it
-		if (nullptr != connection)
+		LAG_STOPWATCH("TCP connections", 2000);
+		std::list<TCPSocket>& incomingTCPConnections = connectionManager.getIncomingTCPConnections();
+		while (!incomingTCPConnections.empty())
 		{
-			// Setup connection
-			connection->setupWithTCPSocket(connectionManager, incomingTCPConnections.front(), getCurrentTimestamp());
+			// Create a new connection
+			NetConnection* connection = createNetConnection(connectionManager, SocketAddress());	// TODO: Fill in the actual sender address, in case some implementation wants to use it
+			if (nullptr != connection)
+			{
+				// Setup connection
+				connection->setupWithTCPSocket(connectionManager, incomingTCPConnections.front(), getCurrentTimestamp());
+			}
+			incomingTCPConnections.pop_front();
 		}
-		incomingTCPConnections.pop_front();
 	}
 
 	// Handle incoming packets
-	while (connectionManager.hasAnyPacket())
 	{
-		ReceivedPacket* receivedPacket = connectionManager.getNextReceivedPacket();
-		if (nullptr == receivedPacket)
+		LAG_STOPWATCH("Incoming packets", 2000);
+		while (connectionManager.hasAnyPacket())
 		{
-			// Handled all current packets
-			break;
-		}
+			ReceivedPacket* receivedPacket = connectionManager.getNextReceivedPacket();
+			if (nullptr == receivedPacket)
+			{
+				// Handled all current packets
+				break;
+			}
 
-		if (receivedPacket->mLowLevelSignature == lowlevel::StartConnectionPacket::SIGNATURE)
-		{
-			// It's a connection start request
-			handleConnectionStartPacket(connectionManager, *receivedPacket);
-		}
-		else
-		{
-			// It's packet for a connection
-			RMX_ASSERT(nullptr != receivedPacket->mConnection, "Expected an assigned connection");
-			receivedPacket->mConnection->handleLowLevelPacket(*receivedPacket);
-		}
+			if (receivedPacket->mLowLevelSignature == lowlevel::StartConnectionPacket::SIGNATURE)
+			{
+				// It's a connection start request
+				LAG_STOPWATCH("handleConnectionStartPacket", 500);
+				handleConnectionStartPacket(connectionManager, *receivedPacket);
+			}
+			else
+			{
+				// It's packet for a connection
+				RMX_ASSERT(nullptr != receivedPacket->mConnection, "Expected an assigned connection");
+				LAG_STOPWATCH("handleLowLevelPacket", 500);
+				receivedPacket->mConnection->handleLowLevelPacket(*receivedPacket);
+			}
 
-		// Return the packet if nobody increased the reference counter meanwhile
-		//  -> E.g. the ReceivedPacketCache does this when adding a high-level packet into its queue of pending packets
-		receivedPacket->decReferenceCounter();
+			// Return the packet if nobody increased the reference counter meanwhile
+			//  -> E.g. the ReceivedPacketCache does this when adding a high-level packet into its queue of pending packets
+			LAG_STOPWATCH("decReferenceCounter", 500);
+			receivedPacket->decReferenceCounter();
+		}
 	}
 
 	return true;

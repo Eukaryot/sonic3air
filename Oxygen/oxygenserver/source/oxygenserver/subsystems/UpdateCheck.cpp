@@ -10,6 +10,8 @@
 #include "oxygenserver/subsystems/UpdateCheck.h"
 #include "oxygenserver/server/ServerNetConnection.h"
 
+#include "oxygen_netcore/network/LagStopwatch.h"
+#include "oxygen_netcore/network/ServerClientBase.h"
 #include "oxygen_netcore/serverclient/Packets.h"
 
 
@@ -82,6 +84,8 @@ UpdateCheck::ReleaseChannel UpdateCheck::getReleaseChannelFromString(const std::
 
 bool UpdateCheck::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 {
+	LAG_STOPWATCH("UpdateCheck::onReceivedRequestQuery", 1000);
+
 	switch (evaluation.mPacketType)
 	{
 		case network::AppUpdateCheckRequest::Query::PACKET_TYPE:

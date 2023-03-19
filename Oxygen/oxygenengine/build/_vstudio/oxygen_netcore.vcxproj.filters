@@ -62,6 +62,9 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\WebSocketClient.h">
       <Filter>network\internal</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\network\LagStopwatch.h">
+      <Filter>network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />

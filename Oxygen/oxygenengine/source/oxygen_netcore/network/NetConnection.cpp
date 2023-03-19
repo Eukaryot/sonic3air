@@ -10,6 +10,7 @@
 #include "oxygen_netcore/network/NetConnection.h"
 #include "oxygen_netcore/network/ConnectionListener.h"
 #include "oxygen_netcore/network/ConnectionManager.h"
+#include "oxygen_netcore/network/LagStopwatch.h"
 #include "oxygen_netcore/network/LowLevelPackets.h"
 #include "oxygen_netcore/network/HighLevelPacketBase.h"
 #include "oxygen_netcore/network/RequestBase.h"
@@ -296,6 +297,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 	{
 		case lowlevel::AcceptConnectionPacket::SIGNATURE:
 		{
+			LAG_STOPWATCH("AcceptConnectionPacket", 1000);
 			lowlevel::AcceptConnectionPacket packet;
 			if (!packet.serializePacket(serializer, lowlevel::PacketBase::LOWLEVEL_PROTOCOL_VERSIONS.mMinimum))
 				return;
@@ -332,6 +334,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 		case lowlevel::HighLevelPacket::SIGNATURE:
 		case lowlevel::RequestQueryPacket::SIGNATURE:	// Can be treated the same way, as it does not have any additional members
 		{
+			LAG_STOPWATCH("HighLevelPacket", 1000);
 			lowlevel::HighLevelPacket highLevelPacket;
 			if (!highLevelPacket.serializePacket(serializer, mLowLevelProtocolVersion))
 				return;
@@ -349,6 +352,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 
 		case lowlevel::RequestResponsePacket::SIGNATURE:
 		{
+			LAG_STOPWATCH("RequestResponsePacket", 1000);
 			lowlevel::RequestResponsePacket requestResponsePacket;
 			if (!requestResponsePacket.serializePacket(serializer, mLowLevelProtocolVersion))
 				return;
@@ -366,6 +370,7 @@ void NetConnection::handleLowLevelPacket(ReceivedPacket& receivedPacket)
 
 		case lowlevel::ReceiveConfirmationPacket::SIGNATURE:
 		{
+			LAG_STOPWATCH("ReceiveConfirmationPacket", 1000);
 			lowlevel::ReceiveConfirmationPacket packet;
 			if (!packet.serializePacket(serializer, mLowLevelProtocolVersion))
 				return;
@@ -429,11 +434,15 @@ bool NetConnection::sendPacketInternal(const std::vector<uint8>& content)
 	{
 		case NetConnection::SocketType::UDP_SOCKET:
 		{
+			LAG_STOPWATCH("sendPacketInternal UDP", 500);
 			return mConnectionManager->sendUDPPacketData(content, mRemoteAddress);
 		}
 
 		case NetConnection::SocketType::TCP_SOCKET:
 		{
+			LAG_STOPWATCH(mIsWebSocketServer ? "sendPacketInternal TCP-web" : "sendPacketInternal TCP", 500);
+			if (content.size() >= 1000)
+				RMX_LOG_INFO("Stopwatch related info: content size was " << content.size());
 			return mConnectionManager->sendTCPPacketData(content, mTCPSocket, mIsWebSocketServer);
 		}
 
@@ -475,6 +484,7 @@ bool NetConnection::sendHighLevelPacket(highlevel::PacketBase& highLevelPacket, 
 
 bool NetConnection::sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacket, highlevel::PacketBase& highLevelPacket, SendFlags::Flags flags, uint32& outUniquePacketID)
 {
+	LAG_STOPWATCH("# sendHighLevelPacket", 500);
 	if (nullptr == mConnectionManager)
 		return false;
 
@@ -529,6 +539,9 @@ bool NetConnection::sendHighLevelPacket(lowlevel::HighLevelPacket& lowLevelPacke
 
 void NetConnection::handleHighLevelPacket(ReceivedPacket& receivedPacket, const lowlevel::HighLevelPacket& highLevelPacket, VectorBinarySerializer& serializer, uint32 uniqueResponseID)
 {
+	const std::string signatureString = "HighLevel_" + std::to_string(highLevelPacket.mPacketType);
+	LAG_STOPWATCH(signatureString.c_str(), 1000);
+
 	// Is this a tracked packet at all?
 	const bool isTracked = (highLevelPacket.mUniquePacketID != 0);
 	if (isTracked)
@@ -570,6 +583,8 @@ void NetConnection::handleHighLevelPacket(ReceivedPacket& receivedPacket, const 
 
 void NetConnection::processExtractedHighLevelPacket(const ReceivedPacketCache::CacheItem& extracted)
 {
+	LAG_STOPWATCH("processExtractedHighLevelPacket", 1000);
+
 	VectorBinarySerializer newSerializer(true, extracted.mReceivedPacket->mContent);
 	newSerializer.skip(extracted.mHeaderSize);
 

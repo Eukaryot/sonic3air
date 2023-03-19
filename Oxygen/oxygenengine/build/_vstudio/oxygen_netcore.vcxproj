@@ -28,6 +28,7 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\SentPacketCache.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\WebSocketClient.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\WebSocketWrapper.h" />
+    <ClInclude Include="..\..\source\oxygen_netcore\network\LagStopwatch.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\LowLevelPackets.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\NetConnection.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionListener.h" />

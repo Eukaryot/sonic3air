@@ -10,6 +10,7 @@
 #include "oxygenserver/server/Server.h"
 #include "oxygenserver/Configuration.h"
 
+#include "oxygen_netcore/network/LagStopwatch.h"
 #include "oxygen_netcore/serverclient/ProtocolVersion.h"
 
 #include "PrivatePackets.h"
@@ -64,16 +65,23 @@ void Server::runServer()
 		lastTimestamp = currentTimestamp;
 
 		// Check for new packets
-		if (!updateReceivePackets(connectionManager))
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			LAG_STOPWATCH("updateReceivePackets", 2000);
+			if (!updateReceivePackets(connectionManager))
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			}
 		}
 
-		connectionManager.updateConnections(currentTimestamp);
+		{
+			LAG_STOPWATCH("updateConnections", 2000);
+			connectionManager.updateConnections(currentTimestamp);
+		}
 
 		// Perform cleanup regularly
 		if (currentTimestamp - mLastCleanupTimestamp > 5000)	// Every 5 seconds
 		{
+			LAG_STOPWATCH("performCleanup", 2000);
 			performCleanup();
 			mLastCleanupTimestamp = currentTimestamp;
 		}
@@ -118,6 +126,8 @@ bool Server::onReceivedPacket(ReceivedPacketEvaluation& evaluation)
 
 bool Server::onReceivedRequestQuery(ReceivedQueryEvaluation& evaluation)
 {
+	LAG_STOPWATCH("## Server::onReceivedRequestQuery", 1000);
+
 	switch (evaluation.mPacketType)
 	{
 		case network::GetServerFeaturesRequest::Query::PACKET_TYPE:
