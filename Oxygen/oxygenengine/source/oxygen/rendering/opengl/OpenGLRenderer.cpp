@@ -168,6 +168,7 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 
 	// Disable depth test for UI
 	glDisable(GL_DEPTH_TEST);
+	OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
 	// Unbind shader
 	glUseProgram(0);
@@ -291,6 +292,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			// For backmost layer, ignore alpha completely
 			const bool useAlphaTest = (pg.mPlaneIndex != 0 || pg.mPriorityFlag);
+			OpenGLDrawerResources::setBlendMode(BlendMode::ONE_BIT);
 			ScrollOffsetsManager& som = mRenderParts.getScrollOffsetsManager();
 			const RenderPlaneShader::Variation variation = (pg.mPlaneIndex == PlaneManager::PLANE_W) ? RenderPlaneShader::PS_SIMPLE :
 															som.getHorizontalScrollNoRepeat(pg.mScrollOffsets) ? RenderPlaneShader::PS_NO_REPEAT :
@@ -335,6 +337,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::VDP:
 				{
 					const SpriteManager::VdpSpriteInfo& spriteInfo = static_cast<const SpriteManager::VdpSpriteInfo&>(sg.mSpriteInfo);
+					OpenGLDrawerResources::setBlendMode(BlendMode::ONE_BIT);
 					RenderVdpSpriteShader& shader = mRenderVdpSpriteShader;
 					if (needsRefresh)
 					{
@@ -347,7 +350,9 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::PALETTE:
 				{
 					const SpriteManager::PaletteSpriteInfo& spriteInfo = static_cast<const SpriteManager::PaletteSpriteInfo&>(sg.mSpriteInfo);
-					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
+					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
+					RenderPaletteSpriteShader& shader = mRenderPaletteSpriteShader[useAlphaTest ? 1 : 0];
 					if (needsRefresh || mLastUsedRenderPaletteSpriteShader != &shader)
 					{
 						shader.refresh(mGameResolution, mRenderParts.getPaletteManager().mSplitPositionY, mResources);
@@ -366,7 +371,9 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::COMPONENT:
 				{
 					const SpriteManager::ComponentSpriteInfo& spriteInfo = static_cast<const SpriteManager::ComponentSpriteInfo&>(sg.mSpriteInfo);
-					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[spriteInfo.mFullyOpaque ? 0 : 1];
+					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
+					const bool useAlphaTest = (spriteInfo.mBlendMode != BlendMode::OPAQUE);
+					RenderComponentSpriteShader& shader = mRenderComponentSpriteShader[useAlphaTest ? 1 : 0];
 					if (needsRefresh || mLastUsedRenderComponentSpriteShader != &shader)
 					{
 						shader.refresh(mGameResolution);
@@ -384,6 +391,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 									  (float)mask.mSize.x / (float)mGameResolution.x,
 									  (float)mask.mSize.y / (float)mGameResolution.y);
 
+					OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
 					Shader& shader = mSimpleRectOverdrawShader;
 					shader.bind();
 					shader.setParam("Rect", rectf);
@@ -408,6 +416,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			{
 				glDisable(GL_DEPTH_TEST);
 			}
+			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
 			Vec4f transform;
 			transform.x = (float)rg.mRect.x / (float)mGameResolution.x * 2.0f - 1.0f;
@@ -436,6 +445,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			{
 				glDisable(GL_DEPTH_TEST);
 			}
+			OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);
 
 			Vec4f transform;
 			transform.x = (float)tg.mRect.x / (float)mGameResolution.x * 2.0f - 1.0f;
@@ -467,6 +477,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 
 			mIsRenderingToProcessingBuffer = false;
 			glBindFramebuffer(GL_FRAMEBUFFER, mGameScreenBuffer.getHandle());
+			OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
 
 			Shader& shader = mPostFxBlurShader;
 			shader.bind();

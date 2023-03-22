@@ -34,6 +34,12 @@ namespace openglresources
 		opengl::VertexArrayObject mSimpleQuadVAO;
 	};
 	Internal* mInternal = nullptr;
+
+	struct State
+	{
+		BlendMode mBlendMode = BlendMode::OPAQUE;
+	};
+	State mState;
 }
 
 
@@ -43,6 +49,7 @@ void OpenGLDrawerResources::startup()
 		return;
 
 	openglresources::mInternal = new openglresources::Internal();
+	openglresources::State mState = openglresources::State();
 
 	// Load shaders
 	FileHelper::loadShader(openglresources::mInternal->mSimpleRectColoredShader, L"data/shader/simple_rect_colored.shader", "Standard");
@@ -98,6 +105,78 @@ Shader& OpenGLDrawerResources::getSimpleRectTexturedUVShader(bool tint, bool alp
 opengl::VertexArrayObject& OpenGLDrawerResources::getSimpleQuadVAO()
 {
 	return openglresources::mInternal->mSimpleQuadVAO;
+}
+
+BlendMode OpenGLDrawerResources::getBlendMode()
+{
+	return openglresources::mState.mBlendMode;
+}
+
+void OpenGLDrawerResources::setBlendMode(BlendMode blendMode)
+{
+	if (openglresources::mState.mBlendMode == blendMode)
+		return;
+
+	openglresources::mState.mBlendMode = blendMode;
+	switch (blendMode)
+	{
+		case BlendMode::OPAQUE:
+		{
+			glDisable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_ONE, GL_ZERO);
+			break;
+		}
+
+		case BlendMode::ALPHA:
+		case BlendMode::ONE_BIT:
+		{
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			break;
+		}
+
+		case BlendMode::ADDITIVE:
+		{
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			break;
+		}
+
+		case BlendMode::SUBTRACTIVE:
+		{
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			break;
+		}
+
+		case BlendMode::MULTIPLICATIVE:
+		{
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_DST_COLOR, GL_ZERO);		// No support for src alpha consideration
+			break;
+		}
+
+		case BlendMode::MINIMUM:
+		{
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_MIN);
+			glBlendFunc(GL_ONE, GL_ONE);			// No support for src alpha consideration
+			break;
+		}
+
+		case BlendMode::MAXIMUM:
+		{
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_MAX);
+			glBlendFunc(GL_ONE, GL_ONE);			// No support for src alpha consideration
+			break;
+		}
+	}
 }
 
 #endif

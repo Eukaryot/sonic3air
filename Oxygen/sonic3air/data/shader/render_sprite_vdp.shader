@@ -130,7 +130,6 @@ void main()
 
 technique Standard
 {
-	blendfunc = alpha;
 	vs = Shared + Vertex;
 	fs = Shared + Fragment;
 	vertexattrib[0] = position;

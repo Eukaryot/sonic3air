@@ -14,6 +14,8 @@
 struct Transform2D
 {
 public:
+	inline Transform2D() : mMatrix(1.0f, 0.0f, 0.0f, 1.0f), mInverse(1.0f, 0.0f, 0.0f, 1.0f) {}
+
 	inline bool isIdentity() const  { return (mMatrix == Vec4f(1.0f, 0.0f, 0.0f, 1.0f)); }
 	bool hasRotationOrScale() const;
 

@@ -75,7 +75,6 @@ void main()
 
 technique Standard
 {
-	blendfunc = opaque;
 	vs = Shared + Vertex;
 	fs = Shared + Fragment;
 	vertexattrib[0] = position;
@@ -83,6 +82,5 @@ technique Standard
 
 technique Standard_AlphaTest : Standard
 {
-	blendfunc = alpha;
 	define = ALPHA_TEST;
 }

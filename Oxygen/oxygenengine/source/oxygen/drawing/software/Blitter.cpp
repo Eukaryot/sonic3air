@@ -347,49 +347,61 @@ bool Blitter::needsIntermediateProcessing(const Options& options)
 
 void Blitter::processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, const Options& options)
 {
-	if (nullptr != options.mTintColor)
+	if (nullptr != options.mTintColor || nullptr != options.mAddedColor)
 	{
-		// Apply tint color
-		const uint32 tintColor = options.mTintColor->getABGR32();
-		const uint32 mult[4] =
+		int mult[4];
+		if (nullptr != options.mTintColor)
 		{
-			(uint32)roundToInt(options.mTintColor->r * 0x100),
-			(uint32)roundToInt(options.mTintColor->g * 0x100),
-			(uint32)roundToInt(options.mTintColor->b * 0x100),
-			(uint32)roundToInt(options.mTintColor->a * 0x100)
-		};
-		for (int y = 0; y < bitmap.getSize().y; ++y)
+			mult[0] = clamp(roundToInt(options.mTintColor->r * 0x100), -0x10000, 0x10000);
+			mult[1] = clamp(roundToInt(options.mTintColor->g * 0x100), -0x10000, 0x10000);
+			mult[2] = clamp(roundToInt(options.mTintColor->b * 0x100), -0x10000, 0x10000);
+			mult[3] = clamp(roundToInt(options.mTintColor->a * 0x100), -0x10000, 0x10000);
+		}
+		else
 		{
-			uint8* dst = (uint8*)bitmap.getLinePointer(y);
-			for (int x = 0; x < bitmap.getSize().x; ++x)
+			mult[0] = 0x100;
+			mult[1] = 0x100;
+			mult[2] = 0x100;
+			mult[3] = 0x100;
+		}
+
+		if (nullptr == options.mAddedColor)
+		{
+			// Only apply tint color
+			for (int y = 0; y < bitmap.getSize().y; ++y)
 			{
-				dst[0] = (uint8)std::min<uint32>((dst[0] * mult[0]) >> 8, 0xff);
-				dst[1] = (uint8)std::min<uint32>((dst[1] * mult[1]) >> 8, 0xff);
-				dst[2] = (uint8)std::min<uint32>((dst[2] * mult[2]) >> 8, 0xff);
-				dst[3] = (uint8)std::min<uint32>((dst[3] * mult[3]) >> 8, 0xff);
-				dst += 4;
+				uint8* dst = (uint8*)bitmap.getLinePointer(y);
+				for (int x = 0; x < bitmap.getSize().x; ++x)
+				{
+					dst[0] = (uint8)clamp((dst[0] * mult[0]) >> 8, 0, 0xff);
+					dst[1] = (uint8)clamp((dst[1] * mult[1]) >> 8, 0, 0xff);
+					dst[2] = (uint8)clamp((dst[2] * mult[2]) >> 8, 0, 0xff);
+					dst[3] = (uint8)clamp((dst[3] * mult[3]) >> 8, 0, 0xff);
+					dst += 4;
+				}
 			}
 		}
-	}
-
-	if (nullptr != options.mAddedColor)
-	{
-		// Apply added color
-		const uint8 add[3] =
+		else
 		{
-			(uint8)roundToInt(options.mAddedColor->r * 0xff),
-			(uint8)roundToInt(options.mAddedColor->g * 0xff),
-			(uint8)roundToInt(options.mAddedColor->b * 0xff)
-		};
-		for (int y = 0; y < bitmap.getSize().y; ++y)
-		{
-			uint8* dst = (uint8*)bitmap.getLinePointer(y);
-			for (int x = 0; x < bitmap.getSize().x; ++x)
+			// Apply tint & added color
+			//  -> Even though tint color may be unused, so that we're just multiplying by 1, but that's expected to be a quite rare case
+			const int add[3] =
 			{
-				dst[0] = std::min(dst[0] + add[0], 0xff);
-				dst[1] = std::min(dst[1] + add[1], 0xff);
-				dst[2] = std::min(dst[2] + add[2], 0xff);
-				dst += 4;
+				roundToInt(options.mAddedColor->r * 0xff),
+				roundToInt(options.mAddedColor->g * 0xff),
+				roundToInt(options.mAddedColor->b * 0xff)
+			};
+			for (int y = 0; y < bitmap.getSize().y; ++y)
+			{
+				uint8* dst = (uint8*)bitmap.getLinePointer(y);
+				for (int x = 0; x < bitmap.getSize().x; ++x)
+				{
+					dst[0] = (uint8)clamp(((dst[0] * mult[0]) >> 8) + add[0], 0, 0xff);
+					dst[1] = (uint8)clamp(((dst[1] * mult[1]) >> 8) + add[1], 0, 0xff);
+					dst[2] = (uint8)clamp(((dst[2] * mult[2]) >> 8) + add[2], 0, 0xff);
+					dst[3] = (uint8)clamp(((dst[3] * mult[3]) >> 8),          0, 0xff);
+					dst += 4;
+				}
 			}
 		}
 	}

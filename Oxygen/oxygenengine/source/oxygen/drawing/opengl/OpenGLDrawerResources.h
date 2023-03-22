@@ -25,6 +25,9 @@ public:
 	static Shader& getSimpleRectTexturedUVShader(bool tint, bool alpha);
 
 	static opengl::VertexArrayObject& getSimpleQuadVAO();
+
+	static BlendMode getBlendMode();
+	static void setBlendMode(BlendMode blendMode);
 };
 
 #endif

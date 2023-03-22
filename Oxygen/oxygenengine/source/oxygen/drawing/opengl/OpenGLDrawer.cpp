@@ -171,40 +171,14 @@ namespace opengldrawer
 			return !mInvalidScissorRegion;
 		}
 
+		BlendMode getBlendMode()
+		{
+			return OpenGLDrawerResources::getBlendMode();
+		}
+
 		void setBlendMode(BlendMode blendMode)
 		{
-			mCurrentBlendMode = blendMode;
-			switch (blendMode)
-			{
-				case BlendMode::OPAQUE:
-				{
-					glDisable(GL_BLEND);
-					glBlendFunc(GL_ONE, GL_ZERO);
-					break;
-				}
-
-				case BlendMode::ALPHA:
-				case BlendMode::ONE_BIT:
-				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					break;
-				}
-
-				case BlendMode::ADDITIVE:
-				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_ONE, GL_ONE);
-					break;
-				}
-
-				case BlendMode::MULTIPLICATIVE:
-				{
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_DST_COLOR, GL_ZERO);
-					break;
-				}
-			}
+			OpenGLDrawerResources::setBlendMode(blendMode);
 		}
 
 		void applySamplingMode()
@@ -283,7 +257,7 @@ namespace opengldrawer
 
 				if (uv0.x == 0.0f && uv0.y == 0.0f && uv1.x == 1.0f && uv1.y == 1.0f)
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, mCurrentBlendMode == BlendMode::ALPHA);
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
 					shader.bind();
 					shader.setParam("Transform", rectParam);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
@@ -294,7 +268,7 @@ namespace opengldrawer
 				}
 				else
 				{
-					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, mCurrentBlendMode == BlendMode::ALPHA);
+					Shader& shader = OpenGLDrawerResources::getSimpleRectTexturedUVShader(needsTintColor, getBlendMode() == BlendMode::ALPHA);
 					shader.bind();
 					shader.setParam("Transform", rectParam);
 					shader.setTexture("Texture", textureHandle, GL_TEXTURE_2D);
@@ -375,7 +349,6 @@ namespace opengldrawer
 		Recti mCurrentViewport;
 		Vec4f mPixelToViewSpaceTransform;	// Transformation from pixel-based coordinates view space, in the form: (x, y) = offset; (z, w) = scale
 
-		BlendMode mCurrentBlendMode = BlendMode::OPAQUE;
 		SamplingMode mCurrentSamplingMode = SamplingMode::POINT;
 		TextureWrapMode mCurrentWrapMode = TextureWrapMode::CLAMP;
 

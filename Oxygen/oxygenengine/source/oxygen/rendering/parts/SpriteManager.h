@@ -42,7 +42,7 @@ public:
 		Color  mTintColor = Color::WHITE;
 		Color  mAddedColor = Color::TRANSPARENT;
 		bool   mUseGlobalComponentTint = true;
-		bool   mFullyOpaque = false;
+		BlendMode mBlendMode = BlendMode::ALPHA;
 		Space  mCoordinatesSpace = Space::SCREEN;	// The coordinate system that "mPosition" is referring to
 		Space  mLogicalSpace = Space::SCREEN;		// The coordinate system used for frame interpolation, can be different from the coordinates space
 
@@ -75,8 +75,6 @@ public:
 		const SpriteCache::CacheItem* mCacheItem = nullptr;
 		Vec2i mSize;
 		Vec2i mPivotOffset;
-		bool mFlipX = false;
-		bool mFlipY = false;
 		Transform2D mTransformation;
 		bool mUseUpscaledSprite = false;	// Currently only supported for palette sprites
 	};
@@ -101,6 +99,28 @@ public:
 		float mDepth = 0.0f;
 	};
 
+	struct SpriteHandleData
+	{
+		uint64 mKey = 0;
+		Vec2i  mPosition;
+		uint16 mRenderQueue = 0;
+		bool   mFlipX = false;
+		bool   mFlipY = false;
+		bool   mPriorityFlag = false;
+		Color  mTintColor = Color::WHITE;
+		Color  mAddedColor = Color::TRANSPARENT;
+		bool   mUseGlobalComponentTint = true;
+		BlendMode mBlendMode = BlendMode::ALPHA;
+		Space  mCoordinatesSpace = Space::SCREEN;	// The coordinate system that "mPosition" is referring to
+		Transform2D mTransformation;
+		float  mRotation = 0.0f;
+		Vec2f  mScale = Vec2f(1.0f, 1.0f);
+		bool   mUseUpscaledSprite = false;			// Only supported for palette sprites
+		uint16 mAtex = 0;							// Only supported for palette sprites
+		uint64 mSpriteTag = 0;
+		Vec2i  mTaggedSpritePosition;
+	};
+
 public:
 	SpriteManager(PatternManager& patternManager, SpacesManager& spacesManager);
 
@@ -117,18 +137,7 @@ public:
 	void addSpriteMask(const Vec2i& position, const Vec2i& size, uint16 renderQueue, bool priorityFlag, Space space);
 
 	uint32 addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue);
-	void setSpriteHandleFlags(uint32 spriteHandle, uint8 flags);
-	void setSpriteHandleFlipX(uint32 spriteHandle, bool flipX);
-	void setSpriteHandleFlipY(uint32 spriteHandle, bool flipY);
-	void setSpriteHandleRotationScale(uint32 spriteHandle, float radians, Vec2f scale);
-	void setSpriteHandleTransform(uint32 spriteHandle, const Transform2D& transformation);
-	void setSpriteHandlePriorityFlag(uint32 spriteHandle, bool priorityFlag);
-	void setSpriteHandleCoordinateSpace(uint32 spriteHandle, Space space);
-	void setSpriteHandleUseGlobalComponentTint(uint32 spriteHandle, bool enable);
-	void setSpriteHandlePaletteOffset(uint32 spriteHandle, uint16 paletteOffset);
-	void setSpriteHandleTintColor(uint32 spriteHandle, Color tintColor);
-	void setSpriteHandleOpacity(uint32 spriteHandle, float opacity);
-	void setSpriteHandleAddedColor(uint32 spriteHandle, Color addedColor);
+	SpriteHandleData* getSpriteHandleData(uint32 spriteHandle);
 
 	void setLogicalSpriteSpace(Space space);
 	void clearSpriteTag();
@@ -149,17 +158,13 @@ private:
 		std::vector<PaletteSpriteInfo>	 mPaletteSprites;
 		std::vector<ComponentSpriteInfo> mComponentSprites;
 		std::vector<SpriteMaskInfo>		 mSpriteMasks;
-		std::unordered_map<uint32, CustomSpriteInfoBase*> mSpritesByHandle;
-		std::pair<uint32, CustomSpriteInfoBase*> mLatestSpritesByHandle;
 
 		void clear();
 		void swap(SpriteSets& other);
-		CustomSpriteInfoBase* getSpriteByHandle(uint32 spriteHandle) const;
 	};
 
 private:
 	CustomSpriteInfoBase* addSpriteByKey(uint64 key);
-	void applyFlags(CustomSpriteInfoBase& sprite, uint8 flags) const;
 	void checkSpriteTag(SpriteInfo& sprite);
 	void collectLegacySprites();
 
@@ -174,6 +179,9 @@ private:
 	SpriteSets mNextSpriteSets;
 	std::vector<SpriteInfo*> mSprites;
 	uint32 mNextSpriteHandle = 1;
+
+	std::unordered_map<uint32, SpriteHandleData> mSpritesHandles;
+	std::pair<uint32, SpriteHandleData*> mLatestSpriteHandle;
 
 	uint16 mSpriteAttributeTableBase = 0xf800;	// Only used in legacy VPD sprite mode
 

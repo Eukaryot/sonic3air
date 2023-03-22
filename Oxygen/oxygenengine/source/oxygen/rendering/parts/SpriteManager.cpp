@@ -20,8 +20,6 @@ void SpriteManager::SpriteSets::clear()
 	mPaletteSprites.clear();
 	mComponentSprites.clear();
 	mSpriteMasks.clear();
-	mSpritesByHandle.clear();
-	mLatestSpritesByHandle = std::make_pair(0, nullptr);
 }
 
 void SpriteManager::SpriteSets::swap(SpriteSets& other)
@@ -30,19 +28,6 @@ void SpriteManager::SpriteSets::swap(SpriteSets& other)
 	other.mPaletteSprites.swap(mPaletteSprites);
 	other.mComponentSprites.swap(mComponentSprites);
 	other.mSpriteMasks.swap(mSpriteMasks);
-	other.mSpritesByHandle.swap(mSpritesByHandle);
-	mLatestSpritesByHandle = std::make_pair(0, nullptr);
-}
-
-SpriteManager::CustomSpriteInfoBase* SpriteManager::SpriteSets::getSpriteByHandle(uint32 spriteHandle) const
-{
-	// Use the quick lookup if possible
-	if (mLatestSpritesByHandle.first == spriteHandle)
-		return mLatestSpritesByHandle.second;
-
-	// Otherwise search the map
-	const auto it = mSpritesByHandle.find(spriteHandle);
-	return (it == mSpritesByHandle.end()) ? nullptr : it->second;
 }
 
 
@@ -80,6 +65,62 @@ void SpriteManager::preFrameUpdate()
 
 void SpriteManager::postFrameUpdate()
 {
+	// Process sprite handles
+	for (const auto& [key, data] : mSpritesHandles)
+	{
+		CustomSpriteInfoBase* spritePtr = addSpriteByKey(data.mKey);
+		if (nullptr == spritePtr)
+			continue;
+
+		CustomSpriteInfoBase& sprite = *spritePtr;
+		sprite.mPosition = data.mPosition;
+		sprite.mRenderQueue = data.mRenderQueue;
+		sprite.mPriorityFlag = data.mPriorityFlag;
+		sprite.mTintColor = data.mTintColor;
+		sprite.mAddedColor = data.mAddedColor;
+		sprite.mUseGlobalComponentTint = data.mUseGlobalComponentTint;
+		sprite.mBlendMode = data.mBlendMode;
+		sprite.mCoordinatesSpace = data.mCoordinatesSpace;
+		sprite.mUseUpscaledSprite = data.mUseUpscaledSprite;
+
+		if (data.mRotation != 0.0f || data.mScale != Vec2f(1.0f, 1.0f))
+		{
+			sprite.mTransformation.setRotationAndScale(data.mRotation, data.mScale);
+		}
+		else
+		{
+			sprite.mTransformation = data.mTransformation;
+		}
+
+		if (data.mFlipX)
+		{
+			sprite.mTransformation.flipX();
+		}
+		if (data.mFlipY)
+		{
+			sprite.mTransformation.flipY();
+		}
+
+		if (sprite.getType() == SpriteInfo::Type::PALETTE)
+		{
+			static_cast<PaletteSpriteInfo&>(sprite).mAtex = data.mAtex;
+		}
+
+		if (data.mSpriteTag != 0)
+		{
+			const auto it = mTaggedSpritesLastFrame.find(data.mSpriteTag);
+			if (it != mTaggedSpritesLastFrame.end())
+			{
+				sprite.mHasLastPosition = true;
+				sprite.mLastPositionChange = data.mTaggedSpritePosition - it->second.mPosition;
+			}
+
+			TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[data.mSpriteTag];
+			taggedSpriteData.mPosition = data.mTaggedSpritePosition;
+		}
+	}
+	mSpritesHandles.clear();
+
 	if (mResetSprites)
 	{
 		// Move over from "next" to "current" sprite sets
@@ -192,10 +233,6 @@ void SpriteManager::drawCustomSprite(uint64 key, const Vec2i& position, uint16 a
 	{
 		transformation.setRotationByAngle(angle);
 	}
-	else
-	{
-		transformation.setIdentity();
-	}
 
 	// Scale
 	if (scale != 1.0f)
@@ -239,7 +276,22 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	sprite.mTransformation = transformation;
 	sprite.mTintColor = tintColor;
 
-	applyFlags(sprite, flags);
+	sprite.mPriorityFlag = (flags & 0x40) != 0;
+	sprite.mBlendMode = (flags & 0x10) ? BlendMode::OPAQUE : BlendMode::ALPHA;
+	sprite.mCoordinatesSpace = ((flags & 0x20) != 0) ? Space::WORLD : Space::SCREEN;
+	sprite.mUseGlobalComponentTint = (flags & 0x80) == 0;
+
+	// Flip X / Y
+	const bool flipX = (flags & 0x01) != 0;
+	const bool flipY = (flags & 0x02) != 0;
+	if (flipX)
+	{
+		sprite.mTransformation.flipX();
+	}
+	if (flipY)
+	{
+		sprite.mTransformation.flipY();
+	}
 
 	// For smoother rotation, use upscaled version of this sprite when actually rotating
 	//  -> This is basically the Fast SpriteRot algorithm (also see "applyScale3x" in PaletteSprite.cpp)
@@ -278,134 +330,35 @@ void SpriteManager::addSpriteMask(const Vec2i& position, const Vec2i& size, uint
 
 uint32 SpriteManager::addSpriteHandle(uint64 key, const Vec2i& position, uint16 renderQueue)
 {
-	CustomSpriteInfoBase* spritePtr = addSpriteByKey(key);
-	if (nullptr == spritePtr)
-		return 0;
-
-	CustomSpriteInfoBase& sprite = *spritePtr;
-	sprite.mPosition = position;
-	sprite.mRenderQueue = renderQueue;
-	sprite.mTransformation.setIdentity();
-
-	checkSpriteTag(sprite);
-
-	const uint32 handle = mNextSpriteHandle;
-	mNextSpriteSets.mSpritesByHandle[handle] = spritePtr;
-
+	const uint32 spriteHandle = mNextSpriteHandle;
 	++mNextSpriteHandle;
 	if (mNextSpriteHandle == 0)
 		++mNextSpriteHandle;
-	return handle;
+
+	SpriteHandleData& data = mSpritesHandles[spriteHandle];
+	data.mKey = key;
+	data.mPosition = position;
+	data.mRenderQueue = renderQueue;
+	data.mSpriteTag = mSpriteTag;
+
+	mLatestSpriteHandle = std::make_pair(spriteHandle, &data);
+	return spriteHandle;
 }
 
-void SpriteManager::setSpriteHandleFlags(uint32 spriteHandle, uint8 flags)
+SpriteManager::SpriteHandleData* SpriteManager::getSpriteHandleData(uint32 spriteHandle)
 {
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		applyFlags(*spritePtr, flags);
-	}
-}
+	// Use the quick lookup if possible
+	if (mLatestSpriteHandle.first == spriteHandle)
+		return mLatestSpriteHandle.second;
 
-void SpriteManager::setSpriteHandleFlipX(uint32 spriteHandle, bool flipX)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr && spritePtr->mFlipX != flipX)
-	{
-		spritePtr->mFlipX = flipX;
-		spritePtr->mTransformation.flipX();
-	}
-}
+	// Otherwise search the map
+	const auto it = mSpritesHandles.find(spriteHandle);
+	if (it == mSpritesHandles.end())
+		return nullptr;
 
-void SpriteManager::setSpriteHandleFlipY(uint32 spriteHandle, bool flipY)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr && spritePtr->mFlipY != flipY)
-	{
-		spritePtr->mFlipY = flipY;
-		spritePtr->mTransformation.flipY();
-	}
-}
-
-void SpriteManager::setSpriteHandleRotationScale(uint32 spriteHandle, float radians, Vec2f scale)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mTransformation.setRotationAndScale(radians, scale);
-	}
-}
-
-void SpriteManager::setSpriteHandleTransform(uint32 spriteHandle, const Transform2D& transformation)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mTransformation = transformation;
-	}
-}
-
-void SpriteManager::setSpriteHandlePriorityFlag(uint32 spriteHandle, bool priorityFlag)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mPriorityFlag = priorityFlag;
-	}
-}
-
-void SpriteManager::setSpriteHandleCoordinateSpace(uint32 spriteHandle, Space space)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mCoordinatesSpace = space;
-	}
-}
-
-void SpriteManager::setSpriteHandleUseGlobalComponentTint(uint32 spriteHandle, bool enable)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mUseGlobalComponentTint = enable;
-	}
-}
-
-void SpriteManager::setSpriteHandlePaletteOffset(uint32 spriteHandle, uint16 paletteOffset)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr && spritePtr->getType() == SpriteInfo::Type::PALETTE)
-	{
-		static_cast<PaletteSpriteInfo*>(spritePtr)->mAtex = paletteOffset;
-	}
-}
-
-void SpriteManager::setSpriteHandleTintColor(uint32 spriteHandle, Color tintColor)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mTintColor = tintColor;
-	}
-}
-
-void SpriteManager::setSpriteHandleOpacity(uint32 spriteHandle, float opacity)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mTintColor.a = opacity;
-	}
-}
-
-void SpriteManager::setSpriteHandleAddedColor(uint32 spriteHandle, Color addedColor)
-{
-	CustomSpriteInfoBase* spritePtr = mNextSpriteSets.getSpriteByHandle(spriteHandle);
-	if (nullptr != spritePtr)
-	{
-		spritePtr->mAddedColor = addedColor;
-	}
+	SpriteHandleData& data = it->second;
+	mLatestSpriteHandle = std::make_pair(spriteHandle, &data);
+	return &data;
 }
 
 void SpriteManager::setLogicalSpriteSpace(Space space)
@@ -461,28 +414,6 @@ SpriteManager::CustomSpriteInfoBase* SpriteManager::addSpriteByKey(uint64 key)
 	return nullptr;
 }
 
-void SpriteManager::applyFlags(CustomSpriteInfoBase& sprite, uint8 flags) const
-{
-	sprite.mPriorityFlag = (flags & 0x40) != 0;
-	sprite.mFullyOpaque = (flags & 0x10) != 0;
-	sprite.mCoordinatesSpace = ((flags & 0x20) != 0) ? Space::WORLD : Space::SCREEN;
-	sprite.mUseGlobalComponentTint = (flags & 0x80) == 0;
-
-	// Flip X / Y
-	const bool flipX = (flags & 0x01) != 0;
-	const bool flipY = (flags & 0x02) != 0;
-	if (sprite.mFlipX != flipX)
-	{
-		sprite.mFlipX = flipX;
-		sprite.mTransformation.flipX();
-	}
-	if (sprite.mFlipY != flipY)
-	{
-		sprite.mFlipY = flipY;
-		sprite.mTransformation.flipY();
-	}
-}
-
 void SpriteManager::checkSpriteTag(SpriteInfo& sprite)
 {
 	if (mSpriteTag != 0)
@@ -494,8 +425,8 @@ void SpriteManager::checkSpriteTag(SpriteInfo& sprite)
 			sprite.mLastPositionChange = mTaggedSpritePosition - it->second.mPosition;
 		}
 
-		TaggedSpriteData& data = mTaggedSpritesThisFrame[mSpriteTag];
-		data.mPosition = mTaggedSpritePosition;
+		TaggedSpriteData& taggedSpriteData = mTaggedSpritesThisFrame[mSpriteTag];
+		taggedSpriteData.mPosition = mTaggedSpritePosition;
 	}
 }
 

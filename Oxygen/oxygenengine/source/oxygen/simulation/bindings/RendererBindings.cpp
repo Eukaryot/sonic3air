@@ -568,7 +568,7 @@ namespace
 		static inline const lemon::CustomDataType* mDataType = nullptr;
 	};
 
-	SpriteHandleWrapper Renderer_addSpriteHandle(uint64 spriteKey, int16 px, int16 py, uint16 renderQueue)
+	SpriteHandleWrapper Renderer_addSpriteHandle(uint64 spriteKey, int32 px, int32 py, uint16 renderQueue)
 	{
 		const uint32 handle = RenderParts::instance().getSpriteManager().addSpriteHandle(spriteKey, Vec2i(px, py), renderQueue);
 		return SpriteHandleWrapper { handle };
@@ -576,84 +576,181 @@ namespace
 
 	void SpriteHandle_setFlags(SpriteHandleWrapper spriteHandle, uint8 flags)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleFlags(spriteHandle.mHandle, flags);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mFlipX = (flags & 0x01) != 0;
+			spriteHandleData->mFlipY = (flags & 0x02) != 0;
+			spriteHandleData->mBlendMode = (flags & 0x10) ? BlendMode::OPAQUE : BlendMode::ALPHA;
+			spriteHandleData->mCoordinatesSpace = ((flags & 0x20) != 0) ? SpacesManager::Space::WORLD : SpacesManager::Space::SCREEN;
+			spriteHandleData->mPriorityFlag = (flags & 0x40) != 0;
+			spriteHandleData->mUseGlobalComponentTint = (flags & 0x80) == 0;
+		}
 	}
 
 	void SpriteHandle_setFlipX(SpriteHandleWrapper spriteHandle, bool flipX)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleFlipX(spriteHandle.mHandle, flipX);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mFlipX = flipX;
+		}
 	}
 
 	void SpriteHandle_setFlipY(SpriteHandleWrapper spriteHandle, bool flipY)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleFlipY(spriteHandle.mHandle, flipY);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mFlipY = flipY;
+		}
 	}
 
 	void SpriteHandle_setRotation(SpriteHandleWrapper spriteHandle, float degrees)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, degrees * PI_FLOAT / 180.f, Vec2f(1.0f));
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mRotation = degrees * PI_FLOAT / 180.f;
+			spriteHandleData->mTransformation.setIdentity();
+		}
 	}
 
 	void SpriteHandle_setScale1(SpriteHandleWrapper spriteHandle, float scale)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, 0.0f, Vec2f(scale));
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mScale = Vec2f(scale);
+			spriteHandleData->mTransformation.setIdentity();
+		}
 	}
 
 	void SpriteHandle_setScale2(SpriteHandleWrapper spriteHandle, float scaleX, float scaleY)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, 0.0f, Vec2f(scaleX, scaleY));
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mScale = Vec2f(scaleX, scaleY);
+			spriteHandleData->mTransformation.setIdentity();
+		}
 	}
 
 	void SpriteHandle_setRotationScale1(SpriteHandleWrapper spriteHandle, float degrees, float scale)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, degrees * PI_FLOAT / 180.f, Vec2f(scale));
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mRotation = degrees * PI_FLOAT / 180.0f;
+			spriteHandleData->mScale = Vec2f(scale);
+			spriteHandleData->mTransformation.setIdentity();
+		}
 	}
 
 	void SpriteHandle_setRotationScale2(SpriteHandleWrapper spriteHandle, float degrees, float scaleX, float scaleY)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleRotationScale(spriteHandle.mHandle, degrees * PI_FLOAT / 180.f, Vec2f(scaleX, scaleY));
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mRotation = degrees * PI_FLOAT / 180.0f;
+			spriteHandleData->mScale = Vec2f(scaleX, scaleY);
+			spriteHandleData->mTransformation.setIdentity();
+		}
 	}
 
 	void SpriteHandle_setTransform(SpriteHandleWrapper spriteHandle, float transform11, float transform12, float transform21, float transform22)
 	{
-		Transform2D transformation;
-		transformation.setByMatrix(transform11, transform12, transform21, transform22);
-		RenderParts::instance().getSpriteManager().setSpriteHandleTransform(spriteHandle.mHandle, transformation);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mRotation = 0.0f;
+			spriteHandleData->mScale = Vec2f(1.0f, 1.0f);
+			spriteHandleData->mTransformation.setByMatrix(transform11, transform12, transform21, transform22);
+		}
 	}
 
 	void SpriteHandle_setPriorityFlag(SpriteHandleWrapper spriteHandle, bool priorityFlag)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandlePriorityFlag(spriteHandle.mHandle, priorityFlag);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mPriorityFlag = priorityFlag;
+		}
 	}
 
 	void SpriteHandle_setCoordinateSpace(SpriteHandleWrapper spriteHandle, uint8 space)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleCoordinateSpace(spriteHandle.mHandle, (space == 0) ? SpacesManager::Space::SCREEN : SpacesManager::Space::WORLD);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mCoordinatesSpace = (space == 0) ? SpacesManager::Space::SCREEN : SpacesManager::Space::WORLD;
+		}
 	}
 
 	void SpriteHandle_setUseGlobalComponentTint(SpriteHandleWrapper spriteHandle, bool enable)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleUseGlobalComponentTint(spriteHandle.mHandle, enable);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mUseGlobalComponentTint = enable;
+		}
+	}
+
+	void SpriteHandle_setBlendMode(SpriteHandleWrapper spriteHandle, uint8 blendMode)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mBlendMode = (BlendMode)blendMode;
+			if (spriteHandleData->mBlendMode > BlendMode::MAXIMUM)
+				spriteHandleData->mBlendMode = BlendMode::ALPHA;
+		}
 	}
 
 	void SpriteHandle_setPaletteOffset(SpriteHandleWrapper spriteHandle, uint16 paletteOffset)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandlePaletteOffset(spriteHandle.mHandle, paletteOffset);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mAtex = paletteOffset;
+		}
 	}
 
 	void SpriteHandle_setTintColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue, float alpha)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleTintColor(spriteHandle.mHandle, Color(red, green, blue, alpha));
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mTintColor.set(red, green, blue, alpha);
+		}
 	}
 
 	void SpriteHandle_setOpacity(SpriteHandleWrapper spriteHandle, float opacity)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleOpacity(spriteHandle.mHandle, opacity);
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mTintColor.a = opacity;
+		}
 	}
 
 	void SpriteHandle_setAddedColor(SpriteHandleWrapper spriteHandle, float red, float green, float blue)
 	{
-		RenderParts::instance().getSpriteManager().setSpriteHandleAddedColor(spriteHandle.mHandle, Color(red, green, blue));
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mAddedColor.set(red, green, blue);
+		}
+	}
+
+	void SpriteHandle_setSpriteTag(SpriteHandleWrapper spriteHandle, uint64 spriteTag, int32 px, int32 py)
+	{
+		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
+		if (nullptr != spriteHandleData)
+		{
+			spriteHandleData->mSpriteTag = spriteTag;
+			spriteHandleData->mTaggedSpritePosition.set(px, py);
+		}
 	}
 }
 
@@ -1145,6 +1242,10 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "enable");
 
+	module.addNativeMethod("SpriteHandle", "setBlendMode", lemon::wrap(&SpriteHandle_setBlendMode), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "blendMode");
+
 	module.addNativeMethod("SpriteHandle", "setPaletteOffset", lemon::wrap(&SpriteHandle_setPaletteOffset), defaultFlags)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "paletteOffset");
@@ -1165,4 +1266,10 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(1, "red")
 		.setParameterInfo(2, "green")
 		.setParameterInfo(3, "blue");
+
+	module.addNativeMethod("SpriteHandle", "setSpriteTag", lemon::wrap(&SpriteHandle_setSpriteTag), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "spriteTag")
+		.setParameterInfo(2, "px")
+		.setParameterInfo(3, "py");
 }
