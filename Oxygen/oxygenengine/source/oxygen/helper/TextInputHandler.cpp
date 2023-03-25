@@ -19,7 +19,7 @@ void TextInputHandler::setText(std::wstring_view text, bool moveCursorToEnd)
 
 void TextInputHandler::setCursorPosition(size_t position)
 {
-	mCursorPosition = clamp(position, 0, mText.length());
+	mCursorPosition = (size_t)clamp((int)position, 0, (int)mText.length());
 	mMarkedRangeStart.reset();
 }
 
@@ -155,7 +155,7 @@ void TextInputHandler::insertText(std::wstring_view text)
 void TextInputHandler::moveCursorTo(size_t position, bool considerShift)
 {
 	const size_t oldCursorPosition = mCursorPosition;
-	mCursorPosition = clamp(position, 0, mText.length());
+	mCursorPosition = (size_t)clamp((int)position, 0, (int)mText.length());
 
 	if (considerShift && (SDL_GetModState() & KMOD_SHIFT) != 0)
 	{

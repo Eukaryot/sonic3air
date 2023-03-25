@@ -36,7 +36,7 @@ void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 {
 	const Recti textRect(renderContext.mCurrentPosition, Vec2i(200, 11));
 	Font& font = global::mOxyfontSmall;
-	const int cursorOffset = font.getWidth(mTextInputHandler.getText(), 0, mTextInputHandler.getCursorPosition());
+	const int cursorOffset = font.getWidth(mTextInputHandler.getText(), 0, (int)mTextInputHandler.getCursorPosition());
 
 	if (renderContext.mIsSelected)
 	{
@@ -50,7 +50,7 @@ void InputFieldMenuEntry::renderEntry(RenderContext& renderContext)
 
 		if (mTextInputHandler.getMarkedRangeStart().has_value())
 		{
-			const int endOffset = font.getWidth(mTextInputHandler.getText(), 0, *mTextInputHandler.getMarkedRangeStart());
+			const int endOffset = font.getWidth(mTextInputHandler.getText(), 0, (int)*mTextInputHandler.getMarkedRangeStart());
 			Recti rect(textRect.x + cursorOffset, textRect.y - 2, endOffset - cursorOffset, textRect.height);
 			if (rect.width < 0)
 			{

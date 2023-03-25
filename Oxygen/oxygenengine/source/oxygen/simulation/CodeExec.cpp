@@ -191,7 +191,7 @@ bool CodeExec::Location::operator==(const Location& other) const
 
 CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type type)
 {
-	const int parentIndex = mCallStack.empty() ? -1 : mCallStack.back();
+	const int parentIndex = mCallStack.empty() ? -1 : (int)mCallStack.back();
 	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
 	callFrame.mType = type;
 	callFrame.mParentIndex = parentIndex;
@@ -202,7 +202,7 @@ CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type 
 
 CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrameFailed(CallFrame::Type type)
 {
-	const int parentIndex = mCallFrames.empty() ? -1 : mCallStack.back();
+	const int parentIndex = mCallFrames.empty() ? -1 : (int)mCallStack.back();
 	CallFrame& callFrame = (mCallFrames.size() == CALL_FRAMES_LIMIT) ? mCallFrames.back() : vectorAdd(mCallFrames);
 	callFrame.mType = type;
 	callFrame.mParentIndex = parentIndex;
