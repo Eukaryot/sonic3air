@@ -823,7 +823,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	std::vector<Mod*> activeMods;
 	activeMods.reserve(menuEntries.size());
 
-	for (size_t index = 0; index < menuEntries.size(); ++index)
+	for (int index = (int)menuEntries.size()-1; index >= 0; --index)
 	{
 		const GameMenuEntry& entry = *menuEntries[index];
 		if (entry.getMenuEntryType() == 0)
