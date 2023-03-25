@@ -55,7 +55,7 @@ UpdateCheck::UpdateCheck()
 	// Test version (Windows only)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x23011500;
+		definition.mVersionNumber = 0x23032501;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
