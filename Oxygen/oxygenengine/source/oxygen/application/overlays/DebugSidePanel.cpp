@@ -749,6 +749,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 						const char* spriteType = nullptr;
 						Color color = Color::fromABGR32(0xffa0a0a0);
 						Recti objectRect(info.mPosition.x, info.mPosition.y, 32, 32);
+						std::string_view spriteName;
 						switch (info.getType())
 						{
 							case SpriteManager::SpriteInfo::Type::VDP:
@@ -760,6 +761,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								objectRect.height = vsi.mSize.y * 8;
 								break;
 							}
+
 							case SpriteManager::SpriteInfo::Type::PALETTE:
 							{
 								spriteType = "Palette sprite";
@@ -768,8 +770,12 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								objectRect.setPos(objectRect.getPos() + psi.mPivotOffset);
 								objectRect.width = psi.mSize.x;
 								objectRect.height = psi.mSize.y;
+								const lemon::FlyweightString* str = codeExec.getLemonScriptRuntime().getInternalLemonRuntime().resolveStringByKey(psi.mKey);
+								if (nullptr != str)
+									spriteName = str->getString();
 								break;
 							}
+
 							case SpriteManager::SpriteInfo::Type::COMPONENT:
 							{
 								spriteType = "Component sprite";
@@ -778,8 +784,12 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								objectRect.setPos(objectRect.getPos() + csi.mPivotOffset);
 								objectRect.width = csi.mSize.x;
 								objectRect.height = csi.mSize.y;
+								const lemon::FlyweightString* str = codeExec.getLemonScriptRuntime().getInternalLemonRuntime().resolveStringByKey(csi.mKey);
+								if (nullptr != str)
+									spriteName = str->getString();
 								break;
 							}
+
 							case SpriteManager::SpriteInfo::Type::MASK:
 							{
 								spriteType = "Sprite mask";
@@ -789,7 +799,9 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								objectRect.height = smi.mSize.y;
 								break;
 							}
-							default: break;
+
+							default:
+								break;
 						}
 
 						if (nullptr != spriteType)
@@ -800,7 +812,14 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 								Application::instance().getGameView().translateRectIntoScreenCoords(translatedRect, objectRect);
 								drawer.drawRect(translatedRect, Color(0.0f, 1.0f, 0.5f, 0.75f));
 							}
-							builder.addLine(String(0, "0x%04x:   %s:  (%d, %d)%s", info.mRenderQueue, spriteType, info.mPosition.x, info.mPosition.y, info.mPriorityFlag ? " -- prio" : ""), color, 0, key);
+							String str(0, "0x%04x:   %s:  (%d, %d)%s", info.mRenderQueue, spriteType, info.mPosition.x, info.mPosition.y, info.mPriorityFlag ? " -- prio" : "");
+							if (!spriteName.empty())
+							{
+								str.add(" (");
+								str.add(spriteName.data(), (int)spriteName.length());
+								str.add(")");
+							}
+							builder.addLine(str, color, 0, key);
 						}
 						break;
 					}
