@@ -711,7 +711,7 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 				blitterOptions.mTintColor = (tintColor != Color::WHITE) ? &tintColor : nullptr;
 				blitterOptions.mAddedColor = (addedColor != Color::TRANSPARENT) ? &addedColor : nullptr;
 				blitterOptions.mDepthBuffer = (mEmptyDepthBuffer && !spriteBase.mPriorityFlag) ? nullptr : &depthBufferView;
-				blitterOptions.mDepthValue = (spriteBase.mPriorityFlag) ? 0x80 : 0;
+				blitterOptions.mDepthTestValue = (spriteBase.mPriorityFlag) ? 0x80 : 0;
 			}
 
 			if (isPaletteSprite)

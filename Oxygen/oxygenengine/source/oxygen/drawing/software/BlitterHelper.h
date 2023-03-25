@@ -73,14 +73,13 @@ struct BlitterHelper
 		memcpy(dst, src, numPixels * sizeof(uint32));
 	}
 
-	static inline void blendLineOpaqueWithDepth(uint32* dst, const uint32* src, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineOpaqueWithDepth(uint32* dst, const uint32* src, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (depthValue >= *depthBuffer)
+			if (depthTestValue >= *depthBuffer)
 			{
 				*dst = *src;
-				*depthBuffer = depthValue;
 			}
 			++dst;
 			++src;
@@ -112,16 +111,15 @@ struct BlitterHelper
 		}
 	}
 
-	static inline void blendLineAlphaWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineAlphaWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (depthValue >= *depthBuffer && src[3] > 0)
+			if (depthTestValue >= *depthBuffer && src[3] > 0)
 			{
 				blendPixelAlpha(dst, src);
-				*depthBuffer = depthValue;
 			}
 			dst += 4;
 			src += 4;
@@ -139,14 +137,13 @@ struct BlitterHelper
 		}
 	}
 
-	static inline void blendLineOneBitWithDepth(uint32* dst, const uint32* src, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineOneBitWithDepth(uint32* dst, const uint32* src, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (depthValue >= *depthBuffer)
+			if (depthTestValue >= *depthBuffer)
 			{
 				*dst = (*src & 0x80000000) ? (*src | 0xff000000) : *dst;
-				*depthBuffer = depthValue;
 			}
 			++dst;
 			++src;
@@ -171,18 +168,17 @@ struct BlitterHelper
 		}
 	}
 
-	static inline void blendLineAdditiveWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineAdditiveWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0 && depthValue >= *depthBuffer)
+			if (src[3] > 0 && depthTestValue >= *depthBuffer)
 			{
 				dst[0] = std::min(dst[0] + src[0], 0xff);
 				dst[1] = std::min(dst[1] + src[1], 0xff);
 				dst[2] = std::min(dst[2] + src[2], 0xff);
-				*depthBuffer = depthValue;
 			}
 			dst += 4;
 			src += 4;
@@ -207,18 +203,17 @@ struct BlitterHelper
 		}
 	}
 
-	static inline void blendLineSubtractiveWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineSubtractiveWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0 && depthValue >= *depthBuffer)
+			if (src[3] > 0 && depthTestValue >= *depthBuffer)
 			{
 				dst[0] = std::max(dst[0] - src[0], 0);
 				dst[1] = std::max(dst[1] - src[1], 0);
 				dst[2] = std::max(dst[2] - src[2], 0);
-				*depthBuffer = depthValue;
 			}
 			dst += 4;
 			src += 4;
@@ -243,18 +238,17 @@ struct BlitterHelper
 		}
 	}
 
-	static inline void blendLineMultiplicativeWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineMultiplicativeWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0 && depthValue >= *depthBuffer)
+			if (src[3] > 0 && depthTestValue >= *depthBuffer)
 			{
 				dst[0] = (src[0] * dst[0]) / 255;
 				dst[1] = (src[1] * dst[1]) / 255;
 				dst[2] = (src[2] * dst[2]) / 255;
-				*depthBuffer = depthValue;
 			}
 			dst += 4;
 			src += 4;
@@ -279,18 +273,17 @@ struct BlitterHelper
 		}
 	}
 
-	static inline void blendLineMinimumWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineMinimumWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0 && depthValue >= *depthBuffer)
+			if (src[3] > 0 && depthTestValue >= *depthBuffer)
 			{
 				dst[0] = std::min(src[0], dst[0]);
 				dst[1] = std::min(src[1], dst[1]);
 				dst[2] = std::min(src[2], dst[2]);
-				*depthBuffer = depthValue;
 			}
 			dst += 4;
 			src += 4;
@@ -315,18 +308,17 @@ struct BlitterHelper
 		}
 	}
 
-	static inline void blendLineMaximumWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthValue)
+	static inline void blendLineMaximumWithDepth(uint32* dst_, const uint32* src_, size_t numPixels, uint8* depthBuffer, uint8 depthTestValue)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0 && depthValue >= *depthBuffer)
+			if (src[3] > 0 && depthTestValue >= *depthBuffer)
 			{
 				dst[0] = std::max(src[0], dst[0]);
 				dst[1] = std::max(src[1], dst[1]);
 				dst[2] = std::max(src[2], dst[2]);
-				*depthBuffer = depthValue;
 			}
 			dst += 4;
 			src += 4;
@@ -469,56 +461,56 @@ struct BlitterHelper
 			case BlendMode::ALPHA:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineAlphaWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineAlphaWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::ONE_BIT:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineOneBitWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineOneBitWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::ADDITIVE:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineAdditiveWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineAdditiveWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::SUBTRACTIVE:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineSubtractiveWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineSubtractiveWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::MULTIPLICATIVE:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMultiplicativeWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineMultiplicativeWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::MINIMUM:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMinimumWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineMinimumWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::MAXIMUM:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMaximumWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineMaximumWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 
 			default:
 			{
 				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineOpaqueWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthValue);
+					blendLineOpaqueWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
 				break;
 			}
 		}

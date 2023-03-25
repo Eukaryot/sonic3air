@@ -25,7 +25,7 @@ public:
 		const Color* mAddedColor = nullptr;
 		bool mSwapRedBlueChannels = false;
 		const BitmapViewMutable<uint8>* mDepthBuffer = nullptr;
-		uint8 mDepthValue = 0;
+		uint8 mDepthTestValue = 0;				// Blitter will never do a depth write, only depth test if mDepthBuffer is set
 	};
 
 	struct OutputWrapper
