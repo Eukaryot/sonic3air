@@ -86,12 +86,12 @@ function void fn03cbce()
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
-			s16[A1 + 0x1c] = -1
+			objA1.groundspeed = -1
 			s8[A1 + 0x27] = -1
 		}
 		else
 		{
-			s16[A1 + 0x1c] = 1
+			objA1.groundspeed = 1
 			s8[A1 + 0x27] = 1
 		}
 	}

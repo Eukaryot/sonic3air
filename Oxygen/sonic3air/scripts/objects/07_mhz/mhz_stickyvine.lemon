@@ -269,13 +269,13 @@ function void fn03ec66()
 	{
 		D1.s32 >>= 8
 		D1.s16 = abs(D1.s16)
-		D0.u16 = abs(s16[A1 + 0x1c])
+		D0.u16 = abs(objA1.groundspeed)
 		if (D0.u16 >= 0x0200)
 		{
 			D0.u16 -= 0x10
 			if (D0.u16 < D1.u16)
 			{
-				s16[A1 + 0x1c] >>= 1
+				objA1.groundspeed >>= 1
 			}
 		}
 	}

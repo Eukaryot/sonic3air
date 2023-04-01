@@ -51,11 +51,11 @@ function void fn042278()
 			D0.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
 			if (D0.s16 <= 0x20)
 			{
-				if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && s16[A1 + 0x1c] >= 0)
+				if (u8[A1 + 0x2e] == 0 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0 && objA1.groundspeed >= 0)
 				{
-					if (s16[A1 + 0x1c] < 0x0600)
+					if (objA1.groundspeed < 0x0600)
 					{
-						u16[A1 + 0x1c] = 0x0600
+						objA1.groundspeed = 0x0600
 					}
 					if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
 					{
@@ -110,8 +110,8 @@ function void fn042368()
 	objA0.flags2a &= ~bit
 	u16[A1 + 0x20] = 1
 	u8[A1 + 0x2e] = 0
-	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
-	objA1.velocity.x = u16[A1 + 0x1c]
+	objA1.groundspeed = -objA1.groundspeed
+	objA1.velocity.x = objA1.groundspeed
 	objA1.velocity.y = 0
 }
 
@@ -128,8 +128,8 @@ function void fn042396()
 	objA0.flags2a &= ~bit
 	u16[A1 + 0x20] = 1
 	u8[A1 + 0x2e] = 0
-	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
-	objA1.velocity.x = u16[A1 + 0x1c]
+	objA1.groundspeed = -objA1.groundspeed
+	objA1.velocity.x = objA1.groundspeed
 	objA1.velocity.y = 0
 }
 
@@ -137,8 +137,7 @@ function void fn042396()
 //# address-hook(0x0423d0) end(0x042478)
 function void fn0423d0()
 {
-	D0.s32 = s16[A1 + 0x1c]
-	D0 <<= 8
+	D0.s32 = s32(objA1.groundspeed) << 8
 	u32[A2] += D0
 
 	if (s32[A2] < 0)
@@ -153,9 +152,9 @@ function void fn0423d0()
 		return
 	}
 
-	if (s16[A1 + 0x1c] < 0x1000)
+	if (objA1.groundspeed < 0x1000)
 	{
-		u16[A1 + 0x1c] += 0x10
+		objA1.groundspeed += 0x10
 	}
 
 	D0.u16 = (u16[A2] >> 1) + 0x40

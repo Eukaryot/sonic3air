@@ -312,7 +312,7 @@ function void fn067704()
 	u8[A1 + 0x05] = 0x04
 	objA1.velocity.y = -0x400
 	objA1.velocity.x = -0x200
-	u16[A1 + 0x1c] = 0
+	objA1.groundspeed = 0
 	objA1.state = char.state.GOT_HURT
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0

@@ -833,7 +833,7 @@ function void fn04b130()
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			objA1.position.x.u16 = objA0.position.x.u16
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 			objA1.state = char.state.HANGING

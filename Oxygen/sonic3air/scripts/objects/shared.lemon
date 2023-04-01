@@ -1308,7 +1308,7 @@ function void fn01e042()
 	{
 		if ((objA1.velocity.x >= 0) == (D0.s16 > 0))
 		{
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			objA1.velocity.x = 0
 			if (u8[A1 + 0x37] & 0x80)
 				u8[A1 + 0x37] |= 0x40

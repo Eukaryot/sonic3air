@@ -141,7 +141,7 @@ function void fn01f7ce()
 	}
 	else
 	{
-		D0.u16 = abs(s16[A1 + 0x1c])
+		D0.u16 = abs(objA1.groundspeed)
 		if (D0.u16 >= 0x600)
 		{
 			if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
@@ -211,7 +211,7 @@ function void fn01f914()
 	if ((u8[A1 + 0x2a] & char.flag.ON_OBJECT) == 0)
 		return
 
-	D0 = s32(s16[A1 + 0x1c]) << 8
+	D0 = s32(objA1.groundspeed) << 8
 	u32[A2] += D0
 	if (s32[A2] < 0)
 	{

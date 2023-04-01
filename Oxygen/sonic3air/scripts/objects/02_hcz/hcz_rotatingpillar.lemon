@@ -148,7 +148,7 @@ function void fn032784()
 
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			u8[A1 + 0x1e] = u8[A1 + 0x44]
 			u8[A1 + 0x1f] = u8[A1 + 0x45]
 			u8[A1 + 0x20] = 0
@@ -187,7 +187,7 @@ function void fn032784()
 		D1.u16 += objA0.position.x.u16
 		objA1.position.x.u16 = D1.u16
 		u8[A2 + 0x01] += 2
-		u16[A1 + 0x1c] = 0
+		objA1.groundspeed = 0
 		D0.u16 = objA0.velocity.y
 		if (D0.s16 < 0)
 			D0.s16 = -D0.s16
@@ -196,7 +196,7 @@ function void fn032784()
 		{
 			if (D0.u16 >= 0x0480)
 			{
-				u16[A1 + 0x1c] = 0x0800
+				objA1.groundspeed = 0x800
 			}
 		}
 
@@ -215,7 +215,7 @@ function void fn032784()
 		u8[A1 + 0x2a] |= char.flag.ROLLING
 		objA1.velocity.y = objA0.velocity.y - 0x680
 		objA1.velocity.x = 0
-		u16[A1 + 0x1c] = 0
+		objA1.groundspeed = 0
 	}
 
 	u8[A1 + 0x2a] |= char.flag.IN_AIR

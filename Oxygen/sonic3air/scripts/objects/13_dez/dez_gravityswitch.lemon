@@ -71,7 +71,7 @@ function void fn048b40()
 		u8[A1 + 0x3d] = 0
 		objA1.velocity.x = 0
 		objA1.velocity.y = 0
-		u16[A1 + 0x1c] = 0
+		objA1.groundspeed = 0
 		u8[A1 + 0x2a] |= char.flag.IN_AIR
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 

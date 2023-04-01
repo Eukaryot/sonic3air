@@ -154,7 +154,7 @@ function bool fn08ac80()
 		if ((u8[A1 + 0x20] == char.state.ROLLING) && (D3.u16 >= 0x0600))
 		{
 			objA1.velocity.x = D0.s16
-			s16[A1 + 0x1c] = D0.s16
+			objA1.groundspeed = D0.s16
 			u8[A1 + 0x2a] &= ~bit
 
 			objA0.flags2a &= ~bit

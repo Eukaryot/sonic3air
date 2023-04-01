@@ -145,7 +145,7 @@ function void fn040c2a()
 	if (crumble)
 	{
 		objA1.velocity.x >>= 1
-		s16[A1 + 0x1c] >>= 1
+		objA1.groundspeed >>= 1
 
 		playSound(0x82)
 

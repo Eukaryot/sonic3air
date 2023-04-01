@@ -179,7 +179,7 @@ function void fn03c0d0()
 		{
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D0.u8 = u8[A1 + 0x1e]
 			u8[A1 + 0x1e] = u8[A1 + 0x44]

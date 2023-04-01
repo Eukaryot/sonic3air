@@ -63,9 +63,9 @@ function void fn048c44()
 			u16[A1 + 0x42] = A0.u16
 			u8[A1 + 0x2e] = 0x83
 			objA1.state = char.state.RUNNING
-			u16[A1 + 0x1c] = 0
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
+			objA1.groundspeed = 0
 			u8[A1 + 0x2a] &= ~char.flag.PUSHING
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
 			objA1.position.x.u16 = objA0.position.x.u16

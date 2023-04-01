@@ -98,10 +98,10 @@ function void fn0328e8()
 	// Keep ground speed inside certain bounds
 	if (objA0.flags2a & 0x01)
 	{
-		s16[A1 + 0x1c] = clamp(s16[A1 + 0x1c], -0xf00, -0x400)
+		objA1.groundspeed = clamp(objA1.groundspeed, -0xf00, -0x400)
 	}
 	else
 	{
-		s16[A1 + 0x1c] = clamp(s16[A1 + 0x1c], 0x400, 0xf00)
+		objA1.groundspeed = clamp(objA1.groundspeed, 0x400, 0xf00)
 	}
 }

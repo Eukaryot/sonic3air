@@ -121,7 +121,7 @@ function void fn045e6e()
 		objA1.hitbox_extends.y = u8[A1 + 0x44]
 	#endif
 		objA1.velocity.x = 0
-		u16[A1 + 0x1c] = 0
+		objA1.groundspeed = 0
 		objA1.state = char.state.RUNNING
 		objA1.flags2a &= ~char.flag.ROLLING
 		u8[A1 + 0x2e] = 0x03
@@ -268,7 +268,7 @@ function void fn045f74()
 	objA1.hitbox_extends.y = u8[A1 + 0x44]
 #endif
 	objA1.velocity.x = 0
-	u16[A1 + 0x1c] = 0
+	objA1.groundspeed = 0
 	objA1.state = char.state.RUNNING
 	objA1.flags2a &= ~char.flag.ROLLING
 	u8[A1 + 0x2e] = 0x03

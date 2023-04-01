@@ -671,7 +671,7 @@ function void fn0222f4()
 			objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			objA1.state = char.state.HANGING
 			u8[A1 + 0x2e] = 3
 			u8[A1 + 0x3d] = 0

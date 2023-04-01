@@ -98,7 +98,7 @@ function void fn027424()
 		objA1.position.x.u16 += 4
 	}
 
-	u16[A1 + 0x1c] = objA1.velocity.x
+	objA1.groundspeed = objA1.velocity.x
 	D1.u8 = objA0.subtype2c
 	if (objA0.subtype2c != 0)
 	{

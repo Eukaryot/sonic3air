@@ -1003,7 +1003,7 @@ function void fn06a7c4()
 
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
-	u16[A1 + 0x1c] = 0
+	objA1.groundspeed = 0
 	objA1.state = char.state.LIFTED
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	u8[A1 + 0x2e] = 0x01

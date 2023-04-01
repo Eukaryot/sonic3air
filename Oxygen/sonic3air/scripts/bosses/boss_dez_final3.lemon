@@ -452,7 +452,7 @@ function void fn080e2c()
 		{
 			A1 = (u8[A0 + 0x1c] == 0) ? 0xffffb000 : 0xffffb04a
 			objA1.velocity.x = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 		}
 	}
 

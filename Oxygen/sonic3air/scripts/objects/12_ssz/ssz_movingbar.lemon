@@ -101,7 +101,7 @@ function void fn0453e6()
 
 		objA1.position.y.u16 = objA0.position.y.u16 + D1.u16
 		objA1.velocity.x = 0
-		u16[A1 + 0x1c] = 0
+		objA1.groundspeed = 0
 		u8[A1 + 0x3d] = 0
 		u8[A1 + 0x2e] = 0x03
 		objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)

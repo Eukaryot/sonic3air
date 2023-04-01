@@ -1084,7 +1084,7 @@ function void fn01459e()
 	// Set other character hanging onto Tails
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
-	u16[A1 + 0x1c] = 0
+	objA1.groundspeed = 0
 	u16[A1 + 0x26] = 0
 	objA1.position.x.u16 = char.position.x.u16
 	objA1.position.y.u16 = char.position.y.u16 + 0x1c

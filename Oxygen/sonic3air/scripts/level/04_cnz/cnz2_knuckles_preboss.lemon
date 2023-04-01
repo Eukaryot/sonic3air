@@ -98,7 +98,7 @@ function void fn06256c()
 	A1 = 0xffffb000
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
-	u16[A1 + 0x1c] = 0
+	objA1.groundspeed = 0
 
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x0625a6

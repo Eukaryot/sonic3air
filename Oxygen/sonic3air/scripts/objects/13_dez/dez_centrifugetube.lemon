@@ -148,9 +148,9 @@ function void fn048fa4()
 
 		#if STANDALONE
 			// Decelerate quickly for fast horizontal speeds
-			if (abs(s16[A1 + 0x1c]) > 0x1000)
+			if (abs(objA1.groundspeed) > 0x1000)
 			{
-				s16[A1 + 0x1c] -= s16[A1 + 0x1c] / 0x20
+				objA1.groundspeed -= objA1.groundspeed / 0x20
 			}
 		#endif
 			return
@@ -220,12 +220,12 @@ function void fn049090()
 		if (D0.s16 < 0)
 		{
 			u8[A1 + 0x26] = 0x40
-			u16[A1 + 0x1c] = objA1.velocity.y
+			objA1.groundspeed = objA1.velocity.y
 		}
 		else
 		{
 			u8[A1 + 0x26] = 0xc0
-			s16[A1 + 0x1c] = -objA1.velocity.y
+			objA1.groundspeed = -objA1.velocity.y
 		}
 
 		objA1.render_flags &= ~render_flag.FLIP_X
@@ -370,7 +370,7 @@ function void fn0492d4()
 				u8[A1 + 0x2a] |= char.flag.IN_AIR
 				objA1.velocity.x = 0
 				objA1.velocity.y = 0
-				u16[A1 + 0x1c] = 0
+				objA1.groundspeed = 0
 				u16[A1 + 0x26] = 0
 				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 				u16[A1 + 0x20] = char.state.RUNNING2

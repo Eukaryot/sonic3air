@@ -106,9 +106,9 @@ function void fn045170()
 		if (objA0.flags2a & bit)
 		{
 			u16[A2 + 0x02] = objA1.velocity.x
-			u16[A2 + 0x04] = u16[A1 + 0x1c]
+			u16[A2 + 0x04] = objA1.groundspeed
 			objA1.velocity.x = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			objA0.state = 0x01
 			u8[A0 + 0x2d] = 0x01
 			D0.u8 = objA0.base_state

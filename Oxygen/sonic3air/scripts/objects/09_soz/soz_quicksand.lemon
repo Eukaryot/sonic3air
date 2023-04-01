@@ -60,7 +60,7 @@ function void fn0400f0()
 				u8[A1 + 0x2f] = 0
 				u8[A1 + 0x40] = 0
 				objA1.velocity.x >>= 1
-				u16[A1 + 0x1c] = objA1.velocity.x
+				objA1.groundspeed = objA1.velocity.x
 				objA1.velocity.y >>= 1
 
 				if (u8[A1 + 0x05] != 2)
@@ -110,7 +110,7 @@ function void fn0400f0()
 				else
 				{
 					objA1.velocity.x >>= 1
-					u16[A1 + 0x1c] = objA1.velocity.x
+					objA1.groundspeed = objA1.velocity.x
 					if (objA1.velocity.y < 0)
 					{
 						objA1.velocity.y += 0x68

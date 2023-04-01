@@ -172,7 +172,7 @@ function void fn03f1c8()
 		objA1.velocity.x = -objA1.velocity.x
 	}
 	u16[A1 + 0x32] = 0x0f
-	u16[A1 + 0x1c] = objA1.velocity.x
+	objA1.groundspeed = objA1.velocity.x
 	u8[A1 + 0x40] = 0
 	u8[A1 + 0x3d] = 0
 	u8[A1 + 0x05] = 0x02
@@ -234,7 +234,7 @@ function void fn03f246()
 			{
 				objA1.velocity.x = 0
 				objA1.velocity.y = 0
-				u16[A1 + 0x1c] = 0
+				objA1.groundspeed = 0
 				objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 				D0.u8 = u8[A1 + 0x1e]
 				u8[A1 + 0x1e] = u8[A1 + 0x44]

@@ -120,7 +120,7 @@ function void fn032d16()
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
 			s8[A1 + 0x27] = -s8[A1 + 0x27]
-			s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+			objA1.groundspeed = -objA1.groundspeed
 		}
 	}
 

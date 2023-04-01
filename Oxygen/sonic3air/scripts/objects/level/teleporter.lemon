@@ -192,9 +192,9 @@ function void fn0456f4()
 		if (u8[A1 + 0x05] == 0x04)
 		{
 			u8[A1 + 0x05] = 0x02
-			u16[A1 + 0x18] = 0
-			u16[A1 + 0x1a] = 0
-			u16[A1 + 0x1c] = 0
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			objA1.groundspeed = 0
 		}
 	#endif
 
@@ -493,7 +493,7 @@ function void fn045c8e()
 			{
 				objA1.position.x.u16 = D0.u16
 				objA1.velocity.x = 0
-				u16[A1 + 0x1c] = 0
+				objA1.groundspeed = 0
 			#if STANDALONE
 				objA1.flags2a |= char.flag.FACING_LEFT	// Another small fix for Tails
 			#endif
@@ -543,7 +543,7 @@ function void fn045c8e()
 			objA1.position.x.u16 = D0.u16
 			objA1.position.y.u16 -= 0x80
 			objA1.velocity.x = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			u8[A1 + 0x2e] = 0x03
 			objA1.state = char.state.RUNNING
 			u8[A1 + 0x22] = 0
@@ -604,7 +604,7 @@ function void fn0522a0()
 		}
 
 		objA1.velocity.x = 0
-		u16[A1 + 0x1c] = 0
+		objA1.groundspeed = 0
 		player1.control_override = 0xff
 		control.player1 = 0
 

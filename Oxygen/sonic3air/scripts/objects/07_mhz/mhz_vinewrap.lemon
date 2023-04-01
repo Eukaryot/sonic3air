@@ -71,9 +71,9 @@ function void fn03dcd0()
 				u8[A1 + 0x2d] = 0x80		// Set counter clockwise corkscrew walking animation going forwards
 
 				u16[A1 + 0x32] = 20
-				if (u16[A1 + 0x1c] < 0x600)
+				if (objA1.groundspeed < 0x600)
 				{
-					u16[A1 + 0x1c] = 0x600
+					objA1.groundspeed = 0x600
 				}
 			}
 			else if (objA1.velocity.x < 0)
@@ -95,9 +95,9 @@ function void fn03dcd0()
 				// Enforce a brief blocking of left/right inputs in any case, so the character can't just stop in between in a somewhat broken hovering state
 				u16[A1 + 0x32] = 20
 			#endif
-				if (s16[A1 + 0x1c] > -0x600)
+				if (objA1.groundspeed > -0x600)
 				{
-					s16[A1 + 0x1c] = -0x600
+					objA1.groundspeed = -0x600
 					u16[A1 + 0x32] = 20
 				}
 			}
@@ -105,8 +105,8 @@ function void fn03dcd0()
 		return
 	}
 
-	D0.u16 = abs(s16[A1 + 0x1c])
-	if (D0.u16 >= 0x0500)
+	D0.u16 = abs(objA1.groundspeed)
+	if (D0.u16 >= 0x500)
 	{
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
@@ -138,7 +138,7 @@ function void fn03dcd0()
 					u8[A1 + 0x26] = 0x80
 					u8[A1 + 0x27] = 0		// Reset x-rotation of character
 					u8[A1 + 0x2d] = 0
-					s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+					objA1.groundspeed = -objA1.groundspeed
 					objA1.velocity.x = -objA1.velocity.x
 					u8[A1 + 0x2a] |= 0x01
 				}
@@ -215,9 +215,9 @@ function void fn03de80()
 					// Enforce a brief blocking of left/right inputs in any case, so the character can't just stop in between in a somewhat broken hovering state
 					u16[A1 + 0x32] = 20
 				#endif
-					if (s16[A1 + 0x1c] < 0x600)
+					if (objA1.groundspeed < 0x600)
 					{
-						u16[A1 + 0x1c] = 0x600
+						objA1.groundspeed = 0x600
 						u16[A1 + 0x32] = 20
 					}
 				}
@@ -238,9 +238,9 @@ function void fn03de80()
 					u8[A1 + 0x2d] = 0x84		// Set clockwise corkscrew walking animation going backwards
 
 					u16[A1 + 0x32] = 20
-					if (s16[A1 + 0x1c] > -0x600)
+					if (objA1.groundspeed > -0x600)
 					{
-						s16[A1 + 0x1c] = -0x600
+						objA1.groundspeed = -0x600
 					}
 				}
 			}
@@ -248,8 +248,8 @@ function void fn03de80()
 		return
 	}
 
-	D0.u16 = abs(s16[A1 + 0x1c])
-	if (D0.u16 >= 0x0500)
+	D0.u16 = abs(objA1.groundspeed)
+	if (D0.u16 >= 0x500)
 	{
 		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
@@ -266,8 +266,7 @@ function void fn03de80()
 					D3.u16 = D1.u16
 					D1.s16 >>= 4
 					D1.u16 += objA0.position.y.u16
-					D0 = 0
-					D0.u8 = u8[A1 + 0x1e]
+					D0 = u8[A1 + 0x1e]
 					D0.s32 = s32(D0.s16) * D3.s16
 					D0.s16 >>= 8
 					D1.u16 += D0.u16
@@ -292,7 +291,7 @@ function void fn03de80()
 				u8[A1 + 0x26] = 0x80
 				u8[A1 + 0x27] = 0		// Reset x-rotation of character
 				u8[A1 + 0x2d] = 0
-				s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+				objA1.groundspeed = -objA1.groundspeed
 				objA1.velocity.x = -objA1.velocity.x
 				u8[A1 + 0x2a] &= ~0x01
 			}

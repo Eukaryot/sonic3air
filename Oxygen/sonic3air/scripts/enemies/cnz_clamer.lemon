@@ -151,18 +151,21 @@ function void fn0890c8()
 //# address-hook(0x0890d8) end(0x089122)
 function void fn0890d8()
 {
-	D0.u16 = 0x0800
-	u8[A1 + 0x2a] &= ~render_flag.FLIP_X
 	if (objA0.render_flags & render_flag.FLIP_X)
 	{
-		D0.s16 = -D0.s16
+		D0.s16 = -0x800
 		u8[A1 + 0x2a] |= render_flag.FLIP_X
+	}
+	else
+	{
+		D0.s16 = 0x800
+		u8[A1 + 0x2a] &= ~render_flag.FLIP_X
 	}
 	u8[A1 + 0x05] = 0x02
 	objA1.position.y.u16 += 6
 	objA1.velocity.x = D0.u16
 	objA1.velocity.y = -0x800
-	u16[A1 + 0x1c] = D0.u16
+	objA1.groundspeed = D0.u16
 	objA1.state = char.state.STRAIGHTJUMP
 	objA1.flags2a |= char.flag.IN_AIR
 	u8[A1 + 0x40] = 0

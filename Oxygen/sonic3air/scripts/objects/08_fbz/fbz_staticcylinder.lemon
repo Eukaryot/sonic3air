@@ -74,7 +74,7 @@ function void fn03a270()
 			D1.u16 = objA1.position.y.u16 - objA0.position.y.u16 + 0x10
 			if (D1.u16 < 0x20)
 			{
-				D0.u16 = abs(s16[A1 + 0x1c])
+				D0.u16 = abs(objA1.groundspeed)
 			#if STANDALONE
 				// Check for Super Peel-Out
 				if (u8[A1 + 0x38] == CHARACTER_SONIC && (control.player1.state & CONTROL_UP) && u16[A1 + 0x18] == 0)
@@ -111,7 +111,7 @@ function void fn03a314()
 {
 	u8 bit = (1 << D6.u8)
 
-	D0.u16 = abs(s16[A1 + 0x1c])
+	D0.u16 = abs(objA1.groundspeed)
 	if (D0.u16 >= 0x0400 && (u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
 		if (u32[A2] != 0)
@@ -130,7 +130,7 @@ function void fn03a314()
 			{
 				if (u8[A2 + 0x04] == 0)
 				{
-					if (D0.u16 >= 0xc0 && s16[A1 + 0x1c] >= 0)
+					if (D0.u16 >= 0xc0 && objA1.groundspeed >= 0)
 					{
 						u16[A2] = D0.u16 - 0xc0
 						u16[A2 + 0x02] = 0
@@ -142,7 +142,7 @@ function void fn03a314()
 				}
 				else
 				{
-					if (D0.u16 < 0xc0 && s16[A1 + 0x1c] < 0)
+					if (D0.u16 < 0xc0 && objA1.groundspeed < 0)
 					{
 						u16[A2] = D0.u16 + objA0.value42 - 0xc0
 						u16[A2 + 0x02] = 0
@@ -203,8 +203,7 @@ function void fn03a314()
 //# address-hook(0x03a480) end(0x03a542)
 function void fn03a480()
 {
-	D0.s32 = s16[A1 + 0x1c]
-	D0 <<= 8
+	D0.s32 = s32(objA1.groundspeed) << 8
 	u32[A2] += D0
 	if (s32[A2] < 0)
 	{
@@ -252,7 +251,7 @@ function void fn03a480()
 	objA1.velocity.y = D0.u16
 
 	D0 = (u16[A2] >> 1) & 0xff
-	if (s16[A1 + 0x1c] < 0)
+	if (objA1.groundspeed < 0)
 	{
 		D0.s8 = -D0.s8
 	}

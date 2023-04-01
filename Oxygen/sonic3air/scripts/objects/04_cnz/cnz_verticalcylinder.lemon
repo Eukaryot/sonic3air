@@ -95,7 +95,7 @@ function void fn0338c4()
 					{
 						if (u8[A1 + 0x26] != 0)
 						{
-							if (abs(s16[A1 + 0x1c]) < 0x400)
+							if (abs(objA1.groundspeed) < 0x400)
 							{
 								u8[A2 + 0x01] = 0x01
 								objA1.flags2a |= char.flag.IN_AIR
@@ -143,7 +143,7 @@ function void fn0338c4()
 
 	if (debug_mode.state == 0)
 	{
-		D0.u16 = abs(s16[A1 + 0x1c])
+		D0.u16 = abs(objA1.groundspeed)
 		if (D0.u16 < 0x300)
 		{
 			u8[A2 + 0x01] = 0x01
@@ -275,7 +275,7 @@ function void fn033ade()
 					{
 						objA1.velocity.x = (s8[A2] >= 0) ? 0x100 : -0x100
 						objA1.velocity.y = 0
-						u16[A1 + 0x1c] = objA1.velocity.x
+						objA1.groundspeed = objA1.velocity.x
 						u8[A1 + 0x2a] |= char.flag.IN_AIR
 					}
 				}

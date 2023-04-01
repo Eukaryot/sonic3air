@@ -59,15 +59,15 @@ function void fn042574()
 			{
 				if (objA0.flags2a & 0x01)
 				{
-					if (s16[A1 + 0x1c] < 0)
+					if (objA1.groundspeed < 0)
 					{
-						if (s16[A1 + 0x1c] > -0x400)
-							s16[A1 + 0x1c] = -0x400
+						if (objA1.groundspeed > -0x400)
+							objA1.groundspeed = -0x400
 
 						fn042636()
 						u32[A2] = 0
 
-						s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+						objA1.groundspeed = -objA1.groundspeed
 						u8[A1 + 0x2a] |= 0x01
 						objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 						objA1.render_flags |= render_flag.FLIP_X
@@ -76,10 +76,10 @@ function void fn042574()
 				}
 				else
 				{
-					if (s16[A1 + 0x1c] >= 0)
+					if (objA1.groundspeed >= 0)
 					{
-						if (s16[A1 + 0x1c] < 0x400)
-							s16[A1 + 0x1c] = 0x400
+						if (objA1.groundspeed < 0x400)
+							objA1.groundspeed = 0x400
 
 						fn042636()
 						u32[A2] = 0
@@ -135,7 +135,7 @@ function void fn0426b0()
 		return
 	}
 
-	D0.s32 = s16[A1 + 0x1c]
+	D0.s32 = objA1.groundspeed
 	D0 <<= 7
 	u32[A2] += D0
 	if (s32[A2] < 0 || u16[A2] >= 0x100)
@@ -144,9 +144,9 @@ function void fn0426b0()
 		return
 	}
 
-	if (s16[A1 + 0x1c] < 0x1000)
+	if (objA1.groundspeed < 0x1000)
 	{
-		u16[A1 + 0x1c] += 0x10
+		objA1.groundspeed += 0x10
 	}
 
 	D2.u16 = objA1.position.x.u16
@@ -194,7 +194,7 @@ function void fn0426b6()
 	{
 		u8[A1 + 0x2a] &= ~char.flag.IN_AIR
 		u8[A1 + 0x2a] |= 0x01
-		s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+		objA1.groundspeed = -objA1.groundspeed
 	}
 	objA0.flags2a &= ~bit
 	u16[A1 + 0x20] = 0x0001		// char.state.RUNNING, char.state.RUNNING2

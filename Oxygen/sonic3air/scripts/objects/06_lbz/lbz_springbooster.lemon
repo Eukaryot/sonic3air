@@ -101,7 +101,7 @@ function void fn0261f2()
 		}
 		if (D0.s16 < 0)
 		{
-			s16[A1 + 0x1c] >>= 1
+			objA1.groundspeed >>= 1
 			objA1.velocity.x >>= 1
 		}
 	}
@@ -126,7 +126,7 @@ function void fn0261f2()
 			}
 
 			u16[A1 + 0x32] = 0x0f
-			u16[A1 + 0x1c] = objA1.velocity.x
+			objA1.groundspeed = objA1.velocity.x
 			objA0.flags2a &= ~object.flag.P1_PUSHING
 			objA0.flags2a &= ~object.flag.P2_PUSHING
 			u8[A1 + 0x2a] &= ~char.flag.PUSHING

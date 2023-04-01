@@ -119,9 +119,9 @@ function void fn036d3e()
 		u16[A1 + 0x14] = checkpoint.y
 		objA1.sprite_attributes = checkpoint.sprite_attr
 		u16[A1 + 0x46] = checkpoint.layer_flags
-		u16[A1 + 0x18] = 0
-		u16[A1 + 0x1a] = 0
-		u16[A1 + 0x1c] = 0
+		objA1.velocity.x = 0
+		objA1.velocity.y = 0
+		objA1.groundspeed = 0
 		u8[A1 + 0x2a] = 0x02
 		u16[A1 + 0x32] = 0
 
@@ -132,9 +132,9 @@ function void fn036d3e()
 			u16[A1 + 0x14] = level.backup.y
 			objA1.sprite_attributes = level.backup.sprite_attr
 			u16[A1 + 0x46] = level.backup.layer_flags
-			u16[A1 + 0x18] = 0
-			u16[A1 + 0x1a] = 0
-			u16[A1 + 0x1c] = 0
+			objA1.velocity.x = 0
+			objA1.velocity.y = 0
+			objA1.groundspeed = 0
 			u8[A1 + 0x2a] = 0x02
 			u16[A1 + 0x32] = 0
 		}

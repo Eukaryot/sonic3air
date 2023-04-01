@@ -168,7 +168,7 @@ function void fn030c8c()
 		u8[A0 + 0x35] &= ~bit
 		objA1.velocity.x = (objA0.flags2a & 0x01) ? -0x1000 : 0x1000
 		objA1.velocity.y = 0
-		s16[A1 + 0x1c] = objA1.velocity.x
+		objA1.groundspeed = objA1.velocity.x
 		objA1.state = char.state.RUNNING
 		u8[A1 + 0x2e] = 0
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
@@ -223,7 +223,7 @@ function void fn030cf8()
 			objA0.flags2a &= ~bit
 			objA1.velocity.x = (objA0.flags2a & 0x01) ? -0x800 : 0x800
 			objA1.velocity.y = -0x400
-			s16[A1 + 0x1c] = objA1.velocity.x
+			objA1.groundspeed = objA1.velocity.x
 			u8[A1 + 0x2e] = 0
 			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 			u8[A1 + 0x2a] |= char.flag.IN_AIR
@@ -265,7 +265,7 @@ function void fn030cf8()
 			if (objA0.flags2a & 0x01)
 			{
 				objA1.position.x.u16 += 4
-				s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+				objA1.groundspeed = -objA1.groundspeed
 				objA1.flags2a |= char.flag.FACING_LEFT
 			}
 			u8[A0 + 0x34] = 1

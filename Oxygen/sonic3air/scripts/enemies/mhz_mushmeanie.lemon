@@ -151,7 +151,7 @@ function void fn08dc6e()
 		objA0.flags2a |= 0x40
 		objA1.velocity.x = -objA1.velocity.x
 		objA1.velocity.y = -objA1.velocity.y
-		s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+		objA1.groundspeed = -objA1.groundspeed
 	}
 }
 

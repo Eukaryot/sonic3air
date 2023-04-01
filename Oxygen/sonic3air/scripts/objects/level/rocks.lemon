@@ -402,7 +402,7 @@ function void fn01fd08()
 					if (u8[A1 + 0x38] == CHARACTER_KNUCKLES || objA1.state == char.state.ROLLING)
 					{
 						objA1.velocity.x = u16[A0 + 0x36]
-						u16[A1 + 0x1c] = objA1.velocity.x
+						objA1.groundspeed = objA1.velocity.x
 						objA0.flags2a &= ~object.flag.P2_PUSHING
 						objA1.flags2a &= ~char.flag.PUSHING
 					}
@@ -469,7 +469,7 @@ function void Rocks.BreakWall()
 			A4 = 0x0202f4
 		}
 
-		u16[A1 + 0x1c] = objA1.velocity.x
+		objA1.groundspeed = objA1.velocity.x
 		u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		if (u8[A1 + 0x38] == CHARACTER_KNUCKLES && u8[A1 + 0x2f] == 0x01)
 		{
@@ -518,7 +518,7 @@ function void Rocks.BreakWall()
 			A4 = 0x020370
 		}
 
-		u16[A1 + 0x1c] = objA1.velocity.x
+		objA1.groundspeed = objA1.velocity.x
 		u8[A1 + 0x2a] &= ~char.flag.PUSHING
 		fn01fcc8()
 		objA0.update_address = 0x01fcae

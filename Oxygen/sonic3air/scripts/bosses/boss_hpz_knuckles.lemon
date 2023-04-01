@@ -327,7 +327,7 @@ function void fn063f7a()
 	}
 	objA1.velocity.x = -D0.s16
 	objA1.velocity.y = -objA1.velocity.y
-	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+	objA1.groundspeed = -objA1.groundspeed
 
 	Object.ResetAnimationProgress(0x0667b4)		// Boss Knuckles "crouch guard" animation data
 }

@@ -715,7 +715,7 @@ function void fn04c026()
 		objA1.position.y.u16 = 0x0430
 		objA1.velocity.x = 0
 		objA1.velocity.y = 0
-		u16[A1 + 0x1c] = 0
+		objA1.groundspeed = 0
 		u8[A1 + 0x2e] = 0x81
 		u16[(A2+=2)-2] += 2
 		u16[A2] = 0x78

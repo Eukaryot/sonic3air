@@ -254,7 +254,7 @@ function void fn0349ba()
 				{
 					objA1.velocity.x = 0
 					objA1.velocity.y = 0
-					u16[A1 + 0x1c] = 0
+					objA1.groundspeed = 0
 					objA1.position.x.u16 = D2.u16
 					objA1.position.y.u16 = D3.u16
 					objA1.state = char.state.PULLEY

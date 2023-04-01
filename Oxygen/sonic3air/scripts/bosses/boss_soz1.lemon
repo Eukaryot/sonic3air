@@ -689,7 +689,7 @@ function void fn076fa6()
 
 	objA1.velocity.x = -objA1.velocity.x
 	objA1.velocity.y = -objA1.velocity.y
-	s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+	objA1.groundspeed = -objA1.groundspeed
 
 	objA0.base_state = 0x08
 	u32[A0 + 0x30] = 0x077495

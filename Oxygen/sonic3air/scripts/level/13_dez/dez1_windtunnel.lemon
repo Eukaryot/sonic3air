@@ -274,7 +274,7 @@ function void fn049850()
 	u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 	{
-		s16[A1 + 0x1c] = -s16[A1 + 0x1c]
+		objA1.groundspeed = -objA1.groundspeed
 	}
 }
 

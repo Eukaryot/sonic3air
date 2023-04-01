@@ -293,7 +293,7 @@ function void fn02fbb2()
 
 	objA1.velocity.x = 0
 	objA1.velocity.y = 0
-	u16[A1 + 0x1c] = 0
+	objA1.groundspeed = 0
 	objA1.state = char.state.BREATHE
 	u16[A1 + 0x32] = 0x23
 	u8[A1 + 0x40] = 0

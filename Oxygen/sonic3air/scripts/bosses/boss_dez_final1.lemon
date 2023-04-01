@@ -80,8 +80,8 @@ function void fn07fe06()
 {
 	u8[A1 + 0x2e] = 0x81
 	objA1.state = char.state.RUNNING
-	objA1.velocity.x = 0x0600
-	u16[A1 + 0x1c] = 0x0600
+	objA1.velocity.x = 0x600
+	objA1.groundspeed = 0x600
 	if (u8[A1 + 0x38] == CHARACTER_TAILS)
 	{
 		objA1.position.y.u16 += 4
@@ -925,9 +925,8 @@ function void fn08119a()
 		playSound(0x6e)
 
 		A1 = (u8[A0 + 0x1c] == 0) ? 0xffffb000 : 0xffffb04a
-		D0.u16 = 0x0600
-		u16[A1 + 0x1c] = D0.u16
-		objA1.velocity.x = D0.u16
+		objA1.groundspeed = 0x600
+		objA1.velocity.x = 0x600
 		objA1.velocity.y = -0x300
 	}
 

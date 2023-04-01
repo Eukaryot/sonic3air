@@ -184,7 +184,7 @@ function void fn044434()
 
 			objA1.velocity.x = 0
 			objA1.velocity.y = 0
-			u16[A1 + 0x1c] = 0
+			objA1.groundspeed = 0
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			objA1.position.x.u16 = objA0.position.x.u16
 
