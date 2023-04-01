@@ -615,7 +615,7 @@ function void fn036926()
 			objA0.value26 = 0
 			return
 		}
-	
+
 		D0.s8 = objA0.value26
 		if (D0.s8 != 0)
 		{

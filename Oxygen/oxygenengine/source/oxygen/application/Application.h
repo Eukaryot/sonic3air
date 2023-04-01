@@ -91,7 +91,7 @@ private:
 	SaveStateMenu* mSaveStateMenu = nullptr;
 	DebugSidePanel* mDebugSidePanel = nullptr;
 	ProfilingView* mProfilingView = nullptr;
-	
+
 	// Input
 	float mMouseHideTimer = 0.0f;
 };

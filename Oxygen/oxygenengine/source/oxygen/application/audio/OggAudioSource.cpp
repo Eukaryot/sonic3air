@@ -150,7 +150,7 @@ float OggAudioSource::mapAudioRefPositionToTrackPosition(float audioRefPosition)
 		// For static caching, i.e. fully cached tracks, there's no difference between audio ref position and absolute position inside the track
 		return audioRefPosition;
 	}
-	
+
 	// Account for the difference in audio ref position (i.e. position inside the audio buffer) and absolute position inside the audio track
 	const float frequency = (float)mAudioBuffer.getFrequency();
 	int trackPosition = mInitialSeekPos + roundToInt(audioRefPosition * frequency);

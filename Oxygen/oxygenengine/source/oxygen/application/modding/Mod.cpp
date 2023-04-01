@@ -126,11 +126,11 @@ void Mod::loadFromJson(const Json::Value& json)
 
 			OtherMod& otherMod = vectorAdd(mOtherMods);
 			otherMod.mModName = iteratorOtherMods.key().asString();
-			
+
 			JsonHelper jsonHelper(modJson);
 			jsonHelper.tryReadString("MinimumVersion", otherMod.mMinimumVersion);
 			jsonHelper.tryReadBool("IsRequired", otherMod.mIsRequired);
-			
+
 			const Json::Value& priorityValue = modJson["Priority"];
 			if (priorityValue.isString())
 			{

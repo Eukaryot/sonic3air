@@ -243,7 +243,7 @@ uint64 ResourcesCache::getHeaderChecksum(const std::vector<uint8>& content)
 {
 	if (content.empty())
 		return 0;
-	
+
 	// Regard the first 512 byte as header
 	return rmx::getMurmur2_64(&content[0], std::min<size_t>(512, content.size()));
 }
@@ -312,7 +312,7 @@ bool ResourcesCache::checkRomContent()
 			return false;
 	}
 
-	// ROM check succeeded 
+	// ROM check succeeded
 	mDiffFileCache.clear();		// This cache is not needed again now
 	return true;
 }

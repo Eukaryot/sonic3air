@@ -584,7 +584,7 @@ InputManager::RescanResult InputManager::rescanRealDevices()
 		SDL_GameController* controller = SDL_GameControllerOpen(i);
 		const std::string joystickName = getJoystickName(joystick);
 		const std::string controllerName = getGameControllerName(controller);
-		
+
 		// Skip it if it's blacklisted
 		if (isBlacklistedName(joystickName) || isBlacklistedName(controllerName))
 			continue;

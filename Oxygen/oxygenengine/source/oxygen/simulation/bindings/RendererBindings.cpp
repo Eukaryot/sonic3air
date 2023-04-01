@@ -26,7 +26,7 @@ namespace
 	{
 		return *lemon::Runtime::getActiveEnvironmentSafe<RuntimeEnvironment>().mEmulatorInterface;
 	}
-	
+
 
 	uint16 getScreenWidth()
 	{
@@ -784,7 +784,7 @@ void RendererBindings::registerBindings(lemon::Module& module)
 	// Data type
 	SpriteHandleWrapper::mDataType = module.addDataType("SpriteHandle", lemon::BaseType::UINT_32);
 
-	
+
 	const BitFlagSet<lemon::Function::Flag> defaultFlags(lemon::Function::Flag::ALLOW_INLINE_EXECUTION);
 
 	// Screen size query
