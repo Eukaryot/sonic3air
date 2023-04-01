@@ -642,11 +642,10 @@ function void initializeMainGame()
 			// Use AIZ critters and not the MHZ critters in Knuckles' intro, #contributed by iCloudius
 			//  -> Also requires a ROM manipulation, search for the comment above to find that one
 			Nemesis.loadDataToVRAM(0x1935a8, 0xb000)
-			Nemesis.loadDataToVRAM(0x193308, 0xb240)
 		#else
-			Nemesis.loadDataToVRAM(0x193308, 0xb000)
-			Nemesis.loadDataToVRAM(0x1931d6, 0xb240)
+			Nemesis.loadDataToVRAM(0x1931d6, 0xb000)
 		#endif
+			Nemesis.loadDataToVRAM(0x193308, 0xb240)
 
 			isAnyIntro = true
 		}
