@@ -219,11 +219,10 @@ function void fn02978e()
 function void fn0297a2()
 {
 	D0.u8 = objA0.subtype2c
-	if (D0.s8 < 0)
+	if (D0.u8 & 0x80)
 	{
-		D0.u16 &= 0x1f
-		D0.u16 *= 4
-		A2 = u32[0x1e3f18 + D0.s16]
+		D0.u16 = (D0.u16 & 0x1f) * 4
+		A2 = u32[0x1e3f18 + D0.u16]
 		D0.u16 = u16[(A2+=2)-2] - 4
 		u16[A4 + 0x04] = D0.u16
 		A2 += D0.s16

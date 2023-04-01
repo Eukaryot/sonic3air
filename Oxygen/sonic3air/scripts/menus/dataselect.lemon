@@ -523,7 +523,8 @@ function void fn00c866()
 	//  - 16:   0xffff0104,  0xceb4,   0x000c,  0x000a		-> Extensions for the 2 additional save slots (S3K style)
 	//  - 17:   0xffff0104,  0xcece,   0x000c,  0x000a
 
-	D7.u16 = u16[(A0+=2)-2]
+	D7.u16 = u16[A0]
+	A0 += 2
 	for (u16 index = 0; index <= D7.u16; ++index)
 	{
 		A1 = u32[A0]										// Source in RAM

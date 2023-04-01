@@ -144,13 +144,13 @@ function void fn0207d4()
 	D1.u16 = (objA0.subtype2c & 0x70) >> 2
 
 	A1 = 0x02089a + D1.u16
-	objA0.box_size.x = u8[(A1+=1)-1]
-	objA0.box_size.y = u8[(A1+=1)-1]
-	objA0.animation.sprite = u8[(A1+=1)-1]
+	objA0.box_size.x = u8[A1]
+	objA0.box_size.y = u8[A1+1]
+	objA0.animation.sprite = u8[A1+2]
 
 	A1 = 0x02089e + D1.u16 * 2
-	u32[A0 + 0x30] = u32[(A1+=4)-4]
-	objA0.countdown_callback = u32[(A1+=4)-4]
+	u32[A0 + 0x30] = u32[A1]
+	objA0.countdown_callback = u32[A1+4]
 
 	fn0208a6()
 }
@@ -167,14 +167,14 @@ function void fn0208a6()
 		D1.u16 = (objA0.subtype2c & 0x70) >> 2
 
 		A1 = 0x0208f8 + D1.u16
-		objA0.box_size.x = u8[(A1+=1)-1]
-		objA0.box_size.y = u8[(A1+=1)-1]
-		objA0.animation.sprite = u8[(A1+=1)-1]
-		objA0.subtype2c = u8[(A1+=1)-1]
+		objA0.box_size.x = u8[A1]
+		objA0.box_size.y = u8[A1+1]
+		objA0.animation.sprite = u8[A1+2]
+		objA0.subtype2c = u8[A1+3]
 
 		A1 = 0x0208fc + D1.u16 * 2
-		u32[A0 + 0x30] = u32[(A1+=4)-4]
-		objA0.countdown_callback = u32[(A1+=4)-4]
+		u32[A0 + 0x30] = u32[A1]
+		objA0.countdown_callback = u32[A1+4]
 
 	#if STANDALONE
 		if (D1.u16 == 0)
@@ -200,13 +200,13 @@ function void fn020904()
 		D1.u16 = (objA0.subtype2c & 0x70) >> 2
 
 		A1 = 0x020952 + D1.u16
-		objA0.box_size.x = u8[(A1+=1)-1]
-		objA0.box_size.y = u8[(A1+=1)-1]
-		objA0.animation.sprite = u8[(A1+=1)-1]
+		objA0.box_size.x = u8[A1]
+		objA0.box_size.y = u8[A1+1]
+		objA0.animation.sprite = u8[A1+2]
 
 		A1 = 0x020956 + D1.u16 * 2
-		u32[A0 + 0x30] = u32[(A1+=4)-4]
-		objA0.countdown_callback = u32[(A1+=4)-4]
+		u32[A0 + 0x30] = u32[A1]
+		objA0.countdown_callback = u32[A1+4]
 	}
 
 #if STANDALONE

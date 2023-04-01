@@ -614,8 +614,7 @@ function void LevelPaletteUpdate.DEZ1()
 		if (level.palettefx.frame_3 >= 0x30)
 			level.palettefx.frame_3 = 0
 
-		A0 = 0x00349c
-		copyMemory(0xfffffc78, A0 + D0.s16, 8)
+		copyMemory(0xfffffc78, 0x00349c + D0.u16, 8)
 	}
 
 	LevelPaletteUpdate.DEZ2()

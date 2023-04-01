@@ -247,26 +247,18 @@ function void fn08b8f2()
 //# address-hook(0x08b8fa) end(0x08b92a)
 function void fn08b8fa()
 {
+	// Setup three two inner "green rings" objects
 	A1 = A0 + 0x18
-	D0.u16 = objA0.position.x.u16
-	D1.u16 = objA0.position.y.u16
-	D2 = 0
-	D3 = 1
-
-	while (D3.s16 >= 0)
+	for (u8 i = 0; i < 2; ++i)
 	{
-		D4.u16 = D0.u16
-		D5.u16 = u16[0x08b92c + D2.s16]
+		s16 offset = s16[0x08b92c + i * 2]
 		if (objA0.render_flags & render_flag.FLIP_X)
-			D5.s16 = -D5.s16
+			offset = -offset
 
-		D4.u16 += D5.u16
-		u16[(A1+=2)-2] = D4.u16
-		u16[(A1+=2)-2] = D1.u16
-		u16[(A1+=2)-2] = 8
-
-		D2.u16 += 2
-		--D3.s16
+		u16[A1]   = objA0.position.x.u16 + offset
+		u16[A1+2] = objA0.position.y.u16
+		u16[A1+4] = 8
+		A1 += 6
 	}
 }
 
@@ -274,17 +266,11 @@ function void fn08b8fa()
 //# address-hook(0x08b930) end(0x08b94e)
 function void fn08b930()
 {
+	// Update position of the inner "green rings" objects
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A2 = A0 + 0x1a
-	D0.u16 = objA0.position.y.u16
-	D1.u16 = objA1.position.y.u16
-	D2.u16 = D1.u16
-	D1.u16 -= D0.u16
-	D1.s16 >>= 1
-	D1.u16 += D0.u16
-	u16[A2] = D1.u16
-	A2 += 6
-	u16[A2] = D2.u16
+	u16[A2]   = objA0.position.y.u16 + ((objA1.position.y.u16 - objA0.position.y.u16) >> 1)
+	u16[A2+6] = objA1.position.y.u16
 }
 
 

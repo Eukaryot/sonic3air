@@ -347,6 +347,11 @@ function void fn038a88()
 //# address-hook(0x038aa2)
 function void fn038aa2()
 {
+#if STANDALONE
+	if (A1 == 0xffffb000 && debug_mode.state)
+		return
+#endif
+
 	u8 bit = (1 << D6.u8)
 	if (objA0.flags2a & bit)
 	{

@@ -388,6 +388,7 @@ function void fn063682()
 //# address-hook(0x063694) end(0x0636f2)
 function void fn063694()
 {
+	// Subtypes used here: 0x00, 0x02, 0x04, ..., 0x0e
 	objA0.position.x.u16 = u16[0x0636f4 + objA0.subtype2c]
 	objA0.position.y.u16 = 0x09f4
 
@@ -398,13 +399,13 @@ function void fn063694()
 	objA0.hitbox_extends.y = 0x0c
 	if (objA0.subtype2c & 0x02)
 	{
-		A1 += 0x0a
+		A1 += 10
 		objA0.hitbox_extends.y = 0x0a
 	}
 
-	objA0.update_address = u32[(A1+=4)-4]
-	objA0.mapping_offset = u32[(A1+=4)-4]
-	objA0.sprite_attributes = u16[(A1+=2)-2]
+	objA0.update_address = u32[A1]
+	objA0.mapping_offset = u32[A1+4]
+	objA0.sprite_attributes = u16[A1+8]
 	objA0.render_flags |= render_flag.WORLD
 	objA0.sprite_priority = 0x0200
 	objA0.box_size.x = 0x10

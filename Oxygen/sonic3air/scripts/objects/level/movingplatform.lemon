@@ -44,9 +44,9 @@ function void MovingPlatform.Init()
 	objA0.sprite_priority = 0x180
 	D0 = (u16(objA0.subtype2c) >> 2) & 0x1c
 	A2 = 0x0254fa + D0.s16
-	objA0.box_size.x = u8[(A2+=1)-1]
-	objA0.box_size.y = u8[(A2+=1)-1]
-	objA0.animation.sprite = u8[(A2+=1)-1]
+	objA0.box_size.x = u8[A2]
+	objA0.box_size.y = u8[A2+1]
+	objA0.animation.sprite = u8[A2+2]
 	u16[A0 + 0x30] = objA0.position.x.u16
 	u16[A0 + 0x32] = objA0.position.x.u16
 	u16[A0 + 0x34] = objA0.position.y.u16

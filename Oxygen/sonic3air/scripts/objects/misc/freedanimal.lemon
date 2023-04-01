@@ -123,9 +123,9 @@ function void fn02c8b8()
 		D0.u16 <<= 3
 
 		A1 = 0x02c7ea + D0.u16
-		objA0.value32 = u16[(A1+=2)-2]		// Used in calculating horizontal velocity
-		u16[A0 + 0x34] = u16[(A1+=2)-2]		// Used in calculating vertical velocity
-		objA0.mapping_offset = u32[(A1+=4)-4]
+		objA0.value32 = u16[A1]			// Used in calculating horizontal velocity
+		u16[A0 + 0x34] = u16[A1+2]		// Used in calculating vertical velocity
+		objA0.mapping_offset = u32[A1+4]
 
 		objA0.hitbox_extends.y = 12
 		objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
