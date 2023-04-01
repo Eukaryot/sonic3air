@@ -30,7 +30,7 @@ function void PathSwapperInit()
 	objA0.box_size.x = 0x40
 	objA0.box_size.y = 0x40
 	objA0.sprite_priority = 0x280
-	objA0.value32 = u16[0x01cd34 + (objA0.subtype2c & 0x03) * 2]
+	objA0.value32 = u16[0x01cd34 + (objA0.subtype2c & 0x03) * 2]	// Half heights: 0x20, 0x40, 0x80, 0x100
 
 	if (objA0.subtype2c & 0x04)
 	{
