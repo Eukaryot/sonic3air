@@ -336,30 +336,9 @@ function void fn01dc56()
 //# address-hook(0x01dc74)
 function void fn01dc74()
 {
-	u8 bit = (1 << D6.u8)
-	if ((objA0.flags2a & bit) == 0)
+	if (fn01dcb6_internal(A1, D6.u8))
 	{
 		fn01df88()
-	}
-	else
-	{
-		D2.u16 = D1.u16 * 2
-		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
-		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
-			if (D0.s16 >= 0 && D0.u16 < D2.u16)
-			{
-				D2.u16 = D4.u16
-				UpdateSonicPositionOnMovingObject()
-				D4 = 0
-				return
-			}
-		}
-
-		objA1.flags2a &= ~char.flag.ON_OBJECT
-		objA1.flags2a |= char.flag.IN_AIR
-		objA0.flags2a &= ~bit
-		D4 = 0
 	}
 }
 
@@ -410,18 +389,16 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 	D6.u8 = bitnum
 	u8 bit = (1 << bitnum)
 
-	if ((objA0.flags2a & bit) == 0)
+	if (objA0.flags2a & bit)
 	{
-		return true
-	}
-	else
-	{
-		D2.u16 = D1.u16 * 2
-		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		D2.u16 = D1.u16 * 2		// Width
+		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
 		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			// Still on the object
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16		// Horizontal distance + half width
 			if (D0.s16 >= 0 && D0.u16 < D2.u16)
 			{
+				// Correct height
 				D2.u16 = D4.u16
 				UpdateSonicPositionOnMovingObject()
 				D4 = 0
@@ -429,12 +406,16 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 			}
 		}
 
+		// Not on the object any more (either in air, or outside the object's width)
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
 		objA0.flags2a &= ~bit
 		D4 = 0
 		return false
 	}
+
+	// Character is colliding with the solid object, but not standing on top of it (e.g. pushing, head bonk, etc.)
+	return true
 }
 
 

@@ -1089,7 +1089,7 @@ function void fn07f900()
 	if (_equal())
 		return
 
-	if (u8[A1 + 0x20] != 0x02)
+	if (u8[A1 + 0x20] != char.state.ROLLING)
 	{
 		if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 		{
@@ -1175,7 +1175,7 @@ function void fn07f9f8()
 		return
 	}
 
-	if (u8[A1 + 0x20] != 0x02 && u8[A1 + 0x20] != 0x09)
+	if (u8[A1 + 0x20] != char.state.ROLLING && u8[A1 + 0x20] != char.state.SPINDASH)
 	{
 		if (u8[A1 + 0x34] == 0 && (u8[A1 + 0x2b] & char.bonus.INVINCIBLE) == 0)
 		{

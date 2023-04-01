@@ -62,6 +62,11 @@ function void ROMManipulation.RepairSpriteMappings()
 	u16[0x22306f4] = 0x02
 	u16[0x2230708] = 0x02
 	u16[0x223071c] = 0x02
+
+	// Fix checkpoint stars loading incorrect tiles
+	u16[0x187b8a] = 0xc0
+	u16[0x187bec] = 0xc0
+	u16[0x187c4e] = 0xc0
 }
 
 

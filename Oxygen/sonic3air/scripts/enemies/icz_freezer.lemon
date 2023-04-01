@@ -431,7 +431,7 @@ function void fn08aa38()
 	if (s16[A3 + 0x1a] < 0)
 		return
 
-	if (u8[A3 + 0x20] != 0x02 && u8[A3 + 0x20] != 0x09)
+	if (u8[A3 + 0x20] != char.state.ROLLING && u8[A3 + 0x20] != char.state.SPINDASH)
 		return
 
 	A1 = 0x08aa8e

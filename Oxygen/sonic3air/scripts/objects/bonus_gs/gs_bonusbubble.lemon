@@ -205,6 +205,16 @@ function void fn0610f8()
 //# address-hook(0x061100) end(0x06110c)
 function void fn061100()
 {
+	// Targets:
+	//  - 0x061120	-> D1.u16 = 0x00	-> 1-up bubble
+	//  - 0x061130	-> D1.u16 = 0x01	-> Rep bubble
+	//  - 0x06114e	-> D1.u16 = 0x02	-> Ring bubble
+	//  - 0x06114c	-> D1.u16 = 0x03	-> Empty bubble
+	//  - 0x06115c	-> D1.u16 = 0x04	-> Bouncy black bubble
+	//  - 0x0611d6	-> D1.u16 = 0x05	-> Fire shield
+	//  - 0x061200	-> D1.u16 = 0x06	-> Bubble shield
+	//  - 0x06122a	-> D1.u16 = 0x07	-> Lightning shield
+	//  - 0x061264	-> D1.u16 = 0x08	-> Unused golden "Super bubble"
 	call tableLookupAddress(0x06110e, D1.u16 * 2)
 	_setZeroFlagByValue(D2.u16)
 }

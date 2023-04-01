@@ -247,8 +247,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 							}
 						}
 						
-						angle = oldRotation
-						angle &= 0xFF
+						angle = oldRotation & 0xff
 					}
 				}
 			}

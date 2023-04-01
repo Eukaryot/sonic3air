@@ -340,7 +340,6 @@ function void fn086770()
 		if (D0.u16 != 0)
 		{
 			A1 = 0xffff0000 + D0.u16
-			debugLog(stringformat("A1 = 0x%06x", A1))
 			if (objA1.velocity.y < 0)
 			{
 				active = (u8[A1 + 0x20] == char.state.ROLLING || u8[A1 + 0x38] == CHARACTER_TAILS)
