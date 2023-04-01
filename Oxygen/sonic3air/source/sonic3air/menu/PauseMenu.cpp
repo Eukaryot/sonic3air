@@ -73,7 +73,7 @@ void PauseMenu::onFadeIn()
 		mMenuEntries.addEntry("Continue", 0);
 		if (mRestartEnabled)
 			mMenuEntries.addEntry("Restart", 2);
-		if (Game::instance().getCurrentMode() != Game::Mode::TIME_ATTACK)
+		if (!Game::instance().isInTimeAttackMode())
 			mMenuEntries.addEntry("Options", 1);
 		mMenuEntries.addEntry("Exit Game", 3);
 	}
@@ -153,7 +153,7 @@ void PauseMenu::update(float timeElapsed)
 					case 2:
 					{
 						// Restart
-						if (Game::instance().isTimeAttackMode())
+						if (Game::instance().isInTimeAttackMode())
 						{
 							resumeGame();
 							Game::instance().restartTimeAttack(false);

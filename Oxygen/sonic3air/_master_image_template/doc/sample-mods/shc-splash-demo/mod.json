@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "SHC Splash Screen Demo Mod",
+		"UniqueID": "euka-shc-splash-screen-demo-mod",
 		"Author": "Eukaryot",
 		"Description": "Contains the script changes needed to enable the Sonic Hacking Contest splash screen.\nSee the mod's \"scripts/main.lemon\" file for more information.",
 		"URL": "https://sonic3air.org",

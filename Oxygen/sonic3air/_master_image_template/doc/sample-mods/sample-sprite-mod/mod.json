@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "Sample Sprite Mod",
+		"UniqueID": "euka-sample-sprite-mod",
 		"Author": "Eukaryot",
 		"Description": "An example how a sprite mod basically looks like. This makes Sonic's Drop Dash darker.",
 		"URL": "https://sonic3air.org",

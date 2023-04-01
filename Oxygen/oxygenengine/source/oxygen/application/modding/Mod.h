@@ -38,6 +38,7 @@ public:
 		uint32 mDefaultValue = 0;
 		uint32 mCurrentValue = 0;
 	};
+
 	struct SettingCategory
 	{
 		std::string mDisplayName;
@@ -45,8 +46,17 @@ public:
 		std::vector<Setting> mSettings;
 	};
 
+	struct OtherMod
+	{
+		std::string mModName;
+		std::string mMinimumVersion;
+		bool mIsRequired = false;
+		int mRelativePriority = 0;
+	};
+
 public:
-	std::string mName;					// Internal name, which is also the directory name
+	std::string mUniqueID;				// Unique mod ID
+	std::string mDirectoryName;			// Directory name (an alternative internal name for the sake of compatibility)
 	std::wstring mLocalDirectory;		// Local path inside mods directory, excluding the trailing slash, e.g. "my-sample-mod" or "modfolder/my-sample-mod"
 	std::wstring mFullPath;				// Complete path, now including the trailing slash, e.g. "<savedatadir>/mods/modfolder/my-sample-mod/"
 	uint64 mLocalDirectoryHash = 0;
@@ -63,6 +73,9 @@ public:
 
 	// Settings
 	std::vector<SettingCategory> mSettingCategories;
+
+	// Relationships with other mods
+	std::vector<OtherMod> mOtherMods;
 
 public:
 	void loadFromJson(const Json::Value& json);

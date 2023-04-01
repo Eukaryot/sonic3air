@@ -455,7 +455,7 @@ void ExtrasMenu::render()
 				const Color color2 = isSelected ? Color(1.0f, 1.0f, 0.6f, tabAlpha) : Color(0.9f, 0.9f, 0.9f, tabAlpha);
 				if (isUnlocked)
 				{
-					std::vector<std::string>* textLines = nullptr;
+					std::vector<std::string_view>* textLines = nullptr;
 					{
 						const auto it = mDescriptionLinesCache.find(0x1000 + entry.mData);
 						if (it == mDescriptionLinesCache.end())
@@ -471,7 +471,7 @@ void ExtrasMenu::render()
 
 					py += (textLines->size() == 1) ? 9 : 5;
 
-					for (const std::string& textLine : *textLines)
+					for (const std::string_view& textLine : *textLines)
 					{
 						py += 10;
 						drawer.printText(global::mOxyfontTiny, Recti(px - 105, py, 0, 10), textLine, 1, color2);
@@ -528,7 +528,7 @@ void ExtrasMenu::render()
 
 				// Description
 				{
-					std::vector<std::string>* textLines = nullptr;
+					std::vector<std::string_view>* textLines = nullptr;
 					{
 						const auto it = mDescriptionLinesCache.find(entry.mData);
 						if (it == mDescriptionLinesCache.end())
@@ -547,7 +547,7 @@ void ExtrasMenu::render()
 					py += (textLines->size() == 1) ? 9 : 5;
 					const Color color2 = isSelected ? Color(1.0f, 1.0f, 0.6f, tabAlpha) : Color(0.9f, 0.9f, 0.9f, tabAlpha);
 
-					for (const std::string& textLine : *textLines)
+					for (const std::string_view& textLine : *textLines)
 					{
 						py += 10;
 						drawer.printText(global::mOxyfontTiny, Recti(px - 105, py, 0, 10), textLine, 1, color2);

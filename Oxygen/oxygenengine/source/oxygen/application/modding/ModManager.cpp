@@ -21,7 +21,7 @@ namespace detail
 	static bool CompareMods(Mod* a, Mod* b)
 	{
 		const int cmp = a->mLocalDirectory.compare(b->mLocalDirectory);
-		return (cmp != 0) ? (cmp < 0) : (a->mName < b->mName);
+		return (cmp != 0) ? (cmp < 0) : (a->mDirectoryName < b->mDirectoryName);
 	}
 }
 
@@ -118,7 +118,7 @@ void ModManager::setActiveMods(const std::vector<Mod*>& newActiveModsList)
 	// Mark the now active mods as such
 	for (Mod* mod : newActiveModsList)
 	{
-		RMX_CHECK(mod->mState != Mod::State::FAILED, "Mod \"" << mod->mName << "\" is failed, can't be made active", continue);
+		RMX_CHECK(mod->mState != Mod::State::FAILED, "Mod \"" << mod->mDisplayName << "\" is failed, can't be made active", continue);
 		if (mod->mState == Mod::State::INACTIVE)
 		{
 			mod->mState = Mod::State::ACTIVE;
@@ -149,10 +149,17 @@ void ModManager::copyModSettingsFromConfig()
 		if (mod->mSettingCategories.empty())
 			continue;
 
-		const uint64 hash = rmx::getMurmur2_64(mod->mName);
+		// First try the directory name (which has been used to save the mod settings since they existed)
+		uint64 hash = rmx::getMurmur2_64(mod->mDirectoryName);
 		const auto it = config.mModSettings.find(hash);
 		if (it == config.mModSettings.end())
-			continue;
+		{
+			// Try the unique ID instead (forward compatibility with future versions, which may actually use that one)
+			hash = rmx::getMurmur2_64(mod->mUniqueID);
+			const auto it = config.mModSettings.find(hash);
+			if (it == config.mModSettings.end())
+				continue;
+		}
 
 		const Configuration::Mod& configMod = it->second;
 		if (configMod.mSettings.empty())
@@ -178,9 +185,9 @@ void ModManager::copyModSettingsToConfig()
 	Configuration& config = Configuration::instance();
 	for (Mod* mod : mAllMods)
 	{
-		const uint64 hash = rmx::getMurmur2_64(mod->mName);
+		const uint64 hash = rmx::getMurmur2_64(mod->mDirectoryName);
 		Configuration::Mod& configMod = config.mModSettings[hash];
-		configMod.mModName = mod->mName;
+		configMod.mModName = mod->mDirectoryName;
 		configMod.mSettings.clear();
 
 		for (Mod::SettingCategory& modSettingCategory : mod->mSettingCategories)
@@ -223,7 +230,7 @@ bool ModManager::scanMods()
 	bool anyChange = false;
 	for (const FoundMod& foundMod : foundMods)
 	{
-		const std::string name = WString(foundMod.mModName).toStdString();
+		const std::string directoryName = WString(foundMod.mDirectoryName).toStdString();
 		const Json::Value& root = foundMod.mModJson;
 
 		std::string errorMessage;
@@ -237,13 +244,13 @@ bool ModManager::scanMods()
 					const uint32 versionNumber = utils::getVersionNumberFromString(value.asString());
 					if (versionNumber != 0 && versionNumber > EngineMain::getDelegate().getAppMetaData().mBuildVersionNumber)
 					{
-						errorMessage = "Mod '" + name + "' requires newer game version v" + utils::getVersionStringFromNumber(versionNumber);
+						errorMessage = "Mod '" + directoryName + "' requires newer game version v" + utils::getVersionStringFromNumber(versionNumber) + ".";
 					}
 				}
 			}
 		}
 
-		const std::wstring localDirectory = foundMod.mLocalPath + foundMod.mModName;
+		const std::wstring localDirectory = foundMod.mLocalPath + foundMod.mDirectoryName;
 		const uint64 hash = rmx::getMurmur2_64(localDirectory);
 		const auto it = mModsByLocalDirectoryHash.find(hash);
 		if (it != mModsByLocalDirectoryHash.end())
@@ -261,7 +268,8 @@ bool ModManager::scanMods()
 		{
 			// Add as a new mod
 			Mod* mod = new Mod();
-			mod->mName = name;
+			mod->mUniqueID = directoryName;		// Just a fallback in case it's not overwritten in "Mod::loadFromJson" below
+			mod->mDirectoryName = directoryName;
 			mod->mLocalDirectory = localDirectory;
 			mod->mFullPath = mBasePath + localDirectory + L'/';
 			mod->mLocalDirectoryHash = hash;
@@ -272,18 +280,18 @@ bool ModManager::scanMods()
 
 			if (errorMessage.empty())
 			{
-				RMX_LOG_INFO("Found mod: '" << name << "'");
+				RMX_LOG_INFO("Found mod: '" << directoryName << "'");
 				mod->mState = Mod::State::INACTIVE;
-
-				// Load mod meta data from JSON
-				mod->loadFromJson(root);
 			}
 			else
 			{
-				RMX_LOG_INFO("Could not load mod: '" << name << "'");
+				RMX_LOG_INFO("Could not load mod: '" << directoryName << "'");
 				mod->mState = Mod::State::FAILED;
 				mod->mFailedMessage = errorMessage;
 			}
+
+			// Load mod meta data from JSON
+			mod->loadFromJson(root);
 		}
 	}
 
@@ -332,25 +340,25 @@ void ModManager::scanDirectoryRecursive(std::vector<FoundMod>& outFoundMods, con
 	std::vector<std::wstring> subDirectories;
 	FTX::FileSystem->listDirectories(mBasePath + localPath, subDirectories);
 
-	for (const std::wstring& modName : subDirectories)
+	for (const std::wstring& directoryName : subDirectories)
 	{
 		// Completely ignore directory names starting with #
-		if (modName[0] != L'#')
+		if (directoryName[0] != L'#')
 		{
 			// Check if this directory is itself a mod
-			Json::Value root = JsonHelper::loadFile(mBasePath + localPath + modName + L"/mod.json");
+			Json::Value root = JsonHelper::loadFile(mBasePath + localPath + directoryName + L"/mod.json");
 			if (root.isObject())
 			{
 				// Looks like this directory is meant to be a mod
 				FoundMod& foundMod = vectorAdd(outFoundMods);
 				foundMod.mLocalPath = localPath;
-				foundMod.mModName = modName;
+				foundMod.mDirectoryName = directoryName;
 				foundMod.mModJson = root;
 			}
 			else
 			{
 				// No "mod.json" found, scan subdirectories
-				scanDirectoryRecursive(outFoundMods, localPath + modName + L'/');
+				scanDirectoryRecursive(outFoundMods, localPath + directoryName + L'/');
 			}
 		}
 	}
@@ -426,9 +434,10 @@ void ModManager::onActiveModsChanged(bool duringStartup)
 	mActiveModsByNameHash.clear();
 	for (Mod* mod : mActiveMods)
 	{
-		mActiveModsByNameHash.emplace(rmx::getMurmur2_64(mod->mName), mod);
-		if (mod->mDisplayName != mod->mName)
-			mActiveModsByNameHash.emplace(rmx::getMurmur2_64(mod->mDisplayName), mod);
+		// Add under all different names that can refer to the mod
+		mActiveModsByNameHash.emplace(rmx::getMurmur2_64(mod->mUniqueID), mod);
+		mActiveModsByNameHash.emplace(rmx::getMurmur2_64(mod->mDirectoryName), mod);
+		mActiveModsByNameHash.emplace(rmx::getMurmur2_64(mod->mDisplayName), mod);
 	}
 
 	if (!duringStartup)		// Not needed during startup, as the engine performs the necessary loading steps anyways afterwards

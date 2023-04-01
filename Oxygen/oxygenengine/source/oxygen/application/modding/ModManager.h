@@ -37,7 +37,7 @@ private:
 	struct FoundMod
 	{
 		std::wstring mLocalPath;
-		std::wstring mModName;
+		std::wstring mDirectoryName;
 		Json::Value mModJson;
 	};
 

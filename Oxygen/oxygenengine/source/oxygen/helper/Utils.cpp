@@ -75,6 +75,59 @@ namespace utils
 		}
 	}
 
+	void splitTextIntoLines(std::vector<std::string_view>& outLines, std::string_view text, Font& font, int maxLineWidth)
+	{
+		outLines.clear();
+		std::string_view line;
+		size_t lineStart = 0;
+		size_t position = 0;
+		while (position < text.length())
+		{
+			const size_t start = position;
+			while (position < text.length() && text[position] != ' ' && text[position] != '\n')
+				++position;
+
+			if (position > start)	// Ignore multiple spaces
+			{
+				if (line.empty())
+				{
+					lineStart = start;
+					line = text.substr(start, position - start);
+				}
+				else
+				{
+					const std::string_view linePlusWord = text.substr(lineStart, position - lineStart);
+					if (font.getWidth(linePlusWord) <= maxLineWidth)
+					{
+						line = linePlusWord;
+					}
+					else
+					{
+						// New line needed
+						outLines.emplace_back(line);
+						lineStart = start;
+						line = text.substr(start, position - start);
+					}
+				}
+			}
+
+			if (position < text.length() && text[position] == '\n')
+			{
+				// New line needed
+				outLines.emplace_back(line);
+				lineStart = position + 1;
+				line = std::string_view();
+			}
+
+			++position;
+		}
+
+		if (!line.empty())
+		{
+			outLines.emplace_back(line);
+		}
+	}
+
 	void shortenTextToFit(std::string& text, Font& font, int maxLineWidth)
 	{
 		// Any change needed at all?

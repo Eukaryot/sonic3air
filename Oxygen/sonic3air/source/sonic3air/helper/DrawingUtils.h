@@ -11,12 +11,11 @@
 #include <rmxbase.h>
 
 class Drawer;
+class Font;
 
 
 class DrawingUtils
 {
 public:
-	static void drawSpeechBalloon(Drawer& drawer, const Recti& innerRect, const Color& color);
-	static void drawSpeechBalloonArrowUp(Drawer& drawer, const Recti& innerRect, const Color& color, int arrowOffset);
-	static void drawSpeechBalloonArrowDown(Drawer& drawer, const Recti& innerRect, const Color& color, int arrowOffset);
+	static void drawSpeechBalloon(Drawer& drawer, Font& font, std::string_view text, const Recti& attachmentRect, const Recti& fenceRect, const Color& color);
 };

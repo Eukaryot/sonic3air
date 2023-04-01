@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "Sample Font Mod",
+		"UniqueID": "euka-sample-font-mod",
 		"Author": "Eukaryot",
 		"Description": "An example how a font mod basically looks like. It adds a shaded version of the normal oxygen_regular font that you can use in scripts (it won't show up otherwise)",
 		"URL": "https://sonic3air.org",

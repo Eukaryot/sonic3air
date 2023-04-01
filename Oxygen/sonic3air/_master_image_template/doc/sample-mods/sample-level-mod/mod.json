@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "Sample Level Mod",
+		"UniqueID": "euka-sample-level-mod",
 		"Author": "Eukaryot",
 		"Description": "An example how a level mod basically looks like. The start of Sonic's path in IceCap Zone Act 2 gets changed by this.",
 		"URL": "https://sonic3air.org",

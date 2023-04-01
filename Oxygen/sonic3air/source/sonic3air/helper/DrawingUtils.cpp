@@ -9,10 +9,12 @@
 #include "sonic3air/pch.h"
 #include "sonic3air/helper/DrawingUtils.h"
 
+#include "oxygen/helper/Utils.h"
+
 
 namespace
 {
-	void drawSpeechBalloon(Drawer& drawer, const Recti& innerRect, const Color& color, int arrowDirection, int arrowOffset)
+	void drawSpeechBalloon(Drawer& drawer, const Recti& innerRect, const Color& color, int arrowDirection, int arrowX)
 	{
 		static const uint64 key00 = rmx::getMurmur2_64(std::string_view("speechballoon_00"));
 		static const uint64 key01 = rmx::getMurmur2_64(std::string_view("speechballoon_01"));
@@ -28,9 +30,10 @@ namespace
 
 		constexpr int ARROW_WIDTH = 12;
 
+		arrowX -= innerRect.x;
 		if (arrowDirection != 0)
 		{
-			arrowOffset = clamp(arrowOffset, ARROW_WIDTH / 2, innerRect.width - ARROW_WIDTH / 2);
+			arrowX = clamp(arrowX, ARROW_WIDTH / 2, innerRect.width - ARROW_WIDTH / 2);
 		}
 
 		const int x0 = innerRect.x;
@@ -38,7 +41,7 @@ namespace
 		const int y0 = innerRect.y;
 		const int y1 = innerRect.y + innerRect.height;
 
-		const int left = arrowOffset - ARROW_WIDTH / 2;
+		const int left = arrowX - ARROW_WIDTH / 2;
 		const int right = left + ARROW_WIDTH;
 
 		// Corners
@@ -56,7 +59,7 @@ namespace
 		{
 			drawer.drawSpriteRect(Recti(x0, y0-5, left, 5), key10, color);
 			drawer.drawSpriteRect(Recti(x0 + right, y0-5, innerRect.width - right, 5), key10, color);
-			drawer.drawSprite(Vec2i(x0 + arrowOffset, y0), arrowUp, color);
+			drawer.drawSprite(Vec2i(x0 + arrowX, y0), arrowUp, color);
 		}
 		else
 		{
@@ -68,7 +71,7 @@ namespace
 		{
 			drawer.drawSpriteRect(Recti(x0, y1, left, 5), key12, color);
 			drawer.drawSpriteRect(Recti(x0 + right, y1, innerRect.width - right, 5), key12, color);
-			drawer.drawSprite(Vec2i(x0 + arrowOffset, y1), arrowDown, color);
+			drawer.drawSprite(Vec2i(x0 + arrowX, y1), arrowDown, color);
 		}
 		else
 		{
@@ -81,17 +84,54 @@ namespace
 }
 
 
-void DrawingUtils::drawSpeechBalloon(Drawer& drawer, const Recti& innerRect, const Color& color)
+void DrawingUtils::drawSpeechBalloon(Drawer& drawer, Font& font, std::string_view text, const Recti& attachmentRect, const Recti& fenceRect, const Color& color)
 {
-	::drawSpeechBalloon(drawer, innerRect, color, 0, 0);
-}
+	std::vector<std::string_view> lines;
+	utils::splitTextIntoLines(lines, text, font, fenceRect.width);
 
-void DrawingUtils::drawSpeechBalloonArrowUp(Drawer& drawer, const Recti& innerRect, const Color& color, int arrowOffset)
-{
-	::drawSpeechBalloon(drawer, innerRect, color, -1, arrowOffset);
-}
+	const Vec2i attachmentCenter = attachmentRect.getCenter();
+	const int lineHeight = font.getLineHeight() + 1;
 
-void DrawingUtils::drawSpeechBalloonArrowDown(Drawer& drawer, const Recti& innerRect, const Color& color, int arrowOffset)
-{
-	::drawSpeechBalloon(drawer, innerRect, color, +1, arrowOffset);
+	Recti textRect;
+	textRect.width = 0;
+	for (const std::string_view& line : lines)
+		textRect.width = std::max(textRect.width, font.getWidth(line));
+	textRect.height = lineHeight * (int)lines.size() - 3;
+
+	textRect.x = attachmentCenter.x - textRect.width / 2;
+	if (textRect.x < fenceRect.x)
+	{
+		textRect.x = fenceRect.x;
+	}
+	else if (textRect.x + textRect.width > fenceRect.x + fenceRect.width)
+	{
+		textRect.x = fenceRect.x + fenceRect.width - textRect.width;
+	}
+
+	if (attachmentCenter.y < fenceRect.getCenter().y)
+	{
+		textRect.y = attachmentRect.y + attachmentRect.height + 3;
+	}
+	else
+	{
+		textRect.y = attachmentRect.y - textRect.height - 17;
+	}
+
+	const Recti innerRect(textRect.x - 3, textRect.y - 2, textRect.width + 6, textRect.height + 4);
+
+	if (attachmentCenter.y < fenceRect.getCenter().y)
+	{
+		::drawSpeechBalloon(drawer, innerRect, color, -1, attachmentCenter.x - 1);
+	}
+	else
+	{
+		::drawSpeechBalloon(drawer, innerRect, color, +1, attachmentCenter.x - 1);
+	}
+
+	Recti rct = textRect;
+	for (const std::string_view& line : lines)
+	{
+		drawer.printText(font, rct, line, 1);
+		rct.y += lineHeight;
+	}
 }

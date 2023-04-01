@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "Sample Raw Data Mod",
+		"UniqueID": "euka-sample-raw-data-mod",
 		"Author": "Eukaryot",
 		"Description": "An example how a raw data mod basically looks like. This makes a few changes to Sonic's palettes.",
 		"URL": "https://sonic3air.org",

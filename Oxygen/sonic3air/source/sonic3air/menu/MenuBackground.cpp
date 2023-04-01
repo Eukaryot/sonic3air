@@ -166,7 +166,7 @@ void MenuBackground::render()
 	{
 		if (titleLeft < titleRight)
 		{
-			if (Game::instance().getCurrentMode() != Game::Mode::MAIN_MENU_BG)
+			if (!Game::instance().isInMainMenuMode())
 			{
 				Game::instance().startIntoMainMenuBG();
 			}
@@ -186,7 +186,7 @@ void MenuBackground::render()
 		{
 			if (mAnimatedBackgroundActive)
 			{
-				if (Game::instance().getCurrentMode() == Game::Mode::MAIN_MENU_BG)
+				if (Game::instance().isInMainMenuMode())
 				{
 					Application::instance().getSimulation().setRunning(false);
 				}

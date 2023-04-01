@@ -273,7 +273,7 @@ LemonScriptProgram::LoadScriptsResult LemonScriptProgram::loadScripts(const std:
 				}
 
 				// Create and compile module
-				lemon::Module* module = new lemon::Module(mod->mName);
+				lemon::Module* module = new lemon::Module(mod->mUniqueID);
 				const std::wstring mainScriptFilename = mod->mFullPath + L"scripts/main.lemon";
 				const bool success = loadScriptModule(*module, globalsLookup, mainScriptFilename);
 				if (success)

@@ -58,7 +58,4 @@ private:
 
 	State mState = State::INACTIVE;
 	float mVisibility = 0.0f;
-
-	bool mCheckedModErrors = false;
-	std::vector<std::string> mErrorLines;
 };

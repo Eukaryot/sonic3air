@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "Classic Mode Sample Mod",
+		"UniqueID": "euka-classic-mode-sample-mod",
 		"Author": "Eukaryot",
 		"Description": "Makes the game (except the menus) run in the original resolution of 320x224.",
 		"URL": "https://sonic3air.org",

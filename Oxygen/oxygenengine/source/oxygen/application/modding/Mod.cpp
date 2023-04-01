@@ -17,16 +17,20 @@ void Mod::loadFromJson(const Json::Value& json)
 	if (metadataJson.isObject())
 	{
 		JsonHelper jsonHelper(metadataJson);
-		jsonHelper.tryReadString("Name", mDisplayName);
+		jsonHelper.tryReadString("Name", mDisplayName);			// Old property, for backward compatibility with old game versions (still recommended)
+		jsonHelper.tryReadString("DisplayName", mDisplayName);	// New property, for forward compatibility with future game versions
+		jsonHelper.tryReadString("UniqueID", mUniqueID);
 		jsonHelper.tryReadString("ModVersion", mModVersion);
 		jsonHelper.tryReadString("Author", mAuthor);
 		jsonHelper.tryReadString("Description", mDescription);
 		jsonHelper.tryReadString("URL", mURL);
 	}
 
-	// Fallback for name
+	// Fallback for names
 	if (mDisplayName.empty())
-		mDisplayName = mName;
+		mDisplayName = mDirectoryName;
+	if (mUniqueID.empty())
+		mUniqueID = mDirectoryName;
 
 	// Read settings
 	Json::Value settingsJson = json["Settings"];
@@ -34,7 +38,6 @@ void Mod::loadFromJson(const Json::Value& json)
 	{
 		for (auto iteratorCategories = settingsJson.begin(); iteratorCategories != settingsJson.end(); ++iteratorCategories)
 		{
-			// TODO: Support categories
 			const Json::Value categoryJson = *iteratorCategories;
 			if (!categoryJson.isArray())
 				continue;
@@ -107,6 +110,36 @@ void Mod::loadFromJson(const Json::Value& json)
 				{
 					settingCategory->mSettings.pop_back();
 				}
+			}
+		}
+	}
+
+	// Read relationships with other mods
+	Json::Value otherModsJson = json["OtherMods"];
+	if (otherModsJson.isObject())
+	{
+		for (auto iteratorOtherMods = otherModsJson.begin(); iteratorOtherMods != otherModsJson.end(); ++iteratorOtherMods)
+		{
+			const Json::Value modJson = *iteratorOtherMods;
+			if (!modJson.isObject())
+				continue;
+
+			OtherMod& otherMod = vectorAdd(mOtherMods);
+			otherMod.mModName = iteratorOtherMods.key().asString();
+			
+			JsonHelper jsonHelper(modJson);
+			jsonHelper.tryReadString("MinimumVersion", otherMod.mMinimumVersion);
+			jsonHelper.tryReadBool("IsRequired", otherMod.mIsRequired);
+			
+			const Json::Value& priorityValue = modJson["Priority"];
+			if (priorityValue.isString())
+			{
+				String str = priorityValue.asString();
+				str.lowerCase();
+				if (str == "higher")
+					otherMod.mRelativePriority = +1;
+				else if (str == "lower")
+					otherMod.mRelativePriority = -1;
 			}
 		}
 	}

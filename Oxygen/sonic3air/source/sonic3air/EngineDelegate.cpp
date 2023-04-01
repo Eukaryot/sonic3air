@@ -171,7 +171,7 @@ void EngineDelegate::onControlsUpdate()
 
 void EngineDelegate::onPreSaveStateLoad()
 {
-	mGame.setCurrentMode(Game::Mode::UNDEFINED);
+	mGame.resetCurrentMode();
 }
 
 void EngineDelegate::onApplicationLostFocus()
@@ -192,8 +192,7 @@ bool EngineDelegate::mayLoadScriptMods()
 
 bool EngineDelegate::allowModdedData()
 {
-	// TODO: How about Competition Mode Time Attack?
-	return (mGame.getCurrentMode() != Game::Mode::TIME_ATTACK);
+	return !mGame.isInTimeAttackMode();
 }
 
 bool EngineDelegate::useDeveloperFeatures()

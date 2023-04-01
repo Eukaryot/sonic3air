@@ -56,5 +56,5 @@ private:
 
 	std::list<Entry> mEnqueuedEntries;
 	Entry mShownEntry;
-	std::vector<std::string> mShownTextLines;
+	std::vector<std::string_view> mShownTextLines;
 };

@@ -107,25 +107,6 @@ void MainMenu::onFadeIn()
 		mMenuEntries[i].mAnimation.mVisibility = ((int)i == mMenuEntries.mSelectedEntryIndex) ? 1.0f : 0.0f;
 	}
 
-	// Prepare mod error output
-	if (!mCheckedModErrors)
-	{
-		const std::vector<Mod*>& allMods = ModManager::instance().getAllMods();
-		std::string text;
-		for (const Mod* mod : allMods)
-		{
-			if (mod->mState == Mod::State::FAILED)
-			{
-				if (!text.empty())
-					text += '\n';
-				text += "Warning: ";
-				text += mod->mFailedMessage;
-			}
-		}
-		utils::splitTextIntoLines(mErrorLines, text, global::mOxyfontTiny, 160);
-		mCheckedModErrors = true;
-	}
-
 	// Check for unlocked secrets (needed when new game versions added secrets or reduced requirements)
 	Game::instance().checkForUnlockedSecrets();
 }
@@ -315,17 +296,6 @@ void MainMenu::render()
 				drawer.printText(global::mSmallfont, Recti(px, 1, 0, 0), txt, 3, Color(0.6f, 0.2f, 0.2f, mVisibility * 0.3f));
 			}
 		}
-	}
-
-	// Mod errors
-	for (size_t i = 0; i < mErrorLines.size(); ++i)
-	{
-		if (i >= 10)
-		{
-			drawer.printText(global::mOxyfontTiny, Recti(8, 30 + (int)i * 12, 0, 0), "...", 1, Color(1.0f, 0.6f, 0.4f, saturate(mVisibility * 5.0f - 4.0f)));
-			break;
-		}
-		drawer.printText(global::mOxyfontTiny, Recti(8, 30 + (int)i * 12, 0, 0), mErrorLines[i], 1, Color(1.0f, 0.6f, 0.4f, saturate(mVisibility * 5.0f - 4.0f)));
 	}
 
 	drawer.performRendering();

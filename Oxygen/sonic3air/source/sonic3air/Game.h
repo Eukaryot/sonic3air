@@ -69,10 +69,11 @@ public:
 
 	void updateSpecialInput(float timeElapsed);
 
-	inline Mode getCurrentMode() const			{ return mMode; }
-	inline void setCurrentMode(Mode mode)		{ mMode = mode; }
+	inline bool isInNormalGameMode() const	{ return mMode == Mode::NORMAL_GAME; }
+	inline bool isInTimeAttackMode() const	{ return mMode == Mode::TIME_ATTACK; }
+	inline bool isInMainMenuMode() const	{ return mMode == Mode::MAIN_MENU_BG; }
+	inline void resetCurrentMode()			{ mMode = Mode::UNDEFINED; }
 
-	inline bool isTimeAttackMode() const		{ return mMode == Mode::TIME_ATTACK; }
 	inline PlayerRecorder& getPlayerRecorder()	{ return mPlayerRecorder; }
 
 	RemasteredMusicDownload& getRemasteredMusicDownload()  { return mRemasteredMusicDownload; }
@@ -108,8 +109,8 @@ private:
 	bool onCharacterDied(uint8 playerIndex);
 	void returnToMainMenu();
 
-	inline bool isNormalGame()	{ return mMode == Mode::NORMAL_GAME; }
-	inline bool isTimeAttack()	{ return mMode == Mode::TIME_ATTACK; }
+	inline bool isNormalGame()	{ return isInNormalGameMode(); }
+	inline bool isTimeAttack()	{ return isInTimeAttackMode(); }
 	bool onTimeAttackFinish();
 
 	void changePlanePatternRectAtex(uint16 px, uint16 py, uint16 width, uint16 height, uint8 planeIndex, uint8 atex);

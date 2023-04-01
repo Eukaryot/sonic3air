@@ -247,7 +247,7 @@ uint32 Game::getSetting(uint32 settingId, bool ignoreGameMode) const
 {
 	const SharedDatabase::Setting* setting = SharedDatabase::getSetting(settingId);
 
-	if (!ignoreGameMode && isTimeAttackMode())
+	if (!ignoreGameMode && isInTimeAttackMode())
 	{
 		// In Time Attack, non-visual settings are always using the default value
 		if ((settingId & 0x80000000) == 0)
@@ -454,7 +454,7 @@ void Game::onPostUpdateFrame()
 	{
 		const uint8 gameMode = emulatorInterface.readMemory8(0xfffff600) & 0x7f;
 		bool isValidGameMode = true;
-		if (mMode == Mode::TIME_ATTACK)
+		if (isInTimeAttackMode())
 		{
 			// Only allowed is the main game
 			isValidGameMode = (gameMode <= 0x0c);
@@ -462,7 +462,7 @@ void Game::onPostUpdateFrame()
 
 		if (!isValidGameMode)
 		{
-			mMode = Mode::UNDEFINED;
+			resetCurrentMode();
 			Application::instance().getSimulation().setSpeed(0.0f);
 			GameApp::instance().returnToMenu();
 			return;
@@ -551,7 +551,7 @@ void Game::updateSpecialInput(float timeElapsed)
 {
 	// In time attack mode: Restart if holding Y button for a while
 	bool isCharging = false;
-	if (mMode == Mode::TIME_ATTACK)
+	if (isInTimeAttackMode())
 	{
 		if (Application::instance().getSimulation().getSpeed() > 0.0f)	// Not in pause
 		{
@@ -606,7 +606,7 @@ void Game::updateSpecialInput(float timeElapsed)
 
 bool Game::shouldPauseOnFocusLoss() const
 {
-	return (GameApp::hasInstance() && Application::instance().getSimulation().isRunning() && Application::instance().getSimulation().getSpeed() > 0.0f && mMode != Mode::MAIN_MENU_BG);
+	return (GameApp::hasInstance() && Application::instance().getSimulation().isRunning() && Application::instance().getSimulation().getSpeed() > 0.0f && !isInMainMenuMode());
 }
 
 void Game::fillDebugVisualization(Bitmap& bitmap, int& mode)
@@ -823,7 +823,7 @@ void Game::startIntoGameInternal()
 	simulation.setSpeed(simulation.getDefaultSpeed());
 
 	// Enforce fixed simulation frequency in Time Attack and for the Main Menu background
-	if (mMode == Mode::TIME_ATTACK || mMode == Mode::MAIN_MENU_BG)
+	if (isInTimeAttackMode() || isInMainMenuMode())
 		simulation.setSimulationFrequencyOverride(60.0f);
 	else
 		simulation.disableSimulationFrequencyOverride();
@@ -832,7 +832,7 @@ void Game::startIntoGameInternal()
 
 	SharedDatabase::resetAchievementValues();
 
-	if (mMode != Mode::MAIN_MENU_BG)
+	if (!isInMainMenuMode())
 	{
 		AudioOut::instance().moveMenuMusicToIngame();	// Needed only for the data select music to continue from main menu to data select
 		AudioOut::instance().resumeSoundContext(AudioOut::CONTEXT_INGAME + AudioOut::CONTEXT_MUSIC);
@@ -959,7 +959,7 @@ uint16 Game::onFadedOutLoadingZone(uint16 zoneAndAct)
 bool Game::onCharacterDied(uint8 playerIndex)
 {
 	// Death in time attack means level restart
-	if (mMode == Mode::TIME_ATTACK)
+	if (isInTimeAttackMode())
 	{
 		if (mReceivedTimeAttackFinished)
 		{
@@ -992,7 +992,7 @@ void Game::returnToMainMenu()
 
 bool Game::onTimeAttackFinish()
 {
-	if (mMode != Mode::TIME_ATTACK || mReceivedTimeAttackFinished)
+	if (!isInTimeAttackMode() || mReceivedTimeAttackFinished)
 		return false;
 
 	mReceivedTimeAttackFinished = true;

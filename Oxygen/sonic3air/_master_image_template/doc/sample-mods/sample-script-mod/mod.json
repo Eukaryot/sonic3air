@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "Sample Script Mod",
+		"UniqueID": "euka-sample-script-mod",
 		"Author": "Eukaryot",
 		"Description": "A basic script mod giving Super / Hyper Tails unlimited flight.",
 		"URL": "https://sonic3air.org",

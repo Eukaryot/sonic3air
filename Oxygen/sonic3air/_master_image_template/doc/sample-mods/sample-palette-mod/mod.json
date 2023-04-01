@@ -2,6 +2,7 @@
 	"Metadata":
 	{
 		"Name": "Sample Palette Mod",
+		"UniqueID": "euka-sample-palette-mod",
 		"Author": "Eukaryot",
 		"Description": "An example how a palette mod basically looks like. It changes all character colors.",
 		"URL": "https://sonic3air.org",

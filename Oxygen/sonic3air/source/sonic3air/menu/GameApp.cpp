@@ -215,7 +215,7 @@ void GameApp::openMainMenu()
 	mGameMenuManager->forceRemoveAll();
 	mMenuBackground->openGameStartedMenu();
 
-	Game::instance().setCurrentMode(Game::Mode::UNDEFINED);		// Needed for Discord integration
+	Game::instance().resetCurrentMode();
 }
 
 void GameApp::openOptionsMenuInGame()
@@ -382,7 +382,7 @@ void GameApp::gotoPhase(int phaseNumber)
 		{
 			// Start in-game
 			mCurrentState = State::INGAME;
-			Game::instance().setCurrentMode(Game::Mode::UNDEFINED);
+			Game::instance().resetCurrentMode();
 			Simulation& simulation = Application::instance().getSimulation();
 			simulation.setRunning(true);
 			break;

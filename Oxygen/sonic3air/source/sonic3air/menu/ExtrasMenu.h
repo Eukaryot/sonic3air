@@ -72,7 +72,7 @@ private:
 	float mVisibility = 0.0f;
 	GameMenuScrolling mScrolling;
 
-	std::map<uint32, std::vector<std::string>> mDescriptionLinesCache;
+	std::map<uint32, std::vector<std::string_view>> mDescriptionLinesCache;
 
 	int mAchievementsCompleted = 0;
 };

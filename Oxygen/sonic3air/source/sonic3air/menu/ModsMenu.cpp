@@ -12,6 +12,7 @@
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/entries/GeneralMenuEntries.h"
 #include "sonic3air/audio/AudioOut.h"
+#include "sonic3air/helper/DrawingUtils.h"
 #include "sonic3air/Game.h"
 
 #include "oxygen/application/Configuration.h"
@@ -122,23 +123,14 @@ void ModsMenu::initialize()
 			entry.mMakeActive = true;
 		}
 
-		// Pass 2: Add inactive mods
+		// Pass 2: Add inactive mods, incl. failed ones
 		for (Mod* mod : allMods)
 		{
-			if (mod->mState == Mod::State::INACTIVE)
+			if (mod->mState != Mod::State::ACTIVE)
 			{
 				ModEntry& entry = vectorAdd(mModEntries);
 				entry.mMod = mod;
 				entry.mMakeActive = false;
-			}
-		}
-
-		// Pass 3: Take care of the failed ones
-		for (Mod* mod : allMods)
-		{
-			if (mod->mState == Mod::State::FAILED)
-			{
-				mFailedMods.push_back(mod);
 			}
 		}
 	}
@@ -380,8 +372,6 @@ void ModsMenu::update(float timeElapsed)
 
 			case ButtonEffect::SWITCH_TAB:
 			{
-				playMenuSound(0x5b);
-
 				if (keys.A.isPressed() || keys.X.isPressed())
 				{
 					// Make entry active or inactive
@@ -394,8 +384,14 @@ void ModsMenu::update(float timeElapsed)
 
 					GameMenuEntry& entry = menuEntries.selected();
 					ModEntry& modEntry = mModEntries[entry.mData];
-					modEntry.mMakeActive = makeActive;
 
+					if (makeActive && modEntry.mMod->mState == Mod::State::FAILED)
+					{
+						playMenuSound(0xb2);
+						break;
+					}
+
+					modEntry.mMakeActive = makeActive;
 					entry.mAnimation.mOffset.x = makeActive ? 1.0f : -1.0f;
 
 					newTab.mMenuEntries.insert(entry, newTab.mMenuEntries.mSelectedEntryIndex);
@@ -406,6 +402,8 @@ void ModsMenu::update(float timeElapsed)
 					for (size_t k = menuEntries.mSelectedEntryIndex; k < menuEntries.size(); ++k)
 						menuEntries[k].mAnimation.mOffset.y = 1.0f;
 				}
+
+				playMenuSound(0x5b);
 
 				mActiveTab = 1 - mActiveTab;
 				preventScrolling = true;
@@ -536,6 +534,13 @@ void ModsMenu::render()
 	Drawer& drawer = EngineMain::instance().getDrawer();
 	GameMenuEntry::RenderContext renderContext;
 	renderContext.mDrawer = &drawer;
+
+	struct SpeechBalloon
+	{
+		std::string_view mText;
+		Vec2i mBasePosition;
+	};
+	SpeechBalloon speechBalloon;
 
 	const int globalOffsetX = -roundToInt(saturate(1.0f - mVisibility) * 300.0f);
 
@@ -669,7 +674,22 @@ void ModsMenu::render()
 						drawer.drawRect(iconRect, texture, Color(1.0f, 1.0f, 1.0f, alpha));
 					}
 
-					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, color);
+					Color textColor = color;
+					if (modEntry->mMod->mState == Mod::State::FAILED)
+					{
+						textColor.set(1.0f, isSelected ? 0.5f : 0.0f, 0.0f, color.a);
+
+						static const uint64 spriteKey = rmx::getMurmur2_64("small_warning_icon_red");
+						drawer.drawSprite(Vec2i(visualRect.x + 212, visualRect.y + 4), spriteKey, Color(1.0f, 1.0f, 1.0f, alpha));
+
+						if (isSelected)
+						{
+							speechBalloon.mText = modEntry->mMod->mFailedMessage;
+							speechBalloon.mBasePosition.set(visualRect.x + 212, visualRect.y + 4);
+						}
+					}
+
+					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, textColor);
 
 					if (isSelected && inMovementMode)
 					{
@@ -794,6 +814,12 @@ void ModsMenu::render()
 		}
 	}
 
+	if (!speechBalloon.mText.empty() && mVisibility == 1.0f)
+	{
+		const Recti attachmentRect(speechBalloon.mBasePosition.x, speechBalloon.mBasePosition.y, 0, 13);
+		DrawingUtils::drawSpeechBalloon(drawer, global::mOxyfontTinySimple, speechBalloon.mText, attachmentRect, Recti(15, 10, 370, 204), Color(1.0f, 1.0f, 1.0f, 0.9f));
+	}
+
 	// "Applying changes" box
 	if (mApplyingChangesFrameCounter > 0)
 	{
@@ -842,7 +868,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	{
 		modManager.setActiveMods(activeMods);
 		modManager.saveActiveMods();
-		Game::instance().setCurrentMode(Game::Mode::UNDEFINED);		// Only used to signal MenuBackground that it needs to reload the animated background
+		Game::instance().resetCurrentMode();		// Only used to signal MenuBackground that it needs to reload the animated background
 	}
 	return anyChange;
 }

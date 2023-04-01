@@ -67,7 +67,6 @@ private:
 		bool mMakeActive = false;
 	};
 	std::vector<ModEntry> mModEntries;
-	std::vector<Mod*> mFailedMods;
 	bool mHasAnyMods = false;
 
 	struct Tab
