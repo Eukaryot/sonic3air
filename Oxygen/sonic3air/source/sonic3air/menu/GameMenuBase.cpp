@@ -268,6 +268,13 @@ void GameMenuEntries::erase(size_t index)
 	mEntries.erase(mEntries.begin() + index);
 }
 
+void GameMenuEntries::swapEntries(size_t indexA, size_t indexB)
+{
+	GameMenuEntry* tmp = mEntries[indexA];
+	mEntries[indexA] = mEntries[indexB];
+	mEntries[indexB] = tmp;
+}
+
 GameMenuEntries::UpdateResult GameMenuEntries::update()
 {
 	// Sanity checks

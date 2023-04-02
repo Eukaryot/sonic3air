@@ -107,6 +107,22 @@ void ModsMenu::initialize()
 	std::sort(allMods.begin(), allMods.end(), [](const Mod* a, const Mod* b) { return (a->mDisplayName < b->mDisplayName); } );
 	const std::vector<Mod*>& activeMods = modManager.getActiveMods();
 
+#if 0
+	// Check mod dependencies
+	for (Mod* mod : allMods)
+	{
+		for (const Mod::OtherMod& otherMod : mod->mOtherMods)
+		{
+			const uint64 idHash = rmx::getMurmur2_64(otherMod.mModID);
+			Mod* foundMod = modManager.findModByIDHash(idHash);
+			if (nullptr == foundMod && otherMod.mIsRequired)
+			{
+				// TODO: Add an error "Requires mod XYZ"
+			}
+		}
+	}
+#endif
+
 	// Rebuild list of mods
 	if (anyChange || (mModEntries.empty() && !allMods.empty()))
 	{
@@ -323,15 +339,15 @@ void ModsMenu::update(float timeElapsed)
 					const int diff = menuEntries.mSelectedEntryIndex - previousSelectedEntryIndex;
 					if (diff == -1 || diff == 1)
 					{
-						GameMenuEntry& menuEntryA = menuEntries[previousSelectedEntryIndex];
-						GameMenuEntry& menuEntryB = menuEntries[menuEntries.mSelectedEntryIndex];
+						const size_t indexA = previousSelectedEntryIndex;
+						const size_t indexB = menuEntries.mSelectedEntryIndex;
 
 						// Exchange entry with previous one, effectively moving that one
-						std::swap(menuEntryA, menuEntryB);
+						menuEntries.swapEntries(indexA, indexB);
 
 						// For animation
-						menuEntryA.mAnimation.mOffset.y = (float)diff;
-						menuEntryB.mAnimation.mOffset.y = -(float)diff;
+						menuEntries[indexA].mAnimation.mOffset.y = (float)diff;
+						menuEntries[indexB].mAnimation.mOffset.y = -(float)diff;
 					}
 					else
 					{
