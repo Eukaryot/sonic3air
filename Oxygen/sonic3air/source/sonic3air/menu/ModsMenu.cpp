@@ -102,7 +102,8 @@ void ModsMenu::initialize()
 	ModManager& modManager = ModManager::instance();
 	const bool anyChange = modManager.rescanMods();
 
-	const std::vector<Mod*>& allMods = modManager.getAllMods();
+	std::vector<Mod*> allMods = modManager.getAllMods();
+	std::sort(allMods.begin(), allMods.end(), [](const Mod* a, const Mod* b) { return (a->mDisplayName < b->mDisplayName); } );
 	const std::vector<Mod*>& activeMods = modManager.getActiveMods();
 
 	// Rebuild list of mods

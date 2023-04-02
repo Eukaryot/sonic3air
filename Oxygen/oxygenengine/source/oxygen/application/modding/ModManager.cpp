@@ -16,16 +16,6 @@
 #include "oxygen/helper/Utils.h"
 
 
-namespace detail
-{
-	static bool CompareMods(Mod* a, Mod* b)
-	{
-		const int cmp = a->mLocalDirectory.compare(b->mLocalDirectory);
-		return (cmp != 0) ? (cmp < 0) : (a->mDirectoryName < b->mDirectoryName);
-	}
-}
-
-
 ModManager::~ModManager()
 {
 	clear();
@@ -329,8 +319,12 @@ bool ModManager::scanMods()
 		}
 	}
 
-	// Sort mod list
-	std::sort(mAllMods.begin(), mAllMods.end(), &detail::CompareMods);
+	// Sort mod list by directory name
+	std::sort(mAllMods.begin(), mAllMods.end(), [](const Mod* a, const Mod* b)
+	{
+		const int cmp = a->mLocalDirectory.compare(b->mLocalDirectory);
+		return (cmp != 0) ? (cmp < 0) : (a->mDirectoryName < b->mDirectoryName);
+	});
 
 	return anyChange;
 }
