@@ -48,7 +48,7 @@ public:
 
 	struct OtherMod
 	{
-		std::string mModName;
+		std::string mModID;
 		std::string mMinimumVersion;
 		bool mIsRequired = false;
 		int mRelativePriority = 0;

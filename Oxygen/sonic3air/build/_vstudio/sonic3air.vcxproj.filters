@@ -43,6 +43,9 @@
     <Filter Include="menu\entries">
       <UniqueIdentifier>{20f22ee4-b33d-4aea-ad8d-884f4e8a2d95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="menu\mods">
+      <UniqueIdentifier>{2d24639b-9a65-4177-a4e0-6783a69f3842}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp">
@@ -118,9 +121,6 @@
     <ClCompile Include="..\..\source\sonic3air\helper\DiscordIntegration.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\sonic3air\menu\ModsMenu.cpp">
-      <Filter>menu</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.cpp">
       <Filter>menu\context</Filter>
     </ClCompile>
@@ -169,6 +169,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\helper\DrawingUtils.cpp">
       <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenu.cpp">
+      <Filter>menu\mods</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.cpp">
+      <Filter>menu\mods</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,9 +254,6 @@
     <ClInclude Include="..\..\source\sonic3air\helper\DiscordIntegration.h">
       <Filter>helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\sonic3air\menu\ModsMenu.h">
-      <Filter>menu</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\context\ApplicationContextMenu.h">
       <Filter>menu\context</Filter>
     </ClInclude>
@@ -298,6 +301,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\helper\DrawingUtils.h">
       <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenu.h">
+      <Filter>menu\mods</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.h">
+      <Filter>menu\mods</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

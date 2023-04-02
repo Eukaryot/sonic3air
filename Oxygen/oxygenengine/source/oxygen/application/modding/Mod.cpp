@@ -125,7 +125,7 @@ void Mod::loadFromJson(const Json::Value& json)
 				continue;
 
 			OtherMod& otherMod = vectorAdd(mOtherMods);
-			otherMod.mModName = iteratorOtherMods.key().asString();
+			otherMod.mModID = iteratorOtherMods.key().asString();
 
 			JsonHelper jsonHelper(modJson);
 			jsonHelper.tryReadString("MinimumVersion", otherMod.mMinimumVersion);

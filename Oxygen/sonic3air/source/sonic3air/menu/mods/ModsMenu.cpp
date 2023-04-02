@@ -7,10 +7,11 @@
 */
 
 #include "sonic3air/pch.h"
-#include "sonic3air/menu/ModsMenu.h"
+#include "sonic3air/menu/mods/ModsMenu.h"
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/MenuBackground.h"
 #include "sonic3air/menu/entries/GeneralMenuEntries.h"
+#include "sonic3air/menu/mods/ModsMenuEntries.h"
 #include "sonic3air/audio/AudioOut.h"
 #include "sonic3air/helper/DrawingUtils.h"
 #include "sonic3air/Game.h"
@@ -215,7 +216,7 @@ void ModsMenu::initialize()
 				{
 					if (mModEntries[index].mMod == mod)
 					{
-						entries.addEntry(mod->mDisplayName, (uint32)index);
+						entries.addEntry<ModMenuEntry>().initEntry(*mod, (uint32)index);
 						break;
 					}
 				}
@@ -233,7 +234,7 @@ void ModsMenu::initialize()
 				const ModEntry& modEntry = mModEntries[index];
 				if (!modEntry.mMakeActive)
 				{
-					entries.addEntry(modEntry.mMod->mDisplayName, (uint32)index);
+					entries.addEntry<ModMenuEntry>().initEntry(*modEntry.mMod, (uint32)index);
 				}
 			}
 		}
@@ -395,7 +396,7 @@ void ModsMenu::update(float timeElapsed)
 					modEntry.mMakeActive = makeActive;
 					entry.mAnimation.mOffset.x = makeActive ? 1.0f : -1.0f;
 
-					newTab.mMenuEntries.insert(entry, newTab.mMenuEntries.mSelectedEntryIndex);
+					newTab.mMenuEntries.insertByReference(entry, newTab.mMenuEntries.mSelectedEntryIndex);
 					for (size_t k = newTab.mMenuEntries.mSelectedEntryIndex + 1; k < newTab.mMenuEntries.size(); ++k)
 						newTab.mMenuEntries[k].mAnimation.mOffset.y = -1.0f;
 
@@ -533,15 +534,8 @@ void ModsMenu::render()
 	GuiBase::render();
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
-	GameMenuEntry::RenderContext renderContext;
+	ModsMenuRenderContext renderContext;
 	renderContext.mDrawer = &drawer;
-
-	struct SpeechBalloon
-	{
-		std::string_view mText;
-		Vec2i mBasePosition;
-	};
-	SpeechBalloon speechBalloon;
 
 	const int globalOffsetX = -roundToInt(saturate(1.0f - mVisibility) * 300.0f);
 
@@ -644,7 +638,7 @@ void ModsMenu::render()
 			const bool isSelected = ((int)index == menuEntries.mSelectedEntryIndex && tabIndex == mActiveTab);
 			renderContext.mIsSelected = isSelected;
 
-			if (entry.getMenuEntryType() == 0)
+			if (entry.getMenuEntryType() == ModMenuEntry::MENU_ENTRY_TYPE)
 			{
 				const ModEntry* modEntry = (entry.mData < 0xfff0) ? &mModEntries[entry.mData] : nullptr;
 
@@ -657,6 +651,10 @@ void ModsMenu::render()
 				visualRect.x -= roundToInt(saturate(1.0f - mVisibility - lineOffset / 500.0f) * 300.0f);
 				visualRect.x += roundToInt(entry.mAnimation.mOffset.x * 200.0f);
 				visualRect.y += roundToInt(entry.mAnimation.mOffset.y * rect.height);
+
+				renderContext.mVisualRect = visualRect;
+				renderContext.mIsSelected = isSelected;
+				renderContext.mBaseColor = color;
 
 				if (nullptr != modEntry)
 				{
@@ -675,22 +673,8 @@ void ModsMenu::render()
 						drawer.drawRect(iconRect, texture, Color(1.0f, 1.0f, 1.0f, alpha));
 					}
 
-					Color textColor = color;
-					if (modEntry->mMod->mState == Mod::State::FAILED)
-					{
-						textColor.set(1.0f, isSelected ? 0.5f : 0.0f, 0.0f, color.a);
-
-						static const uint64 spriteKey = rmx::getMurmur2_64("small_warning_icon_red");
-						drawer.drawSprite(Vec2i(visualRect.x + 212, visualRect.y + 4), spriteKey, Color(1.0f, 1.0f, 1.0f, alpha));
-
-						if (isSelected)
-						{
-							speechBalloon.mText = modEntry->mMod->mFailedMessage;
-							speechBalloon.mBasePosition.set(visualRect.x + 212, visualRect.y + 4);
-						}
-					}
-
-					drawer.printText(global::mOxyfontSmall, visualRect + Vec2i(24, 0), modEntry->mMod->mDisplayName, 1, textColor);
+					// Render this game menu entry
+					entry.performRenderEntry(renderContext);
 
 					if (isSelected && inMovementMode)
 					{
@@ -815,10 +799,10 @@ void ModsMenu::render()
 		}
 	}
 
-	if (!speechBalloon.mText.empty() && mVisibility == 1.0f)
+	if (!renderContext.mSpeechBalloon.mText.empty() && mVisibility == 1.0f)
 	{
-		const Recti attachmentRect(speechBalloon.mBasePosition.x, speechBalloon.mBasePosition.y, 0, 13);
-		DrawingUtils::drawSpeechBalloon(drawer, global::mOxyfontTinySimple, speechBalloon.mText, attachmentRect, Recti(15, 10, 370, 204), Color(1.0f, 1.0f, 1.0f, 0.9f));
+		const Recti attachmentRect(renderContext.mSpeechBalloon.mBasePosition.x, renderContext.mSpeechBalloon.mBasePosition.y, 0, 13);
+		DrawingUtils::drawSpeechBalloon(drawer, global::mOxyfontTinySimple, renderContext.mSpeechBalloon.mText, attachmentRect, Recti(15, 10, 370, 204), Color(1.0f, 1.0f, 1.0f, 0.9f));
 	}
 
 	// "Applying changes" box
@@ -853,7 +837,7 @@ bool ModsMenu::applyModChanges(bool dryRun)
 	for (int index = (int)menuEntries.size()-1; index >= 0; --index)
 	{
 		const GameMenuEntry& entry = *menuEntries[index];
-		if (entry.getMenuEntryType() == 0)
+		if (entry.getMenuEntryType() == ModMenuEntry::MENU_ENTRY_TYPE)
 		{
 			const ModEntry& modEntry = mModEntries[entry.mData];
 			if (modEntry.mMakeActive)

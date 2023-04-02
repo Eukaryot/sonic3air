@@ -246,10 +246,21 @@ GameMenuEntry& GameMenuEntries::addEntry(const std::string& text, uint32 data)
 	return *entry;
 }
 
-void GameMenuEntries::insert(const GameMenuEntry& toCopy, size_t index)
+void GameMenuEntries::insertCopy(const GameMenuEntry& toCopy, size_t index)
 {
 	GameMenuEntry* newEntry = new GameMenuEntry(toCopy);
 	mEntries.insert(mEntries.begin() + index, newEntry);
+}
+
+void GameMenuEntries::insertByReference(GameMenuEntry& entry, size_t index)
+{
+	mEntries.insert(mEntries.begin() + index, &entry);
+}
+
+void GameMenuEntries::destroy(size_t index)
+{
+	delete mEntries[index];
+	mEntries.erase(mEntries.begin() + index);
 }
 
 void GameMenuEntries::erase(size_t index)

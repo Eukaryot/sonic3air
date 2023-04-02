@@ -21,7 +21,10 @@ public:
 
 	inline const std::vector<Mod*>& getAllMods() const	   { return mAllMods; }
 	inline const std::vector<Mod*>& getActiveMods() const  { return mActiveMods; }	// Sorted in inverse priority, i.e. highest prio mods are at the end of the list
-	inline const std::unordered_map<uint64, Mod*>& getActiveModsByNameHash() const  { return mActiveModsByNameHash; }
+	inline const std::unordered_map<uint64, Mod*>& getActiveModsByNameHash() const	{ return mActiveModsByNameHash; }
+	inline const std::unordered_map<uint64, Mod*>& getModsByIDHash() const			{ return mModsByIDHash; }
+
+	Mod* findModByIDHash(uint64 idHash) const  { Mod*const* ptr = mapFind(mModsByIDHash, idHash); return (nullptr != ptr) ? *ptr : nullptr; }
 
 	void startup();
 	void clear();
@@ -54,5 +57,6 @@ private:
 	std::vector<Mod*> mActiveMods;
 	std::unordered_map<uint64, Mod*> mActiveModsByNameHash;		// Each mod is registered by both its internal name and display name
 	std::unordered_map<uint64, Mod*> mModsByLocalDirectoryHash;
+	std::unordered_map<uint64, Mod*> mModsByIDHash;
 	std::map<std::wstring, ZipFileProvider*> mZipFileProviders;
 };

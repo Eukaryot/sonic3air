@@ -13,9 +13,9 @@
 #include "sonic3air/menu/GameApp.h"
 #include "sonic3air/menu/GameMenuManager.h"
 #include "sonic3air/menu/MainMenu.h"
-#include "sonic3air/menu/ModsMenu.h"
 #include "sonic3air/menu/SharedResources.h"
 #include "sonic3air/menu/TimeAttackMenu.h"
+#include "sonic3air/menu/mods/ModsMenu.h"
 #include "sonic3air/menu/options/OptionsMenu.h"
 #include "sonic3air/Game.h"
 

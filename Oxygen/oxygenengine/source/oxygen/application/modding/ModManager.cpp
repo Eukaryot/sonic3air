@@ -241,8 +241,8 @@ bool ModManager::scanMods()
 		}
 
 		const std::wstring localDirectory = foundMod.mLocalPath + foundMod.mDirectoryName;
-		const uint64 hash = rmx::getMurmur2_64(localDirectory);
-		const auto it = mModsByLocalDirectoryHash.find(hash);
+		const uint64 localDirectoryHash = rmx::getMurmur2_64(localDirectory);
+		const auto it = mModsByLocalDirectoryHash.find(localDirectoryHash);
 		if (it != mModsByLocalDirectoryHash.end())
 		{
 			// It's an already known mod, mark as still present
@@ -262,10 +262,10 @@ bool ModManager::scanMods()
 			mod->mDirectoryName = directoryName;
 			mod->mLocalDirectory = localDirectory;
 			mod->mFullPath = mBasePath + localDirectory + L'/';
-			mod->mLocalDirectoryHash = hash;
+			mod->mLocalDirectoryHash = localDirectoryHash;
 
 			mAllMods.emplace_back(mod);
-			mModsByLocalDirectoryHash[hash] = mod;
+			mModsByLocalDirectoryHash[localDirectoryHash] = mod;
 			anyChange = true;
 
 			if (errorMessage.empty())
@@ -282,6 +282,9 @@ bool ModManager::scanMods()
 
 			// Load mod meta data from JSON
 			mod->loadFromJson(root);
+
+			const uint64 idHash = rmx::getMurmur2_64(mod->mUniqueID);
+			mModsByIDHash[idHash] = mod;
 		}
 	}
 
