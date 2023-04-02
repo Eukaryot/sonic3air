@@ -450,6 +450,15 @@ void Game::onPostUpdateFrame()
 {
 	EmulatorInterface& emulatorInterface = *mEmulatorInterface;
 
+	// If code execution stopped, return to the main menu
+	if (!Application::instance().getSimulation().getCodeExec().isCodeExecutionPossible())
+	{
+		if (mMode != Mode::UNDEFINED && mMode != Mode::MAIN_MENU_BG)
+		{
+			GameApp::instance().returnToMenu();
+		}
+	}
+
 	// Check for invalid game mode inside simulation
 	{
 		const uint8 gameMode = emulatorInterface.readMemory8(0xfffff600) & 0x7f;

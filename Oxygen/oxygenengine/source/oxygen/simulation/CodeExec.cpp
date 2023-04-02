@@ -764,7 +764,6 @@ void CodeExec::runScript(bool executeSingleFunction, CallFrameTracking* callFram
 				}
 				else
 				{
-					RMX_ERROR("Script execution completely stopped because call stack was emptied", );
 					mExecutionState = ExecutionState::HALTED;
 				}
 				break;
