@@ -9,10 +9,11 @@
 #pragma once
 
 #include "sonic3air/menu/GameMenuBase.h"
-#include "oxygen/drawing/DrawerTexture.h"
+#include "sonic3air/menu/mods/ModResources.h"
 
 class MenuBackground;
 class Mod;
+class ModMenuEntry;
 
 
 class ModsMenu : public GameMenuBase
@@ -44,6 +45,10 @@ private:
 	};
 
 private:
+	void refreshAllDependencies();
+	void clearDependencies(ModMenuEntry& modMenuEntry);
+	void refreshDependencies(ModMenuEntry& modMenuEntry, size_t modIndex);
+
 	int getInfoOverlayHeight() const;
 	bool applyModChanges(bool dryRun = false);
 	void goBack();
@@ -52,12 +57,6 @@ private:
 private:
 	MenuBackground* mMenuBackground = nullptr;
 
-	struct ModResources
-	{
-		DrawerTexture mLargeIcon;
-		DrawerTexture mSmallIcon;
-		DrawerTexture mSmallIconGray;
-	};
 	std::map<Mod*, ModResources> mModResources;
 
 	struct ModEntry

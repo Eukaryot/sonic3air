@@ -107,6 +107,7 @@
     <ClInclude Include="..\..\source\sonic3air\menu\GameMenuManager.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\MainMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\MenuBackground.h" />
+    <ClInclude Include="..\..\source\sonic3air\menu\mods\ModResources.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenu.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.h" />
     <ClInclude Include="..\..\source\sonic3air\menu\options\ControllerSetupMenu.h" />

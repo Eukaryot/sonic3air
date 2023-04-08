@@ -12,6 +12,7 @@
 
 class ModsMenu;
 class Mod;
+struct ModResources;
 
 
 struct ModsMenuRenderContext : public GameMenuEntry::RenderContext
@@ -23,8 +24,11 @@ struct ModsMenuRenderContext : public GameMenuEntry::RenderContext
 	};
 
 	Recti mVisualRect;
-	bool mIsSelected = false;
 	Color mBaseColor;
+	bool mIsSelected = false;
+	bool mIsActiveModsTab = false;
+	bool mInMovementMode = false;
+	size_t mNumModsInTab = 0;
 	SpeechBalloon mSpeechBalloon;
 };
 
@@ -35,11 +39,24 @@ public:
 	static const constexpr uint32 MENU_ENTRY_TYPE = rmx::compileTimeFNV_32("ModMenuEntry");
 
 public:
+	struct Remark
+	{
+		bool mIsError = false;
+		std::string mText;
+	};
+	std::vector<Remark> mRemarks;
+
+public:
 	ModMenuEntry();
-	ModMenuEntry& initEntry(const Mod& mod, uint32 data);
+	ModMenuEntry& initEntry(const Mod& mod, ModResources& modResources, uint32 data);
 
 	void renderEntry(RenderContext& renderContext_) override;
 
+	const Mod& getMod() const  { return *mMod; }
+	void refreshAfterRemarksChange();
+
 private:
 	const Mod* mMod = nullptr;
+	ModResources* mModResources = nullptr;
+	Remark* mHighestRemark = nullptr;
 };

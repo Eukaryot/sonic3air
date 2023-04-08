@@ -308,6 +308,9 @@
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.h">
       <Filter>menu\mods</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\menu\mods\ModResources.h">
+      <Filter>menu\mods</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\config.json" />

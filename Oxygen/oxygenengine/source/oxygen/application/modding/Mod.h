@@ -46,9 +46,11 @@ public:
 		std::vector<Setting> mSettings;
 	};
 
-	struct OtherMod
+	struct OtherModInfo
 	{
 		std::string mModID;
+		uint64 mModIDHash = 0;
+		std::string mDisplayName;
 		std::string mMinimumVersion;
 		bool mIsRequired = false;
 		int mRelativePriority = 0;
@@ -75,7 +77,7 @@ public:
 	std::vector<SettingCategory> mSettingCategories;
 
 	// Relationships with other mods
-	std::vector<OtherMod> mOtherMods;
+	std::vector<OtherModInfo> mOtherModInfos;
 
 public:
 	void loadFromJson(const Json::Value& json);

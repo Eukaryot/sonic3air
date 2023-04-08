@@ -124,12 +124,15 @@ void Mod::loadFromJson(const Json::Value& json)
 			if (!modJson.isObject())
 				continue;
 
-			OtherMod& otherMod = vectorAdd(mOtherMods);
-			otherMod.mModID = iteratorOtherMods.key().asString();
+			OtherModInfo& otherModInfo = vectorAdd(mOtherModInfos);
+			otherModInfo.mModID = iteratorOtherMods.key().asString();
+			otherModInfo.mModIDHash = rmx::getMurmur2_64(otherModInfo.mModID);
 
 			JsonHelper jsonHelper(modJson);
-			jsonHelper.tryReadString("MinimumVersion", otherMod.mMinimumVersion);
-			jsonHelper.tryReadBool("IsRequired", otherMod.mIsRequired);
+			if (!jsonHelper.tryReadString("DisplayName", otherModInfo.mDisplayName))
+				otherModInfo.mDisplayName = otherModInfo.mModID;
+			jsonHelper.tryReadString("MinimumVersion", otherModInfo.mMinimumVersion);
+			jsonHelper.tryReadBool("IsRequired", otherModInfo.mIsRequired);
 
 			const Json::Value& priorityValue = modJson["Priority"];
 			if (priorityValue.isString())
@@ -137,9 +140,9 @@ void Mod::loadFromJson(const Json::Value& json)
 				String str = priorityValue.asString();
 				str.lowerCase();
 				if (str == "higher")
-					otherMod.mRelativePriority = +1;
+					otherModInfo.mRelativePriority = +1;
 				else if (str == "lower")
-					otherMod.mRelativePriority = -1;
+					otherModInfo.mRelativePriority = -1;
 			}
 		}
 	}
