@@ -1,4 +1,6 @@
 
+//# script-feature-level(2)
+
 global u16 ClassicModeSampleMode.screenWidth
 
 

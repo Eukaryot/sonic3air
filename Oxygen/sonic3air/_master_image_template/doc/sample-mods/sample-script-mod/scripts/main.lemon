@@ -1,6 +1,8 @@
 
 // This is a basic sample script that gives Tails unlimited flight in his Super/Hyper forms
 
+//# script-feature-level(2)
+
 global u8 option.tails.flight_gravity
 global u8 option.require_super
 

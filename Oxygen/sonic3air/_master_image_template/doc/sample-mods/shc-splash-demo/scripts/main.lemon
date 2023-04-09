@@ -1,4 +1,5 @@
 
+//# script-feature-level(2)
 
 // Add the code below somewhere into your mod's scripts.
 // This will mark it as an Sonic Hacking Contest submission by adding the SHC splash right on startup, between disclaimer and the SEGA logo.
