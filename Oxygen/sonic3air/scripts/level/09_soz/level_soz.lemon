@@ -1878,6 +1878,52 @@ function void fn05699a()
 }
 
 
+
+// Rising sand
+
+//# address-hook(0x0569ba) end(0x0569da)
+function void fn0569ba()
+{
+	// u32[0xffffee9c] is the current height of the sand
+	level.dualplanecollision = 0xff
+	u32[0xffffee9c] += 0xa000
+	u16[0xffffee40] = -(s16[0xffffee9c] + 0x02e0)
+	u16[0xffffee3e] = 0x1930
+}
+
+
+// Used in MGZ earthquake sequence and SOZ rising sand
+
+//# address-hook(0x0569dc) end(0x056a10)
+function void fn0569dc()
+{
+	push(A3)
+	push(A2)
+	push(A0)
+	push(D7)
+
+	A1 = 0xffffb000
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
+	{
+		A0 = 0xffff0000 + u16[A1 + 0x42]
+		fn01e580()
+	}
+
+	A1 = 0xffffb04a
+	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
+	{
+		A0 = 0xffff0000 + u16[A1 + 0x42]
+		fn01e580()
+	}
+
+	D7 = pop()
+	A0 = pop()
+	A2 = pop()
+	A3 = pop()
+}
+
+
+
 //# address-hook(0x056a12) end(0x056a32)
 function void fn056a12()
 {

@@ -174,19 +174,6 @@ function void fn041e6a()
 
 
 
-// Rising sand
-
-//# address-hook(0x0569ba) end(0x0569da)
-function void fn0569ba()
-{
-	// u32[0xffffee9c] is the current height of the sand
-	level.dualplanecollision = 0xff
-	u32[0xffffee9c] += 0xa000
-	u16[0xffffee40] = -(s16[0xffffee9c] + 0x02e0)
-	u16[0xffffee3e] = 0x1930
-}
-
-
 //# address-hook(0x04efbc) end(0x04efc8)
 function void fn04efbc()
 {

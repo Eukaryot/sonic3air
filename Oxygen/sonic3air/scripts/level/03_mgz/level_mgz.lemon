@@ -1247,7 +1247,7 @@ function void fn0519c4()
 	D0.u16 = u16[0xffffb000 + 0x10]
 	D1.u16 = u16[0xffffb000 + 0x14]
 	D2.u16 = level.display_routine
-	call 0x0519dc + D2.s16
+	call 0x0519dc + D2.u16
 }
 
 
@@ -1641,36 +1641,4 @@ function void fn23d24c()
 		u16[(A1+=2)-2] += D1.u16
 		--D0.s16
 	}
-}
-
-
-
-// Used in earthquake sequence
-
-//# address-hook(0x0569dc) end(0x056a10)
-function void fn0569dc()
-{
-	push(A3)
-	push(A2)
-	push(A0)
-	push(D7)
-
-	A1 = 0xffffb000
-	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
-	{
-		A0 = 0xffff0000 + u16[A1 + 0x42]
-		fn01e580()
-	}
-
-	A1 = 0xffffb04a
-	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
-	{
-		A0 = 0xffff0000 + u16[A1 + 0x42]
-		fn01e580()
-	}
-
-	D7 = pop()
-	A0 = pop()
-	A2 = pop()
-	A3 = pop()
 }

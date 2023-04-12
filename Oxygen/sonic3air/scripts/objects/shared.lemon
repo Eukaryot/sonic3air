@@ -1672,7 +1672,7 @@ function void LetSonicClimbOnObject()
 	u8 bit = (1 << D6.u8)
 
 	// Already on another object?
-	if (u8[A1 + 0x2a] & char.flag.ON_OBJECT)
+	if (objA1.flags2a & char.flag.ON_OBJECT)
 	{
 		// Unregister there
 		A3 = 0xffff0000 + u16[A1 + 0x42]
@@ -1687,7 +1687,7 @@ function void LetSonicClimbOnObject()
 	objA1.flags2a |= char.flag.ON_OBJECT
 
 	objA0.flags2a |= bit
-	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
+	if (objA1.flags2a & char.flag.IN_AIR)
 	{
 		objA1.flags2a &= ~char.flag.IN_AIR
 		u32 backupA0 = A0
@@ -1740,6 +1740,38 @@ function void fn01e546()
 	}
 }
 
+
+//# address-hook(0x01e580) end(0x01e5de)
+function void fn01e580()
+{
+	A1 = 0xffffb000
+	if (objA0.flags2a & object.flag.P1_ON_OBJECT)
+	{
+		fn00f8ea()
+		if (D1.s16 <= 0)
+		{
+			A1 = 0xffffb000
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
+			objA0.flags2a &= ~object.flag.P1_ON_OBJECT
+		}
+	}
+
+	A1 = 0xffffb04a
+	if (objA0.flags2a & object.flag.P2_ON_OBJECT)
+	{
+		fn00f8ea()
+		if (D1.s16 <= 0)
+		{
+			A1 = 0xffffb04a
+			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+			u8[A1 + 0x2a] |= char.flag.IN_AIR
+			objA0.flags2a &= ~object.flag.P2_ON_OBJECT
+		}
+	}
+
+	D4 = 0
+}
 
 
 
