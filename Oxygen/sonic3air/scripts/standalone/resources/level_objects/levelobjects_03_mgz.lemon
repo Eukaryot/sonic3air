@@ -983,10 +983,10 @@ function void LevelObjectTableBuilder.buildObjects_MGZ2()
 	LevelObjectTableBuilder.addObject(0x3810, 0x0790, OBJECTTABLE1_2f, 0x0b, LVLOBJ_FLIP_Y)
 	LevelObjectTableBuilder.addObject(0x3810, 0x0880, OBJECTTABLE1_59, 0x0b, 0)
 	LevelObjectTableBuilder.addObject(0x3810, 0x0a80, OBJECTTABLE1_08, 0x00, 0)
-	LevelObjectTableBuilder.addObject(0x3860, 0x08d4, OBJECTTABLE1_57, 0x1b, LVLOBJ_FLIP_X)
+	LevelObjectTableBuilder.addObject(0x3860, 0x08d4 + 4, OBJECTTABLE1_57, 0x1b, LVLOBJ_FLIP_X)		// Moved down by 4 pixels to avoid weird behavior when walking on this block while it's still hidden
 	LevelObjectTableBuilder.addObject(0x3870, 0x0a84, OBJECTTABLE1_9c, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x38a0, 0x0428, OBJECTTABLE1_0d, 0x00, 0)
-	LevelObjectTableBuilder.addObject(0x38a0, 0x08d4, OBJECTTABLE1_57, 0x2b, LVLOBJ_FLIP_X)
+	LevelObjectTableBuilder.addObject(0x38a0, 0x08d4 + 4, OBJECTTABLE1_57, 0x2b, LVLOBJ_FLIP_X)		// Moved down by 4 pixels as well
 	LevelObjectTableBuilder.addObject(0x38d0, 0x0910, OBJECTTABLE1_07, 0x02, 0)
 	LevelObjectTableBuilder.addObject(0x38e0, 0x07e8, OBJECTTABLE1_9c, 0x00, 0)
 	LevelObjectTableBuilder.addObject(0x3980, 0x0160, OBJECTTABLE1_0f, 0x02, 0)
