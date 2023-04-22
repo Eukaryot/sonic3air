@@ -38,12 +38,7 @@ function void fn0382ba()
 		{
 			if (allocDynamicObjectAfterA0())
 			{
-				D0 = 0x2c
-				while (D0.s16 >= 0)
-				{
-					u16[A1 + D0.s16] = u16[A0 + D0.s16]
-					D0.u16 -= 2
-				}
+				copyMemory(A1, A0, 0x2e)
 
 				objA1.update_address = 0x0382fc
 				objA1.collision_attributes = (collision.flag.SPECIAL | collision.size.6x6)

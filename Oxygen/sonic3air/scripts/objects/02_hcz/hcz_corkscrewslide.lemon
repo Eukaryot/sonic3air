@@ -62,7 +62,7 @@ function void fn0390c2()
 		D0 = u16[A4 + 0x02]
 		D0.u16 = D0 / 0x60
 		A2 = u32[A0 + 0x40]
-		u8[A4] = u8[A2 + D0.s16]
+		u8[A4] = u8[A2 + D0.u16]
 		if (u8[A4] == 0)
 		{
 			u8[A1 + 0x2e] = 0

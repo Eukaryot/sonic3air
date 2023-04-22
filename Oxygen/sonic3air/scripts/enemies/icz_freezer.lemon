@@ -56,13 +56,12 @@ function void fn08a67e()
 		{
 			D0 = objA0.value39 ^ 0x02
 			objA0.value39 = D0.u8
-			u16[A0 + 0x30] = u16[0x08a6de + D0.s16]
+			u16[A0 + 0x30] = u16[0x08a6de + D0.u16]
 
 			// Targets:
 			//  - 0x08a6e6	-> D0.s16 = 0x00
 			//  - 0x08a6ee	-> D0.s16 = 0x02
-			D0.u16 = u16[0x08a6e2 + D0.s16]
-			call 0x08a6e2 + D0.s16
+			call tableLookupAddress(0x08a6e2, D0.u16)
 		}
 
 		if (objA0.flags38 & 0x02)

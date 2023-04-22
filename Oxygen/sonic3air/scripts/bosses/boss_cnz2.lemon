@@ -854,7 +854,7 @@ function void fn06ec50()
 		D0.u16 = 0x01c0
 	D0.u16 >>= 4
 
-	D2 = u32[0x06ec7e + D0.s16]
+	D2 = u32[0x06ec7e + D0.u16]
 	if (D1.u8 == 0)
 		D2.s32 = -D2.s32
 	u32[A1 + 0x10] += D2

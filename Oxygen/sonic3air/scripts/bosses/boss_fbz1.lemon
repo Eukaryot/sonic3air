@@ -1043,7 +1043,7 @@ function void fn06f7f2()
 	D2.u8 = u8[A0 + 0x40]
 	if (D2.s8 >= 0)
 	{
-		D3.u8 = u8[0x06f82c + D1.s16]
+		D3.u8 = u8[0x06f82c + D1.u16]
 		if (D0.u8 >= D3.u8)
 		{
 			D2.s8 = -D2.s8
@@ -1052,7 +1052,7 @@ function void fn06f7f2()
 	else
 	{
 		++D1.u16
-		D3.u8 = u8[0x06f82c + D1.s16]
+		D3.u8 = u8[0x06f82c + D1.u16]
 		if (D0.u8 <= D3.u8)
 		{
 			D2.s8 = -D2.s8
@@ -1109,7 +1109,7 @@ function void fn06f85a()
 
 	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
 	{
-		D3.u8 = u8[0x06f8bd + D1.s16]
+		D3.u8 = u8[0x06f8bd + D1.u16]
 		D0.u8 -= D2.u8
 		if (D0.u8 > D3.u8)
 		{
@@ -1119,7 +1119,7 @@ function void fn06f85a()
 	}
 	else
 	{
-		D3.u8 = u8[0x06f8c2 + D1.s16]
+		D3.u8 = u8[0x06f8c2 + D1.u16]
 		D0.u8 += D2.u8
 		if (D0.u8 < D3.u8)
 		{

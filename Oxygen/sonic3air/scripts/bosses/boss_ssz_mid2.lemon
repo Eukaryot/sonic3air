@@ -723,9 +723,9 @@ function void fn07ada2()
 		objA1.sprite_priority = 0x0180
 		u8[A1 + 0x05] += 0x02
 		u8[A1 + 0x22] = 0
-		u8[A1 + 0x2e] = u8[0x07ae14 + D2.s16]
-		u8[A1 + 0x41] = u8[0x07ae14 + D2.s16]
-		u8[A1 + 0x40] = u8[0x07ae1b + D2.s16]
+		u8[A1 + 0x2e] = u8[0x07ae14 + D2.u16]
+		u8[A1 + 0x41] = u8[0x07ae14 + D2.u16]
+		u8[A1 + 0x40] = u8[0x07ae1b + D2.u16]
 		u8[A1 + 0x2f] = 0x40
 		objA1.collision_attributes = (collision.flag.THREAT | collision.size.6x6)
 		u8[A1 + 0x42] = 0

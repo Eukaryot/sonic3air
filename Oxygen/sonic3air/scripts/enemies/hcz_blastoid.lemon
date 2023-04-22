@@ -97,7 +97,7 @@ function bool fn0879a8()
 
 	D0.u16 = objA0.subtype2c & 0x0f
 	A3 = 0xfffff7e0
-	u8[A3 + D0.s16] = 0xff
+	u8[A3 + D0.u16] = 0xff
 	fn085732()
 	DrawObject()
 	return true

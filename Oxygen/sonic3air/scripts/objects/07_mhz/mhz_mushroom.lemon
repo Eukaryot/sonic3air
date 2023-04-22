@@ -63,7 +63,7 @@ function void MushroomHead.Update()
 
 	D1.u16 = 0x18
 	D3 = objA0.animation.sprite
-	D3.u8 = u8[0x03e0da + D3.s16]
+	D3.u8 = u8[0x03e0da + D3.u16]
 	D4.u16 = objA0.position.x.u16
 	PlatformCheckClimbOn()
 

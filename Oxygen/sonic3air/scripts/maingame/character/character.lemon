@@ -953,7 +953,7 @@ function void Tails.UpdateCarrySonic()
 				{
 					u8[A1 + 0x24] = 0x0b
 					D1 = u8[A1 + 0x23]
-					D0.u8 = u8[0x014522 + D1.s16]
+					D0.u8 = u8[0x014522 + D1.u16]
 					if (D0.u8 == 0xff)
 					{
 						u8[A1 + 0x23] = 0

@@ -510,7 +510,7 @@ function void fn01dece()
 	}
 
 	D5.u16 >>= 1
-	D3.u8 = u8[A2 + D5.s16] - u8[A2]
+	D3.u8 = u8[A2 + D5.u16] - u8[A2]
 	D5.u16 = objA0.position.y.u16 - D3.s8
 	D2.u16 += s8[A1 + 0x1e]
 	D3.u16 = objA1.position.y.u16 - D5.u16 + D2.u16 + 4

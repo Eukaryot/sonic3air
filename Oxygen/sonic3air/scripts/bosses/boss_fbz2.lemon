@@ -756,7 +756,7 @@ function void fn070c8e()
 
 	if (s8[A2 + 0x3c] > 0)
 	{
-		objA0.sprite_priority = u16[0x070cdc + D4.s16]
+		objA0.sprite_priority = u16[0x070cdc + D4.u16]
 	}
 }
 
@@ -808,12 +808,12 @@ function void fn070d08()
 function void fn070d10()
 {
 	D0 = objA0.subtype2c
-	objA0.countdown_value = u16[0x070d40 + D0.s16]
-	objA0.value42 = u16[0x070d52 + D0.s16]
+	objA0.countdown_value = u16[0x070d40 + D0.u16]
+	objA0.value42 = u16[0x070d52 + D0.u16]
 	D0.u16 *= 2
-	u32[A0 + 0x30] = u32[0x070d64 + D0.s16]
+	u32[A0 + 0x30] = u32[0x070d64 + D0.u16]
 
-	setupObjectAttributesFull(u32[0x070d88 + D0.s16])
+	setupObjectAttributesFull(u32[0x070d88 + D0.u16])
 
 	objA0.flags2b |= char.bonus.SHIELD_FIRE
 	MoveWithParent()
@@ -1078,12 +1078,11 @@ function void fn084ddc()
 	D4.u16 = D0.u16 ^ 0xffff
 
 	// Targets:
-	//  - 0x084e16	-> D1.s16 = 0x00
-	//  - 0x084e1e	-> D1.s16 = 0x02
-	//  - 0x084e28	-> D1.s16 = 0x04
-	//  - 0x084e32	-> D1.s16 = 0x08
-	D1.u16 = u16[0x084e0e + D1.s16]
-	call 0x084e0e + D1.s16
+	//  - 0x084e16	-> D1.u16 = 0x00
+	//  - 0x084e1e	-> D1.u16 = 0x02
+	//  - 0x084e28	-> D1.u16 = 0x04
+	//  - 0x084e32	-> D1.u16 = 0x08
+	call tableLookupAddress(0x084e0e, D1.u16)
 
 	D3.u16 += D1.u16
 	objA0.position.y.u16 = D3.u16
@@ -1120,7 +1119,7 @@ function void fn086cf6()
 {
 	objA0.update_address = addressof(DrawOrUnloadObject)
 	D0 = objA0.subtype2c
-	A1 = u32[0x086d12 + D0.s16]
+	A1 = u32[0x086d12 + D0.u16]
 	objA0.mapping_offset = 0x086d2a
 	SetupObjectAttributesMost()
 }

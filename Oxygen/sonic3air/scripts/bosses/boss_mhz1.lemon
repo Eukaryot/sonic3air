@@ -925,8 +925,8 @@ function void fn075ad4()
 
 	A1 = 0xffff0000 + u16[0xfffffaa4]
 	D2 = u8[A1 + 0x42]
-	D3.s16 = s8[0x075b2e + D2.s16]
-	objA0.position.y.u16 += D3.u16
+	D3.s16 = s8[0x075b2e + D2.u16]
+	objA0.position.y.u16 += D3.s16
 
 	GetRandomNumber()
 	if (!isMainCharacter(CHARACTER_KNUCKLES))
@@ -970,7 +970,7 @@ function void fn075c06()
 {
 	D2.u16 = ((camera.position.y.u16 - objA0.position.y.u16 + getScreenHeight()) >> 3) & 0x1e
 	GetRandomNumber()
-	D3.u16 = u16[0x075c4a + D2.s16]
+	D3.u16 = u16[0x075c4a + D2.u16]
 	D0.u16 &= 0x01ff
 	D3.u16 += D0.u16
 	D4 = -12
@@ -993,16 +993,16 @@ function void fn075c8a()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = u8[A1 + 0x22]
-	objA0.animation.sprite = u8[0x075cb6 + D0.s16]
+	objA0.animation.sprite = u8[0x075cb6 + D0.u16]
 	D0.u16 *= 2
 	D1.u16 = D0.u16
 
-	A2 = 0x075ccc + D0.s16
+	A2 = 0x075ccc + D0.u16
 	objA0.sprite_priority = u16[(A2+=2)-2]
 	D1.u16 *= 2
 	D1.u8 += objA0.subtype2c
 
-	A2 = 0x075cf8 + D1.s16
+	A2 = 0x075cf8 + D1.u16
 	objA0.value42 = u16[(A2+=2)-2]
 }
 

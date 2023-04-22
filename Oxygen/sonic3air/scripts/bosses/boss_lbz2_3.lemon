@@ -1368,9 +1368,9 @@ function void fn074f24()
 	D2.s16 = (objA0.render_flags & render_flag.FLIP_X) ? -0x68 : getScreenWidth() + 0x68
 
 	objA0.position.x.u16 = camera.position.x.u16 + D2.s16
-	objA0.position.y.u16 = camera.position.y.u16 + u16[0x074f72 + D0.s16]
+	objA0.position.y.u16 = camera.position.y.u16 + u16[0x074f72 + D0.u16]
 	objA0.velocity.x = (objA0.render_flags & render_flag.FLIP_X) ? 0x300 : -0x300
-	objA0.velocity.y = u16[0x074f7a + D0.s16]
+	objA0.velocity.y = u16[0x074f7a + D0.u16]
 	u16[A0 + 0x3c] = 0x08
 }
 
@@ -1502,9 +1502,7 @@ function void fn084d78()
 	D3.u16 += s8[A0 + 0x43]
 	D4.u16 = D0.u16 ^ 0xffff
 
-	A4 = 0x084d30
-	D1.u16 = u16[A4 + D1.s16]
-	call A4 + D1.s16
+	call tableLookupAddress(0x084d30, D1.u16)
 
 	if (objA0.render_flags & render_flag.FLIP_X)
 	{

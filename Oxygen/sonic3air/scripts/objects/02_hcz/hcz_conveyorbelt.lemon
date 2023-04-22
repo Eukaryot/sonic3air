@@ -17,7 +17,7 @@ function void fn031164()
 {
 	A1 = 0xffffcfe0
 	D0 = objA0.subtype2c
-	if (u8[A1 + D0.s16] != 0)
+	if (u8[A1 + D0.u16] != 0)
 	{
 		if (objA0.respawn_entry)
 		{
@@ -28,7 +28,7 @@ function void fn031164()
 		return
 	}
 
-	u8[A1 + D0.s16] = 1
+	u8[A1 + D0.u16] = 1
 	A1 = 0x031124 + (D0.u16 & 0x0f) * 4
 
 	D0.u16 = u16[(A1+=2)-2]
@@ -76,9 +76,7 @@ function void fn0311c4()
 			return
 	}
 
-	A1 = 0xffffcfe0
-	D0 = objA0.subtype2c
-	u8[A1 + D0.s16] = 0
+	u8[0xffffcfe0 + objA0.subtype2c] = 0
 
 	if (objA0.respawn_entry)
 	{

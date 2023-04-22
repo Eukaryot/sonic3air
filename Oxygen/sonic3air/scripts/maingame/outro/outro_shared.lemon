@@ -51,8 +51,8 @@ function void fn05928c()
 			if (D0.u16 >= 0x30)
 				D0 = 0
 			level.palettefx.frame_1 = D0.u16
-			u32[0xfffffc7a] = u32[0x0592be + D0.s16]
-			u16[0xfffffc7e] = u16[0x0592c2 + D0.s16]
+			u32[0xfffffc7a] = u32[0x0592be + D0.u16]
+			u16[0xfffffc7e] = u16[0x0592c2 + D0.u16]
 		}
 	}
 }

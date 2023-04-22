@@ -277,31 +277,23 @@ function void fn089dee()
 {
 	D1.u16 = objA0.subtype2c
 	D0 = objA0.subtype2c & 0x06
-	A1 = 0x089e6c
-	D2.u16 = u16[A1 + D0.s16]
+	D2.u16 = u16[0x089e6c + D0.u16]
 	objA0.velocity.y = D2.u16
 	objA0.value3e = D2.u16
-	D0.u16 &= 0x02
-	D2.u16 = D0.u16
-	objA0.sprite_attributes = u16[0x089e74 + D2.s16]
+	objA0.sprite_attributes = u16[0x089e74 + (D0.u16 & 0x02)]
+
 	D2 = global.zone * 2
 	A1 = 0x02c7ba + D2.u16
 	D0.u16 >>= 1
-	D0.u8 = u8[A1 + D0.s16]
-	D0.u16 <<= 3
+	D0.u16 = u8[A1 + D0.u16] * 8
 
 	A2 = 0x02c7ea
 	objA0.mapping_offset = u32[A2 + D0.s16 + 0x04]
 	D1.u16 <<= 2
 	objA0.countdown_value = D1.u16
+
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	D0.u16 = objA0.position.x.u16
-	D1.u16 = 0x0200
-	if (D0.u16 < objA1.position.x.u16)
-	{
-		D1.s16 = -D1.s16
-	}
-	objA0.velocity.x = D1.u16
+	objA0.velocity.x = (objA0.position.x.u16 < objA1.position.x.u16) ? -0x200 : 0x200
 	objA0.render_flags &= ~render_flag.FLIP_X
 	if (objA0.velocity.x < 0)
 	{

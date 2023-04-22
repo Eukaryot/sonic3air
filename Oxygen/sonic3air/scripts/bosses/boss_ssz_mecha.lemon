@@ -352,9 +352,9 @@ function void fn07b5e8()
 
 	D0.u16 = objA0.value3b & 0x07
 	++objA0.value3b
-	D1 = u8[0x07b62e + D0.s16]
+	D1 = u8[0x07b62e + D0.u16]
 	objA0.value3a = D1.u8
-	objA0.base_state = u8[0x07b636 + D1.s16]
+	objA0.base_state = u8[0x07b636 + D1.u16]
 }
 
 
@@ -909,12 +909,8 @@ function void fn07d2d8()
 {
 	if ((objA0.flags2a & 0x40) == 0)
 	{
-		D0 = objA0.animation.sprite
-		D0.u8 = u8[0x07d2fc + D0.s16]
-		if (objA0.flags38 & 0x80)
-		{
-			D0.u8 |= 0x80
-		}
+		D0 = u8[0x07d2fc + objA0.animation.sprite]
+		D0.u8 |= (objA0.flags38 & 0x80)
 		u8[A0 + 0x28] = D0.u8
 	}
 }

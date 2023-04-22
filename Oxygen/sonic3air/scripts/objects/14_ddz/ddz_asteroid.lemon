@@ -79,7 +79,7 @@ function void fn0821fc()
 			D1 = (D3.u8 != 0) ? 8 : 4
 		}
 
-		A2 = u32[0x082346 + D1.s16]
+		A2 = u32[0x082346 + D1.u16]
 		D4 = 2
 		while (D4.s16 >= 0)
 		{
@@ -117,9 +117,8 @@ function void fn0821fc()
 		objA0.position.y.u16 += u16[(A1+=2)-2]
 	}
 
-	D0.u16 = objA0.subtype2c & 0x10
-	D0.u16 >>= 2
-	A2 = u32[0x082382 + D0.s16]
+	D0.u16 = (objA0.subtype2c & 0x10) >> 2
+	A2 = u32[0x082382 + D0.u16]
 	D1 = 0x0823ee
 	D2.u16 = objA0.position.x.u16
 	D3.u16 = objA0.position.y.u16
@@ -195,5 +194,5 @@ function void fn083146()
 	u32[A0 + 0x30] = u32[(A1+=4)-4]
 	objA0.render_flags |= render_flag.WORLD
 	D1.u16 = (D1.u16 & 0x0f) * 2
-	objA0.velocity.x = u16[0x08317e + D1.s16]
+	objA0.velocity.x = u16[0x08317e + D1.u16]
 }

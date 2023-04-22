@@ -204,7 +204,7 @@ function void fn08e7d4()
 function void fn08e828()
 {
 	D0 = objA0.subtype2c >> 1
-	D1.u8 = u8[0x08e862 + D0.s16]
+	D1.u8 = u8[0x08e862 + D0.u16]
 	D2.u8 = u8[A0 + 0x3c] - 8
 	if (D2.u8 <= D1.u8)
 	{
@@ -318,7 +318,7 @@ function void fn08e8fe()
 function void fn08e918()
 {
 	D0 = objA0.subtype2c >> 1
-	D1.u8 = u8[0x08e952 + D0.s16]
+	D1.u8 = u8[0x08e952 + D0.u16]
 	D2.u8 = u8[A0 + 0x3c] + 8
 	if (D2.u8 >= D1.u8)
 	{
@@ -357,7 +357,7 @@ function void fn08e958()
 function void fn08e982()
 {
 	D0 = objA0.subtype2c >> 1
-	u8[A0 + 0x3c] = u8[0x08e992 + D0.s16]
+	u8[A0 + 0x3c] = u8[0x08e992 + D0.u16]
 }
 
 

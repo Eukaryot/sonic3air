@@ -1766,7 +1766,7 @@ function void fn07d150()
 function void fn07d162()
 {
 	D0 = objA0.subtype2c * 2
-	u32[A0 + 0x18] = u32[0x07d172 + D0.s16]
+	u32[A0 + 0x18] = u32[0x07d172 + D0.u16]
 }
 
 

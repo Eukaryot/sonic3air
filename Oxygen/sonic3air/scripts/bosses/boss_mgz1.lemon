@@ -143,7 +143,7 @@ function void fn08867e()
 
 	GetRandomNumber()
 	D0.u16 &= 0x0e
-	D1.u16 = u16[0x0886da + D0.s16]
+	D1.u16 = u16[0x0886da + D0.u16]
 	objA0.position.x.u16 += D1.u16
 	objA0.position.y.u16 -= 0x40
 
@@ -377,8 +377,8 @@ function void fn08894c()
 {
 	setupObjectAttributesBasic(0x088b1a)
 	objA0.update_address = 0x085102
-	D0 = objA0.subtype2c >> 1
-	objA0.animation.sprite = u8[0x088970 + D0.s16]
+	objA0.animation.sprite = u8[0x088970 + (objA0.subtype2c >> 1)]
+
 	D0 = 4
 	fn0852d0()
 }

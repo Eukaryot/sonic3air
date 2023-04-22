@@ -125,11 +125,11 @@ function void fn072a70()
 	objA0.render_flags &= ~render_flag.FLIP_X
 	if (D0 & 0x01)
 	{
-		D1 = 0x02
+		D1 = 2
 		objA0.render_flags |= render_flag.FLIP_X
 	}
 
-	D1.u16 = u16[0x072ae8 + D1.s16]
+	D1.u16 = u16[0x072ae8 + D1.u16]
 	D2.u16 = camera.position.x.u16 + D1.u16 + getScreenExtend()
 	objA0.position.x.u16 = D2.u16
 	D0.u16 = 0x0100
@@ -708,8 +708,7 @@ function void fn0733fc()
 		}
 
 		objA0.value39 = D0.u8
-		A2 = 0x0734aa
-		D1.u8 = u8[A2 + D0.s16]
+		D1.u8 = u8[0x0734aa + D0.u16]
 		objA0.render_flags |= render_flag.FLIP_X
 		if ((D1 & 0x80) == 0)
 		{
@@ -929,9 +928,9 @@ function void fn073682()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A1 = u32[A1 + 0x3e]
-	objA0.animation.sprite = u8[A1 + D1.s16]
+	objA0.animation.sprite = u8[A1 + D1.u16]
 
-	A1 = 0x0736aa + D0.s16 * 2
+	A1 = 0x0736aa + D0.u16 * 2
 	objA0.velocity.x = u16[(A1+=2)-2]
 	objA0.velocity.y = u16[(A1+=2)-2]
 }

@@ -188,7 +188,7 @@ function void InitSaveSlots()
 					u8[A0 + 0x05] = u8[A1 + 0x07]
 					u8[A0 + 0x02] = u8[A1 + 0x02] << 4
 					D1 = u8[A1 + 0x03]
-					u8[A0 + 0x03] = u8[A2 + D1.s16]
+					u8[A0 + 0x03] = u8[A2 + D1.u16]
 					D1.u8 = u8[A1 + 0x04]
 					u8[A0 + 0x02] |= D1.u8
 					D1.u8 = u8[A1 + 0x06]

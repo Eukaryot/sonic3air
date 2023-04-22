@@ -59,7 +59,7 @@ function void fn03b64c()
 		}
 
 		D0.u16 = (objA0.subtype2c & 0x0f) * 4
-		A2 = u32[0x1e3f98 + D0.s16] + 4
+		A2 = u32[0x1e3f98 + D0.u16] + 4
 		u32[A0 + 0x30] = A2
 	}
 }
@@ -98,9 +98,9 @@ function void fn03b566()
 	objA0.box_size.y = 0x0c
 	objA0.sprite_priority = 0x0280
 	objA0.flags2a |= 0x80
-	D0.u16 = (objA0.subtype2c & 0x0f) * 4
 
-	A2 = u32[0x1e3f98 + D0.s16]
+	D0.u16 = (objA0.subtype2c & 0x0f) * 4
+	A2 = u32[0x1e3f98 + D0.u16]
 	D1.u16 = u16[(A2+=2)-2]
 	D0.u16 = u16[(A2+=2)-2]
 	u16[A0 + 0x34] = D0.u16
@@ -217,8 +217,8 @@ function void fn03b6de()
 	objA0.sprite_priority = 0x0200
 	objA0.animation.sprite = objA0.subtype2c
 	D0.u16 = (objA0.subtype2c & 0x03) * 2
-	objA0.box_size.x = u8[0x03b6d8 + D0.s16]
-	objA0.box_size.y = u8[0x03b6d9 + D0.s16]
+	objA0.box_size.x = u8[0x03b6d8 + D0.u16]
+	objA0.box_size.y = u8[0x03b6d9 + D0.u16]
 
 	objA0.update_address = 0x03b718
 	fn03b718()

@@ -1726,7 +1726,7 @@ function void fn07ecf4()
 {
 	GetRandomNumber()
 	D1.u16 = D0.u16 & 0x0c
-	u32[A0 + 0x18] = u32[0x07ed40 + D1.s16]
+	u32[A0 + 0x18] = u32[0x07ed40 + D1.u16]
 	D0.u16 &= 0x1f
 	if (D0 & 0x00000001)
 	{
@@ -1737,7 +1737,7 @@ function void fn07ecf4()
 	objA0.position.x.u16 += D0.u16
 	D0 = (D0 << 16) + (D0 >> 16)
 	D1.u16 = D0.u16 & 0x03
-	objA0.animation.sprite = u8[0x07ed50 + D1.s16]
+	objA0.animation.sprite = u8[0x07ed50 + D1.u16]
 	D0.u16 &= 0x1f
 	if (D0 & 0x00000001)
 	{
@@ -1751,7 +1751,7 @@ function void fn07ecf4()
 function void fn07ed54()
 {
 	D0 = objA0.subtype2c >> 1
-	u8[A0 + 0x3c] = u8[0x07ed64 + D0.s16]
+	u8[A0 + 0x3c] = u8[0x07ed64 + D0.u16]
 }
 
 
@@ -1892,10 +1892,10 @@ function void fn07eeee()
 
 	D0 = u8[A0 + 0x3c]
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = u8[0x07ef2e + D0.s16]
+	u8[A1 + 0x22] = u8[0x07ef2e + D0.u16]
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
-	D0.u8 = u8[0x07ef3a + D0.s16]
+	D0.u8 = u8[0x07ef3a + D0.u16]
 	objA1.render_flags |= D0.u8
 
 	D0 = u8[A1 + 0x22]
@@ -1911,6 +1911,6 @@ function void fn05fd88()
 {
 	A1 = 0xffffb000
 	D0.u16 = global.characters & 0x03
-	u8[A1 + 0x22] = u8[0x05fda0 + D0.s16]
+	u8[A1 + 0x22] = u8[0x05fda0 + D0.u16]
 	UpdatePlayer1SpritePatterns()
 }

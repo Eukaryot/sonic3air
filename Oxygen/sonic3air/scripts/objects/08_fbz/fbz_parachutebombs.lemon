@@ -115,10 +115,9 @@ function void fn03c552()
 			u8[A1 + 0x2c] = objA0.subtype2c
 			u16[A1 + 0x3c] = A0.u16
 
-			D0 = objA0.animation.frame & 0x0e
-			D0.u16 = u16[0x03c612 + D0.s16]
-			D0 <<= 8
-			u32[A1 + 0x36] = D0
+			D0.u16 = objA0.animation.frame & 0x0e
+			D0 = u16[0x03c612 + D0.u16]
+			u32[A1 + 0x36] = D0 << 8
 
 			objA0.animation.frame += 2
 			playSound(0x67)

@@ -383,7 +383,7 @@ function void fn072e54()
 
 	GetRandomNumber()
 	D0.u16 &= 0x07
-	objA0.animation.sprite = u8[0x072e96 + D0.s16]
+	objA0.animation.sprite = u8[0x072e96 + D0.u16]
 	D0 = (D0 << 16) + (D0 >> 16)
 	D0.u16 &= 0xff
 	objA0.position.x.u16 = camera.position.x.u16 + 0x20 + D0.u16

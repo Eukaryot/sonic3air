@@ -620,13 +620,13 @@ function void fn072168()
 	D1 = objA0.subtype2c
 
 	A2 = tableLookupAddress(0x0721f4, D0.s16)
-	objA0.value42 = u16[A2 + D1.s16]
+	objA0.value42 = u16[A2 + D1.u16]
 
 	A2 = tableLookupAddress(0x07222c, D0.s16)
-	objA0.render_flags |= u8[A2 + D1.s16]
+	objA0.render_flags |= u8[A2 + D1.u16]
 
 	A2 = tableLookupAddress(0x0721c2, D0.s16)
-	objA0.countdown_value = u16[A2 + D1.s16]
+	objA0.countdown_value = u16[A2 + D1.u16]
 
 	if (D0.u8 != 0x06)
 	{

@@ -95,7 +95,7 @@ function void fn020c38()
 {
 	D0 = objA0.animation.sprite * 2
 	A3 = objA0.mapping_offset
-	A3.u16 += u16[A3 + D0.s16]
+	A3.u16 += u16[A3 + D0.u16]
 	D1.u16 = u16[(A3+=2)-2]
 	objA0.render_flags |= render_flag.STATIC_MAPPING
 	D5.u8 = objA0.render_flags

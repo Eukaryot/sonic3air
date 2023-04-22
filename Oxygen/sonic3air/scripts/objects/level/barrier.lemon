@@ -459,7 +459,7 @@ function void fn020bba()
 				}
 				D0.u16 >>= 4
 				D2.u8 = u8[A2]
-				D2.u8 -= u8[A2 + D0.s16]
+				D2.u8 -= u8[A2 + D0.u16]
 				if (D3.u8 > D2.u8)
 					return
 			}

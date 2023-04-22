@@ -93,16 +93,14 @@ function void LevelTilesAnim.BonusGS()
 
 	A3 = 0xffff7200
 	D7 = 0
-	D6 = 2
-	while (D6.s16 >= 0)
+	for (u8 i = 0; i < 3; ++i)
 	{
-		D5 = 3
-		while (D5.s16 >= 0)
+		for (u8 k = 0; k < 4; ++k)
 		{
 			A1 = 0xffff7000
 			A2 = A1
-			A1.u16 += u16[0x0285ce + D7.s16]
-			A2.u16 += u16[0x0285d6 + D7.s16]
+			A1.u16 += u16[0x0285ce + D7.u16]
+			A2.u16 += u16[0x0285d6 + D7.u16]
 			D2 = 0xffffffff
 			D3 = 0
 			D4 = 7
@@ -112,17 +110,15 @@ function void LevelTilesAnim.BonusGS()
 				D1 = u32[(A2+=4)-4] & D3
 				D0 |= D1
 				u32[(A3+=4)-4] = D0
-				D2.s32 <<= 4
-				D3.s32 <<= 4
+				D2 <<= 4
+				D3 <<= 4
 				D3.u16 |= 0x0f
 				--D4.s16
 			}
 
 			D7.u16 += 2
-			--D5.s16
 		}
 		A3 += 0x0200
-		--D6.s16
 	}
 
 	++u8[A4 + 2]

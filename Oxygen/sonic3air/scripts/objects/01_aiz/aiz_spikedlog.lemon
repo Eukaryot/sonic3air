@@ -114,8 +114,8 @@ function void fn02b81a()
 			objA0.animation.timer = 0x17
 			D0 = objA0.animation.frame
 			++objA0.animation.frame
-			objA0.animation.sprite = u8[0x02b88e + D0.s16]
-			D0.u8 = u8[0x02b88f + D0.s16]
+			objA0.animation.sprite = u8[0x02b88e + D0.u16]
+			D0.s8 = s8[0x02b88f + D0.u16]
 			if (D0.s8 < 0)
 				objA0.animation.frame = 0
 		}

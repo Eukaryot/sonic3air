@@ -506,7 +506,7 @@ function void fn080a60()
 		objA0.render_flags |= render_flag.FLIP_X
 	}
 	D0.u16 <<= 2
-	u32[A0 + 0x30] = u32[0x080a8c + D0.s16]
+	u32[A0 + 0x30] = u32[0x080a8c + D0.u16]
 }
 
 

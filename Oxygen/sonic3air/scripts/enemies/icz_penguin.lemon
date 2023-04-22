@@ -100,7 +100,7 @@ function void fn08bd9c()
 	{
 		D3.u8 >>= 3
 		D3.u16 &= 0x0f
-		D0.u8 = u8[0x08bdb2 + D3.s16]
+		D0.u8 = u8[0x08bdb2 + D3.u16]
 	}
 	objA0.animation.sprite = D0.u8
 }

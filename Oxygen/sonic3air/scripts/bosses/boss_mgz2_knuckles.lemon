@@ -460,7 +460,7 @@ function void fn06d4dc()
 	D1.u16 = (D0.u16 & 0x01) + 4
 	D2.u16 = u16[0xfffffa82] >> 1
 	objA0.render_flags |= render_flag.FLIP_X
-	D3.u8 = u8[0x06d516 + D2.s16]
+	D3.u8 = u8[0x06d516 + D2.u16]
 	if (D3.u8 != 0)
 	{
 		D0.s16 = -D0.s16
@@ -496,7 +496,7 @@ function void fn06d51a()
 	objA0.position.y.u16 = D3.u16
 	objA0.value3a = u8[0x06d598 + (D0.u16 >> 1)]
 	D0.u16 >>= 2
-	D2.u8 = u8[0x06d5a0 + D0.s16]
+	D2.u8 = u8[0x06d5a0 + D0.u16]
 	objA0.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA0.render_flags |= D2.u8
 	D1.u16 *= 2

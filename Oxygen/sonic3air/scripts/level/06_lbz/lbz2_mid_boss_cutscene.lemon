@@ -321,10 +321,10 @@ function void fn08d53e()
 	else
 #endif
 	{
-		u8[A1 + 0x22] = u8[0x08d55c + D0.s16]
+		u8[A1 + 0x22] = u8[0x08d55c + D0.u16]
 	}
 
-	A2 = 0xffff0000 + u16[0x08d55e + D0.s16 * 2]
+	A2 = 0xffff0000 + u16[0x08d55e + D0.u16 * 2]
 	u8[A2] = 0
 	UpdatePlayer1SpritePatterns()
 }

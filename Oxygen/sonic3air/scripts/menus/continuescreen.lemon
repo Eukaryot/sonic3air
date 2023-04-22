@@ -883,7 +883,7 @@ function void fn05ca5c()
 {
 	D0 = (global.framecounter.low & 0x10) ? 1 : 0
 	A1 = u32[A0 + 0x30]
-	objA0.animation.sprite = u8[A1 + D0.s16]
+	objA0.animation.sprite = u8[A1 + D0.u16]
 	DrawObject()
 }
 

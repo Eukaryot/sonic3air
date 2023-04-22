@@ -568,10 +568,10 @@ function void fn02219e()
 		return
 
 	D1 = u8[A0 + 0x25]
-	if (D0.u8 == u8[0x0221e2 + D1.s16])
+	if (D0.u8 == u8[0x0221e2 + D1.u16])
 	{
 		++u8[A0 + 0x25]
-		D1.u8 = u8[0x0221e3 + D1.s16]
+		D1.u8 = u8[0x0221e3 + D1.u16]
 		if (D1.u8 != 0)
 			return
 

@@ -258,7 +258,7 @@ function void fn03a0d6()
 	D2 = u8[A2]
 	u8[A2] += 4
 	D2.u16 = D2 / 0x0b
-	u8[A1 + 0x22] = u8[0x03a220 + D2.s16]
+	u8[A1 + 0x22] = u8[0x03a220 + D2.u16]
 	D0 = u8[A1 + 0x22]
 	SetCharacterSpritePatterns()
 }

@@ -335,7 +335,7 @@ function void fn081dcc()
 		objA0.update_address = 0x081e28
 		objA0.flags2a |= 0x80
 		D0 = u16(objA0.subtype2c) * 2
-		u32[A0 + 0x18] = u32[0x081e1c + D0.s16]
+		u32[A0 + 0x18] = u32[0x081e1c + D0.u16]
 
 		// "spawnSimpleChildObjects(0x083fee)" replaced by:
 		spawnSimpleChildObjects(0x083d84, 1)		// Boss explosion generator
@@ -366,7 +366,7 @@ function void fn08249a()
 	objA0.velocity.x = 0x0400
 	D0.u16 = objA0.subtype2c + (global.framecounter.low & 0x18)
 	D1 = objA0.subtype2c
-	objA0.velocity.y = u16[0x0824d4 + D0.s16]
+	objA0.velocity.y = u16[0x0824d4 + D0.u16]
 	objA0.countdown_value = D1.u16 * 8
 	objA0.position.x.u16 -= u16[0xfffffaae]
 }

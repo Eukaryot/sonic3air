@@ -270,8 +270,8 @@ function void FlyBotAlert.CallFlyBot()
 
 		// Note: offsetX is always -0xc0 or 0xc0, offsetY is always -0x60
 		D0.u16 = (objA0.subtype2c * 4) & 0x0c
-		s16 offsetX = u16[0x029508 + D0.s16]
-		s16 offsetY = u16[0x02950a + D0.s16]
+		s16 offsetX = u16[0x029508 + D0.u16]
+		s16 offsetY = u16[0x02950a + D0.u16]
 	#if STANDALONE
 		// Flybot spawns on screen without that
 		offsetX = (offsetX > 0) ? (getScreenWidth() / 2 + 0x20) : (-s16(getScreenWidth()) / 2 - 0x10)

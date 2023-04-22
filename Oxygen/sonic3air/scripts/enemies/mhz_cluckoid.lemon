@@ -251,8 +251,8 @@ function bool fn08e2ea()
 		D0 = (D0 << 16) + (D0 >> 16)
 		D2 = (D0.s16 < 0) ? 4 : 0
 		D0.u16 &= 0x06
-		objA0.velocity.y = u16[0x08e36c + D0.s16]
-		objA0.mapping_offset = u32[0x08e374 + D2.s16]
+		objA0.velocity.y = u16[0x08e36c + D0.u16]
+		objA0.mapping_offset = u32[0x08e374 + D2.u16]
 		return false
 	}
 	else

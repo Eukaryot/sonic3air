@@ -241,8 +241,7 @@ function void fn036dfc()
 					--D0.u8
 					if (D0.s8 >= 0 && D0.u8 < 0x05)
 					{
-						D0.s16 = s16(D0.s8) * 4
-						D5 = u32[A6 + D0.s16]
+						D5 = u32[A6 + D0.u8 * 4]
 						D6 = u32[A6 + 0x14]
 						fn036f76()
 						u32[A6 + 0x14] = D6

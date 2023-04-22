@@ -22,7 +22,7 @@ function void fn041b70()
 
 	D0.u16 = objA0.subtype2c & 0x0f
 	A3 = 0xfffff7e0
-	D0.u8 = u8[A3 + D0.s16]
+	D0.u8 = u8[A3 + D0.u16]
 	u16[A0 + 0x36] = D0.u16
 
 	D0.u16 = objA0.subtype2c & 0xf0
@@ -48,7 +48,7 @@ function void fn041be0()
 {
 	D0.u16 = objA0.subtype2c & 0x0f
 	A3 = 0xfffff7e0
-	D0.u8 = u8[A3 + D0.s16]
+	D0.u8 = u8[A3 + D0.u16]
 	if (D0.u16 != u16[A0 + 0x36])
 	{
 		// If setting is active, the wall is opening too slowly without this speed-up
@@ -79,7 +79,7 @@ function void fn041c3a()
 {
 	D0.u16 = objA0.subtype2c & 0x0f
 	A3 = 0xfffff7e0
-	D0.u8 = u8[A3 + D0.s16]
+	D0.u8 = u8[A3 + D0.u16]
 	if (D0.u16 != u16[A0 + 0x36])
 	{
 		// If setting is active, the wall is opening too slowly without this speed-up

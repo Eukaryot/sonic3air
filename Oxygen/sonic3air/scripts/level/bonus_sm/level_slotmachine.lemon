@@ -531,7 +531,7 @@ function void fn04b592()
 			//  - 0x04b5f2	-> Animation of a bumper
 			//  - 0x04b626	-> Animation of an "R" block after touch
 			//  - 0x04b65a	-> Animation of a solid block (blue, yellow, red) after touch
-			A1 = u32[0x04b5ae + D0.s16]
+			A1 = u32[0x04b5ae + D0.u16]
 			call A1
 		}
 		A0 += 8
@@ -551,7 +551,7 @@ function void fn04b5c2()
 		D0 = u8[A0 + 0x03]
 		++u8[A0 + 0x03]
 		A1 = u32[A0 + 0x04]
-		D0.u8 = u8[0x04b5ec + D0.s16]
+		D0.u8 = u8[0x04b5ec + D0.u16]
 		u8[A1] = D0.u8
 		if (u8[A1] == 0)
 		{
@@ -573,7 +573,7 @@ function void fn04b5f2()
 		D0 = u8[A0 + 0x03]
 		++u8[A0 + 0x03]
 		A1 = u32[A0 + 0x04]
-		D0.u8 = u8[0x04b622 + D0.s16]
+		D0.u8 = u8[0x04b622 + D0.u16]
 		if (D0.u8 == 0)
 		{
 			u32[A0] = 0
@@ -599,7 +599,7 @@ function void fn04b626()
 		D0 = u8[A0 + 0x03]
 		++u8[A0 + 0x03]
 		A1 = u32[A0 + 0x04]
-		D0.u8 = u8[0x04b656 + D0.s16]
+		D0.u8 = u8[0x04b656 + D0.u16]
 		if (D0.u8 == 0)
 		{
 			u8[A1] = 0x06
@@ -1219,7 +1219,7 @@ function void fn04c602()
 	fn04c5c4()
 
 	D0.u16 = ((u16[A1] - 0xa0) >> 8) & 0x07
-	D0.u8 = u8[A3 + D0.s16]
+	D0.u8 = u8[A3 + D0.u16]
 	if (D0.u8 == D1.u8)
 	{
 		u8[A1 + 0x03] += 4
@@ -1234,7 +1234,7 @@ function void fn04c63e()
 	fn04c5c4()
 
 	D0.u16 = ((u16[A1] + 0xf0) & 0x0700) >> 8
-	D0.u8 = u8[A3 + D0.s16]
+	D0.u8 = u8[A3 + D0.u16]
 	if (D1.u8 != D0.u8)
 	{
 		if (u8[A1 + 0x02] > 0x20)
@@ -1252,7 +1252,7 @@ function void fn04c63e()
 	D1.u16 = (D0.u16 & 0x0700) - 0x10
 	u16[A1] = D1.u16
 	D0.u16 = (D0.u16 >> 8) & 0x07
-	D1.u8 = u8[A3 + D0.s16]
+	D1.u8 = u8[A3 + D0.u16]
 	fn04c5e0()
 
 	u8[A1 + 0x02] = 0xf8
@@ -1379,7 +1379,7 @@ function void fn04c71a()
 function void fn04c77c()
 {
 	D0.u16 = (D3.u16 >> 8) & 0x07
-	D0.u16 = u8[A3 + D0.s16] & 0x07
+	D0.u16 = u8[A3 + D0.u16] & 0x07
 	D0.u16 = (D0.u16 >> 7) + (D0.u16 << 9)
 
 	A2 = 0x158cae + D0.u16

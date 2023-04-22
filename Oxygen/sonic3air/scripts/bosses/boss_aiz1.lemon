@@ -571,7 +571,7 @@ function void fn068e98()
 function void fn068ec0()
 {
 	D0 = objA0.subtype2c
-	objA0.countdown_value = u16[0x068ece + D0.s16]
+	objA0.countdown_value = u16[0x068ece + D0.u16]
 }
 
 
@@ -580,7 +580,7 @@ function void fn068ed4()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = u8[A1 + 0x2c]
-	objA0.countdown_value = u16[0x068f28 + D0.s16]
+	objA0.countdown_value = u16[0x068f28 + D0.u16]
 	fn068ee4()
 }
 
@@ -607,8 +607,8 @@ function void fn068ee4()
 
 	// Determine where the rocket comes down
 	//  -> Note that this is used for both the transition cutscene and the boss fight (where rockets appear only for Knuckles)
-	D0.u8 = u8[A2 + D0.s16]
-	u16 offset = u16[A3 + D0.s16 * 2]
+	D0.u8 = u8[A2 + D0.u16]
+	u16 offset = u16[A3 + D0.u16 * 2]
 #if STANDALONE
 	offset = u32(offset) * getScreenWidth() / 320
 #endif

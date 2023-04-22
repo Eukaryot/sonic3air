@@ -33,7 +33,7 @@ function void fn0862b4()
 	objA0.box_size.y = D0.u8
 	objA0.animation.sprite = D0.u16 >> 2
 	D1.u16 = (objA0.subtype2c & 0x07) * 2
-	objA0.sprite_priority = u16[0x086324 + D1.s16]
+	objA0.sprite_priority = u16[0x086324 + D1.u16]
 }
 
 

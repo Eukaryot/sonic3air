@@ -352,10 +352,10 @@ function void fn08ce64()
 function void fn08d12c()
 {
 	D0 = objA0.subtype2c
-	objA0.countdown_value = u16[0x08d170 + D0.s16]
+	objA0.countdown_value = u16[0x08d170 + D0.u16]
 	D0.u16 *= 2
-	u32[A0 + 0x30] = u32[0x08d184 + D0.s16]
-	objA0.countdown_callback = u32[0x08d1ac + D0.s16]
+	u32[A0 + 0x30] = u32[0x08d184 + D0.u16]
+	objA0.countdown_callback = u32[0x08d1ac + D0.u16]
 
 	A1 = 0x08d1d4 + D0.u16
 	objA0.animation.sprite = u8[(A1+=1)-1]

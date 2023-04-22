@@ -304,8 +304,8 @@ function void fn08ffe0()
 	objA1.velocity.x -= objA1.velocity.x >> 3
 
 	D0 = (u8[A1 + 0x2a] & char.flag.IN_AIR) ? 0x1a : 0x1c
-	D1.s16 = s16[A1 + D0.s16] >> 3
-	u16[A1 + D0.s16] -= D1.u16
+	D1.s16 = s16[A1 + D0.u16] >> 3
+	s16[A1 + D0.u16] -= D1.s16
 }
 
 

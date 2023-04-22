@@ -118,7 +118,7 @@ function void fn02c8b8()
 		// Squirrel, chicken	-> global.zone = 0x0c	-> DDZ
 		// Flicky, chicken		-> global.zone = 0x0d	-> Outro S/T
 		D1 = global.zone * 2 + D0.u16
-		D0.u8 = u8[0x02c7ba + D1.s16]
+		D0.u8 = u8[0x02c7ba + D1.u16]
 		u8[A0 + 0x30] = D0.u8
 		D0.u16 <<= 3
 

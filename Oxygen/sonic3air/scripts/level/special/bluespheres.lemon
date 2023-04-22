@@ -1571,9 +1571,9 @@ function void BlueSpheres.RenderSpheres()
 				u16 size = (D1.u16 >> 2) - 6
 				if (size < 0x10)		// Filter out what's too small, i.e. completely behind the horizon
 				{
-					D0.u16 = u8(sphereType) * 8
-					A3 = u32[0xffffe480 + D0.s16]
-					D6.u16 = u16[0xffffe480 + D0.s16 + 4]
+					D0.u16 = sphereType * 8
+					A3 = u32[0xffffe480 + D0.u16]
+					D6.u16 = u16[0xffffe480 + D0.u16 + 4]
 					if (distance >= 0x54)	// Draw as non-priority sprite if partly behind the horizon
 					{
 						D6.u16 &= 0x7fff
@@ -1753,7 +1753,7 @@ function void fn009b62()
 						++u8[A2]
 						A1 = 0xffffffb2		// Start of emerald collection states
 						D0 = global.next_bluespheres
-						u8[A1 + D0.s16] |= 0x01
+						u8[A1 + D0.u16] |= 0x01
 					}
 				}
 
@@ -2873,10 +2873,10 @@ function void BlueSpheres.renderCustomSpheres()
 		u32 fog = clamp(s32(0x100000) / size - 0x68, 0, 0x80) * 0x010101
 
 		D0.u16 = u8(sphereType) * 8
-		A3 = u32[0xffffe480 + D0.s16]
-		D6.u16 = u16[0xffffe480 + D0.s16 + 4]
+		A3 = u32[0xffffe480 + D0.u16]
+		D6.u16 = u16[0xffffe480 + D0.u16 + 4]
 
-		D0.u16 = u16[0xffffe480 + D0.s16 + 6]
+		D0.u16 = u16[0xffffe480 + D0.u16 + 6]
 		D1 = (D0.u16 & 0x8000) ? 0 : (form * 2)
 		D1.u16 += D0.u16 * 2
 		A3 += u16[A3 + D1.s16]

@@ -85,12 +85,11 @@ function void fn02f9ca()
 	}
 	else
 	{
-		D0.u8 = objA0.value26
+		D0.u16 = objA0.value26 & 0x7f
 		++objA0.value26
-		D0.u16 &= 0x7f
 
 		A1 = 0x01831e
-		D0.u16 = u16[A0 + 0x30] + s8[A1 + D0.s16]
+		D0.u16 = u16[A0 + 0x30] + s8[A1 + D0.u16]
 		objA0.position.x.u16 = D0.u16
 
 		if (objA0.flags2e != 0)
@@ -202,7 +201,7 @@ function void fn02fa50()
 
 			A2 = u32[A0 + 0x3c]		// Pattern table for bubbles spawning
 			D0 = u8[A0 + 0x34]		// Bubble index
-			u8[A1 + 0x2c] = u8[A2 + D0.s16]
+			u8[A1 + 0x2c] = u8[A2 + D0.u16]
 
 			if (u8[A0 + 0x36] & 0x80)
 			{

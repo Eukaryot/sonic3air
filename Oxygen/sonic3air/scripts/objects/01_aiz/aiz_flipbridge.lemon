@@ -216,7 +216,7 @@ function void fn02ac08()
 
 			D4.u16 = D0.u16
 			D0.u16 >>= 1
-			D3.s16 = s8[A2 + D0.s16]
+			D3.s16 = s8[A2 + D0.u16]
 			D0.u16 = objA0.position.y.u16 - D3.u16
 			D2.u16 = objA1.position.y.u16
 			D1.u16 = D2.u16 + 4 + s8[A1 + 0x1e]

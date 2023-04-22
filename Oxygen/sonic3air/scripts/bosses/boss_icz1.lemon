@@ -679,8 +679,8 @@ function void fn0716b2()
 function void fn0716c8()
 {
 	D0 = objA0.subtype2c
-	objA0.velocity.x = u16[0x0716dc + D0.s16]
-	objA0.countdown_value = u16[0x0716e8 + D0.s16]
+	objA0.velocity.x = u16[0x0716dc + D0.u16]
+	objA0.countdown_value = u16[0x0716e8 + D0.u16]
 }
 
 
@@ -814,10 +814,9 @@ function void fn0717b8()
 //# address-hook(0x07184e) end(0x071860)
 function void fn07184e()
 {
-	D0.u8 = objA0.value3a
+	D0.u16 = objA0.value3a & 0x07
 	++objA0.value3a
-	D0.u16 &= 0x07
-	objA0.value39 = u8[0x071862 + D0.s16]
+	objA0.value39 = u8[0x071862 + D0.u16]
 }
 
 
@@ -830,8 +829,8 @@ function void fn07186a()
 	if (u8[A1 + 0x43] == 0)
 		D1.u16 += 8
 
-	u8[A0 + 0x42] = u8[0x07189a + D1.s16]
-	u32[A0 + 0x18] = u32[0x0718aa + D0.s16 * 2]
+	u8[A0 + 0x42] = u8[0x07189a + D1.u16]
+	u32[A0 + 0x18] = u32[0x0718aa + D0.u16 * 2]
 	if (u8[A1 + 0x43] == 0)
 		objA0.velocity.x = -objA0.velocity.x
 }

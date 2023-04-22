@@ -333,7 +333,7 @@ function void fn0656a8()
 	u16[A0 + 0x3a] = D1.u16
 	if (D1.u16 != D0.u16)
 	{
-		A1 = u32[0x0656d2 + D1.s16]
+		A1 = u32[0x0656d2 + D1.u16]
 		copyMemory(0xfffffc20, A1, 0x60)
 	}
 }

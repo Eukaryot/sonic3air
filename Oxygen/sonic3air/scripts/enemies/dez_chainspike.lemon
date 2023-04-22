@@ -290,22 +290,15 @@ function void fn091eb0()
 {
 	D1.u16 = abs(s16(u16[A0 + 0x3a] - objA0.position.y.u16))
 	D2 = 0
-	D3 = 0x18
 	D4 = 3
-
 	while (true)
 	{
-		D2.u16 += D3.u16
+		D2.u16 += 0x18
 		if (D1.u16 <= D2.u16)
 			break
-
-		--D4.s16
-		if (D4.s16 < 0)
-		{
-			D4 = 0
+		if (D4 == 0)
 			break
-		}
+		--D4
 	}
-
-	objA0.animation.sprite = u8[0x091ed4 + D4.s16]
+	objA0.animation.sprite = u8[0x091ed4 + D4.u16]
 }

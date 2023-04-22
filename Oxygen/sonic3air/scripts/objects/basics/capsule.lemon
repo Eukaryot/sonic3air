@@ -435,11 +435,9 @@ function void fn086820()
 //# address-hook(0x086a7a) end(0x086b0c)
 function void fn086a7a()
 {
-	D0 = objA0.subtype2c
-	D1.u16 = D0.u16
-	D0.u16 &= 0x06
-	A1 = 0x086b0e
-	D2.u16 = u16[A1 + D0.s16]
+	D1.u16 = objA0.subtype2c
+	D0 = objA0.subtype2c & 0x06
+	D2.u16 = u16[0x086b0e + D0.u16]
 	objA0.velocity.y = D2.u16
 	objA0.value3e = D2.u16
 
@@ -452,12 +450,11 @@ function void fn086a7a()
 		objA0.velocity.y = 0
 	}
 
-	D0.u16 &= 0x02
+	D0 = objA0.subtype2c & 0x02
 	D2.u16 = D0.u16
 	if (global.zone_act == 0x0400)		// In Flying Battery Act 1?
 		D2.u16 += 0x04		// Use a different VRAM index entry
-
-	objA0.sprite_attributes = u16[0x086b16 + D2.s16]
+	objA0.sprite_attributes = u16[0x086b16 + D2.u16]
 
 	// Decides the two critter's movement pattern for each zone
 	// Targets:
@@ -478,11 +475,10 @@ function void fn086a7a()
 	D2 = global.zone * 2
 	A1 = 0x02c7ba + D2.u16
 	D0.u16 >>= 1
-	D0.u8 = u8[A1 + D0.s16]
-	D0.u16 <<= 3
+	D0.u16 = u8[A1 + D0.u16] * 8
 
 	A2 = 0x02c7ea
-	objA0.mapping_offset = u32[A2 + D0.s16 + 0x04]
+	objA0.mapping_offset = u32[A2 + D0.u16 + 4]
 
 	// Timer is longer for higher subtypes
 	D1.u16 <<= 2
@@ -491,8 +487,8 @@ function void fn086a7a()
 	// Set movement direction based on critter's position relative to capsule
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0.u16 = objA0.position.x.u16
-	D1.s16 = (D0.u16 < objA1.position.x.u16) ? -0x0200 : 0x0200
-	objA0.velocity.x = D1.u16
+	D1.s16 = (D0.u16 < objA1.position.x.u16) ? -0x200 : 0x200
+	objA0.velocity.x = D1.s16
 	fn086b1e()
 }
 

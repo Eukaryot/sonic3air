@@ -66,7 +66,7 @@ function void fn0394a0()
 
 	D0 = u8[A2 + 0x26] + 5
 	D0.u16 >>= 4
-	objA0.state = u8[0x0394f2 + D0.s16]
+	objA0.state = u8[0x0394f2 + D0.u16]
 	if ((u8[A2 + 0x2a] & char.flag.IN_AIR) == 0)
 	{
 		// Touching ground

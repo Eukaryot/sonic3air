@@ -415,7 +415,7 @@ function void fn070118()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = (objA0.subtype2c == 0) ? 0x44 : 0x46
-	u16[A0 + 0x44] = u16[A1 + D0.s16]
+	u16[A0 + 0x44] = u16[A1 + D0.u16]
 }
 
 
@@ -614,11 +614,11 @@ function void fn0702ea()
 	if (D0.u16 < 4)
 	{
 		D1 = (D0.u8 == 0) ? 0x44 : 0x46
-		u16[A1 + D1.s16] = A0.u16
+		u16[A1 + D1.u16] = A0.u16
 		objA0.render_flags |= render_flag.FLIP_Y
 	}
 
-	A1 = 0x070320 + D0.s16 * 2
+	A1 = 0x070320 + D0.u16 * 2
 	objA0.position.x.u16 += u16[(A1+=2)-2]
 	objA0.position.y.u16 += u16[(A1+=2)-2]
 }

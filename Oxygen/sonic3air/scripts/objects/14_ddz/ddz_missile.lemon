@@ -138,7 +138,7 @@ function void fn0820f8()
 	u8[A0 + 0x0a] |= 0x80
 	objA0.sprite_priority = 0x0180
 	D0 = objA0.value39
-	u8[A0 + 0x40] = u8[0x08211e + D0.s16]
+	u8[A0 + 0x40] = u8[0x08211e + D0.u16]
 }
 
 

@@ -117,10 +117,9 @@ function void fn03f10a()
 function void fn03f11c()
 {
 	D0 = u8[A2 + 0x04] >> 4
-	D1.u8 = u8[0x03f146 + D0.s16]
-	u8[A1 + 0x22] = D1.u8
+	u8[A1 + 0x22] = u8[0x03f146 + D0.u16]
 
-	D1.s16 = s8[0x03f156 + D0.s16]
+	D1.s16 = s8[0x03f156 + D0.u16]
 	if (objA1.render_flags & render_flag.FLIP_X)
 		D1.s16 = -D1.s16
 

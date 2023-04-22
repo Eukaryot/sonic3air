@@ -271,7 +271,7 @@ function void fn05806e()
 		u8[A2 + 0x01] = D0.u8
 
 		A6 = 0x0587b4
-		D0.u8 = u8[A6 + D0.s16]
+		D0.u8 = u8[A6 + D0.u16]
 		D2.u16 = D0.u16
 		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 		D2.u8 += 0x40
@@ -295,15 +295,15 @@ function void fn05806e()
 
 		A6 = 0x058824
 		D0 = u8[A2 + 0x01]
-		D0.s16 = s8[A6 + D0.s16]
-		objA1.position.y.u16 -= D0.u16
+		D0.s16 = s8[A6 + D0.u16]
+		objA1.position.y.u16 -= D0.s16
+
 		D0 = u8[A2] - 1
 		while (D0.s16 >= 0)
 		{
 			objA1.position.y.u16 -= 0x70
 			--D0.s16
 		}
-
 		if (D3.u16 != 0)
 		{
 			objA1.position.y.u16 += 4
@@ -313,7 +313,7 @@ function void fn05806e()
 		D0.u16 = (D2.u16 + 0x0a) & 0xff
 		D2.u16 = (D0.u16 * 3) >> 6
 		A2 = 0x0587a8
-		D0.u8 = u8[A2 + D2.s16]
+		D0.u8 = u8[A2 + D2.u16]
 		u8[A1 + 0x22] = D0.u8
 		SetCharacterSpritePatterns()
 	}
@@ -631,24 +631,21 @@ function void fn0583d2()
 			A2 += D0.u16
 			D1.u16 -= 0x0178
 			D2.u16 = 0x1a08
-			D3 = 0x07
 
 			if (allocDynamicObjectAfterA0())
 			{
-				while (D3.s16 >= 0)
+				for (u8 k = 0; k < 8; ++k)
 				{
 					objA1.update_address = 0x0584a2
 					objA1.sprite_attributes = u16[(A2+=2)-2]
 					objA1.position.x.u16 = D2.u16
 					objA1.position.y.u16 = D1.u16
 					D4.u16 &= 0x07
-					u8[A1 + 0x2e] = u8[A3 + D4.s16]
+					u8[A1 + 0x2e] = u8[A3 + D4.u16]
 					++D4.u16
 					D2.u16 += 0x10
 					if (!allocDynamicObjectAfterA1())
 						break
-
-					--D3.s16
 				}
 			}
 

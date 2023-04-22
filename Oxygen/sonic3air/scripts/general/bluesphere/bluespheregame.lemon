@@ -1233,8 +1233,8 @@ function void fn04d6b8()
 	{
 		A1 = u32[A0 + 0x30]
 		D0 = bluespheregame.menu_selection * 4
-		D2.u16 = u16[A1 + D0.s16] + getScreenExtend()
-		D3.u16 = u16[A1 + D0.s16 + 2]
+		D2.u16 = u16[A1 + D0.u16] + getScreenExtend()
+		D3.u16 = u16[A1 + D0.u16 + 2]
 
 		// Update velocity-x
 		bool skipPart = false

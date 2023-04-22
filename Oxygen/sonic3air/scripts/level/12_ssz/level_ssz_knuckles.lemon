@@ -738,7 +738,7 @@ function void fn05b42a()
 		D1.u16 += (u8[0xfffffa88] == 0) ? 0x04 : 0x08
 	}
 
-	A2 = u32[0x05b472 + D1.s16]
+	A2 = u32[0x05b472 + D1.u16]
 	call A2
 }
 

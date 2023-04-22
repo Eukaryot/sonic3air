@@ -538,7 +538,7 @@ function void fn085870()
 
 		// A1 is assigned 0xffffb000 for D0.u16 == 0 or D0.u16 == 2,
 		//            and 0xffffb04a for D0.u16 == 4 or D0.u16 == 6
-		A1 = 0xffff0000 + u16[0x085890 + D0.s16]
+		A1 = 0xffff0000 + u16[0x085890 + D0.u16]
 		u16[A0 + 0x44] = A1.u16
 		D1 = 1
 		_setZeroFlagByValue(1)
@@ -676,7 +676,7 @@ function void fn085fc4()
 	if (objA0.update_address != 0)
 	{
 		D0 = u16(objA0.flags38) << 2
-		A1 = u32[0x085fb8 + D0.s16]
+		A1 = u32[0x085fb8 + D0.u16]
 		call A1
 	}
 	A0 = backupA0
@@ -1881,8 +1881,7 @@ function void fn084cf4()
 	//  - 0x084d46	-> D1.s16 = 0x02
 	//  - 0x084d56	-> D1.s16 = 0x04
 	//  - 0x084d68	-> D1.s16 = 0x08
-	D1.u16 = u16[0x084d30 + D1.s16]
-	call 0x084d30 + D1.s16
+	call tableLookupAddress(0x084d30, D1.u16)
 
 	D2.u16 += D5.u16
 	D3.u16 += D6.u16

@@ -184,29 +184,26 @@ function void fn090a94()
 	u8[0xfffffab8] &= ~0x01
 
 	A1 = 0xffffffb2		// Start of emerald collection states
-	A2 = 0x090b1a
 	A3 = 0xfffffa82
 	A4 = 0x090b0c
 	A5 = 0xfffffab0
 	D0 = 0
 	D1 = 0
 	D2 = 0
-	D3 = 6				// Number of emeralds
-	while (D3.s16 >= 0)
+	for (u8 emerald = 0; emerald < 7; ++emerald)
 	{
-		D0.u8 = u8[(A2+=1)-1]
-		D4.u8 = u8[A1 + D0.s16]
+		D0.u8 = u8[0x090b1a + emerald]
+		D4.u8 = u8[A1 + D0.u16]
 		if (D4.u8 == 1)
 		{
 			u8[(A5+=1)-1] = D0.u8
-			u16[(A3+=2)-2] = u16[A4 + D0.s16 * 2]
+			u16[(A3+=2)-2] = u16[A4 + D0.u16 * 2]
 			D1 = 1
 		}
 		else if (D4.u8 == 2)
 		{
 			D2 = 1
 		}
-		--D3.s16
 	}
 
 	u16[A3] = 0
@@ -250,11 +247,11 @@ function void fn090b32()
 	++objA0.value39
 
 	A1 = 0xfffffab0
-	D1 = u8[A1 + D0.s16]
+	D1 = u8[A1 + D0.u16]
 	u8[A0 + 0x3c] = D1.u8
 
 	A1 = 0xfffffa82
-	u16[A0 + 0x3a] = u16[A1 + D0.s16 * 2]
+	u16[A0 + 0x3a] = u16[A1 + D0.u16 * 2]
 	if (u16[A0 + 0x3a] == 0)
 	{
 		objA0.countdown_callback = 0x090c16
@@ -288,7 +285,7 @@ function void fn090b84()
 	}
 
 	D0 = u8[A2 + 0x01] + u8[A1 + 0x38]
-	u8[A1 + 0x22] = u8[0x090bca + D0.s16]
+	u8[A1 + 0x22] = u8[0x090bca + D0.u16]
 
 	u32 backupA2 = A2
 	fn085fc4()
@@ -510,7 +507,7 @@ function void fn090da2()
 function void fn090dc0()
 {
 	D0 = u8[A1 + 0x38]
-	u8[A1 + 0x22] = u8[0x090dd8 + D0.s16]
+	u8[A1 + 0x22] = u8[0x090dd8 + D0.u16]
 
 	u32 backupA2 = A2
 	fn085fc4()
@@ -638,8 +635,7 @@ function void fn090e9a()
 	}
 
 	A1 = 0xffffffb2		// Start of emerald collection states
-	D0 = objA0.subtype2c
-	++u8[A1 + D0.s16]
+	++u8[A1 + objA0.subtype2c]
 
 	if (allocDynamicObjectStd())
 	{
@@ -662,7 +658,7 @@ function void fn090eae()
 		objA1.position.y.u16 += 4
 	}
 
-	u8[A1 + 0x22] = u8[0x090f06 + D0.s16]
+	u8[A1 + 0x22] = u8[0x090f06 + D0.u16]
 	u8[A1 + 0x20] = 5
 	fn085fc4()
 }
@@ -677,19 +673,19 @@ function bool fn090f0a()
 	D0 = objA0.subtype2c >> 1
 	D1.u16 = objA0.subtype2c
 	objA0.subtype2c = D0.u8
-	u8[A0 + 0x3c] = u8[0x090f64 + D0.s16]
-	u8[A0 + 0x3d] = u8[0x090f6c + D0.s16]
+	u8[A0 + 0x3c] = u8[0x090f64 + D0.u16]
+	u8[A0 + 0x3d] = u8[0x090f6c + D0.u16]
 
 	A1 = 0xffffffb2		// Start of emerald collection states
-	D2.u8 = u8[A1 + D0.s16]
+	D2.u8 = u8[A1 + D0.u16]
 	if (D2.u8 != 0 && D2.u8 < 2)
 	{
 		objA0.animation.sprite = D0.u8
 		D1.u16 *= 2
-		u32[A0 + 0x18] = u32[0x090f74 + D1.s16]
+		u32[A0 + 0x18] = u32[0x090f74 + D1.u16]
 		if (isMainCharacter(CHARACTER_KNUCKLES))
 			D1.u16 += 2
-		D2.u16 = u16[0x090f90 + D1.s16]
+		D2.u16 = u16[0x090f90 + D1.u16]
 		objA0.sprite_attributes = D2.u16
 		return false
 	}

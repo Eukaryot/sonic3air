@@ -334,8 +334,7 @@ function void Wall.Destroy()
 function void fn0216b8()
 {
 	D0 = objA0.animation.sprite * 2
-	A3 = objA0.mapping_offset
-	A3 += u16[A3 + D0.s16]
+	A3 = tableLookupAddress(objA0.mapping_offset, D0.u16)
 	D1.u16 = u16[A3] - 1
 	A3 += 2
 	objA0.render_flags |= render_flag.STATIC_MAPPING

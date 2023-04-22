@@ -361,14 +361,10 @@ function void fn0787fe()
 //# address-hook(0x07880a) end(0x07882a)
 function void fn07880a()
 {
-	D0 = 0
 	D1 = objA0.subtype2c
-	if (D1.u8 != 0)
-	{
-		D0.u16 += (D1.u8 == 0x16) ? 8 : 4
-	}
+	D0 = (objA0.subtype2c == 0) ? 0 : (objA0.subtype2c == 0x16) ? 8 : 4
 
-	A1 = u32[0x07882c + D0.s16]
+	A1 = u32[0x07882c + D0.u16]
 	objA0.update_address = A1
 	objA0.countdown_value += D1.u16 * 2
 
@@ -632,7 +628,7 @@ function void fn078a70()
 	setupObjectAttributesBasic(0x078d7e)
 	objA0.update_address = 0x085102
 	D0 = objA0.subtype2c >> 1
-	objA0.animation.sprite = u8[0x078a9c + D0.s16]
+	objA0.animation.sprite = u8[0x078a9c + D0.u16]
 
 	D0 = 0x5c
 	fn0852d0()

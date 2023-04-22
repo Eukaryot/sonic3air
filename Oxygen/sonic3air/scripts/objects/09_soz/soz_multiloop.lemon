@@ -30,7 +30,7 @@ function void fn01d106()
 
 	objA0.animation.sprite = D0.u8 & 0x07
 	D0.u16 = (D0.u16 & 0x03) * 2
-	objA0.value32 = u16[0x01d178 + D0.s16]
+	objA0.value32 = u16[0x01d178 + D0.u16]
 
 	D1.u16 = objA0.position.y.u16
 	A1 = 0xffffb000
@@ -55,7 +55,7 @@ function void fn01d180()
 {
 	objA0.animation.sprite = D0.u8 & 0x03
 	D0.u16 = (D0.u16 & 0x03) * 2
-	objA0.value32 = u16[0x01d178 + D0.s16]
+	objA0.value32 = u16[0x01d178 + D0.u16]
 
 	D1.u16 = objA0.position.x.u16
 	A1 = 0xffffb000

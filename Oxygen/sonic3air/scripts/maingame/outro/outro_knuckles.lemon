@@ -918,8 +918,8 @@ function void fn05fba0()
 		u16[A0 + 0x3a] = D0.u16
 
 		A2 = 0xfffffc04
-		u32[A2] = u32[A1 + D0.s16]
-		u16[A2 + 6] = u16[A1 + D0.s16 + 4]
+		u32[A2] = u32[A1 + D0.u16]
+		u16[A2 + 6] = u16[A1 + D0.u16 + 4]
 	}
 }
 

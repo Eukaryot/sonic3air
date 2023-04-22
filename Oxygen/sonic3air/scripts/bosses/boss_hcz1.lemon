@@ -596,7 +596,7 @@ function void fn06a41e()
 	fn06ab1a()
 
 	D0 = objA0.subtype2c >> 1
-	D1.u8 = u8[0x06a45c + D0.s16]
+	D1.u8 = u8[0x06a45c + D0.u16]
 	if (D1.u8 != u8[A0 + 0x3c])
 		return
 
@@ -847,7 +847,7 @@ function void fn06a65c()
 	D0.u16 &= 0x03
 	objA0.animation.sprite = D0.u8
 	D0.u16 *= 4
-	u32[A0 + 0x30] = u32[0x06a6a8 + D0.s16]
+	u32[A0 + 0x30] = u32[0x06a6a8 + D0.u16]
 	objA0.countdown_value = 0x1f
 	objA0.countdown_callback = 0x06a6d2
 }
@@ -1312,7 +1312,7 @@ function void fn06ab1a()
 	fn06ab94()
 
 	D0 = u8[A0 + 0x3d] >> 4
-	objA0.animation.sprite = u8[0x06ab50 + D0.s16]
+	objA0.animation.sprite = u8[0x06ab50 + D0.u16]
 	objA0.sprite_priority = (D0.u8 < 8) ? 0x0200 : 0x0280
 }
 
@@ -1376,7 +1376,7 @@ function void fn06aba8()
 	objA0.position.y.u16 = D3.u16
 
 	D0.u16 >>= 1
-	objA0.animation.sprite = u8[0x06ac38 + D0.s16]
+	objA0.animation.sprite = u8[0x06ac38 + D0.u16]
 }
 
 

@@ -144,7 +144,7 @@ function void fn08de44()
 function void fn08df68()
 {
 	D0 = objA0.subtype2c >> 1
-	u8[A0 + 0x43] = u8[0x08df78 + D0.s16]
+	u8[A0 + 0x43] = u8[0x08df78 + D0.u16]
 }
 
 

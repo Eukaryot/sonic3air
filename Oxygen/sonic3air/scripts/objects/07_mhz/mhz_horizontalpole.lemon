@@ -254,7 +254,7 @@ function void fn03efba()
 
 	D0 = u8[A2 + 0x04] >> 4
 	D0.u8 += u8[A2 + 0x08]
-	D1.u8 = u8[0x03f01a + D0.s16]
+	D1.u8 = u8[0x03f01a + D0.u16]
 	u8[A1 + 0x22] = D1.u8
 	D0.u16 &= 0x0f
 	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x03f03a + D0.u16]

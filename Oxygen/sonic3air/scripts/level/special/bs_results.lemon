@@ -998,8 +998,8 @@ function void fn02ecd0()
 	{
 		A1 = 0x02e398
 		D0 = u8[0xffffef6e] * 2
-		objA0.position.x.u16 = u16[A1 + D0.s16] + 160	// Do not add screen extend here
-		objA0.position.y.u16 = u16[A1 + D0.s16 + 0x10]
+		objA0.position.x.u16 = u16[A1 + D0.u16] + 160	// Do not add screen extend here
+		objA0.position.y.u16 = u16[A1 + D0.u16 + 0x10]
 		objA0.value32 = 0xe000
 	}
 
