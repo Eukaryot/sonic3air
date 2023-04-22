@@ -61,21 +61,6 @@ function void fn086dae()
 }
 
 
-//# address-hook(0x068962) end(0x06898e)
-function void fn068962()
-{
-	objA0.mapping_offset = 0x083ffc
-	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x04d2)
-	u32[A0 + 0x30] = 0x069164
-	objA0.countdown_callback = addressof(Object.TriggerUnloading)
-	if (objA0.subtype2c == 0x06)
-	{
-		// "spawnChildObjects(0x0690d0)" replaced by:
-		spawnChildObject(0x068994, 0x00, 0, 0)		// Angel Island miniboss flamethrower end flame
-	}
-}
-
-
 //# address-hook(0x086dc6) end(0x086dfa)
 function void fn086dc6()
 {
