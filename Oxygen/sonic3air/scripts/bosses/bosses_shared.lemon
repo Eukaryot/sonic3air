@@ -391,12 +391,12 @@ function void fn083c06()
 	// Targets:
 	//  - 0x083c7c		-> AIZ 1
 	//  - 0x083c90		-> AIZ 2
-	//  - 0x083ca6		-> HCZ 1+2							 (empty function)
+	//  - 0x083ca6		-> HCZ 1+2							(empty function)
 	//  - 0x083ca8		-> MGZ 1+2
-	//  - 0x083cb2		-> CNZ 1+2, FBZ 1+2, ICZ 1			 (empty function)
+	//  - 0x083cb2		-> CNZ 1+2, FBZ 1+2, ICZ 1			(empty function)
 	//  - 0x083cb4		-> ICZ 2
 	//  - 0x083cc0		-> LBZ 1+2, MHZ 1+2
-	//  - 0x083ccc		-> SOZ and everything afterwards	 (empty function)
+	//  - 0x083ccc		-> SOZ and everything afterwards	(empty function)
 	call tableLookupAddress(0x083c1c, D0.u8 * 2)
 }
 
@@ -785,7 +785,7 @@ function void FadeColorToWhiteUniform()
 	// Fade to white
 	u16 color = u16[A1]
 #if STANDALONE
-	color  = makeNormalPackedColor(color)
+	color = makeNormalPackedColor(color)
 #endif
 
 	if ((color & 0x0eee) != 0x0eee)

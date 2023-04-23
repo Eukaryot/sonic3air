@@ -413,7 +413,7 @@ function void SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
 	{
 		objA1.state = char.state.RUNNING
 		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 0 : 1		// "char.rotation.x.count"
-		u8[A1 + 0x31] = 4                                       // "char.rotation.x.speed"
+		u8[A1 + 0x31] = 4										// "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
@@ -549,7 +549,7 @@ function void fn0231be()
 	{
 		objA1.state = char.state.RUNNING
 		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3		// "char.rotation.x.count"
-		u8[A1 + 0x31] = 8                                       // "char.rotation.x.speed"
+		u8[A1 + 0x31] = 8										// "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
@@ -691,7 +691,7 @@ function void SpringDiagonal.ApplyToCharacter()
 	{
 		u8[A1 + 0x20] = 0
 		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3		// "char.rotation.x.count"
-		u8[A1 + 0x31] = 8                                       // "char.rotation.x.speed"
+		u8[A1 + 0x31] = 8										// "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{
@@ -791,7 +791,7 @@ function void SpringDiagonalFlipped.ApplyToCharacter()
 	{
 		u8[A1 + 0x20] = 0
 		u8[A1 + 0x30] = (objA0.subtype2c & 0x02) ? 1 : 3		// "char.rotation.x.count"
-		u8[A1 + 0x31] = 8                                       // "char.rotation.x.speed"
+		u8[A1 + 0x31] = 8										// "char.rotation.x.speed"
 
 		if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 		{

@@ -343,15 +343,15 @@ function void fn01a434()
 		if (objA1.update_address == 0x041d32)
 			return
 
-		// Exclude CNZ balloons 
+		// Exclude CNZ balloons
 		if (objA1.update_address == 0x031754)
 			return
 
-		// Exclude CNZ bumpers 
+		// Exclude CNZ bumpers
 		if (objA1.update_address == 0x032e7e || objA1.update_address == 0x032eaa)
 			return
 
-		// Exclude checkpoint and its stars 
+		// Exclude checkpoint and its stars
 		if (objA1.update_address == 0x02cfa8)
 			return
 	#endif

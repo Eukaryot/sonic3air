@@ -208,7 +208,7 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 							s8 diff = angle - oldRotation
 							angle = oldRotation + clamp(diff, -3, 3)
 						}
-					}	
+					}
 				}
 				else
 				{
@@ -228,10 +228,10 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 							u32 targetRotation = 0
 							if (char.rotation > 0x10 && char.rotation < 0xe8)
 								targetRotation = char.rotation
-								
+
 							u32 rotate = targetRotation - oldRotation
 							u32 shift = (abs(char.groundspeed) <= 0x6000) + 1
-							
+
 							if (abs(rotate) >= abs(rotate - 0x100))
 							{
 								if (abs(rotate - 0x200) < abs(rotate + 0x100))

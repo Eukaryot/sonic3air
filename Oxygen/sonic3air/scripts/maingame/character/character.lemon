@@ -1231,7 +1231,7 @@ function void UpdateKnucklesGlideCollision()
 	D0.u8 = char.double_jump_state
 	if (char.double_jump_state == 1 || char.double_jump_state > 5)	// Last check is probably not needed, just added for full compatibility
 	{
-		// Gliding state
+		// Gliding/Climbing state
 		fn01793e()
 		if (knuckles.glideclimbstate & 0x02)	// Gliding?
 		{
@@ -1346,7 +1346,7 @@ function void UpdateKnucklesGlideCollision()
 						char.groundspeed = 0
 						char.velocity.x = 0
 						char.velocity.y = 0
-						char.double_jump_state = 4
+						char.double_jump_state = 4		// Knuckles climbing state
 						char.animation.sprite = 0xb7
 						char.animation.timer = 0x7f
 						char.animation.frame = 0
@@ -1356,7 +1356,7 @@ function void UpdateKnucklesGlideCollision()
 					}
 				}
 
-				char.double_jump_state = 2
+				char.double_jump_state = 2		// Knuckles glide drop state
 				char.state = char.state.KNUX_FALLING
 				char.hitbox_extends.x = char.hitbox.default.x
 				char.hitbox_extends.y = char.hitbox.default.y
@@ -1371,7 +1371,7 @@ function void UpdateKnucklesGlideCollision()
 			else
 			{
 				// Stop gliding
-				char.double_jump_state = 2
+				char.double_jump_state = 2		// Knuckles glide drop state
 				char.state = char.state.KNUX_FALLING
 				if (char.velocity.x < 0)
 					char.flags |= char.flag.FACING_LEFT
@@ -1409,7 +1409,7 @@ function void UpdateKnucklesGlideCollision()
 			}
 			else
 			{
-				char.double_jump_state = 3
+				char.double_jump_state = 3		// Knuckles ground slide state
 				char.animation.sprite = 0xcc
 				char.animation.timer = 0x7f
 				char.animation.frame = 0
@@ -1488,7 +1488,7 @@ function void UpdateKnucklesGlideCollision()
 			}
 			else
 			{
-				char.double_jump_state = 2
+				char.double_jump_state = 2		// Knuckles glide drop state
 				char.state = char.state.KNUX_FALLING
 				char.hitbox_extends.x = char.hitbox.default.x
 				char.hitbox_extends.y = char.hitbox.default.y
@@ -1529,6 +1529,7 @@ function void UpdateKnucklesGlideCollision()
 			return
 		}
 
+		// Knuckles climbing up
 		if (global.inv_gravity)
 		{
 			fn016da8()
@@ -1644,6 +1645,7 @@ function void fn016d10_unified()
 			char.groundspeed = 0
 			char.velocity.x = 0
 			char.velocity.y = 0
+
 			Character.LandingOnGroundNoSpindash()
 			char.state = char.state.STANDING
 		}
@@ -1692,10 +1694,11 @@ function void fn016d6e()
 //# address-hook(0x016ed2) end(0x016efc)
 function void fn016ed2()
 {
-	char.double_jump_state = 2
+	// Knuckles dropped off the bottom of a wall while climbing down
+	char.double_jump_state = 2			// Knuckles glide drop state
 	char.state = char.state.KNUX_FALLING
-	char.state.former = char.state.KNUX_FALLING
-	char.animation.sprite = 0xcb
+	char.state.former = char.state.KNUX_FALLING		// Set this variable as well to prevent animation reset
+	char.animation.sprite = 0xcb		// Set Knuckles dropping sprite
 	char.animation.timer = 7
 	char.animation.frame = 1
 	char.hitbox_extends.x = char.hitbox.default.x
@@ -1771,6 +1774,7 @@ function void fn016da8()
 //# address-hook(0x016e10)
 function void fn016e10()
 {
+	// Shared climbing animation update
 	D0.u8 = control.player1.state & (CONTROL_UP | CONTROL_DOWN)
 	if (D0.u8 == 0)
 	{
@@ -1829,10 +1833,12 @@ function void fn016e10()
 //# address-hook(0x016e60)
 function void fn016e60()
 {
+	// Climbing idle state update
 	char.animation.timer = 0x20
 	char.animation.frame = 0
 	if (control.player1 & CONTROL_ABC)
 	{
+		// Knuckles jumping off the wall
 		char.velocity.y = -0x380
 		char.velocity.x = 0x400
 		char.flags ^= char.flag.FACING_LEFT
@@ -1844,14 +1850,14 @@ function void fn016e60()
 		char.jumping = 1
 		char.hitbox_extends.x = 7
 		char.hitbox_extends.y = 14
-		char.double_jump_state = 0
+		char.double_jump_state = 0		// Allow gliding again
 	}
 }
 
 //# address-hook(0x016eba)
 function void fn016eba()
 {
-	char.double_jump_state = 5
+	char.double_jump_state = 5	// Knuckles ledge climb state
 	if (char.animation.sprite != 0xbd)
 	{
 		knuckles.glide_direction = 0
@@ -5195,7 +5201,7 @@ function void Character.OnCollisionWithDynamicObject()
 			{
 				if (char.double_jump_state == 1)
 				{
-					char.double_jump_state = 2
+					char.double_jump_state = 2		// Knuckles glide drop state
 					char.state = char.state.KNUX_FALLING
 
 					if (char.velocity.x >= 0)
@@ -6136,7 +6142,7 @@ function void Character.CheckCollision()
 			}
 		}
 	}
-	else 	// (D0.u8 == 0xc0)
+	else	// (D0.u8 == 0xc0)
 	{
 		Character.CheckRightWallCollision()
 		if (D1.s16 < 0)

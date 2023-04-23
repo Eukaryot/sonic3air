@@ -139,7 +139,7 @@ function void fn03e37e()
 				if ((D2.u16 & 0x0e) == 0)
 				{
 					D2.u16 -= 2
-    				goto03e3f8 = ((D2.u16 & 0x0e) == 0)
+					goto03e3f8 = ((D2.u16 & 0x0e) == 0)
 				}
 				else
 				{

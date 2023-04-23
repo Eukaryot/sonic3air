@@ -51,7 +51,7 @@ function void fn04964a()
 			objA1.flags2a |= char.flag.IN_AIR
 			u8[A1 + 0x2e] = 0x01
 			u8[A1 + 0x30] = 0xff		// "char.rotation.x.count"
-			u8[A1 + 0x31] = 0x04        // "char.rotation.x.speed"
+			u8[A1 + 0x31] = 0x04		// "char.rotation.x.speed"
 
 			u8[A1 + 0x40] = 0
 			u8[A2] = 1

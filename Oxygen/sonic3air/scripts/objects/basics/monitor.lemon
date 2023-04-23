@@ -579,9 +579,9 @@ function void MonitorIntact.Opening()
 function void ItemEffect.BaseUpdate()
 {
 	// Targets:
-	//  - 0x01d7ce 	-> objA0.base_state = 0x00	-> Initialization
-	//  - 0x01d81a 	-> objA0.base_state = 0x02	-> Rising animation
-	//  - 0x01db2e 	-> objA0.base_state = 0x04	-> Wait time when stopped (+ fade-out in S3AIR)
+	//  - 0x01d7ce	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x01d81a	-> objA0.base_state = 0x02	-> Rising animation
+	//  - 0x01db2e	-> objA0.base_state = 0x04	-> Wait time when stopped (+ fade-out in S3AIR)
 	call tableLookupAddress(0x01d7c8, objA0.base_state)
 }
 

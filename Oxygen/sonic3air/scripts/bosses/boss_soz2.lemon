@@ -891,7 +891,7 @@ function void fn077e90()
 		if (u8[A1 + 0x2a] & 0x80 || u16[0xffffeedc] != 0)
 		{
 			objA0.flags2a |= 0x80
-    		UnloadObject()
+			UnloadObject()
 		}
 	}
 	else

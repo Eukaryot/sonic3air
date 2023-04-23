@@ -72,7 +72,7 @@ function void UpdatePaletteEffects.Default()
 	//  - 0x0021bc	-> offset = 0x2a		-> SSZ Knux	 (empty function)
 	//  - 0x00277e	-> offset = 0x2c		-> DEZ 1
 	//  - 0x0027b2	-> offset = 0x2e		-> DEZ 2
-	//  - 0x0021bc	-> offset = 0x30, 0x32	-> DDZ 		 (empty function)
+	//  - 0x0021bc	-> offset = 0x30, 0x32	-> DDZ		 (empty function)
 	//  - 0x0021bc	-> offset = 0x34, 0x36	-> Outro S/T (empty function)
 	//  - 0x0021bc	-> offset = 0x38, 0x3a	-> ALZ		 (empty function)
 	//  - 0x00281a	-> offset = 0x3c, 0x3e	-> BPZ

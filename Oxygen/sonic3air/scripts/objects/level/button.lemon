@@ -25,20 +25,24 @@ function void Button.Init()
 	objA0.sprite_attributes = 0x0456
 	if (global.zone == 0x01)
 	{
+		// Hydrocity Zone
 		objA0.mapping_offset = 0x22bd1a
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x0426)
 	}
 	else if (global.zone == 0x03)
 	{
+		// Carnival Night zone
 		objA0.mapping_offset = 0x22bd4a
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x041a)
 	}
 	else if (global.zone == 0x04)
 	{
+		// Flying Battery Zone
 		objA0.sprite_attributes = 0x0500
 	}
 	else if (global.zone == 0x09)
 	{
+		// Lava Reef Zone
 		objA0.mapping_offset = 0x02c748
 		objA0.sprite_attributes = (global.act == 0) ? 0x63a1 : 0x2429
 	}

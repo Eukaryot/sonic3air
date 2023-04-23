@@ -503,7 +503,7 @@ define results.ring_bonus		= u16[0xfffff7d4]	// Ring bonus value in level and sp
 
 define level.despawn_position.x	= u16[0xfffff7da]
 
-define level.trigger00			=  u8[0xfffff7e0] 	// Level-specific triggers, e.g. by pressing buttons
+define level.trigger00			=  u8[0xfffff7e0]	// Level-specific triggers, e.g. by pressing buttons
 define level.trigger01			=  u8[0xfffff7e1]
 define level.trigger02			=  u8[0xfffff7e2]
 define level.trigger03			=  u8[0xfffff7e3]

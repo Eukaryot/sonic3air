@@ -309,7 +309,7 @@ function void fn086716()
 }
 
 
-// Unlock button for flying animal capsule 
+// Unlock button for flying animal capsule
 
 //# address-hook(0x08675c) end(0x08676c)
 function void fn08675c()

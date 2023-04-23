@@ -406,7 +406,7 @@ function bool fn01dcb6_internal(u32 characterAddress, u8 bitnum)
 			}
 		}
 
-		// Not on the object any more (either in air, or outside the object's width)
+		// Not on the object anymore (either in air, or outside the object's width)
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
 		objA0.flags2a &= ~bit
@@ -1486,7 +1486,7 @@ function void PlatformCheckClimbOnForCharacterA1()
 	}
 	else
 	{
-		// Not on the object any more (either in air, or outside the object's width)
+		// Not on the object anymore (either in air, or outside the object's width)
 		objA1.flags2a &= ~char.flag.ON_OBJECT
 		objA1.flags2a |= char.flag.IN_AIR
 		objA0.flags2a &= ~bit

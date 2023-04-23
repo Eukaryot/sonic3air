@@ -341,7 +341,7 @@ function void fn0485ae()
 	{
 		// Reached the end of the tunnel
 		u8[A1 + 0x2e] = 0	// Reset control flags for characters
-    	u8[A4] = 0
+		u8[A4] = 0
 		return
 	}
 

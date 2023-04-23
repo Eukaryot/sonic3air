@@ -60,14 +60,14 @@ function void fn08bc6c()
 	if (D1.s16 < -2)
 	{
 		objA0.velocity.x = -objA0.velocity.x
-    	s16[A0 + 0x40] = -s16[A0 + 0x40]
-    	objA0.render_flags ^= render_flag.FLIP_X
+		s16[A0 + 0x40] = -s16[A0 + 0x40]
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 	else if (D1.s16 >= 12)
 	{
 		objA0.base_state = 0x06
-    	objA0.hitbox_extends.y = 0x0b
-    	objA0.countdown_callback = 0x08bc26
+		objA0.hitbox_extends.y = 0x0b
+		objA0.countdown_callback = 0x08bc26
 	}
 	else
 	{
@@ -126,14 +126,14 @@ function void fn08bcba()
 	if (D1.s16 < -2)
 	{
 		objA0.velocity.x = -objA0.velocity.x
-    	s16[A0 + 0x40] = -s16[A0 + 0x40]
-    	objA0.render_flags ^= render_flag.FLIP_X
+		s16[A0 + 0x40] = -s16[A0 + 0x40]
+		objA0.render_flags ^= render_flag.FLIP_X
 	}
 	else if (D1.s16 >= 12)
 	{
 		objA0.base_state = 0x06
-    	objA0.hitbox_extends.y = 0x0b
-    	objA0.countdown_callback = 0x08bc26
+		objA0.hitbox_extends.y = 0x0b
+		objA0.countdown_callback = 0x08bc26
 	}
 	else
 	{

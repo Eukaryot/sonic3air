@@ -1217,18 +1217,10 @@ function void fn0076a6()
 	A1 = 0x098100 + global.zone * 8 + global.act * 4
 	D0 = u32[A1]
 	u32[0xfffff7b4] = D0
-	if (D0 >= 0x260000)
-	{
-		D0 += 0x600
-		u32[0xfffff7b8] = D0
-		u32[0xfffff796] = u32[0xfffff7b4]
-	}
-	else
-	{
-		++D0
-		u32[0xfffff7b8] = D0
-		u32[0xfffff796] = u32[0xfffff7b4]
-	}
+
+	D0 += (D0 >= 0x260000) ? 0x600 : 1
+	u32[0xfffff7b8] = D0
+	u32[0xfffff796] = u32[0xfffff7b4]
 }
 
 
@@ -1488,8 +1480,8 @@ function void SetupCharacterAtLastCheckpoint()
 		checkpoint.number		 = checkpoint.number.backup
 		global.zone_act			 = checkpoint.zone_act
 		global.zone_act.apparent = checkpoint.zone_act.apparent
-		u16[0xffffb000 + 0x10]			 = checkpoint.x
-		u16[0xffffb000 + 0x14]			 = checkpoint.y
+		u16[0xffffb000 + 0x10]			= checkpoint.x
+		u16[0xffffb000 + 0x14]			= checkpoint.y
 	#if STANDALONE
 		if (checkpoint.y & 0x8000)
 		{
@@ -1599,7 +1591,7 @@ function void fn01c2b0()
 	Kosinski.decompress(D0, 0xffff9000)
 
 	D0 = u32[A2+12] & 0x00ffffff		// Pointer to second set of blocks
-	if (D7 != D0)               	// Checking if the two pointers aren't duplicates of eachother
+	if (D7 != D0)						// Checking if the two pointers aren't duplicates of eachother
 	{
 		Kosinski.decompress(D0, A1)
 	}
@@ -1727,7 +1719,7 @@ function void fn028c80()
 	}
 	else if (global.zone == 0x14)
 	{
-		// Glowing Spheres bonus stage 
+		// Glowing Spheres bonus stage
 		Kosinski.decompress(0x156c08, 0xffff1000)		// Animated background art, loaded into a designated area in RAMm before going into VRAM
 		Kosinski.decompress(0x1574e8, 0xffff7000)		// See above
 
@@ -2205,7 +2197,7 @@ function void fn04b6aa()
 	}
 
 	A1 = 0xffff7000 + 0x08		// Starting one block ahead to keep first type as empty space
-	A0 = 0x04b722				// Table of different block sprites for each type 
+	A0 = 0x04b722				// Table of different block sprites for each type
 	for (u8 blockType = 0; blockType < 0x13; ++blockType)	// Loop once for each block type
 	{
 		u32[A1]   = u32[A0]			// Mapping data

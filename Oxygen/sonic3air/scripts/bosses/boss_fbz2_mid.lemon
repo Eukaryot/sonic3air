@@ -66,7 +66,7 @@ function void fn06fd38()
 	move_area.right = 0x2b40
 #endif
 
-	// Load Egg Robo or Robotnik operator sprites alongside the midboss, depending on the player character 
+	// Load Egg Robo or Robotnik operator sprites alongside the midboss, depending on the player character
 	u32 address = isMainCharacter(CHARACTER_KNUCKLES) ? 0x0705d0 : 0x0705b6
 	addPatternLoadingCue(address)
 
@@ -630,7 +630,7 @@ function void fn070330()
 	if (u8[A0 + 0x28] != 0)
 		return
 
-#if STANDALONE	
+#if STANDALONE
 	if (boss.remaining_hits == 0)
 	{
 		// Laser was destroyed by player
@@ -656,7 +656,7 @@ function void fn070330()
 		// Character hit the laser
 		objA0.state = 0x20
 		playSound(0x6e)
-	#if STANDALONE	
+	#if STANDALONE
 		objA0.flags2a |= 0x40
 	#endif
 	}

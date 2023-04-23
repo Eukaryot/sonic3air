@@ -211,7 +211,7 @@ function void fn00c97a()
 			fn001506()
 
 			// Render continues digits
-			D0.u8 = u8[A3 + 0x3f] 	// Get continues data from save file
+			D0.u8 = u8[A3 + 0x3f]	// Get continues data from save file
 			fn00ca14()
 
 			D0 = VDPHelper.getDirectVRAMWriteCode(D7.u16 + 0x306)
@@ -1606,10 +1606,10 @@ function void fn00da1e()
 
 		if (D4.u16 != 0)		// Is Chaos Emerald collected?
 		{
-			++D1.u16			// Increase Chaos Emerald counter 
+			++D1.u16			// Increase Chaos Emerald counter
 			if (D4.u16 == 3)	// Is Super Emerald collected?
 			{
-				++D2.u16		// Increase Super Emerald counter 
+				++D2.u16		// Increase Super Emerald counter
 			}
 		}
 		if (D4.u16 >= 2)		// Is emerald state traded or Super Emerald collected?

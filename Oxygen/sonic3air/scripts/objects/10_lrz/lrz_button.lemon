@@ -46,13 +46,16 @@ function void fn042d16()
 	fn01dc56()
 
 	objA0.animation.sprite = 0
+
 	D0.u16 = objA0.subtype2c & 0x0f
-	A3 = 0xfffff7e0 + D0.s16
+	A3 = 0xfffff7e0 + D0.s16	// This points to one of "level.trigger00" ... "level.trigger0f"
+
 	D3 = (objA0.subtype2c & 0x40) ? 7 : 0
 	D6 = (D6 << 16) + (D6 >> 16)
 	D6.u16 &= 0x03
 	if (D6.u16 == 0)
 	{
+		// Button is released
 		if ((objA0.subtype2c & 0x10) == 0)
 		{
 			u8[A3] &= ~(1 << D3.u8)
@@ -60,6 +63,7 @@ function void fn042d16()
 	}
 	else
 	{
+		// Button is pressed
 		if (u8[A3] == 0)
 		{
 			playSound(SFX_CLICK)

@@ -727,10 +727,12 @@ function void fn0458b4()
 
 	if (global.zone == 0x03)
 	{
+		// Carnival Night Zone
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE1 | 0x04ee)
 	}
 	else if (global.zone == 0x16)
 	{
+		// Hidden Palace Zone
 		objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE3 | 0x052e)
 	}
 	else

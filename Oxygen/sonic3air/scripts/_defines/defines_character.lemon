@@ -220,7 +220,7 @@ define char.protection_flag		=  u8[A0 + 0x37]			// 0x80 is set by objects preven
 define char.character			=  u8[A0 + 0x38]			// 0 = Sonic, 1 = Tails, 2 = Knuckles (see CHARACTER_* constants)
 
 // Camera
-define char.look_up_down_timer 	=  u8[A0 + 0x39]			// Timer for looking up/down, before camera actually moves
+define char.look_up_down_timer	=  u8[A0 + 0x39]			// Timer for looking up/down, before camera actually moves
 
 // Ground sensors
 define char.angle_sensor_1		=  u8[A0 + 0x3a]

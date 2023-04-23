@@ -567,7 +567,7 @@ function void fn012872()
 	}
 	else if (D1.u8 == 2)
 	{
-		// Diagonal corkscrew walking animation, flips vertically and runs backwards when facing left 
+		// Diagonal corkscrew walking animation, flips vertically and runs backwards when facing left
 		if (char.flags & char.flag.FACING_LEFT)
 		{
 			char.render_flags |= (render_flag.FLIP_X | render_flag.FLIP_Y)

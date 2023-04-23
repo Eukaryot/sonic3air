@@ -728,7 +728,7 @@ function void fn068720()
 }
 
 
-// Update of the three rocket launchers + lid 
+// Update of the three rocket launchers + lid
 
 //# address-hook(0x06872c) end(0x068740)
 function void fn06872c()

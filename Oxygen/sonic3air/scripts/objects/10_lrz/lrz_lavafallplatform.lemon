@@ -71,7 +71,7 @@ function void fn079c9e()
 	if (u16[0xfffffaa4] != 0)
 	{
 		fn08594e()
-    	Object.TriggerUnloading()
+		Object.TriggerUnloading()
 	}
 	else
 	{
@@ -176,7 +176,7 @@ function void fn079dea()
 	if (u8[0xfffffaa3] == 0 && s8[A0 + 0x04] >= 0)
 	{
 		fn08594e()
-    	Object.TriggerUnloading()
+		Object.TriggerUnloading()
 	}
 	else
 	{
