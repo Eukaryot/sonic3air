@@ -462,39 +462,3 @@ function void fn029af8()
 
 	CheckForUnloadObject()
 }
-
-
-//# address-hook(0x01e68e) end(0x01e6c0)
-function void fn01e68e()
-{
-	objA0.mapping_offset = 0x01e758
-	objA0.sprite_attributes = 0x05a0
-	objA0.render_flags = render_flag.WORLD
-	objA0.sprite_priority = 0x0280
-	objA0.box_size.x = 0x0c
-	objA0.box_size.y = 0x0c
-	objA0.animation.timer = 3
-	objA0.animation.sprite = 1
-
-	objA0.update_address = 0x01e6c6
-	fn01e6c6()
-}
-
-
-//# address-hook(0x01e6c6) end(0x01e6e6)
-function void fn01e6c6()
-{
-	UpdateMovementStraightSimple()
-	--objA0.animation.timer
-	if (s8(objA0.animation.timer) < 0)
-	{
-		objA0.animation.timer = 3
-		++objA0.animation.sprite
-		if (objA0.animation.sprite == 5)
-		{
-			UnloadObject()
-			return
-		}
-	}
-	DrawObject()
-}

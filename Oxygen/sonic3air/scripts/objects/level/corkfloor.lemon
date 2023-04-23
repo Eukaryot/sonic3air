@@ -323,6 +323,7 @@ function void fn02a6d4()
 	u16[A0 + 0x38] = score.bonus_counter
 	u8[A0 + 0x34] = u8[0xffffb000 + 0x20]
 	u8[A0 + 0x36] = u8[0xffffb04a + 0x20]
+
 	A2 = 0x02a894
 	D1 = objA0.box_size.x + 11
 	D2 = objA0.box_size.y
@@ -435,94 +436,6 @@ function void fn02a816()
 	objA0.update_address = addressof(CorkFloor.Update)
 	Wall.Destroy()
 	CorkFloor.Update()
-}
-
-
-//# address-hook(0x01ddc6) end(0x01de1e)
-function void fn01ddc6()
-{
-	u32 backupD1 = D1
-	u32 backupD2 = D2
-	u32 backupD3 = D3
-	u32 backupD4 = D4
-
-	A1 = 0xffffb000
-	D6 = 3		// object.flag.P1_ON_OBJECT
-	fn01dddc()
-
-	D1 = backupD1
-	D2 = backupD2
-	D3 = backupD3
-	D4 = backupD4
-
-	A1 = 0xffffb04a
-	++D6.u8		// object.flag.P2_ON_OBJECT
-	fn01dddc()
-}
-
-
-function void fn01dddc()
-{
-	u8 bit = (1 << D6.u8)
-	if ((objA0.flags2a & bit) == 0)
-	{
-		fn01dece()
-	}
-	else
-	{
-		D2.u16 = D1.u16 * 2
-		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
-		{
-			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 +  D1.u16
-			if (D0.s16 >= 0 && D0.u16 < D2.u16)
-			{
-				D2.u16 = D4.u16
-				fn01e240()
-				D4.u16 = D6.u16
-				D4.u8 += 0x11
-				D6 |= (u32(1) << D4)
-				D4 = 0
-				return
-			}
-		}
-		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-		objA0.flags2a &= ~bit
-		D4 = 0
-	}
-}
-
-
-//# address-hook(0x01dece) end(0x01df24)
-function void fn01dece()
-{
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
-	D3.u16 = D1.u16 * 2
-	if (D0.s16 < 0 || D0.u16 > D3.u16)
-	{
-		fn01e0a2()
-		return
-	}
-
-	D5.u16 = D0.u16
-	if (objA0.render_flags & render_flag.FLIP_X)
-	{
-		D5.u16 = D3.u16 - D5.u16 - 1
-	}
-
-	D5.u16 >>= 1
-	D3.u8 = u8[A2 + D5.u16] - u8[A2]
-	D5.u16 = objA0.position.y.u16 - D3.s8
-	D2.u16 += s8[A1 + 0x1e]
-	D3.u16 = objA1.position.y.u16 - D5.u16 + D2.u16 + 4
-	D4.u16 = D2.u16 * 2
-	if (D3.s16 < 0 || D3.u16 >= D4.u16)
-	{
-		fn01e0a2()
-	}
-	else
-	{
-		fn01dffe()
-	}
 }
 
 

@@ -475,6 +475,266 @@ function void fn01dd24()
 
 
 
+// Used in corkfloor object
+
+//# address-hook(0x01ddc6) end(0x01de1e)
+function void fn01ddc6()
+{
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+
+	A1 = 0xffffb000
+	D6 = 3		// object.flag.P1_ON_OBJECT
+	fn01dddc()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb04a
+	++D6.u8		// object.flag.P2_ON_OBJECT
+	fn01dddc()
+}
+
+function void fn01dddc()
+{
+	u8 bit = (1 << D6.u8)
+	if ((objA0.flags2a & bit) == 0)
+	{
+		fn01dece()
+	}
+	else
+	{
+		D2.u16 = D1.u16 * 2
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 +  D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D2.u16)
+			{
+				D2.u16 = D4.u16
+				fn01e240()
+				D4.u16 = D6.u16
+				D4.u8 += 0x11
+				D6 |= (u32(1) << D4)
+				D4 = 0
+				return
+			}
+		}
+		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
+		objA0.flags2a &= ~bit
+		D4 = 0
+	}
+}
+
+
+// Used by LBZ tube transport and two FBZ platform objects
+
+//# address-hook(0x01de20) end(0x01deca)
+function void fn01de20()
+{
+	u32 backupD1 = D1
+	u32 backupD2 = D2
+	u32 backupD3 = D3
+	u32 backupD4 = D4
+
+	A1 = 0xffffb000
+	D6 = 3		// object.flag.P1_ON_OBJECT
+	fn01de36()
+
+	D1 = backupD1
+	D2 = backupD2
+	D3 = backupD3
+	D4 = backupD4
+
+	A1 = 0xffffb04a
+	++D6.u8		// object.flag.P2_ON_OBJECT
+	fn01de36()
+}
+
+function void fn01de36()
+{
+	u8 bit = (1 << D6.u8)
+
+	if (objA0.flags2a & bit)
+	{
+		if ((objA1.flags2a & char.flag.IN_AIR) == 0)
+		{
+			D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+			if (D0.s16 >= 0 && D0.u16 < D1.u16 * 2)
+			{
+				D0.u16 = objA0.position.y.u16 - D2.u16 + D3.u16
+				D1 = u8[A1 + 0x1e]
+				D0.u16 -= D1.u16
+				objA1.position.y.u16 = D0.u16
+				objA1.position.x.u16 -= (D4.u16 - objA0.position.x.u16)
+				D4 = 0
+				return
+			}
+		}
+
+		objA1.flags2a &= ~char.flag.ON_OBJECT
+		objA1.flags2a |= char.flag.IN_AIR
+
+		objA0.flags2a &= ~bit
+		D4 = 0
+	}
+	else
+	{
+		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+		if (D0.s16 >= 0 && D0.u16 <= D1.u16 * 2)
+		{
+			D5.u16 = objA0.position.y.u16 + D3.u16
+			D2.u16 += s8[A1 + 0x1e]
+			D3.u16 = objA1.position.y.u16 - D5.u16 + D2.u16 + 4
+			if (D3.s16 >= 0 && D3.u16 < D2.u16 * 2)
+			{
+				fn01dffe()
+				return
+			}
+
+		#if STANDALONE
+			// When moving fast vertically above, limit velocity to prevent phasing through (and maybe even getting killed because of that)
+			if (objA1.velocity.y > 0xc00 && D3.s16 >= -0x20 && D3.s16 < D2.s16 * 2)
+			{
+				objA1.velocity.y = 0xc00
+			}
+		#endif
+		}
+
+		fn01e0a2()
+	}
+}
+
+
+
+//# address-hook(0x01dece) end(0x01df24)
+function void fn01dece()
+{
+	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + D1.u16
+	D3.u16 = D1.u16 * 2
+	if (D0.s16 < 0 || D0.u16 > D3.u16)
+	{
+		fn01e0a2()
+		return
+	}
+
+	D5.u16 = D0.u16
+	if (objA0.render_flags & render_flag.FLIP_X)
+	{
+		D5.u16 = D3.u16 - D5.u16 - 1
+	}
+
+	D5.u16 >>= 1
+	D3.u8 = u8[A2 + D5.u16] - u8[A2]
+	D5.u16 = objA0.position.y.u16 - D3.s8
+	D2.u16 += s8[A1 + 0x1e]
+	D3.u16 = objA1.position.y.u16 - D5.u16 + D2.u16 + 4
+	D4.u16 = D2.u16 * 2
+	if (D3.s16 < 0 || D3.u16 >= D4.u16)
+	{
+		fn01e0a2()
+	}
+	else
+	{
+		fn01dffe()
+	}
+}
+
+
+
+// Small smoke cloud - used in CNZ cannon, LBZ booster tube, and fire shield
+
+//# address-hook(0x01e68e) end(0x01e6c0)
+function void fn01e68e()
+{
+	objA0.mapping_offset = 0x01e758
+	objA0.sprite_attributes = 0x05a0
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0280
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x0c
+	objA0.animation.timer = 3
+	objA0.animation.sprite = 1
+
+	objA0.update_address = 0x01e6c6
+	fn01e6c6()
+}
+
+
+//# address-hook(0x01e6c6) end(0x01e6e6)
+function void fn01e6c6()
+{
+	UpdateMovementStraightSimple()
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 3
+		++objA0.animation.sprite
+		if (objA0.animation.sprite == 5)
+		{
+			UnloadObject()
+			return
+		}
+	}
+	DrawObject()
+}
+
+
+
+// Object used in AIZ 2 boss and bridges
+
+//# address-hook(0x01e6ec) end(0x01e718)
+function void fn01e6ec()
+{
+	objA0.mapping_offset = 0x01e758
+	objA0.sprite_attributes = (sprite_attribute.PRIORITY | 0x05a0)
+	objA0.render_flags = render_flag.WORLD
+	objA0.sprite_priority = 0x0100
+	objA0.box_size.x = 0x0c
+	objA0.box_size.y = 0x0c
+	objA0.animation.sprite = 0
+
+	objA0.update_address = 0x01e71e
+	fn01e71e()
+}
+
+
+//# address-hook(0x01e71e) end(0x01e72c)
+function void fn01e71e()
+{
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) >= 0)
+		return
+
+	objA0.animation.timer = 3
+	objA0.update_address = 0x01e732
+	fn01e732()
+}
+
+
+//# address-hook(0x01e732) end(0x01e752)
+function void fn01e732()
+{
+	UpdateMovementStraightSimple()
+	--objA0.animation.timer
+	if (s8(objA0.animation.timer) < 0)
+	{
+		objA0.animation.timer = 7
+		++objA0.animation.sprite
+		if (objA0.animation.sprite == 5)
+		{
+			UnloadObject()
+			return
+		}
+	}
+	DrawObject()
+}
+
+
+
 // Unknown
 
 //# address-hook(0x08598a) end(0x0859cc)
