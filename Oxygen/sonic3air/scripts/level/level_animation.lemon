@@ -128,30 +128,25 @@ function void fn02788c()
 			return
 		}
 
-		if (D1.s16 < 0)
+		bool negativeD1 = (D1.s16 < 0)
+		D1.s16 = 0x60 - abs(D1.s16)
+		if (D1.s16 >= 0)
 		{
-			D1.u16 += 0x60
-			if (D1.s16 >= 0)
+			A4 = 0xffff7c00
+			A5 = 0x26d000 + D1.u16 * 96
+			u32 baseAddress = negativeD1 ? 0x2a6a60 : 0x2a6d60
+
+			for (u8 i = 0; i < 0x60; ++i)
 			{
-				D0.u16 = D1.u16
-				D1.u16 *= 96
-				A4 = 0xffff7c00
-				A5 = 0x26d000 + D1.u16
-				D1.u16 = 0x5f
+				A0 = baseAddress + u8[A5] * 4
+				u32[A4] = u32[A0]
+				u32[A4 + 0x0180] = u32[A0 + 0x0600]
+				A4 += 4
+				++A5
+			}
 
-				while (D1.s16 >= 0)
-				{
-					D0 = u8[(A5+=1)-1]
-					D0.u16 *= 4
-					A0 = 0x2a6a60 + D0.u16
-					u32[A4] = u32[A0]
-					A0 += 0x0600
-					A4 += 0x0180
-					u32[A4] = u32[A0]
-					A4 -= 0x017c
-					--D1.s16
-				}
-
+			if (negativeD1)
+			{
 				updateSpritePattern(0xffff7c00, 0x5b80, 0x180)
 
 				if (s16[A3 + 0x02] >= 0)
@@ -160,30 +155,8 @@ function void fn02788c()
 					fn0279ac()
 				}
 			}
-		}
-		else
-		{
-			D1.s16 = 0x60 - D1.s16
-			if (D1.s16 >= 0)
+			else
 			{
-				D0.u16 = D1.u16
-				D1.u16 *= 96
-				A4 = 0xffff7c00
-				A5 = 0x26d000 + D1.u16
-				D1.u16 = 0x5f
-				while (D1.s16 >= 0)
-				{
-					D0 = u8[(A5+=1)-1]
-					D0.u16 *= 4
-					A0 = 0x2a6d60 + D0.u16
-					u32[A4] = u32[A0]
-					A0 += 0x0600
-					A4 += 0x0180
-					u32[A4] = u32[A0]
-					A4 -= 0x017c
-					--D1.s16
-				}
-
 				updateSpritePattern(0xffff7c00, 0x5e80, 0x180)
 
 				if (u16[A3 + 0x02] != 0)

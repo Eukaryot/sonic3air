@@ -178,8 +178,7 @@ function void InitSaveSlots()
 			A0 = 0xffffe6ac
 			A1 = 0xff0000
 			A2 = 0x00c306
-			D0 = 0x05
-			while (D0.s16 >= 0)
+			for (u8 slot = 0; slot < 6; ++slot)
 			{
 				if (s8[A1] >= 0)
 				{
@@ -191,11 +190,10 @@ function void InitSaveSlots()
 					u8[A0 + 0x03] = u8[A2 + D1.u16]
 					D1.u8 = u8[A1 + 0x04]
 					u8[A0 + 0x02] |= D1.u8
-					D1.u8 = u8[A1 + 0x06]
 
+					D1.u8 = u8[A1 + 0x06]
 					D2 = 0
-					D3 = 0x06
-					while (D3.s16 >= 0)
+					for (u8 emerald = 0; emerald < 7; ++emerald)
 					{
 						if (D1.u8 & 0x01)
 						{
@@ -203,14 +201,12 @@ function void InitSaveSlots()
 						}
 						D1.u8 <<= 1
 						D2.u16 <<= 2
-						--D3.s16
 					}
 					u16[A0 + 0x06] = D2.u16
 				}
 
 				A0 += 0x0a
 				A1 += 8
-				--D0.s16
 			}
 		}
 

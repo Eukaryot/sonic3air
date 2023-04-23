@@ -579,14 +579,12 @@ function void fn01aaa2()
 {
 	D0 = 0
 	D1 = 1
-	D7 = 0x50
-	while (D7 > 0)
+	for (u8 i = 0; i < 0x50; ++i)
 	{
 		u16[A0] = 0
 		u8[A0 + 3] = D1.u8
 		A0 += 8
 		++D1.u16
-		--D7
 	}
 	u8[A0 - 5] = 0
 }
