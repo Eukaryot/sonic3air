@@ -863,7 +863,7 @@ function void fn06d2a4()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = u8[A1 + 0x3a]
 	objA0.value3a = D0.u8
-	A3 = A2 + D0.s16 * 2
+	A3 = A2 + D0.u16 * 2
 	u8[A0 + 0x42] = u8[(A3+=1)-1]
 	u8[A0 + 0x43] = u8[(A3+=1)-1]
 	objA0.animation.sprite = u8[(A3+=1)-1]

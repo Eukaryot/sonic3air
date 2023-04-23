@@ -178,7 +178,7 @@ function void fn0426b0()
 	objA1.velocity.y = D0.u16
 	D0 = (u16[A2] >> 1) & 0xff
 	D0.u16 = D0 / 0x16
-	u8[A1 + 0x22] = u8[0x042792 + D0.s16]
+	u8[A1 + 0x22] = u8[0x042792 + D0.u16]
 
 	D0 = u8[A1 + 0x22]
 	SetCharacterSpritePatterns()

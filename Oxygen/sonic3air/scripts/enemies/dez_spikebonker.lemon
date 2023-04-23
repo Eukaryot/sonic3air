@@ -231,7 +231,7 @@ function void fn091bfa()
 	D1 = 0
 	while (true)
 	{
-		A1 = 0x091c0e + D1.s16
+		A1 = 0x091c0e + D1.u16
 		if (D0.u8 <= u8[(A1+=1)-1])
 			break
 

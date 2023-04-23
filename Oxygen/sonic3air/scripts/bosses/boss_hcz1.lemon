@@ -921,7 +921,7 @@ function void fn06a710()
 	D0.u16 &= 0x03
 	objA0.animation.sprite = D0.u8
 	A1 = 0x06a6a8
-	u32[A0 + 0x30] = u32[A1 + D0.s16 * 4]
+	u32[A0 + 0x30] = u32[A1 + D0.u16 * 4]
 	objA0.velocity.y = 0x0200
 	objA0.countdown_value = 0xbf
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)

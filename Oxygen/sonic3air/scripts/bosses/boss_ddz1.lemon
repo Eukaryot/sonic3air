@@ -375,7 +375,7 @@ function void fn081e82()
 
 	objA0.update_address = 0x081eb8
 	D0 = objA0.subtype2c * 2
-	A1 = 0x081eac + D0.s16
+	A1 = 0x081eac + D0.u16
 	objA0.value42 = u16[(A1+=2)-2]
 	u16[A0 + 0x44] = u16[(A1+=2)-2]
 	D0.u16 *= 4
@@ -729,7 +729,7 @@ function void fn082f78()
 	}
 
 	objA0.value39 += 2
-	A2 = 0x082fd4 + D0.s16
+	A2 = 0x082fd4 + D0.u16
 
 	if (allocDynamicObjectStd())
 	{

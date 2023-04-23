@@ -16,11 +16,11 @@
 function void fn025f6a()
 {
 	D0.u8 = objA0.subtype2c
-	D1.u8 = D0.u8 & 0x0f
+	D1.u8 = objA0.subtype2c & 0x0f
 	if (u8[A0 + 0x34] == 0)
 	{
 		A3 = 0xfffff7e0
-		if (u8[A3 + D0.s16] != 0)
+		if (u8[A3 + D0.u16] != 0)
 		{
 			D0.u16 += 4
 		}
@@ -28,7 +28,7 @@ function void fn025f6a()
 
 	D0.u8 >>= 1
 	D0.u16 &= 0x38
-	A1 = 0x025f2a + D0.s16
+	A1 = 0x025f2a + D0.u16
 	objA0.mapping_offset = 0x224de6
 	objA0.sprite_attributes = (sprite_attribute.PALETTE.LINE2 | 0x03c3)
 	objA0.render_flags = render_flag.WORLD
@@ -93,7 +93,7 @@ function void fn026044()
 {
 	D0.u16 = objA0.subtype2c & 0x0f
 	A3 = 0xfffff7e0
-	if (u8[A3 + D0.s16] != 0)
+	if (u8[A3 + D0.u16] != 0)
 	{
 		++objA0.animation.sprite
 		u16[A0 + 0x38] = 7

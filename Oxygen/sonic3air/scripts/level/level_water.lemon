@@ -105,7 +105,7 @@ function void fn00717c()
 		{
 			A2 = 0xffff8000
 			D0.u16 = (objA1.position.y.u16 >> 5) & level.chunksize.bitmask
-			D0.u16 = u16[A2 + D0.s16 + 8]
+			D0.u16 = u16[A2 + D0.u16 + 8]
 			D0.u16 += objA1.position.x.u16 >> 7
 
 			A2 = 0xffff0000 + D0.u16
@@ -140,7 +140,7 @@ function void fn0071e4()
 	{
 		A2 = 0xffff8000
 		D0.u16 = (objA1.position.y.u16 >> 5) & level.chunksize.bitmask
-		D0.u16 = u16[A2 + D0.s16 + 8]
+		D0.u16 = u16[A2 + D0.u16 + 8]
 		D0.u16 += objA1.position.x.u16 >> 7
 
 		A2 = 0xffff0000 + D0.u16
@@ -265,7 +265,7 @@ function void fn00730c()
 		D0.u16 += objA1.position.y.u16
 		D0.u16 >>= 5
 		D0.u16 &= level.chunksize.bitmask
-		D0.u16 = u16[A2 + D0.s16 + 0x08]
+		D0.u16 = u16[A2 + D0.u16 + 8]
 		D1.u16 = objA1.position.x.u16
 		D1.u16 >>= 7
 		D0.u16 += D1.u16

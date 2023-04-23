@@ -87,6 +87,6 @@ function void fn090744()
 	objA0.position.y.u16 = objA1.position.y.u16
 
 	D0 = u8[A1 + 0x3b] >> 1
-	objA0.animation.sprite = u8[0x090768 + D0.s16]
+	objA0.animation.sprite = u8[0x090768 + D0.u16]
 	fn084920()
 }

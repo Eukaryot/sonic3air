@@ -2017,7 +2017,7 @@ function void fn0844ce()
 		u8[A1 + 0x24] = u8[A2]
 		D0 = u8[A1 + 0x23] + 2
 		u8[A1 + 0x23] = D0.u8
-		D1.u8 = u8[A2 + D0.s16 + 0x01]
+		D1.u8 = u8[A2 + D0.u16 + 1]
 		if (D1.u8 == 0)
 		{
 			fn085fc4()
@@ -2028,7 +2028,7 @@ function void fn0844ce()
 
 		u8[A1 + 0x22] = D1.u8
 		objA1.render_flags &= ~render_flag.FLIP_X
-		if (u8[A2 + D0.s16 + 0x02] != 0)
+		if (u8[A2 + D0.u16 + 2] != 0)
 		{
 			objA1.render_flags |= render_flag.FLIP_X
 		}

@@ -226,10 +226,8 @@ function void fn0297a2()
 		D0.u16 = u16[(A2+=2)-2] - 4
 		u16[A4 + 0x04] = D0.u16
 		A2 += D0.s16
-		D4.u16 = u16[(A2+=2)-2]
-		objA1.position.x.u16 = D4.u16
-		D5.u16 = u16[(A2+=2)-2]
-		objA1.position.y.u16 = D5.u16
+		objA1.position.x.u16 = u16[(A2+=2)-2]
+		objA1.position.y.u16 = u16[(A2+=2)-2]
 		A2 -= 8
 	}
 	else
@@ -239,15 +237,11 @@ function void fn0297a2()
 			D0 = 0
 		}
 
-		D0.u16 &= 0x1f
-		D0.u16 *= 4
-		A2 = u32[0x1e3f18 + D0.s16]
-		D0.u16 = u16[(A2+=2)-2] - 4
-		u16[A4 + 0x04] = D0.u16
-		D4.u16 = u16[(A2+=2)-2]
-		objA1.position.x.u16 = D4.u16
-		D5.u16 = u16[(A2+=2)-2]
-		objA1.position.y.u16 = D5.u16
+		D0.u16 = (D0.u16 & 0x1f) * 4
+		A2 = u32[0x1e3f18 + D0.u16]
+		u16[A4 + 0x04] = u16[(A2+=2)-2] - 4
+		objA1.position.x.u16 = u16[(A2+=2)-2]
+		objA1.position.y.u16 = u16[(A2+=2)-2]
 	}
 
 	u32[A4 + 0x06] = A2
@@ -381,7 +375,7 @@ function void fn02990a()
 			objA1.sprite_priority = 0x0380
 
 			D0.u16 = u16[A0 + 0x26]
-			A2 = 0x029992 + D0.s16
+			A2 = 0x029992 + D0.u16
 			objA1.velocity.x = u16[(A2+=2)-2]
 			objA1.velocity.y = u16[(A2+=2)-2]
 			objA1.render_flags = u8[(A2+=1)-1]

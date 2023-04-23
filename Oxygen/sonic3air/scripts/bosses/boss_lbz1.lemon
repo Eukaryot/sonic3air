@@ -536,7 +536,7 @@ function void fn072910()
 	objA0.countdown_callback = addressof(Object.TriggerUnloading)
 
 	D0 = objA0.subtype2c * 2
-	A1 = 0x07293e + D0.s16
+	A1 = 0x07293e + D0.u16
 	objA0.velocity.x = u16[(A1+=2)-2]
 	objA0.velocity.y = u16[(A1+=2)-2]
 }

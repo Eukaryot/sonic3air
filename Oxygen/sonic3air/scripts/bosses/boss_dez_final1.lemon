@@ -230,7 +230,7 @@ function void fn07ff3e()
 	playSound(0x9b)
 
 	D0 = u8[A0 + 0x30]
-	call 0x07ff8e + D0.s16
+	call 0x07ff8e + D0.u16
 }
 
 //# address-hook(0x07ff8e) end(0x07ff8e)

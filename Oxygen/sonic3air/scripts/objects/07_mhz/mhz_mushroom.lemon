@@ -86,7 +86,7 @@ function void fn03e0de()
 {
 	D0 = u8[0xfffff7ff]
 	D0.u8 += u8[A0 + 0x36]
-	A1 = 0x03e106 + D0.s16
+	A1 = 0x03e106 + D0.u16
 
 	objA0.position.x.u16 = u16[A0 + 0x38] + s8[(A1+=1)-1]
 	objA0.position.y.u16 = u16[A0 + 0x3a] + s8[(A1+=1)-1]

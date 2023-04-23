@@ -547,19 +547,18 @@ function void fn08af3e()
 	setupObjectAttributesFull(0x08b14c)
 	objA0.update_address = 0x08af9e
 	D0 = objA0.subtype2c
-	D1.u16 = u16[0x08af86 + D0.s16]
-	D1.s16 = -D1.s16
-	objA0.velocity.y = D1.u16
+	D1.s16 = -s16[0x08af86 + D0.u16]
+	objA0.velocity.y = D1.s16
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	if ((objA1.render_flags & render_flag.FLIP_X) == 0)
 		D1.s16 = -D1.s16
 
 	objA0.velocity.x = D1.u16
 	D0.u16 >>= 1
-	D0.u8 = u8[0x08af96 + D0.s16]
+	D0.u8 = u8[0x08af96 + D0.u16]
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	objA0.position.x.u16 = u16[A1 + D0.s16]
-	objA0.position.y.u16 = u16[A1 + D0.s16 + 0x02]
+	objA0.position.x.u16 = u16[A1 + D0.u16]
+	objA0.position.y.u16 = u16[A1 + D0.u16 + 2]
 }
 
 

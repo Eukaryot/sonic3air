@@ -777,12 +777,10 @@ function void fn073f1c()
 //# address-hook(0x073f42) end(0x073f62)
 function void fn073f42()
 {
-	D0 = u16(objA0.subtype2c) * 8
-	A1 = 0x073f64 + D0.s16
-	D0.u16 = u16[(A1+=2)-2]
-	objA0.position.x.u16 += D0.u16
-	D0.u16 = u16[(A1+=2)-2]
-	objA0.position.y.u16 += D0.u16
+	D0 = objA0.subtype2c * 8
+	A1 = 0x073f64 + D0.u16
+	objA0.position.x.u16 += u16[(A1+=2)-2]
+	objA0.position.y.u16 += u16[(A1+=2)-2]
 	objA0.velocity.x = u16[(A1+=2)-2]
 	objA0.velocity.y = u16[(A1+=2)-2]
 }
@@ -801,7 +799,7 @@ function void fn073f7c()
 		D1.u16 = D2.u16
 	}
 
-	A1 = 0x073fae + D0.s16 * 2
+	A1 = 0x073fae + D0.u16 * 2
 	objA0.velocity.x = u16[(A1+=2)-2]
 	objA0.velocity.y = u16[(A1+=2)-2]
 	D1.u16 >>= 1

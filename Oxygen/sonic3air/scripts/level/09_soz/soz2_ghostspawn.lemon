@@ -43,7 +43,7 @@ function void fn08f0ca()
 	if (u8[0xfffff7c3] != 0)
 	{
 		D0 = u8[0xfffff7c3]
-		D0.u8 = u8[0x08f118 + D0.s16]
+		D0.u8 = u8[0x08f118 + D0.u16]
 		D1.u8 = u8[0xfffffaad]
 		if (D1.u8 >= D0.u8)
 			return
@@ -218,7 +218,7 @@ function void fn08f226()
 
 	objA0.base_state = 0x08
 	D0 = u8[0xfffff7c3]
-	D1.u8 = u8[0x08f268 + D0.s16]
+	D1.u8 = u8[0x08f268 + D0.u16]
 	if (D1.u8 == 0)
 		return
 
@@ -250,7 +250,7 @@ function void fn08f26e()
 			D0.u8 = u8[0xfffff7c3]
 			u8[A0 + 0x42] = D0.u8
 			D0.u16 = (D0.u16 * 2) & 0x0c
-			A1 = u32[0x08f2b2 + D0.s16]
+			A1 = u32[0x08f2b2 + D0.u16]
 			objA0.animation.sprite = u8[A1]
 
 			Object.ResetAnimationProgress()
@@ -342,13 +342,13 @@ function void fn08f37a()
 function void fn08f390()
 {
 	D0 = objA0.subtype2c
-	A1 = u32[0x08f3be + D0.s16]
+	A1 = u32[0x08f3be + D0.u16]
 	fn0858f8()
 	if (D0.u16 == 0)
 		return
 
 	D0 = objA0.subtype2c
-	A1 = u32[0x08f3c6 + D0.s16]
+	A1 = u32[0x08f3c6 + D0.u16]
 	call A1
 
 	UnloadObject()
@@ -524,14 +524,14 @@ function void fn08f538()
 function void fn08f58e()
 {
 	D0 = u8[0xfffff7c3] * 2
-	D1.u16 = u16[0x08f582 + D0.s16]
+	D1.u16 = u16[0x08f582 + D0.u16]
 	if (objA0.velocity.x >= 0)
 	{
 		D1.s16 = -D1.s16
 	}
 	objA0.velocity.x = D1.u16
 	D0.u16 *= 2
-	A1 = u32[0x08f5c8 + D0.s16]
+	A1 = u32[0x08f5c8 + D0.u16]
 	objA0.flags38 &= ~0x01
 
 	call A1

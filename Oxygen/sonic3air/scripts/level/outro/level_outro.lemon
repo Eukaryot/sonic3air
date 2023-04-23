@@ -587,7 +587,7 @@ function void InitLevelScrolling.Outro()
 function void UpdateLevelScrolling.Outro()
 {
 	D0.u16 = level.scrolling_routine
-	call 0x05af32 + D0.s16
+	call 0x05af32 + D0.u16
 }
 
 //# address-hook(0x05af32) end(0x05af32)

@@ -757,8 +757,8 @@ function void fn00b0c2()
 function void fn00b0d4()
 {
 	D1.u16 *= 4
-	u16[(A1+=2)-2] = u16[A2 + D1.s16]
-	u16[A1 + 0x0e] = u16[A2 + D1.s16 + 0x02]
+	u16[(A1+=2)-2] = u16[A2 + D1.u16]
+	u16[A1 + 0x0e] = u16[A2 + D1.u16 + 2]
 }
 
 

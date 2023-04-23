@@ -704,7 +704,7 @@ function void UpdateLevelScrolling.MHZ2()
 	fn04f368()
 
 	D0.u16 = level.scrolling_routine
-	call 0x0551c6 + D0.s16
+	call 0x0551c6 + D0.u16
 }
 
 

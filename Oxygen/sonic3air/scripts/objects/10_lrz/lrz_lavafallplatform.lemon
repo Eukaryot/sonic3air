@@ -16,7 +16,7 @@
 function void fn079c52()
 {
 	D0 = objA0.subtype2c * 4
-	call 0x079c5e + D0.s16
+	call 0x079c5e + D0.u16
 }
 
 //# address-hook(0x079c5e) end(0x079c5e)
@@ -339,7 +339,7 @@ function void fn079f14()
 function void fn079f30()
 {
 	D0.u16 = (objA0.position.x.u16 - 0x09e0) >> 1
-	D1 = 0x0642 - u8[0xffffa900 + D0.s16]
+	D1 = 0x0642 - u8[0xffffa900 + D0.u16]
 	D1.u16 += u16[A0 + 0x26]
 	objA0.position.y.u16 = D1.u16
 }
@@ -404,7 +404,7 @@ function void fn07a07c()
 {
 	D0 = objA0.subtype2c >> 1
 	D1.u16 = objA0.subtype2c
-	objA0.animation.sprite = u8[0x07a0ba + D0.s16]
+	objA0.animation.sprite = u8[0x07a0ba + D0.u16]
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D2.u16 = objA1.position.x.u16

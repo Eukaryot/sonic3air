@@ -539,9 +539,8 @@ function void fn0867d6()
 //# address-hook(0x086a64) end(0x086a72)
 function void fn086a64()
 {
-	D0 = objA0.subtype2c
-	D0.u16 >>= 1
-	objA0.animation.sprite = u8[0x086a74 + D0.s16]
+	D0 = objA0.subtype2c >> 1
+	objA0.animation.sprite = u8[0x086a74 + D0.u16]
 }
 
 

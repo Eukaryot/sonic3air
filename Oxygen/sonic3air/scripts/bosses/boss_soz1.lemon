@@ -755,10 +755,10 @@ function void fn07706c()
 
 	objA0.update_address = 0x0770c4
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	D0.s16 = s8[A0 + 0x42]
+	s16 dx = s8[A0 + 0x42]
 	if (objA1.render_flags & render_flag.FLIP_X)
-		D0.s16 = -D0.s16
-	D1.u16 = objA1.position.x.u16 + D0.s16
+		dx = -dx
+	D1.u16 = objA1.position.x.u16 + dx
 
 	A2 = 0x0770b8 + objA0.subtype2c
 	D0 = u8[(A2+=1)-1]

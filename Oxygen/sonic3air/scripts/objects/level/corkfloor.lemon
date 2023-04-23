@@ -431,7 +431,7 @@ function void fn02a816()
 	D0 = objA0.animation.sprite
 	++objA0.animation.sprite
 	D1 = D0
-	A4 = 0x02a84c + D0.s16 * 4
+	A4 = 0x02a84c + D0.u16 * 4
 	objA0.update_address = addressof(CorkFloor.Update)
 	Wall.Destroy()
 	CorkFloor.Update()

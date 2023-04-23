@@ -236,7 +236,7 @@ function void fn01f914()
 	objA1.position.y.u16 = newPosY
 
 	D0 = (u16[A2] >> 1) / 11
-	u8[A1 + 0x22] = u8[0x01f99a + D0.s16]
+	u8[A1 + 0x22] = u8[0x01f99a + D0.u16]
 	D0 = u8[A1 + 0x22]
 	SetCharacterSpritePatterns()
 }

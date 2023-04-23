@@ -53,7 +53,7 @@ function void fn01e85c()
 {
 	D0.u16 = objA0.subtype2c & 0x03
 	objA0.animation.sprite = D0.u8
-	objA0.value32 = u16[0x01e854 + D0.s16 * 2]
+	objA0.value32 = u16[0x01e854 + D0.u16 * 2]
 	D1.u16 = objA0.position.x.u16
 
 	A1 = 0xffffb000

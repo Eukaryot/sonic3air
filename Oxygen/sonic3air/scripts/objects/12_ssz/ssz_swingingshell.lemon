@@ -192,8 +192,8 @@ function void fn0462b6()
 
 	A1 = 0xffff0000 + u16[A0 + 0x2e]
 	D0.u16 = (objA1.compound.count - 1) * 6
-	objA0.position.x.u16 = u16[A1 + D0.s16 + 0x18]
-	D0.u16 = u16[A1 + D0.s16 + 0x1a] + 0x0c
+	objA0.position.x.u16 = u16[A1 + D0.u16 + 0x18]
+	D0.u16 = u16[A1 + D0.u16 + 0x1a] + 0x0c
 	objA0.position.y.u16 = D0.u16
 
 	D1 = 0x23

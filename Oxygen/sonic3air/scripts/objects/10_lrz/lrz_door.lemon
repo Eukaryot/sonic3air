@@ -48,7 +48,7 @@ function void fn042974_inner(bool firstUpdate)
 {
 	A3 = 0xfffff7e0
 	D0.u16 = objA0.subtype2c & 0x0f
-	if (u8[A3 + D0.s16] != 0)
+	if (u8[A3 + D0.u16] != 0)
 	{
 	#if STANDALONE
 		if (!firstUpdate)	// No opening sound if door just got spawned, this just leads to a confusing door sound somewhere offscreen

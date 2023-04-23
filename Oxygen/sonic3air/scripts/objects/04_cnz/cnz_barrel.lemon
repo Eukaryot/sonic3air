@@ -460,10 +460,9 @@ function void fn032610()
 {
 	D0.u8 += 0x0b
 	D0.u16 = D0 / 0x16
-	u8[A1 + 0x22] = u8[0x03263e + D0.s16]
+	u8[A1 + 0x22] = u8[0x03263e + D0.u16]
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
-	D0.u8 = u8[0x03264a + D0.s16]
-	objA1.render_flags |= D0.u8
+	objA1.render_flags |= u8[0x03264a + D0.u16]
 	D0 = u8[A1 + 0x22]
 
 	u32 backupA2 = A2

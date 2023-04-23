@@ -20,7 +20,7 @@ function void fn040546()
 	objA0.sprite_priority = 0x0280
 
 	D0 = (objA0.subtype2c & 0x1f) * 4
-	A1 = u32[0x1e3fd8 + D0.s16]
+	A1 = u32[0x1e3fd8 + D0.u16]
 	u16[A0 + 0x3a] = u16[(A1+=2)-2]
 	u32[A0 + 0x36] = A1
 	if (s8[A0 + 0x2c] < 0)

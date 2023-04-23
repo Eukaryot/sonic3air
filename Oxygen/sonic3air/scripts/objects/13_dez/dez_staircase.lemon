@@ -82,7 +82,7 @@ function void fn0476fe()
 {
 	A2 = 0xffff0000 + objA0.value3e
 	D0 = u8[A0 + 0x33]
-	objA0.position.y.u16 = u16[A2 + D0.s16] + u16[A0 + 0x46]
+	objA0.position.y.u16 = u16[A2 + D0.u16] + u16[A0 + 0x46]
 	D1.u16 = 0x1b
 	D2.u16 = 0x10
 	D3.u16 = 0x11

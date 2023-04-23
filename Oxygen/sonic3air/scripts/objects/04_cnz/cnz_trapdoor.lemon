@@ -146,7 +146,7 @@ function void fn030fd2()
 	D0.u16 &= 0x7f
 
 	objA0.animation.sprite = D0.u8
-	A1 = 0x030fce + D0.s16 * 4
+	A1 = 0x030fce + D0.u16 * 4
 	objA0.box_size.x = u8[(A1+=1)-1]
 	objA0.box_size.y = u8[(A1+=1)-1]
 	objA0.sprite_attributes = u16[(A1+=2)-2]

@@ -163,10 +163,9 @@ function void fn087b4c()
 //# address-hook(0x087b56) end(0x087b86)
 function void fn087b56()
 {
-	// Looks like the search for a large bugernaut after own parent was destroyed
+	// Search for a large bugernaut after own parent was destroyed
 	A2 = 0xffffb128
-	D0.u16 = 0x59
-	while (D0.s16 >= 0)
+	for (u8 i = 0; i < 0x5a; ++i)
 	{
 		if (u32[A2] == 0x087a2a)
 		{
@@ -182,7 +181,6 @@ function void fn087b56()
 		}
 
 		A2 += 0x4a
-		--D0.s16
 	}
 
 	_setZeroFlagByValue(0)

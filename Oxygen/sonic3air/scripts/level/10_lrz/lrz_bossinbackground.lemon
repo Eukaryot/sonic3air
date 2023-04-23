@@ -225,7 +225,7 @@ function void fn079142()
 	u16[A0 + 0x3c] = objA0.position.y.u16
 	D1.u16 = objA0.subtype2c
 	D0 = objA0.subtype2c >> 1
-	objA0.animation.sprite = u8[0x07917e + D0.s16]
+	objA0.animation.sprite = u8[0x07917e + D0.u16]
 	u32[A0 + 0x18] = u32[0x079182 + D1.s16 * 2]
 	objA0.countdown_value = 0x0b
 }
@@ -495,7 +495,7 @@ function void fn079516()
 {
 	D1.u16 = objA0.subtype2c
 	D0.u16 = objA0.subtype2c >> 1
-	objA0.animation.sprite = u8[0x079554 + D0.s16]
+	objA0.animation.sprite = u8[0x079554 + D0.u16]
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	A2 = 0x079566 + D1.s16

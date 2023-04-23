@@ -160,7 +160,7 @@ function bool fn08a916()
 		}
 
 		objA0.value39 = D0.u8
-		A1 = 0x08a97a + D0.s16
+		A1 = 0x08a97a + D0.u16
 		u8[A0 + 0x43] = u8[(A1+=1)-1]
 		objA0.animation.sprite = u8[(A1+=1)-1]
 		D2.u8 = u8[(A1+=1)-1]

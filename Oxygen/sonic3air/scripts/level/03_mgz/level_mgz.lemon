@@ -936,7 +936,7 @@ function void fn051762()
 			D0.u16 = u16[0xffffeede]
 			A1 = 0x23cfa0
 			D0.u16 += u16[A1 + D2.s16]
-			D2.u16 = u16[A1 + D2.s16 + 0x02]
+			D2.u16 = u16[A1 + D2.s16 + 2]
 
 			while (D2.s16 >= 0)
 			{

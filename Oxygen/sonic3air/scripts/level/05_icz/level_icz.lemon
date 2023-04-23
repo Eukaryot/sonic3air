@@ -48,7 +48,7 @@ function void InitLevelTiles.ICZ1()
 function void UpdateLevelTiles.ICZ1()
 {
 	D0.u16 = level.scrolling_routine
-	call 0x05366a + D0.s16
+	call 0x05366a + D0.u16
 }
 
 
@@ -135,7 +135,7 @@ function void InitLevelScrolling.ICZ1()
 function void UpdateLevelScrolling.ICZ1()
 {
 	D0.u16 = level.scrolling_routine
-	call 0x05372c + D0.s16
+	call 0x05372c + D0.u16
 }
 
 

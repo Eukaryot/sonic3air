@@ -288,7 +288,7 @@ function void fn089dee()
 	D0.u16 = u8[A1 + D0.u16] * 8
 
 	A2 = 0x02c7ea
-	objA0.mapping_offset = u32[A2 + D0.s16 + 0x04]
+	objA0.mapping_offset = u32[A2 + D0.u16 + 4]
 	D1.u16 <<= 2
 	objA0.countdown_value = D1.u16
 

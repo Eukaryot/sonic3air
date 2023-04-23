@@ -1042,9 +1042,9 @@ function void fn00937c()
 	D1.u16 = 0x10
 	D0.u16 = posbackup.offset.player1
 	D0.u8 -= D1.u8
-	D2.u8 = u8[A1 + D0.u16 + 0x02]
+	D2.u8 = u8[A1 + D0.u16 + 2]
 	D0.u8 -= 4
-	D1.u8 = u8[A1 + D0.u16 + 0x02]
+	D1.u8 = u8[A1 + D0.u16 + 2]
 	D0 = (D2.u8 == 0x81 || D1.s8 >= 0) ? 0 : 0x70
 }
 

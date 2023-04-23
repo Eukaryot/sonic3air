@@ -1731,7 +1731,7 @@ function void InitLevelScrolling.FBZ2()
 function void UpdateLevelScrolling.FBZ2()
 {
 	D0.u16 = level.scrolling_routine
-	call 0x053024 + D0.s16
+	call 0x053024 + D0.u16
 }
 
 //# address-hook(0x053024) end(0x053024)

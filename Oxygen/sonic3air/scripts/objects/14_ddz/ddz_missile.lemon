@@ -315,7 +315,7 @@ function void fn082ad8()
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	D0 = u8[A1 + 0x3d]
 	objA0.animation.sprite = 0x10 + D0.u8
-	objA0.value42 = u16[0x082af6 + D0.s16 * 2]
+	objA0.value42 = u16[0x082af6 + D0.u16 * 2]
 }
 
 

@@ -204,7 +204,7 @@ function void fn0338c4()
 				D0.s8 = -D0.s8
 				D0.u16 &= 0xff
 				D0.u16 = D0 / 0x0b
-				u8[A1 + 0x22] = u8[0x033ac6 + D0.s16]
+				u8[A1 + 0x22] = u8[0x033ac6 + D0.u16]
 				D0 = u8[A1 + 0x22]
 				SetCharacterSpritePatterns()
 				return
@@ -322,7 +322,7 @@ function void fn033bba()
 	D0.s8 = -D0.s8
 	D0.u16 &= 0xff
 	D0.u16 = D0 / 0x0b
-	u8[A1 + 0x22] = u8[0x033c1c + D0.s16]
+	u8[A1 + 0x22] = u8[0x033c1c + D0.u16]
 	u8[A1 + 0x20] = 0
 	D0 = u8[A1 + 0x22]
 	SetCharacterSpritePatterns()

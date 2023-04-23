@@ -1318,7 +1318,7 @@ function void fn074e30()
 	GetRandomNumber()
 	D0.u16 &= 0x3c
 
-	A1 = 0x074e7c + D0.s16
+	A1 = 0x074e7c + D0.u16
 	objA0.position.x.u16 = u16[(A1+=2)-2]
 	objA0.position.y.u16 = u16[(A1+=2)-2]
 	objA0.update_address = addressof(Object.CountdownAndTrigger)

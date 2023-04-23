@@ -1608,7 +1608,7 @@ function void fn07ce90()
 	objA0.update_address = 0x07cf02
 
 	D0 = objA0.subtype2c
-	A1 = 0x07cee2 + D0.s16
+	A1 = 0x07cee2 + D0.u16
 	D1.s16 = s8[(A1+=1)-1]
 	A2 = 0xffff0000 + u16[A0 + 0x46]
 	if (u8[A2 + 0x04] & 0x01)
@@ -1774,7 +1774,7 @@ function void fn07d162()
 function void fn07d192()
 {
 	D0 = objA0.subtype2c
-	A1 = 0x07d1a6 + D0.s16
+	A1 = 0x07d1a6 + D0.u16
 	u32[A0 + 0x30] = u32[(A1+=4)-4]
 	objA0.countdown_callback = u32[(A1+=4)-4]
 }
@@ -1785,7 +1785,7 @@ function void fn07d1b6()
 {
 	fn07d1ea()
 	D0 = u8[A0 + 0x42] * 4
-	A1 = 0x07d1ce + D0.s16
+	A1 = 0x07d1ce + D0.u16
 
 	while (true)
 	{

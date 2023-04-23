@@ -75,8 +75,8 @@ function void fn08b6ae()
 	D0 = (D0 << 16) + (D0 >> 16)
 	D1.u16 = D0.u16
 	D0.u16 &= 0x03
-	objA0.animation.sprite = u8[0x08b714 + D0.s16]
-	objA0.sprite_priority = u16[0x08b718 + D0.s16 * 2]
+	objA0.animation.sprite = u8[0x08b714 + D0.u16]
+	objA0.sprite_priority = u16[0x08b718 + D0.u16 * 2]
 	objA0.velocity.x = (D1.u16 & 0x3c) - 0x20
 	objA0.velocity.y = 0x0100
 }

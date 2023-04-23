@@ -48,7 +48,7 @@ function void AfterImages.Update()
 	objA0.position.x.u16 = u16[(A1+=2)-2]
 	objA0.position.y.u16 = u16[(A1+=2)-2]
 	A1 = 0xffffe400
-	u8[A0 + 0x0a] = u8[A1 + D0.s16 + 0x03]
+	u8[A0 + 0x0a] = u8[A1 + D0.s16 + 3]
 	objA0.animation.sprite = u8[0xffffb000 + 0x22]
 	objA0.render_flags = u8[0xffffb000 + 0x04]
 	objA0.sprite_priority = u16[0xffffb000 + 0x08]

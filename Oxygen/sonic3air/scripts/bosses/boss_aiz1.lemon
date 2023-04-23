@@ -1046,11 +1046,10 @@ function void fn0689f8()
 	Object.AnimationProgressByLocalA1.DistinctTimer()
 	if (D2.s16 > 0)
 	{
-		D0.u16 = u16[0x068a18 + D0.s16]
+		s16 dx = u16[0x068a18 + D0.s16]
 		if ((objA0.render_flags & render_flag.FLIP_X) == 0)
-			D0.s16 = -D0.s16
-
-		objA0.position.x.u16 += D0.u16
+			dx = -dx
+		objA0.position.x.u16 += dx
 	}
 }
 

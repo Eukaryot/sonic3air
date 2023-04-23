@@ -729,11 +729,11 @@ function void CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 				}
 				D3.u8 += D0.u8
 				D1 = char.animation.frame
-				D0.u8 = u8[A1 + D1.s16 + 0x01]
+				D0.u8 = u8[A1 + D1.s16 + 1]
 				if (D0.u8 == 0xff)
 				{
 					char.animation.frame = 0
-					D0.u8 = u8[A1 + 0x01]
+					D0.u8 = u8[A1 + 1]
 				}
 				char.animation.sprite = D0.u8 + D3.u8
 				--char.animation.timer
@@ -796,27 +796,27 @@ function void CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 
 // 0x012d90:
 	D1 = char.animation.frame
-	D0.u8 = u8[A1 + D1.s16 + 0x01]
+	D0.u8 = u8[A1 + D1.u16 + 1]
 	if (D0.u8 >= 0xfc)
 	{
 		if (D0.u8 == 0xff)
 		{
 			// Loop animation from the start
 			char.animation.frame = 0
-			D0.u8 = u8[A1 + 0x01]
+			D0.u8 = u8[A1 + 1]
 		}
 		else if (D0.u8 == 0xfe)
 		{
 			// Loop animation from specific frame
-			D0.u8 = u8[A1 + D1.s16 + 0x02]
+			D0.u8 = u8[A1 + D1.u16 + 2]
 			char.animation.frame -= D0.u8
 			D1.u8 -= D0.u8
-			D0.u8 = u8[A1 + D1.s16 + 0x01]
+			D0.u8 = u8[A1 + D1.u16 + 1]
 		}
 		else if (D0.u8 == 0xfd)
 		{
 			// Change to another animation
-			char.state = u8[A1 + D1.s16 + 0x02]
+			char.state = u8[A1 + D1.u16 + 2]
 			return
 		}
 		else if (D0.u8 == 0xfc)
@@ -944,11 +944,11 @@ function void CompetitionMode.UpdateTailsAnimation_inner()
 			}
 			D3.u8 += D0.u8
 			D1 = char.animation.frame
-			D0.u8 = u8[A1 + D1.s16 + 0x01]
+			D0.u8 = u8[A1 + D1.s16 + 1]
 			if (D0.u8 == 0xff)
 			{
 				char.animation.frame = 0
-				D0.u8 = u8[A1 + 0x01]
+				D0.u8 = u8[A1 + 1]
 			}
 			char.animation.sprite = D0.u8 + D3.u8
 			--char.animation.timer
@@ -1047,27 +1047,27 @@ function void CompetitionMode.UpdateTailsAnimation_inner()
 function void CompetitionMode.updateTailsAnimation_shared()
 {
 	D1 = char.animation.frame
-	D0.u8 = u8[A1 + D1.s16 + 0x01]
+	D0.u8 = u8[A1 + D1.s16 + 1]
 	if (D0.u8 >= 0xf0)
 	{
 		if (D0.u8 == 0xff)
 		{
 			// Loop animation from the start
 			char.animation.frame = 0
-			D0.u8 = u8[A1 + 0x01]
+			D0.u8 = u8[A1 + 1]
 		}
 		else if (D0.u8 == 0xfe)
 		{
 			// Loop animation from specific frame
-			D0.u8 = u8[A1 + D1.s16 + 0x02]
+			D0.u8 = u8[A1 + D1.s16 + 2]
 			char.animation.frame -= D0.u8
 			D1.u8 -= D0.u8
-			D0.u8 = u8[A1 + D1.s16 + 0x01]
+			D0.u8 = u8[A1 + D1.s16 + 1]
 		}
 		else if (D0.u8 == 0xfd)
 		{
 			// Change to another animation
-			char.state = u8[A1 + D1.s16 + 0x02]
+			char.state = u8[A1 + D1.s16 + 2]
 			return
 		}
 		else

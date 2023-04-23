@@ -116,7 +116,7 @@ function void UpdateLevelTiles.CNZ1()
 function void UpdateLevelScrolling.CNZ1()
 {
 	D0.u16 = level.scrolling_routine
-	call 0x051c8e + D0.s16
+	call 0x051c8e + D0.u16
 
 #if STANDALONE
 	if (level.scrolling_routine >= 0x04)
@@ -695,7 +695,7 @@ function void fn0521d2()
 function void UpdateLevelScrolling.CNZ2()
 {
 	D0.u16 = level.scrolling_routine
-	call 0x05222c + D0.s16
+	call 0x05222c + D0.u16
 }
 
 

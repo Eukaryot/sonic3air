@@ -34,7 +34,7 @@ function void fn034302()
 
 	A3 = 0xfffff7e0
 	D0.u16 = objA0.subtype2c & 0x0f
-	if (u8[A3 + D0.s16] != 0)
+	if (u8[A3 + D0.u16] != 0)
 	{
 		u8[A0 + 0x34] = 1
 		objA0.animation.sprite = 0
@@ -90,7 +90,7 @@ function void fn03438e()
 
 						A3 = 0xfffff7e0
 						D0.u16 = objA0.subtype2c & 0x0f
-						u8[A3 + D0.s16] = 1
+						u8[A3 + D0.u16] = 1
 					}
 
 					objA1.position.x.u16 = objA0.position.x.u16

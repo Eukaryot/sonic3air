@@ -201,20 +201,14 @@ function void fn05607e()
 //# address-hook(0x0560a2) end(0x0560da)
 function void fn0560a2()
 {
-	D1.u16 = level.framecounter & 0x03
-	if (D1.u16 == 0)
-	{
+	if ((level.framecounter & 0x03) == 0)
 		D0.u16 *= 2
-	}
 	objA0.countdown_value += D0.u16
-
-	D0.u16 = objA0.velocity.y + objA0.countdown_value
-	objA0.position.y.u16 = D0.u16
+	objA0.position.y.u16 = objA0.velocity.y + objA0.countdown_value
 
 	A1 = 0x04f438
 	D0.u16 = objA0.countdown_value & 0x3f
-	D0.u16 = (u8[A1 + D0.s16] & 0x01) + objA0.velocity.x
-	objA0.position.x.u16 = D0.u16
+	objA0.position.x.u16 = (u8[A1 + D0.u16] & 0x01) + objA0.velocity.x
 
 	#if STANDALONE
 		// Mask out sprites below the ground, but except the leftmost part (because of HUD and the sand pit)

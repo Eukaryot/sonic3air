@@ -196,7 +196,7 @@ function void fn0275f2()
 	D0 = objA0.animation.sprite * 2
 	A3 = objA0.mapping_offset
 	A2 = A3 + 0x1a
-	A2 += u16[A3 + D0.s16]
+	A2 += u16[A3 + D0.u16]
 	D4 = 0x0275b2
 	D5.u8 = objA0.render_flags
 	D1 = 0x0b
@@ -229,7 +229,7 @@ function void fn0275f2()
 	}
 
 	D0 = objA0.animation.sprite * 2
-	A3 = objA0.mapping_offset + u16[A3 + D0.s16]
+	A3 = objA0.mapping_offset + u16[A3 + D0.u16]
 	D1.u16 = u16[(A3+=2)-2] - 1		// Only "A3 += 2" seems relevant here
 	D1 = 3
 	objA0.render_flags |= render_flag.STATIC_MAPPING

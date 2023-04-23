@@ -59,7 +59,7 @@ function void Spikes.Init()
 //# address-hook(0x024034) end(0x02408e)
 function void fn024034()
 {
-	A1 = 0x024024 + D0.s16
+	A1 = 0x024024 + D0.u16
 	objA0.box_size.x = u8[(A1+=1)-1]
 	objA0.box_size.y = u8[(A1+=1)-1]
 	objA0.update_address = 0x02418e

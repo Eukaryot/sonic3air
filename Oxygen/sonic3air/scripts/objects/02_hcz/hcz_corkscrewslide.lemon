@@ -12,10 +12,10 @@
 function void fn03907c()
 {
 	D0.u16 = (objA0.subtype2c & 0x7f) * 8
-	A1 = 0x03903c + D0.s16
-	u16[A0 + 0x30] = u16[(A1+=2)-2]
-	objA0.value32 = u16[(A1+=2)-2]
-	u32[A0 + 0x40] = u32[(A1+=4)-4]
+	A1 = 0x03903c + D0.u16
+	u16[A0 + 0x30] = u16[A1]
+	objA0.value32  = u16[A1+2]
+	u32[A0 + 0x40] = u32[A1+4]
 
 	objA0.update_address = 0x03909c
 	fn03909c()

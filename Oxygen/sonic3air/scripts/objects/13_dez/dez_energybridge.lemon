@@ -22,7 +22,7 @@ function void fn047dde()
 	objA0.sprite_priority = 0x0300
 
 	D0.u16 = (objA0.subtype2c & 0x0c) >> 1
-	D0.u16 = u16[0x047dd6 + D0.s16]
+	D0.u16 = u16[0x047dd6 + D0.u16]
 	objA0.value32 = D0.u16
 	D0 = (D0.u16 + 1) >> 4
 	D1.u16 = (objA0.subtype2c & 0xf0) >> 4

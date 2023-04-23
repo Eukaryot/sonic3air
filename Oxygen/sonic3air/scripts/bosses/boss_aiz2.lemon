@@ -304,7 +304,7 @@ function void fn069a66()
 			break
 	}
 
-	A1 = 0x069ac8 + D0.s16
+	A1 = 0x069ac8 + D0.u16
 
 	D2 = u16[0xfffffa84] + u16[(A1+=2)-2]
 	D2 = (D2 << 16)

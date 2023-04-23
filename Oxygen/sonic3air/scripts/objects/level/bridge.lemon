@@ -368,7 +368,7 @@ function void fn038aa2()
 					A2 = objA0.countdown_callback
 					D0.u16 -= 8
 				}
-				D0.u16 = u16[A2 + D0.s16 * 6 + 0x1a] - 8
+				D0.u16 = u16[A2 + 0x1a + D0.u16 * 6] - 8
 				D1 = u8[A1 + 0x1e]
 				D0.u16 -= D1.u16
 				objA1.position.y.u16 = D0.u16
@@ -562,15 +562,15 @@ function void fn038c8e()
 	if (D0.u8 < 8)
 	{
 		D0.u16 *= 6
-		if (u8[A1 + D0.s16] == 0)
-			u8[A1 + D0.s16] = 1
+		if (u8[A1 + D0.u16] == 0)
+			u8[A1 + D0.u16] = 1
 	}
 	else
 	{
 		D0.u16 -= 8
 		D0.u16 *= 6
-		if (u8[A2 + D0.s16] == 0)
-			u8[A2 + D0.s16] = 1
+		if (u8[A2 + D0.u16] == 0)
+			u8[A2 + D0.u16] = 1
 	}
 }
 

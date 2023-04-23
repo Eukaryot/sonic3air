@@ -1044,7 +1044,7 @@ function void fn059ba4()
 		D2.u16 = (D0.u16 >> 5) & 0xfffc
 		A1 = 0xffff0000 + u16[A3 + D2.s16]
 		u8[A1 + D3.u16] = 0x17
-		u8[A1 + D3.u16 + 0x01] = 0x17
+		u8[A1 + D3.u16 + 1] = 0x17
 
 		D2 = 0xffffff80
 		D0.u16 = (D0.u16 & D2.u16) + 0x30

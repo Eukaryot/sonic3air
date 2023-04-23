@@ -197,7 +197,7 @@ function void UpdateLevelScrolling.DEZ_Boss()
 	fn05a76c()
 
 	D0.u16 = level.scrolling_routine
-	call 0x05a558 + D0.s16
+	call 0x05a558 + D0.u16
 }
 
 //# address-hook(0x05a558) end(0x05a558)

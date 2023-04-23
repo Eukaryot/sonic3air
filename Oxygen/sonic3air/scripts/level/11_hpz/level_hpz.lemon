@@ -108,7 +108,7 @@ function void UpdateLevelTiles.HPZ()
 function void UpdateLevelScrolling.HPZ()
 {
 	D0.u16 = level.scrolling_routine
-	call 0x05a214 + D0.s16
+	call 0x05a214 + D0.u16
 }
 
 

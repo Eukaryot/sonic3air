@@ -1610,11 +1610,10 @@ function void fn065226()
 	setupObjectAttributesFull(0x06651e)
 	objA0.update_address = 0x065276
 	D0 = objA0.subtype2c
-	D1.u16 = D0.u16
-	objA0.value42 = u16[0x065262 + D0.s16]
-	objA0.countdown_value = u16[0x06526c + D0.s16]
-	D1.u16 >>= 1
-	objA0.animation.sprite = u8[0x06525c + D1.s16]
+	objA0.value42 = u16[0x065262 + D0.u16]
+	objA0.countdown_value = u16[0x06526c + D0.u16]
+	D1.u16 = objA0.subtype2c >> 1
+	objA0.animation.sprite = u8[0x06525c + D1.u16]
 	objA0.countdown_callback = 0x065288
 }
 
@@ -1890,7 +1889,7 @@ function void fn0654fa()
 		{
 			++D0.u16
 		}
-		objA0.animation.sprite = u8[0x065550 + D0.s16]
+		objA0.animation.sprite = u8[0x065550 + D0.u16]
 
 		A2 = 0x184d9c
 		fn084cf4()

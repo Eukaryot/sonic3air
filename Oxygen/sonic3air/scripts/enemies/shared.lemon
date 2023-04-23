@@ -1009,7 +1009,7 @@ function void Object.AnimationProgress.DistinctTimer_CheckFlipX()		// "Animate_R
 
 			// Advance to next frame
 			objA0.animation.sprite = D1.u8
-			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]		// Set unique timer value for new frame
+			objA0.animation.timer = u8[A1 + D0.u16 + 1]		// Set unique timer value for new frame
 			D2 = 1
 		}
 	}
@@ -1064,7 +1064,7 @@ function void Object.AnimationProgress.DistinctTimer_CheckFlipY()		// "Animate_R
 
 			// Advance to next frame
 			objA0.animation.sprite = D1.u8
-			objA0.animation.timer = u8[A1 + D0.s16 + 0x01]		// Set unique timer value for new frame
+			objA0.animation.timer = u8[A1 + D0.s16 + 1]		// Set unique timer value for new frame
 
 			D2 = 1
 			return
@@ -1112,7 +1112,7 @@ function void Object.AnimationProgress.CheckEnd_DistinctTimer()		// "Animate_Raw
 
 	objA0.animation.frame += 2
 	D0 = objA0.animation.frame
-	A2 = A1 + D0.s16
+	A2 = A1 + D0.u16
 	D1 = u8[(A2+=1)-1]
 	if (D1.u8 == 0xff)
 	{
@@ -1229,7 +1229,7 @@ function void Object.AnimationProgress.SpeedUp()		// "Animate_RawNoSSTGetFaster"
 	{
 		D2.u8 = objA0.flags2e
 		D0 = objA0.animation.frame + 1
-		D1.u8 = u8[A1 + D0.s16 + 2]		// Advance to next frame
+		D1.u8 = u8[A1 + D0.u16 + 2]		// Advance to next frame
 		if (D1.s8 < 0)
 		{
 			// Reached end of animation
@@ -1307,7 +1307,7 @@ function void Object.AnimationProgress.SlowDown()		// "Animate_RawNoSSTGetSlower
 
 	D2.u8 = objA0.flags2e
 	D0 = objA0.animation.frame + 1
-	D1.u8 = u8[A1 + D0.s16 + 1]		// Advance to next frame
+	D1.u8 = u8[A1 + D0.u16 + 1]		// Advance to next frame
 	if (D1.s8 < 0)
 	{
 		// Reached end of animation
