@@ -1505,15 +1505,18 @@ function void fn01e006()
 					fn01e042()
 				}
 				else
-				{
-					// Getting crushed
-					u32 backupA0 = A0
-					A0 = A1
-					Character.Die()
-					A0 = backupA0
+				{					
+					if (objA1.value26 != 0x80)
+					{
+						// Getting crushed
+						u32 backupA0 = A0
+						A0 = A1
+						Character.Die()
+						A0 = backupA0
 
-					D6 |= (u32(1) << (D6.u16 + 15))
-					D4 = 0xfffffffe
+						D6 |= (u32(1) << (D6.u16 + 15))
+						D4 = 0xfffffffe
+					}
 				}
 				return
 			}
