@@ -1505,8 +1505,11 @@ function void fn01e006()
 					fn01e042()
 				}
 				else
-				{					
+				{
+				#if STANDALONE
+					// Fix ceiling run crush, e.g. occasional crush death by HCZ 2's first rotating pillar, fix #contributed by Elsie The Pict
 					if (objA1.value26 != 0x80)
+				#endif
 					{
 						// Getting crushed
 						u32 backupA0 = A0
