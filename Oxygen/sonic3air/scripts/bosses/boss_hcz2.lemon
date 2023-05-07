@@ -1115,7 +1115,7 @@ function void fn06b9c8()
 			{
 				D2.s32 = -D2.s32
 			}
-			u32[A1 + 0x10] += D2
+			objA1.position.x += D2
 		}
 	}
 }

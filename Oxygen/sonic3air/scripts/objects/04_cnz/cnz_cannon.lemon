@@ -175,7 +175,7 @@ function void fn0319f4()
 		D0.u16 = objA1.velocity.y
 		objA1.velocity.y += 0x38
 		D0.s32 = s32(D0.s16) << 8
-		u32[A1 + 0x14] += D0
+		objA1.position.y += D0
 		if (objA1.position.y.u16 > objA0.position.y.u16)
 		{
 			objA1.position.y.u16 = objA0.position.y.u16

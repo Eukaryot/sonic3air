@@ -168,11 +168,7 @@ function void fn048dca()
 	--u16[A4 + 0x06]
 	if (s16[A4 + 0x06] >= 0)
 	{
-		D3 = u32[A1 + 0x14]
-		D0.s32 = objA1.velocity.y
-		D0.s32 <<= 8
-		D3 += D0
-		u32[A1 + 0x14] = D3
+		objA1.position.y += s32(objA1.velocity.y) << 8
 		fn048d66()
 		return
 	}

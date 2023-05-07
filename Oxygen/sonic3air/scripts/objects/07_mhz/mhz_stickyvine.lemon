@@ -101,8 +101,8 @@ function void fn03eb26()
 	}
 #endif
 
-	D0 = u32[A1 + 0x10]
-	D1 = u32[A1 + 0x14]
+	D0 = objA1.position.x
+	D1 = objA1.position.y
 
 	fn03ec2a()
 	fn03ec66()
@@ -244,22 +244,20 @@ function void fn03ec2a()
 //# address-hook(0x03ec66) end(0x03ed08)
 function void fn03ec66()
 {
-	D1 = (D1 << 16) + (D1 >> 16)
-	D2 = (D2 << 16) + (D2 >> 16)
+	D1 >>= 16
+	D2 >>= 16
 	D3.u16 = abs(D1.s16)
 	D4.u16 = abs(D2.s16)
 	D3.u16 = (D3.u16 + D4.u16) * 2
 	LookupAngleByVector()
 	LookupSinCos()
-	D1.s32 = s32(D1.s16) * D3.s16
-	D1.s32 <<= 2
-	D0.s32 = s32(D0.s16) * D3.s16
-	D0.s32 <<= 1
+	D1.s32 = (s32(D1.s16) * D3.s16) << 2
+	D0.s32 = (s32(D0.s16) * D3.s16) << 1
+	objA1.position.x -= D1
 
-	u32[A1 + 0x10] -= D1
 	if (u8[A1 + 0x2a] & char.flag.IN_AIR)
 	{
-		u32[A1 + 0x14] -= D0
+		objA1.position.y -= D0
 		if (objA1.velocity.y >= 0)
 		{
 			objA1.velocity.x >>= 1
@@ -302,8 +300,8 @@ function void fn03ec66()
 		--u8[A0 + 0x3e]
 		if (u8[A0 + 0x3e] == 0)
 		{
-			u32[A0 + 0x30] = u32[A1 + 0x10]
-			objA0.countdown_callback = u32[A1 + 0x14]
+			u32[A0 + 0x30] = objA1.position.x
+			u32[A0 + 0x34] = objA1.position.y
 			objA0.velocity.y = -0x600
 			u8[A0 + 0x3d] = 0
 			u8[A0 + 0x3e] = 0

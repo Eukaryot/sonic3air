@@ -74,11 +74,9 @@ function void fn042028()
 //# address-hook(0x042092) end(0x0420a4)
 function void fn042092()
 {
-	D0.u16 = objA1.velocity.y
+	// Character falling straight down
+	objA1.position.y += s32(objA1.velocity.y) << 8
 	objA1.velocity.y += 0x38
-	D0.s32 = D0.s16
-	D0 <<= 8
-	u32[A1 + 0x14] += D0
 }
 
 

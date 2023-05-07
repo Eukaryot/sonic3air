@@ -56,11 +56,11 @@ function void fn033cac()
 
 			D0.s32 = objA1.velocity.x
 			D0 <<= 8
-			u32[A1 + 0x10] += D0
+			objA1.position.x += D0
 			D0.s32 = objA1.velocity.y
 			objA1.velocity.y += 0x38
 			D0 <<= 8
-			u32[A1 + 0x14] += D0
+			objA1.position.y += D0
 			return
 		}
 
@@ -78,7 +78,7 @@ function void fn033cac()
 					D0.u8 &= 0x7f
 					if (D0.u16 == 0x40)
 					{
-						u32[A2] = u32[A1 + 0x14]
+						u32[A2] = objA1.position.y
 						u16[A2] = u16[A2] - objA0.position.y.u16
 						fn033c34()
 

@@ -216,7 +216,7 @@ function void fn03fe70()
 				#else
 					objA1.velocity.x >>= 1
 				#endif
-					u32[A1 + 0x10] += (objA0.flags2a & 0x01) ? -0xb000 : 0xb000
+					objA1.position.x += (objA0.flags2a & 0x01) ? -0xb000 : 0xb000
 				}
 				return
 			}

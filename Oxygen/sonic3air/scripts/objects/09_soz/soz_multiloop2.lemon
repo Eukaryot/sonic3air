@@ -68,15 +68,11 @@ function void fn040474()
 	}
 	else
 	{
-		D0.s32 = objA1.velocity.x
-		D0 <<= 8
-		u32[A1 + 0x10] += D0
-		D0.u16 = objA1.velocity.y
+		objA1.position.x += s32(objA1.velocity.x) << 8
+		objA1.position.y += s32(objA1.velocity.y) << 8
 		objA1.velocity.y += 0x38
-		D0.s32 = s32(D0.s16) << 8
-		u32[A1 + 0x14] += D0
 
-		D0.u16 = objA1.position.y.u16 - u16[A0 + 0x30]
+		D0.s16 = objA1.position.y.u16 - u16[A0 + 0x30]
 		if (D0.s16 >= s16(objA0.position.y.u16))
 		{
 			u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT

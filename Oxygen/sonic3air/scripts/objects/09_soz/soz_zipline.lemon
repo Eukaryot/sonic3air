@@ -561,8 +561,8 @@ function void fn04ad7a()
 		--D4.s16
 	}
 
-	objA0.position.x = D0 + u32[A1 + 0x10]
-	objA0.position.y = D1 + u32[A1 + 0x14]
+	objA0.position.x = D0 + objA1.position.x
+	objA0.position.y = D1 + objA1.position.y
 
 	D1.u16 = objA0.velocity.x
 	D2.u16 = objA0.velocity.y
@@ -629,18 +629,11 @@ function void fn04ae92()
 //# address-hook(0x04aee0) end(0x04af08)
 function void fn04aee0()
 {
-	D0.u16 = objA1.velocity.x
-	objA0.velocity.x = D0.u16
-	D0.s32 = D0.s16
-	D0 <<= 8
-	D0 += u32[A1 + 0x10]
+	objA0.velocity.x = objA1.velocity.x
+	objA0.velocity.y = objA1.velocity.y
+	D0 = objA1.position.x + s32(objA1.velocity.x) << 8
+	D1 = objA1.position.y + s32(objA1.velocity.y) << 8
 	objA0.position.x = D0
-
-	D1.u16 = objA1.velocity.y
-	objA0.velocity.y = D1.u16
-	D1.s32 = D1.s16
-	D1 <<= 8
-	D1 += u32[A1 + 0x14]
 	objA0.position.y = D1
 }
 

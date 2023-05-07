@@ -66,7 +66,7 @@ function void fn033392()
 					if (u8[A1 + 0x2a] & char.flag.IN_AIR && objA1.velocity.y < 0)
 						return
 
-					u32[A2] = u32[A1 + 0x10]
+					u32[A2] = objA1.position.x
 					D0.u16 = u16[A2] - objA0.position.x.u16 + 0x40
 					u16[A2] = D0.u16
 					D0.u16 -= 0x18
@@ -93,7 +93,7 @@ function void fn033392()
 					A3 = 0xffff0000 + u16[A1 + 0x42]
 					if (u32[A3] == 0x033376)
 					{
-						u32[A2] = u32[A1 + 0x10]
+						u32[A2] = objA1.position.x
 						D0.u16 = u16[A2] - objA0.position.x.u16 + 0x40
 						u16[A2] = D0.u16
 						D0.u16 -= 0x20
@@ -220,7 +220,7 @@ function void fn0335c4()
 					if (u8[A1 + 0x2a] & char.flag.IN_AIR && objA1.velocity.y < 0)
 						return
 
-					u32[A2] = u32[A1 + 0x10]
+					u32[A2] = objA1.position.x
 					D0.u16 = u16[A2] - objA0.position.x.u16 + 0x60
 					u16[A2] = D0.u16
 					D0.u16 -= 0x18
@@ -247,7 +247,7 @@ function void fn0335c4()
 					A3 = 0xffff0000 + u16[A1 + 0x42]
 					if (u32[A3] == 0x0335a8)
 					{
-						u32[A2] = u32[A1 + 0x10]
+						u32[A2] = objA1.position.x
 						D0.u16 = u16[A2] - objA0.position.x.u16 + 0x60
 						u16[A2] = D0.u16
 						D0.u16 -= 0x20

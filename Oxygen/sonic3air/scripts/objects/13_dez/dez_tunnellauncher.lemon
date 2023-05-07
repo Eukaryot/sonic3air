@@ -384,8 +384,8 @@ function void fn0485ae()
 function void fn048638()
 {
 	// Move ahead with current velocity
-	u32[A1 + 0x10] += s32(objA1.velocity.x) << 8
-	u32[A1 + 0x14] += s32(objA1.velocity.y) << 8
+	objA1.position.x += s32(objA1.velocity.x) << 8
+	objA1.position.y += s32(objA1.velocity.y) << 8
 }
 
 
