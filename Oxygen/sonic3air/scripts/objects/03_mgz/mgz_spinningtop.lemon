@@ -287,12 +287,7 @@ function void fn034f04()
 	if (s8[A1 + 0x37] >= 0)
 	{
 		u8[A4] += 0x02
-		u8[A4 + 0x01] = 0
-		D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
-		if (D0.s16 < 0)
-		{
-			u8[A4 + 0x01] = 0x01
-		}
+		u8[A4 + 1] = (objA0.position.x.u16 < objA1.position.x.u16) ? 1 : 0
 		fn034f6a()
 	}
 }
@@ -324,22 +319,30 @@ function void fn034f6a()
 		u8[A4] = 0
 	}
 
-	D0.u16 = objA1.position.x.u16 - objA0.position.x.u16
-	if (u8[A4 + 0x01] != 0)
+	// Check if character is close enough to the center of the spinning top
+	s16 dx = objA1.position.x.u16 - objA0.position.x.u16
+	if (u8[A4 + 1] != 0)
 	{
-		D0.u16 += 0x0f
+		dx += 0x0f
 	}
-	if (D0.u16 < 0x10)
+	if (dx >= 0 && dx < 0x10)
 	{
-		objA1.position.x.u16 = objA0.position.x.u16
-		u8[A1 + 0x1e] = u8[A1 + 0x44] + 0x18
-		u8[A1 + 0x2a] |= char.flag.IN_AIR
-		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
-		u8[A1 + 0x2e] |= 0x01
-		u8[A1 + 0x37] = 0x80
+	#if STANDALONE
+		// Also check y-position difference, to prevent a possible softlock here
+		s16 dy = objA1.position.y.u16 - objA0.position.y.u16
+		if (dy >= -0x24 && dy <= -0x18)
+	#endif
+		{
+			objA1.position.x.u16 = objA0.position.x.u16
+			objA1.hitbox_extends.y = u8[A1 + 0x44] + 0x18
+			objA1.flags2a |= char.flag.IN_AIR
+			objA1.flags2a &= ~char.flag.ON_OBJECT
+			objA1.flags2e |= 0x01		// Enable control lock for normal movement
+			u8[A1 + 0x37] = 0x80		// char.protection_flag
 
-		objA0.flags2a &= ~bit
-		u8[A4] += 2
+			objA0.flags2a &= ~bit
+			u8[A4] += 2
+		}
 	}
 }
 
