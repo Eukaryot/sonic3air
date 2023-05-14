@@ -185,8 +185,8 @@ function void fn0296d4()
 //# address-hook(0x029768) end(0x02978c)
 function void fn029768()
 {
-	D2 = objA1.position.x + s32(objA1.velocity.x) << 8
-	D3 = objA1.position.y + s32(objA1.velocity.y) << 8
+	D2 = objA1.position.x + (objA1.velocity.x << 8)
+	D3 = objA1.position.y + (objA1.velocity.y << 8)
 	objA1.position.x = D2
 	objA1.position.y = D3
 }
