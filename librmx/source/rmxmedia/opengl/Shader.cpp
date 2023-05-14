@@ -13,9 +13,6 @@
 
 /* ----- Shader -------------------------------------------------------------------------------------------------- */
 
-std::function<void(String&, Shader::ShaderType)> Shader::mShaderSourcePostProcessCallback;
-
-
 Shader::Shader()
 {
 }
@@ -126,12 +123,21 @@ void Shader::bind()
 {
 	if (mBlendMode != BlendMode::UNDEFINED)
 	{
-		switch (mBlendMode)
+		bool handled = false;
+		if (mShaderApplyBlendModeCallback)
 		{
-			case BlendMode::OPAQUE: glBlendFunc(GL_ONE, GL_ZERO);  break;
-			case BlendMode::ALPHA:  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  break;
-			case BlendMode::ADD:    glBlendFunc(GL_ONE, GL_ONE);   break;
-			default:				glBlendFunc(GL_ONE, GL_ZERO);  break;
+			handled = Shader::mShaderApplyBlendModeCallback(mBlendMode);
+		}
+
+		if (!handled)
+		{
+			switch (mBlendMode)
+			{
+				case BlendMode::OPAQUE: glBlendFunc(GL_ONE, GL_ZERO);  break;
+				case BlendMode::ALPHA:  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  break;
+				case BlendMode::ADD:    glBlendFunc(GL_ONE, GL_ONE);   break;
+				default:				glBlendFunc(GL_ONE, GL_ZERO);  break;
+			}
 		}
 	}
 	glUseProgram(mProgram);

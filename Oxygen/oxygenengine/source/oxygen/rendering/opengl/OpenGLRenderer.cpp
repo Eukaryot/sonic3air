@@ -337,7 +337,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 				case SpriteManager::SpriteInfo::Type::VDP:
 				{
 					const SpriteManager::VdpSpriteInfo& spriteInfo = static_cast<const SpriteManager::VdpSpriteInfo&>(sg.mSpriteInfo);
-					OpenGLDrawerResources::setBlendMode(BlendMode::ONE_BIT);
+					OpenGLDrawerResources::setBlendMode(spriteInfo.mBlendMode);
 					RenderVdpSpriteShader& shader = mRenderVdpSpriteShader;
 					if (needsRefresh)
 					{

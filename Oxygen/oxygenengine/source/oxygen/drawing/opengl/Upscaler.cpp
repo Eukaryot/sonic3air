@@ -145,7 +145,7 @@ void Upscaler::renderImage(const Rectf& rect, GLuint textureHandle, Vec2i textur
 	}
 
 	// Disable blending (though it shouldn't be necessary, as upscaling shaders usually do this already)
-	glDisable(GL_BLEND);
+	OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
 
 	opengl::VertexArrayObject& vao = OpenGLDrawerResources::getSimpleQuadVAO();
 	vao.bind();

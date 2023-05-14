@@ -57,6 +57,18 @@ namespace opengldrawer
 	#endif
 	}
 
+	bool applyShaderBlendMode(Shader::BlendMode blendMode)
+	{
+		switch (blendMode)
+		{
+			case Shader::BlendMode::OPAQUE:		OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);		return true;
+			case Shader::BlendMode::ALPHA:		OpenGLDrawerResources::setBlendMode(BlendMode::ALPHA);		return true;
+			case Shader::BlendMode::ADD:		OpenGLDrawerResources::setBlendMode(BlendMode::ADDITIVE);	return true;
+			case Shader::BlendMode::UNDEFINED:	break;
+		}
+		return false;
+	}
+
 #ifdef USE_OPENGL_MESSAGE_CALLBACK
 	void GLAPIENTRY openGLMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
@@ -115,6 +127,9 @@ namespace opengldrawer
 			// Register oxygen-specific callback for shader source code post-processing
 			//  -> Must be done before loading first shaders in "OpenGLDrawerResources::startup" and "Upscaler::startup"
 			Shader::mShaderSourcePostProcessCallback = std::bind(&opengldrawer::performShaderSourcePostProcessing, std::placeholders::_1, std::placeholders::_2);
+
+			// Also register callback for blend mode changes by shaders
+			Shader::mShaderApplyBlendModeCallback = std::bind(&opengldrawer::applyShaderBlendMode, std::placeholders::_1);
 
 		#ifdef USE_OPENGL_MESSAGE_CALLBACK
 			// Register OpenGL message callback for debugging
