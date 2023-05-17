@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -35,7 +35,6 @@
 		9E0C5E9A247DD697000105D0 /* GameRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8558245F89C300114DEB /* GameRecorder.cpp */; };
 		9E0C5E9B247DD69A000105D0 /* SaveStateSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8559245F89C300114DEB /* SaveStateSerializer.cpp */; };
 		9E0C5E9C247DD69D000105D0 /* EmulatorInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855A245F89C300114DEB /* EmulatorInterface.cpp */; };
-		9E0C5E9D247DD6A0000105D0 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855C245F89C300114DEB /* LemonScriptBindings.cpp */; };
 		9E0C5E9E247DD6A3000105D0 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855D245F89C300114DEB /* Simulation.cpp */; };
 		9E0C5E9F247DD6A7000105D0 /* sn76489.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855F245F89C300114DEB /* sn76489.cpp */; };
 		9E0C5EA0247DD6AB000105D0 /* SoundDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8561245F89C300114DEB /* SoundDriver.cpp */; };
@@ -167,7 +166,6 @@
 		9E0CCB11251910B70007288E /* version.inc in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE3245F88D200114DEB /* version.inc */; };
 		9E0CCB12251910B70007288E /* version.inc in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BE3245F88D200114DEB /* version.inc */; };
 		9E115C2527FA963B001A0FC5 /* liboggvorbis_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E115C2427FA962E001A0FC5 /* liboggvorbis_ios.a */; };
-		9E115C2727FA9B86001A0FC5 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E115C2627FA9B86001A0FC5 /* OpenGLES.framework */; };
 		9E1499CF24CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1499CB24CE613F0015EC7C /* SourceCodeWriter.cpp */; };
 		9E1499D024CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1499CB24CE613F0015EC7C /* SourceCodeWriter.cpp */; };
 		9E1499D124CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1499CB24CE613F0015EC7C /* SourceCodeWriter.cpp */; };
@@ -229,7 +227,6 @@
 		9E1D5FB12475733F003B1774 /* GameUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDC245F88D200114DEB /* GameUtils.cpp */; };
 		9E1D5FB22475733F003B1774 /* HighResolutionTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E1DDD862471E0E8009DA2D2 /* HighResolutionTimer.cpp */; };
 		9E1D5FB32475733F003B1774 /* GameRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8558245F89C300114DEB /* GameRecorder.cpp */; };
-		9E1D5FB72475733F003B1774 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855C245F89C300114DEB /* LemonScriptBindings.cpp */; };
 		9E1D5FB82475733F003B1774 /* Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7B61245F886B00114DEB /* Program.cpp */; };
 		9E1D5FB92475733F003B1774 /* SpriteCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8544245F89C300114DEB /* SpriteCache.cpp */; };
 		9E1D5FBA2475733F003B1774 /* GameApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BB3245F88D200114DEB /* GameApp.cpp */; };
@@ -335,18 +332,8 @@
 		9E453AF125B91FB50012BADC /* GameLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E453AEC25B91F810012BADC /* GameLoader.cpp */; };
 		9E453AF425B91FB50012BADC /* GameLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E453AEC25B91F810012BADC /* GameLoader.cpp */; };
 		9E453AF625B91FB60012BADC /* GameLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E453AEC25B91F810012BADC /* GameLoader.cpp */; };
-		9E469B5C27FBEAFB00FE908D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E469B4C27FBEAFB00FE908D /* AudioToolbox.framework */; };
 		9E469B5D27FBEC3C00FE908D /* DiscordIntegration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDF245F88D200114DEB /* DiscordIntegration.cpp */; };
-		9E469B5F27FBEC8600FE908D /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E469B5E27FBEC8600FE908D /* AVFAudio.framework */; };
-		9E469B6127FBEC9900FE908D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E469B6027FBEC9900FE908D /* AVFoundation.framework */; };
-		9E469B6327FBED2100FE908D /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E469B6227FBED2100FE908D /* GameController.framework */; };
-		9E469B6627FBED3B00FE908D /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E469B6427FBED3B00FE908D /* CoreHaptics.framework */; };
-		9E469B6727FBED3B00FE908D /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E469B6527FBED3B00FE908D /* CoreMotion.framework */; };
 		9E469B6827FBED5900FE908D /* GameUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BDC245F88D200114DEB /* GameUtils.cpp */; };
-		9E47934728221C5C0065707F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E47934628221C5B0065707F /* UIKit.framework */; };
-		9E47934928221CA60065707F /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E47934828221CA60065707F /* Metal.framework */; };
-		9E47934B28221CB20065707F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E47934A28221CB20065707F /* CoreGraphics.framework */; };
-		9E47934D28221CF90065707F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E47934C28221CF90065707F /* QuartzCore.framework */; };
 		9E49B9B1260C315500719EC5 /* ControlFlow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E49B9AF260C315500719EC5 /* ControlFlow.cpp */; };
 		9E49B9B2260C315500719EC5 /* ControlFlow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E49B9AF260C315500719EC5 /* ControlFlow.cpp */; };
 		9E49B9B3260C315500719EC5 /* ControlFlow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E49B9AF260C315500719EC5 /* ControlFlow.cpp */; };
@@ -442,7 +429,6 @@
 		9E5FD89E27EC091900CD430A /* ResourcesCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8546245F89C300114DEB /* ResourcesCache.cpp */; };
 		9E5FD89F27EC091900CD430A /* PrintedTextCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECAAA3727D1C32200A32EEF /* PrintedTextCache.cpp */; };
 		9E5FD8A027EC097900CD430A /* ROMDataAnalyser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8557245F89C300114DEB /* ROMDataAnalyser.cpp */; };
-		9E5FD8A127EC098400CD430A /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855C245F89C300114DEB /* LemonScriptBindings.cpp */; };
 		9E5FD8A227EC098400CD430A /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855D245F89C300114DEB /* Simulation.cpp */; };
 		9E5FD8A327EC098400CD430A /* CodeExec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8549245F89C300114DEB /* CodeExec.cpp */; };
 		9E5FD8A427EC098400CD430A /* LemonScriptProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C78126BDF33D00ADDBD3 /* LemonScriptProgram.cpp */; };
@@ -490,7 +476,6 @@
 		9E5FD8CE27EC0BD900CD430A /* MainMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BB4245F88D200114DEB /* MainMenu.cpp */; };
 		9E5FD8CF27EC0BD900CD430A /* GameApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BB3245F88D200114DEB /* GameApp.cpp */; };
 		9E5FD8D027EC0BD900CD430A /* GameMenuManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BB6245F88D200114DEB /* GameMenuManager.cpp */; };
-		9E5FD8D127EC0BD900CD430A /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80324967986007482F3 /* ModsMenu.cpp */; };
 		9E5FD8D227EC0BD900CD430A /* GameMenuBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E7BB7245F88D200114DEB /* GameMenuBase.cpp */; };
 		9E5FD8D327EC0BE200CD430A /* OptionsMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ECAAA9527D1C89200A32EEF /* OptionsMenuEntries.cpp */; };
 		9E5FD8D427EC0BE200CD430A /* ControllerSetupMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C7BC26BDF8B100ADDBD3 /* ControllerSetupMenu.cpp */; };
@@ -543,6 +528,7 @@
 		9E64753727DB059800612BC4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E64753527DB059800612BC4 /* LaunchScreen.storyboard */; };
 		9E64753A27DB059800612BC4 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9E64753927DB059800612BC4 /* main.mm */; };
 		9E6506D3281B90BB00E08E76 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 9E43948624757D1200F89487 /* data */; };
+		9E6BF2792A14671D001294EA /* liboggvorbis_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC1F7742817853F0073C39E /* liboggvorbis_mac.a */; };
 		9E6D24372982207700140342 /* RemasteredMusicDownload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D24362982207700140342 /* RemasteredMusicDownload.cpp */; };
 		9E6D24382982207700140342 /* RemasteredMusicDownload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D24362982207700140342 /* RemasteredMusicDownload.cpp */; };
 		9E6D24392982207700140342 /* RemasteredMusicDownload.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6D24362982207700140342 /* RemasteredMusicDownload.cpp */; };
@@ -635,7 +621,6 @@
 		9E6E8600245F89C400114DEB /* GameRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8558245F89C300114DEB /* GameRecorder.cpp */; };
 		9E6E8601245F89C400114DEB /* SaveStateSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8559245F89C300114DEB /* SaveStateSerializer.cpp */; };
 		9E6E8602245F89C400114DEB /* EmulatorInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855A245F89C300114DEB /* EmulatorInterface.cpp */; };
-		9E6E8603245F89C400114DEB /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855C245F89C300114DEB /* LemonScriptBindings.cpp */; };
 		9E6E8604245F89C400114DEB /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855D245F89C300114DEB /* Simulation.cpp */; };
 		9E6E8605245F89C400114DEB /* sn76489.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855F245F89C300114DEB /* sn76489.cpp */; };
 		9E6E8606245F89C400114DEB /* SoundDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8561245F89C300114DEB /* SoundDriver.cpp */; };
@@ -679,6 +664,37 @@
 		9E6E863C245F89C400114DEB /* BitStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DA245F89C400114DEB /* BitStream.cpp */; };
 		9E6E863D245F89C400114DEB /* FileHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85DC245F89C400114DEB /* FileHelper.cpp */; };
 		9E6E863E245F89C400114DEB /* JsonHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E85E0245F89C400114DEB /* JsonHelper.cpp */; };
+		9E75251F2A14582000158C14 /* GeneralMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */; };
+		9E7525202A14582000158C14 /* GeneralMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */; };
+		9E7525212A14582000158C14 /* GeneralMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */; };
+		9E7525222A14582000158C14 /* GeneralMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */; };
+		9E7525252A14584800158C14 /* TextInputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525242A14584800158C14 /* TextInputHandler.cpp */; };
+		9E7525262A14584800158C14 /* TextInputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525242A14584800158C14 /* TextInputHandler.cpp */; };
+		9E7525272A14584800158C14 /* TextInputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525242A14584800158C14 /* TextInputHandler.cpp */; };
+		9E7525282A14584800158C14 /* TextInputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525242A14584800158C14 /* TextInputHandler.cpp */; };
+		9E7525292A14584800158C14 /* TextInputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525242A14584800158C14 /* TextInputHandler.cpp */; };
+		9E75252F2A14587A00158C14 /* RendererBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252B2A14587A00158C14 /* RendererBindings.cpp */; };
+		9E7525302A14587A00158C14 /* RendererBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252B2A14587A00158C14 /* RendererBindings.cpp */; };
+		9E7525312A14587A00158C14 /* RendererBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252B2A14587A00158C14 /* RendererBindings.cpp */; };
+		9E7525322A14587A00158C14 /* RendererBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252B2A14587A00158C14 /* RendererBindings.cpp */; };
+		9E7525332A14587A00158C14 /* RendererBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252B2A14587A00158C14 /* RendererBindings.cpp */; };
+		9E7525342A14587A00158C14 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252E2A14587A00158C14 /* LemonScriptBindings.cpp */; };
+		9E7525352A14587A00158C14 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252E2A14587A00158C14 /* LemonScriptBindings.cpp */; };
+		9E7525362A14587A00158C14 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252E2A14587A00158C14 /* LemonScriptBindings.cpp */; };
+		9E7525372A14587A00158C14 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252E2A14587A00158C14 /* LemonScriptBindings.cpp */; };
+		9E7525382A14587A00158C14 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E75252E2A14587A00158C14 /* LemonScriptBindings.cpp */; };
+		9E75253B2A1458AE00158C14 /* DrawingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525392A1458AE00158C14 /* DrawingUtils.cpp */; };
+		9E75253C2A1458AE00158C14 /* DrawingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525392A1458AE00158C14 /* DrawingUtils.cpp */; };
+		9E75253D2A1458AE00158C14 /* DrawingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525392A1458AE00158C14 /* DrawingUtils.cpp */; };
+		9E75253E2A1458AE00158C14 /* DrawingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525392A1458AE00158C14 /* DrawingUtils.cpp */; };
+		9E7525462A14592300158C14 /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525442A14592300158C14 /* ModsMenu.cpp */; };
+		9E7525472A14592300158C14 /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525442A14592300158C14 /* ModsMenu.cpp */; };
+		9E7525482A14592300158C14 /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525442A14592300158C14 /* ModsMenu.cpp */; };
+		9E7525492A14592300158C14 /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525442A14592300158C14 /* ModsMenu.cpp */; };
+		9E75254A2A14592300158C14 /* ModsMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525452A14592300158C14 /* ModsMenuEntries.cpp */; };
+		9E75254B2A14592300158C14 /* ModsMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525452A14592300158C14 /* ModsMenuEntries.cpp */; };
+		9E75254C2A14592300158C14 /* ModsMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525452A14592300158C14 /* ModsMenuEntries.cpp */; };
+		9E75254D2A14592300158C14 /* ModsMenuEntries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7525452A14592300158C14 /* ModsMenuEntries.cpp */; };
 		9E7A08DF28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
 		9E7A08E028A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
 		9E7A08E128A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */; };
@@ -744,7 +760,6 @@
 		9E82C7C726BDFA3200ADDBD3 /* InputConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C7C326BDFA3100ADDBD3 /* InputConfig.cpp */; };
 		9E82C7C826BDFA3200ADDBD3 /* InputConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E82C7C326BDFA3100ADDBD3 /* InputConfig.cpp */; };
 		9E85ED5C246F7B9D001F1749 /* SetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E85ED5B246F7B9D001F1749 /* SetupViewController.m */; };
-		9E90E98228B99AC700526086 /* liboggvorbis_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EC1F7742817853F0073C39E /* liboggvorbis_mac.a */; };
 		9E90E98528B99DA900526086 /* discord_game_sdk.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9E91BAED28B98D7600949235 /* discord_game_sdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */; };
 		9E91BAEF28B98F6D00949235 /* discord_game_sdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */; };
@@ -804,7 +819,6 @@
 		9EB06A0F24808A3F0080AC49 /* GameRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8558245F89C300114DEB /* GameRecorder.cpp */; };
 		9EB06A1024808A3F0080AC49 /* SaveStateSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8559245F89C300114DEB /* SaveStateSerializer.cpp */; };
 		9EB06A1124808A3F0080AC49 /* EmulatorInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855A245F89C300114DEB /* EmulatorInterface.cpp */; };
-		9EB06A1224808A3F0080AC49 /* LemonScriptBindings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855C245F89C300114DEB /* LemonScriptBindings.cpp */; };
 		9EB06A1324808A3F0080AC49 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E855D245F89C300114DEB /* Simulation.cpp */; };
 		9EB06A1424808A3F0080AC49 /* LogDisplay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856A245F89C300114DEB /* LogDisplay.cpp */; };
 		9EB06A1524808A490080AC49 /* pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E856B245F89C300114DEB /* pch.cpp */; };
@@ -851,8 +865,6 @@
 		9EB06A5024808B2B0080AC49 /* blip_buf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8564245F89C300114DEB /* blip_buf.cpp */; };
 		9EB06A5224808B3F0080AC49 /* Kosinski.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8585245F89C400114DEB /* Kosinski.cpp */; };
 		9EB06A5324808B890080AC49 /* Drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9E6E8537245F89C300114DEB /* Drawer.cpp */; };
-		9EB2F80424967986007482F3 /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80324967986007482F3 /* ModsMenu.cpp */; };
-		9EB2F80524967986007482F3 /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80324967986007482F3 /* ModsMenu.cpp */; };
 		9EB2F80E249679D5007482F3 /* ModManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80A249679D5007482F3 /* ModManager.cpp */; };
 		9EB2F80F249679D5007482F3 /* ModManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80A249679D5007482F3 /* ModManager.cpp */; };
 		9EB2F810249679D5007482F3 /* Mod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80B249679D5007482F3 /* Mod.cpp */; };
@@ -861,7 +873,6 @@
 		9EB2F813249679FA007482F3 /* ModManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80A249679D5007482F3 /* ModManager.cpp */; };
 		9EB2F814249679FE007482F3 /* Mod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80B249679D5007482F3 /* Mod.cpp */; };
 		9EB2F815249679FF007482F3 /* Mod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80B249679D5007482F3 /* Mod.cpp */; };
-		9EB2F81624967A09007482F3 /* ModsMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F80324967986007482F3 /* ModsMenu.cpp */; };
 		9EB2F81924967A2A007482F3 /* AudioSourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F81724967A29007482F3 /* AudioSourceManager.cpp */; };
 		9EB2F81A24967A2A007482F3 /* AudioSourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F81724967A29007482F3 /* AudioSourceManager.cpp */; };
 		9EB2F81B24967A2A007482F3 /* AudioSourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EB2F81724967A29007482F3 /* AudioSourceManager.cpp */; };
@@ -1485,7 +1496,7 @@
 			remoteGlobalIDString = BECDF6BE0761BA81005FE872;
 			remoteInfo = "Standard DMG";
 		};
-		9E90E98328B99C4600526086 /* PBXContainerItemProxy */ = {
+		9E75254F2A14658100158C14 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9E115C1927FA962E001A0FC5 /* vorbis.xcodeproj */;
 			proxyType = 1;
@@ -1541,9 +1552,6 @@
 		9E0788532549EDCF0008A7FB /* TouchControlsOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchControlsOverlay.h; sourceTree = "<group>"; };
 		9E086D382476DC8400FA255A /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = boost.framework; sourceTree = "<group>"; };
 		9E0C5E7F247DD5AF000105D0 /* Sonic3AIR */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Sonic3AIR; sourceTree = BUILT_PRODUCTS_DIR; };
-		9E0C5F4B247DFE2A000105D0 /* libSDL2-2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libSDL2-2.0.0.dylib"; path = "../../../../../../../../../usr/local/Cellar/sdl2/2.0.12_1/lib/libSDL2-2.0.0.dylib"; sourceTree = "<group>"; };
-		9E0C5F4D247DFE6C000105D0 /* libogg.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libogg.0.dylib; path = ../../../../../../../../../usr/local/Cellar/libogg/1.3.4/lib/libogg.0.dylib; sourceTree = "<group>"; };
-		9E0C5F4F247DFE94000105D0 /* libvorbis.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvorbis.0.dylib; path = ../../../../../../../../../usr/local/Cellar/libvorbis/1.3.6/lib/libvorbis.0.dylib; sourceTree = "<group>"; };
 		9E0CCAAD2518F7090007288E /* rmxmedia_externals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rmxmedia_externals.h; sourceTree = "<group>"; };
 		9E0CCAB12518F7090007288E /* PlatformDefinitions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlatformDefinitions.h; sourceTree = "<group>"; };
 		9E0CCAB22518F7BF0007288E /* Opcode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Opcode.cpp; sourceTree = "<group>"; };
@@ -1571,7 +1579,6 @@
 		9E0CCAFB2518FFF20007288E /* NativizedCode.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = NativizedCode.inc; sourceTree = "<group>"; };
 		9E103B5B26C8980F00C809E7 /* NativizedCode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NativizedCode.cpp; sourceTree = "<group>"; };
 		9E115C1927FA962E001A0FC5 /* vorbis.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = vorbis.xcodeproj; path = "../../../../framework/external/ogg-vorbis/libvorbis/xcode/vorbis.xcodeproj"; sourceTree = "<group>"; };
-		9E115C2627FA9B86001A0FC5 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
 		9E1499CB24CE613F0015EC7C /* SourceCodeWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SourceCodeWriter.cpp; sourceTree = "<group>"; };
 		9E1499CC24CE613F0015EC7C /* Nativizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nativizer.h; sourceTree = "<group>"; };
 		9E1499CD24CE613F0015EC7C /* Nativizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Nativizer.cpp; sourceTree = "<group>"; };
@@ -1582,8 +1589,6 @@
 		9E1DDD852471E0E8009DA2D2 /* HighResolutionTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighResolutionTimer.h; sourceTree = "<group>"; };
 		9E1DDD862471E0E8009DA2D2 /* HighResolutionTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighResolutionTimer.cpp; sourceTree = "<group>"; };
 		9E1DDD872471E0E8009DA2D2 /* Profiling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Profiling.h; sourceTree = "<group>"; };
-		9E264FB7254B069B0000A100 /* discord_game_sdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = discord_game_sdk.dylib; path = ../external/discord_game_sdk/lib/x86_64/discord_game_sdk.dylib; sourceTree = "<group>"; };
-		9E264FC0254B09B30000A100 /* discord_game_sdk.bundle */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = discord_game_sdk.bundle; path = ../external/discord_game_sdk/lib/x86_64/discord_game_sdk.bundle; sourceTree = "<group>"; };
 		9E264FC7254B0A4D0000A100 /* achievement_manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = achievement_manager.h; sourceTree = "<group>"; };
 		9E264FC8254B0A4D0000A100 /* lobby_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lobby_manager.cpp; sourceTree = "<group>"; };
 		9E264FC9254B0A4D0000A100 /* overlay_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = overlay_manager.cpp; sourceTree = "<group>"; };
@@ -1620,16 +1625,6 @@
 		9E453AE525B91F500012BADC /* OpenGLTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLTexture.h; sourceTree = "<group>"; };
 		9E453AEC25B91F810012BADC /* GameLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameLoader.cpp; sourceTree = "<group>"; };
 		9E453AED25B91F810012BADC /* GameLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameLoader.h; sourceTree = "<group>"; };
-		9E469B4C27FBEAFB00FE908D /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
-		9E469B5E27FBEC8600FE908D /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/AVFAudio.framework; sourceTree = DEVELOPER_DIR; };
-		9E469B6027FBEC9900FE908D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		9E469B6227FBED2100FE908D /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/GameController.framework; sourceTree = DEVELOPER_DIR; };
-		9E469B6427FBED3B00FE908D /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/CoreHaptics.framework; sourceTree = DEVELOPER_DIR; };
-		9E469B6527FBED3B00FE908D /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/CoreMotion.framework; sourceTree = DEVELOPER_DIR; };
-		9E47934628221C5B0065707F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		9E47934828221CA60065707F /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
-		9E47934A28221CB20065707F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
-		9E47934C28221CF90065707F /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		9E49B9AF260C315500719EC5 /* ControlFlow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControlFlow.cpp; sourceTree = "<group>"; };
 		9E49B9B0260C315500719EC5 /* ControlFlow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControlFlow.h; sourceTree = "<group>"; };
 		9E49B9B7260C31B300719EC5 /* GameSetupScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameSetupScreen.h; sourceTree = "<group>"; };
@@ -1663,9 +1658,7 @@
 		9E6E7A52245F723000114DEB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E6E7A53245F723000114DEB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9E6E7A55245F723000114DEB /* sonic3air.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = sonic3air.entitlements; sourceTree = "<group>"; };
-		9E6E7A5C245F784400114DEB /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SDL2.framework; sourceTree = "<group>"; };
 		9E6E7A60245F785D00114DEB /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		9E6E7A6C245F870300114DEB /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Vorbis.framework; sourceTree = "<group>"; };
 		9E6E7A7A245F882600114DEB /* json_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_writer.cpp; sourceTree = "<group>"; };
 		9E6E7A7B245F882600114DEB /* json_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_reader.cpp; sourceTree = "<group>"; };
 		9E6E7A7C245F882600114DEB /* json_tool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_tool.h; sourceTree = "<group>"; };
@@ -1843,7 +1836,6 @@
 		9E6E854F245F89C300114DEB /* EmulatorInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmulatorInterface.h; sourceTree = "<group>"; };
 		9E6E8550245F89C300114DEB /* CodeExec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CodeExec.h; sourceTree = "<group>"; };
 		9E6E8552245F89C300114DEB /* GameRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameRecorder.h; sourceTree = "<group>"; };
-		9E6E8553245F89C300114DEB /* LemonScriptBindings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LemonScriptBindings.h; sourceTree = "<group>"; };
 		9E6E8554245F89C300114DEB /* DebuggingInterfaces.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebuggingInterfaces.h; sourceTree = "<group>"; };
 		9E6E8556245F89C300114DEB /* ROMDataAnalyser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ROMDataAnalyser.h; sourceTree = "<group>"; };
 		9E6E8557245F89C300114DEB /* ROMDataAnalyser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ROMDataAnalyser.cpp; sourceTree = "<group>"; };
@@ -1851,7 +1843,6 @@
 		9E6E8559245F89C300114DEB /* SaveStateSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SaveStateSerializer.cpp; sourceTree = "<group>"; };
 		9E6E855A245F89C300114DEB /* EmulatorInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EmulatorInterface.cpp; sourceTree = "<group>"; };
 		9E6E855B245F89C300114DEB /* PersistentData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PersistentData.h; sourceTree = "<group>"; };
-		9E6E855C245F89C300114DEB /* LemonScriptBindings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LemonScriptBindings.cpp; sourceTree = "<group>"; };
 		9E6E855D245F89C300114DEB /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
 		9E6E855F245F89C300114DEB /* sn76489.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sn76489.cpp; sourceTree = "<group>"; };
 		9E6E8561245F89C300114DEB /* SoundDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundDriver.cpp; sourceTree = "<group>"; };
@@ -1938,7 +1929,23 @@
 		9E6E85DD245F89C400114DEB /* BitStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitStream.h; sourceTree = "<group>"; };
 		9E6E85DF245F89C400114DEB /* FileHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileHelper.h; sourceTree = "<group>"; };
 		9E6E85E0245F89C400114DEB /* JsonHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JsonHelper.cpp; sourceTree = "<group>"; };
-		9E6E8642245FA24500114DEB /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Ogg.framework; sourceTree = "<group>"; };
+		9E75250B2A14578600158C14 /* RuntimeEnvironment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RuntimeEnvironment.h; sourceTree = "<group>"; };
+		9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GeneralMenuEntries.cpp; sourceTree = "<group>"; };
+		9E75251E2A14582000158C14 /* GeneralMenuEntries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeneralMenuEntries.h; sourceTree = "<group>"; };
+		9E7525232A14584800158C14 /* TextInputHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextInputHandler.h; sourceTree = "<group>"; };
+		9E7525242A14584800158C14 /* TextInputHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextInputHandler.cpp; sourceTree = "<group>"; };
+		9E75252B2A14587A00158C14 /* RendererBindings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RendererBindings.cpp; sourceTree = "<group>"; };
+		9E75252C2A14587A00158C14 /* LemonScriptBindings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LemonScriptBindings.h; sourceTree = "<group>"; };
+		9E75252D2A14587A00158C14 /* RendererBindings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RendererBindings.h; sourceTree = "<group>"; };
+		9E75252E2A14587A00158C14 /* LemonScriptBindings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LemonScriptBindings.cpp; sourceTree = "<group>"; };
+		9E7525392A1458AE00158C14 /* DrawingUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DrawingUtils.cpp; sourceTree = "<group>"; };
+		9E75253A2A1458AE00158C14 /* DrawingUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawingUtils.h; sourceTree = "<group>"; };
+		9E75253F2A1458DD00158C14 /* LagStopwatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LagStopwatch.h; sourceTree = "<group>"; };
+		9E7525412A14592300158C14 /* ModsMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModsMenu.h; sourceTree = "<group>"; };
+		9E7525422A14592300158C14 /* ModsMenuEntries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModsMenuEntries.h; sourceTree = "<group>"; };
+		9E7525432A14592300158C14 /* ModResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModResources.h; sourceTree = "<group>"; };
+		9E7525442A14592300158C14 /* ModsMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModsMenu.cpp; sourceTree = "<group>"; };
+		9E7525452A14592300158C14 /* ModsMenuEntries.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModsMenuEntries.cpp; sourceTree = "<group>"; };
 		9E7A08DD28A8418700FA25F6 /* OpenGLSpriteTextureManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLSpriteTextureManager.cpp; sourceTree = "<group>"; };
 		9E7A08DE28A8418700FA25F6 /* OpenGLSpriteTextureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLSpriteTextureManager.h; sourceTree = "<group>"; };
 		9E7A08E528A841D000FA25F6 /* DynamicSprites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicSprites.h; sourceTree = "<group>"; };
@@ -1987,8 +1994,6 @@
 		9EB069A024807A9D0080AC49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9EB069A124807A9D0080AC49 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9EB069A324807A9D0080AC49 /* oxygenApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = oxygenApp.entitlements; sourceTree = "<group>"; };
-		9EB2F80224967986007482F3 /* ModsMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModsMenu.h; sourceTree = "<group>"; };
-		9EB2F80324967986007482F3 /* ModsMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModsMenu.cpp; sourceTree = "<group>"; };
 		9EB2F80A249679D5007482F3 /* ModManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModManager.cpp; sourceTree = "<group>"; };
 		9EB2F80B249679D5007482F3 /* Mod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mod.cpp; sourceTree = "<group>"; };
 		9EB2F80C249679D5007482F3 /* Mod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mod.h; sourceTree = "<group>"; };
@@ -2286,7 +2291,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E90E98228B99AC700526086 /* liboggvorbis_mac.a in Frameworks */,
+				9E6BF2792A14671D001294EA /* liboggvorbis_mac.a in Frameworks */,
 				9E91BAED28B98D7600949235 /* discord_game_sdk.dylib in Frameworks */,
 				9EC1F78C28178EFB0073C39E /* CoreAudio.framework in Frameworks */,
 				9EC1F776281785700073C39E /* libSDL2.a in Frameworks */,
@@ -2302,19 +2307,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E47934B28221CB20065707F /* CoreGraphics.framework in Frameworks */,
-				9E47934D28221CF90065707F /* QuartzCore.framework in Frameworks */,
 				9E5FD84427EC081600CD430A /* libSDL2.a in Frameworks */,
-				9E47934928221CA60065707F /* Metal.framework in Frameworks */,
-				9E469B6727FBED3B00FE908D /* CoreMotion.framework in Frameworks */,
-				9E469B6327FBED2100FE908D /* GameController.framework in Frameworks */,
 				9E115C2527FA963B001A0FC5 /* liboggvorbis_ios.a in Frameworks */,
-				9E469B6127FBEC9900FE908D /* AVFoundation.framework in Frameworks */,
-				9E115C2727FA9B86001A0FC5 /* OpenGLES.framework in Frameworks */,
-				9E469B5C27FBEAFB00FE908D /* AudioToolbox.framework in Frameworks */,
-				9E469B6627FBED3B00FE908D /* CoreHaptics.framework in Frameworks */,
-				9E469B5F27FBEC8600FE908D /* AVFAudio.framework in Frameworks */,
-				9E47934728221C5C0065707F /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2530,10 +2524,6 @@
 			children = (
 				9E91BADF28B97BE900949235 /* discord_game_sdk.dylib */,
 				9E91BAEC28B98D7600949235 /* discord_game_sdk.dylib */,
-				9E47934C28221CF90065707F /* QuartzCore.framework */,
-				9E47934A28221CB20065707F /* CoreGraphics.framework */,
-				9E47934828221CA60065707F /* Metal.framework */,
-				9E47934628221C5B0065707F /* UIKit.framework */,
 				9EC1F79A2817972E0073C39E /* Metal.framework */,
 				9EC1F798281794250073C39E /* AppKit.framework */,
 				9EC1F796281793F90073C39E /* CoreVideo.framework */,
@@ -2542,25 +2532,10 @@
 				9EC1F78628178C450073C39E /* ForceFeedback.framework */,
 				9EC1F78128178BC40073C39E /* AudioToolbox.framework */,
 				9EC1F77C281788520073C39E /* CoreAudio.framework */,
-				9E469B6427FBED3B00FE908D /* CoreHaptics.framework */,
-				9E469B6527FBED3B00FE908D /* CoreMotion.framework */,
-				9E469B6227FBED2100FE908D /* GameController.framework */,
-				9E469B6027FBEC9900FE908D /* AVFoundation.framework */,
-				9E469B5E27FBEC8600FE908D /* AVFAudio.framework */,
-				9E469B4C27FBEAFB00FE908D /* AudioToolbox.framework */,
-				9E115C2627FA9B86001A0FC5 /* OpenGLES.framework */,
 				9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */,
 				9E7E290925EF25F40021AE3A /* libz.tbd */,
-				9E264FC0254B09B30000A100 /* discord_game_sdk.bundle */,
-				9E264FB7254B069B0000A100 /* discord_game_sdk.dylib */,
-				9E0C5F4F247DFE94000105D0 /* libvorbis.0.dylib */,
-				9E0C5F4D247DFE6C000105D0 /* libogg.0.dylib */,
-				9E0C5F4B247DFE2A000105D0 /* libSDL2-2.0.0.dylib */,
 				9E086D382476DC8400FA255A /* boost.framework */,
-				9E6E8642245FA24500114DEB /* Ogg.framework */,
-				9E6E7A6C245F870300114DEB /* Vorbis.framework */,
 				9E6E7A60245F785D00114DEB /* OpenGL.framework */,
-				9E6E7A5C245F784400114DEB /* SDL2.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2898,6 +2873,7 @@
 				9E6E7BC2245F88D200114DEB /* ActSelectMenu.cpp */,
 				9E6E7BB2245F88D200114DEB /* ActSelectMenu.h */,
 				9EB2F81D24967A55007482F3 /* context */,
+				9E75251C2A14582000158C14 /* entries */,
 				9E6E7BCD245F88D200114DEB /* ExtrasMenu.cpp */,
 				9E6E7BCC245F88D200114DEB /* ExtrasMenu.h */,
 				9E6E7BB3245F88D200114DEB /* GameApp.cpp */,
@@ -2910,8 +2886,7 @@
 				9E6E7BB5245F88D200114DEB /* MainMenu.h */,
 				9E6E7BC3245F88D200114DEB /* MenuBackground.cpp */,
 				9E6E7BC1245F88D200114DEB /* MenuBackground.h */,
-				9EB2F80324967986007482F3 /* ModsMenu.cpp */,
-				9EB2F80224967986007482F3 /* ModsMenu.h */,
+				9E7525402A14592300158C14 /* mods */,
 				9ECB71A724C131E500A8B55E /* options */,
 				9E6E7BB8245F88D200114DEB /* overlays */,
 				9E6E7BCA245F88D200114DEB /* PauseMenu.cpp */,
@@ -2971,6 +2946,8 @@
 				9EBAFBF82980DF01004F13AA /* CommandForwarder.h */,
 				9E6E7BDF245F88D200114DEB /* DiscordIntegration.cpp */,
 				9E6E7BDE245F88D200114DEB /* DiscordIntegration.h */,
+				9E7525392A1458AE00158C14 /* DrawingUtils.cpp */,
+				9E75253A2A1458AE00158C14 /* DrawingUtils.h */,
 				9E6E7BDC245F88D200114DEB /* GameUtils.cpp */,
 				9E6E7BE0245F88D200114DEB /* GameUtils.h */,
 				9EBAFBF92980DF01004F13AA /* PackageBuilder.cpp */,
@@ -3124,6 +3101,7 @@
 			isa = PBXGroup;
 			children = (
 				9E6E8555245F89C300114DEB /* analyse */,
+				9E75252A2A14587A00158C14 /* bindings */,
 				9E6E8549245F89C300114DEB /* CodeExec.cpp */,
 				9E6E8550245F89C300114DEB /* CodeExec.h */,
 				9E6E8554245F89C300114DEB /* DebuggingInterfaces.h */,
@@ -3131,8 +3109,6 @@
 				9E6E854F245F89C300114DEB /* EmulatorInterface.h */,
 				9E6E8558245F89C300114DEB /* GameRecorder.cpp */,
 				9E6E8552245F89C300114DEB /* GameRecorder.h */,
-				9E6E855C245F89C300114DEB /* LemonScriptBindings.cpp */,
-				9E6E8553245F89C300114DEB /* LemonScriptBindings.h */,
 				9E82C78126BDF33D00ADDBD3 /* LemonScriptProgram.cpp */,
 				9E82C78226BDF33D00ADDBD3 /* LemonScriptProgram.h */,
 				9E6E854C245F89C300114DEB /* LemonScriptRuntime.cpp */,
@@ -3141,6 +3117,7 @@
 				9E6E854E245F89C300114DEB /* LogDisplay.h */,
 				9E6E854B245F89C300114DEB /* PersistentData.cpp */,
 				9E6E855B245F89C300114DEB /* PersistentData.h */,
+				9E75250B2A14578600158C14 /* RuntimeEnvironment.h */,
 				9E6E8559245F89C300114DEB /* SaveStateSerializer.cpp */,
 				9E6E854D245F89C300114DEB /* SaveStateSerializer.h */,
 				9E6E855D245F89C300114DEB /* Simulation.cpp */,
@@ -3363,12 +3340,46 @@
 				9ECAA9FC27D1BDAC00A32EEF /* Logging.h */,
 				9E1DDD842471E0E8009DA2D2 /* Profiling.cpp */,
 				9E1DDD872471E0E8009DA2D2 /* Profiling.h */,
+				9E7525242A14584800158C14 /* TextInputHandler.cpp */,
+				9E7525232A14584800158C14 /* TextInputHandler.h */,
 				9E0CCAC42518FBCD0007288E /* Transform2D.cpp */,
 				9E0CCAC32518FBCD0007288E /* Transform2D.h */,
 				9E6E85D9245F89C400114DEB /* Utils.cpp */,
 				9E6E85D5245F89C400114DEB /* Utils.h */,
 			);
 			path = helper;
+			sourceTree = "<group>";
+		};
+		9E75251C2A14582000158C14 /* entries */ = {
+			isa = PBXGroup;
+			children = (
+				9E75251D2A14582000158C14 /* GeneralMenuEntries.cpp */,
+				9E75251E2A14582000158C14 /* GeneralMenuEntries.h */,
+			);
+			path = entries;
+			sourceTree = "<group>";
+		};
+		9E75252A2A14587A00158C14 /* bindings */ = {
+			isa = PBXGroup;
+			children = (
+				9E75252E2A14587A00158C14 /* LemonScriptBindings.cpp */,
+				9E75252C2A14587A00158C14 /* LemonScriptBindings.h */,
+				9E75252B2A14587A00158C14 /* RendererBindings.cpp */,
+				9E75252D2A14587A00158C14 /* RendererBindings.h */,
+			);
+			path = bindings;
+			sourceTree = "<group>";
+		};
+		9E7525402A14592300158C14 /* mods */ = {
+			isa = PBXGroup;
+			children = (
+				9E7525432A14592300158C14 /* ModResources.h */,
+				9E7525442A14592300158C14 /* ModsMenu.cpp */,
+				9E7525412A14592300158C14 /* ModsMenu.h */,
+				9E7525452A14592300158C14 /* ModsMenuEntries.cpp */,
+				9E7525422A14592300158C14 /* ModsMenuEntries.h */,
+			);
+			path = mods;
 			sourceTree = "<group>";
 		};
 		9E7A08E428A841D000FA25F6 /* resources */ = {
@@ -3765,6 +3776,7 @@
 				9ECAAA5527D1C7C600A32EEF /* ConnectionManager.h */,
 				9ECAAA6927D1C7C600A32EEF /* HighLevelPacketBase.h */,
 				9ECAAA5727D1C7C600A32EEF /* internal */,
+				9E75253F2A1458DD00158C14 /* LagStopwatch.h */,
 				9ECAAA5227D1C7C600A32EEF /* LowLevelPackets.h */,
 				9ECAAA6527D1C7C600A32EEF /* NetConnection.cpp */,
 				9ECAAA6C27D1C7C600A32EEF /* NetConnection.h */,
@@ -3905,7 +3917,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				9E90E98428B99C4600526086 /* PBXTargetDependency */,
+				9E7525502A14658100158C14 /* PBXTargetDependency */,
 			);
 			name = sonic3air;
 			productName = sonic3air;
@@ -3970,7 +3982,8 @@
 		9E6E7A3F245F722F00114DEB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1340;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = None;
 				TargetAttributes = {
 					9E0C5E7E247DD5AF000105D0 = {
@@ -4179,6 +4192,7 @@
 				9E0C5EEF247DD7F3000105D0 /* ScriptImplementations.cpp in Sources */,
 				9EBAFB042980D5E6004F13AA /* BitmapCodecJPG.cpp in Sources */,
 				9ECAAA2827D1C25E00A32EEF /* Operators.cpp in Sources */,
+				9E7525482A14592300158C14 /* ModsMenu.cpp in Sources */,
 				9E0C5EB1247DD6FB000105D0 /* Kosinski.cpp in Sources */,
 				9E0C5EE9247DD7E0000105D0 /* ActSelectMenu.cpp in Sources */,
 				9EBAFB8A2980D63E004F13AA /* SpriteAtlas.cpp in Sources */,
@@ -4192,10 +4206,13 @@
 				9EBAFB492980D63E004F13AA /* FontProcessor.cpp in Sources */,
 				9E0C5ED2247DD77E000105D0 /* GameView.cpp in Sources */,
 				9E0C5EC8247DD752000105D0 /* MemoryHexView.cpp in Sources */,
+				9E7525272A14584800158C14 /* TextInputHandler.cpp in Sources */,
+				9E7525212A14582000158C14 /* GeneralMenuEntries.cpp in Sources */,
 				9E82C77B26BDF29A00ADDBD3 /* BackdropView.cpp in Sources */,
 				9E0C5EF0247DD7FA000105D0 /* SharedDatabase.cpp in Sources */,
 				9EBAFA292980D527004F13AA /* BuiltInFunctions.cpp in Sources */,
 				9EBAFAAF2980D5E6004F13AA /* RC4Encryption.cpp in Sources */,
+				9E75254C2A14592300158C14 /* ModsMenuEntries.cpp in Sources */,
 				9E0C5EF6247DD80C000105D0 /* DiscordIntegration.cpp in Sources */,
 				9ED1831B28789ED000506AEB /* ComponentSprite.cpp in Sources */,
 				9E0C5EBB247DD720000105D0 /* OverlayManager.cpp in Sources */,
@@ -4240,7 +4257,6 @@
 				9ED1833F28789EFF00506AEB /* OpenGLRenderer.cpp in Sources */,
 				9EBAFAEB2980D5E6004F13AA /* Logging.cpp in Sources */,
 				9E7E28DD25EF21370021AE3A /* FileStructureTree.cpp in Sources */,
-				9EB2F81624967A09007482F3 /* ModsMenu.cpp in Sources */,
 				9EBAFB092980D5E6004F13AA /* BitmapCodecPNG.cpp in Sources */,
 				9E0C5F03247DD848000105D0 /* FunctionWrapper.cpp in Sources */,
 				9E0C5F1A247DDFC1000105D0 /* json_writer.cpp in Sources */,
@@ -4256,7 +4272,6 @@
 				9E6D24492982219D00140342 /* ModuleSerializer.cpp in Sources */,
 				9EBAFB7B2980D63E004F13AA /* Shader.cpp in Sources */,
 				9E0C5ECB247DD761000105D0 /* EmulationAudioSource.cpp in Sources */,
-				9E0C5E9D247DD6A0000105D0 /* LemonScriptBindings.cpp in Sources */,
 				9ECAAA1527D1C24E00A32EEF /* Define.cpp in Sources */,
 				9ED1835328789EFF00506AEB /* RenderPaletteSpriteShader.cpp in Sources */,
 				9EBAFB9E2980D63E004F13AA /* Thread.cpp in Sources */,
@@ -4310,6 +4325,7 @@
 				9EBAFAC32980D5E6004F13AA /* Basics.cpp in Sources */,
 				9EB2F81B24967A2A007482F3 /* AudioSourceManager.cpp in Sources */,
 				9E0C5E8A247DD653000105D0 /* Blitter.cpp in Sources */,
+				9E7525362A14587A00158C14 /* LemonScriptBindings.cpp in Sources */,
 				9EBAFC182980DFD5004F13AA /* DownloadManager.cpp in Sources */,
 				9E0C5E9C247DD69D000105D0 /* EmulatorInterface.cpp in Sources */,
 				9EBAFB942980D63E004F13AA /* AppFramework.cpp in Sources */,
@@ -4372,6 +4388,7 @@
 				9EBAFC022980DF01004F13AA /* PackageBuilder.cpp in Sources */,
 				9E0C5F1C247DDFC1000105D0 /* json_value.cpp in Sources */,
 				9E0C5ECE247DD76A000105D0 /* AudioPlayer.cpp in Sources */,
+				9E7525312A14587A00158C14 /* RendererBindings.cpp in Sources */,
 				9ECAAA3A27D1C32200A32EEF /* PrintedTextCache.cpp in Sources */,
 				9E0C5ECD247DD768000105D0 /* AudioCollection.cpp in Sources */,
 				9EBAFAF02980D5E6004F13AA /* Tools.cpp in Sources */,
@@ -4426,6 +4443,7 @@
 				9ECB71AF24C131F700A8B55E /* OptionsEntry.cpp in Sources */,
 				9EBAFAB42980D5E6004F13AA /* RmxDeflate.cpp in Sources */,
 				9EBAFB762980D63E004F13AA /* Painter.cpp in Sources */,
+				9E75253D2A1458AE00158C14 /* DrawingUtils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4444,6 +4462,7 @@
 				9E26501F254B0A4D0000A100 /* store_manager.cpp in Sources */,
 				9E1D5F652475733F003B1774 /* Utils.cpp in Sources */,
 				9E1D5F662475733F003B1774 /* EmulatorInterface.cpp in Sources */,
+				9E7525202A14582000158C14 /* GeneralMenuEntries.cpp in Sources */,
 				9EBAFB082980D5E6004F13AA /* BitmapCodecPNG.cpp in Sources */,
 				9E1D5F672475733F003B1774 /* EmulationAudioSource.cpp in Sources */,
 				9E7E28DC25EF21370021AE3A /* FileStructureTree.cpp in Sources */,
@@ -4565,7 +4584,6 @@
 				9E6D24382982207700140342 /* RemasteredMusicDownload.cpp in Sources */,
 				9ED1835728789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9EBAFBE42980D6BA004F13AA /* Parser.cpp in Sources */,
-				9E1D5FB72475733F003B1774 /* LemonScriptBindings.cpp in Sources */,
 				9ECAAA9827D1C89200A32EEF /* OptionsMenuEntries.cpp in Sources */,
 				9E1D5FB82475733F003B1774 /* Program.cpp in Sources */,
 				9E1D5FB92475733F003B1774 /* SpriteCache.cpp in Sources */,
@@ -4597,12 +4615,14 @@
 				9E49B9C2260C31B300719EC5 /* MenuItems.cpp in Sources */,
 				9EBAFA862980D5E6004F13AA /* UnalignedMemory.cpp in Sources */,
 				9E1D5FCC2475733F003B1774 /* EngineMain.cpp in Sources */,
+				9E75253C2A1458AE00158C14 /* DrawingUtils.cpp in Sources */,
 				9E1D5FCD2475733F003B1774 /* sn76489.cpp in Sources */,
 				9EBAFC122980DFD5004F13AA /* Downloader.cpp in Sources */,
 				9ECAAA6E27D1C7C600A32EEF /* ConnectionManager.cpp in Sources */,
 				9E1D5FCF2475733F003B1774 /* DebugSidePanelCategory.cpp in Sources */,
 				9EBAFBFC2980DF01004F13AA /* CommandForwarder.cpp in Sources */,
 				9EBAFADB2980D5E6004F13AA /* JsonHelper.cpp in Sources */,
+				9E7525262A14584800158C14 /* TextInputHandler.cpp in Sources */,
 				9E1D5FD32475733F003B1774 /* GameMenuBase.cpp in Sources */,
 				9E1D5FD42475733F003B1774 /* ControlsIn.cpp in Sources */,
 				9E1D5FD52475733F003B1774 /* PlayerRecorder.cpp in Sources */,
@@ -4622,6 +4642,7 @@
 				9ECAAA7E27D1C7C600A32EEF /* SentPacketCache.cpp in Sources */,
 				9E1D5FDF2475733F003B1774 /* Compiler.cpp in Sources */,
 				9E1D5FE02475733F003B1774 /* CodeExec.cpp in Sources */,
+				9E7525352A14587A00158C14 /* LemonScriptBindings.cpp in Sources */,
 				9E1D5FE12475733F003B1774 /* main.m in Sources */,
 				9E1499D424CE613F0015EC7C /* Nativizer.cpp in Sources */,
 				9EB2F82124967A55007482F3 /* ApplicationContextMenu.cpp in Sources */,
@@ -4651,13 +4672,13 @@
 				9ECAAA7A27D1C7C600A32EEF /* CryptoFunctions.cpp in Sources */,
 				9EBAFAE52980D5E6004F13AA /* FileCrawler.cpp in Sources */,
 				9EBAFB842980D63E004F13AA /* VertexArrayObject.cpp in Sources */,
+				9E7525472A14592300158C14 /* ModsMenu.cpp in Sources */,
 				9E453AE725B91F500012BADC /* OpenGLTexture.cpp in Sources */,
 				9EBAFBD52980D6BA004F13AA /* CompilerFrontend.cpp in Sources */,
 				9E1D5FF02475733F003B1774 /* Simulation.cpp in Sources */,
 				9E1D5FF12475733F003B1774 /* LemonScriptRuntime.cpp in Sources */,
 				9E1499D024CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */,
 				9ECB71B024C131FB00A8B55E /* OptionsMenu.cpp in Sources */,
-				9EB2F80524967986007482F3 /* ModsMenu.cpp in Sources */,
 				9E82C77A26BDF29A00ADDBD3 /* BackdropView.cpp in Sources */,
 				9E265010254B0A4D0000A100 /* storage_manager.cpp in Sources */,
 				9E1D5FF62475733F003B1774 /* DrawCollection.cpp in Sources */,
@@ -4693,6 +4714,7 @@
 				9E1D60092475733F003B1774 /* GameView.cpp in Sources */,
 				9E1D600C2475733F003B1774 /* Kosinski.cpp in Sources */,
 				9EBAFBA22980D63E004F13AA /* JobManager.cpp in Sources */,
+				9E7525302A14587A00158C14 /* RendererBindings.cpp in Sources */,
 				9E1D600E2475733F003B1774 /* PaletteBitmap.cpp in Sources */,
 				9E1D600F2475733F003B1774 /* DebugSidePanel.cpp in Sources */,
 				9E1D60102475733F003B1774 /* MenuBackground.cpp in Sources */,
@@ -4703,6 +4725,7 @@
 				9E1D60132475733F003B1774 /* BlueSpheresRendering.cpp in Sources */,
 				9E1D60142475733F003B1774 /* ResourceScriptGenerator.cpp in Sources */,
 				9E1D60152475733F003B1774 /* DrawCommand.cpp in Sources */,
+				9E75254B2A14592300158C14 /* ModsMenuEntries.cpp in Sources */,
 				9EBAFBDA2980D6BA004F13AA /* TokenProcessing.cpp in Sources */,
 				9E26502B254B0A4D0000A100 /* relationship_manager.cpp in Sources */,
 				9E1D60172475733F003B1774 /* SecretUnlockedWindow.cpp in Sources */,
@@ -4761,6 +4784,7 @@
 				9E6D243B2982207700140342 /* RemasteredMusicDownload.cpp in Sources */,
 				9E5FD87A27EC08D500CD430A /* BitStream.cpp in Sources */,
 				9E5FD89427EC090600CD430A /* SoftwareRenderer.cpp in Sources */,
+				9E7525222A14582000158C14 /* GeneralMenuEntries.cpp in Sources */,
 				9EBAFAF22980D5E6004F13AA /* Tools.cpp in Sources */,
 				9E5FD87227EC08C000CD430A /* OpenGLDrawerTexture.cpp in Sources */,
 				9E469B6827FBED5900FE908D /* GameUtils.cpp in Sources */,
@@ -4787,6 +4811,7 @@
 				9E5FD8D227EC0BD900CD430A /* GameMenuBase.cpp in Sources */,
 				9E5FD85927EC087E00CD430A /* GameSetupScreen.cpp in Sources */,
 				9EBAFC0B2980DFA2004F13AA /* RumbleEffectQueue.cpp in Sources */,
+				9E75254D2A14592300158C14 /* ModsMenuEntries.cpp in Sources */,
 				9E6D24502982219D00140342 /* BaseType.cpp in Sources */,
 				9E5FD89A27EC091000CD430A /* Kosinski.cpp in Sources */,
 				9E5FD8E227EC0C1900CD430A /* LineNumberTranslation.cpp in Sources */,
@@ -4842,6 +4867,7 @@
 				9E5FD86D27EC08AE00CD430A /* SoftwareRasterizer.cpp in Sources */,
 				9E5FD8B027EC099800CD430A /* ConnectionManager.cpp in Sources */,
 				9EBAFAF72980D5E6004F13AA /* Bitmap.cpp in Sources */,
+				9E7525492A14592300158C14 /* ModsMenu.cpp in Sources */,
 				9E5FD8F327EC0C4E00CD430A /* OpcodeProcessor.cpp in Sources */,
 				9E5FD84827EC084800CD430A /* AudioCollection.cpp in Sources */,
 				9EBAFB102980D5E6004F13AA /* BitmapCodecBMP.cpp in Sources */,
@@ -4891,13 +4917,13 @@
 				9E64753A27DB059800612BC4 /* main.mm in Sources */,
 				9EBAFBF52980D6EF004F13AA /* PragmaSplitter.cpp in Sources */,
 				9EBAFBC52980D6AC004F13AA /* TokenHelper.cpp in Sources */,
-				9E5FD8D127EC0BD900CD430A /* ModsMenu.cpp in Sources */,
 				9E5FD8B327EC09A000CD430A /* CryptoFunctions.cpp in Sources */,
 				9E5FD8CB27EC0BD000CD430A /* ApplicationContextMenu.cpp in Sources */,
 				9E5FD8CF27EC0BD900CD430A /* GameApp.cpp in Sources */,
 				9E5FD8CE27EC0BD900CD430A /* MainMenu.cpp in Sources */,
 				9EBAFA8E2980D5E6004F13AA /* InputStream.cpp in Sources */,
 				9E5FD85627EC087300CD430A /* InputManager.cpp in Sources */,
+				9E7525292A14584800158C14 /* TextInputHandler.cpp in Sources */,
 				9EBAFC1A2980DFD5004F13AA /* DownloadManager.cpp in Sources */,
 				9E5FD8CD27EC0BD900CD430A /* MenuBackground.cpp in Sources */,
 				9EBAFA982980D5E6004F13AA /* String.cpp in Sources */,
@@ -4913,6 +4939,7 @@
 				9ED1832728789ED000506AEB /* PaletteSprite.cpp in Sources */,
 				9E5FD8D527EC0BE200CD430A /* OptionsEntry.cpp in Sources */,
 				9ED1835A28789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
+				9E7525332A14587A00158C14 /* RendererBindings.cpp in Sources */,
 				9E5FD85127EC086500CD430A /* GameLoader.cpp in Sources */,
 				9E5FD86527EC089200CD430A /* DebugLogView.cpp in Sources */,
 				9E5FD87C27EC08D500CD430A /* Logging.cpp in Sources */,
@@ -4923,6 +4950,7 @@
 				9EBAFAA22980D5E6004F13AA /* BinarySerializer.cpp in Sources */,
 				9E5FD84B27EC085100CD430A /* AudioSourceBase.cpp in Sources */,
 				9E5FD85A27EC087E00CD430A /* MenuItems.cpp in Sources */,
+				9E75253E2A1458AE00158C14 /* DrawingUtils.cpp in Sources */,
 				9E5FD8A427EC098400CD430A /* LemonScriptProgram.cpp in Sources */,
 				9E5FD85027EC086100CD430A /* EngineMain.cpp in Sources */,
 				9E5FD8DD27EC0BFE00CD430A /* ScriptImplementations.cpp in Sources */,
@@ -4946,7 +4974,6 @@
 				9E5FD84A27EC084E00CD430A /* AudioPlayer.cpp in Sources */,
 				9E5FD8AB27EC098E00CD430A /* ym2612.cpp in Sources */,
 				9E5FD86427EC089200CD430A /* ProfilingView.cpp in Sources */,
-				9E5FD8A127EC098400CD430A /* LemonScriptBindings.cpp in Sources */,
 				9E5FD85C27EC088500CD430A /* Mod.cpp in Sources */,
 				9E5FD8B927EC09A800CD430A /* ServerClientBase.cpp in Sources */,
 				9EBAFAC02980D5E6004F13AA /* ErrorHandler.cpp in Sources */,
@@ -4957,6 +4984,7 @@
 				9E5FD87F27EC08D500CD430A /* Utils.cpp in Sources */,
 				9ED1834128789EFF00506AEB /* OpenGLRenderer.cpp in Sources */,
 				9E5FD8E427EC0C1900CD430A /* Compiler.cpp in Sources */,
+				9E7525382A14587A00158C14 /* LemonScriptBindings.cpp in Sources */,
 				9EBAFA2B2980D527004F13AA /* BuiltInFunctions.cpp in Sources */,
 				9ED1835F28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9E5FD8D927EC0BF600CD430A /* TimeAttackResultsMenu.cpp in Sources */,
@@ -5004,6 +5032,7 @@
 				9E26501E254B0A4D0000A100 /* store_manager.cpp in Sources */,
 				9E6E863B245F89C400114DEB /* Utils.cpp in Sources */,
 				9E6E8602245F89C400114DEB /* EmulatorInterface.cpp in Sources */,
+				9E75251F2A14582000158C14 /* GeneralMenuEntries.cpp in Sources */,
 				9EBAFB072980D5E6004F13AA /* BitmapCodecPNG.cpp in Sources */,
 				9E6E8631245F89C400114DEB /* EmulationAudioSource.cpp in Sources */,
 				9E7E28DB25EF21370021AE3A /* FileStructureTree.cpp in Sources */,
@@ -5125,7 +5154,6 @@
 				9E6D24372982207700140342 /* RemasteredMusicDownload.cpp in Sources */,
 				9ED1835628789EFF00506AEB /* DebugDrawPlaneShader.cpp in Sources */,
 				9EBAFBE32980D6BA004F13AA /* Parser.cpp in Sources */,
-				9E6E8603245F89C400114DEB /* LemonScriptBindings.cpp in Sources */,
 				9ECAAA9727D1C89200A32EEF /* OptionsMenuEntries.cpp in Sources */,
 				9E6E7B8E245F886B00114DEB /* Program.cpp in Sources */,
 				9E6E85FA245F89C400114DEB /* SpriteCache.cpp in Sources */,
@@ -5157,12 +5185,14 @@
 				9E49B9C1260C31B300719EC5 /* MenuItems.cpp in Sources */,
 				9EBAFA852980D5E6004F13AA /* UnalignedMemory.cpp in Sources */,
 				9E6E8626245F89C400114DEB /* EngineMain.cpp in Sources */,
+				9E75253B2A1458AE00158C14 /* DrawingUtils.cpp in Sources */,
 				9E6E8605245F89C400114DEB /* sn76489.cpp in Sources */,
 				9EBAFC112980DFD5004F13AA /* Downloader.cpp in Sources */,
 				9ECAAA6D27D1C7C600A32EEF /* ConnectionManager.cpp in Sources */,
 				9E6E862B245F89C400114DEB /* DebugSidePanelCategory.cpp in Sources */,
 				9EBAFBFB2980DF01004F13AA /* CommandForwarder.cpp in Sources */,
 				9EBAFADA2980D5E6004F13AA /* JsonHelper.cpp in Sources */,
+				9E7525252A14584800158C14 /* TextInputHandler.cpp in Sources */,
 				9E6E80B1245F88D400114DEB /* GameMenuBase.cpp in Sources */,
 				9E6E8628245F89C400114DEB /* ControlsIn.cpp in Sources */,
 				9E6E80BF245F88D400114DEB /* PlayerRecorder.cpp in Sources */,
@@ -5182,6 +5212,7 @@
 				9ECAAA7D27D1C7C600A32EEF /* SentPacketCache.cpp in Sources */,
 				9E6E7B94245F886B00114DEB /* Compiler.cpp in Sources */,
 				9E6E85FC245F89C400114DEB /* CodeExec.cpp in Sources */,
+				9E7525342A14587A00158C14 /* LemonScriptBindings.cpp in Sources */,
 				9E6E7A54245F723000114DEB /* main.m in Sources */,
 				9E1499D324CE613F0015EC7C /* Nativizer.cpp in Sources */,
 				9EB2F82024967A55007482F3 /* ApplicationContextMenu.cpp in Sources */,
@@ -5211,13 +5242,13 @@
 				9ECAAA7927D1C7C600A32EEF /* CryptoFunctions.cpp in Sources */,
 				9EBAFAE42980D5E6004F13AA /* FileCrawler.cpp in Sources */,
 				9EBAFB832980D63E004F13AA /* VertexArrayObject.cpp in Sources */,
+				9E7525462A14592300158C14 /* ModsMenu.cpp in Sources */,
 				9E453AE625B91F500012BADC /* OpenGLTexture.cpp in Sources */,
 				9EBAFBD42980D6BA004F13AA /* CompilerFrontend.cpp in Sources */,
 				9E6E8604245F89C400114DEB /* Simulation.cpp in Sources */,
 				9E6E85FE245F89C400114DEB /* LemonScriptRuntime.cpp in Sources */,
 				9E1499CF24CE613F0015EC7C /* SourceCodeWriter.cpp in Sources */,
 				9ECB71AD24C131E500A8B55E /* OptionsMenu.cpp in Sources */,
-				9EB2F80424967986007482F3 /* ModsMenu.cpp in Sources */,
 				9E82C77926BDF29A00ADDBD3 /* BackdropView.cpp in Sources */,
 				9E26500F254B0A4D0000A100 /* storage_manager.cpp in Sources */,
 				9E6E85F6245F89C400114DEB /* DrawCollection.cpp in Sources */,
@@ -5253,6 +5284,7 @@
 				9E6E8638245F89C400114DEB /* GameView.cpp in Sources */,
 				9E6E8617245F89C400114DEB /* Kosinski.cpp in Sources */,
 				9EBAFBA12980D63E004F13AA /* JobManager.cpp in Sources */,
+				9E75252F2A14587A00158C14 /* RendererBindings.cpp in Sources */,
 				9E6E8616245F89C400114DEB /* PaletteBitmap.cpp in Sources */,
 				9E6E862D245F89C400114DEB /* DebugSidePanel.cpp in Sources */,
 				9E6E80B7245F88D400114DEB /* MenuBackground.cpp in Sources */,
@@ -5263,6 +5295,7 @@
 				9E6E80C1245F88D400114DEB /* BlueSpheresRendering.cpp in Sources */,
 				9E6E80AB245F88D400114DEB /* ResourceScriptGenerator.cpp in Sources */,
 				9E6E85EF245F89C400114DEB /* DrawCommand.cpp in Sources */,
+				9E75254A2A14592300158C14 /* ModsMenuEntries.cpp in Sources */,
 				9EBAFBD92980D6BA004F13AA /* TokenProcessing.cpp in Sources */,
 				9E26502A254B0A4D0000A100 /* relationship_manager.cpp in Sources */,
 				9E6E80B3245F88D400114DEB /* SecretUnlockedWindow.cpp in Sources */,
@@ -5299,6 +5332,7 @@
 				9EB069DA248088B20080AC49 /* OggLoader.cpp in Sources */,
 				9EBAFC2F2980DFFA004F13AA /* CrashHandler.cpp in Sources */,
 				9EB06A0424808A1C0080AC49 /* DrawCollection.cpp in Sources */,
+				9E7525282A14584800158C14 /* TextInputHandler.cpp in Sources */,
 				9EB06A4D24808B2B0080AC49 /* sn76489.cpp in Sources */,
 				9EB06A2D24808A780080AC49 /* ScrollOffsetsManager.cpp in Sources */,
 				9EBAFBDC2980D6BA004F13AA /* TokenProcessing.cpp in Sources */,
@@ -5345,6 +5379,7 @@
 				9EB06A0C24808A3F0080AC49 /* PersistentData.cpp in Sources */,
 				9EBAFAB02980D5E6004F13AA /* RC4Encryption.cpp in Sources */,
 				9E8202DA2531497400575E6C /* AudioSourceBase.cpp in Sources */,
+				9E7525372A14587A00158C14 /* LemonScriptBindings.cpp in Sources */,
 				9EBAFC362980E062004F13AA /* OpenGLShader.cpp in Sources */,
 				9EBAFBBD2980D63E004F13AA /* AudioReference.cpp in Sources */,
 				9EBAFAF62980D5E6004F13AA /* Bitmap.cpp in Sources */,
@@ -5433,6 +5468,7 @@
 				9EB06A1624808A590080AC49 /* Geometry.cpp in Sources */,
 				9EBAFAD82980D5E6004F13AA /* FileHandle.cpp in Sources */,
 				9E7E291425EF26AF0021AE3A /* unzip.c in Sources */,
+				9E7525322A14587A00158C14 /* RendererBindings.cpp in Sources */,
 				9ECCA1D0259CF24C0093A389 /* FilePackage.cpp in Sources */,
 				9EB06A3324808A930080AC49 /* InputRecorder.cpp in Sources */,
 				9EB06A2324808A670080AC49 /* RenderUtils.cpp in Sources */,
@@ -5462,7 +5498,6 @@
 				9E7E291C25EF27630021AE3A /* ioapi.c in Sources */,
 				9EBAFBC42980D6AC004F13AA /* TokenHelper.cpp in Sources */,
 				9ECAAA7427D1C7C600A32EEF /* ReceivedPacketCache.cpp in Sources */,
-				9EB06A1224808A3F0080AC49 /* LemonScriptBindings.cpp in Sources */,
 				9ECAAA2927D1C25E00A32EEF /* Operators.cpp in Sources */,
 				9EB069B7248088B20080AC49 /* FunctionWrapper.cpp in Sources */,
 				9E0CCAF12518FF360007288E /* ProfilingView.cpp in Sources */,
@@ -5521,10 +5556,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9E90E98428B99C4600526086 /* PBXTargetDependency */ = {
+		9E7525502A14658100158C14 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = oggvorbis_mac;
-			targetProxy = 9E90E98328B99C4600526086 /* PBXContainerItemProxy */;
+			targetProxy = 9E75254F2A14658100158C14 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -5562,6 +5597,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5602,6 +5638,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5644,6 +5681,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 436AD92E6J;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -5676,7 +5714,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5691,6 +5729,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 436AD92E6J;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -5723,7 +5762,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5776,7 +5815,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5831,7 +5870,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air.sonic3air-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5876,6 +5915,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -5932,6 +5972,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -5960,6 +6001,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -5987,9 +6029,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
@@ -6005,6 +6048,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -6029,9 +6073,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sonic3air-dev";
 				PRODUCT_NAME = "sonic3air-dev";
@@ -6049,6 +6094,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 436AD92E6J;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -6071,10 +6117,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6092,6 +6138,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 436AD92E6J;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -6114,10 +6161,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64]" = 11.0;
 				"MACOSX_DEPLOYMENT_TARGET[arch=arm64e]" = 11.0;
-				MARKETING_VERSION = 22.09.10.0;
+				MARKETING_VERSION = 23.05.14.1;
 				"OTHER_LDFLAGS[arch=x86_64]" = "$(SRCROOT)/boost.framework/boost";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sonic3air.oxygenApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
