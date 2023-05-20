@@ -631,8 +631,8 @@ function void fn04aee0()
 {
 	objA0.velocity.x = objA1.velocity.x
 	objA0.velocity.y = objA1.velocity.y
-	D0 = objA1.position.x + s32(objA1.velocity.x) << 8
-	D1 = objA1.position.y + s32(objA1.velocity.y) << 8
+	D0 = objA1.position.x + (objA1.velocity.x << 8)
+	D1 = objA1.position.y + (objA1.velocity.y << 8)
 	objA0.position.x = D0
 	objA0.position.y = D1
 }
