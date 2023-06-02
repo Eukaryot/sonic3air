@@ -175,17 +175,21 @@ function void fn032784()
 			--u8[A2 + 0x02]
 		}
 
+		// Prevents the game from shifting the characters over a pixel
+		// everytime the game mirrors the rotation animation
 		D0 = u8[A2 + 0x01]
-		LookupSinCos()
-		D0.u16 += 0x0100
-		D0.s16 >>= 2
-		u8[A2 + 0x03] = D0.u8
-
-		D2 = u16[A2 + 0x02]
-		D1.s32 = s32(D1.s16) * D2.s16
-		D1 = (D1 << 16) + (D1 >> 16)
-		D1.u16 += objA0.position.x.u16
-		objA1.position.x.u16 = D1.u16
+        LookupSinCos()
+        D0.u16 = (D0.s16 + 0x0100) >> 2
+        u8[A2 + 0x03] = D0.u8
+		
+        D2 = u16[A2 + 0x02]
+        D1.s32 = s32(D1.s16) * D2.s16
+        bool negative = D1.s32 < 0
+        D1.s32 = (negative) ? -D1.s32 : D1.s32
+        D1 >>= 16
+        D1.u16 = (negative) ? -D1.u16 : D1.u16
+        D1.u16 += objA0.position.x.u16
+        objA1.position.x.u16 = D1.u16
 		u8[A2 + 0x01] += 2
 		objA1.groundspeed = 0
 		D0.u16 = objA0.velocity.y
