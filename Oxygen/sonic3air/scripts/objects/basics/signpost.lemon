@@ -164,6 +164,12 @@ function void fn0837d8()
 	u32[A0 + 0x30] = isMainCharacter(CHARACTER_KNUCKLES) ? 0x083b58 : 0x083b4a		// Signpost spinning animation data
 	objA0.position.y.u16 = camera.position.y.u16 - 0x20		// Place the signpost just above the screen
 
+#if STANDALONE
+	// Move signpost in front of Gapsule in FBZ 1; #contributed by iCloudius
+	if (global.zone_act == 0x0400)
+		objA0.sprite_priority = 0x180
+#endif
+
 	playSound(0xb8)
 
 	// "spawnChildObjects(0x083b2e)" replaced by:
