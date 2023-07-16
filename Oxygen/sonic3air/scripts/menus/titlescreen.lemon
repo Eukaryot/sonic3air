@@ -291,7 +291,7 @@ function void TitleScreen()
 	D0 = 1
 	fn00440c()
 
-	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900
+	global.demo_countdown = (global.region_code & 0x40) ? 750 : 900		// 12 seconds and 30 frames/15 seconds 
 #if STANDALONE
 	// Slightly increase the wait time until demo starts
 	global.demo_countdown += 20
@@ -434,7 +434,7 @@ function void TitleScreen()
 
 		if ((control.pad1.pressed | control.pad2.pressed) & CONTROL_START)
 		{
-			global.game_mode = 0x0c
+			global.game_mode = 0x0c			// Main Game
 			lives_counter = 3
 			unused.lives_counter.player2 = 3
 			ring_counter = 0
@@ -511,7 +511,7 @@ function void TitleScreen()
 	if (D0.s16 < 0)
 	{
 		// Blue Spheres rolling demo
-		global.game_mode = 0x34
+		global.game_mode = 0x34		// Special Stage
 		global.next_bluespheres = 1
 		global.sk_bluespheres = 1
 		global.zone = 0x07

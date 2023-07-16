@@ -22,11 +22,11 @@ function void fn063a6a()
 	}
 
 	// Targets:
-	//  - 0x063a96	-> objA0.base_state = 0x00
-	//  - 0x063aca	-> objA0.base_state = 0x02
-	//  - 0x063ae8	-> objA0.base_state = 0x04
-	//  - 0x063b10	-> objA0.base_state = 0x06
-	//  - 0x063b20	-> objA0.base_state = 0x08
+	//  - 0x063a96	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x063aca	-> objA0.base_state = 0x02  -> Waiting for Sonic/Tails to come closer
+	//  - 0x063ae8	-> objA0.base_state = 0x04  -> Punching the boulder
+	//  - 0x063b10	-> objA0.base_state = 0x06  -> back to standing (maybe this was supposed to be a chuckle?...)
+	//  - 0x063b20	-> objA0.base_state = 0x08  -> Standing in place, inactive 
 	call tableLookupAddress(0x063a8c, objA0.base_state)
 
 	fn0661e0()
@@ -84,13 +84,14 @@ function void fn063af2()
 //# address-hook(0x063b10) end(0x063b14)
 function void fn063b10()
 {
-	Object.AnimationProgress.CheckEnd_DistinctTimer(0x0668a7)		// Cutscene Knuckles boulder push animation
+	Object.AnimationProgress.CheckEnd_DistinctTimer(0x0668a7)		// Cutscene Knuckles punching pose to standing animation
 }
 
 
 //# address-hook(0x063b1a) end(0x063b20)
 function void fn063b1a()
 {
+	// Go to inactive state
 	objA0.base_state = 0x08
 }
 
@@ -98,9 +99,12 @@ function void fn063b1a()
 //# address-hook(0x063b20)
 function void fn063b20()
 {
+	// Inactive, do nothing
 }
 
 
+
+// The boulder pushed by Knuckles
 
 //# address-hook(0x063b22) end(0x063b3a)
 function void fn063b22()
@@ -302,17 +306,17 @@ function void fn065efe()
 	A1 = 0xffffb000
 	D2 = 0
 	D3 = 0x3c
-	D4 = 0xffffff8d
+	D4 = 0xffffff8d		// Sonic's hurt sprite
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_TAILS))	// Choose the right animation for Tails
-		D4 = 0xffffff8a
+		D4 = 0xffffff8a		// Tails' hurt sprite
 #endif
 	fn065f84()
 
 	A1 = 0xffffb04a
 	D2 = 1
 	D3 = 0x3d
-	D4 = 0xffffff8a
+	D4 = 0xffffff8a		// Tails' hurt sprite
 	fn065f84()
 
 	A1 = 0xffffb000

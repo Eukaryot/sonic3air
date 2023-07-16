@@ -57,7 +57,7 @@ function void EntryFunctions.competitionMode()
 	System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
 	System.setupCallFrame("CompetitionMode.MainMenu")
 
-	global.game_mode = 0x38
+	global.game_mode = 0x38		// Competition Mode menu
 	InitSaveSlots()
 }
 
@@ -75,7 +75,7 @@ function void EntryFunctions.levelSelect()
 	System.setupCallFrame("GameModeControlLoop", "@EntryPoint")
 	System.setupCallFrame("LevelSelect")
 
-	global.game_mode = 0x1c
+	global.game_mode = 0x1c		// Level Select
 }
 
 

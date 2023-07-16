@@ -385,7 +385,7 @@ function void fn065e72()
 
 		D0 = (global.framecounter & 0x02) ? 2 : 0
 		D0.u8 += u8[A1 + 0x38]
-		u8[A1 + 0x22] = u8[0x065eb0 + D0.u16]
+		u8[A1 + 0x22] = u8[0x065eb0 + D0.u16]		// Sonic/Tails' grasping sprites
 
 		fn085fc4()
 	}

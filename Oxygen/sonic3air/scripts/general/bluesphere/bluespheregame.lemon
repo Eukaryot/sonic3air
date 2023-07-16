@@ -63,7 +63,7 @@ function void BlueSphereGame()
 #endif
 
 	bluespheregame.menu_flags = 0
-	global.game_mode = 0x2c
+	global.game_mode = 0x2c		// Blue Sphere menu
 
 	while (true)
 	{
@@ -538,7 +538,7 @@ function void fn04cf82()
 		lives_counter = 3
 		global.sk_bluespheres = 0
 		global.next_bluespheres = 0
-		global.game_mode = 0x34
+		global.game_mode = 0x34		// Special Stage
 	}
 }
 
@@ -1690,7 +1690,7 @@ function void fn04df04()
 
 	if (bluespheres.rings_remaining != 0 && control.pad1.pressed != 0)
 	{
-		global.game_mode = 0x2c
+		global.game_mode = 0x2c		// Blue Sphere menu
 	}
 }
 
@@ -1704,13 +1704,13 @@ function void fn04df52()
 		--u16[A0 + 0x30]
 		if (s16[A0 + 0x30] < 0)
 		{
-			global.game_mode = 0x2c
+			global.game_mode = 0x2c		// Blue Sphere menu
 		}
 	}
 
 	if (control.pad1.pressed != 0)
 	{
-		global.game_mode = 0x2c
+		global.game_mode = 0x2c		// Blue Sphere menu
 	}
 
 	D0.u8 = global.framecounter.low & 0x0f
@@ -1899,7 +1899,7 @@ function void fn04e0a4()
 	}
 
 	objA1.animation.sprite = 0x0b	// Right star sprite
-	u16[A0 + 0x30] = 0x1d
+	u16[A0 + 0x30] = 29		// Half a second (minus one frame)
 	objA0.update_address = 0x04e116
 	fn04e116()
 }
@@ -1914,7 +1914,7 @@ function void fn04e116()
 	--u16[A0 + 0x30]
 	if (s16[A0 + 0x30] < 0)
 	{
-		u16[A0 + 0x30] = 0x1d
+		u16[A0 + 0x30] = 29		// Half a second (minus one frame)
 		D1.u8 = bluespheregame.shown_difficulty
 		if (D1.u8 != bluespheregame.difficulty_level)
 		{

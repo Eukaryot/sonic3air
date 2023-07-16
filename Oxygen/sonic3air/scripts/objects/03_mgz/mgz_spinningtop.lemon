@@ -358,9 +358,9 @@ function void fn034fbc()
 			if ((D5.u16 & 0x0c00) == 0 && objA0.velocity.x != 0)
 			{
 				if (objA0.velocity.x < 0)
-					u8[A1 + 0x2a] |= 0x01
+					u8[A1 + 0x2a] |= char.flag.FACING_LEFT
 				else
-					u8[A1 + 0x2a] &= ~0x01
+					u8[A1 + 0x2a] &= ~char.flag.FACING_LEFT
 			}
 
 			D0.u8 = u8[A1 + 0x44] + 0x18
@@ -368,19 +368,19 @@ function void fn034fbc()
 			if (A1 == 0xffffb04a)
 				return
 
-			u32 backupA0 = A0
-			A0 = A1
+			u32 backupA0 = A0		// Backing up the spinning top RAM location
+			A0 = A1					// Copying the character's RAM location to A0
 			D3.u16 = D5.u16
-			if (objA0.state != 0x10)
+			if (objA0.state != char.state.STRAIGHTJUMP)
 			{
 				fn035504()
 			}
 
 			Character.CheckAgainstMoveBorders()
 			UpdateMovementStraightSimple()
-			A0 = backupA0
+			A0 = backupA0		// Restore spinning top RAM location
 
-			if (u8[A1 + 0x20] == 0x10)
+			if (u8[A1 + 0x20] == char.state.STRAIGHTJUMP)
 			{
 				objA0.velocity.x = objA1.velocity.x
 				objA0.velocity.y = objA1.velocity.y
@@ -827,22 +827,27 @@ function void fn03555c()
 		D0.u8 = (objA0.value26 + 0x20) & 0xc0
 		if (D0.u8 == 0 && D0.s16 >= 0x0400)
 		{
-			objA0.state = 0x0d
-			objA0.flags2a &= ~0x01
+			objA0.state = char.state.BRAKING
+			objA0.flags2a &= ~char.flag.FACING_LEFT
 			playSound(SFX_BRAKE)
 
-			A2 = A0 - 0xb000 + 0xcc54
-			u8[A2 + 0x05] = 0x06
-			u8[A2 + 0x22] = 0x15
+			u16 dustAddress = 0xcc54
+		#if STANDALONE
+			// Fix dust particles not appearing for Tails when riding the top
+			dustAddress = isMainCharacter(CHARACTER_TAILS) ? 0xcc9e : 0xcc54
+		#endif
+			A2 = A0 - 0xb000 + dustAddress
+			u8[A2 + 0x05] = 0x06		// Base update for braking dust
+			u8[A2 + 0x22] = 0x15		// First frame of dust animation
 		}
 	}
 	else
 	{
-		if ((objA0.flags2a & 0x01) == 0)
+		if ((objA0.flags2a & char.flag.FACING_LEFT) == 0)
 		{
-			objA0.flags2a |= 0x01
-			objA0.flags2a &= ~0x20
-			objA0.state.former = 0x01
+			objA0.flags2a |= char.flag.FACING_LEFT
+			objA0.flags2a &= ~char.flag.PUSHING
+			objA0.state.former = char.state.RUNNING2
 		}
 
 		D0.u16 -= D5.u16
@@ -867,11 +872,11 @@ function void fn0355e4()
 	D0.u16 = objA0.groundspeed
 	if (D0.s16 >= 0)
 	{
-		if (objA0.flags2a & 0x01)
+		if (objA0.flags2a & char.flag.FACING_LEFT)
 		{
-			objA0.flags2a &= ~0x01
-			objA0.flags2a &= ~0x20
-			objA0.state.former = 0x01
+			objA0.flags2a &= ~char.flag.FACING_LEFT
+			objA0.flags2a &= ~char.flag.PUSHING
+			objA0.state.former = char.state.RUNNING2
 		}
 
 		D0.u16 += D5.u16
@@ -896,13 +901,18 @@ function void fn0355e4()
 		D0.u8 = (objA0.value26 + 0x20) & 0xc0
 		if (D0.u8 == 0 && D0.s16 <= -0x0400)
 		{
-			objA0.state = 0x0d
-			objA0.flags2a |= 0x01
+			objA0.state = char.state.BRAKING
+			objA0.flags2a |= char.flag.FACING_LEFT
 			playSound(SFX_BRAKE)
 
-			A2 = A0 - 0xb000 + 0xcc54
-			u8[A2 + 0x05] = 0x06
-			u8[A2 + 0x22] = 0x15
+			u16 dustAddress = 0xcc54
+		#if STANDALONE
+			// Fix dust particles not appearing for Tails when riding the top
+			dustAddress = isMainCharacter(CHARACTER_TAILS) ? 0xcc9e : 0xcc54
+		#endif
+			A2 = A0 - 0xb000 + dustAddress
+			u8[A2 + 0x05] = 0x06		// Base update for braking dust
+			u8[A2 + 0x22] = 0x15		// First frame of dust animation
 		}
 	}
 }
@@ -1128,6 +1138,7 @@ function void fn03598e()
 
 	if (allocDynamicObjectAfterA0())
 	{
+		// Spawn spinning top
 		objA1.update_address = 0x034bf8
 		u8[A1 + 0x2c] = 0x01
 		objA0.value3e = A1.u16

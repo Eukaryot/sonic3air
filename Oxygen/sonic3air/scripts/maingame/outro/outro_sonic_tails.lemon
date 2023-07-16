@@ -866,7 +866,7 @@ function void fn05e142()
 	if (objA0.position.x.u16 < 0x0120 + getScreenExtend())
 	{
 		objA0.base_state = 0x04
-		objA0.animation.sprite = 0x55
+		objA0.animation.sprite = 0x55		// Knuckles looking ahead sprite
 		objA0.countdown_value = 119
 	}
 }
@@ -989,7 +989,7 @@ function void fn05e288()
 	objA0.countdown_value = 0x1f
 
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = 0x58
+	u8[A1 + 0x22] = 0x58		// Set player character's looking forward sprite
 	objA1.state = char.state.RUNNING
 	UpdatePlayer1SpritePatterns()
 }
@@ -1842,7 +1842,7 @@ function void fn05f6fc()
 //# address-hook(0x05fc8e) end(0x05fc98)
 function void fn05fc8e()
 {
-	u8[0xffffb000 + 0x20] = 0
+	u8[0xffffb000 + 0x20] = char.state.RUNNING
 	super.palettefx.frame = 36
 	super.active = 1
 	fn05fc9e()

@@ -334,7 +334,7 @@ function void UpdateGamePause()
 		{
 			if (control.pad1.pressed & CONTROL_A)
 			{
-				global.game_mode = 0x04
+				global.game_mode = 0x04		// Title Screen
 				break
 			}
 
@@ -352,7 +352,7 @@ function void UpdateGamePause()
 		{
 			if ((control.pad1.pressed & CONTROL_B) && (competition_mode.game_mode < 0))
 			{
-				global.game_mode = 0xc0
+				global.game_mode = 0xc0		// Competition Mode Level Select, fading
 				break
 			}
 		}

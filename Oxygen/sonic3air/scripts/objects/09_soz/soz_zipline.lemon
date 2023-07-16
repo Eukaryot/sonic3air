@@ -702,7 +702,7 @@ function void fn04af80()
 				D0.u16 = u16[A3 + 0x2e]
 				if (D0.u16 == 0)
 				{
-					u8[A1 + 0x22] = 0x92
+					u8[A1 + 0x22] = 0x92		// Player characters' hanging sprite
 				}
 				else
 				{
@@ -713,7 +713,7 @@ function void fn04af80()
 					}
 
 					D0 = u8(u8[A3 + 0x26] * 2 + 8) >> 4
-					u8[A1 + 0x22] = u8[0x04b0a0 + D0.u16]
+					u8[A1 + 0x22] = u8[0x04b0a0 + D0.u16]		// Player characters' hanging sprites
 				}
 
 				fn04b08e()
@@ -786,7 +786,7 @@ function void fn04b0b0()
 
 	objA1.state = char.state.HANGING
 	D0 = u8(u8[A3 + 0x26] + 8) >> 4
-	u8[A1 + 0x22] = u8[0x04b0ce + D0.u16]
+	u8[A1 + 0x22] = u8[0x04b0ce + D0.u16]		// Player characters' hanging sprites
 
 	fn04b08e()
 }
@@ -797,7 +797,7 @@ function void fn04b0de()
 {
 	u8[A1 + 0x20] = 0
 	D0 = u8(u8[A3 + 0x37] + 4) >> 4
-	u8[A1 + 0x22] = u8[0x04b110 + D0.u16]
+	u8[A1 + 0x22] = u8[0x04b110 + D0.u16]		// Player characters' hang turn sprites
 	D0.u8 = u8[0x04b120 + D0.u16]
 
 	objA1.render_flags = (objA1.render_flags & ~(render_flag.FLIP_X | render_flag.FLIP_Y)) | D0.u8

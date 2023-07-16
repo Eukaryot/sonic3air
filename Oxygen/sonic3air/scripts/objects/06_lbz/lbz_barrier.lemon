@@ -181,36 +181,3 @@ function void fn0260d2()
 	}
 #endif
 }
-
-
-
-// Not sure if this is even related to the barrier
-
-//# address-hook(0x0625e2) end(0x0625f4)
-function void fn0625e2()
-{
-	objA0.position.x.u16 += 4
-	Object.AnimationProgressByLocalA1()
-
-	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
-	{
-		objA0.base_state = 0x0e
-		fn0625fa()
-	}
-}
-
-
-//# address-hook(0x0625fa) end(0x062618)
-function void fn0625fa()
-{
-	u8[0xffffb000 + 0x2e] = 0
-
-	// Reset palette after Knuckles is off screen
-	loadPaletteLine1(0x0a8fbc)
-
-	if (allocDynamicObjectStd())
-	{
-		// Create the object that fades out the Knuckles theme and starts the level music afterwards
-		objA1.update_address = 0x085b0a
-	}
-}

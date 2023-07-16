@@ -460,7 +460,7 @@ function void fn032610()
 {
 	D0.u8 += 0x0b
 	D0.u16 = D0 / 0x16
-	u8[A1 + 0x22] = u8[0x03263e + D0.u16]
+	u8[A1 + 0x22] = u8[0x03263e + D0.u16]		// Player characters' spinning standing sprites
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA1.render_flags |= u8[0x03264a + D0.u16]
 	D0 = u8[A1 + 0x22]

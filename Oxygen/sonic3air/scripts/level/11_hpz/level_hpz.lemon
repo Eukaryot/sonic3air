@@ -323,16 +323,17 @@ function void UpdateBackground.HPZ()
 
 
 
-// Some object used only in HPZ?
+// Some object used only to change the palette some ways into HPZ
 
 //# address-hook(0x0656a8) end(0x0656d0)
 function void fn0656a8()
 {
-	D0.u16 = u16[A0 + 0x3a]
-	D1 = (camera.position.x.u16 >= 0x0460) ? 4 : 0
-	u16[A0 + 0x3a] = D1.u16
+	D0.u16 = u16[A0 + 0x3a]		// Previous palette state
+	D1 = (camera.position.x.u16 >= 0x0460) ? 4 : 0		// Assign offset for chosen palette entry
+	u16[A0 + 0x3a] = D1.u16		// New palette state
 	if (D1.u16 != D0.u16)
 	{
+		// Switch palette
 		A1 = u32[0x0656d2 + D1.u16]
 		copyMemory(0xfffffc20, A1, 0x60)
 	}

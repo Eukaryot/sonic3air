@@ -75,7 +75,7 @@ function void fn06215e()
 	move_area.right = 0x3940	// Could be moved right, but then you can see bricks with broken palette
 
 	// "spawnChildObjects(0x0665a2)" replaced by:
-	spawnChildObject(0x065bd4, 0x00, 0, 12)
+	spawnChildObject(0x065bd4, 0x00, 0, 12)		// Button for Cutscene Knuckles
 	if (_equal())
 	{
 		u8[A1 + 0x2c] = 2

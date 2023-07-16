@@ -133,13 +133,13 @@ function void fn040c2a()
 	if (D6 & 0x01)
 	{
 		A1 = 0xffffb000
-		crumble = (u8[A1 + 0x20] == 0x02)
+		crumble = (u8[A1 + 0x20] == char.state.ROLLING)
 	}
 
 	if (D6 & 0x02 && !crumble)
 	{
 		A1 = 0xffffb04a
-		crumble = (u8[A1 + 0x20] == 0x02)
+		crumble = (u8[A1 + 0x20] == char.state.ROLLING)
 	}
 
 	if (crumble)

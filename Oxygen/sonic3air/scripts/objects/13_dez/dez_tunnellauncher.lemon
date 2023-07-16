@@ -299,7 +299,7 @@ function void fn048534()
 
 		if (objA1.update_address != 0x0487e4 && objA1.update_address != 0x0487f0)		// Is target a character?
 		{
-			u8[A1 + 0x22] = 0x96
+			u8[A1 + 0x22] = 0x96		// Player characters' jumping sprite
 			D0 = u8[A1 + 0x22]
 			SetCharacterSpritePatterns()
 		}

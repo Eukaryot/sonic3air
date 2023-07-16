@@ -19,7 +19,7 @@ function void fn062b3a()
 	//  - 0x062bf4	-> objA0.base_state = 0x08  -> Walking towards the button
 	//  - 0x062c42	-> objA0.base_state = 0x0a  -> Jumping on the button
 	//  - 0x062c42	-> objA0.base_state = 0x0c  -> Jumping off the button (same update address as 0x0a)
-	//  - 0x062c90	-> objA0.base_state = 0x0c  -> Walking away
+	//  - 0x062c90	-> objA0.base_state = 0x0e  -> Walking away
 	call tableLookupAddress(0x062b58, objA0.base_state)
 
 	Object.loadSpritePatternsForVDP(0x06666a)
@@ -75,7 +75,7 @@ function void fn062bc0()
 	objA0.base_state = 0x06
 
 	// "spawnSimpleChildObjects(0x0665b0)" replaced by:
-	spawnSimpleChildObjects(0x062f72, 1)
+	spawnSimpleChildObjects(0x062f72, 1)		// Knuckles looking left and right
 
 	fn062be4()
 }
@@ -86,6 +86,7 @@ function void fn062be4()
 {
 	if (objA0.flags38 & 0x08)
 	{
+		// Only proceed after the Knuckles Peeking object is done
 		objA0.base_state = 0x08
 		fn062bf4()
 	}
@@ -103,6 +104,7 @@ function void fn062bf4()
 	if (D0.u16 > objA0.position.x.u16)
 		return
 
+	// Start Knuckles jumping on the button
 	objA0.position.x.u16 = D0.u16
 	objA0.base_state = 0x0a
 	objA0.hitbox_extends.y = 0x17
@@ -128,6 +130,7 @@ function void fn062c42()
 //# address-hook(0x062c5a) end(0x062c74)
 function void fn062c5a()
 {
+	// Start Knuckles jumping off the button
 	objA0.base_state = 0x0c
 	objA0.hitbox_extends.y = 0x13
 	objA0.velocity.y = -0x300
@@ -138,6 +141,7 @@ function void fn062c5a()
 //# address-hook(0x062c76) end(0x062c8a)
 function void fn062c76()
 {
+	// Start Knuckles walking away
 	objA0.base_state = 0x0e
 	objA0.velocity.x = 0x200
 	objA0.velocity.y = 0
@@ -362,7 +366,7 @@ function void fn062e28()
 	setupObjectAttributesFull(0x06644a)
 
 	// "spawnSimpleChildObjects(0x0665b6)" replaced by:
-	spawnSimpleChildObjects(0x06300c, 1)
+	spawnSimpleChildObjects(0x06300c, 1)		// Sliding door
 
 	if (checkpoint.number == 0 && !isMainCharacter(CHARACTER_KNUCKLES))
 		objA0.update_address = 0x062e5c
@@ -482,6 +486,9 @@ function void fn062f4c()
 }
 
 
+
+// Knuckles looking left and right
+
 //# address-hook(0x062f72) end(0x062f9a)
 function void fn062f72()
 {
@@ -491,7 +498,7 @@ function void fn062f72()
 	objA0.position.x.u16 = 0x0374
 	objA0.position.y.u16 = 0x066c
 	objA0.velocity.x = 0x0200
-	objA0.countdown_value = 0x07
+	objA0.countdown_value = 7
 	objA0.countdown_callback = 0x062fb4
 	fn062fa2()
 }
@@ -505,9 +512,6 @@ function void fn062fa2()
 	DrawObject()
 }
 
-
-
-// Knuckles looking left and right
 
 //# address-hook(0x062fb4) end(0x062fc8)
 function void fn062fb4()
@@ -531,7 +535,7 @@ function void fn062fda()
 {
 	objA0.update_address = 0x062fa2
 	objA0.velocity.x = -0x400
-	objA0.countdown_value = 0x0f
+	objA0.countdown_value = 15
 	objA0.countdown_callback = 0x062ffc
 	u8[A0 + 0x0a] &= ~0x80
 }
@@ -540,7 +544,7 @@ function void fn062fda()
 //# address-hook(0x062ffc) end(0x063006)
 function void fn062ffc()
 {
-	A1 = 0xffff0000 + u16[A0 + 0x46]
+	A1 = 0xffff0000 + u16[A0 + 0x46]		// Main Cutscene Knuckles object
 	u8[A1 + 0x38] |= 0x08
 	Object.TriggerUnloading()
 }
@@ -587,14 +591,15 @@ function void fn06303c()
 		D0.s16 = -D0.s16
 
 	objA0.velocity.y = D0.u16
-	objA0.countdown_value = 0x3f
+	objA0.countdown_value = 63
 	objA0.countdown_callback = 0x0630be
 	fn063a6()
 }
 
 
 //# address-hook(0x0630a6) end(0x0630b8)
-function void fn063a6()
+//# alias(fn063a6) deprecated
+function void fn0630a6()
 {
 	UpdateMovementStraightSimple()
 	fn065e4c()

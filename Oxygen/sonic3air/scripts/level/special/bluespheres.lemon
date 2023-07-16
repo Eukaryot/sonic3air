@@ -159,7 +159,7 @@ function void SpecialStage()
 	bluespheres.stage_exit_animation = 0
 	VDP.Config.setRenderingModeConfiguration(true)		// Enable shadow/highlight palette mode
 
-	global.demo_countdown = 1800
+	global.demo_countdown = 1800	// 30 seconds
 	fn0075d2()
 
 #if STANDALONE
@@ -211,7 +211,7 @@ function void SpecialStage()
 		if (global.rolling_demo && global.demo_countdown == 0)
 			break
 
-		if (global.game_mode != 0x34)	// Blue Spheres game mode
+		if (global.game_mode != 0x34)	// Blue Spheres Special Stage
 			break
 
 	#if STANDALONE
@@ -219,7 +219,7 @@ function void SpecialStage()
 		//  -> Not used at the moment, so nevermind
 		if (level.restart)
 		{
-			global.game_mode = 0x0c
+			global.game_mode = 0x0c		// Main Game
 			return
 		}
 	#endif
@@ -227,7 +227,7 @@ function void SpecialStage()
 
 	if (global.rolling_demo)
 	{
-		global.game_mode = 0
+		global.game_mode = 0		// Initialization
 	}
 
 	global.demo_countdown = 60
@@ -1355,7 +1355,7 @@ function void fn00972e()
 		{
 			// Game over
 			bluespheres.stage_exit_animation = 1
-			global.game_mode = (bluespheres.minigame_mode == 0) ? 0x48 : 0x2c
+			global.game_mode = (bluespheres.minigame_mode == 0) ? 0x48 : 0x2c		// Special Stage results/Blue Sphere game menu
 			if (global.stage_type != 0)
 			{
 				global.zone_act = level.backup.zone_act

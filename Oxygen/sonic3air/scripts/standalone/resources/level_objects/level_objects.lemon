@@ -226,7 +226,7 @@ constant u8 OBJECTTABLE1_41		= 0x41		// Object address 0x031704 = -- cnz_balloon
 constant u8 OBJECTTABLE1_42		= 0x42		// Object address 0x0318a4 = -- cnz_cannon.lemon
 constant u8 OBJECTTABLE1_43		= 0x43		// Object address 0x031b9e = -- cnz_inflatingplatform.lemon
 constant u8 OBJECTTABLE1_44		= 0x44		// Object address 0x031c9e = -- cnz_helix.lemon
-constant u8 OBJECTTABLE1_45		= 0x45		// Object address 0x031d3a = -- cnz2_knuckles_lights_out.lemon
+constant u8 OBJECTTABLE1_45		= 0x45		// Object address 0x031d3a = Lightbulb in CNZ2's lights out cutscene
 constant u8 OBJECTTABLE1_46		= 0x46		// Object address 0x031d90 = -- cnz_fan.lemon
 constant u8 OBJECTTABLE1_47		= 0x47		// Object address 0x0320f2 = -- cnz_barrel.lemon
 constant u8 OBJECTTABLE1_48		= 0x48		// Object address 0x031f30 = -- cnz_magneticbarrier.lemon
@@ -288,7 +288,7 @@ constant u8 OBJECTTABLE1_7f		= 0x7f		// Object address 0x03c462 = -- fbz_parachu
 constant u8 OBJECTTABLE1_80		= 0x80		// Object address 0x0836e0 = Hidden monitor
 constant u8 OBJECTTABLE1_81		= 0x81		// Object address 0x086540 = Capsule
 constant u8 OBJECTTABLE1_82		= 0x82		// Object address 0x061d4c = Cutscene Knuckles
-constant u8 OBJECTTABLE1_83		= 0x83		// Object address 0x065bd4 = -- aiz2_post_boss_cutscene.lemon
+constant u8 OBJECTTABLE1_83		= 0x83		// Object address 0x065bd4 = Buttons for Cutscene Knuckles
 constant u8 OBJECTTABLE1_84		= 0x84		// Object address 0x067472 = Cutscene Sonic in intro
 constant u8 OBJECTTABLE1_85		= 0x85		// Object address 0x06166a = Giant Ring
 constant u8 OBJECTTABLE1_86		= 0x86		// Object address 0x060c56 = -- gm_trigger.lemon
@@ -546,7 +546,7 @@ constant u8 OBJECTTABLE2_7f		= 0x7f		// Object address 0x044a68 = -- ssz_platfor
 constant u8 OBJECTTABLE2_80		= 0x80		// Object address 0x0836e0 = Hidden monitor
 constant u8 OBJECTTABLE2_81		= 0x81		// Object address 0x086540 = Capsule
 constant u8 OBJECTTABLE2_82		= 0x82		// Object address 0x061d4c = Cutscene Knuckles
-constant u8 OBJECTTABLE2_83		= 0x83		// Object address 0x065bd4 = -- aiz2_post_boss_cutscene.lemon
+constant u8 OBJECTTABLE2_83		= 0x83		// Object address 0x065bd4 = Buttons for Cutscene Knuckles
 constant u8 OBJECTTABLE2_84		= 0x84		// Object address 0x067472 = Cutscene Sonic in intro
 constant u8 OBJECTTABLE2_85		= 0x85		// Object address 0x06166a = Giant Ring
 constant u8 OBJECTTABLE2_86		= 0x86		// Object address 0x060c56 = -- gm_trigger.lemon
@@ -583,18 +583,18 @@ constant u8 OBJECTTABLE2_a4		= 0xa4		// Object address 0x0919ec = -- dez_spikebo
 constant u8 OBJECTTABLE2_a5		= 0xa5		// Object address 0x091c3c = -- dez_chainspike.lemon
 constant u8 OBJECTTABLE2_a6		= 0xa6		// Object address 0x07ddb4 = -- boss_dez1.lemon
 constant u8 OBJECTTABLE2_a7		= 0xa7		// Object address 0x07f06c = -- boss_dez2.lemon
-constant u8 OBJECTTABLE2_a8		= 0xa8		// Object address 0x062ca4 = -- mhz1_knuckles_cutscene.lemon
-constant u8 OBJECTTABLE2_a9		= 0xa9		// Object address 0x062e28 = -- mhz1_knuckles_cutscene.lemon
+constant u8 OBJECTTABLE2_a8		= 0xa8		// Object address 0x062ca4 = MHZ1 cutscene trigger
+constant u8 OBJECTTABLE2_a9		= 0xa9		// Object address 0x062e28 = Cutscene Knuckles Button in MHZ1
 constant u8 OBJECTTABLE2_aa		= 0xaa		// Object address 0x08f0b8 = -- soz2_ghostspawn.lemon
 constant u8 OBJECTTABLE2_ab		= 0xab		// Object address 0x08f390 = -- soz2_ghostspawn.lemon
 constant u8 OBJECTTABLE2_ac		= 0xac		// Object address 0x08f3f6 = -- soz2_ghostspawn.lemon
 constant u8 OBJECTTABLE2_ad		= 0xad		// Object address 0x079c52 = -- lrz_lavafallplatform.lemon
-constant u8 OBJECTTABLE2_ae		= 0xae		// Object address 0x063b22 = -- lrz_knucklescutscene.lemon
-constant u8 OBJECTTABLE2_af		= 0xaf		// Object address 0x0659b6 = -- ssz_start.lemon
+constant u8 OBJECTTABLE2_ae		= 0xae		// Object address 0x063b22 = LRZ2 cutscene trigger
+constant u8 OBJECTTABLE2_af		= 0xaf		// Object address 0x0659b6 = Cutscene Knuckles Button in SSZ
 constant u8 OBJECTTABLE2_b0		= 0xb0		// Object address 0x0906a0 = -- hpz_masteremerald.lemon
-constant u8 OBJECTTABLE2_b1		= 0xb1		// Object address 0x0656a8 = -- level_hpz.lemon
+constant u8 OBJECTTABLE2_b1		= 0xb1		// Object address 0x0656a8 = HPZ palette switcher
 constant u8 OBJECTTABLE2_b2		= 0xb2		// Object address 0x07ca1c = -- level_ssz_knuckles.lemon
-constant u8 OBJECTTABLE2_b3		= 0xb3		// Object address 0x0863ec = -- level_lrz.lemon
+constant u8 OBJECTTABLE2_b3		= 0xb3		// Object address 0x0863ec = LRZ2 stage exit right, to HPZ
 constant u8 OBJECTTABLE2_b4		= 0xb4		// Object address 0x090774 = -- hpz_superemerald.lemon
 constant u8 OBJECTTABLE2_b5		= 0xb5		// Object address 0x090964 = -- hpz_emeraldcave.lemon
 constant u8 OBJECTTABLE2_b6		= 0xb6		// Object address 0x0817da = -- boss_ddz_1.lemon

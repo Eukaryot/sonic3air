@@ -276,6 +276,8 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 
 		if (key == 0)
 		{
+			if (animationSpriteEx < 0x100)
+				animationSprite = animationSpriteEx		// Allows calling basegame sprites without a modded key
 			key = stringformat(stringformat("%s_0x%02x", getCharacterSpriteKey(character)), animationSprite)
 
 			if (!Renderer.hasCustomSprite(key))
@@ -312,6 +314,8 @@ function bool Standalone.drawCharacterSprite(u8 character, u8 variant, s16 px, s
 			}
 		}
 
+		if (animationSpriteEx < 0x100)
+			animationSprite = animationSpriteEx		// Allows calling basegame sprites without a modded key
 		key = stringformat(stringformat("%s_tails_0x%02x", getCharacterSpriteKey(CHARACTER_TAILS)), animationSprite)
 		if (!Renderer.hasCustomSprite(key))
 		{

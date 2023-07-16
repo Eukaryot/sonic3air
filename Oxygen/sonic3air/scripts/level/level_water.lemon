@@ -191,7 +191,7 @@ function void fn00723e()
 		if (D1.s8 < 0)
 			u8[A1 + 0x2a] |= 0x01
 
-		u8[A1 + 0x20] = (global.zone == 0x05) ? 0x19 : 0x1b
+		u8[A1 + 0x20] = (global.zone == 0x05) ? char.state.GOT_HURT_PANIC : char.state.FALLING_PANIC
 		u8[A1 + 0x2b] |= char.bonus.INFINITE_INERTIA
 	}
 	else

@@ -17,7 +17,7 @@ global s16 MainMenuBG.logoPosition		// "Sonic 3 A.I.R." logo x-position
 
 function void MainMenuBG.Run()
 {
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c			// Main Game
 	global.zone_act = 0x0d01		// Outro for Sonic/Tails
 
 	// Load the required level patterns for the outro

@@ -71,7 +71,7 @@ function void fn041d32()
 //# address-hook(0x041d5c) end(0x041df2)
 function void fn041d5c()
 {
-	if (u8[A1 + 0x20] != 2)
+	if (u8[A1 + 0x20] != char.state.ROLLING)
 		return
 
 	objA1.velocity.x = -objA1.velocity.x

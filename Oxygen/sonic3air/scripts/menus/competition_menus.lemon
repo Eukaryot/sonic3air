@@ -130,7 +130,7 @@ function void CompetitionMode.MainMenu()
 		if (D0.u8 & CONTROL_B)
 	#endif
 		{
-			global.game_mode = 0x04
+			global.game_mode = 0x04		// Title Screen
 
 		#if STANDALONE
 			playSound(0xad)
@@ -194,7 +194,7 @@ function void fn00aa2c()
 //# address-hook(0x00aa2e) end(0x00aa34)
 function void fn00aa2e()
 {
-	global.game_mode = 0x04
+	global.game_mode = 0x04		// Title Screen
 
 #if STANDALONE
 	playSound(0xad)
@@ -215,7 +215,7 @@ function void fn00aa36()
 	competition_mode.game_mode = 0
 	competition_mode.item_flag = competition_mode.menu.items_toggle
 	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
-	global.game_mode = 0x3c
+	global.game_mode = 0x3c		// Competition Mode character select
 	fn00aa8e()
 }
 
@@ -226,7 +226,7 @@ function void fn00aa54()
 	competition_mode.game_mode = 3
 	competition_mode.item_flag = competition_mode.menu.items_toggle
 	competition_mode.multiplay = (control.pad2.pressed & (CONTROL_START | CONTROL_A | CONTROL_C)) ? 0xff : 0x00
-	global.game_mode = 0x40
+	global.game_mode = 0x40		// Competition Mode level select
 	fn00aa8e()
 }
 
@@ -239,7 +239,7 @@ function void fn00aa74()
 		u16[0xffffff8a] = 0xffff	// Items off (competition_mode.item_flag = 0xff), set game mode to time attack (competition_mode.game_mode = -1)
 
 		competition_mode.multiplay = 0
-		global.game_mode = 0xc0
+		global.game_mode = 0xc0		// Competition Mode Level Select, fading
 		fn00aa8e()
 	}
 	else
@@ -576,7 +576,7 @@ function void CompetitionMode.StageSelect()
 	global.zone = u8[0x00af1e + competition_mode.menu.stage]
 	global.act = 0
 	fn00c104()
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c			// Main Game
 }
 
 
@@ -903,7 +903,7 @@ function void fn00b2cc()
 
 	global.zone_act = 0x0e00
 	fn00c104()
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c			// Main Game
 }
 
 
@@ -1397,6 +1397,7 @@ function void fn00b74e()
 				{
 					if (D0.u16 & 0xe0)
 					{
+						// Competition Mode menu
 						global.game_mode = 0x38
 						return
 					}
@@ -1771,7 +1772,7 @@ function void fn00bc08()
 		{
 			if (control.pad1.pressed & (CONTROL_START | CONTROL_A | CONTROL_C))
 			{
-				global.game_mode = 0xc0
+				global.game_mode = 0xc0		// Competition Mode Level Select, fading
 				return
 			}
 		}

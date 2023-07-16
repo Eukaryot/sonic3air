@@ -147,10 +147,7 @@ function void fn067c58()
 	}
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x0a] & 0x80)
-	{
-		u8[A0 + 0x0a] |= 0x80
-	}
+	u8[A0 + 0x0a] |= (u8[A1 + 0x0a] & 0x80)
 }
 
 

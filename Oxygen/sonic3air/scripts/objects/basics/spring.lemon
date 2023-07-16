@@ -535,7 +535,7 @@ function void SpringHorizontal.ApplyToCharacter()
 //# address-hook(0x0231be) end(0x023266)
 function void fn0231be()
 {
-	u16[A1 + 0x32] = 0x0f
+	u16[A1 + 0x32] = 15		// "char.hlock_countdown"
 	if ((u8[A1 + 0x2a] & char.flag.ROLLING) == 0)
 	{
 		u8[A1 + 0x20] = 0

@@ -178,11 +178,11 @@ function void DynamicRing.UpdateAttraction()
 function void fn01a64a()
 {
 	// Targets:
-	//  - 0x01a67a	-> objA0.base_state = 0x00
-	//  - 0x01a75c	-> objA0.base_state = 0x02
-	//  - 0x01a7c2	-> objA0.base_state = 0x04
-	//  - 0x01a7d6	-> objA0.base_state = 0x06
-	//  - 0x01a7e4	-> objA0.base_state = 0x08
+	//  - 0x01a67a	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x01a75c	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x01a7c2	-> objA0.base_state = 0x04  -> Collected
+	//  - 0x01a7d6	-> objA0.base_state = 0x06  -> Sparkles animation
+	//  - 0x01a7e4	-> objA0.base_state = 0x08  -> Unloading
 	call tableLookupAddress(0x01a658, objA0.base_state)
 }
 
@@ -191,11 +191,11 @@ function void fn01a64a()
 function void fn01a662()
 {
 	// Targets:
-	//  - 0x01a67a	-> objA0.base_state = 0x00
-	//  - 0x01a7e8	-> objA0.base_state = 0x02
-	//  - 0x01a7c2	-> objA0.base_state = 0x04
-	//  - 0x01a7d6	-> objA0.base_state = 0x06
-	//  - 0x01a7e4	-> objA0.base_state = 0x08
+	//  - 0x01a67a	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x01a7e8	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x01a7c2	-> objA0.base_state = 0x04  -> Collected
+	//  - 0x01a7d6	-> objA0.base_state = 0x06  -> Sparkles animation
+	//  - 0x01a7e4	-> objA0.base_state = 0x08  -> Unloading
 	call tableLookupAddress(0x01a670, objA0.base_state)
 }
 
@@ -398,11 +398,11 @@ function void fn01a7e8()
 function void fn01a51a()
 {
 	// Targets:
-	//  - 0x01a532	-> objA0.base_state = 0x00
-	//  - 0x01a568	-> objA0.base_state = 0x02
-	//  - 0x01a572	-> objA0.base_state = 0x04
-	//  - 0x01a584	-> objA0.base_state = 0x06
-	//  - 0x01a592	-> objA0.base_state = 0x08
+	//  - 0x01a532	-> objA0.base_state = 0x00  -> Initialization
+	//  - 0x01a568	-> objA0.base_state = 0x02  -> Regular update
+	//  - 0x01a572	-> objA0.base_state = 0x04  -> Collected
+	//  - 0x01a584	-> objA0.base_state = 0x06  -> Sparkles animation
+	//  - 0x01a592	-> objA0.base_state = 0x08  -> Unloading
 	call tableLookupAddress(0x01a528, objA0.base_state)
 }
 

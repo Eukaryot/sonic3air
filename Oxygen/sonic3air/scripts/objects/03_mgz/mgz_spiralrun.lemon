@@ -198,7 +198,7 @@ function void fn033cac()
 				}
 				D2.u16 = u8(0x40 - D2.u8)
 				D2.u16 = D2 / 0x0b
-				u8[A1 + 0x22] = u8[0x033f6c + D2.s16]
+				u8[A1 + 0x22] = u8[0x033f6c + D2.s16]		// Player characters' corkscrew vertical running sprites
 
 				D0 = u8[A1 + 0x22]
 				SetCharacterSpritePatterns()

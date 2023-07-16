@@ -489,7 +489,7 @@ function void fn02a106()
 	#endif
 		{
 			D0 = objA0.value26
-			u8[A1 + 0x22] = u8[0x02a218 + D0.u16]
+			u8[A1 + 0x22] = u8[0x02a218 + D0.u16]		// Player characters' spinning standing sprites
 			objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 			D0.u8 = u8[0x02a224 + D0.u16]
 			objA1.render_flags |= D0.u8

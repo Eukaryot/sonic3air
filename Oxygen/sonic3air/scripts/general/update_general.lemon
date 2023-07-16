@@ -26,7 +26,7 @@ function void GameModeControlLoop()
 #endif
 
 	InitSaveSlots()
-	global.game_mode = 0
+	global.game_mode = 0		// Initialization
 
 	while (true)
 	{
@@ -37,7 +37,7 @@ function void GameModeControlLoop()
 		if (global.game_mode & 0x03 || (global.game_mode & 0x7f) > 0x50)
 		{
 			assert(false, stringformat("Invalid game mode: 0x%02x", global.game_mode))
-			global.game_mode = 0
+			global.game_mode = 0		// Initialization
 		}
 
 	#if GAMEAPP
@@ -610,7 +610,7 @@ function void UpdateRollingDemo()
 
 	if (control.pad1.pressed & CONTROL_START)
 	{
-		global.game_mode = 0x04
+		global.game_mode = 0x04		// Title Screen
 	}
 
 	A0 = rolling_demo.progress
@@ -662,10 +662,21 @@ function void UpdateRollingDemo()
 
 
 
-// Happens after Game Over
+// "JumpToSegaScreen" according to s3unlocked
+// The same game mode index value was used for in Sonic 2 for Vs Mode results screen, so this is probably a dummy
+
+//# address-hook(0x00051a) end(0x000520)
+function void fn00051a()
+{
+	global.game_mode = 0		// Initialization
+}
+
+
+
+// (Re)initialization. Happens after Game Over, some endings, and exiting some screens
 
 //# address-hook(0x003e2a) end(0x003e30)
 function void fn003e2a()
 {
-	global.game_mode = 0x04
+	global.game_mode = 0x04		// Title Screen
 }

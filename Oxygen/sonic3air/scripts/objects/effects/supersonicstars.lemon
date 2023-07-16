@@ -23,8 +23,7 @@ function void fn019156()
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
 	objA0.sprite_attributes = (Shield.targetInVRAM >> 5)
-	if (u8[0xffffb000 + 0x0a] & 0x80)
-		u8[A0 + 0x0a] |= 0x80
+	u8[A0 + 0x0a] |= (u8[0xffffb000 + 0x0a] & 0x80)
 
 	objA0.update_address = 0x0191a4
 	fn0191a4()

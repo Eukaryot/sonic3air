@@ -265,7 +265,7 @@ function void fn061892()
 {
 	global.sk_bluespheres = D0.u8
 	global.stage_type = 1
-	global.game_mode = 0x34
+	global.game_mode = 0x34		// Special Stage
 	global.in_extra_stage = 1
 	fn0618d0()
 }

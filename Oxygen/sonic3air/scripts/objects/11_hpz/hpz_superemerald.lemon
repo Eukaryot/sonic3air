@@ -199,7 +199,7 @@ function void fn090926()
 
 		global.next_bluespheres = objA0.subtype2c
 		global.stage_type = 1
-		global.game_mode = 0x34
+		global.game_mode = 0x34		// Special Stage
 		global.in_extra_stage = 1
 		global.sk_bluespheres = 1
 		checkpoint.number = level.backup.checkpoint

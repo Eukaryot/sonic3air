@@ -1895,7 +1895,7 @@ function void fn07eeee()
 
 	D0 = u8[A0 + 0x3c]
 	A1 = 0xffffb000
-	u8[A1 + 0x22] = u8[0x07ef2e + D0.u16]
+	u8[A1 + 0x22] = u8[0x07ef2e + D0.u16]		// Player characters' spinning standing sprites
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 
 	D0.u8 = u8[0x07ef3a + D0.u16]
@@ -1914,6 +1914,6 @@ function void fn05fd88()
 {
 	A1 = 0xffffb000
 	D0.u16 = global.characters & 0x03
-	u8[A1 + 0x22] = u8[0x05fda0 + D0.u16]
+	u8[A1 + 0x22] = u8[0x05fda0 + D0.u16]		// Player characters' standing sprites. notably this includes Knuckles, even though he normally doesn't go to this zone
 	UpdatePlayer1SpritePatterns()
 }

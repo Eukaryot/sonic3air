@@ -117,7 +117,7 @@ function void fn03f10a()
 function void fn03f11c()
 {
 	D0 = u8[A2 + 0x04] >> 4
-	u8[A1 + 0x22] = u8[0x03f146 + D0.u16]
+	u8[A1 + 0x22] = u8[0x03f146 + D0.u16]		// Player characters' pole spinning sprites
 
 	D1.s16 = s8[0x03f156 + D0.u16]
 	if (objA1.render_flags & render_flag.FLIP_X)
@@ -249,7 +249,7 @@ function void fn03f246()
 				objA1.position.x.u16 = objA0.position.x.u16 + D2.u16
 				u8[A1 + 0x20] = 0
 				u8[A1 + 0x2e] = 0x03
-				u8[A1 + 0x22] = 0x62
+				u8[A1 + 0x22] = 0x62		// Set Player characters' pole posing sprite; unfortunately, due to an error, it only shows up for one frame
 
 				u8[A2 + 0x04] = 0x08
 				u8[A2] = 0x01

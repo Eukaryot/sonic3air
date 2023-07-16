@@ -3573,10 +3573,8 @@ function void CollectRing()
 function void CollectRing_P2()
 {
 	// Only used for the ring item in competition mode
-	if (unused.player2.total_rings < 999)
-		++unused.player2.total_rings
-	if (ring_counter.player2 < 999)
-		++ring_counter.player2
+	unused.player2.total_rings = min(unused.player2.total_rings + 1, 999)
+	ring_counter.player2 = min(ring_counter.player2 + 1, 999)
 
 	// Left out this code, as it's not relevant in Sonic 3, just some leftover from Sonic 2
 #if !STANDALONE
@@ -3587,18 +3585,18 @@ function void CollectRing_P2()
 		return
 	}
 
-	u8[0xfffffebe] |= 0x01	// Player 2 version of "hud.dirty.rings", I guess
+	unused.hud.dirty.rings.player2 |= 0x01
 	if (ring_counter.player2 >= 100)
 	{
 		bool gainLife = false
-		if ((u8[0xfffffebf] & 0x02) == 0)
+		if ((unused.extra_lives_granted.player2 & 0x02) == 0)
 		{
-			u8[0xfffffebf] |= 0x02
+			unused.extra_lives_granted.player2 |= 0x02
 			gainLife = true
 		}
-		else if (ring_counter.player2 >= 200 && (u8[0xfffffebf] & 0x04) == 0)
+		else if (ring_counter.player2 >= 200 && (unused.extra_lives_granted.player2 & 0x04) == 0)
 		{
-			u8[0xfffffebf] |= 0x04
+			unused.extra_lives_granted.player2 |= 0x04
 			gainLife = true
 		}
 
@@ -6283,7 +6281,7 @@ function void Character.LandingOnGroundResetState()
 	}
 
 	// Check for Knuckles gliding/falling/standup state
-	if (char.character == CHARACTER_KNUCKLES && char.state >= 0x20)
+	if (char.character == CHARACTER_KNUCKLES && char.state >= char.state.KNUX_FLYCLIMB)
 	{
 		char.state = char.state.RUNNING
 	}

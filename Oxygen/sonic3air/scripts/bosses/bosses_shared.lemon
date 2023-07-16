@@ -710,7 +710,7 @@ function void fn067e28()
 
 
 
-// Somehow related...
+// Object to manage fading to white, and if to fade back after
 
 //# address-hook(0x085e64) end(0x085e70)
 function void fn085e64()
@@ -726,25 +726,26 @@ function void fn085e64()
 function void fn085e74()
 {
 	--objA0.countdown_value
-	if (objA0.countdown_value < 0)
+	if (objA0.countdown_value >= 0)
+		return
+
+	objA0.countdown_value = u16[A0 + 0x3a]
+	fadePaletteToWhiteUniform()
+
+	--objA0.value39
+	if (s8(objA0.value39) >= 0)
+		return
+
+	if (objA0.subtype2c == 0)
 	{
-		objA0.countdown_value = u16[A0 + 0x3a]
-		fadePaletteToWhiteUniform()
-
-		--objA0.value39
-		if (s8(objA0.value39) >= 0)
-			return
-
-		if (objA0.subtype2c == 0)
-		{
-			u8[0xfffffabf] = 0
-			Object.TriggerUnloading()
-		}
-		else
-		{
-			objA0.update_address = 0x085ee6
-			objA0.flags38 |= 0x20
-		}
+		u8[0xfffffabf] = 0
+		Object.TriggerUnloading()
+	}
+	else
+	{
+		// Replace object to countdown before fading back from white
+		objA0.update_address = 0x085ee6
+		objA0.flags38 |= 0x20
 	}
 }
 
@@ -808,6 +809,9 @@ function void FadeColorToWhiteUniform()
 }
 
 
+
+// Object to countdown before fading back from white
+
 //# address-hook(0x085ee6) end(0x085ef2)
 function void fn085ee6()
 {
@@ -829,11 +833,11 @@ function void fn085ef8()
 	fadePaletteTowardsTargetUniform()
 
 	--objA0.value39
-	if (s8[A0 + 0x39] < 0)
-	{
-		u8[0xfffffabf] = 0
-		Object.TriggerUnloading()
-	}
+	if (s8(objA0.value39) >= 0)
+		return
+
+	u8[0xfffffabf] = 0
+	Object.TriggerUnloading()
 }
 
 

@@ -536,9 +536,10 @@ function void fn063846()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn object to manage fading to white, and if to fade back after
 			u16[A0 + 0x44] = A1.u16
 			objA1.update_address = 0x085e64
-			u16[A1 + 0x3a] = 0x07
+			u16[A1 + 0x3a] = 7
 			u8[A1 + 0x2c] = 0xff
 
 			// "spawnSimpleChildObjects(0x066650)" replaced by:

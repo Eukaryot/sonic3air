@@ -47,9 +47,10 @@ function void fn079416()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object to manage fading to white, and if to fade back after
 		objA1.update_address = 0x085e64
 		u16[A0 + 0x44] = A1.u16
-		u16[A1 + 0x3a] = 0x03
+		u16[A1 + 0x3a] = 3
 	}
 
 	Kosinski.addToDMAQueue(0x17093c, 0x8480)	// Robotnik in pod, missiles and more
@@ -72,6 +73,7 @@ function void fn079486()
 
 	if (allocDynamicObjectStd())
 	{
+		// Spawn object to countdown before fading back from white
 		objA1.update_address = 0x085ee6
 		u16[A0 + 0x44] = A1.u16
 	}

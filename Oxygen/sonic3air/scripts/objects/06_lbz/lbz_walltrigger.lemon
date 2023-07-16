@@ -60,7 +60,7 @@ function void fn025cf0()
 //# address-hook(0x025d2c) end(0x025d52)
 function void fn025d2c()
 {
-	if (u8[A1 + 0x20] == 0x02)
+	if (u8[A1 + 0x20] == char.state.ROLLING)
 	{
 		objA1.velocity.x = -objA1.velocity.x
 		objA1.velocity.y = -objA1.velocity.y

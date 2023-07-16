@@ -70,7 +70,7 @@ function void TitleScreen_SK()
 	}
 	copyMemory(0xfffffca0, 0x0055a8, 0x20)
 
-	global.demo_countdown = (global.region_code & 0x40) ? 150 : 180
+	global.demo_countdown = (global.region_code & 0x40) ? 150 : 180		// 2.5 seconds / 3 seconds
 
 	VDP.Config.setActiveDisplay(true)
 
@@ -116,7 +116,7 @@ function void TitleScreen_SK()
 	playMusic(MUSIC_TITLESCREEN)
 
 	lives_counter = 3
-	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080
+	global.demo_countdown = (global.region_code & 0x40) ? 900 : 1080		// 15 seconds / 18 seconds
 
 	while (true)
 	{
@@ -215,7 +215,7 @@ function void TitleScreen_SK()
 		if ((control.pad1.pressed & CONTROL_START) == 0)
 			continue
 
-		global.game_mode = 0x0c
+		global.game_mode = 0x0c			// Main Game
 		lives_counter = 3
 		unused.lives_counter.player2 = 3
 		ring_counter = 0
@@ -294,7 +294,7 @@ function void TitleScreen_SK()
 
 	if (D0.s16 < 0)
 	{
-		global.game_mode = 0x34
+		global.game_mode = 0x34		// Special Stage
 		global.next_bluespheres = 1
 		global.sk_bluespheres = 1
 		global.zone = 0x07
@@ -307,7 +307,7 @@ function void TitleScreen_SK()
 		{
 			fn00552e()
 		}
-		global.game_mode = 0x08
+		global.game_mode = 0x08		// Rolling Demo
 	}
 
 	global.rolling_demo = 1

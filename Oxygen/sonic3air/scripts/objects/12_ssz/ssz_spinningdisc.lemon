@@ -343,6 +343,7 @@ function void fn0460a6()
 	D0.u16 >>= 5
 	D0.u16 &= 0xfffe
 
+	// Player characters' spinning standing sprites
 	A2 = 0x0468c4 + D0.u16
 	D0.u8 = u8[(A2+=1)-1]
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)

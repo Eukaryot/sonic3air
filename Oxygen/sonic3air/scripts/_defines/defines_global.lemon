@@ -670,6 +670,10 @@ define slotmachine.peppermintblock.animframe =  u8[0xfffffeb5]
 define spilled_rings.speed		=  u8[0xfffffeb6]	// This is both animation speed and a countdown until spilled rings vanish
 define spilled_rings.animframe	=  u8[0xfffffeb7]	// Animation frame 0..3
 define spilled_rings.progress	= u16[0xfffffeb8]	// Grows faster at first, slower towards the end
+define unused.hud.dirty.lives.player2		=  u8[0xfffffebc]	// Gets increased for each life earned this frame
+define unused.hud.dirty.score.player2		=  u8[0xfffffebd]	// Set to 0x01 to update the score
+define unused.hud.dirty.rings.player2		=  u8[0xfffffebe]	// Flags: 0x01 to update last digit only, 0x80 to update all digits
+define unused.extra_lives_granted.player2	=  u8[0xfffffebf]	// Bitmask for continue (bit 0), and extra lives at 100 and 200 rings (bits 1, 2)
 
 define global.move.speedcap.tails		= u16[0xfffffec0]	// Speed cap for normal running for Tails (common value is 0x0600)
 define global.move.acceleration.tails	= u16[0xfffffec2]	// Acceleration for Tails (common value is 0x000c)

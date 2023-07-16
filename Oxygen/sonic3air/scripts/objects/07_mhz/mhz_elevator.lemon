@@ -388,6 +388,8 @@ function void fn03e5f2()
 //# address-hook(0x03e658) end(0x03e680)
 function void fn03e658()
 {
+	// Update Sonic's animation while hanging on the elevator hooks
+
 	D0.u16 = u16[A0 + 0x34]
 	if (D0.u16 != 0)
 	{

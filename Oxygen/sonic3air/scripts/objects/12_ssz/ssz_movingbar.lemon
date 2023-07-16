@@ -107,7 +107,7 @@ function void fn0453e6()
 		objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 		u8[A1 + 0x20] = 0
 
-		D0.u16 = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? 0xe9 : 0xe5
+		D0.u16 = (u8[A1 + 0x2a] & char.flag.FACING_LEFT) ? 0xe9 : 0xe5		// Player characters' hanging sprites, facing forward or back
 		u8[A1 + 0x22] = D0.u8
 		SetCharacterSpritePatterns()
 	}

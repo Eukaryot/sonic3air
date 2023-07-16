@@ -337,7 +337,11 @@ function void UpdateTimeAndHud()
 		else
 		{
 			// Debug mode
+
+			// Draw position values over score
 			DebugModePositionDisplay()
+
+			// Update rings
 			if (hud.dirty.rings != 0)
 			{
 				if (hud.dirty.rings & 0x80)
@@ -350,14 +354,17 @@ function void UpdateTimeAndHud()
 				RefreshRingsHudDisplay()
 			}
 
+			// Draw lag frame count over timer minutes
 			D0 = VDPHelper.getDirectVRAMWriteCode(0xde40)
 			D1 = global.lag_frames
 			RefreshTimeMinutesHudDisplay()
 
+			// Draw sprite count over timer seconds
 			D0 = VDPHelper.getDirectVRAMWriteCode(0xdec0)
 			D1 = u8[0xfffff62c]
 			RefreshTimeSecondsHudDisplay()
 
+			// Update lives
 			if (hud.dirty.lives != 0)
 			{
 				hud.dirty.lives = 0

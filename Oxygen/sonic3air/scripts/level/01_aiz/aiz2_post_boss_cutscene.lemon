@@ -12,47 +12,18 @@
 // Cutscene with Knuckles after AIZ 2 Boss               //
 //-------------------------------------------------------//
 
-//# address-hook(0x065bd4) end(0x065bf6)
-function void fn065bd4()
-{
-	// This is also used in CNZ 2
-
-	if (isMainCharacter(CHARACTER_KNUCKLES))
-	{
-		UnloadObject()
-		return
-	}
-
-#if STANDALONE
-	// Also unload for other characters in Time Attack, which skips Knuckles cutscenes anyway
-	if (Game.isTimeAttack())
-	{
-		UnloadObject()
-		return
-	}
-#endif
-
-	setupObjectAttributesFull(0x066402)
-	objA0.update_address = 0x065c04
-	objA0.position.y.u16 += 4
-
-	addPatternLoadingCue(0x065bfc)		// Knuckles' button sprites
-}
-
-
-
 // Knuckles in action again!
 
 //# address-hook(0x061f98) end(0x061fb0)
 function void fn061f98()
 {
 	// Targets:
-	//  - 0x061fc2	-> objA0.base_state = 0x00
-	//  - 0x062014	-> objA0.base_state = 0x02
-	//  - 0x062022	-> objA0.base_state = 0x04
-	//  - 0x06206e	-> objA0.base_state = 0x06
-	//  - 0x0620aa	-> objA0.base_state = 0x08
-	//  - 0x0620e4	-> objA0.base_state = 0x0a
+	//  - 0x061fc2	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x062014	-> objA0.base_state = 0x02	-> Waiting time before Knuckles starts
+	//  - 0x062022	-> objA0.base_state = 0x04	-> Knuckles walks in
+	//  - 0x06206e	-> objA0.base_state = 0x06  -> Knuckles chuckling
+	//  - 0x0620aa	-> objA0.base_state = 0x08	-> Knuckles jumps onto the button and back, triggers bridge collapse in between
+	//  - 0x0620e4	-> objA0.base_state = 0x0a  -> Back to chuckling
 	call tableLookupAddress(0x061fb6, objA0.base_state)
 
 	Object.loadSpritePatternsForVDP(0x06666a)
@@ -83,6 +54,26 @@ function void fn061fc2()
 		objA1.position.x.u16 = 0x4b08
 		objA1.position.y.u16 = 0x0178
 	}
+}
+
+
+//# address-hook(0x062022) end(0x062050)
+function void fn062022()
+{
+	D0.u16 = objA0.position.x.u16 - 2
+	if (D0.u16 >= 0x4b3c)
+	{
+		objA0.position.x.u16 = D0.u16
+		Object.animationProgress(0x06669f)		// Cutscene Knuckles walking animation
+		return
+	}
+
+	// Start Knuckles chuckling
+	objA0.base_state = 0x06
+	objA0.render_flags &= ~render_flag.FLIP_X
+	objA0.countdown_value = 95
+	objA0.countdown_callback = 0x06207a
+	fn062056()
 }
 
 
@@ -120,53 +111,18 @@ function void fn0620ea()
 }
 
 
-//# address-hook(0x062158) end(0x062158)
-function void fn062158()
-{
-	UnloadObject()
-}
-
-
 //# address-hook(0x06201a) end(0x062020)
 function void fn06201a()
 {
+	// Start Knuckles walking in
 	objA0.base_state = 0x04
-}
-
-
-//# address-hook(0x0625a6) end(0x0625ba)
-function void fn0625a6()
-{
-	objA0.base_state = 0x08
-	objA0.countdown_value = 0x7f
-	objA0.countdown_callback = 0x0625ca
-	fn062080()
 }
 
 
 //# address-hook(0x06207a) end(0x06207a)
 function void fn06207a()
 {
+	// Start Knuckles jumping back and forth on the button
 	objA0.base_state = 0x08
 	fn062080()
-}
-
-
-//# address-hook(0x062080) end(0x062086)
-function void fn062080()
-{
-	objA0.velocity.x = -0x100
-	objA0.velocity.y = -0x400
-	fn06208c()
-}
-
-
-//# address-hook(0x06208c) end(0x0620a8)
-function void fn06208c()
-{
-	u32[A0 + 0x30] = 0x0666af		// Cutscene Knuckles jumping animation data
-	objA0.animation.timer = 0
-	objA0.animation.frame = 0
-	objA0.animation.sprite = 0x08
-	objA0.hitbox_extends.y = 0x13
 }

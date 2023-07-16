@@ -349,7 +349,7 @@ function void fn02291a()
 				if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 					angle = -angle
 				D0.u16 = (angle + 8) >> 4
-				u8[A1 + 0x22] = u8[0x022a4c + D0.u16]
+				u8[A1 + 0x22] = u8[0x022a4c + D0.u16]		// Player characters' hanging sprites
 
 				fn022a28()
 			}
@@ -425,7 +425,7 @@ function void fn022a5c()
 	u16 offset = (u8(angle + 0x10) >> 5) * 2
 
 	u8[A1 + 0x20] = 0
-	u8[A1 + 0x22] = u8[0x022ad8 + offset]
+	u8[A1 + 0x22] = u8[0x022ad8 + offset]		// Player characters' bar spinning sprites
 	D2.s16 = s8[0x022ae8 + offset]
 	D3.s16 = s8[0x022ae9 + offset]
 	if (u8[A1 + 0x2a] & char.flag.FACING_LEFT)

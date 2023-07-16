@@ -542,7 +542,7 @@ function void fn0221ec()
 		D0.s8 = -D0.s8
 
 	D0.u16 = u8(D0.u8 + 8) >> 4
-	u8[A1 + 0x22] = u8[0x022248 + D0.u16]
+	u8[A1 + 0x22] = u8[0x022248 + D0.u16]		// Player characters' hanging sprites
 	fn022224()
 }
 
@@ -602,7 +602,7 @@ function void fn022258()
 	A3 = 0xffff0000 + u16[A0 + 0x3c]
 
 	u16 offset = (u8(angle + 0x10) >> 5) * 2
-	u8[A1 + 0x22] = u8[0x0222d4 + offset]
+	u8[A1 + 0x22] = u8[0x0222d4 + offset]		// Player characters' bar spinning sprites
 
 #if STANDALONE
 

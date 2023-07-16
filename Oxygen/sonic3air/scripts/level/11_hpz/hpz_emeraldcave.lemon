@@ -285,7 +285,7 @@ function void fn090b84()
 	}
 
 	D0 = u8[A2 + 0x01] + u8[A1 + 0x38]
-	u8[A1 + 0x22] = u8[0x090bca + D0.u16]
+	u8[A1 + 0x22] = u8[0x090bca + D0.u16]		// Player characters' standing and looking up sprites, changes for each emerald
 
 	u32 backupA2 = A2
 	fn085fc4()
@@ -507,7 +507,7 @@ function void fn090da2()
 function void fn090dc0()
 {
 	D0 = u8[A1 + 0x38]
-	u8[A1 + 0x22] = u8[0x090dd8 + D0.u16]
+	u8[A1 + 0x22] = u8[0x090dd8 + D0.u16]		// Player characters' looking up sprites
 
 	u32 backupA2 = A2
 	fn085fc4()
@@ -658,8 +658,8 @@ function void fn090eae()
 		objA1.position.y.u16 += 4
 	}
 
-	u8[A1 + 0x22] = u8[0x090f06 + D0.u16]
-	u8[A1 + 0x20] = 5
+	u8[A1 + 0x22] = u8[0x090f06 + D0.u16]		// Player characters' standing sprites
+	u8[A1 + 0x20] = char.state.STANDING
 	fn085fc4()
 }
 

@@ -280,7 +280,7 @@ function bool LevelSelect.innerUpdate()
 				}
 
 				// Start Blue Spheres
-				global.game_mode = 0x34
+				global.game_mode = 0x34		// Special Stage
 
 			#if STANDALONE
 				if (control.pad1.state & CONTROL_A)
@@ -321,7 +321,7 @@ function bool LevelSelect.innerUpdate()
 	else if (control.pad1.pressed & CONTROL_B || Input.buttonPressed(BUTTON_BACK))
 	{
 	#if !GAMEAPP
-		global.game_mode = 0x04
+		global.game_mode = 0x04		// Title Screen
 	#endif
 
 		playSound(0xad)
@@ -427,7 +427,7 @@ function bool fn007d6c()
 	checkpoint.zone_act.apparent = D0.u16
 	checkpoint.move_area.bottom = 0x1000
 	level.backup.move_area.bottom = 0x1000
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c			// Main Game
 
 	lives_counter = 3
 	unused.lives_counter.player2 = 3

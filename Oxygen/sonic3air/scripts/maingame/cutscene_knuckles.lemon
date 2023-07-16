@@ -55,6 +55,37 @@ function void fn062014()
 }
 
 
+//# address-hook(0x062056) end(0x06206c)
+function void fn062056()
+{
+	// Do the chuckle
+	u32[A0 + 0x30] = 0x0666b9		// Cutscene Knuckles crossing arms to chuckling animation data
+	objA0.animation.timer = 0
+	objA0.animation.frame = 0
+	objA0.animation.sprite = 0x1c
+}
+
+
+//# address-hook(0x062080) end(0x062086)
+function void fn062080()
+{
+	objA0.velocity.x = -0x100
+	objA0.velocity.y = -0x400
+	fn06208c()
+}
+
+
+//# address-hook(0x06208c) end(0x0620a8)
+function void fn06208c()
+{
+	u32[A0 + 0x30] = 0x0666af		// Cutscene Knuckles jumping animation data
+	objA0.animation.timer = 0
+	objA0.animation.frame = 0
+	objA0.animation.sprite = 0x08
+	objA0.hitbox_extends.y = 0x13
+}
+
+
 //# address-hook(0x0620aa) end(0x0620e0)
 function void fn0620aa()
 {
@@ -80,6 +111,13 @@ function void fn0620aa()
 			}
 		}
 	}
+}
+
+
+//# address-hook(0x062158) end(0x062158)
+function void fn062158()
+{
+	UnloadObject()
 }
 
 
@@ -109,10 +147,50 @@ function void fn0623fe()
 }
 
 
+//# address-hook(0x065dd6) end(0x065dea)
+function void fn065dd6()
+{
+	if (allocDynamicObjectStd())
+	{
+		// Create the object that fades out level music and starts the Knuckles theme afterwards
+		objA1.update_address = 0x085b30
+		u8[A1 + 0x2c] = MUSIC_KNUCKLES
+	}
+}
+
+
 
 //-------------------------------------------------------//
 // Buttons that Knuckles loves to jump on                //
 //-------------------------------------------------------//
+
+//# address-hook(0x065bd4) end(0x065bf6)
+function void fn065bd4()
+{
+	// This is used in AIZ 2, HCZ 2, and CNZ 2
+
+	if (isMainCharacter(CHARACTER_KNUCKLES))
+	{
+		UnloadObject()
+		return
+	}
+
+#if STANDALONE
+	// Also unload for other characters in Time Attack, which skips Knuckles cutscenes anyway
+	if (Game.isTimeAttack())
+	{
+		UnloadObject()
+		return
+	}
+#endif
+
+	setupObjectAttributesFull(0x066402)
+	objA0.update_address = 0x065c04
+	objA0.position.y.u16 += 4
+
+	addPatternLoadingCue(0x065bfc)		// Knuckles' button sprites
+}
+
 
 //# address-hook(0x065c04) end(0x065c3a)
 function void fn065c04()

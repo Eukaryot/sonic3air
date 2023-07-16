@@ -829,6 +829,6 @@ function void fn08311a()
 	--objA0.value39
 	if (s8[A0 + 0x39] < 0)
 	{
-		objA0.update_address = 0x085ee6
+		objA0.update_address = 0x085ee6		// Object to countdown before fading back from white
 	}
 }

@@ -191,20 +191,20 @@ function void fn03ed6e()
 						objA1.position.y.u16 = objA0.position.y.u16 + 0x14
 						u8[A1 + 0x20] = 0
 						u8[A1 + 0x2e] = 0x03
-						u8[A1 + 0x22] = 0x94
+						u8[A1 + 0x22] = 0x94		// Player characters' bar hanging sprites
 						u8[A2 + 0x04] = 0
 						u8[A2 + 0x06] = 0
 						u8[A2 + 0x08] = 0
 
 						if (s16[A3] <= -0x400)
 						{
-							u8[A1 + 0x22] = 0x95
+							u8[A1 + 0x22] = 0x95		// Player characters' bar hanging sprites
 							u8[A2 + 0x04] = 0x20
 							u8[A2 + 0x08] = 0x10
 						}
 						else if (s16[A3] >= 0x0400)
 						{
-							u8[A1 + 0x22] = 0x95
+							u8[A1 + 0x22] = 0x95		// Player characters' bar hanging sprites
 							u8[A2 + 0x04] = 0x21
 							u8[A2 + 0x08] = 0x10
 						}
@@ -226,6 +226,8 @@ function void fn03ed6e()
 //# address-hook(0x03efba) end(0x03f018)
 function void fn03efba()
 {
+	// Update Sonic's animation while hanging on the horizontal bar
+
 	if (abs(s16[A3]) < 0x400)
 	{
 		D0.u8 = u8[A2 + 0x04]

@@ -471,6 +471,7 @@ function void DataSelect.update()
 			copyMemory(A0, 0x00ca9a, 0x1e)
 		}
 
+		// Data Select
 		if (global.game_mode != 0x4c)
 			break
 	}
@@ -746,7 +747,7 @@ function void fn00d1fa()
 
 function void DataSelect.sharedNewGameStartup()
 {
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c			// Main Game
 	global.zone_act = 0
 	global.zone_act.apparent = 0
 	global.next_bluespheres = 0
@@ -1111,7 +1112,7 @@ function bool fn00d458()
 		sram.block_interrupts.u8 = 0xff
 		SaveGameSlot()
 
-		global.game_mode = 0x0c
+		global.game_mode = 0x0c			// Main Game
 		DrawObject()
 		return 0
 	}

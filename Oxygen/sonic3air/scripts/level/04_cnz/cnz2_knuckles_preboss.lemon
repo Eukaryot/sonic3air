@@ -38,14 +38,14 @@ function void fn0624de()
 function void fn0624f2()
 {
 	// Targets:
-	//  - 0x062528	-> objA0.base_state = 0x00
-	//  - 0x06254e	-> objA0.base_state = 0x02
-	//  - 0x06256c	-> objA0.base_state = 0x04
-	//  - 0x062014	-> objA0.base_state = 0x06
-	//  - 0x0620aa	-> objA0.base_state = 0x08
-	//  - 0x0625be	-> objA0.base_state = 0x0a
-	//  - 0x0625e2	-> objA0.base_state = 0x0c
-	//  - 0x06261a	-> objA0.base_state = 0x0e
+	//  - 0x062528	-> objA0.base_state = 0x00	-> Initialization
+	//  - 0x06254e	-> objA0.base_state = 0x02	-> Waiting for player to reach the right place
+	//  - 0x06256c	-> objA0.base_state = 0x04	-> Move the player forward a bit
+	//  - 0x062014	-> objA0.base_state = 0x06	-> Waiting time before Knuckles starts
+	//  - 0x0620aa	-> objA0.base_state = 0x08	-> Knuckles jumps onto the button and back, triggers transporter in between
+	//  - 0x0625be	-> objA0.base_state = 0x0a	-> Commence chuckling
+	//  - 0x0625e2	-> objA0.base_state = 0x0c	-> Walking away
+	//  - 0x06261a	-> objA0.base_state = 0x0e	-> Sonic being taken by the transporter
 	call tableLookupAddress(0x062510, objA0.base_state)
 
 	Object.loadSpritePatternsForVDP(0x06666a)
@@ -100,8 +100,19 @@ function void fn06256c()
 	objA1.velocity.y = 0
 	objA1.groundspeed = 0
 
-	objA0.countdown_value = 0x1f
+	objA0.countdown_value = 31
 	objA0.countdown_callback = 0x0625a6
+}
+
+
+//# address-hook(0x0625a6) end(0x0625ba)
+function void fn0625a6()
+{
+	// Start Knuckles jumping back and forth on button
+	objA0.base_state = 0x08
+	objA0.countdown_value = 127
+	objA0.countdown_callback = 0x0625ca
+	fn062080()
 }
 
 
@@ -121,6 +132,36 @@ function void fn0625ca()
 	objA0.animation.frame = 0
 	objA0.animation.timer = 0
 	u32[A0 + 0x30] = 0x06669f		// Cutscene Knuckles walking animation data
+}
+
+
+//# address-hook(0x0625e2) end(0x0625f4)
+function void fn0625e2()
+{
+	objA0.position.x.u16 += 4
+	Object.AnimationProgressByLocalA1()
+
+	if ((objA0.render_flags & render_flag.VISIBLE) == 0)
+	{
+		objA0.base_state = 0x0e
+		fn0625fa()
+	}
+}
+
+
+//# address-hook(0x0625fa) end(0x062618)
+function void fn0625fa()
+{
+	u8[0xffffb000 + 0x2e] = 0
+
+	// Reset palette after Knuckles is off screen
+	loadPaletteLine1(0x0a8fbc)
+
+	if (allocDynamicObjectStd())
+	{
+		// Create the object that fades out the Knuckles theme and starts the level music afterwards
+		objA1.update_address = 0x085b0a
+	}
 }
 
 

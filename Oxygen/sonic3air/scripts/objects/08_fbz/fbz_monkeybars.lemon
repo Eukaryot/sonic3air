@@ -303,7 +303,7 @@ function void fn03aa7e()
 				u8[A1 + 0x20] = (D1.u16 == 0) ? char.state.HANGING : char.state.RUNNING
 
 				D1.u8 += u8[A2 + 0x08]
-				u8[A1 + 0x22] = u8[0x03ac38 + D1.s16]
+				u8[A1 + 0x22] = u8[0x03ac38 + D1.s16]		// Player characters' monkey bar sprites
 				D1.s16 = s8[0x03ac40 + D1.s16]
 				if (u8[A2 + 0x02] != 0)
 				{
@@ -350,7 +350,7 @@ function void fn03aa7e()
 			u8[A1 + 0x1e] = 0x0e
 			u8[A1 + 0x1f] = 0x07
 			objA1.state = char.state.ROLLING
-			u8[A1 + 0x22] = 0x96
+			u8[A1 + 0x22] = 0x96		// Set player character's jumping sprite
 			u8[A1 + 0x27] = 0
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 			objA1.flags2a &= ~(char.flag.ON_OBJECT | char.flag.CONTROL_LOCK)
@@ -464,7 +464,7 @@ function void fn03ac86()
 			objA1.velocity.y = 0
 			objA1.groundspeed = 0
 			objA1.state = char.state.HANGING
-			u8[A1 + 0x22] = 0x91
+			u8[A1 + 0x22] = 0x91		// Set player character's hanging sprite
 			u8[A1 + 0x2a] |= char.flag.ON_OBJECT
 			u8[A1 + 0x2e] = 0x03
 			u16[A1 + 0x42] = A0.u16

@@ -52,7 +52,8 @@ function void AIZ_ForegroundDeco_shared(u8 shift)
 }
 
 //# address-hook(0x02c26a) end(0x02c26a)
-function void fn2c26a()
+//# alias(fn2c26a) deprecated
+function void fn02c26a()
 {
 	DrawOrUnloadObject()
 }

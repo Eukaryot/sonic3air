@@ -1008,7 +1008,7 @@ function void fn07cc3a()
 	objA0.position.y.u16 = objA1.position.y.u16
 	objA0.velocity.x = 0x0400
 	objA0.velocity.y = 0x80
-	objA1.animation.sprite = 0xc0
+	objA1.animation.sprite = 0xc0		// Set Knuckles' gliding sprite
 #if STANDALONE
 	// In S3AIR, it can happen that Knuckles faces the wrong direction while gliding
 	u8[A1 + 0x2a] = 0
@@ -1035,7 +1035,7 @@ function void fn07cc68()
 	objA0.velocity.x = 0
 	objA0.velocity.y = 0
 	objA0.hitbox_extends.y = 0x13
-	objA1.animation.sprite = 0xca
+	objA1.animation.sprite = 0xca		// Set Knuckles' glide mid-drop sprite
 	UpdatePlayer1SpritePatterns()
 }
 
@@ -1047,7 +1047,7 @@ function void fn07ccb0()
 	if (objA0.countdown_value == 0)
 	{
 		A1 = 0xffffb000
-		objA1.animation.sprite = 0xcb
+		objA1.animation.sprite = 0xcb		// Set Knuckles' dropping sprite
 		UpdatePlayer1SpritePatterns()
 	}
 
@@ -1164,7 +1164,7 @@ function void fn07cd82()
 		objA0.animation.sprite = 2
 
 		objA1.render_flags |= render_flag.FLIP_X
-		objA1.animation.sprite = 0xcb
+		objA1.animation.sprite = 0xcb		// Set Knuckles' dropping sprite
 		u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 		u8[A1 + 0x2e] = 0x83
 		u8[A1 + 0x3d] = 0

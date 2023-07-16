@@ -57,7 +57,7 @@ function void fn0674ac()
 	objA0.box_size.y = 0x20
 	objA0.position.x.u16 = 0x60 + getScreenExtend()
 	objA0.position.y.u16 = 0x30
-	objA0.countdown_value = 0x40
+	objA0.countdown_value = 64
 	objA0.countdown_callback = 0x06751a
 	u16[A0 + 0x40] = 0x08
 
@@ -110,7 +110,7 @@ function void fn067536()
 
 	objA0.base_state = 0x06
 	objA0.velocity.x = 0
-	objA0.countdown_value = 0x5f
+	objA0.countdown_value = 95
 	objA0.countdown_callback = 0x067572
 	fn0685e2()
 }
@@ -172,9 +172,9 @@ function void fn0675c0()
 	objA0.countdown_value = 0x05
 	objA0.countdown_callback = 0x0675fa
 #if STANDALONE
-	u16[A0 + 0x3a] = 0x2f	// Fine-tuning
+	u16[A0 + 0x3a] = 47	// Fine-tuning
 #else
-	u16[A0 + 0x3a] = 0x3f
+	u16[A0 + 0x3a] = 63
 #endif
 
 	fn067996()
@@ -540,6 +540,7 @@ function void fn06795c()
 //# address-hook(0x067996) end(0x0679b6)
 function void fn067996()
 {
+	// Sonic transforming offscreen
 	objA0.mapping_offset = 0x146816
 	objA0.animation.sprite = 0x21
 	super.palettefx.timer = 0
@@ -552,7 +553,7 @@ function void fn067996()
 function void fn0679b8()
 {
 	super.active = 1
-	objA0.animation.sprite = (global.framecounter & 0x02) ? 0x22 : 0x21
+	objA0.animation.sprite = (global.framecounter & 0x02) ? 0x22 : 0x21		// Super Sonic's running sprites
 
 #if STANDALONE
 	super.palettefx.state = 0x80
@@ -595,6 +596,7 @@ function void fn067a08()
 //# address-hook(0x067a20) end(0x067a4c)
 function void fn067a20()
 {
+	// Seems like a variation of "Object.AnimationProgress"
 	A1 = u32[A0 + 0x30]
 	if (objA0.animation.timer == 0)
 	{
@@ -658,18 +660,6 @@ function void fn061dbe()
 }
 
 
-//# address-hook(0x065dd6) end(0x065dea)
-function void fn065dd6()
-{
-	if (allocDynamicObjectStd())
-	{
-		// Create the object that fades out level music and starts the Knuckles theme afterwards
-		objA1.update_address = 0x085b30
-		u8[A1 + 0x2c] = MUSIC_KNUCKLES
-	}
-}
-
-
 //# address-hook(0x061df4) end(0x061e1e)
 function void fn061df4()
 {
@@ -677,6 +667,7 @@ function void fn061df4()
 	if ((u8[A1 + 0x2a] & 0x80) == 0)
 		return
 
+	// Start Knuckles jumping out of the ground
 	objA0.base_state = 0x04
 	objA0.flags2a |= 0x80
 	objA0.velocity.y = -0x600
@@ -693,17 +684,18 @@ function void fn061e24()
 	UpdateMovementSimple()
 	if (D0.s32 >= 0)
 	{
+		// Dropping down after jumping
 		CheckGroundCollision()
 		if (D1.s16 < 0)
 		{
 			objA0.base_state = 0x06
 			objA0.position.y.u16 += D1.u16
-			objA0.animation.sprite = 0x16
+			objA0.animation.sprite = 0x16		// Cutscene Knuckles standing sprite
 		#if STANDALONE
 			// Don't wait that long, both Sonic and Knuckles just stands there doing nothing for quite some time...
-			objA0.countdown_value = 0x3f
+			objA0.countdown_value = 63
 		#else
-			objA0.countdown_value = 0x7f
+			objA0.countdown_value = 127
 		#endif
 			objA0.countdown_callback = 0x061e6a
 		}
@@ -726,7 +718,7 @@ function void fn061e6a()
 	u32[A0 + 0x30] = 0x0666a9		// Cutscene Knuckles running animation data
 	objA0.velocity.x = -0x600
 	objA0.velocity.y = 0
-	objA0.countdown_value = 0x29
+	objA0.countdown_value = 41
 	objA0.countdown_callback = 0x061ea8
 	fn061e96()
 }
@@ -812,9 +804,10 @@ function void fn061f70()
 //# address-hook(0x061ea8) end(0x061ec0)
 function void fn061ea8()
 {
+	// Knuckles running back to place after grabbing the emeralds
 	objA0.velocity.x = -objA0.velocity.x
 	objA0.render_flags ^= render_flag.FLIP_X
-	objA0.countdown_value = 0x29
+	objA0.countdown_value = 41
 	objA0.countdown_callback = 0x061ec2
 }
 
@@ -823,8 +816,8 @@ function void fn061ea8()
 function void fn061ec2()
 {
 	objA0.base_state = 0x0a
-	objA0.animation.sprite = 0x16
-	objA0.countdown_value = 0x3f
+	objA0.animation.sprite = 0x16		// Back to standing
+	objA0.countdown_value = 63
 	objA0.countdown_callback = 0x061eec
 	fn062056()
 }
@@ -842,33 +835,4 @@ function void fn061eec()
 	{
 		objA1.update_address = 0x085b0a
 	}
-}
-
-
-//# address-hook(0x062022) end(0x062050)
-function void fn062022()
-{
-	D0.u16 = objA0.position.x.u16 - 2
-	if (D0.u16 >= 0x4b3c)
-	{
-		objA0.position.x.u16 = D0.u16
-		Object.animationProgress(0x06669f)		// Cutscene Knuckles walking animation
-		return
-	}
-
-	objA0.base_state = 0x06
-	objA0.render_flags &= ~render_flag.FLIP_X
-	objA0.countdown_value = 0x5f
-	objA0.countdown_callback = 0x06207a
-	fn062056()
-}
-
-
-//# address-hook(0x062056) end(0x06206c)
-function void fn062056()
-{
-	u32[A0 + 0x30] = 0x0666b9		// Cutscene Knuckles crossing arms to chuckling animation data
-	objA0.animation.timer = 0
-	objA0.animation.frame = 0
-	objA0.animation.sprite = 0x1c
 }

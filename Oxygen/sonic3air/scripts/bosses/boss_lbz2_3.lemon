@@ -729,7 +729,7 @@ function void fn07490a()
 		objA0.position.x.u16 = objA1.position.x.u16
 		objA0.position.y.u16 = objA1.position.y.u16
 		u8[A1 + 0x2e] = 0x83
-		objA1.animation.sprite = 0x8c
+		objA1.animation.sprite = 0x8c		// Set Sonic's grabbed sprite
 	#if STANDALONE
 		// This makes AI Tails jump
 		control.player1 = 0x1010		// CONTROL_B, CONTROL_B
@@ -757,7 +757,7 @@ function void fn074952()
 	{
 		objA0.animation.timer = 0x0a
 		++objA0.animation.frame
-		objA1.animation.sprite = (objA0.animation.frame & 0x01) ? 0xffffff8c : 0xffffff8d
+		objA1.animation.sprite = (objA0.animation.frame & 0x01) ? 0xffffff8c : 0xffffff8d		// Set Knuckles' falling sprites
 		UpdatePlayer1SpritePatterns()
 	}
 

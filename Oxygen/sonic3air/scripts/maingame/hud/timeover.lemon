@@ -86,7 +86,7 @@ function void fn02d638()
 			}
 			else
 			{
-				global.game_mode = (continues_counter == 0) ? 0 : 0x14
+				global.game_mode = (continues_counter == 0) ? 0 : 0x14		// Initialization/Continue Screen
 			}
 		}
 	}

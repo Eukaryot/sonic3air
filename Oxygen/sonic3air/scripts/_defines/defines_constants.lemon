@@ -53,10 +53,10 @@ constant u8 CONTROL_ABC		= 0x70	// Any of the three buttons
 	constant u8 BUTTON_DOWN		= 0x01		// Down on d-pad
 	constant u8 BUTTON_LEFT		= 0x02		// Left on d-pad
 	constant u8 BUTTON_RIGHT	= 0x03		// Right on d-pad
-	constant u8 BUTTON_A		= 0x04		// Button A = lower face button -- resembles button B on Genesis pad
-	constant u8 BUTTON_B		= 0x05		// Button B = right face button -- resembles button C on Genesis pad
-	constant u8 BUTTON_X		= 0x06		// Button X =  left face button -- resembles button A on Genesis pad
-	constant u8 BUTTON_START	= 0x06		// Start button
+	constant u8 BUTTON_A		= 0x04		// Button A = lower face button -- resembles button A on Genesis pad
+	constant u8 BUTTON_B		= 0x05		// Button B = right face button -- resembles button B on Genesis pad
+	constant u8 BUTTON_X		= 0x06		// Button X =  left face button -- resembles button C on Genesis pad
+	constant u8 BUTTON_START	= 0x07		// Start button
 	constant u8 BUTTON_Y		= 0x09		// Button Y = upper face button
 	constant u8 BUTTON_BACK		= 0x0b		// Back button
 	constant u8 BUTTON_PAD2		= 0x10		// Add to button ID for second controller

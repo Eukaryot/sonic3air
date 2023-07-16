@@ -205,7 +205,7 @@ function void fn03f6a6()
 	objA1.render_flags &= ~(render_flag.FLIP_X | render_flag.FLIP_Y)
 	objA1.render_flags |= (u8[A1 + 0x2a] & char.flag.FACING_LEFT)
 	D0 = objA0.value26 >> 4
-	u8[A1 + 0x22] = u8[0x03f6ee + D0.u16]
+	u8[A1 + 0x22] = u8[0x03f6ee + D0.u16]		// Player characters' hanging and hang turn sprites
 	D0 = u8[A1 + 0x22]
 
 	u32 backupA2 = A2

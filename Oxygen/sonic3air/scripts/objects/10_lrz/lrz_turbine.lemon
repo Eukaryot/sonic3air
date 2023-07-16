@@ -210,7 +210,7 @@ function void fn044434()
 function void fn04450a()
 {
 	D0 = u8[A2 + 0x04] >> 3
-	D1.u8 = u8[0x044552 + D0.u16]
+	D1.u8 = u8[0x044552 + D0.u16]		// Player characters' bar spinning sprites
 	u8[A1 + 0x22] = D1.u8
 	D0.u16 &= 0x1f
 	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x044572 + D0.u16]

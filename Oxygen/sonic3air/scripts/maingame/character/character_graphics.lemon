@@ -177,8 +177,8 @@ function void updateSonicAnimationRolling()
 	if (s8(char.animation.timer) >= 0)
 		return
 
+	// This snippet sets the character's rolling animation based on ground speed, just like the running animations. but the two rolling animations for each character are exactly the same, so it's a bit pointless
 	D2.u16 = abs(char.groundspeed)
-	// This snippet sets the character's rolling animation based on ground speed, just like the running animations. but the two rolling animations are exactly the same, so it's a bit pointless
 	if (char.character == CHARACTER_SONIC)
 	{
 		A1 = (D2.u16 < 0x600) ? 0x012b02 : 0x012b0c
@@ -346,18 +346,19 @@ function void updateSonicAnimationRunning()
 			}
 		}
 
-		D0.u8 = u8[A1 + char.animation.frame + 1]
+		D0.u8 = u8[A1 + char.animation.frame + 1]	// Load next animation frame byte
 	#if STANDALONE
 		if (D0.u8 >= 0xfe)		// 0xfe is possible in rare cases when Sonic touches ground while being carried by Tails
 	#else
 		if (D0.u8 == 0xff)
 	#endif
 		{
+			// Loop animation from the start
 			char.animation.frame = 0
 			D0.u8 = u8[A1 + 1]
 		}
 
-		char.animation.sprite = D0.u8 + D3.u8
+		char.animation.sprite = D0.u8 + D3.u8		// Change sprites based on rotations
 		--char.animation.timer
 		if (s8(char.animation.timer) < 0)
 		{

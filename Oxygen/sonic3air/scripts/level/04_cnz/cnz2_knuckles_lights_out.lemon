@@ -66,6 +66,7 @@ function void fn0622e4()
 
 	level.bossarea.left -= getScreenExtend() * 2
 
+	// Copies palette colors 0x10 .. 0x1f from primary to secondary (underwater) palette
 	copyMemory(0xfffffca0, 0xfffffc20, 0x20)
 
 	CutsceneKnuckles.loadPalette()

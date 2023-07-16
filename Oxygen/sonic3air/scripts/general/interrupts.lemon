@@ -164,7 +164,7 @@ function void fn000606()
 //# address-hook(0x0007e0) end(0x0007e6)
 function void fn0007e0()
 {
-	if (global.game_mode == 0x34)	// Blue Spheres
+	if (global.game_mode == 0x34)	// Special Stage
 	{
 		VInt.Update.BlueSpheres()
 	}

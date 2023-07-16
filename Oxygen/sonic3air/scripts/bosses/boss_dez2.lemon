@@ -1135,9 +1135,9 @@ function void fn07f9a8()
 	if (_equal())
 		return
 
-	if (u8[A1 + 0x20] == 0x02)
+	if (u8[A1 + 0x20] == char.state.ROLLING)
 	{
-		if ((u8[A1 + 0x2a] & 0x02) == 0)
+		if ((u8[A1 + 0x2a] & char.flag.IN_AIR) == 0)
 		{
 			D0.u16 = objA0.position.x.u16 - objA1.position.x.u16
 			bool flipX = (D0.s16 < 0)

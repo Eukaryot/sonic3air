@@ -240,7 +240,7 @@ function void fn0371be()
 	}
 	else
 	{
-		global.game_mode = 0x44
+		global.game_mode = 0x44		// Competition Mode Results Screen
 	}
 }
 

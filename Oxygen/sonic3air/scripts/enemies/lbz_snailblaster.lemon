@@ -187,7 +187,7 @@ function bool fn08c23c()
 	CheckDistanceToPlayers()
 	if (D2.u16 < 0x30 && D3.u16 < 0x30)
 	{
-		if (u8[A1 + 0x20] == 2)
+		if (u8[A1 + 0x20] == char.state.ROLLING)
 		{
 			objA0.base_state = 0x08
 			objA0.animation.sprite = 3

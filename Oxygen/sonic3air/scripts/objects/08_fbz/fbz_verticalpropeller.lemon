@@ -118,7 +118,7 @@ function void fn03c010()
 		objA1.sprite_attributes &= ~sprite_attribute.PRIORITY
 
 	D0.u8 >>= 4
-	D1.u8 = u8[0x03c048 + D0.u16]
+	D1.u8 = u8[0x03c048 + D0.u16]		// Set player character's pole spinning sprite
 	u8[A1 + 0x22] = D1.u8
 	D1.s16 = s8[0x03c058 + D0.u16]
 	if (objA1.render_flags & render_flag.FLIP_X)

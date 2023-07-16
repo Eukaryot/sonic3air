@@ -312,6 +312,8 @@ function void fn05806e()
 
 		D0.u16 = (D2.u16 + 0x0a) & 0xff
 		D2.u16 = (D0.u16 * 3) >> 6
+
+		// Set player characters' spiral run sprites
 		A2 = 0x0587a8
 		D0.u8 = u8[A2 + D2.u16]
 		u8[A1 + 0x22] = D0.u8

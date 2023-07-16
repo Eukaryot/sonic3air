@@ -267,17 +267,18 @@ function void fn080382()
 
 		if (allocDynamicObjectStd())
 		{
+			// Spawn object to manage fading to white, and if to fade back after
 			objA1.update_address = 0x085e64
 			u16[A0 + 0x44] = A1.u16
-			u16[A1 + 0x3a] = 0x03
+			u16[A1 + 0x3a] = 3
 			return
 		}
 
 		zeroMemory(0xffffc280, 0x4a)
 		A2 = 0xffffc280
 
-		u32[A2] = 0x085e64
-		u16[A2 + 0x3a] = 0x03
+		u32[A2] = 0x085e64		// Object to manage fading to white, and if to fade back after
+		u16[A2 + 0x3a] = 3
 		u16[A0 + 0x44] = A2.u16
 	}
 }

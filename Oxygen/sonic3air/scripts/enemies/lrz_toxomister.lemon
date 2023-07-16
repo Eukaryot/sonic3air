@@ -149,7 +149,7 @@ function void fn08fe36()
 function void fn08fe50()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x44]
-	if (u8[A1 + 0x20] != 9)
+	if (u8[A1 + 0x20] != char.state.SPINDASH)
 	{
 		fn085838()
 		if (!_equal())

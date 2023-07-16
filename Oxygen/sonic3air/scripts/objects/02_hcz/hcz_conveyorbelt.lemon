@@ -179,7 +179,7 @@ function void fn031226()
 				if (upperBelt)
 				{
 					objA1.position.y.u16 = objA0.position.y.u16 - 0x14
-					u8[A1 + 0x22] = 0x65
+					u8[A1 + 0x22] = 0x65		// Player characters' belt hanging sprite
 					u8[A2 + 0x04] = 0x80
 				}
 				else
@@ -187,7 +187,7 @@ function void fn031226()
 					if (objA1.velocity.y < 0)
 						return
 
-					u8[A1 + 0x22] = 0x63
+					u8[A1 + 0x22] = 0x63		// Player characters' belt hanging sprite
 					u8[A2 + 0x04] = 0
 				}
 
@@ -262,7 +262,7 @@ function void fn03145a()
 	}
 
 	D0 = (u8[A2 + 0x04] >> 4) + u8[A2 + 0x08]
-	u8[A1 + 0x22] = u8[0x0314d2 + D0.u16]
+	u8[A1 + 0x22] = u8[0x0314d2 + D0.u16]		// Player characters' belt movement sprites
 	D0.u16 &= 0x0f
 	objA1.position.y.u16 = objA0.position.y.u16 + s8[0x0314f2 + D0.u16]
 }

@@ -47,7 +47,7 @@ function void fn03c984()
 		{
 			if (debug_mode.state == 0)
 			{
-				u16[A0 + 0x30] = 0x1e
+				u16[A0 + 0x30] = 30		// Detonation timer, set to half a second 
 				objA0.update_address = 0x03c9bc
 			}
 		}
@@ -58,12 +58,15 @@ function void fn03c984()
 //# address-hook(0x03c9bc) end(0x03c9de)
 function void fn03c9bc()
 {
+	// Flashing animation
 	++objA0.animation.sprite
 	objA0.animation.sprite &= 1
 
+	// Countdown until detonation
 	--u16[A0 + 0x30]
 	if (s16[A0 + 0x30] < 0)
 	{
+		// Detonation set off
 		objA0.update_address = 0x03c9e4
 		objA0.collision_attributes = (collision.flag.THREAT | collision.size.8x8)
 		AddAsDynamicObject()

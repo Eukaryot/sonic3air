@@ -258,7 +258,7 @@ function void fn05c2e0()
 		return
 	}
 
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c			// Main Game
 	lives_counter = 3
 	unused.lives_counter.player2 = 3
 	ring_counter = 0
@@ -388,7 +388,7 @@ function void fn05c5ac()
 	objA0.mapping_offset = 0x146620
 	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	char.animation.sprite.backup = 0
-	objA0.animation.sprite = 0x5a
+	objA0.animation.sprite = 0x5a		// Sonic standing looking back sprite
 	objA0.animation.timer = 0x06
 }
 
@@ -505,7 +505,7 @@ function void fn05c6b6()
 	}
 
 	objA0.base_state = 0x04
-	objA0.animation.sprite = 0xba
+	objA0.animation.sprite = 0xba		// Sonic's standing sprite
 	objA0.countdown_value = 0x07
 }
 
@@ -517,7 +517,7 @@ function void fn05c6e0()
 	if (objA0.countdown_value < 0)
 	{
 		objA0.base_state = 0x06
-		objA0.animation.sprite = 0x21
+		objA0.animation.sprite = 0x21		// Sonic's first running sprite
 	}
 }
 

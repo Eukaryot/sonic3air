@@ -190,7 +190,7 @@ function void fn026768()
 		D0.s8 = -D0.s8
 	D0.u8 += 8
 	D0.u16 >>= 4
-	u8[A1 + 0x22] = u8[0x026794 + D0.u16]
+	u8[A1 + 0x22] = u8[0x026794 + D0.u16]		// Player characters' hanging sprites
 	D0 = u8[A1 + 0x22]
 
 	u32 backupA2 = A2

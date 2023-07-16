@@ -133,7 +133,7 @@ function void fn088062()
 	objA0.animation.sprite = (global.framecounter & 0x04) ? 2 : 0
 
 	A1 = 0xffff0000 + u16[A0 + 0x44]
-	if (u8[A1 + 0x05] != 0x04 && u8[A1 + 0x20] != 0x02 && u8[A1 + 0x20] != 0x09)
+	if (u8[A1 + 0x05] != 0x04 && u8[A1 + 0x20] != char.state.ROLLING && u8[A1 + 0x20] != char.state.SPINDASH)
 	{
 		fn085838()
 		if (_equal())
@@ -159,7 +159,7 @@ function void fn088062()
 			objA0.position.x.u16 = D0.u16
 			D0.u16 = objA1.position.y.u16
 			D1.s16 = s8[A0 + 0x43]
-			if (D1.s16 < 0 && u8[A1 + 0x20] == 0x08)
+			if (D1.s16 < 0 && u8[A1 + 0x20] == char.state.COWERING)
 			{
 				D1.u16 += 0x10
 			}

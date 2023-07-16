@@ -197,7 +197,7 @@ function void fn02e512()
 			// Tails
 			if (bluespheres.backup.zone != 4 && bluespheres.backup.zone < 7)		// Going to a Sonic 3 (disc 1) zone
 			{
-				global.game_mode = 0x0c
+				global.game_mode = 0x0c		// Main Game
 				return
 			}
 			objA0.base_state = 0x0a		// Fade out
@@ -228,7 +228,7 @@ function void fn02e512()
 	}
 	else
 	{
-		global.game_mode = 0x0c
+		global.game_mode = 0x0c		// Main Game
 	}
 }
 
@@ -259,7 +259,7 @@ function void fn02e5e0()
 		return
 	}
 
-	global.game_mode = 0x0c
+	global.game_mode = 0x0c		// Main Game
 }
 
 

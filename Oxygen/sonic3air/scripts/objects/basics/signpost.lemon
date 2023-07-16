@@ -155,8 +155,7 @@ function void fn0837d8()
 	if (SetupObjectAttributesSlotted(0x083b04))
 		return
 
-	if (u8[0xffffb000 + 0x0a] & 0x80)
-		u8[A0 + 0x0a] |= 0x80
+	u8[A0 + 0x0a] |= (u8[0xffffb000 + 0x0a] & 0x80)
 
 	level.signpost.address = A0.u16
 
@@ -318,8 +317,7 @@ function void fn083938()
 function void fn0839a2()
 {
 	setupObjectAttributesFull(0x083b22)
-	if (u8[0xffffb000 + 0x0a] & 0x80)
-		u8[A0 + 0x0a] |= 0x80
+	u8[A0 + 0x0a] |= (u8[0xffffb000 + 0x0a] & 0x80)
 
 	objA0.update_address = 0x0839ea
 	D0.u16 = (getRandomNumber() & 0x1f) - 0x10
@@ -353,8 +351,7 @@ function void fn083a24()
 {
 	setupObjectAttributesFull(0x083b16)
 	objA0.update_address = 0x083a40
-	if (u8[0xffffb000 + 0x0a] & 0x80)
-		u8[A0 + 0x0a] |= 0x80
+	u8[A0 + 0x0a] |= (u8[0xffffb000 + 0x0a] & 0x80)
 
 	fn083a40()
 }
@@ -457,10 +454,7 @@ function void fn083ac6()
 function void fn085a5a()
 {
 	A1 = 0xffff0000 + u16[A0 + 0x46]
-	if (u8[A1 + 0x0a] & 0x80)
-		u8[A0 + 0x0a] |= 0x80
-	else
-		u8[A0 + 0x0a] &= ~0x80
+	u8[A0 + 0x0a] = (u8[A0 + 0x0a] & ~0x80) | (u8[A1 + 0x0a] & 0x80)
 	objA0.sprite_priority = objA1.sprite_priority
 }
 

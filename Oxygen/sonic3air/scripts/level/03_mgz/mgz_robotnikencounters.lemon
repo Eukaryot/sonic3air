@@ -771,11 +771,7 @@ function void fn06cf20()
 		objA0.sprite_priority = 0x0300
 	}
 
-	u8[A0 + 0x0a] &= ~0x80
-	if (u8[A1 + 0x0a] & 0x80)
-	{
-		u8[A0 + 0x0a] |= 0x80
-	}
+	u8[A0 + 0x0a] = (u8[A0 + 0x0a] & ~0x80) | (u8[A1 + 0x0a] & 0x80)
 }
 
 
