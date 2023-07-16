@@ -256,7 +256,7 @@ function void fn030cf8()
 			objA1.flags2a &= ~char.flag.FACING_LEFT
 			objA1.flags2a &= ~char.flag.ROLLING
 			objA1.flags2a &= ~char.flag.PUSHING
-		#if STANDLAONE
+		#if STANDALONE
 			objA1.flags2a &= ~char.flag.IN_AIR	// Fix for wrong placement of the character if bubble-bouncing onto the hand launcher, #contributed by iCloudius
 		#endif
 			u8[A1 + 0x2e] = 1
