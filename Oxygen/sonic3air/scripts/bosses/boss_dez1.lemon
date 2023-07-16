@@ -717,7 +717,7 @@ function void fn07e420()
 
 		A1 = 0xffffb000
 	#if STANDALONE
-		objA1.flags2e = 0 // Fixes the camera at the start of act 2
+		objA1.flags2e = 0	// Fixes the camera at the start of act 2; #contributed by iCloudius
 	#endif
 		objA1.render_flags &= ~render_flag.FLIP_X
 		objA1.state = char.state.STANDING

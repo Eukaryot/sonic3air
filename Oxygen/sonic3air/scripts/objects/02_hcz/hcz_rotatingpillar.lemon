@@ -184,9 +184,9 @@ function void fn032784()
 		D1.s32 = s32(D1.s16) * D2.s16
 	#if STANDALONE
 		bool negative = D1.s32 < 0 				// Prevents the game from shifting the characters over a pixel
-        D1.s32 = (negative) ? -D1.s32 : D1.s32	// everytime the game mirrors the rotation animation
-        D1 >>= 16
-        D1.u16 = (negative) ? -D1.u16 : D1.u16
+		D1.s32 = (negative) ? -D1.s32 : D1.s32	// everytime the game mirrors the rotation animation; #contributed by iCloudius
+		D1 >>= 16
+		D1.u16 = (negative) ? -D1.u16 : D1.u16
 	#else
 		D1 = (D1 << 16) + (D1 >> 16)
 	#endif
