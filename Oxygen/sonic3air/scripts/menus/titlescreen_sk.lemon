@@ -880,7 +880,7 @@ function void fn005b42()
 	u16[A2+4] = D4.u16
 	u16[A2+6] = D3.u16
 	u16[A2+8] = D2.u16
-	u8[A2+10] = D5.u8
+	u8[A2+11] = D5.u8
 
 	DrawObject()
 }
