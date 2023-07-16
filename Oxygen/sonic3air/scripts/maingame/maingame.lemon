@@ -681,8 +681,7 @@ function void initializeMainGame()
 	}
 
 	Level.loadNonfadingPaletteData(0x03)	// Sonic's character palette
-
-	fn01bc60()
+	Level.SetupLevelSize()
 
 	UpdateCamera()
 	fn007812()
@@ -1225,7 +1224,8 @@ function void fn0076a6()
 
 
 //# address-hook(0x01bc60) end(0x01bcc2)
-function void fn01bc60()
+//# alias(fn01bc60) deprecated
+function void Level.SetupLevelSize()
 {
 	u8[0xffffee30] = 0
 	u8[0xffffee08] = 0

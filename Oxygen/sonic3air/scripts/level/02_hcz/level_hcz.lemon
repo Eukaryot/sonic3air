@@ -583,10 +583,11 @@ function void fn050f20()
 
 	#if STANDALONE
 		// Correct vertical move area, to avoid some camera bugs whose exact cause I wasn't able to track down
-		level.vertical_wrap = 0x0000
-		move_area.bottom.current = 0x1000
-		move_area.bottom.target = 0x1000
-		checkpoint.move_area.bottom = 0x1000
+		//  -> Using the same values as "Level.SetupLevelSize" does
+		level.vertical_wrap         = u16[0x01bce2]
+		move_area.bottom.current    = u16[0x01bce4]
+		move_area.bottom.target     = u16[0x01bce4]
+		checkpoint.move_area.bottom = u16[0x01bce4]
 	#endif
 	}
 }

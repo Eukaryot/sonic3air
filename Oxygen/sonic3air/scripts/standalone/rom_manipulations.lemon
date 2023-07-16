@@ -18,6 +18,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.AIZ1.KnucklesIntroCritters()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
+	ROMManipulation.HCZ.SetBottomHeight()
 	ROMManipulation.BonusSM.Probabilities()
 	ROMManipulation.ALZ.MusicFix()
 	ROMManipulation.DPZ.LoopBugFix()
@@ -195,6 +196,11 @@ function void ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(u16 d
 	u16[A0]   = delayAfterwards
 	u16[A0+2] = position
 	A0 += 4
+}
+
+function void ROMManipulation.HCZ.SetBottomHeight()
+{
+	u16[0x01bce4] = 0x0c00 - getScreenHeight()
 }
 
 function void ROMManipulation.BonusSM.Probabilities()
