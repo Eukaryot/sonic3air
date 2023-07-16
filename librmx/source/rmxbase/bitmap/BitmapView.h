@@ -38,6 +38,8 @@ public:
 	inline T* getPixelPointer(int x, int y) const	{ return &mData[x + y * mStride]; }
 	inline T* getLinePointer(int y) const			{ return &mData[y * mStride]; }
 
+	inline void setPixel(int x, int y, T value) const	{ mData[x + y * mStride] = value; }
+
 	inline void makePartialRect(Recti rect)
 	{
 		rect.intersect(Recti(Vec2i(), mSize));
