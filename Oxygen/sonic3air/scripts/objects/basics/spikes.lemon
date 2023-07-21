@@ -24,6 +24,10 @@ function void Spikes.Init()
 	}
 	else
 	{
+#if STANDALONE
+		if (global.zone_act == 0x0001 && global.zone_act.apparent == 0x0000 && objA0.subtype2c == 0x02)
+			u16[A0 + 0x38] = 0x3c
+#endif
 		A1 = 0x023f74 + D0.u16
 		objA0.box_size.x = u8[(A1+=1)-1]
 		objA0.box_size.y = u8[(A1+=1)-1]
