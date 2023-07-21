@@ -1430,16 +1430,16 @@ function void fn074fd2()
 		{
 			u8[A1 + 0x2c] = 0x04
 		}
-		if (u8[A0 + 0x30] == 0)
+
+	#if !STANDALONE
+		if (u8[A0 + 0x30] == 0) // this resets the character state so leaving it out of S3AIR looks better
 		{
 			stopCharacterWinPose(0xffffb000)
 		}
-
-	#if !STANDALONE
+	
 		// This object looks broken and is unnecessary, so leave it out in S3AIR, fix #contributed by Legobouwer
 		// "spawnChildObjects(0x075186)" replaced by:
 		spawnChildObject(0x074e12, 0x00, 0, 16)
-
 	#else
 		// Release main character if he was grabbed (can happen if second character makes the final hit)
 		if (u8[0xffffb000 + 0x2e] & 0x81)
