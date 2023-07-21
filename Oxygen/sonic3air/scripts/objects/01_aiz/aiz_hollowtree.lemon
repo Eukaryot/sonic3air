@@ -191,7 +191,9 @@ function void fn01f7ce()
 function void fn01f8b4()
 {
 	u8 bit = (1 << D6.u8)
+#if !STANDALONE // unlock horizontal speed in AIR
 	objA1.velocity.x >>= 1
+#endif
 	objA1.velocity.y >>= 1
 	u8[A1 + 0x1e] = 19
 	u8[A1 + 0x1f] = 9
