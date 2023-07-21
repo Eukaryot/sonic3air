@@ -52,7 +52,11 @@ function void fn025d9c()
 		if (D0.u8 != 0)
 		{
 			A1 = 0xffffb000
+		#if STANDALONE
+			if (objA1.state == char.state.SPINDASH || objA1.state.former == char.state.SONIC_DROPDASH)
+		#else
 			if (objA1.state == char.state.SPINDASH)
+		#endif
 			{
 				u16[A0 + 0x30] = 0x3c
 				u8[A0 + 0x32] = 1
@@ -61,6 +65,9 @@ function void fn025d9c()
 				{
 					u8[A0 + 0x32] = 0xff
 				}
+			#if STANDALONE
+				objA1.state = char.state.SONIC_DROPDASH
+			#endif
 			}
 		}
 
@@ -68,7 +75,11 @@ function void fn025d9c()
 		if (D6.u8 != 0)
 		{
 			A1 = 0xffffb04a
+		#if STANDALONE
+			if (objA1.state == char.state.SPINDASH || objA1.state.former == char.state.SONIC_DROPDASH)
+		#else
 			if (objA1.state == char.state.SPINDASH)
+		#endif
 			{
 				u16[A0 + 0x30] = 0x3c
 				u8[A0 + 0x32] = 1
@@ -77,6 +88,9 @@ function void fn025d9c()
 				{
 					u8[A0 + 0x32] = 0xff
 				}
+			#if STANDALONE
+				objA1.state = char.state.SONIC_DROPDASH
+			#endif
 			}
 		}
 	}
