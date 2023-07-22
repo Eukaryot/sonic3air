@@ -155,7 +155,17 @@ function void fn025ea6()
 	objA1.velocity.y = D0.u16
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.ON_OBJECT)
+#if STANDALONE
+	if (objA1.state == char.state.SONIC_DROPDASH)
+	{
+		u8[A1 + 0x40] = 1 // re-enable double jump state
+        u8[A1 + 0x2f] = 1 // re-enable jump flag
+	}
+	else
+		u8[A1 + 0x40] = 0
+#else
 	u8[A1 + 0x40] = 0
+#endif
 	u8[A1 + 0x3d] = 0
 	playSound(0x7b)
 }
