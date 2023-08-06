@@ -126,13 +126,8 @@ function void fn01f7ce()
 							objA1.update_address = 0x04fa0c
 						}
 
-					#if STANDALONE
-						move_area.left = 0x2c54 - getScreenExtend()
-						move_area.right = 0x2c54 + getScreenExtend()
-					#else
-						move_area.left = 0x2c60
-						move_area.right = 0x2c60
-					#endif
+						move_area.left = 0x2c60 - getScreenExtend()
+						move_area.right = 0x2c60 + getScreenExtend()
 						u16[A0 + 0x38] = 0x3c
 					}
 				}
