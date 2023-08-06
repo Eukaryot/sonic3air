@@ -915,6 +915,15 @@ function bool Standalone.onDrawVdpSprite(s16 px, s16 py, u8 size, u16 index, u16
 		return true
 	}
 
+	// Trees in the background before the AIZ 2 boss
+	if (objA0.update_address == 0x05068a)
+	{
+		// Draw trees over the full screen height, to avoid occasional visible gaps there
+		Renderer.drawVdpSprite(px, py+64, size, index, 0x1f00)
+		Renderer.drawVdpSprite(px, py-64, size, index, 0x1f00)
+		return false
+	}
+
 	// FBZ electricity effects
 	if (objA0.update_address == 0x03b1fc || objA0.update_address == 0x03b238)
 	{

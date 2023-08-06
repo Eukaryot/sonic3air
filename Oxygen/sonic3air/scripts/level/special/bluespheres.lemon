@@ -2729,8 +2729,8 @@ function void BlueSpheres.replacePlaneRendering()
 	Renderer.enableDefaultPlane(3, false)
 
 	// Manually render the HUD parts of this plane (blue spheres and rings counter)
-	Renderer.setupPlane(0, 0, 160, 32, 0x11, 3, 0x2f00)
-	Renderer.setupPlane(getScreenWidth()-160, 0, 160, 32, 0x11, 3, 0x2f00)
+	Renderer.setupPlane(0, 0, 120, 32, 0x11, 3, 0x2f00)
+	Renderer.setupPlane(getScreenWidth()-120, 0, 120, 32, 0x11, 3, 0x2f00)
 }
 
 function void BlueSpheres.renderCustomGround()
