@@ -19,19 +19,18 @@ ConnectionManager::ConnectionManager(UDPSocket* udpSocket, TCPSocket* tcpListenS
 	mListener(listener),
 	mHighLevelProtocolVersionRange(highLevelProtocolVersionRange)
 {
-	mActiveConnections.reserve(8);
-	mActiveConnectionsLookup.resize(8);
-	mBitmaskForActiveConnectionsLookup = (uint16)(mActiveConnectionsLookup.size() - 1);
+	mActiveConnections.reserve(16);
 }
 
 void ConnectionManager::updateConnections(uint64 currentTimestamp)
 {
-	for (NetConnection* connection : mActiveConnectionsLookup)
+	for (const ConnectionsProvider::Entry& entry : mConnectionsProvider.getEntries())
 	{
-		if (nullptr != connection)
+		if (ConnectionsProvider::isValidEntry(entry))
 		{
 			// Update connection
-			connection->updateConnection(currentTimestamp);
+			NetConnection& connection = *entry.mContent;
+			connection.updateConnection(currentTimestamp);
 		}
 	}
 }
@@ -230,12 +229,15 @@ NetConnection* ConnectionManager::findConnectionTo(uint64 senderKey) const
 
 void ConnectionManager::addConnection(NetConnection& connection)
 {
-	const uint16 localConnectionID = getFreeLocalConnectionID();
-	RMX_CHECK(localConnectionID != 0, "Error in connection management: Could not assign a valid connection ID", return);
+	// Create a local connection ID
+	const ConnectionsProvider::Entry& newEntry = mConnectionsProvider.createHandle();
+	RMX_CHECK(ConnectionsProvider::isValidEntry(newEntry), "Error in connection management: Could not assign a valid connection ID", return);
 
+	const uint16 localConnectionID = newEntry.mHandle;
 	connection.mLocalConnectionID = localConnectionID;
+
+	newEntry.mContent = &connection;
 	mActiveConnections[localConnectionID] = &connection;
-	mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup] = &connection;
 	mConnectionsBySender[connection.getSenderKey()] = &connection;
 
 	if (connection.mSocketType == NetConnection::SocketType::TCP_SOCKET)
@@ -249,8 +251,8 @@ void ConnectionManager::removeConnection(NetConnection& connection)
 {
 	// This method gets called from "NetConnection::clear", so it's safe to assume the connection gets cleaned up internally already
 	mActiveConnections.erase(connection.getLocalConnectionID());
-	mActiveConnectionsLookup[connection.getLocalConnectionID() & mBitmaskForActiveConnectionsLookup] = nullptr;
 	mConnectionsBySender.erase(connection.getSenderKey());
+	mConnectionsProvider.destroyHandle(connection.getLocalConnectionID());
 
 	// TODO: Maybe reduce size of "mActiveConnectionsLookup" again if there's only few connections left - and if this does not produce any conflicts
 
@@ -321,9 +323,9 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 			if (nullptr == connection)
 			{
 				// Find the connection in our list of active connections
-				connection = mActiveConnectionsLookup[localConnectionID & mBitmaskForActiveConnectionsLookup];
-				if (nullptr != connection && connection->getLocalConnectionID() != localConnectionID)
-					connection = nullptr;
+				NetConnection** ptr = mConnectionsProvider.resolveHandle(localConnectionID);
+				if (nullptr != ptr)
+					connection = *ptr;
 			}
 
 			if (nullptr == connection)
@@ -383,51 +385,4 @@ void ConnectionManager::receivedPacketInternal(const std::vector<uint8>& buffer,
 			}
 		}
 	}
-}
-
-uint16 ConnectionManager::getFreeLocalConnectionID()
-{
-	// Make sure the lookup is always large enough (not filled by more than 75%)
-	if (mActiveConnections.size() + 1 >= mActiveConnectionsLookup.size() * 3/4)
-	{
-		const size_t oldSize = mActiveConnectionsLookup.size();
-		const size_t newSize = std::max<size_t>(mActiveConnectionsLookup.size() * 2, 32);
-		mActiveConnectionsLookup.resize(newSize);
-		mBitmaskForActiveConnectionsLookup = (uint16)(mActiveConnectionsLookup.size() - 1);
-
-		// Move all entries whose index does not fit any more
-		for (size_t k = 0; k < oldSize; ++k)
-		{
-			NetConnection* foundConnection = mActiveConnectionsLookup[k];
-			if (nullptr != foundConnection)
-			{
-				const uint16 newIndex = foundConnection->getLocalConnectionID() & mBitmaskForActiveConnectionsLookup;
-				if (newIndex != k)
-				{
-					mActiveConnectionsLookup[newIndex] = foundConnection;
-					mActiveConnectionsLookup[k] = nullptr;
-				}
-			}
-		}
-	}
-
-	// Get a new random local connection ID candidate
-	static_assert(RAND_MAX >= 0xff);
-	uint16 localConnectionID = (rand() & 0xff) + ((rand() & 0xff) << 8);
-	for (size_t tries = 0; tries < mActiveConnectionsLookup.size(); ++tries)
-	{
-		// Exclude 0, as it would be an invalid connection ID
-		if (localConnectionID != 0)
-		{
-			// Check if it's free in the lookup
-			const uint16 index = localConnectionID & mBitmaskForActiveConnectionsLookup;
-			if (nullptr == mActiveConnectionsLookup[index])
-			{
-				// We're good to go
-				return localConnectionID;
-			}
-		}
-		++localConnectionID;
-	}
-	return 0;
 }

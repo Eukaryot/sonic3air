@@ -11,6 +11,7 @@
 #include "oxygen_netcore/network/internal/SentPacketCache.h"
 #include "oxygen_netcore/network/internal/ReceivedPacket.h"
 #include "oxygen_netcore/network/VersionRange.h"
+#include "oxygen_netcore/base/HandleProvider.h"
 
 namespace lowlevel
 {
@@ -66,7 +67,6 @@ protected:
 
 	// Internal
 	void receivedPacketInternal(const std::vector<uint8>& buffer, const SocketAddress& senderAddress, NetConnection* connection);
-	uint16 getFreeLocalConnectionID();
 
 private:
 	struct SyncedPacketQueue
@@ -76,6 +76,8 @@ private:
 		ReceivedPacket::Dump mToBeReturned;
 	};
 
+	typedef HandleProvider<uint16, NetConnection*, 16> ConnectionsProvider;
+
 private:
 	UDPSocket* mUDPSocket = nullptr;		// Only set if UDP is used (or both UDP and TCP)
 	TCPSocket* mTCPListenSocket = nullptr;	// Only set if TCP is used (or both UDP and TCP)
@@ -83,9 +85,8 @@ private:
 	VersionRange<uint8> mHighLevelProtocolVersionRange = { 1, 1 };
 
 	std::unordered_map<uint16, NetConnection*> mActiveConnections;		// Using local connection ID as key
-	std::vector<NetConnection*> mActiveConnectionsLookup;				// Using the lowest n bits of the local connection ID as index
-	uint16 mBitmaskForActiveConnectionsLookup = 0;
 	std::unordered_map<uint64, NetConnection*> mConnectionsBySender;	// Using a sender key (= hash for the sender address + remote connection ID) as key
+	ConnectionsProvider mConnectionsProvider;
 
 	std::vector<NetConnection*> mTCPNetConnections;
 
