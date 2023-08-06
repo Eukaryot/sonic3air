@@ -250,13 +250,11 @@ function void fn06b0e8()
 	objA0.render_flags &= ~render_flag.VISIBLE
 	level.wait_for_results = 0xff
 	level.boss_encounter = 0
-	screenmover_target.right = level.bossarea.left + 0x0180 + getScreenExtend() * 2
+	screenmover_target.right = level.bossarea.left + 0x0180 + getScreenExtend()
 
 #if STANDALONE
 	if (isMainCharacter(CHARACTER_KNUCKLES))
 	{
-		screenmover_target.right -= getScreenExtend()
-
 		// Correct some chunks to the right that are visible in widescreen
 		u8[0xffff81a8] = 0
 		u8[0xffff8238] = 0
@@ -265,6 +263,10 @@ function void fn06b0e8()
 		u8[0xffff83e8] = 0
 		u8[0xffff8478] = 0
 		u8[0xffff8508] = 0x1f
+	}
+	else
+	{
+		screenmover_target.right += 0x30
 	}
 #endif
 
