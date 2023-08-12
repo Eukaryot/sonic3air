@@ -195,11 +195,7 @@ void EngineMain::setVSyncMode(Configuration::FrameSyncType frameSyncMode)
 	{
 		if (frameSyncMode >= Configuration::FrameSyncType::VSYNC_ON)
 		{
-			// First try adaptive V-Sync; if that's not supported, use regular V-Sync
-			if (SDL_GL_SetSwapInterval(-1) < 0)
-			{
-				SDL_GL_SetSwapInterval(1);
-			}
+			SDL_GL_SetSwapInterval(1);
 		}
 		else
 		{
