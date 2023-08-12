@@ -74,7 +74,9 @@ public:
 
 	inline uint32 getPixel(int x, int y) const				 { return mData[x + y * mWidth]; }
 	inline uint32* getPixelPointer(int x, int y)			 { return &mData[x + y * mWidth]; }
+	inline uint32* getPixelPointer(Vec2i pos)				 { return &mData[pos.x + pos.y * mWidth]; }
 	inline const uint32* getPixelPointer(int x, int y) const { return &mData[x + y * mWidth]; }
+	inline const uint32* getPixelPointer(Vec2i pos) const	 { return &mData[pos.x + pos.y * mWidth]; }
 
 	uint32 getPixelSafe(int x, int y) const;
 	uint32* getPixelPointerSafe(int x, int y);

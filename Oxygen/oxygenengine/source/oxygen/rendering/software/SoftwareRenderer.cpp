@@ -691,9 +691,9 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 
 			// Build blitter options
 			Blitter::Options blitterOptions;
+			Color tintColor = spriteBase.mTintColor;
+			Color addedColor = spriteBase.mAddedColor;
 			{
-				Color tintColor = spriteBase.mTintColor;
-				Color addedColor = spriteBase.mAddedColor;
 				if (spriteBase.mUseGlobalComponentTint && !isPaletteSprite)
 				{
 					tintColor.r *= paletteManager.getGlobalComponentTintColor().r;

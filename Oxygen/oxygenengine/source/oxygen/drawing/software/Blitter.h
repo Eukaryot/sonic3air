@@ -70,10 +70,16 @@ public:
 		inline PaletteWrapper(const uint32* palette, size_t numEntries) : mPalette(palette), mNumEntries(numEntries) {}
 	};
 
+	struct PixelSegment
+	{
+		Vec2i mPosition;
+		int mNumPixels = 0;
+	};
+
 public:
 	void blitColor(const OutputWrapper& output, const Color& color, BlendMode blendMode);
-	void blitSprite(const OutputWrapper& output, const SpriteWrapper& sprite, Vec2i position, const Options& options);
-	void blitIndexed(const OutputWrapper& output, const IndexedSpriteWrapper& sprite, const PaletteWrapper& palette, Vec2i position, const Options& options);
+	void blitSprite(const OutputWrapper& output, const SpriteWrapper& sprite, Vec2i position, Options& options);
+	void blitIndexed(const OutputWrapper& output, const IndexedSpriteWrapper& sprite, const PaletteWrapper& palette, Vec2i position, Options& options);
 	void blitRectWithScaling(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, const Options& options);
 	void blitRectWithUVs(BitmapViewMutable<uint32>& destBitmap, Recti destRect, const BitmapViewMutable<uint32>& sourceBitmap, Recti sourceRect, const Options& options);
 
@@ -84,10 +90,11 @@ private:
 	BitmapViewMutable<uint32> makeTempBitmapAsTransformedCopy(Recti outputBoundingBox, const SpriteWrapper& sprite, Vec2i position, const Options& options);
 	BitmapViewMutable<uint32> makeTempBitmapAsTransformedCopy(Recti outputBoundingBox, const IndexedSpriteWrapper& sprite, const PaletteWrapper& palette, Vec2i position, const Options& options);
 
-	static Recti applyCropping(const Recti& viewportRect, const Recti& spriteRect, const Vec2i& position, const Options& options);
+	static Recti applyCropping(std::vector<PixelSegment>& outPixelSegments, const Recti& viewportRect, const Recti& spriteRect, const Vec2i& position, const Options& options);
 	static bool needsIntermediateProcessing(const Options& options);
-	static void processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, const Options& options);
+	static void processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, Options& options);
 
 private:
 	std::vector<uint32> mTempBitmapData;		// Defined here so its reserved memory can be reused for multiple blitting calls
+	std::vector<PixelSegment> mPixelSegments;
 };

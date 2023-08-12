@@ -346,6 +346,20 @@ void Application::keyboard(const rmx::KeyboardEvent& ev)
 						}
 						break;
 					}
+
+				#ifdef DEBUG
+					case 'r':
+					{
+						// Only for debugging visual differences between hardware and software renderers
+						if (Configuration::instance().mRenderMethod != Configuration::RenderMethod::SOFTWARE)
+						{
+							const Configuration::RenderMethod newRenderMethod = (Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? Configuration::RenderMethod::OPENGL_FULL : Configuration::RenderMethod::OPENGL_SOFT;
+							EngineMain::instance().switchToRenderMethod(newRenderMethod);
+							LogDisplay::instance().setLogDisplay((Configuration::instance().mRenderMethod == Configuration::RenderMethod::OPENGL_SOFT) ? "Switched to opengl-soft renderer" : "Switched to opengl-full renderer");
+						}
+						break;
+					}
+				#endif
 				}
 			}
 
