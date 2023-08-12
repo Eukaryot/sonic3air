@@ -154,8 +154,7 @@ function void fn02248a()
 	}
 
 	u16[A0 + 0x26] = D0.u16
-	D0.s16 >>= 3
-	u16[A0 + 0x3a] = D0.u16
+	u16[A0 + 0x3a] = D0.s16 >> 3
 	objA0.animation.sprite = (objA0.value26 + 4) >> 3
 	DrawObject()
 }
@@ -164,10 +163,16 @@ function void fn02248a()
 //# address-hook(0x02251e) end(0x022544)
 function void fn02251e()
 {
+	// Get the parent object
 	A1 = 0xffff0000 + u16[A0 + 0x3c]
+
+	// Update own angle and curvature from the parent
 	u16[A0 + 0x3a] = u16[A1 + 0x3a]
 	u16[A0 + 0x26] = u16[A1 + 0x26] + u16[A0 + 0x3a]
+
+	// Choose visual rotation of this piece, depending on the calculated angle
 	objA0.animation.sprite = (objA0.value26 + 4) >> 3
+
 	fn022040()
 	DrawObject()
 }

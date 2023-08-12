@@ -211,7 +211,7 @@ function void fn0560a2()
 	objA0.position.x.u16 = (u8[A1 + D0.u16] & 0x01) + objA0.velocity.x
 
 	#if STANDALONE
-		// Mask out sprites below the ground, but except the leftmost part (because of HUD and the sand pit)
-		Renderer.addSpriteMask(160, 160, getScreenWidth()-160, 64, 0xd000, 1)
+		// Mask out sprites below the ground right under the door
+		Renderer.addSpriteMaskWorld(0x4370, 0x0a00, 92, 64, 0xd000, 1)
 	#endif
 }
