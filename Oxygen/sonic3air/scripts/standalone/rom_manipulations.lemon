@@ -19,6 +19,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.AIZ2.StartPosition()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
 	ROMManipulation.HCZ.SetBottomHeight()
+	ROMManipulation.CNZ2.KnucklesPreBossCutscene()
 	ROMManipulation.BonusSM.Probabilities()
 	ROMManipulation.ALZ.MusicFix()
 	ROMManipulation.DPZ.LoopBugFix()
@@ -201,6 +202,12 @@ function void ROMManipulation.AIZ2.BlimpSequenceBombs.addBlimpSequenceBomb(u16 d
 function void ROMManipulation.HCZ.SetBottomHeight()
 {
 	u16[0x01bce4] = 0x0c00 - getScreenHeight()
+}
+
+function void ROMManipulation.CNZ2.KnucklesPreBossCutscene()
+{
+	// Move the maxX screen position for triggering the cutscene a bit to the right, to avoid issues in 4:3 with extended camera
+	u16[0x062526] = 0x46f0		// Originally 0x46e0
 }
 
 function void ROMManipulation.BonusSM.Probabilities()
