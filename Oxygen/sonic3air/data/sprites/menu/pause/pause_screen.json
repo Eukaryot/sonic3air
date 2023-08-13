@@ -1,0 +1,9 @@
+{
+
+	"pause_screen_upper":   { "File": "pause_screen_upper.png",   "Rect": "0,0,210,42",  "Center": "0,0" },
+	"pause_screen_lower":   { "File": "pause_screen_lower.png",   "Rect": "0,0,240,140", "Center": "0,0" },
+	"pause_screen_dialog":  { "File": "pause_screen_dialog.png",  "Rect": "0,0,128,36",  "Center": "0,0" },
+	"pause_screen_dialog3": { "File": "pause_screen_dialog3.png", "Rect": "0,0,140,51",  "Center": "0,0" },
+
+	"unlock_window_bg":     { "File": "pause_screen_lower.png",   "Rect": "0,0,240,140", "Center": "0,0" }
+}

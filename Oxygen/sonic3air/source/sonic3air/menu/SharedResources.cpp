@@ -40,10 +40,6 @@ namespace global
 	DrawerTexture mOptionsTopBar;
 	DrawerTexture mCharSelectionBox;
 	DrawerTexture mAchievementsFrame;
-	DrawerTexture mPauseScreenUpperBG;
-	DrawerTexture mPauseScreenLowerBG;
-	DrawerTexture mPauseScreenDialog2BG;
-	DrawerTexture mPauseScreenDialog3BG;
 	DrawerTexture mTimeAttackResultsBG;
 
 	std::map<ZoneActPreviewKey, DrawerTexture> mZoneActPreview;
@@ -118,10 +114,6 @@ namespace global
 		FileHelper::loadTexture(mOptionsTopBar, L"data/images/menu/options_topbar_bg.png");
 		FileHelper::loadTexture(mCharSelectionBox, L"data/images/menu/charselectionbox.png");
 		FileHelper::loadTexture(mAchievementsFrame, L"data/images/menu/achievements_frame.png");
-		FileHelper::loadTexture(mPauseScreenUpperBG, L"data/images/menu/pause_screen_upper.png");
-		FileHelper::loadTexture(mPauseScreenLowerBG, L"data/images/menu/pause_screen_lower.png");
-		FileHelper::loadTexture(mPauseScreenDialog2BG, L"data/images/menu/pause_screen_dialog.png");
-		FileHelper::loadTexture(mPauseScreenDialog3BG, L"data/images/menu/pause_screen_dialog3.png");
 		FileHelper::loadTexture(mTimeAttackResultsBG, L"data/images/menu/timeattack_results_screen.png");
 
 		const std::vector<SharedDatabase::Zone>& zones = SharedDatabase::getAllZones();

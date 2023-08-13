@@ -43,10 +43,6 @@ namespace global
 	extern DrawerTexture mOptionsTopBar;
 	extern DrawerTexture mCharSelectionBox;
 	extern DrawerTexture mAchievementsFrame;
-	extern DrawerTexture mPauseScreenUpperBG;
-	extern DrawerTexture mPauseScreenLowerBG;
-	extern DrawerTexture mPauseScreenDialog2BG;
-	extern DrawerTexture mPauseScreenDialog3BG;
 	extern DrawerTexture mTimeAttackResultsBG;
 
 	extern std::map<ZoneActPreviewKey, DrawerTexture> mZoneActPreview;

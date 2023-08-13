@@ -310,14 +310,14 @@ void PauseMenu::render()
 
 			if (mDialogEntries.size() <= 2)
 			{
-				const Recti rect = Recti(px - 66, py - 8, global::mPauseScreenDialog2BG.getWidth(), global::mPauseScreenDialog2BG.getHeight());
-				drawer.drawRect(rect, global::mPauseScreenDialog2BG, Color(1.0f, 1.0f, 1.0f, mDialogVisibility));
+				static const uint64 spriteKey = rmx::getMurmur2_64(std::string_view("pause_screen_dialog"));
+				drawer.drawSprite(Vec2i(px - 66, py - 8), spriteKey, Color(1.0f, 1.0f, 1.0f, mDialogVisibility));
 			}
 			else
 			{
 				py -= 15;
-				const Recti rect = Recti(px - 68, py - 8, global::mPauseScreenDialog3BG.getWidth(), global::mPauseScreenDialog3BG.getHeight());
-				drawer.drawRect(rect, global::mPauseScreenDialog3BG, Color(1.0f, 1.0f, 1.0f, mDialogVisibility));
+				static const uint64 spriteKey = rmx::getMurmur2_64(std::string_view("pause_screen_dialog3"));
+				drawer.drawSprite(Vec2i(px - 68, py - 8), spriteKey, Color(1.0f, 1.0f, 1.0f, mDialogVisibility));
 				px += 5;
 			}
 
@@ -339,13 +339,12 @@ void PauseMenu::render()
 		{
 			const constexpr int LINE_HEIGHT = 26;
 			const int rightAnchor = screenWidth + roundToInt((1.0f - mVisibility) * 160.0f);
-
-			Recti rect = Recti(rightAnchor - global::mPauseScreenUpperBG.getWidth(), 0, global::mPauseScreenUpperBG.getWidth(), global::mPauseScreenUpperBG.getHeight());
-			drawer.drawRect(rect, global::mPauseScreenUpperBG);
-
 			int py = screenHeight - (int)mMenuEntries.size() * LINE_HEIGHT;
-			rect = Recti(rightAnchor - 190, py - 8, global::mPauseScreenLowerBG.getWidth(), global::mPauseScreenLowerBG.getHeight());
-			drawer.drawRect(rect, global::mPauseScreenLowerBG);
+
+			static const uint64 upperBGKey = rmx::getMurmur2_64(std::string_view("pause_screen_upper"));
+			static const uint64 lowerBGKey = rmx::getMurmur2_64(std::string_view("pause_screen_lower"));
+			drawer.drawSprite(Vec2i(rightAnchor - 210, 0), upperBGKey);
+			drawer.drawSprite(Vec2i(rightAnchor - 190, py - 8), lowerBGKey);
 
 			for (size_t line = 0; line < mMenuEntries.size(); ++line)
 			{
