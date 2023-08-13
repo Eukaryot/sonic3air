@@ -1647,7 +1647,7 @@ function void DataSelect.drawCustomPlanes()
 	// Draw our own widescreen version of the background
 	// TODO: The actual background still gets rendered, though it's not visible at all
 	//  -> Maybe the plane W is used here?
-	Renderer.drawCustomSprite("bg_dataselect", getScreenExtend() - 40, 0, 0x00, 0, 0x2000)
+	Renderer.drawCustomSprite("bg_dataselect", s16(getScreenWidth() - 512) / 2, 0, 0x00, 0, 0x2000)
 
 	// Custom rendering of plane B (which is not the background here) to ignore the wrapping
 	s16 px = s16(camera.foreground.x.u16)
