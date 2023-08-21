@@ -162,10 +162,10 @@ function void fn025ea6()
         u8[A1 + 0x2f] = 1 // re-enable jump flag
 	}
 	else
-		u8[A1 + 0x40] = 0
-#else
-	u8[A1 + 0x40] = 0
 #endif
+	{
+		u8[A1 + 0x40] = 0
+	}
 	u8[A1 + 0x3d] = 0
 	playSound(0x7b)
 }
