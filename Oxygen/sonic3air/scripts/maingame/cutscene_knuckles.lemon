@@ -40,7 +40,13 @@ function void fn061d4c()
 
 function void CutsceneKnuckles.loadPalette()
 {
-	loadPaletteLine1(0x066912)
+#if STANDALONE
+	// Do not load Knuckles' cutscene palette if using EXTENDED_CHARACTER_PALETTES, fix #contributed by TheMushrunt
+	if (!EXTENDED_CHARACTER_PALETTES)
+#endif
+	{
+		loadPaletteLine1(0x066912)
+	}
 
 	// When using EXTENDED_CHARACTER_PALETTES:
 	//  - the (potentially modded) Knuckles palette gets used instead

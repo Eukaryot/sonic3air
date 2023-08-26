@@ -1430,12 +1430,14 @@ function void fn074fd2()
 		{
 			u8[A1 + 0x2c] = 0x04
 		}
+
+	#if !STANDALONE
+		// This resets the character state, but is unnecessary, #contributed by TheMushrunt
 		if (u8[A0 + 0x30] == 0)
 		{
 			stopCharacterWinPose(0xffffb000)
 		}
 
-	#if !STANDALONE
 		// This object looks broken and is unnecessary, so leave it out in S3AIR, fix #contributed by Legobouwer
 		// "spawnChildObjects(0x075186)" replaced by:
 		spawnChildObject(0x074e12, 0x00, 0, 16)

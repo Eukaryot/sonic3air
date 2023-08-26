@@ -369,6 +369,10 @@ function void fn005628()
 //# address-hook(0x00565a) end(0x0056e2)
 function void fn00565a()
 {
+#if STANDALONE
+	// Fix for Sonic's position in widescreen, #contributed by TheMushrunt
+	objA0.position.x.u16 = 0xe8 + getScreenExtend()
+#endif
 	if (objA0.position.y.u16 != 0xf0)
 		++objA0.position.y.u16
 
