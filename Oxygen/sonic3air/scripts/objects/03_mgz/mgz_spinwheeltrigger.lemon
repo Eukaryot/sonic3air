@@ -53,6 +53,7 @@ function void fn025d9c()
 		{
 			A1 = 0xffffb000
 		#if STANDALONE
+			// Also allow for drop-dashing on the spin wheel, #contributed by iCloudius
 			if (objA1.state == char.state.SPINDASH || objA1.state.former == char.state.SONIC_DROPDASH)
 		#else
 			if (objA1.state == char.state.SPINDASH)
@@ -158,8 +159,8 @@ function void fn025ea6()
 #if STANDALONE
 	if (objA1.state == char.state.SONIC_DROPDASH)
 	{
-		u8[A1 + 0x40] = 1 // re-enable double jump state
-        u8[A1 + 0x2f] = 1 // re-enable jump flag
+		u8[A1 + 0x40] = 1	// Re-enable double jump state
+		u8[A1 + 0x2f] = 1	// Re-enable jump flag
 	}
 	else
 #endif
