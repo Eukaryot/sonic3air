@@ -92,9 +92,9 @@ function void UpdateGameObjects()
 #endif
 
 	A0 = 0xffffb000
-	if (competition_mode.active == 0 && char.base_state >= 0x06 && char.base_state != 0x0c)
+	if (competition_mode.active == 0 && char.base_state >= base_state.DIED && char.base_state != base_state.DROWNED)
 	{
-		// Special case: Main character just died
+		// Special case: Main character is inactive or just died (but did not drown)
 
 		// 0xffffb000...0xffffb127
 		//  -> First 4 game objects, especially the 2 characters

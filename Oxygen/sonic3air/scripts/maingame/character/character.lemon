@@ -33,12 +33,12 @@ function void Character.BaseUpdate.Sonic()
 	if (debug_mode.state == 0)
 	{
 		// Targets:
-		//	- 0x010afa	-> char.base_state = 0x00	-> Character.Initialization.Sonic()		-> Initialization
-		//	- 0x010bba	-> char.base_state = 0x02	-> Character.UpdateNormalState.Sonic()	-> In normal state
-		//	- 0x0122be	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.Sonic()	-> Sonic just got hurt
-		//	- 0x012390	-> char.base_state = 0x06	-> Character.UpdateDiedState.Sonic()	-> Sonic died
-		//	- 0x01257c	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()		-> Completely inactive after death
-		//	- 0x0125ac	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Sonic()	-> Sonic died by drowning
+		//	- 0x010afa	-> char.base_state = 0x00 = base_state.INITIAL	-> Character.Initialization.Sonic()		-> Initialization
+		//	- 0x010bba	-> char.base_state = 0x02 = base_state.NORMAL	-> Character.UpdateNormalState.Sonic()	-> In normal state
+		//	- 0x0122be	-> char.base_state = 0x04 = base_state.HURT		-> Character.UpdateGotHurtState.Sonic()	-> Sonic just got hurt
+		//	- 0x012390	-> char.base_state = 0x06 = base_state.DIED		-> Character.UpdateDiedState.Sonic()	-> Sonic died
+		//	- 0x01257c	-> char.base_state = 0x08 = base_state.INACTIVE	-> Character.UpdateRestartDelay()		-> Completely inactive after death
+		//	- 0x0125ac	-> char.base_state = 0x0c = base_state.DROWNED	-> Character.UpdateDrownedState.Sonic()	-> Sonic died by drowning
 		call tableLookupAddress(0x010aec, char.base_state)
 	}
 	else if (updateDebugModeRegular())
@@ -60,12 +60,12 @@ function void Character.BaseUpdate.Tails()
 	if (debug_mode.state == 0 || !isMainCharacter(CHARACTER_TAILS))	// Maybe a check if it's second player Tails?
 	{
 		// Targets:
-		//  - 0x0136ca	-> char.base_state = 0x00	-> Character.Initialization.Tails()		-> Initialization
-		//  - 0x0137c4	-> char.base_state = 0x02	-> Character.UpdateNormalState.Tails()	-> In normal state
-		//  - 0x01569c	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.Tails()	-> Tails just got hurt
-		//  - 0x01578e	-> char.base_state = 0x06	-> Character.UpdateDiedState.Tails()	-> Tails died
-		//  - 0x0157e0	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()		-> Completely inactive after death
-		//  - 0x015810	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Tails()	-> Tails died by drowning
+		//  - 0x0136ca	-> char.base_state = 0x00 = base_state.INITIAL	-> Character.Initialization.Tails()		-> Initialization
+		//  - 0x0137c4	-> char.base_state = 0x02 = base_state.NORMAL	-> Character.UpdateNormalState.Tails()	-> In normal state
+		//  - 0x01569c	-> char.base_state = 0x04 = base_state.HURT		-> Character.UpdateGotHurtState.Tails()	-> Tails just got hurt
+		//  - 0x01578e	-> char.base_state = 0x06 = base_state.DIED		-> Character.UpdateDiedState.Tails()	-> Tails died
+		//  - 0x0157e0	-> char.base_state = 0x08 = base_state.INACTIVE	-> Character.UpdateRestartDelay()		-> Completely inactive after death
+		//  - 0x015810	-> char.base_state = 0x0c = base_state.DROWNED	-> Character.UpdateDrownedState.Tails()	-> Tails died by drowning
 		call tableLookupAddress(0x0136bc, char.base_state)
 	}
 	else if (updateDebugModeRegular())
@@ -87,12 +87,12 @@ function void Character.BaseUpdate.Knuckles()
 	if (debug_mode.state == 0)
 	{
 		// Targets:
-		//  - 0x0164aa	-> char.base_state = 0x00	-> Character.Initialization.Knuckles()		-> Initialization
-		//  - 0x01656c	-> char.base_state = 0x02	-> Character.UpdateNormalState.Knuckles()	-> In normal state
-		//  - 0x017bb6	-> char.base_state = 0x04	-> Character.UpdateGotHurtState.Knuckles()	-> Knuckles just got hurt
-		//  - 0x017c88	-> char.base_state = 0x06	-> Character.UpdateDiedState.Knuckles()		-> Knuckles died
-		//  - 0x017cba	-> char.base_state = 0x08	-> Character.UpdateRestartDelay()			-> Completely inactive after death
-		//  - 0x017cea	-> char.base_state = 0x0c	-> Character.UpdateDrownedState.Knuckles()	-> Knuckles died by drowning
+		//  - 0x0164aa	-> char.base_state = 0x00 = base_state.INITIAL	-> Character.Initialization.Knuckles()		-> Initialization
+		//  - 0x01656c	-> char.base_state = 0x02 = base_state.NORMAL	-> Character.UpdateNormalState.Knuckles()	-> In normal state
+		//  - 0x017bb6	-> char.base_state = 0x04 = base_state.HURT		-> Character.UpdateGotHurtState.Knuckles()	-> Knuckles just got hurt
+		//  - 0x017c88	-> char.base_state = 0x06 = base_state.DIED		-> Character.UpdateDiedState.Knuckles()		-> Knuckles died
+		//  - 0x017cba	-> char.base_state = 0x08 = base_state.INACTIVE	-> Character.UpdateRestartDelay()			-> Completely inactive after death
+		//  - 0x017cea	-> char.base_state = 0x0c = base_state.DROWNED	-> Character.UpdateDrownedState.Knuckles()	-> Knuckles died by drowning
 		call tableLookupAddress(0x01649c, char.base_state)
 	}
 	else if (updateDebugModeRegular())
@@ -5551,7 +5551,7 @@ function void Character.GettingHurt()
 		}
 	}
 
-	char.base_state = 0x04
+	char.base_state = base_state.HURT
 	Character.LandingOnGroundNoSpindash()
 	char.flags |= char.flag.IN_AIR
 	if (char.flags & char.flag.UNDERWATER)
@@ -5824,7 +5824,7 @@ function void Character.Die_noSound()
 {
 	char.bonus_effect = 0
 	char.protection_flag = 0
-	char.base_state = 0x06		// Character died
+	char.base_state = base_state.DIED
 
 	Character.LandingOnGroundNoSpindash()
 
@@ -6638,7 +6638,7 @@ function void Character.HurtCheckForStateChange()
 		char.control_flags = 0
 		char.state = char.state.RUNNING
 		char.sprite_priority = 0x100
-		char.base_state = 0x02		// Back to normal state
+		char.base_state = base_state.NORMAL		// Back to normal state
 		char.invuln.countdown = 120
 		char.spindash = 0
 	}
@@ -6729,7 +6729,7 @@ function void Character.CheckDiedStateEnd()
 	if (competition_mode.active)
 	{
 		// Competition mode
-		char.base_state = 0x02
+		char.base_state = base_state.NORMAL
 		if (A0 == 0xffffb000)
 		{
 			player1.camera_lock = 0
@@ -6773,12 +6773,12 @@ function void Character.CheckDiedStateEnd()
 		if (char.character == CHARACTER_TAILS && !isMainCharacter(CHARACTER_TAILS))
 		{
 			// Second player Tails
-			char.base_state = 0x02
+			char.base_state = base_state.NORMAL
 			RespawnTails()
 		}
 		else
 		{
-			char.base_state = 0x08
+			char.base_state = base_state.INACTIVE
 			char.spindash_charge = 0x3c
 			global.in_extra_stage = 0
 

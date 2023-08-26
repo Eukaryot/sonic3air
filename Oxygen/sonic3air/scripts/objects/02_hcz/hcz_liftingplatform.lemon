@@ -65,7 +65,7 @@ function void fn0251e4_sub(u32 address)
 	{
 	#if STANDALONE
 		// Check if character is already dying, if so this makes no sense
-		if (char.base_state != 0x06)
+		if (char.base_state < base_state.DIED)
 	#endif
 		{
 			Character.Die()

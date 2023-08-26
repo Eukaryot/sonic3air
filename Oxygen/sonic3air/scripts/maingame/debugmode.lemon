@@ -29,7 +29,7 @@ function void DebugMode.Enter()
 {
 	debug_mode.state += 0x200
 	debug_mode.backup.mapping_offset = char.mapping_offset
-	if (char.base_state < 0x06)
+	if (char.base_state < base_state.DIED)
 	{
 		debug_mode.backup.sprite_attributes = char.sprite_attributes
 	}

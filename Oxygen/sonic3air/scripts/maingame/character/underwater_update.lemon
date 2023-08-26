@@ -258,7 +258,7 @@ function void fn018466()
 				objA0.velocity.y = 0
 				objA0.velocity.x = 0
 				s16[A0 + 0x1c] = 0
-				objA0.base_state = 0x0c
+				objA0.base_state = base_state.DROWNED
 				A0 = backupA0
 				if (A2 == 0xffffb000)
 				{
