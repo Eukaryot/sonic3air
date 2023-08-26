@@ -186,6 +186,8 @@ function void restartAtCheckpoint()
 
 	global.zone_act = global.zone_act.apparent
 	global.in_extra_stage = 0
+	global.shields_backup_1 = 0
+	global.shields_backup_2 = 0
 	level.restart = 1
 
 	Standalone.onRestartAtCheckpoint()
