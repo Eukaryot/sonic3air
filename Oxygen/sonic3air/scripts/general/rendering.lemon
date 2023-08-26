@@ -288,7 +288,8 @@ function void renderNextObject()
 	u16 cameraY = u16[A3+4]
 	u16 renderQueue = 0xa000 - (A4 - 0xffffac00)
 
-	A0 = 0xffff0000 + u16[A4]
+	u32 objAddress = 0xffff0000 + u16[A4]
+	A0 = objAddress
 	A4 += 2
 
 	objA0.render_flags &= ~render_flag.VISIBLE		// Reset visibility flag
@@ -336,7 +337,10 @@ function void renderNextObject()
 		objA0.render_flags |= render_flag.VISIBLE	// Set visibility flag
 
 	#if STANDALONE
-		Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (Standalone.shouldUseFrameInterpolation(objAddress))
+			Renderer.setSpriteTagWithPosition(A0, D0.u16 - 0x80, D1.u16 - 0x80)
+		else
+			Renderer.clearSpriteTag()
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))
 			return
 	#else
@@ -396,7 +400,10 @@ function void renderNextObject()
 				u16 backup = D6.u16
 				++spriteTag
 			#if STANDALONE
-				Renderer.setSpriteTagWithPosition(spriteTag, D0.u16, D1.u16)
+				if (Standalone.shouldUseFrameInterpolation(objAddress))
+					Renderer.setSpriteTagWithPosition(spriteTag, D0.u16 - 0x80, D1.u16 - 0x80)
+				else
+					Renderer.clearSpriteTag()
 			#endif
 				writeToSpriteTableCompound(renderQueue)
 				D6.u16 = backup
@@ -430,8 +437,8 @@ function void renderNextObject()
 		objA0.render_flags |= render_flag.VISIBLE
 
 	#if STANDALONE
-		if (objA0.update_address != 0x04a0c6)	// Explicitly disable sprite interpolation for the Glowing Spheres energy beam, as it ruins the effect
-			Renderer.setSpriteTagWithPosition(A0, D0.u16, D1.u16)
+		if (Standalone.shouldUseFrameInterpolation(objAddress))
+			Renderer.setSpriteTagWithPosition(A0, D0.u16 - 0x80, D1.u16 - 0x80)
 		else
 			Renderer.clearSpriteTag()
 		if (Standalone.onWriteToSpriteTable(D0.u16 - 0x80, D1.u16 - 0x80, renderQueue))

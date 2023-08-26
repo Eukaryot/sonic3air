@@ -172,7 +172,7 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 			for (int k = 0; k < 0x100; ++k)
 			{
 				const int oldK = clamp(k + verticalDifference, 0, 223);
-				mInterpolatedSets[index].mInterpolatedScrollOffsetsH[k] = (mSets[index].mScrollOffsetsH[oldK] - roundToInt((float)mInterpolatedSets[index].mDifferenceScrollOffsetsH[oldK] * interpolationFactor)) & positionMaskH;
+				mInterpolatedSets[index].mInterpolatedScrollOffsetsH[k] = (mSets[index].mScrollOffsetsH[oldK] - roundToInt((float)mInterpolatedSets[index].mDifferenceScrollOffsetsH[oldK] * interpolationFactor));
 			}
 			for (int k = 0; k < 0x20; ++k)
 			{
