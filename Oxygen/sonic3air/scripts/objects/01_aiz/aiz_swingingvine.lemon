@@ -80,8 +80,14 @@ function void fn0223ea()
 function void fn02241a()
 {
 	objA1.render_flags = render_flag.WORLD
-	objA1.box_size.y = 8
+#if STANDALONE
+	// Increase visual bounding box to avoid too early clipping
+	objA1.box_size.x = 16
+	objA1.box_size.y = 16
+#else
 	objA1.box_size.x = 8
+	objA1.box_size.y = 8
+#endif
 	objA1.sprite_priority = 0x0200
 	objA1.sprite_attributes = 0x041b
 	objA1.mapping_offset = 0x022b9e
