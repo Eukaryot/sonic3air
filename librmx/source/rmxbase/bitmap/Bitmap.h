@@ -55,6 +55,11 @@ public:
 	void createReusingMemory(int wid, int hgt, int& reservedSize);
 	void createReusingMemory(int wid, int hgt, int& reservedSize, uint32 color);
 
+	inline void create(Vec2i size)												 { return create(size.x, size.y); }
+	inline void create(Vec2i size, uint32 color)								 { return create(size.x, size.y, color); }
+	inline void createReusingMemory(Vec2i size, int& reservedSize)				 { return createReusingMemory(size.x, size.y, reservedSize); }
+	inline void createReusingMemory(Vec2i size, int& reservedSize, uint32 color) { return createReusingMemory(size.x, size.y, reservedSize, color); }
+
 	// Clear bitmap
 	void clear();
 	void clear(uint32 color);
@@ -72,7 +77,9 @@ public:
 	inline uint32* getData()				{ return mData; }
 	inline const uint32* getData() const	{ return mData; }
 
+	// Pixel access
 	inline uint32 getPixel(int x, int y) const				 { return mData[x + y * mWidth]; }
+	inline uint32 getPixel(Vec2i pos) const					 { return mData[pos.x + pos.y * mWidth]; }
 	inline uint32* getPixelPointer(int x, int y)			 { return &mData[x + y * mWidth]; }
 	inline uint32* getPixelPointer(Vec2i pos)				 { return &mData[pos.x + pos.y * mWidth]; }
 	inline const uint32* getPixelPointer(int x, int y) const { return &mData[x + y * mWidth]; }
@@ -82,10 +89,17 @@ public:
 	uint32* getPixelPointerSafe(int x, int y);
 	const uint32* getPixelPointerSafe(int x, int y) const;
 
+	inline uint32 getPixelSafe(Vec2i pos) const					{ return getPixelSafe(pos.x, pos.y); }
+	inline uint32* getPixelPointerSafe(Vec2i pos)				{ return getPixelPointerSafe(pos.x, pos.y); }
+	inline const uint32* getPixelPointerSafe(Vec2i pos) const	{ return getPixelPointerSafe(pos.x, pos.y); }
+
 	uint32 sampleLinear(float x, float y) const;
+	inline uint32 sampleLinear(Vec2f pos) const  { return sampleLinear(pos.x, pos.y); }
 
 	void setPixel(int x, int y, uint32 color);
 	void setPixel(int x, int y, float red, float green, float blue, float alpha = 1.0f);
+	inline void setPixel(Vec2i pos, uint32 color)											{ return setPixel(pos.x, pos.y, color); }
+	inline void setPixel(Vec2i pos, float red, float green, float blue, float alpha = 1.0f)	{ return setPixel(pos.x, pos.y, red, green, blue, alpha); }
 
 	bool decode(InputStream& stream, LoadResult& outResult, const char* format = nullptr);
 	bool encode(OutputStream& stream, const char* format) const;

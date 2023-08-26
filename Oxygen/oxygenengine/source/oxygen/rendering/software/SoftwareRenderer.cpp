@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/rendering/software/SoftwareRenderer.h"
+#include "oxygen/rendering/software/SoftwareBlur.h"
 #include "oxygen/rendering/Geometry.h"
 #include "oxygen/rendering/parts/RenderParts.h"
 #include "oxygen/application/Configuration.h"
@@ -319,31 +320,9 @@ void SoftwareRenderer::renderGeometry(const Geometry& geometry)
 			const EffectBlurGeometry& ebg = static_cast<const EffectBlurGeometry&>(geometry);
 			Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 
-			// Blur x-direction
 			if (ebg.mBlurValue >= 1)
 			{
-				for (int y = 0; y < gameScreenBitmap.getHeight(); ++y)
-				{
-					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = gameScreenBitmap.getWidth() - 1; x >= 1; --x)
-					{
-						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x-1] & 0xfefefe)) >> 1);
-					}
-				}
-			}
-
-			// Blur y-direction
-			if (ebg.mBlurValue >= 3)
-			{
-				const int stride = gameScreenBitmap.getWidth();
-				for (int y = 0; y < gameScreenBitmap.getHeight()-1; ++y)
-				{
-					uint32* data = gameScreenBitmap.getPixelPointer(0, y);
-					for (int x = 0; x < gameScreenBitmap.getWidth(); ++x)
-					{
-						data[x] = (data[x] & 0xff000000) + (((data[x] & 0xfefefe) + (data[x+stride] & 0xfefefe)) >> 1);
-					}
-				}
+				SoftwareBlur::blurBitmap(gameScreenBitmap, ebg.mBlurValue);
 			}
 			break;
 		}

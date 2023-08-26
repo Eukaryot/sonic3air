@@ -790,6 +790,9 @@
     <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h">
       <Filter>simulation\bindings</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareBlur.h">
+      <Filter>rendering\software</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Oxygen.natvis" />
