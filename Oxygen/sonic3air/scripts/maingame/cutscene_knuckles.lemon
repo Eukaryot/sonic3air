@@ -231,10 +231,13 @@ function void fn065c04()
 //# address-hook(0x065c56) end(0x065c6c)
 function void fn065c56()
 {
-#if !STANDALONE
-	// In standalone, this is done in "fn02b452", so player can't jump and avoid falling down
-	player1.control_override = 0
+#if STANDALONE
+	// In standalone, this is done in "fn02b452", so player can't jump and avoid falling down when "Glitch Fixes" is enabled
+	if (!Game.getSetting(SETTING_FIX_GLITCHES)) // #contributed by TheMushrunt
 #endif
+	{
+		player1.control_override = 0
+	}
 
 	D0.u16 = 0x1000
 	screenmover_target.bottom = D0.u16
