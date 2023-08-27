@@ -78,6 +78,7 @@ Game scripts & other contributions by:
 * Alieneer
 * 3Pills
 * Elsie The Pict
+* TheMushrunt
 
 
 ## Want to contribute?

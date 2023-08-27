@@ -398,6 +398,7 @@ function bool Standalone.onWriteToSpriteTable(s16 px, s16 py, u16 renderQueue)
 				Renderer.drawCustomSprite(key, px, py-16, atex, prioFlag, renderQueue+2)
 				Renderer.addSpriteMask(px-12, py-24, 24, 16, renderQueue+1, 0)		// Masking off the original Tails pilot sprite, #contributed by iCloudius, based on scripts by GFX32
 			}
+			return false
 		}
 
 		// Cutscene Knuckles in LRZ 2, HPZ, SSZ, and ending(s)
@@ -915,6 +916,15 @@ function bool Standalone.onDrawVdpSprite(s16 px, s16 py, u8 size, u16 index, u16
 		return true
 	}
 
+	// Trees in the background before the AIZ 2 boss
+	if (objA0.update_address == 0x05068a)
+	{
+		// Draw trees over the full screen height, to avoid occasional visible gaps there
+		Renderer.drawVdpSprite(px, py+64, size, index, 0x1f00)
+		Renderer.drawVdpSprite(px, py-64, size, index, 0x1f00)
+		return false
+	}
+
 	// FBZ electricity effects
 	if (objA0.update_address == 0x03b1fc || objA0.update_address == 0x03b238)
 	{
@@ -1195,4 +1205,22 @@ function void Standalone.renderCutsceneKnuckles(u8 variant, s16 px, s16 py, u16 
 		if (ROMDataAnalyser.isEnabled())
 			Renderer.extractCustomSprite(key, stringformat("cutscene_knuckles_%d", variant), objA0.animation.sprite, 0x80)
 	}
+}
+
+
+function bool Standalone.shouldUseFrameInterpolation(u32 objAddress)
+{
+	// Better don't use A0 here, but objAddress instead; A0 works for most objects, but not for compound objects
+	u32 updateAddress = u32[objAddress]
+
+	// Explicitly disable sprite interpolation for the Glowing Spheres energy beam, as it ruins the effect
+	if (updateAddress == 0x04a0c6)
+		return false
+
+	// "Sonic" and "Knuckles" selection texts in the S&K title screen
+	if (updateAddress == 0x005b42)
+		return false
+
+	// Otherwise allow it
+	return true
 }

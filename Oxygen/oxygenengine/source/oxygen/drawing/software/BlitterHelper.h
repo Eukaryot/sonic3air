@@ -78,9 +78,7 @@ struct BlitterHelper
 		for (size_t x = 0; x < numPixels; ++x)
 		{
 			if (depthTestValue >= *depthBuffer)
-			{
 				*dst = *src;
-			}
 			++dst;
 			++src;
 			++depthBuffer;
@@ -117,10 +115,8 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (depthTestValue >= *depthBuffer && src[3] > 0)
-			{
+			if (depthTestValue >= *depthBuffer)
 				blendPixelAlpha(dst, src);
-			}
 			dst += 4;
 			src += 4;
 			++depthBuffer;
@@ -151,18 +147,24 @@ struct BlitterHelper
 		}
 	}
 
+	static inline void blendPixelAlphaAdditive(uint8* dst, const uint8* src)
+	{
+		const int alpha = src[3];
+		if (alpha > 0)
+		{
+			dst[0] = std::min(dst[0] + src[0] * alpha / 255, 0xff);
+			dst[1] = std::min(dst[1] + src[1] * alpha / 255, 0xff);
+			dst[2] = std::min(dst[2] + src[2] * alpha / 255, 0xff);
+		}
+	}
+
 	static inline void blendLineAdditive(uint32* dst_, const uint32* src_, size_t numPixels)
 	{
 		uint8* dst = (uint8*)dst_;
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0)
-			{
-				dst[0] = std::min(dst[0] + src[0], 0xff);
-				dst[1] = std::min(dst[1] + src[1], 0xff);
-				dst[2] = std::min(dst[2] + src[2], 0xff);
-			}
+			blendPixelAlphaAdditive(dst, src);
 			dst += 4;
 			src += 4;
 		}
@@ -174,15 +176,22 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0 && depthTestValue >= *depthBuffer)
-			{
-				dst[0] = std::min(dst[0] + src[0], 0xff);
-				dst[1] = std::min(dst[1] + src[1], 0xff);
-				dst[2] = std::min(dst[2] + src[2], 0xff);
-			}
+			if (depthTestValue >= *depthBuffer)
+				blendPixelAlphaAdditive(dst, src);
 			dst += 4;
 			src += 4;
 			++depthBuffer;
+		}
+	}
+
+	static inline void blendPixelAlphaSubtractive(uint8* dst, const uint8* src)
+	{
+		const int alpha = src[3];
+		if (alpha > 0)
+		{
+			dst[0] = std::max(dst[0] - src[0] * alpha / 255, 0);
+			dst[1] = std::max(dst[1] - src[1] * alpha / 255, 0);
+			dst[2] = std::max(dst[2] - src[2] * alpha / 255, 0);
 		}
 	}
 
@@ -192,12 +201,7 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0)
-			{
-				dst[0] = std::max(dst[0] - src[0], 0);
-				dst[1] = std::max(dst[1] - src[1], 0);
-				dst[2] = std::max(dst[2] - src[2], 0);
-			}
+			blendPixelAlphaSubtractive(dst, src);
 			dst += 4;
 			src += 4;
 		}
@@ -209,12 +213,8 @@ struct BlitterHelper
 		const uint8* src = (const uint8*)src_;
 		for (size_t x = 0; x < numPixels; ++x)
 		{
-			if (src[3] > 0 && depthTestValue >= *depthBuffer)
-			{
-				dst[0] = std::max(dst[0] - src[0], 0);
-				dst[1] = std::max(dst[1] - src[1], 0);
-				dst[2] = std::max(dst[2] - src[2], 0);
-			}
+			if (depthTestValue >= *depthBuffer)
+				blendPixelAlphaSubtractive(dst, src);
 			dst += 4;
 			src += 4;
 			++depthBuffer;
@@ -392,142 +392,142 @@ struct BlitterHelper
 		return r + (g << 8) + (b << 16) + (a << 24);
 	}
 
-	static void mergeIntoOutputDirect(const BitmapViewMutable<uint32>& output, const BitmapView<uint32>& input, const Blitter::Options& options)
+	static void mergeIntoOutputDirect(const BitmapViewMutable<uint32>& output, const BitmapView<uint32>& input, const std::vector<Blitter::PixelSegment>& pixelSegments, const Blitter::Options& options)
 	{
 		switch (options.mBlendMode)
 		{
 			case BlendMode::ALPHA:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineAlpha(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineAlpha(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 
 			case BlendMode::ONE_BIT:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineOneBit(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineOneBit(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 
 			case BlendMode::ADDITIVE:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineAdditive(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineAdditive(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 
 			case BlendMode::SUBTRACTIVE:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineSubtractive(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineSubtractive(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 
 			case BlendMode::MULTIPLICATIVE:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMultiplicative(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineMultiplicative(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 
 			case BlendMode::MINIMUM:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMinimum(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineMinimum(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 
 			case BlendMode::MAXIMUM:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMaximum(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineMaximum(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 
 			default:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineOpaque(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineOpaque(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels);
 				break;
 			}
 		}
 	}
 
-	static void mergeIntoOutputWithDepth(const BitmapViewMutable<uint32>& output, const BitmapView<uint32>& input, BitmapViewMutable<uint8>& depthBuffer, const Blitter::Options& options)
+	static void mergeIntoOutputWithDepth(const BitmapViewMutable<uint32>& output, const BitmapView<uint32>& input, BitmapViewMutable<uint8>& depthBuffer, const std::vector<Blitter::PixelSegment>& pixelSegments, const Blitter::Options& options)
 	{
 		switch (options.mBlendMode)
 		{
 			case BlendMode::ALPHA:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineAlphaWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineAlphaWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::ONE_BIT:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineOneBitWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineOneBitWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::ADDITIVE:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineAdditiveWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineAdditiveWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::SUBTRACTIVE:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineSubtractiveWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineSubtractiveWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::MULTIPLICATIVE:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMultiplicativeWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineMultiplicativeWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::MINIMUM:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMinimumWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineMinimumWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 
 			case BlendMode::MAXIMUM:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineMaximumWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineMaximumWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 
 			default:
 			{
-				for (int y = 0; y < input.getSize().y; ++y)
-					blendLineOpaqueWithDepth(output.getLinePointer(y), input.getLinePointer(y), input.getSize().x, depthBuffer.getLinePointer(y), options.mDepthTestValue);
+				for (const Blitter::PixelSegment& pixelSegment : pixelSegments)
+					blendLineOpaqueWithDepth(output.getPixelPointer(pixelSegment.mPosition), input.getPixelPointer(pixelSegment.mPosition), pixelSegment.mNumPixels, depthBuffer.getPixelPointer(pixelSegment.mPosition), options.mDepthTestValue);
 				break;
 			}
 		}
 	}
 
-	static void mergeIntoOutput(const Blitter::OutputWrapper& output, const Recti& outputBoundingBox, const BitmapView<uint32>& intermediate, const Blitter::Options& options)
+	static void mergeIntoOutput(const Blitter::OutputWrapper& output, const Recti& outputBoundingBox, const BitmapView<uint32>& intermediate, const std::vector<Blitter::PixelSegment>& pixelSegments, const Blitter::Options& options)
 	{
 		BitmapViewMutable<uint32> outputView(output.mBitmapView, Recti(outputBoundingBox.getPos(), intermediate.getSize()));
 		if (nullptr == options.mDepthBuffer)
 		{
-			mergeIntoOutputDirect(outputView, intermediate, options);
+			mergeIntoOutputDirect(outputView, intermediate, pixelSegments, options);
 		}
 		else
 		{
 			//RMX_ASSERT(options.mDepthBuffer->getSize() == output.mBitmapView.getSize(), "Depth buffer size differs from output bitmap size");
 			BitmapViewMutable<uint8> depthBuffer(*options.mDepthBuffer, Recti(outputBoundingBox.getPos(), intermediate.getSize()));
-			mergeIntoOutputWithDepth(outputView, intermediate, depthBuffer, options);
+			mergeIntoOutputWithDepth(outputView, intermediate, depthBuffer, pixelSegments, options);
 		}
 	}
 

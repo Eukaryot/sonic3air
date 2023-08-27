@@ -1230,6 +1230,13 @@ void RendererBindings::registerBindings(lemon::Module& module)
 		.setParameterInfo(2, "scaleX")
 		.setParameterInfo(3, "scaleY");
 
+	module.addNativeMethod("SpriteHandle", "setTransform", lemon::wrap(&SpriteHandle_setTransform), defaultFlags)
+		.setParameterInfo(0, "this")
+		.setParameterInfo(1, "transform11")
+		.setParameterInfo(2, "transform12")
+		.setParameterInfo(3, "transform21")
+		.setParameterInfo(4, "transform22");
+
 	module.addNativeMethod("SpriteHandle", "setPriorityFlag", lemon::wrap(&SpriteHandle_setPriorityFlag), defaultFlags)
 		.setParameterInfo(0, "this")
 		.setParameterInfo(1, "priorityFlag");

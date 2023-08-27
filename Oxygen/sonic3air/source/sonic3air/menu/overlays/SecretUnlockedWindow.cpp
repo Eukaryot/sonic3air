@@ -112,21 +112,18 @@ void SecretUnlockedWindow::render()
 
 	const int numTextLines = (int)mShownTextLines.size();
 	const int lineHeight = (font.getLineHeight() + 1);
+	const int px = roundToInt(mRect.width - 240.0f * titleVisibility);
+	const int py = roundToInt(mRect.height - interpolate(19.0f, 22.0f + numTextLines * lineHeight, contentVisibility));
 
-	Recti rect;
-	rect.width = global::mPauseScreenLowerBG.getWidth();
-	rect.height = global::mPauseScreenLowerBG.getHeight();
-	rect.x = roundToInt(mRect.width - (float)rect.width * titleVisibility);
-	rect.y = roundToInt(mRect.height - interpolate(19.0f, 22.0f + numTextLines * lineHeight, contentVisibility));
-
-	drawer.drawRect(rect, global::mPauseScreenLowerBG);
+	static const uint64 spriteKey = rmx::getMurmur2_64(std::string_view("unlock_window_bg"));
+	drawer.drawSprite(Vec2i(px, py), spriteKey);
 
 	const Color titleColor = (mShownEntry.mEntryType == EntryType::ACHIEVEMENT) ? Color(0.6f, 0.8f, 1.0f) : Color(1.0f, 0.7f, 0.6f);
-	drawer.printText(global::mSonicFontB, Recti(rect.x + 55, rect.y, rect.width - 55, 20), mShownEntry.mTitle, 4, titleColor);
+	drawer.printText(global::mSonicFontB, Recti(px + 55, py, 185, 20), mShownEntry.mTitle, 4, titleColor);
 
 	for (int lineIndex = 0; lineIndex < numTextLines; ++lineIndex)
 	{
-		drawer.printText(font, Recti(rect.x + 56 - lineIndex * 2, rect.y + 19 + lineIndex * lineHeight, rect.width - 50, lineHeight), mShownTextLines[lineIndex], 4, Color::WHITE);
+		drawer.printText(font, Recti(px + 56 - lineIndex * 2, py + 19 + lineIndex * lineHeight, 190, lineHeight), mShownTextLines[lineIndex], 4, Color::WHITE);
 	}
 }
 

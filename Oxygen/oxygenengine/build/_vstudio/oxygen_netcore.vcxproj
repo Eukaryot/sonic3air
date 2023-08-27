@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\oxygen_netcore\base\HandleProvider.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\ConnectionManager.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\HighLevelPacketBase.h" />
     <ClInclude Include="..\..\source\oxygen_netcore\network\internal\CryptoFunctions.h" />

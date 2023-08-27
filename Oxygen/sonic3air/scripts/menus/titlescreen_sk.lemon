@@ -370,8 +370,8 @@ function void fn005628()
 function void fn00565a()
 {
 #if STANDALONE
-	if (objA0.position.x.u16 != 0xe8 + getScreenExtend())
-		objA0.position.x.u16 = 0xe8 + getScreenExtend()
+	// Fix for Sonic's position in widescreen, #contributed by TheMushrunt
+	objA0.position.x.u16 = 0xe8 + getScreenExtend()
 #endif
 	if (objA0.position.y.u16 != 0xf0)
 		++objA0.position.y.u16

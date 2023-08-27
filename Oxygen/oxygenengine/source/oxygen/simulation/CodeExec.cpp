@@ -995,6 +995,7 @@ void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
 		if (nullptr != mActiveCallFrameTracking)
 			hit.mCallFrameIndex = (int)mActiveCallFrameTracking->mCallFrames.size() - 1;
 		mWatchHitsThisUpdate.emplace_back(&watch, &hit);
+		mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
 	}
 	watch.mLastHitLocation = location;
 

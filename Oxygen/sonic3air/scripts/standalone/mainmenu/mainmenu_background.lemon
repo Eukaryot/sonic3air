@@ -86,37 +86,43 @@ function void MainMenuBG.Run()
 
 	while (true)
 	{
-		Renderer.resetSprites()
-
-		// Ocean palette effect
-		fn05928c()
-		VDP.copyToCRAMbyDMA(0xfffffc00, 0x0000, 0x80)
-
-		// Scrolling for water and clouds
-		{
-			camera.foreground.x.u16 = cameraForegroundX + MainMenuBG.scrollOffset
-			u16[0xffffee98] = cameraBackgroundX + MainMenuBG.scrollOffset
-
-			fn05b0a8()
-			u32[0xffffa800] -= 0x0200	// Partially undo the scrolling progress, to make it slightly slower
-
-			A4 = 0x05b15a
-			A5 = 0xffffa804
-			A1 = 0xffffe000		// Location of linewise scroll offsets
-			D0.u16 = 0x0300		// camera.background.y.u16 - 0x0500
-			D1.u16 = getScreenHeight() - 1
-			D3.u16 = camera.foreground.x.u16
-			fn04f0de()
-
-			// Manual correction for two lines with broken scrolling (also in outro)
-			u16[0xffffe0ee] = u16[0xffffe0f2]
-			u16[0xffffe16e] = u16[0xffffe172]
-			VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
-		}
-
-		Renderer.drawCustomSprite("sonic3air_logo", MainMenuBG.logoPosition, 11, 0, 0, 0xa000)
+		MainMenuBG.Update(cameraForegroundX, cameraBackgroundX)
 
 		yieldExecution()
 		++level.framecounter
 	}
+}
+
+
+function void MainMenuBG.Update(u16 cameraForegroundX, u16 cameraBackgroundX)
+{
+	Renderer.resetSprites()
+
+	// Ocean palette effect
+	fn05928c()
+	VDP.copyToCRAMbyDMA(0xfffffc00, 0x0000, 0x80)
+
+	// Scrolling for water and clouds
+	{
+		camera.foreground.x.u16 = cameraForegroundX + MainMenuBG.scrollOffset
+		u16[0xffffee98] = cameraBackgroundX + MainMenuBG.scrollOffset
+
+		fn05b0a8()
+		u32[0xffffa800] -= 0x0200	// Partially undo the scrolling progress, to make it slightly slower
+
+		A4 = 0x05b15a
+		A5 = 0xffffa804
+		A1 = 0xffffe000		// Location of linewise scroll offsets
+		D0.u16 = 0x0300		// camera.background.y.u16 - 0x0500
+		D1.u16 = getScreenHeight() - 1
+		D3.u16 = camera.foreground.x.u16
+		fn04f0de()
+
+		// Manual correction for two lines with broken scrolling (also in outro)
+		u16[0xffffe0ee] = u16[0xffffe0f2]
+		u16[0xffffe16e] = u16[0xffffe172]
+		VDP.copyToVRAMbyDMA(0xffffe000, 0xf000, getScreenHeight() * 4)
+	}
+
+	Renderer.drawCustomSprite("sonic3air_logo", MainMenuBG.logoPosition, 11, 0, 0, 0xa000)
 }

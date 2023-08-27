@@ -11,6 +11,45 @@
 #include "oxygen/drawing/software/BlitterHelper.h"
 
 
+namespace
+{
+	void getTransformedLineRange(int& minX, int& maxX, int iy, int width, Vec2i offset, Recti spriteRect, const float* transform)
+	{
+		// Output pixels to render in the given line
+		//  -> Output minX is included, maxX is excluded
+		const float dy = (float)(iy - offset.y) + 0.5f;
+		{
+			int x1 = width;
+			int x2 = 0;
+			if (transform[0] != 0.0f)
+			{
+				const float A = -dy * transform[1] + spriteRect.x;
+				x1 = offset.x + roundToInt((A) / transform[0]);
+				x2 = offset.x + roundToInt((A + spriteRect.width) / transform[0]);
+			}
+			minX = std::min(x1, x2);
+			maxX = std::max(x1, x2);
+		}
+		{
+			int x1 = width;
+			int x2 = 0;
+			if (transform[2] != 0.0f)
+			{
+				const float A = -dy * transform[3] + spriteRect.y;
+				x1 = offset.x + roundToInt((A) / transform[2]);
+				x2 = offset.x + roundToInt((A + spriteRect.height) / transform[2]);
+			}
+			const int minX2 = std::min(x1, x2);
+			const int maxX2 = std::max(x1, x2);
+			minX = std::max(minX, minX2);
+			maxX = std::min(maxX, maxX2);
+		}
+		minX = clamp(minX, 0, width);
+		maxX = clamp(maxX, 0, width);
+	}
+}
+
+
 void Blitter::blitColor(const OutputWrapper& output, const Color& color, BlendMode blendMode)
 {
 	BitmapViewMutable<uint32> outputView(output.mBitmapView, output.mViewportRect);
@@ -30,11 +69,13 @@ void Blitter::blitColor(const OutputWrapper& output, const Color& color, BlendMo
 	}
 }
 
-void Blitter::blitSprite(const OutputWrapper& output, const SpriteWrapper& sprite, Vec2i position, const Options& options)
+void Blitter::blitSprite(const OutputWrapper& output, const SpriteWrapper& sprite, Vec2i position, Options& options)
 {
-	const Recti outputBoundingBox = applyCropping(output.mViewportRect, Recti(-sprite.mPivot, sprite.mBitmapView.getSize()), position, options);
-	if (outputBoundingBox.isEmpty())
+	const Recti outputBoundingBox = applyCropping(mPixelSegments, output.mViewportRect, Recti(-sprite.mPivot, sprite.mBitmapView.getSize()), position, options);
+	if (mPixelSegments.empty())
 		return;
+
+	// TODO: Use "mPixelSegments" in more of the calculations below
 
 	if (nullptr == options.mTransform)
 	{
@@ -50,7 +91,7 @@ void Blitter::blitSprite(const OutputWrapper& output, const SpriteWrapper& sprit
 			processIntermediateBitmap(intermediate, options);
 
 			// Merge into output (incl. blending and depth test)
-			BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, options);
+			BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, mPixelSegments, options);
 		}
 		else
 		{
@@ -58,7 +99,7 @@ void Blitter::blitSprite(const OutputWrapper& output, const SpriteWrapper& sprit
 			BitmapView<uint32> intermediate(sprite.mBitmapView, Recti(innerIndent, outputBoundingBox.getSize()));
 
 			// Merge into output (incl. blending and depth test)
-			BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, options);
+			BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, mPixelSegments, options);
 		}
 	}
 	else
@@ -70,15 +111,17 @@ void Blitter::blitSprite(const OutputWrapper& output, const SpriteWrapper& sprit
 		processIntermediateBitmap(intermediate, options);
 
 		// Merge into output (incl. blending and depth test)
-		BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, options);
+		BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, mPixelSegments, options);
 	}
 }
 
-void Blitter::blitIndexed(const OutputWrapper& output, const IndexedSpriteWrapper& sprite, const PaletteWrapper& palette, Vec2i position, const Options& options)
+void Blitter::blitIndexed(const OutputWrapper& output, const IndexedSpriteWrapper& sprite, const PaletteWrapper& palette, Vec2i position, Options& options)
 {
-	const Recti outputBoundingBox = applyCropping(output.mViewportRect, Recti(-sprite.mPivot, sprite.mBitmapView.getSize()), position, options);
-	if (outputBoundingBox.isEmpty())
+	const Recti outputBoundingBox = applyCropping(mPixelSegments, output.mViewportRect, Recti(-sprite.mPivot, sprite.mBitmapView.getSize()), position, options);
+	if (mPixelSegments.empty())
 		return;
+
+	// TODO: Use "mPixelSegments" in more of the calculations below
 
 	if (nullptr == options.mTransform)
 	{
@@ -91,7 +134,7 @@ void Blitter::blitIndexed(const OutputWrapper& output, const IndexedSpriteWrappe
 		processIntermediateBitmap(intermediate, options);
 
 		// Merge into output (incl. blending and depth test)
-		BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, options);
+		BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, mPixelSegments, options);
 	}
 	else
 	{
@@ -102,7 +145,7 @@ void Blitter::blitIndexed(const OutputWrapper& output, const IndexedSpriteWrappe
 		processIntermediateBitmap(intermediate, options);
 
 		// Merge into output (incl. blending and depth test)
-		BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, options);
+		BlitterHelper::mergeIntoOutput(output, outputBoundingBox, intermediate, mPixelSegments, options);
 	}
 }
 
@@ -301,8 +344,9 @@ BitmapViewMutable<uint32> Blitter::makeTempBitmapAsTransformedCopy(Recti outputB
 	return result;
 }
 
-Recti Blitter::applyCropping(const Recti& viewportRect, const Recti& spriteRect, const Vec2i& position, const Options& options)
+Recti Blitter::applyCropping(std::vector<PixelSegment>& outPixelSegments, const Recti& viewportRect, const Recti& spriteRect, const Vec2i& position, const Options& options)
 {
+	outPixelSegments.clear();
 	if (spriteRect.isEmpty())
 		return Recti();
 
@@ -337,7 +381,40 @@ Recti Blitter::applyCropping(const Recti& viewportRect, const Recti& spriteRect,
 	}
 
 	// Get the (cropped) bounding box in the output viewport
-	return Recti::getIntersection(uncroppedBoundingBox, viewportRect);
+	const Recti boundingBox = Recti::getIntersection(uncroppedBoundingBox, viewportRect);
+	if (!boundingBox.isEmpty())
+	{
+		// Build pixel segments list
+		outPixelSegments.reserve(boundingBox.height);
+		if (nullptr == options.mTransform)
+		{
+			// Simple output the bounding rect
+			for (int iy = 0; iy < boundingBox.height; ++iy)
+			{
+				PixelSegment& pixelSegment = vectorAdd(outPixelSegments);
+				pixelSegment.mPosition.set(0, iy);
+				pixelSegment.mNumPixels = boundingBox.width;
+			}
+		}
+		else
+		{
+			// Output transformed bounding rect
+			for (int iy = 0; iy < boundingBox.height; ++iy)
+			{
+				int minX = 0;
+				int maxX = 0;
+				getTransformedLineRange(minX, maxX, iy, boundingBox.width, position - boundingBox.getPos(), spriteRect, options.mInvTransform);
+				if (minX < maxX)
+				{
+					PixelSegment& pixelSegment = vectorAdd(outPixelSegments);
+					pixelSegment.mPosition.set(minX, iy);
+					pixelSegment.mNumPixels = maxX - minX;
+				}
+			}
+		}
+	}
+
+	return boundingBox;
 }
 
 bool Blitter::needsIntermediateProcessing(const Options& options)
@@ -345,8 +422,9 @@ bool Blitter::needsIntermediateProcessing(const Options& options)
 	return (nullptr != options.mTintColor || nullptr != options.mAddedColor || options.mSwapRedBlueChannels);
 }
 
-void Blitter::processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, const Options& options)
+void Blitter::processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, Options& options)
 {
+	const Options* useOptions = &options;
 	if (nullptr != options.mTintColor || nullptr != options.mAddedColor)
 	{
 		int mult[4];
@@ -400,6 +478,22 @@ void Blitter::processIntermediateBitmap(BitmapViewMutable<uint32>& bitmap, const
 					dst[1] = (uint8)clamp(((dst[1] * mult[1]) >> 8) + add[1], 0, 0xff);
 					dst[2] = (uint8)clamp(((dst[2] * mult[2]) >> 8) + add[2], 0, 0xff);
 					dst[3] = (uint8)clamp(((dst[3] * mult[3]) >> 8),          0, 0xff);
+					dst += 4;
+				}
+			}
+		}
+
+		// Special handling for one-bit alpha if tint color enforces alpha blending
+		if (nullptr != options.mTintColor && options.mTintColor->a < 1.0f && options.mBlendMode == BlendMode::ONE_BIT)
+		{
+			options.mBlendMode = BlendMode::ALPHA;
+			const uint8 alphaValue = (uint8)roundToInt(options.mTintColor->a * 255.0f);
+			for (int y = 0; y < bitmap.getSize().y; ++y)
+			{
+				uint8* dst = (uint8*)bitmap.getLinePointer(y);
+				for (int x = 0; x < bitmap.getSize().x; ++x)
+				{
+					dst[3] = (dst[3] > 0) ? alphaValue : 0;
 					dst += 4;
 				}
 			}

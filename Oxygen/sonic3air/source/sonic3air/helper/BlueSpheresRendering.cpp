@@ -442,7 +442,7 @@ void BlueSpheresRendering::performLookupCalculations()
 				pixelData.mFogAlpha = alpha;
 
 			#ifdef OUTPUT_FOG_BITMAPS
-				fogForegroundBitmap.mData[pixelIndex] = 0xffffff + (roundToInt(alpha * groundVisibility * 192.0f) << 24);
+				fogForegroundBitmap.getData()[pixelIndex] = 0xffffff + (roundToInt(alpha * groundVisibility * 192.0f) << 24);
 			#endif
 			}
 
@@ -453,7 +453,7 @@ void BlueSpheresRendering::performLookupCalculations()
 				pixelData.mFogAlpha = interpolate(alpha, pixelData.mFogAlpha, groundVisibility);
 
 			#ifdef OUTPUT_FOG_BITMAPS
-				fogBackgroundBitmap.mData[pixelIndex] = 0xffffff + (roundToInt(alpha * 255.0f) << 24);
+				fogBackgroundBitmap.getData()[pixelIndex] = 0xffffff + (roundToInt(alpha * 255.0f) << 24);
 			#endif
 			}
 
@@ -499,8 +499,8 @@ void BlueSpheresRendering::performLookupCalculations()
 		}
 
 	#ifdef OUTPUT_FOG_BITMAPS
-		fogForegroundBitmap.save(L"foreground.png");
-		fogBackgroundBitmap.save(L"background.png");
+		fogForegroundBitmap.save(L"glow_foreground.png");
+		fogBackgroundBitmap.save(L"glow_background.png");
 	#endif
 	}
 

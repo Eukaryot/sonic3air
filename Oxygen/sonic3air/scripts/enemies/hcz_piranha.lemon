@@ -255,9 +255,16 @@ function void fn0881f6()
 function void fn0881fe()
 {
 #if STANDALONE
-	// Invulnerability frames should shake off the piranha
 	if (u8[A1 + 0x34] > 0)
 	{
+		// Invulnerability frames should shake off the piranha / toxomister cloud
+		D0 = 1
+	}
+	else if (objA1.base_state >= base_state.DIED)
+	{
+		// Same if the character just died (e.g. drowned)
+		//  -> This prevents an original game issue in case the character drowns and gets killed by a pirhana at almost the same time,
+		//     which would remove two lives, and in worst case could lead to the live counter falling below 0 (resulting in 255 lives)
 		D0 = 1
 	}
 	else

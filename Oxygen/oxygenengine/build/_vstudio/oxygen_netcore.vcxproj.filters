@@ -65,6 +65,9 @@
     <ClInclude Include="..\..\source\oxygen_netcore\network\LagStopwatch.h">
       <Filter>network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\oxygen_netcore\base\HandleProvider.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen_netcore\pch.cpp" />
@@ -108,6 +111,9 @@
     </Filter>
     <Filter Include="serverclient">
       <UniqueIdentifier>{4967edf5-66d2-47bb-84cc-f6f49009d990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{c64b997b-070f-4fc9-a8f1-db54a02c09f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

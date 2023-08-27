@@ -52,7 +52,12 @@ function void fn025d9c()
 		if (D0.u8 != 0)
 		{
 			A1 = 0xffffb000
+		#if STANDALONE
+			// Also allow for drop-dashing on the spin wheel, #contributed by iCloudius
+			if (objA1.state == char.state.SPINDASH || objA1.state.former == char.state.SONIC_DROPDASH)
+		#else
 			if (objA1.state == char.state.SPINDASH)
+		#endif
 			{
 				u16[A0 + 0x30] = 0x3c
 				u8[A0 + 0x32] = 1
@@ -61,6 +66,10 @@ function void fn025d9c()
 				{
 					u8[A0 + 0x32] = 0xff
 				}
+			#if STANDALONE
+				if (objA1.state.former == char.state.SONIC_DROPDASH)
+					objA1.state = char.state.SONIC_DROPDASH
+			#endif
 			}
 		}
 
@@ -68,7 +77,11 @@ function void fn025d9c()
 		if (D6.u8 != 0)
 		{
 			A1 = 0xffffb04a
+		#if STANDALONE
+			if (objA1.state == char.state.SPINDASH || objA1.state.former == char.state.SONIC_DROPDASH)
+		#else
 			if (objA1.state == char.state.SPINDASH)
+		#endif
 			{
 				u16[A0 + 0x30] = 0x3c
 				u8[A0 + 0x32] = 1
@@ -77,6 +90,10 @@ function void fn025d9c()
 				{
 					u8[A0 + 0x32] = 0xff
 				}
+			#if STANDALONE
+				if (objA1.state.former == char.state.SONIC_DROPDASH)
+					objA1.state = char.state.SONIC_DROPDASH
+			#endif
 			}
 		}
 	}
@@ -139,7 +156,17 @@ function void fn025ea6()
 	objA1.velocity.y = D0.u16
 	u8[A1 + 0x2a] |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.CONTROL_LOCK | char.flag.ON_OBJECT)
-	u8[A1 + 0x40] = 0
+#if STANDALONE
+	if (objA1.state == char.state.SONIC_DROPDASH)
+	{
+		u8[A1 + 0x40] = 1	// Re-enable double jump state
+		u8[A1 + 0x2f] = 1	// Re-enable jump flag
+	}
+	else
+#endif
+	{
+		u8[A1 + 0x40] = 0
+	}
 	u8[A1 + 0x3d] = 0
 	playSound(0x7b)
 }

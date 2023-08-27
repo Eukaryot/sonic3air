@@ -359,13 +359,15 @@ function void fn0492b2()
 //# address-hook(0x0492d4) end(0x049398)
 function void fn0492d4()
 {
-	#if STANDALONE
-		if (debug_mode.state)
-		{
-			u8[A2] = 0
-			return
-		}
-	#endif
+#if STANDALONE
+	// Early out in debug mode, #contributed by TheMushrunt
+	if (debug_mode.state)
+	{
+		u8[A2] = 0
+		return
+	}
+#endif
+
 	if (u8[A2] == 0)
 	{
 		D0.u16 = objA1.position.x.u16 - objA0.position.x.u16 + 0x20

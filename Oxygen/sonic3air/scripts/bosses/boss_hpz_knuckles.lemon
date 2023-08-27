@@ -739,8 +739,6 @@ function void fn06438a()
 
 
 
-// Something more general?
-
 //# address-hook(0x066094) end(0x0660a4)
 function void fn066094()
 {
@@ -849,9 +847,10 @@ function void fn066134()
 		// Player or Knuckles gets hit, depending on A3
 
 		// Targets:
-		//  - 0x0660a6
-		//  - (plus 0x0660ae also looks like it could be a target)
-		//  - 0x06429e
+		//  - 0x0660a6		-> A3 == 0x064056	-> Player gets hit
+		//  - 0x06429e		-> A3 == 0x063f10	-> Knuckles gets hit (while standing)
+		//  - 0x06429e		-> A3 == 0x0640cc	-> Knuckles gets hit (while gliding)
+		//  - 0x06429e		-> A3 == 0x064122	-> Knuckles gets hit (while falling)
 		A4 = u32[A3 + 0x08]
 		call A4
 	}
@@ -863,24 +862,28 @@ function void fn06615a()
 {
 	if (objA0.velocity.x != 0)
 	{
-	#if STANDALONE
-		u16 borderDistance = getScreenExtend()
-	#else
-		u16 borderDistance = 0x10
-	#endif
-
 		if (objA0.velocity.x > 0)
 		{
-			D0.u16 = camera.position.x.u16 + getScreenWidth() - borderDistance
-			if (D0.u16 <= objA0.position.x.u16)
+			// Right movement boundary for Knuckles
+		#if STANDALONE
+			u16 rightBoundary = move_area.right + 320 - 0x18
+		#else
+			u16 rightBoundary = camera.position.x.u16 + getScreenWidth() - 0x10
+		#endif
+			if (objA0.position.x.u16 >= rightBoundary)
 			{
 				objA0.velocity.x = 0
 			}
 		}
 		else
 		{
-			D0.u16 = camera.position.x.u16 + borderDistance
-			if (D0.u16 >= objA0.position.x.u16)
+			// Left movement boundary for Knuckles
+		#if STANDALONE
+			u16 leftBoundary = camera.position.x.u16 + 0x18	// Just for the sake of symmetry
+		#else
+			u16 leftBoundary = camera.position.x.u16 + 0x10
+		#endif
+			if (objA0.position.x.u16 <= leftBoundary)
 			{
 				objA0.velocity.x = 0
 			}

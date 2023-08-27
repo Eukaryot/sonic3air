@@ -416,14 +416,17 @@ function void fn0709a8()
 		objA0.countdown_callback = 0x070a12
 
 	#if STANDALONE
-		// Let him move faster
-		if (isMainCharacter(CHARACTER_KNUCKLES))
+		if (getScreenExtend() >= 20)
 		{
-			objA0.velocity.x = objA0.velocity.x * 2
-		}
-		else
-		{
-			objA0.velocity.x = objA0.velocity.x * 3/2
+			// Let him move faster in widescreen
+			if (isMainCharacter(CHARACTER_KNUCKLES))
+			{
+				objA0.velocity.x = objA0.velocity.x * 2
+			}
+			else
+			{
+				objA0.velocity.x = objA0.velocity.x * 3/2
+			}
 		}
 	#endif
 	}

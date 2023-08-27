@@ -35,7 +35,9 @@ public:
 
 	inline T* getData() const						{ return mData; }
 	inline T  getPixel(int x, int y) const			{ return mData[x + y * mStride]; }
+	inline T  getPixel(Vec2i pos) const				{ return mData[pos.x + pos.y * mStride]; }
 	inline T* getPixelPointer(int x, int y) const	{ return &mData[x + y * mStride]; }
+	inline T* getPixelPointer(Vec2i pos) const		{ return &mData[pos.x + pos.y * mStride]; }
 	inline T* getLinePointer(int y) const			{ return &mData[y * mStride]; }
 
 	inline void setPixel(int x, int y, T value) const	{ mData[x + y * mStride] = value; }
@@ -75,8 +77,10 @@ public:
 	inline int getPixelCount() const	{ return mSize.x * mSize.y; }
 
 	inline const T* getData() const						{ return mData; }
-	inline const T  getPixel(int x, int y) const		{ return mData[x + y * mStride]; }
+	inline       T  getPixel(int x, int y) const		{ return mData[x + y * mStride]; }
+	inline       T  getPixel(Vec2i pos) const			{ return mData[pos.x + pos.y * mStride]; }
 	inline const T* getPixelPointer(int x, int y) const { return &mData[x + y * mStride]; }
+	inline const T* getPixelPointer(Vec2i pos) const	{ return &mData[pos.x + pos.y * mStride]; }
 	inline const T* getLinePointer(int y) const			{ return &mData[y * mStride]; }
 
 	inline void makePartialRect(Recti rect)

@@ -343,7 +343,7 @@ function void fn069456()
 	if (camera.position.y.u16 < 0x300)
 	{
 		// Sonic/Tails route boss
-		move_area.right = min(move_area.right, 0x4940 + getScreenExtend() * 2)
+		move_area.right = min(move_area.right, 0x4990)
 	}
 	else
 	{

@@ -62,7 +62,7 @@ function void CompetitionMode.Character.BaseUpdate.Sonic_Knuckles()
 //# address-hook(0x010628) end(0x01073c)
 function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 {
-	char.base_state += 0x02
+	char.base_state += 2
 	char.hitbox_extends.x = 5
 	char.hitbox_extends.y = 11
 	char.hitbox.default.x = 5
@@ -402,7 +402,7 @@ function void CompetitionMode.Character.BaseUpdate.Tails()
 //# address-hook(0x013166) end(0x01326e)
 function void CompetitionMode.Character.Initialization.Tails()
 {
-	char.base_state += 0x02
+	char.base_state += 2
 	char.hitbox_extends.x = 5
 	char.hitbox_extends.y = 11
 	char.hitbox.default.x = 5

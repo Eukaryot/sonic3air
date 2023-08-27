@@ -386,37 +386,6 @@ function void LevelResults.UpdateStaticTextDisplay()
 }
 
 
-//# translated(0x02de04) end(0x02de4e)
-function bool fn02de04()
-{
-	A1 = 0xffff0000 + u16[A0 + 0x48]
-	D0.u16 = u16[A1 + 0x32]
-	if (D0.u16 != 0)
-	{
-		if (!(objA0.render_flags & render_flag.VISIBLE))
-		{
-			--u16[A1 + 0x30]
-			UnloadObject()
-			return true
-		}
-
-		if (D0.u8 < u8[A0 + 0x28])
-			return false
-
-		objA0.position.x.u16 += (objA0.base_state != 0) ? 0x20 : -0x20
-	}
-	else
-	{
-		s16 diff = u16[A0 + 0x46] - objA0.position.x.u16
-		if (diff != 0)
-		{
-			objA0.position.x.u16 += clamp(diff, -0x10, 0x10)
-		}
-	}
-	return false
-}
-
-
 //# address-hook(0x02dda2) end(0x02ddaa)
 function void LevelResults.UpdateTimeBonusDisplay()
 {
@@ -505,6 +474,46 @@ function void fn02ddc6()
 		HUD.drawDigit(0, D2.u16 - 0x80, D3.u16 - 0x80, renderQueue)
 	}
 #endif
+}
+
+
+//# translated(0x02de04) end(0x02de4e)
+function bool fn02de04()
+{
+	A1 = 0xffff0000 + u16[A0 + 0x48]
+	D0.u16 = u16[A1 + 0x32]
+	if (D0.u16 != 0)
+	{
+	#if STANDALONE
+		// In standalone, we don't call "DrawObject", so the visibility flag does not get updated automatically
+		s16 px = s16(objA0.position.x.u16) - 0x80
+		if (px + objA0.box_size.x >= 0 && px < getScreenWidth())
+			objA0.render_flags |= render_flag.VISIBLE
+		else
+			objA0.render_flags &= ~render_flag.VISIBLE
+	#endif
+
+		if (!(objA0.render_flags & render_flag.VISIBLE))
+		{
+			--u16[A1 + 0x30]
+			UnloadObject()
+			return true
+		}
+
+		if (D0.u8 < u8[A0 + 0x28])
+			return false
+
+		objA0.position.x.u16 += (objA0.base_state != 0) ? 0x20 : -0x20
+	}
+	else
+	{
+		s16 diff = u16[A0 + 0x46] - objA0.position.x.u16
+		if (diff != 0)
+		{
+			objA0.position.x.u16 += clamp(diff, -0x10, 0x10)
+		}
+	}
+	return false
 }
 
 

@@ -19,6 +19,48 @@
 #include "oxygen/simulation/LogDisplay.h"
 
 
+namespace
+{
+	Vec4f calculateBlurKernel(float x)
+	{
+		// Calculate 3x3 blur kernel, represented by only 4 values A, B, C, D
+		// (because of symmetry; actually it could even be reduced to 3, as B and C are always the same):
+		//    D | B | D
+		//    C | A | C
+		//    D | B | D
+
+		// The single input value x is a weight factor for the left and right pixel in the underlying 1-dimensional kernel
+		//    x | y | x
+		// with y chosen so that the sum adds up to 1.
+
+		// From this, we calculate the 3x3 kernel by applying the 1-dim kernel once in x- and once in y-direction, leading to:
+		//    x*x | x*y | x*x
+		//    y*x | y*y | y*x
+		//    x*x | x*y | x*x
+
+		const float y = 1.0f - 2.0f * x;
+		const float A = y * y;
+		const float B = y * x;
+		const float C = x * y;
+		const float D = x * x;
+		return Vec4f(A, B, C, D);
+	};
+
+	const Vec4f& getBlurKernel(int blurValue)
+	{
+		static const Vec4f BLUR_KERNELS[] =
+		{
+			Vec4f(1.0f, 0.0f, 0.0f, 0.0f),
+			calculateBlurKernel(16.0f / 256.0f),	// These are the same weights as used in "SoftwareBlur::blurBitmap"
+			calculateBlurKernel(32.0f / 256.0f),
+			calculateBlurKernel(48.0f / 256.0f),
+			calculateBlurKernel(64.0f / 256.0f)
+		};
+		return BLUR_KERNELS[blurValue % 5];
+	}
+}
+
+
 OpenGLRenderer::OpenGLRenderer(RenderParts& renderParts, DrawerTexture& outputTexture) :
 	Renderer(RENDERER_TYPE_ID, renderParts, outputTexture),
 	mResources(renderParts)
@@ -466,15 +508,6 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 		{
 			const EffectBlurGeometry& ebg = static_cast<const EffectBlurGeometry&>(geometry);
 
-			static const Vec4f BLUR_KERNELS[] =
-			{
-				Vec4f(1.0f, 0.0f,  0.0f,  0.0f),
-				Vec4f(0.8f, 0.04f, 0.04f, 0.01f),
-				Vec4f(0.6f, 0.08f, 0.08f, 0.02f),
-				Vec4f(0.4f, 0.12f, 0.12f, 0.03f),
-				Vec4f(0.2f, 0.15f, 0.15f, 0.05f)
-			};
-
 			mIsRenderingToProcessingBuffer = false;
 			glBindFramebuffer(GL_FRAMEBUFFER, mGameScreenBuffer.getHandle());
 			OpenGLDrawerResources::setBlendMode(BlendMode::OPAQUE);
@@ -483,7 +516,7 @@ void OpenGLRenderer::renderGeometry(const Geometry& geometry)
 			shader.bind();
 			shader.setTexture("Texture", mProcessingTexture.getHandle(), GL_TEXTURE_2D);
 			shader.setParam("TexelOffset", Vec2f(1.0f / mGameResolution.x, 1.0f / mGameResolution.y));
-			shader.setParam("Kernel", BLUR_KERNELS[ebg.mBlurValue % 5]);
+			shader.setParam("Kernel", getBlurKernel(ebg.mBlurValue));
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			shader.unbind();
 

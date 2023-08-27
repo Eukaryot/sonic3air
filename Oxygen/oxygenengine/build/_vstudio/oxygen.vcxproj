@@ -225,6 +225,7 @@
     <ClInclude Include="..\..\source\oxygen\rendering\Renderer.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\RenderingDefinitions.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\RenderResources.h" />
+    <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareBlur.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareRenderer.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\sprite\ComponentSprite.h" />
     <ClInclude Include="..\..\source\oxygen\rendering\sprite\PaletteSprite.h" />
