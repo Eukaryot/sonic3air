@@ -102,6 +102,7 @@ private:
 	void run();
 	void shutdown();
 
+	void initDirectories();
 	bool initConfigAndSettings(const std::wstring& argumentProjectPath);
 	bool initFileSystem();
 	bool loadFilePackages(bool forceReload);

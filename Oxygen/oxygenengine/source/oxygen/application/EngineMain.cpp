@@ -25,6 +25,7 @@
 #include "oxygen/resources/ResourcesCache.h"
 #include "oxygen/file/PackedFileProvider.h"
 #include "oxygen/helper/FileHelper.h"
+#include "oxygen/helper/JsonHelper.h"
 #include "oxygen/helper/Logging.h"
 #include "oxygen/rendering/RenderResources.h"
 #include "oxygen/simulation/LogDisplay.h"
@@ -253,37 +254,8 @@ bool EngineMain::startupEngine()
 	//  -> It should be disabled by default according to the SDL2 docs, but that does not seem to be always the case
 	SDL_DisableScreenSaver();
 
-#ifndef PLATFORM_ANDROID
-	config.mExePath = *String(mArguments[0]).toWString();
-#ifndef PLATFORM_IOS
-	// Choose app data path
-	{
-		const std::wstring appDataPath = PlatformFunctions::getAppDataPath();
-		const bool useLocalSaveDataDirectory = (FTX::FileSystem->exists(L"savedata") || appMetaData.mAppDataFolder.empty() || appDataPath.empty());
-		if (!useLocalSaveDataDirectory)
-		{
-			// This is the default case: Use the app data path
-			config.mAppDataPath = appDataPath + L'/' + appMetaData.mAppDataFolder + L'/';
-		}
-		else
-		{
-			// Special case & fallback: Use local "savedata" path instead
-			std::wstring currentDirectory = rmx::FileSystem::getCurrentDirectory();
-			rmx::FileSystem::normalizePath(currentDirectory, true);
-			config.mAppDataPath = currentDirectory + L"savedata/";
-		}
-	}
-#endif
-#else
-	// Android
-	// TODO: Use internal storage path as a fallback?
-	WString storagePath = String(SDL_AndroidGetExternalStoragePath()).toWString();
-	config.mAppDataPath = *(storagePath + L'/');
-#endif
-
-	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
-	config.mSRamFilename = config.mAppDataPath + L"sram.bin";
-	config.mPersistentDataFilename = config.mAppDataPath + L"persistentdata.bin";
+	// Determine verious directory and file paths in config
+	initDirectories();
 
 	// Startup logging
 	{
@@ -387,6 +359,67 @@ void EngineMain::shutdown()
 	mInternal.mModManager.copyModSettingsToConfig();
 	Configuration::instance().saveSettings();
 	oxygen::Logging::shutdown();
+}
+
+void EngineMain::initDirectories()
+{
+	const EngineDelegateInterface::AppMetaData& appMetaData = mDelegate.getAppMetaData();
+	Configuration& config = Configuration::instance();
+
+#if !defined(PLATFORM_ANDROID)
+	config.mExePath = *String(mArguments[0]).toWString();
+#endif
+
+	// Get app data path
+	{
+	#if defined(PLATFORM_ANDROID)
+		// Android
+		// TODO: Use internal storage path as a fallback?
+		WString storagePath = String(SDL_AndroidGetExternalStoragePath()).toWString();
+		config.mAppDataPath = *(storagePath + L'/');
+	#elif !defined(PLATFORM_IOS)
+		// Choose app data path
+		{
+			const std::wstring appDataPath = PlatformFunctions::getAppDataPath();
+			const bool useLocalSaveDataDirectory = (FTX::FileSystem->exists(L"savedata") || appMetaData.mAppDataFolder.empty() || appDataPath.empty());
+			if (!useLocalSaveDataDirectory)
+			{
+				// This is the default case: Use the app data path
+				config.mAppDataPath = appDataPath + L'/' + appMetaData.mAppDataFolder + L'/';
+			}
+			else
+			{
+				// Special case & fallback: Use local "savedata" path instead
+				std::wstring currentDirectory = rmx::FileSystem::getCurrentDirectory();
+				rmx::FileSystem::normalizePath(currentDirectory, true);
+				config.mAppDataPath = currentDirectory + L"savedata/";
+			}
+		}
+	#endif
+
+		// In any case: Check for redirect there
+		for (int iteration = 0; iteration < 3; ++iteration)
+		{
+			Json::Value redirectRoot = JsonHelper::loadFile(config.mAppDataPath + L"redirect.json");
+			if (redirectRoot.isNull())
+				break;
+
+			JsonHelper rootHelper(redirectRoot);
+			std::wstring redirectedPath;
+			if (!rootHelper.tryReadString("Redirect", redirectedPath))
+				break;
+
+			rmx::FileSystem::normalizePath(redirectedPath, true);
+			if (!FTX::FileSystem->exists(redirectedPath))
+				break;
+
+			config.mAppDataPath = redirectedPath;
+		}
+	}
+
+	config.mSaveStatesDirLocal = config.mAppDataPath + L"savestates/";
+	config.mSRamFilename = config.mAppDataPath + L"sram.bin";
+	config.mPersistentDataFilename = config.mAppDataPath + L"persistentdata.bin";
 }
 
 bool EngineMain::initConfigAndSettings(const std::wstring& argumentProjectPath)
