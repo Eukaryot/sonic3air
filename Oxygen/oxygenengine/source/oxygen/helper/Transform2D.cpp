@@ -32,13 +32,13 @@ namespace
 }
 
 
-bool Transform2D::hasRotationOrScale() const
+bool Transform2D::hasNontrivialRotationOrScale() const
 {
-	const float d11 = std::abs(std::abs(mMatrix[0]) - 1.0f);
-	const float d12 = std::abs(mMatrix[1]);
-	const float d21 = std::abs(mMatrix[2]);
-	const float d22 = std::abs(std::abs(mMatrix[3]) - 1.0f);
-	return (d11 + d12 + d21 + d22) > 0.001f;
+	// Check if any component is anything different than -1.0f, 0.0f, or 1.0f
+	return (mMatrix[0] != roundToFloat(mMatrix[0]) ||
+			mMatrix[1] != roundToFloat(mMatrix[1]) ||
+			mMatrix[2] != roundToFloat(mMatrix[2]) ||
+			mMatrix[3] != roundToFloat(mMatrix[3]));
 }
 
 void Transform2D::setIdentity()

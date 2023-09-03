@@ -17,7 +17,7 @@ public:
 	inline Transform2D() : mMatrix(1.0f, 0.0f, 0.0f, 1.0f), mInverse(1.0f, 0.0f, 0.0f, 1.0f) {}
 
 	inline bool isIdentity() const  { return (mMatrix == Vec4f(1.0f, 0.0f, 0.0f, 1.0f)); }
-	bool hasRotationOrScale() const;
+	bool hasNontrivialRotationOrScale() const;	// Checks for scale and rotation that is not just a multiple of 90°
 
 	void setIdentity();
 	void setRotationByAngle(float angle);

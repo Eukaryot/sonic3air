@@ -296,7 +296,7 @@ void SpriteManager::drawCustomSpriteWithTransform(uint64 key, const Vec2i& posit
 	// For smoother rotation, use upscaled version of this sprite when actually rotating
 	//  -> This is basically the Fast SpriteRot algorithm (also see "applyScale3x" in PaletteSprite.cpp)
 	//  -> Currently only implemented for palette sprites, but could be added for component sprites as well if needed
-	if (!sprite.mCacheItem->mUsesComponentSprite && sprite.mTransformation.hasRotationOrScale() && (flags & 0x08) == 0)
+	if (!sprite.mCacheItem->mUsesComponentSprite && sprite.mTransformation.hasNontrivialRotationOrScale() && (flags & 0x08) == 0)
 	{
 		sprite.mUseUpscaledSprite = true;
 
