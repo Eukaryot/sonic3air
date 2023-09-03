@@ -10,6 +10,28 @@
 #include "oxygen/helper/Transform2D.h"
 
 
+namespace
+{
+	void getSinCos(float angle, float& sine, float& cosine)
+	{
+		// Make sure to use precise values when close to a multiple of 90°
+		const float multiple = angle / (PI_FLOAT * 0.5f);
+		if (std::abs(multiple - roundToFloat(multiple)) < 0.001f)
+		{
+			// Make it an int value between 0 and 3, representing 0° to 270°
+			const int multipleInt = roundToInt(multiple) & 3;
+			sine   = (float)std::min(multipleInt, 2 - multipleInt);		// 0, 1, 0, -1
+			cosine = (float)std::max(1 - multipleInt, multipleInt - 3);	// 1, 0, -1, 0
+		}
+		else
+		{
+			sine   = std::sin(angle);
+			cosine = std::cos(angle);
+		}
+	}
+}
+
+
 bool Transform2D::hasRotationOrScale() const
 {
 	const float d11 = std::abs(std::abs(mMatrix[0]) - 1.0f);
@@ -27,30 +49,30 @@ void Transform2D::setIdentity()
 
 void Transform2D::setRotationByAngle(float angle)
 {
-	const float sin_ = std::sin(angle);
-	const float cos_ = std::cos(angle);
-	mMatrix[0] =  cos_;
-	mMatrix[1] = -sin_;
-	mMatrix[2] =  sin_;
-	mMatrix[3] =  cos_;
-	mInverse[0] =  cos_;
-	mInverse[1] =  sin_;
-	mInverse[2] = -sin_;
-	mInverse[3] =  cos_;
+	float sine;
+	float cosine;
+	::getSinCos(angle, sine, cosine);
+	mMatrix[0] =  cosine;
+	mMatrix[1] = -sine;
+	mMatrix[2] =  sine;
+	mMatrix[3] =  cosine;
+	mInverse[0] =  cosine;
+	mInverse[1] =  sine;
+	mInverse[2] = -sine;
+	mInverse[3] =  cosine;
 }
 
 void Transform2D::setRotationAndScale(float angle, Vec2f scale)
 {
-	const float sin_ = std::sin(angle);
-	const float cos_ = std::cos(angle);
-	mMatrix[0] =  cos_ * scale.x;
-	mMatrix[1] = -sin_ * scale.y;
-	mMatrix[2] =  sin_ * scale.x;
-	mMatrix[3] =  cos_ * scale.y;
-	mInverse[0] =  cos_ / scale.x;
-	mInverse[1] =  sin_ / scale.x;
-	mInverse[2] = -sin_ / scale.y;
-	mInverse[3] =  cos_ / scale.y;
+	setRotationByAngle(angle);
+	mMatrix[0] *= scale.x;
+	mMatrix[1] *= scale.y;
+	mMatrix[2] *= scale.x;
+	mMatrix[3] *= scale.y;
+	mInverse[0] /= scale.x;
+	mInverse[1] /= scale.x;
+	mInverse[2] /= scale.y;
+	mInverse[3] /= scale.y;
 }
 
 void Transform2D::setByMatrix(float a, float b, float c, float d)
