@@ -20,6 +20,7 @@ function void ApplyROMManipulations()
 	ROMManipulation.AIZ2.BlimpSequenceBombs()
 	ROMManipulation.HCZ.SetBottomHeight()
 	ROMManipulation.CNZ2.KnucklesPreBossCutscene()
+	ROMManipulation.HPZ.SecondMuralChunks()
 	ROMManipulation.BonusSM.Probabilities()
 	ROMManipulation.ALZ.MusicFix()
 	ROMManipulation.DPZ.LoopBugFix()
@@ -208,6 +209,14 @@ function void ROMManipulation.CNZ2.KnucklesPreBossCutscene()
 {
 	// Move the maxX screen position for triggering the cutscene a bit to the right, to avoid issues in 4:3 with extended camera
 	u16[0x062526] = 0x46f0		// Originally 0x46e0
+}
+
+function void ROMManipulation.HPZ.SecondMuralChunks()
+{
+	// Replace the two chunks in HPZ originally showing a second copy of the mural
+	//  -> This is somewhat irritating in S3AIR because with widescreen, you can see the second mural during the fight against Knuckles
+	u8[0x0a7924 + 0x0218] = 0x42
+	u8[0x0a7924 + 0x0219] = 0x42
 }
 
 function void ROMManipulation.BonusSM.Probabilities()
