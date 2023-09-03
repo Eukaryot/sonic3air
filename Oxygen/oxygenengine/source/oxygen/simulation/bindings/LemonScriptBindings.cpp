@@ -346,16 +346,10 @@ namespace
 	{
 		uint32 lineNumber = 0;
 		const bool success = LemonScriptRuntime::getCurrentScriptFunction(nullptr, nullptr, &lineNumber, nullptr);
-	#if DEBUG
-		if (!success)
-			RMX_ERROR("Could not determine current script function during logging", );
-	#endif
+		RMX_ASSERT(success, "Could not determine current script function during logging");
 
-		LogDisplay::ScriptLogSingleEntry& scriptLogSingleEntry = LogDisplay::instance().updateScriptLogValue(*String(0, "%04d", lineNumber), valueString);
 		if (nullptr != LemonScriptBindings::mDebugNotificationInterface)
-			LemonScriptBindings::mDebugNotificationInterface->onLog(scriptLogSingleEntry);
-
-		Application::instance().getSimulation().stopSingleStepContinue();
+			LemonScriptBindings::mDebugNotificationInterface->onScriptLog(*String(0, "%04d", lineNumber), valueString);
 	}
 
 	void logSetter(int64 value, bool decimal)
@@ -460,26 +454,11 @@ namespace
 
 	void debugLogColors(lemon::StringRef name, uint32 startAddress, uint8 numColors)
 	{
-		if (EngineMain::getDelegate().useDeveloperFeatures())
+		if (EngineMain::getDelegate().useDeveloperFeatures() && name.isValid())
 		{
-			if (!name.isValid())
-				return;
-
 			CodeExec* codeExec = CodeExec::getActiveInstance();
 			RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
-			EmulatorInterface& emulatorInterface = codeExec->getEmulatorInterface();
-
-			LogDisplay::ColorLogEntry entry;
-			entry.mName = name.getString();
-			entry.mColors.reserve(numColors);
-			for (uint8 i = 0; i < numColors; ++i)
-			{
-				const uint16 packedColor = emulatorInterface.readMemory16(startAddress + i * 2);
-				entry.mColors.push_back(PaletteManager::unpackColor(packedColor));
-			}
-			LogDisplay::instance().addColorLogEntry(entry);
-
-			Application::instance().getSimulation().stopSingleStepContinue();
+			codeExec->getDebugTracking().addColorLogEntry(name.getString(), startAddress, numColors);
 		}
 	}
 
@@ -709,7 +688,7 @@ namespace
 		{
 			CodeExec* codeExec = CodeExec::getActiveInstance();
 			RMX_CHECK(nullptr != codeExec, "No running CodeExec instance", return);
-			codeExec->addWatch(address, bytes, false);
+			codeExec->getDebugTracking().addWatch(address, bytes, false);
 		}
 	}
 

@@ -11,16 +11,16 @@
 #include "oxygen/simulation/DebuggingInterfaces.h"
 #include "oxygen/simulation/LemonScriptRuntime.h"
 #include "oxygen/simulation/RuntimeEnvironment.h"
+#include "oxygen/simulation/debug/DebugTracking.h"
 
 class EmulatorInterface;
 namespace lemon
 {
 	class Environment;
-	class ScriptFunction;
 }
 
 
-class CodeExec final : public DebugNotificationInterface
+class CodeExec final
 {
 friend struct RuntimeExecuteConnector;
 friend struct RuntimeExecuteConnectorDev;
@@ -41,16 +41,6 @@ public:
 		RESET,
 		USE_EXISTING,
 		READ_FROM_ASM
-	};
-
-	struct Location
-	{
-		const lemon::ScriptFunction* mFunction = nullptr;
-		size_t mProgramCounter = 0;
-		mutable std::string mResolvedString;
-
-		const std::string& toString(CodeExec& codeExec) const;
-		bool operator==(const Location& other) const;
 	};
 
 	static const constexpr size_t CALL_FRAMES_LIMIT = 0x1000;
@@ -90,33 +80,6 @@ public:
 		size_t processCallFramesRecursive(size_t index);
 	};
 
-	struct Watch
-	{
-		struct Hit
-		{
-			uint32 mWrittenValue = 0;
-			uint32 mAddress = 0;
-			uint16 mBytes = 0;
-			Location mLocation;
-			int mCallFrameIndex = -1;
-		};
-
-		std::vector<Hit*> mHits;
-		uint32 mAddress = 0;
-		uint16 mBytes = 0;
-		bool mPersistent = false;
-		uint32 mInitialValue = 0;
-		Location mLastHitLocation;
-	};
-
-	struct VRAMWrite
-	{
-		uint16 mAddress = 0;
-		uint16 mSize = 0;
-		Location mLocation;
-		int mCallFrameIndex = -1;
-	};
-
 public:
 	static inline CodeExec* getActiveInstance() { return mActiveInstance; }
 
@@ -153,12 +116,8 @@ public:
 
 	inline const std::vector<uint32>& getUnknownAddresses() const  { return mUnknownAddressesInOrder; }
 
-	inline const std::vector<Watch*>& getWatches() const  { return mWatches; }
-	void clearWatches(bool clearPersistent = false);
-	void addWatch(uint32 address, uint16 bytes, bool persistent);
-	void removeWatch(uint32 address, uint16 bytes);
-
-	inline const std::vector<VRAMWrite*>& getVRAMWrites() const  { return mVRAMWrites; }
+	inline CallFrameTracking* getActiveCallFrameTracking()  { return mActiveCallFrameTracking; }
+	inline DebugTracking& getDebugTracking()  { return mDebugTracking; }
 
 private:
 	bool canExecute() const;
@@ -176,23 +135,15 @@ private:
 
 	void popCallFrame();
 
-	uint32 getCurrentWatchValue(uint32 address, uint16 bytes) const;
-	void deleteWatch(Watch& watch);
-
 	void showErrorWithScriptLocation(const std::string& errorText, const std::string& subText = "");
 
 private:
-	// Interface implementations
-	void onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes) override;
-	void onVRAMWrite(uint16 address, uint16 bytes) override;
-	void onLog(LogDisplay::ScriptLogSingleEntry& scriptLogSingleEntry) override;
-
-private:
 	// Order of these three instances is important, as we got a clear dependency chain here
-	LemonScriptProgram& mLemonScriptProgram;	// Move instance to Simulation?
-	EmulatorInterface&  mEmulatorInterface;
-	LemonScriptRuntime& mLemonScriptRuntime;
-	RuntimeEnvironment mRuntimeEnvironment;
+	LemonScriptProgram&	mLemonScriptProgram;	// Move instance to Simulation?
+	EmulatorInterface&	mEmulatorInterface;
+	LemonScriptRuntime&	mLemonScriptRuntime;
+	RuntimeEnvironment	mRuntimeEnvironment;
+	DebugTracking		mDebugTracking;
 
 	bool mIsDeveloperMode = false;
 	ExecutionState mExecutionState = ExecutionState::INACTIVE;
@@ -209,14 +160,6 @@ private:
 
 	std::set<uint32> mUnknownAddressesSet;
 	std::vector<uint32> mUnknownAddressesInOrder;
-
-	std::vector<Watch*> mWatches;
-	std::vector<std::pair<Watch*, Watch::Hit*>> mWatchHitsThisUpdate;
-	RentableObjectPool<Watch, 32> mWatchPool;
-	RentableObjectPool<Watch::Hit, 32> mWatchHitPool;
-
-	std::vector<VRAMWrite*> mVRAMWrites;
-	RentableObjectPool<VRAMWrite, 32> mVRAMWritePool;
 
 private:
 	static inline CodeExec* mActiveInstance = nullptr;

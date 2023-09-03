@@ -8,6 +8,7 @@
 
 #include "oxygen/pch.h"
 #include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/Application.h"
 #include "oxygen/application/Configuration.h"
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/application/video/VideoOut.h"
@@ -466,7 +467,8 @@ void GameView::mouse(const rmx::MouseEvent& ev)
 				chunkType += change;
 				emulatorInterface.writeMemory8(chunkAddress, chunkType);
 
-				LogDisplay::instance().updateScriptLogValue("chunk", rmx::hexString(chunkAddress, 8) + " -> " + rmx::hexString(chunkType, 2));
+				DebugTracking& debugTracking = Application::instance().getSimulation().getCodeExec().getDebugTracking();
+				debugTracking.updateScriptLogValue("chunk", rmx::hexString(chunkAddress, 8) + " -> " + rmx::hexString(chunkType, 2));
 			}
 		}
 	}
@@ -514,9 +516,10 @@ void GameView::update(float timeElapsed)
 				mDebugOutput = 3;
 			}
 
-			LogDisplay::instance().clearScriptLogValue("~index");
-			LogDisplay::instance().clearScriptLogValue("~addr");
-			LogDisplay::instance().clearScriptLogValue("~ptrn");
+			DebugTracking& debugTracking = Application::instance().getSimulation().getCodeExec().getDebugTracking();
+			debugTracking.clearScriptLogValue("~index");
+			debugTracking.clearScriptLogValue("~addr");
+			debugTracking.clearScriptLogValue("~ptrn");
 
 			if (mDebugOutput >= 0)
 			{
@@ -537,17 +540,17 @@ void GameView::update(float timeElapsed)
 				if (translatePositionIntoRect(relativePosition, rect, FTX::mousePos()))
 				{
 					const uint32 index = (int)(relativePosition.x * 64.0f) + (int)(relativePosition.y * 32.0f) * 64;
-					LogDisplay::instance().updateScriptLogValue("~index", rmx::hexString(index, 4));
+					debugTracking.updateScriptLogValue("~index", rmx::hexString(index, 4));
 					if (mDebugOutput < 2)
 					{
 						const uint16 address = planeManager.getPatternVRAMAddress(mDebugOutput, (uint16)index);
 						const uint16 pattern = planeManager.getPatternAtIndex(mDebugOutput, (uint16)index);
-						LogDisplay::instance().updateScriptLogValue("~addr", rmx::hexString(address, 4));
-						LogDisplay::instance().updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
+						debugTracking.updateScriptLogValue("~addr", rmx::hexString(address, 4));
+						debugTracking.updateScriptLogValue("~ptrn", rmx::hexString(pattern, 4));
 					}
 					else
 					{
-						LogDisplay::instance().updateScriptLogValue("~addr", rmx::hexString((uint32)(index * 0x20), 4));
+						debugTracking.updateScriptLogValue("~addr", rmx::hexString((uint32)(index * 0x20), 4));
 					}
 				}
 			}

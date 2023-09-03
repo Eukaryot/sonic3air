@@ -446,6 +446,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 {
 	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
 	EmulatorInterface& emulatorInterface = codeExec.getEmulatorInterface();
+	DebugTracking& debugTracking = codeExec.getDebugTracking();
 
 	switch (category.mIdentifier)
 	{
@@ -590,8 +591,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 		case CATEGORY_WATCHES:
 		{
-			const std::vector<CodeExec::Watch*>& watches = codeExec.getWatches();
-			for (const CodeExec::Watch* watch : watches)
+			const std::vector<DebugTracking::Watch*>& watches = debugTracking.getWatches();
+			for (const DebugTracking::Watch* watch : watches)
 			{
 				// Display 0xffff???? instead of 0x00ff????
 				uint32 displayAddress = watch->mAddress;
@@ -712,11 +713,11 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 							// Add or remove watch
 							if (watched)
 							{
-								codeExec.addWatch(globalDefine.mAddress, globalDefine.mBytes, true);
+								debugTracking.addWatch(globalDefine.mAddress, globalDefine.mBytes, true);
 							}
 							else
 							{
-								codeExec.removeWatch(globalDefine.mAddress, globalDefine.mBytes);
+								debugTracking.removeWatch(globalDefine.mAddress, globalDefine.mBytes);
 							}
 						}
 						builder.addOption("Watched", watched, color, indent + 20, key2);
@@ -872,8 +873,8 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			const uint16 endAddressScrollOffsets = startAddressScrollOffsets + 0x200;
 
 			// Create a sorted list
-			std::vector<CodeExec::VRAMWrite*> writes = codeExec.getVRAMWrites();
-			std::sort(writes.begin(), writes.end(), [](const CodeExec::VRAMWrite* a, const CodeExec::VRAMWrite* b) { return a->mAddress < b->mAddress; } );
+			std::vector<DebugTracking::VRAMWrite*> writes = debugTracking.getVRAMWrites();
+			std::sort(writes.begin(), writes.end(), [](const DebugTracking::VRAMWrite* a, const DebugTracking::VRAMWrite* b) { return a->mAddress < b->mAddress; } );
 
 			const bool showPlaneA = (category.mOpenKeys.count(0x1000000000000001) == 0);
 			const bool showPlaneB = (category.mOpenKeys.count(0x1000000000000002) == 0);
@@ -886,7 +887,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 			builder.addOption("Patterns and others", showOthers, Color::CYAN, 0, 0x1000000000000004);
 			builder.addSpacing(12);
 
-			for (const CodeExec::VRAMWrite* write : writes)
+			for (const DebugTracking::VRAMWrite* write : writes)
 			{
 				const uint64 key = ((uint64)write->mAddress << 32) + write->mSize;
 				String line(0, "0x%04x (0x%02x bytes) at %s", write->mAddress, write->mSize, write->mLocation.toString(codeExec).c_str());
@@ -931,7 +932,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 				}
 			}
 
-			if (writes.size() == codeExec.getVRAMWrites().capacity())
+			if (writes.size() == debugTracking.getVRAMWrites().capacity())
 			{
 				builder.addLine("[Reached the limit]", Color::WHITE, 4);
 			}
@@ -940,10 +941,10 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 
 		case CATEGORY_LOG:
 		{
-			const auto& entries = LogDisplay::instance().getScriptLogEntries();
+			const auto& entries = debugTracking.getScriptLogEntries();
 			for (const auto& pair : entries)
 			{
-				const LogDisplay::ScriptLogEntry& entry = pair.second;
+				const DebugTracking::ScriptLogEntry& entry = pair.second;
 				if (!entry.mEntries.empty())
 				{
 					const bool hasCurrent = (entry.mLastUpdate >= Application::instance().getSimulation().getFrameNumber() - 1);
@@ -955,7 +956,7 @@ void DebugSidePanel::buildInternalCategoryContent(DebugSidePanelCategory& catego
 					builder.addSpacing(-12);
 					for (size_t i = 0; i < entry.mEntries.size(); ++i)
 					{
-						const LogDisplay::ScriptLogSingleEntry& singleEntry = entry.mEntries[i];
+						const DebugTracking::ScriptLogSingleEntry& singleEntry = entry.mEntries[i];
 						const uint64 key = (((uint64)entry.mEntries.size() << 16) + ((uint64)i << 32)) ^ rmx::getMurmur2_64(String(singleEntry.mValue));
 						builder.addLine(singleEntry.mValue, color, 56, key);
 

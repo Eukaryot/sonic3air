@@ -85,6 +85,9 @@
     <Filter Include="simulation\bindings">
       <UniqueIdentifier>{8bad1afb-2428-4f4e-8187-4dbd48347a39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="simulation\debug">
+      <UniqueIdentifier>{75bf8c7b-7f6c-4f46-8328-a9f4bf832b4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\oxygen\helper\BitStream.cpp">
@@ -420,6 +423,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp">
       <Filter>simulation\bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\oxygen\simulation\debug\DebugTracking.cpp">
+      <Filter>simulation\debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -792,6 +798,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\oxygen\rendering\software\SoftwareBlur.h">
       <Filter>rendering\software</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\oxygen\simulation\debug\DebugTracking.h">
+      <Filter>simulation\debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

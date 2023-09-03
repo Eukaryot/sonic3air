@@ -120,6 +120,7 @@
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\LemonScriptBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\bindings\RendererBindings.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\CodeExec.cpp" />
+    <ClCompile Include="..\..\source\oxygen\simulation\debug\DebugTracking.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\EmulatorInterface.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\GameRecorder.cpp" />
     <ClCompile Include="..\..\source\oxygen\simulation\LemonScriptProgram.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="..\..\source\oxygen\simulation\bindings\RendererBindings.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\CodeExec.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\DebuggingInterfaces.h" />
+    <ClInclude Include="..\..\source\oxygen\simulation\debug\DebugTracking.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\EmulatorInterface.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\GameRecorder.h" />
     <ClInclude Include="..\..\source\oxygen\simulation\LemonScriptProgram.h" />
