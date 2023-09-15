@@ -31,9 +31,9 @@ namespace serialization
 		{
 			// When you get a compiler error here, it's because the type you try to serialize is not supported
 			//  -> Most probably, you're just missing the right include for that type, see predefined serialization in "qsf/serialization/binary/"
-#ifdef _MSC_VER
+		#ifdef _MSC_VER
 			T::UNDEFINED_SERIALIZATION_TYPE;
-#endif
+		#endif
 		}
 	};
 
@@ -43,9 +43,9 @@ namespace serialization
 		inline static void serialize(BinarySerializer& serializer, const T& value)
 		{
 			// When you get a compiler error here, it's because the type you try to serialize is const
-#ifdef _MSC_VER
+		#ifdef _MSC_VER
 			T::CONST_SERIALIZATION_TYPE;
-#endif
+		#endif
 		}
 	};
 
