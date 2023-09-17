@@ -201,6 +201,7 @@ void ConfigurationImpl::saveSettingsInternal(Json::Value& root, SettingsType set
 			ghostSyncJson["Enabled"] = mGameServer.mGhostSync.mEnabled ? 1 : 0;
 			ghostSyncJson["ChannelName"] = mGameServer.mGhostSync.mChannelName;
 			ghostSyncJson["ShowOffscreenGhosts"] = mGameServer.mGhostSync.mShowOffscreenGhosts ? 1 : 0;
+			ghostSyncJson["GhostRendering"] = mGameServer.mGhostSync.mGhostRendering;
 			gameServerJson["GhostSync"] = ghostSyncJson;
 
 			Json::Value updateCheckJson;
@@ -250,6 +251,7 @@ void ConfigurationImpl::loadSharedSettingsConfig(JsonHelper& rootHelper)
 				jsonHelper.tryReadBool("Enabled", mGameServer.mGhostSync.mEnabled);
 				jsonHelper.tryReadString("ChannelName", mGameServer.mGhostSync.mChannelName);
 				jsonHelper.tryReadBool("ShowOffscreenGhosts", mGameServer.mGhostSync.mShowOffscreenGhosts);
+				jsonHelper.tryReadInt("GhostRendering", mGameServer.mGhostSync.mGhostRendering);
 			}
 		}
 	}

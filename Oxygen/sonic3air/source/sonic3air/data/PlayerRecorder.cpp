@@ -380,7 +380,7 @@ void PlayerRecorder::updatePlayback(const Recording& recording, uint16 frameNumb
 
 	const uint8 character = (recording.mCategory >> 4) - 1;
 	const Vec2i velocity = (frameNumber > 0) ? (frame.mPosition - recording.mFrames[frameNumber-1].mPosition) : Vec2i(0, 1);
-	s3air::drawPlayerSprite(emulatorInterface, character, Vec2i(px, py), velocity, frame.mSprite, frame.mFlags & 0x43, frame.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &frameNumber, true, 0x99990000 + recording.mIndex * 0x10);
+	s3air::drawPlayerSprite(emulatorInterface, character, Vec2i(px, py), velocity, frame.mSprite, frame.mFlags & 0x43, frame.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &frameNumber, Color(1.5f, 1.5f, 1.5f, 0.65f), 0x99990000 + recording.mIndex * 0x10);
 }
 
 bool PlayerRecorder::serializeRecording(VectorBinarySerializer& serializer, Recording& recording)

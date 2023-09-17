@@ -298,6 +298,7 @@ void GhostSync::updateGhostPlayers()
 
 	// TODO: Check own player's state and whether showing others even makes sense
 
+	ConfigurationImpl::GhostSync& config = ConfigurationImpl::instance().mGameServer.mGhostSync;
 	EmulatorInterface& emulatorInterface = EmulatorInterface::instance();
 
 	std::vector<uint32> playersToRemove;
@@ -372,11 +373,23 @@ void GhostSync::updateGhostPlayers()
 		}
 
 		const float moveDirAngle = (float)ghostData.mMoveDirection / 128.0f * PI_FLOAT;
-		const bool enableOffscreen = ConfigurationImpl::instance().mGameServer.mGhostSync.mShowOffscreenGhosts;
 		uint8 renderFlags = ghostData.mFlags & 0x03;
 		if (ghostData.mFlags & GhostData::FLAG_PRIORITY)
 			renderFlags |= 0x40;
-		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, renderFlags, ghostData.mRotation, Color(1.5f, 1.5f, 1.5f, 0.65f), &ghostData.mFrameCounter, enableOffscreen, playerData.mPlayerID);
+
+		Color tintColor;
+		Color offscreenColor;
+		switch (config.mGhostRendering)
+		{
+			// 0 is reserved for no rendering at all, in case that could be useful some day
+			default:
+			case 1:  tintColor = Color::WHITE;  offscreenColor = Color(1.0f, 1.0f, 1.0f, 0.65f);  break;	// Full opacity, except for offscreen ghosts
+			case 2:  tintColor = Color(1.0f, 1.0f, 1.0f, 0.65f);  offscreenColor = tintColor;  break;		// Transparent
+			case 3:  tintColor = Color(1.5f, 1.5f, 1.5f, 0.65f);  offscreenColor = tintColor;  break;		// Ghost-style rendering: Transparent and lighter than usual
+		}
+		if (!config.mShowOffscreenGhosts)
+			offscreenColor = Color::TRANSPARENT;
+		s3air::drawPlayerSprite(emulatorInterface, ghostData.mCharacter, Vec2i(px, py), moveDirAngle, ghostData.mSprite, renderFlags, ghostData.mRotation, tintColor, &ghostData.mFrameCounter, offscreenColor, playerData.mPlayerID);
 	}
 
 	for (uint32 id : playersToRemove)

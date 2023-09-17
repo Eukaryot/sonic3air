@@ -106,6 +106,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		setupOptionEntryEnum8(option::FRAME_SYNC,				&config.mFrameSync);
 
 		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServer.mGhostSync.mEnabled);
+		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServer.mGhostSync.mGhostRendering);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
@@ -233,6 +234,13 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 			.initEntry("Enable Ghost Sync", option::GHOST_SYNC)
 			.addOption("Disabled", 0)
 			.addOption("Enabled", 1);
+
+		entries.addEntry<OptionsMenuEntry>()
+			.setUseSmallFont(true)
+			.initEntry("Ghost Display", option::GHOST_SYNC_RENDERING)
+			.addOption("Full opacity", 1)
+			.addOption("Semi-transparent", 2)
+			.addOption("Ghost Style", 3);
 
 		// TEST
 		//  -> TODO: Needs support for a label text like "Channel" and possibly some explanation text as well
