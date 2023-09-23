@@ -9,6 +9,10 @@
 #include "sonic3air/pch.h"
 #include "sonic3air/client/crowdcontrol/CrowdControlClient.h"
 
+#include "oxygen/application/Application.h"
+#include "oxygen/simulation/CodeExec.h"
+#include "oxygen/simulation/Simulation.h"
+
 
 bool CrowdControlClient::startConnection()
 {
@@ -23,7 +27,7 @@ bool CrowdControlClient::startConnection()
 	Sockets::startupSockets();
 
 	// Assume a locally running instance of the Crowd Control app
-	if (!mSocket.connectTo("127.0.0.1", 43384))
+	if (!mSocket.connectTo("127.0.0.1", 58430))
 		return false;
 
 	// Done
@@ -39,6 +43,19 @@ void CrowdControlClient::stopConnection()
 
 void CrowdControlClient::updateConnection(float timeElapsed)
 {
+#if 0
+	// Test for script function call if not connected to CC
+	{
+		static float timeout = 3.0f;
+		timeout -= std::min(timeElapsed, 0.05f);
+		if (timeout < 0.0f)
+		{
+			triggerEffect("AddRing");
+			timeout = 5.0f;
+		}
+	}
+#endif
+
 	if (!mSetupDone)
 		return;
 
@@ -72,11 +89,20 @@ void CrowdControlClient::evaluateMessage(const Json::Value& message)
 
 CrowdControlClient::StatusCode CrowdControlClient::triggerEffect(const std::string& effectCode)
 {
-	// TODO: Call a script function, something like "Game.triggerCrownControlEffect(effectCode)"
-	//  -> However, this requires waiting for a frame to get a response...
-	//  -> Or we even run into a timeout because no script is currently running
-	// Alternative: Trigger script function run right away!
+	// Prepare and execute script call
+	CodeExec& codeExec = Application::instance().getSimulation().getCodeExec();
+	LemonScriptRuntime& runtime = codeExec.getLemonScriptRuntime();
 
-	//return StatusCode::SUCCESS;
-	return StatusCode::UNAVAILABLE;
+	const uint64 effectCodeHash = runtime.getInternalLemonRuntime().addString(effectCode);
+
+	CodeExec::FunctionExecData execData;
+	execData.mParams.mReturnType = &lemon::PredefinedDataTypes::UINT_8;
+	lemon::Runtime::FunctionCallParameters::Parameter& param1 = vectorAdd(execData.mParams.mParams);
+	param1.mDataType = &lemon::PredefinedDataTypes::STRING;
+	param1.mStorage = effectCodeHash;
+
+	codeExec.executeScriptFunction("Game.triggerCrowdControlEffect", false, &execData);
+	
+	const StatusCode result = (StatusCode)execData.mReturnValueStorage;
+	return result;
 }

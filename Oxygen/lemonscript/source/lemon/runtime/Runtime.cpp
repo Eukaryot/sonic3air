@@ -364,6 +364,38 @@ namespace lemon
 		return false;
 	}
 
+	bool Runtime::callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params)
+	{
+		const DataTypeDefinition& returnType = (nullptr != params.mReturnType) ? *params.mReturnType : PredefinedDataTypes::VOID;
+
+		// Build the function signature hash
+		uint32 signatureHash = Function::getVoidSignatureHash();
+		if (returnType.getClass() != DataTypeDefinition::Class::VOID || !params.mParams.empty())
+		{
+			Function::SignatureBuilder builder;
+			builder.clear(returnType);
+			for (const FunctionCallParameters::Parameter& param : params.mParams)
+				builder.addParameterType(*param.mDataType);
+			signatureHash = builder.getSignatureHash();
+		}
+
+		const uint64 nameAndSignatureHash = functionName.getHash() + signatureHash;
+		const Function* function = mProgram->getFunctionBySignature(nameAndSignatureHash);
+		if (nullptr != function)
+		{
+			// Push parameters accordingly
+			for (const FunctionCallParameters::Parameter& param : params.mParams)
+			{
+				mSelectedControlFlow->pushValueStack(param.mStorage);
+			}
+
+			// Call
+			callFunction(*function);
+			return true;
+		}
+		return false;
+	}
+
 	bool Runtime::returnFromFunction()
 	{
 		if (mSelectedControlFlow->mCallStack.count == 0)

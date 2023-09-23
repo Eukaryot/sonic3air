@@ -102,6 +102,18 @@ namespace lemon
 			virtual bool handleExternalJump(uint64 address) = 0;
 		};
 
+		struct FunctionCallParameters
+		{
+			struct Parameter
+			{
+				const lemon::DataTypeDefinition* mDataType = nullptr;
+				uint64 mStorage = 0;
+			};
+
+			const lemon::DataTypeDefinition* mReturnType = nullptr;
+			std::vector<Parameter> mParams;
+		};
+
 	public:
 		inline static ControlFlow* getActiveControlFlow()	{ return mActiveControlFlow; }
 		inline static Runtime* getActiveRuntime()			{ return (nullptr == mActiveControlFlow) ? nullptr : &mActiveControlFlow->getRuntime(); }
@@ -143,11 +155,13 @@ namespace lemon
 
 		inline const ControlFlow& getMainControlFlow() const  { return *mControlFlows[0]; }
 		inline const ControlFlow& getSelectedControlFlow() const  { return *mSelectedControlFlow; }
+		inline ControlFlow& getSelectedControlFlowMutable()  { return *mSelectedControlFlow; }
 
 		void callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex = 0);
 		void callFunction(const Function& function, size_t baseCallIndex = 0);
 		bool callFunctionAtLabel(const Function& function, FlyweightString labelName);
 		bool callFunctionByName(FlyweightString functionName, FlyweightString labelName = FlyweightString());
+		bool callFunctionWithParameters(FlyweightString functionName, const FunctionCallParameters& params);
 		bool returnFromFunction();
 
 		void executeSteps(ExecuteConnector& result, size_t stepsLimit, size_t minimumCallStackSize);

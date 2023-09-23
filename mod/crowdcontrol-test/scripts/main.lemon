@@ -1,17 +1,20 @@
 
 //# script-feature-level(2)
 
-constant u8 CCStatusCode.SUCCESS		= 0x00,		// The effect executed successfully
-constant u8 CCStatusCode.FAILURE		= 0x01,		// The effect failed to trigger, but is still available for use; viewer(s) will be refunded
-constant u8 CCStatusCode.UNAVAILABLE	= 0x02,		// Same as FAILURE but the effect is no longer available for use for the remainder of the game
-constant u8 CCStatusCode.RETRY			= 0x03,		// The effect cannot be triggered right now, try again in a few seconds - note: this is the "normal" failure response
-constant u8 CCStatusCode.PAUSED			= 0x06,		// The timed effect has been paused and is now waiting
-constant u8 CCStatusCode.RESUME			= 0x07,		// The timed effect has been resumed and is counting down again
-constant u8 CCStatusCode.FINISHED		= 0x08,		// The timed effect has finished
+constant u8 CCStatusCode.SUCCESS		= 0x00		// The effect executed successfully
+constant u8 CCStatusCode.FAILURE		= 0x01		// The effect failed to trigger, but is still available for use; viewer(s) will be refunded
+constant u8 CCStatusCode.UNAVAILABLE	= 0x02		// Same as FAILURE but the effect is no longer available for use for the remainder of the game
+constant u8 CCStatusCode.RETRY			= 0x03		// The effect cannot be triggered right now, try again in a few seconds - note: this is the "normal" failure response
+constant u8 CCStatusCode.PAUSED			= 0x06		// The timed effect has been paused and is now waiting
+constant u8 CCStatusCode.RESUME			= 0x07		// The timed effect has been resumed and is counting down again
+constant u8 CCStatusCode.FINISHED		= 0x08		// The timed effect has finished
 
 
-function u8 Game.triggerCrownControlEffect(string effectCode)
+function u8 Game.triggerCrowdControlEffect(string effectCode)
 {
+	// Debug output
+	//debugLog(effectCode)
+
 	if (effectCode == "AddRing")
 	{
 		addRings(1)
@@ -37,7 +40,7 @@ function void Debugging.debugDraw()
 	{
 		if (!key2_state)
 		{
-			Game.triggerCrownControlEffect("AddRing")
+			Game.triggerCrowdControlEffect("AddRing")
 			key2_state = true
 		}
 	}
