@@ -21,3 +21,31 @@ function u8 Game.triggerCrownControlEffect(string effectCode)
 	// For unknown effects
 	return CCStatusCode.UNAVAILABLE
 }
+
+
+// Dev feature just for testing - must get disabled / removed before release!
+#if 1
+
+global bool key2_state = false
+
+function void Debugging.debugDraw()
+{
+	// Call the base implementation (which already uses keys 0 and 1)
+	base.Debugging.debugDraw()
+
+	if (Key2)
+	{
+		if (!key2_state)
+		{
+			Game.triggerCrownControlEffect("AddRing")
+			key2_state = true
+		}
+	}
+	else
+	{
+		key2_state = false
+	}
+
+}
+
+#endif
