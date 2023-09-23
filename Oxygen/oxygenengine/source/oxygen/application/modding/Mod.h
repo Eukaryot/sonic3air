@@ -46,6 +46,11 @@ public:
 		std::vector<Setting> mSettings;
 	};
 
+	struct UsedFeature
+	{
+		std::string mFeatureName;
+	};
+
 	struct OtherModInfo
 	{
 		std::string mModID;
@@ -76,11 +81,17 @@ public:
 	// Settings
 	std::vector<SettingCategory> mSettingCategories;
 
+	// Features
+	std::unordered_map<uint64, UsedFeature> mUsedFeatures;	// Using feature name string hash as key
+
 	// Relationships with other mods
 	std::vector<OtherModInfo> mOtherModInfos;
 
 public:
 	void loadFromJson(const Json::Value& json);
+
+	const UsedFeature* getUsedFeature(std::string_view featureName) const;
+	const UsedFeature* getUsedFeature(uint64 featureNameHash) const;
 
 private:
 	bool mDirty = false;			// Only temporarily used by ModManager

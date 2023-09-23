@@ -200,6 +200,11 @@ bool EngineDelegate::useDeveloperFeatures()
 	return mConfiguration.mDevMode.mEnabled;
 }
 
+void EngineDelegate::onActiveModsChanged()
+{
+	mGame.onActiveModsChanged();
+}
+
 void EngineDelegate::onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer)
 {
 	mGame.onGameRecordingHeaderLoaded(buildString, buffer);

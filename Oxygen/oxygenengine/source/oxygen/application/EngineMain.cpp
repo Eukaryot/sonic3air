@@ -129,6 +129,9 @@ void EngineMain::onActiveModsChanged()
 
 	// Scripts need to be reloaded
 	Application::instance().getSimulation().reloadScriptsAfterModsChange();
+
+	// Inform the delegate as well
+	mDelegate.onActiveModsChanged();
 }
 
 bool EngineMain::reloadFilePackage(std::wstring_view packageName, bool forceReload)

@@ -114,6 +114,29 @@ void Mod::loadFromJson(const Json::Value& json)
 		}
 	}
 
+	// Read used features
+	Json::Value featuresModsJson = json["UsesFeatures"];
+	if (featuresModsJson.isObject())
+	{
+		for (auto iteratorFeatures = featuresModsJson.begin(); iteratorFeatures != featuresModsJson.end(); ++iteratorFeatures)
+		{
+			const Json::Value featureJson = *iteratorFeatures;
+			if (featureJson.isBool())
+			{
+				const std::string featureName = iteratorFeatures.key().asString();
+				const uint64 key = rmx::getMurmur2_64(featureName);
+				if (featureJson.asBool())
+				{
+					mUsedFeatures[key].mFeatureName = featureName;
+				}
+				else
+				{
+					mUsedFeatures.erase(key);	// In case it was previously added
+				}
+			}
+		}
+	}
+
 	// Read relationships with other mods
 	Json::Value otherModsJson = json["OtherMods"];
 	if (otherModsJson.isObject())
@@ -146,4 +169,14 @@ void Mod::loadFromJson(const Json::Value& json)
 			}
 		}
 	}
+}
+
+const Mod::UsedFeature* Mod::getUsedFeature(std::string_view featureName) const
+{
+	return mapFind(mUsedFeatures, rmx::getMurmur2_64(featureName));
+}
+
+const Mod::UsedFeature* Mod::getUsedFeature(uint64 featureNameHash) const
+{
+	return mapFind(mUsedFeatures, featureNameHash);
 }

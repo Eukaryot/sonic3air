@@ -64,6 +64,7 @@ public:
 	virtual bool mayLoadScriptMods() = 0;
 	virtual bool allowModdedData() = 0;
 	virtual bool useDeveloperFeatures() = 0;
+	virtual void onActiveModsChanged() = 0;
 
 	virtual void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) = 0;
 	virtual void onGameRecordingHeaderSave(std::vector<uint8>& buffer) = 0;

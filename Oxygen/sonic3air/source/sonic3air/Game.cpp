@@ -23,6 +23,7 @@
 #include "oxygen/application/input/ControlsIn.h"
 #include "oxygen/application/input/InputManager.h"
 #include "oxygen/application/mainview/GameView.h"
+#include "oxygen/application/modding/ModManager.h"
 #include "oxygen/application/video/VideoOut.h"
 #include "oxygen/drawing/software/Blitter.h"
 #include "oxygen/helper/FileHelper.h"
@@ -82,6 +83,7 @@ void Game::startup(EmulatorInterface& emulatorInterface)
 	mPlayerProgress.load();
 	mBlueSpheresRendering.startup();
 	mGameClient.setupClient();
+	checkActiveModsUsedFeatures();
 
 	DiscordIntegration::startup();
 }
@@ -613,6 +615,11 @@ void Game::updateSpecialInput(float timeElapsed)
 	Application::instance().getGameView().setWhiteOverlayAlpha(mTimeAttackRestartCharge);
 }
 
+void Game::onActiveModsChanged()
+{
+	checkActiveModsUsedFeatures();
+}
+
 bool Game::shouldPauseOnFocusLoss() const
 {
 	return (GameApp::hasInstance() && Application::instance().getSimulation().isRunning() && Application::instance().getSimulation().getSpeed() > 0.0f && !isInMainMenuMode());
@@ -817,6 +824,11 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 		serializer.writeAs<uint32>(setting->mSettingId);
 		serializer.write(setting->mCurrentValue);
 	}
+}
+
+void Game::checkActiveModsUsedFeatures()
+{
+	// Yet unused
 }
 
 void Game::startIntoGameInternal()
