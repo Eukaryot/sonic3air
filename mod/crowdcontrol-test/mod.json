@@ -1,0 +1,16 @@
+{
+	"Metadata":
+	{
+		"Name": "CrowdControl Test",
+		"UniqueID": "codenamegamma-crowdcontrol",
+		"Author": "Codename Gamma",
+		"Description": "Add a description here",
+		"URL": "",
+		"ModVersion": "1.0.0.0",
+		"GameVersion": "23.09.23.0"
+	},
+	"UsesFeatures":
+	{
+		"CrowdControl": true
+	}
+}

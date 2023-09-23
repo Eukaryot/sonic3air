@@ -1,0 +1,2 @@
+Default mods directory (Windows):
+%appdata%\Sonic3AIR\mods
