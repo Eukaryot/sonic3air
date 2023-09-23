@@ -46,6 +46,9 @@
     <Filter Include="menu\mods">
       <UniqueIdentifier>{2d24639b-9a65-4177-a4e0-6783a69f3842}</UniqueIdentifier>
     </Filter>
+    <Filter Include="client\crowdcontrol">
+      <UniqueIdentifier>{58c44b68-4d4f-4f2e-9fa9-6c314f319434}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\sonic3air\menu\GameApp.cpp">
@@ -175,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sonic3air\menu\mods\ModsMenuEntries.cpp">
       <Filter>menu\mods</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.cpp">
+      <Filter>client\crowdcontrol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -310,6 +316,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\sonic3air\menu\mods\ModResources.h">
       <Filter>menu\mods</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sonic3air\client\crowdcontrol\CrowdControlClient.h">
+      <Filter>client\crowdcontrol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

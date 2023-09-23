@@ -99,6 +99,7 @@ void Game::update(float timeElapsed)
 {
 	// Update game client
 	mGameClient.updateClient(timeElapsed);
+	mCrowdControlClient.updateConnection(timeElapsed);
 
 	// Update sprite redirects (like input icons)
 	mDynamicSprites.updateSpriteRedirects();
@@ -828,7 +829,22 @@ void Game::onGameRecordingHeaderSave(std::vector<uint8>& buffer)
 
 void Game::checkActiveModsUsedFeatures()
 {
-	// Yet unused
+	// Check mods for usage of Crowd Control
+	bool usesCrowdControl = false;
+	static const uint64 CC_FEATURE_NAME_HASH = rmx::getMurmur2_64("CrowdControl");
+	for (const Mod* mod : ModManager::instance().getActiveMods())
+	{
+		if (nullptr != mod->getUsedFeature(CC_FEATURE_NAME_HASH))
+		{
+			usesCrowdControl = true;
+			break;
+		}
+	}
+
+	if (usesCrowdControl)
+		mCrowdControlClient.startConnection();
+	else
+		mCrowdControlClient.stopConnection();
 }
 
 void Game::startIntoGameInternal()
