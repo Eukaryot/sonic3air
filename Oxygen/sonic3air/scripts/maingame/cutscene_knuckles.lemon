@@ -233,7 +233,7 @@ function void fn065c56()
 {
 #if STANDALONE
 	// In standalone, this is done in "fn02b452", so player can't jump and avoid falling down when "Glitch Fixes" is enabled
-	if (!Game.getSetting(SETTING_FIX_GLITCHES)) // #contributed by TheMushrunt
+	if (!Game.getSetting(SETTING_FIX_GLITCHES))
 #endif
 	{
 		player1.control_override = 0
