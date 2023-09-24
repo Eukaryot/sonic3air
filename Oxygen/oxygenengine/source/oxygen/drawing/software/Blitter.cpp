@@ -21,7 +21,7 @@ namespace
 		{
 			int x1 = width;
 			int x2 = 0;
-			if (transform[0] != 0.0f)
+			if (std::abs(transform[0]) > 0.001f)
 			{
 				const float A = -dy * transform[1] + spriteRect.x;
 				x1 = offset.x + roundToInt((A) / transform[0]);
@@ -33,7 +33,7 @@ namespace
 		{
 			int x1 = width;
 			int x2 = 0;
-			if (transform[2] != 0.0f)
+			if (std::abs(transform[2]) > 0.001f)
 			{
 				const float A = -dy * transform[3] + spriteRect.y;
 				x1 = offset.x + roundToInt((A) / transform[2]);

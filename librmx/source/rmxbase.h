@@ -38,6 +38,7 @@
 #include "export.h"
 #include "rmxbase/base/Types.h"
 #include "rmxbase/base/Basics.h"
+#include "rmxbase/base/StdHelpers.h"
 #include "rmxbase/base/ErrorHandler.h"
 #include "rmxbase/tools/BitArray.h"
 #include "rmxbase/tools/BitFlagSet.h"

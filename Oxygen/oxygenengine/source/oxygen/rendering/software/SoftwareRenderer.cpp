@@ -15,6 +15,7 @@
 #include "oxygen/application/EngineMain.h"
 #include "oxygen/drawing/Drawer.h"
 #include "oxygen/drawing/DrawerTexture.h"
+#include "oxygen/drawing/software/BlitterHelper.h"
 
 
 namespace detail
@@ -639,14 +640,8 @@ void SoftwareRenderer::renderSprite(const SpriteGeometry& geometry)
 							color.g = saturate(sprite.mAddedColor.g + color.g * sprite.mTintColor.g);
 							color.b = saturate(sprite.mAddedColor.b + color.b * sprite.mTintColor.b);
 							color.a = saturate(sprite.mAddedColor.a + color.a * sprite.mTintColor.a);
-
-							if (color.a < 1.0f)
-							{
-								color = color.blendOver(Color::fromABGR32(dst));
-								color.a = 1.0f;
-							}
-
-							dst = color.getABGR32();
+							uint32 src = color.getABGR32();
+							BlitterHelper::blendPixelAlpha((uint8*)&dst, (uint8*)&src);
 						}
 						else
 						{

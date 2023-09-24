@@ -9,6 +9,7 @@
 #include "oxygen/pch.h"
 #include "oxygen/simulation/LemonScriptProgram.h"
 #include "oxygen/simulation/EmulatorInterface.h"
+#include "oxygen/simulation/LogDisplay.h"
 #include "oxygen/application/modding/ModManager.h"
 #include "oxygen/helper/Utils.h"
 

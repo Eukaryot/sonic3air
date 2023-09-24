@@ -64,6 +64,7 @@ public:
 		bool mEnabled = false;
 		std::string mChannelName = "world";
 		bool mShowOffscreenGhosts = true;
+		int mGhostRendering = 3;
 	};
 	struct GameServer
 	{

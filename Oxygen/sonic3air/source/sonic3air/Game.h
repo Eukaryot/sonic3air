@@ -78,6 +78,8 @@ public:
 
 	RemasteredMusicDownload& getRemasteredMusicDownload()  { return mRemasteredMusicDownload; }
 
+	void onActiveModsChanged();
+
 	bool shouldPauseOnFocusLoss() const;
 
 	void fillDebugVisualization(Bitmap& bitmap, int& mode);
@@ -86,6 +88,8 @@ public:
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer);
 
 private:
+	void checkActiveModsUsedFeatures();
+
 	void startIntoGameInternal();
 
 	// Script bindings

@@ -20,6 +20,7 @@ namespace option
 
 		// System
 		GHOST_SYNC,
+		GHOST_SYNC_RENDERING,
 		SCRIPT_OPTIMIZATION,
 		GAME_RECORDING_MODE,
 

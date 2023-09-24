@@ -49,7 +49,7 @@ namespace s3air
 		}
 	}
 
-	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, float moveDirectionRadians, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen, uint64 spriteTagBaseValue)
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, float moveDirectionRadians, uint16 animationSprite, uint8 flags, uint8 rotation, Color color, const uint16* globalFrameNumber, Color offscreenColor, uint64 spriteTagBaseValue)
 	{
 		const uint8 atex = 0x40 + characterIndex * 0x20;
 		int px = position.x;
@@ -67,7 +67,7 @@ namespace s3air
 		}
 
 		bool showAtBorder = false;
-		if (enableOffscreen)
+		if (offscreenColor.a > 0.0f)
 		{
 			const int width = VideoOut::instance().getScreenWidth();
 			const int height = VideoOut::instance().getScreenHeight();
@@ -89,6 +89,7 @@ namespace s3air
 				showAtBorder = true;
 				px = roundToInt((1.0f + rx / scale) / 2.0f * (width-1));
 				py = roundToInt((1.0f + ry / scale) / 2.0f * (height-1));
+				color = offscreenColor;
 			}
 		}
 
@@ -178,9 +179,9 @@ namespace s3air
 		}
 	}
 
-	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, const Color& color, const uint16* globalFrameNumber, bool enableOffscreen, uint64 spriteTagBaseValue)
+	void drawPlayerSprite(EmulatorInterface& emulatorInterface, uint8 characterIndex, const Vec2i& position, const Vec2i& velocity, uint16 animationSprite, uint8 flags, uint8 rotation, Color color, const uint16* globalFrameNumber, Color offscreenColor, uint64 spriteTagBaseValue)
 	{
-		drawPlayerSprite(emulatorInterface, characterIndex, position, std::atan2((float)velocity.y, (float)velocity.x), animationSprite, flags, rotation, color, globalFrameNumber, enableOffscreen, spriteTagBaseValue);
+		drawPlayerSprite(emulatorInterface, characterIndex, position, std::atan2((float)velocity.y, (float)velocity.x), animationSprite, flags, rotation, color, globalFrameNumber, offscreenColor, spriteTagBaseValue);
 	}
 
 }

@@ -202,6 +202,7 @@
     <ClInclude Include="..\..\source\rmxbase.h" />
     <ClInclude Include="..\..\source\rmxbase\base\Basics.h" />
     <ClInclude Include="..\..\source\rmxbase\base\ErrorHandler.h" />
+    <ClInclude Include="..\..\source\rmxbase\base\StdHelpers.h" />
     <ClInclude Include="..\..\source\rmxbase\base\Types.h" />
     <ClInclude Include="..\..\source\rmxbase\bitmap\Bitmap.h" />
     <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapCodecs.h" />

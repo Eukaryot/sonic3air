@@ -214,6 +214,9 @@
     <ClInclude Include="..\..\source\rmxbase\bitmap\BitmapView.h">
       <Filter>bitmap</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\rmxbase\base\StdHelpers.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\rmxbase\rmxbase.cpp" />

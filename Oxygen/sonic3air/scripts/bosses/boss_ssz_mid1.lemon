@@ -26,13 +26,18 @@ function u16 BossMidSSZ1.getMoveTime()
 {
 	// Note that this refers to the move time from center to an edge
 #if STANDALONE
-	// Make him cover more distance in widescreen, and take into account the velocity
-	//  -> Using a value of 0x24 instead of the correct 0x20 to avoid a dead spot where boss can't hit you on the left
-	u16 distanceToCover = 0x24 + getScreenExtend() / 2
-	return distanceToCover * 0x100 / abs(objA0.velocity.x)
-#else
-	return 0x20
+	if (getScreenExtend() > 0)
+	{
+		// Make him cover more distance in widescreen, and take into account the velocity
+		//  -> Using a value of 0x24 instead of the correct 0x20 to avoid a dead spot where boss can't hit you on the left
+		u16 distanceToCover = 0x24 + getScreenExtend() / 2
+		return distanceToCover * 0x100 / abs(objA0.velocity.x)
+	}
+	else
 #endif
+	{
+		return 0x20
+	}
 }
 
 
@@ -128,10 +133,7 @@ function void fn07a2f0()
 function void fn07a2fc()
 {
 	objA0.base_state = 0x04
-	objA0.velocity.x = -BossMidSSZ1.getMovementSpeed()
-#if STANDALONE
-	objA0.velocity.x /= 2
-#endif
+	objA0.velocity.x = -0x100	// Fixed speed here for the first horizontal movement, independent of screen extend
 
 	// "spawnChildObjects(0x07a69e)" replaced by:
 	spawnChildObject(0x07a558, 0x00, 30, 0)		// Egg Mobile exhaust flame

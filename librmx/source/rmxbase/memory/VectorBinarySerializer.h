@@ -56,11 +56,11 @@ public:
 	void serializeData(std::vector<uint8>& data, size_t bytesLimit = 0xffffffff);
 
 	template <typename T>
-	void serializeArraySize(std::vector<T>& value, uint16 arraySizeLimit = 0xffff)
+	void serializeArraySize(std::vector<T>& value, uint32 arraySizeLimit = 0xffff)
 	{
 		if (mReading)
 		{
-			const uint16 numEntries = (arraySizeLimit <= 0xff) ? static_cast<uint16>(read<uint8>()) : read<uint16>();
+			const uint32 numEntries = (arraySizeLimit <= 0xff) ? static_cast<uint16>(read<uint8>()) : (arraySizeLimit <= 0xffff) ? static_cast<uint16>(read<uint16>()) : read<uint32>();
 
 			// Limit number of bytes
 			if (numEntries > arraySizeLimit)
@@ -78,13 +78,18 @@ public:
 		}
 		else
 		{
+			RMX_ASSERT((uint32)value.size() <= arraySizeLimit, "Array size " << value.size() << " exceeds limit " << arraySizeLimit);
 			if (arraySizeLimit <= 0xff)
 			{
 				writeAs<uint8>(value.size());
 			}
-			else
+			else if (arraySizeLimit <= 0xffff)
 			{
 				writeAs<uint16>(value.size());
+			}
+			else
+			{
+				writeAs<uint32>(value.size());
 			}
 		}
 	}

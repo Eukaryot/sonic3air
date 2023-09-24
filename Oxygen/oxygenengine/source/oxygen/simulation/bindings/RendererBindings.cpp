@@ -739,7 +739,7 @@ namespace
 		SpriteManager::SpriteHandleData* spriteHandleData = RenderParts::instance().getSpriteManager().getSpriteHandleData(spriteHandle.mHandle);
 		if (nullptr != spriteHandleData)
 		{
-			spriteHandleData->mAddedColor.set(red, green, blue);
+			spriteHandleData->mAddedColor.set(red, green, blue, 0.0f);
 		}
 	}
 

@@ -10,8 +10,8 @@
 #include "oxygen/application/overlays/DebugLogView.h"
 #include "oxygen/application/Application.h"
 #include "oxygen/application/EngineMain.h"
+#include "oxygen/simulation/CodeExec.h"
 #include "oxygen/simulation/Simulation.h"
-#include "oxygen/simulation/LogDisplay.h"
 
 
 DebugLogView::DebugLogView()
@@ -49,10 +49,11 @@ void DebugLogView::render()
 	setRect(FTX::screenRect());
 
 	Drawer& drawer = EngineMain::instance().getDrawer();
+	DebugTracking& debugTracking = Application::instance().getSimulation().getCodeExec().getDebugTracking();
 
 	// Part 1: Script log entries
 	{
-		const auto& entries = LogDisplay::instance().getScriptLogEntries();
+		const auto& entries = debugTracking.getScriptLogEntries();
 		if (!entries.empty())
 		{
 			// Define rect
@@ -63,12 +64,12 @@ void DebugLogView::render()
 				int height = 20;
 				for (const auto& pair : entries)
 				{
-					const LogDisplay::ScriptLogEntry& entry = pair.second;
+					const DebugTracking::ScriptLogEntry& entry = pair.second;
 					const bool hasCurrent = (entry.mLastUpdate >= Application::instance().getSimulation().getFrameNumber() - 1);
 					height += hasCurrent ? ((int)entry.mEntries.size() * 16 + 2) : 18;
 
 					maxKeyWidth = std::max(maxKeyWidth, mFont.getWidth(pair.first.c_str()) + 20);
-					for (const LogDisplay::ScriptLogSingleEntry& singleEntry : entry.mEntries)
+					for (const DebugTracking::ScriptLogSingleEntry& singleEntry : entry.mEntries)
 					{
 						maxContentWidth = std::max(maxContentWidth, mFont.getWidth(singleEntry.mValue.c_str()));
 					}
@@ -82,7 +83,7 @@ void DebugLogView::render()
 			rect.y += 10;
 			for (const auto& pair : entries)
 			{
-				const LogDisplay::ScriptLogEntry& entry = pair.second;
+				const DebugTracking::ScriptLogEntry& entry = pair.second;
 				const bool hasCurrent = (entry.mLastUpdate >= Application::instance().getSimulation().getFrameNumber() - 1);
 
 				const float brightness = hasCurrent ? 1.0f : 0.6f;
@@ -94,7 +95,7 @@ void DebugLogView::render()
 				rect.x += maxKeyWidth;
 				if (hasCurrent)
 				{
-					for (const LogDisplay::ScriptLogSingleEntry& singleEntry : entry.mEntries)
+					for (const DebugTracking::ScriptLogSingleEntry& singleEntry : entry.mEntries)
 					{
 						drawer.printText(mFont, rect, singleEntry.mValue, 1, color);
 						rect.y += 16;
@@ -112,7 +113,7 @@ void DebugLogView::render()
 
 	// Part 2: Color log entries
 	{
-		const LogDisplay::ColorLogEntryArray& entries = LogDisplay::instance().getColorLogEntries();
+		const DebugTracking::ColorLogEntryArray& entries = debugTracking.getColorLogEntries();
 		if (!entries.empty())
 		{
 			// Define rect
@@ -121,7 +122,7 @@ void DebugLogView::render()
 
 			Recti rect = logRect;
 			rect.y += 10;
-			for (const LogDisplay::ColorLogEntry& entry : entries)
+			for (const DebugTracking::ColorLogEntry& entry : entries)
 			{
 				drawer.printText(mFont, rect, entry.mName, 1, Color::WHITE);
 				rect.y += 20;

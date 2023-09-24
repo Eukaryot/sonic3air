@@ -163,32 +163,6 @@ struct RuntimeExecuteConnectorDev : public RuntimeExecuteConnector
 
 
 
-const std::string& CodeExec::Location::toString(CodeExec& codeExec) const
-{
-	if (mResolvedString.empty())
-	{
-		if (nullptr == mFunction)
-		{
-			mResolvedString = "<unable to resolve location>";
-		}
-		else
-		{
-			std::string scriptFilename;
-			uint32 lineNumber;
-			codeExec.getLemonScriptProgram().resolveLocation(*mFunction, (uint32)mProgramCounter, scriptFilename, lineNumber);
-			mResolvedString = std::string(mFunction->getName().getString()) + ", line " + std::to_string(lineNumber);
-		}
-	}
-	return mResolvedString;
-}
-
-bool CodeExec::Location::operator==(const Location& other) const
-{
-	return (mFunction == other.mFunction && mProgramCounter == other.mProgramCounter);
-}
-
-
-
 CodeExec::CallFrame& CodeExec::CallFrameTracking::pushCallFrame(CallFrame::Type type)
 {
 	const int parentIndex = mCallStack.empty() ? -1 : (int)mCallStack.back();
@@ -281,18 +255,19 @@ size_t CodeExec::CallFrameTracking::processCallFramesRecursive(size_t index)
 CodeExec::CodeExec() :
 	mLemonScriptProgram(*new LemonScriptProgram()),
 	mEmulatorInterface(EngineMain::getDelegate().useDeveloperFeatures() ? *new EmulatorInterfaceDev() : *new EmulatorInterface()),
-	mLemonScriptRuntime(*new LemonScriptRuntime(mLemonScriptProgram, mEmulatorInterface))
+	mLemonScriptRuntime(*new LemonScriptRuntime(mLemonScriptProgram, mEmulatorInterface)),
+	mDebugTracking(*this, mEmulatorInterface, mLemonScriptRuntime)
 {
 	mRuntimeEnvironment.mEmulatorInterface = &mEmulatorInterface;
 
 	mIsDeveloperMode = EngineMain::getDelegate().useDeveloperFeatures();
 	if (mIsDeveloperMode)
 	{
-		mLemonScriptProgram.getLemonScriptBindings().setDebugNotificationInterface(this);
-		mEmulatorInterface.setDebugNotificationInterface(this);
+		mLemonScriptProgram.getLemonScriptBindings().setDebugNotificationInterface(&mDebugTracking);
+		mEmulatorInterface.setDebugNotificationInterface(&mDebugTracking);
 		mMainCallFrameTracking.mCallFrames.reserve(CALL_FRAMES_LIMIT);
 		mMainCallFrameTracking.mCallStack.reserve(0x40);
-		mVRAMWrites.reserve(0x800);
+		mDebugTracking.setupForDevMode();
 	}
 }
 
@@ -322,15 +297,11 @@ void CodeExec::reset()
 void CodeExec::cleanScriptDebug()
 {
 	LogDisplay::instance().clearLogErrors();
-	LogDisplay::instance().clearScriptLogValues();
-	LogDisplay::instance().clearColorLogEntries();
 
 	mMainCallFrameTracking.clear();
 	mUnknownAddressesSet.clear();
 	mUnknownAddressesInOrder.clear();
-	clearWatches();
-	mVRAMWritePool.clear();
-	mVRAMWrites.clear();
+	mDebugTracking.clear();
 }
 
 bool CodeExec::reloadScripts(bool enforceFullReload, bool retainRuntimeState)
@@ -486,26 +457,8 @@ bool CodeExec::performFrameUpdate()
 
 		if (mIsDeveloperMode)
 		{
-			// Reset debug draws etc.
-			LogDisplay::instance().clearColorLogEntries();
-
-			// Sanity check: Make sure no one else changed the emulator interface's watches
-			RMX_ASSERT(mWatches.size() == mEmulatorInterface.getWatches().size(), "Watches got changed by someone");
-
-			// Reset watch hits
-			for (Watch* watch : mWatches)
-			{
-				watch->mInitialValue = getCurrentWatchValue(watch->mAddress, watch->mBytes);
-				for (Watch::Hit* hit : watch->mHits)
-					mWatchHitPool.returnObject(*hit);
-				watch->mHits.clear();
-				watch->mLastHitLocation = Location();
-			}
-
-			// Reset VRAM writes
-			for (VRAMWrite* write : mVRAMWrites)
-				mVRAMWritePool.returnObject(*write);
-			mVRAMWrites.clear();
+			// Reset debug tracking (watches etc.)
+			mDebugTracking.onBeginFrame();
 
 			// Reset call frame tracking
 			mMainCallFrameTracking.clear();
@@ -614,85 +567,6 @@ void CodeExec::getCallStackFromCallFrameIndex(std::vector<uint64>& outCallStack,
 		// Continue with parent
 		callFrameIndex = callFrame.mParentIndex;
 	}
-}
-
-void CodeExec::clearWatches(bool clearPersistent)
-{
-	std::vector<std::pair<uint32, uint16>> reAddWatches;
-	if (!clearPersistent)
-	{
-		// Save persistent watches
-		reAddWatches.reserve(mWatches.size());
-		for (const Watch* watch : mWatches)
-		{
-			if (watch->mPersistent)
-			{
-				reAddWatches.emplace_back(watch->mAddress, watch->mBytes);
-			}
-		}
-	}
-
-	for (Watch* watch : mWatches)
-		deleteWatch(*watch);
-	mWatches.clear();
-	mEmulatorInterface.getWatches().clear();
-
-	for (const auto& pair : reAddWatches)
-	{
-		addWatch(pair.first, pair.second, true);
-	}
-}
-
-void CodeExec::addWatch(uint32 address, uint16 bytes, bool persistent)
-{
-	address &= 0x00ffffff;
-
-	// Check if already exists
-	for (const Watch* watch : mWatches)
-	{
-		if (watch->mAddress == address && watch->mBytes == bytes)
-			return;
-	}
-
-	// Add a new watch in EmulatorInterface
-	EmulatorInterface::Watch& internalWatch = vectorAdd(mEmulatorInterface.getWatches());
-	internalWatch.mAddress = address;
-	internalWatch.mBytes = bytes;
-
-	// Add a new watch here
-	Watch& watch = mWatchPool.rentObject();
-	watch.mAddress = address;
-	watch.mBytes = bytes;
-	watch.mPersistent = persistent;
-	watch.mInitialValue = getCurrentWatchValue(watch.mAddress, watch.mBytes);
-	watch.mHits.clear();
-	watch.mLastHitLocation = Location();
-	mWatches.push_back(&watch);
-}
-
-void CodeExec::removeWatch(uint32 address, uint16 bytes)
-{
-	address &= 0x00ffffff;
-
-	// Try to find the watch
-	int index = -1;
-	for (int i = 0; i < (int)mWatches.size(); ++i)
-	{
-		if (mWatches[i]->mAddress == address && mWatches[i]->mBytes == bytes)
-		{
-			index = i;
-			break;
-		}
-	}
-	if (index == -1)
-		return;
-
-	// Remove it here
-	deleteWatch(*mWatches[index]);
-	mWatches.erase(mWatches.begin() + index);
-
-	// Remove it in EmulatorInterface
-	mEmulatorInterface.getWatches().erase(mEmulatorInterface.getWatches().begin() + index);
 }
 
 bool CodeExec::canExecute() const
@@ -855,16 +729,7 @@ bool CodeExec::executeRuntimeStepsDev(size_t& stepsExecuted, size_t minimumCallS
 		mActiveCallFrameTracking->mCallFrames.back().mSteps += connector.mStepsExecuted;
 
 		// Correct written values for all watches that triggered in this update
-		if (!mWatchHitsThisUpdate.empty())
-		{
-			for (auto& pair : mWatchHitsThisUpdate)
-			{
-				Watch& watch = *pair.first;
-				Watch::Hit& hit = *pair.second;
-				hit.mWrittenValue = (watch.mBytes <= 4) ? getCurrentWatchValue(watch.mAddress, watch.mBytes) : getCurrentWatchValue(hit.mAddress, hit.mBytes);
-			}
-			mWatchHitsThisUpdate.clear();
-		}
+		mDebugTracking.updateWatches();
 	}
 
 	stepsExecuted = connector.mStepsExecuted;
@@ -942,25 +807,6 @@ void CodeExec::popCallFrame()
 	}
 }
 
-uint32 CodeExec::getCurrentWatchValue(uint32 address, uint16 bytes) const
-{
-	switch (bytes)
-	{
-		case 1:  return mEmulatorInterface.readMemory8 (address);
-		case 2:  return mEmulatorInterface.readMemory16(address);
-		case 4:  return mEmulatorInterface.readMemory32(address);
-		default: return 0;
-	}
-}
-
-void CodeExec::deleteWatch(Watch& watch)
-{
-	for (Watch::Hit* hit : watch.mHits)
-		mWatchHitPool.returnObject(*hit);
-	watch.mHits.clear();
-	mWatchPool.returnObject(watch);
-}
-
 void CodeExec::showErrorWithScriptLocation(const std::string& errorText, const std::string& subText)
 {
 	std::string locationString = mLemonScriptRuntime.getOwnCurrentScriptLocationString();
@@ -972,68 +818,4 @@ void CodeExec::showErrorWithScriptLocation(const std::string& errorText, const s
 	{
 		RMX_ERROR(errorText << "\nIn " << locationString << "." << (subText.empty() ? "" : "\n") << subText, );
 	}
-}
-
-void CodeExec::onWatchTriggered(size_t watchIndex, uint32 address, uint16 bytes)
-{
-	if (watchIndex >= mWatches.size())	// This may happen if a watch gets added and changed in the same frame
-		return;
-
-	Location location;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
-
-	Watch& watch = *mWatches[watchIndex];
-	{
-		// Add hit
-		Watch::Hit& hit = mWatchHitPool.rentObject();
-		hit.mWrittenValue = (watch.mBytes <= 4) ? getCurrentWatchValue(watch.mAddress, watch.mBytes) : getCurrentWatchValue(hit.mAddress, hit.mBytes);
-		hit.mAddress = address;
-		hit.mBytes = bytes;
-		hit.mLocation = location;
-		watch.mHits.push_back(&hit);
-
-		if (nullptr != mActiveCallFrameTracking)
-			hit.mCallFrameIndex = (int)mActiveCallFrameTracking->mCallFrames.size() - 1;
-		mWatchHitsThisUpdate.emplace_back(&watch, &hit);
-		mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
-	}
-	watch.mLastHitLocation = location;
-
-	Application::instance().getSimulation().stopSingleStepContinue();
-}
-
-void CodeExec::onVRAMWrite(uint16 address, uint16 bytes)
-{
-	// Not more than the limit
-	if (mVRAMWrites.size() >= mVRAMWrites.capacity())
-		return;
-
-	Location location;
-	mLemonScriptRuntime.getLastStepLocation(location.mFunction, location.mProgramCounter);
-
-	// Check if this can be merged with the VRAM write just before
-	if (!mVRAMWrites.empty())
-	{
-		VRAMWrite& other = *mVRAMWrites.back();
-		if (other.mAddress + other.mSize == address && other.mLocation == location)
-		{
-			other.mSize += bytes;
-			return;
-		}
-	}
-
-	// Add a new VRAM write
-	VRAMWrite& write = mVRAMWritePool.rentObject();
-	write.mAddress = address;
-	write.mSize = bytes;
-	write.mLocation = location;
-	if (nullptr != mActiveCallFrameTracking)
-		write.mCallFrameIndex = (int)mActiveCallFrameTracking->mCallFrames.size() - 1;
-	mVRAMWrites.push_back(&write);
-}
-
-void CodeExec::onLog(LogDisplay::ScriptLogSingleEntry& scriptLogSingleEntry)
-{
-	if (nullptr != mActiveCallFrameTracking)
-		scriptLogSingleEntry.mCallFrameIndex = (int)mActiveCallFrameTracking->mCallFrames.size() - 1;
 }
