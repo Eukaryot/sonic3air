@@ -202,6 +202,13 @@ function void fn03a314()
 //# address-hook(0x03a480) end(0x03a542)
 function void fn03a480()
 {
+#if STANDALONE
+	if (debug_mode.state)
+	{
+		u8[A2] = 0
+		return
+	}
+#endif
 	D0.s32 = s32(objA1.groundspeed) << 8
 	u32[A2] += D0
 	if (s32[A2] < 0)
