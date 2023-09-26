@@ -52,6 +52,7 @@ function void fn23a080()
 
 
 //# address-hook(0x23a73e) end(0x23a746)
+//# alias(fn23a73e) deprecated
 function void UpdateLevelScrolling.ALZ()
 {
 	fn23a7d0()
@@ -64,6 +65,7 @@ function void UpdateLevelScrolling.ALZ()
 // Azure Lake
 
 //# address-hook(0x23a63c) end(0x23a686)
+//# alias(fn23a63c) deprecated
 function void InitLevelTiles.CompetitonModeLevel_shared()
 {
 	fn23a03c()
@@ -90,6 +92,7 @@ function void InitLevelTiles.CompetitonModeLevel_shared()
 
 
 //# address-hook(0x23a68a) end(0x23a6a8)
+//# alias(fn23a68a) deprecated
 function void UpdateLevelTiles.CompetitonModeLevel_shared()
 {
 	fn23a03c()
@@ -111,6 +114,7 @@ function void UpdateLevelTiles.CompetitonModeLevel_shared()
 
 
 //# address-hook(0x23a6ac) end(0x23a6c8)
+//# alias(fn23a6ac) deprecated
 function void UpdateLevelTiles.CGZ()
 {
 	// Used in CGZ
@@ -129,6 +133,7 @@ function void UpdateLevelTiles.CGZ()
 
 
 //# address-hook(0x23a6cc) end(0x23a6d0)
+//# alias(fn23a6cc) deprecated
 function void InitLevelScrolling.ALZ()
 {
 	UpdateLevelScrolling.ALZ()
@@ -137,6 +142,7 @@ function void InitLevelScrolling.ALZ()
 
 
 //# address-hook(0x23a6d2) end(0x23a6d6)
+//# alias(fn23a6d2) deprecated
 function void InitLevelScrolling.BPZ()
 {
 	UpdateLevelScrolling.BPZ()
@@ -145,6 +151,7 @@ function void InitLevelScrolling.BPZ()
 
 
 //# address-hook(0x23a6d8) end(0x23a6dc)
+//# alias(fn23a6d8) deprecated
 function void InitLevelScrolling.DPZ()
 {
 	UpdateLevelScrolling.DPZ()
@@ -153,6 +160,7 @@ function void InitLevelScrolling.DPZ()
 
 
 //# address-hook(0x23a6de) end(0x23a714)
+//# alias(fn23a6de) deprecated
 function void InitLevelScrolling.CGZ()
 {
 	// Loads the CGZ background
@@ -172,6 +180,7 @@ function void InitLevelScrolling.CGZ()
 
 
 //# address-hook(0x23a716) end(0x23a716)
+//# alias(fn23a716) deprecated
 function void InitLevelScrolling.EMZ()
 {
 	UpdateLevelScrolling.EMZ()
@@ -197,6 +206,7 @@ function void fn23a71a()
 // Balloon Park
 
 //# address-hook(0x23a748) end(0x23a750)
+//# alias(fn23a748) deprecated
 function void UpdateLevelScrolling.BPZ()
 {
 	fn23a88e()
@@ -209,6 +219,7 @@ function void UpdateLevelScrolling.BPZ()
 // Chrome Gadget
 
 //# address-hook(0x23a752) end(0x23a75a)
+//# alias(fn23a752) deprecated
 function void UpdateLevelScrolling.CGZ()
 {
 	fn23a924()
@@ -218,6 +229,7 @@ function void UpdateLevelScrolling.CGZ()
 
 
 //# address-hook(0x23a75c) end(0x23a760)
+//# alias(fn23a75c) deprecated
 function void UpdateLevelScrolling.EMZ()
 {
 	fn23a980()
@@ -251,6 +263,7 @@ function void fn23a764()
 // Desert Palace
 
 //# address-hook(0x23a796) end(0x23a7b6)
+//# alias(fn23a796) deprecated
 function void UpdateLevelScrolling.DPZ()
 {
 	fn23a8dc()

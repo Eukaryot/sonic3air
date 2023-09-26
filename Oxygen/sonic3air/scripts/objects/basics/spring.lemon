@@ -20,6 +20,7 @@
 
 
 //# address-hook(0x022d06) end(0x022d46)
+//# alias(SpringVertical.BaseUpdate) deprecated
 function void Spring.BaseUpdate()
 {
 	objA0.mapping_offset = 0x02375c
@@ -69,6 +70,7 @@ function void SpringVertical.Init()
 }
 
 //# address-hook(0x022dee) end(0x022e24)
+//# alias(SpringVertical.InitFlipped) deprecated
 function void SpringVerticalFlipped.Init()
 {
 	if (!global.inv_gravity)
@@ -117,12 +119,14 @@ function void SpringVertical.initInternal(bool flipY)
 
 
 //# address-hook(0x022e28) end(0x022e56)
+//# alias(SpringVertical.InitDiagonal) deprecated
 function void SpringDiagonal.Init()
 {
 	SpringDiagonal.initInternal(false)
 }
 
 //# address-hook(0x022e58) end(0x022e8c)
+//# alias(SpringVertical.InitDiagonalFlipped) deprecated
 function void SpringDiagonalFlipped.Init()
 {
 	SpringDiagonal.initInternal(true)
@@ -184,6 +188,7 @@ function void SpringVertical.Update()
 }
 
 //# address-hook(0x023326) end(0x02336e)
+//# alias(SpringVertical.UpdateFlipped) deprecated
 function void SpringVerticalFlipped.Update()
 {
 	SpringVertical.updateInternal(true)
@@ -230,6 +235,7 @@ function void SpringVertical.updateInternal(bool flipY)
 // Horizontal spring
 
 //# address-hook(0x023050) end(0x0230d8)
+//# alias(SpringHorizontal.Check) deprecated
 function void SpringHorizontal.Update()
 {
 	for (u8 characterIndex = 0; characterIndex < 2; ++characterIndex)
@@ -274,6 +280,7 @@ function void SpringHorizontal.Update()
 // Vertical spring in competition mode
 
 //# address-hook(0x022f46) end(0x022f92)
+//# alias(fn022f46) deprecated
 function void SpringVertical.Update.CompetitionMode()
 {
 	// Only used in competition mode
@@ -377,6 +384,7 @@ function void SpringVertical.ApplyToCharacter()
 
 
 //# address-hook(0x023374) end(0x0233c4)
+//# alias(fn023374) deprecated
 function void SpringVerticalFlipped.Update.CompetitionMode()
 {
 	// Only for competition mode (CGZ)
@@ -397,6 +405,7 @@ function void SpringVerticalFlipped.ApplyToCharacter()
 
 
 //# address-hook(0x0233da) end(0x02348a)
+//# alias(fn0233da) deprecated
 function void SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
 {
 	objA0.state.both = 0x100
@@ -452,6 +461,7 @@ function void SpringVerticalFlipped.ApplyToCharacter.CompetitionMode()
 // Horizontal spring in competition mode
 
 //# address-hook(0x0230de) end(0x02315a)
+//# alias(fn0230de) deprecated
 function void SpringHorizontal.Update.CompetitionMode()
 {
 	for (u8 characterIndex = 0; characterIndex < 2; ++characterIndex)
@@ -491,6 +501,7 @@ function void SpringHorizontal.Update.CompetitionMode()
 
 
 //# address-hook(0x023160) end(0x02318e)
+//# alias(fn023160) deprecated
 function void SpringHorizontal.ApplyToCharacter.CompetitionMode()
 {
 	objA0.state.both = 0x0300
@@ -512,6 +523,7 @@ function void SpringHorizontal.ApplyToCharacter.CompetitionMode()
 
 
 //# address-hook(0x023190) end(0x0231ba)
+//# alias(fn023190) deprecated
 function void SpringHorizontal.ApplyToCharacter()
 {
 	objA0.state.both = 0x300
@@ -650,6 +662,7 @@ function void SpringDiagonal.Update()
 
 
 //# address-hook(0x0234e6) end(0x0235cc)
+//# alias(fn0234e6) deprecated
 function void SpringDiagonal.ApplyToCharacter()
 {
 	if ((objA0.flags2a & 0x01) == 0)
@@ -723,6 +736,7 @@ function void SpringDiagonal.ApplyToCharacter()
 
 
 //# address-hook(0x0235d2) end(0x02361e)
+//# alias(SpringDiagonal.UpdateFlipped) deprecated
 function void SpringDiagonalFlipped.Update()
 {
 	SpringDiagonal.updateInternal(true)
@@ -763,6 +777,7 @@ function void SpringDiagonal.updateInternal(bool flipY)
 
 
 //# address-hook(0x023624) end(0x0236e4)
+//# alias(fn023624) deprecated
 function void SpringDiagonalFlipped.ApplyToCharacter()
 {
 	objA0.state.both = 0x0500

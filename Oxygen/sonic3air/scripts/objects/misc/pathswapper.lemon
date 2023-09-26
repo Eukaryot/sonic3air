@@ -122,6 +122,7 @@ function void PathSwapperBaseUpdateVertical()
 
 
 //# address-hook(0x01cdb2) end(0x01cef0)
+//# alias(fn01cdb2) deprecated
 function void PathSwapperCompetitionMode_UpdateVertical()
 {
 	// This function is only used in competition mode

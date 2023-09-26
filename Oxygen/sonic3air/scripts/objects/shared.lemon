@@ -1190,6 +1190,7 @@ function void PlayMusicAfterLevelResults()
 
 
 //# address-hook(0x085b8a) end(0x085b8a)
+//# alias(fn085b8a) deprecated
 function void StopCharacterWinPose.player1()
 {
 	stopCharacterWinPose(0xffffb000)

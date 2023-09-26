@@ -53,6 +53,7 @@ function void CompetitionMode.Character.BaseUpdate(u32 mainRoutineTableAddress)
 // Sonic, Knuckles
 
 //# address-hook(0x0105c4) end(0x010618)
+//# alias(fn0105c4) deprecated
 function void CompetitionMode.Character.BaseUpdate.Sonic_Knuckles()
 {
 	CompetitionMode.Character.BaseUpdate(0x01061c)
@@ -60,6 +61,7 @@ function void CompetitionMode.Character.BaseUpdate.Sonic_Knuckles()
 
 
 //# address-hook(0x010628) end(0x01073c)
+//# alias(fn010628) deprecated
 function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 {
 	char.base_state += 2
@@ -137,6 +139,7 @@ function void CompetitionMode.Character.Initialization.Sonic_Knuckles()
 
 
 //# address-hook(0x010740) end(0x0107ec)
+//# alias(fn010740) deprecated
 function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 {
 	if (debug_mode.enabled && A0 == 0xffffb000 && (control.pad1.pressed & CONTROL_B))
@@ -196,6 +199,7 @@ function void CompetitionMode.Character.UpdateNormalState.Sonic_Knuckles()
 
 
 //# address-hook(0x0107f6) end(0x010866)
+//# alias(fn0107f6) deprecated
 function void CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
 {
 	if ((control.player1.pressed & CONTROL_ABC) == 0)
@@ -235,6 +239,7 @@ function void CompetitionMode.Character.UpdateUprightOnGround.Sonic_Knuckles()
 
 
 //# address-hook(0x010868) end(0x010894)
+//# alias(fn010868) deprecated
 function void CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()
 {
 	UpdateSonicJumpMoves()
@@ -255,6 +260,7 @@ function void CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()
 
 
 //# address-hook(0x010896) end(0x0108b6)
+//# alias(fn010896) deprecated
 function void CompetitionMode.Character.UpdateRollingOnGround.Sonic_Knuckles()
 {
 	if (char.spindash == 0)
@@ -272,6 +278,7 @@ function void CompetitionMode.Character.UpdateRollingOnGround.Sonic_Knuckles()
 
 
 //# address-hook(0x0108b8) end(0x0108e4)
+//# alias(fn0108b8) deprecated
 function void CompetitionMode.Character.UpdateRollingInAir.Sonic_Knuckles()
 {
 	// This is exactly the same as "CompetitionMode.Character.UpdateUprightInAir.Sonic_Knuckles()", so just call this one
@@ -280,6 +287,7 @@ function void CompetitionMode.Character.UpdateRollingInAir.Sonic_Knuckles()
 
 
 //# address-hook(0x0108e6) end(0x01094a)
+//# alias(fn0108e6) deprecated
 function void CompetitionMode.Character.CheckForStartRolling.Sonic_Knuckles()
 {
 	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
@@ -303,6 +311,7 @@ function void CompetitionMode.Character.CheckForStartRolling.Sonic_Knuckles()
 
 
 //# address-hook(0x01094c) end(0x010a12)
+//# alias(fn01094c) deprecated
 function void CompetitionMode.Character.UpdateSpindash.Sonic_Knuckles()
 {
 	if (char.spindash == 0)
@@ -380,6 +389,7 @@ function void fn010a38()
 
 
 //# address-hook(0x010a80) end(0x010a92)
+//# alias(fn010a80) deprecated
 function void CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
 {
 	signalMultiReturn()
@@ -393,6 +403,7 @@ function void CompetitionMode.centerCameraYOffset.Sonic_Knuckles()
 // Tails
 
 //# address-hook(0x013102) end(0x013156)
+//# alias(fn013102) deprecated
 function void CompetitionMode.Character.BaseUpdate.Tails()
 {
 	CompetitionMode.Character.BaseUpdate(0x01315a)
@@ -400,6 +411,7 @@ function void CompetitionMode.Character.BaseUpdate.Tails()
 
 
 //# address-hook(0x013166) end(0x01326e)
+//# alias(fn013166) deprecated
 function void CompetitionMode.Character.Initialization.Tails()
 {
 	char.base_state += 2
@@ -465,6 +477,7 @@ function void CompetitionMode.Character.Initialization.Tails()
 
 
 //# address-hook(0x013274) end(0x01332c)
+//# alias(fn013274) deprecated
 function void CompetitionMode.Character.UpdateNormalState.Tails()
 {
 	if (debug_mode.enabled != 0 && A0 == 0xffffb000 && (control.pad1.pressed & CONTROL_B))
@@ -526,6 +539,7 @@ function void CompetitionMode.Character.UpdateNormalState.Tails()
 
 
 //# address-hook(0x013336) end(0x013358)
+//# alias(fn013336) deprecated
 function void CompetitionMode.Character.UpdateUprightOnGround.Tails()
 {
 	CompetitionMode.Character.UpdateSpindash.Tails()
@@ -546,6 +560,7 @@ function void CompetitionMode.Character.UpdateUprightOnGround.Tails()
 
 
 //# address-hook(0x01335a) end(0x0133ac)
+//# alias(fn01335a) deprecated
 function void CompetitionMode.Character.UpdateUprightInAir.Tails()
 {
 	if (char.double_jump_state == 0)
@@ -586,6 +601,7 @@ function void fn0133ae()
 
 
 //# address-hook(0x01346a) end(0x01348a)
+//# alias(fn01346a) deprecated
 function void CompetitionMode.Character.UpdateRollingOnGround.Tails()
 {
 	if (char.spindash == 0)
@@ -603,6 +619,7 @@ function void CompetitionMode.Character.UpdateRollingOnGround.Tails()
 
 
 //# address-hook(0x01348c) end(0x0134b8)
+//# alias(fn01348c) deprecated
 function void CompetitionMode.Character.UpdateRollingInAir.Tails()
 {
 	UpdateTailsJumpMoves()
@@ -622,6 +639,7 @@ function void CompetitionMode.Character.UpdateRollingInAir.Tails()
 
 
 //# address-hook(0x0134ba) end(0x01351e)
+//# alias(fn0134ba) deprecated
 function void CompetitionMode.Character.CheckForStartRolling.Tails()
 {
 	if (s8[A0 + 0x2b] >= 0 && abs(char.groundspeed) >= 0x80)
@@ -645,6 +663,7 @@ function void CompetitionMode.Character.CheckForStartRolling.Tails()
 
 
 //# address-hook(0x013520) end(0x0135ec)
+//# alias(fn013520) deprecated
 function void CompetitionMode.Character.UpdateSpindash.Tails()
 {
 	if (char.spindash == 0)
@@ -727,6 +746,7 @@ function void fn013600()
 
 
 //# address-hook(0x013648) end(0x01365a)
+//# alias(fn013648) deprecated
 function void CompetitionMode.centerCameraYOffset.Tails()
 {
 	signalMultiReturn()

@@ -76,6 +76,7 @@ function void TailsTails.UpdateSpritePatterns()
 // Competition mode
 
 //# address-hook(0x016022) end(0x01604e)
+//# alias(fn016022) deprecated
 function void CompetitionMode.TailsTails.UpdateSpritePatterns()
 {
 	u16 targetInVRAM = (A0 == 0xffffcc0a) ? Char.Tails_Tails.targetInVRAM : Char.Player1_Tails.targetInVRAM
@@ -84,6 +85,7 @@ function void CompetitionMode.TailsTails.UpdateSpritePatterns()
 
 
 //# address-hook(0x0161fa) end(0x01622c)
+//# alias(fn0161fa) deprecated
 function void CompetitionMode.TailsTails.Init()
 {
 	objA0.mapping_offset = 0x2a00a4
@@ -99,6 +101,7 @@ function void CompetitionMode.TailsTails.Init()
 
 
 //# address-hook(0x016232) end(0x01629a)
+//# alias(fn016232) deprecated
 function void CompetitionMode.TailsTails.Update()
 {
 	A2 = 0xffff0000 + u16[A0 + 0x30]

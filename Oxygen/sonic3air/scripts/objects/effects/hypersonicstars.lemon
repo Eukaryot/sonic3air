@@ -67,6 +67,7 @@ function void fn01937c()
 
 
 //# address-hook(0x0193ca) end(0x0193e6)
+//# alias(fn0193ca) deprecated
 function void HyperSonicStars.CreateSparks()
 {
 	if (objA0.state != 0)

@@ -108,6 +108,7 @@ function void fn23efca()
 
 
 //# address-hook(0x23efec) end(0x23effa)
+//# alias(fn23efec) deprecated
 function void InitLevelScrolling.BonusGM()
 {
 	fn23f012()

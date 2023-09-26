@@ -5762,6 +5762,7 @@ function void deflectProjectile()
 
 
 //# address-hook(0x012006) end(0x01200e)
+//# alias(fn012006) deprecated
 function void Character.checkGroundEdgeCollision()
 {
 	if (global.inv_gravity == 0)
@@ -5793,7 +5794,7 @@ function void GetGroundAngle()
 		}
 	}
 
-	// Round to 90° value
+	// Round to 90 degree value
 	char.rotation = (char.rotation + 0x20) & 0xc0
 }
 

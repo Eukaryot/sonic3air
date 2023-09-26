@@ -38,6 +38,7 @@ function void UpdateLevelTiles.DEZ1()
 
 
 //# address-hook(0x05937e) end(0x059392)
+//# alias(fn05937e) deprecated
 function void InitLevelScrolling.DEZ1()
 {
 	camera.background.x.u16 = 0

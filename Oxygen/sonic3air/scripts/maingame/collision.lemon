@@ -1192,6 +1192,7 @@ function void CheckLeftWallCollision()
 
 
 //# address-hook(0x00fe6e) end(0x00fe8c)
+//# alias(fn00fe6e) deprecated
 function void CompetitionMode.Character.CheckCollisionsWithDynamicObjects()
 {
 	// Only used in competition mode

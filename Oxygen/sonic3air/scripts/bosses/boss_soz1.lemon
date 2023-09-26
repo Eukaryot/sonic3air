@@ -940,6 +940,7 @@ function void fn0855c2()
 
 
 //# address-hook(0x0855f8) end(0x08562a)
+//# alias(fn0855f8) deprecated
 function void FadeInColorUniform()
 {
 	u16 color = u16[A1]

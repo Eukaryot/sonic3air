@@ -1966,6 +1966,7 @@ function bool SetupObjectAttributesSlotted(u32 sourceAddress)
 }
 
 //# translated(0x084fa4) end(0x085020)
+//# alias(fn084fa4) deprecated
 function bool SetupObjectAttributesSlotted()
 {
 	D0 = 0

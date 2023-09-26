@@ -1683,6 +1683,7 @@ function void fn052f32()
 
 
 //# address-hook(0x052fa8) end(0x053018)
+//# alias(fn052fa8) deprecated
 function void InitLevelScrolling.FBZ2()
 {
 	if (allocDynamicObjectStd())
@@ -1733,6 +1734,7 @@ function void InitLevelScrolling.FBZ2()
 
 
 //# address-hook(0x05301c) end(0x053020)
+//# alias(fn05301c) deprecated
 function void UpdateLevelScrolling.FBZ2()
 {
 	D0.u16 = level.scrolling_routine

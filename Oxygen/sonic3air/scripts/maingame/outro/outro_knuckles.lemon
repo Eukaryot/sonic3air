@@ -1169,6 +1169,7 @@ function void fn08555e()
 
 
 //# address-hook(0x085590) end(0x0855b0)
+//# alias(fn085590) deprecated
 function void FadeOutColorUniform()
 {
 	// Fade to black

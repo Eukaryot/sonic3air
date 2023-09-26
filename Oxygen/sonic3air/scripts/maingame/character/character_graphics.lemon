@@ -642,6 +642,7 @@ function void fn012872()
 // Sonic, Knuckles
 
 //# address-hook(0x012d36) end(0x012f80)
+//# alias(fn012d36) deprecated
 function void CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 {
 	D0 = char.state
@@ -833,6 +834,7 @@ function void CompetitionMode.Character.UpdateAnimation.Sonic_Knuckles()
 
 
 //# address-hook(0x01309a) end(0x013100)
+//# alias(fn01309a) deprecated
 function void CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
 {
 	u16 targetInVRAM = (A0 == 0xffffb000) ? Char.Player1.targetInVRAM : Char.Tails.targetInVRAM
@@ -851,6 +853,7 @@ function void CompetitionMode.Character.UpdateSpritePatterns.Sonic_Knuckles()
 // Tails
 
 //# address-hook(0x015cd0) end(0x015cd0)
+//# alias(fn015cd0) deprecated
 function void CompetitionMode.Character.UpdateAnimation.Tails()
 {
 	A1 = 0x015f60
@@ -859,6 +862,7 @@ function void CompetitionMode.Character.UpdateAnimation.Tails()
 
 
 //# address-hook(0x015cd6) end(0x015f5e)
+//# alias(fn015cd6) deprecated
 function void CompetitionMode.UpdateTailsAnimation_inner()
 {
 	D0 = char.state
@@ -1045,6 +1049,7 @@ function void CompetitionMode.UpdateTailsAnimation_inner()
 
 
 //# address-hook(0x015d1e)
+//# alias(fn015d1e) deprecated
 function void CompetitionMode.updateTailsAnimation_shared()
 {
 	D1 = char.animation.frame
@@ -1084,6 +1089,7 @@ function void CompetitionMode.updateTailsAnimation_shared()
 
 
 //# address-hook(0x016050) end(0x0160a4)
+//# alias(fn016050) deprecated
 function void CompetitionMode.Character.UpdateSpritePatterns.Tails()
 {
 	u16 targetInVRAM = (A0 == 0xffffb000) ? Char.Player1.targetInVRAM : Char.Tails.targetInVRAM

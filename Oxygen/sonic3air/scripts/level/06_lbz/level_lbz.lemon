@@ -802,6 +802,7 @@ function void fn23e526()
 // Level scrolling
 
 //# address-hook(0x0541f0) end(0x0541f4)
+//# alias(fn0541f0) deprecated
 function void UpdateLevelScrolling.LBZ1()
 {
 	call 0x0541f8 + level.scrolling_routine

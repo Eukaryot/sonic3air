@@ -458,6 +458,7 @@ function void MonitorIntact.CheckBlocking()
 
 
 //# address-hook(0x01d6c2) end(0x01d6da)
+//# alias(fn01d6c2) deprecated
 function void MonitorIntact.CheckBlocking.player2()
 {
 	u8 bit = (1 << D6.u8)
@@ -703,6 +704,7 @@ function void ItemEffect.UpdateDefaultInternal()
 
 
 //# address-hook(0x01d890) end(0x01d892)
+//# alias(fn01d890) deprecated
 function void ItemEffect.ApplyRobotnik()
 {
 	++u16[A2]
