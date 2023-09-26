@@ -27,6 +27,29 @@ namespace lemon
 	}
 
 
+	void Function::SignatureBuilder::clear(const DataTypeDefinition& returnType)
+	{
+		mData.clear();
+		mData.push_back(returnType.getDataTypeHash());
+	}
+
+	void Function::SignatureBuilder::addParameterType(const DataTypeDefinition& dataType)
+	{
+		mData.push_back(dataType.getDataTypeHash());
+	}
+
+	uint32 Function::SignatureBuilder::getSignatureHash()
+	{
+		uint32 hash = rmx::getFNV1a_32((const uint8*)&mData[0], mData.size() * sizeof(uint32));
+		while (hash == 0)		// That should be a really rare case anyway
+		{
+			mData.push_back(0xcd000000);		// Just add anything to get away from hash 0
+			hash = rmx::getFNV1a_32((const uint8*)&mData[0], mData.size() * sizeof(uint32));
+		}
+		return hash;
+	}
+
+
 	void Function::setParametersByTypes(const std::vector<const DataTypeDefinition*>& parameterTypes)
 	{
 		mParameters.clear();
@@ -48,20 +71,11 @@ namespace lemon
 	{
 		if (mSignatureHash == 0)
 		{
-			static std::vector<uint32> data;
-			data.clear();
-			data.push_back(mReturnType->getDataTypeHash());
+			static SignatureBuilder builder;
+			builder.clear(*mReturnType);
 			for (const Parameter& parameter : mParameters)
-			{
-				data.push_back(parameter.mDataType->getDataTypeHash());
-			}
-
-			mSignatureHash = rmx::getFNV1a_32((const uint8*)&data[0], data.size() * sizeof(uint32));
-			while (mSignatureHash == 0)		// That should be a really rare case anyway
-			{
-				data.push_back(0xcd000000);		// Just add anything to get away from hash 0
-				mSignatureHash = rmx::getFNV1a_32((const uint8*)&data[0], data.size() * sizeof(uint32));
-			}
+				builder.addParameterType(*parameter.mDataType);
+			mSignatureHash = builder.getSignatureHash();
 		}
 		return mSignatureHash;
 	}

@@ -38,6 +38,15 @@ namespace lemon
 		};
 		typedef std::vector<Parameter> ParameterList;
 
+		struct SignatureBuilder
+		{
+			void clear(const DataTypeDefinition& returnType);
+			void addParameterType(const DataTypeDefinition& dataType);
+			uint32 getSignatureHash();
+
+			std::vector<uint32> mData;
+		};
+
 		enum class Flag
 		{
 			ALLOW_INLINE_EXECUTION = 0x01,	// Native only: Function can be called directly inside the opcode run loop and does not interfere with control flow

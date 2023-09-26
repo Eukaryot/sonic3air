@@ -502,14 +502,24 @@ void CodeExec::yieldExecution()
 	mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
 }
 
-bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail)
+bool CodeExec::executeScriptFunction(const std::string& functionName, bool showErrorOnFail, FunctionExecData* execData)
 {
 	if (canExecute())
 	{
 		// TODO: This would be a good use case for using a different control flow than the main one
 		lemon::Runtime::setActiveEnvironment(&mRuntimeEnvironment);
 
-		if (mLemonScriptRuntime.callFunctionByName(functionName, showErrorOnFail))
+		bool success = false;
+		if (nullptr == execData)
+		{
+			success = mLemonScriptRuntime.callFunctionByName(functionName, showErrorOnFail);
+		}
+		else
+		{
+			success = mLemonScriptRuntime.getInternalLemonRuntime().callFunctionWithParameters(functionName, execData->mParams);
+		}
+
+		if (success)
 		{
 			const size_t oldAccumulatedSteps = mAccumulatedStepsOfCurrentFrame;
 
@@ -532,6 +542,12 @@ bool CodeExec::executeScriptFunction(const std::string& functionName, bool showE
 		#endif
 			{
 				runScript(true, nullptr);
+			}
+
+			// Evaluate the return value
+			if (nullptr != execData && nullptr != execData->mParams.mReturnType)
+			{
+				execData->mReturnValueStorage = mLemonScriptRuntime.getInternalLemonRuntime().getSelectedControlFlowMutable().popValueStack<uint64>();
 			}
 
 			// Revert accumulated steps
