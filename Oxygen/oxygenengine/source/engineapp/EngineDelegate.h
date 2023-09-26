@@ -33,6 +33,7 @@ public:
 	bool mayLoadScriptMods() override;
 	bool allowModdedData() override;
 	bool useDeveloperFeatures() override;
+	void onActiveModsChanged() override;
 
 	void onGameRecordingHeaderLoaded(const std::string& buildString, const std::vector<uint8>& buffer) override;
 	void onGameRecordingHeaderSave(std::vector<uint8>& buffer) override;
