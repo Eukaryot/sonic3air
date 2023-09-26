@@ -1276,7 +1276,12 @@ function void fn0781e4()
 		playSound(0x6e)
 	}
 
+#if STANDALONE
+	// Fix for boss palette damage flash, #contributed by mrgrassman14
+	Boss.updateHitFlashing(5, 0x07826c, 0x078276, 0x078280)
+#else
 	Boss.updateHitFlashing(3, 0x07826c, 0x078276, 0x078284)
+#endif
 
 	--objA0.state
 	if (objA0.state == 0)

@@ -925,6 +925,12 @@ function void InitLevelTiles.LRZ_Boss()
 		u16[0xffffeec0] = 0x0c
 	}
 
+#if STANDALONE
+	// Begin glowing crystal palette cycle if starting from the checkpoint, #contributed by mrgrassman14
+	if (checkpoint.number != 0)
+		u8[0xfffff650] = 1
+#endif
+
 	Level.GetCameraPosition()
 	Level.InitialTilesFill()
 }

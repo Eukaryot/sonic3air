@@ -373,7 +373,7 @@ function void fn05ec36()
 
 
 
-// Some other object
+// Flame object for the Tornado
 
 //# address-hook(0x05ec3c) end(0x05ec4c)
 function void fn05ec3c()

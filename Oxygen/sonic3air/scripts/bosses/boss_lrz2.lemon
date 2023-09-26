@@ -537,14 +537,27 @@ function void fn079c1c()
 
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	objA0.animation.sprite = 0x0f		// Normal face
+
+#if STANDALONE
+	// Swapped if statements to make the otherwise unused defeat face appear when defeated, #contributed by mrgrassman14
+	if (u8[A1 + 0x2a] & 0x80)
+	{
+		objA0.animation.sprite = 0x11	// Defeat face
+	}
+	else if (u8[A1 + 0x2a] & 0x40)
+	{
+		objA0.animation.sprite = 0x10	// Damage face
+	}
+#else
 	if (u8[A1 + 0x2a] & 0x40)
 	{
-		objA0.animation.sprite = 0x10		// Damage face
+		objA0.animation.sprite = 0x10	// Damage face
 	}
 	else if (u8[A1 + 0x2a] & 0x80)
 	{
-		objA0.animation.sprite = 0x11		// Defeat face
+		objA0.animation.sprite = 0x11	// Defeat face
 	}
+#endif
 
 	fn08498c()
 }

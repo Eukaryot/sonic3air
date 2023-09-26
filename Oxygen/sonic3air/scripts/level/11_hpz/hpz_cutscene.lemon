@@ -372,7 +372,11 @@ function void fn06471a()
 	objA0.animation.sprite = 0x9a
 	objA0.velocity.x = -0x200
 	objA0.velocity.y = -0x200
+
+#if !STANDALONE
+	// Removed playSound(SFX_JUMP) as it is not appropriate here, #contributed by mrgrassman14
 	playSound(SFX_JUMP)
+#endif
 
 	Object.ResetAnimationProgress(0x0667c1)		// Cutscene Knuckles jumping animation data
 }
@@ -397,7 +401,11 @@ function void fn064758()
 //# address-hook(0x06478e) end(0x0647c0)
 function void fn06478e()
 {
+#if STANDALONE
+	objA0.position.y.u16 = 0x03ac	// Change from 0x03ab so Knuckles doesn't float 1 pixel above the ground, #contributed by mrgrassman14
+#else
 	objA0.position.y.u16 = 0x03ab
+#endif
 	objA0.base_state = 0x36
 	u8[A0 + 0x0a] &= ~0x80
 	u16[A0 + 0x44] = 0
@@ -1368,6 +1376,11 @@ function void fn066348()
 			playSound(0x6e)
 		}
 
+	#if STANDALONE
+		// Make Egg Mobile flash when Knuckles hits it, #contributed by mrgrassman14
+		Boss.updateHitFlashing(3, 0x07a622, 0x07a628, 0x07a62e)
+	#endif
+
 		--objA0.state
 		if (objA0.state == 0)
 		{
@@ -1390,7 +1403,12 @@ function void fn066372()
 		objA0.flags2a |= 0x40
 	}
 
+#if STANDALONE
+ 	// Fix for Egg Mobile palette damage flash, #contributed by mrgrassman14
+	Boss.updateHitFlashing(3, 0x07a622, 0x07a628, 0x07a62e)
+#else
 	Boss.updateHitFlashing(3, 0x07a622, 0x07a628, 0x07a62c)
+#endif
 
 	--objA0.state
 	if (objA0.state == 0)

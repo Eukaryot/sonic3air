@@ -1692,6 +1692,11 @@ function void InitLevelScrolling.FBZ2()
 
 	if (camera.position.x.u16 >= 0x2c40)
 	{
+	#if STANDALONE
+		// This begins the rumbling sound at the end of Act 2 when starting from the final checkpoint, #contributed by mrgrassman14
+		objA1.update_address = 0x08642e
+	#endif
+
 		level.scrolling_routine = 0x10
 		D0.u16 = u16[A3]
 		u16[A3 + 0x70] = D0.u16

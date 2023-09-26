@@ -585,7 +585,13 @@ function void fn080b66()
 	spawnChildObject(0x080ce2, 0x04, 32, -16)
 
 	objA0.value42 = (objA0.subtype2c == 0) ? -0x80 : 0x80
+
+#if STANDALONE
+	// Prevent fingers from floating 1 pixel above the platform when attacking, #contributed by mrgrassman14
+	objA0.position.y.u16 = 0xe4
+#else
 	objA0.position.y.u16 = 0xe3
+#endif
 	fn080b90()
 }
 
@@ -729,7 +735,13 @@ function void fn080cae()
 function void fn080cca()
 {
 	objA0.base_state = 0x02
+#if STANDALONE
+	// Prevent fingers from floating 1 pixel above the platform when attacking, #contributed by mrgrassman14
+	objA0.position.y.u16 = 0xe4
+#else
 	objA0.position.y.u16 = 0xe3
+#endif
+
 	A1 = 0xffff0000 + u16[A0 + 0x46]
 	u8[A1 + 0x38] &= ~0x02
 }

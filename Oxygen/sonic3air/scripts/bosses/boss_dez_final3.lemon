@@ -343,6 +343,11 @@ function void fn0804d2()
 	if ((u8[0xfffffab8] & 0x08) == 0)
 	{
 		MoveAndFlipWithParent()
+
+	#if STANDALONE
+		// This makes the claw in the third phase of the final boss use the proper grabbing frame instead of the opened one, #contributed by mrgrassman14
+		objA0.animation.sprite = 2
+	#endif
 	}
 	else
 	{
@@ -457,7 +462,12 @@ function void fn080e2c()
 		}
 	}
 
+#if STANDALONE
+	// Fix for boss palette damage flash, #contributed by mrgrassman14
+	Boss.updateHitFlashing(3, 0x080ee2, 0x080ee8, 0x080eee)
+#else
 	Boss.updateHitFlashing(3, 0x080ee2, 0x080ee8, 0x080eec)
+#endif
 
 	--objA0.state
 	if (objA0.state == 0)

@@ -1023,6 +1023,9 @@ function void fn06f7a6()
 	A1 = 0x06f7c6 + objA0.subtype2c * 2
 	D1.u16 = u16[(A1+=2)-2]
 	u16[A0 + D1.s16] = u16[(A1+=2)-2]
+#if STANDALONE
+	u16[A0 + D1.s16] += 2 	// Add 2 to make Gapsule's eye windows symmetrically aligned, #contributed by mrgrassman14
+#endif
 }
 
 

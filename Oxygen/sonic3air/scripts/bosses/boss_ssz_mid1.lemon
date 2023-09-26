@@ -243,6 +243,11 @@ function void fn07a3ce()
 	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0x0400
 	objA0.velocity.y = 0
+
+#if STANDALONE
+	// Draw Egg Mobile so it doesn't disappear for 1 frame, #contributed by mrgrassman14
+	DrawObject()
+#endif
 }
 
 

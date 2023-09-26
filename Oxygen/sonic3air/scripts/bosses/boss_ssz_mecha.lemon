@@ -942,7 +942,12 @@ function void fn07d312()
 		objA0.flags2a |= 0x40
 	}
 
+#if STANDALONE
+	// Fix for boss palette damage flash, #contributed by mrgrassman14
+	Boss.updateHitFlashing(5, 0x07d3cc, 0x07d3d6, 0x07d3e0)
+#else
 	Boss.updateHitFlashing(5, 0x07d3cc, 0x07d3d6, 0x07d3de)
+#endif
 
 	--objA0.state
 	if (objA0.state == 0)

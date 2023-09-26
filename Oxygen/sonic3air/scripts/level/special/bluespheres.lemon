@@ -1447,7 +1447,7 @@ function void fn00972e()
 					if (!Game.getSetting(SETTING_INFINITE_LIVES))
 					{
 						lives_counter = min(lives_counter + 1, 99)
-						soundId = 0xb9
+						soundId = 0x2a 	// Changed from ring loss sound to proper 1-up jingle, #contributed by mrgrassman14
 					}
 				#else
 					++lives_counter
@@ -2795,11 +2795,11 @@ function void BlueSpheres.renderCustomCharacterShadows()
 {
 	if (Game.getSetting(SETTING_BS_VISUAL_STYLE) & 0x02)
 	{
-		Renderer.drawSprite(getNumPlayers() < 2 ? "bluespheres_shadow_1P_smooth" : "bluespheres_shadow_2P_smooth", 142 + getScreenExtend(), 148, 0x00, 0, 0x3100)
+		Renderer.drawSprite(getNumPlayers() < 2 ? "bluespheres_shadow_1P_smooth" : "bluespheres_shadow_2P_smooth", 143 + getScreenExtend(), 149, 0x00, 0, 0x3100) 	// Slightly reposition drop shadows to match the original game, #contributed by mrgrassman14
 	}
 	else
 	{
-		Renderer.drawSprite(getNumPlayers() < 2 ? "bluespheres_shadow_1P_pixel" : "bluespheres_shadow_2P_pixel", 142 + getScreenExtend(), 148, 0x00, 0, 0x3100)
+		Renderer.drawSprite(getNumPlayers() < 2 ? "bluespheres_shadow_1P_pixel" : "bluespheres_shadow_2P_pixel", 143 + getScreenExtend(), 149, 0x00, 0, 0x3100) 	// Slightly reposition drop shadows to match the original game, #contributed by mrgrassman14
 	}
 }
 

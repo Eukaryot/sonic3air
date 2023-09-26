@@ -398,10 +398,14 @@ function void fn05ded4()
 		return
 
 	objA0.base_state = 0x04
+
+#if STANDALONE
+	// Adjusted velocity to help Master Emerald fall properly into place, #contributed by mrgrassman14
+	objA0.velocity.x = -0x1fb
+	objA0.velocity.y = 0x120 - min(getScreenExtend(), 40) / 2
+#else
 	objA0.velocity.x = -0x200
 	objA0.velocity.y = 0x100
-#if STANDALONE
-	objA0.velocity.y -= getScreenExtend() / 2
 #endif
 
 	fn05def0()
@@ -419,8 +423,16 @@ function void fn05def0()
 
 	objA0.base_state = 0x06
 	u16[A0 + 0x46] = u16[0xfffffaa4]
+
+#if STANDALONE
+	// Adjust final position of Master Emerald so it appears properly attached, #contributed by mrgrassman14
+	u8[A0 + 0x42] = 0xdf
+	u8[A0 + 0x43] = 0x09
+#else
 	u8[A0 + 0x42] = 0xe0
 	u8[A0 + 0x43] = 0x01
+#endif
+
 	fn05df12()
 }
 
@@ -792,6 +804,11 @@ function void fn05dfee()
 	}
 
 	Kosinski.addToDMAQueue(0x162914, 0x4dc0)	// Smaller ending sprites + Sonic pilot head + chain
+
+#if STANDALONE
+	// Add missing Tornado flame, #contributed by mrgrassman14
+	spawnChildObject(0x05ec3c, 0x00, -10, 12)
+#endif
 }
 
 

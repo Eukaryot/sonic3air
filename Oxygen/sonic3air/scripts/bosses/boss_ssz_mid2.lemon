@@ -616,6 +616,11 @@ function void fn07ac7a()
 	objA0.render_flags |= render_flag.FLIP_X
 	objA0.velocity.x = 0x400
 	objA0.velocity.y = 0
+
+#if STANDALONE
+	// Draw Egg Mobile so it doesn't disappear for 1 frame, #contributed by mrgrassman14
+	DrawObject()
+#endif
 }
 
 
@@ -682,7 +687,12 @@ function void fn07acf2()
 			playSound(0x6e)
 		}
 
+	#if STANDALONE
+		// Fix for boss palette damage flash, #contributed by mrgrassman14
+		Boss.updateHitFlashing(3, 0x07ad78, 0x07ad7e, 0x07ad84, u8[A0 + 0x1c])
+	#else
 		Boss.updateHitFlashing(3, 0x07ad78, 0x07ad7e, 0x07ad82, u8[A0 + 0x1c])
+	#endif
 
 		--u8[A0 + 0x1c]
 		if (u8[A0 + 0x1c] == 0)

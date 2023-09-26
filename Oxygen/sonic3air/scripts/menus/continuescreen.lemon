@@ -526,7 +526,7 @@ function void fn05c6e0()
 function void fn05c6f4()
 {
 	objA0.position.x.u16 += 6
-	if (objA0.position.x.u16 < getScreenWidth() + 80)
+	if (objA0.position.x.u16 < getScreenWidth() + 160)	// Fix #contributed by mrgrassman14
 	{
 		Object.AnimationProgress.CheckEnd(0x05cbb4)
 		return

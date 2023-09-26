@@ -247,6 +247,9 @@ function void fn08d1fc()
 			objA0.flags2a |= 0x40
 		}
 
+		// Make Egg Mobile flash when hitting it, #contributed by mrgrassman14
+		Boss.updateHitFlashing(3, 0x07a622, 0x07a628, 0x07a62e)
+
 		--objA0.state
 		if (objA0.state == 0)
 		{
@@ -735,6 +738,9 @@ function void fn08cd4c()
 	UpdateMovementStraightSimple()
 	fn08d1fc()
 	fn085160()
+
+	// Added to make Egg Mobile bob up and down instead of moving in a straight line after deploying Twin Hammer's box, #contributed by mrgrassman14
+	fn0847e6()
 }
 
 
