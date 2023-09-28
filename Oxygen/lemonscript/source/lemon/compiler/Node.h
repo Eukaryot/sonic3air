@@ -44,6 +44,8 @@ namespace lemon
 
 		inline Type getType() const { return mType; }
 
+		template<typename T> bool isA() const { return getType() == T::TYPE; }
+
 		template<typename T> const T& as() const { return *static_cast<const T*>(this); }
 		template<typename T> T& as() { return *static_cast<T*>(this); }
 

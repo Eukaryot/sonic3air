@@ -40,7 +40,7 @@ namespace lemon
 	private:
 		union
 		{
-			uint64 mUint64;
+			uint64 mUint64 = 0;
 			float  mFloat;
 			double mDouble;
 		};

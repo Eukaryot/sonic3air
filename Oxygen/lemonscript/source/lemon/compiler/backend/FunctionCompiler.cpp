@@ -326,27 +326,47 @@ namespace lemon
 
 			case Node::Type::IF_STATEMENT:
 			{
-				const IfStatementNode& isn = node.as<IfStatementNode>();
-
-				// First evaluate the condition
-				compileTokenTreeToOpcodes(*isn.mConditionToken);
-
-				OpcodeBuilder builder(*this);
-				builder.beginIf();
+				std::vector<OpcodeBuilder> openOpcodeBuilders;
+				const IfStatementNode* currentIfNode = &node.as<IfStatementNode>();
+				while (true)
 				{
-					// Compile if-block content
-					buildOpcodesForNode(*isn.mContentIf, context);
+					const IfStatementNode& isn = *currentIfNode;
+
+					// First evaluate the condition
+					compileTokenTreeToOpcodes(*isn.mConditionToken);
+
+					OpcodeBuilder& builder = openOpcodeBuilders.emplace_back(*this);
+					builder.beginIf();
+					{
+						// Compile if-block content
+						buildOpcodesForNode(*isn.mContentIf, context);
+					}
+
+					// Optional here is an else-statement
+					if (isn.mContentElse.valid())
+					{
+						builder.beginElse();
+
+						mLineNumber = node.getLineNumber();
+						if (isn.mContentElse->getType() == Node::Type::IF_STATEMENT)
+						{
+							// Start another cycle in the loop
+							currentIfNode = &isn.mContentElse->as<IfStatementNode>();
+							continue;
+						}
+						else
+						{
+							// Compile else-block content
+							buildOpcodesForNode(*isn.mContentElse, context);
+						}
+					}
+					break;
 				}
 
-				// Optional here is an else-statement
-				if (isn.mContentElse.valid())
+				for (auto it = openOpcodeBuilders.rbegin(); it != openOpcodeBuilders.rend(); ++it)
 				{
-					builder.beginElse();
-
-					// Compile else-block content
-					buildOpcodesForNode(*isn.mContentElse, context);
+					it->endIf();
 				}
-				builder.endIf();
 				break;
 			}
 

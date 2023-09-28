@@ -86,6 +86,7 @@ namespace lemon
 		Node* gatherNextStatement(NodesIterator& nodesIterator, ScriptFunction& function, ScopeContext& scopeContext);
 		void processTokens(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, uint32 lineNumber, const DataTypeDefinition* resultType = nullptr);
 		void processConstantDefinition(TokenList& tokens, NodesIterator& nodesIterator, ScopeContext* scopeContext);
+		Node* processIfBlock(TokenList& tokens, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator, uint32 lineNumber);
 
 		// Misc
 		bool processGlobalPragma(const std::string& content);

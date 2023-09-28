@@ -52,7 +52,11 @@ namespace lemon
 		inline Node& operator*() const	{ return mBlockNode.mNodes[mCurrentIndex]; }
 		inline Node* operator->() const	{ return &mBlockNode.mNodes[mCurrentIndex]; }
 		inline bool valid() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()); }
+		inline Node* get() const		{ return (mCurrentIndex < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex] : nullptr; }
 		inline Node* peek() const		{ return (mCurrentIndex + 1 < mBlockNode.mNodes.size()) ? &mBlockNode.mNodes[mCurrentIndex + 1] : nullptr; }
+
+		template<typename T> inline T* getSpecific() const   { Node* node = get();  return (nullptr != node && node->isA<T>()) ? static_cast<T*>(node) : nullptr; }
+		template<typename T> inline T* peekSpecific() const  { Node* node = peek(); return (nullptr != node && node->isA<T>()) ? static_cast<T*>(node) : nullptr; }
 
 		inline void eraseCurrent()
 		{
@@ -606,60 +610,7 @@ namespace lemon
 
 				case Keyword::IF:
 				{
-					if (mCompileOptions.mScriptFeatureLevel >= 2)
-						CHECK_ERROR(tokens.size() >= 2 && isOperator(tokens[1], Operator::PARENTHESIS_LEFT), "Expected parentheses after 'if' keyword", lineNumber);
-
-					// Process tokens
-					processTokens(tokens, function, scopeContext, lineNumber);
-
-					CHECK_ERROR(tokens.size() == 2, "Expected single statement after 'if' keyword", lineNumber);
-					CHECK_ERROR(tokens[1].isStatement(), "Expected statement after 'if' keyword", lineNumber);
-
-					IfStatementNode& node = NodeFactory::create<IfStatementNode>();
-					node.mConditionToken = tokens[1].as<StatementToken>();
-					node.setLineNumber(lineNumber);
-					tokens.erase(1);
-
-					// Go on with the next node, which must be either a block or a statement
-					{
-						Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
-						CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'if' line", node.getLineNumber());
-						newNode->setLineNumber(node.getLineNumber());
-						node.mContentIf = newNode;
-						nodesIterator.eraseCurrent();
-					}
-
-					// Also check for 'else'
-					{
-						Node* nextNode = nodesIterator.peek();
-						if (nullptr != nextNode && nextNode->getType() == Node::Type::UNDEFINED)
-						{
-							UndefinedNode& nextNodeUndefined = nextNode->as<UndefinedNode>();
-							if (nextNodeUndefined.mTokenList.size() >= 1 && isKeyword(nextNodeUndefined.mTokenList[0], Keyword::ELSE))
-							{
-								// Special case: 'else if' (or anything where there's a statement directly after the 'else')
-								if (nextNodeUndefined.mTokenList.size() >= 2)
-								{
-									// Remove the 'else' here and treat the rest as a normal statement, as if it was on the next line
-									nextNodeUndefined.mTokenList.erase(0);
-								}
-								else
-								{
-									// Normal handling for 'else'
-									++nodesIterator;
-									nodesIterator.eraseCurrent();
-								}
-
-								Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
-								CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'else' line", node.getLineNumber());
-								newNode->setLineNumber(node.getLineNumber());
-								node.mContentElse = newNode;
-								nodesIterator.eraseCurrent();
-							}
-						}
-					}
-
-					return &node;
+					return processIfBlock(tokens, function, scopeContext, nodesIterator, lineNumber);
 				}
 
 				case Keyword::ELSE:
@@ -972,6 +923,116 @@ namespace lemon
 				constant.mValue = constantValue;
 			}
 		}
+	}
+
+	Node* CompilerFrontend::processIfBlock(TokenList& tokens_, ScriptFunction& function, ScopeContext& scopeContext, NodesIterator& nodesIterator, uint32 lineNumber)
+	{
+		IfStatementNode* firstIfStatementNode = nullptr;
+		IfStatementNode* previousIfStatementNode = nullptr;
+		TokenList* currentTokens = &tokens_;
+
+		// Loop used in case we have multiple if-else-if, to avoid too deep recursion
+		while (true)
+		{
+			// Assuming here that the first token was already checked and is an 'if' keyword
+			TokenList& tokens = *currentTokens;
+			if (mCompileOptions.mScriptFeatureLevel >= 2)
+				CHECK_ERROR(tokens.size() >= 2 && isOperator(tokens[1], Operator::PARENTHESIS_LEFT), "Expected parentheses after 'if' keyword", lineNumber);
+
+			// Process tokens
+			processTokens(tokens, function, scopeContext, lineNumber);
+
+			CHECK_ERROR(tokens.size() == 2, "Expected single statement after 'if' keyword", lineNumber);
+			CHECK_ERROR(tokens[1].isStatement(), "Expected statement after 'if' keyword", lineNumber);
+
+			// Create node and move the condition statement into it
+			IfStatementNode& isn = NodeFactory::create<IfStatementNode>();
+			isn.mConditionToken = tokens[1].as<StatementToken>();
+			isn.setLineNumber(lineNumber);
+			tokens.erase(1);
+
+			// Is this the first loop iteration or already somewhere further down?
+			if (nullptr == previousIfStatementNode)
+			{
+				// Set the return value
+				firstIfStatementNode = &isn;
+			}
+			else
+			{
+				// Register in the previous node as 'else' content
+				previousIfStatementNode->mContentElse = &isn;
+			}
+
+			// Go on with the next node, which must be either a block or a statement
+			{
+				Node* newNode = gatherNextStatement(nodesIterator, function, scopeContext);
+				CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'if' line", lineNumber);
+				newNode->setLineNumber(lineNumber);
+				isn.mContentIf = newNode;
+				nodesIterator.eraseCurrent();
+			}
+
+			// Also check for 'else'
+			UndefinedNode* peekedNode = nodesIterator.peekSpecific<UndefinedNode>();
+			if (nullptr != peekedNode && !peekedNode->mTokenList.empty() && isKeyword(peekedNode->mTokenList[0], Keyword::ELSE))
+			{
+				++nodesIterator;
+
+				// Special case: 'else if' (or anything where there's a statement directly after the 'else')
+				if (peekedNode->mTokenList.size() >= 2)
+				{
+					// Remove the 'else' here and treat the rest as a normal statement, as if it was on the next line
+					peekedNode->mTokenList.erase(0);
+				}
+				else
+				{
+					// Remove the 'else', it does not contain anything other than the 'else ' itself
+					nodesIterator.eraseCurrent();
+					++nodesIterator;
+				}
+
+				Node* newNode = nullptr;
+				Node* nextNode = nodesIterator.get();
+				if (nullptr != nextNode)
+				{
+					if (nextNode->getType() == Node::Type::BLOCK)
+					{
+						// Handle block
+						newNode = nextNode;
+						processUndefinedNodesInBlock(nextNode->as<BlockNode>(), function, scopeContext);
+					}
+					else if (nextNode->getType() == Node::Type::UNDEFINED)
+					{
+						UndefinedNode& nextNodeUndefined = nextNode->as<UndefinedNode>();
+						if (isKeyword(nextNodeUndefined.mTokenList[0], Keyword::IF))
+						{
+							nodesIterator.eraseCurrent();	// This seems to make no difference?
+
+							// Loop once more
+							currentTokens = &nextNodeUndefined.mTokenList;
+							lineNumber = nextNodeUndefined.getLineNumber();
+							previousIfStatementNode = &isn;
+							continue;
+						}
+						else
+						{
+							newNode = processUndefinedNode(nextNodeUndefined, function, scopeContext, nodesIterator);
+							newNode->setLineNumber(nextNodeUndefined.getLineNumber());
+						}
+					}
+				}
+
+				CHECK_ERROR(nullptr != newNode, "Expected a block or statement after 'else' line", peekedNode->getLineNumber());
+				newNode->setLineNumber(peekedNode->getLineNumber());
+				isn.mContentElse = newNode;
+				nodesIterator.eraseCurrent();
+			}
+
+			// Done, break the loop
+			break;
+		}
+
+		return firstIfStatementNode;
 	}
 
 	bool CompilerFrontend::processGlobalPragma(const std::string& content)
