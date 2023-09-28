@@ -68,8 +68,8 @@ function void CupElevator.Init()
 		}
 	}
 
-	D0 = (objA0.subtype2c & 0x0f) * 0x60
-	u16[A0 + 0x38] = D0.u16
+	u16 height = (objA0.subtype2c & 0x0f) * 0x60
+	u16[A0 + 0x38] = height
 	u16[A0 + 0x26] = 0
 	objA0.position.x.u16 += 0x40
 	if ((objA0.flags2a & 0x01) == 0)
@@ -80,8 +80,10 @@ function void CupElevator.Init()
 
 	if (objA0.subtype2c & 0x30)
 	{
-		u16[A0 + 0x3a] = D0.u16
-		objA0.value32 += D0.u16
+		// This elevator type is starting at the top, moving down first (instead of the default, which is the other way around)
+		//  -> It seems like only flag 0x10 is meant for this, and 0x20 goes unused
+		u16[A0 + 0x3a] = height
+		objA0.value32 += height
 		u16[A0 + 0x36] = 0x06
 		if (objA0.subtype2c & 0x01)
 		{
@@ -146,16 +148,17 @@ function void CupElevator.Update()
 function void fn026b12()
 {
 	// Targets:
-	//  - 0x026b34	-> u16[A0 + 0x36] = 0x00
-	//  - 0x026b46	-> u16[A0 + 0x36] = 0x02
-	//  - 0x026bce	-> u16[A0 + 0x36] = 0x04
-	//  - 0x026b34	-> u16[A0 + 0x36] = 0x06
-	//  - 0x026bda	-> u16[A0 + 0x36] = 0x08
-	//  - 0x026c5e	-> u16[A0 + 0x36] = 0x0a
-	//  - 0x026c6c	-> u16[A0 + 0x36] = 0x0c
-	//  - 0x026d74	-> u16[A0 + 0x36] = 0x0e
-	//  - 0x026d06	-> u16[A0 + 0x36] = 0x12
-	//  - 0x026dbc	-> u16[A0 + 0x36] = 0x14
+	//  - 0x026b34	-> u16[A0 + 0x36] = 0x00	// Standing still at lower position
+	//  - 0x026b46	-> u16[A0 + 0x36] = 0x02	// Moving up
+	//  - 0x026bce	-> u16[A0 + 0x36] = 0x04	// Standing after movement up, while character is still inside
+	//  - 0x026b34	-> u16[A0 + 0x36] = 0x06	// Standing still at upper position
+	//  - 0x026bda	-> u16[A0 + 0x36] = 0x08	// Moving down
+	//  - 0x026c5e	-> u16[A0 + 0x36] = 0x0a	// Standing after movement down, while character is still inside
+	//  - 0x026c6c	-> u16[A0 + 0x36] = 0x0c	// Turning faster and faster before flying off at the upper position
+	//  - 0x026d74	-> u16[A0 + 0x36] = 0x0e	// Flying off at the higher position (?)
+	//  - 0x026d98	-> u16[A0 + 0x36] = 0x10	// Flying off at the higher position
+	//  - 0x026d06	-> u16[A0 + 0x36] = 0x12	// Turning faster and faster before flying off at the lower position
+	//  - 0x026dbc	-> u16[A0 + 0x36] = 0x14	// Flying off at the lower position
 	call tableLookupAddress(0x026b1e, u16[A0 + 0x36])
 }
 
@@ -163,6 +166,26 @@ function void fn026b12()
 //# address-hook(0x026b34) end(0x026b44)
 function void fn026b34()
 {
+#if STANDALONE
+	// Fix for a potential softlock with widescreen in LBZ 1:
+	// Move the elevator down again if the main character is close to the lower end
+	if (u16[A0 + 0x30] == 0x11e0)	// Only consider this very elevator instance
+	{
+		if (u16[A0 + 0x3a] == u16[A0 + 0x38])	// Only if it's on the upper position
+		{
+			// Check if character is close to the lower position
+			s16 dx = u16[0xffffb010] - u16[A0 + 0x30]
+			s16 dy = u16[0xffffb014] - (objA0.position.y.u16 + u16[A0 + 0x38])
+			if (abs(dx) <= 0x80 && abs(dy) <= 0x30)
+			{
+				u16[A0 + 0x36] += 2
+				return
+			}
+		}
+	}
+#endif
+
+	// Waiting for any character to enter
 	if (u16[A0 + 0x3c] != 0)
 	{
 		u16[A0 + 0x34] = 1
@@ -174,10 +197,10 @@ function void fn026b34()
 //# address-hook(0x026b46) end(0x026bcc)
 function void fn026b46()
 {
-	D0.u16 = u16[A0 + 0x3a]
-	if (D0.u16 == u16[A0 + 0x38])
+	if (u16[A0 + 0x3a] == u16[A0 + 0x38])
 	{
-		if (s8[A0 + 0x2c] < 0)
+		// Reached target position
+		if (objA0.subtype2c & 0x80)
 		{
 			u16[A0 + 0x36] = 0x0c
 			objA0.countdown_value = 0x0600
@@ -192,6 +215,7 @@ function void fn026b46()
 		return
 	}
 
+	// Keep moving
 	u16[A0 + 0x3a] += 4
 	D1.u16 = u16[A0 + 0x3a]
 	D0 = u32(u16[A0 + 0x3a]) * 0x0155
@@ -223,6 +247,7 @@ function void fn026b46()
 //# address-hook(0x026bce) end(0x026bd8)
 function void fn026bce()
 {
+	// Waiting for all characters to exit
 	if (u16[A0 + 0x3c] == 0)
 	{
 		u16[A0 + 0x36] += 2
@@ -235,7 +260,8 @@ function void fn026bda()
 {
 	if (u16[A0 + 0x3a] == 0)
 	{
-		if (s8[A0 + 0x2c] < 0)
+		// Reached target position
+		if (objA0.subtype2c & 0x80)
 		{
 			u16[A0 + 0x36] = 0x12
 			objA0.countdown_value = 0x0600
@@ -250,6 +276,7 @@ function void fn026bda()
 		return
 	}
 
+	// Keep moving
 	u16[A0 + 0x3a] -= 4
 	D1.u16 = u16[A0 + 0x3a]
 	D0 = u32(u16[A0 + 0x3a]) * 0x0155
@@ -281,6 +308,7 @@ function void fn026bda()
 //# address-hook(0x026c5e) end(0x026c6a)
 function void fn026c5e()
 {
+	// Waiting for all characters to exit
 	if (u16[A0 + 0x3c] == 0)
 	{
 		u16[A0 + 0x36] = 0
@@ -355,7 +383,7 @@ function void fn026d06()
 			objA0.value26 = 0x40
 			A1 = 0xffff0000 + objA0.value42
 			u16[A1 + 0x30] = 0x7fff
-			u16[A0 + 0x36] += 0x02
+			u16[A0 + 0x36] += 2
 			return
 		}
 	}
