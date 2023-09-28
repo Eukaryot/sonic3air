@@ -22,13 +22,6 @@ RenderParts::RenderParts() :
 	reset();
 }
 
-void RenderParts::setFullEmulation(bool enable)
-{
-	mFullEmulation = enable;
-	mPlaneManager.mAbstractionModeForPlaneA = !enable;
-	mScrollOffsetsManager.mAbstractionModeForPlaneA = !enable;
-}
-
 void RenderParts::addViewport(const Recti& rect, uint16 renderQueue)
 {
 	Viewport& viewport = vectorAdd(mViewports);

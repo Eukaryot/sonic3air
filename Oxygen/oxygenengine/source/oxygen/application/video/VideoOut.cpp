@@ -51,7 +51,6 @@ void VideoOut::startup()
 	{
 		RMX_LOG_INFO("VideoOut: Creating render parts");
 		mRenderParts = new RenderParts();
-		mRenderParts->setFullEmulation(Configuration::instance().mFullEmulationRendering);
 	}
 
 	createRenderer(false);

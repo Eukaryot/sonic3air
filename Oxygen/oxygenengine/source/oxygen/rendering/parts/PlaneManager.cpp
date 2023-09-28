@@ -114,19 +114,6 @@ void PlaneManager::refresh()
 				break;
 			}
 
-			case PLANE_A:
-			{
-				if (mAbstractionModeForPlaneA)
-				{
-					const uint32 cameraX = EmulatorInterface::instance().readMemory16(0xffffee78);
-					const uint32 cameraY = EmulatorInterface::instance().readMemory16(0xffffee7c);
-
-					fillBufferByAbstraction(buffer, Vec2i(cameraX, cameraY), Vec2i(mPlayfieldSize.x * 8, mPlayfieldSize.y * 8));
-					break;
-				}
-				// Fallthrough to the default case
-			}
-
 			default:
 			{
 				const uint16* src = getPlaneContent(index);

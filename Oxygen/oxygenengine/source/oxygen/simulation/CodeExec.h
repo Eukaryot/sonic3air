@@ -84,6 +84,8 @@ public:
 	{
 		lemon::Runtime::FunctionCallParameters mParams;
 		uint64 mReturnValueStorage = 0;
+
+		inline void addParam(const lemon::DataTypeDefinition& dataType, uint64 storageValue)  { mParams.mParams.emplace_back(dataType, storageValue); }
 	};
 
 public:

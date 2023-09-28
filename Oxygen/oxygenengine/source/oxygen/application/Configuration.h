@@ -159,7 +159,6 @@ public:
 	int   mFiltering = 0;
 	int   mScanlines = 0;
 	int   mBackgroundBlur = 0;
-	bool  mFullEmulationRendering = true;
 	int   mPerformanceDisplay = 0;
 
 	// Audio

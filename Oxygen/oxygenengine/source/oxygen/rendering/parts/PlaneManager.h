@@ -74,9 +74,6 @@ public:
 	const std::vector<CustomPlane>& getCustomPlanes() const  { return mCustomPlanes; }
 	void setupCustomPlane(const Recti& rect, uint8 sourcePlane, uint8 scrollOffsets, uint16 renderQueue);
 
-public:
-	bool mAbstractionModeForPlaneA = false;
-
 private:
 	const uint16* getPlaneContent(int planeIndex, uint16 patternIndex = 0) const;
 

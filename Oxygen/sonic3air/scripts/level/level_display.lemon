@@ -229,6 +229,14 @@ function void UpdateLevelDisplay()
 
 	scrolloffset.y.planeA = camera.foreground.y.u16
 	scrolloffset.y.planeB = camera.background.y.u16			// This is half the camera.position.y, but seems to be in pixels
+
+#if STANDALONE
+	// Debug option for abstraction rendering (toggled via Alt+T)
+	if (Debug.useAbstractionRendering)
+	{
+		fillPlaneA_Default(camera.foreground.x.u16, camera.foreground.y.u16, getScreenWidth(), getScreenHeight())
+	}
+#endif
 }
 
 

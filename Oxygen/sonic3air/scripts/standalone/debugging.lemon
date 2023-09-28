@@ -143,3 +143,55 @@ function void OxygenCallback.setupCustomSidePanelEntries()
 		}
 	}
 }
+
+
+
+//-------------------------------------------------------//
+// Abstraction Rendering incl. Alt+LMB / Alt+RMB         //
+//-------------------------------------------------------//
+
+global bool Debug.useAbstractionRendering = false
+
+constant u8 Debug.ClickFlags.ShiftPressed = 0x01
+
+function void OxygenCallback.debugAltT()
+{
+	Debug.useAbstractionRendering = !Debug.useAbstractionRendering
+
+	if (Debug.useAbstractionRendering)
+		debugLog("Renderer mode: Abstraction (allows for Alt-click / Alt-rightclick)")
+	else
+		debugLog("Renderer mode: Normal rendering")
+}
+
+function void OxygenCallback.debugAltLeftMouseDown(s16 mx, s16 my, u8 flags)
+{
+	if (Debug.useAbstractionRendering)
+	{
+		bool shiftPressed = (flags & Debug.ClickFlags.ShiftPressed)
+		Debug.changeChunkAtScreenPosition(mx, my, shiftPressed ? 0x10 : 0x01)
+	}
+}
+
+function void OxygenCallback.debugAltRightMouseDown(s16 mx, s16 my, u8 flags)
+{
+	if (Debug.useAbstractionRendering)
+	{
+		bool shiftPressed = (flags & Debug.ClickFlags.ShiftPressed)
+		Debug.changeChunkAtScreenPosition(mx, my, shiftPressed ? -0x10 : -0x01)
+	}
+}
+
+function void Debug.changeChunkAtScreenPosition(s16 mx, s16 my, s8 change)
+{
+	u16 globalColumn = camera.position.x.u16 + mx
+	u16 globalRow    = camera.position.y.u16 + my
+	
+	u16 chunkColumn = globalColumn / 128
+	u16 chunkRow    = (globalRow / 128) & 0x1f		// Looks like there are only 32 chunks in y-direction allowed in a level; that makes a maximum level height of 4096 pixels
+
+	u32 chunkAddress = 0xffff0000 + u16[0xffff8008 + chunkRow * 4] + chunkColumn
+	u8[chunkAddress] += change
+
+	debugLog(stringformat("chunk: u8[%08x] = 0x%02x", chunkAddress, u8[chunkAddress]))
+}

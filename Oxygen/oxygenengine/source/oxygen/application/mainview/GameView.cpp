@@ -349,13 +349,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 						case 't':
 						{
-							RenderParts& renderer = RenderParts::instance();
-							renderer.setFullEmulation(!renderer.getFullEmulation());
-
-							if (renderer.getFullEmulation())
-								setLogDisplay("Set renderer mode: Full emulation");
-							else
-								setLogDisplay("Set renderer mode: Abstraction (allows for Alt-click / Alt-rightclick)");
+							mSimulation.getCodeExec().executeScriptFunction("OxygenCallback.debugAltT", false);
 							break;
 						}
 					}
@@ -426,7 +420,7 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 				{
 					case SDLK_KP_PERIOD:
 					{
-						// Supporting both Shift and Ctrl, as the SHift + Peroid combination does not seem to work for all keyboards
+						// Supporting both Shift and Ctrl, as the Shift + Peroid combination does not seem to work for all keyboards
 						mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
 						break;
 					}
@@ -438,37 +432,30 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 
 void GameView::mouse(const rmx::MouseEvent& ev)
 {
-	// TODO: This functionality (as well as abstraction plane A rendering) is entirely S3AIR specific and should be moved out of the core engine
-	if (EngineMain::getDelegate().useDeveloperFeatures() && !RenderParts::instance().getFullEmulation())
+	if (FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
 	{
-		if (ev.state && FTX::keyState(SDLK_LALT) && !FTX::keyState(SDLK_RALT))
+		const char* functionName = nullptr;
+		if (ev.button == rmx::MouseButton::Left)
 		{
-			// Translate mouse position into game screen position
+			functionName = ev.state ? "OxygenCallback.debugAltLeftMouseDown" : "OxygenCallback.debugAltLeftMouseUp";
+		}
+		else if (ev.button == rmx::MouseButton::Right)
+		{
+			functionName = ev.state ? "OxygenCallback.debugAltRightMouseDown" : "OxygenCallback.debugAltRightMouseUp";
+		}
+
+		if (nullptr != functionName)
+		{
 			Vec2f relativePosition;
 			if (translatePositionIntoGameViewport(relativePosition, ev.position))
 			{
-				EmulatorInterface& emulatorInterface = mSimulation.getCodeExec().getEmulatorInterface();
+				const uint8 flags = (FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_RSHIFT)) ? 0x01 : 0x00;
 
-				const uint32 cameraX = emulatorInterface.readMemory16(0xffffee78);
-				const uint32 cameraY = emulatorInterface.readMemory16(0xffffee7c);
-
-				const uint32 globalColumn = cameraX + roundToInt(relativePosition.x);
-				const uint32 globalRow = cameraY + roundToInt(relativePosition.y);
-
-				const uint32 chunkColumn = globalColumn / 128;
-				const uint32 chunkRow = (globalRow / 128) & 0x1f;		// Looks like there are only 32 chunks in y-direction allowed in a level; that makes a maximum level height of 4096 pixels
-
-				const uint32 chunkAddress = 0xffff0000 + emulatorInterface.readMemory16(0xffff8008 + chunkRow * 4) + chunkColumn;
-				uint8 chunkType = emulatorInterface.readMemory8(chunkAddress);
-
-				int8 change = (ev.button == rmx::MouseButton::Left) ? 1 : (ev.button == rmx::MouseButton::Right) ? -1 : 0;
-				if (FTX::keyState(SDLK_LSHIFT))
-					change *= 0x10;
-				chunkType += change;
-				emulatorInterface.writeMemory8(chunkAddress, chunkType);
-
-				DebugTracking& debugTracking = Application::instance().getSimulation().getCodeExec().getDebugTracking();
-				debugTracking.updateScriptLogValue("chunk", rmx::hexString(chunkAddress, 8) + " -> " + rmx::hexString(chunkType, 2));
+				CodeExec::FunctionExecData execData;
+				execData.addParam(lemon::PredefinedDataTypes::INT_16, roundToInt(relativePosition.x));
+				execData.addParam(lemon::PredefinedDataTypes::INT_16, roundToInt(relativePosition.y));
+				execData.addParam(lemon::PredefinedDataTypes::UINT_8, flags);
+				mSimulation.getCodeExec().executeScriptFunction(functionName, false, &execData);
 			}
 		}
 	}

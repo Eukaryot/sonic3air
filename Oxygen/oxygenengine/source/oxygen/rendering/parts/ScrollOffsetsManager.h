@@ -47,9 +47,6 @@ public:
 	inline int16 getVerticalScrollOffsetBias() const		{ return mVerticalScrollOffsetBias; }
 	void setVerticalScrollOffsetBias(int16 bias);
 
-public:
-	bool mAbstractionModeForPlaneA = false;
-
 private:
 	PlaneManager& mPlaneManager;
 
@@ -59,11 +56,11 @@ private:
 
 	struct ScrollOffsetSet
 	{
-		uint16 mScrollOffsetsH[0x100] = { 0 };		// One scroll offset per single pixel line
+		uint16 mScrollOffsetsH[0x100]   = { 0 };	// One scroll offset per single pixel line
 		bool mExplicitOverwriteH[0x100] = { 0 };	// One flag per horizontal scroll offset; set if it was explicitly overwritten
-		uint16 mScrollOffsetsV[0x20] = { 0 };		// One scroll offset per row of 0x10 pixels
-		bool mExplicitOverwriteV[0x20] = { 0 };		// One flag per vertical scroll offset; set if it was explicitly overwritten
-		bool mHorizontalScrollNoRepeat = false;
+		uint16 mScrollOffsetsV[0x20]    = { 0 };	// One scroll offset per row of 0x10 pixels
+		bool mExplicitOverwriteV[0x20]  = { 0 };	// One flag per vertical scroll offset; set if it was explicitly overwritten
+		bool mHorizontalScrollNoRepeat  = false;
 	};
 	ScrollOffsetSet mSets[4];		// First two are for the planes, the others are used for certain effects that require an additional set of scroll offsets
 	Vec2i mScrollOffsetW;

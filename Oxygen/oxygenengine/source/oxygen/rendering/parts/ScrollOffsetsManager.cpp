@@ -45,18 +45,7 @@ void ScrollOffsetsManager::refresh(const RefreshParameters& refreshParameters)
 		{
 			uint16* buffer = mSets[index].mScrollOffsetsH;
 			bool* overwriteFlags = mSets[index].mExplicitOverwriteH;
-			if (index == 1 && mAbstractionModeForPlaneA)
-			{
-				const uint16 cameraX = EmulatorInterface::instance().readMemory16(0xffffee78);
-				for (int k = 0; k < 0x100; ++k)
-				{
-					if (!overwriteFlags[k])
-					{
-						buffer[k] = cameraX & SCROLL_OFFSET_VALUE_BITMASK;
-					}
-				}
-			}
-			else if (index < 2)
+			if (index < 2)
 			{
 				const uint16* src = (uint16*)&EmulatorInterface::instance().getVRam()[mHorizontalScrollTableBase + (1 - index) * 2];
 				for (int k = 0; k < 0x100; ++k)
