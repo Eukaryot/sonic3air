@@ -51,7 +51,7 @@ namespace
 
 	bool isOperator(lemon::ParserToken& token, lemon::Operator op)
 	{
-		return (token.getType() == lemon::ParserToken::Type::OPERATOR && token.as<lemon::OperatorParserToken>().mOperator == op);
+		return (token.isA<lemon::OperatorParserToken>() && token.as<lemon::OperatorParserToken>().mOperator == op);
 	}
 
 	void splitIntoParameters(lemon::ParserTokenList& tokenList, std::vector<std::pair<size_t, size_t>>& outTokensRangePerParameter)
@@ -84,7 +84,7 @@ namespace
 
 		for (const auto [startIndex, length] : tokensRangePerParameter)
 		{
-			if (tokenList[startIndex].getType() != lemon::ParserToken::Type::IDENTIFIER)
+			if (!tokenList[startIndex].isA<lemon::IdentifierParserToken>())
 				continue;
 
 			FontKeyParameter& param = vectorAdd(outParameters);
@@ -101,7 +101,7 @@ namespace
 			for (size_t index = firstIndex; index <= lastIndex; ++index)
 			{
 				// Expecting a number constant here
-				RMX_CHECK(tokenList[index].getType() == lemon::ParserToken::Type::CONSTANT, "Syntax error in font key '" << fontKey << "'", break);
+				RMX_CHECK(tokenList[index].isA<lemon::ConstantParserToken>(), "Syntax error in font key '" << fontKey << "'", break);
 				param.mArguments.push_back(&tokenList[index].as<lemon::ConstantParserToken>());
 				++index;
 

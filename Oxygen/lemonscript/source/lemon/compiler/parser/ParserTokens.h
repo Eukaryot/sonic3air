@@ -37,16 +37,15 @@ namespace lemon
 	public:
 		virtual ~ParserToken() {}
 
-		inline Type getType() const { return mType; }
+		inline Type getType() const  { return (Type)genericmanager::Element<ParserToken>::getType(); }
+
+		template<typename T> bool isA() const { return getType() == T::TYPE; }
 
 		template<typename T> const T& as() const { return *static_cast<const T*>(this); }
 		template<typename T> T& as() { return *static_cast<T*>(this); }
 
 	protected:
-		inline ParserToken(Type type) : genericmanager::Element<ParserToken>((uint32)type), mType(type) {}
-
-	private:
-		const Type mType;
+		inline ParserToken(Type type) : genericmanager::Element<ParserToken>((uint32)type) {}
 	};
 
 

@@ -14,21 +14,21 @@ namespace lemon
 {
 	bool isKeyword(const Token& token, Keyword keyword)
 	{
-		return (token.getType() == Token::Type::KEYWORD && token.as<KeywordToken>().mKeyword == keyword);
+		return (token.isA<KeywordToken>() && token.as<KeywordToken>().mKeyword == keyword);
 	}
 
 	bool isOperator(const Token& token, Operator op)
 	{
-		return (token.getType() == Token::Type::OPERATOR && token.as<OperatorToken>().mOperator == op);
+		return (token.isA<OperatorToken>() && token.as<OperatorToken>().mOperator == op);
 	}
 
 	bool isIdentifier(const Token& token, uint64 identifierHash)
 	{
-		return (token.getType() == Token::Type::IDENTIFIER && token.as<IdentifierToken>().mName.getHash() == identifierHash);
+		return (token.isA<IdentifierToken>() && token.as<IdentifierToken>().mName.getHash() == identifierHash);
 	}
 
 	bool isParenthesis(const Token& token, ParenthesisType parenthesisType)
 	{
-		return (token.getType() == Token::Type::PARENTHESIS && token.as<ParenthesisToken>().mParenthesisType == parenthesisType);
+		return (token.isA<ParenthesisToken>() && token.as<ParenthesisToken>().mParenthesisType == parenthesisType);
 	}
 }

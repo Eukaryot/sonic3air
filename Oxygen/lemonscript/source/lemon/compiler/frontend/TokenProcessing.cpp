@@ -172,7 +172,7 @@ namespace lemon
 		bool anyResolved = false;
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			if (tokens[i].isA<IdentifierToken>())
 			{
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 				if (nullptr == identifierToken.mResolved)
@@ -307,7 +307,7 @@ namespace lemon
 		bool anyDefineResolved = false;
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			if (tokens[i].isA<IdentifierToken>())
 			{
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 				if (nullptr != identifierToken.mResolved && identifierToken.mResolved->getType() == GlobalsLookup::Identifier::Type::DEFINE)
@@ -336,7 +336,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER)
+			if (tokens[i].isA<IdentifierToken>())
 			{
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
 				const Constant* constant = nullptr;
@@ -371,7 +371,7 @@ namespace lemon
 		parenthesisStack.clear();
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::OPERATOR)
+			if (tokens[i].isA<OperatorToken>())
 			{
 				const OperatorToken& opToken = tokens[i].as<OperatorToken>();
 				if (opToken.mOperator == Operator::PARENTHESIS_LEFT ||
@@ -419,7 +419,7 @@ namespace lemon
 		// Recursively go through the whole parenthesis hierarchy
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].isA<ParenthesisToken>())
 			{
 				// Call recursively for this parenthesis
 				processCommaSeparators(tokens[i].as<ParenthesisToken>().mContent);
@@ -521,7 +521,7 @@ namespace lemon
 		// Go through the child token lists
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::PARENTHESIS)
+			if (tokens[i].isA<ParenthesisToken>())
 			{
 				// Call recursively for this parenthesis' contents
 				processTokenListRecursiveForPreprocessor(tokens[i].as<ParenthesisToken>().mContent);
@@ -546,7 +546,7 @@ namespace lemon
 					if (keyword == Keyword::FUNCTION)
 					{
 						// Next token must be an identifier
-						CHECK_ERROR(i+1 < tokens.size() && tokens[i+1].getType() == Token::Type::IDENTIFIER, "Function keyword must be followed by an identifier", mLineNumber);
+						CHECK_ERROR(i+1 < tokens.size() && tokens[i+1].isA<IdentifierToken>(), "Function keyword must be followed by an identifier", mLineNumber);
 
 						// TODO: We could register the function name here already, so it is known later on...
 
@@ -563,7 +563,7 @@ namespace lemon
 
 					// Next token must be an identifier
 					Token& nextToken = tokens[i+1];
-					if (nextToken.getType() == Token::Type::IDENTIFIER)
+					if (nextToken.isA<IdentifierToken>())
 					{
 						CHECK_ERROR(varType->getClass() != DataTypeDefinition::Class::VOID, "void variables not allowed", mLineNumber);
 
@@ -599,7 +599,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
+			if (tokens[i].isA<IdentifierToken>() && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
 			{
 				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
@@ -685,7 +685,7 @@ namespace lemon
 				// Build list of parameters
 				if (!content.empty())
 				{
-					if (content[0].getType() == Token::Type::COMMA_SEPARATED)
+					if (content[0].isA<CommaSeparatedListToken>())
 					{
 						const std::vector<TokenList>& tokenLists = content[0].as<CommaSeparatedListToken>().mContent;
 						functionToken.mParameters.reserve(tokenLists.size());
@@ -801,7 +801,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::VARTYPE && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
+			if (tokens[i].isA<VarTypeToken>() && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
 			{
 				TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				CHECK_ERROR(content.size() == 1, "Expected exactly one token inside brackets", mLineNumber);
@@ -824,7 +824,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::IDENTIFIER && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
+			if (tokens[i].isA<IdentifierToken>() && isParenthesis(tokens[i+1], ParenthesisType::BRACKET))
 			{
 				// Check the identifier
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
@@ -882,7 +882,7 @@ namespace lemon
 	{
 		for (size_t i = 0; i + 1 < tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::VARTYPE && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
+			if (tokens[i].isA<VarTypeToken>() && isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS))
 			{
 				const DataTypeDefinition* targetType = tokens[i].as<VarTypeToken>().mDataType;
 
@@ -899,7 +899,7 @@ namespace lemon
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			Token& token = tokens[i];
-			if (token.getType() == Token::Type::IDENTIFIER)
+			if (token.isA<IdentifierToken>())
 			{
 				// Check the identifier
 				IdentifierToken& identifierToken = tokens[i].as<IdentifierToken>();
@@ -927,7 +927,7 @@ namespace lemon
 		// Left to right associative
 		for (int i = 0; i < (int)tokens.size(); ++i)
 		{
-			if (tokens[i].getType() == Token::Type::OPERATOR)
+			if (tokens[i].isA<OperatorToken>())
 			{
 				const Operator op = tokens[i].as<OperatorToken>().mOperator;
 				switch (op)
@@ -960,7 +960,7 @@ namespace lemon
 		// Right to left associative: Go through in reverse order
 		for (int i = (int)tokens.size() - 1; i >= 0; --i)
 		{
-			if (tokens[i].getType() == Token::Type::OPERATOR)
+			if (tokens[i].isA<OperatorToken>())
 			{
 				const Operator op = tokens[i].as<OperatorToken>().mOperator;
 				switch (op)
@@ -975,7 +975,7 @@ namespace lemon
 						if (op == Operator::BINARY_MINUS && i > 0)
 						{
 							Token& leftToken = tokens[i-1];
-							if (leftToken.getType() != Token::Type::OPERATOR)
+							if (!leftToken.isA<OperatorToken>())
 								continue;
 						}
 
@@ -1025,7 +1025,7 @@ namespace lemon
 			size_t bestPosition = 0;
 			for (size_t i = 0; i < tokens.size(); ++i)
 			{
-				if (tokens[i].getType() == Token::Type::OPERATOR)
+				if (tokens[i].isA<OperatorToken>())
 				{
 					const Operator op = tokens[i].as<OperatorToken>().mOperator;
 					CHECK_ERROR((i > 0 && i < tokens.size()-1) && (op != Operator::SEMICOLON_SEPARATOR), getOperatorNotAllowedErrorMessage(op), mLineNumber);
@@ -1096,7 +1096,7 @@ namespace lemon
 				UnaryOperationToken& uot = inputToken.as<UnaryOperationToken>();
 				evaluateCompileTimeConstantsRecursive(*uot.mArgument, uot.mArgument);
 
-				if (uot.mArgument->getType() == ConstantToken::TYPE)
+				if (uot.mArgument->isA<ConstantToken>())
 				{
 					int64 resultValue;
 					if (tryReplaceConstantsUnary(uot.mArgument->as<ConstantToken>(), uot.mOperator, resultValue))
@@ -1117,7 +1117,7 @@ namespace lemon
 				evaluateCompileTimeConstantsRecursive(*bot.mLeft, bot.mLeft);
 				evaluateCompileTimeConstantsRecursive(*bot.mRight, bot.mRight);
 
-				if (bot.mLeft->getType() == ConstantToken::TYPE && bot.mRight->getType() == ConstantToken::TYPE)
+				if (bot.mLeft->isA<ConstantToken>() && bot.mRight->isA<ConstantToken>())
 				{
 					int64 resultValue;
 					if (tryReplaceConstantsBinary(bot.mLeft->as<ConstantToken>(), bot.mRight->as<ConstantToken>(), bot.mOperator, resultValue))
@@ -1139,7 +1139,7 @@ namespace lemon
 				for (TokenPtr<StatementToken>& parameterTokenPtr : ft.mParameters)
 				{
 					evaluateCompileTimeConstantsRecursive(*parameterTokenPtr, parameterTokenPtr);
-					if (parameterTokenPtr->getType() != Token::Type::CONSTANT)
+					if (!parameterTokenPtr->isA<ConstantToken>())
 						allConstant = false;
 				}
 
@@ -1187,7 +1187,7 @@ namespace lemon
 			{
 				CHECK_ERROR(isParenthesis(tokens[i+1], ParenthesisType::PARENTHESIS), "addressof must be followed by parentheses", mLineNumber);
 				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
-				if (content.size() == 1 && content[0].getType() == Token::Type::IDENTIFIER)
+				if (content.size() == 1 && content[0].isA<IdentifierToken>())
 				{
 					IdentifierToken& identifierToken = content[0].as<IdentifierToken>();
 					const std::vector<Function*>& candidateFunctions = mGlobalsLookup.getFunctionsByName(identifierToken.mName.getHash());
@@ -1232,7 +1232,7 @@ namespace lemon
 				const TokenList& content = tokens[i+1].as<ParenthesisToken>().mContent;
 				CHECK_ERROR(content.size() == 1, "Expected a single token in parentheses after addressof", mLineNumber);
 
-				if (content[0].getType() == Token::Type::MEMORY_ACCESS)
+				if (content[0].isA<MemoryAccessToken>())
 				{
 					// Replace addressof and the parenthesis with the actual address
 					TokenPtr<StatementToken> addressToken = content[0].as<MemoryAccessToken>().mAddress;

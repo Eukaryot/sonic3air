@@ -45,7 +45,7 @@ namespace
 
 	bool isOperatorToken(const lemon::Token& token, lemon::Operator op)
 	{
-		return (token.getType() == lemon::Token::Type::OPERATOR) && (token.as<lemon::OperatorToken>().mOperator == op);
+		return token.isA<lemon::OperatorToken>() && (token.as<lemon::OperatorToken>().mOperator == op);
 	}
 
 

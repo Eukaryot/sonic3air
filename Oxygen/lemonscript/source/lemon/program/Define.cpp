@@ -17,7 +17,7 @@ namespace lemon
 	{
 		for (size_t k = 0; k < mContent.size(); ++k)
 		{
-			if (mContent[k].getType() == Token::Type::IDENTIFIER)
+			if (mContent[k].isA<IdentifierToken>())
 			{
 				mContent[k].as<IdentifierToken>().mResolved = nullptr;
 			}

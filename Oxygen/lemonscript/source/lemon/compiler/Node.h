@@ -42,7 +42,7 @@ namespace lemon
 	public:
 		virtual ~Node() {}
 
-		inline Type getType() const { return mType; }
+		inline Type getType() const  { return (Type)genericmanager::Element<Node>::getType(); }
 
 		template<typename T> bool isA() const { return getType() == T::TYPE; }
 
@@ -53,10 +53,9 @@ namespace lemon
 		inline void setLineNumber(uint32 lineNumber)  { mLineNumber = lineNumber; }
 
 	protected:
-		inline Node(Type type) : genericmanager::Element<Node>((uint32)type), mType(type) {}
+		inline Node(Type type) : genericmanager::Element<Node>((uint32)type) {}
 
 	private:
-		const Type mType;
 		uint32 mLineNumber = 0;
 	};
 

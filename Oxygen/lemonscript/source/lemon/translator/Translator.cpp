@@ -45,7 +45,7 @@ namespace lemon
 
 		void translateNodeInternal(CppWriter& writer, const Node& node, bool withExtraIndentation = false)
 		{
-			if (node.getType() == Node::Type::BLOCK)
+			if (node.isA<BlockNode>())
 			{
 				withExtraIndentation = false;		// Block does its own intendation
 			}
@@ -209,7 +209,7 @@ namespace lemon
 
 			if (isn.mContentElse.valid())
 			{
-				if (isn.mContentElse->getType() == Node::Type::IF_STATEMENT)
+				if (isn.mContentElse->isA<IfStatementNode>())
 				{
 					writeIfStatement(writer, isn.mContentElse->as<IfStatementNode>(), true);
 				}

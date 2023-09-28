@@ -410,13 +410,13 @@ void LemonScriptProgram::evaluateDefines()
 
 		// Check for define with single memory access
 		if (tokens.size() >= 4 &&
-			tokens[0].getType() == lemon::Token::Type::VARTYPE &&
+			tokens[0].isA<lemon::VarTypeToken>() &&
 			lemon::isOperator(tokens[1], lemon::Operator::BRACKET_LEFT) &&
 			lemon::isOperator(tokens.back(), lemon::Operator::BRACKET_RIGHT))
 		{
 			// Check for define with fixed address memory access, e.g. "u16[0xffffb000]"
 			if (tokens.size() == 4 &&
-				tokens[2].getType() == lemon::Token::Type::CONSTANT)
+				tokens[2].isA<lemon::ConstantToken>())
 			{
 				const uint32 address = (uint32)tokens[2].as<lemon::ConstantToken>().mValue.get<uint64>();
 				const lemon::DataTypeDefinition& dataType = *tokens[0].as<lemon::VarTypeToken>().mDataType;

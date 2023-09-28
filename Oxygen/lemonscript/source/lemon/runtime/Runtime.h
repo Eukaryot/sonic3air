@@ -108,6 +108,9 @@ namespace lemon
 			{
 				const lemon::DataTypeDefinition* mDataType = nullptr;
 				uint64 mStorage = 0;
+
+				inline Parameter() {}
+				inline Parameter(const lemon::DataTypeDefinition& dataType, uint64 storage) : mDataType(&dataType), mStorage(storage) {}
 			};
 
 			const lemon::DataTypeDefinition* mReturnType = nullptr;

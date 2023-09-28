@@ -260,7 +260,7 @@ namespace lemon
 
 		// Check for identifier
 		CHECK_ERROR(!parserTokens.empty(), "Expected an identifier after #define", mLineNumber);
-		CHECK_ERROR(parserTokens[0].getType() == ParserToken::Type::IDENTIFIER, "Expected an identifier after #define", mLineNumber);
+		CHECK_ERROR(parserTokens[0].isA<IdentifierParserToken>(), "Expected an identifier after #define", mLineNumber);
 		const FlyweightString identifierName = parserTokens[0].as<IdentifierParserToken>().mName;
 
 		// Check for value
@@ -268,7 +268,7 @@ namespace lemon
 		if (parserTokens.size() >= 2)
 		{
 			CHECK_ERROR(parserTokens.size() >= 3, "Assignment for #define expects using =", mLineNumber);
-			CHECK_ERROR(parserTokens[1].getType() == ParserToken::Type::OPERATOR && parserTokens[1].as<OperatorParserToken>().mOperator == Operator::ASSIGN, "Assignment for #define expects using =", mLineNumber);
+			CHECK_ERROR(parserTokens[1].isA<OperatorParserToken>() && parserTokens[1].as<OperatorParserToken>().mOperator == Operator::ASSIGN, "Assignment for #define expects using =", mLineNumber);
 			parserTokens.erase(0, 2);
 			value = evaluateConstantExpression(parserTokens);
 		}

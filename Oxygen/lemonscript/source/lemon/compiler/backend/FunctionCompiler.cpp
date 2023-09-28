@@ -21,11 +21,12 @@ namespace lemon
 	{
 		bool isComparison(const Token& token)
 		{
-			if (token.getType() != Token::Type::BINARY_OPERATION)
-				return false;
-
-			const Operator op = token.as<BinaryOperationToken>().mOperator;
-			return (op >= Operator::COMPARE_EQUAL && op <= Operator::COMPARE_GREATER_OR_EQUAL);
+			if (token.isA<BinaryOperationToken>())
+			{
+				const Operator op = token.as<BinaryOperationToken>().mOperator;
+				return (op >= Operator::COMPARE_EQUAL && op <= Operator::COMPARE_GREATER_OR_EQUAL);
+			}
+			return false;
 		}
 
 		bool isCommutative(Operator op)
@@ -348,7 +349,7 @@ namespace lemon
 						builder.beginElse();
 
 						mLineNumber = node.getLineNumber();
-						if (isn.mContentElse->getType() == Node::Type::IF_STATEMENT)
+						if (isn.mContentElse->isA<IfStatementNode>())
 						{
 							// Start another cycle in the loop
 							currentIfNode = &isn.mContentElse->as<IfStatementNode>();
@@ -625,7 +626,7 @@ namespace lemon
 					case Operator::QUESTIONMARK:
 					{
 						// Trinary operation handling
-						CHECK_ERROR(bot.mRight->getType() == Token::Type::BINARY_OPERATION, "Expected : after ? operator, but no binary operation found at all", mLineNumber);
+						CHECK_ERROR(bot.mRight->isA<BinaryOperationToken>(), "Expected : after ? operator, but no binary operation found at all", mLineNumber);
 						const BinaryOperationToken& colonToken = *bot.mRight.as<BinaryOperationToken>();
 						CHECK_ERROR(colonToken.mOperator == Operator::COLON, "Expected : after ? operator, but found wrong binary operation there", mLineNumber);
 
@@ -740,7 +741,7 @@ namespace lemon
 	{
 		// Special handling for memory access on left side
 		//  -> Memory address calculation must only be done once, especially if it has side effects (e.g. "u8[A0++] += 8")
-		if (bot.mLeft->getType() == Token::Type::MEMORY_ACCESS)
+		if (bot.mLeft->isA<MemoryAccessToken>())
 		{
 			// Compile memory read
 			const MemoryAccessToken& mat = bot.mLeft->as<MemoryAccessToken>();
@@ -785,7 +786,7 @@ namespace lemon
 		// Move constant to the right for easier optimization later on
 		StatementToken* leftToken = bot.mLeft.get();
 		StatementToken* rightToken = bot.mRight.get();
-		if (leftToken->getType() == Token::Type::CONSTANT && rightToken->getType() != Token::Type::CONSTANT && isCommutative(bot.mOperator))
+		if (leftToken->isA<ConstantToken>() && !rightToken->isA<ConstantToken>() && isCommutative(bot.mOperator))
 		{
 			rightToken = bot.mLeft.get();
 			leftToken = bot.mRight.get();
