@@ -78,8 +78,8 @@ function void fn03fd4e()
 			{
 				objA0.flags2a |= bit
 
-				u8[A1 + 0x1e] = 0x0e
-				u8[A1 + 0x1f] = 0x07
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 				objA1.state = char.state.ROLLING
 				objA1.flags2a |= (char.flag.ROLLING | char.flag.ON_OBJECT)
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -178,8 +178,8 @@ function void fn03fe70()
 			{
 				u8[A1 + 0x2a] |= char.flag.ON_OBJECT
 				objA0.flags2a |= bit
-				u8[A1 + 0x1e] = 0x0e
-				u8[A1 + 0x1f] = 0x07
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 				objA1.state = char.state.ROLLING
 				u8[A1 + 0x2a] |= char.flag.ROLLING
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK

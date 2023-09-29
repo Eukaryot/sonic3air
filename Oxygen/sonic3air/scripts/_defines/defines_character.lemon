@@ -87,8 +87,14 @@ define char.velocity.y			= s16[A0 + 0x1a]			// 8:8 fixed point, i.e. upper 8 bit
 define char.groundspeed			= s16[A0 + 0x1c]
 
 // Hitbox for collision checks
-define char.hitbox_extends.y	=  u8[A0 + 0x1e]			// E.g. 19 for Sonic/Knux, 15 for Tails, 14 when rolling (but not when ducking)
-define char.hitbox_extends.x	=  u8[A0 + 0x1f]			// E.g. 9 when upright, 7 when rolling
+define char.hitbox_extends.y	=  u8[A0 + 0x1e]
+	constant u8 char.hitbox.y.UPRIGHT		= 19
+	constant u8 char.hitbox.y.UPRIGHT_TAILS	= 15
+	constant u8 char.hitbox.y.ROLLING		= 14			// But not when ducking
+
+define char.hitbox_extends.x	=  u8[A0 + 0x1f]
+	constant u8 char.hitbox.x.UPRIGHT		= 9
+	constant u8 char.hitbox.x.ROLLING		= 7
 
 
 // State
@@ -237,8 +243,8 @@ define char.jumping				=  u8[A0 + 0x40]			// Jumping flag: 0x01 in air when butt
 define char.object_standing_on	= u16[A0 + 0x42]			// RAM address of object Sonic is standing on
 
 // Default hitbox extends
-define char.hitbox.default.y	=  u8[A0 + 0x44]
-define char.hitbox.default.x	=  u8[A0 + 0x45]
+define char.hitbox.default.y	=  u8[A0 + 0x44]			// See char.hitbox.y.* constants above for common values
+define char.hitbox.default.x	=  u8[A0 + 0x45]			// See char.hitbox.x.* constants above for common values
 
 define char.layer_flags			= u16[A0 + 0x46]
 define char.layer_flags1		=  u8[A0 + 0x46]			// Bit 0x02 = current layer (for loopings etc.)

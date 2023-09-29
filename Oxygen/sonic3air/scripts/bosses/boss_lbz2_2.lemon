@@ -789,8 +789,7 @@ function void fn0734fa()
 		AddScoreForBossEnemy_NoHudDirty()
 
 		objA0.animation.sprite = 5		// Egg mobile full body with the glass dome
-		objA0.flags2a |= 0x40
-		objA0.flags2a |= 0x80
+		objA0.flags2a |= (0x40 | 0x80)
 		u8[A0 + 0x28] = 0
 		D0.u16 = u16[A0 + 0x3c]
 		objA0.flags38 |= (1 << D0.u8)

@@ -177,6 +177,7 @@ function void fn0497b4()
 {
 	if (u8[0xfffff7c0] == 0x3f)
 	{
+		// All trigger buttons pressed, move the blocking bumpers away
 		objA0.position.x.u16 = 0x7f00
 	}
 	fn0497c2()

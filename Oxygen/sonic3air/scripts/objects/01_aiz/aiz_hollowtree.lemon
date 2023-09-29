@@ -188,8 +188,8 @@ function void fn01f8b4()
 	u8 bit = (1 << D6.u8)
 	objA1.velocity.x >>= 1
 	objA1.velocity.y >>= 1
-	u8[A1 + 0x1e] = 19
-	u8[A1 + 0x1f] = 9
+	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
+	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
 	u16[A1 + 0x20] = 1
 	objA1.flags2a |= char.flag.IN_AIR
 	objA1.flags2a &= ~(char.flag.ROLLING | char.flag.ON_OBJECT)

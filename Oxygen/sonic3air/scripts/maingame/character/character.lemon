@@ -132,10 +132,10 @@ function void Character.Initialization.shared(u8 character)
 
 	char.character = character
 
-	u8 characterHeight = (character == CHARACTER_TAILS) ? 15 : 19
-	char.hitbox_extends.x = 9
+	u8 characterHeight = (character == CHARACTER_TAILS) ? char.hitbox.y.UPRIGHT_TAILS : char.hitbox.y.UPRIGHT
+	char.hitbox_extends.x = char.hitbox.x.UPRIGHT
 	char.hitbox_extends.y = characterHeight
-	char.hitbox.default.x = 9
+	char.hitbox.default.x = char.hitbox.x.UPRIGHT
 	char.hitbox.default.y = characterHeight
 
 	if (character == CHARACTER_SONIC)
@@ -1002,8 +1002,8 @@ function void Tails.UpdateCarrySonic()
 				}
 
 				objA1.velocity.y = -0x380		// TODO: Should Knuckles have a different jump acceleration here?
-				u8[A1 + 0x1e] = 0x0e
-				u8[A1 + 0x1f] = 0x07
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 				objA1.state = char.state.ROLLING
 				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 				objA1.flags2a &= ~char.flag.CONTROL_LOCK
@@ -1415,8 +1415,8 @@ function void UpdateKnucklesGlideCollision()
 				char.animation.frame = 0
 				if (char.drown_countdown >= 12)
 				{
-					u8[A6 + 0x05] = 6
-					u8[A6 + 0x22] = 0x15
+					u8[A6 + 0x05] = 0x06		// Base update for braking dust
+					u8[A6 + 0x22] = 0x15		// First frame of dust animation
 				}
 			}
 		}
@@ -1848,8 +1848,8 @@ function void fn016e60()
 		char.flags |= (char.flag.IN_AIR | char.flag.ROLLING)
 		char.state = char.state.ROLLING
 		char.jumping = 1
-		char.hitbox_extends.x = 7
-		char.hitbox_extends.y = 14
+		char.hitbox_extends.x = char.hitbox.x.ROLLING
+		char.hitbox_extends.y = char.hitbox.y.ROLLING
 		char.double_jump_state = 0		// Allow gliding again
 	}
 }
@@ -2133,8 +2133,8 @@ function bool Character.CheckStartJump()
 	}
 	else
 	{
-		char.hitbox_extends.x = 7
-		char.hitbox_extends.y = 14
+		char.hitbox_extends.x = char.hitbox.x.ROLLING
+		char.hitbox_extends.y = char.hitbox.y.ROLLING
 		char.flags |= char.flag.ROLLING
 		char.state = char.state.ROLLING
 
@@ -4024,8 +4024,8 @@ function bool Character.UpdateSpindash()
 function void releaseSpindash()
 {
 	// Release spindash!
-	char.hitbox_extends.x = 7
-	char.hitbox_extends.y = 14
+	char.hitbox_extends.x = char.hitbox.x.ROLLING
+	char.hitbox_extends.y = char.hitbox.y.ROLLING
 	char.state = char.state.ROLLING
 	char.flags |= char.flag.ROLLING
 	char.spindash = 0
@@ -4094,8 +4094,8 @@ function void releaseDropDash()
 	}
 
 	s16 dy = s8(14 - char.hitbox_extends.y)
-	char.hitbox_extends.x = 7
-	char.hitbox_extends.y = 14
+	char.hitbox_extends.x = char.hitbox.x.ROLLING
+	char.hitbox_extends.y = char.hitbox.y.ROLLING
 	char.position.y.u16 += global.inv_gravity ? dy : -dy
 
 	char.state = char.state.ROLLING
@@ -4845,8 +4845,8 @@ function void Character.CheckForStartRolling()
 					if ((char.flags & char.flag.ROLLING) == 0)
 					{
 						char.flags |= char.flag.ROLLING
-						char.hitbox_extends.x = 7
-						char.hitbox_extends.y = 14
+						char.hitbox_extends.x = char.hitbox.x.ROLLING
+						char.hitbox_extends.y = char.hitbox.y.ROLLING
 						char.state = char.state.ROLLING
 
 						s8 dy = (char.character == CHARACTER_TAILS) ? 1 : 5
@@ -6318,8 +6318,8 @@ function void SonicLandingBubbleBounce()
 	char.flags &= ~char.flag.PUSHING
 	char.jumping = 1
 	char.on_convex_surface = 0
-	char.hitbox_extends.y = 14
-	char.hitbox_extends.x = 7
+	char.hitbox_extends.y = char.hitbox.y.ROLLING
+	char.hitbox_extends.x = char.hitbox.x.ROLLING
 
 	s8 dy = char.hitbox_extends.y - char.hitbox.default.y
 	char.position.y.u16 += (global.inv_gravity) ? dy : -dy

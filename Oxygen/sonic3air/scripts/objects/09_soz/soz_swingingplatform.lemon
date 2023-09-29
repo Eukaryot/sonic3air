@@ -30,7 +30,7 @@ function void fn04143c()
 
 	if (allocDynamicObjectAfterA0())
 	{
-		objA1.update_address = 0x01abc6
+		objA1.update_address = addressof(DrawObject)
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.render_flags = render_flag.WORLD

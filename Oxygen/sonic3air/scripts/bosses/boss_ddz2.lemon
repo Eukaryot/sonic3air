@@ -256,7 +256,7 @@ function void fn081cc6()
 
 	objA0.value3a = 0xff
 	copyMemory(0xfffffade, 0x08141e, 0x10)
-	u16[0xfffffaee] = 0
+	u16[0xfffffade+16] = 0
 }
 
 

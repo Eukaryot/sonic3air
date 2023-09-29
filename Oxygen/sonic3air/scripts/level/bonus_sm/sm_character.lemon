@@ -33,7 +33,7 @@ function void fn04b958()
 //# address-hook(0x04b97c) end(0x04b998)
 function void fn04b97c()
 {
-	objA0.state = 0x02
+	objA0.state = char.state.ROLLING
 	fn04b99e()
 
 	A1 = 0xffffb000
@@ -53,11 +53,11 @@ function void fn04b97c()
 //# address-hook(0x04b99e) end(0x04b9b6)
 function void fn04b99e()
 {
-	if (objA0.flags38 == 0)
+	if (char.character == CHARACTER_SONIC)
 	{
 		UpdateSonicAnimation()
 	}
-	else if (objA0.flags38 == 1)
+	else if (char.character == CHARACTER_TAILS)
 	{
 		UpdateTailsAnimation()
 	}
@@ -72,8 +72,8 @@ function void fn04b99e()
 function void fn04b9ce()
 {
 	objA0.base_state += 2
-	objA0.hitbox_extends.x = 0x07
-	objA0.hitbox_extends.y = 0x0e
+	objA0.hitbox_extends.x = char.hitbox.x.ROLLING
+	objA0.hitbox_extends.y = char.hitbox.y.ROLLING
 
 	D0.u16 = min(getMainCharacter(), 2)
 	objA0.flags38 = D0.u8
@@ -81,9 +81,8 @@ function void fn04b9ce()
 	objA0.sprite_attributes = (Char.Player1.targetInVRAM >> 5)
 	objA0.render_flags = render_flag.WORLD
 	objA0.sprite_priority = 0x0100
-	objA0.state = 0x02
-	objA0.flags2a |= 0x04
-	objA0.flags2a |= 0x02
+	objA0.state = char.state.ROLLING
+	objA0.flags2a |= (char.flag.ROLLING | char.flag.IN_AIR)
 
 	if (isMainCharacter(CHARACTER_TAILS))
 	{
@@ -118,9 +117,9 @@ function void fn04ba4e()
 	if (objA0.flags2e == 0)
 	{
 		// Targets:
-		//  - 0x04ba94	-> (objA0.flags2a & 0x02) = 0x00
-		//  - 0x04ba98	-> (objA0.flags2a & 0x02) = 0x02
-		call tableLookupAddress(0x04ba90, objA0.flags2a & 0x02)
+		//  - 0x04ba94	-> (objA0.flags2a & char.flag.IN_AIR) = 0x00
+		//  - 0x04ba98	-> (objA0.flags2a & char.flag.IN_AIR) = char.flag.IN_AIR
+		call tableLookupAddress(0x04ba90, objA0.flags2a & char.flag.IN_AIR)
 	}
 	else
 	{
@@ -213,7 +212,7 @@ function void fn04babc()
 //# address-hook(0x04bb54) end(0x04bb82)
 function void fn04bb54()
 {
-	objA0.flags2a |= 0x01
+	objA0.flags2a |= char.flag.FACING_LEFT
 	D0.u16 = objA0.groundspeed
 	if (D0.s16 > 0)
 	{
@@ -231,7 +230,7 @@ function void fn04bb54()
 //# address-hook(0x04bb84) end(0x04bbb0)
 function void fn04bb84()
 {
-	objA0.flags2a &= ~0x01
+	objA0.flags2a &= ~char.flag.FACING_LEFT
 	D0.u16 = objA0.groundspeed
 	if (D0.s16 >= 0)
 	{
@@ -254,13 +253,16 @@ function void fn04bbb2()
 	{
 		D0.u8 = -(0x40 + slotmachine.rotation.u8 & 0xfc)
 		LookupSinCos()
+
 		D1.s32 = s32(D1.s16) * 0x0680
 		D1.s32 >>= 8
 		objA0.velocity.x = D1.u16
+
 		D0.s32 = s32(D0.s16) * 0x0680
 		D0.s32 >>= 8
 		objA0.velocity.y = D0.u16
-		objA0.flags2a |= 0x02
+
+		objA0.flags2a |= char.flag.IN_AIR
 		playSound(SFX_JUMP)
 	}
 }
@@ -353,7 +355,7 @@ function void fn04bcb0()
 		D3 -= D0
 		D0 = 0
 		objA0.velocity.x = D0.u16
-		objA0.flags2a &= ~0x02
+		objA0.flags2a &= ~char.flag.IN_AIR
 		objA0.value3a = 0x04
 		D2 += D1
 
@@ -382,7 +384,7 @@ function void fn04bcb0()
 			D2 -= D1
 			D1 = 0
 			objA0.velocity.y = D1.u16
-			objA0.flags2a &= ~0x02
+			objA0.flags2a &= ~char.flag.IN_AIR
 			objA0.value3a = 0x04
 
 			D0.s32 >>= 8
@@ -402,7 +404,7 @@ function void fn04bcb0()
 			}
 			else
 			{
-				objA0.flags2a |= 0x02
+				objA0.flags2a |= char.flag.IN_AIR
 			}
 		}
 	}
@@ -558,24 +560,32 @@ function void fn04be3a()
 	{
 		D1 = u32[A0 + 0x32] - 0xffff3001
 		D2.u16 = D1.u16
+
 		D1.u16 &= 0x7f
 		D1 = u32(D1.u16) * 0x18
 		D1.u16 -= 0x14
+
 		D2.u16 >>= 7
+
 		D2.u16 &= 0x7f
 		D2 = u32(D2.u16) * 0x18
 		D2.u16 -= 0x44
+
 		D1.u16 -= objA0.position.x.u16
 		D2.u16 -= objA0.position.y.u16
+
 		LookupAngleByVector()
 		LookupSinCos()
+
 		D1.s32 = s32(D1.s16) * -0x0700
 		D1.s32 >>= 8
 		objA0.velocity.x = D1.u16
+
 		D0.s32 = s32(D0.s16) * -0x0700
 		D0.s32 >>= 8
 		objA0.velocity.y = D0.u16
-		objA0.flags2a |= 0x02
+
+		objA0.flags2a |= char.flag.IN_AIR
 
 		fn04b57c()
 		if (_equal())

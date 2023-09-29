@@ -76,8 +76,8 @@ function void fn063d1a()
 	objA0.sprite_priority = 0x0100
 	objA0.box_size.x = 0x18
 	objA0.box_size.y = 0x18
-	objA0.hitbox_extends.x = 0x09
-	objA0.hitbox_extends.y = 0x13
+	objA0.hitbox_extends.x = char.hitbox.x.UPRIGHT
+	objA0.hitbox_extends.y = char.hitbox.y.UPRIGHT
 	objA0.render_flags = (render_flag.WORLD | render_flag.FLIP_X)
 	objA0.animation.sprite = 0xd8
 	boss.remaining_hits = 8

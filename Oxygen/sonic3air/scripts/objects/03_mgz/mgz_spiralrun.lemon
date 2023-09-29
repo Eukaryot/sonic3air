@@ -254,8 +254,8 @@ function void fn033cac()
 	}
 
 	u8[A1 + 0x2a] &= ~char.flag.ROLLING
-	u8[A1 + 0x1e] = 0x13
-	u8[A1 + 0x1f] = 0x09
+	objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
+	objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
 	u16[A1 + 0x20] = char.state.RUNNING2
 	u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 	objA0.flags2a &= ~bit

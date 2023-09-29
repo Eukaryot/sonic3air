@@ -170,8 +170,8 @@ function void fn04aac8()
 		// TODO: Does not work yet
 		if (control.player1.state & CONTROL_DPAD)
 		{
-			objA1.hitbox_extends.x = 0x07
-			objA1.hitbox_extends.y = 0x0e
+			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (0x02 | 0x04)
 			u8[A1 + 0x40] = 1
@@ -738,8 +738,8 @@ function void fn04af80()
 				objA1.velocity.y -= 0x380
 				u8[A1 + 0x2a] |= char.flag.IN_AIR
 				u8[A1 + 0x40] = 1
-				u8[A1 + 0x1e] = 0x0e
-				u8[A1 + 0x1f] = 0x07
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 				objA1.state = char.state.ROLLING
 				u8[A1 + 0x2a] |= char.flag.ROLLING
 

@@ -26,7 +26,7 @@ function void fn047378()
 		D2.u16 = objA0.position.x.u16
 		D3.u16 = objA0.position.y.u16
 
-		objA1.update_address = 0x01abc6
+		objA1.update_address = addressof(DrawObject)
 		objA1.mapping_offset = objA0.mapping_offset
 		objA1.sprite_attributes = objA0.sprite_attributes
 		objA1.render_flags = objA0.render_flags

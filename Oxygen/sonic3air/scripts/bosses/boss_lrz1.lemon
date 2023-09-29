@@ -816,8 +816,7 @@ function void fn078c60()
 {
 	objA0.update_address = 0x085668
 	objA0.sprite_priority = 0x80
-	objA0.flags38 |= 0x40
-	objA0.flags38 |= 0x80
+	objA0.flags38 |= (0x40 | 0x80)
 	objA0.countdown_callback = 0x0787e0
 
 	// "spawnChildObjects(0x083fee)" replaced by:

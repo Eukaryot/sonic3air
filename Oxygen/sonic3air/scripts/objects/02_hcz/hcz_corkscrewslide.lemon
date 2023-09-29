@@ -113,8 +113,8 @@ function void fn039102()
 		u8[A4] += 2
 
 		u8[A1 + 0x2e] = 0x01
-		u8[A1 + 0x1e] = 0x0e
-		u8[A1 + 0x1f] = 0x07
+		objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+		objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 		objA1.state = char.state.ROLLING
 		u8[A1 + 0x2a] |= char.flag.ROLLING
 		u8[A1 + 0x2a] &= ~char.flag.PUSHING
@@ -130,14 +130,18 @@ function void fn039208()
 {
 	D0.u8 = u8[A1 + 0x26]
 	LookupSinCos()
+
 	D1.s32 = s32(D1.s16) * objA1.groundspeed
 	D1.s32 >>= 8
 	objA1.velocity.x = D1.u16
+
 	D0.s32 = s32(D0.s16) * objA1.groundspeed
 	D0.s32 >>= 8
 	objA1.velocity.y = D0.u16
+
 	D0.u8 = u8[A1 + 0x26]
 	LookupSinCos()
+
 	D0.s32 = s32(D0.s16) * 0x50
 	D0.s32 >>= 8
 	if (objA1.groundspeed >= 0)

@@ -135,8 +135,8 @@ function void fn03c068()
 {
 	objA1.velocity.x = (D1 & 0x0400) ? -0x1000 : 0x1000		// CONTROL_LEFT held
 	objA1.velocity.y = -0x100
-	u8[A1 + 0x1e] = 0x0e
-	u8[A1 + 0x1f] = 0x07
+	objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+	objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 	objA1.state = char.state.ROLLING
 	objA1.flags2a |= char.flag.ROLLING
 

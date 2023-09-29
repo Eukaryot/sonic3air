@@ -288,9 +288,11 @@ function void fn061176()
 	D1.u16 = u8[0xfffffe04] & 0x03
 	D0.u16 += D1.u16
 	LookupSinCos()
+
 	D1.s32 = s32(D1.s16) * -0x700
 	D1.s32 >>= 8
 	objA1.velocity.x = D1.u16
+
 	D0.s32 = s32(D0.s16) * -0x700
 	D0.s32 >>= 8
 	objA1.velocity.y = D0.u16

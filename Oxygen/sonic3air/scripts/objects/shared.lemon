@@ -746,13 +746,13 @@ function void fn08598a()
 	A1 = 0xfffffade
 	while (u16[A1] != 0)
 	{
-		--u8[A1 + 2]
+		--u8[A1 + 2]						// Decrement timer between switching palette animation frames
 		if (s8[A1 + 2] < 0)
 		{
-			A2 = u32[A1 + 4]
-			A3 = 0xffff0000 + u16[A2]
-			A4 = A2 + u16[A1]
-			D1.u16 = u16[A4]
+			A2 = u32[A1 + 4]				// Header describing some properties of the palette animation
+			A3 = 0xffff0000 + u16[A2]		// Target palette address
+			A4 = A2 + u16[A1]				// Address of current frame's palette data
+			D1.u16 = u16[A4]				// Palette animation frame
 			if (D1.s16 < 0)
 			{
 				if (fn0859ce())
@@ -762,17 +762,18 @@ function void fn08598a()
 				}
 			}
 
-			D2 = u8[A2 + 2]
+			D2 = u8[A2 + 2]					// Number of colors in a frame, counting from 0
 			while (D2.s16 >= 0)
 			{
+				// Apply palette frame to its destination
 				u16[A3] = u16[A4]
 				A3 += 2
 				A4 += 2
 				--D2.s16
 			}
 
-			u8[A1 + 2] = u16[A4]
-			A4 += 2
+			u8[A1 + 2] = u16[A4]			// Next palette frame timer
+			A4 += 2							// Next palette frame color address
 			D0 = A4 - A2
 			u16[A1] = D0.u16
 		}
@@ -784,16 +785,17 @@ function void fn08598a()
 //# translated(0x0859ce) end(0x0859d6)
 function bool fn0859ce()
 {
-	D2.u8 = u8[A2 + 0x03]	// D2 assignment is needed
+	D2.u8 = u8[A2 + 0x03]	// Number of animation loop times before executing a new call from the below options. D2 assignment is needed
 	if (D2.u8 == 0)
 	{
+		// Skip if counting loops is pointless anyway
 		fn0859fc()
 	}
 	else
 	{
 		// Known targets of indirect call (actually a jump):
-		//  - 0x0859da (when D1.s16 == 0xfff8)
-		//  - 0x0859de (when D1.s16 == 0xfff4) -> This contains a "A7 += 4" which can't be translated without an explicit call
+		//  - 0x0859da -> fn0859e2() (when D1.s16 == 0xfff8) -> Start a new palette animation loop
+		//  - 0x0859de -> fn085a02() (when D1.s16 == 0xfff4) -> Call function by address stored in 0xfffffada; this contains a "A7 += 4" which can't be translated without an explicit call
 		if (D1.s16 == 0xfff4)
 		{
 			if (fn085a02())
@@ -816,12 +818,14 @@ function void fn0859e2()
 	++u8[A1 + 0x03]
 	if (D2.u8 <= u8[A1 + 0x03])
 	{
-		D2.u16 = u16[A4 + 0x02]
-		A2.u16 += D2.u16
-		u32[A1 + 0x04] = A2
-		A3 = 0xffff0000 + u16[A2]
-		u16[A1 + 0x02] = 0
+		D2.u16 = u16[A4 + 0x02]			// Distance of new header from previous header, in bytes
+		A2.u16 += D2.u16				// Add to current header
+		u32[A1 + 0x04] = A2				// New animation header
+		A3 = 0xffff0000 + u16[A2]		// Replace target palette address
+		u16[A1 + 0x02] = 0				// Reset frame timer
 	}
+
+	// Restart palette animation
 	A4 = A2 + 4
 }
 
@@ -829,6 +833,7 @@ function void fn0859e2()
 //# address-hook(0x0859fc) end(0x085a00)
 function void fn0859fc()
 {
+	// Restart palette animation normally
 	A4 = A2 + 4
 }
 
@@ -840,11 +845,12 @@ function bool fn085a02()
 	++u8[A1 + 0x03]
 	if (D2.u8 > u8[A1 + 0x03])
 	{
+		 // Restart palette animation
 		fn0859fc()
 		return false
 	}
 
-	A2 = u32[0xfffffada]
+	A2 = u32[0xfffffada]		// Address of function to call after palette animation ends
 	u32 backupA1 = A1
 	call A2
 	A1 = backupA1

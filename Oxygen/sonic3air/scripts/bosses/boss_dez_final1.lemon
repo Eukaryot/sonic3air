@@ -459,7 +459,7 @@ function void fn0806da()
 
 		objA0.value3a = 0xff
 		copyMemory(0xfffffade, 0x0813aa, 0x10)
-		u16[0xfffffaee] = 0
+		u16[0xfffffade+16] = 0
 	}
 
 	if (objA0.subtype2c == 0)

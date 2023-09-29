@@ -1757,6 +1757,7 @@ function void fn04df86()
 		objA0.state = char.state.WIN_POSE
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | (Char.Tails.targetInVRAM >> 5))
 
+		// This address and function are only in standalone
 		objA0.update_address = 0x04dffe
 		fn04dffe()
 	}
@@ -1924,7 +1925,7 @@ function void fn04e116()
 		}
 	}
 
-	objA0.animation.sprite = (bluespheregame.shown_difficulty != 12) ? 4 : 5	// "DIFFICULTY" : "DIFFICULTY *MAX*"
+	objA0.animation.sprite = (bluespheregame.shown_difficulty != 12) ? 4 : 5	// "DIFFICULTY"/"DIFFICULTY *MAX*"
 	DrawObject()
 }
 

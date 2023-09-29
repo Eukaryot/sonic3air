@@ -1109,7 +1109,7 @@ function void fn064de0()
 {
 	A1 = 0xffffb000
 	D1.u16 = objA1.position.x.u16 - 0x1892
-	control.player1 = (D1.s16 >= 0) ? 0x0404 : 0x0808		// CONTROL_LEFT, CONTROL_LEFT : CONTROL_RIGHT, CONTROL_RIGHT
+	control.player1 = (D1.s16 >= 0) ? 0x0404 : 0x0808		// CONTROL_LEFT, CONTROL_LEFT/CONTROL_RIGHT, CONTROL_RIGHT
 	if (abs(D1.s16) > 4)
 		return
 

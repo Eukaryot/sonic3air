@@ -149,8 +149,8 @@ function void fn031226()
 		u8[A2] = 0
 		u8[A2+2] = (u8[A1 + 0x2a] & char.flag.UNDERWATER) ? 0x5a : 0x3c
 
-		u8[A1 + 0x1e] = 0x0e
-		u8[A1 + 0x1f] = 0x07
+		objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+		objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 		objA1.state = char.state.ROLLING
 		u8[A1 + 0x27] = 0
 		objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)

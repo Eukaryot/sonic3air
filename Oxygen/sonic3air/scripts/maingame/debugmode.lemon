@@ -230,8 +230,8 @@ function void DebugMode.EvaluateInput()
 		objA1.mapping_offset = debug_mode.backup.mapping_offset
 		objA1.sprite_attributes = debug_mode.backup.sprite_attributes
 		DebugMode.ResetSonic()
-		u8[A1 + 0x1e] = 0x13
-		u8[A1 + 0x1f] = 0x09
+		objA1.hitbox_extends.y = char.hitbox.y.UPRIGHT
+		objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
 	}
 }
 

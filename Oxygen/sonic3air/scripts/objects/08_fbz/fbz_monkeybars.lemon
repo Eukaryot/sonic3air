@@ -138,8 +138,8 @@ function void fn03a8b8()
 					objA1.velocity.x = 0x0200
 				}
 				objA1.velocity.y = -0x380
-				u8[A1 + 0x1e] = 0x0e
-				u8[A1 + 0x1f] = 0x07
+				objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+				objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 				objA1.state = char.state.ROLLING
 				u8[A1 + 0x27] = 0
 				objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
@@ -347,8 +347,8 @@ function void fn03aa7e()
 				objA1.velocity.x = 0x200
 			}
 			objA1.velocity.y = -0x380
-			u8[A1 + 0x1e] = 0x0e
-			u8[A1 + 0x1f] = 0x07
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 			objA1.state = char.state.ROLLING
 			u8[A1 + 0x22] = 0x96		// Set player character's jumping sprite
 			u8[A1 + 0x27] = 0

@@ -764,12 +764,15 @@ function void fn035dde()
 	else
 	{
 		LookupSinCos()
+
 		D1.s32 = s32(D1.s16) * -0x0480
 		D1.s32 >>= 8
 		u16[A1 + 0x18] = D1.u16
+
 		D0.s32 = s32(D0.s16) * -0x0480
 		D0.s32 >>= 8
 		u16[A1 + 0x1a] = D0.u16
+
 		objA0.state = 0x02
 	}
 
@@ -812,7 +815,7 @@ function void fn0380f8()
 		objA0.sprite_attributes = (sprite_attribute.PRIORITY | sprite_attribute.PALETTE.LINE2 | 0x0300)
 		objA0.animation.sprite = 0x03
 
-		objA0.update_address = 0x01abc6
+		objA0.update_address = addressof(DrawObject)
 		DrawObject()
 	}
 	else

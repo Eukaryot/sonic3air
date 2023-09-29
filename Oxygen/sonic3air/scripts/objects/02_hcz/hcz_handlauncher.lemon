@@ -251,8 +251,8 @@ function void fn030cf8()
 			playSound(SFX_ROLL)
 
 			u8[A1 + 0x20] = 0
-			u8[A1 + 0x1e] = (objA1.update_address == addressof(Character.BaseUpdate.Tails)) ? 0x0f : 0x13		// Checking for Tails, might be clearer to check `u8[A1 + 0x38] == CHARACTER_TAILS` instead
-			u8[A1 + 0x1f] = 0x09
+			objA1.hitbox_extends.y = (objA1.update_address == addressof(Character.BaseUpdate.Tails)) ? char.hitbox.y.UPRIGHT_TAILS : char.hitbox.y.UPRIGHT		// Checking for Tails, might be clearer to check `u8[A1 + 0x38] == CHARACTER_TAILS` instead
+			objA1.hitbox_extends.x = char.hitbox.x.UPRIGHT
 			objA1.flags2a &= ~(char.flag.FACING_LEFT | char.flag.ROLLING | char.flag.PUSHING)
 		#if STANDALONE
 			objA1.flags2a &= ~char.flag.IN_AIR	// Fix for wrong placement of the character if bubble-bouncing onto the hand launcher, #contributed by iCloudius

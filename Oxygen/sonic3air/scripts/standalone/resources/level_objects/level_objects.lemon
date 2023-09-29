@@ -157,48 +157,49 @@ constant u8 LVLOBJ_IGNORE_Y = 0x04
 
 
 // First object table
+// Note: Comments on these constants reference significantly from this page: https://info.sonicretro.org/SCHG:Sonic_the_Hedgehog_3_%26_Knuckles/Object_Editing/Pointer_List_1
 constant u8 OBJECTTABLE1_00		= 0x00		// Object address 0x01a51a = Ring
 constant u8 OBJECTTABLE1_01		= 0x01		// Object address 0x01d566 = Monitor
 constant u8 OBJECTTABLE1_02		= 0x02		// Object address 0x01ccae = Path Swapper
 constant u8 OBJECTTABLE1_03		= 0x03		// Object address 0x01f746 = AIZ Hollow Tree
-constant u8 OBJECTTABLE1_04		= 0x04		// Object address 0x0204fe = Collapsing Cliff
-constant u8 OBJECTTABLE1_05		= 0x05		// Object address 0x01f9e0 = Rocks
-constant u8 OBJECTTABLE1_06		= 0x06		// Object address 0x021c6e = AIZ Zipline (object 1)
+constant u8 OBJECTTABLE1_04		= 0x04		// Object address 0x0204fe = Collapsing Cliff from AIZ and ICZ
+constant u8 OBJECTTABLE1_05		= 0x05		// Object address 0x01f9e0 = Rocks from AIZ, LRZ and EMZ
+constant u8 OBJECTTABLE1_06		= 0x06		// Object address 0x021c6e = AIZ Zipline Swinging Vine
 constant u8 OBJECTTABLE1_07		= 0x07		// Object address 0x022d06 = Spring
 constant u8 OBJECTTABLE1_08		= 0x08		// Object address 0x023f84 = Spikes
 constant u8 OBJECTTABLE1_09		= 0x09		// Object address 0x01e78a = Palmtree part in AIZ1 transition cutscene
-constant u8 OBJECTTABLE1_0a		= 0x0a		// Object address 0x01e7b6 = AIZ Zipline (object 2)
+constant u8 OBJECTTABLE1_0a		= 0x0a		// Object address 0x01e7b6 = AIZ Zipline Rope Handle
 constant u8 OBJECTTABLE1_0b		= 0x0b		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_0c		= 0x0c		// Object address 0x02237e = AIZ Swinging Vine
-constant u8 OBJECTTABLE1_0d		= 0x0d		// Object address 0x02131c = Wall
-constant u8 OBJECTTABLE1_0e		= 0x0e		// Object address 0x024d68 = Jump Ramp
-constant u8 OBJECTTABLE1_0f		= 0x0f		// Object address 0x020630 = Barrier
+constant u8 OBJECTTABLE1_0d		= 0x0d		// Object address 0x02131c = Breakable Wall
+constant u8 OBJECTTABLE1_0e		= 0x0e		// Object address 0x024d68 = Jump Ramp from AIZ, MHZ, SOZ and LRZ
+constant u8 OBJECTTABLE1_0f		= 0x0f		// Object address 0x020630 = Collapsing platform/bridge/ledge
 constant u8 OBJECTTABLE1_10		= 0x10		// Object address 0x029c9e = LBZ Tube Transport
 constant u8 OBJECTTABLE1_11		= 0x11		// Object address 0x024e3c = LBZ Moving Platform
-constant u8 OBJECTTABLE1_12		= 0x12		// Object address 0x025af6 = Unused?
-constant u8 OBJECTTABLE1_13		= 0x13		// Object address 0x025cbe = LBZ Wall Trigger
-constant u8 OBJECTTABLE1_14		= 0x14		// Object address 0x025f6a = LBZ Barrier
+constant u8 OBJECTTABLE1_12		= 0x12		// Object address 0x025af6 = Unused LBZ platform effected by a flag
+constant u8 OBJECTTABLE1_13		= 0x13		// Object address 0x025cbe = LBZ Wall Trigger controlling some bridges and gates
+constant u8 OBJECTTABLE1_14		= 0x14		// Object address 0x025f6a = LBZ Bridge controlled by wall trigger
 constant u8 OBJECTTABLE1_15		= 0x15		// Object address 0x026130 = LBZ Spring Booster (object 1)
 constant u8 OBJECTTABLE1_16		= 0x16		// Object address 0x0263d2 = LBZ Flame Thrower
 constant u8 OBJECTTABLE1_17		= 0x17		// Object address 0x0264c0 = LBZ Ride Grapple
 constant u8 OBJECTTABLE1_18		= 0x18		// Object address 0x02694e = LBZ Cup Elevator
 constant u8 OBJECTTABLE1_19		= 0x19		// Object address 0x027096 = LBZ Cup ELevator Pole
-constant u8 OBJECTTABLE1_1a		= 0x1a		// Object address 0x027106 = Unused?
+constant u8 OBJECTTABLE1_1a		= 0x1a		// Object address 0x027106 = Unused LBZ Tilting Bridge, controllable by player 2
 constant u8 OBJECTTABLE1_1b		= 0x1b		// Object address 0x0273e4 = LBZ Pipe Wall
 constant u8 OBJECTTABLE1_1c		= 0x1c		// Object address 0x01a51a = Unused (points to ring)
-constant u8 OBJECTTABLE1_1d		= 0x1d		// Object address 0x025368 = Unused?
+constant u8 OBJECTTABLE1_1d		= 0x1d		// Object address 0x025368 = Unused LBZ hang platform
 constant u8 OBJECTTABLE1_1e		= 0x1e		// Object address 0x028db8 = LBZ Spin Launcher
 constant u8 OBJECTTABLE1_1f		= 0x1f		// Object address 0x029020 = LBZ Grapple
 constant u8 OBJECTTABLE1_20		= 0x20		// Object address 0x029216 = Crusher
 constant u8 OBJECTTABLE1_21		= 0x21		// Object address 0x029338 = LBZ Laser Gate
-constant u8 OBJECTTABLE1_22		= 0x22		// Object address 0x029446 = LBZ Flybot
-constant u8 OBJECTTABLE1_23		= 0x23		// Object address 0x029518 = Unused?
+constant u8 OBJECTTABLE1_22		= 0x22		// Object address 0x029446 = LBZ Flybot Siren
+constant u8 OBJECTTABLE1_23		= 0x23		// Object address 0x029518 = Unused invisible object, forces player falling animation on contact
 constant u8 OBJECTTABLE1_24		= 0x24		// Object address 0x0295d0 = LBZ Booster Tube
 constant u8 OBJECTTABLE1_25		= 0x25		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_26		= 0x26		// Object address 0x01e7e2 = Auto-spin object
-constant u8 OBJECTTABLE1_27		= 0x27		// Object address 0x01eb36 = Unused?
+constant u8 OBJECTTABLE1_27		= 0x27		// Object address 0x01eb36 = Unused lava collision from Sonic 2
 constant u8 OBJECTTABLE1_28		= 0x28		// Object address 0x01ec18 = Non-damaging Blocker Element
-constant u8 OBJECTTABLE1_29		= 0x29		// Object address 0x02a252 = AIZ Waterfall Rock
+constant u8 OBJECTTABLE1_29		= 0x29		// Object address 0x02a252 = AIZ Waterfall Disappearing Rock platform
 constant u8 OBJECTTABLE1_2a		= 0x2a		// Object address 0x02a3d0 = Corkfloor
 constant u8 OBJECTTABLE1_2b		= 0x2b		// Object address 0x02a94c = AIZ Flip Bridge
 constant u8 OBJECTTABLE1_2c		= 0x2c		// Object address 0x02acdc = AIZ Collapsing Bridge
@@ -212,160 +213,160 @@ constant u8 OBJECTTABLE1_33		= 0x33		// Object address 0x02c518 = Button
 constant u8 OBJECTTABLE1_34		= 0x34		// Object address 0x02cfa8 = Checkpoint / Starpost
 constant u8 OBJECTTABLE1_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Ferns
 constant u8 OBJECTTABLE1_36		= 0x36		// Object address 0x01ed26 = HCZ Breakable Bar
-constant u8 OBJECTTABLE1_37		= 0x37		// Object address 0x02fda4 = -- hcz1_firstpool.lemon
-constant u8 OBJECTTABLE1_38		= 0x38		// Object address 0x030580 = -- hcz_fan.lemon
-constant u8 OBJECTTABLE1_39		= 0x39		// Object address 0x0308fa = -- hcz_fan.lemon
-constant u8 OBJECTTABLE1_3a		= 0x3a		// Object address 0x030ad0 = -- hcz_handlauncher.lemon
-constant u8 OBJECTTABLE1_3b		= 0x3b		// Object address 0x02fef6 = -- hcz_waterpipe.lemon
-constant u8 OBJECTTABLE1_3c		= 0x3c		// Object address 0x030e24 = -- cnz_trapdoor.lemon
-constant u8 OBJECTTABLE1_3d		= 0x3d		// Object address 0x0239e4 = -- fbz_flippedspring.lemon
-constant u8 OBJECTTABLE1_3e		= 0x3e		// Object address 0x031164 = -- hcz_conveyorbelt.lemon
-constant u8 OBJECTTABLE1_3f		= 0x3f		// Object address 0x031502 = -- hcz_conveyorbelt.lemon
-constant u8 OBJECTTABLE1_40		= 0x40		// Object address 0x01f392 = -- hcz_blocks.lemon
-constant u8 OBJECTTABLE1_41		= 0x41		// Object address 0x031704 = -- cnz_balloon.lemon
-constant u8 OBJECTTABLE1_42		= 0x42		// Object address 0x0318a4 = -- cnz_cannon.lemon
-constant u8 OBJECTTABLE1_43		= 0x43		// Object address 0x031b9e = -- cnz_inflatingplatform.lemon
-constant u8 OBJECTTABLE1_44		= 0x44		// Object address 0x031c9e = -- cnz_helix.lemon
+constant u8 OBJECTTABLE1_37		= 0x37		// Object address 0x02fda4 = HCZ1 Water Current in the first pool
+constant u8 OBJECTTABLE1_38		= 0x38		// Object address 0x030580 = Propelling fans from HCZ and CGZ
+constant u8 OBJECTTABLE1_39		= 0x39		// Object address 0x0308fa = HCZ large fan in water current
+constant u8 OBJECTTABLE1_3a		= 0x3a		// Object address 0x030ad0 = HCZ Hand Launcher
+constant u8 OBJECTTABLE1_3b		= 0x3b		// Object address 0x02fef6 = HCZ1 Water Geyser
+constant u8 OBJECTTABLE1_3c		= 0x3c		// Object address 0x030e24 = Trapdoor (used in HCZ, CNZ and DEZ)
+constant u8 OBJECTTABLE1_3d		= 0x3d		// Object address 0x0239e4 = FBZ2 Retracting Spring
+constant u8 OBJECTTABLE1_3e		= 0x3e		// Object address 0x031164 = HCZ Conveyor Belt
+constant u8 OBJECTTABLE1_3f		= 0x3f		// Object address 0x031502 = Spike on HCZ Conveyor Belt
+constant u8 OBJECTTABLE1_40		= 0x40		// Object address 0x01f392 = HCZ Solid Block. Usually pieced together to form horizontal groups
+constant u8 OBJECTTABLE1_41		= 0x41		// Object address 0x031704 = CNZ Balloon
+constant u8 OBJECTTABLE1_42		= 0x42		// Object address 0x0318a4 = CNZ Cannon
+constant u8 OBJECTTABLE1_43		= 0x43		// Object address 0x031b9e = CNZ inflating Platform
+constant u8 OBJECTTABLE1_44		= 0x44		// Object address 0x031c9e = CNZ trapdoor ejecting player from helix
 constant u8 OBJECTTABLE1_45		= 0x45		// Object address 0x031d3a = Lightbulb in CNZ2's lights out cutscene
-constant u8 OBJECTTABLE1_46		= 0x46		// Object address 0x031d90 = -- cnz_fan.lemon
-constant u8 OBJECTTABLE1_47		= 0x47		// Object address 0x0320f2 = -- cnz_barrel.lemon
-constant u8 OBJECTTABLE1_48		= 0x48		// Object address 0x031f30 = -- cnz_magneticbarrier.lemon
-constant u8 OBJECTTABLE1_49		= 0x49		// Object address 0x0328c4 = -- cnz_wheel.lemon
-constant u8 OBJECTTABLE1_4a		= 0x4a		// Object address 0x032df2 = -- roundbumper.lemon
-constant u8 OBJECTTABLE1_4b		= 0x4b		// Object address 0x032990 = -- cnz_bouncepad.lemon
-constant u8 OBJECTTABLE1_4c		= 0x4c		// Object address 0x0330c8 = -- cnz_helix.lemon
-constant u8 OBJECTTABLE1_4d		= 0x4d		// Object address 0x033360 = -- cnz_barberpole.lemon
-constant u8 OBJECTTABLE1_4e		= 0x4e		// Object address 0x033836 = -- cnz_verticalcylinder.lemon
-constant u8 OBJECTTABLE1_4f		= 0x4f		// Object address 0x032a78 = -- mgz_tarpit.lemon
-constant u8 OBJECTTABLE1_50		= 0x50		// Object address 0x033c74 = -- mgz_spiralrun.lemon
+constant u8 OBJECTTABLE1_46		= 0x46		// Object address 0x031d90 = CNZ hover fans
+constant u8 OBJECTTABLE1_47		= 0x47		// Object address 0x0320f2 = CNZ rotating barrels
+constant u8 OBJECTTABLE1_48		= 0x48		// Object address 0x031f30 = CNZ magnet tubes
+constant u8 OBJECTTABLE1_49		= 0x49		// Object address 0x0328c4 = CNZ rotating wheel
+constant u8 OBJECTTABLE1_4a		= 0x4a		// Object address 0x032df2 = Bumper
+constant u8 OBJECTTABLE1_4b		= 0x4b		// Object address 0x032990 = CNZ sawtooth-shaped bumpers on floors and ceilings
+constant u8 OBJECTTABLE1_4c		= 0x4c		// Object address 0x0330c8 = CNZ Helix tubes
+constant u8 OBJECTTABLE1_4d		= 0x4d		// Object address 0x033360 = CNZ Spiraling Diagonal Barber Pole
+constant u8 OBJECTTABLE1_4e		= 0x4e		// Object address 0x033836 = CNZ Vertical rotating cylinder mesh
+constant u8 OBJECTTABLE1_4f		= 0x4f		// Object address 0x032a78 = Tarpit from MGZ and ALZ and quicksand from DPZ
+constant u8 OBJECTTABLE1_50		= 0x50		// Object address 0x033c74 = MGZ spiraling pole
 constant u8 OBJECTTABLE1_51		= 0x51		// Object address 0x025506 = Moving Platform
 constant u8 OBJECTTABLE1_52		= 0x52		// Object address 0x029216 = Crusher
-constant u8 OBJECTTABLE1_53		= 0x53		// Object address 0x033f84 = -- mgz_platformwheel.lemon
-constant u8 OBJECTTABLE1_54		= 0x54		// Object address 0x02f938 = Air Bubble
-constant u8 OBJECTTABLE1_55		= 0x55		// Object address 0x034302 = -- mgz_reliefhead.lemon
-constant u8 OBJECTTABLE1_56		= 0x56		// Object address 0x0346e2 = -- mgz_movingtotem.lemon
-constant u8 OBJECTTABLE1_57		= 0x57		// Object address 0x034574 = -- mgz_triggeredplatform.lemon
-constant u8 OBJECTTABLE1_58		= 0x58		// Object address 0x0340cc = -- mgz_chainspikeball.lemon
-constant u8 OBJECTTABLE1_59		= 0x59		// Object address 0x025d54 = -- mgz_spinwheeltrigger.lemon
-constant u8 OBJECTTABLE1_5a		= 0x5a		// Object address 0x034800 = -- mgz_yoyo.lemon
-constant u8 OBJECTTABLE1_5b		= 0x5b		// Object address 0x034bf8 = -- mgz_spinningtop.lemon
-constant u8 OBJECTTABLE1_5c		= 0x5c		// Object address 0x03598e = -- mgz_spinningtop.lemon
-constant u8 OBJECTTABLE1_5d		= 0x5d		// Object address 0x032c6a = Competition mode object
-constant u8 OBJECTTABLE1_5e		= 0x5e		// Object address 0x035a7a = Competition mode object
-constant u8 OBJECTTABLE1_5f		= 0x5f		// Object address 0x023b38 = Competition mode object
-constant u8 OBJECTTABLE1_60		= 0x60		// Object address 0x035bf8 = Competition mode object
-constant u8 OBJECTTABLE1_61		= 0x61		// Object address 0x035d80 = Competition mode object
-constant u8 OBJECTTABLE1_62		= 0x62		// Object address 0x035f3a = Competition mode object
-constant u8 OBJECTTABLE1_63		= 0x63		// Object address 0x0362a2 = Competition mode object
-constant u8 OBJECTTABLE1_64		= 0x64		// Object address 0x036364 = Competition mode object
-constant u8 OBJECTTABLE1_65		= 0x65		// Object address 0x036be0 = Competition mode object
-constant u8 OBJECTTABLE1_66		= 0x66		// Object address 0x0380f8 = Competition mode object
-constant u8 OBJECTTABLE1_67		= 0x67		// Object address 0x0256be = -- hcz_snakeblocks.lemon
-constant u8 OBJECTTABLE1_68		= 0x68		// Object address 0x032656 = -- hcz_rotatingpillar.lemon
-constant u8 OBJECTTABLE1_69		= 0x69		// Object address 0x03907c = -- hcz_corkscrewslide.lemon
+constant u8 OBJECTTABLE1_53		= 0x53		// Object address 0x033f84 = MGZ Platform Wheel
+constant u8 OBJECTTABLE1_54		= 0x54		// Object address 0x02f938 = Air Bubble spawner
+constant u8 OBJECTTABLE1_55		= 0x55		// Object address 0x034302 = MGZ Relief Head
+constant u8 OBJECTTABLE1_56		= 0x56		// Object address 0x0346e2 = MGZ Moving Rotating Spiked Totem Platform
+constant u8 OBJECTTABLE1_57		= 0x57		// Object address 0x034574 = MGZ Triggered Rising Platform from the blue wheel
+constant u8 OBJECTTABLE1_58		= 0x58		// Object address 0x0340cc = MGZ Swinging chained spike ball
+constant u8 OBJECTTABLE1_59		= 0x59		// Object address 0x025d54 = MGZ Blue Wheel triggered by Spin Dash
+constant u8 OBJECTTABLE1_5a		= 0x5a		// Object address 0x034800 = MGZ Yoyo Pulley
+constant u8 OBJECTTABLE1_5b		= 0x5b		// Object address 0x034bf8 = MGZ Blue Spinning Top
+constant u8 OBJECTTABLE1_5c		= 0x5c		// Object address 0x03598e = MGZ launcher and stand for the blue spinning top
+constant u8 OBJECTTABLE1_5d		= 0x5d		// Object address 0x032c6a = Competition mode object - CGZ Triangular Bumpers
+constant u8 OBJECTTABLE1_5e		= 0x5e		// Object address 0x035a7a = Competition mode object - CGZ Platform with blades at the bottom
+constant u8 OBJECTTABLE1_5f		= 0x5f		// Object address 0x023b38 = Competition mode object - Retracting Spring
+constant u8 OBJECTTABLE1_60		= 0x60		// Object address 0x035bf8 = Competition mode object - BPZ Elephant Block
+constant u8 OBJECTTABLE1_61		= 0x61		// Object address 0x035d80 = Competition mode object - BPZ Balloon
+constant u8 OBJECTTABLE1_62		= 0x62		// Object address 0x035f3a = Competition mode object - DPZ Collapsing Sand Platform
+constant u8 OBJECTTABLE1_63		= 0x63		// Object address 0x0362a2 = Competition mode object - DPZ Button
+constant u8 OBJECTTABLE1_64		= 0x64		// Object address 0x036364 = Competition mode object - Bubble containing item
+constant u8 OBJECTTABLE1_65		= 0x65		// Object address 0x036be0 = Competition mode object - Goal Marker
+constant u8 OBJECTTABLE1_66		= 0x66		// Object address 0x0380f8 = Competition mode object - EMZ Water Drop
+constant u8 OBJECTTABLE1_67		= 0x67		// Object address 0x0256be = HCZ2 Snake Blocks
+constant u8 OBJECTTABLE1_68		= 0x68		// Object address 0x032656 = HCZ Spinning Blue Pillar
+constant u8 OBJECTTABLE1_69		= 0x69		// Object address 0x03907c = HCZ2 Twisting Water Slide
 constant u8 OBJECTTABLE1_6a		= 0x6a		// Object address 0x01f3f8 = Damaging Blocker Element
 constant u8 OBJECTTABLE1_6b		= 0x6b		// Object address 0x01f5a0 = Killing Blocker Element
 constant u8 OBJECTTABLE1_6c		= 0x6c		// Object address 0x038688 = Bridge
 constant u8 OBJECTTABLE1_6d		= 0x6d		// Object address 0x0383bc = HCZ Run-on-water Handler
 constant u8 OBJECTTABLE1_6e		= 0x6e		// Object address 0x03827c = HCZ Water Drop
-constant u8 OBJECTTABLE1_6f		= 0x6f		// Object address 0x039f2e = -- fbz_spinningcylinder.lemon
-constant u8 OBJECTTABLE1_70		= 0x70		// Object address 0x03a23a = -- fbz_staticcylinder.lemon
-constant u8 OBJECTTABLE1_71		= 0x71		// Object address 0x03a580 = -- fbz_propellerplatform.lemon
-constant u8 OBJECTTABLE1_72		= 0x72		// Object address 0x03a7cc = -- fbz_monkeybars.lemon
-constant u8 OBJECTTABLE1_73		= 0x73		// Object address 0x03b0e2 = -- fbz_spikedball.lemon
-constant u8 OBJECTTABLE1_74		= 0x74		// Object address 0x03b2f6 = -- fbz_chainlinkplatform.lemon
-constant u8 OBJECTTABLE1_75		= 0x75		// Object address 0x03b534 = -- fbz_snakeplatform.lemon
-constant u8 OBJECTTABLE1_76		= 0x76		// Object address 0x03b6de = -- fbz_snakeplatform.lemon
-constant u8 OBJECTTABLE1_77		= 0x77		// Object address 0x03b766 = -- fbz_snakeplatform.lemon
-constant u8 OBJECTTABLE1_78		= 0x78		// Object address 0x03b934 = -- playerlauncher.lemon
-constant u8 OBJECTTABLE1_79		= 0x79		// Object address 0x03bab2 = -- fbz_ventilationplatform.lemon
-constant u8 OBJECTTABLE1_7a		= 0x7a		// Object address 0x03bbee = -- fbz_screwdoor.lemon
-constant u8 OBJECTTABLE1_7b		= 0x7b		// Object address 0x03bf56 = -- fbz_verticalpropeller.lemon
-constant u8 OBJECTTABLE1_7c		= 0x7c		// Object address 0x03c1a6 = -- fbz_verticalpropeller.lemon
-constant u8 OBJECTTABLE1_7d		= 0x7d		// Object address 0x03c25c = -- fbz_goldenbullet.lemon
-constant u8 OBJECTTABLE1_7e		= 0x7e		// Object address 0x03c34c = -- fbz_platformblock.lemon
-constant u8 OBJECTTABLE1_7f		= 0x7f		// Object address 0x03c462 = -- fbz_parachutebombs.lemon
-constant u8 OBJECTTABLE1_80		= 0x80		// Object address 0x0836e0 = Hidden monitor
-constant u8 OBJECTTABLE1_81		= 0x81		// Object address 0x086540 = Capsule
+constant u8 OBJECTTABLE1_6f		= 0x6f		// Object address 0x039f2e = FBZ Horizontal Rotating Cylinder Mesh
+constant u8 OBJECTTABLE1_70		= 0x70		// Object address 0x03a23a = FBZ Vertical Static Cylinder Mesh
+constant u8 OBJECTTABLE1_71		= 0x71		// Object address 0x03a580 = FBZ Floating Platform with propeller
+constant u8 OBJECTTABLE1_72		= 0x72		// Object address 0x03a7cc = FBZ Monkey Bars
+constant u8 OBJECTTABLE1_73		= 0x73		// Object address 0x03b0e2 = FBZ Magnetic Ceiling Panel
+constant u8 OBJECTTABLE1_74		= 0x74		// Object address 0x03b2f6 = FBZ Magnetic Spiked Platform And Chain
+constant u8 OBJECTTABLE1_75		= 0x75		// Object address 0x03b534 = FBZ Snake Platform Spheres in a chain
+constant u8 OBJECTTABLE1_76		= 0x76		// Object address 0x03b6de = FBZ L-shaped pipe for snake platform
+constant u8 OBJECTTABLE1_77		= 0x77		// Object address 0x03b766 = FBZ Orbiting Sphere Chain
+constant u8 OBJECTTABLE1_78		= 0x78		// Object address 0x03b934 = Player Launcher in FBZ and DEZ
+constant u8 OBJECTTABLE1_79		= 0x79		// Object address 0x03bab2 = FBZ Accordion Ventilation Platform
+constant u8 OBJECTTABLE1_7a		= 0x7a		// Object address 0x03bbee = FBZ Screw-Shaped Door
+constant u8 OBJECTTABLE1_7b		= 0x7b		// Object address 0x03bf56 = FBZ Rotating Fan Pole
+constant u8 OBJECTTABLE1_7c		= 0x7c		// Object address 0x03c1a6 = FBZ Propeller Blades on fan pole
+constant u8 OBJECTTABLE1_7d		= 0x7d		// Object address 0x03c25c = FBZ1 giant golden bullet-shaped piston
+constant u8 OBJECTTABLE1_7e		= 0x7e		// Object address 0x03c34c = FBZ Horizontal Gate Blocks
+constant u8 OBJECTTABLE1_7f		= 0x7f		// Object address 0x03c462 = FBZ Parachute Missile Launcher
+constant u8 OBJECTTABLE1_80		= 0x80		// Object address 0x0836e0 = Hidden monitors
+constant u8 OBJECTTABLE1_81		= 0x81		// Object address 0x086540 = Egg Capsule
 constant u8 OBJECTTABLE1_82		= 0x82		// Object address 0x061d4c = Cutscene Knuckles
 constant u8 OBJECTTABLE1_83		= 0x83		// Object address 0x065bd4 = Buttons for Cutscene Knuckles
 constant u8 OBJECTTABLE1_84		= 0x84		// Object address 0x067472 = Cutscene Sonic in intro
 constant u8 OBJECTTABLE1_85		= 0x85		// Object address 0x06166a = Giant Ring
-constant u8 OBJECTTABLE1_86		= 0x86		// Object address 0x060c56 = -- gm_trigger.lemon
-constant u8 OBJECTTABLE1_87		= 0x87		// Object address 0x060f2e = -- gm_bouncepad.lemon
-constant u8 OBJECTTABLE1_88		= 0x88		// Object address 0x065d16 = -- cnz2_knuckles_lights_out.lemon
-constant u8 OBJECTTABLE1_89		= 0x89		// Object address 0x065d6e = -- cnz2_knuckles_lights_out.lemon
-constant u8 OBJECTTABLE1_8a		= 0x8a		// Object address 0x086cf6 = -- boss_fbz2.lemon
+constant u8 OBJECTTABLE1_86		= 0x86		// Object address 0x060c56 = Gumball Machine from gumball bonus stage. Also initializes all other sprites
+constant u8 OBJECTTABLE1_87		= 0x87		// Object address 0x060f2e = Bumpers on the walls of the gumball bonus stage
+constant u8 OBJECTTABLE1_88		= 0x88		// Object address 0x065d16 = Breakable Floor from CNZ2 that controls water level
+constant u8 OBJECTTABLE1_89		= 0x89		// Object address 0x065d6e = CNZ2 Light Switch Button
+constant u8 OBJECTTABLE1_8a		= 0x8a		// Object address 0x086cf6 = Doors and windows in FBZ2 end cutscene
 constant u8 OBJECTTABLE1_8b		= 0x8b		// Object address 0x0862ae = Sprite Mask Object
-constant u8 OBJECTTABLE1_8c		= 0x8c		// Object address 0x086d6a = -- aiz_bloominator.lemon
-constant u8 OBJECTTABLE1_8d		= 0x8d		// Object address 0x086e56 = -- aiz_rhinobot.lemon
-constant u8 OBJECTTABLE1_8e		= 0x8e		// Object address 0x087156 = -- aiz_monkeydude.lemon
-constant u8 OBJECTTABLE1_8f		= 0x8f		// Object address 0x0876ca = -- aiz_catakillerjr.lemon
-constant u8 OBJECTTABLE1_90		= 0x90		// Object address 0x0684ec = -- aiz1_transition_cutscene.lemon
-constant u8 OBJECTTABLE1_91		= 0x91		// Object address 0x068a24 = -- boss_aiz1.lemon
-constant u8 OBJECTTABLE1_92		= 0x92		// Object address 0x0691a8 = -- boss_aiz2.lemon
-constant u8 OBJECTTABLE1_93		= 0x93		// Object address 0x0878b2 = -- hcz_jawz.lemon
-constant u8 OBJECTTABLE1_94		= 0x94		// Object address 0x087928 = -- hcz_blastoid.lemon
-constant u8 OBJECTTABLE1_95		= 0x95		// Object address 0x087a24 = -- hcz_bugernaut.lemon
-constant u8 OBJECTTABLE1_96		= 0x96		// Object address 0x087bc4 = -- hcz_turbospiker.lemon
-constant u8 OBJECTTABLE1_97		= 0x97		// Object address 0x087f56 = -- hcz_piranha.lemon
-constant u8 OBJECTTABLE1_98		= 0x98		// Object address 0x08827c = -- hcz_pointdexter.lemon
-constant u8 OBJECTTABLE1_99		= 0x99		// Object address 0x069ea0 = -- boss_hcz1.lemon
-constant u8 OBJECTTABLE1_9a		= 0x9a		// Object address 0x06aeb6 = -- boss_hcz2.lemon
-constant u8 OBJECTTABLE1_9b		= 0x9b		// Object address 0x088336 = -- mgz_bubbles.lemon
-constant u8 OBJECTTABLE1_9c		= 0x9c		// Object address 0x088b96 = -- mgz_spiker.lemon
-constant u8 OBJECTTABLE1_9d		= 0x9d		// Object address 0x088e60 = -- mgz_mantis.lemon
-constant u8 OBJECTTABLE1_9e		= 0x9e		// Object address 0x08845a = -- mgz_driller.lemon
-constant u8 OBJECTTABLE1_9f		= 0x9f		// Object address 0x088568 = -- boss_mgz1.lemon
-constant u8 OBJECTTABLE1_a0		= 0xa0		// Object address 0x06bf2a = -- mgz_robotnikencounters.lemon
-constant u8 OBJECTTABLE1_a1		= 0xa1		// Object address 0x06c31a = -- boss_mgz2.lemon
-constant u8 OBJECTTABLE1_a2		= 0xa2		// Object address 0x06c698 = -- boss_mgz2_knuckles.lemon
-constant u8 OBJECTTABLE1_a3		= 0xa3		// Object address 0x088fb4 = -- cnz_clamer.lemon
-constant u8 OBJECTTABLE1_a4		= 0xa4		// Object address 0x089198 = -- cnz_sparkle.lemon
-constant u8 OBJECTTABLE1_a5		= 0xa5		// Object address 0x089376 = -- cnz_batbot.lemon
-constant u8 OBJECTTABLE1_a6		= 0xa6		// Object address 0x06d99c = -- boss_cnz1.lemon
-constant u8 OBJECTTABLE1_a7		= 0xa7		// Object address 0x06e47e = -- boss_cnz2.lemon
-constant u8 OBJECTTABLE1_a8		= 0xa8		// Object address 0x08948e = -- fbz_blaster.lemon
-constant u8 OBJECTTABLE1_a9		= 0xa9		// Object address 0x089820 = -- fbz_technosqueek.lemon
-constant u8 OBJECTTABLE1_aa		= 0xaa		// Object address 0x06ee68 = -- boss_fbz1.lemon
-constant u8 OBJECTTABLE1_ab		= 0xab		// Object address 0x06fd0c = -- boss_fbz2_mid.lemon
-constant u8 OBJECTTABLE1_ac		= 0xac		// Object address 0x0705ea = -- boss_fbz2.lemon
-constant u8 OBJECTTABLE1_ad		= 0xad		// Object address 0x08bade = -- icz_penguin.lemon
-constant u8 OBJECTTABLE1_ae		= 0xae		// Object address 0x08be2e = -- icz_starpointer.lemon
-constant u8 OBJECTTABLE1_af		= 0xaf		// Object address 0x08a44a = -- icz_hugeblock.lemon
-constant u8 OBJECTTABLE1_b0		= 0xb0		// Object address 0x089f32 = -- icz_floatingplatform.lemon
-constant u8 OBJECTTABLE1_b1		= 0xb1		// Object address 0x08a26c = -- icz_icewall.lemon
-constant u8 OBJECTTABLE1_b2		= 0xb2		// Object address 0x08a640 = -- icz_freezer.lemon
-constant u8 OBJECTTABLE1_b3		= 0xb3		// Object address 0x08ab4e = -- icz_iceblocktower.lemon
-constant u8 OBJECTTABLE1_b4		= 0xb4		// Object address 0x08ad04 = -- icz_swingingplatform.lemon
-constant u8 OBJECTTABLE1_b5		= 0xb5		// Object address 0x08b194 = -- icz_largeicicle.lemon
-constant u8 OBJECTTABLE1_b6		= 0xb6		// Object address 0x08b36c = -- icz_iceblock.lemon
+constant u8 OBJECTTABLE1_8c		= 0x8c		// Object address 0x086d6a = AIZ Bloominator
+constant u8 OBJECTTABLE1_8d		= 0x8d		// Object address 0x086e56 = AIZ Rhinobot
+constant u8 OBJECTTABLE1_8e		= 0x8e		// Object address 0x087156 = AIZ Monkey Dude
+constant u8 OBJECTTABLE1_8f		= 0x8f		// Object address 0x0876ca = AIZ Catakiller Jr.
+constant u8 OBJECTTABLE1_90		= 0x90		// Object address 0x0684ec = AIZ1 Boss first cutscene, sets the level on fire
+constant u8 OBJECTTABLE1_91		= 0x91		// Object address 0x068a24 = AIZ1 Boss
+constant u8 OBJECTTABLE1_92		= 0x92		// Object address 0x0691a8 = AIZ2 Boss
+constant u8 OBJECTTABLE1_93		= 0x93		// Object address 0x0878b2 = HCZ Jawz
+constant u8 OBJECTTABLE1_94		= 0x94		// Object address 0x087928 = HCZ Blastoid
+constant u8 OBJECTTABLE1_95		= 0x95		// Object address 0x087a24 = HCZ Buggernaut
+constant u8 OBJECTTABLE1_96		= 0x96		// Object address 0x087bc4 = HCZ Turbo Spiker
+constant u8 OBJECTTABLE1_97		= 0x97		// Object address 0x087f56 = HCZ Mega Chopper (Piranha)
+constant u8 OBJECTTABLE1_98		= 0x98		// Object address 0x08827c = HCZ Pointdexter
+constant u8 OBJECTTABLE1_99		= 0x99		// Object address 0x069ea0 = HCZ1 Boss
+constant u8 OBJECTTABLE1_9a		= 0x9a		// Object address 0x06aeb6 = HCZ2 Boss
+constant u8 OBJECTTABLE1_9b		= 0x9b		// Object address 0x088336 = MGZ Bubbles badnik
+constant u8 OBJECTTABLE1_9c		= 0x9c		// Object address 0x088b96 = MGZ Spiker badnik
+constant u8 OBJECTTABLE1_9d		= 0x9d		// Object address 0x088e60 = MGZ Mantis
+constant u8 OBJECTTABLE1_9e		= 0x9e		// Object address 0x08845a = MGZ1 Driller
+constant u8 OBJECTTABLE1_9f		= 0x9f		// Object address 0x088568 = MGZ1 Boss
+constant u8 OBJECTTABLE1_a0		= 0xa0		// Object address 0x06bf2a = MGZ2 Drilling Eggman cutscenes
+constant u8 OBJECTTABLE1_a1		= 0xa1		// Object address 0x06c31a = MGZ2 Boss
+constant u8 OBJECTTABLE1_a2		= 0xa2		// Object address 0x06c698 = MGZ2 Knuckles' boss
+constant u8 OBJECTTABLE1_a3		= 0xa3		// Object address 0x088fb4 = CNZ Clamer
+constant u8 OBJECTTABLE1_a4		= 0xa4		// Object address 0x089198 = CNZ Sparkle badnik
+constant u8 OBJECTTABLE1_a5		= 0xa5		// Object address 0x089376 = CNZ Batbot
+constant u8 OBJECTTABLE1_a6		= 0xa6		// Object address 0x06d99c = CNZ1 Boss
+constant u8 OBJECTTABLE1_a7		= 0xa7		// Object address 0x06e47e = CNZ2 Boss
+constant u8 OBJECTTABLE1_a8		= 0xa8		// Object address 0x08948e = FBZ Blaster badnik
+constant u8 OBJECTTABLE1_a9		= 0xa9		// Object address 0x089820 = FBZ Technosqueek
+constant u8 OBJECTTABLE1_aa		= 0xaa		// Object address 0x06ee68 = FBZ1 Boss
+constant u8 OBJECTTABLE1_ab		= 0xab		// Object address 0x06fd0c = FBZ2 Mid-Boss
+constant u8 OBJECTTABLE1_ac		= 0xac		// Object address 0x0705ea = FBZ2 Boss
+constant u8 OBJECTTABLE1_ad		= 0xad		// Object address 0x08bade = ICZ Penguinator
+constant u8 OBJECTTABLE1_ae		= 0xae		// Object address 0x08be2e = ICZ Star Pointer badnik
+constant u8 OBJECTTABLE1_af		= 0xaf		// Object address 0x08a44a = ICZ Huge Crushing Pillar Block
+constant u8 OBJECTTABLE1_b0		= 0xb0		// Object address 0x089f32 = ICZ Floating Platform
+constant u8 OBJECTTABLE1_b1		= 0xb1		// Object address 0x08a26c = ICZ Breakable Wall 
+constant u8 OBJECTTABLE1_b2		= 0xb2		// Object address 0x08a640 = ICZ Freezer Cloud Thrower
+constant u8 OBJECTTABLE1_b3		= 0xb3		// Object address 0x08ab4e = ICZ Segmented Ice Tower
+constant u8 OBJECTTABLE1_b4		= 0xb4		// Object address 0x08ad04 = ICZ Swinging Platform
+constant u8 OBJECTTABLE1_b5		= 0xb5		// Object address 0x08b194 = ICZ Stalactite
+constant u8 OBJECTTABLE1_b6		= 0xb6		// Object address 0x08b36c = ICZ Ice Cube covering monitors and switches
 constant u8 OBJECTTABLE1_b7		= 0xb7		// Object address 0x08b2a0 = ICZ Icicles
 constant u8 OBJECTTABLE1_b8		= 0xb8		// Object address 0x08b4ca = ICZ Ice Crystal
-constant u8 OBJECTTABLE1_b9		= 0xb9		// Object address 0x08b550 = ICZ Snow
+constant u8 OBJECTTABLE1_b9		= 0xb9		// Object address 0x08b550 = ICZ Snow Pile
 constant u8 OBJECTTABLE1_ba		= 0xba		// Object address 0x08b89a = ICZ Trampoline
-constant u8 OBJECTTABLE1_bb		= 0xbb		// Object address 0x08a330 = ICZ White Block (next to trampoline)
-constant u8 OBJECTTABLE1_bc		= 0xbc		// Object address 0x071162 = ICZ 1 Boss
-constant u8 OBJECTTABLE1_bd		= 0xbd		// Object address 0x071bce = ICZ 2 Boss
+constant u8 OBJECTTABLE1_bb		= 0xbb		// Object address 0x08a330 = ICZ White Block (support next to trampoline)
+constant u8 OBJECTTABLE1_bc		= 0xbc		// Object address 0x071162 = ICZ1 Boss
+constant u8 OBJECTTABLE1_bd		= 0xbd		// Object address 0x071bce = ICZ2 Boss
 constant u8 OBJECTTABLE1_be		= 0xbe		// Object address 0x08bfae = LBZ Snailblaster
 constant u8 OBJECTTABLE1_bf		= 0xbf		// Object address 0x08c2e2 = LBZ Ribot
 constant u8 OBJECTTABLE1_c0		= 0xc0		// Object address 0x08c632 = LBZ Orbinaut
 constant u8 OBJECTTABLE1_c1		= 0xc1		// Object address 0x08c728 = LBZ Corkey
 constant u8 OBJECTTABLE1_c2		= 0xc2		// Object address 0x08c966 = LBZ Flybot
-constant u8 OBJECTTABLE1_c3		= 0xc3		// Object address 0x08cb56 = -- lbz1_pre_boss_cutscene.lemon
-constant u8 OBJECTTABLE1_c4		= 0xc4		// Object address 0x08cdb8 = -- lbz1_pre_boss_cutscene.lemon
-constant u8 OBJECTTABLE1_c5		= 0xc5		// Object address 0x08cf80 = -- boss_lbz1.lemon
-constant u8 OBJECTTABLE1_c6		= 0xc6		// Object address 0x08d29c = -- lbz2_mid_boss_cutscene.lemon
+constant u8 OBJECTTABLE1_c3		= 0xc3		// Object address 0x08cb56 = LBZ1 Eggman
+constant u8 OBJECTTABLE1_c4		= 0xc4		// Object address 0x08cdb8 = LBZ1 Boss containment box. when player restarts at the checkpoint
+constant u8 OBJECTTABLE1_c5		= 0xc5		// Object address 0x08cf80 = LBZ1 Knuckles' Boss containment box
+constant u8 OBJECTTABLE1_c6		= 0xc6		// Object address 0x08d29c = LBZ2 Egg Mobile ride to the final boss arena
 constant u8 OBJECTTABLE1_c7		= 0xc7		// Object address 0x01a51a = Unused (points to ring)
-constant u8 OBJECTTABLE1_c8		= 0xc8		// Object address 0x062ac2 = -- lbz2_mid_boss_cutscene.lemon
-constant u8 OBJECTTABLE1_c9		= 0xc9		// Object address 0x0723e0 = -- boss_lbz1.lemon
-constant u8 OBJECTTABLE1_ca		= 0xca		// Object address 0x0729ba = -- boss_lbz2_2.lemon
-constant u8 OBJECTTABLE1_cb		= 0xcb		// Object address 0x0738d6 = -- boss_lbz2_1.lemon
-constant u8 OBJECTTABLE1_cc		= 0xcc		// Object address 0x074262 = -- boss_lbz2_3.lemon
-constant u8 OBJECTTABLE1_cd		= 0xcd		// Object address 0x072ffa = -- boss_lbz2_2.lemon
-constant u8 OBJECTTABLE1_ce		= 0xce		// Object address 0x070c2c = -- boss_fbz2.lemon
-constant u8 OBJECTTABLE1_cf		= 0xcf		// Object address 0x089bdc = FBZ Capsule (object 1)
-constant u8 OBJECTTABLE1_d0		= 0xd0		// Object address 0x089c86 = FBZ Capsule (object 2)
+constant u8 OBJECTTABLE1_c8		= 0xc8		// Object address 0x062ac2 = Girders supporting the Death Egg at the time of launch
+constant u8 OBJECTTABLE1_c9		= 0xc9		// Object address 0x0723e0 = LBZ1 Boss
+constant u8 OBJECTTABLE1_ca		= 0xca		// Object address 0x0729ba = LBZ2 Laser Tower boss
+constant u8 OBJECTTABLE1_cb		= 0xcb		// Object address 0x0738d6 = LBZ2 Ball Machine boss
+constant u8 OBJECTTABLE1_cc		= 0xcc		// Object address 0x074262 = LBZ2 Big Arm boss
+constant u8 OBJECTTABLE1_cd		= 0xcd		// Object address 0x072ffa = LBZ2 Knuckles' Laser Tower boss
+constant u8 OBJECTTABLE1_ce		= 0xce		// Object address 0x070c2c = Door at the Flying Battery 2 end cutscene
+constant u8 OBJECTTABLE1_cf		= 0xcf		// Object address 0x089bdc = FBZ Mid-level Egg Capsule
+constant u8 OBJECTTABLE1_d0		= 0xd0		// Object address 0x089c86 = FBZ Mid-level Egg Capsule button spring
 constant u8 OBJECTTABLE1_d1		= 0xd1		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_d2		= 0xd2		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_d3		= 0xd3		// Object address 0x01a51a = Unused (points to ring)
@@ -381,20 +382,20 @@ constant u8 OBJECTTABLE1_dc		= 0xdc		// Object address 0x01a51a = Unused (points
 constant u8 OBJECTTABLE1_dd		= 0xdd		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_de		= 0xde		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_df		= 0xdf		// Object address 0x01a51a = Unused (points to ring)
-constant u8 OBJECTTABLE1_e0		= 0xe0		// Object address 0x03c7ec = -- fbz_rocketlauncher.lemon
-constant u8 OBJECTTABLE1_e1		= 0xe1		// Object address 0x03c946 = -- fbz_mine.lemon
-constant u8 OBJECTTABLE1_e2		= 0xe2		// Object address 0x03ca1a = -- fbz_windingelevator.lemon
-constant u8 OBJECTTABLE1_e3		= 0xe3		// Object address 0x03cb3a = -- fbz_flippedspring.lemon
-constant u8 OBJECTTABLE1_e4		= 0xe4		// Object address 0x03cc8a = -- fbz_flamethrower.lemon
-constant u8 OBJECTTABLE1_e5		= 0xe5		// Object address 0x03d090 = -- fbz_spider.lemon
-constant u8 OBJECTTABLE1_e6		= 0xe6		// Object address 0x049aae = -- gs_sidebumper.lemon
-constant u8 OBJECTTABLE1_e7		= 0xe7		// Object address 0x049c5e = -- gs_flipper.lemon
-constant u8 OBJECTTABLE1_e8		= 0xe8		// Object address 0x049eee = -- gs_energybeam.lemon
-constant u8 OBJECTTABLE1_e9		= 0xe9		// Object address 0x04a09a = -- gs_energybeam.lemon
-constant u8 OBJECTTABLE1_ea		= 0xea		// Object address 0x04a186 = Unused?
-constant u8 OBJECTTABLE1_eb		= 0xeb		// Object address 0x04a2c6 = Unused?
-constant u8 OBJECTTABLE1_ec		= 0xec		// Object address 0x04a3dc = -- gs_glowingsphere.lemon
-constant u8 OBJECTTABLE1_ed		= 0xed		// Object address 0x04a1e6 = -- gs_bonusbubble.lemon
+constant u8 OBJECTTABLE1_e0		= 0xe0		// Object address 0x03c7ec = FBZ1 Missile Launcher embedded in walls
+constant u8 OBJECTTABLE1_e1		= 0xe1		// Object address 0x03c946 = FBZ Mine
+constant u8 OBJECTTABLE1_e2		= 0xe2		// Object address 0x03ca1a = FBZ Winding Elevator
+constant u8 OBJECTTABLE1_e3		= 0xe3		// Object address 0x03cb3a = FBZ Flipping Spring
+constant u8 OBJECTTABLE1_e4		= 0xe4		// Object address 0x03cc8a = FBZ Flamethrower
+constant u8 OBJECTTABLE1_e5		= 0xe5		// Object address 0x03d090 = FBZ Spider Crane
+constant u8 OBJECTTABLE1_e6		= 0xe6		// Object address 0x049aae = Triangular Wall Bumper from glowing sphere bonus stage
+constant u8 OBJECTTABLE1_e7		= 0xe7		// Object address 0x049c5e = Flipper from glowing sphere bonus stage
+constant u8 OBJECTTABLE1_e8		= 0xe8		// Object address 0x049eee = Energy beam trap from glowing sphere bonus stage
+constant u8 OBJECTTABLE1_e9		= 0xe9		// Object address 0x04a09a = Energy Trap Spheres Segments in the glowing sphere bonus stage
+constant u8 OBJECTTABLE1_ea		= 0xea		// Object address 0x04a186 = Unused Breakout-esque Platform from glowing sphere bonus stage (viewable in debug mode)
+constant u8 OBJECTTABLE1_eb		= 0xeb		// Object address 0x04a2c6 = Unused stationary gumball "F" item from glowing sphere bonus stage (viewable in debug mode)
+constant u8 OBJECTTABLE1_ec		= 0xec		// Object address 0x04a3dc = Gravitational orb from glowing sphere bonus stage
+constant u8 OBJECTTABLE1_ed		= 0xed		// Object address 0x04a1e6 = Item Orb from glowing sphere bonus stage
 constant u8 OBJECTTABLE1_ee		= 0xee		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_ef		= 0xef		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE1_f0		= 0xf0		// Object address 0x01a51a = Unused (points to ring)
@@ -415,104 +416,105 @@ constant u8 OBJECTTABLE1_fe		= 0xfe		// Object address 0x01a51a = Unused (points
 constant u8 OBJECTTABLE1_ff		= 0xff		// Object address 0x03d448 = FBZ Magnetic Pendulum
 
 // Second object table
+// Note: comments on these constants reference significantly from this page: https://info.sonicretro.org/SCHG:Sonic_the_Hedgehog_3_%26_Knuckles/Object_Editing/Pointer_List_2
 constant u8 OBJECTTABLE2_00		= 0x00		// Object address 0x01a51a = Ring
 constant u8 OBJECTTABLE2_01		= 0x01		// Object address 0x01d566 = Monitor
 constant u8 OBJECTTABLE2_02		= 0x02		// Object address 0x01ccae = Path Swapper
 constant u8 OBJECTTABLE2_03		= 0x03		// Object address 0x03dc9c = MHZ Vine Wrap
-constant u8 OBJECTTABLE2_04		= 0x04		// Object address 0x0204fe = Collapsing Cliff
-constant u8 OBJECTTABLE2_05		= 0x05		// Object address 0x01f9e0 = Rocks
+constant u8 OBJECTTABLE2_04		= 0x04		// Object address 0x0204fe = Collapsing Cliff from AIZ and ICZ
+constant u8 OBJECTTABLE2_05		= 0x05		// Object address 0x01f9e0 = Rocks from AIZ, LRZ and EMZ
 constant u8 OBJECTTABLE2_06		= 0x06		// Object address 0x03e23e = MHZ Elevator
 constant u8 OBJECTTABLE2_07		= 0x07		// Object address 0x022d06 = Spring
 constant u8 OBJECTTABLE2_08		= 0x08		// Object address 0x023f84 = Spikes
-constant u8 OBJECTTABLE2_09		= 0x09		// Object address 0x03e836 = -- mhz_curledvine.lemon
-constant u8 OBJECTTABLE2_0a		= 0x0a		// Object address 0x03ea56 = -- mhz_stickyvine.lemon
-constant u8 OBJECTTABLE2_0b		= 0x0b		// Object address 0x03ed1a = -- mhz_horizontalpole.lemon
-constant u8 OBJECTTABLE2_0c		= 0x0c		// Object address 0x03f05a = -- mhz_verticalpole.lemon
-constant u8 OBJECTTABLE2_0d		= 0x0d		// Object address 0x02131c = Wall
-constant u8 OBJECTTABLE2_0e		= 0x0e		// Object address 0x024d68 = Jump Ramp
-constant u8 OBJECTTABLE2_0f		= 0x0f		// Object address 0x020630 = Barrier
-constant u8 OBJECTTABLE2_10		= 0x10		// Object address 0x0225d0 = -- mhz_swingvine.lemon
-constant u8 OBJECTTABLE2_11		= 0x11		// Object address 0x03f370 = -- mhz_fallingmushroom.lemon
-constant u8 OBJECTTABLE2_12		= 0x12		// Object address 0x03f4b0 = -- mhz_stickyvine.lemon
-constant u8 OBJECTTABLE2_13		= 0x13		// Object address 0x03f868 = -- mhz_mushroomcatapult.lemon
-constant u8 OBJECTTABLE2_14		= 0x14		// Object address 0x03fb90 = Upwind
-constant u8 OBJECTTABLE2_15		= 0x15		// Object address 0x04224e = -- lrz_spiralstaircase.lemon
-constant u8 OBJECTTABLE2_16		= 0x16		// Object address 0x04254a = -- lrz_downwardhalfpipe.lemon
-constant u8 OBJECTTABLE2_17		= 0x17		// Object address 0x04279e = -- lrz_sinking_stone.lemon
-constant u8 OBJECTTABLE2_18		= 0x18		// Object address 0x04285a = -- lrz_fallingspike.lemon
-constant u8 OBJECTTABLE2_19		= 0x19		// Object address 0x04292a = -- lrz_door.lemon
-constant u8 OBJECTTABLE2_1a		= 0x1a		// Object address 0x042a18 = -- lrz_closingdoor.lemon
-constant u8 OBJECTTABLE2_1b		= 0x1b		// Object address 0x042bb8 = -- lrz_fireballs.lemon
-constant u8 OBJECTTABLE2_1c		= 0x1c		// Object address 0x042cd6 = -- lrz_button.lemon
-constant u8 OBJECTTABLE2_1d		= 0x1d		// Object address 0x042dbe = -- lrz_shootingtrigger.lemon
-constant u8 OBJECTTABLE2_1e		= 0x1e		// Object address 0x042f1a = -- lrz_dashelevator.lemon
-constant u8 OBJECTTABLE2_1f		= 0x1f		// Object address 0x043698 = -- lrz_lavafall.lemon
-constant u8 OBJECTTABLE2_20		= 0x20		// Object address 0x043502 = -- lrz_swingingspikeball.lemon
-constant u8 OBJECTTABLE2_21		= 0x21		// Object address 0x0430ea = -- lrz_stompplatform.lemon
-constant u8 OBJECTTABLE2_22		= 0x22		// Object address 0x04379e = -- lrz_rollingball.lemon
-constant u8 OBJECTTABLE2_23		= 0x23		// Object address 0x03e018 = -- mhz_mushroom.lemon
-constant u8 OBJECTTABLE2_24		= 0x24		// Object address 0x0295d0 = -- lbz_boostertube.lemon
-constant u8 OBJECTTABLE2_25		= 0x25		// Object address 0x04a644 = -- lrz_chainedplatforms.lemon
+constant u8 OBJECTTABLE2_09		= 0x09		// Object address 0x03e836 = MHZ Uncurling Vine Bridge
+constant u8 OBJECTTABLE2_0a		= 0x0a		// Object address 0x03ea56 = MHZ Sticky Vine Trap
+constant u8 OBJECTTABLE2_0b		= 0x0b		// Object address 0x03ed1a = MHZ Horizontal Swing Bar
+constant u8 OBJECTTABLE2_0c		= 0x0c		// Object address 0x03f05a = MHZ Vertical Swing Bar
+constant u8 OBJECTTABLE2_0d		= 0x0d		// Object address 0x02131c = Breakable Wall
+constant u8 OBJECTTABLE2_0e		= 0x0e		// Object address 0x024d68 = Jump Ramp from AIZ, MHZ, SOZ and LRZ
+constant u8 OBJECTTABLE2_0f		= 0x0f		// Object address 0x020630 = Collapsing platform/bridge/ledge
+constant u8 OBJECTTABLE2_10		= 0x10		// Object address 0x0225d0 = MHZ Swinging Bar and Vine
+constant u8 OBJECTTABLE2_11		= 0x11		// Object address 0x03f370 = MHZ Falling Mushroom Platform
+constant u8 OBJECTTABLE2_12		= 0x12		// Object address 0x03f4b0 = MHZ Mushroom Parachute
+constant u8 OBJECTTABLE2_13		= 0x13		// Object address 0x03f868 = MHZ Mushroom Launcher
+constant u8 OBJECTTABLE2_14		= 0x14		// Object address 0x03fb90 = MHZ upwind tunnel
+constant u8 OBJECTTABLE2_15		= 0x15		// Object address 0x04224e = LRZ1 Spiraling Staircase
+constant u8 OBJECTTABLE2_16		= 0x16		// Object address 0x04254a = LRZ Halfpipe Slide that launches player
+constant u8 OBJECTTABLE2_17		= 0x17		// Object address 0x04279e = LRZ Sinking Rock
+constant u8 OBJECTTABLE2_18		= 0x18		// Object address 0x04285a = LRZ Falling Ceiling Spike
+constant u8 OBJECTTABLE2_19		= 0x19		// Object address 0x04292a = LRZ Door
+constant u8 OBJECTTABLE2_1a		= 0x1a		// Object address 0x042a18 = LRZ Big Closing Door
+constant u8 OBJECTTABLE2_1b		= 0x1b		// Object address 0x042bb8 = LRZ Fireball Launcher
+constant u8 OBJECTTABLE2_1c		= 0x1c		// Object address 0x042cd6 = LRZ Button
+constant u8 OBJECTTABLE2_1d		= 0x1d		// Object address 0x042dbe = LRZ Wall Turret that guards some gates
+constant u8 OBJECTTABLE2_1e		= 0x1e		// Object address 0x042f1a = LRZ Spin Dash Elevator
+constant u8 OBJECTTABLE2_1f		= 0x1f		// Object address 0x043698 = LRZ Lavafall
+constant u8 OBJECTTABLE2_20		= 0x20		// Object address 0x043502 = LRZ Swinging Spiked Ball and Chain
+constant u8 OBJECTTABLE2_21		= 0x21		// Object address 0x0430ea = LRZ Stomping Platform with spikes at the bottom
+constant u8 OBJECTTABLE2_22		= 0x22		// Object address 0x04379e = LRZ Rolling Spike Ball
+constant u8 OBJECTTABLE2_23		= 0x23		// Object address 0x03e018 = MHZ Bouncy Mushroom Cap
+constant u8 OBJECTTABLE2_24		= 0x24		// Object address 0x0295d0 = LBZ Looping Pipes/LRZ Booster Tubes
+constant u8 OBJECTTABLE2_25		= 0x25		// Object address 0x04a644 = LRZ Platform Chain
 constant u8 OBJECTTABLE2_26		= 0x26		// Object address 0x01e7e2 = Auto-spin object
-constant u8 OBJECTTABLE2_27		= 0x27		// Object address 0x01eb36 = Unused?
+constant u8 OBJECTTABLE2_27		= 0x27		// Object address 0x01eb36 = Unused lava collision from Sonic 2
 constant u8 OBJECTTABLE2_28		= 0x28		// Object address 0x01ec18 = Non-damaging Blocker Element
 constant u8 OBJECTTABLE2_29		= 0x29		// Object address 0x043d68 = LRZ Flamethrower
 constant u8 OBJECTTABLE2_2a		= 0x2a		// Object address 0x02a3d0 = Corkfloor
 constant u8 OBJECTTABLE2_2b		= 0x2b		// Object address 0x043b3a = LRZ Orbiting Spike Ball (horizontal)
 constant u8 OBJECTTABLE2_2c		= 0x2c		// Object address 0x043c2c = LRZ Orbiting Spike Ball (vertical)
-constant u8 OBJECTTABLE2_2d		= 0x2d		// Object address 0x02582e = -- lrz_blockplatform.lemon
-constant u8 OBJECTTABLE2_2e		= 0x2e		// Object address 0x0440f2 = Unused?
+constant u8 OBJECTTABLE2_2d		= 0x2d		// Object address 0x02582e = LRZ Block Platforms
+constant u8 OBJECTTABLE2_2e		= 0x2e		// Object address 0x0440f2 = Unused LRZ moving solid rock (viewable in debug mode)
 constant u8 OBJECTTABLE2_2f		= 0x2f		// Object address 0x02b928 = Decorative Sprite
 constant u8 OBJECTTABLE2_30		= 0x30		// Object address 0x02bf20 = Generic Object (like AIZ flames)
-constant u8 OBJECTTABLE2_31		= 0x31		// Object address 0x039c50 = -- lrz_collapsingrocks.lemon
-constant u8 OBJECTTABLE2_32		= 0x32		// Object address 0x04429c = -- lrz_turbine.lemon
+constant u8 OBJECTTABLE2_31		= 0x31		// Object address 0x039c50 = LRZ Collapsing Rocks
+constant u8 OBJECTTABLE2_32		= 0x32		// Object address 0x04429c = LRZ2 Horizontal Turbines
 constant u8 OBJECTTABLE2_33		= 0x33		// Object address 0x02c518 = Button
 constant u8 OBJECTTABLE2_34		= 0x34		// Object address 0x02cfa8 = Checkpoint / Starpost
-constant u8 OBJECTTABLE2_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Farns
+constant u8 OBJECTTABLE2_35		= 0x35		// Object address 0x02c1f0 = AIZ Foreground Ferns
 constant u8 OBJECTTABLE2_36		= 0x36		// Object address 0x01ed26 = HCZ Breakable Bar
-constant u8 OBJECTTABLE2_37		= 0x37		// Object address 0x044826 = -- lrz_spikeballlauncher.lemon
-constant u8 OBJECTTABLE2_38		= 0x38		// Object address 0x03fcd4 = -- soz_sandflow.lemon
-constant u8 OBJECTTABLE2_39		= 0x39		// Object address 0x040276 = -- soz_sandslideblock.lemon
-constant u8 OBJECTTABLE2_3a		= 0x3a		// Object address 0x01d106 = -- soz_multiloop.lemon
-constant u8 OBJECTTABLE2_3b		= 0x3b		// Object address 0x04044a = -- soz_multiloop2.lemon
-constant u8 OBJECTTABLE2_3c		= 0x3c		// Object address 0x030e24 = CNZ Trap Door
-constant u8 OBJECTTABLE2_3d		= 0x3d		// Object address 0x0239e4 = -- fbz_flippedspring.lemon
-constant u8 OBJECTTABLE2_3e		= 0x3e		// Object address 0x040546 = -- soz_pushablerock.lemon
-constant u8 OBJECTTABLE2_3f		= 0x3f		// Object address 0x040786 = -- soz_springvine.lemon
-constant u8 OBJECTTABLE2_40		= 0x40		// Object address 0x040b16 = -- soz_sandwall.lemon
-constant u8 OBJECTTABLE2_41		= 0x41		// Object address 0x040e5c = -- soz_lightswitch.lemon
-constant u8 OBJECTTABLE2_42		= 0x42		// Object address 0x041176 = -- soz_movingpillar.lemon
-constant u8 OBJECTTABLE2_43		= 0x43		// Object address 0x04143c = -- soz_swingingplatform.lemon
-constant u8 OBJECTTABLE2_44		= 0x44		// Object address 0x041702 = -- soz_rock.lemon
-constant u8 OBJECTTABLE2_45		= 0x45		// Object address 0x04187e = -- soz_pushswitch.lemon
-constant u8 OBJECTTABLE2_46		= 0x46		// Object address 0x041b70 = -- soz_closingwall.lemon
-constant u8 OBJECTTABLE2_47		= 0x47		// Object address 0x041cc2 = -- soz_sandcork.lemon
-constant u8 OBJECTTABLE2_48		= 0x48		// Object address 0x04a9a8 = -- soz_zipline.lemon
-constant u8 OBJECTTABLE2_49		= 0x49		// Object address 0x041f44 = -- soz_inverseplatform.lemon
-constant u8 OBJECTTABLE2_4a		= 0x4a		// Object address 0x025a30 = -- dez_platform.lemon
-constant u8 OBJECTTABLE2_4b		= 0x4b		// Object address 0x046d9e = -- dez_tiltingbridge.lemon
-constant u8 OBJECTTABLE2_4c		= 0x4c		// Object address 0x046f84 = -- dez_hangcarrier.lemon
-constant u8 OBJECTTABLE2_4d		= 0x4d		// Object address 0x04719a = -- dez_torpedolauncher.lemon
-constant u8 OBJECTTABLE2_4e		= 0x4e		// Object address 0x047378 = -- dez_liftpad.lemon
-constant u8 OBJECTTABLE2_4f		= 0x4f		// Object address 0x04763e = -- dez_staircase.lemon
-constant u8 OBJECTTABLE2_50		= 0x50		// Object address 0x047816 = -- dez_conveyorbelt.lemon
+constant u8 OBJECTTABLE2_37		= 0x37		// Object address 0x044826 = LRZ Spiked Ball Launcher
+constant u8 OBJECTTABLE2_38		= 0x38		// Object address 0x03fcd4 = SOZ Sandfalls And Quicksand
+constant u8 OBJECTTABLE2_39		= 0x39		// Object address 0x040276 = SOZ Sand Blocks Spawner in slides
+constant u8 OBJECTTABLE2_3a		= 0x3a		// Object address 0x01d106 = SOZ Multi-Loop pathswapper
+constant u8 OBJECTTABLE2_3b		= 0x3b		// Object address 0x04044a = SOZ2 Multi-Loop pathswapper, shoots player down
+constant u8 OBJECTTABLE2_3c		= 0x3c		// Object address 0x030e24 = Trapdoor (used in HCZ, CNZ and DEZ)
+constant u8 OBJECTTABLE2_3d		= 0x3d		// Object address 0x0239e4 = FBZ2 Retracting Spring
+constant u8 OBJECTTABLE2_3e		= 0x3e		// Object address 0x040546 = SOZ Pushable Rock
+constant u8 OBJECTTABLE2_3f		= 0x3f		// Object address 0x040786 = SOZ Springing Vine
+constant u8 OBJECTTABLE2_40		= 0x40		// Object address 0x040b16 = SOZ Rising Sand Wall
+constant u8 OBJECTTABLE2_41		= 0x41		// Object address 0x040e5c = SOZ Light Switch
+constant u8 OBJECTTABLE2_42		= 0x42		// Object address 0x041176 = SOZ Floating Pillar
+constant u8 OBJECTTABLE2_43		= 0x43		// Object address 0x04143c = SOZ Swinging Platform
+constant u8 OBJECTTABLE2_44		= 0x44		// Object address 0x041702 = SOZ Breakable Sand Rock
+constant u8 OBJECTTABLE2_45		= 0x45		// Object address 0x04187e = SOZ2 Pushing Switch
+constant u8 OBJECTTABLE2_46		= 0x46		// Object address 0x041b70 = SOZ2 Sand Door
+constant u8 OBJECTTABLE2_47		= 0x47		// Object address 0x041cc2 = SOZ2 Sand Cork Plug
+constant u8 OBJECTTABLE2_48		= 0x48		// Object address 0x04a9a8 = SOZ Zipline Wire
+constant u8 OBJECTTABLE2_49		= 0x49		// Object address 0x041f44 = SOZ Solid (Inversed) Platforms
+constant u8 OBJECTTABLE2_4a		= 0x4a		// Object address 0x025a30 = DEZ Floating Platform
+constant u8 OBJECTTABLE2_4b		= 0x4b		// Object address 0x046d9e = DEZ Tilting Bridge
+constant u8 OBJECTTABLE2_4c		= 0x4c		// Object address 0x046f84 = DEZ Hanging Carrier
+constant u8 OBJECTTABLE2_4d		= 0x4d		// Object address 0x04719a = DEZ Missile Launcher embedded in walls
+constant u8 OBJECTTABLE2_4e		= 0x4e		// Object address 0x047378 = DEZ Swinging Platform
+constant u8 OBJECTTABLE2_4f		= 0x4f		// Object address 0x04763e = DEZ Staircase Snake Platform
+constant u8 OBJECTTABLE2_50		= 0x50		// Object address 0x047816 = DEZ Conveyor Belt
 constant u8 OBJECTTABLE2_51		= 0x51		// Object address 0x025506 = Moving Platform
-constant u8 OBJECTTABLE2_52		= 0x52		// Object address 0x047892 = -- dez_lightnings.lemon
-constant u8 OBJECTTABLE2_53		= 0x53		// Object address 0x047966 = -- dez_conveyorpad.lemon
-constant u8 OBJECTTABLE2_54		= 0x54		// Object address 0x02f938 = Air Bubble
-constant u8 OBJECTTABLE2_55		= 0x55		// Object address 0x047e2e = -- dez_energybridge.lemon
-constant u8 OBJECTTABLE2_56		= 0x56		// Object address 0x047efc = -- dez_energybridge.lemon
-constant u8 OBJECTTABLE2_57		= 0x57		// Object address 0x0481f2 = -- dez_tunnellauncher.lemon
-constant u8 OBJECTTABLE2_58		= 0x58		// Object address 0x048aaa = -- dez_gravityswitch.lemon
-constant u8 OBJECTTABLE2_59		= 0x59		// Object address 0x048c16 = -- dez_gravitytransporter.lemon
-constant u8 OBJECTTABLE2_5a		= 0x5a		// Object address 0x048eae = -- dez_centrifugetube.lemon
-constant u8 OBJECTTABLE2_5b		= 0x5b		// Object address 0x0491f4 = -- dez_centrifugetube.lemon
-constant u8 OBJECTTABLE2_5c		= 0x5c		// Object address 0x0492b2 = -- dez_centrifugetube.lemon
-constant u8 OBJECTTABLE2_5d		= 0x5d		// Object address 0x04808e = -- dez_retractingspring.lemon
-constant u8 OBJECTTABLE2_5e		= 0x5e		// Object address 0x04945c = -- dez_hovermachine.lemon
-constant u8 OBJECTTABLE2_5f		= 0x5f		// Object address 0x049602 = -- dez1_windtunnel.lemon
-constant u8 OBJECTTABLE2_60		= 0x60		// Object address 0x049766 = -- dez1_windtunnel.lemon
-constant u8 OBJECTTABLE2_61		= 0x61		// Object address 0x0498d2 = -- dez1_windtunnel.lemon
+constant u8 OBJECTTABLE2_52		= 0x52		// Object address 0x047892 = DEZ Lightning Bolts
+constant u8 OBJECTTABLE2_53		= 0x53		// Object address 0x047966 = DEZ Moving Conveyor Belt
+constant u8 OBJECTTABLE2_54		= 0x54		// Object address 0x02f938 = Air Bubble spawner
+constant u8 OBJECTTABLE2_55		= 0x55		// Object address 0x047e2e = DEZ Energy Bridge
+constant u8 OBJECTTABLE2_56		= 0x56		// Object address 0x047efc = DEZ Curved Energy Bridge
+constant u8 OBJECTTABLE2_57		= 0x57		// Object address 0x0481f2 = DEZ Light Tunnel Launcher
+constant u8 OBJECTTABLE2_58		= 0x58		// Object address 0x048aaa = DEZ2 Gravity-reversing Switch
+constant u8 OBJECTTABLE2_59		= 0x59		// Object address 0x048c16 = DEZ2 Gravity-reversing Transporting Tunnel
+constant u8 OBJECTTABLE2_5a		= 0x5a		// Object address 0x048eae = DEZ Centrifuge Tube
+constant u8 OBJECTTABLE2_5b		= 0x5b		// Object address 0x0491f4 = DEZ Gravity-reversal object inside tunnels
+constant u8 OBJECTTABLE2_5c		= 0x5c		// Object address 0x0492b2 = DEZ Centrifuge Tube Junction
+constant u8 OBJECTTABLE2_5d		= 0x5d		// Object address 0x04808e = DEZ Retracting Spring
+constant u8 OBJECTTABLE2_5e		= 0x5e		// Object address 0x04945c = DEZ Hover Machine
+constant u8 OBJECTTABLE2_5f		= 0x5f		// Object address 0x049602 = DEZ1 player movement Object in the special engine room
+constant u8 OBJECTTABLE2_60		= 0x60		// Object address 0x049766 = DEZ1 Bumpers in engine room
+constant u8 OBJECTTABLE2_61		= 0x61		// Object address 0x0498d2 = DEZ1 Main Puzzle Bumper in engine room
 constant u8 OBJECTTABLE2_62		= 0x62		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE2_63		= 0x63		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE2_64		= 0x64		// Object address 0x01a51a = Unused (points to ring)
@@ -531,75 +533,75 @@ constant u8 OBJECTTABLE2_70		= 0x70		// Object address 0x01a51a = Unused (points
 constant u8 OBJECTTABLE2_71		= 0x71		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE2_72		= 0x72		// Object address 0x01a51a = Unused (points to ring)
 constant u8 OBJECTTABLE2_73		= 0x73		// Object address 0x01a51a = Unused (points to ring)
-constant u8 OBJECTTABLE2_74		= 0x74		// Object address 0x046426 = -- ssz_flipspring.lemon
-constant u8 OBJECTTABLE2_75		= 0x75		// Object address 0x0460d8 = -- ssz_swingingshell.lemon
-constant u8 OBJECTTABLE2_76		= 0x76		// Object address 0x045dae = -- ssz_spinningdisc.lemon
-constant u8 OBJECTTABLE2_77		= 0x77		// Object address 0x044f52 = -- ssz_extendiblebridge.lemon
-constant u8 OBJECTTABLE2_78		= 0x78		// Object address 0x03b934 = -- playerlauncher.lemon
-constant u8 OBJECTTABLE2_79		= 0x79		// Object address 0x045528 = -- teleporter.lemon
-constant u8 OBJECTTABLE2_7a		= 0x7a		// Object address 0x04536c = -- ssz_movingbar.lemon
-constant u8 OBJECTTABLE2_7b		= 0x7b		// Object address 0x044d60 = -- ssz_bridge.lemon
-constant u8 OBJECTTABLE2_7c		= 0x7c		// Object address 0x044c44 = -- ssz_bridge.lemon
-constant u8 OBJECTTABLE2_7d		= 0x7d		// Object address 0x0450a4 = -- ssz_bouncycloud.lemon
-constant u8 OBJECTTABLE2_7e		= 0x7e		// Object address 0x044ae0 = -- ssz_floatingpillar.lemon
-constant u8 OBJECTTABLE2_7f		= 0x7f		// Object address 0x044a68 = -- ssz_platform.lemon
-constant u8 OBJECTTABLE2_80		= 0x80		// Object address 0x0836e0 = Hidden monitor
-constant u8 OBJECTTABLE2_81		= 0x81		// Object address 0x086540 = Capsule
+constant u8 OBJECTTABLE2_74		= 0x74		// Object address 0x046426 = SSZ Retracting Spring
+constant u8 OBJECTTABLE2_75		= 0x75		// Object address 0x0460d8 = SSZ Swinging Spiked Shell Cradle
+constant u8 OBJECTTABLE2_76		= 0x76		// Object address 0x045dae = SSZ Rotating Disc Platform
+constant u8 OBJECTTABLE2_77		= 0x77		// Object address 0x044f52 = Extending Bridge from the very beginning of SSZ
+constant u8 OBJECTTABLE2_78		= 0x78		// Object address 0x03b934 = Player Launcher in FBZ and DEZ
+constant u8 OBJECTTABLE2_79		= 0x79		// Object address 0x045528 = Teleporter from HPZ and SSZ
+constant u8 OBJECTTABLE2_7a		= 0x7a		// Object address 0x04536c = SSZ Hanging Elevator Bar 
+constant u8 OBJECTTABLE2_7b		= 0x7b		// Object address 0x044d60 = SSZ Diagonal Collapsing Bridge
+constant u8 OBJECTTABLE2_7c		= 0x7c		// Object address 0x044c44 = SSZ Horizontal Collapsing Bridge
+constant u8 OBJECTTABLE2_7d		= 0x7d		// Object address 0x0450a4 = SSZ Bouncy Cloud
+constant u8 OBJECTTABLE2_7e		= 0x7e		// Object address 0x044ae0 = SSZ Collapsing Floating Pillars
+constant u8 OBJECTTABLE2_7f		= 0x7f		// Object address 0x044a68 = SSZ Floating Platform
+constant u8 OBJECTTABLE2_80		= 0x80		// Object address 0x0836e0 = Hidden monitors
+constant u8 OBJECTTABLE2_81		= 0x81		// Object address 0x086540 = Egg Capsule
 constant u8 OBJECTTABLE2_82		= 0x82		// Object address 0x061d4c = Cutscene Knuckles
 constant u8 OBJECTTABLE2_83		= 0x83		// Object address 0x065bd4 = Buttons for Cutscene Knuckles
 constant u8 OBJECTTABLE2_84		= 0x84		// Object address 0x067472 = Cutscene Sonic in intro
 constant u8 OBJECTTABLE2_85		= 0x85		// Object address 0x06166a = Giant Ring
-constant u8 OBJECTTABLE2_86		= 0x86		// Object address 0x060c56 = -- gm_trigger.lemon
-constant u8 OBJECTTABLE2_87		= 0x87		// Object address 0x060f2e = -- gm_bouncepad.lemon
-constant u8 OBJECTTABLE2_88		= 0x88		// Object address 0x065d16 = -- cnz2_knuckles_lights_out.lemon
-constant u8 OBJECTTABLE2_89		= 0x89		// Object address 0x065d6e = -- cnz2_knuckles_lights_out.lemon
-constant u8 OBJECTTABLE2_8a		= 0x8a		// Object address 0x086cf6 = -- boss_fbz2.lemon
+constant u8 OBJECTTABLE2_86		= 0x86		// Object address 0x060c56 = Gumball Machine from gumball bonus stage. Also initializes all other sprites
+constant u8 OBJECTTABLE2_87		= 0x87		// Object address 0x060f2e = Bumpers on the walls of the gumball bonus stage
+constant u8 OBJECTTABLE2_88		= 0x88		// Object address 0x065d16 = Breakable Floor from CNZ2 that controls water level
+constant u8 OBJECTTABLE2_89		= 0x89		// Object address 0x065d6e = CNZ2 Light Switch Button
+constant u8 OBJECTTABLE2_8a		= 0x8a		// Object address 0x086cf6 = Doors and windows in FBZ2 end cutscene
 constant u8 OBJECTTABLE2_8b		= 0x8b		// Object address 0x0862ae = Sprite Mask Object
-constant u8 OBJECTTABLE2_8c		= 0x8c		// Object address 0x08d580 = -- mhz_madmole.lemon
-constant u8 OBJECTTABLE2_8d		= 0x8d		// Object address 0x08daf6 = -- mhz_mushmeanie.lemon
-constant u8 OBJECTTABLE2_8e		= 0x8e		// Object address 0x08dd32 = -- mhz_dragonfly.lemon
-constant u8 OBJECTTABLE2_8f		= 0x8f		// Object address 0x08e09e = -- mhz_butterfly.lemon
-constant u8 OBJECTTABLE2_90		= 0x90		// Object address 0x08e17e = -- mhz_cluckoid.lemon
-constant u8 OBJECTTABLE2_91		= 0x91		// Object address 0x075a84 = -- boss_mhz1.lemon
-constant u8 OBJECTTABLE2_92		= 0x92		// Object address 0x0751ca = -- boss_mhz1.lemon
-constant u8 OBJECTTABLE2_93		= 0x93		// Object address 0x075f50 = -- boss_mhz2.lemon
-constant u8 OBJECTTABLE2_94		= 0x94		// Object address 0x08e650 = -- soz_skorp.lemon
-constant u8 OBJECTTABLE2_95		= 0x95		// Object address 0x08ea66 = -- soz_sandworm.lemon
-constant u8 OBJECTTABLE2_96		= 0x96		// Object address 0x08eda0 = -- soz_rockn.lemon
-constant u8 OBJECTTABLE2_97		= 0x97		// Object address 0x076a12 = -- boss_soz1.lemon
-constant u8 OBJECTTABLE2_98		= 0x98		// Object address 0x07764e = -- boss_soz2.lemon
-constant u8 OBJECTTABLE2_99		= 0x99		// Object address 0x08f750 = -- lrz_fireworm.lemon
-constant u8 OBJECTTABLE2_9a		= 0x9a		// Object address 0x08fae6 = -- lrz_iwamodoki.lemon
-constant u8 OBJECTTABLE2_9b		= 0x9b		// Object address 0x08fd30 = -- lrz_toxomister.lemon
-constant u8 OBJECTTABLE2_9c		= 0x9c		// Object address 0x0900f0 = -- lrz_largedriller.lemon
-constant u8 OBJECTTABLE2_9d		= 0x9d		// Object address 0x0784f0 = -- boss_lrz1.lemon
-constant u8 OBJECTTABLE2_9e		= 0x9e		// Object address 0x078f56 = -- lrz_bossinbackground.lemon
+constant u8 OBJECTTABLE2_8c		= 0x8c		// Object address 0x08d580 = MHZ Madmole
+constant u8 OBJECTTABLE2_8d		= 0x8d		// Object address 0x08daf6 = MHZ Mushmeanie
+constant u8 OBJECTTABLE2_8e		= 0x8e		// Object address 0x08dd32 = MHZ Dragonfly badnik
+constant u8 OBJECTTABLE2_8f		= 0x8f		// Object address 0x08e09e = MHZ Butterdroid
+constant u8 OBJECTTABLE2_90		= 0x90		// Object address 0x08e17e = MHZ Cluckoid
+constant u8 OBJECTTABLE2_91		= 0x91		// Object address 0x075a84 = Tree which MHZ1 Boss chops down
+constant u8 OBJECTTABLE2_92		= 0x92		// Object address 0x0751ca = MHZ1 Boss
+constant u8 OBJECTTABLE2_93		= 0x93		// Object address 0x075f50 = MHZ2 Boss
+constant u8 OBJECTTABLE2_94		= 0x94		// Object address 0x08e650 = SOZ Skorp
+constant u8 OBJECTTABLE2_95		= 0x95		// Object address 0x08ea66 = SOZ Sandworm
+constant u8 OBJECTTABLE2_96		= 0x96		// Object address 0x08eda0 = SOZ Rock'n badnik
+constant u8 OBJECTTABLE2_97		= 0x97		// Object address 0x076a12 = SOZ1 Boss
+constant u8 OBJECTTABLE2_98		= 0x98		// Object address 0x07764e = SOZ2 Boss
+constant u8 OBJECTTABLE2_99		= 0x99		// Object address 0x08f750 = LRZ Fireworm badnik
+constant u8 OBJECTTABLE2_9a		= 0x9a		// Object address 0x08fae6 = LRZ Exploding Rock badnik
+constant u8 OBJECTTABLE2_9b		= 0x9b		// Object address 0x08fd30 = LRZ Toxomister
+constant u8 OBJECTTABLE2_9c		= 0x9c		// Object address 0x0900f0 = LRZ Large Drilling Machine
+constant u8 OBJECTTABLE2_9d		= 0x9d		// Object address 0x0784f0 = LRZ1 Boss
+constant u8 OBJECTTABLE2_9e		= 0x9e		// Object address 0x078f56 = LRZ 3 Torpedo Launcher
 constant u8 OBJECTTABLE2_9f		= 0x9f		// Object address 0x01a51a = Unused (points to ring)
-constant u8 OBJECTTABLE2_a0		= 0xa0		// Object address 0x091518 = -- ssz_eggrobo.lemon
-constant u8 OBJECTTABLE2_a1		= 0xa1		// Object address 0x07a20e = -- boss_ssz_mid1.lemon
-constant u8 OBJECTTABLE2_a2		= 0xa2		// Object address 0x07a6a6 = -- boss_ssz_mid2.lemon
-constant u8 OBJECTTABLE2_a3		= 0xa3		// Object address 0x07b288 = -- boss_ssz_mecha1.lemon
-constant u8 OBJECTTABLE2_a4		= 0xa4		// Object address 0x0919ec = -- dez_spikebonker.lemon
-constant u8 OBJECTTABLE2_a5		= 0xa5		// Object address 0x091c3c = -- dez_chainspike.lemon
-constant u8 OBJECTTABLE2_a6		= 0xa6		// Object address 0x07ddb4 = -- boss_dez1.lemon
-constant u8 OBJECTTABLE2_a7		= 0xa7		// Object address 0x07f06c = -- boss_dez2.lemon
+constant u8 OBJECTTABLE2_a0		= 0xa0		// Object address 0x091518 = SSZ Egg Robo badnik
+constant u8 OBJECTTABLE2_a1		= 0xa1		// Object address 0x07a20e = SSZ Green Hill Mecha Sonic Mid-Boss
+constant u8 OBJECTTABLE2_a2		= 0xa2		// Object address 0x07a6a6 = SSZ Metropolis Mecha Sonic Mid-Boss
+constant u8 OBJECTTABLE2_a3		= 0xa3		// Object address 0x07b288 = SSZ Mecha Sonic Boss
+constant u8 OBJECTTABLE2_a4		= 0xa4		// Object address 0x0919ec = DEZ Spikebonker
+constant u8 OBJECTTABLE2_a5		= 0xa5		// Object address 0x091c3c = DEZ Chainspike
+constant u8 OBJECTTABLE2_a6		= 0xa6		// Object address 0x07ddb4 = DEZ1 Boss
+constant u8 OBJECTTABLE2_a7		= 0xa7		// Object address 0x07f06c = DEZ2 Boss
 constant u8 OBJECTTABLE2_a8		= 0xa8		// Object address 0x062ca4 = MHZ1 cutscene trigger
 constant u8 OBJECTTABLE2_a9		= 0xa9		// Object address 0x062e28 = Cutscene Knuckles Button in MHZ1
-constant u8 OBJECTTABLE2_aa		= 0xaa		// Object address 0x08f0b8 = -- soz2_ghostspawn.lemon
-constant u8 OBJECTTABLE2_ab		= 0xab		// Object address 0x08f390 = -- soz2_ghostspawn.lemon
-constant u8 OBJECTTABLE2_ac		= 0xac		// Object address 0x08f3f6 = -- soz2_ghostspawn.lemon
-constant u8 OBJECTTABLE2_ad		= 0xad		// Object address 0x079c52 = -- lrz_lavafallplatform.lemon
+constant u8 OBJECTTABLE2_aa		= 0xaa		// Object address 0x08f0b8 = SOZ Ghosts
+constant u8 OBJECTTABLE2_ab		= 0xab		// Object address 0x08f390 = SOZ2 art manager object for the Egg Capsule containing ghosts
+constant u8 OBJECTTABLE2_ac		= 0xac		// Object address 0x08f3f6 = SOZ2 Egg Capsule containing ghosts
+constant u8 OBJECTTABLE2_ad		= 0xad		// Object address 0x079c52 = LRZ 3 Platforms, stationary and moving
 constant u8 OBJECTTABLE2_ae		= 0xae		// Object address 0x063b22 = LRZ2 cutscene trigger
 constant u8 OBJECTTABLE2_af		= 0xaf		// Object address 0x0659b6 = Cutscene Knuckles Button in SSZ
-constant u8 OBJECTTABLE2_b0		= 0xb0		// Object address 0x0906a0 = -- hpz_masteremerald.lemon
+constant u8 OBJECTTABLE2_b0		= 0xb0		// Object address 0x0906a0 = HPZ Master Emerald
 constant u8 OBJECTTABLE2_b1		= 0xb1		// Object address 0x0656a8 = HPZ palette switcher
-constant u8 OBJECTTABLE2_b2		= 0xb2		// Object address 0x07ca1c = -- level_ssz_knuckles.lemon
+constant u8 OBJECTTABLE2_b2		= 0xb2		// Object address 0x07ca1c = Egg Robo in Knuckles' SSZ
 constant u8 OBJECTTABLE2_b3		= 0xb3		// Object address 0x0863ec = LRZ2 stage exit right, to HPZ
-constant u8 OBJECTTABLE2_b4		= 0xb4		// Object address 0x090774 = -- hpz_superemerald.lemon
-constant u8 OBJECTTABLE2_b5		= 0xb5		// Object address 0x090964 = -- hpz_emeraldcave.lemon
-constant u8 OBJECTTABLE2_b6		= 0xb6		// Object address 0x0817da = -- boss_ddz_1.lemon
-constant u8 OBJECTTABLE2_b7		= 0xb7		// Object address 0x0821de = -- ddz_asteroid.lemon
-constant u8 OBJECTTABLE2_b8		= 0xb8		// Object address 0x081fee = -- ddz_missile.lemon
+constant u8 OBJECTTABLE2_b4		= 0xb4		// Object address 0x090774 = HPZ Super Emeralds
+constant u8 OBJECTTABLE2_b5		= 0xb5		// Object address 0x090964 = HPZ special stage portal initialize
+constant u8 OBJECTTABLE2_b6		= 0xb6		// Object address 0x0817da = DDZ Boss
+constant u8 OBJECTTABLE2_b7		= 0xb7		// Object address 0x0821de = DDZ Asteroid
+constant u8 OBJECTTABLE2_b8		= 0xb8		// Object address 0x081fee = DDZ Missile
 // Rest is not used (object address is 0xffffffff)
 
 

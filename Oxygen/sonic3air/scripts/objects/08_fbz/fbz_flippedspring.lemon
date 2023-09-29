@@ -109,7 +109,7 @@ function void fn0239e4()
 	Spring.BaseUpdate()
 
 	// Targets:
-	//  - 0x023a04	-> objA0.subtype2c == 0x00 .. 0x0f	-> Vertical spring (the only one used, the rest seem broken)
+	//  - 0x023a04	-> objA0.subtype2c == 0x00 .. 0x0f	-> Vertical spring (the only one used in the original game, and only once at that)
 	//  - 0x023a20	-> objA0.subtype2c == 0x10 .. 0x1f	-> Horizontal spring
 	//  - 0x023a3c	-> objA0.subtype2c == 0x20 .. 0x2f	-> Vertical spring, pointing down
 	//  - 0x023a58	-> objA0.subtype2c == 0x30 .. 0x3f	-> Diagonal spring, pointing up
@@ -134,6 +134,92 @@ function void fn023a0a()
 
 	objA0.position.y.u16 = u16[A0 + 0x34] + u8[A0 + 0x36]
 	SpringVertical.Update()
+}
+
+
+//# address-hook(0x023a20) end(0x023a20)
+function void fn023a20()
+{
+	objA0.update_address = 0x023a26
+	fn023a26()
+}
+
+
+//# address-hook(0x023a26) end(0x023a38)
+function void fn023a26()
+{
+	fn023ab8()
+
+	objA0.position.x.u16 = u16[A0 + 0x32] + u8[A0 + 0x36]
+	SpringHorizontal.Update()
+}
+
+
+//# address-hook(0x023a3c) end(0x023a3c)
+function void fn023a3c()
+{
+	objA0.update_address = 0x023a42
+	fn023a42()
+}
+
+
+//# address-hook(0x023a42) end(0x023326)
+function void fn023a42()
+{
+	fn023ab8()
+
+	objA0.position.y.u16 = u16[A0 + 0x34] + u8[A0 + 0x36]
+	SpringVerticalFlipped.Update()
+}
+
+
+//# address-hook(0x023a58) end(0x023a58)
+function void fn023a58()
+{
+	objA0.update_address = 0x023a5e
+	fn023a5e()
+}
+
+
+//# address-hook(0x023a5e) end(0x023a84)
+function void fn023a5e()
+{
+	fn023ab8()
+
+	D0.u8 = u8[A0 + 0x36]
+	D1.u16 = D0.u16
+	if ((objA0.flags2a & char.flag.FACING_LEFT) == 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.position.x.u16 = D0.s8 + u16[A0 + 0x32]
+	objA0.position.y.u16 = D1.u8 + u16[A0 + 0x34]
+	SpringDiagonal.Update()
+}
+
+
+//# address-hook(0x023a88) end(0x023a88)
+function void fn023a88()
+{
+	objA0.update_address = 0x023a8e
+	fn023a8e()
+}
+
+
+//# address-hook(0x023a8e) end(0x023ab4)
+function void fn023a8e()
+{
+	fn023ab8()
+
+	D0.u8 = u8[A0 + 0x36]
+	D1.u16 = D0.u16
+	if ((objA0.flags2a & char.flag.FACING_LEFT) != 0)
+	{
+		D0.s16 = -D0.s16
+	}
+	objA0.position.x.u16 = D0.s8 + u16[A0 + 0x32]
+	objA0.position.y.u16 = D1.u8 + u16[A0 + 0x34]
+	SpringDiagonalFlipped.Update()
 }
 
 

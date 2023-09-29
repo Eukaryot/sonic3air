@@ -270,7 +270,7 @@ function void fn0534a2()
 //# address-hook(0x0534c6) end(0x053512)
 function void fn0534c6()
 {
-	objA0.update_address = 0x01abc6
+	objA0.update_address = addressof(DrawObject)
 	objA0.render_flags = render_flag.COMPOUND
 	objA0.box_size.y = 0x0c
 	objA0.box_size.x = 0x2c

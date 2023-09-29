@@ -217,6 +217,7 @@ function void fn0371be()
 			return
 	}
 
+	// Stores time records for each track at a designated location
 	D0 = global.zone - 0x0e
 	D0.u8 = u8[0x03739f + D0.u16]
 	A1 = 0xffff7800
@@ -231,6 +232,7 @@ function void fn0371be()
 		u32[A1 + D0.u16 + 0x14] = 0x93b63	// That is 9'59"99
 	}
 
+	// Grand Prix progress through tracks
 	D0.u8 = global.zone - 0x0e
 	D0.u8 = u8[0x03739a + D0.u16]
 	if (D0.u8 != 0)

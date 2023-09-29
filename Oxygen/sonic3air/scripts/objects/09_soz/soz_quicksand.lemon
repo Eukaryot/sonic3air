@@ -97,8 +97,8 @@ function void fn0400f0()
 					u8[A1 + 0x2a] &= ~char.flag.ON_OBJECT
 					objA0.flags2a &= ~bit
 					objA1.velocity.y = (u8[A1 + 0x38] == CHARACTER_KNUCKLES) ? -0x600 : -0x680
-					u8[A1 + 0x1e] = 0x0e
-					u8[A1 + 0x1f] = 0x07
+					objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+					objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 					objA1.state = char.state.ROLLING
 					objA1.flags2a |= char.flag.ROLLING
 					objA1.flags2a &= ~char.flag.CONTROL_LOCK

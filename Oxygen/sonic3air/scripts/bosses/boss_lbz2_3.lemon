@@ -700,8 +700,7 @@ function void fn0748ae()
 
 	objA0.update_address = 0x0748f4
 	objA0.flags2a |= 0x40
-	objA0.flags38 |= 0x10
-	objA0.flags38 |= 0x20
+	objA0.flags38 |= (0x10 | 0x20)
 	level.boss_encounter = 0
 	objA0.render_flags &= ~render_flag.VISIBLE
 }
@@ -1144,7 +1143,8 @@ function void fn074c8c()
 
 #if STANDALONE
 	// Remove spindash cloud
-	u8[0xffffcc54 + 0x20] = 0
+	u32 dustAddress = isMainCharacter(CHARACTER_TAILS) ? 0xffffcc9e : 0xffffcc54
+	u8[dustAddress + 0x20] = 0
 #endif
 
 	fn074ccc()

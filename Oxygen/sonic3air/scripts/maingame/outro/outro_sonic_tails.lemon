@@ -1793,7 +1793,7 @@ function void fn05f682()
 function void fn05f690()
 {
 	setupObjectAttributesBasic(0x0601a6)
-	objA0.update_address = 0x01abc6
+	objA0.update_address = addressof(DrawObject)
 	objA0.render_flags &= ~render_flag.WORLD
 }
 

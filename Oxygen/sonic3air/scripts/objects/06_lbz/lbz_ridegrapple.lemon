@@ -166,8 +166,8 @@ function void fn0266b0()
 
 			objA1.velocity.x = objA0.velocity.x
 			objA1.velocity.y = -0x380
-			u8[A1 + 0x1e] = 0x0e
-			u8[A1 + 0x1f] = 0x07
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 			u8[A1 + 0x40] = 0x01

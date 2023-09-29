@@ -69,8 +69,12 @@ function void fn0476ea()
 	// Targets:
 	//  - 0x04774a	-> (objA0.subtype2c & 0x07) = 0x00
 	//  - 0x0477c2	-> (objA0.subtype2c & 0x07) = 0x01
+	//  - 0x047774	-> (objA0.subtype2c & 0x07) = 0x02
+	//  - 0x0477c2	-> (objA0.subtype2c & 0x07) = 0x03
 	//  - 0x04774a	-> (objA0.subtype2c & 0x07) = 0x04
 	//  - 0x0477ec	-> (objA0.subtype2c & 0x07) = 0x05
+	//  - 0x047774	-> (objA0.subtype2c & 0x07) = 0x06
+	//  - 0x0477ec	-> (objA0.subtype2c & 0x07) = 0x07
 	call tableLookupAddress(0x04773a, (objA0.subtype2c & 0x07) * 2)
 
 	fn0476fe()
@@ -116,6 +120,45 @@ function void fn04774a()
 			playSound(0xc0)
 		}
 	}
+}
+
+
+// Tumbles and draws down if hit from below, based on ported scripts #contributed by Legobouwer
+
+//# address-hook(0x047774) end(0x0477c0)
+function void fn047774()
+{
+	if (u16[A0 + 0x30] == 0)
+	{
+		D0.u8 = u8[A0 + 0x32] & 0x0c
+		if (D0.u8 != 0)
+		{
+			u16[A0 + 0x30] = 0x3c
+		}
+		return
+	}
+	else
+	{
+		--u16[A0 + 0x30]
+		if (u16[A0 + 0x30] == 0)
+		{
+			++objA0.subtype2c
+			playSound(0xc0)
+			return
+		}
+	}
+
+	A1 = A0 + 0x34
+	D0.u16 = u16[A0 + 0x30]
+	D0.u8 >>= 2
+	D0.u8 &= 0x01
+	u16[(A1+=2)-2] = D0.u16
+	D0.u8 ^= 0x01
+	u16[(A1+=2)-2] = D0.u16
+	D0.u8 ^= 0x01
+	u16[(A1+=2)-2] = D0.u16
+	D0.u8 ^= 0x01
+	u16[(A1+=2)-2] = D0.u16
 }
 
 

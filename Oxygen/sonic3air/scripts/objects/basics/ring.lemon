@@ -235,8 +235,8 @@ function void SpillRings()
 		objA1.mapping_offset = 0x01a99a
 		objA1.position.x.u16 = objA0.position.x.u16
 		objA1.position.y.u16 = objA0.position.y.u16
-		u8[A1 + 0x1e] = 8
-		u8[A1 + 0x1f] = 8
+		objA1.hitbox_extends.y = 8
+		objA1.hitbox_extends.x = 8
 		objA1.collision_attributes = (collision.flag.ITEM | collision.size.6x6)
 
 		spilled_rings.speed = 0xff

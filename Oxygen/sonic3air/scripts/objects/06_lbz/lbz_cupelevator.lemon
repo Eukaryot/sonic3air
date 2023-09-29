@@ -643,8 +643,8 @@ function void fn026eda()
 				// Why not allow jump moves here?
 				u8[A1 + 0x40] = Game.getSetting(SETTING_LBZ_CUPELEVATOR)
 			#endif
-			u8[A1 + 0x1e] = 0x0e
-			u8[A1 + 0x1f] = 0x07
+			objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+			objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 			objA1.state = char.state.ROLLING
 			objA1.flags2a |= char.flag.ROLLING
 			objA1.flags2a &= ~char.flag.CONTROL_LOCK

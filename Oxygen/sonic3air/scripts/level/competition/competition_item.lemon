@@ -568,12 +568,15 @@ function void fn036926()
 	{
 		D0.u8 = objA0.value26
 		LookupSinCos()
+
 		D1.s32 = s32(D1.s16) * objA0.groundspeed
 		D1.s32 >>= 8
 		objA0.compound.sprite1.position.x = D1.u16
+
 		D0.s32 = s32(D0.s16) * objA0.groundspeed
 		D0.s32 >>= 8
 		objA0.compound.sprite1.position.y = D0.u16
+
 		UpdateMovementStraightSimple()
 
 		objA0.position.y.u16 &= level.height.bitmask

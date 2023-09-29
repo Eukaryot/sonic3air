@@ -143,8 +143,8 @@ function void fn03f17a()
 	u8[A2] = 0
 	u8[A2 + 0x02] = (u8[A1 + 0x2a] & char.flag.UNDERWATER) ? 0x3c : 0x1e
 
-	u8[A1 + 0x1e] = 0x0e
-	u8[A1 + 0x1f] = 0x07
+	objA1.hitbox_extends.y = char.hitbox.y.ROLLING
+	objA1.hitbox_extends.x = char.hitbox.x.ROLLING
 	objA1.state = char.state.ROLLING
 	objA1.flags2a |= (char.flag.IN_AIR | char.flag.ROLLING)
 	objA1.flags2a &= ~char.flag.CONTROL_LOCK

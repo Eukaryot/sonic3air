@@ -233,6 +233,7 @@ function bool LevelSelect.innerUpdate()
 	{
 		if (global.lock_on_state != 0)
 		{
+			// In Sonic & Knuckles without lock-on, any character selection that isn't Knuckles alone is set to Sonic Alone, skipping Tails alone and Sonic & Tails
 			if (levelselect.characters < CHARS_KNUCKLES_ALONE)
 				levelselect.characters = CHARS_SONIC_ALONE
 		}
@@ -270,6 +271,7 @@ function bool LevelSelect.innerUpdate()
 					// Blue Spheres from Sonic 3
 					if (global.lock_on_state != 0)
 					{
+						// Inaccessible without lock-on
 						global.sk_bluespheres = 1
 					}
 				}

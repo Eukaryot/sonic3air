@@ -32,6 +32,8 @@ function void fn02582e()
 	//  - 0x0258fa	-> (objA0.subtype2c & 0x0f) = 0x04
 	//  - 0x025906	-> (objA0.subtype2c & 0x0f) = 0x05
 	//  - 0x025938	-> (objA0.subtype2c & 0x0f) = 0x06
+	//  - 0x02594c	-> (objA0.subtype2c & 0x0f) = 0x07
+	//  - 0x025960	-> (objA0.subtype2c & 0x0f) = 0x08
 	A1 = tableLookupAddress(0x0258bc, (objA0.subtype2c & 0x0f) * 2)
 	u32[A0 + 0x42] = A1
 
@@ -129,6 +131,28 @@ function void fn025938()
 	fn025974()
 
 	objA0.position.y.u16 = D0.u16 + u16[A0 + 0x34] - 0x60
+}
+
+
+// Platforms moving at a wider range, based on ported scripts #contributed by Legobouwer
+
+//# address-hook(0x02594c) end(0x02595e)
+function void fn02594c()
+{
+	D2.u16 = 0x7f
+	fn025974()
+
+	objA0.position.x.u16 = D0.u16 + u16[A0 + 0x30] - 0x80
+}
+
+
+//# address-hook(0x025960) end(0x025972)
+function void fn025960()
+{
+	D2.u16 = 0x7f
+	fn025974()
+
+	objA0.position.y.u16 = D0.u16 + u16[A0 + 0x34] - 0x80
 }
 
 
