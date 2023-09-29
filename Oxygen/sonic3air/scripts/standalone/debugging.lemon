@@ -95,6 +95,52 @@ function void Debugging.debugDrawDynamicObjects()
 
 function void OxygenCallback.setupCustomSidePanelEntries()
 {
+	setupCharactersSidePanelEntry()
+	setupGameObjectsSidePanelEntry()
+}
+
+function void setupCharactersSidePanelEntry()
+{
+	// Characters panel
+	if (System.SidePanel.setupCustomCategory("C", "CHARACTERS"))
+	{
+		bool showCharacter1 = System.SidePanel.addOption("Show first character", true)
+		bool showCharacter2 = System.SidePanel.addOption("Show second character", false)
+
+		for (u8 index = 0; index < 2; ++index)
+		{
+			u32 address = 0xffffb000 + index * 0x4a
+			A0 = address
+			if (address == 0xffffb000)
+			{
+				if (!showCharacter1)
+					continue
+				System.SidePanel.addEntry("Character 1 (0xffffb000)")
+			}
+			else
+			{
+				if (!showCharacter2)
+					continue
+			}
+
+			System.SidePanel.addEntry(address)
+			System.SidePanel.addLine(stringformat("Character %d (0x%08x)", index + 1, address), 0)
+
+			System.SidePanel.addLine(stringformat("- Update routine: 0x%06x", char.update_address), 8)
+			System.SidePanel.addLine(stringformat("- Base state:     0x%02x", char.base_state), 8)
+			System.SidePanel.addLine(stringformat("- Position:       0x%04x, 0x%04x", char.position.x.u16, char.position.y.u16), 8)
+			System.SidePanel.addLine(stringformat("- Anim sprite:    0x%02x", char.animation.sprite), 8)
+			System.SidePanel.addLine(stringformat("- Anim frame:     0x%02x", char.animation.frame), 8)
+			System.SidePanel.addLine(stringformat("- Anim timer:     0x%02x", char.animation.timer), 8)
+			System.SidePanel.addLine(stringformat("- Flags:          0x%02x", char.flags), 8)
+			System.SidePanel.addLine(stringformat("- Control flags:  0x%02x", char.control_flags), 8)
+			System.SidePanel.addLine(stringformat("- Layer flags:    0x%04x", char.layer_flags), 8)
+		}
+	}
+}
+
+function void setupGameObjectsSidePanelEntry()
+{
 	// Game Objects panel
 	if (System.SidePanel.setupCustomCategory("O", "GAME OBJECTS"))
 	{
@@ -159,9 +205,9 @@ function void OxygenCallback.debugAltT()
 	Debug.useAbstractionRendering = !Debug.useAbstractionRendering
 
 	if (Debug.useAbstractionRendering)
-		debugLog("Renderer mode: Abstraction (allows for Alt-click / Alt-rightclick)")
+		System.writeDisplayLine("Renderer mode: Abstraction (allows for Alt-click / Alt-rightclick)")
 	else
-		debugLog("Renderer mode: Normal rendering")
+		System.writeDisplayLine("Renderer mode: Normal rendering")
 }
 
 function void OxygenCallback.debugAltLeftMouseDown(s16 mx, s16 my, u8 flags)
@@ -193,5 +239,5 @@ function void Debug.changeChunkAtScreenPosition(s16 mx, s16 my, s8 change)
 	u32 chunkAddress = 0xffff0000 + u16[0xffff8008 + chunkRow * 4] + chunkColumn
 	u8[chunkAddress] += change
 
-	debugLog(stringformat("chunk: u8[%08x] = 0x%02x", chunkAddress, u8[chunkAddress]))
+	System.writeDisplayLine(stringformat("Chunk at %08x changed to: 0x%02x", chunkAddress, u8[chunkAddress]))
 }
