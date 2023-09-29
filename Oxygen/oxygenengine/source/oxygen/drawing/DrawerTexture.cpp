@@ -35,7 +35,7 @@ void DrawerTexture::setImplementation(DrawerTextureImplementation* implementatio
 
 	if (nullptr != implementation)
 	{
-		implementation->refreshImplementation(*this, mSetupAsRenderTarget, mSize);
+		implementation->refreshImplementation(mSetupAsRenderTarget, mSize);
 	}
 }
 
@@ -71,7 +71,7 @@ void DrawerTexture::setupAsRenderTarget(uint32 width, uint32 height)
 
 	if (nullptr != mImplementation)
 	{
-		mImplementation->setupAsRenderTarget(mSize, *this);
+		mImplementation->setupAsRenderTarget(mSize);
 	}
 }
 

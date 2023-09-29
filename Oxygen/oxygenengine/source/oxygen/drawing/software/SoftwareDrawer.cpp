@@ -165,9 +165,9 @@ namespace softwaredrawer
 			}
 		}
 
-		SoftwareDrawerTexture* createTexture()
+		SoftwareDrawerTexture* createTexture(DrawerTexture& outTexture)
 		{
-			SoftwareDrawerTexture* texture = new SoftwareDrawerTexture();
+			SoftwareDrawerTexture* texture = new SoftwareDrawerTexture(outTexture);
 			return texture;
 		}
 
@@ -431,7 +431,7 @@ SoftwareDrawer::~SoftwareDrawer()
 
 void SoftwareDrawer::createTexture(DrawerTexture& outTexture)
 {
-	outTexture.setImplementation(mInternal.createTexture());
+	outTexture.setImplementation(mInternal.createTexture(outTexture));
 }
 
 void SoftwareDrawer::refreshTexture(DrawerTexture& texture)

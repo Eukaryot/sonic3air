@@ -15,18 +15,18 @@ void SoftwareDrawerTexture::updateFromBitmap(const Bitmap& bitmap)
 	// Nothing to do
 }
 
-void SoftwareDrawerTexture::setupAsRenderTarget(const Vec2i& size, DrawerTexture& owner)
+void SoftwareDrawerTexture::setupAsRenderTarget(const Vec2i& size)
 {
 	// Set owner's bitmap to the correct size, as we will use that for rendering into
-	owner.accessBitmap().create(size.x, size.y);
+	mOwner.accessBitmap().create(size.x, size.y);
 }
 
 void SoftwareDrawerTexture::writeContentToBitmap(Bitmap& outBitmap)
 {
-	// Nothing to do
+	outBitmap = mOwner.accessBitmap();
 }
 
-void SoftwareDrawerTexture::refreshImplementation(DrawerTexture& owner, bool setupRenderTarget, const Vec2i& size)
+void SoftwareDrawerTexture::refreshImplementation(bool setupRenderTarget, const Vec2i& size)
 {
 	// Nothing to do
 }

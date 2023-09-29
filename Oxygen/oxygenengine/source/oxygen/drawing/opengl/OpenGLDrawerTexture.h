@@ -18,10 +18,12 @@
 class OpenGLDrawerTexture final : public DrawerTextureImplementation
 {
 public:
+	inline explicit OpenGLDrawerTexture(DrawerTexture& owner) : DrawerTextureImplementation(owner) {}
+
 	void updateFromBitmap(const Bitmap& bitmap) override;
-	void setupAsRenderTarget(const Vec2i& size, DrawerTexture& owner) override;
+	void setupAsRenderTarget(const Vec2i& size) override;
 	void writeContentToBitmap(Bitmap& outBitmap) override;
-	void refreshImplementation(DrawerTexture& owner, bool setupRenderTarget, const Vec2i& size) override;
+	void refreshImplementation(bool setupRenderTarget, const Vec2i& size) override;
 
 public:
 	inline OpenGLTexture& getTexture()  { return mTexture; }

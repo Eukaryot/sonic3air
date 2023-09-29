@@ -161,9 +161,9 @@ namespace opengldrawer
 			}
 		}
 
-		OpenGLDrawerTexture* createTexture()
+		OpenGLDrawerTexture* createTexture(DrawerTexture& outTexture)
 		{
-			OpenGLDrawerTexture* texture = new OpenGLDrawerTexture();
+			OpenGLDrawerTexture* texture = new OpenGLDrawerTexture(outTexture);
 			return texture;
 		}
 
@@ -396,7 +396,7 @@ bool OpenGLDrawer::wasSetupSuccessful()
 
 void OpenGLDrawer::createTexture(DrawerTexture& outTexture)
 {
-	outTexture.setImplementation(mInternal.createTexture());
+	outTexture.setImplementation(mInternal.createTexture(outTexture));
 }
 
 void OpenGLDrawer::refreshTexture(DrawerTexture& texture)

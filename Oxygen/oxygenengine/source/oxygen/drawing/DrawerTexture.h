@@ -17,12 +17,16 @@ class DrawerTexture;
 class DrawerTextureImplementation
 {
 public:
+	explicit DrawerTextureImplementation(DrawerTexture& owner) : mOwner(owner) {}
 	virtual ~DrawerTextureImplementation() {}
 
 	virtual void updateFromBitmap(const Bitmap& bitmap) = 0;
-	virtual void setupAsRenderTarget(const Vec2i& size, DrawerTexture& owner) = 0;
+	virtual void setupAsRenderTarget(const Vec2i& size) = 0;
 	virtual void writeContentToBitmap(Bitmap& outBitmap) = 0;
-	virtual void refreshImplementation(DrawerTexture& owner, bool setupRenderTarget, const Vec2i& size) = 0;
+	virtual void refreshImplementation(bool setupRenderTarget, const Vec2i& size) = 0;
+
+protected:
+	DrawerTexture& mOwner;
 };
 
 

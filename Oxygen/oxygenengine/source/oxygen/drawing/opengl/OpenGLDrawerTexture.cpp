@@ -22,7 +22,7 @@ void OpenGLDrawerTexture::updateFromBitmap(const Bitmap& bitmap)
 	mWrapMode = TextureWrapMode::CLAMP;
 }
 
-void OpenGLDrawerTexture::setupAsRenderTarget(const Vec2i& size, DrawerTexture& owner)
+void OpenGLDrawerTexture::setupAsRenderTarget(const Vec2i& size)
 {
 	mTexture.setup(size, rmx::OpenGLHelper::FORMAT_RGB);
 
@@ -49,17 +49,17 @@ void OpenGLDrawerTexture::writeContentToBitmap(Bitmap& outBitmap)
 #endif
 }
 
-void OpenGLDrawerTexture::refreshImplementation(DrawerTexture& owner, bool setupRenderTarget, const Vec2i& size)
+void OpenGLDrawerTexture::refreshImplementation(bool setupRenderTarget, const Vec2i& size)
 {
 	if (setupRenderTarget)
 	{
-		setupAsRenderTarget(size, owner);
+		setupAsRenderTarget(size);
 	}
 	else
 	{
-		if (!owner.accessBitmap().empty())
+		if (!mOwner.accessBitmap().empty())
 		{
-			updateFromBitmap(owner.accessBitmap());
+			updateFromBitmap(mOwner.accessBitmap());
 		}
 	}
 }
