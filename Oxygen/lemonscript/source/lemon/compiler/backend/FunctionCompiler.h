@@ -65,6 +65,13 @@ namespace lemon
 		const GlobalsLookup& mGlobalsLookup;
 		std::vector<Opcode>& mOpcodes;
 		uint32 mLineNumber = 0;		// For error output
+
+		struct CollectedLabel
+		{
+			FlyweightString mLabelName;
+			std::vector<uint32> mJumpLocations;
+		};
+		std::unordered_map<uint64, CollectedLabel> mCollectedLabels;
 	};
 
 }

@@ -123,6 +123,19 @@ namespace lemon
 		NodeContext context;
 		buildOpcodesFromNodes(blockNode, context);
 
+		// Process all jumps to labels
+		for (const auto& [key, collectedLabel] : mCollectedLabels)
+		{
+			for (size_t jumpLocation : collectedLabel.mJumpLocations)
+			{
+				RMX_ASSERT(mOpcodes[jumpLocation].mType == Opcode::Type::JUMP, "Expected JUMP opcode");
+				size_t offset = 0;
+				if (!mFunction.getLabel(collectedLabel.mLabelName, offset))
+					RMX_ASSERT(false, "Jump target label not found: " << collectedLabel.mLabelName.getString());
+				mOpcodes[jumpLocation].mParameter = (uint64)offset;
+			}
+		}
+
 		// Make sure it ends with a return in any case
 		if (mOpcodes.empty() || mOpcodes.back().mType != Opcode::Type::RETURN)
 		{
@@ -224,6 +237,19 @@ namespace lemon
 
 	void FunctionCompiler::buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context)
 	{
+		// First collect all the labels
+		for (size_t i = 0; i < blockNode.mNodes.size(); ++i)
+		{
+			const Node& node = blockNode.mNodes[i];
+			if (node.isA<LabelNode>())
+			{
+				const FlyweightString& labelName = node.as<LabelNode>().mLabel;
+				CollectedLabel& collectedLabel = mCollectedLabels[labelName.getHash()];
+				CHECK_ERROR(!collectedLabel.mLabelName.isValid(), "Label is defined more than once: " << labelName.getString(), node.getLineNumber());
+				collectedLabel.mLabelName = labelName;
+			}
+		}
+
 		// Cycle through all nodes
 		for (size_t i = 0; i < blockNode.mNodes.size(); ++i)
 		{
@@ -266,11 +292,11 @@ namespace lemon
 				const JumpNode& jumpNode = node.as<JumpNode>();
 				CHECK_ERROR(jumpNode.mLabelToken.valid(), "Jump node must have a label", node.getLineNumber());
 
-				size_t offset = 0xffffffff;
-				if (!mFunction.getLabel(jumpNode.mLabelToken->mName, offset))
-					CHECK_ERROR(false, "Jump target label not found: " << jumpNode.mLabelToken->mName.getString(), node.getLineNumber());
+				CollectedLabel* collectedLabel = mapFind(mCollectedLabels, jumpNode.mLabelToken->mName.getHash());
+				CHECK_ERROR(nullptr != collectedLabel, "Jump target label not found: " << jumpNode.mLabelToken->mName.getString(), node.getLineNumber());
+				collectedLabel->mJumpLocations.push_back(mOpcodes.size());
 
-				addOpcode(Opcode::Type::JUMP, offset);
+				addOpcode(Opcode::Type::JUMP);	// Target position must be set afterwards
 				break;
 			}
 

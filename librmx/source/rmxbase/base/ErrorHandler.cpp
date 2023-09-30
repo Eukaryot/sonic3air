@@ -190,6 +190,11 @@ namespace rmx
 		if (gIgnoredAssertHashes.count(hash) != 0)
 			return false;
 
+		static bool isInsideAssertBreakHandler = false;
+		if (isInsideAssertBreakHandler)
+			return false;
+		isInsideAssertBreakHandler = true;
+
 		MessageBoxInterface::DialogType dialogType = MessageBoxInterface::DialogType::ACCEPT_OR_CANCEL;
 		if (isDebuggerAttached())
 		{
@@ -216,6 +221,8 @@ namespace rmx
 		{
 			gIgnoredAssertHashes.insert(hash);
 		}
+
+		isInsideAssertBreakHandler = false;
 
 		// If aborted, break now
 		return (result == MessageBoxInterface::Result::ACCEPT && isDebuggerAttached());
