@@ -11,7 +11,7 @@ project(Sonic3AIR)
 # Determine whether to support discord integration
 set(USE_DISCORD true)
 if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
-	link_directories(/opt/vc/lib)	# Needed when building on Rasperry Pi
+	link_directories(/opt/vc/lib)	# Needed when building on Raspberry Pi
 	set(USE_DISCORD false)
 endif()
 message(STATUS "USE_DISCORD = ${USE_DISCORD}")
@@ -188,6 +188,10 @@ target_link_libraries(oxygen rmxmedia)
 target_link_libraries(oxygen rmxext_oggvorbis)
 target_link_libraries(oxygen lemonscript)
 target_link_libraries(oxygen oxygen_netcore)
+
+if (UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+	target_link_libraries(oxygen atomic)	# Needed when building on Raspberry Pi
+endif()
 
 
 
