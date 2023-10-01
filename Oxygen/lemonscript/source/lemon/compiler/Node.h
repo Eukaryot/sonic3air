@@ -29,6 +29,7 @@ namespace lemon
 			FUNCTION,
 			LABEL,
 			JUMP,
+			JUMP_INDIRECT,
 			BREAK,
 			CONTINUE,
 			RETURN,
@@ -165,6 +166,20 @@ namespace lemon
 
 	public:
 		TokenPtr<LabelToken> mLabelToken;
+	};
+
+
+	class JumpIndirectNode : public Node
+	{
+	public:
+		static const Type TYPE = Type::JUMP_INDIRECT;
+
+	public:
+		inline JumpIndirectNode() : Node(TYPE) {}
+
+	public:
+		TokenPtr<StatementToken> mIndexToken;
+		std::vector<TokenPtr<LabelToken>> mLabelTokens;
 	};
 
 

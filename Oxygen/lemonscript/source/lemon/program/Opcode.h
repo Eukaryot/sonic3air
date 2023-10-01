@@ -50,6 +50,7 @@ namespace lemon
 			COMPARE_GE,
 			JUMP,
 			JUMP_CONDITIONAL,
+			JUMP_INDIRECT,
 			CALL,
 			RETURN,
 			EXTERNAL_CALL,

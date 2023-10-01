@@ -26,7 +26,7 @@ namespace lemon
 		mModuleName(name),
 		mModuleId(rmx::getMurmur2_64(name) & 0xffffffffffff0000ull)
 	{
-		static_assert((size_t)Opcode::Type::_NUM_TYPES == 35);	// Otherwise DEFAULT_OPCODE_BASETYPES needs to get updated
+		static_assert((size_t)Opcode::Type::_NUM_TYPES == 36);	// Otherwise DEFAULT_OPCODE_BASETYPES needs to get updated
 	}
 
 	Module::~Module()

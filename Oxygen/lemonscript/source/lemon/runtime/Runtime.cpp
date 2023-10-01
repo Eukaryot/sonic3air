@@ -518,6 +518,38 @@ namespace lemon
 							break;
 						}
 
+						case Opcode::Type::JUMP_INDIRECT:
+						{
+							RMX_CHECK(false, "Implementation does not work yet", return);
+
+							// Get previously calculated index
+							--mSelectedControlFlow->mValueStackPtr;
+							const size_t index = (size_t)*mSelectedControlFlow->mValueStackPtr;
+							const size_t numJumps = (size_t)context.mOpcode->getParameter<uint64>();
+							if (index < numJumps)
+							{
+								for (size_t k = 0; k < index; ++k)
+									context.mOpcode = context.mOpcode->mNext;
+							}
+							else
+							{
+								for (size_t k = 0; k < numJumps; ++k)
+									context.mOpcode = context.mOpcode->mNext;
+							}
+
+							state.mProgramCounter = (const uint8*)context.mOpcode;
+
+							// Check if steps limit is reached (this usually means the limit was exceeded already, but that's okay)
+							//  -> This is needed to prevent endless loops
+							++result.mStepsExecuted;
+							if (result.mStepsExecuted >= stepsLimit)
+							{
+								mActiveControlFlow = nullptr;
+								return;
+							}
+							break;
+						}
+
 						case Opcode::Type::CALL:
 						{
 							state.mProgramCounter = (uint8*)context.mOpcode->mNext;

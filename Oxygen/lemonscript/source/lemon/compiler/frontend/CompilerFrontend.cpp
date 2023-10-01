@@ -566,6 +566,28 @@ namespace lemon
 					// Process tokens
 					processTokens(tokens, function, scopeContext, lineNumber, mCompileOptions.mExternalAddressType);
 
+					// Special case: Indirect jump
+					if (keyword == Keyword::JUMP && tokens.size() == 1 && tokens[0].isA<CommaSeparatedListToken>())
+					{
+						const CommaSeparatedListToken& cslt = tokens[0].as<CommaSeparatedListToken>();
+						if (cslt.mContent.size() >= 2 && cslt.mContent[0].size() == 2 && cslt.mContent[0][1].isStatement())
+						{
+							JumpIndirectNode& node = NodeFactory::create<JumpIndirectNode>();
+							node.mIndexToken = cslt.mContent[0][1].as<StatementToken>();
+
+							size_t index = 1;
+							while (index < cslt.mContent.size())
+							{
+								CHECK_ERROR(cslt.mContent[index].size() == 1, "Invalid syntax for indirect 'jump'", lineNumber);
+								CHECK_ERROR(cslt.mContent[index][0].isA<LabelToken>(), "Invalid syntax for indirect 'jump'", lineNumber);
+								vectorAdd(node.mLabelTokens) = cslt.mContent[index][0].as<LabelToken>();
+								++index;
+							}
+							node.setLineNumber(lineNumber);
+							return &node;
+						}
+					}
+
 					CHECK_ERROR(tokens.size() == 2, "'call' and 'jump' need an additional token after them", lineNumber);
 					if (tokens[1].isStatement())
 					{

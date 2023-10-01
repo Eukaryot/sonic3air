@@ -300,6 +300,26 @@ namespace lemon
 				break;
 			}
 
+			case Node::Type::JUMP_INDIRECT:
+			{
+				const JumpIndirectNode& jumpNode = node.as<JumpIndirectNode>();
+				CHECK_ERROR(!jumpNode.mLabelTokens.empty(), "Indirect jump node must have at least one label", node.getLineNumber());
+
+				compileTokenTreeToOpcodes(*jumpNode.mIndexToken);
+				
+				const size_t indirectJumpOpcodeIndex = mOpcodes.size();
+				addOpcode(Opcode::Type::JUMP_INDIRECT, jumpNode.mLabelTokens.size());
+
+				for (const TokenPtr<LabelToken>& labelToken : jumpNode.mLabelTokens)
+				{
+					size_t offset = 0xffffffff;
+					if (!mFunction.getLabel(labelToken->mName, offset))
+						CHECK_ERROR(false, "Jump target label not found: " << labelToken->mName.getString(), node.getLineNumber());
+					addOpcode(Opcode::Type::JUMP, offset);
+				}
+				break;
+			}
+
 			case Node::Type::BREAK:
 			{
 				CHECK_ERROR(context.mIsLoopBlock, "Keyword 'break' is only allowed inside a while or for loop", node.getLineNumber());
