@@ -209,6 +209,7 @@ function void fn03a480()
 		return
 	}
 #endif
+
 	D0.s32 = s32(objA1.groundspeed) << 8
 	u32[A2] += D0
 	if (s32[A2] < 0)

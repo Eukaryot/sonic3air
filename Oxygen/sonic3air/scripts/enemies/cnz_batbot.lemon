@@ -24,7 +24,8 @@ function void Batbot.Init()
 function void fn08937c()
 {
 #if STANDALONE
-	objA0.sprite_priority = 0x200 // put Batbot in front of the stage
+	// Put Batbot in front of the stage, #contributed by TheMushrunt
+	objA0.sprite_priority = 0x200
 #endif
 	// Targets:
 	//  - 0x089394	-> objA0.base_state = 0x00
@@ -123,7 +124,8 @@ function void fn089426()
 function void fn08942e()
 {
 #if STANDALONE
-	objA0.sprite_priority = 0x180 // putting the Batbot's body in front of the stage required the eyes to be brought up in priority
+	// Putting Batbot's body in front of the stage required the eyes to be brought up in priority
+	objA0.sprite_priority = 0x180
 #endif
 	MoveWithParent()
 
