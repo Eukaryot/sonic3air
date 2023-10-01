@@ -109,6 +109,7 @@ public:
 private:
 	void deleteWatch(Watch& watch);
 	uint32 getCurrentWatchValue(uint32 address, uint16 bytes) const;
+	int getCurrentCallFrameIndex() const;
 
 private:
 	// Interface implementations

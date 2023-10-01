@@ -260,11 +260,18 @@ uint32 DebugTracking::getCurrentWatchValue(uint32 address, uint16 bytes) const
 	}
 }
 
+int DebugTracking::getCurrentCallFrameIndex() const
+{
+	const CodeExec::CallFrameTracking* tracking = mCodeExec.getActiveCallFrameTracking();
+	if (nullptr == tracking || tracking->mCallStack.empty())
+		return 0;
+	return (int)tracking->mCallStack.back();
+}
+
 void DebugTracking::onScriptLog(std::string_view key, std::string_view value)
 {
 	ScriptLogSingleEntry& scriptLogSingleEntry = updateScriptLogValue(key, value);
-	if (nullptr != mCodeExec.getActiveCallFrameTracking())
-		scriptLogSingleEntry.mCallFrameIndex = (int)mCodeExec.getActiveCallFrameTracking()->mCallFrames.size() - 1;
+	scriptLogSingleEntry.mCallFrameIndex = getCurrentCallFrameIndex();
 
 	Application::instance().getSimulation().stopSingleStepContinue();
 }
@@ -285,10 +292,9 @@ void DebugTracking::onWatchTriggered(size_t watchIndex, uint32 address, uint16 b
 		hit.mAddress = address;
 		hit.mBytes = bytes;
 		hit.mLocation = location;
+		hit.mCallFrameIndex = getCurrentCallFrameIndex();
 		watch.mHits.push_back(&hit);
 
-		if (nullptr != mCodeExec.getActiveCallFrameTracking())
-			hit.mCallFrameIndex = (int)mCodeExec.getActiveCallFrameTracking()->mCallFrames.size() - 1;
 		mWatchHitsThisUpdate.emplace_back(&watch, &hit);
 		mLemonScriptRuntime.getInternalLemonRuntime().triggerStopSignal();
 	}
@@ -322,7 +328,6 @@ void DebugTracking::onVRAMWrite(uint16 address, uint16 bytes)
 	write.mAddress = address;
 	write.mSize = bytes;
 	write.mLocation = location;
-	if (nullptr != mCodeExec.getActiveCallFrameTracking())
-		write.mCallFrameIndex = (int)mCodeExec.getActiveCallFrameTracking()->mCallFrames.size() - 1;
+	write.mCallFrameIndex = getCurrentCallFrameIndex();
 	mVRAMWrites.push_back(&write);
 }
