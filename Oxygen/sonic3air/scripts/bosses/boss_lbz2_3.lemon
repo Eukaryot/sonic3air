@@ -1441,7 +1441,6 @@ function void fn074fd2()
 		// This object looks broken and is unnecessary, so leave it out in S3AIR, fix #contributed by Legobouwer
 		// "spawnChildObjects(0x075186)" replaced by:
 		spawnChildObject(0x074e12, 0x00, 0, 16)
-
 	#else
 		// Release main character if he was grabbed (can happen if second character makes the final hit)
 		if (u8[0xffffb000 + 0x2e] & 0x81)

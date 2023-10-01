@@ -267,7 +267,7 @@ function void TitleScreen()
 	A1 = 0x00459c
 	while (true)
 	{
-		global.frame_state = 0x02
+		global.frame_state = 0x04 // Corrects cut to completely faded SEGA logo
 		waitForNextFrame()
 
 		copyMemory(0xfffffc00, A1, 0x0e)
@@ -1025,7 +1025,7 @@ function void fn004be4()
 	if (u8[A0 + 0x30] == 0)
 	{
 		++objA0.position.x.u16
-		if (objA0.position.x.u16 == 0x0240)
+		if (objA0.position.x.u16 == 0x0240 + getScreenExtend()) // Fixes the Tornado moving downward early
 		{
 			u8[A0 + 0x30] = 1
 			objA0.flags2a |= 0x01

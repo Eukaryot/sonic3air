@@ -23,6 +23,9 @@ function void Batbot.Init()
 //# address-hook(0x08937c) end(0x08938a)
 function void fn08937c()
 {
+#if STANDALONE
+	objA0.sprite_priority = 0x200 // put Batbot in front of the stage
+#endif
 	// Targets:
 	//  - 0x089394	-> objA0.base_state = 0x00
 	//  - 0x0893a4	-> objA0.base_state = 0x02
@@ -119,6 +122,9 @@ function void fn089426()
 //# address-hook(0x08942e) end(0x089440)
 function void fn08942e()
 {
+#if STANDALONE
+	objA0.sprite_priority = 0x180 // putting the Batbot's body in front of the stage required the eyes to be brought up in priority
+#endif
 	MoveWithParent()
 
 	// Targets:

@@ -740,6 +740,10 @@ function void fn01e732()
 //# address-hook(0x08598a) end(0x0859cc)
 function void fn08598a()
 {
+#if STANDALONE
+	if ((objA0.update_address == 0x06da24 && objA0.base_state < 0x06) && global.zone_act == 0x0300) // Fix for CNZ1 miniboss altering Ring palette
+		return
+#endif
 	if (u8[0xfffffabf] != 0)
 		return
 

@@ -148,7 +148,7 @@ function void TitleScreen_SK()
 				fn005972()
 
 				u32[0xffffb04a] = 0x005802
-				u16[0xffffb04a + 0x2e] = 0x0140
+				u16[0xffffb04a + 0x2e] = 0x0140 + getScreenExtend() // Fix for the Death Egg not in the right position when skipping intro
 				u16[0xffffb04a + 0x32] = 0x70
 				u16[0xffffeec0] = 0x03
 
