@@ -335,6 +335,9 @@ void EmulatorInterface::writeVRam16(uint16 vramAddress, uint16 value)
 
 void EmulatorInterface::fillVRam(uint16 vramAddress, uint16 fillValue, uint16 bytes)
 {
+	if (bytes == 0)
+		return;
+
 	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
 	for (uint16 i = 0; i < bytes; i += 2)
 	{
@@ -350,6 +353,9 @@ void EmulatorInterface::fillVRam(uint16 vramAddress, uint16 fillValue, uint16 by
 
 void EmulatorInterface::copyFromMemoryToVRam(uint16 vramAddress, uint32 sourceAddress, uint16 bytes)
 {
+	if (bytes == 0)
+		return;
+
 	uint16* dst = (uint16*)(mInternal.mVRam + vramAddress);
 	const uint16* src = (uint16*)(mInternal.accessMemory<MEMORY_MODE_READ>(sourceAddress, bytes));
 	const uint16* end = src + (bytes / 2);
