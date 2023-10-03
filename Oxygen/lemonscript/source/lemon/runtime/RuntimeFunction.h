@@ -10,6 +10,10 @@
 
 #include "lemon/runtime/RuntimeOpcode.h"
 
+// Experimental change of conditional jump to being executed as a runtime opcode function
+//  -> It works, but has a negative impact on performance
+//#define USE_JUMP_CONDITIONAL_RUNTIME_EXEC
+
 
 namespace lemon
 {
@@ -58,7 +62,8 @@ namespace lemon
 		const uint8* translateToRuntimeProgramCounter(size_t originalProgramCounter) const;
 
 	private:
-		void createRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int& outNumOpcodesConsumed, const Runtime& runtime);
+		void createRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime);
+		const uint8* translateJumpTarget(uint32 targetOpcodeIndex) const;
 
 	public:
 		const ScriptFunction* mFunction = nullptr;

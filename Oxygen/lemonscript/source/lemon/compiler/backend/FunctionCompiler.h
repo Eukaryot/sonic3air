@@ -18,6 +18,7 @@ namespace lemon
 	class BlockNode;
 	class StatementToken;
 	class BinaryOperationToken;
+	class LabelToken;
 	class GlobalsLookup;
 	struct CompileOptions;
 
@@ -44,6 +45,7 @@ namespace lemon
 		Opcode& addOpcode(Opcode::Type type, BaseType dataType, int64 parameter = 0);
 		Opcode& addOpcode(Opcode::Type type, const DataTypeDefinition* dataType, int64 parameter = 0);
 		void addCastOpcodeIfNecessary(const DataTypeDefinition* sourceType, const DataTypeDefinition* targetType);
+		Opcode& addJumpToLabel(Opcode::Type type, const LabelToken& labelToken);
 
 		void buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context);
 		void buildOpcodesForNode(const Node& node, NodeContext& context);

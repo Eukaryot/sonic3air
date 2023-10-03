@@ -117,7 +117,7 @@ namespace lemon
 				const size_t start = tempBuffer.size();
 
 				int numOpcodesConsumed = 1;
-				createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, numOpcodesConsumed, runtime);
+				createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, i, numOpcodesConsumed, runtime);
 				for (int k = 0; k < numOpcodesConsumed; ++k)
 				{
 					mProgramCounterByOpcodeIndex[k + i] = start;
@@ -136,20 +136,16 @@ namespace lemon
 			for (size_t i = 0; i < runtimeOpcodePointers.size(); ++i)
 			{
 				RuntimeOpcode& runtimeOpcode = *runtimeOpcodePointers[i];
-				if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP || runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+				if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP || runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_SWITCH)
 				{
-					const size_t oldJumpTarget = (size_t)runtimeOpcode.getParameter<uint32>();
-					const uint8* newJumpTarget = nullptr;
-					if (oldJumpTarget < mProgramCounterByOpcodeIndex.size())
-					{
-						newJumpTarget = mRuntimeOpcodeBuffer.getStart() + mProgramCounterByOpcodeIndex[oldJumpTarget];
-					}
-					else
-					{
-						RMX_ASSERT(runtimeOpcodePointers.back()->mOpcodeType == Opcode::Type::RETURN, "Functions must end with a return in all cases");
-						newJumpTarget = (uint8*)runtimeOpcodePointers.back();
-					}
-					runtimeOpcode.setParameter<uint64>(reinterpret_cast<uint64>(newJumpTarget));
+					runtimeOpcode.setParameter(translateJumpTarget(runtimeOpcode.getParameter<uint32>()));
+				}
+				else if (runtimeOpcode.mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+				{
+					runtimeOpcode.setParameter(translateJumpTarget(runtimeOpcode.getParameter<uint32>(0)), 0);
+				#ifdef USE_JUMP_CONDITIONAL_RUNTIME_EXEC
+					runtimeOpcode.setParameter(translateJumpTarget(runtimeOpcode.getParameter<uint32>(8)), 8);
+				#endif
 				}
 			}
 
@@ -160,6 +156,10 @@ namespace lemon
 				if (runtimeOpcodePointers[i]->mSuccessiveHandledOpcodes == 0)
 				{
 					sequenceLength = 0;
+				}
+				else if (runtimeOpcodePointers[i]->mOpcodeType == Opcode::Type::JUMP_CONDITIONAL)
+				{
+					sequenceLength = 1;		// Sequence needs to stop after executing the conditional jump
 				}
 				else
 				{
@@ -230,12 +230,12 @@ namespace lemon
 		return &mRuntimeOpcodeBuffer[index];
 	}
 
-	void RuntimeFunction::createRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int& outNumOpcodesConsumed, const Runtime& runtime)
+	void RuntimeFunction::createRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
 	{
 		const Program& program = runtime.getProgram();
 		if (program.getOptimizationLevel() >= 2 && nullptr != program.mNativizedOpcodeProvider)
 		{
-			const bool success = program.mNativizedOpcodeProvider->buildRuntimeOpcode(buffer, opcodes, numOpcodesAvailable, outNumOpcodesConsumed, runtime);
+			const bool success = program.mNativizedOpcodeProvider->buildRuntimeOpcode(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
 			if (success)
 				return;
 		}
@@ -243,13 +243,27 @@ namespace lemon
 		// Runtime opcode generation by merging multiple opcodes where possible
 		if (program.getOptimizationLevel() >= 1)
 		{
-			const bool success = OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, outNumOpcodesConsumed, runtime);
+			const bool success = OptimizedOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
 			if (success)
 				return;
 		}
 
 		// Fallback: Direct translation of one opcode to the respective runtime opcode
-		DefaultOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, outNumOpcodesConsumed, runtime);
+		DefaultOpcodeProvider::buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
+	}
+
+	const uint8* RuntimeFunction::translateJumpTarget(uint32 targetOpcodeIndex) const
+	{
+		const size_t oldJumpTarget = (size_t)targetOpcodeIndex;
+		if (oldJumpTarget < mProgramCounterByOpcodeIndex.size())
+		{
+			return mRuntimeOpcodeBuffer.getStart() + mProgramCounterByOpcodeIndex[oldJumpTarget];
+		}
+		else
+		{
+			RMX_ASSERT(mRuntimeOpcodeBuffer.getOpcodePointers().back()->mOpcodeType == Opcode::Type::RETURN, "Functions must end with a return in all cases");
+			return (const uint8*)mRuntimeOpcodeBuffer.getOpcodePointers().back();
+		}
 	}
 
 }

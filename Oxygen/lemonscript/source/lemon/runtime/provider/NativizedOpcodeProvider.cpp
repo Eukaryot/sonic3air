@@ -22,7 +22,7 @@ namespace lemon
 		(*buildFunction)(mLookupDictionary);
 	}
 
-	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool NativizedOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
 	{
 		if (mLookupDictionary.mEntries.empty() || numOpcodesAvailable < (int)Nativizer::MIN_OPCODES)
 			return false;

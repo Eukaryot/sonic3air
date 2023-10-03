@@ -338,6 +338,15 @@ namespace lemon
 			context.writeValueStack<T>(-1, ~context.readValueStack<T>(-1));
 		}
 
+	#ifdef USE_JUMP_CONDITIONAL_RUNTIME_EXEC
+		static void exec_JUMP_CONDITIONAL(const RuntimeOpcodeContext context)
+		{
+			--context.mControlFlow->mValueStackPtr;
+			const size_t index = (*context.mControlFlow->mValueStackPtr == 0) ? 0 : 8;	// Parameter index 0 if condition is true (i.e. value stack is zero), otherwise index 8
+			const_cast<RuntimeOpcode*>(context.mOpcode)->mNext = context.mOpcode->getParameter<RuntimeOpcode*>(index);
+		}
+	#endif
+
 		static void exec_INLINE_NATIVE_CALL(const RuntimeOpcodeContext context)
 		{
 			const NativeFunction& func = *context.mOpcode->getParameter<const NativeFunction*>();
@@ -352,13 +361,59 @@ namespace lemon
 
 
 
-	void DefaultOpcodeProvider::buildRuntimeOpcodeStatic(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int& outNumOpcodesConsumed, const Runtime& runtime)
+	void DefaultOpcodeProvider::buildRuntimeOpcodeStatic(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
 	{
 		const Opcode& opcode = opcodes[0];
 		outNumOpcodesConsumed = 1;
 
-		RuntimeOpcode& runtimeOpcode = buffer.addOpcode(8);
-		runtimeOpcode.setParameter(opcode.mParameter);		// Default usage, parameter might be used differently depending on the opcode type
+		// Get parameter size
+		//  -> It's usually 8 bytes = 1 parameter, but not all opcodes will actually use parameter
+		size_t parameterSize = 8;
+		switch (opcode.mType)
+		{
+			case Opcode::Type::MOVE_STACK:
+				if (opcode.mParameter == -1)
+					parameterSize = 0;
+				break;
+			case Opcode::Type::NOP:
+			case Opcode::Type::READ_MEMORY:
+			case Opcode::Type::WRITE_MEMORY:
+			case Opcode::Type::MAKE_BOOL:
+			case Opcode::Type::ARITHM_ADD:
+			case Opcode::Type::ARITHM_SUB:
+			case Opcode::Type::ARITHM_MUL:
+			case Opcode::Type::ARITHM_DIV:
+			case Opcode::Type::ARITHM_MOD:
+			case Opcode::Type::ARITHM_AND:
+			case Opcode::Type::ARITHM_OR:
+			case Opcode::Type::ARITHM_XOR:
+			case Opcode::Type::ARITHM_SHL:
+			case Opcode::Type::ARITHM_SHR:
+			case Opcode::Type::COMPARE_EQ:
+			case Opcode::Type::COMPARE_NEQ:
+			case Opcode::Type::COMPARE_LT:
+			case Opcode::Type::COMPARE_LE:
+			case Opcode::Type::COMPARE_GT:
+			case Opcode::Type::COMPARE_GE:
+			case Opcode::Type::ARITHM_NEG:
+			case Opcode::Type::ARITHM_NOT:
+			case Opcode::Type::ARITHM_BITNOT:
+			case Opcode::Type::RETURN:
+			case Opcode::Type::EXTERNAL_CALL:
+			case Opcode::Type::EXTERNAL_JUMP:
+				parameterSize = 0;
+				break;
+
+		#ifdef USE_JUMP_CONDITIONAL_RUNTIME_EXEC
+			case Opcode::Type::JUMP_CONDITIONAL:
+				parameterSize = 16;
+				break;
+		#endif
+		}
+
+		RuntimeOpcode& runtimeOpcode = buffer.addOpcode(parameterSize);
+		if (parameterSize >= 8)
+			runtimeOpcode.setParameter(opcode.mParameter);		// Default usage, parameter might be used differently depending on the opcode type
 		runtimeOpcode.mExecFunc = &OpcodeExec::exec_NOT_HANDLED;
 		runtimeOpcode.mOpcodeType = opcode.mType;
 
@@ -598,12 +653,24 @@ namespace lemon
 			case Opcode::Type::ARITHM_BITNOT:	SELECT_EXEC_FUNC_BY_DATATYPE_INT(OpcodeExec::exec_ARITHM_UNARY_BITNOT);	break;
 
 			case Opcode::Type::JUMP:
-			case Opcode::Type::JUMP_CONDITIONAL:
 			case Opcode::Type::RETURN:
 			case Opcode::Type::EXTERNAL_CALL:
 			case Opcode::Type::EXTERNAL_JUMP:
 			{
 				runtimeOpcode.mSuccessiveHandledOpcodes = 0;
+				return;
+			}
+
+			case Opcode::Type::JUMP_CONDITIONAL:
+			{
+			#ifdef USE_JUMP_CONDITIONAL_RUNTIME_EXEC
+				runtimeOpcode.mExecFunc = &OpcodeExec::exec_JUMP_CONDITIONAL;
+				runtimeOpcode.setParameter((uint32)opcode.mParameter, 0);		// Jump target if condition is true
+				runtimeOpcode.setParameter((uint32)firstOpcodeIndex + 1, 8);	// Pointer to next opcode
+				runtimeOpcode.mSuccessiveHandledOpcodes = 1;
+			#else
+				runtimeOpcode.mSuccessiveHandledOpcodes = 0;
+			#endif
 				return;
 			}
 
@@ -638,9 +705,9 @@ namespace lemon
 		runtimeOpcode.mSuccessiveHandledOpcodes = (runtimeOpcode.mExecFunc == &OpcodeExec::exec_NOT_HANDLED) ? 0 : 1;
 	}
 
-	bool DefaultOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int& outNumOpcodesConsumed, const Runtime& runtime)
+	bool DefaultOpcodeProvider::buildRuntimeOpcode(RuntimeOpcodeBuffer& buffer, const Opcode* opcodes, int numOpcodesAvailable, int firstOpcodeIndex, int& outNumOpcodesConsumed, const Runtime& runtime)
 	{
-		buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, outNumOpcodesConsumed, runtime);
+		buildRuntimeOpcodeStatic(buffer, opcodes, numOpcodesAvailable, firstOpcodeIndex, outNumOpcodesConsumed, runtime);
 		return true;
 	}
 

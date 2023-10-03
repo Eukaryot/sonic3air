@@ -51,7 +51,7 @@ namespace lemon
 			BaseType::UINT_8,		// COMPARE_GE
 			BaseType::VOID,			// JUMP
 			BaseType::VOID,			// JUMP_CONDITIONAL
-			BaseType::VOID,			// JUMP_INDIRECT
+			BaseType::VOID,			// JUMP_SWITCH
 			BaseType::VOID,			// CALL
 			BaseType::VOID,			// RETURN
 			BaseType::VOID,			// EXTERNAL_CALL
@@ -79,7 +79,7 @@ namespace lemon
 		//  - 0x0d = Support for function alias names + added function flags as a small optimization
 		//  - 0x0e = Change in serialization of std::wstring in rmx
 		//  - 0x0f = Smaller optimizations in serialization
-		//  - 0x10 = Opcode JUMP_INDIRECT added
+		//  - 0x10 = Opcode JUMP_SWITCH added
 
 		// Signature and version number
 		const uint32 SIGNATURE = *(uint32*)"LMD|";	// "Lemonscript Module"

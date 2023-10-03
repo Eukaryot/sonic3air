@@ -235,6 +235,15 @@ namespace lemon
 		}
 	}
 
+	Opcode& FunctionCompiler::addJumpToLabel(Opcode::Type type, const LabelToken& labelToken)
+	{
+		CollectedLabel* collectedLabel = mapFind(mCollectedLabels, labelToken.mName.getHash());
+		CHECK_ERROR(nullptr != collectedLabel, "Jump target label not found: " << labelToken.mName.getString(), mLineNumber);
+		collectedLabel->mJumpLocations.push_back(mOpcodes.size());
+
+		addOpcode(type);	// Target position will be set afterwards
+	}
+
 	void FunctionCompiler::buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context)
 	{
 		// First collect all the labels
@@ -292,11 +301,7 @@ namespace lemon
 				const JumpNode& jumpNode = node.as<JumpNode>();
 				CHECK_ERROR(jumpNode.mLabelToken.valid(), "Jump node must have a label", node.getLineNumber());
 
-				CollectedLabel* collectedLabel = mapFind(mCollectedLabels, jumpNode.mLabelToken->mName.getHash());
-				CHECK_ERROR(nullptr != collectedLabel, "Jump target label not found: " << jumpNode.mLabelToken->mName.getString(), node.getLineNumber());
-				collectedLabel->mJumpLocations.push_back(mOpcodes.size());
-
-				addOpcode(Opcode::Type::JUMP);	// Target position must be set afterwards
+				addJumpToLabel(Opcode::Type::JUMP, *jumpNode.mLabelToken);
 				break;
 			}
 
@@ -306,17 +311,12 @@ namespace lemon
 				CHECK_ERROR(!jumpNode.mLabelTokens.empty(), "Indirect jump node must have at least one label", node.getLineNumber());
 
 				compileTokenTreeToOpcodes(*jumpNode.mIndexToken);
-				
-				const size_t indirectJumpOpcodeIndex = mOpcodes.size();
-				addOpcode(Opcode::Type::JUMP_INDIRECT, jumpNode.mLabelTokens.size());
 
 				for (const TokenPtr<LabelToken>& labelToken : jumpNode.mLabelTokens)
 				{
-					size_t offset = 0xffffffff;
-					if (!mFunction.getLabel(labelToken->mName, offset))
-						CHECK_ERROR(false, "Jump target label not found: " << labelToken->mName.getString(), node.getLineNumber());
-					addOpcode(Opcode::Type::JUMP, offset);
+					addJumpToLabel(Opcode::Type::JUMP_SWITCH, *labelToken);
 				}
+				addOpcode(Opcode::Type::MOVE_VAR_STACK, -1);	// Consume top of stack if none of the jumps did
 				break;
 			}
 

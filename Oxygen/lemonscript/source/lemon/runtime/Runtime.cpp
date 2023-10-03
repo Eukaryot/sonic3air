@@ -460,183 +460,170 @@ namespace lemon
 			bool stayInsideInnerLoop = true;
 			while (stayInsideInnerLoop)
 			{
-				// Optimization: Do multiple opcodes in a row without overheads if possible
-				if (context.mOpcode->mSuccessiveHandledOpcodes >= 4)
+				while (context.mOpcode->mSuccessiveHandledOpcodes > 0)
 				{
-					(*context.mOpcode->mExecFunc)(context);
-					context.mOpcode = context.mOpcode->mNext;
-
-					(*context.mOpcode->mExecFunc)(context);
-					context.mOpcode = context.mOpcode->mNext;
-
-					(*context.mOpcode->mExecFunc)(context);
-					context.mOpcode = context.mOpcode->mNext;
-
-					(*context.mOpcode->mExecFunc)(context);
-					context.mOpcode = context.mOpcode->mNext;
-
-					result.mStepsExecuted += 4;
-				}
-				else if (context.mOpcode->mSuccessiveHandledOpcodes > 0)
-				{
-					(*context.mOpcode->mExecFunc)(context);
-					context.mOpcode = context.mOpcode->mNext;
-
-					++result.mStepsExecuted;
-				}
-				else
-				{
-					switch (context.mOpcode->mOpcodeType)
+					// Optimization: Do multiple opcodes in a row without overheads if possible
+					if (context.mOpcode->mSuccessiveHandledOpcodes >= 4)
 					{
-						case Opcode::Type::JUMP_CONDITIONAL:
+						(*context.mOpcode->mExecFunc)(context);
+						context.mOpcode = context.mOpcode->mNext;
+
+						(*context.mOpcode->mExecFunc)(context);
+						context.mOpcode = context.mOpcode->mNext;
+
+						(*context.mOpcode->mExecFunc)(context);
+						context.mOpcode = context.mOpcode->mNext;
+
+						(*context.mOpcode->mExecFunc)(context);
+						context.mOpcode = context.mOpcode->mNext;
+
+						result.mStepsExecuted += 4;
+					}
+					else
+					{
+						(*context.mOpcode->mExecFunc)(context);
+						context.mOpcode = context.mOpcode->mNext;
+
+						++result.mStepsExecuted;
+					}
+				}
+
+				switch (context.mOpcode->mOpcodeType)
+				{
+					case Opcode::Type::JUMP_CONDITIONAL:
+					{
+						--mSelectedControlFlow->mValueStackPtr;
+						if (*mSelectedControlFlow->mValueStackPtr != 0)
 						{
-							--mSelectedControlFlow->mValueStackPtr;
-							if (*mSelectedControlFlow->mValueStackPtr != 0)
-							{
-								context.mOpcode = context.mOpcode->mNext;
-								++result.mStepsExecuted;
-								break;
-							}
-
-							// Fallthrough to unconditional jump
-						}
-
-						case Opcode::Type::JUMP:
-						{
-							state.mProgramCounter = reinterpret_cast<const uint8*>(context.mOpcode->getParameter<uint64>());
-
-							// Check if steps limit is reached (this usually means the limit was exceeded already, but that's okay)
-							//  -> This is needed to prevent endless loops
+							context.mOpcode = context.mOpcode->mNext;
 							++result.mStepsExecuted;
-							if (result.mStepsExecuted >= stepsLimit)
-							{
-								mActiveControlFlow = nullptr;
-								return;
-							}
-
-							context.mOpcode = (const RuntimeOpcode*)state.mProgramCounter;
 							break;
 						}
 
-						case Opcode::Type::JUMP_INDIRECT:
+						// Fallthrough to unconditional jump
+					}
+
+					case Opcode::Type::JUMP:
+					{
+						state.mProgramCounter = reinterpret_cast<const uint8*>(context.mOpcode->getParameter<uint64>());
+
+						// Check if steps limit is reached (this usually means the limit was exceeded already, but that's okay)
+						//  -> This is needed to prevent endless loops
+						++result.mStepsExecuted;
+						if (result.mStepsExecuted >= stepsLimit)
 						{
-							RMX_CHECK(false, "Implementation does not work yet", return);
-
-							// Get previously calculated index
-							--mSelectedControlFlow->mValueStackPtr;
-							const size_t index = (size_t)*mSelectedControlFlow->mValueStackPtr;
-							const size_t numJumps = (size_t)context.mOpcode->getParameter<uint64>();
-							if (index < numJumps)
-							{
-								for (size_t k = 0; k < index; ++k)
-									context.mOpcode = context.mOpcode->mNext;
-							}
-							else
-							{
-								for (size_t k = 0; k < numJumps; ++k)
-									context.mOpcode = context.mOpcode->mNext;
-							}
-
-							state.mProgramCounter = (const uint8*)context.mOpcode;
-
-							// Check if steps limit is reached (this usually means the limit was exceeded already, but that's okay)
-							//  -> This is needed to prevent endless loops
-							++result.mStepsExecuted;
-							if (result.mStepsExecuted >= stepsLimit)
-							{
-								mActiveControlFlow = nullptr;
-								return;
-							}
-							break;
-						}
-
-						case Opcode::Type::CALL:
-						{
-							state.mProgramCounter = (uint8*)context.mOpcode->mNext;
-							const uint64 callTarget = context.mOpcode->getParameter<uint64>();
-							++result.mStepsExecuted;
-
-							const Function* func = handleResultCall(*context.mOpcode);
-							if (result.handleCall(func, callTarget))
-							{
-								// Restart the outer loop now that the running function has changed
-								stayInsideInnerLoop = false;
-								break;
-							}
-							else
-							{
-								// Call handling failed, return control to the caller
-								mActiveControlFlow = nullptr;
-								return;
-							}
-						}
-
-						case Opcode::Type::RETURN:
-						{
-							mSelectedControlFlow->mLocalVariablesSize = mSelectedControlFlow->mCallStack.back().mLocalVariablesStart;
-							mSelectedControlFlow->mCallStack.pop_back();
-							++result.mStepsExecuted;
-
-							if (result.handleReturn())
-							{
-								// Check stop conditions
-								if (mSelectedControlFlow->mCallStack.count > minimumCallStackSize && result.mStepsExecuted < stepsLimit)
-								{
-									// Restart the outer loop now that the running function has changed
-									stayInsideInnerLoop = false;
-									break;
-								}
-							}
-
-							// Handling failed or a stop condition triggered, return control to the caller
 							mActiveControlFlow = nullptr;
 							return;
 						}
 
-						case Opcode::Type::EXTERNAL_CALL:
-						{
-							state.mProgramCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
-							--mSelectedControlFlow->mValueStackPtr;
-							const uint64 targetAddress = *mSelectedControlFlow->mValueStackPtr;
-							++result.mStepsExecuted;
-
-							if (result.handleExternalCall(targetAddress))
-							{
-								// Restart the outer loop now that the running function has changed
-								stayInsideInnerLoop = false;
-								break;
-							}
-							else
-							{
-								mActiveControlFlow = nullptr;
-								return;
-							}
-						}
-
-						case Opcode::Type::EXTERNAL_JUMP:
-						{
-							state.mProgramCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
-							--mSelectedControlFlow->mValueStackPtr;
-							returnFromFunction();
-							const uint64 targetAddress = *mSelectedControlFlow->mValueStackPtr;
-							++result.mStepsExecuted;
-
-							if (result.handleExternalJump(targetAddress))
-							{
-								// Restart the outer loop now that the running function has changed
-								stayInsideInnerLoop = false;
-								break;
-							}
-							else
-							{
-								mActiveControlFlow = nullptr;
-								return;
-							}
-						}
-
-						default:
-							throw std::runtime_error("Unhandled opcode");
+						context.mOpcode = (const RuntimeOpcode*)state.mProgramCounter;
+						break;
 					}
+
+					case Opcode::Type::JUMP_SWITCH:
+					{
+						// Jump if top of stack is zero
+						if (mSelectedControlFlow->mValueStackPtr[-1] == 0)
+						{
+							--mSelectedControlFlow->mValueStackPtr;
+							context.mOpcode = reinterpret_cast<const RuntimeOpcode*>(context.mOpcode->getParameter<uint64>());
+						}
+						else
+						{
+							// Otherwise decrease it and go on with the next opcode
+							--mSelectedControlFlow->mValueStackPtr[-1];
+							context.mOpcode = context.mOpcode->mNext;
+							++result.mStepsExecuted;
+						}
+						break;
+					}
+
+					case Opcode::Type::CALL:
+					{
+						state.mProgramCounter = (uint8*)context.mOpcode->mNext;
+						const uint64 callTarget = context.mOpcode->getParameter<uint64>();
+						++result.mStepsExecuted;
+
+						const Function* func = handleResultCall(*context.mOpcode);
+						if (result.handleCall(func, callTarget))
+						{
+							// Restart the outer loop now that the running function has changed
+							stayInsideInnerLoop = false;
+							break;
+						}
+						else
+						{
+							// Call handling failed, return control to the caller
+							mActiveControlFlow = nullptr;
+							return;
+						}
+					}
+
+					case Opcode::Type::RETURN:
+					{
+						mSelectedControlFlow->mLocalVariablesSize = mSelectedControlFlow->mCallStack.back().mLocalVariablesStart;
+						mSelectedControlFlow->mCallStack.pop_back();
+						++result.mStepsExecuted;
+
+						if (result.handleReturn())
+						{
+							// Check stop conditions
+							if (mSelectedControlFlow->mCallStack.count > minimumCallStackSize && result.mStepsExecuted < stepsLimit)
+							{
+								// Restart the outer loop now that the running function has changed
+								stayInsideInnerLoop = false;
+								break;
+							}
+						}
+
+						// Handling failed or a stop condition triggered, return control to the caller
+						mActiveControlFlow = nullptr;
+						return;
+					}
+
+					case Opcode::Type::EXTERNAL_CALL:
+					{
+						state.mProgramCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
+						--mSelectedControlFlow->mValueStackPtr;
+						const uint64 targetAddress = *mSelectedControlFlow->mValueStackPtr;
+						++result.mStepsExecuted;
+
+						if (result.handleExternalCall(targetAddress))
+						{
+							// Restart the outer loop now that the running function has changed
+							stayInsideInnerLoop = false;
+							break;
+						}
+						else
+						{
+							mActiveControlFlow = nullptr;
+							return;
+						}
+					}
+
+					case Opcode::Type::EXTERNAL_JUMP:
+					{
+						state.mProgramCounter = (uint8*)context.mOpcode + context.mOpcode->mSize;
+						--mSelectedControlFlow->mValueStackPtr;
+						returnFromFunction();
+						const uint64 targetAddress = *mSelectedControlFlow->mValueStackPtr;
+						++result.mStepsExecuted;
+
+						if (result.handleExternalJump(targetAddress))
+						{
+							// Restart the outer loop now that the running function has changed
+							stayInsideInnerLoop = false;
+							break;
+						}
+						else
+						{
+							mActiveControlFlow = nullptr;
+							return;
+						}
+					}
+
+					default:
+						throw std::runtime_error("Unhandled opcode");
 				}
 			}
 		}
