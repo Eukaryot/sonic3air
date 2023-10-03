@@ -32,7 +32,7 @@ namespace lemon
 
 		template<typename T> T get() const		{ return T::INVALID; }
 		template<typename T> void set(T value)	{ return T::INVALID; }
-	
+
 		inline void reset()  { mUint64 = 0; }
 
 		template<typename S, typename T> void cast() { set<T>(static_cast<T>(get<S>())); }

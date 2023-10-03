@@ -104,7 +104,7 @@ private:
 		const uint32* src0 = input.getPixelPointer(0, y0);
 		uint32* src1 = output.getPixelPointer(0, y1);
 		const uint32* src2 = input.getPixelPointer(0, y2);
-		
+
 		uint32* end = src1 + input.getWidth();
 		for (; src1 != end; ++src0, ++src1, ++src2)
 		{

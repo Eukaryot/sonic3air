@@ -685,7 +685,7 @@ bool UDPSocket::sendData(const uint8* data, size_t length, const SocketAddress& 
 {
 	if (!isValid())
 		return false;
-	
+
 	const int result = ::sendto(mInternal->mSocket, (const char*)data, (int)length, 0, (sockaddr*)destinationAddress.getSockAddr(), (int)sizeof(sockaddr));
 	if (result >= 0)
 		return true;

@@ -72,7 +72,7 @@ namespace lemon
 
 
 	inline std::ostream& operator<<(std::ostream& stream, const FlyweightString& flyweightString)
-	{ 
+	{
 		return stream << flyweightString.getString();
 	}
 }

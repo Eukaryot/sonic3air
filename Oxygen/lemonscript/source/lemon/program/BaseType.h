@@ -49,7 +49,7 @@ namespace lemon
 	{
 		INVALID = 0xff,
 		NONE    = 0x00,
-	
+
 		#define BASE_CAST_TYPE(base, original, target) (base + original * 4 + target)
 
 		// Integer cast up (value is unsigned -> adding zeroes)

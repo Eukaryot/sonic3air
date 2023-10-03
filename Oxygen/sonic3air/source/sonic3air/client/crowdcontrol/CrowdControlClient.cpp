@@ -102,7 +102,7 @@ CrowdControlClient::StatusCode CrowdControlClient::triggerEffect(const std::stri
 	param1.mStorage = effectCodeHash;
 
 	codeExec.executeScriptFunction("Game.triggerCrowdControlEffect", false, &execData);
-	
+
 	const StatusCode result = (StatusCode)execData.mReturnValueStorage;
 	return result;
 }

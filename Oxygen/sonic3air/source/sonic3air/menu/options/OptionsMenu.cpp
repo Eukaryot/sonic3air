@@ -1510,7 +1510,7 @@ void OptionsMenu::setupOptionsMenu(bool enteredFromIngame)
 		}
 	}
 
-	mWarningMessageTimeout = enteredFromIngame ? 4.0f : 0.0f;		
+	mWarningMessageTimeout = enteredFromIngame ? 4.0f : 0.0f;
 	mAudioWarningMessageTimeout = 0.0f;
 	mShowedAudioWarningMessage = false;
 }

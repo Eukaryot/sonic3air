@@ -21,7 +21,7 @@ namespace rmx
 		bool getFileSize(const std::wstring& filename, uint64& outFileSize) override;
 		bool getFileTime(const std::wstring& filename, time_t& outFileTime) override;
 		bool readFile(const std::wstring& filename, std::vector<uint8>& outData) override;
-		
+
 		bool renameFile(const std::wstring& oldFilename, const std::wstring& newFilename) override;
 		bool listFiles(const std::wstring& path, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries) override;
 		bool listFilesByMask(const std::wstring& filemask, bool recursive, std::vector<FileIO::FileEntry>& outFileEntries) override;
