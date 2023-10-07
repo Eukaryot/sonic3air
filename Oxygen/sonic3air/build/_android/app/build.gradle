@@ -1,4 +1,4 @@
-def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY');
+def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY')
 def buildAsApplication = !buildAsLibrary
 if (buildAsApplication) {
     apply plugin: 'com.android.application'
@@ -9,7 +9,7 @@ else {
 
 android {
     compileSdkVersion 30
-    ndkVersion "24.0.8215888"
+    ndkVersion "26.0.10792818"
     defaultConfig {
         if (buildAsApplication) {
             applicationId "org.eukaryot.sonic3air"
@@ -17,7 +17,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 29     // Can't go higher, as requestLegacyExternalStorage in the manifest won't work otherwise
         versionCode 1
-        versionName "22.09.10.0"
+        versionName "23.10.07.0"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-18", "-DANDROID_STL=c++_static"
@@ -36,6 +36,13 @@ android {
             minifyEnabled false
         }
     }
+    namespace 'org.eukaryot.sonic3air'
+    androidResources {
+        ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+    }
+    lint {
+        abortOnError false
+    }
     if (!project.hasProperty('EXCLUDE_NATIVE_LIBS')) {
         sourceSets.main {
             jniLibs.srcDir 'libs'
@@ -47,21 +54,13 @@ android {
         }
     }
 
-    aaptOptions {
-        // This is primarily needed to allow for files / directories starting with an underscore
-        ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
-    }
-    lintOptions {
-        abortOnError false
-    }
-
     if (buildAsLibrary) {
         libraryVariants.all { variant ->
             variant.outputs.each { output ->
                 def outputFile = output.outputFile
                 if (outputFile != null && outputFile.name.endsWith(".aar")) {
-                    def fileName = "org.libsdl.app.aar";
-                    output.outputFile = new File(outputFile.parent, fileName);
+                    def fileName = "org.libsdl.app.aar"
+                    output.outputFile = new File(outputFile.parent, fileName)
                 }
             }
         }
