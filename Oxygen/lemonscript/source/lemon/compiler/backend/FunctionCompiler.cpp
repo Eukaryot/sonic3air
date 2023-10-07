@@ -239,9 +239,9 @@ namespace lemon
 	{
 		CollectedLabel* collectedLabel = mapFind(mCollectedLabels, labelToken.mName.getHash());
 		CHECK_ERROR(nullptr != collectedLabel, "Jump target label not found: " << labelToken.mName.getString(), mLineNumber);
-		collectedLabel->mJumpLocations.push_back(mOpcodes.size());
+		collectedLabel->mJumpLocations.push_back((uint32)mOpcodes.size());
 
-		addOpcode(type);	// Target position will be set afterwards
+		return addOpcode(type);	// Target position will be set afterwards
 	}
 
 	void FunctionCompiler::buildOpcodesFromNodes(const BlockNode& blockNode, NodeContext& context)
