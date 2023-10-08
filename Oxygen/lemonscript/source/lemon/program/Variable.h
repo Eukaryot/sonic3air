@@ -22,6 +22,7 @@ namespace lemon
 	class API_EXPORT Variable
 	{
 	friend class Module;
+	friend class Runtime;
 	friend class ScriptFunction;
 
 	public:
@@ -37,10 +38,12 @@ namespace lemon
 		virtual int64 getValue() const = 0;
 		virtual void setValue(int64 value) = 0;
 
-		inline Type getType() const  { return mType; }
-		inline FlyweightString getName() const  { return mName; }
-		inline uint32 getID() const  { return mID; }
-		inline const DataTypeDefinition* getDataType() const  { return mDataType; }
+		inline Type getType() const							 { return mType; }
+		inline FlyweightString getName() const				 { return mName; }
+		inline uint32 getID() const							 { return mID; }
+		inline const DataTypeDefinition* getDataType() const { return mDataType; }
+		inline size_t getStaticMemoryOffset() const			 { return mStaticMemoryOffset; }
+		inline size_t getStaticMemorySize() const			 { return mStaticMemorySize; }
 
 	protected:
 		inline Variable(Type type) : mType(type) {}
@@ -50,6 +53,8 @@ namespace lemon
 		FlyweightString mName;
 		uint32 mID = 0;
 		const DataTypeDefinition* mDataType = nullptr;
+		size_t mStaticMemoryOffset = 0;
+		size_t mStaticMemorySize = 0;
 	};
 
 

@@ -170,22 +170,7 @@ namespace lemon
 		}
 
 		reset();
-
-		// Assign initial values to global variables
-		{
-			// TODO: "getGlobalVariables()" includes both user-defined variables and the script-defined globals variables,
-			//       but "mGlobalVariables" actually only needs to store values for the script-defined ones
-			mGlobalVariables.resize(program.getGlobalVariables().size());
-			for (size_t index = 0; index < program.getGlobalVariables().size(); ++index)
-			{
-				Variable& variable = *program.getGlobalVariables()[index];
-				mGlobalVariables[index] = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue : 0;
-			}
-		}
-		for (ControlFlow* controlFlow : mControlFlows)
-		{
-			controlFlow->mGlobalVariables = &mGlobalVariables[0];
-		}
+		setupGlobalVariables();
 	}
 
     void Runtime::setMemoryAccessHandler(MemoryAccessHandler* handler)
@@ -274,8 +259,9 @@ namespace lemon
 	{
 		RMX_CHECK((variable.getID() & 0xf0000000) == 0x10000000, "Variable " << variable.getName() << " is not a global variable", return nullptr);
 		const uint32 index = variable.getID() & 0x0fffffff;
-		RMX_CHECK(index < mGlobalVariables.size(), "Variable index " << index << " is not valid", return nullptr);
-		return &mGlobalVariables[index];
+		RMX_CHECK(index < mProgram->getGlobalVariables().size(), "Variable index " << index << " is not valid", return nullptr);
+		const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
+		return (int64*)&mStaticMemory[offset];
 	}
 
 	void Runtime::callRuntimeFunction(const RuntimeFunction& runtimeFunction, size_t baseCallIndex)
@@ -822,6 +808,7 @@ namespace lemon
 		}
 
 		// Serialize global variables
+		const size_t numGlobals = mProgram->getGlobalVariables().size();
 		if (version >= 0x01)
 		{
 			if (serializer.isReading())
@@ -837,19 +824,21 @@ namespace lemon
 					if (nullptr != variable && variable->getType() == Variable::Type::GLOBAL)
 					{
 						const size_t index = variable->getID() & 0x0fffffff;
-						RMX_CHECK(index < mGlobalVariables.size(), "Invalid global variable index", continue);
-						mGlobalVariables[index] = value;
+						RMX_CHECK(index < numGlobals, "Invalid global variable index", continue);
+						const size_t offset = mProgram->getGlobalVariables()[index]->getStaticMemoryOffset();
+						memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 					}
 				}
 			}
 			else
 			{
-				RMX_ASSERT(mGlobalVariables.size() == mProgram->getGlobalVariables().size(), "Runtime globals and program globals are supposed to match");
-				serializer.writeAs<uint32>(mGlobalVariables.size());
-				for (size_t i = 0; i < mGlobalVariables.size(); ++i)
+				serializer.writeAs<uint32>(numGlobals);
+				for (size_t i = 0; i < numGlobals; ++i)
 				{
-					serializer.write(mProgram->getGlobalVariables()[i]->getName().getString());
-					serializer.write<uint64>(mGlobalVariables[i]);
+					Variable* variable = mProgram->getGlobalVariables()[i];
+					serializer.write(variable->getName().getString());
+					const size_t offset = variable->getStaticMemoryOffset();
+					serializer.write(&mStaticMemory[offset], sizeof(int64));
 				}
 			}
 		}
@@ -859,29 +848,57 @@ namespace lemon
 			if (serializer.isReading())
 			{
 				const size_t numGlobalsSerialized = (size_t)serializer.read<uint32>();
-				const size_t numGlobalsInProgram = mGlobalVariables.size();
-				const size_t numGlobalsShared = std::min(numGlobalsSerialized, numGlobalsInProgram);
+				const size_t numGlobalsShared = std::min(numGlobalsSerialized, numGlobals);
 				for (size_t i = 0; i < numGlobalsShared; ++i)
 				{
-					mGlobalVariables[i] = serializer.read<uint64>();
+					const int64 value = serializer.read<uint64>();
+					RMX_CHECK(i < numGlobals, "Invalid global variable index", continue);
+					const size_t offset = mProgram->getGlobalVariables()[i]->getStaticMemoryOffset();
+					memcpy(&mStaticMemory[offset], &value, sizeof(int64));
 				}
-				if (numGlobalsSerialized > numGlobalsInProgram)
+				if (numGlobalsSerialized > numGlobals)
 				{
-					serializer.skip((numGlobalsShared - numGlobalsInProgram) * 8);
+					serializer.skip((numGlobalsShared - numGlobals) * 8);
 				}
 			}
 			else
 			{
-				serializer.writeAs<uint32>(mGlobalVariables.size());
-				for (int64 variable : mGlobalVariables)
-				{
-					serializer.write<uint64>(variable);
-				}
+				RMX_ERROR("Saving as version 0x00 is not supported", );
 			}
 		}
 
 		// Done
 		return true;
+	}
+
+	void Runtime::setupGlobalVariables()
+	{
+		// Setup memory offsets and sizes
+		size_t totalSize = 0;
+		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
+		{
+			Variable& variable = *mProgram->getGlobalVariables()[index];
+			if (variable.getType() == Variable::Type::GLOBAL)	// The other variable types don't use static memory size
+			{
+				size_t variableSize = variable.getDataType()->getBytes();
+				variableSize = (variableSize + 7) / 8 * 8;		// Align to multiples of 8 bytes (i.e. int64 size)
+				variable.mStaticMemoryOffset = totalSize;
+				variable.mStaticMemorySize = variableSize;
+				totalSize += variableSize;
+			}
+		}
+
+		mStaticMemory.resize(totalSize);
+
+		for (size_t index = 0; index < mProgram->getGlobalVariables().size(); ++index)
+		{
+			Variable& variable = *mProgram->getGlobalVariables()[index];
+			if (variable.getStaticMemorySize() > 0)
+			{
+				const int64 value = (variable.getType() == Variable::Type::GLOBAL) ? static_cast<GlobalVariable&>(variable).mInitialValue : 0;
+				*(int64*)&mStaticMemory[variable.getStaticMemoryOffset()] = value;
+			}
+		}
 	}
 
 }

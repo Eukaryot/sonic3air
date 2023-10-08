@@ -111,7 +111,6 @@ namespace lemon
 
 		// Only as optimization for OpcodeExec
 		int64* mCurrentLocalVariables = nullptr;
-		int64* mGlobalVariables = nullptr;
 		MemoryAccessHandler* mMemoryAccessHandler = nullptr;
 	};
 

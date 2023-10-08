@@ -175,6 +175,9 @@ namespace lemon
 		bool serializeState(VectorBinarySerializer& serializer, std::string* outError = nullptr);
 
 	private:
+		void setupGlobalVariables();
+
+	private:
 		inline static ControlFlow* mActiveControlFlow = nullptr;
 		inline static const Environment* mActiveEnvironment = nullptr;
 
@@ -188,7 +191,8 @@ namespace lemon
 		std::unordered_map<uint64, std::vector<RuntimeFunction*>> mRuntimeFunctionsBySignature;   // Key is the hashed function name + signature hash
 		rmx::OneTimeAllocPool mRuntimeOpcodesPool;
 
-		std::vector<int64> mGlobalVariables;
+		// Static memory contains all global variables
+		std::vector<uint8> mStaticMemory;
 
 		StringLookup mStrings;
 
