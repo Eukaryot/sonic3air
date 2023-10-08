@@ -52,12 +52,30 @@ UpdateCheck::UpdateCheck()
 		definition.mUpdateURL = "https://sonic3air.org";
 	}
 
-	// Test version (Windows only)
+	// Test version (Windows)
 	{
 		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
-		definition.mVersionNumber = 0x23032501;
+		definition.mVersionNumber = 0x23100700;
 		definition.mReleaseChannel = ReleaseChannel::TEST;
 		definition.addPlatform(Platform::WINDOWS);
+		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
+	}
+
+	// Test version (Android)
+	{
+		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
+		definition.mVersionNumber = 0x23100700;
+		definition.mReleaseChannel = ReleaseChannel::TEST;
+		definition.addPlatform(Platform::ANDROID);
+		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
+	}
+
+	// Test version (Mac)
+	{
+		UpdateDefinition& definition = vectorAdd(mUpdateDefinitions);
+		definition.mVersionNumber = 0x23051401;
+		definition.mReleaseChannel = ReleaseChannel::TEST;
+		definition.addPlatform(Platform::MAC);
 		definition.mUpdateURL = "https://github.com/Eukaryot/sonic3air/releases";
 	}
 }
