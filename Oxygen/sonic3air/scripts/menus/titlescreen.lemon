@@ -267,7 +267,7 @@ function void TitleScreen()
 	A1 = 0x00459c
 	while (true)
 	{
-		global.frame_state = 0x04	// Corrects cut to completely faded SEGA logo, #contributed by TheMushrunt
+		global.frame_state = 0x02
 		waitForNextFrame()
 
 		copyMemory(0xfffffc00, A1, 0x0e)
