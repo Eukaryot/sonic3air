@@ -53,6 +53,24 @@ namespace lemon
 		bool resolveIdentifiers(TokenList& tokens);
 
 	private:
+		struct BinaryOperationResult
+		{
+			const TypeCasting::BinaryOperatorSignature* mSignature = nullptr;
+			Function* mEnforcedFunction = nullptr;
+			Operator mSplitToOperator = Operator::_INVALID;
+		};
+
+		struct BinaryOperationLookup
+		{
+			CachedBuiltinFunction* mCachedBuiltinFunction = nullptr;
+			TypeCasting::BinaryOperatorSignature mSignature;
+			Operator mSplitToOperator = Operator::_INVALID;
+
+			inline BinaryOperationLookup(CachedBuiltinFunction* cachedBuiltinFunction, const DataTypeDefinition* left, const DataTypeDefinition* right, const DataTypeDefinition* result, Operator splitToOperator = Operator::_INVALID) :
+				mCachedBuiltinFunction(cachedBuiltinFunction), mSignature(left, right, result), mSplitToOperator(splitToOperator) {}
+		};
+
+	private:
 		void insertCastTokenIfNecessary(TokenPtr<StatementToken>& token, const DataTypeDefinition* targetDataType);
 		void castCompileTimeConstant(ConstantToken& constantToken, const DataTypeDefinition* targetDataType);
 
@@ -81,6 +99,8 @@ namespace lemon
 		void resolveAddressOfFunctions(TokenList& tokens);
 		void resolveAddressOfMemoryAccesses(TokenList& tokens);
 
+		BinaryOperationResult getBestOperatorSignature(Operator op, const DataTypeDefinition* leftDataType, const DataTypeDefinition* rightDataType);
+
 		void assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType);
 		const DataTypeDefinition* assignStatementDataType(StatementToken& token, const DataTypeDefinition* resultType);
 
@@ -96,10 +116,14 @@ namespace lemon
 
 		CachedBuiltinFunction mBuiltinConstantArrayAccess;
 		CachedBuiltinFunction mBuiltinStringOperatorPlus;
+		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64;
+		CachedBuiltinFunction mBuiltinStringOperatorPlusInt64Inv;
 		CachedBuiltinFunction mBuiltinStringOperatorLess;
 		CachedBuiltinFunction mBuiltinStringOperatorLessOrEqual;
 		CachedBuiltinFunction mBuiltinStringOperatorGreater;
 		CachedBuiltinFunction mBuiltinStringOperatorGreaterOrEqual;
+
+		std::vector<BinaryOperationLookup> mBinaryOperationLookup[(size_t)Operator::_NUM_OPERATORS];
 	};
 
 }

@@ -124,10 +124,22 @@ namespace lemon
 	{
 		fillCachedBuiltInFunctionMultiple(mBuiltinConstantArrayAccess,			globalsLookup, BuiltInFunctions::CONSTANT_ARRAY_ACCESS);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlus,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64);
+		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorPlusInt64Inv,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_PLUS_INT64_INV);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLess,				globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorLessOrEqual,		globalsLookup, BuiltInFunctions::STRING_OPERATOR_LESS_OR_EQUAL);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreater,			globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER);
 		fillCachedBuiltInFunctionSingle(mBuiltinStringOperatorGreaterOrEqual,	globalsLookup, BuiltInFunctions::STRING_OPERATOR_GREATER_OR_EQUAL);
+
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::BINARY_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64Inv,   &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING);
+		mBinaryOperationLookup[(size_t)Operator::ASSIGN_PLUS]             .emplace_back(&mBuiltinStringOperatorPlus,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, Operator::BINARY_PLUS);
+		mBinaryOperationLookup[(size_t)Operator::ASSIGN_PLUS]             .emplace_back(&mBuiltinStringOperatorPlusInt64,      &PredefinedDataTypes::STRING, &PredefinedDataTypes::INT_64, &PredefinedDataTypes::STRING, Operator::BINARY_PLUS);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_LESS]            .emplace_back(&mBuiltinStringOperatorLess,           &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_LESS_OR_EQUAL]   .emplace_back(&mBuiltinStringOperatorLessOrEqual,    &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_GREATER]         .emplace_back(&mBuiltinStringOperatorGreater,        &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
+		mBinaryOperationLookup[(size_t)Operator::COMPARE_GREATER_OR_EQUAL].emplace_back(&mBuiltinStringOperatorGreaterOrEqual, &PredefinedDataTypes::STRING, &PredefinedDataTypes::STRING, &PredefinedDataTypes::BOOL);
 	}
 
 	void TokenProcessing::processTokens(TokenList& tokensRoot, uint32 lineNumber, const DataTypeDefinition* resultType)
@@ -1248,6 +1260,62 @@ namespace lemon
 		}
 	}
 
+	TokenProcessing::BinaryOperationResult TokenProcessing::getBestOperatorSignature(Operator op, const DataTypeDefinition* leftDataType, const DataTypeDefinition* rightDataType)
+	{
+		BinaryOperationResult result;
+
+		// Special handling for certain operations with strings
+		if (mCompileOptions.mScriptFeatureLevel >= 2)
+		{
+			const BinaryOperationLookup* bestLookup = nullptr;
+			uint16 bestPriority = 0xff00;
+			for (const BinaryOperationLookup& lookup : mBinaryOperationLookup[(size_t)op])
+			{
+				// This is pretty much the same as "TypeCasting::getBestOperatorSignature", except for the "exactMatchLeftRequired" part
+				const uint16 priority = mTypeCasting.getPriorityOfSignature(lookup.mSignature, leftDataType, rightDataType);
+				if (priority < bestPriority)
+				{
+					bestLookup = &lookup;
+					bestPriority = priority;
+				}
+			}
+
+			if (nullptr != bestLookup)
+			{
+				result.mEnforcedFunction = (nullptr == bestLookup->mCachedBuiltinFunction || bestLookup->mCachedBuiltinFunction->mFunctions.empty()) ? nullptr : bestLookup->mCachedBuiltinFunction->mFunctions[0];
+				result.mSignature = &bestLookup->mSignature;
+				result.mSplitToOperator = bestLookup->mSplitToOperator;
+				return result;
+			}
+		}
+
+		// Choose best fitting signature
+		{
+			const std::vector<TypeCasting::BinaryOperatorSignature>& signatures = TypeCasting::getBinarySignaturesForOperator(op);
+			const bool exactMatchLeftRequired = (OperatorHelper::getOperatorType(op) == OperatorHelper::OperatorType::ASSIGNMENT);
+			const std::optional<size_t> bestIndex = mTypeCasting.getBestOperatorSignature(signatures, exactMatchLeftRequired, leftDataType, rightDataType);
+			if (bestIndex.has_value())
+			{
+				result.mSignature = &signatures[*bestIndex];
+				// If needed later, store the index in the token - this indirectly gives access to the chosen signature again
+			}
+			else
+			{
+				// Special handling for assignment of the same type
+				if (leftDataType == rightDataType && op == Operator::ASSIGN)
+				{
+					static TypeCasting::BinaryOperatorSignature directSignature(leftDataType, rightDataType, leftDataType);
+					result.mSignature = &directSignature;
+				}
+				else
+				{
+					CHECK_ERROR(false, "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(op) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
+				}
+			}
+		}
+		return result;
+	}
+
 	void TokenProcessing::assignStatementDataTypes(TokenList& tokens, const DataTypeDefinition* resultType)
 	{
 		for (size_t i = 0; i < tokens.size(); ++i)
@@ -1326,82 +1394,41 @@ namespace lemon
 				const DataTypeDefinition* leftDataType = assignStatementDataType(*bot.mLeft, expectedType);
 				const DataTypeDefinition* rightDataType = assignStatementDataType(*bot.mRight, (opType == OperatorHelper::OperatorType::ASSIGNMENT) ? leftDataType : expectedType);
 
-				if (mCompileOptions.mScriptFeatureLevel >= 2)
+				const BinaryOperationResult result = getBestOperatorSignature(bot.mOperator, leftDataType, rightDataType);
+				if (nullptr == result.mEnforcedFunction)
 				{
-					// Special handling for certain operations with two strings
-					if (leftDataType == &PredefinedDataTypes::STRING && rightDataType == &PredefinedDataTypes::STRING)
-					{
-						CachedBuiltinFunction* cachedBuiltinFunction = nullptr;
-						switch (bot.mOperator)
-						{
-							case Operator::BINARY_PLUS:				 cachedBuiltinFunction = &mBuiltinStringOperatorPlus;  break;
-							case Operator::COMPARE_LESS:			 cachedBuiltinFunction = &mBuiltinStringOperatorLess;  break;
-							case Operator::COMPARE_LESS_OR_EQUAL:	 cachedBuiltinFunction = &mBuiltinStringOperatorLessOrEqual;  break;
-							case Operator::COMPARE_GREATER:			 cachedBuiltinFunction = &mBuiltinStringOperatorGreater;  break;
-							case Operator::COMPARE_GREATER_OR_EQUAL: cachedBuiltinFunction = &mBuiltinStringOperatorGreaterOrEqual;  break;
-							default: break;
-						}
+					// Default behavior: Use the found signature
+					bot.mDataType = result.mSignature->mResult;
 
-						if (nullptr != cachedBuiltinFunction)
-						{
-							bot.mFunction = cachedBuiltinFunction->mFunctions[0];
-							token.mDataType = &PredefinedDataTypes::STRING;
-							break;
-						}
-						else
-						{
-							if (bot.mOperator == Operator::ASSIGN_PLUS)
-							{
-								// Convert "A += B" to "A = A + B" for strings
-								TokenPtr<StatementToken> newRightSide;
-								BinaryOperationToken& newRightBot = newRightSide.create<BinaryOperationToken>();
-								newRightBot.mOperator = Operator::BINARY_PLUS;
-								newRightBot.mLeft = bot.mLeft;
-								newRightBot.mRight = bot.mRight;
-								newRightBot.mFunction = mBuiltinStringOperatorPlus.mFunctions[0];
-								newRightBot.mDataType = &PredefinedDataTypes::STRING;
-								bot.mOperator = Operator::ASSIGN;
-								bot.mRight = newRightSide;
-								bot.mDataType = &PredefinedDataTypes::STRING;
-								break;
-							}
-						}
+					if (opType != OperatorHelper::OperatorType::TRINARY)
+					{
+						// Add implicit casts where needed
+						insertCastTokenIfNecessary(bot.mLeft, result.mSignature->mLeft);
+						insertCastTokenIfNecessary(bot.mRight, result.mSignature->mRight);
 					}
 				}
-
-				// Choose best fitting signature
-				const TypeCasting::BinaryOperatorSignature* signature = nullptr;
+				else
 				{
-					const std::vector<TypeCasting::BinaryOperatorSignature>& signatures = TypeCasting::getBinarySignaturesForOperator(bot.mOperator);
-					const bool exactMatchLeftRequired = (OperatorHelper::getOperatorType(bot.mOperator) == OperatorHelper::OperatorType::ASSIGNMENT);
-					const std::optional<size_t> bestIndex = mTypeCasting.getBestOperatorSignature(signatures, exactMatchLeftRequired, leftDataType, rightDataType);
-					if (bestIndex.has_value())
+					if (result.mSplitToOperator == Operator::_INVALID)
 					{
-						signature = &signatures[*bestIndex];
-						// If needed later, store the index in the token - this indirectly gives access to the chosen signature again
+						// Use the enforced function
+						bot.mFunction = result.mEnforcedFunction;
+						bot.mDataType = result.mSignature->mResult;
 					}
 					else
 					{
-						// Special handling for assignment of the same type
-						if (leftDataType == rightDataType && bot.mOperator == Operator::ASSIGN)
-						{
-							static TypeCasting::BinaryOperatorSignature directSignature(leftDataType, rightDataType, leftDataType);
-							signature = &directSignature;
-						}
-						else
-						{
-							CHECK_ERROR(false, "Cannot apply binary operator " << OperatorHelper::getOperatorCharacters(bot.mOperator) << " between types '" << leftDataType->getName() << "' and '" << rightDataType->getName() << "'", mLineNumber);
-						}
+						// Split an operator like "A += B" into "A = A + B"
+						TokenPtr<StatementToken> newRightSide;
+						BinaryOperationToken& newRightBot = newRightSide.create<BinaryOperationToken>();
+						newRightBot.mOperator = result.mSplitToOperator;
+						newRightBot.mLeft = bot.mLeft;
+						newRightBot.mRight = bot.mRight;
+						newRightBot.mFunction = result.mEnforcedFunction;
+						newRightBot.mDataType = result.mSignature->mResult;
+						bot.mOperator = Operator::ASSIGN;
+						bot.mRight = newRightSide;
+						bot.mDataType = result.mSignature->mResult;
 					}
-				}
-
-				token.mDataType = signature->mResult;
-
-				if (opType != OperatorHelper::OperatorType::TRINARY)
-				{
-					// Add implicit casts where needed
-					insertCastTokenIfNecessary(bot.mLeft, signature->mLeft);
-					insertCastTokenIfNecessary(bot.mRight, signature->mRight);
 				}
 				break;
 			}
