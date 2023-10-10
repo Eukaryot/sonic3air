@@ -472,19 +472,19 @@ namespace
 
 	uint16 Input_getController(uint8 controllerIndex)
 	{
-		return (controllerIndex < 2) ? ControlsIn::instance().getInputPad((size_t)controllerIndex) : 0;
+		return ControlsIn::instance().getGamepad((size_t)controllerIndex).mCurrentInput;
 	}
 
 	uint16 Input_getControllerPrevious(uint8 controllerIndex)
 	{
-		return (controllerIndex < 2) ? ControlsIn::instance().getPrevInputPad((size_t)controllerIndex) : 0;
+		return ControlsIn::instance().getGamepad((size_t)controllerIndex).mPreviousInput;
 	}
 
 	bool getButtonState(int index, bool previousValue = false)
 	{
-		ControlsIn& controlsIn = ControlsIn::instance();
-		const int playerIndex = (index & 0x10) ? 1 : 0;
-		const uint16 bitmask = previousValue ? controlsIn.getPrevInputPad(playerIndex) : controlsIn.getInputPad(playerIndex);
+		const size_t playerIndex = (index & 0x10) ? 1 : 0;
+		const ControlsIn::Gamepad& gamepad = ControlsIn::instance().getGamepad(playerIndex);
+		const uint16 bitmask = previousValue ? gamepad.mPreviousInput : gamepad.mCurrentInput;
 		return ((bitmask >> (index & 0x0f)) & 1) != 0;
 	}
 

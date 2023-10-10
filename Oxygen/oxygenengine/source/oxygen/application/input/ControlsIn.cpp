@@ -14,16 +14,13 @@
 
 namespace
 {
-	std::map<const InputManager::Control*, uint16> inputFlagsLookup[2];
+	std::map<const InputManager::Control*, uint16> inputFlagsLookup[ControlsIn::NUM_GAMEPADS];
 }
 
 
 ControlsIn::ControlsIn()
 {
-	mInputPad[0] = mInputPad[1] = 0;
-	mPrevInputPad[0] = mPrevInputPad[1] = 0;
-
-	for (int controllerIndex = 0; controllerIndex < 2; ++controllerIndex)
+	for (int controllerIndex = 0; controllerIndex < NUM_GAMEPADS; ++controllerIndex)
 	{
 		auto& map = inputFlagsLookup[controllerIndex];
 		const InputManager::ControllerScheme& controller = InputManager::instance().getController(controllerIndex);
@@ -38,8 +35,6 @@ ControlsIn::ControlsIn()
 		map.emplace(&controller.B,	 	(uint16)Button::B);
 		map.emplace(&controller.X,	 	(uint16)Button::C);
 		map.emplace(&controller.Y,	 	(uint16)Button::Y);
-
-		mIgnoreInput[controllerIndex] = 0;
 	}
 }
 
@@ -59,10 +54,10 @@ void ControlsIn::update(bool readControllers)
 	const bool switchLeftRight = Configuration::instance().mMirrorMode;
 
 	// Update controllers
-	for (int controllerIndex = 0; controllerIndex < 2; ++controllerIndex)
+	for (int controllerIndex = 0; controllerIndex < NUM_GAMEPADS; ++controllerIndex)
 	{
-		const uint32 padIndex = mGamepadsSwitched ? (1 - controllerIndex) : controllerIndex;
-		mPrevInputPad[padIndex] = mInputPad[padIndex];
+		const uint32 padIndex = (mGamepadsSwitched && controllerIndex < 2) ? (1 - controllerIndex) : controllerIndex;
+		mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
 
 		// Calculate new input flags
 		uint16 inputFlags = 0;
@@ -79,21 +74,21 @@ void ControlsIn::update(bool readControllers)
 		}
 
 		// Remove all inputs from our list of ignored input that are currently not pressed
-		mIgnoreInput[padIndex] &= inputFlags;
+		mGamepad[padIndex].mIgnoreInput &= inputFlags;
 
 		// Remove all inputs from actual output that are still ignored
-		inputFlags &= ~mIgnoreInput[padIndex];
+		inputFlags &= ~mGamepad[padIndex].mIgnoreInput;
 
 		// Assign to emulator input flags
-		mInputPad[padIndex] = inputFlags;
+		mGamepad[padIndex].mCurrentInput = inputFlags;
 	}
 }
 
 void ControlsIn::setIgnores(uint16 bitmask)
 {
-	for (int controllerIndex = 0; controllerIndex < 2; ++controllerIndex)
+	for (int controllerIndex = 0; controllerIndex < NUM_GAMEPADS; ++controllerIndex)
 	{
-		mIgnoreInput[controllerIndex] = bitmask;
+		mGamepad[controllerIndex].mIgnoreInput = bitmask;
 	}
 }
 
@@ -102,12 +97,25 @@ void ControlsIn::setAllIgnores()
 	setIgnores(0x0fff);
 }
 
+const ControlsIn::Gamepad& ControlsIn::getGamepad(size_t index) const
+{
+	if (index < NUM_GAMEPADS)
+	{
+		return mGamepad[index];
+	}
+	else
+	{
+		static Gamepad defaultGamepad;
+		return defaultGamepad;
+	}
+}
+
 void ControlsIn::injectInput(uint32 padIndex, uint16 inputFlags)
 {
-	RMX_CHECK(padIndex == 0 || padIndex == 1, "Invalid controller index", return);
+	RMX_CHECK(padIndex < (uint32)NUM_GAMEPADS, "Invalid controller index", return);
 
-	mPrevInputPad[padIndex] = mInputPad[padIndex];
-	mInputPad[padIndex] = inputFlags;
+	mGamepad[padIndex].mPreviousInput = mGamepad[padIndex].mCurrentInput;
+	mGamepad[padIndex].mCurrentInput = inputFlags;
 }
 
 bool ControlsIn::switchGamepads()
