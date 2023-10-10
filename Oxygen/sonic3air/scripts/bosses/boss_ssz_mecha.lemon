@@ -12,6 +12,22 @@
 // Mecha Sonic Boss in SSZ                               //
 //-------------------------------------------------------//
 
+function u16 BossSSZ.Mecha.calculateInitialVelocityForMovement(bool goingLeft, u16 deceleration, float overshoot)
+{
+	// Do the calculations for a fixed deceleration, independent of screen width
+
+	// First get the distance to cover from the current position to the border of the boss area
+	u32 distanceToCover = goingLeft ? (objA0.position.x.u16 - level.bossarea.left) : (level.bossarea.right - objA0.position.x.u16)
+
+	// The goal here is to get the velocity that makes him slightly overshoot the target (he stops at the boss area boundaries, so he won't actually overshoot)
+	u32 travelDistance = Math.roundToInt(distanceToCover * overshoot)
+
+	// Basic formula for the covered distance:      D = v * v / a / 2
+	// Solve for velocity:                       => v = sqrt(D * a * 2)
+	return sqrt((travelDistance << 8) * abs(deceleration) * 2)	// Note that velocity and decelation are s8.8 fixed point numbers, hence the bitshifting
+}
+
+
 //# address-hook(0x07b288) end(0x07b2ac)
 function void fn07b288()
 {
@@ -281,20 +297,23 @@ function void fn07b544()
 {
 	// Start backslide
 	objA0.base_state = 0x10
+
+	s16 sign = (objA0.render_flags & render_flag.FLIP_X) ? -1 : 1
+	s16 velocity = 0x820
+	s16 deceleration = -0x20
+
 #if STANDALONE
-	D0.s16 = 0x820 + getScreenExtend() * 5		// Not very precise, but works for both 320 and 400 pixels
-#else
-	D0.s16 = 0x820
-#endif
-	D1.s16 = -0x20
-	if (objA0.render_flags & render_flag.FLIP_X)
+	if (getScreenExtend() > 0)
 	{
-		D0.s16 = -D0.s16
-		D1.s16 = -D1.s16
+		// The overshoot factor here is set so that the calculation would result in a velocity close to the default velocity value of 0x820 for the original 320 pixel screen
+		velocity = BossSSZ.Mecha.calculateInitialVelocityForMovement(sign < 0, deceleration, 1.03f)
 	}
-	objA0.velocity.x = D0.u16
-	u16[A0 + 0x40] = D1.u16
+#endif
+	
+	objA0.velocity.x = velocity * sign
+	s16[A0 + 0x40] = deceleration * sign
 	objA0.velocity.y = 0
+
 	objA0.flags38 |= 0x04
 
 	// "spawnSimpleChildObjects(0x07d486)" replaced by:
@@ -368,19 +387,21 @@ function void fn07b63a()
 
 	// Start mid-air dash
 	objA0.base_state = 0x18
+
+	s16 sign = (objA0.render_flags & render_flag.FLIP_X) ? 1 : -1
+	s16 velocity = 0x780
+	s16 deceleration = -0x20
+
 #if STANDALONE
-	D0.s16 = 0x780 + getScreenExtend() * 3		// Not very precise, but works for both 320 and 400 pixels
-#else
-	D0.s16 = 0x780
-#endif
-	D1.s32 = -0x20
-	if ((objA0.render_flags & render_flag.FLIP_X) == 0)
+	if (getScreenExtend() > 0)
 	{
-		D0.s16 = -D0.s16
-		D1.s16 = -D1.s16
+		// The overshoot factor here is set so that the calculation would result in a velocity close to the default velocity value of 0x780 for the original 320 pixel screen
+		velocity = BossSSZ.Mecha.calculateInitialVelocityForMovement(sign < 0, deceleration, 1.125f)
 	}
-	objA0.velocity.x = D0.s16
-	s16[A0 + 0x40] = D1.s16
+#endif
+
+	objA0.velocity.x = velocity * sign
+	s16[A0 + 0x40] = deceleration * sign
 	objA0.velocity.y = 0
 
 	playSound(SFX_SPINDASH_RELEASE)
@@ -499,19 +520,22 @@ function void fn07b790()
 {
 	// Start spindash / drop dash
 	objA0.base_state = 0x24
+
+	s16 sign = (objA0.velocity.x >= 0) ? -1 : 1
+	s16 velocity = 0x640
+	s16 deceleration = -0x20
+
 #if STANDALONE
-	D0.s16 = 0x640 + getScreenExtend() * 3		// Not very precise, but works for both 320 and 400 pixels
-#else
-	D0.s16 = 0x640
-#endif
-	D1.u16 = -0x20
-	if (objA0.velocity.x >= 0)
+	if (getScreenExtend() > 0)
 	{
-		D0.s16 = -D0.s16
-		D1.s16 = -D1.s16
+		// The overshoot factor here is set so that the calculation would result in a velocity close to the default velocity value of 0x640 for the original 320 pixel screen
+		velocity = BossSSZ.Mecha.calculateInitialVelocityForMovement(sign < 0, deceleration, 1.075f)
 	}
-	objA0.velocity.x = D0.u16
-	u16[A0 + 0x40] = D1.u16
+#endif
+
+	objA0.velocity.x = velocity * sign
+	s16[A0 + 0x40] = deceleration * sign
+
 	playSound(SFX_SPINDASH_RELEASE)
 }
 
@@ -863,21 +887,21 @@ function void fn07d216()
 	if (objA0.velocity.x >= 0)
 	{
 		D0.u16 = level.bossarea.right
-		if (D0.u16 > objA0.position.x.u16)
+		if (objA0.position.x.u16 < level.bossarea.right)
 			return
 	}
 	else
 	{
 		D0.u16 = level.bossarea.left
-		if (D0.u16 < objA0.position.x.u16)
+		if (objA0.position.x.u16 > level.bossarea.left)
 			return
 	}
 
 	// Targets:
-	//  - 0x07b462
-	//  - 0x07b5c2
-	//  - 0x07b698
-	//  - 0x07d7d6
+	//  - 0x07b462		-> Changes base state to 0x0a
+	//  - 0x07b5c2		-> Stops at border and changes base state to 0x12
+	//  - 0x07b698		-> Stops at border
+	//  - 0x07d7d6		-> Unknown (is this address even correct?)
 	call A1
 }
 
