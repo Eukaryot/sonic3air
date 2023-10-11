@@ -27,7 +27,6 @@ function u16 BossSSZ.Mecha.calculateInitialVelocityForMovement(bool goingLeft, u
 	return sqrt((travelDistance << 8) * abs(deceleration) * 2)	// Note that velocity and decelation are s8.8 fixed point numbers, hence the bitshifting
 }
 
-
 //# address-hook(0x07b288) end(0x07b2ac)
 function void fn07b288()
 {
