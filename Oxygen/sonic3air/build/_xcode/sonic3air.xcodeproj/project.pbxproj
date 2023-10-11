@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1409,6 +1409,15 @@
 		9ED1835D28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
 		9ED1835E28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
 		9ED1835F28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */; };
+		9EF862372AD62656006EB284 /* DebugTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF862352AD62656006EB284 /* DebugTracking.cpp */; };
+		9EF862382AD62656006EB284 /* DebugTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF862352AD62656006EB284 /* DebugTracking.cpp */; };
+		9EF862392AD62656006EB284 /* DebugTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF862352AD62656006EB284 /* DebugTracking.cpp */; };
+		9EF8623A2AD62656006EB284 /* DebugTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF862352AD62656006EB284 /* DebugTracking.cpp */; };
+		9EF8623B2AD62656006EB284 /* DebugTracking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF862352AD62656006EB284 /* DebugTracking.cpp */; };
+		9EF862402AD626EA006EB284 /* CrowdControlClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF8623F2AD626EA006EB284 /* CrowdControlClient.cpp */; };
+		9EF862412AD626EA006EB284 /* CrowdControlClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF8623F2AD626EA006EB284 /* CrowdControlClient.cpp */; };
+		9EF862432AD62823006EB284 /* CrowdControlClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF8623F2AD626EA006EB284 /* CrowdControlClient.cpp */; };
+		9EF862442AD62828006EB284 /* CrowdControlClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9EF8623F2AD626EA006EB284 /* CrowdControlClient.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2265,6 +2274,13 @@
 		9ED1833B28789EFF00506AEB /* RenderVdpSpriteShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderVdpSpriteShader.h; sourceTree = "<group>"; };
 		9ED1833C28789EFF00506AEB /* OpenGLRenderResources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenGLRenderResources.cpp; sourceTree = "<group>"; };
 		9ED426A92718E3BC00AA3301 /* discord_game_sdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = discord_game_sdk.dylib; path = ../../source/external/discord_game_sdk/lib/x86_64/discord_game_sdk.dylib; sourceTree = "<group>"; };
+		9EF862322AD625F8006EB284 /* HandleProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandleProvider.h; sourceTree = "<group>"; };
+		9EF862332AD62620006EB284 /* SoftwareBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftwareBlur.h; sourceTree = "<group>"; };
+		9EF862352AD62656006EB284 /* DebugTracking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DebugTracking.cpp; sourceTree = "<group>"; };
+		9EF862362AD62656006EB284 /* DebugTracking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugTracking.h; sourceTree = "<group>"; };
+		9EF8623C2AD6267A006EB284 /* StdHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StdHelpers.h; sourceTree = "<group>"; };
+		9EF8623E2AD626EA006EB284 /* CrowdControlClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CrowdControlClient.h; sourceTree = "<group>"; };
+		9EF8623F2AD626EA006EB284 /* CrowdControlClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CrowdControlClient.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3104,6 +3120,7 @@
 				9E75252A2A14587A00158C14 /* bindings */,
 				9E6E8549245F89C300114DEB /* CodeExec.cpp */,
 				9E6E8550245F89C300114DEB /* CodeExec.h */,
+				9EF862342AD62656006EB284 /* debug */,
 				9E6E8554245F89C300114DEB /* DebuggingInterfaces.h */,
 				9E6E855A245F89C300114DEB /* EmulatorInterface.cpp */,
 				9E6E854F245F89C300114DEB /* EmulatorInterface.h */,
@@ -3190,8 +3207,9 @@
 		9E6E8592245F89C400114DEB /* software */ = {
 			isa = PBXGroup;
 			children = (
-				9E6E8593245F89C400114DEB /* SoftwareRenderer.h */,
+				9EF862332AD62620006EB284 /* SoftwareBlur.h */,
 				9E6E8594245F89C400114DEB /* SoftwareRenderer.cpp */,
+				9E6E8593245F89C400114DEB /* SoftwareRenderer.h */,
 			);
 			path = software;
 			sourceTree = "<group>";
@@ -3406,6 +3424,7 @@
 		9E82C78726BDF3A600ADDBD3 /* oxygen_netcore */ = {
 			isa = PBXGroup;
 			children = (
+				9EF862312AD625F8006EB284 /* base */,
 				9ECAAA5127D1C7C600A32EEF /* network */,
 				9E82C79026BDF3C500ADDBD3 /* pch.cpp */,
 				9E82C79126BDF3C500ADDBD3 /* pch.h */,
@@ -3516,6 +3535,7 @@
 				9EBAFA582980D5E6004F13AA /* Basics.h */,
 				9EBAFA552980D5E6004F13AA /* ErrorHandler.cpp */,
 				9EBAFA542980D5E6004F13AA /* ErrorHandler.h */,
+				9EF8623C2AD6267A006EB284 /* StdHelpers.h */,
 				9EBAFA572980D5E6004F13AA /* Types.h */,
 			);
 			path = base;
@@ -3747,10 +3767,11 @@
 		9ECAAA3C27D1C63E00A32EEF /* client */ = {
 			isa = PBXGroup;
 			children = (
+				9EF8623D2AD626EA006EB284 /* crowdcontrol */,
 				9ECAAA3D27D1C63E00A32EEF /* GameClient.cpp */,
-				9ECAAA3E27D1C63E00A32EEF /* GhostSync.h */,
 				9ECAAA3F27D1C63E00A32EEF /* GameClient.h */,
 				9ECAAA4027D1C63E00A32EEF /* GhostSync.cpp */,
+				9ECAAA3E27D1C63E00A32EEF /* GhostSync.h */,
 				9ECAAA4127D1C63E00A32EEF /* UpdateCheck.cpp */,
 				9ECAAA4227D1C63E00A32EEF /* UpdateCheck.h */,
 			);
@@ -3883,6 +3904,32 @@
 				9ED1833B28789EFF00506AEB /* RenderVdpSpriteShader.h */,
 			);
 			path = shaders;
+			sourceTree = "<group>";
+		};
+		9EF862312AD625F8006EB284 /* base */ = {
+			isa = PBXGroup;
+			children = (
+				9EF862322AD625F8006EB284 /* HandleProvider.h */,
+			);
+			path = base;
+			sourceTree = "<group>";
+		};
+		9EF862342AD62656006EB284 /* debug */ = {
+			isa = PBXGroup;
+			children = (
+				9EF862352AD62656006EB284 /* DebugTracking.cpp */,
+				9EF862362AD62656006EB284 /* DebugTracking.h */,
+			);
+			path = debug;
+			sourceTree = "<group>";
+		};
+		9EF8623D2AD626EA006EB284 /* crowdcontrol */ = {
+			isa = PBXGroup;
+			children = (
+				9EF8623E2AD626EA006EB284 /* CrowdControlClient.h */,
+				9EF8623F2AD626EA006EB284 /* CrowdControlClient.cpp */,
+			);
+			path = crowdcontrol;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -4303,6 +4350,7 @@
 				9EBAFA9B2980D5E6004F13AA /* UTF8Conversion.cpp in Sources */,
 				9E49B9C7260C31B300719EC5 /* GameSetupScreen.cpp in Sources */,
 				9EBAFB992980D63E004F13AA /* GuiBase.cpp in Sources */,
+				9EF862432AD62823006EB284 /* CrowdControlClient.cpp in Sources */,
 				9E0C5EF1247DD7FD000105D0 /* PlayerProgress.cpp in Sources */,
 				9E0CCB0A251910740007288E /* NativizedCode.inc in Sources */,
 				9EBAFAAA2980D5E6004F13AA /* OutputStream.cpp in Sources */,
@@ -4393,6 +4441,7 @@
 				9E0C5ECD247DD768000105D0 /* AudioCollection.cpp in Sources */,
 				9EBAFAF02980D5E6004F13AA /* Tools.cpp in Sources */,
 				9E0C5EBD247DD726000105D0 /* PlaneManager.cpp in Sources */,
+				9EF862392AD62656006EB284 /* DebugTracking.cpp in Sources */,
 				9E453AF125B91FB50012BADC /* GameLoader.cpp in Sources */,
 				9EBAFAB92980D5E6004F13AA /* ZlibDeflate.cpp in Sources */,
 				9EBAFC2E2980DFFA004F13AA /* CrashHandler.cpp in Sources */,
@@ -4511,6 +4560,7 @@
 				9ECAAA2B27D1C25E00A32EEF /* TypeCasting.cpp in Sources */,
 				9E1D5F802475733F003B1774 /* FunctionWrapper.cpp in Sources */,
 				9EB2F81A24967A2A007482F3 /* AudioSourceManager.cpp in Sources */,
+				9EF862382AD62656006EB284 /* DebugTracking.cpp in Sources */,
 				9E265022254B0A4D0000A100 /* user_manager.cpp in Sources */,
 				9E1D5F812475733F003B1774 /* Function.cpp in Sources */,
 				9EBAFB7A2980D63E004F13AA /* Shader.cpp in Sources */,
@@ -4611,6 +4661,7 @@
 				9EBAFAC72980D5E6004F13AA /* FileIO.cpp in Sources */,
 				9E265004254B0A4D0000A100 /* lobby_manager.cpp in Sources */,
 				9E1D5FC92475733F003B1774 /* SkippableCutsceneWindow.cpp in Sources */,
+				9EF862412AD626EA006EB284 /* CrowdControlClient.cpp in Sources */,
 				9ECAAA1827D1C24E00A32EEF /* ConstantArray.cpp in Sources */,
 				9E49B9C2260C31B300719EC5 /* MenuItems.cpp in Sources */,
 				9EBAFA862980D5E6004F13AA /* UnalignedMemory.cpp in Sources */,
@@ -4778,6 +4829,7 @@
 				9E5FD8BB27EC0A3F00CD430A /* NativizedCode.cpp in Sources */,
 				9EBAFABB2980D5E6004F13AA /* ZlibDeflate.cpp in Sources */,
 				9ED1831D28789ED000506AEB /* ComponentSprite.cpp in Sources */,
+				9EF862442AD62828006EB284 /* CrowdControlClient.cpp in Sources */,
 				9E5FD8E527EC0C1900CD430A /* Operators.cpp in Sources */,
 				9EBAFB6E2980D63E004F13AA /* Framebuffer.cpp in Sources */,
 				9E5FD8B427EC09A000CD430A /* WebSocketClient.cpp in Sources */,
@@ -5003,6 +5055,7 @@
 				9E5FD84D27EC085600CD430A /* EmulationAudioSource.cpp in Sources */,
 				9EBAFAB62980D5E6004F13AA /* RmxDeflate.cpp in Sources */,
 				9E5FD8A227EC098400CD430A /* Simulation.cpp in Sources */,
+				9EF8623B2AD62656006EB284 /* DebugTracking.cpp in Sources */,
 				9E5FD8B627EC09A800CD430A /* Sockets.cpp in Sources */,
 				9EBAFBE22980D6BA004F13AA /* ParserHelper.cpp in Sources */,
 				9E5FD88027EC08D500CD430A /* HighResolutionTimer.cpp in Sources */,
@@ -5081,6 +5134,7 @@
 				9ECAAA2A27D1C25E00A32EEF /* TypeCasting.cpp in Sources */,
 				9E6E7B92245F886B00114DEB /* FunctionWrapper.cpp in Sources */,
 				9EB2F81924967A2A007482F3 /* AudioSourceManager.cpp in Sources */,
+				9EF862372AD62656006EB284 /* DebugTracking.cpp in Sources */,
 				9E265021254B0A4D0000A100 /* user_manager.cpp in Sources */,
 				9E6E7B91245F886B00114DEB /* Function.cpp in Sources */,
 				9EBAFB792980D63E004F13AA /* Shader.cpp in Sources */,
@@ -5181,6 +5235,7 @@
 				9EBAFAC62980D5E6004F13AA /* FileIO.cpp in Sources */,
 				9E265003254B0A4D0000A100 /* lobby_manager.cpp in Sources */,
 				9E6E80B2245F88D400114DEB /* SkippableCutsceneWindow.cpp in Sources */,
+				9EF862402AD626EA006EB284 /* CrowdControlClient.cpp in Sources */,
 				9ECAAA1727D1C24E00A32EEF /* ConstantArray.cpp in Sources */,
 				9E49B9C1260C31B300719EC5 /* MenuItems.cpp in Sources */,
 				9EBAFA852980D5E6004F13AA /* UnalignedMemory.cpp in Sources */,
@@ -5403,6 +5458,7 @@
 				9ED1835E28789EFF00506AEB /* OpenGLRenderResources.cpp in Sources */,
 				9EB069D5248088B20080AC49 /* rmxbase.cpp in Sources */,
 				9EBAFB542980D63E004F13AA /* FontSource.cpp in Sources */,
+				9EF8623A2AD62656006EB284 /* DebugTracking.cpp in Sources */,
 				9EBAFAA12980D5E6004F13AA /* BinarySerializer.cpp in Sources */,
 				9EB06A3A24808AA50080AC49 /* EmulationAudioSource.cpp in Sources */,
 				9EB069FF24808A1C0080AC49 /* SoftwareDrawerTexture.cpp in Sources */,
