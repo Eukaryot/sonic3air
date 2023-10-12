@@ -11,6 +11,7 @@
 #include "sonic3air/menu/GameMenuBase.h"
 
 class OptionsMenu;
+class Mod;
 
 
 struct OptionsMenuRenderContext : public GameMenuEntry::RenderContext
@@ -34,16 +35,22 @@ public:
 };
 
 
-class SectionMenuEntry : public GameMenuEntry
+class ModTitleMenuEntry : public GameMenuEntry
 {
 public:
-	static const constexpr uint32 MENU_ENTRY_TYPE = rmx::compileTimeFNV_32("SectionMenuEntry");
+	static const constexpr uint32 MENU_ENTRY_TYPE = rmx::compileTimeFNV_32("ModTitleMenuEntry");
 
 public:
-	SectionMenuEntry();
-	SectionMenuEntry& initEntry(const std::string& text);
+	ModTitleMenuEntry();
+	ModTitleMenuEntry& initEntry(const Mod& mod);
 
 	void renderEntry(RenderContext& renderContext_) override;
+
+	inline const Mod& getMod() const  { return *mMod; }
+
+private:
+	const Mod* mMod = nullptr;
+	float mIndent = 0.0f;
 };
 
 

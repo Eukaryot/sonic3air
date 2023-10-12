@@ -40,6 +40,7 @@ public:
 		Drawer* mDrawer = nullptr;
 		Vec2i mCurrentPosition;
 		bool mIsSelected = false;
+		float mDeltaSeconds = 0.0f;
 
 		template<typename T> T& as()  { return *static_cast<T*>(this); }
 	};
