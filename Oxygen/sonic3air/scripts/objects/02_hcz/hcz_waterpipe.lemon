@@ -143,6 +143,9 @@ function void fn03003c()
 	else
 	{
 		DrawOrUnloadObject()
+	#if STANDALONE
+		HCZWaterfallPaletteFix()
+	#endif
 	}
 }
 

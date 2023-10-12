@@ -133,9 +133,17 @@ function void fn02fe5e()
 		}
 	}
 
+	HCZWaterfallPaletteFix()
+
 #else
 	DrawOrUnloadObject()
 #endif
+}
+
+// Fixes the waterfall palette cycle in HCZ from updating every frame, #contributed by iCloudius
+function void HCZWaterfallPaletteFix()
+{
+	level.palettefx.state = (objA0.update_address == 0) ? 0 : 1
 }
 
 
