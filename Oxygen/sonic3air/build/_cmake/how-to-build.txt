@@ -14,11 +14,20 @@ If needed, install them via "sudo apt-get install" (for Debian-based systems, th
 	=> Complete line to copy:   sudo apt-get install g++ cmake libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev libxcomposite-dev libxxf86vm-dev
 	=> More candidates that might be needed by SDL2 see https://github.com/libsdl-org/SDL/blob/3bdc10f842c3eba74b9837caa21339a68a19efbe/.github/workflows/main.yml
 
-Setup and build with CMake:
-	- mkdir ./Oxygen/sonic3air/source/_cmake/build
-	- cd ./Oxygen/sonic3air/source/_cmake/build
+The following commands assume you start in the root directory of the S3AIR Git repo.
+
+On first compilation, you need to create the build directory:
+	- mkdir ./Oxygen/sonic3air/build/_cmake/build
+
+Build with CMake:
+	- cd ./Oxygen/sonic3air/build/_cmake/build
 	- cmake -DCMAKE_BUILD_TYPE=Release ..
 	- cmake --build .
+
+[Optional change]
+You can add the -j option to the last line to enable use of multiple processor cores, which speeds up the build:
+	- cmake --build . -j 6
+	=> Replace the 6 with the number of cores or your CPU, or a little less to not consume all CPU performance of your machine just for the build.
 
 
 
@@ -26,11 +35,12 @@ Setup and build with CMake:
 
 Check if the CMake build created the sonic3air_linux binary in the correct location, namely inside "Oxygen/sonic3air".
 Place a copy of the S3&K ROM "Sonic_Knuckles_wSonic3.bin" inside "Oxygen/sonic3air" or "Oxygen/sonic3air/___internal".
+The following commands assume you're in the root directory of the S3AIR Git repo.
 
 Run S3AIR:
-	- cd Oxygen/sonic3air
+	- cd ./Oxygen/sonic3air
 	- ./sonic3air_linux
 
 To run OxygenApp instead:
-	- cd Oxygen/oxygenengine
+	- cd ./Oxygen/oxygenengine
 	- ./oxygenapp_linux
