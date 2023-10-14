@@ -123,6 +123,7 @@ void ProfilingView::render()
 			addRectToMesh(mesh, rect, Color(0.5f, 0.5f, 0.5f));
 		}
 
+		drawer.setBlendMode(BlendMode::OPAQUE);
 		drawer.drawMesh(mesh);
 	}
 
