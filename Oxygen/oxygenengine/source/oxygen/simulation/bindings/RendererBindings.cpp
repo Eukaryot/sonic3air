@@ -348,11 +348,6 @@ namespace
 		RenderParts::instance().getScrollOffsetsManager().setVerticalScrollOffsetBias(bias);
 	}
 
-	void Renderer_enforceClearScreen(uint8 enabled)
-	{
-		RenderParts::instance().setEnforceClearScreen(enabled != 0);
-	}
-
 	void Renderer_enableDefaultPlane(uint8 planeIndex, uint8 enabled)
 	{
 		RenderParts::instance().getPlaneManager().setDefaultPlaneEnabled(planeIndex, enabled != 0);
@@ -926,9 +921,6 @@ void RendererBindings::registerBindings(lemon::Module& module)
 
 	module.addNativeFunction("Renderer.setVerticalScrollOffsetBias", lemon::wrap(&Renderer_setVerticalScrollOffsetBias), defaultFlags)
 		.setParameterInfo(0, "bias");
-
-	module.addNativeFunction("Renderer.enforceClearScreen", lemon::wrap(&Renderer_enforceClearScreen), defaultFlags)
-		.setParameterInfo(0, "enabled");
 
 	module.addNativeFunction("Renderer.enableDefaultPlane", lemon::wrap(&Renderer_enableDefaultPlane), defaultFlags)
 		.setParameterInfo(0, "planeIndex")

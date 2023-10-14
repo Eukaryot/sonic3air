@@ -142,14 +142,10 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 {
 	Bitmap& gameScreenBitmap = mGameScreenTexture.accessBitmap();
 
-	// Clear depth buffer
+	// Clear the screen
+	gameScreenBitmap.clear(mRenderParts.getPaletteManager().getBackdropColor());
 	memset(mDepthBuffer, 0, sizeof(mDepthBuffer));
 	mEmptyDepthBuffer = true;
-
-	if (mRenderParts.getEnforceClearScreen())
-	{
-		gameScreenBitmap.clear(0);
-	}
 
 	mCurrentViewport.set(0, 0, mGameResolution.x, mGameResolution.y);
 	mFullViewport = true;
@@ -159,7 +155,7 @@ void SoftwareRenderer::renderGameScreen(const std::vector<Geometry*>& geometries
 		mBufferedPlaneData[i].mValid = false;
 	}
 
-	// Do some analysis on what's to render
+	// Check if sprite masking needed
 	bool usingSpriteMask = false;
 	{
 		for (const Geometry* geometry : geometries)

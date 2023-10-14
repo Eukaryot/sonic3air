@@ -221,7 +221,6 @@ declare function void Renderer.setScrollOffsetH(u8 setIndex, u16 lineNumber, u16
 declare function void Renderer.setScrollOffsetV(u8 setIndex, u16 rowNumber, u16 value)
 declare function void Renderer.setHorizontalScrollNoRepeat(u8 setIndex, u8 enable)
 declare function void Renderer.setVerticalScrollOffsetBias(s16 bias)
-declare function void Renderer.enforceClearScreen(u8 enabled)
 declare function void Renderer.enableDefaultPlane(u8 planeIndex, u8 enabled)
 declare function void Renderer.setupPlane(s16 px, s16 py, s16 width, s16 height, u8 planeIndex, u8 scrollOffsets, u16 renderQueue)
 declare function void Renderer.resetCustomPlaneConfigurations()

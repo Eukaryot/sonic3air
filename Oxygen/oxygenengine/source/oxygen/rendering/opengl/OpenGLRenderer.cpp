@@ -145,10 +145,16 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 	glBindFramebuffer(GL_FRAMEBUFFER, mGameScreenBuffer.getHandle());
 	glViewport(0, 0, mGameResolution.x, mGameResolution.y);
 
-	glDepthMask(GL_TRUE);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_SCISSOR_TEST);
+	// Clear the screen
+	{
+		const Color color = mRenderParts.getPaletteManager().getBackdropColor();
+		glDepthMask(GL_TRUE);
+		glClearColor(color.r, color.g, color.b, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDepthMask(GL_FALSE);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glDisable(GL_SCISSOR_TEST);
+	}
 
 	// We'll use the same quad vertex data over and over again during rendering, so just bind it once
 	OpenGLDrawerResources::getSimpleQuadVAO().bind();
@@ -178,15 +184,6 @@ void OpenGLRenderer::renderGameScreen(const std::vector<Geometry*>& geometries)
 			usingSpriteMask = true;
 			break;
 		}
-	}
-
-	// Clear the screen if necessary
-	if (!mRenderParts.mLayerRendering[0] || !mRenderParts.getActiveDisplay() || mRenderParts.getEnforceClearScreen())
-	{
-		const Color color = mRenderParts.getPaletteManager().getBackdropColor();
-		glClearColor(color.r, color.g, color.b, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
 	// Render geometries

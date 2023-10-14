@@ -32,7 +32,6 @@ void RenderParts::addViewport(const Recti& rect, uint16 renderQueue)
 void RenderParts::reset()
 {
 	mActiveDisplay = true;
-	mEnforceClearScreen = false;
 	mViewports.clear();
 
 	mPlaneManager.reset();
@@ -48,7 +47,6 @@ void RenderParts::preFrameUpdate()
 	mPaletteManager.preFrameUpdate();
 	mSpriteManager.preFrameUpdate();
 	mScrollOffsetsManager.preFrameUpdate();
-	mEnforceClearScreen = false;
 }
 
 void RenderParts::postFrameUpdate()

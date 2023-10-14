@@ -136,10 +136,18 @@ void Bitmap::clear(uint32 color)
 {
 	if (nullptr == mData)
 		return;
-	for (int x = 0; x < mWidth; ++x)
-		mData[x] = color;
-	for (int y = 1; y < mHeight; ++y)
-		memcpy(&mData[y*mWidth], mData, mWidth*4);
+
+	if (color == 0)
+	{
+		memset(mData, 0, mWidth*mHeight*4);
+	}
+	else
+	{
+		for (int x = 0; x < mWidth; ++x)
+			mData[x] = color;
+		for (int y = 1; y < mHeight; ++y)
+			memcpy(&mData[y*mWidth], mData, mWidth*4);
+	}
 }
 
 void Bitmap::clear(const Color& color)
