@@ -701,7 +701,7 @@ void GameView::render()
 		const double averageTime = Profiling::getRootRegion().mAverageTime;
 		if (averageTime > 0.0)
 		{
-			drawer.printText(EngineMain::getDelegate().getDebugFont(3), Recti(gameScreenRect.width - 3, 2, 0, 0), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
+			drawer.printText(EngineMain::getDelegate().getDebugFont(3), Vec2i(gameScreenRect.width - 3, 2), String(0, "%d FPS", roundToInt((float)(1.0 / averageTime))), 3);
 		}
 	}
 

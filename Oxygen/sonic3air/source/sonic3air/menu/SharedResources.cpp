@@ -26,6 +26,7 @@ namespace global
 	Font mOxyfontNarrow;
 	Font mOxyfontTinySimple;
 	Font mOxyfontTiny;
+	Font mOxyfontTinyRect;
 	Font mOxyfontSmallNoOutline;
 	Font mOxyfontSmall;
 	Font mOxyfontRegular;
@@ -56,6 +57,7 @@ namespace global
 
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessor = std::make_shared<OutlineFontProcessor>();
 		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorTransparent = std::make_shared<OutlineFontProcessor>(Color(0.0f, 0.0f, 0.0f, 0.5f));
+		std::shared_ptr<OutlineFontProcessor> outlineFontProcessorRect = std::make_shared<OutlineFontProcessor>(Color::BLACK, 1, true);
 
 		std::shared_ptr<GradientFontProcessor> gradientFontProcessor = std::make_shared<GradientFontProcessor>();
 
@@ -81,6 +83,10 @@ namespace global
 		mOxyfontTiny.addFontProcessor(outlineFontProcessor);
 		mOxyfontTiny.addFontProcessor(gradientFontProcessor);
 		mOxyfontTiny.addFontProcessor(shadowFontProcessor3);
+
+		fontCollection.registerManagedFont(mOxyfontTinyRect, "oxyfont_tiny");
+		mOxyfontTinyRect.addFontProcessor(outlineFontProcessorRect);
+		mOxyfontTinyRect.addFontProcessor(gradientFontProcessor);
 
 		fontCollection.registerManagedFont(mOxyfontSmallNoOutline, "oxyfont_small");
 		mOxyfontSmallNoOutline.addFontProcessor(gradientFontProcessor);

@@ -63,6 +63,7 @@ private:
 	bool isTitleShown(int tabIndex, int line) const;
 	GameMenuEntry* getSelectedGameMenuEntry();
 
+	void refreshControlsDisplay();
 	void updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry);
 	void goBack();
 
@@ -105,6 +106,7 @@ private:
 	float mVisibility = 0.0f;
 	float mDeltaSecondsForRendering = 0.0f;
 	GameMenuScrolling mScrolling;
+	GameMenuControlsDisplay mGameMenuControlsDisplay;
 
 	bool mEnteredFromIngame = false;
 	float mWarningMessageTimeout = 0.0f;

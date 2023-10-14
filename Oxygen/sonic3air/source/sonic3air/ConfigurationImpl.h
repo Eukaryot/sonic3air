@@ -51,6 +51,9 @@ public:
 	// Settings game version
 	std::string mGameVersionInSettings;
 
+	// Menus
+	bool mShowControlsDisplay = true;
+
 	// Dev mode (in addition to "mDevMode" from base class)
 	DevModeImplSettings mDevModeImpl;
 

@@ -210,3 +210,27 @@ public:
 	float mScrollOffsetY = 0.0f;
 	bool mScrollingFast = false;
 };
+
+
+
+// TODO: Move this into a helper cpp/h
+
+class GameMenuControlsDisplay
+{
+public:
+	void clear();
+	void addControl(std::string_view displayText, bool alignRight, std::string_view spriteName);
+	void addControl(std::string_view displayText, bool alignRight, std::string_view spriteName, std::string_view additionalSpriteName);
+
+	void render(Drawer& drawer, float visibility = 1.0f);
+
+private:
+	struct Control
+	{
+		std::string mDisplayText;
+		bool mAlignRight = false;
+		std::vector<uint64> mSpriteKeys;
+	};
+
+	std::vector<Control> mControls;
+};

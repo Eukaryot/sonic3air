@@ -132,11 +132,11 @@ void ProfilingView::render()
 	{
 		if (additionalData.mAverageSimulationsPerSecond >= 100.0f)
 		{
-			drawer.printText(font, Recti(FTX::screenWidth() - 100, py - 14, 0, 0), String(0, "%.1f sim./s", additionalData.mAverageSimulationsPerSecond), 3);
-			drawer.printText(font, Recti(FTX::screenWidth() - 100, py, 0, 0), String(0, "(smoothed) %.1f sim./s", additionalData.mSmoothedSimulationsPerSecond), 3);
+			drawer.printText(font, Vec2i(FTX::screenWidth() - 100, py - 14), String(0, "%.1f sim./s", additionalData.mAverageSimulationsPerSecond), 3);
+			drawer.printText(font, Vec2i(FTX::screenWidth() - 100, py), String(0, "(smoothed) %.1f sim./s", additionalData.mSmoothedSimulationsPerSecond), 3);
 		}
 		py += 18;
-		drawer.printText(font, Recti(FTX::screenWidth() - 100, py, 0, 0), String(0, "%.1f fps", (float)(1.0 / rootRegion.mAverageTime)), 3);
+		drawer.printText(font, Vec2i(FTX::screenWidth() - 100, py), String(0, "%.1f fps", (float)(1.0 / rootRegion.mAverageTime)), 3);
 	}
 	py += 36;
 
@@ -148,14 +148,14 @@ void ProfilingView::render()
 		Color color = region.mColor;
 		color.a = 0.333f;
 		color = color.blendOver(Color::WHITE);
-		drawer.printText(font, Recti(px + pair.second * 15, py, 0, 0), region.mName + ":", 1, color);
-		drawer.printText(font, Recti(px + 220, py, 0, 0), String(0, "%0.2f ms", (float)region.mAverageTime * 1000.0f), 3, color);
+		drawer.printText(font, Vec2i(px + pair.second * 15, py), region.mName + ":", 1, color);
+		drawer.printText(font, Vec2i(px + 220, py), String(0, "%0.2f ms", (float)region.mAverageTime * 1000.0f), 3, color);
 		py += 18;
 	}
 
 	// Memory usage data
-	drawer.printText(font, Recti(FTX::screenWidth() - 200, 10, 0, 0), String(0, "Audio Memory: %.2f MB", (float)EngineMain::instance().getAudioOut().getAudioPlayer().getMemoryUsage() / 1048576.0f));
-	drawer.printText(font, Recti(FTX::screenWidth() - 200, 25, 0, 0), String(0, "%d sounds playing", EngineMain::instance().getAudioOut().getAudioPlayer().getNumPlayingSounds()));
+	drawer.printText(font, Vec2i(FTX::screenWidth() - 200, 10), String(0, "Audio Memory: %.2f MB", (float)EngineMain::instance().getAudioOut().getAudioPlayer().getMemoryUsage() / 1048576.0f));
+	drawer.printText(font, Vec2i(FTX::screenWidth() - 200, 25), String(0, "%d sounds playing", EngineMain::instance().getAudioOut().getAudioPlayer().getNumPlayingSounds()));
 
 	drawer.performRendering();
 }

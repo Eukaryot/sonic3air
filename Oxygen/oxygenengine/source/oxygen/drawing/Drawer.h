@@ -63,6 +63,7 @@ public:
 	void drawRect(const Rectf& rect, DrawerTexture& texture);
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Color& tintColor);
 	void drawRect(const Rectf& rect, DrawerTexture& texture, const Vec2f& uv0, const Vec2f& uv1, const Color& tintColor);
+	void drawRect(const Rectf& rect, DrawerTexture& texture, const Recti& textureInnerRect, const Color& tintColor = Color::WHITE);
 	void drawUpscaledRect(const Rectf& rect, DrawerTexture& texture);
 	void drawSprite(Vec2i position, uint64 spriteKey, const Color& tintColor = Color::WHITE, Vec2f scale = Vec2f(1.0f, 1.0f));
 	void drawSpriteRect(const Recti& rect, uint64 spriteKey, const Color& tintColor = Color::WHITE);
@@ -71,9 +72,13 @@ public:
 	void drawQuad(const DrawerMeshVertex* quad, DrawerTexture& texture);
 
 	void printText(Font& font, const Recti& rect, const String& text, int alignment = 1, Color color = Color::WHITE);
+	void printText(Font& font, const Vec2i& position, const String& text, int alignment = 1, Color color = Color::WHITE);
 	void printText(Font& font, const Recti& rect, const String& text, const DrawerPrintOptions& printOptions);
+	void printText(Font& font, const Vec2i& position, const String& text, const DrawerPrintOptions& printOptions);
 	void printText(Font& font, const Recti& rect, const WString& text, int alignment = 1, Color color = Color::WHITE);
+	void printText(Font& font, const Vec2i& position, const WString& text, int alignment = 1, Color color = Color::WHITE);
 	void printText(Font& font, const Recti& rect, const WString& text, const DrawerPrintOptions& printOptions);
+	void printText(Font& font, const Vec2i& position, const WString& text, const DrawerPrintOptions& printOptions);
 
 	void pushScissor(const Recti& rect);
 	void popScissor();

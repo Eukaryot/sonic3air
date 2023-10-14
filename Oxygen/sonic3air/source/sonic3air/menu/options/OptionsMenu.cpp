@@ -107,6 +107,7 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 
 		setupOptionEntryBool(option::GHOST_SYNC,				&config.mGameServer.mGhostSync.mEnabled);
 		setupOptionEntryInt(option::GHOST_SYNC_RENDERING,		&config.mGameServer.mGhostSync.mGhostRendering);
+		setupOptionEntryBool(option::SHOW_CONTROLS_DISPLAY,		&config.mShowControlsDisplay);
 		setupOptionEntryInt(option::SCRIPT_OPTIMIZATION,		&config.mScriptOptimizationLevel);
 		setupOptionEntryInt(option::GAME_RECORDING_MODE,		&config.mGameRecorder.mRecordingMode);
 		setupOptionEntryInt(option::UPSCALING,					&config.mUpscaling);
@@ -245,6 +246,17 @@ OptionsMenu::OptionsMenu(MenuBackground& menuBackground) :
 		// TEST
 		//  -> TODO: Needs support for a label text like "Channel" and possibly some explanation text as well
 		//entries.addEntry<InputFieldMenuEntry>().initEntry(L"world");
+
+		// TODO: Add load/save for this. Also, should this even be an option in the first place?
+	#if 0
+		entries.addEntry<TitleMenuEntry>().initEntry("Menus");
+
+		entries.addEntry<OptionsMenuEntry>()
+			.setUseSmallFont(true)
+			.initEntry("Show Controls In Menus", option::SHOW_CONTROLS_DISPLAY)
+			.addOption("Disabled", 0)
+			.addOption("Enabled", 1);
+	#endif
 
 		entries.addEntry<TitleMenuEntry>().initEntry("More Info");
 		entries.addEntry<OptionsMenuEntry>().initEntry("Open Game Homepage", option::_OPEN_HOMEPAGE);
@@ -844,6 +856,8 @@ void OptionsMenu::onFadeIn()
 	mMenuBackground->showPreview(false);
 	mMenuBackground->startTransition(MenuBackground::Target::LIGHT);
 
+	refreshControlsDisplay();
+
 	const ConfigurationImpl& config = ConfigurationImpl::instance();
 	mOptionEntries[option::WINDOW_MODE].mGameMenuEntry->setSelectedIndexByValue((int)Application::instance().getWindowMode());
 	mOptionEntries[option::WINDOW_MODE_STARTUP].mGameMenuEntry->setSelectedIndexByValue((int)config.mWindowMode);
@@ -1056,10 +1070,14 @@ void OptionsMenu::update(float timeElapsed)
 			{
 				playMenuSound(0x5b);
 
-				if (result == GameMenuEntries::UpdateResult::ENTRY_CHANGED && mActiveMenu != &mTabMenuEntries && mActiveMenu->mSelectedEntryIndex == 0)
+				if (result == GameMenuEntries::UpdateResult::ENTRY_CHANGED)
 				{
-					// Switch from tab content to title
-					mActiveMenu = &mTabMenuEntries;
+					if (mActiveMenu != &mTabMenuEntries && mActiveMenu->mSelectedEntryIndex == 0)
+					{
+						// Switch from tab content to title
+						mActiveMenu = &mTabMenuEntries;
+					}
+					refreshControlsDisplay();
 				}
 				else if (result == GameMenuEntries::UpdateResult::OPTION_CHANGED && mActiveMenu != &mTabMenuEntries)
 				{
@@ -1067,6 +1085,7 @@ void OptionsMenu::update(float timeElapsed)
 					if (selectedEntry.getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
 					{
 						updateModExpandState(static_cast<ModTitleMenuEntry&>(selectedEntry));
+						refreshControlsDisplay();
 					}
 					else
 					{
@@ -1474,30 +1493,51 @@ void OptionsMenu::render()
 			}
 		}
 
+		int bottomY = 224;
+		if (ConfigurationImpl::instance().mShowControlsDisplay)
+		{
+			bottomY = 230 - roundToInt(alpha * 16.0f);
+			const int innerIndentX = (global::mDataSelectBackground.getWidth() - 400) / 2;
+			for (int k = 0; k < 5; ++k)
+			{
+				const int y = bottomY + k - 3;
+				drawer.drawRect(Recti(0, y, 400, 1), global::mDataSelectBackground, Recti(innerIndentX, y, 400, 1), Color(1.0f, 1.0f, 1.0f, ((float)k + 0.5f) * 0.2f));
+			}
+		}
+
 		if (mEnteredFromIngame)
 		{
-			if (mWarningMessageTimeout > 0.0f)
-			{
-				const float visibility = saturate(mWarningMessageTimeout / 0.3f);
-				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
-				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
-				drawer.printText(global::mOxyfontSmall, rect, "Note: Some options are hidden while in-game.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
-				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
-				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
-				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
-				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
-			}
+			const char* message = nullptr;
+			float visibility = 0.0f;
+
 			if (mAudioWarningMessageTimeout > 0.0f)
 			{
-				const float visibility = saturate(mAudioWarningMessageTimeout / 0.3f);
-				const Recti rect(0, 210 + roundToInt((1.0f - visibility) * 16.0f), 400, 16);
+				visibility = saturate(mAudioWarningMessageTimeout / 0.3f);
+				message = "Note: Music changes don't affect already playing tracks.";
+			}
+			else if (mWarningMessageTimeout > 0.0f)
+			{
+				visibility = saturate(mWarningMessageTimeout / 0.3f);
+				message = "Note: Some options are hidden while in-game.";
+			}
+
+			if (visibility > 0.0f && nullptr != message)
+			{
+				bottomY -= 16;
+				const Recti rect(0, bottomY + roundToInt((1.0f - visibility) * 20.0f), 400, 20);
+
 				drawer.drawRect(rect, Color(1.0f, 0.75f, 0.5f, alpha * 0.95f));
-				drawer.printText(global::mOxyfontSmall, rect, "Note: Music changes don't affect already playing tracks.", 5, Color(1.0f, 0.9f, 0.8f, alpha));
+				drawer.printText(global::mOxyfontSmall, rect - Vec2i(0, 2), message, 5, Color(1.0f, 0.9f, 0.8f, alpha));
 				drawer.drawRect(Recti(rect.x, rect.y-1, rect.width, 1), Color(0.4f, 0.2f, 0.0f, alpha * 0.95f));
 				drawer.drawRect(Recti(rect.x, rect.y-2, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.9f));
 				drawer.drawRect(Recti(rect.x, rect.y-3, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.6f));
 				drawer.drawRect(Recti(rect.x, rect.y-4, rect.width, 1), Color(0.9f, 0.9f, 0.9f, alpha * 0.3f));
 			}
+		}
+
+		if (ConfigurationImpl::instance().mShowControlsDisplay)
+		{
+			mGameMenuControlsDisplay.render(drawer, alpha);
 		}
 
 		drawer.performRendering();
@@ -1676,6 +1716,36 @@ GameMenuEntry* OptionsMenu::getSelectedGameMenuEntry()
 		}
 	}
 	return nullptr;
+}
+
+void OptionsMenu::refreshControlsDisplay()
+{
+	GameMenuEntry& selectedEntry = mActiveMenu->selected();
+	mGameMenuControlsDisplay.clear();
+
+	if (mActiveMenu == &mTabMenuEntries)
+	{
+		mGameMenuControlsDisplay.addControl("Switch Tab", false, "@input_icon_button_left", "@input_icon_button_right");
+	}
+	else if (selectedEntry.getMenuEntryType() == ModTitleMenuEntry::MENU_ENTRY_TYPE)
+	{
+		if (selectedEntry.mSelectedIndex == 0)
+			mGameMenuControlsDisplay.addControl("Expand", false, "@input_icon_button_right");
+		else
+			mGameMenuControlsDisplay.addControl("Collapse", false, "@input_icon_button_left");
+	}
+	else if (selectedEntry.mOptions.size() >= 2)
+	{
+		mGameMenuControlsDisplay.addControl("Change", false, "@input_icon_button_left", "@input_icon_button_right");
+		if (selectedEntry.mData == option::SOUND_TEST)
+			mGameMenuControlsDisplay.addControl("Play", false, "@input_icon_button_A");
+	}
+	else
+	{
+		mGameMenuControlsDisplay.addControl("Select", false, "@input_icon_button_A");
+	}
+
+	mGameMenuControlsDisplay.addControl("Back",	true, "@input_icon_button_B");
 }
 
 void OptionsMenu::updateModExpandState(ModTitleMenuEntry& modTitleMenuEntry)

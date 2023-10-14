@@ -29,6 +29,7 @@ namespace global
 	extern Font mOxyfontNarrow;
 	extern Font mOxyfontTinySimple;
 	extern Font mOxyfontTiny;
+	extern Font mOxyfontTinyRect;
 	extern Font mOxyfontSmallNoOutline;
 	extern Font mOxyfontSmall;
 	extern Font mOxyfontRegular;
