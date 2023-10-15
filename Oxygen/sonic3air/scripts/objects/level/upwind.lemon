@@ -42,6 +42,11 @@ function void fn03fbac()
 //# address-hook(0x03fbc4) end(0x03fcd2)
 function void fn03fbc4()
 {
+#if STANDALONE
+	if (debug_mode.state && A1 == 0xffffb000)
+		return
+#endif
+
 	if (u8[A1 + 0x05] >= 0x04)
 		return
 
