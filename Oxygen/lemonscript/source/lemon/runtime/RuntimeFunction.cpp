@@ -117,7 +117,7 @@ namespace lemon
 				const size_t start = tempBuffer.size();
 
 				int numOpcodesConsumed = 1;
-				createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, i, numOpcodesConsumed, runtime);
+				createRuntimeOpcode(tempBuffer, &opcodes[i], opcodeData[i].mRemainingSequenceLength, (int)i, numOpcodesConsumed, runtime);
 				for (int k = 0; k < numOpcodesConsumed; ++k)
 				{
 					mProgramCounterByOpcodeIndex[k + i] = start;
