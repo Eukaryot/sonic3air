@@ -348,11 +348,13 @@ bool Simulation::generateFrame()
 						completedCurrentFrame = true;
 					}
 					else
+					{
 						RMX_ERROR("Failed to load save state", );
+					}
 				}
 
-				ControlsIn::instance().injectInput(0, result.mInputs[0]);
-				ControlsIn::instance().injectInput(1, result.mInputs[1]);
+				ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
+				ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
 				inputWasInjected = true;
 			}
 		}
@@ -412,9 +414,9 @@ bool Simulation::generateFrame()
 		// Update game recording
 		if (isGameRecorderRecording)
 		{
-			InputRecorder::InputState inputState;
-			inputState.mInputFlags[0] = controlsIn.getInputPad(0);
-			inputState.mInputFlags[1] = controlsIn.getInputPad(1);
+			GameRecorder::InputData inputData;
+			inputData.mInputs[0] = controlsIn.getInputPad(0);
+			inputData.mInputs[1] = controlsIn.getInputPad(1);
 
 			if ((mGameRecorder.getRangeEnd() % 180) == 0)	// Keyframe every 3 seconds
 			{
@@ -425,12 +427,12 @@ bool Simulation::generateFrame()
 				SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
 				serializer.saveState(data);
 
-				mGameRecorder.addKeyFrame(inputState.mInputFlags, data);
+				mGameRecorder.addKeyFrame(inputData, data);
 				mGameRecorder.discardOldFrames(1800);
 			}
 			else
 			{
-				mGameRecorder.addFrame(inputState.mInputFlags);
+				mGameRecorder.addFrame(inputData);
 			}
 		}
 
@@ -441,6 +443,37 @@ bool Simulation::generateFrame()
 	//  -> In this case, the outer loop should break
 	//  -> Same if code execution is not possible any more
 	return (completedCurrentFrame && mCodeExec.isCodeExecutionPossible());
+}
+
+bool Simulation::jumpToFrame(uint32 frameNumber)
+{
+	// TODO: This requires all game recording frames to be keyframes - or we need a mechanism to rewind back to the last keyframe, and then forward to the requestes frame
+
+	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
+	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
+
+	// TODO: Support game recorder playback mode here as well
+	if (isGameRecorderRecording)
+	{
+		GameRecorder::PlaybackResult result;
+		if (!mGameRecorder.getFrameData(frameNumber, result))
+			return false;
+
+		SaveStateSerializer::StateType stateType;
+		SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
+
+		const bool success = serializer.loadState(*result.mData, &stateType);
+		if (success)
+		{
+			mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
+			mFrameNumber = frameNumber;
+			mCurrentTargetFrame = (float)frameNumber;
+			mGameRecorder.jumpToPosition(frameNumber + 1, true);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 float Simulation::getSimulationFrequency() const

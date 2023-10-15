@@ -424,6 +424,13 @@ void GameView::keyboard(const rmx::KeyboardEvent& ev)
 						mSimulation.setNextSingleStep(true, FTX::keyState(SDLK_LSHIFT) || FTX::keyState(SDLK_LCTRL));
 						break;
 					}
+
+					case SDLK_KP_9:
+					{
+						setGameSpeed(0.0f);
+						mSimulation.jumpToFrame(mSimulation.getFrameNumber() - 1);
+						break;
+					}
 				}
 			}
 		}

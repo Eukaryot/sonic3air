@@ -14,16 +14,21 @@
 class GameRecorder
 {
 public:
-	struct PlaybackResult
+	struct InputData
 	{
 		uint16 mInputs[2] = { 0, 0 };
-		std::vector<uint8>* mData = nullptr;
+	};
+
+	struct PlaybackResult
+	{
+		const InputData* mInput = nullptr;
+		const std::vector<uint8>* mData = nullptr;
 	};
 
 public:
 	void clear();
-	void addFrame(const uint16* inputs);
-	void addKeyFrame(const uint16* inputs, const std::vector<uint8>& data);
+	void addFrame(const InputData& input);
+	void addKeyFrame(const InputData& input, const std::vector<uint8>& data);
 
 	void discardOldFrames(uint32 minKeepNumber = 3600);
 
@@ -33,6 +38,9 @@ public:
 
 	inline bool isPlaying() const	{ return mPlaybackPosition >= 0; }
 	bool updatePlayback(PlaybackResult& outResult);
+
+	bool getFrameData(uint32 frameNumber, PlaybackResult& outResult);
+	void jumpToPosition(uint32 nextFrameNumber, bool discardNewerFrames);
 
 	bool loadRecording(const std::wstring& filename);
 	bool saveRecording(const std::wstring& filename) const;
@@ -46,19 +54,19 @@ private:
 		{
 			INPUT_ONLY,
 			KEYFRAME,
-			DIFFERENTIAL	// Difference to last keyframe; not implemented yet
+			//DIFFERENTIAL	// Difference to last keyframe; not implemented yet
 		};
 
 		Type mType = Type::INPUT_ONLY;
 		uint32 mNumber = 0;
-		uint16 mInputs[2] = { 0 };
+		InputData mInput;
 		bool mCompressedData = false;
 		std::vector<uint8> mData;
 	};
 
 private:
 	Frame& createFrameInternal(Frame::Type frameType, uint32 number);
-	Frame& addFrameInternal(const uint16* inputs, Frame::Type frameType);
+	Frame& addFrameInternal(const InputData& input, Frame::Type frameType);
 
 private:
 	std::vector<Frame*> mFrames;

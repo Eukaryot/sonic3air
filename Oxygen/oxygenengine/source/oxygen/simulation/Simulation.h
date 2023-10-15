@@ -49,6 +49,7 @@ public:
 
 	void update(float timePassed);
 	bool generateFrame();
+	bool jumpToFrame(uint32 frameNumber);
 
 	float getSimulationFrequency() const;
 	void setSimulationFrequencyOverride(float frequency) { mSimulationFrequencyOverride = frequency; }
