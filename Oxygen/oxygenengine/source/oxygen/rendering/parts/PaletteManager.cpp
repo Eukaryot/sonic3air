@@ -11,14 +11,6 @@
 #include "oxygen/simulation/EmulatorInterface.h"
 
 
-namespace
-{
-	inline uint16 unpackColor()
-	{
-	}
-}
-
-
 uint16 Palette::getEntryPacked(uint16 colorIndex, bool allowExtendedPacked) const
 {
 	RMX_CHECK(colorIndex < Palette::NUM_COLORS, "Invalid color index " << colorIndex, return 0);
