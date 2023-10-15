@@ -29,10 +29,11 @@ public:
 
 public:
 	void clear();
-	void addFrame(const InputData& input);
-	void addKeyFrame(const InputData& input, const std::vector<uint8>& data);
+	void addFrame(uint32 frameNumber, const InputData& input);
+	void addKeyFrame(uint32 frameNumber, const InputData& input, const std::vector<uint8>& data);
 
 	void discardOldFrames(uint32 minKeepNumber = 3600);
+	void discardFramesAfter(uint32 frameNumber);	// Discards from from the frame number on, including that frame itself
 
 	inline uint32 getCurrentNumberOfFrames() const  { return mRangeEnd - mRangeStart; }
 	inline uint32 getRangeStart() const	 { return mRangeStart; }
@@ -42,7 +43,6 @@ public:
 	bool updatePlayback(uint32 frameNumber, PlaybackResult& outResult);
 
 	bool getFrameData(uint32 frameNumber, PlaybackResult& outResult);
-	void jumpToPosition(uint32 nextFrameNumber, bool discardNewerFrames);
 
 	bool loadRecording(const std::wstring& filename);
 	bool saveRecording(const std::wstring& filename) const;
@@ -68,7 +68,8 @@ private:
 
 private:
 	Frame& createFrameInternal(Frame::Type frameType, uint32 number);
-	Frame& addFrameInternal(const InputData& input, Frame::Type frameType);
+	void destroyFrame(Frame& frame);
+	Frame& addFrameInternal(uint32 frameNumber, const InputData& input, Frame::Type frameType);
 
 private:
 	std::vector<Frame*> mFrames;

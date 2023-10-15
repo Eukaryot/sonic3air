@@ -22,15 +22,17 @@ void GameRecorder::clear()
 	mRangeEnd = 0;
 }
 
-void GameRecorder::addFrame(const InputData& input)
+void GameRecorder::addFrame(uint32 frameNumber, const InputData& input)
 {
-	RMX_CHECK(!mFrames.empty(), "First frame must be a keyframe", );
-	addFrameInternal(input, Frame::Type::INPUT_ONLY);
+	RMX_ASSERT(!mFrames.empty(), "First frame must be a keyframe");
+	RMX_ASSERT(frameNumber >= mRangeStart && frameNumber <= mRangeEnd, "Invalid frame number");
+	addFrameInternal(frameNumber, input, Frame::Type::INPUT_ONLY);
 }
 
-void GameRecorder::addKeyFrame(const InputData& input, const std::vector<uint8>& data)
+void GameRecorder::addKeyFrame(uint32 frameNumber, const InputData& input, const std::vector<uint8>& data)
 {
-	Frame& frame = addFrameInternal(input, Frame::Type::KEYFRAME);
+	RMX_ASSERT(frameNumber >= mRangeStart && frameNumber <= mRangeEnd, "Invalid frame number");
+	Frame& frame = addFrameInternal(frameNumber, input, Frame::Type::KEYFRAME);
 	frame.mType = Frame::Type::KEYFRAME;
 	frame.mData = data;
 }
@@ -71,6 +73,15 @@ void GameRecorder::discardOldFrames(uint32 minKeepNumber)
 	}
 }
 
+void GameRecorder::discardFramesAfter(uint32 frameNumber)
+{
+	if (frameNumber < mRangeStart || frameNumber + 1 >= mRangeEnd)
+		return;
+
+	mRangeEnd = frameNumber + 1;
+	mFrames.erase(mFrames.begin() + (mRangeEnd - mRangeStart), mFrames.end());
+}
+
 bool GameRecorder::updatePlayback(uint32 frameNumber, PlaybackResult& outResult)
 {
 	if (!hasFrameNumber(frameNumber))
@@ -106,19 +117,6 @@ bool GameRecorder::getFrameData(uint32 frameNumber, PlaybackResult& outResult)
 		outResult.mData = &frame.mData;
 	}
 	return true;
-}
-
-void GameRecorder::jumpToPosition(uint32 nextFrameNumber, bool discardNewerFrames)
-{
-	if (nextFrameNumber < mRangeStart || nextFrameNumber > mRangeEnd)
-		return;
-
-	if (discardNewerFrames)
-	{
-		const uint32 numFramesToKeep = nextFrameNumber - mRangeStart;
-		mFrames.erase(mFrames.begin() + numFramesToKeep, mFrames.end());
-		mRangeEnd = nextFrameNumber;
-	}
 }
 
 bool GameRecorder::loadRecording(const std::wstring& filename)
@@ -281,12 +279,28 @@ GameRecorder::Frame& GameRecorder::createFrameInternal(Frame::Type frameType, ui
 	return frame;
 }
 
-GameRecorder::Frame& GameRecorder::addFrameInternal(const InputData& input, Frame::Type frameType)
+void GameRecorder::destroyFrame(Frame& frame)
 {
-	Frame& frame = createFrameInternal(frameType, mRangeEnd);
+	if (frame.mType == Frame::Type::INPUT_ONLY)
+		mFrameNoDataPool.returnObject(frame);
+	else
+		mFrameWithDataPool.returnObject(frame);
+}
+
+GameRecorder::Frame& GameRecorder::addFrameInternal(uint32 frameNumber, const InputData& input, Frame::Type frameType)
+{
+	Frame& frame = createFrameInternal(frameType, frameNumber);
 	frame.mInput = input;
 
-	mFrames.push_back(&frame);
-	++mRangeEnd;
+	if (frameNumber == mRangeEnd)
+	{
+		mFrames.push_back(&frame);
+		++mRangeEnd;
+	}
+	else
+	{
+		destroyFrame(*mFrames[frameNumber - mRangeStart]);
+		mFrames[frameNumber - mRangeStart] = &frame;
+	}
 	return frame;
 }

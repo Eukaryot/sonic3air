@@ -27,7 +27,7 @@
 
 namespace
 {
-	void recordKeyFrame(CodeExec& codeExec, GameRecorder& gameRecorder, const GameRecorder::InputData& inputData)
+	void recordKeyFrame(uint32 frameNumber, CodeExec& codeExec, GameRecorder& gameRecorder, const GameRecorder::InputData& inputData)
 	{
 		static std::vector<uint8> data;
 		data.reserve(0x128000);
@@ -36,7 +36,7 @@ namespace
 		SaveStateSerializer serializer(codeExec, RenderParts::instance());
 		serializer.saveState(data);
 
-		gameRecorder.addKeyFrame(inputData, data);
+		gameRecorder.addKeyFrame(frameNumber, inputData, data);
 	}
 }
 
@@ -359,7 +359,7 @@ bool Simulation::generateFrame()
 		// Game recorder: Save initial frame
 		if (isGameRecorderRecording && mGameRecorder.getRangeEnd() == 0)
 		{
-			recordKeyFrame(mCodeExec, mGameRecorder, GameRecorder::InputData());
+			recordKeyFrame(0, mCodeExec, mGameRecorder, GameRecorder::InputData());
 		}
 
 		// Game recorder playback
@@ -385,6 +385,18 @@ bool Simulation::generateFrame()
 					}
 				}
 
+				ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
+				ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+				inputWasInjected = true;
+			}
+		}
+		else
+		{
+			// If game recorder has input data for the frame transition, then use that
+			//  -> This is particularly relevant for rewinds, namely for the small fast forwards from the previous keyframe
+			GameRecorder::PlaybackResult result;
+			if (mGameRecorder.getFrameData(mFrameNumber + 1, result))
+			{
 				ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
 				ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
 				inputWasInjected = true;
@@ -443,27 +455,30 @@ bool Simulation::generateFrame()
 			}
 		}
 
-		++mFrameNumber;
-
 		// Update game recording
 		if (isGameRecorderRecording)
 		{
-			GameRecorder::InputData inputData;
-			inputData.mInputs[0] = controlsIn.getInputPad(0);
-			inputData.mInputs[1] = controlsIn.getInputPad(1);
+			if (!mGameRecorder.hasFrameNumber(mFrameNumber + 1))
+			{
+				GameRecorder::InputData inputData;
+				inputData.mInputs[0] = controlsIn.getInputPad(0);
+				inputData.mInputs[1] = controlsIn.getInputPad(1);
 
-			// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
-			const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
-			if ((mGameRecorder.getRangeEnd() % keyframeFrequency) == 0)	
-			{
-				recordKeyFrame(mCodeExec, mGameRecorder, inputData);
-				mGameRecorder.discardOldFrames(1800);
-			}
-			else
-			{
-				mGameRecorder.addFrame(inputData);
+				// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
+				const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
+				if ((mGameRecorder.getRangeEnd() % keyframeFrequency) == 0)	
+				{
+					recordKeyFrame(mFrameNumber + 1, mCodeExec, mGameRecorder, inputData);
+					mGameRecorder.discardOldFrames(1800);
+				}
+				else
+				{
+					mGameRecorder.addFrame(mFrameNumber + 1, inputData);
+				}
 			}
 		}
+
+		++mFrameNumber;
 	}
 
 	// Return false if frame got interrupted
@@ -472,7 +487,7 @@ bool Simulation::generateFrame()
 	return (completedCurrentFrame && mCodeExec.isCodeExecutionPossible());
 }
 
-bool Simulation::jumpToFrame(uint32 frameNumber)
+bool Simulation::jumpToFrame(uint32 frameNumber, bool clearRecordingAfterwards)
 {
 	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
 	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
@@ -501,10 +516,19 @@ bool Simulation::jumpToFrame(uint32 frameNumber)
 		const bool success = serializer.loadState(*result.mData, &stateType);
 		if (success)
 		{
+			// Inject inputs for this frame, so that previous input will be set correctly in the next frame
+			ControlsIn::instance().injectInput(0, result.mInput->mInputs[0]);
+			ControlsIn::instance().injectInput(1, result.mInput->mInputs[1]);
+
 			mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
 			mFrameNumber = keyframeNumber;
 			mCurrentTargetFrame = (float)frameNumber;
-			mGameRecorder.jumpToPosition(frameNumber + 1, true);
+
+			if (clearRecordingAfterwards)
+			{
+				// Discard later frames to disable the logic that uses their recorded inputs instead of player input
+				mGameRecorder.discardFramesAfter(frameNumber);
+			}
 			return true;
 		}
 	}
