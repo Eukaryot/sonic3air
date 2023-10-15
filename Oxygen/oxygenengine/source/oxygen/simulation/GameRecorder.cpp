@@ -18,7 +18,6 @@ void GameRecorder::clear()
 	mFrames.clear();
 	mFrameNoDataPool.clear();
 	mFrameWithDataPool.clear();
-	mPlaybackPosition = -1;
 	mRangeStart = 0;
 	mRangeEnd = 0;
 }
@@ -72,39 +71,30 @@ void GameRecorder::discardOldFrames(uint32 minKeepNumber)
 	}
 }
 
-bool GameRecorder::updatePlayback(PlaybackResult& outResult)
+bool GameRecorder::updatePlayback(uint32 frameNumber, PlaybackResult& outResult)
 {
-	if (mPlaybackPosition == -1)
-	{
+	if (!hasFrameNumber(frameNumber))
 		return false;
-	}
-	else if (mPlaybackPosition < (int32)mRangeStart || mPlaybackPosition >= (int32)mRangeEnd)
-	{
-		mPlaybackPosition = -1;
-		return false;
-	}
 
-	Frame& frame = *mFrames[mPlaybackPosition - mRangeStart];
+	Frame& frame = *mFrames[frameNumber - mRangeStart];
 	outResult.mInput = &frame.mInput;
 
 	if (frame.mType == Frame::Type::KEYFRAME)
 	{
-		if (!mIgnoreKeys || mPlaybackPosition == mRangeStart)
+		if (!mIgnoreKeys || frameNumber == mRangeStart)
 		{
 			// TODO: Handle "frame.mCompressedData == true" (not needed for pure playback after loading from file)
 			outResult.mData = &frame.mData;
 		}
 	}
 
-	LogDisplay::instance().setModeDisplay("Game recorder playback at position: " + std::to_string(mPlaybackPosition));
-
-	++mPlaybackPosition;
+	LogDisplay::instance().setModeDisplay("Game recorder playback at frame: " + std::to_string(frameNumber));
 	return true;
 }
 
 bool GameRecorder::getFrameData(uint32 frameNumber, PlaybackResult& outResult)
 {
-	if (frameNumber < mRangeStart || frameNumber >= mRangeEnd)
+	if (!hasFrameNumber(frameNumber))
 		return false;
 
 	Frame& frame = *mFrames[frameNumber - mRangeStart];
@@ -114,18 +104,14 @@ bool GameRecorder::getFrameData(uint32 frameNumber, PlaybackResult& outResult)
 	{
 		// TODO: Handle "frame.mCompressedData == true" (not needed for pure playback after loading from file)
 		outResult.mData = &frame.mData;
-		return true;
 	}
-
-	return false;
+	return true;
 }
 
 void GameRecorder::jumpToPosition(uint32 nextFrameNumber, bool discardNewerFrames)
 {
 	if (nextFrameNumber < mRangeStart || nextFrameNumber > mRangeEnd)
 		return;
-
-	mPlaybackPosition = nextFrameNumber;
 
 	if (discardNewerFrames)
 	{
@@ -219,7 +205,6 @@ bool GameRecorder::loadRecording(const std::wstring& filename)
 		}
 	}
 
-	mPlaybackPosition = 0;
 	mRangeEnd = (uint32)mFrames.size();
 	return true;
 }

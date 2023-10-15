@@ -10,6 +10,8 @@
 
 #include <rmxbase.h>
 
+class CodeExec;
+
 
 class GameRecorder
 {
@@ -36,8 +38,8 @@ public:
 	inline uint32 getRangeStart() const	 { return mRangeStart; }
 	inline uint32 getRangeEnd() const	 { return mRangeEnd; }
 
-	inline bool isPlaying() const	{ return mPlaybackPosition >= 0; }
-	bool updatePlayback(PlaybackResult& outResult);
+	inline bool hasFrameNumber(uint32 frameNumber) const  { return frameNumber >= mRangeStart && frameNumber < mRangeEnd; }
+	bool updatePlayback(uint32 frameNumber, PlaybackResult& outResult);
 
 	bool getFrameData(uint32 frameNumber, PlaybackResult& outResult);
 	void jumpToPosition(uint32 nextFrameNumber, bool discardNewerFrames);
@@ -73,7 +75,6 @@ private:
 	RentableObjectPool<Frame> mFrameNoDataPool;
 	RentableObjectPool<Frame> mFrameWithDataPool;
 
-	int32 mPlaybackPosition = -1;	// Frame number of next frame to play; or -1 if no playback active
 	uint32 mRangeStart = 0;			// Frame number of first frame stored in mFrames
 	uint32 mRangeEnd = 0;			// Frame number of last frame stored in mFrames plus one (!)
 	bool mIgnoreKeys = false;

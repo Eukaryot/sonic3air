@@ -25,6 +25,22 @@
 #include "oxygen/simulation/analyse/ROMDataAnalyser.h"
 
 
+namespace
+{
+	void recordKeyFrame(CodeExec& codeExec, GameRecorder& gameRecorder, const GameRecorder::InputData& inputData)
+	{
+		static std::vector<uint8> data;
+		data.reserve(0x128000);
+		data.clear();
+
+		SaveStateSerializer serializer(codeExec, RenderParts::instance());
+		serializer.saveState(data);
+
+		gameRecorder.addKeyFrame(inputData, data);
+	}
+}
+
+
 Simulation::Simulation() :
 	mCodeExec(*new CodeExec()),
 	mGameRecorder(*new GameRecorder()),
@@ -87,7 +103,7 @@ bool Simulation::startup()
 			RMX_LOG_INFO("Playback of 'gamerec.bin'");
 		}
 
-		if (mGameRecorder.isPlaying())
+		if (mGameRecorder.hasFrameNumber(mFrameNumber))
 		{
 			mGameRecorder.setIgnoreKeys(config.mGameRecorder.mPlaybackIgnoreKeys);
 			mCurrentTargetFrame = (double)config.mGameRecorder.mPlaybackStartFrame;
@@ -161,6 +177,9 @@ void Simulation::resetIntoGame(const std::vector<std::pair<std::string, std::str
 	mCurrentTargetFrame = 0.0;
 	mNextSingleStep = false;
 	mSingleStepContinue = false;
+
+	if (!Configuration::instance().mGameRecorder.mIsPlayback)
+		mGameRecorder.clear();
 }
 
 void Simulation::resetIntoGame(const std::string& entryFunctionName)
@@ -195,6 +214,13 @@ bool Simulation::loadState(const std::wstring& filename, bool showError)
 
 	mStateLoaded = filename;
 	mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
+
+	mFrameNumber = 0;
+	mCurrentTargetFrame = 0.0;
+	mNextSingleStep = false;
+	mSingleStepContinue = false;
+
+	mGameRecorder.clear();
 	return true;
 }
 
@@ -330,11 +356,17 @@ bool Simulation::generateFrame()
 		// Tell video that we begin a new frame
 		VideoOut::instance().preFrameUpdate();
 
+		// Game recorder: Save initial frame
+		if (isGameRecorderRecording && mGameRecorder.getRangeEnd() == 0)
+		{
+			recordKeyFrame(mCodeExec, mGameRecorder, GameRecorder::InputData());
+		}
+
 		// Game recorder playback
 		if (isGameRecorderPlayback)
 		{
 			GameRecorder::PlaybackResult result;
-			if (mGameRecorder.updatePlayback(result))
+			if (mGameRecorder.updatePlayback(mFrameNumber, result))
 			{
 				if (nullptr != result.mData)
 				{
@@ -411,6 +443,8 @@ bool Simulation::generateFrame()
 			}
 		}
 
+		++mFrameNumber;
+
 		// Update game recording
 		if (isGameRecorderRecording)
 		{
@@ -418,16 +452,11 @@ bool Simulation::generateFrame()
 			inputData.mInputs[0] = controlsIn.getInputPad(0);
 			inputData.mInputs[1] = controlsIn.getInputPad(1);
 
-			if ((mGameRecorder.getRangeEnd() % 180) == 0)	// Keyframe every 3 seconds
+			// Keyframe every 3 seconds - except when dev mode is active, because rewinding requires more frequent keyframes
+			const int keyframeFrequency = EngineMain::getDelegate().useDeveloperFeatures() ? 10 : 180;
+			if ((mGameRecorder.getRangeEnd() % keyframeFrequency) == 0)	
 			{
-				static std::vector<uint8> data;
-				data.reserve(0x128000);
-				data.clear();
-
-				SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
-				serializer.saveState(data);
-
-				mGameRecorder.addKeyFrame(inputData, data);
+				recordKeyFrame(mCodeExec, mGameRecorder, inputData);
 				mGameRecorder.discardOldFrames(1800);
 			}
 			else
@@ -435,8 +464,6 @@ bool Simulation::generateFrame()
 				mGameRecorder.addFrame(inputData);
 			}
 		}
-
-		++mFrameNumber;
 	}
 
 	// Return false if frame got interrupted
@@ -447,17 +474,26 @@ bool Simulation::generateFrame()
 
 bool Simulation::jumpToFrame(uint32 frameNumber)
 {
-	// TODO: This requires all game recording frames to be keyframes - or we need a mechanism to rewind back to the last keyframe, and then forward to the requestes frame
-
 	const bool isGameRecorderPlayback = Configuration::instance().mGameRecorder.mIsPlayback;
 	const bool isGameRecorderRecording = Configuration::instance().mGameRecorder.mIsRecording;
 
 	// TODO: Support game recorder playback mode here as well
 	if (isGameRecorderRecording)
 	{
+		// Go back until the most recent keyframe, in case the selected frame is not a keyframe itself
 		GameRecorder::PlaybackResult result;
-		if (!mGameRecorder.getFrameData(frameNumber, result))
+		uint32 keyframeNumber = frameNumber;
+		if (!mGameRecorder.getFrameData(keyframeNumber, result))
 			return false;
+
+		while (nullptr == result.mData)
+		{
+			if (keyframeNumber == 0)
+				return false;
+			--keyframeNumber;
+			if (!mGameRecorder.getFrameData(keyframeNumber, result))
+				return false;
+		}
 
 		SaveStateSerializer::StateType stateType;
 		SaveStateSerializer serializer(mCodeExec, RenderParts::instance());
@@ -466,7 +502,7 @@ bool Simulation::jumpToFrame(uint32 frameNumber)
 		if (success)
 		{
 			mCodeExec.reinitRuntime(nullptr, (stateType == SaveStateSerializer::StateType::GENSX) ? CodeExec::CallStackInitPolicy::READ_FROM_ASM : CodeExec::CallStackInitPolicy::USE_EXISTING);
-			mFrameNumber = frameNumber;
+			mFrameNumber = keyframeNumber;
 			mCurrentTargetFrame = (float)frameNumber;
 			mGameRecorder.jumpToPosition(frameNumber + 1, true);
 			return true;
